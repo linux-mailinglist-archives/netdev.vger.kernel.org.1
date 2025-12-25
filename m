@@ -1,161 +1,157 @@
-Return-Path: <netdev+bounces-246046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62EEACDD730
-	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 08:34:47 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D78ABCDD872
+	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 09:47:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CE7EF301A1FE
-	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 07:33:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EE16A301472D
+	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 08:47:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AADEB2F999A;
-	Thu, 25 Dec 2025 07:33:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C7D314B70;
+	Thu, 25 Dec 2025 08:47:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gsFJiT9+";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gSCsE2df"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rSQfAtpu"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0EBF2F6930
-	for <netdev@vger.kernel.org>; Thu, 25 Dec 2025 07:33:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6900314A83;
+	Thu, 25 Dec 2025 08:47:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766648028; cv=none; b=CjPPoRZTX/gEYE9P7JTv9jd3xcZ8GZj7KcUU1hqcPMWXZe9cxnhnHxy+pEXD9FhnXSHbuDDpukZO0easNz0h3Lu91XnI4LumyWbCAIkOAupQ+OOOBQFYOKfTduV9ZRpnXQXvmT74/MlyT5CTYATPmjs/+LEJKrPd7xGZs3666z4=
+	t=1766652472; cv=none; b=K3NXHeyp1NAIvAgv7IEwBd4StYUFQPoSmtGS+xD8LzLwZ8YKO7T8iqtaA/res1ppLYDeJdiyyUanZteOkNo9SzNIstG7m0s1fhwBS9cZFdL8uvwYqamIr2LkhTRwe7sCW2QfiR3xuwFC8InzuxLdHjvbHz2qB/0pTttLB2kv2UQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766648028; c=relaxed/simple;
-	bh=+iyjwmBV87ktkSqNEIqB4ESqTnXUiOMV88fHerMRrvM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JW56YXzhzK9rmsBmwIc1Wl6zDzGnc1EZWMTXMMe4nclhx5NIZe/2NzdJE3nkVKFisUCspJdkXyqAe9e64lW6NT/r8Q+DxwgSJoqV6vfsE2FddWguSGMdbxdytfLLEAtIdRjXLUO8Ee/puSkvtBbu9XFtOt/K30rxo1V9SMlei7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gsFJiT9+; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gSCsE2df; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766648024;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/0m7nvOOvh/L5z00dJTlH990Zltybvr44yIpTdc8ZCI=;
-	b=gsFJiT9+1e0vHTCKUAVGUoRD13YnAk3RcyVRwulmy5xqCT3EvB+osoLDuX/uaYVRdIXscH
-	qFOaah88X2sMPUbd34pp0OwN3agx4mrmultP6SmsJUZYDaT8cNCY595oFI4kJJHr/qOIh4
-	gNHN99UxZ5awNMc+hASQqU9I2Ui47+c=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-593-z7zGSo7LMC2g_sP5i27tRQ-1; Thu, 25 Dec 2025 02:33:42 -0500
-X-MC-Unique: z7zGSo7LMC2g_sP5i27tRQ-1
-X-Mimecast-MFC-AGG-ID: z7zGSo7LMC2g_sP5i27tRQ_1766648021
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-34e70e2e363so13848145a91.1
-        for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 23:33:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1766648021; x=1767252821; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/0m7nvOOvh/L5z00dJTlH990Zltybvr44yIpTdc8ZCI=;
-        b=gSCsE2df1YPFNh3vhMEMnO2ZSm2F2w5G3zYWQSca7AbN31/FwKjU25cnGDQO9W2NRz
-         xGCBgb5hbmcwQcC78WgkceIKvxmv+8NpODWRokZifT9tMEcFHdC0Ah4SG0nGRsskYB0x
-         g9fD457JcyFf6xvqf0RedBeIB/qlQbKWIXEQW8sGsLG0Z5kUjrkDKgXEH0VUC7TT3uos
-         vbQJ/B63rwNwf/9VGZoXdPMpIQMvE/kh4TwJRDhYUy4UsFB9a7OLDVCFcRiYvTn4hlBm
-         jIlcBn41btNKIVcMvoItxOE1cezhDneobYs3ui3r2fiEkrSDi7sG3YkgScX00HRXoerp
-         OMxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766648021; x=1767252821;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=/0m7nvOOvh/L5z00dJTlH990Zltybvr44yIpTdc8ZCI=;
-        b=NVR+XxIBlUJSUhCd8W3WuHwQ+xWY+Q7/nOuB6hlUnapNKdxozMozo0G0vI8PqDBSf2
-         F9ZMI/m5RXNcfpZEohkpfL1GrMf5aMW0th6XHtufh8z6PklOedJL4Wa3RLV9vQ0xlSNu
-         izKvPfr38tR662PLZp9K1ahN/mE/c24UYSx6kEzTzqgTLqeGPCj5IzUmRAQWmOkh4Ejz
-         jyqbf//xTCDrELD3DL2DWeqb13xsSguy/kGCchcAEAXqun6mwmxNY1wBV5H7DtEYO6Bs
-         U6Cyhi/5uhA1jOvbj4gYxGYwsi86l7SGY9Uklny88a6hLXUdZs7i0EuKWfCSmHavb5lo
-         kLsw==
-X-Forwarded-Encrypted: i=1; AJvYcCViW5LfkS8RPMuQB+kZ/kKVy0SQXUn3IK3xIU79+S0PCTKNfDiOgt50LDh9eWj1tzFy3tQgJVQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqMpAu7eVCXjMWRVA/yIuHW+qKsuTkBgZjQtfBHGVevP8mUfsm
-	+0lPD/xqqoyxuXXUAX8xg1aq6lw7Grnlp+XYWQ3XBkWI45pL/tCh1Xyz5RxbGywUoML40GUnFNJ
-	NqzzTZa+RlX418QFu17I+vqXnx+PsEoZBhrW53JTmyqimqfVqK5FUtgAJtTe5iSmyRGpgLnq/mn
-	aT903eNuAY6PRxdoDpjclP9BisiPHm48oe
-X-Gm-Gg: AY/fxX6leizdMPM95nUoIYs7XuTriiwsxco6p2Cs6VRacKF5VGveC2jTB5WzP04WM3T
-	A7pOmshCJDObSAU8Vfu0aXfQE4wqtD3bo9vSLYWPFL9/5CA+/rDAMjtE8ODc4V17a6Or6jCZwJT
-	crRTdr4wlV4nott0M35jYZbwLcNWWSvPvuLATlzbBN70WmjN67IgQzEWglS2Ba6YMkpss=
-X-Received: by 2002:a17:90b:5804:b0:343:c3d1:8bb1 with SMTP id 98e67ed59e1d1-34e921d0d76mr15800483a91.28.1766648021164;
-        Wed, 24 Dec 2025 23:33:41 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFcyl5vR43OkL/hDfKBDmGKAR37cMOZ8Ka1DFFBdJlFQKrUA0x40DEd0hamphs8/qa8tc2gRbIfcXUfzzGSd0U=
-X-Received: by 2002:a17:90b:5804:b0:343:c3d1:8bb1 with SMTP id
- 98e67ed59e1d1-34e921d0d76mr15800458a91.28.1766648020802; Wed, 24 Dec 2025
- 23:33:40 -0800 (PST)
+	s=arc-20240116; t=1766652472; c=relaxed/simple;
+	bh=tGzoiwIypyZ1iLWL1dGZAiulpww0GETNLT0hTiOL9vU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UZzeGi6q+nj8y7x1iEgJScub8HC0APJ8wOZB8jaZznlyaDsHLEoO/2MSkNOLndJSJ2cc7lm3kawrl4JW837WTMriJckbqCJ0K12vLngK9rFDfFSCD4TTHxXGxirO/UVaOs7usuVUZuuKkV+RDwP874a8NB0NXLfbFnO3Wn/ELxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rSQfAtpu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C230FC4CEF1;
+	Thu, 25 Dec 2025 08:47:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766652472;
+	bh=tGzoiwIypyZ1iLWL1dGZAiulpww0GETNLT0hTiOL9vU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=rSQfAtpu1Tvje/pcoez2UitanssUVwM5Cw1SU9kJa9Dw+XhVX2F+U9GlYoKtGJVbX
+	 yg+sXK4KfXtEVLU+r7yvHaiA8uPZaF4WDYdaALbqFC8+I2x4MDvryas+cJma11Ktgl
+	 bD/8n2VD+10tm2Qlrlbp4Uz5mFXnFttIOL5jxnpnZbqe/hojpQ/ctBkpk4ebOK7p53
+	 Jk0AxOaAoVTP73KCHaPr876LRnUVqNn4CHB1Bz/f24N2otmhGdG08GivmZk4jTOXzA
+	 kjH/eT9zXi3CGjKZ95ockcCO0V8gAcyf/rnmeM89AJXIW3sf8z5SUCO7F2KFrsQEdq
+	 HKbnq3pWlXfqg==
+Message-ID: <d210552f-c8bf-4084-9317-b743075d9946@kernel.org>
+Date: Thu, 25 Dec 2025 09:47:34 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251223152533.24364-1-minhquangbui99@gmail.com>
- <20251223152533.24364-2-minhquangbui99@gmail.com> <CACGkMEvXkPiTGxZ6nuC72-VGdLHVXzrGa9bAF=TcP8nqPjeZ_w@mail.gmail.com>
- <1766540234.3618076-1-xuanzhuo@linux.alibaba.com> <20251223204555-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20251223204555-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 25 Dec 2025 15:33:29 +0800
-X-Gm-Features: AQt7F2oZsDAy5UzUdBbuKS6sbUPRqmYTSaTWpVnvwoETb7rBpSLDuU-0lomm-PA
-Message-ID: <CACGkMEs7_-=-8w=7gW8R_EhzfWOwuDoj4p-iCPQ7areOa9uaUw@mail.gmail.com>
-Subject: Re: [PATCH net 1/3] virtio-net: make refill work a per receive queue work
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	Stanislav Fomichev <sdf@fomichev.me>, virtualization@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
-	Bui Quang Minh <minhquangbui99@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 01/15] include: dt-bindings: add LAN969x clock bindings
+To: Robert Marko <robert.marko@sartura.hr>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
+ claudiu.beznea@tuxon.dev, herbert@gondor.apana.org.au, davem@davemloft.net,
+ vkoul@kernel.org, andi.shyti@kernel.org, lee@kernel.org,
+ andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, linusw@kernel.org, Steen.Hegelund@microchip.com,
+ daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
+ olivia@selenic.com, radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com,
+ gregkh@linuxfoundation.org, jirislaby@kernel.org, broonie@kernel.org,
+ mturquette@baylibre.com, sboyd@kernel.org, lars.povlsen@microchip.com,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
+ netdev@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-clk@vger.kernel.org, luka.perkov@sartura.hr
+References: <20251223201921.1332786-1-robert.marko@sartura.hr>
+ <20251223201921.1332786-2-robert.marko@sartura.hr>
+ <20251224-berserk-mackerel-of-snow-4cae54@quoll>
+ <CA+HBbNGym6Q9b166n-P=h_JssOHm0yfyL73JZ+G9P81muK=g4A@mail.gmail.com>
+ <78bf252c-fd5e-4a36-b1a3-ca8ed26fde7a@kernel.org>
+ <CA+HBbNG+ZVD6grGDp32Ninx7H1AyEbGvP0nwc0zUv94tOV8hYg@mail.gmail.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <CA+HBbNG+ZVD6grGDp32Ninx7H1AyEbGvP0nwc0zUv94tOV8hYg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Dec 24, 2025 at 9:48=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com>=
- wrote:
->
-> On Wed, Dec 24, 2025 at 09:37:14AM +0800, Xuan Zhuo wrote:
-> >
-> > Hi Jason,
-> >
-> > I'm wondering why we even need this refill work. Why not simply let NAP=
-I retry
-> > the refill on its next run if the refill fails? That would seem much si=
-mpler.
-> > This refill work complicates maintenance and often introduces a lot of
-> > concurrency issues and races.
-> >
-> > Thanks.
->
-> refill work can refill from GFP_KERNEL, napi only from ATOMIC.
->
-> And if GFP_ATOMIC failed, aggressively retrying might not be a great idea=
-.
+On 24/12/2025 15:01, Robert Marko wrote:
+> On Wed, Dec 24, 2025 at 2:05 PM Krzysztof Kozlowski <krzk@kernel.org> wrote:
+>>
+>> On 24/12/2025 11:30, Robert Marko wrote:
+>>> On Wed, Dec 24, 2025 at 11:21 AM Krzysztof Kozlowski <krzk@kernel.org> wrote:
+>>>>
+>>>> On Tue, Dec 23, 2025 at 09:16:12PM +0100, Robert Marko wrote:
+>>>>> Add the required LAN969x clock bindings.
+>>>>
+>>>> I do not see clock bindings actually here. Where is the actual binding?
+>>>> Commit msg does not help me at all to understand why you are doing this
+>>>> without actual required bindings.
+>>>
+>>> I guess it is a bit confusing, there is no schema here, these are the
+>>> clock indexes that
+>>> reside in dt-bindings and are used by the SoC DTSI.
+>>
+>> I understand as not used by drivers? Then no ABI and there is no point
+>> in putting them into bindings.
+> 
+> It is not included by the driver directly, but it requires these exact
+> indexes to be passed
+> so its effectively ABI.
 
-Btw, I see some drivers are doing things as Xuan said. E.g
-mlx5e_napi_poll() did:
+How it requires the exact index? In what way? I do not see anything in
+the gck driver using/relying on these values. Nothing. Please point me
+to the line which directly uses these values.... or how many times I
+will need to write this is not ABI?
 
-busy |=3D INDIRECT_CALL_2(rq->post_wqes,
-                                mlx5e_post_rx_mpwqes,
-                                mlx5e_post_rx_wqes,
 
-...
 
-if (busy) {
-         if (likely(mlx5e_channel_no_affinity_change(c))) {
-                work_done =3D budget;
-                goto out;
-...
-
->
-> Not saying refill work is a great hack, but that is the reason for it.
-> --
-> MST
->
-
-Thanks
-
+Best regards,
+Krzysztof
 
