@@ -1,133 +1,116 @@
-Return-Path: <netdev+bounces-246052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7E72CDDB8D
-	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 12:55:05 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C61EDCDDCD6
+	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 14:01:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DC0E03016704
-	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 11:55:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 83E99301787D
+	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 13:01:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 323A531AAAE;
-	Thu, 25 Dec 2025 11:55:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F84A325715;
+	Thu, 25 Dec 2025 12:52:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UYrSDPsI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PAqkD1jL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com [209.85.128.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5985E2F5A32
-	for <netdev@vger.kernel.org>; Thu, 25 Dec 2025 11:55:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD71324B2E
+	for <netdev@vger.kernel.org>; Thu, 25 Dec 2025 12:52:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766663703; cv=none; b=M11MTHeoSKXDckvr0URgpwCHpdKYdIW2vwL17vGD+IFSRrTn6WwCGaSZsdCqlzD/HgNZuKC+K+s7GNU1COdtoKhAWeYOgvUG21YDJ5JEaig9wyx7EXft5Jg+/qXNMQ4sH4XqwvdNJueaZdQzHasCRcmnSaga5wTWMpRA9KcHx+E=
+	t=1766667153; cv=none; b=rxxJk7Vufhxi3VBNELSvmEM+O7MniZtbmF5a40vXDZ4jEO93KUMOJbtjGT+pHTWSbGfZFYlf57eu6WKbSgRJZ/oH1wCkC837BnWdPHIxbIj37jhgmp6BejJ7G3FxxgNE6LUpKPMgKK9KYYqcf8PsJ33kO8KWlzMLD1ajPSO6Go4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766663703; c=relaxed/simple;
-	bh=26jbtWO1gui1Tg4M2KXsYQt7Cc6dhgtAwRsKPEv+q0o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=daLQpebBz0lUnwXgybmB2SWWERn1wTDtsMjUSesWQAg2hxdo6iu3J2jehrYUHUXDJJvUxll9TIX6ztu9J3Mi7qvLRPMHyxqWZYVrsRVoWSJcviqyMmhiwhzQgfths2R/n3AaiMEl7hveR/k+s4lDwud+sQKilDoEhYaImAw3iE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UYrSDPsI; arc=none smtp.client-ip=209.85.128.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f67.google.com with SMTP id 5b1f17b1804b1-477a2ab455fso64068455e9.3
-        for <netdev@vger.kernel.org>; Thu, 25 Dec 2025 03:55:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766663700; x=1767268500; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/1F0wCtq3gcx/BwLH3t1r9Kcjr/HuK/9IXAdL1YRX6k=;
-        b=UYrSDPsIOk2yH5GzSgPjaP0uWSExvmdA0BWj2gh4Ec06KVeGFvIwymW4GGRFKswncl
-         9/EbpMhn98fDPigNYKW8FDZYRuy2EIOpYYdtmhZFFvGgRRF1hyesMdfMquwlcslrNSZ4
-         Qan+knk8xzIeeXcXGtFzMcY4tmWjbc33spgn4h5ydzGrSgC+dwSgVMutqZitOlraSlio
-         7Faoi3XLXT+wPShtr2V84KGwE9RQglBAoJOWYkE4RIa8YzKj5+B4BH4x6tJ5IIj1ojk7
-         gl7vrx0jY5CnGJlyFypczi47dVdHioXWGFuTOdqmbvJy369mVRwOwMOyb1U+Jr9NUfHk
-         MydA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766663700; x=1767268500;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/1F0wCtq3gcx/BwLH3t1r9Kcjr/HuK/9IXAdL1YRX6k=;
-        b=Nj2H3082RTE+6CsiY4GreW1XUuFdAgQmM8dwuvkQ4BR/r40gbpqQELHgagI2cDtEIw
-         6qxBZFN4UlYA55I8me1dRWI5dnxK/RSaxaaBM60WfGaNqgRUlt/rottAbtq/vLRupOvm
-         Au58vng7y48Eu6Il0gp4sN4UYnnmRj8ICGtokwabY5sOgjQ8NnaNVZUeoWojYwtT1GuV
-         f9C5yAC/PYgO0hoJ+11LpU54dxK1zj1rORg+tW8rv1VBpeQOsosAN7ic5FzM/Y5n0Kis
-         dIIcG24926unynRDiWZxFJLNgAGg30ymoGTslgX52sN19ycy5TcmshZLov73FcLVh8yD
-         UCZw==
-X-Forwarded-Encrypted: i=1; AJvYcCXx147u7wPUu32aPsxVnkvL6brXa7SQP8OrrKNZQRgyKAj5xC3/v0+Puwzx44laOk1eMeR5bFk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwK0x1gwrGgvxRMveQ3kjMwjDIXusAuAeoU0aqSW2vTDnjk2HpU
-	C3eTOzpJnYtxCH4IWa4pqBmS/30vY+VHnFHWKOh34aJOdopcSTiE/Y9W
-X-Gm-Gg: AY/fxX5VrnRgDkl15e5g43tVfSOmhmLfX5qmpeanSFAUWqdccETLKTecnCGbq+2pYza
-	J0DINmKHz9Q24ZoxY3OSgv68pHocTE0n0HRVG8gF46rfTNv4/q3AuSO7CZIee4SE4RE5PWaejhe
-	r5wfzhO7tJ5jk0/Yoy7H8TUDQJJXlpJ4KeeymJ5w5GB5UVqf9CVO3cbkRdHBnBZGwkEeDOOYTZs
-	7hyN+MEzGrqR3ttsTdDdElvjokSmaS3gxAguI8yLfJS4rWF32l5tnFy6fA+emQUjnOgn1/P78sj
-	fyEjOYu8ctEispZJXlU0nw+Ul1De+b6IfbDXY6TtCP8mTjD3Wztg23V6MEj67vc3FzfJLjm0wUl
-	K28le3oPsWM8u2yEJxU1vs3LOqXbGLDYDQX2SAH+p0WOqP93r6fZn9D20zXNz3ty9J5+ga7k=
-X-Google-Smtp-Source: AGHT+IHugqS8KlGEruk1RYHem/ONDjxOPQtNAOoiwifvCDUQycnoRBKbn+/i8CRTpf+IcmvGYK5Qyg==
-X-Received: by 2002:a5d:588c:0:b0:42b:2a09:2e55 with SMTP id ffacd0b85a97d-4324e45d3famr19833686f8f.0.1766663699468;
-        Thu, 25 Dec 2025 03:54:59 -0800 (PST)
-Received: from ubuntu.. ([2400:adc5:19e:d700::3])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324eaa0908sm39022593f8f.31.2025.12.25.03.54.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Dec 2025 03:54:59 -0800 (PST)
-From: Ali Tariq <alitariq45892@gmail.com>
-To: Jes.Sorensen@gmail.com
-Cc: linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Ali Tariq <alitariq45892@gmail.com>
-Subject: [PATCH] rtl8xxxu: fix slab-out-of-bounds in rtl8xxxu_sta_add
-Date: Thu, 25 Dec 2025 11:54:29 +0000
-Message-ID: <20251225115430.13011-1-alitariq45892@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1766667153; c=relaxed/simple;
+	bh=WhdAQyAUH73sGEGEOZ2qkRT1ubsQeFhp0O18Q/juqZQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=soRgyhK40qi8zacrfWwDhGhD3pQGqcb4ybOZIHeCnp0Vqnnw9lHxZmrWrg1wry+D0zWDOpXMxEAdBkLj0MFxMaCZX8AUx0dEzWS1ctVw1rdHLtjAFMWLRW961h9ML+jisHASHQPJg/CO9kpfx81hpBdnokJPU7qnYzpR6we6Zlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PAqkD1jL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 541EEC4CEF1;
+	Thu, 25 Dec 2025 12:52:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766667153;
+	bh=WhdAQyAUH73sGEGEOZ2qkRT1ubsQeFhp0O18Q/juqZQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PAqkD1jLZcgWCigS3PUS0BqlJ4ywnZ7LjcGyiKhERqGJrdKyUMCJx0aTDS5cwJEJY
+	 GxOxYzOqgXbiHRZb6hXW+iaKFerrT1K46iw+H9J/QtrUUW1cfB6GigYSmPaynTsm90
+	 BUHYaV4YgTuxBgnVbjseggoHBpyIhGsYTu7FpsvGDvFt5QF3JG6P7rIgMQXngZqnNj
+	 o5rezGSueKZoZXQ42dWiZwVTsW0Fl1QWA4fodjfV7g040H6gslX4Ain4sfg/TPg27C
+	 PEEzE5EygfXyTdK4+2Oq9RsnHz0zgXTX/AkygyDByHqPw+ssiiLTSsk6Ay12Ufj+tl
+	 74P7W22UGlyQw==
+Date: Thu, 25 Dec 2025 14:52:29 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
+	Srijit Bose <srijit.bose@broadcom.com>,
+	Ray Jui <ray.jui@broadcom.com>
+Subject: Re: [PATCH net] bnxt_en: Fix potential data corruption with HW
+ GRO/LRO
+Message-ID: <20251225125229.GL11869@unreal>
+References: <20251224191116.3526999-1-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251224191116.3526999-1-michael.chan@broadcom.com>
 
-The driver does not set hw->sta_data_size, which causes mac80211 to
-allocate insufficient space for driver private station data in
-__sta_info_alloc(). When rtl8xxxu_sta_add() accesses members of
-struct rtl8xxxu_sta_info through sta->drv_priv, this results in a
-slab-out-of-bounds write.
+On Wed, Dec 24, 2025 at 11:11:16AM -0800, Michael Chan wrote:
+> From: Srijit Bose <srijit.bose@broadcom.com>
+> 
+> Fix the max number of bits passed to find_first_zero_bit() in
+> bnxt_alloc_agg_idx().  We were incorrectly passing the number of
+> long words.  find_first_zero_bit() may fail to find a zero bit and
+> cause a wrong ID to be used.  If the wrong ID is already in use, this
+> can cause data corruption.  Sometimes an error like this can also be
+> seen:
+> 
+> bnxt_en 0000:83:00.0 enp131s0np0: TPA end agg_buf 2 != expected agg_bufs 1
+> 
+> Fix it by passing the correct number of bits MAX_TPA_P5.  Add a sanity
+> BUG_ON() check if find_first_zero_bit() fails.  It should never happen.
 
-KASAN report on RISC-V (VisionFive 2) with RTL8192EU adapter:
+Things that should never occur are flagged with WARN_ON(), not BUG_ON().
+Using BUG_ON() would unnecessarily crash the system just because something
+unexpected happened in the networking driver.
 
-  BUG: KASAN: slab-out-of-bounds in rtl8xxxu_sta_add+0x31c/0x346
-  Write of size 8 at addr ffffffd6d3e9ae88 by task kworker/u16:0/12
+Thanks
 
-Set hw->sta_data_size to sizeof(struct rtl8xxxu_sta_info) during
-probe, similar to how hw->vif_data_size is configured. This ensures
-mac80211 allocates sufficient space for the driver's per-station
-private data.
-
-Tested on StarFive VisionFive 2 v1.2A board.
-
-Fixes: eef55f1545c9 ("wifi: rtl8xxxu: support multiple interfaces in {add,remove}_interface()")
-
-Cc: stable@vger.kernel.org
-
-Signed-off-by: Ali Tariq <alitariq45892@gmail.com>
----
- drivers/net/wireless/realtek/rtl8xxxu/core.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/wireless/realtek/rtl8xxxu/core.c b/drivers/net/wireless/realtek/rtl8xxxu/core.c
-index c06ad064f37c..f9a527f6a175 100644
---- a/drivers/net/wireless/realtek/rtl8xxxu/core.c
-+++ b/drivers/net/wireless/realtek/rtl8xxxu/core.c
-@@ -7826,6 +7826,7 @@ static int rtl8xxxu_probe(struct usb_interface *interface,
- 		goto err_set_intfdata;
- 
- 	hw->vif_data_size = sizeof(struct rtl8xxxu_vif);
-+	hw->sta_data_size = sizeof(struct rtl8xxxu_sta_info);
- 
- 	hw->wiphy->max_scan_ssids = 1;
- 	hw->wiphy->max_scan_ie_len = IEEE80211_MAX_DATA_LEN;
--- 
-2.43.0
-
+> 
+> Fixes: ec4d8e7cf024 ("bnxt_en: Add TPA ID mapping logic for 57500 chips.")
+> Reviewed-by: Ray Jui <ray.jui@broadcom.com>
+> Signed-off-by: Srijit Bose <srijit.bose@broadcom.com>
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index d17d0ea89c36..6704cbbc1b24 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -1482,9 +1482,10 @@ static u16 bnxt_alloc_agg_idx(struct bnxt_rx_ring_info *rxr, u16 agg_id)
+>  	struct bnxt_tpa_idx_map *map = rxr->rx_tpa_idx_map;
+>  	u16 idx = agg_id & MAX_TPA_P5_MASK;
+>  
+> -	if (test_bit(idx, map->agg_idx_bmap))
+> -		idx = find_first_zero_bit(map->agg_idx_bmap,
+> -					  BNXT_AGG_IDX_BMAP_SIZE);
+> +	if (test_bit(idx, map->agg_idx_bmap)) {
+> +		idx = find_first_zero_bit(map->agg_idx_bmap, MAX_TPA_P5);
+> +		BUG_ON(idx >= MAX_TPA_P5);
+> +	}
+>  	__set_bit(idx, map->agg_idx_bmap);
+>  	map->agg_id_tbl[agg_id] = idx;
+>  	return idx;
+> -- 
+> 2.51.0
+> 
+> 
 
