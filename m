@@ -1,145 +1,117 @@
-Return-Path: <netdev+bounces-246065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B192BCDDEE6
-	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 17:45:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFD4DCDE0B6
+	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 19:55:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7E5473009AB5
-	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 16:45:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 16B90300940B
+	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 18:55:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51B3921773F;
-	Thu, 25 Dec 2025 16:45:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC0CB266B72;
+	Thu, 25 Dec 2025 18:55:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="w2oWrB/L"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d5nmP5I5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718F926CE17;
-	Thu, 25 Dec 2025 16:45:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D02634CDD
+	for <netdev@vger.kernel.org>; Thu, 25 Dec 2025 18:55:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766681125; cv=none; b=mlceDiEoUS1rwkfzDm1sF6BwtZRBAaPaLM31Em0m/uOtnz/Ce2bJjAlAdFOucdibpA7QUXYLWDM59THgMWKsGKPKihQB90IDehhdEIiriONruqHTUDA0k0YXVFvaPW05KsArWKSyquN+7Pwf/1u3tWl58QrDisUW3S2KwCMTnIs=
+	t=1766688953; cv=none; b=VJUkzucxmKoZ5Mcj4eQw2L+Kk5TFePGGt972ZbZzb5qC9q0dNEvUb+XxUjBQX62U3kg7zE0zVWvvUMk4nbBrUROpZx1snMA/R78EwUPKt9Hn5VMhoF/TR9ugLed0fsSdakBDthB+N8oo1gnG9wqkJni2q3Ij/IjssnqlPPIvlsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766681125; c=relaxed/simple;
-	bh=F1jhIpkPigW3NGIX9mflaV75Z1dCaWVNIHmhw5WRobg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fNO4rVOchX2/kJG9HVXRfcQ1aQJATLlG4WGLVqd5lehC5Wsa6eF8kBUVxsSJhHSwBHqO4HGh3A8i+fon5yhjEhny5UvMVhVhfyZyOoSAYCaQfs9yWmWuAyjyCtbAZeGvNFSjkqj+lv1vxF+8Z7nKTzIJWh0iFMEARvjijAfNXRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=w2oWrB/L; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id B0F71C1BE9B;
-	Thu, 25 Dec 2025 16:44:54 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id D4ABC60742;
-	Thu, 25 Dec 2025 16:45:19 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id CE071103C8CAF;
-	Thu, 25 Dec 2025 17:45:12 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1766681118; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=y+IbK0Z2/OU5lKK1OsobvgQQxvg8i2YYJKuwcQL/IaE=;
-	b=w2oWrB/Lvj0ilqa74OxdNWZZ5v5bZKDMsOwNdTw98nCTYRmHJf0e8HPP4xrul/ajIIWaG6
-	t+8YBXYcFixu06CqgdbC5v32jcQub6bcSngIGegihqteqFa3sT2OygBAntd7puzJ5JuOLc
-	yrAN1lGgPUzv5ggcWybFYL0ATjFVbfwCFzSN99Xyolep1YR7P1d+HA4V2jYmfT5EpNkjGj
-	taMJ9+3ELee1EwOn0NwVvTxts78Sk4we6hcqZom9KxJwUndXFo9dk4NPmJ/VIt4ktwNOtg
-	Jix8U3vz8F7vK0JiOUBb9DweiouM32UX42UK5WVXYkIP4EzjlXnlyHNZTEZLSg==
-Date: Thu, 25 Dec 2025 17:45:12 +0100
-From: Alexandre Belloni <alexandre.belloni@bootlin.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Robert Marko <robert.marko@sartura.hr>, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org,
-	nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
-	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
-	andi.shyti@kernel.org, lee@kernel.org, andrew+netdev@lunn.ch,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	linusw@kernel.org, Steen.Hegelund@microchip.com,
-	daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
-	olivia@selenic.com, radu_nicolae.pirea@upb.ro,
-	richard.genoud@bootlin.com, gregkh@linuxfoundation.org,
-	jirislaby@kernel.org, broonie@kernel.org, mturquette@baylibre.com,
-	sboyd@kernel.org, lars.povlsen@microchip.com,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
-	netdev@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
-	linux-usb@vger.kernel.org, linux-clk@vger.kernel.org,
-	luka.perkov@sartura.hr
-Subject: Re: [PATCH v3 01/15] include: dt-bindings: add LAN969x clock bindings
-Message-ID: <20251225164512525907d8@mail.local>
-References: <20251223201921.1332786-1-robert.marko@sartura.hr>
- <20251223201921.1332786-2-robert.marko@sartura.hr>
- <20251224-berserk-mackerel-of-snow-4cae54@quoll>
- <CA+HBbNGym6Q9b166n-P=h_JssOHm0yfyL73JZ+G9P81muK=g4A@mail.gmail.com>
- <78bf252c-fd5e-4a36-b1a3-ca8ed26fde7a@kernel.org>
- <CA+HBbNG+ZVD6grGDp32Ninx7H1AyEbGvP0nwc0zUv94tOV8hYg@mail.gmail.com>
- <d210552f-c8bf-4084-9317-b743075d9946@kernel.org>
- <2025122516245554f59e2e@mail.local>
+	s=arc-20240116; t=1766688953; c=relaxed/simple;
+	bh=Wphvw0z1Ex7aZGjyRHayCfQWSM1WYoBXehAxery+yYg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nSXhAstDFbsHyAFJUvS+8mFmEmD+2gQKnXIrlTg4CVR70HgrBZiwYi84bjqihcsm7SFo6JcbuEqAV8uQSFoSNdiLQmBNXoQGg/dALNsxwxR4AAexyfYZoppJV40zYeIbpHqezF31JbXwLgGMx/6CWb5DWHIelQnqEHchU0HmTNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d5nmP5I5; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-595819064cdso10871889e87.0
+        for <netdev@vger.kernel.org>; Thu, 25 Dec 2025 10:55:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766688950; x=1767293750; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EHqbsSuY3l0hoFQxIvjFiLAZ1GUEsVxDZU1QG/baXzY=;
+        b=d5nmP5I5v3Xw9hzBzb9gHct2IWUt+kS2T9JKutPCdSEV/yssVEnZ8AuUaJJRmm9wFG
+         9Qi/DYzRZ69V+3SBT2Gv1rhXgqn97Vne1+PTPPBftwtN6nZinJN8/aC0x74XyooMwDdk
+         GxYYl9S/rFvCPK7JZgbJ49w2ja9hczhIMok0eaQfCFQwDd7q5U14iMQXsgEhUVLkIAT9
+         ln1yce5sXvSVfP3IKgJDoexkbqErS6FKqt2EY6IeWlN5GzcqxQ8vMdwvovkTdHNtlCEG
+         saYCfzqFaw0WmVVLq1c4Sinaq5lhxegiLIspw01+5aN2pYSWSaXx2t77WyMdFlRfuR6I
+         ikcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766688950; x=1767293750;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EHqbsSuY3l0hoFQxIvjFiLAZ1GUEsVxDZU1QG/baXzY=;
+        b=v9lywhpz4O8pqVdw39uT9CGV8Tb99Ho8hH989HxzDWucR2O7Q2919OKWD8H0y3WOik
+         3Llxw/DsIrZfQCJrBi8sKlA1rhlU8bvg+DyDftPAW1pEN+/HC87d/jxp/syN1kl0qpLX
+         SQS/7cscmaIhBmD/9ljZrFHI6+8m+zomWZYJybXMYyuc2HZg9n+WvjJEL/HGJ5b4qSkg
+         aj+RMvcyoiyq6n4Lf1ODv2L8O9ceywEfj25jGtIRxzZuslK2EHgwxC+dEfgYfuLXqEiF
+         K93bgA6pZ9+nvt89zzo/qTtKKoKR9slSq5wQGXUfQvH3T1PRTEktVTLOPHxDMu/SxEjK
+         SWvw==
+X-Gm-Message-State: AOJu0YxkNxmj3RQ28rNcPIko+8TQtrlkDuJMEod+QUKs5yI3mjMEhTJt
+	DZJtqPxA7eQ9zGjVF5ajpS2GgJtY9Z6gjThA04UBp5mIKdidQMRN1MVtQYRAEUs6WDY=
+X-Gm-Gg: AY/fxX7JlClhDSbo8SjZpu/7lHItXva+RLMSY978NhFNnZM7AXbGu+DM4Joz2Ko/8hg
+	OiLTyKoWfHFohnap/7MoaKoUVNtbS2GA+ZBMqQddjj6EW2fyxaM9iM2sx7Q5YwuloB+tBAI0HxU
+	6F/6L7Zpr1Q7cAjtQefnMryzQgKCytfmnSWU999Ks/5xV2Zkt5DO+IshdhBuPCCaavjG80ozdBv
+	Voe4ZEn7NgGlTkNp2OJn5UdUllc/+USiScTr1Ol5t4p7Mn1giLG2z6qBG5KRCvlLi59cx91Ou1m
+	kLREl8/Jaur4vtJxqA1mEPzYlzaoock2xX+iZpfTnVYQPF+zw6ZhO7w6urIN1QTqmNIzXjrBUFp
+	ZBeKWZkDJQCkPpbiw9WDJCInj9oIx5cARVAmA+t1uMdlOF/lNlFcCCnw5y1xT4Q5siKosbhzVQs
+	YqbYaCZLzI2KWF9GY49p4Cy8kVsiIMXymW+XQKYIxS5Xqe0FShHaxvG5kUhZ42+s3D3VTayCvAm
+	nVH2g==
+X-Google-Smtp-Source: AGHT+IHkdwrkbM2HMh4GrBt+YDazmY/VbZ3BAKixHkK4Tj+V8jzvrHlZDCTvW5Bt4vDo2V07vUGdNg==
+X-Received: by 2002:a05:6512:1587:b0:598:f6a5:2d5c with SMTP id 2adb3069b0e04-59a126f6dd1mr8150982e87.26.1766688949509;
+        Thu, 25 Dec 2025 10:55:49 -0800 (PST)
+Received: from huawei-System-Product-Name.. ([159.138.216.22])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59a185ddd78sm6057675e87.39.2025.12.25.10.55.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Dec 2025 10:55:49 -0800 (PST)
+From: Dmitry Skorodumov <dskr99@gmail.com>
+X-Google-Original-From: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
+To: netdev@vger.kernel.org
+Cc: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
+Subject: [PATCH v3 net 0/2] ipvlan: addrs_lock made per port
+Date: Thu, 25 Dec 2025 21:55:32 +0300
+Message-ID: <20251225185543.1459044-1-skorodumov.dmitry@huawei.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2025122516245554f59e2e@mail.local>
-X-Last-TLS-Session-Version: TLSv1.3
 
-On 25/12/2025 17:25:07+0100, Alexandre Belloni wrote:
-> On 25/12/2025 09:47:34+0100, Krzysztof Kozlowski wrote:
-> > On 24/12/2025 15:01, Robert Marko wrote:
-> > > On Wed, Dec 24, 2025 at 2:05 PM Krzysztof Kozlowski <krzk@kernel.org> wrote:
-> > >>
-> > >> On 24/12/2025 11:30, Robert Marko wrote:
-> > >>> On Wed, Dec 24, 2025 at 11:21 AM Krzysztof Kozlowski <krzk@kernel.org> wrote:
-> > >>>>
-> > >>>> On Tue, Dec 23, 2025 at 09:16:12PM +0100, Robert Marko wrote:
-> > >>>>> Add the required LAN969x clock bindings.
-> > >>>>
-> > >>>> I do not see clock bindings actually here. Where is the actual binding?
-> > >>>> Commit msg does not help me at all to understand why you are doing this
-> > >>>> without actual required bindings.
-> > >>>
-> > >>> I guess it is a bit confusing, there is no schema here, these are the
-> > >>> clock indexes that
-> > >>> reside in dt-bindings and are used by the SoC DTSI.
-> > >>
-> > >> I understand as not used by drivers? Then no ABI and there is no point
-> > >> in putting them into bindings.
-> > > 
-> > > It is not included by the driver directly, but it requires these exact
-> > > indexes to be passed
-> > > so its effectively ABI.
-> > 
-> > How it requires the exact index? In what way? I do not see anything in
-> > the gck driver using/relying on these values. Nothing. Please point me
-> > to the line which directly uses these values.... or how many times I
-> > will need to write this is not ABI?
-> > 
-> 
-> The index here is the exact id that needs to be set in the PMC_PCR
-> register and so it is dictated by the hardware.
+First patch fixes a rather minor issues that sometimes
+ipvlan-addrs are modified without lock (because
+for IPv6 addr can be sometimes added without RTNL)
 
-This is the line you are looking for:
-https://elixir.bootlin.com/linux/v6.18.2/source/drivers/clk/at91/clk-generated.c#L44
+diff from v2:
+- Added a small self-test
+- added early return in ipvlan_find_addr()
+- the iterations over ipvlans in ipvlan_addr_busy()
+must be protected by RCU
+- Added simple self-test. I haven't invented anything
+more sophisticated that this.
 
-	regmap_write(gck->regmap, gck->layout->offset,
-		     (gck->id & gck->layout->pid_mask));
+Dmitry Skorodumov (2):
+  ipvlan: Make the addrs_lock be per port
+  selftests: net: simple selftest for ipvtap
 
-> 
-> 
-> -- 
-> Alexandre Belloni, co-owner and COO, Bootlin
-> Embedded Linux and Kernel engineering
-> https://bootlin.com
+ drivers/net/ipvlan/ipvlan.h                |   2 +-
+ drivers/net/ipvlan/ipvlan_core.c           |  16 +-
+ drivers/net/ipvlan/ipvlan_main.c           |  49 +++---
+ tools/testing/selftests/net/Makefile       |   1 +
+ tools/testing/selftests/net/config         |   2 +
+ tools/testing/selftests/net/ipvtap_test.sh | 167 +++++++++++++++++++++
+ 6 files changed, 207 insertions(+), 30 deletions(-)
+ create mode 100755 tools/testing/selftests/net/ipvtap_test.sh
 
 -- 
-Alexandre Belloni, co-owner and COO, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+2.43.0
+
 
