@@ -1,118 +1,242 @@
-Return-Path: <netdev+bounces-246075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09A2CCDE35D
-	for <lists+netdev@lfdr.de>; Fri, 26 Dec 2025 02:55:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C548CDE3B6
+	for <lists+netdev@lfdr.de>; Fri, 26 Dec 2025 03:25:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 63C783007ED4
-	for <lists+netdev@lfdr.de>; Fri, 26 Dec 2025 01:55:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 966D43009834
+	for <lists+netdev@lfdr.de>; Fri, 26 Dec 2025 02:25:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21E571DF247;
-	Fri, 26 Dec 2025 01:55:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16B5B2E92BA;
+	Fri, 26 Dec 2025 02:25:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="EUSSsvP9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hOwfFZ71";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="D+T4u0/Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E576E3B28D;
-	Fri, 26 Dec 2025 01:55:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 585D22E8B8A
+	for <netdev@vger.kernel.org>; Fri, 26 Dec 2025 02:24:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766714144; cv=none; b=D9XfGaGslxWcW9CmvAq9bV0AT/fw5Wx4BHRaHqTR0UEnfSezsR6thyp5LVAZyGlhGIN+vlcy90AXqAJcQSKpK0nF3JrqCq8K/37AUx1d3PF/ikTPugtY/nOvcBK4HreUOQTK8o/VaQVALaZD/g17Xi+sJMa3tH+Kk6/10zpE5hY=
+	t=1766715902; cv=none; b=Rs5WAgfn4TQ6fclmJ6DWQUF3mOfMkJYHE7X0YgkPbDTzc6WhY7jHwTyL1ZAOe2ysImR+OcK1JsYDojKcNZ56d5bWV2xmqckFwmWroNVMP4T3prJCsAFsnQMyPPHMAEEl2t9a+STT5r4WONIQwtfR5TyMs+GDMWGZPCvn6/TIqfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766714144; c=relaxed/simple;
-	bh=lKUDsZEB6P4Jr599npIY4/DwlX0b3o4KcVduo8EtJ4M=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=CAL3s52GHtXztld4ruB9YkIjZPym/W5tVQVRCPLNzXBqslriIhvo5Y0CqNpbnPZ+x3JFFHUFXinccSba3Rw+DCJXt0unFRiIa9P/Gz1iOS7+JEgRfYQs0VejFn4yJbeW6ZCftPcJPjZ+u8RSg56Rl/PS0EgXUIMYeq0E0G3V2+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=EUSSsvP9; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 5BQ1tc6jB2697011, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
-	t=1766714138; bh=Xcr311D0Fwlm6t0GpVBPTHLELg3jWFeIwOlZbazR/NY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=EUSSsvP9noJXxIDb/MjkWoMP8ocA+h4JeO6djgNjGiRWinI90qsLiFscKD3ZYhFgZ
-	 pKhBfHFLw3o98z0iDvcyBfSY3DAqs3MymVZK/qlBGhfqzQOFlwhowZ/VWwIA9UOINd
-	 HpktyZ2TDUMrFlu2DnMb2BtX4xfcR6uJY0espah+G8SWLuYl24ordP6u9dx2MV+z59
-	 OiKifw5eczG1E3a1lrCa/T6MMvRaX81pWM9JDQbxS3oWzaXuaiR338wtmi6MKWLE+Y
-	 44gK1i0t0lJYdQSXIYuP04Roh0cC4LWiXt9GnvwH5opmQpkExQqy+LFGMEpoNjOBTO
-	 KZG+YWI5LwWQQ==
-Received: from mail.realtek.com (rtkexhmbs03.realtek.com.tw[10.21.1.53])
-	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 5BQ1tc6jB2697011
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 26 Dec 2025 09:55:38 +0800
-Received: from RTKEXHMBS01.realtek.com.tw (172.21.6.40) by
- RTKEXHMBS03.realtek.com.tw (10.21.1.53) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Fri, 26 Dec 2025 09:55:38 +0800
-Received: from RTKEXHMBS06.realtek.com.tw (10.21.1.56) by
- RTKEXHMBS01.realtek.com.tw (172.21.6.40) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Fri, 26 Dec 2025 09:55:38 +0800
-Received: from RTKEXHMBS06.realtek.com.tw ([fe80::4cbd:6c6c:b92b:3913]) by
- RTKEXHMBS06.realtek.com.tw ([fe80::4cbd:6c6c:b92b:3913%10]) with mapi id
- 15.02.1748.010; Fri, 26 Dec 2025 09:55:38 +0800
-From: Ping-Ke Shih <pkshih@realtek.com>
-To: Ali Tariq <alitariq45892@gmail.com>,
-        "Jes.Sorensen@gmail.com"
-	<Jes.Sorensen@gmail.com>
-CC: "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: RE: [PATCH] rtl8xxxu: fix slab-out-of-bounds in rtl8xxxu_sta_add
-Thread-Topic: [PATCH] rtl8xxxu: fix slab-out-of-bounds in rtl8xxxu_sta_add
-Thread-Index: AQHcdZVkivwbOu3+UEmR84fOAq6vqbUzKaSA
-Date: Fri, 26 Dec 2025 01:55:38 +0000
-Message-ID: <678a9c63a185486d89efe46e66d71315@realtek.com>
-References: <20251225115430.13011-1-alitariq45892@gmail.com>
-In-Reply-To: <20251225115430.13011-1-alitariq45892@gmail.com>
-Accept-Language: en-US, zh-TW
-Content-Language: zh-TW
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1766715902; c=relaxed/simple;
+	bh=vBsV97FFWt6taOOfI5IvjUETKhYJ9bzwqpworgVKu8o=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=DD9WMvCMjIqJz+7MTdgag3chUkE14pOyAvLv3xjwXduV1US0onc9sILQGnFUpmjlMzYLz/oe/DQoVuEHgSohyxp0tU3lCanUgKU2m7o4/VpKLRAU+g/WIPCwg3gjIZOBJtrVCUrL8MJaAUWagzAsdX4ziAs+kfQbAN82q+z0HL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hOwfFZ71; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=D+T4u0/Q; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1766715899;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0Qsz5WPFD/uExCJQBnyZrl3TgkdgAhutxKnz59++5sE=;
+	b=hOwfFZ710VPjketZu6BcT4FTzJihP8HWqg/bEK12ffUbnuOtlDn7F61S+drIcBvfayJQiO
+	uPy0yhHcM91k1GV2F+M763QrXGRwYmf+LWEV70nvqdRGZ8sqHgZDdM9/DyyMUzRO0B+5+j
+	Ulw5E/AE8OgX604RaBBQKKgGs5fV6ec=
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
+ [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-131-JU1QaeQnPZivXODoM1-u0Q-1; Thu, 25 Dec 2025 21:24:57 -0500
+X-MC-Unique: JU1QaeQnPZivXODoM1-u0Q-1
+X-Mimecast-MFC-AGG-ID: JU1QaeQnPZivXODoM1-u0Q_1766715897
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-b6ce1b57b9cso6850263a12.1
+        for <netdev@vger.kernel.org>; Thu, 25 Dec 2025 18:24:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1766715897; x=1767320697; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=0Qsz5WPFD/uExCJQBnyZrl3TgkdgAhutxKnz59++5sE=;
+        b=D+T4u0/QjBdxWPDhpxoAygtibZkXthUyHqYlfsOr8ZRLzEMMs9MCv+FeMoHM+koWXG
+         ojVEXXGiuWq5LFvgXXlpTu2xdnXBmqaSfXbhvgeqkn+q3BFbIMQKpU9WxeJ3aDilfjc2
+         8dix5/fTrgpX87HKuTOrhvexEXbAx9xSQ8kI/x3aLjOjm/zjcMeMJcazOmQ7/5qVQLqY
+         09mU0TQkTLVKEEytMSkvhYQueHM2iK7jGI/OK0basFrDm7fWwFQ+nq+pDf1nP+yoLZOG
+         OJlz9mYNkBIGrBqdVPHMTNeE6IPLm30zv6LV7Pp3N1W68waxdELK/fuKVbm5LrQoNlPv
+         BqIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766715897; x=1767320697;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0Qsz5WPFD/uExCJQBnyZrl3TgkdgAhutxKnz59++5sE=;
+        b=faLq0cCqykSKTLAvMfag3/tB9c6FKwQpmG3vF/EC9sahdsTNVVkcjBwrJdlwB9KLpG
+         LbAc7h54G1QFksvcWrSCm79gW/uDZV1vsRjSe4WWInwi2u1obaYwcFRx7lkxiDYDtX47
+         z7AxCRLUp6cp4/6HiKLL6gqfpuJQ+kMWHs3qm6tbI+dtT1k/2T8mk5bMiQjIUDFTGgiL
+         7W1Ifvq3s9Nv5Fh5c67l+t8vaCsU8/swPNjgZBTRKvg8S3ORRcwq3040PS5fXlHNu1v7
+         wg7oW6CENwqy36CcNdRbmUiiHKJDDtQbwvz0SjbJdL6LFrEZa1VR87IzcTw4p4MBCLe/
+         GS/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUQe7BXrV2KybkprGXGT0icTvXwEcBRNYm60ncC87hxh1rHocXrdiKHRhdA8+rufCz+WR2/pwE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3LWRdBZZ55kIPH5g4A2kkFXwuMsAPJo+vcBREN69TwbtaqIAk
+	ZtaMPIyRl53DZGp1AxntMAQNMWvwGqAluVepCvMXX4xsTxHSagJueTbheUspzDvsNx0FX0ecjlj
+	swc7yGzHoAOn6REOIomJprDwhTdVXNdoEG2vTvUPBQgXDXfxNOnZm2AYhsQ==
+X-Gm-Gg: AY/fxX6p7dC4rCIN0XLyJjsqnTPz/uhusM12kaUCYMCGabRFtI+RTs6Vr8/TyKwov2N
+	x4FEz3vaw2sEZiGYAI9BPGgA7Y6SOfonf78QePEfupTgyOBbEMKIWt0BSdPemdwG6JIqBslxVdj
+	46o+JYQfh9uAPyXekAlg2B1U/Jod3QmdW/fzN3eYvs25ceKW8wn4NHEg8RXabNGs6OwqJjkm2u6
+	Aug69NBPLtG6fJGJLQJhIK9iG1k2G2voQEjASys07vTXZXmgI59BSztmSCgZttDscJGrBJVTBEF
+	vWZbvL6O4Bgcd4IiN9FuLY1pnOqRdy5EnBvJeuQw5zM/Nrn2a9Tgdv5KMF690B4svn5U7sCI66U
+	gBj9ZvH9oagdPtsu1a02Cul6yfSY47BARNh6SPcaEhrJz9o7iW88Lduxa
+X-Received: by 2002:a05:7301:7d16:b0:2ae:526a:961d with SMTP id 5a478bee46e88-2b05ec8642fmr15215229eec.40.1766715896411;
+        Thu, 25 Dec 2025 18:24:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGXdA8ClkjU6K261gUhCEsY/UDJEEfrrLSdJplFZD7gmyleR6jxqLs3c/WeMtHejh420lmUqA==
+X-Received: by 2002:a05:7301:7d16:b0:2ae:526a:961d with SMTP id 5a478bee46e88-2b05ec8642fmr15215216eec.40.1766715895871;
+        Thu, 25 Dec 2025 18:24:55 -0800 (PST)
+Received: from ?IPV6:2601:600:947f:f020:85dc:d2b2:c5ee:e3c4? ([2601:600:947f:f020:85dc:d2b2:c5ee:e3c4])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b05ffad66fsm49761798eec.4.2025.12.25.18.24.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Dec 2025 18:24:55 -0800 (PST)
+From: Waiman Long <llong@redhat.com>
+X-Google-Original-From: Waiman Long <longman@redhat.com>
+Message-ID: <17aadc7e-7dd6-4335-a748-e66f0239df85@redhat.com>
+Date: Thu, 25 Dec 2025 21:24:41 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 14/33] cpuset: Update HK_TYPE_DOMAIN cpumask from cpuset
+To: Frederic Weisbecker <frederic@kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>
+Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Chen Ridong <chenridong@huawei.com>, Danilo Krummrich <dakr@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+ Lai Jiangshan <jiangshanlai@gmail.com>,
+ Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
+ <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+ Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
+ Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Vlastimil Babka <vbabka@suse.cz>, Will Deacon <will@kernel.org>,
+ cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-block@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20251224134520.33231-1-frederic@kernel.org>
+ <20251224134520.33231-15-frederic@kernel.org>
+Content-Language: en-US
+In-Reply-To: <20251224134520.33231-15-frederic@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Ali Tariq <alitariq45892@gmail.com> wrote:
-> The driver does not set hw->sta_data_size, which causes mac80211 to
-> allocate insufficient space for driver private station data in
-> __sta_info_alloc(). When rtl8xxxu_sta_add() accesses members of
-> struct rtl8xxxu_sta_info through sta->drv_priv, this results in a
-> slab-out-of-bounds write.
->=20
-> KASAN report on RISC-V (VisionFive 2) with RTL8192EU adapter:
->=20
->   BUG: KASAN: slab-out-of-bounds in rtl8xxxu_sta_add+0x31c/0x346
->   Write of size 8 at addr ffffffd6d3e9ae88 by task kworker/u16:0/12
->=20
-> Set hw->sta_data_size to sizeof(struct rtl8xxxu_sta_info) during
-> probe, similar to how hw->vif_data_size is configured. This ensures
-> mac80211 allocates sufficient space for the driver's per-station
-> private data.
->=20
-> Tested on StarFive VisionFive 2 v1.2A board.
->=20
-> Fixes: eef55f1545c9 ("wifi: rtl8xxxu: support multiple interfaces in {add=
-,remove}_interface()")
->=20
-> Cc: stable@vger.kernel.org
->=20
+On 12/24/25 8:45 AM, Frederic Weisbecker wrote:
+> Until now, HK_TYPE_DOMAIN used to only include boot defined isolated
+> CPUs passed through isolcpus= boot option. Users interested in also
+> knowing the runtime defined isolated CPUs through cpuset must use
+> different APIs: cpuset_cpu_is_isolated(), cpu_is_isolated(), etc...
+>
+> There are many drawbacks to that approach:
+>
+> 1) Most interested subsystems want to know about all isolated CPUs, not
+>    just those defined on boot time.
+>
+> 2) cpuset_cpu_is_isolated() / cpu_is_isolated() are not synchronized with
+>    concurrent cpuset changes.
+>
+> 3) Further cpuset modifications are not propagated to subsystems
+>
+> Solve 1) and 2) and centralize all isolated CPUs within the
+> HK_TYPE_DOMAIN housekeeping cpumask.
+>
+> Subsystems can rely on RCU to synchronize against concurrent changes.
+>
+> The propagation mentioned in 3) will be handled in further patches.
+>
+> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> ---
+>   include/linux/sched/isolation.h |  7 +++
+>   kernel/cgroup/cpuset.c          |  3 ++
+>   kernel/sched/isolation.c        | 76 ++++++++++++++++++++++++++++++---
+>   kernel/sched/sched.h            |  1 +
+>   4 files changed, 81 insertions(+), 6 deletions(-)
+>
+> diff --git a/include/linux/sched/isolation.h b/include/linux/sched/isolation.h
+> index 109a2149e21a..6842a1ba4d13 100644
+> --- a/include/linux/sched/isolation.h
+> +++ b/include/linux/sched/isolation.h
+> @@ -9,6 +9,11 @@
+>   enum hk_type {
+>   	/* Revert of boot-time isolcpus= argument */
+>   	HK_TYPE_DOMAIN_BOOT,
+> +	/*
+> +	 * Same as HK_TYPE_DOMAIN_BOOT but also includes the
+> +	 * revert of cpuset isolated partitions. As such it
+> +	 * is always a subset of HK_TYPE_DOMAIN_BOOT.
+> +	 */
+>   	HK_TYPE_DOMAIN,
+>   	/* Revert of boot-time isolcpus=managed_irq argument */
+>   	HK_TYPE_MANAGED_IRQ,
+> @@ -35,6 +40,7 @@ extern const struct cpumask *housekeeping_cpumask(enum hk_type type);
+>   extern bool housekeeping_enabled(enum hk_type type);
+>   extern void housekeeping_affine(struct task_struct *t, enum hk_type type);
+>   extern bool housekeeping_test_cpu(int cpu, enum hk_type type);
+> +extern int housekeeping_update(struct cpumask *isol_mask, enum hk_type type);
+>   extern void __init housekeeping_init(void);
+>   
+>   #else
+> @@ -62,6 +68,7 @@ static inline bool housekeeping_test_cpu(int cpu, enum hk_type type)
+>   	return true;
+>   }
+>   
+> +static inline int housekeeping_update(struct cpumask *isol_mask, enum hk_type type) { return 0; }
+>   static inline void housekeeping_init(void) { }
+>   #endif /* CONFIG_CPU_ISOLATION */
+>   
+> diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
+> index 5e2e3514c22e..e13e32491ebf 100644
+> --- a/kernel/cgroup/cpuset.c
+> +++ b/kernel/cgroup/cpuset.c
+> @@ -1490,6 +1490,9 @@ static void update_isolation_cpumasks(void)
+>   	ret = tmigr_isolated_exclude_cpumask(isolated_cpus);
+>   	WARN_ON_ONCE(ret < 0);
+>   
+> +	ret = housekeeping_update(isolated_cpus, HK_TYPE_DOMAIN);
+> +	WARN_ON_ONCE(ret < 0);
+> +
+>   	isolated_cpus_updating = false;
+>   }
+>   
+> diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
+> index 83be49ec2b06..a124f1119f2e 100644
+> --- a/kernel/sched/isolation.c
+> +++ b/kernel/sched/isolation.c
+> @@ -29,18 +29,48 @@ static struct housekeeping housekeeping;
+>   
+>   bool housekeeping_enabled(enum hk_type type)
+>   {
+> -	return !!(housekeeping.flags & BIT(type));
+> +	return !!(READ_ONCE(housekeeping.flags) & BIT(type));
+>   }
+>   EXPORT_SYMBOL_GPL(housekeeping_enabled);
+>   
+> +static bool housekeeping_dereference_check(enum hk_type type)
+> +{
+> +	if (IS_ENABLED(CONFIG_LOCKDEP) && type == HK_TYPE_DOMAIN) {
 
-No need empty lines after Fixes and Cc tags. I will remove them while getti=
-ng
-merged into rtw tree.
+To be more correct, we should use IS_ENABLED(CONFIG_PROVE_LOCKING) as 
+this is the real kconfig that enables most of the lockdep checking. 
+PROVE_LOCKING selects LOCKDEP but not vice versa. So for some weird 
+configs that set LOCKDEP but not PROVE_LOCKING, it can cause compilation 
+problem.
 
-> Signed-off-by: Ali Tariq <alitariq45892@gmail.com>
+Other than that, the rest looks good to me.
 
-Reviewed-by: Ping-Ke Shih <pkshih@realtek.com>
-
+Cheers,
+Longman
 
 
