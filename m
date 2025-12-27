@@ -1,119 +1,126 @@
-Return-Path: <netdev+bounces-246113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80B22CDF560
-	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 09:55:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87E3BCDF8CA
+	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 12:17:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EB8E23006AA6
-	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 08:55:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 108EB300DCA7
+	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 11:17:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3516D23505E;
-	Sat, 27 Dec 2025 08:55:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CFB5311C17;
+	Sat, 27 Dec 2025 11:17:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XKEkjg2p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mp7Vf87Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B950B21146C
-	for <netdev@vger.kernel.org>; Sat, 27 Dec 2025 08:55:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9CC92853E9;
+	Sat, 27 Dec 2025 11:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766825747; cv=none; b=KLVJkddtTbPFSHIAXNIHeyYyFNHW2z3Sy3vQT6mh3xaWA/a97kN3/ZLlRUUzaW5ZZKXCTiekWKvPHCU01hXIlhEzdit5BihSMeJDU15lnu5n3qqHehOmAzkk+24cTk5zUY7DhCpI6DKWltXOBHoNOKFPPaO5pJISBom3CKtWQp8=
+	t=1766834242; cv=none; b=uhe4DrJrk75m79+0UDM0BwCiS6ANvW8eGqYX61HQFEfOkNRvX2TeCyB52HECIZmkz9gpit9gLJBJZPpNBOm9V3HX24+XspYGkYfS8WhsqYG1ki22Y153sU81Fz3neAv+zZJS1aer2zUhlDQRjfymETOPyL6SLa1BDrPQ8tuDHWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766825747; c=relaxed/simple;
-	bh=7cfeEWuv8uK+fyIOJzcnge3KyxIGEGN/rqeXvKxcwQY=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Subject:Cc:To:
-	 References:In-Reply-To; b=XN8VyPXgnIxdd5E+nPJfNJogwhvMpPm/QuYxbMAKJw1Sz4v6ooeSlck4zz3xeSOUhK76+UX8VTN6pm6KYaP2xHtb8bbskBn/nXZzpAje0/DKlYSLBVQYBCE8fmId+SecPguajfZpjYqkBp90MArYyafEWwFtS+X47PSKdthYrkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XKEkjg2p; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-34c9edf63a7so8417360a91.1
-        for <netdev@vger.kernel.org>; Sat, 27 Dec 2025 00:55:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766825745; x=1767430545; darn=vger.kernel.org;
-        h=in-reply-to:references:to:cc:subject:from:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IMTRZi0Y5Cq2uagABxlNiFBOS1A/ftQM7so1PS5Zrb0=;
-        b=XKEkjg2pgaUS+n46C33EXXSsj17kG4J8UcDyt7wJglxXPW7l8Et2oCfdFX5RJjqjBM
-         qlhcKvGozTd/cXW8iMuGui1xvoNwAQgR4mQWdubEGJzgKuqkCQVVmcaAltoMZJewevbS
-         yuOxveiW91vL+NyAO2L8QFsLmtoVSEnke3nCZnsTP8wzg7uiFrkPTqLUJzulyY2cxIyT
-         17RvpwtUf6Zn3m7orwBwiXu6mx8LWDlt/1YPSAWmYli9vKv9v9ZWgzhmd13Of3y+IaO+
-         c6g3hrxf2M9mHARmBq5EE3mR0ZOiAgFJe1kaQgCPKj+v3Pue7WtCfuJqqouNcUxEAJut
-         g0OA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766825745; x=1767430545;
-        h=in-reply-to:references:to:cc:subject:from:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IMTRZi0Y5Cq2uagABxlNiFBOS1A/ftQM7so1PS5Zrb0=;
-        b=iYc/CRTM6ypPqJPjP41VBs+mjD2rX4w2sdXoD5mvK8HICXjuCz1oGpZCxmqo0lI5pK
-         nKOXxw8kc8mYbGWZetANRWU5KwlibFsjeymb/IMuPjFTRTb0HOzLKAzVCa4PlP+zYFZB
-         B7Nu7KOd0x0X4YciZ2xSIukrS+jva7zhzmbinNA4eiJKWPaa8a8ZDK4bbELvM1Zipp5C
-         +l0wVEFeYDzIerx6HsxW9vzzRdwtC69gfuK9/I1dMTcdkT2fb5fsFFX+3riSgyZPwcxe
-         7Ua3mNzOKZwXEgyJgyLx2Lct7udxivJlgcznliBvc5mL+TcSCDH0Xxk/plAxI6yGGakj
-         gNiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVKe9B9bRSkU+9CwJy9+0KnGaTkT5W1pnog9kxFgprEDEKAeBgux5EjKXZrpJ4NrY6LabDA154=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzcRiXWD9F3Sn7eu5iBYZBEfkcqeF1XF0R4936ZsPndkBDtu6UG
-	Y/ABGOR3k6KSX9qp3oR17hsJh0LsM59XCwaOJrJ73QQqcrbbYtPReQu7
-X-Gm-Gg: AY/fxX6TH+Ir6IpMaOaKc2zc8ATbhCsbujffdxiaddGJkJHcMWd0N8QjzOx3y72ladq
-	eNquidyqid0m9tVng9kMxeYnmFBFlDG+M0+xjloUcyaH/i9qT78oV6FQdkfSIyP/6ZOiyJCvqoy
-	tJb2qEWPK2NkCim8KZLb364gpsCfJVZD/ev1LhN4VnsCXBpIt6GN8yo73MgWyCSAPLh9zkNRfyH
-	GsgXAEybdXbNObocPhlZW8pgDz28NRCe0ucc636vAgUPW9uln8bB06aCTwbFWY++mjWEEfNNhTU
-	vVl9LocoKOkoAstetv2snR4DaSuyLErK2MzeKpQvSj/x9R+Kd+5jQCY3flC+ar5An6G+1MkLP0H
-	Fi7mud+CXPThHhajrgC0S7hREolGAD/rmOrz4eC4mVb4ThI3Vu7zBT62+G6mW1tsxnabzVnMuOj
-	L3c4RUgpDFOgMFkFs=
-X-Google-Smtp-Source: AGHT+IExxrbtPED9ni4GJa40wGb0R3hBItrv0Ks+I02DdqHnMckn6gYR3u8VGUXE6TLPlay0EBHTDg==
-X-Received: by 2002:a05:6300:210b:b0:34f:ec81:bc3a with SMTP id adf61e73a8af0-376a8bc2ef7mr25671076637.28.1766825744954;
-        Sat, 27 Dec 2025 00:55:44 -0800 (PST)
-Received: from localhost ([61.82.116.93])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34e70d4f7e2sm25192194a91.2.2025.12.27.00.55.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 27 Dec 2025 00:55:44 -0800 (PST)
+	s=arc-20240116; t=1766834242; c=relaxed/simple;
+	bh=mkTJBdGWaaGFXpk4ABan/EOXP8frmcAGWpzfe9DTQsY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RHdvuj2XjjAJUdzKsASVVjPnTmzXKv0m8dNl+CQdZxXSe1HLlFDbCXsKPV9eUur4dK/dm3kgTtrZHXIVqPBY4YsorIRmVKlu4yv2Nh+vm21pp69jPbjnRQ5XWJmIQCxnoGdp3RNTprAbmc/9KYc2Fx9On5/StfvYvCH++XGaa0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mp7Vf87Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F9FCC4CEF1;
+	Sat, 27 Dec 2025 11:17:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766834241;
+	bh=mkTJBdGWaaGFXpk4ABan/EOXP8frmcAGWpzfe9DTQsY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mp7Vf87QB6NclKUBLSZgG25HwjCXi0w1BFQg/Xi32LC2n/3/VELl6cCodVL+Uaohv
+	 knt2f4OAFECmBI2yR6QaJKc4Fu3a0RgdjeQelMCbEngpVtwWKTYTsHw2W1Iz+bxEWv
+	 0zWs04mKwiyvgUvPwIasj1QjjKsDJq89hdt7OjelzvGxzL+3ihvEu5fdHBabQtgXr8
+	 DllSXXTp5/+fVCOegZ18LBeyKqUAgJDvKyYQhRds9kFnFYu05Qmf5FSqSpvj2eGiJS
+	 UXpqSihw//fBPaMJNj+nca6ZTcB88RkYwMxJpkTmCUhvWbKSEP90A++xF9C0FO43Cv
+	 F68a/aRlgpAVQ==
+Date: Sat, 27 Dec 2025 12:17:18 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Alexandre Belloni <alexandre.belloni@bootlin.com>
+Cc: Robert Marko <robert.marko@sartura.hr>, robh@kernel.org, 
+	krzk+dt@kernel.org, conor+dt@kernel.org, nicolas.ferre@microchip.com, 
+	claudiu.beznea@tuxon.dev, herbert@gondor.apana.org.au, davem@davemloft.net, 
+	vkoul@kernel.org, andi.shyti@kernel.org, lee@kernel.org, andrew+netdev@lunn.ch, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, linusw@kernel.org, 
+	Steen.Hegelund@microchip.com, daniel.machon@microchip.com, UNGLinuxDriver@microchip.com, 
+	olivia@selenic.com, radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com, 
+	gregkh@linuxfoundation.org, jirislaby@kernel.org, broonie@kernel.org, 
+	mturquette@baylibre.com, sboyd@kernel.org, lars.povlsen@microchip.com, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-spi@vger.kernel.org, linux-serial@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-clk@vger.kernel.org, luka.perkov@sartura.hr
+Subject: Re: [PATCH v3 01/15] include: dt-bindings: add LAN969x clock bindings
+Message-ID: <20251227-splendid-striped-starfish-ece074@quoll>
+References: <20251223201921.1332786-1-robert.marko@sartura.hr>
+ <20251223201921.1332786-2-robert.marko@sartura.hr>
+ <20251224-berserk-mackerel-of-snow-4cae54@quoll>
+ <CA+HBbNGym6Q9b166n-P=h_JssOHm0yfyL73JZ+G9P81muK=g4A@mail.gmail.com>
+ <78bf252c-fd5e-4a36-b1a3-ca8ed26fde7a@kernel.org>
+ <CA+HBbNG+ZVD6grGDp32Ninx7H1AyEbGvP0nwc0zUv94tOV8hYg@mail.gmail.com>
+ <d210552f-c8bf-4084-9317-b743075d9946@kernel.org>
+ <2025122516245554f59e2e@mail.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Sat, 27 Dec 2025 17:55:40 +0900
-Message-Id: <DF8VGBZ8TBB7.3KB0PWZUJD428@gmail.com>
-From: "Yeounsu Moon" <yyyynoom@gmail.com>
-Subject: Re: [PATCH net] net: dlink: mask rx_coalesce/rx_timeout before
- writing RxDMAIntCtrl
-Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-To: "Andrew Lunn" <andrew@lunn.ch>, "Yeounsu Moon" <yyyynoom@gmail.com>
-X-Mailer: aerc 0.21.0
-References: <20251223001006.17285-1-yyyynoom@gmail.com>
- <ca3335ea-b9cd-4158-91a3-758cba9df804@lunn.ch>
-In-Reply-To: <ca3335ea-b9cd-4158-91a3-758cba9df804@lunn.ch>
+In-Reply-To: <2025122516245554f59e2e@mail.local>
 
-Hi Andrew,
+On Thu, Dec 25, 2025 at 05:24:55PM +0100, Alexandre Belloni wrote:
+> On 25/12/2025 09:47:34+0100, Krzysztof Kozlowski wrote:
+> > On 24/12/2025 15:01, Robert Marko wrote:
+> > > On Wed, Dec 24, 2025 at 2:05=E2=80=AFPM Krzysztof Kozlowski <krzk@ker=
+nel.org> wrote:
+> > >>
+> > >> On 24/12/2025 11:30, Robert Marko wrote:
+> > >>> On Wed, Dec 24, 2025 at 11:21=E2=80=AFAM Krzysztof Kozlowski <krzk@=
+kernel.org> wrote:
+> > >>>>
+> > >>>> On Tue, Dec 23, 2025 at 09:16:12PM +0100, Robert Marko wrote:
+> > >>>>> Add the required LAN969x clock bindings.
+> > >>>>
+> > >>>> I do not see clock bindings actually here. Where is the actual bin=
+ding?
+> > >>>> Commit msg does not help me at all to understand why you are doing=
+ this
+> > >>>> without actual required bindings.
+> > >>>
+> > >>> I guess it is a bit confusing, there is no schema here, these are t=
+he
+> > >>> clock indexes that
+> > >>> reside in dt-bindings and are used by the SoC DTSI.
+> > >>
+> > >> I understand as not used by drivers? Then no ABI and there is no poi=
+nt
+> > >> in putting them into bindings.
+> > >=20
+> > > It is not included by the driver directly, but it requires these exact
+> > > indexes to be passed
+> > > so its effectively ABI.
+> >=20
+> > How it requires the exact index? In what way? I do not see anything in
+> > the gck driver using/relying on these values. Nothing. Please point me
+> > to the line which directly uses these values.... or how many times I
+> > will need to write this is not ABI?
+> >=20
+>=20
+> The index here is the exact id that needs to be set in the PMC_PCR
+> register and so it is dictated by the hardware.
 
-Sorry for the late reply. I recently started a new job and have been
-busy.
+So not a binding between Linux and DTS.
 
-On Tue Dec 23, 2025 at 6:43 PM KST, Andrew Lunn wrote:
->
-> It would be better to do range checks in rio_probe1() and call
-> netdev_err() and return -EINVAL?
->
-> Anybody trying to use very large values then gets an error message
-> rather than it working, but not as expected.
->
-I was planning to add the range checks in rio_probe1() in the next merge
-window to keep this patch small, but I agree it's better to include them no=
-w.
-I'll send a v2 with the checks added.
+Best regards,
+Krzysztof
 
-Thanks for the review.
-
-    Yeounsu Moon
 
