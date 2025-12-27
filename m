@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-246124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FFE2CDF9D6
-	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 13:18:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15CB9CDFBAF
+	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 13:44:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D4D9F3000972
-	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 12:18:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6ED4D302F69D
+	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 12:42:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C105316188;
-	Sat, 27 Dec 2025 12:18:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E376931B137;
+	Sat, 27 Dec 2025 12:18:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="bqhCR2Ep"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="eBo2H9F7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACDA131618C
-	for <netdev@vger.kernel.org>; Sat, 27 Dec 2025 12:17:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4660F3191C2
+	for <netdev@vger.kernel.org>; Sat, 27 Dec 2025 12:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766837880; cv=none; b=Z9c1TkvhP1E0mDvk21NcidFWcYIyLVEnW2QjvpXgWhP/rAAnunqO0rYl60DdwtqF8MZcqWCU9LvMIbhVRKksP4ZDBV/m9Dj5a5B6hrIgjZwh4IKmybvG4S4lLpzzLLFwc7AFppSV4C4pPdEDLDG48d+yEnwSn2mq0h3hgLCcuvU=
+	t=1766837891; cv=none; b=fQsVV95C9ctIwh45oHHKip9ZLJtH1EamB/dWW8gCiLXN0Y8yk4TH6+ApMrO3m1kssqFJd4OpVzILknXgAI1G22rn7BoLqxfrOKf+MHJ03ZyrLN1uO+WZTjfM/G3R7zcuM3uttBduJqGI9WMMkYjZwfXKGrhxwQPlY1EcHcnM4A8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766837880; c=relaxed/simple;
-	bh=oiRJqd24xNJBRHp4bn2koH7CqQq/f2UmEpMOGnQzYhI=;
+	s=arc-20240116; t=1766837891; c=relaxed/simple;
+	bh=i+edMET6/ej5N2K5avM5O831EcMojt2VSHcuUrQdfTw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=lVuoyFcmvlWlsJXELiYe3txkmJrrw1Zo9V95FeP0d5+MkDDHbloa7D0anoESoZq+P7LtFMG/9lY6bGXeA60MQ71iFhYt+1ng6eMPElWwD9YvuRFsOdF45jSU731RJFALCfcdXfyA5K91EKRKN3ax3EL/FP61EijGtA1kCjXaAJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=bqhCR2Ep; arc=none smtp.client-ip=209.85.128.45
+	 In-Reply-To:To:Cc; b=nv6VqSl0n35BI+yiz9VyzDI5hfWxd5di35FNLi4t69Kb7qsScd53zcIT9RANlBx+wzzpv19sWPlBOEEF853V+Df7llSBQiHD2ciagCxb353ZGZzcWJB9GUtzsS4Ud1iiuV3UkkahgU39k9JPOVXWC1lfcXJAhPwf2GkhyHdZLMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=eBo2H9F7; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-477632d9326so48368035e9.1
-        for <netdev@vger.kernel.org>; Sat, 27 Dec 2025 04:17:54 -0800 (PST)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-47d3ffb0f44so13337335e9.3
+        for <netdev@vger.kernel.org>; Sat, 27 Dec 2025 04:18:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1766837872; x=1767442672; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1766837882; x=1767442682; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=8WVQ5l6OvuwNcTcqNwKXFrwDkeL8FFp17NQ/ZoKZRdE=;
-        b=bqhCR2EpXLgE9XhZI2hiZEPRB3n5r5OlzMOb9+L3gWNCQ0G+4Sw63quX08cvfNhUj4
-         7S5EUvA6p5KaP293DvxGfw+1LRUwCv9MqA4vdLqhwK3VPhFu0eGSoZS+m49Ty6DvcSGU
-         LFxHzrsOaUWacQfesOju5lG8NxWBnjrsC1s5Bm01xToejDk/uYBPO+OqNm9vpa12Ge6L
-         IfctQno8izT5lZAB7Ob/tkthX3WObdogL3Ib5eyXYyXilxeMRc8O6xQaAzhyxRSSQKfm
-         0WGFH+ZuJ0Jn3auPF7AmdegCgkbK7Ez/KbUBb86G7NnnsM4k9razjzp3Z9hXG3c3TMsQ
-         uHZQ==
+        bh=YPj481dav1h3nWeyVMYXYXTPRZgLS1US6KZdyNyRyzc=;
+        b=eBo2H9F7jsvmaK92/XVdbdEGM9Tdcx4wgE+kCCLtUhDw4tiFGEFwrffvmJg3Cjflr4
+         lLVjUhZChvFwikE0XJxcYjf0zBktHsHCPeQ1eRdVm52B1/xes6ShF/BI6rU3QvrL5sSM
+         7jUR3QpNP5VGu1rAaHCctimiqxfroEiKYvmlv99XtG3FfaXc2C8SLHlvl87kAxKq3Jva
+         ETdrsaBZZY0yjMUvbD+hJFiwLigqRz/RW3FlZQ8BcDTHnJ+LTxi77x5xGrYYwApC3/HC
+         qy10hdktZ51gFdtI6Ure5hOa6dcgq/XZ2kbj+ggfexvJq8+uWpi7mf1SOoyl/T+MexXY
+         2uVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766837872; x=1767442672;
+        d=1e100.net; s=20230601; t=1766837882; x=1767442682;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=8WVQ5l6OvuwNcTcqNwKXFrwDkeL8FFp17NQ/ZoKZRdE=;
-        b=pCOhrLjPEM1B4ZvkndxLrK2LVcgMUTQp3baKImL0EfdabMPpXWHiBZFL7QrvkO9Sra
-         yQZ4zPyGAiDJ5nqK8T81pv5Z/820FU1mFYwA2rphrG6PI2xOVDhPZkZ+rGqIlnOjGoHH
-         468qkS75Y3yB+1VuqMOrmweajXWgeM+sey9mEve7a9gMROakdCgFqzOHMdbrTNL1D7V4
-         5BevxGXvwXD4h3bj9igdz1TR9mHLoq723we1gdqPYgh//fTSe9xLlJ5LcZjScfwxFWL7
-         K9osZa2PT+t2DKbumuL/L+qd2uGQKOhpMQdBDIquomRscxFlZF+KSdIYpIqPM4+VEYWz
-         QObw==
-X-Forwarded-Encrypted: i=1; AJvYcCUD2crpYSjRpzzc7x8PRuvEkbKBbnWwPD7i4KYq8eIX5SCjNary5G7HKaf62P9Mh5Zd80JlJSo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzesFSziGOafrchVYWqX7vVJrwRUtgjxgRgj6tUiOjTZaAppR8c
-	oxUvxJ0+IDUEU3WBXJVOTTBXvmTo+BdXpFEy3mHEbw/syraD3J9fajncmSPTUkf2oIQ=
-X-Gm-Gg: AY/fxX67M/e27uRWEWMLnWDU5kkUTD7XF5RvFygdCPp6MARKKXniIN9kb1a8O+Boczw
-	SzSeE/xueCfqizsFR+NTgk4MrGwzCfadtG2NE7LzuC+WpJ9tIWyHplzYw9VSpdeI6IQ7IhAyaCO
-	vrWKZtMzmQNrUl5wThpC15nY9l3ihxi8Dcp1Z3nKPdBGmkNeLCm4fdg6+PcziHO8baVXgYYxSm9
-	GVFI9OaP/fCBCAteJLxuekFR7D7CtvkVTMohTZ3rwHcHhBIppZJkQIxe563vLeX8TFAh/UnUvwt
-	QWLb1tJHch1QS52JjiYs32kJItNZA1vSSJkbXMhg4QhCRooHxQhlc9AT3Eot0SbpVT/PlHi/UFm
-	PBzK3+Spx2DcQsCo82xl2QvVHWtegrwIZVIQCo1fgp4cyRJI18D/w/21tEAS6RgkIZ3HA6ogUgU
-	OkvkRvCSVe
-X-Google-Smtp-Source: AGHT+IF/XDCpzgWo6CWLRHeKJmnECzN+dRl41jhTKGOm6P2nA90X9/hReUsAzbYAQmyiLuP2DWyXTg==
-X-Received: by 2002:a05:600c:3111:b0:477:b642:9dc6 with SMTP id 5b1f17b1804b1-47d195aa79cmr275082695e9.34.1766837872067;
-        Sat, 27 Dec 2025 04:17:52 -0800 (PST)
+        bh=YPj481dav1h3nWeyVMYXYXTPRZgLS1US6KZdyNyRyzc=;
+        b=RqDlAX8Tt4xcmgaV/iiJvKqbFkJTkvqQg2SXheueYBtHoCIOUZwuObYjoK5+uFcx+4
+         dNAMpaIHHf3fRR2TPnaILXLFaiL1zLdkZ25AhrsI132QhS70N73pks/sgqxTpCP3dLyn
+         nHXlEfEbwix7P2lrcU/4nmzFDfc8lDmRxR1fXgmO8ct8i39eCFAnNFxVdszoD/TmN23W
+         M6BeYM7V3d75JLeWO/VBIohTLV/HSl7nCx5ZrMEMPa0S9tMWM9a/bxBv/7MhAfxASjLm
+         RnDcZT3BZF/riRnMJz4nGLAv9h4t98Vh6YBrfOofuDozQmNP8GqF89QPCX0akL+FHeH+
+         Tc7g==
+X-Forwarded-Encrypted: i=1; AJvYcCW7scecahAGtuQCb39uPRdaGLZbEAEdCASIaUw5QikPTIET578IloDdrlrNWKzCBak9dh6WA5A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxcIpHOPu8xlLdAgwDB2vhlLRBpl6TDV2RL0/IvUj7wmybVNk+
+	qy2Q8BUiGwlknf960i+7/D/C5xPOQ0ex0s3Hks9uyEY2r0wXtdt3CPR+AtcTAn0Pdm0=
+X-Gm-Gg: AY/fxX4JvVgOcPo1AkqXp+WzyxmtDmyuHo2OpKOugirk5YcSuvgk5+Yx/ZjQlTNYZAG
+	NADIyFxx2NJ9XkVzQ+4y3WfEDC8exIOEcCuh0u8ery1RJXszBhoeFtwpuN34nAO2+BA3UE+j2Mi
+	cKIgUAwfbTyD7uZfxOsOaKqLq/GZ3rH2gr03peu9rwkaOpkKhaJvGCQcFty/BA+C83pd9HAiwBE
+	xIteqqQMes06gHkee1j4PwCIub4aoEjxfqHfkX7rmtImWix8cncm+tKNPV1fGTzgEmgCA0sdjke
+	niJ/DWqi5+29FgbA6+c9AKrbu5kAUqDBbKXqkOVQqNL97sBEnP5SrNFhScye28RDEfnOUNAxOQq
+	ZmsUxXeey75e5ipc8AAYSJCYPxn9Nt642+4zhPPcfXPXt7ZSbuI0+hWXsolwPtV8And2aWRbJh+
+	gpKL1fr8ND
+X-Google-Smtp-Source: AGHT+IG0mR7FQaw+l23lNeDI3HZ2oGPwNQnJRaTrq28MQwyhH5VRn+b1LrDgTvBXBb163N6NepB/tA==
+X-Received: by 2002:a05:600c:198b:b0:477:9fcf:3fe3 with SMTP id 5b1f17b1804b1-47d1df12f84mr272520785e9.0.1766837881680;
+        Sat, 27 Dec 2025 04:18:01 -0800 (PST)
 Received: from [127.0.0.1] ([2804:5078:811:d400:58f2:fc97:371f:2])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-121724cfdd0sm97940127c88.4.2025.12.27.04.17.43
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-121724cfdd0sm97940127c88.4.2025.12.27.04.17.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 Dec 2025 04:17:51 -0800 (PST)
+        Sat, 27 Dec 2025 04:18:00 -0800 (PST)
 From: Marcos Paulo de Souza <mpdesouza@suse.com>
-Date: Sat, 27 Dec 2025 09:16:14 -0300
-Subject: [PATCH 07/19] drivers: netconsole: Migrate to
- register_console_force helper
+Date: Sat, 27 Dec 2025 09:16:15 -0300
+Subject: [PATCH 08/19] debug: debug_core: Migrate to register_console_force
+ helper
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,7 +84,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251227-printk-cleanup-part3-v1-7-21a291bcf197@suse.com>
+Message-Id: <20251227-printk-cleanup-part3-v1-8-21a291bcf197@suse.com>
 References: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
 In-Reply-To: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
 To: Richard Weinberger <richard@nod.at>, 
@@ -121,11 +121,11 @@ Cc: linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org, 
  Marcos Paulo de Souza <mpdesouza@suse.com>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1766837798; l=1917;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1766837798; l=1369;
  i=mpdesouza@suse.com; s=20231031; h=from:subject:message-id;
- bh=oiRJqd24xNJBRHp4bn2koH7CqQq/f2UmEpMOGnQzYhI=;
- b=PNCcHQvlH3xv93I4pBS5nug5ofRvIPVdGmJf0P9wllAmoEtQiq8Up0JT6yGQIvoJ3BjyCDLfA
- 69PIUeecq2AAR6MO/z2xt/dsbeEPhnFU/DPDF0NwOHQtgJdH0eloVGe
+ bh=i+edMET6/ej5N2K5avM5O831EcMojt2VSHcuUrQdfTw=;
+ b=frjUdDlkDnmz9ghHbQI85g3SWQC6r698VmLv/vY5BaR0ZhD0fZI/A4RKNedga5QpYNhkZRCmF
+ 1wOfSuqi/z5ASQwxAphrFcarhmThsZ8zA4jjeiyha2OJh22t8WzJ4PJ
 X-Developer-Key: i=mpdesouza@suse.com; a=ed25519;
  pk=/Ni/TsKkr69EOmdZXkp1Q/BlzDonbOBRsfPa18ySIwU=
 
@@ -133,61 +133,44 @@ The register_console_force function was introduced to register consoles
 even on the presence of default consoles, replacing the CON_ENABLE flag
 that was forcing the same behavior.
 
+No functional changes.
+
 Signed-off-by: Marcos Paulo de Souza <mpdesouza@suse.com>
 ---
- drivers/net/netconsole.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+ kernel/debug/debug_core.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index bb6e03a92956..509ab629d95f 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -583,16 +583,14 @@ static ssize_t enabled_store(struct config_item *item,
- 		}
- 
- 		if (nt->extended && !console_is_registered(&netconsole_ext)) {
--			netconsole_ext.flags |= CON_ENABLED;
--			register_console(&netconsole_ext);
-+			register_console_force(&netconsole_ext);
- 		}
- 
- 		/* User might be enabling the basic format target for the very
- 		 * first time, make sure the console is registered.
- 		 */
- 		if (!nt->extended && !console_is_registered(&netconsole)) {
--			netconsole.flags |= CON_ENABLED;
--			register_console(&netconsole);
-+			register_console_force(&netconsole);
- 		}
- 
- 		/*
-@@ -1917,13 +1915,12 @@ static void free_param_target(struct netconsole_target *nt)
- 
- static struct console netconsole_ext = {
- 	.name	= "netcon_ext",
--	.flags	= CON_ENABLED | CON_EXTENDED,
-+	.flags	= CON_EXTENDED,
- 	.write	= write_ext_msg,
+diff --git a/kernel/debug/debug_core.c b/kernel/debug/debug_core.c
+index 0b9495187fba..4bf736e5a059 100644
+--- a/kernel/debug/debug_core.c
++++ b/kernel/debug/debug_core.c
+@@ -941,7 +941,7 @@ static void kgdb_console_write(struct console *co, const char *s,
+ static struct console kgdbcons = {
+ 	.name		= "kgdb",
+ 	.write		= kgdb_console_write,
+-	.flags		= CON_PRINTBUFFER | CON_ENABLED,
++	.flags		= CON_PRINTBUFFER,
+ 	.index		= -1,
  };
  
- static struct console netconsole = {
- 	.name	= "netcon",
--	.flags	= CON_ENABLED,
- 	.write	= write_msg,
- };
+@@ -950,7 +950,7 @@ static int __init opt_kgdb_con(char *str)
+ 	kgdb_use_con = 1;
  
-@@ -1971,9 +1968,9 @@ static int __init init_netconsole(void)
- 		goto undonotifier;
+ 	if (kgdb_io_module_registered && !kgdb_con_registered) {
+-		register_console(&kgdbcons);
++		register_console_force(&kgdbcons);
+ 		kgdb_con_registered = 1;
+ 	}
  
- 	if (console_type_needed & CONS_EXTENDED)
--		register_console(&netconsole_ext);
-+		register_console_force(&netconsole_ext);
- 	if (console_type_needed & CONS_BASIC)
--		register_console(&netconsole);
-+		register_console_force(&netconsole);
- 	pr_info("network logging started\n");
- 
- 	return err;
+@@ -1071,7 +1071,7 @@ static void kgdb_register_callbacks(void)
+ 		register_sysrq_key('g', &sysrq_dbg_op);
+ #endif
+ 		if (kgdb_use_con && !kgdb_con_registered) {
+-			register_console(&kgdbcons);
++			register_console_force(&kgdbcons);
+ 			kgdb_con_registered = 1;
+ 		}
+ 	}
 
 -- 
 2.52.0
