@@ -1,278 +1,128 @@
-Return-Path: <netdev+bounces-246110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CDFDCDF300
-	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 01:40:09 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 833E9CDF505
+	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 08:38:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 530EF300A86D
-	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 00:39:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3788F300353D
+	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 07:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD7FF1E885A;
-	Sat, 27 Dec 2025 00:39:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FBA61F4C8C;
+	Sat, 27 Dec 2025 07:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CALR7v4X";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="DgHpdiaU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mqfq+0NL"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1004E21FF21
-	for <netdev@vger.kernel.org>; Sat, 27 Dec 2025 00:39:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CEC27DA66
+	for <netdev@vger.kernel.org>; Sat, 27 Dec 2025 07:38:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766795986; cv=none; b=QJPsieMlAjsNYd3Qv9gbGYujLXDDOtgG1drUbBN6UOPu24uwOzDiMeDtO+j5uxIA7dAchXzoFKJm7cyQanLfxm2475bu/9rf5AA1an/fVh8hnqUgi6hQ60mdvti/p+Ko5G/Gik6v3ocxgzPNN1vMj9+8LNhlhzqBwVqt1SD6utQ=
+	t=1766821111; cv=none; b=ITJk0iDFDw9ZIu+oLRbI9fWXUSI0bQjZyhkafqbmat22durgx1Wq16XrLvsP3xvFz/erTPcU3D2MgO2WCfYxe6d6YodE81kTiF/soqurgZILQHktF3Zr6SnoBAvk8V0qZSN/NP6c6GFq2bQl8HnywVvb5OwjdFjW32M/hrVhNhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766795986; c=relaxed/simple;
-	bh=8Xjo+EghXUem5ZAMFl1PTKyQSO4pEPXe8t4z3/MtCAg=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=rhbSbYzWJSGguCJ+eWttXrndIpWUZOz13+u/AuZy97KO+PRlww5k3JPh4TeGL1luZ2OeldhbQPmLh50o0/F5hp3yfB/rt9/WUNFhaLQw7S6dpRR6sTIMgdUlnkbB2BHelqHdcWu6khmDR6fJb3bQUjR/r7KKtxlUUgu9AX3Ryy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CALR7v4X; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=DgHpdiaU; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766795984;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pERT9koOQ435TwRjMEJhS6iFHKSf3ugdix7KpFMpVgE=;
-	b=CALR7v4XUscPCQ8bYSOzM680vVtmAlbCmMZTMn3C6UPLBFhGQ1OJgt/tF+92D6fISZ5yRz
-	WczxCvDzIzajFAMcXLUy40smos4wCufAIrcTwzY4lG1LmuU29u1D7fHiaF4SclDzRjBi//
-	HPlEne4pq1KjVdEKTZSoJ5Lw1Db1cz0=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-597-jQrXzOsMNyOF9bV4LQ-J7w-1; Fri, 26 Dec 2025 19:39:43 -0500
-X-MC-Unique: jQrXzOsMNyOF9bV4LQ-J7w-1
-X-Mimecast-MFC-AGG-ID: jQrXzOsMNyOF9bV4LQ-J7w_1766795982
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-8888447ffebso186222276d6.1
-        for <netdev@vger.kernel.org>; Fri, 26 Dec 2025 16:39:42 -0800 (PST)
+	s=arc-20240116; t=1766821111; c=relaxed/simple;
+	bh=Po2Gok9eI39EyZ36Z3s2MTSaEXgDZ3I2++0gZ8L6Jig=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lchFmESmCk2D6e+vngn6lh/58PPRVfeo9pkWZX9wDTuX1TXMi5MG8JotuPIS1tGf2S8K4upPqnIRiXUXDjfEzqivVyQgsE8/tG0TIjzX2SE6x0w3kT8UQMWLMT1RRqdO+c+dFLQoxLkk2IPKgRw+gE91HJxmWM/ndwaAzsLazjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mqfq+0NL; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5957c929a5eso11179502e87.1
+        for <netdev@vger.kernel.org>; Fri, 26 Dec 2025 23:38:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1766795974; x=1767400774; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=pERT9koOQ435TwRjMEJhS6iFHKSf3ugdix7KpFMpVgE=;
-        b=DgHpdiaUyXw50hIiXrnOXiZdP0QkSfTCeKKPIeWCNlRCkxaM9ERSCNoE2/uIs3rh/z
-         UXvUptg0UG3vFTn5tF4C3rWj69HidC7tkoEQK7fMNHFaMWWo9+7kYbdY+CBTzSYvozbS
-         MJvutWl6XWmZ2zDuqOkbt7EZoSpyOxou9fOVvHzZZC3o16jgw+fmclKLum+/+cFQsvJX
-         VG0dpwyHDITV5UkXq03ZougieaFbupChAxI39kK05r8/xlsSV+4TkJoQOZnPLAUftFON
-         TxUib1ZPu7ga2WZpf3ZBUqWjKTJU819I5jIIY6xvoHlERQBr6WhnpOYRy7C0/99tg9gM
-         U5Ng==
+        d=gmail.com; s=20230601; t=1766821108; x=1767425908; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1OnWDMu+q1WSYGBsX2lqqCjUP5tRl4Im0zQRuOx1Ins=;
+        b=mqfq+0NL4epq7Kt6V2Ym5Vfv4EBs9VyNMUxv1KDZzfBFpomW/SwfkTgeOTcq5qCklP
+         EDemf8ltwklPrM6cTAkgtwsQsmYF8zQscAC+vJ0Q/FMpQLn2fxbkiHrzFZJsgo7AnQf/
+         twOsczwvRaA3wOTbjK1BY9rLDtdxyoOHEL4EIvxpF7R1xulzV9sq1QdWOPoZO7kt6wOn
+         6IKLPDLRK5/g/3wpmfZUK6ecmz8+mTiuRqrX5dmCmXbrhpsbHNEqd62E5X9ARa/eYmqJ
+         MwEhLeGmiotySpOLONuAtgpt+Ha2MiNbm/WMzMw6kUK+hPhjcWd68czAZp9NxNf94aLX
+         3pZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766795974; x=1767400774;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pERT9koOQ435TwRjMEJhS6iFHKSf3ugdix7KpFMpVgE=;
-        b=MFoOtdcYesPeeTJ86tkGmYumwY1fA5QW/Bb7A8kqNhoYaOtwQnP2HkjYUaK7akiUj1
-         hel4jrmDSN5mE1G5gHgTyMacbLFTLySG4Q7/3B9+XOWd/7YwKoLqAdBg7OLHDvj4q3XN
-         PW1LEm3Ui5DkiPw2igjbujnxU171RTLn1n4sEwHmgPmd6vIFCfzg5CyUTqpf9C0PGpum
-         271rX9XmLEicWjehljOf3Oyky44uCP7tNC3p/KTRW8MoZQxDdIbS/BufgGO+z9VaepuR
-         8qe55o/1WbkIR6IPaCpCxExcuCR3V6P8TaNgu1mhrZeXHaecKZM0FV5aPLaiG5LVKDYN
-         4efw==
-X-Forwarded-Encrypted: i=1; AJvYcCWWdJe8nIvyfsDHjCXdIjgCGH059kY6gV3jxGBsBflRUAnwnB9j0D7K5P4Rr+guEcLnJxo3vIM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPhjnv1H33xZMdIb83oTaAwQF+5FNqpoI24zuPfbgBWjWXgdZI
-	mhg7+2W1Kgilzfk8znUSTUEdntZcIQEpjnz2jwu+ibrCN5Oa0gBM6AppKh4/Ydf8ye4K09DBVvZ
-	hUFJQXTYZkwEgtXOlOV7UHgyJWbDIN3JmHGQT+jxP/aaNsqvncMcgIsmLHA==
-X-Gm-Gg: AY/fxX7VNd4zi96EFuxyOVcv9bttdiz0mC2sojdMQuD7o6JFc3JCX5IKf7cXytR3q2V
-	yEegMW7tXhQFE796Vdb1R+jw1076feeO5SbxJ/4qAQfip9ZJAKc6w/bWIlJ+ltDmHFb7QnTbaaR
-	3Y8EZPO0ICkXgf/BFvBim7YzL/3lvP/lC3EKNzbRa647NJxi4y6MHNUZjwcjmGU2xFXHqgpW+eR
-	MXUhQqcOev4WVIUhFcvgpNWoAkcQKZ5C/eg61WmjcVooXYDzy+IOUF3Wys1cdl/uQBjSciO6l5q
-	ESu0HUBJPvh38P6rSRk1mR5pTFiQKJ9HMun1gUHZhOQZnPVd6HT2J7ZO4ApcRKhPhARQablilXp
-	InN1uArKcNRRUXbe2VtJyfy5HAzFUsx+ZcH+Pf5QT5HGbDb3UnJR7uY+Q
-X-Received: by 2002:ac8:1283:0:b0:4ed:43fe:f51e with SMTP id d75a77b69052e-4f4d96611cbmr138083471cf.39.1766795974382;
-        Fri, 26 Dec 2025 16:39:34 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHxBDI7wuXFeJvOL182RfGJ72MAWyQzGy7wYDnXaQodt5PgGkJkP10V4g9eH2qnu2LfLMUFPQ==
-X-Received: by 2002:ac8:1283:0:b0:4ed:43fe:f51e with SMTP id d75a77b69052e-4f4d96611cbmr138083091cf.39.1766795973951;
-        Fri, 26 Dec 2025 16:39:33 -0800 (PST)
-Received: from ?IPV6:2601:600:947f:f020:85dc:d2b2:c5ee:e3c4? ([2601:600:947f:f020:85dc:d2b2:c5ee:e3c4])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4f4d5b4c975sm118077431cf.1.2025.12.26.16.39.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Dec 2025 16:39:33 -0800 (PST)
-From: Waiman Long <llong@redhat.com>
-X-Google-Original-From: Waiman Long <longman@redhat.com>
-Message-ID: <370149fc-1624-4a16-ac47-dd9b2dd0ed29@redhat.com>
-Date: Fri, 26 Dec 2025 19:39:28 -0500
+        d=1e100.net; s=20230601; t=1766821108; x=1767425908;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1OnWDMu+q1WSYGBsX2lqqCjUP5tRl4Im0zQRuOx1Ins=;
+        b=RxV6SQuXq4HXTZh61mTbvxiN/e5wLOtZymORJiri4NR/eu8s5Rpk/U8/7o3r48TTLg
+         /1Vo2Lfun2qBc2JiaG/Bl6B/b+DAKPDJMwqI5j/FBBp6W+HcOfFNgJcDOQnZfP9z6WWE
+         bZPH9U2ZkxcpiYpi5CgENtlaLvFdGc8sfGG38z/L2TmRYdJ1DOt9WjiULWOHy1geJGWH
+         z1Dt0OIAHleXMBItno4I0opZfNzUPMBrhwtJFnRr/YOZxQFUQMXoZRFXAdocKWT9Q97D
+         JQ+s0v7PbCQZUTJtwpLgcMUjzMe+9IBWsB9L7isFt4qalb7INggQ57HWcWQ2fo9T9gHh
+         MAOA==
+X-Forwarded-Encrypted: i=1; AJvYcCVSJkQ7Ccg0gb1Jtm66vug9GUZSknhNtKts2bSAY0hjkccZLui6M11d9X4rnVTwddRSWJgEpF4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwsfeV2Mzs2pNqcQMl3OZVMMdmneRrVo6uhrqLJ2plyV8GIjaf1
+	GVvmL+tznANfuog1DExsPr7QSngFlAjQoDJRn4q6NJKCzhrXjTeDe1Ka
+X-Gm-Gg: AY/fxX6zZaqDlg+IQkgxnmd12wozU6gGS67fU0xH50mO3UIIAdRCEDaovIqhmQE1iJ1
+	No0b4QLJQHiWJ7tlxULhXHReUWJxCBQJhpLI6xyx0/ivD+UrmhBQ6yunQu75UyVqjYOL3iBZ+Zs
+	sdJwWSnUGIqm65YmcF5ydcg0k+Iqa4kBnLkdov7BBBp6O+3OFmr6Y1lcCGp+FtTtMgzSkuLNvIY
+	0siPjmoj02Jt0AHZxy5MwLU2SdYPQiVhd7JebmOF4gHJV0zSGnm1tjcS1VKC+sPucfYN5AOkAKw
+	h5A4qwGrpSc/cltLI5K6pCFk3f1pa/ifYBrJf000OlD4mo+B8azYemsmhsqCzTZW+zL+8RTHgyE
+	JB8i7LC5RaywnUBwDluxZKut3A3aHy9bfG5o9mYa+h866FT7DlA80LkBFI2dfR/Eyb6l1q5qXZG
+	DbpGCx2YnBvaGsFvANoGPJiyblvSA=
+X-Google-Smtp-Source: AGHT+IGkv/1g7SIEMAlMeplAMPTx8z8ZNBEoGr/hm+qZ2r1jeY+I+97394mPN5fP2r9FVLAEbjGe6w==
+X-Received: by 2002:a05:6512:b8a:b0:597:dd9b:d444 with SMTP id 2adb3069b0e04-59a17d1cc84mr9246196e87.19.1766821107348;
+        Fri, 26 Dec 2025 23:38:27 -0800 (PST)
+Received: from localhost.localdomain ([176.33.65.121])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59a185dd90esm7345408e87.31.2025.12.26.23.38.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Dec 2025 23:38:26 -0800 (PST)
+From: Alper Ak <alperyasinak1@gmail.com>
+To: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org
+Cc: Alper Ak <alperyasinak1@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Breno Leitao <leitao@debian.org>,
+	Willem de Bruijn <willemb@google.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: ipv4: ipmr: Prevent information leak in ipmr_sk_ioctl()
+Date: Sat, 27 Dec 2025 10:37:42 +0300
+Message-ID: <20251227073743.17272-1-alperyasinak1@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 33/33] doc: Add housekeeping documentation
-To: Frederic Weisbecker <frederic@kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Chen Ridong <chenridong@huawei.com>, Danilo Krummrich <dakr@kernel.org>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
- Lai Jiangshan <jiangshanlai@gmail.com>,
- Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
- <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
- Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
- Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Vlastimil Babka <vbabka@suse.cz>, Will Deacon <will@kernel.org>,
- cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-block@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20251224134520.33231-1-frederic@kernel.org>
- <20251224134520.33231-34-frederic@kernel.org>
-Content-Language: en-US
-In-Reply-To: <20251224134520.33231-34-frederic@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 12/24/25 8:45 AM, Frederic Weisbecker wrote:
-> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> ---
->   Documentation/core-api/housekeeping.rst | 111 ++++++++++++++++++++++++
->   Documentation/core-api/index.rst        |   1 +
->   2 files changed, 112 insertions(+)
->   create mode 100644 Documentation/core-api/housekeeping.rst
->
-> diff --git a/Documentation/core-api/housekeeping.rst b/Documentation/core-api/housekeeping.rst
-> new file mode 100644
-> index 000000000000..e5417302774c
-> --- /dev/null
-> +++ b/Documentation/core-api/housekeeping.rst
-> @@ -0,0 +1,111 @@
-> +======================================
-> +Housekeeping
-> +======================================
-> +
-> +
-> +CPU Isolation moves away kernel work that may otherwise run on any CPU.
-> +The purpose of its related features is to reduce the OS jitter that some
-> +extreme workloads can't stand, such as in some DPDK usecases.
-Nit: "usecases" => "use cases"
-> +
-> +The kernel work moved away by CPU isolation is commonly described as
-> +"housekeeping" because it includes ground work that performs cleanups,
-> +statistics maintainance and actions relying on them, memory release,
-> +various deferrals etc...
-> +
-> +Sometimes housekeeping is just some unbound work (unbound workqueues,
-> +unbound timers, ...) that gets easily assigned to non-isolated CPUs.
-> +But sometimes housekeeping is tied to a specific CPU and requires
-> +elaborated tricks to be offloaded to non-isolated CPUs (RCU_NOCB, remote
-> +scheduler tick, etc...).
-> +
-> +Thus, a housekeeping CPU can be considered as the reverse of an isolated
-> +CPU. It is simply a CPU that can execute housekeeping work. There must
-> +always be at least one online housekeeping CPU at any time. The CPUs that
-> +are not	isolated are automatically assigned as housekeeping.
-Nit: extra white spaces between "not" and "isolated".
-> +
-> +Housekeeping is currently divided in four features described
-> +by the ``enum hk_type type``:
-> +
-> +1.	HK_TYPE_DOMAIN matches the work moved away by scheduler domain
-> +	isolation performed through ``isolcpus=domain`` boot parameter or
-> +	isolated cpuset partitions in cgroup v2. This includes scheduler
-> +	load balancing, unbound workqueues and timers.
-> +
-> +2.	HK_TYPE_KERNEL_NOISE matches the work moved away by tick isolation
-> +	performed through ``nohz_full=`` or ``isolcpus=nohz`` boot
-> +	parameters. This includes remote scheduler tick, vmstat and lockup
-> +	watchdog.
-> +
-> +3.	HK_TYPE_MANAGED_IRQ matches the IRQ handlers moved away by managed
-> +	IRQ isolation performed through ``isolcpus=managed_irq``.
-> +
-> +4.	HK_TYPE_DOMAIN_BOOT matches the work moved away by scheduler domain
-> +	isolation performed through ``isolcpus=domain`` only. It is similar
-> +	to HK_TYPE_DOMAIN except it ignores the isolation performed by
-> +	cpusets.
-> +
-> +
-> +Housekeeping cpumasks
-> +=================================
-> +
-> +Housekeeping cpumasks include the CPUs that can execute the work moved
-> +away by the matching isolation feature. These cpumasks are returned by
-> +the following function::
-> +
-> +	const struct cpumask *housekeeping_cpumask(enum hk_type type)
-> +
-> +By default, if neither ``nohz_full=``, nor ``isolcpus``, nor cpuset's
-> +isolated partitions are used, which covers most usecases, this function
-> +returns the cpu_possible_mask.
-> +
-> +Otherwise the function returns the cpumask complement of the isolation
-> +feature. For example:
-> +
-> +With isolcpus=domain,7 the following will return a mask with all possible
-> +CPUs except 7::
-> +
-> +	housekeeping_cpumask(HK_TYPE_DOMAIN)
-> +
-> +Similarly with nohz_full=5,6 the following will return a mask with all
-> +possible CPUs except 5,6::
-> +
-> +	housekeeping_cpumask(HK_TYPE_KERNEL_NOISE)
-> +
-> +
-> +Synchronization against cpusets
-> +=================================
-> +
-> +Cpuset can modify the HK_TYPE_DOMAIN housekeeping cpumask while creating,
-> +modifying or deleting an isolated partition.
-> +
-> +The users of HK_TYPE_DOMAIN cpumask must then make sure to synchronize
-> +properly against cpuset in order to make sure that:
-> +
-> +1.	The cpumask snapshot stays coherent.
-> +
-> +2.	No housekeeping work is queued on a newly made isolated CPU.
-> +
-> +3.	Pending housekeeping work that was queued to a non isolated
-> +	CPU which just turned isolated through cpuset must be flushed
-> +	before the related created/modified isolated partition is made
-> +	available to userspace.
-> +
-> +This synchronization is maintained by an RCU based scheme. The cpuset update
-> +side waits for an RCU grace period after updating the HK_TYPE_DOMAIN
-> +cpumask and before flushing pending works. On the read side, care must be
-> +taken to gather the housekeeping target election and the work enqueue within
-> +the same RCU read side critical section.
-> +
-> +A typical layout example would look like this on the update side
-> +(``housekeeping_update()``)::
-> +
-> +	rcu_assign_pointer(housekeeping_cpumasks[type], trial);
-> +	synchronize_rcu();
-> +	flush_workqueue(example_workqueue);
-> +
-> +And then on the read side::
-> +
-> +	rcu_read_lock();
-> +	cpu = housekeeping_any_cpu(HK_TYPE_DOMAIN);
-> +	queue_work_on(cpu, example_workqueue, work);
-> +	rcu_read_unlock();
-> diff --git a/Documentation/core-api/index.rst b/Documentation/core-api/index.rst
-> index 5eb0fbbbc323..79fe7735692e 100644
-> --- a/Documentation/core-api/index.rst
-> +++ b/Documentation/core-api/index.rst
-> @@ -25,6 +25,7 @@ it.
->      symbol-namespaces
->      asm-annotations
->      real-time/index
-> +   housekeeping.rst
->   
->   Data structures and low-level utilities
->   =======================================
-Acked-by: Waiman Long <longman@redhat.com>
+struct sioc_vif_req has a padding hole after the vifi field due to
+alignment requirements. These padding bytes were uninitialized,
+potentially leaking kernel stack memory to userspace when the
+struct is copied via sock_ioctl_inout().
+
+Reported by Smatch:
+    net/ipv4/ipmr.c:1575 ipmr_sk_ioctl() warn: check that 'buffer'
+    doesn't leak information (struct has a hole after 'vifi')
+
+Fixes: e1d001fa5b47 ("net: ioctl: Use kernel memory on protocol ioctl callbacks")
+Signed-off-by: Alper Ak <alperyasinak1@gmail.com>
+---
+ net/ipv4/ipmr.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
+index ca9eaee4c2ef..18441fbe7ed7 100644
+--- a/net/ipv4/ipmr.c
++++ b/net/ipv4/ipmr.c
+@@ -1571,6 +1571,7 @@ int ipmr_sk_ioctl(struct sock *sk, unsigned int cmd, void __user *arg)
+ 	/* These userspace buffers will be consumed by ipmr_ioctl() */
+ 	case SIOCGETVIFCNT: {
+ 		struct sioc_vif_req buffer;
++		memset(&buffer, 0, sizeof(buffer));
+ 
+ 		return sock_ioctl_inout(sk, cmd, arg, &buffer,
+ 				      sizeof(buffer));
+-- 
+2.43.0
 
 
