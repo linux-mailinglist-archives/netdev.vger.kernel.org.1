@@ -1,231 +1,143 @@
-Return-Path: <netdev+bounces-246148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65720CE015F
-	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 20:23:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 650DFCE018A
+	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 20:41:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AC072301E934
-	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 19:23:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 08DE030161AD
+	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 19:41:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889B1288502;
-	Sat, 27 Dec 2025 19:23:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E04C32860F;
+	Sat, 27 Dec 2025 19:41:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="VgQKTfng"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G6OyArXv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B28A11F4615
-	for <netdev@vger.kernel.org>; Sat, 27 Dec 2025 19:23:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED3FD32825D
+	for <netdev@vger.kernel.org>; Sat, 27 Dec 2025 19:41:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766863406; cv=none; b=kaFEUgBtg8eZlmRZNoJWJbFj/pwEouVkIsPu8BAKAYYPrMkiSbaWHutXBU+oXF31sc8H0z3B2e/BtfW1WwLqFOKemcu8TCkrdOe9bh1qEpcZYbWzi1ieEQfDz/qUPgIDBZLf6jre/IWdog/DVnXF6gKyJIBrhfJC1NCYnuBJuo4=
+	t=1766864500; cv=none; b=l1iNg1Hg7IdjIjsg8bXJHXBFh73ll8G+lm2WDklVLI+rn+ql4/edGI3zbJlNN3rauuh9m0WGqbEBMJ4fLycUEVTIi0xSw89GU10Dv+xfTx+SK6008mXfS0zzJyK2Y2nWWxi4vME3uvRl2dw5hNAcR9RoK9sosDWSw2zhsiQaq3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766863406; c=relaxed/simple;
-	bh=CIUTJPnEIzdHePK9nwXrWk8cZBaui4jZl8U3BBKZ3mo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tYsIyaph3jrD1AyMYvU+D6IU3u/NLGLdEujdQwxjY5WXLMEe0sPRVi0qg08077C2QbYouK1RI6ZRLpKYcmGjx1jRcR70Dm2hHAbs8SIiTSaRrUdxph0330uScO4Dag0VP8SEqz4cVPy+NS/9Tp8ujFQQxCkVs8sSHoTNIpdRPL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=VgQKTfng; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BRIEgw23046471
-	for <netdev@vger.kernel.org>; Sat, 27 Dec 2025 11:23:23 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=/9FmIM1H1ArdH+87Bbu2+pLJOGM2QnqhXssbZ8e99+A=; b=VgQKTfng2L9R
-	rhYXyMQRWv8VsHX7/CT8xv9kTh1HVUggRC9V+2MQE3qxxBAlhB5Whhf33c6xfmjt
-	t4AK6t+Ljt4S9A8kDvrCo5KRq/JGwnLAc4FITWcnsIcSEHupKq6IK8dqfp+ZYtXE
-	A7YyewKvy4DiK4dXA61Qx/Bmq0NdKM6HKfkMYIGeYKb0Pqk4EbUfZEq4rrkOBj5E
-	5Q1Jpy+NdKx7+bHeOrz2V0YvU63MeZPUAoYTL1mqeDENXVfdJvcAjQozzfD8JwaG
-	ObxnI691JbQRRrjx6wum3rQG6JimJTqPgdfZzFbgEhswuv765pOZAJ8PPkoGLPxp
-	78dJRDJIvQ==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4badudhgdq-5
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Sat, 27 Dec 2025 11:23:23 -0800 (PST)
-Received: from twshared41309.15.frc2.facebook.com (2620:10d:c0a8:1c::1b) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.29; Sat, 27 Dec 2025 19:23:21 +0000
-Received: by devbig259.ftw1.facebook.com (Postfix, from userid 664516)
-	id BB69FE0509CC; Sat, 27 Dec 2025 11:23:03 -0800 (PST)
-From: Zhiping Zhang <zhipingz@meta.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-CC: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-        <linux-rdma@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-        <netdev@vger.kernel.org>, Keith Busch <kbusch@kernel.org>,
-        Yochai Cohen
-	<yochai@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
-        Zhiping Zhang
-	<zhipingz@meta.com>
-Subject: Re: [RFC 2/2] Set steering-tag directly for PCIe P2P memory access
-Date: Sat, 27 Dec 2025 11:22:54 -0800
-Message-ID: <20251227192303.3866551-1-zhipingz@meta.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251204081117.1987227-1-zhipingz@meta.com>
-References: <20251204081117.1987227-1-zhipingz@meta.com>
+	s=arc-20240116; t=1766864500; c=relaxed/simple;
+	bh=ZS/o8vghJ5h/BMSisAqRUvGjgb71TXnPUFp74NnqLMA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=fueb7rz2p5QrLY8AdmGMpOHmEwEbbcx6a4k2OVT9oz4gTsGKv2kDj20qz0pVPt0aq7Y8II4zcya0cYg6XuDICBYC0HEaJSueWI8ku2DgeGplu6CksNtaahi622IQKnhGUtNGnzJTxYvnvJXhMjbOAvsqIwtD+I25K1aghrdbxgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G6OyArXv; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2a0bae9aca3so117488435ad.3
+        for <netdev@vger.kernel.org>; Sat, 27 Dec 2025 11:41:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766864498; x=1767469298; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HfQ34W5EDtkf/Oqe7WH83aJ2lwQHmBlnyORVV0lhhvo=;
+        b=G6OyArXvqzdImEXLOgwZK8sgi9voeYz/ijnUMgAU1OmVKoU5BRY4LNTOHCJvkjo/xr
+         8jUsowlXarmED3T/FJ9ur4xVEW9cDk+fsiIGXthcUCZxmEIJkkn35tLn5GOr8Ch5SqtF
+         sLjPuWjRhE1sx8WeLncy2zZfiPis7Y70M18Mwpx8HYJTfpURi6dZfw6t3sAaFEtLk/yy
+         P00fpcW3L9FI/LRDbl2bY0PvSppCvlk88U9Lms/ceH/T8mUniI/fXg/11uduL7lzG0v4
+         Ct9UdWi2EQ/zRtPDv45WZExzqOuB1LiFiAOsKfEsFes55eIl8cmQWc4ecnZ6KmABbADj
+         Povw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766864498; x=1767469298;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HfQ34W5EDtkf/Oqe7WH83aJ2lwQHmBlnyORVV0lhhvo=;
+        b=ZUltbHrsMCTvKgC7Lz9q/91jxxgl0wGIVz0qVcYG/IF8y0jdrV4ZWSciI3CrXdDWtE
+         HaK1i2KFoB9HHIRWoIHvU0EZOou9l3oOZnUbmqy4up0javUz1f23rAcTuVS8CFt07y1J
+         XRlPMfb9k5pV+a5tfHylTZ4iEo2JY7SU0G4LzdZV2jBigR3+eLbiyEWNsLb8DviTJI20
+         Xh9/mIWXCKlTdVXwfVNf6Pje7C+PDr7hR2fACz4feprBr0qD82hP3CHV/UI5MySbLlFQ
+         syv17NXnXANcbqAeDVZPp3aPrx9psZX29pYkBLuWM7gkfyIF7fPyO09IyfbgqwHCX7Le
+         kuZw==
+X-Gm-Message-State: AOJu0Yx1tmD4/hBVwFKOhaP9rw4EmQcBDmiz1y+A7bPmAw5zBhJS4fPz
+	YD3AhrxIwA9btBXovjeX2Diha8RTqxds6S6t5U0wCSu7ZT0sk+kYfjcB0Ktycg==
+X-Gm-Gg: AY/fxX6rXNSLLRlSbm5ZmqfceoUtno69bJkCcsPgC3lLrT1oAZ8Xm2b5xchdZjR5NOY
+	sGkaJrTgbbmhgHBYcvjzOhvw5JP7z9rlg1RJRrh5q9KrDt+lDTptUOhPA8xBcGHyUco5/ALczVx
+	9ee916Zz4lgqC/gvm2hwjw+Xzqx1qsMHv9XfD/gutrEJNBb/tAdwEnWdC7cqSFN/r26GcfGSCJd
+	2CGrg2TBz10LDk8jjaX+Dh6E1uNdRh4mAgbupLaeL1UJGHhFOOImSO7pEiCFYASlZEFQXZzQW7q
+	o9cIpIGqN1SYuvt9AaBBjguIup7m/kPu4AUWOePlnnsesTRp/JrVLijaZ6zEFHscZg8+wrtsEyd
+	m6ys+J1xjI5OONh8XHto3yw8BSCyEdL1V2DcDvZUIGQw8A7rgZx5ZX5IUdcUgc5qIAeoJ9NkWrq
+	h589FfGKSMi6Rw2P58gk+9fKW0U0o=
+X-Google-Smtp-Source: AGHT+IE0gjvr7JdOcoXtXSCfnuHbPpU+FHMIKrWr1aWnsT+hE7eIma0exFae4q7bJaus+xIini6PZQ==
+X-Received: by 2002:a05:693c:809c:b0:2b0:4943:8999 with SMTP id 5a478bee46e88-2b05ec47b9emr22757685eec.33.1766864497538;
+        Sat, 27 Dec 2025 11:41:37 -0800 (PST)
+Received: from pop-os.. ([2601:647:6802:dbc0:de11:3cdc:eebf:e8cf])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b05fe5653esm59087584eec.1.2025.12.27.11.41.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 27 Dec 2025 11:41:36 -0800 (PST)
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Cong Wang <xiyou.wangcong@gmail.com>
+Subject: [Patch net v6 0/8] netem: Fix skb duplication logic and prevent infinite loops
+Date: Sat, 27 Dec 2025 11:41:27 -0800
+Message-Id: <20251227194135.1111972-1-xiyou.wangcong@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-X-Proofpoint-ORIG-GUID: Qf77YhGoOfahrXStASEHkfr-0C9vQNCF
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjI3MDE4NSBTYWx0ZWRfXwFdRi2luyM6T
- lvzJJg5cCP8pUw0clKqcnI/HEebjziZTU7zLoeuhBYa/ZZuWYKV6xJZyUpFmJqBYWuwsq8e6T1S
- CVoo9RmBj5bHBUxMqNP5y/7e+xcC2ByiS5xwPESaaUlogIE040WA424M1pRwKDZCthUZjOEHeaJ
- 2fH93JDxXq0vNq+28GY1y+a0cE/vwqJ2NuBhMFDUcYY4YOJRF+dVFGPXJIKlo7TTOtVymA4aTN2
- f4bKgpnva9DN+dNz8IwP8MkmYX8vAglUbZpHjQ5V4kiYJix0Hay5eqZ6r5/DXAchEraiKg1rVOm
- Ewj+VhOjuFF/s1KtoxT5p5zTALpMpqn2afHb/Se7oGsZQkDXcuZn+y4s3218TjjcnkHJfWklKJW
- V/LmUdjhDCzeGV+Jp6jY81/St5JY5Atv0lfwyXId8VJrljaxTTBVtPIhDp3hPH8ASdiI98VWeUe
- /8/MAWLP+yiKgsVidkg==
-X-Authority-Analysis: v=2.4 cv=LryfC3dc c=1 sm=1 tr=0 ts=6950322b cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
- a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=Ikd4Dj_1AAAA:8 a=VabnemYjAAAA:8 a=vaBoqUaa7kBdn5e81RoA:9
- a=QEXdDO2ut3YA:10 a=gKebqoRLp9LExxC7YDUY:22
-X-Proofpoint-GUID: Qf77YhGoOfahrXStASEHkfr-0C9vQNCF
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-27_05,2025-12-26_01,2025-10-01_01
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thur 2025-12-04  8:10 UTC Zhiping Zhang wrote:
+This patchset fixes the infinite loops due to duplication in netem, the
+real root cause of this problem is enqueuing to the root qdisc, which is
+now changed to enqueuing to the same qdisc. This is more reasonable,
+more intuitive from users' perspective, less error-prone and more elegant
+from kernel developers' perspective.
 
-> On Monday 2025-11-20 13:11 UTC, Jason Gunthorpe wrote:
-> >
-> > Re: [RFC 2/2] Set steering-tag directly for PCIe P2P memory access
-> >
-> > On Wed, Nov 19, 2025 at 11:24:40PM -0800, Zhiping Zhang wrote:
-> > > On Monday, November 17, 2025 at 8:00=E2=80=AFAM, Jason Gunthorpe wr=
-ote:
-> > > > Re: [RFC 2/2] Set steering-tag directly for PCIe P2P memory acces=
-s
-> > > >
-> > > > On Thu, Nov 13, 2025 at 01:37:12PM -0800, Zhiping Zhang wrote:
-> > > > > RDMA: Set steering-tag value directly in DMAH struct for DMABUF=
- MR
-> > > > >
-> > > > > This patch enables construction of a dma handler (DMAH) with th=
-e P2P memory type
-> > > > > and a direct steering-tag value. It can be used to register a R=
-DMA memory
-> > > > > region with DMABUF for the RDMA NIC to access the other device'=
-s memory via P2P.
-> > > > >
-> > > > > Signed-off-by: Zhiping Zhang <zhipingz@meta.com>
-> > > > > ---
-> > > > > .../infiniband/core/uverbs_std_types_dmah.c   | 28 ++++++++++++=
-+++++++
-> > > > > drivers/infiniband/core/uverbs_std_types_mr.c |  3 ++
-> > > > > drivers/infiniband/hw/mlx5/dmah.c             |  5 ++--
-> > > > > .../net/ethernet/mellanox/mlx5/core/lib/st.c  | 12 +++++---
-> > > > > include/linux/mlx5/driver.h                   |  4 +--
-> > > > > include/rdma/ib_verbs.h                       |  2 ++
-> > > > > include/uapi/rdma/ib_user_ioctl_cmds.h        |  1 +
-> > > > > 7 files changed, 46 insertions(+), 9 deletions(-)
-> > > > >
-> > > > > diff --git a/drivers/infiniband/core/uverbs_std_types_dmah.c b/=
-drivers/infiniband/core/uverbs_std_types_dmah.c
-> > > > > index 453ce656c6f2..1ef400f96965 100644
-> > > > > --- a/drivers/infiniband/core/uverbs_std_types_dmah.c
-> > > > > +++ b/drivers/infiniband/core/uverbs_std_types_dmah.c
-> > > > > @@ -61,6 +61,27 @@ static int UVERBS_HANDLER(UVERBS_METHOD_DMAH=
-_ALLOC)(
-> > > > >              dmah->valid_fields |=3D BIT(IB_DMAH_MEM_TYPE_EXIST=
-S);
-> > > > >      }
-> > > > >
-> > > > > +     if (uverbs_attr_is_valid(attrs, UVERBS_ATTR_ALLOC_DMAH_DI=
-RECT_ST_VAL)) {
-> > > > > +             ret =3D uverbs_copy_from(&dmah->direct_st_val, at=
-trs,
-> > > > > +                                    UVERBS_ATTR_ALLOC_DMAH_DIR=
-ECT_ST_VAL);
-> > > > > +             if (ret)
-> > > > > +                     goto err;
-> > > >
-> > > > This should not come from userspace, the dmabuf exporter should
-> > > > provide any TPH hints as part of the attachment process.
-> > > >
-> > > > We are trying not to allow userspace raw access to the TPH values=
-, so
-> > > > this is not a desirable UAPI here.
-> > > >
-> > > > Thanks for your feedback!
-> > >
-> > > I understand the concern about not exposing raw TPH values to
-> > > userspace.  To clarify, would it be acceptable to use an index-base=
-d
-> > > mapping table, where userspace provides an index and the kernel
-> > > translates it to the appropriate TPH value? Given that the PCIe spe=
-c
-> > > allows up to 16-bit TPH values, this could require a mapping table
-> > > of up to 128KB. Do you see this as a reasonable approach, or is
-> > > there a preferred alternative?
-> >
-> > ?
-> >
-> > The issue here is to secure the TPH. The kernel driver that owns the
-> > exporting device should control what TPH values an importing driver
-> > will use.
-> >
-> > I don't see how an indirection table helps anything, you need to add
-> > an API to DMABUF to retrieve the tph.
+Please see more details in patch 4/8 which contains two pages of detailed
+explanation including why it is safe and better.
 
-> I see, thanks for the clarification. Yes we can add and use another new
-> API(s) for this purpose.
+This reverts the offending commits from William which clearly broke
+mq+netem use cases, as reported by two users.
 
-> Sorry for the delay: I was waiting for the final version of Leon's
-> vfio-dmabuf patch series and plan to follow that for implementing the n=
-ew
-> API(s) needed.
-> (https://lore.kernel.org/all/20251120-dmabuf-vfio-v9-6-d7f71607f371@nvi=
-dia.com/).
->
-> >
-> > > Additionally, in cases where the dmabuf exporter device can handle =
-all possible 16-bit
-> > > TPH values  (i.e., it has its own internal mapping logic or table),=
- should this still be
-> > > entirely abstracted away from userspace?
-> >
-> > I imagine the exporting device provides the raw on the wire TPH value
-> > it wants the importing device to use and the importing device is
-> > responsible to program it using whatever scheme it has.
-> >
-> > Jason
->
-> Can you suggest or elaborate a bit on the schmes you see feasible?
->
-> When the exporting device supports all or multiple TPH values, it is
-> desirable to have userspace processes select which TPH values to use
-> for the dmabuf at runtime. Actually that is the main use case of this
-> patch: the user can select the TPH values to associate desired P2P
-> operations on the dmabuf. The difficulty is how we can provide this
-> flexibility while still aligning with kernel and security best
-> practices.
->
-> Zhiping
+All the TC test cases pass with this patchset.
 
-Happy holidays! I went through the vfio-dmabuf patch series and Jason's
-comments once more. I think I have a proposal that addresses the concerns=
-.
+---
+v6: Dropped the init_user_ns check patch
+    Reordered the qfq patch
+    Rebased to the latest -net branch
 
-For p2p or dmabuf use cases, we pass in an ID or fd similar to CPU_ID whe=
-n
-allocating a dmah, and make a callback to the dmabuf exporter to get the
-TPH value associated with the fd. That involves adding a new dmabuf opera=
-tion
-for the callback to get the TPH/tag value associated.
+v5: Reverted the offending commits
+    Added a init_user_ns check (4/9)
+    Rebased to the latest -net branch
 
-I can start with vfio-dmabuf and add the new dmabuf op/ABI there based on
-Leon's patch. Pls let me know if you have any concerns or suggestions.
+v4: Added a fix for qfq qdisc (2/6)
+    Updated 1/6 patch description
+    Added a patch to update the enqueue reentrant behaviour tests
 
-Zhiping
+v3: Fixed the root cause of enqueuing to root
+    Switched back to netem_skb_cb safely
+    Added two more test cases
+
+v2: Fixed a typo
+    Improved tdc selftest to check sent bytes
+
+Cong Wang (8):
+  net_sched: Check the return value of qfq_choose_next_agg()
+  Revert "net/sched: Restrict conditions for adding duplicating netems
+    to qdisc tree"
+  Revert "selftests/tc-testing: Add tests for restrictions on netem
+    duplication"
+  net_sched: Implement the right netem duplication behavior
+  selftests/tc-testing: Add a nested netem duplicate test
+  selftests/tc-testing: Add a test case for piro with netem duplicate
+  selftests/tc-testing: Add a test case for mq with netem duplicate
+  selftests/tc-testing: Update test cases with netem duplicate
+
+ net/sched/sch_netem.c                         |  66 +++-------
+ net/sched/sch_qfq.c                           |   2 +
+ .../tc-testing/tc-tests/infra/qdiscs.json     | 115 +++++++++++++-----
+ .../tc-testing/tc-tests/qdiscs/netem.json     |  90 +++-----------
+ 4 files changed, 120 insertions(+), 153 deletions(-)
+
+-- 
+2.34.1
+
 
