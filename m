@@ -1,279 +1,213 @@
-Return-Path: <netdev+bounces-246107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14392CDF25E
-	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 01:00:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E26BCDF2DA
+	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 01:20:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 24F5E301584D
-	for <lists+netdev@lfdr.de>; Fri, 26 Dec 2025 23:59:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C59E43007603
+	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 00:20:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DACE9290D81;
-	Fri, 26 Dec 2025 23:59:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D27851EE033;
+	Sat, 27 Dec 2025 00:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fQbVclIZ";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="hX8/lhjU"
+	dkim=pass (2048-bit key) header.d=fel.cvut.cz header.i=@fel.cvut.cz header.b="S6KJo4cI"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtpx.fel.cvut.cz (smtpx.feld.cvut.cz [147.32.210.153])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4DAA296BAB
-	for <netdev@vger.kernel.org>; Fri, 26 Dec 2025 23:59:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D48C3A1E6E;
+	Sat, 27 Dec 2025 00:20:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=147.32.210.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766793589; cv=none; b=ULfRwI+WUC7qxpt9VHB2sACmxAiobFDUWzox005HFpcMOSzcENzdWSvViS9yn9X2e4/Tjq5vl/gxb7f2MSTL0quKC+Ibkm85vhkf3lQwWucspAiSXnxbXRTRKwZGtUoc0Lif4BVKTP9wtyDOWKR0/RExx/PcTLeR91q9p6W8MGk=
+	t=1766794814; cv=none; b=RCZPEm4YRC5v4D+X4s+/42sD2/uAiIGwcUR5ky9LUpgG/AWOw6BPlnaCG5cQX5AZL17GD2XEq7n6wKGODxew/dE1kITfhyzvD715vvyTCELw6O6oyY3KpSVdSUJtGQJB13FbZvEJwy5xYC4SCEaGGpc7d+Kh0aTP8UzDBFLODdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766793589; c=relaxed/simple;
-	bh=0WgtEyyghiej13OjppeGfPv7cq7v3kU/ZW6GrWWjF1I=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ns9JmsxpaaMPtl63z55LIqeSiawgsggjnRBAFZYxxKAurRzvWGdfpg8XGhOojqdV1HrBMBf+xGUmPJeSEjNXtrHGeLQ1ybjf+Mz/XpHsinAo6+mliPJECKcx+Jvc5u6/P1yiR+wsFtMJcjInCebqM6Xk8hmwRYUmuBQVX4SutIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fQbVclIZ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=hX8/lhjU; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766793586;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=865A7519wiN2/j/d36TzZexT5dCdrH361yDIN6aF4EQ=;
-	b=fQbVclIZo19ltUGahP/PkkpOiREPm+5nd7zkjqh9FQFDPcQLywqOqwXCiR8zTzkWsr/scO
-	ZOlH9Cwr6xzkxxntD2JdD4Cm5idduX/7DMeIZzN6JlMyzEAhxNAgmUvunrCqRJCY8SO8M9
-	8Z7820E6su1ycSvWe+gvf6vGoLBfMPs=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-691-iyLULBF5PvaWBn6kvtdgjg-1; Fri, 26 Dec 2025 18:59:40 -0500
-X-MC-Unique: iyLULBF5PvaWBn6kvtdgjg-1
-X-Mimecast-MFC-AGG-ID: iyLULBF5PvaWBn6kvtdgjg_1766793580
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4ed6ff3de05so209670041cf.3
-        for <netdev@vger.kernel.org>; Fri, 26 Dec 2025 15:59:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1766793580; x=1767398380; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=865A7519wiN2/j/d36TzZexT5dCdrH361yDIN6aF4EQ=;
-        b=hX8/lhjU69EsMzJ45goSg9ZefRLPOdWtjnXVTnr6qD9njIgew8fbvDeFi97WODJtF0
-         ZakysNxmxlrjAvuQ4MKMKhwndrpeL+LjgmB45/MMqnhoNACBeIWVr8JrqSgxlELxBF4Y
-         UZGh+lC76YD68d4ayoUBdOFySRWeGVv8757imn579Qki4ZPumKhtxkUCjASdmKf5SiZ1
-         mZd05s87jG8HOkqiRlo6G4mS+vkfvTm/ZSczPTYFi3CVjJoZm5yM9c2tqwfHMwpJvPpq
-         cTVT88b52JMEu2N9s999y13SN6NDrrxG3Lz1dB/2jDjk+4MjZ3rd0DM/puoTtOrJv67F
-         PpeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766793580; x=1767398380;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=865A7519wiN2/j/d36TzZexT5dCdrH361yDIN6aF4EQ=;
-        b=dceuSI/HRYwEQYU2I3p5j5m7mvQ/Do8SFpZOlBEA8eZCjX0UKWSQDBn7z4dgJaDoiq
-         nC2v7iHHyWMGcKZlxje0GB1a/KurWxwgDByIexnN9THaYY33w9FJ+Vl3wFoCi1E+N/9B
-         C6Rf2kFO68V1tftGa/wNELV+3ZgGIC6osFEgtXQHS3ggqtom4N4ia/RR4y9H6OwcM3mD
-         FqJKOlghVG6JzannnNGEKf1kkiR90rW1wQsI1Hc8duTGwpeTErjzI6tR7jJEWwPjPrNu
-         38A8nV7oPu4fXRXJSG5X5AmYP7SF5MK7zL5xIY0RNuG4879nI2mIWv7APuflHhOzKN5K
-         /fIA==
-X-Forwarded-Encrypted: i=1; AJvYcCUhuk6ynHYtP3DCyLsvjkldIv/sd9CEiUO9ug/pJggibx9tRzLHQF0i1fvZ7iUht4duqeGcdLE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjhFXY1zyMxTez5GzkaKOAxHwnmnY/YjPbeBIU5TgAN3cEgTC7
-	ggAVfK8oYR430sSQFigto3d+Ej5+XdWkSH3rbptdNoQk75AT3gd2O9HOBduiRmLNIGd/5M3oqbK
-	hwjqq4qi2psyYwzLQxNqaN5cIPOEe+tuqFYPyO/YvRUF9tOiLB9VckKRBNw==
-X-Gm-Gg: AY/fxX7QT4yt9r42CHoJttE/4u54IJ3A378a1cq6lnZyGDEyX2tklYmo7wHLUhnbRV1
-	GCJee/eVW1gUOglTfHeUs8qdT32YyDiLZc1zQuE4USlMLDvo6Fdp3NitLUaZVroe8SdtThkgBvO
-	Yx50lDMAr329wjuPjjW4NVYbecwySvLHvybCRYGkBQVw1Ys7B/YY1hdtukNw+Beiy839UeUeVhM
-	cuL/XH1qCP8Fj06stgbdv5vzpEEbMle/mK/QUaZZVC51BolbxCkOfMQSvsxZy+HyJPz+fGdbDSQ
-	4JFkhuJ/WFhNXHPr/ONhs8Cz/qFjyNqlt4a9t6bsIMHk6lVN0Rm9oe6FwZGWDd/Hyjap6gDpkqZ
-	mB9XW3QWmBE4mlq/HDDCJieQ6MjwJ5g4fAi4gxbX7wkW/ll6EKQ4TysVc
-X-Received: by 2002:a05:622a:198b:b0:4ee:1bc7:9d7b with SMTP id d75a77b69052e-4f4abd8cc1fmr323812881cf.39.1766793580140;
-        Fri, 26 Dec 2025 15:59:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IERH4Oby4w37LQow9PPp6jIctRZ9vYsC7ux3H2yEqxLfgye1sWzIlcBk2jF/qfYV4D0shjHTw==
-X-Received: by 2002:a05:622a:198b:b0:4ee:1bc7:9d7b with SMTP id d75a77b69052e-4f4abd8cc1fmr323812481cf.39.1766793579691;
-        Fri, 26 Dec 2025 15:59:39 -0800 (PST)
-Received: from ?IPV6:2601:600:947f:f020:85dc:d2b2:c5ee:e3c4? ([2601:600:947f:f020:85dc:d2b2:c5ee:e3c4])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4f4ac55fde7sm165334981cf.12.2025.12.26.15.59.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Dec 2025 15:59:38 -0800 (PST)
-From: Waiman Long <llong@redhat.com>
-X-Google-Original-From: Waiman Long <longman@redhat.com>
-Message-ID: <a8968902-7fc3-4dec-9a53-e9685a5705b9@redhat.com>
-Date: Fri, 26 Dec 2025 18:59:34 -0500
+	s=arc-20240116; t=1766794814; c=relaxed/simple;
+	bh=mxzYxkFXm1WBNIb5Yog/dRDInADTKBjxopk94N7WIFM=;
+	h=From:To:Subject:Date:Cc:References:In-Reply-To:MIME-Version:
+	 Content-Type:Content-Disposition:Message-Id; b=V9/k7eKjj3WYdN5ikZTVuw+6B+YbAYCgHzNcOBc8ffuo4sCqAamHZCh7jGbyVo5KcV6HW/N/8LybN5CQxwEcRZdxZT+q3SNNoxO7D5pxUkt2YKJnO1NrLdDv/CB0IqhMcymPZNlR3RQBEkeM/9z/BIGSfafbOfY806IhUldIUKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fel.cvut.cz; spf=pass smtp.mailfrom=fel.cvut.cz; dkim=pass (2048-bit key) header.d=fel.cvut.cz header.i=@fel.cvut.cz header.b=S6KJo4cI; arc=none smtp.client-ip=147.32.210.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fel.cvut.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fel.cvut.cz
+Received: from localhost (unknown [192.168.200.27])
+	by smtpx.fel.cvut.cz (Postfix) with ESMTP id E153316404;
+	Sat, 27 Dec 2025 01:20:02 +0100 (CET)
+X-Virus-Scanned: IMAP STYX AMAVIS
+Received: from smtpx.fel.cvut.cz ([192.168.200.2])
+ by localhost (cerokez-250.feld.cvut.cz [192.168.200.27]) (amavis, port 10060)
+ with ESMTP id BqD-eCiLjk-B; Sat, 27 Dec 2025 01:20:01 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fel.cvut.cz;
+	s=felmail; t=1766794342;
+	bh=8OGPj4UIzGsRvEleY+WUlbELMJzYb1fwdxvZmVVR3kE=;
+	h=From:To:Subject:Date:Cc:References:In-Reply-To:From;
+	b=S6KJo4cIytIweL5rd951zqpgPQ7Ltt+wOjYOMDK00eteWf9Qa8tr+M5lV8LgpnvSc
+	 /vVXAoY9et/pm/NjfK1ms32NJA6ZAbYatycXHfRgk/cvNrWod669ZsIGBYQfn8y3eu
+	 9HL5AhUKsxAeY1lDKHdfDiBiCufK2ZTCYI/RJOe3iwBhcW1xzR43SBhlTIyIVope+U
+	 mrj9adJK3Q6AqWsx+hhUYz4ooyd1Rm5CjWqIMUId5eHFkNNwAJAEwjYyr2odIX2U3u
+	 0PxcKQg08xnYrJN7lKxAnVczBFCNn1Y+w5RepdAFT+VE/z5cqiiX3ZifVchq7h7q5U
+	 k/EjPLMVYzwyQ==
+Received: from baree.pikron.com (static-84-242-78-234.bb.vodafone.cz [84.242.78.234])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pisa)
+	by smtpx.fel.cvut.cz (Postfix) with ESMTPSA id 6477216145;
+	Sat, 27 Dec 2025 01:12:21 +0100 (CET)
+From: Pavel Pisa <pisa@fel.cvut.cz>
+To: Ondrej Ille <ondrej.ille@gmail.com>
+Subject: Re: ctucanfd: possible coding error in ctucan_set_secondary_sample_point causing SSP not enabled
+Date: Sat, 27 Dec 2025 01:12:19 +0100
+User-Agent: KMail/1.9.10
+Cc: David Laight <david.laight.linux@gmail.com>,
+ "Marc Kleine-Budde" <mkl@pengutronix.de>,
+ Andrea Daoud <andreadaoud6@gmail.com>,
+ linux-can@vger.kernel.org,
+ Wolfgang Grandegger <wg@grandegger.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+ netdev@vger.kernel.org,
+ Jan Altenberg <Jan.Altenberg@osadl.org>
+References: <CAOprWotBRv_cvD3GCSe7N2tiLooZBoDisSwbu+VBAmt_2izvwQ@mail.gmail.com> <202512222355.10509.pisa@fel.cvut.cz> <CAA7ZjpbhWQab77T42URMxQqv4SZwN+5FfDB9VEn0g9-ZKCqdOQ@mail.gmail.com>
+In-Reply-To: <CAA7ZjpbhWQab77T42URMxQqv4SZwN+5FfDB9VEn0g9-ZKCqdOQ@mail.gmail.com>
+X-KMail-QuotePrefix: > 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 30/33] kthread: Honour kthreads preferred affinity after
- cpuset changes
-To: Frederic Weisbecker <frederic@kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Chen Ridong <chenridong@huawei.com>, Danilo Krummrich <dakr@kernel.org>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
- Lai Jiangshan <jiangshanlai@gmail.com>,
- Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
- <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
- Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
- Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Vlastimil Babka <vbabka@suse.cz>, Will Deacon <will@kernel.org>,
- cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-block@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20251224134520.33231-1-frederic@kernel.org>
- <20251224134520.33231-31-frederic@kernel.org>
-Content-Language: en-US
-In-Reply-To: <20251224134520.33231-31-frederic@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: Text/Plain;
+  charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <202512270112.19801.pisa@fel.cvut.cz>
 
-On 12/24/25 8:45 AM, Frederic Weisbecker wrote:
-> When cpuset isolated partitions get updated, unbound kthreads get
-> indifferently affine to all non isolated CPUs, regardless of their
-> individual affinity preferences.
->
-> For example kswapd is a per-node kthread that prefers to be affine to
-> the node it refers to. Whenever an isolated partition is created,
-> updated or deleted, kswapd's node affinity is going to be broken if any
-> CPU in the related node is not isolated because kswapd will be affine
-> globally.
->
-> Fix this with letting the consolidated kthread managed affinity code do
-> the affinity update on behalf of cpuset.
->
-> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> ---
->   include/linux/kthread.h  |  1 +
->   kernel/cgroup/cpuset.c   |  5 ++---
->   kernel/kthread.c         | 41 ++++++++++++++++++++++++++++++----------
->   kernel/sched/isolation.c |  3 +++
->   4 files changed, 37 insertions(+), 13 deletions(-)
->
-> diff --git a/include/linux/kthread.h b/include/linux/kthread.h
-> index 8d27403888ce..c92c1149ee6e 100644
-> --- a/include/linux/kthread.h
-> +++ b/include/linux/kthread.h
-> @@ -100,6 +100,7 @@ void kthread_unpark(struct task_struct *k);
->   void kthread_parkme(void);
->   void kthread_exit(long result) __noreturn;
->   void kthread_complete_and_exit(struct completion *, long) __noreturn;
-> +int kthreads_update_housekeeping(void);
->   
->   int kthreadd(void *unused);
->   extern struct task_struct *kthreadd_task;
-> diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
-> index 1cc83a3c25f6..c8cfaf5cd4a1 100644
-> --- a/kernel/cgroup/cpuset.c
-> +++ b/kernel/cgroup/cpuset.c
-> @@ -1208,11 +1208,10 @@ void cpuset_update_tasks_cpumask(struct cpuset *cs, struct cpumask *new_cpus)
->   
->   		if (top_cs) {
->   			/*
-> +			 * PF_KTHREAD tasks are handled by housekeeping.
->   			 * PF_NO_SETAFFINITY tasks are ignored.
-> -			 * All per cpu kthreads should have PF_NO_SETAFFINITY
-> -			 * flag set, see kthread_set_per_cpu().
->   			 */
-> -			if (task->flags & PF_NO_SETAFFINITY)
-> +			if (task->flags & (PF_KTHREAD | PF_NO_SETAFFINITY))
->   				continue;
->   			cpumask_andnot(new_cpus, possible_mask, subpartitions_cpus);
->   		} else {
-> diff --git a/kernel/kthread.c b/kernel/kthread.c
-> index 968fa5868d21..03008154249c 100644
-> --- a/kernel/kthread.c
-> +++ b/kernel/kthread.c
-> @@ -891,14 +891,7 @@ int kthread_affine_preferred(struct task_struct *p, const struct cpumask *mask)
->   }
->   EXPORT_SYMBOL_GPL(kthread_affine_preferred);
->   
-> -/*
-> - * Re-affine kthreads according to their preferences
-> - * and the newly online CPU. The CPU down part is handled
-> - * by select_fallback_rq() which default re-affines to
-> - * housekeepers from other nodes in case the preferred
-> - * affinity doesn't apply anymore.
-> - */
-> -static int kthreads_online_cpu(unsigned int cpu)
-> +static int kthreads_update_affinity(bool force)
->   {
->   	cpumask_var_t affinity;
->   	struct kthread *k;
-> @@ -924,7 +917,8 @@ static int kthreads_online_cpu(unsigned int cpu)
->   		/*
->   		 * Unbound kthreads without preferred affinity are already affine
->   		 * to housekeeping, whether those CPUs are online or not. So no need
-> -		 * to handle newly online CPUs for them.
-> +		 * to handle newly online CPUs for them. However housekeeping changes
-> +		 * have to be applied.
->   		 *
->   		 * But kthreads with a preferred affinity or node are different:
->   		 * if none of their preferred CPUs are online and part of
-> @@ -932,7 +926,7 @@ static int kthreads_online_cpu(unsigned int cpu)
->   		 * But as soon as one of their preferred CPU becomes online, they must
->   		 * be affine to them.
->   		 */
-> -		if (k->preferred_affinity || k->node != NUMA_NO_NODE) {
-> +		if (force || k->preferred_affinity || k->node != NUMA_NO_NODE) {
->   			kthread_fetch_affinity(k, affinity);
->   			set_cpus_allowed_ptr(k->task, affinity);
->   		}
-> @@ -943,6 +937,33 @@ static int kthreads_online_cpu(unsigned int cpu)
->   	return ret;
->   }
->   
-> +/**
-> + * kthreads_update_housekeeping - Update kthreads affinity on cpuset change
-> + *
-> + * When cpuset changes a partition type to/from "isolated" or updates related
-> + * cpumasks, propagate the housekeeping cpumask change to preferred kthreads
-> + * affinity.
-> + *
-> + * Returns 0 if successful, -ENOMEM if temporary mask couldn't
-> + * be allocated or -EINVAL in case of internal error.
-> + */
-> +int kthreads_update_housekeeping(void)
-> +{
-> +	return kthreads_update_affinity(true);
-> +}
-> +
-> +/*
-> + * Re-affine kthreads according to their preferences
-> + * and the newly online CPU. The CPU down part is handled
-> + * by select_fallback_rq() which default re-affines to
-> + * housekeepers from other nodes in case the preferred
-> + * affinity doesn't apply anymore.
-> + */
-> +static int kthreads_online_cpu(unsigned int cpu)
-> +{
-> +	return kthreads_update_affinity(false);
-> +}
-> +
->   static int kthreads_init(void)
->   {
->   	return cpuhp_setup_state(CPUHP_AP_KTHREADS_ONLINE, "kthreads:online",
-> diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
-> index 84a257d05918..c499474866b8 100644
-> --- a/kernel/sched/isolation.c
-> +++ b/kernel/sched/isolation.c
-> @@ -157,6 +157,9 @@ int housekeeping_update(struct cpumask *isol_mask, enum hk_type type)
->   	err = tmigr_isolated_exclude_cpumask(isol_mask);
->   	WARN_ON_ONCE(err < 0);
->   
-> +	err = kthreads_update_housekeeping();
-> +	WARN_ON_ONCE(err < 0);
-> +
->   	kfree(old);
->   
->   	return err;
-Reviewed-by: Waiman Long <longman@redhat.com>
+Dear Ondrej Ille,
 
+On Friday 26 of December 2025 23:45:55 Ondrej Ille wrote:
+> Hello everyone,
+>
+> As for this specific case, I am aware of it for longer time
+>
+> > but the last time when we met with Ondrej Ille this part
+> > as been the last one on the table and the firm confirmation
+> > what is the best value have not been stated.
+>
+> Pavel, the sample point should definitely be set to the variant of
+> "measured + offset". That is
+> what why the offset is calculated above the way it is. The aim is to place
+> the sample point
+> on CAN_RX "as-if the same as normal sample point", just with the TX->RX
+> delay accounted for.
+> One only needs to be careful that the value is not in Time Quantas, but in
+> "number of cycles".
+> But AFAICT should be accounted for by the ssp_offset calculation.
+>
+> As for leaving there comment, or leaving it up to the compiler to optimize
+> away since the value is
+> anyway initialized to zero, I don't know what is the preferred way in
+> kernel.
+> Personally, I would not leave any "meaningless code", so, I think comment
+> is better.
+
+I am not sure, I would probably prefer code there because it can be
+easily modified to other value or make it configurable. So this
+would look like
+
+        if (dbt->bitrate > 1000000) {
+                /* Calculate SSP in minimal time quanta */
+                ssp_offset = (priv->can.clock.freq / 1000) * dbt->sample_point / dbt->bitrate;
+
+                if (ssp_offset > 127) {
+                        netdev_warn(ndev, "SSP offset saturated to 127\n");
+                        ssp_offset = 127;
+                }
+
+                ssp_cfg = FIELD_PREP(REG_TRV_DELAY_SSP_OFFSET, ssp_offset);
+                ssp_cfg |= FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x0);
+        }
+
+It matches currents state of the driver in the IP CORE repository where
+you have propagated change lat week
+
+https://gitlab.fel.cvut.cz/canbus/ctucanfd_ip_core/-/commit/6188ca673f823873f7b37dbb588a2d4c0a0cc98c
+
+But I would suggest to cover even else case for dbt->bitrate <= 1 Mbit/s by else
+statement which should be probably 
+
+        } else {
+                ssp_cfg = FIELD_PREP(REG_TRV_DELAY_SSP_OFFSET, 0);
+                ssp_cfg |= FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x0);
+        }
+
+It is right that ctucan_set_secondary_sample_point() is called from ctucan_chip_start()
+only and it is called from ctucan_do_set_mode() and ctucan_open() only and the chip
+reset is done in both paths prior to ctucan_chip_start() but I think that
+state should be defined there even for case that core is only stopped by
+by REG_MODE_ENA and then re-enabled an no leftover from setup with higher
+data bitrate to some followup change to lower one should be left there.
+
+If there is already some defined way how to control/enable/disable
+SSP from userspace for some of other drivers then I would
+ted to have such option for CTU CAN FD as well to have
+option to test/diagnose and correct (in the case of some problems)
+its behavior without driver recompile.  
+
+> 1) the driver is fixed on 4 Tx Buffers synthesis value
+>
+> > for CTU CAN FD IP core. I am not aware about any other value
+> > in real use (FPGA or silicon) but if the core is synthesized
+> > with other value then driver would fail.  If more are used,
+> > then current driver code stuck on Tx empty infinite interrupt,
+> > if less, messages would be lost.
+> > The option to obtain the number of Tx buffers from hardware
+> > has been added into design and we have proper code in RTEMS
+> > driver
+>
+> Yes, this would be useful, I believe there is a tracking issue for that. I
+> believe querying it
+> at run-time is the simplest way to do it, but I don't know if it is "the
+> right way" in kernel.
+
+I think that it is OK, we have there already option to propagate
+value from PCI and OF specific CTU CAN FD mapping into base code
+but it is fixed on four buffers fr now and no mapping to OF is provided.
+So I would change it such that ntxbufs = 0 specified by PCI or OF
+mapping would result in configuration from info register.
+If the requested ntxbufs from PCI or OF is higher than value reported
+by info register then it should be limited as well and final limit
+should be some define
+
+#define CTUCANFD_NTXBUFS_MAX 8
+
+We have that tested info register reading in RTEMS driver
+for 2.5 as well as older branch so I hope that risk
+of breaking someone's CTU CAN FD specific integration
+is relatively small.
+
+I prepare patches. The SSP one can be considered as bugfix
+if Marc, David or somebody with the need proposes that
+and may it be it can get to 6.19. Or I prepare both
+for the next merge window.
+
+Best wishes,
+
+                Pavel
+
+                Pavel Pisa
+    phone:      +420 603531357
+    e-mail:     pisa@cmp.felk.cvut.cz
+    Department of Control Engineering FEE CVUT
+    Karlovo namesti 13, 121 35, Prague 2
+    university: http://control.fel.cvut.cz/
+    personal:   http://cmp.felk.cvut.cz/~pisa
+    social:     https://social.kernel.org/ppisa
+    projects:   https://www.openhub.net/accounts/ppisa
+    CAN related:http://canbus.pages.fel.cvut.cz/
+    RISC-V education: https://comparch.edu.cvut.cz/
+    Open Technologies Research Education and Exchange Services
+    https://gitlab.fel.cvut.cz/otrees/org/-/wikis/home
 
