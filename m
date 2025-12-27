@@ -1,108 +1,181 @@
-Return-Path: <netdev+bounces-246108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71EEBCDF2D0
-	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 01:18:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FA01CDF306
+	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 01:45:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DCB8A3008FBD
-	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 00:18:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 94E473006AB4
+	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 00:45:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2CD61EB9F2;
-	Sat, 27 Dec 2025 00:18:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11291214A9B;
+	Sat, 27 Dec 2025 00:45:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tduMpdCm"
+	dkim=pass (2048-bit key) header.d=fel.cvut.cz header.i=@fel.cvut.cz header.b="FjRX0xZk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtpx.fel.cvut.cz (smtpx.feld.cvut.cz [147.32.210.153])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99321A3166;
-	Sat, 27 Dec 2025 00:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECB5F21D3E2;
+	Sat, 27 Dec 2025 00:45:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=147.32.210.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766794686; cv=none; b=uYpGgV4hImTv3w1kJhsWtVpHC/2ABU7rPi0r0q44QPQKeCuJY7GCMP4+GmyLx456QObofrnBJSB+jop989OpZozGlgB0vPZhaTP2oJd9vpBO6yXjIYzrkobDJX2eipJ7irjI4JwZGD+COJ3DdI3tkw4sH7pkWQ5EHzrbGu4NVqY=
+	t=1766796308; cv=none; b=PDQ/FcR9wwqvJDgdVb8Vv8l7oaa9Vog+lMtP4BDeT2V8Yc6DQb1OZECw4ruAt32g/gaR/42OoXhsx2z+agAP5ifMFoVBfF/pub0KtD1VeKSIGyBbtX7hpO4611HhhqyolHXDfJbqBT3VvG/fTBNHLTMDAesqDyCb9QrZC0ZurDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766794686; c=relaxed/simple;
-	bh=ZqpJU+rrtyriuXVbfa8/1GLYlSPnOy7NbFVtMvqk1so=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k0P6FpKDqCN5YIBPDLCSO/masb4exqKc6KRbTofazAjZ1SBx5713botXilpBMKgt7qnWQt+CyziElmS7GJHdp3EtfqCJeKtX3SpfiuGSdJporLtvfF4lPgR3ouDtilOlc7Cm7jYTN0tzC6oZe+pXi/gjvdA0SZpBsiv7lTByfZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tduMpdCm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F066C4CEF7;
-	Sat, 27 Dec 2025 00:18:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766794686;
-	bh=ZqpJU+rrtyriuXVbfa8/1GLYlSPnOy7NbFVtMvqk1so=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tduMpdCm7pTU545ESqbiCA9OZMUAVvB4CzcHOhvSiJfeHqftgQCgmlMdDZwImZ0je
-	 g8gEFnw4krUQuccQ0OMgu0Kv3Fz5iPLHuGKiJTV+qsqBtqF0j6ykjSlhaX3N6RsT3O
-	 P6qkaOv/wtXzqWrZ//onWroe6YEnQn5jt+HhekOR5TasgETXMgdvyTGjNAGKrhMzsB
-	 KE8n+88ZNp6U9Pvu/FYPmsB0cbUiZu6HvKgQgmIsi5kpMngPZrD1k6arRFvELAHWN8
-	 AJ/zWgabDLlnKrCqpClwTNBuhtZlm2B4uJFjmeBTj9e4gSvzkm4m3dhI9DZLsCfLK8
-	 UYuhDQ1G9YJkg==
-Date: Fri, 26 Dec 2025 14:18:05 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Frederic Weisbecker <frederic@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chen Ridong <chenridong@huawei.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 18/33] cpuset: Propagate cpuset isolation update to
- workqueue through housekeeping
-Message-ID: <aU8lvW7nfTukNKGK@slm.duckdns.org>
-References: <20251224134520.33231-1-frederic@kernel.org>
- <20251224134520.33231-19-frederic@kernel.org>
+	s=arc-20240116; t=1766796308; c=relaxed/simple;
+	bh=IEBm1SxcXBuo96w3k4LPR8IigGiimqKKQp9AJiCr01c=;
+	h=From:To:Subject:Date:Cc:References:In-Reply-To:MIME-Version:
+	 Content-Type:Content-Disposition:Message-Id; b=QzGdIDCfz+1TlZseAQSvuS0XXq2pWvicUPfOEm4Uh65mHt4Bk4bX8ShdrKFsP9mCm/jkEz7Ts1o5Px9V9iWNImv3jcv3+UUedPd1Gjrk03Fxuqah8QR/vSHxP7ETDcY4kslkaQDvnM7r5uV70bhtgm6lFB0VpfyNkXfQDS3KozI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fel.cvut.cz; spf=pass smtp.mailfrom=fel.cvut.cz; dkim=pass (2048-bit key) header.d=fel.cvut.cz header.i=@fel.cvut.cz header.b=FjRX0xZk; arc=none smtp.client-ip=147.32.210.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fel.cvut.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fel.cvut.cz
+Received: from localhost (unknown [192.168.200.27])
+	by smtpx.fel.cvut.cz (Postfix) with ESMTP id DEA6B1626B;
+	Sat, 27 Dec 2025 01:45:02 +0100 (CET)
+X-Virus-Scanned: IMAP STYX AMAVIS
+Received: from smtpx.fel.cvut.cz ([192.168.200.2])
+ by localhost (cerokez-250.feld.cvut.cz [192.168.200.27]) (amavis, port 10060)
+ with ESMTP id q42iJ87A4n5D; Sat, 27 Dec 2025 01:45:01 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fel.cvut.cz;
+	s=felmail; t=1766795951;
+	bh=DndPp7+zVQ7BD6MgvFgzA5RxURbGF01KCj8ehwdRK1w=;
+	h=From:To:Subject:Date:Cc:References:In-Reply-To:From;
+	b=FjRX0xZkm8CaHeFIyjdUKU4YnECrzEyZ78vv3HHWXIvozmR7u8cGpB/+DnsDG7+1L
+	 7zK+ixtHx7NFv8B0ksFMpWBbt8yN2o2Ar2APrF1RpYCK0F7RRYI5Q87WIH5RL1Cp+b
+	 nqoA3O7hZ9XjMQUv8SW8HigaTFBJ+L8SZlXlmLs/E358KvhZq02+BZKAGeJMiNv4Vb
+	 u4tZ/Ib+XRPJMBXqAyHpIXJgrtBa9fkJwaAiG0lR4Su+GjXGbSbLHlVET0WUbBoqAi
+	 8iZVAf7ukOEsdrgvydRyjSZ8yriw9v4MkrgbolG3G0RmhWpIwZozLg+SeD341LIX9V
+	 esUfspJYXoPbA==
+Received: from baree.pikron.com (static-84-242-78-234.bb.vodafone.cz [84.242.78.234])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pisa)
+	by smtpx.fel.cvut.cz (Postfix) with ESMTPSA id 5EDD416156;
+	Sat, 27 Dec 2025 01:39:10 +0100 (CET)
+From: Pavel Pisa <pisa@fel.cvut.cz>
+To: Ondrej Ille <ondrej.ille@gmail.com>
+Subject: Re: ctucanfd: possible coding error in ctucan_set_secondary_sample_point causing SSP not enabled
+Date: Sat, 27 Dec 2025 01:39:08 +0100
+User-Agent: KMail/1.9.10
+Cc: David Laight <david.laight.linux@gmail.com>,
+ "Marc Kleine-Budde" <mkl@pengutronix.de>,
+ Andrea Daoud <andreadaoud6@gmail.com>,
+ linux-can@vger.kernel.org,
+ Wolfgang Grandegger <wg@grandegger.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+ netdev@vger.kernel.org
+References: <CAOprWotBRv_cvD3GCSe7N2tiLooZBoDisSwbu+VBAmt_2izvwQ@mail.gmail.com> <CAA7ZjpbhWQab77T42URMxQqv4SZwN+5FfDB9VEn0g9-ZKCqdOQ@mail.gmail.com> <202512270112.19801.pisa@fel.cvut.cz>
+In-Reply-To: <202512270112.19801.pisa@fel.cvut.cz>
+X-KMail-QuotePrefix: > 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
-In-Reply-To: <20251224134520.33231-19-frederic@kernel.org>
+Message-Id: <202512270139.08818.pisa@fel.cvut.cz>
 
-On Wed, Dec 24, 2025 at 02:45:05PM +0100, Frederic Weisbecker wrote:
-> Until now, cpuset would propagate isolated partition changes to
-> workqueues so that unbound workers get properly reaffined.
-> 
-> Since housekeeping now centralizes, synchronize and propagates isolation
-> cpumask changes, perform the work from that subsystem for consolidation
-> and consistency purposes.
-> 
-> For simplification purpose, the target function is adapted to take the
-> new housekeeping mask instead of the isolated mask.
-> 
-> Suggested-by: Tejun Heo <tj@kernel.org>
-> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+Correction
 
-Acked-by: Tejun Heo <tj@kernel.org>
+On Saturday 27 of December 2025 01:12:19 Pavel Pisa wrote:
+> Dear Ondrej Ille,
+>
+> On Friday 26 of December 2025 23:45:55 Ondrej Ille wrote:
+> > Hello everyone,
+> >
+> > As for this specific case, I am aware of it for longer time
+> >
+> > > but the last time when we met with Ondrej Ille this part
+> > > as been the last one on the table and the firm confirmation
+> > > what is the best value have not been stated.
+> >
+> > Pavel, the sample point should definitely be set to the variant of
+> > "measured + offset". That is
+> > what why the offset is calculated above the way it is. The aim is to
+> > place the sample point
+> > on CAN_RX "as-if the same as normal sample point", just with the TX->RX
+> > delay accounted for.
+> > One only needs to be careful that the value is not in Time Quantas, but
+> > in "number of cycles".
+> > But AFAICT should be accounted for by the ssp_offset calculation.
+> >
+> > As for leaving there comment, or leaving it up to the compiler to
+> > optimize away since the value is
+> > anyway initialized to zero, I don't know what is the preferred way in
+> > kernel.
+> > Personally, I would not leave any "meaningless code", so, I think comment
+> > is better.
+>
+> I am not sure, I would probably prefer code there because it can be
+> easily modified to other value or make it configurable. So this
+> would look like
+>
+>         if (dbt->bitrate > 1000000) {
+>                 /* Calculate SSP in minimal time quanta */
+>                 ssp_offset = (priv->can.clock.freq / 1000) *
+> dbt->sample_point / dbt->bitrate;
+>
+>                 if (ssp_offset > 127) {
+>                         netdev_warn(ndev, "SSP offset saturated to 127\n");
+>                         ssp_offset = 127;
+>                 }
+>
+>                 ssp_cfg = FIELD_PREP(REG_TRV_DELAY_SSP_OFFSET, ssp_offset);
+>                 ssp_cfg |= FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x0);
+>         }
+>
+> It matches currents state of the driver in the IP CORE repository where
+> you have propagated change lat week
+>
+> https://gitlab.fel.cvut.cz/canbus/ctucanfd_ip_core/-/commit/6188ca673f82387
+>3f7b37dbb588a2d4c0a0cc98c
+>
+> But I would suggest to cover even else case for dbt->bitrate <= 1 Mbit/s by
+> else statement which should be probably
+>
+>         } else {
+>                 ssp_cfg = FIELD_PREP(REG_TRV_DELAY_SSP_OFFSET, 0);
+>                 ssp_cfg |= FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x0);
+>         }
 
-Thanks.
+As I have looked only onto patch, I have overlooked that whole
+register is reset to zero if condition (dbt->bitrate > 1000000)
+is not true. So then the
 
--- 
-tejun
+ssp_cfg |= FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x0);
+
+can is equivalent to the default and can be left in common
+path (if we consider value 0 as right value for all cases)
+or removed alltogether. So I am not sure at this moment
+if the whole line should be removed or set to zero
+and moved out of if block.
+
+Best wishes,
+
+                Pavel
+
+                Pavel Pisa
+    phone:      +420 603531357
+    e-mail:     pisa@cmp.felk.cvut.cz
+    Department of Control Engineering FEE CVUT
+    Karlovo namesti 13, 121 35, Prague 2
+    university: http://control.fel.cvut.cz/
+    personal:   http://cmp.felk.cvut.cz/~pisa
+    social:     https://social.kernel.org/ppisa
+    projects:   https://www.openhub.net/accounts/ppisa
+    CAN related:http://canbus.pages.fel.cvut.cz/
+    RISC-V education: https://comparch.edu.cvut.cz/
+    Open Technologies Research Education and Exchange Services
+    https://gitlab.fel.cvut.cz/otrees/org/-/wikis/home
+
+
 
