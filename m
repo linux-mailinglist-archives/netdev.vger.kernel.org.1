@@ -1,276 +1,231 @@
-Return-Path: <netdev+bounces-246147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B743CE0056
-	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 18:43:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65720CE015F
+	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 20:23:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id F2EC530049C5
-	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 17:43:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AC072301E934
+	for <lists+netdev@lfdr.de>; Sat, 27 Dec 2025 19:23:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DC81314A67;
-	Sat, 27 Dec 2025 17:43:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889B1288502;
+	Sat, 27 Dec 2025 19:23:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XXu8l9yV"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="VgQKTfng"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D53922FDEA
-	for <netdev@vger.kernel.org>; Sat, 27 Dec 2025 17:43:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B28A11F4615
+	for <netdev@vger.kernel.org>; Sat, 27 Dec 2025 19:23:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766857404; cv=none; b=JOjSvyBpUPNOltAtWsUDKukunm+tCEza2tmp3gw1H2kaNijwWlY835ivOHssP5UaG7NcQM3PBq6wRyTUtaXbiVhPCt7Fgdqy/2cv/dSCLwN2HBA4b2Wr8t4bOAOlTdGMuwAm1DDDJ2bpepX9mZGgm9fBiNkhPd6OCqnn+cvfxjc=
+	t=1766863406; cv=none; b=kaFEUgBtg8eZlmRZNoJWJbFj/pwEouVkIsPu8BAKAYYPrMkiSbaWHutXBU+oXF31sc8H0z3B2e/BtfW1WwLqFOKemcu8TCkrdOe9bh1qEpcZYbWzi1ieEQfDz/qUPgIDBZLf6jre/IWdog/DVnXF6gKyJIBrhfJC1NCYnuBJuo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766857404; c=relaxed/simple;
-	bh=6pvkrFkXV0ZCgb0+nVWualYwUjlv8Z4QFgD69EoVGbg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tnNbHRwZGDggE46DNwRNYJr0JQA7Y/7KteFZJ00oj2yIQzmTyBl1XtqTGY3G6YI0DTJdMmAhXwFuyNIBoXgyZp0N06TFJDujYqHw0vGnadrvFCNYK0pB1kJP/CTSa6pN0m480+KR5nteoo4HLNj4zWnp7lblTDbXCYvP1eI1tu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XXu8l9yV; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-34c71f462d2so8498573a91.0
-        for <netdev@vger.kernel.org>; Sat, 27 Dec 2025 09:43:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766857402; x=1767462202; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LSaQldGw/Y1Ma9OvlXjySOvj53Quv/UmpFvqZ6pZiR4=;
-        b=XXu8l9yVMNkw+u5hcy+MOTB9bhkiIwrAlVBCSVYlMfMOyVQ8yhFlKnsbLBkkPNvusM
-         YkGHm2w6dC69XFC2YODtT4sdb6AhEDfmcmguC21WFyzysjyHljsN+d2r3IHp7ffkYRC8
-         XsMnyujMxfllnZl+Z5SBvIA7y4KpaXAgfXrO4sd2i+bluZO9xFFmQ8T3NlfzTp/+Q0KE
-         ixcmwcWcOSXxvV9lme/cYn0krJksUS79H68W/OKShU3Xi/aKirI/lsBo+pWX928jj3Qk
-         /CaBevGsPkyto/Sdp+0ruKOWD3JfAlBSfRYnSWzQSq9RMlC9nqDmMJt+fekOqs0ORF/a
-         uiHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766857402; x=1767462202;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=LSaQldGw/Y1Ma9OvlXjySOvj53Quv/UmpFvqZ6pZiR4=;
-        b=G/VKmYWfw++E/+0V+r2VKnfXHnmLx3TYxEOPVkOdDetOdtivrfn8U6OsGMoWWofkq4
-         p3TYzwsFd261NguZAapQCFO6D/TTFd7jZqSnx4icYV8/G69ZG3Ev9FqcPdkMEk6hGSeu
-         hS2Fdz7lDA7fpwT3pki2f1HKqrwNMgMZCi4vXXCl9MydWMdnqouAP05pAEsH4gwz6XL8
-         LqP8pw7FZUxa41jZmiUPY/pOsF5yjDuvp5kglTks9/vi8SWwcVBXr9kRbTfq0DBW2SIN
-         /X9Nwg8/2NALOaPKxUMYS4hswLKEHYSeDUDX0j0Z/7mzryq8XlxWrj0IV5G8wjx/+Gvj
-         yTgA==
-X-Gm-Message-State: AOJu0YzXh/I+7OOsmZtN/rbIBe5zAn2a3w6NgGuy8ClcZL7b9st+p2sA
-	T1GFjGxIOACsWLzzTorQLhNqhBaegj66GbUUh3iYx8Zlw1OXcqhdV9Jy
-X-Gm-Gg: AY/fxX4ipc7E8raS4dodBIQaXfN7aHxfYUcCzVATKO6FcmKgQk8+ivTvLUEZJoxk0VT
-	0trCO2cnlaA7UcF0v28U3NRHnEfG7NY8Heu1XyC7tQ24/iv6EcCCPlOQvKptutc9yGeP5Tv8/RB
-	O3WMOsHGaYQ/hfUpQzhAMI7GjGqhmLNcxJiBVeU4uQ4lmywtmO2qleSzPJRAKHh8cGpNIfCX3MF
-	3V2WEmk6OCt2LDhyNYaHARUl6iiQ1GswdOEj+MIKQNLiWxaGhrc3IIzaKnp31RlkDqJLBdowpkC
-	uYZ0108Qgo85Brfm9wVbwJRx6eE81XkdFNWdkf7GsKnsvpKbL5g7K30XVnsdBu1h6Tf2dIs5aMF
-	iQLjD2uvKkif1IxgEqYI4FtXLf6S6ROTiZb8LXeANFUnZa9g9Nz82gtYiTZXi5CUAjpWN5iUS1C
-	pIt3a6m6y0vi+cZoPvVeASYD+A1BbO9eGvo1liwaiEAS10uP9m96X4Lxl0gHmdVAHs
-X-Google-Smtp-Source: AGHT+IGsxHJ3qlkBFY6LlEDovJZo3ksqIikwpRQUhTFYsTT1rV54HIV8Bd+jeIN258sgwZh9UeW+BA==
-X-Received: by 2002:a17:90b:35ca:b0:341:88c9:6eb2 with SMTP id 98e67ed59e1d1-34e92121d86mr20593864a91.1.1766857401838;
-        Sat, 27 Dec 2025 09:43:21 -0800 (PST)
-Received: from localhost.localdomain ([223.181.117.4])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34e9223ae29sm23274975a91.16.2025.12.27.09.43.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 Dec 2025 09:43:21 -0800 (PST)
-From: I Viswanath <viswanathiyyappan@gmail.com>
-To: kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	andrew+netdev@lunn.ch,
-	edumazet@google.com,
-	xuanzhuo@linux.alibaba.com,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	eperezma@redhat.com
-Cc: netdev@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	I Viswanath <viswanathiyyappan@gmail.com>
-Subject: [PATCH net-next v6 2/2] virtio-net: Implement ndo_write_rx_mode callback
-Date: Sat, 27 Dec 2025 23:12:25 +0530
-Message-ID: <20251227174225.699975-3-viswanathiyyappan@gmail.com>
+	s=arc-20240116; t=1766863406; c=relaxed/simple;
+	bh=CIUTJPnEIzdHePK9nwXrWk8cZBaui4jZl8U3BBKZ3mo=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tYsIyaph3jrD1AyMYvU+D6IU3u/NLGLdEujdQwxjY5WXLMEe0sPRVi0qg08077C2QbYouK1RI6ZRLpKYcmGjx1jRcR70Dm2hHAbs8SIiTSaRrUdxph0330uScO4Dag0VP8SEqz4cVPy+NS/9Tp8ujFQQxCkVs8sSHoTNIpdRPL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=VgQKTfng; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BRIEgw23046471
+	for <netdev@vger.kernel.org>; Sat, 27 Dec 2025 11:23:23 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=/9FmIM1H1ArdH+87Bbu2+pLJOGM2QnqhXssbZ8e99+A=; b=VgQKTfng2L9R
+	rhYXyMQRWv8VsHX7/CT8xv9kTh1HVUggRC9V+2MQE3qxxBAlhB5Whhf33c6xfmjt
+	t4AK6t+Ljt4S9A8kDvrCo5KRq/JGwnLAc4FITWcnsIcSEHupKq6IK8dqfp+ZYtXE
+	A7YyewKvy4DiK4dXA61Qx/Bmq0NdKM6HKfkMYIGeYKb0Pqk4EbUfZEq4rrkOBj5E
+	5Q1Jpy+NdKx7+bHeOrz2V0YvU63MeZPUAoYTL1mqeDENXVfdJvcAjQozzfD8JwaG
+	ObxnI691JbQRRrjx6wum3rQG6JimJTqPgdfZzFbgEhswuv765pOZAJ8PPkoGLPxp
+	78dJRDJIvQ==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4badudhgdq-5
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Sat, 27 Dec 2025 11:23:23 -0800 (PST)
+Received: from twshared41309.15.frc2.facebook.com (2620:10d:c0a8:1c::1b) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Sat, 27 Dec 2025 19:23:21 +0000
+Received: by devbig259.ftw1.facebook.com (Postfix, from userid 664516)
+	id BB69FE0509CC; Sat, 27 Dec 2025 11:23:03 -0800 (PST)
+From: Zhiping Zhang <zhipingz@meta.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+CC: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+        <linux-rdma@vger.kernel.org>, <linux-pci@vger.kernel.org>,
+        <netdev@vger.kernel.org>, Keith Busch <kbusch@kernel.org>,
+        Yochai Cohen
+	<yochai@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
+        Zhiping Zhang
+	<zhipingz@meta.com>
+Subject: Re: [RFC 2/2] Set steering-tag directly for PCIe P2P memory access
+Date: Sat, 27 Dec 2025 11:22:54 -0800
+Message-ID: <20251227192303.3866551-1-zhipingz@meta.com>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251227174225.699975-1-viswanathiyyappan@gmail.com>
-References: <20251227174225.699975-1-viswanathiyyappan@gmail.com>
+In-Reply-To: <20251204081117.1987227-1-zhipingz@meta.com>
+References: <20251204081117.1987227-1-zhipingz@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+X-Proofpoint-ORIG-GUID: Qf77YhGoOfahrXStASEHkfr-0C9vQNCF
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjI3MDE4NSBTYWx0ZWRfXwFdRi2luyM6T
+ lvzJJg5cCP8pUw0clKqcnI/HEebjziZTU7zLoeuhBYa/ZZuWYKV6xJZyUpFmJqBYWuwsq8e6T1S
+ CVoo9RmBj5bHBUxMqNP5y/7e+xcC2ByiS5xwPESaaUlogIE040WA424M1pRwKDZCthUZjOEHeaJ
+ 2fH93JDxXq0vNq+28GY1y+a0cE/vwqJ2NuBhMFDUcYY4YOJRF+dVFGPXJIKlo7TTOtVymA4aTN2
+ f4bKgpnva9DN+dNz8IwP8MkmYX8vAglUbZpHjQ5V4kiYJix0Hay5eqZ6r5/DXAchEraiKg1rVOm
+ Ewj+VhOjuFF/s1KtoxT5p5zTALpMpqn2afHb/Se7oGsZQkDXcuZn+y4s3218TjjcnkHJfWklKJW
+ V/LmUdjhDCzeGV+Jp6jY81/St5JY5Atv0lfwyXId8VJrljaxTTBVtPIhDp3hPH8ASdiI98VWeUe
+ /8/MAWLP+yiKgsVidkg==
+X-Authority-Analysis: v=2.4 cv=LryfC3dc c=1 sm=1 tr=0 ts=6950322b cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=Ikd4Dj_1AAAA:8 a=VabnemYjAAAA:8 a=vaBoqUaa7kBdn5e81RoA:9
+ a=QEXdDO2ut3YA:10 a=gKebqoRLp9LExxC7YDUY:22
+X-Proofpoint-GUID: Qf77YhGoOfahrXStASEHkfr-0C9vQNCF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-27_05,2025-12-26_01,2025-10-01_01
 
-Implement ndo_write_rx_mode callback for virtio-net
+On Thur 2025-12-04  8:10 UTC Zhiping Zhang wrote:
 
-Signed-off-by: I Viswanath <viswanathiyyappan@gmail.com>
----
- drivers/net/virtio_net.c | 55 +++++++++++++++-------------------------
- 1 file changed, 21 insertions(+), 34 deletions(-)
+> On Monday 2025-11-20 13:11 UTC, Jason Gunthorpe wrote:
+> >
+> > Re: [RFC 2/2] Set steering-tag directly for PCIe P2P memory access
+> >
+> > On Wed, Nov 19, 2025 at 11:24:40PM -0800, Zhiping Zhang wrote:
+> > > On Monday, November 17, 2025 at 8:00=E2=80=AFAM, Jason Gunthorpe wr=
+ote:
+> > > > Re: [RFC 2/2] Set steering-tag directly for PCIe P2P memory acces=
+s
+> > > >
+> > > > On Thu, Nov 13, 2025 at 01:37:12PM -0800, Zhiping Zhang wrote:
+> > > > > RDMA: Set steering-tag value directly in DMAH struct for DMABUF=
+ MR
+> > > > >
+> > > > > This patch enables construction of a dma handler (DMAH) with th=
+e P2P memory type
+> > > > > and a direct steering-tag value. It can be used to register a R=
+DMA memory
+> > > > > region with DMABUF for the RDMA NIC to access the other device'=
+s memory via P2P.
+> > > > >
+> > > > > Signed-off-by: Zhiping Zhang <zhipingz@meta.com>
+> > > > > ---
+> > > > > .../infiniband/core/uverbs_std_types_dmah.c   | 28 ++++++++++++=
++++++++
+> > > > > drivers/infiniband/core/uverbs_std_types_mr.c |  3 ++
+> > > > > drivers/infiniband/hw/mlx5/dmah.c             |  5 ++--
+> > > > > .../net/ethernet/mellanox/mlx5/core/lib/st.c  | 12 +++++---
+> > > > > include/linux/mlx5/driver.h                   |  4 +--
+> > > > > include/rdma/ib_verbs.h                       |  2 ++
+> > > > > include/uapi/rdma/ib_user_ioctl_cmds.h        |  1 +
+> > > > > 7 files changed, 46 insertions(+), 9 deletions(-)
+> > > > >
+> > > > > diff --git a/drivers/infiniband/core/uverbs_std_types_dmah.c b/=
+drivers/infiniband/core/uverbs_std_types_dmah.c
+> > > > > index 453ce656c6f2..1ef400f96965 100644
+> > > > > --- a/drivers/infiniband/core/uverbs_std_types_dmah.c
+> > > > > +++ b/drivers/infiniband/core/uverbs_std_types_dmah.c
+> > > > > @@ -61,6 +61,27 @@ static int UVERBS_HANDLER(UVERBS_METHOD_DMAH=
+_ALLOC)(
+> > > > >              dmah->valid_fields |=3D BIT(IB_DMAH_MEM_TYPE_EXIST=
+S);
+> > > > >      }
+> > > > >
+> > > > > +     if (uverbs_attr_is_valid(attrs, UVERBS_ATTR_ALLOC_DMAH_DI=
+RECT_ST_VAL)) {
+> > > > > +             ret =3D uverbs_copy_from(&dmah->direct_st_val, at=
+trs,
+> > > > > +                                    UVERBS_ATTR_ALLOC_DMAH_DIR=
+ECT_ST_VAL);
+> > > > > +             if (ret)
+> > > > > +                     goto err;
+> > > >
+> > > > This should not come from userspace, the dmabuf exporter should
+> > > > provide any TPH hints as part of the attachment process.
+> > > >
+> > > > We are trying not to allow userspace raw access to the TPH values=
+, so
+> > > > this is not a desirable UAPI here.
+> > > >
+> > > > Thanks for your feedback!
+> > >
+> > > I understand the concern about not exposing raw TPH values to
+> > > userspace.  To clarify, would it be acceptable to use an index-base=
+d
+> > > mapping table, where userspace provides an index and the kernel
+> > > translates it to the appropriate TPH value? Given that the PCIe spe=
+c
+> > > allows up to 16-bit TPH values, this could require a mapping table
+> > > of up to 128KB. Do you see this as a reasonable approach, or is
+> > > there a preferred alternative?
+> >
+> > ?
+> >
+> > The issue here is to secure the TPH. The kernel driver that owns the
+> > exporting device should control what TPH values an importing driver
+> > will use.
+> >
+> > I don't see how an indirection table helps anything, you need to add
+> > an API to DMABUF to retrieve the tph.
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 1bb3aeca66c6..165e5943dedf 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -460,9 +460,6 @@ struct virtnet_info {
- 	/* Work struct for config space updates */
- 	struct work_struct config_work;
- 
--	/* Work struct for setting rx mode */
--	struct work_struct rx_mode_work;
--
- 	/* OK to queue work setting RX mode? */
- 	bool rx_mode_work_enabled;
- 
-@@ -3866,33 +3863,31 @@ static int virtnet_close(struct net_device *dev)
- 	return 0;
- }
- 
--static void virtnet_rx_mode_work(struct work_struct *work)
-+static void virtnet_write_rx_mode(struct net_device *dev)
- {
--	struct virtnet_info *vi =
--		container_of(work, struct virtnet_info, rx_mode_work);
-+	struct virtnet_info *vi = netdev_priv(dev);
- 	u8 *promisc_allmulti  __free(kfree) = NULL;
--	struct net_device *dev = vi->dev;
- 	struct scatterlist sg[2];
- 	struct virtio_net_ctrl_mac *mac_data;
--	struct netdev_hw_addr *ha;
-+	char *ha_addr;
- 	int uc_count;
- 	int mc_count;
- 	void *buf;
-+	int idx;
- 	int i;
- 
- 	/* We can't dynamically set ndo_set_rx_mode, so return gracefully */
- 	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_CTRL_RX))
- 		return;
- 
--	promisc_allmulti = kzalloc(sizeof(*promisc_allmulti), GFP_KERNEL);
-+	promisc_allmulti = kzalloc(sizeof(*promisc_allmulti), GFP_ATOMIC);
- 	if (!promisc_allmulti) {
- 		dev_warn(&dev->dev, "Failed to set RX mode, no memory.\n");
- 		return;
- 	}
- 
--	rtnl_lock();
--
--	*promisc_allmulti = !!(dev->flags & IFF_PROMISC);
-+	*promisc_allmulti = netif_rx_mode_get_cfg_bit(dev,
-+						      NETIF_RX_MODE_CFG_PROMISC);
- 	sg_init_one(sg, promisc_allmulti, sizeof(*promisc_allmulti));
- 
- 	if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_RX,
-@@ -3900,7 +3895,8 @@ static void virtnet_rx_mode_work(struct work_struct *work)
- 		dev_warn(&dev->dev, "Failed to %sable promisc mode.\n",
- 			 *promisc_allmulti ? "en" : "dis");
- 
--	*promisc_allmulti = !!(dev->flags & IFF_ALLMULTI);
-+	*promisc_allmulti = netif_rx_mode_get_cfg_bit(dev,
-+						      NETIF_RX_MODE_CFG_ALLMULTI);
- 	sg_init_one(sg, promisc_allmulti, sizeof(*promisc_allmulti));
- 
- 	if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_RX,
-@@ -3908,27 +3904,22 @@ static void virtnet_rx_mode_work(struct work_struct *work)
- 		dev_warn(&dev->dev, "Failed to %sable allmulti mode.\n",
- 			 *promisc_allmulti ? "en" : "dis");
- 
--	netif_addr_lock_bh(dev);
--
--	uc_count = netdev_uc_count(dev);
--	mc_count = netdev_mc_count(dev);
-+	uc_count = netif_rx_mode_get_uc_count(dev);
-+	mc_count = netif_rx_mode_get_mc_count(dev);
- 	/* MAC filter - use one buffer for both lists */
- 	buf = kzalloc(((uc_count + mc_count) * ETH_ALEN) +
- 		      (2 * sizeof(mac_data->entries)), GFP_ATOMIC);
- 	mac_data = buf;
--	if (!buf) {
--		netif_addr_unlock_bh(dev);
--		rtnl_unlock();
-+	if (!buf)
- 		return;
--	}
- 
- 	sg_init_table(sg, 2);
- 
- 	/* Store the unicast list and count in the front of the buffer */
- 	mac_data->entries = cpu_to_virtio32(vi->vdev, uc_count);
- 	i = 0;
--	netdev_for_each_uc_addr(ha, dev)
--		memcpy(&mac_data->macs[i++][0], ha->addr, ETH_ALEN);
-+	netif_rx_mode_for_each_uc_addr(dev, ha_addr, idx)
-+		memcpy(&mac_data->macs[i++][0], ha_addr, ETH_ALEN);
- 
- 	sg_set_buf(&sg[0], mac_data,
- 		   sizeof(mac_data->entries) + (uc_count * ETH_ALEN));
-@@ -3938,10 +3929,8 @@ static void virtnet_rx_mode_work(struct work_struct *work)
- 
- 	mac_data->entries = cpu_to_virtio32(vi->vdev, mc_count);
- 	i = 0;
--	netdev_for_each_mc_addr(ha, dev)
--		memcpy(&mac_data->macs[i++][0], ha->addr, ETH_ALEN);
--
--	netif_addr_unlock_bh(dev);
-+	netif_rx_mode_for_each_mc_addr(dev, ha_addr, idx)
-+		memcpy(&mac_data->macs[i++][0], ha_addr, ETH_ALEN);
- 
- 	sg_set_buf(&sg[1], mac_data,
- 		   sizeof(mac_data->entries) + (mc_count * ETH_ALEN));
-@@ -3950,17 +3939,15 @@ static void virtnet_rx_mode_work(struct work_struct *work)
- 				  VIRTIO_NET_CTRL_MAC_TABLE_SET, sg))
- 		dev_warn(&dev->dev, "Failed to set MAC filter table.\n");
- 
--	rtnl_unlock();
--
- 	kfree(buf);
- }
- 
- static void virtnet_set_rx_mode(struct net_device *dev)
- {
- 	struct virtnet_info *vi = netdev_priv(dev);
-+	char cfg_disabled = !vi->rx_mode_work_enabled;
- 
--	if (vi->rx_mode_work_enabled)
--		schedule_work(&vi->rx_mode_work);
-+	netif_rx_mode_set_ctrl_bit(dev, NETIF_RX_MODE_SET_SKIP, cfg_disabled);
- }
- 
- static int virtnet_vlan_rx_add_vid(struct net_device *dev,
-@@ -5776,7 +5763,7 @@ static void virtnet_freeze_down(struct virtio_device *vdev)
- 	/* Make sure no work handler is accessing the device */
- 	flush_work(&vi->config_work);
- 	disable_rx_mode_work(vi);
--	flush_work(&vi->rx_mode_work);
-+	netif_rx_mode_flush_work(vi->dev);
- 
- 	if (netif_running(vi->dev)) {
- 		rtnl_lock();
-@@ -6279,6 +6266,7 @@ static const struct net_device_ops virtnet_netdev = {
- 	.ndo_validate_addr   = eth_validate_addr,
- 	.ndo_set_mac_address = virtnet_set_mac_address,
- 	.ndo_set_rx_mode     = virtnet_set_rx_mode,
-+	.ndo_write_rx_mode   = virtnet_write_rx_mode,
- 	.ndo_get_stats64     = virtnet_stats,
- 	.ndo_vlan_rx_add_vid = virtnet_vlan_rx_add_vid,
- 	.ndo_vlan_rx_kill_vid = virtnet_vlan_rx_kill_vid,
-@@ -6900,7 +6888,6 @@ static int virtnet_probe(struct virtio_device *vdev)
- 	vdev->priv = vi;
- 
- 	INIT_WORK(&vi->config_work, virtnet_config_changed_work);
--	INIT_WORK(&vi->rx_mode_work, virtnet_rx_mode_work);
- 	spin_lock_init(&vi->refill_lock);
- 
- 	if (virtio_has_feature(vdev, VIRTIO_NET_F_MRG_RXBUF)) {
-@@ -7205,7 +7192,7 @@ static void virtnet_remove(struct virtio_device *vdev)
- 	/* Make sure no work handler is accessing the device. */
- 	flush_work(&vi->config_work);
- 	disable_rx_mode_work(vi);
--	flush_work(&vi->rx_mode_work);
-+	netif_rx_mode_flush_work(vi->dev);
- 
- 	virtnet_free_irq_moder(vi);
- 
--- 
-2.47.3
+> I see, thanks for the clarification. Yes we can add and use another new
+> API(s) for this purpose.
 
+> Sorry for the delay: I was waiting for the final version of Leon's
+> vfio-dmabuf patch series and plan to follow that for implementing the n=
+ew
+> API(s) needed.
+> (https://lore.kernel.org/all/20251120-dmabuf-vfio-v9-6-d7f71607f371@nvi=
+dia.com/).
+>
+> >
+> > > Additionally, in cases where the dmabuf exporter device can handle =
+all possible 16-bit
+> > > TPH values  (i.e., it has its own internal mapping logic or table),=
+ should this still be
+> > > entirely abstracted away from userspace?
+> >
+> > I imagine the exporting device provides the raw on the wire TPH value
+> > it wants the importing device to use and the importing device is
+> > responsible to program it using whatever scheme it has.
+> >
+> > Jason
+>
+> Can you suggest or elaborate a bit on the schmes you see feasible?
+>
+> When the exporting device supports all or multiple TPH values, it is
+> desirable to have userspace processes select which TPH values to use
+> for the dmabuf at runtime. Actually that is the main use case of this
+> patch: the user can select the TPH values to associate desired P2P
+> operations on the dmabuf. The difficulty is how we can provide this
+> flexibility while still aligning with kernel and security best
+> practices.
+>
+> Zhiping
+
+Happy holidays! I went through the vfio-dmabuf patch series and Jason's
+comments once more. I think I have a proposal that addresses the concerns=
+.
+
+For p2p or dmabuf use cases, we pass in an ID or fd similar to CPU_ID whe=
+n
+allocating a dmah, and make a callback to the dmabuf exporter to get the
+TPH value associated with the fd. That involves adding a new dmabuf opera=
+tion
+for the callback to get the TPH/tag value associated.
+
+I can start with vfio-dmabuf and add the new dmabuf op/ABI there based on
+Leon's patch. Pls let me know if you have any concerns or suggestions.
+
+Zhiping
 
