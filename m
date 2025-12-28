@@ -1,82 +1,48 @@
-Return-Path: <netdev+bounces-246167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF1D6CE4840
-	for <lists+netdev@lfdr.de>; Sun, 28 Dec 2025 03:01:11 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7682CE4A19
+	for <lists+netdev@lfdr.de>; Sun, 28 Dec 2025 09:14:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 860203007C67
-	for <lists+netdev@lfdr.de>; Sun, 28 Dec 2025 02:01:10 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E3400300532C
+	for <lists+netdev@lfdr.de>; Sun, 28 Dec 2025 08:14:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE1BC8460;
-	Sun, 28 Dec 2025 02:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1F0C277C88;
+	Sun, 28 Dec 2025 08:14:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UBNM/jBf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gFzKUC44"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCFDA17D2
-	for <netdev@vger.kernel.org>; Sun, 28 Dec 2025 02:01:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A07D2264B8;
+	Sun, 28 Dec 2025 08:14:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766887269; cv=none; b=iQxv+OsIlFuZTDc84KVFiljjmKuBlZmiak3w6zqCaxtY3TDHUWiLvLX0tzd2kU8+NeDvv1CNZrqbKJTo1U4kSRIkXXJXlVOy5zmUZ+/WdAMRrF65c+9EqJuhuHFpIEVVyT5rIlGM4h5FUvpm0o5vBBC8FJ/dEjRcWxL1D9qMqEo=
+	t=1766909659; cv=none; b=dGSWTkgQipjQ5x1SfP8g52dXrpH7nfmxXbX5WdFzQn4Debxr746tW5Dyy+o4XP+GrphRMS56H9o8/bzGNISBySgIPBpHIPZ3VGQLPe/VbqwwIXt2GvhDXoDfvdhjL/sIoe9eXM4TZu5v9Kwkub5mp3SrLhL8jsB6epMcOu2Qi80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766887269; c=relaxed/simple;
-	bh=/uyG9JXkLQyHcIhtoWa0j324fE2ibC5y8+Qj9X3PtIE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R/5LzqqzKtpspD9Stlui/+qdlfSDEXBd9FnaFANejV9w6NREbOMLw5n06hMIJWgA+BIzfNDt+1gC/+t2GstAFN63I5HOOPGVlXrbt8x4Y+5+CGdohxCB3TOjErtVOn5QQoANb/K1ROs2NaD7P234lQRgHnSrueoWQMfrIKGeQ5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UBNM/jBf; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-47a8195e515so50579115e9.0
-        for <netdev@vger.kernel.org>; Sat, 27 Dec 2025 18:01:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766887264; x=1767492064; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=CGWm7f6uw+wCJESodfTeqyjz5qDHRxaWK8I849X/lag=;
-        b=UBNM/jBfSCrrC8qdNUPB2Twx1Z8Oa0DVQCoR1SgIw3IgSGAGqWImuF2qzNXfib78+y
-         a9XXYDm7qL66f7eu1anlanLfHma58gWHqc+HrcskXRLNLPLiM1lBsqS+71ZZf7JpEsL0
-         1zVIbT8xRt2MbIjvjIBe6Xckoz8JDYT28VDCgqu+P9ojeZzxmr8UVh2hrRQnq1I3N7Ug
-         c/po9yOJDYK4X3CKuhTCRg/zx/W/AnmeBTkotB0qFD/mqJbCH18XUepVbxJMPoRVrrpk
-         Xqt4c7f2Y2WGoaM5QfGZasdR4qmHZgEgxdAio0mM0CU1/xeWOKuexLjTE4xQRxV4FJnY
-         YR/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766887264; x=1767492064;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CGWm7f6uw+wCJESodfTeqyjz5qDHRxaWK8I849X/lag=;
-        b=nm34hlrR7kZkLlwdMwnj0bErcJO983+HOoIEvVLhImC/gwdkWu3Mw2yt2XXQia9FOE
-         2U6Pzt+bJVUCU5n6HuZDhzIrccrmb3IqMHilEZZWZaqdDxxKy3GVhmgdWgYpO8K8okI3
-         h4NZC+yt5A1CYu2VoiFdmkHZ59hUaycN6lMrSzNQjLHZ7F+A0zZbTMZO2Ja+J31031+e
-         lg5X5YbAML3v1YZsM/MOavSzjf5e1BOlW5kT0A49h4SR2NqD9WWjU8syKDmE5y8WEhis
-         HxY/5c92ckzocQI7/5diA4xhiq7JflLyXEg6SgaGVKmWdgmtfWxlZJ/geVxEkx2oeUfK
-         BjLg==
-X-Gm-Message-State: AOJu0YwKHgmz8HI7IjpawQx9cOQ9q/yDnXqiKkDEh/mztU+RUoJnYoz8
-	8NyQxVStKUG5NP0YLIynKz7QEdQnFkEXIurDoS12CglkauR5GJr/X5CacsuqGw==
-X-Gm-Gg: AY/fxX5e6IWZNlqaRLuE/IIZYzjJyodLMh8sr7r9OFQCqIpaWue/NjaI3HO6Wz+KN5g
-	GbTVlOMajWwTb2myK898KQNhb6HhHMKy3yjjlXaaLE5m7LTdHabKzDLABpCvvFNUKz0pZJDJoHL
-	WKtOMYIUo86eI3LPPCi6UEz8S+QLe4QT3nvkh9P0DyZ4hJTOaRk0M2TJkEBynz1Xr16MTFD6IIc
-	8FRKMKKxlt7HpAwpE4m5g6idq2y16XbbaOHHX22IuNID8Z+m34/TTJnsxes6q9saL0/bKlEJ9GM
-	7bQmqZnI+aV2V0pFOfXhODgtIZthUNJXy4RsB2GtOpmWUL2ZyuYvbY1nq7jLzEFY091XR6ASan3
-	C1qhIx+EV+Dh7FGvuHAi+zaCuvc5cNj6EVNO7G8f4Jf9N2vAz0/RkxiDzZZQPpsA/kWUNqHnlhs
-	r2UQzEFWBjsCkm0YZmvb+wP3kgz8XjIT87aw==
-X-Google-Smtp-Source: AGHT+IEUkSWMS++nf45AkVJ3pb8cfwfvx628mI/2jAeSksf9uvk3Ak2ImCdT6UECWOT3W7R46ucPdQ==
-X-Received: by 2002:a05:600c:4fcf:b0:477:9650:3175 with SMTP id 5b1f17b1804b1-47d194d17a8mr293216725e9.0.1766887263690;
-        Sat, 27 Dec 2025 18:01:03 -0800 (PST)
-Received: from registry.mehben.fr ([2a01:cb1c:8441:2b00:c694:3c2c:878b:f4c0])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d19346d33sm479953185e9.3.2025.12.27.18.01.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 Dec 2025 18:01:02 -0800 (PST)
-From: Alexandre Knecht <knecht.alexandre@gmail.com>
-To: netdev@vger.kernel.org
-Cc: roopa@nvidia.com,
-	Alexandre Knecht <knecht.alexandre@gmail.com>
-Subject: [PATCH net] bridge: fix C-VLAN preservation in 802.1ad vlan_tunnel egress
-Date: Sun, 28 Dec 2025 03:00:57 +0100
-Message-ID: <20251228020057.2788865-1-knecht.alexandre@gmail.com>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1766909659; c=relaxed/simple;
+	bh=RgPlcrJL2qc5lDmfQILLTZsDGhBsQyId8WOOSgS3640=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ff52U+Aq+u4kadamD1Qjun1fUxnX1DTljK2Xjz94jhEo3yxsTUTOvxz2PPXH1Ag18y0hfmHbcnQaSJhpV58AeDJHnDXpi9wHkdCyDS8RFFInohVRsciENd82nrv9wy7BDTWJbVdF6joDTZIs7nKSbVV4k2wP8Xsf3kZ/QVuaRoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gFzKUC44; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 249B2C4CEFB;
+	Sun, 28 Dec 2025 08:14:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766909659;
+	bh=RgPlcrJL2qc5lDmfQILLTZsDGhBsQyId8WOOSgS3640=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=gFzKUC44G5YtXcK8TkjKDqDgoDNzFt+V9HdtVU9JAg1gxRas2/ugIpMr3b1CxA18c
+	 7n39V2Xr0EeayztvkqyMNuimo8ZfGVDOAMDkcOVAl/CAJfBQpqRIrkO/ayL1OyvOwf
+	 +GbAXSvJ/JZQeC9jUwdr0jG1qZjLN1oQcqmkwbE9QZ4nujlQ3rdhQDrKkXgM61Fsnp
+	 kNrzEb4pX2kn0D9YTcNCSAxFRgINySsA8+HWzvzX+Zu/nWxlvB+VOZv6gS+/Gs+U+v
+	 jUJzfVimjXm697oQ6RIC8zSeTZGeZx+4drOSiLtxpm4cG6qZA3xJQZ6DiXI7GAYvMo
+	 Zlc7zVrawC3GQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B57D53AB0926;
+	Sun, 28 Dec 2025 08:11:03 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,65 +50,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: mdio: rtl9300: use scoped for loops
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176690946258.2286348.10433027050448715125.git-patchwork-notify@kernel.org>
+Date: Sun, 28 Dec 2025 08:11:02 +0000
+References: <20251217210153.14641-1-rosenp@gmail.com>
+In-Reply-To: <20251217210153.14641-1-rosenp@gmail.com>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, chris.packham@alliedtelesis.co.nz,
+ linux-kernel@vger.kernel.org
 
-When using an 802.1ad bridge with vlan_tunnel, the C-VLAN tag is
-incorrectly stripped from frames during egress processing.
+Hello:
 
-br_handle_egress_vlan_tunnel() uses skb_vlan_pop() to remove the S-VLAN
-from hwaccel before VXLAN encapsulation. However, skb_vlan_pop() also
-moves any "next" VLAN from the payload into hwaccel:
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-    /* move next vlan tag to hw accel tag */
-    __skb_vlan_pop(skb, &vlan_tci);
-    __vlan_hwaccel_put_tag(skb, vlan_proto, vlan_tci);
+On Wed, 17 Dec 2025 13:01:53 -0800 you wrote:
+> Currently in the return path, fwnode_handle_put calls are missing. Just use
+> _scoped to avoid the issue.
+> 
+> Fixes: 24e31e474769 ("net: mdio: Add RTL9300 MDIO driver")
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> ---
+>  drivers/net/mdio/mdio-realtek-rtl9300.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+> 
+> [...]
 
-For QinQ frames where the C-VLAN sits in the payload, this moves it to
-hwaccel where it gets lost during VXLAN encapsulation.
+Here is the summary with links:
+  - [net] net: mdio: rtl9300: use scoped for loops
+    https://git.kernel.org/netdev/net/c/a4f800c4487d
 
-Fix by calling __vlan_hwaccel_clear_tag() directly, which clears only
-the hwaccel S-VLAN and leaves the payload untouched.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-This path is only taken when vlan_tunnel is enabled and tunnel_info
-is configured, so 802.1Q bridges are unaffected.
 
-Tested with 802.1ad bridge + VXLAN vlan_tunnel, verified C-VLAN
-preserved in VXLAN payload via tcpdump.
-
-Fixes: 11538d039ac6 ("bridge: vlan dst_metadata hooks in ingress and egress paths")
-Signed-off-by: Alexandre Knecht <knecht.alexandre@gmail.com>
----
- net/bridge/br_vlan_tunnel.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
-
-diff --git a/net/bridge/br_vlan_tunnel.c b/net/bridge/br_vlan_tunnel.c
-index 12de0d1df0bc..a1b62507e521 100644
---- a/net/bridge/br_vlan_tunnel.c
-+++ b/net/bridge/br_vlan_tunnel.c
-@@ -189,7 +189,6 @@ int br_handle_egress_vlan_tunnel(struct sk_buff *skb,
- 	IP_TUNNEL_DECLARE_FLAGS(flags) = { };
- 	struct metadata_dst *tunnel_dst;
- 	__be64 tunnel_id;
--	int err;
-
- 	if (!vlan)
- 		return 0;
-@@ -199,9 +198,13 @@ int br_handle_egress_vlan_tunnel(struct sk_buff *skb,
- 		return 0;
-
- 	skb_dst_drop(skb);
--	err = skb_vlan_pop(skb);
--	if (err)
--		return err;
-+	/* For 802.1ad (QinQ), skb_vlan_pop() incorrectly moves the C-VLAN
-+	 * from payload to hwaccel after clearing S-VLAN. We only need to
-+	 * clear the hwaccel S-VLAN; the C-VLAN must stay in payload for
-+	 * correct VXLAN encapsulation. This is also correct for 802.1Q
-+	 * where no C-VLAN exists in payload.
-+	 */
-+	__vlan_hwaccel_clear_tag(skb);
-
- 	if (BR_INPUT_SKB_CB(skb)->backup_nhid) {
- 		__set_bit(IP_TUNNEL_KEY_BIT, flags);
---
-2.43.0
 
