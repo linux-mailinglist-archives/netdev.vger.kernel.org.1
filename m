@@ -1,386 +1,173 @@
-Return-Path: <netdev+bounces-246189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 215D9CE5669
-	for <lists+netdev@lfdr.de>; Sun, 28 Dec 2025 20:31:52 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B336CE5690
+	for <lists+netdev@lfdr.de>; Sun, 28 Dec 2025 20:38:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D492230094B2
-	for <lists+netdev@lfdr.de>; Sun, 28 Dec 2025 19:31:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B362B3009FA1
+	for <lists+netdev@lfdr.de>; Sun, 28 Dec 2025 19:38:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 241DA231827;
-	Sun, 28 Dec 2025 19:31:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C48CB2741C9;
+	Sun, 28 Dec 2025 19:38:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C96QL+yH";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gwzGyuuA"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="EjAKuzEZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010053.outbound.protection.outlook.com [52.101.69.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B996026290
-	for <netdev@vger.kernel.org>; Sun, 28 Dec 2025 19:31:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766950309; cv=none; b=SavLeINFUcd1J4ijwyiRLglQE4tMHCadsYyBuX2x2wxEmOW8PtybY85/d9wQvGfxvBYjwo2IhzrbP5nNhDBDVch7JdG5tyjihEupJdslOJiDrcYwMTP53ABHYvSD0VOpQ3oh81d86meaXNMOTk9BGA6WZ3KjAkOtUV2yYCmse3U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766950309; c=relaxed/simple;
-	bh=KIuGIDI5lMSOblz8sdDxXkU8j5+QLbM0itX9ccs2b2o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F0dDECDlySjh+OONw40yk5ruckKrSz4+naeDVyr83K376sCDHTtlK4TM9+To2ZwioVCaWbfCLRi75Ye4EopNWd0nt2uLQPfUz1id0pJPnEs6PbmxLtpQj/LmP62b2EmRJzF/usEOy4gBWJiPKD8DAqhE+RNDI0LU45BDhiUSnfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C96QL+yH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gwzGyuuA; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766950305;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7prJP2gBNzHkKEbhnQwXoTFrY1Wo7MjDOS8OjWmtWns=;
-	b=C96QL+yH/OprI7q2a4F8zeiHX1kA4PTfgoeaKLGhiZmZgRIrqoTNiXyQRiAK0GKfzuWZVf
-	E5mm7AgfB//nf1uMCoMSovLo2ZIvk8XNNsxEkh5hMx18suaPjTDHcTR0fWtdEA1bWvGkSe
-	v6v7OymPA7aSmuA8T8leQwHqaYVEgI4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-586-gYpW7My4PQGz8c4pYtS2EQ-1; Sun, 28 Dec 2025 14:31:41 -0500
-X-MC-Unique: gYpW7My4PQGz8c4pYtS2EQ-1
-X-Mimecast-MFC-AGG-ID: gYpW7My4PQGz8c4pYtS2EQ_1766950301
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4775d110fabso72824255e9.1
-        for <netdev@vger.kernel.org>; Sun, 28 Dec 2025 11:31:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1766950300; x=1767555100; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7prJP2gBNzHkKEbhnQwXoTFrY1Wo7MjDOS8OjWmtWns=;
-        b=gwzGyuuAOnNBZ0oKM81Gqrp40hCO/kJuzKT/xfY35WyyB2WzIYcGjAFHTQpbka5A2e
-         GqVDfOpM66bvg+MT98cgxI5zLeFYI8z3n0sKceciVR/M2qdMdUYnYeYczjCDj+3jQNZE
-         ndzDembzs25cLNeURCh35KvaFTtfkX9YgVBHtv4mBMHG2mIoHGDdCaDsdkmbLYECX8qB
-         U7QKRvllGfts1ziecqNdPubHFIlpz0r7kcB5zUgyQ4lhXkEP9Zp2rN/1T1r4+2pCIWHH
-         ynmgXQpRKy7eBEsFOzCPZTp3UCFPwc/JyqOnDICbXY+ndy04Jb8JE1+eKfk5BYmIFRvC
-         q0wA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766950300; x=1767555100;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7prJP2gBNzHkKEbhnQwXoTFrY1Wo7MjDOS8OjWmtWns=;
-        b=l399UWzKoYUxqwzOaizTJs8ueqsvT4Kvsz14Aa9UWzBbydY7gPsber9m98HYKjta1I
-         8oqmf1QHmBiEZqG1FFqGy6+EagWpxtQ4YZW/DVjmiGlC/b7Dw58nMl26zJ+nJ/5n/Flk
-         K5Fw28uDOIWjVz5+3iARIHzUZ/PIvaEUgHXSMbgOun++AzssrMWSf7I4+Dy2KdohOiVV
-         diy7NwACqXoS42GZCOaGs+GxPCAGx+shjV9uei4ws3aiVRL3vwuSLKGTa5peoetQMSzC
-         6Atwl7M2OMN0U/cz0cl9afuB7axC4IBLEuas3Teql4rTbRpjQwwfeJu0zQs6nJOpa/X4
-         OtJw==
-X-Gm-Message-State: AOJu0Yx4RzRDnxJuZ5BctyLCMjAdQS1WlhAXWQv4byzqyBUBQWK6uyV3
-	cRAvIILZOIQwqfhBd6Y7XaBIKEDUzjZPxkNJPmm6x57M25rK/A8pcy6+lcRD0sRzOs9zfHlx+N9
-	qwg4XF25zQi0X1vrrQrthgDMIC4iapLqf0oyXfF92KHuDhHZvIvZ6DlSv9g==
-X-Gm-Gg: AY/fxX5ZKB5qzwZUDVe2B+JpdnYY1pEfQEs9/xSTRAfpcPwKOBzLY7vksel1xiiSx3m
-	rEU/8SrGg6HjWJkXwefb3WJbo4HRZWTgg79Le7mG+nUFHf8m9YDtNOqnvzubc1E2gvJTEwR8KDg
-	ArHOWwov2jfgPPwxo/3q0j3vS0m6JiNQF+9BtT1NCTOoZfZz3l/eMrkcM3Qlv78L8930DGLRtCJ
-	QTp8LQtUwtj2ivI6rWpAhFa27nkuvn+4c89I+UP1RH+9E9iSztM2Urb4NeT0Lzc2P3OJW9cpoDS
-	bD/cuVCiu5/4/4cPSvvZO8tyqyVXCjrunr5XKRHePJsR1Rhou4yutfHh40eb2htal9jtpBsCMeV
-	H6hasPpb63Hc5O38g/ojBzC8aP0q3PL1JzA==
-X-Received: by 2002:a05:600c:4e90:b0:46e:3d41:6001 with SMTP id 5b1f17b1804b1-47d1959440dmr338993575e9.34.1766950300493;
-        Sun, 28 Dec 2025 11:31:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGObEt1/rTh82VhjlHkYAzJrTr31rCzqtVMaa0NJ0RlJL1rOrAWPln5Cc9VnOAVf0Lb9X5nrg==
-X-Received: by 2002:a05:600c:4e90:b0:46e:3d41:6001 with SMTP id 5b1f17b1804b1-47d1959440dmr338993425e9.34.1766950299993;
-        Sun, 28 Dec 2025 11:31:39 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324ea227e0sm59750972f8f.17.2025.12.28.11.31.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Dec 2025 11:31:38 -0800 (PST)
-Date: Sun, 28 Dec 2025 14:31:36 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
-	kvm@vger.kernel.org, Cong Wang <cwang@multikernel.io>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>
-Subject: Re: [Patch net] vsock: fix DMA cacheline overlap warning using
- coherent memory
-Message-ID: <20251228104521-mutt-send-email-mst@kernel.org>
-References: <20251228015451.1253271-1-xiyou.wangcong@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948EBDDC5;
+	Sun, 28 Dec 2025 19:38:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1766950726; cv=fail; b=nCd8E2k/VlT1R1ws2OBpMm4nawoX4XZNiymMwOPZ7KzEYEW3I2kTd5jOatCDgeUW0tZkY0Mrb/SIOaqO3D06LSjJ/7J9XwcEksKTmaXZE9kd7/Yf2ZOZBQalD+YOJHlG1zZMPmlEhpYEcEwltt06/kbXGGZrOExlCPUDw6nD+iU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1766950726; c=relaxed/simple;
+	bh=4m97F55t8D/WLip5qefUBWiuVPNyWX6Rp2DS893YcIc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=YJ7Q7L8HdoqISQcXihS2FW6J1foctGLtPLKSRz943aZuixtc3+dJteO9aJTs8Rq729iKtHrZF+w1qw+Jmo4Jh8VXdLjLNrL3utQrrYPsZPbVpXf6IB0CnZCWe2dNhCcQpbhu0byPPFCILlTtzrF6JI1EX7w0uwH6EgYtNKKnwjg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=EjAKuzEZ; arc=fail smtp.client-ip=52.101.69.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=tqxVdy8T4s89mS61rt+7aMQy4GORkfrALEXOGO+cljqg7KwDWYprlLYt0QlXWD98Ne+JbvhRUxcPxXrFRcuu+i6alGiJZBROw1fuWNJWQZljlSTivM/QfOOqzjGw9ebM0RacHZqagYoNGOGRjYwAwAa8svrhBef+SBQs5hL4G4qULzsGSx7DQzaVM0o218+/VxtWeGwQ+iMxvOWS551hPwY9dt2s6RGkD0oqFURsM+f8BKllxJu80Nz5vSnlf/Vg7SnLFD+SVl0MDufyzXMOJlEGJv5sCymCoeOMSnK2gRcN2Lsb7ROZi+mSXO4nmb6/QPyHxemVaL5828f52T+hMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tt2sS2+UrDTMPwFTqLxgI5cgC+wSC1jr7wYckYGSWbQ=;
+ b=b1sT4bsm2CYlHNhTtZm7dzxJcpjS46znrqijobVjc/rWANBGAdqquEM3e5Uw2FnGlciKOYbRYUDxndF1CGsPW739XUpomGOV2CLyiaHB1d8tjnV+SJ3Xdr15ofH5/AQdLBqeQjEeGtUw8k7Yn1qPM4bVkYSmzJRH4uMhSWz0qte8TqZSUWggN/CtqEOJ9IQJ4+xy+HFVdl2pKrKZU+VRWxQRmxc+8InHMmIz2Rdw6iiTtVD2OHn781+9o/6r6JXi/Q63svOPJGy8ydXHYgmhohZ9j6uLkVZH99TEseXI6AMrkvr99DGDV/Y48G2gFBvaUGc9i3kIH9+d3NRSwERmkQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tt2sS2+UrDTMPwFTqLxgI5cgC+wSC1jr7wYckYGSWbQ=;
+ b=EjAKuzEZvE9ZgnVGWuKsIwNTCzOSbBWxOTWky7h5278HZYelj2BQFomb5nTydaB1V6a9x3N5Wbay1mkqVTd9Pech/CZvglXXKqenpwszy/g/VPIOZvOG6nsoIjYqp5V9tho+dsulWJFUp7hMre0bzBBQ/RXLWhSg53mt4NXPhhm3wpkmFECW8hoBURWN3rRDlJJjAEy7YDeQD/YNx+v5ijHl1DYMWnUj58ssEx+BbPj+/PKHS9a1bwmXQ/aSBOuQ+1yUStTJMsAUyfUHm9CSZGXHzl2ZdcjKH4LLA7Qor+PDS04szJJ9cBOVqiyu2X1qiFNe0Lk0q0JwOsYB3qbwFw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
+ by PA1PR04MB11335.eurprd04.prod.outlook.com (2603:10a6:102:4f6::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9456.14; Sun, 28 Dec
+ 2025 19:38:41 +0000
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::8063:666f:9a2e:1dab]) by AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::8063:666f:9a2e:1dab%5]) with mapi id 15.20.9456.008; Sun, 28 Dec 2025
+ 19:38:41 +0000
+Date: Sun, 28 Dec 2025 21:38:38 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: claudiu.manoil@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, imx@lists.linux.dev
+Subject: Re: [PATCH v2 net] net: enetc: do not print error log if addr is 0
+Message-ID: <20251228193838.pevckwqcqooyd7ir@skbuf>
+References: <20251222022628.4016403-1-wei.fang@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251222022628.4016403-1-wei.fang@nxp.com>
+X-ClientProxiedBy: VI1PR10CA0096.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:803:28::25) To AM9PR04MB8585.eurprd04.prod.outlook.com
+ (2603:10a6:20b:438::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251228015451.1253271-1-xiyou.wangcong@gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|PA1PR04MB11335:EE_
+X-MS-Office365-Filtering-Correlation-Id: d0cdf535-7750-432b-dbdc-08de4648b461
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|19092799006|376014|10070799003|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?MVKkM1jJIPijBZIdaMo+Wia8Lp79NnSuZJuqsT8Ilnr5tpysn0wfALoOy9sb?=
+ =?us-ascii?Q?I6QqGFrhXFMYclp1ZBCeleTlANvg3eBGaH9+o97afDxvqSlKo2ZtEbcRM9nN?=
+ =?us-ascii?Q?WJgwWsKOcNL/c0x21l/zl+yY+xfUHN0p9GREa1/R4+Z5AqLcVjgOaRZwYFBi?=
+ =?us-ascii?Q?8F0c3eF5AuG/Hqt5ypA7kNSxIyBlsJZovWS2mmVBJoyCoNZFiZDXVuZgZiuI?=
+ =?us-ascii?Q?dz6eRpdrdB3eBSsB+fUPpQ3L686mj6pF33LA+BYiEtESc8bnnAfW3B/4NqRe?=
+ =?us-ascii?Q?3GX31BgRYOGB4JgMVd51XDoJZO5WsOxC+RX7Z7m3THQpHrOLIgHQfK77o7Bf?=
+ =?us-ascii?Q?VuMSn4ptc5bAHgrauYRVkuEzLNJyfF/8tuObqqdrysydmEGlg//EuowvwUNJ?=
+ =?us-ascii?Q?KQWu7TjpiF10zMG9ZdvB2zYS8kJiqbl5e7WteB4HZ6DYjwpb8DX7M+S7eiZG?=
+ =?us-ascii?Q?TP7nfiFmcjT1XmGEY+4IiB9fgx/0vxnElKitWn20SSxUNI/tz1rhmTBhsqWo?=
+ =?us-ascii?Q?Ebtnt06+sbFUdr9EUC2KCKCP20XYXeReA6LIdol5KFP8dozJluuuu8zLDvtg?=
+ =?us-ascii?Q?SfjBGLMoBBvLv6mn8GxRXUJWFAZcSC9lWMLKYs8Ura+jHim+ZOXw6L+rxM0i?=
+ =?us-ascii?Q?MiBanoLhfJERN9mV+i3WOPCuW6UzmDvaneVePOTR+bb1zmayh+QktxYIWfmn?=
+ =?us-ascii?Q?XCbQ02ysmKmd1rB1RsaZlVpqysOR8BSR5ffmXCzcl6Z0ZLQAJhjbs+22zfqs?=
+ =?us-ascii?Q?Du9mbD4eH+oot474IXNgqD5jIv9HnDfKuSJfM1rmXb+0EohNypE0P9wL8JIY?=
+ =?us-ascii?Q?pE6O9g/CxxQ9iSYQhcfF6S/pHR1zA4/3GBglPKmPFJXAa/yEjszpfiBPrqlr?=
+ =?us-ascii?Q?Z5OPhzmAnltypCbHfggijhcPwzJFV02NWa/NKjrR4/SvJHfAS1DtYn6+awJH?=
+ =?us-ascii?Q?fwDmtAybH2HI5p8ocsjW2wSj9mzXghkXLBky7EPX7GDgWffoxZwmbzo/rYL/?=
+ =?us-ascii?Q?OE/dcmQGTNYPC3WdLq9/KLmpdh58C+YB3Bo+l3p8xQ2kaueLBz93Io2xE9RY?=
+ =?us-ascii?Q?I3QoYGe2rNoWX3g6ujoh0+EtfmoauibJw5+m1/8D/rr1ANibIa0J4MTVMq7Q?=
+ =?us-ascii?Q?P3KThjqPiF+Ay3mGRiLX+yomq/Wnexj2C35ZjUrMJx+PcwEotya6kf4qY72T?=
+ =?us-ascii?Q?aiaYbGq7KaqaGkUpnNXQ6SyEllJe19mqLgs3/xheeHLc9lYMn3WzISwxDs0t?=
+ =?us-ascii?Q?tWGOE0kN1SKl1Adrs1fG7hUTTN72UGgz64FzTDEPsoTXU2Y7a9z3tM9veR5K?=
+ =?us-ascii?Q?eQIvUwJSUnDoT/gw1oMd0mu8lMrflW1WcwxyWokEYYhpmFsFV2W4aXfv1sKG?=
+ =?us-ascii?Q?zoxp+zsXXZZl0VEn/jNPzfqAb7kErDZQ/fPUq6UdPLPuj66nRNQxq9xoIR2X?=
+ =?us-ascii?Q?CBQf0tQE1uyZ7KdKyRqBQBV4zWa/OfFlDe6hlwbAOLsRqKdQHg+wnA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(376014)(10070799003)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?xmWkaxToTQ8I3IF5TYCy0Aekf4M0wtxKfshPz4w2XxA1mg+lenXjwrhfUoMD?=
+ =?us-ascii?Q?hqNLO6K0R/qmqgRwAn2zteGGkRJK1sSAGZRVv10hRNJXiIl2MNOTGHlz7a1q?=
+ =?us-ascii?Q?nL5DrQSiJQWU47yq44L6Dh10nK00hgabkIq9nwDPcKQ5OxtEOvHanZ2DFjrS?=
+ =?us-ascii?Q?KvzwNeoeUUZLCl8/jsOyAZTrb7ruBW1Gr3btF/2dCYvXuocpJ/cR7C6cViE/?=
+ =?us-ascii?Q?TUWaaFn2y4ERuN03zdKE5PUC2AvUwXkAzhW4HEXPQYt8pMBNCtsfJMVCSkWB?=
+ =?us-ascii?Q?06xPN3XKODisa15kkhH4PFfOtpcy0IGVtpDaUTfslr42t1xKSrwyvUKckMev?=
+ =?us-ascii?Q?ld97JWuOE1SoSqxrYi0TwWv1K24ecX/VHBOKLmZXBOEgzAppjyU8djnrMNUv?=
+ =?us-ascii?Q?8ce31hFrJ4zvS1FEZo4aaCW4ydwrkRgZnSKxTW46SJiscYJJukBE+pnRbWVS?=
+ =?us-ascii?Q?QXn/20e3or8YExXj16E5WNYSJuEr4DX8EIINAWw1RkVCRWqiA3NCofr6jyGJ?=
+ =?us-ascii?Q?QzzBMFbE8CvH4xgcazOe1tkRC+WBUDrsBB7EPGD7yXLyEL3VeeYQLIZASZy+?=
+ =?us-ascii?Q?hojDLv8suF3YonrFIWjqTrHnZJlc0hcONH5oxE2Sj8q1z2azKDZ0fHCRzsSj?=
+ =?us-ascii?Q?xtNVkRRIg4WrE9dLFH0eKO3n1BtEbXOg0PNSbPo2595tXo9m7GIA4+YbA0xC?=
+ =?us-ascii?Q?5RJqDwfvSEu6Q1ChjoCkFx6ALyCKpIZrqxx5WjocT82Z5ICayDgVGSBD/VJ1?=
+ =?us-ascii?Q?l5005Wxh5Rb8vtCgDX1kvJtThuOZ33QQiWFlKFRtocT628f0tlIrFIcWVbqW?=
+ =?us-ascii?Q?EcQIpToWGBHdeWiA5lf3fi0AHXWr7oLC+0c9+5UqXI91pzbNWl2GfjUXPpS9?=
+ =?us-ascii?Q?oY7l2e6utUwTBb/nsRgac5ITsX12NGc3OaRtPrunhno0/Wtb5+zM0MsgjfvR?=
+ =?us-ascii?Q?XHN28lO7IdRvGqjiZAf4xa8HngWI8tsGjvlQHBgNyU/eb/S6xwk68dXhGAMd?=
+ =?us-ascii?Q?tHswdKyDov6CZgOYK7NlsS7mx2CyBouToffBkEYSGJB3dpb7pzPhuJdVBFzD?=
+ =?us-ascii?Q?33mqJxfsbEpxREjG16vUmMVJzKVTqHG0QAtwLOFi5GhF960oLEH/nlCZL4G3?=
+ =?us-ascii?Q?EK0G7FMhWnouQpyC1G78n6thKh0HdOFFSKhm9nUTqZgVg2GGPiB6u1L1wkrc?=
+ =?us-ascii?Q?h4RwwxBUHFfsRQ0DE9sZ9N3ILUcTD8BwLomQ/fB3W2HrLYlmFIM5CY0ymNGl?=
+ =?us-ascii?Q?93be2019hjKsaI0IBt2n3SdTc5jhbm+2BOMXiEBY1lCszlra/n2JtK6QCmfY?=
+ =?us-ascii?Q?Ha25RxtpeMlWPv6tDGir3KFyp5ww8SKCAyY2WxmHZC7BKwyCY4L6yoxC7tqH?=
+ =?us-ascii?Q?YrzoPPYf0v5QNANGSDHJQ0D7Zget7OEwL6KkbvBYR+p3+u6tZsHVaV4uRKOY?=
+ =?us-ascii?Q?O/f99pKpqhoU2YjGdyTFl8raadMU4QZtGslXjdq8WQDElbNBzDddbXH01W/n?=
+ =?us-ascii?Q?tiSMHHiQ6n+q6Fxoc7VF5LQOWCAsaCycxYTaNsjFIM1YJl91/rm0sA6CzFRM?=
+ =?us-ascii?Q?cNxGu7gKy1AGWA7LIEx552tlaamEUzHDQBT6q+gWrfPH/Xca5GjY00sXWN96?=
+ =?us-ascii?Q?4v6dD1QwORiNL3Qk+H3HZWlqSbJwx9BHyuvgOEsANlLc5LHe4UZQpmwvZ68N?=
+ =?us-ascii?Q?itqVRwwzythrkJPJRA/MNr7nL4U0zsPSiwWo8CYFAZQxFqlTyKP2yV5SBvUM?=
+ =?us-ascii?Q?OXLGJOaP30xmrWpoqbo2AkFr47yvBiCp3vU8iwzTGFzFoq8kIdgt98pTZVQc?=
+X-MS-Exchange-AntiSpam-MessageData-1: SG9utPvFuVBlkg==
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d0cdf535-7750-432b-dbdc-08de4648b461
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Dec 2025 19:38:41.3244
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SppfI9Js3YiwSjfZlFGZ17Mxf09nRAKkFr7Stllri4krrtMMhnF3gSfGSNHzjqOB5WrqL/R0+JMQ9t1754fTYQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR04MB11335
 
-On Sat, Dec 27, 2025 at 05:54:51PM -0800, Cong Wang wrote:
-> From: Cong Wang <cwang@multikernel.io>
+On Mon, Dec 22, 2025 at 10:26:28AM +0800, Wei Fang wrote:
+> A value of 0 for addr indicates that the IEB_LBCR register does not
+> need to be configured, as its default value is 0. However, the driver
+> will print an error log if addr is 0, so this issue needs to be fixed.
 > 
-> The virtio-vsock driver triggers a DMA debug warning during probe:
-> 
-> [    9.267139] ------------[ cut here ]------------
-> [    9.268694] DMA-API: virtio-pci 0000:08:00.0: cacheline tracking EEXIST, overlapping mappings aren't supported
-> [    9.271297] WARNING: kernel/dma/debug.c:601 at add_dma_entry+0x220/0x278, CPU#3: swapper/0/1
-> [    9.273628] CPU: 3 UID: 0 PID: 1 Comm: swapper/0 Not tainted 6.19.0-rc1+ #1383 PREEMPT(voluntary)
-> [    9.276124] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
-> [    9.278232] RIP: 0010:add_dma_entry+0x223/0x278
-> [    9.279456] Code: e8 63 ad 30 00 4c 8b 6d 00 48 89 ef e8 d5 6d aa 00 48 89 c6 eb 0a 49 c7 c5 80 55 90 82 4c 89 ee 48 8d 3d 4c 2a 1c 03 4c 89 ea <67> 48 0f b9 3a 48 89 df e8 de f1 ff ff 83 3d 85 e8 19 03 00 74 86
-> [    9.284284] RSP: 0018:ffff8880077ff6a8 EFLAGS: 00010246
-> [    9.285541] RAX: ffffffff82c433a0 RBX: ffff888007aed200 RCX: ffffffff81ec0591
-> [    9.287124] RDX: ffff88800ae7a830 RSI: ffffffff82c433a0 RDI: ffffffff845dc1f0
-> [    9.288801] RBP: ffff88800b2610c8 R08: 0000000000000007 R09: 0000000000000000
-> [    9.290407] R10: ffffffff814d2dcf R11: fffffbfff08b6fd4 R12: 1ffff11000effed5
-> [    9.292111] R13: ffff88800ae7a830 R14: 00000000ffffffef R15: 0000000000000202
-> [    9.293736] FS:  0000000000000000(0000) GS:ffff8880e7da8000(0000) knlGS:0000000000000000
-> [    9.295595] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [    9.297095] CR2: 0000000000000000 CR3: 0000000003ca0000 CR4: 0000000000350ef0
-> [    9.298712] Call Trace:
-> [    9.299229]  <TASK>
-> [    9.299709]  ? __pfx_add_dma_entry+0x10/0x10
-> [    9.300729]  ? _raw_spin_unlock_irqrestore+0x2e/0x44
-> [    9.301786]  ? dma_entry_alloc+0x120/0x131
-> [    9.302650]  ? debug_dma_map_phys+0xf2/0x118
-> [    9.303553]  dma_map_phys+0x1b3/0x1c6
-> [    9.304392]  vring_map_one_sg+0xdf/0x111
-> [    9.305312]  virtqueue_add_split+0x348/0x767
-> [    9.306243]  ? __pfx_virtqueue_add_split+0x10/0x10
-> [    9.307243]  ? lock_acquire.part.0+0xb0/0x1c6
-> [    9.308246]  ? find_held_lock+0x2b/0x71
-> [    9.309078]  ? local_clock_noinstr+0x32/0x9c
-> [    9.310070]  ? local_clock+0x11/0x24
-> [    9.310915]  ? virtqueue_add+0x3e/0x89
-> [    9.311881]  virtqueue_add_inbuf+0x73/0x9a
-> [    9.312840]  ? __pfx_virtqueue_add_inbuf+0x10/0x10
-> [    9.313968]  ? sg_assign_page+0xd/0x32
-> [    9.314907]  ? sg_init_one+0x75/0x84
-> [    9.316025]  virtio_vsock_event_fill_one.isra.0+0x86/0xae
-> [    9.317236]  ? __pfx_virtio_vsock_event_fill_one.isra.0+0x10/0x10
-> [    9.318529]  virtio_vsock_vqs_start+0xab/0xf7
-> [    9.319453]  virtio_vsock_probe.part.0+0x3aa/0x3f0
-> [    9.320546]  virtio_dev_probe+0x397/0x454
-> [    9.321431]  ? __pfx_virtio_dev_probe+0x10/0x10
-> [    9.322382]  ? kernfs_create_link+0xc1/0xec
-> [    9.323290]  ? kernfs_put+0x19/0x33
-> [    9.324106]  ? sysfs_do_create_link_sd+0x7a/0xc0
-> [    9.325104]  really_probe+0x167/0x316
-> [    9.325932]  ? __pfx___driver_attach+0x10/0x10
-> [    9.326905]  __driver_probe_device+0x11e/0x155
-> [    9.327934]  driver_probe_device+0x4a/0xc4
-> [    9.328828]  __driver_attach+0x129/0x14c
-> [    9.329832]  bus_for_each_dev+0xd9/0x12b
-> [    9.330741]  ? __pfx_bus_for_each_dev+0x10/0x10
-> [    9.331851]  ? __lock_release.isra.0+0xdb/0x193
-> [    9.332847]  ? bus_add_driver+0xef/0x246
-> [    9.333700]  bus_add_driver+0x10f/0x246
-> [    9.334521]  driver_register+0x12c/0x181
-> [    9.335572]  ? __pfx_virtio_vsock_init+0x10/0x10
-> [    9.336949]  virtio_vsock_init+0x4f/0x75
-> [    9.337998]  do_one_initcall+0x15e/0x371
-> [    9.339056]  ? __pfx_do_one_initcall+0x10/0x10
-> [    9.340313]  ? parameqn+0x11/0x6b
-> [    9.341205]  ? poison_kmalloc_redzone+0x44/0x69
-> [    9.342435]  ? kasan_save_track+0x10/0x29
-> [    9.343513]  ? rcu_is_watching+0x1c/0x3c
-> [    9.344696]  ? trace_kmalloc+0x82/0x97
-> [    9.345733]  ? __kmalloc_noprof+0x41c/0x446
-> [    9.346888]  ? do_initcalls+0x2c/0x15e
-> [    9.348064]  do_initcalls+0x131/0x15e
-> [    9.349051]  kernel_init_freeable+0x250/0x2a2
-> [    9.350201]  ? __pfx_kernel_init+0x10/0x10
-> [    9.351285]  kernel_init+0x18/0x136
-> [    9.352307]  ? __pfx_kernel_init+0x10/0x10
-> [    9.353383]  ret_from_fork+0x78/0x2e5
-> [    9.354371]  ? __pfx_ret_from_fork+0x10/0x10
-> [    9.355501]  ? __switch_to+0x453/0x4c2
-> [    9.356591]  ? __pfx_kernel_init+0x10/0x10
-> [    9.357666]  ret_from_fork_asm+0x1a/0x30
-> [    9.358713]  </TASK>
-> [    9.359305] irq event stamp: 1580331
-> [    9.360349] hardirqs last  enabled at (1580341): [<ffffffff813c0bf5>] __up_console_sem+0x53/0x59
-> [    9.362650] hardirqs last disabled at (1580348): [<ffffffff813c0bda>] __up_console_sem+0x38/0x59
-> [    9.365096] softirqs last  enabled at (1580150): [<ffffffff812ecf1e>] handle_softirqs+0x46b/0x4bd
-> [    9.367426] softirqs last disabled at (1580145): [<ffffffff812ecfcb>] __irq_exit_rcu+0x4b/0xc3
-> [    9.369750] ---[ end trace 0000000000000000 ]---
-> [    9.370965] DMA-API: Mapped at:
-> [    9.371885]  dma_entry_alloc+0x115/0x131
-> [    9.372921]  debug_dma_map_phys+0x4c/0x118
-> [    9.374014]  dma_map_phys+0x1b3/0x1c6
-> [    9.375000]  vring_map_one_sg+0xdf/0x111
-> [    9.376161]  virtqueue_add_split+0x348/0x767
-> 
-> This occurs because event_list[8] contains 8 struct virtio_vsock_event
-> entries, each only 4 bytes (__le32 id). When virtio_vsock_event_fill()
-> creates DMA mappings for all 8 events via virtqueue_add_inbuf(), these
-> 32 bytes all fit within a single 64-byte cacheline.
-> 
-> The DMA debug subsystem warns about this because multiple DMA_FROM_DEVICE
-> mappings within the same cacheline can cause data corruption: if the CPU
-> writes to one event while the device is writing another event in the same
-> cacheline, the CPU cache writeback could overwrite device data.
-
-But the CPU never writes into one of these, or did I miss anything?
-
-The real issue is other data in the same cache line?
-
-
-
-> Fix this by allocating the event buffers from DMA coherent memory using
-> dma_alloc_coherent(). This memory is always coherent between CPU and
-> device, eliminating the cacheline overlap issue. The premapped virtqueue
-> API (virtqueue_add_inbuf_premapped) is used to prevent virtio from
-> performing redundant DMA mapping on the already-coherent memory.
-> 
-> Fixes: 0ea9e1d3a9e3 ("VSOCK: Introduce virtio_transport.ko")
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> Cc: Stefano Garzarella <sgarzare@redhat.com>
-> Signed-off-by: Cong Wang <cwang@multikernel.io>
-
-
-
-
+> Fixes: 50bfd9c06f0f ("net: enetc: set external PHY address in IERB for i.MX94 ENETC")
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
 > ---
->  net/vmw_vsock/virtio_transport.c | 47 ++++++++++++++++++++++++++------
->  1 file changed, 38 insertions(+), 9 deletions(-)
-> 
-> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-> index 8c867023a2e5..34606de587c0 100644
-> --- a/net/vmw_vsock/virtio_transport.c
-> +++ b/net/vmw_vsock/virtio_transport.c
-> @@ -26,6 +26,8 @@ static struct virtio_vsock __rcu *the_virtio_vsock;
->  static DEFINE_MUTEX(the_virtio_vsock_mutex); /* protects the_virtio_vsock */
->  static struct virtio_transport virtio_transport; /* forward declaration */
->  
-> +#define VIRTIO_VSOCK_EVENT_BUFS	8
-> +
->  struct virtio_vsock {
->  	struct virtio_device *vdev;
->  	struct virtqueue *vqs[VSOCK_VQ_MAX];
-> @@ -59,7 +61,8 @@ struct virtio_vsock {
->  	 */
->  	struct mutex event_lock;
->  	bool event_run;
-> -	struct virtio_vsock_event event_list[8];
-> +	struct virtio_vsock_event *event_list;	/* DMA coherent memory */
-> +	dma_addr_t event_list_dma;
->  
->  	u32 guest_cid;
->  	bool seqpacket_allow;
-> @@ -381,16 +384,19 @@ static bool virtio_transport_more_replies(struct virtio_vsock *vsock)
->  
->  /* event_lock must be held */
->  static int virtio_vsock_event_fill_one(struct virtio_vsock *vsock,
-> -				       struct virtio_vsock_event *event)
-> +				       struct virtio_vsock_event *event,
-> +				       dma_addr_t dma_addr)
->  {
->  	struct scatterlist sg;
->  	struct virtqueue *vq;
->  
->  	vq = vsock->vqs[VSOCK_VQ_EVENT];
->  
-> -	sg_init_one(&sg, event, sizeof(*event));
-> +	sg_init_table(&sg, 1);
-> +	sg_dma_address(&sg) = dma_addr;
-> +	sg_dma_len(&sg) = sizeof(*event);
->  
-> -	return virtqueue_add_inbuf(vq, &sg, 1, event, GFP_KERNEL);
-> +	return virtqueue_add_inbuf_premapped(vq, &sg, 1, event, NULL, GFP_KERNEL);
->  }
->  
->  /* event_lock must be held */
-> @@ -398,10 +404,12 @@ static void virtio_vsock_event_fill(struct virtio_vsock *vsock)
->  {
->  	size_t i;
->  
-> -	for (i = 0; i < ARRAY_SIZE(vsock->event_list); i++) {
-> +	for (i = 0; i < VIRTIO_VSOCK_EVENT_BUFS; i++) {
->  		struct virtio_vsock_event *event = &vsock->event_list[i];
-> +		dma_addr_t dma_addr = vsock->event_list_dma +
-> +				      i * sizeof(*event);
->  
-> -		virtio_vsock_event_fill_one(vsock, event);
-> +		virtio_vsock_event_fill_one(vsock, event, dma_addr);
->  	}
->  
->  	virtqueue_kick(vsock->vqs[VSOCK_VQ_EVENT]);
-> @@ -461,10 +469,14 @@ static void virtio_transport_event_work(struct work_struct *work)
->  
->  		virtqueue_disable_cb(vq);
->  		while ((event = virtqueue_get_buf(vq, &len)) != NULL) {
-> +			size_t idx = event - vsock->event_list;
-> +			dma_addr_t dma_addr = vsock->event_list_dma +
-> +					      idx * sizeof(*event);
-> +
->  			if (len == sizeof(*event))
->  				virtio_vsock_event_handle(vsock, event);
->  
-> -			virtio_vsock_event_fill_one(vsock, event);
-> +			virtio_vsock_event_fill_one(vsock, event, dma_addr);
->  		}
->  	} while (!virtqueue_enable_cb(vq));
->  
-> @@ -796,6 +808,15 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
->  
->  	vsock->vdev = vdev;
->  
-> +	vsock->event_list = dma_alloc_coherent(vdev->dev.parent,
-> +					       VIRTIO_VSOCK_EVENT_BUFS *
-> +					       sizeof(*vsock->event_list),
-> +					       &vsock->event_list_dma,
-> +					       GFP_KERNEL);
-> +	if (!vsock->event_list) {
-> +		ret = -ENOMEM;
-> +		goto out_free_vsock;
-> +	}
->  
->  	mutex_init(&vsock->tx_lock);
->  	mutex_init(&vsock->rx_lock);
-> @@ -813,7 +834,7 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
->  
->  	ret = virtio_vsock_vqs_init(vsock);
->  	if (ret < 0)
-> -		goto out;
-> +		goto out_free_event_list;
->  
->  	for (i = 0; i < ARRAY_SIZE(vsock->out_sgs); i++)
->  		vsock->out_sgs[i] = &vsock->out_bufs[i];
-> @@ -825,8 +846,13 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
->  
->  	return 0;
->  
-> -out:
-> +out_free_event_list:
-> +	dma_free_coherent(vdev->dev.parent,
-> +			  VIRTIO_VSOCK_EVENT_BUFS * sizeof(*vsock->event_list),
-> +			  vsock->event_list, vsock->event_list_dma);
-> +out_free_vsock:
->  	kfree(vsock);
-> +out:
->  	mutex_unlock(&the_virtio_vsock_mutex);
->  	return ret;
->  }
-> @@ -853,6 +879,9 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
->  
->  	mutex_unlock(&the_virtio_vsock_mutex);
->  
-> +	dma_free_coherent(vdev->dev.parent,
-> +			  VIRTIO_VSOCK_EVENT_BUFS * sizeof(*vsock->event_list),
-> +			  vsock->event_list, vsock->event_list_dma);
->  	kfree(vsock);
+> v2 changes:
+> Separate tests for "if (addr < 0)" and a later "if (!addr)".
+> v1: https://lore.kernel.org/imx/20251219082922.3883800-1-wei.fang@nxp.com/
+> ---
 
-
-
-
-You want virtqueue_map_alloc_coherent/virtqueue_map_free_coherent
-methinks.
-
-Then you can use normal inbuf/outbut and not muck around with premapped.
-
-
-I prefer keeping fancy premapped APIs for perf sensitive code,
-let virtio manage DMA API otherwise.
-
-
->  }
->  
-> -- 
-> 2.34.1
-
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
