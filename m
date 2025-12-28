@@ -1,139 +1,140 @@
-Return-Path: <netdev+bounces-246196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 199A3CE5833
-	for <lists+netdev@lfdr.de>; Sun, 28 Dec 2025 23:49:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 962A7CE585D
+	for <lists+netdev@lfdr.de>; Sun, 28 Dec 2025 23:50:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7871D3004B84
-	for <lists+netdev@lfdr.de>; Sun, 28 Dec 2025 22:49:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4F9483004F75
+	for <lists+netdev@lfdr.de>; Sun, 28 Dec 2025 22:50:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCAE228D8D0;
-	Sun, 28 Dec 2025 22:49:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31D8B29AAF7;
+	Sun, 28 Dec 2025 22:50:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nPetPV5i"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WrvU2ZKk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599781C3BFC
-	for <netdev@vger.kernel.org>; Sun, 28 Dec 2025 22:49:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76FDA274B44
+	for <netdev@vger.kernel.org>; Sun, 28 Dec 2025 22:50:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766962147; cv=none; b=BYSmvTtf0GWcDq6h0ovtzGR3APgWhD4Kkcq5NVTmuWvF9L67F5m1C8aRNi31IMbHdHUgpt6xta4K7++NHQTC63engs2OHuUodG1q+nYPYzzQtHrNHRirYzp3ER3KvXvtFgHoPD401iMzCsHZ0fLsZryrN5JptNDmKQTqyNFl1+I=
+	t=1766962210; cv=none; b=UP94RVasQSIwthg77gsGTqd1ocXwEARAkIMjW6y6D0wedTZHbu3oa5OWspkaygJwOSWT37ohtYuiZISxgZZTzsJVSRvhSd6zp293LQo99PyCWpLUpSWwc6C3YfxReDt3+pSiZhEcbC7MhmIrlgpl2+maUutlYYk6P5kYS5NDgSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766962147; c=relaxed/simple;
-	bh=7xs7rBHCkEu0qSnjRBBkrDuWcff1dR9koDAyagfZn70=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TQpGIa5N/lueDD/XBYEyZXkk1PB5+w7vsKCjDNMy5/57xfqDVd3b24oTb58PstDN/W3/I7L86BlbSJBtNbObD/uGSCslT3mNjE6LBs5ypwbcy0HyjalumbgJgNN4y6vliPm5y9dorjrb9G3e6nsKnJQkc7vK55XnnGnuo8ChDX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nPetPV5i; arc=none smtp.client-ip=209.85.214.182
+	s=arc-20240116; t=1766962210; c=relaxed/simple;
+	bh=9KgZlOWCyyz97q21E9W8EANe41Dc0IJ33MJtTZbxqmI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kht8GQ7JUdsROZSYJmsh7YCd8hKLY71UwvZsHDLmiYcUOx3eURQIaAGbTH1ruCkvxZ7EKf91yj5bihxjFp1E2HDZTtvseJTHz5lI8fWnmlRa55ogwL7mHJNUrs6qgH3W9TowMrKjY4jj21JyOn08MPwL8d2OZIl9KYVgFqtdz2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WrvU2ZKk; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-29f1bc40b35so146215455ad.2
-        for <netdev@vger.kernel.org>; Sun, 28 Dec 2025 14:49:06 -0800 (PST)
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-430f57cd471so4236823f8f.0
+        for <netdev@vger.kernel.org>; Sun, 28 Dec 2025 14:50:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766962145; x=1767566945; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BnVxB8hHP+UEx+EyrlcIpTFAKkUEwNTCu8Of5uWFpkg=;
-        b=nPetPV5iEOKTg1X99grd64geyoYpeN4Aexbgs6Ab9dSP8ku/hSCne77nN4ic/KtHRe
-         QeF1BxOq+zpVNa2hBhjMcTITqfxM2j5YLOqjp6vH4Scp5HIheECDkIxseNuIm6q88mYT
-         5zfL8LAEMuihdNDx9B4KvoZb3yjGgnxApFfOxPfh+Q9KuWncQDcYv8MQ9Ct6cOCzC+Pu
-         3HZjGlpZlLVZ7rZGQ3FYefIwvYTa+1D8y9Cp2d62mqDY1qxN670qHTEyhdA7kfklSyTg
-         wr7bxMvXOAUeXPnS/N5fUg1zIEFh3EY81RoXkJwdDrUgI1H4J8UYxFbg8iLF9vohSa0M
-         KNDQ==
+        d=gmail.com; s=20230601; t=1766962207; x=1767567007; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dLa9rIWMcGJ8cd3NrQlUFNZ6zmYa0bxNCj5XPgKm3rs=;
+        b=WrvU2ZKkHWaMlv7oRkd+S+QEtyC1YuhJKXO7LueTJvIn//5dwNhQ4G8JtP2icFhnPx
+         Gz4/ji3vdh/OTs91Ww+RboZbn9yTv0bdQCUtdEDeffvUG6mJAZpUywRn4THuOIsQlWku
+         wSpjJgwH3siDX0WafPL4SJFBMeaFj93tfsHooD4ra27hvT2UZdYtr76tks1s+1EPIGMe
+         /5Y8CtNk5G84L5xS21viUSTYS5jyXajv95Tj2typ46M9gB6LPYA74QkiWXlR6ldxVKUi
+         diEpWgSyO+pI88uWaTW6oH1XBjTw3A4LpcaBn6bb8DMRux2uTTAJ2YTtbyLO7x1a8Iob
+         l4UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766962145; x=1767566945;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BnVxB8hHP+UEx+EyrlcIpTFAKkUEwNTCu8Of5uWFpkg=;
-        b=GkzTOETEivIzi4Hwl0UW8ZvnxtxT00lR53LPeZUfR5Qa6AsQDjUoWS2PYzJ0nUmsZ5
-         zp3VHhdrtxx6uOCqSo5O+/iyTcFcuN0FkcZi4HOHWCT5kw4O/VT27d//AbWCBI4rOVhv
-         AxN9XKFJL2S/vv6jUv3ZLH6QOYQ5pvhksfJPaeTFiK2hpmlkvQsgp7wDlARt19RXsHei
-         dzbBSWw3kM6uC9dPaYn/HxnLzRi55gu7YE0MwM77+zimJB9PbSs7H0XS3Sx7hWLPnPkl
-         Je3JGvWNPWF6FYVl1ETyhGi+1kWJvEg+AXBwYkYFR1WMbV1g+RC/M7sWj/tOLNS6rNdk
-         g/dQ==
-X-Gm-Message-State: AOJu0YyPD6nNOATel2w15Gy6yfIp1Kgj5WKY7TqL5+G+O5VrdTxe8kRK
-	lScWSyZEjUq2poq45iyigt6DE7TYh3LkN7iVdvqPRLepfNttd6lIgi3l
-X-Gm-Gg: AY/fxX7zzkpZ7mx4E7Hc8IJONxmwahlALxxx7rwuPkMCL1ZT7jIcktf33ROKBLwwCPN
-	VQBO4BBaY9+2Drgx47BPGZv1UNHoHuDadYqk9iMsvAiPtoXXY6vIWaUKc4bGkLVoo+pwNKjb2sB
-	XNi/tuZ42VRueH1fJS+5Xi5WWfxdIrTY98vBGvPsZbMlwil9c9vChqb2CnxNZKNBGB8NomKQ1uY
-	A6J4m9eV0BHxCVT1Xs5xT9ws6yvvJHZxLlbnK31LnUYiPXDiM8u0FKAkuLVk74PrwJws7LVTN4D
-	PWL8GYNtmolr6XJSNAmydwRZS4TEAsRrWy9lEz0gUG5imXpWuMDvE36ac4M1XgGcfOi6bVNTO73
-	lbSB9FJTffx/CEjV5sa54YZIrItslV+X/kT/T4qXfXNbDbu3I46NVu8g2jpWjGIeKoRdxB1mlr/
-	qv+l032pBpiQTD9Eg4
-X-Google-Smtp-Source: AGHT+IFrZ0jqqyfa4w9leqRMWpvEB4wvR96T1u2WwgRjWIQZDJOokmhOcBM1uE4s/VnzQJrZGEFtuA==
-X-Received: by 2002:a05:7022:4284:b0:11b:9386:7ed3 with SMTP id a92af1059eb24-1217230b84amr31429073c88.48.1766962145520;
-        Sun, 28 Dec 2025 14:49:05 -0800 (PST)
-Received: from localhost ([2601:647:6802:dbc0:79af:1f76:2f9:193d])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1217253bfe2sm83886095c88.10.2025.12.28.14.49.04
+        d=1e100.net; s=20230601; t=1766962207; x=1767567007;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=dLa9rIWMcGJ8cd3NrQlUFNZ6zmYa0bxNCj5XPgKm3rs=;
+        b=QP2MatNiz1x19KcKuHyRrrYxE8diuPMJyl5/11cUPYgnjCUWKoOoH3RJcJF8IujkPe
+         FycmW6ci4bD7BZnUojC5VNYuu0gmpIlAYUzmtUG3COICYQZifhyxtO03q4wRSqgxwv/Z
+         TKEysjdp/jMpjEpbCUpuxvC0TmEH3+ONewdpnz0mIU9f4HC35Q9VZ5SyAQ3XeuoTPXHd
+         RovELXqm75C7oR9nMsKPRLFCmykJwY7zQ339yKtqt5kGpN5fIZGZpJMxMwOyV4ql3Mpy
+         7Vyfj/Dd3VSrm95JN8WoUHKaO8InUwHt5LF2A8FkX8uAg9Ewt82ho1BGwUstp6zP8gF2
+         eIxg==
+X-Forwarded-Encrypted: i=1; AJvYcCXbWxU85no18BP7TJZIjF0f5ntsr29bP8emchdgZO19uTIHj85a51lDVuqSwxs/SnUJB6mtFCI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkvmIjLAi9RdIA+aWE/87i9DSLgA1g645v4Hwj+BTMqK08WYmp
+	Vrx5RSe+IR4bM1si6lHO+PwY3WPEGdx36thYS+rzXomSVEDZ+ZRYKdSR
+X-Gm-Gg: AY/fxX4S/Z8kr3DTVjAc8wEx3PSf7mGG2OjlQ+grAR5rHpbrV6lNfZ5PKu89eSUKxoP
+	yVlR1ZnshJNnLlmjndCocXlgc9L5H/kQ8omTTUHljuGjXrm88Mv0yZOmVREon4d68TwmfwEBB2+
+	BN25+WL4C6muLlrqQG6NuZgsPvOcFG0FtAoliGMT6aKr9TvG2GtyDHEBfki4ua8iZXkSPONJk0o
+	yFREEr/T5ze2HQy24KD0wwPZn87s4t+ZKhq+2T66GYYzYIw8UIn00cAPML/BNwYhC6SMMEm7r4F
+	7aqkcwm8ekIlA7qsTyY1vnNv7fYk2C5xOfaN8iOrgRM9bQXQdj0jYGweUF8t7ztj1haZj43Wc+B
+	Qav4DrJxAYjLStlmZOTrlmBCdzj0pKR9A+7FmrMg5cxfUJMsQnt3M8fAi93h5ocpH46l9ng15QA
+	0zrRAaAnJk6NhwhK3/qCOQ7dgI6gjrxGk1e4ds2qbsQPZCbBsaJFh9
+X-Google-Smtp-Source: AGHT+IGDmQFJXpTex84Sjvl3OcjyzaSsuGGpBNcSV45EAoewFsb1Yr42jHw1dToXppS6Ot5xXmfiDQ==
+X-Received: by 2002:adf:f70b:0:b0:432:5c43:64 with SMTP id ffacd0b85a97d-4325c4302c7mr23626302f8f.41.1766962206674;
+        Sun, 28 Dec 2025 14:50:06 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324eab33f5sm59078509f8f.41.2025.12.28.14.50.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Dec 2025 14:49:04 -0800 (PST)
-Date: Sun, 28 Dec 2025 14:49:03 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
-	kvm@vger.kernel.org, Cong Wang <cwang@multikernel.io>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>
-Subject: Re: [Patch net] vsock: fix DMA cacheline overlap warning using
- coherent memory
-Message-ID: <aVGz39EoF5ScJfIP@pop-os.localdomain>
-References: <20251228015451.1253271-1-xiyou.wangcong@gmail.com>
- <20251228104521-mutt-send-email-mst@kernel.org>
+        Sun, 28 Dec 2025 14:50:06 -0800 (PST)
+Date: Sun, 28 Dec 2025 22:50:04 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Andy Shevchenko <andriy.shevchenko@intel.com>
+Cc: Jonathan Cameron <jonathan.cameron@huawei.com>, Yury Norov
+ <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+ linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, Geert Uytterhoeven
+ <geert+renesas@glider.be>, Alexandre Belloni
+ <alexandre.belloni@bootlin.com>, Crt Mori <cmo@melexis.com>, Richard Genoud
+ <richard.genoud@bootlin.com>, Luo Jie <quic_luoj@quicinc.com>, Peter
+ Zijlstra <peterz@infradead.org>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, Mika
+ Westerberg <mika.westerberg@linux.intel.com>, Andreas Noever
+ <andreas.noever@gmail.com>, Yehezkel Bernat <YehezkelShB@gmail.com>,
+ Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+Subject: Re: [PATCH v2 08/16] bitfield: Simplify __BF_FIELD_CHECK_REG()
+Message-ID: <20251228225004.69a6972f@pumpkin>
+In-Reply-To: <aVF8uQxjz9trZAHY@smile.fi.intel.com>
+References: <20251212193721.740055-1-david.laight.linux@gmail.com>
+	<20251212193721.740055-9-david.laight.linux@gmail.com>
+	<20251217102618.0000465f@huawei.com>
+	<20251217223155.52249236@pumpkin>
+	<aVF8uQxjz9trZAHY@smile.fi.intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251228104521-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sun, Dec 28, 2025 at 02:31:36PM -0500, Michael S. Tsirkin wrote:
-> On Sat, Dec 27, 2025 at 05:54:51PM -0800, Cong Wang wrote:
-> > From: Cong Wang <cwang@multikernel.io>
+On Sun, 28 Dec 2025 20:53:45 +0200
+Andy Shevchenko <andriy.shevchenko@intel.com> wrote:
+
+> On Wed, Dec 17, 2025 at 10:31:55PM +0000, David Laight wrote:
+> > On Wed, 17 Dec 2025 10:26:18 +0000
+> > Jonathan Cameron <jonathan.cameron@huawei.com> wrote:  
+> > > On Fri, 12 Dec 2025 19:37:13 +0000
+> > > david.laight.linux@gmail.com wrote:  
+> 
+> ...
+> 
+> > > > +	BUILD_BUG_ON_MSG((mask) + 0U + 0UL + 0ULL >			\
+> > > > +			 ~0ULL >> (64 - 8 * sizeof (reg)),		\    
+> > > 
+> > > Trivial.  sizeof(reg) is much more comment syntax in kernel code.  
+> >                                      (common)
 > > 
-> > The virtio-vsock driver triggers a DMA debug warning during probe:
-> > 
-[...]
-> > This occurs because event_list[8] contains 8 struct virtio_vsock_event
-> > entries, each only 4 bytes (__le32 id). When virtio_vsock_event_fill()
-> > creates DMA mappings for all 8 events via virtqueue_add_inbuf(), these
-> > 32 bytes all fit within a single 64-byte cacheline.
-> > 
-> > The DMA debug subsystem warns about this because multiple DMA_FROM_DEVICE
-> > mappings within the same cacheline can cause data corruption: if the CPU
-> > writes to one event while the device is writing another event in the same
-> > cacheline, the CPU cache writeback could overwrite device data.
+> > Hmm. sizeof is an operator not a function.
+> > Its argument is either a variable/expression or a bracketed type
+> > (I don't usually put variables in brackets).
+> > So 'sizeof(reg)' is nearly as bad as 'return(reg)'.  
 > 
-> But the CPU never writes into one of these, or did I miss anything?
-> 
-> The real issue is other data in the same cache line?
+> Yet, it's a style used de facto in the Linux kernel. I am with Jonathan on this.
 
-You are right, it is misleading.
+Not hard to change :-)
 
-The CPU never writes to the event buffers themselves, it only reads them
-after the device writes. The problem is other struct fields in the same
-cacheline.
+There is a more interesting question as to whether that check is
+needed at all?
+It is only really the sanity checks (and the fact that __builtin_ffs() is
+sub-optimal) that stop the functions being 'reasonable' for non-constant
+values.
 
-I will update the commit message.
-
-> 
-> You want virtqueue_map_alloc_coherent/virtqueue_map_free_coherent
-> methinks.
-> 
-> Then you can use normal inbuf/outbut and not muck around with premapped.
-> 
-> 
-> I prefer keeping fancy premapped APIs for perf sensitive code,
-> let virtio manage DMA API otherwise.
-
-Yes, I was not aware of these API's, they are indeed better than using
-DMA API's directly.
-
-Thanks!
-Cong
+	David
 
