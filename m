@@ -1,193 +1,111 @@
-Return-Path: <netdev+bounces-246185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96BC2CE520F
-	for <lists+netdev@lfdr.de>; Sun, 28 Dec 2025 16:46:08 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6E98CE527F
+	for <lists+netdev@lfdr.de>; Sun, 28 Dec 2025 16:59:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 75320300B29F
-	for <lists+netdev@lfdr.de>; Sun, 28 Dec 2025 15:46:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4E8A63002D2F
+	for <lists+netdev@lfdr.de>; Sun, 28 Dec 2025 15:59:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B00413A3ED;
-	Sun, 28 Dec 2025 15:46:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="mwZdNqhj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C85CB2C0F96;
+	Sun, 28 Dec 2025 15:59:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f195.google.com (mail-oi1-f195.google.com [209.85.167.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.blochl.de (mail.blochl.de [151.80.40.192])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A71B81724
-	for <netdev@vger.kernel.org>; Sun, 28 Dec 2025 15:46:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31D12D5925;
+	Sun, 28 Dec 2025 15:59:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.40.192
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766936765; cv=none; b=I/7LyRqBqSu+dJrOwOtHu+wSkTInyUZr+C7j1UvJMJTzOWEL9I5048J6MavGYVzqdto2NhkygeJRF5KxydE7uPAjTbGbWDi4Kw4HMPLJY1aklMNJMLC31cRYZLKRkVgXepP5e/RjQftKC0UizeNV2nO0sdFWJNXj1KQTGyPdvto=
+	t=1766937584; cv=none; b=rVa5R+7t9dOpwabAsrSCiDkd6Cd1FAUamu1ayywLrSH5b2AhKhLQGDFTYUUi8SHJMjlv/dAIpF8EQmC5R6P2uvrTHB8B2ybw0lw0toADuqKgVsQv3ZVo+mLw00r4EE3uBF79uOoZfzAkFBUIjVB65vIwCfW44mcCsGe4Tz+5HNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766936765; c=relaxed/simple;
-	bh=MulVmjwHARqy7rwheWw9SrpplrM/PogbmzNEZ4x0TyU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eHoXjs8YwbDYme2CBfCIhBtcgZnCKGtS8EOfYcsZ+Hqvgzlhj5kLy3vtbIHcDvglGi5M/sD9j7VDiZuHkKwbobh/gHx4Pad//ks9GlPvLgGJc81H9kM1V0lOELVDujACIpugsjHUNW5SQJMVnqoYbX3SiVFm8yDueVFTQKxEQOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=mwZdNqhj; arc=none smtp.client-ip=209.85.167.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-oi1-f195.google.com with SMTP id 5614622812f47-4558f9682efso5483496b6e.3
-        for <netdev@vger.kernel.org>; Sun, 28 Dec 2025 07:46:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1766936760; x=1767541560; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QL4j19IOrqqmuzYnZ1SxQd2ieNi3NuzYkFJwG9nk0po=;
-        b=mwZdNqhjFGOL4n9k1Sqy4FOxlXC9psNVL5UnwecICk1z4pLTizL6lXm6TBk7jllPII
-         z4Fm6Qq3E/Ya2n3ZmOu1ULsDGT5fTGGEOWE5414wkZMo1n9xAAmNbhd16OXY/16kfftw
-         qqKv4FkWIo9daU1y4VfBELCXGGa7qUcFsMcHtwEoRoQxW9VGcl8S66x3/aLtgsYDqo4L
-         C1X+NaAiLfLxzoO0kGvIAedBttwl6zxIIJii3PTIyB0cN18JLFD+OwlMdx3BVn9C/AyY
-         KXNOL6CDPHLrCZr26q5uOr1LqRsAamPjnaePe3HOM2t7+HZuj+l553ERGTWflr7NQUWW
-         lo/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766936760; x=1767541560;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QL4j19IOrqqmuzYnZ1SxQd2ieNi3NuzYkFJwG9nk0po=;
-        b=lO9+Ug0hf7bsqJKWXCcaITxrlPKN/h68o2l4B/k9wopXJzoOGSUrb1xK79vtpJ1TNV
-         8CGngCbnohokE0WkKy+qm/W6bIAk5aBuYOOmcwe4iwjQKBwRaPJpqaO9nMuodmuhzCMM
-         2R82hj6JLpofY6w8WC+DfWuA1TfOja32eAcG/VAjClgKufZXyJBNd7j0GPVoMs253rF/
-         edcaYoaNDUCoMwkMf1Cg19L4EZgLWhdsGwntJV0dS+bnsdQFqPjP4VDQiWWM/TMrRqzD
-         n5zIA2tuTVl8JObmI5cE3Kl53hFoB/2ORHuiUjKiE4fkB7WbL85W3Mz8HLEY6fqe8Fnp
-         Gq4A==
-X-Forwarded-Encrypted: i=1; AJvYcCUiX12zLn0pvyHoPvVj8jLf2KlYMO1e10oycH7EcHaBFfLBHtkRUOr15kghA65Ud5Wn39kJozE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyaAidkHt42hjCTuqfsRiHf0X2dQoWjZ8S57SgYRp6hSslDUDsQ
-	o5N/Hbe+OVE4XXywnXAyUyrANdchMK+8OokZE4FZF14MNMH0L3eE2+UOgJuFmvON42w=
-X-Gm-Gg: AY/fxX7P3KwBIWdJ2vez6AMyhXiKsJ/L9HJyxB3CklctLeevVjs8DSdIiPVXXWkP7pV
-	LOu1ITlLnVJ9efAmS4ftA5w1oZwSeu28AdhwdgVXhR/pUI2cDhr7UXFVJBpzqm3/mBEY9P2oXeu
-	872W/EVtIyKYFxQ0p3h2O6C99GabPaTYSxKB0dEc17j6+FCUCeUrDCKgzUCvMAaJe4S4muD/39A
-	/aXELZ9gsuECC7FSIzRNJEp03rAMXDam2eoSgV7Y+n2njWLt9Xin2PDkmX1k7ojx9yzn+FjI7qD
-	gz0py5EC+NHxp+zp12bW1sZRXOf+USIp4SLl/KXxifBk539ZrOI87fhIBLveeMWcIcMQFlI0tzT
-	BoStgxpkiYjgdJQiza7cLUBMGI1X4bpteYL54G8nhgGwvYNbUTG4i4DDPs17O69NkcJmFLZIXRn
-	ikaXYancw1
-X-Google-Smtp-Source: AGHT+IGcxfzcltO6pnSTS55PPFijzWihLWrTkPcsukI/zVMOfd6BTNXV8M7bnuYSBkzfYvwLBvcsUQ==
-X-Received: by 2002:a05:6808:2389:b0:450:d09a:8cc4 with SMTP id 5614622812f47-457b20ca09fmr11421695b6e.38.1766936759898;
-        Sun, 28 Dec 2025 07:45:59 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cc6673ccc2sm19134080a34.12.2025.12.28.07.45.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 28 Dec 2025 07:45:58 -0800 (PST)
-Message-ID: <b59640ae-97a8-4a46-88fb-e96d1ac394f9@kernel.dk>
-Date: Sun, 28 Dec 2025 08:45:57 -0700
+	s=arc-20240116; t=1766937584; c=relaxed/simple;
+	bh=h+al5x7QZBZWGD1yV7+Jx5X8R7CzoykSu4n9nRd6UyI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=eIywCw5iuSMaqqUlA+dFKz9saU73DRW81cRP21a2/FE1cnAKwS3QFHgaOOg4HSKCEMbPCUYUe+zeocXDQyOmOblROXgTehNlkGBOe+YvB/unEJLxBf+Z11QfyTgcsNlwYiqXjuHxXajh7md2eBelfEO3ea2YnVafpzeSUkwIdoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blochl.de; spf=pass smtp.mailfrom=blochl.de; arc=none smtp.client-ip=151.80.40.192
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blochl.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blochl.de
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.blochl.de 3516946C0140
+Authentication-Results: mail.blochl.de; dmarc=none (p=none dis=none) header.from=blochl.de
+Authentication-Results: mail.blochl.de; spf=fail smtp.mailfrom=blochl.de
+Received: from WorkKnecht (ppp-93-104-30-36.dynamic.mnet-online.de [93.104.30.36])
+	by smtp.blochl.de (Postfix) with ESMTPSA id 3516946C0140;
+	Sun, 28 Dec 2025 15:53:03 +0000 (UTC)
+X-Virus-Status: Clean
+X-Virus-Scanned: clamav-milter 1.4.3 at 0aeafd614e10
+Date: Sun, 28 Dec 2025 16:52:59 +0100
+From: Markus =?utf-8?Q?Bl=C3=B6chl?= <markus@blochl.de>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Vikas Gupta <vikas.gupta@broadcom.com>, Leon Romanovsky <leon@kernel.org>, 
+	Siva Reddy Kallam <siva.kallam@broadcom.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Markus =?utf-8?Q?Bl=C3=B6chl?= <markus@blochl.de>
+Subject: [PATCH net] net: bnge: add AUXILIARY_BUS to Kconfig dependencies
+Message-ID: <20251228-bnge_aux_bus-v1-1-82e273ebfdac@blochl.de>
+X-B4-Tracking: v=1; b=H4sIAIpRUWkC/x2MQQqAIBAAvxJ7TtBNKfpKRGhttRcLzRCivycdZ
+ 2DmgUiBKUJfPRDo5siHL6DqCubd+o0EL4UBJRqF2AlX3GRTnlyKQtvZtbpB2TgDJTkDrZz/3QC
+ eLhjf9wMlHxWpYwAAAA==
+X-Change-ID: 20251228-bnge_aux_bus-4acb743203b5
+X-Mailer: b4 0.14.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] af_unix: don't post cmsg for SO_INQ unless explicitly
- asked for
-To: Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- netdev <netdev@vger.kernel.org>
-Cc: io-uring <io-uring@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima
- <kuniyu@google.com>, Julian Orth <ju.orth@gmail.com>
-References: <07adc0c2-2c3b-4d08-8af1-1c466a40b6a8@kernel.dk>
- <willemdebruijn.kernel.18e89ba05fbac@gmail.com>
- <fe9dbb70-c345-41b2-96d6-2788e2510886@kernel.dk>
- <willemdebruijn.kernel.1996d0172c2e@gmail.com>
- <0f83a7fb-0d1d-40d1-8281-2f6d53270895@kernel.dk>
- <3308e844-6c04-44a1-84c9-9b9f1aaef917@redhat.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <3308e844-6c04-44a1-84c9-9b9f1aaef917@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.6.4 (smtp.blochl.de [0.0.0.0]); Sun, 28 Dec 2025 15:53:03 +0000 (UTC)
 
-On 12/28/25 8:02 AM, Paolo Abeni wrote:
-> On 12/23/25 6:27 PM, Jens Axboe wrote:
->> On 12/19/25 1:08 PM, Willem de Bruijn wrote:
->>> [PATCH net v2] assuming this is intended to go through the net tree.
->>>
->>> Jens Axboe wrote:
->>>> On 12/19/25 12:02 PM, Willem de Bruijn wrote:
->>>>> Jens Axboe wrote:
->>>>>> A previous commit added SO_INQ support for AF_UNIX (SOCK_STREAM), but it
->>>>>> posts a SCM_INQ cmsg even if just msg->msg_get_inq is set. This is
->>>>>> incorrect, as ->msg_get_inq is just the caller asking for the remainder
->>>>>> to be passed back in msg->msg_inq, it has nothing to do with cmsg. The
->>>>>> original commit states that this is done to make sockets
->>>>>> io_uring-friendly", but it's actually incorrect as io_uring doesn't use
->>>>>> cmsg headers internally at all, and it's actively wrong as this means
->>>>>> that cmsg's are always posted if someone does recvmsg via io_uring.
->>>>>>
->>>>>> Fix that up by only posting a cmsg if u->recvmsg_inq is set.
->>>>>>
->>>>>> Additionally, mirror how TCP handles inquiry handling in that it should
->>>>>> only be done for a successful return. This makes the logic for the two
->>>>>> identical.
->>>>>>
->>>>>> Cc: stable@vger.kernel.org
->>>>>> Fixes: df30285b3670 ("af_unix: Introduce SO_INQ.")
->>>>>> Reported-by: Julian Orth <ju.orth@gmail.com>
->>>>>> Link: https://github.com/axboe/liburing/issues/1509
->>>>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
->>>>>>
->>>>>> ---
->>>>>>
->>>>>> V2:
->>>>>> - Unify logic with tcp
->>>>>> - Squash the two patches into one
->>>>>>
->>>>>> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
->>>>>> index 55cdebfa0da0..a7ca74653d94 100644
->>>>>> --- a/net/unix/af_unix.c
->>>>>> +++ b/net/unix/af_unix.c
->>>>>> @@ -2904,6 +2904,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
->>>>>>  	unsigned int last_len;
->>>>>>  	struct unix_sock *u;
->>>>>>  	int copied = 0;
->>>>>> +	bool do_cmsg;
->>>>>>  	int err = 0;
->>>>>>  	long timeo;
->>>>>>  	int target;
->>>>>> @@ -2929,6 +2930,9 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
->>>>>>  
->>>>>>  	u = unix_sk(sk);
->>>>>>  
->>>>>> +	do_cmsg = READ_ONCE(u->recvmsg_inq);
->>>>>> +	if (do_cmsg)
->>>>>> +		msg->msg_get_inq = 1;
->>>>>
->>>>> I would avoid overwriting user written fields if it's easy to do so.
->>>>>
->>>>> In this case it probably is harmless. But we've learned the hard way
->>>>> that applications can even get confused by recvmsg setting msg_flags.
->>>>> I've seen multiple reports of applications failing to scrub that field
->>>>> inbetween calls.
->>>>>
->>>>> Also just more similar to tcp:
->>>>>
->>>>>        do_cmsg = READ_ONCE(u->recvmsg_inq);
->>>>>        if ((do_cmsg || msg->msg_get_inq) && (copied ?: err) >= 0) {
->>>>
->>>> I think you need to look closer, because this is actually what the tcp
->>>> path does:
->>>>
->>>> if (tp->recvmsg_inq) {
->>>> 	[...]
->>>> 	msg->msg_get_inq = 1;
->>>> }
->>>
->>> I indeed missed that TCP does the same. Ack. Indeed consistency was what I asked for.
->>>
->>> Reviewed-by: Willem de Bruijn <willemb@google.com>
->>
->> Can someone get this applied, please?
-> 
-> For a few more days it's just me. That means a significantly longer than
-> usual latency, but I'm almost there.
+The build can currently fail with
 
-Thanks Paolo!
+    ld: drivers/net/ethernet/broadcom/bnge/bnge_auxr.o: in function `bnge_rdma_aux_device_add':
+    bnge_auxr.c:(.text+0x366): undefined reference to `__auxiliary_device_add'
+    ld: drivers/net/ethernet/broadcom/bnge/bnge_auxr.o: in function `bnge_rdma_aux_device_init':
+    bnge_auxr.c:(.text+0x43c): undefined reference to `auxiliary_device_init'
+
+if BNGE is enabled but no other driver pulls in AUXILIARY_BUS.
+
+Select AUXILIARY_BUS in BNGE like in all other drivers which create
+an auxiliary_device.
+
+Fixes: 8ac050ec3b1c ("bng_en: Add RoCE aux device support")
+Signed-off-by: Markus Blöchl <markus@blochl.de>
+---
+Basic steps to reproduce:
+- make allnoconfig
+- manually enable just PCI, NETDEVICES, ETHERNET, NET_VENDOR_BROADCOM and BNGE
+- make
+---
+ drivers/net/ethernet/broadcom/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/ethernet/broadcom/Kconfig b/drivers/net/ethernet/broadcom/Kconfig
+index ca565ace6e6a..cd7dddeb91dd 100644
+--- a/drivers/net/ethernet/broadcom/Kconfig
++++ b/drivers/net/ethernet/broadcom/Kconfig
+@@ -259,6 +259,7 @@ config BNGE
+ 	depends on PCI
+ 	select NET_DEVLINK
+ 	select PAGE_POOL
++	select AUXILIARY_BUS
+ 	help
+ 	  This driver supports Broadcom ThorUltra 50/100/200/400/800 gigabit
+ 	  Ethernet cards. The module will be called bng_en. To compile this
+
+---
+base-commit: 4d1442979e4a53b9457ce1e373e187e1511ff688
+change-id: 20251228-bnge_aux_bus-4acb743203b5
+
+Best regards,
+-- 
+Markus Blöchl <markus@blochl.de>
+
 
 -- 
-Jens Axboe
 
