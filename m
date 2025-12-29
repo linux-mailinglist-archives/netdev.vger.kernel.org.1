@@ -1,90 +1,90 @@
-Return-Path: <netdev+bounces-246220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A539CE64CE
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 10:36:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D3D2DCE64E0
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 10:37:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 655D7300FD6E
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 09:36:55 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 50CF2300F607
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 09:37:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5935426E6E8;
-	Mon, 29 Dec 2025 09:36:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCEF02737E3;
+	Mon, 29 Dec 2025 09:37:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ge/++Wvv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IW2qyP2R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2D4B24293C
-	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 09:36:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBF0F3C2D
+	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 09:37:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767001013; cv=none; b=u7xV04Gf/rgGm1pLWBdKm8S4OAcC+XnAmzUCySnQ2Ann84R71Shm1inzH7xgV5PZJQ3LpuQqUtcBwUqKBK9GXQEazX1iNWzaF4Yb2sePcx0plMoLvdqIJqfPB77J0JwWRGNpV4qk+B33PFZRE5r65ofzzl3frvOKbRTE+c+O1X4=
+	t=1767001074; cv=none; b=TgomfpeqnLkI+xey8vEfKt47g0LYmtJckkpMXiaPivBaXcFJa17Fpj6D3sJky6l4TUmhYDppWyRJFWj0QMzwZPCeqpDVvflN9eRm77ndcmLzzlFHce/GZeNGg06r9ZqV5ygYovPNpvns2cQXIahffw2UyQOFr4X4VlwBXSCRU5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767001013; c=relaxed/simple;
-	bh=y0DBFrvTw5WGdJotdWoUOWRFqnUJHGhrLoNAJ0wT9kM=;
+	s=arc-20240116; t=1767001074; c=relaxed/simple;
+	bh=ZeLo/0hLSY9n2UB+qZNYZtHxg817oGsq7GuA8/DYKC8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SawwUsUULc2lf4an68boD80xrB+rriS0M4ApQtQhrbMkipQtVS2MSwHddFEVAW+9FHO1TtDk+1Pz9rsd+EMTC+rK5vI3h4kHNwa/0jtSmzwYVmboqML767XbxtmjTl+a/ndDRw3sgZWFSeJAoUulTl1eA2hCoZD8sm8cJchsly8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ge/++Wvv; arc=none smtp.client-ip=209.85.167.54
+	 Content-Type:Content-Disposition:In-Reply-To; b=Op2U00AeezCxnl+e3uArENpIAyuJTy8il5FRSiZTAiwLu4kE+YQ60o5AGXUbAcQyXIDu/CqJXm0f1gsz/zG1QcUaCGEstBzDMcrM+WU09MXVLt25t+FvJazOhBjruxQTWiIXicUrL8g4Q/bRB2iAcq6lyjSPTctHM1BCVB/Dpl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IW2qyP2R; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5957c929a5eso12980146e87.1
-        for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 01:36:51 -0800 (PST)
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4779cc419b2so69785325e9.3
+        for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 01:37:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767001010; x=1767605810; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1767001071; x=1767605871; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zy6FaAKrnG9vWUbCJzba2W1+Xz+O91x0kok02ukJILw=;
-        b=Ge/++WvvfTI/b0rED819cAWCD/grpvWrpAEWvKteReG87oHunH3Co5Nm33I48vG5tN
-         G3hljpNUER3uKaEdPqEDWUsimXzW4d4mG5OEjm2fFIP9w0xj+kA9Z9tzG/XJrBoYXlbo
-         O2YUqTodqvk29q+vUwwvH913bKyowHFDqqRJdvvXtwiHzIo08QSS4qu674HFXpp5ANzi
-         c8MSP286AuThBBXQ+xcfNtInRK0nfBLioCSr4mm+lMwCaUIWQMM7wVCIoTyq2ezep+b7
-         PBieBxcEnfg3wzyZo5sF7w6+4HveW5E6FJSe+f94Ks/UGNNHL8p6oGaG4L2+/A3jo1zK
-         YCmw==
+        bh=z7xTL0ht63Yvfquwj8JBduOSEbhvKNXqPm5yX4HgFIE=;
+        b=IW2qyP2RROhHtFB5j871xFJ8DxCSys/pOvyOEQ4irsuIxVx+6hM5aFe2K1UDopxqiU
+         GtM2wVx5ngIpkAWdwCbOJAO8DNjo/KO52ybzvELRKWFiST5t6ipkH9cM9i4kBqcOdq46
+         A0G6qhh7vcn+a3b4DHyZ+UV3GmJGrDjQP4tUebYnn5cKPeoOU+H9bJ1n0UDVTqR2aKjB
+         jSBqOz6oRkjbCcq3A9tQZVhh0QhVaFuUH3GIRUZ23yVhdRTrfoNBWD9iblRgMy3zOh7Q
+         RXKe6sJ31lTFqArAM0QtEY4MYgn4LgZNO8fTPrm+lgFQyvFcajEzlvWXwJEdPpKBnTOr
+         eQdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767001010; x=1767605810;
+        d=1e100.net; s=20230601; t=1767001071; x=1767605871;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zy6FaAKrnG9vWUbCJzba2W1+Xz+O91x0kok02ukJILw=;
-        b=DrhzBLbXtZcEFwCY/0h0b2MsBdg3wjC7nPo9Pe0uBBQ9znYbqKG+oAo5L/+i0T727z
-         j5+70YKMJLddWykjpeBsYQmx4O2KDgF7xJ3+QhDMN/v2l+4lI7QV9MYmatmcz/qU7uRL
-         hrozWLK2G5tlqhxtVpLHq2QfTeFhosYG9TRofpfyv38k+8KnGFdQHM6pyGWpD9D5RFYC
-         EZE1RMtuVHkXUwUksSN3zHsDnwlC46LXNP/sIg/lin/AOHFxzncM7iAdnfeIM/19iA2e
-         dUprjxMKKobYbVD0YEE9ZWgBJRlIq20zm2icZ4KcUsgQIICl4AT90xPw4OmiO/Kxmd6b
-         j/Uw==
-X-Forwarded-Encrypted: i=1; AJvYcCWCW8EZ2/ZyJMO0HyHA9Hb+ieqOxSUj9afXvkiLwH8fBy6Zl55ti72bLjWma48HfA+pbvXjMHQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yykii3bIcxaEKaOEP8MSH0JgNg3BMfiWEbXPhY4Aq9iJaVOUfLp
-	1KR32mzG7yBEE+p9/MQF0JVQ8kkjK8QysQM4xDFHoG+yqSvTQ/jNzG0D
-X-Gm-Gg: AY/fxX5FIjfiTCcGk49XNh0sDe3c6kW5pinSavbPmKM5OZLq7DP7oPV5bmbi/HUUbjS
-	A+shGtTiN3zoWfyWOCVQsYZQuNBK5D4YFL6noEopqSAnnQarqDuZcHExGnZ6omAoD3eZfLu7hoN
-	CGrmaqgST/u0OXK/jIuofqoGHzVDqLqT/RPeAjIVjnScTxM0o92R8SwIozKgsHQgTky3knYEt7F
-	94LhoispZ3CpOcmceiuEXIjjfe1UeisCO3bUEk80BTnrDumWgL3/93j06UFR4dT2oS1Y9gygZno
-	CRUFRqWNUHh6GyfXAydQwktT+S9cMX8MZvgQfY6StDymePojci0+BmlsN/NF8dHh5Hsm9hcEp6X
-	sCp5vC02fgwj2VQiGwAx8aYWNQTUymrIBEiNEmeRALUY467lzljKu0dTghilbX84rk2toeRTBh8
-	BhZxdKpwG5fV8=
-X-Google-Smtp-Source: AGHT+IGHm0Kgnu2qkWrY4EqAUf2ZqTKoDeBs41GVC0pxMiQJd7hpHFbnbDaD1TLfB5HETP94i+VV9w==
-X-Received: by 2002:a05:6512:4020:b0:598:f262:1666 with SMTP id 2adb3069b0e04-59a17d1258dmr11279969e87.16.1767001009412;
-        Mon, 29 Dec 2025 01:36:49 -0800 (PST)
+        bh=z7xTL0ht63Yvfquwj8JBduOSEbhvKNXqPm5yX4HgFIE=;
+        b=NtcyHm1WUXRVti+DxrGGHmpVFUQV0SQnLdgueAnzbYu2hPAR1+4zJ74/AdM5YkSXzo
+         T4xzyv0BfjyMUsmbAdvZxuvQ8xiUR5Py5iXSd0Mq/xayaSyMGbsJu1fVnmxYjYTeI+/z
+         MAGOQdEn1uuyZKkU8b2dW65LJNxpRoXg7p/jRXXm9k2yIA7OnpAv+YooGBhgK/A+9PrE
+         ZlysDY0s/DCFjw0saXs31XbcmtY/gwMAjPxl2rSd9NbIgjjZyym0SHeasv1m3xyaj65m
+         8YVoxxfXSaUHXEhmGGxsDJRPDwSRyE9d2Os+mDFlW3ciQ4L33GMYF6CJvx3nRnESID9S
+         3sow==
+X-Forwarded-Encrypted: i=1; AJvYcCXQPvdgHcxfddOMkV6GbOHu6GQMih6ThINtPfY+EioWJ6QW8fGh+73Vk3WibtO0LXQiF0SzM60=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4evH6/0rNAlViMAoHOha6IaOfmxn08Gdl6RlLo97GBcCaviwA
+	QGHDDRcqw0z1JVlLUKoAydujfnshOvmrCGq/8OHzQ2+5xWC1VszC/Pzf
+X-Gm-Gg: AY/fxX40pnHALdNtp3FL1VFy9SA7Bn7BvA/GwXu+0bT6kNjCYQJcXNHA7InTcgUc3+2
+	Ams5IjlOQxxbsbdMhP8rsqYUgD+hNNL3XS9VFiDvY0NvqE617wXpgqwOrY82PEk7s2pH93vOxII
+	ZWqoZ/dOwoh5mI/GcMFXd3eNLpHf9SEFfrtxOG0M0LHWBJXlhQJ4HTLLYjPnSxw/GhX31/2S1IC
+	cisIYsYphFBk1ULf8RIcE/ab+D9bQX75a8eM0uuCogWCmd+wEEK2MMAZOFo37fuhgMeKVUDJOZ2
+	m+uVBBDOfHYa1ODLsdNzMuXDFDORX4pGrpBcHPz56ca6XO36wuPWyT4KJsSr2msKSTmgq1O8iYb
+	esVAi6f0RmuLg+eqTnL+dyNTBo0BKyO36jZv6g76mS/ayplCvMHvn5KXEGXLqoC2p5XbAduhD5t
+	sKBWJvgRATEJQ=
+X-Google-Smtp-Source: AGHT+IGPOUKX7q14yTgj2CVuuih5QA+xT8nKnXEoSheROymAO9OlKOilKdPI40ok2uMZOMYd5WRLqQ==
+X-Received: by 2002:a05:600c:350b:b0:477:aed0:f403 with SMTP id 5b1f17b1804b1-47d19549a95mr305713395e9.8.1767001070934;
+        Mon, 29 Dec 2025 01:37:50 -0800 (PST)
 Received: from eichest-laptop ([2a02:168:af72:0:305a:a3c6:f52d:de0f])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59a18618d59sm9115943e87.61.2025.12.29.01.36.46
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324ea1aee5sm62443610f8f.4.2025.12.29.01.37.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Dec 2025 01:36:47 -0800 (PST)
-Date: Mon, 29 Dec 2025 10:36:45 +0100
+        Mon, 29 Dec 2025 01:37:50 -0800 (PST)
+Date: Mon, 29 Dec 2025 10:37:49 +0100
 From: Stefan Eichenberger <eichest@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
+To: Rob Herring <robh@kernel.org>
 Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
+	kuba@kernel.org, pabeni@redhat.com, krzk+dt@kernel.org,
+	conor+dt@kernel.org, netdev@vger.kernel.org,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	horms@kernel.org,
 	Stefan Eichenberger <stefan.eichenberger@toradex.com>
 Subject: Re: [PATCH v1 1/2] dt-bindings: net: micrel: Convert to DT schema
-Message-ID: <aVJLrTnCefcjF39m@eichest-laptop>
+Message-ID: <aVJL7b_dG3JT5Pt1@eichest-laptop>
 References: <20251223133446.22401-1-eichest@gmail.com>
  <20251223133446.22401-2-eichest@gmail.com>
- <0376a133-44a7-40e8-be7d-0d04d33c0ec7@lunn.ch>
+ <20251228153609.GA2198936-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,14 +93,239 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0376a133-44a7-40e8-be7d-0d04d33c0ec7@lunn.ch>
+In-Reply-To: <20251228153609.GA2198936-robh@kernel.org>
 
-On Tue, Dec 23, 2025 at 03:34:57PM +0100, Andrew Lunn wrote:
+On Sun, Dec 28, 2025 at 09:36:09AM -0600, Rob Herring wrote:
+> On Tue, Dec 23, 2025 at 02:33:39PM +0100, Stefan Eichenberger wrote:
+> > From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+> > 
+> > Convert the devicetree bindings for the Micrel PHYs and switches to DT
+> > schema.
+> > 
+> > Signed-off-by: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+> > ---
+> >  .../devicetree/bindings/net/micrel.txt        |  57 --------
+> >  .../devicetree/bindings/net/micrel.yaml       | 132 ++++++++++++++++++
+> >  2 files changed, 132 insertions(+), 57 deletions(-)
+> >  delete mode 100644 Documentation/devicetree/bindings/net/micrel.txt
+> >  create mode 100644 Documentation/devicetree/bindings/net/micrel.yaml
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/micrel.txt b/Documentation/devicetree/bindings/net/micrel.txt
+> > deleted file mode 100644
+> > index 01622ce58112e..0000000000000
+> > --- a/Documentation/devicetree/bindings/net/micrel.txt
+> > +++ /dev/null
+> > @@ -1,57 +0,0 @@
+> > -Micrel PHY properties.
+> > -
+> > -These properties cover the base properties Micrel PHYs.
+> > -
+> > -Optional properties:
+> > -
+> > - - micrel,led-mode : LED mode value to set for PHYs with configurable LEDs.
+> > -
+> > -	Configure the LED mode with single value. The list of PHYs and the
+> > -	bits that are currently supported:
+> > -
+> > -	KSZ8001: register 0x1e, bits 15..14
+> > -	KSZ8041: register 0x1e, bits 15..14
+> > -	KSZ8021: register 0x1f, bits 5..4
+> > -	KSZ8031: register 0x1f, bits 5..4
+> > -	KSZ8051: register 0x1f, bits 5..4
+> > -	KSZ8081: register 0x1f, bits 5..4
+> > -	KSZ8091: register 0x1f, bits 5..4
+> > -	LAN8814: register EP5.0, bit 6
+> > -
+> > -	See the respective PHY datasheet for the mode values.
+> > -
+> > - - micrel,rmii-reference-clock-select-25-mhz: RMII Reference Clock Select
+> > -						bit selects 25 MHz mode
+> > -
+> > -	Setting the RMII Reference Clock Select bit enables 25 MHz rather
+> > -	than 50 MHz clock mode.
+> > -
+> > -	Note that this option is only needed for certain PHY revisions with a
+> > -	non-standard, inverted function of this configuration bit.
+> > -	Specifically, a clock reference ("rmii-ref" below) is always needed to
+> > -	actually select a mode.
+> > -
+> > - - clocks, clock-names: contains clocks according to the common clock bindings.
+> > -
+> > -	supported clocks:
+> > -	- KSZ8021, KSZ8031, KSZ8081, KSZ8091: "rmii-ref": The RMII reference
+> > -	  input clock. Used to determine the XI input clock.
+> > -
+> > - - micrel,fiber-mode: If present the PHY is configured to operate in fiber mode
+> > -
+> > -	Some PHYs, such as the KSZ8041FTL variant, support fiber mode, enabled
+> > -	by the FXEN boot strapping pin. It can't be determined from the PHY
+> > -	registers whether the PHY is in fiber mode, so this boolean device tree
+> > -	property can be used to describe it.
+> > -
+> > -	In fiber mode, auto-negotiation is disabled and the PHY can only work in
+> > -	100base-fx (full and half duplex) modes.
+> > -
+> > - - coma-mode-gpios: If present the given gpio will be deasserted when the
+> > -		    PHY is probed.
+> > -
+> > -	Some PHYs have a COMA mode input pin which puts the PHY into
+> > -	isolate and power-down mode. On some boards this input is connected
+> > -	to a GPIO of the SoC.
+> > -
+> > -	Supported on the LAN8814.
+> > diff --git a/Documentation/devicetree/bindings/net/micrel.yaml b/Documentation/devicetree/bindings/net/micrel.yaml
+> > new file mode 100644
+> > index 0000000000000..a8e532fbcb6f5
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/micrel.yaml
+> > @@ -0,0 +1,132 @@
+> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/micrel.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: Micrel KSZ series PHYs and switches
+> > +
+> > +maintainers:
+> > +  - Andrew Lunn <andrew@lunn.ch>
+> > +  - Stefan Eichenberger <eichest@gmail.com>
+> > +
+> > +description: |
+> 
+> Don't need '|' if no formatting to preserve.
+> 
+> > +  The Micrel KSZ series contains different network phys and switches.
+> > +
+> > +properties:
+> > +  compatible:
+> > +    enum:
+> > +      - ethernet-phy-id000e.7237  # KSZ8873MLL
+> > +      - ethernet-phy-id0022.1430  # KSZ886X
+> > +      - ethernet-phy-id0022.1435  # KSZ8863
+> > +      - ethernet-phy-id0022.1510  # KSZ8041
+> > +      - ethernet-phy-id0022.1537  # KSZ8041RNLI
+> > +      - ethernet-phy-id0022.1550  # KSZ8051
+> > +      - ethernet-phy-id0022.1555  # KSZ8021
+> > +      - ethernet-phy-id0022.1556  # KSZ8031
+> > +      - ethernet-phy-id0022.1560  # KSZ8081, KSZ8091
+> > +      - ethernet-phy-id0022.1570  # KSZ8061
+> > +      - ethernet-phy-id0022.161a  # KSZ8001
+> > +      - ethernet-phy-id0022.1720  # KS8737
+> 
+> blank line
+> 
+> > +  micrel,fiber-mode:
+> > +    type: boolean
+> > +    description: |
+> > +      If present the PHY is configured to operate in fiber mode.
+> > +
+> > +      The KSZ8041FTL variant supports fiber mode, enabled by the FXEN
+> > +      boot strapping pin. It can't be determined from the PHY registers
+> > +      whether the PHY is in fiber mode, so this boolean device tree
+> > +      property can be used to describe it.
+> > +
+> > +      In fiber mode, auto-negotiation is disabled and the PHY can only
+> > +      work in 100base-fx (full and half duplex) modes.
+> 
+> blank line
+> 
+> > +  micrel,led-mode:
+> > +    $ref: /schemas/types.yaml#/definitions/uint32
+> > +    description: |
+> > +      LED mode value to set for PHYs with configurable LEDs.
+> > +
+> > +      Configure the LED mode with single value. The list of PHYs and the
+> > +      bits that are currently supported:
+> > +
+> > +      KSZ8001: register 0x1e, bits 15..14
+> > +      KSZ8041: register 0x1e, bits 15..14
+> > +      KSZ8021: register 0x1f, bits 5..4
+> > +      KSZ8031: register 0x1f, bits 5..4
+> > +      KSZ8051: register 0x1f, bits 5..4
+> > +      KSZ8081: register 0x1f, bits 5..4
+> > +      KSZ8091: register 0x1f, bits 5..4
+> > +
+> > +      See the respective PHY datasheet for the mode values.
+> > +    minimum: 0
+> > +    maximum: 3
+> > +
+> > +allOf:
+> > +  - $ref: ethernet-phy.yaml#
+> > +  - if:
+> > +      not:
+> > +        properties:
+> > +          compatible:
+> > +            contains:
+> > +              const: ethernet-phy-id0022.1510
+> > +    then:
+> > +      properties:
+> > +        micrel,fiber-mode: false
+> > +  - if:
+> > +      not:
+> > +        properties:
+> > +          compatible:
+> > +            contains:
+> > +              enum:
+> > +                - ethernet-phy-id0022.1510
+> > +                - ethernet-phy-id0022.1555
+> > +                - ethernet-phy-id0022.1556
+> > +                - ethernet-phy-id0022.1550
+> > +                - ethernet-phy-id0022.1560
+> > +                - ethernet-phy-id0022.161a
+> > +    then:
+> > +      properties:
+> > +        micrel,led-mode: false
+> > +  - if:
+> > +      properties:
+> > +        compatible:
+> > +          contains:
+> > +            enum:
+> > +              - ethernet-phy-id0022.1555
+> > +              - ethernet-phy-id0022.1556
+> > +              - ethernet-phy-id0022.1560
+> > +    then:
+> > +      properties:
+> > +        clocks:
+> > +          maxItems: 1
+> > +        clock-names:
+> > +          const: rmii-ref
+> > +          description: |
+> > +            supported clocks:
+> 
+> Drop this line.
+> 
+> > +              - The RMII reference input clock. Used to determine the XI
+> > +                input clock.
+> > +        micrel,rmii-reference-clock-select-25-mhz:
+> > +          type: boolean
+> > +          description: |
+> > +            RMII Reference Clock Select bit selects 25 MHz mode
+> > +
+> > +            Setting the RMII Reference Clock Select bit enables 25 MHz rather
+> > +            than 50 MHz clock mode.
+> > +
+> > +dependentRequired:
+> > +  micrel,rmii-reference-clock-select-25-mhz: [ clock-names ]
+> > +
+> > +unevaluatedProperties: false
+> > +
 > > +examples:
 > > +  - |
 > > +    ethernet {
-> 
-> This should be an mdio node, not an ethernet node.
+> > +        #address-cells = <1>;
+> > +        #size-cells = <0>;
+> > +
+> > +        ethernet-phy@5 {
+> > +            compatible = "ethernet-phy-id0022.1510";
+> > +            reg = <5>;
+> > +            micrel,led-mode = <2>;
+> > +            micrel,fiber-mode;
+> > +        };
+> > +    };
 
-Thanks, I fill fix that in the next version.
+Thanks for the review, I will fix these points in the next version.
+
+Regards,
+Stefan
 
