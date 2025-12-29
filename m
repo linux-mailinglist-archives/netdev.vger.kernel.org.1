@@ -1,59 +1,124 @@
-Return-Path: <netdev+bounces-246257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38F78CE7EE0
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 19:50:09 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89433CE7F9B
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 20:01:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9A63C3059647
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 18:44:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AA14E3002177
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 19:01:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40F6D331A59;
-	Mon, 29 Dec 2025 18:34:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABBB6335BA7;
+	Mon, 29 Dec 2025 18:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="Z1grI7E+"
+	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="IyrgbF6F"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.st.icloud.com (p-east2-cluster3-host9-snip4-1.eps.apple.com [57.103.77.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com [209.85.128.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9705D331214
-	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 18:34:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.77.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDCA8335562
+	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 18:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767033259; cv=none; b=ARFeMeGkDTnT66vskknhIG1/IFJG8M27/oKNE35CLCQR9uflgEqSL+MRU6IKc8SVEEAvMYn6U2lT/zgQK6rDNbGHYkc4cSfM/pGeask4JtOCAxsNlyeJzGIHDhS2Hh5JlTjhqaUZPfKE59h4ZLHwa/uimy0gIuRv6HO4tGGug1g=
+	t=1767033619; cv=none; b=ZKMFWVbRP3ncgQNqql7xh/qycSzYUn4OchldaWXZxicpFOJUq1KIDxu7AoY2TiYLQnzMJZ43r9BQufgOk+lEZ2NffayT060ZrJgyi16MkBjS40fMeXjKBpO27q5l9qXlJix4/emz0TA9I6ekXCkaU6Ss1Xa9z6Q8VTR2Cih7z9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767033259; c=relaxed/simple;
-	bh=Mi130XGYCHec4OXzL+gxRDI9DMokNqaQL0EQ6yw0ngM=;
+	s=arc-20240116; t=1767033619; c=relaxed/simple;
+	bh=dZfEjbKU/ouuTZTqPmjhpmJn3Qj+z3eYR6Bl3lD/xyY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RfNw8NrVvMVW0VFjgQO5EhfYnouee2UMUq1XXyFl5gtGzeWM0zd7Roblpcs/mHKH/U+SH9qHGm03d5NMw+9PG6LcJwJhNgDkzoTBYxywstl8xC9ToUMr7/pXl3eaNjAeDOWLo4arhTkXZsG9YJkSiNI5GPjF5hcWdAALwlgCx5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=Z1grI7E+ reason="key not found in DNS"; arc=none smtp.client-ip=57.103.77.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=y-koj.net
-Received: from outbound.st.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-east-1a-60-percent-6 (Postfix) with ESMTPS id 8E80718005EA;
-	Mon, 29 Dec 2025 18:34:08 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; bh=cV2EwEWsfYK4Aqz7v9TjiRD2mRX34Z/MplIFfUXaEsc=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=Z1grI7E+EQcIOGcg+LAGj5ShSSBosgR3KZfXb0F/BhoWpFcDHKj4kX4Ww+VokN21QLuudilj1G7wZOHGzRQWQ43T06Qd0T4caR5sajU0F7xlRGEsibNqaPmu3I/xlN/qIgZeOgjSGFba8DSF9AgYak99pDsSDIwBwn41XPJHd+4IXwjW71SPev9Amn3qGmC7BiJQMAHthJkp78d8uioSSwT9W4ZYOrECHtSofs7aJB3TdXaOEM7ahZfkEr+E7BNw+t2YOUNHt3Cc8qAytt/It3dAmRLMujd4QDfh5hz7mHI/U+938D+D1lVjqse0tzeDSBuGvd2u7H0v7eLMXdbvTQ==
-mail-alias-created-date: 1719758601013
-Received: from desktop.tail809fd.ts.net (unknown [17.42.251.67])
-	by p00-icloudmta-asmtp-us-east-1a-60-percent-6 (Postfix) with ESMTPSA id 0F1EF18000AD;
-	Mon, 29 Dec 2025 18:34:05 +0000 (UTC)
-From: yk@y-koj.net
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>
-Cc: Yohei Kojima <yk@y-koj.net>,
+	 MIME-Version; b=nXQaD7RNubFoKb+tadGzPtKG7O6AFI4gpmbcRX45MGFuJa69qJgbJIry3XCEz/ISm+dQ4aIeJelOXn1J5HZazILmcHIbZMYPFVOZ1SXIhb8GhE/CK3BlB0z7HxibagBXAbOZz641AsYkkwSlifoYPa9mg9f3Smm/luBpsObY1G8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=IyrgbF6F; arc=none smtp.client-ip=209.85.128.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
+Received: by mail-wm1-f65.google.com with SMTP id 5b1f17b1804b1-477ba2c1ca2so98479035e9.2
+        for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 10:40:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sartura.hr; s=sartura; t=1767033615; x=1767638415; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=11UWr6vQeMvr9imUXUNdMnB+gxpMnYAq1afoJQH8nw8=;
+        b=IyrgbF6F0u28a5QzqGi50ibLI5sXMnrNs9w2nKZbHvTdLOMtT7fV5tB3XSXxbBin+z
+         +F7iemGAgQcoJ9Flf47KNjfQBnI/iqSFjhlwBxAY1TytmO/7e4JOQPrNinsFzbE1kobm
+         iwp1El2nfozKqd0uOOOIZy4E7W7vs7yG0bwPi2nR/PX0eYqAfLaqKeMcAVOr1MSg30k8
+         YcRIl3dZsgbyi6YROamI3AWybGB52crReQbGZAHW/Wz+ded6FK7NZnz6cmqe3OQd5D4p
+         FxFHbwh7lCbyarJxYMPPv6EjTjI0yKAlsapfEw6F7Nul42Yk6T7qVGvrs+Mor4Cok3iG
+         uIww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767033615; x=1767638415;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=11UWr6vQeMvr9imUXUNdMnB+gxpMnYAq1afoJQH8nw8=;
+        b=kBvBp9bOlJB6c3lODEbS4Mocdx8Jg6pw7G5bCm+1LkD+WtDFnonWOSeQIB9QyizG18
+         j68xSeYIyIjbIHmQwE/phEzoS0mFM7yrJcJdeb7E7ItYGwLj9oTXUmfAPpODnFB4m6Yx
+         zvLdaK3w1G2J1BYhxFeRdUFTx1lhO6xcmiHI5exAjJO9hdlBlon/xy63uoe+/UyMILHs
+         49ZM2dvW9czTdmbPuVdChIL2ndiWqZ44QJCpRvrBofzWZIjgvWAws7BQataCFIuFRYnt
+         hwDfvET5XUduokJ3fjO4GD9nHqjJUXyDbRx0gJpGnSLx+pV+2fKP5w+d0nWqKXQxf5me
+         prJw==
+X-Forwarded-Encrypted: i=1; AJvYcCUp9KVUXquoNgiN5WIbLGgYmU9QjBaWWZMz9ze6QmBkvp/WZXR0IguMOcJ6HmL5V8c74ey+c5c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwoMxn35a+GDZWTHWZ6mv87Wl0HPawx7Mj7W3w4L82g4VrpfPk5
+	7ZutOWBZ+rNuCW3ZmvwZ9dFYcXxZSYiIz9aNjgx3V7NlRj0Gx4jNRD/hcDfOC3eMdz8=
+X-Gm-Gg: AY/fxX58zLpIRuJQaVJCwlKyJ9uK78/fpzXg6z0TjSc0PS2GmoH88dpNuJ/kxTXEfc+
+	yEqq6CNdSauaxrGf50FV3+MaPI/Zee/gLL4O89g8pKuFJu+s15c0OhmIRYRgWw/+b1PlHvH3keD
+	8R+Eugt+AAsM/1RHMbOTnB+dAMwK84r/3zX3+w/UDPHpsfkPhVDWrbp32GkM+WxGIfV+LT84iaO
+	BEXxoZQlZLCUDMjg0sz4LAKJDedNL6GzV+RIsmAalAjnPV6HOr4eYGQyz/LvqaHw5IQrYGbMr/2
+	wf42rkCWRt+1IzLClc42sqFdenTzYKQygET1ZrYJMZdSYQn0G41Mj4XvdgNF/1cOXpIyBqUCCxk
+	dxMTzNSy0ttqz6sX6z9ahwHGnJ2aQfa/fpFS8ReQnZqOzep/6Giq4X6Aoz+WIQODUowEEl9nfQp
+	ZUoSupu70eVNnlcEcBcwgvonP3QG7vvpvOa98aJlHA2wUh19QXPwGbIac1T4eDyGOhwHjQP1T8F
+	fw2s2TXLNYiglp402xo2hJJjb/aNdTDV68NsJ4=
+X-Google-Smtp-Source: AGHT+IHLaRW54exoV7d2gj+gL+Rt0y3shCu9zPoBut21wi+sGprCRHwNncaVYYsnvBzR7kb1R2Xvfw==
+X-Received: by 2002:a05:600c:1f84:b0:479:3a87:2093 with SMTP id 5b1f17b1804b1-47d338a6109mr230056155e9.37.1767033615044;
+        Mon, 29 Dec 2025 10:40:15 -0800 (PST)
+Received: from fedora (cpezg-94-253-146-116-cbl.xnet.hr. [94.253.146.116])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-47be27b28a7sm604907455e9.12.2025.12.29.10.40.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Dec 2025 10:40:14 -0800 (PST)
+From: Robert Marko <robert.marko@sartura.hr>
+To: robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	nicolas.ferre@microchip.com,
+	alexandre.belloni@bootlin.com,
+	claudiu.beznea@tuxon.dev,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	vkoul@kernel.org,
+	andi.shyti@kernel.org,
+	lee@kernel.org,
+	andrew+netdev@lunn.ch,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linusw@kernel.org,
+	Steen.Hegelund@microchip.com,
+	daniel.machon@microchip.com,
+	UNGLinuxDriver@microchip.com,
+	olivia@selenic.com,
+	radu_nicolae.pirea@upb.ro,
+	richard.genoud@bootlin.com,
+	gregkh@linuxfoundation.org,
+	jirislaby@kernel.org,
+	broonie@kernel.org,
+	lars.povlsen@microchip.com,
+	devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org,
+	linux-i2c@vger.kernel.org,
 	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net 5/5] selftests: net: report SKIP if TFO test processes timed out
-Date: Tue, 30 Dec 2025 03:32:38 +0900
-Message-ID: <a4b42beade5730803bdee9c2631b1f4e1364c3f6.1767032397.git.yk@y-koj.net>
-X-Mailer: git-send-email 2.51.2
-In-Reply-To: <cover.1767032397.git.yk@y-koj.net>
-References: <cover.1767032397.git.yk@y-koj.net>
+	linux-gpio@vger.kernel.org,
+	linux-spi@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Cc: luka.perkov@sartura.hr,
+	Robert Marko <robert.marko@sartura.hr>
+Subject: [PATCH v4 01/15] dt-bindings: usb: Add Microchip LAN969x support
+Date: Mon, 29 Dec 2025 19:37:42 +0100
+Message-ID: <20251229184004.571837-2-robert.marko@sartura.hr>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20251229184004.571837-1-robert.marko@sartura.hr>
+References: <20251229184004.571837-1-robert.marko@sartura.hr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,89 +126,92 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Authority-Info: v=2.4 cv=ALPFdfBd c=1 sm=1 tr=0 ts=6952c9a1 cx=c_apl:c_pps
- a=YrL12D//S6tul8v/L+6tKg==:117 a=YrL12D//S6tul8v/L+6tKg==:17
- a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=jnl5ZKOAAAAA:8
- a=wXUYcULF-yfjjPYjaGEA:9 a=RNrZ5ZR47oNZP8zBN2PD:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjI5MDE3MCBTYWx0ZWRfX8XIWiNzE9coh
- gNKgFdgDEPbBr/KAy5PCfXJNUNVdigB/BFVxof17xRgAwIHiDRFTFImTN4sVMd1TJT2/KUcMzN1
- LPg4JUf6UR2JJZhRZsFLSvdfn3thjOncNqTz0z9suvvJzbZZbz1QeKKoR/v0ChXHtPptCHilkqK
- c7hmmQ/dZhF8zQGdmxqpVOeJObGdVbSKOjS2Y9shoHBgOw8jydlC/6/0tfGzIGrdRjiILU42pMV
- 1wGoUd85YiHAPAG5suTTIe0gru8oHhutfFGEMcJLGuGNpdC0S8R1UBnDiCVgf80ChIijuITJ3wM
- uFy9plcnel08m5ISkhn
-X-Proofpoint-ORIG-GUID: sHOBAgfL0sHsPGdOQuD2Gi6xE1gBmejO
-X-Proofpoint-GUID: sHOBAgfL0sHsPGdOQuD2Gi6xE1gBmejO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-29_06,2025-12-29_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- mlxscore=0 phishscore=0 mlxlogscore=853 adultscore=0 clxscore=1030
- malwarescore=0 spamscore=0 bulkscore=0 classifier=spam authscore=0 adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512290170
-X-JNJ: AAAAAAABIHpUnPxyaBlu0UN7W1AkFKyQaI67vP7qv/bn+r4h+oBdm62Fh4Wl1HDnQp5WO4f+4GkDElNQbvf2VlFbmP01ou1qOrjm/hpoDJVetUZM6NnxSwkRxorjmp17YcK/ngAdGjVzmgtJRKnE428HD+F5spMYwBC2wjHH9FDlncILAkj9U680Ok3a1ArJyYNl80h26TyhK1m1aBX4/79Li2jjHJaw/B9gzS3PC2ALQEv6jWjvnKy5uuXsYvwacCESAuOttoFm25Lrha4AmwaQOvM7ySHAXylbVyEXn1NhVHRSBUITeMSDLXGDxZbZeCOF7PYVeR4NDlXTt9L3/vu97CnPASQrBL53OmC3US2dYsBhhkw30eclMfgoEUGSJDb3zG2gppN0/IQtEzeEjcaZgnLqz6NcBEy8LGi/qXc0KWpxDz7B9sW3LR1UR79jWQvNXNTZKAn9Akdskac3OlCyfQIPlbsmp2mCY2GMYuZBdYV8iZq/PY6ZR7V12t55nUqxel5eucbwdY0e1+dwKdywLFoG9j3pfde3Ppk9YWrGjNQaYccNmy9BuqnObfBjnbJtOjaAUKdPBBJCDjpS8dswRwPpw/D/IW69edmF+v4vOSWYkgYojmwnKPamJvkEN6RgRpJWSfdwbxkOJEqqoO5S5x3HzfVLO9tZrONpetqTtwMnJ9p7S5ZbjFT9ahs8YK954QaFve+e/ac93V9d5ZgER5/NzC1KgIQ=
 
-From: Yohei Kojima <yk@y-koj.net>
+Microchip LAN969x has DWC3 compatible controller, though limited to 2.0(HS)
+speed, so document it.
 
-This patch improves the TCP Fast Open (TFO) test to report the timeout
-events and client/server error events by introducing better process
-management.
-
-Previously, TFO test didn't provide any information about the test
-client/server processes' exit status, and just reported "ok". This
-behavior is sometimes misleading in case TFO is unsupported by the
-kernel, or there was a bug in the backing network devices (netdevsim).
-
-Signed-off-by: Yohei Kojima <yk@y-koj.net>
+Signed-off-by: Robert Marko <robert.marko@sartura.hr>
 ---
- tools/testing/selftests/net/tfo_passive.sh | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+Changes in v2:
+* Fix example indentation
 
-diff --git a/tools/testing/selftests/net/tfo_passive.sh b/tools/testing/selftests/net/tfo_passive.sh
-index a4550511830a..1e89f1006c42 100755
---- a/tools/testing/selftests/net/tfo_passive.sh
-+++ b/tools/testing/selftests/net/tfo_passive.sh
-@@ -76,7 +76,7 @@ echo "$NSIM_SV_FD:$NSIM_SV_IFIDX $NSIM_CL_FD:$NSIM_CL_IFIDX" > \
- if [ $? -ne 0 ]; then
- 	echo "linking netdevsim1 with netdevsim2 should succeed"
- 	cleanup_ns
--	exit 1
-+	exit "$ksft_fail"
- fi
- 
- out_file=$(mktemp)
-@@ -85,12 +85,15 @@ timeout -k 1s 30s ip netns exec nssv ./tfo        \
- 				-s                \
- 				-p ${SERVER_PORT} \
- 				-o ${out_file}&
-+server_pid="$!"
- 
- wait_local_port_listen nssv ${SERVER_PORT} tcp
- 
- ip netns exec nscl ./tfo -c -h ${SERVER_IP} -p ${SERVER_PORT}
-+client_exit_status="$?"
- 
--wait
-+wait "$server_pid"
-+server_exit_status="$?"
- 
- res=$(cat $out_file)
- rm $out_file
-@@ -101,6 +104,14 @@ if [ "$res" = "0" ]; then
- 	exit 1
- fi
- 
-+if [ "$client_exit_status" -ne 0 ] || [ "$server_exit_status" -ne 0 ]; then
-+	# Note: timeout(1) exits with 124 if it timed out
-+	echo "client exited with ${client_exit_status}"
-+	echo "server exited with ${server_exit_status}"
-+	cleanup_ns
-+	exit "$ksft_skip"
-+fi
+ .../bindings/usb/microchip,lan9691-dwc3.yaml  | 66 +++++++++++++++++++
+ 1 file changed, 66 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/usb/microchip,lan9691-dwc3.yaml
+
+diff --git a/Documentation/devicetree/bindings/usb/microchip,lan9691-dwc3.yaml b/Documentation/devicetree/bindings/usb/microchip,lan9691-dwc3.yaml
+new file mode 100644
+index 000000000000..08113eac74b8
+--- /dev/null
++++ b/Documentation/devicetree/bindings/usb/microchip,lan9691-dwc3.yaml
+@@ -0,0 +1,66 @@
++# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/usb/microchip,lan9691-dwc3.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
- echo "$NSIM_SV_FD:$NSIM_SV_IFIDX" > $NSIM_DEV_SYS_UNLINK
- 
- echo $NSIM_CL_ID > $NSIM_DEV_SYS_DEL
++title: Microchip LAN969x SuperSpeed DWC3 USB SoC controller
++
++maintainers:
++  - Robert Marko <robert.marko@sartura.hr>
++
++select:
++  properties:
++    compatible:
++      contains:
++        enum:
++          - microchip,lan9691-dwc3
++  required:
++    - compatible
++
++properties:
++  compatible:
++    items:
++      - enum:
++          - microchip,lan9691-dwc3
++      - const: snps,dwc3
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++  clocks:
++    items:
++      - description: Gated USB DRD clock
++      - description: Controller reference clock
++
++  clock-names:
++    items:
++      - const: bus_early
++      - const: ref
++
++unevaluatedProperties: false
++
++required:
++  - compatible
++  - reg
++  - interrupts
++  - clocks
++  - clock-names
++
++allOf:
++  - $ref: snps,dwc3.yaml#
++
++examples:
++  - |
++    #include <dt-bindings/interrupt-controller/arm-gic.h>
++
++    usb@300000 {
++        compatible = "microchip,lan9691-dwc3", "snps,dwc3";
++        reg = <0x300000 0x80000>;
++        interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
++        clocks = <&clks 12>, <&clks 11>;
++        clock-names = "bus_early", "ref";
++    };
 -- 
-2.51.2
+2.52.0
 
 
