@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-246226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3F60CE652E
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 10:53:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB8B3CE6534
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 10:53:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2DAF630010CA
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 09:53:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 79A003005FC5
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 09:53:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C32328312D;
-	Mon, 29 Dec 2025 09:53:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3AF329ACD8;
+	Mon, 29 Dec 2025 09:53:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E53B323D7C5
-	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 09:53:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 742B9283FEF
+	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 09:53:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767001988; cv=none; b=W/7RtNMWD3V6outCfOXkL7Kdvi5s8+q+Ffc/2VrGDl9T7kK1LNWt/urbGUnwPnEQ16oX7DsvaCg9u3u19+eQ7fsAfg74HxnaLErXDD677Rv/fmXRVjKi3VgtW62mOA8M2w0ijWaYmV8zsk5b7IjN/3oWjGcdYEJnc5rywbwRgj8=
+	t=1767002005; cv=none; b=JSKZvSE0QAjnptcDlJQcjhBCUgeVqO0C6AsGQYy3D/34mc2CcOuYyAhPGtb1xhbTMKn/ZufOT2NtIh+vIOR42mSkGPVxBHH0UFdo4g2ExA2rId227M9llN7v3SH+E0YWAv7xopMngSSPlpZc7J3PdGtPz/nCTIToWhTx+Z2Moyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767001988; c=relaxed/simple;
-	bh=g5Dcg6mAhcaDCqdSMd+X2n3kFu8GIg3DeMoRiTucPRU=;
+	s=arc-20240116; t=1767002005; c=relaxed/simple;
+	bh=oQAb+2QjTzCjB0ihqCeziEaHDoA4CY2MKFyp9DpKhA8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RcmxBlU9CukC2yiJbGEnl7RuKWxBHbH9XW7W6YnButzsZJJz15cFt64QoCrubUX/sVw9ELT/nJZrPf+ZkB2lob9wZVKeoZ4Iq7PJKM/Lf4VC+Wex1qjdUsmKsZsuuzd/+qBOLxd2FMlvago4J8YoQqm/3kyq0R9+Ft4PxpygqN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=none smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=18.169.211.239
+	 MIME-Version; b=YTiba+hMvhDdGPJkQFsfPMUmLodDvioopQzTJgaN3GZqI8Vz8jpoo8N2ywrek0MhWqcB76NVFL4agoVJ+VtzVRQqGlAi5alxcxq9NnzNQQILPFayPVtDY8y2ekbOp/E2K1rktq1739vyNTOntfweHDW7VbyC1Hls/1CsG/O1Pyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=none smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.207.22.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bamaicloud.com
-X-QQ-mid: zesmtpsz1t1767001970t1dafd055
-X-QQ-Originating-IP: s+8oHj+omzzo4X2hXKdQQhBDBoiaKpXkb/xPCvCJ/rQ=
+X-QQ-mid: zesmtpsz1t1767001973tb0bda06f
+X-QQ-Originating-IP: z+xaJwzoGMV41D+ilwCyBDRoN3iq4ZNTHlh1wJXAlFg=
 Received: from localhost.localdomain ( [111.204.182.99])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 29 Dec 2025 17:52:48 +0800 (CST)
+	id ; Mon, 29 Dec 2025 17:52:51 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 15048736778371849792
+X-BIZMAIL-ID: 2914368772822095623
 EX-QQ-RecipientCnt: 13
 From: Tonghao Zhang <tonghao@bamaicloud.com>
 To: netdev@vger.kernel.org
@@ -50,9 +50,9 @@ Cc: Tonghao Zhang <tonghao@bamaicloud.com>,
 	Nikolay Aleksandrov <razor@blackwall.org>,
 	Hangbin Liu <liuhangbin@gmail.com>,
 	Jason Xing <kerneljasonxing@gmail.com>
-Subject: [PATCH net-next v4 3/4] net: bonding: skip the 2nd trylock when first one fail
-Date: Mon, 29 Dec 2025 17:50:17 +0800
-Message-Id: <407cd5746d5ca673efd731fbc299abd493f6bf30.1767000122.git.tonghao@bamaicloud.com>
+Subject: [PATCH net-next v4 4/4] net: bonding: add the READ_ONCE/WRITE_ONCE for outside lock accessing
+Date: Mon, 29 Dec 2025 17:50:18 +0800
+Message-Id: <257075c732d5a40dd67d4330826ef66f08ab9222.1767000122.git.tonghao@bamaicloud.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <cover.1767000122.git.tonghao@bamaicloud.com>
 References: <cover.1767000122.git.tonghao@bamaicloud.com>
@@ -65,29 +65,30 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpsz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz3b-0
-X-QQ-XMAILINFO: MYNcaOm1VPp0jcVJGmcxcRdkNwIdtFeF8sI9DDC8jC8/lRu8wuGwYtO1
-	qOYqJaQ9W/6PhPLaVI2kWYGO8b3sVHCuSM6tprsmVZyIo5tfBHKdNeq9WnUYk6JTza0K+R4
-	VFu8eRPzlU1CDanzschAgTXZibFLGioxIyfByAzj3Qb/r6rUZlByxkTzE3XZWzExAukCgg0
-	CBNGAQLSfkuVDub336URvscpIQnnKLqElaBulR2GCylsgVZU3JA6Ztlv6VK1NRp2PL76Oy2
-	HXYQ2Z7VubFd1VHm2y1yjEzFwxPXIws+I2qG5J8obQzg2jZk7VL60hTNBhHKM2NWUFi4TRQ
-	J3RnAoUo0ffLo2LdwpJzKgXT20QwaNgdbo40/7EJzyWBKHM2LZ/vLHc8vREbRXcIensDSYE
-	tNGCrq4a7vtHSBDpZD87JIMNSk8p1WoBdckSWXmIg+SHHbPFCFhOqX7bBoAEpco05GY8mjF
-	zUPuf2Vq0i3fiBor/dFgbgqUOQLvhY9mnK05xiQGEiijz/O64z/Uu1j5lEx2bhkDN8Xu4HW
-	ik5jjE2YvsxLWZiPjkVDQ0mSrM2Vpa6utFiA5oJjqzcf8nOKooSzlbIwlGvcV7yHuFz9O1C
-	tWuDYZaMbsAJpmHtyqtN/zeAyc5NBcIDhxC7Xf/zLAsAOsVz8GFV49CaFjGS7/087UIsSJq
-	USUbVWsA0oNlSkoEgvUU1uWIyNpCSdBf+peI4Gy1B3tgQ/CVgTfScCDQdpLj9L9Jcyb4FAR
-	WsTPYckGN8uq3qw+GJFXnW89r6vW5FR6LnYzx6Z35RYoQk85lPR1cRiz6QYZ/vMKAcZ67LH
-	/3fi4uXijuyl1PgR3zHbmSLU5lMCiWkaiLDP3AL7Od5UyMQjHt646o2PbihX8yJY1Qvuufz
-	3NLmgDLpTceQT6MIXz7bBhf1CS5tnPkkvB/GfZAncBoaWRWH/R4eRdKMzwNYO6Rz4OdtYS7
-	KFu5r9eluFVbdfCHZ3H84MjTx7n+XH2hSI/iSJioqK9Fi/jGkk0CUt8X3nTbPtT4xR6up64
-	y06X5s7rEn7hfy9nVUfZPKlUk1rHNQQGXnCf7zMC6uzeLLT3yeOguNQGfRn7GrzN8/QXrou
-	r4oNyouqocgqMdJU4flKJQ=
-X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
+X-QQ-XMAILINFO: MOJijf76Vc+i3uWEOEJ2GCavGjI3nHZNqHk3JIVoiq4F39LP/0uxVptv
+	f2TA7l/K7vHsfFRfuk2H+MZkidVED8UGntQc+E/3ib9FTw1F18me8Y95GL2C72n9WhS8sb+
+	n6k00UPDMqx7BQOvJKX+yM8xnjXF2cGT8NAvuFb5HpwuWNfvd5jf8IjtV5mv3Ce+1G+VOqF
+	xOyaRkgp2jDLCDmn//hq7uONL+M0YKCVF4W5xCsB0427x7nO/uGDgXo1G3h/LWAmFl7EV9p
+	o7Hu1RbpbqKrnnXYkl7cfDcw+nDiHtC2Ew8URXc1fwWZTaMsmDBhh7v+qfOkUOONezSPBjY
+	UEZ2jPiAVdEJe15Uv6rD4IF/UOWtntIA1hhcmiTK6kqHSTG2et7RftY7eAw0Czk5ia//Lv6
+	zh2Vh/Cd6uOdq+bu5NnaqzagF8CEYdcHx7kr6Tvoaf6xNkAqYN+HH9SWZ5NkY1jGmTJlmtq
+	azP0Tkn+J9txbJbcydSkgdzSBUaNMN4TrL7yb1Ewqc5Injel6D2tCpCsYERWEBp8jHdHoIM
+	zXaBrYVfGr0IW1WvA7AMumCdo04qxpJKpIeq859wXUR/o0WSTRf4T144o01qWag3kDhVU4o
+	lN/KZG8ubjP/eX6tuVj7Glljvk325Yf9kvF6EF6PCPU2gMPM5gMgsik8iRF4LFrXtdD8Qcz
+	nBPUsEUbVLkX2pMVVbulMFUCzBumd4WAfgsAM9oQOb9IZuJ7zwgPNIU7+So9zcsWZ25BXCd
+	FmmDMqj/su8ykP5o/mIdpyG3yEU3F7/j+SmDEF8kiRXSQ/BVOGOnlB7QOuDNYDXQiBrQ29E
+	eTxFq2KQPUGCZ3fiL6tlP42ED9iup6E6WJzqqwYq5XlPRspuGINa/9z3G9dwOoGqtwpIheX
+	W9eGjWGWHDUzv0GjrDICHqqOVoTe6vt/PeP8aIlVMH6twBFfod4GbkrjW7Qi79z0NZCU3oE
+	bDIQbXbsaPi4/eMVOw9E/+nFuCe+y4hCC4Fz115L2US7h/fp9ML9eg+j4zr2Er/ZV4DuAwL
+	yI19loq6cws+jsKbwvpS/v+zdd0C3GN+xYlEMtjWlcZAPUv5WPrMKXyDQ+P9NH8NGLnpU5D
+	5aJQEahktT99PgIILCeKFZL+Xzrlxq4SQ==
+X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
 X-QQ-RECHKSPAM: 0
 
-After the first trylock fail, retrying immediately is
-not advised as there is a high probability of failing
-to acquire the lock again. This optimization makes sense.
+Although operations on the variable send_peer_notif are already within
+a lock-protected critical section, there are cases where it is accessed
+outside the lock. Therefore, READ_ONCE() and WRITE_ONCE() should be
+added to it.
 
 Cc: Jay Vosburgh <jv@jvosburgh.net>
 Cc: "David S. Miller" <davem@davemloft.net>
@@ -101,59 +102,49 @@ Cc: Nikolay Aleksandrov <razor@blackwall.org>
 Cc: Hangbin Liu <liuhangbin@gmail.com>
 Cc: Jason Xing <kerneljasonxing@gmail.com>
 Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
-v2-4:
+v3/4:
 - no change
-v1:
-- splitted from: https://patchwork.kernel.org/project/netdevbpf/patch/20251118090431.35654-1-tonghao@bamaicloud.com/
-- this patch only skip the 2nd rtnl lock.
-- add this patch to series
+v2: fix compilation errors
 ---
- drivers/net/bonding/bond_main.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ drivers/net/bonding/bond_main.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 8be7f52e847c..b835f63d2871 100644
+index b835f63d2871..909c01f55744 100644
 --- a/drivers/net/bonding/bond_main.c
 +++ b/drivers/net/bonding/bond_main.c
-@@ -3756,7 +3756,7 @@ static bool bond_ab_arp_probe(struct bonding *bond)
- 
- static void bond_activebackup_arp_mon(struct bonding *bond)
+@@ -1204,8 +1204,9 @@ void bond_peer_notify_work_rearm(struct bonding *bond, unsigned long delay)
+ /* Peer notify update handler. Holds only RTNL */
+ static void bond_peer_notify_reset(struct bonding *bond)
  {
--	bool should_notify_rtnl = false;
-+	bool should_notify_rtnl;
- 	int delta_in_ticks;
+-	bond->send_peer_notif = bond->params.num_peer_notif *
+-		max(1, bond->params.peer_notif_delay);
++	WRITE_ONCE(bond->send_peer_notif,
++		   bond->params.num_peer_notif *
++		   max(1, bond->params.peer_notif_delay));
+ }
  
- 	delta_in_ticks = msecs_to_jiffies(bond->params.arp_interval);
-@@ -3784,13 +3784,11 @@ static void bond_activebackup_arp_mon(struct bonding *bond)
+ static void bond_peer_notify_handler(struct work_struct *work)
+@@ -2825,7 +2826,7 @@ static void bond_mii_monitor(struct work_struct *work)
+ 
+ 	rcu_read_unlock();
+ 
+-	if (commit || bond->send_peer_notif) {
++	if (commit || READ_ONCE(bond->send_peer_notif)) {
+ 		/* Race avoidance with bond_close cancel of workqueue */
+ 		if (!rtnl_trylock()) {
+ 			delay = 1;
+@@ -3784,7 +3785,7 @@ static void bond_activebackup_arp_mon(struct bonding *bond)
  	should_notify_rtnl = bond_ab_arp_probe(bond);
  	rcu_read_unlock();
  
--re_arm:
--	if (bond->params.arp_interval)
--		queue_delayed_work(bond->wq, &bond->arp_work, delta_in_ticks);
--
- 	if (bond->send_peer_notif || should_notify_rtnl) {
--		if (!rtnl_trylock())
--			return;
-+		if (!rtnl_trylock()) {
-+			delta_in_ticks = 1;
-+			goto re_arm;
-+		}
- 
- 		if (bond->send_peer_notif) {
- 			if (bond_should_notify_peers(bond))
-@@ -3805,6 +3803,10 @@ static void bond_activebackup_arp_mon(struct bonding *bond)
- 
- 		rtnl_unlock();
- 	}
-+
-+re_arm:
-+	if (bond->params.arp_interval)
-+		queue_delayed_work(bond->wq, &bond->arp_work, delta_in_ticks);
- }
- 
- static void bond_arp_monitor(struct work_struct *work)
+-	if (bond->send_peer_notif || should_notify_rtnl) {
++	if (READ_ONCE(bond->send_peer_notif) || should_notify_rtnl) {
+ 		if (!rtnl_trylock()) {
+ 			delta_in_ticks = 1;
+ 			goto re_arm;
 -- 
 2.34.1
 
