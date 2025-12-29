@@ -1,138 +1,148 @@
-Return-Path: <netdev+bounces-246284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54861CE814B
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 20:45:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C04D0CE8175
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 20:56:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1A294300E160
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 19:45:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8B78930124C4
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 19:56:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AF44136672;
-	Mon, 29 Dec 2025 19:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6577E23E334;
+	Mon, 29 Dec 2025 19:56:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="JtJcSr7w"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="v8EKlzNm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from outbound.st.icloud.com (p-east2-cluster4-host9-snip4-10.eps.apple.com [57.103.78.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018262AD03
-	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 19:45:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A955B23ABBF
+	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 19:56:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.78.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767037527; cv=none; b=pwKGsWknad8ADBLJkeLIwJjq+LKUs3m3xuYvdqV5xGfaP1Jfnw1xvOe1vBqtqPniDJA6kKBnzIEj2zHdGFvFrx3gseQLm+bpg86QaBX+0cUwmdheroMet4eGT9MKAKPtKy6Drxj/YjSpiqT4icijv9tvCS21hgwZ0rsrRMTcaj4=
+	t=1767038185; cv=none; b=pj2otNnquewCnoFSsBknjcZm4gsUd/9oB6DmZBtUIp8NLeKI0tLg2PkUlY8ifhKG3chouOS3Rr3iBsy1oV7TcIvfpdY56HNpFWNOLztyjtzL3HUSGvv7E23pU09WORCDxe0CJ1y56ykAMgbJulPSzm53GQgcN+icyu5J5awXDXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767037527; c=relaxed/simple;
-	bh=ezNcr8pVPE1PaShtXb2giCvbL3shhTUeyQQS1kS2RMg=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=V1bfphE9cLhuYAbvKJ2p9g9odYHk7b872x5GRtxtyD8GXVjoDsR8rYYbZoJezQAWx7ZFuBfwBxPaie4p3W6x8IbvvLT3MbA9lyH49ZgTtQGWi9f//G0GQDpUAIxg43oTVp+EiCQ+vQ92jaxibeqnaM0p9TfogbdyC9pIbYk3/0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=JtJcSr7w; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1vaJBA-00DZ89-3b; Mon, 29 Dec 2025 20:45:20 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
-	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
-	bh=/xZxzdkHzTL1qxsYkwcAznlT6NJL1YIIbVKy6ysI3HM=; b=JtJcSr7wgprzYiBsojYQb6/PZ/
-	w4wpT8u+P4wDKXyvHeSMfLdlmCm68ETMcMAcUULXdLjVIPLZdJWZL2z+/ygxqolpndFLCLgypWtVV
-	QjQmPTNiELJEUvasqaJ7HfMGTTM394pM1kDSGYsd4KsYqNajuGVX9RMbdLjyuONWg5lRq4Heu8G7W
-	AV10Ls4OmCbTnLV42KsUjo9mOzWJVFY7hDg3jO10DU5FOXW8f/4GZOTRapg9CwnkZFL+cJtQZP9Wd
-	/4svTk1zTslv8+N/PnDMSPIg/sjJ29ij2DJKE9rVDixJVIm4rNolMGDfmntTuxq40qG3pbuZnsYGD
-	NkNf1f7g==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1vaJB9-0000Vy-Pb; Mon, 29 Dec 2025 20:45:19 +0100
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1vaJB0-006B0A-1e; Mon, 29 Dec 2025 20:45:10 +0100
-Message-ID: <1dad1adc-f287-4871-a86d-e77fe7f84b89@rbox.co>
-Date: Mon, 29 Dec 2025 20:45:09 +0100
+	s=arc-20240116; t=1767038185; c=relaxed/simple;
+	bh=1urNez9iDIld6OAxncsepPTunpYtCzTt7d7WWb2c4HQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cOHJ4/p7GcnzRHLXhDFoGH28LXOL0jRgWXWNZJO5i+QGbFWMBoUhkewFkvhgPs8U+ae294J0fphyCaIVRJBFkFv54IUPfjytheVmaWHbjzNAQ6TBScteIAOWMJV5qU9n4sINAaX+iqsViT9J53PakPlV5siokNsYmM57siLN9mM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=v8EKlzNm reason="key not found in DNS"; arc=none smtp.client-ip=57.103.78.221
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=y-koj.net
+Received: from outbound.st.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-east-1a-100-percent-6 (Postfix) with ESMTPS id 75C2E18007C5;
+	Mon, 29 Dec 2025 19:56:21 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; bh=1KbO+RoiTJgCNtLW0OzrhM8WEo6RLQNavBQZsLzI+Ok=; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=v8EKlzNmEKFd+689+slNHuA04jyH1G4JbyaaPu4qGK/G7aEXZOH8OuzT6gQ/5+gwPkzo+unwG8jr9VnGGMLlEUrO8IgAYwNXPraV5dQHqLbKHAhH20Op56jcse4OvElQNrezczQn9AGKgOWvDF5Vw2sbIXe/yVbsWbYpAd7p3wQuhHdUQ3olalXH2sMHoEgdtCSFbn8blJ+EdFV2OT+mJU8SZzXthHSNRgd9/bdToZgfatu/t2T+ym7MSAH+u3rJQxF55bOwFxmDhnTKdoVDYBZW/YBeKoPn1U1Hi2/V7/Kru1A0MJX38hNZrrdO419jq15qx4Qwn3VHMLc7fzUAEQ==
+mail-alias-created-date: 1719758601013
+Received: from y-koj.net (unknown [17.42.251.67])
+	by p00-icloudmta-asmtp-us-east-1a-100-percent-6 (Postfix) with ESMTPSA id 144AB18002F4;
+	Mon, 29 Dec 2025 19:56:18 +0000 (UTC)
+Date: Tue, 30 Dec 2025 04:56:16 +0900
+From: Yohei Kojima <yk@y-koj.net>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Breno Leitao <leitao@debian.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 1/5] net: netdevsim: fix inconsistent carrier state
+ after link/unlink
+Message-ID: <aVLc4J8SQYLPWdZZ@y-koj.net>
+References: <cover.1767032397.git.yk@y-koj.net>
+ <ff1139d3236ab7fec2b2b3a2e22510dcd7b01a21.1767032397.git.yk@y-koj.net>
+ <e8180dc5-fc23-4044-bd67-92fc3eebdaa0@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Michal Luczaj <mhal@rbox.co>
-Subject: Re: [PATCH net 1/2] vsock: Make accept()ed sockets use custom
- setsockopt()
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Arseniy Krasnov <avkrasnov@salutedevices.com>,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251223-vsock-child-sock-custom-sockopt-v1-0-4654a75d0f58@rbox.co>
- <20251223-vsock-child-sock-custom-sockopt-v1-1-4654a75d0f58@rbox.co>
- <aUptJ2ECAPbLEZNp@sgarzare-redhat>
- <ff469a0f-091b-4260-8a54-e620024e0ec9@rbox.co>
- <aUqI_qW3SZ-WBXk3@sgarzare-redhat>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <aUqI_qW3SZ-WBXk3@sgarzare-redhat>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e8180dc5-fc23-4044-bd67-92fc3eebdaa0@lunn.ch>
+X-Proofpoint-ORIG-GUID: -Mzj7FTA82WPivV3uBl2NzpCwTPUY4fm
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjI5MDE4MiBTYWx0ZWRfX/y0Xi/+2E4O2
+ otl/0zwfS+PDDLzi7OEYgMuV2UdvP6dBOuBebcV57qySoS0lfMQ0iqW7OtXLn0bw03tg0DPIZAj
+ DAX+WQRMjABjfBoprQPNQMIXuTJwDs/1opAlenVWn9bnXwgJQq9DaNztFFKFjRqg3DAPh91xLlC
+ LNqsLvh8S75T9ohsdWU2Dg88GcswRixeHlplCVeW/geZ8m61W6k6bfR68IngIYMyOQZAA6+Qd7Y
+ QuLZVQWBMjj2W27VUzVigUTCsoczJHmByDvz0i2f1LfsdEGdd83ll0xUS50VlMIE1guoXu2Zp02
+ sfZNFMqAJrYHPBo4O2s
+X-Authority-Info: v=2.4 cv=DJ+CIiNb c=1 sm=1 tr=0 ts=6952dce6 cx=c_apl:c_pps
+ a=YrL12D//S6tul8v/L+6tKg==:117 a=YrL12D//S6tul8v/L+6tKg==:17
+ a=kj9zAlcOel0A:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=jnl5ZKOAAAAA:8 a=7gZhQl7Q0LLefV5nMKsA:9 a=CjuIK1q_8ugA:10
+ a=RNrZ5ZR47oNZP8zBN2PD:22
+X-Proofpoint-GUID: -Mzj7FTA82WPivV3uBl2NzpCwTPUY4fm
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-29_06,2025-12-29_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
+ mlxlogscore=487 phishscore=0 spamscore=0 suspectscore=0 clxscore=1030
+ bulkscore=0 adultscore=0 mlxscore=0 classifier=spam authscore=0 adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512290182
+X-JNJ: AAAAAAAB48aOiXs0D6hG/j+Fcz1meNmtg8UIqtpwpZoGprHUUzBNav3vyyo3KrJIyCLYpvPQt7odfvDa/kodSzjrL5XzECI5gMM0t5CIukXNCUQNN7dLkKxZhWRwLqesz6WUNfBFLzyQcRN4Vc1yFZKknBlf2NiHQPP7u0ZZQHz5ZRInHBBDtmFk/Dw0fgFvyvmX91Ru5xNV/hxJc0FxWwzMkQRn1dg9AU///IG8hdr7N3qDgXqy69l7VCS/vmvsXLIvwQ2j1p5ssgsZ/Lym3ooDGwib2pKTvfwcTP96C8Hou9awFXt5KbXYCtkDAPSN1evlI6JAvK1uhcSDx/Gt6ftHUoG3sXrukYgvcofaDwr2sRG9SusHDJRQhEq2SKOV4/iYnOMxWxAHzJj2uJBPMRd1QvaztDENTbugZ85bweZaKa+o9TUx6B6T9CsSbvc83qJ6BkBc2Q19UspdvOk4+eu5L+/MvHyaMCx++njqGENYNYieA83YBEPM3DxaXLELw/jcc2bbt/BIQ4KNrp48MLC6rQD6JnnICMfqYNaDJbPl1JTiraAkNS2AfK3P3NDnYrMAbKydwWdGfY4qjIOhj3E45meLKcr+7QwHQT7huOGhx/6J9n13IdY7cUiurPCDAPj+ArsXy2JKNCXZSG61b/L7//H3dt2RB1M191pdOq0wPsRbtmbx02GNtsr3IDzPJi646Lw=
 
-On 12/23/25 14:15, Stefano Garzarella wrote:
-> On Tue, Dec 23, 2025 at 12:09:51PM +0100, Michal Luczaj wrote:
->> On 12/23/25 11:26, Stefano Garzarella wrote:
->>> On Tue, Dec 23, 2025 at 10:15:28AM +0100, Michal Luczaj wrote:
->> ...
->>>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->>>> index adcba1b7bf74..c093db8fec2d 100644
->>>> --- a/net/vmw_vsock/af_vsock.c
->>>> +++ b/net/vmw_vsock/af_vsock.c
->>>> @@ -1787,6 +1787,7 @@ static int vsock_accept(struct socket *sock, struct socket *newsock,
->>>> 		} else {
->>>> 			newsock->state = SS_CONNECTED;
->>>> 			sock_graft(connected, newsock);
->>>> +			set_bit(SOCK_CUSTOM_SOCKOPT, &newsock->flags);
->>>
->>> I was a bit confused about next lines calling set_bit on
->>> `connected->sk_socket->flags`, but after `sock_graft(connected,
->>> newsock)` they are equivalent.
->>>
->>> So, maybe I would move the new line before the sock_graft() call or use
->>> `connected->sk_socket->flags` if you want to keep it after it.
->> ...
->>>> 			if (vsock_msgzerocopy_allow(vconnected->transport))
->>>> 				set_bit(SOCK_SUPPORT_ZC,
->>>> 					&connected->sk_socket->flags);
->>
->> Hmm, isn't using both `connected->sk_socket->flags` and `newsock->flags` a
->> bit confusing?
+On Mon, Dec 29, 2025 at 07:39:29PM +0100, Andrew Lunn wrote:
+> On Tue, Dec 30, 2025 at 03:32:34AM +0900, yk@y-koj.net wrote:
+> > From: Yohei Kojima <yk@y-koj.net>
+> > 
+> > This patch fixes the edge case behavior on ifup/ifdown and
+> > linking/unlinking two netdevsim interfaces:
+> > 
+> > 1. unlink two interfaces netdevsim1 and netdevsim2
+> > 2. ifdown netdevsim1
+> > 3. ifup netdevsim1
+> > 4. link two interfaces netdevsim1 and netdevsim2
+> > 5. (Now two interfaces are linked in terms of netdevsim peer, but
+> >     carrier state of the two interfaces remains DOWN.)
+> > 
+> > This inconsistent behavior is caused by the current implementation,
+> > which only cares about the "link, then ifup" order, not "ifup, then
+> > link" order. This patch fixes the inconsistency by calling
+> > netif_carrier_on() when two netdevsim interfaces are linked.
+> > 
+> > This patch solves buggy behavior on NetworkManager-based systems which
+> > causes the netdevsim test to fail with the following error:
+> > 
+> >   # timeout set to 600
+> >   # selftests: drivers/net/netdevsim: peer.sh
+> >   # 2025/12/25 00:54:03 socat[9115] W address is opened in read-write mode but only supports read-only
+> >   # 2025/12/25 00:56:17 socat[9115] W connect(7, AF=2 192.168.1.1:1234, 16): Connection timed out
+> >   # 2025/12/25 00:56:17 socat[9115] E TCP:192.168.1.1:1234: Connection timed out
+> >   # expected 3 bytes, got 0
+> >   # 2025/12/25 00:56:17 socat[9109] W exiting on signal 15
+> >   not ok 13 selftests: drivers/net/netdevsim: peer.sh # exit=1
+> > 
+> > This patch also fixes timeout on TCP Fast Open (TFO) test because the
+> > test also depends on netdevsim.
+> > 
+> > Fixes: 1a8fed52f7be ("netdevsim: set the carrier when the device goes up")
 > 
-> Yep, for that reason I suggested to use `connected->sk_socket->flags`.
+> Stable rules say:
 > 
->> `connected->sk_socket->flags` feels unnecessary long to me.
->> So how about a not-so-minimal-patch to have
->>
->> 	newsock->state = SS_CONNECTED;
->> 	set_bit(SOCK_CUSTOM_SOCKOPT, &newsock->flags);
->> 	if (vsock_msgzerocopy_allow(vconnected->transport))
->> 		set_bit(SOCK_SUPPORT_ZC, &newsock->flags);
->> 	sock_graft(connected, newsock);
-> 
-> No, please, this is a fix, so let's touch less as possible.
-> 
-> As I mentioned before, we have 2 options IMO:
-> 1. use `set_bit(SOCK_CUSTOM_SOCKOPT, &newsock->flags);` but move it
->     before `sock_graft()`
-> 2. use `connected->sk_socket->flags` and set it after `sock_graft()` if
->     we want to be a bit more consistent
-> 
-> I'd go with option 2, because I like to be consistent and it's less
-> confusing IMHO, but I'm fine also with option 1.
+>    It must either fix a real bug that bothers people or just add a device ID.
 
-Yeah, all right, here it is:
-https://lore.kernel.org/netdev/20251229-vsock-child-sock-custom-sockopt-v2-0-64778d6c4f88@rbox.co/
+Thank you for the quick reply. I don't intend for this patch to be
+backported to the stable tree. My understanding was that bugfix patches
+to the net tree should have Fixes: tag for historical tracking.
 
-Thanks,
-Michal
+> 
+> netdevsim is not a real device. Do its bugs actually bother people?
+
+This patch fixes a real bug that is seen when a developer tries to test
+TFO or netdevsim tests on NetworkManager-enabled systems: it causes
+false positives in kselftests on such systems.
+
+> Should this patch have a Fixes: tag?
+
+The patch 1a8fed52f7be ("netdevsim: set the carrier when the device goes
+up"), which does a similar change, has Fixes: tag. Since this patch fixes
+the corner-case behavior which was missed in the previous fix, this
+patch should have Fixes: tag for consistency.
+
+> 
+>        Andrew
+
+Thank you,
+Yohei Kojima
 
