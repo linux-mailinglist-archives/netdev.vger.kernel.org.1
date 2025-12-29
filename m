@@ -1,46 +1,79 @@
-Return-Path: <netdev+bounces-246230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1C51CE6C0F
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 13:46:24 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58CA6CE6E3E
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 14:32:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4D11530123D6
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 12:46:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B297F300DBB5
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 13:32:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 776933126D2;
-	Mon, 29 Dec 2025 12:46:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED4533164B6;
+	Mon, 29 Dec 2025 13:32:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uW8DbN4z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vk8Gtq/G"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 260DC205E25;
-	Mon, 29 Dec 2025 12:46:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB0E212554
+	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 13:32:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767012379; cv=none; b=NwUXdxALNe81DhSGy3rVVDD/XQQjMZ4jSEY6X8lYbBY/0ENh+LsBmWaQbuH9jQu1GNyOxLFiT+fYZuc/MKhyj/YT8GpX6KDm0xqTVwEe0MALYuuRVSRC3gqod6DAW1K0I+kdpIn0OqQQ21qP4TWo/qjQ+zwEoSH2CT8VtIok9gU=
+	t=1767015147; cv=none; b=jlUXLi4MAWnf/NUaH5wJEnTC8niVNxQ8j06cYTr9NdxxKbLaW3y7Ki2YY9wdKN1z/xv6LOsKRU21W5fchqx4yxeH4kxEcELbLofl1MsEU9boZqilBmJ0Md4TgDZ6Ret+DX4XPBvsxO0IrtpZVky/g2KVyNBYlmReD2k1cKtA/qM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767012379; c=relaxed/simple;
-	bh=YEEehNuAmCrRszpCZWxVYHNFGLvgk2GlJvR9Gw2D5kA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LhpO26FFB/GoWIQcLkTF/hlfzlOyInsaoovIB+4MhzM8DHr7i7NfuVLJ98WOeINt1ejWhuslcm79H4GomkCXbQqY+9gnLQC4+TdOFesL0uwxazrjAr7R55iiPFlFyUMtE/YURBtNc6CnuNenW5ff6Qk0kw8tN2FNlB6Z8YUSfWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uW8DbN4z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9B10C4CEF7;
-	Mon, 29 Dec 2025 12:46:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767012378;
-	bh=YEEehNuAmCrRszpCZWxVYHNFGLvgk2GlJvR9Gw2D5kA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=uW8DbN4z6Tyhug910b8kLK7d8z9xCMwiIg3pb0DAjUICnmBPBz4KQX0ui8+mJMU2w
-	 pd06v2IEp9ttFE+sUrXYPY+9X0SqpRIDQ2lay7rntJw2PWD+LbED5mnL9hAl9WEzT1
-	 xSZzB5vJ+o19SLb9oe/lBh2B+/v7EhSMhXtrI4ihEDjR2t6sB6zM1wCcvev0REgGa/
-	 D6Buzmyzl/cfwkiyHe1CPCz8JwAKtoxVgbY0SlV7xz6BLaiWy0rG8hcfDW6Aru9tcK
-	 HpkvcPJsa8HZJ0ktCcDFolFGacXN61DEC7axbxeNR9ReEp+Tw4YYuCuUQiD9ngR7CP
-	 6AqQkTMevjDKw==
-Message-ID: <756ead5d-8c9b-480d-8ae5-71667575ab7c@kernel.org>
-Date: Mon, 29 Dec 2025 13:46:06 +0100
+	s=arc-20240116; t=1767015147; c=relaxed/simple;
+	bh=cjm2ARDU4Ilw36GA6XP8oG+tMJuID0N8F0GSM/rH/Xk=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=XgAQjVHxlnVdyYQ7wtveipf5+Z1Ni2Qk6T1xYZd8Nmg0iTtX/5Y4Qcu3IirCZpLT+DsNSky5Jws+fAu31JCMwTCYsG71j2jeRR8uGA6rV1DND2wrDohy68eZk1w8TEDpyrmfHnrIYfdrTNlod0lj4vAvNt6iR96Dln5XR5teAM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vk8Gtq/G; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-47928022b93so11219475e9.0
+        for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 05:32:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767015144; x=1767619944; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=TH+hcq7bd4mxCYeCUmeAujqoUODEJoLDU3mL4QihJ+I=;
+        b=Vk8Gtq/GjGO58WYU7NEBnPzu9phufBPwVWt4ajhiOfeitaJiLd15FsUrTDcoY+tELr
+         8df5QK1a5pdjSK0zYybWYv6LIKHJXxbYyFjj20pb9Ki0vIuUuPjujgO0qz0ZGr7CJquA
+         suBmC6GsgQZ9gMvToUnfZ5iFqVqyN1G9mvVWQZcTyazb6XyqiH5tJpoYo21+E6crRmrm
+         JNIXNIq3R1cH9+se0Ecc9UtRkxUkmc6pqcKW7b6vT7dj3yZiRawpzdVxgN0Cuyw+w3z5
+         a42LfvPnR/INxw2E3dvodUAAAj4L8Gm6cKPDj8KqJqEwHfNG5yPHg13Oemaii5rgR02h
+         alZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767015144; x=1767619944;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TH+hcq7bd4mxCYeCUmeAujqoUODEJoLDU3mL4QihJ+I=;
+        b=DNpT2tdjyZKju9xZrxfY8+MomEYCOCpnYMbgfjJxwwvdMezT6Ibz+GyUdC4InSFXjP
+         YNEnYcH/tPNhPijGf+G6RTpJqnjpTUyDBmBTBoEnmvDp+rrV2vSs85OrsiOc6QiX9JTo
+         4kppH+IlBs41Tl+Z25ygVhCGrVsrAUK5NCxLad6UH4m4+pn3oF5iz0cBWEQEXd3+ngiF
+         iB4CXdaF/uwWpQzKQWDmj2VHZkrr/oXjoMbKkZXQXrgtK3UupnXMkal6ASUciiXpzpbA
+         pqutoPQj47iemq/Prc/S60mQDDkOZqD7k8X90ksUcfH6UAE3Djg4b7OAeVYcCXYeL/Rd
+         MtkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVeuFTG8gfo8uZ6T4uQ9n0qYVXztPqr5/1V7FbpH+MOliVrenTizkrC+qbcuSHg7t9BZh24lfo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyalCEhni01ududy1874T+0NQE3BRjfXrZMqLgmYh33AjkRsNKL
+	4RlB65p3ETy5tDYx9DvlzbI8gfABHOf3C0x6tPuRb0nE6XtLq/Yf+1iq
+X-Gm-Gg: AY/fxX40MNdBa0oKmrl3dTZ2qm2wNhnUvj3zy/fXk3OU5lscyRQ+ltrdvSLCZsJPohh
+	CFerO4NDhw4PZIsET4bMYgZXxHfa7FGK7h/X0F5Tyjex7ffKgy48M4xy/5N3kZzTUc8yv8NBubT
+	YcADcP7cunEeH2np5GUkZ5zmTjB65j/JCoJR2qM2EScnmIDT9lgqlX7HyhLoF2IUuE4fJDQw+di
+	5aS25d9hA8FFpwN3d/JzxMi50ubodQ3h9wI8mJRa3rb+qUAnRBqYK1Sxc9/NkX3airmJt5fiTiW
+	z1ZbeBukaa4cLZTTQNCeqqTpd/TNmtCj3NPzc+oaRfUegnu5JHa76VXOJ1f8P8S8EZ6dx5yXH9t
+	2Z1mWanDsh1JxMiDPH3Igkd6KDrrhaN4S92tUR80oH1u7dj5JxmfDRfGnjArBJ2buNA64ybrru6
+	NgOr73PQU5xCtfxBNOCFL/0XqK9P7jmZKk+YY5y6jxrqvrqAy3NpBr
+X-Google-Smtp-Source: AGHT+IHszWy0+s83zJSwanWUVcASb7lQtk8CjsaWtYMfYyLjCXdDlLtmTCgSm1MFc64raO36ZloPcg==
+X-Received: by 2002:a05:6000:4305:b0:431:32f:3153 with SMTP id ffacd0b85a97d-4324e51040fmr22586616f8f.7.1767015143929;
+        Mon, 29 Dec 2025 05:32:23 -0800 (PST)
+Received: from [128.93.83.215] (wifi-pro-83-215.paris.inria.fr. [128.93.83.215])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324ea1b36fsm62031162f8f.5.2025.12.29.05.32.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Dec 2025 05:32:23 -0800 (PST)
+Message-ID: <9074448b-1b2c-4791-94ed-0ac296f0b897@gmail.com>
+Date: Mon, 29 Dec 2025 14:32:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,112 +81,83 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 01/15] include: dt-bindings: add LAN969x clock bindings
-To: Robert Marko <robert.marko@sartura.hr>
-Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, nicolas.ferre@microchip.com,
- claudiu.beznea@tuxon.dev, herbert@gondor.apana.org.au, davem@davemloft.net,
- vkoul@kernel.org, andi.shyti@kernel.org, lee@kernel.org,
- andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, linusw@kernel.org, Steen.Hegelund@microchip.com,
- daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
- olivia@selenic.com, radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com,
- gregkh@linuxfoundation.org, jirislaby@kernel.org, broonie@kernel.org,
- mturquette@baylibre.com, sboyd@kernel.org, lars.povlsen@microchip.com,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
- netdev@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
- linux-usb@vger.kernel.org, linux-clk@vger.kernel.org, luka.perkov@sartura.hr
-References: <20251223201921.1332786-1-robert.marko@sartura.hr>
- <20251223201921.1332786-2-robert.marko@sartura.hr>
- <20251224-berserk-mackerel-of-snow-4cae54@quoll>
- <CA+HBbNGym6Q9b166n-P=h_JssOHm0yfyL73JZ+G9P81muK=g4A@mail.gmail.com>
- <78bf252c-fd5e-4a36-b1a3-ca8ed26fde7a@kernel.org>
- <CA+HBbNG+ZVD6grGDp32Ninx7H1AyEbGvP0nwc0zUv94tOV8hYg@mail.gmail.com>
- <d210552f-c8bf-4084-9317-b743075d9946@kernel.org>
- <2025122516245554f59e2e@mail.local>
- <20251227-splendid-striped-starfish-ece074@quoll>
- <CA+HBbNEqq9ZqBR88DFSSSrYw=LBzAreFC0kL88-HZCGAsOrqZw@mail.gmail.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <CA+HBbNEqq9ZqBR88DFSSSrYw=LBzAreFC0kL88-HZCGAsOrqZw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH net] ethernet: cxgb4: Fix dma_unmap_sg() nents value
+From: Thomas Fourier <fourier.thomas@gmail.com>
+To: Potnuri Bharat Teja <bharat@chelsio.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250623122557.116906-2-fourier.thomas@gmail.com>
+ <aFrBED5rhHtrN0sv@chelsio.com>
+ <ace152fe-877b-4df9-ba22-3c928bffa253@gmail.com>
+Content-Language: en-US, fr
+In-Reply-To: <ace152fe-877b-4df9-ba22-3c928bffa253@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 29/12/2025 13:07, Robert Marko wrote:
->>>>>> I understand as not used by drivers? Then no ABI and there is no point
->>>>>> in putting them into bindings.
->>>>>
->>>>> It is not included by the driver directly, but it requires these exact
->>>>> indexes to be passed
->>>>> so its effectively ABI.
->>>>
->>>> How it requires the exact index? In what way? I do not see anything in
->>>> the gck driver using/relying on these values. Nothing. Please point me
->>>> to the line which directly uses these values.... or how many times I
->>>> will need to write this is not ABI?
->>>>
+On 25/06/2025 15:27, Thomas Fourier wrote:
+> On 24/06/2025 17:17, Potnuri Bharat Teja wrote:
+>> On Monday, June 06/23/25, 2025 at 14:25:55 +0200, Thomas Fourier wrote:
+>>> The dma_unmap_sg() functions should be called with the same nents as 
+>>> the
+>>> dma_map_sg(), not the value the map function returned.
 >>>
->>> The index here is the exact id that needs to be set in the PMC_PCR
->>> register and so it is dictated by the hardware.
+>>> Fixes: 8b4e6b3ca2ed ("cxgb4: Add HMA support")
+>>> Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
+>>> ---
+>>>   drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c | 2 +-
+>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c 
+>>> b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+>>> index 51395c96b2e9..73bb1f413761 100644
+>>> --- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+>>> +++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+>>> @@ -3998,7 +3998,7 @@ static void adap_free_hma_mem(struct adapter 
+>>> *adapter)
+>>>         if (adapter->hma.flags & HMA_DMA_MAPPED_FLAG) {
+>>>           dma_unmap_sg(adapter->pdev_dev, adapter->hma.sgt->sgl,
+>>> -                 adapter->hma.sgt->nents, DMA_BIDIRECTIONAL);
+>>> +                 adapter->hma.sgt->orig_nents, DMA_BIDIRECTIONAL);
+>>>           adapter->hma.flags &= ~HMA_DMA_MAPPED_FLAG;
+>>>       }
+>> Thanks for the patch Thomas.
+>> this fix needs below change as well:
+>> --- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+>> +++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+>> @@ -4000,7 +4000,7 @@ static void adap_free_hma_mem(struct adapter 
+>> *adapter)
+>>          }
 >>
->> So not a binding between Linux and DTS.
->>
-> 
-> What would be your suggestion on moving forwarding regarding the clock
-> HW indexes?
+>>     for_each_sg(adapter->hma.sgt->sgl, iter,
+>> -                   adapter->hma.sgt->orig_nents, i) {
+>> +                   adapter->hma.sgt->nents, i) {
+>>                  page = sg_page(iter);
+>>         if (page)
+>>                          __free_pages(page, HMA_PAGE_ORDER);
+>
+> I don't think this change is correct since this loop iterates over all 
+> the pages
+>
+> allocated at line 4076, not over the dma mapped pages.
+>
+> It also seems that when passing the dma addresses to hardware,
+>
+> the newpage assignment is not used line 4104 and that the dma mapping
+>
+> length is not given to hardware.  Is that correct?
+>
+>>> -- 
+>>> 2.43.0
+>>>
+Hello Potnuri,
 
-The same as for every other hardware constant, like interrupts,
-registers and addresses - you use the value directly.
+Any update on this patch?
 
-If you want nicer names, we moved them to DTS headers for several
-platforms (see several commits in the past).
+Thanks for your time,
 
-Best regards,
-Krzysztof
+Thomas
+
+
 
