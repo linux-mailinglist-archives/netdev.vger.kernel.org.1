@@ -1,182 +1,199 @@
-Return-Path: <netdev+bounces-246286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 675C9CE817E
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 20:58:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93C20CE81F2
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 21:20:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1A2D13014A04
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 19:58:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2DDBD301FF44
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 20:20:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A29BB25B662;
-	Mon, 29 Dec 2025 19:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C74A2459CF;
+	Mon, 29 Dec 2025 20:20:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZYThaZjB"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="DRwYQYc6";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="ByFV6TeC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2993023A984
-	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 19:58:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D022673B7
+	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 20:20:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767038289; cv=none; b=Za8JlNf39Dlg684RQNAp30n0hlqflQiS5HsfiMo6ijjlPnXGJpnT0YzPWwiNJlHghhVcNzv/C95WL2NzpEAEg35mRYGAkASNO+avuabJZ4leP3Sv5DKPmOS4Zfwf0Nf9HopUvKnRz34HHLbx25dPKpCKGKx5hYMuvdE/eCQICjM=
+	t=1767039612; cv=none; b=uc09T3Oux/WFBfPzEZF8SNyvkrN2s37dcWSpC0AIYYQJfz1BjGXY26O+rKQiBGx0qW+s0t78dkP97Z4YjREnHnt/0lO7+6tScV0EY7DddRKrrjQSn0VzAj7NEa04D8BzTJpZm8HEmz0ixWnMBVOsdw92Q62jMZw+CwqjfOkKLUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767038289; c=relaxed/simple;
-	bh=ILOnzjB6omPzsTjFaR5p7kIAmLgY60kDToG8kB6uAvw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dwWK/EbM2zo1gcpaTyth5PCPS2k5aSN5/NqgMwWCgfWBlFeG8ikHhpcJevCfogbO+rdX/DWFCLbBZg/IlsvAWNmy3l5RsGxD+wnvgqHpdGAmTfh5/8DBZghXE8JICg6EFUBX6wlonnGS95yjredbJQcKVqzeGFcS9M/W2r7JqQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZYThaZjB; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-803474aaa8bso3236519b3a.0
-        for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 11:58:06 -0800 (PST)
+	s=arc-20240116; t=1767039612; c=relaxed/simple;
+	bh=BwsOeiT9u3rzrRz11E8mkHEqiVBgJs18hfyrJTOTuh0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mX3leONUuFBKYWvQocwfrjVuZ3QnfKKam061NkInlH3wXFgZlmwEmj/lTX0TI710bZA5N+BDQHLVM3+T6JP4ErRXbmpWGBBug4p6iRdxJUIL6XEk4Wcd8tarK3/Zs+o9xNSAp4YIRAfamVeGd+pPoNxmYjl1uL+OQ2lNUop8msI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=DRwYQYc6; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=ByFV6TeC; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BTAavlp3371288
+	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 20:20:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	7MozNexHgJw4PP86LYlmpf5GcfoVsuHBu4VnE8EoW0g=; b=DRwYQYc6xXrnDYfr
+	4zRQWdR3gjE1qZXQA0FLzBPH7KkA61L1rU+1UwsFW2KeVAg4ylPLhHzsLwcVreoX
+	RBdj6tQj9QdRrgeLzrsl9GpeAnO+WoQdhvIEUBuimZ9l/doWI6ATiXrc9yweeazI
+	0WGbiS69rwFLUA6BPpDQDeXEmw4d/qGbTHIsUTwP9aVSSxNsunYUOzvw1gSlvW27
+	Z+BdYghv3ZbMC269yXSZDBdNq0HrXwcTmJebFHgnbGo9qXqrwliIMQNXSlZGqjrQ
+	U2VvdGIzyWc78GnzV4TFHUmOHt54ps1lb6YANvyCvR1MDQXnnDmUngnPDhMu9DR+
+	OcPABA==
+Received: from mail-dl1-f72.google.com (mail-dl1-f72.google.com [74.125.82.72])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ba4tnwgv3-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 20:20:08 +0000 (GMT)
+Received: by mail-dl1-f72.google.com with SMTP id a92af1059eb24-11ddcc9f85eso18262836c88.0
+        for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 12:20:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767038286; x=1767643086; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Xko4XQ8K4/4/p+5qf10V0z8LE3R9sFv1la/WwKpKg8w=;
-        b=ZYThaZjBxgHPLg/ru2oZZkkkGV9I+IQ40v7BeSRjUsjFg8NWfReiJwLQlrKmnUqHLA
-         rvkVXYMB6uxFjEseJU4LblqV3xz3tL12y51GumsjIc6cyS6zleoKH96pr/Tu3MCKuh6z
-         1dkPwxdpY+D6+VQ7nF03YfwSISSL9p0H/3y7TtvjKIMmnjgr5ZS7B38Ulg/fPpmOCF/C
-         mzs007TEjxUXjZWR40SZsreLbn7Jhf2pb0ZW/kFXs1QmTYbCo3paFgYLhanP+ceAWCdo
-         Ud7A7P4dtNPgw8WyCtxZZmpBMyv54oRfhGuAZ+FKsKVJkhdrbHIGLMTgVMUxRxwk+/qG
-         7PcA==
+        d=oss.qualcomm.com; s=google; t=1767039608; x=1767644408; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7MozNexHgJw4PP86LYlmpf5GcfoVsuHBu4VnE8EoW0g=;
+        b=ByFV6TeCwejM9c00g1m657kaLjF+tU6LuWF2ToVTI4euAP82wg7cbSedeHIsyVvfy2
+         agaLvGol5K0YtXtI6yaGn3uXKWMKQMPtwizXVVLBwIRgP8PELlCglXliRZIvOk5dJTKG
+         5vGaIIUMzZmUa7Nar5owsg6Ap9sDiH2FcNu5xhy73vgQWvFgdnzxgbMyJTyetDh2/fS8
+         qXjrsE4jLahYIuipKrLqcw3NURMEi81VtQ44Blk7RuvR8xSGg3lhozeCDpf8eHJjCt8Y
+         Y/en/m/uoIsHgNFDofXV8is5MhhV4he0R6PiI4XrHRVS7jBzlB67D/m6iDXGtz0Sp7Mt
+         J+fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767038286; x=1767643086;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xko4XQ8K4/4/p+5qf10V0z8LE3R9sFv1la/WwKpKg8w=;
-        b=wdz7uhjfsJ5wrwD1eO7YvJs26ACZWt/EQvPexlD0NeEkX0OoPx5PzZe4qbwntsKfJT
-         i9Kg1Ok0pc/5zWFbILl1B2U8NZSOHdJWprfHkvXLqzJKSPZz0PfjibPkTxZsBQYOa5D1
-         KwsbTFyvOfPK7k0U/8McZtvGMEsMXIjXUrHtF+oKggEHTZHSAmPbp/P+x1WqGh0HR0sM
-         57AzKDoOoQ7z5CiHNmJpCeSzUmQNjqXUd6D0pKwl+b/CBqiVR2Bk1w61F7+KkyX2M8hy
-         6q9QVlBvaTTY+dZ/In/++yFuDAZwfICnfDCiYGxeIKDtCWh76e1dNRH8lBQSpTHWDIjy
-         +jbg==
-X-Forwarded-Encrypted: i=1; AJvYcCVRpTImV/0nvzPvj+arAuz8TJy4rgma4N+8jT+3uAyKNY2wp1NJVXWcqJNIDFX2VApr5Skm3GI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVPTvkzLJHXoKMikEIrMEpKvC7qQqCZ8agh4mGID3DVx7wbYTQ
-	L/U0+hC0Tp2nTdhnRfwl7/Qeh9rkslsID+D+WbPX+CC3WsbC+5MqzlWh
-X-Gm-Gg: AY/fxX6iWYw6TDo/e+jfM2qLPpK5l/mvvPM77XFj9or1JkvqdaTVv8XRl/tJ1ZI28ba
-	oFunmhX4MWts36nnbxpQLqkFSjXTBcawLWS7oex+RR2IK99l88AkqmPLgnasOgU+o6/VsXXbyTw
-	CAplTJr6DjDnngTmkzVlRfWiPPgNwwIuLy+01UO8VuKkQyJrBgmJTDzx8omH0SGyC7OmvKzDu9C
-	soKvibkhLswNvSEzEdTRYZFCDXDnoBdP/zOuHvxTpRKLQKMxOaUnNwUDPqEeOZbIhBhOPlPtRMO
-	IW6Syar/QN8bSTI61+Y4wTmnZ0zAh+owCKZ7/873Gw9SzmybmjqWsXMZeaNBERJYWM4BmusP5on
-	A61qKLn3dc1FHLjlEJJSnooOQ9FwuRS8zqm2yrZiYHZmJnoaGu3Hk+VtZDVX8H8gbm2jtgC83wY
-	7fVOmzfuLiK8j8qOtiEk4npGCtj4zaautV8X1rbY6Q9fXetoY=
-X-Google-Smtp-Source: AGHT+IFClYfhXcvzYGUEAeGNRFFMkUwqOYUjfX2LyOlUE6PEoi9FZ13hia7PJghTWywP+YG21UqZAQ==
-X-Received: by 2002:a05:6a20:7f81:b0:366:14b0:4b1c with SMTP id adf61e73a8af0-3769ff1c33fmr28383151637.39.1767038286311;
-        Mon, 29 Dec 2025 11:58:06 -0800 (PST)
-Received: from ?IPv6:2a03:83e0:115c:1:ac6b:d5ad:83fe:6cca? ([2620:10d:c090:500::2:1bc9])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7dfac28fsm30215140b3a.32.2025.12.29.11.58.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Dec 2025 11:58:06 -0800 (PST)
-Message-ID: <0f0bd124a42723acf87b427cc69356a0e4b1e339.camel@gmail.com>
-Subject: Re: [PATCH bpf-next] bpf, x86: inline bpf_get_current_task() for
- x86_64
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Menglong Dong <menglong8.dong@gmail.com>, ast@kernel.org
-Cc: davem@davemloft.net, dsahern@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
- yonghong.song@linux.dev, 	john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, 	jolsa@kernel.org, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, 	dave.hansen@linux.intel.com,
- jiang.biao@linux.dev, x86@kernel.org, hpa@zytor.com, 
-	netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Mon, 29 Dec 2025 11:58:03 -0800
-In-Reply-To: <20251225104459.204104-1-dongml2@chinatelecom.cn>
-References: <20251225104459.204104-1-dongml2@chinatelecom.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+        d=1e100.net; s=20230601; t=1767039608; x=1767644408;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7MozNexHgJw4PP86LYlmpf5GcfoVsuHBu4VnE8EoW0g=;
+        b=HrMtVTjHO7x94wQUQOeOq3A+bK4dJPXJx6iqO0zgQNFPR6+C8f9jYaQWIkbn6RXkdw
+         nqUi77xNM6I/Pz/6rCw7LwGFswfq0sA4mLSa7puqTMsRekEe5PHNRyspxwjioRK7ZBsV
+         sqAzNSG894mT8ImpgO2bPhAPLUZ/0rzJc871RSNiQgjMLIVWusEd9rXDDM6YxBjYCgHE
+         TjbIhGMMCyB67+eo8QDRebog5+w31yVDSNQ1IOqg2guxno6aF/LBiOF5QEI/+ChoY5yg
+         ah1CbcMVaRvSsTR35DVG/52HbHqfgBCJJ8aMiUGxFgR1VxyuDSxbcVjSFojB+PiVAZ42
+         M2Hw==
+X-Forwarded-Encrypted: i=1; AJvYcCXQ4F6W6IE+8dCP61ZB+J+pPqQNkyqX/dw8l4GKDL8Fiq2GkrTkH36lwxjB1l/iW9+sPGSzCvc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6yBct1TMCOR5NkWkh+7S3bHOpCfXrbEmB+bZwuEhJtIFZykVN
+	YOq5XA6y8MZouolerdHTfgdbPSYQxD0npEnDTnNhZgHb5kpF2hC0l6yY2EJUNGiYPXVD5zlB2UG
+	72xWo7QTHaw8KA/+rP/BfHyP05v1raGeeBjVePSLissaSe4CdioVwpsB98E4=
+X-Gm-Gg: AY/fxX68IeAffeVnhuyORpckMfUZy7sa8vulNkOkyVYxzXaFJz7OEp64ZBL4Q1UCGVw
+	qdI6uxT1qK4XSK0L6JUhW+g6R2VnkUzOKTqCm/KNxQU9uib3vrARL1NbyeianaS1P9LSNkCKLuT
+	gN9Lgs5TlYADb6FtLvHffJvbw6MKwkScoQo7cr3QIWBYgSh+KJInmob0V9SlUjnjl/afSp+WPNN
+	+jQQXFMZeR1Rf8RJ66gLxfEE7d3JZOZyCTZVhr8wN0goT0/g/lYnnsctwmIj74iVUhfXuTXe4dk
+	5cKSp/cv5Vu+BptKvWOcxLr47o5U98CpqQ0oLoA/33cozvIGVBdWKlUXCGioaZS2IRsKQz4XqW7
+	vP9QNPnVxNpOlws9YjowJaog0vecxgHng6LSEv9O65k/cHBlNrdvS7cmg0OGrOKY=
+X-Received: by 2002:a05:7022:e1a:b0:11e:3e9:3e8e with SMTP id a92af1059eb24-12171afd95bmr24941790c88.23.1767039607771;
+        Mon, 29 Dec 2025 12:20:07 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH/lwK2wTaR4697pd1i+xemc7zfhrLFxVX/r/0pN47IvpGex944GuH8FMyKdtpVLY3DVSOxHw==
+X-Received: by 2002:a05:7022:e1a:b0:11e:3e9:3e8e with SMTP id a92af1059eb24-12171afd95bmr24941750c88.23.1767039607116;
+        Mon, 29 Dec 2025 12:20:07 -0800 (PST)
+Received: from [10.226.59.182] (i-global254.qualcomm.com. [199.106.103.254])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1217253c23csm117915702c88.9.2025.12.29.12.20.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Dec 2025 12:20:06 -0800 (PST)
+Message-ID: <60aea371-915f-431d-88dd-3be633dc2bcf@oss.qualcomm.com>
+Date: Mon, 29 Dec 2025 13:20:04 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] net: qrtr: Drop the MHI auto_queue feature for
+ IPCR DL channels
+To: manivannan.sadhasivam@oss.qualcomm.com,
+        Carl Vanderlip <carl.vanderlip@oss.qualcomm.com>,
+        Oded Gabbay <ogabbay@kernel.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Jeff Johnson <jjohnson@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Loic Poulain <loic.poulain@oss.qualcomm.com>,
+        Maxim Kochetkov <fido_max@inbox.ru>
+Cc: linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org, mhi@lists.linux.dev,
+        linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
+        ath12k@lists.infradead.org, netdev@vger.kernel.org,
+        Bjorn Andersson <andersson@kernel.org>,
+        Johan Hovold <johan@kernel.org>, Chris Lew <quic_clew@quicinc.com>,
+        stable@vger.kernel.org
+References: <20251218-qrtr-fix-v2-0-c7499bfcfbe0@oss.qualcomm.com>
+ <20251218-qrtr-fix-v2-1-c7499bfcfbe0@oss.qualcomm.com>
+Content-Language: en-US
+From: Jeff Hugo <jeff.hugo@oss.qualcomm.com>
+In-Reply-To: <20251218-qrtr-fix-v2-1-c7499bfcfbe0@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Authority-Analysis: v=2.4 cv=G+YR0tk5 c=1 sm=1 tr=0 ts=6952e278 cx=c_pps
+ a=bS7HVuBVfinNPG3f6cIo3Q==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=zitRP-D0AAAA:8 a=EUspDBNiAAAA:8
+ a=COk6AnOGAAAA:8 a=isMaZ9OHK7bkWVW8W2QA:9 a=QEXdDO2ut3YA:10
+ a=vBUdepa8ALXHeOFLBtFW:22 a=xwnAI6pc5liRhupp6brZ:22 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-GUID: SWHKEPxR4XsUXtBpvVGuPNHP7Zx_GQIf
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjI5MDE4NSBTYWx0ZWRfXzZQoRVNDR/eQ
+ DIRwadSSQE7DsKTM7Rl/afJv+M8RbZp89IslDUeoeitGMGpz5dCOSAL5NRoiCXec2HLMKTqC142
+ rtGsT6Ot2k5pWvhsPWgnK5H2sFq5NNhgtl+fHdIzIYh4KkmkBKRAJptNp09wuiDFWem0sYgZbI5
+ +QaS2CvHGgORemd8aGm/iZgq/pw/W/l6o5VI3yBKeHY6DTC87S2Yp1xyxQvY5bJ+eR/P6MJq0Cr
+ KLCS0vo3J0rRvhr4sWmnSjr6OfUhwFSumYK1+jkvecL8PjAhv3/jyfxZT1wVUILrAG9pWAh6+hq
+ vMSW8NF00HmL2jNcJYlIkj16o+Zq5q60Y1L4UK0F/EvOOCfXHFDB9w4YntRMb3t83C/RHyqhreT
+ Zt12nW28zNunABTdouBoosc6HPq26jXIWa5ui6pYSVOHri+TZAkdEptOovSMMj7NZUN365iwu8U
+ q7LiukA5KNXTE59LJwQ==
+X-Proofpoint-ORIG-GUID: SWHKEPxR4XsUXtBpvVGuPNHP7Zx_GQIf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-29_06,2025-12-29_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 phishscore=0 bulkscore=0 adultscore=0 spamscore=0
+ lowpriorityscore=0 suspectscore=0 clxscore=1011 priorityscore=1501
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2512120000
+ definitions=main-2512290185
 
-On Thu, 2025-12-25 at 18:44 +0800, Menglong Dong wrote:
-> Inline bpf_get_current_task() and bpf_get_current_task_btf() for x86_64
-> to obtain better performance. The instruction we use here is:
->=20
->   65 48 8B 04 25 [offset] // mov rax, gs:[offset]
->=20
-> Not sure if there is any side effect here.
->=20
-> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> ---
+On 12/18/2025 9:51 AM, Manivannan Sadhasivam via B4 Relay wrote:
+> From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+> 
+> MHI stack offers the 'auto_queue' feature, which allows the MHI stack to
+> auto queue the buffers for the RX path (DL channel). Though this feature
+> simplifies the client driver design, it introduces race between the client
+> drivers and the MHI stack. For instance, with auto_queue, the 'dl_callback'
+> for the DL channel may get called before the client driver is fully probed.
+> This means, by the time the dl_callback gets called, the client driver's
+> structures might not be initialized, leading to NULL ptr dereference.
+> 
+> Currently, the drivers have to workaround this issue by initializing the
+> internal structures before calling mhi_prepare_for_transfer_autoqueue().
+> But even so, there is a chance that the client driver's internal code path
+> may call the MHI queue APIs before mhi_prepare_for_transfer_autoqueue() is
+> called, leading to similar NULL ptr dereference. This issue has been
+> reported on the Qcom X1E80100 CRD machines affecting boot.
+> 
+> So to properly fix all these races, drop the MHI 'auto_queue' feature
+> altogether and let the client driver (QRTR) manage the RX buffers manually.
+> In the QRTR driver, queue the RX buffers based on the ring length during
+> probe and recycle the buffers in 'dl_callback' once they are consumed. This
+> also warrants removing the setting of 'auto_queue' flag from controller
+> drivers.
+> 
+> Currently, this 'auto_queue' feature is only enabled for IPCR DL channel.
+> So only the QRTR client driver requires the modification.
+> 
+> Fixes: 227fee5fc99e ("bus: mhi: core: Add an API for auto queueing buffers for DL channel")
+> Fixes: 68a838b84eff ("net: qrtr: start MHI channel after endpoit creation")
+> Reported-by: Johan Hovold <johan@kernel.org>
+> Closes: https://lore.kernel.org/linux-arm-msm/ZyTtVdkCCES0lkl4@hovoldconsulting.com
+> Suggested-by: Chris Lew <quic_clew@quicinc.com>
+> Acked-by: Jeff Johnson <jjohnson@kernel.org> # drivers/net/wireless/ath/...
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+Reviewed-by: Jeff Hugo <jeff.hugo@oss.qualcomm.com>
 
-The change makes sense to me.
-Could you please address the compilation error reported by kernel test robo=
-t?
-Could you please also add a tests case using __jited annotation like
-in verifier_ldsx.c?
+For the qaic bits
 
->  arch/x86/net/bpf_jit_comp.c | 33 +++++++++++++++++++++++++++++++++
->  1 file changed, 33 insertions(+)
->=20
-> diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
-> index b69dc7194e2c..7f38481816f0 100644
-> --- a/arch/x86/net/bpf_jit_comp.c
-> +++ b/arch/x86/net/bpf_jit_comp.c
-> @@ -1300,6 +1300,19 @@ static void emit_st_r12(u8 **pprog, u32 size, u32 =
-dst_reg, int off, int imm)
->  	emit_st_index(pprog, size, dst_reg, X86_REG_R12, off, imm);
->  }
-> =20
-> +static void emit_ldx_percpu_r0(u8 **pprog, const void __percpu *ptr)
-> +{
-> +	u8 *prog =3D *pprog;
-> +
-> +	/* mov rax, gs:[offset] */
-> +	EMIT2(0x65, 0x48);
-> +	EMIT2(0x8B, 0x04);
-> +	EMIT1(0x25);
-> +	EMIT((u32)(unsigned long)ptr, 4);
-> +
-> +	*pprog =3D prog;
-> +}
-> +
->  static int emit_atomic_rmw(u8 **pprog, u32 atomic_op,
->  			   u32 dst_reg, u32 src_reg, s16 off, u8 bpf_size)
->  {
-> @@ -2435,6 +2448,15 @@ st:			if (is_imm8(insn->off))
->  		case BPF_JMP | BPF_CALL: {
->  			u8 *ip =3D image + addrs[i - 1];
-> =20
-> +			if (insn->src_reg =3D=3D 0 && (insn->imm =3D=3D BPF_FUNC_get_current_=
-task ||
-> +						   insn->imm =3D=3D BPF_FUNC_get_current_task_btf)) {
-> +				if (IS_ENABLED(CONFIG_USE_X86_SEG_SUPPORT))
-> +					emit_ldx_percpu_r0(&prog, &const_current_task);
-> +				else
-> +					emit_ldx_percpu_r0(&prog, &current_task);
-
-Nit: arch/x86/include/asm/current.h says that current_task and const_curren=
-t_task are aliases.
-     In that case, why would we need two branches here?
-
-> +				break;
-> +			}
-> +
->  			func =3D (u8 *) __bpf_call_base + imm32;
->  			if (src_reg =3D=3D BPF_PSEUDO_CALL && tail_call_reachable) {
->  				LOAD_TAIL_CALL_CNT_PTR(stack_depth);
-> @@ -4067,3 +4089,14 @@ bool bpf_jit_supports_timed_may_goto(void)
->  {
->  	return true;
->  }
-> +
-> +bool bpf_jit_inlines_helper_call(s32 imm)
-> +{
-> +	switch (imm) {
-> +	case BPF_FUNC_get_current_task:
-> +	case BPF_FUNC_get_current_task_btf:
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
+Acked-by: Jeff Hugo <jeff.hugo@oss.qualcomm.com>
 
