@@ -1,188 +1,105 @@
-Return-Path: <netdev+bounces-246280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7161ACE810F
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 20:40:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68131CE812D
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 20:43:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3127E300D412
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 19:40:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ECA5E3012DD3
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 19:43:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A204218E02A;
-	Mon, 29 Dec 2025 19:40:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E1E6221DAE;
+	Mon, 29 Dec 2025 19:43:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="esazk0vj"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="gSh+81xV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BC161474CC
-	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 19:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F17EE215F42;
+	Mon, 29 Dec 2025 19:43:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767037247; cv=none; b=sJO5DmTdq1LvFv4NeUdoQXq0NBx3kjoRNbHVe6rB5xELZYlOqK+tm78da8DkoQG97Pv2UeGahS6T4+DDoEeJPAal7LUqK6QnPvo/ksA4oEncp2AKteFg1theWA8DqaEPEr5ewCvRw1yqhQalkV68rtBBHyKUt8gJAkfhmR7n7JE=
+	t=1767037415; cv=none; b=OgHZxmb29H1J/SNw1mh6fcAUCnRXjJu4PE2le7ICZpzuEXaGEsb8SA5l+S4gSuGgmpuf7RQtKjvj48EQfnIWwBZwb8BMhXTfJhke5iodRWxpXRUa3Bz5u2iyEFLboO9s4CH3UBvp1g6EYb0ZEhUqZvqOsK1bpaABvptYGUZKNto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767037247; c=relaxed/simple;
-	bh=3FxapXkLxdf/PMsz9yaDHCSgAZk60YfnbYIDvlaT1Pg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rZTbe5EvS/ORkEk2GWIP4JuzAkR/QgQ7vMaIrtjTSy5dny4uYxFsNw5uGyAIc9YhHWjwcppq0p0t9OdZ2h+dTj1n0V55qoBRQuD4OgewMhPZRotB1B5qYaJ3GRNunanJSYjmnDKyTefdvVG4ZzfyMRVhL5JQqiotgVx5ABfU+CA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=esazk0vj; arc=none smtp.client-ip=185.226.149.38
+	s=arc-20240116; t=1767037415; c=relaxed/simple;
+	bh=mumakuwGdLBzLzk6e4czTmQbX785Gxu9ciavMRfH+R8=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=nHsIKGM6k1B+mV3CtNw2yYRLHEESBT7YxAKp2nuAf/qfI74uXlMhnyT6fYRd0xYOT6tA19+Ikl/vq4E801xeMKn3szlmwZdEMXaeoEduKc2pNsA2Tn6rGZCM58dD4321DcxholzUjS14/+h8i3bAkspX2oev68MNykD+qOMm6O8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=gSh+81xV; arc=none smtp.client-ip=185.226.149.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1vaJ6U-00CgVl-W8; Mon, 29 Dec 2025 20:40:31 +0100
+	id 1vaJ9O-00DYtW-UQ; Mon, 29 Dec 2025 20:43:30 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=UExefshQVQAOSU2HaTtm9BnCYxE55bmxAcyfp3Uz3pk=; b=esazk0vjx7gz60zsNrttL1U/hf
-	9qLF8+Vm/WSpxnlXFAGVtb+LJINgHFHqwNjiZOuPBx6KFTCgrgTtMZ5bxlF4ySW380B6sRl10mKBJ
-	eziSuh9e1JifUhCo+bzb/Gon3tPZlTwUTl5Abcv1damOAlOQXkw+2d6vg6JAtkKuUGbYqckEtycY0
-	LfBCB7JVnETXgKkUv7qA6zdfh966JijUlt+b2j+QUgPcR0d+AsQBRAYNF4DUgFS4SQ7drFZhjmmnG
-	RdPzDI9M5qnLLW3Omez7Zrk24Re4eSTHc/dGyCNSSI9z4CW0UWVdYOTPHaoQxXoQ4ifNU0ZZZHN78
-	LsLLSkMQ==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From; bh=P7++EmvYFmvUeCzYrRvjhyvzJfMFPh7IoMxVV4S8Nrg=
+	; b=gSh+81xVIEavGaC4ZxWz1pGAJYrgt+KRG2bT6H5Edn5a7aL3HmtNvmxPYzgM6gWN3TshJ+Ya1
+	AlGNCbRlfJ/UGkss+de/8+K3qvNQD/c231EWB1p8mBZrcw6jKaZ8xnzByM15H4IBhcMBP2IOWU2kv
+	EmA6BTf9e0EHhyEmbPlarTveX/u0kROfJRH/rxBlUBNIP396ezpuhszINkPe41KpvRikKVmRcXZw5
+	4GddBGTFwNaIbK2+W8yv46F+q+ovxZxzXblDRmWnFJwU1HS4dDml8j0yeQlZGcWkK4JGhNWI0dmir
+	Ni04al13JwGSyFlalIWd205Z7jOsHPxhE6SFaQ==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1vaJ6T-00009U-Ps; Mon, 29 Dec 2025 20:40:30 +0100
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	id 1vaJ9O-0007qY-Ix; Mon, 29 Dec 2025 20:43:30 +0100
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1vaJ6O-005APE-Lf; Mon, 29 Dec 2025 20:40:24 +0100
-Message-ID: <645da2e4-28fb-450d-8f9f-7f025df463df@rbox.co>
-Date: Mon, 29 Dec 2025 20:40:22 +0100
+	id 1vaJ98-0055FL-QX; Mon, 29 Dec 2025 20:43:14 +0100
+From: Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH net v2 0/2] vsock: Fix SO_ZEROCOPY on accept()ed vsocks
+Date: Mon, 29 Dec 2025 20:43:09 +0100
+Message-Id: <20251229-vsock-child-sock-custom-sockopt-v2-0-64778d6c4f88@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/2] vsock/test: Test setting SO_ZEROCOPY on
- accept()ed socket
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Arseniy Krasnov <avkrasnov@salutedevices.com>,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251223-vsock-child-sock-custom-sockopt-v1-0-4654a75d0f58@rbox.co>
- <20251223-vsock-child-sock-custom-sockopt-v1-2-4654a75d0f58@rbox.co>
- <aUpualKwJbT9W1ia@sgarzare-redhat>
- <1c877a67-778e-424c-8c23-9e4d799fac2f@rbox.co>
- <aUqWtwr0n2RO7IB-@sgarzare-redhat> <aUrIDT-Tg5SpXhlO@sgarzare-redhat>
- <8b76f6f8-3f5c-4bea-8084-577712ec028b@rbox.co>
- <aUut_Avq3t_xk0Uh@sgarzare-redhat>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <aUut_Avq3t_xk0Uh@sgarzare-redhat>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAM3ZUmkC/4WNTQ6CMBCFr0Jm7ZgyUEFW3sOwgFJkorakxQZDu
+ LtNde/u/eS9bwOvHWsPTbaB04E9WxMNHTJQU2duGnmIHkiQzIkIg7fqjmrix4Bf+fKLfSZt5wW
+ p6KvqrAqh6hHiy+z0yGsiXMHoBdoYThw37p2oIU/VD1D8BYQcBZYnWXaVHMQo64vr7XpUFtp93
+ z/Rag2E0QAAAA==
+X-Change-ID: 20251222-vsock-child-sock-custom-sockopt-23b779c30c8f
+To: Stefano Garzarella <sgarzare@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
+X-Mailer: b4 0.14.3
 
-On 12/24/25 10:15, Stefano Garzarella wrote:
-> On Tue, Dec 23, 2025 at 09:38:07PM +0100, Michal Luczaj wrote:
->> On 12/23/25 17:50, Stefano Garzarella wrote:
->>> On Tue, Dec 23, 2025 at 02:20:33PM +0100, Stefano Garzarella wrote:
->>>> On Tue, Dec 23, 2025 at 12:10:25PM +0100, Michal Luczaj wrote:
->>>>> On 12/23/25 11:27, Stefano Garzarella wrote:
->>>>>> On Tue, Dec 23, 2025 at 10:15:29AM +0100, Michal Luczaj wrote:
->>>>>>> Make sure setsockopt(SOL_SOCKET, SO_ZEROCOPY) on an accept()ed socket is
->>>>>>> handled by vsock's implementation.
->>>>>>>
->>>>>>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
->>>>>>> ---
->>>>>>> tools/testing/vsock/vsock_test.c | 33 +++++++++++++++++++++++++++++++++
->>>>>>> 1 file changed, 33 insertions(+)
->>>>>>>
->>>>>>> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->>>>>>> index 9e1250790f33..8ec8f0844e22 100644
->>>>>>> --- a/tools/testing/vsock/vsock_test.c
->>>>>>> +++ b/tools/testing/vsock/vsock_test.c
->>>>>>> @@ -2192,6 +2192,34 @@ static void test_stream_nolinger_server(const struct test_opts *opts)
->>>>>>> 	close(fd);
->>>>>>> }
->>>>>>>
->>>>>>> +static void test_stream_accepted_setsockopt_client(const struct test_opts *opts)
->>>>>>> +{
->>>>>>> +	int fd;
->>>>>>> +
->>>>>>> +	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
->>>>>>> +	if (fd < 0) {
->>>>>>> +		perror("connect");
->>>>>>> +		exit(EXIT_FAILURE);
->>>>>>> +	}
->>>>>>> +
->>>>>>> +	vsock_wait_remote_close(fd);
->>>
->>> On a second look, why we need to wait the remote close?
->>> can we just have a control message?
->>
->> I think we can. I've used vsock_wait_remote_close() simply as a sync
->> primitive. It's one line of code less.
->>
->>> I'm not sure even on that, I mean why this peer can't close the
->>> connection while the other is checking if it's able to set zerocopy?
->>
->> I was worried that without any sync, client-side close() may race
->> server-side accept(), but I've just checked and it doesn't seem to cause
->> any issues, at least for the virtio transports.
-> 
-> Okay, I see. Feel free to leave it, but if it's not really needed, I'd 
-> prefer to keep the tests as simple as possible.
+vsock has its own handling of setsockopt(SO_ZEROCOPY). Which works just
+fine unless socket comes from a call to accept(). Because
+SOCK_CUSTOM_SOCKOPT flag is missing, attempting to set the option always
+results in errno EOPNOTSUPP.
 
-OK, dropping the sync here. It will be interesting to see if it ever blows up.
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+Changes in v2:
+- Fix: set socket flags in a consistent way [Stefano]
+- Test: simplify sync by removing sync [Stefano]
+- Link to v1: https://lore.kernel.org/r/20251223-vsock-child-sock-custom-sockopt-v1-0-4654a75d0f58@rbox.co
 
-...
->>>> In my suite, I'm checking the client, and if the last test fails only
->>>> on the server, I'm missing it. I'd fix my suite, and maybe also
->>>> vsock_test adding another sync point.
->>>
->>> Added a full barrier here:
->>> https://lore.kernel.org/netdev/20251223162210.43976-1-sgarzare@redhat.com
->>
->> Which reminds me of discussion in
->> https://lore.kernel.org/netdev/151bf5fe-c9ca-4244-aa21-8d7b8ff2470f@rbox.co/
-> 
-> Oh, I forgot that we already discussed that.
-> 
-> My first attempt was exactly that, but then discovered that it didn't 
-> add too much except for the last one since for the others we have 2 full 
-> barriers back to back, so I preferred to move outside the loop. In that 
-> way we can also be sure the 2 `vsock_tests` are in sync with the amount 
-> of tests to run.
+---
+Michal Luczaj (2):
+      vsock: Make accept()ed sockets use custom setsockopt()
+      vsock/test: Test setting SO_ZEROCOPY on accept()ed socket
 
-Might it be that we're solving different issues?
+ net/vmw_vsock/af_vsock.c         |  4 ++++
+ tools/testing/vsock/vsock_test.c | 32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 36 insertions(+)
+---
+base-commit: 58fc7342b529803d3c221101102fe913df7adb83
+change-id: 20251222-vsock-child-sock-custom-sockopt-23b779c30c8f
 
-I was annoyed by the next test's name/prompt being printed when the
-previous test is still running on the other side. Which happens e.g. when
-one side takes longer than the other. Or when one of the sides is
-unimplemented.
-
-How about something like below; would that cover your case as well?
-
-diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
-index d843643ced6b..5d94ffd2fa82 100644
---- a/tools/testing/vsock/util.c
-+++ b/tools/testing/vsock/util.c
-@@ -495,7 +495,7 @@ void run_tests(const struct test_case *test_cases,
- 			printf("skipped\n");
-
- 			free(line);
--			continue;
-+			goto sync;
- 		}
-
- 		control_cmpln(line, "NEXT", true);
-@@ -510,6 +510,9 @@ void run_tests(const struct test_case *test_cases,
- 			run(opts);
-
- 		printf("ok\n");
-+sync:
-+		control_writeln("RUN_TESTS_SYNC");
-+		control_expectln("RUN_TESTS_SYNC");
- 	}
- }
+Best regards,
+-- 
+Michal Luczaj <mhal@rbox.co>
 
 
