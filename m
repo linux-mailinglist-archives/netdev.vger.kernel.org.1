@@ -1,245 +1,150 @@
-Return-Path: <netdev+bounces-246235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5DA0CE721F
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 15:54:10 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF815CE724F
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 15:58:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B01DD30041A0
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 14:53:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D16E7300A6D4
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 14:58:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E6903195FB;
-	Mon, 29 Dec 2025 14:53:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA4CB316193;
+	Mon, 29 Dec 2025 14:58:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XKZ2Ddwb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bbu6PfkP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3135D3195F4;
-	Mon, 29 Dec 2025 14:53:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767020032; cv=fail; b=ISSbXiEY7gZdlFU50iCrF0WwSyCf5w7/jey9O2BfZ7cWCK93THkDvje4IdYJ8Ohc1pmjINuVx+IH5VKPy3mbhSDNZx/CfVmBewt6h7cZzIGLRHlsXFe7ZUW5it7MHcxZbDud7pQVlHaMEmkKdwGWbpc53cSlaXV8XHgHYltuaP0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767020032; c=relaxed/simple;
-	bh=LhEVR1PjOR96xbM13zGnWRohAUO2fldOJWjGT6GaafE=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ZH3Ul98/Of+dp77oR7swwBFkjNxh/pMbdPmHFa8NsSFsEETLGBaiKygOUrTQLh5KgS6rFWqU9QQbX8GMhNuyJv7H064cYF3zOwROnUd/qc8SDO/VCJSbDBi2faK1yNv0QjSsYg6lX9x5e+SMdYwT5eSoGQ9dGOYBUyR8W2z0Md8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XKZ2Ddwb; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767020030; x=1798556030;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=LhEVR1PjOR96xbM13zGnWRohAUO2fldOJWjGT6GaafE=;
-  b=XKZ2Ddwb/YeOah6mJzmyMnnGcAnoUZysxqnednl8zlfA+C7Ge/E3X+93
-   TdcNHOb8NhSbdTwvHQa57gODSfYKzPxqVg+BQe6ex9af/qg4BDX0hvgT2
-   1Gb80h1yR0rX1mNJBHLMt/+yq3MOy8Iy+VcKkXu0TdKFWfWHfaWV16FRE
-   PEsWIwTpEdhJPticK8DTTRG9FQIgitJTzeb9AWaNcs9P7hpNuNddhrRYb
-   3mKAwPn+DUGygXR9UF5VnOPTSwc3oZMh4Wil3a3NbnAIywkz8myUzZ35D
-   kAlPUmcJvsDfPdn/1+w1JPZRpwP/XlM0Oz4UZhs3lBw77jd3ZhOxEbwi+
-   g==;
-X-CSE-ConnectionGUID: aNz3Dr/vTiK4spUMyVw9QQ==
-X-CSE-MsgGUID: Te9LwdyUQuCjUsCzaWCzGQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11656"; a="72476297"
-X-IronPort-AV: E=Sophos;i="6.21,186,1763452800"; 
-   d="scan'208";a="72476297"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Dec 2025 06:53:49 -0800
-X-CSE-ConnectionGUID: UDWBZfM0Q7Gj55UOXIx/Sw==
-X-CSE-MsgGUID: BmcLRJWXTXGS/mde6Ym1QA==
-X-ExtLoop1: 1
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Dec 2025 06:53:48 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 29 Dec 2025 06:53:48 -0800
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Mon, 29 Dec 2025 06:53:48 -0800
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.24)
- by edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 29 Dec 2025 06:53:48 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cY7QaW0cQjLntiJTGS9ESAk85v+WgXtbaivL/JmGC/wZNTz/bYgaDB03GcM65E7erIu7Yaw6qmSgsxQDIjwZtkp4LiiYvL938KhlIBRJ82NnCD2Bm0nhmJl6gIgRaERDDllGn56kTi3RK7Oy9djgvSQLXDVfxHgjftrb7e3LWpg6QFSw4D2ylyGitT67CSxlQXz0TB/1MF+zbnQhfEcUSV+0FWzSQ6O8rJJI5vndy5XAWRtuh3RENui/mP+89Qdg2DrHUhG8KMNkL82pUN31hnHwHUPvaP/RaQv51zLVrS2WCukt6ws/A4c/B1T0+ZhO/qj5iIVFBwVVw9FwDg7a9w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=53QdsszUt+lbVKzEKOINFbtJmtyuWqUrhP2zyvSFsMM=;
- b=SzcdPlJ+qYZo/hDGwlA1AeR0BxiFRVs1AjZwoVFdkENGV11Xv7yS+cR0RdqOggXDUpSqRlgFaNkJE8XXWKgwukCwzHv9Ged6RZ7JW2RnWncwmb9S0l+seeWwUqqWHHojs3VVpagX506sNVGtmIrcN3lbJHlf4NR/SaN27QxSCVusuEFWjFJ/dCdXTrFJlCv/zac41fw1bdIGMu2VVXvyB+4G6fhCLQNnc9h8Ge0Qol5dgMbddXoIXX29u4US5xkUaBnLji8o34LstIOKXO5GIhpglWm7FCZGaKSQCbhq7v5RHZWrRP08kYtXmM6Ffc3LvUCJuUKgCOYXnfGw4rejAw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SA3PR11MB8021.namprd11.prod.outlook.com (2603:10b6:806:2fd::21)
- by IA1PR11MB8802.namprd11.prod.outlook.com (2603:10b6:208:598::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9456.11; Mon, 29 Dec
- 2025 14:53:45 +0000
-Received: from SA3PR11MB8021.namprd11.prod.outlook.com
- ([fe80::f52f:bc53:5d2f:9cce]) by SA3PR11MB8021.namprd11.prod.outlook.com
- ([fe80::f52f:bc53:5d2f:9cce%5]) with mapi id 15.20.9456.013; Mon, 29 Dec 2025
- 14:53:45 +0000
-Message-ID: <38f70791-56b6-4795-876d-b84df289dbd8@intel.com>
-Date: Mon, 29 Dec 2025 16:53:38 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v2] igc: Reduce TSN TX packet
- buffer from 7KB to 5KB per queue
-To: Chwee-Lin Choong <chwee.lin.choong@intel.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Zdenek Bouska <zdenek.bouska@siemens.com>,
-	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>, Aleksandr Loktionov
-	<aleksandr.loktionov@intel.com>, Paul Menzel <pmenzel@molgen.mpg.de>, "Simon
- Horman" <horms@kernel.org>
-References: <20251204122150.23853-1-chwee.lin.choong@intel.com>
-Content-Language: en-US
-From: Avigail Dahan <Avigailx.dahan@intel.com>
-In-Reply-To: <20251204122150.23853-1-chwee.lin.choong@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: TL0P290CA0002.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:5::10) To SA3PR11MB8021.namprd11.prod.outlook.com
- (2603:10b6:806:2fd::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2CC631353C
+	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 14:58:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767020302; cv=none; b=FSjwV4md+JEaoFJIuT7lEvfPfeaoGo5M+ZCUKHHPGKQC+VCWwDr9EzneuxZVtFaZj9w+xcp9s/gtOhh8YAZNNXuE2IRprjArdBln2cbIF19Gv7dE13kudXJoBX0fncFjxJiyOyR0V2J9HkdNk4HM5V2Y+A6GcU0mykYn63RNZgw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767020302; c=relaxed/simple;
+	bh=+rKUTHE1C5tMd4wO+uOJxCIcCFL6pdF1qrOtPb4XEzs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aPJdOXUumaREZULxYr8DpoqEMj4uXeuuWkv+rZ0SFchCn40VNgYyxls9T+HAhArT2ugtRHiuSnl6HYYcTmFPhPxd1xpMT3XqJUMM18wKpTSTrvQHqeujFmTzWuZDF1TWNVHtJroP9xoMVgjSu6tXfpF73pCKKuweWEgBHxYh2s4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bbu6PfkP; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767020300;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9d0Dg/LIBtWTzr9qM/QWRGOSrtOr1mmiEet2atE3UG4=;
+	b=bbu6PfkPBCSapdQxEqa0UY+lCXuJ5WdnJvR7ux5XK0xeHh7pvFJsuyeiozv6KXiZahLva+
+	P1KskRnrd73S7n+MRVjvBUlFz1AnzIUMdN+/W2QAb0M9X+GSCRbT0+a3DYNl2EhIa64Rfk
+	bUhnv3weytnhIDJ6rLzId9GW50OZWPY=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-515-vfhV7sM9Pqiqvj2-wog-DA-1; Mon,
+ 29 Dec 2025 09:58:16 -0500
+X-MC-Unique: vfhV7sM9Pqiqvj2-wog-DA-1
+X-Mimecast-MFC-AGG-ID: vfhV7sM9Pqiqvj2-wog-DA_1767020295
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6AFC1180035A;
+	Mon, 29 Dec 2025 14:58:15 +0000 (UTC)
+Received: from localhost.redhat.com (unknown [10.72.112.136])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 271D919560A7;
+	Mon, 29 Dec 2025 14:58:11 +0000 (UTC)
+From: Xiao Liang <xiliang@redhat.com>
+To: shayagr@amazon.com,
+	akiyano@amazon.com,
+	darinzon@amazon.com,
+	saeedb@amazon.com,
+	netdev@vger.kernel.org
+Cc: xiliang@redhat.com
+Subject: [PATCH] net/ena: fix missing lock when update devlink params
+Date: Mon, 29 Dec 2025 22:57:08 +0800
+Message-ID: <20251229145708.16603-1-xiliang@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA3PR11MB8021:EE_|IA1PR11MB8802:EE_
-X-MS-Office365-Filtering-Correlation-Id: 12b41939-aa34-473d-c2fd-08de46ea10ca
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?VFA5KzB4KzBDNjEyVDZrNTlmR2htdFJGY3RCQm5hWDN2RW1MbGU0UmM2ejNH?=
- =?utf-8?B?ZlNZWlg0V3BMUzZoSkY4VmpDSjlQVCtQTnFSem9YVmxvMjRIN2JPV3RqSHNv?=
- =?utf-8?B?OTF0RnRPcmM4SmxyT3dsRzZRbXl6WG13L01mb0ZxTU82aUI0d3ltT3QyaWM2?=
- =?utf-8?B?ald1MXphbU16S2FIRDJ6elc0V1JiSEk0ZlhMZ0RGNjAzYW43cVI5YzVUbWMz?=
- =?utf-8?B?alQ5U3QrN1RuTDlWTEJNa0FlZVhDTjFZTmorb2w1Y0VpekZ5R2xnbVdZWTBi?=
- =?utf-8?B?QlY2amxpTUVDZlYzcjY3eUhVYXBnNE14c3Z4UUNzRWZoYUxkRjJvaE40WkVC?=
- =?utf-8?B?NVFKUDZvaTdYMDZTRE5kYmFKbjU5VXRQdHlQTHk4NFpwR3Byc1FkRC9Ua1NV?=
- =?utf-8?B?eDBneXdVNnZJdk16OUhtOWJxTlI1cEJYN1FXZVZXemxmWWFwbit0b2dQaUV2?=
- =?utf-8?B?M0F5UmNRUVp4ODJZZ0hrc3ZpMWhvOWJmSm5zc1JkaDNhNmdzS0Nia0Qxd0Rw?=
- =?utf-8?B?MjhCL0N5MUZWOHZ5RDZIdS80bjVjQmd5eVZqM01iTFJBbzkrMGE0TlBSYUM0?=
- =?utf-8?B?WjdzUld1T0VWUGxrenI3a2pNWE44azRudEwza3psb1B2Qmhwdy9nd1E5Q2dY?=
- =?utf-8?B?a2swS3JvQ1Bldm9WUnJCUDBTN0RsWjhFeTJ1SVFNQkd1V1djMCtQeVFEek1n?=
- =?utf-8?B?Y0FnTzY2blpRWGdCYlNZaXlscDBHaVJwVzJFeDhDaTBBZkxqSi8xdUc5amtt?=
- =?utf-8?B?ck1GQWJ2dHVNSnRJakZ1K29XVkJpTjJ4eXkvSmk0RHM5dU5WUVcxTzNENUV6?=
- =?utf-8?B?QTVEV3U3aER0bFpnTmpXd3JZc2V4aHFWN0Fib3dxS282alFKc1V6ZWlIK2xO?=
- =?utf-8?B?N29iV1VVYkdqV050bG53ci9xN0NSVVN1ekhwVTFEWjVvWjF3YkNMQ0F0cDZS?=
- =?utf-8?B?Qm5WamQvZSsrejFUVGVpbDlsR2MwMm1pWXVDMlNVeEU0Y3prTzNma1ZPMFZh?=
- =?utf-8?B?VG9uUHBja0JEQWxXbjVwSmhVOVBWdHB5bDhoaEZwQXhSclIyUFFLeGJzVEJo?=
- =?utf-8?B?NFJZY3FjZ3ZBaXVIQ3BRRjJmRENSTEVVWWFlODZ2M3NISVV6QjVvRnhhNDV3?=
- =?utf-8?B?VE1qY1BFK0hPYjZydVVQZElmSDUwa1FWblVLQ1Q4bDdyNks2K0cxRi8vS2Fu?=
- =?utf-8?B?bEIzczFZbnNPcmFsTm4rSmtQVFNpZk90blc3OUFDbmdHblYzaHZhclZqVFZW?=
- =?utf-8?B?ZEtZeHpCckIxNktRNUhkcUFXejNMaSsxWGdBZ1NNTVlUd1VUZ0RLRkVZMVRq?=
- =?utf-8?B?Vkc0aDlsbFFxN2drT1BJQkZ0cDFNUTZCRC9oUEdYOGd1WWJjRzZlcHhLSWNx?=
- =?utf-8?B?WitGVDd1dHluSitaMnkyMzJoWFJBRnF0WFBBdFdUaFk0MVFOVUVxem40Y1Q1?=
- =?utf-8?B?cFNZcjNJc0cyVFQ1WnZpMWRhWkt1V081c2dVOHh4aU41TUNDdy9mckd3eGdi?=
- =?utf-8?B?cnZQQW1KZUxWODFzWnVGQVBRNXZwSlpXbjN1L1FWOWIyczE1T0FsaXFrbEdh?=
- =?utf-8?B?T2RsZHRWbUsvNFU1bVdkR2lBTERtNHIyRW9rQlNsQ1hVNDBxMFo3MTJwTGxy?=
- =?utf-8?B?cFpBRnlyK1lUb3d2QlZRL0hBalRuZVZrQWY0VlBEMlNUTXJRVzMvd2tZckxP?=
- =?utf-8?B?ZmIvU2toOG5pVUQwWTZ6eFBzQTg3b0xhaXh0VzlHL3M3WlQrMTBvcVdrWGVV?=
- =?utf-8?B?M09PRGpYZHhIMy9CNmt3QWFDL0FqMHlIQlpQVlBlNG0rSFJxQldqaFY3UUI3?=
- =?utf-8?B?dzBnSGlMMmtYT1F0ZWNNR0U0c0R4UkpLRklkQUNNOVBkZjlST1JtTGVEaXFr?=
- =?utf-8?B?OTRTQlR4TVQ3U01POWpyZWdjRmxpbDRjem1FSFJObGY5SldQdVJpQTN4cnJF?=
- =?utf-8?B?R3FNdTYvOTFjMDhXT3l4eFBaaEk0d2x4czRkdFVQRk4ybk44b3pwWFZhUE5E?=
- =?utf-8?B?aUlOUmZKTlh3PT0=?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR11MB8021.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bkVtNHJIeFoxMHBicERnWFoweTR2TC91SmRuUkRHVUNsOEJwRjlmOTJuM2pm?=
- =?utf-8?B?NXZLY2NnQnc5U29NQURLS293RE9mdG1zZzRXbERVUGFUU3JLSlZNN1hsMWtJ?=
- =?utf-8?B?MkI5T1A0YjlNWG9kOElXUUlobFFaUmRKK0dqWlhNanNpei9iTnJ5Tm8wTE5w?=
- =?utf-8?B?aGh4NGY5L3EzU1BXZUlNYkNRc3Z6aCtvMWs0YzZ1YTdEVG4ycCtodEl5VU9V?=
- =?utf-8?B?TTRSaXFXaEcwakExd2puQjZ3amdWRnlYeDVQV2NQcHJtSTk4NE1FTWdmUUtk?=
- =?utf-8?B?Z1VYY0hYcHQ5MUFCb01IV0xQRGQyVXRyOTRzcWZhTzNjS1JsT0ZaRDYzU2Fj?=
- =?utf-8?B?V0syMGVNeGxUd210OVRrbDJILzMwdlFMRG5GQUIybW1RVEZPclFLS1RveGpD?=
- =?utf-8?B?eEc2Nk91OG4xNjRtRU1IYWtON0pad2hobGowWHI4cEh4QUhoVUZsdTl2T2xG?=
- =?utf-8?B?UXBub09rOWxmWWVremwvR0liWW1Jb1RGOHFYWCtET1RWVkwzcEJhSGRQUUFJ?=
- =?utf-8?B?aWVZdVQ4OTJsV0EweWF5MGhsRmlVbzloZGdnUWxUS2M4bTJPM0lybHNmK2Rv?=
- =?utf-8?B?MVAyRWRvVmczd2ZXRTJIWGlWSDhVZGRrNjEvaVBWNk16M3IyYncxU3hEU2p0?=
- =?utf-8?B?S0Qza2FzTWR0SjU5dUVZTWdVekN3SnRsSGh4akdDVktKM3JnZ01DWGxlQmZz?=
- =?utf-8?B?NklWVHpzNU9WTmpCL0RuMUNvSmlpSXVJUllMdFBBZ0xKdzl3WUM1R3J0RnB2?=
- =?utf-8?B?Z2hpTVVwY01XRVZQSkE5cjd4dktDTGxwanBNR1lsclpJaER5L3JQTFlSZUFF?=
- =?utf-8?B?dytzTDZ5eW5tVGdGa2h0cUNMUzl3SnlpbVd2K282VjFPdXA1NDdlRUMvWGdK?=
- =?utf-8?B?QlVMQkhqcmgzUU1LNWthSDgwZFpUa2xIWXRKUzZBUTh3L0xpYllJMmJuWUV2?=
- =?utf-8?B?OWtHSnZHVExXUWVuRGtQMkFxTENBeDFRVXJPWWVqL3BCU0xIQVlPa1Bndjhh?=
- =?utf-8?B?eEgyOUV2LzVhd25Oa0laM01icGxkMTllNTFmV1VnelkvdHBrMUhsWjZXSUNn?=
- =?utf-8?B?TkZrYS9aNkRYSFV2L3FhVGxoZk5ZTHhjeVplM0M0b2pGYjEwTzFxVGZHNmJU?=
- =?utf-8?B?VEhLU3NzQm9PWFJTcEMwWlNMYjdNQVRhM2VxS2YxbmxXNTk5WXZMbG5BdHNv?=
- =?utf-8?B?Zy9jMWpOSFJ2amZ1VkJtY1d0cThZM1FYTXZYdXllS1ZQVmQ2YTZNVzlJTFBL?=
- =?utf-8?B?QmpDRXdtQVQ4bXV0KzJteGFHVUNrWEZyQXMyTk96QmZ5Rk5tSjBHY1lCeml6?=
- =?utf-8?B?UjNuRWdYWUN5R1htbngxK0lacEV1cUlpalAyd2t4NlRLSzcwOUo2b0xHSUsw?=
- =?utf-8?B?c3dzT2VvaW1pZHVXWXdFdGJGTXRHb045bDBGV2R1MUN5UFdObEtYUTRCT2NZ?=
- =?utf-8?B?ZVJGNzU3YWViSXpnNkV6Zm4xanRVQmxGdDNpNXhOTVBkRFplLzJFcjN4N1Er?=
- =?utf-8?B?NEZ5cytTUnZ2dm43aUpPMHR3MVYxMWl4ZVJrNXo3dUE1bFlyOGE3ZytsM1h5?=
- =?utf-8?B?SUI3bzgwUU5wbkYyQkd1ejZBbjY3Mm5VRm5BWHo2TXQzMTFDQk5MYUJCbldD?=
- =?utf-8?B?MVBZOXFuL0NQT1NTL3pBREhBZ0pacG1tS25mVXlCN3l3aW9GcVBWMTB4WUc2?=
- =?utf-8?B?TnBlajJDL3plQTllc2lFMjdDSk5DaDRmeXNVU1NVQWpaaFlJY3VXMFhRd1Zp?=
- =?utf-8?B?V1lBRGFVUUlGbEQ0aVJnTzNpM1pxSE9kTGJxbXV0bjM5VWpLQnJrd2kxZ25Y?=
- =?utf-8?B?SWo3djUyczRROWRCU0lxZ1Npem5ENkh4L2NXaGhsS3FzbVZoVHlKekZrL3Bu?=
- =?utf-8?B?NXQzeDg3ZUJFYklVSVAvZ3gyejFpQUMvcXMwOFN4K2trNlFRQ004dUJobG03?=
- =?utf-8?B?UVlHSWNJQk50Y1lQd3lXMTBNcGF5bWlCTGtFWW81MEtXaFBYMzZFUitva0lK?=
- =?utf-8?B?YXYvM0VWZm1CQ2FlaHlkMldWbk5mYmdqdjhDcFJ3dHlISXJON25yK2JIeUk1?=
- =?utf-8?B?M042dENkbkxoSlc3SnEwRW1MMXFIN1prVkFtZEJYZ0lUZG1XWnNaVytNMld1?=
- =?utf-8?B?THl4dGhybXJpbWNrbzVpNllheEw4NWZIU1crWnR2QjI3VEI5dDVISStCNUVx?=
- =?utf-8?B?UDJORmxHeGgwaytXTHV5MTF3ZnBGRXNab25ENlFoa1BsenhtNXNUeDJFMktJ?=
- =?utf-8?B?dmx5ODhFaVdObWk0Q0g2cS9iQW1YeGhZT1d2QU12R1dIY2trVWtGUFZlczFm?=
- =?utf-8?B?MURtU0U2SmNEYU11TnNpbk1Cck55blpkTFRIVlBaY0IvYlg4c3h5NTh4dW9p?=
- =?utf-8?Q?RV4IbC0pcfDcfitI=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 12b41939-aa34-473d-c2fd-08de46ea10ca
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR11MB8021.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Dec 2025 14:53:45.4237
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YFs5gmKJr89Ljjp2CzfMwIVP2iOduutNETiAUT10T+CqkXkurLaZ+jbueI/0IqYg5GN6frzPudR68RznVY55LKJfncGqdd4FrcdH5Y5qh3g=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB8802
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
+From: Frank Liang <xiliang@redhat.com>
 
+Fix assert lock warning while calling devl_param_driverinit_value_set()
+in ena.
 
-On 04/12/2025 14:21, Chwee-Lin Choong wrote:
-> The previous 7 KB per queue caused TX unit hangs under heavy
-> timestamping load. Reducing to 5 KB avoids these hangs and matches
-> the TSN recommendation in I225/I226 SW User Manual Section 7.5.4.
-> 
-> The 8 KB “freed” by this change is currently unused. This reduction
-> is not expected to impact throughput, as the i226 is PCIe-limited
-> for small TSN packets rather than TX-buffer-limited.
-> 
-> Fixes: 0d58cdc902da ("igc: optimize TX packet buffer utilization for TSN mode")
-> Reported-by: Zdenek Bouska <zdenek.bouska@siemens.com>
-> Closes: https://lore.kernel.org/netdev/AS1PR10MB5675DBFE7CE5F2A9336ABFA4EBEAA@AS1PR10MB5675.EURPRD10.PROD.OUTLOOK.COM/
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Signed-off-by: Chwee-Lin Choong <chwee.lin.choong@intel.com>
-> ---
-> v1: https://patchwork.ozlabs.org/project/intel-wired-lan/patch/20250918183811.31270-1-chwee.lin.choong@intel.com/
-> 
-> changelog:
-> v1 -> v2
-> - Elaborated commit message
-> ---
->   drivers/net/ethernet/intel/igc/igc_defines.h | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
-> 
+WARNING: net/devlink/core.c:261 at devl_assert_locked+0x62/0x90, CPU#0: kworker/0:0/9
+CPU: 0 UID: 0 PID: 9 Comm: kworker/0:0 Not tainted 6.19.0-rc2+ #1 PREEMPT(lazy)
+Hardware name: Amazon EC2 m8i-flex.4xlarge/, BIOS 1.0 10/16/2017
+Workqueue: events work_for_cpu_fn
+RIP: 0010:devl_assert_locked+0x62/0x90
 
-Tested-by: Avigail Dahan <avigailx.dahan@intel.com>
+Call Trace:
+ <TASK>
+ devl_param_driverinit_value_set+0x15/0x1c0
+ ena_devlink_alloc+0x18c/0x220 [ena]
+ ? __pfx_ena_devlink_alloc+0x10/0x10 [ena]
+ ? trace_hardirqs_on+0x18/0x140
+ ? lockdep_hardirqs_on+0x8c/0x130
+ ? __raw_spin_unlock_irqrestore+0x5d/0x80
+ ? __raw_spin_unlock_irqrestore+0x46/0x80
+ ? devm_ioremap_wc+0x9a/0xd0
+ ena_probe+0x4d2/0x1b20 [ena]
+ ? __lock_acquire+0x56a/0xbd0
+ ? __pfx_ena_probe+0x10/0x10 [ena]
+ ? local_clock+0x15/0x30
+ ? __lock_release.isra.0+0x1c9/0x340
+ ? mark_held_locks+0x40/0x70
+ ? lockdep_hardirqs_on_prepare.part.0+0x92/0x170
+ ? trace_hardirqs_on+0x18/0x140
+ ? lockdep_hardirqs_on+0x8c/0x130
+ ? __raw_spin_unlock_irqrestore+0x5d/0x80
+ ? __raw_spin_unlock_irqrestore+0x46/0x80
+ ? __pfx_ena_probe+0x10/0x10 [ena]
+ ......
+ </TASK>
+
+Signed-off-by: Frank Liang <xiliang@redhat.com>
+---
+ drivers/net/ethernet/amazon/ena/ena_devlink.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/net/ethernet/amazon/ena/ena_devlink.c b/drivers/net/ethernet/amazon/ena/ena_devlink.c
+index ac81c24016dd..b1eed4b3b39e 100644
+--- a/drivers/net/ethernet/amazon/ena/ena_devlink.c
++++ b/drivers/net/ethernet/amazon/ena/ena_devlink.c
+@@ -53,10 +53,12 @@ void ena_devlink_disable_phc_param(struct devlink *devlink)
+ {
+ 	union devlink_param_value value;
+ 
++	devl_lock(devlink);
+ 	value.vbool = false;
+ 	devl_param_driverinit_value_set(devlink,
+ 					DEVLINK_PARAM_GENERIC_ID_ENABLE_PHC,
+ 					value);
++	devl_unlock(devlink);
+ }
+ 
+ static void ena_devlink_port_register(struct devlink *devlink)
+@@ -144,11 +146,13 @@ static int ena_devlink_configure_params(struct devlink *devlink)
+ 		netdev_err(adapter->netdev, "Failed to register devlink params\n");
+ 		return rc;
+ 	}
++	devl_lock(devlink);
+ 
+ 	value.vbool = ena_phc_is_enabled(adapter);
+ 	devl_param_driverinit_value_set(devlink,
+ 					DEVLINK_PARAM_GENERIC_ID_ENABLE_PHC,
+ 					value);
++	devl_unlock(devlink);
+ 
+ 	return 0;
+ }
+-- 
+2.52.0
+
 
