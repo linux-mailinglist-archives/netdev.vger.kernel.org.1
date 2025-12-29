@@ -1,148 +1,182 @@
-Return-Path: <netdev+bounces-246285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C04D0CE8175
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 20:56:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 675C9CE817E
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 20:58:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8B78930124C4
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 19:56:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1A2D13014A04
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 19:58:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6577E23E334;
-	Mon, 29 Dec 2025 19:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A29BB25B662;
+	Mon, 29 Dec 2025 19:58:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="v8EKlzNm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZYThaZjB"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.st.icloud.com (p-east2-cluster4-host9-snip4-10.eps.apple.com [57.103.78.221])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A955B23ABBF
-	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 19:56:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.78.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2993023A984
+	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 19:58:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767038185; cv=none; b=pj2otNnquewCnoFSsBknjcZm4gsUd/9oB6DmZBtUIp8NLeKI0tLg2PkUlY8ifhKG3chouOS3Rr3iBsy1oV7TcIvfpdY56HNpFWNOLztyjtzL3HUSGvv7E23pU09WORCDxe0CJ1y56ykAMgbJulPSzm53GQgcN+icyu5J5awXDXo=
+	t=1767038289; cv=none; b=Za8JlNf39Dlg684RQNAp30n0hlqflQiS5HsfiMo6ijjlPnXGJpnT0YzPWwiNJlHghhVcNzv/C95WL2NzpEAEg35mRYGAkASNO+avuabJZ4leP3Sv5DKPmOS4Zfwf0Nf9HopUvKnRz34HHLbx25dPKpCKGKx5hYMuvdE/eCQICjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767038185; c=relaxed/simple;
-	bh=1urNez9iDIld6OAxncsepPTunpYtCzTt7d7WWb2c4HQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cOHJ4/p7GcnzRHLXhDFoGH28LXOL0jRgWXWNZJO5i+QGbFWMBoUhkewFkvhgPs8U+ae294J0fphyCaIVRJBFkFv54IUPfjytheVmaWHbjzNAQ6TBScteIAOWMJV5qU9n4sINAaX+iqsViT9J53PakPlV5siokNsYmM57siLN9mM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=v8EKlzNm reason="key not found in DNS"; arc=none smtp.client-ip=57.103.78.221
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=y-koj.net
-Received: from outbound.st.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-east-1a-100-percent-6 (Postfix) with ESMTPS id 75C2E18007C5;
-	Mon, 29 Dec 2025 19:56:21 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; bh=1KbO+RoiTJgCNtLW0OzrhM8WEo6RLQNavBQZsLzI+Ok=; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=v8EKlzNmEKFd+689+slNHuA04jyH1G4JbyaaPu4qGK/G7aEXZOH8OuzT6gQ/5+gwPkzo+unwG8jr9VnGGMLlEUrO8IgAYwNXPraV5dQHqLbKHAhH20Op56jcse4OvElQNrezczQn9AGKgOWvDF5Vw2sbIXe/yVbsWbYpAd7p3wQuhHdUQ3olalXH2sMHoEgdtCSFbn8blJ+EdFV2OT+mJU8SZzXthHSNRgd9/bdToZgfatu/t2T+ym7MSAH+u3rJQxF55bOwFxmDhnTKdoVDYBZW/YBeKoPn1U1Hi2/V7/Kru1A0MJX38hNZrrdO419jq15qx4Qwn3VHMLc7fzUAEQ==
-mail-alias-created-date: 1719758601013
-Received: from y-koj.net (unknown [17.42.251.67])
-	by p00-icloudmta-asmtp-us-east-1a-100-percent-6 (Postfix) with ESMTPSA id 144AB18002F4;
-	Mon, 29 Dec 2025 19:56:18 +0000 (UTC)
-Date: Tue, 30 Dec 2025 04:56:16 +0900
-From: Yohei Kojima <yk@y-koj.net>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Breno Leitao <leitao@debian.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 1/5] net: netdevsim: fix inconsistent carrier state
- after link/unlink
-Message-ID: <aVLc4J8SQYLPWdZZ@y-koj.net>
-References: <cover.1767032397.git.yk@y-koj.net>
- <ff1139d3236ab7fec2b2b3a2e22510dcd7b01a21.1767032397.git.yk@y-koj.net>
- <e8180dc5-fc23-4044-bd67-92fc3eebdaa0@lunn.ch>
+	s=arc-20240116; t=1767038289; c=relaxed/simple;
+	bh=ILOnzjB6omPzsTjFaR5p7kIAmLgY60kDToG8kB6uAvw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=dwWK/EbM2zo1gcpaTyth5PCPS2k5aSN5/NqgMwWCgfWBlFeG8ikHhpcJevCfogbO+rdX/DWFCLbBZg/IlsvAWNmy3l5RsGxD+wnvgqHpdGAmTfh5/8DBZghXE8JICg6EFUBX6wlonnGS95yjredbJQcKVqzeGFcS9M/W2r7JqQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZYThaZjB; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-803474aaa8bso3236519b3a.0
+        for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 11:58:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767038286; x=1767643086; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Xko4XQ8K4/4/p+5qf10V0z8LE3R9sFv1la/WwKpKg8w=;
+        b=ZYThaZjBxgHPLg/ru2oZZkkkGV9I+IQ40v7BeSRjUsjFg8NWfReiJwLQlrKmnUqHLA
+         rvkVXYMB6uxFjEseJU4LblqV3xz3tL12y51GumsjIc6cyS6zleoKH96pr/Tu3MCKuh6z
+         1dkPwxdpY+D6+VQ7nF03YfwSISSL9p0H/3y7TtvjKIMmnjgr5ZS7B38Ulg/fPpmOCF/C
+         mzs007TEjxUXjZWR40SZsreLbn7Jhf2pb0ZW/kFXs1QmTYbCo3paFgYLhanP+ceAWCdo
+         Ud7A7P4dtNPgw8WyCtxZZmpBMyv54oRfhGuAZ+FKsKVJkhdrbHIGLMTgVMUxRxwk+/qG
+         7PcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767038286; x=1767643086;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xko4XQ8K4/4/p+5qf10V0z8LE3R9sFv1la/WwKpKg8w=;
+        b=wdz7uhjfsJ5wrwD1eO7YvJs26ACZWt/EQvPexlD0NeEkX0OoPx5PzZe4qbwntsKfJT
+         i9Kg1Ok0pc/5zWFbILl1B2U8NZSOHdJWprfHkvXLqzJKSPZz0PfjibPkTxZsBQYOa5D1
+         KwsbTFyvOfPK7k0U/8McZtvGMEsMXIjXUrHtF+oKggEHTZHSAmPbp/P+x1WqGh0HR0sM
+         57AzKDoOoQ7z5CiHNmJpCeSzUmQNjqXUd6D0pKwl+b/CBqiVR2Bk1w61F7+KkyX2M8hy
+         6q9QVlBvaTTY+dZ/In/++yFuDAZwfICnfDCiYGxeIKDtCWh76e1dNRH8lBQSpTHWDIjy
+         +jbg==
+X-Forwarded-Encrypted: i=1; AJvYcCVRpTImV/0nvzPvj+arAuz8TJy4rgma4N+8jT+3uAyKNY2wp1NJVXWcqJNIDFX2VApr5Skm3GI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVPTvkzLJHXoKMikEIrMEpKvC7qQqCZ8agh4mGID3DVx7wbYTQ
+	L/U0+hC0Tp2nTdhnRfwl7/Qeh9rkslsID+D+WbPX+CC3WsbC+5MqzlWh
+X-Gm-Gg: AY/fxX6iWYw6TDo/e+jfM2qLPpK5l/mvvPM77XFj9or1JkvqdaTVv8XRl/tJ1ZI28ba
+	oFunmhX4MWts36nnbxpQLqkFSjXTBcawLWS7oex+RR2IK99l88AkqmPLgnasOgU+o6/VsXXbyTw
+	CAplTJr6DjDnngTmkzVlRfWiPPgNwwIuLy+01UO8VuKkQyJrBgmJTDzx8omH0SGyC7OmvKzDu9C
+	soKvibkhLswNvSEzEdTRYZFCDXDnoBdP/zOuHvxTpRKLQKMxOaUnNwUDPqEeOZbIhBhOPlPtRMO
+	IW6Syar/QN8bSTI61+Y4wTmnZ0zAh+owCKZ7/873Gw9SzmybmjqWsXMZeaNBERJYWM4BmusP5on
+	A61qKLn3dc1FHLjlEJJSnooOQ9FwuRS8zqm2yrZiYHZmJnoaGu3Hk+VtZDVX8H8gbm2jtgC83wY
+	7fVOmzfuLiK8j8qOtiEk4npGCtj4zaautV8X1rbY6Q9fXetoY=
+X-Google-Smtp-Source: AGHT+IFClYfhXcvzYGUEAeGNRFFMkUwqOYUjfX2LyOlUE6PEoi9FZ13hia7PJghTWywP+YG21UqZAQ==
+X-Received: by 2002:a05:6a20:7f81:b0:366:14b0:4b1c with SMTP id adf61e73a8af0-3769ff1c33fmr28383151637.39.1767038286311;
+        Mon, 29 Dec 2025 11:58:06 -0800 (PST)
+Received: from ?IPv6:2a03:83e0:115c:1:ac6b:d5ad:83fe:6cca? ([2620:10d:c090:500::2:1bc9])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7dfac28fsm30215140b3a.32.2025.12.29.11.58.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Dec 2025 11:58:06 -0800 (PST)
+Message-ID: <0f0bd124a42723acf87b427cc69356a0e4b1e339.camel@gmail.com>
+Subject: Re: [PATCH bpf-next] bpf, x86: inline bpf_get_current_task() for
+ x86_64
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Menglong Dong <menglong8.dong@gmail.com>, ast@kernel.org
+Cc: davem@davemloft.net, dsahern@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+ yonghong.song@linux.dev, 	john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, 	jolsa@kernel.org, tglx@linutronix.de,
+ mingo@redhat.com, bp@alien8.de, 	dave.hansen@linux.intel.com,
+ jiang.biao@linux.dev, x86@kernel.org, hpa@zytor.com, 
+	netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Mon, 29 Dec 2025 11:58:03 -0800
+In-Reply-To: <20251225104459.204104-1-dongml2@chinatelecom.cn>
+References: <20251225104459.204104-1-dongml2@chinatelecom.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e8180dc5-fc23-4044-bd67-92fc3eebdaa0@lunn.ch>
-X-Proofpoint-ORIG-GUID: -Mzj7FTA82WPivV3uBl2NzpCwTPUY4fm
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjI5MDE4MiBTYWx0ZWRfX/y0Xi/+2E4O2
- otl/0zwfS+PDDLzi7OEYgMuV2UdvP6dBOuBebcV57qySoS0lfMQ0iqW7OtXLn0bw03tg0DPIZAj
- DAX+WQRMjABjfBoprQPNQMIXuTJwDs/1opAlenVWn9bnXwgJQq9DaNztFFKFjRqg3DAPh91xLlC
- LNqsLvh8S75T9ohsdWU2Dg88GcswRixeHlplCVeW/geZ8m61W6k6bfR68IngIYMyOQZAA6+Qd7Y
- QuLZVQWBMjj2W27VUzVigUTCsoczJHmByDvz0i2f1LfsdEGdd83ll0xUS50VlMIE1guoXu2Zp02
- sfZNFMqAJrYHPBo4O2s
-X-Authority-Info: v=2.4 cv=DJ+CIiNb c=1 sm=1 tr=0 ts=6952dce6 cx=c_apl:c_pps
- a=YrL12D//S6tul8v/L+6tKg==:117 a=YrL12D//S6tul8v/L+6tKg==:17
- a=kj9zAlcOel0A:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=jnl5ZKOAAAAA:8 a=7gZhQl7Q0LLefV5nMKsA:9 a=CjuIK1q_8ugA:10
- a=RNrZ5ZR47oNZP8zBN2PD:22
-X-Proofpoint-GUID: -Mzj7FTA82WPivV3uBl2NzpCwTPUY4fm
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-29_06,2025-12-29_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
- mlxlogscore=487 phishscore=0 spamscore=0 suspectscore=0 clxscore=1030
- bulkscore=0 adultscore=0 mlxscore=0 classifier=spam authscore=0 adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512290182
-X-JNJ: AAAAAAAB48aOiXs0D6hG/j+Fcz1meNmtg8UIqtpwpZoGprHUUzBNav3vyyo3KrJIyCLYpvPQt7odfvDa/kodSzjrL5XzECI5gMM0t5CIukXNCUQNN7dLkKxZhWRwLqesz6WUNfBFLzyQcRN4Vc1yFZKknBlf2NiHQPP7u0ZZQHz5ZRInHBBDtmFk/Dw0fgFvyvmX91Ru5xNV/hxJc0FxWwzMkQRn1dg9AU///IG8hdr7N3qDgXqy69l7VCS/vmvsXLIvwQ2j1p5ssgsZ/Lym3ooDGwib2pKTvfwcTP96C8Hou9awFXt5KbXYCtkDAPSN1evlI6JAvK1uhcSDx/Gt6ftHUoG3sXrukYgvcofaDwr2sRG9SusHDJRQhEq2SKOV4/iYnOMxWxAHzJj2uJBPMRd1QvaztDENTbugZ85bweZaKa+o9TUx6B6T9CsSbvc83qJ6BkBc2Q19UspdvOk4+eu5L+/MvHyaMCx++njqGENYNYieA83YBEPM3DxaXLELw/jcc2bbt/BIQ4KNrp48MLC6rQD6JnnICMfqYNaDJbPl1JTiraAkNS2AfK3P3NDnYrMAbKydwWdGfY4qjIOhj3E45meLKcr+7QwHQT7huOGhx/6J9n13IdY7cUiurPCDAPj+ArsXy2JKNCXZSG61b/L7//H3dt2RB1M191pdOq0wPsRbtmbx02GNtsr3IDzPJi646Lw=
 
-On Mon, Dec 29, 2025 at 07:39:29PM +0100, Andrew Lunn wrote:
-> On Tue, Dec 30, 2025 at 03:32:34AM +0900, yk@y-koj.net wrote:
-> > From: Yohei Kojima <yk@y-koj.net>
-> > 
-> > This patch fixes the edge case behavior on ifup/ifdown and
-> > linking/unlinking two netdevsim interfaces:
-> > 
-> > 1. unlink two interfaces netdevsim1 and netdevsim2
-> > 2. ifdown netdevsim1
-> > 3. ifup netdevsim1
-> > 4. link two interfaces netdevsim1 and netdevsim2
-> > 5. (Now two interfaces are linked in terms of netdevsim peer, but
-> >     carrier state of the two interfaces remains DOWN.)
-> > 
-> > This inconsistent behavior is caused by the current implementation,
-> > which only cares about the "link, then ifup" order, not "ifup, then
-> > link" order. This patch fixes the inconsistency by calling
-> > netif_carrier_on() when two netdevsim interfaces are linked.
-> > 
-> > This patch solves buggy behavior on NetworkManager-based systems which
-> > causes the netdevsim test to fail with the following error:
-> > 
-> >   # timeout set to 600
-> >   # selftests: drivers/net/netdevsim: peer.sh
-> >   # 2025/12/25 00:54:03 socat[9115] W address is opened in read-write mode but only supports read-only
-> >   # 2025/12/25 00:56:17 socat[9115] W connect(7, AF=2 192.168.1.1:1234, 16): Connection timed out
-> >   # 2025/12/25 00:56:17 socat[9115] E TCP:192.168.1.1:1234: Connection timed out
-> >   # expected 3 bytes, got 0
-> >   # 2025/12/25 00:56:17 socat[9109] W exiting on signal 15
-> >   not ok 13 selftests: drivers/net/netdevsim: peer.sh # exit=1
-> > 
-> > This patch also fixes timeout on TCP Fast Open (TFO) test because the
-> > test also depends on netdevsim.
-> > 
-> > Fixes: 1a8fed52f7be ("netdevsim: set the carrier when the device goes up")
-> 
-> Stable rules say:
-> 
->    It must either fix a real bug that bothers people or just add a device ID.
+On Thu, 2025-12-25 at 18:44 +0800, Menglong Dong wrote:
+> Inline bpf_get_current_task() and bpf_get_current_task_btf() for x86_64
+> to obtain better performance. The instruction we use here is:
+>=20
+>   65 48 8B 04 25 [offset] // mov rax, gs:[offset]
+>=20
+> Not sure if there is any side effect here.
+>=20
+> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> ---
 
-Thank you for the quick reply. I don't intend for this patch to be
-backported to the stable tree. My understanding was that bugfix patches
-to the net tree should have Fixes: tag for historical tracking.
+The change makes sense to me.
+Could you please address the compilation error reported by kernel test robo=
+t?
+Could you please also add a tests case using __jited annotation like
+in verifier_ldsx.c?
 
-> 
-> netdevsim is not a real device. Do its bugs actually bother people?
+>  arch/x86/net/bpf_jit_comp.c | 33 +++++++++++++++++++++++++++++++++
+>  1 file changed, 33 insertions(+)
+>=20
+> diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+> index b69dc7194e2c..7f38481816f0 100644
+> --- a/arch/x86/net/bpf_jit_comp.c
+> +++ b/arch/x86/net/bpf_jit_comp.c
+> @@ -1300,6 +1300,19 @@ static void emit_st_r12(u8 **pprog, u32 size, u32 =
+dst_reg, int off, int imm)
+>  	emit_st_index(pprog, size, dst_reg, X86_REG_R12, off, imm);
+>  }
+> =20
+> +static void emit_ldx_percpu_r0(u8 **pprog, const void __percpu *ptr)
+> +{
+> +	u8 *prog =3D *pprog;
+> +
+> +	/* mov rax, gs:[offset] */
+> +	EMIT2(0x65, 0x48);
+> +	EMIT2(0x8B, 0x04);
+> +	EMIT1(0x25);
+> +	EMIT((u32)(unsigned long)ptr, 4);
+> +
+> +	*pprog =3D prog;
+> +}
+> +
+>  static int emit_atomic_rmw(u8 **pprog, u32 atomic_op,
+>  			   u32 dst_reg, u32 src_reg, s16 off, u8 bpf_size)
+>  {
+> @@ -2435,6 +2448,15 @@ st:			if (is_imm8(insn->off))
+>  		case BPF_JMP | BPF_CALL: {
+>  			u8 *ip =3D image + addrs[i - 1];
+> =20
+> +			if (insn->src_reg =3D=3D 0 && (insn->imm =3D=3D BPF_FUNC_get_current_=
+task ||
+> +						   insn->imm =3D=3D BPF_FUNC_get_current_task_btf)) {
+> +				if (IS_ENABLED(CONFIG_USE_X86_SEG_SUPPORT))
+> +					emit_ldx_percpu_r0(&prog, &const_current_task);
+> +				else
+> +					emit_ldx_percpu_r0(&prog, &current_task);
 
-This patch fixes a real bug that is seen when a developer tries to test
-TFO or netdevsim tests on NetworkManager-enabled systems: it causes
-false positives in kselftests on such systems.
+Nit: arch/x86/include/asm/current.h says that current_task and const_curren=
+t_task are aliases.
+     In that case, why would we need two branches here?
 
-> Should this patch have a Fixes: tag?
-
-The patch 1a8fed52f7be ("netdevsim: set the carrier when the device goes
-up"), which does a similar change, has Fixes: tag. Since this patch fixes
-the corner-case behavior which was missed in the previous fix, this
-patch should have Fixes: tag for consistency.
-
-> 
->        Andrew
-
-Thank you,
-Yohei Kojima
+> +				break;
+> +			}
+> +
+>  			func =3D (u8 *) __bpf_call_base + imm32;
+>  			if (src_reg =3D=3D BPF_PSEUDO_CALL && tail_call_reachable) {
+>  				LOAD_TAIL_CALL_CNT_PTR(stack_depth);
+> @@ -4067,3 +4089,14 @@ bool bpf_jit_supports_timed_may_goto(void)
+>  {
+>  	return true;
+>  }
+> +
+> +bool bpf_jit_inlines_helper_call(s32 imm)
+> +{
+> +	switch (imm) {
+> +	case BPF_FUNC_get_current_task:
+> +	case BPF_FUNC_get_current_task_btf:
+> +		return true;
+> +	default:
+> +		return false;
+> +	}
+> +}
 
