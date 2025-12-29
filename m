@@ -1,100 +1,42 @@
-Return-Path: <netdev+bounces-246211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D3F3CE5E4E
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 04:54:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3804CE5E73
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 05:19:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EE758300CB94
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 03:54:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 147983004F73
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 04:19:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B162741DF;
-	Mon, 29 Dec 2025 03:54:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HCtlTqKH";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="jn0E/HQE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D532C2EA;
+	Mon, 29 Dec 2025 04:19:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD100251795
-	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 03:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D87FAD5A
+	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 04:18:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766980442; cv=none; b=l8Hup25DX1wYiXANyGO3NGmCIZORh7mHhdru7V/hSV3l4JR/txWcOmUG4lwoUDANarqtktxFs0kLKLcgU2em/yP9alKceiE76TagF581NUNsip79saSZFZ16O15APdk+RtR90sn5wNJvNxS2qwd9rSZSAnsldgNhtYLmLUruHFI=
+	t=1766981944; cv=none; b=hHy1i3jvNoOUnHSHi/k63jFU06kgnVdighAHiLpZ/AdHoa2GV0zL1dcX5quO1+3h50obeh9pwogKIxvU4QXrbDkPctWwTsFeKw6tqwcVv25Fq7eEzpmMXpeUCAWVZrhFVEZc8Rps2ofu3woZjIeTCcqTNFUqmJFg/luOrd6gLxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766980442; c=relaxed/simple;
-	bh=i/2pV3I6wfGKU/F6zki7C+oop7j6XFoO7cS1k967DAI=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Iw0LOmhH1PIAkE5dUt8fq2tRrKwHt9Kr5S4jvl9ozMkkdskuHQ+skrTrqZ1pwOAqsqyCfCXs1aeaYiHk9IXSGF2CNwpL1tSzZHMvyVUC5rUxK7vffZWOvtuDR0aPFPr8SBO3buyb6xOqFrrNn6+lir0cSGfb4pN5IC4LZrHJEak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HCtlTqKH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=jn0E/HQE; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766980438;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CS1U9kbXClTn3ClPyOJkBE6Q0JxlFOFOmyrM4XYp2Bs=;
-	b=HCtlTqKHCWpuLpTEmpjiR7Sq7HBpV063dko44Alv2Xt6LT9kOovD7L7yU1qGUbsHJNuXH4
-	N5VhrXivjxS9mco4QetyNkvbrnRRFIU5UWxx7pgrBaDgURUBskMCjEnDMitTkipPe9snun
-	Tq45oBVZ4j+0xFY3MA7mkGzHNYSQ/h0=
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
- [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-460-SCY6ccqhPSi4Bbsh_aLR0A-1; Sun, 28 Dec 2025 22:53:56 -0500
-X-MC-Unique: SCY6ccqhPSi4Bbsh_aLR0A-1
-X-Mimecast-MFC-AGG-ID: SCY6ccqhPSi4Bbsh_aLR0A_1766980435
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-b993eb2701bso9083020a12.0
-        for <netdev@vger.kernel.org>; Sun, 28 Dec 2025 19:53:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1766980435; x=1767585235; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CS1U9kbXClTn3ClPyOJkBE6Q0JxlFOFOmyrM4XYp2Bs=;
-        b=jn0E/HQEL51glzKt+wZtdjjFDVWwxAGNh3v9us6I5CG4JFyJNtHCQJ3i76bQ3KHYsv
-         Vf8S9deBnwXNPbq4E97AO7jxQW/P6gxnjM18vxqW5b/aHvRsdhnqXmmS3t28wgUu8YA5
-         2C/l3VBgsP1uxbgCToxgYKSFvfHQRBGtqRZgo9YoXuaMX8pwhdBzl2MJbC4rjt2lJBka
-         q9n4LZmIwcRgxoqzwA6xK79HL/jKpN4wdjPYHcTUfHTR/+qlYK9G4Sd3acpRdkOh1Pnm
-         YK4kD5PLD9Fm+55Mvmr74ECseG55VoY+8vA0sJ313X4AbpLVtM2zZy/BRumT54k5ghJA
-         kt9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766980435; x=1767585235;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CS1U9kbXClTn3ClPyOJkBE6Q0JxlFOFOmyrM4XYp2Bs=;
-        b=kKYI0TV8PqDBxeBOsb5EK4lIfrXVFs5rycxN7j5zLltas/Bq6s2fSbGO0JDomjeZWS
-         cw0dAH9aP7b3majmM0v/80N/ozl/7kMHDRU9Fr6I/MnAhGRuHeN+OTm4dYxOl52C2vm3
-         DGMpvlM1PL7EzVKKHCSgjxmc9pdHIbPis2fQsv7/onHGqCaf5x0CmsqJK+4xJzBw/Gc2
-         BGIS43CKGLXSeD7DjRjp7k+B6Ju+CD4XMbatlVn3bgtTuqP8WwNphujd0fj9CeX15Wuy
-         NW0SOZchokrlgtVgpD/bZAAn51WpOKEDMDIp68pW9KTmzRHndB2+uJHjv5g9vahB10P6
-         sOEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVjwArUqQE3c6pbGNogbRJiDBNk4sRfC7qkixq8mw0d6goSxJthC4auYIOpKO8L5lY7mQsmKq0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1v/KIRmzTy9Wezw8eFwuJ/c/07fYwXn4pHBA9XaFxLC+bxN0u
-	fgMZsor1eaqKX4QKgWlP+enbi6nxSC+0P2ZvlntKplmDyXCUxXRRK45sXOWuz4Pw/+tP3aDcfnr
-	ti4bckigGX1zybXBzdn8b13pKCAMA8/eWvxoN3oqAKc3MrDkEo6m7r6aN+Q==
-X-Gm-Gg: AY/fxX6UegelRWqArfaEWeTHkt8sJNQgVsXMf28sVEzsS/ky7cG0AsKym0IJtIq/tOe
-	ZmX80ZS8X2kl1gzHxsf/LF5sBzgtbTOdMph4Nx/N3wUQV0qJqc8Xg+45A2HJV5wlvf7IsIy+xEL
-	s0vDtenGIWq1MHm0qhFYxkbGOx2BbKaBYIW/gWsi6mMZdstp7lr79kPoI6NSUdaEdIZQlaE4Nbw
-	pb8sdwQfOCP6cT4NqAkEbVYkQ2EfLJPXnHQSuZP9DJzdrAB+pVGlrdR3LUPZO+2x0sJ/CqzpJpo
-	rS/IFY+o072/WYRs0zWJFxdWUXuqU0rKL39+wFOFIT6WxU/j3ZIbjNf2RZUE3OeKAwsxXxOcSbY
-	nVAoX7rjOeJaXYkBmX4O4f3Zo9CPFc8zimPSNqQHY5kPTn6KAA+HLLE23
-X-Received: by 2002:a05:7301:508a:b0:2af:7429:e53d with SMTP id 5a478bee46e88-2b05ebf88e5mr14193618eec.10.1766980435153;
-        Sun, 28 Dec 2025 19:53:55 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFwUgAvkgKwyfAg/XY7OmY8/35HtixZhtufU5RpA+DoSNpJWPgIxTe0gLEz02J7RhXsL5qbsA==
-X-Received: by 2002:a05:7301:508a:b0:2af:7429:e53d with SMTP id 5a478bee46e88-2b05ebf88e5mr14193600eec.10.1766980434676;
-        Sun, 28 Dec 2025 19:53:54 -0800 (PST)
-Received: from ?IPV6:2601:188:c102:b180:1f8b:71d0:77b1:1f6e? ([2601:188:c102:b180:1f8b:71d0:77b1:1f6e])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b05ff8634csm69342683eec.3.2025.12.28.19.53.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 28 Dec 2025 19:53:54 -0800 (PST)
-From: Waiman Long <llong@redhat.com>
-X-Google-Original-From: Waiman Long <longman@redhat.com>
-Message-ID: <81f201cc-395a-48d7-a1b0-db8c62b93c9e@redhat.com>
-Date: Sun, 28 Dec 2025 22:53:41 -0500
+	s=arc-20240116; t=1766981944; c=relaxed/simple;
+	bh=lkw/+atPxW7AA3kjcz7U+nXpWcQNiqLT7AOcnmnjzHc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dNME0QcAyvQ6jy/+OnYE4+gba+bG/24fCpYPwXzDSf3ir34rx0M9HeBJMb/JplOaLxiCPrsgLE3OnWt+2RMDNvxcaPAPhVjWdoEThK0ZXF5YRO00tmgDmiL7vjQkEpLBu8tBCi4lXBea70u7MrKGdhp4NNdNPk9VIpFP1MH+5Q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=radxa.com; spf=pass smtp.mailfrom=radxa.com; arc=none smtp.client-ip=54.204.34.129
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=radxa.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=radxa.com
+X-QQ-mid: zesmtpip4t1766981924t8f506d98
+X-QQ-Originating-IP: xw7EXW2ieoe1L2q2bgUK/SIDg20cC3Xa74+GoFuIlJI=
+Received: from [IPV6:240f:10b:7440:1:3961:bf03 ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 29 Dec 2025 12:18:42 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 5321299945096190126
+Message-ID: <4B0E7A890ED5AF50+57f079d1-0be3-4d27-8118-1216bef2076a@radxa.com>
+Date: Mon, 29 Dec 2025 13:18:42 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,165 +44,187 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/33] PCI: Prepare to protect against concurrent isolated
- cpuset change
-To: Zhang Qiao <zhangqiao22@huawei.com>,
- Frederic Weisbecker <frederic@kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Chen Ridong <chenridong@huawei.com>, Danilo Krummrich <dakr@kernel.org>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
- Lai Jiangshan <jiangshanlai@gmail.com>,
- Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
- <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
- Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
- Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Vlastimil Babka <vbabka@suse.cz>, Will Deacon <will@kernel.org>,
- cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-block@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20251224134520.33231-1-frederic@kernel.org>
- <20251224134520.33231-2-frederic@kernel.org>
- <e01189e1-d8ef-2791-632c-90d4d897859b@huawei.com>
+Subject: Re: [PATCH v2] r8169: add support for RTL8127ATF
+To: Heiner Kallweit <hkallweit1@gmail.com>,
+ Fabio Baltieri <fabio.baltieri@gmail.com>
+Cc: nic_swsd@realtek.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Michael Zimmermann <sigmaepsilon92@gmail.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20251120195055.3127-1-fabio.baltieri@gmail.com>
+ <f263daf0-70c2-46c2-af25-653ff3179cb0@gmail.com>
+ <aSDLYiBftMR9ArUI@google.com>
+ <b012587a-2c38-4597-9af9-3ba723ba6cba@gmail.com>
+ <aSNVVoAOQHbleZFF@google.com>
+ <0cacca03-6302-4e39-a807-06591bf787b1@gmail.com>
 Content-Language: en-US
-In-Reply-To: <e01189e1-d8ef-2791-632c-90d4d897859b@huawei.com>
+From: FUKAUMI Naoki <naoki@radxa.com>
+In-Reply-To: <0cacca03-6302-4e39-a807-06591bf787b1@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpip:radxa.com:qybglogicsvrsz:qybglogicsvrsz4b-0
+X-QQ-XMAILINFO: OSjQccS6YHkHxppCOJg+azNBeIImlJAqzbQ6fJnYyxkKQWPbcljSDEMr
+	XyjOYEjhlWs0Re4zDK/SviunNv6qZZ+7mlHW7Wnw2pX1yEpXhC4W3514IQ3lcgt564aWZAp
+	nqmStkFk//yAX41yDtWhR+9pZtKXKHZqXA7tkScm/xxIBpfb+M3lSdDKTv/xuc9lu08dfqY
+	E8VPoTKP3IaX/eYZFiBJpFJBEWhKCP+1dvGrE6upyPT0OBMNdiWfM6sk7I+TABW/STj1nWi
+	pruGeXeaQB8x5yob0CbFGT68vdoWFps6gN4JPhlrwEupuSe73oQRK/d2P+YWt5ZCl2Ccdjc
+	vJNto6QUmNHiH2ulYZI10VaYflYL6o8F+ipAIoorXG6C+8Z4XD09UT3Vs0aeOo3Td5CReeE
+	sKbLGbah4Mb6ngtk5RIEn+q4LLYrmBQY9Syt26A/RklpDSXc0h45FCbs7T1Zy8E81GGkyRk
+	UmRNGzoczxvI5Fp844AroYOahh7w54zoi3VhpkFavA45empLNCTC5LLE/MJFTJZvGw/DPfC
+	LIoXdJRTxb7w3UYdCUVlbkhQ96PUtaRNc0eAdca4kcKFiKum2fgSewI3ncxlHk06mShGQa4
+	NUvRsDF51rWKK5yzOzUPZJmd1XX9CM3H1mkYgHMWtrwgzWSWs0SmXg7Y4w78+ZmtwSq8KDZ
+	vbhhadBSZUXj1+rMkbIHhhyzUgYorjaEfPdxkxL00R+jgOftnCpeDbx4ht5ZSnjnbMZkFpm
+	UhluxYm54ihSrqeNMR0RGeC4274P340bRp12zRj+eqCbXAg4B7pICyFhYw7P0sAKr6qBCGE
+	9ixQCHJpHX+Q8PWTIoBeqZcfQs9pd6CiMLk34wRoqICGDiazF1JrUlhuI53gklGp4JO055G
+	Mp3Lu4oXzR+3Oy2wjpIvyCnuJIiie57qiK7klzH3mlUSiIJI1QjltCyAbUB5CHc4y4LvKX/
+	VyEEPVpB4AvWqpqL+Mx1UMlriorMRrKTpDCcKiqNS9TUPzUT7YPBKg0HU
+X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
+X-QQ-RECHKSPAM: 0
 
-On 12/28/25 10:23 PM, Zhang Qiao wrote:
-> Hi, Weisbecker，
->
-> 在 2025/12/24 21:44, Frederic Weisbecker 写道:
->> HK_TYPE_DOMAIN will soon integrate cpuset isolated partitions and
->> therefore be made modifiable at runtime. Synchronize against the cpumask
->> update using RCU.
+Hi Heiner,
+
+Thank you so much for your work!
+
+On 11/24/25 07:54, Heiner Kallweit wrote:
+> On 11/23/2025 7:41 PM, Fabio Baltieri wrote:
+>> Hi Heiner,
 >>
->> The RCU locked section includes both the housekeeping CPU target
->> election for the PCI probe work and the work enqueue.
+>> On Sun, Nov 23, 2025 at 04:58:23PM +0100, Heiner Kallweit wrote:
+>>> This is a version with better integration with phylib, and with 10G support only.
+>>> Maybe I simplified the PHY/Serdes initialization too much, we'll see.
+>>> A difference to your version is that via ethtool you now can and have to set autoneg to off.
+>>>
+>>> I'd appreciate if you could give it a try and provide a full dmesg log and output of "ethtool <if>".
+>>>
+>>> Note: This patch applies on top of net-next and linux-next. However, if you apply it on top
+>>> of some other recent kernel version, conflicts should be easy to resolve.
 >>
->> This way the housekeeping update side will simply need to flush the
->> pending related works after updating the housekeeping mask in order to
->> make sure that no PCI work ever executes on an isolated CPU. This part
->> will be handled in a subsequent patch.
+>> Thanks for the patch, ran some initial tests, I'm on Linus tree for
+>> other reasons but applied 3dc2a17efc5f, 1479493c91fc, 28c0074fd4b7 and
+>> the recent suspend fix, then your patch applies cleanly.
 >>
->> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
->> ---
->>   drivers/pci/pci-driver.c | 47 ++++++++++++++++++++++++++++++++--------
->>   1 file changed, 38 insertions(+), 9 deletions(-)
+>> Here's ethtool output:
 >>
->> diff --git a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
->> index 7c2d9d596258..786d6ce40999 100644
->> --- a/drivers/pci/pci-driver.c
->> +++ b/drivers/pci/pci-driver.c
->> @@ -302,9 +302,8 @@ struct drv_dev_and_id {
->>   	const struct pci_device_id *id;
->>   };
->>   
->> -static long local_pci_probe(void *_ddi)
->> +static int local_pci_probe(struct drv_dev_and_id *ddi)
+>> # ethtool eth1
+>> Settings for eth1:
+>>          Supported ports: [  ]
+>>          Supported link modes:   10000baseT/Full
+>>          Supported pause frame use: Symmetric Receive-only
+>>          Supports auto-negotiation: No
+>>          Supported FEC modes: Not reported
+>>          Advertised link modes:  10000baseT/Full
+>>          Advertised pause frame use: Symmetric Receive-only
+>>          Advertised auto-negotiation: No
+>>          Advertised FEC modes: Not reported
+>>          Speed: 10000Mb/s
+>>          Duplex: Full
+>>          Auto-negotiation: off
+>>          master-slave status: master
+>>          Port: Twisted Pair
+>>          PHYAD: 0
+>>          Transceiver: internal
+>>          MDI-X: Unknown
+>>          Supports Wake-on: pumbg
+>>          Wake-on: d
+>>          Link detected: yes
+>>
+>> The phy is identified correctly:
+>>
+>> [ 1563.678133] Realtek SFP PHY Mode r8169-1-500:00: attached PHY driver (mii_bus:phy_addr=r8169-1-500:00, irq=MAC)
+>>
+>> That said I've observed two issues with the current patch:
+>>
+>> 1. the link on the other end is flapping, I've seen this while working
+>> on the original patch and seems to be due to the EEE settings, it is
+>> addressed by:
+>>
+>> @@ -2439,7 +2439,10 @@ static void rtl8125a_config_eee_mac(struct rtl8169_private *tp)
+>>
+>>   static void rtl8125b_config_eee_mac(struct rtl8169_private *tp)
 >>   {
->> -	struct drv_dev_and_id *ddi = _ddi;
->>   	struct pci_dev *pci_dev = ddi->dev;
->>   	struct pci_driver *pci_drv = ddi->drv;
->>   	struct device *dev = &pci_dev->dev;
->> @@ -338,6 +337,19 @@ static long local_pci_probe(void *_ddi)
->>   	return 0;
+>> -       r8168_mac_ocp_modify(tp, 0xe040, 0, BIT(1) | BIT(0));
+>> +       if (tp->sfp_mode)
+>> +               r8168_mac_ocp_modify(tp, 0xe040, BIT(1) | BIT(0), 0);
+>> +       else
+>> +               r8168_mac_ocp_modify(tp, 0xe040, 0, BIT(1) | BIT(0));
 >>   }
->>   
->> +struct pci_probe_arg {
->> +	struct drv_dev_and_id *ddi;
->> +	struct work_struct work;
->> +	int ret;
->> +};
->> +
->> +static void local_pci_probe_callback(struct work_struct *work)
->> +{
->> +	struct pci_probe_arg *arg = container_of(work, struct pci_probe_arg, work);
->> +
->> +	arg->ret = local_pci_probe(arg->ddi);
->> +}
->> +
->>   static bool pci_physfn_is_probed(struct pci_dev *dev)
->>   {
->>   #ifdef CONFIG_PCI_IOV
->> @@ -362,34 +374,51 @@ static int pci_call_probe(struct pci_driver *drv, struct pci_dev *dev,
->>   	dev->is_probed = 1;
->>   
->>   	cpu_hotplug_disable();
->> -
->>   	/*
->>   	 * Prevent nesting work_on_cpu() for the case where a Virtual Function
->>   	 * device is probed from work_on_cpu() of the Physical device.
->>   	 */
->>   	if (node < 0 || node >= MAX_NUMNODES || !node_online(node) ||
->>   	    pci_physfn_is_probed(dev)) {
->> -		cpu = nr_cpu_ids;
->> +		error = local_pci_probe(&ddi);
->>   	} else {
->>   		cpumask_var_t wq_domain_mask;
->> +		struct pci_probe_arg arg = { .ddi = &ddi };
->> +
->> +		INIT_WORK_ONSTACK(&arg.work, local_pci_probe_callback);
->>   
->>   		if (!zalloc_cpumask_var(&wq_domain_mask, GFP_KERNEL)) {
->>   			error = -ENOMEM;
-> If we return from here, arg.work will not be destroyed.
->
->
-Right. INIT_WORK_ONSTACK() should be called after successful 
-cpumask_var_t allocation.
-
-Cheers,
-Longman
-
->>   			goto out;
->>   		}
->> +
->> +		/*
->> +		 * The target election and the enqueue of the work must be within
->> +		 * the same RCU read side section so that when the workqueue pool
->> +		 * is flushed after a housekeeping cpumask update, further readers
->> +		 * are guaranteed to queue the probing work to the appropriate
->> +		 * targets.
->> +		 */
->> +		rcu_read_lock();
->>   		cpumask_and(wq_domain_mask,
->>   			    housekeeping_cpumask(HK_TYPE_WQ),
->>   			    housekeeping_cpumask(HK_TYPE_DOMAIN));
->>   
->>   		cpu = cpumask_any_and(cpumask_of_node(node),
->>   				      wq_domain_mask);
->> +		if (cpu < nr_cpu_ids) {
->> +			schedule_work_on(cpu, &arg.work);
->> +			rcu_read_unlock();
->> +			flush_work(&arg.work);
->> +			error = arg.ret;
->> +		} else {
->> +			rcu_read_unlock();
->> +			error = local_pci_probe(&ddi);
->> +		}
->> +
->>   		free_cpumask_var(wq_domain_mask);
->> +		destroy_work_on_stack(&arg.work);
->>   	}
->> -
->> -	if (cpu < nr_cpu_ids)
->> -		error = work_on_cpu(cpu, local_pci_probe, &ddi);
->> -	else
->> -		error = local_pci_probe(&ddi);
->>   out:
->>   	dev->is_probed = 0;
->>   	cpu_hotplug_enable();
 >>
+>>   static void rtl_rar_exgmac_set(struct rtl8169_private *tp, const u8 *addr)
+>>
+>>
+>> 2. the link is lost after a module reload or after an ip link down and
+>> up, the driver logs "Link is Down" and stays there until the cable is
+>> unplugged and re-plugged. This seems to be addressed by the code that
+>> was in rtl8127_sds_phy_reset(), re-adding that code fixes it:
+>>
+>> @@ -2477,6 +2480,13 @@ static void r8127_init_sfp_10g(struct rtl8169_private *tp)
+>>   {
+>>          int val;
+>>
+>> +       RTL_W8(tp, 0x2350, RTL_R8(tp, 0x2350) & ~BIT(0));
+>> +       udelay(1);
+>> +
+>> +       RTL_W16(tp, 0x233a, 0x801f);
+>> +       RTL_W8(tp, 0x2350, RTL_R8(tp, 0x2350) | BIT(0));
+>> +       udelay(10);
+>> +
+>>          RTL_W16(tp, 0x233a, 0x801a);
+>>          RTL_W16(tp, 0x233e, (RTL_R16(tp, 0x233e) & ~0x3003) | 0x1000);
+>>
+>> Guess the phy needs a reset after all.
+>>
+>> With these two applied it seems to be working fine, tested suspend as
+>> well.
+>>
+>> Would you integrate these two or want to try me something different?
+> 
+> Thanks a lot for the valuable feedback!
+> I added the SDS PHY reset to the patch, and improved MAC EEE handling
+> in a second patch, incl. what you mentioned.
+> Patches should fully cover your use case now. Please give it a try.
 
+for 0001-r8169-add-support-for-10G-SFP-mode-on-RTL8127ATF.patch,
+
+Tested-by: FUKAUMI Naoki <naoki@radxa.com>
+
+Tested on Radxa ROCK 5B+/5T (RK3588 SoC) running v6.18.1 with the 
+following commits applied:
+
+  28c0074fd4b7 (r8169: bail out from probe if fiber mode is detected on 
+RTL8127AF, 2025-11-13)
+  87ad869feaed (r8169: improve MAC EEE handling, 2025-11-24)
+
+$ lspci -s 0001:11:00.0 -v
+0001:11:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. Device 
+8127 (rev 08)
+	Subsystem: Realtek Semiconductor Co., Ltd. Device 0123
+	Flags: bus master, fast devsel, latency 0, IRQ 77, IOMMU group 7
+	I/O ports at 100000 [size=256]
+	Memory at f1300000 (64-bit, non-prefetchable) [size=256K]
+	Memory at f1360000 (64-bit, non-prefetchable) [size=16K]
+	Expansion ROM at f1340000 [virtual] [disabled] [size=128K]
+	Capabilities: <access denied>
+	Kernel driver in use: r8169
+	Kernel modules: r8169
+
+$ dmesg | grep SFP
+[    4.799931] Realtek SFP PHY Mode r8169-1-1100:00: attached PHY driver 
+(mii_bus:phy_addr=r8169-1-1100:00, irq=MAC)
+
+iperf3 results:
+
+TX: 9.4 Gbps
+RX: Limited to 5.5 Gbps due to single-core performance bottlenecks (RSS 
+and RPS are not working)
+
+It would be great if this could be backported to the v6.18.y.
+
+Best regards,
+
+--
+FUKAUMI Naoki
+Radxa Computer (Shenzhen) Co., Ltd.
 
