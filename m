@@ -1,125 +1,179 @@
-Return-Path: <netdev+bounces-246228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0314ECE697B
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 12:47:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AD06CE6A2F
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 13:07:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EC1D1303AEB7
-	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 11:45:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C70A83009AAD
+	for <lists+netdev@lfdr.de>; Mon, 29 Dec 2025 12:07:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66EE730BB83;
-	Mon, 29 Dec 2025 11:45:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D728530F80B;
+	Mon, 29 Dec 2025 12:07:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JQbdZzUY"
+	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="iamT1tTG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 528C330DED8
-	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 11:45:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D3218A921
+	for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 12:07:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767008734; cv=none; b=pVyCGl6dhuqC9xGawcRAK2Quqxa1A9n2g0xl0ADHtwCp/8tngH9MJFK0aZvB1llV4I9KvPhpBt4vqnu0+XhIcTwP6+1kJva6d1cD0AOvAm5YrdWtuD/DXBGKLjqyFmmsnQ7OrSGvBjTditRV7BgPCECML5dgczauUhlUcO4MaEk=
+	t=1767010048; cv=none; b=COcaVOxyvgBe9nIkPC0GKwzCy7DB6zQUfGmUvazdS86s8IJ3m+M1/Q+7efgKlElAmyrpSSwF9Hbcb6JudOtp1snuBZrdglmxcEUuv9/eKAU9TAFVJWlAhTsFY4G+2CKXyEGMmm5QzejvAWfrdYGttwMRuuPd6OEH3mWR9R5EiiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767008734; c=relaxed/simple;
-	bh=FnqrHBDnkXYFDp1T4K5G7I3G/5qKZlHts3NFEuwPA4o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tfdw1loQzwlPcrG2VW9HgTUNSqxtotuVX9I1m8rWyP7wPI33UONIq/oYD7suq5Hf0sJCq/pFoP7WbTr89epnmLcfFVzYMCS4Uo2QVC+6vzdWizcwca9Y1YmqzvSOOrz/z91gkZ4zz+TCVgT9t9a5x5UMJtdAlA3CShMTPx+Pn00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JQbdZzUY; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-47798089d30so5334025e9.1
-        for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 03:45:29 -0800 (PST)
+	s=arc-20240116; t=1767010048; c=relaxed/simple;
+	bh=M0RIAwtADvVOqaERuCW9IojIKIPb3AOQCX/h4YSSMVA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ss9XBle6Jbl3DfX19QXuoodtZxi+cAtmL7xYKOLYVR4EhVBPJS/Qur3k0jB6mE4DVFmOsuoyau4I96FiYK/o96bCLJSO/cBV632s0qw8tSqLobqOxtNw66enn4zS5Zf6wNjog5BDMExrUXAlC11UvaIL4miyMSYd8apDZVHFu5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=iamT1tTG; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b79ea617f55so1676494166b.3
+        for <netdev@vger.kernel.org>; Mon, 29 Dec 2025 04:07:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767008727; x=1767613527; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pd6bT6wJQiLnyABIdP4QbPF8bfvDog3aiJF+bv347cs=;
-        b=JQbdZzUYzaOtkIxClCmzUVmBsMggVRdIA+zXF+7w+rK46IF/CsPA4S8vvXqlmlDYFN
-         PvNL4HF5e8BYp+tmvmUmuLyT9dtli6Yzxejo/Tkn7TzEzniOoNF7fWS+758n2ysgLU59
-         HfzNT50zy94cvtcEciXzUhhAwVNt/gp0P2tgnY/VbwP32XhGhvZ/3BVJf6Zh5HHfpwCm
-         MH0zA8D4RNoY+UUfXXvB5m3KDNAcHQgEdMPrOUgIbVwxIfuITVGJAK+ko4FhYD5VKuU0
-         WHgt8hYzBMQgDb934znZg7G7TQhWhVpvWTZmAmrIeiPbZgbQpfPekOlGf0QvXBjiwX5D
-         kndQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767008727; x=1767613527;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=sartura.hr; s=sartura; t=1767010045; x=1767614845; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pd6bT6wJQiLnyABIdP4QbPF8bfvDog3aiJF+bv347cs=;
-        b=EbwjAcY8AZvB1q4wlfgzxESQBnnz48W2bmcBnGhYi4zu59mpe5FcwaFN0EEeSeY2uD
-         kEYYUlX2LNC2p9UyNFSAlVlsR/AFVGbnk9e/WjF//nBkdM+4VPDJyagvyjd43EQD3Abg
-         KqT9GbiE5Z+V4ZahtYLvpzh46R+R/44j0Ho1IFHTLTVs1Sul3odPWS2L23dgX4ZdhW6R
-         q5VxcK0Eq2Dzj0U9F7/6EnL0HgHgYlc4gCSAOoTArjfopzfA4oPNVWPUsKTNTRxlFsie
-         d39+iRfrX3tg0RA7Ie0pwMWue4MuWy4kYBDfY4ekQ524zt/kfHq63J8YZpBHfIU4STnK
-         wYuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCViS8ZNc+Qs/LinJL+N521GtlR3rMyqBRuzBrpleVdX1ujo4rCZrwMYZGYygoh1hNcvYoWAo5Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1dZxDPuBwOuPsIEWdS7Q72zizQM/DxV71K7Mkw9LxQ9g5o9UV
-	QL8ApA+A0i/ZwcIx+ji5930sT88JzomCrzDUnnu4C/ekVfBV9EHHTvJG
-X-Gm-Gg: AY/fxX5EdJwUkEAKXHmaZBGpIENxcOQhlXL3mSghWMJNvXouNK1KSOH2qfOYaQbT6YQ
-	6wyHrJTPzTcLd/xXJRA1XCCnxVEu1avXxItwhfB0jHlu39aChTSLbG1Hw9cF0Uz0+6UGagyp4tP
-	HzGVYr/lKVDYW51YeGui/+KjCeMiWn1p8SMpZ4ZyfCiOb/dRnawXMPw9B+gWL0LUEmKYzEJp/11
-	1oISh2co/msymcbsnpc+A4vMOXbPgszB4RXnhreiID6/sVLXHgdlJwuLLZTJgVRSgKs32Df/cS/
-	2i/VDfc3/6EBIVfAYEb8FnTIfGkutcVpy+8oH8Lt67fzBiMG8vEwTTsmeMRKEbEktZDqsxepR3f
-	Oynl28s1N5QnuSe/aq8KoHIDnZCFE8eqWiBGDlheQuIX/oRMIGZ70TUj6NBC6wOZ0I/yoB2vKxu
-	qnHPI0cyh4YgogEROtnz8OobBRH+7gsVgdCwgr6srz16cWq9jI3ridI1CWuqhfZT21OhFmNQK/4
-	NHJQnA=
-X-Google-Smtp-Source: AGHT+IE4Eqr532WMTP2bycwTtVuomjgtN8fZjVnKc91ifmCm3XzCySyUy/SDSX2M7whbZT2bmdncog==
-X-Received: by 2002:a05:600c:3b85:b0:477:a478:3f94 with SMTP id 5b1f17b1804b1-47d1957f7dcmr250652945e9.5.1767008727208;
-        Mon, 29 Dec 2025 03:45:27 -0800 (PST)
-Received: from thomas-precision3591.paris.inria.fr (wifi-pro-83-215.paris.inria.fr. [128.93.83.215])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-4324eab257asm62738107f8f.38.2025.12.29.03.45.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Dec 2025 03:45:26 -0800 (PST)
-From: Thomas Fourier <fourier.thomas@gmail.com>
-To: 
-Cc: Thomas Fourier <fourier.thomas@gmail.com>,
-	Chas Williams <3chas3@gmail.com>,
-	linux-atm-general@lists.sourceforge.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] atm: idt77252: Use sb_pool_remove()
-Date: Mon, 29 Dec 2025 12:42:01 +0100
-Message-ID: <20251229114208.20653-2-fourier.thomas@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        bh=M0RIAwtADvVOqaERuCW9IojIKIPb3AOQCX/h4YSSMVA=;
+        b=iamT1tTGYGQlzW0SD7Bc5Gh9ZF8yq3i589wLhXJrSD1Kp1ZG0ZaxE07zplkkGHJVEP
+         gb0by9XjDcH0ilhHcxSpil+RiSM7Ic1A8SSNbg2dpEfXCZg6NkVkwkdjMMKKxH2KX1Gf
+         pdYGVDhIhWLK9RFe3oxaeh42xev2B9E2QeiJUwmTrK4iiImu5MhqPNxGIoaKR9SmPIJk
+         BWAa1Ab215SKOtSeT5lNMMdyImsouv4dTKP/3SsgFQhmmnNLv71u8lm9YmvDxnym0Tez
+         P3Fx5ZSdHR5Mqj4oBpHnVUccNb6D0RfhAVP83lrcvz6sILAhn4GItv8EK4Uo/FOIg5GA
+         UIIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767010045; x=1767614845;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=M0RIAwtADvVOqaERuCW9IojIKIPb3AOQCX/h4YSSMVA=;
+        b=ataElyNDUFyBTtu0B1lBWIpVUeYf0un6uIX2SGyEbP+1b3gZaZBWHm9auHDaZmGOnF
+         UetegWq/PaydDwpun1bXaQXZqpwuS3Q9I10EdqcG+dTvRNPwJNvY9Y8NNg2zGuLQ05gg
+         PKL94nRqHmpie5aLpLLA/klpVvLprItu9lwgI9nlzOqV8+nqxgJCPpBnKW5Go4TrIoSE
+         1s3qSzzN0Yki8gBj/SUqb4rWkxvru6GwKCVdK8BcGnXLHjzyX9PwoxsTFdf+vJTfGUGw
+         TSDYESLF2vL5hc6KA+NW7VE0THYIhPJaTScuIDFjWK9nKD3mF0zGVgV9jUuIvMxxnhlr
+         rBYg==
+X-Forwarded-Encrypted: i=1; AJvYcCWRwBhgXbd2LLh1kdNsLpH6BuKjEhFwfdPDuZZ19w6SiDb3DuxfhDvJ1wK4UmJ4LsxyvqeSF/M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6GHTyAoxT6faDnAXXnxEgyPeooVoGBJZIe+fjX9PMGUTwcw68
+	lQWmjqQ3cGQ7D/SVZQHFawUIi/FiHV3w4h0cxkwWMExokXRW1gmILlnKkpZ7xnlwiz6/EM1W/qY
+	tvOjSqrzer0x64TAgMLwjfBGQJ3pe4oLhP6HHMBByVQ==
+X-Gm-Gg: AY/fxX67sEErqvsIFNpbKjtN0xeGhqcbpUB3vtZf8chg1GaWbhR6SuG4ZrKiU/pWoJU
+	7qSFUDZ35H375NNCSaXYqG1JBB4SfaUu3RQ6F0jyqfqQveCygtorrZRvKk6arDCLjWl0xw9hoCV
+	uK21ofaSHxnrssFGt+gLT3sWhnYiISaQM76z2jwba4EerSVyRrI4/Oo4Em8OTUCDR7CVGrkN9r7
+	j2c+gaui6DB6NzJO3gj1PUTDoeI0tc/8mVjwqUBD3zA39MGy+8uAklzwuAy13uzOLM6P1GBRaF0
+	E1icR6ZyBs2lsM7YhpGkV1TWMagbMyFvrmUFa6ZDekU1SX4WtSX3
+X-Google-Smtp-Source: AGHT+IHwGBZ7fPOTgnv1RT35iaeFO7HZRzkOQtdPCeQFstms7NNREAW/jaHp2F7zdlu800ZsYVpbEuZjGBw4wnDce1o=
+X-Received: by 2002:a17:906:2081:b0:b80:415e:5b2 with SMTP id
+ a640c23a62f3a-b80415e05efmr2616951466b.4.1767010044222; Mon, 29 Dec 2025
+ 04:07:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251223201921.1332786-1-robert.marko@sartura.hr>
+ <20251223201921.1332786-2-robert.marko@sartura.hr> <20251224-berserk-mackerel-of-snow-4cae54@quoll>
+ <CA+HBbNGym6Q9b166n-P=h_JssOHm0yfyL73JZ+G9P81muK=g4A@mail.gmail.com>
+ <78bf252c-fd5e-4a36-b1a3-ca8ed26fde7a@kernel.org> <CA+HBbNG+ZVD6grGDp32Ninx7H1AyEbGvP0nwc0zUv94tOV8hYg@mail.gmail.com>
+ <d210552f-c8bf-4084-9317-b743075d9946@kernel.org> <2025122516245554f59e2e@mail.local>
+ <20251227-splendid-striped-starfish-ece074@quoll>
+In-Reply-To: <20251227-splendid-striped-starfish-ece074@quoll>
+From: Robert Marko <robert.marko@sartura.hr>
+Date: Mon, 29 Dec 2025 13:07:13 +0100
+X-Gm-Features: AQt7F2pkPcBxmyeR-DPcdCGLawGZy7wfoKy0BfxlIeZ5QxnvZTUu33UqbaIu3eU
+Message-ID: <CA+HBbNEqq9ZqBR88DFSSSrYw=LBzAreFC0kL88-HZCGAsOrqZw@mail.gmail.com>
+Subject: Re: [PATCH v3 01/15] include: dt-bindings: add LAN969x clock bindings
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>, robh@kernel.org, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org, 
+	andi.shyti@kernel.org, lee@kernel.org, andrew+netdev@lunn.ch, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, linusw@kernel.org, 
+	Steen.Hegelund@microchip.com, daniel.machon@microchip.com, 
+	UNGLinuxDriver@microchip.com, olivia@selenic.com, radu_nicolae.pirea@upb.ro, 
+	richard.genoud@bootlin.com, gregkh@linuxfoundation.org, jirislaby@kernel.org, 
+	broonie@kernel.org, mturquette@baylibre.com, sboyd@kernel.org, 
+	lars.povlsen@microchip.com, devicetree@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-spi@vger.kernel.org, linux-serial@vger.kernel.org, 
+	linux-usb@vger.kernel.org, linux-clk@vger.kernel.org, luka.perkov@sartura.hr
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Replacing the manual pool remove with the dedicated function.
+On Sat, Dec 27, 2025 at 12:17=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel.o=
+rg> wrote:
+>
+> On Thu, Dec 25, 2025 at 05:24:55PM +0100, Alexandre Belloni wrote:
+> > On 25/12/2025 09:47:34+0100, Krzysztof Kozlowski wrote:
+> > > On 24/12/2025 15:01, Robert Marko wrote:
+> > > > On Wed, Dec 24, 2025 at 2:05=E2=80=AFPM Krzysztof Kozlowski <krzk@k=
+ernel.org> wrote:
+> > > >>
+> > > >> On 24/12/2025 11:30, Robert Marko wrote:
+> > > >>> On Wed, Dec 24, 2025 at 11:21=E2=80=AFAM Krzysztof Kozlowski <krz=
+k@kernel.org> wrote:
+> > > >>>>
+> > > >>>> On Tue, Dec 23, 2025 at 09:16:12PM +0100, Robert Marko wrote:
+> > > >>>>> Add the required LAN969x clock bindings.
+> > > >>>>
+> > > >>>> I do not see clock bindings actually here. Where is the actual b=
+inding?
+> > > >>>> Commit msg does not help me at all to understand why you are doi=
+ng this
+> > > >>>> without actual required bindings.
+> > > >>>
+> > > >>> I guess it is a bit confusing, there is no schema here, these are=
+ the
+> > > >>> clock indexes that
+> > > >>> reside in dt-bindings and are used by the SoC DTSI.
+> > > >>
+> > > >> I understand as not used by drivers? Then no ABI and there is no p=
+oint
+> > > >> in putting them into bindings.
+> > > >
+> > > > It is not included by the driver directly, but it requires these ex=
+act
+> > > > indexes to be passed
+> > > > so its effectively ABI.
+> > >
+> > > How it requires the exact index? In what way? I do not see anything i=
+n
+> > > the gck driver using/relying on these values. Nothing. Please point m=
+e
+> > > to the line which directly uses these values.... or how many times I
+> > > will need to write this is not ABI?
+> > >
+> >
+> > The index here is the exact id that needs to be set in the PMC_PCR
+> > register and so it is dictated by the hardware.
+>
+> So not a binding between Linux and DTS.
+>
 
-Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
----
- drivers/atm/idt77252.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+What would be your suggestion on moving forwarding regarding the clock
+HW indexes?
 
-diff --git a/drivers/atm/idt77252.c b/drivers/atm/idt77252.c
-index f2e91b7d79f0..888695ccc2a7 100644
---- a/drivers/atm/idt77252.c
-+++ b/drivers/atm/idt77252.c
-@@ -1844,7 +1844,6 @@ add_rx_skb(struct idt77252_dev *card, int queue,
- {
- 	struct sk_buff *skb;
- 	dma_addr_t paddr;
--	u32 handle;
- 
- 	while (count--) {
- 		skb = dev_alloc_skb(size);
-@@ -1876,8 +1875,7 @@ add_rx_skb(struct idt77252_dev *card, int queue,
- 			 skb_end_pointer(skb) - skb->data, DMA_FROM_DEVICE);
- 
- outpoolrm:
--	handle = IDT77252_PRV_POOL(skb);
--	card->sbpool[POOL_QUEUE(handle)].skb[POOL_INDEX(handle)] = NULL;
-+	sb_pool_remove(card, skb);
- 
- outfree:
- 	dev_kfree_skb(skb);
--- 
-2.43.0
+LAN966x does the same with HW clock indexes in the dt-bindings includes.
 
+Regards,
+Robert
+
+> Best regards,
+> Krzysztof
+>
+
+
+--=20
+Robert Marko
+Staff Embedded Linux Engineer
+Sartura d.d.
+Lendavska ulica 16a
+10000 Zagreb, Croatia
+Email: robert.marko@sartura.hr
+Web: www.sartura.hr
 
