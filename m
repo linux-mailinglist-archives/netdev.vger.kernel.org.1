@@ -1,95 +1,95 @@
-Return-Path: <netdev+bounces-246326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE83DCE9581
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 11:18:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 041E4CE9596
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 11:19:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C535C302E15A
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 10:16:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 95B233061924
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 10:16:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6EEB2C028F;
-	Tue, 30 Dec 2025 10:15:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A14382E2850;
+	Tue, 30 Dec 2025 10:16:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hvoCvzfd";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="km1vHaGw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hzo/ukVG";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZviZVR0u"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C3AA2E091C
-	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 10:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1737258EE1
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 10:16:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767089759; cv=none; b=WGu6sSvSUDU/J2XkVFM0y6F1oXH+gTGIu60ThpZoNQuCApA0tlRe0kxBr40CIjXDPVw1ZctwVP6KggVQbV6Wp3KoAII3je0U/AAvjrMT8I6fy8E4sgSVZnvZfCs4KGs6mEa/ojbkR4NAEP6wqprp5WDE4gDYHsWz7t4ia5DMbjg=
+	t=1767089762; cv=none; b=GFYxZ72y19UwfM9iwOBdYw42L6gr701MAy7XNS/SNFddtom84KofPqVGBO/tgac+X7TeN7fFy34V506GAABnK/dTABWFf1U2hw3n6stdv4Raa9GUD/nBMXyJpz79Dpl59OZehcZVYbbgSLAHQA9Teq1zAVJ28py3pz5qbS1J+Bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767089759; c=relaxed/simple;
-	bh=1JUA4c0efATkxneQm73kN9tTpnR2rWTicL6pMgMgIPw=;
+	s=arc-20240116; t=1767089762; c=relaxed/simple;
+	bh=PKPLA1kpbL7fJYEUVDcqch/rjberNxsCb/G2InoSmIU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sROANW+4NBD0m8U+PNBHBhRQEh6zOem9eo4YaZwFqwZpVMTifb0TBwEfeaurxeeYXtsS4t90rkX3d5CakFHOCwD1oSBNw6khMJP+9GU7QS+IyXYdYVP2vrVeY1+5EJdFRgKU4o83UcBGA2WHRcpKFIC/oXHVrxgvHVNJLWThuSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hvoCvzfd; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=km1vHaGw; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=Tdn01je4C8Sq+F47nkZ1+c4PQqDIghzMXPfYkZCLPXIbVyM022UGP8D407yoawnqbneAw43hHs1fsrEI8T5Rp7IWJuZZOfAqhKyYcIUCeFlZNe4HmPHmLWElbGLyM19SSiWGrxhq5Nh+zn9EtgVpbBqDDxm7zvIr2lo9Oz2tf7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hzo/ukVG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZviZVR0u; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767089756;
+	s=mimecast20190719; t=1767089759;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=lIFloJTLYi5ioijSED2t687CZ+kUT7GxSlzISMtKW5A=;
-	b=hvoCvzfdYVI5QnmibP+2Yajm1ZhOWvPiSLWw22wJxk4akt6ZEkoNRCt/E6rQe8E02O2dG1
-	u0+tK8UWATMvs3Q7iUbi4PnqB2fic9QoSW+7L/5kdiCPHLjOpweM/DXA0SwBxigpcCz3qn
-	5s1u/+cCMULSkZyYkuzBAFP+x5qYBPM=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=vlUDEgWO93Cmk0Xa8O4C3C5KUT8jOBeRcuReRJ9yK0k=;
+	b=Hzo/ukVGpCpZFTerO6TPVTUe75x9pQ1BR1LptdEzWoyEQ/osq2e8qbvA7igncJP60Lnn8M
+	cAmlIoq9purJRZszQ7iImNMTkvCoPlaZd4humItpsA8OY7yk+kDS7DCURt5KOhFT3wU3pq
+	/MrPGTP9IJ8w/QKJNIwqFSmI5wmFvcc=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-677-i7LkxpTDNI23pfxQErdeVQ-1; Tue, 30 Dec 2025 05:15:54 -0500
-X-MC-Unique: i7LkxpTDNI23pfxQErdeVQ-1
-X-Mimecast-MFC-AGG-ID: i7LkxpTDNI23pfxQErdeVQ_1767089754
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4779d8fd4ecso49770275e9.1
-        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 02:15:54 -0800 (PST)
+ us-mta-628-pejH285YOgG9ZUxGCLEoXw-1; Tue, 30 Dec 2025 05:15:58 -0500
+X-MC-Unique: pejH285YOgG9ZUxGCLEoXw-1
+X-Mimecast-MFC-AGG-ID: pejH285YOgG9ZUxGCLEoXw_1767089757
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-477a1e2b372so77921145e9.2
+        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 02:15:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767089754; x=1767694554; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1767089757; x=1767694557; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lIFloJTLYi5ioijSED2t687CZ+kUT7GxSlzISMtKW5A=;
-        b=km1vHaGwMEO7mfXobXgRu2GF7yYLs+HkCTr39aGgXIkNfyh4MCjSseN2GIB2WtRFSB
-         QYd42Kf3alEVord81XaouvsCcmA3h+Xnno+9YgpNQtjvo4sqLgAY0LhKgNU2UyZJKPu8
-         xK8BtD3XMZHDaRUcQwN/nsTpeBiSDoHpB3HTtur7rtj+2Bp8j2u1zc0wiAwPtmrJnI6J
-         sT4d82FeSZkdH53JxTvjOAJeLgjdD12T+wgmpkjIpwQC2epj0el+N4GG3yUbrL8VgamH
-         nm9NFPzcebrHNzdpgOOBgUyPU9c3UadTicdwhiCKwVZ+iFNiYzE/6lbWPCQPoec4VOn9
-         Z75A==
+        bh=vlUDEgWO93Cmk0Xa8O4C3C5KUT8jOBeRcuReRJ9yK0k=;
+        b=ZviZVR0uqwFPJZivYXOhQ8AGvYAcXNGBSibAk7l/oSytGm4r+M2JydcqprJdVhVB+i
+         ZIT2OgPtUxe4Ig/8PWscY5IluLSBlXeJMmo+M56+KQ6c49gz2d2R7M70UIA+wjl3sUEv
+         9DMWprpyUREi6QHA3BAWnf8/4i8ze2sC62tcCLFtwzaJTOjTblCtfgXkdREJ9nHMD/06
+         Ztkp862/yqlkCUXHjZQ3n0HMHaYrj9VVf1a8iVtpAbXtdj4Iiyfu5/PERkeOruvDUwWd
+         FjsncdDmsrzS2crWBCEZC6A1v6x2xG2aNO2eHqDBYyRno+5IpaPdaciAPF6ItsqB1e6t
+         PySA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767089754; x=1767694554;
+        d=1e100.net; s=20230601; t=1767089757; x=1767694557;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lIFloJTLYi5ioijSED2t687CZ+kUT7GxSlzISMtKW5A=;
-        b=stGvJubcNtU8MgwHA9NkOP5U+h52IbYShtsmT7rdTjYn/KvInx2iPF/tF2V33LT4PA
-         BMYTzD+pA6cFg7PgQRA1NULkShOneuXPQ8Ai38bjlf2XCDm+Ql9/FKX2H2vgeWCkyvwt
-         /cq6f/YxscqWCWUzWgUfjsZTUcH/NoPrDp/5hN0tVmJbpogjsuiSTkb1gIsrqVsxA2Te
-         Q4FoBnoC09MdD73lKK8LQa4dVXdDQ4k9J6fdad6tN/68/4KYIBGJEqQD7DdmxOC3heBX
-         nBd3AWKNkcwYs7xOJlIqySU/F0ncpMIzKfsF5BaLy9Bxu496atg6g+sNsu85uLR9lSCQ
-         +xcA==
-X-Forwarded-Encrypted: i=1; AJvYcCXaPh3L+yaDU3y7XVkN/TWzYy9/unyylg37NnCq26VGHBGwP0H69gdi2nGU/z8CdK4pdmo+yrE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YylJAy65nJDvOPF8QneCqGI6nDJ+uQ3ymbAGLiMbralNfMzqQ/N
-	3xJp5wmjLFuyzocU1PFppEfeyN2AxwQELaJ2FBlmD/dgTknUFsUW8V3g0Sd0X+N0nHmD4oWEnHY
-	Jzgzr4jn725o53f88uc7ujCgntH/f7SHpFUPoPF8AqSh0xIhdqfuPRShYWg==
-X-Gm-Gg: AY/fxX7R3Z+sY5BEh4ukQOm2lPO3ejWH2mEz55NPm4sgp/WgmYE0R++6NaWqdNPkLL6
-	98XH7lsytalx3Y0iocmSPKQ8+neTXs5ZUwHVYqMKE+36Y1xrtrAmVClyHL8bkyAB0Ul1gA/mTuC
-	kidsGFLE5ZoV/2dSg6fw4IEOLebatgep89mRh+Ecce+Wbz+dmbWrKEfrMLpUNqFRucC2H5MAChO
-	r3enmV7Bv1SRTFpPiKLjzgKv3GTo/f9AVWpbTZyEgR2hOSxGFbXEKoGdWOS6z8v+wWTVO18+gEp
-	+CINuseNy8HY7Hz/5CrV5+PGwxw7MrDA9d7zxPfgfJUvk3yv9B681+Jw6eH21+7KHnukgZf4+3l
-	8ZNRwA6KcFUje/CckmZTRFsUOS5SkZ8uj/A==
-X-Received: by 2002:a05:600c:46cf:b0:477:9e0c:f59 with SMTP id 5b1f17b1804b1-47d18b833a6mr393752945e9.2.1767089753558;
-        Tue, 30 Dec 2025 02:15:53 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF0nrcJnS7RjupXcIyxgJ/7OwvI0dkgJ3plFmvdD3JvcGLBLhWJUwOhq1auRl2SqH+pkIX7dw==
-X-Received: by 2002:a05:600c:46cf:b0:477:9e0c:f59 with SMTP id 5b1f17b1804b1-47d18b833a6mr393752425e9.2.1767089752979;
-        Tue, 30 Dec 2025 02:15:52 -0800 (PST)
+        bh=vlUDEgWO93Cmk0Xa8O4C3C5KUT8jOBeRcuReRJ9yK0k=;
+        b=p9IaSE4nq3UzxWp4IdSTdhrRkY3bGgz9oRxtRcPGkF9TvGgmYRW2ZJ8PziYGNNyHwG
+         KPSdPaKtENnSW1IMTePNH7X5BY7+UYqVWWem56dT63RNcAam6etX92WnsdRj5wm5V8wm
+         dzM8IdQJ8OQJfZTyOn6PaPX2SydUyHdlIXQKp5M9gQxK+yT8rsFVd2jj+Y0r5iU0JVRp
+         vVvPEt0adYwfgpNxxUQ19SYMgRzTOm27btUcEouCr18RRpil5VhowTeWZbhAoLy21Lac
+         WHZ1p3HYRTYvdQebVCTV3Ztul2Gq2RGijb1LGOq1tnQEuLk26OF2iS0zgmkg94KaEoJL
+         sECg==
+X-Forwarded-Encrypted: i=1; AJvYcCVTN3NK8rQPO4wp8p8qiKnGpYZcQIB7pWvxeVUROUS1RlnwChsY5P+YEBsIlv4LYanAMtFj3xI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMox/GggtNSLfTsaI+Xy2bC8j4EmfHuPrBu2dqCPDT1ozkFqRv
+	19Ihozpod7r5GHtcP+G4vWwJzgv+7TAJq+dF5Rdwu28+X2Ct25GeUj7y1aT/i/aPL4dr/I39IAc
+	Z/MgyN5LQnZvvQ+WNk8GWrieUZH0damBOAbXIFKRXIgb6FMYrtrt/QGQzWA==
+X-Gm-Gg: AY/fxX45m325Pgz0N0vysU+Igz8HDjMp6612C//HgDIRzbGLDqstaqWjieEBg7GjWzj
+	+rd99veKiqlM/surgY1irBjvwaXXdDb0sAjLanbJW6wNjrR3YLojJzvSPxEis0vW+tmbQ5R3Tg5
+	NLhIjW44CpFss3zctwo6x+LyszbBdrlaC/buBDqbiMjuFJjGCoaDGDinCtBgHRgt2YlP4j5v3K3
+	imAge9mCknt6kJ7I3FUb5xHaZNFizYSRf8oTxbDA1Hxci+bkCaLuqebj9WH7wbpIUVQFKZE51et
+	IcA8X4lhEvfGm+scTCWmYsG016k1UTOuBLJItU/hu/jJBoAXz4RKY1CfbKt8amWh9paIuNoKPqK
+	IxSz/dliKpqy1W0RgjUdJIAPNfTi5Ahg8Fg==
+X-Received: by 2002:a05:600c:3b0e:b0:477:b0b9:3129 with SMTP id 5b1f17b1804b1-47d1955b7d1mr374948005e9.3.1767089757010;
+        Tue, 30 Dec 2025 02:15:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFcsewURuffZ55cO3Q+sj2TN55Hu1ppUSdeqHbu2iFeBFoCSmT0tG7gytPk3ITCZSUZTYC9tQ==
+X-Received: by 2002:a05:600c:3b0e:b0:477:b0b9:3129 with SMTP id 5b1f17b1804b1-47d1955b7d1mr374947795e9.3.1767089756491;
+        Tue, 30 Dec 2025 02:15:56 -0800 (PST)
 Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be272eaf8sm630001695e9.5.2025.12.30.02.15.50
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be3a6c6ebsm263705445e9.4.2025.12.30.02.15.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Dec 2025 02:15:52 -0800 (PST)
-Date: Tue, 30 Dec 2025 05:15:49 -0500
+        Tue, 30 Dec 2025 02:15:56 -0800 (PST)
+Date: Tue, 30 Dec 2025 05:15:53 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: linux-kernel@vger.kernel.org
 Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
@@ -114,8 +114,8 @@ Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
 	linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
 	virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
 	iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH RFC 02/13] docs: dma-api: document __dma_align_begin/end
-Message-ID: <192a335d783a2e54f539dc5ff81bf3207dafa88f.1767089672.git.mst@redhat.com>
+Subject: [PATCH RFC 03/13] dma-mapping: add DMA_ATTR_CPU_CACHE_CLEAN
+Message-ID: <1f271a22a3aae6afb97c5f9ae35b1802eaa036a7.1767089672.git.mst@redhat.com>
 References: <cover.1767089672.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -129,67 +129,55 @@ In-Reply-To: <cover.1767089672.git.mst@redhat.com>
 X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
 X-Mutt-Fcc: =sent
 
-Document the __dma_align_begin/__dma_align_end annotations
-introduced by the previous patch.
+When multiple small DMA_FROM_DEVICE or DMA_BIDIRECTIONAL buffers share a
+cacheline, and DMA_API_DEBUG is enabled, we get this warning:
+	cacheline tracking EEXIST, overlapping mappings aren't
+supported.
+
+This is because when one of the mappings is removed, while another
+one is active, CPU might write into the buffer.
+
+Add an attribute for the driver to promise not to do this,
+making the overlapping safe, and suppressing the warning.
 
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- Documentation/core-api/dma-api-howto.rst | 42 ++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+ include/linux/dma-mapping.h | 7 +++++++
+ kernel/dma/debug.c          | 3 ++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/core-api/dma-api-howto.rst b/Documentation/core-api/dma-api-howto.rst
-index 96fce2a9aa90..99eda4c5c8e7 100644
---- a/Documentation/core-api/dma-api-howto.rst
-+++ b/Documentation/core-api/dma-api-howto.rst
-@@ -146,6 +146,48 @@ What about block I/O and networking buffers?  The block I/O and
- networking subsystems make sure that the buffers they use are valid
- for you to DMA from/to.
+diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
+index 47b7de3786a1..8216a86cd0c2 100644
+--- a/include/linux/dma-mapping.h
++++ b/include/linux/dma-mapping.h
+@@ -78,6 +78,13 @@
+  */
+ #define DMA_ATTR_MMIO		(1UL << 10)
  
-+__dma_from_device_aligned_begin/end annotations
-+===============================================
++/*
++ * DMA_ATTR_CPU_CACHE_CLEAN: Indicates the CPU will not dirty any cacheline
++ * overlapping this buffer while it is mapped for DMA. All mappings sharing
++ * a cacheline must have this attribute for this to be considered safe.
++ */
++#define DMA_ATTR_CPU_CACHE_CLEAN	(1UL << 11)
 +
-+As explained previously, when a structure contains a DMA_FROM_DEVICE buffer
-+(device writes to memory) alongside fields that the CPU writes to, cache line
-+sharing between the DMA buffer and CPU-written fields can cause data corruption
-+on CPUs with DMA-incoherent caches.
-+
-+The ``__dma_from_device_aligned_begin/__dma_from_device_aligned_end``
-+annotations ensure proper alignment to prevent this::
-+
-+	struct my_device {
-+		spinlock_t lock1;
-+		__dma_from_device_aligned_begin char dma_buffer1[16];
-+		char dma_buffer2[16];
-+		__dma_from_device_aligned_end spinlock_t lock2;
-+	};
-+
-+On cache-coherent platforms these macros expand to nothing. On non-coherent
-+platforms, they ensure the minimal DMA alignment, which can be as large as 128
-+bytes.
-+
-+.. note::
-+
-+	To isolate a DMA buffer from adjacent fields, you must apply
-+	``__dma_from_device_aligned_begin`` to the first DMA buffer field
-+	**and additionally** apply ``__dma_from_device_aligned_end`` to the
-+	**next** field in the structure, **beyond** the DMA buffer (as opposed
-+	to the last field of the DMA buffer!).  This protects both the head and
-+	tail of the buffer from cache line sharing.
-+
-+	When the DMA buffer is the **last field** in the structure, just
-+	``__dma_from_device_aligned_begin`` is enough - the compiler's struct
-+	padding protects the tail::
-+
-+		struct my_device {
-+			spinlock_t lock;
-+			struct mutex mlock;
-+			__dma_from_device_aligned_begin char dma_buffer1[16];
-+			char dma_buffer2[16];
-+		};
-+
- DMA addressing capabilities
- ===========================
- 
+ /*
+  * A dma_addr_t can hold any valid DMA or bus address for the platform.  It can
+  * be given to a device to use as a DMA source or target.  It is specific to a
+diff --git a/kernel/dma/debug.c b/kernel/dma/debug.c
+index 138ede653de4..7e66d863d573 100644
+--- a/kernel/dma/debug.c
++++ b/kernel/dma/debug.c
+@@ -595,7 +595,8 @@ static void add_dma_entry(struct dma_debug_entry *entry, unsigned long attrs)
+ 	if (rc == -ENOMEM) {
+ 		pr_err_once("cacheline tracking ENOMEM, dma-debug disabled\n");
+ 		global_disable = true;
+-	} else if (rc == -EEXIST && !(attrs & DMA_ATTR_SKIP_CPU_SYNC) &&
++	} else if (rc == -EEXIST &&
++		   !(attrs & (DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_CPU_CACHE_CLEAN)) &&
+ 		   !(IS_ENABLED(CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC) &&
+ 		     is_swiotlb_active(entry->dev))) {
+ 		err_printk(entry->dev, entry,
 -- 
 MST
 
