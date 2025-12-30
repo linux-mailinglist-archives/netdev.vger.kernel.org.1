@@ -1,70 +1,62 @@
-Return-Path: <netdev+bounces-246381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3DD3CEA680
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 19:07:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09620CEA7BC
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 19:38:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B93FF302489F
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 18:06:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C19D230204A9
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 18:38:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC64C322DA3;
-	Tue, 30 Dec 2025 18:06:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D434432D42F;
+	Tue, 30 Dec 2025 18:38:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TnAphv0B"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UbVCgevF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99121242935;
-	Tue, 30 Dec 2025 18:06:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F52B231C91;
+	Tue, 30 Dec 2025 18:38:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767117993; cv=none; b=HGXGAbN+X5mymUQ8gHVg7ramgs5Wv0DPzM6S1Iki2YPzHna+Y9v98McsvgETfJNrAirSglxbCbFdsFlwjI8sv0W8j+T2KydaXVeH5p4k4eVPNjxqK89z7fnrrfjhxI5A2eaCCPXg1LhQ7ZWXlcd7LhhMj6cPDO0PNNbeg/tmzNk=
+	t=1767119907; cv=none; b=shXPpFwXpIpEgGILMBJm8txOHL8PIKlUkPpjYf428JGGzb+ZXmajLpAgOz7f6AQ/IdAqDs6cY6nIKuAEW7H1zuxaPltZLZiHNQr4wXTIkfZFNmyeAtzZlClE+gZP/znXmAKPK6nnyUFgbsS1Ex9cauOQ2ctYSPZMZKcHm8871fg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767117993; c=relaxed/simple;
-	bh=+mZ2BSG8Mo/7t6pCnAocYIY+9a/YSRxQPsfDZwP6lI8=;
+	s=arc-20240116; t=1767119907; c=relaxed/simple;
+	bh=ur0VxoSB6RSnbWIDeXbhT/wa344vQ+T9KG6s/RtqtA0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kBBfiieqd4XasHq6tVzFyW9LzK0B/NeVunw5iUYBmybYuUt197vdnp5vrmfTnE6vGpODGz3ztDFv3hmdZwq3dIxPlCzWIxxIrxJpW6Z7JITR86FnABxZa2suuPgFg+bWQDAiUL84X4pk3QIowH+9bmCrEJBhz/9oPNnJwvz29Yo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TnAphv0B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05D38C4CEFB;
-	Tue, 30 Dec 2025 18:06:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767117993;
-	bh=+mZ2BSG8Mo/7t6pCnAocYIY+9a/YSRxQPsfDZwP6lI8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TnAphv0B8FtOm3V3/J/xA4md6HvcO0RI7LhtjTixEFWoixXCzDO0IAujqQVLnllOv
-	 0jGx9RP58yCr81eA/hxp+CWpMUCxj/5XWjj2Agm37F3dM12xuM4s/7vJwqhl3CQ+Jp
-	 KFqk1dqNiAQtDEUdAzvsb6zm/W0i8Tp8xi7pb1O6dUEn/hUhyKmLm4jTcX1KrJkoSi
-	 RiqOUTv5h7UervvaA1pcwasBEwBWD1bICWOom/h4D4SM5ezakBx9beiiK979Kzyc41
-	 6uulURq3HYMtSiPsHPaX4lREJ0IdVGgpFmpq5ROLATAnKBs4IHllkMkLHZFLbtQPJH
-	 qLplRteSg0EbA==
-Date: Tue, 30 Dec 2025 12:06:32 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Robert Marko <robert.marko@sartura.hr>
-Cc: daniel.machon@microchip.com, radu_nicolae.pirea@upb.ro,
-	linux-i2c@vger.kernel.org, linux-crypto@vger.kernel.org,
-	jirislaby@kernel.org, conor+dt@kernel.org,
-	alexandre.belloni@bootlin.com, andi.shyti@kernel.org,
-	olivia@selenic.com, linux-spi@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org,
-	dmaengine@vger.kernel.org, andrew+netdev@lunn.ch,
-	krzk+dt@kernel.org, nicolas.ferre@microchip.com, linusw@kernel.org,
-	lars.povlsen@microchip.com, pabeni@redhat.com,
-	richard.genoud@bootlin.com, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-	claudiu.beznea@tuxon.dev, linux-gpio@vger.kernel.org,
-	Steen.Hegelund@microchip.com, broonie@kernel.org,
-	luka.perkov@sartura.hr, edumazet@google.com,
-	herbert@gondor.apana.org.au, lee@kernel.org, kuba@kernel.org,
-	vkoul@kernel.org, UNGLinuxDriver@microchip.com,
-	linux-serial@vger.kernel.org
-Subject: Re: [PATCH v4 09/15] dt-bindings: dma: atmel: add
- microchip,lan9691-dma
-Message-ID: <176711799188.884536.16157476210751555846.robh@kernel.org>
-References: <20251229184004.571837-1-robert.marko@sartura.hr>
- <20251229184004.571837-10-robert.marko@sartura.hr>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QkE7jiBlP5wVlhJPPeGel8h1bH9SaR7EJ9yKti/xNdjSX8zts8eo/JWBZDxgsJ738jEXWhVIOwt+WN+ZLk4UMARN5X7A3e5HsS35jm7svqt/nSPgnxxey7RcOrts05AZE5iGxF/TIHK+KdnlJklo5+UHb2E7Y8WXAQdQCjVvXpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UbVCgevF; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=BJpNxtvmPujJMM+4H3jPm4H3rGg/lb3Bx3fF2YOrtP4=; b=UbVCgevF8yVFgZDPjydYWIEjYj
+	jZu2gH3FsDZs61hGHOcTjjVCoH6RMONxEAFWbhb6iGGrxX1sVkzb3P/UtT9YAE4HOFs8erT+kAIyS
+	+S0f4GS2ZL4cyiR2mbCkxSsVAE1kywJnr/NDntN5RXQDxBxP2Ie4mL9pwIsAlL2O/E0U=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vaebZ-000tMn-59; Tue, 30 Dec 2025 19:38:01 +0100
+Date: Tue, 30 Dec 2025 19:38:01 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yohei Kojima <yk@y-koj.net>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Breno Leitao <leitao@debian.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 1/5] net: netdevsim: fix inconsistent carrier state
+ after link/unlink
+Message-ID: <2a1e3bdf-e6b0-4c6f-ac59-cda5ec565b82@lunn.ch>
+References: <cover.1767032397.git.yk@y-koj.net>
+ <ff1139d3236ab7fec2b2b3a2e22510dcd7b01a21.1767032397.git.yk@y-koj.net>
+ <e8180dc5-fc23-4044-bd67-92fc3eebdaa0@lunn.ch>
+ <aVLc4J8SQYLPWdZZ@y-koj.net>
+ <1c8edd12-0933-4aae-8af3-307b133dce27@lunn.ch>
+ <aVP72wedMbegkqzs@desktop.homenetwork>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,22 +65,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251229184004.571837-10-robert.marko@sartura.hr>
+In-Reply-To: <aVP72wedMbegkqzs@desktop.homenetwork>
 
-
-On Mon, 29 Dec 2025 19:37:50 +0100, Robert Marko wrote:
-> Document Microchip LAN969x DMA compatible which is compatible to SAMA7G5.
+> Sure, I've submitted the v2 patch here.
 > 
-> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-> ---
-> Changes in v3:
-> * Merged with microchip,sama7d65-dma since that also falls back to
-> microchip,sama7g5-dma
+> https://lore.kernel.org/netdev/cover.1767108538.git.yk@y-koj.net/
 > 
->  Documentation/devicetree/bindings/dma/atmel,sama5d4-dma.yaml | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+> Following your suggestion, I've removed the unrelated TFO tests and
+> the netdevsim test improvement. I will post the removed patches as a
+> separate series once net-next reopens.
 > 
+> However, I kept the regression test for this patch in the v2 series, as
+> the "1.5.10. Co-posting selftests" section in the maintainer-netdev
+> document says:
 
-Acked-by: Rob Herring (Arm) <robh@kernel.org>
+Thanks for doing this. I don't know enough about netdevsim to be able
+to do a proper review, so i will let somebody else do that.
 
+   Andrew
 
