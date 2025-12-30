@@ -1,217 +1,206 @@
-Return-Path: <netdev+bounces-246371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1D9ECEA2E5
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 17:31:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED238CEA324
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 17:41:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D275E301787D
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 16:31:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BB8FA302EF68
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 16:40:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C3912D878D;
-	Tue, 30 Dec 2025 16:31:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D958320A0B;
+	Tue, 30 Dec 2025 16:40:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lk1mDZW/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CDo8618x";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="mwtxk4Ig"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD5E71E572F
-	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 16:31:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3D825C838
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 16:40:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767112302; cv=none; b=ulqTBqd8w2jToHQITPQ1633q8Si6h+bLsm8VChgZxLypf5JhwuEDFC7lAmNMf1o7Xcob8KFtt4EMaJsEGLvUlrB/MCJHkPDyiHd+g5sl/aeal5U+eV30iH7pnjAvsGS/zlO7KGFtH3KxmPig6ChZWIfh9SxxO9W+QknIS/iah/k=
+	t=1767112839; cv=none; b=KFwSVZR+cPtfbOqFJdqi8yQ244fcwozks0imFk1/4oBEg59+eK2le/VtJSjbKLNzA1eCqXQayPAQUtoCTSsnU1OVykX7dbj96sSBoVXk97at10mgdgme16AydL4wPPu7bkyUkn2q4dms+vHfhznotKz4SkDDRrXlDrEsGJPnIsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767112302; c=relaxed/simple;
-	bh=Y8RZU5d6lIZmaHofQqr+vmPHvJdl64Cmo4166dAgXrQ=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Dr5SxT9Pa1B63dxb5ns9FeOvEBgUTbZEdKyQYuSUxHCUdkw3Y4JM/DqwYjOIoh1s0vu3DUi4wkpc/qIaYYhpxQSUI3cTWi3edFRyriqv9U7J0/AKCvq8mUOvYj7ONuRn6uR88EHDENzy/9ih0U9HvI3bsOC8ybx0YJXEs6n3tCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lk1mDZW/; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-787eb2d8663so129081007b3.0
-        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 08:31:40 -0800 (PST)
+	s=arc-20240116; t=1767112839; c=relaxed/simple;
+	bh=R3ssxNR/IfKvvzigNkiBKuIwzZmdFCE30Vek2VE5a/c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IMBE9Wexaz9DEiH9YdrB+vmLT1Ex+H0lVkfR8/V65Hp0Wk6HlBeGK2BNyRGlZdhYzuoCuw+igQFwa/e1ASQvxs6mzj5bfFMYf7+6SgU9nEP2cuACmTmvagUhXWT9xmZJzvnzc5+7uZeqqOjX1onF59UgazB4vCglVkJPrIZtb+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CDo8618x; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=mwtxk4Ig; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767112836;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7J8z1fD7DSMGZ6iKBx0OqXIx7XfW+ZYePKweShXuH2A=;
+	b=CDo8618xqajMYlrIganDweT8AiGYtCkoWL2waz6M6UJJ78xULg6Xf2r37MrUCzU18evdkK
+	YPMeCIqdnKCMkyIKoc9m3X1R86c2sn8+7/6qBkCYPvCl68I17EVe+Rpai7To6YzRaVdRAF
+	9xDz/cUdBFkP/auH7HPtWHP0TFdclfw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-642-H0WjLIcNO724EVheNQdl8A-1; Tue, 30 Dec 2025 11:40:35 -0500
+X-MC-Unique: H0WjLIcNO724EVheNQdl8A-1
+X-Mimecast-MFC-AGG-ID: H0WjLIcNO724EVheNQdl8A_1767112834
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-430fcf10287so7069992f8f.0
+        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 08:40:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767112299; x=1767717099; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=on+gq2R8tsrRlsmf8QVhviZCXTes9OWH3XXjR5+jNpU=;
-        b=lk1mDZW/ZX/oFFJ8GdsBSZ4GAZUmj2OmrA8h7ftO+MabBw5mRnnd/EtHbrhVQwRcHz
-         G9hkdngXK2BVZD2PbxyWwt1sXyA+0XZCtaNYfdI1GwvPhbnNPnCBPbQANpPsGqi9+tf4
-         Eb8rb88fojZ8teceCjXMEABs5/MArTu5jtdY08XZ8xiLZH6oQmHelx6oIdDWgV7lhZYW
-         U7Lt+Hg/vd0+d3WSvqoagf0qdOAOqjKYawNxixZUy1gT1jlL12j1jNfY99gqIhAjVP/D
-         RxGOx4OdPeP2I7CErQ4iWLc7MjQPAhniqWWs46I+/ia2KgsZAzjxgL9EB7ydyB3QjACc
-         usyA==
+        d=redhat.com; s=google; t=1767112834; x=1767717634; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7J8z1fD7DSMGZ6iKBx0OqXIx7XfW+ZYePKweShXuH2A=;
+        b=mwtxk4IgurGsXmXd+3+syJYF4kqDb7jp92HD8KsW1qYtDpPNBqBEfkEjr+DGU/LqEj
+         IQfp9Epfrx6WuceQhlRBYpv2WP8tgGg/ZI+fw98PU5ieTRk1k6etoYJsEPx69Y9GtGB0
+         2bgZVq5rtiR0W7x8g3XvkRgGktX31eTmXvTZK12Ts+VrG0yHuvCTvG5gjpjfh3U22HJh
+         AzM6zEIL0YXPBD+YUx389UpQnhu6xjHcKFnlQIqfqNpaxyZsbxfMC7wag8SiCa+bRuoU
+         XE6Pk8MyI2vwkXRTiROwsc5p2fUBQXgQIgqfsD+vJq+ayJzkBE85gu8gpwatzOQ7r7Um
+         nXmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767112299; x=1767717099;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=on+gq2R8tsrRlsmf8QVhviZCXTes9OWH3XXjR5+jNpU=;
-        b=Fockkl5yX7khuM++LoWyz+aU9o6kzq99somZSje42JPM599XXXOwpENsBImhMZKMRL
-         xH13MtLAu47lZzQe0PfZygCw7fVv/bq/KUIHiFy9vMVwlG8jY9KjXWD8RZfhVkBv5+vf
-         24TnCYHxX/0vum931Y0RTayNL2PjswqJvFw+HRTQPFNgC2BPitrw5cXZUiegcLIdznWV
-         Kc5A9LxqmtFuowkV4skRvbc+uM/Mx3dC+/edFE+FarVKAc3JxTvWc5MG8c2XXB0W5T+J
-         BQ+tTfIYXch8715B43fzotTat3gVx1lTwwpSFgMND4UCdPRfJpR+OrGSOOdXIjB+xwhd
-         rQ7w==
-X-Forwarded-Encrypted: i=1; AJvYcCXVmYM2md50ABTDLN0kpwrfMCaOiVONW4P7jNhcTyqBPWR3YuowPqNqdnkMwjkHyxPQiEhOAWw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTmhWXDkfKPYhxNJAEHnx0Wsy5xhzYr2YNQQAw9RDxO/ib/UqU
-	7CDTbv7maZrQ5MdpbcogmxhEyRAg38LGB6SSk6hSxBgNdjGaGETOIFNp
-X-Gm-Gg: AY/fxX62MLD14evwpofv9UKgOmPC2Bg1msaObjOtZM+7kq4JPlx12Pu02i/nvCQ06Kr
-	3PtNJGJKMBh9MrhL93ttC6kQ3tv+vutgEommPRCANysGKAd4Onrc7X6z62gZWHPGzcraybqLmsB
-	39+ObM0Dqn26vpACOdAaR2A0zj8uTEKPJ9a/UiHNmI8XuEerHmjIlWoVeB6rbOIKaN7SbOlr7h3
-	zPC2QGGT7CgBq73r7wQgMtXFReGYy8zIb3FXzk23qeZXIUGjBweNBsjGo8qGg3d8vLlBkxuL0pO
-	jY4y1jDzPj9hUasBEVOK4svAihxPdHHAPLqx+6Smh4+wACDBxqy9LDf6Mj8/+HB90TWVGs2QL4A
-	vyBSXlxShvZZua9SyDb9lVmRyZEVRfTF2z+lPw2YYIyGCN8B5ZJ6OPJNWbwVy+iQYPR2gS7tD1C
-	JMWDKrMXX0ECB8hp6T3S4S+cLu9YOI/OrVK43QPmGaO5WjVej1Oz6a3WMDZCpDqsQvo2eElA==
-X-Google-Smtp-Source: AGHT+IEjZu6mjcJcT4uNKe3nRUv5B3/LQQpt7ip4UKVcDHnnb1HmgiSEEa3Fv+8kaAGbrpLFD8eAAw==
-X-Received: by 2002:a05:690c:c513:b0:78f:a003:ad66 with SMTP id 00721157ae682-78fa5a5d938mr312034447b3.7.1767112299128;
-        Tue, 30 Dec 2025 08:31:39 -0800 (PST)
-Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78fb44f0dcdsm127595867b3.30.2025.12.30.08.31.38
+        d=1e100.net; s=20230601; t=1767112834; x=1767717634;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7J8z1fD7DSMGZ6iKBx0OqXIx7XfW+ZYePKweShXuH2A=;
+        b=OaUPSHhJWvlxgh+sx+DphaTdTm6oBjCQAMFnrqc7/rtcbzynAYYlkVDByQTOgzKW6p
+         Qe09oSfQeWx2n1KIzeYMkxBRlnDAPYCCk+XNUAHA7EZ/LbmP5e4T8wRCwYSOCamUekm4
+         ETEMALC8Wl8UwcsoC1jny+K45h9ib1oa3RwFryrO58pLe2SEk2AL8XwRBBbZTTa3VIcY
+         DTRjG6XmgyheZHC4AKPSe062qJBOdtUMFg7hPIErWmnjOlTExApfIAXSI5NQl9i+GHmP
+         zqX5twjbMn1AgIww8B7Bo7Mddoo0ThOpSt9RXgrXPDcC35M0TKSr51hfibKga3BmZU3B
+         PjZw==
+X-Forwarded-Encrypted: i=1; AJvYcCW5kNiKISqIpDSV/ay57ilxrY4I11tyfATXOo89QXDUrasrqwyG4d8u/r//ahAhi5dRyNNrMw8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGSfnmENXoroAXbCOydJrRyjx2Xh7kO6kH2g758K/ooW8ficqj
+	68ISngCr76B90c0MUCG8kRwznCzxhmzw99drHGfbuZPmaBw4GDzZHN4LHhssz7V3lYlKBvDtdYx
+	4sIsL+kwllXPTz+Kg+RTiUO9oqrasjidMdjYigEeHneqU3JlODJkH+/f2kg==
+X-Gm-Gg: AY/fxX6d0MaKvcq3/Dg7lie0KbfQrJ6enKLeTSJZ67G/uawsK/Ajdfiy5yqSekgGMlI
+	oxVoqmRBSjk7P2EGlTwLVmVXjxfpFnWRmQJ/55dgVUYpqpf0yebhHNsPy5AZT1erX2BMzJ4iHHh
+	U812in4yzRbqgakRrvhLASaORbEPEeVlgm2Dl3hJQMM1YP7oQ8lrk2wsysDqW5oSWhj0qIcTUNK
+	etgDIZptirHLtFWwyc8f0TKyAQ9UUbPY2pqUvJetwrw16Kf2tL7VIGUPDIIYOyoflJruSQshP20
+	YWr6ZRdMsNwuotEZXQ2i10r+ou7rcNurmuoBgj7hi0TlCy22cYUEzjDlgmGYYp+zTeZFNpb+F84
+	R5HseuWxaYd3SzL1WeLzNBLtuwngHJWQYOg==
+X-Received: by 2002:adf:f144:0:b0:431:855:c791 with SMTP id ffacd0b85a97d-4324e4c1501mr32588453f8f.3.1767112833341;
+        Tue, 30 Dec 2025 08:40:33 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IECVSdNBMTG9k8N96cOa931b+MOajxv263SWbXaTmkKbkTS3ub+IC9yjT+L/YMFbjvC3biqWw==
+X-Received: by 2002:adf:f144:0:b0:431:855:c791 with SMTP id ffacd0b85a97d-4324e4c1501mr32588393f8f.3.1767112832791;
+        Tue, 30 Dec 2025 08:40:32 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324ea1aef7sm69573295f8f.7.2025.12.30.08.40.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Dec 2025 08:31:38 -0800 (PST)
-Date: Tue, 30 Dec 2025 11:31:37 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: mheib@redhat.com, 
- netdev@vger.kernel.org
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- horms@kernel.org, 
- kernelxing@tencent.com, 
- kuniyu@google.com, 
- Mohammad Heib <mheib@redhat.com>, 
- steffen.klassert@secunet.com, 
- atenart@kernel.org
-Message-ID: <willemdebruijn.kernel.2dac63d32f3d9@gmail.com>
-In-Reply-To: <20251230091107.120038-1-mheib@redhat.com>
-References: <20251230091107.120038-1-mheib@redhat.com>
-Subject: Re: [PATCH net] net: skbuff: fix truesize and head state corruption
- in skb_segment_list
+        Tue, 30 Dec 2025 08:40:32 -0800 (PST)
+Date: Tue, 30 Dec 2025 11:40:28 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jason Wang <jasowang@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Petr Tesarik <ptesarik@suse.com>,
+	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
+	iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org,
+	"Enrico Weigelt, metux IT consult" <info@metux.net>,
+	Viresh Kumar <vireshk@kernel.org>,
+	Linus Walleij <linusw@kernel.org>,
+	Bartosz Golaszewski <brgl@kernel.org>, linux-gpio@vger.kernel.org
+Subject: [PATCH RFC 14/13] gpio: virtio: fix DMA alignment
+Message-ID: <6f2f2a7a74141fa3ad92e001ee276c01ffe9ae49.1767112757.git.mst@redhat.com>
+References: <cover.1767089672.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1767089672.git.mst@redhat.com>
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 
-mheib@ wrote:
-> From: Mohammad Heib <mheib@redhat.com>
-> 
-> When skb_segment_list is called during packet forwarding through
-> a bridge or VXLAN, it assumes that every fragment in a frag_list
-> carries its own socket ownership and head state. While this is true for
-> GSO packets created by the transmit path (via __ip_append_data), it is
-> not true for packets built by the GRO receive path.
+The res and ires buffers in struct virtio_gpio_line and struct
+vgpio_irq_line respectively are used for DMA_FROM_DEVICE via virtqueue_add_sgs().
+However, within these structs, even though these elements are tagged
+as ____cacheline_aligned, adjacent struct elements
+can share DMA cachelines on platforms where ARCH_DMA_MINALIGN >
+L1_CACHE_BYTES (e.g., arm64 with 128-byte DMA alignment but 64-byte
+cache lines).
 
-We have to separate packets that use frag_list, a broader category,
-from those that use fraglist gso chaining. This code path is only
-exercised by the latter.
+The existing ____cacheline_aligned annotation aligns to L1_CACHE_BYTES
+which is now always sufficient for DMA alignment. For example,
+with L1_CACHE_BYTES = 32 and ARCH_DMA_MINALIGN = 128
+  - irq_lines[0].ires at offset 128
+  - irq_lines[1].type at offset 192
+both in same 128-byte DMA cacheline [128-256)
 
-> In the GRO path, fragments are "orphans" (skb->sk == NULL) and were
-> never charged to a socket. However, the current logic in
-> skb_segment_list unconditionally adds every fragment's truesize to
-> delta_truesize and subsequently subtracts this from the parent SKB.
+When the device writes to irq_lines[0].ires and the CPU concurrently
+modifies one of irq_lines[1].type/disabled/masked/queued flags,
+corruption can occur on non-cache-coherent platform.
 
-This was not present in the original fraglist chaining patch cited in
-the Fixes tag. It was added in commit ed4cccef64c1 ("gro: fix
-ownership transfer"). Which was a follow-on to commit 5e10da5385d2
-("skbuff: allow 'slow_gro' for skb carring sock reference") removing
-the skb->destructor reference.
+Fix by using __dma_from_device_aligned_begin/end annotations on the
+DMA buffers. Drop ____cacheline_aligned - it's not required to isolate
+request and response, and keeping them would increase the memory cost.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ drivers/gpio/gpio-virtio.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/gpio/gpio-virtio.c b/drivers/gpio/gpio-virtio.c
+index 17e040991e46..32b578b46df8 100644
+--- a/drivers/gpio/gpio-virtio.c
++++ b/drivers/gpio/gpio-virtio.c
+@@ -10,6 +10,7 @@
+  */
  
-> This results a memory accounting leak, Since GRO fragments were never
-> charged to the socket in the first place, the "refund" results in the
-> parent SKB returning less memory than originally charged when it is
-> finally freed. This leads to a permanent leak in sk_wmem_alloc, which
-> prevents the socket from being destroyed, resulting in a persistent memory
-> leak of the socket object and its related metadata.
-> 
-> The leak can be observed via KMEMLEAK when tearing down the networking
-> environment:
-> 
-> unreferenced object 0xffff8881e6eb9100 (size 2048):
->   comm "ping", pid 6720, jiffies 4295492526
->   backtrace:
->     kmem_cache_alloc_noprof+0x5c6/0x800
->     sk_prot_alloc+0x5b/0x220
->     sk_alloc+0x35/0xa00
->     inet6_create.part.0+0x303/0x10d0
->     __sock_create+0x248/0x640
->     __sys_socket+0x11b/0x1d0
-> 
-> This patch modifies skb_segment_list to only perform head state release
-> and truesize subtraction if the fragment explicitly owns a socket
-> reference. For GRO-forwarded packets where fragments are not owners,
-> the parent maintains the full truesize and acts as the single anchor for
-> the memory refund upon destruction.
-
-Thanks for the report and fix. It can probably be simplified a bit
-based on knowledge that only fraglist chaining skbs reach this path.
-And the Fixes tag should reflect the patch that changed this
-accounting in the GRO patch. Matching that in the GSO path makes
-sense.
-
-> Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
-> Signed-off-by: Mohammad Heib <mheib@redhat.com>
-> ---
->  net/core/skbuff.c | 18 ++++++++++++++++--
->  1 file changed, 16 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index a00808f7be6a..aee9be42409b 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -4641,6 +4641,7 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
->  	struct sk_buff *tail = NULL;
->  	struct sk_buff *nskb, *tmp;
->  	int len_diff, err;
-> +	bool is_flist = !!(skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST);
-
-This is guaranteed when entering skb_segment_list.
-
->  
->  	skb_push(skb, -skb_network_offset(skb) + offset);
->  
-> @@ -4656,7 +4657,15 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
->  		list_skb = list_skb->next;
->  
->  		err = 0;
-> -		delta_truesize += nskb->truesize;
-> +
-> +		/* Only track truesize delta if the fragment is being orphaned.
-> +		 * In the GRO path, fragments don't have a socket owner (sk=NULL),
-> +		 * so the parent must maintain the total truesize to prevent
-> +		 * memory accounting leaks.
-> +		 */
-> +		if (!is_flist || nskb->sk)
-> +			delta_truesize += nskb->truesize;
-> +
->  		if (skb_shared(nskb)) {
->  			tmp = skb_clone(nskb, GFP_ATOMIC);
->  			if (tmp) {
-> @@ -4684,7 +4693,12 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
->  
->  		skb_push(nskb, -skb_network_offset(nskb) + offset);
->  
-> -		skb_release_head_state(nskb);
-> +		/* For GRO-forwarded packets, fragments have no head state
-> +		 * (no sk/destructor) to release. Skip this.
-> +		 */
-> +		if (!is_flist || nskb->sk)
-> +			skb_release_head_state(nskb);
-> +
->  		len_diff = skb_network_header_len(nskb) - skb_network_header_len(skb);
->  		__copy_skb_header(nskb, skb);
->  
-> -- 
-> 2.52.0
-> 
-
+ #include <linux/completion.h>
++#include <linux/dma-mapping.h>
+ #include <linux/err.h>
+ #include <linux/gpio/driver.h>
+ #include <linux/io.h>
+@@ -24,8 +25,12 @@
+ struct virtio_gpio_line {
+ 	struct mutex lock; /* Protects line operation */
+ 	struct completion completion;
+-	struct virtio_gpio_request req ____cacheline_aligned;
+-	struct virtio_gpio_response res ____cacheline_aligned;
++
++	__dma_from_device_aligned_begin
++	struct virtio_gpio_request req;
++	struct virtio_gpio_response res;
++
++	__dma_from_device_aligned_end
+ 	unsigned int rxlen;
+ };
+ 
+@@ -37,8 +42,9 @@ struct vgpio_irq_line {
+ 	bool update_pending;
+ 	bool queue_pending;
+ 
+-	struct virtio_gpio_irq_request ireq ____cacheline_aligned;
+-	struct virtio_gpio_irq_response ires ____cacheline_aligned;
++	__dma_from_device_aligned_begin
++	struct virtio_gpio_irq_request ireq;
++	struct virtio_gpio_irq_response ires;
+ };
+ 
+ struct virtio_gpio {
+-- 
+MST
 
 
