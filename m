@@ -1,133 +1,313 @@
-Return-Path: <netdev+bounces-246369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACA84CEA285
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 17:20:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA7C9CEA2CD
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 17:29:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7CD643016351
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 16:20:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 295C93027A55
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 16:29:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC94A2DFA46;
-	Tue, 30 Dec 2025 16:20:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64EC93218BA;
+	Tue, 30 Dec 2025 16:29:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="LjhWoVpJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GfuEmRU1"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.st.icloud.com (p-east2-cluster6-host3-snip4-8.eps.apple.com [57.103.76.139])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 215E023D291
-	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 16:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.76.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCD1F3203B2
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 16:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767111655; cv=none; b=GMGTmZNJfofWKvxxndjcNAJ9S98oJBupcxLDeQf1mL1n2PUT6/gtcXj5rjrEN2ZieFsi7un/cZQEHWSHz5jEi0UQfZCUBLB1pBYQLIbERLgS63XcMFxFv2Y0bzQfemZUEbM28Qo7Gz/2rnKqsbwnbiuQUrhZUIfAONMbnOFELA0=
+	t=1767112141; cv=none; b=tsY/jY145AGbK4ml7kCoj4WK2dpYzCZ9xtpwZP5cA9Zi85eeh36mcrByTgAoQoD+mlP5wT8cIN6uOfoX+Mwv/0kxD+wjXIxlRaQMCod44PVV+vE1KU4KYiMhUJnZFRUbbGELN4oGG4juvbPi0NXxRj9FViThtkcMWJD/YXZQu0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767111655; c=relaxed/simple;
-	bh=dDXWnCq0Za/OuZWyC0m5psZoWkR2+Iv9p0NoWO6hGAU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nJsIx8PLnuzAbuLWygLlVQU6fGs1Bc11dM51mO26WzcVBJ0JA8Nm2gbwhpiKtfyRgfUpI6sLm1NU68y12mdWJfGMfE6RxFwXipYbNMDO989tL4NJDDT2B+a9KU09qDr5qfiCa0/fNel3u0v0BvyvF6fKyQQ5+Kv77YO3/F+dlp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=LjhWoVpJ reason="key not found in DNS"; arc=none smtp.client-ip=57.103.76.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=y-koj.net
-Received: from outbound.st.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-east-1a-10-percent-1 (Postfix) with ESMTPS id BE6601800945;
-	Tue, 30 Dec 2025 16:20:49 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; bh=tSItxaKxgrEix3YXJKP7kH4+YC+yo1zWfJ4X9i74RkY=; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=LjhWoVpJBImLPH25iNCinboAeJI+3Mn385QmdQqrBIopquopj+FyfMIaOZB7GBG/VttyX/9zzQ6Uu0aQILVj4dB25u7WYGM1UaU0q7AP8EH3PAO97Rar+nGnVpT0jQNqZSrB1cL9TMSQ6dqaSReNzwRZWmLgN08G1wc+RQcdKfxK125hILAsPt5S7JLZEnK5pHxGVhbDvp6cLRobf0JKCyJdp8eOjMPUdi29YB+CMhkzYW0X4hvOS3csG/Gi5P63hd5GSr/B2tnyaTu67a3SyuXL0/69dUWTvyvrtplcGCO+66BNVMAsLuG82eTlDdliIC/GH/9BwTt7U/i7h1buVA==
-mail-alias-created-date: 1719758601013
-Received: from desktop.homenetwork (unknown [17.42.251.67])
-	by p00-icloudmta-asmtp-us-east-1a-10-percent-1 (Postfix) with ESMTPSA id BAFF118001F3;
-	Tue, 30 Dec 2025 16:20:46 +0000 (UTC)
-Date: Wed, 31 Dec 2025 01:20:43 +0900
-From: Yohei Kojima <yk@y-koj.net>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Breno Leitao <leitao@debian.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 1/5] net: netdevsim: fix inconsistent carrier state
- after link/unlink
-Message-ID: <aVP72wedMbegkqzs@desktop.homenetwork>
-References: <cover.1767032397.git.yk@y-koj.net>
- <ff1139d3236ab7fec2b2b3a2e22510dcd7b01a21.1767032397.git.yk@y-koj.net>
- <e8180dc5-fc23-4044-bd67-92fc3eebdaa0@lunn.ch>
- <aVLc4J8SQYLPWdZZ@y-koj.net>
- <1c8edd12-0933-4aae-8af3-307b133dce27@lunn.ch>
+	s=arc-20240116; t=1767112141; c=relaxed/simple;
+	bh=KKpqZbEtskgb5NBKeJlGWbLifno9PTy5moTyS5l7PDc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DOUpD0oMMhw6xuRuV9opTUUHGqTyC/dmHgx6XjwNOKAygEcmq8caTkFWcDjjKF+n7do/Zk9230eRsY8lsLTp4yDsgpFdHQQ3rgV529VD5VFg/7Jr4IgMUZdcK8h7fZds7PeE10VDHqdMdJ0DttgDllFajrKj1zv7fT/PTpuch50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GfuEmRU1; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-803474aaa8bso3608129b3a.0
+        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 08:28:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767112138; x=1767716938; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=avaMKZupKtJgQKOisKq5Lh5/+7xstw6Aa+YwOZ+A+Sg=;
+        b=GfuEmRU1fG637DEnYsbPDCCTXc/r5UNtEuBwx2pMEHH33LgxuwY4q+WJ5bZq5AsFXi
+         MlffsCiiADNH7SHjMejf7MFFLutoKIMkBhnwGY4U0L5Nq24xbrZsUzmFYUSCNbWTl8ze
+         /PyzO9MGFbSCKoF/gc2rg+j7/ITZKWsw9SK1SmlPGhVbIPDsOhXaGAWIcndFCWuuqdm8
+         GJOCSHNKd0UwJcSMWvldthW+K6YnP3ATlrM/fTxIFPB88oo8SGH0qjtdLrLj0TZrctqv
+         vlxxyiVOcUVXETUeWZvu5igrA4FECRH75XhwKIlOVpxo++xnuwotqsEP+bx1SAPMQUiT
+         bxdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767112138; x=1767716938;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=avaMKZupKtJgQKOisKq5Lh5/+7xstw6Aa+YwOZ+A+Sg=;
+        b=sUCIygTT/Qb8D6iJcFxRIrmCIDlixL/eXAbft2tBgX3pHQqc0RAezsbrhccE8z2wMS
+         4YBtoH8xmYDbXwbeiFnKcF/DC7NZNAjOZjZOaZEXp1vXwWg6rjdMYFuk9J7i8CCM/+o8
+         lNPR5NGhdTKoX1GbDY7yEL4i/52ZmpXMVbFZJCMgJqtREbECwWWmo6kqbNApChDrm4xI
+         vfvHSd4HButiWHOozJpMV1mvxc+ewVLUqj5e4cXQY9rcwCjN/tl4Ga416c4Rk+MMCzaL
+         lZMqkQLni6Z/qcvRcsml2OAeWKvJNuUJcWTWOmfCIgvPAbCOtXWHgtBKbys1rfnDqRih
+         qNpw==
+X-Forwarded-Encrypted: i=1; AJvYcCVPnGbkpgFLDLYTDNSKm+wdDBKB6hgjec2sBbzTzw1PqPo/bfudeOon+F5eWczpiE5BIWXwaS0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDCxN4WwAxlr2rtKdhODHjjb5PgPcKLxj1MWzMMWc/wts1a37r
+	qHEfi8JR/nSX2q6wBuIxaQtQMrMgFZ9ILWJC9RqbBXTY3+5YQ14usN3D
+X-Gm-Gg: AY/fxX5UvktCzmbuRi4Z+ZaLb2u5jeiNnCRc6+OSQU6DPgFDxysmfxvvp5UCySmoCFB
+	VcIK4svPibYh2RqzdjrFNmf/bMyP+lrjau61P+CO/TrpSvUkVwk46QQmBiTxHd8mE3TT0CuxcDr
+	2h9MpEd/cr/cC6A5xGOsZ6cAb/Bz5WOqHeJLOjepGlUdZrUlVxn5mSdo7+UhMWxrm8oK7vD75jz
+	e6/lcAkxngIooA/TnHVchP5qkR6IA2wmYCb3FQZPaDkgRVwmknC4NH2y6vtsfjdOfGBOdp+pY8P
+	uAS3biVNB+hRL0lwHQc//J4VuRNFVX1xFwA/eBq5Q7DFAzCo9CF278S+pchQ0pzXHRXdlg3gdUo
+	7VVt7Nn+FqbUu+QFIFF22fYSo4t0UtHvj7vuK9luRP/Bi9hyjkMZ8bj1/DBk/QRtXTRY116ur1I
+	auFKWY8RJHiTxvryYPbIe9mo6MihdRYRwsuwkox83/lJURZoBZZZ95bCAhGC8nn2snvj6hgP7S
+X-Google-Smtp-Source: AGHT+IEeIFcn942167d2Oa9jA5JH71Kb7EInHlhV/HyENTzZnTajimLC14AMzvcWvH9NUqaWmckHDQ==
+X-Received: by 2002:a05:6a20:1588:b0:366:14b0:4b18 with SMTP id adf61e73a8af0-3769ff1a89amr35543258637.35.1767112138052;
+        Tue, 30 Dec 2025 08:28:58 -0800 (PST)
+Received: from ?IPV6:2001:ee0:4f4c:210:f996:1f74:6f8f:2cf2? ([2001:ee0:4f4c:210:f996:1f74:6f8f:2cf2])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7aa328basm33010825b3a.11.2025.12.30.08.28.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Dec 2025 08:28:57 -0800 (PST)
+Message-ID: <7143657a-a52f-4cff-acbc-e89f4c713cc4@gmail.com>
+Date: Tue, 30 Dec 2025 23:28:50 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1c8edd12-0933-4aae-8af3-307b133dce27@lunn.ch>
-X-Proofpoint-ORIG-GUID: po66zsw5zFCFgmG7oSpJ4WJ_0KLjmH5g
-X-Proofpoint-GUID: po66zsw5zFCFgmG7oSpJ4WJ_0KLjmH5g
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjMwMDE0OCBTYWx0ZWRfXwkBLL1IHA9om
- eWlKhSnw96R1YxjoeofbFNxwf/cCu92OyqSJKfqGIld4doPkLdXMx5Ti7Lg8my2fM1u2SSBVQjd
- ntqcGWgUt1hLlZFlefDcj9alnZPL6IBhcIyqXKoxH3AfQ7+BwwNuZ+2JYvn1JcRFJx8Z+ADmL16
- VlIl7HPPvci6SH9f2JHi5z8/6uCdEHOE3h745CfEDRqjDc8zPLIaYksYClKGCZugYG06LOXEcj9
- +9927RVf7HEPoaBt/WfhdaG5tBuALjnvqRjAYrTYDkGEoPkxc88ni91mH9jLSdO6HwFnw7qZg2I
- ZP8DcGRyiYPT8xgvGwU
-X-Authority-Info: v=2.4 cv=EaXFgfmC c=1 sm=1 tr=0 ts=6953fbe3 cx=c_apl:c_pps
- a=YrL12D//S6tul8v/L+6tKg==:117 a=YrL12D//S6tul8v/L+6tKg==:17
- a=kj9zAlcOel0A:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=jnl5ZKOAAAAA:8 a=-R4GPZT43BhAmBvLjtsA:9 a=CjuIK1q_8ugA:10
- a=sCYvTA3s4OUA:10 a=5imOhvl-4yYA:10 a=RNrZ5ZR47oNZP8zBN2PD:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-30_02,2025-12-30_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
- bulkscore=0 clxscore=1030 adultscore=0 suspectscore=0 phishscore=0
- mlxlogscore=392 spamscore=0 malwarescore=0 classifier=spam authscore=0
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
- definitions=main-2512300148
-X-JNJ: AAAAAAABtVWw0NogA427bYar3HqBdOi0LuUt1K9jL2dk7SmvZnxJcKOZIbpT/6fJj0lcQd3OG/WlrgRL9QEvkKElmBa6efvMk2VNeUXFd10ROWhf0p31Td894idCtgyzrFT3+wSkBS09//k+OCsOEwNS3FXqe+MAoKeQhjE7Y68NtlDuWtSkV8rwXdrDAI5aTYvvg8OYpW+MpJGrk0/qZSp4UwpswiNuEjPTJUMG+XAj65nHoJTmqwmAXN0g5pzhCCA5qBc+i7Ri+RVixr11soar60GsCSQWL+pk/KGatH7cpGHd4pmQIJQJNaIbwwzqUTsNWjWlZvLnsDH9lb49UD8C8yE/jFc8Wvf+8qiFXC0YBLKdUK+dqVKunCv6P2YwZkePW0Ew5XiKAmJriVLz22DVDfl6qdCJvnU8I8EqQ0G5Nhwh3j/gzNdAwBcippCG/sWqLv+CRV0ZSsPb1uC+HFecwHHA/VB86qfB3OYwKIOfL2292sWL6SQxl4/2zhlG6TBhdjwvfWBdrMW0EAPuLK8d8joLpZCLsraqEeCjItNShdwzYXZrjfNJ5MI+suWVwVZOXOsnSe4QY9jt/kvA2p92XUnIBTP9rUEBwFxJsSS6PrKxW5WtLPLxsNrI4IHQM4JMiNjJIrrP0OKeKP0N4cBNgiShGwK6OPpgOVqkr54RsaLP/eHEnrHTgWxsIs2tAxbTY6HdbWGMdyn+0bYBSA==
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/3] virtio-net: make refill work a per receive queue
+ work
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+References: <20251223152533.24364-1-minhquangbui99@gmail.com>
+ <20251223152533.24364-2-minhquangbui99@gmail.com>
+ <CACGkMEvXkPiTGxZ6nuC72-VGdLHVXzrGa9bAF=TcP8nqPjeZ_w@mail.gmail.com>
+ <1766540234.3618076-1-xuanzhuo@linux.alibaba.com>
+ <20251223204555-mutt-send-email-mst@kernel.org>
+ <CACGkMEs7_-=-8w=7gW8R_EhzfWOwuDoj4p-iCPQ7areOa9uaUw@mail.gmail.com>
+ <20251225112729-mutt-send-email-mst@kernel.org>
+ <CACGkMEt33BAWGmeFfHWYrjQLOT4+JB7HsWWVMKUn6yFxQ9y2gg@mail.gmail.com>
+ <20251226022727-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+In-Reply-To: <20251226022727-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 30, 2025 at 12:02:22PM +0100, Andrew Lunn wrote:
-> > Thank you for the quick reply. I don't intend for this patch to be
-> > backported to the stable tree. My understanding was that bugfix patches
-> > to the net tree should have Fixes: tag for historical tracking.
-> > 
-> > > 
-> > > netdevsim is not a real device. Do its bugs actually bother people?
-> > 
-> > This patch fixes a real bug that is seen when a developer tries to test
-> > TFO or netdevsim tests on NetworkManager-enabled systems: it causes
-> > false positives in kselftests on such systems.
-> 
-> O.K, then keep the Fixes tag and submit it for net. However, the tests
-> should be considered development work, and submitted to net-next, if
-> they are not fixes. Please split this into two series.
+On 12/26/25 14:37, Michael S. Tsirkin wrote:
+> On Fri, Dec 26, 2025 at 09:31:26AM +0800, Jason Wang wrote:
+>> On Fri, Dec 26, 2025 at 12:27 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+>>> On Thu, Dec 25, 2025 at 03:33:29PM +0800, Jason Wang wrote:
+>>>> On Wed, Dec 24, 2025 at 9:48 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+>>>>> On Wed, Dec 24, 2025 at 09:37:14AM +0800, Xuan Zhuo wrote:
+>>>>>> Hi Jason,
+>>>>>>
+>>>>>> I'm wondering why we even need this refill work. Why not simply let NAPI retry
+>>>>>> the refill on its next run if the refill fails? That would seem much simpler.
+>>>>>> This refill work complicates maintenance and often introduces a lot of
+>>>>>> concurrency issues and races.
+>>>>>>
+>>>>>> Thanks.
+>>>>> refill work can refill from GFP_KERNEL, napi only from ATOMIC.
+>>>>>
+>>>>> And if GFP_ATOMIC failed, aggressively retrying might not be a great idea.
+>>>> Btw, I see some drivers are doing things as Xuan said. E.g
+>>>> mlx5e_napi_poll() did:
+>>>>
+>>>> busy |= INDIRECT_CALL_2(rq->post_wqes,
+>>>>                                  mlx5e_post_rx_mpwqes,
+>>>>                                  mlx5e_post_rx_wqes,
+>>>>
+>>>> ...
+>>>>
+>>>> if (busy) {
+>>>>           if (likely(mlx5e_channel_no_affinity_change(c))) {
+>>>>                  work_done = budget;
+>>>>                  goto out;
+>>>> ...
+>>>
+>>> is busy a GFP_ATOMIC allocation failure?
+>> Yes, and I think the logic here is to fallback to ksoftirqd if the
+>> allocation fails too much.
+>>
+>> Thanks
+>
+> True. I just don't know if this works better or worse than the
+> current design, but it is certainly simpler and we never actually
+> worried about the performance of the current one.
+>
+>
+> So you know, let's roll with this approach.
+>
+> I do however ask that some testing is done on the patch forcing these OOM
+> situations just to see if we are missing something obvious.
+>
+>
+> the beauty is the patch can be very small:
+> 1. patch 1 do not schedule refill ever, just retrigger napi
+> 2. remove all the now dead code
+>
+> this way patch 1 will be small and backportable to stable.
 
-Sure, I've submitted the v2 patch here.
+I've tried 1. with this patch
 
-https://lore.kernel.org/netdev/cover.1767108538.git.yk@y-koj.net/
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 1bb3aeca66c6..9e890aff2d95 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -3035,7 +3035,7 @@ static int virtnet_receive_packets(struct virtnet_info *vi,
+  }
 
-Following your suggestion, I've removed the unrelated TFO tests and
-the netdevsim test improvement. I will post the removed patches as a
-separate series once net-next reopens.
+  static int virtnet_receive(struct receive_queue *rq, int budget,
+-               unsigned int *xdp_xmit)
++               unsigned int *xdp_xmit, bool *retry_refill)
+  {
+      struct virtnet_info *vi = rq->vq->vdev->priv;
+      struct virtnet_rq_stats stats = {};
+@@ -3047,12 +3047,8 @@ static int virtnet_receive(struct receive_queue *rq, int budget,
+          packets = virtnet_receive_packets(vi, rq, budget, xdp_xmit, &stats);
 
-However, I kept the regression test for this patch in the v2 series, as
-the "1.5.10. Co-posting selftests" section in the maintainer-netdev
-document says:
+      if (rq->vq->num_free > min((unsigned int)budget, virtqueue_get_vring_size(rq->vq)) / 2) {
+-        if (!try_fill_recv(vi, rq, GFP_ATOMIC)) {
+-            spin_lock(&vi->refill_lock);
+-            if (vi->refill_enabled)
+-                schedule_delayed_work(&vi->refill, 0);
+-            spin_unlock(&vi->refill_lock);
+-        }
++        if (!try_fill_recv(vi, rq, GFP_ATOMIC))
++            *retry_refill = true;
+      }
 
-  Selftests should be part of the same series as the code changes.
-  Specifically for fixes both code change and related test should
-  go into the same tree (the tests may lack a Fixes tag, which is
-  expected). Mixing code changes and test changes in a single commit
-  is discouraged.
+      u64_stats_set(&stats.packets, packets);
+@@ -3129,18 +3125,18 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
+      struct send_queue *sq;
+      unsigned int received;
+      unsigned int xdp_xmit = 0;
+-    bool napi_complete;
++    bool napi_complete, retry_refill = false;
 
-> 
-> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-> 
->     Andrew
+      virtnet_poll_cleantx(rq, budget);
 
-Thank you,
-Yohei Kojima
+-    received = virtnet_receive(rq, budget, &xdp_xmit);
++    received = virtnet_receive(rq, budget, &xdp_xmit, &retry_refill);
+      rq->packets_in_napi += received;
 
-> 
-> ---
-> pw-bot: cr
+      if (xdp_xmit & VIRTIO_XDP_REDIR)
+          xdp_do_flush();
+
+      /* Out of packets? */
+-    if (received < budget) {
++    if (received < budget && !retry_refill) {
+          napi_complete = virtqueue_napi_complete(napi, rq->vq, received);
+          /* Intentionally not taking dim_lock here. This may result in a
+           * spurious net_dim call. But if that happens virtnet_rx_dim_work
+@@ -3230,9 +3226,11 @@ static int virtnet_open(struct net_device *dev)
+
+      for (i = 0; i < vi->max_queue_pairs; i++) {
+          if (i < vi->curr_queue_pairs)
+-            /* Make sure we have some buffers: if oom use wq. */
+-            if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
+-                schedule_delayed_work(&vi->refill, 0);
++            /* If this fails, we will retry later in
++             * NAPI poll, which is scheduled in the below
++             * virtnet_enable_queue_pair
++             */
++            try_fill_recv(vi, &vi->rq[i], GFP_KERNEL);
+
+          err = virtnet_enable_queue_pair(vi, i);
+          if (err < 0)
+@@ -3473,15 +3471,15 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
+                  bool refill)
+  {
+      bool running = netif_running(vi->dev);
+-    bool schedule_refill = false;
+
+-    if (refill && !try_fill_recv(vi, rq, GFP_KERNEL))
+-        schedule_refill = true;
++    if (refill)
++        /* If this fails, we will retry later in NAPI poll, which is
++         * scheduled in the below virtnet_napi_enable
++         */
++        try_fill_recv(vi, rq, GFP_KERNEL);
++
+      if (running)
+          virtnet_napi_enable(rq);
+-
+-    if (schedule_refill)
+-        schedule_delayed_work(&vi->refill, 0);
+  }
+
+  static void virtnet_rx_resume_all(struct virtnet_info *vi)
+@@ -3777,6 +3775,7 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
+      struct virtio_net_rss_config_trailer old_rss_trailer;
+      struct net_device *dev = vi->dev;
+      struct scatterlist sg;
++    int i;
+
+      if (!vi->has_cvq || !virtio_has_feature(vi->vdev, VIRTIO_NET_F_MQ))
+          return 0;
+@@ -3829,11 +3828,8 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
+      }
+  succ:
+      vi->curr_queue_pairs = queue_pairs;
+-    /* virtnet_open() will refill when device is going to up. */
+-    spin_lock_bh(&vi->refill_lock);
+-    if (dev->flags & IFF_UP && vi->refill_enabled)
+-        schedule_delayed_work(&vi->refill, 0);
+-    spin_unlock_bh(&vi->refill_lock);
++    for (i = 0; i < vi->curr_queue_pairs; i++)
++        try_fill_recv(vi, &vi->rq[i], GFP_KERNEL);
+
+      return 0;
+  }
+
+
+But I got an issue with selftests/drivers/net/hw/xsk_reconfig.py. This
+test sets up XDP zerocopy (Xsk) but does not provide any descriptors to
+the fill ring. So xsk_pool does not have any descriptors and
+try_fill_recv will always fail. The RX NAPI keeps polling. Later, when
+we want to disable the xsk_pool, in virtnet_xsk_pool_disable path,
+
+virtnet_xsk_pool_disable
+-> virtnet_rq_bind_xsk_pool
+   -> virtnet_rx_pause
+     -> __virtnet_rx_pause
+       -> virtnet_napi_disable
+         -> napi_disable
+
+We get stuck in napi_disable because the RX NAPI is still polling.
+
+In drivers/net/ethernet/mellanox/mlx5, AFAICS, it uses state bit for
+synchronization between xsk setup (mlx5e_xsk_setup_pool) with RX NAPI
+(mlx5e_napi_poll) without using napi_disable/enable. However, in
+drivers/net/ethernet/intel/ice,
+
+ice_xsk_pool_setup
+-> ice_qp_dis
+   -> ice_qvec_toggle_napi
+     -> napi_disable
+
+it still uses napi_disable. Did I miss something in the above patch?
+I'll try to look into using another synchronization instead of
+napi_disable/enable in xsk_pool setup path too.
+
+Thanks,
+Quang Minh.
+
 
