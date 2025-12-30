@@ -1,313 +1,217 @@
-Return-Path: <netdev+bounces-246370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA7C9CEA2CD
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 17:29:08 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1D9ECEA2E5
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 17:31:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 295C93027A55
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 16:29:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D275E301787D
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 16:31:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64EC93218BA;
-	Tue, 30 Dec 2025 16:29:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C3912D878D;
+	Tue, 30 Dec 2025 16:31:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GfuEmRU1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lk1mDZW/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCD1F3203B2
-	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 16:28:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD5E71E572F
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 16:31:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767112141; cv=none; b=tsY/jY145AGbK4ml7kCoj4WK2dpYzCZ9xtpwZP5cA9Zi85eeh36mcrByTgAoQoD+mlP5wT8cIN6uOfoX+Mwv/0kxD+wjXIxlRaQMCod44PVV+vE1KU4KYiMhUJnZFRUbbGELN4oGG4juvbPi0NXxRj9FViThtkcMWJD/YXZQu0g=
+	t=1767112302; cv=none; b=ulqTBqd8w2jToHQITPQ1633q8Si6h+bLsm8VChgZxLypf5JhwuEDFC7lAmNMf1o7Xcob8KFtt4EMaJsEGLvUlrB/MCJHkPDyiHd+g5sl/aeal5U+eV30iH7pnjAvsGS/zlO7KGFtH3KxmPig6ChZWIfh9SxxO9W+QknIS/iah/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767112141; c=relaxed/simple;
-	bh=KKpqZbEtskgb5NBKeJlGWbLifno9PTy5moTyS5l7PDc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DOUpD0oMMhw6xuRuV9opTUUHGqTyC/dmHgx6XjwNOKAygEcmq8caTkFWcDjjKF+n7do/Zk9230eRsY8lsLTp4yDsgpFdHQQ3rgV529VD5VFg/7Jr4IgMUZdcK8h7fZds7PeE10VDHqdMdJ0DttgDllFajrKj1zv7fT/PTpuch50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GfuEmRU1; arc=none smtp.client-ip=209.85.210.181
+	s=arc-20240116; t=1767112302; c=relaxed/simple;
+	bh=Y8RZU5d6lIZmaHofQqr+vmPHvJdl64Cmo4166dAgXrQ=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Dr5SxT9Pa1B63dxb5ns9FeOvEBgUTbZEdKyQYuSUxHCUdkw3Y4JM/DqwYjOIoh1s0vu3DUi4wkpc/qIaYYhpxQSUI3cTWi3edFRyriqv9U7J0/AKCvq8mUOvYj7ONuRn6uR88EHDENzy/9ih0U9HvI3bsOC8ybx0YJXEs6n3tCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lk1mDZW/; arc=none smtp.client-ip=209.85.128.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-803474aaa8bso3608129b3a.0
-        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 08:28:58 -0800 (PST)
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-787eb2d8663so129081007b3.0
+        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 08:31:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767112138; x=1767716938; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=avaMKZupKtJgQKOisKq5Lh5/+7xstw6Aa+YwOZ+A+Sg=;
-        b=GfuEmRU1fG637DEnYsbPDCCTXc/r5UNtEuBwx2pMEHH33LgxuwY4q+WJ5bZq5AsFXi
-         MlffsCiiADNH7SHjMejf7MFFLutoKIMkBhnwGY4U0L5Nq24xbrZsUzmFYUSCNbWTl8ze
-         /PyzO9MGFbSCKoF/gc2rg+j7/ITZKWsw9SK1SmlPGhVbIPDsOhXaGAWIcndFCWuuqdm8
-         GJOCSHNKd0UwJcSMWvldthW+K6YnP3ATlrM/fTxIFPB88oo8SGH0qjtdLrLj0TZrctqv
-         vlxxyiVOcUVXETUeWZvu5igrA4FECRH75XhwKIlOVpxo++xnuwotqsEP+bx1SAPMQUiT
-         bxdw==
+        d=gmail.com; s=20230601; t=1767112299; x=1767717099; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=on+gq2R8tsrRlsmf8QVhviZCXTes9OWH3XXjR5+jNpU=;
+        b=lk1mDZW/ZX/oFFJ8GdsBSZ4GAZUmj2OmrA8h7ftO+MabBw5mRnnd/EtHbrhVQwRcHz
+         G9hkdngXK2BVZD2PbxyWwt1sXyA+0XZCtaNYfdI1GwvPhbnNPnCBPbQANpPsGqi9+tf4
+         Eb8rb88fojZ8teceCjXMEABs5/MArTu5jtdY08XZ8xiLZH6oQmHelx6oIdDWgV7lhZYW
+         U7Lt+Hg/vd0+d3WSvqoagf0qdOAOqjKYawNxixZUy1gT1jlL12j1jNfY99gqIhAjVP/D
+         RxGOx4OdPeP2I7CErQ4iWLc7MjQPAhniqWWs46I+/ia2KgsZAzjxgL9EB7ydyB3QjACc
+         usyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767112138; x=1767716938;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=avaMKZupKtJgQKOisKq5Lh5/+7xstw6Aa+YwOZ+A+Sg=;
-        b=sUCIygTT/Qb8D6iJcFxRIrmCIDlixL/eXAbft2tBgX3pHQqc0RAezsbrhccE8z2wMS
-         4YBtoH8xmYDbXwbeiFnKcF/DC7NZNAjOZjZOaZEXp1vXwWg6rjdMYFuk9J7i8CCM/+o8
-         lNPR5NGhdTKoX1GbDY7yEL4i/52ZmpXMVbFZJCMgJqtREbECwWWmo6kqbNApChDrm4xI
-         vfvHSd4HButiWHOozJpMV1mvxc+ewVLUqj5e4cXQY9rcwCjN/tl4Ga416c4Rk+MMCzaL
-         lZMqkQLni6Z/qcvRcsml2OAeWKvJNuUJcWTWOmfCIgvPAbCOtXWHgtBKbys1rfnDqRih
-         qNpw==
-X-Forwarded-Encrypted: i=1; AJvYcCVPnGbkpgFLDLYTDNSKm+wdDBKB6hgjec2sBbzTzw1PqPo/bfudeOon+F5eWczpiE5BIWXwaS0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDCxN4WwAxlr2rtKdhODHjjb5PgPcKLxj1MWzMMWc/wts1a37r
-	qHEfi8JR/nSX2q6wBuIxaQtQMrMgFZ9ILWJC9RqbBXTY3+5YQ14usN3D
-X-Gm-Gg: AY/fxX5UvktCzmbuRi4Z+ZaLb2u5jeiNnCRc6+OSQU6DPgFDxysmfxvvp5UCySmoCFB
-	VcIK4svPibYh2RqzdjrFNmf/bMyP+lrjau61P+CO/TrpSvUkVwk46QQmBiTxHd8mE3TT0CuxcDr
-	2h9MpEd/cr/cC6A5xGOsZ6cAb/Bz5WOqHeJLOjepGlUdZrUlVxn5mSdo7+UhMWxrm8oK7vD75jz
-	e6/lcAkxngIooA/TnHVchP5qkR6IA2wmYCb3FQZPaDkgRVwmknC4NH2y6vtsfjdOfGBOdp+pY8P
-	uAS3biVNB+hRL0lwHQc//J4VuRNFVX1xFwA/eBq5Q7DFAzCo9CF278S+pchQ0pzXHRXdlg3gdUo
-	7VVt7Nn+FqbUu+QFIFF22fYSo4t0UtHvj7vuK9luRP/Bi9hyjkMZ8bj1/DBk/QRtXTRY116ur1I
-	auFKWY8RJHiTxvryYPbIe9mo6MihdRYRwsuwkox83/lJURZoBZZZ95bCAhGC8nn2snvj6hgP7S
-X-Google-Smtp-Source: AGHT+IEeIFcn942167d2Oa9jA5JH71Kb7EInHlhV/HyENTzZnTajimLC14AMzvcWvH9NUqaWmckHDQ==
-X-Received: by 2002:a05:6a20:1588:b0:366:14b0:4b18 with SMTP id adf61e73a8af0-3769ff1a89amr35543258637.35.1767112138052;
-        Tue, 30 Dec 2025 08:28:58 -0800 (PST)
-Received: from ?IPV6:2001:ee0:4f4c:210:f996:1f74:6f8f:2cf2? ([2001:ee0:4f4c:210:f996:1f74:6f8f:2cf2])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7aa328basm33010825b3a.11.2025.12.30.08.28.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Dec 2025 08:28:57 -0800 (PST)
-Message-ID: <7143657a-a52f-4cff-acbc-e89f4c713cc4@gmail.com>
-Date: Tue, 30 Dec 2025 23:28:50 +0700
+        d=1e100.net; s=20230601; t=1767112299; x=1767717099;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=on+gq2R8tsrRlsmf8QVhviZCXTes9OWH3XXjR5+jNpU=;
+        b=Fockkl5yX7khuM++LoWyz+aU9o6kzq99somZSje42JPM599XXXOwpENsBImhMZKMRL
+         xH13MtLAu47lZzQe0PfZygCw7fVv/bq/KUIHiFy9vMVwlG8jY9KjXWD8RZfhVkBv5+vf
+         24TnCYHxX/0vum931Y0RTayNL2PjswqJvFw+HRTQPFNgC2BPitrw5cXZUiegcLIdznWV
+         Kc5A9LxqmtFuowkV4skRvbc+uM/Mx3dC+/edFE+FarVKAc3JxTvWc5MG8c2XXB0W5T+J
+         BQ+tTfIYXch8715B43fzotTat3gVx1lTwwpSFgMND4UCdPRfJpR+OrGSOOdXIjB+xwhd
+         rQ7w==
+X-Forwarded-Encrypted: i=1; AJvYcCXVmYM2md50ABTDLN0kpwrfMCaOiVONW4P7jNhcTyqBPWR3YuowPqNqdnkMwjkHyxPQiEhOAWw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTmhWXDkfKPYhxNJAEHnx0Wsy5xhzYr2YNQQAw9RDxO/ib/UqU
+	7CDTbv7maZrQ5MdpbcogmxhEyRAg38LGB6SSk6hSxBgNdjGaGETOIFNp
+X-Gm-Gg: AY/fxX62MLD14evwpofv9UKgOmPC2Bg1msaObjOtZM+7kq4JPlx12Pu02i/nvCQ06Kr
+	3PtNJGJKMBh9MrhL93ttC6kQ3tv+vutgEommPRCANysGKAd4Onrc7X6z62gZWHPGzcraybqLmsB
+	39+ObM0Dqn26vpACOdAaR2A0zj8uTEKPJ9a/UiHNmI8XuEerHmjIlWoVeB6rbOIKaN7SbOlr7h3
+	zPC2QGGT7CgBq73r7wQgMtXFReGYy8zIb3FXzk23qeZXIUGjBweNBsjGo8qGg3d8vLlBkxuL0pO
+	jY4y1jDzPj9hUasBEVOK4svAihxPdHHAPLqx+6Smh4+wACDBxqy9LDf6Mj8/+HB90TWVGs2QL4A
+	vyBSXlxShvZZua9SyDb9lVmRyZEVRfTF2z+lPw2YYIyGCN8B5ZJ6OPJNWbwVy+iQYPR2gS7tD1C
+	JMWDKrMXX0ECB8hp6T3S4S+cLu9YOI/OrVK43QPmGaO5WjVej1Oz6a3WMDZCpDqsQvo2eElA==
+X-Google-Smtp-Source: AGHT+IEjZu6mjcJcT4uNKe3nRUv5B3/LQQpt7ip4UKVcDHnnb1HmgiSEEa3Fv+8kaAGbrpLFD8eAAw==
+X-Received: by 2002:a05:690c:c513:b0:78f:a003:ad66 with SMTP id 00721157ae682-78fa5a5d938mr312034447b3.7.1767112299128;
+        Tue, 30 Dec 2025 08:31:39 -0800 (PST)
+Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78fb44f0dcdsm127595867b3.30.2025.12.30.08.31.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Dec 2025 08:31:38 -0800 (PST)
+Date: Tue, 30 Dec 2025 11:31:37 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: mheib@redhat.com, 
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ horms@kernel.org, 
+ kernelxing@tencent.com, 
+ kuniyu@google.com, 
+ Mohammad Heib <mheib@redhat.com>, 
+ steffen.klassert@secunet.com, 
+ atenart@kernel.org
+Message-ID: <willemdebruijn.kernel.2dac63d32f3d9@gmail.com>
+In-Reply-To: <20251230091107.120038-1-mheib@redhat.com>
+References: <20251230091107.120038-1-mheib@redhat.com>
+Subject: Re: [PATCH net] net: skbuff: fix truesize and head state corruption
+ in skb_segment_list
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/3] virtio-net: make refill work a per receive queue
- work
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-References: <20251223152533.24364-1-minhquangbui99@gmail.com>
- <20251223152533.24364-2-minhquangbui99@gmail.com>
- <CACGkMEvXkPiTGxZ6nuC72-VGdLHVXzrGa9bAF=TcP8nqPjeZ_w@mail.gmail.com>
- <1766540234.3618076-1-xuanzhuo@linux.alibaba.com>
- <20251223204555-mutt-send-email-mst@kernel.org>
- <CACGkMEs7_-=-8w=7gW8R_EhzfWOwuDoj4p-iCPQ7areOa9uaUw@mail.gmail.com>
- <20251225112729-mutt-send-email-mst@kernel.org>
- <CACGkMEt33BAWGmeFfHWYrjQLOT4+JB7HsWWVMKUn6yFxQ9y2gg@mail.gmail.com>
- <20251226022727-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-In-Reply-To: <20251226022727-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On 12/26/25 14:37, Michael S. Tsirkin wrote:
-> On Fri, Dec 26, 2025 at 09:31:26AM +0800, Jason Wang wrote:
->> On Fri, Dec 26, 2025 at 12:27 AM Michael S. Tsirkin <mst@redhat.com> wrote:
->>> On Thu, Dec 25, 2025 at 03:33:29PM +0800, Jason Wang wrote:
->>>> On Wed, Dec 24, 2025 at 9:48 AM Michael S. Tsirkin <mst@redhat.com> wrote:
->>>>> On Wed, Dec 24, 2025 at 09:37:14AM +0800, Xuan Zhuo wrote:
->>>>>> Hi Jason,
->>>>>>
->>>>>> I'm wondering why we even need this refill work. Why not simply let NAPI retry
->>>>>> the refill on its next run if the refill fails? That would seem much simpler.
->>>>>> This refill work complicates maintenance and often introduces a lot of
->>>>>> concurrency issues and races.
->>>>>>
->>>>>> Thanks.
->>>>> refill work can refill from GFP_KERNEL, napi only from ATOMIC.
->>>>>
->>>>> And if GFP_ATOMIC failed, aggressively retrying might not be a great idea.
->>>> Btw, I see some drivers are doing things as Xuan said. E.g
->>>> mlx5e_napi_poll() did:
->>>>
->>>> busy |= INDIRECT_CALL_2(rq->post_wqes,
->>>>                                  mlx5e_post_rx_mpwqes,
->>>>                                  mlx5e_post_rx_wqes,
->>>>
->>>> ...
->>>>
->>>> if (busy) {
->>>>           if (likely(mlx5e_channel_no_affinity_change(c))) {
->>>>                  work_done = budget;
->>>>                  goto out;
->>>> ...
->>>
->>> is busy a GFP_ATOMIC allocation failure?
->> Yes, and I think the logic here is to fallback to ksoftirqd if the
->> allocation fails too much.
->>
->> Thanks
->
-> True. I just don't know if this works better or worse than the
-> current design, but it is certainly simpler and we never actually
-> worried about the performance of the current one.
->
->
-> So you know, let's roll with this approach.
->
-> I do however ask that some testing is done on the patch forcing these OOM
-> situations just to see if we are missing something obvious.
->
->
-> the beauty is the patch can be very small:
-> 1. patch 1 do not schedule refill ever, just retrigger napi
-> 2. remove all the now dead code
->
-> this way patch 1 will be small and backportable to stable.
+mheib@ wrote:
+> From: Mohammad Heib <mheib@redhat.com>
+> 
+> When skb_segment_list is called during packet forwarding through
+> a bridge or VXLAN, it assumes that every fragment in a frag_list
+> carries its own socket ownership and head state. While this is true for
+> GSO packets created by the transmit path (via __ip_append_data), it is
+> not true for packets built by the GRO receive path.
 
-I've tried 1. with this patch
+We have to separate packets that use frag_list, a broader category,
+from those that use fraglist gso chaining. This code path is only
+exercised by the latter.
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 1bb3aeca66c6..9e890aff2d95 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -3035,7 +3035,7 @@ static int virtnet_receive_packets(struct virtnet_info *vi,
-  }
+> In the GRO path, fragments are "orphans" (skb->sk == NULL) and were
+> never charged to a socket. However, the current logic in
+> skb_segment_list unconditionally adds every fragment's truesize to
+> delta_truesize and subsequently subtracts this from the parent SKB.
 
-  static int virtnet_receive(struct receive_queue *rq, int budget,
--               unsigned int *xdp_xmit)
-+               unsigned int *xdp_xmit, bool *retry_refill)
-  {
-      struct virtnet_info *vi = rq->vq->vdev->priv;
-      struct virtnet_rq_stats stats = {};
-@@ -3047,12 +3047,8 @@ static int virtnet_receive(struct receive_queue *rq, int budget,
-          packets = virtnet_receive_packets(vi, rq, budget, xdp_xmit, &stats);
+This was not present in the original fraglist chaining patch cited in
+the Fixes tag. It was added in commit ed4cccef64c1 ("gro: fix
+ownership transfer"). Which was a follow-on to commit 5e10da5385d2
+("skbuff: allow 'slow_gro' for skb carring sock reference") removing
+the skb->destructor reference.
+ 
+> This results a memory accounting leak, Since GRO fragments were never
+> charged to the socket in the first place, the "refund" results in the
+> parent SKB returning less memory than originally charged when it is
+> finally freed. This leads to a permanent leak in sk_wmem_alloc, which
+> prevents the socket from being destroyed, resulting in a persistent memory
+> leak of the socket object and its related metadata.
+> 
+> The leak can be observed via KMEMLEAK when tearing down the networking
+> environment:
+> 
+> unreferenced object 0xffff8881e6eb9100 (size 2048):
+>   comm "ping", pid 6720, jiffies 4295492526
+>   backtrace:
+>     kmem_cache_alloc_noprof+0x5c6/0x800
+>     sk_prot_alloc+0x5b/0x220
+>     sk_alloc+0x35/0xa00
+>     inet6_create.part.0+0x303/0x10d0
+>     __sock_create+0x248/0x640
+>     __sys_socket+0x11b/0x1d0
+> 
+> This patch modifies skb_segment_list to only perform head state release
+> and truesize subtraction if the fragment explicitly owns a socket
+> reference. For GRO-forwarded packets where fragments are not owners,
+> the parent maintains the full truesize and acts as the single anchor for
+> the memory refund upon destruction.
 
-      if (rq->vq->num_free > min((unsigned int)budget, virtqueue_get_vring_size(rq->vq)) / 2) {
--        if (!try_fill_recv(vi, rq, GFP_ATOMIC)) {
--            spin_lock(&vi->refill_lock);
--            if (vi->refill_enabled)
--                schedule_delayed_work(&vi->refill, 0);
--            spin_unlock(&vi->refill_lock);
--        }
-+        if (!try_fill_recv(vi, rq, GFP_ATOMIC))
-+            *retry_refill = true;
-      }
+Thanks for the report and fix. It can probably be simplified a bit
+based on knowledge that only fraglist chaining skbs reach this path.
+And the Fixes tag should reflect the patch that changed this
+accounting in the GRO patch. Matching that in the GSO path makes
+sense.
 
-      u64_stats_set(&stats.packets, packets);
-@@ -3129,18 +3125,18 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
-      struct send_queue *sq;
-      unsigned int received;
-      unsigned int xdp_xmit = 0;
--    bool napi_complete;
-+    bool napi_complete, retry_refill = false;
+> Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
+> Signed-off-by: Mohammad Heib <mheib@redhat.com>
+> ---
+>  net/core/skbuff.c | 18 ++++++++++++++++--
+>  1 file changed, 16 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index a00808f7be6a..aee9be42409b 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -4641,6 +4641,7 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
+>  	struct sk_buff *tail = NULL;
+>  	struct sk_buff *nskb, *tmp;
+>  	int len_diff, err;
+> +	bool is_flist = !!(skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST);
 
-      virtnet_poll_cleantx(rq, budget);
+This is guaranteed when entering skb_segment_list.
 
--    received = virtnet_receive(rq, budget, &xdp_xmit);
-+    received = virtnet_receive(rq, budget, &xdp_xmit, &retry_refill);
-      rq->packets_in_napi += received;
+>  
+>  	skb_push(skb, -skb_network_offset(skb) + offset);
+>  
+> @@ -4656,7 +4657,15 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
+>  		list_skb = list_skb->next;
+>  
+>  		err = 0;
+> -		delta_truesize += nskb->truesize;
+> +
+> +		/* Only track truesize delta if the fragment is being orphaned.
+> +		 * In the GRO path, fragments don't have a socket owner (sk=NULL),
+> +		 * so the parent must maintain the total truesize to prevent
+> +		 * memory accounting leaks.
+> +		 */
+> +		if (!is_flist || nskb->sk)
+> +			delta_truesize += nskb->truesize;
+> +
+>  		if (skb_shared(nskb)) {
+>  			tmp = skb_clone(nskb, GFP_ATOMIC);
+>  			if (tmp) {
+> @@ -4684,7 +4693,12 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
+>  
+>  		skb_push(nskb, -skb_network_offset(nskb) + offset);
+>  
+> -		skb_release_head_state(nskb);
+> +		/* For GRO-forwarded packets, fragments have no head state
+> +		 * (no sk/destructor) to release. Skip this.
+> +		 */
+> +		if (!is_flist || nskb->sk)
+> +			skb_release_head_state(nskb);
+> +
+>  		len_diff = skb_network_header_len(nskb) - skb_network_header_len(skb);
+>  		__copy_skb_header(nskb, skb);
+>  
+> -- 
+> 2.52.0
+> 
 
-      if (xdp_xmit & VIRTIO_XDP_REDIR)
-          xdp_do_flush();
-
-      /* Out of packets? */
--    if (received < budget) {
-+    if (received < budget && !retry_refill) {
-          napi_complete = virtqueue_napi_complete(napi, rq->vq, received);
-          /* Intentionally not taking dim_lock here. This may result in a
-           * spurious net_dim call. But if that happens virtnet_rx_dim_work
-@@ -3230,9 +3226,11 @@ static int virtnet_open(struct net_device *dev)
-
-      for (i = 0; i < vi->max_queue_pairs; i++) {
-          if (i < vi->curr_queue_pairs)
--            /* Make sure we have some buffers: if oom use wq. */
--            if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
--                schedule_delayed_work(&vi->refill, 0);
-+            /* If this fails, we will retry later in
-+             * NAPI poll, which is scheduled in the below
-+             * virtnet_enable_queue_pair
-+             */
-+            try_fill_recv(vi, &vi->rq[i], GFP_KERNEL);
-
-          err = virtnet_enable_queue_pair(vi, i);
-          if (err < 0)
-@@ -3473,15 +3471,15 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
-                  bool refill)
-  {
-      bool running = netif_running(vi->dev);
--    bool schedule_refill = false;
-
--    if (refill && !try_fill_recv(vi, rq, GFP_KERNEL))
--        schedule_refill = true;
-+    if (refill)
-+        /* If this fails, we will retry later in NAPI poll, which is
-+         * scheduled in the below virtnet_napi_enable
-+         */
-+        try_fill_recv(vi, rq, GFP_KERNEL);
-+
-      if (running)
-          virtnet_napi_enable(rq);
--
--    if (schedule_refill)
--        schedule_delayed_work(&vi->refill, 0);
-  }
-
-  static void virtnet_rx_resume_all(struct virtnet_info *vi)
-@@ -3777,6 +3775,7 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
-      struct virtio_net_rss_config_trailer old_rss_trailer;
-      struct net_device *dev = vi->dev;
-      struct scatterlist sg;
-+    int i;
-
-      if (!vi->has_cvq || !virtio_has_feature(vi->vdev, VIRTIO_NET_F_MQ))
-          return 0;
-@@ -3829,11 +3828,8 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
-      }
-  succ:
-      vi->curr_queue_pairs = queue_pairs;
--    /* virtnet_open() will refill when device is going to up. */
--    spin_lock_bh(&vi->refill_lock);
--    if (dev->flags & IFF_UP && vi->refill_enabled)
--        schedule_delayed_work(&vi->refill, 0);
--    spin_unlock_bh(&vi->refill_lock);
-+    for (i = 0; i < vi->curr_queue_pairs; i++)
-+        try_fill_recv(vi, &vi->rq[i], GFP_KERNEL);
-
-      return 0;
-  }
-
-
-But I got an issue with selftests/drivers/net/hw/xsk_reconfig.py. This
-test sets up XDP zerocopy (Xsk) but does not provide any descriptors to
-the fill ring. So xsk_pool does not have any descriptors and
-try_fill_recv will always fail. The RX NAPI keeps polling. Later, when
-we want to disable the xsk_pool, in virtnet_xsk_pool_disable path,
-
-virtnet_xsk_pool_disable
--> virtnet_rq_bind_xsk_pool
-   -> virtnet_rx_pause
-     -> __virtnet_rx_pause
-       -> virtnet_napi_disable
-         -> napi_disable
-
-We get stuck in napi_disable because the RX NAPI is still polling.
-
-In drivers/net/ethernet/mellanox/mlx5, AFAICS, it uses state bit for
-synchronization between xsk setup (mlx5e_xsk_setup_pool) with RX NAPI
-(mlx5e_napi_poll) without using napi_disable/enable. However, in
-drivers/net/ethernet/intel/ice,
-
-ice_xsk_pool_setup
--> ice_qp_dis
-   -> ice_qvec_toggle_napi
-     -> napi_disable
-
-it still uses napi_disable. Did I miss something in the above patch?
-I'll try to look into using another synchronization instead of
-napi_disable/enable in xsk_pool setup path too.
-
-Thanks,
-Quang Minh.
 
 
