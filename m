@@ -1,98 +1,80 @@
-Return-Path: <netdev+bounces-246314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0801ECE93F1
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 10:43:37 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E028CCE93EB
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 10:43:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7276A301C90C
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 09:42:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D655E3011EF9
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 09:43:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914EE2D480E;
-	Tue, 30 Dec 2025 09:42:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D9C2C1594;
+	Tue, 30 Dec 2025 09:43:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vp4I4MmK";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xvl3Ppnx"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="Yx0T07BY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB2C2C3251
-	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 09:42:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E8A1273D6D
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 09:43:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767087777; cv=none; b=VajNmNblm7O5l0UbvshqUoFkLUL/zjBEBa5OSL+sR8sfjSm/fxS6U/EjT6HqdK9tGL5KEWwNLXSOCjnOcJx4k0BW3kDGaaX/TdIk8pMMsrBlPgm+p5jjVfm7KGczvMHQ4jEQbD9lZdMVQwk/UICBgz40IHzThfNQKz4mBaybpeY=
+	t=1767087800; cv=none; b=Lq8QhVKxVcauzwKISSYD8y82D9HuE/ciyqQtbTLEq2JwRMNsommpiSpuURKDBQ95CyFOpbaBV2+CPirCWpq/q4UadzzCl3W26mwDB/ZyZvUPrGSzN22ssFfNpFFgo21vMKjhmmedzKfKRLmBq28HTiF5ico/BM2AvkZFnCtGJfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767087777; c=relaxed/simple;
-	bh=SU/gkVSJSKmS1toUh8a9AX9Zwej8Gg1TuhVWXdqgfeM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z+9BbHfL/qmq6yUVXWN+T13kXlDSmfXOTBvyJbgZqDrY77kcwxxdLWutZbf8OEHr1Fx3ngA5fFSgnJYOGEGJS34EPGvuMoQfmO2Qpb9blL7XDgd67rLElUz2mL7jpJRKQtMGPlHVBzfapgSTIUVYgGy3xD1tZLIOkF1W878ANPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vp4I4MmK; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xvl3Ppnx; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767087774;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q9/bKFXPzIaEZ/uggKugW5GizuegwuaRhWjx7DK7tW0=;
-	b=Vp4I4MmKubqCsQ+bGeKHvxIxKkxKySm5OkuRtb9IvksBZToddEVR1TlzSsBxy9zRjE1grE
-	+qqp1GXGorwVAWYi+H+LIZM5xtP9gV4rxtvx9UERQFfGBOC2B0JyyQzOgUjplIyG0bHgIL
-	EdBmTK9T+159c53R+WrUWgoniKOGcro=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-460-L-i0QONNPAqcIlhoEfxOOQ-1; Tue, 30 Dec 2025 04:42:51 -0500
-X-MC-Unique: L-i0QONNPAqcIlhoEfxOOQ-1
-X-Mimecast-MFC-AGG-ID: L-i0QONNPAqcIlhoEfxOOQ_1767087770
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-430fc83f58dso5479025f8f.2
-        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 01:42:51 -0800 (PST)
+	s=arc-20240116; t=1767087800; c=relaxed/simple;
+	bh=iE6KV/7UHGp41soTgYVw3e1OL80Hieyf4n1TNLf1WjA=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=DIXI5N2HWNoFM+ON07irqDhPjf69xOWNqXxMDQTOgaOtBkmLFd3HQdDq0CXJ319ajy0kZ8tFgTaob3KW+nCxjFmcgAqow+tlCLmpmnnckFSzhdjUsmIiv654xdx55uiDJ7L+aRqmLl0H8/aT58vg8u55DwpkdwDLUiebgWzu7UA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=Yx0T07BY; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-42fbc3056afso5269316f8f.2
+        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 01:43:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767087770; x=1767692570; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Q9/bKFXPzIaEZ/uggKugW5GizuegwuaRhWjx7DK7tW0=;
-        b=Xvl3PpnxqJ8ShPtrHMNnbUU40XyeJSVfCzxWQfJWZM7In46jKQnpEt3DDDNWlulBRT
-         8VQq6DyPJyqzTz830FwvbWoQSFE3jCh0RFTi2AU29XhRjsD1x8jIUlJDfd1YM11EJl5X
-         mqWVJDPRMHgIvNnJevB8jZD+kTGKNWHig4MsUNZ69nQAP3xDHKJpzCutB8Vsexg6150q
-         EavwzHnGnGxwvvOTEOGHmRRFoM7I6Q5z7VEsK9uaix2msUbw3A2VB5ObhvlJnT1bpTua
-         ffkQ9zsMczDMrhYimfP/lFqGCM4rHUAeFjT9t1j7oR7TDVxNcrdX953CjsVOb+vyDG7Z
-         UHGQ==
+        d=blackwall.org; s=google; t=1767087797; x=1767692597; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ZI12bs0nfawvolFv3Qb93ZqyLQZt1RM+Ems0PNmAxgw=;
+        b=Yx0T07BYPCcFhDBKYke/NAaTvDdgUA+lFZ/6WggO02N39st7cpIz9sOeGiAQEEjBPZ
+         DkxqvJPik2FKQ76LUyF0kHOw+RdNgcFzF8gXFE4ccNgiOA1xcEDEZKeqIJeflH+7lkYa
+         vYie0HPgxMLoiNBAIHJhu5agdUbIFsGjn2oKmVOL4JXmJQkDNVEd8HRXGHVmXWLPONX4
+         iO1b9uuSS6faMhUDX1rHqNQ4GnFmFwKWZ4EM/IB3xv6ymrmC4Agc7dQ+kjOo2RiUqLfr
+         e+nzeh5tTDqRZo5IpAK+/lEP3ECwdwUoYpEjjRRzfaFMcxwCjUtQ8WKww7KHUALtindR
+         0rPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767087770; x=1767692570;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Q9/bKFXPzIaEZ/uggKugW5GizuegwuaRhWjx7DK7tW0=;
-        b=RJqjmHq7/T7F/J/HhNcHtL6S7qODbtY0+s/zAiXXMSCiLlGZRJkvt/zQYAkLW/g74p
-         bXI1Ynwn6H19jwbfBGGTaokFDytEY1IpitTKQJQrMKorkU+E/ylyWQ4EljXmo5D54G2y
-         rhG08PKvZDPgMy9bxGCXSlbjKRhnGyKrfXLbwfRk5Ujmtg4M9Fc4o8ZyWS/iewKCYMJB
-         EzkmwFgtqiytVeRtWacKWQ/1A15LeMj9Ano6WyEc5E85PAtgIyKJLapQdKhxk75D4qlJ
-         QYc6XEXZ5haAZGV2DtZjWK7eaHKO0AcR72jdagqeu0EioDm9x1U8PQo6HGOiWOkDZovz
-         +VOw==
-X-Gm-Message-State: AOJu0Yww+CPUB0rNJJiEMcc8zm0jxfg+FX3a6mo6ti+sP/TB0HY9OHlC
-	fB9JYd84LPhF9NRulct6hDn52uiit2O+KQAR5ARHT8mI1MrjrEM2NbulR3/6ciY3vPXCKP0Y3lp
-	JXzeoylLMrhGvnpgRZ/NTAHCLv41B4kiiPDJPMIjf5OwMxlM4Hk5m9fbOcA==
-X-Gm-Gg: AY/fxX6vu04+WaxT9UTEpHVf7/tjECy/DjoY3/tu9Jga2W6XkhNMEwIn/ip/91HVbS2
-	RAt0bvYUfvc0DcSz36svxlN560/oTGHfHSRRjCYbkXVDIdwy/oGS28xd3iPmBXOV67YL952fGKv
-	mFB8KNlpWmpJpuB/4Iww1/QVxpYGtLyG6xMvzLBuiQjdgFg/53oZaU2Bv2YglCk50qsGtDuv1F9
-	FBi5PeNBl6BCGCXoWWu1XgHXbreKNGXoDC613eds3WH7KrYPbb03B6s2stf9+oPYtsYWuWos20Q
-	vyEzVQ2BAf+PrHZfMlIe2WlA8OL0EZHMnj35S09pUHEbUEYul7GUYddYdbA9r4q5ZHTdQ27KrSb
-	4k7y4ef3jdpUi
-X-Received: by 2002:a05:600c:8b06:b0:477:a977:b8c5 with SMTP id 5b1f17b1804b1-47d34de6358mr303808845e9.31.1767087770031;
-        Tue, 30 Dec 2025 01:42:50 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE3Zx9lRdKfuZUc0CFMcTPCHEvkS3FVBu+fC+b4QW1XnjJD/mHOaw+2kjvzo31uDZK3uXx8xw==
-X-Received: by 2002:a05:600c:8b06:b0:477:a977:b8c5 with SMTP id 5b1f17b1804b1-47d34de6358mr303808595e9.31.1767087769680;
-        Tue, 30 Dec 2025 01:42:49 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.153.12])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be3a4651bsm250192045e9.7.2025.12.30.01.42.48
+        d=1e100.net; s=20230601; t=1767087797; x=1767692597;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZI12bs0nfawvolFv3Qb93ZqyLQZt1RM+Ems0PNmAxgw=;
+        b=QvxZEcQe0uAan1pPX72Vi1jJP+7QB5KKBqamulccvJ9zMByHW2HE3DrjMsje5AvW4a
+         tCUEiHaYQeYKz+FMuN0veLsnvbBGkTXQEgvJ6tkHQa0wgF2j1MKV3sqoyP5A7v/Zx7y6
+         lGWhQ6EQ8gZIQrwRig7goSdOYbgOrlzZnBbcIb8egHdsCHaQAYdUXEL77MKxvBHwk4wF
+         2V1AAh7VznYmwQSCLJfqWrmTY0syIjNS0R5SQsNr+rbde/XcqkxDnHK8VA+VzIhNvfQQ
+         Fd/eZWrJ4dhPMiEmonYVYcLY5DLVJXsr91apr3c3kD0PsN5KdQACcbFGl1ULcnv6fE+c
+         DLHA==
+X-Forwarded-Encrypted: i=1; AJvYcCWyNYWb5R0ztHIuAQKB8ueH6pIVUgriS1zGP2Ubfd8CBllUr11bb7DNsTp4dnP7ZPMOPjt3qk4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhUH51/k0oQxfgEvS24W4KMnm/7hi2135zsl5UPgf1fqdKnQTZ
+	Ju3sQfwVMp2mqN0XMhJ5VfByDcABDUrA/gx+M0ql7O83XHBMpWbLncC5p9Kw1oQrDYwL63c7V4P
+	nxn0PGtM=
+X-Gm-Gg: AY/fxX6oo3EoHMSUSLpVuNqu/zWzsAxhAte01qii0ac+ybo3VmXGg8e6T1NoneUOhaZ
+	YsXViT3NMVg2sEppLq+MykiZ1bFKxOZBp/Eca4B33SivJ3cy6qCS/k2o+R27OVsPANUYGTAAQ1L
+	/SQJ01JbBcHPQ1qKi9UVZm2o3uKHBGF12Tw9MVXxVmW5ydCrSFiIJtIvhOoea16Oek/UbDVusNJ
+	lbTAzoY4JXRXnjjfcsXsca3vN411rDPfu6wcTTu6yh/X6YysckvBnAPFFktr+CPa4Cgn4wYDKRD
+	1tLrPg+QtNTyeFE//tE4zstoMgly+R+q3LzwuQb2TYeO4JJkjX6SbWCleYZj5vmQ7sUz/x8rCHX
+	E8ZGrK3crO17pq9ZyTdIiEgPkBfbb2VGW7sf+K3fFOsfR7FPrFoFWEPuD5T39CClgt0pAm7qQq7
+	x1bgwM7mN6zS8zDQRVZ1FzJGlGTQo3jGDhpvHYlnI/YA==
+X-Google-Smtp-Source: AGHT+IH+oKW1kxJutJxOKBjSITpQG+izJaO+2kKRoWTWKVcGbjKSJw8OJGb916fH2IBsCpd5yAJqrQ==
+X-Received: by 2002:a05:6000:2281:b0:432:86e1:bd35 with SMTP id ffacd0b85a97d-43286e1be62mr13373132f8f.31.1767087796592;
+        Tue, 30 Dec 2025 01:43:16 -0800 (PST)
+Received: from [192.168.0.161] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324eab33f5sm67809180f8f.41.2025.12.30.01.43.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Dec 2025 01:42:49 -0800 (PST)
-Message-ID: <3d6fbc23-e9b8-443c-badb-b3380b62d21f@redhat.com>
-Date: Tue, 30 Dec 2025 10:42:47 +0100
+        Tue, 30 Dec 2025 01:43:16 -0800 (PST)
+Message-ID: <d9558681-3113-4993-81a1-ff22873908cf@blackwall.org>
+Date: Tue, 30 Dec 2025 11:43:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,45 +82,99 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Fix PTP driver warnings by removing settime64 check
-To: Tinsae Tadesse <tinsaetadesse2015@gmail.com>, richardcochran@gmail.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20251229173346.8899-1-tinsaetadesse2015@gmail.com>
+Subject: Re: [PATCH net] bridge: fix C-VLAN preservation in 802.1ad
+ vlan_tunnel egress
+From: Nikolay Aleksandrov <razor@blackwall.org>
+To: Alexandre Knecht <knecht.alexandre@gmail.com>, netdev@vger.kernel.org
+Cc: roopa@nvidia.com, Ido Schimmel <idosch@nvidia.com>
+References: <20251228020057.2788865-1-knecht.alexandre@gmail.com>
+ <7cde982c-a9c1-4b9e-8d73-458ebede9bcc@blackwall.org>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251229173346.8899-1-tinsaetadesse2015@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <7cde982c-a9c1-4b9e-8d73-458ebede9bcc@blackwall.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 12/29/25 6:32 PM, Tinsae Tadesse wrote:
-> Signed-off-by: Tinsae Tadesse <tinsaetadesse2015@gmail.com>
-> ---
->  drivers/ptp/ptp_clock.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+On 30/12/2025 11:38, Nikolay Aleksandrov wrote:
+> On 28/12/2025 04:00, Alexandre Knecht wrote:
+>> When using an 802.1ad bridge with vlan_tunnel, the C-VLAN tag is
+>> incorrectly stripped from frames during egress processing.
+>>
+>> br_handle_egress_vlan_tunnel() uses skb_vlan_pop() to remove the S-VLAN
+>> from hwaccel before VXLAN encapsulation. However, skb_vlan_pop() also
+>> moves any "next" VLAN from the payload into hwaccel:
+>>
+>>      /* move next vlan tag to hw accel tag */
+>>      __skb_vlan_pop(skb, &vlan_tci);
+>>      __vlan_hwaccel_put_tag(skb, vlan_proto, vlan_tci);
+>>
+>> For QinQ frames where the C-VLAN sits in the payload, this moves it to
+>> hwaccel where it gets lost during VXLAN encapsulation.
+>>
+>> Fix by calling __vlan_hwaccel_clear_tag() directly, which clears only
+>> the hwaccel S-VLAN and leaves the payload untouched.
+>>
+>> This path is only taken when vlan_tunnel is enabled and tunnel_info
+>> is configured, so 802.1Q bridges are unaffected.
+>>
+>> Tested with 802.1ad bridge + VXLAN vlan_tunnel, verified C-VLAN
+>> preserved in VXLAN payload via tcpdump.
+>>
+>> Fixes: 11538d039ac6 ("bridge: vlan dst_metadata hooks in ingress and 
+>> egress paths")
+>> Signed-off-by: Alexandre Knecht <knecht.alexandre@gmail.com>
+>> ---
+>>   net/bridge/br_vlan_tunnel.c | 11 +++++++----
+>>   1 file changed, 7 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/net/bridge/br_vlan_tunnel.c b/net/bridge/br_vlan_tunnel.c
+>> index 12de0d1df0bc..a1b62507e521 100644
+>> --- a/net/bridge/br_vlan_tunnel.c
+>> +++ b/net/bridge/br_vlan_tunnel.c
+>> @@ -189,7 +189,6 @@ int br_handle_egress_vlan_tunnel(struct sk_buff *skb,
+>>       IP_TUNNEL_DECLARE_FLAGS(flags) = { };
+>>       struct metadata_dst *tunnel_dst;
+>>       __be64 tunnel_id;
+>> -    int err;
+>>
+>>       if (!vlan)
+>>           return 0;
+>> @@ -199,9 +198,13 @@ int br_handle_egress_vlan_tunnel(struct sk_buff 
+>> *skb,
+>>           return 0;
+>>
+>>       skb_dst_drop(skb);
+>> -    err = skb_vlan_pop(skb);
+>> -    if (err)
+>> -        return err;
+>> +    /* For 802.1ad (QinQ), skb_vlan_pop() incorrectly moves the C-VLAN
+>> +     * from payload to hwaccel after clearing S-VLAN. We only need to
+>> +     * clear the hwaccel S-VLAN; the C-VLAN must stay in payload for
+>> +     * correct VXLAN encapsulation. This is also correct for 802.1Q
+>> +     * where no C-VLAN exists in payload.
+>> +     */
+>> +    __vlan_hwaccel_clear_tag(skb);
+>>
+>>       if (BR_INPUT_SKB_CB(skb)->backup_nhid) {
+>>           __set_bit(IP_TUNNEL_KEY_BIT, flags);
+>> -- 
+>> 2.43.0
+>>
 > 
-> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-> index b0e167c0b3eb..5374b3e9ad15 100644
-> --- a/drivers/ptp/ptp_clock.c
-> +++ b/drivers/ptp/ptp_clock.c
-> @@ -323,8 +323,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
->  	size_t size;
->  
->  	if (WARN_ON_ONCE(info->n_alarm > PTP_MAX_ALARMS ||
-> -			 (!info->gettimex64 && !info->gettime64) ||
-> -			 !info->settime64))
-> +			 (!info->gettimex64 && !info->gettime64)))
->  		return ERR_PTR(-EINVAL);
->  
->  	/* Initialize a clock structure. */
+> Nice catch. As Ido said, please use get_maintainer.pl next time.
+> The change looks good to me as well. Thanks!
+> 
+> Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+> 
+> 
+> 
 
-I guess this is an attempt to address the following issue:
+haha and I missed to add Ido to the reply..
+need more coffee this morning :)
+Sorry about that!
 
-https://lore.kernel.org/all/20251108044822.GA3262936@ax162/
++ Ido
 
-If so, it's already fixed by commit 81d90d93d22ca4f61833cba921dce9a0bd82218f
-
-/P
+Cheers,
+  Nik
 
 
