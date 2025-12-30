@@ -1,204 +1,163 @@
-Return-Path: <netdev+bounces-246307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CFCBCE92D1
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 10:13:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48BAFCE931A
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 10:22:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7F0193085C65
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 09:11:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3022C302B74B
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 09:21:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2992E27A47F;
-	Tue, 30 Dec 2025 09:11:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 656482D7398;
+	Tue, 30 Dec 2025 09:15:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VaIWxcn3";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="hQCLzRkR"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="NGKwMX2M"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mout.web.de (mout.web.de [212.227.17.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5244328506F
-	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 09:11:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D452D480E;
+	Tue, 30 Dec 2025 09:15:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767085889; cv=none; b=Y7M37XilQ6mvcuEj+WbXFH+RII/r8LTxEIeu7Sy1zXjy6gUY+5MrH3OZAo1FOyDlQXhgqdtLoNXlQc1Y/ajba0L5cUo6iPFfEXUIsJsRj00+CBTR/B4kyJ58FxxWBUA00vTkDzecLWv2TaFbY8fFxX6dH+mfPecNUqbN7qVomLg=
+	t=1767086120; cv=none; b=t8wKDaMRtrm6btnabD/7hwPHCOjnJn2g405G0A8MffdYy4RTB8SvC5q6pMXh9webH7ogN+fuifujMxav4/TlIc6xtIA1r11B5TbAwii+PGvTrag/dmubpxFax07AFkVVsRHaAi4bv7K9PB+lsGHss41y0Ga0zbj5jknKRbDyhz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767085889; c=relaxed/simple;
-	bh=oYbu0tIYoHG1HcqoOg5987tLiqfGlRkg2cpMxO6DQ5s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eR7VCWiqqNY1jlTOwKRmZWA0CUygwxTWtEq+KMghwavxWRVPB966b3fTDgUbmO8QDY0ioiQARhsWZQ3ZkO3q7rFSPlBBfrFpo3KcErOeBd9dyYNsXfsFNjvMtzFi2azjW1qnArVnBkHaf5kdhVGuqSsTN81oYctpG8zMF5lj5p0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VaIWxcn3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=hQCLzRkR; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767085886;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=tRbSF8f0CRS5s5qA6Hwt7UKsA1Pd5658S3WqT4XAkMw=;
-	b=VaIWxcn3C/ncCId329zi+XJhpihn0oJymrjfqqfa9SZLTqyN/0FQBh46Or3mo/HAtCDj45
-	oDSfbIsSSPFryrSAxchYcXgmUjAJZgMsfUWV2ZQwvTBi9V34YW14zABnMRcf9FbexdvsvT
-	NP0+/D8652jaUqJ++Ul7DuJN7sMay8k=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-56-MvODhlXYNnmRcycitjkgJw-1; Tue, 30 Dec 2025 04:11:24 -0500
-X-MC-Unique: MvODhlXYNnmRcycitjkgJw-1
-X-Mimecast-MFC-AGG-ID: MvODhlXYNnmRcycitjkgJw_1767085883
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-430fcb6b2ebso5714118f8f.2
-        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 01:11:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767085883; x=1767690683; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tRbSF8f0CRS5s5qA6Hwt7UKsA1Pd5658S3WqT4XAkMw=;
-        b=hQCLzRkRtev12Di0xgzX44hmyTM6pBxx0VnhytC95XZVVGQz8RLELP9Is38RjgkYvf
-         NBIHZGb/U+lMrX0OE2NBDnKMTyUZJDL3BLgYfB/MU8Yo80VxvnJ8ZF8VMvSrJBO+Zz3a
-         ir9RRYPNsoOEHlSjVdGc88JEU8MWvHP8am5AYtzY6ehypcpM4izYMzj75+Uhym3PKHYb
-         VLtkcdIz4mkfifYvHX9qFqn8QSV0aP03CfgzX4K07YcJmMKE5JZVMM2jWXQ08NSpUGaz
-         ucThZxY6ABi2WFrE/Vk7eh5ihu+9FXOdETQtlt+JWk6FH+ps+/ox7J/2WOwXE+++hK2f
-         kfLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767085883; x=1767690683;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tRbSF8f0CRS5s5qA6Hwt7UKsA1Pd5658S3WqT4XAkMw=;
-        b=dN1Vu+wl5Gb9pfOb0l72Hud5ICbdEM70iFsKbSrCTIFz8/W+uH6Y30rFMBk+cX5HWT
-         OXPNPVuUztbIYr/FqPDdDFpgi3w8qa6y7rK8xg/muE9Ji4hpw7uziuo6cZESyUxt+h/m
-         8vw5rCXsg06xHFMO8RP7BqMgN05sE6j8Pf25z0pSR+KGDKtJJJ3IaCnNda6UmIPzXX5J
-         tX1JVeKPjhT/mmliZzM17JOZ7vmf7DZ6NXtL7Lv6f+HVjGyiuDd+ldsHIWkAXELyHglA
-         Z6IJiHBotv+viRuWj+no0tkQ5noE6HA6oLttsEu3mHjXtwuV+rSc43tk1ahqXUZCP2cV
-         IKew==
-X-Gm-Message-State: AOJu0Yxwv2RJVF3TmOZc6OoBKT4661le5Vffk99+43EwYUZfxNsqLyAR
-	tn7dsKLblPcamwwSJH4r/DRzTgmA7YsdcZ18gKzxuVJfTv0AT6zxJ4/9Is1BaJGoljRx51U9DGI
-	98/HEHXXQ+UOP3lesdlDUx5HvfiJHThZNWj//0nS3zZSkN2Mpby4y3EFAcJxML5I1yFfK1NuLaV
-	2HPJj9AyRTJI3qsG2V6HG5NjxvFLj/b1lddSlXBg==
-X-Gm-Gg: AY/fxX76E+nfXxAb5DvrCnEMnKfp7VOKcWRIbGI6FFM88soAL4+5nVnjXkBitLjnoBT
-	O3GUL6QZ3Tm9O5xx//CXVVa93JK9RXaX+H8smTIHWnmGNhBMDXbUW3d3RIkO9ijdWFRGyEv8hdB
-	De5mzEus4gLxjjZospbsmZPSp2ULiYUJ+EfP1OknEfv9cs12/Hs2BN6IZeNpxgHQ6X7COT8CiYE
-	f+z+kkJuPFKHuGdZO+4JXPbwKfNCyfzCovhF0vWVEe/VP2o0+MpnWOrNxAci9ZkFvP/+oBwXSQX
-	bkB3uH/u2hmDBiqpsciWFW+QB7C41lGpsxRp8VZEf/zOW8ggXsaTT3cx72inG6OE+pSZ4yOPGND
-	n7fFOX/vQHDhPT7rxoA7WHQ==
-X-Received: by 2002:a05:6000:2089:b0:430:f449:5f0e with SMTP id ffacd0b85a97d-4324e4c8efemr35353602f8f.16.1767085883163;
-        Tue, 30 Dec 2025 01:11:23 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHdNYgq3F70FSOCwWlfqAm5cdcGEoQq9Bv+aBqDM/sO/SPrYcJ0XLBNRD0UwPM8Om/8YUCh1g==
-X-Received: by 2002:a05:6000:2089:b0:430:f449:5f0e with SMTP id ffacd0b85a97d-4324e4c8efemr35353565f8f.16.1767085882656;
-        Tue, 30 Dec 2025 01:11:22 -0800 (PST)
-Received: from fedora.redhat.com ([216.128.14.64])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432613f7e6esm56933907f8f.21.2025.12.30.01.11.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Dec 2025 01:11:22 -0800 (PST)
-From: mheib@redhat.com
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	kernelxing@tencent.com,
-	kuniyu@google.com,
-	Mohammad Heib <mheib@redhat.com>
-Subject: [PATCH net] net: skbuff: fix truesize and head state corruption in skb_segment_list
-Date: Tue, 30 Dec 2025 11:11:07 +0200
-Message-ID: <20251230091107.120038-1-mheib@redhat.com>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1767086120; c=relaxed/simple;
+	bh=nKlGD0iOh/5/xMlfN3ETty6x8mzuOc5TnJO1QjTdUPA=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=j/PUe+lCFSs6JAo5o39e/Y8cQrFyYebHICKWvt1XG80m6JLq0H6uxMAMM3HtJ2pOVGzssd+G6195MY31tae5RaitklAFf9sHH6akCkkIlUoa/twPMF8E+8gHxg290dFRdRhNn7INiPjiXE7ypGwQAwnSf4pd9tQs6YDhtS40ueM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=NGKwMX2M; arc=none smtp.client-ip=212.227.17.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1767086109; x=1767690909; i=markus.elfring@web.de;
+	bh=w2En0UyjEUsIhglvZPuZfS3PKF17UZ3RB3fhzFfpiBI=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=NGKwMX2MMSfpy3NrlKW15e4NL37xyE64pwEsqexWN3xDyYaxY271EmoSUE3MtxK0
+	 JehDimpNug4PTRbUSVHq+Gaxu1sYmyrGbqnMBDcB6uRBAfK4REuY7BruRBPr0j78w
+	 w5I9KB3qL+6NbcCs2lJZgAQssaeUOuKCiH+aXzJkX94ieH9+9ZKLlH8cInKp+4s1d
+	 4AZyCk6ZmdAEN+4gHOzONgyFHcKW+a1doSihd0RG4frtEokYM9G0955ywOv3H2G8b
+	 AGv1DpJtlkdXyafjrNaz+eUATxrWiGK1KieSnkFEebBcKorm/HIT7yIalc65XkbnV
+	 JwrUsYQBN1o5cdgAsw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.93.0]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1Mmyr7-1wIgo73ojH-00ZQ2j; Tue, 30
+ Dec 2025 10:15:08 +0100
+Message-ID: <2835cc53-326d-41d4-9ca5-1558c0ccbbaa@web.de>
+Date: Tue, 30 Dec 2025 10:15:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+To: Jianhao Xu <jianhao.xu@seu.edu.cn>, Zilin Guan <zilin@seu.edu.cn>,
+ netdev@vger.kernel.org, Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Johannes Berg <johannes@sipsolutions.net>,
+ Paolo Abeni <pabeni@redhat.com>, Sergey Ryazanov <ryazanov.s.a@gmail.com>
+References: <20251230071853.1062223-1-zilin@seu.edu.cn>
+Subject: Re: [PATCH net] net: wwan: iosm: Fix memory leak in ipc_mux_deinit()
+Content-Language: en-GB, de-DE
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20251230071853.1062223-1-zilin@seu.edu.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:fInRbEpN2lz+Mbs4YicpQSScntASu/ilH8zQdUwZ3QLroJjN7Fd
+ HHo2VigRj2B31Ou8Tv7DaUty/mDXItKnjo4izPHajhT0FF2PSA+IgUq7T63xasWa/JfM7Lx
+ MLR+PLSBxRh2GXRLNWT97zu4KvuOP6Vx/Ht6Lc8q+LhW0qEjMuxfK6Ua9u85OxDmCvC0Blx
+ c+y/4hRftnpkS2y1akyIg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:eaKYI5gbp+w=;Or7S8spFstaNbZepLsLjYRaM++D
+ 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
 
-From: Mohammad Heib <mheib@redhat.com>
+=E2=80=A6
+> +++ b/drivers/net/wwan/iosm/iosm_ipc_mux.c
+> @@ -456,6 +456,7 @@ void ipc_mux_deinit(struct iosm_mux *ipc_mux)
+>  	struct sk_buff_head *free_list;
+>  	union mux_msg mux_msg;
+>  	struct sk_buff *skb;
+> +	int i;
+=E2=80=A6
 
-When skb_segment_list is called during packet forwarding through
-a bridge or VXLAN, it assumes that every fragment in a frag_list
-carries its own socket ownership and head state. While this is true for
-GSO packets created by the transmit path (via __ip_append_data), it is
-not true for packets built by the GRO receive path.
+May this variable be defined in the loop header instead?
 
-In the GRO path, fragments are "orphans" (skb->sk == NULL) and were
-never charged to a socket. However, the current logic in
-skb_segment_list unconditionally adds every fragment's truesize to
-delta_truesize and subsequently subtracts this from the parent SKB.
-
-This results a memory accounting leak, Since GRO fragments were never
-charged to the socket in the first place, the "refund" results in the
-parent SKB returning less memory than originally charged when it is
-finally freed. This leads to a permanent leak in sk_wmem_alloc, which
-prevents the socket from being destroyed, resulting in a persistent memory
-leak of the socket object and its related metadata.
-
-The leak can be observed via KMEMLEAK when tearing down the networking
-environment:
-
-unreferenced object 0xffff8881e6eb9100 (size 2048):
-  comm "ping", pid 6720, jiffies 4295492526
-  backtrace:
-    kmem_cache_alloc_noprof+0x5c6/0x800
-    sk_prot_alloc+0x5b/0x220
-    sk_alloc+0x35/0xa00
-    inet6_create.part.0+0x303/0x10d0
-    __sock_create+0x248/0x640
-    __sys_socket+0x11b/0x1d0
-
-This patch modifies skb_segment_list to only perform head state release
-and truesize subtraction if the fragment explicitly owns a socket
-reference. For GRO-forwarded packets where fragments are not owners,
-the parent maintains the full truesize and acts as the single anchor for
-the memory refund upon destruction.
-
-Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
-Signed-off-by: Mohammad Heib <mheib@redhat.com>
----
- net/core/skbuff.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
-
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index a00808f7be6a..aee9be42409b 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -4641,6 +4641,7 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
- 	struct sk_buff *tail = NULL;
- 	struct sk_buff *nskb, *tmp;
- 	int len_diff, err;
-+	bool is_flist = !!(skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST);
- 
- 	skb_push(skb, -skb_network_offset(skb) + offset);
- 
-@@ -4656,7 +4657,15 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
- 		list_skb = list_skb->next;
- 
- 		err = 0;
--		delta_truesize += nskb->truesize;
-+
-+		/* Only track truesize delta if the fragment is being orphaned.
-+		 * In the GRO path, fragments don't have a socket owner (sk=NULL),
-+		 * so the parent must maintain the total truesize to prevent
-+		 * memory accounting leaks.
-+		 */
-+		if (!is_flist || nskb->sk)
-+			delta_truesize += nskb->truesize;
-+
- 		if (skb_shared(nskb)) {
- 			tmp = skb_clone(nskb, GFP_ATOMIC);
- 			if (tmp) {
-@@ -4684,7 +4693,12 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
- 
- 		skb_push(nskb, -skb_network_offset(nskb) + offset);
- 
--		skb_release_head_state(nskb);
-+		/* For GRO-forwarded packets, fragments have no head state
-+		 * (no sk/destructor) to release. Skip this.
-+		 */
-+		if (!is_flist || nskb->sk)
-+			skb_release_head_state(nskb);
-+
- 		len_diff = skb_network_header_len(nskb) - skb_network_header_len(skb);
- 		__copy_skb_header(nskb, skb);
- 
--- 
-2.52.0
-
+Regards,
+Markus
 
