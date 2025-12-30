@@ -1,89 +1,90 @@
-Return-Path: <netdev+bounces-246346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 528F5CE97D4
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 12:02:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74320CE97FE
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 12:04:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 19C8B3019B80
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 11:02:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0C9E3301EC71
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 11:04:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 111D3212554;
-	Tue, 30 Dec 2025 11:02:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60E172DCBF8;
+	Tue, 30 Dec 2025 11:04:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zqxbjTvD"
+	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="T2Sf4zWM"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail-m49198.qiye.163.com (mail-m49198.qiye.163.com [45.254.49.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 865328F5B;
-	Tue, 30 Dec 2025 11:02:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78460222590;
+	Tue, 30 Dec 2025 11:04:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767092552; cv=none; b=SHp5N+54v4DwaueJIpc3xZJmQBKgSTvBvHFcKbfWBqEGYd25dvzoRqfsJ52CsyfWsF2824jOi01hCGSwVYRUbD353s3XljQ0kfkyb6U5iGqpAagMqOlDA9yZEQ/AeRZbpZR7U52gSF2XX6bu0eNI5Giyh4qQfbzomfu5az4cGAQ=
+	t=1767092691; cv=none; b=Ua8XiFcZYhRfQC8gaMlTmGkCmjsPD1ZQg1lInFfiCUmWZnfmGvpZocgX7Nyy5tJP6Hv2gfBgIQpXNYI/aQj7QiJmfkTw3R5O6iMoZzP6GGmhs377ujjG62pi6fT9wQcOVyOV/patkrraPmcCLPlrPgGzGlBGXAJDvb525f8up18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767092552; c=relaxed/simple;
-	bh=hyGR4Yw9uLbxt3DVmlj3NCZmO3oBisZJI46slB/d74s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AkebW7Ct1vRCsLjeeQ0bULrTtzsrUvw8fu7l/tRRYKLmoZzKYx1rcJTvOXT6EXoqV403wqktdVe7zPlcQFxa1jQsEGIt/Djz9wHu5FEOYGssnvOHok2MNRbRBgNtEBxyGPtKv7sS5mKcRDMGOrhfn19NH93xPc4xk/Wm3FX1JIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zqxbjTvD; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=oDSISqItq20dAUa3QhlG5JmCf5mHPcKdFZF8J+jWsFs=; b=zqxbjTvDQ2ISbFSt5tUUefFEkh
-	bpT+heMRDW1OvceAMmFTdNOVw1OaLSO50khSh8b+M67wTvcN37GWLSRHZgOUgLyAQEsyR3jFPV8IU
-	oMnPGhRGmTVYUvY0ZqaNzV9Qf6Ffe2WNVbT3UTWgSOmbKlEWR3C4oJ49TZR/+XVL98no=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vaXUc-000rgn-8M; Tue, 30 Dec 2025 12:02:22 +0100
-Date: Tue, 30 Dec 2025 12:02:22 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yohei Kojima <yk@y-koj.net>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Breno Leitao <leitao@debian.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 1/5] net: netdevsim: fix inconsistent carrier state
- after link/unlink
-Message-ID: <1c8edd12-0933-4aae-8af3-307b133dce27@lunn.ch>
-References: <cover.1767032397.git.yk@y-koj.net>
- <ff1139d3236ab7fec2b2b3a2e22510dcd7b01a21.1767032397.git.yk@y-koj.net>
- <e8180dc5-fc23-4044-bd67-92fc3eebdaa0@lunn.ch>
- <aVLc4J8SQYLPWdZZ@y-koj.net>
+	s=arc-20240116; t=1767092691; c=relaxed/simple;
+	bh=F0CydUX36atljRFcC0lk0ZP/JGD/uDK4RbtAqtC301g=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=BzKkOgvOjg83vscff8RI1FcfiGmmiYflmpIfeivk2VcqZWf0oOMMlxOn4Rxh+lii8MfKVw4Ly95J41xJiVreyKSuTm2GWIpeHrL+oqrmEOoUcDhcmpyqYLfFRUytqtfN6OyL2uGrbZjSlVUcj9BIOg3KUGQc5LS5ISIvQ4jOsJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=T2Sf4zWM; arc=none smtp.client-ip=45.254.49.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
+Received: from LAPTOP-N070L597.localdomain (unknown [58.241.16.34])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 2f071aa9e;
+	Tue, 30 Dec 2025 19:04:42 +0800 (GMT+08:00)
+From: Zilin Guan <zilin@seu.edu.cn>
+To: markus.elfring@web.de
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	jianhao.xu@seu.edu.cn,
+	johannes@sipsolutions.net,
+	kernel-janitors@vger.kernel.org,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	loic.poulain@oss.qualcomm.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	ryazanov.s.a@gmail.com,
+	zilin@seu.edu.cn
+Subject: Re: [PATCH net] net: wwan: iosm: Fix memory leak in ipc_mux_deinit()
+Date: Tue, 30 Dec 2025 11:04:41 +0000
+Message-Id: <20251230110441.1205454-1-zilin@seu.edu.cn>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <a79bed83-8a43-4ed8-94d4-542b7285835e@web.de>
+References: <a79bed83-8a43-4ed8-94d4-542b7285835e@web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aVLc4J8SQYLPWdZZ@y-koj.net>
+Content-Transfer-Encoding: 8bit
+X-HM-Tid: 0a9b6eee800f03a1kunmd5da7ee315bc2e
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlDTxoYVkhKHUIYGENDGU9OSVYeHw5VEwETFhoSFy
+	QUDg9ZV1kYEgtZQVlOQ1VJT0pVSk1VSE9ZV1kWGg8SFR0UWUFZT0tIVUJCSU5LVUpLS1VKQktCWQ
+	Y+
+DKIM-Signature: a=rsa-sha256;
+	b=T2Sf4zWMEYerkfFCJzQcTmT2FCm2XpTB3p7eHKGnOkFO/8/V+RwpPzJAkQcHyqHSJnIRKtmvJgTlIeopSBRdDpVFItSXGaRtb4LOYyvCBtI49Ni1nz9bjGI8tGYnhfmJ9OC+KrofTPFEFMg+FippPxEFU8aUJCoCifu/Ri/QFzo=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
+	bh=7/RXZ93bmqyzIid2z4BLYpbdA6KQARRTDAWMUQSplSY=;
+	h=date:mime-version:subject:message-id:from;
 
-> Thank you for the quick reply. I don't intend for this patch to be
-> backported to the stable tree. My understanding was that bugfix patches
-> to the net tree should have Fixes: tag for historical tracking.
-> 
-> > 
-> > netdevsim is not a real device. Do its bugs actually bother people?
-> 
-> This patch fixes a real bug that is seen when a developer tries to test
-> TFO or netdevsim tests on NetworkManager-enabled systems: it causes
-> false positives in kselftests on such systems.
+On Tue, Dec 30, 2025 at 10:42:22AM+0100, Markus Elfring wrote:
+> Do you tend to interpret such information still as the beginning
+> of the function implementation?
+> ...
+> Would the mentioned variable be relevant only for an additional if branch?
 
-O.K, then keep the Fixes tag and submit it for net. However, the tests
-should be considered development work, and submitted to net-next, if
-they are not fixes. Please split this into two series.
+I prefer to strictly follow the existing coding style of the current file, 
+where all local variables are declared at the top of the function. I do 
+not wish to mix different declaration styles in this patch.
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+If you believe the file should be converted to C99 style, that would be 
+better handled in a separate cleanup patch for the entire file, rather 
+than mixing it into this bug fix.
 
-    Andrew
-
----
-pw-bot: cr
+Regards,
+Zilin Guan
 
