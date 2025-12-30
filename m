@@ -1,114 +1,134 @@
-Return-Path: <netdev+bounces-246354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 309E9CE9880
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 12:27:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FE5FCE9937
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 12:50:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3ACFF3014DC8
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 11:27:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D84673014D8F
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 11:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D2A2E093F;
-	Tue, 30 Dec 2025 11:27:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E1B26561D;
+	Tue, 30 Dec 2025 11:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ti49gbzS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fAW3Cd6N"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D69F528135D
-	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 11:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3448D18A6A8
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 11:50:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767094073; cv=none; b=lleKGa3L4v1XuRjm8JYA7WlkZcI5z//UriOhgf2xWiNCqhyn60d2LjlyQT1kL6nKRUWF+YQDojqvK7hLzofd838F1KW6RyIYEzayH1yAT683CCg4W/8pnQkJEi8/5IRkwC1/hC+4lQdoUCIgxSwoYJuG2DeOgVVmSN3cc1rVOdw=
+	t=1767095426; cv=none; b=OvdJWc3J25uHNg23FzOFRZiGRXNt9yHFggmepN36pk5WbjCPLE9p+2tF/Q1LrSHg34cLUYgyUnXL6w4HjYgDRd5n8VIJ85Rdx/EBygOjw0bVizJ74C4A6DB2CX6NfFfPPItY5KsbvFJUw0qjOX/3VxzZCErt9bdfaMlEX/hwcuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767094073; c=relaxed/simple;
-	bh=leJjdZs3pviKoCXS0m/3MT3MyFdHZGu1rGnoGL9HVgU=;
+	s=arc-20240116; t=1767095426; c=relaxed/simple;
+	bh=6IFLil+wD2JSrCtWOl+NqVwmMKqZIPHW8twk7WZ3ss0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Vv2U7ZX/PNLwN81AezpM8NJFT9AVn5/PhNz7kGuPalDDc46BoTRmxcUfjocX31FAIZbT72trZ+TIGGya2Scn7LrJAb8xRGxbxFxOrJr4ImV3WqM8NpAFivTeMvZLOo8Fie/ohJk92yLNgmtQGfgytwZp2OMxFgMDFqzSsbUykTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ti49gbzS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80431C116C6
-	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 11:27:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767094073;
-	bh=leJjdZs3pviKoCXS0m/3MT3MyFdHZGu1rGnoGL9HVgU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Ti49gbzSK+3E1pOw/5IncIrVOsvkDHW2qBjnUsqNvaiKxesjNE0jylbzuEGsEXv11
-	 6jgkCBlOReHf5h/PaK7Ids09+SY5Dcyu27oOF+XoR86c834zfKKF2AttUCIesEbhXg
-	 6j/WUkVD2MMtifQ9xewwF4rtD4YAFbLXSuWutQVQJUzoRVAQKO9msdiHMW5526TKGx
-	 5H+6J+CAQPvDKMqNam1KaR+dPiqZzrCMgBWgh0Uo7sa9CyGgNlzHs5xfMDC2zR6K3T
-	 WmpHy/Khh5JNNKACEQ/icEuKC4I5U6uukDo2dd5NAhNgcJn6Y7hqaQm8NJpZfxH50y
-	 +3t9TmBo2PkBA==
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-37bac34346dso73651571fa.2
-        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 03:27:53 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXwGqfDjSZEGKtoSyjsVF7pd+kwuTwYMFAv/w5va/FSe+EwFeLblI6NH7wYqva3TrOKNJZtG8U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5p0HIR7R1hcEnMeeEGbVEu9OKWQeUJfFIGpwms4eKu14Pm0qg
-	jn5RvHoqqIue+DdF+B2y4+6uKQQN88eHbH3mfekDQScVSo05pZ/r+u/f/ggf6Gm7URbVCK4511v
-	8Z3pZfUnZpF+lnrQuWI08G85gH845Zv0=
-X-Google-Smtp-Source: AGHT+IHPGzwFVfZohXUlwjkwrktoaQn/snnrlmsIiwWkSfWvcb7/V3Sk+I1nUkYo+gWEKKlylRQqCdNtOtziv7NNOJs=
-X-Received: by 2002:a05:651c:3043:b0:37a:2c50:c437 with SMTP id
- 38308e7fff4ca-3812158e42amr88523171fa.14.1767094072078; Tue, 30 Dec 2025
- 03:27:52 -0800 (PST)
+	 To:Cc:Content-Type; b=qU27cxbulAht0P006C9aG5FEDQ7cGtCL3JMBVazqPAiL5tkOuMBWPRW5/go6FxpazwHJwDlHvDWIxDuOFLkly444rKVCNU2EA6a8NulgLBWHnCSx4BNpLAju/eMlm0wchpVMomn+OxjuUfg41/ADMtO4yPuaIonIlPpKxD5G+Sk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fAW3Cd6N; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2a1388cdac3so92143155ad.0
+        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 03:50:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767095424; x=1767700224; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OdHa8PFyWxGkeyfxKnoCO0rhiy8W3DjG38QD2TZnWW0=;
+        b=fAW3Cd6Nl6mZ1k0UbWSWNYWblZe+3rXre+rGWGenThw4I/xxX35ke+57xSWQT1TiSp
+         lvGK04o9vfMdwrp6DZRzsxHtfdbeUnaobqhNjEsAFC9TXAVe0wtXBIQV3AYRciPfrkEy
+         Nr7n3xEHywGWGBlIzcaUK7qrTSUb8BhRxGB6Wu3+9to+MWbBPA+2GN5C2HVhIbCgVSq/
+         C2NIwVtBVs5GOo52/loA7UxiBJy1IeLU2BnWQsMm17IxqvMehLNP5vMGWKBizJuCSd2P
+         7ts0723ZzBTxdtqjFD3URVXYwb0gNGpc7wn+u31Yz7x9F+AaUSEJCrUMQRb4oqVwAIBn
+         xmGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767095424; x=1767700224;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=OdHa8PFyWxGkeyfxKnoCO0rhiy8W3DjG38QD2TZnWW0=;
+        b=lZ62DTCyGSBWg9glg88OKNoeHAw/VqJn20J9qOihm5sRF745MIS/sA4zImb3AlNaUg
+         Ku7pgKpXpgWltKxGcj6xEFytlsKpwArSvGXvQVRlZ8gv9++32HrBdukP00/7i+Ce0xlG
+         xf+qrMlXNGcx0CLdYWn8q6VG9nro+t5Lit3tMGjD+OrzBTC7a2AxH+Ksv9y+7g3V/frr
+         204TwYPD89AcO1dpPbFII3lk/NB/MRkGmePc+eqAdL+aUNgIKopOfDgWfq8Lashm8JUW
+         zej/EM1yLufSTZw3p/lDbtXuYsT8pBowtV+y11DHpUpaFPwV/z6HKfZk9AqFd7juVd55
+         0K7A==
+X-Forwarded-Encrypted: i=1; AJvYcCUtKCsD3ce7rjJwVIqCSzlCOGvtEWOaZfYCWg4jH0Vzqy3Hw/1KHmuNR1TvxHn+R9kx/CdQlV4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykONRNr4iEE0uGAPC/J3sEF3qreEoxNX/GrN5MDAeN/p9VhKUq
+	kjYG1odWPpS+J9xsZ6KfYta24PbqJP1ZphTeBUGGG91MmfnHR7fv9oazPhj+s22jdCBPK5cmB93
+	lQGeRyBeEA4sYfHqerHDeT0tcSVaBN2g=
+X-Gm-Gg: AY/fxX6c+2r5sa/1GeCVD8KxFW6Lm6Fnp5mk4b3gROqXOhxcO1sXHk/Eeaz+rdsJEMF
+	Mi6IpU4YLdfcgzQkCZUxznaedhmyCwcaDlIqbAjYTrosyaEpRywajUuM3IZnDUJz+9GJiAI2Rt1
+	8a/AOaHfkPJo8itPUXiRRykkwNixnRaVdu89FLHv7WismUoi/JY1OKNFj3nweoCX9Z7SwM7UKbA
+	3FjJtbBiGaDzXbsC0/ngUN1cqmRB0Es869cG9i/9OS+gp2YnCwa1kKnMz2W4s+kFj6QaRRngg==
+X-Google-Smtp-Source: AGHT+IFaPnCWi9xdkDb8vFzhvIsC3MueEnQ+BB8sBt9iWzRA9eQOUa/HT7hEudfWpE2f7TWEE5NOXrF94uUxKwgpz9c=
+X-Received: by 2002:a05:701b:2404:b0:11e:3e9:3ea3 with SMTP id
+ a92af1059eb24-1217230f5edmr19919889c88.50.1767095424448; Tue, 30 Dec 2025
+ 03:50:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251222-cstr-net-v1-0-cd9e30a5467e@gmail.com>
- <20251222-cstr-net-v1-2-cd9e30a5467e@gmail.com> <44fd3760-5a01-43b4-ae68-31e6d3c18dc3@redhat.com>
-In-Reply-To: <44fd3760-5a01-43b4-ae68-31e6d3c18dc3@redhat.com>
-From: Tamir Duberstein <tamird@kernel.org>
-Date: Tue, 30 Dec 2025 06:27:16 -0500
-X-Gmail-Original-Message-ID: <CAJ-ks9kQj0bSAA0j0MRhbvSk7OkMqAaFuw+TsS9HMEgjqyW6Cw@mail.gmail.com>
-X-Gm-Features: AQt7F2okjrDKa9fg1wVEDLsM3rjbX7E-R6aE5Wu4ax-TgUelKnLl6vfiY44CrNA
-Message-ID: <CAJ-ks9kQj0bSAA0j0MRhbvSk7OkMqAaFuw+TsS9HMEgjqyW6Cw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] drivers: net: replace `kernel::c_str!` with C-Strings
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, Trevor Gross <tmgross@umich.edu>, 
-	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Danilo Krummrich <dakr@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+References: <20251229173346.8899-1-tinsaetadesse2015@gmail.com>
+ <f04e466b-8b8b-466e-a67c-d7fbfea2fbfd@linux.dev> <CAJ12PfM3zkJCJLJ3dLtvab2t9O9Dqs8MnoEo=zDb5OcyAPDuJQ@mail.gmail.com>
+ <67fb6d48-148f-49c7-86aa-4f4244ec6f31@lunn.ch>
+In-Reply-To: <67fb6d48-148f-49c7-86aa-4f4244ec6f31@lunn.ch>
+From: TINSAE TADESSE GUTEMA <tinsaetadesse2015@gmail.com>
+Date: Tue, 30 Dec 2025 14:50:07 +0300
+X-Gm-Features: AQt7F2q3p2tw78nqLVEpOi3ZlDRbSg-heSK6aPSTrOtUj-3XoyWPpVwud-GOsno
+Message-ID: <CAJ12PfMyMh6O5K5Gs=gxSoTmL1ORg6a7e3Q2d0nOSyYEhuyOzw@mail.gmail.com>
+Subject: Re: [PATCH] Fix PTP driver warnings by removing settime64 check
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, richardcochran@gmail.com, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 30, 2025 at 5:40=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
+On Tue, Dec 30, 2025 at 1:59=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
 >
-> On 12/22/25 1:32 PM, Tamir Duberstein wrote:
-> > From: Tamir Duberstein <tamird@gmail.com>
+> > This patch resolves warnings triggered when either gettimex64 or settim=
+e64 are
+> > NULL.
+> > The CONFIG_PTP_1588_CLOCK=3Dy option enables PTP support for all Ethern=
+et
+> > devices.
+> > In systems with Intel-based network devices, both the iwlwifi and e1000=
+e
+> > modules attempt to register clocks, resulting in calls to ptp_clock_reg=
+ister in
+> > drivers/ptp/ptp_clock.c that produce warnings if any function pointers =
+are
+> > uninitialized.
 > >
-> > C-String literals were added in Rust 1.77. Replace instances of
-> > `kernel::c_str!` with C-String literals where possible.
-> >
-> > Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-> > Reviewed-by: Benno Lossin <lossin@kernel.org>
-> > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
-> > ---
-> >  drivers/net/phy/ax88796b_rust.rs | 7 +++----
-> >  drivers/net/phy/qt2025.rs        | 5 ++---
-> >  2 files changed, 5 insertions(+), 7 deletions(-)
->
-> It's not clear to me if this is targeting the net-next tree. In such case=
+> > Without this patch, the following warning is logged during registration=
 :
+> >
+> >     info->n_alarm > PTP_MAX_ALARMS || (!info->gettimex64 && !info->gett=
+ime64) |
+> >     | !info->settime64
+> >     WARNING: drivers/ptp/ptp_clock.c:325 at ptp_clock_register+0x54/0xb=
+70, CPU#
+> >     2: NetworkManager/1102
+> >     ...
+> >     iwlwifi 0000:00:14.3: Failed to register PHC clock (-22)
 >
-> ## Form letter - net-next-closed
+> It seems this patch is no longer needed. But FYI, this explanation
+> should of been in the commit message. The commit message should
+> explain why a change is needed.
 >
-> The net-next tree is closed for new drivers, features, code refactoring
-> and optimizations due to the merge window and the winter break. We are
-> currently accepting bug fixes only.
 >
-> Please repost when net-next reopens after Jan 2nd.
+>     Andrew
 >
-> RFC patches sent for review only are obviously welcome at any time.
+> ---
+> pw-bot: cr
 
-Yes, this is targeting net-next (unless you folks are OK with it going
-through rust-next, which is also OK with me). Thank you for including
-the date to resend.
+Hi Andrew,
+
+Your suggestion is well noted, thank you!
 
