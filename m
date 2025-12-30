@@ -1,95 +1,95 @@
-Return-Path: <netdev+bounces-246330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EB72CE9638
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 11:28:47 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07C38CE9752
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 11:47:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A22EE30049CD
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 10:28:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B39DD302FA23
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 10:46:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 979402E9EB5;
-	Tue, 30 Dec 2025 10:16:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761BB2EAB64;
+	Tue, 30 Dec 2025 10:16:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gsyT/re7";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="BQIq3j9r"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JUV93+Gv";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="D8kiRJdc"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4814D2E1F01
-	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 10:16:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D53257821
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 10:16:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767089773; cv=none; b=oPhadM1S/qjoL3hvUsw36RM/RxPXQJoasgMdPXi8R4BPUrVJeJVcaDEVydLSKGJgCtAQAloAwAvNBJQF+CmJzhz4GydhHsejxAss4GwCofQmwmrLvOKcMz5/Fx5E0gGKmk7lsJXseyQAXMYu11R7tOKInrw2sCt0zpu/JDHCmUA=
+	t=1767089778; cv=none; b=CCh4OVh9Yeex/HUtZuYZpIlkDBy0Gcmh16iBbpqaXGadigtYf4Cmk3H+STdmI+OhFQEhBCVSxLFNF4R6LdnrW8CY0gHoLfqXcE4fkYL7FMmoYlkDNA1GYTB+Z5Tyjutt6O4YBxilFtETuGp7yvSkPxHdH1N9WDlcBr9oRzsrOl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767089773; c=relaxed/simple;
-	bh=N4HR0a5dn05GuDoktJG7BnG9Lq/5EUgyVWUyfL7k7BY=;
+	s=arc-20240116; t=1767089778; c=relaxed/simple;
+	bh=1nvGVVfYMss4t3CEcUrrF8Nk2cSppyMGKm3YyiTIiKQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qcRR4mIdwvvJOWzw5VNol/QyD5Pg/O9XJ04AyZRqhS3KeFMOrK1si8jbtB3xCRaUt2C7qq3JvCpTdV9t8oBUZ0J8KOG5wP4Q2UDkBTs/SMwwBHm0PECzD8dU2JCUin8uKQhJ736TzHsQZkbDyVL4UO34mU2ZY7tLw1UAAhlx9Kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gsyT/re7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=BQIq3j9r; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=KiBGKZqHs85RnrwN/hYWLTfUW9VBYRwZ/g1feY8deNa3DO5wRB1e9LR2CubeZs4yOe29eyCHtjdoeb4z7jajIwwjBHXCFPLclDIJaNwcKK6oZZ7vHUcey2q6LG6/ULoSYT2dQZXLnpHp6Zz+Lg5U6fkFmmovvGzpQGWzeqcYSdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JUV93+Gv; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=D8kiRJdc; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767089770;
+	s=mimecast20190719; t=1767089774;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5P8nBFllNyVQLFQFLwvEGLPOI82khKcPXA1snN92gfM=;
-	b=gsyT/re7zBghS/yQntGAGJu/ISHw3WlYNSYuOoI3O5bVjjfEChnWJYC8bfiysfM7cdsytI
-	mC1VU/x0p9sSZcPopYpSC8DxVm38YZ7jhJABhGAUEAI/psZFsU4ReqN0GjJ5mGfM899Qof
-	2dYKGMpN2Pc62ofKcAndOkY+dEAyPcI=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=N7TdGrHAal4YSCbHD/e5fBMwf7XbmUGP5Z2mh/ui0sA=;
+	b=JUV93+GvNWX3nxpTw8cau2vP30RBijuoxCYWrIDxyYcvX4p3XvCk95xccbON6+L/U3eb9t
+	si8hWuSvT4Mt3QErEjU5PTb0AlztpEMPM3HXaJlVfXud/33UjYfqDajJuESmoRTs+TkhT4
+	8bBFTetu85d5QnbDKsQ6WrE2G/IJ4h8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-118-v0gWtXflNcqFU860mKUi6Q-1; Tue, 30 Dec 2025 05:16:08 -0500
-X-MC-Unique: v0gWtXflNcqFU860mKUi6Q-1
-X-Mimecast-MFC-AGG-ID: v0gWtXflNcqFU860mKUi6Q_1767089768
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-431054c09e3so5919386f8f.0
-        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 02:16:08 -0800 (PST)
+ us-mta-184-4YVmyVFZMESpD4uEeqNzbw-1; Tue, 30 Dec 2025 05:16:12 -0500
+X-MC-Unique: 4YVmyVFZMESpD4uEeqNzbw-1
+X-Mimecast-MFC-AGG-ID: 4YVmyVFZMESpD4uEeqNzbw_1767089772
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-47918084ac1so83216265e9.2
+        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 02:16:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767089767; x=1767694567; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1767089771; x=1767694571; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5P8nBFllNyVQLFQFLwvEGLPOI82khKcPXA1snN92gfM=;
-        b=BQIq3j9rguJWyrvd0HjPJXDNX+NtKpiHoktjQ29KrPuk2LNpuwJpCc9WXELU8o7gNm
-         Jb1EOjk1yaT9PsO1B2M8gfgNnJAxvHZG+N7/4B+h/UwegvZFOQX8D6kM2j9s8xRWcTpM
-         0nVTeZVfJmIKk4C5/OplOmF7GDLe/WK4CGK6SgD7uPojWxMLwmbEwHX4A7ao9OQp+x2n
-         ao7u0hEVzvtDO4P24+hzhy93IJZLc8wLn6O0iguKMLX4lXYMQjs0Uer4FLR+Pzof99lP
-         Z+iTthyfW4pkHSfY829nZaRdtzGJXbwyxiVIRWEymLLBJLvbP8ubz8MVqXrDVuTi8z9B
-         3OBA==
+        bh=N7TdGrHAal4YSCbHD/e5fBMwf7XbmUGP5Z2mh/ui0sA=;
+        b=D8kiRJdccnjA7UBfQdPD1dIdRkpZkqA8vResLYU9t9f20l4nQJx5GuLg0IRRo4HmkA
+         Ez9QUd8ztax/ZM6qlWpStt6ig9rAwGG18m9odbjAYC7V/8aib3iWrs8f6Glxnfo92e6M
+         kbzp51OUt/jpLMIaQ9dSi354rrPCe5h6M+dOEHdwzUrk1FtyKjQU3A+QpWIY5VrGfgPZ
+         GasDPxSRI4RFXD/RE1XwOWs4ZpqcTdTHkb9bC/VEyiOzSm70/GLjGNOKak5FNDBdiJa7
+         ZMR2k8LgePJspuqK6/IhpTuKlpvOtJWOoqS7UikPR07hhtZjj/ERppykuPbLuGVi1fLU
+         yJXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767089767; x=1767694567;
+        d=1e100.net; s=20230601; t=1767089771; x=1767694571;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5P8nBFllNyVQLFQFLwvEGLPOI82khKcPXA1snN92gfM=;
-        b=VUiViJGEWn7vXz7FaTfGPJnjsf1YNGAk6ME4OmkBWZu9czhgL91+UWjaugTBdJ/Rn0
-         2U5AX7oHnZcHj8R5QUTWU7soJmaYTFN3FlMulh2zH7ONqqhuZaJ4CLTFZdQoHcljDSeS
-         /mBVuxkdFG7RCDQiquhhrqEVqDL8kYSUPnyXOifjl4LLhj1TOpskGG8Cfm+epwgTnng0
-         xdQGC3j9/0wQjDaTL48V/LNcLFoqFQWQJud+8AHCF/CuBTnEq8Bw4IStVJ1a7w8uEqid
-         D0URyy6LAq5KRoFBVsSAIvferw+ihlscDVkDQzPqXIE40+32ksrLu9UCzPz7arwfz0nG
-         wcPw==
-X-Forwarded-Encrypted: i=1; AJvYcCWOFLcbcD/e/BpQ130k3YsYbEDA210u93vKY6dz5zcof0a1ORq66WMA7j640GcuQzcPqfg8xc8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+JLBttbp+XQrijPD+fOK0Gn1G7jCyi17MUVXLQ8bl7DGAjf58
-	F7w56jrNA1XFbtFyEZxe2SBO22cJnT27VAUVB3Zkqolp8oZP5XGWbyKIcV8T8ADXQRyMxN8tdnD
-	AU/422VVyOtvle+IX9CyFUn7rcB6ZDw9KKmvazkHTBV1JMqq9FfzCH33ISg==
-X-Gm-Gg: AY/fxX421bBL/F0U+b3l2lWPtUnnNXWAr81VUcLrG7bGMebJXxGgq3Ogy+EKhpWyDx6
-	iL3M/saeFf9IuiMxtjR7g/YTD8flUtqTdW42vQRwt5g0AIKnHdn5+vzsBal8/eA6Lbv79/Kcha1
-	IWobBIkPl9twHAyzSK2cxv4ksdsMUCjVWSx3Qi6Fci8c2nZUFG9O7A1EyjdqPeVNgiOl2qHCbLg
-	PWRfAkFGValRfzzTq8EI48mW4Vhc6YgPe/hiCtoJvP9KLt7pt2LYJapwMUZvd8iFuH/FRVHLHK9
-	7EbdU6qseDrhESA0Kh4HdAkcDZVxqGawHQUwZRZfnHemC7a25vOGJyIbbUAH3lgWGVaHkbfMfaG
-	ChxnkqItXU0csCBtb5MkjZpDZHSUVkByJZw==
-X-Received: by 2002:a5d:5f54:0:b0:431:2b2:9628 with SMTP id ffacd0b85a97d-4324e506ba3mr39259946f8f.52.1767089767421;
-        Tue, 30 Dec 2025 02:16:07 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGtsdMUlb1wS6GR5OayFkymlWIYaYAnUxOGKY8jeZK45Dwg0ymMw4lZ1+63FGBt0jVsyojNrA==
-X-Received: by 2002:a5d:5f54:0:b0:431:2b2:9628 with SMTP id ffacd0b85a97d-4324e506ba3mr39259899f8f.52.1767089766895;
-        Tue, 30 Dec 2025 02:16:06 -0800 (PST)
+        bh=N7TdGrHAal4YSCbHD/e5fBMwf7XbmUGP5Z2mh/ui0sA=;
+        b=T2Gr8Xj4yc9FsUZbDpQas7A6ZO+GABnOhq61V1sTLMd1YnokPHMTpzQ7mrn0W25iQR
+         7/+yUFrgLLrXcfaGAFLdTgNMP/pY7tpd58KOFgRbTYJlUgSalgkAmpKIbpnmoshB0Wtr
+         pJoWx4MTLcyrrMkmBpQPlC9QlsdzVvInwIfo2L9ad93fp5I6nTjviavr7tISqgKHhgSe
+         ezv2pZz9xu4mPrXnhmXfC79C/CjL9NARfpnvpQVG68+KAgepGpSQ/kQRxXJOlKjXYYXm
+         B4jE4cSknD32gVXg28+d1HSnNOC3CsZ5JfdrcVpBsQ/eaxmrr3Tf3FZP3CJ2Nm9kzS5r
+         YqiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWYQ9+Q1DFtsL7/YLzf+eCd1m/BOObLOKc6LiSKlE+Axfmu3TxzFiItY5fGhz+dovN9l13e8EE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKeDVY4K0I4lN0BZrcA/xuEX47/aJyCfiGg3KTFtoh4VfgXExZ
+	knI/F+SHHnAIG0Mvbrp30an5mLL2E7O3dZK/EmCqT29D/mr2025HaG94VTvjNqWqvjiwddgIxtP
+	7flMWRJdMbDlyOuWEJpg+NrtoLZQPKr2wJaLyIA0XZTEE3ndczsjBjreP5Q==
+X-Gm-Gg: AY/fxX7ljRRqvgIkscvCdoNPGmEz/UXHhCBD02ZuOyaHR4ffZDei0z3WWG4wDY19SjE
+	oo0F862kBBom+ARI6X7ZElMqAgY+651DuaGGy3vHS/pL12wwmvmQM/wcNf1IhMUlUlc2x9JLYFX
+	MMvXctUYFh7Oo+rjswhMpxSGdI9J9dJ98+rYR4V575hVcQJtLxV33tr0vmaes3pzoPfWAjLi88Q
+	rFrbDfRAXXwFlqw565R/hFTtlShkoanhodZRujbVLJzBkvPY4+J8r3CnnFvS5Iv3UjrLGM2VxHB
+	KDnxOV0Wl6nTesW1vtUU5NeyEVboMJTkX7BHmNMy6Yr0BIYvBrRJrxIcwUi7MW5qmLoI5yuLPcl
+	HMJRJkdSAegb/KRsDLNglLUocCgS2cG3lPQ==
+X-Received: by 2002:a05:600c:45c8:b0:477:8a2a:1244 with SMTP id 5b1f17b1804b1-47d195558bemr375729695e9.11.1767089771393;
+        Tue, 30 Dec 2025 02:16:11 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHjzVX0GYuttaIVhsj3PIAp1ZJ2Zp++QasW4yFBwV4WaDkrZ/icz8/Y8CMg+xDJDk6ilEld2g==
+X-Received: by 2002:a05:600c:45c8:b0:477:8a2a:1244 with SMTP id 5b1f17b1804b1-47d195558bemr375729355e9.11.1767089770967;
+        Tue, 30 Dec 2025 02:16:10 -0800 (PST)
 Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324eaa477bsm67834948f8f.36.2025.12.30.02.16.04
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d193d4e91sm569777955e9.13.2025.12.30.02.16.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Dec 2025 02:16:06 -0800 (PST)
-Date: Tue, 30 Dec 2025 05:16:03 -0500
+        Tue, 30 Dec 2025 02:16:09 -0800 (PST)
+Date: Tue, 30 Dec 2025 05:16:07 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: linux-kernel@vger.kernel.org
 Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
@@ -114,8 +114,8 @@ Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
 	linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
 	virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
 	iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH RFC 06/13] virtio: add virtqueue_add_inbuf_cache_clean API
-Message-ID: <e5a7240e7c8e590c4745a76c4ab4d76f7f8bd88c.1767089672.git.mst@redhat.com>
+Subject: [PATCH RFC 07/13] vsock/virtio: fix DMA alignment for event_list
+Message-ID: <c195bc45032be85c3f0bad7362f0ba0a4e8a7726.1767089672.git.mst@redhat.com>
 References: <cover.1767089672.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -129,236 +129,47 @@ In-Reply-To: <cover.1767089672.git.mst@redhat.com>
 X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
 X-Mutt-Fcc: =sent
 
-Add virtqueue_add_inbuf_cache_clean() for passing DMA_ATTR_CPU_CACHE_CLEAN
-to virtqueue operations. This suppresses DMA debug cacheline overlap
-warnings for buffers where proper cache management is ensured by the
-caller.
+On non-cache-coherent platforms, when a structure contains a buffer
+used for DMA alongside fields that the CPU writes to, cacheline sharing
+can cause data corruption.
+
+The event_list array is used for DMA_FROM_DEVICE operations via
+virtqueue_add_inbuf(). The adjacent event_run and guest_cid fields are
+written by the CPU while the buffer is available, so mapped for the
+device. If these share cachelines with event_list, CPU writes can
+corrupt DMA data.
+
+Add __dma_from_device_aligned_begin/end annotations to ensure event_list
+is isolated in its own cachelines.
 
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- drivers/virtio/virtio_ring.c | 72 ++++++++++++++++++++++++++----------
- include/linux/virtio.h       |  5 +++
- 2 files changed, 58 insertions(+), 19 deletions(-)
+ net/vmw_vsock/virtio_transport.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-index 1832ea7982a6..19a4a8cd22f9 100644
---- a/drivers/virtio/virtio_ring.c
-+++ b/drivers/virtio/virtio_ring.c
-@@ -382,7 +382,7 @@ static int vring_mapping_error(const struct vring_virtqueue *vq,
- /* Map one sg entry. */
- static int vring_map_one_sg(const struct vring_virtqueue *vq, struct scatterlist *sg,
- 			    enum dma_data_direction direction, dma_addr_t *addr,
--			    u32 *len, bool premapped)
-+			    u32 *len, bool premapped, unsigned long attr)
- {
- 	if (premapped) {
- 		*addr = sg_dma_address(sg);
-@@ -410,7 +410,7 @@ static int vring_map_one_sg(const struct vring_virtqueue *vq, struct scatterlist
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index 8c867023a2e5..76099f7dc040 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -17,6 +17,7 @@
+ #include <linux/virtio_ids.h>
+ #include <linux/virtio_config.h>
+ #include <linux/virtio_vsock.h>
++#include <linux/dma-mapping.h>
+ #include <net/sock.h>
+ #include <linux/mutex.h>
+ #include <net/af_vsock.h>
+@@ -59,8 +60,10 @@ struct virtio_vsock {
  	 */
- 	*addr = virtqueue_map_page_attrs(&vq->vq, sg_page(sg),
- 					 sg->offset, sg->length,
--					 direction, 0);
-+					 direction, attr);
+ 	struct mutex event_lock;
+ 	bool event_run;
++	__dma_from_device_aligned_begin
+ 	struct virtio_vsock_event event_list[8];
  
- 	if (vring_mapping_error(vq, *addr))
- 		return -ENOMEM;
-@@ -539,7 +539,8 @@ static inline int virtqueue_add_split(struct vring_virtqueue *vq,
- 				      void *data,
- 				      void *ctx,
- 				      bool premapped,
--				      gfp_t gfp)
-+				      gfp_t gfp,
-+				      unsigned long attr)
- {
- 	struct vring_desc_extra *extra;
- 	struct scatterlist *sg;
-@@ -605,7 +606,8 @@ static inline int virtqueue_add_split(struct vring_virtqueue *vq,
- 			dma_addr_t addr;
- 			u32 len;
++	__dma_from_device_aligned_end
+ 	u32 guest_cid;
+ 	bool seqpacket_allow;
  
--			if (vring_map_one_sg(vq, sg, DMA_TO_DEVICE, &addr, &len, premapped))
-+			if (vring_map_one_sg(vq, sg, DMA_TO_DEVICE, &addr, &len,
-+					     premapped, attr))
- 				goto unmap_release;
- 
- 			prev = i;
-@@ -622,7 +624,8 @@ static inline int virtqueue_add_split(struct vring_virtqueue *vq,
- 			dma_addr_t addr;
- 			u32 len;
- 
--			if (vring_map_one_sg(vq, sg, DMA_FROM_DEVICE, &addr, &len, premapped))
-+			if (vring_map_one_sg(vq, sg, DMA_FROM_DEVICE, &addr, &len,
-+					     premapped, attr))
- 				goto unmap_release;
- 
- 			prev = i;
-@@ -1315,7 +1318,8 @@ static int virtqueue_add_indirect_packed(struct vring_virtqueue *vq,
- 					 unsigned int in_sgs,
- 					 void *data,
- 					 bool premapped,
--					 gfp_t gfp)
-+					 gfp_t gfp,
-+					 unsigned long attr)
- {
- 	struct vring_desc_extra *extra;
- 	struct vring_packed_desc *desc;
-@@ -1346,7 +1350,7 @@ static int virtqueue_add_indirect_packed(struct vring_virtqueue *vq,
- 		for (sg = sgs[n]; sg; sg = sg_next(sg)) {
- 			if (vring_map_one_sg(vq, sg, n < out_sgs ?
- 					     DMA_TO_DEVICE : DMA_FROM_DEVICE,
--					     &addr, &len, premapped))
-+					     &addr, &len, premapped, attr))
- 				goto unmap_release;
- 
- 			desc[i].flags = cpu_to_le16(n < out_sgs ?
-@@ -1441,7 +1445,8 @@ static inline int virtqueue_add_packed(struct vring_virtqueue *vq,
- 				       void *data,
- 				       void *ctx,
- 				       bool premapped,
--				       gfp_t gfp)
-+				       gfp_t gfp,
-+				       unsigned long attr)
- {
- 	struct vring_packed_desc *desc;
- 	struct scatterlist *sg;
-@@ -1466,7 +1471,7 @@ static inline int virtqueue_add_packed(struct vring_virtqueue *vq,
- 
- 	if (virtqueue_use_indirect(vq, total_sg)) {
- 		err = virtqueue_add_indirect_packed(vq, sgs, total_sg, out_sgs,
--						    in_sgs, data, premapped, gfp);
-+						    in_sgs, data, premapped, gfp, attr);
- 		if (err != -ENOMEM) {
- 			END_USE(vq);
- 			return err;
-@@ -1502,7 +1507,7 @@ static inline int virtqueue_add_packed(struct vring_virtqueue *vq,
- 
- 			if (vring_map_one_sg(vq, sg, n < out_sgs ?
- 					     DMA_TO_DEVICE : DMA_FROM_DEVICE,
--					     &addr, &len, premapped))
-+					     &addr, &len, premapped, attr))
- 				goto unmap_release;
- 
- 			flags = cpu_to_le16(vq->packed.avail_used_flags |
-@@ -2244,14 +2249,17 @@ static inline int virtqueue_add(struct virtqueue *_vq,
- 				void *data,
- 				void *ctx,
- 				bool premapped,
--				gfp_t gfp)
-+				gfp_t gfp,
-+				unsigned long attr)
- {
- 	struct vring_virtqueue *vq = to_vvq(_vq);
- 
- 	return vq->packed_ring ? virtqueue_add_packed(vq, sgs, total_sg,
--					out_sgs, in_sgs, data, ctx, premapped, gfp) :
-+					out_sgs, in_sgs, data, ctx, premapped, gfp,
-+					attr) :
- 				 virtqueue_add_split(vq, sgs, total_sg,
--					out_sgs, in_sgs, data, ctx, premapped, gfp);
-+					out_sgs, in_sgs, data, ctx, premapped, gfp,
-+					attr);
- }
- 
- /**
-@@ -2289,7 +2297,7 @@ int virtqueue_add_sgs(struct virtqueue *_vq,
- 			total_sg++;
- 	}
- 	return virtqueue_add(_vq, sgs, total_sg, out_sgs, in_sgs,
--			     data, NULL, false, gfp);
-+			     data, NULL, false, gfp, 0);
- }
- EXPORT_SYMBOL_GPL(virtqueue_add_sgs);
- 
-@@ -2311,7 +2319,7 @@ int virtqueue_add_outbuf(struct virtqueue *vq,
- 			 void *data,
- 			 gfp_t gfp)
- {
--	return virtqueue_add(vq, &sg, num, 1, 0, data, NULL, false, gfp);
-+	return virtqueue_add(vq, &sg, num, 1, 0, data, NULL, false, gfp, 0);
- }
- EXPORT_SYMBOL_GPL(virtqueue_add_outbuf);
- 
-@@ -2334,7 +2342,7 @@ int virtqueue_add_outbuf_premapped(struct virtqueue *vq,
- 				   void *data,
- 				   gfp_t gfp)
- {
--	return virtqueue_add(vq, &sg, num, 1, 0, data, NULL, true, gfp);
-+	return virtqueue_add(vq, &sg, num, 1, 0, data, NULL, true, gfp, 0);
- }
- EXPORT_SYMBOL_GPL(virtqueue_add_outbuf_premapped);
- 
-@@ -2356,10 +2364,36 @@ int virtqueue_add_inbuf(struct virtqueue *vq,
- 			void *data,
- 			gfp_t gfp)
- {
--	return virtqueue_add(vq, &sg, num, 0, 1, data, NULL, false, gfp);
-+	return virtqueue_add(vq, &sg, num, 0, 1, data, NULL, false, gfp, 0);
- }
- EXPORT_SYMBOL_GPL(virtqueue_add_inbuf);
- 
-+/**
-+ * virtqueue_add_inbuf_cache_clean - expose input buffers with cache clean hint
-+ * @vq: the struct virtqueue we're talking about.
-+ * @sg: scatterlist (must be well-formed and terminated!)
-+ * @num: the number of entries in @sg writable by other side
-+ * @data: the token identifying the buffer.
-+ * @gfp: how to do memory allocations (if necessary).
-+ *
-+ * Adds DMA_ATTR_CPU_CACHE_CLEAN attribute to suppress overlapping cacheline
-+ * warnings in DMA debug builds. Has no effect in production builds.
-+ *
-+ * Caller must ensure we don't call this with other virtqueue operations
-+ * at the same time (except where noted).
-+ *
-+ * Returns zero or a negative error (ie. ENOSPC, ENOMEM, EIO).
-+ */
-+int virtqueue_add_inbuf_cache_clean(struct virtqueue *vq,
-+				    struct scatterlist *sg, unsigned int num,
-+				    void *data,
-+				    gfp_t gfp)
-+{
-+	return virtqueue_add(vq, &sg, num, 0, 1, data, NULL, false, gfp,
-+			     DMA_ATTR_CPU_CACHE_CLEAN);
-+}
-+EXPORT_SYMBOL_GPL(virtqueue_add_inbuf_cache_clean);
-+
- /**
-  * virtqueue_add_inbuf_ctx - expose input buffers to other end
-  * @vq: the struct virtqueue we're talking about.
-@@ -2380,7 +2414,7 @@ int virtqueue_add_inbuf_ctx(struct virtqueue *vq,
- 			void *ctx,
- 			gfp_t gfp)
- {
--	return virtqueue_add(vq, &sg, num, 0, 1, data, ctx, false, gfp);
-+	return virtqueue_add(vq, &sg, num, 0, 1, data, ctx, false, gfp, 0);
- }
- EXPORT_SYMBOL_GPL(virtqueue_add_inbuf_ctx);
- 
-@@ -2405,7 +2439,7 @@ int virtqueue_add_inbuf_premapped(struct virtqueue *vq,
- 				  void *ctx,
- 				  gfp_t gfp)
- {
--	return virtqueue_add(vq, &sg, num, 0, 1, data, ctx, true, gfp);
-+	return virtqueue_add(vq, &sg, num, 0, 1, data, ctx, true, gfp, 0);
- }
- EXPORT_SYMBOL_GPL(virtqueue_add_inbuf_premapped);
- 
-diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-index 3626eb694728..63bb05ece8c5 100644
---- a/include/linux/virtio.h
-+++ b/include/linux/virtio.h
-@@ -62,6 +62,11 @@ int virtqueue_add_inbuf(struct virtqueue *vq,
- 			void *data,
- 			gfp_t gfp);
- 
-+int virtqueue_add_inbuf_cache_clean(struct virtqueue *vq,
-+				    struct scatterlist sg[], unsigned int num,
-+				    void *data,
-+				    gfp_t gfp);
-+
- int virtqueue_add_inbuf_ctx(struct virtqueue *vq,
- 			    struct scatterlist sg[], unsigned int num,
- 			    void *data,
 -- 
 MST
 
