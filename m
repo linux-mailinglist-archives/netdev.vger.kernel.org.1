@@ -1,243 +1,184 @@
-Return-Path: <netdev+bounces-246304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C52E0CE8F36
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 09:00:24 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6A06CE9085
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 09:31:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AB197301A711
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 08:00:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 66C88300C2BE
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 08:31:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689D92F745D;
-	Tue, 30 Dec 2025 08:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1F02641FC;
+	Tue, 30 Dec 2025 08:31:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ALk7XeB+"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="R2D848oJ";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="e4A3jgsY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A1EE1DED4C
-	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 07:59:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1C51F30BB
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 08:31:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767081600; cv=none; b=bO1YDY89hUvqNJ+JlCZE3rSrD419LWgZxU/ceW4vqeHrGcxzwXYMmVlcrdxNjaXXuIP8+g6phZ+CjyDe5KJx1vZN5tzyOT2OwET1Thq7HU/Ho59hUOo6xWkQdJ/K3ZhC2UWZz+UpD2d19ok1eLbjFjyWGEQ/QTxCZDV+pGHIEQ4=
+	t=1767083514; cv=none; b=lDCI/uTDAs+UG6ATWsgZLUJSnMx3EkZ1lbecy0ytXjCaIntkQ5s88m6itjQEO8HCD1mQKB2Y51C1Kw/dG8/7+8+hAFgLbPrrupegcRmxNYAB0qDgyBuC9hR8oNxr0mG1jB6FLkncdUK70QGtITRM7BlGckBw0t5npqP+s3Cjk5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767081600; c=relaxed/simple;
-	bh=riJGbPocmScMhyWNFDAAT8g32Ex5OW4JQQni6EltDeM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DROxVWO3WDvakLX1VScFsf2vzpz6ORQzCWlROLpdEbPqMGVEdc5XJw6XdaVaToFGe3Y0LcVOiESZ4zbxYCQQagQS9sSozcoLKuECOKG/zTO+1U7QybEqwE5CDuXlTdmstAdqB0MTkn2sPhP444mmV8zt4PZPe56ypAQbK6N6SGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ALk7XeB+; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767081597;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NV/o1IadiRm0HWU7yBq7XT+X0hWIulEOgoL1ZQv6qPU=;
-	b=ALk7XeB+Vyb5Rf8nX2/OYwhvu+RBbYYVwo+to3uBIcDS+GPim7yQD9GbXq+0WKV41ux4N1
-	y0/qDgGS4GJaEeLLq0SEc4IZiivE2vpVx+8AVC/ycStbqw1b1UE6wwUIoZtcp+zbqO3r6t
-	XqzJwmhMGTz5jvgJcW+f1f5G9F9SJM4=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-530-NcY2Xo9yMBOP6DHaSGkBiA-1; Tue,
- 30 Dec 2025 02:59:52 -0500
-X-MC-Unique: NcY2Xo9yMBOP6DHaSGkBiA-1
-X-Mimecast-MFC-AGG-ID: NcY2Xo9yMBOP6DHaSGkBiA_1767081591
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 017691956061;
-	Tue, 30 Dec 2025 07:59:50 +0000 (UTC)
-Received: from xudu-thinkpadx1carbongen9.nay.csb (unknown [10.66.60.72])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CB6661800576;
-	Tue, 30 Dec 2025 07:59:47 +0000 (UTC)
-From: Xu Du <xudu@redhat.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org
-Cc: netdev@vger.kernel.org
-Subject: [RFC PATCH net-next v2 8/8] selftest: tun: Add test data for success and failure paths
-Date: Tue, 30 Dec 2025 15:59:12 +0800
-Message-ID: <581b50dfe7ecd936afe738514320095f51695f71.1767074545.git.xudu@redhat.com>
-In-Reply-To: <cover.1767074545.git.xudu@redhat.com>
-References: <cover.1767074545.git.xudu@redhat.com>
+	s=arc-20240116; t=1767083514; c=relaxed/simple;
+	bh=m6hvbevJyuhk10WNOvBFfjn3rxeFkTJLsdGukclyKE4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JlS9US7kklT6TKGJmtfGV9L7TQAuVfCkHqMrHU52H37QasLPAzZXp9SVV5emqYHmkrXCyfE7BTFHUbeEi4W/ifLrOsdWUJoaILrZL4fmW8Ibn8xaD0oDMTTrRAdAMnUvUKAft1Om8CBOZQ40X9khgtRm9Xy+SoeV8vqIl/RulqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=R2D848oJ; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=e4A3jgsY; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BTKefxS2725780
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 08:31:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	Y2Kiv61EPEz01nq0NjrAsUOCXUCMEjN7vnkWpbw0MHE=; b=R2D848oJFCwYBQqR
+	v+6i8pRjzwPCz+ZgaEo1OJvarDMSp9mItGxtS9JTsfIAJ41Ju2efDmMVEbEhI/z1
+	8cYHZwwaPlTS4eiSwTQc5WD9OJ9vtN2Z3Lcqlekrb3THg7hbB+jgmZMOCdvWjWLY
+	MQImwCtqoOiJHI0Yb3KHTscwsKu/0AmXWoaR8/Yyo1cn1k+MkeMo75KBGBhrtJ/D
+	9Yt6U2zL0Cn03GfvL4spy53pewdZx4gtmskw++hpGAZkHYUrHhcTHQyq8V3m0u2j
+	74sh4sj+ZzgskCLgPYxMnAQ8Ln1/aZjBjXVcjhK4sSMw1mruMofzZaFgOPOJ6lui
+	ttCjdg==
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com [209.85.219.71])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bc0vdh9he-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 08:31:51 +0000 (GMT)
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-8804b991a54so368055026d6.2
+        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 00:31:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1767083511; x=1767688311; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y2Kiv61EPEz01nq0NjrAsUOCXUCMEjN7vnkWpbw0MHE=;
+        b=e4A3jgsYgKGJg3wNiUnSyM5dem+TMnsKMZOEA8Zq052DpyI7TQqevYhG8yh5tM5oW+
+         +Q38jI0nkVkTAqVm7pPTKHqN/mENf3V7QgcBjafM+rFgY5O8QS9008SsM+h3OQy7dYK5
+         kRumTojndci3OSdbJnQM2eglJR9czNwq2fokAjBegbloOpuhtkJmSIO5xTageJzfUT7g
+         yV5STWc+M1m6itSknsK4srBazdT+otZf8KJIS3TXGIAVb9aoi8hTC3ziCeVrRA6EVVan
+         nQLMulq+u+IUmUh7H9dMTPQtJQ2XYTlYHPGJSBSZV54Q8Y8wIPHC110FM0gYG5OeWL3/
+         HpJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767083511; x=1767688311;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Y2Kiv61EPEz01nq0NjrAsUOCXUCMEjN7vnkWpbw0MHE=;
+        b=SnLKCj8weNyvtngBenJqFKsmufkZTDq8h9tZd7TUYXFRubs57w35Y0byi6o7M6sClv
+         Ua3UQ3YhI7oWLA5FCzrechV8eHmveONqmejXv6BXW4dRp0aYNwXAFjRvmczZxprQi6e/
+         ESj2ljEb14Om0HEMD2qVbW4ACE5eqR8PpuKO5HQkremsTzIqOTkXTzU3DrMVZvV7n4IV
+         ggX+9kFDcQLJKmb0guwROL1Ol7obj96ehxXGkzEO9Cw4ftS9ynNJXMsKRJY/7guiKwl7
+         MhNdWyIAgaamNxeBEcEzIR6jJiZBKjmi/NUBxV8+rQnX3WHIS528mE69+FhzwV6wujwS
+         QMBw==
+X-Forwarded-Encrypted: i=1; AJvYcCUGme53qUoo10lrV434BvorQJ8ssSrgWt0hOfoE3sNuN6d7edgWGjyEVlLsMS2w2ghfWs7V8HM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6eQMj9YTGY1yHW5XhQ3+DWIXLQDsVrg9UsBRh4N0GtuuHvdZo
+	QjEx98zeLCh0HQ4dF+Qqj338UnV8UdLT5+B394eSz5Lkpa9naH2jSy/XPzZ+dZssVQjPcI/L+1q
+	ie5YQFVSRwKv8wkpqX3zMImJNCfc0UOVfWeiOJUgcADDTNums8rDpHjGFiVnUVRzu3K0Fz+yLf9
+	alR+P+bRBw1rryRTjMlvVf87IT4dzBc52bZQ==
+X-Gm-Gg: AY/fxX5ht7P8h90ne7J/Rx8KKjAqahaSU94RlHhzKmnSR7bPKShH24xWMIx9b6btEBj
+	xcqahQOE/Dml/wHYRFUxt88or1MBQuewtFQFCY8ODXgQEsVTN+Lz1+cMVadP/0UIXr1lYZvMNQn
+	7yaVYPm69qFaOt2Mon5Yewrzh6Jc6YPoiFhCzVTI35uGohGsqWkxEUDHB7YXPJL0r13nAX58SJh
+	Jn5Ej4GpyIFuf8DsIeiHMTO4Ws=
+X-Received: by 2002:a05:6214:5082:b0:88a:2b73:db72 with SMTP id 6a1803df08f44-88d87af3aacmr538276996d6.55.1767083511050;
+        Tue, 30 Dec 2025 00:31:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFlytyrWfqGacbq6jhfS1Kjjo3UORFqjnyT7qepIEarqZmvgkgByM+VEXBg7QlZkmlh64MhDsTWZV8GnQAtQJE=
+X-Received: by 2002:a05:6214:5082:b0:88a:2b73:db72 with SMTP id
+ 6a1803df08f44-88d87af3aacmr538276736d6.55.1767083510662; Tue, 30 Dec 2025
+ 00:31:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+References: <20251230071853.1062223-1-zilin@seu.edu.cn>
+In-Reply-To: <20251230071853.1062223-1-zilin@seu.edu.cn>
+From: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Date: Tue, 30 Dec 2025 09:31:32 +0100
+X-Gm-Features: AQt7F2qz6AjXDkjLv2IVr0jEsV7rCZHzHYmHrrPwVgXEUtxqpuw5DbfCEi7yChI
+Message-ID: <CAFEp6-15L291Ae1zbon=cD-iaQ-4RbVZNW42KUHx4G7KRP8Mdw@mail.gmail.com>
+Subject: Re: [PATCH net] net: wwan: iosm: Fix memory leak in ipc_mux_deinit()
+To: Zilin Guan <zilin@seu.edu.cn>
+Cc: ryazanov.s.a@gmail.com, johannes@sipsolutions.net, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jianhao Xu <jianhao.xu@seu.edu.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Authority-Analysis: v=2.4 cv=dfONHHXe c=1 sm=1 tr=0 ts=69538df7 cx=c_pps
+ a=UgVkIMxJMSkC9lv97toC5g==:117 a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10
+ a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8
+ a=bq_3mZz8qLaXMhAjHesA:9 a=QEXdDO2ut3YA:10 a=1HOtulTD9v-eNWfpl4qZ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjMwMDA3NiBTYWx0ZWRfXzSSnLKfIRlqc
+ lCQcSfU8nIkbkJZyXR9df5NDf9QaO4d6zju1rBeOFElz1WxXPXrXZ/Dyy2K3uWpXnndV0oW1fZw
+ dz50RQKBRMevru2ZImvr8P9Hl6wbZD6RLfB8Q3xZaXCzcxKObQF4kp7CJHciHGCtRpyHvggrwYk
+ qpmZ+vrDMdxHkc3YhrB79ADZqClOnYhixaxkohfhGOqsYSsROP1OnDiOqM6Ks6PoLRsxEQkm2Ep
+ EN9ooUSuX9T//MRR4K1yJUd96DhVmajl/4QMr4mZFg/2cU2+m94q1OmjonI2rYsHKUY+gGLhwQF
+ bLegDx62OseCSRTk9ziTn4X5p7tCPaKKR+RZUq0v0/TiSN/gs+sN7+XQlkkWbaUl7U8ETw90T9n
+ lNHIjAHTroUbdMhGMrHsj/e4zA8ave7NT7FXzpf+fx00nRSf2FeVX8GuKa93pQPm9Xy8mee1Oyg
+ SHkpyDRKe+qGq5orDew==
+X-Proofpoint-GUID: 0FzcMki86NaVSDJvtnvV1DxdFYvgRxCh
+X-Proofpoint-ORIG-GUID: 0FzcMki86NaVSDJvtnvV1DxdFYvgRxCh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-29_07,2025-12-30_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 spamscore=0 clxscore=1015 phishscore=0 malwarescore=0
+ suspectscore=0 bulkscore=0 impostorscore=0 lowpriorityscore=0 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2512120000 definitions=main-2512300076
 
-To improve the robustness and coverage of the TUN selftests, this
-patch expands the set of test data.
+On Tue, Dec 30, 2025 at 8:19=E2=80=AFAM Zilin Guan <zilin@seu.edu.cn> wrote=
+:
+>
+> Commit 1f52d7b62285 ("net: wwan: iosm: Enable M.2 7360 WWAN card support"=
+)
+> allocated memory for pp_qlt in ipc_mux_init() but did not free it in
+> ipc_mux_deinit(). This results in a memory leak when the driver is
+> unloaded.
+>
+> Free the allocated memory in ipc_mux_deinit() to fix the leak.
+>
+> Fixes: 1f52d7b62285 ("net: wwan: iosm: Enable M.2 7360 WWAN card support"=
+)
+> Co-developed-by: Jianhao Xu <jianhao.xu@seu.edu.cn>
+> Signed-off-by: Jianhao Xu <jianhao.xu@seu.edu.cn>
+> Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
 
-Signed-off-by: Xu Du <xudu@redhat.com>
----
- tools/testing/selftests/net/tun.c | 115 +++++++++++++++++++++++++++++-
- 1 file changed, 113 insertions(+), 2 deletions(-)
+Reviewed-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
 
-diff --git a/tools/testing/selftests/net/tun.c b/tools/testing/selftests/net/tun.c
-index 519aaffd6d1a..2322929b0194 100644
---- a/tools/testing/selftests/net/tun.c
-+++ b/tools/testing/selftests/net/tun.c
-@@ -57,6 +57,10 @@ static struct in6_addr param_ipaddr6_inner_src = {
- 	{ { 0x20, 0x02, 0x0d, 0xb8, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 } },
- };
- 
-+#ifndef BIT
-+#define BIT(nr) (1UL << (nr))
-+#endif
-+
- #define VN_ID 1
- #define VN_PORT 4789
- #define UDP_SRC_PORT 22
-@@ -72,6 +76,8 @@ static struct in6_addr param_ipaddr6_inner_src = {
- #define UDP_TUNNEL_VXLAN_4IN6 0x04
- #define UDP_TUNNEL_VXLAN_6IN6 0x08
- 
-+#define UDP_TUNNEL_MAX_SEGMENTS BIT(7)
-+
- #define UDP_TUNNEL_OUTER_IPV4 (UDP_TUNNEL_VXLAN_4IN4 | UDP_TUNNEL_VXLAN_6IN4)
- #define UDP_TUNNEL_INNER_IPV4 (UDP_TUNNEL_VXLAN_4IN4 | UDP_TUNNEL_VXLAN_4IN6)
- 
-@@ -545,6 +551,39 @@ FIXTURE_VARIANT(tun_vnet_udptnl)
- 
- /* clang-format off */
- #define TUN_VNET_UDPTNL_VARIANT_ADD(type, desc)                              \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_nogsosz_1byte) {         \
-+		/* no GSO: send a single byte */                             \
-+		.tunnel_type = type,                                         \
-+		.data_size = 1,                                              \
-+		.r_num_mss = 1,                                              \
-+		.is_tap = true,                                              \
-+		.no_gso = true,                                              \
-+	};                                                                   \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_nogsosz_1mss) {          \
-+		/* no GSO: send a single MSS, fall back to no GSO */         \
-+		.tunnel_type = type,                                         \
-+		.data_size = UDP_TUNNEL_MSS(type),                           \
-+		.r_num_mss = 1,                                              \
-+		.is_tap = true,                                              \
-+		.no_gso = true,                                              \
-+	};                                                                   \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_nogsosz_gtmss) {         \
-+		/* no GSO: send a single MSS + 1B: fail */                   \
-+		.tunnel_type = type,                                         \
-+		.data_size = UDP_TUNNEL_MSS(type) + 1,                       \
-+		.r_num_mss = 1,                                              \
-+		.is_tap = true,                                              \
-+		.no_gso = true,                                              \
-+	};                                                                   \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_1byte) {                 \
-+		/* GSO: send 1 byte, gso 1 byte, fall back to no GSO */      \
-+		.tunnel_type = type,                                         \
-+		.gso_size = 1,                                               \
-+		.data_size = 1,                                              \
-+		.r_num_mss = 1,                                              \
-+		.is_tap = true,                                              \
-+		.no_gso = true,                                              \
-+	};                                                                   \
- 	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_1mss) {                  \
- 		/* send a single MSS: fall back to no GSO */                 \
- 		.tunnel_type = type,                                         \
-@@ -553,8 +592,65 @@ FIXTURE_VARIANT(tun_vnet_udptnl)
- 		.r_num_mss = 1,                                              \
- 		.is_tap = true,                                              \
- 		.no_gso = true,                                              \
--	};
--/* clang-format on */
-+	};                                                                   \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_ltgso) {                 \
-+		/* data <= MSS < gso: will fall back to no GSO */            \
-+		.tunnel_type = type,                                         \
-+		.gso_size = UDP_TUNNEL_MSS(type) + 1,                        \
-+		.data_size = UDP_TUNNEL_MSS(type),                           \
-+		.r_num_mss = 1,                                              \
-+		.is_tap = true,                                              \
-+		.no_gso = true,                                              \
-+	};                                                                   \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_gtgso) {                 \
-+		/* GSO: a single MSS + 1B */                                 \
-+		.tunnel_type = type,                                         \
-+		.gso_size = UDP_TUNNEL_MSS(type),                            \
-+		.data_size = UDP_TUNNEL_MSS(type) + 1,                       \
-+		.r_num_mss = 2,                                              \
-+		.is_tap = true,                                              \
-+	};                                                                   \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_2mss) {                  \
-+		/* no GSO: send exactly 2 MSS */                             \
-+		.tunnel_type = type,                                         \
-+		.gso_size = UDP_TUNNEL_MSS(type),                            \
-+		.data_size = UDP_TUNNEL_MSS(type) * 2,                       \
-+		.r_num_mss = 2,                                              \
-+		.is_tap = true,                                              \
-+	};                                                                   \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_maxbytes) {              \
-+		/* GSO: send max bytes */                                    \
-+		.tunnel_type = type,                                         \
-+		.gso_size = UDP_TUNNEL_MSS(type),                            \
-+		.data_size = UDP_TUNNEL_MAX(type, true),                     \
-+		.r_num_mss = UDP_TUNNEL_MAX(type, true) /                    \
-+			     UDP_TUNNEL_MSS(type) + 1,                       \
-+		.is_tap = true,                                              \
-+	};                                                                   \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_over_maxbytes) {         \
-+		/* GSO: send oversize max bytes: fail */                     \
-+		.tunnel_type = type,                                         \
-+		.gso_size = UDP_TUNNEL_MSS(type),                            \
-+		.data_size = ETH_MAX_MTU,                                    \
-+		.r_num_mss = ETH_MAX_MTU / UDP_TUNNEL_MSS(type) + 1,         \
-+		.is_tap = true,                                              \
-+	};                                                                   \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_maxsegs) {               \
-+		/* GSO: send max number of min sized segments */             \
-+		.tunnel_type = type,                                         \
-+		.gso_size = 1,                                               \
-+		.data_size = UDP_TUNNEL_MAX_SEGMENTS,                        \
-+		.r_num_mss = UDP_TUNNEL_MAX_SEGMENTS,                        \
-+		.is_tap = true,                                              \
-+	};                                                                   \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_5byte) {                 \
-+		/* GSO: send 5 bytes, gso 2 bytes */                         \
-+		.tunnel_type = type,                                         \
-+		.gso_size = 2,                                               \
-+		.data_size = 5,                                              \
-+		.r_num_mss = 3,                                              \
-+		.is_tap = true,                                              \
-+	} /* clang-format on */
- 
- TUN_VNET_UDPTNL_VARIANT_ADD(UDP_TUNNEL_VXLAN_4IN4, 4in4);
- TUN_VNET_UDPTNL_VARIANT_ADD(UDP_TUNNEL_VXLAN_6IN4, 6in4);
-@@ -893,4 +989,19 @@ TEST_F(tun_vnet_udptnl, recv_gso_packet)
- 	}
- }
- 
-+XFAIL_ADD(tun_vnet_udptnl, 4in4_nogsosz_gtmss, recv_gso_packet);
-+XFAIL_ADD(tun_vnet_udptnl, 6in4_nogsosz_gtmss, recv_gso_packet);
-+XFAIL_ADD(tun_vnet_udptnl, 4in6_nogsosz_gtmss, recv_gso_packet);
-+XFAIL_ADD(tun_vnet_udptnl, 6in6_nogsosz_gtmss, recv_gso_packet);
-+
-+XFAIL_ADD(tun_vnet_udptnl, 4in4_over_maxbytes, send_gso_packet);
-+XFAIL_ADD(tun_vnet_udptnl, 6in4_over_maxbytes, send_gso_packet);
-+XFAIL_ADD(tun_vnet_udptnl, 4in6_over_maxbytes, send_gso_packet);
-+XFAIL_ADD(tun_vnet_udptnl, 6in6_over_maxbytes, send_gso_packet);
-+
-+XFAIL_ADD(tun_vnet_udptnl, 4in4_over_maxbytes, recv_gso_packet);
-+XFAIL_ADD(tun_vnet_udptnl, 6in4_over_maxbytes, recv_gso_packet);
-+XFAIL_ADD(tun_vnet_udptnl, 4in6_over_maxbytes, recv_gso_packet);
-+XFAIL_ADD(tun_vnet_udptnl, 6in6_over_maxbytes, recv_gso_packet);
-+
- TEST_HARNESS_MAIN
--- 
-2.49.0
-
+> ---
+>  drivers/net/wwan/iosm/iosm_ipc_mux.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/drivers/net/wwan/iosm/iosm_ipc_mux.c b/drivers/net/wwan/iosm=
+/iosm_ipc_mux.c
+> index fc928b298a98..b846889fcb09 100644
+> --- a/drivers/net/wwan/iosm/iosm_ipc_mux.c
+> +++ b/drivers/net/wwan/iosm/iosm_ipc_mux.c
+> @@ -456,6 +456,7 @@ void ipc_mux_deinit(struct iosm_mux *ipc_mux)
+>         struct sk_buff_head *free_list;
+>         union mux_msg mux_msg;
+>         struct sk_buff *skb;
+> +       int i;
+>
+>         if (!ipc_mux->initialized)
+>                 return;
+> @@ -479,5 +480,10 @@ void ipc_mux_deinit(struct iosm_mux *ipc_mux)
+>                 ipc_mux->channel->dl_pipe.is_open =3D false;
+>         }
+>
+> +       if (ipc_mux->protocol !=3D MUX_LITE) {
+> +               for (i =3D 0; i < IPC_MEM_MUX_IP_SESSION_ENTRIES; i++)
+> +                       kfree(ipc_mux->ul_adb.pp_qlt[i]);
+> +       }
+> +
+>         kfree(ipc_mux);
+>  }
+> --
+> 2.34.1
+>
 
