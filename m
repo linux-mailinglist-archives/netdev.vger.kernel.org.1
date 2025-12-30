@@ -1,217 +1,102 @@
-Return-Path: <netdev+bounces-246391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 076FDCEACB2
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 23:42:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0ACFCCEADC0
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 00:24:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BBF523017F1A
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 22:42:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0FC3D300F31C
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 23:24:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 481512D7DD5;
-	Tue, 30 Dec 2025 22:42:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51DF7242D9D;
+	Tue, 30 Dec 2025 23:24:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="WMrJIfM0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sGTCHa55"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CD002D7D41
-	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 22:42:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76A122689C
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 23:24:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767134538; cv=none; b=MXjyaH/cwBR7v74DwEqkm5l+Njyoe7kq8kFaOZfahBGGz0I89kU7CYXRpvPbnpvGduYL1bwn8NFBqPUm3xuWkgdD57+vrOTd/hu0wXNsppUiUGMtE1IBvEIk/JAoJmjhaClMl71Oqv/9AVRpyCSINDVCwTnCNV73UkEAbMpeOXs=
+	t=1767137067; cv=none; b=ZDC29al89unXNB3Xy80AZS2XsiDJw0M/c/aHznCHUUMTv0upgCHXtneAEGzG7daoo4aMr1XwOvqaUTHF5GtYgWRRCM4Vrqc+rJJY2dmFW33n4vZoRgHd0IEXhfvxQxoLcmgO/n4xLBcqdoZP1KlvNpD+noZ9wd8BEia3Vg/B16I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767134538; c=relaxed/simple;
-	bh=ytti8HfhjEI7qz2E/SV9wToGZyResVG1xMQaZNVMCqc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Fnwl/sPmeQ+aIkrItwChWsH89ezx4/oEwm9F8LKK7wNLs0l1U4z/EfFb7DgCNbH+fuDXdO+DiT9PVsQZ2NA6j9JruH9Ga/jEQk9/fKCqQhJifg8qBtiAaH2LDGyujQWA6dO1LiSfctlhrUSMLvTW0G31xRs1h0y/tUyEBcWkBo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=WMrJIfM0; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-64d02c01865so13361982a12.1
-        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 14:42:15 -0800 (PST)
+	s=arc-20240116; t=1767137067; c=relaxed/simple;
+	bh=SIikXicIPVE6mIsTe0Brr3XY/DnV6A9FoUg4Wm80Mqo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=qxjBiB5vMQgSxz+ljuifc8EzHC7fXDX1FIEZ7/kN0/MkkOurgCHdrPFQhcIpLo7esJAIWHs6WHDvQVN8wuG/v8CMpd24ulsMzb5c+QVAQznWriLSwEC/CI+xRyF8g7z46pmzeaYQkmsWVmWrpsByvF7RCXrB21yqPW6IkYOl1sQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--decot.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sGTCHa55; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--decot.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a0b7eb0a56so260401635ad.1
+        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 15:24:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1767134534; x=1767739334; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t9U9LNkjVXjPqNZ8Lhy0u5mczUvv7Up+w00WyQpO1Dc=;
-        b=WMrJIfM0pzkHRV+KcsuhKdTrtHSniFOIfjYxrliVHOiByA8WZ2YpQH7A2iFXM2fsc8
-         NnQLFycWWEsRHcEam0HSUkVg0rgugodgFk+Tpljcb21Upeb7da0x5x5+BNnQBx3ppCJu
-         1LcDAIxtG5GuuD0Gx1jHMWD4ThtKvTHkUta39DcYn7PR0bLwekLbF9wLGusHQxWd3jvK
-         3gA6Y5jCSKjzSx3Rsz26Pc8ni29hAIJn87r38O5eIKt8gc04Ul/ZKJNQd1bOClLF8Bt2
-         Cb91Af6TpljyjWJd+i+mH05gFRA0szRLyyRaYRdvxPMMEhY39QO7k5n++sXsMOhQsYIM
-         ukEQ==
+        d=google.com; s=20230601; t=1767137065; x=1767741865; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=otefy10bqMQ6Rkz8jl3RITolqSd8NKK7YcepSO+lkXo=;
+        b=sGTCHa553qNJJrOkLhOv+AU+VsKZFStK7vsngHW2NpLPUNUcMUTtUkAnnbf4x6iAyX
+         e6Ww4U2kjsY/YMbWsqw+iiXoHy+Rf/l5u9kKqJ3LkbGFxow8dSfcNnVprVRRjeZ15nGE
+         oOfjKVGu/1pfei5hWHHIBuzuZ/+e6696SLkHqHGLvgvpkT+XkmiHXn7fvmtQ09fIaWbv
+         LZPgWl9Sgs99iAw3NXoDeMT3TnPHhHVf9HY1FrStJn5LPPbBqSBntx7RXpEMpSUYiAom
+         uEU/NEn1vo+KAXFkmCxW6GbLt5G/e102wAWmWWhQpSJWX+WCGRVSJBc0kkHv1vS6UMWa
+         zFWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767134534; x=1767739334;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=t9U9LNkjVXjPqNZ8Lhy0u5mczUvv7Up+w00WyQpO1Dc=;
-        b=iFCO+jf/SCIZyMCrZjzl5qIZBeGWroHi0O7bxCS/p3lb2J/0ELfda8niTdbOudbIi5
-         dRfunoQED34zykLayKBjPggfiCG97i0uxYRBiuOAMJo0osmPfvXyAouMoLeN0H3aBl1O
-         gh+WxrOZlRA296iDwJz2nNjWb4D+iPB+VbsxAv8ECO917j/CRtUsAt6TIAawHOOvpU8m
-         qWhFIazkCfHKcjD90MutWpuaW+dUVfCN+PkdRE8IhbG3M9ONmS768WCoukjO0fWKlA+D
-         qouoTFTP8gexYyCw0K10HjzMb8iKItTg7jAPieX96PDIMYLpwBKTRLMF65aC7/z9B1Te
-         BeNg==
-X-Gm-Message-State: AOJu0YzgrY5XMlvypT1FmoE09tkj29hF+YNZ4R/m29ceaz34CyBl7vfo
-	3VpOOC+gVNU/UOaD8pbBqL5/7V8XRuM4GPkTaT4dtKNsvPSZLCzrTKhmrob/XNe2QZwNwLA9ePv
-	7v2NKCFF7gwiij6aBA9R1w8BJj+akLxLEW2eC/ObkzXusdMEpDkKhTTV8b+UfRxI18M1pLdFhkW
-	DWICbhAvzhp4929KE+H+wX0qdeAohz4tKoIGR/Rq3mhydEaJHAKw==
-X-Gm-Gg: AY/fxX7rQ4rjA/GxOhZjNUnsvdpZIR/GxJ7Gb5zpcVPjmTKXWDHVKYULyyqaJoSQY33
-	6Fcu5mNF4YgfqOOHbZrQgqo7+3pn5VMrBSHGrbaU3HoPrVNoAMUe+jg6BdYtwcqbRyreoRNv57P
-	Y5fwfYinzpyMYRy+YvGtDbccp0lg/IIwcRckkWPwHJRUPmGCtNyxaXev8+mmmjuTIi1+XCJQ7qx
-	Q1nirydOUXDABAD1Pg5fMobw7eKljOOQnEfbIEgEPbDnznOO+Y68YEfojvDrZZ65mg71WwJfk1w
-	eCKJyqfSOgXPqA72BwEwleOoP2Ev5Sdqju9CgadZXbcvKaAkWNw5mAcK1c+psgpZb2QGZ+23e4L
-	GCfeMN7gOUg8CFUqLyMNi0Aw2FFa22AzHIlBvYwn829duP9B9hJsR2IFoToVdsKUeWfCdUEALl6
-	kxHw/lAnB09ShHw/Kip9iu2TYXuNis4BXA817q
-X-Google-Smtp-Source: AGHT+IEehrvR3CHpzcz0HwMMxyJNPnJfQ5bw7tqFn605K5zJWwbvlcA29fEL5wspmrqrpvsU3Da/3A==
-X-Received: by 2002:a05:6402:34cc:b0:64d:498b:aee7 with SMTP id 4fb4d7f45d1cf-64d498bb3ccmr23212270a12.9.1767134533954;
-        Tue, 30 Dec 2025 14:42:13 -0800 (PST)
-Received: from dev-rjethwani.dev.purestorage.com ([2620:125:9007:640:ffff::71f8])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-64b91599844sm36214651a12.25.2025.12.30.14.42.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Dec 2025 14:42:13 -0800 (PST)
-From: Rishikesh Jethwani <rjethwani@purestorage.com>
-To: netdev@vger.kernel.org
-Cc: saeedm@nvidia.com,
-	tariqt@nvidia.com,
-	mbloch@nvidia.com,
-	borisp@nvidia.com,
-	john.fastabend@gmail.com,
-	kuba@kernel.org,
-	sd@queasysnail.net,
-	davem@davemloft.net,
-	Rishikesh Jethwani <rjethwani@purestorage.com>
-Subject: [PATCH] mlx5: TLS 1.3 hardware offload support
-Date: Tue, 30 Dec 2025 15:41:37 -0700
-Message-Id: <20251230224137.3600355-3-rjethwani@purestorage.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20251230224137.3600355-1-rjethwani@purestorage.com>
-References: <20251230224137.3600355-1-rjethwani@purestorage.com>
+        d=1e100.net; s=20230601; t=1767137065; x=1767741865;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=otefy10bqMQ6Rkz8jl3RITolqSd8NKK7YcepSO+lkXo=;
+        b=IY3SyaVPzZlRron432E94rEFhBHEwjlTXJsm35v6Dn1nvFTLYbdFT3H6VR760XpHQY
+         Mq7NCgWDQdaHYcbWvifCss0pavoiJDuWBn83ak3M6DAMFzEfISYTtDVHwoFNI/iBkHuX
+         OVIl+sunOh3WaQs8jBSeuimDSI9tP/r6MJnPZ8E2pqqq9VJXGaawDujkDDmyy5hCyiZP
+         Z1Dctxw/vbVtDdYapoWWYBQlZ/EtKUatUUxhlcYQoHfdT4p4fPC6hUHtBoyU+a8qajBH
+         BRi1HjMa3FurGwRnv/SPsxXjWIcd7C17qPowccolvTFNysMPYVxRU/EbbOFEjXk1W5K1
+         UPdA==
+X-Gm-Message-State: AOJu0YxX8vYE0VGj1NHD8O8DQ147paxsHJjUWjE5XrGCupxrn03p/qr0
+	cZChL+0Y+pLKkpKVTnfghjrbrSRRZdj2gbY61cdpg4nSbslD5j0xAwJrKJbRl7zsuHaeMC3WzoJ
+	rlg==
+X-Google-Smtp-Source: AGHT+IHqR/6lsYHNU7FNcWu3yhSTAtOgs3q5BmJ4yTy19weMjJ3YUksVel4kP5W/QptL5Y2q7QbRD4Sv8Q==
+X-Received: from plzu9.prod.google.com ([2002:a17:902:82c9:b0:2a0:8cbb:6431])
+ (user=decot job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3c6e:b0:2a0:c1e4:e25
+ with SMTP id d9443c01a7336-2a2f293bdc3mr328462765ad.54.1767137065078; Tue, 30
+ Dec 2025 15:24:25 -0800 (PST)
+Date: Tue, 30 Dec 2025 15:23:46 -0800
+In-Reply-To: <20251103212036.2788093-1-joshua.a.hay@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20251103212036.2788093-1-joshua.a.hay@intel.com>
+X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
+Message-ID: <20251230232400.3515704-1-decot+git@google.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net] idpf: cap maximum Rx buffer size
+From: David Decotigny <decot+git@google.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, Joshua Hay <joshua.a.hay@intel.com>, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>, Madhu Chittim <madhu.chittim@intel.com>, 
+	David Decotigny <ddecotig@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Add TLS 1.3 hardware offload support to mlx5 driver, enabling both
-TX and RX hardware acceleration for TLS 1.3 connections on Mellanox
-ConnectX-6 Dx and newer adapters.
+On 11/3/2025 1:20 PM, Joshua Hay wrote:
+> The HW only supports a maximum Rx buffer size of 16K-128. On systems
+> using large pages, the libeth logic can configure the buffer size to be
+> larger than this. The upper bound is PAGE_SIZE while the lower bound is
+> MTU rounded up to the nearest power of 2. For example, ARM systems with
+> a 64K page size and an mtu of 9000 will set the Rx buffer size to 16K,
+> which will cause the config Rx queues message to fail.
+> 
+> Initialize the bufq/fill queue buf_len field to the maximum supported
+> size. This will trigger the libeth logic to cap the maximum Rx buffer
+> size by reducing the upper bound.
+> 
+> Fixes: 74d1412ac8f37 ("idpf: use libeth Rx buffer management for payload buffer")
+> Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
+> Acked-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
+> ---
 
-This patch enables:
-- TLS 1.3 version detection and validation with proper capability
-checking
-- TLS 1.3 crypto context configuration using
-MLX5E_STATIC_PARAMS_CONTEXT_TLS_1_3 (0x3)
-- Correct IV handling for TLS 1.3 (12-byte IV vs TLS 1.2's 4-byte salt)
-- Hardware offload for both TLS 1.3 AES-GCM-128 and AES-GCM-256 cipher
-suites
-
-Key differences from TLS 1.2:
-- TLS 1.2: Only 4-byte salt copied to gcm_iv, explicit IV in each record
-- TLS 1.3: Full 12-byte IV (salt + iv) copied to gcm_iv + implicit_iv
-  * salt (4 bytes) → gcm_iv[0:3]
-  * iv (8 bytes)   → gcm_iv[4:7] + implicit_iv[0:3]
-  * Note: gcm_iv and implicit_iv are contiguous in memory
-
-The EXTRACT_INFO_FIELDS macro is updated to also extract the 'iv' field
-which is needed for TLS 1.3.
-
-Testing:
-Verified on Mellanox ConnectX-6 Dx (Crypto Enabled) (MT2892) using
-ktls_test suite. Both TX and RX hardware offload working successfully
-with TLS 1.3 AES-GCM-128 and AES-GCM-256 cipher suites.
-
-Signed-off-by: Rishikesh Jethwani <rjethwani@purestorage.com>
----
- .../mellanox/mlx5/core/en_accel/ktls.h        |  8 +++++-
- .../mellanox/mlx5/core/en_accel/ktls_txrx.c   | 14 ++++++++++++++++---
- 2 files changed, 18 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls.h b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls.h
-index f11075e67658..b2d4f887582c 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls.h
-@@ -29,7 +29,9 @@ static inline bool mlx5e_is_ktls_device(struct mlx5_core_dev *mdev)
- 		return false;
- 
- 	return (MLX5_CAP_TLS(mdev, tls_1_2_aes_gcm_128) ||
--		MLX5_CAP_TLS(mdev, tls_1_2_aes_gcm_256));
-+		MLX5_CAP_TLS(mdev, tls_1_2_aes_gcm_256) ||
-+		MLX5_CAP_TLS(mdev, tls_1_3_aes_gcm_128) ||
-+		MLX5_CAP_TLS(mdev, tls_1_3_aes_gcm_256));
- }
- 
- static inline bool mlx5e_ktls_type_check(struct mlx5_core_dev *mdev,
-@@ -39,10 +41,14 @@ static inline bool mlx5e_ktls_type_check(struct mlx5_core_dev *mdev,
- 	case TLS_CIPHER_AES_GCM_128:
- 		if (crypto_info->version == TLS_1_2_VERSION)
- 			return MLX5_CAP_TLS(mdev,  tls_1_2_aes_gcm_128);
-+		else if (crypto_info->version == TLS_1_3_VERSION)
-+			return MLX5_CAP_TLS(mdev,  tls_1_3_aes_gcm_128);
- 		break;
- 	case TLS_CIPHER_AES_GCM_256:
- 		if (crypto_info->version == TLS_1_2_VERSION)
- 			return MLX5_CAP_TLS(mdev,  tls_1_2_aes_gcm_256);
-+		else if (crypto_info->version == TLS_1_3_VERSION)
-+			return MLX5_CAP_TLS(mdev,  tls_1_3_aes_gcm_256);
- 		break;
- 	}
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_txrx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_txrx.c
-index 570a912dd6fa..2e845f88a86c 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_txrx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_txrx.c
-@@ -6,6 +6,7 @@
- 
- enum {
- 	MLX5E_STATIC_PARAMS_CONTEXT_TLS_1_2 = 0x2,
-+	MLX5E_STATIC_PARAMS_CONTEXT_TLS_1_3 = 0x3,
- };
- 
- enum {
-@@ -15,8 +16,10 @@ enum {
- #define EXTRACT_INFO_FIELDS do { \
- 	salt    = info->salt;    \
- 	rec_seq = info->rec_seq; \
-+	iv      = info->iv;      \
- 	salt_sz    = sizeof(info->salt);    \
- 	rec_seq_sz = sizeof(info->rec_seq); \
-+	iv_sz      = sizeof(info->iv);      \
- } while (0)
- 
- static void
-@@ -25,8 +28,8 @@ fill_static_params(struct mlx5_wqe_tls_static_params_seg *params,
- 		   u32 key_id, u32 resync_tcp_sn)
- {
- 	char *initial_rn, *gcm_iv;
--	u16 salt_sz, rec_seq_sz;
--	char *salt, *rec_seq;
-+	u16 salt_sz, rec_seq_sz, iv_sz;
-+	char *salt, *rec_seq, *iv;
- 	u8 tls_version;
- 	u8 *ctx;
- 
-@@ -59,7 +62,12 @@ fill_static_params(struct mlx5_wqe_tls_static_params_seg *params,
- 	memcpy(gcm_iv,      salt,    salt_sz);
- 	memcpy(initial_rn,  rec_seq, rec_seq_sz);
- 
--	tls_version = MLX5E_STATIC_PARAMS_CONTEXT_TLS_1_2;
-+	if (crypto_info->crypto_info.version == TLS_1_3_VERSION) {
-+		memcpy(gcm_iv + salt_sz, iv, iv_sz);
-+		tls_version = MLX5E_STATIC_PARAMS_CONTEXT_TLS_1_3;
-+	} else {
-+		tls_version = MLX5E_STATIC_PARAMS_CONTEXT_TLS_1_2;
-+	}
- 
- 	MLX5_SET(tls_static_params, ctx, tls_version, tls_version);
- 	MLX5_SET(tls_static_params, ctx, const_1, 1);
--- 
-2.25.1
-
+Reviewed-by: David Decotigny <ddecotig@google.com>
 
