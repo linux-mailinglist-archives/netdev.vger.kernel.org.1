@@ -1,102 +1,127 @@
-Return-Path: <netdev+bounces-246392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ACFCCEADC0
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 00:24:33 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B24E0CEAF15
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 00:57:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0FC3D300F31C
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 23:24:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 468E53019579
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 23:57:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51DF7242D9D;
-	Tue, 30 Dec 2025 23:24:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B8102FDC28;
+	Tue, 30 Dec 2025 23:57:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sGTCHa55"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Cp+gMj20"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-dl1-f73.google.com (mail-dl1-f73.google.com [74.125.82.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76A122689C
-	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 23:24:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AAF92E8B81
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 23:57:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767137067; cv=none; b=ZDC29al89unXNB3Xy80AZS2XsiDJw0M/c/aHznCHUUMTv0upgCHXtneAEGzG7daoo4aMr1XwOvqaUTHF5GtYgWRRCM4Vrqc+rJJY2dmFW33n4vZoRgHd0IEXhfvxQxoLcmgO/n4xLBcqdoZP1KlvNpD+noZ9wd8BEia3Vg/B16I=
+	t=1767139026; cv=none; b=gcm98omwfRMNK/AK21YjVxSAoTnud7MI6BF3T6aENGnXhGSajpjHwSmAX3pGJ46lG447ILIbSXkn6vPgnKP06IXphT1hG/7yAFCgiBsQ6wPCmUNcuqzxJhgQxPJ6snTrUTwrVRsmit/er0Vd8EwyDK72gyFUH5y/7gD3/DNFdcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767137067; c=relaxed/simple;
-	bh=SIikXicIPVE6mIsTe0Brr3XY/DnV6A9FoUg4Wm80Mqo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qxjBiB5vMQgSxz+ljuifc8EzHC7fXDX1FIEZ7/kN0/MkkOurgCHdrPFQhcIpLo7esJAIWHs6WHDvQVN8wuG/v8CMpd24ulsMzb5c+QVAQznWriLSwEC/CI+xRyF8g7z46pmzeaYQkmsWVmWrpsByvF7RCXrB21yqPW6IkYOl1sQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--decot.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sGTCHa55; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1767139026; c=relaxed/simple;
+	bh=gTyDjneYMywgzwOsVojtgReBKWldGAntIvNhEE6gK5Y=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gxGLlHk7hpN7WJ3phFAPyNLOK2ReAOslzWnQQdEiLC41KtZxsGGBhHloHNmJca0xarfmPmyyALMmHBQ5Hv9XX537Wf0AArKHuzFdrttiN/bkFPvZk8GQNQD0GlAxmgu5EVPVI2RXtEisL9gVKYKENZNq1f2GsKG2aBpNHz2YBzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--boolli.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Cp+gMj20; arc=none smtp.client-ip=74.125.82.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--decot.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2a0b7eb0a56so260401635ad.1
-        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 15:24:25 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--boolli.bounces.google.com
+Received: by mail-dl1-f73.google.com with SMTP id a92af1059eb24-11ddcc9f85eso19818586c88.0
+        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 15:57:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767137065; x=1767741865; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=otefy10bqMQ6Rkz8jl3RITolqSd8NKK7YcepSO+lkXo=;
-        b=sGTCHa553qNJJrOkLhOv+AU+VsKZFStK7vsngHW2NpLPUNUcMUTtUkAnnbf4x6iAyX
-         e6Ww4U2kjsY/YMbWsqw+iiXoHy+Rf/l5u9kKqJ3LkbGFxow8dSfcNnVprVRRjeZ15nGE
-         oOfjKVGu/1pfei5hWHHIBuzuZ/+e6696SLkHqHGLvgvpkT+XkmiHXn7fvmtQ09fIaWbv
-         LZPgWl9Sgs99iAw3NXoDeMT3TnPHhHVf9HY1FrStJn5LPPbBqSBntx7RXpEMpSUYiAom
-         uEU/NEn1vo+KAXFkmCxW6GbLt5G/e102wAWmWWhQpSJWX+WCGRVSJBc0kkHv1vS6UMWa
-         zFWA==
+        d=google.com; s=20230601; t=1767139024; x=1767743824; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0z+YZ2YNsMdoMFE7LSlh6yUmpOlG2Vk2g7LqMYQuv6I=;
+        b=Cp+gMj20HXKQi81pmNJKhz42/WS+RyIXlzQnaTxFZHxj6/P37/cvu8Mfh0QZ2Ud321
+         /UHwLAFnc2YrgsOgy/XL5cIU+IEpNerWB6yKo6rHBd/KWA1WUwE3B1yEnK7BagJqB5y2
+         hgnPNTMed2LJvzaxX2jlfTllYvEvIgOdol4w3p2CmhQnIAgrQ2kno3wA4aHYkM5ikrO3
+         vW9Ng826qi1gNAgXA+1lBYgj3HpUNbf8Gc1oJzirUXmgcqx9XIbQAoeIkyL0vvjKyzCf
+         r/L8DDQSlNjjI+yRDeDoROkh4Ohc4G7qjEY8dvojj9fVMZHStC9hjLfCkL8qcKpH9HCj
+         v1dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767137065; x=1767741865;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=otefy10bqMQ6Rkz8jl3RITolqSd8NKK7YcepSO+lkXo=;
-        b=IY3SyaVPzZlRron432E94rEFhBHEwjlTXJsm35v6Dn1nvFTLYbdFT3H6VR760XpHQY
-         Mq7NCgWDQdaHYcbWvifCss0pavoiJDuWBn83ak3M6DAMFzEfISYTtDVHwoFNI/iBkHuX
-         OVIl+sunOh3WaQs8jBSeuimDSI9tP/r6MJnPZ8E2pqqq9VJXGaawDujkDDmyy5hCyiZP
-         Z1Dctxw/vbVtDdYapoWWYBQlZ/EtKUatUUxhlcYQoHfdT4p4fPC6hUHtBoyU+a8qajBH
-         BRi1HjMa3FurGwRnv/SPsxXjWIcd7C17qPowccolvTFNysMPYVxRU/EbbOFEjXk1W5K1
-         UPdA==
-X-Gm-Message-State: AOJu0YxX8vYE0VGj1NHD8O8DQ147paxsHJjUWjE5XrGCupxrn03p/qr0
-	cZChL+0Y+pLKkpKVTnfghjrbrSRRZdj2gbY61cdpg4nSbslD5j0xAwJrKJbRl7zsuHaeMC3WzoJ
-	rlg==
-X-Google-Smtp-Source: AGHT+IHqR/6lsYHNU7FNcWu3yhSTAtOgs3q5BmJ4yTy19weMjJ3YUksVel4kP5W/QptL5Y2q7QbRD4Sv8Q==
-X-Received: from plzu9.prod.google.com ([2002:a17:902:82c9:b0:2a0:8cbb:6431])
- (user=decot job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:3c6e:b0:2a0:c1e4:e25
- with SMTP id d9443c01a7336-2a2f293bdc3mr328462765ad.54.1767137065078; Tue, 30
- Dec 2025 15:24:25 -0800 (PST)
-Date: Tue, 30 Dec 2025 15:23:46 -0800
-In-Reply-To: <20251103212036.2788093-1-joshua.a.hay@intel.com>
+        d=1e100.net; s=20230601; t=1767139024; x=1767743824;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0z+YZ2YNsMdoMFE7LSlh6yUmpOlG2Vk2g7LqMYQuv6I=;
+        b=mxTjIfQ0wTXPZHovGEvFfDwG4K1L+f3kAlTtYDCNsbQvr4CoYIUiAOag25kyxvSfML
+         yVv5TzFfqXe/Ams336G8QjxkSfDPhshAsV4AFgXHFSHLGDYbXLP5IpAAjzPJOZWoX6xP
+         BqBbW2KuOpE1w3CtLTZNTPNVUg3YSavDz0VzFXhMXu5KBRxSb6J6ErtiKOXA1rPEQal2
+         7K8eAVkyJ+VhmMCvVst9FqmgHUqBzh+7R4OI0wRJcoDvkMSLIZhTI8QGsQoDBM+6wNcP
+         Qql3hA/jzTngBD6hYc+wIRzSHfLnHlpmbQWAaF0nZLOhhUKR9J9flK10G43ZMkU+l3EP
+         Zxnw==
+X-Gm-Message-State: AOJu0YyPCiIq/31YrxVwiljrtTyD/q3zRl3TczqOjvGQBuKx/d7C5A3P
+	wldxh3R0VQSfIu7Z0FF3TyjQCrPLAYzMbogmS6/O7heBw+3mAtSqvEiWVE7IAaFpYSEusLMezof
+	AumrMqg==
+X-Google-Smtp-Source: AGHT+IHuKsYSd2kwNPtEc4XiZmk+kOE4LhPvJ+nztAMwJKOGMzdDI0Og5UaGs2DvBeC0wc83yh3yJySPuis=
+X-Received: from dlbrx13.prod.google.com ([2002:a05:7022:170d:b0:11f:3fcf:58c])
+ (user=boolli job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7022:e01:b0:11b:f271:835a
+ with SMTP id a92af1059eb24-120619277e0mr35739751c88.3.1767139024417; Tue, 30
+ Dec 2025 15:57:04 -0800 (PST)
+Date: Tue, 30 Dec 2025 23:56:57 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20251103212036.2788093-1-joshua.a.hay@intel.com>
 X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
-Message-ID: <20251230232400.3515704-1-decot+git@google.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net] idpf: cap maximum Rx buffer size
-From: David Decotigny <decot+git@google.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org, Joshua Hay <joshua.a.hay@intel.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Madhu Chittim <madhu.chittim@intel.com>, 
-	David Decotigny <ddecotig@google.com>
+Message-ID: <20251230235657.2497593-1-boolli@google.com>
+Subject: [PATCH] idpf: increment completion queue next_to_clean in sw marker
+ wait routine
+From: Li Li <boolli@google.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	David Decotigny <decot@google.com>, Anjali Singhai <anjali.singhai@intel.com>, 
+	Sridhar Samudrala <sridhar.samudrala@intel.com>, emil.s.tantilov@intel.com, 
+	Brian Vazquez <brianvv@google.com>, Li Li <boolli@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-On 11/3/2025 1:20 PM, Joshua Hay wrote:
-> The HW only supports a maximum Rx buffer size of 16K-128. On systems
-> using large pages, the libeth logic can configure the buffer size to be
-> larger than this. The upper bound is PAGE_SIZE while the lower bound is
-> MTU rounded up to the nearest power of 2. For example, ARM systems with
-> a 64K page size and an mtu of 9000 will set the Rx buffer size to 16K,
-> which will cause the config Rx queues message to fail.
-> 
-> Initialize the bufq/fill queue buf_len field to the maximum supported
-> size. This will trigger the libeth logic to cap the maximum Rx buffer
-> size by reducing the upper bound.
-> 
-> Fixes: 74d1412ac8f37 ("idpf: use libeth Rx buffer management for payload buffer")
-> Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
-> Acked-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
-> ---
+Currently, in idpf_wait_for_sw_marker_completion(), when an
+IDPF_TXD_COMPLT_SW_MARKER packet is found, the routine breaks out of
+the for loop and does not increment the next_to_clean counter. This
+causes the subsequent NAPI polls to run into the same
+IDPF_TXD_COMPLT_SW_MARKER packet again and print out the following:
 
-Reviewed-by: David Decotigny <ddecotig@google.com>
+    [   23.261341] idpf 0000:05:00.0 eth1: Unknown TX completion type: 5
+
+Instead, we should increment next_to_clean regardless when an
+IDPF_TXD_COMPLT_SW_MARKER packet is found.
+
+Tested: with the patch applied, we do not see the errors above from NAPI
+polls anymore.
+
+Signed-off-by: Li Li <boolli@google.com>
+---
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index 69bab7187e541..4435dba27a24a 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -2346,14 +2346,14 @@ void idpf_wait_for_sw_marker_completion(const struct idpf_tx_queue *txq)
+ 		target = complq->txq_grp->txqs[id];
+ 
+ 		idpf_queue_clear(SW_MARKER, target);
+-		if (target == txq)
+-			break;
+ 
+ next:
+ 		if (unlikely(++ntc == complq->desc_count)) {
+ 			ntc = 0;
+ 			gen_flag = !gen_flag;
+ 		}
++		if (target == txq)
++			break;
+ 	} while (time_before(jiffies, timeout));
+ 
+ 	idpf_queue_assign(GEN_CHK, complq, gen_flag);
+-- 
+2.52.0.351.gbe84eed79e-goog
+
 
