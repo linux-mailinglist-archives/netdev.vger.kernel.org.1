@@ -1,95 +1,116 @@
-Return-Path: <netdev+bounces-246365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A865CEA0C2
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 16:21:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 543D7CEA209
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 17:04:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 93E6F3004E2A
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 15:21:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 11D4D3021FBD
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 16:03:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C338C1F3BA4;
-	Tue, 30 Dec 2025 15:21:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6E8231AA91;
+	Tue, 30 Dec 2025 16:03:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="3TLWBP7H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com [209.85.210.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outbound.st.icloud.com (p-east2-cluster3-host12-snip4-10.eps.apple.com [57.103.77.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1F813957E
-	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 15:21:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D2721FF21
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 16:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.77.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767108066; cv=none; b=XwCWWB6jVtbXMd/zdiUdy0cJBar4AmnfRhuZi1HZ9OICU/XCoh6vOjXoym5B2F4UnMQKDllTLmyTpmOrvdCCzt7OyeRTPp27mXWeYIrpwjraz7pZUMhKgzkEtGSh8KV2n97aYj5bq6kZExZg8gZrj3laWyHsp3Wkhn6oSzloh+8=
+	t=1767110621; cv=none; b=RIl24W5RTcHJdfNsyeNC81yp2AdtvJzo8ybNUovz+QbuX0XrvlyuRJ3CCyemVCNXomUI0lGh3OTigcxpV19K+s0y+UgzeZvkdB6czvI2wNVmTv7QZrCerUUtaG8/6bBf9mW7Y9pgtbzSzkHJOS83rk0M3xaHFJNm6+YptKH7eHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767108066; c=relaxed/simple;
-	bh=UqefMjhSVqeqxZ7cw9SZ3XXPaID45kiWVvBSiFES5nw=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=j+Jx3WP63/RZt8SR6MIuZP5u0Qvy76QpA0QrsQuoM4MbI2wvhH2uOXRHQ2vV1kbHvkaDYY3V2lfYZZgzV7OlfQDdBfwpDg4SGOgG4CHXXwMcyaQMwFzJWZ+3hS/zlI0ofWxL9FYgvJveLIng3+sYl3AMyJ0uhrDwMQdvbAbZHBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-7c766d79592so24481204a34.0
-        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 07:21:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767108063; x=1767712863;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2mGAIhaLqmqueebz091ruC6N1hhdYb289JyV9x3owoM=;
-        b=B+5yrqU/IGhJ+Mw1V5spNPfbhTbT1UfC8TXFGJ93A7ciRwdazRG4Vmb9ZXAFkp3BzO
-         21oJsv+/j1+cLMQeqQ2hDrPaIi6jRuAFv+wMCoym0z0nhGr5gS7oaYltNw8x1fS6QiD0
-         o/x2La3qKZRINSMWKrgYL6lYjmq5uVWGhu46X94JIltlicAWLhBxynpecndw5NKIpP5V
-         fKsrKIvD4WUnzc6CXg3DgWGl0WTu0zjl3IEHgEIZOAQCkXu9Hln/o5wIlOw5bbStBIW9
-         +L27L6eA3NcnM/4+bmTGuisaISvuaJjntJAug1on6Dfwkpsi7TRav3tX5Lnzic4A7OL2
-         yUGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVZK95Ohzn5gEIoY7CraMfU8ssr5RHdSs+SAWcaUZUx/hEq68DRtZ5p923DkEk7ZN3BdzOV3wk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5tFC3oFPC/Fw8OFyjzYUY4P93DoG22eW37XduJRjVJk2t7mBQ
-	lcUNO4BjtUi6865cGtGAII5V0VMQd7or8nVC2ta1lwSUc8wPiM2IO5oeCOI9xc4iqIzAotSYtan
-	n6MJ4ajvMc+Nx/m1aJ4lH8xWLL9MQUcIMJ6EDaHBzrOgBYJUJT7Q+rvvCIRU=
-X-Google-Smtp-Source: AGHT+IHkKUH30RxqdCakjTYB1Y4xBbuTNTd0OXa/1EH11X4dbUPXfPlYah/opolSsQ87AVuh34brTp8VvzOuaj9iGfTQpVdHJrW1
+	s=arc-20240116; t=1767110621; c=relaxed/simple;
+	bh=jZ5wrB73KdrvQzKfloURZ+MtB++6n2OMN0nUcYwqCy4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mEYwYsnMJCe8tXwvg4j9McM8ez6kOkshKe8DKYfeWKVtOTm+B5vU8up+lz22gfPTl1b5hA44cGjDQhe9P+uk6jNRnvtwhJg9w+VqTaHP+oRb+mrs5oMii9S3VNt9pJcU6f8KaPbAC8aj8fBAIJwfgQJ9sWHMym8nFkz+OThOioc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=3TLWBP7H reason="key not found in DNS"; arc=none smtp.client-ip=57.103.77.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=y-koj.net
+Received: from outbound.st.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-east-1a-60-percent-7 (Postfix) with ESMTPS id 716DA1800BCC;
+	Tue, 30 Dec 2025 16:03:38 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; bh=ozeBeREBzR3JOVi2UxPUVOx3sVJ2H7KJAHTuW3q9vZ0=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=3TLWBP7HGvqbIDZMRylEHCMVA5UXVz5QI1o0KUmtLZS1cVf+UV9msiwlRtLgFaghEDN0Q/ngZx1T49feXA43p0vlBlwGoOcKQpctYvk9TYEQH95SAz1Cc7ZEQJZaCfafQtZLa11TsARdVt7zGEZ97gVZSuP8Rxd9lPD163rp1Fd7DLvjObtnNXiA/7e7nXL+ODJVs8JUkwdF7nrXCPfK4YzS7hT4qJG262XP7yAqRb0f6wTFNlo26ni8KJ6/fJY9IDcvQR9mLZSe6Gm45coxb7XketNFbqlCOTcIcPBavdndriUjnh/G8dzl0xSdLMq4ZuNH9KVGelFmK/CucOPCEQ==
+mail-alias-created-date: 1719758601013
+Received: from desktop.tail809fd.ts.net (unknown [17.42.251.67])
+	by p00-icloudmta-asmtp-us-east-1a-60-percent-7 (Postfix) with ESMTPSA id 2E16F1800BC6;
+	Tue, 30 Dec 2025 16:03:36 +0000 (UTC)
+From: yk@y-koj.net
+To: Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	netdev@vger.kernel.org
+Cc: Yohei Kojima <yk@y-koj.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Breno Leitao <leitao@debian.org>,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net v2 0/2] net: netdevsim: fix inconsistent carrier state after link/unlink
+Date: Wed, 31 Dec 2025 01:03:28 +0900
+Message-ID: <cover.1767108538.git.yk@y-koj.net>
+X-Mailer: git-send-email 2.51.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a4a:e1c9:0:b0:65c:fb86:8a94 with SMTP id
- 006d021491bc7-65d0eaa2672mr11026884eaf.36.1767108063158; Tue, 30 Dec 2025
- 07:21:03 -0800 (PST)
-Date: Tue, 30 Dec 2025 07:21:03 -0800
-In-Reply-To: <686ea951.050a0220.385921.0015.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6953eddf.050a0220.a1b6.02ff.GAE@google.com>
-Subject: Re: [syzbot] [xfs?] INFO: task hung in xfs_file_fsync
-From: syzbot <syzbot+9bc8c0586b39708784d9@syzkaller.appspotmail.com>
-To: anna.luese@v-bien.de, cem@kernel.org, cmaiolino@redhat.com, corbet@lwn.net, 
-	davem@davemloft.net, dchinner@redhat.com, djwong@kernel.org, 
-	edumazet@google.com, horms@kernel.org, jhs@mojatatu.com, jiri@resnulli.us, 
-	john.ogness@linutronix.de, kuba@kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, pmladek@suse.com, 
-	rostedt@goodmis.org, senozhatsky@chromium.org, 
-	syzkaller-bugs@googlegroups.com, xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: Huh26dr2RGitJIM98C2ZoLyHpuzFh53D
+X-Proofpoint-ORIG-GUID: Huh26dr2RGitJIM98C2ZoLyHpuzFh53D
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjMwMDE0NSBTYWx0ZWRfXxsml2XQtfkHW
+ YO9ksQ5rOnBibJpzmG8pZmOuyrOskx/s2+EsapkqUMjguXxCtDpuU3C9Lsi+Oc6qcBQXBCGmTLB
+ hcPl4dT1rhSIjW7G6SFOphu29pFx68rHNLMj0qLDGGjdjt+yLw2RvSkusWQWLU3y2QgLdEG0QzH
+ qxt3VbLAgMzw85NkOC2Qw8sY3lg9s1Upuv1JyNjg596D/oXYk3KzFLxsFOyySc+rI+RlHBnJGNR
+ pCKKopBqahkQ9KceclQYX3G4r138h3g5Zn1VmHisrc2PyRIihkMyqnLM2PdbsTmaFa88JnpS4Dy
+ Q9LDAS6UUlxIL/Xx1Wz
+X-Authority-Info: v=2.4 cv=eeMwvrEH c=1 sm=1 tr=0 ts=6953f7da cx=c_apl:c_pps
+ a=YrL12D//S6tul8v/L+6tKg==:117 a=YrL12D//S6tul8v/L+6tKg==:17
+ a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=jnl5ZKOAAAAA:8
+ a=7r5JYaH8yVXzpy3mEmcA:9 a=RNrZ5ZR47oNZP8zBN2PD:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-30_02,2025-12-30_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ suspectscore=0 mlxlogscore=840 bulkscore=0 adultscore=0 clxscore=1030
+ phishscore=0 malwarescore=0 mlxscore=0 classifier=spam authscore=0 adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512300145
+X-JNJ: AAAAAAAB+/gZoBu8u0f/6IECSBQDulEFBV3bqj36pDUZVy7wVvfI2V9VPF8IT8kYheh6CAHgt/YCT38XpMb6kbuFvWo07TtUanqjqqpArrBIO9BPNJLxx5jFJoXJsFAni03oGFhTFSHgmCChDkIFp0uM6i8be8DQxiaOD3eRmZfNFo8czrQtQoWWn/QVFgI3psT5Y2epOd2Xxhml763e5h7ESGd9uTi8X1SeyV3TDadcNxdAtiYkt7z6VPST+Jzpopdku73b1td4lSXdYq79KnTp25dra/LzWpgvqzlvLMXLgc0YqA6WAzd7OwjJ7DpitQD5TEYFu4A8NNCTIPWIyW8kGVvL9J3xo+gSOyVSLtqaWIzH4nnBeLhI9SA3jMBQ3XpG/Jcw3Vkp/DCmS4ARCCHLFrIHZqnDWFw7ddFAvnL1btNCIwecMQafCyKP0pv2oA+JWmass5wOf+CZSF0ZH1MZhDiyfKhggdS230Z9xT064TlgLgnMm1JR48TjkEq38iqv0vY6QjvZSlbLCtMdzsREgR7p1nkJLtTNHZ6PsC7o+iPww+kRnmUVC2rfc24eTLmawIwUPuwK2RLmAMZLK4/u2wZAG5jCzM6KfNG30HSncILYdjNmbXw0XNLeQQ8CuRsq0TU3E0vRa7apb0/nz0Vxe2NeAr8AQkj8moxN6t9oOalry0/difYlKWrLL64tvGy4sQRAlN1KdjWTBNAv22YXzfRCl6oY93P5QsU=
 
-syzbot suspects this issue was fixed by commit:
+From: Yohei Kojima <yk@y-koj.net>
 
-commit b9a176e54162f890aaf50ac8a467d725ed2f00df
-Author: Darrick J. Wong <djwong@kernel.org>
-Date:   Tue Sep 2 21:33:53 2025 +0000
+This series fixes netdevsim's inconsistent behavior between carrier
+and link/unlink state.
 
-    xfs: remove deprecated mount options
+More specifically, this fixes a bug that the carrier goes DOWN although
+two netdevsim were peered, depending on the order of peering and ifup.
+Especially in a NetworkManager-enabled environment, netdevsim test fails
+because of this.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1481829a580000
-start commit:   d006330be3f7 Merge tag 'sound-6.16-rc6' of git://git.kerne..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b309c907eaab29da
-dashboard link: https://syzkaller.appspot.com/bug?extid=9bc8c0586b39708784d9
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15e24a8c580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10ed3582580000
+The first patch fixes the bug itself in netdevsim/bus.c by adding
+netif_carrier_on() into a proper function. The second patch adds a
+regression test for this bug.
 
-If the result looks correct, please mark the issue as fixed by replying with:
+Changelog
+=========
+v1 -> v2
+- Rebase to the latest net/main
+- Separate TFO tests from this series
+- Separate netdevsim test improvement from this series
+- v1: https://lore.kernel.org/netdev/cover.1767032397.git.yk@y-koj.net/
 
-#syz fix: xfs: remove deprecated mount options
+Yohei Kojima (2):
+  net: netdevsim: fix inconsistent carrier state after link/unlink
+  selftests: netdevsim: add carrier state consistency test
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+ drivers/net/netdevsim/bus.c                   |  6 ++
+ .../selftests/drivers/net/netdevsim/peer.sh   | 63 +++++++++++++++++++
+ 2 files changed, 69 insertions(+)
+
+-- 
+2.51.2
+
 
