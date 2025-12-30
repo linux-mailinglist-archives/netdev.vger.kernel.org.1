@@ -1,56 +1,106 @@
-Return-Path: <netdev+bounces-246308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63403CE92CB
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 10:13:35 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CFCBCE92D1
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 10:13:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D47D830028A6
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 09:13:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7F0193085C65
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 09:11:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F64727F75F;
-	Tue, 30 Dec 2025 09:13:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2992E27A47F;
+	Tue, 30 Dec 2025 09:11:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tinyisr.com header.i=@tinyisr.com header.b="SpVQxjT2";
-	dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b="EbUQ/opg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VaIWxcn3";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="hQCLzRkR"
 X-Original-To: netdev@vger.kernel.org
-Received: from sendmail.purelymail.com (sendmail.purelymail.com [34.202.193.197])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A19B277023
-	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 09:13:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.202.193.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5244328506F
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 09:11:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767086013; cv=none; b=ECmflT0AHHaNkW/PbLwbI2c0fku3dld/XC8Awab1FC8JAUJXOjlKihmeLr9V/ILRxEOOyXt6M3Wo8sZ82DuTbSFev+IT6mth8LizdAU0JCeROo7k2TqD7TWlQSxMyEnTYCYsFwG7m1F7bGl6DkpPohazdUg79SpOehnRzap6pHs=
+	t=1767085889; cv=none; b=Y7M37XilQ6mvcuEj+WbXFH+RII/r8LTxEIeu7Sy1zXjy6gUY+5MrH3OZAo1FOyDlQXhgqdtLoNXlQc1Y/ajba0L5cUo6iPFfEXUIsJsRj00+CBTR/B4kyJ58FxxWBUA00vTkDzecLWv2TaFbY8fFxX6dH+mfPecNUqbN7qVomLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767086013; c=relaxed/simple;
-	bh=g+TBXdgYNtzZT3hhbPhG1j65uOqO8FfPYxezOjTu+Js=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MjZmILlnzZjMmrdnocedErigLsOrKdmSiA5oCidj4v1uXso/jwo6YU1bC9xmca/kkvOSYWeO+Z5qh/4VCIiU3ZWSpsn0iKEapVkVmQVyahiFU8n65d6dA2P9GbaJ+Wjus2+b4Dx84ZaShMST9qydgSVucou83hP7O0GecPXwh3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tinyisr.com; spf=pass smtp.mailfrom=tinyisr.com; dkim=pass (2048-bit key) header.d=tinyisr.com header.i=@tinyisr.com header.b=SpVQxjT2; dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b=EbUQ/opg; arc=none smtp.client-ip=34.202.193.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tinyisr.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tinyisr.com
-Authentication-Results: purelymail.com; auth=pass
-DKIM-Signature: a=rsa-sha256; b=SpVQxjT20DVlJdYcTQF8LKhB1ZH7/WfMmCkjp8PWcYupuDPzQQ5X/tdlXYapw4i8cqdlA8LF5rDGX78o6BGbPlSHHmJlGHk00P/ljwByPpwVMZU/omwjko+IZt67SrIjZiZabZ7EnCpr8Y2TNyHYLluWEdVNCzyVIbz9AbyomqUFSkrGAsppHN5rbJS4rqXeGowI985PW/A3bRhigSLo7U831l49Me75CIFLw580bXAr6vEMkr4gRxVSbiB8JJ2yeP62Pq8MJWzjyg/+fCsUhHii3/3Usl0rTrtq68pBWJOLT9BfZ6Cdwy2l6MR/fDUfC9ftUF8MTBjGHJqQ8L/fFA==; s=purelymail3; d=tinyisr.com; v=1; bh=g+TBXdgYNtzZT3hhbPhG1j65uOqO8FfPYxezOjTu+Js=; h=Received:From:To:Subject:Date;
-DKIM-Signature: a=rsa-sha256; b=EbUQ/opgnGj5N6IgWTA+zUmA2YUbhsfkYg67pVb9PK+/kEvYwkJs9yTpc/x7AI4ArXVueoswlYppRZTo+6SPMFB8AqOtyYwv870K0AMsXLfJep59BKq1RsOLfdfsO7hnSuGVJEiptI+wPkIf14Wmk8Ayil3e3+Og3I4yiYsOD+C1G1rSnpp4rCP9W9/pnp8gkNRg82nCdwrxPWAaC2sB2M3HK6MCaWMOlEoRycksoyOmSMbShWKjm0wSxC+uBNDFsDWr9Xy0n8c04QsP6xNQwT2a50+oS4EAduf0omw4Mo3GIINqzcd+Bfee7094/hXhuHS2QOC4UFdEhed0WS1xxg==; s=purelymail3; d=purelymail.com; v=1; bh=g+TBXdgYNtzZT3hhbPhG1j65uOqO8FfPYxezOjTu+Js=; h=Feedback-ID:Received:From:To:Subject:Date;
-Feedback-ID: 99681:12517:null:purelymail
-X-Pm-Original-To: netdev@vger.kernel.org
-Received: by smtp.purelymail.com (Purelymail SMTP) with ESMTPSA id 2012679011;
-          (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
-          Tue, 30 Dec 2025 09:13:23 +0000 (UTC)
-From: Joris Vaisvila <joey@tinyisr.com>
+	s=arc-20240116; t=1767085889; c=relaxed/simple;
+	bh=oYbu0tIYoHG1HcqoOg5987tLiqfGlRkg2cpMxO6DQ5s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eR7VCWiqqNY1jlTOwKRmZWA0CUygwxTWtEq+KMghwavxWRVPB966b3fTDgUbmO8QDY0ioiQARhsWZQ3ZkO3q7rFSPlBBfrFpo3KcErOeBd9dyYNsXfsFNjvMtzFi2azjW1qnArVnBkHaf5kdhVGuqSsTN81oYctpG8zMF5lj5p0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VaIWxcn3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=hQCLzRkR; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767085886;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tRbSF8f0CRS5s5qA6Hwt7UKsA1Pd5658S3WqT4XAkMw=;
+	b=VaIWxcn3C/ncCId329zi+XJhpihn0oJymrjfqqfa9SZLTqyN/0FQBh46Or3mo/HAtCDj45
+	oDSfbIsSSPFryrSAxchYcXgmUjAJZgMsfUWV2ZQwvTBi9V34YW14zABnMRcf9FbexdvsvT
+	NP0+/D8652jaUqJ++Ul7DuJN7sMay8k=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-56-MvODhlXYNnmRcycitjkgJw-1; Tue, 30 Dec 2025 04:11:24 -0500
+X-MC-Unique: MvODhlXYNnmRcycitjkgJw-1
+X-Mimecast-MFC-AGG-ID: MvODhlXYNnmRcycitjkgJw_1767085883
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-430fcb6b2ebso5714118f8f.2
+        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 01:11:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1767085883; x=1767690683; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tRbSF8f0CRS5s5qA6Hwt7UKsA1Pd5658S3WqT4XAkMw=;
+        b=hQCLzRkRtev12Di0xgzX44hmyTM6pBxx0VnhytC95XZVVGQz8RLELP9Is38RjgkYvf
+         NBIHZGb/U+lMrX0OE2NBDnKMTyUZJDL3BLgYfB/MU8Yo80VxvnJ8ZF8VMvSrJBO+Zz3a
+         ir9RRYPNsoOEHlSjVdGc88JEU8MWvHP8am5AYtzY6ehypcpM4izYMzj75+Uhym3PKHYb
+         VLtkcdIz4mkfifYvHX9qFqn8QSV0aP03CfgzX4K07YcJmMKE5JZVMM2jWXQ08NSpUGaz
+         ucThZxY6ABi2WFrE/Vk7eh5ihu+9FXOdETQtlt+JWk6FH+ps+/ox7J/2WOwXE+++hK2f
+         kfLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767085883; x=1767690683;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tRbSF8f0CRS5s5qA6Hwt7UKsA1Pd5658S3WqT4XAkMw=;
+        b=dN1Vu+wl5Gb9pfOb0l72Hud5ICbdEM70iFsKbSrCTIFz8/W+uH6Y30rFMBk+cX5HWT
+         OXPNPVuUztbIYr/FqPDdDFpgi3w8qa6y7rK8xg/muE9Ji4hpw7uziuo6cZESyUxt+h/m
+         8vw5rCXsg06xHFMO8RP7BqMgN05sE6j8Pf25z0pSR+KGDKtJJJ3IaCnNda6UmIPzXX5J
+         tX1JVeKPjhT/mmliZzM17JOZ7vmf7DZ6NXtL7Lv6f+HVjGyiuDd+ldsHIWkAXELyHglA
+         Z6IJiHBotv+viRuWj+no0tkQ5noE6HA6oLttsEu3mHjXtwuV+rSc43tk1ahqXUZCP2cV
+         IKew==
+X-Gm-Message-State: AOJu0Yxwv2RJVF3TmOZc6OoBKT4661le5Vffk99+43EwYUZfxNsqLyAR
+	tn7dsKLblPcamwwSJH4r/DRzTgmA7YsdcZ18gKzxuVJfTv0AT6zxJ4/9Is1BaJGoljRx51U9DGI
+	98/HEHXXQ+UOP3lesdlDUx5HvfiJHThZNWj//0nS3zZSkN2Mpby4y3EFAcJxML5I1yFfK1NuLaV
+	2HPJj9AyRTJI3qsG2V6HG5NjxvFLj/b1lddSlXBg==
+X-Gm-Gg: AY/fxX76E+nfXxAb5DvrCnEMnKfp7VOKcWRIbGI6FFM88soAL4+5nVnjXkBitLjnoBT
+	O3GUL6QZ3Tm9O5xx//CXVVa93JK9RXaX+H8smTIHWnmGNhBMDXbUW3d3RIkO9ijdWFRGyEv8hdB
+	De5mzEus4gLxjjZospbsmZPSp2ULiYUJ+EfP1OknEfv9cs12/Hs2BN6IZeNpxgHQ6X7COT8CiYE
+	f+z+kkJuPFKHuGdZO+4JXPbwKfNCyfzCovhF0vWVEe/VP2o0+MpnWOrNxAci9ZkFvP/+oBwXSQX
+	bkB3uH/u2hmDBiqpsciWFW+QB7C41lGpsxRp8VZEf/zOW8ggXsaTT3cx72inG6OE+pSZ4yOPGND
+	n7fFOX/vQHDhPT7rxoA7WHQ==
+X-Received: by 2002:a05:6000:2089:b0:430:f449:5f0e with SMTP id ffacd0b85a97d-4324e4c8efemr35353602f8f.16.1767085883163;
+        Tue, 30 Dec 2025 01:11:23 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHdNYgq3F70FSOCwWlfqAm5cdcGEoQq9Bv+aBqDM/sO/SPrYcJ0XLBNRD0UwPM8Om/8YUCh1g==
+X-Received: by 2002:a05:6000:2089:b0:430:f449:5f0e with SMTP id ffacd0b85a97d-4324e4c8efemr35353565f8f.16.1767085882656;
+        Tue, 30 Dec 2025 01:11:22 -0800 (PST)
+Received: from fedora.redhat.com ([216.128.14.64])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432613f7e6esm56933907f8f.21.2025.12.30.01.11.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Dec 2025 01:11:22 -0800 (PST)
+From: mheib@redhat.com
 To: netdev@vger.kernel.org
-Cc: nbd@nbd.name,
-	sean.wang@mediatek.com,
-	lorenzo@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
+Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	Joris Vaisvila <joey@tinyisr.com>
-Subject: [PATCH] net: ethernet: mtk_eth_soc: avoid writing to ESW registers on MT7628
-Date: Tue, 30 Dec 2025 11:10:41 +0200
-Message-ID: <20251230091151.129176-1-joey@tinyisr.com>
+	horms@kernel.org,
+	kernelxing@tencent.com,
+	kuniyu@google.com,
+	Mohammad Heib <mheib@redhat.com>
+Subject: [PATCH net] net: skbuff: fix truesize and head state corruption in skb_segment_list
+Date: Tue, 30 Dec 2025 11:11:07 +0200
+Message-ID: <20251230091107.120038-1-mheib@redhat.com>
 X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -58,76 +108,97 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by Purelymail
-Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-The MT7628 does not expose MAC control registers. Writes to these
-registers corrupt the ESW VLAN configuration. Existing drivers
-never use the affected features, so this went unnoticed.
+From: Mohammad Heib <mheib@redhat.com>
 
-This patch skips MCR register reads and writes on MT7628, preventing
-invalid register access.
+When skb_segment_list is called during packet forwarding through
+a bridge or VXLAN, it assumes that every fragment in a frag_list
+carries its own socket ownership and head state. While this is true for
+GSO packets created by the transmit path (via __ip_append_data), it is
+not true for packets built by the GRO receive path.
 
-Signed-off-by: Joris Vaisvila <joey@tinyisr.com>
+In the GRO path, fragments are "orphans" (skb->sk == NULL) and were
+never charged to a socket. However, the current logic in
+skb_segment_list unconditionally adds every fragment's truesize to
+delta_truesize and subsequently subtracts this from the parent SKB.
+
+This results a memory accounting leak, Since GRO fragments were never
+charged to the socket in the first place, the "refund" results in the
+parent SKB returning less memory than originally charged when it is
+finally freed. This leads to a permanent leak in sk_wmem_alloc, which
+prevents the socket from being destroyed, resulting in a persistent memory
+leak of the socket object and its related metadata.
+
+The leak can be observed via KMEMLEAK when tearing down the networking
+environment:
+
+unreferenced object 0xffff8881e6eb9100 (size 2048):
+  comm "ping", pid 6720, jiffies 4295492526
+  backtrace:
+    kmem_cache_alloc_noprof+0x5c6/0x800
+    sk_prot_alloc+0x5b/0x220
+    sk_alloc+0x35/0xa00
+    inet6_create.part.0+0x303/0x10d0
+    __sock_create+0x248/0x640
+    __sys_socket+0x11b/0x1d0
+
+This patch modifies skb_segment_list to only perform head state release
+and truesize subtraction if the fragment explicitly owns a socket
+reference. For GRO-forwarded packets where fragments are not owners,
+the parent maintains the full truesize and acts as the single anchor for
+the memory refund upon destruction.
+
+Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
+Signed-off-by: Mohammad Heib <mheib@redhat.com>
 ---
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+ net/core/skbuff.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethe=
-rnet/mediatek/mtk_eth_soc.c
-index e68997a29191..2fae6bd368a6 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -699,6 +699,9 @@ static int mtk_mac_finish(struct phylink_config *config=
-, unsigned int mode,
- =09struct mtk_eth *eth =3D mac->hw;
- =09u32 mcr_cur, mcr_new;
-=20
-+=09if (MTK_HAS_CAPS(eth->soc->caps, MTK_SOC_MT7628))
-+=09=09return 0;
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index a00808f7be6a..aee9be42409b 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -4641,6 +4641,7 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
+ 	struct sk_buff *tail = NULL;
+ 	struct sk_buff *nskb, *tmp;
+ 	int len_diff, err;
++	bool is_flist = !!(skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST);
+ 
+ 	skb_push(skb, -skb_network_offset(skb) + offset);
+ 
+@@ -4656,7 +4657,15 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
+ 		list_skb = list_skb->next;
+ 
+ 		err = 0;
+-		delta_truesize += nskb->truesize;
 +
- =09/* Enable SGMII */
- =09if (interface =3D=3D PHY_INTERFACE_MODE_SGMII ||
- =09    phy_interface_mode_is_8023z(interface))
-@@ -724,6 +727,9 @@ static void mtk_mac_link_down(struct phylink_config *co=
-nfig, unsigned int mode,
- =09struct mtk_mac *mac =3D container_of(config, struct mtk_mac,
- =09=09=09=09=09   phylink_config);
-=20
-+=09if (MTK_HAS_CAPS(mac->hw->soc->caps, MTK_SOC_MT7628))
-+=09=09return;
++		/* Only track truesize delta if the fragment is being orphaned.
++		 * In the GRO path, fragments don't have a socket owner (sk=NULL),
++		 * so the parent must maintain the total truesize to prevent
++		 * memory accounting leaks.
++		 */
++		if (!is_flist || nskb->sk)
++			delta_truesize += nskb->truesize;
 +
- =09if (!mtk_interface_mode_is_xgmii(mac->hw, interface)) {
- =09=09/* GMAC modes */
- =09=09mtk_m32(mac->hw,
-@@ -815,6 +821,9 @@ static void mtk_gdm_mac_link_up(struct mtk_mac *mac,
- {
- =09u32 mcr;
-=20
-+=09if (MTK_HAS_CAPS(mac->hw->soc->caps, MTK_SOC_MT7628))
-+=09=09return;
+ 		if (skb_shared(nskb)) {
+ 			tmp = skb_clone(nskb, GFP_ATOMIC);
+ 			if (tmp) {
+@@ -4684,7 +4693,12 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
+ 
+ 		skb_push(nskb, -skb_network_offset(nskb) + offset);
+ 
+-		skb_release_head_state(nskb);
++		/* For GRO-forwarded packets, fragments have no head state
++		 * (no sk/destructor) to release. Skip this.
++		 */
++		if (!is_flist || nskb->sk)
++			skb_release_head_state(nskb);
 +
- =09mcr =3D mtk_r32(mac->hw, MTK_MAC_MCR(mac->id));
- =09mcr &=3D ~(MAC_MCR_SPEED_100 | MAC_MCR_SPEED_1000 |
- =09=09 MAC_MCR_FORCE_DPX | MAC_MCR_FORCE_TX_FC |
-@@ -4357,9 +4366,11 @@ static void mtk_prepare_for_reset(struct mtk_eth *et=
-h)
- =09mtk_w32(eth, 0, MTK_FE_INT_ENABLE);
-=20
- =09/* force link down GMAC */
--=09for (i =3D 0; i < 2; i++) {
--=09=09val =3D mtk_r32(eth, MTK_MAC_MCR(i)) & ~MAC_MCR_FORCE_LINK;
--=09=09mtk_w32(eth, val, MTK_MAC_MCR(i));
-+=09if (!MTK_HAS_CAPS(eth->soc->caps, MTK_SOC_MT7628)) {
-+=09=09for (i =3D 0; i < 2; i++) {
-+=09=09=09val =3D mtk_r32(eth, MTK_MAC_MCR(i)) & ~MAC_MCR_FORCE_LINK;
-+=09=09=09mtk_w32(eth, val, MTK_MAC_MCR(i));
-+=09=09}
- =09}
- }
-=20
---=20
+ 		len_diff = skb_network_header_len(nskb) - skb_network_header_len(skb);
+ 		__copy_skb_header(nskb, skb);
+ 
+-- 
 2.52.0
 
 
