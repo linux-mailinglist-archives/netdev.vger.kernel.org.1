@@ -1,161 +1,167 @@
-Return-Path: <netdev+bounces-246386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45D34CEA8B0
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 20:36:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F1F5CEAB88
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 22:32:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 645BC302E04E
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 19:35:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 35E08300E02F
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 21:32:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83A8B2E6CC7;
-	Tue, 30 Dec 2025 19:35:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69B6417A300;
+	Tue, 30 Dec 2025 21:32:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V51zEPOV"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="QIm3Ojxf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9DD28489E
-	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 19:35:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65688B67A
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 21:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767123350; cv=none; b=aVBWW04ufU9rzb7+mUW6mOMUX/+VAHUrM7ellC2rMe4mc+C1YY+dSjreTvpQyatIlicMuVw9N89XGABvWmVwVenrTPB7pq1u/PnpCBKfg7LpxPtHBSLalNxZQo/BVEdXFoNL9huLJLq2QyukTiMY5/QoeG1VeUNM1JTP11Jjh+o=
+	t=1767130357; cv=none; b=pbAtb3pLk4h57omTyI0Vr5dCVNK3HPhFzVv91sZ9E9Qt0QGFGbA9WiL+SmNfF97VORTVqddId19C38R7UAxiF160DSlxo7TvYN8W/TODou8J4MXVEcA024GAstvJNl5K3cTsz9etKXVr9HDITXsEydz4EClnzJ8nZ3W4q4LZxdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767123350; c=relaxed/simple;
-	bh=2fZeFI8ChalvAPPCVG+1WXDPJh0uoiPyhnhHPGeZFas=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Zjvcrsj2yyP6GdOCtrb/VDl+dOc/FIYXrfI2UrG5ryRxMYmNImDMDUF0plUZE2umwuPDwdb727dH0q2CbCx4cLSEliEBx2g0vfQoPsBn3RQwPuCj5pgSvS0ei5x550Gq4CtDIDWAXdAOmHZdd6NWg2ONH4Yusmd79g9r+ulW7OE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V51zEPOV; arc=none smtp.client-ip=74.125.224.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-6432842cafdso8923746d50.2
-        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 11:35:47 -0800 (PST)
+	s=arc-20240116; t=1767130357; c=relaxed/simple;
+	bh=LMT9Jyiy4vv5NU3wSzYm3bllk24aUfp+Jtz17CtDuyo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dIxKfkp0xtc8GSJvJWuQ662NYoEtdHLgC9Px0WjvBqGaHLCLFaOTKg8bXXvtWZPNMsn6Wc+0udwMZPcAR08Jw7nRyBICk86tpRJR1bnU/pMv4MdZF/nn7GiTxe48YprEnPl1TDz46XrCsigzjaI/WFwRVPOrTAPl+MdeBoUCGnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=QIm3Ojxf; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2a0c20ee83dso131600125ad.2
+        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 13:32:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767123347; x=1767728147; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1767130354; x=1767735154; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GbLbN5qo8BhCJ3h1f/M+MLdJNxCUmuM3GwhK4z+mTLA=;
-        b=V51zEPOVHXhb5idn+Y2psWcL0uZLT4o1RLbTrzzj+FzbwJ+yF3yBJaUXmxy0y/QOo8
-         cmA7/2ODa7NVlS6eaWqwNr8E2b3X4brSS4YFxtJROuBi88PZf0xZiz6zy8DHNFzEcJWb
-         onuwqgXd8ckYSuuHeUFHJY5KjFoqxYC5y0J1B4ogpAlxr+lUW3QNkhGWLcHYWTWalzF1
-         Nu4oT+T+N8/kT8mVqJQfN3/OqzhtNT5K821J+tOPHecwc+6jQQGaRFYjNzlSMULOgFtf
-         V3JziBFsjaLXp1KwtDAFWUur8br+tW/8iqRSow1zAlAFcknw5yEd8SuuevntaRhDDSvi
-         mMGQ==
+        bh=fogvJd7M6/3tAIpQswcL6Bh1r+vFqYoyUCG2xTi3sL4=;
+        b=QIm3OjxfRgqFoC6rnslNm1gqp2fvMkrE2fDTzrXr0PUqyfoAPB/0unxfVjPMKSeZIY
+         qqOQB++VQybng94hqrA2wZa4a6/p6eM3wnkMW4HUyFLtbUB6IatC4ToKaose95ZxU52S
+         ne//yphTOtlYNd4qTllEMaFkhB08EVGv9Md0MtKCyQ4FI53jZMQsrRpalFJuUXQZ3Pvm
+         CwqMa7AtL7WKYa1VSvno/allo6AWthEqwTPbj/x24qJJ1Pj/w/odl2tZGmfm1DJmou8M
+         ROgeYUXu5zmL4pEO6t26q5qW2vOynd+LnXQwqQRLIPK2XilOG3ZJBxG22DDc6polL0Ys
+         He/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767123347; x=1767728147;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GbLbN5qo8BhCJ3h1f/M+MLdJNxCUmuM3GwhK4z+mTLA=;
-        b=j1PK684FB9YBB9Xrz4Z/TudsnT9O0VPxfcR1gLdLeTw4e6hNXLMr3+DkWiRLCaH3Po
-         iWQ2lDO7ogSNGn2bOMcqICZdBnu497WvpOTrhz54MdXQx/XA9PB6TB0NnQBII9oacZ9I
-         /lufonFhlmqG5SpomhOuvoe5zTPGfrYbkuFPZRTyJl1HUbV7fj+zxzEEV0bodE3wSeAk
-         g4/WgkQwP8RHjYpIC3WSrSPwmnbcxO4OorjBdLul7vu+4mpKucXfPnDeBTRXDCn3Ikpc
-         6Q4mR0bGGdKQqM1KKzOnfGB5c4tK6pIHvdNVFEcYuzVed9C+H3hj2RYlf1YzCUoS+Zb+
-         1ArA==
-X-Forwarded-Encrypted: i=1; AJvYcCXEjJCZBwqLOElQ2Ov6VwgB75zV38oUAMujlb6sqdAyA7uojUAkrEdmD7oScunH+TBciYQ3H7s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKFxPaDEh/uOoq80ynlDGzpOTznLuBuGVg29ywLD2h2DmUQ4l5
-	4kFrSZBTlELr8KrfpyRxrwRWWoxw5B4aqr1VFP37cgbkIexIBJjbSosU
-X-Gm-Gg: AY/fxX56F1GVUliyNHGeeVWDZYfXv0ws9opJqLxQnrOn4aMK5G5p/9sUQ1ilvTPxFt1
-	ur8ClJJecn4ExpANfkw6OSnjoWsgCG5K4d88DrRZgsM8nK76HZvof2njvRhtEAeemIRQUmU9kVL
-	J5KnAtUas8lMBiYsGgVJ5Ov8C2DpkAQJNFonuPJY6DIswnYMwR1tp67uqK4SL33HaA7dfuv1PDR
-	ryQv58vYVXTrwkSWiNZrt8a4bgF4FDVu8EzPfrlQK0QQ+iNnzyv/aas3VlNmomFZKDLwZfiqVMA
-	rNFj5ikcV9d8dITdGyRh8a2fIYM3xjl3TJUNNQ3hbkLxvBf/mpceYpT98gs+5pzcZnJF78SF4FD
-	k1D16wir8wQWFZglXhNuIP6UIySaJiqnG0FIZJC+4T9T6CrNKHRQirltfJh+89VV3797KRToVoT
-	ZyXwm5jD371xXPT6+trO4SihJClPm0n3zccO3D2fZWc+vywcrNToFP01vFyNw=
-X-Google-Smtp-Source: AGHT+IGskJuGH1ry4lW++SW/O5+eFpbYgJV1JB4rR83UjJdJAPT2DRTtF+kwsfPk5XXMD9qFGe8aFQ==
-X-Received: by 2002:a05:690e:1281:b0:646:7d1b:614f with SMTP id 956f58d0204a3-6467d1b653fmr24659651d50.56.1767123346798;
-        Tue, 30 Dec 2025 11:35:46 -0800 (PST)
-Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78fb44f9a42sm128149897b3.29.2025.12.30.11.35.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Dec 2025 11:35:46 -0800 (PST)
-Date: Tue, 30 Dec 2025 14:35:45 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Alper Ak <alperyasinak1@gmail.com>, 
- davem@davemloft.net, 
- dsahern@kernel.org, 
- edumazet@google.com, 
- kuba@kernel.org
-Cc: Alper Ak <alperyasinak1@gmail.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Kuniyuki Iwashima <kuniyu@google.com>, 
- Breno Leitao <leitao@debian.org>, 
- Willem de Bruijn <willemb@google.com>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.332a5aa0f6f9f@gmail.com>
-In-Reply-To: <20251227073743.17272-1-alperyasinak1@gmail.com>
-References: <20251227073743.17272-1-alperyasinak1@gmail.com>
-Subject: Re: [PATCH] net: ipv4: ipmr: Prevent information leak in
- ipmr_sk_ioctl()
+        d=1e100.net; s=20230601; t=1767130354; x=1767735154;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=fogvJd7M6/3tAIpQswcL6Bh1r+vFqYoyUCG2xTi3sL4=;
+        b=Bt6iBnXgJdqMy8M+Jo5GvRyqeOZugqUlfKFOKRnN0pfxsLmyN8JsrQ85bndFu/RG+a
+         Ec2W5ML28MJoHX6R4yLNZVvTGyw/jVbgYGGQ2b3KcJcf5gjTlPPcJZEBqk5N3DZbVRZv
+         XiE9tr5jOpgfGtGoaybmwuMBhiNfYhrR7QZbH4vLIkGodvRAlj0s9q441E/W1dajhWxr
+         BZHwQTewEheoyvkNo1CHWj8ErMowjeEnVcFNZjuiw9YbJaF9iFXuq4KaU1g/1FGQE5PA
+         4cKBrnffDYfH+PVqyVDbOt1qyAkAIvcjgT8NWmEH1lueH8exvm6L1nzpQAWElj8WTv6H
+         4whQ==
+X-Gm-Message-State: AOJu0Ywaw6xXWya+4PiKBNlsyjbybzaU2zbXLhraSQSu9mbE/9osLMNZ
+	UOzLFWuDZOjFMXR7vEVEYlKfQFBAxg/UwfJ31O9CVtNg3XP5qzpEZ+g8Dm0ROU4P3dhI078zLjX
+	OfEiD1cGQpCzNhlerjrqKB9mxdAKJsNxOiVeUHBTZ
+X-Gm-Gg: AY/fxX5pGUp0TF3UFYfMyeaG/Up/1K/4CAIOUx9H57qzcJp6wPv5yyPWsUOjHRRTSEG
+	8moNNlq9wQhXIiofOoxMyL8a+l24fs9w9P7r65diG21alGly065CY016VIYyawWn+kMpFmopAeQ
+	1r81pBR5GL9/CNcroJvqbDSYbX4OdOjyM3B2fCMPh05mhX8giJG6yu3veWbPhAarqlsT/fYXgxe
+	PoWhu/ur+7Q5SlkG2Zo6ptLbIyxdL6bq9QRiVXO8YSOYJsKmHRBs1ZY1WsG6O+Z4YArSvFh6Kmh
+	idY=
+X-Google-Smtp-Source: AGHT+IGyGlmzTAaqM9W565PMF5auSkaF2mhId1J+Bp+ymXbnvxWOW9ForqZWNORcQQiia3tNeVXDdbKiGBVNE19Q6KY=
+X-Received: by 2002:a17:903:249:b0:2a0:de4f:c9b with SMTP id
+ d9443c01a7336-2a2f222b700mr359098975ad.4.1767130354566; Tue, 30 Dec 2025
+ 13:32:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20251230191814.213789-1-jhs@mojatatu.com>
+In-Reply-To: <20251230191814.213789-1-jhs@mojatatu.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Tue, 30 Dec 2025 16:32:23 -0500
+X-Gm-Features: AQt7F2pEjLPjspsKCAlsX8Gx6PEseFqXYj7y9bNphRqI85JJf3g8bvmQhi5mc6Y
+Message-ID: <CAM0EoMmDfrgH7wbguUf+T+mos2ehnm4cnwCGxY4+tZ79_7zB8A@mail.gmail.com>
+Subject: Re: [PATCH net 1/2] net/sched: act_mirred: Fix leak when redirecting
+ to self on egress
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, andrew+netdev@lunn.ch
+Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
+	victor@mojatatu.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Alper Ak wrote:
-> struct sioc_vif_req has a padding hole after the vifi field due to
-> alignment requirements. These padding bytes were uninitialized,
-> potentially leaking kernel stack memory to userspace when the
-> struct is copied via sock_ioctl_inout().
-> 
-> Reported by Smatch:
->     net/ipv4/ipmr.c:1575 ipmr_sk_ioctl() warn: check that 'buffer'
->     doesn't leak information (struct has a hole after 'vifi')
-> 
-> Fixes: e1d001fa5b47 ("net: ioctl: Use kernel memory on protocol ioctl callbacks")
+On Tue, Dec 30, 2025 at 2:18=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
+>
+> Whenever a mirred redirect to self on egress happens, mirred allocates a
+> new skb (skb_to_send). The loop to self check was done after that
+> allocation, but was not freeing the newly allocated skb, causing a leak.
+>
+> Fix this by moving the if-statement to before the allocation of the new
+> skb.
+>
+> The issue was found by running the accompanying tdc test in 2/2
+> with config kmemleak enabled.
+> After a few minutes the kmemleak thread ran and reported the leak coming =
+from
+> mirred.
+>
 
-The commit mentions other similar cases. If this is a concern for
-sioc_vif_req, then it likely would alos be for sioc_mif_req6, which
-similarly has a hole.
+Grr. There is a bug in the print - i will send a new version tomorrow.
 
-> Signed-off-by: Alper Ak <alperyasinak1@gmail.com>
+cheers,
+jamal
+
+> Fixes: 1d856251a009 ("net/sched: act_mirred: fix loop detection")
+> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 > ---
->  net/ipv4/ipmr.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-> index ca9eaee4c2ef..18441fbe7ed7 100644
-> --- a/net/ipv4/ipmr.c
-> +++ b/net/ipv4/ipmr.c
-> @@ -1571,6 +1571,7 @@ int ipmr_sk_ioctl(struct sock *sk, unsigned int cmd, void __user *arg)
->  	/* These userspace buffers will be consumed by ipmr_ioctl() */
->  	case SIOCGETVIFCNT: {
->  		struct sioc_vif_req buffer;
-> +		memset(&buffer, 0, sizeof(buffer));
->  
->  		return sock_ioctl_inout(sk, cmd, arg, &buffer,
->  				      sizeof(buffer));
-
-sock_ioctl_inout copies the whole struct from userspace, calls a
-domain specific callback and then copies the whole struct back:
-
-       if (copy_from_user(karg, arg, size))
-               return -EFAULT;
-
-       ret = READ_ONCE(sk->sk_prot)->ioctl(sk, cmd, karg);
-       if (ret)
-               return ret;
-
-       if (copy_to_user(arg, karg, size))
-               return -EFAULT;
-
-As a result every byte of the memset will be overwritten with the
-copy_from_user.
-
-
-> -- 
-> 2.43.0
-> 
-
-
+>  net/sched/act_mirred.c | 22 +++++++++++-----------
+>  1 file changed, 11 insertions(+), 11 deletions(-)
+>
+> diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+> index 91c96cc625bd..c9653b76a4cf 100644
+> --- a/net/sched/act_mirred.c
+> +++ b/net/sched/act_mirred.c
+> @@ -266,6 +266,17 @@ static int tcf_mirred_to_dev(struct sk_buff *skb, st=
+ruct tcf_mirred *m,
+>                 goto err_cant_do;
+>         }
+>
+> +       want_ingress =3D tcf_mirred_act_wants_ingress(m_eaction);
+> +
+> +       if (dev =3D=3D skb->dev && want_ingress =3D=3D at_ingress) {
+> +               pr_notice_once("tc mirred: Loop (%s:%s --> %s:%s)\n",
+> +                              netdev_name(skb->dev),
+> +                              at_ingress ? "ingress" : "egress",
+> +                              netdev_name(dev),
+> +                              want_ingress ? "ingress" : "egress");
+> +               goto err_cant_do;
+> +       }
+> +
+>         /* we could easily avoid the clone only if called by ingress and =
+clsact;
+>          * since we can't easily detect the clsact caller, skip clone onl=
+y for
+>          * ingress - that covers the TC S/W datapath.
+> @@ -279,17 +290,6 @@ static int tcf_mirred_to_dev(struct sk_buff *skb, st=
+ruct tcf_mirred *m,
+>                         goto err_cant_do;
+>         }
+>
+> -       want_ingress =3D tcf_mirred_act_wants_ingress(m_eaction);
+> -
+> -       if (dev =3D=3D skb->dev && want_ingress =3D=3D at_ingress) {
+> -               pr_notice_once("tc mirred: Loop (%s:%s --> %s:%s)\n",
+> -                              netdev_name(skb->dev),
+> -                              at_ingress ? "ingress" : "egress",
+> -                              netdev_name(dev),
+> -                              want_ingress ? "ingress" : "egress");
+> -               goto err_cant_do;
+> -       }
+> -
+>         /* All mirred/redirected skbs should clear previous ct info */
+>         nf_reset_ct(skb_to_send);
+>         if (want_ingress && !at_ingress) /* drop dst for egress -> ingres=
+s */
+> --
+> 2.52.0
+>
 
