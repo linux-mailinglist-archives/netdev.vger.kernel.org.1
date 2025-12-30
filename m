@@ -1,103 +1,129 @@
-Return-Path: <netdev+bounces-246322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EADCCE94F9
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 11:10:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EBCACE94E7
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 11:09:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 59E313012DE7
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 10:09:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 39B94301460E
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 10:08:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA3AF2D062F;
-	Tue, 30 Dec 2025 10:09:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5612B2D47E9;
+	Tue, 30 Dec 2025 10:08:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ctehTI5y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iWGOaHbB"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5826528C84A;
-	Tue, 30 Dec 2025 10:09:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94A429A32D
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 10:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767089395; cv=none; b=mXMGjJ8oS7+wfepHtXqAPVg0ANV4AI7HxyocHQe0xPFeYgs1AtMV02A2fYhmsjX8Ks/743KAvVDNupxF6KwlKRj8WbuI5Jdrwu3KdbWoiLXsJjrEdafA8FnzmuBygQvV+6Mq4TgwKaAmT2GFcn5BheUem0CLXm9cMCgw3Ru/y+w=
+	t=1767089337; cv=none; b=Ik7GO1nxZqKn3QlcaZhXtDzImHw1PvyJChVcG38XQLW8irHEXtm4Lp5mSGBZt5Ih+gERvOsvDqAvU7XR1A6yI1VHayvsrP5VdZgrao5FJUUaQ0sMlQvKenybv+qv76YZCE+uCpTZENCov2Tki0mW3zZps/0KtlvG1c1MsJ7CVII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767089395; c=relaxed/simple;
-	bh=wTiXDpfU6q9X5QdMk9Tcxn26k+zyE0H7rCZr5xwZ3ks=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=ZIvUGCP7fVQJqIy9r3EcbiML9XwmgA7ZoAo3WP1I8i2bW7rRTS6XVhrf5D3yCCmFvZzFVU+U6Lnuvc/b+TwSx868dZrk1LHVOodWFfqdDddgFsji+eQtcwZHCSYOKCIOuM8F6fHGzcN9y9NFru1gWh2vFvusrI/q17cjwo6T9O0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ctehTI5y; arc=none smtp.client-ip=220.197.31.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=wTiXDpfU6q9X5QdMk9Tcxn26k+zyE0H7rCZr5xwZ3ks=; b=c
-	tehTI5yuWGpg8uWZasa2JnFFRnvcbitNFiLLNXjT5x6goUKhCricZHtF8jb5meIz
-	GwGJqQ/rSBCkHH5g8svs6dJtqp9Ihk34EJHS9b5w+aqwfRDRQWkqEmL9vyWJfTY7
-	P3Kx1WTFkw9Md7UqAIx6JwJhcXRVEObJ1gqJQbXCNw=
-Received: from slark_xiao$163.com ( [112.97.82.249] ) by
- ajax-webmail-wmsvr-40-137 (Coremail) ; Tue, 30 Dec 2025 18:08:04 +0800
- (CST)
-Date: Tue, 30 Dec 2025 18:08:04 +0800 (CST)
-From: "Slark Xiao" <slark_xiao@163.com>
-To: "Loic Poulain" <loic.poulain@oss.qualcomm.com>
-Cc: mani@kernel.org, ryazanov.s.a@gmail.com, johannes@sipsolutions.net,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, mhi@lists.linux.dev,
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re:Re: Re: [PATCH v3 2/2] net: wwan: mhi: Add network support for
- Foxconn T99W760
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
- 20250723(a044bf12) Copyright (c) 2002-2025 www.mailtech.cn 163com
-In-Reply-To: <CAFEp6-2NBa8tgzTH__F4MOg=03-LO7RjhobhaKHmapXXa9Xeyw@mail.gmail.com>
-References: <20251119105615.48295-1-slark_xiao@163.com>
- <20251119105615.48295-3-slark_xiao@163.com>
- <CAFEp6-23je6WC0ocMP7jXUtPGfeG9_LpY+1N-oLcSTOmqQCL2w@mail.gmail.com>
- <4c4751c0.9803.19b3079a159.Coremail.slark_xiao@163.com>
- <CAFEp6-2NBa8tgzTH__F4MOg=03-LO7RjhobhaKHmapXXa9Xeyw@mail.gmail.com>
-X-NTES-SC: AL_Qu2dBfyTtkoj4imZYukfmk8Sg+84W8K3v/0v1YVQOpF8jBLowBkwXUJINHjZyMiRJAKgrRWbTjtF++VreJlyZIwLdz1obbFqRjSDjk80aCdNiw==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1767089337; c=relaxed/simple;
+	bh=VQZj6EuQ2ZoY4vY74orxPnwNlaav6retxXbAo80HSoo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TK+GUd2Pb8ArUTwOSpzMdV7yVdFCxnnHjI0H1Ss9sBCDE6oZxgVvL6FeSwmCb1qXu9N6LgWDO8vtpUZxOruTqJ6P65fHhq12D/uBYmPmD0SSl2SkzoDjJa1vyfRQRQQNDiDGr5BTW1VQymu4sj2gms14nlg+lQYEckoXTScVBvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iWGOaHbB; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-bc29d64b39dso5269059a12.3
+        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 02:08:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767089335; x=1767694135; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y4F9bSCEJ0/0vAqvKbzwSPjoi5jovTSkn9ts7DNm0H0=;
+        b=iWGOaHbBqrPnPks2GODCBbPxu7uxYdz13/t+2auqYI8qvTJe6/8b1qzd1x9weP3plg
+         Q4wxjUGdCtfpIHVsINpJPoZGG/Fv/SVGOLIuJEYlYREuPPrc1cic+zb7EO/R6EjCtje1
+         HtPFGSlQtBlyTr5h0ULsnXTqzUA1Gtn6FY/bi9Nns9oixD2arsEfsN2RVaf2zTn1q9E7
+         oFv5fUrUTh4gG5xvVRIngGACi49qiSq4odrfmflbykaB+2dR6bcQmBYDgtqAqyUvnYxE
+         A+R/4wLuNc9G5/on7f4a7u8zTjkAvWfkXqiuE9N1T01Ej5Tg0KefTOKYlDTYshSpowMk
+         ZKDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767089335; x=1767694135;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=y4F9bSCEJ0/0vAqvKbzwSPjoi5jovTSkn9ts7DNm0H0=;
+        b=u/5hWYdTvKz3haz74Y0quolGHnlBq3s9XqBb6a1dzfTHdQPgYJnn71fkM1wmk5CA4j
+         J22fpgoAMoH32Vbu6wIvhyKKr8XsZ3lfjlr4zUN32rwCqySqFi00wnLamKj4JyCg8l0g
+         O3ClYkNl6FIMDHoi+wJhUlzEMtAhYew5YsABYq0hH6maXeUORTI201B4w6E0VXY7GKcP
+         iIe1kZE4CW0uPfoNOKlQNDAr3v6hOijY8l7Ei+sIbIVUlIHP65O+I99LN/lTmPOSVcep
+         eZt2Sgxp4L3FTlRW2JIoQf3CB3vrwrqUDHuMXu+XpT1IcGQe/gBo2TS16mZkYOVq2uLB
+         Stgw==
+X-Forwarded-Encrypted: i=1; AJvYcCUbRP5thFNESmz0xKxSqNymM6AJ7iDYd+Kh49Bg5j29vOhhem+NKR3f3PzoR/RKICizSQb/xfA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7nsGG3iGyTaecsW6py9ULU9CZRAbsa3TKTPL22Kf95fOZHNS+
+	CvohggRdfO1TNq0UjvP1iVzwU6SGa5NlE1ER4DR6jP3mN4cqLlAaJsR4du9goviKnkPo3zGDNMI
+	eAzi/bruOiJqY7E5MBL9K0c6G/V9KgYk=
+X-Gm-Gg: AY/fxX6yHYZhSFkt0SHEvI44sgLGZV5fqLiP5I7Uun11ZTMMcQqpTbi+1BFS/Jq0QNe
+	WSTb05BlXAr9ZqJwfLCh6ixYpaapxwFfP1yo0lDlLiDU9/SOTmmuf9bi1ZJVcXTl6kLOR81aVq1
+	7rJNGXH7UT3ePMMd8vumXUCBL0veBTG0GaFkd9LzAbAKIYpfXOtl3epv0/7M+e6D2rgJNb4n18R
+	KRDT9hP7/kB0mIXJZe3EH2wVEppaCYJC/vCD+VtcLuZ2hw/zK/vOrkxYvUkpYtpqK+GeER7zeUc
+	V3I4pQKp
+X-Google-Smtp-Source: AGHT+IHZAaxt027sGHCGDX3pnrOwzKxIkX7D8fXW+aIEYtuBua5GkzZCr7nRm2DE4BZgvhp3LrKi8sNU3zALzogPMZQ=
+X-Received: by 2002:a05:7022:6294:b0:11b:9b9f:427a with SMTP id
+ a92af1059eb24-121722b4fdfmr32658769c88.21.1767089334852; Tue, 30 Dec 2025
+ 02:08:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <703d68c0.93c7.19b6ebaa741.Coremail.slark_xiao@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:iSgvCgD3XwiFpFNpCS1MAA--.4671W
-X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/xtbC5wR53WlTpIQiBgAA35
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+References: <20251229173346.8899-1-tinsaetadesse2015@gmail.com> <3d6fbc23-e9b8-443c-badb-b3380b62d21f@redhat.com>
+In-Reply-To: <3d6fbc23-e9b8-443c-badb-b3380b62d21f@redhat.com>
+From: TINSAE TADESSE GUTEMA <tinsaetadesse2015@gmail.com>
+Date: Tue, 30 Dec 2025 13:08:36 +0300
+X-Gm-Features: AQt7F2p3if1NR4ZDsHiLWZeYPxAFBSFcIkLSOPbnDa8Ac8ysbT0vFjTMH1hAAUM
+Message-ID: <CAJ12PfMGqsLWQvaeW4WSNHXd838XYuJ+QHiYZS1FtgmYWH9NnA@mail.gmail.com>
+Subject: Re: [PATCH] Fix PTP driver warnings by removing settime64 check
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-CgpBdCAyMDI1LTEyLTMwIDE3OjUwOjM5LCAiTG9pYyBQb3VsYWluIiA8bG9pYy5wb3VsYWluQG9z
-cy5xdWFsY29tbS5jb20+IHdyb3RlOgo+SGkgU2xhcmssCj4KPk9uIFRodSwgRGVjIDE4LCAyMDI1
-IGF0IDk6MDHigK9BTSBTbGFyayBYaWFvIDxzbGFya194aWFvQDE2My5jb20+IHdyb3RlOgo+Pgo+
-Pgo+PiBBdCAyMDI1LTExLTIxIDIwOjQ2OjU0LCAiTG9pYyBQb3VsYWluIiA8bG9pYy5wb3VsYWlu
-QG9zcy5xdWFsY29tbS5jb20+IHdyb3RlOgo+PiA+T24gV2VkLCBOb3YgMTksIDIwMjUgYXQgMTE6
-NTfigK9BTSBTbGFyayBYaWFvIDxzbGFya194aWFvQDE2My5jb20+IHdyb3RlOgo+PiA+Pgo+PiA+
-PiBUOTlXNzYwIGlzIGRlc2lnbmVkIGJhc2VkIG9uIFF1YWxjb21tIFNEWDM1IGNoaXAuIEl0IHVz
-ZSBzaW1pbGFyCj4+ID4+IGFyY2hpdGVjaHR1cmUgd2l0aCBTRFg3Mi9TRFg3NSBjaGlwLiBTbyB3
-ZSBuZWVkIHRvIGFzc2lnbiBpbml0aWFsCj4+ID4+IGxpbmsgaWQgZm9yIHRoaXMgZGV2aWNlIHRv
-IG1ha2Ugc3VyZSBuZXR3b3JrIGF2YWlsYWJsZS4KPj4gPj4KPj4gPj4gU2lnbmVkLW9mZi1ieTog
-U2xhcmsgWGlhbyA8c2xhcmtfeGlhb0AxNjMuY29tPgo+PiA+Cj4+ID5SZXZpZXdlZC1ieTogTG9p
-YyBQb3VsYWluIDxsb2ljLnBvdWxhaW5Ab3NzLnF1YWxjb21tLmNvbT4KPj4gPgo+PiBIaSBMb2lj
-LAo+PiBNYXkgSSBrbm93IHdoZW4gdGhpcyBwYXRjaCB3b3VsZCBiZSBhcHBsaWVkIGludG8gbmV0
-IG9yIGxpbnV4LW5leHQ/Cj4+IEkgc2F3IHRoZSBjaGFuZ2VzIGluIE1ISSBzaWRlIGhhcyBiZWVu
-IGFwcGxpZWQuCj4+IFQ5OVc3NjAgZGV2aWNlIHdvdWxkIGhhdmUgYSBuZXR3b3JrIHByb2JsZW0g
-aWYgbWlzc2luZyB0aGlzIGNoYW5nZXMgaW4gd3dhbgo+PiBzaWRlLiBQbGVhc2UgaGVscCBkbyBh
-IGNoZWNraW5nLgo+Cj5Zb3UgY2FuIHNlZSBzdGF0dXMgaGVyZTogaHR0cHM6Ly9wYXRjaHdvcmsu
-a2VybmVsLm9yZy9wcm9qZWN0L25ldGRldmJwZi9saXN0Lwo+Cj5JZiB0aGUgY2hhbmdlcyBoYXZl
-IG5vdCBiZWVuIHBpY2tlZCB0b2dldGhlciwgcGxlYXNlIHJlc2VuZCB0aGlzIG9uZSwKPmluY2x1
-ZGluZyB0YWdzLgo+Cj5SZWdhcmRzLAo+TG9pYwpIaSBMb2ljLApJIGNoZWNrZWQgYWJvdmUgbGlu
-ayBhbmQgZGlkbid0IGZpbmQgbXkgY2hhbmdlcy4KVGhpcyBpcyBzdHJhbmdlIHNpbmNlIHRoZSBj
-aGFuZ2VzIGluIE1ISSBzaWRlIG9mIHRoaXMgc2VyaWFsIGhhcyBiZWVuIGFwcGxpZWQsIGJ1dCB0
-aGlzIApoYXMgYmVlbiBpZ25vcmVkLgpCVFcsIHRoaXMgY2hhbmdlcyBtYXkgbm90IGJlIGFwcGxp
-Y2FibGUgYmVjYXVzZSBhbm90aGVyIGNoYW5nZSAKaHR0cHM6Ly9wYXRjaHdvcmsua2VybmVsLm9y
-Zy9wcm9qZWN0L25ldGRldmJwZi9wYXRjaC8yMDI1MTEyMDExNDExNS4zNDQyODQtMS1zbGFya194
-aWFvQDE2My5jb20vCmhhcyBiZWVuIGFwcGxpZWQuIAoKU28gZG8geW91IHdhbnQgbWUgdG8gcmVz
-ZW5kIHRoZSBuZXcgY2hhbmdlcyBiYXNlZCBvbiB0aGUgbGF0ZXN0IG5ldCBiYXNlbGluZSA/CkFu
-eSBzZXJpYWxzIHNoYWxsIGJlIGFzc2lnbmVkPyBWNCBzaGFsbCBiZSB1c2VkPwo=
+On Tue, Dec 30, 2025 at 12:42=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> On 12/29/25 6:32 PM, Tinsae Tadesse wrote:
+> > Signed-off-by: Tinsae Tadesse <tinsaetadesse2015@gmail.com>
+> > ---
+> >  drivers/ptp/ptp_clock.c | 3 +--
+> >  1 file changed, 1 insertion(+), 2 deletions(-)
+> >
+> > diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+> > index b0e167c0b3eb..5374b3e9ad15 100644
+> > --- a/drivers/ptp/ptp_clock.c
+> > +++ b/drivers/ptp/ptp_clock.c
+> > @@ -323,8 +323,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clo=
+ck_info *info,
+> >       size_t size;
+> >
+> >       if (WARN_ON_ONCE(info->n_alarm > PTP_MAX_ALARMS ||
+> > -                      (!info->gettimex64 && !info->gettime64) ||
+> > -                      !info->settime64))
+> > +                      (!info->gettimex64 && !info->gettime64)))
+> >               return ERR_PTR(-EINVAL);
+> >
+> >       /* Initialize a clock structure. */
+>
+> I guess this is an attempt to address the following issue:
+>
+> https://lore.kernel.org/all/20251108044822.GA3262936@ax162/
+>
+> If so, it's already fixed by commit 81d90d93d22ca4f61833cba921dce9a0bd822=
+18f
+>
+> /P
+>
+
+Hi Paolo,
+
+Thanks for the update!
 
