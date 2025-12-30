@@ -1,175 +1,162 @@
-Return-Path: <netdev+bounces-246388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05217CEACA3
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 23:38:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E92E0CEACAC
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 23:41:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ED8A0301B2DC
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 22:38:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 956D13016376
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 22:41:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAE502BDC3D;
-	Tue, 30 Dec 2025 22:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BAD82BEC3F;
+	Tue, 30 Dec 2025 22:41:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b2cOJ8YL"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="KjfpbM5v"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69E803A1E94;
-	Tue, 30 Dec 2025 22:38:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81E1223ABBF
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 22:41:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767134293; cv=none; b=DsU9ExFeZpQLf3LgXrU/csOUCvV7sP49pIVvjgjnlEoJLQlyZzgf13qyN6EI6irAo7d8s5jFetZ3WjC/x8rLWUsBI2pSRCRW+8aN8ryyhXkVW2Bc1UGswXiwczB0Z0TBy01E51X5hFhxzLq2b+K/VRUfoAB3xSDjhVIk9kCH6jU=
+	t=1767134510; cv=none; b=TqbbZza1yEf3mZuc77ADDdikqKGeSHDNaHOGk/Qy4VoWj0dMgmddaemx5nCsMwmEpo6ztBJqDspX5bkSt9dtRASvy/jF2j9PzOxUmxgrPWg5vRrTMeTR2hsooW6eZXGuTl8xcBCW6RfuVsx99ds5Dm3qqwqI5ld2AsFIBnSnuqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767134293; c=relaxed/simple;
-	bh=Tb3tynnxxnwuANiHqkonp4fihfVrESQp6TRTMLE8/iI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WJrfDkpfeXjLSYcJWvwD1W7xBh1FYhPymnoFwjgrXd8X8AcOmOYUE3djMkwOqAPRyyiO4dFNQfruPEFp8633QtbgUt8QuNflpFjxHaZjWbEoJ9XzwJc0qw9Z51qxo+aQ9bNhjvx2FVFJzqzYl7dJeiStQvF9V1478AcIGk7Ba+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b2cOJ8YL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69369C4CEFB;
-	Tue, 30 Dec 2025 22:38:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767134292;
-	bh=Tb3tynnxxnwuANiHqkonp4fihfVrESQp6TRTMLE8/iI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=b2cOJ8YL9H3+tcxp0RAQnc5CQYnXPXOwJghUPMxwUA9nJ6+jdDVbBaf+CVtGr49mj
-	 NcFoZvSde20KbB6f29qNdHoYvCrrD9KXIKSkLSESSZU3CeFKhgKvmeLsIKz36l3BDv
-	 ZqHDMjOeFqTCfC1E3RRn+MqTIhX3ZzoVKL9GVwFxgm5PZpPnoEShKS6g+GEHhM3T5R
-	 Ak3KCLfwYwDPNgJrx7tv306BftuJfE5/umRJJVfDTi/6tf7wCvTJtzXWSTNibia4VO
-	 e+wO+Ccg/vgWi85o7qxny3KxKBVON1mdMm8lbrc3w/6NSbRmm//YBotNrxpr9frRna
-	 8XuNauqTZD6tg==
-Date: Tue, 30 Dec 2025 23:38:09 +0100
-From: Frederic Weisbecker <frederic@kernel.org>
-To: Zhang Qiao <zhangqiao22@huawei.com>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chen Ridong <chenridong@huawei.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 01/33] PCI: Prepare to protect against concurrent
- isolated cpuset change
-Message-ID: <aVRUUXa6kJKHHQ_n@pavilion.home>
-References: <20251224134520.33231-1-frederic@kernel.org>
- <20251224134520.33231-2-frederic@kernel.org>
- <e01189e1-d8ef-2791-632c-90d4d897859b@huawei.com>
+	s=arc-20240116; t=1767134510; c=relaxed/simple;
+	bh=OWWomHk99HdeezC4OgdbDZeJCyIrSnuuMVxN2AgCZr0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=t0pEudycbtDkKabpIEPZjIz4r4c2Gn+nIBgDc4OZYpTYoESMc+pcukEbFBPOBGmtaKpWxc/AbQVWYODw9oIxXHVzO4adc7oL1+VrBdpNPN8XvZ1u3irDOuBLRxS8+uuHCzvzNDhoIuw8V5Nn6NtNZ3yNmxbU+JSqblrD2ZB4qEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=KjfpbM5v; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-64b92abe63aso17386884a12.0
+        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 14:41:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1767134506; x=1767739306; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=06dW1Ho7bV8eKHm9UgM3Iym6VDOMBdpFG2s9p/N9gyI=;
+        b=KjfpbM5vQDTqZ7ZwGQZpjiDP0TSlIvTbhFN+Ws56vbgXZ2xIQ/G1P7snSbfbs+O31E
+         LgF7O/vFTxpScBIamczQQ8TFDkF/NXdf+tLAHFThTO/CLX5dbpk6y8dgYntUu+4d267P
+         xS+A/Yk1cE3KfA2mrB+nFv9YGGnCw7gIMlRlIaLjAQg6lrhpZCP0P2y9YjpJLfRH9jAi
+         O3fHwZvmH6+gLKzS1hQaThqFJtokzYyOBDsR1EtpwUt97Ypgjqb6kLPNSmo1bi+BhiJI
+         axV/x/el4tLQXcPMdq0l4jZlDkgKQA7T7rwEdFP/JymFv2vDgtjAw3yUTCdsKVZaG1SD
+         es9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767134506; x=1767739306;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=06dW1Ho7bV8eKHm9UgM3Iym6VDOMBdpFG2s9p/N9gyI=;
+        b=enpTo+ovpNQjyvGIHuJlEayhoqjwOrYUwh6UEYjpLQPMedkRCaNNkl2TgaHVdr7jK2
+         2eYqD8XCm+N0UUq2LaD4LN8KskgSaoEcmsMfN+2rlgSAtnwidc2t09+cAihbqPKmBCRK
+         i1hKBlG9TOnB5+dmGTdId+EpUgCTNKvxcC5N+BBf/HNKrYmPM+1r3nfdERI3VBFKZNMh
+         ZF5BVGcwbB8XivbQg3uUp3YFwp1MJ2/pAeweTBj0zK62jue/coIko20mDedp1zANMamU
+         sUVm7F80PGH4M4IThmn9QoLyudrehIfL8RtWYYpO5jjHNdwoEptYyxMaT8Q8xiiitGfc
+         vBXQ==
+X-Gm-Message-State: AOJu0YwP2RS6Pjeq2YFYegc2kmCD4+YONZPPlGoj8h54Up7BUnU2iA6k
+	psMNjRJSgubJwGRpDLpTwWrKUktOLhWpItWqOzljIgNXKMZ5UZjZpC0rwBXuB4sN+5BDh+6ZPEO
+	MEJ//th0wgSvybvpN1vZN2SLF0UQn9Co+I6Vd6rDf100RXd/4Gtwt/0ScY9wbKt6MD+LhExw2C3
+	D+kKLVwbfX9mjZJPLNr/zRHZpeJnr1YHd58/MiNFg2KCsMeAS6og==
+X-Gm-Gg: AY/fxX6jV6cOSGmQgU1dt2oO5t1NSIc3fVSSAIFOnn6u8TW+yZIT1ALLMsUG2NSZ0hk
+	IrrmxNieMKICjOPh5pzR/n+p71LyaCKYrrtT5gOzkLT8zxSm0m/kwW2LxNiAW/Nw+ybKCHx1Bbc
+	IQTgnvzlH9aEzVd3NXdnf1LFrLJcHr6UYXQ7Q8rVwyZs8qrSJqjiRVyXCj+Wan9tUIjnhLuzgRA
+	HxPU/ibfDX//59fmyEPNxMgkTOEXjB0pTTpita2pXBvfZdiOxadt7bUU85wYWDHFSHn9Hfi+pn/
+	qdhcTyEWfCkBJDrxsgZskrA8EiO1jA8HHLQEf7/Wa94PNHzxunQ87iM3GoR2eYHL2d7oow0rbst
+	CEclhabBolFHMIrnS5zOv6LjyP4dm045lcXTxs/7GC++Mu/KgPd40LPFfi/oW8Q+7l7deVoHqOo
+	KXalB1VpfKm8l3/ID+csHVQdyyDz7nYXAf0db4LTTEgWINFbUBfDZZt8AfWA==
+X-Google-Smtp-Source: AGHT+IEnm+Td03B4FYGC71L5CtP6eykYA6dxr5iHliINpVIYBTK74eJNQeIX7ea8GVLZO4KH4qW3MA==
+X-Received: by 2002:a50:fb18:0:b0:64d:d85:4c75 with SMTP id 4fb4d7f45d1cf-64d0d854e37mr21895579a12.12.1767134506451;
+        Tue, 30 Dec 2025 14:41:46 -0800 (PST)
+Received: from dev-rjethwani.dev.purestorage.com ([2620:125:9007:640:ffff::71f8])
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-64b91599844sm36214651a12.25.2025.12.30.14.41.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Dec 2025 14:41:45 -0800 (PST)
+From: Rishikesh Jethwani <rjethwani@purestorage.com>
+To: netdev@vger.kernel.org
+Cc: saeedm@nvidia.com,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
+	borisp@nvidia.com,
+	john.fastabend@gmail.com,
+	kuba@kernel.org,
+	sd@queasysnail.net,
+	davem@davemloft.net,
+	Rishikesh Jethwani <rjethwani@purestorage.com>
+Subject: [PATCH net-next 0/2] tls: Add TLS 1.3 hardware offload support
+Date: Tue, 30 Dec 2025 15:41:35 -0700
+Message-Id: <20251230224137.3600355-1-rjethwani@purestorage.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <e01189e1-d8ef-2791-632c-90d4d897859b@huawei.com>
 
-Le Mon, Dec 29, 2025 at 11:23:56AM +0800, Zhang Qiao a écrit :
-> Hi, Weisbecker，
-> 
-> 在 2025/12/24 21:44, Frederic Weisbecker 写道:
-> > HK_TYPE_DOMAIN will soon integrate cpuset isolated partitions and
-> > therefore be made modifiable at runtime. Synchronize against the cpumask
-> > update using RCU.
-> > 
-> > The RCU locked section includes both the housekeeping CPU target
-> > election for the PCI probe work and the work enqueue.
-> > 
-> > This way the housekeeping update side will simply need to flush the
-> > pending related works after updating the housekeeping mask in order to
-> > make sure that no PCI work ever executes on an isolated CPU. This part
-> > will be handled in a subsequent patch.
-> > 
-> > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> > ---
-> >  drivers/pci/pci-driver.c | 47 ++++++++++++++++++++++++++++++++--------
-> >  1 file changed, 38 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
-> > index 7c2d9d596258..786d6ce40999 100644
-> > --- a/drivers/pci/pci-driver.c
-> > +++ b/drivers/pci/pci-driver.c
-> > @@ -302,9 +302,8 @@ struct drv_dev_and_id {
-> >  	const struct pci_device_id *id;
-> >  };
-> >  
-> > -static long local_pci_probe(void *_ddi)
-> > +static int local_pci_probe(struct drv_dev_and_id *ddi)
-> >  {
-> > -	struct drv_dev_and_id *ddi = _ddi;
-> >  	struct pci_dev *pci_dev = ddi->dev;
-> >  	struct pci_driver *pci_drv = ddi->drv;
-> >  	struct device *dev = &pci_dev->dev;
-> > @@ -338,6 +337,19 @@ static long local_pci_probe(void *_ddi)
-> >  	return 0;
-> >  }
-> >  
-> > +struct pci_probe_arg {
-> > +	struct drv_dev_and_id *ddi;
-> > +	struct work_struct work;
-> > +	int ret;
-> > +};
-> > +
-> > +static void local_pci_probe_callback(struct work_struct *work)
-> > +{
-> > +	struct pci_probe_arg *arg = container_of(work, struct pci_probe_arg, work);
-> > +
-> > +	arg->ret = local_pci_probe(arg->ddi);
-> > +}
-> > +
-> >  static bool pci_physfn_is_probed(struct pci_dev *dev)
-> >  {
-> >  #ifdef CONFIG_PCI_IOV
-> > @@ -362,34 +374,51 @@ static int pci_call_probe(struct pci_driver *drv, struct pci_dev *dev,
-> >  	dev->is_probed = 1;
-> >  
-> >  	cpu_hotplug_disable();
-> > -
-> >  	/*
-> >  	 * Prevent nesting work_on_cpu() for the case where a Virtual Function
-> >  	 * device is probed from work_on_cpu() of the Physical device.
-> >  	 */
-> >  	if (node < 0 || node >= MAX_NUMNODES || !node_online(node) ||
-> >  	    pci_physfn_is_probed(dev)) {
-> > -		cpu = nr_cpu_ids;
-> > +		error = local_pci_probe(&ddi);
-> >  	} else {
-> >  		cpumask_var_t wq_domain_mask;
-> > +		struct pci_probe_arg arg = { .ddi = &ddi };
-> > +
-> > +		INIT_WORK_ONSTACK(&arg.work, local_pci_probe_callback);
-> >  
-> >  		if (!zalloc_cpumask_var(&wq_domain_mask, GFP_KERNEL)) {
-> >  			error = -ENOMEM;
-> 
-> If we return from here, arg.work will not be destroyed.
+Hi all,
 
-Good catch! Thanks.
+This patch series adds TLS 1.3 support to the kernel TLS hardware offload
+infrastructure, enabling hardware acceleration for TLS 1.3 connections.
 
--- 
-Frederic Weisbecker
-SUSE Labs
+Background
+==========
+Currently, the kernel TLS device offload only supports TLS 1.2. With
+TLS 1.3 being the current standard and widely deployed, there is a
+growing need to extend hardware offload support to TLS 1.3 connections.
+
+TLS 1.3 differs from TLS 1.2 in its record format:
+
+  TLS 1.2: [Header (5)] + [Explicit IV (8)] + [Ciphertext] + [Tag (16)]
+  TLS 1.3: [Header (5)] + [Ciphertext + ContentType (1)] + [Tag (16)]
+
+The key difference is that TLS 1.3 eliminates the explicit IV and
+instead appends the content type byte to the plaintext before
+encryption. This content type byte must be encrypted along with the
+payload for proper authentication tag computation per RFC 8446.
+
+Patch 1: Core TLS infrastructure (tls_device.c)
+================================================
+- Extended version validation to accept TLS_1_3_VERSION in both
+  tls_set_device_offload() and tls_set_device_offload_rx()
+- Modified tls_device_record_close() to append the content type
+  byte before the authentication tag for TLS 1.3 records
+- Pre-populated dummy_page with valid record types for memory
+  allocation failure fallback path
+
+Patch 2: mlx5 driver enablement
+===============================
+- TLS 1.3 version detection and validation with proper capability checking
+- TLS 1.3 crypto context configuration using MLX5E_STATIC_PARAMS_CONTEXT_TLS_1_3
+- Correct IV handling for TLS 1.3 (12-byte IV vs TLS 1.2's 4-byte salt)
+- Hardware offload for both TLS 1.3 AES-GCM-128 and AES-GCM-256
+
+Testing
+=======
+Tested on the following hardware:
+- Broadcom BCM957608 (Thor 2)
+- Mellanox ConnectX-6 Dx (Crypto Enabled)
+
+Both TX and RX hardware offload verified working with:
+- TLS 1.3 AES-GCM-128
+- TLS 1.3 AES-GCM-256
+
+Test methodology: ktls_test : https://github.com/insanum/ktls_test/tree/master
+
+Please review and provide feedback.
+
+Thanks,
+Rishikesh
+
+Rishikesh Jethwani (2):
+  tls: TLS 1.3 hardware offload support
+  mlx5: TLS 1.3 hardware offload support
+
+ drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls.h      |  8 ++++-
+ drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_txrx.c | 14 +++++++---
+ net/tls/tls_device.c                                         | 48 +++++++++++++++++++++++++++++++++++++++++--- 
+ 3 files changed, 63 insertions(+), 7 deletions(-)
+
+--
+2.25.1
 
