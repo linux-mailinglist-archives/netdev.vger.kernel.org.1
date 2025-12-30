@@ -1,112 +1,157 @@
-Return-Path: <netdev+bounces-246383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05B76CEA7F8
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 19:44:54 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4595CEA87B
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 20:18:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 27A11300F5AA
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 18:44:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D0C6E3002848
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 19:18:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ED1D32C312;
-	Tue, 30 Dec 2025 18:44:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB4E2749D2;
+	Tue, 30 Dec 2025 19:18:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="QrxzF4bz"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="x1HgDMk4"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.pv.icloud.com (p-west1-cluster1-host11-snip4-1.eps.apple.com [57.103.64.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D26B732ED41
-	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 18:44:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.64.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06DDE261B91
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 19:18:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767120260; cv=none; b=J+kTddYicAHhHmC8X3W8mSFsBvcacYE3OkGn1sxJ7XultITVGDoeBNxUcjtcjU9f48Xrr1W3jJj6UMmZjQy7mwDvZ4n7DLgvQZVbIWHUBmtYdU8S+Kj14qwB+arQ1TAeZOGhHj3MxPYf85f/zB7Ip19GJrwEspPy/j6Hlq7MsY4=
+	t=1767122299; cv=none; b=NRZA49rhrETM29dEhm11Bz6GDLgNbup5l752VJ/ywDy8ZDziuomDSZQrhQjNwY+QQOorrB60mhV9vLlBxDzj4abB9habvIYL6LYsV96OKwJfosLEeAJhXA8R+xaSzUhLU5BXOoYCbLwf9xuCX49hbVXX7rwe1m3rcaVuYlxmfuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767120260; c=relaxed/simple;
-	bh=SMImo3ORCUvjc4xSB2lVMeLPBjj8z9R8OTx4XA5kTtQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Bwb090vUVISB+lNdi3L2mDHmZbHKyTDvxQa76om4aGpR4R+bo2DRtP1RptVJQKZ5pkQOd3h07Jfzy42M6rVJaEhj5z7UXjk+I6ecNq2dPB/fq/1i3OIbbHVyisssQfG6tlFsgn3ZY3Ouy5Yc8Q1j/WZtCOlJvhly5dLirtgFFvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=QrxzF4bz reason="key not found in DNS"; arc=none smtp.client-ip=57.103.64.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=y-koj.net
-Received: from outbound.pv.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-west-1a-60-percent-14 (Postfix) with ESMTPS id F113D18001A6;
-	Tue, 30 Dec 2025 18:44:16 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; bh=O7v4N3Ho181TS8rbUxfrU8UvYC9fe90w67sMGyAnWuw=; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=QrxzF4bzzKE60Zw6D+dU9P5B9jCl4CfrqUIypIaWhlfpvWTjENrmBTboT1+HaNj7437f2lSyYDzUt7eb2zZLicKD58+ViLQM/KBEYIIVT0GWwMMDULWmDwgOFyEZOw8Dv9Ztf4PS1o8OC8Cs8fIqyEWJbiIWBek/1rn2NTsWW4aLg6loC2rmXrzkJx88x3WPySvso5cOQXz/yEHaTnwCAGJtpz421XYYbLj885YTRGGt4vFQzmU8BJa0p1UX2O6ZBijWxr51NUZ/53RCedKfKnW/UEZC+lq62a+LiEQWDHoIm7P5kayWE5KGUqs63D4r5w+19pau+dEE42IEwv6JZQ==
-mail-alias-created-date: 1719758601013
-Received: from desktop.homenetwork (unknown [17.56.9.36])
-	by p00-icloudmta-asmtp-us-west-1a-60-percent-14 (Postfix) with ESMTPSA id 443431800091;
-	Tue, 30 Dec 2025 18:44:15 +0000 (UTC)
-Date: Wed, 31 Dec 2025 03:44:13 +0900
-From: Yohei Kojima <yk@y-koj.net>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Breno Leitao <leitao@debian.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 1/5] net: netdevsim: fix inconsistent carrier state
- after link/unlink
-Message-ID: <aVQdfaYqt2ahDSs3@desktop.homenetwork>
-References: <cover.1767032397.git.yk@y-koj.net>
- <ff1139d3236ab7fec2b2b3a2e22510dcd7b01a21.1767032397.git.yk@y-koj.net>
- <e8180dc5-fc23-4044-bd67-92fc3eebdaa0@lunn.ch>
- <aVLc4J8SQYLPWdZZ@y-koj.net>
- <1c8edd12-0933-4aae-8af3-307b133dce27@lunn.ch>
- <aVP72wedMbegkqzs@desktop.homenetwork>
- <2a1e3bdf-e6b0-4c6f-ac59-cda5ec565b82@lunn.ch>
+	s=arc-20240116; t=1767122299; c=relaxed/simple;
+	bh=+/qYVGHS9whREl9wMfE/Im3VfFq6fcB6Vf7VUhKTaVs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tbcGQFeUIv/PDb+kTpd6krwxbBfzECVxUsCt2VwOq1H+gBIS5D49og/TrdWE8vt19K1cd5Y6OGeK7HBvShpVdQmaRVvfOqggzAZGs8b4clfu9Rk2z1N9ujeKOFhnECPcJX1uS841SkZCFu6T5yz9gIseG1RC+FB/44WPGDbXxRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=x1HgDMk4; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-88a367a1dbbso162991076d6.0
+        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 11:18:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1767122297; x=1767727097; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VM8NU8RSIpNM+NAIMAH/BxvA1IJjsQyJhFywNUYlvYw=;
+        b=x1HgDMk4ssEqRfmZQcKUi/zCLvG4y5KlGvZd7TzQq1+bFiAA45qlsL8kp3S7Or5ucS
+         95GR/bEnfb03NE4+unBI2LWgMVaerZxVZTnPlRPQqxJbLeT+B9Hze5EYqJApKVp/53q6
+         DxbTgnhlDHIlAcOSIdIdZa5pVX0zsn3friT+FpA5zewRS9hRWKhK43vATosm17PaXbXJ
+         01qZB91JYlDGpHuL1DbCJ7DxjJV9PmXLKUFtJMeBnno3xDyFw3VV9tq/TmLaz5odPm31
+         AXFAqYQNZ3xTN+bV0dUz+WQtThqIuaP6LITs81TuAEyiEeWvqhP2sZuh4ZGb41C4Wk+E
+         RbxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767122297; x=1767727097;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VM8NU8RSIpNM+NAIMAH/BxvA1IJjsQyJhFywNUYlvYw=;
+        b=MA0w71+YdUZhp6I7m1eRGbekw4WzhKiicdh4WshFoFcuwD9uNogWPikvHODgVOdQTA
+         ZVV3b6cduUGDLciZzFckgqahMknKeopdEg4B98w3xRDuoTifG9hlGH6vjdhFELDWN+wW
+         MXPouTP4ztXzd57TaIVPy4yn48vW6bXId8wKYUYhbYPElF+XZUmFu0+cskNt0c7s8Z8n
+         zo6EW56MNhy40FCpllhzfp5Uc4hQp0nsU96RRPw6/SRKDNkor0nhMP6jCNN6/ubVClbQ
+         vQQqdpTyJBYYaTGbVq8rHjbqKghUi0253THonqgibzN7O2mxwW6Bp5UqFuj2rb3VpI4/
+         ikdg==
+X-Gm-Message-State: AOJu0YxgI2m/yry+oylATqbBjb1wGqPNhxSsXKt/KFq1qXpjCzm6y2Xv
+	DskBvQ5CcTQk7qszQMOFnFW37I2GqHfbA+qXSFFiNz/MAU5o9IGA1EA2dSwHnVjZXQ==
+X-Gm-Gg: AY/fxX43CV50MJvq+ulMQUcpzoi6p0SWqC28SqpikrM5z8oaCbtSSz+mLD8wYgt7IOI
+	0U0DN1NACa4iz/YLn7IuNfOVxMV+lmsOnx6dMUg1w+FH/rajvc5pmWqi7seKMDOc+NW4jksKySA
+	VJvMXY+nt1Mm36O+AUJmwhFxfhTSXmHShten0AR87yXdC2lWR9bhEzZgThIHSK2ng2K7d7Re+bO
+	U7WSO+5mpSTccDsOTQsHq7KQENtKXFvXtAMLwKny6wNAV10vadqxjsezPqDUcWUlHuwBNGRgvMl
+	SjovO+nxtlhaPsYeU1iSMhh3CgK/1NnxXs1OYUWF42fwgxT1L0orYNRkOcVPva0nUGTeuehgUXD
+	fFr6e7VX6O38dxmEewx/6cX3MDFl3w4zFKtlKiQ5ognDIh0vph4g4V39ATI4mvcQXAMt4XSIyH4
+	NAiMIuC4CmxESCSlr0R7Ws7BeLUOL6dYESoCG/6+FOcsI7niVruKkiE79QZvJunlORlBHN36e/
+X-Google-Smtp-Source: AGHT+IGiC1dIFyCwBPy9CVnUzumHuT6UcgGL2JyTN4OPzrLqsQHc5UnLOK/DQ9anSPNGyGpYH2dOYw==
+X-Received: by 2002:a05:622a:1a96:b0:4f3:4cd3:164c with SMTP id d75a77b69052e-4f4abcd2a94mr501219851cf.21.1767122296728;
+        Tue, 30 Dec 2025 11:18:16 -0800 (PST)
+Received: from majuu.waya (bras-base-kntaon1621w-grc-18-70-50-89-69.dsl.bell.ca. [70.50.89.69])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4f4ac62f973sm256121391cf.18.2025.12.30.11.18.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Dec 2025 11:18:15 -0800 (PST)
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	andrew+netdev@lunn.ch
+Cc: netdev@vger.kernel.org,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	victor@mojatatu.com,
+	Jamal Hadi Salim <jhs@mojatatu.com>
+Subject: [PATCH net 1/2] net/sched: act_mirred: Fix leak when redirecting to self on egress
+Date: Tue, 30 Dec 2025 14:18:13 -0500
+Message-Id: <20251230191814.213789-1-jhs@mojatatu.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2a1e3bdf-e6b0-4c6f-ac59-cda5ec565b82@lunn.ch>
-X-Authority-Info: v=2.4 cv=Sej6t/Ru c=1 sm=1 tr=0 ts=69541d81 cx=c_apl:c_pps
- a=azHRBMxVc17uSn+fyuI/eg==:117 a=azHRBMxVc17uSn+fyuI/eg==:17
- a=kj9zAlcOel0A:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=jnl5ZKOAAAAA:8 a=JsK1SPK4e216-w5R4n4A:9 a=CjuIK1q_8ugA:10
- a=RNrZ5ZR47oNZP8zBN2PD:22
-X-Proofpoint-ORIG-GUID: epIuVc9zcgsnq4mFuT0SgnnC9KF-Af0f
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjMwMDE2OCBTYWx0ZWRfX2O8/4Aqg+e0L
- LuzqyoFHa7AunJKhyJBUgVnSJ6sTjvGgHn1dJwXPWvFLe8K2L7VVzT2nxqJwXYYs3OXThCNt4kp
- NkhBawBtVvRK48yBVU452f4dEmbnM4vnqd4qQdbUdt2YPT2p26Qlk4VOr+qRNERkJH0ci64moXN
- odvWIQqh7ETGe0suxI6Lgo3Rl0o6ijvmAIXYrKn54VpN61JRWWfJNGshYnIKJy6eNmIy5kvkOgv
- Vx9c/GMw7ApJgyeDkoGYjjyoFQGlVOZAZKhkCIaU51TYRz411Aqpa3n/FbDUitRqpZei3QN5496
- NV2IJvybfuLjzxd33Wr
-X-Proofpoint-GUID: epIuVc9zcgsnq4mFuT0SgnnC9KF-Af0f
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-30_03,2025-12-30_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- malwarescore=0 mlxscore=0 spamscore=0 adultscore=0 mlxlogscore=363
- clxscore=1030 bulkscore=0 suspectscore=0 classifier=spam authscore=0 adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512300168
-X-JNJ: AAAAAAABzZCSw2rxN2xzCib0hoT3zdOphpmJr4yEPIAskY48vNPaBPOkfAXP0qz/l09tFPym6Zt/2zlrhASbbJBThJu0cb3m++RfRPHnITHgVKjzvBPe19ObbqPl/ydrGSDkOA6PZXKOtiIt5+bXNfE8ABoQvjVSzzP3a+dhfxrDncVFjSUqT9jemVCE0Ry2ydqhFmQkU+JEkzXZ4tm0dUEZH8l7h1S0o5co3DmYAZs+oAzOP2VSa2qWWmPywfKT6dnsDnpLwAhKDzaHq8uTsaANhS7mbAFAQDqoax3wJeMtU704HcjecedUbVKZGs2Tg4EVuo/wlHjWLPIhKo+xx6E7bNjEd1PuQPsDxptrp4+c20IiJTC/PM/L4Dznqe4pssTcV8aqGVtGDGExOvu1on+iqtwc1RiH3jd6W7x395IYPGvFcQnB6L0zAuUG7u0sAUjbfY0KKoBVItd01kwN691HzS0+SWCIywUWxKj7jCtxI7WwgRthPVCekCB3lrt+4PS97SDxJr4TswUr5Tc0fwMb+sCvbTRE2ZywDh2YdGMIn1qHVuEYJENm0uw07ewM7Kz0Ld3sso66tb9AZFqtFIwgbKCzcqMa9M4SHkhV96cacG+DpXwIARp8Z8jAdqiSzxKa1QoR2WUaAiX80jd+aZtO0o401jQQgvWY9/h6qXX1M+OLKLrL8uet7EXg06Lxb9GPWqMqGCjIQ99uwFb13P9xKIVcbP7hswq7ZPiseEFOLwws
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 30, 2025 at 07:38:01PM +0100, Andrew Lunn wrote:
-> > Sure, I've submitted the v2 patch here.
-> > 
-> > https://lore.kernel.org/netdev/cover.1767108538.git.yk@y-koj.net/
-> > 
-> > Following your suggestion, I've removed the unrelated TFO tests and
-> > the netdevsim test improvement. I will post the removed patches as a
-> > separate series once net-next reopens.
-> > 
-> > However, I kept the regression test for this patch in the v2 series, as
-> > the "1.5.10. Co-posting selftests" section in the maintainer-netdev
-> > document says:
-> 
-> Thanks for doing this. I don't know enough about netdevsim to be able
-> to do a proper review, so i will let somebody else do that.
+Whenever a mirred redirect to self on egress happens, mirred allocates a
+new skb (skb_to_send). The loop to self check was done after that
+allocation, but was not freeing the newly allocated skb, causing a leak.
 
-Okay, thank you for the early review!
+Fix this by moving the if-statement to before the allocation of the new
+skb.
 
-> 
->    Andrew
+The issue was found by running the accompanying tdc test in 2/2
+with config kmemleak enabled.
+After a few minutes the kmemleak thread ran and reported the leak coming from
+mirred.
 
-Best regards,
-Yohei Kojima
+Fixes: 1d856251a009 ("net/sched: act_mirred: fix loop detection")
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+---
+ net/sched/act_mirred.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+index 91c96cc625bd..c9653b76a4cf 100644
+--- a/net/sched/act_mirred.c
++++ b/net/sched/act_mirred.c
+@@ -266,6 +266,17 @@ static int tcf_mirred_to_dev(struct sk_buff *skb, struct tcf_mirred *m,
+ 		goto err_cant_do;
+ 	}
+ 
++	want_ingress = tcf_mirred_act_wants_ingress(m_eaction);
++
++	if (dev == skb->dev && want_ingress == at_ingress) {
++		pr_notice_once("tc mirred: Loop (%s:%s --> %s:%s)\n",
++			       netdev_name(skb->dev),
++			       at_ingress ? "ingress" : "egress",
++			       netdev_name(dev),
++			       want_ingress ? "ingress" : "egress");
++		goto err_cant_do;
++	}
++
+ 	/* we could easily avoid the clone only if called by ingress and clsact;
+ 	 * since we can't easily detect the clsact caller, skip clone only for
+ 	 * ingress - that covers the TC S/W datapath.
+@@ -279,17 +290,6 @@ static int tcf_mirred_to_dev(struct sk_buff *skb, struct tcf_mirred *m,
+ 			goto err_cant_do;
+ 	}
+ 
+-	want_ingress = tcf_mirred_act_wants_ingress(m_eaction);
+-
+-	if (dev == skb->dev && want_ingress == at_ingress) {
+-		pr_notice_once("tc mirred: Loop (%s:%s --> %s:%s)\n",
+-			       netdev_name(skb->dev),
+-			       at_ingress ? "ingress" : "egress",
+-			       netdev_name(dev),
+-			       want_ingress ? "ingress" : "egress");
+-		goto err_cant_do;
+-	}
+-
+ 	/* All mirred/redirected skbs should clear previous ct info */
+ 	nf_reset_ct(skb_to_send);
+ 	if (want_ingress && !at_ingress) /* drop dst for egress -> ingress */
+-- 
+2.52.0
+
 
