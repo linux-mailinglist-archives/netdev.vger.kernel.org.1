@@ -1,167 +1,175 @@
-Return-Path: <netdev+bounces-246387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F1F5CEAB88
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 22:32:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05217CEACA3
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 23:38:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 35E08300E02F
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 21:32:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ED8A0301B2DC
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 22:38:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69B6417A300;
-	Tue, 30 Dec 2025 21:32:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAE502BDC3D;
+	Tue, 30 Dec 2025 22:38:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="QIm3Ojxf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b2cOJ8YL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65688B67A
-	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 21:32:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69E803A1E94;
+	Tue, 30 Dec 2025 22:38:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767130357; cv=none; b=pbAtb3pLk4h57omTyI0Vr5dCVNK3HPhFzVv91sZ9E9Qt0QGFGbA9WiL+SmNfF97VORTVqddId19C38R7UAxiF160DSlxo7TvYN8W/TODou8J4MXVEcA024GAstvJNl5K3cTsz9etKXVr9HDITXsEydz4EClnzJ8nZ3W4q4LZxdY=
+	t=1767134293; cv=none; b=DsU9ExFeZpQLf3LgXrU/csOUCvV7sP49pIVvjgjnlEoJLQlyZzgf13qyN6EI6irAo7d8s5jFetZ3WjC/x8rLWUsBI2pSRCRW+8aN8ryyhXkVW2Bc1UGswXiwczB0Z0TBy01E51X5hFhxzLq2b+K/VRUfoAB3xSDjhVIk9kCH6jU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767130357; c=relaxed/simple;
-	bh=LMT9Jyiy4vv5NU3wSzYm3bllk24aUfp+Jtz17CtDuyo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dIxKfkp0xtc8GSJvJWuQ662NYoEtdHLgC9Px0WjvBqGaHLCLFaOTKg8bXXvtWZPNMsn6Wc+0udwMZPcAR08Jw7nRyBICk86tpRJR1bnU/pMv4MdZF/nn7GiTxe48YprEnPl1TDz46XrCsigzjaI/WFwRVPOrTAPl+MdeBoUCGnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=QIm3Ojxf; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2a0c20ee83dso131600125ad.2
-        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 13:32:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1767130354; x=1767735154; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fogvJd7M6/3tAIpQswcL6Bh1r+vFqYoyUCG2xTi3sL4=;
-        b=QIm3OjxfRgqFoC6rnslNm1gqp2fvMkrE2fDTzrXr0PUqyfoAPB/0unxfVjPMKSeZIY
-         qqOQB++VQybng94hqrA2wZa4a6/p6eM3wnkMW4HUyFLtbUB6IatC4ToKaose95ZxU52S
-         ne//yphTOtlYNd4qTllEMaFkhB08EVGv9Md0MtKCyQ4FI53jZMQsrRpalFJuUXQZ3Pvm
-         CwqMa7AtL7WKYa1VSvno/allo6AWthEqwTPbj/x24qJJ1Pj/w/odl2tZGmfm1DJmou8M
-         ROgeYUXu5zmL4pEO6t26q5qW2vOynd+LnXQwqQRLIPK2XilOG3ZJBxG22DDc6polL0Ys
-         He/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767130354; x=1767735154;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=fogvJd7M6/3tAIpQswcL6Bh1r+vFqYoyUCG2xTi3sL4=;
-        b=Bt6iBnXgJdqMy8M+Jo5GvRyqeOZugqUlfKFOKRnN0pfxsLmyN8JsrQ85bndFu/RG+a
-         Ec2W5ML28MJoHX6R4yLNZVvTGyw/jVbgYGGQ2b3KcJcf5gjTlPPcJZEBqk5N3DZbVRZv
-         XiE9tr5jOpgfGtGoaybmwuMBhiNfYhrR7QZbH4vLIkGodvRAlj0s9q441E/W1dajhWxr
-         BZHwQTewEheoyvkNo1CHWj8ErMowjeEnVcFNZjuiw9YbJaF9iFXuq4KaU1g/1FGQE5PA
-         4cKBrnffDYfH+PVqyVDbOt1qyAkAIvcjgT8NWmEH1lueH8exvm6L1nzpQAWElj8WTv6H
-         4whQ==
-X-Gm-Message-State: AOJu0Ywaw6xXWya+4PiKBNlsyjbybzaU2zbXLhraSQSu9mbE/9osLMNZ
-	UOzLFWuDZOjFMXR7vEVEYlKfQFBAxg/UwfJ31O9CVtNg3XP5qzpEZ+g8Dm0ROU4P3dhI078zLjX
-	OfEiD1cGQpCzNhlerjrqKB9mxdAKJsNxOiVeUHBTZ
-X-Gm-Gg: AY/fxX5pGUp0TF3UFYfMyeaG/Up/1K/4CAIOUx9H57qzcJp6wPv5yyPWsUOjHRRTSEG
-	8moNNlq9wQhXIiofOoxMyL8a+l24fs9w9P7r65diG21alGly065CY016VIYyawWn+kMpFmopAeQ
-	1r81pBR5GL9/CNcroJvqbDSYbX4OdOjyM3B2fCMPh05mhX8giJG6yu3veWbPhAarqlsT/fYXgxe
-	PoWhu/ur+7Q5SlkG2Zo6ptLbIyxdL6bq9QRiVXO8YSOYJsKmHRBs1ZY1WsG6O+Z4YArSvFh6Kmh
-	idY=
-X-Google-Smtp-Source: AGHT+IGyGlmzTAaqM9W565PMF5auSkaF2mhId1J+Bp+ymXbnvxWOW9ForqZWNORcQQiia3tNeVXDdbKiGBVNE19Q6KY=
-X-Received: by 2002:a17:903:249:b0:2a0:de4f:c9b with SMTP id
- d9443c01a7336-2a2f222b700mr359098975ad.4.1767130354566; Tue, 30 Dec 2025
- 13:32:34 -0800 (PST)
+	s=arc-20240116; t=1767134293; c=relaxed/simple;
+	bh=Tb3tynnxxnwuANiHqkonp4fihfVrESQp6TRTMLE8/iI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WJrfDkpfeXjLSYcJWvwD1W7xBh1FYhPymnoFwjgrXd8X8AcOmOYUE3djMkwOqAPRyyiO4dFNQfruPEFp8633QtbgUt8QuNflpFjxHaZjWbEoJ9XzwJc0qw9Z51qxo+aQ9bNhjvx2FVFJzqzYl7dJeiStQvF9V1478AcIGk7Ba+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b2cOJ8YL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69369C4CEFB;
+	Tue, 30 Dec 2025 22:38:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767134292;
+	bh=Tb3tynnxxnwuANiHqkonp4fihfVrESQp6TRTMLE8/iI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=b2cOJ8YL9H3+tcxp0RAQnc5CQYnXPXOwJghUPMxwUA9nJ6+jdDVbBaf+CVtGr49mj
+	 NcFoZvSde20KbB6f29qNdHoYvCrrD9KXIKSkLSESSZU3CeFKhgKvmeLsIKz36l3BDv
+	 ZqHDMjOeFqTCfC1E3RRn+MqTIhX3ZzoVKL9GVwFxgm5PZpPnoEShKS6g+GEHhM3T5R
+	 Ak3KCLfwYwDPNgJrx7tv306BftuJfE5/umRJJVfDTi/6tf7wCvTJtzXWSTNibia4VO
+	 e+wO+Ccg/vgWi85o7qxny3KxKBVON1mdMm8lbrc3w/6NSbRmm//YBotNrxpr9frRna
+	 8XuNauqTZD6tg==
+Date: Tue, 30 Dec 2025 23:38:09 +0100
+From: Frederic Weisbecker <frederic@kernel.org>
+To: Zhang Qiao <zhangqiao22@huawei.com>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chen Ridong <chenridong@huawei.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 01/33] PCI: Prepare to protect against concurrent
+ isolated cpuset change
+Message-ID: <aVRUUXa6kJKHHQ_n@pavilion.home>
+References: <20251224134520.33231-1-frederic@kernel.org>
+ <20251224134520.33231-2-frederic@kernel.org>
+ <e01189e1-d8ef-2791-632c-90d4d897859b@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251230191814.213789-1-jhs@mojatatu.com>
-In-Reply-To: <20251230191814.213789-1-jhs@mojatatu.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Tue, 30 Dec 2025 16:32:23 -0500
-X-Gm-Features: AQt7F2pEjLPjspsKCAlsX8Gx6PEseFqXYj7y9bNphRqI85JJf3g8bvmQhi5mc6Y
-Message-ID: <CAM0EoMmDfrgH7wbguUf+T+mos2ehnm4cnwCGxY4+tZ79_7zB8A@mail.gmail.com>
-Subject: Re: [PATCH net 1/2] net/sched: act_mirred: Fix leak when redirecting
- to self on egress
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, andrew+netdev@lunn.ch
-Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
-	victor@mojatatu.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e01189e1-d8ef-2791-632c-90d4d897859b@huawei.com>
 
-On Tue, Dec 30, 2025 at 2:18=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
- wrote:
->
-> Whenever a mirred redirect to self on egress happens, mirred allocates a
-> new skb (skb_to_send). The loop to self check was done after that
-> allocation, but was not freeing the newly allocated skb, causing a leak.
->
-> Fix this by moving the if-statement to before the allocation of the new
-> skb.
->
-> The issue was found by running the accompanying tdc test in 2/2
-> with config kmemleak enabled.
-> After a few minutes the kmemleak thread ran and reported the leak coming =
-from
-> mirred.
->
+Le Mon, Dec 29, 2025 at 11:23:56AM +0800, Zhang Qiao a écrit :
+> Hi, Weisbecker，
+> 
+> 在 2025/12/24 21:44, Frederic Weisbecker 写道:
+> > HK_TYPE_DOMAIN will soon integrate cpuset isolated partitions and
+> > therefore be made modifiable at runtime. Synchronize against the cpumask
+> > update using RCU.
+> > 
+> > The RCU locked section includes both the housekeeping CPU target
+> > election for the PCI probe work and the work enqueue.
+> > 
+> > This way the housekeeping update side will simply need to flush the
+> > pending related works after updating the housekeeping mask in order to
+> > make sure that no PCI work ever executes on an isolated CPU. This part
+> > will be handled in a subsequent patch.
+> > 
+> > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> > ---
+> >  drivers/pci/pci-driver.c | 47 ++++++++++++++++++++++++++++++++--------
+> >  1 file changed, 38 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
+> > index 7c2d9d596258..786d6ce40999 100644
+> > --- a/drivers/pci/pci-driver.c
+> > +++ b/drivers/pci/pci-driver.c
+> > @@ -302,9 +302,8 @@ struct drv_dev_and_id {
+> >  	const struct pci_device_id *id;
+> >  };
+> >  
+> > -static long local_pci_probe(void *_ddi)
+> > +static int local_pci_probe(struct drv_dev_and_id *ddi)
+> >  {
+> > -	struct drv_dev_and_id *ddi = _ddi;
+> >  	struct pci_dev *pci_dev = ddi->dev;
+> >  	struct pci_driver *pci_drv = ddi->drv;
+> >  	struct device *dev = &pci_dev->dev;
+> > @@ -338,6 +337,19 @@ static long local_pci_probe(void *_ddi)
+> >  	return 0;
+> >  }
+> >  
+> > +struct pci_probe_arg {
+> > +	struct drv_dev_and_id *ddi;
+> > +	struct work_struct work;
+> > +	int ret;
+> > +};
+> > +
+> > +static void local_pci_probe_callback(struct work_struct *work)
+> > +{
+> > +	struct pci_probe_arg *arg = container_of(work, struct pci_probe_arg, work);
+> > +
+> > +	arg->ret = local_pci_probe(arg->ddi);
+> > +}
+> > +
+> >  static bool pci_physfn_is_probed(struct pci_dev *dev)
+> >  {
+> >  #ifdef CONFIG_PCI_IOV
+> > @@ -362,34 +374,51 @@ static int pci_call_probe(struct pci_driver *drv, struct pci_dev *dev,
+> >  	dev->is_probed = 1;
+> >  
+> >  	cpu_hotplug_disable();
+> > -
+> >  	/*
+> >  	 * Prevent nesting work_on_cpu() for the case where a Virtual Function
+> >  	 * device is probed from work_on_cpu() of the Physical device.
+> >  	 */
+> >  	if (node < 0 || node >= MAX_NUMNODES || !node_online(node) ||
+> >  	    pci_physfn_is_probed(dev)) {
+> > -		cpu = nr_cpu_ids;
+> > +		error = local_pci_probe(&ddi);
+> >  	} else {
+> >  		cpumask_var_t wq_domain_mask;
+> > +		struct pci_probe_arg arg = { .ddi = &ddi };
+> > +
+> > +		INIT_WORK_ONSTACK(&arg.work, local_pci_probe_callback);
+> >  
+> >  		if (!zalloc_cpumask_var(&wq_domain_mask, GFP_KERNEL)) {
+> >  			error = -ENOMEM;
+> 
+> If we return from here, arg.work will not be destroyed.
 
-Grr. There is a bug in the print - i will send a new version tomorrow.
+Good catch! Thanks.
 
-cheers,
-jamal
-
-> Fixes: 1d856251a009 ("net/sched: act_mirred: fix loop detection")
-> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> ---
->  net/sched/act_mirred.c | 22 +++++++++++-----------
->  1 file changed, 11 insertions(+), 11 deletions(-)
->
-> diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
-> index 91c96cc625bd..c9653b76a4cf 100644
-> --- a/net/sched/act_mirred.c
-> +++ b/net/sched/act_mirred.c
-> @@ -266,6 +266,17 @@ static int tcf_mirred_to_dev(struct sk_buff *skb, st=
-ruct tcf_mirred *m,
->                 goto err_cant_do;
->         }
->
-> +       want_ingress =3D tcf_mirred_act_wants_ingress(m_eaction);
-> +
-> +       if (dev =3D=3D skb->dev && want_ingress =3D=3D at_ingress) {
-> +               pr_notice_once("tc mirred: Loop (%s:%s --> %s:%s)\n",
-> +                              netdev_name(skb->dev),
-> +                              at_ingress ? "ingress" : "egress",
-> +                              netdev_name(dev),
-> +                              want_ingress ? "ingress" : "egress");
-> +               goto err_cant_do;
-> +       }
-> +
->         /* we could easily avoid the clone only if called by ingress and =
-clsact;
->          * since we can't easily detect the clsact caller, skip clone onl=
-y for
->          * ingress - that covers the TC S/W datapath.
-> @@ -279,17 +290,6 @@ static int tcf_mirred_to_dev(struct sk_buff *skb, st=
-ruct tcf_mirred *m,
->                         goto err_cant_do;
->         }
->
-> -       want_ingress =3D tcf_mirred_act_wants_ingress(m_eaction);
-> -
-> -       if (dev =3D=3D skb->dev && want_ingress =3D=3D at_ingress) {
-> -               pr_notice_once("tc mirred: Loop (%s:%s --> %s:%s)\n",
-> -                              netdev_name(skb->dev),
-> -                              at_ingress ? "ingress" : "egress",
-> -                              netdev_name(dev),
-> -                              want_ingress ? "ingress" : "egress");
-> -               goto err_cant_do;
-> -       }
-> -
->         /* All mirred/redirected skbs should clear previous ct info */
->         nf_reset_ct(skb_to_send);
->         if (want_ingress && !at_ingress) /* drop dst for egress -> ingres=
-s */
-> --
-> 2.52.0
->
+-- 
+Frederic Weisbecker
+SUSE Labs
 
