@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-246340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E670CE96A7
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 11:35:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 999F2CE96AD
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 11:35:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 41256300DC96
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 10:33:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0013830321CA
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 10:33:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10CC82E7F25;
-	Tue, 30 Dec 2025 10:33:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67F5C2E9730;
+	Tue, 30 Dec 2025 10:33:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Po9DcAYw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KOVKQNMw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D745D2E6CDB;
-	Tue, 30 Dec 2025 10:33:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE9E2E8DFE;
+	Tue, 30 Dec 2025 10:33:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767090806; cv=none; b=kSeSGKtlE4T3tzdUS+dhxmawVYcdVvjH1jwliPOV0V4VAzLU6h2NZ2WUxOQ0w0lAGEDPw+GNUTVTza8hrCXW8RJ17bkv+wPz31gQBtIRZkw3bMWFYlEj1B47Xno+3PiNECgfA138Zk1s4RepGyTQCu7KE/Gw0NshUqnqq7hkbJk=
+	t=1767090807; cv=none; b=s65C8NDvohnujepBj8OZ32obECwsyvYJfzMPVHfXhZ/rPuj1nqVzQeRME2kFJ0dAVlpxlekYxXWSSlGLUgfYxNS95mDNX1lRRSqBjcYpRUPsdP6k5IBLs/+Jl5tNg6nidUfiITcxaJk/9cfrDFTAtbFyu33yXwIYY0JBrvpCEPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767090806; c=relaxed/simple;
-	bh=NjopScScNjiTaDj0Pt/NIrfapPm/FVFgEDlh1wyz6rE=;
+	s=arc-20240116; t=1767090807; c=relaxed/simple;
+	bh=2ANyrjuANu+qFdsCi/uswp1/kr4bYlks/T/a0CCxBJw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=VCMHz8Y3KYO358+6kgIRC+On178nKwpTuuIuXwm8JOUnZPoT6UX8PnW6Kue3N/tfFZUz5WlQrlMqJsRNQsv9hj9k721tJRInskEsook6Q6UZecMOv38I4FjW4ZapZLPb30pxUGQ9CmEoYBPoWVE9CrDN4oc/MpXM8WzJAXpkRsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Po9DcAYw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FB30C4CEFB;
-	Tue, 30 Dec 2025 10:33:25 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=kGybK2a0RrvQhPUvvJf/kOKtqUYG5aKL1xoYIZyeDnOH+vdvgy297SjiNtY2OwXUBg2EYEPe3j0CF0WMidF7mwg6fO2+p4HXh6NEact21Y/VcUxClA+zIS3SSYFFKZjiz4PTkCOiWi0VyrPbRisaQO6KCVQXPG/jlRvgssnQN+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KOVKQNMw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1434C4CEFB;
+	Tue, 30 Dec 2025 10:33:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767090805;
-	bh=NjopScScNjiTaDj0Pt/NIrfapPm/FVFgEDlh1wyz6rE=;
+	s=k20201202; t=1767090806;
+	bh=2ANyrjuANu+qFdsCi/uswp1/kr4bYlks/T/a0CCxBJw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Po9DcAYwY5tIE4dEQ86vPWJZaTUjXFQR1kHTj2umcizKxLAAH1ps5b3JH3h6/UiLf
-	 6AEczmi3teGvrkym2s8rhCqVGEyZXNpHCenWNaBpObeFSE8LnPNp8FIgO4NpDys/2x
-	 hgVnFGM+IBTvcts62LHn79uM4Mi6jvthKt3dSkqeNXFsXvLkWA7PUqYAN8gEJ1aVNk
-	 IK6gQpdZsvzr5jlwwC1NCM3l6Y4ouyGQjbEzkjhLjIIv+IC103pfqjhk+MPQPOogqL
-	 oLyELfnV57TqFukcx9F7Y+Z9mJRXu9DTsdqF/Zyo+uXt0S7ZMIrXu93hwYbsPMi/lF
-	 AXcYTXzKEIRZg==
+	b=KOVKQNMwdDFwqbH4SmQoIlN/hXALuhjQIc8sZMUz3iRwDP+bf89SVPshjmCUlqMPA
+	 l9aidOgKIBWFx/HQyS04ma8yi2yNncaXLvKeBDkzsv93gIz/ou6TUz5RdBvKtxQg7D
+	 PYLYHPzPhdOeAvE5VQDg0FkXs2D1w/Jf9iMlDZloe+XnxEtAapsmCq4su/lkQA+cXP
+	 M47hch38NbhcvnOL+vx1czoJDB7VsPs4CK13zE5uunZANbCs6Zb4jOAAanBTrjK8Vw
+	 piWKSrz4Cz2Ewa/X5acnhfNv97/8ylbQyK2dBPiCTcOK/T5x+M1vxGPCZqHS0ty1lR
+	 fUVv7Uk6XqCSg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B59753808205;
-	Tue, 30 Dec 2025 10:30:08 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B7373808205;
+	Tue, 30 Dec 2025 10:30:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,37 +50,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net] net: enetc: do not print error log if addr is 0
+Subject: Re: [PATCH net v3] net: macb: Relocate mog_init_rings() callback from
+ macb_mac_link_up() to macb_open()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176709060754.3205848.10930624411819154546.git-patchwork-notify@kernel.org>
-Date: Tue, 30 Dec 2025 10:30:07 +0000
-References: <20251222022628.4016403-1-wei.fang@nxp.com>
-In-Reply-To: <20251222022628.4016403-1-wei.fang@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
+ <176709060877.3205848.3719021860077682100.git-patchwork-notify@kernel.org>
+Date: Tue, 30 Dec 2025 10:30:08 +0000
+References: <20251222015624.1994551-1-xiaolei.wang@windriver.com>
+In-Reply-To: <20251222015624.1994551-1-xiaolei.wang@windriver.com>
+To: Xiaolei Wang <xiaolei.wang@windriver.com>
+Cc: pabeni@redhat.com, nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
  andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, imx@lists.linux.dev
+ kuba@kernel.org, rmk+kernel@armlinux.org.uk, Kexin.Hao@windriver.com,
+ Xiaolei.Wang@windriver.com, netdev@vger.kernel.org, stable@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Mon, 22 Dec 2025 10:26:28 +0800 you wrote:
-> A value of 0 for addr indicates that the IEB_LBCR register does not
-> need to be configured, as its default value is 0. However, the driver
-> will print an error log if addr is 0, so this issue needs to be fixed.
+On Mon, 22 Dec 2025 09:56:24 +0800 you wrote:
+> In the non-RT kernel, local_bh_disable() merely disables preemption,
+> whereas it maps to an actual spin lock in the RT kernel. Consequently,
+> when attempting to refill RX buffers via netdev_alloc_skb() in
+> macb_mac_link_up(), a deadlock scenario arises as follows:
 > 
-> Fixes: 50bfd9c06f0f ("net: enetc: set external PHY address in IERB for i.MX94 ENETC")
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+>    WARNING: possible circular locking dependency detected
+>    6.18.0-08691-g2061f18ad76e #39 Not tainted
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,net] net: enetc: do not print error log if addr is 0
-    https://git.kernel.org/netdev/net/c/5939b6dbcda8
+  - [net,v3] net: macb: Relocate mog_init_rings() callback from macb_mac_link_up() to macb_open()
+    https://git.kernel.org/netdev/net/c/99537d5c476c
 
 You are awesome, thank you!
 -- 
