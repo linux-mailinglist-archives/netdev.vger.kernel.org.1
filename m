@@ -1,54 +1,98 @@
-Return-Path: <netdev+bounces-246313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE803CE93E5
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 10:42:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0801ECE93F1
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 10:43:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C33F5300206D
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 09:42:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7276A301C90C
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 09:42:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 885ED2C21D8;
-	Tue, 30 Dec 2025 09:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914EE2D480E;
+	Tue, 30 Dec 2025 09:42:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="jSIagAW4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vp4I4MmK";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xvl3Ppnx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [217.72.192.78])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326082C033C;
-	Tue, 30 Dec 2025 09:42:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB2C2C3251
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 09:42:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767087762; cv=none; b=ou6yxAIqsU5UCP+C3vo7K8bWvomPNKLT7ztprN+W8PpCdDVaQojjvYMvDH+uZeD6jPhAvVFXbPALit+Optpy/W6lOxi7oj734LT/N1OeFY9rZWL+Y6M1SC9JIGQasfijXIyzSTrQHIfaXKDHniB9FT7VCs0GFW6Ojl1TLLrDCKk=
+	t=1767087777; cv=none; b=VajNmNblm7O5l0UbvshqUoFkLUL/zjBEBa5OSL+sR8sfjSm/fxS6U/EjT6HqdK9tGL5KEWwNLXSOCjnOcJx4k0BW3kDGaaX/TdIk8pMMsrBlPgm+p5jjVfm7KGczvMHQ4jEQbD9lZdMVQwk/UICBgz40IHzThfNQKz4mBaybpeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767087762; c=relaxed/simple;
-	bh=XmqKIy9cnklve1BV71QOG3wfHWFkj4jPxiUdfwlPgPM=;
+	s=arc-20240116; t=1767087777; c=relaxed/simple;
+	bh=SU/gkVSJSKmS1toUh8a9AX9Zwej8Gg1TuhVWXdqgfeM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=U2oZfX5py8aLGVLhwReQGzk+y96LuVfeC0qPSI97xd1qbLyrbkKqKN881+/VKpuAapoiZYhzJvHV3kRy8iwdrKsvHLbx8VB9gV2EkZ3i89fZ+vyIIhC2IaLzvbiWAFoP/CA9mptgiN6CF1jK+Dg8DxX5hXkRCBKtf+7ZX/zBinI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=jSIagAW4; arc=none smtp.client-ip=217.72.192.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1767087744; x=1767692544; i=markus.elfring@web.de;
-	bh=GSOjd40VlSlbou9mKAeILtRlZtg68k4M7wE/MNX/JyE=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=jSIagAW4ZukCNkfYb2KA6wXczmmwZWVFFU2aauF3TggWnBJRoBoidZ9WvsenbJEt
-	 ghaYvejLesmv/YpkhGPPq1EwN//uVK4byGs1GUTjcM9Hnr5vYTT7DIo8IrnZhe+d9
-	 PkeYQ1unfZ0n8Scr+HQA6iSY97Zv5UQhR7cIJDV0O3aw1IRxPY41C6jD1coE2B+ZC
-	 9H6FBYFGlSTG5SUOtQwADUJ4/RJhuTvwtWg3lk7fBAL4TTbW66ANYQzrt1Wpzkn/E
-	 AOGlKl7mstIsoxRI9PjIM3+HiM9KLEjHsiyi2lB9leX8tBOYhcuas1vLhTyg9+xr9
-	 gKHqmGqWKaw7sjlEMg==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.93.0]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1N9cLf-1vxHu92sLN-00vuk2; Tue, 30
- Dec 2025 10:42:24 +0100
-Message-ID: <a79bed83-8a43-4ed8-94d4-542b7285835e@web.de>
-Date: Tue, 30 Dec 2025 10:42:22 +0100
+	 In-Reply-To:Content-Type; b=Z+9BbHfL/qmq6yUVXWN+T13kXlDSmfXOTBvyJbgZqDrY77kcwxxdLWutZbf8OEHr1Fx3ngA5fFSgnJYOGEGJS34EPGvuMoQfmO2Qpb9blL7XDgd67rLElUz2mL7jpJRKQtMGPlHVBzfapgSTIUVYgGy3xD1tZLIOkF1W878ANPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vp4I4MmK; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xvl3Ppnx; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767087774;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q9/bKFXPzIaEZ/uggKugW5GizuegwuaRhWjx7DK7tW0=;
+	b=Vp4I4MmKubqCsQ+bGeKHvxIxKkxKySm5OkuRtb9IvksBZToddEVR1TlzSsBxy9zRjE1grE
+	+qqp1GXGorwVAWYi+H+LIZM5xtP9gV4rxtvx9UERQFfGBOC2B0JyyQzOgUjplIyG0bHgIL
+	EdBmTK9T+159c53R+WrUWgoniKOGcro=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-460-L-i0QONNPAqcIlhoEfxOOQ-1; Tue, 30 Dec 2025 04:42:51 -0500
+X-MC-Unique: L-i0QONNPAqcIlhoEfxOOQ-1
+X-Mimecast-MFC-AGG-ID: L-i0QONNPAqcIlhoEfxOOQ_1767087770
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-430fc83f58dso5479025f8f.2
+        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 01:42:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1767087770; x=1767692570; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Q9/bKFXPzIaEZ/uggKugW5GizuegwuaRhWjx7DK7tW0=;
+        b=Xvl3PpnxqJ8ShPtrHMNnbUU40XyeJSVfCzxWQfJWZM7In46jKQnpEt3DDDNWlulBRT
+         8VQq6DyPJyqzTz830FwvbWoQSFE3jCh0RFTi2AU29XhRjsD1x8jIUlJDfd1YM11EJl5X
+         mqWVJDPRMHgIvNnJevB8jZD+kTGKNWHig4MsUNZ69nQAP3xDHKJpzCutB8Vsexg6150q
+         EavwzHnGnGxwvvOTEOGHmRRFoM7I6Q5z7VEsK9uaix2msUbw3A2VB5ObhvlJnT1bpTua
+         ffkQ9zsMczDMrhYimfP/lFqGCM4rHUAeFjT9t1j7oR7TDVxNcrdX953CjsVOb+vyDG7Z
+         UHGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767087770; x=1767692570;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Q9/bKFXPzIaEZ/uggKugW5GizuegwuaRhWjx7DK7tW0=;
+        b=RJqjmHq7/T7F/J/HhNcHtL6S7qODbtY0+s/zAiXXMSCiLlGZRJkvt/zQYAkLW/g74p
+         bXI1Ynwn6H19jwbfBGGTaokFDytEY1IpitTKQJQrMKorkU+E/ylyWQ4EljXmo5D54G2y
+         rhG08PKvZDPgMy9bxGCXSlbjKRhnGyKrfXLbwfRk5Ujmtg4M9Fc4o8ZyWS/iewKCYMJB
+         EzkmwFgtqiytVeRtWacKWQ/1A15LeMj9Ano6WyEc5E85PAtgIyKJLapQdKhxk75D4qlJ
+         QYc6XEXZ5haAZGV2DtZjWK7eaHKO0AcR72jdagqeu0EioDm9x1U8PQo6HGOiWOkDZovz
+         +VOw==
+X-Gm-Message-State: AOJu0Yww+CPUB0rNJJiEMcc8zm0jxfg+FX3a6mo6ti+sP/TB0HY9OHlC
+	fB9JYd84LPhF9NRulct6hDn52uiit2O+KQAR5ARHT8mI1MrjrEM2NbulR3/6ciY3vPXCKP0Y3lp
+	JXzeoylLMrhGvnpgRZ/NTAHCLv41B4kiiPDJPMIjf5OwMxlM4Hk5m9fbOcA==
+X-Gm-Gg: AY/fxX6vu04+WaxT9UTEpHVf7/tjECy/DjoY3/tu9Jga2W6XkhNMEwIn/ip/91HVbS2
+	RAt0bvYUfvc0DcSz36svxlN560/oTGHfHSRRjCYbkXVDIdwy/oGS28xd3iPmBXOV67YL952fGKv
+	mFB8KNlpWmpJpuB/4Iww1/QVxpYGtLyG6xMvzLBuiQjdgFg/53oZaU2Bv2YglCk50qsGtDuv1F9
+	FBi5PeNBl6BCGCXoWWu1XgHXbreKNGXoDC613eds3WH7KrYPbb03B6s2stf9+oPYtsYWuWos20Q
+	vyEzVQ2BAf+PrHZfMlIe2WlA8OL0EZHMnj35S09pUHEbUEYul7GUYddYdbA9r4q5ZHTdQ27KrSb
+	4k7y4ef3jdpUi
+X-Received: by 2002:a05:600c:8b06:b0:477:a977:b8c5 with SMTP id 5b1f17b1804b1-47d34de6358mr303808845e9.31.1767087770031;
+        Tue, 30 Dec 2025 01:42:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE3Zx9lRdKfuZUc0CFMcTPCHEvkS3FVBu+fC+b4QW1XnjJD/mHOaw+2kjvzo31uDZK3uXx8xw==
+X-Received: by 2002:a05:600c:8b06:b0:477:a977:b8c5 with SMTP id 5b1f17b1804b1-47d34de6358mr303808595e9.31.1767087769680;
+        Tue, 30 Dec 2025 01:42:49 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.153.12])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be3a4651bsm250192045e9.7.2025.12.30.01.42.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Dec 2025 01:42:49 -0800 (PST)
+Message-ID: <3d6fbc23-e9b8-443c-badb-b3380b62d21f@redhat.com>
+Date: Tue, 30 Dec 2025 10:42:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,127 +100,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: wwan: iosm: Fix memory leak in ipc_mux_deinit()
-To: Jianhao Xu <jianhao.xu@seu.edu.cn>, Zilin Guan <zilin@seu.edu.cn>,
- netdev@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Johannes Berg <johannes@sipsolutions.net>,
- Loic Poulain <loic.poulain@oss.qualcomm.com>, Paolo Abeni
- <pabeni@redhat.com>, Sergey Ryazanov <ryazanov.s.a@gmail.com>
-References: <2835cc53-326d-41d4-9ca5-1558c0ccbbaa@web.de>
- <20251230092532.1145752-1-zilin@seu.edu.cn>
-Content-Language: en-GB, de-DE
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20251230092532.1145752-1-zilin@seu.edu.cn>
+Subject: Re: [PATCH] Fix PTP driver warnings by removing settime64 check
+To: Tinsae Tadesse <tinsaetadesse2015@gmail.com>, richardcochran@gmail.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20251229173346.8899-1-tinsaetadesse2015@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251229173346.8899-1-tinsaetadesse2015@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:KYu3y2aFGD3vMkvPGPThL0Lgr4n7pFDelEFMtz562Ja7o8wgh52
- vZ8+AdNcWjzB7XCr2z2fCPC2zPO5s+dAAdh+KXjO12QxoJro2HH0L93Jnp1p9bzW+2qs6jt
- RE7bIMjkqnkRFuAOiw0UYsJG9+TuFkjWkLXIrxf6sDvOm0CVDDtP4vTHZiFi8ofV6qWOyj6
- 4ajmKcvvlTJUIcVlBuO2Q==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:9qTOH6/4xto=;aLy0C3ki1CRw3hcPrmU+Dz4mH3M
- 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
+Content-Transfer-Encoding: 7bit
 
->> =E2=80=A6
->>> +++ b/drivers/net/wwan/iosm/iosm_ipc_mux.c
->>> @@ -456,6 +456,7 @@ void ipc_mux_deinit(struct iosm_mux *ipc_mux)
->>>  	struct sk_buff_head *free_list;
->>>  	union mux_msg mux_msg;
->>>  	struct sk_buff *skb;
->>> +	int i;
->> =E2=80=A6
->>
->> May this variable be defined in the loop header instead?
-=E2=80=A6
-> Thanks for the suggestion.
->=20
-> I would prefer to keep the declaration at the top of the block
+On 12/29/25 6:32 PM, Tinsae Tadesse wrote:
+> Signed-off-by: Tinsae Tadesse <tinsaetadesse2015@gmail.com>
+> ---
+>  drivers/ptp/ptp_clock.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+> index b0e167c0b3eb..5374b3e9ad15 100644
+> --- a/drivers/ptp/ptp_clock.c
+> +++ b/drivers/ptp/ptp_clock.c
+> @@ -323,8 +323,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+>  	size_t size;
+>  
+>  	if (WARN_ON_ONCE(info->n_alarm > PTP_MAX_ALARMS ||
+> -			 (!info->gettimex64 && !info->gettime64) ||
+> -			 !info->settime64))
+> +			 (!info->gettimex64 && !info->gettime64)))
+>  		return ERR_PTR(-EINVAL);
+>  
+>  	/* Initialize a clock structure. */
 
-Do you tend to interpret such information still as the beginning
-of the function implementation?
+I guess this is an attempt to address the following issue:
 
+https://lore.kernel.org/all/20251108044822.GA3262936@ax162/
 
->                                                                to mainta=
-in=20
-> consistency with the existing coding style of this function and to keep=
-=20
-> the patch focused strictly on the fix.
+If so, it's already fixed by commit 81d90d93d22ca4f61833cba921dce9a0bd82218f
 
-Would the mentioned variable be relevant only for an additional if branch?
+/P
 
-Regards,
-Markus
 
