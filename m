@@ -1,170 +1,161 @@
-Return-Path: <netdev+bounces-246385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32057CEA87E
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 20:18:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 45D34CEA8B0
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 20:36:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2ADCA301B81E
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 19:18:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 645BC302E04E
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 19:35:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A8EC2DC767;
-	Tue, 30 Dec 2025 19:18:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83A8B2E6CC7;
+	Tue, 30 Dec 2025 19:35:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="zuzb+alh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V51zEPOV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C51F427145F
-	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 19:18:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9DD28489E
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 19:35:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767122301; cv=none; b=gLTJTdqCn9aZS1+mBrJv5+Or99BMxo4XK7sew276VPG++hF7dGx5zbQSKwNFdVAM+YUjUaYn/Hyj3t/fnrfRSsQyUI72MCC4hsjDOZgjxWagZEv3NXzKBLw3UeyZJ9sG9DOpTlsIQ45rWmyOt9EWpUX2gfmKrr9Sv8KKCJCjftc=
+	t=1767123350; cv=none; b=aVBWW04ufU9rzb7+mUW6mOMUX/+VAHUrM7ellC2rMe4mc+C1YY+dSjreTvpQyatIlicMuVw9N89XGABvWmVwVenrTPB7pq1u/PnpCBKfg7LpxPtHBSLalNxZQo/BVEdXFoNL9huLJLq2QyukTiMY5/QoeG1VeUNM1JTP11Jjh+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767122301; c=relaxed/simple;
-	bh=z9omgvc12kkRDC5d1qizZewxjVlwGlpOy3feVmGOZyM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=u+HeZShU+HoqKjVyXYpunDTfusUvc0ZlQFbzSp7YSejizQLs23atym62DoeS53kDpoooGxX+7GYKyQGOCPo/zyneRitz6uDqkRyQVz6VLgdYrc2Np9Rg47WBef/IOBoh2y+oQ19+09LUw6w1PCneTd7qYYFqOJUPg7P1fvvbUBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=zuzb+alh; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4eda77e2358so90592811cf.1
-        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 11:18:19 -0800 (PST)
+	s=arc-20240116; t=1767123350; c=relaxed/simple;
+	bh=2fZeFI8ChalvAPPCVG+1WXDPJh0uoiPyhnhHPGeZFas=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Zjvcrsj2yyP6GdOCtrb/VDl+dOc/FIYXrfI2UrG5ryRxMYmNImDMDUF0plUZE2umwuPDwdb727dH0q2CbCx4cLSEliEBx2g0vfQoPsBn3RQwPuCj5pgSvS0ei5x550Gq4CtDIDWAXdAOmHZdd6NWg2ONH4Yusmd79g9r+ulW7OE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V51zEPOV; arc=none smtp.client-ip=74.125.224.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-6432842cafdso8923746d50.2
+        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 11:35:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1767122298; x=1767727098; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1767123347; x=1767728147; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ajYuhtWL5PAsZb+FBfTZPURM15KG50rUqf/7o+1z0U0=;
-        b=zuzb+alhtgSIGMvUgO6FpBk6uno/fvkdsrxNb9PdSev1CJ2hHoAl1642JyeXVMfjF7
-         FbtkfwRnbZq1LwOUVLNVxCW1i3KWUmh8j/CGbz4UPL1rxmpqXiEw4b1IU7jyW7AeJRnZ
-         KVHLReGOiaQixkDw6TSnWn8LUGzKEaiU1F/ZTVYg05HmcEZczJ5beUpHT89ZO/sbcmrt
-         Ejr1RgWe/LezcMgMdgIdBruyAXrbBl7Fj+HejVw9v6m5WC2jEz9hoavM8T8dX8tipvIg
-         h/wkhz2rGH+WAkpnGUguqEjiReCCwPuZIdNQPi1okVwW2uUm0DBMTpGM9YH8bT3kG/9h
-         ykXQ==
+        bh=GbLbN5qo8BhCJ3h1f/M+MLdJNxCUmuM3GwhK4z+mTLA=;
+        b=V51zEPOVHXhb5idn+Y2psWcL0uZLT4o1RLbTrzzj+FzbwJ+yF3yBJaUXmxy0y/QOo8
+         cmA7/2ODa7NVlS6eaWqwNr8E2b3X4brSS4YFxtJROuBi88PZf0xZiz6zy8DHNFzEcJWb
+         onuwqgXd8ckYSuuHeUFHJY5KjFoqxYC5y0J1B4ogpAlxr+lUW3QNkhGWLcHYWTWalzF1
+         Nu4oT+T+N8/kT8mVqJQfN3/OqzhtNT5K821J+tOPHecwc+6jQQGaRFYjNzlSMULOgFtf
+         V3JziBFsjaLXp1KwtDAFWUur8br+tW/8iqRSow1zAlAFcknw5yEd8SuuevntaRhDDSvi
+         mMGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767122298; x=1767727098;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ajYuhtWL5PAsZb+FBfTZPURM15KG50rUqf/7o+1z0U0=;
-        b=gVFOcYJ0ubaKA9ZM4+G61ceuI40VcfmEH9ji5EeZuZHJUhWM29iDxnW4gr6XgsR/AB
-         hS0G3LRV/Od3PRvYn8DrCJclNUuAxC1bsuoxaNrR4rHJ01POFo9MHoG7DUmye1r/kJ0S
-         OzjFZJ2QTxd1J4cMf+G6LKJnwc6L1qbVnqC7wOOCq+Pxn8ySPo7FxZUcSAfcV1YXnKyK
-         5J0a05e03FlyQtnjZD4JYIX9WwBWMmmGMTQUYsD4k6OmqFpSsRhc+VSY/62CgBkwlF+i
-         BNteHTwHSCPoMYAkFnNP/oI/g4QABeOXSNv9Luuwc/VDAQWBOQGCO67MwVfl80ybdSy5
-         1IVw==
-X-Gm-Message-State: AOJu0YyB+O/MP8qVDlT6q18kJQgPM77Mh8JYsdOKYzk+2Svm4Vtdoz6Q
-	Ik3G5G5RlDMhMVnNwtGKYdd/6t+YsKQkHdDN0rU33Nsi6RSPxm7rhWanzIe3hUn4ow==
-X-Gm-Gg: AY/fxX47LVj0MFvkYbf7RvgGRfIBhqzF7yQvr6meusvuDS2QSdJ1WMT3Ao1LdYmEiv6
-	KgwJFLS1EGYY486wUyCB+i5QiX9UFjeEq8oM+RImHAYbE4j5WTGim0amDwcw9JvTK8MbUciSfGH
-	RamVDhWZ2u6Ml/Zt47bEND1GSdUk/wyeAPBfc2Jfg6bGfrYveg9k08plGjo6v0GYieXnhPflyPc
-	nTneAWCd/4vLVTuzNfUvQ8qYHFu3whCyn8ereBahiyr7CN6d3Etm/YlCFXm65jyAKKYu7BdcEKc
-	sfGsZBQ3xorPjgisU6DFZ5h4vmiaCG+qCnoSUnQ88CiNsZtrjHOn1Jt1BY+oa6RvUkAG+aZ9D6v
-	wv7v6xixCHkBPm8yFBWVZBcfKUyRWXr3Krj2WU0OB5SZWAnRtgixbydEnDng+UGIuv/Y/8f0ZAA
-	0QvrTzc1sQz+ifXIYwzkVlce6cexQ3BcfzH3Y87h9HeuW6yxnyMrUtHHbtnXSNHYlzYajOO26PV
-	rTn20t/aEU=
-X-Google-Smtp-Source: AGHT+IHuCvss04Ol4FSWFsjOyHKEZa4lE5DjuKiVnEC4MqTsmbVW9JxerFEBIPPnoyAOy4WhuoyWAA==
-X-Received: by 2002:a05:622a:4209:b0:4f1:b947:aa04 with SMTP id d75a77b69052e-4f4abcef4c3mr536060971cf.18.1767122298488;
-        Tue, 30 Dec 2025 11:18:18 -0800 (PST)
-Received: from majuu.waya (bras-base-kntaon1621w-grc-18-70-50-89-69.dsl.bell.ca. [70.50.89.69])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4f4ac62f973sm256121391cf.18.2025.12.30.11.18.16
+        d=1e100.net; s=20230601; t=1767123347; x=1767728147;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GbLbN5qo8BhCJ3h1f/M+MLdJNxCUmuM3GwhK4z+mTLA=;
+        b=j1PK684FB9YBB9Xrz4Z/TudsnT9O0VPxfcR1gLdLeTw4e6hNXLMr3+DkWiRLCaH3Po
+         iWQ2lDO7ogSNGn2bOMcqICZdBnu497WvpOTrhz54MdXQx/XA9PB6TB0NnQBII9oacZ9I
+         /lufonFhlmqG5SpomhOuvoe5zTPGfrYbkuFPZRTyJl1HUbV7fj+zxzEEV0bodE3wSeAk
+         g4/WgkQwP8RHjYpIC3WSrSPwmnbcxO4OorjBdLul7vu+4mpKucXfPnDeBTRXDCn3Ikpc
+         6Q4mR0bGGdKQqM1KKzOnfGB5c4tK6pIHvdNVFEcYuzVed9C+H3hj2RYlf1YzCUoS+Zb+
+         1ArA==
+X-Forwarded-Encrypted: i=1; AJvYcCXEjJCZBwqLOElQ2Ov6VwgB75zV38oUAMujlb6sqdAyA7uojUAkrEdmD7oScunH+TBciYQ3H7s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKFxPaDEh/uOoq80ynlDGzpOTznLuBuGVg29ywLD2h2DmUQ4l5
+	4kFrSZBTlELr8KrfpyRxrwRWWoxw5B4aqr1VFP37cgbkIexIBJjbSosU
+X-Gm-Gg: AY/fxX56F1GVUliyNHGeeVWDZYfXv0ws9opJqLxQnrOn4aMK5G5p/9sUQ1ilvTPxFt1
+	ur8ClJJecn4ExpANfkw6OSnjoWsgCG5K4d88DrRZgsM8nK76HZvof2njvRhtEAeemIRQUmU9kVL
+	J5KnAtUas8lMBiYsGgVJ5Ov8C2DpkAQJNFonuPJY6DIswnYMwR1tp67uqK4SL33HaA7dfuv1PDR
+	ryQv58vYVXTrwkSWiNZrt8a4bgF4FDVu8EzPfrlQK0QQ+iNnzyv/aas3VlNmomFZKDLwZfiqVMA
+	rNFj5ikcV9d8dITdGyRh8a2fIYM3xjl3TJUNNQ3hbkLxvBf/mpceYpT98gs+5pzcZnJF78SF4FD
+	k1D16wir8wQWFZglXhNuIP6UIySaJiqnG0FIZJC+4T9T6CrNKHRQirltfJh+89VV3797KRToVoT
+	ZyXwm5jD371xXPT6+trO4SihJClPm0n3zccO3D2fZWc+vywcrNToFP01vFyNw=
+X-Google-Smtp-Source: AGHT+IGskJuGH1ry4lW++SW/O5+eFpbYgJV1JB4rR83UjJdJAPT2DRTtF+kwsfPk5XXMD9qFGe8aFQ==
+X-Received: by 2002:a05:690e:1281:b0:646:7d1b:614f with SMTP id 956f58d0204a3-6467d1b653fmr24659651d50.56.1767123346798;
+        Tue, 30 Dec 2025 11:35:46 -0800 (PST)
+Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78fb44f9a42sm128149897b3.29.2025.12.30.11.35.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Dec 2025 11:18:17 -0800 (PST)
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	andrew+netdev@lunn.ch
-Cc: netdev@vger.kernel.org,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	victor@mojatatu.com
-Subject: [PATCH net 2/2] selftests/tc-testing: Add test case redirecting to self on egress
-Date: Tue, 30 Dec 2025 14:18:14 -0500
-Message-Id: <20251230191814.213789-2-jhs@mojatatu.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251230191814.213789-1-jhs@mojatatu.com>
-References: <20251230191814.213789-1-jhs@mojatatu.com>
+        Tue, 30 Dec 2025 11:35:46 -0800 (PST)
+Date: Tue, 30 Dec 2025 14:35:45 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Alper Ak <alperyasinak1@gmail.com>, 
+ davem@davemloft.net, 
+ dsahern@kernel.org, 
+ edumazet@google.com, 
+ kuba@kernel.org
+Cc: Alper Ak <alperyasinak1@gmail.com>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ Breno Leitao <leitao@debian.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.332a5aa0f6f9f@gmail.com>
+In-Reply-To: <20251227073743.17272-1-alperyasinak1@gmail.com>
+References: <20251227073743.17272-1-alperyasinak1@gmail.com>
+Subject: Re: [PATCH] net: ipv4: ipmr: Prevent information leak in
+ ipmr_sk_ioctl()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-From: Victor Nogueira <victor@mojatatu.com>
+Alper Ak wrote:
+> struct sioc_vif_req has a padding hole after the vifi field due to
+> alignment requirements. These padding bytes were uninitialized,
+> potentially leaking kernel stack memory to userspace when the
+> struct is copied via sock_ioctl_inout().
+> 
+> Reported by Smatch:
+>     net/ipv4/ipmr.c:1575 ipmr_sk_ioctl() warn: check that 'buffer'
+>     doesn't leak information (struct has a hole after 'vifi')
+> 
+> Fixes: e1d001fa5b47 ("net: ioctl: Use kernel memory on protocol ioctl callbacks")
 
-Add single mirred test case that attempts to redirect to self on egress
-using clsact
+The commit mentions other similar cases. If this is a concern for
+sioc_vif_req, then it likely would alos be for sioc_mif_req6, which
+similarly has a hole.
 
-Signed-off-by: Victor Nogueira <victor@mojatatu.com>
----
- .../tc-testing/tc-tests/actions/mirred.json   | 47 +++++++++++++++++++
- 1 file changed, 47 insertions(+)
+> Signed-off-by: Alper Ak <alperyasinak1@gmail.com>
+> ---
+>  net/ipv4/ipmr.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
+> index ca9eaee4c2ef..18441fbe7ed7 100644
+> --- a/net/ipv4/ipmr.c
+> +++ b/net/ipv4/ipmr.c
+> @@ -1571,6 +1571,7 @@ int ipmr_sk_ioctl(struct sock *sk, unsigned int cmd, void __user *arg)
+>  	/* These userspace buffers will be consumed by ipmr_ioctl() */
+>  	case SIOCGETVIFCNT: {
+>  		struct sioc_vif_req buffer;
+> +		memset(&buffer, 0, sizeof(buffer));
+>  
+>  		return sock_ioctl_inout(sk, cmd, arg, &buffer,
+>  				      sizeof(buffer));
 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json b/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
-index da156feabcbf..b056eb966871 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
-@@ -1098,5 +1098,52 @@
-         "teardown": [
-             "$TC qdisc del dev $DUMMY root"
-         ]
-+    },
-+    {
-+        "id": "4ed9",
-+        "name": "Try to redirect to self on egress with clsact",
-+        "category": [
-+            "filter",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": [
-+                "nsPlugin"
-+            ]
-+        },
-+        "setup": [
-+            "$IP link set dev $DUMMY up || true",
-+            "$IP addr add 10.10.10.10/24 dev $DUMMY || true",
-+            "$TC qdisc add dev $DUMMY clsact",
-+            "$TC filter add dev $DUMMY egress protocol ip prio 10 matchall action mirred egress redirect dev $DUMMY index 1"
-+        ],
-+        "cmdUnderTest": "ping -c1 -W0.01 -I $DUMMY 10.10.10.1",
-+        "expExitCode": "1",
-+        "verifyCmd": "$TC -j -s actions get action mirred index 1",
-+        "matchJSON": [
-+            {
-+                "total acts": 0
-+            },
-+            {
-+                "actions": [
-+                    {
-+                        "order": 1,
-+                        "kind": "mirred",
-+                        "mirred_action": "redirect",
-+                        "direction": "egress",
-+                        "index": 1,
-+                        "stats": {
-+                            "packets": 1,
-+                            "overlimits": 1
-+                        },
-+                        "not_in_hw": true
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            "$TC qdisc del dev $DUMMY clsact"
-+        ]
-     }
-+
- ]
--- 
-2.52.0
+sock_ioctl_inout copies the whole struct from userspace, calls a
+domain specific callback and then copies the whole struct back:
+
+       if (copy_from_user(karg, arg, size))
+               return -EFAULT;
+
+       ret = READ_ONCE(sk->sk_prot)->ioctl(sk, cmd, karg);
+       if (ret)
+               return ret;
+
+       if (copy_to_user(arg, karg, size))
+               return -EFAULT;
+
+As a result every byte of the memset will be overwritten with the
+copy_from_user.
+
+
+> -- 
+> 2.43.0
+> 
+
 
 
