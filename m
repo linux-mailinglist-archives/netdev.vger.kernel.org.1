@@ -1,80 +1,112 @@
-Return-Path: <netdev+bounces-246295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 063A0CE8EB8
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 08:49:23 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 238F2CE8F1E
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 08:59:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id CA3AD3002058
-	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 07:49:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 888313001837
+	for <lists+netdev@lfdr.de>; Tue, 30 Dec 2025 07:59:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ED8824EF8C;
-	Tue, 30 Dec 2025 07:49:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FC022D7D41;
+	Tue, 30 Dec 2025 07:59:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PgOAtBCK"
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A73791BF33
-	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 07:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E14822AE7A
+	for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 07:59:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767080958; cv=none; b=Th+P1DCkfqEzIDcA2AGZ/cEIM3uYvmkIick5XzlfsOdSyxvCmQEBwcLxqqYDX6F2s2ugfV4jcZy4NWGcqD7Y7ePQ0mEFWydB3qPSbz7WdUQ1cEDNBhaVCOCOmS36xogLGkKxo4CrIRu6WvM29jemy51Kxw8VrG8ysWmEcLFdXis=
+	t=1767081567; cv=none; b=Wsf7SbJUZ6xcXd1TwTlFT2DUWQ2wiijvfAYIgBipIjLAzf7KxfPkuCDUpqxHPd1sq2SXKceCzMTByv+VHwLmHoVj9WlQUhzBktHO81PfdDpYSV9m2qq4aMuXRWBsvu33H3kbR690xaiIWdFSRgahh2O3MMrx5KrNNbCUe5ew+E8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767080958; c=relaxed/simple;
-	bh=vtNnPNhHcVUR7xr+bGQgPTq1AHS2tAMOUxRppIVNRAk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Soapi/OcCWkitXBtF5XAIK13HmWzbSIKeHL53wWc8BWvGYjLJklthDmjuYopVNY9uGr2mEHOYuGFiI0Do1+R0ez9hbKy1NjAjr8bciUHCIEW8EsVdudp4b78eLzRvZzVl/LuJ7volsg4+/A8OuStanSKqgbhXCp7TuPGxXuE8PY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 5BU7mOGx091407;
-	Tue, 30 Dec 2025 16:48:24 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 5BU7mOw5091400
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Tue, 30 Dec 2025 16:48:24 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <a127c251-5d62-47c5-8ac0-37a490ed0c37@I-love.SAKURA.ne.jp>
-Date: Tue, 30 Dec 2025 16:48:23 +0900
+	s=arc-20240116; t=1767081567; c=relaxed/simple;
+	bh=8jPmQen44zA33S7n2Etxe5dVecUhiSgrXfORdR8FFMY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DGLlwUid/X3n6Xny91i9wWNnTht1vNoJj83yTZf7FJJaubT1OGqJ3WvC7ve5srhHOcB1wlIb+m2uTdDjvn/lg3QM7mutDXGbfueIcNNSuqcjOpa/DFNI2WdlEsIU7KS6YULkaB33U5BM9/n74+Pu1fT3ZM+aTAb2yPLL44VcLFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PgOAtBCK; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767081564;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=kbhpEMXNgm3tTgoLY7Vy2dg7URMTphCxWjTZwP1bNlY=;
+	b=PgOAtBCKp8p+MH6QIALiOl3j6L0Yknsxi4sQPfiRBYwcjr7M9p4g3Qit+H8fBzTOMJF4vv
+	gTV53dVb6cUsUvt3VW4MoiAX5lAYqjlinGFey47PG7fz6AYqxJxZ+z3gaT3UMHtYGXUCtz
+	1d8qJ/yxIloWc14xRzeuQuiuZM23vZQ=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-676-_QIb2Xl2MV2RW5ULrHVCZA-1; Tue,
+ 30 Dec 2025 02:59:21 -0500
+X-MC-Unique: _QIb2Xl2MV2RW5ULrHVCZA-1
+X-Mimecast-MFC-AGG-ID: _QIb2Xl2MV2RW5ULrHVCZA_1767081559
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A9479195608E;
+	Tue, 30 Dec 2025 07:59:19 +0000 (UTC)
+Received: from xudu-thinkpadx1carbongen9.nay.csb (unknown [10.66.60.72])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 509C11800367;
+	Tue, 30 Dec 2025 07:59:15 +0000 (UTC)
+From: Xu Du <xudu@redhat.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org
+Cc: netdev@vger.kernel.org
+Subject: [RFC PATCH net-next v2 0/8] selftest: Extend tun/virtio coverage for GSO over UDP tunnel
+Date: Tue, 30 Dec 2025 15:59:04 +0800
+Message-ID: <cover.1767074545.git.xudu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [net?] INFO: task hung in new_device_store (5)
-To: syzbot <syzbot+05f9cecd28e356241aba@syzkaller.appspotmail.com>,
-        andrew+netdev@lunn.ch, boqun.feng@gmail.com, davem@davemloft.net,
-        edumazet@google.com, hdanton@sina.com, kuba@kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        pabeni@redhat.com, syzkaller-bugs@googlegroups.com,
-        torvalds@linux-foundation.org
-References: <694d6533.050a0220.35954c.0047.GAE@google.com>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <694d6533.050a0220.35954c.0047.GAE@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Virus-Status: clean
-X-Anti-Virus-Server: fsav202.rs.sakura.ne.jp
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-If we ratelimit
+The primary goal is to add test validation for GSO when operating over
+UDP tunnels, a scenario which is not currently covered.
 
-  "received packet on %s with own address as source address (addr:%pM, vlan:%u)\n",
+The design strategy is to extend the existing tun/tap testing infrastructure
+to support this new use-case, rather than introducing a new or parallel framework.
+This allows for better integration and re-use of existing test logic.
 
-message with up to once per 2 second [1], this problem is shown as "task hung in rtnl_lock".
-If we ratelimit this message with up to 10 times per 5 second [2], this problem is shown as
-"INFO: task hung in del_device_store".
+---
+v1 -> v2:
+ - Addresse sporadic failures due to too early send.
+ - Refactor environment address assign helper function.
+ - Fix incorrect argument passing in build packet functions.
 
-This difference suggests that this task hung is caused by out of CPU time for making
-forward progress due to spending too much CPU time for printk() operation from interrupt
-context. We might want to ratelimit more aggressively.
+v1: https://lore.kernel.org/netdev/cover.1763345426.git.xudu@redhat.com/
 
-Link: https://lkml.kernel.org/r/69533402.050a0220.329c0f.0428.GAE@google.com [1]
-Link: https://lkml.kernel.org/r/695347ee.050a0220.329c0f.042b.GAE@google.com [2]
+Xu Du (8):
+  selftest: tun: Format tun.c existing code
+  selftest: tun: Introduce tuntap_helpers.h header for TUN/TAP testing
+  selftest: tun: Refactor tun_delete to use tuntap_helpers
+  selftest: tap: Refactor tap test to use tuntap_helpers
+  selftest: tun: Add helpers for GSO over UDP tunnel
+  selftest: tun: Add test for sending gso packet into tun
+  selftest: tun: Add test for receiving gso packet from tun
+  selftest: tun: Add test data for success and failure paths
+
+ tools/testing/selftests/net/tap.c            | 287 +-----
+ tools/testing/selftests/net/tun.c            | 917 ++++++++++++++++++-
+ tools/testing/selftests/net/tuntap_helpers.h | 608 ++++++++++++
+ 3 files changed, 1530 insertions(+), 282 deletions(-)
+ create mode 100644 tools/testing/selftests/net/tuntap_helpers.h
+
+
+base-commit: 7b8e9264f55a9c320f398e337d215e68cca50131
+-- 
+2.49.0
 
 
