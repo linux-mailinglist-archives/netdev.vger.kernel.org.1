@@ -1,118 +1,208 @@
-Return-Path: <netdev+bounces-246469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5462CECAA3
-	for <lists+netdev@lfdr.de>; Thu, 01 Jan 2026 00:20:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BDBC4CECAA9
+	for <lists+netdev@lfdr.de>; Thu, 01 Jan 2026 00:21:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2E75F3011FA1
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 23:20:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8568F30109B3
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 23:21:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F89253359;
-	Wed, 31 Dec 2025 23:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B372D47F3;
+	Wed, 31 Dec 2025 23:21:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fel.cvut.cz header.i=@fel.cvut.cz header.b="NbMpNhl9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V5ua38zc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpx.fel.cvut.cz (smtpx.feld.cvut.cz [147.32.210.153])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A849123AB87;
-	Wed, 31 Dec 2025 23:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=147.32.210.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 416D527C84B
+	for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 23:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767223236; cv=none; b=WU2cxHEhvNbrd7v5hX3cdcL3o3ShBSPm6nd9SdXWw5jqhvSgmrcjUzFxiBMCtZdDgrb+C5+CjTuQGs8tHrSO0kM3Iy3kyMqGnVCT3F8T/hUUapsbaaXJrXUoh7gQ8U/UZB1vJcwWYMTgpM9AUaGs3Sz09NiIX6P69uhk9YOfXgo=
+	t=1767223261; cv=none; b=AeM6h42qan41HpFceGMmrydXVr7geXBv526PoifoqXqPLuypy1XF2V2fcyveNITviM62oPs6PgxCWe/8m7mW+itwYlzXAZZKrR7f5btygh7aY/xBS+5JTa54AXamDrQyeQIvVk2E604wkKdoZRJMCi+3hCMwWGVm/ELDIh49S0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767223236; c=relaxed/simple;
-	bh=FYGdSp6czj+0imSdcNgSv3AclAmLyHq2HJLGdWVBaAA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=A+X+Jhtqk7Q5LhdulTR7zWbBAVKTDlTO5O9DkH5qBpb9836tv+BLCTgUnDuVrC5i6+9evs2yPJGvayZH6yrQ8Zwaesw8iLM6WtMeuCEPc27OUOfJn7oc3amlPsF5wQu217W5U/bNau/A046YuTDL3e5Y8UcHAIxUl/6XG3LumzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fel.cvut.cz; spf=pass smtp.mailfrom=fel.cvut.cz; dkim=pass (2048-bit key) header.d=fel.cvut.cz header.i=@fel.cvut.cz header.b=NbMpNhl9; arc=none smtp.client-ip=147.32.210.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fel.cvut.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fel.cvut.cz
-Received: from localhost (unknown [192.168.200.27])
-	by smtpx.fel.cvut.cz (Postfix) with ESMTP id D331722685;
-	Thu, 01 Jan 2026 00:20:23 +0100 (CET)
-X-Virus-Scanned: IMAP STYX AMAVIS
-Received: from smtpx.fel.cvut.cz ([192.168.200.2])
- by localhost (cerokez-250.feld.cvut.cz [192.168.200.27]) (amavis, port 10060)
- with ESMTP id lcYaQay1hnm5; Thu,  1 Jan 2026 00:20:22 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fel.cvut.cz;
-	s=felmail; t=1767223222;
-	bh=93RrIMjakSwcrq6K5DWbPxQYjGApwXm9Nt8UBxC9kTI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=NbMpNhl9OsaBty7wrPCGpnukd3WNOnpFq3pUn42Q5sUQQN8u52d6bxjfAIj0MG8c/
-	 /ULjRETyfaklJC7okNA7FMRU/Ixzi3sDqGJSd86qGlJ2Pl7woitx2I42utpOpNWEzF
-	 xY4NRH1m2iMfHLWj8c/IRYpyFAbTlkLBrF9QxVJAh+DjVC+JxYdsmSiS7OmksRHysb
-	 JaANT4cc43588AgWrvXUNakjs76tWgaH/Tg4kizJpNX0EFH9b918kkZGbACFQgiDni
-	 YDiEPnTOSA7kygsmGgtxWASgvyjtZJLJeAmMoRDUrsWLE9txI3fau5ZkYq8OZy714j
-	 lwy3C+udiAw7A==
-Received: from fel.cvut.cz (static-84-242-78-234.bb.vodafone.cz [84.242.78.234])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pisa)
-	by smtpx.fel.cvut.cz (Postfix) with ESMTPSA id E4749224E6;
-	Thu, 01 Jan 2026 00:20:21 +0100 (CET)
-From: Pavel Pisa <pisa@fel.cvut.cz>
-To: linux-can@vger.kernel.org,
-	"Marc Kleine-Budde" <mkl@pengutronix.de>,
-	David Laight <david.laight.linux@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrea Daoud <andreadaoud6@gmail.com>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Cc: Jiri Novak <jnovak@fel.cvut.cz>,
-	Ondrej Ille <ondrej.ille@gmail.com>,
-	Pavel Pisa <pisa@fel.cvut.cz>
-Subject: [PATCH] can: ctucanfd: fix SSP_SRC in cases when bit-rate is higher than 1 MBit.
-Date: Thu,  1 Jan 2026 00:19:26 +0100
-Message-ID: <20251231231926.20043-1-pisa@fel.cvut.cz>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1767223261; c=relaxed/simple;
+	bh=QbQeTPKkvqwDTi9jphXlB0QOUtZZZiT4Q18MidmASV8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=GIuURj+HW60k77/7oBZ23Rv+z8BvA8cdrBwXQjlzWlocVxeeqiYoutvU4gCYyxmqxk41Ptn3iPepnRZ7bVxxAcbDZJu+S9LC8TT7z2M5jneI2SM2MsXF7il44HZFkWVJhlq8xSv4FZ83VScULZUeOoNMQbSLL8NahycpyY50ndQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--maze.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V5ua38zc; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--maze.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b993eb2701bso11346751a12.0
+        for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 15:21:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767223259; x=1767828059; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5Fkw4pJwbf+RiOcgktvh2leaGPbqkfTxYnH0P1Ik49Q=;
+        b=V5ua38zcVzyEbjtiknV/tnbR2joQ4EIFPjYyQ98e0A4d2jNRaHHVOA6mlq+eKw5ndl
+         skhJVQZpGE3VcVjPiBMJEC0gHBGtLYxODPq6zyECUdbL1X4cUl6E60FeR8YtauHFNE/8
+         w6eAs2+XZPoFOu/t7TtONN47pW2wkU1alLOEcn+AzhwbuH1FN+X2wP1i+7f+IyJ1LI37
+         b7O2Kqo1A//JlXsigmb1jTZh0dTDXmMUEUw093J8XttO7IMIKhtW4c0GLtkogcFmoN3O
+         QJ2TU8sS0RghBF7tIujBQ0sjx9UDQ2y4nyv85Es3utUo3TFR38P29ju9b/QSq2G9WQZK
+         0p2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767223259; x=1767828059;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5Fkw4pJwbf+RiOcgktvh2leaGPbqkfTxYnH0P1Ik49Q=;
+        b=xPuRC4iJT/9sjNlxAtrfAxwSySwLRNscD1+wZ4vsUJj5tDNVtta3NGUNlunU/K97Kk
+         vzo9tdhDS2rMtbUQa+sA1JZiLQVnwKjAqK4KLNk1e76ceFTyqDknbFE/OIKr/IaYhp86
+         QqBXZTa/GBEE1utx1EwcoqUacnN++LQ6H2ScdDz2cf/j3gC2xcFn7t3If/Lww7Z6LfC0
+         QHLiVXPlpYDasDc/CwmNujJfuUQrGC6yUQ9BnvSObgDsviuo8eeR6t1K4qWo17+taR0l
+         9JMUvlIHqkGxtw71m+SupigGJFyV3iE0PgA9pEr+hbALrIKsfmoDzI8Whdeo+adiM8V1
+         kbbA==
+X-Gm-Message-State: AOJu0YzTnv2Ogbmm+P6H7S1XKUhFmNcGk7X6YzNfRl6/sK6eJh2kU7S/
+	1nWH+NgiSv6MrAageDwCqTyuFLcEp8XRPkbQSNobOfu40Yn4+fSv08O5KQMU1faUZ1WbdPAQIg=
+	=
+X-Google-Smtp-Source: AGHT+IGQ1Yo74Lfs+XDagvF/do2RICQ0VFYGB7N4aHuu3r4sO5GbnwTUXgQ19dSEciYhPBpJEkJa6lWY
+X-Received: from dlbsi4.prod.google.com ([2002:a05:7022:b884:b0:119:9f33:34a6])
+ (user=maze job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7022:f401:b0:119:fb9c:4ebb
+ with SMTP id a92af1059eb24-121722ebbafmr31057680c88.30.1767223259510; Wed, 31
+ Dec 2025 15:20:59 -0800 (PST)
+Date: Wed, 31 Dec 2025 15:20:48 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.394.g0814c687bb-goog
+Message-ID: <20251231232048.2860014-1-maze@google.com>
+Subject: [PATCH bpf] bpf: 'fix' for undefined future potential exploits of BPF_PROG_LOAD
+From: "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>
+To: "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <zenczykowski@gmail.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>
+Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, BPF Mailing List <bpf@vger.kernel.org>, 
+	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, John Fastabend <john.fastabend@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Ondrej Ille <ondrej.ille@gmail.com>
+Over the years there's been a number of issues with the eBPF
+verifier/jit/codegen (incl. both code bugs & spectre related stuff).
 
-The change has been tested on AMD/Xilinx Zynq
-with the next CTU CN FD IP core versions:
+It's an amazing but very complex piece of logic, and I don't think
+it's realistic to expect it to ever be (or become) 100% secure.
 
- - 2.6 aka master in the "integration with Zynq-7000 system" test
-   6.12.43-rt12+ #1 SMP PREEMPT_RT kernel with CTU CAN FD git
-   driver (change already included in the driver repo)
- - older 2.5 snapshot with mainline kernels with this patch
-   applied locally in the multiple CAN latency tester nightly runs
-   6.18.0-rc4-rt3-dut #1 SMP PREEMPT_RT
-   6.19.0-rc3-dut
+For example we currently have KASAN reporting buffer length violation
+issues on 6.18 (which may or may not be due to eBPF subsystem, but are
+worrying none-the-less)
 
-The logs are available at
+Blocking bpf(BPF_PROG_LOAD, ...) is the only sure fire way to guarantee
+the inability to exploit the eBPF subsystem.
+In comparison other eBPF operations are pretty benign.
+Even map creation is usually at most a memory DoS, furthermore it
+remains useful (even with prog load disabled) due to inner maps.
 
- https://canbus.pages.fel.cvut.cz/
+This new sysctl is designed primarily for verified boot systems,
+where (while the system is booting from trusted/signed media)
+BPF_PROG_LOAD can be enabled, but before untrusted user
+media is mounted or networking is enabled, BPF_PROG_LOAD
+can be outright disabled.
 
-Signed-off-by: Ondrej Ille <ondrej.ille@gmail.com>
-Signed-off-by: Pavel Pisa <pisa@fel.cvut.cz>
+This provides for a very simple way to limit eBPF programs to only
+those signed programs that are part of the verified boot chain,
+which has always been a requirement of eBPF use in Android.
+
+I can think of two other ways to accomplish this:
+(a) via sepolicy with booleans, but it ends up being pretty complex
+    (especially wrt verifying the correctness of the resulting policies)
+(b) via BPF_LSM bpf_prog_load hook, which requires enabling additional
+    kernel options which aren't necessarily worth the bother,
+    and requires dynamically patching the kernel (frowned upon by
+    security folks).
+
+This approach appears to simply be the most trivial.
+
+I've chosed to return EUNATCH 'Protocol driver not attached.'
+to separate it from EPERM and make it clear the eBPF program loading
+subsystem has been outright disabled (detached).  There aren't
+any permissions you could gain to make things work again (short
+of a reboot/kexec).
+
+It is intentionally kernel global and doesn't affect cBPF,
+which has various runtime use cases (incl. tcpdump style dynamic
+socket filters and seccomp sandboxing) and thus cannot be disabled,
+but (as experience shows) is also much less dangerous (mainly due
+to being much simpler).
+
+Cc: Alexei Starovoitov <ast@kernel.org>
+Cc: Daniel Borkmann <daniel@iogearbox.net>
+Cc: John Fastabend <john.fastabend@gmail.com>
+Signed-off-by: Maciej =C5=BBenczykowski <maze@google.com>
 ---
- drivers/net/can/ctucanfd/ctucanfd_base.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Documentation/admin-guide/sysctl/kernel.rst |  9 +++++++++
+ kernel/bpf/syscall.c                        | 14 ++++++++++++++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/drivers/net/can/ctucanfd/ctucanfd_base.c b/drivers/net/can/ctucanfd/ctucanfd_base.c
-index 1e6b9e3dc2fe..0ea1ff28dfce 100644
---- a/drivers/net/can/ctucanfd/ctucanfd_base.c
-+++ b/drivers/net/can/ctucanfd/ctucanfd_base.c
-@@ -310,7 +310,7 @@ static int ctucan_set_secondary_sample_point(struct net_device *ndev)
- 		}
- 
- 		ssp_cfg = FIELD_PREP(REG_TRV_DELAY_SSP_OFFSET, ssp_offset);
--		ssp_cfg |= FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x1);
-+		ssp_cfg |= FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x0);
- 	}
- 
- 	ctucan_write32(priv, CTUCANFD_TRV_DELAY, ssp_cfg);
--- 
-2.47.3
+diff --git a/Documentation/admin-guide/sysctl/kernel.rst b/Documentation/ad=
+min-guide/sysctl/kernel.rst
+index f3ee807b5d8b..4906ef08c741 100644
+--- a/Documentation/admin-guide/sysctl/kernel.rst
++++ b/Documentation/admin-guide/sysctl/kernel.rst
+@@ -1655,6 +1655,15 @@ entry will default to 2 instead of 0.
+ =3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+=20
+=20
++disable_bpf_prog_load
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++Writing 1 to this entry will cause all future invocations of
++``bpf(BPF_PROG_LOAD, ...)`` to fail with -EUNATCH, thus effectively
++permanently disabling the instantiation of new eBPF programs.
++Once set to 1, this cannot be reset back to 0.
++
++
+ warn_limit
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+=20
+diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
+index 6589acc89ef8..ef655ff501e7 100644
+--- a/kernel/bpf/syscall.c
++++ b/kernel/bpf/syscall.c
+@@ -67,6 +67,8 @@ static DEFINE_SPINLOCK(link_idr_lock);
+ int sysctl_unprivileged_bpf_disabled __read_mostly =3D
+ 	IS_BUILTIN(CONFIG_BPF_UNPRIV_DEFAULT_OFF) ? 2 : 0;
+=20
++int sysctl_disable_bpf_prog_load =3D 0;
++
+ static const struct bpf_map_ops * const bpf_map_types[] =3D {
+ #define BPF_PROG_TYPE(_id, _name, prog_ctx_type, kern_ctx_type)
+ #define BPF_MAP_TYPE(_id, _ops) \
+@@ -2891,6 +2893,9 @@ static int bpf_prog_load(union bpf_attr *attr, bpfptr=
+_t uattr, u32 uattr_size)
+ 				 BPF_F_TOKEN_FD))
+ 		return -EINVAL;
+=20
++	if (sysctl_disable_bpf_prog_load)
++		return -EUNATCH;
++
+ 	bpf_prog_load_fixup_attach_type(attr);
+=20
+ 	if (attr->prog_flags & BPF_F_TOKEN_FD) {
+@@ -6511,6 +6516,15 @@ static const struct ctl_table bpf_syscall_table[] =
+=3D {
+ 		.extra1		=3D SYSCTL_ZERO,
+ 		.extra2		=3D SYSCTL_TWO,
+ 	},
++	{
++		.procname	=3D "disable_bpf_prog_load",
++		.data		=3D &sysctl_disable_bpf_prog_load,
++		.maxlen		=3D sizeof(sysctl_disable_bpf_prog_load),
++		.mode		=3D 0644,
++		.proc_handler	=3D proc_dointvec_minmax,
++		.extra1		=3D SYSCTL_ONE,
++		.extra2		=3D SYSCTL_ONE,
++	},
+ 	{
+ 		.procname	=3D "bpf_stats_enabled",
+ 		.data		=3D &bpf_stats_enabled_key.key,
+--=20
+2.52.0.394.g0814c687bb-goog
 
 
