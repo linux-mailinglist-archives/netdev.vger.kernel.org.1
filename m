@@ -1,134 +1,198 @@
-Return-Path: <netdev+bounces-246423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88366CEBD76
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 12:15:02 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 719E3CEBDCB
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 12:26:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AF971300F611
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 11:15:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 23F8930078A3
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 11:26:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A401313E02;
-	Wed, 31 Dec 2025 11:14:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F16922C325C;
+	Wed, 31 Dec 2025 11:26:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="tMjHCubG"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="fBDcFVs0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010060.outbound.protection.outlook.com [52.101.201.60])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39FF2D73A3
-	for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 11:14:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767179699; cv=none; b=iDhEAiZrpnIMVIkxtYKI/UBA/4LezPhvkOMVTpVUCrwPFNQsFzir4Q5nOEHVrxZe29K6iozQyFN9BuUUMkeNjLpIazQUU1sN54dRFpuCfHeoyLeQ/CRIygYP3rwlnGFbmHZqCUFrKHjD+GQr0zNXFKRT0hZPmCQENuFwnC+3v7A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767179699; c=relaxed/simple;
-	bh=tkDmmKE53uMXasuWbPWPdAKXnYeMy78fXdSHQRj6umw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k8hJ/R4YbZI580O9faGVJdG19Z9ntGAaMAbSrFxwMDnlsN62VtgbCRxmi/JFjEVmk7LwCaBau3SRlAK+XQJMn8sTmR3TzHmwHi0naAVpr0kVa7fVI7gTVkvwo/55B1UawWuSoEcEo6jfH5uZqbga6eRPOUi9UvB6gHyWJHHdPD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=tMjHCubG; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-47a8195e515so65565965e9.0
-        for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 03:14:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1767179694; x=1767784494; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tkDmmKE53uMXasuWbPWPdAKXnYeMy78fXdSHQRj6umw=;
-        b=tMjHCubGd3V4bnxOEvtliUxD9ubk5MKKHLRivZCD3xGLd1xjXbs0eGklGCoLm0CLt1
-         1TWRmyHEdUWMsMFhlOrIlxniE1v6qjbKjuJFXstdGC152UDnGEwLGGI0M5nPX8Ao8//8
-         Za5bJlZSoDZTiw+a/wIwPO4CLWPfk19h5JqBRzc3m1orUKcfkrSuGPGmD6ragmiw8OBa
-         SzlFi5TY4XvO1OxFr0joQOpiljcbi0dZZYEXfX0fos4lKt+IyeZy4Q4E2PbtrB9sbZ1s
-         yA9IDH0a8ClV4fc/bVsPwpPwc8V+SKGqJTcwSeipXDTqJ1fGUMK5I88FWrb7kT63K+Ya
-         Xf2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767179694; x=1767784494;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tkDmmKE53uMXasuWbPWPdAKXnYeMy78fXdSHQRj6umw=;
-        b=hvPqppxYRsHnGRPPRUE8jqMO6/txPY84Hq7Lffx6YGDr8QgD3u5QkZU3sE7tCL5Rbv
-         52Vqjt1Mbsjwg5jPPk2xWn0wj0gjFvNzjMsimisIvMyD8lO20+OHyBkKQ28YT+ekpTS9
-         zWvcqSFGMUPPyFyHsLrb/3ZfMMBcTcoqhfku9/OQP2640O6OVymQhI8X1/8Nz2ASKS2t
-         qn4G2U0DJ4p7MaRkaM66OuqCcVrVg2TmFyjtpmV1EOC8aKe6m+6RBfwZn47kRMlCLX2W
-         8m3v2NG93Tpps9hvxQeFlWgM7W2MmWv54CZh7WfqKYcJYEotR8IBfefy3vBvzHktQLWZ
-         i5yw==
-X-Forwarded-Encrypted: i=1; AJvYcCUwVEr+BifOrWBBjFkylKQmpKmxBVLJEhJ76xghr0vVF2IezrSGnvalDW10Pl9l0mwgz0GbnI8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhfKd7ObQOeRsiHx1jTIii5sXRp+9Ax+2ouIhLfepYS+GdvR09
-	LNRd2HUCEkX668/yjZjskQJpVOjmTs9Vp2ZDMgXpsMMEi/deGZwsbbqnAmnvQY8b4G4=
-X-Gm-Gg: AY/fxX4eIWFW8zcvbL7NmBpBYhj3Dxk7PR3WVRo8QLQ4uPxDcIqb0IfPNyodWVgETpK
-	exdSrNaN/NlUeR91r/+0ZvdoB32q/x2sItipHFUni7afWVxxnaigp71+rp5yfP2T8FPbkzAqNEA
-	P8ModP9J5vXHUNY9JPmjtiB+T5qGpR66uU83pYZQ2Flt0m4Q7JR3MV60K9NVg1/t34j/2lfltUr
-	5ZDxBPcHSWxjg8NNcpeQO6sCPt2PLOdmVzi2Eh76/toVG6YAK9tz/4jJfw7XkDLqWBzkI81zIdd
-	gkulA5DgCSm/3a8I56rQZApFhpZI5CnFwEQjRwrqh6O0eAngt6YooBmS7Sjef8oS5aaRAenPTv9
-	b3wD2MZSSmG3aZRTvNeINoYeTNEEY7E/IoHf3MuegNXLbY+yBLCXx3QS7+9cm3xBM2sLc2IEjJN
-	T83adDyyqsHNoHNE/iAbqCUAgWyuy4
-X-Google-Smtp-Source: AGHT+IGMtaJXoovbo2PQ1F27BguelXZUDbYGedpDVrbAnujnog0Z+dPhlMcUbpzXmKuMWPaYR+mcjA==
-X-Received: by 2002:a05:600c:314d:b0:47d:586e:2fea with SMTP id 5b1f17b1804b1-47d586e309dmr121457085e9.15.1767179693996;
-        Wed, 31 Dec 2025 03:14:53 -0800 (PST)
-Received: from FV6GYCPJ69 ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d1936d220sm706164765e9.8.2025.12.31.03.14.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Dec 2025 03:14:53 -0800 (PST)
-Date: Wed, 31 Dec 2025 12:14:50 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Xiao Liang <xiliang@redhat.com>
-Cc: shayagr@amazon.com, akiyano@amazon.com, darinzon@amazon.com, 
-	saeedb@amazon.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v2] net/ena: fix missing lock when update devlink params
-Message-ID: <hwvwosj5ccc6ulas3rk4b3rnx3be6rr3jrow2lobg5tmg4nc47@bcrdpysve4g3>
-References: <20251229145708.16603-1-xiliang@redhat.com>
- <20251231012030.6184-1-xiliang@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6383B2DF12F
+	for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 11:26:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.60
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767180416; cv=fail; b=up8h8YboX4pJxdqjXMmlZc2x/DPkeQYZpbqwPCigJcbB7XS7TmY6lhfbUr9xzqlqJAuDl27w9vxRgv5suSpRSAdaWnJN0m5K34yhioBdiqfpO7syukT+x0gFIH8XccLUR5kCBjTPia0rGGMETcmufw8w+MP6ZVeQa2LSbmVdHuE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767180416; c=relaxed/simple;
+	bh=6D16B7m9uQRJNUmyKXmraBn8q8d04KialojlzcSjKuc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Iz4j+sVFjaOXniXPYWOkBZsYjhCHsmfZ8J2nz9HMIjj31zzoKSj3UBzADtYqewziKwDWrW2XT8cQfWuVEZVo19Wdf+qP59EU3zKvqJbUoGjCaanUBL4K2TgXkj3X4iOaMIrmd29V71+99Cy9lklcRSqixrACmcsxs+Zb5mcW4C8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=fBDcFVs0; arc=fail smtp.client-ip=52.101.201.60
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hsXeJ/s+bY+MXKTZ9mPZI1W2+9I42ZToMfcWrs35QgXFzDoYkTlW7vOb+bRYTrGSWKwVo7SeH2MJA7PfPD49nHjTJ7HycMYUP24vJIpRc/tNh9x8ViUH8GUUYswruAZJ1xTgshIdm32qk6BB/u1w37zoFJ0Zrf9dADz14siy0BhsIa3pCNi7kfLXXttnM5njkqkF0AxkqVEH8jklSm8d85golVr8tPEEY40Ofe//RuzBmvXsIEMRspUl+t0o47lFBSZKkF3KWKJvviMhl4bEIcMMrjOU57fSvnS77DCQunugVh+Ddlm6RQzqOE5NKeMajk6ywRj7DCbq7EItIpc6rQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wSxFbtLhGpXJJDoKz317lJ/8JKwA1YnD6R4kNZXO7bY=;
+ b=hkTi96IWDu9BBFmGRDfC4/Hevp8pCZ9dycVtPJX0xnclRbVAUROnMmFQz3lj29i9xjKPOVZMskryJsNqVvvnu2eM+zIr5FItcexKEXetquOWmTFsoz1Eej31EJjNqrrSs5YEjmUWskBHRULJT3TRZH3P1FuO21X2K5mFj+7U8p1nyAf0ahYJmXt0XBRQUJyi91OQ6GWtt8xU2Z0BlZtlzg30Vr9g6bNkqy/HL4mzOY+3ezuAdt7s67PE0TyGd4ArVsN18KB6RaMatObBdaZ2+vi2LRNk+lUcVPAz7Cjv0Qm8MCVvjQjre3+zwh34Oubv1GECKb2EZH0FB/onxjH2eg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=suse.cz smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wSxFbtLhGpXJJDoKz317lJ/8JKwA1YnD6R4kNZXO7bY=;
+ b=fBDcFVs0dz42+5D6BUY1ovVz4t0cLOCqBNDfZWXVP1cmar5+UQRih57G42V8b+elqwmOjB7OI/hPvwN3xhRFtV5SSHlEbReVsWCKnyS0WBLipu9gt5X7W2bbiqFDbaWS1P8xWZCSFfdSh4rHGvU4abTA+W1vPPQuEom8ycX5M9EcqLqGMsslD3A/UU8r6E7Q+pxcM9wVX/Fh+TVXlklQ5/gwE2VE175s/xQYbxhAldbFrA6HoUQ00RKsmeueWabwWcOfLWEscTPeHJH0lFrOs1omkHNNdCiW8FMUd86dW1lD+DnN/TO31F7W0HuZbfMj4n2iG4jQWRWrKDKu6GYYsQ==
+Received: from SN7P220CA0002.NAMP220.PROD.OUTLOOK.COM (2603:10b6:806:123::7)
+ by BY5PR12MB4243.namprd12.prod.outlook.com (2603:10b6:a03:20f::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9456.14; Wed, 31 Dec
+ 2025 11:25:39 +0000
+Received: from SN1PEPF00026368.namprd02.prod.outlook.com
+ (2603:10b6:806:123:cafe::90) by SN7P220CA0002.outlook.office365.com
+ (2603:10b6:806:123::7) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9478.4 via Frontend Transport; Wed,
+ 31 Dec 2025 11:25:38 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ SN1PEPF00026368.mail.protection.outlook.com (10.167.241.133) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9478.4 via Frontend Transport; Wed, 31 Dec 2025 11:25:38 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 31 Dec
+ 2025 03:25:32 -0800
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Wed, 31 Dec 2025 03:25:32 -0800
+Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com
+ (10.126.190.181) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
+ Transport; Wed, 31 Dec 2025 03:25:30 -0800
+From: Gal Pressman <gal@nvidia.com>
+To: Michal Kubecek <mkubecek@suse.cz>, Chintan Vankar <c-vankar@ti.com>,
+	<netdev@vger.kernel.org>
+CC: Gal Pressman <gal@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>
+Subject: [PATCH ethtool] ethtool: Fix declaration after label compilation error
+Date: Wed, 31 Dec 2025 13:25:33 +0200
+Message-ID: <20251231112533.303145-1-gal@nvidia.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251231012030.6184-1-xiliang@redhat.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF00026368:EE_|BY5PR12MB4243:EE_
+X-MS-Office365-Filtering-Correlation-Id: c7d0b2e5-7f5f-4c17-892b-08de485f530c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?CfQcuIEm7EFASqZM8bRRllC2MHgQiJk3qpTMehKRftTmljgsN57QzH08yl9L?=
+ =?us-ascii?Q?nxYYNOso+wKnXBvb8cLOt6Ov/I4iaUANPX06wfekDzH+RFVKMyEPhaoTpP8q?=
+ =?us-ascii?Q?sHMjthBChw3YbR6DpMH4AJWYOfPMsA5iLD0yq9l+bW9W9glkWUqwbZC4Yk43?=
+ =?us-ascii?Q?H8WF0jbsdLGskYyGm+9+8NnpfreLwJfbvc+Wz8I1/Mtew7E4YoGSietYS/5v?=
+ =?us-ascii?Q?qut2A26liJ+wZFicE+s6tHSbFNtUewMA1w8AK1Ihg7bfeRJwUeYu+Mk8lhlO?=
+ =?us-ascii?Q?izP0FZyFmgqSua4UG+uXy4Gh0CAaHqKBITStrvQfnaNFQjB4eCy2gkpvJcIr?=
+ =?us-ascii?Q?JNlWJM1psSWHzWWNMchRdNHoKvkBy5FLwIsbPWmMz+3Ni2i/Fm5qshRiuidW?=
+ =?us-ascii?Q?Zuc5Q/GTTUYHIX7zidf30Qx5EMijR4+rGB0YS1Wb3Sk3IH/yTgFFxMKaI+NS?=
+ =?us-ascii?Q?HN9fvU3UcaOwUgDbz1fKo415ulliQ0MXr0tC8b6JrtMfynACujMFNZ+2jexG?=
+ =?us-ascii?Q?5ZTCgmiEjvpanx85tB3Zl2j47OcDJILvaxZO2dgQO1D/xhAEANDw6+WYuQyy?=
+ =?us-ascii?Q?eXwbvrjch90rSpuadJtKaraZ7L2ePf22qkMu3YC+ALITimXBI1O+xwGQvrGG?=
+ =?us-ascii?Q?IiWO6Qh1KyaprP0OeuycxeXrN6/7lDSl9K5IO8aZhdV3tLEfabgKJq6CF08v?=
+ =?us-ascii?Q?6cWBgUBeqOElWZPojmMC9KD+++idhKX/rs9W2nh3nbUxj6Rd+4bYH24lNmvT?=
+ =?us-ascii?Q?aQ3blUe4huUGjrSzjagXovNMEQIoy3hN2Zj7TZHhQhR0ALEZ7OwwAC3qWJ6E?=
+ =?us-ascii?Q?iFgqiuzLiU8kmB4zdpJ7hypWjmQLSJFbcoD2qc28g3RUbY4xLfCUZtT6CcgY?=
+ =?us-ascii?Q?DQZRYANNF3lZc9Xjvkgj0g+0YekEuWL+iV/EgOyPTj5j6MhJAkYDljUNGg4Z?=
+ =?us-ascii?Q?s/urhR/Ol/gvokYMmqO5zmffpfxG5CAG6x9pEJEhUM3tFf4bpbUmqRlhseNm?=
+ =?us-ascii?Q?fxugKu20yhYudgftjdvfxkGqpuEEUshaxbsmdSwat78sWdEHPp7nkOYLP/I/?=
+ =?us-ascii?Q?8oo71Rhis8rbiBz5ULH1451CNkLgHDAUBfyPeHJvypXfomi6ITB1NP8tc0iy?=
+ =?us-ascii?Q?P94C2CrvKzxFukGjKHtTxXF9ztpLS6e7H0hvr8WrVWpY/NMFJaLaP04ck9uV?=
+ =?us-ascii?Q?NYW0iBGH/ChKjNqlTeN+wfo1ZSTZRuXpiQClxz2oQxqOYzUWIaaKRjqyLZFD?=
+ =?us-ascii?Q?sl6dWlEmWyscicjWCQ46UxZbdefnRMVpmHdR2k7tR3fwEkcaHt661F1ZqrQo?=
+ =?us-ascii?Q?rwkd8uI1ZiwlhhOY/tW1+FakKYt3Pn23wl2TeKB939KAIL2D6Vd3h/MugFYO?=
+ =?us-ascii?Q?/Fh8RcYhIvU+TxC7T4oqKncz/ZMNNVeHvZM8dzp3WSxeMcedV0p8F6TNyw4b?=
+ =?us-ascii?Q?hTKCyFgegfBJOvcFzqZqDmrgFgj77SYQdj+buhnYAw39bQbk4nWKybXB/NPR?=
+ =?us-ascii?Q?m9LCsvqlropBLbu3tSWHloKrU8jPimxnofKzKZWvBRaDT8CuwYQBq8bbSJpj?=
+ =?us-ascii?Q?mMlQo4Yk7MnfzXkh1lU=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Dec 2025 11:25:38.4358
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c7d0b2e5-7f5f-4c17-892b-08de485f530c
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF00026368.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4243
 
-Wed, Dec 31, 2025 at 02:20:30AM +0100, xiliang@redhat.com wrote:
->From: Frank Liang <xiliang@redhat.com>
->
->Fix assert lock warning while calling devl_param_driverinit_value_set()
->in ena.
->
->WARNING: net/devlink/core.c:261 at devl_assert_locked+0x62/0x90, CPU#0: kworker/0:0/9
->CPU: 0 UID: 0 PID: 9 Comm: kworker/0:0 Not tainted 6.19.0-rc2+ #1 PREEMPT(lazy)
->Hardware name: Amazon EC2 m8i-flex.4xlarge/, BIOS 1.0 10/16/2017
->Workqueue: events work_for_cpu_fn
->RIP: 0010:devl_assert_locked+0x62/0x90
->
->Call Trace:
-> <TASK>
-> devl_param_driverinit_value_set+0x15/0x1c0
-> ena_devlink_alloc+0x18c/0x220 [ena]
-> ? __pfx_ena_devlink_alloc+0x10/0x10 [ena]
-> ? trace_hardirqs_on+0x18/0x140
-> ? lockdep_hardirqs_on+0x8c/0x130
-> ? __raw_spin_unlock_irqrestore+0x5d/0x80
-> ? __raw_spin_unlock_irqrestore+0x46/0x80
-> ? devm_ioremap_wc+0x9a/0xd0
-> ena_probe+0x4d2/0x1b20 [ena]
-> ? __lock_acquire+0x56a/0xbd0
-> ? __pfx_ena_probe+0x10/0x10 [ena]
-> ? local_clock+0x15/0x30
-> ? __lock_release.isra.0+0x1c9/0x340
-> ? mark_held_locks+0x40/0x70
-> ? lockdep_hardirqs_on_prepare.part.0+0x92/0x170
-> ? trace_hardirqs_on+0x18/0x140
-> ? lockdep_hardirqs_on+0x8c/0x130
-> ? __raw_spin_unlock_irqrestore+0x5d/0x80
-> ? __raw_spin_unlock_irqrestore+0x46/0x80
-> ? __pfx_ena_probe+0x10/0x10 [ena]
-> ......
-> </TASK>
->
->Signed-off-by: Frank Liang <xiliang@redhat.com>
->Reviewed-by: David Arinzon <darinzon@amazon.com>
+Wrap case blocks in braces to allow variable declarations after case
+labels, fixing C89 compilation errors:
 
-Missing "Fixes" tag?
+  am65-cpsw-nuss.c: In function 'cpsw_dump_ale':
+  am65-cpsw-nuss.c:423:4: error: a label can only be part of a statement and a declaration is not a statement
+      u32 oui_entry = cpsw_ale_get_oui_addr(ale_pos);
+      ^~~
+  am65-cpsw-nuss.c:432:4: error: a label can only be part of a statement and a declaration is not a statement
+      u32 vlan_entry_type = cpsw_ale_get_vlan_entry_type(ale_pos);
+      ^~~
+
+Fixes: eb91e05c98d4 ("pretty: Add support for TI K3 CPSW registers and ALE table dump")
+Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
+Signed-off-by: Gal Pressman <gal@nvidia.com>
+---
+ am65-cpsw-nuss.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/am65-cpsw-nuss.c b/am65-cpsw-nuss.c
+index de8e3e9d4cc1..fbb20bf271e7 100644
+--- a/am65-cpsw-nuss.c
++++ b/am65-cpsw-nuss.c
+@@ -419,7 +419,7 @@ void cpsw_dump_ale(struct k3_cpsw_regdump_hdr *ale_hdr, u32 *ale_pos)
+ 		case ALE_ENTRY_FREE:
+ 			break;
+ 
+-		case ALE_ENTRY_ADDR:
++		case ALE_ENTRY_ADDR: {
+ 			u32 oui_entry = cpsw_ale_get_oui_addr(ale_pos);
+ 
+ 			if (oui_entry == 0x2)
+@@ -427,8 +427,9 @@ void cpsw_dump_ale(struct k3_cpsw_regdump_hdr *ale_hdr, u32 *ale_pos)
+ 			else
+ 				cpsw_ale_dump_addr(i, ale_pos);
+ 			break;
++		}
+ 
+-		case ALE_ENTRY_VLAN:
++		case ALE_ENTRY_VLAN: {
+ 			u32 vlan_entry_type = cpsw_ale_get_vlan_entry_type(ale_pos);
+ 
+ 			if (vlan_entry_type == VLAN_INNER_ENTRY)
+@@ -442,6 +443,7 @@ void cpsw_dump_ale(struct k3_cpsw_regdump_hdr *ale_hdr, u32 *ale_pos)
+ 			else if (vlan_entry_type & VLAN_IPV6_ENTRY_MASK)
+ 				cpsw_ale_dump_ipv6_entry(i, ale_pos);
+ 			break;
++		}
+ 
+ 		case ALE_ENTRY_VLAN_ADDR:
+ 			cpsw_ale_dump_vlan_addr(i, ale_pos);
+-- 
+2.40.1
+
 
