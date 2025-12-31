@@ -1,72 +1,110 @@
-Return-Path: <netdev+bounces-246394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 750CCCEAFDB
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 02:21:24 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92E8ECEB1E7
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 03:54:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 98DEA302C22C
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 01:21:11 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4A0A33007654
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 02:54:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F5D61F1513;
-	Wed, 31 Dec 2025 01:21:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A0D82773CB;
+	Wed, 31 Dec 2025 02:54:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eyFAhoo9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ArsgC8aJ";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="SGnw6ERa"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9962374C14
-	for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 01:21:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F639274B2A
+	for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 02:54:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767144070; cv=none; b=h/l4L9NMJoyK5ZeLFSy019A5VBx5GkmIEUJXXJmbL/FEkUeyAdzlD3prj5XjjiQ9MnAHRkYL3uc0ulwqmPFl7zQXVDGOHoVOkDK0tVP0b00Aq7JymzO8Ao0YfTldegm4MgsFHHzUeN6gn1JIIZvTa9TjwevDsz1FiCILZEKfFDw=
+	t=1767149669; cv=none; b=JCRFByaLl+5O1IomOHY7iqUZ+pS12iuIuka0k8sPYePd5A6yN+2xUzYnJRaLaTyDxQjJndsRSTirc/XIPWLpLyposfTVMj9GJnacztXtqfGSWW9uo2GXN+1GVaH9oVOCPsHgMt4+2ZD7aKDMTp/LJYekOas9LGGSRXEqA56r7Uw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767144070; c=relaxed/simple;
-	bh=filJgWl47X7iQElQfzz4maRRhjiUUJfd+B8gjoh7umY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=i94ucdN/L1qZ+zDxbxm/dFpLuZZQ854Pi9y2ycv8cj7PTi8DnOmQFF8PdkxMjG5D/rTtUKUPxnUilNEwoq35904ejFz47EJupUkHBVwzO4xSwFgYchCohvUmQj41UkjYy98293j8povzCKJBtUNel3p5t5LerAT8QBIZnvx94Jc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eyFAhoo9; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1767149669; c=relaxed/simple;
+	bh=ZfhT/g/KXKfyDI1I/BMzMejSaXPtB4iu884BXeXIILY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XKl7H6SwU1I+iE9smL+c4L1oC7Q0SScCOS1g8SvyMZV6c8RasY00JAZhCx4RUbNzlRMMVr5K/L4v3lVoWRqMbsyxuAW02cYTt5xtnJu1kyPyHCIa80Nyp+Ri5mR+NP4QgGO1eudoXQPtab+x4ktgCQK7xrEMjmUBSbeVGfyl7BU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ArsgC8aJ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=SGnw6ERa; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767144065;
+	s=mimecast20190719; t=1767149666;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lgMKBlblGEGUwbZ2glt1AcmEiBNBCwiy72H146MYxIk=;
-	b=eyFAhoo9yYdxh20q7Xp/1jaiDYhmcqGlTs8APIx5Ix6UCuwul1jXj/suNs2/aMXOHhcUoZ
-	BZFCOVtZf90q95dQlDKhjzhNoEpRL2Tnal0jvuS+TdCWm3lHLaibvrwG6B/n7OsDrldW8f
-	KLwaSjqfx0sZlvvDqSgGId6QTZzGOAQ=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-235-5fS7eBybMyeFMWdqAGnCrA-1; Tue,
- 30 Dec 2025 20:21:01 -0500
-X-MC-Unique: 5fS7eBybMyeFMWdqAGnCrA-1
-X-Mimecast-MFC-AGG-ID: 5fS7eBybMyeFMWdqAGnCrA_1767144059
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CE1531956050;
-	Wed, 31 Dec 2025 01:20:59 +0000 (UTC)
-Received: from localhost.redhat.com (unknown [10.72.112.28])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5FFD430001A2;
-	Wed, 31 Dec 2025 01:20:55 +0000 (UTC)
-From: Xiao Liang <xiliang@redhat.com>
-To: shayagr@amazon.com,
-	akiyano@amazon.com,
-	darinzon@amazon.com,
-	saeedb@amazon.com,
-	netdev@vger.kernel.org
-Cc: xiliang@redhat.com
-Subject: [PATCH v2] net/ena: fix missing lock when update devlink params
-Date: Wed, 31 Dec 2025 09:20:30 +0800
-Message-ID: <20251231012030.6184-1-xiliang@redhat.com>
-In-Reply-To: <20251229145708.16603-1-xiliang@redhat.com>
-References: <20251229145708.16603-1-xiliang@redhat.com>
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=2Ci8Uj4n1LPHgZebXoB/5YEcgElZddA0d+SGTjdwxBk=;
+	b=ArsgC8aJKIPHIdaj6ZJl2wT+BpObUEto9svK3gvf2lV0NPLtAVUW0f2e1wtuSrtojBMVG6
+	k4jZC/Kv41ymwjkxfmATaSzFSoskNYU+03UWrmHt9igiSjkaGtKNu0X2MVRrKsdPHJArvH
+	z5RooPYvKi4BRiCM/WhFRzOT8eUipbY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-333-BZILgek3PjuobIVp8YOm2g-1; Tue, 30 Dec 2025 21:54:24 -0500
+X-MC-Unique: BZILgek3PjuobIVp8YOm2g-1
+X-Mimecast-MFC-AGG-ID: BZILgek3PjuobIVp8YOm2g_1767149664
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-430f527f5easo6179154f8f.1
+        for <netdev@vger.kernel.org>; Tue, 30 Dec 2025 18:54:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1767149663; x=1767754463; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2Ci8Uj4n1LPHgZebXoB/5YEcgElZddA0d+SGTjdwxBk=;
+        b=SGnw6ERamwI0FQJNe309QbnUdgdPkLxsqfE7bIMGmU6gJmxwKrGpce4hPjgAXOvSG+
+         jXTN7+Ip/9lFJH4gkIIOcrwwKkzu0HyQnzYTh2X3cAJjq2ivEsjH1NfA7jwdTe7bWMnm
+         URvWdvmcTMgQVJ9ptF1v2mbdw5YRj3ai+js5FlFKkT2SqaUn7x6hZO2853xEVQnrhePg
+         U8sHVP5J6lY71ThNKgqWEcqZOegpmTuEr00gdSAxicsiDCsBEm4KgTXFjjgTC11MLaf5
+         kq6Z2poPvFmZ2dq4zoQbjZi/d73I9DN90bVRHwOj9hUIrU2yFgUsNGbVidzQPky7fFtw
+         KkdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767149663; x=1767754463;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2Ci8Uj4n1LPHgZebXoB/5YEcgElZddA0d+SGTjdwxBk=;
+        b=XV/PCcgFutUBQbnjaXQ/802q2JlkLHjIWhuYSH31vQq5Wg7I8xevD+WWjDORCpqvHk
+         GXxfkQ7fZSqim7rAEIS1pPLZLA2hz4O940WHol54V0xZG13FR2n3caZF+uo9s1zhhcf4
+         cj7QfrcFGwV6I40+esRSdKO3UGtB4qzrraxTMeBvz6+TmMdKPhjfLC4fk2BDXtVP35b4
+         u2Bj/2wbVpuTWvq4bBRYJKKzgeqJZDk7AlnZtrprHVLTs2VJW9FEk0jC5iFfen0V+DZR
+         LftnoRZq/xYmKlPO3HPyL7yI9drE5U5yD9/W48yBAPkyhomqd5khynBd2p1oFUCb1tzi
+         XC+Q==
+X-Gm-Message-State: AOJu0YwAStLmXrdRZ9Z/Rhjms6H81LMdIULKbQqrBhAPpr4P4BhrVYme
+	lEQ9Te2dlPoraS2Jqr0gp5iycjWgh8iA66/HHju5Iugsvfw+0kTeajg93L2cPwS7dSfhTSf3NHd
+	a8rEuI123/6bOnbswgHRylwCAB3sR8qOOO3HQlLESlW9e2eph8vsBBWAUQVLcMn9lyCnOqjiMn8
+	bPbM70ww6yNlRncz3p9PmoTSvY9l1doh5eAE2DaA==
+X-Gm-Gg: AY/fxX6ab23bicoukImfeeho1BYYD2jB/WqYt1tRo7uZn/uZEOs3PfDucdhWq4PhgHG
+	CKvivG9wZ67+BJYGnMwSkLyJXwL8Cg/XvBz0tf6RQUREQ1KwPQe37pntf/aQwEWfG54tWu2U9NI
+	gByiFRdZhQTqIzC6CYY7pgnjHgH+fgiWLbClnpkfR2AcRYf3zDyPpdugrSfZk/pINmjfLfgGWwW
+	erqeiozF8XxROujVPqsAoOfuOrq+dKkZ1MxagTCMGsABjFVUldEhXnoQ2brZvaLPCG2cX9wBv1d
+	zHCBZm4o70XdRYUnQU/FDQWhCJ1Nd+3EGbkZvGp5r0A8sBL/XMS7zXq3dM1zxXqwSa/I3d76l49
+	1GOG7GWwf2TbTpq8pJM2kIrE=
+X-Received: by 2002:a05:600c:828d:b0:46e:2815:8568 with SMTP id 5b1f17b1804b1-47d20502f98mr321882695e9.10.1767149663367;
+        Tue, 30 Dec 2025 18:54:23 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHXyY9SNQaOqW5dzTdsToa8HRodCjlWWkzkH1jaaxruL8NcW5OPk4PZyT78Tl7K83rC5mi4YQ==
+X-Received: by 2002:a05:600c:828d:b0:46e:2815:8568 with SMTP id 5b1f17b1804b1-47d20502f98mr321882515e9.10.1767149662975;
+        Tue, 30 Dec 2025 18:54:22 -0800 (PST)
+Received: from fedora.redhat.com ([216.128.14.244])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be273f147sm689497605e9.7.2025.12.30.18.54.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Dec 2025 18:54:21 -0800 (PST)
+From: mheib@redhat.com
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	kernelxing@tencent.com,
+	kuniyu@google.com,
+	willemdebruijn.kernel@gmail.com,
+	atenart@kernel.org,
+	aleksander.lobakin@intel.com,
+	Mohammad Heib <mheib@redhat.com>
+Subject: [PATCH net v2] net: skbuff: fix truesize and head state corruption in skb_segment_list
+Date: Wed, 31 Dec 2025 04:54:14 +0200
+Message-ID: <20251231025414.149005-1-mheib@redhat.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,80 +112,86 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-From: Frank Liang <xiliang@redhat.com>
+From: Mohammad Heib <mheib@redhat.com>
 
-Fix assert lock warning while calling devl_param_driverinit_value_set()
-in ena.
+When skb_segment_list is called during packet forwarding through
+a bridge or VXLAN, it assumes that every fragment in a frag_list
+carries its own socket ownership and head state. While this is true for
+GSO packets created by the transmit path (via __ip_append_data), it is
+not true for packets built by the GRO receive path.
 
-WARNING: net/devlink/core.c:261 at devl_assert_locked+0x62/0x90, CPU#0: kworker/0:0/9
-CPU: 0 UID: 0 PID: 9 Comm: kworker/0:0 Not tainted 6.19.0-rc2+ #1 PREEMPT(lazy)
-Hardware name: Amazon EC2 m8i-flex.4xlarge/, BIOS 1.0 10/16/2017
-Workqueue: events work_for_cpu_fn
-RIP: 0010:devl_assert_locked+0x62/0x90
+In the GRO path, fragments are "orphans" (skb->sk == NULL) and were
+never charged to a socket. However, the current logic in
+skb_segment_list unconditionally adds every fragment's truesize to
+delta_truesize and subsequently subtracts this from the parent SKB.
 
-Call Trace:
- <TASK>
- devl_param_driverinit_value_set+0x15/0x1c0
- ena_devlink_alloc+0x18c/0x220 [ena]
- ? __pfx_ena_devlink_alloc+0x10/0x10 [ena]
- ? trace_hardirqs_on+0x18/0x140
- ? lockdep_hardirqs_on+0x8c/0x130
- ? __raw_spin_unlock_irqrestore+0x5d/0x80
- ? __raw_spin_unlock_irqrestore+0x46/0x80
- ? devm_ioremap_wc+0x9a/0xd0
- ena_probe+0x4d2/0x1b20 [ena]
- ? __lock_acquire+0x56a/0xbd0
- ? __pfx_ena_probe+0x10/0x10 [ena]
- ? local_clock+0x15/0x30
- ? __lock_release.isra.0+0x1c9/0x340
- ? mark_held_locks+0x40/0x70
- ? lockdep_hardirqs_on_prepare.part.0+0x92/0x170
- ? trace_hardirqs_on+0x18/0x140
- ? lockdep_hardirqs_on+0x8c/0x130
- ? __raw_spin_unlock_irqrestore+0x5d/0x80
- ? __raw_spin_unlock_irqrestore+0x46/0x80
- ? __pfx_ena_probe+0x10/0x10 [ena]
- ......
- </TASK>
+This results a memory accounting leak, Since GRO fragments were never
+charged to the socket in the first place, the "refund" results in the
+parent SKB returning less memory than originally charged when it is
+finally freed. This leads to a permanent leak in sk_wmem_alloc, which
+prevents the socket from being destroyed, resulting in a persistent memory
+leak of the socket object and its related metadata.
 
-Signed-off-by: Frank Liang <xiliang@redhat.com>
-Reviewed-by: David Arinzon <darinzon@amazon.com>
+The leak can be observed via KMEMLEAK when tearing down the networking
+environment:
+
+unreferenced object 0xffff8881e6eb9100 (size 2048):
+  comm "ping", pid 6720, jiffies 4295492526
+  backtrace:
+    kmem_cache_alloc_noprof+0x5c6/0x800
+    sk_prot_alloc+0x5b/0x220
+    sk_alloc+0x35/0xa00
+    inet6_create.part.0+0x303/0x10d0
+    __sock_create+0x248/0x640
+    __sys_socket+0x11b/0x1d0
+
+This patch modifies skb_segment_list to only perform head state release
+and truesize subtraction if the fragment explicitly owns a socket
+reference. For GRO-forwarded packets where fragments are not owners,
+the parent maintains the full truesize and acts as the single anchor for
+the memory refund upon destruction.
+
+Fixes: ed4cccef64c1 ("gro: fix ownership transfer")
+Signed-off-by: Mohammad Heib <mheib@redhat.com>
 ---
- drivers/net/ethernet/amazon/ena/ena_devlink.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ net/core/skbuff.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/amazon/ena/ena_devlink.c b/drivers/net/ethernet/amazon/ena/ena_devlink.c
-index ac81c24016dd..4772185e669d 100644
---- a/drivers/net/ethernet/amazon/ena/ena_devlink.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_devlink.c
-@@ -53,10 +53,12 @@ void ena_devlink_disable_phc_param(struct devlink *devlink)
- {
- 	union devlink_param_value value;
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index a00808f7be6a..63d3d76162ef 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -4656,7 +4656,14 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
+ 		list_skb = list_skb->next;
  
-+	devl_lock(devlink);
- 	value.vbool = false;
- 	devl_param_driverinit_value_set(devlink,
- 					DEVLINK_PARAM_GENERIC_ID_ENABLE_PHC,
- 					value);
-+	devl_unlock(devlink);
- }
+ 		err = 0;
+-		delta_truesize += nskb->truesize;
++
++		/* Only track truesize delta and release head state for fragments
++		 * that own a socket. GRO-forwarded fragments (sk == NULL) rely on
++		 * the parent SKB for memory accounting.
++		 */
++		if (nskb->sk)
++			delta_truesize += nskb->truesize;
++
+ 		if (skb_shared(nskb)) {
+ 			tmp = skb_clone(nskb, GFP_ATOMIC);
+ 			if (tmp) {
+@@ -4684,7 +4691,12 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
  
- static void ena_devlink_port_register(struct devlink *devlink)
-@@ -145,10 +147,12 @@ static int ena_devlink_configure_params(struct devlink *devlink)
- 		return rc;
- 	}
+ 		skb_push(nskb, -skb_network_offset(nskb) + offset);
  
-+	devl_lock(devlink);
- 	value.vbool = ena_phc_is_enabled(adapter);
- 	devl_param_driverinit_value_set(devlink,
- 					DEVLINK_PARAM_GENERIC_ID_ENABLE_PHC,
- 					value);
-+	devl_unlock(devlink);
+-		skb_release_head_state(nskb);
++		/* For GRO-forwarded packets, fragments have no head state
++		 * (no sk/destructor) to release. Skip this.
++		 */
++		if (nskb->sk)
++			skb_release_head_state(nskb);
++
+ 		len_diff = skb_network_header_len(nskb) - skb_network_header_len(skb);
+ 		__copy_skb_header(nskb, skb);
  
- 	return 0;
- }
 -- 
 2.52.0
 
