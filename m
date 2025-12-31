@@ -1,172 +1,115 @@
-Return-Path: <netdev+bounces-246427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1BB9CEC033
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 14:12:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 91243CEC05E
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 14:19:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9E78E30161B5
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 13:12:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 109E2301765A
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 13:19:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9659D322B90;
-	Wed, 31 Dec 2025 13:12:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57529322B9F;
+	Wed, 31 Dec 2025 13:19:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="SiNOf5hC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sqJJ3lmV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E112773C1
-	for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 13:12:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5691EEA55;
+	Wed, 31 Dec 2025 13:19:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767186755; cv=none; b=CJRSoks4NWlg3WxLTZNzL8kHhC5Y8WnCWl836GlvkE3F0H4L+NBq5vnFJB/fO3CBZufWdUdxep2T10AKC01zlBuSk+uC26ZiNb+nPzkJlfkDs07l4YbLAlGgpvHqldW7JDiFhYCIjg3+7nmPgJsRsAnTEsBdr4Es+uYJS9q+NPg=
+	t=1767187143; cv=none; b=I/B6lw2pr9m8qFA8/sbIoztjV2rPOBhx2wB0tdGlcNsnm2k/fnP7JWenXoDNkPHqzqDoFvR4F8pUxVZ3qVX43OWXmXy0NAt3ea5ekLv4aGo8tECb5f4xzoASz3kmNb1pgrWQfVrD9gs+gLmwihfpPNZCgp64xNefLNvW1OMRq7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767186755; c=relaxed/simple;
-	bh=+Rj9uS/xKO+b+rZgqDTkOPQ7AM9H+O0zY3sW6JnGIaQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PpJ0f5FeTWJXATvNIDLQC/7XAQQItgJmzrvNunUFR8QDZY/1ca+WQmg1pQvNVDe9WA5ZeE42Ub/J3lC7we7+h4p2NHO32EjuJo6dNaFIAvMEk05so67zw1oB7man2omC6xU9qvhT4IqwmNepdUadZ/Qmo3BtIimTiNbvygJLuCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=SiNOf5hC; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-47d538fafdfso3024565e9.1
-        for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 05:12:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1767186751; x=1767791551; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Fke3G5rSH2WPZ2DuQdyfqEfEpoI6l76uJNtI0EpEhAo=;
-        b=SiNOf5hCQAQ9lih0xDGV7gjR7CfpmOO8AB3s9IeITfpaC328pdo654nC3FNIfPPnYB
-         fkd5qD9q+HvWSq536C6BhTSPieAbHLipRfLKE21iDDYtDmghplktpIhdpDtdORPciAcZ
-         LQpQ8PKMM8Q6/YUI7t1QvsKoPzRYURS1J27f9/F31nTEFyFQlVX8XQzAr1xtRLQ39GkB
-         REQ15nkajDKe1xg9zkDXa/UH9tt1LtbNShtNDDvRc1UpIXkWn8dwnUZCTvot/hexmBta
-         XggYEqQC1GM23pJ7GQgNCAuwh+5a70MQJiobGXUg7XwbkgAb1lDG3040If49qmyX801q
-         2gDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767186751; x=1767791551;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Fke3G5rSH2WPZ2DuQdyfqEfEpoI6l76uJNtI0EpEhAo=;
-        b=U6Fe3RRr+nqG+BGLDShn2mnB9WcbUDykTCl/8ZeE1DldiDwbKoFCsP5tduuT41kkVJ
-         tiFKLnPLLzTAG9VM8uQB/0iyOpAqr0BmoeFYmpy81wlK3QcidLoi4szhJyCyC6K8jneo
-         Ym3BJv9tDDrrqFFgUDR6uguYpiINrMm8rCYqQL7Hp6L3JufY57ObQLTSIOnkA3ea0QPW
-         eDwWnRe6RLr57rck6gBwc1CHRAV8yEnqTFBN+PVVAQrYu9Ru6ieX1x5eq0cxpKCmUmuA
-         7fcJJqjGiKxLiehxIlrOF7qsuwPBwiyVnWAQ3/k0qgCzrc0RA87EJmz0Dclz52Vd9BAs
-         IgTA==
-X-Forwarded-Encrypted: i=1; AJvYcCWWfvNRUef/Ri/K9Y5hqS3cjdgzFaINFuhkq7YK2hoFN0VyVugVWsCZPbQPiYPah8vND7Wu9Bs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQ8Ya/fNew8QMUXNElYL7sbV/kBmAdWS4lfbVOJpwAYnDyKene
-	lnlK9mu2sNeaNyiJI3cXHY3IXT6lT5eT807j5DT6bLeAP7TsvwySLkf8+dWbaOwcLCQ=
-X-Gm-Gg: AY/fxX7Gb+tuTXbt+yj3yKULD2+OZYKZDDvHZvzsr/evHH4K8szN5Jm1g1QIuaFenrD
-	NvSSWYDyTYBJUkgYD/T+rHTnx4iZgRmnvMiBV+ULfg7NgsjhVkaqOniqQpNQPOlziGLPkSXBs+I
-	XRJb6FjsBT2TWABcj15Ng7uz3Hc7ubpR432RwMIUk3XJFlMXDGngOuC+OXtJluyelKgZbJjiHhc
-	PzJeHL7+zPIZLfKUP795dMybjO2AxOiNyF9pssEIId6o/fzhoPZ0lwowUuMK+nR/BSQ9otFNC6N
-	/xmhHmGpgknns/s4lEqsziONwSBQWzZr29LD4LCuQLdEQeo1eS7M3w0XSHyBrcJJW7jMYAQnTnA
-	mTzRBza2eA0e59YsBf064HpCQvl3R9X1jXIQevwuvCATdCK1neXBTtRlZt5pCqTpe+LTFqg34sP
-	EvqxAJ4zf2JVzkQg0ozx/J4kciE0h88CEr9C83KBKoWTl3dzdkqBwPjuhjcRK4yZ/FMz91y4foe
-	Fqq
-X-Google-Smtp-Source: AGHT+IF4mp6GOV5G6x95wPZOhGbqasawR+ZO3M57T/TzQMfUeMdF8kArZ+ePMOUwA5I3JuKmTuDssg==
-X-Received: by 2002:a05:600c:3e0b:b0:477:9c73:268a with SMTP id 5b1f17b1804b1-47d195b3d55mr287631655e9.6.1767186751342;
-        Wed, 31 Dec 2025 05:12:31 -0800 (PST)
-Received: from mordecai (dynamic-2a00-1028-83b8-1e7a-3010-3bd6-8521-caf1.ipv6.o2.cz. [2a00:1028:83b8:1e7a:3010:3bd6:8521:caf1])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be3a20af0sm269524875e9.4.2025.12.31.05.12.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Dec 2025 05:12:30 -0800 (PST)
-Date: Wed, 31 Dec 2025 14:12:24 +0100
-From: Petr Tesarik <ptesarik@suse.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>, Olivia Mackall <olivia@selenic.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Eugenio =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, "James E.J. Bottomley"
- <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
- Robin Murphy <robin.murphy@arm.com>, Stefano Garzarella
- <sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Leon Romanovsky
- <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
- linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
- virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
- iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH RFC 00/13] fix DMA aligment issues around virtio
-Message-ID: <20251231141224.56d4ce56@mordecai>
-In-Reply-To: <cover.1767089672.git.mst@redhat.com>
-References: <cover.1767089672.git.mst@redhat.com>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-suse-linux-gnu)
+	s=arc-20240116; t=1767187143; c=relaxed/simple;
+	bh=ypn/q+ILRrt5uVnU9TRkKLrfFM5tQxriCjP5mEvYBRY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NU/kSGWG3Khlkv3+V0KPP92OszZEySzGg/x8qFJKB5ke3V/MD02AP79C4j9ioGyMIbP5zmbfTyJtSUwIDemOin1VcL3Mw6iWjv1IePAPp/3BjLY+Wqal/XUyyZ7L3UIDIfgUtoTpoW1+EfKXrbNF+UXXpyvcNWGuiIwVwmkYbck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sqJJ3lmV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A1A3C113D0;
+	Wed, 31 Dec 2025 13:19:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767187142;
+	bh=ypn/q+ILRrt5uVnU9TRkKLrfFM5tQxriCjP5mEvYBRY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sqJJ3lmVMf3teCNuAdVsjiRVupecIds4UPxN86Cxl9KA2fwWuX6h3c50j+Jw9b3mL
+	 rCqKrw8OoWIjhaI2tYqbnk0gExYsfn3LbQAa2vQj8o+hbrwPOWtDg6Rjm1DLv13mVm
+	 MC5ly2S3u2zhzuY4tSWXwxE7HNPL6YBvMCjC2ff3u3MG+mlfHFcuf6gr5p6k5L4qp8
+	 bvHV9dc+xaGru5y/5nJGRRHHaf+Pq3JYeutXzbOGpqsuTFm28PzP8lX+UrxPZuRxh1
+	 Xj8ccKa6cuxj20i6EcP4HOb8zAbp0t8x44gLAREO+hbs10vbn7IRasxXyGloGJMJVS
+	 suVKTc9BXvBtg==
+Date: Wed, 31 Dec 2025 14:18:59 +0100
+From: Frederic Weisbecker <frederic@kernel.org>
+To: Waiman Long <llong@redhat.com>
+Cc: Zhang Qiao <zhangqiao22@huawei.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chen Ridong <chenridong@huawei.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Will Deacon <will@kernel.org>,
+	cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-mm@kvack.org,
+	linux-pci@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 01/33] PCI: Prepare to protect against concurrent
+ isolated cpuset change
+Message-ID: <aVUiw34NAG3OfOV8@localhost.localdomain>
+References: <20251224134520.33231-1-frederic@kernel.org>
+ <20251224134520.33231-2-frederic@kernel.org>
+ <e01189e1-d8ef-2791-632c-90d4d897859b@huawei.com>
+ <81f201cc-395a-48d7-a1b0-db8c62b93c9e@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <81f201cc-395a-48d7-a1b0-db8c62b93c9e@redhat.com>
 
-On Tue, 30 Dec 2025 05:15:42 -0500
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+Le Sun, Dec 28, 2025 at 10:53:41PM -0500, Waiman Long a écrit :
+> On 12/28/25 10:23 PM, Zhang Qiao wrote:
+> > >   	if (node < 0 || node >= MAX_NUMNODES || !node_online(node) ||
+> > >   	    pci_physfn_is_probed(dev)) {
+> > > -		cpu = nr_cpu_ids;
+> > > +		error = local_pci_probe(&ddi);
+> > >   	} else {
+> > >   		cpumask_var_t wq_domain_mask;
+> > > +		struct pci_probe_arg arg = { .ddi = &ddi };
+> > > +
+> > > +		INIT_WORK_ONSTACK(&arg.work, local_pci_probe_callback);
+> > >   		if (!zalloc_cpumask_var(&wq_domain_mask, GFP_KERNEL)) {
+> > >   			error = -ENOMEM;
+> > If we return from here, arg.work will not be destroyed.
+> > 
+> > 
+> Right. INIT_WORK_ONSTACK() should be called after successful cpumask_var_t
+> allocation.
 
-> Cong Wang reported dma debug warnings with virtio-vsock
-> and proposed a patch, see:
-> 
-> https://lore.kernel.org/all/20251228015451.1253271-1-xiyou.wangcong@gmail.com/
-> 
-> however, the issue is more widespread.
-> This is an attempt to fix it systematically.
-> Note: i2c and gio might also be affected, I am still looking
-> into it. Help from maintainers welcome.
-> 
-> Early RFC, compile tested only. Sending for early feedback/flames.
-> Cursor/claude used liberally mostly for refactoring, and english.
-> 
-> DMA maintainers, could you please confirm the DMA core changes
-> are ok with you?
+Doing that, thank you both!
 
-Before anyone else runs into the same issue as I did: This patch series
-does not apply cleanly unless you first apply commit b148e85c918a
-("virtio_ring: switch to use vring_virtqueue for virtqueue_add
-variants") from the mst/vhost/vhost branch.
-
-But if you go to the trouble of adding the mst/vhost remote, then the
-above-mentioned branch also contains this patch series, and it's
-probably the best place to find the patched code...
-
-Now, let me set out for review.
-
-Petr T
-
-> Thanks!
-> 
-> 
-> Michael S. Tsirkin (13):
->   dma-mapping: add __dma_from_device_align_begin/end
->   docs: dma-api: document __dma_align_begin/end
->   dma-mapping: add DMA_ATTR_CPU_CACHE_CLEAN
->   docs: dma-api: document DMA_ATTR_CPU_CACHE_CLEAN
->   dma-debug: track cache clean flag in entries
->   virtio: add virtqueue_add_inbuf_cache_clean API
->   vsock/virtio: fix DMA alignment for event_list
->   vsock/virtio: use virtqueue_add_inbuf_cache_clean for events
->   virtio_input: fix DMA alignment for evts
->   virtio_scsi: fix DMA cacheline issues for events
->   virtio-rng: fix DMA alignment for data buffer
->   virtio_input: use virtqueue_add_inbuf_cache_clean for events
->   vsock/virtio: reorder fields to reduce struct padding
-> 
->  Documentation/core-api/dma-api-howto.rst  | 42 +++++++++++++
->  Documentation/core-api/dma-attributes.rst |  9 +++
->  drivers/char/hw_random/virtio-rng.c       |  2 +
->  drivers/scsi/virtio_scsi.c                | 18 ++++--
->  drivers/virtio/virtio_input.c             |  5 +-
->  drivers/virtio/virtio_ring.c              | 72 +++++++++++++++++------
->  include/linux/dma-mapping.h               | 17 ++++++
->  include/linux/virtio.h                    |  5 ++
->  kernel/dma/debug.c                        | 26 ++++++--
->  net/vmw_vsock/virtio_transport.c          |  8 ++-
->  10 files changed, 172 insertions(+), 32 deletions(-)
-> 
-
+-- 
+Frederic Weisbecker
+SUSE Labs
 
