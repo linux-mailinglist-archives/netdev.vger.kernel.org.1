@@ -1,158 +1,169 @@
-Return-Path: <netdev+bounces-246455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27F5ECEC73E
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 19:14:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 754B5CEC7E3
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 20:25:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0E4993028DAE
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 18:14:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3BFAE300CBB9
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 19:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B1ED2FBE1D;
-	Wed, 31 Dec 2025 18:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83025309DC5;
+	Wed, 31 Dec 2025 19:25:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OfLzlWNU"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="NvyuZTyr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC322FB0B3
-	for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 18:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2BB62DC35A
+	for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 19:25:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767204842; cv=none; b=CoZT9ZgwSh0A+UNfEIT/vHCu4BpkQ7RzeBTyPMSazV6GmSHZyX48ccIqrCndSkS5cbwm9EWp/jOPouDsNZFdMVZcTjdP/a6dTLxD5Mll14ENiXO8RZc+42qr/yeueBKfFMtoWjrT5MQgebxbtj2TO08YKpMrCdbtOMoxDhdeW50=
+	t=1767209113; cv=none; b=oLbjpAdXHg1P1JzMjirwnM8gUhykAg6dPAQEHxvtbhcdY3tHSQViqM3GqbZGrF+muxmFn6500W2yK+VWB0fDPS6UsRH84jAGb/hCvTYpwUCz1l4678CPazXBc3wQyufsOGlcsCmFg/5fmI46aaicCAuI1ZMVHFXgo+w9jSV6zDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767204842; c=relaxed/simple;
-	bh=l0LRvl1kqcmBpJ+oiXL+hUtJD8MnLQw7yRd+cy/68MI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TzIzLYWgVIZVNNJkn/jfaWHeel5ooymMhfxobosUClQCIxvoMmbeIoi3NxrhubIwNd1sRWE5wgIR6Uo8TUVWGo25+l3PcuVN10F36qfmZ2tvuK9O0iyjNBnD6EVkVhp7UdQg/FQSyblA/n4wa5jupca6f6qRgy0cJymjDe7d16Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OfLzlWNU; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-42fbbc3df8fso5461414f8f.2
-        for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 10:14:00 -0800 (PST)
+	s=arc-20240116; t=1767209113; c=relaxed/simple;
+	bh=OHhqeIFf57MbMaPf4s+6Np8yQGOgSRZAkLrtpJt1Yes=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=V0bld8YqFBoVvrQ9gkxBfM2ZCdk64qMTHyQlKreK38VtbfUvzpsmT77hoSmQNU2SpwMvAyikiqbR4M1MfwT9ReTaibw08Ac88xohDx6CvDQBcMcCTfUTVzblj9YEIcCViYoEqdlWhU+JXeg170DqZMENV/qIrPujhGWylFoN0yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=NvyuZTyr; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-64b7a38f07eso14874525a12.0
+        for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 11:25:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767204839; x=1767809639; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=80wuQlyFH/FTtp28IkHfYhaeWqE7rS7z6vp3Trh+jc4=;
-        b=OfLzlWNU9tNh19lSAgaTDAAozHeFHEju+uWNAjP9QTUwb8+5hd+Nq9C8dAiR0RPdYg
-         J2czUTeqjfPVMQ4ePBDiPsfUjuCNlI2iAxFhljFDCeoTJ5vDlXEsrqi8GN7n0iQKa483
-         YmLoaPgSHLGADSqNRv6rmSRSB+8oHnY6/hy3v82ss0yvfk6125AncvXKghhsQCzenEuJ
-         drtwjRNp8bU1+aDi+7jqdM8/bS5plGkyolcMmSD9xvY/2jhlaG5q+eyFZ71S98AHJlmE
-         uQwtrCw9PU9u8SsPUsfe7ZLdrwA1qQpB6YMJJPwY1HzSzWxPQ0CllxHFZ/sYcgwVaXVz
-         J4wg==
+        d=purestorage.com; s=google2022; t=1767209109; x=1767813909; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WQvfyx7NYeUmPzZLPw8NgOUAQ2rSJAXwiVOTSPFXMiU=;
+        b=NvyuZTyrtA5i7RiBLS2R4oz2kmlceJqXxHBvyKRTaL9uto8cnwr3N65Vj5loHPeG9L
+         +kCWmtg7aysLWfDf++oXocNwKN6zaanGR4+kW64uc0P90Rdwd8bnB4FZAOANskR/wnNS
+         Gg1oWKiRRHcF5Vz5o8Eb6MljWuSC3mmRQ1gBDvRD4h/fnm63sh6P9CHLqNle4M+0Kcwr
+         o2HJ2ht7SXxPAlNwHHcLxYlTpm9AG/DyVZmq89bEdR5B5w+VN5in7kFWsyIFNbiJpoAw
+         dvtjjmLcNmR+dr1vLPWbMOlIaqJtVG/OKQxn2koYA6z2tqh0lxqxcuZrSJNsKfFfV2yg
+         0RNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767204839; x=1767809639;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=80wuQlyFH/FTtp28IkHfYhaeWqE7rS7z6vp3Trh+jc4=;
-        b=aImCC/y4dOu0UERjZ3WMiDHhmZTWYPOtTmOSVbI1hknuwTOUl70r2tLjrGG6n8hbVv
-         eL2hxxOA0BG21n1wb+pVXHJUA1tDc0g3lsQFjutexk5fCqCynvNrO//kPlywkI5zIqed
-         7rRf4tgxLXYic6cxlY8wIH+Hsn7crllMZnkPc6tBpH60LnS3zRXw77MfUT4bFQw6SfS8
-         3WSjxAD0z/eArgeKp9ACJGcL3kvPfHr3aI7+yZCmHLHiuAC7EzXbkIEncmoyPuBInw33
-         bMrKz/dj3exV03WPBSvbOX67GqlJKUX5xqZzGg2ClnmJduLUaJM/FzOx5+lo2aICB5bS
-         p66w==
-X-Forwarded-Encrypted: i=1; AJvYcCVSM8f7C7wIz03XaswEteLIdGuf4hoNwuwS1W4agJcYRzuoOiiEqBeerYl4SHOzqi+b7JbxZjg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOE32uyTdfhzkRZD7nTVDHWSUbDG/o5aK0SC0RmF1PWtj0HyZQ
-	RonpmpERJoDtivn9JhTsDtMJn6w09/qbkexTbLD8rNu8nSSjX8shXu9XTjQAJi7s1EQy2bOX5bN
-	Nwm9LfmSyecoWjGYNmoeH3ATrWH/KmqU=
-X-Gm-Gg: AY/fxX4cXTvCKdMCXhDisZqfakwzHOYsEnBAtKzBVMF/4RSyrw9cURTsJGoKJ3ib7MB
-	/SXt/Bh9DQvf7KEHb96m1JWEAwEwCjavNt55vcrQ1J2pefi0ObxtL3usmLjV7jjT52WjKRp2peg
-	yyT8Sidqin/5yhYl72I+5M9Egm7LFTvrz15j3A1tVw+AmUh7EMY1WTQC6QaqA6LV8snJcba9bdE
-	4RN3YfpMdT6N2ywxCl7oaJJSaVDCD0sfEubkaZA6S24NNegTuPwAZv+fUagJf6CYp8e0JHTqp78
-	1dhSHNjl9ETXaDN37AQlxE7pEaFv
-X-Google-Smtp-Source: AGHT+IE7rn8UGO5FxmIqC7DPe8kHIdUtmNgCuEKioyalqiNjU4yifPpIQxEAl6/RRsYuU+/knbKXbX9dpW9nJ6ADD+Y=
-X-Received: by 2002:a05:6000:611:b0:431:3ba:1188 with SMTP id
- ffacd0b85a97d-4324e4c70e5mr40336157f8f.3.1767204838828; Wed, 31 Dec 2025
- 10:13:58 -0800 (PST)
+        d=1e100.net; s=20230601; t=1767209109; x=1767813909;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WQvfyx7NYeUmPzZLPw8NgOUAQ2rSJAXwiVOTSPFXMiU=;
+        b=PNfFr8BOVxzdi/bp5eVxds3tpQbWN0rxZtLoRUtnmhWZSqMFMSBDyLCeN8ybe/DKgu
+         5ieftmCqvlE3R7U95y3M0npmNelIJKaCTCVI/Wfdn+WXfg19Rsw9rSwwGS9agjRFHc1v
+         UEkUVFJi9mpugupxzvlpWMq0+dv6AY1s3GTKgTlX5Ywy/+h/kTm9tEUBAkixYxkvclJz
+         f+i3H/hTCL/NY4hzpwJ4Jh8Ea5WkFQ35fdY5NhjzdtHwABm6PBCz2TNz9f0j7jERigkM
+         zPQDGhV2r9Ptxp1zc+Kb4NknXLX7ncFDgSA1n5vKhn7ZwpV98el5i+vu6uWIt1WSC8q2
+         qPyw==
+X-Gm-Message-State: AOJu0YyQeMrDZR/owBeEBwvlTALCBC6p8VJGhDw82k4C7L72szj4lE49
+	fIKmCX3+Xsl4345yCU9EhE3VgpDgP4D9MGYHXO5UeXvuz7b+Sm0wSQX/i2OeGRCCZ9DR1VwRcRh
+	LaIj4NFzStFxRqBqwz4V6bC2CTdQ9wBZiLnrMCwNxaKaC2tbg7p/ESE3dhal9ccD74AukikIc7Z
+	l50lW52wy+wvFvTahApLm/sM9KpEwssKPbvZNmZPX4GFXzT6A=
+X-Gm-Gg: AY/fxX5up+cWWrEosCAfqgetY6kprYIG5+8ISMf3i7pvcNuzh9sQ+QN5SEkbosbxKX1
+	BTiwSt+FvnWxMDmGoOdZn89mR16N+RRpwysDHWLjvHG6Nx0oOWdeuZnG5iU1K6oy82nh/p80TWj
+	mDtqDZioru26qX9wcgbHTelcf+QtuKCOeqDQyvVE9/PPbfbYqHzDgeT7lO0eNUHTdIlMiGtCzTI
+	KVO1qGBqzYkJlBNzLuFueHwnWkgmrs4pV5BTsXEY6GF43ZUL+CeKy5Puj7Pe4ppYjRZdKW0qTNV
+	QLykCdeyr0cDy9pZHD45v6kCNfgo6EEiBZmCzkWLvBsOfg+G2W874ZYu5MsHHGu+6AAjk9Qtddh
+	rEcdnbcPAISQvA7vQZqSytvXVs725P8J3GZYjvl6vqya0YePYDDwMt2pU2oOi8rAawnTQwVUgy/
+	OaVmNsWSD2qvHPy/kRaxWKAtVmNLgbHox6LjTe
+X-Google-Smtp-Source: AGHT+IGvs3t2Af5+2sv1CIHeyeQhiGJRI7JesHoEwav0TK4Es1FSlmNIoKAjvi1U1zHVkRurxIldQw==
+X-Received: by 2002:a17:906:730f:b0:b80:b7f:aa10 with SMTP id a640c23a62f3a-b80371d8c5cmr3973162066b.59.1767209108883;
+        Wed, 31 Dec 2025 11:25:08 -0800 (PST)
+Received: from dev-rjethwani.dev.purestorage.com ([2620:125:9007:640:ffff::71f8])
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-64b90f5400bsm38680736a12.4.2025.12.31.11.25.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Dec 2025 11:25:08 -0800 (PST)
+From: Rishikesh Jethwani <rjethwani@purestorage.com>
+To: netdev@vger.kernel.org
+Cc: saeedm@nvidia.com,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
+	borisp@nvidia.com,
+	john.fastabend@gmail.com,
+	kuba@kernel.org,
+	sd@queasysnail.net,
+	davem@davemloft.net,
+	Rishikesh Jethwani <rjethwani@purestorage.com>
+Subject: [PATCH v2 0/2] tls: Add TLS 1.3 hardware offload support
+Date: Wed, 31 Dec 2025 12:23:20 -0700
+Message-Id: <20251231192322.3791912-1-rjethwani@purestorage.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251231173633.3981832-6-csander@purestorage.com>
- <e9a1bd633fb4bb3d2820f63f41a8dd60d8c9c5e3c699fa56057ae393ef2f31d0@mail.kernel.org>
- <CADUfDZpSSikiZ8d8eWvfucj=Cvhc=k-sHN03EVExGBQ4Lx+23Q@mail.gmail.com>
-In-Reply-To: <CADUfDZpSSikiZ8d8eWvfucj=Cvhc=k-sHN03EVExGBQ4Lx+23Q@mail.gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 31 Dec 2025 10:13:47 -0800
-X-Gm-Features: AQt7F2oHF_qxr3_KPJ-VT5eeYhG4tvvvWKJxtIn11KSC3ODYIcBGmV1QpWm3ri0
-Message-ID: <CAADnVQKXUUNn=P=2-UECF1X7SR+oqm4xsr-2trpgTy1q+0c5FQ@mail.gmail.com>
-Subject: Re: [PATCH 5/5] selftests/bpf: make cfi_stubs globals const
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: bot+bpf-ci@kernel.org, Jiri Kosina <jikos@kernel.org>, 
-	Benjamin Tissoires <bentiss@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard <eddyz87@gmail.com>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Tejun Heo <tj@kernel.org>, David Vernet <void@manifault.com>, Andrea Righi <arighi@nvidia.com>, 
-	Changwoo Min <changwoo@igalia.com>, Ingo Molnar <mingo@redhat.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Dietmar Eggemann <dietmar.eggemann@arm.com>, 
-	Steven Rostedt <rostedt@goodmis.org>, Benjamin Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
-	Valentin Schneider <vschneid@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, "D. Wythe" <alibuda@linux.alibaba.com>, 
-	Dust Li <dust.li@linux.alibaba.com>, sidraya@linux.ibm.com, wenjia@linux.ibm.com, 
-	mjambigi@linux.ibm.com, Tony Lu <tonylu@linux.alibaba.com>, guwen@linux.alibaba.com, 
-	Shuah Khan <shuah@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	"open list:HID CORE LAYER" <linux-input@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, sched-ext@lists.linux.dev, 
-	linux-rdma@vger.kernel.org, linux-s390 <linux-s390@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
-	Martin KaFai Lau <martin.lau@kernel.org>, Chris Mason <clm@meta.com>, 
-	Ihor Solodrai <ihor.solodrai@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Dec 31, 2025 at 10:09=E2=80=AFAM Caleb Sander Mateos
-<csander@purestorage.com> wrote:
->
-> On Wed, Dec 31, 2025 at 10:04=E2=80=AFAM <bot+bpf-ci@kernel.org> wrote:
-> >
-> > > diff --git a/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c b/t=
-ools/testing/selftests/bpf/test_kmods/bpf_testmod.c
-> > > index 90c4b1a51de6..5e460b1dbdb6 100644
-> > > --- a/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c
-> > > +++ b/tools/testing/selftests/bpf/test_kmods/bpf_testmod.c
-> >
-> > [ ... ]
-> >
-> > > @@ -1275,7 +1275,7 @@ bpf_testmod_ops__test_return_ref_kptr(int dummy=
-, struct task_struct *task__ref,
-> > >       return NULL;
-> > >  }
-> > >
-> > > -static struct bpf_testmod_ops __bpf_testmod_ops =3D {
-> > > +static const struct bpf_testmod_ops __bpf_testmod_ops =3D {
-> > >       .test_1 =3D bpf_testmod_test_1,
-> > >       .test_2 =3D bpf_testmod_test_2,
-> >
-> > Is it safe to make __bpf_testmod_ops const here? In bpf_testmod_init(),
-> > this struct is modified at runtime:
-> >
-> >     tramp =3D (void **)&__bpf_testmod_ops.tramp_1;
-> >     while (tramp <=3D (void **)&__bpf_testmod_ops.tramp_40)
-> >         *tramp++ =3D bpf_testmod_tramp;
-> >
-> > Writing to a const-qualified object is undefined behavior and may cause=
- a
-> > protection fault when the compiler places this in read-only memory. Wou=
-ld
-> > the module fail to load on systems where .rodata is actually read-only?
->
-> Yup, that's indeed the bug caught by KASAN. Missed this mutation at
-> init time, I'll leave __bpf_testmod_ops as mutable.
+Hi all,
 
-No. You're missing the point. The whole patch set is no go.
-The pointer to cfi stub can be updated just as well.
+This patch series adds TLS 1.3 support to the kernel TLS hardware offload
+infrastructure, enabling hardware acceleration for TLS 1.3 connections.
+
+Background
+==========
+Currently, the kernel TLS device offload only supports TLS 1.2. With
+TLS 1.3 being the current standard and widely deployed, there is a
+growing need to extend hardware offload support to TLS 1.3 connections.
+
+TLS 1.3 differs from TLS 1.2 in its record format:
+
+  TLS 1.2: [Header (5)] + [Explicit IV (8)] + [Ciphertext] + [Tag (16)]
+  TLS 1.3: [Header (5)] + [Ciphertext + ContentType (1)] + [Tag (16)]
+
+The key difference is that TLS 1.3 eliminates the explicit IV and
+instead appends the content type byte to the plaintext before
+encryption. This content type byte must be encrypted along with the
+payload for proper authentication tag computation per RFC 8446.
+
+Patch 1: Core TLS infrastructure (tls_device.c)
+================================================
+- Extended version validation to accept TLS_1_3_VERSION in both
+  tls_set_device_offload() and tls_set_device_offload_rx()
+- Modified tls_device_record_close() to append the content type
+  byte before the authentication tag for TLS 1.3 records
+- Pre-populated dummy_page with valid record types for memory
+  allocation failure fallback path
+
+Patch 2: mlx5 driver enablement
+===============================
+- TLS 1.3 version detection and validation with proper capability checking
+- TLS 1.3 crypto context configuration using MLX5E_STATIC_PARAMS_CONTEXT_TLS_1_3
+- Correct IV handling for TLS 1.3 (12-byte IV vs TLS 1.2's 4-byte salt)
+- Hardware offload for both TLS 1.3 AES-GCM-128 and AES-GCM-256
+
+Testing
+=======
+Tested on the following hardware:
+- Broadcom BCM957608 (Thor 2)
+- Mellanox ConnectX-6 Dx (Crypto Enabled)
+
+Both TX and RX hardware offload verified working with:
+- TLS 1.3 AES-GCM-128
+- TLS 1.3 AES-GCM-256
+
+Test methodology: ktls_test : https://github.com/insanum/ktls_test/tree/master
+
+Please review and provide feedback.
+
+Thanks,
+Rishikesh
+
+v2:
+  - Fixed reverse Christmas tree ordering in variable declarations
+  - Combined 'err' and 'i' declarations (reviewer feedback)
+  - Link to v1: https://lore.kernel.org/netdev/20251230224137.3600355-1-rjethwani@purestorage.com/
+
+Rishikesh Jethwani (2):
+  tls: TLS 1.3 hardware offload support
+  mlx5: TLS 1.3 hardware offload support
+
+ .../mellanox/mlx5/core/en_accel/ktls.h        |  8 ++-
+ .../mellanox/mlx5/core/en_accel/ktls_txrx.c   | 14 ++++--
+ net/tls/tls_device.c                          | 49 +++++++++++++++++--
+ 3 files changed, 63 insertions(+), 8 deletions(-)
+
+-- 
+2.25.1
+
 
