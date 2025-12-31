@@ -1,142 +1,196 @@
-Return-Path: <netdev+bounces-246443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D468FCEC366
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 17:07:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4A98CEC4CF
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 17:58:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5266F3007191
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 16:07:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2B499300941B
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 16:58:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF7E2701D1;
-	Wed, 31 Dec 2025 16:07:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A46F2296BA8;
+	Wed, 31 Dec 2025 16:58:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="0sOqNwNZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="htLX0VET"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.st.icloud.com (p-east2-cluster2-host12-snip4-8.eps.apple.com [57.103.78.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F051547EE
-	for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 16:07:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.78.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02EA82820C6
+	for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 16:58:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767197228; cv=none; b=XYLyk1MEu4VUsHwvpeyM+AAFlkbLAKztDnml5c0h+cVqHFJoCtGwfEXShBnFw2LsoRy6p6E8NrpZoaRK4/7jK8r2szwqY9k1NBAGWEl9ldKX7BPwwjIlLOn0HYktFQAgWZd9QZUOwm3lYBmAmLHjvYXRj5x7zPnbCSO+Yi4eJDs=
+	t=1767200333; cv=none; b=rvcN3wkx/LtSGStq4WhlNR/SxLe3hiiBktzFiCeZhQAbWoZo0p1KzmdjM9VjrOyHYpP67/0/VnkhCrIIQ17iMIZbSB0wErTWjSfvCuZANr4nGqlob9UjEu/ffEKzUFgyFANPDSkA/K1X0K/Q9b69OqKTOUQz8IrcXr+LwFKEeiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767197228; c=relaxed/simple;
-	bh=0JVXy2gwJTVwEVVlEQ5jZj98Ua9gSKA/Gc+afc8wBf0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BRPmu8AaJKN+yEJ3f2bYB0gfzbwVZsHCm4qBQp9xs/MVx/bPIx9RVT+tmZyN9mzDcCl94Fpk5GQO1TP29PHL+BFFXxQv2MmERr0RL/YE9X09urRM4muAZkpU6yunuEgr2pzUB7ecGbI3uaIXousDDS4/wdVfK1j+7On7HxPBGVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=0sOqNwNZ reason="key not found in DNS"; arc=none smtp.client-ip=57.103.78.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=y-koj.net
-Received: from outbound.st.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-east-1a-100-percent-2 (Postfix) with ESMTPS id 230531800303;
-	Wed, 31 Dec 2025 16:07:01 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; bh=FnxT6ofpnpa3D+FRgAoLQu+CKxc/yMPkGpPebPRzSE8=; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=0sOqNwNZvnGcqTApxEdzinvDC/K7XgnTUmEZlMa+EhJYf5mu1/CSBtwXAE3RloQN6JoSfGe53ADUSnaFB46iGEERcIRP4BxPK7eAItenvrz7GysKaw9Iz9Ri2CCmVwyCnZj0AaLaI9uWcf9BgosPoJ73nbVReiP6OvyxOxr+xInB/pLc54rr4l1onNosVdHuItbAIwQtxsJ3XJf/B8B+J6Y7Ux0fLjt6WqHvGQEfPaGmaBZxjGZhmmvp9yt5NR/1kP2iFoQIhO1wcgrdifssW1aKpv2Q7Bk9wv5AYKocHcA7WNxdsVikVji8HEaCeADubeaiT9Fmj+PM3+1XfEHT3g==
-mail-alias-created-date: 1719758601013
-Received: from desktop.homenetwork (unknown [17.42.251.67])
-	by p00-icloudmta-asmtp-us-east-1a-100-percent-2 (Postfix) with ESMTPSA id 49661180016B;
-	Wed, 31 Dec 2025 16:06:59 +0000 (UTC)
-Date: Thu, 1 Jan 2026 01:06:56 +0900
-From: Yohei Kojima <yk@y-koj.net>
-To: Breno Leitao <leitao@debian.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2 1/2] net: netdevsim: fix inconsistent carrier
- state after link/unlink
-Message-ID: <aVVKICvpimILHy5s@desktop.homenetwork>
-References: <cover.1767108538.git.yk@y-koj.net>
- <c1a057c1586b1ec11875b3014cdf6196ffb2c62b.1767108538.git.yk@y-koj.net>
- <4xxshlplnoulncmfkinnuzvwx7bbnukkwds7go75cese4scrws@6xlfsy35t7gg>
+	s=arc-20240116; t=1767200333; c=relaxed/simple;
+	bh=WyqHYezKOH+DMJ0UpAwYhp8NooCaZxdex/cupUoeXDE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=CqG/kEtZlZmH/1a/ufCC0U4zT5P61eZSrhc/j33HJut9m4xgqbmfIWKJfo1Oz78Du9wS3koqkW/ZV5qq4FikQAnEQQ/7UlLijka3Zj1ADlC9SZW+JxZ30/rTCzKDmhSi8obFe1iTojKeK/p7eIA0cI1ds7v/LpDwv1UwZ5Z1+yI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=htLX0VET; arc=none smtp.client-ip=74.125.224.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-64467071f9fso8332955d50.0
+        for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 08:58:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767200331; x=1767805131; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I5vfxC5LQq+6GqGCoNMY0GdxL0wTOy2eVAsq/vGyBfA=;
+        b=htLX0VETx9lBm/v4kX9/AFLXocYNlwZnH8eg1yp/cX0OR5SZKqqc0nKoDq6Bsuy1TC
+         kMoRIpSZtn+EmZAP/VlbpXb70UW5k0B3Zb6LWTAqEBP9LBex/SDQid9BDQjhZgSzAPkX
+         vQSJrihS5MHZFaNjSUOnbDkZ3c6F4jTyL7UVVRN7u1H3F5//5pui+PalW+zki0yWcFF7
+         TDAkEgbeNCn3wt5vV3wG6IFMLG5P/tPzsvMKDys017aTrZWYHDjWmj5GMByVwkTm3s8V
+         yomO/UYggHgfuaDQugSE3SYcNqqDmcNUl1iGlG/8sHLQ8QEI2q1sGPDZU1ApFgptBY7L
+         4FPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767200331; x=1767805131;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=I5vfxC5LQq+6GqGCoNMY0GdxL0wTOy2eVAsq/vGyBfA=;
+        b=NZYfavqwYy2GocuPW606+9WrIudqPLV3N527hgOjIr7zsNDk4spDbJy8ZmpkI93hLt
+         j2wXuAtorznOCuzhLOwG7ONvnyJW0mLbJDdYg+stscauRjwinHjotvzAOSCzDSqAhXem
+         YfrhyzZSAkAMhPFVmYNQWtKrruqOoU2S5OOYbx3YKiddZQXAprHI58pV6CHzkC4oILbc
+         nHfNFhaqTitiY4QS0NdfW/sAxYv2dFyJYQa0212uZebvNyHbSvylAvkQGf7rVaLesjNL
+         kqAieLzU+5VdA+8J6DNsdRy70KU1bmkAV2Dps90esTyBVuNrfWT1ioJxEvmNerSvPcnv
+         TRag==
+X-Forwarded-Encrypted: i=1; AJvYcCUZ3WIR37pimjzvJf0uQgEhvfjMGrbE/+pmx0fovvGUx7G+CFiSxeY9KBhgTo5qcnhYgd/ltG8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzA7BsAIqHVWVVL08p0MAmy9jKeBB0a2H/FaHF4eaCgPgg9Qcgu
+	6QwaHTr648k1YbZmd9KbOgujqN0rBx5IJR41K1jw8fUGYw88EQwuTkODTx5hyg==
+X-Gm-Gg: AY/fxX4PSFQb6gkz3gX9PYkFZgmpU8KquMqT9nlCPRuN3EqVKIrs4hZfBGtzIuhrdvA
+	X1Ow/9yYo80QyYtSUSnfugdrgZkRQXtKn3XgfX61kjfIEifyM47yv8P+7k95TC8bUJoeKbsT3rx
+	uP9+xHQOOe5h37GifDPZPhgjX3E44r4XAu9ekDCZol2w1az3dYD3xDKMqyTr+jxh1OOCNrzHvy0
+	ZpT5e7maFspRp3XEtq92YnDmcd1cji6Z8Jbl7GuB5lUUHhQYbKHhfavBMo1Lma9q+gFmDooC5Bn
+	a5SpCJt30E7QiQkKSS+rrpi0H0e7Jg5MhzIblBk6W/eyqnkZh6nnsA4qvrLJkwy6epnPmCbuK4y
+	lpT5ch00PNsAl6QXnRZsiBNNLwKE5gSfJcDXj3UWUFMadrkeF8FhOT8/2e0YF/2NsX/lfoXMYfm
+	Mesop3Uha6/NUMY/vBXSpzQBGUZPUxdZ5wpMzsi5nTKFCtp8wjMhOiKTcmwJ0=
+X-Google-Smtp-Source: AGHT+IEEbf1Ml/7y8rtjxwVetsP36RiH/JP8aBTm3mU6oSNB1EXZyf7kW80KkTZecm+oV8sizPnBDQ==
+X-Received: by 2002:a05:690e:1387:b0:644:60d9:7530 with SMTP id 956f58d0204a3-6466a8de5c9mr30559920d50.86.1767200330823;
+        Wed, 31 Dec 2025 08:58:50 -0800 (PST)
+Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78fb44f0d4csm139530617b3.37.2025.12.31.08.58.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Dec 2025 08:58:49 -0800 (PST)
+Date: Wed, 31 Dec 2025 11:58:49 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: mheib@redhat.com, 
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ horms@kernel.org, 
+ kernelxing@tencent.com, 
+ kuniyu@google.com, 
+ willemdebruijn.kernel@gmail.com, 
+ atenart@kernel.org, 
+ aleksander.lobakin@intel.com, 
+ Mohammad Heib <mheib@redhat.com>
+Message-ID: <willemdebruijn.kernel.14a62f33c80f0@gmail.com>
+In-Reply-To: <20251231025414.149005-1-mheib@redhat.com>
+References: <20251231025414.149005-1-mheib@redhat.com>
+Subject: Re: [PATCH net v2] net: skbuff: fix truesize and head state
+ corruption in skb_segment_list
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4xxshlplnoulncmfkinnuzvwx7bbnukkwds7go75cese4scrws@6xlfsy35t7gg>
-X-Proofpoint-ORIG-GUID: nLISmvHcFDC5WwTRfZtJnPYsiGZHQ63P
-X-Proofpoint-GUID: nLISmvHcFDC5WwTRfZtJnPYsiGZHQ63P
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjMxMDE0MSBTYWx0ZWRfXyBQPWPkOHIe/
- 13PUJrvqNTyRNgOqRdEb5fCgKhF5/gYikPn3giuQbfQagP1BljP7S2/oT26QBnjd4p28T4jZd/L
- +sHBqYXkRPqkIDcB1CgyIHDXf36TN54L7+U9CgEcZ8IG3121EFJ0Koc+OEJ/ZGKTJCRObcdo9gk
- PQ0mphKRu42HQYTRE47yi9k+9CqahAszgt+3d6/YyOp+7LaoOv7H0z5kgqtPAbww3N1IkRZKP64
- k4ygdoP8tATYOaou7dLbIRwEJTLy7Afoowk3SIWwLab3We3Hbbn6d/+jtrYWkDDRgP23qgGDCPb
- EHtrUpxJ7WUrLYCVfAx
-X-Authority-Info: v=2.4 cv=S7XUAYsP c=1 sm=1 tr=0 ts=69554a27 cx=c_apl:c_pps
- a=YrL12D//S6tul8v/L+6tKg==:117 a=YrL12D//S6tul8v/L+6tKg==:17
- a=kj9zAlcOel0A:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=jnl5ZKOAAAAA:8 a=xNf9USuDAAAA:8 a=QPRiRnIaLoA074YFEDcA:9 a=CjuIK1q_8ugA:10
- a=RNrZ5ZR47oNZP8zBN2PD:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-31_05,2025-12-31_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- mlxscore=0 mlxlogscore=651 spamscore=0 suspectscore=0 clxscore=1030
- phishscore=0 malwarescore=0 bulkscore=0 classifier=spam authscore=0 adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512310141
-X-JNJ: AAAAAAAB0tCeAz+8Yd6KVsmlQVO1REb8PfDA8BzAu4AVpajvuMRFM0ovlaYLFxoeATrtKCUINZu3c2+JOctrWqQrKb6Z69caE/KB/hciWGcY54bL6iiagAJoBO79/WJzSSqWH5D27YWGJ7ws0DRqtNMi0GG5SSK3nf/NWFvi0q6FHksVhVxFWPWTgAVwW+9EsApKzccLTUSnvdMUSoaqk034RFHpN1Jxzb3DIaGylt7L5wmAao25QpILhMtxcasX/Nenh6MkG8OplS6IUAvq1NEZJdwG0rubzEfyiFFWuxMXePFdA0wgoOOM2XHc7lp2CZQ2KIKLl8U07px+l3AzW1RlKPsn62x4HhMNJCYDL7A1mVJM3TSC9ijqwDsPY2ATL99Uko2YhmwHcgfFsWRUq2YGx0sPlYaiFtoFwz3OJY8IgHkmycqqC8SnFI3bUvHnGupEbFqJKrvZhO5jwqAmE9jgeLCtPCscM/Y4Ak81HV7W9uJgCpE2xC9U4yd/AsEyDTKTpjCwyYMb//7rNcHTcNwggnR0eEWvQ0UZAiHFoRn7xC0+2dybbviuC2Di3oxk5ldixVRIZBu7/IGxh77bXLm8rc7AP6wyyETd/P1SFc0lEue2u2dNNkB6tOKTGFOGtUWy2WdErPyxUd9c7ZJBu5mPWX1S/3ZKs8CHs9Pt+JavMr7fv00PvKkQ0ucDHUA2Kob4TbzRZkaPFN3wGlRJp/xVpPAq5Qc1H1crRT8=
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Dec 31, 2025 at 02:16:53AM -0800, Breno Leitao wrote:
-> Hello Yohei,
+mheib@ wrote:
+> From: Mohammad Heib <mheib@redhat.com>
 > 
-> On Wed, Dec 31, 2025 at 01:03:29AM +0900, yk@y-koj.net wrote:
-> > From: Yohei Kojima <yk@y-koj.net>
-> > 
-> > This patch fixes the edge case behavior on ifup/ifdown and
-> > linking/unlinking two netdevsim interfaces:
-> > 
-> > 1. unlink two interfaces netdevsim1 and netdevsim2
-> > 2. ifdown netdevsim1
-> > 3. ifup netdevsim1
-> > 4. link two interfaces netdevsim1 and netdevsim2
+> When skb_segment_list is called during packet forwarding through
+> a bridge or VXLAN, it assumes that every fragment in a frag_list
+> carries its own socket ownership and head state. While this is true for
+> GSO packets created by the transmit path (via __ip_append_data), it is
+> not true for packets built by the GRO receive path.
 > 
-> > 5. (Now two interfaces are linked in terms of netdevsim peer, but
-> >     carrier state of the two interfaces remains DOWN.)
+> In the GRO path, fragments are "orphans" (skb->sk == NULL) and were
+> never charged to a socket. However, the current logic in
+> skb_segment_list unconditionally adds every fragment's truesize to
+> delta_truesize and subsequently subtracts this from the parent SKB.
 > 
-> That seems a real issue, in fact. The carriers are only getting up when
-> opening the device, not when linking. Thus, this patch makes sense to
-> me.
+> This results a memory accounting leak, Since GRO fragments were never
+> charged to the socket in the first place, the "refund" results in the
+> parent SKB returning less memory than originally charged when it is
+> finally freed. This leads to a permanent leak in sk_wmem_alloc, which
+> prevents the socket from being destroyed, resulting in a persistent memory
+> leak of the socket object and its related metadata.
 > 
-> > This inconsistent behavior is caused by the current implementation,
-> > which only cares about the "link, then ifup" order, not "ifup, then
-> > link" order. This patch fixes the inconsistency by calling
-> > netif_carrier_on() when two netdevsim interfaces are linked.
-> > 
-> > This patch fixes buggy behavior on NetworkManager-based systems which
-> > causes the netdevsim test to fail with the following error:
-> > 
-> >   # timeout set to 600
-> >   # selftests: drivers/net/netdevsim: peer.sh
-> >   # 2025/12/25 00:54:03 socat[9115] W address is opened in read-write mode but only supports read-only
-> >   # 2025/12/25 00:56:17 socat[9115] W connect(7, AF=2 192.168.1.1:1234, 16): Connection timed out
-> >   # 2025/12/25 00:56:17 socat[9115] E TCP:192.168.1.1:1234: Connection timed out
-> >   # expected 3 bytes, got 0
-> >   # 2025/12/25 00:56:17 socat[9109] W exiting on signal 15
-> >   not ok 13 selftests: drivers/net/netdevsim: peer.sh # exit=1
-> > 
-> > This patch also solves timeout on TCP Fast Open (TFO) test in
-> > NetworkManager-based systems because it also depends on netdevsim's
-> > carrier consistency.
-> > 
-> > Fixes: 1a8fed52f7be ("netdevsim: set the carrier when the device goes up")
-> > Signed-off-by: Yohei Kojima <yk@y-koj.net>
+> The leak can be observed via KMEMLEAK when tearing down the networking
+> environment:
 > 
-> Reviewed-by: Breno Leitao <leitao@debian.org>
+> unreferenced object 0xffff8881e6eb9100 (size 2048):
+>   comm "ping", pid 6720, jiffies 4295492526
+>   backtrace:
+>     kmem_cache_alloc_noprof+0x5c6/0x800
+>     sk_prot_alloc+0x5b/0x220
+>     sk_alloc+0x35/0xa00
+>     inet6_create.part.0+0x303/0x10d0
+>     __sock_create+0x248/0x640
+>     __sys_socket+0x11b/0x1d0
+> 
+> This patch modifies skb_segment_list to only perform head state release
+> and truesize subtraction if the fragment explicitly owns a socket
+> reference. For GRO-forwarded packets where fragments are not owners,
+> the parent maintains the full truesize and acts as the single anchor for
+> the memory refund upon destruction.
+> 
+> Fixes: ed4cccef64c1 ("gro: fix ownership transfer")
+> Signed-off-by: Mohammad Heib <mheib@redhat.com>
+> ---
+>  net/core/skbuff.c | 16 ++++++++++++++--
+>  1 file changed, 14 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index a00808f7be6a..63d3d76162ef 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -4656,7 +4656,14 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
+>  		list_skb = list_skb->next;
+>  
+>  		err = 0;
+> -		delta_truesize += nskb->truesize;
+> +
+> +		/* Only track truesize delta and release head state for fragments
+> +		 * that own a socket. GRO-forwarded fragments (sk == NULL) rely on
+> +		 * the parent SKB for memory accounting.
+> +		 */
+> +		if (nskb->sk)
+> +			delta_truesize += nskb->truesize;
+> +
 
-Thank you for the review!  
+Similar to the previous point: if all paths that generate GSO packets
+with SKB_GSO_FRAGLIST are generated from skb_gro_receive_list and that
+function always sets skb->sk = NULL, is there even a need for this
+brancy (and comment)?
 
+>  		if (skb_shared(nskb)) {
+>  			tmp = skb_clone(nskb, GFP_ATOMIC);
+>  			if (tmp) {
+> @@ -4684,7 +4691,12 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
+>  
+>  		skb_push(nskb, -skb_network_offset(nskb) + offset);
+>  
+> -		skb_release_head_state(nskb);
+> +		/* For GRO-forwarded packets, fragments have no head state
+> +		 * (no sk/destructor) to release. Skip this.
+> +		 */
+> +		if (nskb->sk)
+> +			skb_release_head_state(nskb);
+> +
+>  		len_diff = skb_network_header_len(nskb) - skb_network_header_len(skb);
+>  		__copy_skb_header(nskb, skb);
+>  
+> -- 
+> 2.52.0
 > 
-> Thanks for the fix!
 
-When I encountered this bug, I could easily identify where to fix thanks
-to your previous commit. Thanks again for your support!
 
-Best regards,
-Yohei Kojima
 
