@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-246447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93141CEC651
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 18:37:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8025ACEC68D
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 18:38:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E5E27300EA3B
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 17:37:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D2E54302E157
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 17:37:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D2112BDC1B;
-	Wed, 31 Dec 2025 17:37:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB2562BE642;
+	Wed, 31 Dec 2025 17:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="P2mJbFiI"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="PeLjBzk6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f99.google.com (mail-qv1-f99.google.com [209.85.219.99])
+Received: from mail-ej1-f97.google.com (mail-ej1-f97.google.com [209.85.218.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D822459C6
-	for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 17:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1090C2BE032
+	for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 17:37:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767202646; cv=none; b=DQO3bibzVCIm40O623xSsX0Jy5RtbbbA72Z9IGWWuutilnqS2WfODSdUz5nBhS5aiJ1U2ZU22cdieqArUqwxIvvctNuEI3qMK0OKK8hkdy1KXzEZdh3oWvEafbTI4a+B68YaIMnzln3VgS8t6Ra8PsGQ0hNJJxqTfQ+qZf1BSz4=
+	t=1767202648; cv=none; b=C2xTsA23KRINx3pQgi18awYkeYuOPPvvLOLncSvcvQRAAOM4sbNDXRAhNrQyw6cYNx1ACwlG2+nb7nIqzf8jKMQj4USeh9P2SvEpSOba2iSmrEWEVvhedbRJHwfxX8rlsp89AQg6hCqrVcTQhkzYeOOT9c+o7gf9ub4pFnC/Yjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767202646; c=relaxed/simple;
-	bh=7sztx2cWvWIz9TKeoZ7WJJeq8MyUlFzC//jJbHulVpU=;
+	s=arc-20240116; t=1767202648; c=relaxed/simple;
+	bh=WVYQGhpSvliDxHIS3oLwubflGM55eX6MoNuxuho0+Uc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J/k0z2ZnzULVCav8PpJswrWzqU+HAt6VEeiiu5WHdOi961YMrl4XecBeN81LU9DZLDxWYetaiJr1sznWu4VtyA7MLq6Ok7+VRrkpzjac7d91N+Aw+TreHOI2imM2eFloT/IZjVvBLm+/U75VHx/NJxa4uezFlzDZnavmA/vxZAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=P2mJbFiI; arc=none smtp.client-ip=209.85.219.99
+	 MIME-Version; b=dU4PeM+S9GxLOfHxOiGRqytSW5ntsGRG2FaEDoGBVVBy9QzI6qbU+I9uAe3t/QnbMbjpjEK0tGgP8eSn5bL3InhIrqUchoMdH6C++xApyOwaI+nnT8W5H8U4VmxDdDmz73feGuFcHkyQkzzP7dZq6CFdKMflGTxfPhPk/T11wUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=PeLjBzk6; arc=none smtp.client-ip=209.85.218.97
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-qv1-f99.google.com with SMTP id 6a1803df08f44-88a390056e1so4183216d6.0
-        for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 09:37:23 -0800 (PST)
+Received: by mail-ej1-f97.google.com with SMTP id a640c23a62f3a-b737d4cde73so77937966b.2
+        for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 09:37:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=purestorage.com; s=google2022; t=1767202643; x=1767807443; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=f/dTXIrnjBfrtWAAe53M4yTIg6PHJwwBbAiaJAY560g=;
-        b=P2mJbFiIjxyvdqq/JX2llGW/WJojGB4kayCihusbAmL/yNlDIjsOKRLWjRyPWI3DLQ
-         2CtA7ap8gGYXNq84Y6oj9Mu6UZcTaq+e5TMThl8Xb14mvo+olG8oZ516c19DahmPmXd2
-         HdRU/B3SF2w8HaiHu8sFSN4Emg8DGyxDx28yRrZY6tRBPMshz+mgTha/6tpLs/DGoFD4
-         8/kh/QbLbSbe0bKmG2pkNdWssaIwZ8MMMM/OQDrVjy0sw/eSHReM/UvSf/POjb18OOnG
-         xdGuC9qHSgN+Y/8no06Ff/Q17rMSad4HBKIVUdAralaCrnDcWBheu4icsbsd4lR2Oxc5
-         C0SQ==
+        bh=CPtJoM4BdsW1AWCT74nIdjccEavCkJ/nIFp8Za4jgwE=;
+        b=PeLjBzk6HD/l348HM8MLW1j5beEB21RZ112O4uvyZIZLMA55gblkaKZ2+Mb91hFnY5
+         3xyXEyfKbkFaEORoDTeGujBGvo9Mgde/bR0k4fKNzUS85UwkKgp3W5G4IWKl/0Yt8686
+         aGl8ymFQekBTdTHyUb7uPi+WekMbyjU8IfBgsPor4YDI1E+PS5EKR5VYt4xEARUdsEG6
+         Cb2SRjHTdMhPk5pvMjOOO25PIByS+KZaJmPUfT8OTpglbwB7dzhmMz9mcJNd0PEjCHyK
+         ETY4LqgN3btjlMPs9EUGii6evKaTJ36XHobXs1b3Ubn4MCXySU0QB2d2dDRgXN3fWOaH
+         r36w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1767202643; x=1767807443;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=f/dTXIrnjBfrtWAAe53M4yTIg6PHJwwBbAiaJAY560g=;
-        b=ZmPBcqQwBSsEz1ClGMfrTzLta+ncPBPDUswqHFVRN3wpzPhkDHNJSI3/oIUGJpNmG+
-         VCC4NvgEEoLRmrhMCdirUR1xRc9y//rdHxLUUwL4n7Y1XlqC1Prox60i/EATq86J20b3
-         AxfJ+0Ii6fbfatcFkEPYye+44Feg7SzkDpvVEr63gIyXKbxWuW+hW7RSjJANcLK557nT
-         qpSddba5QZ80IaUS/HqQA4WeqpRLqG2d1aMr+ZsBA1hiOrQ7HcgySz0BfjdtcYgqUsZw
-         rEigVJrFZL0NGmotQavn6pUnXhPOSkOugoH/aPockx4/esyC/UiZshstlUUbA+/nQL5m
-         7cQw==
-X-Forwarded-Encrypted: i=1; AJvYcCXYsXYzRnIFvCBG4ArbHP9YIPj3aCInivHzw1CAA3kZkAKC1PXY9zzWrngVmvYCPcHHg+qS9Ig=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxe/seNucMEVcMIVhqRtHWC1LS0R/alyNCOIjMDVALZ9Iab1Afa
-	j/9hsDHr55oIUwDenVyshX0O8xmFRFVLBSK/QbQdoYxvZ15UVgPl7JcMrxS4pe5MrVKHM6O1seB
-	pvfUP8A/W8axmpn5rkvo3NKMAmq46wnbvxEsBBD0ieNuZWOA6DleS
-X-Gm-Gg: AY/fxX7G/Jo2GtNSNZjLbnb3ookjHXOV6TTr9mRVoh9B4af5K7Z7lBIX6R2MYFvmmjL
-	TyeRfw4ooP2mOElF+qJlLODDWkVmYWNZPEaFuLohW4+tJ6vFImNBE9CW8j/QI/J+oygiIWKrYdX
-	vsSJzjZxgJlQjV/BM1RSwdfIVSaYDo4oiBtUf+CXt9/eBENe/wWCVyGxBEqLucrDBcS/muSYFz/
-	g9P5lXNWepwR0TNH9TMRh0UAeksk/2DqPoNcEOHl/dHPA8wpZUpdivSt9MEW4VBQLiH+1xeVuG1
-	4aGCmpvMw/Ld2i4LwPRbkX0yBokkIHSnAkFUiq8OB9Nad8h7IfOo6skhdHCNv5JuV9SN/GcCUaP
-	qNQPQJ1NNhGJsapgNpYIauzoHzBQ=
-X-Google-Smtp-Source: AGHT+IEwtYVxzJM5e94yPY3BVIRxsLzn9rKk7vTIuxyQqU0ow24Nub5lypi+z+bUWbmSnwSzc3qVcPo88ZOY
-X-Received: by 2002:a05:6214:1c05:b0:880:6fa4:f55c with SMTP id 6a1803df08f44-88d8404da77mr466260576d6.6.1767202642560;
-        Wed, 31 Dec 2025 09:37:22 -0800 (PST)
-Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-88d97a82a66sm46301936d6.16.2025.12.31.09.37.22
+        bh=CPtJoM4BdsW1AWCT74nIdjccEavCkJ/nIFp8Za4jgwE=;
+        b=v4Gg0Itf9KVjpO/ERbwv5Ceo42MMBG+1M+buNsWEFUVdXIytkWhubRa8rGqYPgktEv
+         FH9QmeGVv3oTfZL31booTIGHZI9uqOj70vJQdiyqK2OqbKESkQPX95jvarNs5FLUKqR3
+         q9Ml3C5RYVh61EL4HYYNLLuKzG3cCCzjGCiYugZT9DFwFg1s7p1ktA2ulSJYxAJC3BUd
+         iyhGjNBP+9wLSVvaUmoQ6ae70uVz0tITza7Mm5Gwti8rohH8m53YrjAFNcKKKiNL+m+W
+         NSFKelkIedT/MUVZWekYoZ4axgdaZCsorOIhqugJeCU+/QoqNdZf+ty7FqFcyLpcSzMW
+         0r7w==
+X-Forwarded-Encrypted: i=1; AJvYcCVGacxu/MPxM4N7nx69a5LV0oViQpj/XXPn8/TRksC5hgUvkjDnY3v9x7zjH78pgXqr8BQ2cV8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6Kf/Ad+K73hlWYqErphCN4wJGLGcaM3InqaXq/RUO+DDohCoG
+	D5W3LpyzmOZYkT7VJj/VDNeLlaOMpP/fKVoGaLDaeAqoFn7Yl3Ev8VKEvrLwqJgpRCM8dxJh7GZ
+	kfQ0/N2aNp66EbX3efY6FCFzqBxKFfgZ9FbMB
+X-Gm-Gg: AY/fxX71x82xbYwLXAsH5cNdZLP6ep/lhGTZFDzD7qEv4JukKA9Qk8mDDXfh/gT+ErI
+	MEm0IMk0QBYFWDlGWIaPuy6LxSvk0dtT7IxUJBN41O+bbeucwXuEMI/3ahrdTsV98Sg9rH+n++y
+	vqiNL9eO7EoZRKw5fKOCsRKzyxeFQFP2YlH/ikU/+G+k4dHxvtSegqV3Q9n8SD5s/UGyMUcshpz
+	GVqxBLERFJJNSuyazTA0Sdg/x8zNheynjt/yD9fYn4zRl8CW0sYpkmjFiseNIhUfsqjZq6CNFxJ
+	GyxugGdFnrJx888PunjjBC3bR6BOKowP5jjBOAxh6UOHeuLQba8vorMzjvJ3UbBeBbIlrGzwXE7
+	28IO0YhI3kmkfkLDBkqPbFgY3RihCnYp63u0cKaq0QQ==
+X-Google-Smtp-Source: AGHT+IEi03ZQZjXAnQiEZTFYKeIsY3RuVDBYnomwpJqWJlLI46xo1bUhyzXBcQMLZiL4Tr8s0Id0tWh610wS
+X-Received: by 2002:a17:907:7209:b0:b76:3548:c34c with SMTP id a640c23a62f3a-b80372602eamr1981571766b.8.1767202643158;
+        Wed, 31 Dec 2025 09:37:23 -0800 (PST)
+Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
+        by smtp-relay.gmail.com with ESMTPS id a640c23a62f3a-b8037d637fasm499254166b.58.2025.12.31.09.37.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Dec 2025 09:37:22 -0800 (PST)
+        Wed, 31 Dec 2025 09:37:23 -0800 (PST)
 X-Relaying-Domain: purestorage.com
 Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.49.34.222])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 79CB9340681;
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id CA50C34076F;
 	Wed, 31 Dec 2025 10:37:21 -0700 (MST)
 Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 71A47E4234A; Wed, 31 Dec 2025 10:37:21 -0700 (MST)
+	id C307BE4234A; Wed, 31 Dec 2025 10:37:21 -0700 (MST)
 From: Caleb Sander Mateos <csander@purestorage.com>
 To: Jiri Kosina <jikos@kernel.org>,
 	Benjamin Tissoires <bentiss@kernel.org>,
@@ -136,9 +136,9 @@ Cc: linux-input@vger.kernel.org,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org,
 	Caleb Sander Mateos <csander@purestorage.com>
-Subject: [PATCH 1/5] bpf: use const pointer for struct_ops cfi_stubs
-Date: Wed, 31 Dec 2025 10:36:29 -0700
-Message-ID: <20251231173633.3981832-2-csander@purestorage.com>
+Subject: [PATCH 2/5] HID: bpf: make __bpf_hid_bpf_ops const
+Date: Wed, 31 Dec 2025 10:36:30 -0700
+Message-ID: <20251231173633.3981832-3-csander@purestorage.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20251231173633.3981832-1-csander@purestorage.com>
 References: <20251231173633.3981832-1-csander@purestorage.com>
@@ -150,77 +150,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-struct bpf_struct_ops's cfi_stubs field is used as a readonly pointer
-but has type void *. Change its type to void const * to allow it to
-point to readonly global memory. Change the void ** casts of cfi_stubs
-to void * const * accordingly.
+Now that struct bpf_struct_ops's cfi_stubs field is a const pointer,
+declare the __bpf_hid_bpf_ops global variable it points to as const.
+This allows the global variable to be placed in readonly memory.
 
 Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 ---
- include/linux/bpf.h         | 2 +-
- kernel/bpf/bpf_struct_ops.c | 6 +++---
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/hid/bpf/hid_bpf_struct_ops.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-index 4e7d72dfbcd4..d74189ea1066 100644
---- a/include/linux/bpf.h
-+++ b/include/linux/bpf.h
-@@ -1977,11 +1977,11 @@ struct bpf_struct_ops {
- 			   void *kdata, const void *udata);
- 	int (*reg)(void *kdata, struct bpf_link *link);
- 	void (*unreg)(void *kdata, struct bpf_link *link);
- 	int (*update)(void *kdata, void *old_kdata, struct bpf_link *link);
- 	int (*validate)(void *kdata);
--	void *cfi_stubs;
-+	void const *cfi_stubs;
- 	struct module *owner;
- 	const char *name;
- 	struct btf_func_model func_models[BPF_STRUCT_OPS_MAX_NR_MEMBERS];
- };
- 
-diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
-index c43346cb3d76..42cfc3e0bc68 100644
---- a/kernel/bpf/bpf_struct_ops.c
-+++ b/kernel/bpf/bpf_struct_ops.c
-@@ -321,11 +321,11 @@ static bool is_module_member(const struct btf *btf, u32 id)
- 	return !strcmp(btf_name_by_offset(btf, t->name_off), "module");
- }
- 
- int bpf_struct_ops_supported(const struct bpf_struct_ops *st_ops, u32 moff)
+diff --git a/drivers/hid/bpf/hid_bpf_struct_ops.c b/drivers/hid/bpf/hid_bpf_struct_ops.c
+index 702c22fae136..30ddcf78e0ea 100644
+--- a/drivers/hid/bpf/hid_bpf_struct_ops.c
++++ b/drivers/hid/bpf/hid_bpf_struct_ops.c
+@@ -286,11 +286,11 @@ static int __hid_bpf_hw_request(struct hid_bpf_ctx *ctx, unsigned char reportnum
+ static int __hid_bpf_hw_output_report(struct hid_bpf_ctx *ctx, u64 source)
  {
--	void *func_ptr = *(void **)(st_ops->cfi_stubs + moff);
-+	void *func_ptr = *(void * const *)(st_ops->cfi_stubs + moff);
- 
- 	return func_ptr ? 0 : -ENOTSUPP;
+ 	return 0;
  }
  
- int bpf_struct_ops_desc_init(struct bpf_struct_ops_desc *st_ops_desc,
-@@ -444,11 +444,11 @@ int bpf_struct_ops_desc_init(struct bpf_struct_ops_desc *st_ops_desc,
- 				mname, st_ops->name);
- 			err = -EINVAL;
- 			goto errout;
- 		}
- 
--		stub_func_addr = *(void **)(st_ops->cfi_stubs + moff);
-+		stub_func_addr = *(void * const *)(st_ops->cfi_stubs + moff);
- 		err = prepare_arg_info(btf, st_ops->name, mname,
- 				       func_proto, stub_func_addr,
- 				       arg_info + i);
- 		if (err)
- 			goto errout;
-@@ -833,11 +833,11 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
- 		*pksym++ = ksym;
- 
- 		trampoline_start = image_off;
- 		err = bpf_struct_ops_prepare_trampoline(tlinks, link,
- 						&st_ops->func_models[i],
--						*(void **)(st_ops->cfi_stubs + moff),
-+						*(void * const *)(st_ops->cfi_stubs + moff),
- 						&image, &image_off,
- 						st_map->image_pages_cnt < MAX_TRAMP_IMAGE_PAGES);
- 		if (err)
- 			goto reset_unlock;
- 
+-static struct hid_bpf_ops __bpf_hid_bpf_ops = {
++static const struct hid_bpf_ops __bpf_hid_bpf_ops = {
+ 	.hid_device_event = __hid_bpf_device_event,
+ 	.hid_rdesc_fixup = __hid_bpf_rdesc_fixup,
+ 	.hid_hw_request = __hid_bpf_hw_request,
+ 	.hid_hw_output_report = __hid_bpf_hw_output_report,
+ };
 -- 
 2.45.2
 
