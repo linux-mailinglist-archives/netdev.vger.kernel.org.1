@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-246399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB684CEB335
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 04:39:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22576CEB341
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 04:44:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1EAC7300B344
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 03:39:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C7A16300E797
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 03:44:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2FED2DD5E2;
-	Wed, 31 Dec 2025 03:39:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B02E62E4263;
+	Wed, 31 Dec 2025 03:44:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="UfwzP0nU"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="wpFHrjKO"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8070C2AEE1;
-	Wed, 31 Dec 2025 03:39:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09171DF27F;
+	Wed, 31 Dec 2025 03:43:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767152394; cv=none; b=FWBujxBCLz+soeU9MzV8F4l6S2st39csBPW9T/Kdlk2Ygq9vDDIFpPK6YP03ORbKA59CHQTAvdnrpY2y7piUczdTETJBKO5sqhkk/EpAlItRUl0InTl7VYuiWzztgXFfc2yNm9v2bKQNgGdJbNdFCDf5MekQV+UDWm85cy5GiBA=
+	t=1767152643; cv=none; b=LdYwDgAzs+ocQJwvBadvn+1XFSNPqCQazT0hIcdt/DrEb5SQSsiADTX4MCb73AZ31gNZY2ufqw4nVsvmoHlQ4I5sVoE/FLcqo68THHiliNeBOIkud6afbKnnWTZRgHnpR6I/XRzXi33xSnufrTn8XFbYzTTznreXZseKaqU6L5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767152394; c=relaxed/simple;
-	bh=eWnfZXPyzbEegLUP/5fLC2ArN9hhjIYQ/JJYp3FX5sk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hBjzQ7MHiEyfwifUXbulSLzDQ007dcp+ntwAsoAqzPVeyQqnhFXpPvjT+0rGOnqwGHajlNomo5X80YRugu7gI7UD3JcYL+pw38iGw4cf6iU/gnxeKP7jwZYcHCM51Xhwrve0f8HsyqVyTaazoVOCTTBZeFKvR/C2Ar9VLHIc8tU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=UfwzP0nU; arc=none smtp.client-ip=113.46.200.220
+	s=arc-20240116; t=1767152643; c=relaxed/simple;
+	bh=SRhvHenXPlYX/SKh/bBvEoxLFhDnQDe2TouBglOqZfs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=naP3CsEafkZGI0/bxtTPnOSz2RL/gQEiWcad8OShTbCqOzQT7zf1FGuwz0lVq3kRER9L9fypaNGcoudGop3OF8UqI9f0t4yuRmiAM4ZO0eroTaynWlrQJnWyd54/zZs5H2wZJnM+Eh3ymfLuwxua7n50CXBtYZLuq1wTfInPIEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=wpFHrjKO; arc=none smtp.client-ip=113.46.200.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=v22+Zwwmh78GetApenZC3hPh2Fiu8Xv4iv1uYr4o/gs=;
-	b=UfwzP0nUxzU4oayWKnbMdaNhAPinnzyWC/PepdXoLuGwVupOJcnxUJumtlWx1hgsNQvfU+AeY
-	H2v40Nbt5r0M6ZJ6CTlkwRoFkARlZh59LtQiJiRMD4pFjlgasJ0GN8ls9WOAaziLaN44BsHdyL+
-	bVNWT4z4KVArFYcLd/UazLQ=
-Received: from mail.maildlp.com (unknown [172.19.162.144])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4dgwc10ZjSz12Lc5;
-	Wed, 31 Dec 2025 11:36:33 +0800 (CST)
+	bh=MzgrMvQDWZkLvC8U6+ga/s9XsxBhURpjlisbFbw7l70=;
+	b=wpFHrjKO29Ta+Xx62RWJl9gUvsINAF/RylDXkOxUfPOQh1zFGu6Daegw4lWnAUIPW3rG4SIMg
+	XxsfSrVklEjrnF2x1iPLB94ZckeTqyQikMVA92ypZ/lewNwdR7vi+lNf1mGeFZaf+G0cXPQRx28
+	+HoY82w71AXvTcKiUyoj9iM=
+Received: from mail.maildlp.com (unknown [172.19.163.127])
+	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4dgwhq299SznTXY;
+	Wed, 31 Dec 2025 11:40:43 +0800 (CST)
 Received: from kwepemk500008.china.huawei.com (unknown [7.202.194.93])
-	by mail.maildlp.com (Postfix) with ESMTPS id 89ADC40605;
-	Wed, 31 Dec 2025 11:39:41 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id BC001402AB;
+	Wed, 31 Dec 2025 11:43:51 +0800 (CST)
 Received: from huawei.com (10.50.159.234) by kwepemk500008.china.huawei.com
  (7.202.194.93) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 31 Dec
- 2025 11:39:40 +0800
-From: c00642392 <chenzhen126@huawei.com>
+ 2025 11:43:51 +0800
+From: Chen Zhen <chenzhen126@huawei.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <horms@kernel.org>
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<huyizhen2@huawei.com>, <gaoxingwang1@huawei.com>
 Subject: [PATCH net] net: vlan: set header_ops to match hard_header_len when hw offload is toggled
-Date: Wed, 31 Dec 2025 11:50:09 +0800
-Message-ID: <20251231035009.20813-1-chenzhen126@huawei.com>
+Date: Wed, 31 Dec 2025 11:54:19 +0800
+Message-ID: <20251231035419.23422-1-chenzhen126@huawei.com>
 X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -64,8 +64,6 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
  kwepemk500008.china.huawei.com (7.202.194.93)
-
-From: Chen Zhen <chenzhen126@huawei.com>
 
 We found a skb_panic in vlan_dev_hard_header():
 
