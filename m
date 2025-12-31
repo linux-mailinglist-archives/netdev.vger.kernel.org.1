@@ -1,305 +1,142 @@
-Return-Path: <netdev+bounces-246442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D63CBCEC35D
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 17:01:16 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D468FCEC366
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 17:07:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9627F300B92E
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 16:01:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5266F3007191
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 16:07:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00EF41E5B95;
-	Wed, 31 Dec 2025 16:01:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF7E2701D1;
+	Wed, 31 Dec 2025 16:07:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="dwnXgXCp"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="0sOqNwNZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f228.google.com (mail-yw1-f228.google.com [209.85.128.228])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outbound.st.icloud.com (p-east2-cluster2-host12-snip4-8.eps.apple.com [57.103.78.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C9CD1D6BB
-	for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 16:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.228
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F051547EE
+	for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 16:07:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.78.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767196874; cv=none; b=bw6yzTjj5eEJyFvbcrKXC91hlFEHleRSV3zUPGkAGX03lKjQf9+P9+L5u2lZemrVxm9UrV+mhDo/wTDzmCH58TeAx8+5E16Dg9oTqdiWYt9uj6Ox6kZtUyrVwYQESrwf9SqfJHXd9GOKkRwW/Y8tUg8/bBFWE/BitIzTo1AlJdI=
+	t=1767197228; cv=none; b=XYLyk1MEu4VUsHwvpeyM+AAFlkbLAKztDnml5c0h+cVqHFJoCtGwfEXShBnFw2LsoRy6p6E8NrpZoaRK4/7jK8r2szwqY9k1NBAGWEl9ldKX7BPwwjIlLOn0HYktFQAgWZd9QZUOwm3lYBmAmLHjvYXRj5x7zPnbCSO+Yi4eJDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767196874; c=relaxed/simple;
-	bh=9wzupSMaeXbDHpeRO65zn6oE3aPlKfwj4rW6Xkyqw0M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uBRwvceLYlXTkw0bPjXOoCMz2dFJjmmw/EmqP01GNdm7fTCCtySye47h1PXQd/NJ8WqtfHh63dpklq1Rpn5ze4s8/Q0xomIP2Ho8Kc7xFYgFKmIiKh5Xlfmkg8ejSdGJYmaHZt+Jq5Mj7OxMS9QC1pJH8UbgG31cuhBXxtXxYqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=dwnXgXCp; arc=none smtp.client-ip=209.85.128.228
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-yw1-f228.google.com with SMTP id 00721157ae682-78fd0cd23faso76882527b3.2
-        for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 08:01:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767196872; x=1767801672;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lMStzXK1epWXymgIMFfy/NLEkfueARsRpdZNcHB2h9o=;
-        b=Bgvbhv5BLYXgujCDJZ1CaW7pY3Un3l9KEaGFBdQo5EdrXe3mdgKEOBeUe/SD/vscB2
-         yIDwB6YXYxT2lnMW2kKcHS5OVyMCJJkI5kFQLj3PbPO46pmX56/e+umuUF6JHiJuChj/
-         lfmD8NdHxKGBkrL5NERJFuHzKTfGt+B3/E7HWthhK0DG/liK3uBtFyPRfngh3p0RtDXC
-         iA3kcD9lnWnpl5uiCcWPIXrDFFdW9IuH6jZPfCCHUYm2qr9/3DvbgeceDlixiaX6xn1E
-         22xHUEYbrFUz53Y7Uzzx1VVjl8nHM3MFYuemBBl+hAR7SramNQocIPC4FrBpdIZmItu0
-         enSA==
-X-Forwarded-Encrypted: i=1; AJvYcCVdZHcgCQwezLNeESvkAxqPU7240IQE3Xr5H6yJx43ihHsgmXMBeZYmyfFHKug9iTI5c/VxCC0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbgHgiZoeX7ZQsLMiyWwGBrgQFFWFWfnF1OIVl7p2aPTSsvXoZ
-	3xyAc7AMTbxLDgMBa7rK3hTdJCeazHXXgDkNEr7gCCntstHUDgH4lJBgGefJt9h2lhyf0J0u39R
-	5faggkJTNrtySVqR5J0RlEj3PDMOYnzXwffTDPxXU0Sa+AHGjsxeVq6ulHjm/ahOFfwdz6fZPZm
-	puN9tDt2g4wVwAKtq7hp/Tl99ZsMYjmsOdBoGHhyj9HGmg0hPlMfNijI82HRYV2Cdt6XBbnFVhC
-	zmG1RDvPXU=
-X-Gm-Gg: AY/fxX4uTvduhqXB/59byKrMKmkiSPd1PGoVg53I3le+eRPS0FcQHPm+y8TnCvuIEQh
-	DBazUcAt9RYTviwwYDMo1plAJ2H0uDdOAJbNkgyH746veE2O2IY57heQ+o8+Folzb6EaFk41O4Y
-	uZyySob1+XAbppcVzk6aqpzqd0ZRYiuwi4cZxK4l+M1Cgu36HW1Jj9cvMeo4YHXMCVNTsHds0Ki
-	9BYxEtRVXZsam33geaC9kqJutL5U9k6NWNm/Oe1SEBkweLCv5f18g8eQW7bIrSdLy8obThY7pB2
-	XpShaZCuI2jjEeYkMyDkI88vLknm8SToZdkUQ5A9RmIYU2/DgyHbtDBc9TOWuBmpCz3uGFCQ1ay
-	IIKtTRUHXsJ0jkYtP3kx2v1FmMaBtBCVI7tpHKwPTdym0BrxWQudTwZZ0LXTZj1iWGJlgk+ycRK
-	Gol5aBArZUN4sL+md0aSWH5ikC1Y9SyqoGRNmtm1WqOhEOWCE=
-X-Google-Smtp-Source: AGHT+IHKgo3krsojMqd7j0Xkpl3/vg3KBQJuUHPl6d4sQKD7uEitxL7XpfZBICZ5BHgM5YBLXO470aF3LJrP
-X-Received: by 2002:a53:bdc5:0:b0:63f:2bc7:7074 with SMTP id 956f58d0204a3-6466a8aba62mr23275303d50.60.1767196871839;
-        Wed, 31 Dec 2025 08:01:11 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-101.dlp.protect.broadcom.com. [144.49.247.101])
-        by smtp-relay.gmail.com with ESMTPS id 956f58d0204a3-6466a91dd41sm1865454d50.9.2025.12.31.08.01.11
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 31 Dec 2025 08:01:11 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-34c5d203988so23006331a91.3
-        for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 08:01:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1767196870; x=1767801670; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=lMStzXK1epWXymgIMFfy/NLEkfueARsRpdZNcHB2h9o=;
-        b=dwnXgXCpLOJ1y8gcAlncKnpJj99wdvk5+2Ed4nKtF5/RAsTQ+nk8W9UMoIn7Ada/tS
-         CdsJ0bQSvTDEJ67xKGYI2WkTVAu0RtDEX7oD77T6HX95PT47Cx8oMLgXK9ivuKTFT9z+
-         ZfHfsRYwwH6/0A5wOX+r9cBR29btfP+m1ZMbU=
-X-Forwarded-Encrypted: i=1; AJvYcCWpikS0Va6f1BQuzBd6MrktojMJHBrSFSgWwpm49S6TcNM5VtMFke33qfsY1ypUgEHnxFn8MQE=@vger.kernel.org
-X-Received: by 2002:a17:90b:2251:b0:340:ad5e:cb with SMTP id 98e67ed59e1d1-34e9212f362mr31347236a91.8.1767196870281;
-        Wed, 31 Dec 2025 08:01:10 -0800 (PST)
-X-Received: by 2002:a17:90b:2251:b0:340:ad5e:cb with SMTP id
- 98e67ed59e1d1-34e9212f362mr31347171a91.8.1767196869587; Wed, 31 Dec 2025
- 08:01:09 -0800 (PST)
+	s=arc-20240116; t=1767197228; c=relaxed/simple;
+	bh=0JVXy2gwJTVwEVVlEQ5jZj98Ua9gSKA/Gc+afc8wBf0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BRPmu8AaJKN+yEJ3f2bYB0gfzbwVZsHCm4qBQp9xs/MVx/bPIx9RVT+tmZyN9mzDcCl94Fpk5GQO1TP29PHL+BFFXxQv2MmERr0RL/YE9X09urRM4muAZkpU6yunuEgr2pzUB7ecGbI3uaIXousDDS4/wdVfK1j+7On7HxPBGVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=0sOqNwNZ reason="key not found in DNS"; arc=none smtp.client-ip=57.103.78.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=y-koj.net
+Received: from outbound.st.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-east-1a-100-percent-2 (Postfix) with ESMTPS id 230531800303;
+	Wed, 31 Dec 2025 16:07:01 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; bh=FnxT6ofpnpa3D+FRgAoLQu+CKxc/yMPkGpPebPRzSE8=; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=0sOqNwNZvnGcqTApxEdzinvDC/K7XgnTUmEZlMa+EhJYf5mu1/CSBtwXAE3RloQN6JoSfGe53ADUSnaFB46iGEERcIRP4BxPK7eAItenvrz7GysKaw9Iz9Ri2CCmVwyCnZj0AaLaI9uWcf9BgosPoJ73nbVReiP6OvyxOxr+xInB/pLc54rr4l1onNosVdHuItbAIwQtxsJ3XJf/B8B+J6Y7Ux0fLjt6WqHvGQEfPaGmaBZxjGZhmmvp9yt5NR/1kP2iFoQIhO1wcgrdifssW1aKpv2Q7Bk9wv5AYKocHcA7WNxdsVikVji8HEaCeADubeaiT9Fmj+PM3+1XfEHT3g==
+mail-alias-created-date: 1719758601013
+Received: from desktop.homenetwork (unknown [17.42.251.67])
+	by p00-icloudmta-asmtp-us-east-1a-100-percent-2 (Postfix) with ESMTPSA id 49661180016B;
+	Wed, 31 Dec 2025 16:06:59 +0000 (UTC)
+Date: Thu, 1 Jan 2026 01:06:56 +0900
+From: Yohei Kojima <yk@y-koj.net>
+To: Breno Leitao <leitao@debian.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2 1/2] net: netdevsim: fix inconsistent carrier
+ state after link/unlink
+Message-ID: <aVVKICvpimILHy5s@desktop.homenetwork>
+References: <cover.1767108538.git.yk@y-koj.net>
+ <c1a057c1586b1ec11875b3014cdf6196ffb2c62b.1767108538.git.yk@y-koj.net>
+ <4xxshlplnoulncmfkinnuzvwx7bbnukkwds7go75cese4scrws@6xlfsy35t7gg>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251231-bnxt-v1-1-8f9cde6698b4@debian.org>
-In-Reply-To: <20251231-bnxt-v1-1-8f9cde6698b4@debian.org>
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Date: Wed, 31 Dec 2025 21:30:57 +0530
-X-Gm-Features: AQt7F2qBxre4gEx9lPoKL50XL6gs5aq-TJTnGLJtW2nYJSF0T9B6CCzo6Tdrpo4
-Message-ID: <CALs4sv2qQuL0trq3ZB6SczPK5BmFMF6p2Ki-3q+4Xqc_qzauoQ@mail.gmail.com>
-Subject: Re: [PATCH net] bnxt_en: Fix NULL pointer crash in bnxt_ptp_enable
- during error cleanup
-To: Breno Leitao <leitao@debian.org>
-Cc: Michael Chan <michael.chan@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Richard Cochran <richardcochran@gmail.com>, 
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kernel-team@meta.com, stable@vger.kernel.org
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000bdcc910647419512"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4xxshlplnoulncmfkinnuzvwx7bbnukkwds7go75cese4scrws@6xlfsy35t7gg>
+X-Proofpoint-ORIG-GUID: nLISmvHcFDC5WwTRfZtJnPYsiGZHQ63P
+X-Proofpoint-GUID: nLISmvHcFDC5WwTRfZtJnPYsiGZHQ63P
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjMxMDE0MSBTYWx0ZWRfXyBQPWPkOHIe/
+ 13PUJrvqNTyRNgOqRdEb5fCgKhF5/gYikPn3giuQbfQagP1BljP7S2/oT26QBnjd4p28T4jZd/L
+ +sHBqYXkRPqkIDcB1CgyIHDXf36TN54L7+U9CgEcZ8IG3121EFJ0Koc+OEJ/ZGKTJCRObcdo9gk
+ PQ0mphKRu42HQYTRE47yi9k+9CqahAszgt+3d6/YyOp+7LaoOv7H0z5kgqtPAbww3N1IkRZKP64
+ k4ygdoP8tATYOaou7dLbIRwEJTLy7Afoowk3SIWwLab3We3Hbbn6d/+jtrYWkDDRgP23qgGDCPb
+ EHtrUpxJ7WUrLYCVfAx
+X-Authority-Info: v=2.4 cv=S7XUAYsP c=1 sm=1 tr=0 ts=69554a27 cx=c_apl:c_pps
+ a=YrL12D//S6tul8v/L+6tKg==:117 a=YrL12D//S6tul8v/L+6tKg==:17
+ a=kj9zAlcOel0A:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=jnl5ZKOAAAAA:8 a=xNf9USuDAAAA:8 a=QPRiRnIaLoA074YFEDcA:9 a=CjuIK1q_8ugA:10
+ a=RNrZ5ZR47oNZP8zBN2PD:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-31_05,2025-12-31_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ mlxscore=0 mlxlogscore=651 spamscore=0 suspectscore=0 clxscore=1030
+ phishscore=0 malwarescore=0 bulkscore=0 classifier=spam authscore=0 adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512310141
+X-JNJ: AAAAAAAB0tCeAz+8Yd6KVsmlQVO1REb8PfDA8BzAu4AVpajvuMRFM0ovlaYLFxoeATrtKCUINZu3c2+JOctrWqQrKb6Z69caE/KB/hciWGcY54bL6iiagAJoBO79/WJzSSqWH5D27YWGJ7ws0DRqtNMi0GG5SSK3nf/NWFvi0q6FHksVhVxFWPWTgAVwW+9EsApKzccLTUSnvdMUSoaqk034RFHpN1Jxzb3DIaGylt7L5wmAao25QpILhMtxcasX/Nenh6MkG8OplS6IUAvq1NEZJdwG0rubzEfyiFFWuxMXePFdA0wgoOOM2XHc7lp2CZQ2KIKLl8U07px+l3AzW1RlKPsn62x4HhMNJCYDL7A1mVJM3TSC9ijqwDsPY2ATL99Uko2YhmwHcgfFsWRUq2YGx0sPlYaiFtoFwz3OJY8IgHkmycqqC8SnFI3bUvHnGupEbFqJKrvZhO5jwqAmE9jgeLCtPCscM/Y4Ak81HV7W9uJgCpE2xC9U4yd/AsEyDTKTpjCwyYMb//7rNcHTcNwggnR0eEWvQ0UZAiHFoRn7xC0+2dybbviuC2Di3oxk5ldixVRIZBu7/IGxh77bXLm8rc7AP6wyyETd/P1SFc0lEue2u2dNNkB6tOKTGFOGtUWy2WdErPyxUd9c7ZJBu5mPWX1S/3ZKs8CHs9Pt+JavMr7fv00PvKkQ0ucDHUA2Kob4TbzRZkaPFN3wGlRJp/xVpPAq5Qc1H1crRT8=
 
---000000000000bdcc910647419512
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Wed, Dec 31, 2025 at 02:16:53AM -0800, Breno Leitao wrote:
+> Hello Yohei,
+> 
+> On Wed, Dec 31, 2025 at 01:03:29AM +0900, yk@y-koj.net wrote:
+> > From: Yohei Kojima <yk@y-koj.net>
+> > 
+> > This patch fixes the edge case behavior on ifup/ifdown and
+> > linking/unlinking two netdevsim interfaces:
+> > 
+> > 1. unlink two interfaces netdevsim1 and netdevsim2
+> > 2. ifdown netdevsim1
+> > 3. ifup netdevsim1
+> > 4. link two interfaces netdevsim1 and netdevsim2
+> 
+> > 5. (Now two interfaces are linked in terms of netdevsim peer, but
+> >     carrier state of the two interfaces remains DOWN.)
+> 
+> That seems a real issue, in fact. The carriers are only getting up when
+> opening the device, not when linking. Thus, this patch makes sense to
+> me.
+> 
+> > This inconsistent behavior is caused by the current implementation,
+> > which only cares about the "link, then ifup" order, not "ifup, then
+> > link" order. This patch fixes the inconsistency by calling
+> > netif_carrier_on() when two netdevsim interfaces are linked.
+> > 
+> > This patch fixes buggy behavior on NetworkManager-based systems which
+> > causes the netdevsim test to fail with the following error:
+> > 
+> >   # timeout set to 600
+> >   # selftests: drivers/net/netdevsim: peer.sh
+> >   # 2025/12/25 00:54:03 socat[9115] W address is opened in read-write mode but only supports read-only
+> >   # 2025/12/25 00:56:17 socat[9115] W connect(7, AF=2 192.168.1.1:1234, 16): Connection timed out
+> >   # 2025/12/25 00:56:17 socat[9115] E TCP:192.168.1.1:1234: Connection timed out
+> >   # expected 3 bytes, got 0
+> >   # 2025/12/25 00:56:17 socat[9109] W exiting on signal 15
+> >   not ok 13 selftests: drivers/net/netdevsim: peer.sh # exit=1
+> > 
+> > This patch also solves timeout on TCP Fast Open (TFO) test in
+> > NetworkManager-based systems because it also depends on netdevsim's
+> > carrier consistency.
+> > 
+> > Fixes: 1a8fed52f7be ("netdevsim: set the carrier when the device goes up")
+> > Signed-off-by: Yohei Kojima <yk@y-koj.net>
+> 
+> Reviewed-by: Breno Leitao <leitao@debian.org>
 
-On Wed, Dec 31, 2025 at 6:35=E2=80=AFPM Breno Leitao <leitao@debian.org> wr=
-ote:
->
-> When bnxt_init_one() fails during initialization (e.g.,
-> bnxt_init_int_mode returns -ENODEV), the error path calls
-> bnxt_free_hwrm_resources() which destroys the DMA pool and sets
-> bp->hwrm_dma_pool to NULL. Subsequently, bnxt_ptp_clear() is called,
-> which invokes ptp_clock_unregister().
->
-> Since commit a60fc3294a37 ("ptp: rework ptp_clock_unregister() to
-> disable events"), ptp_clock_unregister() now calls
-> ptp_disable_all_events(), which in turn invokes the driver's .enable()
-> callback (bnxt_ptp_enable()) to disable PTP events before completing the
-> unregistration.
->
-> bnxt_ptp_enable() attempts to send HWRM commands via bnxt_ptp_cfg_pin()
-> and bnxt_ptp_cfg_event(), both of which call hwrm_req_init(). This
-> function tries to allocate from bp->hwrm_dma_pool, causing a NULL
-> pointer dereference:
->
->   bnxt_en 0000:01:00.0 (unnamed net_device) (uninitialized): bnxt_init_in=
-t_mode err: ffffffed
->   KASAN: null-ptr-deref in range [0x0000000000000028-0x000000000000002f]
->   Call Trace:
->    __hwrm_req_init (drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.c:72)
->    bnxt_ptp_enable (drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c:323 dri=
-vers/net/ethernet/broadcom/bnxt/bnxt_ptp.c:517)
->    ptp_disable_all_events (drivers/ptp/ptp_chardev.c:66)
->    ptp_clock_unregister (drivers/ptp/ptp_clock.c:518)
->    bnxt_ptp_clear (drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c:1134)
->    bnxt_init_one (drivers/net/ethernet/broadcom/bnxt/bnxt.c:16889)
->
-> Lines are against commit f8f9c1f4d0c7 ("Linux 6.19-rc3")
->
-> Fix this by checking if bp->hwrm_dma_pool is NULL at the start of
-> bnxt_ptp_enable(). During error/cleanup paths when HWRM resources have
-> been freed, return success without attempting to send commands since the
-> hardware is being torn down anyway.
->
-> During normal operation, the DMA pool is always valid so PTP
-> functionality is unaffected.
->
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> Fixes: a60fc3294a37 ("ptp: rework ptp_clock_unregister() to disable event=
-s")
-> Cc: stable@vger.kernel.org
-> ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/=
-ethernet/broadcom/bnxt/bnxt_ptp.c
-> index a8a74f07bb54..a749bbfa398e 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-> @@ -482,6 +482,13 @@ static int bnxt_ptp_enable(struct ptp_clock_info *pt=
-p_info,
->         int pin_id;
->         int rc;
->
-> +       /* Return success if HWRM resources are not available.
-> +        * This can happen during error/cleanup paths when DMA pool has b=
-een
-> +        * freed.
-> +        */
-> +       if (!bp->hwrm_dma_pool)
+Thank you for the review!  
 
-Thanks for the fix. While it's valid, just that to me, this check here
-looks a bit odd.
-Why not call bnxt_ptp_clear() before bnxt_free_hwrm_resources() in the
-unwind path?
+> 
+> Thanks for the fix!
 
-> +               return 0;
-> +
->         switch (rq->type) {
->         case PTP_CLK_REQ_EXTTS:
->                 /* Configure an External PPS IN */
->
-> ---
-> base-commit: 80380f6ce46f38a0d1200caade2f03de4b6c1d27
-> change-id: 20251231-bnxt-c54d317d8bfe
->
-> Best regards,
-> --
-> Breno Leitao <leitao@debian.org>
->
+When I encountered this bug, I could easily identify where to fix thanks
+to your previous commit. Thanks again for your support!
 
---000000000000bdcc910647419512
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-/HTPxpDrr4vzZL0yoc9XefyCbdiwfyFl99oBekp+1ZxXc5bZsVhRPVyEWFtCys66nqu5cU2GPT3a
-ySQEHOtIKyGGgzMVvitOzO2suQkoMvu/swsftfgCY/PObdlBZhv0BD97+WwR6CQJh/YEuDDEHYCy
-NDeiVtF3/jwT04bHB7lR9n+AiCSLr9wlgBHGdBFIOmT/XMX3K8fuMMGLq9PpGQEMvYa9QTkE9+zc
-MddiNNh1xtCTG0+kC7KIttdXTnffisXKsX44B8ECAwEAAaOCAd0wggHZMA4GA1UdDwEB/wQEAwIF
-oDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3Nl
-Y3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEF
-BQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1Ud
-IAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIB
-FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAy
-hjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwJAYDVR0R
-BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAdBgNVHQ4EFgQUxJ6fps/yOGneJRYDWUKPuLPk
-miYwDQYJKoZIhvcNAQELBQADggIBAI2j2qBMKYV8SLK1ysjOOS54Lpm3geezjBYrWor/BAKGP7kT
-QN61VWg3QlZqiX21KLNeBWzJH7r+zWiS8ykHApTnBlTjfNGF8ihZz7GkpBTa3xDW5rT/oLfyVQ5k
-Wr2OZ268FfZPyAgHYnrfhmojupPS4c7bT9fQyep3P0sAm6TQxmhLDh/HcsloIn7w1QywGRyesbRw
-CFkRbTnhhTS9Tz3pYs5kHbphHY5oF3HNdKgFPrfpF9ei6dL4LlwvQgNlRB6PhdUBL80CJ0UlY2Oz
-jIAKPusiSluFH+NvwqsI8VuId34ug+B5VOM2dWXR/jY0as0Va5Fpjpn1G+jG2pzr1FQu2OHR5GAh
-6Uw50Yh3H77mYK67fCzQVcHrl0qdOLSZVsz/T3qjRGjAZlIDyFRjewxLNunJl/TGtu1jk1ij7Uzh
-PtF4nfZaVnWJowp/gE+Hr21BXA1nj+wBINHA0eufDHd/Y0/MLK+++i3gPTermGBIfadXUj8NGCGe
-eIj4fd2b29HwMCvfX78QR4JQM9dkDoD1ZFClV17bxRPtxhwEU8DzzcGlLfKJhj8IxkLoww9hqNul
-Md+LwA5kUTLPBBl9irP7Rn3jfftdK1MgrNyomyZUZSI1pisbv0Zn/ru3KD3QZLE17esvHAqCfXAZ
-a2vE+o+ZbomB5XkihtQpb/DYrfjAMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
-ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
-MjAyMwIMClwVCDIzIfrgd31IMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCAg1up4
-mHRndmcHxBrnE/tmOpkSJTeYq0ao2c2XXUG3WDAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
-CSqGSIb3DQEJBTEPFw0yNTEyMzExNjAxMTBaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
-MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
-SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQDOrQm5zBmBZ+Hf/4y3tOL1cddz+JpQsYlKnosWs/FM
-xoPwqVADGPVsxsABcSJ4tnlOdosUeG7ur2vXj0svGRqLwQfYVb2SBFmowgpGQYx3//xNWwjZuV8N
-3gdzwkt7raGNKktxr5zmhFOKxljI3N5TsPh1+ejFKwsP/+Rp7syRbpqbOc7E7MCZjVc08PEwWDYz
-Xrcbuwvlf4qoU2rQ09d+nIbj7GEU4QPGaIybZ0WYI4/6sbUF0ZiNct/b5sXeuXT+twUIMSBHPUPX
-gKdJeMZU1RFF2omzbVCOd+vEiL9wLsrVnVZuE5q35NjrFIHKJLx8390+SYayumY1wFiPCdmO
---000000000000bdcc910647419512--
+Best regards,
+Yohei Kojima
 
