@@ -1,177 +1,172 @@
-Return-Path: <netdev+bounces-246426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88F6FCEC013
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 14:06:04 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1BB9CEC033
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 14:12:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D5C06300A575
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 13:06:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9E78E30161B5
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 13:12:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C91931079B;
-	Wed, 31 Dec 2025 13:06:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9659D322B90;
+	Wed, 31 Dec 2025 13:12:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="SiNOf5hC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF69721C160
-	for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 13:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E112773C1
+	for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 13:12:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767186362; cv=none; b=V+zYxbVQxaJ3PgX1PYCjQMlKit1U+NL7cYjCHrOu/gmyVA/fXW3j54cOKx5kAfoBD97DinlUOz6p1hgYYMD3I/K4neUM7E6m8mnxxxLthClLIdckeMWMaV+JV/MX/dmkWxKH9AqUN9K+OBc95/GCUfCQyPA7CXWadM7cs4WTjq4=
+	t=1767186755; cv=none; b=CJRSoks4NWlg3WxLTZNzL8kHhC5Y8WnCWl836GlvkE3F0H4L+NBq5vnFJB/fO3CBZufWdUdxep2T10AKC01zlBuSk+uC26ZiNb+nPzkJlfkDs07l4YbLAlGgpvHqldW7JDiFhYCIjg3+7nmPgJsRsAnTEsBdr4Es+uYJS9q+NPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767186362; c=relaxed/simple;
-	bh=MDcd1bGhccG6X9ai4kuqFpZk9zpxTDM/8y4BfsTO1bE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=hRlJpEkLdzPVVUc2Y/thKne+zfzZB/RYUltZaPQmn1QIgJGhlnvh9/e4gd6zCLgyUfp/BLbnkpQdjHcbCb/9Pu2nUCx/SI6sGmRE6oQ08+XWGW3DxBUbB+5Dmh2mPCt7SrzTtMsFhq2diivSLrvJLu1I6LIAvVPvlpa7ZF8klnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-7c6e9538945so7761332a34.1
-        for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 05:05:59 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767186359; x=1767791159;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1767186755; c=relaxed/simple;
+	bh=+Rj9uS/xKO+b+rZgqDTkOPQ7AM9H+O0zY3sW6JnGIaQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PpJ0f5FeTWJXATvNIDLQC/7XAQQItgJmzrvNunUFR8QDZY/1ca+WQmg1pQvNVDe9WA5ZeE42Ub/J3lC7we7+h4p2NHO32EjuJo6dNaFIAvMEk05so67zw1oB7man2omC6xU9qvhT4IqwmNepdUadZ/Qmo3BtIimTiNbvygJLuCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=SiNOf5hC; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-47d538fafdfso3024565e9.1
+        for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 05:12:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1767186751; x=1767791551; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pbnElRqbRnD4WG3UkShPsEoYZpnGixbcSQcdBWQX0Ew=;
-        b=W6+mvtkov5IHQUwNKVvbVG+bMbUBR+1oDA3GPWHlEXqlQFkqiYjBc0PDE6ahF4BYEQ
-         xF5FRxuRzu2F5V8HIUhvlXK/ZIXguE1ARzufWSBwOPvM5WUliR22EduBCNCQjBphmlZE
-         bn1adviE2vONfKK8AgFPd6X61LWPoQ9uTgCOhEpI8gbSPP8n7i8luty7SMBU/3V157pF
-         eb+SOSLTM+jZMGVi+6C6r5wYQeMF8SnY/DrXi0EubMatwNYya2bwBWX/frUuq5SHWfPV
-         HQdVDdjkNRJxhJg6B85aclWN7AQ7Xp3h+0f82DgFQCZ7t6PK//J6pFn/1/+AbuadNx3r
-         h9Xw==
-X-Gm-Message-State: AOJu0YxqgjYnDnOSR957WWyOk9kE6hXJT1dGvtKaxqKsY96B4yMlo8PU
-	0v8i8VtZ/PbEpcc+1UoI8ItPecgCj3iTxt10Q7YqjsdTmMXx49hyFAO/
-X-Gm-Gg: AY/fxX5ChFGMg+XookmVEilJCdfznWGh5vvGVktmXVkXgA0K2A5QRwCYgvrQy7pE9ws
-	St7J8XS5ybUtoKpyUs7M+iD5dlVdP5TVizLrv4IckL/6IktAdka73Bdm3IFRWO2PZTgnPYE8ch+
-	w5xdY2PflBB9tBXOhN45w3uBAd2MREezAEI8pZ74Y83a/TjgkB+lrah+ZQLLn9S+IuQVK08063C
-	jY2eQPqvjVEY9X5YLXydCpU5kt53+4e9v4bLzzGmll7J5z+DoWEB4jRTwUBFRYz1hnSNcK4kv2e
-	7YtN1pfSW6pSfvj4Z1R3qcnsWNAqKB5wDe4e3oIuzlJebgABrZruFWN5iAABTmzy5qT+WTcZxHG
-	/1JppBhv601eZGEe9OaOY+os/eFPKArPWqZfJT1L9LVl6WbLnTUIXdz4jeigZkcDdsX+gykhIIW
-	r/DwsCI/e3ySxaVQ==
-X-Google-Smtp-Source: AGHT+IEYrzaVvZv/bIMY6srXwLcMFuv6qqbv2T7g2ZyO0CjurEzavAPpm4aq7O+Bni2FRGchzZfHgA==
-X-Received: by 2002:a05:6830:11c2:b0:785:6792:4b3 with SMTP id 46e09a7af769-7cc5926f15dmr16552158a34.10.1767186358781;
-        Wed, 31 Dec 2025 05:05:58 -0800 (PST)
-Received: from localhost ([2a03:2880:10ff:48::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cc667281fesm24446233a34.6.2025.12.31.05.05.58
+        bh=Fke3G5rSH2WPZ2DuQdyfqEfEpoI6l76uJNtI0EpEhAo=;
+        b=SiNOf5hCQAQ9lih0xDGV7gjR7CfpmOO8AB3s9IeITfpaC328pdo654nC3FNIfPPnYB
+         fkd5qD9q+HvWSq536C6BhTSPieAbHLipRfLKE21iDDYtDmghplktpIhdpDtdORPciAcZ
+         LQpQ8PKMM8Q6/YUI7t1QvsKoPzRYURS1J27f9/F31nTEFyFQlVX8XQzAr1xtRLQ39GkB
+         REQ15nkajDKe1xg9zkDXa/UH9tt1LtbNShtNDDvRc1UpIXkWn8dwnUZCTvot/hexmBta
+         XggYEqQC1GM23pJ7GQgNCAuwh+5a70MQJiobGXUg7XwbkgAb1lDG3040If49qmyX801q
+         2gDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767186751; x=1767791551;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Fke3G5rSH2WPZ2DuQdyfqEfEpoI6l76uJNtI0EpEhAo=;
+        b=U6Fe3RRr+nqG+BGLDShn2mnB9WcbUDykTCl/8ZeE1DldiDwbKoFCsP5tduuT41kkVJ
+         tiFKLnPLLzTAG9VM8uQB/0iyOpAqr0BmoeFYmpy81wlK3QcidLoi4szhJyCyC6K8jneo
+         Ym3BJv9tDDrrqFFgUDR6uguYpiINrMm8rCYqQL7Hp6L3JufY57ObQLTSIOnkA3ea0QPW
+         eDwWnRe6RLr57rck6gBwc1CHRAV8yEnqTFBN+PVVAQrYu9Ru6ieX1x5eq0cxpKCmUmuA
+         7fcJJqjGiKxLiehxIlrOF7qsuwPBwiyVnWAQ3/k0qgCzrc0RA87EJmz0Dclz52Vd9BAs
+         IgTA==
+X-Forwarded-Encrypted: i=1; AJvYcCWWfvNRUef/Ri/K9Y5hqS3cjdgzFaINFuhkq7YK2hoFN0VyVugVWsCZPbQPiYPah8vND7Wu9Bs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQ8Ya/fNew8QMUXNElYL7sbV/kBmAdWS4lfbVOJpwAYnDyKene
+	lnlK9mu2sNeaNyiJI3cXHY3IXT6lT5eT807j5DT6bLeAP7TsvwySLkf8+dWbaOwcLCQ=
+X-Gm-Gg: AY/fxX7Gb+tuTXbt+yj3yKULD2+OZYKZDDvHZvzsr/evHH4K8szN5Jm1g1QIuaFenrD
+	NvSSWYDyTYBJUkgYD/T+rHTnx4iZgRmnvMiBV+ULfg7NgsjhVkaqOniqQpNQPOlziGLPkSXBs+I
+	XRJb6FjsBT2TWABcj15Ng7uz3Hc7ubpR432RwMIUk3XJFlMXDGngOuC+OXtJluyelKgZbJjiHhc
+	PzJeHL7+zPIZLfKUP795dMybjO2AxOiNyF9pssEIId6o/fzhoPZ0lwowUuMK+nR/BSQ9otFNC6N
+	/xmhHmGpgknns/s4lEqsziONwSBQWzZr29LD4LCuQLdEQeo1eS7M3w0XSHyBrcJJW7jMYAQnTnA
+	mTzRBza2eA0e59YsBf064HpCQvl3R9X1jXIQevwuvCATdCK1neXBTtRlZt5pCqTpe+LTFqg34sP
+	EvqxAJ4zf2JVzkQg0ozx/J4kciE0h88CEr9C83KBKoWTl3dzdkqBwPjuhjcRK4yZ/FMz91y4foe
+	Fqq
+X-Google-Smtp-Source: AGHT+IF4mp6GOV5G6x95wPZOhGbqasawR+ZO3M57T/TzQMfUeMdF8kArZ+ePMOUwA5I3JuKmTuDssg==
+X-Received: by 2002:a05:600c:3e0b:b0:477:9c73:268a with SMTP id 5b1f17b1804b1-47d195b3d55mr287631655e9.6.1767186751342;
+        Wed, 31 Dec 2025 05:12:31 -0800 (PST)
+Received: from mordecai (dynamic-2a00-1028-83b8-1e7a-3010-3bd6-8521-caf1.ipv6.o2.cz. [2a00:1028:83b8:1e7a:3010:3bd6:8521:caf1])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be3a20af0sm269524875e9.4.2025.12.31.05.12.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Dec 2025 05:05:58 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-Date: Wed, 31 Dec 2025 05:05:34 -0800
-Subject: [PATCH net] bnxt_en: Fix NULL pointer crash in bnxt_ptp_enable
- during error cleanup
+        Wed, 31 Dec 2025 05:12:30 -0800 (PST)
+Date: Wed, 31 Dec 2025 14:12:24 +0100
+From: Petr Tesarik <ptesarik@suse.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>, Olivia Mackall <olivia@selenic.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Eugenio =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, "James E.J. Bottomley"
+ <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Robin Murphy <robin.murphy@arm.com>, Stefano Garzarella
+ <sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Leon Romanovsky
+ <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+ linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
+ virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
+ iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH RFC 00/13] fix DMA aligment issues around virtio
+Message-ID: <20251231141224.56d4ce56@mordecai>
+In-Reply-To: <cover.1767089672.git.mst@redhat.com>
+References: <cover.1767089672.git.mst@redhat.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-suse-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251231-bnxt-v1-1-8f9cde6698b4@debian.org>
-X-B4-Tracking: v=1; b=H4sIAJ4fVWkC/yXMQQqDMBAF0KsMf22giUpLriIuTDLqdBElSYsg3
- l3U7Vu8HZmTcIalHYn/kmWJsKQrgp+HOLGSAEswL9NqU2vl4laUb5tQ63f4uJFREdbEo2x30yF
- yQf9g/rkv+3IFOI4T3nSalG0AAAA=
-X-Change-ID: 20251231-bnxt-c54d317d8bfe
-To: Michael Chan <michael.chan@broadcom.com>, 
- Pavan Chebbi <pavan.chebbi@broadcom.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, 
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
- Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- kernel-team@meta.com, Breno Leitao <leitao@debian.org>, 
- stable@vger.kernel.org
-X-Mailer: b4 0.15-dev-47773
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2910; i=leitao@debian.org;
- h=from:subject:message-id; bh=MDcd1bGhccG6X9ai4kuqFpZk9zpxTDM/8y4BfsTO1bE=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpVR+1FiLsstnJScE9knBwtFyXA31Y5m9+ra75Y
- GxF3pU4EnGJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaVUftQAKCRA1o5Of/Hh3
- bfaJD/sGSpBK+ivtrCA5bmOPt6CGYezAsTYL2EcFDmCkdYSp2NUHIj0RjAiRmCHC/YEONVg5xWJ
- KUGiQ0kfwVmtB8IpXO7iBxKtvM1JLBscyF88FzpqWhf5xqL2xBgTKgQXMdtXuysYDY4/EiEyAp0
- M1i5v0IKphUqV9O19F01GkikQuYLO/J6F9a9rjRaQBh6SDm+WKP3eVqGuP3Pb64zWRTqSwmFQrU
- svD+BFYUjaetg9RHd7yrPih1lX29NejtU33VEGdodZS4zwBr+vIMkY8CE4sAdahzyLb6PRbwQLB
- ZdmRWNkjfsqi3qpu9G9N9Di4KspHFeWPepVXtI0j7hjbFBERJNHWkPXQKBKyHDI0VAVAA8eVTW6
- T+AL9arnKOEh0EKK/qhI76SgIQWSGVTSar0XP7E6y9nFgdihoBQ1YvYTKdn7beRBZqcyHI676iN
- w7zJaUPhDpoSMpnstQ1Ol2skw1P2w+54CNfKY4DZTvjrZ4x/F+KLXQdWmn+U6YbJK5s9mhMC78k
- blVyeWf+5SDHCU7KG1P/RHA2LBKyPBuSC7O3aUniARJnNqC3cDKwGcAzHmu4vgluHgBCTAN+9I5
- 1SYLzAzKlbikZmbTtbnHNzt1P/+J9IvAwpKcjEZ1HCnva3EoV7jngH4ojExALGfhRqsiG44bMvJ
- Gx3RixyKlyf/dTg==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-When bnxt_init_one() fails during initialization (e.g.,
-bnxt_init_int_mode returns -ENODEV), the error path calls
-bnxt_free_hwrm_resources() which destroys the DMA pool and sets
-bp->hwrm_dma_pool to NULL. Subsequently, bnxt_ptp_clear() is called,
-which invokes ptp_clock_unregister().
+On Tue, 30 Dec 2025 05:15:42 -0500
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Since commit a60fc3294a37 ("ptp: rework ptp_clock_unregister() to
-disable events"), ptp_clock_unregister() now calls
-ptp_disable_all_events(), which in turn invokes the driver's .enable()
-callback (bnxt_ptp_enable()) to disable PTP events before completing the
-unregistration.
+> Cong Wang reported dma debug warnings with virtio-vsock
+> and proposed a patch, see:
+> 
+> https://lore.kernel.org/all/20251228015451.1253271-1-xiyou.wangcong@gmail.com/
+> 
+> however, the issue is more widespread.
+> This is an attempt to fix it systematically.
+> Note: i2c and gio might also be affected, I am still looking
+> into it. Help from maintainers welcome.
+> 
+> Early RFC, compile tested only. Sending for early feedback/flames.
+> Cursor/claude used liberally mostly for refactoring, and english.
+> 
+> DMA maintainers, could you please confirm the DMA core changes
+> are ok with you?
 
-bnxt_ptp_enable() attempts to send HWRM commands via bnxt_ptp_cfg_pin()
-and bnxt_ptp_cfg_event(), both of which call hwrm_req_init(). This
-function tries to allocate from bp->hwrm_dma_pool, causing a NULL
-pointer dereference:
+Before anyone else runs into the same issue as I did: This patch series
+does not apply cleanly unless you first apply commit b148e85c918a
+("virtio_ring: switch to use vring_virtqueue for virtqueue_add
+variants") from the mst/vhost/vhost branch.
 
-  bnxt_en 0000:01:00.0 (unnamed net_device) (uninitialized): bnxt_init_int_mode err: ffffffed
-  KASAN: null-ptr-deref in range [0x0000000000000028-0x000000000000002f]
-  Call Trace:
-   __hwrm_req_init (drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.c:72)
-   bnxt_ptp_enable (drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c:323 drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c:517)
-   ptp_disable_all_events (drivers/ptp/ptp_chardev.c:66)
-   ptp_clock_unregister (drivers/ptp/ptp_clock.c:518)
-   bnxt_ptp_clear (drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c:1134)
-   bnxt_init_one (drivers/net/ethernet/broadcom/bnxt/bnxt.c:16889)
+But if you go to the trouble of adding the mst/vhost remote, then the
+above-mentioned branch also contains this patch series, and it's
+probably the best place to find the patched code...
 
-Lines are against commit f8f9c1f4d0c7 ("Linux 6.19-rc3")
+Now, let me set out for review.
 
-Fix this by checking if bp->hwrm_dma_pool is NULL at the start of
-bnxt_ptp_enable(). During error/cleanup paths when HWRM resources have
-been freed, return success without attempting to send commands since the
-hardware is being torn down anyway.
+Petr T
 
-During normal operation, the DMA pool is always valid so PTP
-functionality is unaffected.
-
-Signed-off-by: Breno Leitao <leitao@debian.org>
-Fixes: a60fc3294a37 ("ptp: rework ptp_clock_unregister() to disable events")
-Cc: stable@vger.kernel.org
----
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-index a8a74f07bb54..a749bbfa398e 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-@@ -482,6 +482,13 @@ static int bnxt_ptp_enable(struct ptp_clock_info *ptp_info,
- 	int pin_id;
- 	int rc;
- 
-+	/* Return success if HWRM resources are not available.
-+	 * This can happen during error/cleanup paths when DMA pool has been
-+	 * freed.
-+	 */
-+	if (!bp->hwrm_dma_pool)
-+		return 0;
-+
- 	switch (rq->type) {
- 	case PTP_CLK_REQ_EXTTS:
- 		/* Configure an External PPS IN */
-
----
-base-commit: 80380f6ce46f38a0d1200caade2f03de4b6c1d27
-change-id: 20251231-bnxt-c54d317d8bfe
-
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
+> Thanks!
+> 
+> 
+> Michael S. Tsirkin (13):
+>   dma-mapping: add __dma_from_device_align_begin/end
+>   docs: dma-api: document __dma_align_begin/end
+>   dma-mapping: add DMA_ATTR_CPU_CACHE_CLEAN
+>   docs: dma-api: document DMA_ATTR_CPU_CACHE_CLEAN
+>   dma-debug: track cache clean flag in entries
+>   virtio: add virtqueue_add_inbuf_cache_clean API
+>   vsock/virtio: fix DMA alignment for event_list
+>   vsock/virtio: use virtqueue_add_inbuf_cache_clean for events
+>   virtio_input: fix DMA alignment for evts
+>   virtio_scsi: fix DMA cacheline issues for events
+>   virtio-rng: fix DMA alignment for data buffer
+>   virtio_input: use virtqueue_add_inbuf_cache_clean for events
+>   vsock/virtio: reorder fields to reduce struct padding
+> 
+>  Documentation/core-api/dma-api-howto.rst  | 42 +++++++++++++
+>  Documentation/core-api/dma-attributes.rst |  9 +++
+>  drivers/char/hw_random/virtio-rng.c       |  2 +
+>  drivers/scsi/virtio_scsi.c                | 18 ++++--
+>  drivers/virtio/virtio_input.c             |  5 +-
+>  drivers/virtio/virtio_ring.c              | 72 +++++++++++++++++------
+>  include/linux/dma-mapping.h               | 17 ++++++
+>  include/linux/virtio.h                    |  5 ++
+>  kernel/dma/debug.c                        | 26 ++++++--
+>  net/vmw_vsock/virtio_transport.c          |  8 ++-
+>  10 files changed, 172 insertions(+), 32 deletions(-)
+> 
 
 
