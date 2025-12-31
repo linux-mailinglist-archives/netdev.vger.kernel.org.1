@@ -1,125 +1,220 @@
-Return-Path: <netdev+bounces-246433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A243BCEC188
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 15:37:42 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF846CEC1AC
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 15:40:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1C1F730049F4
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 14:37:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A75F930039FC
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 14:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F018B26ED2A;
-	Wed, 31 Dec 2025 14:37:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8653276049;
+	Wed, 31 Dec 2025 14:40:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ug55uySx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J5iYxZnv";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="OUPcxx4T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B706B22301;
-	Wed, 31 Dec 2025 14:37:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4EFA273D77
+	for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 14:40:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767191859; cv=none; b=sA5OI5p8MJy399ekL2md0pGAUDZZMgT6aKC3VD4dyzZ1Vub5YeZMUpyNdTX/hTWZEpDRjdjsEnmd1/9eUU7kWy6Kw5o5lOh3i/67ZTpgM9pS2il+Ea8QNBVhOIZ6w/RGGbccr/7By766fLViuQr412CMAi7k4Yx1Gd2oeJz0DVA=
+	t=1767192044; cv=none; b=DHmAQtnMFrP3Hr8df76hUXanEkdjbO4V2MtGScFF/pTDc7W42qjkBQ8MnUObKF7P2nNourB/atjBS5KOmFwbMMwrGfD/TIZWVx+WuMYJtR4JnXk2h28OG8h5IAvlCRVq2SyKfabPj9Lf2FFjfNyMr5w/xMO3h8NDd6fN2a2OG9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767191859; c=relaxed/simple;
-	bh=rnNQxQRICVG0/bRCHLds18VIp4MhYcD23gBS1k4tm4w=;
+	s=arc-20240116; t=1767192044; c=relaxed/simple;
+	bh=uCJpKbQgK1JDZeWrhG0sD4sWy8cW8kDi8pCaSJxqzWY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AJowfv9iyzS7T3MX6qCTSABf04wQXRi662Ev0eEEHuoQF/RPyUF1J/CZCWBYybu/QOi+GWlpRMdWfqfQ/IUACY8YzBRhUq9TkeG5SC/C2+WYbKmGPeGCjVMP2rfc2hWUR2RYvgb2FQfcil3ez9imdwhwC0AVUEl9Fusm7kB9Luc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ug55uySx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE058C113D0;
-	Wed, 31 Dec 2025 14:37:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767191859;
-	bh=rnNQxQRICVG0/bRCHLds18VIp4MhYcD23gBS1k4tm4w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ug55uySx/TS9I8SDIbLCqdWvgFFvx7oQBG42eNACAkO9SMq2ggXfcXb2F44FGN50K
-	 13mXv2fVVQh7P1dXLSg7Da7qFtZegjEtOHHfMgKfursGukFoc8GLy67UuFkBND8bmu
-	 1hRTfjdoq07zNV+R2kWXv/+mIgcBQN7SPKkBEeQau5EEWxacetnIh3vIMdssmjat6M
-	 H/l2aL8FQsS9UnMjZ/iiQf9qUG5o98tjDOaHYOou4DExuKYBxNh8n29IIOMSCteAyX
-	 9Xsvmkd6qooprztWFYZy7sLZa63PRgX3T04lKq3mgg7JBGjIe3B//fShIC1zjPD6kx
-	 ojzdtaOi8ppWA==
-Date: Wed, 31 Dec 2025 15:37:36 +0100
-From: Frederic Weisbecker <frederic@kernel.org>
-To: Chen Ridong <chenridong@huaweicloud.com>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chen Ridong <chenridong@huawei.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=XQQPkhiW96wswGIAQ/UYm/5HAasQwUoVSTOe6bd8zag5bwUfsY2oM8H/j8B3aDvzE/xbFzReFUsdtV8oUZ2kdym2sVHFojHIEKoRfsKJD2gdexWjQtpJWUtxRcQj9z3PdrU5BOgT3GmLErgzXcPIZzJdV7ByEx1RpESQBM0j2cM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J5iYxZnv; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=OUPcxx4T; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767192042;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=n0eNh1PwPkp66fDhwYL8c44iVldZ6MxzxhBv6XJLUek=;
+	b=J5iYxZnvSQIqmiKLOTWoOeC+n5Y1mDaq769ttcC9zSfqvV+Ssn7pW0XZ4NmkxLzIfS271D
+	/0rAD+fTtuzejdPzCeMA9ed/KpI5ut0VR4vWzIKHMGY22HdD9+ah8zturKbgLo6nE/Gx+i
+	ONnkIvAdublIwQUppAkGQP4W/WoK7kU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-55-HIK8clr4NWyG2T-2MWTzKw-1; Wed, 31 Dec 2025 09:40:40 -0500
+X-MC-Unique: HIK8clr4NWyG2T-2MWTzKw-1
+X-Mimecast-MFC-AGG-ID: HIK8clr4NWyG2T-2MWTzKw_1767192039
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-477cf2230c8so109869875e9.0
+        for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 06:40:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1767192039; x=1767796839; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=n0eNh1PwPkp66fDhwYL8c44iVldZ6MxzxhBv6XJLUek=;
+        b=OUPcxx4TcY8oIazW0j05RQ+fBwXK6dVnvRKGVVtsfOea04Jdvd7GJs4iaLtSJ27Yfy
+         SMhJHXnaZyuB38co1vH7ROc+20AWAIKUV3FLm0wqz89/a4OoH0rejlT0OatejEoZye+r
+         +S0PJZgV5f8riwSnNknTY1CeMcu0Y/KSglDf/Z8U+XGy2byq8cK/+zmIcpOIKYuKlSQ3
+         8alwrl9vDI+MpaonjOc/8FuYyyjoJMGNMImUFcUG7ExRe3p6KMTgYLbmpsjUmItGvwpb
+         JrlzLRpaxJe09bL7vC5PaXdLyK470z4j3bo8x3RQAwqjeSWPIwqDGquJ4ghBMjhXXWJI
+         /lGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767192039; x=1767796839;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=n0eNh1PwPkp66fDhwYL8c44iVldZ6MxzxhBv6XJLUek=;
+        b=j2Vix2C5fQ7OqGU0raegBhW1ZEyY6iUc86yrgIfUnobGWTMpmJ3IIxRHSWp7tNkkDp
+         JcY/Bbci+eo+2bCwuh8Ivy4HnY7LurMkGeECG+ABxvVCai1q2IR5onj8u/6wxn7ZZI0k
+         A3qOmGgsb+XhrAqHjLrncAI6izP5Tv1TPPFGQGkAvVA4iMqGGlEWnyREb8dceQhzIC5H
+         H875ck9kIyDiznVL2zHoeSwO7CmSzGBEYSFOXRy1A9eIAkYjif7MNJPhgDbI9AF0c19b
+         dGRGzmUhURcr4PBZScYqqkQ5DC+900HzRnLqEx03ephvdnC3OAUNLwEshbSTvpreFZ7m
+         sBSw==
+X-Forwarded-Encrypted: i=1; AJvYcCViNis3u/rlC5lxUFDWzt9VlQ9sBijEHJBICgaKACpuIK5hAYQH11bFtluGnvKIPpRLJasgGd8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwyOqBjppoFi7Fjm5Fzx3r2X4aHnrtEDrSZvhTwya76dfRDMQ2
+	oiUfTrroZFOG//zjMJ6Ks3l8rGj2KT5xED68FJOzfvJqT3jn2yvFVEHtzlYMSwgXxQUUw65cXom
+	g5CH87V51AQvg+htcEITPPm8gr6QhfcNW62bc2f+mPOaFwdcnINHHoJxz+A==
+X-Gm-Gg: AY/fxX4H/JUIEugFrDWSXdaI+qEx6GksqZO0Ab3ltfECo7S8BbMWZDJPRzHjBu140+R
+	KQ8hmF3jTRE6qXz84eVH3gfXpj+Y+//exSt+rmyB7UCwMdZpOq+rNnPPOnBReRFirLfe/sSAZqQ
+	f2Qa/BBK7DPOIUT33MeLOCuarImyEkQFJ3Xh5NSPeyftl812BWG7jkm6B2bFMM9EgGOhPyRqNyg
+	uFm2gyyz74DL/SFo/HMrohTKCW3eOR6BIh1V68TraktX2n1sFovAEF2/HVHsv0cjc8IpDBCStz4
+	UmR8xhe6KnCN7/Twp66bmbYU5t22aa9LDZU1/T1Xdp4t1afIgnc3nudAG2LcHU+ZF06D/Fk1ySm
+	WEIuHFL9fujqgDq6IA+JVtY86mT1EflbIaw==
+X-Received: by 2002:a05:600c:1d29:b0:477:1af2:f40a with SMTP id 5b1f17b1804b1-47d1957f946mr504015345e9.17.1767192039240;
+        Wed, 31 Dec 2025 06:40:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFftjQcUwvXMCaEXUnp/nGSfuL085M1yJ9YObPox1uDg3/ci/kM4qMkiO89pT6mz04eQEDKgA==
+X-Received: by 2002:a05:600c:1d29:b0:477:1af2:f40a with SMTP id 5b1f17b1804b1-47d1957f946mr504014855e9.17.1767192038655;
+        Wed, 31 Dec 2025 06:40:38 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be2724fe8sm835831745e9.1.2025.12.31.06.40.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Dec 2025 06:40:38 -0800 (PST)
+Date: Wed, 31 Dec 2025 09:40:34 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Petr Tesarik <ptesarik@suse.com>
+Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jason Wang <jasowang@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 17/33] PCI: Flush PCI probe workqueue on cpuset isolated
- partition change
-Message-ID: <aVU1MIyJ3VH4V80O@localhost.localdomain>
-References: <20251224134520.33231-1-frederic@kernel.org>
- <20251224134520.33231-18-frederic@kernel.org>
- <c724aac7-5647-4253-bf7b-4ea92ea5d167@huaweicloud.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>, linux-doc@vger.kernel.org,
+	linux-crypto@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-scsi@vger.kernel.org, iommu@lists.linux.dev,
+	kvm@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH RFC 01/13] dma-mapping: add
+ __dma_from_device_align_begin/end
+Message-ID: <20251231092346-mutt-send-email-mst@kernel.org>
+References: <cover.1767089672.git.mst@redhat.com>
+ <ca12c790f6dee2ca0e24f16c0ebf3591867ddc4a.1767089672.git.mst@redhat.com>
+ <20251231150159.1779b585@mordecai>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c724aac7-5647-4253-bf7b-4ea92ea5d167@huaweicloud.com>
+In-Reply-To: <20251231150159.1779b585@mordecai>
 
-Le Fri, Dec 26, 2025 at 04:48:10PM +0800, Chen Ridong a écrit :
-> > @@ -145,6 +146,7 @@ int housekeeping_update(struct cpumask *isol_mask, enum hk_type type)
-> >  
-> >  	synchronize_rcu();
-> >  
-> > +	pci_probe_flush_workqueue();
-> >  	mem_cgroup_flush_workqueue();
-> >  	vmstat_flush_workqueue();
-> >  
+On Wed, Dec 31, 2025 at 03:01:59PM +0100, Petr Tesarik wrote:
+> On Tue, 30 Dec 2025 05:15:46 -0500
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
 > 
-> I am concerned that this flush work may slow down writes to the cpuset interface. I am not sure how
-> significant the impact will be.
+> > When a structure contains a buffer that DMA writes to alongside fields
+> > that the CPU writes to, cache line sharing between the DMA buffer and
+> > CPU-written fields can cause data corruption on non-cache-coherent
+> > platforms.
+> > 
+> > Add __dma_from_device_aligned_begin/__dma_from_device_aligned_end
+> > annotations to ensure proper alignment to prevent this:
+> > 
+> > struct my_device {
+> > 	spinlock_t lock1;
+> > 	__dma_from_device_aligned_begin char dma_buffer1[16];
+> > 	char dma_buffer2[16];
+> > 	__dma_from_device_aligned_end spinlock_t lock2;
+> > };
+> > 
+> > When the DMA buffer is the last field in the structure, just
+> > __dma_from_device_aligned_begin is enough - the compiler's struct
+> > padding protects the tail:
+> > 
+> > struct my_device {
+> > 	spinlock_t lock;
+> > 	struct mutex mlock;
+> > 	__dma_from_device_aligned_begin char dma_buffer1[16];
+> > 	char dma_buffer2[16];
+> > };
+> 
+> This works, but it's a bit hard to read. Can we reuse the
+> __cacheline_group_{begin, end}() macros from <linux/cache.h>?
+> Something like this:
+> 
+> #define __dma_from_device_group_begin(GROUP)			\
+> 	__cacheline_group_begin(GROUP)				\
+> 	____dma_from_device_aligned
+> #define __dma_from_device_group_end(GROUP)			\
+> 	__cacheline_group_end(GROUP)				\
+> 	____dma_from_device_aligned
+> 
+> And used like this (the "rxbuf" group id was chosen arbitrarily):
+> 
+> struct my_device {
+> 	spinlock_t lock1;
+> 	__dma_from_device_group_begin(rxbuf);
+> 	char dma_buffer1[16];
+> 	char dma_buffer2[16];
+> 	__dma_from_device_group_end(rxbuf);
+> 	spinlock_t lock2;
+> };
+> 
+> Petr T
 
-First, writing to cpuset is not something that should be considered as a fast
-path. It is a preparation work at configuration time that can tolerate a few
-milliseconds of delay, which I expect to be what we should encounter most
-of time here.
+Oh, that's a clever idea!
 
-Second, this is not a "usual" cpuset partition write. CPU isolation is a niche
-usecase (real time or Data plane). User must expect tradeoffs against the offer.
+Will do! And GROUP is optional if there's only one group in a structure.
 
-Third, about this very patch, most pci probe should happen at boot time before
-cgroup is even accessible to userspace.
 
-> I'm concerned about potential deadlock risks. While preliminary investigation hasn't uncovered any
-> issues, we must ensure that the cpu write lock is not held during the work(writing cpuset interface
-> needs cpu read lock).
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> >  include/linux/dma-mapping.h | 10 ++++++++++
+> >  1 file changed, 10 insertions(+)
+> > 
+> > diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
+> > index aa36a0d1d9df..47b7de3786a1 100644
+> > --- a/include/linux/dma-mapping.h
+> > +++ b/include/linux/dma-mapping.h
+> > @@ -703,6 +703,16 @@ static inline int dma_get_cache_alignment(void)
+> >  }
+> >  #endif
+> >  
+> > +#ifdef ARCH_HAS_DMA_MINALIGN
+> > +#define ____dma_from_device_aligned __aligned(ARCH_DMA_MINALIGN)
+> > +#else
+> > +#define ____dma_from_device_aligned
+> > +#endif
+> > +/* Apply to the 1st field of the DMA buffer */
+> > +#define __dma_from_device_aligned_begin ____dma_from_device_aligned
+> > +/* Apply to the 1st field beyond the DMA buffer */
+> > +#define __dma_from_device_aligned_end ____dma_from_device_aligned
+> > +
+> >  static inline void *dmam_alloc_coherent(struct device *dev, size_t size,
+> >  		dma_addr_t *dma_handle, gfp_t gfp)
+> >  {
 
-That's what we have lockdep for :-)
-
-Thanks.
-
--- 
-Frederic Weisbecker
-SUSE Labs
 
