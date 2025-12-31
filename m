@@ -1,337 +1,328 @@
-Return-Path: <netdev+bounces-246437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70C32CEC256
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 16:10:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8FE6CEC2A3
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 16:26:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C062330036E5
-	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 15:10:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4748F30380EF
+	for <lists+netdev@lfdr.de>; Wed, 31 Dec 2025 15:25:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D69233721;
-	Wed, 31 Dec 2025 15:10:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D864928469B;
+	Wed, 31 Dec 2025 15:25:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="VnIU1dgP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aXvR5FNJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f97.google.com (mail-ot1-f97.google.com [209.85.210.97])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7017B19644B
-	for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 15:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5052868AD
+	for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 15:25:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767193835; cv=none; b=pSQK170k1E8c7dTbI+DF+KWH8s8P7DGLo4W018urkgKIGvk143psDHoJtlkU3hW+AOG2j/6QJntuzk3LJuDyVV88MbfG6y8DSJtzJlTisVPgyZshorDDxUTIqhP4DmgZSmxKCRfeR3zI1KnJB90yHNFzMEErvQgy9uflNyH652Y=
+	t=1767194745; cv=none; b=hn0a+A/t5ollnqpJn0umNajpMNkNUdj5viFxUD+qis++bCSzCAWgOH5plVt5JSomrZLlDYDs11ezn9pWmC26MQmQyTz/5NsWydceOQEOmBVdyhtwrj9QsKNws/ei3Bt2LIYgSe8P8xNjegLJE3PfK0vncheAd7XxswJVpCxAYyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767193835; c=relaxed/simple;
-	bh=FXbn4ekXRLaTR78D+ljQHAOpWUIXd+6+z5pyXlBbYRc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Unf3HhigMro4jHIJxXQypSkPVOKcU1YTjGIfPIEh0aDEAGroZjs58Q7qTmRywF80Zg8tnhUo2RhA26YLZqBUDN/lmaUgFaPwrlT5wy2a4gwVTaVG9O8duDwGVH2QW/naTZ9+Wsc6a+3H61MtJjvDt18yEO/DZgWRL5PYcbAfWgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=VnIU1dgP; arc=none smtp.client-ip=209.85.210.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ot1-f97.google.com with SMTP id 46e09a7af769-7c6e9538945so7817475a34.1
-        for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 07:10:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767193831; x=1767798631;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W2ySRBidCBbhvDmawxI5qxPDx7hc60A606cDToL/e0k=;
-        b=VPhRaVUTVzby8YeLnPDhJ3XN1EneFLv6622K859o7PNw34bMbrY4QGTS3nD+jwxWlj
-         3XopgKEN4ISJBssduQmw7RE0ZBtxvjynNCo67FjaY199Ul6dlZ3J9qDmsORu/havWUxu
-         v/O1bq0BGvAaaUs0vBx6mU8t2wTven//NwSRYoU0U0xXIBFKQIglfrhKP+t2IZ+Aj+31
-         msGfdW2ZeVlHDF1ET8b44GiC4wrd5vAOD4tYUuMucX0kHmiwAb2ePCmu9i5qQuVf4a1G
-         AEHOyjmjy20VTEfuWpbysUxoR+0uvrfRvKDIo/tl+mz312XWeEMaBqX9MJj+MeKAbWXF
-         TYsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVB0bDBr+PgBTEmgbQ+whA69RD8K3ri4fbklR+e/OWz+B2qJjgDJLznbUoekCy2AG7sRQVWSSk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmLajBdJIX7OCsmcpD6bdskK3vD4hOhdHZZjmepV/+1mgPesUt
-	YSgwkJTHubFKr78T/7lT9qTUgA7RmSebJMq0C+88ai4ERulBhjZg3/zQjTjGvkznGTqKvCi9t1K
-	gh93FMutK41OGqQm+WbI/pCIengzZReKijnAH0bc4TK7ILF4i833DRizZs6PL/toSxlsTgHIRIO
-	ndH7u5jH2z4B2U0B/fTu8ATg+UG1e7HQQ4o94LIDR5/6QQPr8JQLTUoGYyUOGDTymLBOyCZnOEg
-	UnX8GCyfWY=
-X-Gm-Gg: AY/fxX53Bqjtl8nnKTy0JG/3UdSznqMtPiKfbWZYEci8Do4gQca6faFkrD7DoFtvAH9
-	L8hglPfQpqS6co9QZgPzSa3XQkYewBm8dO43uppBTm9QW2DIBUd1MlzCNpRwbtAbfE/YU/Io+aj
-	oLbdHWwMEPjbj471TMCBOhmGjlCSWgc1qZaX+jr2u3sry1GkEm3AGGOJCWkXyD9fEOoNYh9bzEh
-	OjVfe4v+MykzIF2SBs0uEtchGp60s7DWhLHCc0maiD4L1XQeht+HjJw+/rhvM9oGwlWMFT4sMun
-	0xpjsmfn9cz3VYCL5knSxPGrK71gwK/o5EyzNkIpqQGbpg0/LLkq5TC1eXvXASTWWYp3oz0E0Ee
-	mwkMGlhNr1XqSUiITDEjBN69C8UHHW562903JFNZHS4WtSbVdP806cXnRE2wBRSvZs32N/xWRGW
-	axjDvdGp7aV3nlg045f3UyiB8gwPIIQgXqkKzaWGDIQQ7LVEk=
-X-Google-Smtp-Source: AGHT+IHXQL60PV5vM+gMBGihIPEwREeWF+DxVpD+cnYHK8thJXumrfdUdfjZiB1Mn1mZHGnDY+rbGlO6jQ/z
-X-Received: by 2002:a05:6830:264b:b0:79e:7e5e:7c63 with SMTP id 46e09a7af769-7cc65e736fdmr25173982a34.14.1767193831148;
-        Wed, 31 Dec 2025 07:10:31 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-117.dlp.protect.broadcom.com. [144.49.247.117])
-        by smtp-relay.gmail.com with ESMTPS id 46e09a7af769-7cc667ba104sm4533520a34.3.2025.12.31.07.10.30
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 31 Dec 2025 07:10:31 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-c1d27c65670so5450776a12.1
-        for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 07:10:29 -0800 (PST)
+	s=arc-20240116; t=1767194745; c=relaxed/simple;
+	bh=979UspiXNW4eGHFMpGtmLPEpArKB8uG9aRPcJ46m//Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cJsIBuAtTkQ34Y9TaS4/ecrWmLEpp73PfwoPOVldTTv1rBL9SYECdyZb3SteWYlvBuPM+Ry5xDUHcUepsAkWOTb0E3vImQle7XD2YePhx5oRzB2Rts10FMPF7EsmKNTHWqmaNJt5erHNqhwIPXFdqm45WDH5C0z4RDoluWKNl1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aXvR5FNJ; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7aa9be9f03aso8994289b3a.2
+        for <netdev@vger.kernel.org>; Wed, 31 Dec 2025 07:25:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1767193829; x=1767798629; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=W2ySRBidCBbhvDmawxI5qxPDx7hc60A606cDToL/e0k=;
-        b=VnIU1dgPjrFWid8Z2i3tpjs72IQmv9BIr3y96j0MFJbiEYg22ipMBHJLxfhHZtHGPf
-         JJtN53b0pO7ntJn6onrWPue/YPpg81QBvanCoQu76TNvYszwvTmypGWUfhlGZj55QqEx
-         eZpGJtszkPsBuAWs7Bf0x+tu8kJ23EIP2uMO8=
-X-Forwarded-Encrypted: i=1; AJvYcCUvciIAZF3kZh8anQ4GcsHknqFMt0vtgcrvtJaBrMdxrI9xLeZ548uzed9QTXJ4SsUuyh6JDmA=@vger.kernel.org
-X-Received: by 2002:a05:6a21:6d9f:b0:343:9397:c4d6 with SMTP id adf61e73a8af0-3769f335237mr34892463637.23.1767193828897;
-        Wed, 31 Dec 2025 07:10:28 -0800 (PST)
-X-Received: by 2002:a05:6a21:6d9f:b0:343:9397:c4d6 with SMTP id
- adf61e73a8af0-3769f335237mr34892441637.23.1767193828421; Wed, 31 Dec 2025
- 07:10:28 -0800 (PST)
+        d=gmail.com; s=20230601; t=1767194743; x=1767799543; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lODuypmLoWbnrtex5xb240RMLf3LliH4cjDbDAmHrvU=;
+        b=aXvR5FNJhCzPE2Uz3GhORxI0YFKw3xOXO9TVX3H0N7LxwEZpQxXbMQBtvEmv5xx0sG
+         dsWXBjfEIMIgPvaLNwlnuIU+7qWn+1pGuJ06eqQ8Mnid3HfvXDHu10LP71JqEuVr8c0F
+         omd8WJhWLp1fyR+5ZVhFbex0FzTnNqgi7U1IXV0xO3igylf7zkStBikYW+s9FG9Ib7+j
+         qLWyfCSdRlYQgex8b8rSfOxNl4l/+xvqHglG4GjPaeHFpy9Pg66jjv8xJRBg0JoIBrq2
+         PMttLwV8k0T6gbAkblvQICCl4PWUz61lEeSrdBszOy61zeMq7s69EEPdU/DB6h3nMBzb
+         tN7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767194743; x=1767799543;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lODuypmLoWbnrtex5xb240RMLf3LliH4cjDbDAmHrvU=;
+        b=YJPv7oB+PqX40EtoUnSxgliXjYwsRfY/9io9TFOuO88oFnllcyBukL4UtQTd6E1agc
+         s2As3CzEoSe7K+eCWR1VYV6vddqAfyfhEoXxYlUq+7gCydasDhzMKi2f1Igh5vzVVw7K
+         B2ujjGYGJvAxOHdsXO5GzOwIhIeKEhHy5bnVM3sIDtJk2i3JahNYZTEPk7JQ5UZCAsEW
+         lwR9KJN8p/2oTHFQvLHjDaJhGUgQb9DaOgLMvtg/HENGCn01hcs2K5jSAHkR13pAcTxy
+         GNum2nb0Dsv5SY+Wgz9kbGQgAa7PhIkD/4/osR8z0ZcDU6e7JLW5itLDou7/cPxEVl9V
+         n3Dw==
+X-Forwarded-Encrypted: i=1; AJvYcCU6Tku/xocqvci0i6dFXcJgwUUau2gicG7gcAWmRw+hbJWmvFN3cmjTd5F9GEwThP7LyVlp7V8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywq0b4g+tZhJZT261fpI214fUrvvGdv7iSVIjlSPrylCEk19OL2
+	jdMpVJGlw+PMvWY+/KzpEFHortmBJDCq5IfTyvJ3xTfOkLNGv/nt9ZXp
+X-Gm-Gg: AY/fxX6sI1OUD+scWsGrTS/rilJSw8ES+NPAAf9fdIcYv34W/U+vRHjiLKq8whLQMTE
+	JucXFRcPrrNJcOwEqakL4izfYgjPnnGeXN9fygeP3vzgN1PqSXXb0nT1l8p7h88s+7BddyfzPBj
+	rYYrhq9ZeV4nUU0GUQ2pfSSjUvFc/jwHok5pghcz1kNMWC50Qj3aJkXufoqvUSp9tSvo86mCoez
+	g56Rdk0gFrcaiJd9lPRivy3ej9BQkP5c+E1kSu3tRfHyps9vQHqda3MA8ZWUv7180e4yNESQecZ
+	JEMpsHd/wqfKS//vN/ZwI6w/bRa9DZVB0pN5d0tbCJWy1+/sngdRgkXkRNNqL0t5WMOiLr2Z7tq
+	h0z/v2xpBVsuOaWQXSQbmM/6vXmsjRy6peR9pon2Mb74Q0R4WKc050mqEp/fDG6/hBQk7KpWGDL
+	6jNXRdkZyJcbf4I1jVxyd7yKHebXICoxWLLp21QGxiDKaUpTsWjRVrxtaZs/faK9xw48PgwFT3
+X-Google-Smtp-Source: AGHT+IFlAvoj9OX5Jfdu6AtFcYb3Ny0uLLf0Tj74ADp6OdyjPjL2eECj+48RLjIcfjlXxc49Lq2Ssw==
+X-Received: by 2002:a05:6a00:a882:b0:7f7:26fe:c92f with SMTP id d2e1a72fcca58-7ff64cd5fcbmr30658077b3a.29.1767194742942;
+        Wed, 31 Dec 2025 07:25:42 -0800 (PST)
+Received: from ?IPV6:2001:ee0:4f4c:210:331d:4167:c690:ec93? ([2001:ee0:4f4c:210:331d:4167:c690:ec93])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7a843ee4sm36172944b3a.10.2025.12.31.07.25.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 31 Dec 2025 07:25:41 -0800 (PST)
+Message-ID: <750b2296-9009-45d8-9e18-a47ebcfb912d@gmail.com>
+Date: Wed, 31 Dec 2025 22:25:34 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALs4sv0EYR=bMSW6pF6W=W_mZHhQBpkeg=ugwTtpBc7_FyPDug@mail.gmail.com>
- <20251224165301.2794-1-noam.d.eliyahu@gmail.com>
-In-Reply-To: <20251224165301.2794-1-noam.d.eliyahu@gmail.com>
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Date: Wed, 31 Dec 2025 20:40:17 +0530
-X-Gm-Features: AQt7F2o-hmGNq6izxPSNdMLvmcFwX27Xh9pt8ugJKFdZzKaCUjLlPTXgDVNTuLM
-Message-ID: <CALs4sv0BdhVHawBkkxN2v2o_jqGyFRAe1RVJjGu9d08HM2Jwug@mail.gmail.com>
-Subject: Re: [DISCUSS] tg3 reboot handling on Dell T440 (BCM5720)
-To: "Noam D. Eliyahu" <noam.d.eliyahu@gmail.com>
-Cc: mchan@broadcom.com, netdev@vger.kernel.org, 
-	George Shuklin <george.shuklin@gmail.com>, Lenny Szubowicz <lszubowi@redhat.com>
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000714dde064740e07a"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/3] virtio-net: make refill work a per receive queue
+ work
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+References: <20251223152533.24364-1-minhquangbui99@gmail.com>
+ <20251223152533.24364-2-minhquangbui99@gmail.com>
+ <CACGkMEvXkPiTGxZ6nuC72-VGdLHVXzrGa9bAF=TcP8nqPjeZ_w@mail.gmail.com>
+ <1766540234.3618076-1-xuanzhuo@linux.alibaba.com>
+ <20251223204555-mutt-send-email-mst@kernel.org>
+ <CACGkMEs7_-=-8w=7gW8R_EhzfWOwuDoj4p-iCPQ7areOa9uaUw@mail.gmail.com>
+ <20251225112729-mutt-send-email-mst@kernel.org>
+ <CACGkMEt33BAWGmeFfHWYrjQLOT4+JB7HsWWVMKUn6yFxQ9y2gg@mail.gmail.com>
+ <20251226022727-mutt-send-email-mst@kernel.org>
+ <7143657a-a52f-4cff-acbc-e89f4c713cc4@gmail.com>
+ <CACGkMEuasGDh=wT0n5b5QFDSNNBK7muipBKHb2v5eoKCU0NWDw@mail.gmail.com>
+Content-Language: en-US
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+In-Reply-To: <CACGkMEuasGDh=wT0n5b5QFDSNNBK7muipBKHb2v5eoKCU0NWDw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---000000000000714dde064740e07a
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 12/31/25 14:30, Jason Wang wrote:
+> On Wed, Dec 31, 2025 at 12:29 AM Bui Quang Minh
+> <minhquangbui99@gmail.com> wrote:
+>> On 12/26/25 14:37, Michael S. Tsirkin wrote:
+>>> On Fri, Dec 26, 2025 at 09:31:26AM +0800, Jason Wang wrote:
+>>>> On Fri, Dec 26, 2025 at 12:27 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+>>>>> On Thu, Dec 25, 2025 at 03:33:29PM +0800, Jason Wang wrote:
+>>>>>> On Wed, Dec 24, 2025 at 9:48 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+>>>>>>> On Wed, Dec 24, 2025 at 09:37:14AM +0800, Xuan Zhuo wrote:
+>>>>>>>> Hi Jason,
+>>>>>>>>
+>>>>>>>> I'm wondering why we even need this refill work. Why not simply let NAPI retry
+>>>>>>>> the refill on its next run if the refill fails? That would seem much simpler.
+>>>>>>>> This refill work complicates maintenance and often introduces a lot of
+>>>>>>>> concurrency issues and races.
+>>>>>>>>
+>>>>>>>> Thanks.
+>>>>>>> refill work can refill from GFP_KERNEL, napi only from ATOMIC.
+>>>>>>>
+>>>>>>> And if GFP_ATOMIC failed, aggressively retrying might not be a great idea.
+>>>>>> Btw, I see some drivers are doing things as Xuan said. E.g
+>>>>>> mlx5e_napi_poll() did:
+>>>>>>
+>>>>>> busy |= INDIRECT_CALL_2(rq->post_wqes,
+>>>>>>                                   mlx5e_post_rx_mpwqes,
+>>>>>>                                   mlx5e_post_rx_wqes,
+>>>>>>
+>>>>>> ...
+>>>>>>
+>>>>>> if (busy) {
+>>>>>>            if (likely(mlx5e_channel_no_affinity_change(c))) {
+>>>>>>                   work_done = budget;
+>>>>>>                   goto out;
+>>>>>> ...
+>>>>> is busy a GFP_ATOMIC allocation failure?
+>>>> Yes, and I think the logic here is to fallback to ksoftirqd if the
+>>>> allocation fails too much.
+>>>>
+>>>> Thanks
+>>> True. I just don't know if this works better or worse than the
+>>> current design, but it is certainly simpler and we never actually
+>>> worried about the performance of the current one.
+>>>
+>>>
+>>> So you know, let's roll with this approach.
+>>>
+>>> I do however ask that some testing is done on the patch forcing these OOM
+>>> situations just to see if we are missing something obvious.
+>>>
+>>>
+>>> the beauty is the patch can be very small:
+>>> 1. patch 1 do not schedule refill ever, just retrigger napi
+>>> 2. remove all the now dead code
+>>>
+>>> this way patch 1 will be small and backportable to stable.
+>> I've tried 1. with this patch
+>>
+>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>> index 1bb3aeca66c6..9e890aff2d95 100644
+>> --- a/drivers/net/virtio_net.c
+>> +++ b/drivers/net/virtio_net.c
+>> @@ -3035,7 +3035,7 @@ static int virtnet_receive_packets(struct virtnet_info *vi,
+>>    }
+>>
+>>    static int virtnet_receive(struct receive_queue *rq, int budget,
+>> -               unsigned int *xdp_xmit)
+>> +               unsigned int *xdp_xmit, bool *retry_refill)
+>>    {
+>>        struct virtnet_info *vi = rq->vq->vdev->priv;
+>>        struct virtnet_rq_stats stats = {};
+>> @@ -3047,12 +3047,8 @@ static int virtnet_receive(struct receive_queue *rq, int budget,
+>>            packets = virtnet_receive_packets(vi, rq, budget, xdp_xmit, &stats);
+>>
+>>        if (rq->vq->num_free > min((unsigned int)budget, virtqueue_get_vring_size(rq->vq)) / 2) {
+>> -        if (!try_fill_recv(vi, rq, GFP_ATOMIC)) {
+>> -            spin_lock(&vi->refill_lock);
+>> -            if (vi->refill_enabled)
+>> -                schedule_delayed_work(&vi->refill, 0);
+>> -            spin_unlock(&vi->refill_lock);
+>> -        }
+>> +        if (!try_fill_recv(vi, rq, GFP_ATOMIC))
+>> +            *retry_refill = true;
+>>        }
+>>
+>>        u64_stats_set(&stats.packets, packets);
+>> @@ -3129,18 +3125,18 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
+>>        struct send_queue *sq;
+>>        unsigned int received;
+>>        unsigned int xdp_xmit = 0;
+>> -    bool napi_complete;
+>> +    bool napi_complete, retry_refill = false;
+>>
+>>        virtnet_poll_cleantx(rq, budget);
+>>
+>> -    received = virtnet_receive(rq, budget, &xdp_xmit);
+>> +    received = virtnet_receive(rq, budget, &xdp_xmit, &retry_refill);
+>>        rq->packets_in_napi += received;
+>>
+>>        if (xdp_xmit & VIRTIO_XDP_REDIR)
+>>            xdp_do_flush();
+>>
+>>        /* Out of packets? */
+>> -    if (received < budget) {
+>> +    if (received < budget && !retry_refill) {
+> But you didn't return the budget when we need to retry here?
 
-On Wed, Dec 24, 2025 at 10:23=E2=80=AFPM Noam D. Eliyahu
-<noam.d.eliyahu@gmail.com> wrote:
->
-> Thanks for the quick reply!
->
-> On Mon, Dec 22, 2025 at 11:23 AM Pavan Chebbi <pavan.chebbi@broadcom.com>=
- wrote:
-> >
-> > On Sun, Dec 21, 2025 at 11:20 PM Noam D. Eliyahu
-> > <noam.d.eliyahu@gmail.com> wrote:
-> > >
-> > > ### Relevant driver evolution
-> > >
-> > > * **9931c9d04f4d =E2=80=93 tg3: power down device only on SYSTEM_POWE=
-R_OFF**
-> >
-> > I think this commit id is wrong. Anyway, I know the commit.
->
-> My apologies, I likely copied a local hash; the upstream commit ID is 9fc=
-3bc764334.
->
-> > This is going to be a problem, please follow the discussion here:
-> > https://lore.kernel.org/netdev/CALs4sv1-6mgQ2JfF9MYiRADxumJD7m7OGWhCB5a=
-Wj1tGP0OPJg@mail.gmail.com/
-> > where regression risk is flagged and it came true in
-> > https://lore.kernel.org/netdev/CALs4sv2_JZd5K-ZgBkjL=3DQpXVEXnoJrjuqwwK=
-g0+jo2-4taHJw@mail.gmail.com/
->
-> Thank you for the links.
-> I understand the need to prevent regressions, especially in an area where=
- it happened before.
-> That said, I still think the design of the first and second fixes is prob=
-lematic and needs adjusting.
->
-> The original bug (Fixed in: 9fc3bc764334) was triggered by SNP initializa=
-tion on specific models (R650xs with BCM5720).
-> The fix, the conditional tg3_power_down call, *was applied globally regar=
-dless of models*.
->
-> The second bug I mentioned (Fixed in: e0efe83ed3252) was triggered mainly=
- due to the conditional tg3_power_down call.
-> Look again at the changes made in the commit referenced by e0efe83ed3252 =
-(2ca1c94ce0b6 as the original fix):
-> ```
-> +       tg3_reset_task_cancel(tp);
-> +
->         rtnl_lock();
-> +
->         netif_device_detach(dev);
->
->         if (netif_running(dev))
->                 dev_close(dev);
->
-> -       if (system_state =3D=3D SYSTEM_POWER_OFF)
-> -               tg3_power_down(tp);
-> +       tg3_power_down(tp); /* NOTE: the conditional system state based t=
-g3_power_down call was problematic */
->
->         rtnl_unlock();
-> +
-> +       pci_disable_device(pdev);
->  }
-> ```
->
-> The changes in 2ca1c94ce0b6 caused the regression which later led to the =
-AER disablement in e0efe83ed3252.
-> The problem is that it was decided to apply the change to a specific set =
-of models, even though it originated from 9fc3bc764334 which was applied gl=
-obally.
->
-> If we apply the conditional tg3_power_down specifically for the R650xs, w=
-e can guarantee no regression, as the logic for the models with the first b=
-ug stays the same, just now limited to their set of models.
-> By applying the conditional tg3_power_down this way, we won't need the AE=
-R disablement at all.
->
-> > >
-> > > 2. **Flip the conditioning**
-> > >    Keep the DMI list, but use it to guard the conditional tg3_power_d=
-own instead (only for models where the original issue was observed, e.g. R6=
-50xs). Drop the AER handling entirely. This limits risk to known systems wh=
-ile simplifying the flow.
->
-> > But I am not sure how systems affected in the commit e0efe83ed3252 will=
- react. Can't tell 100pc without testing.
->
-> Regarding your concern about systems affected in e0efe83ed3252: my hardwa=
-re (Dell PowerEdge T440) is one of the models affected in e0efe83ed3252 but=
- not listed in the initial DMI match list.
-> I tested all of the solutions I suggested, others have reported the same =
-regarding my first suggestion (to remove both the conditional tg3_power_dow=
-n and the AER disablement) online, and most importantly, the e0efe83ed3252 =
-commit itself references the original fix (2ca1c94ce0b6) which didn't inclu=
-de a specific set of models and was considered a viable fix.
->
-> If we restrict the system_state check (from 9fc3bc764334) to a DMI table =
-for the R650xs, all other systems would revert to the 'unconditional' tg3_p=
-ower_down which was the standard for years. This would naturally prevent th=
-e AER errors (as I and others had seen on our machines) without needing to =
-touch the AER registers at all.
+You are right. Returning budget when we need to retry solves the issue. In __napi_poll, if we return budget, it will check whether we have pending disable by calling napi_disable_pending. If so, the NAPI is descheduled and we can napi_disable it.
 
-OK I now understand. You make a lucid argument. 9fc3bc764334 does
-indicate that the problem it is trying to fix is very much limited to
-R650xs. Hence while I am almost sure that your proposal (about adding
-conditional tg3_power_down for R650xs alone) won't break anything for
-cc: George, we need an ack from cc: Lenny, to see if he is OK with an
-unconditional power down, and that he had no other motive to disable
-AER in tg3 config space. In all possible logic, it should just be fine
-because e0efe83ed3252 is fixing 9fc3bc764334.
-P.S Sorry for the delayed reply. I am on vacation.
-
+Thanks,
+Quang Minh.
 
 >
-> For reference:
-> - https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit=
-/?id=3De0efe83ed3252
-> - https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit=
-/?id=3D2ca1c94ce0b6
-> - https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit=
-/?id=3D9fc3bc764334
+>>            napi_complete = virtqueue_napi_complete(napi, rq->vq, received);
+>>            /* Intentionally not taking dim_lock here. This may result in a
+>>             * spurious net_dim call. But if that happens virtnet_rx_dim_work
+>> @@ -3230,9 +3226,11 @@ static int virtnet_open(struct net_device *dev)
+>>
+>>        for (i = 0; i < vi->max_queue_pairs; i++) {
+>>            if (i < vi->curr_queue_pairs)
+>> -            /* Make sure we have some buffers: if oom use wq. */
+>> -            if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
+>> -                schedule_delayed_work(&vi->refill, 0);
+>> +            /* If this fails, we will retry later in
+>> +             * NAPI poll, which is scheduled in the below
+>> +             * virtnet_enable_queue_pair
+>> +             */
+>> +            try_fill_recv(vi, &vi->rq[i], GFP_KERNEL);
+>>
+>>            err = virtnet_enable_queue_pair(vi, i);
+>>            if (err < 0)
+>> @@ -3473,15 +3471,15 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
+>>                    bool refill)
+>>    {
+>>        bool running = netif_running(vi->dev);
+>> -    bool schedule_refill = false;
+>>
+>> -    if (refill && !try_fill_recv(vi, rq, GFP_KERNEL))
+>> -        schedule_refill = true;
+>> +    if (refill)
+>> +        /* If this fails, we will retry later in NAPI poll, which is
+>> +         * scheduled in the below virtnet_napi_enable
+>> +         */
+>> +        try_fill_recv(vi, rq, GFP_KERNEL);
+>> +
+>>        if (running)
+>>            virtnet_napi_enable(rq);
+>> -
+>> -    if (schedule_refill)
+>> -        schedule_delayed_work(&vi->refill, 0);
+>>    }
+>>
+>>    static void virtnet_rx_resume_all(struct virtnet_info *vi)
+>> @@ -3777,6 +3775,7 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
+>>        struct virtio_net_rss_config_trailer old_rss_trailer;
+>>        struct net_device *dev = vi->dev;
+>>        struct scatterlist sg;
+>> +    int i;
+>>
+>>        if (!vi->has_cvq || !virtio_has_feature(vi->vdev, VIRTIO_NET_F_MQ))
+>>            return 0;
+>> @@ -3829,11 +3828,8 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
+>>        }
+>>    succ:
+>>        vi->curr_queue_pairs = queue_pairs;
+>> -    /* virtnet_open() will refill when device is going to up. */
+>> -    spin_lock_bh(&vi->refill_lock);
+>> -    if (dev->flags & IFF_UP && vi->refill_enabled)
+>> -        schedule_delayed_work(&vi->refill, 0);
+>> -    spin_unlock_bh(&vi->refill_lock);
+>> +    for (i = 0; i < vi->curr_queue_pairs; i++)
+>> +        try_fill_recv(vi, &vi->rq[i], GFP_KERNEL);
+>>
+>>        return 0;
+>>    }
+>>
+>>
+>> But I got an issue with selftests/drivers/net/hw/xsk_reconfig.py. This
+>> test sets up XDP zerocopy (Xsk) but does not provide any descriptors to
+>> the fill ring. So xsk_pool does not have any descriptors and
+>> try_fill_recv will always fail. The RX NAPI keeps polling. Later, when
+>> we want to disable the xsk_pool, in virtnet_xsk_pool_disable path,
+>>
+>> virtnet_xsk_pool_disable
+>> -> virtnet_rq_bind_xsk_pool
+>>     -> virtnet_rx_pause
+>>       -> __virtnet_rx_pause
+>>         -> virtnet_napi_disable
+>>           -> napi_disable
+>>
+>> We get stuck in napi_disable because the RX NAPI is still polling.
+> napi_disable will set NAPI_DISABLE bit, no?
 >
-> Best regards,
-> Noam D. Eliyahu
+>> In drivers/net/ethernet/mellanox/mlx5, AFAICS, it uses state bit for
+>> synchronization between xsk setup (mlx5e_xsk_setup_pool) with RX NAPI
+>> (mlx5e_napi_poll) without using napi_disable/enable. However, in
+>> drivers/net/ethernet/intel/ice,
+>>
+>> ice_xsk_pool_setup
+>> -> ice_qp_dis
+>>     -> ice_qvec_toggle_napi
+>>       -> napi_disable
+>>
+>> it still uses napi_disable. Did I miss something in the above patch?
+>> I'll try to look into using another synchronization instead of
+>> napi_disable/enable in xsk_pool setup path too.
+>>
+>> Thanks,
+>> Quang Minh.
+>>
+> Thanks
+>
 
---000000000000714dde064740e07a
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-/HTPxpDrr4vzZL0yoc9XefyCbdiwfyFl99oBekp+1ZxXc5bZsVhRPVyEWFtCys66nqu5cU2GPT3a
-ySQEHOtIKyGGgzMVvitOzO2suQkoMvu/swsftfgCY/PObdlBZhv0BD97+WwR6CQJh/YEuDDEHYCy
-NDeiVtF3/jwT04bHB7lR9n+AiCSLr9wlgBHGdBFIOmT/XMX3K8fuMMGLq9PpGQEMvYa9QTkE9+zc
-MddiNNh1xtCTG0+kC7KIttdXTnffisXKsX44B8ECAwEAAaOCAd0wggHZMA4GA1UdDwEB/wQEAwIF
-oDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3Nl
-Y3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEF
-BQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1Ud
-IAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIB
-FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAy
-hjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwJAYDVR0R
-BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAdBgNVHQ4EFgQUxJ6fps/yOGneJRYDWUKPuLPk
-miYwDQYJKoZIhvcNAQELBQADggIBAI2j2qBMKYV8SLK1ysjOOS54Lpm3geezjBYrWor/BAKGP7kT
-QN61VWg3QlZqiX21KLNeBWzJH7r+zWiS8ykHApTnBlTjfNGF8ihZz7GkpBTa3xDW5rT/oLfyVQ5k
-Wr2OZ268FfZPyAgHYnrfhmojupPS4c7bT9fQyep3P0sAm6TQxmhLDh/HcsloIn7w1QywGRyesbRw
-CFkRbTnhhTS9Tz3pYs5kHbphHY5oF3HNdKgFPrfpF9ei6dL4LlwvQgNlRB6PhdUBL80CJ0UlY2Oz
-jIAKPusiSluFH+NvwqsI8VuId34ug+B5VOM2dWXR/jY0as0Va5Fpjpn1G+jG2pzr1FQu2OHR5GAh
-6Uw50Yh3H77mYK67fCzQVcHrl0qdOLSZVsz/T3qjRGjAZlIDyFRjewxLNunJl/TGtu1jk1ij7Uzh
-PtF4nfZaVnWJowp/gE+Hr21BXA1nj+wBINHA0eufDHd/Y0/MLK+++i3gPTermGBIfadXUj8NGCGe
-eIj4fd2b29HwMCvfX78QR4JQM9dkDoD1ZFClV17bxRPtxhwEU8DzzcGlLfKJhj8IxkLoww9hqNul
-Md+LwA5kUTLPBBl9irP7Rn3jfftdK1MgrNyomyZUZSI1pisbv0Zn/ru3KD3QZLE17esvHAqCfXAZ
-a2vE+o+ZbomB5XkihtQpb/DYrfjAMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
-ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
-MjAyMwIMClwVCDIzIfrgd31IMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCCtLvr8
-keiQetqQ/Dq/PnN4Yk+XEXtxyoRQYJQ1FbzGZjAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
-CSqGSIb3DQEJBTEPFw0yNTEyMzExNTEwMjlaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
-MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
-SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAb1f8PLwshICs9RgJtOlAoACnN9egk8nSjJtgyMKxu
-BBFWZGzsTUWOMlbE5x7JCwLKo3FqvMZmFc2Vk3rkN1nNj4p3Sm+PjcSsC/SM206wFQP/840P4gd3
-tVILYWlgDu7f9DDCm5rEB6sYHmqgvPO7az6ThBIh2gUV7NJSw5cXrbSCJ4uFa9VSFE1z79UmwOQe
-Jk1AjZELD89zEFdx3E26BA3NvDGaABpXnQJAKC36Cl0xvy2QB1K9nr5FpvZPPfmCTwMdFKljPMEp
-cyTt4WK8zuZQcUoz0wKOP+ukJMyWmOslr1vkXOLtlZMnnrwqhK8B9k1H+8acdYosnMI8UtiK
---000000000000714dde064740e07a--
 
