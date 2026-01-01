@@ -1,99 +1,76 @@
-Return-Path: <netdev+bounces-246494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AB75CED3D9
-	for <lists+netdev@lfdr.de>; Thu, 01 Jan 2026 18:42:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68E86CED3F4
+	for <lists+netdev@lfdr.de>; Thu, 01 Jan 2026 18:44:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7AE1B3019BE3
-	for <lists+netdev@lfdr.de>; Thu,  1 Jan 2026 17:41:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D0AAD3007252
+	for <lists+netdev@lfdr.de>; Thu,  1 Jan 2026 17:43:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E48A2F0C6A;
-	Thu,  1 Jan 2026 17:41:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEBF32EFD95;
+	Thu,  1 Jan 2026 17:43:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ER9t7cAl"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eAv5axdw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3F0A224AF1;
-	Thu,  1 Jan 2026 17:41:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A95D42E2F1F;
+	Thu,  1 Jan 2026 17:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767289316; cv=none; b=NrTyiQWRpofLmJkcT0La0zOE28btIyA8GiYS41FfWN2bUbicL5plMTG4zofHuO57L7lxfkfV2P2JcEHzg4b1abYwHYSCacd+mNCdPRNCBHrn1mAK34pKKVDIN4eR5SX3/kIf5m5Jws3f4UcU9Lt8JbJYQ1Ncz+9kxAoR8DwuRHs=
+	t=1767289434; cv=none; b=M+Lmi6mqCJyVdbdcA9/INv8HopONIYdlrzdMSJ7C6dQUtTbuzNq6JRD4nTd1zj4EFynkDd7Sc9qnvSLE6cm60LUKfipaElVJlLvPnLh1hVXOfR+SxHIqVC8zk79XEeBIEf5SrMsxadP4BlbyipuNuyhidwodyH0eFQF786t+h6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767289316; c=relaxed/simple;
-	bh=Zv64SapDen5kzKJuMbMGdMPYfIhGVyuPqNwGNzVunrE=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=m8XXNr8BZpXXMzhYmKYONw+6diQPTE2tmAiOrPA10aUOjHf0VqhKjWujHUTpVEZDL7AS7gOnMaqcOLUnTu8S+7psaPd5C0YHYkcT88CDc4+ID2tQ+cUeiPXt3ViuUM91MgxHYjGmtZECWjHMJ7rl/2QSSljpS8uFuhKKqLRs9FY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ER9t7cAl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 455F6C4CEF7;
-	Thu,  1 Jan 2026 17:41:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767289315;
-	bh=Zv64SapDen5kzKJuMbMGdMPYfIhGVyuPqNwGNzVunrE=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=ER9t7cAlj7MqNGXcP5YMCKuLDsKR9w84FCNrArooQFtHOjmbI/DfZrwYQE1VvulF8
-	 DZFaUNowxcdH965RH9OZgKQAcXSyG2w5/MG46R88qAOCABM+8kP/0TVLa6bD4kqL4E
-	 GriArNDwSzEGl3tltbYRZxoiNQGRjqyqUKNmhJI/GVdl1unkW+vYqi+lKLebLH9/PR
-	 Dtcrikk7oRT/GK4vdCGlBPTHnucq204vQ6dfb87P8u4v7kGhQl1vvcSbNh3KTThJRG
-	 FNP98/I/YiWCMXFsPA0TvmzkGoFOTDL9lb8djzInRuDqu1+qcPkf+hK4tlCEL93Sf5
-	 VUXlu59t8g4hA==
-From: Vinod Koul <vkoul@kernel.org>
-To: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
- nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, 
- claudiu.beznea@tuxon.dev, herbert@gondor.apana.org.au, davem@davemloft.net, 
- andi.shyti@kernel.org, lee@kernel.org, andrew+netdev@lunn.ch, 
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, linusw@kernel.org, 
- Steen.Hegelund@microchip.com, daniel.machon@microchip.com, 
- UNGLinuxDriver@microchip.com, olivia@selenic.com, radu_nicolae.pirea@upb.ro, 
- richard.genoud@bootlin.com, gregkh@linuxfoundation.org, 
- jirislaby@kernel.org, broonie@kernel.org, lars.povlsen@microchip.com, 
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
- dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org, 
- netdev@vger.kernel.org, linux-gpio@vger.kernel.org, 
- linux-spi@vger.kernel.org, linux-serial@vger.kernel.org, 
- linux-usb@vger.kernel.org, Robert Marko <robert.marko@sartura.hr>
-Cc: luka.perkov@sartura.hr
-In-Reply-To: <20251229184004.571837-1-robert.marko@sartura.hr>
-References: <20251229184004.571837-1-robert.marko@sartura.hr>
-Subject: Re: (subset) [PATCH v4 00/15] Add support for Microchip LAN969x
-Message-Id: <176728930591.239406.10977505367349763113.b4-ty@kernel.org>
-Date: Thu, 01 Jan 2026 23:11:45 +0530
+	s=arc-20240116; t=1767289434; c=relaxed/simple;
+	bh=8OWtH6d11T139XRjdlZVjy86THcJjqyH7sZz65YdM1Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WXPsLeRwTVJIymW0IMSuEd0ncSRwqz3wh76gyn7FU4gIlwW65qPz0zhqDOvgVb8ge6fasZapCrco5WE1DUuuukK+lLV027xsm0mYumlUWQhYTA6tls3cxLsJGQNZjLAJNNQKqLlQLx4VHFaWOpn3ncwnwPvqv0W4bLTSc9bDyrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eAv5axdw; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ct5vIeuM3pnRkd7r4+7GyKo373O2Sf6tlFOwpODQT60=; b=eAv5axdwTT540Hyh6nHYPVaTGr
+	epGhkk62MKja7RKPvqg6XMd9bJHC/5MjcbvVpeddvnzADpOZelY/lyp4XSPcoekYAmQKYxXS2zp0/
+	OWU3l/jTKYqiQtU0TQoaYwU5eHAYi12LLBim9jaTbEOf0L4+k6XSi7E8sD8BSu/Yt8UE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vbMi2-0015h0-Ef; Thu, 01 Jan 2026 18:43:38 +0100
+Date: Thu, 1 Jan 2026 18:43:38 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Josua Mayer <josua@solid-run.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next v2 2/2] net: sfp: support 25G long-range
+ modules (extended compliance code 0x3)
+Message-ID: <b88e844d-96a7-48fd-bfc8-a33b2fe32e19@lunn.ch>
+References: <20260101-cisco-1g-sfp-phy-features-v2-0-47781d9e7747@solid-run.com>
+ <20260101-cisco-1g-sfp-phy-features-v2-2-47781d9e7747@solid-run.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260101-cisco-1g-sfp-phy-features-v2-2-47781d9e7747@solid-run.com>
 
+> Unfortunately ethtool.h does not (currently) provide a bit for 25G
+> long-range modules.
+> Should it be added?
+> Are there any reasons to not have long-range variants?
 
-On Mon, 29 Dec 2025 19:37:41 +0100, Robert Marko wrote:
-> This series adds support for the Microchip LAN969x switch SoC family.
-> 
-> Series is a bit long since after discussions in previous versions, it was
-> recommended[1][2] to add SoC specific compatibles for device nodes so it
-> includes the required bindings updates.
-> 
-> [1] https://lore.kernel.org/all/20251203-splendor-cubbyhole-eda2d6982b46@spud/
-> [2] https://lore.kernel.org/all/173412c8-c2fb-4c38-8de7-5b1c2eebdbf9@microchip.com/
-> [3] https://lore.kernel.org/all/20251203-duly-leotard-86b83bd840c6@spud/
-> [4] https://lore.kernel.org/all/756ead5d-8c9b-480d-8ae5-71667575ab7c@kernel.org/
-> 
-> [...]
+Please add it.
 
-Applied, thanks!
-
-[09/15] dt-bindings: dma: atmel: add microchip,lan9691-dma
-        commit: c47422f4d0a26b25ff59709921eaaf8f916eec7d
-
-Best regards,
--- 
-~Vinod
-
-
+Thanks
+       Andrew
 
