@@ -1,158 +1,296 @@
-Return-Path: <netdev+bounces-246536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D6F4CED8EB
-	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 00:40:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C844ECED920
+	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 00:58:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9F35D300A355
-	for <lists+netdev@lfdr.de>; Thu,  1 Jan 2026 23:40:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8E177300A1E8
+	for <lists+netdev@lfdr.de>; Thu,  1 Jan 2026 23:58:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37E8826C39F;
-	Thu,  1 Jan 2026 23:40:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBFF621D599;
+	Thu,  1 Jan 2026 23:58:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O0/iEmZZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yn64q5Ol"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071C124A049
-	for <netdev@vger.kernel.org>; Thu,  1 Jan 2026 23:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 222072459E5
+	for <netdev@vger.kernel.org>; Thu,  1 Jan 2026 23:58:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767310855; cv=none; b=OZQYl+4ED5g3cJUPMKMqCf1F+wNmFh7ZGF9GccfXxUcEdcS9YFEi/3lfmwHEW5LrWJ9qhPMZbb2DSxxtVrV8LAJ/4jH/L1y5as685H8q0sk+lq76jehBJsbQlmIVvYWL3bTAvdnPGec4MfZgIki8Ilu2MJLwHZ81ePZ1ECwN3Lo=
+	t=1767311904; cv=none; b=RexBqiEzhU6UGDcsJVB3TBWYcK9pOEpgWGSX9PamqPD8fZ+J9yZG1k2b49k8ZNAOk7xl16JOT7DrQl6AfLjx8YgBWMATnijqAOFNkXcb1CxHP6xog0LEDmDAtxWFuJRospsT6KcO0DATzwD/NumyxY5cqAaxxAc34nCmevV652U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767310855; c=relaxed/simple;
-	bh=cHaOplRIv2s5yEHDc1ml8DnxLbzB5UiibX4F6W3wE34=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fmM4zWI4Ig1OCgDnY+1gStjC6gVlk6hezTlGaTGSXzylR9vw+irMFJJoR8BcMg8qXGfAyceyJLr8+kEERVmttANywSxFkaBzA6QiJWDuy1C0S9MTb1+BHIREft2uFVELypOLZhyf7cbTROTfbrJ8E97XX6WANFaDQb03nWneYDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O0/iEmZZ; arc=none smtp.client-ip=74.125.224.54
+	s=arc-20240116; t=1767311904; c=relaxed/simple;
+	bh=8siTNbrpTJbAklTnTARy6JaEYVIFFW/vQOM9LGSCEuI=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=XvF8oIXkCeNN/Lh0nb1E3hAqLvTKb7ce5VF6Je7CXN3A21BIiCagBafJSicrL+4nJcTEQj5KZdw5jG10+YY5NvyDQ0+Fjfa70OwpD9yKDoD/kP9x0NsOJD35vOnj7RWeP/bIkD9/T+VHqWBjVnXhoAGmEBRD3qIsFeUj9eL/UZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yn64q5Ol; arc=none smtp.client-ip=209.85.128.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-6442e2dd8bbso7953576d50.0
-        for <netdev@vger.kernel.org>; Thu, 01 Jan 2026 15:40:52 -0800 (PST)
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-78fccbc683bso84774897b3.3
+        for <netdev@vger.kernel.org>; Thu, 01 Jan 2026 15:58:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767310852; x=1767915652; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BaZgB/0vC9aWPnmDin2g8hReSOJZPuV1mCiVW+Kasj4=;
-        b=O0/iEmZZqSD9Rc8fkyV8S2qn6GX8EyJj7/+lo3yO/e5ySoJNGm2HmM2iQDCBPyiffG
-         ecHGK/XR3PLenx44KuDjMoQOrsSOI/6xawQg1C5aMaxpoqb8fckDFkW9dkfZ5dISdXvD
-         51i7d3sk70ZclP4ez+SbzIyYerftuq1ufPujG2RZ2LbLcArmLRXHnN11ckhfCOFqIXO4
-         6QlbLAwzwSNLrnO4cEJt80we8L5LBfalVPi/GxCi+zpYml3NsHEeBwuV7DkVIlQFIZdd
-         eVClHn9MuL05h9RVNWfQMJ5a/LEE5dGfJYQY6pz6yfba7qQne1FF81EbPBRM4XdD7M1u
-         6LsA==
+        d=gmail.com; s=20230601; t=1767311902; x=1767916702; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=44NWk22GMeh5qMFMg6DlMiWm5Qp2Enym4Sz/btosLP4=;
+        b=Yn64q5OlRHvxV8CsAtMfSkGOSRoYbk8inzLbnMlH3vM6l7prViGWRS9YV/V5qYAl8I
+         CUg0/BUb44UXRqv2BIPVedXL3JfuwlyhnrGKNgv9lsJBB3lRZxIzoM8u8ecNcyaiWNP5
+         eQceeF8Xpj1xeXRxxRojy4PNKFcgPCwJs3bJz0ff3jRZr/gIMCY8nWghhdxmXD3dmHi+
+         IXHkzKJPkOc/DmoYNhvhxleTxX2thgBeytZB+LMzeNXPDbcqt7tVXKK38jMDmS3PNDPu
+         jJIsxPNm4idSi/m9M3XzbrMXV5ZDKTw69/6rc6l/YxmmAt1xkYfXXNiafvwP5jz7VtEZ
+         e7RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767310852; x=1767915652;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BaZgB/0vC9aWPnmDin2g8hReSOJZPuV1mCiVW+Kasj4=;
-        b=FTDP7MKEu+u069FbRcbV21VmbAk7R7/OHj62NKi4JiUDB9EWjok9mkQoSqv/kSzyhc
-         GhWiyQzzlxlQJOBv9dSkf1I5NsWnob7OyCkh7ah5McfmRsyPYa/SnqSCPF/xYhfGXPAi
-         fN8UqrW6/YiHxR+yLGROQW6FQo1v9MYA3ZfE6juKDTa02Y0pv/o6gRiSD+0tH8d6SZ38
-         +PzR08wSm//OhB63bn+8hL/bu7mUs6ZLSIDeNWZnc1jeROXZpmFypcJgMtLvSuSVhekz
-         mA9MahIQMyHGDDUnQYShtuciQui0OWQxoOwMiw0bulkhdtic39oMrm6nA6qTrkzTNTab
-         yW9w==
-X-Forwarded-Encrypted: i=1; AJvYcCXuqayvFBiCsmcxr11jBFkdRicJPYBmtv25UZCc+5Y8lZvTIfLGpJrxFkGFSTO5hZdgT23AtyU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzaZTEznM6A/h4ZyN7vLUdhYUwOLkJFJUFXf6fNXuC3XpVXs5Zi
-	zcU5y4DxjgnOmhKDjBZNGqVecCmEyu9cb+JtW4LioW5+zufEisaK67Oo
-X-Gm-Gg: AY/fxX7c5mnBMJDTYtsoyazBSeR10LvHxj+C1I6BbiPx7n9OZQvfajp+4EipSdez8d3
-	C6uo+T9wKR6T1GHoVCDwnYgkNfk19gbxR/4+OyBAdfKw66gHi7F4zxCqPhseVaFxQtGQc1+8Oj1
-	K/Q9XaMnjXR+OsefQPWuXmIRjZFN8g+o6li9G2HSGAVwnbOcpJzXyRGZphac0i6FKMoEFP2+UBn
-	lqujL7wOKyry5Uwnl/PQqD4OGW9fvh/TiQBFKm1iohC/U5VkAprD/XQ5OrKyrXq8cq3zr9CG6cX
-	0iL7SxSyFJ7mA2+Ea7/zM6XwNoRAhI7bMyUpT+Gnh8TJemt0aHzMknaoBPY9+jEHcYyjjqb98Xd
-	m6w3B8R9k7Eb22/8zMvOI3JIsFzXui1YRLQQJJ5n6NJ6U3UWm8V+txCE+aDEWYV0hVn++Fma2WL
-	c7ncp8lWOirUz+rC5KiSbCzJWQnXqyvd6B2DUQD9V1SBV7l6mB17HAKX01+VPDrAafy6e93g==
-X-Google-Smtp-Source: AGHT+IHO4l5iOHN18kmUpzMMZ1XijQJRBwTQEPahlD7N2hLnBbuPsKliSlV73wybrZLK6ihf+dc6og==
-X-Received: by 2002:a53:d846:0:b0:63c:f5a6:f2ef with SMTP id 956f58d0204a3-6466a901165mr25743473d50.65.1767310851998;
-        Thu, 01 Jan 2026 15:40:51 -0800 (PST)
-Received: from [10.10.10.50] (71-132-185-69.lightspeed.tukrga.sbcglobal.net. [71.132.185.69])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6466a94072bsm19229805d50.23.2026.01.01.15.40.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Jan 2026 15:40:51 -0800 (PST)
-Message-ID: <714c39e3-61fa-449c-b4ab-bdb41a35fc40@gmail.com>
-Date: Thu, 1 Jan 2026 18:40:49 -0500
+        d=1e100.net; s=20230601; t=1767311902; x=1767916702;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=44NWk22GMeh5qMFMg6DlMiWm5Qp2Enym4Sz/btosLP4=;
+        b=UT4AxMA6GuWZ2bpEl13UfNHuU6/A2RpG/rw77lEy0HkwSpwvXszJnAdPcKsfq0XMDz
+         +RALfAKiPyareKU7ULRV1FBaWhm7uiNvOujDtrZQ7tICGQ6YdkNiuLeK5+MIUNN0l0Xt
+         RZK7Lxotr7nOuOL4tJhNGbDDVSTE4/CBG95D4BFxT0Bwy02NY9W9tFV2KW6eOV2vvm2w
+         3yB9U1yEDB+jjSttr5e2ErmTscDOUTqEHGJWlx/TTuLwrRipJIrj4h3V02HsNt+WpD3O
+         ei/qa0/+zzZhcf1DfJC4YjPqfy8Mmw4MDwGwUro5lnUvck0A31kp5PokOBSGD5UGFmuh
+         Ie0g==
+X-Forwarded-Encrypted: i=1; AJvYcCWBQoId9u80pxP/teuSPERxaiPu6T8hfQ6KHiWUDd1ag8jfouDn/QfnshHtbCA8Kr0IcmQtyYw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJHTyQuwZ25RAIpiVmt4hRZIIXejIHfafTnchpktqsPb+aA/KN
+	qJfuaNGmdo+kKyfyk1v5N/wJueDbPALAv5n50zLW/iTTk6/YpxJ2YSwk4syixA==
+X-Gm-Gg: AY/fxX7zZrJMqiHBqiPspM4tkQQEnMWoKpC5F8knvuSlvbM5Ht6NEIxQ4gnWDrAKI1m
+	Wan38ObN8N3J/ETX8JZ4+PpfQFNqyTXJ7GFLbf4a1W6on1Lni0nvF1CJZYair/pjLI5uQhOSDBG
+	SJNPzEKsobyrnPsrIgPBoBbmxcbD2XnwIKAgTvKP2k7qsGSvCQnUvkYjDtPmq8wq2zv5bq4PlKB
+	hnNslbJQyo48KiDYBlJyW1rf7UDSsD3UE7NlgDLMOZW/s05Fd2nB8vYtWytnNsUWpMzl5eYMdpx
+	owclsFUIW/EGHJXHVdStj5WQNG+ZIGtcPnvMEexeZwyfoKgZWZ84EDc5rRtB6uC9Dc2lkC+Z5/l
+	oQtR+oK7Evld61EnZzVNXyeozziCeD0HT9UHotMkso6SxFeaZbc1BpG979/NQRU5PN9daZsZs3m
+	//J8r3f3bRtWbK14Qy7nAcH/gmxxPAs1xdI+qVHp1kOlBIAjihcnQw2Wg299hEX5AVS9I/CA==
+X-Google-Smtp-Source: AGHT+IHuGHqD7mTDIMXSkA+4FBDB3tWrua4XHs2DHPo/ZAmj/UPhZ8FWq52KKAMKfwmzuZysEZYfew==
+X-Received: by 2002:a05:690e:1404:b0:640:d038:fb02 with SMTP id 956f58d0204a3-6466a845e07mr30515488d50.25.1767311901924;
+        Thu, 01 Jan 2026 15:58:21 -0800 (PST)
+Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-790166a5da5sm76822287b3.22.2026.01.01.15.58.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Jan 2026 15:58:21 -0800 (PST)
+Date: Thu, 01 Jan 2026 18:58:20 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: mohammad heib <mheib@redhat.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ horms@kernel.org, 
+ kernelxing@tencent.com, 
+ kuniyu@google.com, 
+ atenart@kernel.org, 
+ aleksander.lobakin@intel.com, 
+ fw@strlen.de, 
+ steffen.klassert@secunet.com
+Message-ID: <willemdebruijn.kernel.26c920bcfc4bf@gmail.com>
+In-Reply-To: <0684bf0a-c6eb-4d06-a054-dc9b4f97dbfa@redhat.com>
+References: <20251231025414.149005-1-mheib@redhat.com>
+ <willemdebruijn.kernel.14a62f33c80f0@gmail.com>
+ <0684bf0a-c6eb-4d06-a054-dc9b4f97dbfa@redhat.com>
+Subject: Re: [PATCH net v2] net: skbuff: fix truesize and head state
+ corruption in skb_segment_list
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 0/1] lsm: Add hook unix_path_connect
-To: Tingmao Wang <m@maowtm.org>
-Cc: gnoack3000@gmail.com, gnoack@google.com, horms@kernel.org,
- jmorris@namei.org, kuniyu@google.com, linux-security-module@vger.kernel.org,
- mic@digikod.net, netdev@vger.kernel.org, paul@paul-moore.com,
- serge@hallyn.com
-References: <20260101.f6d0f71ca9bb@gnoack.org>
- <20260101194551.4017198-1-utilityemal77@gmail.com>
- <b992df90-92da-48bd-91d1-051af9670d07@maowtm.org>
-Content-Language: en-US
-From: Justin Suess <utilityemal77@gmail.com>
-In-Reply-To: <b992df90-92da-48bd-91d1-051af9670d07@maowtm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 1/1/26 18:11, Tingmao Wang wrote:
-> On 1/1/26 19:45, Justin Suess wrote:
->> [...]
->> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
->> index 55cdebfa0da0..397687e2d87f 100644
->> --- a/net/unix/af_unix.c
->> +++ b/net/unix/af_unix.c
->> @@ -1226,6 +1226,18 @@ static struct sock *unix_find_bsd(struct
->> sockaddr_un *sunaddr, int addr_len,
->>         if (!S_ISSOCK(inode->i_mode))
->>                 goto path_put;
->>  
->> +       /*
->> +        * We call the hook because we know that the inode is a socket
->> +        * and we hold a valid reference to it via the path.
->> +        * We intentionally forgo the ability to restrict SOCK_COREDUMP.
->> +        */
->> +       if (!(flags & SOCK_COREDUMP)) {
->> +               err = security_unix_path_connect(&path);
->> +               if (err)
->> +                       goto path_put;
->> +               err = -ECONNREFUSED;
-> I'm not sure if this is a good suggestion, but I think it might be cleaner
-> to move this `err = -ECONNREFUSED;` out of the if, and do it
-> unconditionally above the `sk = unix_find_socket_byinode(inode);` below?
-> To me that makes the intention for resetting err clear (it is to ensure
-> that a NULL return from unix_find_socket_byinode causes us to return
-> -ECONNREFUSED).
->
-I'll do that. That does make it more clear.
+mohammad heib wrote:
+> Hi Willem,
+> =
 
-I suspect resetting the error accidentally was what caused the syzbot to rightfully complain.
+> You're right. I did a deeper dive into the callers and where the =
 
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 55cdebfa0da0..2e0300121ab5 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -1226,6 +1226,18 @@ static struct sock *unix_find_bsd(struct sockaddr_un *sunaddr, int addr_len,
-     if (!S_ISSOCK(inode->i_mode))
-         goto path_put;
- 
-+    /*
-+     * We call the hook because we know that the inode is a socket
-+     * and we hold a valid reference to it via the path.
-+     * We intentionally forgo the ability to restrict SOCK_COREDUMP.
-+     */
-+    if (!(flags & SOCK_COREDUMP)) {
-+        err = security_unix_path_connect(&path);
-+        if (err)
-+            goto path_put;
-+    }
-+    err = -ECONNREFUSED;
-+
-     sk = unix_find_socket_byinode(inode);
-     if (!sk)
-         goto path_put;
+> SKB_GSO_FRAGLIST bit actually originates.
+> =
+
+> It turns out it is exclusively set in the GRO complete paths (tcp4, =
+
+> udp4, tcp6, udp6). Since these packets are built by the GRO engine for =
+
+> forwarding, the fragments are guaranteed to be orphans without socket =
+
+> ownership or head state.
+
+When revising, please include my short note on relevant prior patches.
+
+Also, let's self document these known invariants with
+
+    /* Only skb_gro_receive_list generated skbs arrive here */
+    DEBUG_NET_WARN_ON_ONCE(!skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST)=
+;
+    DEBUG_NET_WARN_ON_ONCE(nskb->sk);
+ =
+
+> i will simply removed the truesize accumulation, as they are =
+
+> inapplicable to this GSO type.
+> =
+
+> =
+
+> One thing that=E2=80=99s confusing me is whether I should remove the ca=
+ll to =
+
+> skb_release_head_state().
+> This function updates reference counts for some fields in the skb, even=
+ =
+
+> when no socket is attached to it.
+> =
+
+> So I=E2=80=99m wondering should I remove this call, or keep it as is?
+> What do you think?
+
+This was apparently introduced in commit cf673ed0e057 ("net: fix
+fraglist segmentation reference count leak"). To handle a special
+case for skbs with skb extensions. From that commit:
+
+    "where the frag skbs
+     will get the header copied from the head skb in skb_segment_list()
+     by calling __copy_skb_header(), which could overwrite the frag skbs'=
+
+     extensions by __skb_ext_copy() and cause a leak."
+
+So I read that has (1) this is still needed for some skbs (though the
+only thing that is really needed is the skb_ext_reset(skb) call) and
+(2) it is evidently safe to call unconditionally in skb_segment_list.
+
+Same as previous, please include this context in the commit message.
+
+> =
+
+> On 12/31/25 6:58 PM, Willem de Bruijn wrote:
+> > mheib@ wrote:
+> >> From: Mohammad Heib <mheib@redhat.com>
+> >>
+> >> When skb_segment_list is called during packet forwarding through
+> >> a bridge or VXLAN, it assumes that every fragment in a frag_list
+> >> carries its own socket ownership and head state. While this is true =
+for
+> >> GSO packets created by the transmit path (via __ip_append_data), it =
+is
+> >> not true for packets built by the GRO receive path.
+> >>
+> >> In the GRO path, fragments are "orphans" (skb->sk =3D=3D NULL) and w=
+ere
+> >> never charged to a socket. However, the current logic in
+> >> skb_segment_list unconditionally adds every fragment's truesize to
+> >> delta_truesize and subsequently subtracts this from the parent SKB.
+> >>
+> >> This results a memory accounting leak, Since GRO fragments were neve=
+r
+> >> charged to the socket in the first place, the "refund" results in th=
+e
+> >> parent SKB returning less memory than originally charged when it is
+> >> finally freed. This leads to a permanent leak in sk_wmem_alloc, whic=
+h
+> >> prevents the socket from being destroyed, resulting in a persistent =
+memory
+> >> leak of the socket object and its related metadata.
+> >>
+> >> The leak can be observed via KMEMLEAK when tearing down the networki=
+ng
+> >> environment:
+> >>
+> >> unreferenced object 0xffff8881e6eb9100 (size 2048):
+> >>    comm "ping", pid 6720, jiffies 4295492526
+> >>    backtrace:
+> >>      kmem_cache_alloc_noprof+0x5c6/0x800
+> >>      sk_prot_alloc+0x5b/0x220
+> >>      sk_alloc+0x35/0xa00
+> >>      inet6_create.part.0+0x303/0x10d0
+> >>      __sock_create+0x248/0x640
+> >>      __sys_socket+0x11b/0x1d0
+> >>
+> >> This patch modifies skb_segment_list to only perform head state rele=
+ase
+> >> and truesize subtraction if the fragment explicitly owns a socket
+> >> reference. For GRO-forwarded packets where fragments are not owners,=
+
+> >> the parent maintains the full truesize and acts as the single anchor=
+ for
+> >> the memory refund upon destruction.
+> >>
+> >> Fixes: ed4cccef64c1 ("gro: fix ownership transfer")
+> >> Signed-off-by: Mohammad Heib <mheib@redhat.com>
+> >> ---
+> >>   net/core/skbuff.c | 16 ++++++++++++++--
+> >>   1 file changed, 14 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> >> index a00808f7be6a..63d3d76162ef 100644
+> >> --- a/net/core/skbuff.c
+> >> +++ b/net/core/skbuff.c
+> >> @@ -4656,7 +4656,14 @@ struct sk_buff *skb_segment_list(struct sk_bu=
+ff *skb,
+> >>   		list_skb =3D list_skb->next;
+> >>   =
+
+> >>   		err =3D 0;
+> >> -		delta_truesize +=3D nskb->truesize;
+> >> +
+> >> +		/* Only track truesize delta and release head state for fragments=
+
+> >> +		 * that own a socket. GRO-forwarded fragments (sk =3D=3D NULL) re=
+ly on
+> >> +		 * the parent SKB for memory accounting.
+> >> +		 */
+> >> +		if (nskb->sk)
+> >> +			delta_truesize +=3D nskb->truesize;
+> >> +
+> > =
+
+> > Similar to the previous point: if all paths that generate GSO packets=
+
+> > with SKB_GSO_FRAGLIST are generated from skb_gro_receive_list and tha=
+t
+> > function always sets skb->sk =3D NULL, is there even a need for this
+> > brancy (and comment)?
+> > =
+
+> >>   		if (skb_shared(nskb)) {
+> >>   			tmp =3D skb_clone(nskb, GFP_ATOMIC);
+> >>   			if (tmp) {
+> >> @@ -4684,7 +4691,12 @@ struct sk_buff *skb_segment_list(struct sk_bu=
+ff *skb,
+> >>   =
+
+> >>   		skb_push(nskb, -skb_network_offset(nskb) + offset);
+> >>   =
+
+> >> -		skb_release_head_state(nskb);
+> >> +		/* For GRO-forwarded packets, fragments have no head state
+> >> +		 * (no sk/destructor) to release. Skip this.
+> >> +		 */
+> >> +		if (nskb->sk)
+> >> +			skb_release_head_state(nskb);
+> >> +
+> >>   		len_diff =3D skb_network_header_len(nskb) - skb_network_header_l=
+en(skb);
+> >>   		__copy_skb_header(nskb, skb);
+> >>   =
+
+> >> -- =
+
+> >> 2.52.0
+> >>
+> > =
+
+> > =
+
+> =
+
 
 
 
