@@ -1,121 +1,181 @@
-Return-Path: <netdev+bounces-246481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1B7CCECFF6
-	for <lists+netdev@lfdr.de>; Thu, 01 Jan 2026 13:08:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B150FCED002
+	for <lists+netdev@lfdr.de>; Thu, 01 Jan 2026 13:12:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6F4DF300796C
-	for <lists+netdev@lfdr.de>; Thu,  1 Jan 2026 12:08:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B55D23007611
+	for <lists+netdev@lfdr.de>; Thu,  1 Jan 2026 12:12:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FD362BE64F;
-	Thu,  1 Jan 2026 12:08:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38FFF2C21F0;
+	Thu,  1 Jan 2026 12:12:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="KyPOajH5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h7yqcYB1"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D77E0238178;
-	Thu,  1 Jan 2026 12:08:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057782773D8;
+	Thu,  1 Jan 2026 12:12:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767269290; cv=none; b=g/dsXA+GSqODU4eDGoZyl0oLc2MoevfYb/t8ph2Jr59ADckdCd/eK193RLrH1zr8AfCHmmupk7t6xTq8DdDXbQdq5LGDX/6k9YRY8JBaAF7Vnbwosmzg3lYV8nv6gFk8eg94F+/5vh3RMamhqj0vB00IKhNY5SqnX6ja6J3Rjow=
+	t=1767269559; cv=none; b=T66RBO66FSocASR0Aa6JUGaNpG5Pd9IkXc1ecwlJs1UQfRv96g1ZMiJxNjiy6WgdLy6d1PEYP0boHLYHExPdfVupunyuPr8TVowKbA9RUOi1LlgBwLuTLKz9DIStlmeHpQuqTNl8krF94jk4R+3rIxRBZ47Bxp1rLR7iwqhQw+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767269290; c=relaxed/simple;
-	bh=tsGSo2HrsFMCY95+pk823dqDu+F13XWvyAa5ILtk8mY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=oB7hUnrN8Pn58OWTU1JHWq0BQYB+UmkHu4ysj/Aubtxjzzq6bR7PKTXLY6HS6SBUn50oM/+0fNmLgN7/0HmJOMhedBIA2hPIDWTyF+QzhRDBx4mgsrLWHQDeiBggZPVKqAIDJ2BJ60MYDiVnwzeyHIMPLJAlxmAehImft0CSFIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=KyPOajH5; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=vKPGkbZIKCZmwh5SXm3zhdSjGIVlD9aFSZwKeUbOzjw=;
-	t=1767269288; x=1768478888; b=KyPOajH5flWHeBg9ubdEzFMfVOysbzfhQglhCJQM8Qb68HG
-	ATeayvBNNTGTOn84EddTvwcHu7aFCvNy2hNX1EKQDKLfOVqbOQourv3UmTnYdO8WQcpb+DaATKubu
-	IcDkGgAb+I+IYIOC5AuFJW7x7ZnFh0EfufQktvtN4VnqUIQImI8MpT6bupSI9gsQovB5EwxjNf+EV
-	plVcIVVssTxsxpRJtUHepkVoVreAzDiiwohnAkp0AUSsM6WosDuKhBJPXtht0wwAi2toUo1D8sKD1
-	FQCfDI1I9e+W4zkgX7E1AS2jj9FFcxu/QUJqofidjus63iCjyIyaXYns13wYXazQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1vbHTD-00000000V0v-2KOc;
-	Thu, 01 Jan 2026 13:07:59 +0100
-Message-ID: <e062f6a0a7583ca99ab0449481119634f8b02a3d.camel@sipsolutions.net>
-Subject: Re: [syzbot] [wireless?] WARNING in rfkill_unregister
-From: Johannes Berg <johannes@sipsolutions.net>
-To: syzbot <syzbot+16210d09509730207241@syzkaller.appspotmail.com>, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Cc: Krzysztof Kozlowski <krzk@kernel.org>
-Date: Thu, 01 Jan 2026 13:07:58 +0100
-In-Reply-To: <6955cbd5.050a0220.a1b6.032d.GAE@google.com> (sfid-20260101_022031_682582_A65E16A5)
-References: <6955cbd5.050a0220.a1b6.032d.GAE@google.com>
-	 (sfid-20260101_022031_682582_A65E16A5)
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+	s=arc-20240116; t=1767269559; c=relaxed/simple;
+	bh=twTmdX32akwxQI5NUrmsrOlchdtaTJjigYNdzguzqyY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LXvunZ3XXMmIMVHO7vvW6OR1GzcnBqib+fs2JYHXKeF+k5Dt3N9wiWr/6j/vdgncMia0Dx6mbDharXHKH/d7OnSvsxY4/YSPGn0MLjTQEx2poGhFWfeNSHXEV/EQmxSi1WvfiBUJB1IXXWnAlU6yhckNC0XHd9x6bHx6AMqY9Eg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h7yqcYB1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07044C4CEF7;
+	Thu,  1 Jan 2026 12:12:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767269558;
+	bh=twTmdX32akwxQI5NUrmsrOlchdtaTJjigYNdzguzqyY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=h7yqcYB1+jYcqUlJ76scSrm+NGJoxw1RAu0N7hHs7ZzoRhWMZkuUCIq07xtPUXBkw
+	 lZV4aR8gR+UZ9yI2jrHR210iIgmdryDO+iwT0YZy20TkwReHLAi07Wl+JqcpcwnT1m
+	 w73HfTYgZjWTUoYenkwpcGeraNjWbFKpy6owoUfb59RyYZWuabNpP3w0K/Ua/gClZl
+	 zdAEpaeGiFcT9Km5mhh9ANsHDLHboacFr+ANOTjs0tPGF6R7xtKh4F+6/tEnRPaNS0
+	 wzGF/N9iETezQd+MTdrwdQGqvjkjhzMqkKzLJBToLGtQI9TzvAKl6tl3HsosoYH/te
+	 341MPKI3lVMWA==
+Message-ID: <d058f82b-2e2f-4353-8518-2cc9e15f7a98@kernel.org>
+Date: Thu, 1 Jan 2026 13:12:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] can: dummy_can: add CAN termination support
+To: Rakuram Eswaran <rakuram.e96@gmail.com>,
+ Marc Kleine-Budde <mkl@pengutronix.de>,
+ Oliver Hartkopp <socketcan@hartkopp.net>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>
+Cc: linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org
+References: <20251231-can_doc_update_v1-v1-0-97aac5c20a35@gmail.com>
+ <20251231-can_doc_update_v1-v1-1-97aac5c20a35@gmail.com>
+From: Vincent Mailhol <mailhol@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=mailhol@kernel.org; keydata=
+ xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
+ JFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbEBrZXJuZWwub3JnPsKZBBMWCgBBFiEE7Y9wBXTm
+ fyDldOjiq1/riG27mcIFAmdfB/kCGwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcC
+ F4AACgkQq1/riG27mcKBHgEAygbvORJOfMHGlq5lQhZkDnaUXbpZhxirxkAHwTypHr4A/joI
+ 2wLjgTCm5I2Z3zB8hqJu+OeFPXZFWGTuk0e2wT4JzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrb
+ YZzu0JG5w8gxE6EtQe6LmxKMqP6EyR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDl
+ dOjiq1/riG27mcIFAmceMvMCGwwFCQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8V
+ zsZwr/S44HCzcz5+jkxnVVQ5LZ4BANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
+In-Reply-To: <20251231-can_doc_update_v1-v1-1-97aac5c20a35@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On 31/12/2025 at 19:13, Rakuram Eswaran wrote:
+> Add support for configuring bus termination in the dummy_can driver.
+> This allows users to emulate a properly terminated CAN bus when
+> setting up virtual test environments.
+> 
+> Signed-off-by: Rakuram Eswaran <rakuram.e96@gmail.com>
+> ---
+> Tested the termination setting using below iproute commands:
+> 
+>   ip link set can0 type can termination 120
+>   ip link set can0 type can termination off
+>   ip link set can0 type can termination potato
+>   ip link set can0 type can termination 10000
+>   
+>  drivers/net/can/dummy_can.c | 25 +++++++++++++++++++++++--
+>  1 file changed, 23 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/can/dummy_can.c b/drivers/net/can/dummy_can.c
+> index 41953655e3d3c9187d6574710e6aa90fc01c92a7..418d9e25bfca1c7af924ad451c8dd8ae1bca78a3 100644
+> --- a/drivers/net/can/dummy_can.c
+> +++ b/drivers/net/can/dummy_can.c
+> @@ -86,6 +86,11 @@ static const struct can_pwm_const dummy_can_pwm_const = {
+>  	.pwmo_max = 16,
+>  };
+>  
+> +static const u16 dummy_can_termination_const[] = {
+> +	CAN_TERMINATION_DISABLED,	/* 0 = off */
+> +	120,				/* 120 Ohms */
 
-> ------------[ cut here ]------------
-> rtmutex deadlock detected
-> WARNING: kernel/locking/rtmutex.c:1674 at rt_mutex_handle_deadlock+0x21/0=
-xb0 kernel/locking/rtmutex.c:1674, CPU#0: syz.7.2908/15923
-> Modules linked in:
-> CPU: 0 UID: 0 PID: 15923 Comm: syz.7.2908 Not tainted syzkaller #0 PREEMP=
-T_{RT,(full)}=20
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
-oogle 10/25/2025
-> RIP: 0010:rt_mutex_handle_deadlock+0x21/0xb0 kernel/locking/rtmutex.c:167=
-4
-> Code: 90 90 90 90 90 90 90 90 90 41 57 41 56 41 55 41 54 53 83 ff dd 0f 8=
-5 86 00 00 00 48 89 f7 e8 a6 39 01 00 48 8d 3d af 7c 0a 04 <67> 48 0f b9 3a=
- 4c 8d 3d 00 00 00 00 65 48 8b 1c 25 08 10 b3 91 4c
-> RSP: 0018:ffffc90004617710 EFLAGS: 00010286
-> RAX: 0000000080000000 RBX: ffffc900046177a0 RCX: 0000000000000000
-> RDX: 0000000000000006 RSI: ffffffff8ce0bbf9 RDI: ffffffff8ede5760
-> RBP: ffffc900046178c0 R08: ffffffff8edb3477 R09: 1ffffffff1db668e
-> R10: dffffc0000000000 R11: fffffbfff1db668f R12: 1ffff920008c2ef0
-> R13: ffffffff8ad3d599 R14: ffffffff8eb910e0 R15: dffffc0000000000
-> FS:  0000000000000000(0000) GS:ffff888126cef000(0000) knlGS:0000000000000=
-000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 000056422df5abe0 CR3: 000000005929c000 CR4: 00000000003526f0
-> Call Trace:
->  <TASK>
->  __rt_mutex_slowlock kernel/locking/rtmutex.c:1734 [inline]
->  __rt_mutex_slowlock_locked kernel/locking/rtmutex.c:1760 [inline]
->  rt_mutex_slowlock+0x666/0x6b0 kernel/locking/rtmutex.c:1800
->  __rt_mutex_lock kernel/locking/rtmutex.c:1815 [inline]
->  __mutex_lock_common kernel/locking/rtmutex_api.c:534 [inline]
->  mutex_lock_nested+0x16a/0x1d0 kernel/locking/rtmutex_api.c:552
->  rfkill_unregister+0xd1/0x230 net/rfkill/core.c:1145
->  nfc_unregister_device+0x96/0x300 net/nfc/core.c:1167
->  virtual_ncidev_close+0x59/0x90 drivers/nfc/virtual_ncidev.c:172
+Nitpick: no need to explain that disabled means "off", the first comment
+can be removed. Also, to be consistent with how the can.bitrate_max and
+can.clock.freq are declared, you can add the unit just next to the value.
 
-NFC has been issues with this for *years*. Technically, Krzysztof is
-listed as a maintainer but I suspect that's mostly dead.
+	static const u16 dummy_can_termination_const[] = {
+		CAN_TERMINATION_DISABLED,
+		120 /* Ohms */,
+	};
 
-Is there a way you could route rfkill issues to NFC (and have them
-ignored there) if NFC is involved?
+(above comment is notwithstanding).
 
-Clearly they're not useful if nobody is interested in fixing NFC, so
-maybe we should just disable the virtual NFC driver completely and just
-not have syzbot run on anything there...
+> +};
+> +
+>  static void dummy_can_print_bittiming(struct net_device *dev,
+>  				      struct can_bittiming *bt)
+>  {
+> @@ -179,6 +184,16 @@ static void dummy_can_print_bittiming_info(struct net_device *dev)
+>  	netdev_dbg(dev, "\n");
+>  }
+>  
+> +static int dummy_can_set_termination(struct net_device *dev, u16 term)
+> +{
+> +	struct dummy_can *priv = netdev_priv(dev);
+> +
+> +	netdev_dbg(dev, "set termination to %u Ohms\n", term);
+> +	priv->can.termination = term;
+> +
+> +	return 0;
+> +}
+> +
+>  static int dummy_can_netdev_open(struct net_device *dev)
+>  {
+>  	int ret;
+> @@ -243,17 +258,23 @@ static int __init dummy_can_init(void)
+>  	dev->ethtool_ops = &dummy_can_ethtool_ops;
+>  	priv = netdev_priv(dev);
+>  	priv->can.bittiming_const = &dummy_can_bittiming_const;
+> -	priv->can.bitrate_max = 20 * MEGA /* BPS */;
+> -	priv->can.clock.freq = 160 * MEGA /* Hz */;
 
-If this email doesn't wake anyone up, I'll do that on the next syzbot
-rfkill vs. NFC report I get :)
+Don't add unrelated changes to your patch. Your patch should do one
+thing (here: add the resistance termination). If you want to reorder the
+existing lines, that should go in a separate clean-up patch. But here,
+there is no need to touch those lines, so just drop this reorder.
 
-johannes
+>  	priv->can.fd.data_bittiming_const = &dummy_can_fd_databittiming_const;
+>  	priv->can.fd.tdc_const = &dummy_can_fd_tdc_const;
+>  	priv->can.xl.data_bittiming_const = &dummy_can_xl_databittiming_const;
+>  	priv->can.xl.tdc_const = &dummy_can_xl_tdc_const;
+>  	priv->can.xl.pwm_const = &dummy_can_pwm_const;
+> +	priv->can.bitrate_max = 20 * MEGA /* BPS */;
+> +	priv->can.clock.freq = 160 * MEGA /* Hz */;
+> +	priv->can.termination_const_cnt = ARRAY_SIZE(dummy_can_termination_const);
+> +	priv->can.termination_const = dummy_can_termination_const;
+> +
+>  	priv->can.ctrlmode_supported = CAN_CTRLMODE_LISTENONLY |
+>  		CAN_CTRLMODE_FD | CAN_CTRLMODE_TDC_AUTO |
+>  		CAN_CTRLMODE_RESTRICTED | CAN_CTRLMODE_XL |
+>  		CAN_CTRLMODE_XL_TDC_AUTO | CAN_CTRLMODE_XL_TMS;
+> +
+> +	priv->can.do_set_termination = dummy_can_set_termination;
+> +
+>  	priv->dev = dev;
+>  
+>  	ret = register_candev(priv->dev);
+
+Aside from the above remark this is OK. Please send a v2 with that last
+remark addressed. You can also add my review tag:
+
+Reviewed-by: Vincent Mailhol <mailhol@kernel.org>
+
+
+Yours sincerely,
+Vincent Mailhol
+
 
