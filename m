@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-246512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90DCDCED8D6
-	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 00:31:39 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D327CED8C4
+	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 00:21:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2E3A4300B2AF
-	for <lists+netdev@lfdr.de>; Thu,  1 Jan 2026 23:31:35 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B20D430011B3
+	for <lists+netdev@lfdr.de>; Thu,  1 Jan 2026 23:21:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72D7B2F8BDF;
-	Thu,  1 Jan 2026 22:15:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F23D730DD18;
+	Thu,  1 Jan 2026 22:17:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SyFLLg0i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k3tzAh1q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E28B2F7AD2;
-	Thu,  1 Jan 2026 22:15:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C508A30DD14;
+	Thu,  1 Jan 2026 22:17:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767305753; cv=none; b=GEMKjKeH/WTXS4gulkZVTMUcVcZhh2j8AaYzfMhB9yQZAn04irTFsZkJ0Gu21r+SBwpcqoKhS9kCFo90F+3P+/6pYZhxnQO7t43qnE6z0ADCy9ObsHr1QYo3Hi466WZiQ7RhLD5U2xXhqBat8a0Bc4ohLb3s01hTpRbVchmCBKA=
+	t=1767305874; cv=none; b=soj7oguk7xddQzcBd1ZhJsWV/RDQj4ziOzDSfOWAQsSwzHfXLWcNAsCMr8Xc6afridogRvTaYGp+kGk+AbhXoOiKe3o3nr6/fHWsb6d1/8KiTsPHAu6k/dp97HWbwivBV9AFeqT1uczrzfE5Bf9iYV1T+INiQl8oNTuaChFB7hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767305753; c=relaxed/simple;
-	bh=v9YrBjmYoXXJcaUrCVcNEergJy1rpdNBj6w7mIgdodQ=;
+	s=arc-20240116; t=1767305874; c=relaxed/simple;
+	bh=OKxr66AuTYpmtINGeWatnOeeLWTfC6xUU/wfI1fZOeA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JDQt14zvqslTqdnhaMHEETA0EUVcT86dxy54c3LFGsM87BmkVUdw44nl3b+DB4HzqWXt9A+mpoa8ieveHLOVR9lRVSCy9+e54V7ujcPKz2pJwjk1RbKkCGAwJvPZHGmjJ2c0CCIb4On/cjHVTTUvEXso76OA7VfwlaeCPbn6c20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SyFLLg0i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 012EBC116D0;
-	Thu,  1 Jan 2026 22:15:44 +0000 (UTC)
+	 MIME-Version; b=jrILqCXd9AEXg9kOO92KC9l9unsS0IemVVrnuSHNkP8bZStUIUBIFABCrWefERaS55hrAqS5G1CZKQc+wQ9V0ZtI8Ild7lZ1SyA2GhcHAqLk6yN3jas36h95gP84VmdDwE4VKcWxtAaRJuzkZ0I8SaqoG0MA3q9qeMbbosmnWXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k3tzAh1q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 696F1C4CEF7;
+	Thu,  1 Jan 2026 22:17:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767305752;
-	bh=v9YrBjmYoXXJcaUrCVcNEergJy1rpdNBj6w7mIgdodQ=;
+	s=k20201202; t=1767305874;
+	bh=OKxr66AuTYpmtINGeWatnOeeLWTfC6xUU/wfI1fZOeA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SyFLLg0iW6FU1eawRmvnINnCpxzead2omuxl9REafTvn+PFWHvz19FAsri2C1gbYz
-	 nmBMznsPhIHNzpbRATsRTyEQmSHDmZRSJpNzzQHYX4BxZkvQqQciqWraphJHo4otMG
-	 yKE6X1B02Y0h85ZIcFaIRchoCui9kzgnkUDtVsfAXxYLAi2HJxIA4Yd0JmB+Pqb/vJ
-	 KFlIaxmBoJqkoT94z2kMTPUGJ4vpk1jl7UDtwx5C++CbT7Zm18ygJQdm4fRZr6G4CD
-	 Tchm5MK1nQsZUtkbmbGbmnfdRBNoOl6ziRKujJrp7iJG93T0zheiYwTQ4Z5PaQM92J
-	 1KWjLLM8diO1w==
+	b=k3tzAh1qqBzEdJr7W13PBSjlKJJ2OZj+v1bk3WgK5Y/gMgiJhnOqkbzrE4d5fNn6r
+	 3ihlWEqcfPQ/esrNTdCUpshwQlHu06VG7Fg8ddHxFPeJyiGDYP6VsaEe7AtkYGFNID
+	 7bW3zS0Mk2L74PT+vdla6Mz6/0qfIdMkfBICDBxermqoh+GzMfbu/cvTlTD1Um7KNG
+	 qADGnv9N68YVfnTeHvZRAP+S2Gd2w3P6I51mCUa2XTbkMdiLCDF9BPwbcddsZ2ehdj
+	 ZdhkVDdGYr4dZ1sqs2Pe0ofLfYQE9v4eJ/Tk1J3wPU7EWgXsmp45dISB+MYVn2h/GZ
+	 vonDrbTOK4C9w==
 From: Frederic Weisbecker <frederic@kernel.org>
 To: LKML <linux-kernel@vger.kernel.org>
 Cc: Frederic Weisbecker <frederic@kernel.org>,
@@ -78,9 +78,9 @@ Cc: Frederic Weisbecker <frederic@kernel.org>,
 	linux-mm@kvack.org,
 	linux-pci@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH 12/33] cpuset: Provide lockdep check for cpuset lock held
-Date: Thu,  1 Jan 2026 23:13:37 +0100
-Message-ID: <20260101221359.22298-13-frederic@kernel.org>
+Subject: [PATCH 27/33] kthread: Rely on HK_TYPE_DOMAIN for preferred affinity management
+Date: Thu,  1 Jan 2026 23:13:52 +0100
+Message-ID: <20260101221359.22298-28-frederic@kernel.org>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <20260101221359.22298-1-frederic@kernel.org>
 References: <20260101221359.22298-1-frederic@kernel.org>
@@ -90,54 +90,48 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-cpuset modifies partitions, including isolated, while holding the cpuset
-mutex.
+Unbound kthreads want to run neither on nohz_full CPUs nor on domain
+isolated CPUs. And since nohz_full implies domain isolation, checking
+the latter is enough to verify both.
 
-This means that holding the cpuset mutex is safe to synchronize against
-housekeeping cpumask changes.
-
-Provide a lockdep check to validate that.
+Therefore exclude kthreads from domain isolation.
 
 Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+Reviewed-by: Waiman Long <longman@redhat.com>
 ---
- include/linux/cpuset.h | 2 ++
- kernel/cgroup/cpuset.c | 7 +++++++
- 2 files changed, 9 insertions(+)
+ kernel/kthread.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/cpuset.h b/include/linux/cpuset.h
-index a98d3330385c..1c49ffd2ca9b 100644
---- a/include/linux/cpuset.h
-+++ b/include/linux/cpuset.h
-@@ -18,6 +18,8 @@
- #include <linux/mmu_context.h>
- #include <linux/jump_label.h>
+diff --git a/kernel/kthread.c b/kernel/kthread.c
+index 85ccf5bb17c9..968fa5868d21 100644
+--- a/kernel/kthread.c
++++ b/kernel/kthread.c
+@@ -362,18 +362,20 @@ static void kthread_fetch_affinity(struct kthread *kthread, struct cpumask *cpum
+ {
+ 	const struct cpumask *pref;
  
-+extern bool lockdep_is_cpuset_held(void);
++	guard(rcu)();
 +
- #ifdef CONFIG_CPUSETS
+ 	if (kthread->preferred_affinity) {
+ 		pref = kthread->preferred_affinity;
+ 	} else {
+ 		if (kthread->node == NUMA_NO_NODE)
+-			pref = housekeeping_cpumask(HK_TYPE_KTHREAD);
++			pref = housekeeping_cpumask(HK_TYPE_DOMAIN);
+ 		else
+ 			pref = cpumask_of_node(kthread->node);
+ 	}
  
- /*
-diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
-index 3afa72f8d579..5e2e3514c22e 100644
---- a/kernel/cgroup/cpuset.c
-+++ b/kernel/cgroup/cpuset.c
-@@ -283,6 +283,13 @@ void cpuset_full_unlock(void)
- 	cpus_read_unlock();
+-	cpumask_and(cpumask, pref, housekeeping_cpumask(HK_TYPE_KTHREAD));
++	cpumask_and(cpumask, pref, housekeeping_cpumask(HK_TYPE_DOMAIN));
+ 	if (cpumask_empty(cpumask))
+-		cpumask_copy(cpumask, housekeeping_cpumask(HK_TYPE_KTHREAD));
++		cpumask_copy(cpumask, housekeeping_cpumask(HK_TYPE_DOMAIN));
  }
  
-+#ifdef CONFIG_LOCKDEP
-+bool lockdep_is_cpuset_held(void)
-+{
-+	return lockdep_is_held(&cpuset_mutex);
-+}
-+#endif
-+
- static DEFINE_SPINLOCK(callback_lock);
- 
- void cpuset_callback_lock_irq(void)
+ static void kthread_affine_node(void)
 -- 
 2.51.1
 
