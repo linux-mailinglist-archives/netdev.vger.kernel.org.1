@@ -1,93 +1,80 @@
-Return-Path: <netdev+bounces-246535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19102CED89A
-	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 00:11:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D6F4CED8EB
+	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 00:40:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CE54730057FA
-	for <lists+netdev@lfdr.de>; Thu,  1 Jan 2026 23:11:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9F35D300A355
+	for <lists+netdev@lfdr.de>; Thu,  1 Jan 2026 23:40:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBFFC202997;
-	Thu,  1 Jan 2026 23:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37E8826C39F;
+	Thu,  1 Jan 2026 23:40:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=maowtm.org header.i=@maowtm.org header.b="oxuv75dz";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="TpouiE+p"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O0/iEmZZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C79902A1BA;
-	Thu,  1 Jan 2026 23:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071C124A049
+	for <netdev@vger.kernel.org>; Thu,  1 Jan 2026 23:40:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767309087; cv=none; b=MGiiAdmOAcbsee7Gtz/mcjve2tcK1dKn91LTxD4rkmymJPxOUCOP/WK+yhV5JvFtlI9OsTs0f5LAMPHdEXcYtxQtF0Xi8l/6ZO6tkMDOGxXC/hi5om/GY9C7FsamiSIQ1IbMZr2XzI88qlXNLpZUoF7dUkXW1MZ15TyN18yK9Ok=
+	t=1767310855; cv=none; b=OZQYl+4ED5g3cJUPMKMqCf1F+wNmFh7ZGF9GccfXxUcEdcS9YFEi/3lfmwHEW5LrWJ9qhPMZbb2DSxxtVrV8LAJ/4jH/L1y5as685H8q0sk+lq76jehBJsbQlmIVvYWL3bTAvdnPGec4MfZgIki8Ilu2MJLwHZ81ePZ1ECwN3Lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767309087; c=relaxed/simple;
-	bh=PPrXV2IR7jc7OCJJVoOeWTZ7Vt8X/2RmDuBUK7l8B7o=;
+	s=arc-20240116; t=1767310855; c=relaxed/simple;
+	bh=cHaOplRIv2s5yEHDc1ml8DnxLbzB5UiibX4F6W3wE34=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iJJhfba0Atc9k9Iy+wQO7eZIVxSUqQVREBjMHW96j9BCD3rPaooUTZWSepDtUsWhw1Hioq1NHtXJl1iYbtiua1sxf4m3pm0hBjP33LUVw/EzqzWPWL7sYnGjDoPTnKQ3VDNePXS0AiVJqkE/WvAumXttQw1LQitzBRqV5nlV35U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=maowtm.org; spf=pass smtp.mailfrom=maowtm.org; dkim=pass (2048-bit key) header.d=maowtm.org header.i=@maowtm.org header.b=oxuv75dz; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=TpouiE+p; arc=none smtp.client-ip=202.12.124.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=maowtm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=maowtm.org
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.stl.internal (Postfix) with ESMTP id C3A231D000B2;
-	Thu,  1 Jan 2026 18:11:24 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Thu, 01 Jan 2026 18:11:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=maowtm.org; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1767309084;
-	 x=1767395484; bh=QoH60nt6jj+dad1rA/Vjn5lgtgqut6j5eqlPqXVpRww=; b=
-	oxuv75dzbHz06mxgoCEN7wngFhLjxmndSMIZixRpcZ4nSL3uCFLBfKfCTUNkiyJ8
-	qHid1P/h6LIOVJvhxwi+fvsKtKu18CgAKYbp1yQ7iZn/l/Ue/spHfVMKzHnTFPtR
-	Srezhvnb0tr4L8mwHX7kAPlc7Q6thMm1+dGV84PbVnng2ArMl0t2DCfUrfUx5yAx
-	tOr+3RAqtF/a0jzhvIvkasgIqARRgRpUBgSzPkaFJuk/sqW3qVGpPJ9Z8EK9rm3s
-	PDVz+TGbEJuhKddZHVzmscazzeu1C4yTP5bKwy/pwEaSDCQbyAuad4TrrVPRWsEJ
-	Zq88yfziKvsT2d7ZMQT4aQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1767309084; x=
-	1767395484; bh=QoH60nt6jj+dad1rA/Vjn5lgtgqut6j5eqlPqXVpRww=; b=T
-	pouiE+pc9xg8vAbTHYWYlZwYVqHGGANPVgnRt5nCYP/7hBe4ycX9dWqpzTOJbsDU
-	pMMBEKtt32fMlKQounBFDnEcsQc+uZWMJH1HiBB+HDrAxWiMMzr2O0BQYPDtbwAc
-	eajQAh56Oul+DXpnWuPa3wdoPvy7S+Fr1v3ROfLi7A5uQIH/Wrq1tH4R4s3zc10U
-	DrxodE3VIN9JfozOKmOVN1/0e/YfRhxOVx+SmmJsOkF4EPROkO6m2QRnLOK6MGal
-	R3w5rlSKk1w01PVTj5rU+gCGA8Wk2n3ftFrYD3IySnR61teEbI26ISxADkiRr7dU
-	qNQVd17DfNhwcx580tQiA==
-X-ME-Sender: <xms:G_9WabTNrQiiW5ERqHQoZo7sYHJZo8i5NaVEbEQH9roJxJBB3B4ayg>
-    <xme:G_9WabDTOPU787N8clpMlnD9dGzSeyDRhGR4QgwjZs3_Qy42jG5ebPAXLrGbdULPn
-    xe56xWHRqTA1baQtE7vB5xuspWCOLbJ7DvZe7LEhi0bzTHL7F3jaMQ>
-X-ME-Received: <xmr:G_9WaaKF8DQ-CtpP8m0hvTtYlHzI-BHYWAXMCshps207mmC62CTUtlIv6pBOQ0FcL7_xSNHZxtMFCm2vzw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdekjedtjecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecunecujfgurhepkfffgggfuffvvehfhfgjtgfgsehtjeertd
-    dtvdejnecuhfhrohhmpefvihhnghhmrghoucghrghnghcuoehmsehmrghofihtmhdrohhr
-    gheqnecuggftrfgrthhtvghrnhepfedvheeluedthfelgfevvdfgkeelgfelkeegtddvhe
-    dvgfdtfeeilefhudetgfdunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehm
-    rghilhhfrhhomhepmhesmhgrohifthhmrdhorhhgpdhnsggprhgtphhtthhopeduuddpmh
-    houggvpehsmhhtphhouhhtpdhrtghpthhtohepuhhtihhlihhthigvmhgrlhejjeesghhm
-    rghilhdrtghomhdprhgtphhtthhopehgnhhorggtkheftddttdesghhmrghilhdrtghomh
-    dprhgtphhtthhopehgnhhorggtkhesghhoohhglhgvrdgtohhmpdhrtghpthhtohephhho
-    rhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhhmohhrrhhishesnhgrmhgvih
-    drohhrghdprhgtphhtthhopehkuhhnihihuhesghhoohhglhgvrdgtohhmpdhrtghpthht
-    oheplhhinhhugidqshgvtghurhhithihqdhmohguuhhlvgesvhhgvghrrdhkvghrnhgvlh
-    drohhrghdprhgtphhtthhopehmihgtseguihhgihhkohgurdhnvghtpdhrtghpthhtohep
-    nhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:G_9WaeBEtUas5hz0s-BfvwtDwWwXCZqPEVCy0gmc3SKcwwyBTORTPg>
-    <xmx:G_9WaXuuWoVuIM7PJxLQDEsJ5rklZlE5yV0rO_kxn9vRr7roSTl-Nw>
-    <xmx:G_9WaUQ39IBenjAH59oH1AFe2E87BhYH3PeM5O0dXkxIsDDD812Myw>
-    <xmx:G_9WaWLZowS5Kj8df7jbiT-m-LQYzRdXf_hcBU8yRa8tcL39_9UQ-g>
-    <xmx:HP9Wack_XcMjbrwQOPgedc88-RkGh9wTIAoqmKkjsGZcdCLlXa287tQ4>
-Feedback-ID: i580e4893:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 1 Jan 2026 18:11:22 -0500 (EST)
-Message-ID: <b992df90-92da-48bd-91d1-051af9670d07@maowtm.org>
-Date: Thu, 1 Jan 2026 23:11:20 +0000
+	 In-Reply-To:Content-Type; b=fmM4zWI4Ig1OCgDnY+1gStjC6gVlk6hezTlGaTGSXzylR9vw+irMFJJoR8BcMg8qXGfAyceyJLr8+kEERVmttANywSxFkaBzA6QiJWDuy1C0S9MTb1+BHIREft2uFVELypOLZhyf7cbTROTfbrJ8E97XX6WANFaDQb03nWneYDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O0/iEmZZ; arc=none smtp.client-ip=74.125.224.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-6442e2dd8bbso7953576d50.0
+        for <netdev@vger.kernel.org>; Thu, 01 Jan 2026 15:40:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767310852; x=1767915652; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BaZgB/0vC9aWPnmDin2g8hReSOJZPuV1mCiVW+Kasj4=;
+        b=O0/iEmZZqSD9Rc8fkyV8S2qn6GX8EyJj7/+lo3yO/e5ySoJNGm2HmM2iQDCBPyiffG
+         ecHGK/XR3PLenx44KuDjMoQOrsSOI/6xawQg1C5aMaxpoqb8fckDFkW9dkfZ5dISdXvD
+         51i7d3sk70ZclP4ez+SbzIyYerftuq1ufPujG2RZ2LbLcArmLRXHnN11ckhfCOFqIXO4
+         6QlbLAwzwSNLrnO4cEJt80we8L5LBfalVPi/GxCi+zpYml3NsHEeBwuV7DkVIlQFIZdd
+         eVClHn9MuL05h9RVNWfQMJ5a/LEE5dGfJYQY6pz6yfba7qQne1FF81EbPBRM4XdD7M1u
+         6LsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767310852; x=1767915652;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BaZgB/0vC9aWPnmDin2g8hReSOJZPuV1mCiVW+Kasj4=;
+        b=FTDP7MKEu+u069FbRcbV21VmbAk7R7/OHj62NKi4JiUDB9EWjok9mkQoSqv/kSzyhc
+         GhWiyQzzlxlQJOBv9dSkf1I5NsWnob7OyCkh7ah5McfmRsyPYa/SnqSCPF/xYhfGXPAi
+         fN8UqrW6/YiHxR+yLGROQW6FQo1v9MYA3ZfE6juKDTa02Y0pv/o6gRiSD+0tH8d6SZ38
+         +PzR08wSm//OhB63bn+8hL/bu7mUs6ZLSIDeNWZnc1jeROXZpmFypcJgMtLvSuSVhekz
+         mA9MahIQMyHGDDUnQYShtuciQui0OWQxoOwMiw0bulkhdtic39oMrm6nA6qTrkzTNTab
+         yW9w==
+X-Forwarded-Encrypted: i=1; AJvYcCXuqayvFBiCsmcxr11jBFkdRicJPYBmtv25UZCc+5Y8lZvTIfLGpJrxFkGFSTO5hZdgT23AtyU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzaZTEznM6A/h4ZyN7vLUdhYUwOLkJFJUFXf6fNXuC3XpVXs5Zi
+	zcU5y4DxjgnOmhKDjBZNGqVecCmEyu9cb+JtW4LioW5+zufEisaK67Oo
+X-Gm-Gg: AY/fxX7c5mnBMJDTYtsoyazBSeR10LvHxj+C1I6BbiPx7n9OZQvfajp+4EipSdez8d3
+	C6uo+T9wKR6T1GHoVCDwnYgkNfk19gbxR/4+OyBAdfKw66gHi7F4zxCqPhseVaFxQtGQc1+8Oj1
+	K/Q9XaMnjXR+OsefQPWuXmIRjZFN8g+o6li9G2HSGAVwnbOcpJzXyRGZphac0i6FKMoEFP2+UBn
+	lqujL7wOKyry5Uwnl/PQqD4OGW9fvh/TiQBFKm1iohC/U5VkAprD/XQ5OrKyrXq8cq3zr9CG6cX
+	0iL7SxSyFJ7mA2+Ea7/zM6XwNoRAhI7bMyUpT+Gnh8TJemt0aHzMknaoBPY9+jEHcYyjjqb98Xd
+	m6w3B8R9k7Eb22/8zMvOI3JIsFzXui1YRLQQJJ5n6NJ6U3UWm8V+txCE+aDEWYV0hVn++Fma2WL
+	c7ncp8lWOirUz+rC5KiSbCzJWQnXqyvd6B2DUQD9V1SBV7l6mB17HAKX01+VPDrAafy6e93g==
+X-Google-Smtp-Source: AGHT+IHO4l5iOHN18kmUpzMMZ1XijQJRBwTQEPahlD7N2hLnBbuPsKliSlV73wybrZLK6ihf+dc6og==
+X-Received: by 2002:a53:d846:0:b0:63c:f5a6:f2ef with SMTP id 956f58d0204a3-6466a901165mr25743473d50.65.1767310851998;
+        Thu, 01 Jan 2026 15:40:51 -0800 (PST)
+Received: from [10.10.10.50] (71-132-185-69.lightspeed.tukrga.sbcglobal.net. [71.132.185.69])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6466a94072bsm19229805d50.23.2026.01.01.15.40.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Jan 2026 15:40:51 -0800 (PST)
+Message-ID: <714c39e3-61fa-449c-b4ab-bdb41a35fc40@gmail.com>
+Date: Thu, 1 Jan 2026 18:40:49 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,46 +83,76 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [RFC PATCH 0/1] lsm: Add hook unix_path_connect
-To: Justin Suess <utilityemal77@gmail.com>
+To: Tingmao Wang <m@maowtm.org>
 Cc: gnoack3000@gmail.com, gnoack@google.com, horms@kernel.org,
  jmorris@namei.org, kuniyu@google.com, linux-security-module@vger.kernel.org,
  mic@digikod.net, netdev@vger.kernel.org, paul@paul-moore.com,
  serge@hallyn.com
 References: <20260101.f6d0f71ca9bb@gnoack.org>
  <20260101194551.4017198-1-utilityemal77@gmail.com>
+ <b992df90-92da-48bd-91d1-051af9670d07@maowtm.org>
 Content-Language: en-US
-From: Tingmao Wang <m@maowtm.org>
-In-Reply-To: <20260101194551.4017198-1-utilityemal77@gmail.com>
+From: Justin Suess <utilityemal77@gmail.com>
+In-Reply-To: <b992df90-92da-48bd-91d1-051af9670d07@maowtm.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 1/1/26 19:45, Justin Suess wrote:
-> [...]
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index 55cdebfa0da0..397687e2d87f 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -1226,6 +1226,18 @@ static struct sock *unix_find_bsd(struct
-> sockaddr_un *sunaddr, int addr_len,
->         if (!S_ISSOCK(inode->i_mode))
->                 goto path_put;
->  
-> +       /*
-> +        * We call the hook because we know that the inode is a socket
-> +        * and we hold a valid reference to it via the path.
-> +        * We intentionally forgo the ability to restrict SOCK_COREDUMP.
-> +        */
-> +       if (!(flags & SOCK_COREDUMP)) {
-> +               err = security_unix_path_connect(&path);
-> +               if (err)
-> +                       goto path_put;
-> +               err = -ECONNREFUSED;
+On 1/1/26 18:11, Tingmao Wang wrote:
+> On 1/1/26 19:45, Justin Suess wrote:
+>> [...]
+>> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+>> index 55cdebfa0da0..397687e2d87f 100644
+>> --- a/net/unix/af_unix.c
+>> +++ b/net/unix/af_unix.c
+>> @@ -1226,6 +1226,18 @@ static struct sock *unix_find_bsd(struct
+>> sockaddr_un *sunaddr, int addr_len,
+>>         if (!S_ISSOCK(inode->i_mode))
+>>                 goto path_put;
+>>  
+>> +       /*
+>> +        * We call the hook because we know that the inode is a socket
+>> +        * and we hold a valid reference to it via the path.
+>> +        * We intentionally forgo the ability to restrict SOCK_COREDUMP.
+>> +        */
+>> +       if (!(flags & SOCK_COREDUMP)) {
+>> +               err = security_unix_path_connect(&path);
+>> +               if (err)
+>> +                       goto path_put;
+>> +               err = -ECONNREFUSED;
+> I'm not sure if this is a good suggestion, but I think it might be cleaner
+> to move this `err = -ECONNREFUSED;` out of the if, and do it
+> unconditionally above the `sk = unix_find_socket_byinode(inode);` below?
+> To me that makes the intention for resetting err clear (it is to ensure
+> that a NULL return from unix_find_socket_byinode causes us to return
+> -ECONNREFUSED).
+>
+I'll do that. That does make it more clear.
 
-I'm not sure if this is a good suggestion, but I think it might be cleaner
-to move this `err = -ECONNREFUSED;` out of the if, and do it
-unconditionally above the `sk = unix_find_socket_byinode(inode);` below?
-To me that makes the intention for resetting err clear (it is to ensure
-that a NULL return from unix_find_socket_byinode causes us to return
--ECONNREFUSED).
+I suspect resetting the error accidentally was what caused the syzbot to rightfully complain.
+
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 55cdebfa0da0..2e0300121ab5 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -1226,6 +1226,18 @@ static struct sock *unix_find_bsd(struct sockaddr_un *sunaddr, int addr_len,
+     if (!S_ISSOCK(inode->i_mode))
+         goto path_put;
+ 
++    /*
++     * We call the hook because we know that the inode is a socket
++     * and we hold a valid reference to it via the path.
++     * We intentionally forgo the ability to restrict SOCK_COREDUMP.
++     */
++    if (!(flags & SOCK_COREDUMP)) {
++        err = security_unix_path_connect(&path);
++        if (err)
++            goto path_put;
++    }
++    err = -ECONNREFUSED;
++
+     sk = unix_find_socket_byinode(inode);
+     if (!sk)
+         goto path_put;
+
 
 
