@@ -1,151 +1,564 @@
-Return-Path: <netdev+bounces-246484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7E46CED06D
-	for <lists+netdev@lfdr.de>; Thu, 01 Jan 2026 14:03:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD397CED0E6
+	for <lists+netdev@lfdr.de>; Thu, 01 Jan 2026 14:52:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8D769300F584
-	for <lists+netdev@lfdr.de>; Thu,  1 Jan 2026 12:59:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1FF6F300724E
+	for <lists+netdev@lfdr.de>; Thu,  1 Jan 2026 13:52:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEDE5221F2F;
-	Thu,  1 Jan 2026 12:59:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DA3124291E;
+	Thu,  1 Jan 2026 13:52:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cve.cx header.i=cve@cve.cx header.b="kU4ZH4Hg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZRsY4x4T"
 X-Original-To: netdev@vger.kernel.org
-Received: from wilbur.contactoffice.com (wilbur.contactoffice.com [212.3.242.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C385D19E992;
-	Thu,  1 Jan 2026 12:59:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.3.242.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63945238C3A
+	for <netdev@vger.kernel.org>; Thu,  1 Jan 2026 13:52:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767272398; cv=none; b=cWZuFaCKpTwD7gjfpW8pt/I9uZdDImzbbARcFr/ogG0kHP2xdxDAbgdDtc4kiSKKON77NnXYdFpKeqvB4Ct4e1Aj9c21FAHOGh4KSx8dNvtL/NWCh8GEMeAYY1Ow++8YtdMOy10IRab9X4t13KBEJGsZTPGVFWkZaeIHygCX1x8=
+	t=1767275572; cv=none; b=MTfkz7J7K/v7RRgEbvvPSQOxlpCAdGH+gUQEW9GDRBd5IFK6G3mvP5aTzOQfSlfM3yYwxS1c8wBbms6gfPxuOoB5vDoyl9hDA+h46ymq5OT2bE7LZ7Cwvddyyiti+w5kG0kmjK6mguxOjYqN27uUOB8AomZ3FBiZLPZgOmPLtug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767272398; c=relaxed/simple;
-	bh=p34Cw7DqI/kE0pvho9/OjwaVKeY6olRBNr1qh70/2lA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PXrBFnedzh+jPofR0erg4NjjJAdbooUAeogbzwCpHwdvvyK1SyEkOvGjNUSnxitN8EzsqObJ4N6KSq6RKkpS+B78nTD+0XK4cY8NgLmiidP8JiAdSu2M+xbmCmHkd5pCdYQ7o0t4BPFhT2MU3L5HvzpAzpzisayUOEHQrgnmfSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cve.cx; spf=pass smtp.mailfrom=cve.cx; dkim=pass (1024-bit key) header.d=cve.cx header.i=cve@cve.cx header.b=kU4ZH4Hg; arc=none smtp.client-ip=212.3.242.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cve.cx
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cve.cx
-Received: from smtpauth1.co-bxl (smtpauth1.co-bxl [10.2.0.15])
-	by wilbur.contactoffice.com (Postfix) with ESMTP id AE6EB1BD3;
-	Thu,  1 Jan 2026 13:51:45 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1767271905;
-	s=20250923-2z95; d=cve.cx; i=cve@cve.cx;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Transfer-Encoding;
-	bh=UoWT89VRnZn9G0HfoZk/cVPF8yTHcYWVbhNlbQ/LmoM=;
-	b=kU4ZH4Hgj4Oz8ir5FBtZdpHFjI7Zxm3cq7pwPl1IoqieX0Pe7bI/L7HkZyWW7C0f
-	QArZ/1BoThhPO0cRoZHbF0FXZ8u/uq7LVCLUS3UXw3brPRrDJOPZ6uE3Fs7i1ILz/Fl
-	jTHMwhnIyB1aDrYQuCn0URM/yBFj4oZR1Sj6H7nk=
-Received: by smtp.mailfence.com with ESMTPSA ; Thu, 1 Jan 2026 13:51:42 +0100 (CET)
-From: Clara Engler <cve@cve.cx>
-To: netdev@vger.kernel.org,
+	s=arc-20240116; t=1767275572; c=relaxed/simple;
+	bh=JngaPYe7celccn/40A8xDQJiVt9wmDUffXA+IHmojRA=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JugzZQo3rD32TH1TuLogGY2ueX9UQg2Zy7hWAYjqM5XikKEmI18EaQqhVzgRCVitnubhAUcqmT1V5c9hnapGLn6TdQLH2ezUZASBP+Hq2SBlVXL2foGO1epwippZ9SDjwvJArzsHp5fmU3PNhbYGGWdZGvRiWWMrruoJExmJVA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZRsY4x4T; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-47d182a8c6cso52187455e9.1
+        for <netdev@vger.kernel.org>; Thu, 01 Jan 2026 05:52:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767275569; x=1767880369; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2oYFP1afTViiWa0k3ptFFA82/ht3QtAavgSwTUsgiuE=;
+        b=ZRsY4x4TP9qEAU5WPjQZ4QX+bf7X64kq4nOK6hROS8kQpI245bfE8ziq4RqcJh33Nz
+         4hsZR6tAUiXmmDwSBuxPY9LKkg6Ha08nvlQDvb67xxKaL5EhUNSyS8pHTS649oAyUJYu
+         HvzmKrH45ouCZG2CuM8oaSS5A4SB3oxPO13k1QVkWdiYgkuFJFcqBEp5hE59YXF8gg8K
+         4ZSMto6SC13Wf060H7Knprnb+SFUIgeJBtQaB68CxbTUQ1AwKkBroWLBnhzmjUOAvR7M
+         /46W7641jMMDx82q0Osr1y0WbQJgqoiIiWyOwoNyHIpykYwnMZ1j440AArcy3/4yHmla
+         svmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767275569; x=1767880369;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2oYFP1afTViiWa0k3ptFFA82/ht3QtAavgSwTUsgiuE=;
+        b=PpASmcnk9Xi2wfR+uiEj3gzMPYAbn6mQMltahlSoAdRdd/Bcu7nQTbsgT0LY8ru9YS
+         pvS9R+c+ybD26wopigoHd0nVZYncalzgsUwferP/EP41Vj6pMiIKlhIIkVV8meGIFQCo
+         nHDbXKgwSwonm5mremno64F2VL6owt+zvJLOtJHFdeY2C9PpyG7QFdztt9zT1HBZKAZZ
+         AJIgxud6Dc3IzspokTQ8AlZrso9YEb0MCORqufiOMrejAzEgMr0NZia7xr/fpadly5Ea
+         lqYkRQ5s5xrJQhlVVISa9IHhJ8Qx2Ckuzvuczu1YkaOp0gqT0yo66QHyWWL/IIF5JKLD
+         To1A==
+X-Forwarded-Encrypted: i=1; AJvYcCVBacSm3ihnYREgEKoOQAfkC6ZSd1BwEj40KdONXKhr8DN+0CMuEKNywO/G9dSPAigmz7SzGQU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMMo/7FwWAy5fvY7vBDbL8tOccx3XUwpsA02JkONDuDbmNf5+U
+	Q/2zhuh50aq+UP/QFmTTQwM0KjWnxjd1sydTgCQjB1AX9KiHFbzkILmY
+X-Gm-Gg: AY/fxX6aiqe748iuxWCtejVq0AK2dXHdWUaOltc7B0MsVPP3qJ3D5ZeqFeNTq9WZFrF
+	XDCEMYoMHwCawPi4HksZlh5tD37syEai04Yl5yP9zqkt9G5NH+vrfcTtbtrI5tPgfZd9oXCZvsc
+	bBaLFgQMESA9GG7Dd/BkbCYdWt12BlE0kQmfhG4XhrG+Y5XqGNgJ2yAFYjdOeEDj/ryEuKtyW+O
+	kyH2Ob5FHehaJKbjZ1NZkJ8ZpP0t5wZbwE8wDIzxD83r7bpONbkqWzDwCC1sn+FpJTV8vVRfl+c
+	YF/HLOFN3yLiLUANekZ+lCagcm164b/fTDjDUDKnUhlm5D0JTpOLPIsg/6DINR9gMPg/8Mi5fxM
+	bXLFq28gzUzh8rIOvnCGqwaESNwWfr97QalZurwG/1vMElZpjiR/PbEjWdZ6OO7QDRA/Cq1Ie28
+	I=
+X-Google-Smtp-Source: AGHT+IE18iFYdMkxEuQfkDsYO2vpFgVpa0RSiS17WBdiZ262JJkrQExdId1oUtX/8/bA9uZmQY7z2A==
+X-Received: by 2002:a05:600c:3486:b0:471:700:f281 with SMTP id 5b1f17b1804b1-47d1958f974mr475655875e9.25.1767275568358;
+        Thu, 01 Jan 2026 05:52:48 -0800 (PST)
+Received: from krava ([176.74.159.170])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be3ac4c1esm293096855e9.14.2026.01.01.05.52.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Jan 2026 05:52:47 -0800 (PST)
+From: Jiri Olsa <olsajiri@gmail.com>
+X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
+Date: Thu, 1 Jan 2026 14:52:45 +0100
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net,
+	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+	yonghong.song@linux.dev, john.fastabend@gmail.com,
+	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com,
+	davem@davemloft.net, dsahern@kernel.org, tglx@linutronix.de,
+	mingo@redhat.com, jiang.biao@linux.dev, bp@alien8.de,
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+	bpf@vger.kernel.org, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	cve@cve.cx
-Subject: [PATCH] ipv4: Improve martian logs
-Date: Thu,  1 Jan 2026 13:51:14 +0100
-Message-ID: <20260101125114.2608-1-cve@cve.cx>
-X-Mailer: git-send-email 2.50.1
+Subject: Re: [PATCH bpf-next v5 01/10] bpf: add fsession support
+Message-ID: <aVZ8LQXPhRqUz5dO@krava>
+References: <20251224130735.201422-1-dongml2@chinatelecom.cn>
+ <20251224130735.201422-2-dongml2@chinatelecom.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-ContactOffice-Account: com:620022785
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251224130735.201422-2-dongml2@chinatelecom.cn>
 
-At the current moment, the logs for martian packets are as follows:
-```
-martian source {DST} from {SRC}, on dev {DEV}
-martian destination {DST} from {SRC}, dev {DEV}
-```
+On Wed, Dec 24, 2025 at 09:07:26PM +0800, Menglong Dong wrote:
 
-These messages feel rather hard to understand in production, especially
-the "martian source" one, mostly because it is grammatically ambitious
-to parse which part is now the source address and which part is the
-destination address.  For example, "{DST}" may there be interpreted as
-the actual source address due to following the word "source", thereby
-implying the actual source address to be the destination one.
+SNIP
 
-Personally, I discovered this bug while toying around with TUN
-interfaces and using them as a tunnel (receiving packets via a TUN
-interface and sending them over a TCP stream; receiving packets from a
-TCP stream and writing them to a TUN).[^1]
+> +struct bpf_fsession_link {
+> +	struct bpf_tracing_link link;
+> +	struct bpf_tramp_link fexit;
+> +};
+> +
+>  struct bpf_raw_tp_link {
+>  	struct bpf_link link;
+>  	struct bpf_raw_event_map *btp;
+> @@ -2114,6 +2120,20 @@ static inline void bpf_struct_ops_desc_release(struct bpf_struct_ops_desc *st_op
+>  
+>  #endif
+>  
+> +static inline int bpf_fsession_cnt(struct bpf_tramp_links *links)
+> +{
+> +	struct bpf_tramp_links fentries = links[BPF_TRAMP_FENTRY];
+> +	int cnt = 0;
+> +
+> +	for (int i = 0; i < links[BPF_TRAMP_FENTRY].nr_links; i++) {
+> +		if (fentries.links[i]->link.prog->expected_attach_type ==
+> +		    BPF_TRACE_FSESSION)
 
-When these IP addresses contained local IPs (i.e. 10.0.0.0/8 in source
-and destination), everything worked fine.  However, sending them to a
-real routable IP address on the internet led to them being treated as a
-martian packet, obviously.  Using a few sysctl(8) and iptables(8)
-settings[^2] fixed it, but while debugging I found the log message
-starting with "martian source" rather confusing, as I was unsure on
-whether the packet that gets dropped was the packet originating from me
-or the response from the endpoint, as "martian source <ROUTABLE IP>"
-could also be falsely interpreted as the response packet being martian,
-due to the word "source" followed by the routable IP address, implying
-the source address of that packet is set to this IP, as explained above.
-In the end, I had to look into the source code of the kernel on where
-this error message gets generated, which is usually an indicator of
-there being room for improvement with regard to this error message.
+let's keep it on the single line ?
 
-In terms of improvement, this commit changes the error messages for
-martian source and martian destination packets as follows:
-```
-martian source (src={SRC}, dst={DST}, dev={DEV})
-martian destination (src={SRC}, dst={DST}, dev={DEV})
-```
+> +			cnt++;
+> +	}
+> +
+> +	return cnt;
+> +}
+> +
+>  int bpf_prog_ctx_arg_info_init(struct bpf_prog *prog,
+>  			       const struct bpf_ctx_arg_aux *info, u32 cnt);
+>  
+> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> index 84ced3ed2d21..cd2d7c4fc6e7 100644
+> --- a/include/uapi/linux/bpf.h
+> +++ b/include/uapi/linux/bpf.h
+> @@ -1145,6 +1145,7 @@ enum bpf_attach_type {
+>  	BPF_NETKIT_PEER,
+>  	BPF_TRACE_KPROBE_SESSION,
+>  	BPF_TRACE_UPROBE_SESSION,
+> +	BPF_TRACE_FSESSION,
+>  	__MAX_BPF_ATTACH_TYPE
+>  };
+>  
+> diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
+> index 0de8fc8a0e0b..dff3eae4b51e 100644
+> --- a/kernel/bpf/btf.c
+> +++ b/kernel/bpf/btf.c
+> @@ -6107,6 +6107,7 @@ static int btf_validate_prog_ctx_type(struct bpf_verifier_log *log, const struct
+>  		case BPF_TRACE_FENTRY:
+>  		case BPF_TRACE_FEXIT:
+>  		case BPF_MODIFY_RETURN:
+> +		case BPF_TRACE_FSESSION:
+>  			/* allow u64* as ctx */
+>  			if (btf_is_int(t) && t->size == 8)
+>  				return 0;
+> @@ -6704,6 +6705,7 @@ bool btf_ctx_access(int off, int size, enum bpf_access_type type,
+>  			fallthrough;
+>  		case BPF_LSM_CGROUP:
+>  		case BPF_TRACE_FEXIT:
+> +		case BPF_TRACE_FSESSION:
+>  			/* When LSM programs are attached to void LSM hooks
+>  			 * they use FEXIT trampolines and when attached to
+>  			 * int LSM hooks, they use MODIFY_RETURN trampolines.
+> diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
+> index 3080cc48bfc3..3bfaf550ad08 100644
+> --- a/kernel/bpf/syscall.c
+> +++ b/kernel/bpf/syscall.c
+> @@ -3579,6 +3579,7 @@ static int bpf_tracing_prog_attach(struct bpf_prog *prog,
+>  	case BPF_PROG_TYPE_TRACING:
+>  		if (prog->expected_attach_type != BPF_TRACE_FENTRY &&
+>  		    prog->expected_attach_type != BPF_TRACE_FEXIT &&
+> +		    prog->expected_attach_type != BPF_TRACE_FSESSION &&
+>  		    prog->expected_attach_type != BPF_MODIFY_RETURN) {
+>  			err = -EINVAL;
+>  			goto out_put_prog;
+> @@ -3628,7 +3629,21 @@ static int bpf_tracing_prog_attach(struct bpf_prog *prog,
+>  		key = bpf_trampoline_compute_key(tgt_prog, NULL, btf_id);
+>  	}
+>  
+> -	link = kzalloc(sizeof(*link), GFP_USER);
+> +	if (prog->expected_attach_type == BPF_TRACE_FSESSION) {
+> +		struct bpf_fsession_link *fslink;
+> +
+> +		fslink = kzalloc(sizeof(*fslink), GFP_USER);
+> +		if (fslink) {
+> +			bpf_link_init(&fslink->fexit.link, BPF_LINK_TYPE_TRACING,
+> +				      &bpf_tracing_link_lops, prog, attach_type);
 
-These new wordings leave pretty much no room for ambiguity as all
-parameters are prefixed with a respective key explaining their semantic
-meaning.
+I don't think we need the extra exit struct bpf_link, we just need
+hlist_node hook for exit program, so this should perhaps be:
 
-See also the following thread on LKML.[^3]
+struct bpf_fsession_link {
+	struct bpf_tracing_link link;
+	struct hlist_node tramp_hlist;
+};
 
-[^1]: <https://backreference.org/2010/03/26/tuntap-interface-tutorial>
-[^2]: sysctl net.ipv4.ip_forward=1 && \
-      iptables -A INPUT -i tun0 -j ACCEPT && \
-      iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-[^3]: <https://lore.kernel.org/all/aSd4Xj8rHrh-krjy@4944566b5c925f79/>
 
-Signed-off-by: Clara Engler <cve@cve.cx>
+SNIP
+
+> @@ -596,6 +598,8 @@ static int __bpf_trampoline_link_prog(struct bpf_tramp_link *link,
+>  {
+>  	enum bpf_tramp_prog_type kind;
+>  	struct bpf_tramp_link *link_exiting;
+> +	struct bpf_fsession_link *fslink;
+> +	struct hlist_head *prog_list;
+>  	int err = 0;
+>  	int cnt = 0, i;
+>  
+> @@ -621,24 +625,44 @@ static int __bpf_trampoline_link_prog(struct bpf_tramp_link *link,
+>  					  BPF_MOD_JUMP, NULL,
+>  					  link->link.prog->bpf_func);
+>  	}
+> +	if (kind == BPF_TRAMP_FSESSION) {
+> +		prog_list = &tr->progs_hlist[BPF_TRAMP_FENTRY];
+> +		cnt++;
+> +	} else {
+> +		prog_list = &tr->progs_hlist[kind];
+> +	}
+>  	if (cnt >= BPF_MAX_TRAMP_LINKS)
+>  		return -E2BIG;
+>  	if (!hlist_unhashed(&link->tramp_hlist))
+>  		/* prog already linked */
+>  		return -EBUSY;
+> -	hlist_for_each_entry(link_exiting, &tr->progs_hlist[kind], tramp_hlist) {
+> +	hlist_for_each_entry(link_exiting, prog_list, tramp_hlist) {
+>  		if (link_exiting->link.prog != link->link.prog)
+>  			continue;
+>  		/* prog already linked */
+>  		return -EBUSY;
+>  	}
+>  
+> -	hlist_add_head(&link->tramp_hlist, &tr->progs_hlist[kind]);
+> -	tr->progs_cnt[kind]++;
+> +	hlist_add_head(&link->tramp_hlist, prog_list);
+> +	if (kind == BPF_TRAMP_FSESSION) {
+> +		tr->progs_cnt[BPF_TRAMP_FENTRY]++;
+> +		fslink = container_of(link, struct bpf_fsession_link, link.link);
+> +		hlist_add_head(&fslink->fexit.tramp_hlist,
+> +			       &tr->progs_hlist[BPF_TRAMP_FEXIT]);
+> +		tr->progs_cnt[BPF_TRAMP_FEXIT]++;
+> +	} else {
+> +		tr->progs_cnt[kind]++;
+> +	}
+>  	err = bpf_trampoline_update(tr, true /* lock_direct_mutex */);
+>  	if (err) {
+>  		hlist_del_init(&link->tramp_hlist);
+> -		tr->progs_cnt[kind]--;
+> +		if (kind == BPF_TRAMP_FSESSION) {
+> +			tr->progs_cnt[BPF_TRAMP_FENTRY]--;
+> +			hlist_del_init(&fslink->fexit.tramp_hlist);
+> +			tr->progs_cnt[BPF_TRAMP_FEXIT]--;
+> +		} else {
+> +			tr->progs_cnt[kind]--;
+> +		}
+>  	}
+>  	return err;
+
+this seems confusing, how about we just add abolish bpf_fsession_link
+and add extra hlist_node hook to struct bpf_tramp_link .. we will waste
+16 bytes for other cases, but the code seems less confusing to me
+
+untested, so I might overlooked something..
+
+jirka
+
+
+
 ---
- net/ipv4/route.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index b549d6a57307..05f8c550a915 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -1795,8 +1795,8 @@ static void ip_handle_martian_source(struct net_device *dev,
- 		 *	RFC1812 recommendation, if source is martian,
- 		 *	the only hint is MAC header.
- 		 */
--		pr_warn("martian source %pI4 from %pI4, on dev %s\n",
--			&daddr, &saddr, dev->name);
-+		pr_warn("martian source (src=%pI4, dst=%pI4, dev=%s)\n",
-+			&saddr, &daddr, dev->name);
- 		if (dev->hard_header_len && skb_mac_header_was_set(skb)) {
- 			print_hex_dump(KERN_WARNING, "ll header: ",
- 				       DUMP_PREFIX_OFFSET, 16, 1,
-@@ -2475,8 +2475,8 @@ ip_route_input_slow(struct sk_buff *skb, __be32 daddr, __be32 saddr,
- 	RT_CACHE_STAT_INC(in_martian_dst);
- #ifdef CONFIG_IP_ROUTE_VERBOSE
- 	if (IN_DEV_LOG_MARTIANS(in_dev))
--		net_warn_ratelimited("martian destination %pI4 from %pI4, dev %s\n",
--				     &daddr, &saddr, dev->name);
-+		net_warn_ratelimited("martian destination (src=%pI4, dst=%pI4, dev=%s)\n",
-+				     &saddr, &daddr, dev->name);
- #endif
- 	goto out;
+diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+index 4e7d72dfbcd4..7479664844ea 100644
+--- a/include/linux/bpf.h
++++ b/include/linux/bpf.h
+@@ -1309,6 +1309,7 @@ enum bpf_tramp_prog_type {
+ 	BPF_TRAMP_MODIFY_RETURN,
+ 	BPF_TRAMP_MAX,
+ 	BPF_TRAMP_REPLACE, /* more than MAX */
++	BPF_TRAMP_FSESSION,
+ };
  
--- 
-2.52.0
+ struct bpf_tramp_image {
+@@ -1861,6 +1862,7 @@ struct bpf_link_ops {
+ struct bpf_tramp_link {
+ 	struct bpf_link link;
+ 	struct hlist_node tramp_hlist;
++	struct hlist_node extra_hlist;
+ 	u64 cookie;
+ };
+ 
+@@ -2169,6 +2171,19 @@ static inline void bpf_struct_ops_desc_release(struct bpf_struct_ops_desc *st_op
+ 
+ #endif
+ 
++static inline int bpf_fsession_cnt(struct bpf_tramp_links *links)
++{
++	struct bpf_tramp_links fentries = links[BPF_TRAMP_FENTRY];
++	int cnt = 0;
++
++	for (int i = 0; i < links[BPF_TRAMP_FENTRY].nr_links; i++) {
++		if (fentries.links[i]->link.prog->expected_attach_type == BPF_TRACE_FSESSION)
++			cnt++;
++	}
++
++	return cnt;
++}
++
+ int bpf_prog_ctx_arg_info_init(struct bpf_prog *prog,
+ 			       const struct bpf_ctx_arg_aux *info, u32 cnt);
+ 
+diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+index 84ced3ed2d21..cd2d7c4fc6e7 100644
+--- a/include/uapi/linux/bpf.h
++++ b/include/uapi/linux/bpf.h
+@@ -1145,6 +1145,7 @@ enum bpf_attach_type {
+ 	BPF_NETKIT_PEER,
+ 	BPF_TRACE_KPROBE_SESSION,
+ 	BPF_TRACE_UPROBE_SESSION,
++	BPF_TRACE_FSESSION,
+ 	__MAX_BPF_ATTACH_TYPE
+ };
+ 
+diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
+index 539c9fdea41d..8b1dcd440356 100644
+--- a/kernel/bpf/btf.c
++++ b/kernel/bpf/btf.c
+@@ -6107,6 +6107,7 @@ static int btf_validate_prog_ctx_type(struct bpf_verifier_log *log, const struct
+ 		case BPF_TRACE_FENTRY:
+ 		case BPF_TRACE_FEXIT:
+ 		case BPF_MODIFY_RETURN:
++		case BPF_TRACE_FSESSION:
+ 			/* allow u64* as ctx */
+ 			if (btf_is_int(t) && t->size == 8)
+ 				return 0;
+@@ -6704,6 +6705,7 @@ bool btf_ctx_access(int off, int size, enum bpf_access_type type,
+ 			fallthrough;
+ 		case BPF_LSM_CGROUP:
+ 		case BPF_TRACE_FEXIT:
++		case BPF_TRACE_FSESSION:
+ 			/* When LSM programs are attached to void LSM hooks
+ 			 * they use FEXIT trampolines and when attached to
+ 			 * int LSM hooks, they use MODIFY_RETURN trampolines.
+diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
+index a4d38272d8bc..d05f59bffa02 100644
+--- a/kernel/bpf/syscall.c
++++ b/kernel/bpf/syscall.c
+@@ -3579,6 +3579,7 @@ static int bpf_tracing_prog_attach(struct bpf_prog *prog,
+ 	case BPF_PROG_TYPE_TRACING:
+ 		if (prog->expected_attach_type != BPF_TRACE_FENTRY &&
+ 		    prog->expected_attach_type != BPF_TRACE_FEXIT &&
++		    prog->expected_attach_type != BPF_TRACE_FSESSION &&
+ 		    prog->expected_attach_type != BPF_MODIFY_RETURN) {
+ 			err = -EINVAL;
+ 			goto out_put_prog;
+@@ -4352,6 +4353,7 @@ attach_type_to_prog_type(enum bpf_attach_type attach_type)
+ 	case BPF_TRACE_RAW_TP:
+ 	case BPF_TRACE_FENTRY:
+ 	case BPF_TRACE_FEXIT:
++	case BPF_TRACE_FSESSION:
+ 	case BPF_MODIFY_RETURN:
+ 		return BPF_PROG_TYPE_TRACING;
+ 	case BPF_LSM_MAC:
+diff --git a/kernel/bpf/trampoline.c b/kernel/bpf/trampoline.c
+index 2a125d063e62..f27ed8b934f9 100644
+--- a/kernel/bpf/trampoline.c
++++ b/kernel/bpf/trampoline.c
+@@ -111,7 +111,7 @@ bool bpf_prog_has_trampoline(const struct bpf_prog *prog)
+ 
+ 	return (ptype == BPF_PROG_TYPE_TRACING &&
+ 		(eatype == BPF_TRACE_FENTRY || eatype == BPF_TRACE_FEXIT ||
+-		 eatype == BPF_MODIFY_RETURN)) ||
++		 eatype == BPF_MODIFY_RETURN || eatype == BPF_TRACE_FSESSION)) ||
+ 		(ptype == BPF_PROG_TYPE_LSM && eatype == BPF_LSM_MAC);
+ }
+ 
+@@ -559,6 +559,8 @@ static enum bpf_tramp_prog_type bpf_attach_type_to_tramp(struct bpf_prog *prog)
+ 		return BPF_TRAMP_MODIFY_RETURN;
+ 	case BPF_TRACE_FEXIT:
+ 		return BPF_TRAMP_FEXIT;
++	case BPF_TRACE_FSESSION:
++		return BPF_TRAMP_FSESSION;
+ 	case BPF_LSM_MAC:
+ 		if (!prog->aux->attach_func_proto->type)
+ 			/* The function returns void, we cannot modify its
+@@ -621,6 +623,8 @@ static int __bpf_trampoline_link_prog(struct bpf_tramp_link *link,
+ 					  BPF_MOD_JUMP, NULL,
+ 					  link->link.prog->bpf_func);
+ 	}
++	if (kind == BPF_TRAMP_FSESSION)
++		cnt++;
+ 	if (cnt >= BPF_MAX_TRAMP_LINKS)
+ 		return -E2BIG;
+ 	if (!hlist_unhashed(&link->tramp_hlist))
+@@ -633,12 +637,27 @@ static int __bpf_trampoline_link_prog(struct bpf_tramp_link *link,
+ 		return -EBUSY;
+ 	}
+ 
+-	hlist_add_head(&link->tramp_hlist, &tr->progs_hlist[kind]);
+-	tr->progs_cnt[kind]++;
++	if (kind == BPF_TRAMP_FSESSION) {
++		hlist_add_head(&link->tramp_hlist, &tr->progs_hlist[BPF_TRAMP_FENTRY]);
++		hlist_add_head(&link->extra_hlist, &tr->progs_hlist[BPF_TRAMP_FEXIT]);
++		tr->progs_cnt[BPF_TRAMP_FENTRY]++;
++		tr->progs_cnt[BPF_TRAMP_FEXIT]++;
++	} else {
++		hlist_add_head(&link->tramp_hlist, &tr->progs_hlist[kind]);
++		tr->progs_cnt[kind]++;
++	}
++
+ 	err = bpf_trampoline_update(tr, true /* lock_direct_mutex */);
+ 	if (err) {
+-		hlist_del_init(&link->tramp_hlist);
+-		tr->progs_cnt[kind]--;
++		if (kind == BPF_TRAMP_FSESSION) {
++			hlist_del_init(&link->tramp_hlist);
++			hlist_del_init(&link->extra_hlist);
++			tr->progs_cnt[BPF_TRAMP_FENTRY]--;
++			tr->progs_cnt[BPF_TRAMP_FEXIT]--;
++		} else {
++			hlist_del_init(&link->tramp_hlist);
++			tr->progs_cnt[kind]--;
++		}
+ 	}
+ 	return err;
+ }
+@@ -672,9 +691,15 @@ static int __bpf_trampoline_unlink_prog(struct bpf_tramp_link *link,
+ 		guard(mutex)(&tgt_prog->aux->ext_mutex);
+ 		tgt_prog->aux->is_extended = false;
+ 		return err;
++	} else if (kind == BPF_TRAMP_FSESSION) {
++		hlist_del_init(&link->tramp_hlist);
++		hlist_del_init(&link->extra_hlist);
++		tr->progs_cnt[BPF_TRAMP_FENTRY]--;
++		tr->progs_cnt[BPF_TRAMP_FEXIT]--;
++	} else {
++		hlist_del_init(&link->tramp_hlist);
++		tr->progs_cnt[kind]--;
+ 	}
+-	hlist_del_init(&link->tramp_hlist);
+-	tr->progs_cnt[kind]--;
+ 	return bpf_trampoline_update(tr, true /* lock_direct_mutex */);
+ }
+ 
+diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+index 2de1a736ef69..6146f63cb03a 100644
+--- a/kernel/bpf/verifier.c
++++ b/kernel/bpf/verifier.c
+@@ -17406,6 +17406,7 @@ static int check_return_code(struct bpf_verifier_env *env, int regno, const char
+ 		switch (env->prog->expected_attach_type) {
+ 		case BPF_TRACE_FENTRY:
+ 		case BPF_TRACE_FEXIT:
++		case BPF_TRACE_FSESSION:
+ 			range = retval_range(0, 0);
+ 			break;
+ 		case BPF_TRACE_RAW_TP:
+@@ -23303,6 +23304,7 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
+ 		if (prog_type == BPF_PROG_TYPE_TRACING &&
+ 		    insn->imm == BPF_FUNC_get_func_ret) {
+ 			if (eatype == BPF_TRACE_FEXIT ||
++			    eatype == BPF_TRACE_FSESSION ||
+ 			    eatype == BPF_MODIFY_RETURN) {
+ 				/* Load nr_args from ctx - 8 */
+ 				insn_buf[0] = BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_1, -8);
+@@ -24247,7 +24249,8 @@ int bpf_check_attach_target(struct bpf_verifier_log *log,
+ 		if (tgt_prog->type == BPF_PROG_TYPE_TRACING &&
+ 		    prog_extension &&
+ 		    (tgt_prog->expected_attach_type == BPF_TRACE_FENTRY ||
+-		     tgt_prog->expected_attach_type == BPF_TRACE_FEXIT)) {
++		     tgt_prog->expected_attach_type == BPF_TRACE_FEXIT ||
++		     tgt_prog->expected_attach_type == BPF_TRACE_FSESSION)) {
+ 			/* Program extensions can extend all program types
+ 			 * except fentry/fexit. The reason is the following.
+ 			 * The fentry/fexit programs are used for performance
+@@ -24262,7 +24265,7 @@ int bpf_check_attach_target(struct bpf_verifier_log *log,
+ 			 * beyond reasonable stack size. Hence extending fentry
+ 			 * is not allowed.
+ 			 */
+-			bpf_log(log, "Cannot extend fentry/fexit\n");
++			bpf_log(log, "Cannot extend fentry/fexit/fsession\n");
+ 			return -EINVAL;
+ 		}
+ 	} else {
+@@ -24346,6 +24349,7 @@ int bpf_check_attach_target(struct bpf_verifier_log *log,
+ 	case BPF_LSM_CGROUP:
+ 	case BPF_TRACE_FENTRY:
+ 	case BPF_TRACE_FEXIT:
++	case BPF_TRACE_FSESSION:
+ 		if (!btf_type_is_func(t)) {
+ 			bpf_log(log, "attach_btf_id %u is not a function\n",
+ 				btf_id);
+@@ -24512,6 +24516,7 @@ static bool can_be_sleepable(struct bpf_prog *prog)
+ 		case BPF_TRACE_FEXIT:
+ 		case BPF_MODIFY_RETURN:
+ 		case BPF_TRACE_ITER:
++		case BPF_TRACE_FSESSION:
+ 			return true;
+ 		default:
+ 			return false;
+@@ -24593,9 +24598,10 @@ static int check_attach_btf_id(struct bpf_verifier_env *env)
+ 			tgt_info.tgt_name);
+ 		return -EINVAL;
+ 	} else if ((prog->expected_attach_type == BPF_TRACE_FEXIT ||
++		   prog->expected_attach_type == BPF_TRACE_FSESSION ||
+ 		   prog->expected_attach_type == BPF_MODIFY_RETURN) &&
+ 		   btf_id_set_contains(&noreturn_deny, btf_id)) {
+-		verbose(env, "Attaching fexit/fmod_ret to __noreturn function '%s' is rejected.\n",
++		verbose(env, "Attaching fexit/fsession/fmod_ret to __noreturn function '%s' is rejected.\n",
+ 			tgt_info.tgt_name);
+ 		return -EINVAL;
+ 	}
+diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+index 655efac6f133..3b0d9bd039de 100644
+--- a/net/bpf/test_run.c
++++ b/net/bpf/test_run.c
+@@ -685,6 +685,7 @@ int bpf_prog_test_run_tracing(struct bpf_prog *prog,
+ 	switch (prog->expected_attach_type) {
+ 	case BPF_TRACE_FENTRY:
+ 	case BPF_TRACE_FEXIT:
++	case BPF_TRACE_FSESSION:
+ 		if (bpf_fentry_test1(1) != 2 ||
+ 		    bpf_fentry_test2(2, 3) != 5 ||
+ 		    bpf_fentry_test3(4, 5, 6) != 15 ||
+diff --git a/net/core/bpf_sk_storage.c b/net/core/bpf_sk_storage.c
+index 850dd736ccd1..de111818f3a0 100644
+--- a/net/core/bpf_sk_storage.c
++++ b/net/core/bpf_sk_storage.c
+@@ -365,6 +365,7 @@ static bool bpf_sk_storage_tracing_allowed(const struct bpf_prog *prog)
+ 		return true;
+ 	case BPF_TRACE_FENTRY:
+ 	case BPF_TRACE_FEXIT:
++	case BPF_TRACE_FSESSION:
+ 		return !!strncmp(prog->aux->attach_func_name, "bpf_sk_storage",
+ 				 strlen("bpf_sk_storage"));
+ 	default:
+diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
+index 6b92b0847ec2..012abaf3d4ac 100644
+--- a/tools/include/uapi/linux/bpf.h
++++ b/tools/include/uapi/linux/bpf.h
+@@ -1145,6 +1145,7 @@ enum bpf_attach_type {
+ 	BPF_NETKIT_PEER,
+ 	BPF_TRACE_KPROBE_SESSION,
+ 	BPF_TRACE_UPROBE_SESSION,
++	BPF_TRACE_FSESSION,
+ 	__MAX_BPF_ATTACH_TYPE
+ };
+ 
+diff --git a/tools/testing/selftests/bpf/prog_tests/tracing_failure.c b/tools/testing/selftests/bpf/prog_tests/tracing_failure.c
+index 10e231965589..f9f9e1cb87bf 100644
+--- a/tools/testing/selftests/bpf/prog_tests/tracing_failure.c
++++ b/tools/testing/selftests/bpf/prog_tests/tracing_failure.c
+@@ -73,7 +73,7 @@ static void test_tracing_deny(void)
+ static void test_fexit_noreturns(void)
+ {
+ 	test_tracing_fail_prog("fexit_noreturns",
+-			       "Attaching fexit/fmod_ret to __noreturn function 'do_exit' is rejected.");
++			       "Attaching fexit/fsession/fmod_ret to __noreturn function 'do_exit' is rejected.");
+ }
+ 
+ void test_tracing_failure(void)
 
 
