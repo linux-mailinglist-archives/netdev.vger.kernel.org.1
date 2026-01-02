@@ -1,153 +1,138 @@
-Return-Path: <netdev+bounces-246584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57506CEEAC1
-	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 14:28:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD328CEEB12
+	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 14:45:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BE58A3013574
-	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 13:28:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 32F2D3011EC8
+	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 13:45:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BD2F31197B;
-	Fri,  2 Jan 2026 13:28:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D62E2D2490;
+	Fri,  2 Jan 2026 13:45:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j/LYyrVW"
+	dkim=pass (2048-bit key) header.d=pace-systems.de header.i=@pace-systems.de header.b="XVOtwCq0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ms-10.1blu.de (ms-10.1blu.de [178.254.4.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112B130FF1E
-	for <netdev@vger.kernel.org>; Fri,  2 Jan 2026 13:28:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0AC31DE4DC;
+	Fri,  2 Jan 2026 13:45:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.254.4.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767360498; cv=none; b=anXoX36KgK8sR7q6zng0ZXTy8UFn8vIwHauUqB0UBDrWrPGl3kTe0iCHsH6qxN9Qjt9hlIkVzCSyzZHwevRhECsWu7P/Vn+jtZeOhmwQzUtSdYzdiSfS+7h0iJFZW0liI+WiUA/M72UDABS/mN0iigIdse7yX7zSwSGwsb7/rGg=
+	t=1767361547; cv=none; b=WDdy2dYi2FyVfzbaoHforfiNUqPathANkQAR9iA0LHDubFNUaC5PfV0tZFu8UWN1lhHWy29pVjTUY2dqzCSgIN6PdPozb/RG8lmote36kxHQIp38jvTIDfERVYRm1Fm8vfzksI8e2lImoeOTmPVfud1vfU0XcmjQoM1ShwzlCYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767360498; c=relaxed/simple;
-	bh=caKMln/4An5074vy/0LbmODygrWbyLltEqRTVzyaZyo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kvkflUw/xz7EGspGaLJjWOMip8kiWUoHwL3omeZWpjSApfwR5aerdPb0yYaGODTEUwWaygNtimELVY5TTLm/1rrYeXwpME5M6RDxP/Yyar3n55m1skeXVexLb9c3vmUiDQLdd6US9zn2CUfJdY8qgJt+704dnjvckuPpwEQETi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j/LYyrVW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8C38C19422
-	for <netdev@vger.kernel.org>; Fri,  2 Jan 2026 13:28:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767360497;
-	bh=caKMln/4An5074vy/0LbmODygrWbyLltEqRTVzyaZyo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=j/LYyrVWYBX6/xiFBJCYzPt2mAjHPCdML6RZHqYxHB3JLuG+XVa48k+IbFa1/ydYH
-	 yzLWkGX2d/nsNwNLBfGEKgQx/Y31IcJRJytcsUrwFYWxV4I4ndl8HDE1gsWW9D+fsW
-	 tkOdzT6QA4VM80ok+nOp6C16Iy1MKAT95Q/2l9114MivMXUzbox1yPNxO2sfnrqTwX
-	 pm8UKITq5tQDOE65/Qnd0pkfKV9M7ZB31pmItU0vWSV/qe8rZrpUm2qM/b1BHC1YYp
-	 F/QZg0d4SfPs97bZzrucZYLPyO4UX37A651XQnEg9dQ930Z2nK3qcF40HhLqhQRSeU
-	 h/5hZzEbjYRDQ==
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5958931c9c7so13818014e87.2
-        for <netdev@vger.kernel.org>; Fri, 02 Jan 2026 05:28:17 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVfLW547x0bQFajAeibJkeCdXlRkQeJofOuWqYf28G0PlqTHGwqWwAHZVhGSKCfQjgfDNsVJtY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwS7Eu85NGar6fThAkb6mDgsU/J+MEjbqfDzP7VJ3AM/QQP2Rq4
-	nNfoXDx/m4QYRwwJNW6mesJA/82fR9+W77uaUg6uTV4eoufBiWCpj3bZ9TdZIGBtm1OCVquRsKz
-	4sC6CM7qZHBoRP1mu6Vypgmqq83uRj8Iwi2gMVZ+sJw==
-X-Google-Smtp-Source: AGHT+IHHF6srkWGBj0h2W2m125Q8RRqweGoiS7tVO11k+MLcdE1dgvfbJ2DaGFg9ECUq+/XShJKxHMrRpS3Ip55rUHI=
-X-Received: by 2002:a05:6512:398c:b0:594:522d:68f4 with SMTP id
- 2adb3069b0e04-59a17de2c1amr14462802e87.28.1767360495900; Fri, 02 Jan 2026
- 05:28:15 -0800 (PST)
+	s=arc-20240116; t=1767361547; c=relaxed/simple;
+	bh=odpTuxH9kYZ3GnKkdybEyntftVSqh6ui7FmUigsWUfo=;
+	h=From:To:Cc:Subject:References:In-Reply-To:Message-ID:Date:
+	 Content-Type:MIME-Version; b=slXlp61M2W4CdgN9ZplsPFcVoZiIqeLN9KityXytqngnQmEmjqFvdj8e5Pasb0unvjaNkfu3He6mqBif+7iKOYjBIWLuwMj+CJfED2hHax1hfYQ8rsZMAFg9IakN1OL6QWdstJ9aMUAjcIF2BVcCtLyHJMkgijjPz7JryIkABe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pace-systems.de; spf=pass smtp.mailfrom=pace-systems.de; dkim=pass (2048-bit key) header.d=pace-systems.de header.i=@pace-systems.de header.b=XVOtwCq0; arc=none smtp.client-ip=178.254.4.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pace-systems.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pace-systems.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=pace-systems.de; s=blu0479712; h=Content-Transfer-Encoding:MIME-Version:
+	Content-Type:Date:Message-ID:In-Reply-To:References:Subject:Cc:To:From:Sender
+	:Reply-To:Content-ID:Content-Description;
+	bh=odpTuxH9kYZ3GnKkdybEyntftVSqh6ui7FmUigsWUfo=; b=XVOtwCq0iU57pqACQQxvCNHc3F
+	vfIZmPvCu3a4sbVOl7hBfqnj69w1JV7vyztxFCmB5JKDchGhH5MS30WKHPkv1ZuaCYHG9J0YB12lt
+	fULne1bjakxyZMRPzvB3dbqHk7QWROCxBIKPy0DywJXBsdqjfJkzmykC2+msMOgHM4LtVsfM9MQxl
+	84ryxhshWLanjoTA3WO0H0Dp/uW/SwT0YIuAvmHtbR8tAFvBiGJDY2b+OVZHXm0o76oEJLIq0CoAs
+	/+he+Ilp2Ec791/J+FplcKyVD5aZA2sNlFwty/H/Lihaw8PaE+Zxu40Kl5zkwoRKyRi3uyVWrAWNI
+	Ik3jbSRw==;
+Received: from [178.254.3.181] (helo=nc.pace-systems.de)
+	by ms-10.1blu.de with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <Sebastian.Wolf@pace-systems.de>)
+	id 1vbfSz-005D98-NS;
+	Fri, 02 Jan 2026 14:45:21 +0100
+From: Sebastian Wolf <Sebastian.Wolf@pace-systems.de>
+To: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Matthias Brugger
+ <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, Sebastian Roland Wolf
+ <srw@root533.premium-rootserver.net>
+Subject: Re: [PATCH] net: mediatek: add null pointer check for hardware
+ offloading
+References: <6856f6aa-c6b8-4966-9dd2-9bf0315395c2@linux.dev>
+In-Reply-To: <6856f6aa-c6b8-4966-9dd2-9bf0315395c2@linux.dev>
+Message-ID: <20260102134521.Horde.OJhG83vhDBgeJWzIiPESJP-@nc.pace-systems.de>
+User-Agent: Horde Application Framework 5
+Date: Fri, 02 Jan 2026 13:45:21 +0000
+Content-Type: text/plain; charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1767089672.git.mst@redhat.com> <55e9351282f530e2302e11497c6339c4a2e74471.1767112757.git.mst@redhat.com>
- <CAMRc=MfWX5CZ6GL0ph1g-KupBS3gaztk=VxTnfC1QwUvQmuZrg@mail.gmail.com> <20260102080135-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20260102080135-mutt-send-email-mst@kernel.org>
-From: Bartosz Golaszewski <brgl@kernel.org>
-Date: Fri, 2 Jan 2026 14:27:50 +0100
-X-Gmail-Original-Message-ID: <CAMRc=MdWWQihgt8haFYxSh7MgUoBuf3ZkBA6cbErSVNmAtb8Mw@mail.gmail.com>
-X-Gm-Features: AQt7F2qkcWsOmteak3UHSQG8tO-rpcwm3KC2_8dv0RlxH64IzhKa8xcVzXSnZm4
-Message-ID: <CAMRc=MdWWQihgt8haFYxSh7MgUoBuf3ZkBA6cbErSVNmAtb8Mw@mail.gmail.com>
-Subject: Re: [PATCH RFC 15/13] gpio: virtio: reorder fields to reduce struct padding
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Olivia Mackall <olivia@selenic.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Marek Szyprowski <m.szyprowski@samsung.com>, 
-	Robin Murphy <robin.murphy@arm.com>, Stefano Garzarella <sgarzare@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Petr Tesarik <ptesarik@suse.com>, Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-scsi@vger.kernel.org, 
-	iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org, 
-	"Enrico Weigelt, metux IT consult" <info@metux.net>, Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linusw@kernel.org>, 
-	linux-gpio@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Con-Id: 282146
+X-Con-U: 0-sebastianwolf
 
-On Fri, Jan 2, 2026 at 2:02=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com> =
-wrote:
+Hi Vadim,
+"Vadim Fedorenko" vadim.fedorenko@linux.dev – 2. Januar 2026 12:20
+> On 31/12/2025 22:52, Sebastian Roland Wolf wrote:
+> > From: Sebastian Roland Wolf <srw@root533.premium-rootserver.net>
+> > 
+> > Add a null pointer check to prevent kernel crashes when hardware
+> > offloading is active on MediaTek devices.
+> > 
+> > In some edge cases, the ethernet pointer or its associated netdev
+> > element can be NULL. Checking these pointers before access is
+> > mandatory to avoid segmentation faults and kernel oops.
+> > 
+> > This improves the robustness of the validation check for mtk_eth
+> > ingress devices introduced in commit 73cfd947dbdb ("net: mediatek:
+> > add support for ingress traffic offloading").
+> > 
+> > Fixes: 73cfd947dbdb ("net: mediatek: add support for ingress traffic offloading")
+> > net: mediatek: Add null pointer check to prevent crashes with active hardware offloading.
+> > 
+> > Signed-off-by: Sebastian Roland Wolf <Sebastian.Wolf@pace-systems.de>
+> > ---
+> > drivers/net/ethernet/mediatek/mtk_ppe_offload.c | 3 ++-
+> > 1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/net/ethernet/mediatek/mtk_ppe_offload.c b/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
+> > index e9bd32741983..6900ac87e1e9 100644
+> > --- a/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
+> > +++ b/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
+> > @@ -270,7 +270,8 @@ mtk_flow_offload_replace(struct mtk_eth *eth, struct flow_cls_offload *f,
+> > flow_rule_match_meta(rule, &match);
+> > if (mtk_is_netsys_v2_or_greater(eth)) {
+> 
+> The code dereferences eth here ...
+> 
+> > idev = __dev_get_by_index(&init_net, match.key->ingress_ifindex);
+> > - if (idev && idev->netdev_ops == eth->netdev[0]->netdev_ops) {
+> > + if (idev && eth && eth->netdev[0] &&
+> 
+> ... but it is checked a couple of lines after.
+> 
+You are right that 'eth' is already dereferenced above, so checking it here is redundant. I will remove the 'eth' check in a V2 of this patch. (As this is first patch ever I hope I do it right)
+> Even more, the function starts with providing rhahstable to lookup
+> cookie. I'm really doubt eth can be NULL.
+> At the same time lack of eth->netdev[0] looks like a design problem,
+> because according to the code there might be up to 3 netdev devices
+> registered for ppe.
+While it might point to a deeper design issue, the check for 'eth->netdev[0]' is necessary to prevent the immediate kernel oops I am seeing. Forcing this check prevents the crash, which is the lesser evil compared to a complete system failure, even if hardware offloading might not function correctly in that specific state.
+> 
+> I'm not familiar with the code, but it would be better to have a splat
+> of crash to check what was exactly missing, and drgn can help you find
+> if there were other netdevs available at the moment of crash.
+Unfortunately, I am not a regular kernel developer and have no experience with drgn. Furthermore, I am testing this on a production device which limits my ability to perform deep interactive debugging or long-term crash analysis.
+> 
+> > + idev->netdev_ops == eth->netdev[0]->netdev_ops) {
+> > struct mtk_mac *mac = netdev_priv(idev);
+> > 
+> > if (WARN_ON(mac->ppe_idx >= eth->soc->ppe_num))
+> 
 >
-> On Fri, Jan 02, 2026 at 12:47:04PM +0000, Bartosz Golaszewski wrote:
-> > On Tue, 30 Dec 2025 17:40:33 +0100, "Michael S. Tsirkin" <mst@redhat.co=
-m> said:
-> > > Reorder struct virtio_gpio_line fields to place the DMA buffers (req/=
-res)
-> > > last. This eliminates the need for __dma_from_device_aligned_end padd=
-ing
-> > > after the DMA buffer, since struct tail padding naturally protects it=
-,
-> > > making the struct a bit smaller.
-> > >
-> > > Size reduction estimation when ARCH_DMA_MINALIGN=3D128:
-> > > - request is 8 bytes
-> > > - response is 2 bytes
-> > > - removing _end saves up to 128-6=3D122 bytes padding to align rxlen =
-field
-> > >
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > ---
-> > >  drivers/gpio/gpio-virtio.c | 5 ++---
-> > >  1 file changed, 2 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/drivers/gpio/gpio-virtio.c b/drivers/gpio/gpio-virtio.c
-> > > index 32b578b46df8..8b30a94e4625 100644
-> > > --- a/drivers/gpio/gpio-virtio.c
-> > > +++ b/drivers/gpio/gpio-virtio.c
-> > > @@ -26,12 +26,11 @@ struct virtio_gpio_line {
-> > >     struct mutex lock; /* Protects line operation */
-> > >     struct completion completion;
-> > >
-> > > +   unsigned int rxlen;
-> > > +
-> > >     __dma_from_device_aligned_begin
-> > >     struct virtio_gpio_request req;
-> > >     struct virtio_gpio_response res;
-> > > -
-> > > -   __dma_from_device_aligned_end
-> > > -   unsigned int rxlen;
-> > >  };
-> > >
-> > >  struct vgpio_irq_line {
-> > > --
-> > > MST
-> > >
-> > >
-> >
-> > Acked-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
->
-> Thanks! There's a new API as suggested by Petr so these patches got chang=
-ed,
-> but the same idea. Do you want me to carry your ack or you prefer to
-> re-review?
->
-> --
-> MST
->
-
-I'll take a second look. Can you Cc me on all the key patches - like
-the ones introducing new APIs? I needed to grab it from lore this
-time.
-
-Bart
+I will send a V2 shortly, focusing on the 'eth->netdev[0]' check while removing the redundant 'eth' check.
+Best regards,
+Sebastian
 
