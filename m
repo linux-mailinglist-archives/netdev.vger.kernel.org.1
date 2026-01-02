@@ -1,70 +1,62 @@
-Return-Path: <netdev+bounces-246615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09D62CEF3F1
-	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 20:51:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DDF4CEF472
+	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 21:11:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CBFF6300CB84
-	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 19:51:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AC33F301FF46
+	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 20:11:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC7AC2D2490;
-	Fri,  2 Jan 2026 19:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 218AD31961F;
+	Fri,  2 Jan 2026 20:04:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hAb1q+jE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LatBHsvD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840432D0606;
-	Fri,  2 Jan 2026 19:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E588F319614;
+	Fri,  2 Jan 2026 20:04:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767383498; cv=none; b=IEaOSHaq9SDp1aCtAYKX2kw8HoYSy+OhfxbFBWfV9GVdTGUbVgg0RyoFzvF7/AvcRUr7UNH7lAU/ECOHZiA4LVMPxRaSCaIfaiog0Oq3kp8ImIQggJi/0iRbR+Y2Q5sywQd2jhRcCpNDxgNYhB0cs9xQ+QlMpVxbKsGcYSeUwAc=
+	t=1767384247; cv=none; b=NEQ1RAg4gJkxG0jOoshQ9lBtPUZDyqTQCT3BTbx7bxaY+iSlNSwre2cSvc40mwu9tDrLECjSS/8IboskKqNe0ZsQNHue1GxP9DQCBlp1OnaguWcAthIXux8Qp0EKhWvhf4maPtwAk0pgTYmIvjILm+7+RY+R2kTIQ/S6ix2+qhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767383498; c=relaxed/simple;
-	bh=XO8nfIIMIOeyft3TWTJEGlqdi7kY1s5i+DL11uhX8Lg=;
+	s=arc-20240116; t=1767384247; c=relaxed/simple;
+	bh=2vq9xeh/ZjwJCXeCtC2pq+VOjFi6w5FQElmEF3VFqI4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GkopBgYFYmNXWAFb765x+HEcloc7D+y2G2JzlDik3tcoSZd5aqtYdzC4OnPi/ysxTHivT/z0Op0KLA2E1nGvr7pC2D095Q/MnY6cWnlSGM47pJPWXyZoNkEh5w3nrDZCj+OWqjc9o2LLEA5mvbpMND4zJeN94yMgDVM3zmCVeqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hAb1q+jE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66F3DC116B1;
-	Fri,  2 Jan 2026 19:51:37 +0000 (UTC)
+	 MIME-Version:Content-Type; b=CxYKCpWtT0yVNSWvL9p8656Gt0UzNMS0iLBJd2x0fsBuBf4At7KC4s2KAqkEDjTeA5nDXwH4nmg8D7pMxlAEE7qqVPtHK3ucWYudgZ5pO/I2Dh+PASrLnfWqFdGWCwQ7hnhcdYpFv+IQXiaBOZ81GwHF/ZPGaR5tzV07o9echGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LatBHsvD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D356C116B1;
+	Fri,  2 Jan 2026 20:04:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767383497;
-	bh=XO8nfIIMIOeyft3TWTJEGlqdi7kY1s5i+DL11uhX8Lg=;
+	s=k20201202; t=1767384246;
+	bh=2vq9xeh/ZjwJCXeCtC2pq+VOjFi6w5FQElmEF3VFqI4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hAb1q+jE2b+lEiRJ0WK++1HFWc9dkYEVpwFVUs5HTGYm+VObcrxcUeCK19rVjKZKB
-	 Kwitk7mty4sBFjnRZitUAjGJm4U4/0ri0jh4IA+vklCZkAMAcMCZ+qwXQtHT1BKK4g
-	 dh3ppOKFCWGNtsyh5GwrS2nnctkKo+uoIMOaDBULIzxFeBHr8yQ2xt3D6oOwCn/stY
-	 yji561vHe7LEdb7HBULKlbxkV6KjoXvF5xA0xNS1GiNEPkJ2Qm0MLOGd25qErhhGVn
-	 rlH2UD+yYuGtjEeMzWELfQgtYtHZohw/VMlm6WWti8OHs4Bknd4gaE/xAtQPgCatRD
-	 AZ23rmbgVI21g==
-Date: Fri, 2 Jan 2026 11:51:36 -0800
+	b=LatBHsvD91n9PNyXgiGK0woU+gfEz/RmcTMpAH63pH2HJ45jAmGWuxu0/CWc6nRyi
+	 d5iMxlym4KCsdn7VB+gsCe6IlDZfYidTTJkIFws+m+X8TDdooFeYDU46F2mQTLq16I
+	 D7dz7PAfigSVVC0otmNZFVr8AXNNcKNnk4dle1D13AEqFGsSgxqNJpalYuDQ7tEsB0
+	 +Ej+i+szISTz0FYqKX3mQvRdi26UPAQv00iyWhyOIE67wYMNE2BCEbKZAefNsfEifk
+	 v4M3YBamRKzulRg+iPuvjzlCQdXEyfoMvPPEJZUc36e4U6wxwUnfRyS0SbUo950kQj
+	 CEwhk5RS94Fzw==
+Date: Fri, 2 Jan 2026 12:04:05 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Wen Gu <guwen@linux.alibaba.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Richard Cochran
- <richardcochran@gmail.com>, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, xuanzhuo@linux.alibaba.com,
- dust.li@linux.alibaba.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 1/2] ptp: introduce Alibaba CIPU PHC driver
-Message-ID: <20260102115136.239806fa@kernel.org>
-In-Reply-To: <957500e7-5753-488d-872d-4dbbdcac0bb2@linux.alibaba.com>
-References: <20251030121314.56729-1-guwen@linux.alibaba.com>
-	<20251030121314.56729-2-guwen@linux.alibaba.com>
-	<20251031165820.70353b68@kernel.org>
-	<8a74f801-1de5-4a1d-adc7-66a91221485d@linux.alibaba.com>
-	<20251105162429.37127978@kernel.org>
-	<34b30157-6d67-46ec-abde-da9087fbf318@linux.alibaba.com>
-	<20251127083610.6b66a728@kernel.org>
-	<f2afb292-287e-4f2f-b131-50a1650bbb1d@linux.alibaba.com>
-	<20251128102437.7657f88f@kernel.org>
-	<9a75e3b2-4d1c-4911-81e4-cab988c24b77@linux.alibaba.com>
-	<c92b47cf-3da0-446d-8b8f-674830256143@linux.alibaba.com>
-	<20251213075028.2f570f23@kernel.org>
-	<fb01b35d-55a8-4313-ad14-b529b63c9e04@linux.alibaba.com>
-	<20251216135848.174e010f@kernel.org>
-	<957500e7-5753-488d-872d-4dbbdcac0bb2@linux.alibaba.com>
+To: Prithvi <activprithvi@gmail.com>
+Cc: andrii@kernel.org, socketcan@hartkopp.net, mkl@pengutronix.de,
+ linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com, netdev@vger.kernel.org
+Subject: Re: [bpf, xdp] headroom - was: Re: Question about to KMSAN:
+ uninit-value in can_receive
+Message-ID: <20260102120405.34613b68@kernel.org>
+In-Reply-To: <20260102153611.63wipdy2meh3ovel@inspiron>
+References: <20251117173012.230731-1-activprithvi@gmail.com>
+	<0c98b1c4-3975-4bf5-9049-9d7f10d22a6d@hartkopp.net>
+	<c2cead0a-06ed-4da4-a4e4-8498908aae3e@hartkopp.net>
+	<aSx++4VrGOm8zHDb@inspiron>
+	<d6077d36-93ed-4a6d-9eed-42b1b22cdffb@hartkopp.net>
+	<20251220173338.w7n3n4lkvxwaq6ae@inspiron>
+	<01190c40-d348-4521-a2ab-3e9139cc832e@hartkopp.net>
+	<20260102153611.63wipdy2meh3ovel@inspiron>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,20 +66,25 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 22 Dec 2025 15:18:19 +0800 Wen Gu wrote:
-> The same applies to ptp_cipu, since it is already used and relies on
-> exposing /dev/ptpX.
+On Fri, 2 Jan 2026 21:06:11 +0530 Prithvi wrote:
+> Just a gentle ping on this thread 
 
-IIUC you mean that the driver is already used downstream and abandoning
-PTP will break the OOT users? This is a non-argument upstream.
+You're asking the wrong person, IIUC Andrii is tangentially involved
+in XDP (via bpf links?):
 
-> Given the historical baggage, it seems better to keep using the
-> existing ptp framework, but separate these pure phc drivers into a
-> new subsystem with a dedicated directory (e.g. drivers/phc/) and a
-> MAINTAINERS entry, moving them out of the netdev maintenance scope.
-> This should also address the concern that these pure phc drivers are
-> not a good fit to be maintained under the networking subsystem.
+XDP (eXpress Data Path)
+M:	Alexei Starovoitov <ast@kernel.org>
+M:	Daniel Borkmann <daniel@iogearbox.net>
+M:	David S. Miller <davem@davemloft.net>
+M:	Jakub Kicinski <kuba@kernel.org>
+M:	Jesper Dangaard Brouer <hawk@kernel.org>
+M:	John Fastabend <john.fastabend@gmail.com>
+R:	Stanislav Fomichev <sdf@fomichev.me>
+L:	netdev@vger.kernel.org
+L:	bpf@vger.kernel.org
 
-I'd rather you left PTP completely alone with your funny read only
-clocks. Please and thank you.
+Without looking too deeply - XDP has historically left the new space
+uninitialized after push, expecting programs to immediately write the
+headers in that space. syzbot had run into this in the past but I can't
+find any references to past threads quickly :(
 
