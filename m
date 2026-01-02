@@ -1,250 +1,78 @@
-Return-Path: <netdev+bounces-246623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B999CEF5C4
-	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 22:38:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07F3ECEF66C
+	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 23:04:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 83AAC3015AB7
-	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 21:37:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7DB45303801A
+	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 22:03:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E6E52BDC23;
-	Fri,  2 Jan 2026 21:37:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 561642D839D;
+	Fri,  2 Jan 2026 22:03:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="VD6euAVD"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Iy9v9Hq4"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01E02245019;
-	Fri,  2 Jan 2026 21:37:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3C22882AF;
+	Fri,  2 Jan 2026 22:03:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767389876; cv=none; b=rahbsd2tmqFPjoEN1JFNZTww0RUgl3arHISaGU1YyWFqXy15hsR5hBqdNfG7+xonh7J+nLrg0lRxxSa2b+ccy1cgoDc5cNA8mVgVJbT+q67ZFJzeftW85M6wgUoKjntGOhA3uuqEhSRgAWHif1/K4Hz9FDYRvUjIS9NjFiTYhtc=
+	t=1767391392; cv=none; b=Kacvs74kD2Irt0wIUuGqeh4TnFt23eLqPwh0TxByKxFe/da9kpOPUJ/smywJE8UUa7gaeVyvTXPS9AaNMJO8xSjW4R+zuGqrl26kkB/NJwZn6IQ8buzIS0vtIAYmL16hbuMAqV4GyXVdOfh0CObCkPFBWHhVeXN6uCZ0bLoUaWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767389876; c=relaxed/simple;
-	bh=+FD0V0EJPERUoQUgBeN2NkS/rAttv8C1gPYbZv1vKJk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=MeCAttjNn848AbnLGB6o5wcABVlSp/GHPYUBXoybVIQJ9d6RrqWmwgpwirT+cA+GiiVD12i8LFy57VgDTURWSFQQwQEcKsefPmN+gxlFSrtRskEIAvwvaqxefBRuLO0/c5VygP2nTWs1NqJ6V1frVtkJde2gZlAAR7ykD3mvonI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=VD6euAVD; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1006)
-	id AEE612125362; Fri,  2 Jan 2026 13:37:54 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com AEE612125362
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1767389874;
-	bh=MMYlzxb9LGt6lSZq2UX+9M01F33aytJB+tqipZTzYWw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VD6euAVDltdlhWYYQBE37cfRYq10mFNcOidREy2spa8weLOt30lDPxAYLzoDa66HU
-	 arZ1qzqVRe74/ODZLuxY6lB/s71pHP/Ob7nMVKqdd9WSaba16iHGvQWUhmc/zxFmeM
-	 oyMy0PQ2pkgnhcHMduUGvosSJu7EbPIAnL7qHLjY=
-From: Haiyang Zhang <haiyangz@linux.microsoft.com>
-To: linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Long Li <longli@microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Simon Horman <horms@kernel.org>,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	Saurabh Sengar <ssengar@linux.microsoft.com>,
-	Aditya Garg <gargaditya@linux.microsoft.com>,
-	Dipayaan Roy <dipayanroy@linux.microsoft.com>,
-	Shiraz Saleem <shirazsaleem@microsoft.com>,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: paulros@microsoft.com
-Subject: [PATCH net-next, 2/2] net: mana: Add ethtool counters for RX CQEs in coalesced type
-Date: Fri,  2 Jan 2026 13:35:58 -0800
-Message-Id: <1767389759-3460-3-git-send-email-haiyangz@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1767389759-3460-1-git-send-email-haiyangz@linux.microsoft.com>
-References: <1767389759-3460-1-git-send-email-haiyangz@linux.microsoft.com>
+	s=arc-20240116; t=1767391392; c=relaxed/simple;
+	bh=JuO1ZynaO2BBF1wfF7nO/buaGvl9DLsg6Gd55hvq7io=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rqVAN8d8J3UtXVMcX0m1LCd8eDMiCHMBBg8/YEsVEHUsHNhcGQNJSq6IMJ8afvFvjstbz0Dwu1UNbXN5NFl7hVGL4dh01ohKOE+9PHwPtzJK9b/dHsJoYreqsvn8eY4mdcaYJ3qNXn5BVa9xfG3Q00x9g7VdUA9cY+N99MbY594=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Iy9v9Hq4; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=YbSUuZNunQGW5DP0yW6H2zamWsE+O1PJd6nM6xlwcm0=; b=Iy9v9Hq4WrRioNK+3BWhrtZcck
+	K6li7BFlUXX1G3WCkq2TTumfTc30g3h+eO7EJEFWwQ2O5g3LcC4FJkMMw25HwlWYZ/jrfdygN6Tps
+	Jc5uzPJoNeyBnLSbtD03se+3S1z/GYDw7cAQoCOXf9EjDgKXVisINqg4LPO4bvU6a00g=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vbnET-001DoV-De; Fri, 02 Jan 2026 23:02:53 +0100
+Date: Fri, 2 Jan 2026 23:02:53 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Petko Manolov <petko.manolov@konsulko.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net,
+	netdev@vger.kernel.org, kuba@kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] net: usb: pegasus: fix memory leak on usb_submit_urb()
+ failure
+Message-ID: <38d73c63-7521-41ad-8d4d-03d5ba2288df@lunn.ch>
+References: <20251216184113.197439-1-petko.manolov@konsulko.com>
+ <b3d2a2fa-35cb-48ad-ad2e-de997e9b2395@redhat.com>
+ <20260102121011.GA25015@carbon.k.g>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260102121011.GA25015@carbon.k.g>
 
-From: Haiyang Zhang <haiyangz@microsoft.com>
+> Sure, will do.  However, my v2 patch makes use of __free() cleanup
+> functionality, which in turn only applies back to v6.6 stable kernels.
 
-For RX CQEs with type CQE_RX_COALESCED_4, to measure the coalescing
-efficiency, add counters to count how many contains 2, 3, 4 packets
-respectively.
-Also, add a counter for the error case of first packet with length == 0.
+I would suggest not using the magical __free() cleanup.
 
-Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
----
- drivers/net/ethernet/microsoft/mana/mana_en.c | 25 +++++++++++++++++--
- .../ethernet/microsoft/mana/mana_ethtool.c    | 17 ++++++++++---
- include/net/mana/mana.h                       | 10 +++++---
- 3 files changed, 42 insertions(+), 10 deletions(-)
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#using-device-managed-and-cleanup-h-constructs
 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index a46a1adf83bc..78824567d80b 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -2083,8 +2083,22 @@ static void mana_process_rx_cqe(struct mana_rxq *rxq, struct mana_cq *cq,
- 
- nextpkt:
- 	pktlen = oob->ppi[i].pkt_len;
--	if (pktlen == 0)
-+	if (pktlen == 0) {
-+		/* Collect coalesced CQE count based on packets processed.
-+		 * Coalesced CQEs have at least 2 packets, so index is i - 2.
-+		 */
-+		if (i > 1) {
-+			u64_stats_update_begin(&rxq->stats.syncp);
-+			rxq->stats.coalesced_cqe[i - 2]++;
-+			u64_stats_update_end(&rxq->stats.syncp);
-+		} else if (i == 0) {
-+			/* Error case stat */
-+			u64_stats_update_begin(&rxq->stats.syncp);
-+			rxq->stats.pkt_len0_err++;
-+			u64_stats_update_end(&rxq->stats.syncp);
-+		}
- 		return;
-+	}
- 
- 	curr = rxq->buf_index;
- 	rxbuf_oob = &rxq->rx_oobs[curr];
-@@ -2102,8 +2116,15 @@ static void mana_process_rx_cqe(struct mana_rxq *rxq, struct mana_cq *cq,
- 
- 	mana_post_pkt_rxq(rxq);
- 
--	if (coalesced && (++i < MANA_RXCOMP_OOB_NUM_PPI))
-+	if (!coalesced)
-+		return;
-+
-+	if (++i < MANA_RXCOMP_OOB_NUM_PPI)
- 		goto nextpkt;
-+
-+	u64_stats_update_begin(&rxq->stats.syncp);
-+	rxq->stats.coalesced_cqe[MANA_RXCOMP_OOB_NUM_PPI - 2]++;
-+	u64_stats_update_end(&rxq->stats.syncp);
- }
- 
- static void mana_poll_rx_cq(struct mana_cq *cq)
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-index 1b9ed5c9bbff..773f50b1a4f4 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-@@ -20,8 +20,6 @@ static const struct mana_stats_desc mana_eth_stats[] = {
- 					tx_cqe_unknown_type)},
- 	{"tx_linear_pkt_cnt", offsetof(struct mana_ethtool_stats,
- 				       tx_linear_pkt_cnt)},
--	{"rx_coalesced_err", offsetof(struct mana_ethtool_stats,
--					rx_coalesced_err)},
- 	{"rx_cqe_unknown_type", offsetof(struct mana_ethtool_stats,
- 					rx_cqe_unknown_type)},
- };
-@@ -151,7 +149,7 @@ static void mana_get_strings(struct net_device *ndev, u32 stringset, u8 *data)
- {
- 	struct mana_port_context *apc = netdev_priv(ndev);
- 	unsigned int num_queues = apc->num_queues;
--	int i;
-+	int i, j;
- 
- 	if (stringset != ETH_SS_STATS)
- 		return;
-@@ -170,6 +168,9 @@ static void mana_get_strings(struct net_device *ndev, u32 stringset, u8 *data)
- 		ethtool_sprintf(&data, "rx_%d_xdp_drop", i);
- 		ethtool_sprintf(&data, "rx_%d_xdp_tx", i);
- 		ethtool_sprintf(&data, "rx_%d_xdp_redirect", i);
-+		ethtool_sprintf(&data, "rx_%d_pkt_len0_err", i);
-+		for (j = 0; j < MANA_RXCOMP_OOB_NUM_PPI - 1; j++)
-+			ethtool_sprintf(&data, "rx_%d_coalesced_cqe_%d", i, j + 2);
- 	}
- 
- 	for (i = 0; i < num_queues; i++) {
-@@ -203,6 +204,8 @@ static void mana_get_ethtool_stats(struct net_device *ndev,
- 	u64 xdp_xmit;
- 	u64 xdp_drop;
- 	u64 xdp_tx;
-+	u64 pkt_len0_err;
-+	u64 coalesced_cqe[MANA_RXCOMP_OOB_NUM_PPI - 1];
- 	u64 tso_packets;
- 	u64 tso_bytes;
- 	u64 tso_inner_packets;
-@@ -211,7 +214,7 @@ static void mana_get_ethtool_stats(struct net_device *ndev,
- 	u64 short_pkt_fmt;
- 	u64 csum_partial;
- 	u64 mana_map_err;
--	int q, i = 0;
-+	int q, i = 0, j;
- 
- 	if (!apc->port_is_up)
- 		return;
-@@ -241,6 +244,9 @@ static void mana_get_ethtool_stats(struct net_device *ndev,
- 			xdp_drop = rx_stats->xdp_drop;
- 			xdp_tx = rx_stats->xdp_tx;
- 			xdp_redirect = rx_stats->xdp_redirect;
-+			pkt_len0_err = rx_stats->pkt_len0_err;
-+			for (j = 0; j < MANA_RXCOMP_OOB_NUM_PPI - 1; j++)
-+				coalesced_cqe[j] = rx_stats->coalesced_cqe[j];
- 		} while (u64_stats_fetch_retry(&rx_stats->syncp, start));
- 
- 		data[i++] = packets;
-@@ -248,6 +254,9 @@ static void mana_get_ethtool_stats(struct net_device *ndev,
- 		data[i++] = xdp_drop;
- 		data[i++] = xdp_tx;
- 		data[i++] = xdp_redirect;
-+		data[i++] = pkt_len0_err;
-+		for (j = 0; j < MANA_RXCOMP_OOB_NUM_PPI - 1; j++)
-+			data[i++] = coalesced_cqe[j];
- 	}
- 
- 	for (q = 0; q < num_queues; q++) {
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index 51d26ebeff6c..f8dd19860103 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -61,8 +61,11 @@ enum TRI_STATE {
- 
- #define MAX_PORTS_IN_MANA_DEV 256
- 
-+/* Maximum number of packets per coalesced CQE */
-+#define MANA_RXCOMP_OOB_NUM_PPI 4
-+
- /* Update this count whenever the respective structures are changed */
--#define MANA_STATS_RX_COUNT 5
-+#define MANA_STATS_RX_COUNT (6 + MANA_RXCOMP_OOB_NUM_PPI - 1)
- #define MANA_STATS_TX_COUNT 11
- 
- #define MANA_RX_FRAG_ALIGNMENT 64
-@@ -73,6 +76,8 @@ struct mana_stats_rx {
- 	u64 xdp_drop;
- 	u64 xdp_tx;
- 	u64 xdp_redirect;
-+	u64 pkt_len0_err;
-+	u64 coalesced_cqe[MANA_RXCOMP_OOB_NUM_PPI - 1];
- 	struct u64_stats_sync syncp;
- };
- 
-@@ -227,8 +232,6 @@ struct mana_rxcomp_perpkt_info {
- 	u32 pkt_hash;
- }; /* HW DATA */
- 
--#define MANA_RXCOMP_OOB_NUM_PPI 4
--
- /* Receive completion OOB */
- struct mana_rxcomp_oob {
- 	struct mana_cqe_header cqe_hdr;
-@@ -378,7 +381,6 @@ struct mana_ethtool_stats {
- 	u64 tx_cqe_err;
- 	u64 tx_cqe_unknown_type;
- 	u64 tx_linear_pkt_cnt;
--	u64 rx_coalesced_err;
- 	u64 rx_cqe_unknown_type;
- };
- 
--- 
-2.34.1
+    Low level cleanup constructs (such as __free()) can be used when
+    building APIs and helpers, especially scoped iterators. However,
+    direct use of __free() within networking core and drivers is
+    discouraged. Similar guidance applies to declaring variables
+    mid-function.
 
+    Andrew
 
