@@ -1,155 +1,139 @@
-Return-Path: <netdev+bounces-246586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C62B9CEEB39
-	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 14:54:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EF1DCEEB45
+	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 14:55:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C113A300091B
-	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 13:54:39 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6E01F3000B42
+	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 13:55:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ECE73126C3;
-	Fri,  2 Jan 2026 13:54:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 386083126BC;
+	Fri,  2 Jan 2026 13:55:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TjSVEr+l"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="g0/KqriM"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89847310630
-	for <netdev@vger.kernel.org>; Fri,  2 Jan 2026 13:54:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E302E62A8;
+	Fri,  2 Jan 2026 13:55:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767362078; cv=none; b=L0ay+h4iWolELLdk1jvPr7cgPFNskpD4CnU6sTnAsmxMmuG5pl6mg997R//smMS46jx8Z4TDfzfyAQaTGQhlidJtYlbTpyvTJD4t/UJN0at22Um7jec9C4yI7NqkebkQQ6gbdyk3oItkO0qLNZ1xTyndwHvVV91OItv4vwxq4ks=
+	t=1767362152; cv=none; b=n72RK6ERIrIx37G/0VanRtiGFyrThH3a7AiwQvIc2QshY8w17kAlUvgOIGyMqGJbsyQhIQ/RzVr1wA7XbbblfrSQiml+tyN1P1AjUE1BSa5rT71FdkbtyRQNI+pnL6N6bAaTvTpHhnLngvB+kknzEzd6TdjqN3eFN/5o6Emacrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767362078; c=relaxed/simple;
-	bh=sfgzLw6T/MQzpo/xhzZ+DWJl9w43rzPkLh3LYn4joxo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J+hhv74wFK2fuJOVNBBS7WyHN3ASBDzoXI0JpGrlc+WNKsZjw9dgKSoP4ALTxdF7xDg+GAZdBdqQEzd4jZ0aGEWVMC2WNEW6ES2catjkfrtu0yaDJtGFBkA+utsQe6sM+cAh76nfPSaGqh3E1tVxoKNEIZB/Gy+wOf2ndhQBftM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TjSVEr+l; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3461bd2d-2ee6-4592-9069-2c7a4b8a0b4b@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767362072;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Um8VhsKFWm3QgNgqCqwn+UbLKJeOFTEy1s5gZCC82xA=;
-	b=TjSVEr+laVrs4xS/ZqgUOcA+M6r50cnGYXq/pLXedv0hKsxXhLP/9dC7+acKKQu+Kxwqbw
-	jMx+EhlXsi/avIYKJqF/lwhjlho0VnydlCLuMd3mCW/09UwmBm/P2Xp2PJBRdtVUvrCLoS
-	/xvUfChlTlN/C7PjLD7ekSEGQzSmDUw=
-Date: Fri, 2 Jan 2026 21:54:16 +0800
+	s=arc-20240116; t=1767362152; c=relaxed/simple;
+	bh=+PPX2QYeqcyNz/7lFT9g242GDVChRlFtN2xR2XoWCck=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cmsgt5DZ72lBabKvZe5aV1P3nUe8qEm0Wwcyay2YoBYDwhuK+IScFJKwnEaJQSTZ54IxZqMcqfgGk0Y6Q+UHG29PGOuZ51YS03/ML7dnQ9CsHrZqXQsAnz+vDOZOWlegs7OcP5JoqXQMioPEmsi0UdQ4cYGevLpmV0Jth9Z0c+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=g0/KqriM; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=8py2WJDoyq/KnDzBegVDn8YyDVEJRrfxPuzzHEASs9o=; b=g0/KqriMA+s1PIZL0dtuML3Aob
+	wnq5xosgbYY8Y8ChPZz8CNvd3D+RGL4qrIQ+QVKvW+5zgjKs1j9Y2ZvOJt/mY2wj/0xMmiPpb3QXK
+	AQy2CMo42Vltuli6obsd5V9AlkQB8RQQNVwk7POYHehmZXl4fczYzr5RVFd2mQNBoVedPKpJsSkOz
+	RPkWtF8nTPg+V0dFTdDa7MEHZK4yusmNS4kyk0Jrmx/sWOeI+kzufrhbMNXt3G/hck6hIpihpPIRT
+	PUiggqKeY6I5SlYYa5YfmCYavLeZC5WPtQe4Fg4YxMbIQ9HD/T22J0zv/2HIqP1IY2CJ97qpVltLs
+	kzIxkw9A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34010)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vbfd0-0000000063I-1uFW;
+	Fri, 02 Jan 2026 13:55:42 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vbfcx-0000000055x-3TvW;
+	Fri, 02 Jan 2026 13:55:39 +0000
+Date: Fri, 2 Jan 2026 13:55:39 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Josua Mayer <josua@solid-run.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next v2 1/2] net: phy: marvell: 88e1111: define
+ gigabit features
+Message-ID: <aVfOW3y0LTcwQncB@shell.armlinux.org.uk>
+References: <20260101-cisco-1g-sfp-phy-features-v2-0-47781d9e7747@solid-run.com>
+ <20260101-cisco-1g-sfp-phy-features-v2-1-47781d9e7747@solid-run.com>
+ <aVe-SlqC0DfGS6O5@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v3] page_pool: Add page_pool_release_stalled
- tracepoint
-To: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org
-Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- kerneljasonxing@gmail.com, lance.yang@linux.dev, jiayuan.chen@linux.dev,
- linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- Leon Huang Fu <leon.huangfu@shopee.com>, Dragos Tatulea
- <dtatulea@nvidia.com>, kernel-team <kernel-team@cloudflare.com>,
- Yan Zhai <yan@cloudflare.com>
-References: <20260102071745.291969-1-leon.hwang@linux.dev>
- <011ca15e-107b-4679-8203-f5f821f27900@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Leon Hwang <leon.hwang@linux.dev>
-In-Reply-To: <011ca15e-107b-4679-8203-f5f821f27900@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <aVe-SlqC0DfGS6O5@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-
-
-On 2026/1/2 19:43, Jesper Dangaard Brouer wrote:
+On Fri, Jan 02, 2026 at 12:47:06PM +0000, Russell King (Oracle) wrote:
+> I do have patches that add phydev->supported_interfaces which are
+> populated at probe time to inform phylink which host interface modes
+> that the PHY can be reconfigured between - and this overrides the
+> linkmode-derivation of that information - it basically becomes:
 > 
+>         phy_interface_and(interfaces, phy->supported_interfaces,
+>                           pl->config->supported_interfaces);
+>         interface = phylink_choose_sfp_interface(pl, interfaces);
+>         if (interface == PHY_INTERFACE_MODE_NA) {
+>                 phylink_err(pl, "selection of interface for PHY failed\n");
+>                 return -EINVAL;
+>         }
 > 
-> On 02/01/2026 08.17, Leon Hwang wrote:
->> Introduce a new tracepoint to track stalled page pool releases,
->> providing better observability for page pool lifecycle issues.
->>
+>         phylink_dbg(pl, "copper SFP: chosen %s interface\n",
+>                     phy_modes(interface));
 > 
-> In general I like/support adding this tracepoint for "debugability" of
-> page pool lifecycle issues.
+>         ret = phylink_attach_phy(pl, phy, interface);
 > 
-> For "observability" @Kuba added a netlink scheme[1][2] for page_pool[3],
-> which gives us the ability to get events and list page_pools from
-> userspace.
-> I've not used this myself (yet) so I need input from others if this is
-> something that others have been using for page pool lifecycle issues?
+> and phylink_attach_phy() will result in the PHY driver's config_init
+> being called, configuring the appropriate operating mode for the
+> PHY, which can then be used to update phydev->supported as appropriate.
 > 
-> Need input from @Kuba/others as the "page-pool-get"[4] state that "Only
-> Page Pools associated with a net_device can be listed".  Don't we want
-> the ability to list "invisible" page_pool's to allow debugging issues?
+> phylink will then look at phydev->supported once the above has
+> completed when it will do so in phylink_bringup_phy().
 > 
->  [1] https://docs.kernel.org/userspace-api/netlink/intro-specs.html
->  [2] https://docs.kernel.org/userspace-api/netlink/index.html
->  [3] https://docs.kernel.org/netlink/specs/netdev.html
->  [4] https://docs.kernel.org/netlink/specs/netdev.html#page-pool-get
-> 
-> Looking at the code, I see that NETDEV_CMD_PAGE_POOL_CHANGE_NTF netlink
-> notification is only generated once (in page_pool_destroy) and not when
-> we retry in page_pool_release_retry (like this patch).  In that sense,
-> this patch/tracepoint is catching something more than netlink provides.
-> First I though we could add a netlink notification, but I can imagine
-> cases this could generate too many netlink messages e.g. a netdev with
-> 128 RX queues generating these every second for every RX queue.
-> 
-> Guess, I've talked myself into liking this change, what do other
-> maintainers think?  (e.g. netlink scheme and debugging balance)
-> 
+> Deriving the host side PHY interface mode from the link modes has
+> always been rather sketchy.
 
-Hi Jesper,
+These patches can be found at:
 
-Thanks for the thoughtful review and for sharing the context around the
-existing netlink-based observability.
+http://git.armlinux.org.uk/cgit/linux-arm.git/log/?h=net-queue
 
-I ran into a real-world issue where stalled pages were still referenced
-by dangling TCP sockets. I wrote up the investigation in more detail in
-my blog post “let page inflight” [1] (unfortunately only available in
-Chinese at the moment).
+See:
 
-In practice, the hardest part was identifying *who* was still holding
-references to the inflight pages. With the current tooling, it is very
-difficult to introspect the active users of a page once it becomes stalled.
+net: phylink: use phy interface mode bitmaps for SFP PHYs
+net: phy: add supported_interfaces to Aquantia AQR113C
+net: phy: add supported_interfaces to marvell10g PHYs
+net: phy: add supported_interfaces to marvell PHYs
+net: phy: add supported_interfaces to bcm84881
+net: phy: add supported_interfaces to phylib
 
-If we can expose more information about current page users—such as the
-user type and a user pointer, it becomes much easier to debug these
-issues using BPF-based tools. For example, by tracing
-page_pool_state_hold and page_pool_state_release, tools like bpftrace
-[2] or bpfsnoop [3] (which I implemented) can correlate inflight page
-pointers with their active users. This significantly lowers the barrier
-to diagnosing page pool lifecycle problems.
+The reason I didn't end up pushing them (they're almost six years old)
+is because I decided that the host_interfaces approach wasn't a good
+idea, and dropped those patches. Marek Beh�n took my patches for
+host_interfaces and they were merged in 2022. I had already junked
+the host_interfaces approach.
 
-As you noted, the existing netlink notifications are generated only at
-page_pool_destroy, and not during retries in page_pool_release_retry. In
-that sense, the proposed tracepoint captures a class of issues that
-netlink does not currently cover, and does so without the risk of
-generating excessive userspace events.
+The problem is that we now have two ways that PHY drivers configure
+their interface mode - one where config_init() decides on its own
+based on the host_interfaces supplied to it, and this approach above
+where phylink attempts to choose the interface based on what the
+PHY and host (and datapath) can support. These two approaches are
+mutually incompatible if we get both phylink _and_ the PHY driver
+attempting to do the same thing.
 
-Thanks again for the feedback, and I’m happy to refine the approach
-based on further input from you, Kuba, or other maintainers.
-
-Links:
-[1] https://blog.leonhw.com/post/linux-networking-6-inflight-page/
-[2] https://github.com/bpftrace/bpftrace/
-[3] https://github.com/bpfsnoop/bpfsnoop/
-
-Thanks,
-Leon
-
-[...]
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
