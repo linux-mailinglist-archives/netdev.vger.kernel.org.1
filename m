@@ -1,158 +1,205 @@
-Return-Path: <netdev+bounces-246555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8861ACEE1D5
-	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 11:01:03 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56486CEE278
+	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 11:19:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4BF843006F60
-	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 10:01:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5660C3007CB2
+	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 10:19:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EFD12036E9;
-	Fri,  2 Jan 2026 10:01:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 304182D9792;
+	Fri,  2 Jan 2026 10:19:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RafPRW0X"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Gn52lJeU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E031E573;
-	Fri,  2 Jan 2026 10:01:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3835E215F7D;
+	Fri,  2 Jan 2026 10:19:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767348061; cv=none; b=dr6wbx2NJbrhTXXd9gL/7rfjjN4J8i01AE/y5nVIFDWT9Gn7Cm023Sbc4tVUR0n/mqSawNulEaUiaznSSrKFmypXwpXSMLDEOALKRCzhq4TJ3kQnu+0Bez6OhyNR+eWBUi1KtdDygI7nDOGRGd34/vDOoRZ/mdDWxbMAgdKxkzk=
+	t=1767349174; cv=none; b=qkdPwHohHXMBnP0TmpOq/BXebrSB3WpjHIzCNf+f13JlxPORN2eK2R2KrFdYYMYtKKZZrbPr1mveF6mrH4VJQg9npxk9jpWWG4S04gMRThWcPIOB/1N1DAY66lrwQkmraOa43QIRk84vG4Ff6oCrTPuLFrImSlHTQjBDDLhr+L8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767348061; c=relaxed/simple;
-	bh=uO3alF6Zq3I2FUn3PgzZJqkAM48dsLDrTU0qNG9HkCc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=u7xVsT9Q4nC5yVc7JZUbaWsPV43SfIdqSRrPxDir/P7RFH8Qos4LBL25hqV4gQTf7b6nPChz26Gr9uGlK1wWgdLD0hCDCT7T8JSSn2GOJI+12b41g5dyCt5e2132F+fI7dT8BQeA0FTx3kQbCu86ixqLxt5c0QzoiqD4Gdu1VKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RafPRW0X; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DB06C116B1;
-	Fri,  2 Jan 2026 10:00:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767348060;
-	bh=uO3alF6Zq3I2FUn3PgzZJqkAM48dsLDrTU0qNG9HkCc=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=RafPRW0XsOmn/eAj96G3HfTALrfVO8gFNBYE5dr5U6RwYxWVottC7pnZDci4MAnD4
-	 qdq/g2Gyj8rS/+t8reMou56DNJvMFsRZntTfJROexJSsrCAhs/30cpyj4pLau7TwR+
-	 gtbkfTtJcq7jTxns5KrGc9PGkxVjIFqmHCo1ZyveRtmRoCjE9qTDuhnDiT9esLkC/6
-	 wQ7FbM2naejXDKx4+p/cp/d1hK+DYdx3XVLontugziQwQaI2krJgRLecvaHkPyToWW
-	 hMGCy2xM3rth0M7zAVqmzxbculyQ6Jo2jVo2N3xlkQAEzhjATMK7p+768ZCv/3GDDD
-	 EAY3rALpP+REQ==
-Message-ID: <d7ab53b2-6b26-4e66-8ae1-cb63d98cee88@kernel.org>
-Date: Fri, 2 Jan 2026 11:00:57 +0100
+	s=arc-20240116; t=1767349174; c=relaxed/simple;
+	bh=ajTWQQ+q5aAsOe+jXvHdnyff4T9nCaiiQ2anKx0DmFs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=k7v0WUeL+ROfIR2metmU1kwFZUCxpt7G3DsSsN/4ZwKg7bdAdEr2WvvL4pCR+L9ndbwqx3PRcgIJ/vdFaPXo+F5gi7GM8wPRaSCXmD6llGDdMvC6f/IxoCQiqgt2pBmJY2YFYjH39IMgt3c+G+u5hI+1Q0ESmLu46K8ROsYRABQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Gn52lJeU; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6025sCeK4036863;
+	Fri, 2 Jan 2026 02:19:06 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=5B3HZ7MSyvayqUbr22rW0pc
+	9f+R2/53Dpzl0nElB6T4=; b=Gn52lJeU1wpQwZBWz2mlI6UShLjNwet1MvA/lb6
+	yrOyKYKetAMGmGyHvq5/QfOAZkgIaHRRyzFDH8LiRTdgElgclVgCW1mIqoIoNoBm
+	lJPyzieDN06Af6G1QS2uwfbqpH3DfgFtxNBDx7s3/zv78ibvJJEy80znP5+ZM7i2
+	Hye+9Tv616bEalFqM23YwOmmenhROgxNos5YMBh9OLhtISTLfXSCxy97//pZThd9
+	zPM4kiWqkif3Dhm0TT4SNL5HbJXlSVBg/yJv6hdP54ddXQ26LFxReLAmviw4WSMh
+	RlkIUpD0zaTc2zO5yZip0r7TZNz9MSw15HOO3lYyYKA/tTA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4be89ag9hm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 02 Jan 2026 02:19:06 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Fri, 2 Jan 2026 02:19:19 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Fri, 2 Jan 2026 02:19:19 -0800
+Received: from 5810.marvell.com (unknown [10.29.45.105])
+	by maili.marvell.com (Postfix) with ESMTP id 6A62B3F7059;
+	Fri,  2 Jan 2026 02:19:01 -0800 (PST)
+From: Kommula Shiva Shankar <kshankar@marvell.com>
+To: <netdev@vger.kernel.org>
+CC: <mst@redhat.com>, <jasowang@redhat.com>, <xuanzhuo@linux.alibaba.com>,
+        <eperezma@redhat.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <virtualization@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+        <jerinj@marvell.com>, <ndabilpuram@marvell.com>, <schalla@marvell.com>
+Subject: [PATCH net] virtio_net: fix device mismatch in devm_kzalloc/devm_kfree
+Date: Fri, 2 Jan 2026 15:49:00 +0530
+Message-ID: <20260102101900.692770-1-kshankar@marvell.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [wireless?] WARNING in rfkill_unregister
-To: Johannes Berg <johannes@sipsolutions.net>,
- syzbot <syzbot+16210d09509730207241@syzkaller.appspotmail.com>,
- linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-References: <6955cbd5.050a0220.a1b6.032d.GAE@google.com>
- <e062f6a0a7583ca99ab0449481119634f8b02a3d.camel@sipsolutions.net>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
- cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
- JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
- gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
- J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
- NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
- BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
- vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
- Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
- TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
- S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
- FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJoF1BKBQkWlnSaAAoJEBuTQ307
- QWKbHukP/3t4tRp/bvDnxJfmNdNVn0gv9ep3L39IntPalBFwRKytqeQkzAju0whYWg+R/rwp
- +r2I1Fzwt7+PTjsnMFlh1AZxGDmP5MFkzVsMnfX1lGiXhYSOMP97XL6R1QSXxaWOpGNCDaUl
- ajorB0lJDcC0q3xAdwzRConxYVhlgmTrRiD8oLlSCD5baEAt5Zw17UTNDnDGmZQKR0fqLpWy
- 786Lm5OScb7DjEgcA2PRm17st4UQ1kF0rQHokVaotxRM74PPDB8bCsunlghJl1DRK9s1aSuN
- hL1Pv9VD8b4dFNvCo7b4hfAANPU67W40AaaGZ3UAfmw+1MYyo4QuAZGKzaP2ukbdCD/DYnqi
- tJy88XqWtyb4UQWKNoQqGKzlYXdKsldYqrLHGoMvj1UN9XcRtXHST/IaLn72o7j7/h/Ac5EL
- 8lSUVIG4TYn59NyxxAXa07Wi6zjVL1U11fTnFmE29ALYQEXKBI3KUO1A3p4sQWzU7uRmbuxn
- naUmm8RbpMcOfa9JjlXCLmQ5IP7Rr5tYZUCkZz08LIfF8UMXwH7OOEX87Y++EkAB+pzKZNNd
- hwoXulTAgjSy+OiaLtuCys9VdXLZ3Zy314azaCU3BoWgaMV0eAW/+gprWMXQM1lrlzvwlD/k
- whyy9wGf0AEPpLssLVt9VVxNjo6BIkt6d1pMg6mHsUEVzsFNBFVDXDQBEADNkrQYSREUL4D3
- Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
- MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
- OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
- GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
- 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
- YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
- 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
- BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
- JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
- 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
- YpsFAmgXUF8FCRaWWyoACgkQG5NDfTtBYptO0w//dlXJs5/42hAXKsk+PDg3wyEFb4NpyA1v
- qmx7SfAzk9Hf6lWwU1O6AbqNMbh6PjEwadKUk1m04S7EjdQLsj/MBSgoQtCT3MDmWUUtHZd5
- RYIPnPq3WVB47GtuO6/u375tsxhtf7vt95QSYJwCB+ZUgo4T+FV4hquZ4AsRkbgavtIzQisg
- Dgv76tnEv3YHV8Jn9mi/Bu0FURF+5kpdMfgo1sq6RXNQ//TVf8yFgRtTUdXxW/qHjlYURrm2
- H4kutobVEIxiyu6m05q3e9eZB/TaMMNVORx+1kM3j7f0rwtEYUFzY1ygQfpcMDPl7pRYoJjB
- dSsm0ZuzDaCwaxg2t8hqQJBzJCezTOIkjHUsWAK+tEbU4Z4SnNpCyM3fBqsgYdJxjyC/tWVT
- AQ18NRLtPw7tK1rdcwCl0GFQHwSwk5pDpz1NH40e6lU+NcXSeiqkDDRkHlftKPV/dV+lQXiu
- jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
- zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
- XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <e062f6a0a7583ca99ab0449481119634f8b02a3d.camel@sipsolutions.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: LHT1r8lqNWcei800b7K696E1KRi8T7Hp
+X-Proofpoint-ORIG-GUID: LHT1r8lqNWcei800b7K696E1KRi8T7Hp
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTAyMDA4OSBTYWx0ZWRfX11k+mHdgBJl6
+ v/lOWsVBmSDI0y74vNuCCaloBCVQFsIHWAYBh7gn3pIlSydNYuyBri+Mc3HxzbSCUKD4RXHE4bB
+ aZDl8Uq+q6CbDn+P+gzyHVg9s/mFzyh+5eILthsXgSjkt5sWEdwufyQ0+mrQYj8aGtV0m5XO7QV
+ Wp4YLcQET6OrOknC1hOuV5IRafBJteaIFT+ogW1dP1meRcUyUqUmuvpQYVOvY8BwMOnQZGYvqZt
+ QQcoe6JIxyKYnwvn1YHajL9ONYHyYDTl/BnCAaoihB1tTqihOg+SbZB9yn3HsiZnpvRVzFjR2x7
+ iO017tvhMTYctmnBP6tp9Cl7d/r8pXYqoFbbIckso+2rp5ygflGEC+2OgBiNhouZ18rjdlA5jAn
+ /MPzP96PQvcEr5OLxw+B6AxBl0j4L7cF2fEPRDkRy5K0AfLipHaMKsH27inQCPV75IF2sjCpPRh
+ wWPrMQYT1HQY2sfuDcw==
+X-Authority-Analysis: v=2.4 cv=ZbcQ98VA c=1 sm=1 tr=0 ts=69579b9a cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
+ a=AcOwvBPJr7tEbDvczk0A:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-01_07,2025-12-31_01,2025-10-01_01
 
-On 01/01/2026 13:07, Johannes Berg wrote:
-> Hi,
-> 
->> ------------[ cut here ]------------
->> rtmutex deadlock detected
->> WARNING: kernel/locking/rtmutex.c:1674 at rt_mutex_handle_deadlock+0x21/0xb0 kernel/locking/rtmutex.c:1674, CPU#0: syz.7.2908/15923
->> Modules linked in:
->> CPU: 0 UID: 0 PID: 15923 Comm: syz.7.2908 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
->> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
->> RIP: 0010:rt_mutex_handle_deadlock+0x21/0xb0 kernel/locking/rtmutex.c:1674
->> Code: 90 90 90 90 90 90 90 90 90 41 57 41 56 41 55 41 54 53 83 ff dd 0f 85 86 00 00 00 48 89 f7 e8 a6 39 01 00 48 8d 3d af 7c 0a 04 <67> 48 0f b9 3a 4c 8d 3d 00 00 00 00 65 48 8b 1c 25 08 10 b3 91 4c
->> RSP: 0018:ffffc90004617710 EFLAGS: 00010286
->> RAX: 0000000080000000 RBX: ffffc900046177a0 RCX: 0000000000000000
->> RDX: 0000000000000006 RSI: ffffffff8ce0bbf9 RDI: ffffffff8ede5760
->> RBP: ffffc900046178c0 R08: ffffffff8edb3477 R09: 1ffffffff1db668e
->> R10: dffffc0000000000 R11: fffffbfff1db668f R12: 1ffff920008c2ef0
->> R13: ffffffff8ad3d599 R14: ffffffff8eb910e0 R15: dffffc0000000000
->> FS:  0000000000000000(0000) GS:ffff888126cef000(0000) knlGS:0000000000000000
->> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> CR2: 000056422df5abe0 CR3: 000000005929c000 CR4: 00000000003526f0
->> Call Trace:
->>  <TASK>
->>  __rt_mutex_slowlock kernel/locking/rtmutex.c:1734 [inline]
->>  __rt_mutex_slowlock_locked kernel/locking/rtmutex.c:1760 [inline]
->>  rt_mutex_slowlock+0x666/0x6b0 kernel/locking/rtmutex.c:1800
->>  __rt_mutex_lock kernel/locking/rtmutex.c:1815 [inline]
->>  __mutex_lock_common kernel/locking/rtmutex_api.c:534 [inline]
->>  mutex_lock_nested+0x16a/0x1d0 kernel/locking/rtmutex_api.c:552
->>  rfkill_unregister+0xd1/0x230 net/rfkill/core.c:1145
->>  nfc_unregister_device+0x96/0x300 net/nfc/core.c:1167
->>  virtual_ncidev_close+0x59/0x90 drivers/nfc/virtual_ncidev.c:172
-> 
-> NFC has been issues with this for *years*. Technically, Krzysztof is
-> listed as a maintainer but I suspect that's mostly dead.
+Initial rss_hdr allocation uses virtio_device->device,
+but virtnet_set_queues() frees using net_device->device.
+This device mismatch causing below devres warning
 
-And I have little time nowadays to do any real maintenance. I am
-thinking that NFC should be marked Odd Fixes.
+[ 3788.514041] ------------[ cut here ]------------
+[ 3788.514044] WARNING: drivers/base/devres.c:1095 at devm_kfree+0x84/0x98, CPU#16: vdpa/1463
+[ 3788.514054] Modules linked in: octep_vdpa virtio_net virtio_vdpa [last unloaded: virtio_vdpa]
+[ 3788.514064] CPU: 16 UID: 0 PID: 1463 Comm: vdpa Tainted: G        W           6.18.0 #10 PREEMPT
+[ 3788.514067] Tainted: [W]=WARN
+[ 3788.514069] Hardware name: Marvell CN106XX board (DT)
+[ 3788.514071] pstate: 63400009 (nZCv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
+[ 3788.514074] pc : devm_kfree+0x84/0x98
+[ 3788.514076] lr : devm_kfree+0x54/0x98
+[ 3788.514079] sp : ffff800084e2f220
+[ 3788.514080] x29: ffff800084e2f220 x28: ffff0003b2366000 x27: 000000000000003f
+[ 3788.514085] x26: 000000000000003f x25: ffff000106f17c10 x24: 0000000000000080
+[ 3788.514089] x23: ffff00045bb8ab08 x22: ffff00045bb8a000 x21: 0000000000000018
+[ 3788.514093] x20: ffff0004355c3080 x19: ffff00045bb8aa00 x18: 0000000000080000
+[ 3788.514098] x17: 0000000000000040 x16: 000000000000001f x15: 000000000007ffff
+[ 3788.514102] x14: 0000000000000488 x13: 0000000000000005 x12: 00000000000fffff
+[ 3788.514106] x11: ffffffffffffffff x10: 0000000000000005 x9 : ffff800080c8c05c
+[ 3788.514110] x8 : ffff800084e2eeb8 x7 : 0000000000000000 x6 : 000000000000003f
+[ 3788.514115] x5 : ffff8000831bafe0 x4 : ffff800080c8b010 x3 : ffff0004355c3080
+[ 3788.514119] x2 : ffff0004355c3080 x1 : 0000000000000000 x0 : 0000000000000000
+[ 3788.514123] Call trace:
+[ 3788.514125]  devm_kfree+0x84/0x98 (P)
+[ 3788.514129]  virtnet_set_queues+0x134/0x2e8 [virtio_net]
+[ 3788.514135]  virtnet_probe+0x9c0/0xe00 [virtio_net]
+[ 3788.514139]  virtio_dev_probe+0x1e0/0x338
+[ 3788.514144]  really_probe+0xc8/0x3a0
+[ 3788.514149]  __driver_probe_device+0x84/0x170
+[ 3788.514152]  driver_probe_device+0x44/0x120
+[ 3788.514155]  __device_attach_driver+0xc4/0x168
+[ 3788.514158]  bus_for_each_drv+0x8c/0xf0
+[ 3788.514161]  __device_attach+0xa4/0x1c0
+[ 3788.514164]  device_initial_probe+0x1c/0x30
+[ 3788.514168]  bus_probe_device+0xb4/0xc0
+[ 3788.514170]  device_add+0x614/0x828
+[ 3788.514173]  register_virtio_device+0x214/0x258
+[ 3788.514175]  virtio_vdpa_probe+0xa0/0x110 [virtio_vdpa]
+[ 3788.514179]  vdpa_dev_probe+0xa8/0xd8
+[ 3788.514183]  really_probe+0xc8/0x3a0
+[ 3788.514186]  __driver_probe_device+0x84/0x170
+[ 3788.514189]  driver_probe_device+0x44/0x120
+[ 3788.514192]  __device_attach_driver+0xc4/0x168
+[ 3788.514195]  bus_for_each_drv+0x8c/0xf0
+[ 3788.514197]  __device_attach+0xa4/0x1c0
+[ 3788.514200]  device_initial_probe+0x1c/0x30
+[ 3788.514203]  bus_probe_device+0xb4/0xc0
+[ 3788.514206]  device_add+0x614/0x828
+[ 3788.514209]  _vdpa_register_device+0x58/0x88
+[ 3788.514211]  octep_vdpa_dev_add+0x104/0x228 [octep_vdpa]
+[ 3788.514215]  vdpa_nl_cmd_dev_add_set_doit+0x2d0/0x3c0
+[ 3788.514218]  genl_family_rcv_msg_doit+0xe4/0x158
+[ 3788.514222]  genl_rcv_msg+0x218/0x298
+[ 3788.514225]  netlink_rcv_skb+0x64/0x138
+[ 3788.514229]  genl_rcv+0x40/0x60
+[ 3788.514233]  netlink_unicast+0x32c/0x3b0
+[ 3788.514237]  netlink_sendmsg+0x170/0x3b8
+[ 3788.514241]  __sys_sendto+0x12c/0x1c0
+[ 3788.514246]  __arm64_sys_sendto+0x30/0x48
+[ 3788.514249]  invoke_syscall.constprop.0+0x58/0xf8
+[ 3788.514255]  do_el0_svc+0x48/0xd0
+[ 3788.514259]  el0_svc+0x48/0x210
+[ 3788.514264]  el0t_64_sync_handler+0xa0/0xe8
+[ 3788.514268]  el0t_64_sync+0x198/0x1a0
+[ 3788.514271] ---[ end trace 0000000000000000 ]---
 
-> 
-> Is there a way you could route rfkill issues to NFC (and have them
-> ignored there) if NFC is involved?
-> 
-> Clearly they're not useful if nobody is interested in fixing NFC, so
-> maybe we should just disable the virtual NFC driver completely and just
-> not have syzbot run on anything there...
+Fix by using virtio_device->device consistently for
+allocation and deallocation
 
-Great benefit of virtual NFC driver was to show how buggy the NFC stack
-is :)
+Fixes: 4944be2f5ad8c ("virtio_net: Allocate rss_hdr with devres")
+Signed-off-by: Kommula Shiva Shankar <kshankar@marvell.com>
+---
+ drivers/net/virtio_net.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Best regards,
-Krzysztof
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 1bb3aeca66c6..22d894101c01 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -3791,7 +3791,7 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
+ 	if (vi->has_rss && !netif_is_rxfh_configured(dev)) {
+ 		old_rss_hdr = vi->rss_hdr;
+ 		old_rss_trailer = vi->rss_trailer;
+-		vi->rss_hdr = devm_kzalloc(&dev->dev, virtnet_rss_hdr_size(vi), GFP_KERNEL);
++		vi->rss_hdr = devm_kzalloc(&vi->vdev->dev, virtnet_rss_hdr_size(vi), GFP_KERNEL);
+ 		if (!vi->rss_hdr) {
+ 			vi->rss_hdr = old_rss_hdr;
+ 			return -ENOMEM;
+@@ -3802,7 +3802,7 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
+ 
+ 		if (!virtnet_commit_rss_command(vi)) {
+ 			/* restore ctrl_rss if commit_rss_command failed */
+-			devm_kfree(&dev->dev, vi->rss_hdr);
++			devm_kfree(&vi->vdev->dev, vi->rss_hdr);
+ 			vi->rss_hdr = old_rss_hdr;
+ 			vi->rss_trailer = old_rss_trailer;
+ 
+@@ -3810,7 +3810,7 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
+ 				 queue_pairs);
+ 			return -EINVAL;
+ 		}
+-		devm_kfree(&dev->dev, old_rss_hdr);
++		devm_kfree(&vi->vdev->dev, old_rss_hdr);
+ 		goto succ;
+ 	}
+ 
+-- 
+2.48.1
+
 
