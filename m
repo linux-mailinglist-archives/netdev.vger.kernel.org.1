@@ -1,273 +1,362 @@
-Return-Path: <netdev+bounces-246539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36471CED97C
-	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 02:35:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8886CED9B1
+	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 03:25:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B457030006C2
-	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 01:35:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A094F30062FE
+	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 02:25:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44AB21E5B68;
-	Fri,  2 Jan 2026 01:35:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="K9ZztDyf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54E3830BF5C;
+	Fri,  2 Jan 2026 02:25:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-oo1-f79.google.com (mail-oo1-f79.google.com [209.85.161.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575E21A2C11
-	for <netdev@vger.kernel.org>; Fri,  2 Jan 2026 01:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128E3285418
+	for <netdev@vger.kernel.org>; Fri,  2 Jan 2026 02:25:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767317711; cv=none; b=kIG1slnmxpysWmx5/sCQn93bNnrKgtdkWQdAcdcf7UjNMyzF2tAw9hazBgzXk1UQrDKj2ZHThsSr3bpJ4sL+ON/ATUmws4sPrMmcbKhPmAiKCY2DSzTwhkSZW0zFPUqCmB9TH307etoOWBK7zYKpffj/X1b85g5Q23WJjx3NwDs=
+	t=1767320724; cv=none; b=aRsvym5LAJbHVqY4q6q0Ytlp98XrMl+vVzTAAdnzkKvbOu8nv+BiREb5H/9NGruQz+aFlFzkYwTuC/KCOCy+6CqAJeh2B3r82aBbsHAi1z1N7KTpu8CYKTn47a/iBdN067HQGP42GXhEiBoTLr952QMIKwqAexj7xClZNUrP83M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767317711; c=relaxed/simple;
-	bh=9nNIM9F1XXM7932VsRbmLczecpbBd6ol5c2MFsFBzys=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a1iq334q/mdw+bSOKq8G5Othh6cwCIgRR6zheSOCnfINUPttbmOCID2xZUaQzRRceOf0Zcg0OgXnoEYctPssePU4SyUEwNESLc4O+iu6RqzIE0hRXHk6imIe5X4//G+lE47bW8jFstT4TEr3zYM3KEUruS4UgrHC5CYOVRoHSDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=K9ZztDyf; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2a0d06ffa2aso144815205ad.3
-        for <netdev@vger.kernel.org>; Thu, 01 Jan 2026 17:35:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1767317708; x=1767922508; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IkzvQVEJ8PAKkvu0ccUwRPk23ExIWvEwnMgvYt9WHpw=;
-        b=K9ZztDyf1Utq5QPPp4KMdD6vQY1myibPldQVQIHnB6zwvIlFHZgybKVR8mqUgMu+h8
-         x08QVTa/CRoIngVJF1rdxV56+ZeR9xdlJmMb+EXIwevbnp7syCoF1eU//W5negxG3HZ5
-         Sy0LvbdDK4QIlC6H2QY5k5Q8WlEon8DSXheohjxr1b8/rdq8EVORdD6DnsIZSPl2WL76
-         jc5YmmsRUZ+mHg0hvimmj+zrZz1ICCu9Zgr/+8H+qqSlFuqXvMVuk33SqmSoskcekFvR
-         w8F22AUH3HndLPMRq3u2T3Kurt+neOY6KXIdoZew9eWgFH0SpeIS1fBwGn799twJuEbp
-         9qyA==
+	s=arc-20240116; t=1767320724; c=relaxed/simple;
+	bh=XhiVjpGD9kG5ZvW871psqt8khBSGzuKtZYMHCsnokks=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=oziSv/Sq472C5IQFiVJ5V1eW8uuyE1HmnnnU5sW7HKh26VBEWB/D41vHp1GF1Eheau4/jB+HTTIxGQtJLST1qo7xzFzucFEm8w5lxUn8nr0LmOBPqjXunpZfaWr7kYNsAffap0bVZwsvrMej4pcGl1ENTAUe1jSrW7JARua1au8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f79.google.com with SMTP id 006d021491bc7-65eb49dd974so17142893eaf.1
+        for <netdev@vger.kernel.org>; Thu, 01 Jan 2026 18:25:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767317708; x=1767922508;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IkzvQVEJ8PAKkvu0ccUwRPk23ExIWvEwnMgvYt9WHpw=;
-        b=co5pTHl6XsD0/duM4up0E/XdLgV+fR0KA7N6B9Q+dK6m7aVvLV/djyBZLSdWJFo38Y
-         n75jt7urOZ2SFJ3qqvZ+x1uy39OSsljcLNvO8zzVAX7n2myjdOCjvfXEYZajEM9fwq3n
-         2hsMgk8QP67+cXOWZpZzeR+mJUNU0ZtpyJf1RIAbUg9LD9DwgZ4CzJfOrLY1TtnyWz/J
-         dLVmEqx2W4FEEPOUT7u6tVz5+jBjFBMvOp5WxVgE1yr8uIZdKrMYegUUzfQZewZY1Rkp
-         x7INlUGBO79EkKhGKTl99Y8YOFrMZgx7Mf0tPbyatY7QbliwEcrm3N5D6jHAARP9cNV9
-         07Gg==
-X-Gm-Message-State: AOJu0YzGYdMMWNzZ3vAtiRHKYzEThUNZQl6UFOhlnYUGZe8L7B1HuZxh
-	p0QYjojZhewXmUooQ+V3gaK8pH65WyxJQfnDfeTRU8LHKtQ5Ji92zRQBQ2ukBxBy/Q==
-X-Gm-Gg: AY/fxX44+yDiNNHKNnp++O8fWtXTOs6JGzMl5QRtgW20eLtgF+HcJJb/hUPUfE99dKy
-	WDzmi8YrTduIG7n+ZBtF+OcOEui9j2HmPPO6MAYUowgO4SZWbRPxc7dDhocejvMf251Wzo+WZyf
-	tBuDcOnxE2lmwpTznfya7hJvOgbO4x0FWj238BxVdoX8Uz0pK8oubb7NVIQ5vqrakmo68vTMVOz
-	fdCz4p/f3DUvlnOR2AgG0cW9bcJeoEl3ASeMHFRm3hN3z08W4bw58rWq9B9Sh1YAPcqpXTuGTut
-	6uyEdM2oas13/luk1DSP7NaBlB92d04g1dcvlAhwzeB4GOstzs0EOIqW9bYTbKHnjLdCHC0ados
-	58l2r7qktXYlcaLDbrHzmWc0heZkyl9NdnIucMwP23SR400fN98yKne++rcUllcdqq1wwpEI5fo
-	LoxijbzNPaLeWB+hp2
-X-Google-Smtp-Source: AGHT+IG1m1QBlTS5MevJrw+s918/4Xe/Bw3MaHTHQYNpegHTUEsV1YyQvFvVUJEtJr4Ul4CrkKC4pw==
-X-Received: by 2002:a05:7022:2520:b0:119:e56b:c753 with SMTP id a92af1059eb24-121722e30e3mr50795935c88.24.1767317708423;
-        Thu, 01 Jan 2026 17:35:08 -0800 (PST)
-Received: from p1 (209-147-138-15.nat.asu.edu. [209.147.138.15])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1217253c23csm147728097c88.9.2026.01.01.17.35.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Jan 2026 17:35:08 -0800 (PST)
-Date: Thu, 1 Jan 2026 18:35:06 -0700
-From: Xiang Mei <xmei5@asu.edu>
-To: security@kernel.org
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com, 
-	jiri@resnulli.us
-Subject: Re: [PATCH net v2] net/sched: sch_qfq: Fix NULL deref when
- deactivating inactive aggregate in qfq_reset
-Message-ID: <hvgvn5n45dla46vehvoi63frvkzk7s2wnpbi6l3mrbfl5njk2y@ttfv2gestxf2>
-References: <20260102013148.1611988-1-xmei5@asu.edu>
+        d=1e100.net; s=20230601; t=1767320721; x=1767925521;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iNXAqAgcGflW6xRJhSCyAKDKPQaiCihSYEu8ztmzuXk=;
+        b=j26q2eJZxt114X16sNHTmkO4kYhOQCG5XumwIIv/sfMJz75BYY+j9JQIgYMOkJCM3Z
+         eSlgDk7i0aeD0nSLF0EXR4vqDngWh+kzG2J3aZN557fJXVlAYHQuhb8O4kWmtcESmilT
+         dyhywZ8IgnD8spbMovQJUagcz+FDPgv8W8Pz4CG5cHGPYcdK8lMYuNpysG8Rm6hqIchT
+         IbuXMztL0vM+TfmDbBlVIvFtLzgM2KgcLrWWO3cR6POaCWp1gNOCByFb3qYWP4wxRWxq
+         NJrGnw19UoNusF4+3CPPRhC98tNRhiuizR/10lpLbtJvUyIvJwJT9GW9bUt0EVR1FPvo
+         PkHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCURTarALHF7mJH693Kvnz94VcqcGXevgz8FhI1fzPdcI2LDVDrWb3gGNXAZV6Vgzy9dKs4LWIo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcxGmSPPXv/FBQP4alckVhD2/FU/mPVowEvfeHWAEMzrHJ7m7s
+	LB9vt4lrd0GSpqeil4quNAWJROiAD9fRO7QL9dxBkARRk57xOhHmQ4PJnwXQ1kSh8DDPtJQOQTh
+	fhOkfei9082kAITb3Q6BFTUVplQru2Vj6cTO8XLIjvnMoRlUm0mvSYCBfLpI=
+X-Google-Smtp-Source: AGHT+IEgXwi3DuUDXjaNhG2fYM/nOMFwE8lzSb9m6Ai1XD3w2WBhM68kSw99+vRKtOaWaeuw4R23aabV4FLCKJZmxGk58kw7VSQx
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260102013148.1611988-1-xmei5@asu.edu>
+X-Received: by 2002:a05:6820:6481:b0:65c:f363:fe06 with SMTP id
+ 006d021491bc7-65cfe7d1734mr13535185eaf.42.1767320721022; Thu, 01 Jan 2026
+ 18:25:21 -0800 (PST)
+Date: Thu, 01 Jan 2026 18:25:21 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69572c91.050a0220.a1b6.034b.GAE@google.com>
+Subject: [syzbot] [netfilter?] INFO: task hung in nfnetlink_rcv_msg (5)
+From: syzbot <syzbot+c4b20b80ee6a7a2f5012@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	fw@strlen.de, horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	phil@nwl.cc, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jan 01, 2026 at 06:31:47PM -0700, Xiang Mei wrote:
-> `qfq_class->leaf_qdisc->q.qlen > 0` does not imply that the class
-> itself is active.
-> 
-> Two qfq_class objects may point to the same leaf_qdisc. This happens
-> when:
-> 
-> 1. one QFQ qdisc is attached to the dev as the root qdisc, and
-> 
-> 2. another QFQ qdisc is temporarily referenced (e.g., via qdisc_get()
-> / qdisc_put()) and is pending to be destroyed, as in function
-> tc_new_tfilter.
-> 
-> When packets are enqueued through the root QFQ qdisc, the shared
-> leaf_qdisc->q.qlen increases. At the same time, the second QFQ
-> qdisc triggers qdisc_put and qdisc_destroy: the qdisc enters
-> qfq_reset() with its own q->q.qlen == 0, but its class's leaf
-> qdisc->q.qlen > 0. Therefore, the qfq_reset would wrongly deactivate
-> an inactive aggregate and trigger a null-deref in qfq_deactivate_agg:
-> 
-> [    0.977749] Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] SMP KAI
-> [    0.978440] KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-> [    0.978875] CPU: 0 UID: 0 PID: 135 Comm: exploit Not tainted 6.12.57 #3
-> [    0.979270] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.17.0-0-gb52ca86e094d-prebuilt.qemu.or4
-> [    0.979913] RIP: qfq_deactivate_agg+0x187/0xca0
-> [    0.980200] Code: 00 fc ff df 48 89 fe 48 c1 ee 03 80 3c 16 00 0f 85 1d 09 00 00 48 be 00 00 00 00 00 fc ff df 48 80
-> 
-> Code starting with the faulting instruction
-> ===========================================
->    0:	00 fc                	add    %bh,%ah
->    2:	ff                   	lcall  (bad)
->    3:	df 48 89             	fisttps -0x77(%rax)
->    6:	fe 48 c1             	decb   -0x3f(%rax)
->    9:	ee                   	out    %al,(%dx)
->    a:	03 80 3c 16 00 0f    	add    0xf00163c(%rax),%eax
->   10:	85 1d 09 00 00 48    	test   %ebx,0x48000009(%rip)        # 0x4800001f
->   16:	be 00 00 00 00       	mov    $0x0,%esi
->   1b:	00 fc                	add    %bh,%ah
->   1d:	ff                   	lcall  (bad)
->   1e:	df 48 80             	fisttps -0x80(%rax)
-> [    0.981234] RSP: 0018:ffff8880106d73f8 EFLAGS: 00010246
-> [    0.981517] RAX: 0000000000000000 RBX: ffff88800c518000 RCX: ffff888010bc1358
-> [    0.981943] RDX: 0000000000000000 RSI: dffffc0000000000 RDI: 0000000000000000
-> [    0.982336] RBP: ffff888010bc1340 R08: ffff88800c518158 R09: ffff88800c518158
-> [    0.982734] R10: 1ffff110018a302c R11: ffffffff89689156 R12: 0000000000000000
-> [    0.983140] R13: ffff888010bc0180 R14: 0000000000000000 R15: ffff888010bc1350
-> [    0.983521] FS:  0000000009737380(0000) GS:ffff8880bf000000(0000) knlGS:0000000000000000
-> [    0.983955] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [    0.984270] CR2: 00000000097c1000 CR3: 000000000ee7c004 CR4: 0000000000772ef0
-> [    0.984654] PKRU: 55555554
-> [    0.984804] Call Trace:
-> [    0.984957]  <TASK>
-> [    0.985084]  qfq_reset_qdisc+0x27c/0x3e0
-> [    0.985316]  ? __pfx_mutex_lock+0x10/0x10
-> [    0.985541]  qdisc_reset+0x9d/0x590
-> [    0.985736]  ? __tcf_block_put+0x2e/0x2b0
-> [    0.985980]  ? __pfx_mutex_unlock+0x10/0x10
-> [    0.986237]  ? __tcf_chain_put+0x4a/0x880
-> [    0.986465]  __qdisc_destroy+0xb2/0x280
-> [    0.986686]  tc_new_tfilter+0x9af/0x2180
-> [    0.986932]  ? __pfx_stack_trace_consume_entry+0x10/0x10
-> [    0.987216]  ? __pfx_stack_trace_consume_entry+0x10/0x10
-> [    0.987505]  ? __pfx_tc_new_tfilter+0x10/0x10
-> [    0.987755]  ? unwind_get_return_address+0x5e/0xa0
-> [    0.988025]  ? arch_stack_walk+0xac/0x100
-> [    0.988241]  ? stack_depot_save_flags+0x29/0x7e0
-> [    0.988506]  ? stack_trace_save+0x94/0xd0
-> [    0.988722]  ? security_capable+0xda/0x160
-> [    0.988970]  rtnetlink_rcv_msg+0x543/0xc50
-> [    0.989204]  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
-> [    0.989458]  netlink_rcv_skb+0x134/0x370
-> [    0.989676]  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
-> [    0.989951]  ? __pfx_netlink_rcv_skb+0x10/0x10
-> [    0.990190]  ? __pfx___netlink_lookup+0x10/0x10
-> [    0.990440]  ? kasan_save_track+0x14/0x30
-> [    0.990659]  ? _copy_from_iter+0x214/0x1100
-> [    0.990886]  netlink_unicast+0x6db/0xa20
-> [    0.991116]  ? __pfx_netlink_unicast+0x10/0x10
-> [    0.991355]  ? unwind_get_return_address+0x5e/0xa0
-> [    0.991616]  ? arch_stack_walk+0xac/0x100
-> [    0.991854]  ? __check_object_size+0x46c/0x690
-> [    0.992091]  netlink_sendmsg+0x72b/0xbd0
-> [    0.992301]  ? __pfx_netlink_sendmsg+0x10/0x10
-> [    0.992545]  ? __pfx_aa_file_perm+0x10/0x10
-> [    0.992793]  sock_write_iter+0x489/0x560
-> [    0.993043]  ? kmem_cache_free+0x249/0x4b0
-> [    0.993282]  ? __pfx_sock_write_iter+0x10/0x10
-> [    0.993565]  ? security_file_permission+0x7e/0xe0
-> [    0.993922]  ? rw_verify_area+0x70/0x4d0
-> [    0.994192]  vfs_write+0x930/0xea0
-> [    0.994439]  ? __pfx_vfs_write+0x10/0x10
-> [    0.994642]  ? fdget_pos+0x57/0x4f0
-> [    0.994810]  ? __call_rcu_common.constprop.0+0x247/0x7a0
-> [    0.995105]  ksys_write+0x17c/0x1d0
-> [    0.995290]  ? __pfx_ksys_write+0x10/0x10
-> [    0.995511]  ? __x64_sys_close+0x7c/0xd0
-> [    0.995732]  do_syscall_64+0x58/0x120
-> [    0.995959]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> [    0.996233] RIP: 0033:0x424c34
-> [    0.996397] Code: 89 02 48 c7 c0 ff ff ff ff eb bd 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 80 3d 2d 44 09 00 09
-> 
-> Code starting with the faulting instruction
-> ===========================================
->    0:	89 02                	mov    %eax,(%rdx)
->    2:	48 c7 c0 ff ff ff ff 	mov    $0xffffffffffffffff,%rax
->    9:	eb bd                	jmp    0xffffffffffffffc8
->    b:	66 2e 0f 1f 84 00 00 	cs nopw 0x0(%rax,%rax,1)
->   12:	00 00 00
->   15:	90                   	nop
->   16:	f3 0f 1e fa          	endbr64
->   1a:	80 3d 2d 44 09 00 09 	cmpb   $0x9,0x9442d(%rip)        # 0x9444e
-> [    0.997360] RSP: 002b:00007ffea27af418 EFLAGS: 00000202 ORIG_RAX: 0000000000000001
-> [    0.997746] RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 0000000000424c34
-> [    0.998123] RDX: 000000000000003c RSI: 00000000097bf5d0 RDI: 0000000000000003
-> [    0.998495] RBP: 00007ffea27af460 R08: 0000000000000000 R09: 0000000000000000
-> [    0.998862] R10: 0000000000000001 R11: 0000000000000202 R12: 00007ffea27af5c8
-> [    0.999224] R13: 00007ffea27af5d8 R14: 00000000004b3828 R15: 0000000000000001
-> [    0.999592]  </TASK>
-> [    0.999711] Modules linked in:
-> [    0.999899] ---[ end trace 0000000000000000 ]---
-> [    1.000143] RIP: qfq_deactivate_agg+0x187/0xca0
-> [    1.000396] Code: 00 fc ff df 48 89 fe 48 c1 ee 03 80 3c 16 00 0f 85 1d 09 00 00 48 be 00 00 00 00 00 fc ff df 48 80
-> 
-> Code starting with the faulting instruction
-> ===========================================
->    0:	00 fc                	add    %bh,%ah
->    2:	ff                   	lcall  (bad)
->    3:	df 48 89             	fisttps -0x77(%rax)
->    6:	fe 48 c1             	decb   -0x3f(%rax)
->    9:	ee                   	out    %al,(%dx)
->    a:	03 80 3c 16 00 0f    	add    0xf00163c(%rax),%eax
->   10:	85 1d 09 00 00 48    	test   %ebx,0x48000009(%rip)        # 0x4800001f
->   16:	be 00 00 00 00       	mov    $0x0,%esi
->   1b:	00 fc                	add    %bh,%ah
->   1d:	ff                   	lcall  (bad)
->   1e:	df 48 80             	fisttps -0x80(%rax)
-> [    1.001456] RSP: 0018:ffff8880106d73f8 EFLAGS: 00010246
-> [    1.001735] RAX: 0000000000000000 RBX: ffff88800c518000 RCX: ffff888010bc1358
-> [    1.002107] RDX: 0000000000000000 RSI: dffffc0000000000 RDI: 0000000000000000
-> [    1.002478] RBP: ffff888010bc1340 R08: ffff88800c518158 R09: ffff88800c518158
-> [    1.002853] R10: 1ffff110018a302c R11: ffffffff89689156 R12: 0000000000000000
-> [    1.003204] R13: ffff888010bc0180 R14: 0000000000000000 R15: ffff888010bc1350
-> [    1.003559] FS:  0000000009737380(0000) GS:ffff8880bf000000(0000) knlGS:0000000000000000
-> [    1.003962] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [    1.004243] CR2: 00000000097c1000 CR3: 000000000ee7c004 CR4: 0000000000772ef0
-> [    1.004599] PKRU: 55555554
-> [    1.004740] Kernel panic - not syncing: Fatal exception
-> [    1.005071] Kernel Offset: disabled
-> 
-> Fixes: 0545a3037773 ("pkt_sched: QFQ - quick fair queue scheduler")
-> Signed-off-by: Xiang Mei <xmei5@asu.edu>
-> ---
-> v2: attach the crash information to the commit message
-> 
->  net/sched/sch_qfq.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/sched/sch_qfq.c b/net/sched/sch_qfq.c
-> index d920f57dc6d7..f4013b547438 100644
-> --- a/net/sched/sch_qfq.c
-> +++ b/net/sched/sch_qfq.c
-> @@ -1481,7 +1481,7 @@ static void qfq_reset_qdisc(struct Qdisc *sch)
->  
->  	for (i = 0; i < q->clhash.hashsize; i++) {
->  		hlist_for_each_entry(cl, &q->clhash.hash[i], common.hnode) {
-> -			if (cl->qdisc->q.qlen > 0)
-> +			if (cl_is_active(cl))
->  				qfq_deactivate_class(q, cl);
->  
->  			qdisc_reset(cl->qdisc);
-> -- 
-> 2.43.0
->
+Hello,
 
-Sorry for the delay of update.
+syzbot found the following issue on:
 
-For the new version of patch, I attached the crash infomation decoded from
-scripts/decode_stacktrace.sh.
+HEAD commit:    c9b47175e913 Merge tag 'i2c-for-6.19-rc1' of git://git.ker..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=12bd3992580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b60f8d9470fe9d28
+dashboard link: https://syzkaller.appspot.com/bug?extid=c4b20b80ee6a7a2f5012
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
 
-Thanks,
-Xiang
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/925ba1d27063/disk-c9b47175.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/fd9b311222a4/vmlinux-c9b47175.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/8fa7a5cb2cbc/bzImage-c9b47175.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c4b20b80ee6a7a2f5012@syzkaller.appspotmail.com
+
+INFO: task syz.6.3244:18586 blocked for more than 143 seconds.
+      Tainted: G             L      syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz.6.3244      state:D stack:26472 pid:18586 tgid:18584 ppid:17031  task_flags:0x400140 flags:0x00080002
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5256 [inline]
+ __schedule+0x14bc/0x5000 kernel/sched/core.c:6863
+ __schedule_loop kernel/sched/core.c:6945 [inline]
+ schedule+0x165/0x360 kernel/sched/core.c:6960
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:7017
+ __mutex_lock_common kernel/locking/mutex.c:692 [inline]
+ __mutex_lock+0x7e6/0x1350 kernel/locking/mutex.c:776
+ nfnl_lock net/netfilter/nfnetlink.c:98 [inline]
+ nfnetlink_rcv_msg+0x9dc/0x1130 net/netfilter/nfnetlink.c:295
+ netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2550
+ nfnetlink_rcv+0x282/0x2590 net/netfilter/nfnetlink.c:669
+ netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+ netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1344
+ netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1894
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg+0x21c/0x270 net/socket.c:742
+ ____sys_sendmsg+0x505/0x820 net/socket.c:2592
+ ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2681
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f9fb618f749
+RSP: 002b:00007f9fb6f56038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f9fb63e5fa0 RCX: 00007f9fb618f749
+RDX: 0000000000000000 RSI: 0000200000000040 RDI: 0000000000000005
+RBP: 00007f9fb6213f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f9fb63e6038 R14: 00007f9fb63e5fa0 R15: 00007f9fb650fa28
+ </TASK>
+INFO: task syz.8.3259:18660 blocked for more than 144 seconds.
+      Tainted: G             L      syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz.8.3259      state:D stack:24904 pid:18660 tgid:18659 ppid:14215  task_flags:0x400140 flags:0x00080002
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5256 [inline]
+ __schedule+0x14bc/0x5000 kernel/sched/core.c:6863
+ __schedule_loop kernel/sched/core.c:6945 [inline]
+ schedule+0x165/0x360 kernel/sched/core.c:6960
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:7017
+ __mutex_lock_common kernel/locking/mutex.c:692 [inline]
+ __mutex_lock+0x7e6/0x1350 kernel/locking/mutex.c:776
+ nfnl_lock net/netfilter/nfnetlink.c:98 [inline]
+ nfnetlink_rcv_msg+0x9dc/0x1130 net/netfilter/nfnetlink.c:295
+ netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2550
+ nfnetlink_rcv+0x282/0x2590 net/netfilter/nfnetlink.c:669
+ netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+ netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1344
+ netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1894
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg+0x21c/0x270 net/socket.c:742
+ ____sys_sendmsg+0x505/0x820 net/socket.c:2592
+ ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2681
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fa675b8f749
+RSP: 002b:00007fa676af6038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fa675de5fa0 RCX: 00007fa675b8f749
+RDX: 0000000000000080 RSI: 00002000000002c0 RDI: 000000000000000a
+RBP: 00007fa675c13f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fa675de6038 R14: 00007fa675de5fa0 R15: 00007fa675f0fa28
+ </TASK>
+
+Showing all locks held in the system:
+1 lock held by khungtaskd/31:
+ #0: ffffffff8df419e0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #0: ffffffff8df419e0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:867 [inline]
+ #0: ffffffff8df419e0 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x2e/0x180 kernel/locking/lockdep.c:6775
+2 locks held by getty/5584:
+ #0: ffff88814e12e0a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
+ #1: ffffc9000332b2f0 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x449/0x1460 drivers/tty/n_tty.c:2211
+4 locks held by kworker/u8:15/5950:
+2 locks held by syz.1.1820/12285:
+5 locks held by kworker/1:8/12380:
+ #0: ffff88801fe93948 ((wq_completion)usb_hub_wq){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3232 [inline]
+ #0: ffff88801fe93948 ((wq_completion)usb_hub_wq){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x1770 kernel/workqueue.c:3340
+ #1: ffffc9000b58fb80 ((work_completion)(&hub->events)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3233 [inline]
+ #1: ffffc9000b58fb80 ((work_completion)(&hub->events)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x1770 kernel/workqueue.c:3340
+ #2: ffff888028045198 (&dev->mutex){....}-{4:4}, at: device_lock include/linux/device.h:895 [inline]
+ #2: ffff888028045198 (&dev->mutex){....}-{4:4}, at: hub_event+0x187/0x4ef0 drivers/usb/core/hub.c:5899
+ #3: ffff888053b10198 (&dev->mutex){....}-{4:4}, at: device_lock include/linux/device.h:895 [inline]
+ #3: ffff888053b10198 (&dev->mutex){....}-{4:4}, at: __device_attach+0x88/0x430 drivers/base/dd.c:1006
+ #4: ffff888053b15160 (&dev->mutex){....}-{4:4}, at: device_lock include/linux/device.h:895 [inline]
+ #4: ffff888053b15160 (&dev->mutex){....}-{4:4}, at: __device_attach+0x88/0x430 drivers/base/dd.c:1006
+4 locks held by udevd/17748:
+ #0: ffff88805ce04790 (&p->lock){+.+.}-{4:4}, at: seq_read_iter+0xb7/0xe20 fs/seq_file.c:182
+ #1: ffff888055614488 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_seq_start+0x5c/0x420 fs/kernfs/file.c:172
+ #2: ffff888057715968 (kn->active#21){++++}-{0:0}, at: kernfs_get_active_of fs/kernfs/file.c:80 [inline]
+ #2: ffff888057715968 (kn->active#21){++++}-{0:0}, at: kernfs_seq_start+0xb2/0x420 fs/kernfs/file.c:173
+ #3: ffff888053b10198 (&dev->mutex){....}-{4:4}, at: device_lock_interruptible include/linux/device.h:900 [inline]
+ #3: ffff888053b10198 (&dev->mutex){....}-{4:4}, at: manufacturer_show+0x26/0xa0 drivers/usb/core/sysfs.c:142
+1 lock held by syz.6.3244/18586:
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnl_lock net/netfilter/nfnetlink.c:98 [inline]
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnetlink_rcv_msg+0x9dc/0x1130 net/netfilter/nfnetlink.c:295
+1 lock held by syz.8.3259/18660:
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnl_lock net/netfilter/nfnetlink.c:98 [inline]
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnetlink_rcv_msg+0x9dc/0x1130 net/netfilter/nfnetlink.c:295
+1 lock held by syz.3.3449/19803:
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnl_lock net/netfilter/nfnetlink.c:98 [inline]
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnetlink_rcv_msg+0x9dc/0x1130 net/netfilter/nfnetlink.c:295
+1 lock held by syz.7.3593/20594:
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnl_lock net/netfilter/nfnetlink.c:98 [inline]
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnetlink_rcv_msg+0x9dc/0x1130 net/netfilter/nfnetlink.c:295
+1 lock held by syz.4.3613/20669:
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnl_lock net/netfilter/nfnetlink.c:98 [inline]
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnetlink_rcv_msg+0x9dc/0x1130 net/netfilter/nfnetlink.c:295
+1 lock held by syz.4.3613/20670:
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnl_lock net/netfilter/nfnetlink.c:98 [inline]
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnetlink_rcv_msg+0x9dc/0x1130 net/netfilter/nfnetlink.c:295
+1 lock held by syz.4.3613/20671:
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnl_lock net/netfilter/nfnetlink.c:98 [inline]
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnetlink_rcv_msg+0x9dc/0x1130 net/netfilter/nfnetlink.c:295
+1 lock held by syz.5.3626/20714:
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnl_lock net/netfilter/nfnetlink.c:98 [inline]
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnetlink_rcv_msg+0x9dc/0x1130 net/netfilter/nfnetlink.c:295
+1 lock held by syz.1.3655/20911:
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnl_lock net/netfilter/nfnetlink.c:98 [inline]
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnetlink_rcv_msg+0x9dc/0x1130 net/netfilter/nfnetlink.c:295
+1 lock held by syz.0.3714/21320:
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnl_lock net/netfilter/nfnetlink.c:98 [inline]
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnetlink_rcv_msg+0x9dc/0x1130 net/netfilter/nfnetlink.c:295
+1 lock held by syz.6.3716/21340:
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnl_lock net/netfilter/nfnetlink.c:98 [inline]
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnetlink_rcv_msg+0x9dc/0x1130 net/netfilter/nfnetlink.c:295
+1 lock held by syz.2.3719/21363:
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnl_lock net/netfilter/nfnetlink.c:98 [inline]
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnetlink_rcv_msg+0x9dc/0x1130 net/netfilter/nfnetlink.c:295
+1 lock held by syz.8.3731/21463:
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnl_lock net/netfilter/nfnetlink.c:98 [inline]
+ #0: ffffffff99dc8278 (nfnl_subsys_ipset){+.+.}-{4:4}, at: nfnetlink_rcv_msg+0x9dc/0x1130 net/netfilter/nfnetlink.c:295
+1 lock held by syz.9.3734/21464:
+ #0: ffffffff8df47538 (rcu_state.exp_mutex){+.+.}-{4:4}, at: exp_funnel_lock kernel/rcu/tree_exp.h:311 [inline]
+ #0: ffffffff8df47538 (rcu_state.exp_mutex){+.+.}-{4:4}, at: synchronize_rcu_expedited+0x2f6/0x730 kernel/rcu/tree_exp.h:956
+
+=============================================
+
+NMI backtrace for cpu 1
+CPU: 1 UID: 0 PID: 31 Comm: khungtaskd Tainted: G             L      syzkaller #0 PREEMPT(full) 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ nmi_cpu_backtrace+0x39e/0x3d0 lib/nmi_backtrace.c:113
+ nmi_trigger_cpumask_backtrace+0x17a/0x300 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:160 [inline]
+ __sys_info lib/sys_info.c:157 [inline]
+ sys_info+0x135/0x170 lib/sys_info.c:165
+ check_hung_uninterruptible_tasks kernel/hung_task.c:346 [inline]
+ watchdog+0xf95/0xfe0 kernel/hung_task.c:515
+ kthread+0x711/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x599/0xb30 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
+ </TASK>
+Sending NMI from CPU 1 to CPUs 0:
+NMI backtrace for cpu 0
+CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Tainted: G             L      syzkaller #0 PREEMPT(full) 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+RIP: 0010:hlock_class kernel/locking/lockdep.c:229 [inline]
+RIP: 0010:check_wait_context kernel/locking/lockdep.c:4879 [inline]
+RIP: 0010:__lock_acquire+0x518/0x2cf0 kernel/locking/lockdep.c:5187
+Code: 1d 44 89 e0 49 ff c7 49 63 8e 28 0b 00 00 48 83 c3 28 41 89 c4 49 39 cf 0f 8d c7 00 00 00 49 83 ff 31 0f 83 83 00 00 00 8b 03 <25> ff 1f 00 00 48 0f a3 05 7b 96 e7 11 73 10 48 69 c0 c8 00 00 00
+RSP: 0018:ffffc90000007170 EFLAGS: 00000097
+RAX: 0000000000022007 RBX: ffffffff8dc95e90 RCX: 00000000ffffffff
+RDX: 0000000000000003 RSI: 0000000000002000 RDI: 0000000000000000
+RBP: ffffffff8dc95ec0 R08: ffffffff81743f85 R09: ffffffff8df419e0
+R10: ffffc90000007478 R11: ffffffff81ad9fb0 R12: ffffffffffffff03
+R13: ffffffff8dc95ec0 R14: ffffffff8dc95340 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff888125e3a000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055be7a9c1000 CR3: 000000007e93c000 CR4: 00000000003526f0
+Call Trace:
+ <IRQ>
+ lock_acquire+0x117/0x340 kernel/locking/lockdep.c:5868
+ rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ rcu_read_lock include/linux/rcupdate.h:867 [inline]
+ class_rcu_constructor include/linux/rcupdate.h:1195 [inline]
+ unwind_next_frame+0xc2/0x2390 arch/x86/kernel/unwind_orc.c:479
+ arch_stack_walk+0x11c/0x150 arch/x86/kernel/stacktrace.c:25
+ stack_trace_save+0x9c/0xe0 kernel/stacktrace.c:122
+ kasan_save_stack mm/kasan/common.c:56 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
+ unpoison_slab_object mm/kasan/common.c:339 [inline]
+ __kasan_slab_alloc+0x6c/0x80 mm/kasan/common.c:365
+ kasan_slab_alloc include/linux/kasan.h:252 [inline]
+ slab_post_alloc_hook mm/slub.c:4948 [inline]
+ slab_alloc_node mm/slub.c:5258 [inline]
+ kmem_cache_alloc_node_noprof+0x43c/0x720 mm/slub.c:5310
+ kmalloc_reserve+0xbd/0x290 net/core/skbuff.c:586
+ __alloc_skb+0x27e/0x430 net/core/skbuff.c:690
+ __netdev_alloc_skb+0x108/0x960 net/core/skbuff.c:754
+ netdev_alloc_skb include/linux/skbuff.h:3484 [inline]
+ dev_alloc_skb include/linux/skbuff.h:3497 [inline]
+ __ieee80211_beacon_get+0xc06/0x1880 net/mac80211/tx.c:5654
+ ieee80211_beacon_get_tim+0xb4/0x2b0 net/mac80211/tx.c:5776
+ ieee80211_beacon_get include/net/mac80211.h:5669 [inline]
+ mac80211_hwsim_beacon_tx+0x3c5/0x870 drivers/net/wireless/virtual/mac80211_hwsim.c:2361
+ __iterate_interfaces+0x2ab/0x590 net/mac80211/util.c:761
+ ieee80211_iterate_active_interfaces_atomic+0xdb/0x180 net/mac80211/util.c:797
+ mac80211_hwsim_beacon+0xbb/0x180 drivers/net/wireless/virtual/mac80211_hwsim.c:2395
+ __run_hrtimer kernel/time/hrtimer.c:1777 [inline]
+ __hrtimer_run_queues+0x51c/0xc30 kernel/time/hrtimer.c:1841
+ hrtimer_run_softirq+0x187/0x2b0 kernel/time/hrtimer.c:1858
+ handle_softirqs+0x27d/0x850 kernel/softirq.c:622
+ __do_softirq kernel/softirq.c:656 [inline]
+ invoke_softirq kernel/softirq.c:496 [inline]
+ __irq_exit_rcu+0xca/0x1f0 kernel/softirq.c:723
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:739
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1056 [inline]
+ sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1056
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
+RIP: 0010:pv_native_safe_halt+0x13/0x20 arch/x86/kernel/paravirt.c:82
+Code: 13 ee 02 00 cc cc cc 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 66 90 0f 00 2d f3 50 0d 00 f3 0f 1e fa fb f4 <c3> cc cc cc cc cc cc cc cc cc cc cc cc 90 90 90 90 90 90 90 90 90
+RSP: 0018:ffffffff8dc07d80 EFLAGS: 000002c6
+RAX: 5f11becca7314500 RBX: ffffffff81978eba RCX: 5f11becca7314500
+RDX: 0000000000000001 RSI: ffffffff8d78fddd RDI: ffffffff8bc07960
+RBP: ffffffff8dc07ea8 R08: ffff8880b86336db R09: 1ffff110170c66db
+R10: dffffc0000000000 R11: ffffed10170c66dc R12: ffffffff8f81f870
+R13: 1ffffffff1b92a68 R14: 0000000000000000 R15: 0000000000000000
+ arch_safe_halt arch/x86/include/asm/paravirt.h:107 [inline]
+ default_idle+0x13/0x20 arch/x86/kernel/process.c:767
+ default_idle_call+0x73/0xb0 kernel/sched/idle.c:122
+ cpuidle_idle_call kernel/sched/idle.c:191 [inline]
+ do_idle+0x1ea/0x520 kernel/sched/idle.c:332
+ cpu_startup_entry+0x44/0x60 kernel/sched/idle.c:430
+ rest_init+0x2de/0x300 init/main.c:757
+ start_kernel+0x3a7/0x400 init/main.c:1206
+ x86_64_start_reservations+0x24/0x30 arch/x86/kernel/head64.c:310
+ x86_64_start_kernel+0x143/0x1c0 arch/x86/kernel/head64.c:291
+ common_startup_64+0x13e/0x147
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
