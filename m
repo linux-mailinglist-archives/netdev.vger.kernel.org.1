@@ -1,65 +1,68 @@
-Return-Path: <netdev+bounces-246544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13666CEDAD1
-	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 07:18:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8443ECEDB04
+	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 07:57:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 99EFF30056E8
-	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 06:18:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5146F30056CF
+	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 06:57:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2156E2C3745;
-	Fri,  2 Jan 2026 06:18:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC13127AC5C;
+	Fri,  2 Jan 2026 06:57:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Hy7dwZk0"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="cIwC8HbK"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE6E62165EA
-	for <netdev@vger.kernel.org>; Fri,  2 Jan 2026 06:18:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A01D238C3A;
+	Fri,  2 Jan 2026 06:57:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767334698; cv=none; b=n+kRX2nRFGhvYLEn5Tfc5hQ7h1rAjBQmKts1soIu5O4wK5N0guhgBIVB/xWEB9xRMAbFWWGK2KCNfEqMdxiad+EmaA+nHvT4hpAtunh7cieoWwwJJ2lsWRRIJzWbtNugr2rKmpuQLclSs147yXk32VphoHiwU/aZO1wIYDf8u/Q=
+	t=1767337034; cv=none; b=HYGH9QqLt/RZKrSrTiPIPDVygQsIsEQB/ZW6zbr0ocKCS+/B58e15htSwTe+Ft6NTvNFIy9B+R9Jt9NmtCAqpYz+iLPN1UmzBHDDYuotR7DGFe+IBS+nutCt5RvhK92/zV+3ksGlPISTPQD4TiMppaIg6hctp0f+v1Ra2ujtUxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767334698; c=relaxed/simple;
-	bh=rvVUTxI3sl/dBrj9ZY9pXH6xhKb5bAk61+SpRF95xos=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bHxD9GzNNvb9rkjUUPClL/1jyZ7p813D5o7MW3DX9bjizZrxrl0rQDzTn7Y2leLBPpMHL4AGKlkdVzYVculuLE8YWPe1N55n8LPYvB/5AjYE/n6a/9l84pt3iZAfu1hxvtKA6ng+zxLIz5c+hRr2N2H3H0D9CRQI2j3W/3GJFj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Hy7dwZk0; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767334683;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=wIgtotwjXNQ9yqFMyPJfsL0psaFasUQk+W6358KND8c=;
-	b=Hy7dwZk0P0FYPxT4jmdk5pOT2DvnnqliJSn1wK0MzHHZf+9ZNURW07+EXtHYhVrBfSLfDh
-	1BM9CwW+tcI4sRfVBswpoKmwjW6YkvCfwc5NM6HhICG5ZfI4zxO0cIAB/Z3YxOCBQ+vHBS
-	69WqXfx8HcaYh3bt8xLKHq/+Zu79D8Y=
-From: Leon Hwang <leon.hwang@linux.dev>
-To: netdev@vger.kernel.org
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	kerneljasonxing@gmail.com,
-	lance.yang@linux.dev,
-	jiayuan.chen@linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	Leon Hwang <leon.hwang@linux.dev>,
-	Leon Huang Fu <leon.huangfu@shopee.com>
-Subject: [PATCH net-next v2] page_pool: Add page_pool_release_stalled tracepoint
-Date: Fri,  2 Jan 2026 14:17:18 +0800
-Message-ID: <20260102061718.210248-1-leon.hwang@linux.dev>
+	s=arc-20240116; t=1767337034; c=relaxed/simple;
+	bh=Giiur8wOK75juDLaaBPPCjjZThES+dD8KEcyGXN1y1Y=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WG8BMGlInRCnaJNiUCHq18E/+1mwzpQLYhpMx9Jc6y8n0Gg7K2+GRu/N2v5b27ID+1ltc3oQZoPSSPU7l7OfylAh8GMYjBFnHlSU65u1foJQ/m+TS2Hpyoz8s2JOvBpUa9Bt30Lxw4ctxP3Lt4A9MUHGbUpYYsI2Mxt+kzKEQGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=cIwC8HbK; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6024SIPn072128;
+	Thu, 1 Jan 2026 22:57:08 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=/4YYqHOfPMdRa/spETylSpX
+	ytWs2YqgmMtty3S1xSSw=; b=cIwC8HbKF9S1a8Icl9l/NCcUhjiqRXyQVuxJzXK
+	UDAYSuGRIOb1Ry5NoG0nD32C20TRYj95daA7yNbsVo9jpC9sj/eIxm6kS7PkZ4ou
+	UsdPBqp+M37ZkDPFynXHJnHxpMOmI0dFJj9Xk5WXjJNYVqZQIxBCY8b7u+pmnnmD
+	pRYEOPLIKKu2EBcPKtet53M9VqJ9t2cxdcxREeIhE0+wPIrhfCFrPIiHzMzWuCgU
+	EiEm4ElGmzbnMarXbTxXOlLmZNXwT6ttoGVctAC873pb/FN8ynN+W8qI05BBneoX
+	R1INwk78//dS6WtjE6accQAuiLu4yCBofaRpxspkH3f4RxQ==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4be2mb8e7a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 01 Jan 2026 22:57:08 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Thu, 1 Jan 2026 22:57:07 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Thu, 1 Jan 2026 22:57:07 -0800
+Received: from 5810.marvell.com (unknown [10.29.45.105])
+	by maili.marvell.com (Postfix) with ESMTP id 447605B6945;
+	Thu,  1 Jan 2026 22:57:04 -0800 (PST)
+From: Kommula Shiva Shankar <kshankar@marvell.com>
+To: <mst@redhat.com>
+CC: <jasowang@redhat.com>, <virtualization@lists.linux.dev>,
+        <eperezma@redhat.com>, <kvm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <jerinj@marvell.com>, <ndabilpuram@marvell.com>, <schalla@marvell.com>
+Subject: [PATCH] vhost: fix caching attributes of MMIO regions by setting them explicitly
+Date: Fri, 2 Jan 2026 12:27:03 +0530
+Message-ID: <20260102065703.656255-1-kshankar@marvell.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,106 +70,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=DqtbOW/+ c=1 sm=1 tr=0 ts=69576c44 cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8 a=20KFwNOVAAAA:8
+ a=B7PU6KTNA_LlbaTfV1kA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: Jfn3uONG0LL2oWxZkExQ3gnUW7zEnwzS
+X-Proofpoint-GUID: Jfn3uONG0LL2oWxZkExQ3gnUW7zEnwzS
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTAyMDA2MyBTYWx0ZWRfX79SelernEzUf
+ LomwbPlho60xcHzQ+pKnBQ3Z/04BYRiKIB4qJrs0ApbPgVwKZVC8H1qJYlBkyTT+f70NhKoaRSc
+ BTM6wfBpGFlksgNz33bCGhsC2EUyPOBRrOTBqkV+f5Lw7bF/mdAbD9DRudtiquI1H+PLvrJgCM2
+ EIWltIu2ctCX92G50uGieif/657/BEAiVfruloeNTZ81JqKVkVg3jWxIcA8MOuIYG8AQUynG2XC
+ 4OwGKLiWV5O+G8ZkoCOQkkMxtSsXHZK8hwR5JWrvgzbgmIqJDOoEYqrge/3MzoDQlbSl/Z3xDlz
+ 551AOd2Ju0xBDDCa2SK286cuNVqHwlxeJJ5kqQ+mI67PnD6z/a5M+klJgRETMVsH+EAhEdYtDp2
+ DE9rbntHTDSDC0FatmzajnGPI3Yuo+YPQ4RIZrC3fem/O2UH0y10k0xYKh5TW+XtAWaeaNquXz0
+ lB7GHg8jFkKe3ODgnAw==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-01_07,2025-12-31_01,2025-10-01_01
 
-Introduce a new tracepoint to track stalled page pool releases,
-providing better observability for page pool lifecycle issues.
+Explicitly set non-cached caching attributes for MMIO regions.
+Default write-back mode can cause CPU to cache device memory,
+causing invalid reads and unpredictable behavior.
 
-Problem:
-Currently, when a page pool shutdown is stalled due to inflight pages,
-the kernel only logs a warning message via pr_warn(). This has several
-limitations:
+Invalid read and write issues were observed on ARM64 when mapping the
+notification area to userspace via mmap.
 
-1. The warning floods the kernel log after the initial DEFER_WARN_INTERVAL,
-   making it difficult to track the progression of stalled releases
-2. There's no structured way to monitor or analyze these events
-3. Debugging tools cannot easily capture and correlate stalled pool
-   events with other network activity
-
-Solution:
-Add a new tracepoint, page_pool_release_stalled, that fires when a page
-pool shutdown is stalled. The tracepoint captures:
-- pool: pointer to the stalled page_pool
-- inflight: number of pages still in flight
-- sec: seconds since the release was deferred
-
-The implementation also modifies the logging behavior:
-- pr_warn() is only emitted during the first warning interval
-  (DEFER_WARN_INTERVAL to DEFER_WARN_INTERVAL*2)
-- The tracepoint is fired always, reducing log noise while still
-  allowing monitoring tools to track the issue
-
-This allows developers and system administrators to:
-- Use tools like perf, ftrace, or eBPF to monitor stalled releases
-- Correlate page pool issues with network driver behavior
-- Analyze patterns without parsing kernel logs
-- Track the progression of inflight page counts over time
-
-Signed-off-by: Leon Huang Fu <leon.huangfu@shopee.com>
-Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
+Signed-off-by: Kommula Shiva Shankar <kshankar@marvell.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
 ---
-v1 -> v2:
- - Drop RFC.
- - Store 'pool->user.id' to '__entry->id' (per Steven Rostedt).
- - https://lore.kernel.org/netdev/20251125082207.356075-1-leon.hwang@linux.dev/
----
- include/trace/events/page_pool.h | 24 ++++++++++++++++++++++++
- net/core/page_pool.c             |  6 ++++--
- 2 files changed, 28 insertions(+), 2 deletions(-)
+Originally sent to net-next, now redirected to vhost tree
+per Jason Wang's suggestion. 
 
-diff --git a/include/trace/events/page_pool.h b/include/trace/events/page_pool.h
-index 31825ed30032..c34de6a5ae80 100644
---- a/include/trace/events/page_pool.h
-+++ b/include/trace/events/page_pool.h
-@@ -113,6 +113,30 @@ TRACE_EVENT(page_pool_update_nid,
- 		  __entry->pool, __entry->pool_nid, __entry->new_nid)
- );
+ drivers/vhost/vdpa.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index 05a481e4c385..b0179e8567ab 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -1527,6 +1527,7 @@ static int vhost_vdpa_mmap(struct file *file, struct vm_area_struct *vma)
+ 	if (vma->vm_end - vma->vm_start != notify.size)
+ 		return -ENOTSUPP;
  
-+TRACE_EVENT(page_pool_release_stalled,
-+
-+	TP_PROTO(const struct page_pool *pool, int inflight, int sec),
-+
-+	TP_ARGS(pool, inflight, sec),
-+
-+	TP_STRUCT__entry(
-+		__field(const struct page_pool *, pool)
-+		__field(u32,			  id)
-+		__field(int,			  inflight)
-+		__field(int,			  sec)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->pool		= pool;
-+		__entry->id		= pool->user.id;
-+		__entry->inflight	= inflight;
-+		__entry->sec		= sec;
-+	),
-+
-+	TP_printk("page_pool=%p id=%d inflight=%d sec=%d",
-+		  __entry->pool, __entry->id, __entry->inflight, __entry->sec)
-+);
-+
- #endif /* _TRACE_PAGE_POOL_H */
- 
- /* This part must be outside protection */
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 265a729431bb..01564aa84c89 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -1222,8 +1222,10 @@ static void page_pool_release_retry(struct work_struct *wq)
- 	    (!netdev || netdev == NET_PTR_POISON)) {
- 		int sec = (s32)((u32)jiffies - (u32)pool->defer_start) / HZ;
- 
--		pr_warn("%s() stalled pool shutdown: id %u, %d inflight %d sec\n",
--			__func__, pool->user.id, inflight, sec);
-+		if (sec >= DEFER_WARN_INTERVAL / HZ && sec < DEFER_WARN_INTERVAL * 2 / HZ)
-+			pr_warn("%s() stalled pool shutdown: id %u, %d inflight %d sec\n",
-+				__func__, pool->user.id, inflight, sec);
-+		trace_page_pool_release_stalled(pool, inflight, sec);
- 		pool->defer_warn = jiffies + DEFER_WARN_INTERVAL;
- 	}
- 
++	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+ 	vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP);
+ 	vma->vm_ops = &vhost_vdpa_vm_ops;
+ 	return 0;
 -- 
-2.52.0
+2.48.1
 
 
