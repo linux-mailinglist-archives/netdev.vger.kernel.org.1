@@ -1,135 +1,158 @@
-Return-Path: <netdev+bounces-246554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86B99CEE12D
-	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 10:41:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8861ACEE1D5
+	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 11:01:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DCCF8300119E
-	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 09:41:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4BF843006F60
+	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 10:01:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0477D275114;
-	Fri,  2 Jan 2026 09:41:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EFD12036E9;
+	Fri,  2 Jan 2026 10:01:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="0KqSC4py"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RafPRW0X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB0861E89C
-	for <netdev@vger.kernel.org>; Fri,  2 Jan 2026 09:41:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E031E573;
+	Fri,  2 Jan 2026 10:01:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767346900; cv=none; b=e6GbcQRQ0X1YexCSuBSv39Q3cqRQJUFhw5uU8BDPiIaxjHk4fPJobeqhpRBJsHS/g6baxXFmnEHKZQlB7Hll6av9faUVnlxXIg7U3CUR5QnensOwyZXqib7zuGN+SgDmW7DQD5Z3nY1s0MqXRj+v8tG4MiiRkN5hy0EaIJiAqqU=
+	t=1767348061; cv=none; b=dr6wbx2NJbrhTXXd9gL/7rfjjN4J8i01AE/y5nVIFDWT9Gn7Cm023Sbc4tVUR0n/mqSawNulEaUiaznSSrKFmypXwpXSMLDEOALKRCzhq4TJ3kQnu+0Bez6OhyNR+eWBUi1KtdDygI7nDOGRGd34/vDOoRZ/mdDWxbMAgdKxkzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767346900; c=relaxed/simple;
-	bh=5uO8RDHjB/bNUyexWySF2lb28p//jJ/aWFv27W2+lGQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZvfBSqh22LudW+Y35QI5KTYWaOKRZbstiRbQ7ry0CIzqXqW+GPqGVl81OqjJciuhg1sFIJgj8ODmw1SVHryNeApD1iqRDw8/SmwUqry+BKpD8hrbpZnBn4rozKeJ6Kign33oQME7EKhxcYTtg7ovhICxVgmZyye3nwNK2uvDHZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=0KqSC4py; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-47775fb6c56so92577265e9.1
-        for <netdev@vger.kernel.org>; Fri, 02 Jan 2026 01:41:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1767346896; x=1767951696; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5uO8RDHjB/bNUyexWySF2lb28p//jJ/aWFv27W2+lGQ=;
-        b=0KqSC4pyViPkpTROH9CyX2WNUasUj1P1HSM4M9RXZ3TCKDNha7nVjRv+ywP35R4VTf
-         JpHx0ExghCjf0ZXzGGsat3v5bhkMbYhEy0lmo9DoP5Bm/4nLrc/ABL5xiPjetbXYO5Hv
-         iGeEqCRjxymQ57m03RX7RlQcBA1F+bynBWCt3I96DR2/Rgn+U0rZPPfICc8pLAtlgzTG
-         UNAO3/T9nCVQ1fumNQaQr5yvU2cb3cb2kzzM9hy8cJCPqkwmSj3PqMxj2olmGO9LM21T
-         bV1WyktCX5QJGHtzfsnLIvOyQkPF5e9h5ojWedMcnO7s8uLsgPvM5N0qqi3vionxN2Qs
-         LRyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767346896; x=1767951696;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5uO8RDHjB/bNUyexWySF2lb28p//jJ/aWFv27W2+lGQ=;
-        b=VWAwR1hctCu0I1y0JaJ/1G+JEZH2+gqS0vYnzQouRG0dUu5fLQhIy+y+e0VvK22NA0
-         vKaOjkSr3KvLfxdAXakXs0o6jNa0d49AkTcblWYwyG1JI7Xytg04kKLH4AhmDdxo60KS
-         fW6C/CBJl9Qxmhe3KU6poSuGAyTXl1gtnajHDqu6XDIQT+MxhHVs6cEHb/86PYxUw00B
-         h9Uql4cFXeebiHnMBa5jtFTLT///D2OtMjVHcST5Z25bwxSWN9Z1U5p6etEFxokLIHlF
-         BvU6qt2svmQ97yBRCY7AXT023s3Xa7cj6P2GbVXNzTAeg7puFKJQsDja9rWhEs12rQOG
-         5Ueg==
-X-Forwarded-Encrypted: i=1; AJvYcCU7L4j4Q7gcE3rcsTaKD3WptWYnumbL+KlI/D6PbWk5oTueJhe0TmHTytlKiqpqoti69xd935o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmQZcJgs+WV6PssDUDAL6WTF1oG1CP83suAcWH5g3kkI87NDKq
-	TbM3iEsGIDdleWE1Gwm0lSbkdWCGlfQ5n4DkrDM3L9tk7kjenwzgqUn/kluLB37Wedo=
-X-Gm-Gg: AY/fxX62WvEvj9KXJlmXKFkQD2sB+6IdefDseloxqGq9GY+WrQ0BnlN1BNO0pLOtgCi
-	sALSwF69wDMubdKcUlYNwWXKPkYVDior1PuX2l3Ir1GzDVOes/EjRghWer4j6MTx81Nq5FnTR03
-	bVPSMeVix3j4pRLlIYOaPZHzZoegZ/cUgsNy2COxXPKllVGXLjgZSK0CicNiDZ4P/0D2al/ly6K
-	j64urX/TLRjB7aWXFjmwoqBapbfrnStbjV5Z2u3ycI0zTX4E+ktD7Ti9g5iFRkUXkxKoUgUr1tm
-	T7DXwBgVbrKS8cIfcSzXmiBmDyjwH6fy5lAoOlwK4lzuHNHTHLC6XWrgzR3r9gviKMxYuIgze6U
-	J5h4cBMPZMe9InsCBuJ9xCYKLEUaGzLCP6bUyeryJfQJSIIyRhQpjW2YctkVqJkkrYWimK0tNJ/
-	cT4SWRTvW/zRyUhwFim/zrKzY=
-X-Google-Smtp-Source: AGHT+IGD39cVObDVeZ6xmuQpCvjSA+AN2zRcHRkFTjgfnuPMfho0Ql5qklljpYqa27sF3WBPpLyf3g==
-X-Received: by 2002:a05:600c:1914:b0:477:6d96:b3e5 with SMTP id 5b1f17b1804b1-47d1955b79amr465110435e9.7.1767346895958;
-        Fri, 02 Jan 2026 01:41:35 -0800 (PST)
-Received: from FV6GYCPJ69 ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d193d5372sm760352485e9.14.2026.01.02.01.41.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Jan 2026 01:41:35 -0800 (PST)
-Date: Fri, 2 Jan 2026 10:41:31 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Xiao Liang <xiliang@redhat.com>
-Cc: shayagr@amazon.com, akiyano@amazon.com, darinzon@amazon.com, 
-	saeedb@amazon.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v3] net/ena: fix missing lock when update devlink params
-Message-ID: <auk6ifnbjy7xhmv5il5mhkttlg2sgvj2fqmmryt53pf7ifhga2@a6m25efjduln>
-References: <20251229145708.16603-1-xiliang@redhat.com>
- <20251231145808.6103-1-xiliang@redhat.com>
+	s=arc-20240116; t=1767348061; c=relaxed/simple;
+	bh=uO3alF6Zq3I2FUn3PgzZJqkAM48dsLDrTU0qNG9HkCc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=u7xVsT9Q4nC5yVc7JZUbaWsPV43SfIdqSRrPxDir/P7RFH8Qos4LBL25hqV4gQTf7b6nPChz26Gr9uGlK1wWgdLD0hCDCT7T8JSSn2GOJI+12b41g5dyCt5e2132F+fI7dT8BQeA0FTx3kQbCu86ixqLxt5c0QzoiqD4Gdu1VKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RafPRW0X; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DB06C116B1;
+	Fri,  2 Jan 2026 10:00:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767348060;
+	bh=uO3alF6Zq3I2FUn3PgzZJqkAM48dsLDrTU0qNG9HkCc=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=RafPRW0XsOmn/eAj96G3HfTALrfVO8gFNBYE5dr5U6RwYxWVottC7pnZDci4MAnD4
+	 qdq/g2Gyj8rS/+t8reMou56DNJvMFsRZntTfJROexJSsrCAhs/30cpyj4pLau7TwR+
+	 gtbkfTtJcq7jTxns5KrGc9PGkxVjIFqmHCo1ZyveRtmRoCjE9qTDuhnDiT9esLkC/6
+	 wQ7FbM2naejXDKx4+p/cp/d1hK+DYdx3XVLontugziQwQaI2krJgRLecvaHkPyToWW
+	 hMGCy2xM3rth0M7zAVqmzxbculyQ6Jo2jVo2N3xlkQAEzhjATMK7p+768ZCv/3GDDD
+	 EAY3rALpP+REQ==
+Message-ID: <d7ab53b2-6b26-4e66-8ae1-cb63d98cee88@kernel.org>
+Date: Fri, 2 Jan 2026 11:00:57 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251231145808.6103-1-xiliang@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot] [wireless?] WARNING in rfkill_unregister
+To: Johannes Berg <johannes@sipsolutions.net>,
+ syzbot <syzbot+16210d09509730207241@syzkaller.appspotmail.com>,
+ linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+ netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <6955cbd5.050a0220.a1b6.032d.GAE@google.com>
+ <e062f6a0a7583ca99ab0449481119634f8b02a3d.camel@sipsolutions.net>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
+ FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJoF1BKBQkWlnSaAAoJEBuTQ307
+ QWKbHukP/3t4tRp/bvDnxJfmNdNVn0gv9ep3L39IntPalBFwRKytqeQkzAju0whYWg+R/rwp
+ +r2I1Fzwt7+PTjsnMFlh1AZxGDmP5MFkzVsMnfX1lGiXhYSOMP97XL6R1QSXxaWOpGNCDaUl
+ ajorB0lJDcC0q3xAdwzRConxYVhlgmTrRiD8oLlSCD5baEAt5Zw17UTNDnDGmZQKR0fqLpWy
+ 786Lm5OScb7DjEgcA2PRm17st4UQ1kF0rQHokVaotxRM74PPDB8bCsunlghJl1DRK9s1aSuN
+ hL1Pv9VD8b4dFNvCo7b4hfAANPU67W40AaaGZ3UAfmw+1MYyo4QuAZGKzaP2ukbdCD/DYnqi
+ tJy88XqWtyb4UQWKNoQqGKzlYXdKsldYqrLHGoMvj1UN9XcRtXHST/IaLn72o7j7/h/Ac5EL
+ 8lSUVIG4TYn59NyxxAXa07Wi6zjVL1U11fTnFmE29ALYQEXKBI3KUO1A3p4sQWzU7uRmbuxn
+ naUmm8RbpMcOfa9JjlXCLmQ5IP7Rr5tYZUCkZz08LIfF8UMXwH7OOEX87Y++EkAB+pzKZNNd
+ hwoXulTAgjSy+OiaLtuCys9VdXLZ3Zy314azaCU3BoWgaMV0eAW/+gprWMXQM1lrlzvwlD/k
+ whyy9wGf0AEPpLssLVt9VVxNjo6BIkt6d1pMg6mHsUEVzsFNBFVDXDQBEADNkrQYSREUL4D3
+ Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
+ MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
+ OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
+ GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
+ 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
+ YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
+ 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
+ BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
+ JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
+ 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
+ YpsFAmgXUF8FCRaWWyoACgkQG5NDfTtBYptO0w//dlXJs5/42hAXKsk+PDg3wyEFb4NpyA1v
+ qmx7SfAzk9Hf6lWwU1O6AbqNMbh6PjEwadKUk1m04S7EjdQLsj/MBSgoQtCT3MDmWUUtHZd5
+ RYIPnPq3WVB47GtuO6/u375tsxhtf7vt95QSYJwCB+ZUgo4T+FV4hquZ4AsRkbgavtIzQisg
+ Dgv76tnEv3YHV8Jn9mi/Bu0FURF+5kpdMfgo1sq6RXNQ//TVf8yFgRtTUdXxW/qHjlYURrm2
+ H4kutobVEIxiyu6m05q3e9eZB/TaMMNVORx+1kM3j7f0rwtEYUFzY1ygQfpcMDPl7pRYoJjB
+ dSsm0ZuzDaCwaxg2t8hqQJBzJCezTOIkjHUsWAK+tEbU4Z4SnNpCyM3fBqsgYdJxjyC/tWVT
+ AQ18NRLtPw7tK1rdcwCl0GFQHwSwk5pDpz1NH40e6lU+NcXSeiqkDDRkHlftKPV/dV+lQXiu
+ jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
+ zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
+ XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
+In-Reply-To: <e062f6a0a7583ca99ab0449481119634f8b02a3d.camel@sipsolutions.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Wed, Dec 31, 2025 at 03:58:08PM +0100, xiliang@redhat.com wrote:
->From: Frank Liang <xiliang@redhat.com>
->
->Fix assert lock warning while calling devl_param_driverinit_value_set()
->in ena.
->
->WARNING: net/devlink/core.c:261 at devl_assert_locked+0x62/0x90, CPU#0: kworker/0:0/9
->CPU: 0 UID: 0 PID: 9 Comm: kworker/0:0 Not tainted 6.19.0-rc2+ #1 PREEMPT(lazy)
->Hardware name: Amazon EC2 m8i-flex.4xlarge/, BIOS 1.0 10/16/2017
->Workqueue: events work_for_cpu_fn
->RIP: 0010:devl_assert_locked+0x62/0x90
->
->Call Trace:
-> <TASK>
-> devl_param_driverinit_value_set+0x15/0x1c0
-> ena_devlink_alloc+0x18c/0x220 [ena]
-> ? __pfx_ena_devlink_alloc+0x10/0x10 [ena]
-> ? trace_hardirqs_on+0x18/0x140
-> ? lockdep_hardirqs_on+0x8c/0x130
-> ? __raw_spin_unlock_irqrestore+0x5d/0x80
-> ? __raw_spin_unlock_irqrestore+0x46/0x80
-> ? devm_ioremap_wc+0x9a/0xd0
-> ena_probe+0x4d2/0x1b20 [ena]
-> ? __lock_acquire+0x56a/0xbd0
-> ? __pfx_ena_probe+0x10/0x10 [ena]
-> ? local_clock+0x15/0x30
-> ? __lock_release.isra.0+0x1c9/0x340
-> ? mark_held_locks+0x40/0x70
-> ? lockdep_hardirqs_on_prepare.part.0+0x92/0x170
-> ? trace_hardirqs_on+0x18/0x140
-> ? lockdep_hardirqs_on+0x8c/0x130
-> ? __raw_spin_unlock_irqrestore+0x5d/0x80
-> ? __raw_spin_unlock_irqrestore+0x46/0x80
-> ? __pfx_ena_probe+0x10/0x10 [ena]
-> ......
-> </TASK>
->
->Fixes: 816b52624cf6 ("net: ena: Control PHC enable through devlink")
->Signed-off-by: Frank Liang <xiliang@redhat.com>
->Reviewed-by: David Arinzon <darinzon@amazon.com>
+On 01/01/2026 13:07, Johannes Berg wrote:
+> Hi,
+> 
+>> ------------[ cut here ]------------
+>> rtmutex deadlock detected
+>> WARNING: kernel/locking/rtmutex.c:1674 at rt_mutex_handle_deadlock+0x21/0xb0 kernel/locking/rtmutex.c:1674, CPU#0: syz.7.2908/15923
+>> Modules linked in:
+>> CPU: 0 UID: 0 PID: 15923 Comm: syz.7.2908 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
+>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+>> RIP: 0010:rt_mutex_handle_deadlock+0x21/0xb0 kernel/locking/rtmutex.c:1674
+>> Code: 90 90 90 90 90 90 90 90 90 41 57 41 56 41 55 41 54 53 83 ff dd 0f 85 86 00 00 00 48 89 f7 e8 a6 39 01 00 48 8d 3d af 7c 0a 04 <67> 48 0f b9 3a 4c 8d 3d 00 00 00 00 65 48 8b 1c 25 08 10 b3 91 4c
+>> RSP: 0018:ffffc90004617710 EFLAGS: 00010286
+>> RAX: 0000000080000000 RBX: ffffc900046177a0 RCX: 0000000000000000
+>> RDX: 0000000000000006 RSI: ffffffff8ce0bbf9 RDI: ffffffff8ede5760
+>> RBP: ffffc900046178c0 R08: ffffffff8edb3477 R09: 1ffffffff1db668e
+>> R10: dffffc0000000000 R11: fffffbfff1db668f R12: 1ffff920008c2ef0
+>> R13: ffffffff8ad3d599 R14: ffffffff8eb910e0 R15: dffffc0000000000
+>> FS:  0000000000000000(0000) GS:ffff888126cef000(0000) knlGS:0000000000000000
+>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> CR2: 000056422df5abe0 CR3: 000000005929c000 CR4: 00000000003526f0
+>> Call Trace:
+>>  <TASK>
+>>  __rt_mutex_slowlock kernel/locking/rtmutex.c:1734 [inline]
+>>  __rt_mutex_slowlock_locked kernel/locking/rtmutex.c:1760 [inline]
+>>  rt_mutex_slowlock+0x666/0x6b0 kernel/locking/rtmutex.c:1800
+>>  __rt_mutex_lock kernel/locking/rtmutex.c:1815 [inline]
+>>  __mutex_lock_common kernel/locking/rtmutex_api.c:534 [inline]
+>>  mutex_lock_nested+0x16a/0x1d0 kernel/locking/rtmutex_api.c:552
+>>  rfkill_unregister+0xd1/0x230 net/rfkill/core.c:1145
+>>  nfc_unregister_device+0x96/0x300 net/nfc/core.c:1167
+>>  virtual_ncidev_close+0x59/0x90 drivers/nfc/virtual_ncidev.c:172
+> 
+> NFC has been issues with this for *years*. Technically, Krzysztof is
+> listed as a maintainer but I suspect that's mostly dead.
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+And I have little time nowadays to do any real maintenance. I am
+thinking that NFC should be marked Odd Fixes.
+
+> 
+> Is there a way you could route rfkill issues to NFC (and have them
+> ignored there) if NFC is involved?
+> 
+> Clearly they're not useful if nobody is interested in fixing NFC, so
+> maybe we should just disable the virtual NFC driver completely and just
+> not have syzbot run on anything there...
+
+Great benefit of virtual NFC driver was to show how buggy the NFC stack
+is :)
+
+Best regards,
+Krzysztof
 
