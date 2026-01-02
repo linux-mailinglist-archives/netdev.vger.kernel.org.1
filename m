@@ -1,46 +1,78 @@
-Return-Path: <netdev+bounces-246588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88F42CEEB7B
-	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 15:00:52 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47F8BCEECEE
+	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 16:01:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 581FD300D17E
-	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 14:00:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B3A3830019EB
+	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 15:01:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4A6D3A1E67;
-	Fri,  2 Jan 2026 14:00:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FB5223D281;
+	Fri,  2 Jan 2026 15:01:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DabqC3OW"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA2CEEBB
-	for <netdev@vger.kernel.org>; Fri,  2 Jan 2026 14:00:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FAF6231829
+	for <netdev@vger.kernel.org>; Fri,  2 Jan 2026 15:01:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767362450; cv=none; b=euHoPXZv9bTD5ax9sKhqsepKRNOMFGC6BeuDJN0d5FRZYeVNiB1j3SCmB5nhC/GfyHfJZAOkfXJJWaYNwjJyHYh5t3S64E8qk4kGewLg2EFB3VYIomc+8d2D8UQkY8yNn59QtS4LTKnvmtd80T4yTCpaPUx4fVOZ0ebLFjgLf7Y=
+	t=1767366115; cv=none; b=CMaZnpvoL+TC08IbZzN/JuKVqsKIhUHicrTNuRlgA6NDNMk2oh1X48lOrVZ59xPvSSnGp3latmT0rqSzlewhcwU6U7yhCJjtCIGlAn8ZHb4OrLO231p2GWA4qzDeh1MALS2FaYTGCTIGmwqHibVxcna+CFftrHVAzWaH+LiHB7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767362450; c=relaxed/simple;
-	bh=s3utorbSSo/daQapsq6QQCIizAg3tqu/G85i1AZtpvY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y014SwZRaP+wkAYJjgUbIRbu2oO4SW8eZtFizfJpMCbrOEZ6YLRScCjmrjYQA8TQ7Dea4Q1M8VXrtiPEBl9B3MqrznRht0lToGXDM64ifWsUujYFihJMMscfYFWy90wQ+imIohsXfGGYyfTMWuiGgad7FPg6mRwT+RI9wIdW+YQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 5174B6015E; Fri, 02 Jan 2026 15:00:46 +0100 (CET)
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	dsahern@kernel.org,
-	Florian Westphal <fw@strlen.de>,
-	syzbot+4393c47753b7808dac7d@syzkaller.appspotmail.com
-Subject: [PATCH net] inet: frags: drop fraglist conntrack references
-Date: Fri,  2 Jan 2026 15:00:07 +0100
-Message-ID: <20260102140030.32367-1-fw@strlen.de>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1767366115; c=relaxed/simple;
+	bh=3/STyZQ6KuX+xvZ6JTum6U+Nz29JODH6abBJ4FGY2Xg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gYJjCUAaYDaIkzGFFGGT8E0NTp2XbOtCPfBkmZDxWTUEk2hBEFYm4XUml4659lHtcfCOwaCQ8pLk7AjVf+k8qbiZW4HXtuRSX+BBusICXT8h/2jq/IaTdwFdzOtzc0IwaMZZKtusWupA0wuTyX8jMIiHes8DBhEecgNVdHoV1vk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DabqC3OW; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1767366101;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=BiRCJtw4ELvsXjmY6Q3y3Drgdzip5X30NSHjEWzRHx0=;
+	b=DabqC3OWDAIBs9M6SPPDyL32w6/4Fhiq9+8+V0B+dkhXafrqj6RoOvDXCi0nKj/H2LekNl
+	tlQzcLDVBn687MtMndiRNxC1ZzpwZClYqefHi4YPuV0sNwc+md5/3/c+HmKCGAB7DyFCJm
+	69TpO5x1z1/hNGYzoQQSeSL8q63O0v8=
+From: Leon Hwang <leon.hwang@linux.dev>
+To: bpf@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Puranjay Mohan <puranjay@kernel.org>,
+	Xu Kuohai <xukuohai@huaweicloud.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	kernel-patches-bot@fb.com,
+	Leon Hwang <leon.hwang@linux.dev>
+Subject: [PATCH bpf-next 0/4] bpf: tailcall: Eliminate max_entries and bpf_func access at runtime
+Date: Fri,  2 Jan 2026 23:00:28 +0800
+Message-ID: <20260102150032.53106-1-leon.hwang@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,85 +80,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Jakub added a warning in nf_conntrack_cleanup_net_list() to make debugging
-leaked skbs/conntrack references more obvious.
+This patch series optimizes BPF tail calls on x86_64 and arm64 by
+eliminating runtime memory accesses for max_entries and 'prog->bpf_func'
+when the prog array map is known at verification time.
 
-syzbot reports this as triggering, and I can also reproduce this via
-ip_defrag.sh selftest:
+Currently, every tail call requires:
+  1. Loading max_entries from the prog array map
+  2. Dereferencing 'prog->bpf_func' to get the target address
 
- conntrack cleanup blocked for 60s
- WARNING: net/netfilter/nf_conntrack_core.c:2512
- [..]
+This series introduces a mechanism to precompute and cache the tail call
+target addresses (bpf_func + prologue_offset) in the prog array itself:
+  array->ptrs[max_entries + index] = prog->bpf_func + prologue_offset
 
-conntrack clenups gets stuck because there are skbs with still hold nf_conn
-references via their frag_list.
+When a program is added to or removed from the prog array, the cached
+target is atomically updated via xchg().
 
-   net.core.skb_defer_max=0 makes the hang disappear.
+The verifier now encodes additional information in the tail call
+instruction's imm field:
+  - bits 0-7:   map index in used_maps[]
+  - bits 8-15:  dynamic array flag (1 if map pointer is poisoned)
+  - bits 16-31: poke table index + 1 for direct tail calls
 
-Eric Dumazet points out that skb_release_head_state() doesn't follow the
-fraglist.
+For static tail calls (map known at verification time):
+  - max_entries is embedded as an immediate in the comparison instruction
+  - The cached target from array->ptrs[max_entries + index] is used
+    directly, avoiding the 'prog->bpf_func' dereference
 
-ip_defrag.sh can only reproduce this problem since
-commit 6471658dc66c ("udp: use skb_attempt_defer_free()"), but AFAICS this
-problem could happen with TCP as well if pmtu discovery is off.
+For dynamic tail calls (map pointer poisoned):
+  - Fall back to runtime lookup of max_entries and prog->bpf_func
 
-The relevant problem path for udp is:
-1. netns emits fragmented packets
-2. nf_defrag_v6_hook reassembles them (in output hook)
-3. reassembled skb is tracked (skb owns nf_conn reference)
-4. ip6_output refragments
-5. refragmented packets also own nf_conn reference (ip6_fragment
-   calls ip6_copy_metadata())
-6. on input path, nf_defrag_v6_hook skips defragmentation: the
-   fragments already have skb->nf_conn attached
-7. skbs are reassembled via ipv6_frag_rcv()
-8. skb_consume_udp -> skb_attempt_defer_free() -> skb ends up
-   in pcpu freelist, but still has nf_conn reference.
+This reduces cache misses and improves tail call performance for the
+common case where the prog array is statically known.
 
-Possible solutions:
- 1 let defrag engine drop nf_conn entry, OR
- 2 export kick_defer_list_purge() and call it from the conntrack
-   netns exit callback, OR
- 3 add skb_has_frag_list() check to skb_attempt_defer_free()
+Leon Hwang (4):
+  bpf: tailcall: Introduce bpf_arch_tail_call_prologue_offset
+  bpf, x64: tailcall: Eliminate max_entries and bpf_func access at
+    runtime
+  bpf, arm64: tailcall: Eliminate max_entries and bpf_func access at
+    runtime
+  bpf, lib/test_bpf: Fix broken tailcall tests
 
-2 & 3 also solve ip_defrag.sh hang but share same drawback:
+ arch/arm64/net/bpf_jit_comp.c | 71 +++++++++++++++++++++++++----------
+ arch/x86/net/bpf_jit_comp.c   | 51 ++++++++++++++++++-------
+ include/linux/bpf.h           |  1 +
+ kernel/bpf/arraymap.c         | 27 ++++++++++++-
+ kernel/bpf/verifier.c         | 30 ++++++++++++++-
+ lib/test_bpf.c                | 39 ++++++++++++++++---
+ 6 files changed, 178 insertions(+), 41 deletions(-)
 
-Such reassembled skbs, queued to socket, can prevent conntrack module
-removal until userspace has consumed the packet. While both tcp and udp
-stack do call nf_reset_ct() before placing skb on socket queue, that
-function doesn't iterate frag_list skbs.
-
-Therefore drop nf_conn entries when they are placed in defrag queue.
-Keep the nf_conn entry of the first (offset 0) skb so that reassembled
-skb retains nf_conn entry for sake of TX path.
-
-Note that fixes tag is incorrect; it points to the commit introducing the
-'ip_defrag.sh reproducible problem': no need to backport this patch to
-every stable kernel.
-
-Reported-by: syzbot+4393c47753b7808dac7d@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/693b0fa7.050a0220.4004e.040d.GAE@google.com/
-Fixes: 6471658dc66c ("udp: use skb_attempt_defer_free()")
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- net/ipv4/inet_fragment.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/net/ipv4/inet_fragment.c b/net/ipv4/inet_fragment.c
-index 001ee5c4d962..4e6d7467ed44 100644
---- a/net/ipv4/inet_fragment.c
-+++ b/net/ipv4/inet_fragment.c
-@@ -488,6 +488,8 @@ int inet_frag_queue_insert(struct inet_frag_queue *q, struct sk_buff *skb,
- 	}
- 
- 	FRAG_CB(skb)->ip_defrag_offset = offset;
-+	if (offset)
-+		nf_reset_ct(skb);
- 
- 	return IPFRAG_OK;
- }
--- 
+--
 2.52.0
 
 
