@@ -1,90 +1,161 @@
-Return-Path: <netdev+bounces-246616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DDF4CEF472
-	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 21:11:57 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 639EBCEF4B5
+	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 21:18:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AC33F301FF46
-	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 20:11:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 636F3300B687
+	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 20:18:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 218AD31961F;
-	Fri,  2 Jan 2026 20:04:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99A641990A7;
+	Fri,  2 Jan 2026 20:18:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LatBHsvD"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="aPqhpcYz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E588F319614;
-	Fri,  2 Jan 2026 20:04:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62732459C6;
+	Fri,  2 Jan 2026 20:18:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767384247; cv=none; b=NEQ1RAg4gJkxG0jOoshQ9lBtPUZDyqTQCT3BTbx7bxaY+iSlNSwre2cSvc40mwu9tDrLECjSS/8IboskKqNe0ZsQNHue1GxP9DQCBlp1OnaguWcAthIXux8Qp0EKhWvhf4maPtwAk0pgTYmIvjILm+7+RY+R2kTIQ/S6ix2+qhE=
+	t=1767385134; cv=none; b=fyojiCqx/JlEaqdntEf3+/BPIp/4qBVyFku9VptlsWxyz8diqSZtB+pWobUunWqu6jlmenlsygzYc5o447uEtwc3iP6iK7YmmbLk9QUtdYH6gHVzNV0DRj9Dvl5VEKK9s5g7mjaHWunSeBAcqhalz7NzyzI8UrlPbQe30d2wAOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767384247; c=relaxed/simple;
-	bh=2vq9xeh/ZjwJCXeCtC2pq+VOjFi6w5FQElmEF3VFqI4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CxYKCpWtT0yVNSWvL9p8656Gt0UzNMS0iLBJd2x0fsBuBf4At7KC4s2KAqkEDjTeA5nDXwH4nmg8D7pMxlAEE7qqVPtHK3ucWYudgZ5pO/I2Dh+PASrLnfWqFdGWCwQ7hnhcdYpFv+IQXiaBOZ81GwHF/ZPGaR5tzV07o9echGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LatBHsvD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D356C116B1;
-	Fri,  2 Jan 2026 20:04:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767384246;
-	bh=2vq9xeh/ZjwJCXeCtC2pq+VOjFi6w5FQElmEF3VFqI4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LatBHsvD91n9PNyXgiGK0woU+gfEz/RmcTMpAH63pH2HJ45jAmGWuxu0/CWc6nRyi
-	 d5iMxlym4KCsdn7VB+gsCe6IlDZfYidTTJkIFws+m+X8TDdooFeYDU46F2mQTLq16I
-	 D7dz7PAfigSVVC0otmNZFVr8AXNNcKNnk4dle1D13AEqFGsSgxqNJpalYuDQ7tEsB0
-	 +Ej+i+szISTz0FYqKX3mQvRdi26UPAQv00iyWhyOIE67wYMNE2BCEbKZAefNsfEifk
-	 v4M3YBamRKzulRg+iPuvjzlCQdXEyfoMvPPEJZUc36e4U6wxwUnfRyS0SbUo950kQj
-	 CEwhk5RS94Fzw==
-Date: Fri, 2 Jan 2026 12:04:05 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Prithvi <activprithvi@gmail.com>
-Cc: andrii@kernel.org, socketcan@hartkopp.net, mkl@pengutronix.de,
- linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzkaller-bugs@googlegroups.com, netdev@vger.kernel.org
-Subject: Re: [bpf, xdp] headroom - was: Re: Question about to KMSAN:
- uninit-value in can_receive
-Message-ID: <20260102120405.34613b68@kernel.org>
-In-Reply-To: <20260102153611.63wipdy2meh3ovel@inspiron>
-References: <20251117173012.230731-1-activprithvi@gmail.com>
-	<0c98b1c4-3975-4bf5-9049-9d7f10d22a6d@hartkopp.net>
-	<c2cead0a-06ed-4da4-a4e4-8498908aae3e@hartkopp.net>
-	<aSx++4VrGOm8zHDb@inspiron>
-	<d6077d36-93ed-4a6d-9eed-42b1b22cdffb@hartkopp.net>
-	<20251220173338.w7n3n4lkvxwaq6ae@inspiron>
-	<01190c40-d348-4521-a2ab-3e9139cc832e@hartkopp.net>
-	<20260102153611.63wipdy2meh3ovel@inspiron>
+	s=arc-20240116; t=1767385134; c=relaxed/simple;
+	bh=+agCO8qgZzoCTvxk+09fXoc+5YuFE6U+k7GKWMlCFsk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=UFe3SDlKHL3fYdV6/du3APPYJ4hGW0rUjAkjtvJWsTStUr/9vUgcGvkdj9MlgbAU+vU1SzaTC/sXGOvTMb6kSWGCdBT0eqg+NTvQsQCWAXEp1kSG2HHVbgXClk3yLpm8lXNkXak8G7tSGdHkaT+4RQiLQ9/gGQnaH9wMFkk6XIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=aPqhpcYz; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=QRmCVPeP+RIEBMuUcBbI7kHMTrc6nq0oB8Cnpy0O4B8=; b=aPqhpcYzztDJKxwcg3YQlMqpo6
+	vK9a2edoBrl7cVNq8xCxQkas8x+azHFteFeqnv8pxJdPq1UlhCVebzsuJzFRlqz+nH86g1OHUG/Ay
+	zMVVkrxdtwb6oDve6WocaiPqEXqQPudX1mzkViAaCyMAmUpBqQj0RdYZtPqiZtU7QmGmDLDiU++cL
+	OG3eZ7eRi8zPjXhNymG9887x9uhU4z3XJJ165S7vY4VdwhE4eJBkYAYXGnMIt4erdk/KcAwbsxEZF
+	w4KteSo5qRGYgWow1eqzJ7n2HcFhSo2VVlxkqeTB5SRTJmvsWQQPgN+YHmP3LBlqXwNJMcK3tUbL/
+	gaxHsCfw==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <benh@debian.org>)
+	id 1vblbU-00Eir4-JI; Fri, 02 Jan 2026 20:18:32 +0000
+Message-ID: <27c249d80c346a258cfbf32f1d131ad4fe64e77c.camel@debian.org>
+Subject: Re: [regression 5.10.y] Libvirt can no longer delete macvtap
+ devices after backport of a6cec0bcd342 ("net: rtnetlink: add bulk delete
+ support flag") to 5.10.y series (Debian 11)
+From: Ben Hutchings <benh@debian.org>
+To: Thorsten Leemhuis <regressions@leemhuis.info>, Roland Schwarzkopf	
+ <rschwarzkopf@mathematik.uni-marburg.de>, Nikolay Aleksandrov	
+ <razor@blackwall.org>, David Ahern <dsahern@kernel.org>, "David S. Miller"	
+ <davem@davemloft.net>, Sasha Levin <sashal@kernel.org>, 
+	debian-kernel@lists.debian.org, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org, regressions@lists.linux.dev, 1124549@bugs.debian.org
+Date: Fri, 02 Jan 2026 21:18:26 +0100
+In-Reply-To: <d4b4a22e-c0cb-4e1f-8125-11e7a4f44562@leemhuis.info>
+References: <0b06eb09-b1a9-41f9-8655-67397be72b22@mathematik.uni-marburg.de>
+	 <aUMEVm1vb7bdhlcK@eldamar.lan>
+	 <e8bcfe99-5522-4430-9826-ed013f529403@mathematik.uni-marburg.de>
+	 <176608738558.457059.16166844651150713799@eldamar.lan>
+	 <d4b4a22e-c0cb-4e1f-8125-11e7a4f44562@leemhuis.info>
+Organization: Debian
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-OII6/htffjAg1Djg2KhL"
+User-Agent: Evolution 3.56.2-7 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Debian-User: benh
 
-On Fri, 2 Jan 2026 21:06:11 +0530 Prithvi wrote:
-> Just a gentle ping on this thread 
 
-You're asking the wrong person, IIUC Andrii is tangentially involved
-in XDP (via bpf links?):
+--=-OII6/htffjAg1Djg2KhL
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-XDP (eXpress Data Path)
-M:	Alexei Starovoitov <ast@kernel.org>
-M:	Daniel Borkmann <daniel@iogearbox.net>
-M:	David S. Miller <davem@davemloft.net>
-M:	Jakub Kicinski <kuba@kernel.org>
-M:	Jesper Dangaard Brouer <hawk@kernel.org>
-M:	John Fastabend <john.fastabend@gmail.com>
-R:	Stanislav Fomichev <sdf@fomichev.me>
-L:	netdev@vger.kernel.org
-L:	bpf@vger.kernel.org
+Hi all,
 
-Without looking too deeply - XDP has historically left the new space
-uninitialized after push, expecting programs to immediately write the
-headers in that space. syzbot had run into this in the past but I can't
-find any references to past threads quickly :(
+On Fri, 2025-12-19 at 10:19 +0100, Thorsten Leemhuis wrote:
+> On 12/18/25 20:50, Salvatore Bonaccorso wrote:
+> >=20
+> > Is there soemthing missing?
+> >=20
+> > Roland I think it would be helpful if you can test as well more recent
+> > stable series versions to confirm if the issue is present there as
+> > well or not, which might indicate a 5.10.y specific backporting
+> > problem.
+>=20
+> FWIW, it (as usual) would be very important to know if this happens with
+> mainline as well, as that determines if it's a general problem or a
+> backporting problem
+[...]
+
+The bug is this:
+
+- libvirtd wrongly used to use NLM_F_CREATE (0x400) and NLM_F_EXCL
+  (0x200) flags on an RTM_DELLINK operation.  These flags are only
+  semantically valid for NEW-type operations.
+
+- rtnetlink is rather lax about checking the flags on operations, so
+  these unsupported flags had no effect.
+
+- rtnetlink can now support NLM_F_BULK (0x200) on some DEL-type
+  operations.  If the flag is used but is not valid for the specific
+  operation then the operation now fails with EOPNOTSUPP.  Since
+  NLM_F_EXCL =3D=3D NLM_F_BULK and RTM_DELLINK does not support bulk
+  operations, libvirtd now hits this error case.
+
+I have not tested with mainline, but in principle the same issue should
+occur with any other kernel version that has commit=C2=A0a6cec0bcd342 "net:
+rtnetlink: add bulk delete support flag" together with an older version
+of libvirt.
+
+This was fixed in libvirt commit 1334002340b, which appears to have gone
+into version 7.1.0, but Debian 11 "bullseye" has 7.0.0.
+
+We can certainly fix the libvirt side of this in Debian, but this also
+sounds like a case where the kernel should work around known buggy user-
+space.  On the other hand, this has been upstream for over 3 years so
+maybe it doesn't make sense now.
+
+Please let me know whether I (or anyone) should try to implement a
+workaround for this in the kernel.
+
+Ben.
+
+--=20
+Ben Hutchings - Debian developer, member of kernel, installer and LTS
+teams
+
+--=-OII6/htffjAg1Djg2KhL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAmlYKBIACgkQ57/I7JWG
+EQnD0A//T7s2mc8lgDzrecnjiCAaxAAnYMYUy/UhgiuFea9wFuXqo76ucc0paWs7
+YmvABwnDSiyl9lq4WfN5CGTmai+arF4PMLQLlmRXslato+22hVK/731P62DfzW+6
+Mx5pPyDGaVAkFQHe/hOku64F9/NHbC3ZptPXVoxLeQDTTkTPP+y7G7mxZJUp/KOu
+YsnMQdDvnqiZsjSyEddi+HDast2K7bxm+iDZ8qJm8crzYux4kXeRo1b+Pug72f1k
+XErFYPSw8DtQw1OOdxRtP2id4dMhLaXzkde8VFky6jowAFLk3dwV0YwsYm9OAkEQ
+8pdQ+7C/JTKznJFeJQjVz5P9TDevqDK+v4PkGPia+KSQN1rcxVRHX9h7Ci5ongk3
+l3gTy4U8nz4Mw+ap0qWAmgidfkqcL2Kp/GY0ck8uPXUjtPYWE288KOtMK/z+R8vk
+B7KcU4YmIvqxEAVMPARatHO4ElUhdzNhj0+vRlr00zHumWZb+Cu6Sk5QC9aTCUVJ
+gNi/tveeZwcbKWpnyaUr7CdLwgLVXhi7k6KDw+UCMWYrOqMiLsjgFa9QMHqK9bKG
+FETqDyYvkGnU0Yb4itsE5hTkh9pqNTp3nkIxn0YI7RUF8kYEstV4DW3jjMVjIMad
+PLiW1gtAOxADHaHuFlqcpbCI1SRsS56ID5r0dgZPjaNoUmbJVR0=
+=AH7O
+-----END PGP SIGNATURE-----
+
+--=-OII6/htffjAg1Djg2KhL--
 
