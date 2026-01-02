@@ -1,170 +1,129 @@
-Return-Path: <netdev+bounces-246627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 684F0CEF75D
-	for <lists+netdev@lfdr.de>; Sat, 03 Jan 2026 00:21:26 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD6B5CEF766
+	for <lists+netdev@lfdr.de>; Sat, 03 Jan 2026 00:21:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 63C43300C140
-	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 23:21:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 708F13006E08
+	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 23:21:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56C1B2459C6;
-	Fri,  2 Jan 2026 23:21:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA9DA2D321B;
+	Fri,  2 Jan 2026 23:21:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D+jbDLYR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T3RjcTdg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 865831A3029
-	for <netdev@vger.kernel.org>; Fri,  2 Jan 2026 23:21:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0CCB29B22F
+	for <netdev@vger.kernel.org>; Fri,  2 Jan 2026 23:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767396084; cv=none; b=rwM8HqeDWLu1NnMYUNKM9TIy8uvh67DruozSpPyZVo786e7yMrzU4oepF31Oqk2Coyei/cWV9GorUnflGinryTEi9IbGzCapRBl1wZAT3hLGUJhDuiLbEWSZdWfPpOwJJNahbrbMEONkszc/jxD+L4YSbPSKILk8OJ5oTwv6fE8=
+	t=1767396101; cv=none; b=ReR5zqQ0WSJqy7iex9plHw9+NErJ5AaZUYbHd36tiWUrMopBbv4WpF6bb63ZVkNjTgOZjWt7pldx88+Pdwt4da9sVexkhx17K7lUWDJuvN6yCf+Av+HQaeElhtjJw+VdsmQjvEXLv7lXAUUcqxR3F+7NWPQpBx5+U/Y0rg8COec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767396084; c=relaxed/simple;
-	bh=LODOdPKPxdr1EwABTQ3putGhvukWY4XVL+VZuH8DKwY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lkMPuv2F51EE/UyIRS0Tpj9LTfxZC1Hr4BytKtZWVJ4crUkObhDGOM9PWyqBNXmg41ImjYaHwI1+wLAcRQV9lL4IrhIvxA5T0km4jXXMhQpLN09kcn8CFZ5gtMbFjEazllXrWDQOQLWLMqUAJvEbXdQ59rOC32sKYS+t32REA+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D+jbDLYR; arc=none smtp.client-ip=209.85.221.42
+	s=arc-20240116; t=1767396101; c=relaxed/simple;
+	bh=f4kteEJWqfB5NQC+HtTP0VKtTfVlTEXeEMM71ASFoaU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HWUY1QwtVqIdkuXmc3C3DI6QaBmx2vG9tp7lBV2+0usnoZd2vv6XAjH4X9u/qJzkXawbkwZMAqGMz600Xf8ZtTBZNm+qCSy4mt95/fGXOG7yUt6juOtBhpK62WL3G6Pck+qxi0IGlPmEHlcmLIP31EdGLj5chMG6rSHm7Ma90Bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T3RjcTdg; arc=none smtp.client-ip=209.85.210.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-43284ed32a0so2578345f8f.3
-        for <netdev@vger.kernel.org>; Fri, 02 Jan 2026 15:21:22 -0800 (PST)
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7c6cc366884so6070332a34.1
+        for <netdev@vger.kernel.org>; Fri, 02 Jan 2026 15:21:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767396081; x=1768000881; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W0BCkqrSr7+3s77zFvT5FgfHYyteD50Ev53ENDz7yYU=;
-        b=D+jbDLYRM1pUqrv0zsLrroYNl04gQC/HyU1gZ63dDDRW8dwV6oon0dEqWxnLdjZyaY
-         tyAbl1st2z5BK19AEH2lZcIeN8g361NTJYslm+pMjiQjKZYGdKdkNTujYdME/L9jovZZ
-         D3SG6y42U7fP9uyarb3LqSgE2uxt7XqS0fKHlGa922Vj2NfEEDXgTmPS+1uBjkCbm0yP
-         Fb1pAlGHZH6zE8B2TSJnoijrFh7Zrqe+VRETe4jfNd3YQQ4bUEgOc3lfIHWEUZiBMgYA
-         fU+SaAozu5YpTj0Qyi9kfQ2msSNy0T8pEnQw8FTFMeuw89vzFxww5lHLVGqQ7dPs6VFJ
-         B/ew==
+        d=gmail.com; s=20230601; t=1767396098; x=1768000898; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tKhe5lXW6R7PuCU3Ipdc8PAGYW/AaKmllbW+NUzDHeo=;
+        b=T3RjcTdgx2hDyfVJjzK12DFwy0O9YtQCiCqbjUlwYKRVNvSOablDjnfvP7bD+Fcs58
+         tcPJSevDBb0GONFuc58I7aP3P5CcwUlWBNgCF6IhYEAdISAg+sfQ0XU2gKXFhO3vjtzo
+         Yz7k/QeLYHtb35J+WmX68zvov0eh9gLF+P8Xde8zYVaMFitug77kkP9zhkEbhUTznEK2
+         FBl/8R3S4vo5KYtMoXTaKLvgO3PFLdNOWKsQjv0B4j23YAW6338eMnEpr8XrZbUetpPE
+         leFCqss4rTHQwhhXCyK5yo/dZptZbxTn/M200Kd7CF9rkL9LvJxtyTlxkUi7IHL0HLYO
+         qj1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767396081; x=1768000881;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=W0BCkqrSr7+3s77zFvT5FgfHYyteD50Ev53ENDz7yYU=;
-        b=S9pARVEOjcRTzVMZo8RVl4FPJoCDsEjwO9XzurxvNX0DOT/bxGPdf7cUWWOykBP8dR
-         qarE+b5cqXLWFwbTSENSnBvm96VQT5L7cIrxa0XTOnhdPzEBMpaQ+mRRSEiraxdyoj4s
-         LrD1SzC8Oiui6DkJ/lyR5KDHWHfOtibSvRHM58qYqwrDphOnJP+y5n0zn+nS08xooFAJ
-         tky9W6w6r9tYfKuXx/QhlKpZNW1Un4+O67tkYHIvZ5oRiPLJee/JOjVLr35upa8AsC5t
-         j5YlD45AiMOQ1R64YJIXM2E9iL57Woi3Qc+o4FnfQdraJLyn7C5E/aKHa87Z4iq9dHHg
-         uhkg==
-X-Forwarded-Encrypted: i=1; AJvYcCVF2OnbhCVHXRjrwGbVtUF3fMWh8LPUxjHcfslLwQ+5RfuZB0z+RPshwEqLxtW99nCxRnddTX8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzzhdcUWkeMufyVJ8eacBOy08ERA0oBqtGyWmJq577WdJjHsctJ
-	mJAGkIkv0jk795rJlL3CpwrpSnQnU7HgF32hAsihsBCMqD8FENSFRZcJAIseoYvZpps6IBd3rVS
-	y3DQV0i6pXR2JX+hWzPiy8tprhkEDF+I=
-X-Gm-Gg: AY/fxX7IqLrpwQzeFBhFhLz7KBYwdsA8EPl3g4vp8wZhhPKR5w69VyWifUhZOygjsWx
-	jeJ3nNbjimzjBcqTr8fzDXUltILWhPU40To1gX0OD8rKm5tlJ2ce49YFGuN4WfOg4qou5WeiacF
-	BRaGw1y4oCc50x4tfVRBgEWpdH9dVhePLo1Zldp9TCojBloJmG8Nm+6yYzmgwXWtrGG5r6PQTtH
-	/EZWwxDHK4kIEbGoqI0saXCd6DpGB8c7BK/oyjSrJuAuP2BaHbdazhWk+mPdAWmJubCI19WnV4e
-	yTFywtJ1LAJWCqRr8oUwExG4rIcw
-X-Google-Smtp-Source: AGHT+IGn5P8bsQyBXvGqBtYekNEfmK/G6BKsQJ8hQ4y4/Wzh1oj5w7JrqKdbG1NJbBH+VpwhT1OBdW/3bHrCO26EMjM=
-X-Received: by 2002:a05:6000:2890:b0:431:864:d48d with SMTP id
- ffacd0b85a97d-4324e4bf703mr59704764f8f.5.1767396080690; Fri, 02 Jan 2026
- 15:21:20 -0800 (PST)
+        d=1e100.net; s=20230601; t=1767396098; x=1768000898;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tKhe5lXW6R7PuCU3Ipdc8PAGYW/AaKmllbW+NUzDHeo=;
+        b=RaHxZrMrYxhJ0ah7uajqyVQVZuNSmU96btlaIyQpg5VwcrbOOHyPvAT3LPGO6ebObM
+         temjlzK9f7Wk4pLDYakZw84/5T3vy3weEa4ZLTcKvIqRdhRN2PQq/mUyNmpXBK3C+QnF
+         U6FqI4Z8iYsd2kONbxyVqJ92wmzc0JMiYMiQL2PYHGAnzGUlCSpSlMHRkDWTzRZ2ebYi
+         O5m2Oby7SJuhGdAJi2wwm3Z125KwQniTzeReJ6DYlKgkN91Y8CYG4xCHkZErxp+DlswY
+         80T5pRjHy2JJXpjpJxzy4po11XCjoOq31Kjd5IBPjDoJyu/nXG7/Zo29IebZt05WSf2/
+         u+Gw==
+X-Gm-Message-State: AOJu0YwO70SGe7qYLZBaONkniI102idn42FvTnNrvnQIAEhXaheTjvwi
+	9Bb1uD1qwEeJxiisnmid39gM5rHTXYOFNOGHnkaeWOfQXILU1zd2L3NH+5BKT5yd
+X-Gm-Gg: AY/fxX5E/wiOZmfZr3QFsuYGiAqj/BOP5Jr13nXpVFSquKzsCKoV464TT7mffVyRf/t
+	GIir0TN58R4aned8LxH6w71RhkDS6UJoI8GBR6NQG9xYFbZ1yf4GwJo+d6feWcdlKsN9BVGBwPE
+	8V55DTNE4IghvW/FoYkKUbFUVHAjae12AWl2go0QgzrMqJWm891Wq1QY1zvj/qiiOQXTm3sTlmx
+	4J3chlKBU1H//uY3uevDbE80zd3pvHMl/lKRYPHrZA3wiiOz0mU910x9apNOiufccCnw441aRIp
+	rZv3RGVcIWPbrNvJK9sTWQ9Up9bYA9HS/sTrJb70C6uyNV/6+QpvgP588D/xtJmU6NbGchP8rRG
+	upg6QQAyI53xrR3UdO5bSPGWxdsiHqdg61iLgFp158L4Bbbi/noral7z0oMkpJv0Q55XYsF51Qe
+	RZC+AIVFRrS6zZHqZAh59WzHF4H9jYAj6Kjlu1skX5BzI=
+X-Google-Smtp-Source: AGHT+IH0q/1hPcl4M/DWj6mwHSJUevT+paP2kujg0wB8vzvyehp7qn4CfGnDzFR9wYyDHvT2JeJmBg==
+X-Received: by 2002:a4a:e252:0:b0:659:9a49:8e09 with SMTP id 006d021491bc7-65d0ebd893cmr14867076eaf.75.1767396097818;
+        Fri, 02 Jan 2026 15:21:37 -0800 (PST)
+Received: from shiv-machina.. (97-118-238-54.hlrn.qwest.net. [97.118.238.54])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-65d0f69b9e9sm25421627eaf.12.2026.01.02.15.21.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Jan 2026 15:21:37 -0800 (PST)
+From: Shivani Gupta <shivani07g@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shivani Gupta <shivani07g@gmail.com>,
+	syzbot+8f1c492ffa4644ff3826@syzkaller.appspotmail.com
+Subject: [PATCH] net/sched: act_api: avoid dereferencing ERR_PTR in tcf_idrinfo_destroy
+Date: Fri,  2 Jan 2026 23:21:16 +0000
+Message-Id: <20260102232116.204796-1-shivani07g@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251224130735.201422-1-dongml2@chinatelecom.cn>
-In-Reply-To: <20251224130735.201422-1-dongml2@chinatelecom.cn>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Fri, 2 Jan 2026 15:21:09 -0800
-X-Gm-Features: AQt7F2rscT_gj4mowy2CmXVR0NcdxV61KBEbPavnmO85j2f1ZJ9LVc_rSTc2YuQ
-Message-ID: <CAADnVQJRXWtt3MY+Z+mZerYjir-735z9_mbLJQF-TyUL9pFt5g@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v5 00/10] bpf: fsession support
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard <eddyz87@gmail.com>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, jiang.biao@linux.dev, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, bpf <bpf@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Dec 24, 2025 at 5:07=E2=80=AFAM Menglong Dong <menglong8.dong@gmail=
-.com> wrote:
->
-> Hi, all.
->
-> In this version, I did some modifications according to Andrii's
-> suggestion.
->
-> overall
-> -------
-> Sometimes, we need to hook both the entry and exit of a function with
-> TRACING. Therefore, we need define a FENTRY and a FEXIT for the target
-> function, which is not convenient.
->
-> Therefore, we add a tracing session support for TRACING. Generally
-> speaking, it's similar to kprobe session, which can hook both the entry
-> and exit of a function with a single BPF program.
->
-> We allow the usage of bpf_get_func_ret() to get the return value in the
-> fentry of the tracing session, as it will always get "0", which is safe
-> enough and is OK.
->
-> Session cookie is also supported with the kfunc bpf_fsession_cookie().
-> In order to limit the stack usage, we limit the maximum number of cookies
-> to 4.
->
-> kfunc design
-> ------------
-> The kfunc bpf_fsession_is_return() and bpf_fsession_cookie() are
-> introduced, and they are both inlined in the verifier.
->
-> In current solution, we can't reuse the existing bpf_session_cookie() and
-> bpf_session_is_return(), as their prototype is different from
-> bpf_fsession_is_return() and bpf_fsession_cookie(). In
-> bpf_fsession_cookie(), we need the function argument "void *ctx" to get
-> the cookie. However, the prototype of bpf_session_cookie() is "void".
->
-> Maybe it's possible to reuse the existing bpf_session_cookie() and
-> bpf_session_is_return(). First, we move the nr_regs from stack to struct
-> bpf_tramp_run_ctx, as Andrii suggested before. Then, we define the sessio=
-n
-> cookies as flexible array in bpf_tramp_run_ctx like this:
->     struct bpf_tramp_run_ctx {
->         struct bpf_run_ctx run_ctx;
->         u64 bpf_cookie;
->         struct bpf_run_ctx *saved_run_ctx;
->         u64 func_meta; /* nr_args, cookie_index, etc */
->         u64 fsession_cookies[];
->     };
->
-> The problem of this approach is that we can't inlined the bpf helper
-> anymore, such as get_func_arg, get_func_ret, get_func_arg_cnt, etc, as
-> we can't use the "current" in BPF assembly.
->
-> So maybe it's better to use the new kfunc for now? And I'm analyzing that
-> if it is possible to inline "current" in verifier. Maybe we can convert t=
-o
-> the solution above if it success.
+syzbot reported a crash in tc_act_in_hw() during netns teardown where
+tcf_idrinfo_destroy() passed an ERR_PTR(-EBUSY) value as a tc_action
+pointer, leading to an invalid dereference.
 
-I suspect your separate patch set to inline get_current addresses
- this concern?
+Guard against ERR_PTR entries when iterating the action IDR so teardown
+does not call tc_act_in_hw() on an error pointer.
 
-> architecture
-> ------------
-> The fsession stuff is arch related, so the -EOPNOTSUPP will be returned i=
-f
-> it is not supported yet by the arch. In this series, we only support
-> x86_64. And later, other arch will be implemented.
->
-> Changes since v4:
+Link: https://syzkaller.appspot.com/bug?extid=8f1c492ffa4644ff3826
+Reported-by: syzbot+8f1c492ffa4644ff3826@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=8f1c492ffa4644ff3826
+Signed-off-by: Shivani Gupta <shivani07g@gmail.com>
+---
+ net/sched/act_api.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-v5 looks to be in good shape. It needs a rebase now due to conflicts.
+diff --git a/net/sched/act_api.c b/net/sched/act_api.c
+index ff6be5cfe2b0..994f7ffe26a5 100644
+--- a/net/sched/act_api.c
++++ b/net/sched/act_api.c
+@@ -940,6 +940,10 @@ void tcf_idrinfo_destroy(const struct tc_action_ops *ops,
+ 	int ret;
+ 
+ 	idr_for_each_entry_ul(idr, p, tmp, id) {
++		if (IS_ERR(p)) {
++			WARN_ON_ONCE(1);
++			continue;
++		}
+ 		if (tc_act_in_hw(p) && !mutex_taken) {
+ 			rtnl_lock();
+ 			mutex_taken = true;
+-- 
+2.34.1
+
 
