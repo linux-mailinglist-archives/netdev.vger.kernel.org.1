@@ -1,83 +1,95 @@
-Return-Path: <netdev+bounces-246576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43944CEE765
-	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 13:11:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74DB8CEE771
+	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 13:12:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B161F30198B1
-	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 12:10:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7C1EF302C8F5
+	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 12:11:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2D5B30EF8F;
-	Fri,  2 Jan 2026 12:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E608A30EF84;
+	Fri,  2 Jan 2026 12:11:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=konsulko.com header.i=@konsulko.com header.b="aWse4Gb6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gJwsYjUo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9DC630E83C
-	for <netdev@vger.kernel.org>; Fri,  2 Jan 2026 12:10:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2269B2D24B4
+	for <netdev@vger.kernel.org>; Fri,  2 Jan 2026 12:11:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767355819; cv=none; b=Qsep2EyxeGgNNtRSdgCbf7ANPl2aSBPsK7UaYZxYf/ER3E7nax09Sa1dF/JaukL4iuAf/4hTy1MZRkzhIV8QOq1A65TsYU1IDI5gTVB9WOBNCWJVxKjvGOnjksuSgr2d8FjHwIoBf0p1fa/JAjjpK628pmo8NYX4RYkdN7z+ehM=
+	t=1767355867; cv=none; b=RzvD8YRB2FZPjJFYqZygOAWYAxeaDeZQq2UeSM5EjAHkQhsC67Xi7QFXyUAOUbthvYzLL20NDqmeKV+WXNHQmGCxixn66wERg+Mcl/EBIXGJXKjRIBFl9tcWVdkMGGeEW2mK5mvaYNv6KQ/Wx0cNtuFVsGsImzekOXwT76POvaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767355819; c=relaxed/simple;
-	bh=D3hz3RlW/hBNIlTvBIru3FX1ozhyNkbv1Ma+Wj+so4g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jsmH3WjOkplfywXwiUrwDlMphmwpjSJyeaI73OynEpyiniIOUykXhnWLebjrZtG4TGNtV9ew+dki9QjiZpV9LOPbyXP8U4suuiNEVl8bRZ1hQaE5/3foUKRpPLkwQJZIXhOLzN8wawZ8JEHgyq6AIQbFdUFNA/bbiJBJ/IfG1aw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=konsulko.com; spf=pass smtp.mailfrom=konsulko.com; dkim=pass (1024-bit key) header.d=konsulko.com header.i=@konsulko.com header.b=aWse4Gb6; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=konsulko.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=konsulko.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-64d30dc4ed7so15554531a12.0
-        for <netdev@vger.kernel.org>; Fri, 02 Jan 2026 04:10:17 -0800 (PST)
+	s=arc-20240116; t=1767355867; c=relaxed/simple;
+	bh=YkwKeora1mLV9PdHzkifnJhsG7z5aIrHh9/DgI4be78=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Axd0mEKldKRcjqmU6iYK/Ocs4kllS5d3RHN1pbUXkvlDwsipKfCEWH3Nvh//u+REuNQ0pHho4l60rhY0INLUZ8C/SXn2LG8fLBgGlVcXhKnhjWjDnEe2xPQxVyO2mUTIz6hlqTOg5LjcTQR6GsG1IZXBZZlPBe49RuMSGPB5iv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gJwsYjUo; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-47795f6f5c0so65085635e9.1
+        for <netdev@vger.kernel.org>; Fri, 02 Jan 2026 04:11:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=konsulko.com; s=google; t=1767355816; x=1767960616; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1767355864; x=1767960664; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hyAExea92lRqN3+lMIDtFuHcTalaR06svoPNW5R6G2A=;
-        b=aWse4Gb6yUVDw1uaPq638k1G8c9WxMtcmi7eBIHQHCyjhM/XOq2LMG9IL+VRjFl+ae
-         4i0Pu35cf3599DnqB1xlUUA14fr7I+vyIfgUtar2OyCGJPzUNMldlIOh3FhfDg8VlKGZ
-         YVt+oslBEQ5uHl3chDH2E95RBg4BDv4BOJeU8=
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KsymdoSnuKbN2NyfZ9ktVw8fTlQLoP9UwvhxFPZnyng=;
+        b=gJwsYjUot6uGYLkdPEp1fL2VaUjINgI6EoXe6r49RY4/CAScgwZ2JGH5PqLTkczMHN
+         Y3DWHz3V5hmT6mW3SrRgMAFJxA5ypPeMaZFJc0Tycf+/9iCTzgAIZ9zsnxgpQNcVzDfm
+         b0ylHo/sGtwf2pujiyE70XiE6OhiscUNcLof02vSMdZMxaMWZQKaGOzsWNh9MXRuYaYw
+         B+4KYiz3q15fS4OPLiE5IzkvZ/PBt0cVaAvHYfhdNEMt2Kj2nsMcPjENbvKLQmq9VUiZ
+         uPnU+JewKgJifpoMQhJ9/rv/YfvZoZENxscp/1z+J7liutaASjWIurP4qbunG/KDnsHG
+         PXmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767355816; x=1767960616;
+        d=1e100.net; s=20230601; t=1767355864; x=1767960664;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:cc:to:date:from:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hyAExea92lRqN3+lMIDtFuHcTalaR06svoPNW5R6G2A=;
-        b=IY/i7gINWvfJv8ipiZFxaNpQPN6flYv3tFa9M1WjiX7in4jqoSwFApqoHlH8HytIpu
-         2GzLTXPGyujkK1yxg9ZiEXnQTUqGsL/I2Bz3EA1EFORemgL4xaBxh2iXPVMsWj/y4tLT
-         ZGDBUwq1w9z6+YcNE4irR+vSKzsl1aDB5IGHFq2Y/xn8jPQlUFmE9TMmuI0Jyb4MrO3s
-         Z7IorJnyl+nyXPDbMX+5ovr9D04wnKbX99bilVPK0UHrn4h1677GmRUEMEdqyWdeITcL
-         BlhgUEdlaG2MB9VWLMsYvqtCCrdEzQIaqDA3bTklUXIdpLEopQGFqUF3Rgk7KxyBcit9
-         OGDw==
-X-Forwarded-Encrypted: i=1; AJvYcCVBJttnDTyJrmlPLigFKFjY5+jj/4VGxjrM/PGzC2zAsPxDMPTi5bdpWijUQeWSJmrCRMJ80cM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJWUo2R5bIJ6LAUKehdLsmk2yvfOpNi1j0vYjcaXjinyvMwl2B
-	QUGstfXX/KkSPA9TpxbTqMtJzD9IC5QgXoQ7RuhM3kJzb0vlAF/ofx3stV9HRdMVCi4=
-X-Gm-Gg: AY/fxX6RyT2tKB7gDGk/tN8+ZPBfo1BGmUkjF7JZQijJ6ib9TkcNX/5S5QOsA48/NiD
-	cNfqrDETY2EpOTsGFLWvRBEaho7U18axdvIr7jrQaEUFkXz+cxWYgLact9ZB6gEqsC9P+kohQ1Q
-	9HtWuKVuxOHOJVUvGLaV9yCZqxuTC8O797C0KKRz80fRy/Qbo8MsYIGtAQ6HsByMj4VBN9Rhr6e
-	aaY8MgT9d5T7ROXelirJryHSTmf9G6ry2nbzG4vATw2HuVR9NC/QH0jwNF9YaUKq14F4sG4wyFG
-	+oTe08TUX3l2VW5HsQmkmuALKMWLOXCeTzT2TtDEi3wbSIWye7HZZX7SeBtQnUtRs8MOG2daNpD
-	vb93fy+eH7HXNOkSHlWsE5vS07RMiQO7GZs9FGZQvCgYxL8UsK5T6FbLSxLmbWGSYt/mCTa8J7Q
-	vbWK8msT6ECiGqElsJqQ==
-X-Google-Smtp-Source: AGHT+IG8H78AqDGUvKh1cti5vZlXZa2v48LQQN927UiarpjJoTYvBWuOyOqu0OgFvo9qewXcWc563Q==
-X-Received: by 2002:a05:6402:2787:b0:64d:1f6b:f594 with SMTP id 4fb4d7f45d1cf-64d1f6bf77cmr39880832a12.15.1767355816208;
-        Fri, 02 Jan 2026 04:10:16 -0800 (PST)
-Received: from carbon.k.g ([85.187.61.220])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-64b91494ce2sm43342738a12.17.2026.01.02.04.10.12
+        bh=KsymdoSnuKbN2NyfZ9ktVw8fTlQLoP9UwvhxFPZnyng=;
+        b=Z7wnQ3WHdxeYNyItwvkCoQuqEy/vBq365aOk+EPDDBv0nteJSIg8BpN0g0Lt68IChz
+         agWBShWNlXVmUm/e7cveRID5s/eTSNIaQH0PAbwDIdBzXnb8zpg3h/t6FEBQAko7AsJF
+         K+4b/uzWri2IHnvcPb+94W+7/2R/4fg3Edr9vOCCp9fON6Hu/ZFIX1dbpUnqSVGa+Qmi
+         76hcbhrEXvUa90fAFcCAPKDKi2YptQvp8BXCURRFMn9eVQYs4sfPdFitHPIp1CdlVR0V
+         pK8sue1RNjiMVRQJBfRh2I39HJT4dCq6AVMiDaB6aoRIOZrjtkd73/39xFJ1qKbmiuEu
+         T2zQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUhWakWbJTszdLK4AfU1G97NutHc3MGr97hhm4n/1SXQGqqi5C1z88rMjO2cN5o+mP1iw6sHRQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqrNddO1IB8N7+hZdPDOEP9yjeD81qrQAgoPqX7a6GW0GXQ/x7
+	0BdyDjYGA7mxYAbXieLqWWc0SHoBgNH3+unRyoJUw4tH26RAGLGHRrPw
+X-Gm-Gg: AY/fxX60m7wdOgCCW9vM3R/KWyIWie+M/YQXxB3s31RIEgCFoKERoh5ox/sjPuJbodc
+	HIlZL0shPtajYFgdevVHCx5+ciMH+K5t04x3JUo4o3nVU4XChfalJTGjQsMXL31itcvJ7wlsZ6D
+	Fa2OhCHmaNsjEoNml73bthSZF5y6k2Y0XwXMYr/weaSNoM47UTWszhDILrVrRv8JPfbsK+uh99Y
+	0g1HGD17X3ltTtMKuJdLWRvdQXN4k5sFzYy3tUmErtXAuGzsxDc1YNNA4tpqbMGiCxK4r9U7ztm
+	sYw3/zvjRU8V0oOYVRvo+BGt7/kXCBXlFJEAdPxtSnFHmAJZ7rWR9Hge3+ocIqIK29EydG0JG52
+	pRYSzknnWq5+limReIbljRXxkgW6XPWZfv7BPilhS2VX1MGpoXioGvXM6TzEb
+X-Google-Smtp-Source: AGHT+IGeHD9QGEO0EfQ4SPnoATfBRsOVSiPNLkPDj1EO6UPvf2BjuDLtdPNOtD42UKdvOUOZls5LEg==
+X-Received: by 2002:a05:600c:818f:b0:477:a0dd:b2af with SMTP id 5b1f17b1804b1-47d195920damr519524465e9.33.1767355864261;
+        Fri, 02 Jan 2026 04:11:04 -0800 (PST)
+Received: from krava ([2a02:8308:a00c:e200::b44f])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324eaa2bdfsm85321033f8f.32.2026.01.02.04.11.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Jan 2026 04:10:14 -0800 (PST)
-Date: Fri, 2 Jan 2026 14:10:11 +0200
-From: Petko Manolov <petko.manolov@konsulko.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] net: usb: pegasus: fix memory leak on usb_submit_urb()
- failure
-Message-ID: <20260102121011.GA25015@carbon.k.g>
-References: <20251216184113.197439-1-petko.manolov@konsulko.com>
- <b3d2a2fa-35cb-48ad-ad2e-de997e9b2395@redhat.com>
+        Fri, 02 Jan 2026 04:11:03 -0800 (PST)
+From: Jiri Olsa <olsajiri@gmail.com>
+X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
+Date: Fri, 2 Jan 2026 13:11:02 +0100
+To: Menglong Dong <menglong.dong@linux.dev>
+Cc: Menglong Dong <menglong8.dong@gmail.com>,
+	Jiri Olsa <olsajiri@gmail.com>, ast@kernel.org, andrii@kernel.org,
+	daniel@iogearbox.net, martin.lau@linux.dev, eddyz87@gmail.com,
+	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
+	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com,
+	davem@davemloft.net, dsahern@kernel.org, tglx@linutronix.de,
+	mingo@redhat.com, jiang.biao@linux.dev, bp@alien8.de,
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+	bpf@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next v5 01/10] bpf: add fsession support
+Message-ID: <aVe11o2SFzjEnGpw@krava>
+References: <20251224130735.201422-1-dongml2@chinatelecom.cn>
+ <20251224130735.201422-2-dongml2@chinatelecom.cn>
+ <aVZ8LQXPhRqUz5dO@krava>
+ <2251274.irdbgypaU6@7940hx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,28 +98,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b3d2a2fa-35cb-48ad-ad2e-de997e9b2395@redhat.com>
+In-Reply-To: <2251274.irdbgypaU6@7940hx>
 
-On 25-12-23 12:44:53, Paolo Abeni wrote:
-> On 12/16/25 7:41 PM, Petko Manolov wrote:
-> > In update_eth_regs_async() neither the URB nor the request structure are being
-> > freed if usb_submit_urb() fails.  The patch fixes this long lurking bug in the
-> > error path.
-> > 
-> > Signed-off-by: Petko Manolov <petko.manolov@konsulko.com>
+On Fri, Jan 02, 2026 at 05:21:42PM +0800, Menglong Dong wrote:
+
+SNIP
+
+> > ---
+> > diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+> > index 4e7d72dfbcd4..7479664844ea 100644
+> > --- a/include/linux/bpf.h
+> > +++ b/include/linux/bpf.h
+> > @@ -1309,6 +1309,7 @@ enum bpf_tramp_prog_type {
+> >  	BPF_TRAMP_MODIFY_RETURN,
+> >  	BPF_TRAMP_MAX,
+> >  	BPF_TRAMP_REPLACE, /* more than MAX */
+> > +	BPF_TRAMP_FSESSION,
+> >  };
+> >  
+> >  struct bpf_tramp_image {
+> > @@ -1861,6 +1862,7 @@ struct bpf_link_ops {
+> >  struct bpf_tramp_link {
+> >  	struct bpf_link link;
+> >  	struct hlist_node tramp_hlist;
+> > +	struct hlist_node extra_hlist;
+> >  	u64 cookie;
+> >  };
 > 
-> Please:
-> - include the targed tree in the subj prefix ('net' in this case)
-> - include a suitable Fixes tag
+> In this way, it indeed can make the update of the hlist more clear. However,
+> I think that you missed the reading of the hlist as I mentioned above.
+> You can't add both the "tramp_hlist" and "extra_hlist" to the same hlist. If
+> so, how do we iterate the hlist? Do I miss something?
 
-Sure, will do.  However, my v2 patch makes use of __free() cleanup
-functionality, which in turn only applies back to v6.6 stable kernels.
+ugh, it's on the same list.. nevermind then ;-)
 
-I guess i shall make another version of the patch that is suitable only for v5.4
-to v6.1 stable releases, right?  How shall i format the patch so that it targets
-only these old versions?
-
-
-cheers,
-Petko
+jirka
 
