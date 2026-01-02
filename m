@@ -1,176 +1,245 @@
-Return-Path: <netdev+bounces-246546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3788CEDFAD
-	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 08:21:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 56172CEE001
+	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 08:59:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5CCB23004513
-	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 07:18:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A6CF6300B9B5
+	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 07:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1F9522424C;
-	Fri,  2 Jan 2026 07:18:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C5A2D47F5;
+	Fri,  2 Jan 2026 07:59:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xpxQh49s"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="D70AjJsl"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C029F1D6BB;
-	Fri,  2 Jan 2026 07:18:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 956FF2C0307
+	for <netdev@vger.kernel.org>; Fri,  2 Jan 2026 07:59:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767338304; cv=none; b=uOyVkp5kuO7jz37IUzRDKilHAxr9N/8CwzKF0pyjdFVVd+DryOSI7WIg/3DtmQNXV7ADiF50gCTz03+dijNxEMo6uWmK2MnagjgW3efH5CYVnsPXDq/G9qvEOVqJtYYpH6EyxSKkvfr/Kk3S7MJjGBITEHS/aXupDJdzISHFVXA=
+	t=1767340781; cv=none; b=iUjY9QvHULP8cWNHE0Z7EFNN4QDeX08gSdZzbWLdUfgTJi4xwg+JvzTIyPmbHoR/7v+rp9AVACt0xlEaAMkH1LksBZUTpNphe8nFBm8rM59fl1wMHHaHcaCRSAnsqIvlLvvYkVYzwb/BZzQC93xWN5oAbeXr41xjpL6QbFCwHeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767338304; c=relaxed/simple;
-	bh=/KuBx49d5gjgzKReNkIRGAu7sAvVLIwxW3BdCaWxRPg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VQnc7HBdSePAMOFU6HeFvFd4NTblVNZmkad/NpoX+n+Rm4DUgi38TlG7xKwtt/CwURYWSqfagPMuwbQ0JCSR5qKs67p8UwwWbJHO5i/zoWRuN0n3yyI8uqewHilyHi1iD+dXydL7aVIUCTljtcjSqUxXNj79fA94Sj7741jMTLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xpxQh49s; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767338298;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=eylvSQmChZMfxijIPHskgRliJXun0Tl2206mxguAE+g=;
-	b=xpxQh49s1u+S1m2kshVe0GLjWLkTw4Nc2M4WVXGCH/pADxVqY4brhLmZGBZm0h2BZb5TQd
-	ITOJFVM/Jdvt6bJsZBdB5MeqsXQh+a6Af3UBrtQ5+oF0azRxMo+C1dazp6baClicZ+sufI
-	85F1TQfScRIoa72gqphiPx/vgVIUUrQ=
-From: Leon Hwang <leon.hwang@linux.dev>
-To: netdev@vger.kernel.org
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	kerneljasonxing@gmail.com,
-	lance.yang@linux.dev,
-	jiayuan.chen@linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	Leon Hwang <leon.hwang@linux.dev>,
-	Leon Huang Fu <leon.huangfu@shopee.com>
-Subject: [PATCH net-next v3] page_pool: Add page_pool_release_stalled tracepoint
-Date: Fri,  2 Jan 2026 15:17:45 +0800
-Message-ID: <20260102071745.291969-1-leon.hwang@linux.dev>
+	s=arc-20240116; t=1767340781; c=relaxed/simple;
+	bh=UD0nX92LmX0AHSDMj1Aw7fSctz7TIO+ioQ0bAnsD9YM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TbOmR+gwLWXqzlWgimSh55CikX38GST+AZ1l86rDwr6VfgthlJwTtPGCbtE1mjYum8AU+Wp+Vc3NkyjRTXSdW/3pLHUXK7OWIwdGExZzTLXajg1zWDyTocVry1DoecyjcQpo3hMbIulsRiy9azfOHXhYtIxmZxRsVRtCAM5eB6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=D70AjJsl; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-47928022b93so15660915e9.0
+        for <netdev@vger.kernel.org>; Thu, 01 Jan 2026 23:59:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1767340777; x=1767945577; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fIhwYQ0S620I5qazfGkJGP1Z1tDhQZ9HETsO3rBfl20=;
+        b=D70AjJslxj1qbSUfx4TCz6WdXJVcjR8YmBc32CBbTNWXm/wMQU4eS17spg+XEE7r8n
+         DfU+egnpiQIWDtvgmaYPqZ35V8LkjAaTg+tJ2KX6mx2M8LpgrvOU+R113Hj5EfucbxZH
+         doyHpKIhqbtzXneoqUJCudHAvqycF1su93VizXXf4T13wRKThPL/WT7510cPd4aUphmS
+         9dsmmNOvhRy8Hf/t9jp8tQqw9IPXg92olXzeibQiLFoIXpIZ5VEawdjS83L8q82joeTg
+         2j5sCrRMAgdgu843uAAxHc/sVguW4HBlsiiNENOFF3S0jjXs69zSIqSCxNydNfNZmUnz
+         h35A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767340777; x=1767945577;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=fIhwYQ0S620I5qazfGkJGP1Z1tDhQZ9HETsO3rBfl20=;
+        b=WDQfNqxpKWptFeCVKcYxZqZSbq8dvhTvktELYDqQe+KuGBBJ8vlj4Act71a0O4vA+S
+         t8kh4B670yqkJMaLqHNQE/FKWXGVMKS/liJnabNFw4n5yvI8HOds9Ja/qDTSw3ZD+MbC
+         5d/JzKwKDUXoIKG6NMV39h7saERHYgk1TvQShbZsO5azrzk4IQnXz7p7xGDSZZ7NyIPH
+         d+tJK3bY9eRPgASgUWY/AqEAXFmNgFroQHbIsi98AM/HgtbIiMtZZDbeIs8e9NEX34cY
+         OYjK68wnbBHEvZOex83EJLJ538RpGuk0wFnXJAsWU2h4rua0281fAInotHXIS0yWO+n0
+         a1Rw==
+X-Forwarded-Encrypted: i=1; AJvYcCXdN/k7rGCvC4CrA7dWGxs+RGGHBWY+rOxfbOuWClVWxV41tnpwqZH3K6liwzj91EQRlDnCbG0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6+AP1j2D0c8nsjocdWrpoYl4cuUsgyZw2oOONYuKBbCpt3ENS
+	IejYAmxdVZU+nuEhSJyy3AP6736aoQkIB2v8Il3zuwKRhmP/ImV6Vvd0aDFupQvOMqc=
+X-Gm-Gg: AY/fxX4o0dszh1VEGi/8h+5A8d/VIyUQv++ocpY61FXQg7rJDS/JCNlEZ6JHPvYyi0E
+	Yk+EzQ3vkWhhaQ+b7ixZWdyXzuWGCvhAgEcIe4XF6c0kYsugeVNhqtgApVohPJ/REL84H/N2h46
+	7L46xpIX8+DYC1GhsqI6yK+bBAmFzWQ9qVjLSEGBAHdEcMkrgY9Q0m2IiCMCDP4r8nlvbNEgXOi
+	IbH1ByP5/5QLEtc6AZZOHLd7bS/yx8wZn7GU0VpktuJRRHE6GmBTWIfNYAincwLCv61NQb8h2wd
+	K5MGAeWokWEMcnd5Ep9cbmoHujjvO5eZ9/UetP23agV+0FXrbZ+7t3T6Opn6QTs4RLqF7P7BK4z
+	LUMakKWIT200u8NZBk8RjH3BM6Nz9eXpYZGrABpjclnVZYhxTVP1MCsHiyh+hqS4RCwA7UKCj+7
+	BQZJMj1EHMr/cI6IHwu08XuDtJ52l02DkyCgAu/kDeKaCFQLsTSkkBHCSGHX9s3y0DpeqBdixn8
+	4iaqvmP4wkHGZQ=
+X-Google-Smtp-Source: AGHT+IGPmW2Otkj8FnNc/KvSgCnn85RbpVPA2pWTb5toeH0C7mqfw399DBVUSTCo8Ruk60hhUTeL4g==
+X-Received: by 2002:a05:600c:310e:b0:477:7a78:3000 with SMTP id 5b1f17b1804b1-47d195815b0mr307920935e9.6.1767340776886;
+        Thu, 01 Jan 2026 23:59:36 -0800 (PST)
+Received: from mordecai (dynamic-2a00-1028-83b8-1e7a-3010-3bd6-8521-caf1.ipv6.o2.cz. [2a00:1028:83b8:1e7a:3010:3bd6:8521:caf1])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be3af6dbdsm314869295e9.19.2026.01.01.23.59.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Jan 2026 23:59:36 -0800 (PST)
+Date: Fri, 2 Jan 2026 08:59:33 +0100
+From: Petr Tesarik <ptesarik@suse.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>, Olivia Mackall <olivia@selenic.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Eugenio =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, "James E.J. Bottomley"
+ <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Robin Murphy <robin.murphy@arm.com>, Stefano Garzarella
+ <sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Leon Romanovsky
+ <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+ linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
+ virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
+ iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH RFC 05/13] dma-debug: track cache clean flag in entries
+Message-ID: <20260102085933.2f78123b@mordecai>
+In-Reply-To: <c0df5d43759202733ccff045f834bd214977945f.1767089672.git.mst@redhat.com>
+References: <cover.1767089672.git.mst@redhat.com>
+	<c0df5d43759202733ccff045f834bd214977945f.1767089672.git.mst@redhat.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-suse-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Introduce a new tracepoint to track stalled page pool releases,
-providing better observability for page pool lifecycle issues.
+On Tue, 30 Dec 2025 05:16:00 -0500
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Problem:
-Currently, when a page pool shutdown is stalled due to inflight pages,
-the kernel only logs a warning message via pr_warn(). This has several
-limitations:
+> If a driver is bugy and has 2 overlapping mappings but only
+> sets cache clean flag on the 1st one of them, we warn.
+> But if it only does it for the 2nd one, we don't.
+> 
+> Fix by tracking cache clean flag in the entry.
+> Shrink map_err_type to u8 to avoid bloating up the struct.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  kernel/dma/debug.c | 25 ++++++++++++++++++++-----
+>  1 file changed, 20 insertions(+), 5 deletions(-)
+> 
+> diff --git a/kernel/dma/debug.c b/kernel/dma/debug.c
+> index 7e66d863d573..9bd14fd4c51b 100644
+> --- a/kernel/dma/debug.c
+> +++ b/kernel/dma/debug.c
+> @@ -63,6 +63,7 @@ enum map_err_types {
+>   * @sg_mapped_ents: 'mapped_ents' from dma_map_sg
+>   * @paddr: physical start address of the mapping
+>   * @map_err_type: track whether dma_mapping_error() was checked
+> + * @is_cache_clean: driver promises not to write to buffer while mapped
+>   * @stack_len: number of backtrace entries in @stack_entries
+>   * @stack_entries: stack of backtrace history
+>   */
+> @@ -76,7 +77,8 @@ struct dma_debug_entry {
+>  	int		 sg_call_ents;
+>  	int		 sg_mapped_ents;
+>  	phys_addr_t	 paddr;
+> -	enum map_err_types  map_err_type;
+> +	u8		 map_err_type;
 
-1. The warning floods the kernel log after the initial DEFER_WARN_INTERVAL,
-   making it difficult to track the progression of stalled releases
-2. There's no structured way to monitor or analyze these events
-3. Debugging tools cannot easily capture and correlate stalled pool
-   events with other network activity
+Where exactly is the bloat? With my configuration, the size of struct
+dma_debug_entry is 128 bytes, with enough padding bytes at the end to
+keep it at 128 even if I keep this member an enum...
 
-Solution:
-Add a new tracepoint, page_pool_release_stalled, that fires when a page
-pool shutdown is stalled. The tracepoint captures:
-- pool: pointer to the stalled page_pool
-- inflight: number of pages still in flight
-- sec: seconds since the release was deferred
+Anyway, if there is a reason to keep this member small, I prefer to
+pack enum map_err_types instead:
 
-The implementation also modifies the logging behavior:
-- pr_warn() is only emitted during the first warning interval
-  (DEFER_WARN_INTERVAL to DEFER_WARN_INTERVAL*2)
-- The tracepoint is fired always, reducing log noise while still
-  allowing monitoring tools to track the issue
-
-This allows developers and system administrators to:
-- Use tools like perf, ftrace, or eBPF to monitor stalled releases
-- Correlate page pool issues with network driver behavior
-- Analyze patterns without parsing kernel logs
-- Track the progression of inflight page counts over time
-
-Signed-off-by: Leon Huang Fu <leon.huangfu@shopee.com>
-Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
----
-v2 -> v3:
- - Print id using '%u'.
- - https://lore.kernel.org/netdev/20260102061718.210248-1-leon.hwang@linux.dev/
-
-v1 -> v2:
- - Drop RFC.
- - Store 'pool->user.id' to '__entry->id' (per Steven Rostedt).
- - https://lore.kernel.org/netdev/20251125082207.356075-1-leon.hwang@linux.dev/
----
- include/trace/events/page_pool.h | 24 ++++++++++++++++++++++++
- net/core/page_pool.c             |  6 ++++--
- 2 files changed, 28 insertions(+), 2 deletions(-)
-
-diff --git a/include/trace/events/page_pool.h b/include/trace/events/page_pool.h
-index 31825ed30032..a851e0f6a384 100644
---- a/include/trace/events/page_pool.h
-+++ b/include/trace/events/page_pool.h
-@@ -113,6 +113,30 @@ TRACE_EVENT(page_pool_update_nid,
- 		  __entry->pool, __entry->pool_nid, __entry->new_nid)
- );
+@@ -46,9 +46,9 @@ enum {
+ enum map_err_types {
+ 	MAP_ERR_CHECK_NOT_APPLICABLE,
+ 	MAP_ERR_NOT_CHECKED,
+ 	MAP_ERR_CHECKED,
+-};
++} __packed;
  
-+TRACE_EVENT(page_pool_release_stalled,
-+
-+	TP_PROTO(const struct page_pool *pool, int inflight, int sec),
-+
-+	TP_ARGS(pool, inflight, sec),
-+
-+	TP_STRUCT__entry(
-+		__field(const struct page_pool *, pool)
-+		__field(u32,			  id)
-+		__field(int,			  inflight)
-+		__field(int,			  sec)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->pool		= pool;
-+		__entry->id		= pool->user.id;
-+		__entry->inflight	= inflight;
-+		__entry->sec		= sec;
-+	),
-+
-+	TP_printk("page_pool=%p id=%u inflight=%d sec=%d",
-+		  __entry->pool, __entry->id, __entry->inflight, __entry->sec)
-+);
-+
- #endif /* _TRACE_PAGE_POOL_H */
+ #define DMA_DEBUG_STACKTRACE_ENTRIES 5
  
- /* This part must be outside protection */
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 265a729431bb..01564aa84c89 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -1222,8 +1222,10 @@ static void page_pool_release_retry(struct work_struct *wq)
- 	    (!netdev || netdev == NET_PTR_POISON)) {
- 		int sec = (s32)((u32)jiffies - (u32)pool->defer_start) / HZ;
- 
--		pr_warn("%s() stalled pool shutdown: id %u, %d inflight %d sec\n",
--			__func__, pool->user.id, inflight, sec);
-+		if (sec >= DEFER_WARN_INTERVAL / HZ && sec < DEFER_WARN_INTERVAL * 2 / HZ)
-+			pr_warn("%s() stalled pool shutdown: id %u, %d inflight %d sec\n",
-+				__func__, pool->user.id, inflight, sec);
-+		trace_page_pool_release_stalled(pool, inflight, sec);
- 		pool->defer_warn = jiffies + DEFER_WARN_INTERVAL;
- 	}
- 
--- 
-2.52.0
+ /**
+
+This will shrink it to a single byte but it will also keep the type
+information.
+
+> +	bool		 is_cache_clean;
+>  #ifdef CONFIG_STACKTRACE
+>  	unsigned int	stack_len;
+>  	unsigned long	stack_entries[DMA_DEBUG_STACKTRACE_ENTRIES];
+> @@ -472,12 +474,15 @@ static int active_cacheline_dec_overlap(phys_addr_t cln)
+>  	return active_cacheline_set_overlap(cln, --overlap);
+>  }
+>  
+> -static int active_cacheline_insert(struct dma_debug_entry *entry)
+> +static int active_cacheline_insert(struct dma_debug_entry *entry,
+> +				   bool *overlap_cache_clean)
+>  {
+>  	phys_addr_t cln = to_cacheline_number(entry);
+>  	unsigned long flags;
+>  	int rc;
+>  
+> +	*overlap_cache_clean = false;
+> +
+>  	/* If the device is not writing memory then we don't have any
+>  	 * concerns about the cpu consuming stale data.  This mitigates
+>  	 * legitimate usages of overlapping mappings.
+> @@ -487,8 +492,14 @@ static int active_cacheline_insert(struct dma_debug_entry *entry)
+>  
+>  	spin_lock_irqsave(&radix_lock, flags);
+>  	rc = radix_tree_insert(&dma_active_cacheline, cln, entry);
+> -	if (rc == -EEXIST)
+> +	if (rc == -EEXIST) {
+> +		struct dma_debug_entry *existing;
+> +
+>  		active_cacheline_inc_overlap(cln);
+> +		existing = radix_tree_lookup(&dma_active_cacheline, cln);
+> +		if (existing)
+> +			*overlap_cache_clean = existing->is_cache_clean;
+
+*nitpick*
+
+IIUC radix_tree_insert() returns -EEXIST only if the key is already
+present in the tree. Since radix_lock is not released between the
+insert attempt and this lookup, I don't see how this lookup could
+possibly fail. If it's not expected to fail, I would add a WARN_ON().
+
+Please, do correct me if I'm missing something.
+
+Other than that, LGTM.
+
+Petr T
+
+> +	}
+>  	spin_unlock_irqrestore(&radix_lock, flags);
+>  
+>  	return rc;
+> @@ -583,20 +594,24 @@ DEFINE_SHOW_ATTRIBUTE(dump);
+>   */
+>  static void add_dma_entry(struct dma_debug_entry *entry, unsigned long attrs)
+>  {
+> +	bool overlap_cache_clean;
+>  	struct hash_bucket *bucket;
+>  	unsigned long flags;
+>  	int rc;
+>  
+> +	entry->is_cache_clean = !!(attrs & DMA_ATTR_CPU_CACHE_CLEAN);
+> +
+>  	bucket = get_hash_bucket(entry, &flags);
+>  	hash_bucket_add(bucket, entry);
+>  	put_hash_bucket(bucket, flags);
+>  
+> -	rc = active_cacheline_insert(entry);
+> +	rc = active_cacheline_insert(entry, &overlap_cache_clean);
+>  	if (rc == -ENOMEM) {
+>  		pr_err_once("cacheline tracking ENOMEM, dma-debug disabled\n");
+>  		global_disable = true;
+>  	} else if (rc == -EEXIST &&
+> -		   !(attrs & (DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_CPU_CACHE_CLEAN)) &&
+> +		   !(attrs & DMA_ATTR_SKIP_CPU_SYNC) &&
+> +		   !(entry->is_cache_clean && overlap_cache_clean) &&
+>  		   !(IS_ENABLED(CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC) &&
+>  		     is_swiotlb_active(entry->dev))) {
+>  		err_printk(entry->dev, entry,
 
 
