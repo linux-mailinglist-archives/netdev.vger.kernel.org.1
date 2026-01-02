@@ -1,205 +1,129 @@
-Return-Path: <netdev+bounces-246556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56486CEE278
-	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 11:19:37 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1740CEE2A2
+	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 11:28:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5660C3007CB2
-	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 10:19:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 630D8300BBBE
+	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 10:28:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 304182D9792;
-	Fri,  2 Jan 2026 10:19:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Gn52lJeU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 691CC2DA76C;
+	Fri,  2 Jan 2026 10:28:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3835E215F7D;
-	Fri,  2 Jan 2026 10:19:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46D372DA749;
+	Fri,  2 Jan 2026 10:28:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767349174; cv=none; b=qkdPwHohHXMBnP0TmpOq/BXebrSB3WpjHIzCNf+f13JlxPORN2eK2R2KrFdYYMYtKKZZrbPr1mveF6mrH4VJQg9npxk9jpWWG4S04gMRThWcPIOB/1N1DAY66lrwQkmraOa43QIRk84vG4Ff6oCrTPuLFrImSlHTQjBDDLhr+L8=
+	t=1767349728; cv=none; b=FT5fTYqW8tsWUtd65mz94qBE02ioKF0OGzn1vjDKZoaESfZJ1lnHMR2ppPwWtK9nbXCgwrhNIoHm6nbFmL2B2ViKEdXw4ZsFu1rl1YS/ePuremvHdPcjGLFEFSrMtJjbH70RkTRgv5aQpplUDZ+qPhA2jL1P6mDMd35NarktNjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767349174; c=relaxed/simple;
-	bh=ajTWQQ+q5aAsOe+jXvHdnyff4T9nCaiiQ2anKx0DmFs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=k7v0WUeL+ROfIR2metmU1kwFZUCxpt7G3DsSsN/4ZwKg7bdAdEr2WvvL4pCR+L9ndbwqx3PRcgIJ/vdFaPXo+F5gi7GM8wPRaSCXmD6llGDdMvC6f/IxoCQiqgt2pBmJY2YFYjH39IMgt3c+G+u5hI+1Q0ESmLu46K8ROsYRABQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Gn52lJeU; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6025sCeK4036863;
-	Fri, 2 Jan 2026 02:19:06 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=5B3HZ7MSyvayqUbr22rW0pc
-	9f+R2/53Dpzl0nElB6T4=; b=Gn52lJeU1wpQwZBWz2mlI6UShLjNwet1MvA/lb6
-	yrOyKYKetAMGmGyHvq5/QfOAZkgIaHRRyzFDH8LiRTdgElgclVgCW1mIqoIoNoBm
-	lJPyzieDN06Af6G1QS2uwfbqpH3DfgFtxNBDx7s3/zv78ibvJJEy80znP5+ZM7i2
-	Hye+9Tv616bEalFqM23YwOmmenhROgxNos5YMBh9OLhtISTLfXSCxy97//pZThd9
-	zPM4kiWqkif3Dhm0TT4SNL5HbJXlSVBg/yJv6hdP54ddXQ26LFxReLAmviw4WSMh
-	RlkIUpD0zaTc2zO5yZip0r7TZNz9MSw15HOO3lYyYKA/tTA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4be89ag9hm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 02 Jan 2026 02:19:06 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Fri, 2 Jan 2026 02:19:19 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Fri, 2 Jan 2026 02:19:19 -0800
-Received: from 5810.marvell.com (unknown [10.29.45.105])
-	by maili.marvell.com (Postfix) with ESMTP id 6A62B3F7059;
-	Fri,  2 Jan 2026 02:19:01 -0800 (PST)
-From: Kommula Shiva Shankar <kshankar@marvell.com>
-To: <netdev@vger.kernel.org>
-CC: <mst@redhat.com>, <jasowang@redhat.com>, <xuanzhuo@linux.alibaba.com>,
-        <eperezma@redhat.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <virtualization@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
-        <jerinj@marvell.com>, <ndabilpuram@marvell.com>, <schalla@marvell.com>
-Subject: [PATCH net] virtio_net: fix device mismatch in devm_kzalloc/devm_kfree
-Date: Fri, 2 Jan 2026 15:49:00 +0530
-Message-ID: <20260102101900.692770-1-kshankar@marvell.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1767349728; c=relaxed/simple;
+	bh=V/sqwXHm2sJeqHpSG4R8qtwl8OvnE0heO4RGb+KaupI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=e6Af2JFwzHBWWShY67zmoFQdU0BMzj40ZHJ9aMdc+X2BhDzmNIOcl+gSK67XhmCL2VVQ02iJO+JJc5kiGGLeOw48gsmDscKa+DxUIoiHWCIZ+cuVAyldmpY9Fvr4cq8CwgrwrzT7U4JndQW9y2kR5TNkYWMOP5v1/jz4f56Xnz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 602ASPBK050190;
+	Fri, 2 Jan 2026 19:28:25 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 602ASPDU050187
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Fri, 2 Jan 2026 19:28:25 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <27b1ec67-cb85-4673-b6f2-00003c705b8f@I-love.SAKURA.ne.jp>
+Date: Fri, 2 Jan 2026 19:28:25 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: LHT1r8lqNWcei800b7K696E1KRi8T7Hp
-X-Proofpoint-ORIG-GUID: LHT1r8lqNWcei800b7K696E1KRi8T7Hp
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTAyMDA4OSBTYWx0ZWRfX11k+mHdgBJl6
- v/lOWsVBmSDI0y74vNuCCaloBCVQFsIHWAYBh7gn3pIlSydNYuyBri+Mc3HxzbSCUKD4RXHE4bB
- aZDl8Uq+q6CbDn+P+gzyHVg9s/mFzyh+5eILthsXgSjkt5sWEdwufyQ0+mrQYj8aGtV0m5XO7QV
- Wp4YLcQET6OrOknC1hOuV5IRafBJteaIFT+ogW1dP1meRcUyUqUmuvpQYVOvY8BwMOnQZGYvqZt
- QQcoe6JIxyKYnwvn1YHajL9ONYHyYDTl/BnCAaoihB1tTqihOg+SbZB9yn3HsiZnpvRVzFjR2x7
- iO017tvhMTYctmnBP6tp9Cl7d/r8pXYqoFbbIckso+2rp5ygflGEC+2OgBiNhouZ18rjdlA5jAn
- /MPzP96PQvcEr5OLxw+B6AxBl0j4L7cF2fEPRDkRy5K0AfLipHaMKsH27inQCPV75IF2sjCpPRh
- wWPrMQYT1HQY2sfuDcw==
-X-Authority-Analysis: v=2.4 cv=ZbcQ98VA c=1 sm=1 tr=0 ts=69579b9a cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
- a=AcOwvBPJr7tEbDvczk0A:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-01_07,2025-12-31_01,2025-10-01_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot] [wireless?] WARNING in rfkill_unregister
+To: Johannes Berg <johannes@sipsolutions.net>,
+        syzbot <syzbot+16210d09509730207241@syzkaller.appspotmail.com>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Cc: Krzysztof Kozlowski <krzk@kernel.org>
+References: <6955cbd5.050a0220.a1b6.032d.GAE@google.com>
+ <e062f6a0a7583ca99ab0449481119634f8b02a3d.camel@sipsolutions.net>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <e062f6a0a7583ca99ab0449481119634f8b02a3d.camel@sipsolutions.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Virus-Status: clean
+X-Anti-Virus-Server: fsav401.rs.sakura.ne.jp
 
-Initial rss_hdr allocation uses virtio_device->device,
-but virtnet_set_queues() frees using net_device->device.
-This device mismatch causing below devres warning
+On 2026/01/01 21:07, Johannes Berg wrote:
+> If this email doesn't wake anyone up, I'll do that on the next syzbot
+> rfkill vs. NFC report I get :)
 
-[ 3788.514041] ------------[ cut here ]------------
-[ 3788.514044] WARNING: drivers/base/devres.c:1095 at devm_kfree+0x84/0x98, CPU#16: vdpa/1463
-[ 3788.514054] Modules linked in: octep_vdpa virtio_net virtio_vdpa [last unloaded: virtio_vdpa]
-[ 3788.514064] CPU: 16 UID: 0 PID: 1463 Comm: vdpa Tainted: G        W           6.18.0 #10 PREEMPT
-[ 3788.514067] Tainted: [W]=WARN
-[ 3788.514069] Hardware name: Marvell CN106XX board (DT)
-[ 3788.514071] pstate: 63400009 (nZCv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
-[ 3788.514074] pc : devm_kfree+0x84/0x98
-[ 3788.514076] lr : devm_kfree+0x54/0x98
-[ 3788.514079] sp : ffff800084e2f220
-[ 3788.514080] x29: ffff800084e2f220 x28: ffff0003b2366000 x27: 000000000000003f
-[ 3788.514085] x26: 000000000000003f x25: ffff000106f17c10 x24: 0000000000000080
-[ 3788.514089] x23: ffff00045bb8ab08 x22: ffff00045bb8a000 x21: 0000000000000018
-[ 3788.514093] x20: ffff0004355c3080 x19: ffff00045bb8aa00 x18: 0000000000080000
-[ 3788.514098] x17: 0000000000000040 x16: 000000000000001f x15: 000000000007ffff
-[ 3788.514102] x14: 0000000000000488 x13: 0000000000000005 x12: 00000000000fffff
-[ 3788.514106] x11: ffffffffffffffff x10: 0000000000000005 x9 : ffff800080c8c05c
-[ 3788.514110] x8 : ffff800084e2eeb8 x7 : 0000000000000000 x6 : 000000000000003f
-[ 3788.514115] x5 : ffff8000831bafe0 x4 : ffff800080c8b010 x3 : ffff0004355c3080
-[ 3788.514119] x2 : ffff0004355c3080 x1 : 0000000000000000 x0 : 0000000000000000
-[ 3788.514123] Call trace:
-[ 3788.514125]  devm_kfree+0x84/0x98 (P)
-[ 3788.514129]  virtnet_set_queues+0x134/0x2e8 [virtio_net]
-[ 3788.514135]  virtnet_probe+0x9c0/0xe00 [virtio_net]
-[ 3788.514139]  virtio_dev_probe+0x1e0/0x338
-[ 3788.514144]  really_probe+0xc8/0x3a0
-[ 3788.514149]  __driver_probe_device+0x84/0x170
-[ 3788.514152]  driver_probe_device+0x44/0x120
-[ 3788.514155]  __device_attach_driver+0xc4/0x168
-[ 3788.514158]  bus_for_each_drv+0x8c/0xf0
-[ 3788.514161]  __device_attach+0xa4/0x1c0
-[ 3788.514164]  device_initial_probe+0x1c/0x30
-[ 3788.514168]  bus_probe_device+0xb4/0xc0
-[ 3788.514170]  device_add+0x614/0x828
-[ 3788.514173]  register_virtio_device+0x214/0x258
-[ 3788.514175]  virtio_vdpa_probe+0xa0/0x110 [virtio_vdpa]
-[ 3788.514179]  vdpa_dev_probe+0xa8/0xd8
-[ 3788.514183]  really_probe+0xc8/0x3a0
-[ 3788.514186]  __driver_probe_device+0x84/0x170
-[ 3788.514189]  driver_probe_device+0x44/0x120
-[ 3788.514192]  __device_attach_driver+0xc4/0x168
-[ 3788.514195]  bus_for_each_drv+0x8c/0xf0
-[ 3788.514197]  __device_attach+0xa4/0x1c0
-[ 3788.514200]  device_initial_probe+0x1c/0x30
-[ 3788.514203]  bus_probe_device+0xb4/0xc0
-[ 3788.514206]  device_add+0x614/0x828
-[ 3788.514209]  _vdpa_register_device+0x58/0x88
-[ 3788.514211]  octep_vdpa_dev_add+0x104/0x228 [octep_vdpa]
-[ 3788.514215]  vdpa_nl_cmd_dev_add_set_doit+0x2d0/0x3c0
-[ 3788.514218]  genl_family_rcv_msg_doit+0xe4/0x158
-[ 3788.514222]  genl_rcv_msg+0x218/0x298
-[ 3788.514225]  netlink_rcv_skb+0x64/0x138
-[ 3788.514229]  genl_rcv+0x40/0x60
-[ 3788.514233]  netlink_unicast+0x32c/0x3b0
-[ 3788.514237]  netlink_sendmsg+0x170/0x3b8
-[ 3788.514241]  __sys_sendto+0x12c/0x1c0
-[ 3788.514246]  __arm64_sys_sendto+0x30/0x48
-[ 3788.514249]  invoke_syscall.constprop.0+0x58/0xf8
-[ 3788.514255]  do_el0_svc+0x48/0xd0
-[ 3788.514259]  el0_svc+0x48/0x210
-[ 3788.514264]  el0t_64_sync_handler+0xa0/0xe8
-[ 3788.514268]  el0t_64_sync+0x198/0x1a0
-[ 3788.514271] ---[ end trace 0000000000000000 ]---
+Is the next report https://syzkaller.appspot.com/bug?extid=ef8f802abdb9a32343fc ?
 
-Fix by using virtio_device->device consistently for
-allocation and deallocation
+Obviously deadlocked (but lockdep cannot report due to dev->mutex being marked as novalidate).
 
-Fixes: 4944be2f5ad8c ("virtio_net: Allocate rss_hdr with devres")
-Signed-off-by: Kommula Shiva Shankar <kshankar@marvell.com>
----
- drivers/net/virtio_net.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+INFO: task syz.4.1326:10654 blocked for more than 143 seconds.
+      Not tainted syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz.4.1326      state:D stack:27848 pid:10654 tgid:10645 ppid:5823   task_flags:0x400040 flags:0x00080002
+Call Trace:
+ context_switch kernel/sched/core.c:5256 [inline]
+ __schedule+0x14bc/0x5000 kernel/sched/core.c:6863
+ __schedule_loop kernel/sched/core.c:6945 [inline]
+ schedule+0x165/0x360 kernel/sched/core.c:6960
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:7017
+ __mutex_lock_common kernel/locking/mutex.c:692 [inline]
+ __mutex_lock+0x7e6/0x1350 kernel/locking/mutex.c:776
+ rfkill_unregister+0xc8/0x220 net/rfkill/core.c:1145
+ nfc_unregister_device+0x96/0x300 net/nfc/core.c:1167
+ virtual_ncidev_close+0x56/0x90 drivers/nfc/virtual_ncidev.c:172
+ __fput+0x44c/0xa70 fs/file_table.c:468
+ fput_close_sync+0x113/0x220 fs/file_table.c:573
+ __do_sys_close fs/open.c:1573 [inline]
+ __se_sys_close fs/open.c:1558 [inline]
+ __x64_sys_close+0x7f/0x110 fs/open.c:1558
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+2 locks held by syz.4.1326/10654:
+ #0: ffff888078c13100 (&dev->mutex){....}-{4:4}, at: device_lock include/linux/device.h:895 [inline]
+ #0: ffff888078c13100 (&dev->mutex){....}-{4:4}, at: nfc_unregister_device+0x63/0x300 net/nfc/core.c:1165
+ #1: ffffffff8f5fd668 (rfkill_global_mutex){+.+.}-{4:4}, at: rfkill_unregister+0xc8/0x220 net/rfkill/core.c:1145
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 1bb3aeca66c6..22d894101c01 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -3791,7 +3791,7 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
- 	if (vi->has_rss && !netif_is_rxfh_configured(dev)) {
- 		old_rss_hdr = vi->rss_hdr;
- 		old_rss_trailer = vi->rss_trailer;
--		vi->rss_hdr = devm_kzalloc(&dev->dev, virtnet_rss_hdr_size(vi), GFP_KERNEL);
-+		vi->rss_hdr = devm_kzalloc(&vi->vdev->dev, virtnet_rss_hdr_size(vi), GFP_KERNEL);
- 		if (!vi->rss_hdr) {
- 			vi->rss_hdr = old_rss_hdr;
- 			return -ENOMEM;
-@@ -3802,7 +3802,7 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
- 
- 		if (!virtnet_commit_rss_command(vi)) {
- 			/* restore ctrl_rss if commit_rss_command failed */
--			devm_kfree(&dev->dev, vi->rss_hdr);
-+			devm_kfree(&vi->vdev->dev, vi->rss_hdr);
- 			vi->rss_hdr = old_rss_hdr;
- 			vi->rss_trailer = old_rss_trailer;
- 
-@@ -3810,7 +3810,7 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
- 				 queue_pairs);
- 			return -EINVAL;
- 		}
--		devm_kfree(&dev->dev, old_rss_hdr);
-+		devm_kfree(&vi->vdev->dev, old_rss_hdr);
- 		goto succ;
- 	}
- 
--- 
-2.48.1
+INFO: task syz.3.1329:10652 blocked for more than 144 seconds.
+      Not tainted syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz.3.1329      state:D stack:26824 pid:10652 tgid:10651 ppid:5820   task_flags:0x400140 flags:0x00080002
+Call Trace:
+ context_switch kernel/sched/core.c:5256 [inline]
+ __schedule+0x14bc/0x5000 kernel/sched/core.c:6863
+ __schedule_loop kernel/sched/core.c:6945 [inline]
+ schedule+0x165/0x360 kernel/sched/core.c:6960
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:7017
+ __mutex_lock_common kernel/locking/mutex.c:692 [inline]
+ __mutex_lock+0x7e6/0x1350 kernel/locking/mutex.c:776
+ device_lock include/linux/device.h:895 [inline]
+ nfc_dev_down+0x3b/0x290 net/nfc/core.c:143
+ nfc_rfkill_set_block+0x2d/0x100 net/nfc/core.c:179
+ rfkill_set_block+0x1d2/0x440 net/rfkill/core.c:346
+ rfkill_fop_write+0x44b/0x570 net/rfkill/core.c:1301
+ vfs_write+0x27e/0xb30 fs/read_write.c:684
+ ksys_write+0x145/0x250 fs/read_write.c:738
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+2 locks held by syz.3.1329/10652:
+ #0: ffffffff8f5fd668 (rfkill_global_mutex){+.+.}-{4:4}, at: rfkill_fop_write+0x191/0x570 net/rfkill/core.c:1293
+ #1: ffff888078c13100 (&dev->mutex){....}-{4:4}, at: device_lock include/linux/device.h:895 [inline]
+ #1: ffff888078c13100 (&dev->mutex){....}-{4:4}, at: nfc_dev_down+0x3b/0x290 net/nfc/core.c:143
+
 
 
