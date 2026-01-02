@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-246618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94FD0CEF4ED
-	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 21:26:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 430C4CEF53B
+	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 21:47:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5F3F830155C6
-	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 20:26:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 48860300F316
+	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 20:46:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8552D2391;
-	Fri,  2 Jan 2026 20:26:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4CD01F2B88;
+	Fri,  2 Jan 2026 20:46:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NpFEpb1C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a14tEpAS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59852BE646;
-	Fri,  2 Jan 2026 20:26:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2F579CD;
+	Fri,  2 Jan 2026 20:46:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767385598; cv=none; b=WP4Jm6mWDyu1Ic95j4B/fnGn3WtuF8o+CacGC2Yc2RwYoFv8etWHtaQXTdVCseinIdGuPtElcvZVCU32DYQ0czUyIxM2M/9GImWZwlChlAJDNnMzuYVEIqaJ1PwNQjTCoApUezweUV/Nv7cUrrE7XozqQwwEUdUKWX2VPUiX4FA=
+	t=1767386808; cv=none; b=pOPzlN4HrfPM+mpFqUUCqAEystVqwJzlPEK0zGy+vDEYLtu1EqBk6zs0GVWBCJqdkTdqFMWTdmBJRQTdppX+miGKZjHdQhhncfipPmu4gX2bVQMY7Wkg8H523B25yeCbkC13sDwkpi2BjN2wR1ELAEFe+++VCmOgaLrDNmukVH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767385598; c=relaxed/simple;
-	bh=69Vj5Q9Rf2Q1+8bWYhSvejuzOwrPHdL8T1fMzDcxvGM=;
+	s=arc-20240116; t=1767386808; c=relaxed/simple;
+	bh=bdCY5cMbhUX9SwB8MkbAUbYbFHlPUggK/Adf1cTLEWU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L2I6wDMQCIvKdYPniTlD3OjQB62bdw/NiF9fmmRODoh3Bla5N/9dA2eohXtJE+T51gwSJW0mSJoIESUOaoEqQseeflotosYLZW9t2QDEbh3psOyh5dlF1rEiYW7+o32IX8YMLmEjQCmuScb5FA1AAtfwfyrzmNMhPrf5keuyD7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NpFEpb1C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0742FC116B1;
-	Fri,  2 Jan 2026 20:26:37 +0000 (UTC)
+	 MIME-Version:Content-Type; b=eX1psHk2yf2hhduIIH1H77Sv8gOjMO9Zg5OBEJxyW2A3SsAc3IDDXqph4zfVDwyzqp+7piyUBr6JVJUXcbAGrdpi4wWgYv+JVPkQr4cJ2zENEZ70Mv1lwcFX4ggCApb0YnBpdWn75kcl5WQfI7itcOC/JG/pzLLKH8zxO1o6gko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a14tEpAS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B238DC116B1;
+	Fri,  2 Jan 2026 20:46:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767385598;
-	bh=69Vj5Q9Rf2Q1+8bWYhSvejuzOwrPHdL8T1fMzDcxvGM=;
+	s=k20201202; t=1767386808;
+	bh=bdCY5cMbhUX9SwB8MkbAUbYbFHlPUggK/Adf1cTLEWU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NpFEpb1ClOwt4ZwNeztGj6bFngkNGUIRdZGRva7bxXMpxed8TTbuWRGeEsXvHdXEA
-	 nZ7lYV4HGC4T7BApp7POIX0+hvmD5SHr29SA1/IF2Wye9EtFZF4JZ0HUqrHzpkNe4x
-	 I9Bzy711YQNx968faXSNg0XCuQnjzFDnTydPWs0fARIvYSypGcZJU/Qmm8RujLD8Zr
-	 mCMxqYuCyMDaKHvk5VBG1mBCNXwPr9aDJHxW3Hj82WwAO0w9DZTRs6aSP0WCgfVR/B
-	 dFM82iMTKE5xkplrlCQqhDzR4NhU6iyOcCTL+pgZvWeo2a9zwjjVLHxg5Prj19fSNX
-	 aXFucHm85FPRg==
-Date: Fri, 2 Jan 2026 12:26:37 -0800
+	b=a14tEpASXW25oxfwdx7qAQU5v2ZKJimFJeyFPBBfFqYyw5tJOIduaF9CY59db/LAX
+	 Bm5DX1iaWfPrYu7uG5bA3xRJuViokEg3esFY+ZGmzHzobhM9kqehiF1BLdHitdsIsz
+	 ENLl1+6a02eiUHe7WBRZpyQSCQiI97mJIpDz84zF5LOsC1E7s1dUIhKON0d9qi0wZH
+	 svQpfxd7F8DV/oGK/BdQvviYBLaOM4rnsLDqt/un6jXAalyZer1ETKy0gapAot/CJF
+	 TzbM0aRF3teO9zq0U1AXD8uoQ9LELblaf0H6AX8A5CR+YCDtAM105sNhW7a+ka5cx1
+	 Prg+eJo4rjVHQ==
+Date: Fri, 2 Jan 2026 12:46:46 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Dmitry Skorodumov <dskr99@gmail.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, Dmitry
- Skorodumov <skorodumov.dmitry@huawei.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
-Subject: Re: [PATCH v4 net 2/2] selftests: net: simple selftest for ipvtap
-Message-ID: <20260102122637.40556d72@kernel.org>
-In-Reply-To: <20251230140333.2088391-3-skorodumov.dmitry@huawei.com>
-References: <20251230140333.2088391-1-skorodumov.dmitry@huawei.com>
-	<20251230140333.2088391-3-skorodumov.dmitry@huawei.com>
+To: Junjie Cao <junjie.cao@intel.com>
+Cc: pabeni@redhat.com, davem@davemloft.net, edumazet@google.com,
+ syzbot+14afda08dc3484d5db82@syzkaller.appspotmail.com, horms@kernel.org,
+ linux-hams@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+ stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] netrom: fix possible deadlock in nr_rt_device_down
+Message-ID: <20260102124646.04dd56af@kernel.org>
+In-Reply-To: <20251204090905.28663-2-junjie.cao@intel.com>
+References: <20251204090905.28663-1-junjie.cao@intel.com>
+	<20251204090905.28663-2-junjie.cao@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,31 +61,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 30 Dec 2025 17:03:24 +0300 Dmitry Skorodumov wrote:
-> @@ -122,6 +123,7 @@ CONFIG_TEST_BPF=m
->  CONFIG_TLS=m
->  CONFIG_TRACEPOINTS=y
->  CONFIG_TUN=y
-> +CONFIG_TAP=m
+On Thu,  4 Dec 2025 17:09:04 +0800 Junjie Cao wrote:
+> -	struct nr_node  *t = NULL;
+> +	struct nr_node *t = NULL;
 
-alphabetical order please
+AFAICT your fixes were archived before any reviewer had a chance to
+take a look (perhaps due to LPC / Maintainer Summit). Could you repost,
+and when you do drop the whitespace cleanups from this patch? There
+should be no whitespace cleanups in fixes..
 
->  CONFIG_USER_NS=y
->  CONFIG_VETH=y
->  CONFIG_VLAN_8021Q=y
-> diff --git a/tools/testing/selftests/net/ipvtap_test.sh b/tools/testing/selftests/net/ipvtap_test.sh
-> new file mode 100755
-
-> +NS_COUNT=32
-> +IP_ITERATIONS=1024
-> +[ "$KSFT_MACHINE_SLOW" = "yes" ] && NS_COUNT=8
-
-This still fails on our slow VMs with debug kernel enabled (even tho
-they set KSFT_MACHINE_SLOW). The test runs for 15+ minutes without
-printing anything. That's pretty bad, humans running this tests will
-also have no idea what's going on. Maybe limit the runtime of the test
-as well as the iterations? To 1min? It takes <50sec on non-debug kernels
-in our CI.
--- 
-pw-bot: cr
+Have you written a test to exercise these code paths by any chance?
+Adding one would be great.
 
