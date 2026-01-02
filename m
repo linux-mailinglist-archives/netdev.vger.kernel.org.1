@@ -1,109 +1,181 @@
-Return-Path: <netdev+bounces-246600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 424CBCEEE42
-	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 16:38:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13EADCEEE63
+	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 16:43:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6B469300F899
-	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 15:38:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6AB1F300F9CE
+	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 15:43:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68A927700D;
-	Fri,  2 Jan 2026 15:38:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B67B027E077;
+	Fri,  2 Jan 2026 15:43:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="J2c9SRA/"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="DhXt/xB3"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13B822749E6
-	for <netdev@vger.kernel.org>; Fri,  2 Jan 2026 15:38:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E42E227D786;
+	Fri,  2 Jan 2026 15:43:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767368335; cv=none; b=LtF4gbHTGl1x/k+yXjhJDBYAQMYuhsoMPZJDkGQV52SsijqHAVOax+rmqPqbT2EE2W6HYjAtxiD0Arst7FCz/JM4D7Uxaq7051cfwWqriYaNkNQKTubU7i0/ei0620K/58bZgiLN6g/+yfW3tRev5x6AFZ35ftSCCvzmz6It7hM=
+	t=1767368612; cv=none; b=EEvRnZcGRwdSQMHdsssn11CwaJIM/IS9WXKTl488nBR9qZIUQ36GtiypU2uzsbr67Ew8SJUcLy6dZQuBh0wIhmR3ncPlZf9fzWMcp/jZjfsn8iLexbCc9I8umyOmOdjeR3AItmLH/HcEun4u0qXCkAnO6np8aIFUs/O+xpYRuAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767368335; c=relaxed/simple;
-	bh=+iYz7m2D8U8EwGz1kSidRtFmtpogOaFyOnPfxjbl6zI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qZZJnpgIo6DtM1qRzzZ1GwougSO8qPJB/LWu0AGdvnpHZ/BjpOkFRjFXxM+qH5i0Rm93lSLZNh1V+EpOIehIxxAiCm8RBeqfRhtEEXbu8JRKbiFt362lTL45x0IaVhdcVimla8Y7H7yBz77EXx+7Uj3/aeQ361xV0lsv+f2ZQiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=J2c9SRA/; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <883a21af-750c-49df-88c6-47bd642e03d4@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767368320;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=taD8t+CRYZkYr8f56OzWxn0Ld4xi2x2xvqJmet4VYKk=;
-	b=J2c9SRA/ZhbRgjOYPehVBB39V1rco1clZMAUidT4LuwgHuP8gvVpBo+rR3q/m91jrmXejR
-	VkeWIS/+7E64XyXQfUsgt7kCFxlA4wd/JurUBVXSVh0WqktjV3xAXihcoQl/6qwP39dXq9
-	P9PAoRpEfFR5S4QDwFvEBJ/EU7V1kV8=
-Date: Fri, 2 Jan 2026 23:38:25 +0800
+	s=arc-20240116; t=1767368612; c=relaxed/simple;
+	bh=LUAbwzwebUPLNRmd7O1YDQA4ve1R2wFu1VV/nEiRio8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jOt0ghfKWQNSlshrIpM8Tpp1PIwoTIVNwJVFtaCdv9Y5ZsFOwAhX5UScAV4Xnf+4x1h3HEBarG1BQDI/ag0u5kVeSAlhOTQJt84msBLgPnG8rx9bZpMODn/MSnNMpGH1eKLXH99sqffMnErRoe5vv0oppZLLCM8IqynTTOYe87w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=DhXt/xB3; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Reply-To:Content-ID:Content-Description;
+	bh=0t9mnhJSHOECX4KKppwdSKbhkFJo/W7qfjc5l3Ril5k=; b=DhXt/xB3ETIg6Y6xEBN2I1ztJz
+	11XWIjk3f5y5f8cw7qR99jIPofQo39yuaWKZLN8GFgrMIETGLuzkhf8M01TUfLu/kErSuHiQ2im3P
+	y4eGcFnKm+ANnnoDxN4UqJvlPtZWqqaB5HiOPW3+VAWC0K6o9jY4ICV9H/EEwmkj4cZkfRhljQkNI
+	zDTG+FGN8MxXK6OrIm415D3w9HhvtYGyKjS1tK9hQjSSNKHvI3fX2v0PQ3oWLQsfBlEm5cPSgp7mL
+	WNIuBEhnzliwDJTbPJFKJ2C6DFD4anTA2WWI5wT38kaxBhwGKOjN3DGieNkb2/K4rQWamstuxNLG8
+	EDO6DU1Q==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <leitao@debian.org>)
+	id 1vbhJ2-00EYVY-87; Fri, 02 Jan 2026 15:43:12 +0000
+Date: Fri, 2 Jan 2026 07:43:07 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Cc: Michael Chan <michael.chan@broadcom.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kernel-team@meta.com, stable@vger.kernel.org
+Subject: Re: [PATCH net] bnxt_en: Fix NULL pointer crash in bnxt_ptp_enable
+ during error cleanup
+Message-ID: <nejlqwxc4ekfhmpodjm63cfob4o5uf2z7qukk3daofykegnwvs@sksxy4lmxrnd>
+References: <20251231-bnxt-v1-1-8f9cde6698b4@debian.org>
+ <CALs4sv2qQuL0trq3ZB6SczPK5BmFMF6p2Ki-3q+4Xqc_qzauoQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next 1/4] bpf: tailcall: Introduce
- bpf_arch_tail_call_prologue_offset
-To: bot+bpf-ci@kernel.org, bpf@vger.kernel.org
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, puranjay@kernel.org,
- xukuohai@huaweicloud.com, catalin.marinas@arm.com, will@kernel.org,
- davem@davemloft.net, dsahern@kernel.org, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
- hpa@zytor.com, akpm@linux-foundation.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kernel-patches-bot@fb.com, martin.lau@kernel.org,
- clm@meta.com, ihor.solodrai@linux.dev
-References: <20260102150032.53106-2-leon.hwang@linux.dev>
- <45f1e1978b7dc28e522dcc0a72954d892b37a85220749bd027c7395edb01d991@mail.kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Leon Hwang <leon.hwang@linux.dev>
-In-Reply-To: <45f1e1978b7dc28e522dcc0a72954d892b37a85220749bd027c7395edb01d991@mail.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <CALs4sv2qQuL0trq3ZB6SczPK5BmFMF6p2Ki-3q+4Xqc_qzauoQ@mail.gmail.com>
+X-Debian-User: leitao
 
+Hello Pavan,
 
-
-On 2026/1/2 23:21, bot+bpf-ci@kernel.org wrote:
->> diff --git a/kernel/bpf/arraymap.c b/kernel/bpf/arraymap.c
->> index 1eeb31c5b317..beedd1281c22 100644
->> --- a/kernel/bpf/arraymap.c
->> +++ b/kernel/bpf/arraymap.c
->> @@ -127,6 +127,9 @@ static struct bpf_map *array_map_alloc(union bpf_attr *attr)
->>  			array_size += (u64) max_entries * elem_size;
->>  		}
->>  	}
->> +	if (attr->map_type == BPF_MAP_TYPE_PROG_ARRAY && bpf_arch_tail_call_prologue_offset())
->> +		/* Store tailcall targets */
->> +		array_size += (u64) max_entries * sizeof(void *);
+On Wed, Dec 31, 2025 at 09:30:57PM +0530, Pavan Chebbi wrote:
+> On Wed, Dec 31, 2025 at 6:35 PM Breno Leitao <leitao@debian.org> wrote:
+> > Fix this by checking if bp->hwrm_dma_pool is NULL at the start of
+> > bnxt_ptp_enable(). During error/cleanup paths when HWRM resources have
+> > been freed, return success without attempting to send commands since the
+> > hardware is being torn down anyway.
+> >
+> > During normal operation, the DMA pool is always valid so PTP
+> > functionality is unaffected.
+> >
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > Fixes: a60fc3294a37 ("ptp: rework ptp_clock_unregister() to disable events")
+> > Cc: stable@vger.kernel.org
+> > ---
+> >  drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 7 +++++++
+> >  1 file changed, 7 insertions(+)
+> >
+> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+> > index a8a74f07bb54..a749bbfa398e 100644
+> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+> > @@ -482,6 +482,13 @@ static int bnxt_ptp_enable(struct ptp_clock_info *ptp_info,
+> >         int pin_id;
+> >         int rc;
+> >
+> > +       /* Return success if HWRM resources are not available.
+> > +        * This can happen during error/cleanup paths when DMA pool has been
+> > +        * freed.
+> > +        */
+> > +       if (!bp->hwrm_dma_pool)
 > 
-> Should array_map_mem_usage() also account for this additional space?
-> Currently array_map_mem_usage() handles special cases for percpu arrays
-> and mmapable arrays, but has no corresponding check for PROG_ARRAY maps
-> when bpf_arch_tail_call_prologue_offset() is non-zero. This would cause
-> the reported memory usage to be lower than the actual allocation when
-> an architecture implements this function (e.g., x86_64 and arm64 in the
-> subsequent patches of this series).
-> 
-> [ ... ]
-> 
+> Thanks for the fix. While it's valid, just that to me, this check here
+> looks a bit odd.
+> Why not call bnxt_ptp_clear() before bnxt_free_hwrm_resources() in the
+> unwind path?
 
-You are right, array_map_mem_usage() needs to stay in sync with the
-allocation logic to avoid under-reporting memory.
+I thought about it, but, I didn't understand all the implication of
+changing the unwind order. 
 
-I will include this fix in the next revision after I’ve collected more
-feedback.
+Anyway, I've have tested the current patch and it worked fine. Do you
+think we should move kfree(bp->ptp_cfg) closer to bnxt_ptp_clear()?
 
-Thanks,
-Leon
+Thanks for the review,
+--breno
 
+
+commit d07c08889f75966d6829b93304de5030cf4e66aa
+Author: Breno Leitao <leitao@debian.org>
+Date:   Wed Dec 31 04:00:57 2025 -0800
+
+    bnxt_en: Fix NULL pointer crash in bnxt_ptp_enable during error cleanup
+    
+    When bnxt_init_one() fails during initialization (e.g.,
+    bnxt_init_int_mode returns -ENODEV), the error path calls
+    bnxt_free_hwrm_resources() which destroys the DMA pool and sets
+    bp->hwrm_dma_pool to NULL. Subsequently, bnxt_ptp_clear() is called,
+    which invokes ptp_clock_unregister().
+    
+    Since commit a60fc3294a37 ("ptp: rework ptp_clock_unregister() to
+    disable events"), ptp_clock_unregister() now calls
+    ptp_disable_all_events(), which in turn invokes the driver's .enable()
+    callback (bnxt_ptp_enable()) to disable PTP events before completing the
+    unregistration.
+    
+    bnxt_ptp_enable() attempts to send HWRM commands via bnxt_ptp_cfg_pin()
+    and bnxt_ptp_cfg_event(), both of which call hwrm_req_init(). This
+    function tries to allocate from bp->hwrm_dma_pool, causing a NULL
+    pointer dereference:
+    
+      bnxt_en 0000:01:00.0 (unnamed net_device) (uninitialized): bnxt_init_int_mode err: ffffffed
+      KASAN: null-ptr-deref in range [0x0000000000000028-0x000000000000002f]
+      Call Trace:
+       __hwrm_req_init (drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.c:72)
+       bnxt_ptp_enable (drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c:323 drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c:517)
+       ptp_disable_all_events (drivers/ptp/ptp_chardev.c:66)
+       ptp_clock_unregister (drivers/ptp/ptp_clock.c:518)
+       bnxt_ptp_clear (drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c:1134)
+       bnxt_init_one (drivers/net/ethernet/broadcom/bnxt/bnxt.c:16889)
+    
+    Lines are against commit f8f9c1f4d0c7 ("Linux 6.19-rc3")
+    
+    Fix this by clearing and unregistering ptp (bnxt_ptp_clear()) before
+    freeing HWRM resources.
+    
+    Suggested-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+    Signed-off-by: Breno Leitao <leitao@debian.org>
+    Fixes: a60fc3294a37 ("ptp: rework ptp_clock_unregister() to disable events")
+    Cc: stable@vger.kernel.org
+
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index d17d0ea89c36..68fc9977b375 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -16882,10 +16882,10 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 
+ init_err_pci_clean:
+ 	bnxt_hwrm_func_drv_unrgtr(bp);
++	bnxt_ptp_clear(bp);
+ 	bnxt_free_hwrm_resources(bp);
+ 	bnxt_hwmon_uninit(bp);
+ 	bnxt_ethtool_free(bp);
+-	bnxt_ptp_clear(bp);
+ 	kfree(bp->ptp_cfg);
+ 	bp->ptp_cfg = NULL;
+ 	kfree(bp->fw_health);
 
