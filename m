@@ -1,123 +1,111 @@
-Return-Path: <netdev+bounces-246560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB8C6CEE511
-	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 12:20:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09BBACEE52F
+	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 12:22:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 95C963000DDA
-	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 11:20:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 29040300451B
+	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 11:22:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2A952E975E;
-	Fri,  2 Jan 2026 11:20:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 088A62E22B5;
+	Fri,  2 Jan 2026 11:22:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lUQSooyi"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="lLtaXHfy"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3CBC1EBA19
-	for <netdev@vger.kernel.org>; Fri,  2 Jan 2026 11:20:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CD7F2690EC;
+	Fri,  2 Jan 2026 11:22:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767352842; cv=none; b=fivKY/cTwhI3NDna5mkdN7JL9bD0+g3Z6bm9myBh0IWQvtcicwbWhFYLOCLWK2GgYQeUUfj29S/3ptFJKOUC+8DEAM/NUxZ8pvhkIL9jFwmIJZ3WHKP89thFAuc/J/nG+0/i7xRmizGfwCmXEybXOr6YMGCJZJzhFSQLhkpdAek=
+	t=1767352933; cv=none; b=H6vT3X/dtfDgLud6TNIGD2J0QJIXQuMUnTcq8tGoWKa9hvbgef/Ry4uNtrfHqo3iPqoKBpL3Mqi8zRTN3Av+xEpauBkwd1Q6R3c/LcCu5Kzt0ieUdP5gQaTU1qmOeD7SvpfBvvZFcSmxXMSen6mL74N6owmxMFrOKLPICGZk0sU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767352842; c=relaxed/simple;
-	bh=ekma1JNtY3HapFlGPYJ1yaPfaPBCx4jLHOR+xVZRGXY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nqRRQM9JJdPl0iMf1+7k9crjMp1HUsqCRZ4+mXbwulnokqEzCa+HZGUYEScA7RUBldow7KnREb2Q88kY9Sjgi/53/IEdn89ozuHZ1H9HWsloCfJjsWSzw/fwaGOdwUPhs/5Fx3R9Xe6IDC/sYT3iHf4iVWro1g4XFj78w4C8GzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lUQSooyi; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <6856f6aa-c6b8-4966-9dd2-9bf0315395c2@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767352837;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GjCw3B/ZE6UsbRGFFrEOWgoAv9dKcIBGeE3THIAgxpw=;
-	b=lUQSooyi39lfIMRVjaV/kmKb7WdyvSWRxBnlGP3xc7CZNiG0dOFmTTzioIzLXkKrGeGHx9
-	lasbtDCBKxbzFDV+WYUYuNUwnSsnqm+3PQ9iL5AzpZ0pAi2o/XZImmck8yhSNLNwagcyb2
-	drVc+NYVSsYpBIhkYqQwHgaGHcI5Byo=
-Date: Fri, 2 Jan 2026 11:20:28 +0000
+	s=arc-20240116; t=1767352933; c=relaxed/simple;
+	bh=DFNwcvFT6CS+U/63LNkTD/dJXIepoj/tpicP/GPrJoU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SYd2Vdc5y4pWXiwrEcpmHsBYzKps/5t+dwnirly0m5isrDGCVz0hYcD75Eg41KFVwjwKktYaIPilX3cRaXVIzJB6tg5pjyw+8m905NOnCPbWGi1bzTDmGX4JpiY5qBFdai2BuAuyNTndkIkNXIzFxZREPqtlzBPOtIdihF3C6k4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=lLtaXHfy; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=rrfz9N7B8i7I9HCUv8haUfs2CvkRvGTfH+5BsheLZBU=; b=lLtaXHfy41/OGO9VMemuNM2qCN
+	aQCtTkrRyG3YE3BHfhO6gUm9iERpxWT+3o9KHwljC3DMg+QBAuRKB6RhYwzmLq61gf5OA3yPWeq89
+	i4h8cuYTyM8yWAIdo+WyrzfOJyXJgiZfw4DQ/J9Mo9TMUVENc/pFHnmdCrIKOMUySgpb+7piu1sTO
+	DOqUk1vyxTdzdOVOr8icU3MMJnbXmiiTL6FxezeO2fb9v+uYehsVWeGPJKQf5dnWntVE6SCEYyEa7
+	TU5wET3rI9K5gV6UBbdpzDG8d+h6SDiI8a3evCJeqyrKT6fDSoMqzm7D8Zfcl13SUmBtyImw0qmtT
+	raHNy8ZQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36608)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vbdE8-000000005tv-3Z3i;
+	Fri, 02 Jan 2026 11:21:53 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vbdE0-000000004zr-2CR7;
+	Fri, 02 Jan 2026 11:21:44 +0000
+Date: Fri, 2 Jan 2026 11:21:44 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Jiawen Wu <jiawenwu@trustnetic.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: wangxun: move PHYLINK dependency
+Message-ID: <aVeqSLtI0SgjsQP-@shell.armlinux.org.uk>
+References: <20251216213547.115026-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] net: mediatek: add null pointer check for hardware
- offloading
-To: Sebastian Roland Wolf <Sebastian.Wolf@pace-systems.de>,
- Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- Sebastian Roland Wolf <srw@root533.premium-rootserver.net>
-References: <20251231225206.3212871-1-Sebastian.Wolf@pace-systems.de>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20251231225206.3212871-1-Sebastian.Wolf@pace-systems.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251216213547.115026-1-arnd@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 31/12/2025 22:52, Sebastian Roland Wolf wrote:
-> From: Sebastian Roland Wolf <srw@root533.premium-rootserver.net>
+On Tue, Dec 16, 2025 at 10:35:42PM +0100, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> Add a null pointer check to prevent kernel crashes when hardware
-> offloading is active on MediaTek devices.
+> The LIBWX library code is what calls into phylink, so any user of
+> it has to select CONFIG_PHYLINK at the moment, with NGBEVF missing this:
 > 
-> In some edge cases, the ethernet pointer or its associated netdev
-> element can be NULL. Checking these pointers before access is
-> mandatory to avoid segmentation faults and kernel oops.
+> x86_64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_ethtool.o: in function `wx_nway_reset':
+> wx_ethtool.c:(.text+0x613): undefined reference to `phylink_ethtool_nway_reset'
+> x86_64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_ethtool.o: in function `wx_get_link_ksettings':
+> wx_ethtool.c:(.text+0x62b): undefined reference to `phylink_ethtool_ksettings_get'
+> x86_64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_ethtool.o: in function `wx_set_link_ksettings':
+> wx_ethtool.c:(.text+0x643): undefined reference to `phylink_ethtool_ksettings_set'
+> x86_64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_ethtool.o: in function `wx_get_pauseparam':
+> wx_ethtool.c:(.text+0x65b): undefined reference to `phylink_ethtool_get_pauseparam'
+> x86_64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_ethtool.o: in function `wx_set_pauseparam':
+> wx_ethtool.c:(.text+0x677): undefined reference to `phylink_ethtool_set_pauseparam'
 > 
-> This improves the robustness of the validation check for mtk_eth
-> ingress devices introduced in commit 73cfd947dbdb ("net: mediatek:
-> add support for ingress traffic offloading").
+> Add the 'select PHYLINK' line in the libwx option directly so this will
+> always be enabled for all current and future wangxun drivers, and remove
+> the now duplicate lines.
 > 
-> Fixes: 73cfd947dbdb ("net: mediatek: add support for ingress traffic offloading")
-> net: mediatek: Add null pointer check to prevent crashes with active hardware offloading.
-> 
-> Signed-off-by: Sebastian Roland Wolf <Sebastian.Wolf@pace-systems.de>
-> ---
->   drivers/net/ethernet/mediatek/mtk_ppe_offload.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/mediatek/mtk_ppe_offload.c b/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
-> index e9bd32741983..6900ac87e1e9 100644
-> --- a/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
-> +++ b/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
-> @@ -270,7 +270,8 @@ mtk_flow_offload_replace(struct mtk_eth *eth, struct flow_cls_offload *f,
->   		flow_rule_match_meta(rule, &match);
->   		if (mtk_is_netsys_v2_or_greater(eth)) {
+> Fixes: a0008a3658a3 ("net: wangxun: add ngbevf build")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-The code dereferences eth here ...
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
->   			idev = __dev_get_by_index(&init_net, match.key->ingress_ifindex);
-> -			if (idev && idev->netdev_ops == eth->netdev[0]->netdev_ops) {
-> +			if (idev && eth && eth->netdev[0] &&
+Thanks!
 
-... but it is checked a couple of lines after.
-
-Even more, the function starts with providing rhahstable to lookup
-cookie. I'm really doubt eth can be NULL.
-At the same time lack of eth->netdev[0] looks like a design problem,
-because according to the code there might be up to 3 netdev devices
-registered for ppe.
-
-I'm not familiar with the code, but it would be better to have a splat
-of crash to check what was exactly missing, and drgn can help you find
-if there were other netdevs available at the moment of crash.
-
-> +			    idev->netdev_ops == eth->netdev[0]->netdev_ops) {
->   				struct mtk_mac *mac = netdev_priv(idev);
->   
->   				if (WARN_ON(mac->ppe_idx >= eth->soc->ppe_num))
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
