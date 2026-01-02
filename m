@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-246595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 067CECEEDAC
-	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 16:21:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BAADECEEDB2
+	for <lists+netdev@lfdr.de>; Fri, 02 Jan 2026 16:22:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 294533010CDF
-	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 15:20:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 109E6302A3A2
+	for <lists+netdev@lfdr.de>; Fri,  2 Jan 2026 15:20:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46C0925F7A5;
-	Fri,  2 Jan 2026 15:20:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 625E726A1B9;
+	Fri,  2 Jan 2026 15:20:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nHgspHF9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bbAX9zBw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F532417D1
-	for <netdev@vger.kernel.org>; Fri,  2 Jan 2026 15:20:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69DAB261B9C
+	for <netdev@vger.kernel.org>; Fri,  2 Jan 2026 15:20:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767367251; cv=none; b=DSeeGxzMVIEjhBbUs8j372GajL8V5vynZ3HtCEi7q68Ky3AvROTvQ/vgY+V1En8JHZi/r/3zqDsdZUE2aTHcFLb6rgpKWwfHpz0cXBBLFH3AqeVTCRH/f3fv9df9Z+r5rmTi0n6BjYcRyJZe4UYitZ1uxEvYd/mEm5rMgiOUrNI=
+	t=1767367258; cv=none; b=brsKp7pFaQc+YfjhqSJpYV8hLv35VA/sXTCi8+wXp7GCqOVXPTkmYwk71Gqr/xMfrGPnJ0ZIKrn/5DR4gworuy/APHtprOarQ2C4PKmzQTAJMLjIfXMHCf/DNtqsul2Sjk1i0L0E7X9Y2uAR3DHfR/ud6Lfk7lrkDugjkFInw2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767367251; c=relaxed/simple;
-	bh=AVmbCTua2itYQSdqi67Rg2DvQJpSs9Fw5lo+ym0KgKI=;
+	s=arc-20240116; t=1767367258; c=relaxed/simple;
+	bh=IhIOm/waVwb/Npd7naFhHnteaL1RMxK1LRiQGSxMRvU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fMDN0NbWQ5odFnd3f0awVztAdR7XcpaC6ibfPgDlGZC3+SiJ9GRLgRbojQGzkX0yCFiL6uKZq7yYzIey5mf4wjnAQ3k1ji3KrMCM2AlUm7M5yUvqZuFIkIhOimLBNBPRLx7qJhsl1ZEdVcbMmrcsE78n6PpUyBRrYJqGtXuvPio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nHgspHF9; arc=none smtp.client-ip=209.85.210.175
+	 MIME-Version; b=YQQP6kzOvcW9h/Q9D9JMb7OvJNFzY+n7MXCxtp0Hr1wWvxEB29cw+bMPWOB7QJTaq12aWzz50gEX7Nza+KoWONBzVGyD5U/mw6jDiKtUgoaQBMLCKo46obQGrFRDobk5KcoWyOLHgoT4Klp5qBiZiaVAf5XYk+bWSL4Jn6U6Ygg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bbAX9zBw; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7e1651ae0d5so9411708b3a.1
-        for <netdev@vger.kernel.org>; Fri, 02 Jan 2026 07:20:49 -0800 (PST)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7d26a7e5639so13777100b3a.1
+        for <netdev@vger.kernel.org>; Fri, 02 Jan 2026 07:20:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767367248; x=1767972048; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1767367255; x=1767972055; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=viiMT0mJ8A1eQE5ko81RyEvaps1qhf8umuQOghYhhoM=;
-        b=nHgspHF9T7yoCA4K1d8XVNuDBmDhdYM8YBktwCnxbjG95MFCE3M6fF3bHqEqvr/Ua9
-         QQ5wnuUPwC9xSFF3hAfdVB71LSCEnGXQSCIeHtjW9qq1M122ZlRICcp9TthWlVeBzYou
-         uHyf8/0lVgs0XbekgewKVfWyosQ8hzxllxkDRNBlUbUVSTyND+GC2rO91Pc+8xQCFSq0
-         X3qIAVgYFXSHbbKqJECsa6xVx1/LZadsYdPq8cDDSUVmRgk4GnSERuvYADTbTngFyxso
-         a33gsqa/fbN7DfuehjP01pSRcofhDcjH3FRidSRUKe4URcj/rVRBq0DnjxUWPs5OvqwF
-         pmWQ==
+        bh=6p9926v+j8hRdiPJTHDEVVkAKp32Z3dkDYChWeFnkTc=;
+        b=bbAX9zBw2ONdq3W1f+IIpkty+jiVkPi6HUJOuSvWcyDpDG6ag+uahKLobxHVzQETcu
+         c3D/HZf/9pKSpiYlfqOYCuOQWg/MVEZilwJg6td/XSvDjCzPNIBpVLXT8UM4GVutawqq
+         Hl+qgzpGxyGishWTGs1Vq1v0lAiTr0XsnlJXcfad89HcVL/Qk8tQosmu69rSLtu4PxIf
+         bUKhFgfs5Q6Oi7hSG8qZHG5DRuSvl2cj0KVL7VhXQiZ7ul5Mo1RxASdCHQrUShWcP/es
+         opsx+O7bWys9VhuGTf+7Vg0FPrfCRY9PFWDKOgHAiF0pAlJzEt7gDCJu3tAS4pQMwGgx
+         SObQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767367248; x=1767972048;
+        d=1e100.net; s=20230601; t=1767367255; x=1767972055;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=viiMT0mJ8A1eQE5ko81RyEvaps1qhf8umuQOghYhhoM=;
-        b=q5m/XDGlTMs7OIeW3QkGNlN7pMtms4mOZbVGYv91JZkE6fB+xMqIPwA3mwQAI4xT0+
-         jlqxiMqC9lu4Dde6LFgYAEWtXT89FeSyUaOPTI7xKBpwh120onFRv6PcITwZTLo088E+
-         AtID9ni9EoyZt5OrlxHT32GnqTx8Qu/m8R5MX+mOcwgLLhGFOZu+JmwaDG7utCKZmUFj
-         mejKZ7H4TMdhPYbGLIZu8I7CbrXHE3mcsaGnqNzo/dqfMt/YR3JbErbHQJoDN27JR2/o
-         yund0Hq5Lc8tI4UYTAZgpbmibNswJjqSKyGIA1VU1BYzfveMAa3wZuOMH2h7Y+tnn/xt
-         jk9A==
-X-Gm-Message-State: AOJu0YxuYWKxo3s1628w/+Cd/olep5dQoqjiwXpE94wUZVeUiP/Lh+Gg
-	C80rY7GhYljjRMvNSHx9R9fz5yPGO5m7S69nMoGlAplJXXnIP459gVlB6mfab6LS
-X-Gm-Gg: AY/fxX5wG9Jc4RXa/amhtkDkdgCotYvZ/IRSCWztJvKX4PxSvZVh4RbZwG2lFwnbr4j
-	tyybSRqIEEr47ctfaSelxVSZZB/jjhW9bax9OgT/iOwbebqf1GWIjahC0861BpKCOxYaC13cJYE
-	Pzb3LH1BwF70TZZkUKAo0wTO29N3QLyDSMIkR1UR3ksNPyrBLXq+pZvmcznVtKS1v5rvn2HoiCy
-	nvWl9FaeVPKwg0tM0mgjBLwtTgQBX6g9ReOlYiGCTG1ww615r89hsMna5GTLQgjnEY+eToc7KNW
-	PRAI950G6kcRUlUpFTJGYdrEITEbNAQ5hNOgQ+Nx4+b7lrzSZ1c9fGcQcJGHt8gQJ13bX3mWdcr
-	gjK7VCdInHAXn8Lgt4WEbgSYinJ3OnZjTCpbETwjeoGVB91gPejVM4NeNLvU6CstEBAg5dyknNs
-	ZyQLOAO1KQQTb9eAp59S0ZzkmAP8P5GWXRow==
-X-Google-Smtp-Source: AGHT+IGW/oGz/NZjf+BGO8R4q9EUzB2Mdtq7Z2nuodi9vs6ehE50GZWiOZQO50TBdIV5gsvGFMRUSA==
-X-Received: by 2002:a05:6a21:99a4:b0:342:9cb7:649d with SMTP id adf61e73a8af0-376a7cec847mr41356285637.26.1767367248120;
-        Fri, 02 Jan 2026 07:20:48 -0800 (PST)
+        bh=6p9926v+j8hRdiPJTHDEVVkAKp32Z3dkDYChWeFnkTc=;
+        b=GbjmcJbpNXfRzIOMZgB7uVHf1dk/mDTaVDMjDcrqjiHv6CbvDd3w1ALMC2otr9jM01
+         cThcFEH2JkoNi3cKoS/niEUXA3dgXnT4R0icGpyIVfAjEo+sDAi+/ldCLqsHWwWuliFv
+         OBifknlyLYcrSWI27g0pRkwrPA3ccd8nwuE3zjFJOWG/cQImyTeXzoeXQyTc3m5ZE4G2
+         Qpi9akhJuWcZVqSyhDdQStbgb/WjZTrIJyiZYjSmI/SW/5q5Dxrlag8ft9KcEDy8n/x+
+         xxOTN1mYHksYH+AeZ2zpvlCNUnsz23puSE05u6KBRANjpLzU/rzAFGl69MSmDOd0v/0r
+         p6Kw==
+X-Gm-Message-State: AOJu0Yyf5kStn6bk2GPiC+JTtJdMUshSlWpCtZxXtqk99h35QfeNgqW4
+	PxyV2MoBq4porLQuztbNXLEkMpanjbX/7P+BW89hV7w74YALRrpupOAPdnHndkRP
+X-Gm-Gg: AY/fxX4EhHo8pRyo9TQSrHo307JD5RDcAzPbsVfTxDqBlaZJtlv2du4zTaoHElbpczN
+	kSK1e4GSUV8nNGB78ilLbA1BhgXS9t82cTI0Brm3M7G3hRFEc/Pei+sdRNWFlmrCtiDY6y3qKuh
+	o/J56iV7L8wDL+KJy9dW0r4RF7qEp1FXJ1P2nMQs2Wawl6OyKjixu6gouVjPrdFueNrVjFoQOuv
+	Ew5EwsC4su3mghFjcm1ImEQHkWoa2As6VnvF0Pvbgx3GG1uh3VPScGsUcAGzHlkpcT+CySaM2s6
+	QsnW4ApMv9WiPA7H4X2SCbtjOh1HQhmgYhuRmi/MDk7EcSSR1e+r4ij0pg3FeYmcJZo4GV/jgXU
+	Qf4RautQ6XOj3UYPOTqJKu40mVNPbF0lOeSdfH4aw6P/+gV7NuWc5Z9zdTxuwcmN59YHiEhMtbD
+	J4FDx9s0CENZzMVIywPHZSo/g=
+X-Google-Smtp-Source: AGHT+IG6Z89asELtZL25bqp1wItzqCcfh/QFAyUyxW2i4m6A92FWF0k6z8ouT/hhDGRbNkmbOPf90w==
+X-Received: by 2002:a05:6a20:431a:b0:35d:5d40:6d86 with SMTP id adf61e73a8af0-376a9de51cbmr41286930637.40.1767367254850;
+        Fri, 02 Jan 2026 07:20:54 -0800 (PST)
 Received: from minh.192.168.1.1 ([2001:ee0:4f4c:210:a612:725:7af0:96ca])
-        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-c1e7c146aabsm35041268a12.25.2026.01.02.07.20.43
+        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-c1e7c146aabsm35041268a12.25.2026.01.02.07.20.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Jan 2026 07:20:47 -0800 (PST)
+        Fri, 02 Jan 2026 07:20:53 -0800 (PST)
 From: Bui Quang Minh <minhquangbui99@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>,
@@ -90,11 +90,10 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>,
 	virtualization@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	bpf@vger.kernel.org,
-	Bui Quang Minh <minhquangbui99@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net v2 1/3] virtio-net: don't schedule delayed refill worker
-Date: Fri,  2 Jan 2026 22:20:21 +0700
-Message-ID: <20260102152023.10773-2-minhquangbui99@gmail.com>
+	Bui Quang Minh <minhquangbui99@gmail.com>
+Subject: [PATCH net v2 2/3] virtio-net: remove unused delayed refill worker
+Date: Fri,  2 Jan 2026 22:20:22 +0700
+Message-ID: <20260102152023.10773-3-minhquangbui99@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260102152023.10773-1-minhquangbui99@gmail.com>
 References: <20260102152023.10773-1-minhquangbui99@gmail.com>
@@ -106,148 +105,208 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When we fail to refill the receive buffers, we schedule a delayed worker
-to retry later. However, this worker creates some concurrency issues
-such as races and deadlocks. To simplify the logic and avoid further
-problems, we will instead retry refilling in the next NAPI poll.
+Since we change to retry refilling receive buffer in NAPI poll instead
+of delayed worker, remove all unused delayed refill worker code.
 
-Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
-Reported-by: Paolo Abeni <pabeni@redhat.com>
-Closes: https://netdev-ctrl.bots.linux.dev/logs/vmksft/drv-hw-dbg/results/400961/3-xdp-py/stderr
-Cc: stable@vger.kernel.org
-Suggested-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
 ---
- drivers/net/virtio_net.c | 55 ++++++++++++++++++++++------------------
- 1 file changed, 30 insertions(+), 25 deletions(-)
+ drivers/net/virtio_net.c | 86 ----------------------------------------
+ 1 file changed, 86 deletions(-)
 
 diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 1bb3aeca66c6..ac514c9383ae 100644
+index ac514c9383ae..7e77a05b5662 100644
 --- a/drivers/net/virtio_net.c
 +++ b/drivers/net/virtio_net.c
-@@ -3035,7 +3035,7 @@ static int virtnet_receive_packets(struct virtnet_info *vi,
+@@ -441,9 +441,6 @@ struct virtnet_info {
+ 	/* Packet virtio header size */
+ 	u8 hdr_len;
+ 
+-	/* Work struct for delayed refilling if we run low on memory. */
+-	struct delayed_work refill;
+-
+ 	/* UDP tunnel support */
+ 	bool tx_tnl;
+ 
+@@ -451,12 +448,6 @@ struct virtnet_info {
+ 
+ 	bool rx_tnl_csum;
+ 
+-	/* Is delayed refill enabled? */
+-	bool refill_enabled;
+-
+-	/* The lock to synchronize the access to refill_enabled */
+-	spinlock_t refill_lock;
+-
+ 	/* Work struct for config space updates */
+ 	struct work_struct config_work;
+ 
+@@ -720,20 +711,6 @@ static void virtnet_rq_free_buf(struct virtnet_info *vi,
+ 		put_page(virt_to_head_page(buf));
  }
  
- static int virtnet_receive(struct receive_queue *rq, int budget,
--			   unsigned int *xdp_xmit)
-+			   unsigned int *xdp_xmit, bool *retry_refill)
+-static void enable_delayed_refill(struct virtnet_info *vi)
+-{
+-	spin_lock_bh(&vi->refill_lock);
+-	vi->refill_enabled = true;
+-	spin_unlock_bh(&vi->refill_lock);
+-}
+-
+-static void disable_delayed_refill(struct virtnet_info *vi)
+-{
+-	spin_lock_bh(&vi->refill_lock);
+-	vi->refill_enabled = false;
+-	spin_unlock_bh(&vi->refill_lock);
+-}
+-
+ static void enable_rx_mode_work(struct virtnet_info *vi)
  {
- 	struct virtnet_info *vi = rq->vq->vdev->priv;
- 	struct virtnet_rq_stats stats = {};
-@@ -3047,12 +3047,8 @@ static int virtnet_receive(struct receive_queue *rq, int budget,
- 		packets = virtnet_receive_packets(vi, rq, budget, xdp_xmit, &stats);
- 
- 	if (rq->vq->num_free > min((unsigned int)budget, virtqueue_get_vring_size(rq->vq)) / 2) {
--		if (!try_fill_recv(vi, rq, GFP_ATOMIC)) {
--			spin_lock(&vi->refill_lock);
--			if (vi->refill_enabled)
--				schedule_delayed_work(&vi->refill, 0);
--			spin_unlock(&vi->refill_lock);
--		}
-+		if (!try_fill_recv(vi, rq, GFP_ATOMIC))
-+			*retry_refill = true;
- 	}
- 
- 	u64_stats_set(&stats.packets, packets);
-@@ -3129,18 +3125,18 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
- 	struct send_queue *sq;
- 	unsigned int received;
- 	unsigned int xdp_xmit = 0;
--	bool napi_complete;
-+	bool napi_complete, retry_refill = false;
- 
- 	virtnet_poll_cleantx(rq, budget);
- 
--	received = virtnet_receive(rq, budget, &xdp_xmit);
-+	received = virtnet_receive(rq, budget, &xdp_xmit, &retry_refill);
- 	rq->packets_in_napi += received;
- 
- 	if (xdp_xmit & VIRTIO_XDP_REDIR)
- 		xdp_do_flush();
- 
- 	/* Out of packets? */
--	if (received < budget) {
-+	if (received < budget && !retry_refill) {
- 		napi_complete = virtqueue_napi_complete(napi, rq->vq, received);
- 		/* Intentionally not taking dim_lock here. This may result in a
- 		 * spurious net_dim call. But if that happens virtnet_rx_dim_work
-@@ -3160,7 +3156,7 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
- 		virtnet_xdp_put_sq(vi, sq);
- 	}
- 
--	return received;
-+	return retry_refill ? budget : received;
+ 	rtnl_lock();
+@@ -2948,42 +2925,6 @@ static void virtnet_napi_disable(struct receive_queue *rq)
+ 	napi_disable(napi);
  }
  
- static void virtnet_disable_queue_pair(struct virtnet_info *vi, int qp_index)
-@@ -3230,9 +3226,11 @@ static int virtnet_open(struct net_device *dev)
+-static void refill_work(struct work_struct *work)
+-{
+-	struct virtnet_info *vi =
+-		container_of(work, struct virtnet_info, refill.work);
+-	bool still_empty;
+-	int i;
+-
+-	for (i = 0; i < vi->curr_queue_pairs; i++) {
+-		struct receive_queue *rq = &vi->rq[i];
+-
+-		/*
+-		 * When queue API support is added in the future and the call
+-		 * below becomes napi_disable_locked, this driver will need to
+-		 * be refactored.
+-		 *
+-		 * One possible solution would be to:
+-		 *   - cancel refill_work with cancel_delayed_work (note:
+-		 *     non-sync)
+-		 *   - cancel refill_work with cancel_delayed_work_sync in
+-		 *     virtnet_remove after the netdev is unregistered
+-		 *   - wrap all of the work in a lock (perhaps the netdev
+-		 *     instance lock)
+-		 *   - check netif_running() and return early to avoid a race
+-		 */
+-		napi_disable(&rq->napi);
+-		still_empty = !try_fill_recv(vi, rq, GFP_KERNEL);
+-		virtnet_napi_do_enable(rq->vq, &rq->napi);
+-
+-		/* In theory, this can happen: if we don't get any buffers in
+-		 * we will *never* try to fill again.
+-		 */
+-		if (still_empty)
+-			schedule_delayed_work(&vi->refill, HZ/2);
+-	}
+-}
+-
+ static int virtnet_receive_xsk_bufs(struct virtnet_info *vi,
+ 				    struct receive_queue *rq,
+ 				    int budget,
+@@ -3222,8 +3163,6 @@ static int virtnet_open(struct net_device *dev)
+ 	struct virtnet_info *vi = netdev_priv(dev);
+ 	int i, err;
  
+-	enable_delayed_refill(vi);
+-
  	for (i = 0; i < vi->max_queue_pairs; i++) {
  		if (i < vi->curr_queue_pairs)
--			/* Make sure we have some buffers: if oom use wq. */
--			if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
--				schedule_delayed_work(&vi->refill, 0);
-+			/* If this fails, we will retry later in
-+			 * NAPI poll, which is scheduled in the below
-+			 * virtnet_enable_queue_pair
-+			 */
-+			try_fill_recv(vi, &vi->rq[i], GFP_KERNEL);
- 
- 		err = virtnet_enable_queue_pair(vi, i);
- 		if (err < 0)
-@@ -3473,15 +3471,15 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
- 				bool refill)
- {
- 	bool running = netif_running(vi->dev);
--	bool schedule_refill = false;
- 
--	if (refill && !try_fill_recv(vi, rq, GFP_KERNEL))
--		schedule_refill = true;
-+	if (refill)
-+		/* If this fails, we will retry later in NAPI poll, which is
-+		 * scheduled in the below virtnet_napi_enable
-+		 */
-+		try_fill_recv(vi, rq, GFP_KERNEL);
-+
- 	if (running)
- 		virtnet_napi_enable(rq);
--
--	if (schedule_refill)
--		schedule_delayed_work(&vi->refill, 0);
- }
- 
- static void virtnet_rx_resume_all(struct virtnet_info *vi)
-@@ -3777,6 +3775,7 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
- 	struct virtio_net_rss_config_trailer old_rss_trailer;
- 	struct net_device *dev = vi->dev;
- 	struct scatterlist sg;
-+	int i;
- 
- 	if (!vi->has_cvq || !virtio_has_feature(vi->vdev, VIRTIO_NET_F_MQ))
- 		return 0;
-@@ -3829,11 +3828,17 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
- 	}
- succ:
- 	vi->curr_queue_pairs = queue_pairs;
--	/* virtnet_open() will refill when device is going to up. */
--	spin_lock_bh(&vi->refill_lock);
--	if (dev->flags & IFF_UP && vi->refill_enabled)
--		schedule_delayed_work(&vi->refill, 0);
--	spin_unlock_bh(&vi->refill_lock);
-+	if (dev->flags & IFF_UP) {
-+		/* Let the NAPI poll refill the receive buffer for us. We can't
-+		 * safely call try_fill_recv() here because the NAPI might be
-+		 * enabled already.
-+		 */
-+		local_bh_disable();
-+		for (i = 0; i < vi->curr_queue_pairs; i++)
-+			virtqueue_napi_schedule(&vi->rq[i].napi, vi->rq[i].vq);
-+
-+		local_bh_enable();
-+	}
- 
+ 			/* If this fails, we will retry later in
+@@ -3249,9 +3188,6 @@ static int virtnet_open(struct net_device *dev)
  	return 0;
+ 
+ err_enable_qp:
+-	disable_delayed_refill(vi);
+-	cancel_delayed_work_sync(&vi->refill);
+-
+ 	for (i--; i >= 0; i--) {
+ 		virtnet_disable_queue_pair(vi, i);
+ 		virtnet_cancel_dim(vi, &vi->rq[i].dim);
+@@ -3445,24 +3381,12 @@ static void virtnet_rx_pause_all(struct virtnet_info *vi)
+ {
+ 	int i;
+ 
+-	/*
+-	 * Make sure refill_work does not run concurrently to
+-	 * avoid napi_disable race which leads to deadlock.
+-	 */
+-	disable_delayed_refill(vi);
+-	cancel_delayed_work_sync(&vi->refill);
+ 	for (i = 0; i < vi->max_queue_pairs; i++)
+ 		__virtnet_rx_pause(vi, &vi->rq[i]);
  }
+ 
+ static void virtnet_rx_pause(struct virtnet_info *vi, struct receive_queue *rq)
+ {
+-	/*
+-	 * Make sure refill_work does not run concurrently to
+-	 * avoid napi_disable race which leads to deadlock.
+-	 */
+-	disable_delayed_refill(vi);
+-	cancel_delayed_work_sync(&vi->refill);
+ 	__virtnet_rx_pause(vi, rq);
+ }
+ 
+@@ -3486,7 +3410,6 @@ static void virtnet_rx_resume_all(struct virtnet_info *vi)
+ {
+ 	int i;
+ 
+-	enable_delayed_refill(vi);
+ 	for (i = 0; i < vi->max_queue_pairs; i++) {
+ 		if (i < vi->curr_queue_pairs)
+ 			__virtnet_rx_resume(vi, &vi->rq[i], true);
+@@ -3497,7 +3420,6 @@ static void virtnet_rx_resume_all(struct virtnet_info *vi)
+ 
+ static void virtnet_rx_resume(struct virtnet_info *vi, struct receive_queue *rq)
+ {
+-	enable_delayed_refill(vi);
+ 	__virtnet_rx_resume(vi, rq, true);
+ }
+ 
+@@ -3848,10 +3770,6 @@ static int virtnet_close(struct net_device *dev)
+ 	struct virtnet_info *vi = netdev_priv(dev);
+ 	int i;
+ 
+-	/* Make sure NAPI doesn't schedule refill work */
+-	disable_delayed_refill(vi);
+-	/* Make sure refill_work doesn't re-enable napi! */
+-	cancel_delayed_work_sync(&vi->refill);
+ 	/* Prevent the config change callback from changing carrier
+ 	 * after close
+ 	 */
+@@ -5807,7 +5725,6 @@ static int virtnet_restore_up(struct virtio_device *vdev)
+ 
+ 	virtio_device_ready(vdev);
+ 
+-	enable_delayed_refill(vi);
+ 	enable_rx_mode_work(vi);
+ 
+ 	if (netif_running(vi->dev)) {
+@@ -6564,7 +6481,6 @@ static int virtnet_alloc_queues(struct virtnet_info *vi)
+ 	if (!vi->rq)
+ 		goto err_rq;
+ 
+-	INIT_DELAYED_WORK(&vi->refill, refill_work);
+ 	for (i = 0; i < vi->max_queue_pairs; i++) {
+ 		vi->rq[i].pages = NULL;
+ 		netif_napi_add_config(vi->dev, &vi->rq[i].napi, virtnet_poll,
+@@ -6906,7 +6822,6 @@ static int virtnet_probe(struct virtio_device *vdev)
+ 
+ 	INIT_WORK(&vi->config_work, virtnet_config_changed_work);
+ 	INIT_WORK(&vi->rx_mode_work, virtnet_rx_mode_work);
+-	spin_lock_init(&vi->refill_lock);
+ 
+ 	if (virtio_has_feature(vdev, VIRTIO_NET_F_MRG_RXBUF)) {
+ 		vi->mergeable_rx_bufs = true;
+@@ -7170,7 +7085,6 @@ static int virtnet_probe(struct virtio_device *vdev)
+ 	net_failover_destroy(vi->failover);
+ free_vqs:
+ 	virtio_reset_device(vdev);
+-	cancel_delayed_work_sync(&vi->refill);
+ 	free_receive_page_frags(vi);
+ 	virtnet_del_vqs(vi);
+ free:
 -- 
 2.43.0
 
