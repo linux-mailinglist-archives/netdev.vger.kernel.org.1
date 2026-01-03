@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-246686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86ABFCF060D
-	for <lists+netdev@lfdr.de>; Sat, 03 Jan 2026 22:07:22 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4017CF05E6
+	for <lists+netdev@lfdr.de>; Sat, 03 Jan 2026 22:05:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 23A76305CA12
-	for <lists+netdev@lfdr.de>; Sat,  3 Jan 2026 21:05:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 040EB30487E2
+	for <lists+netdev@lfdr.de>; Sat,  3 Jan 2026 21:05:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFF362BD58C;
-	Sat,  3 Jan 2026 21:05:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 070132BE642;
+	Sat,  3 Jan 2026 21:05:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="LoW23hoA"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="kwB1yhAD"
 X-Original-To: netdev@vger.kernel.org
 Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013007.outbound.protection.outlook.com [40.107.162.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8755A2BDC05;
-	Sat,  3 Jan 2026 21:05:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12CB62BE641;
+	Sat,  3 Jan 2026 21:05:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.7
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767474307; cv=fail; b=VSLPOHcJEafxKSPztSyRUREvnIrzdAWlcm+VXjv9mTkHFjqa8FwWUpGA0S3IjjqIDqP+sPmzT92VWKryJMhgI+9B3lrkRL8Ol9BC2QDKv2Pv2GCBbeGS/PXowgMZmQ1/JSxCF3omri7oy90QGt6TYYWbhBDOsMd/imMflFjPudM=
+	t=1767474311; cv=fail; b=T+ejaOBBekumhDiirkAmzJH0nveCaY0xZV4rVe4j4I/Vh98GVf9elTTrcPkiRd/TYOct465yK4JYLFODhWt+5qslxJqyPE44DrQDznllzXGdkrVENuu8pn8bUFPPH4TWjamrakWr17dA+aoRXlD0MkrLhisdxRIKStYdoM4dvJU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767474307; c=relaxed/simple;
-	bh=uWzDC7aTjn8yJMLl0qA3/0Lh0RlAqLPm+wrTZ7Xk+1g=;
+	s=arc-20240116; t=1767474311; c=relaxed/simple;
+	bh=Vw8i3Lo54xWCFsYYsuNyGVJE2dsg504CYuBeTTBJti0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=N9yOR1c9GZgSqyKxd6hbUaGm/64F4E1nEEbVcK9YKSbb4z6i54zjQ1RmygV4qE4/h7ewcnKo5FMD0TDzZqwhzoSk9Q/EWvSbODgSkdirSyTkcCpZVYfksTC4Uiqpq7bJfZeRfoayJK695cViywOk2xyNJpq+VnLxH1dfNkDCwsc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=LoW23hoA; arc=fail smtp.client-ip=40.107.162.7
+	 Content-Type:MIME-Version; b=cxOFgBt5zkxc94qkooQZx3RZ0C+fm4idVTxi/zRm2eK2rOyTLFvYWFKoprq3/Ie+5a/qFNFjhyNL/EQ3jGe91xnSw8uFb18cDK/5EXGV1q1QOYFrc1yFCAKGnCox4Cg/KSA7XXWarsZgDv8wvrz3lfsap5GjX0t50sih0phl3/k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=kwB1yhAD; arc=fail smtp.client-ip=40.107.162.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mNb2lMZLFlT3WieKW9lk2VOIh9PD++ro5V9TrNYhvL5WM+W5uYIxwOA9SfefqAey8tIn5Ka78+vY87d2wMIqabQkNPSGJZV40RZnwQd5L4nNULK5oxd85AQwRHul5n9ASdjcml4rW489clvjTdQ0OeYATk5iQTUIxZAWOT5ZB2rdN0ynBeU1vFqACPJyHcsA+kFmJBVD+4+7szrMZRhKhrt+iK+aYQbtjgzA/sB4vH9NoSD2c4vXWF2taehqQaI4MN3YJbIENhYXVBQBYRZpia0FHZm39ioOfaTa8bWbgPbk1r48DWqBTerB511L0Uyima0ZR6FQIG+RagclJs8hww==
+ b=poWfc2ZfJzIlsDK4zq1vvgxQKANiXAcUCRVCBBgifh04MPeQnk8+/Uv4MIQJKv6mBOtpKZOelLPOINyAl02XOYckFIIWiVaCTVG5OigLAFwSR93qdbC5NjhVUpi05T/z3xVcxL7FJ3rnA4oVdrLt2su3nSgaLzkqnnbsxP3IvY02ihrIMJOMMjYsmcTvFS5NOuQw4dPOB0O+JOFev8SSZTC/DRfTuT8aGmonFHqkwA2T4dn7u60I0v4Vw+UR0+pHYscy10eJcY5xB/QrZUspaTPvR6lZmiAm2dnP1T3BXQwJkny2jhjQOcH/KTIWQ206RW7FNksOAger+CP3F1Hcsw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Bl6FgsuCeY/OigHwy1S6TV+ByxXFXwXz/Ng1f5nbTpY=;
- b=Zyp2UgZ1+rIdJfplpLjHoob50qKYv7wcUE4nIJpSOVHoAYCsrSbJAz73KcMLlX7JcErX3i4Q1R/zf+2eGuCOJJPUfdRoxepz2Wh9VGRsCNGZqt/cnBCZ/Sr+qPQtfDJkkT9vTuqpkPqSXvtGU0jQsQpOAu9cyTk4B9YUWUIKBRBR+Murc+ReqvMecEocGz+B88Zr3bBistq2KOC5ltjBYviU/aipAle2s7eIbyq1an7DO/eMaL6OiJUpzhzzAHJdkrQISzUoCVxIRxIPw9udj/CZhMLDAB78oDOlL8WNXfGuBHBhThvHhg9n3HwV86ScR5XxfrR9AM3gzTCrfRFlDQ==
+ bh=tO4pLOQUtDnt9X38blVvGkPDCp/0C2CzQLQrJXApMAs=;
+ b=UIOHc+64iXOlvb8nCuu0qGThFhDeO9snYX2Vsv+1Ul2uen/b+4adaXQoaZqZvgo3Lr0kkifu7pbEFmlOsszhJOV+1W+toVaeseKyzjkZETQxH1PjcmCQkZMTVISwMY4t1jBwP9XNbQO/tLVIf+8fAjw33b1BQEs/ngOJFf46YAe01UWlZV8bmR4GwdJs446boNHMebuGh8uaNXuqe8/+cBfQZfEhaQf3SMZ289+vkkTVGwDiCa8IntFgfZyFJBTggjDlgEzg8ph3d6eUcUetogBCOInBZ39Ju6bSfBk4VbOo6sIJPsqlGT3d3qFvpmRFzCc7puAjNJDJI5AqsgsHBQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Bl6FgsuCeY/OigHwy1S6TV+ByxXFXwXz/Ng1f5nbTpY=;
- b=LoW23hoAIWycaMGOY6J8zhMt0sNVjl6iTCOQhzZx1KpmSQiMiMHZBl6JM9/hrClXpAecoh9o3QyFpmRe90CpKwDJGPe1zHwbl7MfnlFILYNUfywEkZ2ZzQdFBJU1YUOSj23jd3g8oA95q8jlX7Pr5d8EG0Ouvvqfzrc6D8KsZtlriV9Ud8ewpUVzyxWGI+fKuTlo+hjGkcXK6DFwFv/mnCOmowU9OrDDh28K/zCf6eM38hZoWTh3gfqxAutNyyq2tsUJ87DCQlT5JQ2vlY9D74w461qNZXHG+RF35lACBffnCvhgf9yZmBTsAUvbL0bzSEoZV/Q2Zf8hlnpnLF2Bkw==
+ bh=tO4pLOQUtDnt9X38blVvGkPDCp/0C2CzQLQrJXApMAs=;
+ b=kwB1yhADbqXpxURwmR0qcplCTkxAhv4pURMR/ID3hczcrS3PrXXrQxKNkXcQiF7x1/6StITOWH03ftOClC+VnH5I8qay0FC07R/AEpnpfbI6zhOcAPwFvW5zBTojKWfF7tlRJtJxeoQfL5t69lPbUDLWqnOfCSuYezjHkWb6me0AwPdTDYyNcxqmi4ZnNeuYhaJjIUnWwpAmpmmrbERKG0BCoozFGFwi2sXHicsLcp8di+vYcu3ddD7/UOPdnwoFcIsDe8sCqdE9yodZX8sm8MbhonvSQ8Wd/X46TLSf1j4HyKaCQ02IUrVaNKS8T/2a3Vxkf8EK0L4Kd+bbYazo9Q==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from DU2PR04MB8584.eurprd04.prod.outlook.com (2603:10a6:10:2db::24)
  by AS8PR04MB8088.eurprd04.prod.outlook.com (2603:10a6:20b:3f7::24) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9478.4; Sat, 3 Jan
- 2026 21:05:00 +0000
+ 2026 21:05:04 +0000
 Received: from DU2PR04MB8584.eurprd04.prod.outlook.com
  ([fe80::3f9d:4a01:f53c:952d]) by DU2PR04MB8584.eurprd04.prod.outlook.com
  ([fe80::3f9d:4a01:f53c:952d%3]) with mapi id 15.20.9456.013; Sat, 3 Jan 2026
- 21:05:00 +0000
+ 21:05:04 +0000
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 To: netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
@@ -82,9 +82,9 @@ Cc: linux-kernel@vger.kernel.org,
 	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
 	Lee Jones <lee@kernel.org>,
 	Patrice Chotard <patrice.chotard@foss.st.com>
-Subject: [PATCH v2 net-next 04/10] dt-bindings: phy-common-props: RX and TX lane polarity inversion
-Date: Sat,  3 Jan 2026 23:03:57 +0200
-Message-Id: <20260103210403.438687-5-vladimir.oltean@nxp.com>
+Subject: [PATCH v2 net-next 05/10] phy: add phy_get_rx_polarity() and phy_get_tx_polarity()
+Date: Sat,  3 Jan 2026 23:03:58 +0200
+Message-Id: <20260103210403.438687-6-vladimir.oltean@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260103210403.438687-1-vladimir.oltean@nxp.com>
 References: <20260103210403.438687-1-vladimir.oltean@nxp.com>
@@ -101,267 +101,849 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DU2PR04MB8584:EE_|AS8PR04MB8088:EE_
-X-MS-Office365-Filtering-Correlation-Id: e4a1724c-7fcb-490d-b0a1-08de4b0bc1d8
+X-MS-Office365-Filtering-Correlation-Id: 1937f309-8241-42ec-2242-08de4b0bc3a4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|19092799006|7416014|52116014|376014|1800799024|366016|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?3XpQyoS2VQtpK/+m7LCIODT0E6S+UkYSbEgoSroZFN2DjsF+H3RQhJAYTc92?=
- =?us-ascii?Q?+xYvBihIz1BMrv9b6lZvO3roBGW39iODKmuaTHTqGgfcukGkhQrYt92TtndC?=
- =?us-ascii?Q?sUCfq90AgRyYjMcKHim1skxETlNUSTOMctksm/sd/DLYmPEYpafPx5WwONhs?=
- =?us-ascii?Q?YDBWcYgIRqcf4bw5XY1Q7UNkjC7dLJFB5D3ocWULk1ToJg6i2uygilc4XgtZ?=
- =?us-ascii?Q?KD7/EyS5KpDGrL2zrhJFiRf1xh/VVJIH8gowhlbLBtJ0gkJ+x5/nFaulu8BW?=
- =?us-ascii?Q?WTWoWG3DdDSGfE3IjP3XHh5bYCRXu4un8ZoQHGCjx7Lg4IrPGC3w7GmsFhC8?=
- =?us-ascii?Q?Vyy4ArfD8qP/tYXDqUTXOgGU/xo8vgS2k3SOww630NFRziQ1XYdLCUNkArTb?=
- =?us-ascii?Q?0DdTD7u/teGqpmA5wxMiDRyiTeWrNWuC9zI1HEiros9AuwAKsVQzi235N28E?=
- =?us-ascii?Q?+NJ/nxEJfiw/nHAFCA3HvAlc1yrsytVjqYpzd5DgevQgI38aSbVQb1WxKKfk?=
- =?us-ascii?Q?aCKURoVg5r+3DTLBrYyDebW5jXp392JdEQOxD8BrKnYqWTBa3z8RQZPFjXRW?=
- =?us-ascii?Q?pTK8mwpA1XGge32bzzn7Pjwi8k96oLiW0HkgIAadG5N4D3z9/gf88a9DS/wO?=
- =?us-ascii?Q?RelN/mI5W0Q+cxfQY62ZU5nNNhbkkWuBlprJV6PhX1rSD41kGMKnyWh2kL1j?=
- =?us-ascii?Q?gp87qF4vckWORHO2kuUWOzGKwxYNkl83oVudoR0mtKSWqAUODUViqPJXQnSx?=
- =?us-ascii?Q?63yJb1Z6yH0KLt4oFrNHw2z9eK4dO9LHjzF4U59VDSQDGEUjMQHncHvNQgDj?=
- =?us-ascii?Q?kXiWqnvWip2L2vFWZ0/Pjdz7xssD28G5VMFeOJAIuAz4ihmu1KVPJE3NAnwj?=
- =?us-ascii?Q?meT4QwFYH0sS/jXaNDDx7speCeMpX+IY4NVWH2xptTQhXiLpHiAO+dZMBfuo?=
- =?us-ascii?Q?UuxbLYTKClXiWjbrFDKXd8SzlMCOXpOssbk7zuaOwrXBOGVwQb81KA79MLvY?=
- =?us-ascii?Q?ybXKt5Uv1Mzb3TLi/aDKLiLhFzppSxOR6/UNl+N0VwuMGGJiI8CbzceOXbYh?=
- =?us-ascii?Q?PQgCXL34AzBYaTz8SLIS1jmCZ4zUmOD4ZzVIwVWD8XzpRwsnVn38DZVSNATW?=
- =?us-ascii?Q?cv5HvpQQX/+fySxi1IPngNGvMTo978KmGm/UQnt2r/uO+bxNoAoXOZnAgiwv?=
- =?us-ascii?Q?q1irek//LIVLybg7q1bjU8i/Houp7SuMDszIdQ/fFYKvFEDesNGGHxZk+kiX?=
- =?us-ascii?Q?ibsZHdhtx3MxPky1eflKJ5U/vrmVC3Ntc5PF8DXGcS2NcAGze5HjTTcAvV0T?=
- =?us-ascii?Q?Ll08A6OBgT9jMS1p9fYPeIHWwM2N6s9ggDJIKMdQ6nZWs33XvPV+7Qi3Stsp?=
- =?us-ascii?Q?MeGa4fKWI7/TvHE10v/KnBlNR2l0xBmNSwme01PzPxHaHAKaiARWDS/BNtDn?=
- =?us-ascii?Q?RP766cYmqhYL97Fn2KjX49LiisOU/CjjXCMbqvWDrfKvibqZOJ/A4fmLZNB3?=
- =?us-ascii?Q?duvQV0p8aHHxuKDhGxAbjWmEgGBgUgDdjc+cMkmUB3O7Y7PUXMUJF9QDXQ?=
- =?us-ascii?Q?=3D=3D?=
+	=?us-ascii?Q?8fXbFnw47XXIaLqZ+BMbpNQ2OIcA8kGMi0eKcW9jnB3qyHQgMz0HjRTFawGv?=
+ =?us-ascii?Q?l8E0JC6wFoIeyMRAUrqybBZTMhOPbzUcRK/e4yR3aBZy1FpXAS8b89gE5Pvb?=
+ =?us-ascii?Q?qau1Q6/SKWX2BViRYscAykkk05Cdc+7PxdF0HAbnQgTuejO7bCeXWpONjeA9?=
+ =?us-ascii?Q?8kEjPrHx2BHnFBKhmPPeUBg515WDqcy/gj3nr70A+3eUJvd9ZnXITRh5cCoe?=
+ =?us-ascii?Q?XqBENDUOZ7aTdOn4oEHZIWAVBz8jzgbxK+7wzYf7F978BkZW6U+DNfwJUoqO?=
+ =?us-ascii?Q?DtAswUGGmDD1hlsTDcFnGzP5urbQLkU3+YT+yU9yZtt5lHLmJjoVdfpui49+?=
+ =?us-ascii?Q?5Xynt3urJB69C+GrU2LyelQ1T5zuTFCVMWY/cN33x422hN6nHof6OKmh8MS5?=
+ =?us-ascii?Q?NqPm0PGxM/v8ar0ApqWM9hZUdKmkR0/C2gDHaWUbbrZkqJ3ISIQq33rhmNJx?=
+ =?us-ascii?Q?w8H/KBBzR6fQPxPtFd7xQeSWShVuMaXGXJmmXbS945M0NnmDkyyMjclrpl9Y?=
+ =?us-ascii?Q?PTJXp9+0Ct5znRKEWEwb6p8LIFMVA78beIdL2Xn5ullTGyfEfSyiRKGMxzCG?=
+ =?us-ascii?Q?kgFi84Gf3RNt4tUSKixo+OoKuKSJeOz/f68xhuiH2CDCAF3TLh5aF9tkn2vY?=
+ =?us-ascii?Q?CAcxU17JzYqHkZ3+lLJbCiiXiCE7yQBc+fIQ/3H5wZ02U1lB1IHGDTeEEKS7?=
+ =?us-ascii?Q?icN1Kd+cS38swN+dfVIMclvshzDOAP4ZimJNhJy9ahbIE2Wc2lNy1Oy9Vtul?=
+ =?us-ascii?Q?njRj1TNdhGFhDio7NfeyLtZVwr37MXtXzxx2NqLKIe3d6IdUuc11ga54WkH6?=
+ =?us-ascii?Q?cMZqf9f35TIGH7alZ7SAg8kYuhOOZ5VszmV/SLMJolYPjZzvTu58FrJDqosL?=
+ =?us-ascii?Q?nC3EI4H/Voxpd00HJB+2Ph+ZpJ+rw97fHMwVVD1N8mDlRDFNAxrPJTcien/Z?=
+ =?us-ascii?Q?y4eEqZM/gk0qB7ACxRHL/y2GYTV6wl/pSACobWRdrumhxd9C5MIcckYhEpT2?=
+ =?us-ascii?Q?4Y60JE36hgdddrSR7Rzt0F6JF1TYdm3N59qvcuGbrZb+qR6XhXP6FseEiCkn?=
+ =?us-ascii?Q?64sExSlBiqI2QsMwxhdNAiUiXoJCB5oJPqiTr6zsZquWhCrmUmiNaJfA4ru0?=
+ =?us-ascii?Q?VCqyQjtEoNDx2enjpuBh5u912EW+2WxH5uXm/LqNhIxy05S48M2DyIJG4R3v?=
+ =?us-ascii?Q?J7aNiHAaWkhTrYOkc00HHGGnYltmyuRiOm8bq8XawGRLNtLQlsuTO29CGxu4?=
+ =?us-ascii?Q?ljDoT+7NZeuFn/BF7RzTU8HQT+25v+1l6Xy8fwbSGqB79M/UadvKlxR2bfDk?=
+ =?us-ascii?Q?qtyrsUqYINrtuHeuSiBjttslaDq6VU1bzHYDw5DBnAkxGrZjSPyX9HkHxXZG?=
+ =?us-ascii?Q?IZNDoZEMpglCEJdh4u+r0evWsH1L6+dJ1+ByDg8tDf2ga2jtxF7yKnnhXXZ5?=
+ =?us-ascii?Q?wR1EnX5UI+Bt5jJIcZ0m15KXtWPCN+21qX4t7t6N4nc7T8K8XAqNJ+FiWQw0?=
+ =?us-ascii?Q?cr7oBY70QLRgKouyTxpCxD4WbdgbJDB7Rlut?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU2PR04MB8584.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(7416014)(52116014)(376014)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?kMRKKhGa7CsxpY70DSLOjxKzb2RRJjsZZddtxRWwx9CowcsHH6hAj3J632kL?=
- =?us-ascii?Q?iXmnjrTIrNBBqf8LcN9xIxMetUV1TrnLFZAH6NBOYIqCKN4J3xXhFngM4l3E?=
- =?us-ascii?Q?TpWaDxdklq7wP6YmRAjAyfLvqr8qyhvxJ9W/go40xCWe5A1wbCMxiDuVvKJ9?=
- =?us-ascii?Q?ysoba4W7+lEu7KPq8Lvvb+JlgWFCfpiOI10/18ApGBa9Bum0qrsRRvHIHBz7?=
- =?us-ascii?Q?aaL9iXczS7sjN3TYjiqxHVdzS3Vg0LQ7S4hjfUGjp+itUe2gAstcT/eQ17lJ?=
- =?us-ascii?Q?rJXoNvgmFa/4885u0EW5rKjPqmLrMzUtVtyLeBsvpmiy6hvfrYi9XmR+BC/4?=
- =?us-ascii?Q?20frLYyB4Db/Nc1l+qPeW72v2J9ZYGJSdTPzXp9Cp5JpTtldJkpKoGcevpPS?=
- =?us-ascii?Q?C4ayzPK6xSQnXMydzYKtq+UtqRlHIlZR32A/J150EY6J6YrMdWz4TSIbL9O8?=
- =?us-ascii?Q?mTFlgFYehnAhILUSI+vuQ7fUXNoIJf2nGX3daTTIjiGW3NDAjE+UzEpLzXKZ?=
- =?us-ascii?Q?g1Onu01N6vrI/DCEb8YCIYHQ9FAE2mnlhLl+DE2yZdi/VG87H9Po9qCCGY2r?=
- =?us-ascii?Q?elGFo0w5d5yknqM1nkWgb6E1B3uai09SqchbiJINUrOdVaBo0lN8IBwLW5Ng?=
- =?us-ascii?Q?ByMnkAiFEQKb3plW5P5hR6cuevJaFavpAyvmubaYjmhjPYTaVWPxCQSwytab?=
- =?us-ascii?Q?liI/pSWNplE7/ilaIP1Kp+AAQZzScbJntqqni4BhT/+f03j2nKNI36a99r7N?=
- =?us-ascii?Q?19/Q6Cub7q5wmlZ7mJtsBbLy4muMT2M+cml1uUH7rluK7cwsWmyNt5YwDohd?=
- =?us-ascii?Q?l/IYhJtKJngaFnfKdNErSRG+xGQaLXWwyEq27Aor+ks0nhKzlQS69l937SN6?=
- =?us-ascii?Q?ZE4SX8zQhhTa5wJNNPqUzTn3ZvRGqk8uftD5Fay8O3JXZ//2oO1psrKxn9lM?=
- =?us-ascii?Q?vQctsnom5ed+a0elX72XzYLFSG/qrKJGXIRGeoDAn0yZvOzmx1La+phKyCF5?=
- =?us-ascii?Q?rADVpJTO5S+MO2nDo/Rz9D7FEAKQ99/OssQyPWcxAHo0/u2uAUy9Qj6nvDx7?=
- =?us-ascii?Q?dMGmnKzMk8MNcQjasQ3Yrjk0DPO5y1yLiGQ44rmojkm3nusvGr14b2uhJmJp?=
- =?us-ascii?Q?0wkFFtM6F2nRKHiOhfRdI33s1j5QTkz+6S06Z6GS4EYpV9zWaCbEbQd67l82?=
- =?us-ascii?Q?aFewqzPGhMOy7nf8a/wUUIifWhjnd7k2cFNJDxsjSD74QxXhAqLdtdwv6hx5?=
- =?us-ascii?Q?lMdRjoK3Ic6HtY6lxSXFOe3ZuLQcvPZJHK/wS3Mfhg+VQKCXvlYDt1C5TpCL?=
- =?us-ascii?Q?ddtdSjrtrMHPj9DMezbIiIVOVLtZZ6VQDVuIAiGO0dIwZ/9o0SFEwDscOjJm?=
- =?us-ascii?Q?Tx7waFIRCnPBFIzC1Fbnl5UqFyxWzjPzY+rf8g15drAVQQgn64Tw+VoIDa/l?=
- =?us-ascii?Q?lKRpOe/FLvEg38hsNG8Qf1XaGoGWEmL32wopdY4fHoPI2+IrLBG8L82LWz7a?=
- =?us-ascii?Q?Si52H6CFCtLWZibvyavWLyJYKvpjms3mGQSFKm6Oql+gwMhzbv5HlRwQAcBt?=
- =?us-ascii?Q?X0U1cNt/U0u+YfOcrtOXkA1/ZDronKY58HPcmQIKsDD9onFESHblU/z8ogST?=
- =?us-ascii?Q?L+RE9h/K13VYp87NdQQDLTm2KENLwqk307SoIe7clngD7CE21u6mC4+Enq8M?=
- =?us-ascii?Q?OcX7jzzHcdLihrPXlJQg5CP7tILLptDdlTAjTvmY6Ot5q/ucwuOC45MQvyOy?=
- =?us-ascii?Q?E4AoR8LiNMyLEC5vsiXabs55+IS9dKc=3D?=
+	=?us-ascii?Q?/Zo6G81zvfYAB0vj6agJ0PBD4Z6yZoDU2cJY5Hwq/x4vjDxSVifQHKX52EzT?=
+ =?us-ascii?Q?HAS8HSZuDiKalrDnfgVkiw181yETLB3Y6l4xms5Dg+RDbE41WPh46YAqbCdy?=
+ =?us-ascii?Q?OSWTQqpo+dvIf2r19K3D96/Q4kuQ6rE1IPIDnIDcY+SKmEwYVPI9LY0fRjwo?=
+ =?us-ascii?Q?Cvl48Dafp9s/RKrfjhNeZiCiaAQSkiH8PHRGTGtUuVd8xJc7dU8WxjfJOBiI?=
+ =?us-ascii?Q?Hy5vE3Dd/uPg7dQcK2KFAVp1JxucWiW2RElGHQEXL6Y5eTc9V7yJ7S92r1w2?=
+ =?us-ascii?Q?pR0DGKel49vSj9INyZ02ERDZYwUXHgJooGw9YLwGxuUEPaQFDJk5Z/+YsHok?=
+ =?us-ascii?Q?KCM9S4Srwa7re+oUDd1m681E9sqIekV6HYLeDOhC1VW3oNWnZ8ZbVqrTn/YR?=
+ =?us-ascii?Q?JkJHbvSjz/tQFKZWlG/NDn1Iyk7sb2di6atktMkZzDq8GX3GTM6SqtuGH1HK?=
+ =?us-ascii?Q?qIxqAh/lFjS72Z2UECMsbzHhfhC1ay0ssgutUtzx8mxxKM0Genn600xMd6wP?=
+ =?us-ascii?Q?kyDWDDmZtbxClstVOwFi7inrcEei7Xid4Wy05WRIYJggy/30EJF9kswt4c7H?=
+ =?us-ascii?Q?8RcS0f5co7gObwn/FMVsq8RXmBx2k2bXnpX6pvOx7PelJjGe6BhJpb3XEbtd?=
+ =?us-ascii?Q?I2TjDh13kDrzedcTxK9JmC5M/OdCrw9rvzqP90eiRN5xsXinmKxB9lhe/dAR?=
+ =?us-ascii?Q?voxQDsiUY42Hdu84bEnbvmMjvtuT/mpwEDcafaCYSCzxYpuHXTb6dXxi9L9K?=
+ =?us-ascii?Q?7YFrhC1icfnp4pE9SX9yS/s+RZxh9DQVe0ktfgAXhvtHRbICOkK58uinX0T/?=
+ =?us-ascii?Q?5jGVblDw29udJzm1qHtFu3O73nVI1LPXoQO1qaPe7YGdjhpkbbGpJOvXKRVV?=
+ =?us-ascii?Q?Ch2yGXaPvHO2SB9u7X3gMNFeRlXaTkE5GjIuEQo5/juABwSvKs53lir9mO6I?=
+ =?us-ascii?Q?Q8Z1vjosSsQZxPw+0iIjsASSoWz069VRXTgLYMP0hKDxzKcVkVfUAdUktdm3?=
+ =?us-ascii?Q?BZOwzozv3w+lpp//EONu6wpubQ09qXkGebFraINpNJ973qVGI7QpLaEPjOie?=
+ =?us-ascii?Q?wow89+AstiaJIczbEHftHxbWPFE2j9yjQFqvaqONdzr9+q67zfFmCMaUyXgJ?=
+ =?us-ascii?Q?8Ey+hxreYlKZvgvh1Hg28P1/h2wPC3BNH1LS0hgeSFSg5qLnNHdlYgOWeoCl?=
+ =?us-ascii?Q?cSAx38uzfKmpFVCVNPvRdYW6BJUxtf0og7p6/xmXiIbVaMN48mICE/QGd51C?=
+ =?us-ascii?Q?ObC0GuMD/GEdVYeuFOb8q2GnILZ2YWoZv86ufny5UK0uXJjBGLRX3BMCp8Yj?=
+ =?us-ascii?Q?f6fYMUWg/1E0iwpm8MnP4GWTu3yJ8Ja523FhEMgE5yziLuQQmF2u+7s16cPX?=
+ =?us-ascii?Q?iIzqAUJIm1yEd6eMYfwbqayzexHuWhYlD9Otug9KGL+3zBfRHHQeD5Dlqhyv?=
+ =?us-ascii?Q?iD4hPA57AgaGhkM5o70apl6NChrDdLAomVerqBIyqY9hVD5OGG0Vzprcvef5?=
+ =?us-ascii?Q?TDep9vnjXW+QEB+vz3wbJXU/nUn5KQ0xaTxz2Z+KTKHQ7TCqaSA8N6shxza6?=
+ =?us-ascii?Q?Cn/ZG1hWw+l6DFzujSLfeiOxgOJUevdLZPKms7+TvS67yk0ZcHkaT3Mard5t?=
+ =?us-ascii?Q?ODLbLnlEy09cGOBST7vu1/uKUt9KPIrQJ35wwAtofawcv8zlmsMPkxXTgQ7k?=
+ =?us-ascii?Q?nNeopiytMQ+rSQDC9EZHJBiv/ywHuK/7lXFdoAAMK2BwbjVqtp66Sf1Q5uFV?=
+ =?us-ascii?Q?w+UllerF6mY0K2Umn76kSLuWdkdQ2zE=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e4a1724c-7fcb-490d-b0a1-08de4b0bc1d8
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1937f309-8241-42ec-2242-08de4b0bc3a4
 X-MS-Exchange-CrossTenant-AuthSource: DU2PR04MB8584.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jan 2026 21:05:00.4893
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jan 2026 21:05:04.0463
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: N+M8juUItx2bKzVadi5NjgtBMdvKxoT6zUWbn9fTpMe6hXTFeiJ0H7eaNF6Vh5WdJVnVqKkJFd6pgczGbrt5Fw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: NCfa+kue7zPA4aVhU4N0f3rPzETE16lA+DcqowKNGdRMerLYa6OORTqbeq1rRa0eQticLi5YHSGitQ+l2Rnr4A==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8088
 
-Differential signaling is a technique for high-speed protocols to be
-more resilient to noise. At the transmit side we have a positive and a
-negative signal which are mirror images of each other. At the receiver,
-if we subtract the negative signal (say of amplitude -A) from the
-positive signal (say +A), we recover the original single-ended signal at
-twice its original amplitude. But any noise, like one coming from EMI
-from outside sources, is supposed to have an almost equal impact upon
-the positive (A + E, E being for "error") and negative signal (-A + E).
-So (A + E) - (-A + E) eliminates this noise, and this is what makes
-differential signaling useful.
+Add helpers in the generic PHY folder which can be used using 'select
+GENERIC_PHY_COMMON_PROPS' from Kconfig, without otherwise needing to
+enable GENERIC_PHY.
 
-Except that in order to work, there must be strict requirements observed
-during PCB design and layout, like the signal traces needing to have the
-same length and be physically close to each other, and many others.
+These helpers need to deal with the slight messiness of the fact that
+the polarity properties are arrays per protocol, and with the fact that
+there is no default value mandated by the standard properties, all
+default values depend on driver and protocol (PHY_POL_NORMAL may be a
+good default for SGMII, whereas PHY_POL_AUTO may be a good default for
+PCIe).
 
-Sometimes it is not easy to fulfill all these requirements, a simple
-case to understand is when on chip A's pins, the positive pin is on the
-left and the negative is on the right, but on the chip B's pins (with
-which A tries to communicate), positive is on the right and negative on
-the left. The signals would need to cross, using vias and other ugly
-stuff that affects signal integrity (introduces impedance
-discontinuities which cause reflections, etc).
+Push the supported mask of polarities to these helpers, to simplify
+drivers such that they don't need to validate what's in the device tree
+(or other firmware description).
 
-So sometimes, board designers intentionally connect differential lanes
-the wrong way, and expect somebody else to invert that signal to recover
-useful data. This is where RX and TX polarity inversion comes in as a
-generic concept that applies to any high-speed serial protocol as long
-as it uses differential signaling.
+Add a KUnit test suite to make sure that the API produces the expected
+results. The fact that we use fwnode structures means we can validate
+with software nodes, and as opposed to the device_property API, we can
+bypass the need to have a device structure.
 
-I've stopped two attempts to introduce more vendor-specific descriptions
-of this only in the past month:
-https://lore.kernel.org/linux-phy/20251110110536.2596490-1-horatiu.vultur@microchip.com/
-https://lore.kernel.org/netdev/20251028000959.3kiac5kwo5pcl4ft@skbuf/
-
-and in the kernel we already have merged:
-- "st,px_rx_pol_inv"
-- "st,pcie-tx-pol-inv"
-- "st,sata-tx-pol-inv"
-- "mediatek,pnswap"
-- "airoha,pnswap-rx"
-- "airoha,pnswap-tx"
-
-and maybe more. So it is pretty general.
-
-One additional element of complexity is introduced by the fact that for
-some protocols, receivers can automatically detect and correct for an
-inverted lane polarity (example: the PCIe LTSSM does this in the
-Polling.Configuration state; the USB 3.1 Link Layer Test Specification
-says that the detection and correction of the lane polarity inversion in
-SuperSpeed operation shall be enabled in Polling.RxEQ.). Whereas for
-other protocols (SGMII, SATA, 10GBase-R, etc etc), the polarity is all
-manual and there is no detection mechanism mandated by their respective
-standards.
-
-So why would one even describe rx-polarity and tx-polarity for protocols
-like PCIe, if it had to always be PHY_POL_AUTO?
-
-Related question: why would we define the polarity as an array per
-protocol? Isn't the physical PCB layout protocol-agnostic, and aren't we
-describing the same physical reality from the lens of different protocols?
-
-The answer to both questions is because multi-protocol PHYs exist
-(supporting e.g. USB2 and USB3, or SATA and PCIe, or PCIe and Ethernet
-over the same lane), one would need to manually set the polarity for
-SATA/Ethernet, while leaving it at auto for PCIe/USB 3.0+.
-
-I also investigated from another angle: what if polarity inversion in
-the PHY is one layer, and then the PCIe/USB3 LTSSM polarity detection is
-another layer on top? Then rx-polarity = <PHY_POL_AUTO> doesn't make
-sense, it can still be rx-polarity = <PHY_POL_NORMAL> or <PHY_POL_INVERT>,
-and the link training state machine figures things out on top of that.
-This would radically simplify the design, as the elimination of
-PHY_POL_AUTO inherently means that the need for a property array per
-protocol also goes away.
-
-I don't know how things are in the general case, but at least in the 10G
-and 28G Lynx SerDes blocks from NXP Layerscape devices, this isn't the
-case, and there's only a single level of RX polarity inversion: in the
-SerDes lane. In the case of PCIe, the controller is in charge of driving
-the RDAT_INV bit autonomously, and it is read-only to software.
-
-So the existence of this kind of SerDes lane proves the need for
-PHY_POL_AUTO to be a third state.
-
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 ---
 v1->v2:
-- logical change: the bindings refer to the described block's I/O
-  signals, not necessarily device pins. This means that a PCS that needs
-  to internall invert a polarity to work around an inverting PMA in
-  order to achieve normal polarity at the pin needs to be described as
-  PHY_POL_INVERT now.
-- clarify that default values are undefined.
-- fix a checkpatch issue: duplicated "the the" in rx-polarity description
+- add KUnit test suite
+- replace joint maintainership model with linux-phy being the only tree.
+- split the combined return code (if negative, error, if positive, valid
+  return value) into a single "error or zero" return code and an
+  unsigned int pointer argument to the returned polarity
+- add __must_check to ensure that callers are forced to test for errors
+- add a reusable fwnode_get_u32_prop_for_name() helper for further
+  property parsing
+- remove support for looking up polarity of a NULL PHY mode
+- introduce phy_get_manual_rx_polarity() and
+  phy_get_manual_tx_polarity() helpers to reduce boilerplate in simple
+  drivers
+- bug fix: a polarity defined as a single value rather than an array was
+  not validated against the supported mask
+- bug fix: the default polarity was not validated against the supported
+  mask
+- bug fix: wrong error message if the polarity value is unsupported
 
- .../bindings/phy/phy-common-props.yaml        | 49 +++++++++++++++++++
- include/dt-bindings/phy/phy.h                 |  4 ++
- 2 files changed, 53 insertions(+)
+ MAINTAINERS                          |  10 +
+ drivers/phy/Kconfig                  |  22 ++
+ drivers/phy/Makefile                 |   2 +
+ drivers/phy/phy-common-props-test.c  | 380 +++++++++++++++++++++++++++
+ drivers/phy/phy-common-props.c       | 216 +++++++++++++++
+ include/linux/phy/phy-common-props.h |  32 +++
+ 6 files changed, 662 insertions(+)
+ create mode 100644 drivers/phy/phy-common-props-test.c
+ create mode 100644 drivers/phy/phy-common-props.c
+ create mode 100644 include/linux/phy/phy-common-props.h
 
-diff --git a/Documentation/devicetree/bindings/phy/phy-common-props.yaml b/Documentation/devicetree/bindings/phy/phy-common-props.yaml
-index 31bf1382262a..b2c709cc1b0d 100644
---- a/Documentation/devicetree/bindings/phy/phy-common-props.yaml
-+++ b/Documentation/devicetree/bindings/phy/phy-common-props.yaml
-@@ -94,15 +94,64 @@ properties:
-       property. Required only if multiple voltages are provided.
-     $ref: "#/$defs/protocol-names"
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 765ad2daa218..24965eec37c9 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10561,6 +10561,16 @@ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/arnd/asm-generic.git
+ F:	include/asm-generic/
+ F:	include/uapi/asm-generic/
  
-+  rx-polarity:
-+    description:
-+      An array of values indicating whether the differential receiver's
-+      polarity is inverted. Each value can be one of
-+      PHY_POL_NORMAL (0) which means the negative signal is decoded from the
-+      RXN input, and the positive signal from the RXP input;
-+      PHY_POL_INVERT (1) which means the negative signal is decoded from the
-+      RXP input, and the positive signal from the RXN input;
-+      PHY_POL_AUTO (2) which means the receiver performs automatic polarity
-+      detection and correction, which is a mandatory part of link training for
-+      some protocols (PCIe, USB SS).
++GENERIC PHY COMMON PROPERTIES
++M:	Vladimir Oltean <vladimir.oltean@nxp.com>
++L:	netdev@vger.kernel.org
++S:	Maintained
++Q:	https://patchwork.kernel.org/project/netdevbpf/list/
++F:	Documentation/devicetree/bindings/phy/phy-common-props.yaml
++F:	drivers/phy/phy-common-props-test.c
++F:	drivers/phy/phy-common-props.c
++F:	include/linux/phy/phy-common-props.h
 +
-+      The values are defined in <dt-bindings/phy/phy.h>. If the property is
-+      absent, the default value is undefined.
-+
-+      Note that the RXP and RXN inputs refer to the block that this property is
-+      under, and do not necessarily directly translate to external pins.
-+
-+      If this property contains multiple values for various protocols, the
-+      'rx-polarity-names' property must be provided.
-+    $ref: /schemas/types.yaml#/definitions/uint32-array
-+    minItems: 1
-+    maxItems: 16
-+    items:
-+      enum: [0, 1, 2]
-+
-+  rx-polarity-names:
-+    $ref: '#/$defs/protocol-names'
-+
-+  tx-polarity:
-+    description:
-+      Like 'rx-polarity', except it applies to differential transmitters,
-+      and only the values of PHY_POL_NORMAL and PHY_POL_INVERT are possible.
-+    $ref: /schemas/types.yaml#/definitions/uint32-array
-+    minItems: 1
-+    maxItems: 16
-+    items:
-+      enum: [0, 1]
-+
-+  tx-polarity-names:
-+    $ref: '#/$defs/protocol-names'
-+
- dependencies:
-   tx-p2p-microvolt-names: [ tx-p2p-microvolt ]
-+  rx-polarity-names: [ rx-polarity ]
-+  tx-polarity-names: [ tx-polarity ]
+ GENERIC PHY FRAMEWORK
+ M:	Vinod Koul <vkoul@kernel.org>
+ R:	Neil Armstrong <neil.armstrong@linaro.org>
+diff --git a/drivers/phy/Kconfig b/drivers/phy/Kconfig
+index 678dd0452f0a..f082680e1262 100644
+--- a/drivers/phy/Kconfig
++++ b/drivers/phy/Kconfig
+@@ -16,6 +16,28 @@ config GENERIC_PHY
+ 	  phy users can obtain reference to the PHY. All the users of this
+ 	  framework should select this config.
  
- additionalProperties: true
- 
- examples:
-   - |
-+    #include <dt-bindings/phy/phy.h>
++config GENERIC_PHY_COMMON_PROPS
++	bool
++	help
++	  Generic PHY common property parsing.
 +
-     phy: phy {
-       #phy-cells = <1>;
-       tx-p2p-microvolt = <915000>, <1100000>, <1200000>;
-       tx-p2p-microvolt-names = "2500base-x", "usb-hs", "usb-ss";
-+      rx-polarity = <PHY_POL_AUTO>, <PHY_POL_NORMAL>;
-+      rx-polarity-names = "usb-ss", "default";
-+      tx-polarity = <PHY_POL_INVERT>;
-     };
-diff --git a/include/dt-bindings/phy/phy.h b/include/dt-bindings/phy/phy.h
-index 6b901b342348..f8d4094f0880 100644
---- a/include/dt-bindings/phy/phy.h
-+++ b/include/dt-bindings/phy/phy.h
-@@ -24,4 +24,8 @@
- #define PHY_TYPE_CPHY		11
- #define PHY_TYPE_USXGMII	12
- 
-+#define PHY_POL_NORMAL		0
-+#define PHY_POL_INVERT		1
-+#define PHY_POL_AUTO		2
++	  Select this from consumer drivers to gain access to helpers for
++	  parsing properties from the
++	  Documentation/devicetree/bindings/phy/phy-common-props.yaml schema.
 +
- #endif /* _DT_BINDINGS_PHY */
++config GENERIC_PHY_COMMON_PROPS_TEST
++	tristate "KUnit tests for generic PHY common props" if !KUNIT_ALL_TESTS
++	select GENERIC_PHY_COMMON_PROPS
++	depends on KUNIT
++	default KUNIT_ALL_TESTS
++	help
++	  This builds KUnit tests for the generic PHY common property API.
++
++	  For more information on KUnit and unit tests in general,
++	  please refer to the KUnit documentation in Documentation/dev-tools/kunit/.
++
++	  When in doubt, say N.
++
+ config GENERIC_PHY_MIPI_DPHY
+ 	bool
+ 	select GENERIC_PHY
+diff --git a/drivers/phy/Makefile b/drivers/phy/Makefile
+index bfb27fb5a494..4e8ac966064b 100644
+--- a/drivers/phy/Makefile
++++ b/drivers/phy/Makefile
+@@ -4,6 +4,8 @@
+ #
+ 
+ obj-$(CONFIG_GENERIC_PHY)		+= phy-core.o
++obj-$(CONFIG_GENERIC_PHY_COMMON_PROPS)	+= phy-common-props.o
++obj-$(CONFIG_GENERIC_PHY_COMMON_PROPS_TEST) += phy-common-props-test.o
+ obj-$(CONFIG_GENERIC_PHY_MIPI_DPHY)	+= phy-core-mipi-dphy.o
+ obj-$(CONFIG_PHY_CAN_TRANSCEIVER)	+= phy-can-transceiver.o
+ obj-$(CONFIG_PHY_LPC18XX_USB_OTG)	+= phy-lpc18xx-usb-otg.o
+diff --git a/drivers/phy/phy-common-props-test.c b/drivers/phy/phy-common-props-test.c
+new file mode 100644
+index 000000000000..269353891add
+--- /dev/null
++++ b/drivers/phy/phy-common-props-test.c
+@@ -0,0 +1,380 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * phy-common-props-test.c  --  Unit tests for PHY common properties API
++ *
++ * Copyright 2025-2026 NXP
++ */
++#include <kunit/test.h>
++#include <linux/property.h>
++#include <linux/phy/phy-common-props.h>
++#include <dt-bindings/phy/phy.h>
++
++/* Test: rx-polarity has more values than rx-polarity-names */
++static void phy_test_rx_polarity_more_values_than_names(struct kunit *test)
++{
++	static const u32 rx_pol[] = { PHY_POL_NORMAL, PHY_POL_INVERT, PHY_POL_NORMAL };
++	static const char * const rx_pol_names[] = { "sgmii", "2500base-x" };
++	static const struct property_entry entries[] = {
++		PROPERTY_ENTRY_U32_ARRAY("rx-polarity", rx_pol),
++		PROPERTY_ENTRY_STRING_ARRAY("rx-polarity-names", rx_pol_names),
++		{}
++	};
++	struct fwnode_handle *node;
++	unsigned int val;
++	int ret;
++
++	node = fwnode_create_software_node(entries, NULL);
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, node);
++
++	ret = phy_get_manual_rx_polarity(node, "sgmii", &val);
++	KUNIT_EXPECT_EQ(test, ret, -EINVAL);
++
++	fwnode_remove_software_node(node);
++}
++
++/* Test: rx-polarity has 1 value and rx-polarity-names does not exist */
++static void phy_test_rx_polarity_single_value_no_names(struct kunit *test)
++{
++	static const u32 rx_pol[] = { PHY_POL_INVERT };
++	static const struct property_entry entries[] = {
++		PROPERTY_ENTRY_U32_ARRAY("rx-polarity", rx_pol),
++		{}
++	};
++	struct fwnode_handle *node;
++	unsigned int val;
++	int ret;
++
++	node = fwnode_create_software_node(entries, NULL);
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, node);
++
++	ret = phy_get_manual_rx_polarity(node, "sgmii", &val);
++	KUNIT_EXPECT_EQ(test, ret, 0);
++	KUNIT_EXPECT_EQ(test, val, PHY_POL_INVERT);
++
++	fwnode_remove_software_node(node);
++}
++
++/* Test: rx-polarity-names has more values than rx-polarity */
++static void phy_test_rx_polarity_more_names_than_values(struct kunit *test)
++{
++	static const u32 rx_pol[] = { PHY_POL_NORMAL, PHY_POL_INVERT };
++	static const char * const rx_pol_names[] = { "sgmii", "2500base-x", "1000base-x" };
++	static const struct property_entry entries[] = {
++		PROPERTY_ENTRY_U32_ARRAY("rx-polarity", rx_pol),
++		PROPERTY_ENTRY_STRING_ARRAY("rx-polarity-names", rx_pol_names),
++		{}
++	};
++	struct fwnode_handle *node;
++	unsigned int val;
++	int ret;
++
++	node = fwnode_create_software_node(entries, NULL);
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, node);
++
++	ret = phy_get_manual_rx_polarity(node, "sgmii", &val);
++	KUNIT_EXPECT_EQ(test, ret, -EINVAL);
++
++	fwnode_remove_software_node(node);
++}
++
++/* Test: rx-polarity and rx-polarity-names have same length, find the name */
++static void phy_test_rx_polarity_find_by_name(struct kunit *test)
++{
++	static const u32 rx_pol[] = { PHY_POL_NORMAL, PHY_POL_INVERT, PHY_POL_AUTO };
++	static const char * const rx_pol_names[] = { "sgmii", "2500base-x", "usb-ss" };
++	static const struct property_entry entries[] = {
++		PROPERTY_ENTRY_U32_ARRAY("rx-polarity", rx_pol),
++		PROPERTY_ENTRY_STRING_ARRAY("rx-polarity-names", rx_pol_names),
++		{}
++	};
++	struct fwnode_handle *node;
++	unsigned int val;
++	int ret;
++
++	node = fwnode_create_software_node(entries, NULL);
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, node);
++
++	ret = phy_get_manual_rx_polarity(node, "sgmii", &val);
++	KUNIT_EXPECT_EQ(test, ret, 0);
++	KUNIT_EXPECT_EQ(test, val, PHY_POL_NORMAL);
++
++	ret = phy_get_manual_rx_polarity(node, "2500base-x", &val);
++	KUNIT_EXPECT_EQ(test, ret, 0);
++	KUNIT_EXPECT_EQ(test, val, PHY_POL_INVERT);
++
++	ret = phy_get_rx_polarity(node, "usb-ss", BIT(PHY_POL_AUTO),
++				  PHY_POL_AUTO, &val);
++	KUNIT_EXPECT_EQ(test, ret, 0);
++	KUNIT_EXPECT_EQ(test, val, PHY_POL_AUTO);
++
++	fwnode_remove_software_node(node);
++}
++
++/* Test: same length, name not found, no "default" - error */
++static void phy_test_rx_polarity_name_not_found_no_default(struct kunit *test)
++{
++	static const u32 rx_pol[] = { PHY_POL_NORMAL, PHY_POL_INVERT };
++	static const char * const rx_pol_names[] = { "2500base-x", "1000base-x" };
++	static const struct property_entry entries[] = {
++		PROPERTY_ENTRY_U32_ARRAY("rx-polarity", rx_pol),
++		PROPERTY_ENTRY_STRING_ARRAY("rx-polarity-names", rx_pol_names),
++		{}
++	};
++	struct fwnode_handle *node;
++	unsigned int val;
++	int ret;
++
++	node = fwnode_create_software_node(entries, NULL);
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, node);
++
++	ret = phy_get_manual_rx_polarity(node, "sgmii", &val);
++	KUNIT_EXPECT_EQ(test, ret, -EINVAL);
++
++	fwnode_remove_software_node(node);
++}
++
++/* Test: same length, name not found, but "default" exists */
++static void phy_test_rx_polarity_name_not_found_with_default(struct kunit *test)
++{
++	static const u32 rx_pol[] = { PHY_POL_NORMAL, PHY_POL_INVERT };
++	static const char * const rx_pol_names[] = { "2500base-x", "default" };
++	static const struct property_entry entries[] = {
++		PROPERTY_ENTRY_U32_ARRAY("rx-polarity", rx_pol),
++		PROPERTY_ENTRY_STRING_ARRAY("rx-polarity-names", rx_pol_names),
++		{}
++	};
++	struct fwnode_handle *node;
++	unsigned int val;
++	int ret;
++
++	node = fwnode_create_software_node(entries, NULL);
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, node);
++
++	ret = phy_get_manual_rx_polarity(node, "sgmii", &val);
++	KUNIT_EXPECT_EQ(test, ret, 0);
++	KUNIT_EXPECT_EQ(test, val, PHY_POL_INVERT);
++
++	fwnode_remove_software_node(node);
++}
++
++/* Test: polarity found but value is unsupported */
++static void phy_test_rx_polarity_unsupported_value(struct kunit *test)
++{
++	static const u32 rx_pol[] = { PHY_POL_AUTO };
++	static const char * const rx_pol_names[] = { "sgmii" };
++	static const struct property_entry entries[] = {
++		PROPERTY_ENTRY_U32_ARRAY("rx-polarity", rx_pol),
++		PROPERTY_ENTRY_STRING_ARRAY("rx-polarity-names", rx_pol_names),
++		{}
++	};
++	struct fwnode_handle *node;
++	unsigned int val;
++	int ret;
++
++	node = fwnode_create_software_node(entries, NULL);
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, node);
++
++	ret = phy_get_manual_rx_polarity(node, "sgmii", &val);
++	KUNIT_EXPECT_EQ(test, ret, -EOPNOTSUPP);
++
++	fwnode_remove_software_node(node);
++}
++
++/* Test: tx-polarity has more values than tx-polarity-names */
++static void phy_test_tx_polarity_more_values_than_names(struct kunit *test)
++{
++	static const u32 tx_pol[] = { PHY_POL_NORMAL, PHY_POL_INVERT, PHY_POL_NORMAL };
++	static const char * const tx_pol_names[] = { "sgmii", "2500base-x" };
++	static const struct property_entry entries[] = {
++		PROPERTY_ENTRY_U32_ARRAY("tx-polarity", tx_pol),
++		PROPERTY_ENTRY_STRING_ARRAY("tx-polarity-names", tx_pol_names),
++		{}
++	};
++	struct fwnode_handle *node;
++	unsigned int val;
++	int ret;
++
++	node = fwnode_create_software_node(entries, NULL);
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, node);
++
++	ret = phy_get_manual_tx_polarity(node, "sgmii", &val);
++	KUNIT_EXPECT_EQ(test, ret, -EINVAL);
++
++	fwnode_remove_software_node(node);
++}
++
++/* Test: tx-polarity has 1 value and tx-polarity-names does not exist */
++static void phy_test_tx_polarity_single_value_no_names(struct kunit *test)
++{
++	static const u32 tx_pol[] = { PHY_POL_INVERT };
++	static const struct property_entry entries[] = {
++		PROPERTY_ENTRY_U32_ARRAY("tx-polarity", tx_pol),
++		{}
++	};
++	struct fwnode_handle *node;
++	unsigned int val;
++	int ret;
++
++	node = fwnode_create_software_node(entries, NULL);
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, node);
++
++	ret = phy_get_manual_tx_polarity(node, "sgmii", &val);
++	KUNIT_EXPECT_EQ(test, ret, 0);
++	KUNIT_EXPECT_EQ(test, val, PHY_POL_INVERT);
++
++	fwnode_remove_software_node(node);
++}
++
++/* Test: tx-polarity-names has more values than tx-polarity */
++static void phy_test_tx_polarity_more_names_than_values(struct kunit *test)
++{
++	static const u32 tx_pol[] = { PHY_POL_NORMAL, PHY_POL_INVERT };
++	static const char * const tx_pol_names[] = { "sgmii", "2500base-x", "1000base-x" };
++	static const struct property_entry entries[] = {
++		PROPERTY_ENTRY_U32_ARRAY("tx-polarity", tx_pol),
++		PROPERTY_ENTRY_STRING_ARRAY("tx-polarity-names", tx_pol_names),
++		{}
++	};
++	struct fwnode_handle *node;
++	unsigned int val;
++	int ret;
++
++	node = fwnode_create_software_node(entries, NULL);
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, node);
++
++	ret = phy_get_manual_tx_polarity(node, "sgmii", &val);
++	KUNIT_EXPECT_EQ(test, ret, -EINVAL);
++
++	fwnode_remove_software_node(node);
++}
++
++/* Test: tx-polarity and tx-polarity-names have same length, find the name */
++static void phy_test_tx_polarity_find_by_name(struct kunit *test)
++{
++	static const u32 tx_pol[] = { PHY_POL_NORMAL, PHY_POL_INVERT, PHY_POL_NORMAL };
++	static const char * const tx_pol_names[] = { "sgmii", "2500base-x", "1000base-x" };
++	static const struct property_entry entries[] = {
++		PROPERTY_ENTRY_U32_ARRAY("tx-polarity", tx_pol),
++		PROPERTY_ENTRY_STRING_ARRAY("tx-polarity-names", tx_pol_names),
++		{}
++	};
++	struct fwnode_handle *node;
++	unsigned int val;
++	int ret;
++
++	node = fwnode_create_software_node(entries, NULL);
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, node);
++
++	ret = phy_get_manual_tx_polarity(node, "sgmii", &val);
++	KUNIT_EXPECT_EQ(test, ret, 0);
++	KUNIT_EXPECT_EQ(test, val, PHY_POL_NORMAL);
++
++	ret = phy_get_manual_tx_polarity(node, "2500base-x", &val);
++	KUNIT_EXPECT_EQ(test, ret, 0);
++	KUNIT_EXPECT_EQ(test, val, PHY_POL_INVERT);
++
++	ret = phy_get_manual_tx_polarity(node, "1000base-x", &val);
++	KUNIT_EXPECT_EQ(test, ret, 0);
++	KUNIT_EXPECT_EQ(test, val, PHY_POL_NORMAL);
++
++	fwnode_remove_software_node(node);
++}
++
++/* Test: same length, name not found, no "default" - error */
++static void phy_test_tx_polarity_name_not_found_no_default(struct kunit *test)
++{
++	static const u32 tx_pol[] = { PHY_POL_NORMAL, PHY_POL_INVERT };
++	static const char * const tx_pol_names[] = { "2500base-x", "1000base-x" };
++	static const struct property_entry entries[] = {
++		PROPERTY_ENTRY_U32_ARRAY("tx-polarity", tx_pol),
++		PROPERTY_ENTRY_STRING_ARRAY("tx-polarity-names", tx_pol_names),
++		{}
++	};
++	struct fwnode_handle *node;
++	unsigned int val;
++	int ret;
++
++	node = fwnode_create_software_node(entries, NULL);
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, node);
++
++	ret = phy_get_manual_tx_polarity(node, "sgmii", &val);
++	KUNIT_EXPECT_EQ(test, ret, -EINVAL);
++
++	fwnode_remove_software_node(node);
++}
++
++/* Test: same length, name not found, but "default" exists */
++static void phy_test_tx_polarity_name_not_found_with_default(struct kunit *test)
++{
++	static const u32 tx_pol[] = { PHY_POL_NORMAL, PHY_POL_INVERT };
++	static const char * const tx_pol_names[] = { "2500base-x", "default" };
++	static const struct property_entry entries[] = {
++		PROPERTY_ENTRY_U32_ARRAY("tx-polarity", tx_pol),
++		PROPERTY_ENTRY_STRING_ARRAY("tx-polarity-names", tx_pol_names),
++		{}
++	};
++	struct fwnode_handle *node;
++	unsigned int val;
++	int ret;
++
++	node = fwnode_create_software_node(entries, NULL);
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, node);
++
++	ret = phy_get_manual_tx_polarity(node, "sgmii", &val);
++	KUNIT_EXPECT_EQ(test, ret, 0);
++	KUNIT_EXPECT_EQ(test, val, PHY_POL_INVERT);
++
++	fwnode_remove_software_node(node);
++}
++
++/* Test: polarity found but value is unsupported (AUTO for TX) */
++static void phy_test_tx_polarity_unsupported_value(struct kunit *test)
++{
++	static const u32 tx_pol[] = { PHY_POL_AUTO };
++	static const char * const tx_pol_names[] = { "sgmii" };
++	static const struct property_entry entries[] = {
++		PROPERTY_ENTRY_U32_ARRAY("tx-polarity", tx_pol),
++		PROPERTY_ENTRY_STRING_ARRAY("tx-polarity-names", tx_pol_names),
++		{}
++	};
++	struct fwnode_handle *node;
++	unsigned int val;
++	int ret;
++
++	node = fwnode_create_software_node(entries, NULL);
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, node);
++
++	ret = phy_get_manual_tx_polarity(node, "sgmii", &val);
++	KUNIT_EXPECT_EQ(test, ret, -EOPNOTSUPP);
++
++	fwnode_remove_software_node(node);
++}
++
++static struct kunit_case phy_common_props_test_cases[] = {
++	KUNIT_CASE(phy_test_rx_polarity_more_values_than_names),
++	KUNIT_CASE(phy_test_rx_polarity_single_value_no_names),
++	KUNIT_CASE(phy_test_rx_polarity_more_names_than_values),
++	KUNIT_CASE(phy_test_rx_polarity_find_by_name),
++	KUNIT_CASE(phy_test_rx_polarity_name_not_found_no_default),
++	KUNIT_CASE(phy_test_rx_polarity_name_not_found_with_default),
++	KUNIT_CASE(phy_test_rx_polarity_unsupported_value),
++	KUNIT_CASE(phy_test_tx_polarity_more_values_than_names),
++	KUNIT_CASE(phy_test_tx_polarity_single_value_no_names),
++	KUNIT_CASE(phy_test_tx_polarity_more_names_than_values),
++	KUNIT_CASE(phy_test_tx_polarity_find_by_name),
++	KUNIT_CASE(phy_test_tx_polarity_name_not_found_no_default),
++	KUNIT_CASE(phy_test_tx_polarity_name_not_found_with_default),
++	KUNIT_CASE(phy_test_tx_polarity_unsupported_value),
++	{}
++};
++
++static struct kunit_suite phy_common_props_test_suite = {
++	.name = "phy-common-props",
++	.test_cases = phy_common_props_test_cases,
++};
++
++kunit_test_suite(phy_common_props_test_suite);
++
++MODULE_DESCRIPTION("Test module for PHY common properties API");
++MODULE_AUTHOR("Vladimir Oltean <vladimir.oltean@nxp.com>");
++MODULE_LICENSE("GPL");
+diff --git a/drivers/phy/phy-common-props.c b/drivers/phy/phy-common-props.c
+new file mode 100644
+index 000000000000..120b5562ade5
+--- /dev/null
++++ b/drivers/phy/phy-common-props.c
+@@ -0,0 +1,216 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * phy-common-props.c  --  Common PHY properties
++ *
++ * Copyright 2025-2026 NXP
++ */
++#include <linux/export.h>
++#include <linux/fwnode.h>
++#include <linux/phy/phy-common-props.h>
++#include <linux/printk.h>
++#include <linux/property.h>
++#include <linux/slab.h>
++
++/**
++ * fwnode_get_u32_prop_for_name - Find u32 property by name, or default value
++ * @fwnode: Pointer to firmware node, or NULL to use @default_val
++ * @name: Property name used as lookup key in @names_title (must not be NULL)
++ * @props_title: Name of u32 array property holding values
++ * @names_title: Name of string array property holding lookup keys
++ * @default_val: Default value if @fwnode is NULL or @props_title is empty
++ * @val: Pointer to store the returned value
++ *
++ * This function retrieves a u32 value from @props_title based on a name lookup
++ * in @names_title. The value stored in @val is determined as follows:
++ *
++ * - If @fwnode is NULL or @props_title is empty: @default_val is used
++ * - If @props_title has exactly one element and @names_title is empty:
++ *   that element is used
++ * - Otherwise: @val is set to the element at the same index where @name is
++ *   found in @names_title.
++ * - If @name is not found, the function looks for a "default" entry in
++ *   @names_title and uses the corresponding value from @props_title
++ *
++ * When both @props_title and @names_title are present, they must have the
++ * same number of elements (except when @props_title has exactly one element).
++ *
++ * Return: zero on success, negative error on failure.
++ */
++static int fwnode_get_u32_prop_for_name(struct fwnode_handle *fwnode,
++					const char *name,
++					const char *props_title,
++					const char *names_title,
++					unsigned int default_val,
++					unsigned int *val)
++{
++	int err, n_props, n_names, idx = -1;
++	u32 *props;
++
++	if (!name) {
++		pr_err("Lookup key inside \"%s\" is mandatory\n", names_title);
++		return -EINVAL;
++	}
++
++	if (!fwnode) {
++		*val = default_val;
++		return 0;
++	}
++
++	err = fwnode_property_count_u32(fwnode, props_title);
++	if (err < 0)
++		return err;
++	if (err == 0) {
++		*val = default_val;
++		return 0;
++	}
++	n_props = err;
++
++	n_names = fwnode_property_string_array_count(fwnode, names_title);
++	if (n_names >= 0 && n_props != n_names) {
++		pr_err("%pfw mismatch between \"%s\" and \"%s\" property count (%d vs %d)\n",
++		       fwnode, props_title, names_title, n_props, n_names);
++		return -EINVAL;
++	}
++
++	idx = fwnode_property_match_string(fwnode, names_title, name);
++	if (idx < 0)
++		idx = fwnode_property_match_string(fwnode, names_title, "default");
++	/*
++	 * If the mode name is missing, it can only mean the specified property
++	 * is the default one for all modes, so reject any other property count
++	 * than 1.
++	 */
++	if (idx < 0 && n_props != 1) {
++		pr_err("%pfw \"%s \" property has %d elements, but cannot find \"%s\" in \"%s\" and there is no default value\n",
++		       fwnode, props_title, n_props, name, names_title);
++		return -EINVAL;
++	}
++
++	if (n_props == 1) {
++		err = fwnode_property_read_u32(fwnode, props_title, val);
++		if (err)
++			return err;
++
++		return 0;
++	}
++
++	/* We implicitly know idx >= 0 here */
++	props = kcalloc(n_props, sizeof(*props), GFP_KERNEL);
++	if (!props)
++		return -ENOMEM;
++
++	err = fwnode_property_read_u32_array(fwnode, props_title, props, n_props);
++	if (err >= 0)
++		*val = props[idx];
++
++	kfree(props);
++
++	return err;
++}
++
++static int phy_get_polarity_for_mode(struct fwnode_handle *fwnode,
++				     const char *mode_name,
++				     unsigned int supported,
++				     unsigned int default_val,
++				     const char *polarity_prop,
++				     const char *names_prop,
++				     unsigned int *val)
++{
++	int err;
++
++	err = fwnode_get_u32_prop_for_name(fwnode, mode_name, polarity_prop,
++					   names_prop, default_val, val);
++	if (err)
++		return err;
++
++	if (!(supported & BIT(*val))) {
++		pr_err("%d is not a supported value for %pfw '%s' element '%s'\n",
++		       *val, fwnode, polarity_prop, mode_name);
++		err = -EOPNOTSUPP;
++	}
++
++	return err;
++}
++
++/**
++ * phy_get_rx_polarity - Get RX polarity for PHY differential lane
++ * @fwnode: Pointer to the PHY's firmware node.
++ * @mode_name: The name of the PHY mode to look up.
++ * @supported: Bit mask of PHY_POL_NORMAL, PHY_POL_INVERT and PHY_POL_AUTO
++ * @default_val: Default polarity value if property is missing
++ * @val: Pointer to returned polarity.
++ *
++ * Return: zero on success, negative error on failure.
++ */
++int __must_check phy_get_rx_polarity(struct fwnode_handle *fwnode,
++				     const char *mode_name,
++				     unsigned int supported,
++				     unsigned int default_val,
++				     unsigned int *val)
++{
++	return phy_get_polarity_for_mode(fwnode, mode_name, supported,
++					 default_val, "rx-polarity",
++					 "rx-polarity-names", val);
++}
++EXPORT_SYMBOL_GPL(phy_get_rx_polarity);
++
++/**
++ * phy_get_tx_polarity - Get TX polarity for PHY differential lane
++ * @fwnode: Pointer to the PHY's firmware node.
++ * @mode_name: The name of the PHY mode to look up.
++ * @supported: Bit mask of PHY_POL_NORMAL and PHY_POL_INVERT
++ * @default_val: Default polarity value if property is missing
++ * @val: Pointer to returned polarity.
++ *
++ * Return: zero on success, negative error on failure.
++ */
++int __must_check phy_get_tx_polarity(struct fwnode_handle *fwnode,
++				     const char *mode_name, unsigned int supported,
++				     unsigned int default_val, unsigned int *val)
++{
++	return phy_get_polarity_for_mode(fwnode, mode_name, supported,
++					 default_val, "tx-polarity",
++					 "tx-polarity-names", val);
++}
++EXPORT_SYMBOL_GPL(phy_get_tx_polarity);
++
++/**
++ * phy_get_manual_rx_polarity - Get manual RX polarity for PHY differential lane
++ * @fwnode: Pointer to the PHY's firmware node.
++ * @mode_name: The name of the PHY mode to look up.
++ * @val: Pointer to returned polarity.
++ *
++ * Helper for PHYs which do not support protocols with automatic RX polarity
++ * detection and correction.
++ *
++ * Return: zero on success, negative error on failure.
++ */
++int __must_check phy_get_manual_rx_polarity(struct fwnode_handle *fwnode,
++					    const char *mode_name,
++					    unsigned int *val)
++{
++	return phy_get_rx_polarity(fwnode, mode_name,
++				   BIT(PHY_POL_NORMAL) | BIT(PHY_POL_INVERT),
++				   PHY_POL_NORMAL, val);
++}
++EXPORT_SYMBOL_GPL(phy_get_manual_rx_polarity);
++
++/**
++ * phy_get_manual_tx_polarity - Get manual TX polarity for PHY differential lane
++ * @fwnode: Pointer to the PHY's firmware node.
++ * @mode_name: The name of the PHY mode to look up.
++ * @val: Pointer to returned polarity.
++ *
++ * Helper for PHYs without any custom default value for the TX polarity.
++ *
++ * Return: zero on success, negative error on failure.
++ */
++int __must_check phy_get_manual_tx_polarity(struct fwnode_handle *fwnode,
++					    const char *mode_name,
++					    unsigned int *val)
++{
++	return phy_get_tx_polarity(fwnode, mode_name,
++				   BIT(PHY_POL_NORMAL) | BIT(PHY_POL_INVERT),
++				   PHY_POL_NORMAL, val);
++}
++EXPORT_SYMBOL_GPL(phy_get_manual_tx_polarity);
+diff --git a/include/linux/phy/phy-common-props.h b/include/linux/phy/phy-common-props.h
+new file mode 100644
+index 000000000000..680e13de4558
+--- /dev/null
++++ b/include/linux/phy/phy-common-props.h
+@@ -0,0 +1,32 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * phy-common-props.h -- Common properties for generic PHYs
++ *
++ * Copyright 2025 NXP
++ */
++
++#ifndef __PHY_COMMON_PROPS_H
++#define __PHY_COMMON_PROPS_H
++
++#include <dt-bindings/phy/phy.h>
++
++struct fwnode_handle;
++
++int __must_check phy_get_rx_polarity(struct fwnode_handle *fwnode,
++				     const char *mode_name,
++				     unsigned int supported,
++				     unsigned int default_val,
++				     unsigned int *val);
++int __must_check phy_get_tx_polarity(struct fwnode_handle *fwnode,
++				     const char *mode_name,
++				     unsigned int supported,
++				     unsigned int default_val,
++				     unsigned int *val);
++int __must_check phy_get_manual_rx_polarity(struct fwnode_handle *fwnode,
++					    const char *mode_name,
++					    unsigned int *val);
++int __must_check phy_get_manual_tx_polarity(struct fwnode_handle *fwnode,
++					    const char *mode_name,
++					    unsigned int *val);
++
++#endif /* __PHY_COMMON_PROPS_H */
 -- 
 2.34.1
 
