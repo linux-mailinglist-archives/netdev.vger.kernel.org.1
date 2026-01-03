@@ -1,203 +1,294 @@
-Return-Path: <netdev+bounces-246638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06033CEFAAC
-	for <lists+netdev@lfdr.de>; Sat, 03 Jan 2026 05:41:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79B10CEFADF
+	for <lists+netdev@lfdr.de>; Sat, 03 Jan 2026 05:57:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8501D3012256
-	for <lists+netdev@lfdr.de>; Sat,  3 Jan 2026 04:41:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BEF2D3012241
+	for <lists+netdev@lfdr.de>; Sat,  3 Jan 2026 04:57:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BEE41BD035;
-	Sat,  3 Jan 2026 04:41:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E03F5228C9D;
+	Sat,  3 Jan 2026 04:57:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cFYehaCi"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Z44brt+4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f67.google.com (mail-yx1-f67.google.com [74.125.224.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7D12744F
-	for <netdev@vger.kernel.org>; Sat,  3 Jan 2026 04:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.67
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20C9E20E31C;
+	Sat,  3 Jan 2026 04:57:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767415274; cv=none; b=shrEvWT1RJY6GmFb383BvwVnkVgq9SqS9tGJ5VDV5r4/fNuKVNiSXq59jywymuhb7RuIb2VpLPVgBRVOT8QKBkqe/x4Vs+rpEKKjAGM8wKl8ROvg/6IByC4rNc96JsuO/SnkVZD3DcFPkrnrnU6Tg6kNt5haxk97t+/mfGFE0yg=
+	t=1767416227; cv=none; b=dmZfndUaV+z1VDwpMGzXhuLtskzh3A/035NlrMzRupkq0XK3jbqsWYBYZDyKNjXJB2TZVEUor2HUENi0IQ9FUr8mxg9GNS6Zsmahko3P6Wsfm93rez+FI6QatOZuP0e9zxsCmFS1aL3CQ3sdmgDMsmBKVrYdkahJnSFZjVa0qL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767415274; c=relaxed/simple;
-	bh=0+LkSwSLxMfBSS6LmX+QdOh//xZ3eXwArE503ClxAC8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kXOQkqx4D7tw6BD1G+x+gGtp2xd2KOmoifBN4qafLHo2UHS5ZPHy2Pdtux0OesYQCcwB0OalMLMgeeP7sGuRk/3H36soCcpGh6Rx/lODWwKU3CVOpD1WGpH1RquFRf13bK5MhCcZLA0nvHuSyXvUO1O6vKeCAtJiIBYSq6ULB8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cFYehaCi; arc=none smtp.client-ip=74.125.224.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f67.google.com with SMTP id 956f58d0204a3-6466d8fd383so10038967d50.2
-        for <netdev@vger.kernel.org>; Fri, 02 Jan 2026 20:41:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767415271; x=1768020071; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u55nSpyWrrztdfEQVGRs1g73yYdmmd3y+S7959wC3Qw=;
-        b=cFYehaCidioPmVUyVu+ysDON15flE+lJw5MzbWaxoqiyIUsyE0S316kBWfAxfONy0N
-         2w5G3gG/R2+BbZhqkow7orlzcbWs366zOYMwsPNwblaKwAzVrAyaRumrdHrCuFtJSOrS
-         HizLEvo8HAuXa0AVRn7YX0AjcMZMNLjjiOTUdvVe9zF9zFoYaPNfJRv6NW7Qq1bfaWcb
-         T5LMe8AFy9EzveHnTaso7PQrnH8HcLmjU0/UYkaacL4mUFG7g5JlU1FZQhJ8Dt7E+fBI
-         f8slCKCk6Om2LldGWuXqNf6arBqnJNgpcOcTx82ulFHmxVPuCDCXoxtL0PvfzczMvxUb
-         irBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767415271; x=1768020071;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=u55nSpyWrrztdfEQVGRs1g73yYdmmd3y+S7959wC3Qw=;
-        b=eBTlyJ3SkZ0nZNwtqQzG1EPeiKip5AeML3P9VV7JvgmBgIYChuBRBw5VTr4/FgH2QM
-         m3oNo8NMCdI7KcNgFGuQebEVrHNUfAuhQDK5U56GEyuM8QL3rf83LXwhK+SrgQzPWnNl
-         l9VxbUCdGQOMKpXEWFdnA/ZDg4jQDXVcTTM7B599qr8urCo3T497O0I5V/NvgZyfGKA9
-         VucwcbXiUqKtDoL1FB3vwXZJ+EthrwrSPUeFv2y4Svv5dgsd9+sF2V7iKOW8tRHnn8ea
-         10QlTH507+BbgW8H4kySuGafFtoON9tqycHlNYE8EPJ/1BaFFJuAiCE3C9E9QKcf0+xu
-         opPg==
-X-Forwarded-Encrypted: i=1; AJvYcCVhNmJp7Ivixoyyfl3ESztfZ2yttGpxN1g47DfZd6oxRFHNQ86iudxeQpuSUXQlsvV6jvL7CjA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCCEbvMwIZJ+pjbi/uJotrTsoyeVFFxrVryQjTkwnoLbO3GmZU
-	rL4y3oEaxkv0/nWKtmvjY/qwP/GhqVsrgwV85Lujf3CcCEl2W8B45DzfXrufDiC1J1s7xZ72mXq
-	o4o3hdOHEECMbAoGUGZvNoiPT+JQKolo=
-X-Gm-Gg: AY/fxX669P0NpgPV1LkMoauGJpj5tEt08T7AWcisHTwvfgFt5blp5+sSGJ06yKES/Aw
-	uULS96NvjkcnxsY1cS58zFz3CtStzfkkmclF3sjf/Ft9yzUKCGQR3HQj6KR3j1Ew6bXL+vFLMpv
-	QJ2YDMCMBDJEazxdJsRfSpmhFPOHzsM5eVr6Xq95RNsLA/hhmzuwJNNUpNHi8aMbPkNED4LhpoF
-	Z1t6y1JOx6x4oT8ttu0CzDyydEBDcCyfll1MoJVtJOH3tFJZENmb9cphwx3piYor1kArcY=
-X-Google-Smtp-Source: AGHT+IGykmfUKli6phhTxdOxBn5HgeYWHuY3ueRidHGG1DUJpaEk/3LscYz8m56j9vI9mueBy2Wkm88SoZfjLzw18Wk=
-X-Received: by 2002:a05:690e:bce:b0:644:7b59:4219 with SMTP id
- 956f58d0204a3-6466a87ecc6mr32492107d50.10.1767415271290; Fri, 02 Jan 2026
- 20:41:11 -0800 (PST)
+	s=arc-20240116; t=1767416227; c=relaxed/simple;
+	bh=+f3ZRJAXg+xPmggbZCY4R8p0d2XUOUhaFD61CPOaa+4=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=L5/3Rcw+Klg3E/Otkvf6TdNKxQe0LHJVjg5fuo/8XbwNQkZ9NmARSS94H//WE4VGBqlEETca6YX50/daHcjzzA/JheqyKtN+dRO8Bka1bJ8wjoZF4mhhmTvGIptyRPojecnFdV1Ts74HGsLnXaP/tohkAL2lMlhW3ZmGOqIu6Kc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Z44brt+4; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id A31E2212536C; Fri,  2 Jan 2026 20:57:05 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A31E2212536C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1767416225;
+	bh=HuIWNrscgxXLoTeyAWg1MtA44CEADUTTT7E6koSAQ9g=;
+	h=Date:From:To:Subject:From;
+	b=Z44brt+4AnkBlBQ13REvAabQ2E6ktBUvrwBUSgYRGPNmHbiPNdR96lICeIC7nI4C9
+	 psX6rkvEwLoPMQKLueAemfXOHBoZ7u1P1E0IBxAQnTLLBSNCskaegxrzWEWUUFyrsD
+	 9BHc3Dsohx+UMGtfahaMcxMOlUu4NqoahnFfW2b0=
+Date: Fri, 2 Jan 2026 20:57:05 -0800
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	dipayanroy@microsoft.com
+Subject: [PATCH net-next, v6] net: mana: Implement ndo_tx_timeout and
+ serialize queue resets per port.
+Message-ID: <20260103045705.GA3757@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251224130735.201422-1-dongml2@chinatelecom.cn> <CAADnVQJRXWtt3MY+Z+mZerYjir-735z9_mbLJQF-TyUL9pFt5g@mail.gmail.com>
-In-Reply-To: <CAADnVQJRXWtt3MY+Z+mZerYjir-735z9_mbLJQF-TyUL9pFt5g@mail.gmail.com>
-From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Sat, 3 Jan 2026 12:41:00 +0800
-X-Gm-Features: AQt7F2olmvAh-RSX3Ph-HRL35i6uoxOqGSgbb7YMhYeBqMxy_u8ecmMmivLfQqs
-Message-ID: <CADxym3Ztg28LwFsZ8K_RSmBxHuzwKcL8Q339WDoid8H95QwJGA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v5 00/10] bpf: fsession support
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard <eddyz87@gmail.com>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, jiang.biao@linux.dev, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, bpf <bpf@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Sat, Jan 3, 2026 at 7:21=E2=80=AFAM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Wed, Dec 24, 2025 at 5:07=E2=80=AFAM Menglong Dong <menglong8.dong@gma=
-il.com> wrote:
-> >
-> > Hi, all.
-> >
-> > In this version, I did some modifications according to Andrii's
-> > suggestion.
-> >
-> > overall
-> > -------
-> > Sometimes, we need to hook both the entry and exit of a function with
-> > TRACING. Therefore, we need define a FENTRY and a FEXIT for the target
-> > function, which is not convenient.
-> >
-> > Therefore, we add a tracing session support for TRACING. Generally
-> > speaking, it's similar to kprobe session, which can hook both the entry
-> > and exit of a function with a single BPF program.
-> >
-> > We allow the usage of bpf_get_func_ret() to get the return value in the
-> > fentry of the tracing session, as it will always get "0", which is safe
-> > enough and is OK.
-> >
-> > Session cookie is also supported with the kfunc bpf_fsession_cookie().
-> > In order to limit the stack usage, we limit the maximum number of cooki=
-es
-> > to 4.
-> >
-> > kfunc design
-> > ------------
-> > The kfunc bpf_fsession_is_return() and bpf_fsession_cookie() are
-> > introduced, and they are both inlined in the verifier.
-> >
-> > In current solution, we can't reuse the existing bpf_session_cookie() a=
-nd
-> > bpf_session_is_return(), as their prototype is different from
-> > bpf_fsession_is_return() and bpf_fsession_cookie(). In
-> > bpf_fsession_cookie(), we need the function argument "void *ctx" to get
-> > the cookie. However, the prototype of bpf_session_cookie() is "void".
-> >
-> > Maybe it's possible to reuse the existing bpf_session_cookie() and
-> > bpf_session_is_return(). First, we move the nr_regs from stack to struc=
-t
-> > bpf_tramp_run_ctx, as Andrii suggested before. Then, we define the sess=
-ion
-> > cookies as flexible array in bpf_tramp_run_ctx like this:
-> >     struct bpf_tramp_run_ctx {
-> >         struct bpf_run_ctx run_ctx;
-> >         u64 bpf_cookie;
-> >         struct bpf_run_ctx *saved_run_ctx;
-> >         u64 func_meta; /* nr_args, cookie_index, etc */
-> >         u64 fsession_cookies[];
-> >     };
-> >
-> > The problem of this approach is that we can't inlined the bpf helper
-> > anymore, such as get_func_arg, get_func_ret, get_func_arg_cnt, etc, as
-> > we can't use the "current" in BPF assembly.
-> >
-> > So maybe it's better to use the new kfunc for now? And I'm analyzing th=
-at
-> > if it is possible to inline "current" in verifier. Maybe we can convert=
- to
-> > the solution above if it success.
->
-> I suspect your separate patch set to inline get_current addresses
->  this concern?
+Implement .ndo_tx_timeout for MANA so any stalled TX queue can be detected
+and a device-controlled port reset for all queues can be scheduled to a
+ordered workqueue. The reset for all queues on stall detection is
+recomended by hardware team.
 
-Yeah. I'm hesitating if we should do it this way. I found that
-even though we can inline the "current", which can be done by
-using the "call bpf_get_current_task" in verifier, it's still hard to inlin=
-e
-the following function:
+Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+---
+Changes in v6:
+  - Rebased.
+Changes in v5:
+  -Fixed commit message, used 'create_singlethread_workqueue' and fixed
+   cleanup part.
+Changes in v4:
+  -Fixed commit message, work initialization before registering netdev,
+   fixed potential null pointer de-reference bug.
+Changes in v3:
+  -Fixed commit meesage, removed rtnl_trylock and added
+   disable_work_sync, fixed mana_queue_reset_work, and few
+   cosmetics.
+Changes in v2:
+  -Fixed cosmetic changes.
+---
+---
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 77 ++++++++++++++++++-
+ include/net/mana/gdma.h                       |  7 +-
+ include/net/mana/mana.h                       |  8 +-
+ 3 files changed, 89 insertions(+), 3 deletions(-)
 
-__bpf_kfunc void *bpf_fsession_cookie(void)
-{
-    ......
-    return run_ctx->fsession_cookies[run_ctx->func_meta >> BPF_TRAMP_M_COOK=
-IE];
-}
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index 1ad154f9db1a..d8451f550db4 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -299,6 +299,42 @@ static int mana_get_gso_hs(struct sk_buff *skb)
+ 	return gso_hs;
+ }
+ 
++static void mana_per_port_queue_reset_work_handler(struct work_struct *work)
++{
++	struct mana_queue_reset_work *reset_queue_work =
++			container_of(work, struct mana_queue_reset_work, work);
++
++	struct mana_port_context *apc = container_of(reset_queue_work,
++						     struct mana_port_context,
++						     queue_reset_work);
++	struct net_device *ndev = apc->ndev;
++	int err;
++
++	rtnl_lock();
++
++	/* Pre-allocate buffers to prevent failure in mana_attach later */
++	err = mana_pre_alloc_rxbufs(apc, ndev->mtu, apc->num_queues);
++	if (err) {
++		netdev_err(ndev, "Insufficient memory for reset post tx stall detection\n");
++		goto out;
++	}
++
++	err = mana_detach(ndev, false);
++	if (err) {
++		netdev_err(ndev, "mana_detach failed: %d\n", err);
++		goto dealloc_pre_rxbufs;
++	}
++
++	err = mana_attach(ndev);
++	if (err)
++		netdev_err(ndev, "mana_attach failed: %d\n", err);
++
++dealloc_pre_rxbufs:
++	mana_pre_dealloc_rxbufs(apc);
++out:
++	rtnl_unlock();
++}
++
+ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+ {
+ 	enum mana_tx_pkt_format pkt_fmt = MANA_SHORT_PKT_FMT;
+@@ -839,6 +875,23 @@ static int mana_change_mtu(struct net_device *ndev, int new_mtu)
+ 	return err;
+ }
+ 
++static void mana_tx_timeout(struct net_device *netdev, unsigned int txqueue)
++{
++	struct mana_port_context *apc = netdev_priv(netdev);
++	struct mana_context *ac = apc->ac;
++	struct gdma_context *gc = ac->gdma_dev->gdma_context;
++
++	/* Already in service, hence tx queue reset is not required.*/
++	if (gc->in_service)
++		return;
++
++	/* Note: If there are pending queue reset work for this port(apc),
++	 * subsequent request queued up from here are ignored. This is because
++	 * we are using the same work instance per port(apc).
++	 */
++	queue_work(ac->per_port_queue_reset_wq, &apc->queue_reset_work.work);
++}
++
+ static int mana_shaper_set(struct net_shaper_binding *binding,
+ 			   const struct net_shaper *shaper,
+ 			   struct netlink_ext_ack *extack)
+@@ -924,6 +977,7 @@ static const struct net_device_ops mana_devops = {
+ 	.ndo_bpf		= mana_bpf,
+ 	.ndo_xdp_xmit		= mana_xdp_xmit,
+ 	.ndo_change_mtu		= mana_change_mtu,
++	.ndo_tx_timeout		= mana_tx_timeout,
+ 	.net_shaper_ops         = &mana_shaper_ops,
+ };
+ 
+@@ -3287,6 +3341,8 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+ 	ndev->min_mtu = ETH_MIN_MTU;
+ 	ndev->needed_headroom = MANA_HEADROOM;
+ 	ndev->dev_port = port_idx;
++	/* Recommended timeout based on HW FPGA re-config scenario. */
++	ndev->watchdog_timeo = 15 * HZ;
+ 	SET_NETDEV_DEV(ndev, gc->dev);
+ 
+ 	netif_set_tso_max_size(ndev, GSO_MAX_SIZE);
+@@ -3303,6 +3359,10 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+ 	if (err)
+ 		goto reset_apc;
+ 
++	/* Initialize the per port queue reset work.*/
++	INIT_WORK(&apc->queue_reset_work.work,
++		  mana_per_port_queue_reset_work_handler);
++
+ 	netdev_lockdep_set_classes(ndev);
+ 
+ 	ndev->hw_features = NETIF_F_SG | NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM;
+@@ -3549,6 +3609,14 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
+ 	if (ac->num_ports > MAX_PORTS_IN_MANA_DEV)
+ 		ac->num_ports = MAX_PORTS_IN_MANA_DEV;
+ 
++	ac->per_port_queue_reset_wq =
++		create_singlethread_workqueue("mana_per_port_queue_reset_wq");
++	if (!ac->per_port_queue_reset_wq) {
++		dev_err(dev, "Failed to allocate per port queue reset workqueue\n");
++		err = -ENOMEM;
++		goto out;
++	}
++
+ 	if (!resuming) {
+ 		for (i = 0; i < ac->num_ports; i++) {
+ 			err = mana_probe_port(ac, i, &ac->ports[i]);
+@@ -3616,13 +3684,15 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+ 
+ 	for (i = 0; i < ac->num_ports; i++) {
+ 		ndev = ac->ports[i];
+-		apc = netdev_priv(ndev);
+ 		if (!ndev) {
+ 			if (i == 0)
+ 				dev_err(dev, "No net device to remove\n");
+ 			goto out;
+ 		}
+ 
++		apc = netdev_priv(ndev);
++		disable_work_sync(&apc->queue_reset_work.work);
++
+ 		/* All cleanup actions should stay after rtnl_lock(), otherwise
+ 		 * other functions may access partially cleaned up data.
+ 		 */
+@@ -3649,6 +3719,11 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+ 
+ 	mana_destroy_eq(ac);
+ out:
++	if (ac->per_port_queue_reset_wq) {
++		destroy_workqueue(ac->per_port_queue_reset_wq);
++		ac->per_port_queue_reset_wq = NULL;
++	}
++
+ 	mana_gd_deregister_device(gd);
+ 
+ 	if (suspending)
+diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
+index eaa27483f99b..a59bd4035a99 100644
+--- a/include/net/mana/gdma.h
++++ b/include/net/mana/gdma.h
+@@ -598,6 +598,10 @@ enum {
+ 
+ /* Driver can self reset on FPGA Reconfig EQE notification */
+ #define GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE BIT(17)
++
++/* Driver detects stalled send queues and recovers them */
++#define GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY BIT(18)
++
+ #define GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE BIT(6)
+ 
+ /* Driver supports linearizing the skb when num_sge exceeds hardware limit */
+@@ -621,7 +625,8 @@ enum {
+ 	 GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE | \
+ 	 GDMA_DRV_CAP_FLAG_1_PERIODIC_STATS_QUERY | \
+ 	 GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE | \
+-	 GDMA_DRV_CAP_FLAG_1_PROBE_RECOVERY)
++	 GDMA_DRV_CAP_FLAG_1_PROBE_RECOVERY | \
++	 GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY)
+ 
+ #define GDMA_DRV_CAP_FLAGS2 0
+ 
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index d7e089c6b694..cef78a871c7c 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -480,7 +480,7 @@ struct mana_context {
+ 	struct mana_ethtool_hc_stats hc_stats;
+ 	struct mana_eq *eqs;
+ 	struct dentry *mana_eqs_debugfs;
+-
++	struct workqueue_struct *per_port_queue_reset_wq;
+ 	/* Workqueue for querying hardware stats */
+ 	struct delayed_work gf_stats_work;
+ 	bool hwc_timeout_occurred;
+@@ -492,9 +492,15 @@ struct mana_context {
+ 	u32 link_event;
+ };
+ 
++struct mana_queue_reset_work {
++	/* Work structure */
++	struct work_struct work;
++};
++
+ struct mana_port_context {
+ 	struct mana_context *ac;
+ 	struct net_device *ndev;
++	struct mana_queue_reset_work queue_reset_work;
+ 
+ 	u8 mac_addr[ETH_ALEN];
+ 
+-- 
+2.43.0
 
-We can only use the r0 register during the inline, and we
-need at least another one register to finish the logic above. Do we
-have a temporary register that can be used here?
-
-I'm not sure if the effort is worth it, so I think maybe it's better
-to keep the current approach. As for the inline of get_current,
-it's an optimization that we can do anyway.
-
->
-> > architecture
-> > ------------
-> > The fsession stuff is arch related, so the -EOPNOTSUPP will be returned=
- if
-> > it is not supported yet by the arch. In this series, we only support
-> > x86_64. And later, other arch will be implemented.
-> >
-> > Changes since v4:
->
-> v5 looks to be in good shape. It needs a rebase now due to conflicts.
-
-OK, I'll rebase and send it later.
-
-Thanks!
-Menglong Dong
 
