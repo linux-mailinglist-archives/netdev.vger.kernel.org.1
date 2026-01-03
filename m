@@ -1,287 +1,238 @@
-Return-Path: <netdev+bounces-246634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F580CEF840
-	for <lists+netdev@lfdr.de>; Sat, 03 Jan 2026 01:16:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58F46CEF8A2
+	for <lists+netdev@lfdr.de>; Sat, 03 Jan 2026 01:27:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8B951300EDFA
-	for <lists+netdev@lfdr.de>; Sat,  3 Jan 2026 00:16:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 75A82305F827
+	for <lists+netdev@lfdr.de>; Sat,  3 Jan 2026 00:24:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 816341B6D1A;
-	Sat,  3 Jan 2026 00:16:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22CA72264C0;
+	Sat,  3 Jan 2026 00:24:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hP++kspM";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="WjdvncfR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QIheJrua"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DEFE3B1B3
-	for <netdev@vger.kernel.org>; Sat,  3 Jan 2026 00:16:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BFE92222C8
+	for <netdev@vger.kernel.org>; Sat,  3 Jan 2026 00:24:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767399372; cv=none; b=K7cX2KuRUZMHuzA6Fo2OalrHDGRo1Ebslos5Clkn0yPuaRE8WsquIfnfMGTQE94IT+NC1v2FfmeTc0wlNwwQvI8P+YhwIzbhH11U1aUpYhNucgsXJ4czsLfYDatzKC3VX+4Xo5PIh+Tz2uaO3kWiE+qY4w5jUhkMkbiqUZyyVn8=
+	t=1767399858; cv=none; b=UOaPPFU81INHxMr7PH8RU44dyCljRhn/mo2F9k/O85572qqqbbbQPOY7OALAb/yKw5/vi9jGnQ8dt3NV8QxhMFWn2wIunMpwQGglbGmbTQieYVhKUev9gDBNpr0EEhhQSw5oXPIPlbuWfg56ibeprN49RkY1jSErqa4QQkUsNPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767399372; c=relaxed/simple;
-	bh=oeixh7OIs8mUJmcLOGI3IzkhbDJiXpGDI0HEiz+o0bI=;
+	s=arc-20240116; t=1767399858; c=relaxed/simple;
+	bh=GrruGnTWNFicIxTKog0wvHUDAWFhHC8XMrj2UCVjKRg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nS02CosZYQWmcnYirSwVE51HA1F15BK6Tim0gf2KKyKx11qa9GCoP66mjLLyWexLaiqN583BmB4XtkG3UCfDakD4kMDoaOtBLyxUQE5Xq6ocHJPc11QC6r2t60YDsyBKMFngvhjdg9WC5z4FHXed2WmgRgiGscatiGGH2Y8f55g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hP++kspM; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=WjdvncfR; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767399368;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LgmwNMSPn56V/BSylDuVjsVQwHfchpHkar4n4cWE59k=;
-	b=hP++kspMAVBA5GHMPbhaI6TspRmfsTQFMK4UwIARAivylV4Mt3kOrGu5pvuhKoePu6biNw
-	apY+O6lFtWvNZydk0HHGxVUFwfpwd/u54rQ+Mh1b0b7dXxZU5OTC7gIITewlbF2Y3/k00p
-	5e0hxamCbjNT1s9NxQNemrhzSc+GBe4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-335-ifUOeMOXO0eVlLP9oyWEVQ-1; Fri, 02 Jan 2026 19:16:07 -0500
-X-MC-Unique: ifUOeMOXO0eVlLP9oyWEVQ-1
-X-Mimecast-MFC-AGG-ID: ifUOeMOXO0eVlLP9oyWEVQ_1767399366
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-477cf2230c8so126070305e9.0
-        for <netdev@vger.kernel.org>; Fri, 02 Jan 2026 16:16:07 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=GxFhlx5Je8qYZKnM5tOmZQ2hVD8pLfPhKhKiAS0xBGg0f4qnrRJbCF9rMpTKalaKPUufcEs+kS0DijBse2kzA5OlWT1wNaj4xdhxEX7q5HPMfZwPwg9BKHGm7MbXKWc9pLe8F6V4yapCYno0gIiuDnpEmnloNmfvycqsdXucpts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QIheJrua; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-430f6ab1f67so647908f8f.0
+        for <netdev@vger.kernel.org>; Fri, 02 Jan 2026 16:24:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767399366; x=1768004166; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LgmwNMSPn56V/BSylDuVjsVQwHfchpHkar4n4cWE59k=;
-        b=WjdvncfRf5n53SHe0OsSm2VkH9cRfVBUFmyxvQhRrV+xSedquWUIcDC5w9zii5N/Ti
-         M2i6hbeIDYAyObE4y4EZhdVKA7oqmWLjDAC8elekvz/cHSlXlC5hneLbttt65jj7ATYB
-         XFRT/z41YRYs6ftgPgz9I+vA3iMZtKg3huzQMRcHtagOWGvtbQsDWtpOhwlydOYVpKYd
-         keWe+UvRsyTsD8Zbw2GpiOiVSrxSXjE2F3NCmnGFKLSjZXjz0Hesu3SSLFZDEGVAnZOP
-         WvdTeSq8zE6NeSeIBHmD5myiujVBDKsOrWOB3MmpRd2L8cf1wxKKkRMrWuc5bk2h6wih
-         DZrg==
+        d=gmail.com; s=20230601; t=1767399854; x=1768004654; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=D95a5c1nOaQkivBqExxtnMCQs8Q4tlZPGQfVh8XzhJ8=;
+        b=QIheJrua19UO2Tgvy6iSVcdH7C9ubyYrEgcR4d+a/EEPhJM1MlGi5Ha2qW2+5Y3JP6
+         eK82d+ymADRm7v30o+2q8NbC1Gw6aK+6VVj95+bqTT6S/f3m63Ud+lZicAzsvKuEL/ck
+         bp+KQEwhNOuKacSziE3VoPImMPyE4oE9q0uA/T5+hCwQvm2rZwHEOYXFiFU2Bm7UVNMJ
+         tVdK4mMdlnHMVWSaEUXKER7wSCFAVCbu639s0JSjjVGr6bA7UuovpkyLqoCYRB0ABIJJ
+         5izIeu9DpnOMdAmq2VrW4S3eqIUt59r5tCOzGefSmXhxtcsmOhktfgkVwTWUDRh4WCoL
+         tspA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767399366; x=1768004166;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LgmwNMSPn56V/BSylDuVjsVQwHfchpHkar4n4cWE59k=;
-        b=hD1zJtN4whEj5SruQ47P7TOkNPKor4L6uPQUxchVj/4CwGfeumEtYnjyuvGDyf35v2
-         zr+tRgJiZ+fBRYTZuXMHqf1o+1ReaBNNSms/CxcSQe+uKbadM2b/cT5g/LlOWKtLfj5Q
-         tgGXlbxqimrVhrGFFarMsRhHN1zsf4HqGZzgHfPsrqyUJzX2BYdqmMXNSa14aax1buv4
-         bXXCgJUc6DOi8SCiOaOqA8G3fE5ZXTpvWm1i4iLf6riKVVPTfau2vL0qeAXkzoFSv/vt
-         /hNcCPBR30fCsVFczBMsX0JqqayHdH7iGDSfqot+zPiMCsnsOr2mOKEvKhqN6tx+OdrN
-         oOwg==
-X-Gm-Message-State: AOJu0Yxi+zYTqIxIszlnJGSW3bK3xAk3AGIOg/KRRg5RXUU6ZxwLa3Qg
-	3uwUBjvhQuU4Hf1Bqvc1kliKcSNV8s4tzSqJBjghAf9+1r1b378kz2esmCi2e4Ph+qSCyjT2mVO
-	+fBpNoLVJDLlVvkkV53LHo/ccHoJPdcNSk0dzCo5ltiO9tXeBnWvYu0Skx4Gi7C3DWQ==
-X-Gm-Gg: AY/fxX4CXF1Eel7KtfUx9l1ASJyd7EvdFtssqiHxQN+0qp/B1bLXUvp8IkGZpKaIOg0
-	JEI/Ves4gQP83whU6jXLg4aK0Y3WosITEtJt4G5CBHVC7cWyjG5/pPTfnz6CiB/uQbsT4rOdsxP
-	WHPOE55O5L+lallgGeZ3D46zXFocE0xH+YyfeSLR22JykMTdfG6YTsMJpi/nLzPFg4sL9rFB+iO
-	UEPAJb+dyzf7CQ2pWzYci+McOK35zOOQu8xWS16u/XSBhOUSor/2niBXZ0Bp4rBP1vZZ4C6wrMA
-	aFgXaxxdbdSpbxJAlbij0/D9UT59iPNL7FjRrQOQIYVjWhgQJvcaANUvT11HevaygJC7BDCg44s
-	GC4HXOQ==
-X-Received: by 2002:a05:6000:2909:b0:430:f97a:6f43 with SMTP id ffacd0b85a97d-4324e709710mr66217961f8f.53.1767399365836;
-        Fri, 02 Jan 2026 16:16:05 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH9aB7zkIrFTuuZ7xl2WvyXAoAEavadLOe7DzHD1qTfvtUGbDJjbs2g2P+Yqoa6knBaVtt76Q==
-X-Received: by 2002:a05:6000:2909:b0:430:f97a:6f43 with SMTP id ffacd0b85a97d-4324e709710mr66217916f8f.53.1767399365267;
-        Fri, 02 Jan 2026 16:16:05 -0800 (PST)
-Received: from redhat.com ([2a06:c701:73d7:4800:ba30:1c4a:380d:b509])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324eaa64cesm87134943f8f.35.2026.01.02.16.16.02
+        d=1e100.net; s=20230601; t=1767399854; x=1768004654;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=D95a5c1nOaQkivBqExxtnMCQs8Q4tlZPGQfVh8XzhJ8=;
+        b=BD4cpgybtF5Rm/Q65jE0b1eJ5122oe5fYPFvLdBO2d/RFC8VKqViies7u2mxX1Ajap
+         dScXHV6PbrHq80oB2/bj6iGvQcJfhVDU7o01W/RYvfplX6ZmSbB+cs+HbT9cf89LhwRF
+         aIBrusV54s5GZXYK+lfdKQaFQaAq0sqaRfa53HB83qyqH+mNiFwG3PPM4gcffcttncWs
+         1XEOAkx/WPr0HW7PLz7J5p0eacEm0lUwpXEsWdoZp/Hs0cXjp86Zot8QJK8YVWQhQeAb
+         sr5/Y5lOvIls3bmOfU8Pnjpk1z0HNihs4S7Swz6ebD3vqU04CS9sM0QeJ5eEBNL1ycev
+         XKjw==
+X-Forwarded-Encrypted: i=1; AJvYcCXHYBjzh67KJZonhj9f19oZHI7lqvq/gq1h+8jvvY4HLvE5Q7YmRdFeUL6nX439Se+bwNvK688=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVDmyQSDBz+hTQus721k3oC+v8ShCIwgBqAQRwEMkMj1gSaQAM
+	V41TNSz6Xiq2OeCOu7y8KmGTl4Kv1xjOAJuZZcN2PpDOUp33nKjvMcyy
+X-Gm-Gg: AY/fxX6Eh/vAwRyX+ISdHDsWlGXV7cpuqPaUct+Qp48VYDe9f7dzO9BKwScMa9RyOGF
+	ywXe4maoKnAPnokkl/7lda+oiSXzbOIg2T4gS0VMPc0oGfxt9GY+rgbPFyIUMM73/eCEY8XvGkZ
+	p0egJPZlN7HU5TEAU9GQykSPCCb8ahDDJz4A9ML5Fb9ZrprRuE5HRKlJsamHwadWqErVFaz/ZUb
+	42L3rw05wCFi57X8cLCPjYm6TnvAjrfBz3ku6K8n1RuYeAQ5se5PctRMMW2tUecAkSiPRkGEt7D
+	jBP96RoA2jdNCR1r63hedsTQ4pce9M7zboDSEns+1/12q4+UjyaSpe3Cu7ixm76HO7UrJxkXbIg
+	W4tZ/bzNllazJYm4z7z68rlLHJhkTfNMefy04ejht6mjKKW67OmRenRKfJiBvRx4lqstDISxFy0
+	uLjQ==
+X-Google-Smtp-Source: AGHT+IHXO+SKLKqYCf/PmRSq/tuN2EoFNx+cLMtlICEErr5AEN8+fpwT7TqnosDuyMb4fsxKDrG0Pw==
+X-Received: by 2002:a05:600c:310e:b0:477:7a78:3000 with SMTP id 5b1f17b1804b1-47d195815b0mr328415975e9.6.1767399853446;
+        Fri, 02 Jan 2026 16:24:13 -0800 (PST)
+Received: from skbuf ([2a02:2f04:d804:300:99e9:1ddf:4bef:6664])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d6d13ed0asm9818545e9.3.2026.01.02.16.24.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Jan 2026 16:16:04 -0800 (PST)
-Date: Fri, 2 Jan 2026 19:16:00 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net v2 1/3] virtio-net: don't schedule delayed refill
- worker
-Message-ID: <20260102190935-mutt-send-email-mst@kernel.org>
-References: <20260102152023.10773-1-minhquangbui99@gmail.com>
- <20260102152023.10773-2-minhquangbui99@gmail.com>
+        Fri, 02 Jan 2026 16:24:12 -0800 (PST)
+Date: Sat, 3 Jan 2026 02:24:10 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org
+Subject: Re: Fw: [Bug 220932] New: Possible bug (use after free) on DSA
+ driver removal
+Message-ID: <20260103002410.brxrcajbnd2bpq5a@skbuf>
+References: <20260102114605.3351c6eb@phoenix.local>
+ <20260102114605.3351c6eb@phoenix.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20260102152023.10773-2-minhquangbui99@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260102114605.3351c6eb@phoenix.local>
+ <20260102114605.3351c6eb@phoenix.local>
 
-On Fri, Jan 02, 2026 at 10:20:21PM +0700, Bui Quang Minh wrote:
-> When we fail to refill the receive buffers, we schedule a delayed worker
-> to retry later. However, this worker creates some concurrency issues
-> such as races and deadlocks.
+Hi Luiz,
 
-include at least one example here, pls.
-
-> To simplify the logic and avoid further
-> problems, we will instead retry refilling in the next NAPI poll.
+On Fri, Jan 02, 2026 at 11:46:05AM -0800, Stephen Hemminger wrote:
 > 
-> Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
-> Reported-by: Paolo Abeni <pabeni@redhat.com>
-> Closes: https://netdev-ctrl.bots.linux.dev/logs/vmksft/drv-hw-dbg/results/400961/3-xdp-py/stderr
-> Cc: stable@vger.kernel.org
-> Suggested-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
-> ---
->  drivers/net/virtio_net.c | 55 ++++++++++++++++++++++------------------
->  1 file changed, 30 insertions(+), 25 deletions(-)
 > 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 1bb3aeca66c6..ac514c9383ae 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -3035,7 +3035,7 @@ static int virtnet_receive_packets(struct virtnet_info *vi,
->  }
->  
->  static int virtnet_receive(struct receive_queue *rq, int budget,
-> -			   unsigned int *xdp_xmit)
-> +			   unsigned int *xdp_xmit, bool *retry_refill)
->  {
->  	struct virtnet_info *vi = rq->vq->vdev->priv;
->  	struct virtnet_rq_stats stats = {};
-> @@ -3047,12 +3047,8 @@ static int virtnet_receive(struct receive_queue *rq, int budget,
->  		packets = virtnet_receive_packets(vi, rq, budget, xdp_xmit, &stats);
->  
->  	if (rq->vq->num_free > min((unsigned int)budget, virtqueue_get_vring_size(rq->vq)) / 2) {
-> -		if (!try_fill_recv(vi, rq, GFP_ATOMIC)) {
-> -			spin_lock(&vi->refill_lock);
-> -			if (vi->refill_enabled)
-> -				schedule_delayed_work(&vi->refill, 0);
-> -			spin_unlock(&vi->refill_lock);
-> -		}
-> +		if (!try_fill_recv(vi, rq, GFP_ATOMIC))
-> +			*retry_refill = true;
->  	}
->  
->  	u64_stats_set(&stats.packets, packets);
+> Begin forwarded message:
+> 
+> Date: Thu, 01 Jan 2026 22:56:38 +0000
+> From: bugzilla-daemon@kernel.org
+> To: stephen@networkplumber.org
+> Subject: [Bug 220932] New: Possible bug (use after free) on DSA driver removal
+> 
+> 
+> https://bugzilla.kernel.org/show_bug.cgi?id=220932
+> 
+>             Bug ID: 220932
+>            Summary: Possible bug (use after free) on DSA driver removal
+>            Product: Networking
+>            Version: 2.5
+>           Hardware: Mips32
+>                 OS: Linux
+>             Status: NEW
+>           Severity: normal
+>           Priority: P3
+>          Component: Other
+>           Assignee: stephen@networkplumber.org
+>           Reporter: luizluca@gmail.com
+>         Regression: No
+> 
+> While testing a driver patch for OpenWrt (dev), I noticed that the system
+> sometimes crashes a little after I remove the module. I dropped all my patches
+> and bruteforce it:
+> 
+> 
+> echo 'file drivers/net/dsa/realtek/rtl8365mb.c +p' >
+> /sys/kernel/debug/dynamic_debug/control; echo 'file net/dsa/* +p' >
+> /sys/kernel/debug/dynamic_debug/control; rmmod rtl8365mb; echo 0 >
+> /proc/sys/kernel/panic; while true; do sleep 1; insmod /tmp/rtl8365mb.ko; sleep
+> 10; rmmod rtl8365mb; done
+> 
+> 
+> After a couple of cycles, I got this (repeatable) crash below.
+> rtl8365mb_get_tag_protocol and rtl8365mb_port_stp_state_set messages are from a
+> small debug patch I added trying to trace the crash origin but it should not
+> matter.
+> 
+> 
+> [  469.884379] DSA: tree 0 torn down
+> [  471.094669] rtl8365mb-mdio mdio-bus:1d: found an RTL8367S switch
+> [  471.100980] rtl8365mb-mdio mdio-bus:1d: rtl8365mb_get_tag_protocol priv:126ea59d
+> [  471.349018] rtl8365mb-mdio mdio-bus:1d: rtl8365mb_port_stp_state_set priv:126ea59d
+> [  471.357364] rtl8365mb-mdio mdio-bus:1d: rtl8365mb_port_stp_state_set priv:126ea59d
+> [  471.365716] rtl8365mb-mdio mdio-bus:1d: rtl8365mb_port_stp_state_set priv:126ea59d
+> [  471.373964] rtl8365mb-mdio mdio-bus:1d: rtl8365mb_port_stp_state_set priv:126ea59d
+> [  471.382228] rtl8365mb-mdio mdio-bus:1d: rtl8365mb_port_stp_state_set priv:126ea59d
+> [  471.390503] rtl8365mb-mdio mdio-bus:1d: rtl8365mb_port_stp_state_set priv:126ea59d
+> [  471.398580] rtl8365mb-mdio mdio-bus:1d: rtl8365mb_port_change_mtu priv:126ea59d
+> [  471.647590] mtk_soc_eth 10100000.ethernet eth0: port 5 link down
+> [  471.674092] CPU 0 Unable to handle kernel paging request at virtual address 702e7660, epc == 702e7660, ra == 80001e90
+> [  471.685048] Oops[#1]:
+> [  471.687381] CPU: 0 UID: 0 PID: 7473 Comm: modprobe Tainted: G           O       6.12.60 #0
+> [  471.695837] Tainted: [O]=OOT_MODULE
+> [  471.699401] Hardware name: TP-Link Archer C5 v4
+> [  471.704029] $ 0   : 00000000 00000001 81c40560 80a63cdc
+> [  471.709403] $ 4   : 00000cc0 00000001 0004c50b 82ab2f00
+> [  471.714771] $ 8   : 0004c50c 00000cc0 00000000 77e89000
+> [  471.720139] $12   : 00000003 82b8dc0c 00000001 77e8afff
+> [  471.725508] $16   : 00001173 77e89000 7f958894 00400dc1
+> [  471.730877] $20   : 8383fbf8 77e903d0 00000000 7f958730
+> [  471.736246] $24   : 00000003 8084aba8
+> [  471.741613] $28   : 81c1c000 81c1df28 00000000 80001e90
+> [  471.746982] Hi    : 00000000
+> [  471.749926] Lo    : 00000000
+> [  471.752868] epc   : 702e7660 0x702e7660
+> [  471.756798] ra    : 80001e90 work_notifysig+0x10/0x18
+> [  471.761975] Status: 1100b403 KERNEL EXL IE
+> [  471.766269] Cause : 50800008 (ExcCode 02)
+> [  471.770366] BadVA : 702e7660
+> [  471.773309] PrId  : 00019650 (MIPS 24KEc)
+> [  471.777406] Modules linked in: rtl8365mb(+) rt2800soc(O) rt2800mmio(O) rt2800lib(O) pppoe ppp_async nft_fib_inet nf_flow_table_inet rt2x00mmio(O) rt2x00lib(O) pppox ppp_generic nft_reject_ipv6 nft_reject_ipv4 nft_reject_inet nft_reject nft_redir nft_quota nft_numgen nft_nat nft_masq nft_log nft_limit nft_hash nft_flow_offload nft_fib_ipv6 nft_fib_ipv4 nft_fib nft_ct nft_chain_nat nf_tables nf_nat nf_flow_table nf_conntrack mt76x2e(O) mt76x2_common(O) mt76x02_lib(O) mt76(O) mac80211(O) cfg80211(O) slhc nfne tlink nf_reject_ipv6 nf_reject_ipv4 nf_log_syslog nf_defrag_ipv6 nf_defrag_ipv4 libcrc32c crc_ccitt compat(O) i2c_dev ledtrig_usbport sha512_generic seqiv sha3_generic jitterentropy_rng drbg hmac geniv rng cmac leds_gpio tag_rtl8_4 realtek_dsa dsa_core gpio_button_hotplug(O) realtek hwmon i2c_core phylink crc32c_generic [last unloaded: rtl8365mb]
+> [  471.854523] Process modprobe (pid: 7473, threadinfo=674a8fb4, task=b017bdbf,tls=77e98dfc)
+> [  471.862981] Stack : 00000000 00000000 00000000 00000000 77e97290 00420f3877e97290 00420f10
+> [  471.871571]         00000000 00000001 00000000 77e1f644 77e89000 0000117300000000 00000000
+> [  471.880157]         0000000c 83855940 77e85000 77e77000 81b911e5 0000000181bbac60 77e85fff
+> [  471.888745]         00001173 77e89000 7f958894 00400dc1 8383fbf8 77e903d000000000 7f958730
+> [  471.897333]         81bbac60 77e556d0 00000001 00000000 77e97290 7f95845000000000 77e1f674
+> [  471.905921]         ...  
+> [  471.908431] Call Trace:  
+> [  471.908437]
+> [  471.912653]
+> [  471.914177] Code: (Bad address in epc)
+> [  471.914177]
+> [  471.919517]
+> [  471.921240] ---[ end trace 0000000000000000 ]---
+> [  471.926052] Kernel panic - not syncing: Fatal exception
+> [  471.931404] ---[ end Kernel panic - not syncing: Fatal exception ]---
+> 
+> 
+> The RA value (80001e90 work_notifysig+0x10/0x18) indicates that the crash came
+> from a notification. Maybe DSA didn't unregister/drain notifications after the
+> tear down.
 
-So this function sets retry_refill to true but assumes caller
-will set it to false? seems unnecessarily complex.
-just have to always set retry_refill correctly
-and not rely on the caller.
+My reading of work_notifysig() is that this is delivering signals to
+user space, completely unrelated to DSA. It is just what the return
+address was at the time of the crash.
 
+The epc == 702e7660 possibly means that the kernel tried to execute code
+through a stale function pointer.
 
-> @@ -3129,18 +3125,18 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
->  	struct send_queue *sq;
->  	unsigned int received;
->  	unsigned int xdp_xmit = 0;
-> -	bool napi_complete;
-> +	bool napi_complete, retry_refill = false;
->  
->  	virtnet_poll_cleantx(rq, budget);
->  
-> -	received = virtnet_receive(rq, budget, &xdp_xmit);
-> +	received = virtnet_receive(rq, budget, &xdp_xmit, &retry_refill);
->  	rq->packets_in_napi += received;
->  
->  	if (xdp_xmit & VIRTIO_XDP_REDIR)
->  		xdp_do_flush();
->  
->  	/* Out of packets? */
-> -	if (received < budget) {
-> +	if (received < budget && !retry_refill) {
->  		napi_complete = virtqueue_napi_complete(napi, rq->vq, received);
->  		/* Intentionally not taking dim_lock here. This may result in a
->  		 * spurious net_dim call. But if that happens virtnet_rx_dim_work
-> @@ -3160,7 +3156,7 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
->  		virtnet_xdp_put_sq(vi, sq);
->  	}
->  
-> -	return received;
-> +	return retry_refill ? budget : received;
+Nothing in rtl8365mb looks particularly out of place in terms of things
+that could linger on after the driver is unregistered. I looked at:
+- priv->user_mii_bus could host a PHY whose state machine continues to
+  run. But it is allocated and registered using devres.
+- mb->irq cannot fire after rtl8365mb_irq_teardown()
+- p->mib_work cannot get rescheduled after rtl8365mb_stats_teardown(),
+  because the ports are already torn down by the time the switch is torn
+  down, and the phylink instance which schedules the mib_work is destroyed
 
-a comment can't hurt here, to document what is going on.
+The only question mark right now is with the many out-of-tree modules.
+If there's anything in the kernel holding a pointer to the DSA switch,
+it needs to drop it when the switch driver is removed.
 
->  }
->  
->  static void virtnet_disable_queue_pair(struct virtnet_info *vi, int qp_index)
-> @@ -3230,9 +3226,11 @@ static int virtnet_open(struct net_device *dev)
->  
->  	for (i = 0; i < vi->max_queue_pairs; i++) {
->  		if (i < vi->curr_queue_pairs)
-> -			/* Make sure we have some buffers: if oom use wq. */
-> -			if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
-> -				schedule_delayed_work(&vi->refill, 0);
-> +			/* If this fails, we will retry later in
-> +			 * NAPI poll, which is scheduled in the below
-> +			 * virtnet_enable_queue_pair
-> +			 */
-> +			try_fill_recv(vi, &vi->rq[i], GFP_KERNEL);
->  
->  		err = virtnet_enable_queue_pair(vi, i);
->  		if (err < 0)
-> @@ -3473,15 +3471,15 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
->  				bool refill)
->  {
->  	bool running = netif_running(vi->dev);
-> -	bool schedule_refill = false;
->  
-> -	if (refill && !try_fill_recv(vi, rq, GFP_KERNEL))
-> -		schedule_refill = true;
-> +	if (refill)
-> +		/* If this fails, we will retry later in NAPI poll, which is
-> +		 * scheduled in the below virtnet_napi_enable
-> +		 */
-> +		try_fill_recv(vi, rq, GFP_KERNEL);
-> +
->  	if (running)
->  		virtnet_napi_enable(rq);
-> -
-> -	if (schedule_refill)
-> -		schedule_delayed_work(&vi->refill, 0);
->  }
->  
->  static void virtnet_rx_resume_all(struct virtnet_info *vi)
-> @@ -3777,6 +3775,7 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
->  	struct virtio_net_rss_config_trailer old_rss_trailer;
->  	struct net_device *dev = vi->dev;
->  	struct scatterlist sg;
-> +	int i;
->  
->  	if (!vi->has_cvq || !virtio_has_feature(vi->vdev, VIRTIO_NET_F_MQ))
->  		return 0;
-> @@ -3829,11 +3828,17 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
->  	}
->  succ:
->  	vi->curr_queue_pairs = queue_pairs;
-> -	/* virtnet_open() will refill when device is going to up. */
-> -	spin_lock_bh(&vi->refill_lock);
-> -	if (dev->flags & IFF_UP && vi->refill_enabled)
-> -		schedule_delayed_work(&vi->refill, 0);
-> -	spin_unlock_bh(&vi->refill_lock);
-> +	if (dev->flags & IFF_UP) {
-> +		/* Let the NAPI poll refill the receive buffer for us. We can't
-> +		 * safely call try_fill_recv() here because the NAPI might be
-> +		 * enabled already.
-> +		 */
-> +		local_bh_disable();
-> +		for (i = 0; i < vi->curr_queue_pairs; i++)
+> 
+> I'm using kernel 6.12.60 (LTS) and I also didn't notice any relevant changes
+> since that version. I'm just not sure if
+> 2bcf4772e45adb00649a4e9cbff14b08a144f9e3 would be related.
+> 
 
-you cam declare i here in the for loop.
-and ++i is a bit clearer.
+Without a stack trace, it's hard to say what could be wrong. Could you
+retest with CONFIG_KALLSYMS, CONFIG_FRAME_POINTER, CONFIG_STACKTRACE and
+whatever else might be needed to produce a stack trace on MIPS?
 
-> +			virtqueue_napi_schedule(&vi->rq[i].napi, vi->rq[i].vq);
-> +
-> +		local_bh_enable();
-> +	}
->  
->  	return 0;
->  }
-> -- 
-> 2.43.0
+In addition, could you try enabling some debug options for use-after-free
+which are more lightweight than KASAN? I'm thinking of:
+CONFIG_SLUB_DEBUG + CONFIG_SLUB_DEBUG_ON,
+CONFIG_DEBUG_PAGEALLOC + CONFIG_DEBUG_PAGEALLOC_ENABLE_DEFAULT (if memory allows)
 
+If this doesn't point to anything, you could simplify the setup and
+teardown (and then probe and remove) methods little by little until you
+find the culprit. The idea being that a driver which doesn't do anything
+on probe and remove shouldn't crash the kernel.
 
