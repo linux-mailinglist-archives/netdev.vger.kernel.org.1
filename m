@@ -1,87 +1,58 @@
-Return-Path: <netdev+bounces-246648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C643FCEFD74
-	for <lists+netdev@lfdr.de>; Sat, 03 Jan 2026 10:30:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7935ACEFDA1
+	for <lists+netdev@lfdr.de>; Sat, 03 Jan 2026 10:50:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 963C330249F4
-	for <lists+netdev@lfdr.de>; Sat,  3 Jan 2026 09:30:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 31E023026AED
+	for <lists+netdev@lfdr.de>; Sat,  3 Jan 2026 09:50:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD19B299AAA;
-	Sat,  3 Jan 2026 09:30:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ShMfDIrT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 788622D94A0;
+	Sat,  3 Jan 2026 09:50:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA5A3A1E94
-	for <netdev@vger.kernel.org>; Sat,  3 Jan 2026 09:30:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2C41CEAC2
+	for <netdev@vger.kernel.org>; Sat,  3 Jan 2026 09:50:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767432615; cv=none; b=gCLSaSTH+n734y2u4ni4+Z0MPbUZgQcuDsu3s28bnJWBP8sZM46SBYqr2bK3QbjzqM4Lq0zDK1MwPKPpNg23qbropIKh3np7AFCF29JqHfEKqUquH70Z9wKKo/4oVN9mM/ESm301LY1qsH1ECrtbRQRKuLCulF0H1XE9HqN41lA=
+	t=1767433815; cv=none; b=djjqhOGD8fE/TKmrZdbhMEtWMqDp9hEbTcXJjWhmSI6tPWfFn012IhZNccIrZyq8ocQ6kSnJQ9rRfQcjAPrI9szQsNoHCdXphZf1RxOoZKI2dIawz+LGZ/w4FKeb5s5zC1z/6Vvj9h99MTAkRaNJIgEHA8dB21zHPnocerj+H5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767432615; c=relaxed/simple;
-	bh=xPBhV3xf/mEOLNuM1+djpRv2cyMz8fzyttuoGbo3704=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QFgT1hqq3iwwC3LM4Y3CWUNvM3TGrVB+FInqDW/3Qs+OL5hm2EhMoYGxVxR0yB96RzSyVNZQPzbOg3oalEnECmonb7AvbGKXh364NWq7PoDoC5OxTR77XSpZzvyqJ5vQtTnk/cuydzxUm+XabN16EqC43XPq8R9Vtl0W1ucsPYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ShMfDIrT; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7aab061e7cbso16881639b3a.1
-        for <netdev@vger.kernel.org>; Sat, 03 Jan 2026 01:30:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767432614; x=1768037414; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bt9tJYP4C9GkuKYSjvH8xQ7Gj8IEbQo1GeZTVx+trAY=;
-        b=ShMfDIrT9kJHvQ9U234fvxLmd8cQjvS9cbTtwY63aasR7XL9QrARVtQPraAD8vUDpV
-         1P+zgHtEaKXJi48xPlaTzSzoS+gBIIqTpSv49sgZZPpIEECfPxCCmKZ4rDo2CC7rm3Le
-         t0bkfdzUjKpE0vrxtxU8hreIeMs2w7Rj2ZQ0IiWwcHPD9P9oOL9YV+HjTv4+kzWd4Fpi
-         U6hiSrnuvqo71emA+8QFHSzSjx2irh/MD3+PIuit4sq08QQLIGf/oMPWrlif+BzEBRDR
-         GZGm10TzW8CQogK6gB093h6sVxdOIwOxgS7z6Jr8lRn1KOSw9UNcf/xyFkEGCk8E5t8Z
-         3YKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767432614; x=1768037414;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Bt9tJYP4C9GkuKYSjvH8xQ7Gj8IEbQo1GeZTVx+trAY=;
-        b=p6Nu3yy8hSowJtXKjoisv/8jm/VpE3yK2x4jl18lYSl5/7q7QCM4wfjyZiACT9bGPx
-         7fxNHE0+D7Z5zmCfLixNnIVCRjeR74+3nAFtJfe7y8N2V7+SOsY0tvOGzqx8NlcGpMHm
-         4HVW7FmuRdZLfTvp19n2jzT2JxYET+Vg6Tg1A84UfYZkfQ3k0LHLFrgVOY8kFU55juh8
-         xfvkIKS1O12q5Vlwa2WrSfac1dUTOk6rE2gc5NpWV0DOLfLzJo2iLKWfMfBk+ODw29KG
-         2shKfefggznPF4IKT1LZzWT+B8cwFIJQn6ESc4YL+vy8rsstbZv/GorMlCyFYt+jh29e
-         J8Ow==
-X-Gm-Message-State: AOJu0YyZd5PvP9uIHjdyOZ1IJhMWt1meg1Z8AXb1bHkYq4acuTUgfVP1
-	FXX7fOp5ozS6kBygeQM+zIX998OvPz1AfaL6LOKMF22n1Azd5y4ZvUJf5m1GuA==
-X-Gm-Gg: AY/fxX6bV0Hj8TTWPMSBIQEeu9e7zaVahacDsjzUzrGWjn8Boq7myX0Z2S4UOspJs21
-	79BKJREJy7MOspNRr9FSB6ulLfvLYy/7t13arYmIVXepqehwJdNff+Vgqpu9dtw4uq66m2rGG2t
-	0usVg84lo3sFIKBkDzBHumz0T+6SVp6qO0fG0fFOSe96sJzPuji/ZIdfy6/wJgQi0yK8TnNdjVL
-	0INQWLFd5Gnqx8rnLCEr7jcfSfWA9NfL/jvu4q6U4Y1ny8/UjLD6KFIqlcaF+xQqFLQsKNBLIpv
-	phfIF+0Ni59MJGohmYxyyVxiChThA/LuNVaO0Sh7WWszZKOkp0Qua9CG5gort4hKQSxIpLe/Vez
-	3FwHh0l0BP23St2SFkrOuK618m/qC7VzxCO3EiNrYPwl8yupVdODho1AVKLo705/8QmpsbVvpoQ
-	O74P6Wjis34gvncRnuZR0=
-X-Google-Smtp-Source: AGHT+IH5m1iMRPHgBJ6TJtBzdLg/1Zcz/w0B39ddDknVSCVCLeF7pbZ57H5QL0PYLZNutuZ6eRJTVQ==
-X-Received: by 2002:a05:6a20:1611:b0:35d:5d40:6d75 with SMTP id adf61e73a8af0-376a7afad8cmr35575798637.29.1767432613559;
-        Sat, 03 Jan 2026 01:30:13 -0800 (PST)
-Received: from mythos-cloud ([61.82.116.93])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34f476ec31dsm1331875a91.3.2026.01.03.01.30.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 03 Jan 2026 01:30:12 -0800 (PST)
-From: Yeounsu Moon <yyyynoom@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1767433815; c=relaxed/simple;
+	bh=m2aZss0+ZM8b/lxCn7No8GorU3awbdpWBPrKC2tzIHY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=m1FLloes8NMdtiZg7Dg232OGTpl+oC7nJUgc/uxiMzoA6rIGpt0gerCdfgSFj5Rh5PIk3LVAcyM+3OyZ0ri+zbQ5SGSiaV18zk++cHabxJws0raIUfFfzAyYrdbN7cXvu01+iVvPPd002kIaj083XRAovkIcX4Ke9AqpAYxfKtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=18.169.211.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
+X-QQ-mid: zesmtpsz9t1767433790teb21184d
+X-QQ-Originating-IP: nO0rtLGfmJDPd2iY+R26e/t0RD4UGJbK8wAD0XsILeo=
+Received: from MacBook-Pro-022.xiaojukeji.com ( [183.241.14.96])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Sat, 03 Jan 2026 17:49:47 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 10111140801060055609
+EX-QQ-RecipientCnt: 13
+From: Tonghao Zhang <tonghao@bamaicloud.com>
+To: netdev@vger.kernel.org
+Cc: Tonghao Zhang <tonghao@bamaicloud.com>,
+	Jay Vosburgh <jv@jvosburgh.net>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yeounsu Moon <yyyynoom@gmail.com>
-Subject: [PATCH net v2] net: dlink: mask rx_coalesce/rx_timeout before writing RxDMAIntCtrl
-Date: Sat,  3 Jan 2026 18:29:05 +0900
-Message-ID: <20260103092904.44462-2-yyyynoom@gmail.com>
-X-Mailer: git-send-email 2.52.0
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Jason Xing <kerneljasonxing@gmail.com>
+Subject: [PATCH RESEND net-next v4 0/4] A series of minor optimizations of the bonding module
+Date: Sat,  3 Jan 2026 17:49:42 +0800
+Message-Id: <cover.1767000122.git.tonghao@bamaicloud.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,43 +60,59 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz3b-0
+X-QQ-XMAILINFO: Mdekj0pmbZiWR0MjpYn9nQLRvvWN5VKXelQeZSFvECkjp3UmoZ1jfEI1
+	oZHTMVVybBjhTu3rnUa3EVykXHvTMEWkTWWeEavGZfo7+DFAwy0WrYVcO/fge3sELVe0Cf8
+	0aq+RdXtzi4Yj1riHhvqdLpQ4lkROOwMbQf5BYBNGIOb0CwB4pSzIPVj9rm468Y1e/tkEPQ
+	nfCKnFZhRbm3Nmf8w+pUDLJb7tfLUNwox6htapOKiB0keQmiYpPeDeS+GgMnV486wXaXGDK
+	jV7CoMv+FMaOZhrCaJB5nlia2o/mn4Yx+B6n46A2tIhB/RBksGe/ns17F/zGho/ekUyEJ7H
+	Qa63309F61YbQGLGgtdB2GWmf9MoBweq8uMFfOuVdY+ivibZN+hG5w1qTUhz+B+oMQDqseS
+	6Q3Me1orS+BKcxbahGPixQoh4sW0T2F90tc3b79kbLlSaysV6aHbvI7lyejH0zP8Ysuavgr
+	iRm1YbHxUC9FfpJ6zCorO7O2ATt9CdOLglM2tvI2tThuX1XyRmdAWWId6OZDufag/wF2qkE
+	Zu0TVYYHfvYHURMrcYSCpbk+Cd8Uy2NFJhd4xt3u9my29kVLSJ/LCyPpl2pR/xyEEkTHo/X
+	plc7DL4+rcQb+pDOyh4M4OOgy0VBeLy9TQTKF5kn9ggflhwUBF5jF75Hd9cFl6i1XSSLz4Y
+	LQqeVr2PmcHiAkw00EV/UGWSoFJyPHuO63ICriiWYPwbg21vVhbpDPXw8ky8CL8ZAHXUgZB
+	2dX/QcIHb68FwRLTpFTT2a06E4oiMfs99d7bALRg2YwLdfH17kQZspDy5WgnzmDvBEs8kTw
+	wAzuHU4C4pj4LB4QxVwfOJchMqmAuIdD6kNNu5xXGRvvmoGtRrAog/PTkUJYy2zPvxQgf0k
+	IgpFtK7QXNDYpk7oX+t2ojBL8I44CJTcZtx+KFBoNKXVh9bWp0PjZxDzknTN/N1Yo18oli7
+	KHPlkww9EhFbayyWOnXIqtwZp8/BldbNcKWqN9lwvETTKiyJaBEYe4AW5WkgCj7YFkx23vg
+	bcPMxzNrxTY7nBVNGE
+X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
+X-QQ-RECHKSPAM: 0
 
-RxDMAIntCtrl encodes rx_coalesce in the low 16 bits
-and rx_timeout in the high 16 bits. If either value exceeds
-the field width, the current code may truncate the value and/or
-corrupt adjacent bits when programming the register.
+These patches mainly target the peer notify mechanism of the bonding module.
+Including updates of peer notify, lock races, etc. For more information, please
+refer to the patch.
 
-Mask both values to 16 bits so only the intended fields are written.
+Cc: Jay Vosburgh <jv@jvosburgh.net>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: Hangbin Liu <liuhangbin@gmail.com>
+Cc: Jason Xing <kerneljasonxing@gmail.com>
 
-Found by inspection.
+v4: patch1 keeps the netdevice notifier order
+v3: drop the 5/5 patch, net: bonding: combine rtnl lock block for arp monitor in activebackup mode 
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Tested-on: D-Link DGE-550T Rev-A3
-Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
----
-Changelog:
-v2:
-- drop unnecessary cast
-v1: https://lore.kernel.org/netdev/20251223001006.17285-1-yyyynoom@gmail.com/
----
- drivers/net/ethernet/dlink/dl2k.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Tonghao Zhang (4):
+  net: bonding: use workqueue to make sure peer notify updated in lacp
+    mode
+  net: bonding: move bond_should_notify_peers, e.g. into rtnl lock block
+  net: bonding: skip the 2nd trylock when first one fail
+  net: bonding: add the READ_ONCE/WRITE_ONCE for outside lock accessing
 
-diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
-index 846d58c769ea..74e0fd08d828 100644
---- a/drivers/net/ethernet/dlink/dl2k.c
-+++ b/drivers/net/ethernet/dlink/dl2k.c
-@@ -590,7 +590,8 @@ static void rio_hw_init(struct net_device *dev)
- 
- 	set_multicast (dev);
- 	if (np->coalesce) {
--		dw32(RxDMAIntCtrl, np->rx_coalesce | np->rx_timeout << 16);
-+		dw32(RxDMAIntCtrl, (np->rx_coalesce & 0x0000ffff) |
-+				    (np->rx_timeout & 0x0000ffff) << 16);
- 	}
- 	/* Set RIO to poll every N*320nsec. */
- 	dw8(RxDMAPollPeriod, 0x20);
+ drivers/net/bonding/bond_3ad.c  |   7 +--
+ drivers/net/bonding/bond_main.c | 101 ++++++++++++++++++++------------
+ include/net/bonding.h           |   2 +
+ 3 files changed, 69 insertions(+), 41 deletions(-)
+
 -- 
-2.52.0
+2.34.1
 
 
