@@ -1,125 +1,219 @@
-Return-Path: <netdev+bounces-246678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 825C5CF0506
-	for <lists+netdev@lfdr.de>; Sat, 03 Jan 2026 20:30:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF9D2CF0594
+	for <lists+netdev@lfdr.de>; Sat, 03 Jan 2026 21:34:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 713683007228
-	for <lists+netdev@lfdr.de>; Sat,  3 Jan 2026 19:30:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E5AB53012263
+	for <lists+netdev@lfdr.de>; Sat,  3 Jan 2026 20:34:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E86930F538;
-	Sat,  3 Jan 2026 19:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3A7829BDB3;
+	Sat,  3 Jan 2026 20:34:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mxNDb/ti"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="UVqV4ctF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11020087.outbound.protection.outlook.com [52.101.46.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74CBF30F522;
-	Sat,  3 Jan 2026 19:30:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767468610; cv=none; b=cPv7N/dAle8A7ioMUM6pgQg/N2PS+nB16rwjBlKnERX8ki1Ozjm9bgfFnN9nflRPjFL5voqVDE7yEUEVsVaey/7OlVPNiBLvVsqiCNtPuqnmJloR2Vwb861Ixucv1vCRAAQuCfKLA79DAZpftrKYvMNzZKQVYnxrys0PjuTKh9o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767468610; c=relaxed/simple;
-	bh=Vw0CSYs8ZRkyhGGBdWqeozUHGguxua25NRiezzbXUrs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LEiTj/4Zysb7lq+YQDXMUbH+4HQ9SyVnepqzVpXRoyUU8knVsuvYJt7PpCSRLW3ET1kApuC+K6oMx7G3wCSonKy8AHIrd5+Cj0QnVZl4KCUB+u1g2tC12vS/KN9oAaqWD6moY/EhLPomoqD/l2UdKr9V0Bq7QT18GnNblO6y6E8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mxNDb/ti; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F8A5C113D0;
-	Sat,  3 Jan 2026 19:30:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767468609;
-	bh=Vw0CSYs8ZRkyhGGBdWqeozUHGguxua25NRiezzbXUrs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=mxNDb/tiulVEVHsTMBerD96HPEwq+MX48PgQ/xjZqBlP+0XY5qY9dQ044l8xRU2wE
-	 K5WR9ArGjmJxyl/HwRsMiPKhB+74gz7R2/wNlPrdYEFPg3H17W05stdbCzkKLT4H7X
-	 jcL2EPlkT8O05zmOOLun8XxMC9KAZzy9cb2J8HKGorrpr7AG0kGGcmIVdvDSGnc5gM
-	 TY4HlfVJR/izOmXO54RZeKR82FdTmeCdrMoLypUPgV6/dZvSveUTqD0mwRwHnT3dN/
-	 gtFWrhm1R2MAUNVLa7rZRnc75Ml22cUm8qkG/lXTILjIiM/Y/+Uo7ntpVlq3woM5Jj
-	 ybS0joUVwqG6A==
-Message-ID: <c269cd25-9e77-4b8c-9cf6-8f2cc86296e7@kernel.org>
-Date: Sat, 3 Jan 2026 12:30:08 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2170D28F50F;
+	Sat,  3 Jan 2026 20:34:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767472458; cv=fail; b=MzaUtPoe/j/Ydxu7sYqWDyWEFaYB7QUWKl0AFu+QqmmKehnAPx4yUpjEyZz9DfyRpMD5n/fqSnD+LSDbg+W/I7M5vaum/aTH0WvxwMUhfOSx2KYeNqgKWJIrZMBtvb6x0Mn43eZBpMf1ijo6c0MWF8BGXR8GlagS5UiNH9r2RCI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767472458; c=relaxed/simple;
+	bh=YhspdBsaW0kr0lSRrqunJszoCPBcl88DenyU8XcffRU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=glkYpKKTPGlCC7ouKo7zKQzpsmWcFoiPT+7YqjcPNi4eKAjUZKRmZ8bSfeO1wxd1CP9VCgVd++Ueu1glzIvKWMczuO3gaT0xHkHewJr/xcQrozh4QDjhZhvFgOElAGeT3KR7B1d+/08Gep49HkHBsEEGmrO1de6ky9kYNM+W30o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=UVqV4ctF; arc=fail smtp.client-ip=52.101.46.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Q5YKpJqNNo0uJmEX9DyjqKxbefV9UhTovsuBME7VV7BiUBXllwRe5rKlU231kP3+V03w7VyFt0szhqF0P2T3xncZbQbZhLeHLyI2x8fxZ0UmVgirjEo9k+joKM4OAxSdHvJ1OSSp2asKCMcI45UJPpYUNk4M5edGAvwtTI6II8RrY0nZnjK1X2Udht8GwXV4sz1G7FSufNcjH5fkh5ky35i4fwBjUTfnO4kUt1TY2Hm5XJl29U9UEDrgD8moO22lar9Y1Bmc9PBz5LDpBbuN54oMpaDISdl0tQbpbdbh+7AlYt17GAMIkF7bHDnCng/3uZuFFYkbMybj423NpOqagQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7xy7QmyossDddd86txsmz6trUfWAkooOihca3M6/cts=;
+ b=faAT1lzwjGOjTnBJQ1ixuxEX5mhfoFf6kWss0yBcJrLCw0/H1G8MtUskjAWBxql7Nvw3V4lQvUgszlymWS48Iov65Ybu1ox7iPVaFCo5/EwNqSvB8qH8A31msSKQT7vmfo1Z0WWs+oHYC9N1xAn5nYhmHKE32sDOzUl39PuRCt3v18e+aE2WT1DeIZeAul4iANEnMoX7x6Dxc+tuRe4M8fOLFKmQ+Byp6AdMWd+AjY7hSII8+HKZgboB6DoE0rDyyqa+YP+cFd2MVQthUyW5+mrYII1NoSMukPsV7noSFwPPTReMT7m2n73eRLFetHWs9Q2QG+t6LrsAkBZUmdYLBw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7xy7QmyossDddd86txsmz6trUfWAkooOihca3M6/cts=;
+ b=UVqV4ctFUHftkn+RP8Z9/upZMiL7WraxrIFNq3DU8wL0/FWtx8nX4p0XpFE9EQIUrxu8GELZ/qNpqqb88hMsgnCesd+Ex2q4c4jySYvkO+tUff6uoaQ4VKTjhLTOAOZAsO+thZVlPYs0vZ5KqN2SGR+GHTxak5v8XHc6uy1Rfxs=
+Received: from SA3PR21MB3867.namprd21.prod.outlook.com (2603:10b6:806:2fc::15)
+ by SA3PR21MB5771.namprd21.prod.outlook.com (2603:10b6:806:492::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.1; Sat, 3 Jan
+ 2026 20:34:13 +0000
+Received: from SA3PR21MB3867.namprd21.prod.outlook.com
+ ([fe80::70ff:4d3:2cb6:92a3]) by SA3PR21MB3867.namprd21.prod.outlook.com
+ ([fe80::70ff:4d3:2cb6:92a3%6]) with mapi id 15.20.9520.000; Sat, 3 Jan 2026
+ 20:34:13 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>, Haiyang Zhang
+	<haiyangz@linux.microsoft.com>
+CC: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, KY Srinivasan
+	<kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
+	<DECUI@microsoft.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>, Long Li <longli@microsoft.com>, Konstantin Taranov
+	<kotaranov@microsoft.com>, Simon Horman <horms@kernel.org>, Erni Sri Satya
+ Vennela <ernis@linux.microsoft.com>, Shradha Gupta
+	<shradhagupta@linux.microsoft.com>, Saurabh Sengar
+	<ssengar@linux.microsoft.com>, Aditya Garg <gargaditya@linux.microsoft.com>,
+	Dipayaan Roy <dipayanroy@linux.microsoft.com>, Shiraz Saleem
+	<shirazsaleem@microsoft.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, Paul Rosswurm <paulros@microsoft.com>
+Subject: RE: [EXTERNAL] Re: [PATCH net-next, 1/2] net: mana: Add support for
+ coalesced RX packets on CQE
+Thread-Topic: [EXTERNAL] Re: [PATCH net-next, 1/2] net: mana: Add support for
+ coalesced RX packets on CQE
+Thread-Index: AQHcfDAC9zbupp0oYUqTZlvwbw1m4rU/krmAgAFVTPA=
+Date: Sat, 3 Jan 2026 20:34:13 +0000
+Message-ID:
+ <SA3PR21MB3867EFB48C19C1457B547F33CAB8A@SA3PR21MB3867.namprd21.prod.outlook.com>
+References: <1767389759-3460-1-git-send-email-haiyangz@linux.microsoft.com>
+	<1767389759-3460-2-git-send-email-haiyangz@linux.microsoft.com>
+ <20260102161147.1938b51d@kernel.org>
+In-Reply-To: <20260102161147.1938b51d@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=430089c3-d348-4c05-b716-2a8f1cdb585a;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2026-01-03T20:33:20Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA3PR21MB3867:EE_|SA3PR21MB5771:EE_
+x-ms-office365-filtering-correlation-id: ae6c9751-4922-4b65-63b0-08de4b077541
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|7416014|376014|1800799024|38070700021;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?axy3BjRxHtioZrHgqXfyLoyrcfILG2J1QF8gaSKHw/489kP2tw2p+Vjn+N8c?=
+ =?us-ascii?Q?WGHhALczoElA1BQYA7A+sR/cIv0IcLGXLJqOM02HgKRPhBtcRp4U1ouP4b3Z?=
+ =?us-ascii?Q?Glc9iPA/DdO4p2CJpEOpiAPwmuTrvP777LmkOiUMxIYq2h6j6/cnAjXX5ofZ?=
+ =?us-ascii?Q?Xp2XUAzhaR4Lr6C1YxLKk7mpJVIVSACm4Cv1oYFDhfKGYYtZXHopzY/rOq7X?=
+ =?us-ascii?Q?mBJCSAk6kaJTGpKKQZvvqShSBxjWiQ4YJGXuJa2K+VG1t+7Z+BqsShMIEslg?=
+ =?us-ascii?Q?JCD9uwxfcHiovUzHz9P5YKmsAcLESnZ8t6oCUeaoxNA1z4BhkcjkHlOGpYHe?=
+ =?us-ascii?Q?JA52NdZWH0pWSKx+TmZG7Yt7BXzxoWwjqhRopOgNdggYZBgb+Cc7itplGC4B?=
+ =?us-ascii?Q?LcfaAYKZ9LRoZJFjGDeiavFxWfvMVsu4NhamUA5lmlKnhAMu88E+nQo3PAsm?=
+ =?us-ascii?Q?UV+9KXP9eqG8XfxNs/DsxwqXUyzm4xDxTb80zLa30Gr/N/n54iLBoi+5sQ9d?=
+ =?us-ascii?Q?Hu67s/cJbBfwpbItoyCxRsPF7DVpfwfPHQnRVzSK+pDKDtWnGZl8DtkMAb1K?=
+ =?us-ascii?Q?KJk6E8ZCOo/m8K4Y8YKjpi8CfCwmgXnpyjDefqeArNr6ExWJUXH5bK5CgZoA?=
+ =?us-ascii?Q?bBGEZcJdUtpZdgA+3HQqBWLf1plUg1xtkCmncELY91YVH57/4yTEIy/mT/BS?=
+ =?us-ascii?Q?ZoTrYNFbvcestRGCGObY68iree4yp1PYlqaLYIBUhldrJNtey15pbX3yd776?=
+ =?us-ascii?Q?Oju5yBPCixuAwmV9qhr7qtnDlkRyLgrYNBwdDOxUmIRtDdK0/lJO5NdorPyl?=
+ =?us-ascii?Q?pvFjBVj9W3mGiYCMmZZY7LzDXXZWxrcQxWB9NfEwSUfNlcIITp+KQDOKXy4b?=
+ =?us-ascii?Q?GKSvu8LDV5HjfEDbYWBtthVq+QIsbPNQcOgP2O+VkhMo/H2EJkejwlZnHYiO?=
+ =?us-ascii?Q?T24hBe0Tyb77uzt3YdMyXZMi5OR5prdscmr+KwPBByuLRmaaRuURs0ybONCp?=
+ =?us-ascii?Q?vcxZxvss4res0TwLi7KygqV3prxNxRhBZmG70aQKLQZAynyM/qO33JR4AD6K?=
+ =?us-ascii?Q?C3iSJ+WU7UhZvlysOKxYbYgeIAjANDXar7XhLds+RXjvptqSfXohnLd82Zk7?=
+ =?us-ascii?Q?G7oS3l8QM/9UKYDdWGqitsVOnLM3B1vx1P8vKkrbfomgZkg2Oq4nUWFiSYv5?=
+ =?us-ascii?Q?lQPpP4oirrPQiTu7tKT3HZl3/wGXEnQiLP3KljvFreFYX3NY/463p/1eqUzP?=
+ =?us-ascii?Q?8GjTNvi7N720c2PUxJ+RzDTJgpcZJFw4/g0xg8xAouqDv1BzSLJIKkYWWQAs?=
+ =?us-ascii?Q?Zsw/6wQ5cQqJol9ZAi+4vwkkgS2RJd40MN11UZo2D64paeGWdp5JLdGflcpk?=
+ =?us-ascii?Q?xTiG/mohfT+3RRJamDMHP7WSeWBHyey2P8i+v5VZ1CvEAT4VvZlhv+4vuRV9?=
+ =?us-ascii?Q?HxaiI+ewt3w2qO+j9PoTimmk7tv/fIftWxKsc0uacdAtADBfb1t6G4mv2rwU?=
+ =?us-ascii?Q?WiBYTWbKuD7LeZngTCIUdJcACZny3mCL0BUq?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR21MB3867.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?LnpniloHq+Y9JI1pDm6SB0bwPnyZtFaWvJSGAfIWaq3I/zoS5Js0D40kEvce?=
+ =?us-ascii?Q?uQuy+4jdguuwB22Dh1cVDsH8Ro87AypoRa/k0GHtd79+iUYsyjeNsgRLV46R?=
+ =?us-ascii?Q?8eai3SZ6UcU/LH18G9cXjKknmpfXh+2Ry+/aEFtCVx4grkIRiXMcmqW0EdGi?=
+ =?us-ascii?Q?pe4E8cve3uJI9UyVc3ng9DRLT3outPi3iXbl5K9ccAB7O5qPsbDNRZrwia/5?=
+ =?us-ascii?Q?WK7qxTVg+bS7o+nhVGLtgFOSEDQ8izmO09AnKou1JzMM4wxFazFW+qQPyRcw?=
+ =?us-ascii?Q?gF5eusjmtJaDe7qxE+GCIxNk6a7J1LL+7VB9e+1YeZBcTeHuvt5Y3o3h8mAR?=
+ =?us-ascii?Q?rKaQ4i6egld5zxIslmP7Plzv5AhsrR7OFs5sCgdnuCvxcQpxvE4DXleYVqJQ?=
+ =?us-ascii?Q?k0agBwYD5v0KBjsIL1BGEydsIW9Oezsww2g6Mb7d1pVAfGR7zKKstYq02rVV?=
+ =?us-ascii?Q?F0+u7YW39xw1pS7rlenjRllqbV+ELCtObNGAXRap7mez1w8ZCIc4dNenpPzN?=
+ =?us-ascii?Q?L1vNLtUba8uDTAlsZagWw+Ky4gh/G7OyD9CQXJ1lkLDRIvc70FGqih1LD1Rw?=
+ =?us-ascii?Q?U7IOYRYuI1BXqSLo5Y2J+SOeN1UlnUQjrVGhWy76YIaMxtW0Nhl5gJR1KUe9?=
+ =?us-ascii?Q?Dh53eUT5zmLjBkpN+cL2uQCr9UvVCp8Ge7V3+llGDQupfS3gUmFwfiUZazcU?=
+ =?us-ascii?Q?eFGet/5R+v7Mt+CqYjzxy79VGjPRLnF5s1cecCgMbhzh5hJegGdL+8OGR8Qb?=
+ =?us-ascii?Q?MBagq76sTlD6lPDIjk3QS4Gm89zgDrKTiKOiHFg+TBYeXCiJy4Twk5p28SkI?=
+ =?us-ascii?Q?aKXYLLTWfDU+Evv9+bwFtcQZl7zinTH5UJDUe0WbsQQLZeTosjANb1/rdvmc?=
+ =?us-ascii?Q?HVIY81RKGqc0C6BizwhC8l+qgy6m6J6Hsc8yj9C/tMZkhMXzvdFueOUmZvJa?=
+ =?us-ascii?Q?54TVAjkOICIfONE4a932Phv6uYBhjUXTDghp+0odDs6VqhqLFZrharnRuqs7?=
+ =?us-ascii?Q?uwfpvXhV3I1MPIWT4q5yxbHUHXwxQwNnJMlfR42ILop3biCJ0NnmCCkv27KF?=
+ =?us-ascii?Q?2Ha8ngm+7/tBQhJTYrx2sFP8xvfqGskURwUhhpiHAuHqguZtej2S7A1+dZg1?=
+ =?us-ascii?Q?DBskwVjZDQMt4VqnNEZCva8LX912TCxuCb/Hx8/T62dMGXJ4WhcdFVqqg7YM?=
+ =?us-ascii?Q?TdKuJGO6Z3X7G2tQA74tzgxGUGPVoXXVp2eSy/LhBFuFxzASTq4NpQnh9ron?=
+ =?us-ascii?Q?lG61HJ5qkHWHp6U5ul2jAIhexWY/GJ5z4uRb7Xq0x/kLuXGNsgZm6Mx4kA3l?=
+ =?us-ascii?Q?CoRA/ZDmYizmzuG2c3ebz/Ek8rDYnNr2jABJGciZnPbTGmkwSBVsUG3uHD7u?=
+ =?us-ascii?Q?JWr5fPyWDSODWLCEVn7IcYp9if0t1xPcUIPIxvvzwI+9o41NmXaTd9XLj0e2?=
+ =?us-ascii?Q?JxZ6HAabtdyjsW79VvtUEKrX0pSSNHK2KIrw7J7UOPPJElBxRWL8UwMViS8J?=
+ =?us-ascii?Q?e4f9hpweiR/L+NtJYxORh/d9aRuaRKjog3cxNsMqxC2fK0EDTH6bBEVN/QHw?=
+ =?us-ascii?Q?hryMqJb/C46TQQsaeodrqfUIo7Onv074szamroMObG9NPqYaujIoR2v8IbGi?=
+ =?us-ascii?Q?23lnKMgCCRo+j+RrCBzN68Q8E6zc8qNT5QbydTDPJDNEUtsrHEOktepzaTar?=
+ =?us-ascii?Q?AZMyawlcMF9VX7LGLjTh4JHcWqiMHq26Ld8PntS0OwEmYUx6?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] ipv4: Improve martian logs
-Content-Language: en-US
-To: Clara Engler <cve@cve.cx>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org
-References: <20260101125114.2608-1-cve@cve.cx>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20260101125114.2608-1-cve@cve.cx>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-
-On 1/1/26 5:51 AM, Clara Engler wrote:
-> At the current moment, the logs for martian packets are as follows:
-> ```
-> martian source {DST} from {SRC}, on dev {DEV}
-> martian destination {DST} from {SRC}, dev {DEV}
-> ```
-> 
-> These messages feel rather hard to understand in production, especially
-> the "martian source" one, mostly because it is grammatically ambitious
-> to parse which part is now the source address and which part is the
-> destination address.  For example, "{DST}" may there be interpreted as
-> the actual source address due to following the word "source", thereby
-> implying the actual source address to be the destination one.
-> 
-> Personally, I discovered this bug while toying around with TUN
-> interfaces and using them as a tunnel (receiving packets via a TUN
-> interface and sending them over a TCP stream; receiving packets from a
-> TCP stream and writing them to a TUN).[^1]
-> 
-> When these IP addresses contained local IPs (i.e. 10.0.0.0/8 in source
-> and destination), everything worked fine.  However, sending them to a
-> real routable IP address on the internet led to them being treated as a
-> martian packet, obviously.  Using a few sysctl(8) and iptables(8)
-> settings[^2] fixed it, but while debugging I found the log message
-> starting with "martian source" rather confusing, as I was unsure on
-> whether the packet that gets dropped was the packet originating from me
-> or the response from the endpoint, as "martian source <ROUTABLE IP>"
-> could also be falsely interpreted as the response packet being martian,
-> due to the word "source" followed by the routable IP address, implying
-> the source address of that packet is set to this IP, as explained above.
-> In the end, I had to look into the source code of the kernel on where
-> this error message gets generated, which is usually an indicator of
-> there being room for improvement with regard to this error message.
-> 
-> In terms of improvement, this commit changes the error messages for
-> martian source and martian destination packets as follows:
-> ```
-> martian source (src={SRC}, dst={DST}, dev={DEV})
-> martian destination (src={SRC}, dst={DST}, dev={DEV})
-> ```
-> 
-> These new wordings leave pretty much no room for ambiguity as all
-> parameters are prefixed with a respective key explaining their semantic
-> meaning.
-> 
-> See also the following thread on LKML.[^3]
-> 
-> [^1]: <https://backreference.org/2010/03/26/tuntap-interface-tutorial>
-> [^2]: sysctl net.ipv4.ip_forward=1 && \
->       iptables -A INPUT -i tun0 -j ACCEPT && \
->       iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-> [^3]: <https://lore.kernel.org/all/aSd4Xj8rHrh-krjy@4944566b5c925f79/>
-> 
-> Signed-off-by: Clara Engler <cve@cve.cx>
-> ---
->  net/ipv4/route.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR21MB3867.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ae6c9751-4922-4b65-63b0-08de4b077541
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jan 2026 20:34:13.7097
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vFolhAs70/893Uelxs2KTLLr2QyEVDnL/P9H9nY46gF4jqJZbR0HkKC0iNejVQ8uczcConUlMzdNjzfmiGgUTw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR21MB5771
 
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
 
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org>
+> Sent: Friday, January 2, 2026 7:12 PM
+> To: Haiyang Zhang <haiyangz@linux.microsoft.com>
+> Cc: linux-hyperv@vger.kernel.org; netdev@vger.kernel.org; KY Srinivasan
+> <kys@microsoft.com>; Haiyang Zhang <haiyangz@microsoft.com>; Wei Liu
+> <wei.liu@kernel.org>; Dexuan Cui <DECUI@microsoft.com>; Andrew Lunn
+> <andrew+netdev@lunn.ch>; David S. Miller <davem@davemloft.net>; Eric
+> Dumazet <edumazet@google.com>; Paolo Abeni <pabeni@redhat.com>; Long Li
+> <longli@microsoft.com>; Konstantin Taranov <kotaranov@microsoft.com>;
+> Simon Horman <horms@kernel.org>; Erni Sri Satya Vennela
+> <ernis@linux.microsoft.com>; Shradha Gupta
+> <shradhagupta@linux.microsoft.com>; Saurabh Sengar
+> <ssengar@linux.microsoft.com>; Aditya Garg
+> <gargaditya@linux.microsoft.com>; Dipayaan Roy
+> <dipayanroy@linux.microsoft.com>; Shiraz Saleem
+> <shirazsaleem@microsoft.com>; linux-kernel@vger.kernel.org; linux-
+> rdma@vger.kernel.org; Paul Rosswurm <paulros@microsoft.com>
+> Subject: [EXTERNAL] Re: [PATCH net-next, 1/2] net: mana: Add support for
+> coalesced RX packets on CQE
+>=20
+> On Fri,  2 Jan 2026 13:35:57 -0800 Haiyang Zhang wrote:
+> > +		NL_SET_ERR_MSG_FMT(extack, "Set rx-frames to %u failed:%d\n",
+> > +				   ec->rx_max_coalesced_frames, err);
+>=20
+> No trailing new line in extack messages, please.
+> Also please do not duplicate the err value in the message itself,
+> it's already passed to user space. Well behaved user space will format
+> this as eg:
+>=20
+>   Set rx-frames to 123 failed:-11: Invalid argument
+
+I will update the patch.
+
+Thanks,
+- Haiyang
 
