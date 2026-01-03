@@ -1,150 +1,84 @@
-Return-Path: <netdev+bounces-246655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5FDECEFEAC
-	for <lists+netdev@lfdr.de>; Sat, 03 Jan 2026 13:20:56 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62186CEFF37
+	for <lists+netdev@lfdr.de>; Sat, 03 Jan 2026 14:05:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A13B73026B3B
-	for <lists+netdev@lfdr.de>; Sat,  3 Jan 2026 12:20:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9A2993008C92
+	for <lists+netdev@lfdr.de>; Sat,  3 Jan 2026 13:05:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C04A827702E;
-	Sat,  3 Jan 2026 12:20:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B20A2F5A12;
+	Sat,  3 Jan 2026 13:05:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="KhBqZedV";
-	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="ma1RT0EY"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="QblgN0iW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.54])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D57B1FF5F9;
-	Sat,  3 Jan 2026 12:20:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767442852; cv=pass; b=dLEvmZjnPzY6Ab+dJd6heh4u9uIzYwUrjI+h0j87V3p2HeYtEN3C+5qj7PXfTwDE9V+rU99xk4yUg48tbhrR9mKqYMyvpaOztLO+JUDuldOxgF5znzVmId6d6Y+QlJY54rAOjONRR3rr5dxBsBL749GBIEtOLr3w6fnVxJCl/L4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767442852; c=relaxed/simple;
-	bh=E2yG9qpAqc/yVBTPBXGeGaaHgpwEVJYZbc7mY9v3vww=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=D5B11W+JGJuinBLtKursZlHcxBUOZmX+zQDZJf8p+3ZpBQovsPtfKb1QT0FwxY9MFyy9iXLZZjSU8ihaY9q3VcuMDVy4C0PAgiT5vNYqnVEihh/96qXhlInsrOhJSJWfCKId2czHpxgCH2s+xyou63HXRMIvbydxsJaKR7G0SNA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=KhBqZedV; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=ma1RT0EY; arc=pass smtp.client-ip=85.215.255.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
-ARC-Seal: i=1; a=rsa-sha256; t=1767442839; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=ktY4Wp1mWWb5RWYGU1zRAYTtXwgQ8T4GVs5w7IuX7JJLw+PGIKqNxr7fekyb793l+r
-    QldTg1xX7u5v8cHeEyTFrDpKyzr4t7efMgPrSVesWnPwntl3ZTloskH90zMuRgew3Mp8
-    fn6jSRBYBhbIXJ8B6wwAfq9ouw4ONWG1AS/899FqvYMJvuHWzaZIlWRCrmxlsMcTKypd
-    ORvA3tac8NdsSL3+0jstUZeCQjlt8R5I6vFu/Ieu6JTZXd2O4jBribYrKvqkfrSBZDXs
-    jQZCejqnrOnqucjI7wVUEZBDluxjLustNRzLL/WPg7Ntw6tSx0j3tq2ius64OMIkh9UE
-    2O3w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1767442839;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=S3lwPWHvOvbD6pJQc28NwM8aXvYUV0HGlA5QrCpwyO8=;
-    b=OLZy2IO3AeMQQ1R17GIeFqjsshavTR+m7YFu1Im4ZrjrAWjB6PlAt7mz+XJvQA1lV3
-    t8VfJcMSvGInkWlVI8t48Y8o7wa3n6wpadDvcv/DphKbdhc5uPJYpAlSPpkCGyEj6hjp
-    kfx5cOkutydZkzcIhERlxC3SFIminhYhzPbCRXI9xamgbx1APiSw7KUqQWCfuqdt/k4x
-    xlBrX16VmDyitsVNeL1EK2H+1JltaDinhbtRv0nP9kCnB5mNMsTXhXpfVfesANdPWhWq
-    tdMtMUkW/s7nPki357H0jYTUenM4/FNmBT2iAyAWBsYA+5NpyhTkzKOdyWmrGBHRdg9f
-    j1og==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1767442839;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=S3lwPWHvOvbD6pJQc28NwM8aXvYUV0HGlA5QrCpwyO8=;
-    b=KhBqZedVjCQssY9n5ohlDY7qzJPL/i4N9FPF+kSy6pjTNsKIJpFua/ilB7Ie8SnV/s
-    ZRr9gUxmudMoN23Ka49Btd6oyW/DXbhxwVXEbULkQwk14+WNyszw7Q1Us3c5rAKoHteP
-    POO1ypF42FNp8uamfUZD7wVZXYCepMKlte7JhfeLslT/bHYqzzqnKz3ebrh6AoBXZEVo
-    SliZu/i2FCbDX+XE0xwWcdkWG4WGVUmArQmdo/CYUUuLKo6Aqzc9u1lrludJO9mhwYlA
-    hJiI5fheGlGj4/UC+2S/l3tKYoc+W8zR/1Eyu/01/n20FgupO4t/QaoXl/9p88X1mfgJ
-    FVtg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1767442839;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=S3lwPWHvOvbD6pJQc28NwM8aXvYUV0HGlA5QrCpwyO8=;
-    b=ma1RT0EY8AdE2ll4GsTxBnwORwTFpCMrFcCZWrgd3e14TtOouod3LHtDH6hyPnm5rP
-    pu694zTYb9G9OjJhmRBg==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeEQ7s8bGWj0Q=="
-Received: from [IPV6:2a00:6020:4a38:6810::9f3]
-    by smtp.strato.de (RZmta 54.1.0 AUTH)
-    with ESMTPSA id K0e68b203CKdmPD
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Sat, 3 Jan 2026 13:20:39 +0100 (CET)
-Message-ID: <63c20aae-e014-44f9-a201-99e0e7abadcb@hartkopp.net>
-Date: Sat, 3 Jan 2026 13:20:34 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0635246762;
+	Sat,  3 Jan 2026 13:05:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767445529; cv=none; b=jcY/SPaGGDm8ylIhpf9gYva+s9Pklj+SDbfIl/w6UHFR//0MUW/EphRQudEHYdWTrEQW7zeWwLU165uu0kV0avEuL9r9MSFKkCPJWedriYG5vRzZWbGiNyTVhD1WoIrfnQZISiuZnj8jdDr/b8S9f5qv00bJjrpU6cTX628uksk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767445529; c=relaxed/simple;
+	bh=ljhVWlyIzpcsTEWCqtSJLtuxw6WH53rf4m2/VigWrdw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=mRVokD6MkgJ7eECm8zVskR041fUqHPfP+BDn3FWFlr5+jTiRnfrfvbvdMSKEk2N0GQyNZ12SyPkXxPNA+gxswikf3tgSEttvF3IbOAqY74YlogXpjR4jCYq1XuoHqAfmuvJY3QrNQVDJjOB/2NJSn8KGimaQ/RA5N+uUF+WWsGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=QblgN0iW; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=ljhVWlyIzpcsTEWCqtSJLtuxw6WH53rf4m2/VigWrdw=;
+	t=1767445527; x=1768655127; b=QblgN0iW73bDkWa22VRbfapK86CrjlvTuLTuUWAutWX4dUO
+	b6VrpCuvUCuqajyZioLVE2s1sJfH1m55TGwh8k9czuFCtuoibkx/VXoavGIimvM1agNRskMId4v9f
+	hJq5SFP/xP9Gcp/rO5lvV9EKFsXHKA7stg9mqwV+G8TC/ZjPZrinWQTjivLJXTGWzQoXnvyl8z7em
+	8MRJvLjguCWuAWrtQTAaVeFR9JcxC5lNS3umD2xdq9L7gU7ba7VvJ39kF/CAPWkC73Lp1yJu7J4GY
+	X+bF0lQTf3CJq6dpO6P634R/jd7YbN+16bTcl8GwgKizpCxEGnBUaQ8I8A2us0rg==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1vc1Jn-00000002A78-04GT;
+	Sat, 03 Jan 2026 14:05:19 +0100
+Message-ID: <13bd5c0903fef7d27b4af2a2e43e92a380f71968.camel@sipsolutions.net>
+Subject: Re: [syzbot] [wireless?] WARNING in rfkill_unregister
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Aleksandr Nogikh <nogikh@google.com>
+Cc: syzbot <syzbot+16210d09509730207241@syzkaller.appspotmail.com>, 
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com, Krzysztof
+ Kozlowski	 <krzk@kernel.org>
+Date: Sat, 03 Jan 2026 14:05:18 +0100
+In-Reply-To: <CANp29Y6NNtie6ZTsFbYUfhubEYW2A-K44B0-TZC=b3+OZcz-Rg@mail.gmail.com> (sfid-20260102_230310_438801_8E58F90B)
+References: <6955cbd5.050a0220.a1b6.032d.GAE@google.com>
+	 <e062f6a0a7583ca99ab0449481119634f8b02a3d.camel@sipsolutions.net>
+	 <CANp29Y6NNtie6ZTsFbYUfhubEYW2A-K44B0-TZC=b3+OZcz-Rg@mail.gmail.com>
+	 (sfid-20260102_230310_438801_8E58F90B)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [bpf, xdp] headroom - was: Re: Question about to KMSAN:
- uninit-value in can_receive
-To: Jakub Kicinski <kuba@kernel.org>, Prithvi <activprithvi@gmail.com>
-Cc: andrii@kernel.org, mkl@pengutronix.de, linux-can@vger.kernel.org,
- linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
- netdev@vger.kernel.org
-References: <20251117173012.230731-1-activprithvi@gmail.com>
- <0c98b1c4-3975-4bf5-9049-9d7f10d22a6d@hartkopp.net>
- <c2cead0a-06ed-4da4-a4e4-8498908aae3e@hartkopp.net>
- <aSx++4VrGOm8zHDb@inspiron>
- <d6077d36-93ed-4a6d-9eed-42b1b22cdffb@hartkopp.net>
- <20251220173338.w7n3n4lkvxwaq6ae@inspiron>
- <01190c40-d348-4521-a2ab-3e9139cc832e@hartkopp.net>
- <20260102153611.63wipdy2meh3ovel@inspiron>
- <20260102120405.34613b68@kernel.org>
-Content-Language: en-US
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-In-Reply-To: <20260102120405.34613b68@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-malware-bazaar: not-scanned
 
-Hello Jakub,
+On Fri, 2026-01-02 at 23:02 +0100, Aleksandr Nogikh wrote:
+>=20
+> It depends on the particular case. It should be fairly easy to do for
+> warnings (where there's just one clear stack trace) and potentially
+> very tricky for task hungs (e.g.
+> https://syzkaller.appspot.com/bug?extid=3Def8f802abdb9a32343fc).
 
-thanks for stepping in!
+Makes sense. I see now that there was a recent attempt to fix this NFC
+vs. rfkill deadlock issue (and this report is on a kernel before it), so
+I guess let's leave it and see what happens :)
 
-On 02.01.26 21:04, Jakub Kicinski wrote:
-
-> You're asking the wrong person, IIUC Andrii is tangentially involved
-> in XDP (via bpf links?):
-> 
-(..)
-> 
-> Without looking too deeply - XDP has historically left the new space
-> uninitialized after push, expecting programs to immediately write the
-> headers in that space. syzbot had run into this in the past but I can't
-> find any references to past threads quickly :(
-
-To identify Andrii I mainly looked into the code with 'git blame' that 
-led to this problematic call chain:
-
-   pskb_expand_head+0x226/0x1a60 net/core/skbuff.c:2275
-   netif_skb_check_for_xdp net/core/dev.c:5081 [inline]
-   netif_receive_generic_xdp net/core/dev.c:5112 [inline]
-   do_xdp_generic+0x9e3/0x15a0 net/core/dev.c:5180
-
-Having in mind that the syzkaller refers to 
-6.13.0-rc7-syzkaller-00039-gc3812b15000c I wonder if we can leave this 
-report as-is, as the problem might be solved in the meantime??
-
-In any case I wonder, if we should add some code to re-check if the 
-headroom of the CAN-related skbs is still consistent and not changed in 
-size by other players. And maybe add some WARN_ON_ONCE() before dropping 
-the skb then.
-
-When the skb headroom is not safe to be used we need to be able to 
-identify and solve it.
-
-Best regards,
-Oliver
-
+johannes
 
