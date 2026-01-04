@@ -1,188 +1,108 @@
-Return-Path: <netdev+bounces-246709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15E6FCF0953
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 04:24:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F0F3CF0965
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 04:39:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 56710300F8BC
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 03:24:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7FA103010FEE
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 03:39:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B0C2C324E;
-	Sun,  4 Jan 2026 03:24:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF0872857FC;
+	Sun,  4 Jan 2026 03:39:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fUBqoj4O"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uqbrkn1Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B84F25C80E
-	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 03:24:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B43337260F;
+	Sun,  4 Jan 2026 03:39:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767497057; cv=none; b=uMOdlt84pMPEHPPHv+DmMi8ZOqcmQA/GC5dazbBpqSKEuLtsefpRnLqgr+Dd3KoKcVTSHnXr2w9jX4zJWfHyMGL0ZAo3vQ7SSgsHjqFG0J2jDa0drephLXWEpttbHYgNq6gRMMK0dZlzIhLECDz0km3MxRhYr9sA4JL1FHcr+Ws=
+	t=1767497986; cv=none; b=gYwn97NGhkfhrGYKgxZ57JTUaO4u1AlndUdpHmNrnLY5OvdsyKp350CTKmdR21ZIMdSNOv7TLTatOjxz26kFRqsx3BiVshL4tvjW7a/YfgUdUEl4wL10XG0xCk2o2jGRO+lidv80xKYtMGMS0UvBgVZE6JlF7dauOIukhMFGRxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767497057; c=relaxed/simple;
-	bh=/lEI3/+J/BPnZOVKSfEgPgwaAZ3096zvgLIqg+pqJh8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JCtgGuhSmw9qWHXoQIvMGLTw0hlq54WIQNqkXtLw63DQsWEu6KQyeck0wtqxKTbPLlevfkE+GEc+Vg7Oemn0nZSeP2DQJ9atoVmc2gvgs9hbrZJzjczF4xqIvE7L5NQMyt1PQtlZcUNF1QXjfZ/wvtRZ84Qv2IpYE/rJ3vl0Vhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fUBqoj4O; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767497054;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ii8w9Sk0VGXA6EfYewOe7fg/XK65AlKb5PXLcHLgJRs=;
-	b=fUBqoj4OL6vGjlL6jPhmHkGBQoHYnBIkM8bNfGYx8f9HbUmeLbtOr4QICPxPpyzYAS0MZq
-	JDC+tPCy0OOLfTKpbOuTj04FHpm49PSGDo0bB+c6S3cF5jmvYqrrTDLz6pW2ndtwJOq9SQ
-	WWezm22+UgsS4ne+W1WEzeAqb198o28=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-168-xbALdIZ0PR-HKjuLWFJAQg-1; Sat,
- 03 Jan 2026 22:24:11 -0500
-X-MC-Unique: xbALdIZ0PR-HKjuLWFJAQg-1
-X-Mimecast-MFC-AGG-ID: xbALdIZ0PR-HKjuLWFJAQg_1767497049
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D621C18002ED;
-	Sun,  4 Jan 2026 03:24:08 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.72.116.49])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2BF2A19560AB;
-	Sun,  4 Jan 2026 03:24:00 +0000 (UTC)
-From: Yumei Huang <yuhuang@redhat.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: sbrivio@redhat.com,
-	david@gibson.dropbear.id.au,
-	yuhuang@redhat.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	justin.iurman@uliege.be,
-	shuah@kernel.org
-Subject: [PATCH net-next v2] ipv6: preserve insertion order for same-scope addresses
-Date: Sun,  4 Jan 2026 11:23:57 +0800
-Message-ID: <20260104032357.38555-1-yuhuang@redhat.com>
+	s=arc-20240116; t=1767497986; c=relaxed/simple;
+	bh=5r8iqOVcvXSOkMwPFhOzGH0ybiMC6bwkE2VmwotzUbw=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=Ig4A92/6+zoLvXiUmyKLWzjsYIXF8uGhz2XW4hkRzk4q1Sd8xNk74TSudhxgArtsaBeNQrk95jXw8F7yySUK0qJcMILdPFXBrOC2e+8vas/YsSC/Wdf3QiWwT81QZdIf85pRakZiVSmTs5TElwkHVZq/Y6brgZXdFIGWJyDxOBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uqbrkn1Y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8B8EC4CEF7;
+	Sun,  4 Jan 2026 03:39:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767497986;
+	bh=5r8iqOVcvXSOkMwPFhOzGH0ybiMC6bwkE2VmwotzUbw=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=Uqbrkn1Y9Y9T4E78DTcCrnjtjAJsNYZxMS1lIulZbWdbjO42D6KIQQ0GL2LxLJTmy
+	 zgfwHqMPlDBdl9Xmnmhc18mzm18oM4+QDZFCUKpE8bKUCEwm0ZUTpgg3y6r8qnVji1
+	 iT6ZqCyI2KIUm6OkKX+Muj9JQrXaISCnZrIJAx790E70P7S1X6acuWff9ZVRf0zdVx
+	 xb+BIZCGqd8jPbBYfwbfBUBBr6CrqLQyapuL1fd22lt6gEDsSxsrFA0Ip54NH3v1sT
+	 5jA5ev7kYNw9XcDwCB6ONnXG3Vufom44iBAl5ezRnj1UBq41FH9oO77tq4pK14D9+6
+	 gn97SdFxEjG7g==
+Content-Type: multipart/mixed; boundary="===============5096022303574277409=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Message-Id: <e15de586e958d118e15c59026406ca4df756ccd9075fdcedd458639685b661a9@mail.kernel.org>
+In-Reply-To: <20260104032313.76121-3-kerneljasonxing@gmail.com>
+References: <20260104032313.76121-3-kerneljasonxing@gmail.com>
+Subject: Re: [PATCH bpf-next v3 2/2] xsk: introduce a dedicated local completion queue for each xsk
+From: bot+bpf-ci@kernel.org
+To: kerneljasonxing@gmail.com,davem@davemloft.net,edumazet@google.com,kuba@kernel.org,pabeni@redhat.com,bjorn@kernel.org,magnus.karlsson@intel.com,maciej.fijalkowski@intel.com,jonathan.lemon@gmail.com,sdf@fomichev.me,ast@kernel.org,daniel@iogearbox.net,hawk@kernel.org,john.fastabend@gmail.com
+Cc: bpf@vger.kernel.org,netdev@vger.kernel.org,kernelxing@tencent.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Sun,  4 Jan 2026 03:39:45 +0000 (UTC)
 
-IPv6 addresses with the same scope are returned in reverse insertion
-order, unlike IPv4. For example, when adding a -> b -> c, the list is
-reported as c -> b -> a, while IPv4 preserves the original order.
+--===============5096022303574277409==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This behavior causes:
+> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> index f41e0b480aa4..0a724cf20fcb 100644
+> --- a/net/xdp/xsk.c
+> +++ b/net/xdp/xsk.c
 
-a. When using `ip -6 a save` and `ip -6 a restore`, addresses are restored
-   in the opposite order from which they were saved. See example below
-   showing addresses added as 1::1, 1::2, 1::3 but displayed and saved
-   in reverse order.
+[ ... ]
 
-   # ip -6 a a 1::1 dev x
-   # ip -6 a a 1::2 dev x
-   # ip -6 a a 1::3 dev x
-   # ip -6 a s dev x
-   2: x: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN group default qlen 1000
-       inet6 1::3/128 scope global tentative
-       valid_lft forever preferred_lft forever
-       inet6 1::2/128 scope global tentative
-       valid_lft forever preferred_lft forever
-       inet6 1::1/128 scope global tentative
-       valid_lft forever preferred_lft forever
-   # ip -6 a save > dump
-   # ip -6 a d 1::1 dev x
-   # ip -6 a d 1::2 dev x
-   # ip -6 a d 1::3 dev x
-   # ip a d ::1 dev lo
-   # ip a restore < dump
-   # ip -6 a s dev x
-   2: x: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN group default qlen 1000
-       inet6 1::1/128 scope global tentative
-       valid_lft forever preferred_lft forever
-       inet6 1::2/128 scope global tentative
-       valid_lft forever preferred_lft forever
-       inet6 1::3/128 scope global tentative
-       valid_lft forever preferred_lft forever
-   # ip a showdump < dump
-    if1:
-        inet6 ::1/128 scope host proto kernel_lo
-        valid_lft forever preferred_lft forever
-    if2:
-        inet6 1::3/128 scope global tentative
-        valid_lft forever preferred_lft forever
-    if2:
-        inet6 1::2/128 scope global tentative
-        valid_lft forever preferred_lft forever
-    if2:
-        inet6 1::1/128 scope global tentative
-        valid_lft forever preferred_lft forever
+> +static void xsk_cq_write_addr(struct sk_buff *skb, u32 desc_processed)
+> +{
+> +	struct xsk_buff_pool *pool = xdp_sk(skb->sk)->pool;
+> +	u32 idx, addr, pos = xsk_get_start_addr(skb);
+             ^^^^
 
-b. Addresses in pasta to appear in reversed order compared to host
-   addresses.
+Should addr be u64 here? The lcq->desc[] array stores u64 values
+(descriptor addresses), and xskq_prod_write_addr() expects a u64 parameter.
+Declaring addr as u32 truncates the upper 32 bits when reading from
+lcq->desc[].
 
-The ipv6 addresses were added in reverse order by commit e55ffac60117
-("[IPV6]: order addresses by scope"), then it was changed by commit
-502a2ffd7376 ("ipv6: convert idev_list to list macros"), and restored by
-commit b54c9b98bbfb ("ipv6: Preserve pervious behavior in
-ipv6_link_dev_addr()."). However, this reverse ordering within the same
-scope causes inconsistency with IPv4 and the issues described above.
+For reference, struct local_cq in include/net/xdp_sock.h declares:
 
-This patch aligns IPv6 address ordering with IPv4 for consistency
-by changing the comparison from >= to > when inserting addresses
-into the address list. Also updates the ioam6 selftest to reflect
-the new address ordering behavior. Combine these two changes into
-one patch for bisectability.
+    u64 desc[] ____cacheline_aligned_in_smp;
 
-Fixes: e55ffac60117 ("[IPV6]: order addresses by scope")
-Link: https://bugs.passt.top/show_bug.cgi?id=175
-Suggested-by: Stefano Brivio <sbrivio@redhat.com>
-Signed-off-by: Yumei Huang <yuhuang@redhat.com>
+And xskq_prod_write_addr() in net/xdp/xsk_queue.h has signature:
+
+    static inline void xskq_prod_write_addr(struct xsk_queue *q, u32 idx, u64 addr)
+
+If a umem is large enough that descriptor offsets exceed 4GB, this would
+silently write incorrect addresses to the completion queue, causing user
+space to receive corrupted descriptor addresses.
+
+> +	struct xdp_sock *xs = xdp_sk(skb->sk);
+> +
+> +	idx = xskq_get_prod(pool->cq) + desc_processed;
+> +	addr = xs->lcq->desc[(pos + desc_processed) & xs->lcq->ring_mask];
+> +	xskq_prod_write_addr(pool->cq, idx, addr);
+> +}
+
+
 ---
- net/ipv6/addrconf.c                  | 2 +-
- tools/testing/selftests/net/ioam6.sh | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 40e9c336f6c5..ca998bf46863 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -1013,7 +1013,7 @@ ipv6_link_dev_addr(struct inet6_dev *idev, struct inet6_ifaddr *ifp)
- 	list_for_each(p, &idev->addr_list) {
- 		struct inet6_ifaddr *ifa
- 			= list_entry(p, struct inet6_ifaddr, if_list);
--		if (ifp_scope >= ipv6_addr_src_scope(&ifa->addr))
-+		if (ifp_scope > ipv6_addr_src_scope(&ifa->addr))
- 			break;
- 	}
- 
-diff --git a/tools/testing/selftests/net/ioam6.sh b/tools/testing/selftests/net/ioam6.sh
-index 845c26dd01a9..b2b99889942f 100755
---- a/tools/testing/selftests/net/ioam6.sh
-+++ b/tools/testing/selftests/net/ioam6.sh
-@@ -273,8 +273,8 @@ setup()
-   ip -netns $ioam_node_beta link set ioam-veth-betaR name veth1 &>/dev/null
-   ip -netns $ioam_node_gamma link set ioam-veth-gamma name veth0 &>/dev/null
- 
--  ip -netns $ioam_node_alpha addr add 2001:db8:1::50/64 dev veth0 &>/dev/null
-   ip -netns $ioam_node_alpha addr add 2001:db8:1::2/64 dev veth0 &>/dev/null
-+  ip -netns $ioam_node_alpha addr add 2001:db8:1::50/64 dev veth0 &>/dev/null
-   ip -netns $ioam_node_alpha link set veth0 up &>/dev/null
-   ip -netns $ioam_node_alpha link set lo up &>/dev/null
-   ip -netns $ioam_node_alpha route add 2001:db8:2::/64 \
--- 
-2.52.0
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/20686964750
 
+--===============5096022303574277409==--
 
