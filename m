@@ -1,80 +1,93 @@
-Return-Path: <netdev+bounces-246787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 619F0CF12C6
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 18:57:51 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D05DFCF12D8
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 19:05:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 018C030019CC
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 17:57:51 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 58CD23002146
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 18:05:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2442B2D3727;
-	Sun,  4 Jan 2026 17:57:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 724D12D6E6B;
+	Sun,  4 Jan 2026 18:04:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eNlmOwGt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YN0uDbJm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00BF22D24B7
-	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 17:57:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF422D6E5A
+	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 18:04:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767549470; cv=none; b=rJ+4x0gpVJB/zeeiPmWoGUnyMH6lKnU53TxdwspQcQfD4ZGpeA2WEV4GPPNTpNlwlFsLAqI7wz3SWCor+Vob+9ZnJyT+phw02b7qpZYesMllhpdHHanmtHmKrYVTZ4tJZjV1RKWMxZl3QOj2X3yjZJ+YIFAAX+oxcgVGuirYr48=
+	t=1767549899; cv=none; b=iw9lZFf66U+IZNFjBl/nH9gNImEbBjhD1AZYHgjwTz8+1IOt8oBuwUS4O2f6cFeEgXXNuPPZLPSPpK9LamFda7jLe/6Dc36qLGPHTkHFReJhwGy+zJKoFoWdp2u5no0U9qnHrSAJakpxzyY7vnG51SAqQror7QwIj1dbCu0utQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767549470; c=relaxed/simple;
-	bh=GogI6KoWMG7sQcRQST4tSXHnHsU61K4n/uzTVM7dT2U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SO5Es3lSc4mrnLkZPI3ptWBOhipKHXsF6qWCtElDNVrjUg3BpHnjLhoyTPz7R7sMnpFCU/N5snKHnMoYYTi6F5ZP3p5HEgX+9PbOd97/iiUVLKDwOaCG5Pr+yuUK9BEVNV2QcsJY/0dWwPV1aqOIPRw4L2rGFxdQuQFKtXgyVp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eNlmOwGt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85112C4CEF7;
-	Sun,  4 Jan 2026 17:57:49 +0000 (UTC)
+	s=arc-20240116; t=1767549899; c=relaxed/simple;
+	bh=FPGo+lL0zGCrh+eaLOu0a4WnDcGsQjYyVn5UQ4U6MLc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=QPObNw8dJZYbvD89qXtqH6huKAJxAI7mz6fN4sHNMKlHduvVCzlKjcSV+4jlqPKUdJm/KXVTntnj/ZIwN1MrpcSnzxjiJHe8FmyvGEBhpZnGS2PNDsDfjngVy9sfzEGPlEhfFjumTk/A18dLLg+gW/1qPYcFnM7av9SMlhttpJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YN0uDbJm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27688C4CEF7;
+	Sun,  4 Jan 2026 18:04:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767549469;
-	bh=GogI6KoWMG7sQcRQST4tSXHnHsU61K4n/uzTVM7dT2U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eNlmOwGt/ErVXDeQvrb5x/qUdjhqLGFlCC5iP6wYoNNvUFVP7cv000yCvfbY9Xm+3
-	 t0bz76FZmYWEyQMjc56C/y8XInKLqwSmjpGLbondvk0JTc5JxPQgyTX8tLj4dIng8/
-	 ExnUx4fTaZhZNsOUunMIUh7D9KDaKIEjIB8ETkd7VcEuBSysYTkyEvkvIlix/9SbFw
-	 k121A6v0zYiVfiXUrRFD73zwSDF6lacJKsWuHqsCQI1b8yuw+snggzPOjY4rU++Qnf
-	 WWkxV1i/NQdTfXrtbab97ljbHLNU1R0vyrBFrPidwil+oZDy6+pLf2SpYuX7Vp9nqt
-	 2+uBB0ndeE5dg==
-Date: Sun, 4 Jan 2026 09:57:48 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: airoha: Fix schedule while atomic in
- airoha_ppe_deinit()
-Message-ID: <20260104095748.70107b9b@kernel.org>
-In-Reply-To: <20251223-airoha-fw-ethtool-v1-1-1dbd1568c585@kernel.org>
-References: <20251223-airoha-fw-ethtool-v1-1-1dbd1568c585@kernel.org>
+	s=k20201202; t=1767549899;
+	bh=FPGo+lL0zGCrh+eaLOu0a4WnDcGsQjYyVn5UQ4U6MLc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=YN0uDbJmCyT/mZFMPbKUS1JHeDyFQK49iRisJX9KhWKppX3Hz5kluA1R9x4QsNBHv
+	 95cl0Z5JKRuq+6uHmFU1gcGnOEGjAXMce/9QJOu8mL0SxpJgxgxWGqVLefgBWuoLAN
+	 7aITQGlLzcIa87f+W+KILCHSRgRE1/atoTH11BOk76yFANd3aOApzqOLV+Mt7ubJmE
+	 Bsalu2kSGOD5L8SQwhjW2PCCHwUQZZV7Tcd3ybSvdDYdqzOxiF7d6EjUOH+31AI1gs
+	 G+iXT/irlFApquYtZIJ3cO+DLzw1zuzQkx5gHEn+4uVeB+8FxtCTMSFLt/VDfVX9Wo
+	 gjF57N7CQ8m3Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B9AF380AA4F;
+	Sun,  4 Jan 2026 18:01:39 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: marvell: prestera: fix NULL dereference on
+ devlink_alloc() failure
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176754969806.141026.18096309039043852139.git-patchwork-notify@kernel.org>
+Date: Sun, 04 Jan 2026 18:01:38 +0000
+References: <20251230052124.897012-1-alok.a.tiwari@oracle.com>
+In-Reply-To: <20251230052124.897012-1-alok.a.tiwari@oracle.com>
+To: ALOK TIWARI <alok.a.tiwari@oracle.com>
+Cc: vadym.kochan@plvision.eu, andrew+netdev@lunn.ch,
+ taras.chornyi@plvision.eu, kuba@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, alok.a.tiwarilinux@gmail.com
 
-On Tue, 23 Dec 2025 22:56:44 +0100 Lorenzo Bianconi wrote:
-> Rely on rcu_replace_pointer in airoha_ppe_deinit routine in order to fix
-> schedule while atomic issue.
+Hello:
 
-The information in the commit message is not sufficient.
-What "schedule while atomic issue"?
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> -	npu = rcu_dereference(eth->npu);
-> +	mutex_lock(&flow_offload_mutex);
-> +
-> +	npu = rcu_replace_pointer(eth->npu, NULL,
-> +				  lockdep_is_held(&flow_offload_mutex));
->  	if (npu) {
->  		npu->ops.ppe_deinit(npu);
->  		airoha_npu_put(npu);
+On Mon, 29 Dec 2025 21:21:18 -0800 you wrote:
+> devlink_alloc() may return NULL on allocation failure, but
+> prestera_devlink_alloc() unconditionally calls devlink_priv() on
+> the returned pointer.
+> 
+> This leads to a NULL pointer dereference if devlink allocation fails.
+> Add a check for a NULL devlink pointer and return NULL early to avoid
+> the crash.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net: marvell: prestera: fix NULL dereference on devlink_alloc() failure
+    https://git.kernel.org/netdev/net/c/a428e0da1248
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
