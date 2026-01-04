@@ -1,131 +1,112 @@
-Return-Path: <netdev+bounces-246724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3BF3CF0A98
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 07:23:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF67CCF0A80
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 07:22:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4E95B3018185
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 06:22:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7A92F300C5F4
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 06:22:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4B4B2DECBF;
-	Sun,  4 Jan 2026 06:22:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6D3D2D839B;
+	Sun,  4 Jan 2026 06:22:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="icOJK9J9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PyJP66sH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0202DF3DA
-	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 06:22:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D0B2BE02B
+	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 06:22:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767507776; cv=none; b=OrTY7EyB47JTFBT9CGrElfIBpo3BGScwyBTJVaz92YdrvkDG7toJih+9U+EZeC6HP4A6ouoH2+Vg/KoljXBu3perYe9tExp4AKHnOHNiInXxan7Blg8MdN/Vz3zruabxmL0ijBVerQfecX6qoW+dJ23AWwymqr9WjL2cCNqtwUM=
+	t=1767507763; cv=none; b=pJ1SqsURtIR8gW2B3FrleAidU953PFamhpeEiJwHa3csjPV8YwGUhZARTM87wm1zKqzHMRL5IyBi5qrWVoCim7NI0pA/zULyB9kxOnHA6o1uMtW9VqCOKwOI+SBWsMiIB+G/ktSKRr2+uviXjRO6lLX7xqirA+M357A3/OhHR00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767507776; c=relaxed/simple;
-	bh=nmvNTEn2d2Kw218CvlRrrbyqxjZtPZvg0zO+e9VgXnU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eHeVcNaU/CF+H7l30WVA7HHXOtXp1Cn7UbfgPUnOFWh1ountdDEQ2weoZvkvX6oW7fX7yo/TFgc5Y8cqPjzzUAJjg8HHf2pwr+1qNh9g6Cx+HDTdiJSy3LzBCO+kwesrzQiMIWlyEcIU1SkAQBjS3B4AuEbddF3gur5vX96GDQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=icOJK9J9; arc=none smtp.client-ip=209.85.161.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-65d132240acso8011262eaf.1
-        for <netdev@vger.kernel.org>; Sat, 03 Jan 2026 22:22:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767507772; x=1768112572; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pFfPlAf5+lGKz5BhLDkt0s58hyQ5L/Fh79A19Mu9HtQ=;
-        b=icOJK9J98CqvKrYWJIDE6E78U7K/zODI9DdmWPPhdKE4bVxbpqb1IM0QEfVwLwVHHg
-         8Q047gkcbk7CsRHRs9TE/lrNHIO2c/lxMLydrTykBUmiFtZje2Qb/XwiPm5I7EFSnTnM
-         ZKGndtdjvs4zjPf+LBydoBBaTnwefFLS/swwfTHR4XAUexVpLQnPWWDyHAhud8f9yNsG
-         sS7Ul7CIPsj+S9/5U2x5K1soCPVIdMIDMsVfsJWdGI4gQGIhgXlo4bnDkRaTXflT4iVs
-         gRrSVHDRkxPdYaWyYhJYRtbPdX1EI0j2ckMmRH2djD5XMr83rOyq7MexuvVml29kZXZN
-         TtFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767507772; x=1768112572;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=pFfPlAf5+lGKz5BhLDkt0s58hyQ5L/Fh79A19Mu9HtQ=;
-        b=uAU7ZYXF4KLASEQJQDjYdhE6n0tI69P4I18QLF0z/Y3Y3jxGdJrncWWwEilhWn90y0
-         9y7HmigT5IrfbSEgLGdbEawnsO8Rd/3MU/W2SnoPxOkpYBopwGE7qA+Ropq95F7R99/E
-         ukgB2q8g/QoAe8qxgR1tZspgQSP+3SIA6QEDPMulawitXlPZyCcEkQepsWG2rtOgtHV1
-         IvHbM83EnTnQoPOvZSS2M5r2YO6zchotrLY3YtwmpBLuL5WGJj8DbbKj6jyrQfgkZS6J
-         4vUaRfsHW+GDWNUnZ/NW5uEqDwvKhatLqV4hTS8ahkwLzQ9UZIz927RtDEdY2SjD/2XI
-         cQyw==
-X-Forwarded-Encrypted: i=1; AJvYcCUtE39ZtytQS8ENYXxiftH3NZhZtaOD+Xuq6amjU277ibobuSj4nZhcWxMEjoUBsQngs1TnkgM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjH1fWITyqSdxldYzy2GMdetUPvJTc4ouPBmWpI84KdyzAOBEA
-	2J6c1VWWJhBpyKXYSBs0Ad4l94Fyx90HBfDilLlO0hgs0Yka8Oq0uULGDabVJhRxiXuyg1/288w
-	M7x1r5APqLBh37ZKe8xrKpCqZSXUGI+4=
-X-Gm-Gg: AY/fxX5YOUZQRCotOoifH6W6khq87bICYqSoPjOjM1Zn4s8i/bM3fxSWZd2Eehu1FOH
-	1FFjU+R6+89LMzVxzUp0vQ2aLoSjX0IEGlRTlOUw3TSf8BruIXgVgWHz0SqktyDRn6DxVEfK15y
-	q4DcIDPbRUHg+TS6OuC8qsxWhq8m8AVjeTJeh02uvgzTUSp4j+nap9y0bY/xEZpC0k/FkRnTzfs
-	Dww9kFc+gZ+9xZ/yaaobCuhuqy/3EDKQNniT/olXCDIjFUVKXDeRQjGcZRk2CKKBBdgORls
-X-Google-Smtp-Source: AGHT+IHKUzNaqXfAAOXTQH/wyhLdPifEG8hdfQus5/ZP24EhvnoebGBAh1/QoRljvFz3JP4QEo0R0qH1KXixAhwxZ7E=
-X-Received: by 2002:a05:6820:330d:b0:65c:f046:bb71 with SMTP id
- 006d021491bc7-65d0ea9933fmr13839045eaf.46.1767507772044; Sat, 03 Jan 2026
- 22:22:52 -0800 (PST)
+	s=arc-20240116; t=1767507763; c=relaxed/simple;
+	bh=8jPmQen44zA33S7n2Etxe5dVecUhiSgrXfORdR8FFMY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ql25OVn5pu2388AhAzH86fjA/YUhhnp/cN8s0hiuLP5y8VobDWjCiuvi1ayEzEr/9O4x5i0x73hcDHNWTbBTsNJcDx2UW8AVaokDTXgo1gBhvEV60DPJsThCp1w2MtYX7/lB1av3xkVbZHHy76DxHnADo9T8Dk9S5QdqkGHBDVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PyJP66sH; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767507761;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=kbhpEMXNgm3tTgoLY7Vy2dg7URMTphCxWjTZwP1bNlY=;
+	b=PyJP66sHULmFZdfUGFw3a9+mxslvZPwGu+fxIGwT/ed4FozAxtxxhsOKTW1rBex9ZeShuR
+	aMxg7rHcnym4C/i8/+sfyxLdCLcRhlDNJR/F0Hhwd7EAoPxXoXkGH31vy2+mfM/SgbVH7W
+	82Goo6Yi5TXH7bY5Qp78zsm0kYh05Ik=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-394-YB025s2FNI6SL0g33yxu2g-1; Sun,
+ 04 Jan 2026 01:22:37 -0500
+X-MC-Unique: YB025s2FNI6SL0g33yxu2g-1
+X-Mimecast-MFC-AGG-ID: YB025s2FNI6SL0g33yxu2g_1767507755
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BE5BC18002DE;
+	Sun,  4 Jan 2026 06:22:35 +0000 (UTC)
+Received: from xudu-thinkpadx1carbongen9.nay.csb (unknown [10.66.60.72])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7322019560A7;
+	Sun,  4 Jan 2026 06:22:32 +0000 (UTC)
+From: Xu Du <xudu@redhat.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org
+Cc: netdev@vger.kernel.org
+Subject: [PATCH net-next v2 0/8] selftest: Extend tun/virtio coverage for GSO over UDP tunnel
+Date: Sun,  4 Jan 2026 14:22:19 +0800
+Message-ID: <cover.1767074545.git.xudu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260104032313.76121-3-kerneljasonxing@gmail.com> <e15de586e958d118e15c59026406ca4df756ccd9075fdcedd458639685b661a9@mail.kernel.org>
-In-Reply-To: <e15de586e958d118e15c59026406ca4df756ccd9075fdcedd458639685b661a9@mail.kernel.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sun, 4 Jan 2026 14:22:15 +0800
-X-Gm-Features: AQt7F2rOvf6soK_ZUGhuzyLkXSDXSaX75Goy7BHhQb-bgoLkIADQtPUhfMbpsMo
-Message-ID: <CAL+tcoB6eCogZXXxDQ58nxp-VxWFOPR2DP4pyLVxGtjXdWPQXA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v3 2/2] xsk: introduce a dedicated local
- completion queue for each xsk
-To: bot+bpf-ci@kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	kernelxing@tencent.com, andrii@kernel.org, martin.lau@kernel.org, 
-	eddyz87@gmail.com, yonghong.song@linux.dev, clm@meta.com, 
-	ihor.solodrai@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Sun, Jan 4, 2026 at 11:39=E2=80=AFAM <bot+bpf-ci@kernel.org> wrote:
->
-> > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> > index f41e0b480aa4..0a724cf20fcb 100644
-> > --- a/net/xdp/xsk.c
-> > +++ b/net/xdp/xsk.c
->
-> [ ... ]
->
-> > +static void xsk_cq_write_addr(struct sk_buff *skb, u32 desc_processed)
-> > +{
-> > +     struct xsk_buff_pool *pool =3D xdp_sk(skb->sk)->pool;
-> > +     u32 idx, addr, pos =3D xsk_get_start_addr(skb);
->              ^^^^
->
-> Should addr be u64 here? The lcq->desc[] array stores u64 values
-> (descriptor addresses), and xskq_prod_write_addr() expects a u64 paramete=
-r.
-> Declaring addr as u32 truncates the upper 32 bits when reading from
-> lcq->desc[].
->
-> For reference, struct local_cq in include/net/xdp_sock.h declares:
->
->     u64 desc[] ____cacheline_aligned_in_smp;
->
-> And xskq_prod_write_addr() in net/xdp/xsk_queue.h has signature:
->
->     static inline void xskq_prod_write_addr(struct xsk_queue *q, u32 idx,=
- u64 addr)
->
-> If a umem is large enough that descriptor offsets exceed 4GB, this would
-> silently write incorrect addresses to the completion queue, causing user
-> space to receive corrupted descriptor addresses.
+The primary goal is to add test validation for GSO when operating over
+UDP tunnels, a scenario which is not currently covered.
 
-Yes, it can happen. Thanks for pointing this out.
+The design strategy is to extend the existing tun/tap testing infrastructure
+to support this new use-case, rather than introducing a new or parallel framework.
+This allows for better integration and re-use of existing test logic.
+
+---
+v1 -> v2:
+ - Addresse sporadic failures due to too early send.
+ - Refactor environment address assign helper function.
+ - Fix incorrect argument passing in build packet functions.
+
+v1: https://lore.kernel.org/netdev/cover.1763345426.git.xudu@redhat.com/
+
+Xu Du (8):
+  selftest: tun: Format tun.c existing code
+  selftest: tun: Introduce tuntap_helpers.h header for TUN/TAP testing
+  selftest: tun: Refactor tun_delete to use tuntap_helpers
+  selftest: tap: Refactor tap test to use tuntap_helpers
+  selftest: tun: Add helpers for GSO over UDP tunnel
+  selftest: tun: Add test for sending gso packet into tun
+  selftest: tun: Add test for receiving gso packet from tun
+  selftest: tun: Add test data for success and failure paths
+
+ tools/testing/selftests/net/tap.c            | 287 +-----
+ tools/testing/selftests/net/tun.c            | 917 ++++++++++++++++++-
+ tools/testing/selftests/net/tuntap_helpers.h | 608 ++++++++++++
+ 3 files changed, 1530 insertions(+), 282 deletions(-)
+ create mode 100644 tools/testing/selftests/net/tuntap_helpers.h
+
+
+base-commit: 7b8e9264f55a9c320f398e337d215e68cca50131
+-- 
+2.49.0
+
 
