@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-246777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8695BCF121D
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 17:25:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E78C5CF122C
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 17:26:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C34F9300F583
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 16:25:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 64977303212E
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 16:25:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA863279DCE;
-	Sun,  4 Jan 2026 16:25:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B95281503;
+	Sun,  4 Jan 2026 16:25:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wqGYwy3r"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vuVRnV8K"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFCF227703A
-	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 16:25:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C056234973;
+	Sun,  4 Jan 2026 16:25:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767543904; cv=none; b=hFmB3tMwgY7NXEhtSqyDk4KK+aWgXDlSWGA3SPMTYx9HRcR9foxPTOpJLnkj8M6NJ6bQUXqzOt9KcVuT8Bhe/PtqRENM8cA0btrMf34S+iFF6J8viya1k4panMUU02t03sXK6Sj4nFKvl6+zrOlnZnFadpGLtGcNm3uOjKGyIVk=
+	t=1767543911; cv=none; b=VvLH0oP5drHGnhRPhOWTQMgvVhxmP9kkQ7P379Yj59V3DdqCt5Cc5zh22uzAhqwaQieKIFlqTrPjIvWqSbe0HbiKm4dxNslIBxFORicx8dFFzR7H6IfQ1KxoW69hEn+aYBG0aJiyica+vhRMIjEF5T6p6cw7k6yt+nk0KDxz1sE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767543904; c=relaxed/simple;
-	bh=j7cR8+ufxEC6b3PZjjtmQAAcUCXybtKLeeEyN+Kt9zs=;
+	s=arc-20240116; t=1767543911; c=relaxed/simple;
+	bh=LSTTQ1Bw6k7njO8lwuxwQO6h9yNeUWCg0KXwR2Yikd8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OcZGIKBsy7lGUKE8Px+WOHsVdSTHNmlBX1Vnd2ZTd9mPK2Ja+OHDI2oD9LJ8GJwM1QPkSdYHi2t1lQPOA1/wO+hGuuyy5lKfQk20Kg0KNI7nPDz8PxBZUBRkB6EiufAH0WkPsAi0Cs7rbIFBPnWZjcH1WHam6E0GpS4T3dlW7pg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wqGYwy3r; arc=none smtp.client-ip=91.218.175.181
+	 MIME-Version; b=sUcoo27Q+R4WGRl71E1dDUxqXvENq+Db6Xt6J7su4OUoqLiLMEU8Rvuhwnnv4bgoxzAnWg19BsHI1TY7AC869aaEPzKpTz8xyLZj+mYQQjy/MCmObc29atL+vKOu8vkhp4nmfUPvfQ4UllM/01JVcNw0LClTFz/qekbVYO9QtsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vuVRnV8K; arc=none smtp.client-ip=91.218.175.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767543899;
+	t=1767543906;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CvUp10h0Mn9exzUZ/n1dBrd2YDkqgmgwZbLLzqYBLM4=;
-	b=wqGYwy3rPPwjUgcwc+Zk72fRwu9rJHd4cpXwPFYdXQyo3aLdr2BFjuogY9pVKKvMo27hRB
-	MJoMlLw7LAHxkey1r+/58EPUG5f81OtXgLn0IPa8CtwgPehxf7xadVLLtvI06qmcLb0YRz
-	Ett+KwBbweZPn8l+dQiGwaC6Q4/vKc4=
+	bh=pqbsIbMnN1SRJEl+iPFxJCqCnnA13u+xQvRbspdzZhg=;
+	b=vuVRnV8KsWEl32XjLibUJqTVNuyAgu2Rfq8RAwC0U+f3yHLB0jE+t/S/hmO3+uRW8TzkY1
+	Igqj2rbXzsy0k2snLJkZd8fi0/Z4YVnnVT9yrGEce7ypmn/GIYwbswno5s2vtQk8OlNSXx
+	qghU0C9WepW1socVTmvBocKOfMzllHM=
 From: KaFai Wan <kafai.wan@linux.dev>
 To: ast@kernel.org,
 	daniel@iogearbox.net,
@@ -66,13 +66,10 @@ To: ast@kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Cc: KaFai Wan <kafai.wan@linux.dev>,
-	Yinhao Hu <dddddd@hust.edu.cn>,
-	Kaiyan Mei <M202472210@hust.edu.cn>,
-	Dongliang Mu <dzm91@hust.edu.cn>
-Subject: [PATCH bpf-next 1/2] bpf, test_run: Fix user-memory-access vulnerability for LIVE_FRAMES
-Date: Mon,  5 Jan 2026 00:23:49 +0800
-Message-ID: <20260104162350.347403-2-kafai.wan@linux.dev>
+Cc: KaFai Wan <kafai.wan@linux.dev>
+Subject: [PATCH bpf-next 2/2] selftests/bpf: Add test for xdp_md context with LIVE_FRAMES in BPF_PROG_TEST_RUN
+Date: Mon,  5 Jan 2026 00:23:50 +0800
+Message-ID: <20260104162350.347403-3-kafai.wan@linux.dev>
 In-Reply-To: <20260104162350.347403-1-kafai.wan@linux.dev>
 References: <fa2be179-bad7-4ee3-8668-4903d1853461@hust.edu.cn>
  <20260104162350.347403-1-kafai.wan@linux.dev>
@@ -85,109 +82,75 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-When testing XDP programs with LIVE_FRAMES mode, if the metalen is set
-to >= (XDP_PACKET_HEADROOM - sizeof(struct xdp_frame)), there won't be
-enough space for the xdp_frame conversion in xdp_update_frame_from_buff().
-Additionally, the xdp_frame structure may be filled with user-provided data,
-which can lead to a memory access vulnerability when converting to skb.
+Add a test case uses xdp_md as context parameter for BPF_PROG_TEST_RUN
+with LIVE_FRAMES flag. The test ensures that potential user-memory-access
+vulnerabilities are properly prevented.
 
-This fix reverts to the original version and ensures data_hard_start
-correctly points to the xdp_frame structure, eliminating the security risk.
-
-Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
-Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
-Reviewed-by: Dongliang Mu <dzm91@hust.edu.cn>
-Fixes: 294635a8165a ("bpf, test_run: fix &xdp_frame misplacement for LIVE_FRAMES")
 Signed-off-by: KaFai Wan <kafai.wan@linux.dev>
 ---
- net/bpf/test_run.c                            | 23 +++++++++----------
- .../bpf/prog_tests/xdp_do_redirect.c          |  6 ++---
- 2 files changed, 14 insertions(+), 15 deletions(-)
+ .../bpf/prog_tests/xdp_context_test_run.c     | 19 +++++++++++++++++++
+ .../bpf/progs/test_xdp_context_test_run.c     |  6 ++++++
+ 2 files changed, 25 insertions(+)
 
-diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-index 655efac6f133..00234eba7c76 100644
---- a/net/bpf/test_run.c
-+++ b/net/bpf/test_run.c
-@@ -90,11 +90,9 @@ static bool bpf_test_timer_continue(struct bpf_test_timer *t, int iterations,
- struct xdp_page_head {
- 	struct xdp_buff orig_ctx;
- 	struct xdp_buff ctx;
--	union {
--		/* ::data_hard_start starts here */
--		DECLARE_FLEX_ARRAY(struct xdp_frame, frame);
--		DECLARE_FLEX_ARRAY(u8, data);
--	};
-+	/* ::data_hard_start starts here */
-+	struct xdp_frame frame;
-+	DECLARE_FLEX_ARRAY(u8, data);
- };
+diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
+index ee94c281888a..0276daaae45c 100644
+--- a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
++++ b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
+@@ -45,6 +45,7 @@ void test_xdp_context_error(int prog_fd, struct bpf_test_run_opts opts,
+ void test_xdp_context_test_run(void)
+ {
+ 	struct test_xdp_context_test_run *skel = NULL;
++	char data_xdp[sizeof(pkt_v4) + XDP_PACKET_HEADROOM];
+ 	char data[sizeof(pkt_v4) + sizeof(__u32)];
+ 	char bad_ctx[sizeof(struct xdp_md) + 1];
+ 	struct xdp_md ctx_in, ctx_out;
+@@ -55,6 +56,12 @@ void test_xdp_context_test_run(void)
+ 			    .ctx_size_out = sizeof(ctx_out),
+ 			    .repeat = 1,
+ 		);
++	DECLARE_LIBBPF_OPTS(bpf_test_run_opts, opts_xdp,
++			    .data_in = &data_xdp,
++			    .data_size_in = sizeof(data_xdp),
++			    .flags = BPF_F_TEST_XDP_LIVE_FRAMES,
++			    .repeat = 1,
++		);
+ 	int err, prog_fd;
  
- struct xdp_test_data {
-@@ -131,10 +129,11 @@ static void xdp_test_run_init_page(netmem_ref netmem, void *arg)
- 	frm_len = orig_ctx->data_end - orig_ctx->data_meta;
- 	meta_len = orig_ctx->data - orig_ctx->data_meta;
- 	headroom -= meta_len;
-+	headroom += sizeof(head->frame);
+ 	skel = test_xdp_context_test_run__open_and_load();
+@@ -70,6 +77,18 @@ void test_xdp_context_test_run(void)
+ 	ASSERT_EQ(errno, E2BIG, "extradata-errno");
+ 	ASSERT_ERR(err, "bpf_prog_test_run(extradata)");
  
- 	new_ctx = &head->ctx;
--	frm = head->frame;
--	data = head->data;
-+	frm = &head->frame;
-+	data = frm;
- 	memcpy(data + headroom, orig_ctx->data_meta, frm_len);
- 
- 	xdp_init_buff(new_ctx, TEST_XDP_FRAME_SIZE, &xdp->rxq);
-@@ -215,8 +214,8 @@ static bool frame_was_changed(const struct xdp_page_head *head)
- 	 * i.e. has the highest chances to be overwritten. If those two are
- 	 * untouched, it's most likely safe to skip the context reset.
- 	 */
--	return head->frame->data != head->orig_ctx.data ||
--	       head->frame->flags != head->orig_ctx.flags;
-+	return head->frame.data != head->orig_ctx.data ||
-+	       head->frame.flags != head->orig_ctx.flags;
++	memset(&ctx_in, 0, sizeof(ctx_in));
++	ctx_in.data_meta = 0;
++	ctx_in.data = 0xf4;
++	ctx_in.data_end = sizeof(data_xdp);
++	opts_xdp.ctx_in = &ctx_in;
++	opts_xdp.ctx_size_in = sizeof(ctx_in);
++	*(__u32 *)(data_xdp + 0) = 0x28d6a0b5;
++	*(__u32 *)(data_xdp + 4) = 0xf273eea3;
++	*(struct ipv4_packet *)(data_xdp + ctx_in.data) = pkt_v4;
++	err = bpf_prog_test_run_opts(bpf_program__fd(skel->progs.xdp_pass), &opts_xdp);
++	ASSERT_OK(err, "bpf_prog_test_run(valid meta)");
++
+ 	*(__u32 *)data = XDP_PASS;
+ 	*(struct ipv4_packet *)(data + sizeof(__u32)) = pkt_v4;
+ 	opts.ctx_in = &ctx_in;
+diff --git a/tools/testing/selftests/bpf/progs/test_xdp_context_test_run.c b/tools/testing/selftests/bpf/progs/test_xdp_context_test_run.c
+index d7b88cd05afd..2166928d4680 100644
+--- a/tools/testing/selftests/bpf/progs/test_xdp_context_test_run.c
++++ b/tools/testing/selftests/bpf/progs/test_xdp_context_test_run.c
+@@ -17,4 +17,10 @@ int xdp_context(struct xdp_md *xdp)
+ 	return ret;
  }
  
- static bool ctx_was_changed(struct xdp_page_head *head)
-@@ -234,8 +233,8 @@ static void reset_ctx(struct xdp_page_head *head)
- 	head->ctx.data = head->orig_ctx.data;
- 	head->ctx.data_meta = head->orig_ctx.data_meta;
- 	head->ctx.data_end = head->orig_ctx.data_end;
--	xdp_update_frame_from_buff(&head->ctx, head->frame);
--	head->frame->mem_type = head->orig_ctx.rxq->mem.type;
-+	xdp_update_frame_from_buff(&head->ctx, &head->frame);
-+	head->frame.mem_type = head->orig_ctx.rxq->mem.type;
- }
- 
- static int xdp_recv_frames(struct xdp_frame **frames, int nframes,
-@@ -301,7 +300,7 @@ static int xdp_test_run_batch(struct xdp_test_data *xdp, struct bpf_prog *prog,
- 		head = phys_to_virt(page_to_phys(page));
- 		reset_ctx(head);
- 		ctx = &head->ctx;
--		frm = head->frame;
-+		frm = &head->frame;
- 		xdp->frame_cnt++;
- 
- 		act = bpf_prog_run_xdp(prog, ctx);
-diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_do_redirect.c b/tools/testing/selftests/bpf/prog_tests/xdp_do_redirect.c
-index dd34b0cc4b4e..f7615c265e6e 100644
---- a/tools/testing/selftests/bpf/prog_tests/xdp_do_redirect.c
-+++ b/tools/testing/selftests/bpf/prog_tests/xdp_do_redirect.c
-@@ -59,12 +59,12 @@ static int attach_tc_prog(struct bpf_tc_hook *hook, int fd)
- 
- /* The maximum permissible size is: PAGE_SIZE - sizeof(struct xdp_page_head) -
-  * SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) - XDP_PACKET_HEADROOM =
-- * 3408 bytes for 64-byte cacheline and 3216 for 256-byte one.
-+ * 3368 bytes for 64-byte cacheline and 3216 for 256-byte one.
-  */
- #if defined(__s390x__)
--#define MAX_PKT_SIZE 3216
-+#define MAX_PKT_SIZE 3176
- #else
--#define MAX_PKT_SIZE 3408
-+#define MAX_PKT_SIZE 3368
- #endif
- 
- #define PAGE_SIZE_4K  4096
++SEC("xdp")
++int xdp_pass(struct xdp_md *xdp)
++{
++	return XDP_PASS;
++}
++
+ char _license[] SEC("license") = "GPL";
 -- 
 2.43.0
 
