@@ -1,157 +1,131 @@
-Return-Path: <netdev+bounces-246778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E78C5CF122C
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 17:26:28 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA47FCF126B
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 17:43:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 64977303212E
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 16:25:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 477EF3004CDA
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 16:43:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B95281503;
-	Sun,  4 Jan 2026 16:25:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345AB283FD9;
+	Sun,  4 Jan 2026 16:43:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vuVRnV8K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g+hAgoJT"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C056234973;
-	Sun,  4 Jan 2026 16:25:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F0F235BE2;
+	Sun,  4 Jan 2026 16:43:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767543911; cv=none; b=VvLH0oP5drHGnhRPhOWTQMgvVhxmP9kkQ7P379Yj59V3DdqCt5Cc5zh22uzAhqwaQieKIFlqTrPjIvWqSbe0HbiKm4dxNslIBxFORicx8dFFzR7H6IfQ1KxoW69hEn+aYBG0aJiyica+vhRMIjEF5T6p6cw7k6yt+nk0KDxz1sE=
+	t=1767545030; cv=none; b=uR/qxmFCsk7ZI4j7j+V5rkv2ptkwSTeJ49bDtGa4xhXg/F/CrUYzUmqbzNbVS51TbepAG5filbu9IKflhX6WTLBA1x4DZip7rZ1Vi4UzUs4SfTTKHVFqDgf1m/b7TxyggX6zkAPrNTXGjF6BJRxuK9VcRKp9kSWZeoIJnbDONzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767543911; c=relaxed/simple;
-	bh=LSTTQ1Bw6k7njO8lwuxwQO6h9yNeUWCg0KXwR2Yikd8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sUcoo27Q+R4WGRl71E1dDUxqXvENq+Db6Xt6J7su4OUoqLiLMEU8Rvuhwnnv4bgoxzAnWg19BsHI1TY7AC869aaEPzKpTz8xyLZj+mYQQjy/MCmObc29atL+vKOu8vkhp4nmfUPvfQ4UllM/01JVcNw0LClTFz/qekbVYO9QtsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vuVRnV8K; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767543906;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pqbsIbMnN1SRJEl+iPFxJCqCnnA13u+xQvRbspdzZhg=;
-	b=vuVRnV8KsWEl32XjLibUJqTVNuyAgu2Rfq8RAwC0U+f3yHLB0jE+t/S/hmO3+uRW8TzkY1
-	Igqj2rbXzsy0k2snLJkZd8fi0/Z4YVnnVT9yrGEce7ypmn/GIYwbswno5s2vtQk8OlNSXx
-	qghU0C9WepW1socVTmvBocKOfMzllHM=
-From: KaFai Wan <kafai.wan@linux.dev>
-To: ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	hawk@kernel.org,
-	shuah@kernel.org,
-	aleksander.lobakin@intel.com,
-	toke@redhat.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: KaFai Wan <kafai.wan@linux.dev>
-Subject: [PATCH bpf-next 2/2] selftests/bpf: Add test for xdp_md context with LIVE_FRAMES in BPF_PROG_TEST_RUN
-Date: Mon,  5 Jan 2026 00:23:50 +0800
-Message-ID: <20260104162350.347403-3-kafai.wan@linux.dev>
-In-Reply-To: <20260104162350.347403-1-kafai.wan@linux.dev>
-References: <fa2be179-bad7-4ee3-8668-4903d1853461@hust.edu.cn>
- <20260104162350.347403-1-kafai.wan@linux.dev>
+	s=arc-20240116; t=1767545030; c=relaxed/simple;
+	bh=AqzuhN55ZaaCJw1PTFBjT0AsN7LhAyrG2IsV5tfNyMs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=F4KOVxaRSid61ZqqOxHl0ocoMmEpE9EXCTELCGwbsrRU4iIQJVoIfNk+rIJJaX5EMlm2NzrmmsSEosEE6rba0jsjYlQLdvnRuODXh1fqEGuwHtuP9CmF8titb1ANKcrDdl4wwRXO+ApHQhDc2ZzYIGu5w6P4GW7126+GsRUcrzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g+hAgoJT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99239C4CEF7;
+	Sun,  4 Jan 2026 16:43:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767545029;
+	bh=AqzuhN55ZaaCJw1PTFBjT0AsN7LhAyrG2IsV5tfNyMs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=g+hAgoJTTM0+4P2t6YJZLYzP1IwH7RrKnfcbordv/AC2HlaEIxIQ6UyMt8052CoeM
+	 P9EDJm92gr9VzrhyfSbvCJ7uPMshyPhrc3mfDsuBs7PmBTePPnDxxR3px7uKty3SCB
+	 PDN+LfBgUWvPm5TL1f61KSBjC4y8pMBWP11cOUIXsqyDbr0QlMWL8IUeE9sLQv0qEV
+	 IpB8c8u+13/NrHJTS7vyUx/qc2kQjP1Gn8rEp2AoRoclXiH5TFeM6vbeV0C+xwOqZr
+	 5DGWn2my+pXoM92hYFbyI4u2HzZthwktXu/xQiX9Rg7eDXHIBr2fE7/UicGwgNdl7c
+	 qR6IJxKnFS18w==
+Date: Sun, 4 Jan 2026 08:43:47 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: Leon Hwang <leon.hwang@linux.dev>, netdev@vger.kernel.org, Ilias
+ Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt
+ <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, Mathieu
+ Desnoyers <mathieu.desnoyers@efficios.com>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ kerneljasonxing@gmail.com, lance.yang@linux.dev, jiayuan.chen@linux.dev,
+ linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, Leon
+ Huang Fu <leon.huangfu@shopee.com>, Dragos Tatulea <dtatulea@nvidia.com>,
+ kernel-team <kernel-team@cloudflare.com>, Yan Zhai <yan@cloudflare.com>
+Subject: Re: [PATCH net-next v3] page_pool: Add page_pool_release_stalled
+ tracepoint
+Message-ID: <20260104084347.5de3a537@kernel.org>
+In-Reply-To: <011ca15e-107b-4679-8203-f5f821f27900@kernel.org>
+References: <20260102071745.291969-1-leon.hwang@linux.dev>
+	<011ca15e-107b-4679-8203-f5f821f27900@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Add a test case uses xdp_md as context parameter for BPF_PROG_TEST_RUN
-with LIVE_FRAMES flag. The test ensures that potential user-memory-access
-vulnerabilities are properly prevented.
+On Fri, 2 Jan 2026 12:43:46 +0100 Jesper Dangaard Brouer wrote:
+> On 02/01/2026 08.17, Leon Hwang wrote:
+> > Introduce a new tracepoint to track stalled page pool releases,
+> > providing better observability for page pool lifecycle issues.
+> 
+> In general I like/support adding this tracepoint for "debugability" of
+> page pool lifecycle issues.
+> 
+> For "observability" @Kuba added a netlink scheme[1][2] for page_pool[3], 
+> which gives us the ability to get events and list page_pools from userspace.
+> I've not used this myself (yet) so I need input from others if this is 
+> something that others have been using for page pool lifecycle issues?
 
-Signed-off-by: KaFai Wan <kafai.wan@linux.dev>
----
- .../bpf/prog_tests/xdp_context_test_run.c     | 19 +++++++++++++++++++
- .../bpf/progs/test_xdp_context_test_run.c     |  6 ++++++
- 2 files changed, 25 insertions(+)
+My input here is the least valuable (since one may expect the person
+who added the code uses it) - but FWIW yes, we do use the PP stats to
+monitor PP lifecycle issues at Meta. That said - we only monitor for
+accumulation of leaked memory from orphaned pages, as the whole reason
+for adding this code was that in practice the page may be sitting in
+a socket rx queue (or defer free queue etc.) IOW a PP which is not
+getting destroyed for a long time is not necessarily a kernel issue.
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-index ee94c281888a..0276daaae45c 100644
---- a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-+++ b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-@@ -45,6 +45,7 @@ void test_xdp_context_error(int prog_fd, struct bpf_test_run_opts opts,
- void test_xdp_context_test_run(void)
- {
- 	struct test_xdp_context_test_run *skel = NULL;
-+	char data_xdp[sizeof(pkt_v4) + XDP_PACKET_HEADROOM];
- 	char data[sizeof(pkt_v4) + sizeof(__u32)];
- 	char bad_ctx[sizeof(struct xdp_md) + 1];
- 	struct xdp_md ctx_in, ctx_out;
-@@ -55,6 +56,12 @@ void test_xdp_context_test_run(void)
- 			    .ctx_size_out = sizeof(ctx_out),
- 			    .repeat = 1,
- 		);
-+	DECLARE_LIBBPF_OPTS(bpf_test_run_opts, opts_xdp,
-+			    .data_in = &data_xdp,
-+			    .data_size_in = sizeof(data_xdp),
-+			    .flags = BPF_F_TEST_XDP_LIVE_FRAMES,
-+			    .repeat = 1,
-+		);
- 	int err, prog_fd;
- 
- 	skel = test_xdp_context_test_run__open_and_load();
-@@ -70,6 +77,18 @@ void test_xdp_context_test_run(void)
- 	ASSERT_EQ(errno, E2BIG, "extradata-errno");
- 	ASSERT_ERR(err, "bpf_prog_test_run(extradata)");
- 
-+	memset(&ctx_in, 0, sizeof(ctx_in));
-+	ctx_in.data_meta = 0;
-+	ctx_in.data = 0xf4;
-+	ctx_in.data_end = sizeof(data_xdp);
-+	opts_xdp.ctx_in = &ctx_in;
-+	opts_xdp.ctx_size_in = sizeof(ctx_in);
-+	*(__u32 *)(data_xdp + 0) = 0x28d6a0b5;
-+	*(__u32 *)(data_xdp + 4) = 0xf273eea3;
-+	*(struct ipv4_packet *)(data_xdp + ctx_in.data) = pkt_v4;
-+	err = bpf_prog_test_run_opts(bpf_program__fd(skel->progs.xdp_pass), &opts_xdp);
-+	ASSERT_OK(err, "bpf_prog_test_run(valid meta)");
-+
- 	*(__u32 *)data = XDP_PASS;
- 	*(struct ipv4_packet *)(data + sizeof(__u32)) = pkt_v4;
- 	opts.ctx_in = &ctx_in;
-diff --git a/tools/testing/selftests/bpf/progs/test_xdp_context_test_run.c b/tools/testing/selftests/bpf/progs/test_xdp_context_test_run.c
-index d7b88cd05afd..2166928d4680 100644
---- a/tools/testing/selftests/bpf/progs/test_xdp_context_test_run.c
-+++ b/tools/testing/selftests/bpf/progs/test_xdp_context_test_run.c
-@@ -17,4 +17,10 @@ int xdp_context(struct xdp_md *xdp)
- 	return ret;
- }
- 
-+SEC("xdp")
-+int xdp_pass(struct xdp_md *xdp)
-+{
-+	return XDP_PASS;
-+}
-+
- char _license[] SEC("license") = "GPL";
--- 
-2.43.0
+> Need input from @Kuba/others as the "page-pool-get"[4] state that "Only 
+> Page Pools associated with a net_device can be listed".  Don't we want 
+> the ability to list "invisible" page_pool's to allow debugging issues?
+> 
+>   [1] https://docs.kernel.org/userspace-api/netlink/intro-specs.html
+>   [2] https://docs.kernel.org/userspace-api/netlink/index.html
+>   [3] https://docs.kernel.org/netlink/specs/netdev.html
+>   [4] https://docs.kernel.org/netlink/specs/netdev.html#page-pool-get
 
+The documentation should probably be updated :(
+I think what I meant is that most _drivers_ didn't link their PP to the
+netdev via params when the API was added. So if the user doesn't see the
+page pools - the driver is probably not well maintained.
+
+In practice only page pools which are not accessible / visible via the
+API are page pools from already destroyed network namespaces (assuming
+their netdevs were also destroyed and not re-parented to init_net).
+Which I'd think is a rare case?
+
+> Looking at the code, I see that NETDEV_CMD_PAGE_POOL_CHANGE_NTF netlink
+> notification is only generated once (in page_pool_destroy) and not when
+> we retry in page_pool_release_retry (like this patch).  In that sense,
+> this patch/tracepoint is catching something more than netlink provides.
+> First I though we could add a netlink notification, but I can imagine
+> cases this could generate too many netlink messages e.g. a netdev with
+> 128 RX queues generating these every second for every RX queue.
+
+FWIW yes, we can add more notifications. Tho, as I mentioned at the
+start of my reply - the expectation is that page pools waiting for
+a long time to be destroyed is something that _will_ happen in
+production.
+
+> Guess, I've talked myself into liking this change, what do other
+> maintainers think?  (e.g. netlink scheme and debugging balance)
+
+We added the Netlink API to mute the pr_warn() in all practical cases.
+If Xiang Mei is seeing the pr_warn() I think we should start by asking
+what kernel and driver they are using, and what the usage pattern is :(
+As I mentioned most commonly the pr_warn() will trigger because driver
+doesn't link the pp to a netdev.
 
