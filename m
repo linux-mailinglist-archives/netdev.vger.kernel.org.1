@@ -1,207 +1,154 @@
-Return-Path: <netdev+bounces-246700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BEB2CF0792
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 02:21:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7D13CF086F
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 03:19:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 457363005F08
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 01:21:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7E49B300F8B4
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 02:19:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2683714F9D6;
-	Sun,  4 Jan 2026 01:21:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B19A241103;
+	Sun,  4 Jan 2026 02:19:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b9RkOXPR"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="f6c33vgW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8964A18C332
-	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 01:21:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8636E19D093;
+	Sun,  4 Jan 2026 02:19:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767489704; cv=none; b=XfTjsCSNtaHHLNb4eW33wdj2Ikx7mCgBFrBdIjINyzXZHa2+fnt0xfNpWBXFjlaaHzZCkdHIx8XzDtptXnZSsniGt+urmhfaulWabrrNTN/KrZ41SdxBwPzertwo+k9RyUhGtCCdrX4fJGaQ7a0ao3F7l0drVQKRQSS0SSUvlQo=
+	t=1767493153; cv=none; b=tFpKVZ3cWwtKPslNHxA1w9IOEE4ozDw5LNVSyu5WOQsYfV5nLaL0hevuqLNH7irDZZPXAZtaosMvNNbFYFsNtBKVkwDabNA0SHgjFHC+KOIUHDjNsMXsDAtBVZvK9KxOz6XUIfhBNa/kAgaK1qqp2KYdYfKSFAvlJIY9x3IIN1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767489704; c=relaxed/simple;
-	bh=8wGPoBC17Pvs5ona0WtPiKM0dyyrKxFlOWQ78mY4B7M=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=l3ohbvl3BE2UYVh6v5AmxNCbcUU5LSTyHIBcw7sKVKGWqmoEqEQJnfzD3tUe3cvT2UrT4QkjVzr1+re9TBoze+h4k6hNIeOk6QF3L9GrcrrhUDN3x54LJ1hzwnw57grmj93IpKC9bXd3LiHComN7CQL7taUieFf2FUEV5kfHD6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b9RkOXPR; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7aab7623f42so14259736b3a.2
-        for <netdev@vger.kernel.org>; Sat, 03 Jan 2026 17:21:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767489702; x=1768094502; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z8Jkr4gptnr43lfvojhWFIhKYNObRq5vr1EGbHYpgkk=;
-        b=b9RkOXPRO8wrd9C77jg/izJy8zMAe/Po8tQedjzNrrwnCz95np5s4gxbY8P3BuL+87
-         NWRCLdM29ThSC8mzym2G8zA8xAZadibTwwiI955oVyiRbW8gqliCvLtJ3LAiLpcU48GW
-         b/lRz/C3RpIM3xMHMOiLp1TnNUoBofIuzV26mWDBIhVHh+QgkOF4gabOmgSfpt3MoAkn
-         uLSo4zFYEzbNAowoXbqtqov/jDHog8rg7n5O+oF6uoWv+h+imfORBy1BeiicPFKUOI+A
-         2ovMmLOkXpfvngKTUfXVLKro+LR2+HWbiSRkyN4BZESJKHA1qfF0UCwTqvR02K0IFQJJ
-         6q+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767489702; x=1768094502;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=z8Jkr4gptnr43lfvojhWFIhKYNObRq5vr1EGbHYpgkk=;
-        b=gfC0Red5UWNObI7HBEfxzwhGKmH3rFmblRdFZJt+PEl+WLkth6ArN8nZ8owh3se3zF
-         lBY+vjZ54Uu1FsVzQw6rlOnvwzrtBFj4nyrzIbPjO2dODJYkbUAC+iL3VQrHHi8uwSJ3
-         CmprKqNzt5pfCwTG87dkIzAGDlMIZMU8nTF0Xvt4sAzhtk6eChLdDn12Pf/sXjPbmDAv
-         Cp1+wFf+mxk1TnCAVbwlyoCdPF6afZs2ia4DmMkXrXln4tvaSkAVvojwuCaLcoCwKCQj
-         6kJ5eyp2L2EJ9NNRgnM+UBvJxb/kyBKpYi4Hik1ID0ivQYIbsAWEfvj/rYV4tUUF8VU6
-         ECLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVMjt5Y3C6VRGhdlRdAfX07OLxLxaAqWsz8a1uj2rWGLWLwVOA/yKAU4jk2qB6wqjUSa+teOtQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywq2agPj2CiPXfr6l2fZKyL541suM2ftBI1JGB1FIH4p8NTe1Dx
-	DCs6hmHU+6KMzNlgUYrc5LdTLbHk2rip0glvLm3JSsnjtFV9ghLQ39tB
-X-Gm-Gg: AY/fxX64O+3sjIDwXuj3WKAU0BmZokeKiNh5V00F4yLQzODAG2xl8tN7R9pZS/vuFVY
-	4zPk2zqx2rLRyX/x04G4Nl2dqso0lJAnIkZKxwI9gaxHO5YWvd2ZVEc+VMIXyx/i7rQbJjAbUpZ
-	wlRc5afTiWr/w3I6R6QzQdRjN1uQoBLCLzphPxEVrXKZNfJrw3WB7aaRkkJcvxBgqxVhqTV0/DT
-	h/+BgzYv9piJG2Slz9FwI55vNZyqx35jB4MudwFVkZ3JLQD14nB0slrRzjWaL0Ru04McD0mUpde
-	24OLljBG0sBPJzNR/VlYT1n+Mt1Vhdwpc3GwrJn/qJEoFOjRkdDLc3jZb9thP8Lk9XfDDsatBJt
-	sWh4eqXPOewwUJLWM6ebPsNneOWYaf80PC+wjtB5zAU5gUFi5ffF5yC9VjSrR15DBoSma0214SH
-	pGAK3mIaa0nsm3y1uUBePKcL+indIUyackGFm/CR10yQvvvLKk2UEzFclVrDJ7QCisEoBe
-X-Google-Smtp-Source: AGHT+IHXcLCj2DQh05sklNFFdl2iZXimH8QCanQzksf/yniKVaRnmrNAw6RARmyMQhoJeX4PlW/qWg==
-X-Received: by 2002:a05:6a00:6510:b0:7ff:c1c7:4559 with SMTP id d2e1a72fcca58-7ffc1c74644mr26973094b3a.5.1767489701800;
-        Sat, 03 Jan 2026 17:21:41 -0800 (PST)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.24])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7e48f3d7sm44484500b3a.51.2026.01.03.17.21.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 03 Jan 2026 17:21:41 -0800 (PST)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	bjorn@kernel.org,
-	magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com,
-	jonathan.lemon@gmail.com,
-	sdf@fomichev.me,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v6 2/2] xsk: move cq_cached_prod_lock to avoid touching a cacheline in sending path
-Date: Sun,  4 Jan 2026 09:21:25 +0800
-Message-Id: <20260104012125.44003-3-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20260104012125.44003-1-kerneljasonxing@gmail.com>
-References: <20260104012125.44003-1-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1767493153; c=relaxed/simple;
+	bh=y3QaYbrkjyyOPmdsHqhgwhgovdLb2QZ3keKDHZJtdCI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=tn5bzHPrkBjCPl4olTJw6qBFyvyL1KyLLHTzEe+eo9ZAABpeeBB8Q2/xpXr8zYk0sblU3MMy/xl4JEEghJGlznqVAP+gRUUCUaSKRKbGy5lJxCBmULPKxl9xxE3WhO2PIKNgTdlYJBfSWDoPjef3TOU8jz1nUloNwL2S/jL+jos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=f6c33vgW; arc=none smtp.client-ip=113.46.200.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=6z5+S1yxCPSNbxBzivMIIqV9f4PGVRzEFQUWbP9fmvs=;
+	b=f6c33vgW9RV+dsQlbKk7K4l6byfS340uX2l8nOr5kmPf6avZao3sY5n+HSNANjrl6rT+uUU6O
+	EtpJkBCT8OhQeZttZNPaTwxDVzG+SR8wUjxtIfGyaIFkz3Sfu0OwRj7YIMgcbrQ5mKwjmlOz73A
+	yT0AXdwDGNXU8Y27T+pdwhk=
+Received: from mail.maildlp.com (unknown [172.19.163.0])
+	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4dkLcw0qxPzpStt;
+	Sun,  4 Jan 2026 10:15:44 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 7B1F74036C;
+	Sun,  4 Jan 2026 10:18:59 +0800 (CST)
+Received: from [10.67.112.40] (10.67.112.40) by dggpemf200006.china.huawei.com
+ (7.185.36.61) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sun, 4 Jan
+ 2026 10:18:58 +0800
+Message-ID: <dfc33064-f99f-4728-858f-95c80300bcff@huawei.com>
+Date: Sun, 4 Jan 2026 10:18:50 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3] page_pool: Add page_pool_release_stalled
+ tracepoint
+To: Jesper Dangaard Brouer <hawk@kernel.org>, Leon Hwang
+	<leon.hwang@linux.dev>, <netdev@vger.kernel.org>
+CC: Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt
+	<rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, Mathieu
+ Desnoyers <mathieu.desnoyers@efficios.com>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, <kerneljasonxing@gmail.com>, <lance.yang@linux.dev>,
+	<jiayuan.chen@linux.dev>, <linux-kernel@vger.kernel.org>,
+	<linux-trace-kernel@vger.kernel.org>, Leon Huang Fu
+	<leon.huangfu@shopee.com>, Dragos Tatulea <dtatulea@nvidia.com>, kernel-team
+	<kernel-team@cloudflare.com>, Yan Zhai <yan@cloudflare.com>
+References: <20260102071745.291969-1-leon.hwang@linux.dev>
+ <011ca15e-107b-4679-8203-f5f821f27900@kernel.org>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <011ca15e-107b-4679-8203-f5f821f27900@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-From: Jason Xing <kernelxing@tencent.com>
+On 2026/1/2 19:43, Jesper Dangaard Brouer wrote:
+> 
+> 
+> On 02/01/2026 08.17, Leon Hwang wrote:
+>> Introduce a new tracepoint to track stalled page pool releases,
+>> providing better observability for page pool lifecycle issues.
+>>
+> 
+> In general I like/support adding this tracepoint for "debugability" of
+> page pool lifecycle issues.
+> 
+> For "observability" @Kuba added a netlink scheme[1][2] for page_pool[3], which gives us the ability to get events and list page_pools from userspace.
+> I've not used this myself (yet) so I need input from others if this is something that others have been using for page pool lifecycle issues?
+> 
+> Need input from @Kuba/others as the "page-pool-get"[4] state that "Only Page Pools associated with a net_device can be listed".  Don't we want the ability to list "invisible" page_pool's to allow debugging issues?
+> 
+>  [1] https://docs.kernel.org/userspace-api/netlink/intro-specs.html
+>  [2] https://docs.kernel.org/userspace-api/netlink/index.html
+>  [3] https://docs.kernel.org/netlink/specs/netdev.html
+>  [4] https://docs.kernel.org/netlink/specs/netdev.html#page-pool-get
+> 
+> Looking at the code, I see that NETDEV_CMD_PAGE_POOL_CHANGE_NTF netlink
+> notification is only generated once (in page_pool_destroy) and not when
+> we retry in page_pool_release_retry (like this patch).  In that sense,
+> this patch/tracepoint is catching something more than netlink provides.
+> First I though we could add a netlink notification, but I can imagine
+> cases this could generate too many netlink messages e.g. a netdev with
+> 128 RX queues generating these every second for every RX queue.
+> 
+> Guess, I've talked myself into liking this change, what do other
+> maintainers think?  (e.g. netlink scheme and debugging balance)
+> 
+> 
+>> Problem:
+>> Currently, when a page pool shutdown is stalled due to inflight pages,
+>> the kernel only logs a warning message via pr_warn(). This has several
+>> limitations:
+>>
+>> 1. The warning floods the kernel log after the initial DEFER_WARN_INTERVAL,
+>>     making it difficult to track the progression of stalled releases
+>> 2. There's no structured way to monitor or analyze these events
+>> 3. Debugging tools cannot easily capture and correlate stalled pool
+>>     events with other network activity
+>>
+>> Solution:
+>> Add a new tracepoint, page_pool_release_stalled, that fires when a page
+>> pool shutdown is stalled. The tracepoint captures:
+>> - pool: pointer to the stalled page_pool
+>> - inflight: number of pages still in flight
+>> - sec: seconds since the release was deferred
+>>
+>> The implementation also modifies the logging behavior:
+>> - pr_warn() is only emitted during the first warning interval
+>>    (DEFER_WARN_INTERVAL to DEFER_WARN_INTERVAL*2)
+>> - The tracepoint is fired always, reducing log noise while still
+>>    allowing monitoring tools to track the issue
 
-We (Paolo and I) noticed that in the sending path touching an extra
-cacheline due to cq_cached_prod_lock will impact the performance. After
-moving the lock from struct xsk_buff_pool to struct xsk_queue, the
-performance is increased by ~5% which can be observed by xdpsock.
+If the initial log is still present, I don't really see what's the benefit
+of re-triggering logs or tracepoints when the first two fields are unchanged
+and the last two fields can be inspected using some tool? If there are none,
+perhaps we only need to print the first trigger log and a log upon completion
+of page_pool destruction.
 
-An alternative approach [1] can be using atomic_try_cmpxchg() to have the
-same effect. But unfortunately I don't have evident performance numbers to
-prove the atomic approach is better than the current patch. The advantage
-is to save the contention time among multiple xsks sharing the same pool
-while the disadvantage is losing good maintenance. The full discussion can
-be found at the following link.
-
-[1]: https://lore.kernel.org/all/20251128134601.54678-1-kerneljasonxing@gmail.com/
-
-Suggested-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- include/net/xsk_buff_pool.h | 5 -----
- net/xdp/xsk.c               | 8 ++++----
- net/xdp/xsk_buff_pool.c     | 2 +-
- net/xdp/xsk_queue.h         | 5 +++++
- 4 files changed, 10 insertions(+), 10 deletions(-)
-
-diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
-index 92a2358c6ce3..0b1abdb99c9e 100644
---- a/include/net/xsk_buff_pool.h
-+++ b/include/net/xsk_buff_pool.h
-@@ -90,11 +90,6 @@ struct xsk_buff_pool {
- 	 * destructor callback.
- 	 */
- 	spinlock_t cq_prod_lock;
--	/* Mutual exclusion of the completion ring in the SKB mode.
--	 * Protect: when sockets share a single cq when the same netdev
--	 * and queue id is shared.
--	 */
--	spinlock_t cq_cached_prod_lock;
- 	struct xdp_buff_xsk *free_heads[];
- };
- 
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index 3c52fafae47c..3b46bc635c43 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -543,9 +543,9 @@ static int xsk_cq_reserve_locked(struct xsk_buff_pool *pool)
- {
- 	int ret;
- 
--	spin_lock(&pool->cq_cached_prod_lock);
-+	spin_lock(&pool->cq->cq_cached_prod_lock);
- 	ret = xskq_prod_reserve(pool->cq);
--	spin_unlock(&pool->cq_cached_prod_lock);
-+	spin_unlock(&pool->cq->cq_cached_prod_lock);
- 
- 	return ret;
- }
-@@ -619,9 +619,9 @@ static void xsk_cq_submit_addr_locked(struct xsk_buff_pool *pool,
- 
- static void xsk_cq_cancel_locked(struct xsk_buff_pool *pool, u32 n)
- {
--	spin_lock(&pool->cq_cached_prod_lock);
-+	spin_lock(&pool->cq->cq_cached_prod_lock);
- 	xskq_prod_cancel_n(pool->cq, n);
--	spin_unlock(&pool->cq_cached_prod_lock);
-+	spin_unlock(&pool->cq->cq_cached_prod_lock);
- }
- 
- INDIRECT_CALLABLE_SCOPE
-diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
-index 6bf84316e2ad..cd5125b6af53 100644
---- a/net/xdp/xsk_buff_pool.c
-+++ b/net/xdp/xsk_buff_pool.c
-@@ -91,7 +91,7 @@ struct xsk_buff_pool *xp_create_and_assign_umem(struct xdp_sock *xs,
- 	INIT_LIST_HEAD(&pool->xsk_tx_list);
- 	spin_lock_init(&pool->xsk_tx_list_lock);
- 	spin_lock_init(&pool->cq_prod_lock);
--	spin_lock_init(&pool->cq_cached_prod_lock);
-+	spin_lock_init(&xs->cq_tmp->cq_cached_prod_lock);
- 	refcount_set(&pool->users, 1);
- 
- 	pool->fq = xs->fq_tmp;
-diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
-index 1eb8d9f8b104..ec08d9c102b1 100644
---- a/net/xdp/xsk_queue.h
-+++ b/net/xdp/xsk_queue.h
-@@ -46,6 +46,11 @@ struct xsk_queue {
- 	u64 invalid_descs;
- 	u64 queue_empty_descs;
- 	size_t ring_vmalloc_size;
-+	/* Mutual exclusion of the completion ring in the SKB mode.
-+	 * Protect: when sockets share a single cq when the same netdev
-+	 * and queue id is shared.
-+	 */
-+	spinlock_t cq_cached_prod_lock;
- };
- 
- struct parsed_desc {
--- 
-2.41.3
-
+>>
+>> This allows developers and system administrators to:
+>> - Use tools like perf, ftrace, or eBPF to monitor stalled releases
+>> - Correlate page pool issues with network driver behavior
+>> - Analyze patterns without parsing kernel logs
+>> - Track the progression of inflight page counts over time
+>>
+>> Signed-off-by: Leon Huang Fu <leon.huangfu@shopee.com>
+>> Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
 
