@@ -1,154 +1,109 @@
-Return-Path: <netdev+bounces-246701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7D13CF086F
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 03:19:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA068CF0875
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 03:24:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7E49B300F8B4
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 02:19:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 91469300EA3F
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 02:24:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B19A241103;
-	Sun,  4 Jan 2026 02:19:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43C1124677F;
+	Sun,  4 Jan 2026 02:24:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="f6c33vgW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m0GVBe3B"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8636E19D093;
-	Sun,  4 Jan 2026 02:19:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F9D18DB1E;
+	Sun,  4 Jan 2026 02:24:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767493153; cv=none; b=tFpKVZ3cWwtKPslNHxA1w9IOEE4ozDw5LNVSyu5WOQsYfV5nLaL0hevuqLNH7irDZZPXAZtaosMvNNbFYFsNtBKVkwDabNA0SHgjFHC+KOIUHDjNsMXsDAtBVZvK9KxOz6XUIfhBNa/kAgaK1qqp2KYdYfKSFAvlJIY9x3IIN1s=
+	t=1767493479; cv=none; b=B7Q6M9Y9QVsPRfpjPK4NyFMFSb9EnQwG0gkoL272j4t9Nr32yuBmAkxh1SdwtoRFpKXwi1hGXy4vI6vvm+861VAYeYZ6d9vy/Wd8MooZrRxG446ypFOYE1NK/1UyCBrk31MInCFSdHO7wz/8bUtiFgE3tiLhBgM0oJpFVDYWeZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767493153; c=relaxed/simple;
-	bh=y3QaYbrkjyyOPmdsHqhgwhgovdLb2QZ3keKDHZJtdCI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=tn5bzHPrkBjCPl4olTJw6qBFyvyL1KyLLHTzEe+eo9ZAABpeeBB8Q2/xpXr8zYk0sblU3MMy/xl4JEEghJGlznqVAP+gRUUCUaSKRKbGy5lJxCBmULPKxl9xxE3WhO2PIKNgTdlYJBfSWDoPjef3TOU8jz1nUloNwL2S/jL+jos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=f6c33vgW; arc=none smtp.client-ip=113.46.200.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=6z5+S1yxCPSNbxBzivMIIqV9f4PGVRzEFQUWbP9fmvs=;
-	b=f6c33vgW9RV+dsQlbKk7K4l6byfS340uX2l8nOr5kmPf6avZao3sY5n+HSNANjrl6rT+uUU6O
-	EtpJkBCT8OhQeZttZNPaTwxDVzG+SR8wUjxtIfGyaIFkz3Sfu0OwRj7YIMgcbrQ5mKwjmlOz73A
-	yT0AXdwDGNXU8Y27T+pdwhk=
-Received: from mail.maildlp.com (unknown [172.19.163.0])
-	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4dkLcw0qxPzpStt;
-	Sun,  4 Jan 2026 10:15:44 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7B1F74036C;
-	Sun,  4 Jan 2026 10:18:59 +0800 (CST)
-Received: from [10.67.112.40] (10.67.112.40) by dggpemf200006.china.huawei.com
- (7.185.36.61) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sun, 4 Jan
- 2026 10:18:58 +0800
-Message-ID: <dfc33064-f99f-4728-858f-95c80300bcff@huawei.com>
-Date: Sun, 4 Jan 2026 10:18:50 +0800
+	s=arc-20240116; t=1767493479; c=relaxed/simple;
+	bh=6zlbwmKxYqD0IqTcR4BQOFgDh/0IVz0BY9YeMtaSrcY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=EWAwqsvXRl98ZoYMS1QfbV0gv5fVarHndfg6wvUwa8DiGc/X2T0MRPXnzrN/dqjbszhyRoSq94JYNwTFFpB5XjUbjgFehBO64sXP6u2wYaaaTOrStQZ/TlyDqXaZcYy3tea+YRUGDorHBSCZkjiKVDdb6X0vqyE1UoQdsmxqXPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m0GVBe3B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65FAEC113D0;
+	Sun,  4 Jan 2026 02:24:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767493478;
+	bh=6zlbwmKxYqD0IqTcR4BQOFgDh/0IVz0BY9YeMtaSrcY=;
+	h=From:Subject:Date:To:Cc:From;
+	b=m0GVBe3BBmT45DpZ6iZbJeFF06Ij8V5nfqdnMsZJzzyZPoR0lbVFlgNzF0pSNX+rU
+	 xQmxnlRAu4Vey2cxF9+SpkqypjYs8iNT+voUwpGc5enEhq2GbRue8c4HAn6UWEQjk8
+	 aZwCpEIpJLxTuuK+wSGril2pPCZArU5ClnLkDnMqv2bsS4khvDv+wb+LAIcrkUU14p
+	 ujv/BqZ9082l7u+R6tkV4kmK5o9Jdvt2HSYUW/TwiWHUqkUVFkMZJJWCUBvaVc2m/Y
+	 pfu9L5RjwgeV2EiY/dbsIPUfQ6N6oBaPDA6YXVDBCDGtmSxLffT8TLaFkRX0uXqOz8
+	 nsc/odkrE/VLA==
+From: Tamir Duberstein <tamird@kernel.org>
+Subject: [PATCH v2 0/2] rust: net: replace `kernel::c_str!` with C-Strings
+Date: Sat, 03 Jan 2026 21:24:26 -0500
+Message-Id: <20260103-cstr-net-v2-0-8688f504b85d@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3] page_pool: Add page_pool_release_stalled
- tracepoint
-To: Jesper Dangaard Brouer <hawk@kernel.org>, Leon Hwang
-	<leon.hwang@linux.dev>, <netdev@vger.kernel.org>
-CC: Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt
-	<rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, Mathieu
- Desnoyers <mathieu.desnoyers@efficios.com>, "David S . Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, <kerneljasonxing@gmail.com>, <lance.yang@linux.dev>,
-	<jiayuan.chen@linux.dev>, <linux-kernel@vger.kernel.org>,
-	<linux-trace-kernel@vger.kernel.org>, Leon Huang Fu
-	<leon.huangfu@shopee.com>, Dragos Tatulea <dtatulea@nvidia.com>, kernel-team
-	<kernel-team@cloudflare.com>, Yan Zhai <yan@cloudflare.com>
-References: <20260102071745.291969-1-leon.hwang@linux.dev>
- <011ca15e-107b-4679-8203-f5f821f27900@kernel.org>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <011ca15e-107b-4679-8203-f5f821f27900@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/22NQQ6CMBBFr0JmbQ0dRKIr72FYtMMAY6QlbSUaw
+ t0F3Lp8yfvvzxA5CEe4ZjMEniSKdyvgIQPqjetYSbMyYI6lRkRFMQXlOKnCtk1li9IQaVj1MXA
+ r7z11r38cX/bBlLb9ZvQSkw+f/WvSm/cnO2mVK2ouXOSmPJ0rvnWDkeeR/AD1sixfc7/KvLIAA
+ AA=
+X-Change-ID: 20251222-cstr-net-3bfd7b35acc1
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+ Trevor Gross <tmgross@umich.edu>, Miguel Ojeda <ojeda@kernel.org>, 
+ Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+ Alice Ryhl <aliceryhl@google.com>, Danilo Krummrich <dakr@kernel.org>, 
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Tamir Duberstein <tamird@gmail.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Daniel Almeida <daniel.almeida@collabora.com>
+X-Mailer: b4 0.15-dev
+X-Developer-Signature: v=1; a=openssh-sha256; t=1767493475; l=822;
+ i=tamird@gmail.com; h=from:subject:message-id;
+ bh=6zlbwmKxYqD0IqTcR4BQOFgDh/0IVz0BY9YeMtaSrcY=;
+ b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgtYz36g7iDMSkY5K7Ab51ksGX7hJgs
+ MRt+XVZTrIzMVIAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
+ QJ1o8mCvCivMZI1NY2PJdpvhMVV/ABFZ/HepqSU+f1B2xz4IYVgbVxKHwmp3Y14wrMUctUCVnkv
+ s7CvOBGnvxAY=
+X-Developer-Key: i=tamird@gmail.com; a=openssh;
+ fpr=SHA256:264rPmnnrb+ERkS7DDS3tuwqcJss/zevJRzoylqMsbc
 
-On 2026/1/2 19:43, Jesper Dangaard Brouer wrote:
-> 
-> 
-> On 02/01/2026 08.17, Leon Hwang wrote:
->> Introduce a new tracepoint to track stalled page pool releases,
->> providing better observability for page pool lifecycle issues.
->>
-> 
-> In general I like/support adding this tracepoint for "debugability" of
-> page pool lifecycle issues.
-> 
-> For "observability" @Kuba added a netlink scheme[1][2] for page_pool[3], which gives us the ability to get events and list page_pools from userspace.
-> I've not used this myself (yet) so I need input from others if this is something that others have been using for page pool lifecycle issues?
-> 
-> Need input from @Kuba/others as the "page-pool-get"[4] state that "Only Page Pools associated with a net_device can be listed".  Don't we want the ability to list "invisible" page_pool's to allow debugging issues?
-> 
->  [1] https://docs.kernel.org/userspace-api/netlink/intro-specs.html
->  [2] https://docs.kernel.org/userspace-api/netlink/index.html
->  [3] https://docs.kernel.org/netlink/specs/netdev.html
->  [4] https://docs.kernel.org/netlink/specs/netdev.html#page-pool-get
-> 
-> Looking at the code, I see that NETDEV_CMD_PAGE_POOL_CHANGE_NTF netlink
-> notification is only generated once (in page_pool_destroy) and not when
-> we retry in page_pool_release_retry (like this patch).  In that sense,
-> this patch/tracepoint is catching something more than netlink provides.
-> First I though we could add a netlink notification, but I can imagine
-> cases this could generate too many netlink messages e.g. a netdev with
-> 128 RX queues generating these every second for every RX queue.
-> 
-> Guess, I've talked myself into liking this change, what do other
-> maintainers think?  (e.g. netlink scheme and debugging balance)
-> 
-> 
->> Problem:
->> Currently, when a page pool shutdown is stalled due to inflight pages,
->> the kernel only logs a warning message via pr_warn(). This has several
->> limitations:
->>
->> 1. The warning floods the kernel log after the initial DEFER_WARN_INTERVAL,
->>     making it difficult to track the progression of stalled releases
->> 2. There's no structured way to monitor or analyze these events
->> 3. Debugging tools cannot easily capture and correlate stalled pool
->>     events with other network activity
->>
->> Solution:
->> Add a new tracepoint, page_pool_release_stalled, that fires when a page
->> pool shutdown is stalled. The tracepoint captures:
->> - pool: pointer to the stalled page_pool
->> - inflight: number of pages still in flight
->> - sec: seconds since the release was deferred
->>
->> The implementation also modifies the logging behavior:
->> - pr_warn() is only emitted during the first warning interval
->>    (DEFER_WARN_INTERVAL to DEFER_WARN_INTERVAL*2)
->> - The tracepoint is fired always, reducing log noise while still
->>    allowing monitoring tools to track the issue
+C-String literals were added in Rust 1.77. Replace instances of
+`kernel::c_str!` with C-String literals where possible.
 
-If the initial log is still present, I don't really see what's the benefit
-of re-triggering logs or tracepoints when the first two fields are unchanged
-and the last two fields can be inspected using some tool? If there are none,
-perhaps we only need to print the first trigger log and a log upon completion
-of page_pool destruction.
+Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+---
+Changes in v2:
+- Pick up Tomo and Daniel's tags.
+- Link to v1: https://patch.msgid.link/20251222-cstr-net-v1-0-cd9e30a5467e@gmail.com
 
->>
->> This allows developers and system administrators to:
->> - Use tools like perf, ftrace, or eBPF to monitor stalled releases
->> - Correlate page pool issues with network driver behavior
->> - Analyze patterns without parsing kernel logs
->> - Track the progression of inflight page counts over time
->>
->> Signed-off-by: Leon Huang Fu <leon.huangfu@shopee.com>
->> Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
+---
+Tamir Duberstein (2):
+      rust: net: replace `kernel::c_str!` with C-Strings
+      drivers: net: replace `kernel::c_str!` with C-Strings
+
+ drivers/net/phy/ax88796b_rust.rs | 7 +++----
+ drivers/net/phy/qt2025.rs        | 5 ++---
+ rust/kernel/net/phy.rs           | 6 ++----
+ 3 files changed, 7 insertions(+), 11 deletions(-)
+---
+base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+change-id: 20251222-cstr-net-3bfd7b35acc1
+
+Best regards,
+--  
+Tamir Duberstein <tamird@gmail.com>
+
 
