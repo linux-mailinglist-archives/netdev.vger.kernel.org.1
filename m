@@ -1,64 +1,56 @@
-Return-Path: <netdev+bounces-246786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5229ECF12C0
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 18:52:46 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 619F0CF12C6
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 18:57:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 729CE30081BC
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 17:52:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 018C030019CC
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 17:57:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D398E2BE7CB;
-	Sun,  4 Jan 2026 17:52:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2442B2D3727;
+	Sun,  4 Jan 2026 17:57:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WVSZHVQC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eNlmOwGt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AECDF126F0A
-	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 17:52:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00BF22D24B7
+	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 17:57:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767549163; cv=none; b=PW0UFjD4d0PPtFvNsFx7zt1tWAnzi91IfEDV0EHCTooIym6DLeaebm4gK7y2dZSHt2gG3blTWE4mstzNLN+FerJtKHCaEimuwcbonBnurkpdaYE3sFWbidBOcEh453ywwUDKWuIkogpk5jGqskYW/Ya1ewzvOnEuGFbQZcXzg5s=
+	t=1767549470; cv=none; b=rJ+4x0gpVJB/zeeiPmWoGUnyMH6lKnU53TxdwspQcQfD4ZGpeA2WEV4GPPNTpNlwlFsLAqI7wz3SWCor+Vob+9ZnJyT+phw02b7qpZYesMllhpdHHanmtHmKrYVTZ4tJZjV1RKWMxZl3QOj2X3yjZJ+YIFAAX+oxcgVGuirYr48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767549163; c=relaxed/simple;
-	bh=Jtr7/YkBWihsBTHdvh91SQ5PxGPS+8ySsRwtEDqgaao=;
+	s=arc-20240116; t=1767549470; c=relaxed/simple;
+	bh=GogI6KoWMG7sQcRQST4tSXHnHsU61K4n/uzTVM7dT2U=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o9n91HrrGMQL2WlQ5idMOKwj0dl3GzeNkQS/dQhHPdL9eHKWJgyBwQp8EFGqKCXSSqegTfMpUxGwJlqJ1iQeR3PwAa4Q0A4hLfjUu1btErMUNTmL2VUlNxI4k6p/PdkpsLWE7gXu046q8Hj8DOPm/hmAZYur+ksLqRMj/8Ta5LY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WVSZHVQC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EDD8C4CEF7;
-	Sun,  4 Jan 2026 17:52:43 +0000 (UTC)
+	 MIME-Version:Content-Type; b=SO5Es3lSc4mrnLkZPI3ptWBOhipKHXsF6qWCtElDNVrjUg3BpHnjLhoyTPz7R7sMnpFCU/N5snKHnMoYYTi6F5ZP3p5HEgX+9PbOd97/iiUVLKDwOaCG5Pr+yuUK9BEVNV2QcsJY/0dWwPV1aqOIPRw4L2rGFxdQuQFKtXgyVp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eNlmOwGt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85112C4CEF7;
+	Sun,  4 Jan 2026 17:57:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767549163;
-	bh=Jtr7/YkBWihsBTHdvh91SQ5PxGPS+8ySsRwtEDqgaao=;
+	s=k20201202; t=1767549469;
+	bh=GogI6KoWMG7sQcRQST4tSXHnHsU61K4n/uzTVM7dT2U=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WVSZHVQCjWh4/FnltdAJMTqbwi1aKflyhGkv1qTCrRsJZiWkDlU/FTVRFO/6y1aQo
-	 5gHUEeTaPMhHhICncBvtUiwaZkXWegjhlwCo98hZvrSkgPtX29ybDYpY2BWSMfg3z8
-	 EOzJuPnSRACFpf5h5GfAMKWUiZKDqa1YYA6L2OH0QMPS9WydhdB1sHGN4h9bXCZgma
-	 JJ5Pu842IFEthl8ahNLiFFTUqy6WZhuYvvNxhNOUM+9/Ta+JPsZsTW0um9cLs4HGxQ
-	 bgrSJaLZHhPtIE1hdJJQ0TDLv2ZIQpc911vJQ3FlRx1PULHdfaINckWG54B5GMCMgS
-	 YC57O5cAlUYmw==
-Date: Sun, 4 Jan 2026 09:52:42 -0800
+	b=eNlmOwGt/ErVXDeQvrb5x/qUdjhqLGFlCC5iP6wYoNNvUFVP7cv000yCvfbY9Xm+3
+	 t0bz76FZmYWEyQMjc56C/y8XInKLqwSmjpGLbondvk0JTc5JxPQgyTX8tLj4dIng8/
+	 ExnUx4fTaZhZNsOUunMIUh7D9KDaKIEjIB8ETkd7VcEuBSysYTkyEvkvIlix/9SbFw
+	 k121A6v0zYiVfiXUrRFD73zwSDF6lacJKsWuHqsCQI1b8yuw+snggzPOjY4rU++Qnf
+	 WWkxV1i/NQdTfXrtbab97ljbHLNU1R0vyrBFrPidwil+oZDy6+pLf2SpYuX7Vp9nqt
+	 2+uBB0ndeE5dg==
+Date: Sun, 4 Jan 2026 09:57:48 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Mieczyslaw Nalewaj <namiltd@yahoo.com>
-Cc: "alsi@bang-olufsen.dk" <alsi@bang-olufsen.dk>, "olteanv@gmail.com"
- <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, "davem@davemloft.net"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Paolo Abeni
- <pabeni@redhat.com>
-Subject: Re: [PATCH v5] net: dsa: realtek: rtl8365mb: remove ifOutDiscards
- from rx_packets
-Message-ID: <20260104095242.3b82b332@kernel.org>
-In-Reply-To: <09c19b60-a795-4640-90b8-656b3bb3c161@yahoo.com>
-References: <2114795695.8721689.1763312184906.ref@mail.yahoo.com>
-	<2114795695.8721689.1763312184906@mail.yahoo.com>
-	<234545199.8734622.1763313511799@mail.yahoo.com>
-	<d2339247-19a6-4614-a91c-86d79c2b4d00@yahoo.com>
-	<20260104073101.2b3a0baa@kernel.org>
-	<1bc5c4f0-5cec-4fab-b5ad-5c0ab213ce37@yahoo.com>
-	<20260104090132.5b1e676e@kernel.org>
-	<09c19b60-a795-4640-90b8-656b3bb3c161@yahoo.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: airoha: Fix schedule while atomic in
+ airoha_ppe_deinit()
+Message-ID: <20260104095748.70107b9b@kernel.org>
+In-Reply-To: <20251223-airoha-fw-ethtool-v1-1-1dbd1568c585@kernel.org>
+References: <20251223-airoha-fw-ethtool-v1-1-1dbd1568c585@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,12 +60,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 4 Jan 2026 18:39:50 +0100 Mieczyslaw Nalewaj wrote:
-> Fixes: 4af2950c50c8 ("net: dsa: realtek-smi: add rtl8365mb subdriver for RTL8365MB-VC")
-> 
-> Signed-off-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
+On Tue, 23 Dec 2025 22:56:44 +0100 Lorenzo Bianconi wrote:
+> Rely on rcu_replace_pointer in airoha_ppe_deinit routine in order to fix
+> schedule while atomic issue.
 
- - no empty lines between tags
- - don't send patches in reply to existing threads
- - don't send new versions less than 24h after previous version
+The information in the commit message is not sufficient.
+What "schedule while atomic issue"?
+
+> -	npu = rcu_dereference(eth->npu);
+> +	mutex_lock(&flow_offload_mutex);
+> +
+> +	npu = rcu_replace_pointer(eth->npu, NULL,
+> +				  lockdep_is_held(&flow_offload_mutex));
+>  	if (npu) {
+>  		npu->ops.ppe_deinit(npu);
+>  		airoha_npu_put(npu);
+-- 
+pw-bot: cr
 
