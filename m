@@ -1,101 +1,253 @@
-Return-Path: <netdev+bounces-246741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EDBCCF0E5C
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 13:16:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A2A9CF0EA8
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 13:29:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 30BBE300795C
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 12:16:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1ADCE3009F91
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 12:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F3B2877CD;
-	Sun,  4 Jan 2026 12:16:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C17C2C21C0;
+	Sun,  4 Jan 2026 12:28:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="JkUv73OV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AI+a281B"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic314-20.consmr.mail.ne1.yahoo.com (sonic314-20.consmr.mail.ne1.yahoo.com [66.163.189.146])
+Received: from mail-yw1-f195.google.com (mail-yw1-f195.google.com [209.85.128.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78EA845C0B
-	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 12:16:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.189.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 414202C15A0
+	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 12:28:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767528999; cv=none; b=qjGfaOJmLBu5Da9Xm/rSxeRy0gAz7YJdEdD1Uj7i/KjMcXYRaCaX8OSku0ja7/KSlF0TPoEGrniCn1tZmD6/PiJJltZm9tmCFLYbyksIReQAb92G7le7LeXS7wESlpRCX0fusmaKeVJHZ4srM6uxi6vmuIvlfWxoM07zR7pEiPI=
+	t=1767529717; cv=none; b=szvOo+B50LMVRdLuS3617wWqdG+bF/n1ld1761OEG4xNr8BLEn5mqKFtTRMA4b861votS+TCVm+f1BsIk32UnZM9X5U11s0uKSlBW4l2a3Y9UEAyCgRNLrbcx/vfnmzEk4DfrEHGgaXd8Wpxs3I3R4WP8CG0Ucoi+KvSUGyOp7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767528999; c=relaxed/simple;
-	bh=3D6yB/tkNqBcd2BIOiIWtHj3FCr7e0QhLcZECDY6Jyg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=TR59UTuqOmndsUxYNt64AyUF1NkmpB7W/SNSJ/F6VixinzZxuJs8oCQSZuIVBaMwGCZ2SR2hjTxkeaD50nvJcWonjNc/hnBc3s6LM3vQem89V1ttUDYXvCy7qpNapHWupsrdL3MnkrnmR0rKArV1jDt6iXjplnzLpJQ85nkSIIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=JkUv73OV; arc=none smtp.client-ip=66.163.189.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1767528997; bh=3D6yB/tkNqBcd2BIOiIWtHj3FCr7e0QhLcZECDY6Jyg=; h=Date:Subject:From:To:Cc:References:In-Reply-To:From:Subject:Reply-To; b=JkUv73OVe4jVzJyFVulkm2l32wNlLjoFAiETUslPKmHuSn3HS+HiKrXipNmBKjmepCHK1IAUYLqejqEc8oirOa87uk+pmKlPDOg/qSx/phYzeYdgtl+HIoH2ZE7nOrSSwLPad6L4IHH62lmUjxgpb6UQrXo+Bl6mpYcYHmCzpi938e5e+rExW79bYKCq1wagsnOPwe6Yb6Bji3NSdTSRyQ5wkwjlNt5iK9YYk0P4QDr0VMayzzGxFFnHqU7R093orINKcxvG5+rC1CrOiFuSk5r0NyunJD5obAeTIaoAUj2l2LWLWEgwbMRGtcbCKcWoAEQeFVIRpH+vmaCKwc6xMg==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1767528997; bh=u1Kph8D2nasqXX2J0Jkl7k7BpN6n5HdpWCG0FyU8gEF=; h=X-Sonic-MF:Date:Subject:From:To:From:Subject; b=TJ2Hp7ghRTLOVozQZq8vAMbQWNGiIv/32TQId7JcXLjK4THPgaeF3pZCu7fMEJQQpH1jlVGakcLzFIXcXEjV/awHfFoL9aoJi4HnnwegRZ773hsezL8Sx/i1KRd9XxOYmPJUOVzeC7x1GT8NXblZEUZFmhxFuMbnGDaSajhDajwGCxy5TBwsOR/EZzM0FvsUQFQuyZx/2dgiVrXi2pk4ojIE8rihThmfeKhbFKeUg0uDoVZEa66LUPAx1JFH90H2ZKjTaeH0IbRe9053tTBMirqvP1Uoyd75IrZZ0bYNzNqsZxoHl4A/n49FFiDn7PDwX9q1PQmHcjpyEd4CKx+6Pw==
-X-YMail-OSG: vqLiSbwVM1nTK3tC_z3B3bHG2vqT8SrjJMAxO8a6BTTG8WtQxxf3cVNLq60Tj7O
- v_OabmAESA7RZwamxLpUm_iwY0cyFnqPJFVJlClSreMBZL7zUCURguGQjNwIq6vsDeta_GsyiFYS
- BI1XOH83lCMm0ZjPh2mkrfWoxhCRWpfSkHhqxI.CDcQ4BRIfvHAbqpNu6xckkEq7.QgmfAAU.lBm
- vYkA7Z1p4s7Um9WL78yXOhy1LHDYycjc1Eh2ttMoGkv02HbB1pZSHtasIkijcfAwvoqMif4aFdTH
- y0kDjDS0Be2abvx06UbzXg6Q9q4F4iLlPf.O3MtIeRS4cAUifAsKYu4ddn38JguwJ4C.RpWUKGH1
- miLH3HipKHDGckWvHt6buey016f0iyNq7rx78mtOmNgedib2wxh5EM3bRjppwRFuPiSUQkk.xcX8
- 79WT5HRsNMjTE3dHfrv_w97FHWcPIUtWNx2s6ZCS1cipS69f7N7CfE3Nr1LipVHHSSxToIsyIcMV
- _1cJRP7IxnodeSjvqU3ALpWPxRCpZT.0sfa42omEx33ERYdITO3Zdfb20mrkmFBRfEEEaLhGTAPC
- gJdSs2s7ugok_RU57dikr7rRE4PcK4VojzsqqVyMOPDTRVnpXMxSvwkhx4gFrY0Gc61DSv1tJrWS
- CfmFhlIJmEgh84iM_pvseKJjqVMnXyLZpgM6yGtLwwDStqypl4Yv3bWy5vytAny1MMVHc3.I5Xs0
- IVXMw7NDF2PIAJ9qEbPHxgDkrryfXw3kY4naeN1F0POgxmFOHFKTBpBlOVLK935gD9T_Io74z4OJ
- JshloRnlaT2hLdMm8I4OZ4ZZOHr8CjCeUUvtMydKkK84HpY4GcdQKVHYqrGlyLuMiEzMLhk3B0qS
- 2BWPPU0D4GttTLvg2cOTUYND5Nk9SDvcmPu7ialVAh1pye6ikDC552q1Cx4CNE_9FQcGzr55nios
- bwCVvudv.Z.DvggDxnnM8Krbot12QoUxr6Wnk2iNzAAV4feIKMSTYhZELQq3N8SIsrk24N_xelCF
- XKjkvfgduWkj66yUzlRcbySuxmpWYBJkPv1nlYORtpv3JhVrwJ_oekNkII7U8kXfsdMXZm3ES6ok
- _CIpRPk9Kc5Tmgher.U24j.ZL0yLbGe4WXjRoUnl.TGXgIO54x.3LHIF0CPTdDN8k_npKsqF40m6
- KmVk62JiQpuynS8mxKX_zyxGvRV0xvalxtqVZX1WmXxLDm4xKo6lTNIDbNTsbqAkMgW_N7t2MBb5
- uD80AQz1fE5Qil6E.G6c1TxWZWX5VSDx2Feql1VwIsByHOeVvo.r2Ql_a3vp5_2GL9LvJjzgb4Hn
- z3QSF_eJEnWN277CVGDiGqXkar.ouxYwxrJ5pU3UcQ9FQUTtsDCJyco5roashlHligqwjahEomej
- qJh1mqJH1MGv4cXCpDh7OYbwWyoA1veVbtD1EXzXNPKorqWDWb8KJpIagDb2s.pxh2oTrSbaeCql
- hK_wqT7yA03yDXlD6YrLJ6SebtsVLZdq1HX.ae93UWyO9.u0ud7WBGQTW.UA9k8S_aLbPjanojyI
- 4fIDYC2KB2fofFw.RBbVplfru4GqIPEEZ7gvr4qLLFxM9703XO1iT4WnhQR5ljx2b0EIRDcMMFiM
- kLrhXHPB5voedZh.34.7k2kUHkwjW9_8QZm3uQayz9Gg6Ue4VL4xXej3BbpO30VWg3CEbkePwTzJ
- ShRQYkehGzz3Hhfq2wC6mI3I4XYmwRO1ls1cvKoJ9QyPdy04ebUZoaW1d_SlpsOjcRuL3uaC_ZPp
- R63svRsNFMdVoyU85nSYFOY9H_5pu4FV7wPWC9gxOEE9BD2Ag4giFaecQKcSVGezwXJNxUnd9VmW
- cvj5QDDJK5txpfXW6QzjKfD1EEr.2GuPuZBpjAp9BpmC1vdb2TAxRs4Ca28rsKC3ExHzm6kjkC8s
- 2sOv51Rw5KS7aail9726rI3IwiO3PEht00utXFc1x8Dq9__Qd1CeyTZa72ckzeorSjRGOvXYU0v7
- 0egw8Kz7H61n2Mbzf5Y11fG8OQZHUJmVsl_CZaZ.4Z3fDjU8X3ZxOlKgRH6apEJP1PeqVh5g7PVk
- h0Ydx4Ntc.P7Hcc3Rqe6y7oXFcw0MYyTOwkbecndqWNag5ADM7JmuK4OPZpC5th_CWusXILlkbsC
- yrEMQ7.Y1upTOSpFE3LtgI9qzc2sxCm5U6DfQXeBR0.aStlqxCbOqNDiOu0DY6javSrRBDTSHUj8
- 3vap2tM9x4iFEO54ljFwqvcEPJmaYgpLA6UbMVJD0B8PIfORbymtL02fravpOqEvwDKrLeNgc_2j
- FFfqSih_pCHKcYBF5XlEG6iDGba1opo4Tq3E2Zg--
-X-Sonic-MF: <namiltd@yahoo.com>
-X-Sonic-ID: 0bd8863e-00df-45b3-9e56-4b178a26e161
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic314.consmr.mail.ne1.yahoo.com with HTTP; Sun, 4 Jan 2026 12:16:37 +0000
-Received: by hermes--production-ir2-7679c5bc-fgcdr (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 637d18e6f1fcaf9cb173793a3d3d31e8;
-          Sun, 04 Jan 2026 11:25:59 +0000 (UTC)
-Message-ID: <97f5fb4a-f71b-4737-b637-321d41b067b6@yahoo.com>
-Date: Sun, 4 Jan 2026 12:25:56 +0100
+	s=arc-20240116; t=1767529717; c=relaxed/simple;
+	bh=37NoOwmbEFbtysE2DlDpNUYsBOiTWnWUsCk/VqY80jM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TkiPLAOKqHpUAn95/keGXU/SOXBx6mAuok8ZE8qATMfTdYL+LQ4lYn5oez8caY00S7SmN+gjltmfLVNaLA0m5GqyYZmyUweGxs+0yauf1A2H1CcP8tRWxrDUgOJ+vkXoAtPJQpJEqWUQuuPs6OxqqxFfX+RNOJnklXI2kXv60Us=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AI+a281B; arc=none smtp.client-ip=209.85.128.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f195.google.com with SMTP id 00721157ae682-790647da8cbso18350267b3.1
+        for <netdev@vger.kernel.org>; Sun, 04 Jan 2026 04:28:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767529714; x=1768134514; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2G7eadH5MMBxz7yZ0+iAQgcawTRkgGwCWOA1VR9NfFs=;
+        b=AI+a281BWbTzdwHK/chIp2I6YIAdOzSlvMlJLXaq2YPGSPDRO9oviqzUpTgtXVqBHk
+         AC5R4Oq5Kikj+ZpjGoHHoLd5J4GYHJIlk2LMW4DlWSU4e0FS0Q8eCbJISm4aahYEKGSW
+         cCWi7krOxRGpQimMtpVv+dEwGOzFSclM1p3UpWDU9QBAe5uOZW7oFz8NCfp6fLe54VCa
+         YTzZdI2kXBJC3Q/WEM4wQrf9OcEKIGWJl7VbyGJ9lyOgGmMLsg0+JEX4nGA2e2cwHD4k
+         E5aIffzJjxnZ2fqOm+gYNHllYHyMq9frk0g1+jO+4TiWt61bHy5H3g+OPvEHwZ7gkCrh
+         2KvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767529714; x=1768134514;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2G7eadH5MMBxz7yZ0+iAQgcawTRkgGwCWOA1VR9NfFs=;
+        b=pf1hGxMRUXEgacuq7Z7bBw2FFuURiiExUzdyZS2L+6lds/0uWDNZqaBw0QnpvwVmyn
+         K+yL2oU8F0VC+zbNVeByjgAyT57rOgXnyyQ9jjnIq+qu1UqvSuJPUOfYweNq1/nLzMnv
+         CKAH4/xqeZqQiyh5TOv5wweenwJvhr0gMiBOlkJ0qveoqUISNECok1LVa2lMYI5xScEW
+         owjGlrxQJ2Toh72DcFcYFK5y7mjd3NvvefbT3RERSiEuUUoaPylNzSLQOeKidHghJh15
+         gP0mLuj9Mv2IaNEwGkOBhVYXizfQgvlAVxnJozEkBbv/VikqePLWVgEd+G+FATKLUzdX
+         r3Iw==
+X-Forwarded-Encrypted: i=1; AJvYcCWH1GGVCjjr/PYMkYyjjRrlXbmK8WWXBtdezOToW3HIgy+z6hvrsWyQf+pWAHTAxgubN5731xE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzS/BmBc1HlIQJAQkEnW51BRMtanobh9YdQQcHHZGSR2xKSU6/P
+	VjVJHKXOd7ldpUp0V0dvInjtY6RnjS9bWL+aoouEHLQU+wESWJwgTk3c
+X-Gm-Gg: AY/fxX40X+zJl56ftfddQ/oKlvJ1gN88ujpOOUSBxvRuVUVBJn90agxdrzSr/prRa7a
+	Q/OCyB2Ava0nI+CUI01tqD23hToEA/c1W/JokuYlEVo/iNVbC3r1jmbClGJu3tHYBAN/5PJCjEv
+	cSq0OTaQsw7thnyJ18vWwboMRUCCvNXOiFdagl+pjkTmjNzDlApsB53jYVMoIPykM7nwaSHeaEW
+	VhX18URjCmDMV4dB4A3cPSsA9GY0OKpU6iYbU7Zmmv2kyKAy5B4seA66oMQ+t9J+2FMXVC4zst4
+	9FHo0Zc7WeaxjbiBzkjlSgnbgH/tl/EBvT+3Uh78mlJOSYroPmtF01PZkKATncUx9Hn29MH2Fyx
+	is9apfPHoeF720CyUhB7UrL0OEB/kioAUeqbwTGCd8nF+eXet6UKOjRhyuqwoDiF9nEvT5B7Bw9
+	DY6HwDnFdexFqj5CL5zg==
+X-Google-Smtp-Source: AGHT+IHS9a4jImQKSg/PReudg9XbT91OW2y1MNoQqzFfjATamNzIW8aA0ESgRzh5mH2OJJYRUevbPg==
+X-Received: by 2002:a05:690e:144c:b0:646:82e4:8539 with SMTP id 956f58d0204a3-64682e486camr33149822d50.43.1767529714160;
+        Sun, 04 Jan 2026 04:28:34 -0800 (PST)
+Received: from 7940hx ([23.94.188.235])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-78fb4378372sm175449427b3.12.2026.01.04.04.28.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 04 Jan 2026 04:28:33 -0800 (PST)
+From: Menglong Dong <menglong8.dong@gmail.com>
+X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
+To: ast@kernel.org,
+	andrii@kernel.org
+Cc: daniel@iogearbox.net,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@fomichev.me,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	tglx@linutronix.de,
+	mingo@redhat.com,
+	jiang.biao@linux.dev,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	hpa@zytor.com,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH bpf-next v6 00/10] bpf: fsession support
+Date: Sun,  4 Jan 2026 20:28:04 +0800
+Message-ID: <20260104122814.183732-1-dongml2@chinatelecom.cn>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: dsa: realtek: rtl8365mb: fix return value in
- rtl8365mb_phy_ocp_write
-From: Mieczyslaw Nalewaj <namiltd@yahoo.com>
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc: "linus.walleij@linaro.org" <linus.walleij@linaro.org>,
- "edumazet@google.com" <edumazet@google.com>,
- "alsi@bang-olufsen.dk" <alsi@bang-olufsen.dk>,
- "olteanv@gmail.com" <olteanv@gmail.com>, "kuba@kernel.org"
- <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
- Andrew Lunn <andrew@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>
-References: <2114795695.8721689.1763312184906.ref@mail.yahoo.com>
- <2114795695.8721689.1763312184906@mail.yahoo.com>
- <234545199.8734622.1763313511799@mail.yahoo.com>
-Content-Language: pl
-In-Reply-To: <234545199.8734622.1763313511799@mail.yahoo.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Mailer: WebService/1.1.24866 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+Content-Transfer-Encoding: 8bit
 
-What else can I do to add this patch?
+Hi, all.
+
+No changes in this version, just a rebase to deal with conflicts.
+
+overall
+-------
+Sometimes, we need to hook both the entry and exit of a function with
+TRACING. Therefore, we need define a FENTRY and a FEXIT for the target
+function, which is not convenient.
+
+Therefore, we add a tracing session support for TRACING. Generally
+speaking, it's similar to kprobe session, which can hook both the entry
+and exit of a function with a single BPF program.
+
+We allow the usage of bpf_get_func_ret() to get the return value in the
+fentry of the tracing session, as it will always get "0", which is safe
+enough and is OK.
+
+Session cookie is also supported with the kfunc bpf_fsession_cookie().
+In order to limit the stack usage, we limit the maximum number of cookies
+to 4.
+
+kfunc design
+------------
+The kfunc bpf_fsession_is_return() and bpf_fsession_cookie() are
+introduced, and they are both inlined in the verifier.
+
+In current solution, we can't reuse the existing bpf_session_cookie() and
+bpf_session_is_return(), as their prototype is different from
+bpf_fsession_is_return() and bpf_fsession_cookie(). In
+bpf_fsession_cookie(), we need the function argument "void *ctx" to get
+the cookie. However, the prototype of bpf_session_cookie() is "void".
+
+Maybe it's possible to reuse the existing bpf_session_cookie() and
+bpf_session_is_return(). First, we move the nr_regs from stack to struct
+bpf_tramp_run_ctx, as Andrii suggested before. Then, we define the session
+cookies as flexible array in bpf_tramp_run_ctx like this:
+    struct bpf_tramp_run_ctx {
+        struct bpf_run_ctx run_ctx;
+        u64 bpf_cookie;
+        struct bpf_run_ctx *saved_run_ctx;
+        u64 func_meta; /* nr_args, cookie_index, etc */
+        u64 fsession_cookies[];
+    };
+
+The problem of this approach is that we can't inlined the bpf helper
+anymore, such as get_func_arg, get_func_ret, get_func_arg_cnt, etc, as
+we can't use the "current" in BPF assembly.
+
+So maybe it's better to use the new kfunc for now? And I'm analyzing that
+if it is possible to inline "current" in verifier. Maybe we can convert to
+the solution above if it success.
+
+architecture
+------------
+The fsession stuff is arch related, so the -EOPNOTSUPP will be returned if
+it is not supported yet by the arch. In this series, we only support
+x86_64. And later, other arch will be implemented.
+
+Changes since v5:
+* No changes in this version, just a rebase to deal with conflicts.
+
+Changes since v4:
+* use fsession terminology consistently in all patches
+* 1st patch:
+  - use more explicit way in __bpf_trampoline_link_prog()
+* 4th patch:
+  - remove "cookie_cnt" in struct bpf_trampoline
+* 6th patch:
+  - rename nr_regs to func_md
+  - define cookie_off in a new line
+* 7th patch:
+  - remove the handling of BPF_TRACE_SESSION in legacy fallback path for
+    BPF_RAW_TRACEPOINT_OPEN
+
+Changes since v3:
+* instead of adding a new hlist to progs_hlist in trampoline, add the bpf
+  program to both the fentry hlist and the fexit hlist.
+* introduce the 2nd patch to reuse the nr_args field in the stack to
+  store all the information we need(except the session cookies).
+* limit the maximum number of cookies to 4.
+* remove the logic to skip fexit if the fentry return non-zero.
+
+Changes since v2:
+* squeeze some patches:
+  - the 2 patches for the kfunc bpf_tracing_is_exit() and
+    bpf_fsession_cookie() are merged into the second patch.
+  - the testcases for fsession are also squeezed.
+
+* fix the CI error by move the testcase for bpf_get_func_ip to
+  fsession_test.c
+
+Changes since v1:
+* session cookie support.
+  In this version, session cookie is implemented, and the kfunc
+  bpf_fsession_cookie() is added.
+
+* restructure the layout of the stack.
+  In this version, the session stuff that stored in the stack is changed,
+  and we locate them after the return value to not break
+  bpf_get_func_ip().
+
+* testcase enhancement.
+  Some nits in the testcase that suggested by Jiri is fixed. Meanwhile,
+  the testcase for get_func_ip and session cookie is added too.
+
+Menglong Dong (10):
+  bpf: add fsession support
+  bpf: use last 8-bits for the nr_args in trampoline
+  bpf: add the kfunc bpf_fsession_is_return
+  bpf: add the kfunc bpf_fsession_cookie
+  bpf,x86: introduce emit_st_r0_imm64() for trampoline
+  bpf,x86: add fsession support for x86_64
+  libbpf: add fsession support
+  selftests/bpf: add testcases for fsession
+  selftests/bpf: add testcases for fsession cookie
+  selftests/bpf: test fsession mixed with fentry and fexit
+
+ arch/x86/net/bpf_jit_comp.c                   |  48 ++++-
+ include/linux/bpf.h                           |  37 ++++
+ include/uapi/linux/bpf.h                      |   1 +
+ kernel/bpf/btf.c                              |   2 +
+ kernel/bpf/syscall.c                          |  18 +-
+ kernel/bpf/trampoline.c                       |  53 ++++-
+ kernel/bpf/verifier.c                         |  76 +++++--
+ kernel/trace/bpf_trace.c                      |  56 ++++-
+ net/bpf/test_run.c                            |   1 +
+ net/core/bpf_sk_storage.c                     |   1 +
+ tools/bpf/bpftool/common.c                    |   1 +
+ tools/include/uapi/linux/bpf.h                |   1 +
+ tools/lib/bpf/bpf.c                           |   1 +
+ tools/lib/bpf/libbpf.c                        |   3 +
+ .../selftests/bpf/prog_tests/fsession_test.c  | 115 ++++++++++
+ .../bpf/prog_tests/tracing_failure.c          |   2 +-
+ .../selftests/bpf/progs/fsession_test.c       | 198 ++++++++++++++++++
+ 17 files changed, 572 insertions(+), 42 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/fsession_test.c
+ create mode 100644 tools/testing/selftests/bpf/progs/fsession_test.c
+
+-- 
+2.52.0
 
 
