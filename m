@@ -1,293 +1,297 @@
-Return-Path: <netdev+bounces-246716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4C64CF0A2B
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 07:00:52 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC709CF0A4C
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 07:09:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1729A3000EBC
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 06:00:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CE71530052FE
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 06:09:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE832165EA;
-	Sun,  4 Jan 2026 06:00:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4386A2D8DC3;
+	Sun,  4 Jan 2026 06:09:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i0WtJolI";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="AQ3Vfp5Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E50EA191;
-	Sun,  4 Jan 2026 06:00:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266852D876A
+	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 06:09:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767506450; cv=none; b=M3Zm9Rg1OJiPrhk0y1MAn3+GsAjENou6WmpAakrepU4B81Oc8G2eF8TKIhTxVMy7avMWjct/f8lQl5rgBm6nauY64FyQ1gpMYOgGHPVABnYttxgNC5iO6tXm4DuMvGjaptLFLlND1IhRNmwV0M+AjQuxeu8voFMQ3MI7BfCH+CE=
+	t=1767506964; cv=none; b=ErVpOtHUgP3BHHPBg7LEm2ZdFO1/ptuBTwVdjHG0pA7PQl9BqBKtwufvBW4hT+/blaf2aqFdKSFYCspNk+eNK3361ZMMuy+krM2S1uJiqEJ/QuyWp0n83361tQmE5NIhA0K3M3uyTVb9d7NI1KTYpjJ04+uxvS7dp+mOBKYk4x8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767506450; c=relaxed/simple;
-	bh=pxDgtE8DhvzZK71HNp6zF525hyAyalNTpqUMKI/MXQ4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=gwcONioRZESxKGGohg1M9ApJjEgrO8r1vV1WS/LNGvsvAyxU6bBOkRgBZ5+D3wkfoTbzA40tYTt+lsyJN0PMzvWW6jO0M5cEBb5/XhVMNyGJocUUq8wRFaLBbjP9AewHyMOKgrMoTDYk0IOIsmVYMOQnkG9W+xZEmw0sU2RwK7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [127.0.0.2] (unknown [114.241.82.145])
-	by APP-01 (Coremail) with SMTP id qwCowAD3oGzmAVppu3AIAw--.1340S2;
-	Sun, 04 Jan 2026 14:00:08 +0800 (CST)
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-Date: Sun, 04 Jan 2026 14:00:04 +0800
-Subject: [PATCH net-next v3] net: spacemit: Remove broken flow control
- support
+	s=arc-20240116; t=1767506964; c=relaxed/simple;
+	bh=d62UFEnU7fCkorQZkkR3CJODcl+iqve4VXrymJhCGPw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UKmXrjDVNQTORFbkyS8QvCCZAYdz5l1oLQiFUIk2SPj+j/gKdjLWe/uM6EwYIaLBpc2g4GWjyj5NJha9yHspmSWsz8NvzNDw6Jyo8jW4wHXg+GV1oAibA3LXaJ3EQtFRD92G0AEEZBcVg4+m6Co0rsInVP26XpS5hoVT1QXSSqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i0WtJolI; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AQ3Vfp5Y; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767506960;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mJExj1wMdLs7y98GZ9+oLjZ8HntohnFo3s2nmuYpgMU=;
+	b=i0WtJolIKY0SMBetpuxyQ9XZeA3cvV2hzpvdzNCb7pD7efy/vjxYH5dUCUjo9zVWiLR1fe
+	x4OPxfYmhi4lR+ZlL07WGUYta57QJFl3BwcJCW1gbAMam6UnDLkjSQm63X+3+FxWqTo0Iw
+	gasLI62ca04f2KoHVSdJfJlckTuFUok=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-45-_Af7TUJvMm22UFP3ISd9Pg-1; Sun, 04 Jan 2026 01:09:19 -0500
+X-MC-Unique: _Af7TUJvMm22UFP3ISd9Pg-1
+X-Mimecast-MFC-AGG-ID: _Af7TUJvMm22UFP3ISd9Pg_1767506959
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-34c704d5d15so26308490a91.1
+        for <netdev@vger.kernel.org>; Sat, 03 Jan 2026 22:09:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1767506958; x=1768111758; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mJExj1wMdLs7y98GZ9+oLjZ8HntohnFo3s2nmuYpgMU=;
+        b=AQ3Vfp5YShHj7ZRYhv8bH/nsVha3znspsNNF2Ma/gbnaDaLcH12JStCwDyLonLbIsT
+         ByVldf4bw+lt//933CxBoR+/zq9jrEyM3H7J/9fO2f6p9Z5f7MLTMY1cZC8J0dfNmhfK
+         aSn7rwy/kTP7LNJdLH55dWUU/2GOTJLma3RnDCvxiIf4S3nrjFPo86jKydyRnqrKRZf7
+         8qEdsAIhIrsascXmSPLwXommbxxcUIBxMOTWZI8ASoaOSLTfV+bkdIqb+vz7CcDr594a
+         pJCGt+5xOXsXZ9h2D2tRwL3R6FdN0A77C2jcZmcBaM7wsEZoGz6sYaJqPRpy8nrjRmK6
+         uMrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767506958; x=1768111758;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=mJExj1wMdLs7y98GZ9+oLjZ8HntohnFo3s2nmuYpgMU=;
+        b=YybE7h3F/OrTo5p775ZI1XaQxXQ5p9dnGgwb3YgfSzZ/kZXAhsReZ7+jBkX1T9R9B8
+         9nd1B3sXzQXyu5CuQIz/shbxnrbJlMVBWUgQT2rBe9AFECMqi3PkJOEzkP2PrS/S9FRB
+         yG7Bev5UmQR3XBmgPKccRuik9Nhvh7uurGGOzb/FgICEYL/F1XMm5Fr8EjTKaAC8Sjqt
+         YBEMkEs+enaSJQVVYYTkEo8MfZYIrRSWo2GIjhw8Ky17UqzPxhL/AVhNv3v+JcZxozfl
+         k/P30NTjTPZ5peJK3CcIYazsxZrmkivqTifZRcovxE+08HIvT7j+cPEz+vsqObPH1813
+         EOtA==
+X-Gm-Message-State: AOJu0YwqDQchMqyWrwGNIdUm9KZytu/1MlB6jW3p354Xwm/3ztFOEeu8
+	gOHMze/M/A4jnu7n18pBaQlrhK27+9LCDh3kdUR6kSCOACTeRDxIcsvxg3Frx/P6WQPhEJTr1A4
+	DOFZmKse7JsEcVEvL+3W0tbIEN+AdBouG4SsBwKzMHqvIIPSnTll+xmeohW3YnFA0WLzebCkt24
+	o8D4Rb1+YpDghHxW091aTMwUNkoSDsfhGb
+X-Gm-Gg: AY/fxX5XrEvvVRc4/clZdjyxEwRu7nLXUANEvlFlzrTV3tvsmcXPaLpUsd3iNxnU9PE
+	NuersnYHcI2his6qwv53qGLPgVudGaXWK41nT86gOWTrSMIWI4gNdbfWJ+CpTHUKvmlLsnzX4iq
+	VfCLQqcgCDai/7kjFbaQxuJNEhludH90vgEXEwM1EezKrMguDBSp8ANHAH0R75VfQ=
+X-Received: by 2002:a17:90b:2804:b0:339:a243:e96d with SMTP id 98e67ed59e1d1-34e921f7bb8mr34964878a91.36.1767506958550;
+        Sat, 03 Jan 2026 22:09:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG1TrnHOaObWiDYx4VRiV588ZpfCmQ2a6hTaoJiRv90CvgOiEyCA+WPpxYK2SDPSu+eSM2BKeUX90AdzmAJQvU=
+X-Received: by 2002:a17:90b:2804:b0:339:a243:e96d with SMTP id
+ 98e67ed59e1d1-34e921f7bb8mr34964869a91.36.1767506958105; Sat, 03 Jan 2026
+ 22:09:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260104-k1-ethernet-actually-remove-fc-v3-1-3871b055064c@iscas.ac.cn>
-X-B4-Tracking: v=1; b=H4sIAOMBWmkC/42OQQ7CIBREr9L8tb8pqKV05T2MJhS/lthSBSSap
- ncX0QO4nMy8mZnBkzPkoS1mcBSNN5NNYr0qQPfKXgjNKWngFd8yxjd4ZUihJ2cpoNLhoYbhhY7
- GKRKeNYqqbtZMiGrTSEglN0dn88wDe/gwlp4BDl/H0f2RFsPP7pQn1NM4mtAWsS6ZRKfZcV5yv
- jc+TO6Vn0aegX9PRY4MtySE6mrZCcl2xmvlS6VLbeGwLMsbNQdpkQgBAAA=
-X-Change-ID: 20251124-k1-ethernet-actually-remove-fc-706831770489
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Yixun Lan <dlan@gentoo.org>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
- Troy Mitchell <troy.mitchell@linux.spacemit.com>, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: netdev@vger.kernel.org, linux-riscv@lists.infradead.org, 
- spacemit@lists.linux.dev, linux-kernel@vger.kernel.org, 
- Vivian Wang <wangruikang@iscas.ac.cn>
-X-Mailer: b4 0.14.3
-X-CM-TRANSID:qwCowAD3oGzmAVppu3AIAw--.1340S2
-X-Coremail-Antispam: 1UD129KBjvJXoW3Wr43Gr1rWr4xtw43Cw4kJFb_yoWxAr4rpF
-	45X3s2kFWUXFsYgFs3Cw4UAFy3Ga4xtrnrua4fCw4Fg3ZIyrn7AFy0k3W7CFyDurW8ury5
-	Kw4UA3W8GFsrX37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
-	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
-	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
-	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
-	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-	nIWIevJa73UjIFyTuYvjfUonmRUUUUU
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
+References: <20260102152023.10773-1-minhquangbui99@gmail.com> <20260102152023.10773-2-minhquangbui99@gmail.com>
+In-Reply-To: <20260102152023.10773-2-minhquangbui99@gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Sun, 4 Jan 2026 14:09:06 +0800
+X-Gm-Features: AQt7F2roE9LpNfzF8c2KtQ4VSRlYXoi2Mx29Nbq8m5ARZMNVXphPDvutIIePn_4
+Message-ID: <CACGkMEs9wCM8s4_r1HCQGj9mUDdTF+BqkF0rse+dzB3USprhMA@mail.gmail.com>
+Subject: Re: [PATCH net v2 1/3] virtio-net: don't schedule delayed refill worker
+To: Bui Quang Minh <minhquangbui99@gmail.com>
+Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, virtualization@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The current flow control implementation doesn't handle autonegotiation
-and ethtool operations properly. Remove it for now so we don't claim
-support for something that doesn't really work. A better implementation
-will be sent in future patches.
+On Fri, Jan 2, 2026 at 11:20=E2=80=AFPM Bui Quang Minh <minhquangbui99@gmai=
+l.com> wrote:
+>
+> When we fail to refill the receive buffers, we schedule a delayed worker
+> to retry later. However, this worker creates some concurrency issues
+> such as races and deadlocks. To simplify the logic and avoid further
+> problems, we will instead retry refilling in the next NAPI poll.
+>
+> Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx"=
+)
+> Reported-by: Paolo Abeni <pabeni@redhat.com>
+> Closes: https://netdev-ctrl.bots.linux.dev/logs/vmksft/drv-hw-dbg/results=
+/400961/3-xdp-py/stderr
+> Cc: stable@vger.kernel.org
+> Suggested-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+> ---
+>  drivers/net/virtio_net.c | 55 ++++++++++++++++++++++------------------
+>  1 file changed, 30 insertions(+), 25 deletions(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 1bb3aeca66c6..ac514c9383ae 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -3035,7 +3035,7 @@ static int virtnet_receive_packets(struct virtnet_i=
+nfo *vi,
+>  }
+>
+>  static int virtnet_receive(struct receive_queue *rq, int budget,
+> -                          unsigned int *xdp_xmit)
+> +                          unsigned int *xdp_xmit, bool *retry_refill)
+>  {
+>         struct virtnet_info *vi =3D rq->vq->vdev->priv;
+>         struct virtnet_rq_stats stats =3D {};
+> @@ -3047,12 +3047,8 @@ static int virtnet_receive(struct receive_queue *r=
+q, int budget,
+>                 packets =3D virtnet_receive_packets(vi, rq, budget, xdp_x=
+mit, &stats);
+>
+>         if (rq->vq->num_free > min((unsigned int)budget, virtqueue_get_vr=
+ing_size(rq->vq)) / 2) {
+> -               if (!try_fill_recv(vi, rq, GFP_ATOMIC)) {
+> -                       spin_lock(&vi->refill_lock);
+> -                       if (vi->refill_enabled)
+> -                               schedule_delayed_work(&vi->refill, 0);
+> -                       spin_unlock(&vi->refill_lock);
+> -               }
+> +               if (!try_fill_recv(vi, rq, GFP_ATOMIC))
+> +                       *retry_refill =3D true;
+>         }
+>
+>         u64_stats_set(&stats.packets, packets);
+> @@ -3129,18 +3125,18 @@ static int virtnet_poll(struct napi_struct *napi,=
+ int budget)
+>         struct send_queue *sq;
+>         unsigned int received;
+>         unsigned int xdp_xmit =3D 0;
+> -       bool napi_complete;
+> +       bool napi_complete, retry_refill =3D false;
+>
+>         virtnet_poll_cleantx(rq, budget);
+>
+> -       received =3D virtnet_receive(rq, budget, &xdp_xmit);
+> +       received =3D virtnet_receive(rq, budget, &xdp_xmit, &retry_refill=
+);
 
-Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
----
-Changes in v3:
-- Remove Fixes since this is for net-next, not for backporting (Andrew)
-- Link to v2: https://lore.kernel.org/r/20251124-k1-ethernet-actually-remove-fc-v2-1-5e77ab69b791@iscas.ac.cn
----
+I think we can simply let virtnet_receive() to return the budget when
+reill fails.
 
-My employer has switched focus somewhat so I'm unlikely to prioritize
-the proper implementation of flow control etc with phylink for now.
-Sorry. This is just a little bit of polish for Spacemit K1 ethernet
-support on 6.20/7.0 to go with the other peripheral support.
----
- drivers/net/ethernet/spacemit/k1_emac.c | 110 --------------------------------
- 1 file changed, 110 deletions(-)
+>         rq->packets_in_napi +=3D received;
+>
+>         if (xdp_xmit & VIRTIO_XDP_REDIR)
+>                 xdp_do_flush();
+>
+>         /* Out of packets? */
+> -       if (received < budget) {
+> +       if (received < budget && !retry_refill) {
+>                 napi_complete =3D virtqueue_napi_complete(napi, rq->vq, r=
+eceived);
+>                 /* Intentionally not taking dim_lock here. This may resul=
+t in a
+>                  * spurious net_dim call. But if that happens virtnet_rx_=
+dim_work
+> @@ -3160,7 +3156,7 @@ static int virtnet_poll(struct napi_struct *napi, i=
+nt budget)
+>                 virtnet_xdp_put_sq(vi, sq);
+>         }
+>
+> -       return received;
+> +       return retry_refill ? budget : received;
+>  }
+>
+>  static void virtnet_disable_queue_pair(struct virtnet_info *vi, int qp_i=
+ndex)
+> @@ -3230,9 +3226,11 @@ static int virtnet_open(struct net_device *dev)
+>
+>         for (i =3D 0; i < vi->max_queue_pairs; i++) {
+>                 if (i < vi->curr_queue_pairs)
+> -                       /* Make sure we have some buffers: if oom use wq.=
+ */
+> -                       if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
+> -                               schedule_delayed_work(&vi->refill, 0);
+> +                       /* If this fails, we will retry later in
+> +                        * NAPI poll, which is scheduled in the below
+> +                        * virtnet_enable_queue_pair
+> +                        */
+> +                       try_fill_recv(vi, &vi->rq[i], GFP_KERNEL);
 
-diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/ethernet/spacemit/k1_emac.c
-index 220eb5ce7583..c85dc742c404 100644
---- a/drivers/net/ethernet/spacemit/k1_emac.c
-+++ b/drivers/net/ethernet/spacemit/k1_emac.c
-@@ -46,8 +46,6 @@
- #define EMAC_RX_FRAMES			64
- #define EMAC_RX_COAL_TIMEOUT		(600 * 312)
- 
--#define DEFAULT_FC_PAUSE_TIME		0xffff
--#define DEFAULT_FC_FIFO_HIGH		1600
- #define DEFAULT_TX_ALMOST_FULL		0x1f8
- #define DEFAULT_TX_THRESHOLD		1518
- #define DEFAULT_RX_THRESHOLD		12
-@@ -132,9 +130,6 @@ struct emac_priv {
- 	u32 tx_delay;
- 	u32 rx_delay;
- 
--	bool flow_control_autoneg;
--	u8 flow_control;
--
- 	/* Softirq-safe, hold while touching hardware statistics */
- 	spinlock_t stats_lock;
- };
-@@ -179,9 +174,7 @@ static void emac_set_mac_addr_reg(struct emac_priv *priv,
- 
- static void emac_set_mac_addr(struct emac_priv *priv, const unsigned char *addr)
- {
--	/* We use only one address, so set the same for flow control as well */
- 	emac_set_mac_addr_reg(priv, addr, MAC_ADDRESS1_HIGH);
--	emac_set_mac_addr_reg(priv, addr, MAC_FC_SOURCE_ADDRESS_HIGH);
- }
- 
- static void emac_reset_hw(struct emac_priv *priv)
-@@ -200,9 +193,6 @@ static void emac_reset_hw(struct emac_priv *priv)
- 
- static void emac_init_hw(struct emac_priv *priv)
- {
--	/* Destination address for 802.3x Ethernet flow control */
--	u8 fc_dest_addr[ETH_ALEN] = { 0x01, 0x80, 0xc2, 0x00, 0x00, 0x01 };
--
- 	u32 rxirq = 0, dma = 0;
- 
- 	regmap_set_bits(priv->regmap_apmu,
-@@ -228,12 +218,6 @@ static void emac_init_hw(struct emac_priv *priv)
- 		DEFAULT_TX_THRESHOLD);
- 	emac_wr(priv, MAC_RECEIVE_PACKET_START_THRESHOLD, DEFAULT_RX_THRESHOLD);
- 
--	/* Configure flow control (enabled in emac_adjust_link() later) */
--	emac_set_mac_addr_reg(priv, fc_dest_addr, MAC_FC_SOURCE_ADDRESS_HIGH);
--	emac_wr(priv, MAC_FC_PAUSE_HIGH_THRESHOLD, DEFAULT_FC_FIFO_HIGH);
--	emac_wr(priv, MAC_FC_HIGH_PAUSE_TIME, DEFAULT_FC_PAUSE_TIME);
--	emac_wr(priv, MAC_FC_PAUSE_LOW_THRESHOLD, 0);
--
- 	/* RX IRQ mitigation */
- 	rxirq = FIELD_PREP(MREGBIT_RECEIVE_IRQ_FRAME_COUNTER_MASK,
- 			   EMAC_RX_FRAMES);
-@@ -1018,57 +1002,6 @@ static int emac_mdio_init(struct emac_priv *priv)
- 	return ret;
- }
- 
--static void emac_set_tx_fc(struct emac_priv *priv, bool enable)
--{
--	u32 val;
--
--	val = emac_rd(priv, MAC_FC_CONTROL);
--
--	FIELD_MODIFY(MREGBIT_FC_GENERATION_ENABLE, &val, enable);
--	FIELD_MODIFY(MREGBIT_AUTO_FC_GENERATION_ENABLE, &val, enable);
--
--	emac_wr(priv, MAC_FC_CONTROL, val);
--}
--
--static void emac_set_rx_fc(struct emac_priv *priv, bool enable)
--{
--	u32 val = emac_rd(priv, MAC_FC_CONTROL);
--
--	FIELD_MODIFY(MREGBIT_FC_DECODE_ENABLE, &val, enable);
--
--	emac_wr(priv, MAC_FC_CONTROL, val);
--}
--
--static void emac_set_fc(struct emac_priv *priv, u8 fc)
--{
--	emac_set_tx_fc(priv, fc & FLOW_CTRL_TX);
--	emac_set_rx_fc(priv, fc & FLOW_CTRL_RX);
--	priv->flow_control = fc;
--}
--
--static void emac_set_fc_autoneg(struct emac_priv *priv)
--{
--	struct phy_device *phydev = priv->ndev->phydev;
--	u32 local_adv, remote_adv;
--	u8 fc;
--
--	local_adv = linkmode_adv_to_lcl_adv_t(phydev->advertising);
--
--	remote_adv = 0;
--
--	if (phydev->pause)
--		remote_adv |= LPA_PAUSE_CAP;
--
--	if (phydev->asym_pause)
--		remote_adv |= LPA_PAUSE_ASYM;
--
--	fc = mii_resolve_flowctrl_fdx(local_adv, remote_adv);
--
--	priv->flow_control_autoneg = true;
--
--	emac_set_fc(priv, fc);
--}
--
- /*
-  * Even though this MAC supports gigabit operation, it only provides 32-bit
-  * statistics counters. The most overflow-prone counters are the "bytes" ones,
-@@ -1425,42 +1358,6 @@ static void emac_ethtool_get_regs(struct net_device *dev,
- 			emac_rd(priv, MAC_GLOBAL_CONTROL + i * 4);
- }
- 
--static void emac_get_pauseparam(struct net_device *dev,
--				struct ethtool_pauseparam *pause)
--{
--	struct emac_priv *priv = netdev_priv(dev);
--
--	pause->autoneg = priv->flow_control_autoneg;
--	pause->tx_pause = !!(priv->flow_control & FLOW_CTRL_TX);
--	pause->rx_pause = !!(priv->flow_control & FLOW_CTRL_RX);
--}
--
--static int emac_set_pauseparam(struct net_device *dev,
--			       struct ethtool_pauseparam *pause)
--{
--	struct emac_priv *priv = netdev_priv(dev);
--	u8 fc = 0;
--
--	if (!netif_running(dev))
--		return -ENETDOWN;
--
--	priv->flow_control_autoneg = pause->autoneg;
--
--	if (pause->autoneg) {
--		emac_set_fc_autoneg(priv);
--	} else {
--		if (pause->tx_pause)
--			fc |= FLOW_CTRL_TX;
--
--		if (pause->rx_pause)
--			fc |= FLOW_CTRL_RX;
--
--		emac_set_fc(priv, fc);
--	}
--
--	return 0;
--}
--
- static void emac_get_drvinfo(struct net_device *dev,
- 			     struct ethtool_drvinfo *info)
- {
-@@ -1634,8 +1531,6 @@ static void emac_adjust_link(struct net_device *dev)
- 		}
- 
- 		emac_wr(priv, MAC_GLOBAL_CONTROL, ctrl);
--
--		emac_set_fc_autoneg(priv);
- 	}
- 
- 	phy_print_status(phydev);
-@@ -1715,8 +1610,6 @@ static int emac_phy_connect(struct net_device *ndev)
- 		goto err_node_put;
- 	}
- 
--	phy_support_asym_pause(phydev);
--
- 	phydev->mac_managed_pm = true;
- 
- 	emac_update_delay_line(priv);
-@@ -1886,9 +1779,6 @@ static const struct ethtool_ops emac_ethtool_ops = {
- 	.get_sset_count		= emac_get_sset_count,
- 	.get_strings		= emac_get_strings,
- 	.get_ethtool_stats	= emac_get_ethtool_stats,
--
--	.get_pauseparam		= emac_get_pauseparam,
--	.set_pauseparam		= emac_set_pauseparam,
- };
- 
- static const struct net_device_ops emac_netdev_ops = {
+Consider NAPI will be eventually scheduled, I wonder if it's still
+worth to refill here.
 
----
-base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
-change-id: 20251124-k1-ethernet-actually-remove-fc-706831770489
+>
+>                 err =3D virtnet_enable_queue_pair(vi, i);
+>                 if (err < 0)
+> @@ -3473,15 +3471,15 @@ static void __virtnet_rx_resume(struct virtnet_in=
+fo *vi,
+>                                 bool refill)
+>  {
+>         bool running =3D netif_running(vi->dev);
+> -       bool schedule_refill =3D false;
+>
+> -       if (refill && !try_fill_recv(vi, rq, GFP_KERNEL))
+> -               schedule_refill =3D true;
+> +       if (refill)
+> +               /* If this fails, we will retry later in NAPI poll, which=
+ is
+> +                * scheduled in the below virtnet_napi_enable
+> +                */
+> +               try_fill_recv(vi, rq, GFP_KERNEL);
 
-Best regards,
--- 
-Vivian "dramforever" Wang
+and here.
+
+> +
+>         if (running)
+>                 virtnet_napi_enable(rq);
+> -
+> -       if (schedule_refill)
+> -               schedule_delayed_work(&vi->refill, 0);
+>  }
+>
+>  static void virtnet_rx_resume_all(struct virtnet_info *vi)
+> @@ -3777,6 +3775,7 @@ static int virtnet_set_queues(struct virtnet_info *=
+vi, u16 queue_pairs)
+>         struct virtio_net_rss_config_trailer old_rss_trailer;
+>         struct net_device *dev =3D vi->dev;
+>         struct scatterlist sg;
+> +       int i;
+>
+>         if (!vi->has_cvq || !virtio_has_feature(vi->vdev, VIRTIO_NET_F_MQ=
+))
+>                 return 0;
+> @@ -3829,11 +3828,17 @@ static int virtnet_set_queues(struct virtnet_info=
+ *vi, u16 queue_pairs)
+>         }
+>  succ:
+>         vi->curr_queue_pairs =3D queue_pairs;
+> -       /* virtnet_open() will refill when device is going to up. */
+> -       spin_lock_bh(&vi->refill_lock);
+> -       if (dev->flags & IFF_UP && vi->refill_enabled)
+> -               schedule_delayed_work(&vi->refill, 0);
+> -       spin_unlock_bh(&vi->refill_lock);
+> +       if (dev->flags & IFF_UP) {
+> +               /* Let the NAPI poll refill the receive buffer for us. We=
+ can't
+> +                * safely call try_fill_recv() here because the NAPI migh=
+t be
+> +                * enabled already.
+> +                */
+> +               local_bh_disable();
+> +               for (i =3D 0; i < vi->curr_queue_pairs; i++)
+> +                       virtqueue_napi_schedule(&vi->rq[i].napi, vi->rq[i=
+].vq);
+> +
+> +               local_bh_enable();
+> +       }
+>
+>         return 0;
+>  }
+> --
+> 2.43.0
+>
+
+Thanks
 
 
