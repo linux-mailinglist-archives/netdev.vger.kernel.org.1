@@ -1,81 +1,96 @@
-Return-Path: <netdev+bounces-246790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E7A0CF12E3
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 19:13:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 66EEDCF12F6
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 19:26:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CE568300C29D
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 18:13:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 61E1D300C2BE
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 18:26:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1619256C88;
-	Sun,  4 Jan 2026 18:13:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16C152D5926;
+	Sun,  4 Jan 2026 18:26:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rVGjuvKX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h/mFAmnU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A291D3A1E70;
-	Sun,  4 Jan 2026 18:13:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF6D2797B5;
+	Sun,  4 Jan 2026 18:26:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767550405; cv=none; b=lwgeVOCIZyRy1KrMA0a9Ghe5ROsnoFOStBM1+pCNgV/U1mYZ+kBqpTv8Gsv5bskuQXqLHE7toZ/9zbzsemg0Np9Z1KgqpGExSxSrn1H84FBmDsCa+5KaMuAKiFsy+bk4s6Qm4X5zAl4jA/wTPqDEO0XixCAuiFyeU4hp93gM2Wo=
+	t=1767551163; cv=none; b=lTUNldVvtnYHUrhLN5k6NITumHJb3I4fqnNPnYXIEA6bSEAjvF56+SkDXOZM65piffeMbhRAUXXh9hM/BjlwOI4LZJurkVsnQrgLTgJPSZEOc088mkoJX35W0wSa1Zbn8Is1QiNOpqAkyV4/6ltFvUaqVOXhq28aZIL4pYlUn5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767550405; c=relaxed/simple;
-	bh=7aLUiot2SfuGwMnLVofiZQScB17Z0NLov7dmrjYkKj8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PPJtZAzu1GTqwsVw6+v66GBYcy2uGwgEln1OMDXYIOrmUzyNn0Z1rKwzyCy+WrdtR8t74QDg5vKmoL6iv3HgVSDhgC8SHNXDv3ZgEUc39Z650DBKYmUr372dmWf7JgP7YethCRTZdq5SWduGStldyNTR39JlR3ZUXo9AdGnqfMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rVGjuvKX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99084C4CEF7;
-	Sun,  4 Jan 2026 18:13:24 +0000 (UTC)
+	s=arc-20240116; t=1767551163; c=relaxed/simple;
+	bh=clhBWUoYeZWEDAFPY3adO7NhzlQ58GU2nLISINnoLAI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rRjAwaWox0YbPkWcq0NSZ+6iyT8XAvmClCe2+Q7LNX/2H0bANdA3IPXPAciaKHO/+8lsfohFba37mNw3VjdOSX/kEKzH9BFKNiCccN7gdNSspQ8xf2fs1CetYNx/J5zvu2Erz3LMIoTRsUDw4pMvy2fHOibVZsBOQq7qZiu0zu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h/mFAmnU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6948BC4CEF7;
+	Sun,  4 Jan 2026 18:26:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767550405;
-	bh=7aLUiot2SfuGwMnLVofiZQScB17Z0NLov7dmrjYkKj8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rVGjuvKXaV8PbensfG4lQRQXlB5xjTFbHGDiPC0QvCI2etwW4y4iVjH0cwivp33HT
-	 LyViESXin1u4ySEGbeDZV3xfg8fa3MsBo4KYTqsl3ey8EU++1BNvQXdfeF+ly47iuV
-	 FBawWKsh8xXg+z14cclTGltbwu61GI0t9HYIvkkvcr2TdXLDIp6Ccabsj2Dj/l1ngW
-	 qxs8ajFB1AulpmllylfPzTxkScysFZX4TDvGc4tPprXhUbdLZ8dN1D3I8y2b0JyKmA
-	 typfIFdaOBVHdF4nche0c01OX6+MhmR9DaaNiys/sLa2L3FQIduj4q9+vrP4JL5NuH
-	 EgzVdJvF5nt1g==
-Date: Sun, 4 Jan 2026 10:13:23 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Michael Thalmeier <michael.thalmeier@hale.at>
-Cc: Deepak Sharma <deepak.sharma.472935@gmail.com>, Krzysztof Kozlowski
- <krzk@kernel.org>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, Simon
- Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Michael Thalmeier
- <michael@thalmeier.at>, stable@vger.kernel.org
-Subject: Re: [PATCH net v4] net: nfc: nci: Fix parameter validation for
- packet data
-Message-ID: <20260104101323.1ac8b478@kernel.org>
-In-Reply-To: <20251223072552.297922-1-michael.thalmeier@hale.at>
-References: <20251223072552.297922-1-michael.thalmeier@hale.at>
+	s=k20201202; t=1767551161;
+	bh=clhBWUoYeZWEDAFPY3adO7NhzlQ58GU2nLISINnoLAI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=h/mFAmnUlB3ZKObDG165cFDz5+zZR39PryuuYkRn4kBImU8AnmuYCeB6axlA3VVRg
+	 QNLmaGNItOX7pCsJZAfkxFIsep9KAqKrOhe4YUQv1bELQFKG2fOoNbLG59NwPC+BfL
+	 vW1/UQgeLNVqamvBm7i5a6rl2uP8rTKsSUamHMumcZgI1gFcyRmcDv2iKbBdbQdf3Q
+	 33NnXvZh33PI8ipszlAwY8pkJK1iOnZzFgMrTi9r5JBMvGo+ZEjkR6CqnHWzjuiXI6
+	 FCWr6o4NNKSz6bxd63q5RzIZ3HuSv3Bc7fXSb6UMg4Aq6Y5mExEA5G7SbZn3+YqwRk
+	 wfXJuejMNKDOA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 789E5380AA4F;
+	Sun,  4 Jan 2026 18:22:41 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] net: phy: mxl-86110: Add power management and soft
+ reset support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176755096036.142863.1452181499477671976.git-patchwork-notify@kernel.org>
+Date: Sun, 04 Jan 2026 18:22:40 +0000
+References: <20251223120940.407195-1-stefano.r@variscite.com>
+In-Reply-To: <20251223120940.407195-1-stefano.r@variscite.com>
+To: Stefano Radaelli <stefano.radaelli21@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stefano.r@variscite.com, lxu@maxlinear.com, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
 
-On Tue, 23 Dec 2025 08:25:52 +0100 Michael Thalmeier wrote:
-> diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
-> index 418b84e2b260..a5cafcd10cc3 100644
-> --- a/net/nfc/nci/ntf.c
-> +++ b/net/nfc/nci/ntf.c
+Hello:
 
-> @@ -380,6 +384,10 @@ static int nci_rf_discover_ntf_packet(struct nci_dev *ndev,
->  	pr_debug("rf_tech_specific_params_len %d\n",
->  		 ntf.rf_tech_specific_params_len);
->  
-> +	if (skb->len < (data - skb->data) +
-> +			ntf.rf_tech_specific_params_len + sizeof(ntf.ntf_type))
-> +		return -EINVAL;
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Are we validating ntf.rf_tech_specific_params_len against the
-extraction logic in nci_extract_rf_params_nfca_passive_poll()
-and friends?
+On Tue, 23 Dec 2025 13:09:39 +0100 you wrote:
+> From: Stefano Radaelli <stefano.r@variscite.com>
+> 
+> Implement soft_reset, suspend, and resume callbacks using
+> genphy_soft_reset(), genphy_suspend(), and genphy_resume()
+> to fix PHY initialization and power management issues.
+> 
+> The soft_reset callback is needed to properly recover the PHY after an
+> ifconfig down/up cycle. Without it, the PHY can remain in power-down
+> state, causing MDIO register access failures during config_init().
+> The soft reset ensures the PHY is operational before configuration.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2] net: phy: mxl-86110: Add power management and soft reset support
+    https://git.kernel.org/netdev/net/c/62f7edd59964
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
