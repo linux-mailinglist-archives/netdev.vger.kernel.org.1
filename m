@@ -1,91 +1,81 @@
-Return-Path: <netdev+bounces-246789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ED41CF12DB
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 19:05:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E7A0CF12E3
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 19:13:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 366A93010ABE
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 18:05:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CE568300C29D
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 18:13:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B43702D7398;
-	Sun,  4 Jan 2026 18:05:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1619256C88;
+	Sun,  4 Jan 2026 18:13:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="firLmRX9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rVGjuvKX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C6052D738E;
-	Sun,  4 Jan 2026 18:05:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A291D3A1E70;
+	Sun,  4 Jan 2026 18:13:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767549900; cv=none; b=l2se4wyzQEJhi5lO0Hs8x1ffdss1HuYMSAusySk4QZiXN6+QO3aabpDCjbXRcW+Up2Y7UuEDB9/YywEY1pSx3su7mSVRQ7k4z+vnnFFvjzIOMd0+K810YPT6Qc71GoNQI1jf4E/6/BzmSRB/JHp0ffnMTYVsJ/W/hIsH17ntbnw=
+	t=1767550405; cv=none; b=lwgeVOCIZyRy1KrMA0a9Ghe5ROsnoFOStBM1+pCNgV/U1mYZ+kBqpTv8Gsv5bskuQXqLHE7toZ/9zbzsemg0Np9Z1KgqpGExSxSrn1H84FBmDsCa+5KaMuAKiFsy+bk4s6Qm4X5zAl4jA/wTPqDEO0XixCAuiFyeU4hp93gM2Wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767549900; c=relaxed/simple;
-	bh=N9reVgHxUFIXhGhMYyqKvMFqtt2tUVHQzz1N7y9V08Y=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=czJ4MVOOpbyq64TzdxngkDSTiF/GK3CGUCSAcphxGbbmIQd0maHCCpSt8Jp0hiIqZ32k9R4QCEF/9Y+Xkq6GTFnEp/D7Ij55s1I1AHT4nUft2njIavib9Dry1p9sHkIfJqd1h9bk4ODi0BlBl/Ghz98okghRPfejXuiqGruMbuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=firLmRX9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6533FC4CEF7;
-	Sun,  4 Jan 2026 18:05:00 +0000 (UTC)
+	s=arc-20240116; t=1767550405; c=relaxed/simple;
+	bh=7aLUiot2SfuGwMnLVofiZQScB17Z0NLov7dmrjYkKj8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PPJtZAzu1GTqwsVw6+v66GBYcy2uGwgEln1OMDXYIOrmUzyNn0Z1rKwzyCy+WrdtR8t74QDg5vKmoL6iv3HgVSDhgC8SHNXDv3ZgEUc39Z650DBKYmUr372dmWf7JgP7YethCRTZdq5SWduGStldyNTR39JlR3ZUXo9AdGnqfMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rVGjuvKX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99084C4CEF7;
+	Sun,  4 Jan 2026 18:13:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767549900;
-	bh=N9reVgHxUFIXhGhMYyqKvMFqtt2tUVHQzz1N7y9V08Y=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=firLmRX9HL7TlQg9KaTgAY9nvdDgN483LYBEcDrLd1UnlRMJe+SCxk3iSfD9+wzE1
-	 /1z9fBv1Sj33lbjpoo3qtUteFd6z5fYuIjIC85hhWtYe/m2CrWdXYytG7fQEs9qDT4
-	 s42JdOS3kEaWZop6HVpVc+/Y9awWHvChW5qqQmT0p/Ool/crZ/yX4+rWdmNVBwyz+Q
-	 bIe5t7lwkPTYM27tx5DE/XXVzGZQ+8mRqCceAyIqKY29Y/SXuebxR6l/oV/RHA43PC
-	 CIKbIlq0AhIM3n3Vin8Sj5U25RdvIYn/l6KMm3tOv4QWDyod4oQb4bqOK3r2EQrJze
-	 uDzNHm1EilusA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 79191380AA4F;
-	Sun,  4 Jan 2026 18:01:40 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1767550405;
+	bh=7aLUiot2SfuGwMnLVofiZQScB17Z0NLov7dmrjYkKj8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rVGjuvKXaV8PbensfG4lQRQXlB5xjTFbHGDiPC0QvCI2etwW4y4iVjH0cwivp33HT
+	 LyViESXin1u4ySEGbeDZV3xfg8fa3MsBo4KYTqsl3ey8EU++1BNvQXdfeF+ly47iuV
+	 FBawWKsh8xXg+z14cclTGltbwu61GI0t9HYIvkkvcr2TdXLDIp6Ccabsj2Dj/l1ngW
+	 qxs8ajFB1AulpmllylfPzTxkScysFZX4TDvGc4tPprXhUbdLZ8dN1D3I8y2b0JyKmA
+	 typfIFdaOBVHdF4nche0c01OX6+MhmR9DaaNiys/sLa2L3FQIduj4q9+vrP4JL5NuH
+	 EgzVdJvF5nt1g==
+Date: Sun, 4 Jan 2026 10:13:23 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Michael Thalmeier <michael.thalmeier@hale.at>
+Cc: Deepak Sharma <deepak.sharma.472935@gmail.com>, Krzysztof Kozlowski
+ <krzk@kernel.org>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, Simon
+ Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Michael Thalmeier
+ <michael@thalmeier.at>, stable@vger.kernel.org
+Subject: Re: [PATCH net v4] net: nfc: nci: Fix parameter validation for
+ packet data
+Message-ID: <20260104101323.1ac8b478@kernel.org>
+In-Reply-To: <20251223072552.297922-1-michael.thalmeier@hale.at>
+References: <20251223072552.297922-1-michael.thalmeier@hale.at>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: bnge: add AUXILIARY_BUS to Kconfig dependencies
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176754969928.141026.3418587325823396897.git-patchwork-notify@kernel.org>
-Date: Sun, 04 Jan 2026 18:01:39 +0000
-References: <20251228-bnge_aux_bus-v1-1-82e273ebfdac@blochl.de>
-In-Reply-To: <20251228-bnge_aux_bus-v1-1-82e273ebfdac@blochl.de>
-To: =?utf-8?b?TWFya3VzIEJsw7ZjaGwgPG1hcmt1c0BibG9jaGwuZGU+?=@codeaurora.org
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, vikas.gupta@broadcom.com,
- leon@kernel.org, siva.kallam@broadcom.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue, 23 Dec 2025 08:25:52 +0100 Michael Thalmeier wrote:
+> diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
+> index 418b84e2b260..a5cafcd10cc3 100644
+> --- a/net/nfc/nci/ntf.c
+> +++ b/net/nfc/nci/ntf.c
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+> @@ -380,6 +384,10 @@ static int nci_rf_discover_ntf_packet(struct nci_dev *ndev,
+>  	pr_debug("rf_tech_specific_params_len %d\n",
+>  		 ntf.rf_tech_specific_params_len);
+>  
+> +	if (skb->len < (data - skb->data) +
+> +			ntf.rf_tech_specific_params_len + sizeof(ntf.ntf_type))
+> +		return -EINVAL;
 
-On Sun, 28 Dec 2025 16:52:59 +0100 you wrote:
-> The build can currently fail with
-> 
->     ld: drivers/net/ethernet/broadcom/bnge/bnge_auxr.o: in function `bnge_rdma_aux_device_add':
->     bnge_auxr.c:(.text+0x366): undefined reference to `__auxiliary_device_add'
->     ld: drivers/net/ethernet/broadcom/bnge/bnge_auxr.o: in function `bnge_rdma_aux_device_init':
->     bnge_auxr.c:(.text+0x43c): undefined reference to `auxiliary_device_init'
-> 
-> [...]
-
-Here is the summary with links:
-  - [net] net: bnge: add AUXILIARY_BUS to Kconfig dependencies
-    https://git.kernel.org/netdev/net/c/d7065436e8a0
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Are we validating ntf.rf_tech_specific_params_len against the
+extraction logic in nci_extract_rf_params_nfca_passive_poll()
+and friends?
 
