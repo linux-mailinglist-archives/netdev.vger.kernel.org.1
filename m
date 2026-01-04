@@ -1,59 +1,48 @@
-Return-Path: <netdev+bounces-246803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC342CF1389
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 19:46:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 36D9ECF13A4
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 19:56:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3679A3006F7D
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 18:46:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 70114300D4BB
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 18:55:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4294A313E11;
-	Sun,  4 Jan 2026 18:46:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADD34313E1B;
+	Sun,  4 Jan 2026 18:55:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RbFS7+mZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IC7pSnzE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16661313E0A;
-	Sun,  4 Jan 2026 18:46:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FBCE23AB90;
+	Sun,  4 Jan 2026 18:55:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767552371; cv=none; b=kFPIyJmsuUXNHWibHN6d7UENH9i+TMhcj3R5neO8GRb/5wKilvv+7+Rib0i2Bu19p1bDCtK8E2EvxfbSX6ySCLyd67iJglfV5fur3bE+R383fNKWO9RllbFlvfkQQZMrCDFJlAZQHMuhbE/nl+6DlPuErgnGAViPv2qA+Z33Dzo=
+	t=1767552955; cv=none; b=GuFsJaMsGb0giLUpW9LWxb/MAH0a1E8vj2DUUwVsaEQ04+e92REqndyHMr8VRet1cn3enEB3j9g/OALU6p4xafkzZyQNYMWh9+2agMdBvFZoU2vfIaPIurKv36yQOZc9AWHLRd8SicGqxMMhsTMN/N5TvmW5bBdaLtzM9Krzmug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767552371; c=relaxed/simple;
-	bh=DJRqWfjAnc68o32BNUsIZ4YkJ68XYVkr/l7dJC6cRuI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RCZG9dD8f9OHnBx8QIf/M10jXqzyjjVu9n71955CqcnvAFVlVkWzFV7A16ZdGQikGcWQa2R5CZycHKdJCCjBkgYYR/7jSbq9/W4l7s8ps+6e9mlzDX97sOOhNjxT5z5WNb3qIdiLbCrGipYIwrIj0KiJlsvsMhB41bM4rnXjh+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RbFS7+mZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1481C4CEF7;
-	Sun,  4 Jan 2026 18:46:07 +0000 (UTC)
+	s=arc-20240116; t=1767552955; c=relaxed/simple;
+	bh=FsmYT4J2wneLygt9k8P00NIpU5dia1i3KeDHzRjOSyc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=lgfvFDzKAZwDcGA6St5eX6bKOdP+MVwaHH4l/sOU1c4j+lYovfr10IAm2fBzlfSJXDGj4skFvmbO4ms/jifC/r8K2IUywDv9rYz89ombyIprPL4YUOeHm6TQClcHYvriVUY//tBoqPy8FCTcXiKFi935b24K72bUvr5NPGslHYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IC7pSnzE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30F5FC4CEF7;
+	Sun,  4 Jan 2026 18:55:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767552368;
-	bh=DJRqWfjAnc68o32BNUsIZ4YkJ68XYVkr/l7dJC6cRuI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=RbFS7+mZ8wIfBAL1hzmTnQq5T/MU1J5knRf44oDp3Tl67x6ftckLm6f797KbPgiTm
-	 7mYlpMX4j3/GUb4Waap+uhEQnXSAvdjzvh1g9zQ1BGz+dFpZQGm9q54P/Ai3EYqV87
-	 UeFGPdO74zgRv24Ddi80DKIb6twlHBAt1w7a6ESeBVWC9ZTCHfOMkOgurH2OZJV8A6
-	 bNl1yEBIM6lmW33QSSzJ8pmDzsz0dTKVtxlP4FxtHLLhBz1ONpBFYR3Z04w8QiKEOn
-	 cxQr8m6EJ4kkEX6AIvGneG2+pUiBBQkeLmGnCZta9Vd1k3yDYCXB4l2+Bcb8cZesLb
-	 fhStqmwN8t1fw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	gal@nvidia.com,
-	noren@nvidia.com,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next] selftests: hw-net: rss-input-xfrm: try to enable the xfrm at the start
-Date: Sun,  4 Jan 2026 10:46:00 -0800
-Message-ID: <20260104184600.795280-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.52.0
+	s=k20201202; t=1767552955;
+	bh=FsmYT4J2wneLygt9k8P00NIpU5dia1i3KeDHzRjOSyc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=IC7pSnzEclHGwg200X/YkdBBynq7odRScUs9ppZoZpZ5+vCC75MulNZG9xoNbQ7ea
+	 YHl+gfz24aU8DAk/01qqCzHWqgE5huqcVehQ7bOvjuf1C9PfOOiVV+8sKjo5PD0Ux8
+	 gufnEXHEZAj84Zw7OxxJ8epEP1/fFxR6HWqDntc0r/AZVBg5anq5l1wosBra4diGjh
+	 HemjiMkiYw9l4FXiTGEZzICBstLP/oFQ2Kp80I2pGwGdvs9cEXvi/gXm+jLpkn5ydQ
+	 PaFF0rRXFM7FglqmFWK1tATHw28PJZH5oZFT/U/eEwxFbtqt5UsOaoH8qU0JuS60fs
+	 dMLakUjvihl3Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3BC38380AA4F;
+	Sun,  4 Jan 2026 18:52:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,114 +50,86 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v4 00/15] Add support for Microchip LAN969x
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176755275401.146974.3696343941489230641.git-patchwork-notify@kernel.org>
+Date: Sun, 04 Jan 2026 18:52:34 +0000
+References: <20251229184004.571837-1-robert.marko@sartura.hr>
+In-Reply-To: <20251229184004.571837-1-robert.marko@sartura.hr>
+To: Robert Marko <robert.marko@sartura.hr>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
+ claudiu.beznea@tuxon.dev, herbert@gondor.apana.org.au, davem@davemloft.net,
+ vkoul@kernel.org, andi.shyti@kernel.org, lee@kernel.org,
+ andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, linusw@kernel.org, Steen.Hegelund@microchip.com,
+ daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
+ olivia@selenic.com, radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com,
+ gregkh@linuxfoundation.org, jirislaby@kernel.org, broonie@kernel.org,
+ lars.povlsen@microchip.com, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+ linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org,
+ linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
+ luka.perkov@sartura.hr
 
-The test currently SKIPs if the symmetric RSS xfrm is not enabled
-by default. This leads to spurious SKIPs in the Intel CI reporting
-results to NIPA.
+Hello:
 
-Testing on CX7:
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
- # ./drivers/net/hw/rss_input_xfrm.py
-  TAP version 13
-  1..2
-  ok 1 rss_input_xfrm.test_rss_input_xfrm_ipv4 # SKIP Test requires IPv4 connectivity
-  # Sym input xfrm already enabled: {'sym-or-xor'}
-  ok 2 rss_input_xfrm.test_rss_input_xfrm_ipv6
-  # Totals: pass:1 fail:0 xfail:0 xpass:0 skip:1 error:0
+On Mon, 29 Dec 2025 19:37:41 +0100 you wrote:
+> This series adds support for the Microchip LAN969x switch SoC family.
+> 
+> Series is a bit long since after discussions in previous versions, it was
+> recommended[1][2] to add SoC specific compatibles for device nodes so it
+> includes the required bindings updates.
+> 
+> [1] https://lore.kernel.org/all/20251203-splendor-cubbyhole-eda2d6982b46@spud/
+> [2] https://lore.kernel.org/all/173412c8-c2fb-4c38-8de7-5b1c2eebdbf9@microchip.com/
+> [3] https://lore.kernel.org/all/20251203-duly-leotard-86b83bd840c6@spud/
+> [4] https://lore.kernel.org/all/756ead5d-8c9b-480d-8ae5-71667575ab7c@kernel.org/
+> 
+> [...]
 
- # ethtool -X eth0 xfrm none
+Here is the summary with links:
+  - [v4,01/15] dt-bindings: usb: Add Microchip LAN969x support
+    (no matching commit)
+  - [v4,02/15] dt-bindings: mfd: atmel,sama5d2-flexcom: add microchip,lan9691-flexcom
+    (no matching commit)
+  - [v4,03/15] dt-bindings: serial: atmel,at91-usart: add microchip,lan9691-usart
+    (no matching commit)
+  - [v4,04/15] dt-bindings: spi: at91: add microchip,lan9691-spi
+    (no matching commit)
+  - [v4,05/15] dt-bindings: i2c: atmel,at91sam: add microchip,lan9691-i2c
+    (no matching commit)
+  - [v4,06/15] dt-bindings: rng: atmel,at91-trng: add microchip,lan9691-trng
+    (no matching commit)
+  - [v4,07/15] dt-bindings: crypto: atmel,at91sam9g46-aes: add microchip,lan9691-aes
+    (no matching commit)
+  - [v4,08/15] dt-bindings: crypto: atmel,at91sam9g46-sha: add microchip,lan9691-sha
+    (no matching commit)
+  - [v4,09/15] dt-bindings: dma: atmel: add microchip,lan9691-dma
+    (no matching commit)
+  - [v4,10/15] dt-bindings: net: mscc-miim: add microchip,lan9691-miim
+    https://git.kernel.org/netdev/net-next/c/c303e8b86d9d
+  - [v4,11/15] dt-bindings: pinctrl: pinctrl-microchip-sgpio: add LAN969x
+    (no matching commit)
+  - [v4,12/15] arm64: dts: microchip: add LAN969x clock header file
+    (no matching commit)
+  - [v4,13/15] arm64: dts: microchip: add LAN969x support
+    (no matching commit)
+  - [v4,14/15] dt-bindings: arm: AT91: document EV23X71A board
+    (no matching commit)
+  - [v4,15/15] arm64: dts: microchip: add EV23X71A board
+    (no matching commit)
 
- # ./drivers/net/hw/rss_input_xfrm.py
-  TAP version 13
-  1..2
-  ok 1 rss_input_xfrm.test_rss_input_xfrm_ipv4 # SKIP Test requires IPv4 connectivity
-  # Sym input xfrm configured: {'sym-or-xor'}
-  ok 2 rss_input_xfrm.test_rss_input_xfrm_ipv6
-  # Totals: pass:1 fail:0 xfail:0 xpass:0 skip:1 error:0
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: shuah@kernel.org
-CC: gal@nvidia.com
-CC: noren@nvidia.com
-CC: linux-kselftest@vger.kernel.org
----
- .../drivers/net/hw/rss_input_xfrm.py          | 44 ++++++++++++++++---
- 1 file changed, 38 insertions(+), 6 deletions(-)
-
-diff --git a/tools/testing/selftests/drivers/net/hw/rss_input_xfrm.py b/tools/testing/selftests/drivers/net/hw/rss_input_xfrm.py
-index 72880e388478..503f1a2a2872 100755
---- a/tools/testing/selftests/drivers/net/hw/rss_input_xfrm.py
-+++ b/tools/testing/selftests/drivers/net/hw/rss_input_xfrm.py
-@@ -5,9 +5,9 @@ import multiprocessing
- import socket
- from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_ge, cmd, fd_read_timeout
- from lib.py import NetDrvEpEnv
--from lib.py import EthtoolFamily, NetdevFamily
-+from lib.py import EthtoolFamily, NetdevFamily, NlError
- from lib.py import KsftSkipEx, KsftFailEx
--from lib.py import rand_port
-+from lib.py import defer, ksft_pr, rand_port
- 
- 
- def traffic(cfg, local_port, remote_port, ipver):
-@@ -21,6 +21,40 @@ from lib.py import rand_port
-     return sock.getsockopt(socket.SOL_SOCKET, socket.SO_INCOMING_CPU)
- 
- 
-+def _rss_input_xfrm_try_enable(cfg):
-+    """
-+    Check if symmetric input-xfrm is already enabled, if not try to enable it
-+    and register a cleanup.
-+    """
-+    rss = cfg.ethnl.rss_get({'header': {'dev-name': cfg.ifname}})
-+    orig_xfrm = rss.get('input-xfrm', set())
-+    sym_xfrm = set(filter(lambda x: 'sym' in x, orig_xfrm))
-+
-+    if sym_xfrm:
-+        ksft_pr("Sym input xfrm already enabled:", sym_xfrm)
-+        return sym_xfrm
-+
-+    for xfrm in cfg.ethnl.consts["input-xfrm"].entries:
-+        # Skip non-symmetric transforms
-+        if "sym" not in xfrm:
-+            continue
-+
-+        try_xfrm = {xfrm} | orig_xfrm
-+        try:
-+            cfg.ethnl.rss_set({"header": {"dev-index": cfg.ifindex},
-+                               "input-xfrm": try_xfrm})
-+        except NlError:
-+            continue
-+
-+        ksft_pr("Sym input xfrm configured:", try_xfrm)
-+        defer(cfg.ethnl.rss_set,
-+              {"header": {"dev-index": cfg.ifindex},
-+               "input-xfrm": orig_xfrm})
-+        return {xfrm}
-+
-+    return set()
-+
-+
- def test_rss_input_xfrm(cfg, ipver):
-     """
-     Test symmetric input_xfrm.
-@@ -37,12 +71,10 @@ from lib.py import rand_port
-     if not hasattr(socket, "SO_INCOMING_CPU"):
-         raise KsftSkipEx("socket.SO_INCOMING_CPU was added in Python 3.11")
- 
--    rss = cfg.ethnl.rss_get({'header': {'dev-name': cfg.ifname}})
--    input_xfrm = set(filter(lambda x: 'sym' in x, rss.get('input-xfrm', {})))
--
-     # Check for symmetric xor/or-xor
-+    input_xfrm = _rss_input_xfrm_try_enable(cfg)
-     if not input_xfrm:
--        raise KsftSkipEx("Symmetric RSS hash not requested")
-+        raise KsftSkipEx("Symmetric RSS hash not supported by device")
- 
-     cpus = set()
-     successful = 0
+You are awesome, thank you!
 -- 
-2.52.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
