@@ -1,213 +1,160 @@
-Return-Path: <netdev+bounces-246731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D71DACF0B3B
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 08:12:21 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD904CF0B45
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 08:19:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9DDE0302E72F
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 07:10:12 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5E4AE3009283
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 07:19:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E819B2EAB72;
-	Sun,  4 Jan 2026 07:10:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OOXi/RyL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4629B261393;
+	Sun,  4 Jan 2026 07:19:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C729D2E3387
-	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 07:10:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8CE3C38
+	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 07:19:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767510608; cv=none; b=FEXQjaPQp9vLwUV+URh9I9R4R+3t4gRyZXS1p51IxBN/0VvM995sHRvy4t/UYbRIPr0uKaejEO4mNUHJLnPPxe5yMt2VwwL5z1R2Xuq8hPFdvzcszBe6nHfKCGKcZ/GODWEfj4Ok+x9oqGKN4E144J1bW10gZmOM8FdIfMT4pY8=
+	t=1767511180; cv=none; b=s1URbdBX9CYtFOQbDByBeXwlOfKsS/3FbWTQAkV5v9xleSn/rJP3SXe4nB0+DPUWChJZjFI4zKL8GDGwUB+ke0vUtI18RoIvEHrTjK5cGeZ2RsN7/wgYZfrXEHbf6SqIATcuJiSijO0NaHhvxNQiMGbLEuK7l/pgOiNrJ2FS0ZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767510608; c=relaxed/simple;
-	bh=igyM/8qIW3+Hq3eZX0VZjcZW40iUc/SMwNFaDv5FwdM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T4x+wCyMAB2auymIRqKEJBGJYGmDJVgVbXoqCd5cYr0jqpByMggiKYaKFY1D8Ajl78ua9XSJD1c1BrfAUpBPdgOA9L7ABPDHEKpXdJs2sCQZPS6YixlJuEQkFmeiDKkAvwVmc0nkEjEm3A/VVdDek/MZhM4caBZhZ829ID6LOmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OOXi/RyL; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767510607; x=1799046607;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=igyM/8qIW3+Hq3eZX0VZjcZW40iUc/SMwNFaDv5FwdM=;
-  b=OOXi/RyLbVvTOy4wLUxUxZtV31vADEdDH9oBjAHWyxllvrS4rDQgPLxH
-   6ioL5AYeDtWHucfq7e3nH6gziseZuyr1G/wkg7+aaKZx0cYUN4DtVRAIK
-   QhdcAcuSOPBU1vL88czG3+PhCy8kCnLynnqw2dcjPVp5P31CDk4s+Hb/C
-   dDGbCjoYsIYr9MZ6ZWTceLjHr/AkOZWmB4ZE3bbzCk9rtPLTlgSBnsCpx
-   s+ZSjiDdGKKTzcBws2ZFBqguUGPOkqaPm4tLctoRIgw3gBOlLj2bPp2UV
-   GADZXq/dgSKPSCKMgEf5zj9+D355HyfTkj79LJlu7FW2jPnB/r5AQIru9
-   g==;
-X-CSE-ConnectionGUID: XiK99WvKRXqfUgXLps2jdA==
-X-CSE-MsgGUID: EMH2A1XuQn+KCbXKqYdNEQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11635"; a="68853834"
-X-IronPort-AV: E=Sophos;i="6.20,256,1758610800"; 
-   d="scan'208";a="68853834"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2026 23:10:07 -0800
-X-CSE-ConnectionGUID: i3pqvFJTQzCM3MdVGH7Vkw==
-X-CSE-MsgGUID: lnJpXq3hQIu53ez2vE1xYg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,200,1763452800"; 
-   d="scan'208";a="206649339"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 03 Jan 2026 23:10:03 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vcIFU-000000000Q9-1G01;
-	Sun, 04 Jan 2026 07:10:00 +0000
-Date: Sun, 4 Jan 2026 15:09:27 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, andrew+netdev@lunn.ch
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us,
-	victor@mojatatu.com, Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: Re: [PATCH net 1/2] net/sched: act_mirred: Fix leak when redirecting
- to self on egress
-Message-ID: <202601041445.FfX5dT9n-lkp@intel.com>
-References: <20251230191814.213789-1-jhs@mojatatu.com>
+	s=arc-20240116; t=1767511180; c=relaxed/simple;
+	bh=nSSABm3RUHfTBBd6BSGZmGMrq2fBPWE2PmN6O88g7us=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Zy0SmLYvyV4XHvQtoHMVawPKyLOh/s4Gm4uMQDdBL7bzfw5+y5xoW6N5N8GknQO0jzYsAOGG35b3DUHVxbaNc0vNTWFVItRYgNejG1JD4j9/iL4dFJsN8mgUEYIiU29jvgeReEQkfqdcLoXXLv5IOQTSvVHt7VmIk7WVSgzL/os=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: b46d2892e93d11f0a38c85956e01ac42-20260104
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.6,REQID:ca697646-5223-4501-bc50-73b7441f1390,IP:0,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:0
+X-CID-META: VersionHash:a9d874c,CLOUDID:699cdf5fb24a3864ed4b1f82a4a13486,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:102|898,TC:nil,Content:0|15|50,EDM:-3,IP
+	:nil,URL:99|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV
+	:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULS
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: b46d2892e93d11f0a38c85956e01ac42-20260104
+X-User: jiangyunshui@kylinos.cn
+Received: from kylin-pc.. [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <jiangyunshui@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 1418844213; Sun, 04 Jan 2026 15:19:27 +0800
+From: Yunshui Jiang <jiangyunshui@kylinos.cn>
+To: gregkh@linuxfoundation.org,
+	sashal@kernel.org
+Cc: arvid.brodin@alten.se,
+	netdev@vger.kernel.org,
+	jiangyunshui <jiangyunshui@kylinos.cn>,
+	syzbot <syzkaller@googlegroups.com>
+Subject: [PATCH] net: hsr: avoid possible NULL deref in skb_clone()
+Date: Sun,  4 Jan 2026 15:19:22 +0800
+Message-ID: <20260104071922.2712346-1-jiangyunshui@kylinos.cn>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251230191814.213789-1-jhs@mojatatu.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Jamal,
+From: jiangyunshui <jiangyunshui@kylinos.cn>
 
-kernel test robot noticed the following build warnings:
+commit d8b57135fd9f ("net: hsr: avoid possible NULL deref in
+skb_clone()")
 
-[auto build test WARNING on net/main]
+Modify frame_get_stripped_skb for 5.4.y branch according to the
+upstream fix in hsr_get_untagged_frame.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jamal-Hadi-Salim/selftests-tc-testing-Add-test-case-redirecting-to-self-on-egress/20251231-031934
-base:   net/main
-patch link:    https://lore.kernel.org/r/20251230191814.213789-1-jhs%40mojatatu.com
-patch subject: [PATCH net 1/2] net/sched: act_mirred: Fix leak when redirecting to self on egress
-config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20260104/202601041445.FfX5dT9n-lkp@intel.com/config)
-compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260104/202601041445.FfX5dT9n-lkp@intel.com/reproduce)
+syzbot got a crash [1] in skb_clone(), caused by a bug
+in hsr_get_untagged_frame().
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601041445.FfX5dT9n-lkp@intel.com/
+When/if create_stripped_skb_hsr() returns NULL, we must
+not attempt to call skb_clone().
 
-All warnings (new ones prefixed by >>):
+While we are at it, replace a WARN_ONCE() by netdev_warn_once().
 
->> net/sched/act_mirred.c:271:41: warning: variable 'at_ingress' is uninitialized when used here [-Wuninitialized]
-     271 |         if (dev == skb->dev && want_ingress == at_ingress) {
-         |                                                ^~~~~~~~~~
-   net/sched/act_mirred.c:256:17: note: initialize the variable 'at_ingress' to silence this warning
-     256 |         bool at_ingress;
-         |                        ^
-         |                         = 0
-   1 warning generated.
+[1]
+general protection fault, probably for non-canonical address 0xdffffc000000000f:
+0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000078-0x000000000000007f]
+CPU: 1 PID: 754 Comm: syz-executor.0 Not tainted 6.0.0-syzkaller-02734-g0326074ff465 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/22/2022
+RIP: 0010:skb_clone+0x108/0x3c0 net/core/skbuff.c:1641
+Code: 93 02 00 00 49 83 7c 24 28 00 0f 85 e9 00 00 00 e8 5d 4a 29 fa 4c 8d 75 7e 48 b8 00 00 00 00 00 fc ff df 4c 89 f2 48 c1 ea 03 <0f> b6 04 02 4c 89 f2 83 e2 07 38 d0 7f 08 84 c0 0f 85 9e 01 00 00
+RSP: 0018:ffffc90003ccf4e0 EFLAGS: 00010207
 
+RAX: dffffc0000000000 RBX: ffffc90003ccf5f8 RCX: ffffc9000c24b000
+RDX: 000000000000000f RSI: ffffffff8751cb13 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 00000000000000f0 R09: 0000000000000140
+R10: fffffbfff181d972 R11: 0000000000000000 R12: ffff888161fc3640
+R13: 0000000000000a20 R14: 000000000000007e R15: ffffffff8dc5f620
+FS: 00007feb621e4700(0000) GS:ffff8880b9b00000(0000) knlGS:0000000000000000
+CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007feb621e3ff8 CR3: 00000001643a9000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+<TASK>
+hsr_get_untagged_frame+0x4e/0x610 net/hsr/hsr_forward.c:164
+hsr_forward_do net/hsr/hsr_forward.c:461 [inline]
+hsr_forward_skb+0xcca/0x1d50 net/hsr/hsr_forward.c:623
+hsr_handle_frame+0x588/0x7c0 net/hsr/hsr_slave.c:69
+__netif_receive_skb_core+0x9fe/0x38f0 net/core/dev.c:5379
+__netif_receive_skb_one_core+0xae/0x180 net/core/dev.c:5483
+__netif_receive_skb+0x1f/0x1c0 net/core/dev.c:5599
+netif_receive_skb_internal net/core/dev.c:5685 [inline]
+netif_receive_skb+0x12f/0x8d0 net/core/dev.c:5744
+tun_rx_batched+0x4ab/0x7a0 drivers/net/tun.c:1544
+tun_get_user+0x2686/0x3a00 drivers/net/tun.c:1995
+tun_chr_write_iter+0xdb/0x200 drivers/net/tun.c:2025
+call_write_iter include/linux/fs.h:2187 [inline]
+new_sync_write fs/read_write.c:491 [inline]
+vfs_write+0x9e9/0xdd0 fs/read_write.c:584
+ksys_write+0x127/0x250 fs/read_write.c:637
+do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
-vim +/at_ingress +271 net/sched/act_mirred.c
+Fixes: f266a683a480 ("net/hsr: Better frame dispatch")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Link: https://lore.kernel.org/r/20221017165928.2150130-1-edumazet@google.com
+Signed-off-by: jiangyunshui <jiangyunshui@kylinos.cn>
+---
+ net/hsr/hsr_forward.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-   246	
-   247	static int tcf_mirred_to_dev(struct sk_buff *skb, struct tcf_mirred *m,
-   248				     struct net_device *dev,
-   249				     const bool m_mac_header_xmit, int m_eaction,
-   250				     int retval)
-   251	{
-   252		struct sk_buff *skb_to_send = skb;
-   253		bool want_ingress;
-   254		bool is_redirect;
-   255		bool expects_nh;
-   256		bool at_ingress;
-   257		bool dont_clone;
-   258		int mac_len;
-   259		bool at_nh;
-   260		int err;
-   261	
-   262		is_redirect = tcf_mirred_is_act_redirect(m_eaction);
-   263		if (unlikely(!(dev->flags & IFF_UP)) || !netif_carrier_ok(dev)) {
-   264			net_notice_ratelimited("tc mirred to Houston: device %s is down\n",
-   265					       dev->name);
-   266			goto err_cant_do;
-   267		}
-   268	
-   269		want_ingress = tcf_mirred_act_wants_ingress(m_eaction);
-   270	
- > 271		if (dev == skb->dev && want_ingress == at_ingress) {
-   272			pr_notice_once("tc mirred: Loop (%s:%s --> %s:%s)\n",
-   273				       netdev_name(skb->dev),
-   274				       at_ingress ? "ingress" : "egress",
-   275				       netdev_name(dev),
-   276				       want_ingress ? "ingress" : "egress");
-   277			goto err_cant_do;
-   278		}
-   279	
-   280		/* we could easily avoid the clone only if called by ingress and clsact;
-   281		 * since we can't easily detect the clsact caller, skip clone only for
-   282		 * ingress - that covers the TC S/W datapath.
-   283		 */
-   284		at_ingress = skb_at_tc_ingress(skb);
-   285		dont_clone = skb_at_tc_ingress(skb) && is_redirect &&
-   286			tcf_mirred_can_reinsert(retval);
-   287		if (!dont_clone) {
-   288			skb_to_send = skb_clone(skb, GFP_ATOMIC);
-   289			if (!skb_to_send)
-   290				goto err_cant_do;
-   291		}
-   292	
-   293		/* All mirred/redirected skbs should clear previous ct info */
-   294		nf_reset_ct(skb_to_send);
-   295		if (want_ingress && !at_ingress) /* drop dst for egress -> ingress */
-   296			skb_dst_drop(skb_to_send);
-   297	
-   298		expects_nh = want_ingress || !m_mac_header_xmit;
-   299		at_nh = skb->data == skb_network_header(skb);
-   300		if (at_nh != expects_nh) {
-   301			mac_len = at_ingress ? skb->mac_len :
-   302				  skb_network_offset(skb);
-   303			if (expects_nh) {
-   304				/* target device/action expect data at nh */
-   305				skb_pull_rcsum(skb_to_send, mac_len);
-   306			} else {
-   307				/* target device/action expect data at mac */
-   308				skb_push_rcsum(skb_to_send, mac_len);
-   309			}
-   310		}
-   311	
-   312		skb_to_send->skb_iif = skb->dev->ifindex;
-   313		skb_to_send->dev = dev;
-   314	
-   315		if (is_redirect) {
-   316			if (skb == skb_to_send)
-   317				retval = TC_ACT_CONSUMED;
-   318	
-   319			skb_set_redirected(skb_to_send, skb_to_send->tc_at_ingress);
-   320	
-   321			err = tcf_mirred_forward(at_ingress, want_ingress, skb_to_send);
-   322		} else {
-   323			err = tcf_mirred_forward(at_ingress, want_ingress, skb_to_send);
-   324		}
-   325		if (err)
-   326			tcf_action_inc_overlimit_qstats(&m->common);
-   327	
-   328		return retval;
-   329	
-   330	err_cant_do:
-   331		if (is_redirect)
-   332			retval = TC_ACT_SHOT;
-   333		tcf_action_inc_overlimit_qstats(&m->common);
-   334		return retval;
-   335	}
-   336	
-
+diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
+index 7073724fdfa6..5c1b9cd6dd52 100644
+--- a/net/hsr/hsr_forward.c
++++ b/net/hsr/hsr_forward.c
+@@ -115,8 +115,17 @@ static struct sk_buff *create_stripped_skb(struct sk_buff *skb_in,
+ static struct sk_buff *frame_get_stripped_skb(struct hsr_frame_info *frame,
+ 					      struct hsr_port *port)
+ {
+-	if (!frame->skb_std)
+-		frame->skb_std = create_stripped_skb(frame->skb_hsr, frame);
++	if (!frame->skb_std) {
++		if (frame->skb_hsr)
++			frame->skb_std =
++				create_stripped_skb(frame->skb_hsr, frame);
++		else
++			netdev_warn_once(port->dev,
++				"Unexpected frame received in hsr_get_untagged_frame()\n");
++
++		if (!frame->skb_std)
++			return NULL;
++	}
+ 	return skb_clone(frame->skb_std, GFP_ATOMIC);
+ }
+ 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.47.1
+
 
