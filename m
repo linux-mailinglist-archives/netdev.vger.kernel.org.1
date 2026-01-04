@@ -1,280 +1,249 @@
-Return-Path: <netdev+bounces-246734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B979CF0C15
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 09:35:23 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9923ECF0C2D
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 09:39:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 276DD300D65E
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 08:35:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E54A2300AFDD
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 08:39:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E993322D4C3;
-	Sun,  4 Jan 2026 08:35:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C034726CE3B;
+	Sun,  4 Jan 2026 08:39:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NH5FqNkS"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="UqJBUiY3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012059.outbound.protection.outlook.com [40.93.195.59])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AFD54400
-	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 08:35:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767515715; cv=none; b=fNkmFNVYC5VTC9pwXd3tYCPxBM92AGsc9u09BY0b/4qTXedWBHAtXG0K9uQali600GpcBYoEowyfi0otAb6B6/PjYDecz+/EtstJSqsshzz9t/heENENkEj1Zu4Vo35bFob3YTNW/P5ARs/yaphlXOwnEOxeCxJpRMmOxvrqeno=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767515715; c=relaxed/simple;
-	bh=eh/G7NXvMlnitQDBYTjGmYbYR7qvOpK6QBEB1BtFFZk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IljDLVWD9gfCf2fJzafr53pVSCqTdG35jSS5gbVd1a0WkrTwD3PKpxHORDpP/T5cP6m0WPDsDOLnebm3yYV/zj+4HmWJZYXJbhRU9PM4OsLAJNQkPiSj0/mUc9EYoDOSTLJqbgcMjGEw7s5e+mkSLo2lthq00rjFixEibSTBb2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NH5FqNkS; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2a0bb2f093aso132410185ad.3
-        for <netdev@vger.kernel.org>; Sun, 04 Jan 2026 00:35:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767515713; x=1768120513; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zYcNf5ruViQ0Bt7O6W4MTNR6Ck20+B4qnwscXLHJrJ4=;
-        b=NH5FqNkSopY9ZyBmxALYz0wr7Y3pa6gCLfdjCgzhB6la3xEK25CYec2gwf+7J50/j5
-         Zc+AsXEsyfFcfqcVH7Iz3zvWZTfyiFhS2imYdtO1b51cvwujJDEcDnqxBcmRmNrhKAXF
-         404D2Y2lgCuEu2xfIyxEgAJ2j2biARUa3IXWjAiENAl/138FAEqLNGDlbvvRhwn+H28N
-         u/UqB3UENBjjWVayxqfPITYUcIBeQYFhUHQ6tUfoWp7pGjx8mL6gj5L4x7/s26jRUTjn
-         Eo64/vDsETVqzOxK2zAT62kk/EZFpuxZDMZNKoL3LXJ8RW7kIkld+OOjYqKQVhpRSfkY
-         +yPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767515713; x=1768120513;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zYcNf5ruViQ0Bt7O6W4MTNR6Ck20+B4qnwscXLHJrJ4=;
-        b=toyHsEwtQmuOP8+G4GErJNKXfkQ7HJhRMuboHnv8D9eugKvd3TbmiXjglAPXycWZ63
-         oT+9Xj4oc6hARABMZofPWEYKiSANsLjhRQV2Wlj40K1ElSMiDD2sh/fD5UaCGwIg/DkH
-         25MH+yuqY30dhbeYpDDvzP5YXtT3SCV+2f2PIqaqhYkEjSi+cYOeqXZj+GEuwZrssyDO
-         vcGUA/RvTrGPR0ki2cr8IIXrrMpnFQJ2Reo8lBnG7SkaE+9fD2YKNHA7HCDkb97SA9Am
-         bitgXcUv7RpTeH9vAWW/gOfd0TnHFqVpvOB4GC0gexyUzw8WPrPHzHFwtJBNLpe9Hr1i
-         f/BA==
-X-Gm-Message-State: AOJu0Yx/3eHgGPT0wxvqoYIJL7tozkp1f4WfLK1uzl+8jKHvpcJss6sk
-	0TDOF7qHoIoEfPVy6fe92AHDvvIfahfP++K8uh2t3e3XeIfnzv4rgTw9
-X-Gm-Gg: AY/fxX4UI9EwpvRyyHeZmGHprVFvwmYZZ9ZZgcLF/kvVQc3ZYMeCKxZ0hZIZZwJsUU9
-	DfajYpgj+uuYr+WBc7FFSqkxVHtY3117CA3qK/TYLLgSPvxuZA1HBMjTGAX1UK7dM7QjBDE+bso
-	7p/xD04hgxBr1J8jPpmXKhQvH8N+BqZbmiSNTDCqYoYat3sWZMEg7oWe3EzAdbhQs2/jaIWCqh9
-	m/HRBGtdgQhg4+DPLPvlMvXE4PWcP+BPaIKLnn8gm0jHNc4oU5KZYfTyxCZNGTe6EZ70z3MYuXs
-	WIUnOLRN8BICJuoQiP7xdNTyyAe+bj7OrrfL6XMX4LymUKW6iTpP572F6PcKysBJPoyvTdvdHAU
-	K3W083v4YR9CSuIOpUVQgBxZTOmxCbu43cuzpzbjDsCmgAieZQaouWrfoVImJp1VdMOCFfEecOJ
-	UMohvQeIKVXi+B+TUhESHI
-X-Google-Smtp-Source: AGHT+IGONnUzqL7+hHcisSojq0N9wRnZKkoN8MPifLQrP1FZZCuWqkigoPO5dJvLiXoTCd9y6sg47Q==
-X-Received: by 2002:a05:6a20:394a:b0:35c:dfd6:6acb with SMTP id adf61e73a8af0-376a7af5089mr41512918637.30.1767515712648;
-        Sun, 04 Jan 2026 00:35:12 -0800 (PST)
-Received: from [172.16.98.252] ([14.161.45.246])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34f44ea585fsm2120401a91.0.2026.01.04.00.34.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 04 Jan 2026 00:35:12 -0800 (PST)
-Message-ID: <6bac1895-d4a3-4e98-8f39-358fa14102db@gmail.com>
-Date: Sun, 4 Jan 2026 15:34:52 +0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6CF7254B18;
+	Sun,  4 Jan 2026 08:39:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767515949; cv=fail; b=fWY/H6r6yr3qJVZ4AqzHUD/wqQLDxHatdEMtrTXslfKj/CxdCZ1Vv1pBBs6l6WXwlms3aDRwaW7Ia96pjSsUKsEl62+JLa9uD5HHU7IMQymi18MD9bPkr9bkU/vHbxDUniVI8PcCp8KH+XBCQrp5SNtAWzESva3pVyC8c42KqnM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767515949; c=relaxed/simple;
+	bh=GTNfRlEVDNuU+BCoJB1Ig2t51SQHghtA9hJkE5WjzuY=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=gYP1AWPSnzp4wVYMwyYej2SEGiSPMZtsImvv4VQkMkHc1NFc7/erZ8bc55D0fPRlyoKQz64lkUuckAj2TgDsRV+BcZWl9m/DJYU2zmis115Oc1CrUCPQ1Nq+TfWtw8DwGfdPQMirpyCbDs2lgIOUShK1myuCDKQgxgu8AZL5p8I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=UqJBUiY3; arc=fail smtp.client-ip=40.93.195.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bms0lpkt7dJKGG9P/5SobNlwVEI+Xs9GuL7JED8YvrGpAkSMEJ/djxOdYrLClWwfI68Ro5pK6vymN217FXW5NonZKsq2+Fslua7fkUtRoT4t/ZPIsLXpJvv1v713xlR26MnPE0GxQA/Om50xSRYhzgxO6ejwO4/POImDGoQrWsIT0H8yGBbjNVd7pYTpATR841yeJ2Vn/1rJ9BY7N4p33w6OD+rUONMpJcXMgZi6HgvhiAlVzHU/lCLwzfsn0mayLkjgWmIZCiKMcbyAFKVSNx0kPOiFwyIcZjFw7qp/XD745qdn5iiCJzLXJv/hoR7qgrAyOYmrKbGyvust4WnAmA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=y1AqaI7BNQiON5jMUWeSvruWo36MWHuF7QbFDSJVUWg=;
+ b=DTTcRQR8ney71/U2v0yXeiE84noDCZQz8V3pLaVdyPHqj5+cqQf+12TAfdMbeCS410kE84bCFcXe2mAFap6LNlc6UvUU3ImkAsfO5JVHS/Ww6T/uwLbCoWYSPl0ItoCnpFIuOxnkmnqCMO4YxKfYi3/Bh887UkKHdAU63WGWGLNgK7/F+qQGlKfg+4Xbx8T12QUZbtsLBFuM8joQouk7ozxXXoL6ius8lkhVRF7ltDoPiQFDmZL1zEjp6+2YjbE6ilfDnEHyFleJ4a+nWmZzthPOg59RqitXUeHYN+GQiFkkIU2U/KhUKqaKkOphCdrev22ilcaZw+RFDz/epdxemA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=y1AqaI7BNQiON5jMUWeSvruWo36MWHuF7QbFDSJVUWg=;
+ b=UqJBUiY3nvx/1WhTtxfefHcPJyLLEabtwWUbh99/Rvyjg1wkPwo0g05C2tm09jnXpmcKLq/G+kgGjBptROiQuUmIEw6KCGIgsEjk4MCIi8pUD9vR7LlDF/xZdw3cYAmuNeU4xqUcQoLheCwS/sVk4sfBLYJvspVwHXinUNEwRcK6tSF7nQU21uh2wAbT3Lo4VHLbvfeFv7nndvRBAi6o1AJYtbOiwq26bZr1Ji8YJlUmVzJbSMJ5fCjHZut3NHEEOkU/01GvnRtICaOPuZHleo9ORewj05g+HeHd6KT5GtTKGkfbBg829PL5SgfOzCXGzVV6JXhH/Ue1FxyWYm5uXQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5505.namprd12.prod.outlook.com (2603:10b6:208:1ce::7)
+ by DS0PR12MB7533.namprd12.prod.outlook.com (2603:10b6:8:132::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9478.4; Sun, 4 Jan
+ 2026 08:39:05 +0000
+Received: from BL0PR12MB5505.namprd12.prod.outlook.com
+ ([fe80::9329:96cf:507a:eb21]) by BL0PR12MB5505.namprd12.prod.outlook.com
+ ([fe80::9329:96cf:507a:eb21%4]) with mapi id 15.20.9478.004; Sun, 4 Jan 2026
+ 08:39:04 +0000
+Message-ID: <834c29e3-d2c4-48bc-a2e7-4f80209a3328@nvidia.com>
+Date: Sun, 4 Jan 2026 10:39:03 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/3] net: Introduce
+ netif_xmit_time_out_duration() helper
+To: Jakub Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Jian Shen <shenjian15@huawei.com>,
+ Salil Mehta <salil.mehta@huawei.com>, Jijie Shao <shaojijie@huawei.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
+ Moshe Shemesh <moshe@nvidia.com>, Yael Chemla <ychemla@nvidia.com>
+References: <1764054776-1308696-1-git-send-email-tariqt@nvidia.com>
+ <1764054776-1308696-2-git-send-email-tariqt@nvidia.com>
+ <20251127173437.479d27fa@kernel.org>
+Content-Language: en-US
+From: Shahar Shitrit <shshitrit@nvidia.com>
+In-Reply-To: <20251127173437.479d27fa@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: TL0P290CA0007.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:5::11) To BL0PR12MB5505.namprd12.prod.outlook.com
+ (2603:10b6:208:1ce::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/3] virtio-net: don't schedule delayed refill
- worker
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, stable@vger.kernel.org
-References: <20260102152023.10773-1-minhquangbui99@gmail.com>
- <20260102152023.10773-2-minhquangbui99@gmail.com>
- <CACGkMEs9wCM8s4_r1HCQGj9mUDdTF+BqkF0rse+dzB3USprhMA@mail.gmail.com>
-Content-Language: en-US
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-In-Reply-To: <CACGkMEs9wCM8s4_r1HCQGj9mUDdTF+BqkF0rse+dzB3USprhMA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-
-On 1/4/26 13:09, Jason Wang wrote:
-> On Fri, Jan 2, 2026 at 11:20 PM Bui Quang Minh <minhquangbui99@gmail.com> wrote:
->> When we fail to refill the receive buffers, we schedule a delayed worker
->> to retry later. However, this worker creates some concurrency issues
->> such as races and deadlocks. To simplify the logic and avoid further
->> problems, we will instead retry refilling in the next NAPI poll.
->>
->> Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
->> Reported-by: Paolo Abeni <pabeni@redhat.com>
->> Closes: https://netdev-ctrl.bots.linux.dev/logs/vmksft/drv-hw-dbg/results/400961/3-xdp-py/stderr
->> Cc: stable@vger.kernel.org
->> Suggested-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
->> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
->> ---
->>   drivers/net/virtio_net.c | 55 ++++++++++++++++++++++------------------
->>   1 file changed, 30 insertions(+), 25 deletions(-)
->>
->> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->> index 1bb3aeca66c6..ac514c9383ae 100644
->> --- a/drivers/net/virtio_net.c
->> +++ b/drivers/net/virtio_net.c
->> @@ -3035,7 +3035,7 @@ static int virtnet_receive_packets(struct virtnet_info *vi,
->>   }
->>
->>   static int virtnet_receive(struct receive_queue *rq, int budget,
->> -                          unsigned int *xdp_xmit)
->> +                          unsigned int *xdp_xmit, bool *retry_refill)
->>   {
->>          struct virtnet_info *vi = rq->vq->vdev->priv;
->>          struct virtnet_rq_stats stats = {};
->> @@ -3047,12 +3047,8 @@ static int virtnet_receive(struct receive_queue *rq, int budget,
->>                  packets = virtnet_receive_packets(vi, rq, budget, xdp_xmit, &stats);
->>
->>          if (rq->vq->num_free > min((unsigned int)budget, virtqueue_get_vring_size(rq->vq)) / 2) {
->> -               if (!try_fill_recv(vi, rq, GFP_ATOMIC)) {
->> -                       spin_lock(&vi->refill_lock);
->> -                       if (vi->refill_enabled)
->> -                               schedule_delayed_work(&vi->refill, 0);
->> -                       spin_unlock(&vi->refill_lock);
->> -               }
->> +               if (!try_fill_recv(vi, rq, GFP_ATOMIC))
->> +                       *retry_refill = true;
->>          }
->>
->>          u64_stats_set(&stats.packets, packets);
->> @@ -3129,18 +3125,18 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
->>          struct send_queue *sq;
->>          unsigned int received;
->>          unsigned int xdp_xmit = 0;
->> -       bool napi_complete;
->> +       bool napi_complete, retry_refill = false;
->>
->>          virtnet_poll_cleantx(rq, budget);
->>
->> -       received = virtnet_receive(rq, budget, &xdp_xmit);
->> +       received = virtnet_receive(rq, budget, &xdp_xmit, &retry_refill);
-> I think we can simply let virtnet_receive() to return the budget when
-> reill fails.
-
-That makes sense, I'll change it.
-
->
->>          rq->packets_in_napi += received;
->>
->>          if (xdp_xmit & VIRTIO_XDP_REDIR)
->>                  xdp_do_flush();
->>
->>          /* Out of packets? */
->> -       if (received < budget) {
->> +       if (received < budget && !retry_refill) {
->>                  napi_complete = virtqueue_napi_complete(napi, rq->vq, received);
->>                  /* Intentionally not taking dim_lock here. This may result in a
->>                   * spurious net_dim call. But if that happens virtnet_rx_dim_work
->> @@ -3160,7 +3156,7 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
->>                  virtnet_xdp_put_sq(vi, sq);
->>          }
->>
->> -       return received;
->> +       return retry_refill ? budget : received;
->>   }
->>
->>   static void virtnet_disable_queue_pair(struct virtnet_info *vi, int qp_index)
->> @@ -3230,9 +3226,11 @@ static int virtnet_open(struct net_device *dev)
->>
->>          for (i = 0; i < vi->max_queue_pairs; i++) {
->>                  if (i < vi->curr_queue_pairs)
->> -                       /* Make sure we have some buffers: if oom use wq. */
->> -                       if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
->> -                               schedule_delayed_work(&vi->refill, 0);
->> +                       /* If this fails, we will retry later in
->> +                        * NAPI poll, which is scheduled in the below
->> +                        * virtnet_enable_queue_pair
->> +                        */
->> +                       try_fill_recv(vi, &vi->rq[i], GFP_KERNEL);
-> Consider NAPI will be eventually scheduled, I wonder if it's still
-> worth to refill here.
-
-With GFP_KERNEL here, I think it's more likely to succeed than 
-GFP_ATOMIC in NAPI poll. Another small benefit is that the actual packet 
-can happen earlier. In case the receive buffer is empty and we don't 
-refill here, the #1 NAPI poll refill the buffer and the #2 NAPI poll can 
-receive packets. The #2 NAPI poll is scheduled in the interrupt handler 
-because the #1 NAPI poll will deschedule the NAPI and enable the device 
-interrupt. In case we successfully refill here, the #1 NAPI poll can 
-receive packets right away.
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL0PR12MB5505:EE_|DS0PR12MB7533:EE_
+X-MS-Office365-Filtering-Correlation-Id: ff7f08ef-4ee2-4769-4302-08de4b6cb7da
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?eW5HbnZxWW0raVRpV3N3NFdJSm9qTGNLZUt1MEkzQXhadGpFT2hLdlFSUWtn?=
+ =?utf-8?B?Y2o4aGQyV2FZamNSeU1OdXJwWnc0cEFzYzB4MENPbDVCaUNTNnlWV3h3LzVH?=
+ =?utf-8?B?VzdRQkdSb1pkaDlQeFh5TE8vOWRjVzdDRTlGVDNVR01GdHVJR2NHUmVoTFFL?=
+ =?utf-8?B?VSsyalhqRDRYZ1VnTlU0WlUvRXU3U2d4VFUwSEpoN3NqdkYxdXFpU1JVL1JX?=
+ =?utf-8?B?Y2FhN3AyTjI5ZU9KdjhqS3FyR2lUM29EZkZRKzlZVVBHY0s5YjljV1ViV3Rw?=
+ =?utf-8?B?NjV2NnJNeStTckJYTUV4cGs2aHRyZnU2ckh6aXVrbjEzYk9nNjJyZ0cwUkJW?=
+ =?utf-8?B?c0JaYnMyNmNZTTM0ZXpETWU5Z1dhR0VnbDNtZmcydzNrMjdCV1JpUTEyUUNm?=
+ =?utf-8?B?Y1V3clRxWUl3NExXY3Y4eHBGVE5BTW1RR1pPY0hINHl0VnRrdnJvYVhpaFUr?=
+ =?utf-8?B?Nkw3VXRqL0hRdk5sLzRmU0x6MUVOaDNIY2tOYW9zaTdnQ1lPa3B1bmQvaWs4?=
+ =?utf-8?B?WUxmKytFREhpcHhBU1VjcytNTWtDU1JlVW9RSS8wMHY2MnpFT1FBY2htOGQr?=
+ =?utf-8?B?WU9oYlcwaVAxOTZDb2FUTzhLMjByT3pua0h2Ymk2MmtFZ2NmdVZBbW9iRTJC?=
+ =?utf-8?B?VktrQURZSVpQZ2x1ZjFLbjlvYnIwY29sRS95ekdiMDEvR0JvQVFZY0JDY01y?=
+ =?utf-8?B?aThGa3NKMS9ZTVVPTE5QNGNwdnNnUmxYTk0wd2JmUit4THM4QXlRT0xoZWRa?=
+ =?utf-8?B?SEswcUVUSVRiWUttbDlWL0lzY1dGb1JFcTlpczg1UmtkS1pjZ0NRd3EzVmxZ?=
+ =?utf-8?B?cE5EenQ3SGNkRDZGQjVnWHNJbHZVcWhoSy9RdDVSNVFqL0FvM1haR0N2TnRT?=
+ =?utf-8?B?b0ErTXJWaWxMaUttczhDUmlENXZ5K3N1eGMveXRrTGtNZm5iVUI3cUExZ3gz?=
+ =?utf-8?B?WmxwSjJpMlZ1ZkN0ZDFvSnVNWFR4Ulc3VDc2TmxaQ1VrU0p1Q1pid004ejdp?=
+ =?utf-8?B?dk1id3drYnhEUFRJNFc0QlZ3cnFpUWpyYnloYi96QnJuSTBGaC9lb3RXaVRV?=
+ =?utf-8?B?SWpWK1M0eEo0ckMwNG5URGFqWnBJcmFEa1EyZUx2eGFNTUV3TEZ1c3o4Qm5a?=
+ =?utf-8?B?RThEOUo4dWMvbG12a3ZpdkpTNm5rZWhBWXFJdjRlQWJUdEVsMTZTQ1Y3S0xM?=
+ =?utf-8?B?UjJoQzI3L3hPTjZIcFFOQm1Na0c5dW5BYzFrc1R0R1JZUFc1QzEwTUVPa3Fl?=
+ =?utf-8?B?U3pRcnZUbUtZcjVCS1h3Wk5BR1NMblMwNElSVy8zTUs1Z1JkdElkWjlzcnVk?=
+ =?utf-8?B?TmF3SVBYVUlXdVdZTkRpMEl2RGdveWdCejdnanp3enJpYlNTbzQwcTRGdnpB?=
+ =?utf-8?B?UHNuMGt4SDlXUXprOWNWOUw0RE5WeXlZa2ZKenRaS3YxTVVjelY2SUdYRTVK?=
+ =?utf-8?B?bkdPZUNlemp0Wm5EeUppakpFaTdOdXRFcS9XS2lPYy85YWdIZHp2UlZQeXd6?=
+ =?utf-8?B?MTZFQThhbE82OFZUTUVldFIwL0lHd0ZzdUJ0K0NSY1RLSjAwZ3diYXpFN0FC?=
+ =?utf-8?B?N0M0bUQwdDZlaDRIZVlMeVFnSUxmTzNoS1E5dnBzZzFTV1Jjbk5yNVhXTFNM?=
+ =?utf-8?B?VnNvQ2l2YVROWXZJUmo3TTFjVkxaSkovZnAyQzdybllGZFNveUtFbU9URkF1?=
+ =?utf-8?B?RnF2ZVh1SXZEaXhlQ0lCbDlXQnA3bm9ZaW9XRHljb25MaVpmZE1hZzkwYUJI?=
+ =?utf-8?B?MlJzNzIyeFhXUm9zWDd5UmlvRWQ4eEhVdWZkM3Y4aEtFTHZlWms2OVNDWGFV?=
+ =?utf-8?B?SEk0SW4vNGFVSzlFRjc5SGRsM25OOGl6alU4RVpBR285aytWRXYwa0ZQVFVS?=
+ =?utf-8?B?NVlqdFJxNTNjNTZteHowTGtZTHQ5Z1hjQ0FJdVoxWFJKUEFWWXM1ckJGUmE1?=
+ =?utf-8?Q?QdVvTNLgXJo50h6xn/qT5HlH6P3VUUTX?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5505.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ODRyYWRpMDJiKzFscnd0R1FTdGhFWkc3UDlCT0VZb1hubituODdsT3dENW0w?=
+ =?utf-8?B?ckZWRmRHa3cwWWZWUlovRHcvOGozSzZ2QXRlQ1pLMGFPSkMveHdIREx6QW93?=
+ =?utf-8?B?SytRb2RtM1RlUjJVSnZIUDhQMHFNUXhWL2t5YW8vdjFiQTZkbVVmTVFWenVW?=
+ =?utf-8?B?VTZtZFVVQjBTaHlsajdVNE4rTS92b1FRam5uZjJaaVFHV3o4SXhxSXk5ekdl?=
+ =?utf-8?B?SmNRaEhnTkZ1UE5uSzl3K2lvaUN4cDRiUkhZSlRuYTdqVXEyL0pHVkJxRE5N?=
+ =?utf-8?B?Y3M2eWw2Mld1cm5Cb2Znai9iaWFWVW5laVkzWG1zM3QwTDd4SXd6dlEzWjdo?=
+ =?utf-8?B?cHBiZmJlU3JWTzNYcVkrY1lxT2wvb1JKbkpRb1lOWlV3SzlwelFNRk5KMFBq?=
+ =?utf-8?B?MXFLZ0poNXFvN09DVnBkRVNCbGtuQnEyeE5rZ3doUXoyVjUvaE5vRVlkMGRP?=
+ =?utf-8?B?aEVIQTdsdEtkNFhiWjJESFY1eHVKVlBwNUZsZlJyYk1qVVdyaTF0M1VUT2dD?=
+ =?utf-8?B?bG5GbXBMZSs3OEx3TWhPaFNPc0lGVzVMd0E2N0kvOGw1S3kzeUs1Slg1QUll?=
+ =?utf-8?B?bG9BYjVtMFA4VGZVWDJXSDJYbmxHdlcrWGp6T2V5S0tvNFJhODFaOWxzV002?=
+ =?utf-8?B?cFE4Rk15RVRrWktaNStkSEN0NVU4VjBWellySmorUlpIc1FyQmZSL1ZEcHJ1?=
+ =?utf-8?B?bDduQjk1Z3hXTkI3SGE5OUJlRWZ5Q1daTmJZVEZ1Rlp4OGtvc1JRWUczL1F4?=
+ =?utf-8?B?djB2VEptM3BKUGVmaitESzc5OWlyUElpUTlxeGFEUGNRcjBISXRCc2QvVVdX?=
+ =?utf-8?B?ODNEM2s1VTEzMnJZMysvYmRrbjkydVhLbGJTMjlnZTNHZ1hrOXNESnhpL3dj?=
+ =?utf-8?B?TUlxejFOTzBHQ050NWZ3Ry81WlcvblV1aWkxMk5jb3k2bXJRbWVGcFVnQ2Iv?=
+ =?utf-8?B?b2pRZkFncElVNlZJSCtrT1ptc0krSStiWmFXZWRNMVp5YzVQU2lZZkFLMWNE?=
+ =?utf-8?B?ZzhOZGt2aHRYVHJnNnltZEFuZGVJZXZMOHdQVVRFNHJPS1BKdGlwS2wweEIr?=
+ =?utf-8?B?NmhpT250QmVVMSswNXhPZHlBQlFSb3dkTVh2RURlWkJaczlTQm9pRnlYNTVy?=
+ =?utf-8?B?RVQ4ZytVelN0T09EMFZWRW1IWWs1dWRpazRHdkNJN1B2SUpwZ21DSVBXYXZ2?=
+ =?utf-8?B?SGU2K0Y3QVlRUGwvZVI1c2x3UGd3enNqaFd6ZHZ2cE54Uk95eUkrelltQ1pn?=
+ =?utf-8?B?SVJTMkp6dHFIWGs4MU8wYlE5dkxrTTN5cExWSnFGR2ZUeXUzR29STloyVk9Y?=
+ =?utf-8?B?bnpwVXNPZ2docU1HUkJock9oVTg3Y2FTNHF1b3YzRzNqa2w0UVVtL2VTVE56?=
+ =?utf-8?B?T2lTUU5POGJUbWRhN2FHcGltM3dSTjB0L1B6ZU5sL29WWnJWMmZuK0h2M2Ru?=
+ =?utf-8?B?SzF2QjJ6WU9ubmlYdVFLR21rZFdjQjVXN3JQcEdkdWxpTElmY3BYOWZUT3Nt?=
+ =?utf-8?B?SjA3bUdaS1VaYTd6R2c4VjZXOVZnV1d5dG04UExiaE5QdEFIM1B4OCs3Z214?=
+ =?utf-8?B?enE0cGFpVHBWV3FWOEMyRVpXbmR1eURWbDE4dUpKYnBqc1dIUGRkdEJZbCtv?=
+ =?utf-8?B?bnZaTjlxaEJHUURwYWgxM3pDeGpBYUliN2xKcXFhOFdzdWV0SWN1VVpCb2tn?=
+ =?utf-8?B?elVlYmpxV0VwNWNrdmV1WE91NTFPNklaMXFsbWxNcVdYeCtJT05Dbm0wMDRS?=
+ =?utf-8?B?a2dSMzNLbi9peW1FSkZlWjlYVnpXS1VtRGFKRFY5cVF0ZWc3ZkhRV1ZkbDI3?=
+ =?utf-8?B?VnNKMnEvTnhKQlN4V0toUnN1Q3pTaEwyMk14RkdvY1NGR1JzVnNzSlZkeGg5?=
+ =?utf-8?B?dGdnRnp3Wk40cVliSGdZVUM4Yno5cWtHWVhMRVJmOXord1EwQ3JmbjdNdEw0?=
+ =?utf-8?B?L0Z4OFg3ZU10UmN5dG5OVTlsYnZuQW9kYkx1WHZKamRjZEh6TGIweEFhdlFt?=
+ =?utf-8?B?WHVIVSt2VDJ1dFFLRWhjMXNla3hneWxMTVlBMDdCZjdONEI4R0R0aEZlNm1D?=
+ =?utf-8?B?eVh1Ry9yTk8yd1FjNVA1VXI0Ny8rSGFvOCt5Q1oyMUQ3UFdrTFhqcWY4MWN6?=
+ =?utf-8?B?b1dDQ0xvSFJPMDltbmN4UGlmMm5rWlIzaWVBZ1cvc01nM244Q1Qzck1jeU5Q?=
+ =?utf-8?B?MG5NRFhQbUZTVmdnTWp6TnlkRG01ellIM3ZKTEEwdE13Y2hpYU1aUVVCVmUw?=
+ =?utf-8?B?bVJhUWU5N1RvK3FZSWdwSVE1YVE3OGo5TG9HbmV6WTNuRVhFTDFEemhaYXBn?=
+ =?utf-8?B?VkpkRGsyK0pzSWllOHFZQWMrUFAwOXY0Qjgwa0ZVejE3MWg1TlB0Zz09?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ff7f08ef-4ee2-4769-4302-08de4b6cb7da
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5505.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jan 2026 08:39:04.8640
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LojHKfDqVK/RHX6oH9OY6qkGV1xbfdk5letTtgLIR/gOjMUuMBY0LTT/YdBfIG5bIN3og6fBJ2XaFZsgFk68zA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7533
 
 
->
->>                  err = virtnet_enable_queue_pair(vi, i);
->>                  if (err < 0)
->> @@ -3473,15 +3471,15 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
->>                                  bool refill)
->>   {
->>          bool running = netif_running(vi->dev);
->> -       bool schedule_refill = false;
->>
->> -       if (refill && !try_fill_recv(vi, rq, GFP_KERNEL))
->> -               schedule_refill = true;
->> +       if (refill)
->> +               /* If this fails, we will retry later in NAPI poll, which is
->> +                * scheduled in the below virtnet_napi_enable
->> +                */
->> +               try_fill_recv(vi, rq, GFP_KERNEL);
-> and here.
->
+
+On 28/11/2025 3:34, Jakub Kicinski wrote:
+> On Tue, 25 Nov 2025 09:12:54 +0200 Tariq Toukan wrote:
+>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+>> index e808071dbb7d..3cd73769fcfa 100644
+>> --- a/include/linux/netdevice.h
+>> +++ b/include/linux/netdevice.h
+> 
+> include/net/net_queue.h seems like a better place for new code
+I don't see this header, even in older kernels.
+> 
+>> @@ -3680,6 +3680,21 @@ static inline bool netif_xmit_stopped(const struct netdev_queue *dev_queue)
+>>  	return dev_queue->state & QUEUE_STATE_ANY_XOFF;
+>>  }
+>>  
+>> +static inline unsigned int
+>> +netif_xmit_timeout_ms(struct netdev_queue *txq, unsigned long *trans_start)
+>> +{
+>> +	unsigned long txq_trans_start = READ_ONCE(txq->trans_start);
 >> +
->>          if (running)
->>                  virtnet_napi_enable(rq);
+>> +	if (trans_start)
+>> +		*trans_start = txq_trans_start;
+> 
+> The drivers don't really care about this, AFAICT hns3 uses this
+> to calculate the stall length (return value of this func.
+ok
+> 
+>> +	if (netif_xmit_stopped(txq) &&
+>> +	    time_after(jiffies, txq_trans_start + txq->dev->watchdog_timeo))
+>> +		return jiffies_to_msecs(jiffies - txq_trans_start);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>  static inline bool
+>>  netif_xmit_frozen_or_stopped(const struct netdev_queue *dev_queue)
+>>  {
+>> diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+>> index 852e603c1755..aa6192781a24 100644
+>> --- a/net/sched/sch_generic.c
+>> +++ b/net/sched/sch_generic.c
+>> @@ -523,10 +523,9 @@ static void dev_watchdog(struct timer_list *t)
+>>  				 * netdev_tx_sent_queue() and netif_tx_stop_queue().
+>>  				 */
+>>  				smp_mb();
+>> -				trans_start = READ_ONCE(txq->trans_start);
 >> -
->> -       if (schedule_refill)
->> -               schedule_delayed_work(&vi->refill, 0);
->>   }
->>
->>   static void virtnet_rx_resume_all(struct virtnet_info *vi)
->> @@ -3777,6 +3775,7 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
->>          struct virtio_net_rss_config_trailer old_rss_trailer;
->>          struct net_device *dev = vi->dev;
->>          struct scatterlist sg;
->> +       int i;
->>
->>          if (!vi->has_cvq || !virtio_has_feature(vi->vdev, VIRTIO_NET_F_MQ))
->>                  return 0;
->> @@ -3829,11 +3828,17 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
->>          }
->>   succ:
->>          vi->curr_queue_pairs = queue_pairs;
->> -       /* virtnet_open() will refill when device is going to up. */
->> -       spin_lock_bh(&vi->refill_lock);
->> -       if (dev->flags & IFF_UP && vi->refill_enabled)
->> -               schedule_delayed_work(&vi->refill, 0);
->> -       spin_unlock_bh(&vi->refill_lock);
->> +       if (dev->flags & IFF_UP) {
->> +               /* Let the NAPI poll refill the receive buffer for us. We can't
->> +                * safely call try_fill_recv() here because the NAPI might be
->> +                * enabled already.
->> +                */
->> +               local_bh_disable();
->> +               for (i = 0; i < vi->curr_queue_pairs; i++)
->> +                       virtqueue_napi_schedule(&vi->rq[i].napi, vi->rq[i].vq);
->> +
->> +               local_bh_enable();
->> +       }
->>
->>          return 0;
->>   }
->> --
->> 2.43.0
->>
-> Thanks
->
-
-Thanks,
-Quang Minh.
+>> -				if (time_after(jiffies, trans_start + dev->watchdog_timeo)) {
+>> -					timedout_ms = jiffies_to_msecs(jiffies - trans_start);
+>> +				timedout_ms = netif_xmit_timeout_ms(txq,
+>> +								    &trans_start);
+>> +				if (timedout_ms) {
+> 
+> The use of the new helper in the core feels a bit forced, I'd leave 
+> the core as is. Otherwise you need the awkward output param, and
+> core now duplicates the netif_xmit_stopped(txq) check
+ok
+> 
+>>  					atomic_long_inc(&txq->trans_timeout);
+>>  					break;
+>>  				}
 
 
