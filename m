@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-246813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C4A3CF146E
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 21:17:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6CADCF1476
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 21:17:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 71F4D3003FA9
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 20:17:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5A52E30102B0
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 20:17:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 032C223EAAB;
-	Sun,  4 Jan 2026 20:17:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87C3A2EB84E;
+	Sun,  4 Jan 2026 20:17:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IF0DWggP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ioJBOVnN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD17E1E3DED;
-	Sun,  4 Jan 2026 20:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 628001E3DED
+	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 20:17:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767557830; cv=none; b=itPrsY2gahS0ZbdGFngHUnrwa3ahz+cDYWMN5t2sI+It5ejVXA2X/og2bw2bckzF9VjUZNh6gnqtWFOtY/BwyB0Ymr4MdrJ00Vatv0OL1jw/ZcOJAzC40md+Qu7qsz+MKTPli2J5g4TcTifYa+K6VAT7pNodfspaBMA+qkKZni8=
+	t=1767557833; cv=none; b=ppYqd7t0kU0BW1WXtSySDs9OqvAy54du516ied1AG3lRy+BxFulkABqxh4Yv5whVjYnHpW1XuaM41q1OuG7puL77aUcVsEHPWh2sySxSpoPKsxtjebo0fWGaXRrozomfhhwUWa6J3lM1M6OVRW9J/AC2NA/eDS801cS53nQZBkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767557830; c=relaxed/simple;
-	bh=MbcUpwDFt9twtpPtCl2E6jvD3/Jkl6ammYkMQpIgrQU=;
+	s=arc-20240116; t=1767557833; c=relaxed/simple;
+	bh=cKOSnoVOTi5Exf1RmyrwoAd7fZVqfcmh4VBMd+WH9qk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WeYYweaG46J+BFseoZcL8s/SEtSF+u7xRSvJ48LHcUcQTo2yP1yvQ0/DCkDvUF6xZUAhjicSBGJ0OtIiOIfahNAx/WjOCzcmDoVXLKlbj9Y4bM7WYTtxm/WFoGkckFXIORz6g8UEbwtQweB/v2HweB8JeMSXc+skvA4IjU5ttmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IF0DWggP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B6BCC4CEF7;
-	Sun,  4 Jan 2026 20:17:10 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=LKvYNtNLxflyPdbJcAG46LC5qhmQZZ/6ZvlkXWRQGYrvqmfjtqkFyEzwKwxBSeWBcFWxeSX2QyozBwI9Em/cbgJtNxvg1L6iv9Xorz0+mZIrXbDYPzTKcoFbcEDIh2M3cVx3so3yToUsop25Szer3/MeCBK+y8U5/411oqBP4/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ioJBOVnN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E105FC4CEF7;
+	Sun,  4 Jan 2026 20:17:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767557830;
-	bh=MbcUpwDFt9twtpPtCl2E6jvD3/Jkl6ammYkMQpIgrQU=;
+	s=k20201202; t=1767557831;
+	bh=cKOSnoVOTi5Exf1RmyrwoAd7fZVqfcmh4VBMd+WH9qk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IF0DWggP8w6TB/caRLMcb9h/jpwQLVq3Bokz+L1lFzAH8czbUzaQgXAT6AC2tf/tO
-	 gF3NadBQ75aZ3JD1/grpOTmZkesuRaeFY02aEVVKMMjFNGgq68b22UPC4r230VRiRh
-	 Ecq0jnv64WN0UfhKRPu2W0eF9kvXAWGNaDFiKy/qiNf6dB4aEz0O+rP7xFMhHnOkWk
-	 UrDFNj4MXKWVoTgCYMiv5YR9t7fK/NudPUkmgDC/tm5trsWTbRgwNS+B7CfDiG5jBI
-	 vE0e6rRsBtwBBBy1Z0f91TborMFGkZUEoPxUmqXQ8UijoTmp3/1xGJYsTefOR92J8j
-	 QPXu6bT9ZeIUw==
+	b=ioJBOVnNMHmzLf0NQN8CpysyyZPQCP4DOx9ce9ztKd827Z0P67dH63emY52tprKQg
+	 UR3jvb5k9tdxKvxdmJ01cqmyuDvz5IRvb6/05IYVVw/xGqV+ety9ej6RSytBNWX1zu
+	 iniv7ZK+/rwX0Xoqh9I11/TsicPR+D/7hMn8d4dmIC/9IfCkQvpDdgIV69MSALZkCJ
+	 c5dV0eD3rMVdAcLX3sbrA6hqm4yTq6drpGfucmxMd6Zz6WBgqH/xJ1/Hj9p819P080
+	 RY/TNtMMdrxxi+Mmcd3aeWMuF/ByZFiLeObYhGItFXEDTnnN4j1MrL8op9Dh/joRCC
+	 eaKN0aQ34VKgA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 78906380AA58;
-	Sun,  4 Jan 2026 20:13:50 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F295C380AA58;
+	Sun,  4 Jan 2026 20:13:51 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,51 +50,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/6] netfilter: nft_set_pipapo: fix range overlap
- detection
+Subject: Re: [PATCH net] MAINTAINERS: Update email address for Justin Iurman
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176755762931.155813.1576847923477813062.git-patchwork-notify@kernel.org>
-Date: Sun, 04 Jan 2026 20:13:49 +0000
-References: <20260102114128.7007-2-fw@strlen.de>
-In-Reply-To: <20260102114128.7007-2-fw@strlen.de>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
- pablo@netfilter.org
+ <176755763052.155813.15487618694758455412.git-patchwork-notify@kernel.org>
+Date: Sun, 04 Jan 2026 20:13:50 +0000
+References: <20260103165331.20120-1-justin.iurman@gmail.com>
+In-Reply-To: <20260103165331.20120-1-justin.iurman@gmail.com>
+To: Justin Iurman <justin.iurman@gmail.com>
+Cc: netdev@vger.kernel.org, justin.iurman@uliege.be
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Florian Westphal <fw@strlen.de>:
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  2 Jan 2026 12:41:23 +0100 you wrote:
-> set->klen has to be used, not sizeof().  The latter only compares a
-> single register but a full check of the entire key is needed.
+On Sat,  3 Jan 2026 17:53:31 +0100 you wrote:
+> Due to a change of employer, I'll be using a permanent and personal
+> email address.
 > 
-> Example:
-> table ip t {
->         map s {
->                 typeof iifname . ip saddr : verdict
->                 flags interval
->         }
-> }
+> Signed-off-by: Justin Iurman <justin.iurman@gmail.com>
+> ---
+> Cc: Justin Iurman <justin.iurman@uliege.be>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/6] netfilter: nft_set_pipapo: fix range overlap detection
-    https://git.kernel.org/netdev/net/c/7711f4bb4b36
-  - [net,2/6] selftests: netfilter: nft_concat_range.sh: add check for overlap detection bug
-    https://git.kernel.org/netdev/net/c/a675d1caa204
-  - [net,3/6] netfilter: nft_synproxy: avoid possible data-race on update operation
-    https://git.kernel.org/netdev/net/c/36a320057564
-  - [net,4/6] netfilter: replace -EEXIST with -EBUSY
-    https://git.kernel.org/netdev/net/c/2bafeb8d2f38
-  - [net,5/6] netfilter: nf_tables: fix memory leak in nf_tables_newrule()
-    https://git.kernel.org/netdev/net/c/d077e8119ddb
-  - [net,6/6] netfilter: nf_conncount: update last_gc only when GC has been performed
-    https://git.kernel.org/netdev/net/c/7811ba452402
+  - [net] MAINTAINERS: Update email address for Justin Iurman
+    https://git.kernel.org/netdev/net/c/1806d210e5a8
 
 You are awesome, thank you!
 -- 
