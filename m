@@ -1,156 +1,293 @@
-Return-Path: <netdev+bounces-246715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71B90CF09D0
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 06:29:14 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4C64CF0A2B
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 07:00:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B5178300F32C
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 05:29:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1729A3000EBC
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 06:00:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB852D5959;
-	Sun,  4 Jan 2026 05:29:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yg6Zqa0y"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE832165EA;
+	Sun,  4 Jan 2026 06:00:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f51.google.com (mail-dl1-f51.google.com [74.125.82.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41D002D593C
-	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 05:29:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E50EA191;
+	Sun,  4 Jan 2026 06:00:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767504551; cv=none; b=F/M65HTneztvNgGwD9YXLHE64eZ9gdLw7TJw0MRyhgpZ5FISr1XPLGsVqiK64SKgHBEq+5aMY3ptDOlgzEyI4fCDThMkIFmypuFCXrg1g1ZccBguGlmjMpBFoxqAbyueFnO9Jb3F3mtsK5pO95kNI6CvlzadXsNqz27f9dplzI4=
+	t=1767506450; cv=none; b=M3Zm9Rg1OJiPrhk0y1MAn3+GsAjENou6WmpAakrepU4B81Oc8G2eF8TKIhTxVMy7avMWjct/f8lQl5rgBm6nauY64FyQ1gpMYOgGHPVABnYttxgNC5iO6tXm4DuMvGjaptLFLlND1IhRNmwV0M+AjQuxeu8voFMQ3MI7BfCH+CE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767504551; c=relaxed/simple;
-	bh=65vgSVMqf/BQy1Yp33ggrUZQR1FCpsrPR3lKZwoF6e0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LZKULY/4XJJ61ZIl89Phz1AEV1ARNixmQjE9ibAs23QCxUgczyjpQaa6qZJtTdwI3USb7ogdGyRtpMVmKuP02USvtepp3sWa0yRB8do4Ne6834i2i+W+n4rHGQyrByNX0m2zER7LUB8WrlXwxHPwHyDOlRcbM9RyS4OCh2/kDT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yg6Zqa0y; arc=none smtp.client-ip=74.125.82.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-11beb0a7bd6so1228607c88.1
-        for <netdev@vger.kernel.org>; Sat, 03 Jan 2026 21:29:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767504548; x=1768109348; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nvOkP8SZJigPzeyYaj+yZhhAkS0A2aAjhXuUNUZVL+k=;
-        b=Yg6Zqa0yl4Ps3xat499EvczeKmPP3moBORRbUlV1QwjEzeMc2FetSIJuCtbs0xtf+l
-         lCWXpwZzaZAEqvlD0feNi3BzaeGwEw9+ejVV+ZUjPH1Lpan1bVeLIixJaVysBv+/t5IV
-         X6YFXEH5EKv1KMD6dbg8J7d7sWaWzu8wK59iQ90DJMds5LwqrLJEMQcY49mX6eC/kQVV
-         bHEo2ypbv+2s6Wj3z8y8lxVNyQBOTMvbiL0tTw7YnhkiXz3fUdvsRDd9kbVNpOkjDxQ5
-         DBrABF2OGuS5DIGq7A+GwgXOr3T4uR8t7sJyTp3eHFAUf2ft/ISVWPeE2X7lvHUzovGG
-         FAXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767504548; x=1768109348;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nvOkP8SZJigPzeyYaj+yZhhAkS0A2aAjhXuUNUZVL+k=;
-        b=DxerIzqAJXtjcVSAbwDF7IWWU+b/K3g//egT4So2qbVBCrI2bOG3gww/rjZxRRDF5R
-         1z1Zj2ZSr8zi8DwSPhkW79NUN8348B4DpBe+A7DsUezaUs3/OGaLnRKl1J82zRhLg7Sc
-         VZRBRW9VB72NkfXyMbHuDzwrHHjKGG4Q3uX6qzMzy4Ya/mzlryWEb2CVbLwwihs+dH12
-         GA0oGCQ9qVzXQ9lbP4PPHVpFqlBEL2zxwUdvKHyqn3AP4hiaXzPC7GGO7CK4DbfPGUWF
-         ZzTWOvCzrfFnmGiaYgCknj0r1+TCuDNbkVi6a6KGd69YXw9YcpNpjwc50Q07Egywwfes
-         Cy6A==
-X-Gm-Message-State: AOJu0YxkmUSvDG/omJ2irQ9YBqRkoSWJ56x/SNGshiZWD3BhjLa2IEcf
-	5NHA++udhDrVGBvgvoFJWs9VC+nPJtuRG5pGG8NMgOvE0GQL/m6oAkWf
-X-Gm-Gg: AY/fxX6gd0C3x+uBmIv/OnYNj6DQQ8dNJFbWVct5G9UlWFNkkLOab3WP8mFPSZ4WAHG
-	keGwTRA7UzfdySmStVFdRMOdHWD8P1i1Im7iM/cnI8pOJ5aLsSOhCku+23m9zri2a1QMp/JKOUc
-	Ar68/BMUPp82H+ej401PKP2bBEtOknF811sIHVsS4ENZc5iHDXR5VEVpEjvaf7gik6M2Wgii0My
-	BHGWe/j4NRzlAC5aJ117sVqQSHObS+PgTxBQfT+yGZ5Vxu6Zhkr5FHXDGHHfMEsOT00ChgC3hM8
-	63pG9EQFBOVLh33bXUhNWWwvMcK3BC1BeiH5kOCYPdOM4h/kwjRGOCYC270L0pPAsAOu27MzIR5
-	sSn5M6ctOEX03lZixpK9s+W+RhiMYopfy6Ce8oKfEiD+eI1KFic+56CsITBGZ/KJZeeK5jqAldc
-	bMD1cg03K3fIIedC8S
-X-Google-Smtp-Source: AGHT+IEUP35P72PXbqK3T+Jw88HQN7ZqgMrv6wlEXPBBGaZBS9BBhhgZozXciIYpR2i4MqLpZOsSXw==
-X-Received: by 2002:a05:7022:320:b0:11f:3479:fb72 with SMTP id a92af1059eb24-121d808b16emr3204222c88.6.1767504547989;
-        Sat, 03 Jan 2026 21:29:07 -0800 (PST)
-Received: from localhost ([2601:647:6802:dbc0:8a10:ce2:890f:8db0])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-121724cfdd0sm164944598c88.4.2026.01.03.21.29.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 03 Jan 2026 21:29:07 -0800 (PST)
-Date: Sat, 3 Jan 2026 21:29:06 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
-	kvm@vger.kernel.org, Cong Wang <cwang@multikernel.io>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>
-Subject: Re: [Patch net] vsock: fix DMA cacheline overlap warning using
- coherent memory
-Message-ID: <aVn6ooxGnWH3X8ZZ@pop-os.localdomain>
-References: <20251228015451.1253271-1-xiyou.wangcong@gmail.com>
- <20251228104521-mutt-send-email-mst@kernel.org>
- <aVGz39EoF5ScJfIP@pop-os.localdomain>
- <20251230081220-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1767506450; c=relaxed/simple;
+	bh=pxDgtE8DhvzZK71HNp6zF525hyAyalNTpqUMKI/MXQ4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=gwcONioRZESxKGGohg1M9ApJjEgrO8r1vV1WS/LNGvsvAyxU6bBOkRgBZ5+D3wkfoTbzA40tYTt+lsyJN0PMzvWW6jO0M5cEBb5/XhVMNyGJocUUq8wRFaLBbjP9AewHyMOKgrMoTDYk0IOIsmVYMOQnkG9W+xZEmw0sU2RwK7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [127.0.0.2] (unknown [114.241.82.145])
+	by APP-01 (Coremail) with SMTP id qwCowAD3oGzmAVppu3AIAw--.1340S2;
+	Sun, 04 Jan 2026 14:00:08 +0800 (CST)
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+Date: Sun, 04 Jan 2026 14:00:04 +0800
+Subject: [PATCH net-next v3] net: spacemit: Remove broken flow control
+ support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251230081220-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260104-k1-ethernet-actually-remove-fc-v3-1-3871b055064c@iscas.ac.cn>
+X-B4-Tracking: v=1; b=H4sIAOMBWmkC/42OQQ7CIBREr9L8tb8pqKV05T2MJhS/lthSBSSap
+ ncX0QO4nMy8mZnBkzPkoS1mcBSNN5NNYr0qQPfKXgjNKWngFd8yxjd4ZUihJ2cpoNLhoYbhhY7
+ GKRKeNYqqbtZMiGrTSEglN0dn88wDe/gwlp4BDl/H0f2RFsPP7pQn1NM4mtAWsS6ZRKfZcV5yv
+ jc+TO6Vn0aegX9PRY4MtySE6mrZCcl2xmvlS6VLbeGwLMsbNQdpkQgBAAA=
+X-Change-ID: 20251124-k1-ethernet-actually-remove-fc-706831770489
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Yixun Lan <dlan@gentoo.org>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+ Troy Mitchell <troy.mitchell@linux.spacemit.com>, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: netdev@vger.kernel.org, linux-riscv@lists.infradead.org, 
+ spacemit@lists.linux.dev, linux-kernel@vger.kernel.org, 
+ Vivian Wang <wangruikang@iscas.ac.cn>
+X-Mailer: b4 0.14.3
+X-CM-TRANSID:qwCowAD3oGzmAVppu3AIAw--.1340S2
+X-Coremail-Antispam: 1UD129KBjvJXoW3Wr43Gr1rWr4xtw43Cw4kJFb_yoWxAr4rpF
+	45X3s2kFWUXFsYgFs3Cw4UAFy3Ga4xtrnrua4fCw4Fg3ZIyrn7AFy0k3W7CFyDurW8ury5
+	Kw4UA3W8GFsrX37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
+	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
+	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
+	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
+	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+	nIWIevJa73UjIFyTuYvjfUonmRUUUUU
+X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
-On Tue, Dec 30, 2025 at 08:12:47AM -0500, Michael S. Tsirkin wrote:
-> On Sun, Dec 28, 2025 at 02:49:03PM -0800, Cong Wang wrote:
-> > On Sun, Dec 28, 2025 at 02:31:36PM -0500, Michael S. Tsirkin wrote:
-> > > On Sat, Dec 27, 2025 at 05:54:51PM -0800, Cong Wang wrote:
-> > > > From: Cong Wang <cwang@multikernel.io>
-> > > > 
-> > > > The virtio-vsock driver triggers a DMA debug warning during probe:
-> > > > 
-> > [...]
-> > > > This occurs because event_list[8] contains 8 struct virtio_vsock_event
-> > > > entries, each only 4 bytes (__le32 id). When virtio_vsock_event_fill()
-> > > > creates DMA mappings for all 8 events via virtqueue_add_inbuf(), these
-> > > > 32 bytes all fit within a single 64-byte cacheline.
-> > > > 
-> > > > The DMA debug subsystem warns about this because multiple DMA_FROM_DEVICE
-> > > > mappings within the same cacheline can cause data corruption: if the CPU
-> > > > writes to one event while the device is writing another event in the same
-> > > > cacheline, the CPU cache writeback could overwrite device data.
-> > > 
-> > > But the CPU never writes into one of these, or did I miss anything?
-> > > 
-> > > The real issue is other data in the same cache line?
-> > 
-> > You are right, it is misleading.
-> > 
-> > The CPU never writes to the event buffers themselves, it only reads them
-> > after the device writes. The problem is other struct fields in the same
-> > cacheline.
-> > 
-> > I will update the commit message.
-> > 
-> > > 
-> > > You want virtqueue_map_alloc_coherent/virtqueue_map_free_coherent
-> > > methinks.
-> > > 
-> > > Then you can use normal inbuf/outbut and not muck around with premapped.
-> > > 
-> > > 
-> > > I prefer keeping fancy premapped APIs for perf sensitive code,
-> > > let virtio manage DMA API otherwise.
-> > 
-> > Yes, I was not aware of these API's, they are indeed better than using
-> > DMA API's directly.
-> > 
-> > Thanks!
-> > Cong
-> 
-> BTW I sent an RFC fixing these bugs in all drivers. Review/testing would
-> be appreciated.
+The current flow control implementation doesn't handle autonegotiation
+and ethtool operations properly. Remove it for now so we don't claim
+support for something that doesn't really work. A better implementation
+will be sent in future patches.
 
-Thanks for taking care of it.
+Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+---
+Changes in v3:
+- Remove Fixes since this is for net-next, not for backporting (Andrew)
+- Link to v2: https://lore.kernel.org/r/20251124-k1-ethernet-actually-remove-fc-v2-1-5e77ab69b791@iscas.ac.cn
+---
 
-In case you need, it is 100% reproducible with CONFIG_DMA_API_DEBUG=y.
+My employer has switched focus somewhat so I'm unlikely to prioritize
+the proper implementation of flow control etc with phylink for now.
+Sorry. This is just a little bit of polish for Spacemit K1 ethernet
+support on 6.20/7.0 to go with the other peripheral support.
+---
+ drivers/net/ethernet/spacemit/k1_emac.c | 110 --------------------------------
+ 1 file changed, 110 deletions(-)
 
-If you need my config, here it is:
-https://github.com/congwang/kernelconfig/blob/master/kvm-debug-config
+diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/ethernet/spacemit/k1_emac.c
+index 220eb5ce7583..c85dc742c404 100644
+--- a/drivers/net/ethernet/spacemit/k1_emac.c
++++ b/drivers/net/ethernet/spacemit/k1_emac.c
+@@ -46,8 +46,6 @@
+ #define EMAC_RX_FRAMES			64
+ #define EMAC_RX_COAL_TIMEOUT		(600 * 312)
+ 
+-#define DEFAULT_FC_PAUSE_TIME		0xffff
+-#define DEFAULT_FC_FIFO_HIGH		1600
+ #define DEFAULT_TX_ALMOST_FULL		0x1f8
+ #define DEFAULT_TX_THRESHOLD		1518
+ #define DEFAULT_RX_THRESHOLD		12
+@@ -132,9 +130,6 @@ struct emac_priv {
+ 	u32 tx_delay;
+ 	u32 rx_delay;
+ 
+-	bool flow_control_autoneg;
+-	u8 flow_control;
+-
+ 	/* Softirq-safe, hold while touching hardware statistics */
+ 	spinlock_t stats_lock;
+ };
+@@ -179,9 +174,7 @@ static void emac_set_mac_addr_reg(struct emac_priv *priv,
+ 
+ static void emac_set_mac_addr(struct emac_priv *priv, const unsigned char *addr)
+ {
+-	/* We use only one address, so set the same for flow control as well */
+ 	emac_set_mac_addr_reg(priv, addr, MAC_ADDRESS1_HIGH);
+-	emac_set_mac_addr_reg(priv, addr, MAC_FC_SOURCE_ADDRESS_HIGH);
+ }
+ 
+ static void emac_reset_hw(struct emac_priv *priv)
+@@ -200,9 +193,6 @@ static void emac_reset_hw(struct emac_priv *priv)
+ 
+ static void emac_init_hw(struct emac_priv *priv)
+ {
+-	/* Destination address for 802.3x Ethernet flow control */
+-	u8 fc_dest_addr[ETH_ALEN] = { 0x01, 0x80, 0xc2, 0x00, 0x00, 0x01 };
+-
+ 	u32 rxirq = 0, dma = 0;
+ 
+ 	regmap_set_bits(priv->regmap_apmu,
+@@ -228,12 +218,6 @@ static void emac_init_hw(struct emac_priv *priv)
+ 		DEFAULT_TX_THRESHOLD);
+ 	emac_wr(priv, MAC_RECEIVE_PACKET_START_THRESHOLD, DEFAULT_RX_THRESHOLD);
+ 
+-	/* Configure flow control (enabled in emac_adjust_link() later) */
+-	emac_set_mac_addr_reg(priv, fc_dest_addr, MAC_FC_SOURCE_ADDRESS_HIGH);
+-	emac_wr(priv, MAC_FC_PAUSE_HIGH_THRESHOLD, DEFAULT_FC_FIFO_HIGH);
+-	emac_wr(priv, MAC_FC_HIGH_PAUSE_TIME, DEFAULT_FC_PAUSE_TIME);
+-	emac_wr(priv, MAC_FC_PAUSE_LOW_THRESHOLD, 0);
+-
+ 	/* RX IRQ mitigation */
+ 	rxirq = FIELD_PREP(MREGBIT_RECEIVE_IRQ_FRAME_COUNTER_MASK,
+ 			   EMAC_RX_FRAMES);
+@@ -1018,57 +1002,6 @@ static int emac_mdio_init(struct emac_priv *priv)
+ 	return ret;
+ }
+ 
+-static void emac_set_tx_fc(struct emac_priv *priv, bool enable)
+-{
+-	u32 val;
+-
+-	val = emac_rd(priv, MAC_FC_CONTROL);
+-
+-	FIELD_MODIFY(MREGBIT_FC_GENERATION_ENABLE, &val, enable);
+-	FIELD_MODIFY(MREGBIT_AUTO_FC_GENERATION_ENABLE, &val, enable);
+-
+-	emac_wr(priv, MAC_FC_CONTROL, val);
+-}
+-
+-static void emac_set_rx_fc(struct emac_priv *priv, bool enable)
+-{
+-	u32 val = emac_rd(priv, MAC_FC_CONTROL);
+-
+-	FIELD_MODIFY(MREGBIT_FC_DECODE_ENABLE, &val, enable);
+-
+-	emac_wr(priv, MAC_FC_CONTROL, val);
+-}
+-
+-static void emac_set_fc(struct emac_priv *priv, u8 fc)
+-{
+-	emac_set_tx_fc(priv, fc & FLOW_CTRL_TX);
+-	emac_set_rx_fc(priv, fc & FLOW_CTRL_RX);
+-	priv->flow_control = fc;
+-}
+-
+-static void emac_set_fc_autoneg(struct emac_priv *priv)
+-{
+-	struct phy_device *phydev = priv->ndev->phydev;
+-	u32 local_adv, remote_adv;
+-	u8 fc;
+-
+-	local_adv = linkmode_adv_to_lcl_adv_t(phydev->advertising);
+-
+-	remote_adv = 0;
+-
+-	if (phydev->pause)
+-		remote_adv |= LPA_PAUSE_CAP;
+-
+-	if (phydev->asym_pause)
+-		remote_adv |= LPA_PAUSE_ASYM;
+-
+-	fc = mii_resolve_flowctrl_fdx(local_adv, remote_adv);
+-
+-	priv->flow_control_autoneg = true;
+-
+-	emac_set_fc(priv, fc);
+-}
+-
+ /*
+  * Even though this MAC supports gigabit operation, it only provides 32-bit
+  * statistics counters. The most overflow-prone counters are the "bytes" ones,
+@@ -1425,42 +1358,6 @@ static void emac_ethtool_get_regs(struct net_device *dev,
+ 			emac_rd(priv, MAC_GLOBAL_CONTROL + i * 4);
+ }
+ 
+-static void emac_get_pauseparam(struct net_device *dev,
+-				struct ethtool_pauseparam *pause)
+-{
+-	struct emac_priv *priv = netdev_priv(dev);
+-
+-	pause->autoneg = priv->flow_control_autoneg;
+-	pause->tx_pause = !!(priv->flow_control & FLOW_CTRL_TX);
+-	pause->rx_pause = !!(priv->flow_control & FLOW_CTRL_RX);
+-}
+-
+-static int emac_set_pauseparam(struct net_device *dev,
+-			       struct ethtool_pauseparam *pause)
+-{
+-	struct emac_priv *priv = netdev_priv(dev);
+-	u8 fc = 0;
+-
+-	if (!netif_running(dev))
+-		return -ENETDOWN;
+-
+-	priv->flow_control_autoneg = pause->autoneg;
+-
+-	if (pause->autoneg) {
+-		emac_set_fc_autoneg(priv);
+-	} else {
+-		if (pause->tx_pause)
+-			fc |= FLOW_CTRL_TX;
+-
+-		if (pause->rx_pause)
+-			fc |= FLOW_CTRL_RX;
+-
+-		emac_set_fc(priv, fc);
+-	}
+-
+-	return 0;
+-}
+-
+ static void emac_get_drvinfo(struct net_device *dev,
+ 			     struct ethtool_drvinfo *info)
+ {
+@@ -1634,8 +1531,6 @@ static void emac_adjust_link(struct net_device *dev)
+ 		}
+ 
+ 		emac_wr(priv, MAC_GLOBAL_CONTROL, ctrl);
+-
+-		emac_set_fc_autoneg(priv);
+ 	}
+ 
+ 	phy_print_status(phydev);
+@@ -1715,8 +1610,6 @@ static int emac_phy_connect(struct net_device *ndev)
+ 		goto err_node_put;
+ 	}
+ 
+-	phy_support_asym_pause(phydev);
+-
+ 	phydev->mac_managed_pm = true;
+ 
+ 	emac_update_delay_line(priv);
+@@ -1886,9 +1779,6 @@ static const struct ethtool_ops emac_ethtool_ops = {
+ 	.get_sset_count		= emac_get_sset_count,
+ 	.get_strings		= emac_get_strings,
+ 	.get_ethtool_stats	= emac_get_ethtool_stats,
+-
+-	.get_pauseparam		= emac_get_pauseparam,
+-	.set_pauseparam		= emac_set_pauseparam,
+ };
+ 
+ static const struct net_device_ops emac_netdev_ops = {
 
-Regards,
-Cong Wang
+---
+base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+change-id: 20251124-k1-ethernet-actually-remove-fc-706831770489
+
+Best regards,
+-- 
+Vivian "dramforever" Wang
+
 
