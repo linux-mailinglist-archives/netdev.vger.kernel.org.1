@@ -1,128 +1,112 @@
-Return-Path: <netdev+bounces-246772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0E71CF11BF
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 16:37:41 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 107D9CF11C3
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 16:42:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 24E53300726D
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 15:37:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D4BC33003F9C
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 15:42:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 411D626C39F;
-	Sun,  4 Jan 2026 15:37:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8FF26D4DD;
+	Sun,  4 Jan 2026 15:42:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JX2Fedpw"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A2D178372;
-	Sun,  4 Jan 2026 15:37:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D0FA4400;
+	Sun,  4 Jan 2026 15:42:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767541059; cv=none; b=P9KpmRHIGwA6+H7RfyfsHIU7b3upd6c+/ucbpMocIy6sJtXcGi4z9OL7jTeXCL6MhrIKycyBMB71XURzx8hfddxKqy4aVxpOD7lqZpUtq6nHZ5YskVxoE86iYJO000OXtFXXKVfDZXXxkFPOYMJeIMonb6cvDRN0p3nZdVYuOGU=
+	t=1767541344; cv=none; b=t3ZsmqQP2gRIvqir7NKtwHyFV5g3pPtnB4+IXVnPgAeR9Snhr5FkApkH7TRVweJdmUYLS7CKtMWynRXqMuVK322In9MzjfQq7aGX916nBPoyzWpDzVKAaLiq5cyluv6k7fsjclZnlOcN6yQYooEs9rirg05i6yneZAdF1XTY634=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767541059; c=relaxed/simple;
-	bh=f8qA51GeLCIlhDQrH0p3jEQtUeHoC2nIO3MdcGWziF8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NW5X1jbeEcgs7RDeJXLNNIjAbV6/jlbK69YYDXUUpu08qZ1FSZnfJXxHJcZIWOusE7NnsozQkVsXiK19Ujvd+aReiGb9SFWl3tUNMhv1fUJ/WntzkTzpQ5ijB4W2F1lRgsbgy+z8yJNN9zCKr81mhmro0KQxwwoB3u3bvcdY6Uc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 6E7436033B; Sun, 04 Jan 2026 16:37:34 +0100 (CET)
-Date: Sun, 4 Jan 2026 16:37:33 +0100
-From: Florian Westphal <fw@strlen.de>
-To: =?utf-8?B?546L5b+X?= <wangzhi_xd@stu.xidian.edu.cn>
-Cc: pablo@netfilter.org, kadlec@netfilter.org,
-	netfilter-devel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] netfilter: iptable_nat: fix null-ptr-deref in
- ipt_nat_register_lookups
-Message-ID: <aVqJPbwPspQALMbt@strlen.de>
-References: <70343c9f.96e5.19b8953d001.Coremail.wangzhi_xd@stu.xidian.edu.cn>
+	s=arc-20240116; t=1767541344; c=relaxed/simple;
+	bh=UjJWRT85rpQHhNsUnnSlU0JLznEEUlM8LzlU0ybpfFI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Mk5oGEOjGovTcS1Sox/tbmwj/AWfbWRW7qi+s2KNX27AZHEaS/kUQLjazS/1TLlXHTo7yn3l4mm4N3Ckc5xOPNe0/rRThA6dUe+sJJSzvlfl6oO/jEcUPKKiTAR4o5u79VdZwlq4K3Uur4eNWBDnFAgLgS4ahRqp/ze/m9gE3fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JX2Fedpw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 766AFC4CEF7;
+	Sun,  4 Jan 2026 15:42:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767541343;
+	bh=UjJWRT85rpQHhNsUnnSlU0JLznEEUlM8LzlU0ybpfFI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JX2FedpwHJMYb96Y9Hy/Y/5G5AucFNpQZ9MKpn7vaeggkv3iwWznZagNcO3I4F+13
+	 I2rpWUGxNZy9WV5sK+rx6X1GTsLQLoKymHxKLZJHgD40PqSUcJlpv4g9oSOvyuOtG6
+	 Di/moqAA5PrKdauPb43IzQOLEVhqZA6h06TmNKnRJIyv/g2le03f1J/7oSPLgiBX+b
+	 YIp8Ude3W+FvJGOSnQ1btl10PFS13jPDONArZBSZ/nxwlyOC36wIndPxZqFVvLrr6w
+	 HyXFHnEBH5h+ydJjSNskwod+SbmMRodu1JqsSzV++T6YsSEiOm52PJKuPu3cW0z9kX
+	 L6AgIVAW6parg==
+Date: Sun, 4 Jan 2026 07:42:22 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Oliver Hartkopp <socketcan@hartkopp.net>
+Cc: Prithvi <activprithvi@gmail.com>, andrii@kernel.org, mkl@pengutronix.de,
+ linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com, netdev@vger.kernel.org
+Subject: Re: [bpf, xdp] headroom - was: Re: Question about to KMSAN:
+ uninit-value in can_receive
+Message-ID: <20260104074222.29e660ac@kernel.org>
+In-Reply-To: <63c20aae-e014-44f9-a201-99e0e7abadcb@hartkopp.net>
+References: <20251117173012.230731-1-activprithvi@gmail.com>
+	<0c98b1c4-3975-4bf5-9049-9d7f10d22a6d@hartkopp.net>
+	<c2cead0a-06ed-4da4-a4e4-8498908aae3e@hartkopp.net>
+	<aSx++4VrGOm8zHDb@inspiron>
+	<d6077d36-93ed-4a6d-9eed-42b1b22cdffb@hartkopp.net>
+	<20251220173338.w7n3n4lkvxwaq6ae@inspiron>
+	<01190c40-d348-4521-a2ab-3e9139cc832e@hartkopp.net>
+	<20260102153611.63wipdy2meh3ovel@inspiron>
+	<20260102120405.34613b68@kernel.org>
+	<63c20aae-e014-44f9-a201-99e0e7abadcb@hartkopp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <70343c9f.96e5.19b8953d001.Coremail.wangzhi_xd@stu.xidian.edu.cn>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-王志 <wangzhi_xd@stu.xidian.edu.cn> wrote:
-> Dear Developers,
+On Sat, 3 Jan 2026 13:20:34 +0100 Oliver Hartkopp wrote:
+> Hello Jakub,
 > 
-> I am reporting a null-pointer dereference detected by Syzkaller on Linux 6.18.0. The issue occurs in the netfilter subsystem during concurrent network namespace creation and module loading.
-> 1. Analysis
-> The crash is triggered by a race condition between the registration of the iptable_nat template and the initialization of per-net private data.
-> In ipt_nat_register_lookups(), the driver attempts to retrieve its private data using net_generic(net, iptable_nat_net_id). However, if the module is being loaded while a new network namespace is being initialized, net_generic can return NULL because the storage for this specific module ID has not yet been allocated or linked for the target namespace.
-> The code currently proceeds without checking if xt_nat_net is valid. When it subsequently attempts to store the ops pointers: xt_nat_net->nf_nat_ops = ops; It results in a null-pointer dereference (GPF), specifically at an offset (e.g., 0x18) from the NULL base.
-
-This needs a better description on the sequence of events that leads to
-this bug.  I also don't understand the bit about the 0x18 offset.
-
-struct iptable_nat_pernet {
-        struct nf_hook_ops *nf_nat_ops;
-};
-
-... so where would 0x18 come from?
-
-If this is AI generated, please don't do that :-|
-
-> 2. Proposed Fix
-> The fix involves adding a NULL check for the pointer returned by net_generic(). If it returns NULL, the registration should be aborted with -ENOMEM to prevent the kernel crash.
+> thanks for stepping in!
 > 
-> 3. Patch
-> Diff
-> --- a/net/ipv4/netfilter/iptable_nat.c
-> +++ b/net/ipv4/netfilter/iptable_nat.c
-> @@ -66,6 +66,9 @@ static int ipt_nat_register_lookups(struct net *net)
->  	int i, ret;
->  
->  	xt_nat_net = net_generic(net, iptable_nat_net_id);
-> +	if (!xt_nat_net)
-> +		return -ENOMEM;
-> +
+> On 02.01.26 21:04, Jakub Kicinski wrote:
+> 
+> > You're asking the wrong person, IIUC Andrii is tangentially involved
+> > in XDP (via bpf links?):
+> >   
+> (..)
+> > 
+> > Without looking too deeply - XDP has historically left the new space
+> > uninitialized after push, expecting programs to immediately write the
+> > headers in that space. syzbot had run into this in the past but I can't
+> > find any references to past threads quickly :(  
+> 
+> To identify Andrii I mainly looked into the code with 'git blame' that 
+> led to this problematic call chain:
+> 
+>    pskb_expand_head+0x226/0x1a60 net/core/skbuff.c:2275
+>    netif_skb_check_for_xdp net/core/dev.c:5081 [inline]
+>    netif_receive_generic_xdp net/core/dev.c:5112 [inline]
+>    do_xdp_generic+0x9e3/0x15a0 net/core/dev.c:5180
+> 
+> Having in mind that the syzkaller refers to 
+> 6.13.0-rc7-syzkaller-00039-gc3812b15000c I wonder if we can leave this 
+> report as-is, as the problem might be solved in the meantime??
+> 
+> In any case I wonder, if we should add some code to re-check if the 
+> headroom of the CAN-related skbs is still consistent and not changed in 
+> size by other players. And maybe add some WARN_ON_ONCE() before dropping 
+> the skb then.
+> 
+> When the skb headroom is not safe to be used we need to be able to 
+> identify and solve it.
 
-ip6t_nat_register_lookups() needs the same check, assuming this report
-is correct.
-
-> 4. Bug Trace Highlights
-> KASAN: null-ptr-deref in range [0x0000000000000018-0x000000000000001f]
-> RIP: 0010:ipt_nat_register_lookups+0xf6/0x1e0
-> Code: 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 
-> Call Trace:
->  <TASK>
->  xt_find_table_lock+0x20a/0x2f0 home/wmy/Fuzzer/third_tool/linux-6.7-defconfig/net/netfilter/x_tables.c:1259
->  xt_request_find_table_lock+0x2b/0xc0 home/wmy/Fuzzer/third_tool/linux-6.7-defconfig/net/netfilter/x_tables.c:1284
->  get_info+0xec/0x330 home/wmy/Fuzzer/third_tool/linux-6.7-defconfig/net/ipv4/netfilter/ip_tables.c:963
->  do_ipt_get_ctl+0x134/0xa60 home/wmy/Fuzzer/third_tool/linux-6.7-defconfig/net/ipv4/netfilter/ip_tables.c:1651
->  nf_getsockopt+0x6a/0xa0 home/wmy/Fuzzer/third_tool/linux-6.7-defconfig/net/netfilter/nf_sockopt.c:116
->  ip_getsockopt+0x190/0x1f0 home/wmy/Fuzzer/third_tool/linux-6.7-defconfig/net/ipv4/ip_sockglue.c:1781
->  tcp_getsockopt+0x7f/0xd0 home/wmy/Fuzzer/third_tool/linux-6.7-defconfig/net/ipv4/tcp.c:4340
->  do_sock_getsockopt+0x20b/0x280 home/wmy/Fuzzer/third_tool/linux-6.7-defconfig/net/socket.c:2377
->  __sys_getsockopt+0x115/0x1b0 home/wmy/Fuzzer/third_tool/linux-6.7-defconfig/net/socket.c:2406
->  __do_sys_getsockopt home/wmy/Fuzzer/third_tool/linux-6.7-defconfig/net/socket.c:2416 [inline]
->  __se_sys_getsockopt home/wmy/Fuzzer/third_tool/linux-6.7-defconfig/net/socket.c:2413 [inline]
->  __x64_sys_getsockopt+0x64/0x80 home/wmy/Fuzzer/third_tool/linux-6.7-defconfig/net/socket.c:2413
->  do_syscall_x64 home/wmy/Fuzzer/third_tool/linux-6.7-defconfig/arch/x86/entry/common.c:51 [inline]
->  do_syscall_64+0x46/0xf0 home/wmy/Fuzzer/third_tool/linux-6.7-defconfig/arch/x86/entry/common.c:82
->  entry_SYSCALL_64_after_hwframe+0x6f/0x77
->  </TASK>
-
-Please describe the sequence of events that lead to this bug.
-
-1. xt_find_table_lock() found the nat table in xt_templates[] list.
-2. BUT iptable_nat_init calls xt_register_template() AFTER
-   register_pernet_subsys() returns; not before.
-
-How does xt_find_table_lock() observe the nat table but the associated
-net generic slot is NULL?
-
-Under what condition will register_pernet_subsys() return 0 but leave
-net->gen->ptr[iptable_nat_net_id] == NULL?
-
-5830aa863981 ("netfilter: iptables: Fix null-ptr-deref in iptable_nat_table_init().")
-changed the ordering to avoid this exact problem, so I wonder what
-was missing.
+Ugh, I should have looked at the report. The struct can_skb_priv
+business is highly unconventional for the networking stack.
+Would it be possible to kmalloc() this info and pass it to the socket
+via shinfo->destructor_arg?
 
