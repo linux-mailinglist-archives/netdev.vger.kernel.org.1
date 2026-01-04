@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-246796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EDC3CF133B
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 19:41:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5452CCF1359
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 19:42:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 38D783004226
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 18:41:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8ACE930198DD
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 18:41:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E57530FC10;
-	Sun,  4 Jan 2026 18:41:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1334D225416;
+	Sun,  4 Jan 2026 18:41:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i+lagqRn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EFs6Qzgh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
+Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7CF62D97BF
-	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 18:41:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA1D30FC27
+	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 18:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767552096; cv=none; b=htIupErkfRDLtE721xv9DZseI6KiCWkgk+CMCzvfBAnAqJuYJ5ew4rLSbazNt0uHV3MvIRNq1EUQasJpvle1yaJn5cGcaXuMPGWor/6wZuc4OFCGIrnVhTCVbs4DlFIEjCA1ZEhAvx3XU5MVcNIfpgQMWrp1uxzNlXy/iGGsa8M=
+	t=1767552105; cv=none; b=rfbmaUS9r02nRy/0xprfuNOLsKOuTJNJ4vWckGdCRma52rRR7eFQArgJVZUD3trxWbDqZ2hGZ+zEiZtJrlpTjF8Fw54aQOSW+jQZwQ9+srb6CY5vNhhOQ3FwmnhyoKgwf0g6bQLEzyNFmrOVhBro6487PtPhWRob1ttRK/c4128=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767552096; c=relaxed/simple;
-	bh=k6HYkuFjGOkMGYq7NrGDAXkhegT+uwp4gHCdoaClonY=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=StGVg3y44bH1vXCpbVPbsBoIFuHmYRy+8Bw1eSD/mSiEk98uXfQKs9VJxBjXhISvKJYAD7Z9/Ob4pLswbkx+4x+4Pfbg3j3qJghcS0AiCOxSi+bHYUubCmRMwhfo0geZmP1uz/dwV+mv8mvOdvLm4ETUk0mE3N6efH2rIy8v334=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i+lagqRn; arc=none smtp.client-ip=74.125.82.50
+	s=arc-20240116; t=1767552105; c=relaxed/simple;
+	bh=xTW7lVbfJsgnlziO9m7HRTBaTgvYhjTEK5XGbQnoB3Q=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=JvLJnIyFDiTfOywMLqSrzDq6Z5SqpxgHa0SNiJk8dYhqgCRsmjdL0pmWW4Q2dOvJWiv0zglfT0ulSulvoVB4pQasNO24Kk6t0dMWb52Fyfa8CMgDP7iH8zDLj79mtujcChGGoPVg6JFu8lKkJz6RKQyp6Onmc/tqhgZz/m4HqFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EFs6Qzgh; arc=none smtp.client-ip=74.125.82.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-121b251438eso1787051c88.0
-        for <netdev@vger.kernel.org>; Sun, 04 Jan 2026 10:41:34 -0800 (PST)
+Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-121b251438eso1787111c88.0
+        for <netdev@vger.kernel.org>; Sun, 04 Jan 2026 10:41:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767552094; x=1768156894; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=TMiD346ICb1bspuV7cqGoIBZJwRiXZOhPp5cwrAlU3s=;
-        b=i+lagqRnijg9iar6YL/ftREFJIhI5m2g3BFoVClagvXawP0YzUDXZsFj0CBD/c9dnt
-         7w2uke5aGs87OtQy48QRHDnX9qDeu2vW4V/PpeV2WNobyWlWrcKd0+lYfQTCciyFiF9V
-         UhmbqTQuv8jKivpzoC8EyRQ+aC+gJ7Wd0K5dL5+3pO1lrFEUWSAPNbvXdWQpS2JuUlLH
-         bpTXzdMw6OL05TRlPJRTGiMuLccwcLnwBGUe5RRVbD+/WVQ/AFZ1MDDRZvFjIqGVcYaD
-         EsCr25UnjauN2PBOwyViApd05MtWck9mMrMvwiBEhApd9TsiPz2K+F7t6F99ORNo+Gj+
-         p2Hg==
+        d=gmail.com; s=20230601; t=1767552101; x=1768156901; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uKBmUb8EWfQ3VixqXwZwtOjhnNqHJe7y4QanLPyxD5w=;
+        b=EFs6Qzghey7xQ6Fcur0QLwvI940WJB8GnGr2SNvRWe39WZsSBZRiAl9SmSMEQkR+GQ
+         70BZndiK56RDqkzGfMIUraEGzKAr4MdJjXOzpct3kVrPq9aj1LwXU/inH9NqI4o28FGC
+         4dPjNRt4sP9HCT8eCJgcOTQ7wJdalG7Sq4UWPzJMX4K7KBSQb0Ed4lxRRDgliGHHdONn
+         Ydv5NqPb58INBhoP98o2ja+AGm8HN9rcz+Og2TgklpV45Nb/G+BI9q8nOS37EV96apX+
+         iKUfeHAQJs0XcO9ZsPxnqK4BlRsLGDMzqtO0VTPanIm+OyzHrTs54Fm9MANeXxkcB1j4
+         mcfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767552094; x=1768156894;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TMiD346ICb1bspuV7cqGoIBZJwRiXZOhPp5cwrAlU3s=;
-        b=NHT06gG/O3aQ99OoTy3nfOTBERGg2p5oqJFBpPdu8SjUhVGyhr9xNxwFWlfyPkyT02
-         IwU+yj1lzntlNNJ7Ls4s9TX92TDjcmFlc9Gxe+QUK5ewqfu9krknvLeU6bJzO8sVgLnp
-         ThxICVrQR312UZs3UTvUcXcGqhI4Re4ZZWfCvEGaevCIKTDC1Se5tSBozUznFJKrVfr8
-         bA+sWTOqZ6+ZwLUkOY43BDfdNdVZKXrSjgSXQdHK3oWbRr3nT+rq7Acu4fFPYVQn/VqU
-         B9HrDQ8eCwPHCjtJ86ia7gKuvrwo2oEA9yFLCbT5kmz6McLMbn3TkdXHrWn+wV6RHmbW
-         bFhg==
-X-Gm-Message-State: AOJu0YwNfYP8z7Y3ZKlyGD6CUe48lkenC/fH0w89DE+M8EsptcTkFApZ
-	d7D+t8X1tjVgzBnXVgK+hvWU84yEPfvT0mqYVSiNJBHXHvkB2xDMv13j
-X-Gm-Gg: AY/fxX6dgeYMddWbN1+kI0lLFKX2gWzAgfb/NmyXJurBhpD/0uxRkzUT/Lrk6/vbzGU
-	7bvY2BD4jtn0FsVRAJrKUL4988iFhBPvWcgZ5EFBgJAfrwdRM3kOJerAAArWmsWrnNXfgHnnxO/
-	i7IwsY6mFlh7s1C8+/Ime5fOdS0d+xjNXKLan7ytl3lQQsLhOKhQF859WYJ3/AjRnKQAn0JXeyS
-	ffRKSSahu5tsvGkND/l4U6AY3Bg7SC0F+bm+NviZC9Om6nF/7rKnQaRp2SYGy+6JvA3is9nsCW4
-	B+syUnsitrNgs9wlEwEXU5ZVL/poluf4Gc9K8Ii3CDy32LNhrdwsS8LhOSgL6a40Au5Qfnxlp67
-	AhXYkGWHcOR3z9T4yfkdId1hHHCFBeJh+WqXi60hfuZ/9+5CFVMazfpgcLF/cfrsOocco9KPGt1
-	lWrXGKkJ1XbEhurasCj7q3yKHx8ec=
-X-Google-Smtp-Source: AGHT+IEQw3jWBR372JNKXP+kV3AP4HMYDSMrhVC7CyEowmce5ByqdcDNZSCGiF8GmqwdMKdNBSlYNA==
-X-Received: by 2002:a05:7022:49a:b0:119:e569:f86c with SMTP id a92af1059eb24-121d80a2831mr4561121c88.9.1767552093505;
-        Sun, 04 Jan 2026 10:41:33 -0800 (PST)
+        d=1e100.net; s=20230601; t=1767552101; x=1768156901;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=uKBmUb8EWfQ3VixqXwZwtOjhnNqHJe7y4QanLPyxD5w=;
+        b=KR0glCxWTO4+2HP70TCrKmmU+0bUx8k+XEKlJBM+pTgVgFvnHQAW/7vvAsrNE00KUl
+         6cG1u+ZthLLA3omaHOwPfkT6Pew4SxxYqMJ9upaYnukVk//1OEltB/j8Erxn4nXWGQaJ
+         6+oDc4N3u+jJRmoVUKb8K91Fg+F8jWuBLSPyHxWsoi5As70Y7dak7U8ImBC8FRmswGhK
+         nWKD5EFIbcwe4+sAo8NLI31WrBJlckavS7vRRZ3n/Wfe+9hqptq7FczbQ8kSjxpY7AZl
+         VFwJwILF5wnZJ+pWa7j2JTRbXGE9khHHlwBedhfZH3+KEBnIbNgehOgyZlWR8R6rxdEm
+         D95w==
+X-Gm-Message-State: AOJu0Yy4xuUMplbek1YYZ0CDZP+9y1J0oySE9I4p5GYzsBkrl+El/QJZ
+	QUx5SJOLa0VS9oLWtVYbOpC6uKnPBAFXbROzVTZl1EQwt4mMXuw8thQ5
+X-Gm-Gg: AY/fxX7fw9LDDDLA3GA3y0TM0Bv0W5XRYCG3kzGXrz2kAvyOW5opUwtno//PE+0Z5Oh
+	hWox+avfkdgRMXrVekLfhcLxZyAx0GzXXG6fknFedAtn+KtbRne61liOeOoW47i4hIhZywHUiGk
+	LvGgcxeJjJAcFnHbUUEaEAzG9KGXjOk/MXRHK7lnUM6krVbKNXQfC4pzaFdWhryOmIq7lf+03bg
+	wrYJqOlk8fv/UF8/RQPn7WbjRXkDT7ZwNWrJsIjYKHUY3Bpa1oQS+XI/9LxgwxqLMDDT3H2uV5a
+	72EA0sk6vtAoOtTh628jKYc5y9Y/4VrVT230OmLaogm2TZL8ynO8zogXi7M1hY5y3NpllJ/OKSb
+	OjSlQ1jPx7egoKOiSv0XWS3NruiJtvMsiMDrZAudvMC+01FDbvFOKAXEitY+adZy/Su8PatyZ8O
+	IZEDuKWfnohvMM7QPb
+X-Google-Smtp-Source: AGHT+IEkrerLkA/4ixjyUlfOE1XXFSRLs3hEvRo2xtxXa3LLm+JllqO1Z2sjIR8HVARMLkkwliMMxg==
+X-Received: by 2002:a05:7022:4589:b0:11e:3e9:3e91 with SMTP id a92af1059eb24-121d80da9a4mr5164433c88.26.1767552101038;
+        Sun, 04 Jan 2026 10:41:41 -0800 (PST)
 Received: from [192.168.15.94] ([179.181.255.35])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1217254c734sm170975553c88.13.2026.01.04.10.41.26
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1217254c734sm170975553c88.13.2026.01.04.10.41.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Jan 2026 10:41:32 -0800 (PST)
+        Sun, 04 Jan 2026 10:41:40 -0800 (PST)
 From: Andre Carvalho <asantostc@gmail.com>
-Subject: [PATCH net-next v9 0/6] netconsole: support automatic target
- recovery
-Date: Sun, 04 Jan 2026 18:41:10 +0000
-Message-Id: <20260104-netcons-retrigger-v9-0-38aa643d2283@gmail.com>
+Date: Sun, 04 Jan 2026 18:41:11 +0000
+Subject: [PATCH net-next v9 1/6] netconsole: add target_state enum
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,13 +82,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAEa0WmkC/23QS27EIAwG4KuMWJfKPANd9R5VF2Agg9RJKhJFU
- 41y99IsKpRhaRl/2P+DLLHkuJC3y4OUuOUlz1Mt7MuF4NVNY6Q51Jpw4AoM03SKK87TQktcSx7
- HWKiTScnBJzR6IHXuu8SU74f5QerzOnJfyWftXPOyzuXn+GxjR/9wLdiOuzEKVLjoLEjLNab38
- eby1yvOt0PbeCNw1hN4FRxEIwE0F8OTIP4Fxvo7iCowrSRyA95HfRZkI3TT2WQVFLfgVWISkJ8
- F1QrdHVQVOA4hOA1KhacddCP0c9BVsAgiKcd90E85DK3QvWL4yyEYHbwzwjM8C6YVTE8wVQCP6
- JNELYxqhX3ffwEckM/kigIAAA==
-X-Change-ID: 20250816-netcons-retrigger-a4f547bfc867
+Message-Id: <20260104-netcons-retrigger-v9-1-38aa643d2283@gmail.com>
+References: <20260104-netcons-retrigger-v9-0-38aa643d2283@gmail.com>
+In-Reply-To: <20260104-netcons-retrigger-v9-0-38aa643d2283@gmail.com>
 To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -96,115 +92,43 @@ To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  linux-kselftest@vger.kernel.org, Andre Carvalho <asantostc@gmail.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1767552086; l=4592;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1767552086; l=747;
  i=asantostc@gmail.com; s=20250807; h=from:subject:message-id;
- bh=k6HYkuFjGOkMGYq7NrGDAXkhegT+uwp4gHCdoaClonY=;
- b=g2T/UnpauvFW+HV51tODfeoldeNAV4osAHAyv6P4JevBfseVIrzcIeeUKRa2GQciBYSUoAw/1
- EOkaIGo1oofC82MLds4rBJ9FeT3QbSn33QnAtj5n0SbI/NH5st0PhSv
+ bh=BLduFEel2At1ZpRoHzUB/43M6t0wpDLHJLh+eokOBeA=;
+ b=16wxTenr+y86Rt/Ag3RI3x399WrHWTY/kIyhlsFlYOMk5zACPlbx+jeBwuMORyjOODyzqYAE4
+ 84+KGlB10dsDrvpVh1t3elftkyBxiXuobe8zN7mpmcowQZ0MWrnvM+N
 X-Developer-Key: i=asantostc@gmail.com; a=ed25519;
  pk=eWre+RwFHCxkiaQrZLsjC67mZ/pZnzSM/f7/+yFXY4Q=
 
-This patchset introduces target resume capability to netconsole allowing
-it to recover targets when underlying low-level interface comes back
-online.
+From: Breno Leitao <leitao@debian.org>
 
-The patchset starts by refactoring netconsole state representation in
-order to allow representing deactivated targets (targets that are
-disabled due to interfaces unregister).
+Introduces a enum to track netconsole target state which is going to
+replace the enabled boolean.
 
-It then modifies netconsole to handle NETDEV_REGISTER events for such
-targets, setups netpoll and forces the device UP. Targets are matched with
-incoming interfaces depending on how they were bound in netconsole
-(by mac or interface name). For these reasons, we also attempt resuming
-on NETDEV_CHANGENAME.
-
-The patchset includes a selftest that validates netconsole target state
-transitions and that target is functional after resumed.
-
+Signed-off-by: Breno Leitao <leitao@debian.org>
 Signed-off-by: Andre Carvalho <asantostc@gmail.com>
 ---
-Changes in v9:
-- Hold dynamic_netconsole_mutex on process_resume_target.
-- Cleanup dev_name as part of netconsole_process_cleanups_core to ensure
-  we correctly resume by mac (for targets bound by mac)
-- Link to v8: https://lore.kernel.org/r/20251128-netcons-retrigger-v8-0-0bccbf4c6385@gmail.com
+ drivers/net/netconsole.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Changes in v8:
-- Handle NETDEV_REGISTER/CHANGENAME instead of NETDEV_UP (and force the device
-  UP), to increase the chances of succesfully resuming a target. This
-  requires using a workqueue instead of inline in the event notifier as
-  we can't UP the device otherwise.
-- Link to v7: https://lore.kernel.org/r/20251126-netcons-retrigger-v7-0-1d86dba83b1c@gmail.com
+diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+index 9cb4dfc242f5..e2ec09f238a0 100644
+--- a/drivers/net/netconsole.c
++++ b/drivers/net/netconsole.c
+@@ -119,6 +119,11 @@ enum sysdata_feature {
+ 	MAX_SYSDATA_ITEMS = 4,
+ };
+ 
++enum target_state {
++	STATE_DISABLED,
++	STATE_ENABLED,
++};
++
+ /**
+  * struct netconsole_target - Represents a configured netconsole target.
+  * @list:	Links this target into the target_list.
 
-Changes in v7:
-- selftest: use ${EXIT_STATUS} instead of ${ksft_pass} to avoid
-  shellcheck warning
-- Link to v6: https://lore.kernel.org/r/20251121-netcons-retrigger-v6-0-9c03f5a2bd6f@gmail.com
-
-Changes in v6:
-- Rebase on top of net-next to resolve conflicts, no functional changes.
-- Link to v5: https://lore.kernel.org/r/20251119-netcons-retrigger-v5-0-2c7dda6055d6@gmail.com
-
-Changes in v5:
-- patch 3: Set (de)enslaved target as DISABLED instead of DEACTIVATED to prevent
-  resuming it.
-- selftest: Fix test cleanup by moving trap line to outside of loop and remove
-  unneeded 'local' keyword
-- Rename maybe_resume_target to resume_target, add netconsole_ prefix to
-  process_resumable_targets.
-- Hold device reference before calling __netpoll_setup.
-- Link to v4: https://lore.kernel.org/r/20251116-netcons-retrigger-v4-0-5290b5f140c2@gmail.com
-
-Changes in v4:
-- Simplify selftest cleanup, removing trap setup in loop.
-- Drop netpoll helper (__setup_netpoll_hold) and manage reference inside
-  netconsole.
-- Move resume_list processing logic to separate function.
-- Link to v3: https://lore.kernel.org/r/20251109-netcons-retrigger-v3-0-1654c280bbe6@gmail.com
-
-Changes in v3:
-- Resume by mac or interface name depending on how target was created.
-- Attempt to resume target without holding target list lock, by moving
-  the target to a temporary list. This is required as netpoll may
-  attempt to allocate memory.
-- Link to v2: https://lore.kernel.org/r/20250921-netcons-retrigger-v2-0-a0e84006237f@gmail.com
-
-Changes in v2:
-- Attempt to resume target in the same thread, instead of using
-workqueue .
-- Add wrapper around __netpoll_setup (patch 4).
-- Renamed resume_target to maybe_resume_target and moved conditionals to
-inside its implementation, keeping code more clear.
-- Verify that device addr matches target mac address when target was
-setup using mac.
-- Update selftest to cover targets bound by mac and interface name.
-- Fix typo in selftest comment and sort tests alphabetically in
-  Makefile.
-- Link to v1:
-https://lore.kernel.org/r/20250909-netcons-retrigger-v1-0-3aea904926cf@gmail.com
-
----
-Andre Carvalho (4):
-      netconsole: convert 'enabled' flag to enum for clearer state management
-      netconsole: clear dev_name for devices bound by mac
-      netconsole: resume previously deactivated target
-      selftests: netconsole: validate target resume
-
-Breno Leitao (2):
-      netconsole: add target_state enum
-      netconsole: add STATE_DEACTIVATED to track targets disabled by low level
-
- drivers/net/netconsole.c                           | 171 +++++++++++++++++----
- tools/testing/selftests/drivers/net/Makefile       |   1 +
- .../selftests/drivers/net/lib/sh/lib_netcons.sh    |  35 ++++-
- .../selftests/drivers/net/netcons_resume.sh        |  97 ++++++++++++
- 4 files changed, 270 insertions(+), 34 deletions(-)
----
-base-commit: dbf8fe85a16a33d6b6bd01f2bc606fc017771465
-change-id: 20250816-netcons-retrigger-a4f547bfc867
-
-Best regards,
 -- 
-Andre Carvalho <asantostc@gmail.com>
+2.52.0
 
 
