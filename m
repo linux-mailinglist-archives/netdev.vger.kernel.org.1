@@ -1,88 +1,87 @@
-Return-Path: <netdev+bounces-246739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A56BECF0D17
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 11:57:51 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1CD2CF0D37
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 12:19:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5527E300942C
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 10:57:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A8F9B3000E87
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 11:19:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC72F26A09B;
-	Sun,  4 Jan 2026 10:57:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CAA9258CCC;
+	Sun,  4 Jan 2026 11:19:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FrqEheWl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LFvFHx+I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AFC316DC28
-	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 10:57:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91ABA20C00C
+	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 11:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767524269; cv=none; b=PiVN4173X9fMD+tKqhzmtpfNgPtD9yWphjIDG5vI6RFvaKTIR1BWlycSKFN2yLrYVFPEzy+nruW8rwVqxKK6pNsF+VQzp2FBZ5KmJD6ZJMw1r/mbBEfFJa6rFFfq3YsR7nD2/+la/WgbATnYyF5LpOfzoyPJVltopKTgQwaz/I0=
+	t=1767525586; cv=none; b=MpubWmZ6GgIauw/BOb0KslaRZXTwZKwrfE+Ko/1aRUFtB/SwUdMcRUjD/Yu0VdWDImYC4nY1vaGzUOU/9oBhrDCKuV9zU9Utj+LUoiHKSPHiX6N9f0fi8/+L35RAass2lCVNupaXjcn4J0hKajfhMosfu7l+5woAXVlabQvQkws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767524269; c=relaxed/simple;
-	bh=ToXSaSvHXtKX2QRxKYEYwL3ZEu7LNb34jWKKNlkc1IQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mCsxWZcEBPRa5lbYENpNJDsKpqFwEXoR4615OSoIoPH4a4AKne0zQ+bjaK4M2VJcbWri7myG14H2OCQFRVu6zCkmDaVmcdHLClTgHvDcarWOHUC7VJb7wpf3uzCOMXPZb6TO8DmGplCxYw0VyhGpVKqrvPbe54wz8Xn0EZZd5zQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FrqEheWl; arc=none smtp.client-ip=209.85.221.48
+	s=arc-20240116; t=1767525586; c=relaxed/simple;
+	bh=yBrqkYj1jnzncmJZwro64AcHNTLTvquv/IKdVLYG8Dc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=d06YmIriXX89IDfis3OWILg122M5ItxYGNZECKaDxQ67X86s4wecMiM4x5/OSdTplp6ucVMCckDvXh1BFAZn5DnBFfv2r79mGzloE2pYxyQAxsspj+zchTM262niFgd76t2deD6KvSWWlwqGEQ4y03HlCpOtFOkgaje4NHE08Dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LFvFHx+I; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-42fb2314eb0so10480237f8f.2
-        for <netdev@vger.kernel.org>; Sun, 04 Jan 2026 02:57:48 -0800 (PST)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-29f2676bb21so184290295ad.0
+        for <netdev@vger.kernel.org>; Sun, 04 Jan 2026 03:19:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767524267; x=1768129067; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1767525584; x=1768130384; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ex1tzrhi+VpVUpcNNg8DPlqsj/+xBz28OKRugjsNrj0=;
-        b=FrqEheWl5018s6jF9ab4SBiYnFWRmItS1uXciJXrjBSW9IUDOoltw4jeMXSZhbIOBJ
-         SsPPwluT+36iKBrv2Cft6jdgm5l7eGiQxKEQo7bjdnfCne/t6v7wTklcqiG9oVvqSdNH
-         4jUndCkdIuO7z3lEPgqoZrLAnwfAHE9isQrrcFrLozF3v5v8Xm7Y1I9wTg8AwCMeAzpi
-         UWnSYfrzgIOVzmJuXQjfAZI1r3DjGt5Ejkw72x3Clx1cJoqZ/4LIAP1V/Puw2yywZ8Tx
-         HFD23a9HeRvVzvqXEnKzKkILNwwEM1KUyUik7HYeRpx6Fl/UTfymk+Ljph7Ki2iUnFZD
-         G0CQ==
+        bh=557gGaDYszK6QJZXXNva39IMoUKqT6OCm1hcM4MYEI4=;
+        b=LFvFHx+Io0DF+VWalgvj8AnE5Zbb/6vzfrnkriS8UkE4p5Ji37lcWFQ5AhQZmNRob/
+         AMNrbWQFdQ34q1fYz94Dv7PeV+DHA/CcEkAW5x0e1qPnSkY6I1zzS4XWhJ6C/pNiVICo
+         8RzE3CIE9CYbFJuEpDBp+zJSXkttePO21eA5PdHgLAvuDMZp1JLklgNgGZFKCGAqTEU0
+         E1CTKbJkEgthCvyPJkzHL0UKVN0Xk1ih6c8CvRhsoqK06Po1lgMEQA8Sk4/bVrzoE7Lx
+         Ii4lCosZkGz48Z7SjSP/M1RSferJS/uLYeIjTd6mLACvqZanuR5Oedf3ebpZGZH91wwl
+         djZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767524267; x=1768129067;
+        d=1e100.net; s=20230601; t=1767525584; x=1768130384;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ex1tzrhi+VpVUpcNNg8DPlqsj/+xBz28OKRugjsNrj0=;
-        b=YLczgLVLaq7zew0QLMmj9GhnJ2xZGjimPvAv6bTzyjApZDiFSvDAo/QMb1wYxvToIC
-         J7ih08sTfpIzM6Dm7B2iAweJdtioUfw3TTs8oB5xIkcPkAvImJ+GTWx0mGaSKZRrdxNI
-         bo+IDDvPKYF28xFc7p8GYNMZ7dgQ+lk5dklhw3QQXqyI2W16hpNwzFjXWwp2Z6fSFeGj
-         ECs75a3wWWbMAtD3UIITRzlEiLxwAk6JuLKp1hqW+TsSKsUeYKKjMuWkB6fei9R5xO79
-         beu79DuvkYD/0R/f7X8Frnj315vWTwjsqbH5vnLuqBBK2F4J9GLrVrl/IeqBnhXNfd/3
-         UIYA==
-X-Gm-Message-State: AOJu0YwZR4Y7NlcgoYGZinwjYbr8et3JVqxOrRXohmwW+68QrEnALD3d
-	EEgp8KS7hxrz0jJ2wN670OVgPFA0Z/JcGa4O7W6LmxnUgExgCbGo2Je3ZYf6EvMZ
-X-Gm-Gg: AY/fxX6moJGnPgQgemJHIZdXBXwHHaFaeE8WdChl6x6SHVupZMXBm5jPJ1xcOaL54ne
-	/xu7dBbzGUj93T6YMcnPT0r3bbpehao7bIU1Xhf9HuLILwg8oam0YQoQo1PMzb5F1GpuHNfB74u
-	HTZX2UKYqbCNdsCHV2bndclHmOjqW26eW+2zW2awhMG6R67wS0uT0iriCWiWS9j+f1flU+2ZIJq
-	X8jjhTiF+IIe2eHiTDZck+V0I55i8IegV2uzDTwA5GHsjnYJJa1XGsoD8wyLgq03g+n00dknONx
-	rEdOhcBiZIG8XduWD6JZninF0FdTttrwhKyYtfX3BWyG75YBHsEzL6YHUhmtvkhMEwbgOdPcC8e
-	XOU2wZcaq3XkAjJBzFDNHg7m36T9CPVsHDDIvJWxRPSlMMrI0G7J5O9WDH+gjxSk/iQWuxecfWl
-	Iq
-X-Google-Smtp-Source: AGHT+IE7kuYxbDe09JzMytqtigdG/pIaA/9PUcoDUeH+C+eF8YcTSGWrElUz8p2vRvtloSsxIaHlhQ==
-X-Received: by 2002:a05:6000:4202:b0:430:fd9f:e6e2 with SMTP id ffacd0b85a97d-4324e4c3e3cmr55330940f8f.9.1767524266505;
-        Sun, 04 Jan 2026 02:57:46 -0800 (PST)
-Received: from wdesk. ([5.214.18.232])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324eaa46c0sm94682897f8f.34.2026.01.04.02.57.44
+        bh=557gGaDYszK6QJZXXNva39IMoUKqT6OCm1hcM4MYEI4=;
+        b=qpDrJ4mX3xobRRHegyleuw/aNbffyfjElKiaLUDY7UBA6rB2M2efFdb4FX0VVCk5P5
+         LbrBlYXFNQGtjRY1zlbYzpA29sioMK40pgGsAwxSy1nBAd8TNhN6u7iLkOgCYhtuLJ2k
+         JHp8q69/O9JPXafefBa/uNd5/dVd0ZS4zoqSgtajupE+W9HJBtBvvIDl3paIeUlFC03s
+         jrMt+Xy5q9K/W5O11YKGn9YzH4YufYYzVGgBSmRSUFAeeRU+uU7UyA/cDIRzrem+1GlD
+         FB9stRawDEp1GvkQ+wgWHKSxB/P4rXQwGPXunz09UkVLt6RlhvvO45EMYxxwYABWk1Gr
+         2NIg==
+X-Gm-Message-State: AOJu0YxSMUpt16dw1MW3BR4JY8fFtMZC6T7b55Wdvm7s2YbalsJTC5YT
+	noMYqRA5TQO7ESRIv1iKy22sfXKK2ojarhiGkCOgzO2ARKpHxLsoRe9M
+X-Gm-Gg: AY/fxX44M2fmi+/KQkR01yOh3DU+FJkXnTF4VXSLr/xlO9gJhEdz5ShZhs49CC3h+DP
+	GRaZj5wMkQpyTlw2mP8ET4UIufBL4cc4ma/LLYeTUDAzuxW2Be2/9/eMf7zrnW5eiIk+WH7c4Oy
+	lGrxAwxFZNuqQr5mq3GEeQhuk6/4S2C3/3IHhlU+mmR2cGv/DKbFCfnqoTl1tnEuReOsvr68U14
+	qXTrBsxhLZdSNWDoTe0kxVVnJb42ZIREfKrpeQEu1INVqcjYTpzFQVG5ar5w/6ceIBOD1uM+arz
+	9vw7+GGERGpZ+OmVXXG6UwlbomM7CVIJT4w6C7KduwuoAMEig5Bm6PaR9mWFvnpdKuYc3+Qm/Mi
+	+veW0Mk6tMsJZUYLKu8Szw2l/pfwmzc8Nij4qSEOy04eedcEt3ShgqBtQLuC0GgvrwqRBDUWinE
+	atuTCEOw64
+X-Google-Smtp-Source: AGHT+IHRVJEybvq3AyLDdbIXZOJCVDPxlEoUyjmGZKGMx1FXIn8jyOWGH+ZMCKi8vQaSqiPwzL2bbw==
+X-Received: by 2002:a17:903:1cd:b0:258:f033:3ff9 with SMTP id d9443c01a7336-2a2f2a4f072mr412570065ad.48.1767525583766;
+        Sun, 04 Jan 2026 03:19:43 -0800 (PST)
+Received: from mythos-cloud ([61.82.116.93])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a3560ad15dsm281946715ad.86.2026.01.04.03.19.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Jan 2026 02:57:46 -0800 (PST)
-From: Mahdi Faramarzpour <mahdifrmx@gmail.com>
-To: netdev@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	Mahdi Faramarzpour <mahdifrmx@gmail.com>
-Subject: [PATCH net-next] udp: add drop count for packets in udp_prod_queue
-Date: Sun,  4 Jan 2026 14:27:32 +0330
-Message-Id: <20260104105732.427691-1-mahdifrmx@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Sun, 04 Jan 2026 03:19:43 -0800 (PST)
+From: Yeounsu Moon <yyyynoom@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yeounsu Moon <yyyynoom@gmail.com>
+Subject: [PATCH net-next] net: dlink: replace printk() with netdev_info() in rio_probe1()
+Date: Sun,  4 Jan 2026 20:18:50 +0900
+Message-ID: <20260104111849.10790-2-yyyynoom@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,76 +90,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This commit adds SNMP drop count increment for the packets in
-per NUMA queues which were introduced in commit b650bf0977d3
-("udp: remove busylock and add per NUMA queues").
+Replace rio_probe1() printk(KERN_INFO) messages with netdev_info().
 
-Signed-off-by: Mahdi Faramarzpour <mahdifrmx@gmail.com>
+Log rx_timeout on a separate line since netdev_info() prefixes each
+message and the multi-line formatting looks broken otherwise.
+
+No functional change intended.
+
+Tested-on: D-Link DGE 550T Rev-A3
+Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
 ---
- net/ipv4/udp.c | 32 +++++++++++++++++++++++++++++++-
- 1 file changed, 31 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/dlink/dl2k.c | 17 +++++++----------
+ 1 file changed, 7 insertions(+), 10 deletions(-)
 
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index ffe074cb5..aff8cab57 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -1709,6 +1709,13 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
- 	int dropcount;
- 	int nb = 0;
+diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
+index 846d58c769ea..b2af6399c3e8 100644
+--- a/drivers/net/ethernet/dlink/dl2k.c
++++ b/drivers/net/ethernet/dlink/dl2k.c
+@@ -279,18 +279,15 @@ rio_probe1 (struct pci_dev *pdev, const struct pci_device_id *ent)
  
-+	struct {
-+		int rcvbuf4;
-+		int rcvbuf6;
-+		int mem4;
-+		int mem6;
-+	} err_count = {0, 0, 0, 0};
-+
- 	rmem = atomic_read(&sk->sk_rmem_alloc);
- 	rcvbuf = READ_ONCE(sk->sk_rcvbuf);
- 	size = skb->truesize;
-@@ -1760,6 +1767,17 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
- 		total_size += size;
- 		err = udp_rmem_schedule(sk, size);
- 		if (unlikely(err)) {
-+			if (err == -ENOMEM) {
-+				if (skb->protocol == htons(ETH_P_IP))
-+					err_count.rcvbuf4++;
-+				else
-+					err_count.rcvbuf6++;
-+			} else {
-+				if (skb->protocol == htons(ETH_P_IP))
-+					err_count.mem4++;
-+				else
-+					err_count.mem6++;
-+			}
- 			/*  Free the skbs outside of locked section. */
- 			skb->next = to_drop;
- 			to_drop = skb;
-@@ -1797,10 +1815,22 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
- 			skb = to_drop;
- 			to_drop = skb->next;
- 			skb_mark_not_on_list(skb);
--			/* TODO: update SNMP values. */
- 			sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_PROTO_MEM);
- 		}
- 		numa_drop_add(&udp_sk(sk)->drop_counters, nb);
-+
-+		SNMP_ADD_STATS(__UDPX_MIB(sk, true), UDP_MIB_RCVBUFERRORS,
-+			       err_count.rcvbuf4);
-+		SNMP_ADD_STATS(__UDPX_MIB(sk, true), UDP_MIB_MEMERRORS,
-+			       err_count.mem4);
-+		SNMP_ADD_STATS(__UDPX_MIB(sk, true), UDP_MIB_INERRORS,
-+			       err_count.mem4 + err_count.rcvbuf4);
-+		SNMP_ADD_STATS(__UDPX_MIB(sk, false), UDP_MIB_RCVBUFERRORS,
-+			       err_count.rcvbuf6);
-+		SNMP_ADD_STATS(__UDPX_MIB(sk, false), UDP_MIB_MEMERRORS,
-+			       err_count.mem6);
-+		SNMP_ADD_STATS(__UDPX_MIB(sk, false), UDP_MIB_INERRORS,
-+			       err_count.mem6 + err_count.rcvbuf6);
- 	}
+ 	card_idx++;
  
- 	atomic_sub(total_size, &udp_prod_queue->rmem_alloc);
+-	printk (KERN_INFO "%s: %s, %pM, IRQ %d\n",
+-		dev->name, np->name, dev->dev_addr, irq);
++	netdev_info(dev, "%s, %pM, IRQ %d", np->name, dev->dev_addr, irq);
+ 	if (tx_coalesce > 1)
+-		printk(KERN_INFO "tx_coalesce:\t%d packets\n",
+-				tx_coalesce);
+-	if (np->coalesce)
+-		printk(KERN_INFO
+-		       "rx_coalesce:\t%d packets\n"
+-		       "rx_timeout: \t%d ns\n",
+-				np->rx_coalesce, np->rx_timeout*640);
++		netdev_info(dev, "tx_coalesce:\t%d packets", tx_coalesce);
++	if (np->coalesce) {
++		netdev_info(dev, "rx_coalesce:\t%d packets", np->rx_coalesce);
++		netdev_info(dev, "rx_timeout: \t%d ns", np->rx_timeout * 640);
++	}
+ 	if (np->vlan)
+-		printk(KERN_INFO "vlan(id):\t%d\n", np->vlan);
++		netdev_info(dev, "vlan(id):\t%d", np->vlan);
+ 	return 0;
+ 
+ err_out_unmap_rx:
 -- 
-2.34.1
+2.52.0
 
 
