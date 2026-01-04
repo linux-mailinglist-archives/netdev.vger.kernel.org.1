@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-246793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 871F0CF12FC
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 19:26:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CA7FCF1302
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 19:26:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C271F30056C1
+	by sea.lore.kernel.org (Postfix) with ESMTP id 84F803014BCF
 	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 18:26:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E7392D7DDB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B1982D7DD5;
 	Sun,  4 Jan 2026 18:26:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f+5L9hrr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mCcoV2Ao"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761C72D7DC4;
-	Sun,  4 Jan 2026 18:26:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72F552D7DC0;
+	Sun,  4 Jan 2026 18:26:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767551164; cv=none; b=Qvr8R8kU9/bSzfUMQITjp1W2iiQWhGQ6Dk1Tyu+YgCqnR43/jpcx4Hy2rreruLYrYD8udo776G6u4w9jW4dqxZhkMqm0MUsZqme6FMxfCP6ot0l4AstDtuskQSaOqavA0Q+cuWVBlSw2Oq5mJrtBwFtGIYcrBS3M4db64oGMHrI=
+	t=1767551164; cv=none; b=Ahtwhaz8rOzFJTbzcxB8nwvzG9VZZBJmgDa2M7tlR03E8DfSM5AAbxqtFyztuhLGJZ26KSw/NBCUZRw4oI15+HGl1aoc4rdrqsNgUndNhHmHoXxjPmSzREWjFMN+1RZJFdkhSQWs0clhLbY3gVg+Q8cp8ik3TPm6cHNz9dKLM28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1767551164; c=relaxed/simple;
-	bh=CO2S7t9L6KKi/q5HQ9TVGnJjFJjVGfggW1WPU+Bh+q8=;
+	bh=l49lKSRr9mv/JL0+y7qLuqhr0b4ZKkZ+dtOWdUKfR8w=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Bhm4+T+ZVT0HiX7p4tpBxM9hhW1BUQw9eaqlehvWV4fWWs2OebPUoYodwMBHJyLmmfi9iN9BLImBG5chqbpAx/06Ge4rnBt/xNaa2VjcvfzMArRQl2QnI235KSHJF6/KaNw1h4AuKvnCEm+Tpnnago39pdLeymPKLFBJIXtXozQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f+5L9hrr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0C5EC19421;
-	Sun,  4 Jan 2026 18:26:02 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=kbLko//XK24XZoRJAvEb3G2KSmatDUe2VmwDQ0a8HOaBIbbVRmdhU01SsE8qkJfekeRZ/zmUM+ff0LB4ca0TKrCGa1MwyLvKQNabh3Olj6Ebf6dUZVA5n+aXm9UPdn5+Cci8XhhaRWH9VW8rYZqvUNL3sVfZ9T3xPi6UoEAuhV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mCcoV2Ao; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 171C8C19423;
+	Sun,  4 Jan 2026 18:26:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767551162;
-	bh=CO2S7t9L6KKi/q5HQ9TVGnJjFJjVGfggW1WPU+Bh+q8=;
+	s=k20201202; t=1767551164;
+	bh=l49lKSRr9mv/JL0+y7qLuqhr0b4ZKkZ+dtOWdUKfR8w=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=f+5L9hrrufJQZwG2rxtZp7xVC4dXelU9FarhzyMvI0YYH5AHy2ppLtl39PxgHuRmC
-	 XKqdpQPKQCOqtGxxy4Es73vNf+s5KSnnvDpl8uHH7PjKs2uICElGGFMBz+cLcthAhM
-	 P096DUo6Mzs2l1l0oiiLCTmOPoTdG9nEbs75n9uGrcDaciNeGOw7aXyPHVAojoEVah
-	 gYathni/45kq8pH8kiQRrb/oUMHNR61n531Ieix+nBUPTOej/9hpWCMnGjTV/l8mWH
-	 tZ6dL9iB+PY1J3YnPeurosnd1aeYXUAC1OLARfSgyHPVZ1q+9O9fpENAzDPJkThf4L
-	 iUXuH6F5HShQQ==
+	b=mCcoV2AoQVVUqWBsEkiec/Il5Ms+XTd5g9infLt5GRuFp9ozoNjaR95E8zf/n05eV
+	 1GmtYTT8CWrdS2GPYiGiTyup/RUe4E9+GD6xfOt+dpzCm0D+hOBOMVpbuwjeApCw7j
+	 8g1yDNGf7i5k5tP2gDP/pqMXv0IdeynAVIQSFhSpNHRNn0JlsADmj1I9SpFLCW6tQi
+	 1SNptGPZ4wtafkltv+PoIQZYUcfRGvweGCzqWZdBlCj+s864sCTWnlRVktqrjxyVc7
+	 Gli9VgHQg8uKaLdL4N72ljAuYANWYQQJVOTJ4ZzJotzSU7wzQ8KmTf3K3TIEbkf2Hk
+	 kMR27wBAroxDw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2ABF380AA4F;
-	Sun,  4 Jan 2026 18:22:42 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B728380AA4F;
+	Sun,  4 Jan 2026 18:22:44 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,41 +50,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] net: mscc: ocelot: Fix crash when adding interface
- under a lag
+Subject: Re: [PATCH net v5] net: sock: fix hardened usercopy panic in
+ sock_recv_errqueue
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176755096153.142863.971381899802476876.git-patchwork-notify@kernel.org>
-Date: Sun, 04 Jan 2026 18:22:41 +0000
-References: <tencent_75EF812B305E26B0869C673DD1160866C90A@qq.com>
-In-Reply-To: <tencent_75EF812B305E26B0869C673DD1160866C90A@qq.com>
-To: Jerry Wu <w.7erry@foxmail.com>
-Cc: vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
- alexandre.belloni@bootlin.com, andrew+netdev@lunn.ch,
- christophe.jaillet@wanadoo.fr, claudiu.manoil@nxp.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com
+ <176755096302.142863.3789456679843940692.git-patchwork-notify@kernel.org>
+Date: Sun, 04 Jan 2026 18:22:43 +0000
+References: <20251223203534.1392218-2-bestswngs@gmail.com>
+In-Reply-To: <20251223203534.1392218-2-bestswngs@gmail.com>
+To: Weiming Shi <bestswngs@gmail.com>
+Cc: security@kernel.org, edumazet@google.com, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, xmei5@asu.edu
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 25 Dec 2025 20:36:17 +0000 you wrote:
-> Commit 15faa1f67ab4 ("lan966x: Fix crash when adding interface under a lag")
-> fixed a similar issue in the lan966x driver caused by a NULL pointer dereference.
-> The ocelot_set_aggr_pgids() function in the ocelot driver has similar logic
-> and is susceptible to the same crash.
+On Wed, 24 Dec 2025 04:35:35 +0800 you wrote:
+> From: Weiming Shi <bestswngs@gmail.com>
 > 
-> This issue specifically affects the ocelot_vsc7514.c frontend, which leaves
-> unused ports as NULL pointers. The felix_vsc9959.c frontend is unaffected as
-> it uses the DSA framework which registers all ports.
+> skbuff_fclone_cache was created without defining a usercopy region,
+> [1] unlike skbuff_head_cache which properly whitelists the cb[] field.
+> [2] This causes a usercopy BUG() when CONFIG_HARDENED_USERCOPY is
+> enabled and the kernel attempts to copy sk_buff.cb data to userspace
+> via sock_recv_errqueue() -> put_cmsg().
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v3] net: mscc: ocelot: Fix crash when adding interface under a lag
-    https://git.kernel.org/netdev/net/c/34f3ff52cb9f
+  - [net,v5] net: sock: fix hardened usercopy panic in sock_recv_errqueue
+    https://git.kernel.org/netdev/net/c/2a71a1a8d0ed
 
 You are awesome, thank you!
 -- 
