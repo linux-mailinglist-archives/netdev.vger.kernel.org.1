@@ -1,131 +1,108 @@
-Return-Path: <netdev+bounces-246780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA47FCF126B
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 17:43:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D807ECF1271
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 17:52:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 477EF3004CDA
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 16:43:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 529383006601
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 16:52:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345AB283FD9;
-	Sun,  4 Jan 2026 16:43:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96D351ADC97;
+	Sun,  4 Jan 2026 16:52:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g+hAgoJT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dWwuYig8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F0F235BE2;
-	Sun,  4 Jan 2026 16:43:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DFF845BE3
+	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 16:52:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767545030; cv=none; b=uR/qxmFCsk7ZI4j7j+V5rkv2ptkwSTeJ49bDtGa4xhXg/F/CrUYzUmqbzNbVS51TbepAG5filbu9IKflhX6WTLBA1x4DZip7rZ1Vi4UzUs4SfTTKHVFqDgf1m/b7TxyggX6zkAPrNTXGjF6BJRxuK9VcRKp9kSWZeoIJnbDONzk=
+	t=1767545558; cv=none; b=SVzupTNrReOSAOMcvUY8di4kiO/hGgaDy/FpltEyTXs2JRGuLV+MMs/3bjZS11A4qCgLlCxq/bH0R6eM0gl47egN5EjfV4bQnyAI0wB+rAHe9SMJnIMFyCjI0uOfVQ6PPOmmGXaGwAToeUjJ/m8RDyKQKtPicNC62bcfBLUm58A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767545030; c=relaxed/simple;
-	bh=AqzuhN55ZaaCJw1PTFBjT0AsN7LhAyrG2IsV5tfNyMs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F4KOVxaRSid61ZqqOxHl0ocoMmEpE9EXCTELCGwbsrRU4iIQJVoIfNk+rIJJaX5EMlm2NzrmmsSEosEE6rba0jsjYlQLdvnRuODXh1fqEGuwHtuP9CmF8titb1ANKcrDdl4wwRXO+ApHQhDc2ZzYIGu5w6P4GW7126+GsRUcrzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g+hAgoJT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99239C4CEF7;
-	Sun,  4 Jan 2026 16:43:48 +0000 (UTC)
+	s=arc-20240116; t=1767545558; c=relaxed/simple;
+	bh=FntpX30+4RbjwCFMmWcoAaThVFpVxaRd4r/3iqGlcgQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mWT3XLaBKet99ZKYMcwpnflkRhhvZa0O2Zs5EIWLzZkQ8/5as+zVgDI3bxXuTRC93r++uIOoH7lDeMnjQnc17Vwzi/WmVbGUt8mlkYCvIK5a0Gd50/RBs10jZnBGOEO8ReU2+IcNZ3nCgKi4IKDDIDtddm6mdpZy+joxGwCeO5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dWwuYig8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70A2EC4CEF7;
+	Sun,  4 Jan 2026 16:52:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767545029;
-	bh=AqzuhN55ZaaCJw1PTFBjT0AsN7LhAyrG2IsV5tfNyMs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=g+hAgoJTTM0+4P2t6YJZLYzP1IwH7RrKnfcbordv/AC2HlaEIxIQ6UyMt8052CoeM
-	 P9EDJm92gr9VzrhyfSbvCJ7uPMshyPhrc3mfDsuBs7PmBTePPnDxxR3px7uKty3SCB
-	 PDN+LfBgUWvPm5TL1f61KSBjC4y8pMBWP11cOUIXsqyDbr0QlMWL8IUeE9sLQv0qEV
-	 IpB8c8u+13/NrHJTS7vyUx/qc2kQjP1Gn8rEp2AoRoclXiH5TFeM6vbeV0C+xwOqZr
-	 5DGWn2my+pXoM92hYFbyI4u2HzZthwktXu/xQiX9Rg7eDXHIBr2fE7/UicGwgNdl7c
-	 qR6IJxKnFS18w==
-Date: Sun, 4 Jan 2026 08:43:47 -0800
+	s=k20201202; t=1767545557;
+	bh=FntpX30+4RbjwCFMmWcoAaThVFpVxaRd4r/3iqGlcgQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=dWwuYig8ZPIYDQ1OM66p7V7rCFE3EFGb77CvXtkNVJuT7OvrWWVIY8lM2HDP7umX+
+	 CZCRKxRxCBeCi0wtgqkiiChRUJXgwSEzHPEZO7LgnBrIgKA2t5JOsrqHnUKuOLKCk7
+	 C+JQKUQGlIsNWPqY33oPuCo7a6q6CIiuNM6nkMHg8BW/Bx+q+p7fWCsnbBiEIRDPpz
+	 kZjjP9lA2c1D8whWgeC5zh5dNDp0AW8dXmCwgALfYHxeQn5LJcIC2v1yriyEtjpeoL
+	 NnPi8j4DqJyxne+OxaU0WJjPkPXH99aKfyoFzhtyhh8WAsvmgsoipPdsbAPYGZuvz5
+	 s5tKPjzmYvCHQ==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Leon Hwang <leon.hwang@linux.dev>, netdev@vger.kernel.org, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt
- <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, Mathieu
- Desnoyers <mathieu.desnoyers@efficios.com>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- kerneljasonxing@gmail.com, lance.yang@linux.dev, jiayuan.chen@linux.dev,
- linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, Leon
- Huang Fu <leon.huangfu@shopee.com>, Dragos Tatulea <dtatulea@nvidia.com>,
- kernel-team <kernel-team@cloudflare.com>, Yan Zhai <yan@cloudflare.com>
-Subject: Re: [PATCH net-next v3] page_pool: Add page_pool_release_stalled
- tracepoint
-Message-ID: <20260104084347.5de3a537@kernel.org>
-In-Reply-To: <011ca15e-107b-4679-8203-f5f821f27900@kernel.org>
-References: <20260102071745.291969-1-leon.hwang@linux.dev>
-	<011ca15e-107b-4679-8203-f5f821f27900@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	donald.hunter@gmail.com,
+	hawk@kernel.org
+Subject: [PATCH net] netlink: specs: netdev: clarify the page pool API a little
+Date: Sun,  4 Jan 2026 08:52:32 -0800
+Message-ID: <20260104165232.710460-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Fri, 2 Jan 2026 12:43:46 +0100 Jesper Dangaard Brouer wrote:
-> On 02/01/2026 08.17, Leon Hwang wrote:
-> > Introduce a new tracepoint to track stalled page pool releases,
-> > providing better observability for page pool lifecycle issues.
-> 
-> In general I like/support adding this tracepoint for "debugability" of
-> page pool lifecycle issues.
-> 
-> For "observability" @Kuba added a netlink scheme[1][2] for page_pool[3], 
-> which gives us the ability to get events and list page_pools from userspace.
-> I've not used this myself (yet) so I need input from others if this is 
-> something that others have been using for page pool lifecycle issues?
+The phrasing of the page-pool-get doc is very confusing.
+It's supposed to highlight that support depends on the driver
+doing its part but it sounds like orphaned page pools won't
+be visible.
 
-My input here is the least valuable (since one may expect the person
-who added the code uses it) - but FWIW yes, we do use the PP stats to
-monitor PP lifecycle issues at Meta. That said - we only monitor for
-accumulation of leaked memory from orphaned pages, as the whole reason
-for adding this code was that in practice the page may be sitting in
-a socket rx queue (or defer free queue etc.) IOW a PP which is not
-getting destroyed for a long time is not necessarily a kernel issue.
+The description of the ifindex is completely wrong.
+We move the page pool to loopback and skip the attribute if
+ifindex is loopback.
 
-> Need input from @Kuba/others as the "page-pool-get"[4] state that "Only 
-> Page Pools associated with a net_device can be listed".  Don't we want 
-> the ability to list "invisible" page_pool's to allow debugging issues?
-> 
->   [1] https://docs.kernel.org/userspace-api/netlink/intro-specs.html
->   [2] https://docs.kernel.org/userspace-api/netlink/index.html
->   [3] https://docs.kernel.org/netlink/specs/netdev.html
->   [4] https://docs.kernel.org/netlink/specs/netdev.html#page-pool-get
+Link: https://lore.kernel.org/20260104084347.5de3a537@kernel.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: donald.hunter@gmail.com
+CC: hawk@kernel.org
+---
+ Documentation/netlink/specs/netdev.yaml | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-The documentation should probably be updated :(
-I think what I meant is that most _drivers_ didn't link their PP to the
-netdev via params when the API was added. So if the user doesn't see the
-page pools - the driver is probably not well maintained.
+diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
+index 82bf5cb2617d..596c306ce52b 100644
+--- a/Documentation/netlink/specs/netdev.yaml
++++ b/Documentation/netlink/specs/netdev.yaml
+@@ -142,7 +142,7 @@ doc: >-
+         name: ifindex
+         doc: |
+           ifindex of the netdev to which the pool belongs.
+-          May be reported as 0 if the page pool was allocated for a netdev
++          May not be reported if the page pool was allocated for a netdev
+           which got destroyed already (page pools may outlast their netdevs
+           because they wait for all memory to be returned).
+         type: u32
+@@ -601,7 +601,9 @@ doc: >-
+       name: page-pool-get
+       doc: |
+         Get / dump information about Page Pools.
+-        (Only Page Pools associated with a net_device can be listed.)
++        Only Page Pools associated by the driver with a net_device
++        can be listed. ifindex will not be reported if the net_device
++        no longer exists.
+       attribute-set: page-pool
+       do:
+         request:
+-- 
+2.52.0
 
-In practice only page pools which are not accessible / visible via the
-API are page pools from already destroyed network namespaces (assuming
-their netdevs were also destroyed and not re-parented to init_net).
-Which I'd think is a rare case?
-
-> Looking at the code, I see that NETDEV_CMD_PAGE_POOL_CHANGE_NTF netlink
-> notification is only generated once (in page_pool_destroy) and not when
-> we retry in page_pool_release_retry (like this patch).  In that sense,
-> this patch/tracepoint is catching something more than netlink provides.
-> First I though we could add a netlink notification, but I can imagine
-> cases this could generate too many netlink messages e.g. a netdev with
-> 128 RX queues generating these every second for every RX queue.
-
-FWIW yes, we can add more notifications. Tho, as I mentioned at the
-start of my reply - the expectation is that page pools waiting for
-a long time to be destroyed is something that _will_ happen in
-production.
-
-> Guess, I've talked myself into liking this change, what do other
-> maintainers think?  (e.g. netlink scheme and debugging balance)
-
-We added the Netlink API to mute the pr_warn() in all practical cases.
-If Xiang Mei is seeing the pr_warn() I think we should start by asking
-what kernel and driver they are using, and what the usage pattern is :(
-As I mentioned most commonly the pr_warn() will trigger because driver
-doesn't link the pp to a netdev.
 
