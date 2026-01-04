@@ -1,72 +1,105 @@
-Return-Path: <netdev+bounces-246812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33E73CF1421
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 20:19:16 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C4A3CF146E
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 21:17:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C43663001184
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 19:19:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 71F4D3003FA9
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 20:17:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F24362798F3;
-	Sun,  4 Jan 2026 19:19:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 032C223EAAB;
+	Sun,  4 Jan 2026 20:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sbz24gjy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IF0DWggP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE7374C92
-	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 19:19:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD17E1E3DED;
+	Sun,  4 Jan 2026 20:17:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767554353; cv=none; b=qhjH3CmmnN/SncvpH+0QXKtQmI18BdtS/DqZM5wpga0MfuCBs9tMywBeUbajEBk/M70bvx/eB7UFCrqGvAEsUJHmot1mnZRljIP01kmxf0KbrtCrcW1597RUE2yCkEcghGgwBTxkUKwGKNtCEJGDC5IXnG6JDXIpPh15Fu9mKXk=
+	t=1767557830; cv=none; b=itPrsY2gahS0ZbdGFngHUnrwa3ahz+cDYWMN5t2sI+It5ejVXA2X/og2bw2bckzF9VjUZNh6gnqtWFOtY/BwyB0Ymr4MdrJ00Vatv0OL1jw/ZcOJAzC40md+Qu7qsz+MKTPli2J5g4TcTifYa+K6VAT7pNodfspaBMA+qkKZni8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767554353; c=relaxed/simple;
-	bh=HdmQKswoZx8azX9NuRqWZS3ubjazjBKaK9jb8oq3ATE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bF69f0S2rYqeXqnrKFrzp1QKg8YjSFYCXQwq9a/cOWkUOnj8np5vLG69qoZWcGD02tNNkBl4je7bPEKiyiiJWAaUF+JBIvJb2mlDMdthEpgYCxzwL2bq6RJ66aJ2qbkeM4YfF5BrEDiUD/DDXX8IQIQi2YOwSZUq5KTBG9CzTNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sbz24gjy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E24BC4CEF7;
-	Sun,  4 Jan 2026 19:19:13 +0000 (UTC)
+	s=arc-20240116; t=1767557830; c=relaxed/simple;
+	bh=MbcUpwDFt9twtpPtCl2E6jvD3/Jkl6ammYkMQpIgrQU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=WeYYweaG46J+BFseoZcL8s/SEtSF+u7xRSvJ48LHcUcQTo2yP1yvQ0/DCkDvUF6xZUAhjicSBGJ0OtIiOIfahNAx/WjOCzcmDoVXLKlbj9Y4bM7WYTtxm/WFoGkckFXIORz6g8UEbwtQweB/v2HweB8JeMSXc+skvA4IjU5ttmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IF0DWggP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B6BCC4CEF7;
+	Sun,  4 Jan 2026 20:17:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767554353;
-	bh=HdmQKswoZx8azX9NuRqWZS3ubjazjBKaK9jb8oq3ATE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sbz24gjyPYJd6vZbP8fp2xewgM2Hb7taxO0OdGMsjk9e0UioyycsTu3vUlwi6K6jF
-	 +7Df6G3YJ1mASJ3AxIpGGw8qFbgzQrK4+sWfU47Tf42XsWua/FuyEnl6E9T6A2GSCq
-	 DEBdeYuJZjHVVIRRqKfPOHcFaPLjtTKAc/0mFol/Bgtnm0EoRwQuw+WTvw7nxs5j3j
-	 PgA571POhldUAmqk9V6UMZAzvdrRCVWjSQFNWl7tA8aILaM3qo4+ikxnjh75o1KnDY
-	 DjwNnNcxSIyM/ClaMPazZ7xHvRSFElsET1dZlb0mjcYCIqoZMh5xyOAj4fYCZlgHJf
-	 qH6FraqJgwXzg==
-Date: Sun, 4 Jan 2026 11:19:12 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org, William
- Liu <will@willsroot.io>, Savino Dicanosa <savy@syst3mfailure.io>
-Subject: Re: [Patch net v6 4/8] net_sched: Implement the right netem
- duplication behavior
-Message-ID: <20260104111912.66940630@kernel.org>
-In-Reply-To: <20251230092850.43251a09@phoenix.local>
-References: <20251227194135.1111972-1-xiyou.wangcong@gmail.com>
-	<20251227194135.1111972-5-xiyou.wangcong@gmail.com>
-	<20251230092850.43251a09@phoenix.local>
+	s=k20201202; t=1767557830;
+	bh=MbcUpwDFt9twtpPtCl2E6jvD3/Jkl6ammYkMQpIgrQU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=IF0DWggP8w6TB/caRLMcb9h/jpwQLVq3Bokz+L1lFzAH8czbUzaQgXAT6AC2tf/tO
+	 gF3NadBQ75aZ3JD1/grpOTmZkesuRaeFY02aEVVKMMjFNGgq68b22UPC4r230VRiRh
+	 Ecq0jnv64WN0UfhKRPu2W0eF9kvXAWGNaDFiKy/qiNf6dB4aEz0O+rP7xFMhHnOkWk
+	 UrDFNj4MXKWVoTgCYMiv5YR9t7fK/NudPUkmgDC/tm5trsWTbRgwNS+B7CfDiG5jBI
+	 vE0e6rRsBtwBBBy1Z0f91TborMFGkZUEoPxUmqXQ8UijoTmp3/1xGJYsTefOR92J8j
+	 QPXu6bT9ZeIUw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 78906380AA58;
+	Sun,  4 Jan 2026 20:13:50 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/6] netfilter: nft_set_pipapo: fix range overlap
+ detection
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176755762931.155813.1576847923477813062.git-patchwork-notify@kernel.org>
+Date: Sun, 04 Jan 2026 20:13:49 +0000
+References: <20260102114128.7007-2-fw@strlen.de>
+In-Reply-To: <20260102114128.7007-2-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
+ pablo@netfilter.org
 
-On Tue, 30 Dec 2025 09:28:50 -0800 Stephen Hemminger wrote:
-> It is worth testing for the case where netem is used as a leaf qdisc.
-> I worry that this could cause the parent qdisc to get accounting wrong.
-> I.e if HTB calls netem and netem queues 2 packets, the qlen in HTB
-> would be incorrect.
+Hello:
 
-Indeed, presumably backlog should be corrected with
-qdisc_tree_reduce_backlog() ? Either way it'd be great to add / adjust 
-some test cases to confirm backlogs are 0 after the traffic stopped.
+This series was applied to netdev/net.git (main)
+by Florian Westphal <fw@strlen.de>:
+
+On Fri,  2 Jan 2026 12:41:23 +0100 you wrote:
+> set->klen has to be used, not sizeof().  The latter only compares a
+> single register but a full check of the entire key is needed.
+> 
+> Example:
+> table ip t {
+>         map s {
+>                 typeof iifname . ip saddr : verdict
+>                 flags interval
+>         }
+> }
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/6] netfilter: nft_set_pipapo: fix range overlap detection
+    https://git.kernel.org/netdev/net/c/7711f4bb4b36
+  - [net,2/6] selftests: netfilter: nft_concat_range.sh: add check for overlap detection bug
+    https://git.kernel.org/netdev/net/c/a675d1caa204
+  - [net,3/6] netfilter: nft_synproxy: avoid possible data-race on update operation
+    https://git.kernel.org/netdev/net/c/36a320057564
+  - [net,4/6] netfilter: replace -EEXIST with -EBUSY
+    https://git.kernel.org/netdev/net/c/2bafeb8d2f38
+  - [net,5/6] netfilter: nf_tables: fix memory leak in nf_tables_newrule()
+    https://git.kernel.org/netdev/net/c/d077e8119ddb
+  - [net,6/6] netfilter: nf_conncount: update last_gc only when GC has been performed
+    https://git.kernel.org/netdev/net/c/7811ba452402
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
