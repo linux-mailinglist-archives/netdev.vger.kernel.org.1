@@ -1,47 +1,48 @@
-Return-Path: <netdev+bounces-246703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE290CF087E
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 03:25:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88C0CCF0884
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 03:26:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2A2DA3027DAE
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 02:24:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6B915303A02E
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 02:24:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9459326158B;
-	Sun,  4 Jan 2026 02:24:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BE43256C88;
+	Sun,  4 Jan 2026 02:24:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fND0paGH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="skw6/NKv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65D2D25F984;
-	Sun,  4 Jan 2026 02:24:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4BCC254841;
+	Sun,  4 Jan 2026 02:24:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767493481; cv=none; b=DxumybTvFjmuIO1XC6DtSble4P5fT8BTEBtwgXX2ldDDyOL9qqNGQ7qQkXL74jv755VdVhKQiFNU3oGVsj1u25m5QEhICaKw9NxEVnsc4V/W6IRVnzrLazcrnyMik0mAGu2ESd/U3P/48A9MrRZUVobqHnYDnuz3Lr+vSdQAqks=
+	t=1767493483; cv=none; b=fwyckJQvYZXthscQnJZpWhfqTfhyNEEXmjGNShnt56N/mVrB4PUj4j4pvpP6Mt8SMUHYqEEyeOcDS6h+wzn3nwAF3j1T7lftw1p9VulgPGoxCB67sFCXJ5b4KngwbuJbUCuIFhSfJXBQw6+1WCW8/+/wr8xlO5z6vIvuWmDNk6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767493481; c=relaxed/simple;
-	bh=gsy0D8kyDYWakr3jYAc2tAVK8UL7Tar8rcqHT/k5YKc=;
+	s=arc-20240116; t=1767493483; c=relaxed/simple;
+	bh=9LMut1A4CV78HzKmGgD+dcyT7kO9KFAuY0P2Ze1hrOY=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=kAT5zsCvgm1kyMfR4umjVJROKwBY8r9O20ezFUSd/ZvzmzplHkILMtyGQ7WrQpqWwLUVYsa3OwDfhw1WzO7tnaAO1NXxQ5aQQEedBzDcTHFS58+LmG/xXIR5fk9DHM559va+niaVCz7X+s2YoNQWy/1gSSNRunYtrKn66+nqWak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fND0paGH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C93A8C19423;
-	Sun,  4 Jan 2026 02:24:38 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=kjwJbXFPMgkZFLEeoATYP/Bi5ihSCeMsO0hVu6gRReuLCcbhpKyWsWfvr8XRnbd9QUtpCrokosYyT5rgNwaBBIf6e5vg1Q5uMDKbKuQaKAcboeXTn2I9m/JBKME5jNt1Syj6GFHgPagRv+hg8adBMcQUzbsWxdiVOLivE/58PNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=skw6/NKv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4549FC19425;
+	Sun,  4 Jan 2026 02:24:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767493481;
-	bh=gsy0D8kyDYWakr3jYAc2tAVK8UL7Tar8rcqHT/k5YKc=;
+	s=k20201202; t=1767493483;
+	bh=9LMut1A4CV78HzKmGgD+dcyT7kO9KFAuY0P2Ze1hrOY=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=fND0paGHo9Yei4E9mSCjdZcHdeaI8VwKB5Sijbb+Wkb/zfffRQ4y5V5CU9Tcj9OQX
-	 vnMnzeiqb7Mm5w+Qlrav9Hz9Azo5dFVhjI0y4ZuhDiMi6SXH21xWaYw162//5ltdVa
-	 pXlqW6dhuSG6dXT2pGetfXtTVh03jkUKW+soMMT9srqf9usIoqwGiuLKzLmgQ52ojl
-	 jmN7A5Otk6XaLfXhUhtT1ZA3sCeON11+vKBXHOfCW/AJCxGIE6dH6ykIISG0Pz8imR
-	 KzOsx1fCk2DSI+No7L0WxIJqwfUGmc7MEklmWFEN77skD22PGKlw4qR07tgdaHXBEj
-	 e1PesxTqB3N5A==
+	b=skw6/NKvs5XCYzyHQ44ag5bbtP4lrXzaBplc9vq94cC/ooxq6tYSTKiq8p0ofGjkP
+	 X1oAY8/i1oeT6tneHW6gKhihMqWew93XDYx0IgOtjpMYbvbjeJXnzpIWgXsCtMaq2n
+	 IL/ZM8ojjjQPnRXMCllGqguotHQrYVT1SC6LcagkFGWd1/JsOJv7Qp9hK9L7sUMm3i
+	 FE/fUQSLQUv2eyrP19i7yJfP7+SfinM8tEcICl9U+cUO0HYsYNfQsrrNuP+ejUxf27
+	 sJ7Ppixt4Dn9QsRzti2odizBpkTGkfXA50NvSz/mjBgLGVAxcBK79RiN9yfaLMogIz
+	 pDK2woQGxvOZA==
 From: Tamir Duberstein <tamird@kernel.org>
-Date: Sat, 03 Jan 2026 21:24:27 -0500
-Subject: [PATCH v2 1/2] rust: net: replace `kernel::c_str!` with C-Strings
+Date: Sat, 03 Jan 2026 21:24:28 -0500
+Subject: [PATCH v2 2/2] drivers: net: replace `kernel::c_str!` with
+ C-Strings
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,7 +51,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260103-cstr-net-v2-1-8688f504b85d@gmail.com>
+Message-Id: <20260103-cstr-net-v2-2-8688f504b85d@gmail.com>
 References: <20260103-cstr-net-v2-0-8688f504b85d@gmail.com>
 In-Reply-To: <20260103-cstr-net-v2-0-8688f504b85d@gmail.com>
 To: FUJITA Tomonori <fujita.tomonori@gmail.com>, 
@@ -68,13 +69,13 @@ Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
  Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
  Daniel Almeida <daniel.almeida@collabora.com>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openssh-sha256; t=1767493475; l=1830;
+X-Developer-Signature: v=1; a=openssh-sha256; t=1767493476; l=3501;
  i=tamird@gmail.com; h=from:subject:message-id;
- bh=m1Ef+5RLILS8khynua89ge37a6Fboijupoulr4slPF0=;
+ bh=a9Gc0dWFCmJUkl74ABPiLC6aJsSL7lpKNR3BSBUb4Bk=;
  b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgtYz36g7iDMSkY5K7Ab51ksGX7hJgs
  MRt+XVZTrIzMVIAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
- QFyUe2hm/ILt6BBdSFF4ctMYHW3ZibaaZc6dp3MO1Pxe1NYS09RvIKDumFTtQCkin+lQze69Ytz
- SrAp+98zLYAA=
+ QPT+d5g4FStm4p/FRSP7o1J0CiffTw7Jt+D/tVf8lgXSCyPCmG0/ymd+ovWFomTlrXM63w/FPy/
+ 3PNM5/7dG7Ao=
 X-Developer-Key: i=tamird@gmail.com; a=openssh;
  fpr=SHA256:264rPmnnrb+ERkS7DDS3tuwqcJss/zevJRzoylqMsbc
 
@@ -90,47 +91,79 @@ Reviewed-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
 Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>
 Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 ---
- rust/kernel/net/phy.rs | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ drivers/net/phy/ax88796b_rust.rs | 7 +++----
+ drivers/net/phy/qt2025.rs        | 5 ++---
+ 2 files changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
-index bf6272d87a7b..3ca99db5cccf 100644
---- a/rust/kernel/net/phy.rs
-+++ b/rust/kernel/net/phy.rs
-@@ -777,7 +777,6 @@ const fn as_int(&self) -> u32 {
- ///
- /// ```
- /// # mod module_phy_driver_sample {
--/// use kernel::c_str;
- /// use kernel::net::phy::{self, DeviceId};
- /// use kernel::prelude::*;
- ///
-@@ -796,7 +795,7 @@ const fn as_int(&self) -> u32 {
- ///
- /// #[vtable]
- /// impl phy::Driver for PhySample {
--///     const NAME: &'static CStr = c_str!("PhySample");
-+///     const NAME: &'static CStr = c"PhySample";
- ///     const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x00000001);
- /// }
- /// # }
-@@ -805,7 +804,6 @@ const fn as_int(&self) -> u32 {
- /// This expands to the following code:
- ///
- /// ```ignore
--/// use kernel::c_str;
- /// use kernel::net::phy::{self, DeviceId};
- /// use kernel::prelude::*;
- ///
-@@ -825,7 +823,7 @@ const fn as_int(&self) -> u32 {
- ///
- /// #[vtable]
- /// impl phy::Driver for PhySample {
--///     const NAME: &'static CStr = c_str!("PhySample");
-+///     const NAME: &'static CStr = c"PhySample";
- ///     const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x00000001);
- /// }
- ///
+diff --git a/drivers/net/phy/ax88796b_rust.rs b/drivers/net/phy/ax88796b_rust.rs
+index bc73ebccc2aa..2d24628a4e58 100644
+--- a/drivers/net/phy/ax88796b_rust.rs
++++ b/drivers/net/phy/ax88796b_rust.rs
+@@ -5,7 +5,6 @@
+ //!
+ //! C version of this driver: [`drivers/net/phy/ax88796b.c`](./ax88796b.c)
+ use kernel::{
+-    c_str,
+     net::phy::{self, reg::C22, DeviceId, Driver},
+     prelude::*,
+     uapi,
+@@ -41,7 +40,7 @@ fn asix_soft_reset(dev: &mut phy::Device) -> Result {
+ #[vtable]
+ impl Driver for PhyAX88772A {
+     const FLAGS: u32 = phy::flags::IS_INTERNAL;
+-    const NAME: &'static CStr = c_str!("Asix Electronics AX88772A");
++    const NAME: &'static CStr = c"Asix Electronics AX88772A";
+     const PHY_DEVICE_ID: DeviceId = DeviceId::new_with_exact_mask(0x003b1861);
+ 
+     // AX88772A is not working properly with some old switches (NETGEAR EN 108TP):
+@@ -105,7 +104,7 @@ fn link_change_notify(dev: &mut phy::Device) {
+ #[vtable]
+ impl Driver for PhyAX88772C {
+     const FLAGS: u32 = phy::flags::IS_INTERNAL;
+-    const NAME: &'static CStr = c_str!("Asix Electronics AX88772C");
++    const NAME: &'static CStr = c"Asix Electronics AX88772C";
+     const PHY_DEVICE_ID: DeviceId = DeviceId::new_with_exact_mask(0x003b1881);
+ 
+     fn suspend(dev: &mut phy::Device) -> Result {
+@@ -125,7 +124,7 @@ fn soft_reset(dev: &mut phy::Device) -> Result {
+ 
+ #[vtable]
+ impl Driver for PhyAX88796B {
+-    const NAME: &'static CStr = c_str!("Asix Electronics AX88796B");
++    const NAME: &'static CStr = c"Asix Electronics AX88796B";
+     const PHY_DEVICE_ID: DeviceId = DeviceId::new_with_model_mask(0x003b1841);
+ 
+     fn soft_reset(dev: &mut phy::Device) -> Result {
+diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
+index aaaead6512a0..470d89a0ac00 100644
+--- a/drivers/net/phy/qt2025.rs
++++ b/drivers/net/phy/qt2025.rs
+@@ -9,7 +9,6 @@
+ //!
+ //! The QT2025 PHY integrates an Intel 8051 micro-controller.
+ 
+-use kernel::c_str;
+ use kernel::error::code;
+ use kernel::firmware::Firmware;
+ use kernel::io::poll::read_poll_timeout;
+@@ -38,7 +37,7 @@
+ 
+ #[vtable]
+ impl Driver for PhyQT2025 {
+-    const NAME: &'static CStr = c_str!("QT2025 10Gpbs SFP+");
++    const NAME: &'static CStr = c"QT2025 10Gpbs SFP+";
+     const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x0043a400);
+ 
+     fn probe(dev: &mut phy::Device) -> Result<()> {
+@@ -71,7 +70,7 @@ fn probe(dev: &mut phy::Device) -> Result<()> {
+         // The micro-controller will start running from the boot ROM.
+         dev.write(C45::new(Mmd::PCS, 0xe854), 0x00c0)?;
+ 
+-        let fw = Firmware::request(c_str!("qt2025-2.0.3.3.fw"), dev.as_ref())?;
++        let fw = Firmware::request(c"qt2025-2.0.3.3.fw", dev.as_ref())?;
+         if fw.data().len() > SZ_16K + SZ_8K {
+             return Err(code::EFBIG);
+         }
 
 -- 
 2.52.0
