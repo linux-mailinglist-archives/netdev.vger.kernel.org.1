@@ -1,100 +1,76 @@
-Return-Path: <netdev+bounces-246708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7D14CF093B
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 04:23:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15E6FCF0953
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 04:24:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1E73F300103F
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 03:23:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 56710300F8BC
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 03:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BC142C236B;
-	Sun,  4 Jan 2026 03:23:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B0C2C324E;
+	Sun,  4 Jan 2026 03:24:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="II558UB0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fUBqoj4O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB9A155322
-	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 03:23:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B84F25C80E
+	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 03:24:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767497013; cv=none; b=KE9tRV2+5gy3/Lh01vGL1KmD4y3GYavmQ/gw39N2B1FsqaF/+xAjcrEU4KV0+vxc9iuNdWFZlPSGo/RZiVOH3knkslTMo6lwqh/gPUg1Td3MyyM1fop1wP95OpymYQNhHcU/sOSSZ9M6VGqyw8d1S35q8NAk4GXseC1LosHrpd8=
+	t=1767497057; cv=none; b=uMOdlt84pMPEHPPHv+DmMi8ZOqcmQA/GC5dazbBpqSKEuLtsefpRnLqgr+Dd3KoKcVTSHnXr2w9jX4zJWfHyMGL0ZAo3vQ7SSgsHjqFG0J2jDa0drephLXWEpttbHYgNq6gRMMK0dZlzIhLECDz0km3MxRhYr9sA4JL1FHcr+Ws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767497013; c=relaxed/simple;
-	bh=lyGKCVJk2AeM6cWwhwyQD+q5hQSy62Ji6FiDbPmZkmc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=s4wHVBirhi3xSaEAUqtgW7sY6F5CxVOz4BMtxAiGU67UAvTbDK6hIxpNhqxRhkWt4TA0Fl80JIdD1n5JTnNU2rzVOlgTk/o+QZglzxM3s9oMPuiwSZ/rlXGIdtwfFgFIa+ey9hjp4PZXgQiz6gx9PuTm4AtxKfX9tsDlhGLK77M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=II558UB0; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2a081c163b0so118436235ad.0
-        for <netdev@vger.kernel.org>; Sat, 03 Jan 2026 19:23:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767497010; x=1768101810; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+HgGBF7fBlltY4WM79dB2+M0cxk9isi6GPT+VdOp9bY=;
-        b=II558UB091u/r4hjUXEol3I3sYZdVZ7+aoFzve0Rqity5HIae9owwqYo/qfX3nRPap
-         6EPg/9WiEsWmX0sBvQDaEv0nUkCYSWeDYw8QUcvmMjawRrer4kPa+83cegCTR+bRPxWn
-         hqkhRztIyHkqpE5hfBw/X6RUAunCXvOymHZWIrb0BqzoNBPN3BcQjPsU4tgfNxMgFPM2
-         ymgYeCLLM7Z6t7BjHISRgaPNobP9/QJYg4XZitbrRUC6Qo7fyT5D7OFdKs7DZUNawF2i
-         +OdRaR6rtxBP4eyB7um0v4TB+39BjqHs2HT6cZBkJ4TSxrcHTSALQ7u9StmDrsXXL6+y
-         T/MA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767497010; x=1768101810;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=+HgGBF7fBlltY4WM79dB2+M0cxk9isi6GPT+VdOp9bY=;
-        b=IQdeppTLvfPjoDrUji8GACOyhm/NdQizD9eDQ4npECdDOD4OwLVfB0ZRFBdMRZkmwb
-         cHQd8EgfEtcJIbifjs1HRK5RIyLflPJ7QtgYYFYVLoL5SOSqx1fVAzNluSe1DBS/e4jw
-         4Uf6QJpGiSfljCQDv2ZcXGE2jPhXQG5R5E2RNnrGlExWIxBgIIv0IaLDBnGOa1OkVmm7
-         fVO/rnEVV7gyIYiBznh/NUEeBPqqScfwlSYiCAHjd14jRdvjEf5EWpu0sLq9jQDNP9Jo
-         wz/zGYGeA06bNJq0mczqPvv9GP9VJHOZ7Rzo3YHcFS3JzX4EADFY4A2MtwP4sQagYd9O
-         OcQA==
-X-Forwarded-Encrypted: i=1; AJvYcCUGz4iGIq/l31m0DCUos4ZZdSHdpwXG2mUfrCAbWrooeWu+4j/NQq5KF+EY5DI0z/KMx9+Gnpg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfFd7Y5u//I45anuQfUXwONdkuPyl7AVQoPqS8rh/tzv7gJphi
-	bY7I7hsfv1JXEj/3o8/kkwlVvoB6rG0bQmJktKEzISSK9ilS4dXgLk2J
-X-Gm-Gg: AY/fxX5Jm5g+XvYP1yFbyfMTbgaXiHinTutCbo0ZwaWnZELf2Zn8zNSYvJRToVSSyRw
-	qsmDN+8maMvbpCJDHzxwT7cBEE00k0xuYZG8GhX/Vz5YJ70AAKvw8QQ4Dk5jICS4q/XWM/YOJTH
-	gw1QC3mKyKVRrqzUvJ+Qb+7FvpscAVeZFZBLyIxxxQ8Ky778VmJig57QZWDO9tetfeorkYmprfi
-	idAD3CkEjjtXoGZ/sXdP69fIvqIVr13JftenLNzjn6b00SZv0B2n290qwECToXdPAi4fPBesORA
-	4u9RH5NyuSrKZwXyQ2SYkbWrWt+blpeCEOq99E61CmG0mbblzVmXaL6KmxOEEW4rSCNsfv9pjEb
-	9gHqb9evUHZkR4H83F74UE0+Voo//jvMMzZGgj14uY4ixIV6IGUbaRD870bPzDrmydpQ0EgTJZL
-	IVESuppAhz+FaCkG5s0FDZX2XiYcSWIvbDB294TAUpTlMmvacKVkVlkOliiQ==
-X-Google-Smtp-Source: AGHT+IGSJ2uKgZgu5gd/PplAZJq2ns2/6tWVr+J3zelIKWv/u1C1FeR1WVVn1E42fD8CEocGVDHx6g==
-X-Received: by 2002:a17:903:2a8b:b0:2a1:3cd8:d2dc with SMTP id d9443c01a7336-2a2f2b53f26mr508836445ad.57.1767497010426;
-        Sat, 03 Jan 2026 19:23:30 -0800 (PST)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.21])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a2f3d6d557sm405852335ad.84.2026.01.03.19.23.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 03 Jan 2026 19:23:30 -0800 (PST)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
+	s=arc-20240116; t=1767497057; c=relaxed/simple;
+	bh=/lEI3/+J/BPnZOVKSfEgPgwaAZ3096zvgLIqg+pqJh8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JCtgGuhSmw9qWHXoQIvMGLTw0hlq54WIQNqkXtLw63DQsWEu6KQyeck0wtqxKTbPLlevfkE+GEc+Vg7Oemn0nZSeP2DQJ9atoVmc2gvgs9hbrZJzjczF4xqIvE7L5NQMyt1PQtlZcUNF1QXjfZ/wvtRZ84Qv2IpYE/rJ3vl0Vhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fUBqoj4O; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767497054;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ii8w9Sk0VGXA6EfYewOe7fg/XK65AlKb5PXLcHLgJRs=;
+	b=fUBqoj4OL6vGjlL6jPhmHkGBQoHYnBIkM8bNfGYx8f9HbUmeLbtOr4QICPxPpyzYAS0MZq
+	JDC+tPCy0OOLfTKpbOuTj04FHpm49PSGDo0bB+c6S3cF5jmvYqrrTDLz6pW2ndtwJOq9SQ
+	WWezm22+UgsS4ne+W1WEzeAqb198o28=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-168-xbALdIZ0PR-HKjuLWFJAQg-1; Sat,
+ 03 Jan 2026 22:24:11 -0500
+X-MC-Unique: xbALdIZ0PR-HKjuLWFJAQg-1
+X-Mimecast-MFC-AGG-ID: xbALdIZ0PR-HKjuLWFJAQg_1767497049
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D621C18002ED;
+	Sun,  4 Jan 2026 03:24:08 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.72.116.49])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2BF2A19560AB;
+	Sun,  4 Jan 2026 03:24:00 +0000 (UTC)
+From: Yumei Huang <yuhuang@redhat.com>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Cc: sbrivio@redhat.com,
+	david@gibson.dropbear.id.au,
+	yuhuang@redhat.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	bjorn@kernel.org,
-	magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com,
-	jonathan.lemon@gmail.com,
-	sdf@fomichev.me,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH bpf-next v3 2/2] xsk: introduce a dedicated local completion queue for each xsk
-Date: Sun,  4 Jan 2026 11:23:13 +0800
-Message-Id: <20260104032313.76121-3-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20260104032313.76121-1-kerneljasonxing@gmail.com>
-References: <20260104032313.76121-1-kerneljasonxing@gmail.com>
+	horms@kernel.org,
+	justin.iurman@uliege.be,
+	shuah@kernel.org
+Subject: [PATCH net-next v2] ipv6: preserve insertion order for same-scope addresses
+Date: Sun,  4 Jan 2026 11:23:57 +0800
+Message-ID: <20260104032357.38555-1-yuhuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,360 +78,111 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-From: Jason Xing <kernelxing@tencent.com>
+IPv6 addresses with the same scope are returned in reverse insertion
+order, unlike IPv4. For example, when adding a -> b -> c, the list is
+reported as c -> b -> a, while IPv4 preserves the original order.
 
-Before the commit 30f241fcf52a ("xsk: Fix immature cq descriptor
-production"), there is one issue[1] which causes the wrong publish
-of descriptors in race condidtion. The above commit fixes the issue
-but adds more memory operations in the xmit hot path and interrupt
-context, which can cause side effect in performance.
+This behavior causes:
 
-Based on the existing infrastructure, this patch tries to propose
-a new solution to fix the problem by using a pre-allocated memory
-that is local completion queue to avoid frequently performing memory
-functions. The benefit comes from replacing xsk_tx_generic_cache with
-local cq.
+a. When using `ip -6 a save` and `ip -6 a restore`, addresses are restored
+   in the opposite order from which they were saved. See example below
+   showing addresses added as 1::1, 1::2, 1::3 but displayed and saved
+   in reverse order.
 
-The core logics are as show below:
-1. allocate a new local completion queue when setting the real queue.
-2. write the descriptors into the local cq in the xmit path. And
-   record the prod as @start_pos that reflects the start position of
-   skb in this queue so that later the skb can easily write the desc
-   addr(s) from local cq to cq addrs in the destruction phase.
-3. initialize the upper 24 bits of destructor_arg to store @start_pos
-   in xsk_skb_init_misc().
-4. Initialize the lower 8 bits of destructor_arg to store how many
-   descriptors the skb owns in xsk_inc_num_desc().
-5. write the desc addr(s) from the @start_addr from the local cq
-   one by one into the real cq in xsk_destruct_skb(). In turn sync
-   the global state of the cq as before.
+   # ip -6 a a 1::1 dev x
+   # ip -6 a a 1::2 dev x
+   # ip -6 a a 1::3 dev x
+   # ip -6 a s dev x
+   2: x: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN group default qlen 1000
+       inet6 1::3/128 scope global tentative
+       valid_lft forever preferred_lft forever
+       inet6 1::2/128 scope global tentative
+       valid_lft forever preferred_lft forever
+       inet6 1::1/128 scope global tentative
+       valid_lft forever preferred_lft forever
+   # ip -6 a save > dump
+   # ip -6 a d 1::1 dev x
+   # ip -6 a d 1::2 dev x
+   # ip -6 a d 1::3 dev x
+   # ip a d ::1 dev lo
+   # ip a restore < dump
+   # ip -6 a s dev x
+   2: x: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN group default qlen 1000
+       inet6 1::1/128 scope global tentative
+       valid_lft forever preferred_lft forever
+       inet6 1::2/128 scope global tentative
+       valid_lft forever preferred_lft forever
+       inet6 1::3/128 scope global tentative
+       valid_lft forever preferred_lft forever
+   # ip a showdump < dump
+    if1:
+        inet6 ::1/128 scope host proto kernel_lo
+        valid_lft forever preferred_lft forever
+    if2:
+        inet6 1::3/128 scope global tentative
+        valid_lft forever preferred_lft forever
+    if2:
+        inet6 1::2/128 scope global tentative
+        valid_lft forever preferred_lft forever
+    if2:
+        inet6 1::1/128 scope global tentative
+        valid_lft forever preferred_lft forever
 
-The format of destructor_arg is designed as:
- ------------------------ --------
-|       start_pos        |  num   |
- ------------------------ --------
-Using upper 24 bits is enough to keep the temporary descriptors. And
-it's also enough to use lower 8 bits to show the number of descriptors
-that one skb owns.
+b. Addresses in pasta to appear in reversed order compared to host
+   addresses.
 
-[1]: https://lore.kernel.org/all/20250530095957.43248-1-e.kubanski@partner.samsung.com/
+The ipv6 addresses were added in reverse order by commit e55ffac60117
+("[IPV6]: order addresses by scope"), then it was changed by commit
+502a2ffd7376 ("ipv6: convert idev_list to list macros"), and restored by
+commit b54c9b98bbfb ("ipv6: Preserve pervious behavior in
+ipv6_link_dev_addr()."). However, this reverse ordering within the same
+scope causes inconsistency with IPv4 and the issues described above.
 
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
+This patch aligns IPv6 address ordering with IPv4 for consistency
+by changing the comparison from >= to > when inserting addresses
+into the address list. Also updates the ioam6 selftest to reflect
+the new address ordering behavior. Combine these two changes into
+one patch for bisectability.
+
+Fixes: e55ffac60117 ("[IPV6]: order addresses by scope")
+Link: https://bugs.passt.top/show_bug.cgi?id=175
+Suggested-by: Stefano Brivio <sbrivio@redhat.com>
+Signed-off-by: Yumei Huang <yuhuang@redhat.com>
 ---
- net/xdp/xsk.c | 168 ++++++++++++++++++--------------------------------
- 1 file changed, 60 insertions(+), 108 deletions(-)
+ net/ipv6/addrconf.c                  | 2 +-
+ tools/testing/selftests/net/ioam6.sh | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index f41e0b480aa4..0a724cf20fcb 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -41,8 +41,6 @@ struct xsk_addrs {
- 	u64 addrs[MAX_SKB_FRAGS + 1];
- };
- 
--static struct kmem_cache *xsk_tx_generic_cache;
--
- void xsk_set_rx_need_wakeup(struct xsk_buff_pool *pool)
- {
- 	if (pool->cached_need_wakeup & XDP_WAKEUP_RX)
-@@ -539,89 +537,99 @@ static int xsk_wakeup(struct xdp_sock *xs, u8 flags)
- 	return dev->netdev_ops->ndo_xsk_wakeup(dev, xs->queue_id, flags);
- }
- 
--static int xsk_cq_reserve_locked(struct xsk_buff_pool *pool)
-+static int xsk_cq_reserve_addr_locked(struct xdp_sock *xs, u64 addr)
- {
-+	struct xsk_buff_pool *pool = xs->pool;
-+	struct local_cq *lcq = xs->lcq;
- 	int ret;
- 
- 	spin_lock(&pool->cq_cached_prod_lock);
- 	ret = xskq_prod_reserve(pool->cq);
- 	spin_unlock(&pool->cq_cached_prod_lock);
-+	if (!ret)
-+		lcq->desc[lcq->prod++ & lcq->ring_mask] = addr;
- 
- 	return ret;
- }
- 
--static bool xsk_skb_destructor_is_addr(struct sk_buff *skb)
-+#define XSK_DESTRUCTOR_DESCS_SHIFT 8
-+#define XSK_DESTRUCTOR_DESCS_MASK \
-+	((1ULL << XSK_DESTRUCTOR_DESCS_SHIFT) - 1)
-+
-+static long xsk_get_destructor_arg(struct sk_buff *skb)
- {
--	return (uintptr_t)skb_shinfo(skb)->destructor_arg & 0x1UL;
-+	return (long)skb_shinfo(skb)->destructor_arg;
- }
- 
--static u64 xsk_skb_destructor_get_addr(struct sk_buff *skb)
-+static u8 xsk_get_num_desc(struct sk_buff *skb)
- {
--	return (u64)((uintptr_t)skb_shinfo(skb)->destructor_arg & ~0x1UL);
-+	long val = xsk_get_destructor_arg(skb);
-+
-+	return (u8)val & XSK_DESTRUCTOR_DESCS_MASK;
- }
- 
--static void xsk_skb_destructor_set_addr(struct sk_buff *skb, u64 addr)
-+/* Record the position of first desc in local cq */
-+static void xsk_skb_destructor_set_addr(struct sk_buff *skb,
-+					struct xdp_sock *xs)
- {
--	skb_shinfo(skb)->destructor_arg = (void *)((uintptr_t)addr | 0x1UL);
-+	long val;
-+
-+	val = ((xs->lcq->prod - 1) & xs->lcq->ring_mask) << XSK_DESTRUCTOR_DESCS_SHIFT;
-+	skb_shinfo(skb)->destructor_arg = (void *)val;
- }
- 
-+/* Only update the lower bits to adjust number of descriptors the skb
-+ * carries. We have enough bits to increase the value of number of
-+ * descriptors that should be within MAX_SKB_FRAGS, so increase it by
-+ * one directly.
-+ */
- static void xsk_inc_num_desc(struct sk_buff *skb)
- {
--	struct xsk_addrs *xsk_addr;
-+	long val = xsk_get_destructor_arg(skb) + 1;
- 
--	if (!xsk_skb_destructor_is_addr(skb)) {
--		xsk_addr = (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
--		xsk_addr->num_descs++;
--	}
-+	skb_shinfo(skb)->destructor_arg = (void *)val;
- }
- 
--static u32 xsk_get_num_desc(struct sk_buff *skb)
-+static u32 xsk_get_start_addr(struct sk_buff *skb)
- {
--	struct xsk_addrs *xsk_addr;
-+	long val = xsk_get_destructor_arg(skb);
- 
--	if (xsk_skb_destructor_is_addr(skb))
--		return 1;
-+	return val >> XSK_DESTRUCTOR_DESCS_SHIFT;
-+}
- 
--	xsk_addr = (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
-+static void xsk_cq_write_addr(struct sk_buff *skb, u32 desc_processed)
-+{
-+	struct xsk_buff_pool *pool = xdp_sk(skb->sk)->pool;
-+	u32 idx, addr, pos = xsk_get_start_addr(skb);
-+	struct xdp_sock *xs = xdp_sk(skb->sk);
- 
--	return xsk_addr->num_descs;
-+	idx = xskq_get_prod(pool->cq) + desc_processed;
-+	addr = xs->lcq->desc[(pos + desc_processed) & xs->lcq->ring_mask];
-+	xskq_prod_write_addr(pool->cq, idx, addr);
- }
- 
--static void xsk_cq_submit_addr_locked(struct xsk_buff_pool *pool,
--				      struct sk_buff *skb)
-+static void xsk_cq_submit_addr_locked(struct sk_buff *skb)
- {
--	u32 num_descs = xsk_get_num_desc(skb);
--	struct xsk_addrs *xsk_addr;
--	u32 descs_processed = 0;
-+	struct xsk_buff_pool *pool = xdp_sk(skb->sk)->pool;
-+	u8 i, num = xsk_get_num_desc(skb);
- 	unsigned long flags;
--	u32 idx, i;
- 
- 	spin_lock_irqsave(&pool->cq_prod_lock, flags);
--	idx = xskq_get_prod(pool->cq);
--
--	if (unlikely(num_descs > 1)) {
--		xsk_addr = (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
--
--		for (i = 0; i < num_descs; i++) {
--			xskq_prod_write_addr(pool->cq, idx + descs_processed,
--					     xsk_addr->addrs[i]);
--			descs_processed++;
--		}
--		kmem_cache_free(xsk_tx_generic_cache, xsk_addr);
--	} else {
--		xskq_prod_write_addr(pool->cq, idx,
--				     xsk_skb_destructor_get_addr(skb));
--		descs_processed++;
--	}
--	xskq_prod_submit_n(pool->cq, descs_processed);
-+	for (i = 0; i < num; i++)
-+		xsk_cq_write_addr(skb, i);
-+	xskq_prod_submit_n(pool->cq, num);
- 	spin_unlock_irqrestore(&pool->cq_prod_lock, flags);
- }
- 
--static void xsk_cq_cancel_locked(struct xsk_buff_pool *pool, u32 n)
-+static void xsk_cq_cancel_locked(struct xdp_sock *xs, u32 n)
- {
-+	struct xsk_buff_pool *pool = xs->pool;
-+
- 	spin_lock(&pool->cq_cached_prod_lock);
- 	xskq_prod_cancel_n(pool->cq, n);
- 	spin_unlock(&pool->cq_cached_prod_lock);
-+	/* Keep align with cq->cached_prod */
-+	xs->lcq->prod -= n;
- }
- 
- INDIRECT_CALLABLE_SCOPE
-@@ -634,33 +642,26 @@ void xsk_destruct_skb(struct sk_buff *skb)
- 		*compl->tx_timestamp = ktime_get_tai_fast_ns();
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index 40e9c336f6c5..ca998bf46863 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -1013,7 +1013,7 @@ ipv6_link_dev_addr(struct inet6_dev *idev, struct inet6_ifaddr *ifp)
+ 	list_for_each(p, &idev->addr_list) {
+ 		struct inet6_ifaddr *ifa
+ 			= list_entry(p, struct inet6_ifaddr, if_list);
+-		if (ifp_scope >= ipv6_addr_src_scope(&ifa->addr))
++		if (ifp_scope > ipv6_addr_src_scope(&ifa->addr))
+ 			break;
  	}
  
--	xsk_cq_submit_addr_locked(xdp_sk(skb->sk)->pool, skb);
-+	xsk_cq_submit_addr_locked(skb);
- 	sock_wfree(skb);
- }
+diff --git a/tools/testing/selftests/net/ioam6.sh b/tools/testing/selftests/net/ioam6.sh
+index 845c26dd01a9..b2b99889942f 100755
+--- a/tools/testing/selftests/net/ioam6.sh
++++ b/tools/testing/selftests/net/ioam6.sh
+@@ -273,8 +273,8 @@ setup()
+   ip -netns $ioam_node_beta link set ioam-veth-betaR name veth1 &>/dev/null
+   ip -netns $ioam_node_gamma link set ioam-veth-gamma name veth0 &>/dev/null
  
--static void xsk_skb_init_misc(struct sk_buff *skb, struct xdp_sock *xs,
--			      u64 addr)
-+static void xsk_skb_init_misc(struct sk_buff *skb, struct xdp_sock *xs)
- {
- 	skb->dev = xs->dev;
- 	skb->priority = READ_ONCE(xs->sk.sk_priority);
- 	skb->mark = READ_ONCE(xs->sk.sk_mark);
- 	skb->destructor = xsk_destruct_skb;
--	xsk_skb_destructor_set_addr(skb, addr);
-+	xsk_skb_destructor_set_addr(skb, xs);
- }
- 
- static void xsk_consume_skb(struct sk_buff *skb)
- {
- 	struct xdp_sock *xs = xdp_sk(skb->sk);
- 	u32 num_descs = xsk_get_num_desc(skb);
--	struct xsk_addrs *xsk_addr;
--
--	if (unlikely(num_descs > 1)) {
--		xsk_addr = (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
--		kmem_cache_free(xsk_tx_generic_cache, xsk_addr);
--	}
- 
- 	skb->destructor = sock_wfree;
--	xsk_cq_cancel_locked(xs->pool, num_descs);
-+	xsk_cq_cancel_locked(xs, num_descs);
- 	/* Free skb without triggering the perf drop trace */
- 	consume_skb(skb);
- 	xs->skb = NULL;
-@@ -734,33 +735,12 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
- 
- 		skb_reserve(skb, hr);
- 
--		xsk_skb_init_misc(skb, xs, desc->addr);
-+		xsk_skb_init_misc(skb, xs);
- 		if (desc->options & XDP_TX_METADATA) {
- 			err = xsk_skb_metadata(skb, buffer, desc, pool, hr);
- 			if (unlikely(err))
- 				return ERR_PTR(err);
- 		}
--	} else {
--		struct xsk_addrs *xsk_addr;
--
--		if (xsk_skb_destructor_is_addr(skb)) {
--			xsk_addr = kmem_cache_zalloc(xsk_tx_generic_cache,
--						     GFP_KERNEL);
--			if (!xsk_addr)
--				return ERR_PTR(-ENOMEM);
--
--			xsk_addr->num_descs = 1;
--			xsk_addr->addrs[0] = xsk_skb_destructor_get_addr(skb);
--			skb_shinfo(skb)->destructor_arg = (void *)xsk_addr;
--		} else {
--			xsk_addr = (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
--		}
--
--		/* in case of -EOVERFLOW that could happen below,
--		 * xsk_consume_skb() will release this node as whole skb
--		 * would be dropped, which implies freeing all list elements
--		 */
--		xsk_addr->addrs[xsk_addr->num_descs] = desc->addr;
- 	}
- 
- 	len = desc->len;
-@@ -828,7 +808,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 			if (unlikely(err))
- 				goto free_err;
- 
--			xsk_skb_init_misc(skb, xs, desc->addr);
-+			xsk_skb_init_misc(skb, xs);
- 			if (desc->options & XDP_TX_METADATA) {
- 				err = xsk_skb_metadata(skb, buffer, desc,
- 						       xs->pool, hr);
-@@ -837,25 +817,9 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 			}
- 		} else {
- 			int nr_frags = skb_shinfo(skb)->nr_frags;
--			struct xsk_addrs *xsk_addr;
- 			struct page *page;
- 			u8 *vaddr;
- 
--			if (xsk_skb_destructor_is_addr(skb)) {
--				xsk_addr = kmem_cache_zalloc(xsk_tx_generic_cache,
--							     GFP_KERNEL);
--				if (!xsk_addr) {
--					err = -ENOMEM;
--					goto free_err;
--				}
--
--				xsk_addr->num_descs = 1;
--				xsk_addr->addrs[0] = xsk_skb_destructor_get_addr(skb);
--				skb_shinfo(skb)->destructor_arg = (void *)xsk_addr;
--			} else {
--				xsk_addr = (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
--			}
--
- 			if (unlikely(nr_frags == (MAX_SKB_FRAGS - 1) && xp_mb_desc(desc))) {
- 				err = -EOVERFLOW;
- 				goto free_err;
-@@ -873,8 +837,6 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 
- 			skb_add_rx_frag(skb, nr_frags, page, 0, len, PAGE_SIZE);
- 			refcount_add(PAGE_SIZE, &xs->sk.sk_wmem_alloc);
--
--			xsk_addr->addrs[xsk_addr->num_descs] = desc->addr;
- 		}
- 	}
- 
-@@ -893,7 +855,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 		xskq_cons_release(xs->tx);
- 	} else {
- 		/* Let application retry */
--		xsk_cq_cancel_locked(xs->pool, 1);
-+		xsk_cq_cancel_locked(xs, 1);
- 	}
- 
- 	return ERR_PTR(err);
-@@ -931,7 +893,7 @@ static int __xsk_generic_xmit(struct sock *sk)
- 		 * if there is space in it. This avoids having to implement
- 		 * any buffering in the Tx path.
- 		 */
--		err = xsk_cq_reserve_locked(xs->pool);
-+		err = xsk_cq_reserve_addr_locked(xs, desc.addr);
- 		if (err) {
- 			err = -EAGAIN;
- 			goto out;
-@@ -1988,18 +1950,8 @@ static int __init xsk_init(void)
- 	if (err)
- 		goto out_pernet;
- 
--	xsk_tx_generic_cache = kmem_cache_create("xsk_generic_xmit_cache",
--						 sizeof(struct xsk_addrs),
--						 0, SLAB_HWCACHE_ALIGN, NULL);
--	if (!xsk_tx_generic_cache) {
--		err = -ENOMEM;
--		goto out_unreg_notif;
--	}
--
- 	return 0;
- 
--out_unreg_notif:
--	unregister_netdevice_notifier(&xsk_netdev_notifier);
- out_pernet:
- 	unregister_pernet_subsys(&xsk_net_ops);
- out_sk:
+-  ip -netns $ioam_node_alpha addr add 2001:db8:1::50/64 dev veth0 &>/dev/null
+   ip -netns $ioam_node_alpha addr add 2001:db8:1::2/64 dev veth0 &>/dev/null
++  ip -netns $ioam_node_alpha addr add 2001:db8:1::50/64 dev veth0 &>/dev/null
+   ip -netns $ioam_node_alpha link set veth0 up &>/dev/null
+   ip -netns $ioam_node_alpha link set lo up &>/dev/null
+   ip -netns $ioam_node_alpha route add 2001:db8:2::/64 \
 -- 
-2.41.3
+2.52.0
 
 
