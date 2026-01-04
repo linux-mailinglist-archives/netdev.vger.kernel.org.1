@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-246794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FBC0CF1305
-	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 19:26:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB8E9CF130B
+	for <lists+netdev@lfdr.de>; Sun, 04 Jan 2026 19:27:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EEE6B300BEC1
-	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 18:26:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5385A3037501
+	for <lists+netdev@lfdr.de>; Sun,  4 Jan 2026 18:26:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D77F32E091B;
-	Sun,  4 Jan 2026 18:26:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B29842D7810;
+	Sun,  4 Jan 2026 18:26:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ehqn6cPE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y18UDyaV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B382C2E03F0
-	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 18:26:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0002D781E
+	for <netdev@vger.kernel.org>; Sun,  4 Jan 2026 18:26:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767551165; cv=none; b=T2f3im6u/+3RncQtgK4N8LpXbVaMdr3i03T7ZxsHwg953fadRwsN4EOLUU2YIFOruYnXS5SDpwmI7gS/xnHHdxzp06pdol6Xybrxybemen463Zp+rk/6Hq9VpAxt3l4llpxeQMJ3k7DUA06fjcaxIvuy9qufP9+Y/BY7CzKBCEw=
+	t=1767551167; cv=none; b=n80rggOE0n/fjrVk5lecQ9Wv3rXMZNZM/eD5cFkvaJ1pRDGs7aVvDp2HAbcBSddEYNWabj+TcwY/rTXp6gIOCuJVmd3FRgdITvlQWbzANrDqNt7iFhqs0lwKLyqDQRqoOCaLDlAz/mmVo0jbq4FoxrxMxqKFvSy2+eedZSsKnRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767551165; c=relaxed/simple;
-	bh=3OcYIADWS6OLb71Ww/hx37jTbqZQ9/7EFd/t12hB2ec=;
+	s=arc-20240116; t=1767551167; c=relaxed/simple;
+	bh=HIXb1ad2CCUJ43kMt8AJA/ococOBYxO+d8ZeScFhWfc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BBAL6hMcX6hebwMFr3Fyir5A3lG4SFofMLIZWG+r9ojkV+0/vTjA1HvuTtFQfkzucgn3weWvmLS9zmY3VdA7ztOkZ1o9lT3Pfo9DtcWOWah9g1vODzFTMsF6pzV/Pf/k5n3o9evkquu6/AZXsOo06DqSePKaNYOA2EPjIVS7kuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ehqn6cPE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 963F2C4CEF7;
-	Sun,  4 Jan 2026 18:26:05 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=p5SwS1rb4x9iqLRZHUp8xr9/m+NXrEQOSVUQhxlAsMlZ6vM0fa4R3bqZzTN4YQYesgDVFOglNqVhEjfWnyRrF+ZfTxxyqy8aCKKhYoW0QcZYU/1YV3cY5tjeuV7rQCg/kPetLxtTo/u7PtcMvoDCqwHEr7kYvixxTEk5BmOlt4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y18UDyaV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24F0FC4CEF7;
+	Sun,  4 Jan 2026 18:26:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767551165;
-	bh=3OcYIADWS6OLb71Ww/hx37jTbqZQ9/7EFd/t12hB2ec=;
+	s=k20201202; t=1767551167;
+	bh=HIXb1ad2CCUJ43kMt8AJA/ococOBYxO+d8ZeScFhWfc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ehqn6cPEm8G8Jf+myBw+Uk+vgfLTGUGENJim1LEsUHRKsvugqz/AEw6o8Lz4Xm7ij
-	 QNz4Xo8tT9cTlf6GsvmiklgECcmlSuTzMGyL+AHOFZG5t0J7e3INzumtKfVnzkFRXa
-	 mkweCA1TbKRZGzMhehR8q9PFSG/dQrMaRZPyaENm2NYhSBbC3Z3fbXVHUm4H9BODqa
-	 aGvwzCn3ktjWQZ4EmEMVm1nuqRoJA8A7cNxc1xgebbzFjr60pJM5drzKTF4HjtFdDP
-	 mAPWvxi9ZIxumjXAhEntOyFI9CmxJnah+KX3HX0HmXA0+ri+K//6Vc8BFkYHJm078k
-	 NzCELwaiFKgFQ==
+	b=Y18UDyaVxsCKPPKcVOUvL/x7AMLervvQAOtDPr4EdXFUx//tmq4HllSQkIf6upK08
+	 /YRG3FDvHqPPSlpFW1JGTiXDbhn7xj4QE2/2hBeuxnKZnadOS+Uk1sP37a9IHO+lEN
+	 09VnnqI6+rErafqwt2fgPvAejiBw93/BMAW7U7QFg2MUGJ2zOymYe9ulLeXNeEe4pT
+	 Z6MsOw/rfZ4ZrRgR7j3F4yUA2giNu7E+1cAnnfd396sU4qeybVM5+4AReZ/Py8ENpn
+	 HtmUDGMEK0rN36mM3WwMs5VvkdHy1NqeSy7w+cOzqjSVitmpHsv3+ahcuD+Sncu/Bc
+	 2T2Yfa3+d5anQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B5800380AA4F;
-	Sun,  4 Jan 2026 18:22:45 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B8AD380AA4F;
+	Sun,  4 Jan 2026 18:22:47 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,36 +50,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] bridge: fix C-VLAN preservation in 802.1ad
- vlan_tunnel
- egress
+Subject: Re: [PATCH] inet: ping: Fix icmp out counting
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176755096427.142863.8710171882718555642.git-patchwork-notify@kernel.org>
-Date: Sun, 04 Jan 2026 18:22:44 +0000
-References: <20251228020057.2788865-1-knecht.alexandre@gmail.com>
-In-Reply-To: <20251228020057.2788865-1-knecht.alexandre@gmail.com>
-To: Alexandre Knecht <knecht.alexandre@gmail.com>
-Cc: netdev@vger.kernel.org, roopa@nvidia.com
+ <176755096577.142863.15109109995613331415.git-patchwork-notify@kernel.org>
+Date: Sun, 04 Jan 2026 18:22:45 +0000
+References: <20251224063145.3615282-1-yuan.gao@ucloud.cn>
+In-Reply-To: <20251224063145.3615282-1-yuan.gao@ucloud.cn>
+To: yuan.gao <yuan.gao@ucloud.cn>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, segoon@openwall.com,
+ netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun, 28 Dec 2025 03:00:57 +0100 you wrote:
-> When using an 802.1ad bridge with vlan_tunnel, the C-VLAN tag is
-> incorrectly stripped from frames during egress processing.
+On Wed, 24 Dec 2025 14:31:45 +0800 you wrote:
+> From: "yuan.gao" <yuan.gao@ucloud.cn>
 > 
-> br_handle_egress_vlan_tunnel() uses skb_vlan_pop() to remove the S-VLAN
-> from hwaccel before VXLAN encapsulation. However, skb_vlan_pop() also
-> moves any "next" VLAN from the payload into hwaccel:
+> When the ping program uses an IPPROTO_ICMP socket to send ICMP_ECHO
+> messages, ICMP_MIB_OUTMSGS is counted twice.
+> 
+>     ping_v4_sendmsg
+>       ping_v4_push_pending_frames
+>         ip_push_pending_frames
+>           ip_finish_skb
+>             __ip_make_skb
+>               icmp_out_count(net, icmp_type); // first count
+>       icmp_out_count(sock_net(sk), user_icmph.type); // second count
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] bridge: fix C-VLAN preservation in 802.1ad vlan_tunnel egress
-    https://git.kernel.org/netdev/net/c/3128df6be147
+  - inet: ping: Fix icmp out counting
+    https://git.kernel.org/netdev/net/c/4c0856c225b3
 
 You are awesome, thank you!
 -- 
