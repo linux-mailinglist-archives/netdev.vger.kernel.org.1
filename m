@@ -1,152 +1,138 @@
-Return-Path: <netdev+bounces-246985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86AF7CF3442
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 12:32:07 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFC2ACF33DC
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 12:27:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1287B30FB4DE
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 11:26:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 57192300E42D
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 11:26:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3CC333A9DB;
-	Mon,  5 Jan 2026 11:07:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 239D6340DA6;
+	Mon,  5 Jan 2026 11:17:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="erNGVJjy"
+	dkim=pass (2048-bit key) header.d=fel.cvut.cz header.i=@fel.cvut.cz header.b="RWjUJ3Qf"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtpx.fel.cvut.cz (smtpx.feld.cvut.cz [147.32.210.153])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D17733A719
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 11:07:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538EF340A6A;
+	Mon,  5 Jan 2026 11:17:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=147.32.210.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767611243; cv=none; b=dj6I3uNKcn7Qv74GZXWs9cJwhCKjdz7GgcQSX3qJNzFAwmrXPv/kOzNDjvSwWuWM4jXv+Jin0BK+cjQy7cV5dkMmv+n0GKWj7A1mzG1GNT6hF1+iDyrJnbgTLMQDrsvzhPbeUafdsqVXX6xKJ1DW8NaICHwQujJKGSLBBiDO+JU=
+	t=1767611854; cv=none; b=WY619DVf+nF0aa2uG5dBhjM5t/kzkWYJX/0jYIK35A1XU92CTloTavTy0gpxWPwKv64i1sCIUUO4PXI69EOtdDX8dryIl1askG/gMWy+6yYBcdgQtPM8a076LMcDg0tPW5zol2S2m0yQxw8Pd0HEBoVZCYMii9yE6ja44Z+V71Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767611243; c=relaxed/simple;
-	bh=PihHnJ8onhQtjASh5hI9FjE37Vi7IpwsUlN0PesaYhI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=V0wbhY5VF5SEy4F9dtV/ah/ujxgEcz1sK7vIClTIlBrGAoUbIiwCGA1OmrMqb2kRQ7f2TpM5T0Se9a84JUTiHbxk+dmxmaO0B0SH6zSZfEkZKcvp++kXNAkhtsiM8rI3VNqElkFLLZXNbu4jw6dBMybPWSZlozypBbOWPKfA5Kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=erNGVJjy; arc=none smtp.client-ip=115.124.30.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1767611239; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=gjSTUQEFzKiZNSQYC7uLXUfDcu7AlN63uuFcNjk3Luw=;
-	b=erNGVJjyHmaJzviAckBIpEKMqfxuOXyCjOyc5gzOzkeaoScmMqt96KPhwmH8yFBYnwZ9cC//qyJjJFhGpzVm+LNWUyS56/BnByZzi9Rom9pyMF6Ce4DFYLiAdAQI/07yYv6mixtdB53C1onNVceC91pSNGew4Mxig4Itm7wk4FQ=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WwNV-bK_1767611236 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 05 Jan 2026 19:07:17 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1767611854; c=relaxed/simple;
+	bh=TGf6Xx6EH00BglDDqkVDcwkNf66EGGQew7JsrhRqn2Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OyYjqAYaLnChhrR3oxJnlucLp4zbTbf76n9GQD983q6WczNjZovlzNajVHU2I44nD66VH1dAxDMukkBMN8YLN5fw0f7zLp11ckwFXZzbOF0OtqOvak7dhyRwZzsKFtIo9kQC0Ndh2zw1eJfiyYRty2NJAU8BLP3n29XdrePA0Sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fel.cvut.cz; spf=pass smtp.mailfrom=fel.cvut.cz; dkim=pass (2048-bit key) header.d=fel.cvut.cz header.i=@fel.cvut.cz header.b=RWjUJ3Qf; arc=none smtp.client-ip=147.32.210.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fel.cvut.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fel.cvut.cz
+Received: from localhost (unknown [192.168.200.27])
+	by smtpx.fel.cvut.cz (Postfix) with ESMTP id C40092A6C1;
+	Mon, 05 Jan 2026 12:17:21 +0100 (CET)
+X-Virus-Scanned: IMAP STYX AMAVIS
+Received: from smtpx.fel.cvut.cz ([192.168.200.2])
+ by localhost (cerokez-250.feld.cvut.cz [192.168.200.27]) (amavis, port 10060)
+ with ESMTP id EmTVYg8_ynXu; Mon,  5 Jan 2026 12:17:20 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fel.cvut.cz;
+	s=felmail; t=1767611840;
+	bh=39GTysQ2XB6nQtWthRK9kPEZbFJ8UXpWexiHu0yeSGc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=RWjUJ3QfZod/XZfb1byB+7qSEAmyXtkxTF9EqiI+pg0N7fufgBAbEIxwgE2x8O49t
+	 rmGRJgtyn4W+KABlLyYWPiSvxKd840fVFYwVe/DlWJhYDoDuIqPrL7VPKlo0paup1N
+	 KAC1mFeqIaTjcS4oZNXlQ1SoLGG7kgrrjUkstx0jWyMEDJKokH8635sLs0tkbgnaNk
+	 P+/880+rQjyJZ1UhFE/BDgYYjl9hkvreDH83AiLdm5aLL+wWRHJnuHx4jOnHOkH33+
+	 CSagkNsEKWnPhihEiDGvJVGw70RrhejwLzKTAeaxkhVB4CZ4+qU6+UlzK4n2+T5YmG
+	 d+cj6XouootYQ==
+Received: from fel.cvut.cz (unknown [147.32.86.152])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pisa)
+	by smtpx.fel.cvut.cz (Postfix) with ESMTPSA id CB8CD2A9CC;
+	Mon, 05 Jan 2026 12:17:19 +0100 (CET)
+From: Pavel Pisa <pisa@fel.cvut.cz>
+To: linux-can@vger.kernel.org,
+	"Marc Kleine-Budde" <mkl@pengutronix.de>,
+	David Laight <david.laight.linux@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+	Andrea Daoud <andreadaoud6@gmail.com>,
+	Wolfgang Grandegger <wg@grandegger.com>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Philo Lu <lulie@linux.alibaba.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
-	Dong Yibo <dong100@mucse.com>,
-	Vivian Wang <wangruikang@iscas.ac.cn>,
-	MD Danish Anwar <danishanwar@ti.com>,
-	Dust Li <dust.li@linux.alibaba.com>
-Subject: [PATCH net-next v18 6/6] eea: introduce callback for ndo_get_stats64
-Date: Mon,  5 Jan 2026 19:07:12 +0800
-Message-Id: <20260105110712.22674-7-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20260105110712.22674-1-xuanzhuo@linux.alibaba.com>
-References: <20260105110712.22674-1-xuanzhuo@linux.alibaba.com>
+	netdev@vger.kernel.org
+Cc: Jiri Novak <jnovak@fel.cvut.cz>,
+	Ondrej Ille <ondrej.ille@gmail.com>,
+	Pavel Pisa <pisa@fel.cvut.cz>
+Subject: [PATCH v2] can: ctucanfd: fix SSP_SRC in cases when bit-rate is higher than 1 MBit.
+Date: Mon,  5 Jan 2026 12:16:20 +0100
+Message-ID: <20260105111620.16580-1-pisa@fel.cvut.cz>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Git-Hash: c650b8b40fc4
 Content-Transfer-Encoding: 8bit
 
-Add basic driver framework for the Alibaba Elastic Ethernet Adapter(EEA).
+From: Ondrej Ille <ondrej.ille@gmail.com>
 
-This commit introduces ndo_get_stats64 support.
+The Secondary Sample Point Source field has been
+set to an incorrect value by some mistake in the
+past
 
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-Reviewed-by: Philo Lu <lulie@linux.alibaba.com>
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+  0b01 - SSP_SRC_NO_SSP - SSP is not used.
+
+for data bitrates above 1 MBit/s. The correct/default
+value already used for lower bitrates is
+
+  0b00 - SSP_SRC_MEAS_N_OFFSET - SSP position = TRV_DELAY
+         (Measured Transmitter delay) + SSP_OFFSET.
+
+The related configuration register structure is described
+in section 3.1.46 SSP_CFG of the CTU CAN FD
+IP CORE Datasheet.
+
+The analysis leading to the proper configuration
+is described in section 2.8.3 Secondary sampling point
+of the datasheet.
+
+The change has been tested on AMD/Xilinx Zynq
+with the next CTU CN FD IP core versions:
+
+ - 2.6 aka master in the "integration with Zynq-7000 system" test
+   6.12.43-rt12+ #1 SMP PREEMPT_RT kernel with CTU CAN FD git
+   driver (change already included in the driver repo)
+ - older 2.5 snapshot with mainline kernels with this patch
+   applied locally in the multiple CAN latency tester nightly runs
+   6.18.0-rc4-rt3-dut #1 SMP PREEMPT_RT
+   6.19.0-rc3-dut
+
+The logs, the datasheet and sources are available at
+
+ https://canbus.pages.fel.cvut.cz/
+
+Signed-off-by: Ondrej Ille <ondrej.ille@gmail.com>
+Signed-off-by: Pavel Pisa <pisa@fel.cvut.cz>
 ---
- drivers/net/ethernet/alibaba/eea/eea_net.c | 47 ++++++++++++++++++++++
- 1 file changed, 47 insertions(+)
+ drivers/net/can/ctucanfd/ctucanfd_base.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.c b/drivers/net/ethernet/alibaba/eea/eea_net.c
-index 7b43823ca3b1..b085f89997d2 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_net.c
-+++ b/drivers/net/ethernet/alibaba/eea/eea_net.c
-@@ -269,6 +269,52 @@ static int eea_netdev_open(struct net_device *netdev)
- 	return err;
- }
+diff --git a/drivers/net/can/ctucanfd/ctucanfd_base.c b/drivers/net/can/ctucanfd/ctucanfd_base.c
+index 1e6b9e3dc2fe..0ea1ff28dfce 100644
+--- a/drivers/net/can/ctucanfd/ctucanfd_base.c
++++ b/drivers/net/can/ctucanfd/ctucanfd_base.c
+@@ -310,7 +310,7 @@ static int ctucan_set_secondary_sample_point(struct net_device *ndev)
+ 		}
  
-+static void eea_stats(struct net_device *netdev, struct rtnl_link_stats64 *tot)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+	u64 packets, bytes;
-+	u32 start;
-+	int i;
-+
-+	/* This function is protected by RCU. Here uses enet->tx and enet->rx
-+	 * to check whether the TX and RX structures are safe to access. In
-+	 * eea_free_rxtx_q_mem, before freeing the TX and RX resources, enet->rx
-+	 * and enet->tx are set to NULL, and synchronize_net is called.
-+	 */
-+
-+	if (enet->rx) {
-+		for (i = 0; i < enet->cfg.rx_ring_num; i++) {
-+			struct eea_net_rx *rx = enet->rx[i];
-+
-+			do {
-+				start = u64_stats_fetch_begin(&rx->stats.syncp);
-+				packets = u64_stats_read(&rx->stats.packets);
-+				bytes = u64_stats_read(&rx->stats.bytes);
-+			} while (u64_stats_fetch_retry(&rx->stats.syncp,
-+						       start));
-+
-+			tot->rx_packets += packets;
-+			tot->rx_bytes   += bytes;
-+		}
-+	}
-+
-+	if (enet->tx) {
-+		for (i = 0; i < enet->cfg.tx_ring_num; i++) {
-+			struct eea_net_tx *tx = &enet->tx[i];
-+
-+			do {
-+				start = u64_stats_fetch_begin(&tx->stats.syncp);
-+				packets = u64_stats_read(&tx->stats.packets);
-+				bytes = u64_stats_read(&tx->stats.bytes);
-+			} while (u64_stats_fetch_retry(&tx->stats.syncp,
-+						       start));
-+
-+			tot->tx_packets += packets;
-+			tot->tx_bytes   += bytes;
-+		}
-+	}
-+}
-+
- /* resources: ring, buffers, irq */
- int eea_reset_hw_resources(struct eea_net *enet, struct eea_net_init_ctx *ctx)
- {
-@@ -453,6 +499,7 @@ static const struct net_device_ops eea_netdev = {
- 	.ndo_stop           = eea_netdev_stop,
- 	.ndo_start_xmit     = eea_tx_xmit,
- 	.ndo_validate_addr  = eth_validate_addr,
-+	.ndo_get_stats64    = eea_stats,
- 	.ndo_features_check = passthru_features_check,
- 	.ndo_tx_timeout     = eea_tx_timeout,
- };
+ 		ssp_cfg = FIELD_PREP(REG_TRV_DELAY_SSP_OFFSET, ssp_offset);
+-		ssp_cfg |= FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x1);
++		ssp_cfg |= FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x0);
+ 	}
+ 
+ 	ctucan_write32(priv, CTUCANFD_TRV_DELAY, ssp_cfg);
 -- 
-2.32.0.3.g01195cf9f
+2.47.3
 
 
