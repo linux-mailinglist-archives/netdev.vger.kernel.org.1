@@ -1,124 +1,132 @@
-Return-Path: <netdev+bounces-246979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2367ECF3077
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 11:42:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25D16CF3409
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 12:30:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0BC1730552DB
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 10:39:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 10902308361F
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 11:26:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1576314B9F;
-	Mon,  5 Jan 2026 10:39:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Fz2JOjb4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B1E133A71F;
+	Mon,  5 Jan 2026 11:16:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C29AB2D8382;
-	Mon,  5 Jan 2026 10:39:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0E733A71D
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 11:16:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767609561; cv=none; b=i97XljJZhGKsRmxPXlaSKPaIZDMSDVSdDYmPnFoWXbXcYoLrL1t7FmNSDL4wYxD2JWo3y19xP15sVWJdaPfZ/AZ5m38w5Cf/KSjUpwB+jkbY6c/xLyVewA+vh49OT/BSk5H7BfgDfWAgyXIG22x83U2jBiGBxIUiGoyOOa543SA=
+	t=1767611816; cv=none; b=HqLRUidYGPjYoX8kVFFBJTFwPTQqgmPZ4AfDexUXYUC3ZXxcTzs80tp6II4n3SFOS6IaVuHjcY3qK8cmElQK2TEtP3tAryyZP3ZCd5n5jL4LIvI3dBEagkf1mtQcnjOQNVFTrjAVe22SpPC2iSbh8Xrk34lTbnjaOCPi3kGTsWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767609561; c=relaxed/simple;
-	bh=auaWrlklStGyGtxL5JgH4a3smEJfo2D0fNwKvm7SaKo=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ci135+EovxVX8FBQ3t/LjMPi1QuX2fxxNVKaZVVJoDg4JTCTtSZuwI8lFGTW+b/bFYtlRmCTnDZ8LsQ0QDSO3aSoF/A8dejiMdp6MqcF3/uT1jIzsp1p/uAZmgFe6jeng4m4UwV9xBPLfoIEc6gPcp/y449hcwMkWQvUHafAdMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Fz2JOjb4; arc=none smtp.client-ip=113.46.200.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=l3s7cX/ZeOHl9HnqSZY8U8DaJGP2WKlEP0TykuYXlbM=;
-	b=Fz2JOjb4Te8gnO7rj4dgrJ7j+hrcNBCFgX/jivMD93VAMHJGMXFOwHSVS4imda5hIQsfjhwCY
-	ZimlykASdKpWy8j/AGUGvXUPUaq5Iu5hmnLE+f9S5gPh7L5BQUjdwefwpb+HTSL8Iwl3jo/CjGF
-	Vt+tJckoOQUSnru8/0geYw0=
-Received: from mail.maildlp.com (unknown [172.19.163.104])
-	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dl9gL5NTDzcb14;
-	Mon,  5 Jan 2026 18:35:42 +0800 (CST)
-Received: from dggpemf100004.china.huawei.com (unknown [7.185.36.110])
-	by mail.maildlp.com (Postfix) with ESMTPS id 08AFD404AD;
-	Mon,  5 Jan 2026 18:39:11 +0800 (CST)
-Received: from huawei.com (10.175.121.217) by dggpemf100004.china.huawei.com
- (7.185.36.110) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 5 Jan
- 2026 18:39:09 +0800
-From: Cao Jiaqiang <caojiaqiang@huawei.com>
-To: <gregkh@linuxfoundation.org>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<shuah@kernel.org>
-CC: <stable@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<dsahern@kernel.org>, <vincent.wang@huawei.com>, <liujian56@huawei.com>,
-	<yi.zhang@huawei.com>, <caojiaqiang@huawei.com>
-Subject: [PATCH 5.15.y] selftests: net: test_vxlan_under_vrf: fix HV connectivity test
-Date: Mon, 5 Jan 2026 18:52:51 +0800
-Message-ID: <20260105105251.33854-1-caojiaqiang@huawei.com>
-X-Mailer: git-send-email 2.22.0
+	s=arc-20240116; t=1767611816; c=relaxed/simple;
+	bh=JjoPgzEC4mP6Vy0x1fg8v6Y4M8XNcEd2kWV8rJLszAI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cGN6p66LvnYE/va7H9doITp+qoxMlKdF9TNCS8iQGcjt6jxii3H9G36QP7dboEbcT/iiFKTkqujp0CLyG6/wVSXlxt6oXiin8VfOvjIGXH/p5uloJqfwErLo0NeIByiAuZ0BsyRswcVynVqB+vY7aFP073jtLp4CCr/Hgfz7b0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vciIH-00025R-Jy; Mon, 05 Jan 2026 11:58:37 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vciIG-0099Xn-0v;
+	Mon, 05 Jan 2026 11:58:36 +0100
+Received: from pengutronix.de (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id F2F134C64B7;
+	Mon, 05 Jan 2026 10:58:35 +0000 (UTC)
+Date: Mon, 5 Jan 2026 11:58:35 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Pavel Pisa <pisa@fel.cvut.cz>
+Cc: linux-can@vger.kernel.org, David Laight <david.laight.linux@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Andrea Daoud <andreadaoud6@gmail.com>, 
+	Wolfgang Grandegger <wg@grandegger.com>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Jiri Novak <jnovak@fel.cvut.cz>, Ondrej Ille <ondrej.ille@gmail.com>
+Subject: Re: [PATCH] can: ctucanfd: fix SSP_SRC in cases when bit-rate is
+ higher than 1 MBit.
+Message-ID: <20260105-flying-thankful-chachalaca-1d68e5-mkl@pengutronix.de>
+References: <20251231231926.20043-1-pisa@fel.cvut.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- dggpemf100004.china.huawei.com (7.185.36.110)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="donhkjnqvsccjyie"
+Content-Disposition: inline
+In-Reply-To: <20251231231926.20043-1-pisa@fel.cvut.cz>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-From: Andrea Righi <andrea.righi@canonical.com>
 
-[ Upstream commit e7e4785fa30f9b5d1b60ed2d8e221891325dfc5f ]
+--donhkjnqvsccjyie
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH] can: ctucanfd: fix SSP_SRC in cases when bit-rate is
+ higher than 1 MBit.
+MIME-Version: 1.0
 
-It looks like test_vxlan_under_vrf.sh is always failing to verify the
-connectivity test during the ping between the two simulated VMs.
+On 01.01.2026 00:19:26, Pavel Pisa wrote:
+> From: Ondrej Ille <ondrej.ille@gmail.com>
 
-This is due to the fact that veth-hv in each VM should have a distinct
-MAC address.
+Let's describe the problem here and in an imperative way how it is
+fixed.
 
-Fix by setting a unique MAC address on each simulated VM interface.
+> The change has been tested on AMD/Xilinx Zynq
+> with the next CTU CN FD IP core versions:
+>
+>  - 2.6 aka master in the "integration with Zynq-7000 system" test
+>    6.12.43-rt12+ #1 SMP PREEMPT_RT kernel with CTU CAN FD git
+>    driver (change already included in the driver repo)
+>  - older 2.5 snapshot with mainline kernels with this patch
+>    applied locally in the multiple CAN latency tester nightly runs
+>    6.18.0-rc4-rt3-dut #1 SMP PREEMPT_RT
+>    6.19.0-rc3-dut
+>
+> The logs are available at
+>
+>  https://canbus.pages.fel.cvut.cz/
+>
+> Signed-off-by: Ondrej Ille <ondrej.ille@gmail.com>
+> Signed-off-by: Pavel Pisa <pisa@fel.cvut.cz>
 
-Without this fix:
+regards,
+Marc
 
- $ sudo ./tools/testing/selftests/net/test_vxlan_under_vrf.sh
- Checking HV connectivity                                           [ OK ]
- Check VM connectivity through VXLAN (underlay in the default VRF)  [FAIL]
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
-With this fix applied:
+--donhkjnqvsccjyie
+Content-Type: application/pgp-signature; name="signature.asc"
 
- $ sudo ./tools/testing/selftests/net/test_vxlan_under_vrf.sh
- Checking HV connectivity                                           [ OK ]
- Check VM connectivity through VXLAN (underlay in the default VRF)  [ OK ]
- Check VM connectivity through VXLAN (underlay in a VRF)            [FAIL]
+-----BEGIN PGP SIGNATURE-----
 
-NOTE: the connectivity test with the underlay VRF is still failing; it
-seems that ARP requests are blocked at the simulated hypervisor level,
-probably due to some missing ARP forwarding rules. This requires more
-investigation (in the meantime we may consider to set that test as
-expected failure - XFAIL).
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmlbmVgACgkQDHRl3/mQ
+kZztzwf/cm4EoX+2NpVICR7MwS7jUx9mWlSapHJR9hbWx5RVtIqcFpwGKFa6AoaX
+Yi7xpig5yDCb6RPcwTi7RyrbMzf+1cCOTv4xHoWAzHdFhxyh5GGs/LVX+v3Z+vbn
+nbbw8cPKXoJZ2UyRA3osPFH/Vq0O3PMx1wq3zws5k4urgPb8NQ+uAodeyLJKYXgJ
++/gd/LbPYlyZBfAezaGXSq13ZNrTmdfbSLlZ8OfScG3k9iPP5ASn7FkoNJeUC6ab
+3SxHgoggSdF3nvtzmwGXV2GyQdkRpVWH6GWuOQGTsSFnGBwmHSzWaVfZ63U7rYg6
+72iN/iKKeqRqea3qNt3sfYzF4N/xEg==
+=bFZ0
+-----END PGP SIGNATURE-----
 
-Signed-off-by: Andrea Righi <andrea.righi@canonical.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Cao Jiaqiang <caojiaqiang@huawei.com>
----
- tools/testing/selftests/net/test_vxlan_under_vrf.sh | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/tools/testing/selftests/net/test_vxlan_under_vrf.sh b/tools/testing/selftests/net/test_vxlan_under_vrf.sh
-index 6fadc8e2f116..1fd1250ebc66 100755
---- a/tools/testing/selftests/net/test_vxlan_under_vrf.sh
-+++ b/tools/testing/selftests/net/test_vxlan_under_vrf.sh
-@@ -101,6 +101,8 @@ setup-vm() {
-     ip -netns hv-$id link set veth-tap master br0
-     ip -netns hv-$id link set veth-tap up
- 
-+    ip link set veth-hv address 02:1d:8d:dd:0c:6$id
-+
-     ip link set veth-hv netns vm-$id
-     ip -netns vm-$id addr add 10.0.0.$id/24 dev veth-hv
-     ip -netns vm-$id link set veth-hv up
--- 
-2.22.0
-
+--donhkjnqvsccjyie--
 
