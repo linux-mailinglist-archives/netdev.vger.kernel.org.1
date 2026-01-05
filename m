@@ -1,91 +1,66 @@
-Return-Path: <netdev+bounces-246851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D400BCF1AD6
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 03:52:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4320FCF1B46
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 04:13:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A733E3003079
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 02:52:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9C98B3007943
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 03:13:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFFAF280331;
-	Mon,  5 Jan 2026 02:51:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A811531DD96;
+	Mon,  5 Jan 2026 03:13:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kdcU4cGw"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="1KGt/28C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495C92AE99
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 02:51:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6EDF229B18;
+	Mon,  5 Jan 2026 03:13:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767581519; cv=none; b=m9bKhS1A0PuneSsV79K4Kn64VtsxQIqhRkg/ZHt5hSO28e2LAMVZUW8Tj+CkD01UGhE/wKBe76fFs/SMIwU+Z1XS/1ywsJI9U7YSWBBdMBrixmv1v0waJTgkQTPLNYARRsFKD6qbmzZNf3hcMuYhGCHtD1P9GRcRL6FFjcfSH6M=
+	t=1767582813; cv=none; b=naQtvpKOWxcP2NGkuqCpfS7HYS8760bP4sGcZ8AwgcluJYeQpgCSF+3rFANJz8VPpZdfeTlXsZXF2f3wUr4wHjogFjJdGq5z6TO0G1KjJBHCxs+8R2aqvj5jqhRytEQqLLftcSYaN8bH4WiPvzRdXlXHh4p5mbxgQSMMd3yeuL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767581519; c=relaxed/simple;
-	bh=UHZ/FPXU+VQZlVeKz1Jh4u82PvhOAlXFRnbgwfwarOw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qtddLik5ft9gCUpR188Dmd51zV2xzlo4lMd2Nl27ditHESOdKMJyipZv0j00xwblTguFHSigyUcdJDClSJurDG6/+Fr2LxdkR7A0trsWXL6FJg0+oBGBinBF1B8z4qZC/DboOfX4MsqyyE9TDx6T1nSnm/wS+gSdxYSBf0x0XC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kdcU4cGw; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-c075ec1a58aso7790823a12.0
-        for <netdev@vger.kernel.org>; Sun, 04 Jan 2026 18:51:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767581517; x=1768186317; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UHZ/FPXU+VQZlVeKz1Jh4u82PvhOAlXFRnbgwfwarOw=;
-        b=kdcU4cGwGBvLJZlva2e8egSUnX5JIrOvpFBg3ZB/7MLRnTnQy3UI4o6Smvoy4dHihw
-         8BOIMbKxrV82F8bGyO/GpZaaI+2yMywnGCbYdraJhRSs5fJiIQWVPVy3nFuMsecMGQ2g
-         zV0nf4C+AW3ofZ0mVRaEns48H+XyfwIHT2MsT8yl0EARWLwHMYVxrLyZUkj3fC26lWzA
-         LW2Qze9g/di1tNu1ImQMiVPu2Z/WXG4fEk0L9AjGj1K7A//+dI2N1s9TBRiZJnnuXgGs
-         5T6MUSl5zaG69FZW4Mx8ghP5A24zbbCjSRg7nFREJtrGWgWj35B1tcXdsGzel/Yo1LRC
-         NC1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767581517; x=1768186317;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=UHZ/FPXU+VQZlVeKz1Jh4u82PvhOAlXFRnbgwfwarOw=;
-        b=dhfm2+N8FkFq/3rNtg+oQbYMSIdPj+Ov75cUsAa/hHSjSp5JS8mnBPxH3SAkzhWmz9
-         Yih8efe/YClt7pokm1h+UyX/YptnWiKB78hEGP4ad0+ZYv0OTtl+06F5QTiQUTU2c/4F
-         WyUV6u5WcdbnjXwyq2qzsZh3j7OM7gyKeUlEWZ3Z3pQgfwHqmdLxMAmncsiWg0kTBiqT
-         bammx/LOo4ftm6xiGxvoIsHzKKpuy1MNfZAqquwMfLucaVeOoKCzgHXgib8zgfr0yGVa
-         to/unecvbv6XLO6PYhIs9uKOyD/DSeRdboB6iNk9OgW7pS3ejXICTzXn+IHCQrEE0QhR
-         CKkg==
-X-Gm-Message-State: AOJu0Ywc9riPcdISUnH7pnaekVA3tO+af4cA9FiKFQHQibNgvQGNzcAq
-	owjMePQlxt09puJfppJY9C0hoWNxuoPsyjJp6l9sM8o6qZEUCrd4w0Gf
-X-Gm-Gg: AY/fxX6arqHI3MkEFwg2FmQRPrRR3vGgamiPEooJyBfcmlEzQwO+/nnSzbV5HfPtkbE
-	zcntW1tLFeZuRKiKYxm/KrV2TsmcCgumHxeScpzY8oPGphsm2DjY/H9/8eK6BsDl52xAGQNUorK
-	0ECLojYdkY7eO8cyPMCUyC8FvxgLv62Jq2NPu6qCeQPLCvPOQVn0lj4Hyue9VGMQSwm1kcboKj9
-	ZjaX2+mpG6SxcBQuVvAtMvNgh5ck1btMPR/mslIfY2sjwwCaMdOPpZohWQS6JpMh3ixJcTTF1bh
-	Qh1dmHrldmXfhx/DPWqFUzzVqr0Wt15cI463O90k0hrGOKpSY+yrNmFYo0aPaCm7eL60Qx0eyM9
-	glFEPAOZz46vxoakuNEnPFmVDEv8IkkY7FUxskUG7tmmZLWgrWUG7cxw2DoR7NUo=
-X-Google-Smtp-Source: AGHT+IFXvOJ2HRQ/ak8rer6QeFk/Bm3/VX88d8mLYTC10wc9VIMvqdV1KV3aBpX6VOM+Pqe5oLZw6A==
-X-Received: by 2002:a05:7022:e11:b0:11b:7dcd:ca9a with SMTP id a92af1059eb24-12172302438mr54322378c88.34.1767581517469;
-        Sun, 04 Jan 2026 18:51:57 -0800 (PST)
-Received: from gmail.com ([2a09:bac1:1980:20::4:33f])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1217253c0c6sm189959924c88.12.2026.01.04.18.51.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Jan 2026 18:51:57 -0800 (PST)
-From: Qingfang Deng <dqfext@gmail.com>
-To: David Yang <mmyangfl@gmail.com>
-Cc: netdev@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 2/2] net: dsa: yt921x: Protect MIB stats with a lock
-Date: Mon,  5 Jan 2026 10:51:39 +0800
-Message-ID: <20260105025139.2348-1-dqfext@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260105020905.3522484-3-mmyangfl@gmail.com>
-References: <20260105020905.3522484-1-mmyangfl@gmail.com> <20260105020905.3522484-3-mmyangfl@gmail.com>
+	s=arc-20240116; t=1767582813; c=relaxed/simple;
+	bh=OhXaNpnM88uh60zV9MNuNq/p2Ngch3J4Uz1jYdED/Qo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sihUoz3fcH+mj1YjMOCkRiiGv2aY5dvN5VZwZA9oe/KcyByeCyfWOEa72j8vvFFym956vy/ZJ0RDtDqBkR6ocMy1Frjtzl0K8AIlZubXBXl3CSRYFB+g3sw/gNzy9h6LxheYII4gQN2n7bUgR5vo8aUZS9KOjJDiSCghT0SNC/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=1KGt/28C; arc=none smtp.client-ip=113.46.200.222
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=Avf6Loonv93Or49Wuy8lkOEDMIA95ehEwIKvt2FV9KE=;
+	b=1KGt/28CYPhnLS8QdHM7vqp52FcGx1qvWqibzkZcTJeMdvCJHwJAb/pm/ZY5Lxv9CJZtnoLGj
+	FsUrouhoKJm3u1bWFuGt8V798lqBC/LX5Zf2LZsW3YIWaFoKPriE/gW/rNtnWfLmMKB4jtesFqK
+	GBuJ6hrzOIAjPse2NCmSNlU=
+Received: from mail.maildlp.com (unknown [172.19.163.200])
+	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4dkznF2J87zLm0y;
+	Mon,  5 Jan 2026 11:10:09 +0800 (CST)
+Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
+	by mail.maildlp.com (Postfix) with ESMTPS id ABDE64057C;
+	Mon,  5 Jan 2026 11:13:22 +0800 (CST)
+Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.188.120) by
+ kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Mon, 5 Jan 2026 11:13:21 +0800
+From: Fan Gong <gongfan1@huawei.com>
+To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
+	<netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, Markus Elfring <Markus.Elfring@web.de>, Pavan Chebbi
+	<pavan.chebbi@broadcom.com>, ALOK TIWARI <alok.a.tiwari@oracle.com>
+CC: <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>, luosifu
+	<luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>, Shen Chenyang
+	<shenchenyang1@hisilicon.com>, Zhou Shuai <zhoushuai28@huawei.com>, Wu Like
+	<wulike1@huawei.com>, Shi Jing <shijing34@huawei.com>, Luo Yang
+	<luoyang82@h-partners.com>
+Subject: [PATCH net-next v08 0/9] net: hinic3: PF initialization
+Date: Mon, 5 Jan 2026 11:13:03 +0800
+Message-ID: <cover.1767495881.git.zhuyikai1@h-partners.com>
+X-Mailer: git-send-email 2.51.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,16 +68,110 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ kwepemf100013.china.huawei.com (7.202.181.12)
 
-Hi David,
+This is [1/3] part of hinic3 Ethernet driver second submission.
+With this patch hinic3 becomes a complete Ethernet driver with
+pf and vf.
 
-On Mon, 5 Jan 2026 10:09:01 +0800, David Yang wrote:
-> 64bit variables might not be atomic on 32bit architectures, thus cannot
-> be made lock-free. Protect them with a spin lock since get_stats64()
-> cannot sleep.
+The driver parts contained in this patch:
+Add support for PF framework based on the VF code.
+Add PF management interfaces to communicate with HW.
+Add 8 netdev ops to configure NIC features.
+Support mac filter to unicast and multicast.
+Add HW event handler to manage port and link status.
 
-Synchronizing both reads and updates with a spin lock is an overkill.
-See include/linux/u64_stats_sync.h for a better approach.
+Changes:
 
--- Qingfang
+PATCH 01 V01: https://lore.kernel.org/netdev/cover.1760502478.git.zhuyikai1@h-partners.com/
+
+PATCH 01 V02: https://lore.kernel.org/netdev/cover.1760685059.git.zhuyikai1@h-partners.com/
+* Change the order of hinic3_netdev_event (Jakub Kicinski)
+* Use netdev_hold/put instead of dev_hold/put (Jakub Kicinski)
+* Remove the semicolon at the end of switch case (Jakub Kicinski)
+* Remove redundant PF judgement in hinic3_rx_tx_flush (Paven Chebbi)
+* change hinic3_send_mbox_to_mgmt errcode to EFAULT (Paven Chebbi)
+* Optimize hinic3_set_bdf_ctxt parameters (Paven Chebbi)
+* Modify main and CC recipients (Markus Elfring)
+
+PATCH 01 V03: https://lore.kernel.org/netdev/cover.1761362580.git.zhuyikai1@h-partners.com/
+* Use disable_delayed_work_sync instead of cancel_delayed_work_sync (Paolo Abeni)
+* Fill in the missing hinic3_sync_time & hinic3_free_ppf_work (Paolo Abeni)
+* Refactor hinic3_mac_filter_sync to implement linux coding style(err label)
+  and improve readability (Paolo Abeni & Markus Elfring)
+
+PATCH 01 V04: https://lore.kernel.org/netdev/cover.1761711549.git.zhuyikai1@h-partners.com/
+* Use linux error value(EADDRINUSE) instead of custom value in set_mac (Simon Horman)
+* Use "hinic3_check_pf_set_vf_already" function instead of macro (Simon Horman)
+
+PATCH 01 V05: https://lore.kernel.org/netdev/cover.1762414088.git.zhuyikai1@h-partners.com/
+* Code format fixes: wrap the code at 80 characters (Jakub Kicinski)
+* Use str_up_down instead of ternary expression (Simon Horman)
+* Remove needless override of error value (Simon Horman)
+
+PATCH 01 V06: https://lore.kernel.org/netdev/cover.1762581665.git.zhuyikai1@h-partners.com/
+* Update dev_err messages (ALOK TIWARI)
+* Remove redundant codes "message from vf" in get_mbox_msg_desc (ALOK TIWARI)
+* Code spell fix (ALOK TIWARI)
+* Modfiy hinic3_uc_sync/unsync to hinic3_filter_mac_sync/unsync (ALOK TIWARI)
+* Modify hinic3_mac_filter_sync_hw to return error code (ALOK TIWARI)
+
+PATCH 01 V07: https://lore.kernel.org/netdev/cover.1763555878.git.zhuyikai1@h-partners.com/
+* Change port_state_sem to mutex (Jakub Kicinski)
+* Use DIM infrastructure to change itr moderation configuration (Jakub Kicinski)
+* Remove redundant TX TIMEOUT counter (Jakub Kicinski)
+* Use txqueue in tx_timeout instead of searching for timeout queue (Jakub Kicinski)
+* Remove redundant initialization to ndev features with more than 1
+  vlan depth. (Jakub Kicinski)
+* Split patch for one single thing and optimize commit information (Jakub Kicinski)
+
+Patch 01 V08:
+* Remove netdev notifier interfaces and use ndo_features_check to solve packets
+  with multiple vlan tags instead of using vlan_features (Paolo Abeni)
+
+Fan Gong (9):
+  hinic3: Add PF framework
+  hinic3: Add PF management interfaces
+  hinic3: Add .ndo_tx_timeout and .ndo_get_stats64
+  hinic3: Add .ndo_set_features and .ndo_fix_features
+  hinic3: Add .ndo_features_check
+  hinic3: Add .ndo_vlan_rx_add/kill_vid and .ndo_validate_addr
+  hinic3: Add adaptive IRQ coalescing with DIM
+  hinic3: Add mac filter ops
+  hinic3: Add HW event handler
+
+ drivers/net/ethernet/huawei/hinic3/Makefile   |   1 +
+ .../net/ethernet/huawei/hinic3/hinic3_csr.h   |   6 +
+ .../ethernet/huawei/hinic3/hinic3_filter.c    | 416 ++++++++++++++++++
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.c   | 115 +++++
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.h   |   6 +
+ .../ethernet/huawei/hinic3/hinic3_hw_intf.h   |  24 +
+ .../net/ethernet/huawei/hinic3/hinic3_hwdev.c |  97 +++-
+ .../net/ethernet/huawei/hinic3/hinic3_hwdev.h |  21 +
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.c  |  90 +++-
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.h  |  23 +
+ .../net/ethernet/huawei/hinic3/hinic3_irq.c   |  97 +++-
+ .../net/ethernet/huawei/hinic3/hinic3_lld.c   |  53 ++-
+ .../net/ethernet/huawei/hinic3/hinic3_main.c  | 181 +++++++-
+ .../net/ethernet/huawei/hinic3/hinic3_mbox.c  |  47 +-
+ .../net/ethernet/huawei/hinic3/hinic3_mbox.h  |   2 +
+ .../net/ethernet/huawei/hinic3/hinic3_mgmt.c  | 311 ++++++++++++-
+ .../net/ethernet/huawei/hinic3/hinic3_mgmt.h  |  53 +++
+ .../huawei/hinic3/hinic3_mgmt_interface.h     |  69 +++
+ .../huawei/hinic3/hinic3_netdev_ops.c         | 378 ++++++++++++++++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.c   | 284 +++++++++++-
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.h   |  47 ++
+ .../ethernet/huawei/hinic3/hinic3_nic_dev.h   |  60 ++-
+ .../net/ethernet/huawei/hinic3/hinic3_rx.h    |  21 +
+ .../net/ethernet/huawei/hinic3/hinic3_tx.h    |  16 +
+ 24 files changed, 2382 insertions(+), 36 deletions(-)
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_filter.c
+
+
+base-commit: dbf8fe85a16a33d6b6bd01f2bc606fc017771465
+-- 
+2.43.0
+
 
