@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-247010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04294CF379F
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 13:18:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB6F7CF3778
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 13:15:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 91962309F72F
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 12:14:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 316223020154
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 12:14:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D075335544;
-	Mon,  5 Jan 2026 12:14:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77CB4335543;
+	Mon,  5 Jan 2026 12:14:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="JasSORni"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="QOS48JTI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25C14335072
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 12:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EEBA334C22
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 12:14:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767615286; cv=none; b=kFE9sCLGWEOOWkoQReO78aNWfiQG5P56LRpL5iVniKCPoiCzeqLEED2CIRnIb4Tanr5pMrd3y48hrEXzM/OkjF7arLMy5GEuhw+vTco/3ZgrllG+lCOluyYu2ow9kix6OyCNE2JRTbwdV7IYary6F7+a06dqTrb2GcH7Ll+wxqg=
+	t=1767615287; cv=none; b=R/VzwQFMjFy7vH/mJ9BBUlcFsfTGoGbLn2wyweqHCAKqEOQdnl9wiB3Ilv4EXtWdfH0wz0upM7oAGFG60KQqEiOXM3S80kC9fmPuhrhIEYjN/KGl9+tmphg00Xr+QrcF49ch1ZesvSYnIdJWW+z9UrL4QPNwV6nsMSooumtHJnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767615286; c=relaxed/simple;
-	bh=oMHmrv504DpK3sDJkcM25UNgfzziW6gjvBfOPGWboAA=;
+	s=arc-20240116; t=1767615287; c=relaxed/simple;
+	bh=Jw4sZlwfvlCw9U70oFYHFDt2JUDMKantZkYZjOZFw6k=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=rhnM3LDJ9IDb9leg+aFnd8xA3aj8JcMR8X2cuR3PYQT7LNxQBnl9n9dSQRhNikJMuJuzfkAdFNKPSVLNvFgWqsu+Dq8KP5CyMDZWjgjw2DSmoiZHNUteN4CW79Du+6hZaHGxvRqpY8SB020CI8gkzcwdqTuQSdebO7o5IMzt8zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=JasSORni; arc=none smtp.client-ip=209.85.218.50
+	 In-Reply-To:To:Cc; b=uOQF0anpWAQkuU57G4ZemBc7EtQdH3xBvlt0tc6Nd7pwqPYn5vnz5f0dj1W7VDJrle/89WBo9nr4RY0W98Xyra2mwk9U3ihyZH5TVMGVn4G/pCwHK2TY+XRwQmhEmbw9+r0mmi/EpYeWkyo5i6YPhiRnVKU05EtF7CXF5enW0c4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=QOS48JTI; arc=none smtp.client-ip=209.85.218.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b725ead5800so1980254966b.1
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 04:14:43 -0800 (PST)
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b802d5e9f06so1781915466b.1
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 04:14:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1767615282; x=1768220082; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1767615284; x=1768220084; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=xhn4HZ+NklBudGUcJpb0YU7dEzH4q1ZmXiPPH0r44sQ=;
-        b=JasSORni3SGFg1SvuUvndtb6mBN10PVTTpaFqJK+k6WBa99alT+7Fv03U9o3k2nUdk
-         CUgIPgmhhpigUcBMFZCuBH8uN0f15A2PqA6kv1g2dQ7U6tbLgY+GnGNaaPfI0os0y2PF
-         cT6H3w72d74R253H2AEXWqFy9iXgz3F7ZCKPwPJ77Bb08AQebeane/A6T/+r6QFl/3UL
-         uIoCixNribDxhlmwy62OZg6IWdMw3Rdu/3uAnhU+57Q1SqvLLW8Y75xVhU5vCO2RWP05
-         R0QDbfn9FOwPY4yc+nGSP6RgM+o90jE97ty4PkyFLnylUOZ7nDt5gUgTdnH8IaHdkvl3
-         8FSg==
+        bh=nT0a9okVqQVqG4JPUviJUmT9EW1WnhugEMsAcr4nqg8=;
+        b=QOS48JTI/P7Yyy5cuGUkCQBKfRGFS8iIXRxmpBOMMBE5xPmnLNsTM/BUb8OS0U7S4O
+         /kiJsXTUA2OUyGzp989ukwfNKFL5YWg4cXPQ52juDmjEDPFH6yHysQ0njo9JqX4/mfrk
+         huoIA/AL8Lmd/bFZXpK538rinuf0Y2YHqN0YJh9VV1Kg9CJFwe9JZnn4dV2I5tiBL4sV
+         4ajx74/okN3SfncJ94c1fmHa2bEl7IwyEeMHyXo/IpHgK9+0DAM/ft9Sa0mTYk4VUl5d
+         gFgM4xwXu6Hq9NfswoSZ3j6zTOtbFzLIrj3eml3vMZk9d/tEyx5t1avPcfb35CHFc6nn
+         z1KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767615282; x=1768220082;
+        d=1e100.net; s=20230601; t=1767615284; x=1768220084;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=xhn4HZ+NklBudGUcJpb0YU7dEzH4q1ZmXiPPH0r44sQ=;
-        b=cyQAL54GlgrNwW1NT22KtL1K67P2zOhMdcROZNvvfYGB2GDSr9gysy3reSC7PBuZTR
-         ItPUfwHvh0Y3V53h2m486b12keFzBcDfHVkLQ1BF1fjH9Yn9i29E/in4/0zIcsOmKucp
-         RivWwvLhphuFKag2dt87lqdlXsL1L2AF01A2trmoU91IivnMn1kmn3LRZHwgSgDsvXlt
-         49dschf4VC2mx/bL9CGAwbc+8iYDeraWB/DzDwZ39XKJ+VaNnGalOgYbKZCRe789yhyq
-         lCUr6DyOmhme+aScsw8HYquU1Hp/A0PYcNd7+aG/FzTcJcojvNcL3NTDcysEdkChQJvZ
-         B1lw==
-X-Gm-Message-State: AOJu0YxKUCSJA5DbW+tnHXNrXVpE8MwTiVZfMwURZorMrO3OvWMQiICP
-	wptj+OaqRiJxY7bxbLqXPWP4Uc3QS/lK7JBkorMW2c6bvp6NAClOpS7+dhfnl9LO/8s=
-X-Gm-Gg: AY/fxX6529dgtTvqcGpJEcNFPfpxBguvuUhIjoAV9YC2Vloq+TRfibAAOM1hzpnl3qv
-	8p/RTTRoyEVEWBjBW9NgZEqU765h9Lg+ki57DE1CCRFAxrfW4G1oJbzgbuFrKDy8PJQaFBUXn3C
-	w43rWUIln/feFiewI4KgQTvZC7wSlQR2snAtt2UnPskAbCqBt4ofE8GujnELd8ycpbuyCMM51wj
-	bBmu+44sBwt21spTo0x83eCeDDD2a0uGdhefSu3qKdwbKY+4L3mfl1McghkYjqAE/KTSoZkOmdi
-	qHlAClyUri4rY8EvkdZAMSGWjz1KzIcsXgHB6DazJaR3Ma4ZjNXrvY8GdC9Da8C+qbW46Eijy7R
-	62wIddT646aZd68BW0Kr488IEJD7gZfikobNm/5I4y8gl67cIf6k/QBE7CowwrQGgUzPXlBl8Sp
-	cLPr7nMVrEnr2CkGqRMeYnR1SEHHDVp7CLFU1CIRstf5siw5FSbzx2nsAhEqE=
-X-Google-Smtp-Source: AGHT+IEzR8UiPgOwvsgT+xP6okgmIV8TAjb8DBcV9yRJuXjUDaccDus6pJOrK4chKxcxEZN8ldHefA==
-X-Received: by 2002:a17:907:9717:b0:b84:1fc8:2fb3 with SMTP id a640c23a62f3a-b841fc8efafmr95959766b.4.1767615282283;
-        Mon, 05 Jan 2026 04:14:42 -0800 (PST)
+        bh=nT0a9okVqQVqG4JPUviJUmT9EW1WnhugEMsAcr4nqg8=;
+        b=dVjKiP23NBg6jM5RfIrzIpjdVgYRsBlkvMTTwplrjCXgaThVaOR/h6DVaOAD96adpQ
+         ce98mc8apef23+CJvYJsNb561yXxOfBMApOgkR00kkn3+2C21szvLIGI3dJE/OSYrri+
+         UCOLeCF2FPmxvVCGfMN6YQnGcIYvlWb+C+d4wUhNXy/MevvZfXku6TfxDJ/Q1oWhyLlu
+         KdFis5WMLitkGYRhhxUfUK60oFJtxHVkbFDnAOeHReaRvGwGw8PX7p8qk7WPyX63e+tu
+         nYMXHDabknSpQ2d0RsO5D46ErJ+Gks/TzSryva8XiOi1Srh9eXQ+V31DP3RHjb3Qt28c
+         CVYg==
+X-Gm-Message-State: AOJu0Yz3KJXhw62LOK7OCEHK7ylAMzLCe0tbtzrCssW7xBJpF/tk+ojo
+	rLVF7liPPLQ3+pDJ2Qpwjgkcmn5mwYUBit2On7GkWdy3yOKb2RoMzx8Djn2Wi0zBr44=
+X-Gm-Gg: AY/fxX6QwJBWn484Yho2WVrnYvXjb8ZP8ByUnp8zlH8+BkR6QKy7epLXe/cGH6W9EEP
+	qADO0s7jfIuV5HCiifSU2baRK0JN3ENWhEOVQnSDCsAAYYTRJZvVxIg9rDLL8duV5Aqa4UeDUf+
+	4hHODD5tPOQP346/JLoFBlDFrMbIMMKDdwfaG2HDLLdOiRY0OPVUaLjB/NIeq4t9XwRIwOO97Bz
+	bcVpzqo1ovhpQSkCFkkCtoP9SD7sDO49ayCXKhxchW/gDz9XLkuA0O/UO7+EnRb4kvrxIVu64sN
+	oh544hFKN5xppxAqkw92E02cMinU48jnV1Fg5+cytyq2rNbURHrk9KGDLmCe0GyEvlRI5bvEEcT
+	Fh/GgxHyeXNR4os2429G8YSz1e5H4ZIr+vMPSzuwxbbkMABGFZSN5Cj/wbKrTh1hwHDfcF/5KMU
+	wgPwXNPeQLXfLg6Hz13m3Dhiw1pE0zBDxJl4UT2AvFhqDbduPScFjUY90Pt/8=
+X-Google-Smtp-Source: AGHT+IHnCZ5omgu7ZRNjq2O1BB6JNDBHj6Vw8V7C0m2iRJcZNjtbxb29+5EsB+UFZxxKS5F3ve2vqA==
+X-Received: by 2002:a17:907:9722:b0:b83:13ac:a3c4 with SMTP id a640c23a62f3a-b8313aca9dcmr3790232666b.52.1767615283518;
+        Mon, 05 Jan 2026 04:14:43 -0800 (PST)
 Received: from cloudflare.com (79.184.207.118.ipv4.supernova.orange.pl. [79.184.207.118])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b803d3cea32sm5367128266b.34.2026.01.05.04.14.41
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8037f0cea9sm5458801566b.50.2026.01.05.04.14.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 04:14:41 -0800 (PST)
+        Mon, 05 Jan 2026 04:14:43 -0800 (PST)
 From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Mon, 05 Jan 2026 13:14:27 +0100
-Subject: [PATCH bpf-next v2 02/16] i40e: Call skb_metadata_set when
+Date: Mon, 05 Jan 2026 13:14:28 +0100
+Subject: [PATCH bpf-next v2 03/16] igb: Call skb_metadata_set when
  skb->data points at metadata end
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -83,7 +83,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260105-skb-meta-safeproof-netdevs-rx-only-v2-2-a21e679b5afa@cloudflare.com>
+Message-Id: <20260105-skb-meta-safeproof-netdevs-rx-only-v2-3-a21e679b5afa@cloudflare.com>
 References: <20260105-skb-meta-safeproof-netdevs-rx-only-v2-0-a21e679b5afa@cloudflare.com>
 In-Reply-To: <20260105-skb-meta-safeproof-netdevs-rx-only-v2-0-a21e679b5afa@cloudflare.com>
 To: bpf@vger.kernel.org
@@ -112,14 +112,14 @@ Adjust the driver to pull from skb->data before calling skb_metadata_set().
 
 Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 ---
- drivers/net/ethernet/intel/i40e/i40e_xsk.c | 2 +-
+ drivers/net/ethernet/intel/igb/igb_xsk.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_xsk.c b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
-index 9f47388eaba5..11eff5bd840b 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_xsk.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
-@@ -310,8 +310,8 @@ static struct sk_buff *i40e_construct_skb_zc(struct i40e_ring *rx_ring,
+diff --git a/drivers/net/ethernet/intel/igb/igb_xsk.c b/drivers/net/ethernet/intel/igb/igb_xsk.c
+index 30ce5fbb5b77..9202da66e32c 100644
+--- a/drivers/net/ethernet/intel/igb/igb_xsk.c
++++ b/drivers/net/ethernet/intel/igb/igb_xsk.c
+@@ -284,8 +284,8 @@ static struct sk_buff *igb_construct_skb_zc(struct igb_ring *rx_ring,
  	       ALIGN(totalsize, sizeof(long)));
  
  	if (metasize) {
@@ -128,7 +128,7 @@ index 9f47388eaba5..11eff5bd840b 100644
 +		skb_metadata_set(skb, metasize);
  	}
  
- 	if (likely(!xdp_buff_has_frags(xdp)))
+ 	return skb;
 
 -- 
 2.43.0
