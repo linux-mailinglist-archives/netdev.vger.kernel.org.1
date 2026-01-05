@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-247015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5915DCF37C0
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 13:20:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C723FCF37CF
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 13:20:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EA41F30F4360
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 12:14:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1809930EA70A
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 12:15:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF3E5335547;
-	Mon,  5 Jan 2026 12:14:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB6913358C6;
+	Mon,  5 Jan 2026 12:14:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="gTkhxGbU"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="SIezLRJ4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0357A3358CB
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 12:14:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29669335575
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 12:14:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767615291; cv=none; b=f8Zmn+GxgbwmZL5BppF9skq1ouwVUNQYilAWm2cTCUB0c8VRlfJq5HbBxfM0eaJ/ykafucCI6QgkQgIHR5Nz84YMMZm2+Txs1gc1yDrtsSX6nvUdkL0SQwQo6rdSeYyv0lw46hdyyYvIUt+lkpQBhOLd4onkN/PdV5xvKcH4PJE=
+	t=1767615292; cv=none; b=mnOzY36oat+642WIdE/H2iho+kKhCnQXuIqRyALulzKaOhGEoWNdYQkfLtBtBDVZrzgVfMgaCqSLwrFdiR+QxxEOoxZOgbpz0zorVEcx69E4LIseoiuXjLvH2EL/DKC+jMq8VfEHteUVFJIJryZGMxBgkKfY+TUKCeCnOg6Nq+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767615291; c=relaxed/simple;
-	bh=NaajF5tLSJC0MVk186WINR7q37KABHcy2kYvLo9rMVw=;
+	s=arc-20240116; t=1767615292; c=relaxed/simple;
+	bh=1tuE34tqdRZ0Cq/ciIXf0IbqXReLHJ00YT+wtQPddnU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=HPgHL1cyI5ezdF5ogJR4PIyzQOD2K8vCpvMOfnueiDeG0NyzPOVGtr9AxhOZuDUM1bzmydNHbRzBtQuq+B04T2hbDzJN4zPNy9ILBST77hw5HztRkSY2NFJQXX+HFn/Qa1i3IhaRa9cg1Q95sTr5qugZvvvFoNyUDs7SqhcQux0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=gTkhxGbU; arc=none smtp.client-ip=209.85.218.46
+	 In-Reply-To:To:Cc; b=rqxiJij0+70KzjxQmBkXCit0qebtBkDoW3Lc5wjXus1u6LFLXcJtUGRORZWDLAlT+kOkoA3ucgvXdHowvEP+YrYlOyhWFmuj3gL3vuqR/4nZJYVOioLk/bRRWARdNeyrFy2VGad7dyO653NZpXrxYLtpbNuCtighcirP0Ixy9B4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=SIezLRJ4; arc=none smtp.client-ip=209.85.208.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b79ea617f55so2719800266b.3
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 04:14:49 -0800 (PST)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-64b9cb94ff5so18163623a12.2
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 04:14:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1767615288; x=1768220088; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1767615289; x=1768220089; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=nyt1pEvTxrkLTTNOpoJZXjB9GHiCuwIadpGr/Kcla8c=;
-        b=gTkhxGbUb8Ptgo4Gjcj5sx+cdMRkUVjG2/PLEzlb7Jv/bZF5RxZBb0lOlIs9NsHK1I
-         jrqDCKZMks4Qz+0how+P4pwwpYuY42aVSsihltesKRG2V/rgNppjVDLhrTaDaCJyvUpO
-         8A8pmLqUqbpGpvbjN16+U46XJRr+Cc3lsT8/2SPVGsPCGm6PgFl7Qu3XhfbVJgnNAXjC
-         5SHTlVcrzeCMjfucRTEPnNmVnmGlUeH6IFsbN30o8CDxXfHGIh+CxE/ySV3ttmp0nsV5
-         ZixBanFCqrS+sNtq9zhUQu/FrQm0w5mhMCjbBn6fLfNOd/Sty2jcEJIstyooFofHh1Sr
-         SGYw==
+        bh=bvsM1sRJWYDcPZakX1MsPvBpIu+3P2Cxb3oshH7eLdY=;
+        b=SIezLRJ4AVA4pUlrYJWYpK4OjS0xu8c0PR+pDma7V1KQoqUFsb81WUdqtJI7bVzC/O
+         7LH49Rg/jtEqWzWvq5ypXal3WU9d68196xXcEYs0vajyRYwHL/aN+gLdF4Jlc3UwtkZB
+         P811MuYoud7f1MnST8zLFlDh5EbAKbYoAvBewXVuo0cf3ABc4tbd3F3u2/iPGapTO+2D
+         KVuLTRl1zvtVTbac+j7lX+e+O/sRSxKI6RZJCf9FsOjW8hP2+ApeiNkx1lZJcZuo2fwB
+         n5xhYnjlUAej9mdOB0jbNkzmLTK+G9pTl/QIRHCVrTVWSnf2OVYarez1c70NHC5bNiPM
+         +Iag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767615288; x=1768220088;
+        d=1e100.net; s=20230601; t=1767615289; x=1768220089;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=nyt1pEvTxrkLTTNOpoJZXjB9GHiCuwIadpGr/Kcla8c=;
-        b=fVmZl8HOlQXtrvOP1NYU0fxZmaqOgRfL1oajxp+oxoAx01rCRcgPn+0dPVfSCRt4Mc
-         mKi9JjrNo6MfSL4p8YYrUiczfD+zO15QE5xjXZz4yohQ3ih5SMPEJa9DY9xLMdND0yx+
-         HKYLQ4YBVAJxWFcd8x3EzsvKzdzd99BsU9puhXjoppikZf94yBU93Sb42N0SyVmPLilV
-         ae78Yk9ydWkhaATBB37fwlSLn96ubvWRhXhubKyT0rD2UYdFp/eF2g8ptPi5Cli7VFAH
-         tQPga9xVGpyLKY1lTuwRUJEXwf63GqBl9BaTzsOFNnbM7/wfgFwXvpc7IeS1JVD6t8Qf
-         UeGg==
-X-Gm-Message-State: AOJu0YzVGAFthuOtAt+ks939sGs24Ywek6K4Nrj40O4oK+8AMaavt6yk
-	igIr6A8TVoi+iicYl7tXxg3K/u23u8vsfdyrdGCzF/JiERmxjeM7BMg2mkbilXIiEKI=
-X-Gm-Gg: AY/fxX4qhDXQ9wyNYUvRgEM3MHGayrqGryLD9VXCRieTYROQj0lBk93MtP0uABE0XCp
-	ftF1Mtik+3LYKy0ijS0nrd130tYBlqamAQsfIeJm3r9eKoSyFfldrZjXDofvM3gltOx2EL5jB4Y
-	8mY5FCrEz+gAsIogEpXenr5KKuLu7dLapEhrpPwWgN6hO4v14G2S2lls1XcSFcP0sLWHhxReN9l
-	f+1iNUZwvvw486fsdxSbbyaAeaxuXVAXwake7R+uqy4FEJeruCVx8x4z7qSCFBDkDFgh4Y83sm/
-	CI1QpYR2i0cKaDf3EWketb3o6kIr6H0bGT683IrGL85QDcmNBQ5hPWKRzFw9PyJwreO/7kpoEEx
-	KnvIRzZlAM1eOcfUjJjr/SuRh9sxV+Zccnv+gramrA+qm18m9hBfNtTxVTsDBhpd7ztygdQLQ0A
-	kt1JLi3DYBvJcO/LGIXV5Zz1VzOrQFOizaCrCD9mb63qwFHjNmL3o0IZdxPKY=
-X-Google-Smtp-Source: AGHT+IHF2y789vZ9L5QZP11T2yCBl7sSqeVv1BFKUDGeKuzVN6znOu+Fdjpsor2okWeZSF/297bDuw==
-X-Received: by 2002:a17:906:fe0a:b0:b73:8887:f42d with SMTP id a640c23a62f3a-b8036f0a3ffmr4987450566b.5.1767615288231;
-        Mon, 05 Jan 2026 04:14:48 -0800 (PST)
+        bh=bvsM1sRJWYDcPZakX1MsPvBpIu+3P2Cxb3oshH7eLdY=;
+        b=gWark+vlsaWmZulIG6zv7irk6EhgT1qjMYcKOwbBG/0YvDoNu8+F5xG4TzBBADHYu+
+         SQeQ8pbX26JVYuCfdZEeJzx77xOLFnRpfI0X83mpROgPay1x14pdWWqViApNqJ/CbviQ
+         YYVb+LZ3XTERh2GJHD2L3ZYmNLrv5NjyE6EdgKDJWEd+L1u5vezh49wm0t2M05Q5D499
+         juyi4pud9FdcKfJZkYaLtM547ULQs69y6pSDJnidCYbc8odv4CCgGBhVoW3v97+rtHLC
+         JhxgK6QZ1CSUiqyjppLWDA7NemEmaPz3oZBDMF3SstAylXLPIgKlb1a8mo3KbKKiUboI
+         Wu4g==
+X-Gm-Message-State: AOJu0YxvPV4t+UbNH4JOhhIitKsBcLa1j498qEnMauoFtSRHyfJyTVYL
+	x2A3SD3REMsujmW9c0gC1VAhMCUYuD5kiRGv0EMAlKUpfi/AAo9zE1bXc0XSiFI8B4E=
+X-Gm-Gg: AY/fxX7rixkY+A3vBDb+tXpz83eO67esNbg5847n1xHYUaSTsAUaeViTwIg1kLABGFo
+	g9i6oyIF3vFuxTOirPSZPommTQ9koxFPuPbo+apuXmbU+B3uNJ0WW0svornF+/H+VRvCLMHpJFF
+	ER3EtujMaoG6M3NY+xeo37Z/8QwRdsK9kgYy59XmcwVFwnJ2M/ROMmbQFrtZNSINTtCVn+t+S7J
+	D5kvHFf9h95GSf+D6+L43k0rFLugoUo2Tnf0R6xWKzD4VlnssKXszdez4PsI8K1lkCMdLgwGFAU
+	jOeq0E3s4/2YBKtp43mLLJRsZ4udXA5cmV4LtRoHDzMq8IuEu3QUVhQdCwcPEgMzSf8eNn8+Q8d
+	rj7SQpYcCin1Hgi8ZiZr8oPjDRoEt3fL001fc1C3pySCpXoyNcb/YckYanVmnxaRXSdRnzsDAaP
+	RCX0xR4KrLEuHo2SkIN+YWSqUgPEoZJ3ZYMDRl5BIzSmyWMRMbBbwFWiJ3kWI=
+X-Google-Smtp-Source: AGHT+IGB7MLOlR1tLtuW8MR85eupPc/VpekFTuwvyLYlBNEjUgo9TT1UfR0xNH8NjYLmvRnpdpM93g==
+X-Received: by 2002:a17:907:3cca:b0:b83:c7ff:a47c with SMTP id a640c23a62f3a-b83c7ffa5b2mr1145231766b.17.1767615289369;
+        Mon, 05 Jan 2026 04:14:49 -0800 (PST)
 Received: from cloudflare.com (79.184.207.118.ipv4.supernova.orange.pl. [79.184.207.118])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-64b9159a6d0sm53485163a12.28.2026.01.05.04.14.47
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8037ab7f7bsm5433934466b.18.2026.01.05.04.14.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 04:14:47 -0800 (PST)
+        Mon, 05 Jan 2026 04:14:49 -0800 (PST)
 From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Mon, 05 Jan 2026 13:14:32 +0100
-Subject: [PATCH bpf-next v2 07/16] veth: Call skb_metadata_set when
+Date: Mon, 05 Jan 2026 13:14:33 +0100
+Subject: [PATCH bpf-next v2 08/16] xsk: Call skb_metadata_set when
  skb->data points at metadata end
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -83,7 +83,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260105-skb-meta-safeproof-netdevs-rx-only-v2-7-a21e679b5afa@cloudflare.com>
+Message-Id: <20260105-skb-meta-safeproof-netdevs-rx-only-v2-8-a21e679b5afa@cloudflare.com>
 References: <20260105-skb-meta-safeproof-netdevs-rx-only-v2-0-a21e679b5afa@cloudflare.com>
 In-Reply-To: <20260105-skb-meta-safeproof-netdevs-rx-only-v2-0-a21e679b5afa@cloudflare.com>
 To: bpf@vger.kernel.org
@@ -106,37 +106,29 @@ Prepare to track skb metadata location independently of MAC header offset.
 
 Following changes will make skb_metadata_set() record where metadata ends
 relative to skb->head. Hence the helper must be called when skb->data
-points right past the metadata area.
+already points past the metadata area.
 
-Unlike other drivers, veth calls skb_metadata_set() after eth_type_trans(),
-which pulls the Ethernet header and moves skb->data. This violates the
-future calling convention.
-
-Adjust the driver to pull the MAC header after calling skb_metadata_set().
+Adjust AF_XDP to pull from skb->data before calling skb_metadata_set().
 
 Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 ---
- drivers/net/veth.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/core/xdp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 14e6f2a2fb77..1d1dbfa2e5ef 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -874,11 +874,11 @@ static struct sk_buff *veth_xdp_rcv_skb(struct veth_rq *rq,
- 	else
- 		skb->data_len = 0;
+diff --git a/net/core/xdp.c b/net/core/xdp.c
+index fee6d080ee85..f35661305660 100644
+--- a/net/core/xdp.c
++++ b/net/core/xdp.c
+@@ -768,8 +768,8 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp_buff *xdp)
  
--	skb->protocol = eth_type_trans(skb, rq->dev);
--
  	metalen = xdp->data - xdp->data_meta;
- 	if (metalen)
- 		skb_metadata_set(skb, metalen);
-+
-+	skb->protocol = eth_type_trans(skb, rq->dev);
- out:
- 	return skb;
- drop:
+ 	if (metalen > 0) {
+-		skb_metadata_set(skb, metalen);
+ 		__skb_pull(skb, metalen);
++		skb_metadata_set(skb, metalen);
+ 	}
+ 
+ 	skb_record_rx_queue(skb, rxq->queue_index);
 
 -- 
 2.43.0
