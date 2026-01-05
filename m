@@ -1,182 +1,179 @@
-Return-Path: <netdev+bounces-247001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 562C5CF36A0
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 13:06:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 80AD9CF36A3
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 13:06:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4A852309C3AD
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 12:00:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3718E30305A5
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 12:00:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B79613346BA;
-	Mon,  5 Jan 2026 12:00:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="JTz5j2Pn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA6D9330B36;
+	Mon,  5 Jan 2026 12:00:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-57-87.mail.qq.com (out162-62-57-87.mail.qq.com [162.62.57.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 201CA334681;
-	Mon,  5 Jan 2026 12:00:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD2D33375A
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 12:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767614410; cv=none; b=GJaI9Vd6X7rrdCmXbhJMuotzpFmNZ2feIMT5Vd0VdjYCXUx2S3IaVGgse0EQrKmk2mbCuAQgnEG65G8aha/LiAo305lbCDKKvbEqIwbe9LlzhDkP6W/jEdDQAN9tSabRpY6j8cBb2uNuyX7a3afkYuPHUEYx05vufOo6oJp3zRw=
+	t=1767614445; cv=none; b=RJ26Vw5qj1j7yHk1ix/khiyndDtjk6mqGmOIxUWEoO5uCEA6L+UTx1ACQEGyVBVXewRE7CgyUvjB+x9Zion2hgG2xWfCzFtp5AJBDw+6Ipkc6mwO4oQaYKbLV/2e6KLF/yrB8uCSTwpJ5kkQ22FaJHk+uI5LB6QhDEGOAJDl3Ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767614410; c=relaxed/simple;
-	bh=83e85h+P4XAdW21RDXPLl/BdUOaF6CIC+zqld7yeDV0=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=P6rem+YDBrIxUzKQT31yl/IDreObtywio0DX0kHnxHATcpjImEdtEGC1dNV/gNK8IaDJ/IFskPVLzWHuWOtvk/od7+nLJ4JvHrZEUxh3xMTY0orlEO7QH+i0uYfCqBj7TU4Rw5AeAwn8d5zExwzs1RFWpI5/yjuWk9r8tl1HmRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=JTz5j2Pn; arc=none smtp.client-ip=162.62.57.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1767614397; bh=HsQN+LjsQ7x+jgQekkX3zGf1yUPhzeVvR7BJTXKig0M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=JTz5j2PnQn5GPlSchiputctKmGa+YRZ0bnXO1S+QmZIICH35QE4fe/DZOIxL7WWEB
-	 NJ46VaXKky56914mMLw0SQplpL91XNXWyX16Q4s4CFFAoNbeCblHE8Cz5sAKf3bxYk
-	 VNA7zLdRnH08RFRQ/SX8bNeqYtveCnBValyDUz4g=
-Received: from localhost.localdomain ([61.144.111.35])
-	by newxmesmtplogicsvrsza63-0.qq.com (NewEsmtp) with SMTP
-	id EF714E12; Mon, 05 Jan 2026 19:59:55 +0800
-X-QQ-mid: xmsmtpt1767614395t10ab52fo
-Message-ID: <tencent_44B556221480D8371FBC534ACCF3CE2C8707@qq.com>
-X-QQ-XMAILINFO: OKKHiI6c9SH3ipsCvfcnKCvyjqv8ekmf+ebMWrVPiBuv6RLMOQg5RL/RofiVd/
-	 Q/z8tsTMMuxCqfp1mNxK0B08WagzH9XhTgD1B9WV1hvlj+Lzg8foGl+qLGjy03r0jv+9XRU+5Ms5
-	 /6OvCfvdsB8TRaFJPIO0yr+c0fhtyLqZf8Zxcb2EZCxUh0b6e+Af33TuzTx91bDYYOsVBHILtzLr
-	 pYnVQtVz0WvJB9vd50Ty3jgyBD0PPzq2CxEljCGGB7Y4l+ZKjJ1U1JOY82W+BmkQfdagH3bWnOgs
-	 NRhcJS1wlIAffD6EtP/UfmY4o/VMwXJxa4rPGv0GWkfgqKy9nT75xlpIwRi5dOpCUI8yAO3evEKw
-	 +iYS2/F4Jcysrxif1i9rlSGRekiMlxJyt/lWbzwXz3kaWXBaMv0t42cpg3UrDAaeOUr1u7aCUuww
-	 ZdhBXLMvkXPY4m2kvs4bwU5WB/bXo8GonwHb2dEwLQhqdLJ4NIbXdfTAqJFaomRMtT4IthprlGBj
-	 qBpKnOZKWE8FKkd6CB32o1O3JQDVEZaeRfdyips3Sp4p/JKLx6ZQ+RV8Un67a1jFWdZfwicDD4+S
-	 UbbprhBuUISqDbkEdcQNr+zCoTN9kBVLxKZfNqUIEQYQtvISq0iOY2U6PvJJZHnehrFF+fURZdkD
-	 0kLRsIn2yzbK0RlNkJA1apzeP6B9dyYaUKvgm2ejyA2d/JsCsblIbXMyhVEGmDbkq0EqwuBX34ZX
-	 oCKi2MD5fUgIzKL3dGbOxyn7qhAUElkZX4wkWeRcUhpyisyTwI55IWfAL7iHOUg1kiv71YWn2x4a
-	 7j6XVxUJagzDVY98UYARJlJvfrVLX+6Xq2CN0EtiFg6r7ugWTUIt/Iq5kJnX8LrtLeJoSAtCo/PO
-	 w1N9KS6nQZxF3WQypLCBHllfpIn1sTkJdLRdLUbzlk27P/qtZtgIvvQmLNhua0W3puXU/1+6waCt
-	 U14GRXvhIwqjDzYcxI7CApZ/Lc3jVZvh/rzoydt7XRh7ew6zGgKdHiXUdoT146a6t2wqol3VID3Y
-	 wzWqFRXTB88MyvZgXPmSLRxfUs5XWgmYSO5sr8Wf6vJMEQ2FBhBPAF6vYhktga2MoBo1pVi1I0zr
-	 oihXCzGJqucmWVAGBsMb2A5qLzpg==
-X-QQ-XMRINFO: Mp0Kj//9VHAxzExpfF+O8yhSrljjwrznVg==
-From: wujing <realwujing@qq.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Vlastimil Babka <vbabka@suse.cz>
-Cc: Matthew Wilcox <willy@infradead.org>,
-	Lance Yang <lance.yang@linux.dev>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Brendan Jackman <jackmanb@google.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Zi Yan <ziy@nvidia.com>,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Qiliang Yuan <yuanql9@chinatelecom.cn>,
-	wujing <realwujing@qq.com>
-Subject: [PATCH v3 1/1] mm/page_alloc: auto-tune watermarks on atomic allocation failure
-Date: Mon,  5 Jan 2026 19:59:43 +0800
-X-OQ-MSGID: <20260105115943.1361645-2-realwujing@qq.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20260105115943.1361645-1-realwujing@qq.com>
-References: <tencent_C5AD9528AAB1853E24A7DC98A19D700E3808@qq.com>
- <20260105115943.1361645-1-realwujing@qq.com>
+	s=arc-20240116; t=1767614445; c=relaxed/simple;
+	bh=ofkk3fDMXfaDqdL6mAbClhIKaLqJwPvhJFxDHVlpUhM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=NLS9w9Jds7T8lwE+eBGKfNEWI5j9Bb50ih2Mjq7I3ESUjD3mKOZyOJmZIxu/Vc06pTWQZToT6vucdYqYV+7X9+UzpZhB0qyTSZ3rZFR5lmj93gawS2jkGVxUXhD9MKdp6zHUWq1dY9J2PqfBCQIEDycfDGAu8MP8fKBh9Bevp0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-7c75b829eb6so8844810a34.1
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 04:00:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767614442; x=1768219242;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+nGI90FgNg6Orxw3QE9KbiBZzXhpcXBalJ+YBtICfE0=;
+        b=PjEdxTlK0J0kvJmxp9ulio5z+NPZfSXd1voWgNpCrLP3/7MFTT4hG60Ny7eEVVl//9
+         rL61BrkB29bLweOMhPWZzpx9G+kxQpDvWscLLg1nk5b+445O1rXlohjWXOp+arY62q/0
+         fQur1GjRlnQ5r/0xqUyxib7Y0Jra+ao9d14TQei90DE8sLcxDCHKZK2U93fAdCYuckSG
+         j0mgLY6JRkzY0kBEbk2O5uLCs0gvW3Z117ini/24BwnPj67gbIrDisdVsM9BdF7Z/NG+
+         84vfJ1RCW3U1PyZ7Mszjbz7JiJUnXNLC6tJnqVBWbFyMmhAncGAHzV2YDgESwAwsR2OR
+         yNhQ==
+X-Gm-Message-State: AOJu0YxfzOAkmdjvz0pT78pLECpdCxxCfbe83jyTdHHikxOLLRTJjgY0
+	xf+iCwLiur8y6XcORnYwEuoerWl6Np+hxu46fNRoGkZrrK1Rf06/sh9a
+X-Gm-Gg: AY/fxX5qcLT1beq4oWMHXgfG993lYj7GMJx1pG8GvMqyqrdTtSyvctwvN2pf36FzsFD
+	KFU3XKug/7m/00K2uJfon/7BUNWbgNEtn1jKMaCWerfAmpnBLyzB4d/NweP4Bk29+5Uy2CITvYq
+	6lQ6sTjaY9NfuMz1lUlg5GJHYCUUz5yRS1/0VQ8RB1zdJC6HXpwRkHGr6tWk5Z2nge9IDVc1qDn
+	yT6O1h2lOtfTDwT0NDinMWSSaSLHErkxUlIH7lWEhc5DedDzJ0Ypu7JKJOb/3FgvDXBRtoZZjJ2
+	XQghPQbedyOF91wodUQFaeDgNG5JEhrD5Q49S9Ct+aJ+Z9SD8D90uRGaM0K+MeuahCLvJ/zNmuH
+	HZCPJUQCdpBb0qLGzNczy9RjoN19tEydKldeiezoLEO/20EYbfuiTq+NZJwhD3/71U9ZBGEZP7l
+	nBmXt1tNMRA1UN
+X-Google-Smtp-Source: AGHT+IH8deTVPke2vXyRK4ncJdp0pK2ey5NcMLE1Kk9Y3AUkKsrGoLMbt59kO3J3OMAbGgUYNScKQg==
+X-Received: by 2002:a05:6830:4119:b0:7c6:a2da:ce4b with SMTP id 46e09a7af769-7cc668a4bb0mr26188912a34.5.1767614440673;
+        Mon, 05 Jan 2026 04:00:40 -0800 (PST)
+Received: from localhost ([2a03:2880:10ff:5::])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cc667fa674sm32887148a34.29.2026.01.05.04.00.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 04:00:40 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Date: Mon, 05 Jan 2026 04:00:16 -0800
+Subject: [PATCH net v2] bnxt_en: Fix NULL pointer crash in bnxt_ptp_enable
+ during error cleanup
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260105-bnxt-v2-1-9ac69edef726@debian.org>
+X-B4-Tracking: v=1; b=H4sIANCnW2kC/1XNyw6CMBCF4VdpZk2NUy4WVr6HYUHbKYyLYtpKM
+ IR3N+DK7cmf72yQKDIl6MQGkRZOPAfohCoE2GkII0l20AlQV1WjKlGasGZp68qVeHPaeIJCwCu
+ S5/VkHhAoQ/8b09s8yeYDOLKJU57j5zxb8Iz/3QUlSu1b66hpWm2quyPDQ7jMcYR+3/cvpkq7k
+ LAAAAA=
+X-Change-ID: 20251231-bnxt-c54d317d8bfe
+To: Michael Chan <michael.chan@broadcom.com>, 
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, 
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+ Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ kernel-team@meta.com, Breno Leitao <leitao@debian.org>, 
+ stable@vger.kernel.org
+X-Mailer: b4 0.15-dev-47773
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2959; i=leitao@debian.org;
+ h=from:subject:message-id; bh=ofkk3fDMXfaDqdL6mAbClhIKaLqJwPvhJFxDHVlpUhM=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpW6fnW7MzHTVeSjf5pSIQjcuOIopl/jVai0jMP
+ G7iyXAaFYaJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaVun5wAKCRA1o5Of/Hh3
+ bWsWD/9JLfEicI2+EMVUr7Q2qY/ChMUsiCsxDBicYYI8wwK9tpyNuyFextX2bXbYY8obVfl3FD1
+ a3Nah9zOpJ03BQhU7huiSbEMG58BVvbuuxFuZSq5jHuSbXwTdhje1+4KGuTMH9+uRekVWzVIUME
+ mcX47ZVNQ5yLG4jks86VO9l35fXl9KNjRIq/6s04yhAXFqC9/qcBQD5VWsp0thLEfwv3ii95GrY
+ 7ew+PhHMsfJORRW8aVGkAkbMkYzXzoCBkpMa4aSCnmPLvASLWaURTAkOMQwYpKMjv29PcvVCM2p
+ 9a6Xpx0Hqj8zW3Rp1M05eJg/mHb7Teho44fGLOR3okE4SGx2JJA5w8Srz2Cr7/8I6l6D8b3S6MW
+ HCzslV+zyzazoCFBO+V39CqrNrqx6mP/Jj2442rbHNoJVeh4pdmokF1HljLpeloJhJ+rK48nqJ7
+ +9NmdtDxtot9HoBcDnAyjGyCGFOeXxOsibTMkHyTRljahrBXmkVBLzGSUFg2EvpIZIVdOfjegoA
+ kKswRQQqv4LO1+5qy/OseXyXYNXAPdGIzDi4D23e/IntHd7sNjAVtGDeyNGL5rsNis4tw2yNatk
+ 1J0eyxXTDax4ZasCYGekoIW1kC4zsh2OgegB1VRTBWWqqLuGiZQQVKBo6+xKKwBd+CI7BaQoUEf
+ xYHV0cjCWwncmRQ==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Introduce a mechanism to dynamically boost watermarks when critical
-atomic allocations (GFP_ATOMIC, order-0) fail. This prevents recurring
-network packet drops or other atomic failures by proactively triggering
-kswapd to reclaim memory for future atomic requests.
+When bnxt_init_one() fails during initialization (e.g.,
+bnxt_init_int_mode returns -ENODEV), the error path calls
+bnxt_free_hwrm_resources() which destroys the DMA pool and sets
+bp->hwrm_dma_pool to NULL. Subsequently, bnxt_ptp_clear() is called,
+which invokes ptp_clock_unregister().
 
-The mechanism utilizes the existing watermark_boost infrastructure. When
-an order-0 atomic allocation fails, watermarks are boosted in the
-relevant zones, which encourages kswapd to reclaim pages more
-aggressively. Boosting is debounced to once every 10 seconds to prevent
-adjustment storms during burst traffic.
+Since commit a60fc3294a37 ("ptp: rework ptp_clock_unregister() to
+disable events"), ptp_clock_unregister() now calls
+ptp_disable_all_events(), which in turn invokes the driver's .enable()
+callback (bnxt_ptp_enable()) to disable PTP events before completing the
+unregistration.
 
-Testing has shown that this allows the system to recover quickly from
-sudden spikes in network traffic that otherwise would cause persistent
-allocation failures.
+bnxt_ptp_enable() attempts to send HWRM commands via bnxt_ptp_cfg_pin()
+and bnxt_ptp_cfg_event(), both of which call hwrm_req_init(). This
+function tries to allocate from bp->hwrm_dma_pool, causing a NULL
+pointer dereference:
 
-Observed failure logs:
-[38535641.026406] node 0: slabs: 941, objs: 54656, free: 0
-[38535641.037711] node 1: slabs: 349, objs: 22096, free: 272
-[38535641.049025] node 1: slabs: 349, objs: 22096, free: 272
-[38535642.795972] SLUB: Unable to allocate memory on node -1, gfp=0x480020(GFP_ATOMIC)
-[38535642.805017] cache: skbuff_head_cache, object size: 232, buffer size: 256, default order: 2, min order: 0
-[38535642.816311] node 0: slabs: 854, objs: 42320, free: 0
-[38535642.823066] node 1: slabs: 400, objs: 25360, free: 294
-[38535643.070199] SLUB: Unable to allocate memory on node -1, gfp=0x480020(GFP_ATOMIC)
-[38535643.078861] cache: skbuff_head_cache, object size: 232, buffer size: 256, default order: 2, min order: 0
-[38535643.089719] node 0: slabs: 841, objs: 41824, free: 0
-[38535643.096513] node 1: slabs: 393, objs: 24480, free: 272
-[38535643.484149] SLUB: Unable to allocate memory on node -1, gfp=0x480020(GFP_ATOMIC)
-[38535643.492831] cache: skbuff_head_cache, object size: 232, buffer size: 256, default order: 2, min order: 0
-[38535643.503666] node 0: slabs: 898, objs: 43120, free: 159
-[38535643.510140] node 1: slabs: 404, objs: 25424, free: 319
-[38535644.699224] SLUB: Unable to allocate memory on node -1, gfp=0x480020(GFP_ATOMIC)
-[38535644.707911] cache: skbuff_head_cache, object size: 232, buffer size: 256, default order: 2, min order: 0
-[38535644.718700] node 0: slabs: 1031, objs: 43328, free: 0
-[38535644.725059] node 1: slabs: 339, objs: 17616, free: 317
-[38535645.428345] SLUB: Unable to allocate memory on node -1, gfp=0x480020(GFP_ATOMIC)
-[38535645.436888] cache: skbuff_head_cache, object size: 232, buffer size: 256, default order: 2, min order: 0
-[38535645.447664] node 0: slabs: 940, objs: 40864, free: 144
-[38535645.454026] node 1: slabs: 322, objs: 19168, free: 383
-[38535645.556122] SLUB: Unable to allocate memory on node -1, gfp=0x480020(GFP_ATOMIC)
-[38535645.564576] cache: skbuff_head_cache, object size: 232, buffer size: 256, default order: 2, min order: 0
-[38535649.655523] warn_alloc: 59 callbacks suppressed
-[38535649.655527] swapper/100: page allocation failure: order:0, mode:0x480020(GFP_ATOMIC), nodemask=(null)
-[38535649.671692] swapper/100 cpuset=/ mems_allowed=0-1
+  bnxt_en 0000:01:00.0 (unnamed net_device) (uninitialized): bnxt_init_int_mode err: ffffffed
+  KASAN: null-ptr-deref in range [0x0000000000000028-0x000000000000002f]
+  Call Trace:
+   __hwrm_req_init (drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.c:72)
+   bnxt_ptp_enable (drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c:323 drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c:517)
+   ptp_disable_all_events (drivers/ptp/ptp_chardev.c:66)
+   ptp_clock_unregister (drivers/ptp/ptp_clock.c:518)
+   bnxt_ptp_clear (drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c:1134)
+   bnxt_init_one (drivers/net/ethernet/broadcom/bnxt/bnxt.c:16889)
 
-Signed-off-by: wujing <realwujing@qq.com>
-Signed-off-by: Qiliang Yuan <yuanql9@chinatelecom.cn>
+Lines are against commit f8f9c1f4d0c7 ("Linux 6.19-rc3")
+
+Fix this by clearing and unregistering ptp (bnxt_ptp_clear()) before
+freeing HWRM resources.
+
+Suggested-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Signed-off-by: Breno Leitao <leitao@debian.org>
+Fixes: a60fc3294a37 ("ptp: rework ptp_clock_unregister() to disable events")
+Cc: stable@vger.kernel.org
 ---
- mm/page_alloc.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+Changes in v2:
+- Instead of checking for HWRM resources in bnxt_ptp_enable(), call it
+  when HWRM resources are availble (Pavan Chebbi)
+- Link to v1: https://patch.msgid.link/20251231-bnxt-v1-1-8f9cde6698b4@debian.org
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index c380f063e8b7..a2959fee28d9 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -3975,6 +3975,10 @@ static void warn_alloc_show_mem(gfp_t gfp_mask, nodemask_t *nodemask)
- 	mem_cgroup_show_protected_memory(NULL);
- }
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index d160e54ac121..5a4af8abf848 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -16891,11 +16891,11 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
  
-+/* Auto-tuning watermarks on atomic allocation failures */
-+static unsigned long last_boost_jiffies = 0;
-+#define BOOST_DEBOUNCE_MS 10000  /* 10 seconds debounce */
-+
- void warn_alloc(gfp_t gfp_mask, nodemask_t *nodemask, const char *fmt, ...)
- {
- 	struct va_format vaf;
-@@ -4947,6 +4951,22 @@ __alloc_pages_slowpath(gfp_t gfp_mask, unsigned int order,
- 		goto retry;
- 	}
- fail:
-+	/* Auto-tuning: boost watermarks if atomic allocation fails */
-+	if ((gfp_mask & GFP_ATOMIC) && order == 0) {
-+		unsigned long now = jiffies;
-+
-+		if (time_after(now, last_boost_jiffies + msecs_to_jiffies(BOOST_DEBOUNCE_MS))) {
-+			struct zoneref *z;
-+			struct zone *zone;
-+
-+			last_boost_jiffies = now;
-+			for_each_zone_zonelist(zone, z, ac->zonelist, ac->highest_zoneidx) {
-+				if (boost_watermark(zone))
-+					wakeup_kswapd(zone, gfp_mask, 0, ac->highest_zoneidx);
-+			}
-+		}
-+	}
-+
- 	warn_alloc(gfp_mask, ac->nodemask,
- 			"page allocation failure: order:%u", order);
- got_pg:
--- 
-2.39.5
+ init_err_pci_clean:
+ 	bnxt_hwrm_func_drv_unrgtr(bp);
++	bnxt_ptp_clear(bp);
++	kfree(bp->ptp_cfg);
+ 	bnxt_free_hwrm_resources(bp);
+ 	bnxt_hwmon_uninit(bp);
+ 	bnxt_ethtool_free(bp);
+-	bnxt_ptp_clear(bp);
+-	kfree(bp->ptp_cfg);
+ 	bp->ptp_cfg = NULL;
+ 	kfree(bp->fw_health);
+ 	bp->fw_health = NULL;
+
+---
+base-commit: e146b276a817807b8f4a94b5781bf80c6c00601b
+change-id: 20251231-bnxt-c54d317d8bfe
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
 
