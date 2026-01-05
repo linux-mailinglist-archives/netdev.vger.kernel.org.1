@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-247086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8925DCF459B
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 16:18:44 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E39D3CF45A1
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 16:18:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 69D4F3005F3B
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 15:18:40 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5F1E3300A921
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 15:18:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A62A3090CD;
-	Mon,  5 Jan 2026 15:18:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC9103093AE;
+	Mon,  5 Jan 2026 15:18:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="IJ58j31C"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="AS0ElPIQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.ci.icloud.com (ci-2005a-snip4-3.eps.apple.com [57.103.89.134])
+Received: from outbound.ci.icloud.com (ci-2005k-snip4-2.eps.apple.com [57.103.89.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB58280CF6
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 15:18:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.89.134
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56EF63093A7
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 15:18:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.89.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767626313; cv=none; b=PnSrP8znOrGO5dzI+RxaVUsA3OszCOVUuml8gFaZjoH+wqkuomYXeUpJjM5u74ANb36WY0gxtzpIWErIwHLsuT1g+CqkaKvFco/h0OEgcSQjEz07Weo5IdrWnGBFZp8EcW3jc66bWNgEjKkdmcBNhIIJWYDSySQ8CTeLm0QJaKY=
+	t=1767626330; cv=none; b=FictLuaxxrU5Ka+Ori5+ko/lIipz43ZNyYrL+X0CjoaT27GlbiMo+RStRlJPZxlC1Vy6UqJsmNcrK49DCA1M4jhqXntWHdFwVxuIMI95b+DZlbkCooV7SzpgAhTmnGqkjSgKmT93PUzuPl45seSQxQ4TvFNYjZbKrFD2fSEJ9GI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767626313; c=relaxed/simple;
-	bh=SVxOsw2k3KVq6Ted7fFwk6/YKVJHu8/dTlrsg5slf3Q=;
+	s=arc-20240116; t=1767626330; c=relaxed/simple;
+	bh=1mLLSDLrqDBxxnY7WEhyxV3W7d+OdA7gCMCNqwJkKwc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z74+c0lSVI0TgFWxOEMXaic+CrjVe215SlC+iB3Y2fiG5tOkqHvp15s/EvzXzTV81lsRPJ8gGZZndseejROVqprDHUDBbOGFSsHf2jrpCb9tNQtUvenqqsYhZLeuZPuPzlkOszq3knf0AnqQyJ/v6ZNoYNMc5QPo7LfUyQUKMqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=IJ58j31C reason="key not found in DNS"; arc=none smtp.client-ip=57.103.89.134
+	 MIME-Version; b=daO5cB9ytJjvV/cphGuJwcJBtDTaNJ75oTE8GvaMUn1U2Hlpl1Ye2PbL2RTUIcYMtUi/9lG+duB6vtolGtsA+eFRxf6gWEHqlb6WROBp54qQfhLCyG6N3oJNI2O1TUEWJS9qEqenAXS//jU2P6wGvkC2eqax+emYYfwjycSe4WA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=AS0ElPIQ reason="key not found in DNS"; arc=none smtp.client-ip=57.103.89.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=y-koj.net
 Received: from outbound.ci.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-central-1k-60-percent-8 (Postfix) with ESMTPS id 10AC918004B9;
-	Mon,  5 Jan 2026 15:18:28 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; bh=YISc121iEw1U0K84tC+9FLPepOG5WP12STjtWNLyhzM=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=IJ58j31CzJZat2P0Nu4KBdMBxE/fAgmRrhe2p8rnvFYnoXtjLs4yHoFR8QOQFI1aKQjZYSqzWBZjd9n/DCDs4DJ5NqJ94q9qWo7MqxecUdYmSyBvN95DyIufmT8H/cnf6tvyursVrMz2sPPI+B4Xx69k9R0FMpY0cxmQFqDfXxe4/ut6LSkEHBu1bYME3DXOfeb/Fvh7yIRekvQrSR1BKs0jAoKxtIqmw5DJ57fiyXY3+pzZK5kKgRfY+Axe1Vbkb2ya3CAYhm4/XCTDBvsVjOoKLHRWnx/KEmpY21F6+Fs0CfpBOyI8KJ7no5eaKvVieoG9Oa07t7Bw+UI8aAvmBw==
+	by p00-icloudmta-asmtp-us-central-1k-60-percent-8 (Postfix) with ESMTPS id 191621802808;
+	Mon,  5 Jan 2026 15:18:43 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; bh=CWiGzLWAaGYTukQE2sji50bXuS4xVvcD+phOiglkWuM=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=AS0ElPIQzYOaFd8j+Uq1tnR4LAkC4SikM+MxD5s2qxAvFMeNt9Nu6lNmpBE4VgW/Y0gen2tSQAxuCQ7qAlF4tPTkigAvrT3fBrXIkvQh7Sgvkhebd3ogQRKXrmEl/rO+nnkdiPR6nrTmb27FmrtnCKpgP7MDM+l0wlGx5NFHDm/CxNYJ23kZW1NUryE7mYN4sFbTpuOvrWBoJ+0daaeJb9mc2cbGDwOxrgRGJ6sVB5B19sJgHmhvt+9+NZ+kMivBQ4Y9F0TFHWh+pl5MP4m3yYXXKDk7QUxlVepHvjJ30xfHc8/41oQFWpGP6wL29Vty1uhlxdix7DH4QNy3/y5aPA==
 mail-alias-created-date: 1719758601013
 Received: from desktop.tail809fd.ts.net (unknown [17.57.156.36])
-	by p00-icloudmta-asmtp-us-central-1k-60-percent-8 (Postfix) with ESMTPSA id A220B18000AF;
-	Mon,  5 Jan 2026 15:18:26 +0000 (UTC)
+	by p00-icloudmta-asmtp-us-central-1k-60-percent-8 (Postfix) with ESMTPSA id AAEE7180011F;
+	Mon,  5 Jan 2026 15:18:41 +0000 (UTC)
 From: Yohei Kojima <yk@y-koj.net>
 To: Jakub Kicinski <kuba@kernel.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Breno Leitao <leitao@debian.org>
+	Shuah Khan <shuah@kernel.org>
 Cc: Yohei Kojima <yk@y-koj.net>,
-	Andrew Lunn <andrew@lunn.ch>,
 	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net v3 1/2] net: netdevsim: fix inconsistent carrier state after link/unlink
-Date: Tue,  6 Jan 2026 00:17:32 +0900
-Message-ID: <602c9e1ba5bb2ee1997bb38b1d866c9c3b807ae9.1767624906.git.yk@y-koj.net>
+Subject: [PATCH net v3 2/2] selftests: netdevsim: add carrier state consistency test
+Date: Tue,  6 Jan 2026 00:17:33 +0900
+Message-ID: <481e2729e53b6074ebfc0ad85764d8feb244de8c.1767624906.git.yk@y-koj.net>
 X-Mailer: git-send-email 2.51.2
 In-Reply-To: <cover.1767624906.git.yk@y-koj.net>
 References: <cover.1767624906.git.yk@y-koj.net>
@@ -61,91 +61,121 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA1MDEzNCBTYWx0ZWRfX+5JGg4Jb4fJE
- zQl9WnkzRvGIG/vg9AgoFz1mKbCecm+fV7GOBqmynoxydF02nkEx7WVIkfKmP0AbAHTyTZqO5HN
- 7YnTWnapEm3dMbg+p/1IdU3zO/ORt2l61tJvxuMEhf+K8f3sRGZZhkIetbxtkiSv5I+PLBDFZYJ
- TfyhgvPpQ9QohY4dvoRyPpqYrv8KT8JdrJKHI0mx0VNib+A1or6sVfH1wfAaQm995jgxH5TdiTm
- cylVSADca4DPKzMR9aJuZ/WFrxfYexB02EWGMF4OHY5pZplMgtXOiZ/uLjOW8OBre7uGJdcWgQh
- 3S/c1lnkIUllM9pkUgw
-X-Proofpoint-GUID: GTo9MAcgiIL292q951e2ibbNGduPR6Fw
-X-Authority-Info: v=2.4 cv=Zqfg6t7G c=1 sm=1 tr=0 ts=695bd646 cx=c_apl:c_pps
+X-Proofpoint-ORIG-GUID: 43L0P_ZGYm0T1XDrAQq9yfPDRn0fPnt5
+X-Proofpoint-GUID: 43L0P_ZGYm0T1XDrAQq9yfPDRn0fPnt5
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA1MDEzNCBTYWx0ZWRfXxL3Fr8LdomxL
+ 42dJiO7LwP2VatNrDtQKlFV492Id9erbzMiQ8K27TzCwt5HW367lH5DQdEecbPnARQk2xswLnlG
+ ljU9TqqVlmNzr0oM9rGlMFC8xSP7911qJEYFgWcrEjVHTAjY2YzkmBEj2tP+CUP6DAkChzAYQkD
+ Imke6hRH4LuN4+S0GeqetlJIg9dVl08qgOQJY4S26efL304wZNSUDcPSJNkAVjjdkgPYQmBVOCn
+ jV+EiBrGLEt/d4JJI2azC+eNFavCrD5aNYu5CyBdm4kEbBcPIDiLCYZnpBSA/Fy5j1K7vIksKQy
+ abYO1B/CTPGQzMyqnvy
+X-Authority-Info: v=2.4 cv=C7XkCAP+ c=1 sm=1 tr=0 ts=695bd655 cx=c_apl:c_pps
  a=2G65uMN5HjSv0sBfM2Yj2w==:117 a=2G65uMN5HjSv0sBfM2Yj2w==:17
- a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=jnl5ZKOAAAAA:8 a=xNf9USuDAAAA:8
- a=7gZhQl7Q0LLefV5nMKsA:9 a=RNrZ5ZR47oNZP8zBN2PD:22
-X-Proofpoint-ORIG-GUID: GTo9MAcgiIL292q951e2ibbNGduPR6Fw
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=jnl5ZKOAAAAA:8
+ a=dxafgm9mWqSCDGKd2yIA:9 a=RNrZ5ZR47oNZP8zBN2PD:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2026-01-05_01,2026-01-05_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
- suspectscore=0 clxscore=1030 phishscore=0 malwarescore=0 mlxscore=0
- mlxlogscore=999 adultscore=0 bulkscore=0 classifier=spam authscore=0 adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2601050134
-X-JNJ: AAAAAAABw8wxKkH38tEO1aIPKKXnC5qt0sRs8Nn01BA+aZmaKvGPKn/nsFht75n4+wCKWhLsdWBxvmqDBa4CfMtUhjo21JArfqJ6u0v2cGdmPG74VsSgHDTbE81BAbc2oXl+IpunLFX4zey2tIiVspTe4v4sqeoT1bzWzGlFwp7RZelDpsNxIgmWhMj4u9a/yt7R1+KFmMBXnuQqlO8PSJ1Z+9MoSSBr14bOQdRP8deX5A6c9xBemnTfavwIzRIKLaKQHeQdWrcZOUYjxbdMp8bgJ9Y0fJx70yjZrL6VHJSzocfqJpCIILmVg7QpV/fHvK5XByVmw6KamcILmEjjX9TuqG7+fPvhy9X9L8EtbGTc2lax7fG5tlTE7WG0pqfQA4Lb2ACWfTm5XgAyY+BJ0THkVt2MIpAeAsNT1yr64ag1NAef30uXEYnniAyd9Q4dza99vqJIQB3rCr24HNq8cDq+KGO2zi9vFAiUkQJ2c2DhBLPfJzll34rJqOkq0/KsArEq2U/KaDNtnMqSqzHR9AWN1EUo9E5WQPY61WbxH3etJdtSTJjoURcrw7T8qq8p9Y1HeLHziHdPV5vJzqJtBZk/a2upGrMy9xX2stpXzjSXHn6HBExe4Lv+rMP8ofBiwqgv+UT8t1fuNqGiobzFptPEn3C3IvqAx+gkbmRlIzriwkGcciwYwp2w2IMXbVTEH0EUhczbMI+h0UyFSOS2OlyYSsWW1PNFb1PFe/NXJd+p870qXIXV2Kbi09KIIGlvDaIDEjMDhgPGQPS08yrBAG6lXTXE0E+Vf4LMw+MX5Q==
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
+ bulkscore=0 adultscore=0 phishscore=0 mlxscore=0 mlxlogscore=999 spamscore=0
+ suspectscore=0 clxscore=1030 classifier=spam authscore=0 adjust=0 reason=mlx
+ scancount=1 engine=8.22.0-2510240001 definitions=main-2601050134
+X-JNJ: AAAAAAAB6zbODNCHc2pEGpkujMrlqlv3tsP/ekW+u9mSEvB5EdwXjtsoGvgXmmGzDlLLRNJ95Z4hQ8AwyzK5+nBgzf9DWOOBc4rn/mwhxUBHULfqcr8bhIh9Gy9bd7vGXqWK/WNHh+wqtIG/vBCOEoBXuLDOHCC+9z8jxXGb/qBUCLkx0SAjT1FKIPcbKEesiCD4Lv4Ke2uAAeq+ItUVZlLBVtWKlxPUK0J7KSKeokD6B7khK/YRwwcc0d4tbfJUiBWoTnBQpwY09EjKVw5EIbbMI8ZNKf+jTLGunaf7kD9IDTPnl8Z+yQAfsVP9PR2zLXUBa0RgXkfsDazfZ9ZU0n1PR/YD2Gu6KH0ME9AvCnO06PhvEvJv7Pw/e6XVLw7GVwZCHT9NdjyXung0UkU6cSuHIv+rK3V5gAgysHVt0Cqyvkyj/f3giOTfX21aehfjOqNWOmW8Lc8m/Cmy6fIsbzpRIy92zbFkUr16fq2w3oMlCqbWPk17fh1ZdTUvVueqeoMpOYR+FzKJMaL5Z6n/7pxMBcb0UV/JawHIIrFLocSIL5GyKcs/u0n64aKvY6NsL8n5W1Dy/nW3tXuqhVoyGMCi3gQWWY0h7ZfNqDITRFhfVQcoWRf85DpthnAnUZEX9CleaTIl9ndZvAh/xgZgrGcV6tXYaYldLg8KDE4XGxSkSddMhHNfTv00vsZHTCFLCzn5mxf9BCcQERw5E1z9r4M22jkbS1wwvGmjgbUu50pzTwfAcFS35vjM9rPxZhuDLaBgVXeVwPzGQuNHCo8RJq7S1NpdbOqV
 
-This patch fixes the edge case behavior on ifup/ifdown and
-linking/unlinking two netdevsim interfaces:
+This commit adds a test case for netdevsim carrier state consistency.
+Specifically, the added test verifies the carrier state during the
+following operations:
 
-1. unlink two interfaces netdevsim1 and netdevsim2
-2. ifdown netdevsim1
-3. ifup netdevsim1
-4. link two interfaces netdevsim1 and netdevsim2
-5. (Now two interfaces are linked in terms of netdevsim peer, but
-    carrier state of the two interfaces remains DOWN.)
+1. Unlink two netdevsims
+2. ifdown one netdevsim, then ifup again
+3. Link the netdevsims again
+4. ifdown one netdevsim, then ifup again
 
-This inconsistent behavior is caused by the current implementation,
-which only cares about the "link, then ifup" order, not "ifup, then
-link" order. This patch fixes the inconsistency by calling
-netif_carrier_on() when two netdevsim interfaces are linked.
+These steps verifies that the carrier is UP iff two netdevsims are
+linked and ifuped.
 
-This patch fixes buggy behavior on NetworkManager-based systems which
-causes the netdevsim test to fail with the following error:
-
-  # timeout set to 600
-  # selftests: drivers/net/netdevsim: peer.sh
-  # 2025/12/25 00:54:03 socat[9115] W address is opened in read-write mode but only supports read-only
-  # 2025/12/25 00:56:17 socat[9115] W connect(7, AF=2 192.168.1.1:1234, 16): Connection timed out
-  # 2025/12/25 00:56:17 socat[9115] E TCP:192.168.1.1:1234: Connection timed out
-  # expected 3 bytes, got 0
-  # 2025/12/25 00:56:17 socat[9109] W exiting on signal 15
-  not ok 13 selftests: drivers/net/netdevsim: peer.sh # exit=1
-
-This patch also solves timeout on TCP Fast Open (TFO) test in
-NetworkManager-based systems because it also depends on netdevsim's
-carrier consistency.
-
-Fixes: 1a8fed52f7be ("netdevsim: set the carrier when the device goes up")
 Signed-off-by: Yohei Kojima <yk@y-koj.net>
-Reviewed-by: Breno Leitao <leitao@debian.org>
 ---
- drivers/net/netdevsim/bus.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ .../selftests/drivers/net/netdevsim/peer.sh   | 59 +++++++++++++++++++
+ 1 file changed, 59 insertions(+)
 
-diff --git a/drivers/net/netdevsim/bus.c b/drivers/net/netdevsim/bus.c
-index 70e8c38ddad6..d16b95304aa7 100644
---- a/drivers/net/netdevsim/bus.c
-+++ b/drivers/net/netdevsim/bus.c
-@@ -332,6 +332,11 @@ static ssize_t link_device_store(const struct bus_type *bus, const char *buf, si
- 	rcu_assign_pointer(nsim_a->peer, nsim_b);
- 	rcu_assign_pointer(nsim_b->peer, nsim_a);
+diff --git a/tools/testing/selftests/drivers/net/netdevsim/peer.sh b/tools/testing/selftests/drivers/net/netdevsim/peer.sh
+index 7f32b5600925..f4721f7636dd 100755
+--- a/tools/testing/selftests/drivers/net/netdevsim/peer.sh
++++ b/tools/testing/selftests/drivers/net/netdevsim/peer.sh
+@@ -52,6 +52,39 @@ cleanup_ns()
+ 	ip netns del nssv
+ }
  
-+	if (netif_running(dev_a) && netif_running(dev_b)) {
-+		netif_carrier_on(dev_a);
-+		netif_carrier_on(dev_b);
-+	}
++is_carrier_up()
++{
++	local netns="$1"
++	local nsim_dev="$2"
 +
- out_err:
- 	put_net(ns_b);
- 	put_net(ns_a);
-@@ -381,6 +386,9 @@ static ssize_t unlink_device_store(const struct bus_type *bus, const char *buf,
- 	if (!peer)
- 		goto out_put_netns;
++	test "$(ip netns exec "$netns"	\
++		cat /sys/class/net/"$nsim_dev"/carrier 2>/dev/null)" -eq 1
++}
++
++assert_carrier_up()
++{
++	local netns="$1"
++	local nsim_dev="$2"
++
++	if ! is_carrier_up "$netns" "$nsim_dev"; then
++		echo "$nsim_dev's carrier should be UP, but it isn't"
++		cleanup_ns
++		exit 1
++	fi
++}
++
++assert_carrier_down()
++{
++	local netns="$1"
++	local nsim_dev="$2"
++
++	if is_carrier_up "$netns" "$nsim_dev"; then
++		echo "$nsim_dev's carrier should be DOWN, but it isn't"
++		cleanup_ns
++		exit 1
++	fi
++}
++
+ ###
+ ### Code start
+ ###
+@@ -113,6 +146,32 @@ if [ $? -eq 0 ]; then
+ 	exit 1
+ fi
  
-+	netif_carrier_off(dev);
-+	netif_carrier_off(peer->netdev);
++# netdevsim carrier state consistency checking
++assert_carrier_up nssv "$NSIM_DEV_1_NAME"
++assert_carrier_up nscl "$NSIM_DEV_2_NAME"
 +
- 	err = 0;
- 	RCU_INIT_POINTER(nsim->peer, NULL);
- 	RCU_INIT_POINTER(peer->peer, NULL);
++echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX" > "$NSIM_DEV_SYS_UNLINK"
++
++assert_carrier_down nssv "$NSIM_DEV_1_NAME"
++assert_carrier_down nscl "$NSIM_DEV_2_NAME"
++
++ip netns exec nssv ip link set dev "$NSIM_DEV_1_NAME" down
++ip netns exec nssv ip link set dev "$NSIM_DEV_1_NAME" up
++
++assert_carrier_down nssv "$NSIM_DEV_1_NAME"
++assert_carrier_down nscl "$NSIM_DEV_2_NAME"
++
++echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_2_FD:$NSIM_DEV_2_IFIDX" > $NSIM_DEV_SYS_LINK
++
++assert_carrier_up nssv "$NSIM_DEV_1_NAME"
++assert_carrier_up nscl "$NSIM_DEV_2_NAME"
++
++ip netns exec nssv ip link set dev "$NSIM_DEV_1_NAME" down
++ip netns exec nssv ip link set dev "$NSIM_DEV_1_NAME" up
++
++assert_carrier_up nssv "$NSIM_DEV_1_NAME"
++assert_carrier_up nscl "$NSIM_DEV_2_NAME"
++
+ # send/recv packets
+ 
+ tmp_file=$(mktemp)
 -- 
 2.51.2
 
