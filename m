@@ -1,52 +1,82 @@
-Return-Path: <netdev+bounces-247003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 963BACF365E
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 13:01:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DAA6BCF3655
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 13:00:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A19023003FE7
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 12:01:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3FF5F3003B3C
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 12:00:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA37333291B;
-	Mon,  5 Jan 2026 12:01:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A248C333755;
+	Mon,  5 Jan 2026 12:00:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b="PFcG9yP7"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="ij48lTOs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-internal.sh.cz (mail-internal.sh.cz [95.168.196.40])
+Received: from out162-62-57-87.mail.qq.com (out162-62-57-87.mail.qq.com [162.62.57.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB1E330D2A
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 12:01:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.168.196.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB92333451;
+	Mon,  5 Jan 2026 12:00:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767614473; cv=none; b=DTB05ee+lPIYoNweB0lJJcgfQXGo+kAOLydaIy8pum0fiwgXCK3BfMiG5Q6fP4zKLU4M6di+6t16w3vT4wU952dTTlt9ARrLsDWBLhiJImodWcb8pYUBO8btc+xtF2xXwLSyLaZa/IWxOQjD+1llI6kQowccR5tme4VH+QkfykU=
+	t=1767614406; cv=none; b=QJ7Rh8Gcobxy1lKpsr1nT9MBxLuPCKkBng/h0rj60HK99uP0qh7DNtjUcr0LYl266rVmVQMnH+rwMMZ8WDElku+AsEz0suaqPEieriL0tacSywUpESi6iYvMztxOVLy/bx1wlf2AyayG1SF/n5yQIi3YQhsb1IYBXmGTxliMBS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767614473; c=relaxed/simple;
-	bh=18raZhmpFTwODA8sz/4MhjDdY+LXW9FNpXfqu0ATNjE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Dwm0Yynd/WVBX65LUokQc7wmEDLNeVRCvyYrSI1bfyGU/t7NNtniHTB45vIR+F9MsPm7nN2/rxKUcnevOBSV/r68bjepbkByAtFsPTwFbInm+ld4MOmr8fte0Q1R5Ka2HHipMVgV3A5Myg3t4V96DB1gltyHOMoTHLgDhPqJh8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com; spf=fail smtp.mailfrom=cdn77.com; dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b=PFcG9yP7; arc=none smtp.client-ip=95.168.196.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=cdn77.com
-DKIM-Signature: a=rsa-sha256; t=1767614159; x=1768218959; s=dkim2019; d=cdn77.com; c=relaxed/relaxed; v=1; bh=ovbISY9Hoz8IE0AR4zzdU++AVAbMMHC38b3c2Gj157k=; h=From:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Transfer-Encoding;
-   b=PFcG9yP7z9VoXEmIr2BqNkIJDeN4bHa0Jydvqgc9U8HL1ksQnG842hApeyJGmh8B+0yL3RZ+atosjVlQY0YS9YrVnAeFnEKQouVyI9+gWN2vdkqVYKPjmMPt+MF4cHtl9oDUuDZlP20jaEJ1VynrJaDCNXbLEni97iSFvHZ3LNY=
-Received: from osgiliath ([188.75.189.151])
-        by mail.sh.cz (14.2.0 build 9 ) with ASMTP (SSL) id 202601051255580699;
-        Mon, 05 Jan 2026 12:55:58 +0100
-From: Daniel Sedlak <daniel.sedlak@cdn77.com>
-To: Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org
-Cc: Daniel Sedlak <daniel.sedlak@cdn77.com>
-Subject: [PATCH net-next v2] tcp: clarify tcp_congestion_ops functions comments
-Date: Mon,  5 Jan 2026 12:55:33 +0100
-Message-ID: <20260105115533.1151442-1-daniel.sedlak@cdn77.com>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1767614406; c=relaxed/simple;
+	bh=n1qvQvUP8Tc1ge0D3hbyWIHdrfniwFulB8hQ3XwguQE=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=NvnYUJm7jAUIYdegINEXY2uYTVVQT+qh3vBJNK8aIc8AYbfaLaCBTPbWvGbgwlPC1eA/JmjmNhEV+C0EQnjwuA4jjq45RJHisF2WjTtTGFw4Sr/Bqw2WOGcgcWNVd3LTH+pqUaIHvOZpygd5ZNKNmDbU+Yw6sfyK0hKCSak9wTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=ij48lTOs; arc=none smtp.client-ip=162.62.57.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1767614392; bh=ZHsshIjfSqIMQ3XoA6Iibo5+CynohV16uWOFfEhVjRs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=ij48lTOsLKkblyVAztR2FaTuDAuzHsgwF2l7dnWSCk/WxTWOaG1zRgSJ8yofWkP85
+	 AaNx4FSlmsm5UeYHuaPrHF57FCaGWPBlmJ+hJc7BWK54yZLTs3jv1wBCsqjwIuwNNB
+	 8m8Eweb+6QTi6ftjipWKshFZS1tQZcONmGQH1LHo=
+Received: from localhost.localdomain ([61.144.111.35])
+	by newxmesmtplogicsvrszb51-1.qq.com (NewEsmtp) with SMTP
+	id EF0A8E12; Mon, 05 Jan 2026 19:59:48 +0800
+X-QQ-mid: xmsmtpt1767614388trjnbkar0
+Message-ID: <tencent_DEB3B993C801A1D507C53976DEA7F6940D05@qq.com>
+X-QQ-XMAILINFO: MMwjR1C73eIsPqlrovuwgOgybZRKqow9kNg5BmWF6S7qErNMeqkWu6+VQi28Lv
+	 saIyjhbPxM6h4565rvqFl5HQLwuLy0ksvN5/jAk482wP0tf9Sub35FQBgMM7yZmodOpFReXHD0o2
+	 u3TpfoOsY+mBedwitU7SouVYxpP9o0HPySkHPzZ80ZVz2BA9/MbYwkgDXsYaUMaCv1NBwNDLIm0s
+	 IHWPTaxj7g1w4XGUQx3v0hK/1Y0P517UuqegKUTOSDxE4mGf3SDE9ArfThcJ0T74HaG/8c+EAjj4
+	 ekh1Of2iguFcfWIfkWgGC6Xp4Ng8+uQUQOTtif9wZK53gYd0xjYOiy/6vSWpliRH6K/0rHLcpoo9
+	 dlbChG0Xs88QmmKiffGx5pYGFIR4kxbi1glMjjy6tNWsOCutgRm34cmHIrNinhvsIhUXs9reDBuJ
+	 9qBBUt+0sEUorbyy39MCslk7KKCoJkKvGsG9IlKngzQzwdVo5f1hw63wvYfc1vtG9lFtZ8w5EQlX
+	 TBF27PDY28MDKQH7sNr/kDuA9AnRt/iQu9TeofyJluGTffgOGu6JyXfBtW7D1F3w+YEwNXfgV5yo
+	 knUhcF2KcjtgLEnt0s0hAPTSsrFqjae0CdP/pPmY78PeqcD5XkgcJXtlXOA0TJXmGtCL9ZCpa2k8
+	 ybI38GZSN4JcZVMA5hFDQhnrWnlhjZHVKRELVdigIx8lCROMez9lnpHqmRHhMXTsho3hdCj3aKdT
+	 E0NXqEXavO5DBAZVxMLUOJ6aVgAPAQW/t9kEWbWwDa3GfSzmLr/8LUal6O1xVBxH3ISHfpuiXhbu
+	 2kUu7rZmoPBIvOADuJDalWeBb3FeUbo6h/JQkHUMrJFy4hJOUtjLsBBWy9QHekp8qCL0rdscWUhA
+	 y7GKzAADF5M0zSbV3/Tlw8HFfzJMDt46ZaWvl6YbYdcm6W/qGZY9FAvaNoe2ez4np7GiCAJtF+Uy
+	 HWRMDmHktJ76ClJ+75Ca85zHMwG+wJfpovxjETvyAptaEEEpHfv5JGqSCoMtNfb2Vo7vcTLKyfIG
+	 L5TFhtiQIV1F6ZhtBffoeD7dLBlMmo7yvn0IT+Zg+tGYiwmCNF
+X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
+From: wujing <realwujing@qq.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Vlastimil Babka <vbabka@suse.cz>
+Cc: Matthew Wilcox <willy@infradead.org>,
+	Lance Yang <lance.yang@linux.dev>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Brendan Jackman <jackmanb@google.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Zi Yan <ziy@nvidia.com>,
+	linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Qiliang Yuan <yuanql9@chinatelecom.cn>,
+	wujing <realwujing@qq.com>
+Subject: [PATCH v3 0/1] mm/page_alloc: dynamic watermark boosting
+Date: Mon,  5 Jan 2026 19:59:42 +0800
+X-OQ-MSGID: <20260105115943.1361645-1-realwujing@qq.com>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <tencent_C5AD9528AAB1853E24A7DC98A19D700E3808@qq.com>
+References: <tencent_C5AD9528AAB1853E24A7DC98A19D700E3808@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,85 +84,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CTCH: RefID="str=0001.0A2D031F.695BA6CF.0006,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0"; Spam="Unknown"; VOD="Unknown"
 
-The optional and required hints in the tcp_congestion_ops are information
-for the user of this interface to signalize its importance when
-implementing these functions.
+This is v3 of the auto-tuning patch, addressing feedback from Vlastimil Babka,
+Andrew Morton, and Matthew Wilcox.
 
-However, cong_avoid comment incorrectly tells that it is required,
-in reality congestion control must provide one of either cong_avoid or
-cong_control.
+Major shift in v3:
+Following Vlastimil's suggestion, this version abandons the direct modification
+of min_free_kbytes. Instead, it leverages the existing watermark_boost
+infrastructure. This approach is more idiomatic as it:
+- Avoids conflicts with administrative sysctl settings.
+- Only affects specific zones experiencing pressure.
+- Utilizes standard kswapd logic for natural decay after reclamation.
 
-In addition, min_tso_segs has not had any comment optional/required
-hints. So mark it as optional since it is used only in BBR.
+Responses to Vlastimil Babka's feedback:
+> "Were they really packet drops observed? AFAIK the receive is deferred to non-irq 
+> context if those atomic allocations fail, it shouldn't mean a drop."
+In our high-concurrency production environment, we observed that while the 
+network stack tries to defer processing, persistent GFP_ATOMIC failures 
+eventually lead to NIC-level drops due to RX buffer exhaustion.
 
-Co-developed-by: Neal Cardwell <ncardwell@google.com>
-Signed-off-by: Neal Cardwell <ncardwell@google.com>
-Signed-off-by: Daniel Sedlak <daniel.sedlak@cdn77.com>
----
-changelog:
-- Apply Neal's suggestion and add as Co-developed-by.
-- Link: https://lore.kernel.org/netdev/20251218105819.63906-1-daniel.sedlak@cdn77.com/
+> "As for the implementation I'd rather not be changing min_free_kbytes directly... 
+> We already have watermark_boost to dynamically change watermarks"
+Agreed and implemented in v3.
 
- include/net/tcp.h | 29 +++++++++++++++++++----------
- 1 file changed, 19 insertions(+), 10 deletions(-)
+Changes in v3:
+- Replaced min_free_kbytes modification with watermark_boost calls.
+- Removed all complex decay/persistence logic from v2, relying on kswapd's 
+  standard behavior.
+- Maintained the 10-second debounce mechanism.
+- Engaged netdev@ community as requested by Andrew Morton.
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 0deb5e9dd911..ef0fee58fde8 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -1243,12 +1243,27 @@ struct rate_sample {
- struct tcp_congestion_ops {
- /* fast path fields are put first to fill one cache line */
- 
-+	/* A congestion control (CC) must provide one of either:
-+	 *
-+	 * (a) a cong_avoid function, if the CC wants to use the core TCP
-+	 *     stack's default functionality to implement a "classic"
-+	 *     (Reno/CUBIC-style) response to packet loss, RFC3168 ECN,
-+	 *     idle periods, pacing rate computations, etc.
-+	 *
-+	 * (b) a cong_control function, if the CC wants custom behavior and
-+	 *      complete control of all congestion control behaviors.
-+	 */
-+	/* (a) "classic" response: calculate new cwnd.
-+	 */
-+	void (*cong_avoid)(struct sock *sk, u32 ack, u32 acked);
-+	/* (b) "custom" response: call when packets are delivered to update
-+	 * cwnd and pacing rate, after all the ca_state processing.
-+	 */
-+	void (*cong_control)(struct sock *sk, u32 ack, int flag, const struct rate_sample *rs);
-+
- 	/* return slow start threshold (required) */
- 	u32 (*ssthresh)(struct sock *sk);
- 
--	/* do new cwnd calculation (required) */
--	void (*cong_avoid)(struct sock *sk, u32 ack, u32 acked);
--
- 	/* call before changing ca_state (optional) */
- 	void (*set_state)(struct sock *sk, u8 new_state);
- 
-@@ -1261,15 +1276,9 @@ struct tcp_congestion_ops {
- 	/* hook for packet ack accounting (optional) */
- 	void (*pkts_acked)(struct sock *sk, const struct ack_sample *sample);
- 
--	/* override sysctl_tcp_min_tso_segs */
-+	/* override sysctl_tcp_min_tso_segs (optional) */
- 	u32 (*min_tso_segs)(struct sock *sk);
- 
--	/* call when packets are delivered to update cwnd and pacing rate,
--	 * after all the ca_state processing. (optional)
--	 */
--	void (*cong_control)(struct sock *sk, u32 ack, int flag, const struct rate_sample *rs);
--
--
- 	/* new value of cwnd after loss (required) */
- 	u32  (*undo_cwnd)(struct sock *sk);
- 	/* returns the multiplier used in tcp_sndbuf_expand (optional) */
+Thanks for the thoughtful reviews!
 
-base-commit: 8f7aa3d3c7323f4ca2768a9e74ebbe359c4f8f88
+wujing (1):
+  mm/page_alloc: auto-tune watermarks on atomic allocation failure
+
+ mm/page_alloc.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
 -- 
-2.52.0
+2.39.5
 
 
