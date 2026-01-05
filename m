@@ -1,123 +1,124 @@
-Return-Path: <netdev+bounces-246996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B3B0CF3566
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 12:48:06 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D009FCF3571
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 12:48:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C7C723003FC5
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 11:48:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6FDEC3015122
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 11:48:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B192D32863E;
-	Mon,  5 Jan 2026 11:48:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4990E333441;
+	Mon,  5 Jan 2026 11:48:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gJVt47Yk";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="tEiLZn92"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CBtImg1N";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Uq/gqoWu"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745592F5A3E
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 11:47:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CA4C31987E
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 11:47:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767613680; cv=none; b=SmnTvfv/MTsxYdthPQ5AibQa9hoyedn0GACOQebJcSrKVB+/Y0X+tMiAIZLPj6O6gXUfKIDKLl5vDUQ0j8V5mF+PV/1i6cgeMcyJ/WinsL4wsxQdBgaddQnxMrlm3E/mz897y2mNUUbHnnrvaDSNhvyow1UDJu2LimTCxtyJDYs=
+	t=1767613682; cv=none; b=Qzls/HoqHustUnmGCX6FzB9aFf3mDuELGO94AIQSr08c8nT0ExyFuDKk8hlpeUmxpG4erFfWy3mGymLS6+RGED8hTTx3U9WT6yoG3llQo4qwz5hhyoIDw0ltaaLrmiLlCOCc4AUshaSwj1NhILoBdfbeOS0kQ+CPzoctUvcPBY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767613680; c=relaxed/simple;
-	bh=Ge4t427bDOOVbbyxmm6WKToUT86Yj4z7o+/cHmkHI+U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tvczbbyx/7R6meIxHTmCVAxqUupDSQL3dLwvlGKagmYPRxwdMoVT6yyDMqnHHBReezLnN9Vrl8kC3eu7KNQkVEG0cO1RAGDdLPb2aBSHdcQ/jfVPvBd9Zf6t55zZQfwdcmzahW87lvS33thhLlmWA7t8YGrU0IQ8YBkpogxavWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gJVt47Yk; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=tEiLZn92; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1767613682; c=relaxed/simple;
+	bh=sZVZYXKGi6x0/cNomEW7NL3LhpGZjdik2+xI/ZdAt6U=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=E0qFbg5X2fMkAOSVH2s+ih+mgZCD2qqY3P7cXJe/3X2CyGdYogI4ReLrq1Qzb6gjbF+eFzVKuifvmLgtcl2Vk+lQBLaDDIutEbyzNdqp3Y/lpyr9hAxtyyYw5dwBLw2buRHdWPca6yjatI9k+HkHdY/p2iq/k+l3Y5RMMPN2O+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CBtImg1N; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Uq/gqoWu; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767613677;
+	s=mimecast20190719; t=1767613678;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=FTq0SRVG2GhbxGwoJ2wHpDXS98n9lOz+EoWA2XjToqk=;
-	b=gJVt47YkL+6vTkuRy7dPyvSoD9jKjHAwUCSWtqHGyjwS9uDDwQWnfiMRKgWQCuBgPL3Adk
-	YGVL8dOgULWpcl5i1kktFY1oSbOooGN1S1Itjev4rv9LttXh1j6BxHDHOT/LKD133UqFU6
-	MLf6N1UomIlKLnMM9YItoRsPVZacIcc=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4yVc7Fv6KTjwK4Gtk6iZcVFGv62TYxn7ujD99PvmsPk=;
+	b=CBtImg1N9b7D0gq4DcCK7I03eHnJ//kp4F4hkeRadWwoB2JCyBLZ+J0z/tAaxg2263MY3N
+	zFPg/gj0ibTUSWbF6AQnr6YN8bHylBr1Gta6nsSZ0sntoBmFYb9Paw9i5XmrVMKquBb0ll
+	2Nrb1JDmoCG2WkpW4Z1VBlPB1mYD8ic=
 Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
  [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-532-ilM7afWHNfqRN2n7YrxWpA-1; Mon, 05 Jan 2026 06:47:56 -0500
-X-MC-Unique: ilM7afWHNfqRN2n7YrxWpA-1
-X-Mimecast-MFC-AGG-ID: ilM7afWHNfqRN2n7YrxWpA_1767613675
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-b7ce2f26824so1245310466b.1
+ us-mta-519-Q-5YMvvuML6_CsU-ubWolg-1; Mon, 05 Jan 2026 06:47:56 -0500
+X-MC-Unique: Q-5YMvvuML6_CsU-ubWolg-1
+X-Mimecast-MFC-AGG-ID: Q-5YMvvuML6_CsU-ubWolg_1767613675
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-b73599315adso1087413366b.2
         for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 03:47:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=redhat.com; s=google; t=1767613675; x=1768218475; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FTq0SRVG2GhbxGwoJ2wHpDXS98n9lOz+EoWA2XjToqk=;
-        b=tEiLZn92WwFVrPmGWgHjbkHAmtFaZqjaqUvTfWi9l7wwcD3/AK1nJivx7yMTGAM81+
-         Xe2/EcWcy4ccGN919XN6wHb8nsJbgqFyk3e7Dl7ney5jdDIOWKB9yJ5TVfaXvy8bK8i4
-         kf+UwBAR5t0qaGUkhDLNlBmLd4piCTymf3biDnDYud2B7ZWGQtE0BOe9WOEo8jlk8tqb
-         FD83kVN1gvNlR3J9cbsyC/GLPvRew9Zu1HgduIeAJt0wNkBTQmfmtpyWbgdNAykqwSnd
-         rjC/07zC8CIDbt1lb5L7UkB5ZflzrU4T4/8glGqNytJS59L7wH05tQSj3xzX2dhrRJ4T
-         nAoQ==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4yVc7Fv6KTjwK4Gtk6iZcVFGv62TYxn7ujD99PvmsPk=;
+        b=Uq/gqoWu5sz0+kM0gQ2AKZLImyqocLSMwvGdj01wCLkxw7mUBET96VM7Xuevdj0Apg
+         QwzB6o/e2vBtebblp4Gcnb/A9dw2Al37TselWVwaTp6SpIXh7gib4fagZBbhf/lWpzua
+         GyjbPzT5V0E9OP4qIf0Vh7ofiPMceSfCl9NLnNsWY/UmChgMqZQML1N/o0PhSmJMW3vn
+         ZlUnRPMmOjRwsrEwweaPJ+Fkof8HhAENLpppyLcD5sirU6vlyxmYoYpNfEFljHC3aLhq
+         b8Jz7uoS0I2jRwQhk5oXWfIXkK04dEWvPTS8spWeHS6i5vzSQTpfRETreDDmUx35yA06
+         /APg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1767613675; x=1768218475;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FTq0SRVG2GhbxGwoJ2wHpDXS98n9lOz+EoWA2XjToqk=;
-        b=rGLnkSjR/zjpZHKYfAJ1VT3dpgtpB8uX2Tkgp1PuL78gDCAUpnJGYJnXd0VIX5vuAI
-         O+WvpCanoI8rgffk2pNXIskYXw4iWmkv7oCRWOe0sjoiGJl/7aM6pi1LA2HDlFdRS13j
-         nK2i1CVDsm66OATp5gEO9dpsExCPt81vtvEsIn5QeHcvWYyGMFx8Z8XpHTGTCOfvKqE2
-         Hf91KgP/0S7qH6g00cjSDlqeFsonVckljyp6iq2tgrGP2UfvUsModjELpxDuYulvq/PB
-         Jie1s2e0O0/47k8mwtCPlM8ZmATnW6dRnapLrzCQoz6jG/nBQcEgbHluAJe5u5S+XHEk
-         NdSg==
-X-Forwarded-Encrypted: i=1; AJvYcCUZOXkTxaoLU++uLYojcvjIskFxUSQpPC+cS6usef5SemNAsdWOkSgvZ08JXEBfSBpO5F9p6rE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxq9Wwu7JHNLywIOxOD7izg7JOrnK+hf8+GKIXzXgTI4LQ492oq
-	DgWfE8Wd/tQ86Gl+8FuackDPVmPvwWDuRHdbYviujvafRvezg4Gj9fUgo1fLGTd1pgrxFT9jlCX
-	OuHODR31yvaQ0x1z6wjvnncHzpQ8/sV06r6ySmd15a9XjyUzGQwYa39k0zw==
-X-Gm-Gg: AY/fxX6O60LT5xwSkXon/ITDjX5ZuCEL7XVGlRkvocht0a+imtgIthaNxO2O9w42a5K
-	ddmiSjX6iVLXHzdPOk6QjlYbfXGlUDynxIO0Br5gGJdFzn7Q6Ke1rv7Kp4FG2LTdjnCJd4wjZRq
-	hOrd0UB1hrhqUSa2g/lFp/NPuobJQ3Z/AglzIzTIFqdMKSrQwqZXlVymI3Dxoa8oRnBbWSz6/wV
-	x7oezFb7oBS9QvUHvE6tpR2QbM/trRbcNA63YiuSihFL33PzBQp6ZIJGNklZMwzp1k+KZsyoqGt
-	Lv+YCFBexJ0ARaj5AOlX1tdtjclFNNkzEsp9MSoXh9ABmyKyppMxBwBcIGC//6hNSFFrrKqiZet
-	DQfWTkfLwmzxLU0myHifdrnfB5prXg+oknRKb
-X-Received: by 2002:a17:907:cb09:b0:b83:8fc:c64b with SMTP id a640c23a62f3a-b8308fcf401mr2519598166b.38.1767613674990;
-        Mon, 05 Jan 2026 03:47:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFOO1wGyvAPubPA3xIUEgRxLSshivKNVRBI838uDhukv4Vv0lIJ9Qr6trIs7oNMz6CK4yHlTQ==
-X-Received: by 2002:a17:907:cb09:b0:b83:8fc:c64b with SMTP id a640c23a62f3a-b8308fcf401mr2519595466b.38.1767613674496;
-        Mon, 05 Jan 2026 03:47:54 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=4yVc7Fv6KTjwK4Gtk6iZcVFGv62TYxn7ujD99PvmsPk=;
+        b=J0OSM5eqspNOI6AuzOmGC/VoN5J9ZF9a+U/KDE8aTU9nzgDd5hogobhSsd3D0Xi8lq
+         H5CHaz/3wJwfVKlVwrcx2KmJDbGM4ZryJksX6KtDKHQrVUCNAnM+lTg6Q33sg+1JliM2
+         ckkglJIdUisLubg4nJ44EoQiZMrYaEq82VU9yo50arsT0LNON5my704GjV8+ZC884pjl
+         NJ8+A0eUoaOTjwR4I2U2w7sNhdCV9XybEm3xSYGfcQJm/bXy+rcGM+9n3HdeWo4DxGyk
+         ywaURrXmroZcNNCuMbCQigHtLiWtbZYsI6aZWJWD92FlK5kp5K7kSjXIiZ2VFGlXWPgx
+         MrUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUvsfF4M5Nh4VGqqbsL5Kcn6FgPRmgQTfebG4i3rdUUVedI8DputONzdp1CGuTtl/oenb4R9ro=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz99ZNLDxg/RalIn+61l7vqacpA1aoEQbmRp+7v+doAhfy4IRKO
+	D3AUTt3a+n/Rq5ZySUPIb1dYuM36I49rpLDxymu40Xki5oRJmT+wv7alrTfipCv5/3lrQayEduV
+	7NSt3BjUySujxbPrdZldNQ7E7wUZdwiBc7Xx12v9stl9kqj+Fh1lGbF+38g==
+X-Gm-Gg: AY/fxX5NFp3ehnwyNIZNm2e1UB7dy+Ozhdq5BI42LRZv4FHOcMLV07c/LUbcFceMTxS
+	69LLRPVUTy+CMGWMXcRm/6oYU0LWgnjoPBGfulMB25lVAiuAGDMY2qRNmK1EEHzHSONPceiep7s
+	aRPMhf1plg2tARf6ka4JyanZWsP6P/MnA08AyLJGH6qR1os/i81at04y7KRHhsJ+7UYar01nwA3
+	8hGV6J7NL9jGOtLvbwGFCJWyiDa6Cpe829dOhHH19NDc3ZDpaDqY7+dTDAC7zIV6WyjLMU+Yl/7
+	dD9YvgSM5xGmhJBkq9PzudP0VsGP+6qwnggSaWptaKypEOq5YTlP6KwGevGWkfOon7gj1Ak5ZjS
+	S701RypAKiuKjStCmCTP2aOJt+8WMEHIfCBV/
+X-Received: by 2002:a17:907:7b9e:b0:b83:f03a:664 with SMTP id a640c23a62f3a-b83f03a080dmr523519566b.49.1767613675485;
+        Mon, 05 Jan 2026 03:47:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHxl5eOZaA5tkb0SiXmLtUqZuvDTKDYvvMC2EjLr6KOiOyt8Eqh0XpS42ZrtvKeQMhJx1p6cw==
+X-Received: by 2002:a17:907:7b9e:b0:b83:f03a:664 with SMTP id a640c23a62f3a-b83f03a080dmr523515866b.49.1767613675017;
+        Mon, 05 Jan 2026 03:47:55 -0800 (PST)
 Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8037a5bdfesm5519158466b.10.2026.01.05.03.47.53
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b80426fc164sm5336443066b.30.2026.01.05.03.47.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 03:47:53 -0800 (PST)
+        Mon, 05 Jan 2026 03:47:54 -0800 (PST)
 Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 1E9E3407E7D; Mon, 05 Jan 2026 12:47:53 +0100 (CET)
+	id A4FDF407E7F; Mon, 05 Jan 2026 12:47:53 +0100 (CET)
 From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
 To: Alexei Starovoitov <ast@kernel.org>,
 	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Jesper Dangaard Brouer <hawk@kernel.org>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Cc: Yinhao Hu <dddddd@hust.edu.cn>,
-	Kaiyan Mei <M202472210@hust.edu.cn>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH bpf 1/2] bpf, test_run: Subtract size of xdp_frame from allowed metadata size
-Date: Mon,  5 Jan 2026 12:47:45 +0100
-Message-ID: <20260105114747.1358750-1-toke@redhat.com>
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Cc: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH bpf 2/2] selftests/bpf: Update xdp_context_test_run test to check maximum metadata size
+Date: Mon,  5 Jan 2026 12:47:46 +0100
+Message-ID: <20260105114747.1358750-2-toke@redhat.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260105114747.1358750-1-toke@redhat.com>
+References: <20260105114747.1358750-1-toke@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -127,73 +128,56 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The xdp_frame structure takes up part of the XDP frame headroom,
-limiting the size of the metadata. However, in bpf_test_run, we don't
-take this into account, which makes it possible for userspace to supply
-a metadata size that is too large (taking up the entire headroom).
+Update the selftest to check that the metadata size check takes the
+xdp_frame size into account in bpf_prog_test_run. The original
+check (for meta size 256) was broken because the data frame supplied was
+smaller than this, triggering a different EINVAL return. So supply a
+larger data frame for this test to make sure we actually exercise the
+check we think we are.
 
-If userspace supplies such a large metadata size in live packet mode,
-the xdp_update_frame_from_buff() call in xdp_test_run_init_page() call
-will fail, after which packet transmission proceeds with an
-uninitialised frame structure, leading to the usual Bad Stuff.
-
-The commit in the Fixes tag fixed a related bug where the second check
-in xdp_update_frame_from_buff() could fail, but did not add any
-additional constraints on the metadata size. Complete the fix by adding
-an additional check on the metadata size. Reorder the checks slightly to
-make the logic clearer and add a comment.
-
-Link: https://lore.kernel.org/r/fa2be179-bad7-4ee3-8668-4903d1853461@hust.edu.cn
-Fixes: b6f1f780b393 ("bpf, test_run: Fix packet size check for live packet mode")
-Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
-Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
 Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
 ---
- net/bpf/test_run.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+ .../bpf/prog_tests/xdp_context_test_run.c          | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-index 655efac6f133..e6c0ad204b92 100644
---- a/net/bpf/test_run.c
-+++ b/net/bpf/test_run.c
-@@ -1294,8 +1294,6 @@ int bpf_prog_test_run_xdp(struct bpf_prog *prog, const union bpf_attr *kattr,
- 			batch_size = NAPI_POLL_WEIGHT;
- 		else if (batch_size > TEST_XDP_MAX_BATCH)
- 			return -E2BIG;
+diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
+index ee94c281888a..24d7d6d8fea1 100644
+--- a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
++++ b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
+@@ -47,6 +47,7 @@ void test_xdp_context_test_run(void)
+ 	struct test_xdp_context_test_run *skel = NULL;
+ 	char data[sizeof(pkt_v4) + sizeof(__u32)];
+ 	char bad_ctx[sizeof(struct xdp_md) + 1];
++	char large_data[256];
+ 	struct xdp_md ctx_in, ctx_out;
+ 	DECLARE_LIBBPF_OPTS(bpf_test_run_opts, opts,
+ 			    .data_in = &data,
+@@ -94,9 +95,6 @@ void test_xdp_context_test_run(void)
+ 	test_xdp_context_error(prog_fd, opts, 4, sizeof(__u32), sizeof(data),
+ 			       0, 0, 0);
+ 
+-	/* Meta data must be 255 bytes or smaller */
+-	test_xdp_context_error(prog_fd, opts, 0, 256, sizeof(data), 0, 0, 0);
 -
--		headroom += sizeof(struct xdp_page_head);
- 	} else if (batch_size) {
- 		return -EINVAL;
- 	}
-@@ -1308,16 +1306,26 @@ int bpf_prog_test_run_xdp(struct bpf_prog *prog, const union bpf_attr *kattr,
- 		/* There can't be user provided data before the meta data */
- 		if (ctx->data_meta || ctx->data_end > kattr->test.data_size_in ||
- 		    ctx->data > ctx->data_end ||
--		    unlikely(xdp_metalen_invalid(ctx->data)) ||
- 		    (do_live && (kattr->test.data_out || kattr->test.ctx_out)))
- 			goto free_ctx;
--		/* Meta data is allocated from the headroom */
--		headroom -= ctx->data;
+ 	/* Total size of data must be data_end - data_meta or larger */
+ 	test_xdp_context_error(prog_fd, opts, 0, sizeof(__u32),
+ 			       sizeof(data) + 1, 0, 0, 0);
+@@ -116,6 +114,16 @@ void test_xdp_context_test_run(void)
+ 	test_xdp_context_error(prog_fd, opts, 0, sizeof(__u32), sizeof(data),
+ 			       0, 0, 1);
  
- 		meta_sz = ctx->data;
-+		if (xdp_metalen_invalid(meta_sz) || meta_sz > headroom - sizeof(struct xdp_frame))
-+			goto free_ctx;
++	/* Meta data must be 216 bytes or smaller (256 - sizeof(struct
++	 * xdp_frame)). Test both nearest invalid size and nearest invalid
++	 * 4-byte-aligned size, and make sure data_in is large enough that we
++	 * actually hit the cheeck on metadata length
++	 */
++	opts.data_in = large_data;
++	opts.data_size_in = sizeof(large_data);
++	test_xdp_context_error(prog_fd, opts, 0, 217, sizeof(large_data), 0, 0, 0);
++	test_xdp_context_error(prog_fd, opts, 0, 220, sizeof(large_data), 0, 0, 0);
 +
-+		/* Meta data is allocated from the headroom */
-+		headroom -= meta_sz;
- 		linear_sz = ctx->data_end;
- 	}
- 
-+	/* The xdp_page_head structure takes up space in each page, limiting the
-+         * size of the packet data; add the extra size to headroom here to make
-+         * sure it's accounted in the length checks below, but not in the
-+         * metadata size check above.
-+         */
-+        if (do_live)
-+		headroom += sizeof(struct xdp_page_head);
-+
- 	max_linear_sz = PAGE_SIZE - headroom - tailroom;
- 	linear_sz = min_t(u32, linear_sz, max_linear_sz);
+ 	test_xdp_context_test_run__destroy(skel);
+ }
  
 -- 
 2.52.0
