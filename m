@@ -1,110 +1,92 @@
-Return-Path: <netdev+bounces-247079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81325CF41D0
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 15:30:54 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A12D3CF43D1
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 15:51:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CF84530155DB
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 14:27:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 096003014713
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 14:51:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17C41C8604;
-	Mon,  5 Jan 2026 14:27:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDB2D2FE582;
+	Mon,  5 Jan 2026 14:37:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="MiOqiS63"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zbfkZdRE"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D02419CCFC;
-	Mon,  5 Jan 2026 14:27:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2BD72F83AC;
+	Mon,  5 Jan 2026 14:37:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767623250; cv=none; b=TOVIpCIz8Zugd/vcW906XKC+IbTZ7AZNUT4LY2XzSz4N0hfpcgcJwFMIUAZU8kF1Kpl2mL2ET6WLSwxMx9zs8HEr/hDVnuEFJ4VEBFn7jVjVN5HAuH9i5epjFMKYulvV6nJft0oCWoEJLIQH2pbRWYl9UK8FewKsCCAbnKbw4iU=
+	t=1767623860; cv=none; b=iheDk+vyJ8DYRW45J1HkJqO67NXD7TPjR6Vn4szheXcUWGb8qgSsBK5UBjk26XfmjFYtUHnu8qG9P5iVRgwGDSdMgrX/hUpsP8Fcycwyx8wwTK9T1R0nQl54msXMohAXFp0XM0iUMpleBZz/c3klcatm5GGBrsqzAz/zNHXb71s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767623250; c=relaxed/simple;
-	bh=DdYhTjNfP7e1khLO0LP+NDeTBRyadztgwywclnHYJSs=;
+	s=arc-20240116; t=1767623860; c=relaxed/simple;
+	bh=r8InnM7CWzRXcHzjg2Qv5gtmy2MttSw4zvRMyXDY3cQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QzjvUu3Ycy0Ua9l3UkxfdvEZ9zvowcsGexD+p35UZdKMVfbjtnI+46b4z0e/K62zBgcF8WWERMbAvxtMgxU4TBP0QfIrSbI3mNvDw72QdSRnKsUd5dShWGb5ulrr+TACQJg8VXR2S/aiuxVkziczH4lXJSgXYHCLjGiKyXN9Y6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=MiOqiS63; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=r/xnRq6aPfliQavgZCSwZnJjF/QATt/NHvsM2dpp6t4=; b=MiOqiS63aY1JBxBuaXgV/E9PeG
-	bZ98oa2Rbel/LNh8KsP8+5PemWupQP1pija3Bymo6FHYWjb8TkUCD9YEl9ndLUndxM3huRUzsYDvL
-	NBUPNEomxgT4Lz/xMiACoeHMK7iBZAo1zVAmc/yn+1LoYAohw4SMztq/XAxAhhJplCusr897/itIB
-	SpG5AdXz5aEluw7rNXsMWtZB6C/D0szI0OvpkOnnL+qJtbyvk9e0LwlHf/X0V3IwdiMGIEJRIVDYw
-	CUB2YqNSYmZwN6R5ZCv831t5t8OFbYKAfov7BRppB2aFHl/3IwLO92BPPgPA+tDROQla5/2HnLY0a
-	HLWS23MQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45724)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vclYF-000000007vq-0TS5;
-	Mon, 05 Jan 2026 14:27:19 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vclYC-000000007v5-1gLe;
-	Mon, 05 Jan 2026 14:27:16 +0000
-Date: Mon, 5 Jan 2026 14:27:16 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Breno Leitao <leitao@debian.org>
-Cc: Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=U1QOE2NvIw2INXraxsa1P3BmOKSnlARJnxEUlV2J4OvntXnPCjES02QCw8VJvvIBwqd3nFdsUX79k+rwuiFopdxEgodn0dljf0Tfd4nqiJVHNTujdYjx4EK1Pbfn4ofv6uQ9JIEGHCzUPkDeP7V97x0KFQxpXByoqqT9w6eaa5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zbfkZdRE; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=qrztH/Bu5dLCW+mHwisY0aYQyMQV85bZ08nlEFScStM=; b=zb
+	fkZdREj3+PDmoGxO8n0D6uPG/4mLD8k6Y9Co36LXqhp2kd+bYgg46Oid5+fzE+saHkPA/cQtWgcU8
+	Q8BbmVa9h+Uv7ouJBvrafEVvXq8Vh0xy2GqEdTcxOcB8ICiQVSPoNmKqL77IVEk1u+5ttKef9EXFM
+	mfvNC1Wd0kqzYqw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vclhq-001Uoc-PK; Mon, 05 Jan 2026 15:37:14 +0100
+Date: Mon, 5 Jan 2026 15:37:14 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-team@meta.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net v2] bnxt_en: Fix NULL pointer crash in
- bnxt_ptp_enable during error cleanup
-Message-ID: <aVvKRGcSWb1muZ-k@shell.armlinux.org.uk>
-References: <20260105-bnxt-v2-1-9ac69edef726@debian.org>
- <aVu8xIfFrIIFqR0P@shell.armlinux.org.uk>
- <ft63jjhpr2w5s6cdpriixbmmxft5phkvui25pdy46vexpawzz6@mu6gblhm7ofv>
+	Simon Horman <horms@kernel.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org
+Subject: Re: [PATCH RFC net-next 1/3] uapi: add INT_MAX and INT_MIN constants
+Message-ID: <ae78ddb2-7b5f-4d3b-adef-97b0ab363a30@lunn.ch>
+References: <20260105-uapi-limits-v1-0-023bc7a13037@linutronix.de>
+ <20260105-uapi-limits-v1-1-023bc7a13037@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <ft63jjhpr2w5s6cdpriixbmmxft5phkvui25pdy46vexpawzz6@mu6gblhm7ofv>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260105-uapi-limits-v1-1-023bc7a13037@linutronix.de>
 
-On Mon, Jan 05, 2026 at 06:11:26AM -0800, Breno Leitao wrote:
-> Hello Russell,
+On Mon, Jan 05, 2026 at 09:26:47AM +0100, Thomas Weißschuh wrote:
+> Some UAPI headers use INT_MAX and INT_MIN. Currently they include
+> <limits.h> for their definitions, which introduces a problematic
+> dependency on libc.
 > 
-> On Mon, Jan 05, 2026 at 01:29:40PM +0000, Russell King (Oracle) wrote:
-> > On Mon, Jan 05, 2026 at 04:00:16AM -0800, Breno Leitao wrote:
-> > My guess is that this has something to do with firmware, and maybe
-> > upgrading it at runtime - so if the firmware gets upgraded to a
-> > version that doesn't support PTP, the driver removes PTP. However,
-> > can PTP be used while firmware is being upgraded, and what happens
-> > if, e.g. bnxt_ptp_enable() were called mid-upgrade? Would that be
-> > safe?
-> 
-> This crash happened at boot time, when the kernel was having another
-> at DMA path, which was triggering this bug. There was no firmare upgrade
-> at all. Just rebooting the machine with 6.19 was crashing everytime due
-> to the early failure to initialize the driver.
+> Add custom, namespaced definitions of INT_MAX and INT_MIN using the
+> same values as the regular kernel code.
 
-Please read my email again. I wasn't questioning _when_ the problem you
-were seeing was occuring. I was questioning the overall structural
-quality of the driver, suggesting that there are further issues with it
-around PTP.
+Maybe a dumb question.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> +#define __KERNEL_INT_MAX ((int)(~0U >> 1))
+> +#define __KERNEL_INT_MIN (-__KERNEL_INT_MAX - 1)
+
+How does this work for a 32 bit userspace on top of a 64 bit kernel?
+
+And do we need to be careful with KERNEL in the name, in that for a 32
+bit userspace, this is going to be 32bit max int, when in fact the
+kernel is using 64 bit max int?
+
+       Andrew
 
