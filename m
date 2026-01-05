@@ -1,202 +1,194 @@
-Return-Path: <netdev+bounces-246955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC29CCF2CFF
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 10:41:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF147CF2D5B
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 10:49:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 291E1301277A
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 09:41:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 728533017F32
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 09:48:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 646B832C934;
-	Mon,  5 Jan 2026 09:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF66337102;
+	Mon,  5 Jan 2026 09:48:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P21RtkAO"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="AtICXBre"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com [209.85.221.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB05132E6B0
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 09:41:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1489C3370E5
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 09:48:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767606066; cv=none; b=mmXkwdt5W3cboCNhYLkRorZlrnylcN+J4fyZ5TfnFG+EVZALM4afCvy+9eZxCKJCW0c8+QMSr78g5zqjKrKxbTi5Vxd6rfCwyw9spouxuC4uCOaJMs4AU0NBSO/yHATT9GVE0tdMNl2u9GkJb9D3SVbLm9/FEbsasZ6VgLucOTE=
+	t=1767606489; cv=none; b=d9PoIQWQ3YraHlvCPp97BIl6s/KY1jeUWqFb75rivwV7bfouS8jVG1TDGJWjDbIKxa+y0WOdvz6zXtoK6MGVBD+3KNn6swHQu8tbek9S+TxFb30B9Bmryrqd8P1GBug6+YHKQtH5Lr/3rwC81mgVPAT799UKP1ilsHte+wn2jPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767606066; c=relaxed/simple;
-	bh=wlF4+QAOSqPBHkUCKYJlkeu9hVcfkDHErk2D6WLawpk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=qkkzv1HS86J3wPshXfNxtolCYbIN89Ym7NfronIp+Yw53i4WuJ+CDfSrqSklKf02O5PdTQBG1vlbN6J2a1ouwjDKPajMw9mG66vyQ4jvCwx+GZCPDNcqOPzmbYCuSi5tKGcuBTdhzK1NyvlYWTv9U4PFghkIIwgjXK37q3kxZyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P21RtkAO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D8F1C116D0;
-	Mon,  5 Jan 2026 09:41:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767606064;
-	bh=wlF4+QAOSqPBHkUCKYJlkeu9hVcfkDHErk2D6WLawpk=;
-	h=From:Date:Subject:To:Cc:From;
-	b=P21RtkAO1j7eYVquFmr318nf8lyAj6ygieaiD2X4FXbXNFHPy5MR+0TcKaum1EG9h
-	 mN+663r+TiKiSX7ulbMbqX9Zg9SChdb8+QIo/cOTqtHtdxJ4ehdOKuEQxy0UZW8rko
-	 Y19TO+HgeNbjX+zb/V9VATJHaFWUJrusseF6514t++f/8075gA7uiP3p3Hy7mDDvhc
-	 +Di3FjEsgRW+4BFD0h1n3iHkiB+hu6oW/nMKFR8+avZyTK1OMdOp3BOpdzNUMNGMP0
-	 Ml0OytGjPAtpNlhHwAHHQJ7bdyz4V9BnL+Hz1CT8T5SgNujbVesWnYbdseKz8yHK7A
-	 TUWJEOnBZ7dEA==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Mon, 05 Jan 2026 10:40:47 +0100
-Subject: [PATCH net-next] net: airoha: Use gdm port enum value whenever
- possible
+	s=arc-20240116; t=1767606489; c=relaxed/simple;
+	bh=GqAwY0OHbZKQzzJb3VatReAfBA97RCbOF3bWO0/Z1Js=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iBvV56VZtQjrasHm4tBa/Gmw79JMdfUjRUZt+n/Z35g3z+HxfDqMVDwnf8pQCFqWTiM5ok9Pv5nriFNZQjYBjTBJSGNtRb+7lhTwer3htOaY2QWT2d9TUqGa/VBEPqr7TXk0kgfyMiOVU7dR7dsJAEoplZaummCKvczloQNGD4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=AtICXBre; arc=none smtp.client-ip=209.85.221.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f68.google.com with SMTP id ffacd0b85a97d-4308d87782dso983692f8f.2
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 01:48:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1767606485; x=1768211285; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3YNJPmUNbnGNTCEfFfuOCZFqj9o9elJ+A8mEb2IK5hU=;
+        b=AtICXBreWgR5zWZkx70j07qlSmmhIC3ZqGCmXxKIMHXOTLOy6nxn/qnWTCcX39gjFk
+         3C08xn4HmXvUYMcS+jm212kQBf9YRafJTOsRdrtWvU36SA7FdNxr8XNcVBgfGBzTAkuK
+         Aoa1U3rC9OJpawzXJNlg1hERi0SRUuLISUXKnXuQmxC+z5zY5iCJ/NwZlwTh/huv1ech
+         c7swds+qtkU3pFgdt4NUYI4ZRIDQ2zF4e4Wk1Ltncgakxx9VL0Yr5ihmTvmeoyiX72lj
+         x25excA6kO47QS8slAvbH3zgN3UoSoQBCQx6iEM6UfvFUWWgb58FaR7EieXDWAS01dYW
+         sxmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767606485; x=1768211285;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=3YNJPmUNbnGNTCEfFfuOCZFqj9o9elJ+A8mEb2IK5hU=;
+        b=EVIiUoATGNQeltZbuDx7B95FQ/A6iPyRfqzdO2st6KslEr/lnKwRNnp4CzzYss0u0U
+         kFGviPtAiROaOvGNtc8gNFzSkBt+/HtXz9NdMpO4Zr4ie/mpbH3+o8BF9Nin5UiFl+9D
+         Ba9ybTw2fkLjAgjrjMm3kerAxp6hcZigk+I5sNEb0TYmh/XTHJtPr0bONWhadK5IBnC8
+         vUpZnJsVrSM10pr/bzvr/V08BPQ7hrlR0Qz+o88muIj7K7a3HGs/80UwuZaW3j688QpO
+         JlDn8eAPrlaqbfnWOf0jS3TJ0/VA0Hn1hrjcxRt/KEwBPHvE1KOTWlAA/d28UP5bEpQC
+         syQA==
+X-Forwarded-Encrypted: i=1; AJvYcCWXCzbb5BgzAa2gb4X5Sxd46GyzMd2bD33lRZfxgxvg5M+fhYOEOLREajBuWqd3wmdvnBO0jD8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJVqaP4YVo1XfCVi6W7QZ7EPA4E/GiM6rIiHjIE64GNvtoR9gG
+	7kFgpSP34sIX8BcmuyMWW5tWLjdvzSxzP08y8IYmoj9mng11ewRqkSDfE9+8GjP7KNM=
+X-Gm-Gg: AY/fxX4Y7uC46Pyt46WMsM7fTUwYOS90DLZ5dUVPLjtKi3X+dhauSBbWrGihsyKi1hn
+	NcADYEu1f6vVz4eeF9bq3PDcUPw+UXS9Y9Nhz3xGXpXBkdId2i5Bn3Ggb9X3iJYZ/jaGf5CGhQ6
+	VRc2LOo0QXICDEdCeos/Kh5uskgQt6FMBtP3QCJoCPs3uO6FYhCSz1oZ3qeqDK/qs7NWpIHOr3S
+	eTOUQXfnfVvzd5sCTGwsYFtk9QO4kI8UiKpb639fX+5AXoz9YiLefd9CEy2kFRaSLPtdz9B/cXz
+	64TjSU0bCtU69erBBTcrm0ImpP7ZFvi1HqrNqh4PD9Y1ilHTb7OUWIePGs+rm6DN5364jpuAAJq
+	M70UXyemF4skF0GWkZZpjkfJat2e2EoGMCDlEsqtBGgUtLOf/nYl3fBlFtiW/wdu0sZwGRBeoDu
+	yMiY6DhnPx2hd+xxhc0VWXEMFCBLUC5tZZFQydrWTxLPAasBci++HrSqfJ+yWd3TGSLhDSduIVf
+	358
+X-Google-Smtp-Source: AGHT+IHPziOrpKV7Kr9yyjS7tcuC3KfVS3vu6/0u8YX5ecS7isO2cmN7o1CvFXRGO2JgzmojB4/s8Q==
+X-Received: by 2002:a5d:548c:0:b0:432:5b81:493 with SMTP id ffacd0b85a97d-4325b810aa7mr24854531f8f.5.1767606485367;
+        Mon, 05 Jan 2026 01:48:05 -0800 (PST)
+Received: from mordecai (dynamic-2a00-1028-83b8-1e7a-3010-3bd6-8521-caf1.ipv6.o2.cz. [2a00:1028:83b8:1e7a:3010:3bd6:8521:caf1])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324ea1af2bsm99699009f8f.1.2026.01.05.01.48.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 01:48:04 -0800 (PST)
+Date: Mon, 5 Jan 2026 10:48:02 +0100
+From: Petr Tesarik <ptesarik@suse.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>, Olivia Mackall <olivia@selenic.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Eugenio =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, "James E.J. Bottomley"
+ <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Robin Murphy <robin.murphy@arm.com>, Stefano Garzarella
+ <sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Leon Romanovsky
+ <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, Bartosz Golaszewski
+ <brgl@kernel.org>, linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
+ virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
+ iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 02/15] docs: dma-api: document
+ __dma_from_device_group_begin()/end()
+Message-ID: <20260105104802.42bd8fe5@mordecai>
+In-Reply-To: <01ea88055ded4d70cac70ba557680fd5fa7d9ff5.1767601130.git.mst@redhat.com>
+References: <cover.1767601130.git.mst@redhat.com>
+	<01ea88055ded4d70cac70ba557680fd5fa7d9ff5.1767601130.git.mst@redhat.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-suse-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260105-airoha-use-port-idx-enum-v1-1-503ca5763858@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2MwQqDMBAFf0X27EKyVFv6K8VD1KfuoYlsqgjiv
- zd4HIaZkzJMkeldnWTYNWuKBXxd0bCEOIN1LEzipHXeCQe1tATeMnhN9iv6YMTty8NTXv7Ro0E
- QKvlqmPS415/uuv4aVegIagAAAA==
-X-Change-ID: 20260102-airoha-use-port-idx-enum-c72814be5ea2
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
 
-Use AIROHA_GDMx_IDX enum value whenever possible.
-This patch is just cosmetic changes and does not introduce any logic one.
+On Mon, 5 Jan 2026 03:22:57 -0500
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/airoha/airoha_eth.c | 40 +++++++++++++++++---------------
- 1 file changed, 21 insertions(+), 19 deletions(-)
+> Document the __dma_from_device_group_begin()/end() annotations.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 315d97036ac1d611cc786020cbf2c6df810995a9..724904d08febdd88c1145da7531f012755412ec4 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -108,11 +108,11 @@ static int airoha_set_vip_for_gdm_port(struct airoha_gdm_port *port,
- 	u32 vip_port;
- 
- 	switch (port->id) {
--	case 3:
-+	case AIROHA_GDM3_IDX:
- 		/* FIXME: handle XSI_PCIE1_PORT */
- 		vip_port = XSI_PCIE0_VIP_PORT_MASK;
- 		break;
--	case 4:
-+	case AIROHA_GDM4_IDX:
- 		/* FIXME: handle XSI_USB_PORT */
- 		vip_port = XSI_ETH_VIP_PORT_MASK;
- 		break;
-@@ -514,8 +514,8 @@ static int airoha_fe_init(struct airoha_eth *eth)
- 		      FIELD_PREP(IP_ASSEMBLE_PORT_MASK, 0) |
- 		      FIELD_PREP(IP_ASSEMBLE_NBQ_MASK, 22));
- 
--	airoha_fe_set(eth, REG_GDM_FWD_CFG(3), GDM_PAD_EN_MASK);
--	airoha_fe_set(eth, REG_GDM_FWD_CFG(4), GDM_PAD_EN_MASK);
-+	airoha_fe_set(eth, REG_GDM_FWD_CFG(AIROHA_GDM3_IDX), GDM_PAD_EN_MASK);
-+	airoha_fe_set(eth, REG_GDM_FWD_CFG(AIROHA_GDM4_IDX), GDM_PAD_EN_MASK);
- 
- 	airoha_fe_crsn_qsel_init(eth);
- 
-@@ -1690,27 +1690,29 @@ static int airhoha_set_gdm2_loopback(struct airoha_gdm_port *port)
- 	/* Forward the traffic to the proper GDM port */
- 	pse_port = port->id == AIROHA_GDM3_IDX ? FE_PSE_PORT_GDM3
- 					       : FE_PSE_PORT_GDM4;
--	airoha_set_gdm_port_fwd_cfg(eth, REG_GDM_FWD_CFG(2), pse_port);
--	airoha_fe_clear(eth, REG_GDM_FWD_CFG(2), GDM_STRIP_CRC_MASK);
-+	airoha_set_gdm_port_fwd_cfg(eth, REG_GDM_FWD_CFG(AIROHA_GDM2_IDX),
-+				    pse_port);
-+	airoha_fe_clear(eth, REG_GDM_FWD_CFG(AIROHA_GDM2_IDX),
-+			GDM_STRIP_CRC_MASK);
- 
- 	/* Enable GDM2 loopback */
--	airoha_fe_wr(eth, REG_GDM_TXCHN_EN(2), 0xffffffff);
--	airoha_fe_wr(eth, REG_GDM_RXCHN_EN(2), 0xffff);
-+	airoha_fe_wr(eth, REG_GDM_TXCHN_EN(AIROHA_GDM2_IDX), 0xffffffff);
-+	airoha_fe_wr(eth, REG_GDM_RXCHN_EN(AIROHA_GDM2_IDX), 0xffff);
- 
- 	chan = port->id == AIROHA_GDM3_IDX ? airoha_is_7581(eth) ? 4 : 3 : 0;
--	airoha_fe_rmw(eth, REG_GDM_LPBK_CFG(2),
-+	airoha_fe_rmw(eth, REG_GDM_LPBK_CFG(AIROHA_GDM2_IDX),
- 		      LPBK_CHAN_MASK | LPBK_MODE_MASK | LPBK_EN_MASK,
- 		      FIELD_PREP(LPBK_CHAN_MASK, chan) |
- 		      LBK_GAP_MODE_MASK | LBK_LEN_MODE_MASK |
- 		      LBK_CHAN_MODE_MASK | LPBK_EN_MASK);
--	airoha_fe_rmw(eth, REG_GDM_LEN_CFG(2),
-+	airoha_fe_rmw(eth, REG_GDM_LEN_CFG(AIROHA_GDM2_IDX),
- 		      GDM_SHORT_LEN_MASK | GDM_LONG_LEN_MASK,
- 		      FIELD_PREP(GDM_SHORT_LEN_MASK, 60) |
- 		      FIELD_PREP(GDM_LONG_LEN_MASK, AIROHA_MAX_MTU));
- 
- 	/* Disable VIP and IFC for GDM2 */
--	airoha_fe_clear(eth, REG_FE_VIP_PORT_EN, BIT(2));
--	airoha_fe_clear(eth, REG_FE_IFC_PORT_EN, BIT(2));
-+	airoha_fe_clear(eth, REG_FE_VIP_PORT_EN, BIT(AIROHA_GDM2_IDX));
-+	airoha_fe_clear(eth, REG_FE_IFC_PORT_EN, BIT(AIROHA_GDM2_IDX));
- 
- 	/* XXX: handle XSI_USB_PORT and XSI_PCE1_PORT */
- 	nbq = port->id == AIROHA_GDM3_IDX && airoha_is_7581(eth) ? 4 : 0;
-@@ -1746,8 +1748,8 @@ static int airoha_dev_init(struct net_device *dev)
- 	airoha_set_macaddr(port, dev->dev_addr);
- 
- 	switch (port->id) {
--	case 3:
--	case 4:
-+	case AIROHA_GDM3_IDX:
-+	case AIROHA_GDM4_IDX:
- 		/* If GDM2 is active we can't enable loopback */
- 		if (!eth->ports[1]) {
- 			int err;
-@@ -1757,7 +1759,7 @@ static int airoha_dev_init(struct net_device *dev)
- 				return err;
- 		}
- 		fallthrough;
--	case 2:
-+	case AIROHA_GDM2_IDX:
- 		if (airoha_ppe_is_enabled(eth, 1)) {
- 			/* For PPE2 always use secondary cpu port. */
- 			fe_cpu_port = FE_PSE_PORT_CDM2;
-@@ -3101,14 +3103,14 @@ static const char * const en7581_xsi_rsts_names[] = {
- static int airoha_en7581_get_src_port_id(struct airoha_gdm_port *port, int nbq)
- {
- 	switch (port->id) {
--	case 3:
-+	case AIROHA_GDM3_IDX:
- 		/* 7581 SoC supports PCIe serdes on GDM3 port */
- 		if (nbq == 4)
- 			return HSGMII_LAN_7581_PCIE0_SRCPORT;
- 		if (nbq == 5)
- 			return HSGMII_LAN_7581_PCIE1_SRCPORT;
- 		break;
--	case 4:
-+	case AIROHA_GDM4_IDX:
- 		/* 7581 SoC supports eth and usb serdes on GDM4 port */
- 		if (!nbq)
- 			return HSGMII_LAN_7581_ETH_SRCPORT;
-@@ -3132,12 +3134,12 @@ static const char * const an7583_xsi_rsts_names[] = {
- static int airoha_an7583_get_src_port_id(struct airoha_gdm_port *port, int nbq)
- {
- 	switch (port->id) {
--	case 3:
-+	case AIROHA_GDM3_IDX:
- 		/* 7583 SoC supports eth serdes on GDM3 port */
- 		if (!nbq)
- 			return HSGMII_LAN_7583_ETH_SRCPORT;
- 		break;
--	case 4:
-+	case AIROHA_GDM4_IDX:
- 		/* 7583 SoC supports PCIe and USB serdes on GDM4 port */
- 		if (!nbq)
- 			return HSGMII_LAN_7583_PCIE_SRCPORT;
+I really like your wording ("CPU does not write"), which rightly refers
+to what happens on the bus rather then what may or may not make a
+specific CPU architecture initiate a bus write.
 
----
-base-commit: c303e8b86d9dbd6868f5216272973292f7f3b7f1
-change-id: 20260102-airoha-use-port-idx-enum-c72814be5ea2
+I'm not formally a reviewer, but FWIW:
 
-Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+Reviewed-by: Petr Tesarik <ptesarik@suse.com>
+
+> ---
+>  Documentation/core-api/dma-api-howto.rst | 52 ++++++++++++++++++++++++
+>  1 file changed, 52 insertions(+)
+> 
+> diff --git a/Documentation/core-api/dma-api-howto.rst b/Documentation/core-api/dma-api-howto.rst
+> index 96fce2a9aa90..e97743ab0f26 100644
+> --- a/Documentation/core-api/dma-api-howto.rst
+> +++ b/Documentation/core-api/dma-api-howto.rst
+> @@ -146,6 +146,58 @@ What about block I/O and networking buffers?  The block I/O and
+>  networking subsystems make sure that the buffers they use are valid
+>  for you to DMA from/to.
+>  
+> +__dma_from_device_group_begin/end annotations
+> +=============================================
+> +
+> +As explained previously, when a structure contains a DMA_FROM_DEVICE /
+> +DMA_BIDIRECTIONAL buffer (device writes to memory) alongside fields that the
+> +CPU writes to, cache line sharing between the DMA buffer and CPU-written fields
+> +can cause data corruption on CPUs with DMA-incoherent caches.
+> +
+> +The ``__dma_from_device_group_begin(GROUP)/__dma_from_device_group_end(GROUP)``
+> +macros ensure proper alignment to prevent this::
+> +
+> +	struct my_device {
+> +		spinlock_t lock1;
+> +		__dma_from_device_group_begin();
+> +		char dma_buffer1[16];
+> +		char dma_buffer2[16];
+> +		__dma_from_device_group_end();
+> +		spinlock_t lock2;
+> +	};
+> +
+> +To isolate a DMA buffer from adjacent fields, use
+> +``__dma_from_device_group_begin(GROUP)`` before the first DMA buffer
+> +field and ``__dma_from_device_group_end(GROUP)`` after the last DMA
+> +buffer field (with the same GROUP name). This protects both the head
+> +and tail of the buffer from cache line sharing.
+> +
+> +The GROUP parameter is an optional identifier that names the DMA buffer group
+> +(in case you have several in the same structure)::
+> +
+> +	struct my_device {
+> +		spinlock_t lock1;
+> +		__dma_from_device_group_begin(buffer1);
+> +		char dma_buffer1[16];
+> +		__dma_from_device_group_end(buffer1);
+> +		spinlock_t lock2;
+> +		__dma_from_device_group_begin(buffer2);
+> +		char dma_buffer2[16];
+> +		__dma_from_device_group_end(buffer2);
+> +	};
+> +
+> +On cache-coherent platforms these macros expand to zero-length array markers.
+> +On non-coherent platforms, they also ensure the minimal DMA alignment, which
+> +can be as large as 128 bytes.
+> +
+> +.. note::
+> +
+> +        It is allowed (though somewhat fragile) to include extra fields, not
+> +        intended for DMA from the device, within the group (in order to pack the
+> +        structure tightly) - but only as long as the CPU does not write these
+> +        fields while any fields in the group are mapped for DMA_FROM_DEVICE or
+> +        DMA_BIDIRECTIONAL.
+> +
+>  DMA addressing capabilities
+>  ===========================
+>  
 
 
