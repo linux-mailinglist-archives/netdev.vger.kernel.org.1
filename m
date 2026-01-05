@@ -1,115 +1,153 @@
-Return-Path: <netdev+bounces-246995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B22ECF3466
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 12:34:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE6A6CF357D
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 12:48:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0CF283032AD0
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 11:28:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 45A7330380FD
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 11:48:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B6453314D1;
-	Mon,  5 Jan 2026 11:27:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21C4D32FA34;
+	Mon,  5 Jan 2026 11:48:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QGPTqadR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e1CPeIYq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199E4330D47
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 11:27:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A081333447
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 11:48:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767612456; cv=none; b=MyPJN2VVFK15DrH6XMnX9U2BdZCH84m0ZVmNvc4XXhLcMRfHWW2Rr+lsC1lIvIYIZlp/l4DVBdwUmPScdlODEJ/2dGWQovMzZPSCoA/fK0r/4tqMr3cIqXOoKTdqjr6LdJBPlyQCtI734da4r/gl0HtGcDuD6Cn3bq2xomKsF6s=
+	t=1767613685; cv=none; b=SwLUgBY66UUwRP8AaHIYz7Eti3Jd1Ae3h51/aTKGj1N/D2bXVUZCIi48hn/hfBmTUT8rO8Fx5+2r2/9WRkI5c9RaE08rFfz/fkCdqg9mibAduK8A3UV2AsAqpc4x+QwKdcJvBoAnf+qd595+rLKOZPIET2axnB2ApI9dXz1FDBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767612456; c=relaxed/simple;
-	bh=w3LxHMD4kkR5wHW0DV+nRsYtmZeTdTO9Z0RD8SuWoHA=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=PMu6xEItLOV8Ex6OVcMs+lMH/A9XoQiI1zkqmrnmhgscrOeYS4//SUDLZUkDfxF9cI+A9OQMYUlMwzKsP9VvREAJKShYfkYr3r6GWYOUp7tK4IsSpWdmil9WIeRxxgl0HNIegXDhFcQbko5lD+OiBSZsz0R6C9KdhyMKWuO7Xos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QGPTqadR; arc=none smtp.client-ip=209.85.128.52
+	s=arc-20240116; t=1767613685; c=relaxed/simple;
+	bh=9KuF5mVTCYqNpYTWSGEzNxM1NAUHaHIt1frKONRl/3c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MbizIGQlFoNgFTL00UcD4Ap/dK88ymFjUjxv41LgkG15Q0aRcovLoWdTYgzb3iGjm6atV2fAcz9IoQEBvSaox5Fjwv53KAEAEKpqVWZ/2DHByTEqOFei+cwBG27IfNm3v+Q06vDg1JHjbjhuYZxWdV9XZZ6INrtkGUVs5Fkpm/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e1CPeIYq; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-477770019e4so117245845e9.3
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 03:27:30 -0800 (PST)
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-47d3ffa5f33so36534025e9.2
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 03:48:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767612448; x=1768217248; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GtGsEIDk5yYBdSjpqv4emoTr198N8agoa4ygu+ppaC0=;
-        b=QGPTqadRx7X+kZK3LdlTIiUc43AuQK4354hYR2OcSsTaqVPR8vrc7M7Ef2DQ+1697s
-         NKkrlEHxum15dbLpWwbTsfR2wLO+3zgoZPm0QLM12rddHPN79ZgbSw2ucr/XeAs101bJ
-         EeEMzZFw1biLnW6ZGGZhyePbKYGFiDCugiTVZoXy3lWG7qDBxpfzUr5fsGZSL7ScZtB+
-         X8NZUd3nlRVuY1Pjirm8fs111XACaogoddZHwGnmG8og5EZwtMzURqREApXh7kckK4tj
-         6zRkX40cHUoNslmpkkV6aD5kvgP46QcItOg4wLYiS4HhkPMN8HwXuMzI6Ib1XuUkrZXh
-         tYCg==
+        d=gmail.com; s=20230601; t=1767613681; x=1768218481; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0c7x1KuoCO36lV/cUbw2RbaoUEVJdub9OudTswrskL8=;
+        b=e1CPeIYqqLxhaGhQhEAFUgiFi3kRex4k/G1yNOl/C+sz70vye3TpgcVztmpo+9xu9K
+         RdcrHg9wGVad2cynGGGE3DQS+Npv0odgsCGBymJ+l6xRZabra0GEgoxZvpNvyznz8nKD
+         Guik2Bwd3XFgy8yqQODXasy1JepllAfWtTV+kRf1FKepERZGCx7cO+tHEX4e3V9D5fwe
+         e+snLowISA53rBynxc1JiWae22Izm42JrpLbSeYkqR0XRHoq1jn82bWm9/g/BDDqC0xi
+         eDJWWFMxkLCpLxhOm+izU6Cw5PZ0L+4GwJGwH7Kk4FHMSpAujy3+PZ5b6DHR66Wp1610
+         dkLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767612448; x=1768217248;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=GtGsEIDk5yYBdSjpqv4emoTr198N8agoa4ygu+ppaC0=;
-        b=i9X9hXcuP43iQIolg3a5b8WM/J9/XJwiVnKdf1yT3E42rFcvaLsAPr0RbCOw6ioPh+
-         W9ymY+HRaU/hvGeIEWuKc3Ub8nuYTwUjnrh8HiGHHgxgcbgPTl61lzW8EbyrkmuyoQbb
-         /onDw+kSPeEJRAi8MdGmAo5s5oe6eUgXBxssXeo98npWpNA70PB7AechW/5EVaUnSTpH
-         wsyBG6FvZZRdJhUR3lhBINdGlVN71LziQlr87xE/c1D8BQNNn2G1Zm8LBMs01iTgW7XJ
-         rbW1dU7uf0laCgjhdi3fIxcF38TgVqA2iUClvOKVOu+qYBLw7C7VMtcATLaVaCLXEd40
-         kM+A==
-X-Forwarded-Encrypted: i=1; AJvYcCV6DFhUJVtF9RzZkwodiZ4l1V1wrn+wp+tzmP00UMgiqiJEfSpVDjgJiEWMghIrv7YZpowYuXo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVIq+vDt/Wivp/mFSPC8E+BtwdUoINJVxQl3964PI3iHM5sFfb
-	OukOMGIxNjq1FvsnCJOWJmk7CtXnVfNxgFAUKh2zOpjFadHzLetjbp6N
-X-Gm-Gg: AY/fxX6DLiRW19U0JAQpChxACRaLMm10eYQtyt6eARecmdUuWqAy955xY6r3wmxAqGd
-	w3fTL4HH5qF0+OTClEfYXKOZ8beVJF8Jr/vrkJZdmegY4MjDNdsJXVEXN/rZ+tIQEPnv3a5bZvy
-	YoLDK0pBsLqXIA/fWD15ZulwnQhTtfgHCJr7ndcqJN4/0VvfMIV+Ly3y0+RKuXk1ArCJaBu8S9B
-	cMWqQrReIdMekXf7y+5ioDErIE0JdTiBP4mzT67cCuyJFJKjXNOn9WZeHvWcD2t12KMlfaJ1Ike
-	FPv8BcWcuuky90bRMCc/8yOxXjyMDd6GsNTTlUeD50ZBwVCOpi9spFORfdUcYTEnIomuMxzrSkL
-	b+Dqw+ppQYXWYcukKtqgGlhS1gDPT7i0DsRfqXuTTkjfFVy6fl3e7qHOfZOa58Gc2ZvCaXXqsJL
-	O0jPHHde2mMLbQkK2n0GVAQys=
-X-Google-Smtp-Source: AGHT+IFWhDyHbAPuYySIWsrxVQyQ2qEdwvB4qT70AHLiqMEgM6c0m1XGx2ijUI+szqgh35agh76d9g==
-X-Received: by 2002:a05:600c:c05b:b0:45b:7d77:b592 with SMTP id 5b1f17b1804b1-47d1c03867amr520692785e9.12.1767612448161;
-        Mon, 05 Jan 2026 03:27:28 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:fc71:3122:e892:1c45])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d6b9efb7dsm61399255e9.0.2026.01.05.03.27.27
+        d=1e100.net; s=20230601; t=1767613681; x=1768218481;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0c7x1KuoCO36lV/cUbw2RbaoUEVJdub9OudTswrskL8=;
+        b=eOLDg5rBr2eTqLiep65FHNi+tu3h3UASkAThpDWWC0d9PySjPRjnGTVqmCgZCWb5sj
+         6Ttc4PXaoDUASm8ay7M4cW2GzUwaTWGni3EsFGgRy8oq0FUMBdfhpudUicodv0QRwI1W
+         /5BvtYO2tp8kAjZwQiOvdJ0/RpeScaj1q7eP9HWxOzXN9xVlaS/9tk56i6fgWvQjXigz
+         ks1lNyrb9OrIQqRfkOJsn2PiLjGT2GNTf1JP1CXEg7g0H8VJVWRhdCuv1cKn2DE/mIRM
+         1BLXaQn3DWy/v8RW/+/pixP2n5K7cb2d6LQ2CusS7ZhLHmCUWlbQx0BVxBBkKrGAh7IC
+         gUJw==
+X-Gm-Message-State: AOJu0Yz4bhJRxujCcZYoKj0I5DWsVNj1zKAFdSu/J6GzB5UvNfI4r49L
+	b2XbZhgZgtHaNdPlUq2zm5nkeLqUF5A38pre1rV1kG8bj8lJCrIqnbkk+QaTTy9L
+X-Gm-Gg: AY/fxX4/dmfHh8yjpc+5MElghlcmx/b6SES/onv8L8gc+b3o34C/U0G3hE4h1GoQJmc
+	07P6Rx53StT67564OLNHbyO/GdjqhIyUSOAXk71kQ2sfuUMoMnzQ8WBPV68qtLE/PQvqFOeFIjO
+	98YrYo7uWTK8LJt7PepyEb876pGUpnWEWhYkyzT4un8p8W3bv54jq4UL7DWl9kNdYywN2TFG8yA
+	p52th8cB8I996GlL82EpeP4PMgAVLwOCzgjiVaSi6fmUerS6DkYYYeQIWmzTjNZF5Fy5ooQb0uc
+	dGKk0zL6f5a/rLgc+w4XUqrXGNm4htUb5wyW3Js5uDOl8cMBDpDgcGNC2T5yPm3Vk6MI6I6zw5+
+	Nl6YuTMRNld9JWmD4cM59tQEBC33CulSWOHFFhygbs13CMjv1o6qbkGMcgScRbG7oiXboMwx4f9
+	Ag
+X-Google-Smtp-Source: AGHT+IHKI7pXBundH6Aldzu3XpW85g+I64MiD5fidXc/xSwpMM10ybpQYDIOpGVHUtF2nmtmcb5RbA==
+X-Received: by 2002:a05:600c:310c:b0:46e:32dd:1b1a with SMTP id 5b1f17b1804b1-47d1953b941mr483080275e9.7.1767613681409;
+        Mon, 05 Jan 2026 03:48:01 -0800 (PST)
+Received: from wdesk. ([5.213.159.39])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d6ba7090esm56459345e9.7.2026.01.05.03.47.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 03:27:27 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
-  hawk@kernel.org
-Subject: Re: [PATCH net] netlink: specs: netdev: clarify the page pool API a
- little
-In-Reply-To: <20260104165232.710460-1-kuba@kernel.org>
-Date: Mon, 05 Jan 2026 11:27:17 +0000
-Message-ID: <m2y0mcguzu.fsf@gmail.com>
-References: <20260104165232.710460-1-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        Mon, 05 Jan 2026 03:48:00 -0800 (PST)
+From: Mahdi Faramarzpour <mahdifrmx@gmail.com>
+To: netdev@vger.kernel.org
+Cc: willemdebruijn.kernel@gmail.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	Mahdi Faramarzpour <mahdifrmx@gmail.com>
+Subject: [PATCH net-next] udp: add drop count for packets in udp_prod_queue
+Date: Mon,  5 Jan 2026 15:17:32 +0330
+Message-Id: <20260105114732.140719-1-mahdifrmx@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Jakub Kicinski <kuba@kernel.org> writes:
+This commit adds SNMP drop count increment for the packets in
+per NUMA queues which were introduced in commit b650bf0977d3
+("udp: remove busylock and add per NUMA queues").
 
-> The phrasing of the page-pool-get doc is very confusing.
-> It's supposed to highlight that support depends on the driver
-> doing its part but it sounds like orphaned page pools won't
-> be visible.
->
-> The description of the ifindex is completely wrong.
-> We move the page pool to loopback and skip the attribute if
-> ifindex is loopback.
->
-> Link: https://lore.kernel.org/20260104084347.5de3a537@kernel.org
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: donald.hunter@gmail.com
-> CC: hawk@kernel.org
-> ---
->  Documentation/netlink/specs/netdev.yaml | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+Signed-off-by: Mahdi Faramarzpour <mahdifrmx@gmail.com>
+---
+ net/ipv4/udp.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index ffe074cb5..19ab44e46 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -1709,6 +1709,11 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
+ 	int dropcount;
+ 	int nb = 0;
+ 
++	struct {
++		int mem4;
++		int mem6;
++	} err_count = { 0, 0 };
++
+ 	rmem = atomic_read(&sk->sk_rmem_alloc);
+ 	rcvbuf = READ_ONCE(sk->sk_rcvbuf);
+ 	size = skb->truesize;
+@@ -1760,6 +1765,10 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
+ 		total_size += size;
+ 		err = udp_rmem_schedule(sk, size);
+ 		if (unlikely(err)) {
++			if (skb->protocol == htons(ETH_P_IP))
++				err_count.mem4++;
++			else
++				err_count.mem6++;
+ 			/*  Free the skbs outside of locked section. */
+ 			skb->next = to_drop;
+ 			to_drop = skb;
+@@ -1797,10 +1806,18 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
+ 			skb = to_drop;
+ 			to_drop = skb->next;
+ 			skb_mark_not_on_list(skb);
+-			/* TODO: update SNMP values. */
+ 			sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_PROTO_MEM);
+ 		}
+ 		numa_drop_add(&udp_sk(sk)->drop_counters, nb);
++
++		SNMP_ADD_STATS(__UDPX_MIB(sk, true), UDP_MIB_MEMERRORS,
++			       err_count.mem4);
++		SNMP_ADD_STATS(__UDPX_MIB(sk, true), UDP_MIB_INERRORS,
++			       err_count.mem4);
++		SNMP_ADD_STATS(__UDPX_MIB(sk, false), UDP_MIB_MEMERRORS,
++			       err_count.mem6);
++		SNMP_ADD_STATS(__UDPX_MIB(sk, false), UDP_MIB_INERRORS,
++			       err_count.mem6);
+ 	}
+ 
+ 	atomic_sub(total_size, &udp_prod_queue->rmem_alloc);
+-- 
+2.34.1
+
 
