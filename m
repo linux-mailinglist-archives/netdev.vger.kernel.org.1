@@ -1,82 +1,154 @@
-Return-Path: <netdev+bounces-247360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87B24CF863E
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 13:54:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D85ACF8C9E
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 15:31:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 288553015838
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 12:54:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 53A7830CD392
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 14:23:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A38832B9A8;
-	Tue,  6 Jan 2026 12:54:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72549311597;
+	Tue,  6 Jan 2026 14:23:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4nE8BVg/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gvq7Blsk"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A2B32692D;
-	Tue,  6 Jan 2026 12:54:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D729F31280E
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 14:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767704059; cv=none; b=u3xZKxoNjx8wPdj2OLG4RMl4YbA7T/N+PX6LdladecpQaZdvyzzoEFQFedyQ8NGO+heyZaa8Aq/paV0gipKbl1juMYQ1qnV9QNWn+XvYERUEng8jsD9KIWoLo3FR51fAPqGb5NHle5jdy3Cv01u9Cf9h2igIwZs64ybmg8dd56w=
+	t=1767709429; cv=none; b=Hhn708Hr+urWiecu2n/YbjNj2KqAoxuSYvY0ZlFwz25xpQz4NkUwEevjOlAKGbZQ1YqspbwEJsMn0SqKhstviHaDUlzvejlyiINXJAN3M4Z4+cJhurULpzwNmUr8AHr6WK3gktn/rz7H91XbLpvpSO3bxOozwdqf1mWmgUnFxhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767704059; c=relaxed/simple;
-	bh=93gh9+VDzi+8yVCF9d3h6WpeiVbzmwxN2sfEx8EWLLs=;
+	s=arc-20240116; t=1767709429; c=relaxed/simple;
+	bh=lVULV5GfaJFN2tASGfIP17U8gJhLLwXEwGtmS7IVzcI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mWkZutlSeV02PFuxNHWEl+ejSXUVZnoWpCJo0EpEwIUVLUpZKUSw0Y/YJpypX8pRTj0lxSZZK8wCqui9ACK6QdXbaD0Bzk8oxq0KzUsJ3blBBHBv0yo+J3cKPtAYemaLKqNEok+G6CV9r97GEHWMAwxgAR+TCRCD8T2HuGcoqYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4nE8BVg/; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=tDXsteGd4Cd3IMBJ9PXzx1xR+9oA/9cQlHgLCmWx+qs=; b=4nE8BVg//+OMorD8xMCIyVHC02
-	W4/0GzmevQaE8BzZ7nJaciCxEGdrQCITrSBTrtosro+0mawZGZk11541DkmNqaEBXhjGypLRMnkE/
-	MWz5ZPpqrzGQAh53AKYfgdGx5J1sxON6qp+nfApesWHvQDuvM1OHQ7Qv7HvLfyZDX5Iw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vd6ZH-001cPO-T2; Tue, 06 Jan 2026 13:53:47 +0100
-Date: Tue, 6 Jan 2026 13:53:47 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=X1BCEdLP/h5iiFoszc3RVnPjxXmPjoc+n/bftqVc14QZjLSrJxS0qBL3t+ENV1YCMklb2MQn1+XPTpnREsfBCwhfgzbUlqkDQPsfasdf/IfaebXdcYK6SctkWYATIrrmBfaSL1NQeFE0bRh97G5OSnw/zvulSeaZbT+5Uk1Z6fk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Gvq7Blsk; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767709424;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0OqzwyCKSkjy5BfIhkLbUQnq0t0kB+MbQfPUkbaaRNY=;
+	b=Gvq7BlskAL2Pg/D6NOCh5280H8VzccaI5vc/PdRXlSRVPtdXVT7pKPLfYgsValLeuuCZJC
+	Un0ds4FZXWOpmCYEWHQBUn15W4cpD470UwpjOjzBW8agi9LxT7SXvfrY+1hGxhJgDwXmzP
+	JJXnNTRsxUInnHi+UkefsSrFj+EQWqw=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-119-bni8fjkMOieXIdoRKDxuwg-1; Tue,
+ 06 Jan 2026 09:23:39 -0500
+X-MC-Unique: bni8fjkMOieXIdoRKDxuwg-1
+X-Mimecast-MFC-AGG-ID: bni8fjkMOieXIdoRKDxuwg_1767709416
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 343971955F3E;
+	Tue,  6 Jan 2026 14:23:32 +0000 (UTC)
+Received: from localhost (unknown [10.2.16.158])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DB52419560AB;
+	Tue,  6 Jan 2026 14:23:29 +0000 (UTC)
+Date: Mon, 5 Jan 2026 13:19:39 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jason Wang <jasowang@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Michael Klein <michael@fossekall.de>,
-	Aleksander Jan Bajkowski <olek2@wp.pl>,
-	Bevan Weiss <bevan.weiss@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 3/5] net: phy: move mmd_phy_read and
- mmd_phy_write to phylib.h
-Message-ID: <e957ec9e-6732-4229-872f-e961be3d6c56@lunn.ch>
-References: <cover.1767630451.git.daniel@makrotopia.org>
- <79169cd624a3572d426e42c7b13cd2654a35d0cb.1767630451.git.daniel@makrotopia.org>
+	Simon Horman <horms@kernel.org>, Petr Tesarik <ptesarik@suse.com>,
+	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Bartosz Golaszewski <brgl@kernel.org>, linux-doc@vger.kernel.org,
+	linux-crypto@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-scsi@vger.kernel.org, iommu@lists.linux.dev,
+	kvm@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 10/15] virtio_scsi: fix DMA cacheline issues for events
+Message-ID: <20260105181939.GA59391@fedora>
+References: <cover.1767601130.git.mst@redhat.com>
+ <8801aeef7576a155299f19b6887682dd3a272aba.1767601130.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="TgzbTybhuc4Vbyp1"
+Content-Disposition: inline
+In-Reply-To: <8801aeef7576a155299f19b6887682dd3a272aba.1767601130.git.mst@redhat.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+
+
+--TgzbTybhuc4Vbyp1
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <79169cd624a3572d426e42c7b13cd2654a35d0cb.1767630451.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 05, 2026 at 04:38:29PM +0000, Daniel Golle wrote:
-> Helper functions mmd_phy_read and mmd_phy_write are useful for PHYs
-> which require custom MMD access functions for some but not all MMDs.
-> Move mmd_phy_read and mmd_phy_write function prototypes from
-> phylib-internal.h to phylib.h to make them available for PHY drivers.
-> 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+On Mon, Jan 05, 2026 at 03:23:29AM -0500, Michael S. Tsirkin wrote:
+> @@ -61,7 +62,7 @@ struct virtio_scsi_cmd {
+> =20
+>  struct virtio_scsi_event_node {
+>  	struct virtio_scsi *vscsi;
+> -	struct virtio_scsi_event event;
+> +	struct virtio_scsi_event *event;
+>  	struct work_struct work;
+>  };
+> =20
+> @@ -89,6 +90,11 @@ struct virtio_scsi {
+> =20
+>  	struct virtio_scsi_vq ctrl_vq;
+>  	struct virtio_scsi_vq event_vq;
+> +
+> +	__dma_from_device_group_begin();
+> +	struct virtio_scsi_event events[VIRTIO_SCSI_EVENT_LEN];
+> +	__dma_from_device_group_end();
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+If the device emits two events in rapid succession, could the CPU see
+stale data for the second event because it already holds the cache line
+for reading the first event?
 
-    Andrew
+In other words, it's not obvious to me that the DMA warnings are indeed
+spurious and should be silenced here.
+
+It seems safer and simpler to align and pad the struct virtio_scsi_event
+field in struct virtio_scsi_event_node rather than packing these structs
+into a single array here they might share cache lines.
+
+Stefan
+
+--TgzbTybhuc4Vbyp1
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmlcALoACgkQnKSrs4Gr
+c8hxKAgAntRCUOkAR5sJ85qdfsRgS5doxT9/NXPvgLJJuioZ7uhZ5gZoJlDI03Jd
+hAhz7RZQq0egV90TXQcX+aVTCMEoVFBZs9myLPSn3+P2aJI58FiFGQtA0EmzWkA5
+sjTyB+Fn5GvsA5yoatFgYoqr0Fc6xPDTWWkgqMkg2nmMjdbnR9taetiYfcW8FdHu
+eZmLE0d8xc2KhR/HMfz11L+fk1oXF94bZyqM98sOXkzqWgXK0vyd4UK/atflMQMv
+QInPClb3ErPbr27EQixAwC6yR40bvPArKxVFbJEYWYm1uP4fprxUVZD6VfmeTMZZ
+vJCcbmW4I0BK/ICRg+hCVzw3tAAmjg==
+=RvL+
+-----END PGP SIGNATURE-----
+
+--TgzbTybhuc4Vbyp1--
+
 
