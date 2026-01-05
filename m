@@ -1,133 +1,169 @@
-Return-Path: <netdev+bounces-247193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3BEBCF5923
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 21:52:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB3D6CF5956
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 21:55:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6647E306B745
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 20:52:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7CDBE3079C8D
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 20:55:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE6CF26F2AF;
-	Mon,  5 Jan 2026 20:52:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B1D2C0F9A;
+	Mon,  5 Jan 2026 20:55:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="wqVECP1z"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rrXCpRIl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06E2722E406
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 20:52:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8006C28750B
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 20:55:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767646373; cv=none; b=AYvItlGT8EC/bfuEgm+W45L9mswqIPtLbVpmVnZrV6mAu8j8eqKRh+/OM/nx37gzZ/r6GCPsb2s02HYA7/keUOpsEbs0DydjslEtFlqaPAXJtrqbTVI9EDz1mVJSTcU0itEFt+3ShGN5Vs5m3FOSTmWZADX/0aS3HcjaSwX1G18=
+	t=1767646523; cv=none; b=f4soc4OKKKTyEegZPhvUL36ZBWyVZIso26Q0YLm3W60ybnLgUAlbX4P0B3dzZgw1PI2aZigFarAyFvP7p+kiduH78n0f4CoqCuLSaerID5AvRH0lGQ1aE62hFxAipKzEfNxy39HaKJF0vrT0SlElQrSI12AYDSz3Sb5i9HhBuAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767646373; c=relaxed/simple;
-	bh=iyKn8rvUpe9Ixbpns20EJkjgG9Hb4qzmINql41dCdHk=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=TS1+jhtRBPmECr0vo9MyKpaNH8YKq9YENMWFvVBKMQ3jWtEXGLu4Zm/Y+OMpr4HNKgJL4Qj4uWm6mlfIaV0L2yUjQxvTF8fOD/KzpW2yiVCi22XU5NY6EjeKOUFBtfuGH3S+FWXghVxmlBoqGRFmb7EEhXzwu4fC08H7gjIM9Nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=wqVECP1z; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-bd1ce1b35e7so219732a12.0
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 12:52:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1767646371; x=1768251171; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=gCb9sY5eWHfFp7S6NJ1pwNDBiIDe2ARMH+uqafrlkAM=;
-        b=wqVECP1zLwx1ClSGb6SWkevTDdWXCVBDZRSGoOw21dFiToGXMmwwODtQqANvGj3GB9
-         IR/Tl4nfPEWMFaqOfyW6UJJ71PfBQYL9lIz51nj309F+SQRNilo/w42HBOgQ6sG9ac/H
-         qJiAjBV1PkASwpkLiSLR6wCdKpzQQ/JPZwXIeN1VM+lhoUYtiboz7pAA68hLgAUazoq0
-         XiJg0ahoTxyzTIAGnfUYus1NjrUS2X0jerzFNVymNd+FIlWfcO4AWP/JceUfEHcT4RBq
-         xhCA0pBtsVszQxxkUJnVREoAfZ4O60IUdzMpsCqmDpC3qFxCoDPUHaS5+0OJ5hifKnVL
-         RJOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767646371; x=1768251171;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gCb9sY5eWHfFp7S6NJ1pwNDBiIDe2ARMH+uqafrlkAM=;
-        b=on/YsOngPYmm0/7EUUTHg3eRMe8zgkeXq+mpjU1uoBIyRa4l4+xWbzAbQe6f2AZgC4
-         ApaMZiPsv2QWJsI2hoVqzh0M6giI9i/lk7NEsfUEFhLWpsfPQPjOODM5jkdmoqmvX/8B
-         ys/HmEdt+wv4S0wC7VwZ5h6H1Kge78K8bn03RA6Pr1w1vYvOO2bz/uhfDO0LIun/cK4Z
-         m2HFySU3HlCwFOMsEoLsT7ylCZBF23/+ak8baOs0ynZcM13yP1qMvnoQ0tovrdkLUV03
-         9K4NbvGW7fKtG8CLK2nCot4BPpzGPVnJGa/YJFrAn+8EyggIWC6DBbaApap6WpIZC4SB
-         lRCw==
-X-Forwarded-Encrypted: i=1; AJvYcCXrzy6O+IOwIA2CYtNDGPsIkTOMD5i6qyOS7t29XpLvU+L5W5OApS1O4r/sfAPdiYMOJhmIK/o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqK2DFeUVC6qAQCfmcOafvLx2ly3UeJmrzz1R88J/mu20v2ydS
-	2iBgo/qtnyRW/X7PpLzhoOaTYOysHvChqnynnkJdkmUKpS5oAexQ1BbqgScaHbStZA==
-X-Gm-Gg: AY/fxX6rQrKPv3uTkiOaEFYQkCUkNlYk5IehjBLUOVPTQNLSuunJuG4+TPXfSLzO1NM
-	Ud6RD5fT9qQkd/wAEoYixHZczItoGKKcb3MhYObOihGGQSUcEnI4JQe1Pu9fJ+3w4UYD5muYRjq
-	A5AiuOzv/yP1/IxK0eFTbQq1NqEehiRm3TIM33LW18sBjqsagjuo5g1it5ueumwiJhGV1lCEk7y
-	onSM8naysklG67xgcSJbM7iANHKGMygzPMOR5h+0utFgy1nPlF8lX6OMDJn7vnnsa9t/n2B0qkY
-	g004K8gDsRLN53LmrULhx5fuWQ3C9itr65mNMD76xmVrt9UbKauqM8EALXjfiYLBxtSUXy+aXfa
-	9vpPm1Lsua83hZF67o4uMW6vpuzHF+CFca69+Gjwlcfr0TWd1ADZBl1cnP8uWxUUYHxnjrsuLXb
-	kk/w1ftDSLnYafRtvZJmHqqr6MUI/CtCy0
-X-Google-Smtp-Source: AGHT+IE+dMTxe1WIhbpzEtzhArfLn62auaFBdv1wnjaBHeXTlYeyhZ+F8ywFN+X/W2GeTbPrTXKvZg==
-X-Received: by 2002:a05:7300:bc0b:b0:2b0:514a:a8cf with SMTP id 5a478bee46e88-2b16f880888mr462930eec.17.1767646370718;
-        Mon, 05 Jan 2026 12:52:50 -0800 (PST)
-Received: from ?IPV6:2804:14d:5c54:4efb::2000? ([2804:14d:5c54:4efb::2000])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b1706a6386sm371481eec.14.2026.01.05.12.52.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Jan 2026 12:52:50 -0800 (PST)
-Message-ID: <04a4cfc3-ca15-49cf-89c1-17a4bc374caa@mojatatu.com>
-Date: Mon, 5 Jan 2026 17:52:45 -0300
+	s=arc-20240116; t=1767646523; c=relaxed/simple;
+	bh=cPLHx2u+VtT7U+mGNRAI79mWLAumyN0Rwk2CKqpVslE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hE7Mbp1phmvfQeHpLow7RHczgFDA6LktKYRFW3+QXtX16t9vtbUOf8GivhzWo5Hx1+8Pr13TsnwM8zfTA2zsxZv9h112bOF2UyYpjJMVYgnD+wyf7Ub5I85nbHuCCXhCZGLwC07GBCBgbPGRvBSUWUuUF0MIB6QiL1pJzVTCSyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rrXCpRIl; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <e969a85c-94eb-4cb5-a7ac-524a16ccce01@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1767646509;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3vEP7e/4Et03fQL9fjLrx/Pt1lGtSEdxlbOHmAHK6ws=;
+	b=rrXCpRIl+cjcPXFLB7d/Rwjpw/YwkF581+7g/o5omPHJJLiTk0ImGfhVtQgixF+1u7L2n8
+	+WB2rHO4x7g5PoH2Od5XLJt4/aJKJMrxaff/eJ5MG6BYl8dWKQznp8CXxvXpz2xer1/8yf
+	TNIB5YfqF2VGPjf1aYwfdmChq3Ij2UQ=
+Date: Mon, 5 Jan 2026 12:54:55 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Victor Nogueira <victor@mojatatu.com>
-Subject: Re: [PATCH net-next v5 6/6] selftests/tc-testing: add selftests for
- cake_mq qdisc
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>,
- cake@lists.bufferbloat.net, netdev@vger.kernel.org
-References: <20260105-mq-cake-sub-qdisc-v5-0-8a99b9db05e6@redhat.com>
- <20260105-mq-cake-sub-qdisc-v5-6-8a99b9db05e6@redhat.com>
+Subject: Re: [PATCH bpf-next v2 15/16] bpf: Realign skb metadata for TC progs
+ using data_meta
+To: Amery Hung <ameryhung@gmail.com>,
+ Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Jakub Sitnicki <jakub@cloudflare.com>,
+ Martin KaFai Lau <martin.lau@kernel.org>, bpf <bpf@vger.kernel.org>,
+ Network Development <netdev@vger.kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Simon Horman <horms@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, kernel-team <kernel-team@cloudflare.com>
+References: <20260105-skb-meta-safeproof-netdevs-rx-only-v2-0-a21e679b5afa@cloudflare.com>
+ <20260105-skb-meta-safeproof-netdevs-rx-only-v2-15-a21e679b5afa@cloudflare.com>
+ <CAADnVQJbGosoXOCdyi=NZar966FVibKYobBgQ9BiyEH3=-HOsw@mail.gmail.com>
+ <CAMB2axPivi+mZOXie=VnJM8nscqkHDjSrKT=Dhp5z_copEwxLQ@mail.gmail.com>
 Content-Language: en-US
-In-Reply-To: <20260105-mq-cake-sub-qdisc-v5-6-8a99b9db05e6@redhat.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CAMB2axPivi+mZOXie=VnJM8nscqkHDjSrKT=Dhp5z_copEwxLQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 05/01/2026 09:50, Toke HÃ¸iland-JÃ¸rgensen wrote:
-> From: Jonas Köppeler <j.koeppeler@tu-berlin.de>
-> [...]
-> Test 18e0: Fail to install CAKE_MQ on single queue device
->  [...]
-> +    {
-> +        "id": "18e0",
-> +        "name": "Fail to install CAKE_MQ on single queue device",
-> +        "category": [
-> +            "qdisc",
-> +            "cake_mq"
-> +        ],
-> +        "plugins": {
-> +            "requires": "nsPlugin"
-> +        },
-> +        "setup": [
-> +            "echo \"1 1 1\" > /sys/bus/netdevsim/new_device"
-> +        ],
-> +        "cmdUnderTest": "$TC qdisc add dev $ETH handle 1: root cake_mq",
-> +        "expExitCode": "2",
-> +        "verifyCmd": "$TC qdisc show dev $ETH",
-> +        "matchPattern": "qdisc (cake_mq 1: root|cake 0: parent 1:[1-4]) bandwidth unlimited diffserv3 triple-isolate nonat nowash no-ack-filter split-gso rtt 100ms raw overhead 0 ",
-> +        "matchCount": "0",
-> +        "teardown": []
 
-Hi!
 
-This test is missing the device deletion on the teardown stage.
+On 1/5/26 11:42 AM, Amery Hung wrote:
+> On Mon, Jan 5, 2026 at 11:14 AM Alexei Starovoitov
+> <alexei.starovoitov@gmail.com> wrote:
+>>
+>> On Mon, Jan 5, 2026 at 4:15 AM Jakub Sitnicki <jakub@cloudflare.com> wrote:
+>>>
+>>>
+>>> +__bpf_kfunc_start_defs();
+>>> +
+>>> +__bpf_kfunc void bpf_skb_meta_realign(struct __sk_buff *skb_)
+>>> +{
+>>> +       struct sk_buff *skb = (typeof(skb))skb_;
+>>> +       u8 *meta_end = skb_metadata_end(skb);
+>>> +       u8 meta_len = skb_metadata_len(skb);
+>>> +       u8 *meta;
+>>> +       int gap;
+>>> +
+>>> +       gap = skb_mac_header(skb) - meta_end;
+>>> +       if (!meta_len || !gap)
+>>> +               return;
+>>> +
+>>> +       if (WARN_ONCE(gap < 0, "skb metadata end past mac header")) {
+>>> +               skb_metadata_clear(skb);
+>>> +               return;
+>>> +       }
+>>> +
+>>> +       meta = meta_end - meta_len;
+>>> +       memmove(meta + gap, meta, meta_len);
+>>> +       skb_shinfo(skb)->meta_end += gap;
+>>> +
+>>> +       bpf_compute_data_pointers(skb);
+>>> +}
+>>> +
+>>> +__bpf_kfunc_end_defs();
+>>> +
+>>> +BTF_KFUNCS_START(tc_cls_act_hidden_ids)
+>>> +BTF_ID_FLAGS(func, bpf_skb_meta_realign)
+>>> +BTF_KFUNCS_END(tc_cls_act_hidden_ids)
+>>> +
+>>> +BTF_ID_LIST_SINGLE(bpf_skb_meta_realign_ids, func, bpf_skb_meta_realign)
+>>> +
+>>>   static int tc_cls_act_prologue(struct bpf_insn *insn_buf, u32 pkt_access_flags,
+>>>                                 const struct bpf_prog *prog)
+>>>   {
+>>> -       return bpf_unclone_prologue(insn_buf, pkt_access_flags, prog,
+>>> -                                   TC_ACT_SHOT);
+>>> +       struct bpf_insn *insn = insn_buf;
+>>> +       int cnt;
+>>> +
+>>> +       if (pkt_access_flags & PA_F_DATA_META_LOAD) {
+>>> +               /* Realign skb metadata for access through data_meta pointer.
+>>> +                *
+>>> +                * r6 = r1; // r6 will be "u64 *ctx"
+>>> +                * r0 = bpf_skb_meta_realign(r1); // r0 is undefined
+>>> +                * r1 = r6;
+>>> +                */
+>>> +               *insn++ = BPF_MOV64_REG(BPF_REG_6, BPF_REG_1);
+>>> +               *insn++ = BPF_CALL_KFUNC(0, bpf_skb_meta_realign_ids[0]);
+>>> +               *insn++ = BPF_MOV64_REG(BPF_REG_1, BPF_REG_6);
+>>> +       }
+>>
+>> I see that we already did this hack with bpf_qdisc_init_prologue()
+>> and bpf_qdisc_reset_destroy_epilogue().
+>> Not sure why we went that route back then.
+>>
+>> imo much cleaner to do BPF_EMIT_CALL() and wrap
+>> BPF_CALL_1(bpf_skb_meta_realign, struct sk_buff *, skb)
+>>
+>> BPF_CALL_x doesn't make it an uapi helper.
+>> It's still a hidden kernel function,
+>> while this kfunc stuff looks wrong, since kfunc isn't really hidden.
+>>
+>> I suspect progs can call this bpf_skb_meta_realign() explicitly,
+>> just like they can call bpf_qdisc_init_prologue() ?
+>>
+> 
+> qdisc prologue and epilogue qdisc kfuncs should be hidden from users.
+> The kfunc filter, bpf_qdisc_kfunc_filter(), determines what kfunc are
+> actually exposed.
 
-cheers,
-Victor
+Similar to Amery's comment, I recalled I tried the BPF_CALL_1 in the 
+qdisc but stopped at the "fn = env->ops->get_func_proto(insn->imm, 
+env->prog);" in do_misc_fixups(). Potentially it could add new enum ( > 
+__BPF_FUNC_MAX_ID) outside of the uapi and the user space tool should be 
+able to handle unknown helper also but we went with the kfunc+filter 
+approach without thinking too much about it.
+
+https://lore.kernel.org/bpf/3961c9ce-21d3-4a35-956c-5e1a6eb6031b@linux.dev/
 
