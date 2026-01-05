@@ -1,252 +1,104 @@
-Return-Path: <netdev+bounces-247074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01F34CF430B
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 15:42:23 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id B925ECF42A8
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 15:37:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 37EA5311722A
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 14:36:40 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E52DC300D902
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 14:37:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA64E346768;
-	Mon,  5 Jan 2026 14:11:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69349346ADD;
+	Mon,  5 Jan 2026 14:11:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9985345CDA
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 14:11:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B03D3346AC9
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 14:11:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767622281; cv=none; b=n02JQWVSDjrUE+JRGNC1rQL/+pPeB7980hCq5ZwhEcF09D0d1BJm4Go9y05uxQXpuUbjdk6SbShcqRWQt7Y98r8BZWaReydytvioEXqjsLtq1ES41OsservpkJpEAUZJvw1UD2t7iIiRW0p37E9W8/a0a0y7X5EFuwyWQJ+U2aA=
+	t=1767622291; cv=none; b=kHxUcNjPtZ8c5BaT4oUPgGwmFUf4M9zzi7jQ1cscjUVDni8QOLKaaV3ne7sH2TAsPTjihWGrbRqKFNKZsS4AUHuc4uorEqpzjbO3hUMxXtig+uZc7xPIl4owV5BKSmUI0KeV0jBSHiwYp/KZsZ07Y129fYaBNRFCzWeIjpeVz+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767622281; c=relaxed/simple;
-	bh=SxNlGhoDBkaZv0Iy0fCk8gTsb4Hnd6ztmd4CRnc3a+M=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=aFGVtLpNpGU+jzsjCv1XQEyz/o81g5jcxhayuOx8ws71W9Bs0d+/lrm0iqR+7995ob4XKS2wOo/b9M4dq7qYJWB97DiyXQiKAbAPktwHKtIMxpMBMCIg1Ohi1U9Icju2ivOfYWhrEGrdTjKftMfT1XloAk8OzX2r3TCiBrGpDRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-65d12f446c2so27013505eaf.1
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 06:11:19 -0800 (PST)
+	s=arc-20240116; t=1767622291; c=relaxed/simple;
+	bh=HN2CkVPM1eN6Kh9bWCQdL1MiYXNKTJ3dLqrwp7UfePw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PMvF0cUIp/7TtLjDVbIbWBmq6Iv/cKb/ocPFEMAaFMCw7BY4CnvysyoUlST/eLHxHo/KQIZNB4ppWeZ6zHlg0qKc7TPh5Og8Mzhq/tKkKKO8wzeCRDnKFJ7JHgLgPqb+NqQC2K0TAu5F1+MCaYMu6reBQCzjLtwsbW5DuqLxtJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-7c7660192b0so9653115a34.0
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 06:11:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767622279; x=1768227079;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wtMWxxPLCuk2eWMEbDquYa0hrVzkkp2fBA7Y9QCp76s=;
-        b=D+eEA7RfBPUVhez3sgDQPPkloaVbn05hRy3LNqk395yFgh2b07d/+AoaZGn5DvBXsV
-         yw34FF3lkPMOTuGyCExOkCYI89KFbLtbZCaPQskIxSVOLySGYRoNDFA/ARa+XF6b4J/p
-         WMs9BDAjpBuPJH0b3ld/GLTxJq89NI3Wj9h42P7GV6ARw9jZglbsEaGIWjK73cGLpk4D
-         i1aYxW9q5SgEuyrd7bi9dl+MIYoqH/3hOqRhaN0SczSclIiYrmBxNvj3iymo9aoLCV//
-         E1XtWJej4KWf8IShN9L+aex6VcY2DKBGq9Kg0dp6lBZS6L8e+kj/33tTCq/l1nnt0WFU
-         ZaoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU3m05cCKLT0WA9oxPQiA83qwCzPAldGdXYsZPTSavg0vGSiu3dYTXDbR89tF+qSOOzeveEI8Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBHuDPL3ck4q4FnINVwGIV8nIh/U09I+hJF8aTUcG8Srr3+dN8
-	u/dJuHFCyHALaytBOqZOSJQMu3H4JhUAkdvEbby0usfWFad05DejG1KG84TkunAbQGKBqaet5Qn
-	tiPKQlc9eLa6bSzHz5jUiMsbs6UQ5oksyM0zQkD675egbBcbGq0uOKgQenx4=
-X-Google-Smtp-Source: AGHT+IEtUuAscl8sS2KwjQTHkBr++AMhsAQH1zdhVQ+qs1Np9ixn7kBeTOEbFr2sI8lujPW+hVCE2quCBT31w6fXtRyamdvkHjwd
+        d=1e100.net; s=20230601; t=1767622288; x=1768227088;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HN2CkVPM1eN6Kh9bWCQdL1MiYXNKTJ3dLqrwp7UfePw=;
+        b=nqAfijIdtuqwu8zWluFByNOY/bfuOJVwe6JyuM8FkUmKziw1poHl2fMSLLEdFjvt/0
+         gK5vGH7q2uTR662LuqNpf3IVT9U2JAReaN44+qd/6ogfC0XKwI2MvDQroRexnRqHUu9O
+         WzHIz/4ttshr7BEbjGn1a0UZ3r8gaCnAvLwFOB70eIC4vs/tuJ3wONXh+P8i2J2mDwut
+         o9yclHJwu+E03VCfN3IJ53XNscYWMl4UkbXvNlBgcJlgQ0w7rW21kY8L44BqAUuA0wF6
+         OMW+lal3hOdN1zuZZ9JcRc2FHJ68R0/hDGQTynNfvcu+DXc6o4/769J8+aZqtwWBrqqa
+         /ewA==
+X-Forwarded-Encrypted: i=1; AJvYcCVUf7dirMQoCO9qSAS0IeQz27qqRTcO0YuWG6JzDA9njRBMjgbTkf5mogzKzyL7WLmSfOAD79E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1EbmVfqVpnKq7DTFWyDZWM5FjkNntCGAw9sROcvOG9h6dJUCi
+	f7NqP5/ac6WXrCiOaffnCdE3FO1+NM5VTQ9g0zdN384pp/obOEzt7Rsz
+X-Gm-Gg: AY/fxX4vdVvFh/L2Rs1FYc8HMxBliHFaO0iTUIY85JHQKNvsvsQlLVlo+gDL2TL8eLE
+	42skO0byRVPiFWW3d6P4zsE/Z5UFvHU11Gv1qp+2OYv8j2KvUb+0bR61sezROkEQKOT4q1z6iOp
+	bgfvSNUAXZOx38kAZKdq13tV5OHr1C3n9UlUgdeRySm2HI+vsLPGCJiqDe+BYEsQW0Umt5dP13U
+	RzsJ5ansI0ZjvyqD9eLgM9W1LZFBIWZgIACuKeDhbtpcxV3BGUhXfNx2UA3pzl1iqTCZZzybFVf
+	4/Zo5tB2fEGtDbx9NiM1Vo/NAu1hlOW5BYbnTc9z1V7SxgSXQWdQjvEa2veG0zWsypoxK9Z5Pwp
+	ApIIXsELZz4gW874/+bbavlXCSLnVYEQXKM+wCDTxdd93Wi4hDf194zE66w0Orn+GaKib1oniKp
+	2qRwh8PdaN6MzDcr+aIq9WP0g=
+X-Google-Smtp-Source: AGHT+IFag+cDv1EyiaP4MYi1ZbK/LSZq6/9BQnh0bUb96hv7LJ+5A+T859z2mvDQYonPQSgWuytAgw==
+X-Received: by 2002:a05:6830:34a8:b0:7c7:6063:8e02 with SMTP id 46e09a7af769-7cc668a4ba5mr27471112a34.6.1767622288604;
+        Mon, 05 Jan 2026 06:11:28 -0800 (PST)
+Received: from gmail.com ([2a03:2880:10ff:5::])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cc667ec367sm33167544a34.23.2026.01.05.06.11.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 06:11:28 -0800 (PST)
+Date: Mon, 5 Jan 2026 06:11:26 -0800
+From: Breno Leitao <leitao@debian.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Michael Chan <michael.chan@broadcom.com>, 
+	Pavan Chebbi <pavan.chebbi@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kernel-team@meta.com, stable@vger.kernel.org
+Subject: Re: [PATCH net v2] bnxt_en: Fix NULL pointer crash in
+ bnxt_ptp_enable during error cleanup
+Message-ID: <ft63jjhpr2w5s6cdpriixbmmxft5phkvui25pdy46vexpawzz6@mu6gblhm7ofv>
+References: <20260105-bnxt-v2-1-9ac69edef726@debian.org>
+ <aVu8xIfFrIIFqR0P@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:2224:b0:65b:33ec:1bd4 with SMTP id
- 006d021491bc7-65d0eb2e62amr21568883eaf.43.1767622278740; Mon, 05 Jan 2026
- 06:11:18 -0800 (PST)
-Date: Mon, 05 Jan 2026 06:11:18 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <695bc686.050a0220.1c677c.032f.GAE@google.com>
-Subject: [syzbot] [bpf?] KASAN: slab-out-of-bounds Read in strnchr
-From: syzbot <syzbot+2c29addf92581b410079@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
-	yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aVu8xIfFrIIFqR0P@shell.armlinux.org.uk>
 
-Hello,
+Hello Russell,
 
-syzbot found the following issue on:
+On Mon, Jan 05, 2026 at 01:29:40PM +0000, Russell King (Oracle) wrote:
+> On Mon, Jan 05, 2026 at 04:00:16AM -0800, Breno Leitao wrote:
+> My guess is that this has something to do with firmware, and maybe
+> upgrading it at runtime - so if the firmware gets upgraded to a
+> version that doesn't support PTP, the driver removes PTP. However,
+> can PTP be used while firmware is being upgraded, and what happens
+> if, e.g. bnxt_ptp_enable() were called mid-upgrade? Would that be
+> safe?
 
-HEAD commit:    22cc16c04b78 riscv, bpf: Fix incorrect usage of BPF_TRAMP_..
-git tree:       bpf
-console output: https://syzkaller.appspot.com/x/log.txt?x=1391f792580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a94030c847137a18
-dashboard link: https://syzkaller.appspot.com/bug?extid=2c29addf92581b410079
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10c82e22580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16de569a580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/43a53493cb5f/disk-22cc16c0.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/9726fb9e1980/vmlinux-22cc16c0.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/efd2bc050ab6/bzImage-22cc16c0.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+2c29addf92581b410079@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: slab-out-of-bounds in strnchr+0x5e/0x80 lib/string.c:405
-Read of size 1 at addr ffff888029e093b0 by task ksoftirqd/1/23
-
-CPU: 1 UID: 0 PID: 23 Comm: ksoftirqd/1 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xca/0x240 mm/kasan/report.c:482
- kasan_report+0x118/0x150 mm/kasan/report.c:595
- strnchr+0x5e/0x80 lib/string.c:405
- bpf_bprintf_prepare+0x167/0x13d0 kernel/bpf/helpers.c:829
- ____bpf_snprintf kernel/bpf/helpers.c:1065 [inline]
- bpf_snprintf+0xd3/0x1b0 kernel/bpf/helpers.c:1049
- bpf_prog_c2925c0a7ac12d80+0x58/0x60
- bpf_dispatcher_nop_func include/linux/bpf.h:1378 [inline]
- __bpf_prog_run include/linux/filter.h:723 [inline]
- bpf_prog_run include/linux/filter.h:730 [inline]
- __bpf_trace_run kernel/trace/bpf_trace.c:2075 [inline]
- bpf_trace_run1+0x27f/0x4c0 kernel/trace/bpf_trace.c:2115
- __bpf_trace_rcu_utilization+0xa1/0xf0 include/trace/events/rcu.h:27
- __do_trace_rcu_utilization include/trace/events/rcu.h:27 [inline]
- trace_rcu_utilization+0x191/0x1c0 include/trace/events/rcu.h:27
- rcu_core+0x13fe/0x1870 kernel/rcu/tree.c:2865
- handle_softirqs+0x27d/0x850 kernel/softirq.c:622
- run_ksoftirqd+0x9b/0x100 kernel/softirq.c:1063
- smpboot_thread_fn+0x542/0xa60 kernel/smpboot.c:160
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x599/0xb30 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
- </TASK>
-
-Allocated by task 6022:
- kasan_save_stack mm/kasan/common.c:56 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
- poison_kmalloc_redzone mm/kasan/common.c:397 [inline]
- __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:414
- kasan_kmalloc include/linux/kasan.h:262 [inline]
- __do_kmalloc_node mm/slub.c:5657 [inline]
- __kmalloc_node_noprof+0x57a/0x820 mm/slub.c:5663
- kmalloc_node_noprof include/linux/slab.h:987 [inline]
- __bpf_map_area_alloc kernel/bpf/syscall.c:395 [inline]
- bpf_map_area_alloc+0x64/0x180 kernel/bpf/syscall.c:408
- insn_array_alloc+0x52/0x140 kernel/bpf/bpf_insn_array.c:49
- map_create+0xafd/0x16a0 kernel/bpf/syscall.c:1514
- __sys_bpf+0x5f0/0x860 kernel/bpf/syscall.c:6146
- __do_sys_bpf kernel/bpf/syscall.c:6274 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:6272 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6272
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-The buggy address belongs to the object at ffff888029e09000
- which belongs to the cache kmalloc-cg-1k of size 1024
-The buggy address is located 0 bytes to the right of
- allocated 944-byte region [ffff888029e09000, ffff888029e093b0)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x29e08
-head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-memcg:ffff888072141701
-flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000040 ffff88813ffb0280 dead000000000100 dead000000000122
-raw: 0000000000000000 0000000080100010 00000000f5000000 ffff888072141701
-head: 00fff00000000040 ffff88813ffb0280 dead000000000100 dead000000000122
-head: 0000000000000000 0000000080100010 00000000f5000000 ffff888072141701
-head: 00fff00000000003 ffffea0000a78201 00000000ffffffff 00000000ffffffff
-head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000008
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5709, tgid 5709 (dhcpcd-run-hook), ts 83835394493, free_ts 83796353079
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x234/0x290 mm/page_alloc.c:1846
- prep_new_page mm/page_alloc.c:1854 [inline]
- get_page_from_freelist+0x2365/0x2440 mm/page_alloc.c:3915
- __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:5210
- alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2486
- alloc_slab_page mm/slub.c:3075 [inline]
- allocate_slab+0x86/0x3b0 mm/slub.c:3248
- new_slab mm/slub.c:3302 [inline]
- ___slab_alloc+0xf2b/0x1960 mm/slub.c:4656
- __slab_alloc+0x65/0x100 mm/slub.c:4779
- __slab_alloc_node mm/slub.c:4855 [inline]
- slab_alloc_node mm/slub.c:5251 [inline]
- __do_kmalloc_node mm/slub.c:5656 [inline]
- __kmalloc_noprof+0x47d/0x800 mm/slub.c:5669
- kmalloc_noprof include/linux/slab.h:961 [inline]
- kmalloc_array_noprof include/linux/slab.h:1003 [inline]
- alloc_pipe_info+0x1fd/0x4d0 fs/pipe.c:817
- get_pipe_inode fs/pipe.c:896 [inline]
- create_pipe_files+0x8a/0x7e0 fs/pipe.c:928
- __do_pipe_flags+0x46/0x1f0 fs/pipe.c:990
- do_pipe2+0x9c/0x170 fs/pipe.c:1038
- __do_sys_pipe2 fs/pipe.c:1056 [inline]
- __se_sys_pipe2 fs/pipe.c:1054 [inline]
- __x64_sys_pipe2+0x5a/0x70 fs/pipe.c:1054
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-page last free pid 5712 tgid 5712 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1395 [inline]
- __free_frozen_pages+0xbc8/0xd30 mm/page_alloc.c:2943
- __slab_free+0x21b/0x2a0 mm/slub.c:6004
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x97/0x100 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x148/0x160 mm/kasan/quarantine.c:286
- __kasan_slab_alloc+0x22/0x80 mm/kasan/common.c:349
- kasan_slab_alloc include/linux/kasan.h:252 [inline]
- slab_post_alloc_hook mm/slub.c:4953 [inline]
- slab_alloc_node mm/slub.c:5263 [inline]
- kmem_cache_alloc_noprof+0x37d/0x710 mm/slub.c:5270
- vm_area_alloc+0x24/0x140 mm/vma_init.c:32
- __mmap_new_vma mm/vma.c:2469 [inline]
- __mmap_region mm/vma.c:2708 [inline]
- mmap_region+0xdea/0x1d10 mm/vma.c:2786
- do_mmap+0xc45/0x10d0 mm/mmap.c:558
- vm_mmap_pgoff+0x2a6/0x4d0 mm/util.c:581
- ksys_mmap_pgoff+0x51f/0x760 mm/mmap.c:604
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Memory state around the buggy address:
- ffff888029e09280: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
- ffff888029e09300: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->ffff888029e09380: 00 00 00 00 00 00 fc fc fc fc fc fc fc fc fc fc
-                                     ^
- ffff888029e09400: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff888029e09480: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-==================================================================
+This crash happened at boot time, when the kernel was having another
+at DMA path, which was triggering this bug. There was no firmare upgrade
+at all. Just rebooting the machine with 6.19 was crashing everytime due
+to the early failure to initialize the driver.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+--breno
 
