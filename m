@@ -1,188 +1,132 @@
-Return-Path: <netdev+bounces-247170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02527CF5344
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 19:17:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AA809CF5398
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 19:23:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 46C19302515D
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 18:14:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 008F4305BC2D
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 18:22:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2C1F33B6DD;
-	Mon,  5 Jan 2026 18:14:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67DEF33EAEC;
+	Mon,  5 Jan 2026 18:22:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LMS0fZK+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H3v75Vej"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFB9424291E
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 18:14:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43E71338594
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 18:22:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767636858; cv=none; b=U8X814vNlTc9V4TXys3Y2eQ3Vlv8F9Esnc5Cjn0Q4U7AXLEI9eDn5K2+K56/5ZGRw0uxWI1qrCmDv+NJVjeuaUEFtSTqdeMxTSReVwjqHC9abq43yRQ3OP2Y7HbMf4IrebV1TvHTuqDHN2rhF4Zf5Jy+87Nr10Hi0g8mD8hG+TE=
+	t=1767637355; cv=none; b=qJ8JhLwdDC22jliPRO2L2XKs0sUZyqFmOkG/5xLH/vmBE/3Qbz1VxD6930HgkstVhBVaD6tGlWxfPDK0eUVNyJYGStMGON4c9NXPmr9zm9b2RyNykg5Kgq4/F2q29gZQuttFyJ9KifYLzU95ESVr1Ts9/8oZfRi5ZsKF+rP9YcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767636858; c=relaxed/simple;
-	bh=bqtNUILbm6lJat/9Xu0gpKiAI1RZvgXVDpApnTxDQMU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=phRiL+z5ujClaAAar/q1/oKkx0OzfRoJ8jqMNneFp7bgZHP7lFJATximpuKtLcUGLNPx5gxJNfraQU4jB5mJsEJv53YaNDcwSH2BN7GD8ExAbKcJRHBbX+3o03Dur6UOi2IVekF6mBZ0sXN38Hk+V2CSHvHfU5GgOMWWQu3FZgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LMS0fZK+; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-430f9ffd4e8so1027122f8f.0
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 10:14:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767636855; x=1768241655; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=/oP9O+J1jrunuk+Y661pj013SgRFAFyNbhxBfEwCmlA=;
-        b=LMS0fZK+OcvnH2SLJUlfefKr5m2N44kV8AVnzvzSavD+dOeuKvn0xwu6F0AKfW3qCu
-         r3dtXyUjGdpyFV8SvoZ0RU7u05UyCyiMV4BRB2bfaCmpddUGrbgE69Slr562+ULf3FRJ
-         gXc6VFYne2jdZb+1X/fZ/NbSn+b8xRQH5a692xPH2J2PpLt0+bb28Jk01n58fdWnphLv
-         Rpx9rMXDGWlL9q5buhbwk0MlNiIeJSPDNesd1H+6s6wD0l/MIOnIekqr65xF7jOHbp2r
-         8eWPLNcRX+dPpJUuNSDEf5+Jh6MNMkSAp268mq/MykE/K6P+4gPpOPi0B4NYitH21ekf
-         9uig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767636855; x=1768241655;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/oP9O+J1jrunuk+Y661pj013SgRFAFyNbhxBfEwCmlA=;
-        b=qN/BwNoSdBeUPvUiHQa7zPigBG0d1U6GnDAL2SwvkLZBOX7OKGxNSIvvMNn4TfJzQG
-         l95TYi7KqTJGhuaqBePWl2QRitpfIotakLLu8mBS+GnSOOgmAu8EKbSru62yVFY3W673
-         eczPh6sslQL4B0CzcKOBYfufDPJrRhu4lZkK0kFkWmbgOnS1QT+mL/hVXAbTGke2IdnE
-         WG5RTgTRn16WdS5VtuRS6reUpw2EupyDFDX+XgBlnnxtWudNxKFSFjVqPlsqwaS4xHqw
-         OcXalcgMJcTMmTLzPjKEQ6OPm+G9xSEdwx+FyhzO1tTTzP80zKRxg/6coojEA4rpoILJ
-         yfKg==
-X-Forwarded-Encrypted: i=1; AJvYcCX298tjGtZU/KXmJJBeXbQTXB6sQIAHJtljEvvSvIRVea+zqwPxNuTp4/2MxCyXEJn46+4LNTo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwpQK4tqo9bTR1gFdNeUR4rtquT1d+ijBPBdE1jmBtsVjwkoVs
-	YzrXbFwXElPhnVJZd6+FDxhjIXCT4yIG1J/VAiCSiKsEEM0Pd8mC5ovp
-X-Gm-Gg: AY/fxX6U6NDH+E1acYIRc+FDdlrPZcBTGYHP5M/6Mk2QMvTm62q3ykyeiEXFFM/FWm5
-	TnsL3/zSV68hFMY4LI+xA2/vUvO2gjEjr/8Xdr0/lpR1pyntSCVwhzyRE+jKTv5xSruLG2jtSTI
-	BNcO9u4nqMkNftxj1Yq56EDcI3loac49K+BoxuYMHPE5Iawu9bRvpsD3ztJNFKvGA/Uq5RZKMOv
-	CKWDoTqXvVZ0RvLPxkwbrNb7c7jOxZp6tjXlkRUJ6ytipX6PWaAYp2Gj8hUWTJrumM0nWTQ00Ok
-	Ay0lP9jx4arpRN32JD3cpbhejY69NCfW/vLlCUUHpKfxF8y6ZgnhErHrXgQhZgEqVcPZLC4ZT2T
-	mKAa+EoaiEvivn1oyMZrFuLLR7J/7NvL/yZfIqWjRtfri1d2bzPKCQjQwig2jmoyhOKeAKchCyi
-	LuykfQCSYG17ZEg7uEZ/LKaqQlKGvVx4tsIwssLcNOEsR4s1HjvEUfHIs=
-X-Google-Smtp-Source: AGHT+IE/WbbnXt6m79lszz8chS7NFY/jLDyt4rB9ShhndFA1aa1Z8u6f+/lIFkSh4Lfi6OF6YByoxQ==
-X-Received: by 2002:a05:6000:26ce:b0:430:f3bd:71f8 with SMTP id ffacd0b85a97d-432bcfde915mr70237f8f.25.1767636855046;
-        Mon, 05 Jan 2026 10:14:15 -0800 (PST)
-Received: from eldamar.lan (c-82-192-244-13.customer.ggaweb.ch. [82.192.244.13])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bca5a132sm688291f8f.39.2026.01.05.10.14.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 10:14:14 -0800 (PST)
-Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
-Received: by eldamar.lan (Postfix, from userid 1000)
-	id 44C5FBE2EE7; Mon, 05 Jan 2026 19:14:13 +0100 (CET)
-Date: Mon, 5 Jan 2026 19:14:13 +0100
-From: Salvatore Bonaccorso <carnil@debian.org>
-To: Thorsten Leemhuis <regressions@leemhuis.info>
-Cc: Ben Hutchings <benh@debian.org>,
-	Roland Schwarzkopf <rschwarzkopf@mathematik.uni-marburg.de>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	David Ahern <dsahern@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Sasha Levin <sashal@kernel.org>, debian-kernel@lists.debian.org,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Greg KH <gregkh@linuxfoundation.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	regressions@lists.linux.dev, 1124549@bugs.debian.org
-Subject: Re: [regression 5.10.y] Libvirt can no longer delete macvtap devices
- after backport of a6cec0bcd342 ("net: rtnetlink: add bulk delete support
- flag") to 5.10.y series (Debian 11)
-Message-ID: <aVv_dewfbbgQ5o0J@eldamar.lan>
-Mail-Followup-To: Thorsten Leemhuis <regressions@leemhuis.info>,
-	Ben Hutchings <benh@debian.org>,
-	Roland Schwarzkopf <rschwarzkopf@mathematik.uni-marburg.de>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	David Ahern <dsahern@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Sasha Levin <sashal@kernel.org>, debian-kernel@lists.debian.org,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Greg KH <gregkh@linuxfoundation.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	regressions@lists.linux.dev, 1124549@bugs.debian.org
-References: <0b06eb09-b1a9-41f9-8655-67397be72b22@mathematik.uni-marburg.de>
- <aUMEVm1vb7bdhlcK@eldamar.lan>
- <e8bcfe99-5522-4430-9826-ed013f529403@mathematik.uni-marburg.de>
- <176608738558.457059.16166844651150713799@eldamar.lan>
- <d4b4a22e-c0cb-4e1f-8125-11e7a4f44562@leemhuis.info>
- <27c249d80c346a258cfbf32f1d131ad4fe64e77c.camel@debian.org>
- <6498cffd-5bf9-490a-910d-f64ab9b7f330@leemhuis.info>
+	s=arc-20240116; t=1767637355; c=relaxed/simple;
+	bh=t66+7KOAPUPEKD/IgPT6Ru7OImztlruilpFCWBeGF8Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oYlrgljIxZsZmqdU8dH4iqnuWdh7xUsxBZq4iFmwcUUGH6D/8n/vgLuAVfzBK3zXg+ASl+9xZquI9Si6v61Xz7GRpeD/mrKjx2Ks8OlExZ7MP1tODXF5YUqX28WVRw3YFh0cyZ1L1Xx2xxTUykqHK0rlvhXjTSN6e908bieL6+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H3v75Vej; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6D03C19421
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 18:22:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767637354;
+	bh=t66+7KOAPUPEKD/IgPT6Ru7OImztlruilpFCWBeGF8Y=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=H3v75VejZiNrQbIst6HHnXoO52ZM3Tx8ntiu3O/Msz5wcDsrWEc8ezPVnk8ri0yd0
+	 Rh4pTt3Y1cWmiQ+8Zqz8DMt6AS9L5KNl2AoTVCpLRVC55oTfl5yxL1WaxTN89d3qFI
+	 4nFGjxtFGBe1jeg5Zz2wK2BVB6yaLHaoFWgmC6b8QqTukyRg/VwujlzdlcSCcxeb2K
+	 IAyF4kf3P4BYFZzngnRRpQgVrJOLagl7A5Vb6d+TwEj/biXuDn0GVZA7P5PUbHnjDv
+	 153+Wyzg1IPiPc0lh5P84q+BSjuuAd9Fve1sNFowy8o9tn9TdtW2/7wqYzOeO6rg+D
+	 N8IFIInNNFTgw==
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-65b73eacdfcso41050eaf.2
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 10:22:34 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV1+1s3GCus0IXwBYz+2/+XYZxlh4NyB0QjAAC4NFVhKgRXQAkVkKJQnYZG+98XmUynij0oTHM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEbJCnM2t6w/Ujfr1kRaXYfUrxY3fU6DEYBryWkGvJfze+OGGH
+	KW2pk2K0sJ0SB454+Shpeo5QLOV5jk1u/Wwj+f9Pr7EOAtSHX34YcKiLvdTsyfThgqochV2/wI3
+	wsYr+g1vWLrmhUTXNrqzor4L/xG29cW4=
+X-Google-Smtp-Source: AGHT+IHB172ZQGOi9ZR1u9PjyV58cNhnXMvGGbP/9JKsqng7N5nz0M5cIctutXbciJi9XeHJlW5h6fuqEMIqm3oSi7E=
+X-Received: by 2002:a05:6820:7802:b0:659:9a49:8e74 with SMTP id
+ 006d021491bc7-65f47a463d7mr130879eaf.68.1767637353760; Mon, 05 Jan 2026
+ 10:22:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <6498cffd-5bf9-490a-910d-f64ab9b7f330@leemhuis.info>
+References: <20251225040104.982704-1-changwoo@igalia.com> <849b576e-9563-42ae-bd5c-756fb6dfd8de@arm.com>
+In-Reply-To: <849b576e-9563-42ae-bd5c-756fb6dfd8de@arm.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Mon, 5 Jan 2026 19:22:22 +0100
+X-Gmail-Original-Message-ID: <CAJZ5v0imU_DkW5-Pip3ze-MaHj+CAvc0LNkaLsTZuFbj33R0aA@mail.gmail.com>
+X-Gm-Features: AQt7F2rIqrdl4_Lfta-tfUzoW3gXGzlizLu8a9j9KJ9CU01qQlc9bEEV4GjzNSk
+Message-ID: <CAJZ5v0imU_DkW5-Pip3ze-MaHj+CAvc0LNkaLsTZuFbj33R0aA@mail.gmail.com>
+Subject: Re: [PATCH for 6.19 0/4] Revise the EM YNL spec to be clearer
+To: Lukasz Luba <lukasz.luba@arm.com>
+Cc: Changwoo Min <changwoo@igalia.com>, kernel-dev@igalia.com, linux-pm@vger.kernel.org, 
+	horms@kernel.org, pabeni@redhat.com, rafael@kernel.org, 
+	netdev@vger.kernel.org, edumazet@google.com, davem@davemloft.net, 
+	sched-ext@lists.linux.dev, linux-kernel@vger.kernel.org, lenb@kernel.org, 
+	pavel@kernel.org, donald.hunter@gmail.com, kuba@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Tue, Dec 30, 2025 at 10:44=E2=80=AFAM Lukasz Luba <lukasz.luba@arm.com> =
+wrote:
+>
+> Hi Changwoo,
+>
+> On 12/25/25 04:01, Changwoo Min wrote:
+> > This patch set addresses all the concerns raised at [1] to make the EM =
+YNL spec
+> > clearer. It includes the following changes:
+> >
+> > - Fix the lint errors (1/4).
+> > - Rename em.yaml to dev-energymodel.yaml (2/4).  =E2=80=9Cdev-energymod=
+el=E2=80=9D was used
+> >    instead of =E2=80=9Cdevice-energy-model=E2=80=9D, which was original=
+ly proposed [2], because
+> >    the netlink protocol name cannot exceed GENL_NAMSIZ(16). In addition=
+, docs
+> >    strings and flags attributes were added.
+> > - Change cpus' type from string to u64 array of CPU ids (3/4).
+> > - Add dump to get-perf-domains in the EM YNL spec (4/4). A user can fet=
+ch
+> >    either information about a specific performance domain with do or in=
+formation
+> >    about all performance domains with dump.
+> >
+> > This can be tested using the tool, tools/net/ynl/pyynl/cli.py, for exam=
+ple,
+> > with the following commands:
+> >
+> >    $> tools/net/ynl/pyynl/cli.py \
+> >       --spec Documentation/netlink/specs/dev-energymodel.yaml \
+> >       --dump get-perf-domains
+> >    $> tools/net/ynl/pyynl/cli.py \
+> >       --spec Documentation/netlink/specs/dev-energymodel.yaml \
+> >       --do get-perf-domains --json '{"perf-domain-id": 0}'
+> >    $> tools/net/ynl/pyynl/cli.py \
+> >       --spec Documentation/netlink/specs/dev-energymodel.yaml \
+> >       --do get-perf-table --json '{"perf-domain-id": 0}'
+> >    $> tools/net/ynl/pyynl/cli.py \
+> >       --spec Documentation/netlink/specs/dev-energymodel.yaml \
+> >       --subscribe event  --sleep 10
+> >
+> > [1] https://lore.kernel.org/lkml/CAD4GDZy-aeWsiY=3D-ATr+Y4PzhMX71DFd_mm=
+dMk4rxn3YG8U5GA@mail.gmail.com/
+> > [2] https://lore.kernel.org/lkml/CAJZ5v0gpYQwC=3D1piaX-PNoyeoYJ7uw=3DDt=
+AGdTVEXAsi4bnSdbA@mail.gmail.com/
+>
+> My apologies, I've missed those conversations (not the best season).
+>
+> So what would be the procedure here for the review?
+> Could Folks from netlink help here?
+>
+> I will do my bit for the EM related stuff (to double-check them).
 
-On Mon, Jan 05, 2026 at 01:30:59PM +0100, Thorsten Leemhuis wrote:
-> @stable team and/or @net maintainers: this imho needs a judgement call
-> from your side. See below for details.
-> 
-> On 1/2/26 21:18, Ben Hutchings wrote:
-> > On Fri, 2025-12-19 at 10:19 +0100, Thorsten Leemhuis wrote:
-> >> On 12/18/25 20:50, Salvatore Bonaccorso wrote:
-> >>>
-> >>> Is there soemthing missing?
-> >>>
-> >>> Roland I think it would be helpful if you can test as well more recent
-> >>> stable series versions to confirm if the issue is present there as
-> >>> well or not, which might indicate a 5.10.y specific backporting
-> >>> problem.
-> >>
-> >> FWIW, it (as usual) would be very important to know if this happens with
-> >> mainline as well, as that determines if it's a general problem or a
-> >> backporting problem
-> > [...]
-> > 
-> > The bug is this:
-> > 
-> > - libvirtd wrongly used to use NLM_F_CREATE (0x400) and NLM_F_EXCL
-> >   (0x200) flags on an RTM_DELLINK operation.  These flags are only
-> >   semantically valid for NEW-type operations.
-> > 
-> > - rtnetlink is rather lax about checking the flags on operations, so
-> >   these unsupported flags had no effect.
-> > 
-> > - rtnetlink can now support NLM_F_BULK (0x200) on some DEL-type
-> >   operations.  If the flag is used but is not valid for the specific
-> >   operation then the operation now fails with EOPNOTSUPP.  Since
-> >   NLM_F_EXCL == NLM_F_BULK and RTM_DELLINK does not support bulk
-> >   operations, libvirtd now hits this error case.
-> > 
-> > I have not tested with mainline, but in principle the same issue should
-> > occur with any other kernel version that has commit a6cec0bcd342 "net:
-> > rtnetlink: add bulk delete support flag"
-> 
-> FWIW, merged for v5.19-rc1 and backported to v5.10.246 as 1550f3673972c5
-> End of October 2025 in parallel with 5b22f62724a0a0 ("net: rtnetlink:
-> fix module reference count leak issue in rtnetlink_rcv_msg") [v6.0-rc2],
-> which is a fix for the former.
-> 
-> > together with an older version of libvirt.
-> > 
-> > This was fixed in libvirt commit 1334002340b, which appears to have gone
-> > into version 7.1.0,
-> 
-> Could not find that commit when looking briefly, but that version was
-> released 2021-03-01.
-
-For reference it is this one I think:
-https://gitlab.com/libvirt/libvirt/-/commit/81334002340be6bd3a1a34c6584a85fe25cc049c
-
-Regards,
-Salvatore
+I think that it'll be good to have this in 6.19 to avoid making a
+major release with an outdated EM YNL spec and I see that the review
+on the net side is complete, so are there any concerns about this?
 
