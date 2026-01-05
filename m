@@ -1,188 +1,184 @@
-Return-Path: <netdev+bounces-247061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35933CF3FC2
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 14:57:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB737CF4323
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 15:43:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C58073010D61
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 13:56:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CD5C0313B4A6
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 14:36:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77CC9333739;
-	Mon,  5 Jan 2026 13:56:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F38334C06;
+	Mon,  5 Jan 2026 14:08:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PE0GDLa2";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gyfJUffD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nbs62fZj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264CC330673
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 13:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 750A3335091
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 14:08:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767621370; cv=none; b=ra7xjBeC5UgRFLpSqDT7P/sUdh8/1JoKaeuwUqssazgLjvWhUJiwn6ebDEZ7K+QdRCgPYpBwzZaWg/jS2p4hIQptzAIcsWLVTwDQXjFrKa5pkaxnXeI+ibwkCv6BkDtX9X0UEVNLoh6xYVYcgU2wSH6VAOeKsNdY0V6+uvJM9c8=
+	t=1767622095; cv=none; b=jjQONH8/jRaM9vYrQ2j5ZXArWGziwDUy4aj/H8NEyXa3/QuAJ37u5K8zR5aRgesqL+OrfoUA6lCwf5fL+NsCdqujLTHNJrYeeWlqbd0YE9GpE8529DPoYPfAsbuPYjwRFt8utpftQ2ymNWFtuhoMUznIEGmwBr1xeuYZPOxEkT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767621370; c=relaxed/simple;
-	bh=2AXve2RVv3Fx6YOvospEYEqh4Y9K3EooVWW06ml7JoE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rSGUio13P02loKvoNYugLnTh2lURtxmw/bdAAp4e3k6fWRz0NAZM30pZ/tjBLdlP5cK6BPp29YRodH/7cX5UMK0MhI8zbRXELgoF3156I7eJo5hUYDDSw6ta6bpZxeyx/8UX09d2mEQOqyAHM8LoMLffXUdPxB1zreAyzsLmkkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PE0GDLa2; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gyfJUffD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767621364;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b4zxKV5KisOZLklnIhqPWg8+R5Qnw1OvgpHfGWe2u6k=;
-	b=PE0GDLa2rMNgDDc9Pg34ZbyEPIDgxi5ca6FVVJdFdKbjsNHblk+GBfZCBox0EwtIXc1DE+
-	mG0kB4Q7nQpmGz2eFZV5cLH/x7p+C+AEk8ObnREQJoPN9zVqKuGffDGhHQbNftVZtKE+1U
-	9XNthiBGYSYljEa/5/6ddPV7QtGR/rs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-286-qQuTlIpDNyGIGgakkMmJZQ-1; Mon, 05 Jan 2026 08:56:03 -0500
-X-MC-Unique: qQuTlIpDNyGIGgakkMmJZQ-1
-X-Mimecast-MFC-AGG-ID: qQuTlIpDNyGIGgakkMmJZQ_1767621362
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-47a97b719ccso84391675e9.2
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 05:56:03 -0800 (PST)
+	s=arc-20240116; t=1767622095; c=relaxed/simple;
+	bh=zEN3doId9UKmo1rLmAoDue2BHiaeEn8l3OYvCK/ydP4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=lG3rNjoZ4wiqtwyFKi4zoX86kQsgX1d/iqNPeJyuy19aExDrEObwYhZUgoTcc8NM+b3wMvDTDWXukhuXRr1bHR4uZSKLqMOjUw/JL7H5wuBRvc39Sx1/Wm2gskRIRazuuWjxYLxd3a31XINjWBY04vb5E+yuNv4fuOSzX+Yzw88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nbs62fZj; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4f822b2df7aso91750851cf.2
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 06:08:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767621362; x=1768226162; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=b4zxKV5KisOZLklnIhqPWg8+R5Qnw1OvgpHfGWe2u6k=;
-        b=gyfJUffDFt5mae0t85GIAmi87ApazsnpkkbLhJNmUnBvWWrJeFcqINDzCs+3IF1YmV
-         MIim5WoAY2QJ03r4k/5bZttR0XwbNoyk6EySm592atFJfsG/RqJgisSYlB6BdPD/CX4Z
-         E+UCTn6pvWtjwP8mh645le6ucE9xgH+3RhXCRnTWIHPCGsZ2Ce6mhoEi3ySrqoLSm8yB
-         nzqQl73ZEI13u9mGo2gc4vhH0vMsiSfWojE14wy69vbAbyPbgdH1FiQEYCZADav6f1Kj
-         AkG18Wz/58xvBCgLvKtC16fbHRbdyJbQwYHZ3O1IO/X78D6cCTLPVnId/oigQAJ5L2UR
-         1uHQ==
+        d=gmail.com; s=20230601; t=1767622092; x=1768226892; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d+6m+RaUAFXaTtrp8udufW/i4uBYkmLcVK6S66Yx8m8=;
+        b=nbs62fZjoNNrnkNazI/VlOlZH5Z+0L64lVOdlicBv7qhRDSd3uzriUmI2d7AT6j8VZ
+         3/0/2pZA9VeJZm7KLlZ5mL+a9XrnWjWkFPJrazCxkABXJ2giG1tQs8AZRZU+AtOgJ6RQ
+         d4eCiJYHq30rr9/Mrt/RQcthrJsqocutb3vP63OxOR/s1dztkk7rNcUYlevVKhUFoAda
+         JqB2MFTpqwwowx26y5ulIV9bidzOqZTuOgW3f9hXeCtvcJ50JhU+FV8zr/yFMEz/t9wP
+         dLqhUmjzVcLUnZU5Hr6XHlffbzD5Xnee4+Z2AbWovpW/NfoOp7/6lXSQdVTJH/8WtVvg
+         NfEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767621362; x=1768226162;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=b4zxKV5KisOZLklnIhqPWg8+R5Qnw1OvgpHfGWe2u6k=;
-        b=NdJITtS0OJ9sTvS+8fXGIY3A2FGwAEyCU/YxyIVe+SNP4O93PnGvjXgoLgbDuql1wl
-         F7c9eV31LP39+eJ/GYjjDhNc/KVwO0HlIQVyonEkv8PdiNzizg2Rj1Pe2+Sa0Kq+iMFr
-         zubqtLx8ndT/f6AeHbOMsOQoA8CkStPlRebR1bPPdgxYoQsvz4t4KFv6K5SyB8c97QvY
-         SaWRsal8LirBeB5s5gun5j/pJr7siono/1xSbubK/CPNFLTn6dbKJ+fzsGeDRGCBjF08
-         QOTglolJNkc1yiuFZAmScKBB40TJD6EL3icRYV5IDN4r2km5A12ArkPvV/R4OwEgClED
-         emgA==
-X-Forwarded-Encrypted: i=1; AJvYcCU/UpDpykLLoF1SRmy7FQAxxncZs8HP4V+uqh0Bak+lRVgpAgc0E758afuU7L8nXxDEhNNv/qc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YynhzwR/Z+MZ+euDYRGgDXl0qTHFAj2G+brXtZeIvqB4wNkcvtt
-	0oa955yX2Uo4iMTGzo5pStAErychj0YptjyEUimoLxehSMHaPehmnWqdtfWFphZzCCi9xHYWZbt
-	j51JPcXmGK4tExRqXVYOeeTkeYX0mI4lXPaJuys77R39jstuONAEmVo8e
-X-Gm-Gg: AY/fxX4mVvNto88SWEL+hrJ+8WH2Epe+6UbZx6dlrDkHpSHrzRL0nHBNAKDH/2fxL1J
-	Ukzm6QampKrSHY+n+38EjvCnweFnYx+2v3VfpacFV2mY5FrORaubo+HLxUp2+DzCCqo12iidYST
-	lma7EP4XrA2bXt8Jwmmrza8+JwHhoNR2Xh5qJd3yRQSJflUfB78VWA37gXTj0+DfSjJb1FqnhuG
-	AJ21LIamfznpFADB4zbn+WxB8/H8wFGPtrp3Z/ufbTmBcnIXIMeLB80YeDPt3eqXHG3uzk9c914
-	6rkQWzeZT8rFryHY4hGzdGbe4y/xlzfU0fqAbq9KoTCYXsLbf1P5FYXRFeQyB5gl8njYHtuHnJu
-	NsfzIMDoRQ/kj3c7A0DQe1lutEieFnA2UBRU7k8IOO/qD
-X-Received: by 2002:a05:600c:4e8f:b0:477:df7:b020 with SMTP id 5b1f17b1804b1-47d1957da79mr548081935e9.18.1767621362384;
-        Mon, 05 Jan 2026 05:56:02 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGwkc9xT5MvAHbAzqBog1JNIM9VFxAc64wmZIIOhWpWsIlDZ7Xk0cIs/gMJo0V9qDmhI+RJwA==
-X-Received: by 2002:a05:600c:4e8f:b0:477:df7:b020 with SMTP id 5b1f17b1804b1-47d1957da79mr548081655e9.18.1767621361932;
-        Mon, 05 Jan 2026 05:56:01 -0800 (PST)
-Received: from [192.168.0.135] (185-219-167-205-static.vivo.cz. [185.219.167.205])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d6d143f57sm155098545e9.4.2026.01.05.05.56.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Jan 2026 05:56:01 -0800 (PST)
-Message-ID: <6482b711-4def-427a-a416-f59fe08e61d0@redhat.com>
-Date: Mon, 5 Jan 2026 14:55:59 +0100
+        d=1e100.net; s=20230601; t=1767622092; x=1768226892;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=d+6m+RaUAFXaTtrp8udufW/i4uBYkmLcVK6S66Yx8m8=;
+        b=uc4Jdi/IQG/bFmElp/+sWKUt1uytSy/qWuj6UcF/TEMKmolvW2Quuka2Y7NMGy5Jky
+         qQBMvHlW5xNXKJ3a3uBpdTP37DR2jPz+PCNLo386AHZoAnd80bKqjyeVwNc+S5QbCb9Z
+         kXT0JqutUzwZ5Jv5gjnIW2u1CTG3EQYlakTX9UpIQOtcrYZa+YYY8DUQ1SmbWz/acG+t
+         j728FV18MQI4oGMb0Ujwdi3i2Xui1NV6oTWJy+Joh/8uXwLAn+ycrjSL/9HZwtmGRgX5
+         2xWCCGT0fs4zJl8ccQwGJiPxqkpLBpKt2hTBCmPxMwt/ZCp/zjhkRU1cfG7bP5cJ9BNt
+         j01A==
+X-Gm-Message-State: AOJu0YyHuuaAeXtB8y+euuQIQ9y1svnrZRI7rcE7l2EimlUvOwlmcAu7
+	4VDeOuWhY5gqaII9z1a76s1hc/F9UF0Gs0CWp+p7ZUPLo4XbJtTVl4YsdCK9xw==
+X-Gm-Gg: AY/fxX72nA9Pj9NSBZIwEAY71ObdYJASvcJN28Z6OTx/eAxbpa+1bu7hZSMtZUk5pQA
+	89vDqcmOHnhChn4DqyWW0AkNnXU7iDZvxe7TTEhbDPmJqb1LaaXi2LXEMkCZl7wdt1DCFTUhjIw
+	mCmLPd3NSm/q/uPIJny60LronoX90wunBvGw7n6Et2alCzPiGj3msqyRe1rFJOHAvCpoZEq1p9Z
+	jVziWdjryxDrZO1FnJG7mpRcrsGAoOysrMZU3YxZNHfFkrOGkzpHLiwYVsoDUbouFFoVkKWC1Ib
+	6qL8j1F8//F805G/5rAvGIbt1Ef6hl7GmQppr99x+kFw7D6iuL1xfuha0PYgpVn78GtYiBtXS4K
+	Rnvb33Hyt5ZCER9Od64untSwpwOti79OrHZO5sw/dSSz+wezVTDyW7i5jl16grYNNLByBvjsPzT
+	PozdqZDkcY/r4PampRJ6D7M6Pr3njcfLp7KHU1Ax9YavrzslV3NhE=
+X-Google-Smtp-Source: AGHT+IEHuRM2+t5qnRSVI0kl/We7szrHGppbL3OLinZ2JFHLaZJDDk0NxAF77vZNPlpHu38oz5oaFA==
+X-Received: by 2002:ac8:5914:0:b0:4f1:b9ec:f6a4 with SMTP id d75a77b69052e-4f4abceebf3mr885961071cf.33.1767622091533;
+        Mon, 05 Jan 2026 06:08:11 -0800 (PST)
+Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4f4ac64a47esm368957221cf.24.2026.01.05.06.08.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 06:08:10 -0800 (PST)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	quic@lists.linux.dev
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Metzmacher <metze@samba.org>,
+	Moritz Buhl <mbuhl@openbsd.org>,
+	Tyler Fanelli <tfanelli@redhat.com>,
+	Pengtao He <hepengtao@xiaomi.com>,
+	Thomas Dreibholz <dreibh@simula.no>,
+	linux-cifs@vger.kernel.org,
+	Steve French <smfrench@gmail.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Tom Talpey <tom@talpey.com>,
+	kernel-tls-handshake@lists.linux.dev,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Steve Dickson <steved@redhat.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Alexander Aring <aahringo@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	John Ericson <mail@johnericson.me>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	"D . Wythe" <alibuda@linux.alibaba.com>,
+	Jason Baron <jbaron@akamai.com>,
+	illiliti <illiliti@protonmail.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Daniel Stenberg <daniel@haxx.se>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Subject: [PATCH net-next v6 01/16] net: define IPPROTO_QUIC and SOL_QUIC constants
+Date: Mon,  5 Jan 2026 09:04:27 -0500
+Message-ID: <d04504f267ed7dbc7075b96e0da08feb3c301d8a.1767621882.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.47.1
+In-Reply-To: <cover.1767621882.git.lucien.xin@gmail.com>
+References: <cover.1767621882.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v4 0/4] Use correct destructor kfunc types
-To: bpf@vger.kernel.org
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>,
- Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Sami Tolvanen <samitolvanen@google.com>
-References: <20251126221724.897221-6-samitolvanen@google.com>
-From: Viktor Malik <vmalik@redhat.com>
-Content-Language: en-US
-In-Reply-To: <20251126221724.897221-6-samitolvanen@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 11/26/25 23:17, Sami Tolvanen wrote:
-> Hi folks,
-> 
-> While running BPF self-tests with CONFIG_CFI (Control Flow
-> Integrity) enabled, I ran into a couple of failures in
-> bpf_obj_free_fields() caused by type mismatches between the
-> btf_dtor_kfunc_t function pointer type and the registered
-> destructor functions.
-> 
-> It looks like we can't change the argument type for these
-> functions to match btf_dtor_kfunc_t because the verifier doesn't
-> like void pointer arguments for functions used in BPF programs,
-> so this series fixes the issue by adding stubs with correct types
-> to use as destructors for each instance of this I found in the
-> kernel tree.
-> 
-> The last patch changes btf_check_dtor_kfuncs() to enforce the
-> function type when CFI is enabled, so we don't end up registering
-> destructors that panic the kernel.
+This patch adds IPPROTO_QUIC and SOL_QUIC constants to the networking
+subsystem. These definitions are essential for applications to set
+socket options and protocol identifiers related to the QUIC protocol.
 
-Hi,
+QUIC does not possess a protocol number allocated from IANA, and like
+IPPROTO_MPTCP, IPPROTO_QUIC is merely a value used when opening a QUIC
+socket with:
 
-this seems to have slipped through the cracks so I'm bumping the thread.
-It would be nice if we could merge this.
+  socket(AF_INET, SOCK_STREAM, IPPROTO_QUIC);
 
-Thanks.
-Viktor
+Note we did not opt for UDP ULP for QUIC implementation due to several
+considerations:
 
-> 
-> Sami
-> 
-> ---
-> v4:
-> - Rebased on bpf-next/master.
-> - Renamed CONFIG_CFI_CLANG to CONFIG_CFI.
-> - Picked up Acked/Tested-by tags.
-> 
-> v3: https://lore.kernel.org/bpf/20250728202656.559071-6-samitolvanen@google.com/
-> - Renamed the functions and went back to __bpf_kfunc based
->   on review feedback.
-> 
-> v2: https://lore.kernel.org/bpf/20250725214401.1475224-6-samitolvanen@google.com/
-> - Annotated the stubs with CFI_NOSEAL to fix issues with IBT
->   sealing on x86.
-> - Changed __bpf_kfunc to explicit __used __retain.
-> 
-> v1: https://lore.kernel.org/bpf/20250724223225.1481960-6-samitolvanen@google.com/
-> 
-> ---
-> Sami Tolvanen (4):
->   bpf: crypto: Use the correct destructor kfunc type
->   bpf: net_sched: Use the correct destructor kfunc type
->   selftests/bpf: Use the correct destructor kfunc type
->   bpf, btf: Enforce destructor kfunc type with CFI
-> 
->  kernel/bpf/btf.c                                     | 7 +++++++
->  kernel/bpf/crypto.c                                  | 8 +++++++-
->  net/sched/bpf_qdisc.c                                | 8 +++++++-
->  tools/testing/selftests/bpf/test_kmods/bpf_testmod.c | 8 +++++++-
->  4 files changed, 28 insertions(+), 3 deletions(-)
-> 
-> 
-> base-commit: 688b745401ab16e2e1a3b504863f0a45fd345638
+- QUIC's connection Migration requires at least 2 UDP sockets for one
+  QUIC connection at the same time, not to mention the multipath
+  feature in one of its draft RFCs.
+
+- In-Kernel QUIC, as a Transport Protocol, wants to provide users with
+  the TCP or SCTP like Socket APIs, like connect()/listen()/accept()...
+  Note that a single UDP socket might even be used for multiple QUIC
+  connections.
+
+The use of IPPROTO_QUIC type sockets over UDP tunnel will effectively
+address these challenges and provides a more flexible and scalable
+solution.
+
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+Acked-by: Paolo Abeni <pabeni@redhat.com>
+---
+ include/linux/socket.h  | 1 +
+ include/uapi/linux/in.h | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/include/linux/socket.h b/include/linux/socket.h
+index 944027f9765e..b4563ffe552b 100644
+--- a/include/linux/socket.h
++++ b/include/linux/socket.h
+@@ -401,6 +401,7 @@ struct ucred {
+ #define SOL_MCTP	285
+ #define SOL_SMC		286
+ #define SOL_VSOCK	287
++#define SOL_QUIC	288
+ 
+ /* IPX options */
+ #define IPX_TYPE	1
+diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
+index ced0fc3c3aa5..34becd90d3a6 100644
+--- a/include/uapi/linux/in.h
++++ b/include/uapi/linux/in.h
+@@ -85,6 +85,8 @@ enum {
+ #define IPPROTO_RAW		IPPROTO_RAW
+   IPPROTO_SMC = 256,		/* Shared Memory Communications		*/
+ #define IPPROTO_SMC		IPPROTO_SMC
++  IPPROTO_QUIC = 261,		/* A UDP-Based Multiplexed and Secure Transport	*/
++#define IPPROTO_QUIC		IPPROTO_QUIC
+   IPPROTO_MPTCP = 262,		/* Multipath TCP connection		*/
+ #define IPPROTO_MPTCP		IPPROTO_MPTCP
+   IPPROTO_MAX
+-- 
+2.47.1
 
 
