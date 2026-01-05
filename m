@@ -1,98 +1,73 @@
-Return-Path: <netdev+bounces-246873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AECE1CF2066
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 06:50:30 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF354CF20E5
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 07:23:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 917593000930
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 05:50:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 03D0E30011A6
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 06:23:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61822283FD9;
-	Mon,  5 Jan 2026 05:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F2A629D27E;
+	Mon,  5 Jan 2026 06:23:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EvUXFoYx"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="JllL/YNg"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD645478D
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 05:50:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4898A3A1E74
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 06:23:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767592226; cv=none; b=ZEjhdertRyPn0qp8Ul00IYZq/KjLamrQQATwoZ6qznhEmbQU/Fwjisiy4eLpmNUFlrORJit8FmlzSf+LXZQfdVjGxl6JrkZWlBfZGPU8CUDdJK8uuRiMmjFYFVAonFiaPsoox67oQaVbE8Ih5E+8umHIgYyRFqI/PHs+H/PRJck=
+	t=1767594207; cv=none; b=MA/Vnf1F6bHT/rdB+Qyyd0ls4DpJgIatEGkk2mBddDZOgWiwSNmqcF1EhKeAoqMxOeyUKbXnowEBGQ9xNoSh2yaz7ISdBNR6GBKRVItGB9BKo7eCzrUyklfK6Ud3PkmPH0CjlGdctuwjFNpaqvIbW353dvxETscgYpcPEM0Fr5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767592226; c=relaxed/simple;
-	bh=V4KqZ3driE22w5/F97L1WeQ7I+Gqva5pvc8F8ol3oyk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hQD6B5AqP5mzGNZKr0Wzso0FcqtaCb48E55qqBGwdYmKO87uoebe5Fdzrq18aMPT267nkLSr/5boVRiOvurLpVQ/pWACceZ5mN2jIelfPMF3TML3Y3+eCSm8Lk8FuC5Da8sVVH1kTbeE91WcNb1yhRc4LdtKEg7aBCvCFi4gP7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EvUXFoYx; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <7a2d0d37-bcca-454f-85c3-063906ecd042@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767592212;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=V4KqZ3driE22w5/F97L1WeQ7I+Gqva5pvc8F8ol3oyk=;
-	b=EvUXFoYxVWa/4DMrkhSmRnxwi2VMErcYLJXiOHBH2ZN21LtOHFGQ1HW38zsN6YgvrsPdGq
-	62BwHeUixth06jLLS+oF3xW5CJJugPZTyVS4tOfCodTndgieesgjOVVWEWkUAYLCzx4JyY
-	4VboiG+6LWkoraGtFHMwmO25hnNDHKM=
-Date: Sun, 4 Jan 2026 21:50:04 -0800
+	s=arc-20240116; t=1767594207; c=relaxed/simple;
+	bh=CfhvDe+i2+DYvMrRDEilAe/YmobBzpxJvmNEmIuKW6Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Uq3G3JAwOraQSggXx1H3YJzwyfHRlXWwpbzfpftSj0FNnd8mPlWs0AzMQhGsHDaiSKd8krsFdvP0XpCd+EGqOiodRqttSK5BBGsGLzSnyOb4iZQWyPwTyopW8nedF8zWB4UuOYrrLJRWHWERDpIGyWib09/lejC/N04IZyjMWGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=JllL/YNg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35122C116D0;
+	Mon,  5 Jan 2026 06:23:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1767594206;
+	bh=CfhvDe+i2+DYvMrRDEilAe/YmobBzpxJvmNEmIuKW6Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JllL/YNgVuVwhStwpEpv4PoGAs2vQaGdiitycutzK0nTIyoph+nHGmufy9k5vO7nb
+	 AaCICzp5yfi9F3erIeWbOWL9rRy+qK5YWqwZNruQ7VkNc90JmkIbX3kwlA8T915fY6
+	 RLtGfGESRCP5Px0f/iFj5BZR88anHvCBJxQfRnNc=
+Date: Mon, 5 Jan 2026 07:23:23 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Yunshui Jiang <jiangyunshui@kylinos.cn>
+Cc: arvid.brodin@alten.se, netdev@vger.kernel.org, sashal@kernel.org,
+	syzkaller@googlegroups.com, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH v2] net: hsr: avoid possible NULL deref in skb_clone()
+Message-ID: <2026010511-wrist-squiggly-afad@gregkh>
+References: <2026010424-calcium-flavoring-6fb6@gregkh>
+ <20260105023936.3910886-1-jiangyunshui@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] bpf-next: Prevent out of bound buffer write in
- __bpf_get_stack
-Content-Language: en-GB
-To: Arnaud Lecomte <contact@arnaud-lcm.com>,
- syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
-Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
- daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com,
- john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
- linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org,
- sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com,
- Brahmajit Das <listout@listout.xyz>
-References: <20260104205220.980752-1-contact@arnaud-lcm.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <20260104205220.980752-1-contact@arnaud-lcm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260105023936.3910886-1-jiangyunshui@kylinos.cn>
 
+On Mon, Jan 05, 2026 at 10:39:36AM +0800, Yunshui Jiang wrote:
+> From: Eric Dumazet <edumazet@google.com>
+> 
+> commit d8b57135fd9f ("net: hsr: avoid possible NULL deref in
+> skb_clone()")
 
+<formletter>
 
-On 1/4/26 12:52 PM, Arnaud Lecomte wrote:
-> Syzkaller reported a KASAN slab-out-of-bounds write in __bpf_get_stack()
-> during stack trace copying.
->
-> The issue occurs when: the callchain entry (stored as a per-cpu variable)
-> grow between collection and buffer copy, causing it to exceed the initially
-> calculated buffer size based on max_depth.
->
-> The callchain collection intentionally avoids locking for performance
-> reasons, but this creates a window where concurrent modifications can
-> occur during the copy operation.
->
-> To prevent this from happening, we clamp the trace len to the max
-> depth initially calculated with the buffer size and the size of
-> a trace.
->
-> Reported-by: syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/691231dc.a70a0220.22f260.0101.GAE@google.com/T/
-> Fixes: e17d62fedd10 ("bpf: Refactor stack map trace depth calculation into helper function")
-> Tested-by: syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
-> Cc: Brahmajit Das <listout@listout.xyz>
-> Signed-off-by: Arnaud Lecomte <contact@arnaud-lcm.com>
+This is not the correct way to submit patches for inclusion in the
+stable kernel tree.  Please read:
+    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+for how to do this properly.
 
-LGTM.
-
-Acked-by: Yonghong Song <yonghong.song@linux.dev>
-
+</formletter>
 
