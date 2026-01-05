@@ -1,171 +1,210 @@
-Return-Path: <netdev+bounces-246929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B74B3CF2792
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 09:39:16 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E358CF264C
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 09:27:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3955C3033697
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 08:37:58 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9DD49300252A
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 08:27:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BAA132D0D3;
-	Mon,  5 Jan 2026 08:24:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5475A331224;
+	Mon,  5 Jan 2026 08:26:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=redhat.com header.i=@redhat.com header.b="U0EJGw52";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="jhuW0fAF"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="nWSSKglL";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="m2V5ETSY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FDB231354A
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 08:23:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E92AE32E6B4;
+	Mon,  5 Jan 2026 08:25:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767601445; cv=none; b=Iw9RfkWm3GWqraG+N+YhSeCGMexAxI6t37DRj1dz0HpkBDvd84mos2c1oW7b5VagOGggt7MnzCpaL/uRYbD1Yg+JFNFoQFZwWx+qIY6bEMsrQ2HXN2hQ1UuqO45PR0pb26VPIY/LI8MxiBW5+eU7N8DvDusYNxQ+6zczjQ8UbO0=
+	t=1767601560; cv=none; b=Rd38tzWOxfN3dLlqtp1eoflqIsdO6gvc65LNImqkRNqMn8f4GM117ggkwrEKOLelDogFaYo3f4sXPpBkj0/aABAHnCO/IBwdeuMeTY8Qb+HpXK8C1/pOuLvaEBw8EVzGLLYDNpO3hfe38Ta0aFW3FqBWVTXo/sZk15sMkuie0Z8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767601445; c=relaxed/simple;
-	bh=jIFi+Zvcrqx5KM1Tn7Vx/X/Ro5vONbP7sNW0Mf3F+ms=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CkAevp0YfZ0oPoyLUAKjYUuytrcd5fDihLiTzzsIEqf3WNfT+y9sH3sY1bbQ5PDwWR7obo2Ov6BnI0t+drImP46GanFRZsMeykKLb5WY6UhOoDo/fmTXxojE9F216RwoVJ82Tf5auMM9ju8Ja6yC0DppuC6uevqDwDQAT+xaG5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=fail smtp.mailfrom=redhat.com; dkim=fail (0-bit key) header.d=redhat.com header.i=@redhat.com header.b=U0EJGw52 reason="key not found in DNS"; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=jhuW0fAF; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767601436;
+	s=arc-20240116; t=1767601560; c=relaxed/simple;
+	bh=F0BXKGEIbQEgNDpnR4sFqfVyBXsRDo0ukaJR9qC1Fkg=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=QNSZVHQDHV9+cPsc2dKQmAEyhDMfYuBftpkuX3IIBKPJkcZWJ9O1eULDqH+YdSAf5BQ4qBddv6hIszpjP0IMUQncFUEm0gGUyBN9Sxms4Vf1FI6letf37IUB8mRvduAjIfL9kNrtv8b2St0q88V3Ox5GQ5c0eVzGU5HvJyFQJR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=nWSSKglL; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=m2V5ETSY; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1767601556;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7Ko5SEulg/0toBKRpZAMNGsguRweEFK2Nvy+yQ/ftdE=;
-	b=U0EJGw525N36TsoWhwIOnHH1npKLZARnTZguj2NX/3prDCcmeRPQbwt+hNfC0WXAQ3xUXf
-	72jxF5QIZDsJqNjXDrw/4uv/LyZg03zEUPojJb9o56hhsYdQgPliO9LIbaDzxu0dd7svGC
-	fhwmZSYop0+2nnDzQJGqmS6QbD+QSn0=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-679-6Qq4pD8oPP2Qt5Oh4b8UIA-1; Mon, 05 Jan 2026 03:23:55 -0500
-X-MC-Unique: 6Qq4pD8oPP2Qt5Oh4b8UIA-1
-X-Mimecast-MFC-AGG-ID: 6Qq4pD8oPP2Qt5Oh4b8UIA_1767601434
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-477a11d9e67so88358755e9.2
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 00:23:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767601434; x=1768206234; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7Ko5SEulg/0toBKRpZAMNGsguRweEFK2Nvy+yQ/ftdE=;
-        b=jhuW0fAFKWout8NvzOE75lr0thW/Bvte4Ikr3Ds2O8GTD5vrsS8ZXy/VT74UzpbAlc
-         SkwWcLIGG2nOn2hJ3IOcZWexU19Ly66MFoocUxD3oz4K3yQnN35L6SydRy6k/+YyXyBd
-         yPebtVj0mQhCIVAxVWRptftBXMGxBrm45coShq6icSkrazqS6YFoU488FT0ix7EZbdU0
-         Tgt3MkO+ClKdAAuJSso08c1qe6N9IhusEsMZYkwbRWP4dwNmx37rNJr4j76KliGNlmwr
-         zxVVw3FkCTqRZ/sC1v8j5gVlPYVLiP9gScBNQgEJyJqfnGaU0TgCBqXdJGQXno4Ef1MY
-         fWAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767601434; x=1768206234;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7Ko5SEulg/0toBKRpZAMNGsguRweEFK2Nvy+yQ/ftdE=;
-        b=XbMqu/Ioiyja43hQ3WaEngntLH0+0XIwixmj/7KgeC73HqKCUDiElawbk11fXcIaT9
-         eUko1wHPNjIYQgLnTfsf6KO68Pym6SYbCBdmqjQte7N7W0/oLe3fJFuO4Dy1J6ahZqOD
-         B1AtxyRxd8k7lHeL+woxkKm1Kv/y2T+iV1BblNampHvnRdwgM4hFI+FcD4uGJcq28Ifc
-         yFtpigC6VTxr/nn8IBDtfEovTuwlKmSbT39nmJI7B8RQxESBxjTqjwHvZiEuQNYvLaJ+
-         xHfRakS0WnVByaFvguwQtXlntaFDdgD5hoWygw8mhNwAmgoGtjpNoIWrGXbFqsXbxHFY
-         +8Bw==
-X-Forwarded-Encrypted: i=1; AJvYcCXleWF1QN/7RQOG2AijwD72P2buy0rkE1COayV/6t0dB8Ia2uimGFwDP17e9SrzATJnfmyqchE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywm78/QgT3QiNCfUuAvJlkIdE52uZi67YUHAVOFyl3fEQ+09rSL
-	vEnxkDYiB5yZjTMGI/3sjdzK+Q/95oK3HLFCY/HzmrJlFzKhjRYri/YFlVLmgXxj1Dw0iKC7I8/
-	Cec7nQlScXJ8ErX8gjWW5Sg0BWsVSbIyJZ/vYfQXSKPqo7lB2RWwhHNNfOg==
-X-Gm-Gg: AY/fxX4qKt98T3Ou0bXX+a39dRhuw+9IYFSMhTZppkaAa9amlkH6srdpZe9z0wV8T+0
-	f6HwW+ncbYV4Pk74fP6URIyk0aVCR8NNkLVNn5n9d45CVMlfM7O82sxX0K2y60jKzuNzVQJp2d2
-	ttq/z/UZX9VV+adWlAhxNN5ObOrcDOV7x/8DcqXLdCEYpnQKf6ceipGZmb1QpLUQYF2MejMsT/Y
-	Q7qYFACA4Atz56EW1Evbg8CzKXcmmvbiW1r1WC6AmL9IanaHys0F7aNj8OZq6xoZBCa6Ulyb52Z
-	iO3mUxmbwEgbHLsovJhWXBLBuYGhw/FwZnF5/7gidKqnXF+o7ZI1ryAxpG/XmAA4OQh0rKDUBBG
-	Sgmsk+wwE0KipAlC06V1+7exZwBWtPObE3g==
-X-Received: by 2002:a05:600c:4fd4:b0:477:9cdb:e336 with SMTP id 5b1f17b1804b1-47d1957afd8mr619222125e9.21.1767601433876;
-        Mon, 05 Jan 2026 00:23:53 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGMqr5RF3PmeKLntFlggNTcPo2ZIBIezL7tE6/J3AdeaKkIeEvwYa+UmsMabaObW/38gLAvfg==
-X-Received: by 2002:a05:600c:4fd4:b0:477:9cdb:e336 with SMTP id 5b1f17b1804b1-47d1957afd8mr619221495e9.21.1767601433387;
-        Mon, 05 Jan 2026 00:23:53 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324eab2721sm99141541f8f.39.2026.01.05.00.23.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 00:23:52 -0800 (PST)
-Date: Mon, 5 Jan 2026 03:23:49 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jason Wang <jasowang@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Petr Tesarik <ptesarik@suse.com>,
-	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Bartosz Golaszewski <brgl@kernel.org>, linux-doc@vger.kernel.org,
-	linux-crypto@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-scsi@vger.kernel.org, iommu@lists.linux.dev,
-	kvm@vger.kernel.org, netdev@vger.kernel.org,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	"Enrico Weigelt, metux IT consult" <info@metux.net>,
-	Viresh Kumar <vireshk@kernel.org>,
-	Linus Walleij <linusw@kernel.org>, linux-gpio@vger.kernel.org
-Subject: [PATCH v2 15/15] gpio: virtio: reorder fields to reduce struct
- padding
-Message-ID: <f1221bbc120df6adaba9006710a517f1e84a10b2.1767601130.git.mst@redhat.com>
-References: <cover.1767601130.git.mst@redhat.com>
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=iomAiraVidAewY3lmJu2od0SPuPOGXSVoNfq8xPpxJ4=;
+	b=nWSSKglLmp7/eMP8nNDM6vrYHRfHBOQTAiOT8zKJaWCE+nktUo2aokh8aI3ImWVItHeIl2
+	30iVoK3GBcpuit5sL7ev/V7jRlMygpMGPM6E/uHVmRfG58UBmH8SsMcOinRpPLOuuc1QLM
+	ybuRK+dzlE44E4Cys2aWy7QOeRcnxaLVkVBeGrCxMopEPWmKywtcBQ3olFS8BQaOtITgLf
+	dWx5EKseWRiOZRh7ZXC33opAP6moL2/W90accepPsi7dCtzoVvBkabECN/ivUz+2Uqa8+S
+	n3/rKvTrGQ8XU9BdRlq52Xc/QELnMg4+tt11RSX3U/AYv4v2dG3Q1TFGSYmfNA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1767601556;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=iomAiraVidAewY3lmJu2od0SPuPOGXSVoNfq8xPpxJ4=;
+	b=m2V5ETSYA+AAksePtKRl2SD9H+s59ZvuDemc1NOyEhpaSKvY+UBYMGcwal2eg4vTfz//+Y
+	K0MBhOtdTKFyVEAQ==
+Date: Mon, 05 Jan 2026 09:25:55 +0100
+Subject: [PATCH net-next] net: uapi: Provide an UAPI definition of 'struct
+ sockaddr'
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1767601130.git.mst@redhat.com>
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20260105-uapi-sockaddr-v1-1-b7653aba12a5@linutronix.de>
+X-B4-Tracking: v=1; b=H4sIAJJ1W2kC/x3MQQqAIBBA0avErBvIoZK6SrQQHWsILLRCiO6et
+ HyL/x9IHIUTjNUDkW9JsocCVVdgVxMWRnHFQA11iojwModg2u1mnItovWpY99RqGqA0R2Qv+f9
+ NEPjEwPmE+X0/S41aq2kAAAA=
+X-Change-ID: 20251222-uapi-sockaddr-cf10e7624729
+To: Eric Dumazet <edumazet@google.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-api@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1767601555; l=4018;
+ i=thomas.weissschuh@linutronix.de; s=20240209; h=from:subject:message-id;
+ bh=F0BXKGEIbQEgNDpnR4sFqfVyBXsRDo0ukaJR9qC1Fkg=;
+ b=+I/qcHQzJobm848ZdicumfKVxZIq5NV0lyRX410kNtzxyPvyrXtlW+t4seoD6lIEOrLdduxY/
+ XNiqcVgytBrC6QmA9VNd5M89I7FZdLRhJ9ajIpFVm9kxXMmr25AOd26
+X-Developer-Key: i=thomas.weissschuh@linutronix.de; a=ed25519;
+ pk=pfvxvpFUDJV2h2nY0FidLUml22uGLSjByFbM6aqQQws=
 
-Reorder struct virtio_gpio_line fields to place the DMA buffers
-(req/res) last.
+Various UAPI headers reference 'struct sockaddr'. Currently the
+definition of this struct is pulled in from the libc header
+sys/socket.h. This is problematic as it introduces a dependency
+on a full userspace toolchain.
 
-This eliminates the padding from aligning struct size on
-ARCH_DMA_MINALIGN.
+Instead expose a custom but compatible definition of 'struct sockaddr'
+in the UAPI headers. It is guarded by the libc compatibility
+infrastructure to avoid potential conflicts.
 
-Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+The compatibility symbol won't be supported by glibc right away,
+but right now __UAPI_DEF_IF_IFNAMSIZ is not supported either,
+so including the libc headers before the UAPI headers is broken anyways.
+
+Signed-off-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
 ---
- drivers/gpio/gpio-virtio.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ include/linux/socket.h           | 10 ----------
+ include/uapi/linux/if.h          |  4 ----
+ include/uapi/linux/libc-compat.h | 12 ++++++++++++
+ include/uapi/linux/socket.h      | 14 ++++++++++++++
+ 4 files changed, 26 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/gpio/gpio-virtio.c b/drivers/gpio/gpio-virtio.c
-index b70294626770..ed6e0e90fa8a 100644
---- a/drivers/gpio/gpio-virtio.c
-+++ b/drivers/gpio/gpio-virtio.c
-@@ -26,11 +26,12 @@ struct virtio_gpio_line {
- 	struct mutex lock; /* Protects line operation */
- 	struct completion completion;
+diff --git a/include/linux/socket.h b/include/linux/socket.h
+index ec715ad4bf25..8363d4e0a044 100644
+--- a/include/linux/socket.h
++++ b/include/linux/socket.h
+@@ -28,16 +28,6 @@ extern void socket_seq_show(struct seq_file *seq);
  
-+	unsigned int rxlen;
+ typedef __kernel_sa_family_t	sa_family_t;
+ 
+-/*
+- *	1003.1g requires sa_family_t and that sa_data is char.
+- */
+-
+-/* Deprecated for in-kernel use. Use struct sockaddr_unsized instead. */
+-struct sockaddr {
+-	sa_family_t	sa_family;	/* address family, AF_xxx	*/
+-	char		sa_data[14];	/* 14 bytes of protocol address	*/
+-};
+-
+ /**
+  * struct sockaddr_unsized - Unspecified size sockaddr for callbacks
+  * @sa_family: Address family (AF_UNIX, AF_INET, AF_INET6, etc.)
+diff --git a/include/uapi/linux/if.h b/include/uapi/linux/if.h
+index 797ba2c1562a..a4bc54196a07 100644
+--- a/include/uapi/linux/if.h
++++ b/include/uapi/linux/if.h
+@@ -25,10 +25,6 @@
+ #include <linux/socket.h>		/* for "struct sockaddr" et al	*/
+ #include <linux/compiler.h>		/* for "__user" et al           */
+ 
+-#ifndef __KERNEL__
+-#include <sys/socket.h>			/* for struct sockaddr.		*/
+-#endif
+-
+ #if __UAPI_DEF_IF_IFNAMSIZ
+ #define	IFNAMSIZ	16
+ #endif /* __UAPI_DEF_IF_IFNAMSIZ */
+diff --git a/include/uapi/linux/libc-compat.h b/include/uapi/linux/libc-compat.h
+index 0eca95ccb41e..13a06ce4e825 100644
+--- a/include/uapi/linux/libc-compat.h
++++ b/include/uapi/linux/libc-compat.h
+@@ -140,6 +140,13 @@
+ 
+ #endif /* _NETINET_IN_H */
+ 
++/* Definitions for socket.h */
++#if defined(_SYS_SOCKET_H)
++#define __UAPI_DEF_SOCKADDR		0
++#else
++#define __UAPI_DEF_SOCKADDR		1
++#endif
 +
- 	__dma_from_device_group_begin();
- 	struct virtio_gpio_request req;
- 	struct virtio_gpio_response res;
- 	__dma_from_device_group_end();
--	unsigned int rxlen;
+ /* Definitions for xattr.h */
+ #if defined(_SYS_XATTR_H)
+ #define __UAPI_DEF_XATTR		0
+@@ -221,6 +228,11 @@
+ #define __UAPI_DEF_IP6_MTUINFO		1
+ #endif
+ 
++/* Definitions for socket.h */
++#ifndef __UAPI_DEF_SOCKADDR
++#define __UAPI_DEF_SOCKADDR		1
++#endif
++
+ /* Definitions for xattr.h */
+ #ifndef __UAPI_DEF_XATTR
+ #define __UAPI_DEF_XATTR		1
+diff --git a/include/uapi/linux/socket.h b/include/uapi/linux/socket.h
+index d3fcd3b5ec53..35d7d5f4b1a8 100644
+--- a/include/uapi/linux/socket.h
++++ b/include/uapi/linux/socket.h
+@@ -2,6 +2,8 @@
+ #ifndef _UAPI_LINUX_SOCKET_H
+ #define _UAPI_LINUX_SOCKET_H
+ 
++#include <linux/libc-compat.h>          /* for compatibility with glibc */
++
+ /*
+  * Desired design of maximum size and alignment (see RFC2553)
+  */
+@@ -26,6 +28,18 @@ struct __kernel_sockaddr_storage {
+ 	};
  };
  
- struct vgpio_irq_line {
++/*
++ *	1003.1g requires sa_family_t and that sa_data is char.
++ */
++
++/* Deprecated for in-kernel use. Use struct sockaddr_unsized instead. */
++#if __UAPI_DEF_SOCKADDR
++struct sockaddr {
++	__kernel_sa_family_t	sa_family;	/* address family, AF_xxx	*/
++	char			sa_data[14];	/* 14 bytes of protocol address	*/
++};
++#endif /* __UAPI_DEF_SOCKADDR */
++
+ #define SOCK_SNDBUF_LOCK	1
+ #define SOCK_RCVBUF_LOCK	2
+ 
+
+---
+base-commit: dbf8fe85a16a33d6b6bd01f2bc606fc017771465
+change-id: 20251222-uapi-sockaddr-cf10e7624729
+
+Best regards,
 -- 
-MST
+Thomas Weißschuh <thomas.weissschuh@linutronix.de>
 
 
