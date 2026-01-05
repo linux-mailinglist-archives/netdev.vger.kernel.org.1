@@ -1,89 +1,89 @@
-Return-Path: <netdev+bounces-247207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9207CCF5C1A
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 23:01:19 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53115CF5BF4
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 22:59:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7816830F4117
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 21:59:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 03D1A300E621
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 21:59:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FA483126D8;
-	Mon,  5 Jan 2026 21:59:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E65D63126A3;
+	Mon,  5 Jan 2026 21:59:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="XVizX5k8"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RKOh6zkE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f227.google.com (mail-pl1-f227.google.com [209.85.214.227])
+Received: from mail-pl1-f225.google.com (mail-pl1-f225.google.com [209.85.214.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF14311C21
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 21:59:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6113A3126D7
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 21:59:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767650359; cv=none; b=j2EWqEsbOPpa30BjswXnF20QzngzLVXbzSWnrvntQmrFaybZUSq/cWeL+raJ9qIOYi7ubbFlLYCDIKC3Q9QxlqYMlmpzQUPZ2MLQJCEQUd11VZuxZw8BM/sJMO4WyMXjnxH1aKU25Bx4agEJ4e+IPfJFZByrIKTI67dIyjpbtwg=
+	t=1767650360; cv=none; b=UeF1opaNjoQMLcmy8kz7B04TE8WmuteonxzqT5f3qlJtE4lFaxHJKy0ExEsG1cu3SGxCFN4sWlNR4z3GQLTBhcZ7EURBhvJhf1ER2cR3AgCCv//ojk34EBEG9+16g04aVPWqOluA7riDMG7K/vwhbBuanVEk5poGsTVu5YBaGgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767650359; c=relaxed/simple;
-	bh=MElSNsMyL0QjYJjRfdQZnWTbJ/B15mT7IzbVc+sS90g=;
+	s=arc-20240116; t=1767650360; c=relaxed/simple;
+	bh=ul1Ac3V/B60/F2WMkTXYIjv0mwsahIkaQoG0gRQ6OjA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oHNkO6QIDGUkXCYX/OQlSmnf0L+o9v/cMhwFt17XWZlkJ7xiwdajgYhdVMhAH1/DSXBsxjBY+PDx7KV8jam8/r2cKz6fXyTkTFdOvV0QGxsGqjIkJPJwZqIbVOiupkJEthkd+Ea4+vrg/tl6nxsC5aP+YTai2nyswJ01MRFX0eo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=XVizX5k8; arc=none smtp.client-ip=209.85.214.227
+	 MIME-Version; b=WaDK470JVh6ywrGx2neClq8ytnXAL98DKuQ8UlJ6pOslJSjbkyNZPIh/A8ZOfNHcfanCylaowN5zjicJr1EKIlxzrKDE5HSDTB4zh+KijoPa78Rxon8Ri5RR5lUXTZsooiL4Wo9bH71PN950N2DVWXsWQ9Xx+iFfzqFxZZ6TJnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=RKOh6zkE; arc=none smtp.client-ip=209.85.214.225
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f227.google.com with SMTP id d9443c01a7336-2a0d06ffa2aso3543965ad.3
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 13:59:17 -0800 (PST)
+Received: by mail-pl1-f225.google.com with SMTP id d9443c01a7336-2a12ebe4b74so5225935ad.0
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 13:59:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767650357; x=1768255157;
+        d=1e100.net; s=20230601; t=1767650358; x=1768255158;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y3ELeCpDaSbQrwRYrtN0w3AXxnc5irV437hDC1oO8AI=;
-        b=FMNUVyGPqCN8xEaO34pU6NedBCWG7U1bnMuL2UrSjGUhVkZZqX35nu70Ypz9NeVNWi
-         C4cOc6HdelQrrx1CSVmITnqcwuz4svApOlxiZjkR0/tfGJn4pyeEIzRJp+Wtju1QFJSz
-         kSDOKRnHbhWumNT/MCLyy8Ww7yMTEKE6KPd1J/yjgMlZnKyD1QR2nhCaRRpAmP8f+06Y
-         CUUlqJRSfkKoRvOVtaM7Bav7liWVAnvIqxezCjn3wh8V9olAuQJif3FfPYXdiU5PDt+v
-         SI8EbhBySnkId7nS7czesWY+1E9Od7LylFuvfFlEu27E57VFZwV9THEnJHEj3NBwtmhT
-         Hq1w==
-X-Gm-Message-State: AOJu0YzfPmAnRUJGqMq9hLfRn+IYR4/XwDBX+vj9inQX3L7WkmADoABG
-	/VJ+ybcbdJ20FMWvmkfMB/vwj4MSTKfVdEh6iHf5Vj7APLKcq07F+DVccbAt98UuIq8ZbnV6jWy
-	PWG6duwSm8onKcxu1reOCyHbEP1UEJl5pUi+SHTwpls1zN6TFGRlg6pCs0/eruxt7VvGSAyhIDe
-	67GxoRYtZ0vb47HLS0DQiapICpXS0UFMyzFRRAZ8dW5/2l0pEUvpdxk2WWbqq38HPbUtViZCUPl
-	IUWbi2CxCQ=
-X-Gm-Gg: AY/fxX7rNmBwr7lVtTWMImS2ryHh4YpSP0SMwEf18xF3qTEZjNJD2McPmmEyfjcBipV
-	KTsKzWQ49/KSE791kqCkww4pqzt9i9LarUjiQdCKZZpOyWhLBpcmSs1dz7y6ihwyLzSc2uFn4Uj
-	yutej+Om+FmgXl2MBoKbffAs36z/qMuBnRwP54G5vilGu+Uovvu7WqplFCmUZi9dp3USCcNeYOT
-	QSniXaWuOBuRSqAyOauqI6z+OCdlfJ3MLbx/jzE48ePYFX3ssNVb1T10mWrT6Zm933YIwQH90wi
-	DKX9S2/uJoeoMudMpCtUSkxFVzIwnDVXu4UsH99oF5o/xXd6rPx62o6Mwwb7AwDwKFGlM+o8YT8
-	BjNV5zL7RHL28Ozqvw5VWs/t1030po6dJyjNYrP992E9zNS3O2ueKjQG/D6hK0+vAYG+43faRYZ
-	6JZsuwWVodiQqnh1a6goixNQ4oaUJQg0OJB/6OFmSBWA==
-X-Google-Smtp-Source: AGHT+IHn0pq+U5Q1m/zauaL5pNsFQx1dekVQFNL7pgA4VTxBNexjYjqErBf2hQdnbf9I4qxvDcoanVYohwdu
-X-Received: by 2002:a17:903:1b0c:b0:2a0:8be7:e3db with SMTP id d9443c01a7336-2a3e2d8e30cmr9993165ad.15.1767650357055;
-        Mon, 05 Jan 2026 13:59:17 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-1.dlp.protect.broadcom.com. [144.49.247.1])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2a3e3c3bc07sm457395ad.8.2026.01.05.13.59.16
+        bh=Te25MviDlrxzlq2B2duHSN+1gL9C//NivqToMQtg1Ow=;
+        b=Sy1i+Vsgtv1yzNcnlnUxZSPN+WzU7sGUptgvQbllPuLNiXn2aK1JPkywOy4SwTFplB
+         i9MOLVqH2z3PEh27HluD62TXOrhIy7RPSOC4lZ6htQ192R4FKNr42m0gzLTeaIOt5zOt
+         KLLlkyDRdm1+ASkz8USXoXFamLo+wlaYxYGUcwa6c87+q7XC0Jiq4Pbr1wCYUOWoHMZk
+         npAD26ZuQhT+VeF2HQNT03COtGvWXvDQk5asm0O2mD3GkqhbMN3dzuCda+f+FPyTsx2A
+         QBiidii/0vsgdx2yh/OcstsqJxsYoOdrfNuovkJ6ZUzyHUfYkqsHog48tmySsMXy4V3U
+         YRMQ==
+X-Gm-Message-State: AOJu0YxplkopwENzFhBYOJbclgQFgttCsnrD863deHe5zucgdOMqJlWk
+	WWOrrzESnrgexqCjrBbRGurz+HP8Py2AwNus/hu6Ca8agb+thoekTYk5JXe+FTlPLpXDubr+2N6
+	FFdmf9ntieE7Er/TGqBIUD1T6TvhfKGqMxkFXwX+wmdBQrpQNBMurV+x3icx7TqQjLyUUJjHyCm
+	1TBRIDO0Fz+HDwUEYvecqwb91n4N5ehWqf9DEkJTd5U1RVoE/q8YRIAsiSdtVKVv+DtsUg7mLdZ
+	P1Qfpuh/pE=
+X-Gm-Gg: AY/fxX73GJeeEawDsWEvUgxKiL6ILsN0Y4WND4e6TizXcGCad1EzbaUeTrwVnhJdAV/
+	N+OzxsMFM/CW3KpRvs6M1u62nnK79LAmU3DjJcpoAxJm4s0uVZ7iYGPEPVjs1440BlaQZCNAZHE
+	17Hr+We/vxOQNPrBWQ3+WhTKutHtV5KDMI4WfcucSzSngq+CbJ4w9esew7N8KiPB0lrRGY1Dyh/
+	6e6vMGMeXIhWKiJD28msmELuRI8SjqPDV4ME+ql1+XaVO0m8gSMaZxfFHYbxAQXudk/Gvpj0oSV
+	FkPy/zQ8tfS2wDiKJISGUYP4IYHHKqI+rmBZr5GwKN9ZuL+bc7nm+baUnsCO0W0ZW5ZomQcTIAr
+	Aak6BXe2WtZw4xGNWstlONPsAIYz+r9zgH6/2b3DQB/Hi2Ae11tml+ORQrs98/Izp6/ZeMSXb2t
+	ixiLCRIHOqSvkpdbTSAIbsZbGFPjgAnuJ6BUbswiNY3Q==
+X-Google-Smtp-Source: AGHT+IGiJvWqe4SLcVfq96oW9mdXRzRiSlLatUfRxFBgo2F0tqTY3y8DwOJjUh6fzytciBvJ6fYV4Xd1wG7y
+X-Received: by 2002:a17:902:e88d:b0:295:5da6:600c with SMTP id d9443c01a7336-2a3e2d789dbmr10846545ad.2.1767650358530;
+        Mon, 05 Jan 2026 13:59:18 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-2.dlp.protect.broadcom.com. [144.49.247.2])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2a3e3cae700sm412715ad.34.2026.01.05.13.59.18
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 05 Jan 2026 13:59:17 -0800 (PST)
+        Mon, 05 Jan 2026 13:59:18 -0800 (PST)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4f35f31000cso5820841cf.2
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 13:59:16 -0800 (PST)
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4ee416413a8so4565761cf.1
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 13:59:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1767650355; x=1768255155; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1767650357; x=1768255157; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=y3ELeCpDaSbQrwRYrtN0w3AXxnc5irV437hDC1oO8AI=;
-        b=XVizX5k8Ugo5kKyvK/LfDTBWgAu8lNNBZNmXpcxEssLvzVVMjA7+qnCZU4KImkl93G
-         fUFE8fvHX7JA20tyX941DSi8mOab3LBoIl1qFjNoWcdu3SLpiSCzK1/J1qE6aFAgGTNz
-         S46eGhv9Rb+fIrfu5hK1sRHB6uFBg5UvlKmsc=
-X-Received: by 2002:a05:622a:909:b0:4ee:bff:7fcb with SMTP id d75a77b69052e-4ffa76a1997mr15476751cf.1.1767650355580;
-        Mon, 05 Jan 2026 13:59:15 -0800 (PST)
-X-Received: by 2002:a05:622a:909:b0:4ee:bff:7fcb with SMTP id d75a77b69052e-4ffa76a1997mr15476501cf.1.1767650355184;
-        Mon, 05 Jan 2026 13:59:15 -0800 (PST)
+        bh=Te25MviDlrxzlq2B2duHSN+1gL9C//NivqToMQtg1Ow=;
+        b=RKOh6zkEOysGxi5rWjF8PuS2gLj1OdEY8yHKeD+61cljUxrpc42OaIop8/tPJH7vCk
+         rXvhRNQeJ4fYJl4071Xd19f8ezdMkPkqMP3PoxJbBEXa7Rx3lf0ojNjtI3wXftm7lmsD
+         k1wRt+K3v65PtFY3VQSOMTqXxm9SiuCh4pLJY=
+X-Received: by 2002:a05:622a:2447:b0:4f1:bdba:8cfc with SMTP id d75a77b69052e-4ffa77dfa39mr13972011cf.65.1767650357323;
+        Mon, 05 Jan 2026 13:59:17 -0800 (PST)
+X-Received: by 2002:a05:622a:2447:b0:4f1:bdba:8cfc with SMTP id d75a77b69052e-4ffa77dfa39mr13971871cf.65.1767650356904;
+        Mon, 05 Jan 2026 13:59:16 -0800 (PST)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ffa8d38e12sm1882051cf.3.2026.01.05.13.59.13
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ffa8d38e12sm1882051cf.3.2026.01.05.13.59.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 13:59:14 -0800 (PST)
+        Mon, 05 Jan 2026 13:59:16 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -93,11 +93,10 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com,
-	Somnath Kotur <somnath.kotur@broadcom.com>,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Subject: [PATCH net-next 4/6] bnxt_en: Defrag the NVRAM region when resizing UPDATE region fails
-Date: Mon,  5 Jan 2026 13:58:31 -0800
-Message-ID: <20260105215833.46125-5-michael.chan@broadcom.com>
+	Somnath Kotur <somnath.kotur@broadcom.com>
+Subject: [PATCH net-next 5/6] bnxt_en: Use a larger RSS indirection table on P5_PLUS chips
+Date: Mon,  5 Jan 2026 13:58:32 -0800
+Message-ID: <20260105215833.46125-6-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.45.4
 In-Reply-To: <20260105215833.46125-1-michael.chan@broadcom.com>
 References: <20260105215833.46125-1-michael.chan@broadcom.com>
@@ -110,78 +109,91 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+The driver currently uses a chip supported RSS indirection table size
+just big enough to cover the number of RX rings.  Each table with 64
+entries requires one HW RSS context.  The HW supported table sizes are
+64, 128, 256, and 512 entries.  Using the smallest table size can cause
+unbalanced RSS packet distributions.  For example, if the number of
+rings is 48, the table size using existing logic will be 64.  32 rings
+will have a weight of 1 and 16 rings will have a weight of 2 when
+set to default even distribution.  This represents a 100% difference in
+weights between some of the rings.
 
-When updating to a new firmware pkg, the driver checks if the UPDATE
-region is big enough for the pkg and if it's not big enough, it
-issues an NVM_WRITE cmd to update with the requested size.
+Newer FW has increased the RSS indirection table resource.  When the
+increased resource is detected, use the largest RSS indirection table
+size (512 entries) supported by the chip.  Using the same example
+above, the weights of the 48 rings will be either 10 or 11 when set to
+default even distribution.  The weight difference is only 10%.
 
-This NVM_WRITE cmd can fail indicating fragmented region. Currently
-the driver fails the fw update when this happens. We can improve the
-situation by defragmenting the region and try the NVM_WRITE cmd
-again. This will make firmware update more reliable.
+If there are thousands of VFs, there is a possiblity that we may not
+be able to allocate this larger RSS indirection table from the FW, so
+we add a check to fall back to the legacy scheme.
 
 Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 32 +++++++++++++++++--
- 1 file changed, 29 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 12 ++++++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h |  3 +++
+ 2 files changed, 15 insertions(+)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index af4ceb6d2158..a5ed6dd42bfc 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -3848,9 +3848,25 @@ static int nvm_update_err_to_stderr(struct net_device *dev, u8 result,
- #define BNXT_NVM_MORE_FLAG	(cpu_to_le16(NVM_MODIFY_REQ_FLAGS_BATCH_MODE))
- #define BNXT_NVM_LAST_FLAG	(cpu_to_le16(NVM_MODIFY_REQ_FLAGS_BATCH_LAST))
- 
-+static int bnxt_hwrm_nvm_defrag(struct bnxt *bp)
-+{
-+	struct hwrm_nvm_defrag_input *req;
-+	int rc;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 9ab9ebd57367..9efdc382ebd7 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -6558,6 +6558,9 @@ int bnxt_get_nr_rss_ctxs(struct bnxt *bp, int rx_rings)
+ 	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
+ 		if (!rx_rings)
+ 			return 0;
++		if (bp->rss_cap & BNXT_RSS_CAP_LARGE_RSS_CTX)
++			return BNXT_RSS_TABLE_MAX_TBL_P5;
 +
-+	rc = hwrm_req_init(bp, req, HWRM_NVM_DEFRAG);
-+	if (rc)
-+		return rc;
-+	req->flags = cpu_to_le32(NVM_DEFRAG_REQ_FLAGS_DEFRAG);
-+	hwrm_req_timeout(bp, req, bp->hwrm_cmd_max_timeout);
-+
-+	return hwrm_req_send(bp, req);
-+}
-+
- static int bnxt_resize_update_entry(struct net_device *dev, size_t fw_size,
- 				    struct netlink_ext_ack *extack)
- {
-+	struct bnxt *bp = netdev_priv(dev);
-+	bool retry = false;
- 	u32 item_len;
- 	int rc;
- 
-@@ -3863,9 +3879,19 @@ static int bnxt_resize_update_entry(struct net_device *dev, size_t fw_size,
+ 		return bnxt_calc_nr_ring_pages(rx_rings - 1,
+ 					       BNXT_RSS_TABLE_ENTRIES_P5);
  	}
+@@ -8068,6 +8071,11 @@ static int __bnxt_reserve_rings(struct bnxt *bp)
+ 	bp->rx_nr_rings = rx_rings;
+ 	bp->cp_nr_rings = hwr.cp;
  
- 	if (fw_size > item_len) {
--		rc = bnxt_flash_nvram(dev, BNX_DIR_TYPE_UPDATE,
--				      BNX_DIR_ORDINAL_FIRST, 0, 1,
--				      round_up(fw_size, 4096), NULL, 0);
-+		do {
-+			rc = bnxt_flash_nvram(dev, BNX_DIR_TYPE_UPDATE,
-+					      BNX_DIR_ORDINAL_FIRST, 0, 1,
-+					      round_up(fw_size, 4096), NULL,
-+					      0);
++	/* Fall back if we cannot reserve enough HW RSS contexts */
++	if ((bp->rss_cap & BNXT_RSS_CAP_LARGE_RSS_CTX) &&
++	    hwr.rss_ctx < bnxt_get_total_rss_ctxs(bp, &hwr))
++		bp->rss_cap &= ~BNXT_RSS_CAP_LARGE_RSS_CTX;
 +
-+			if (rc == -ENOSPC) {
-+				if (retry || bnxt_hwrm_nvm_defrag(bp))
-+					break;
-+				retry = true;
-+			}
-+		} while (rc == -ENOSPC && retry);
+ 	if (!bnxt_rings_ok(bp, &hwr))
+ 		return -ENOMEM;
+ 
+@@ -9558,6 +9566,10 @@ int bnxt_hwrm_func_resc_qcaps(struct bnxt *bp, bool all)
+ 	hw_resc->min_stat_ctxs = le16_to_cpu(resp->min_stat_ctx);
+ 	hw_resc->max_stat_ctxs = le16_to_cpu(resp->max_stat_ctx);
+ 
++	if (hw_resc->max_rsscos_ctxs >=
++	    hw_resc->max_vnics * BNXT_LARGE_RSS_TO_VNIC_RATIO)
++		bp->rss_cap |= BNXT_RSS_CAP_LARGE_RSS_CTX;
 +
- 		if (rc) {
- 			BNXT_NVM_ERR_MSG(dev, extack, MSG_RESIZE_UPDATE_ERR);
- 			return rc;
+ 	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
+ 		u16 max_msix = le16_to_cpu(resp->max_msix);
+ 
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index 2a2d172fa6ed..476c5684a1eb 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -1369,6 +1369,8 @@ struct bnxt_hw_resc {
+ 	u32	max_rx_wm_flows;
+ };
+ 
++#define BNXT_LARGE_RSS_TO_VNIC_RATIO	7
++
+ #if defined(CONFIG_BNXT_SRIOV)
+ struct bnxt_vf_info {
+ 	u16	fw_fid;
+@@ -2412,6 +2414,7 @@ struct bnxt {
+ #define BNXT_RSS_CAP_ESP_V6_RSS_CAP		BIT(7)
+ #define BNXT_RSS_CAP_MULTI_RSS_CTX		BIT(8)
+ #define BNXT_RSS_CAP_IPV6_FLOW_LABEL_RSS_CAP	BIT(9)
++#define BNXT_RSS_CAP_LARGE_RSS_CTX		BIT(10)
+ 
+ 	u8			rss_hash_key[HW_HASH_KEY_SIZE];
+ 	u8			rss_hash_key_valid:1;
 -- 
 2.51.0
 
