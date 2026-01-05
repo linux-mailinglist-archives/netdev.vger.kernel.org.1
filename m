@@ -1,127 +1,146 @@
-Return-Path: <netdev+bounces-247198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48D2ECF5AC0
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 22:30:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2040CF5AC6
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 22:31:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 44B9B301F251
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 21:30:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A702230AD372
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 21:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC8192D7DD3;
-	Mon,  5 Jan 2026 21:30:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 885C92D6E64;
+	Mon,  5 Jan 2026 21:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C7QP59S3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kaSktb+O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB1C72D0610
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 21:30:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D447D2773EE
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 21:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767648616; cv=none; b=Qn34XIRRnUOkIjzvLY1j1RuUQS1in++IR5Vx3T79pqjM1rC1nML40a7rX14nu954fXBFvv90PTAlLZPdg81mKWhYmJ3HQTZZNd60VWBEnvxcX+AP1o+74tqR4C/zLia9rRG656ghpv2IfofhlUQCYWqG1Z3DB5GUWvqXGVBOQZ8=
+	t=1767648626; cv=none; b=qfLpC0H/9xMbV+/XXMXuAOJZ6LXJFQxgrZunML9LzaVxT2G63paZMWL44o80gOAcF/xw7h8myQHDebRLRQ+vR5CMa6UHXC3oB8EZXRBRjoBczl1Tb5EKcI92joVa5Kr8KhdvZBbKRK4EytcrponSU8xiE4rj88DGLmZqIQv5ieI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767648616; c=relaxed/simple;
-	bh=BHiL+KXoHcbysNOY6KLyrbE8PDnFpcFn2m13IohvTIE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tQS+bbUdycsg64UMGjQHMYNtf/R9g6/KTb4V61hJWjJHKwfh0McH+NKJZXVhAunZN5YyTUEa0ZB+FCVfP1XNux4xHsYwGK5Y4TnxtYjwM63NsafAQicoL7wpuHf+oXq0nxM/ckt1+eVRkhKjeBwgv4JF56bc3bPVgxfhF11KVjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C7QP59S3; arc=none smtp.client-ip=209.85.128.49
+	s=arc-20240116; t=1767648626; c=relaxed/simple;
+	bh=3n2vCisThVsOlragyGDay+6tW9w4bEoSHR5iRUS9Glw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iBXiUt7ELyL0/77/aMJ4jwgEWFYzlPxeKMpQ1cFvIdrbEQezaAlPx/+xkQkC/lcjYAXwe944d0Pyew6Ky7AjKTAL34FYyfT3jDLZZM5bOGwBVK7zwiczbVM9XNTEhaO6ph6Hh4W+t30Z+o8+gt7TxcJ7UfyfMIWInRdnlV8AaYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kaSktb+O; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-47798f4059fso521235e9.2
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 13:30:14 -0800 (PST)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2a1022dda33so2805425ad.2
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 13:30:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767648613; x=1768253413; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GA4+IXe/WrVRqttt3cX2Kp/8yqzKmexXegFMx0tjcA8=;
-        b=C7QP59S3eNahtF36XzamO7bAoZQvYKlq+gIhLPA5/r6oM4WBjaR80XXI0i77paRzXo
-         Pe3eV9ErUpoWZ6BTBacbRfnC0cbsopASsAV/Eo9XR9bCaZtS+zCuXcDm5snIxZTFDZe7
-         xTU91iJ603nuZ7EJbHltf20e93HlAtJpcNK8kL0teDLRMbSyt9QTh3z9vPIQ1yzNq/hO
-         fdz+i5JLsy2yDmXA7lZ8DA0FBKibmP9mxdZi99flVUfiYAAXmhtNYdTgWb/OMBU99HwP
-         vrsrg3FQMH1aamZBQFedlUdW8zVclg7OCZeZKZ/VBfXAlhaH0Z0Scs1mqAdCfbgw6A9g
-         Q0JA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767648613; x=1768253413;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1767648624; x=1768253424; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GA4+IXe/WrVRqttt3cX2Kp/8yqzKmexXegFMx0tjcA8=;
-        b=M0s0x9I4Q0PUZ4sDN8RbhsCBJkXmgFl1G5De/t4XBkVwgITcQZtsKtnk2R9mdXk1eC
-         c9MNLRkEICNb9qMD4YvVh/4/d5LTyvLGu5xWzCtlOUJSinCFyOGtTLNtA3MIllnQ59Ju
-         GfbCEWU7DmfMeUHgQ1gt0UpqCI0uUpr2IIabknaxBjAuRYBRRmZ4bVsD6iW91nPXtmrl
-         oPEfoxSGcDtQai6i1cqK3er5JXf+2+6BUmZOBS4xRVjYGYV9cEvp2WAA/fbL7racwD+e
-         QZSo/v4/YfaGbniJ8xf4QxVKJ+o4nMjd7CFtm8+XQkijWaTFNzb0l6iFPijtASaQj5Rm
-         AoPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXkEsN+SQS938CC8tCdhmoEvHjp4sk7UJQO5W42SfYXgOJ80NcnhFvzDMy+a79sygIahp4ePLg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLO7peXiHbo23Hw/2ZEEt1EE6TZq5r3JmUT7VM1IJnhfJQfLss
-	E809XTqKnBUxBkiSauIEhZCLp7O3A9h2raIMFGHeuAhM5gBFU+FveAqh
-X-Gm-Gg: AY/fxX4SMeE8w1CIKIvAFmQ68n8mSr2BTFJM5oo7MBhhppBV2axO/CT3D9EVTmPiKTP
-	94BP8rOvDzAg2Hd4G3Q96RllKPigbl+brbPaKMzoFrWPjSIlNnTpcmJMndAdBCl4aJeIBLGM0uR
-	fkxkM7eDysAHjycIU01k2xihZee8BVei8x8TQSkRDfq7MOA+r0YXDPYJJ8TO/4nc1VJmwnX4i15
-	BKQs8BKQBn4T+38HHQXsraR8xPKXDWMVzKIYRFmVZULqaB/rm4EvrXuPtuezUih9krHXEhPy7QJ
-	bSoRbINObpsmPDQa15bx57zGxiYyMTL7Lxp+ZsC0BJN2CHKULc4+9ceiOOhJuZwXz/5uBkznnGc
-	lA8Zzr2+PRjX61bLrep+xnvFYxGv/OWknN6ifi/cGAL5gaGjmDgDT0NGOBCQl/XrY24kYLf2jlX
-	ScEYP1b0qcKGXfCPnAVrm+5InSoN5XTQxEbqA=
-X-Google-Smtp-Source: AGHT+IGM83/oM7smR0fad6oyFH2XZEQ5E1KkArDYeP/yHJIxVcqKFv4FNTFUBSOObnE/c5IRL1c8Jg==
-X-Received: by 2002:a05:6000:2511:b0:429:b697:1fa with SMTP id ffacd0b85a97d-432bc9cc89amr886924f8f.2.1767648613270;
-        Mon, 05 Jan 2026 13:30:13 -0800 (PST)
-Received: from thomas-precision3591.. ([2a0d:e487:144e:5eef:4e0a:3841:cee5:ead8])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-432bd5df90dsm583536f8f.20.2026.01.05.13.30.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 13:30:13 -0800 (PST)
-From: Thomas Fourier <fourier.thomas@gmail.com>
-To: 
-Cc: Thomas Fourier <fourier.thomas@gmail.com>,
-	Chas Williams <3chas3@gmail.com>,
-	linux-atm-general@lists.sourceforge.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next,v2] atm: idt77252: Use sb_pool_remove()
-Date: Mon,  5 Jan 2026 22:29:15 +0100
-Message-ID: <20260105212916.26678-2-fourier.thomas@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        bh=hNQTNhTvb1y3r7Npal158k3hpZgaWnE9Tjsv4NEjAEw=;
+        b=kaSktb+OJP6e5Z/3toUd+sSmSOlSNCL93jQuFV3yrlQ0CV7cgturJMM0BWhFgwashz
+         jMTQ/4eY8JBBDKFchuubNoH+NmkAtmPMcaN7FR4c5c40SW3Ef2AJVgpl1QYiLL+Vk3aM
+         N57R6rcOGTm2Gnf+LGNa0x63kRQirS7J2EK46czy98368ESGjbwIaM7BlS5B27dH+bpV
+         8Hd4v8/EUsstTftlZ3Xre12EUkTaQP5S5sABlT6q+m5QBaqfNwiOYGqtI4Sn35GVQsr+
+         ebmkU8iuszfXD/kHYZTd5B2U1FPnDom1VGbZxHxdxVEZit7fAJcWGvkoCqTqB8GmyM4U
+         buWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767648624; x=1768253424;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=hNQTNhTvb1y3r7Npal158k3hpZgaWnE9Tjsv4NEjAEw=;
+        b=L/4KjQRdAxaapMmniCimCWoYh09NxOmUCfU3wNtf8jKvMRBwDNO/1iuV/4/v26/gFB
+         IdUq2v/v+Nde0XlD94gYAoW+hKuXsCBQCgUDSB78nypqwf+wIKSaA5tbMItLOwPE1HjC
+         7HHM6mZLP8MR6+ZDfPxewMqoAPuHP5vCSzMb7eOqSq0RNtl6ZxTmSweuLArQdRmbDAtc
+         Xtm/PAQ/88L/pDTk3hSqzt/Vv7lqfbxOqzw/TqMr+IL4gbbs19fwPMeS5zyjWTV7w1wf
+         oQHcUsM8Hm8z+hwrpZorKw0hEBsJh5LW6bapilhVU3792Ea6MT50HRD4XRYWVJWOfR6E
+         bNyA==
+X-Forwarded-Encrypted: i=1; AJvYcCUXvHLBLKWm+Q0xX/aMKNyZAcrL4pc3BcAtDBLN45v2nEI/+NrRSaGm+GqCKwRCOmJmswKYdtA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvYv17sjZEkFAL2EHrvfGyQYNmSpP9DuQcA3341crzNvJ93aBD
+	vC5wxQyWP7F48q/Ist1za1Fn+NkPU1++21yf7OYf0C0NdjEotJIHm7yzDm6PpK91n9gkjF+i7FH
+	RbxEduqcvqpnSUaLcZKBZgqwhPCqpoYY=
+X-Gm-Gg: AY/fxX4s2LKBWDPkJtJy4HH5p1ZLqK4b1oUo+JzIdtdFTTnbLD8zSWc7Z7SfTBsEBrC
+	jLDCb96aTeqZaZ7V2HxRONiJ5Uw5iT9C3JnJeEepWL4YYR54oRLAlJOcPg5vXSNuA6hTfLbZ7MA
+	nJVDbBdkHCOw9EDeDXwNJRuvitOI20JT7VkfdMOHdXYSEXDkrRSxv2MfxKBl8M5aC69ixI5ey5A
+	P+CIG4DssoxF7H2fglErIQ+Jtmn3+rRf47Q5FUFxZBGh1ph7vqiJUVoICceqvttVIi7Tyce5XW2
+	z1Bgpa/KT04=
+X-Google-Smtp-Source: AGHT+IGhvOS6mcpN4NPO0ujazhU5nslDD3kJzFAVysyKpRaxl9lOdq/Dh+NTy2Y+4Opk4T8XqoGTf22bJdbaV7lJ22s=
+X-Received: by 2002:a17:90b:3843:b0:32e:a8b7:e9c with SMTP id
+ 98e67ed59e1d1-34f5f32c24bmr465278a91.29.1767648624076; Mon, 05 Jan 2026
+ 13:30:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251117173012.230731-1-activprithvi@gmail.com>
+ <0c98b1c4-3975-4bf5-9049-9d7f10d22a6d@hartkopp.net> <c2cead0a-06ed-4da4-a4e4-8498908aae3e@hartkopp.net>
+ <aSx++4VrGOm8zHDb@inspiron> <d6077d36-93ed-4a6d-9eed-42b1b22cdffb@hartkopp.net>
+ <20251220173338.w7n3n4lkvxwaq6ae@inspiron> <01190c40-d348-4521-a2ab-3e9139cc832e@hartkopp.net>
+ <20260102153611.63wipdy2meh3ovel@inspiron> <20260102120405.34613b68@kernel.org>
+ <63c20aae-e014-44f9-a201-99e0e7abadcb@hartkopp.net>
+In-Reply-To: <63c20aae-e014-44f9-a201-99e0e7abadcb@hartkopp.net>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Mon, 5 Jan 2026 13:30:11 -0800
+X-Gm-Features: AQt7F2qB98D05JFXrn5jIaSNXe0Wo-ByX8IsQT-ZSn0gRMHCve1bRDNsBexvBSA
+Message-ID: <CAEf4BzaXNbzsVhLLk2brJn0duyRTjxoiofisEQOv=y43hxvFag@mail.gmail.com>
+Subject: Re: [bpf, xdp] headroom - was: Re: Question about to KMSAN:
+ uninit-value in can_receive
+To: Oliver Hartkopp <socketcan@hartkopp.net>
+Cc: Jakub Kicinski <kuba@kernel.org>, Prithvi <activprithvi@gmail.com>, andrii@kernel.org, 
+	mkl@pengutronix.de, linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Replacing the manual pool remove with the dedicated function.  This is
-safer and more consistent with the rest of the code[1].
+On Sat, Jan 3, 2026 at 4:21=E2=80=AFAM Oliver Hartkopp <socketcan@hartkopp.=
+net> wrote:
+>
+> Hello Jakub,
+>
+> thanks for stepping in!
+>
+> On 02.01.26 21:04, Jakub Kicinski wrote:
+>
+> > You're asking the wrong person, IIUC Andrii is tangentially involved
+> > in XDP (via bpf links?):
+> >
+> (..)
+> >
+> > Without looking too deeply - XDP has historically left the new space
+> > uninitialized after push, expecting programs to immediately write the
+> > headers in that space. syzbot had run into this in the past but I can't
+> > find any references to past threads quickly :(
+>
+> To identify Andrii I mainly looked into the code with 'git blame' that
 
-[1]; https://lore.kernel.org/all/20250625094013.GL1562@horms.kernel.org/
+Hey, sorry for a late response, I've been out on vacation for the past
+~2 weeks. But as Jakub correctly pointed out, I'm probably not the
+right person to help with this, I touched XDP bits only superficially
+to wire up some generic BPF infrastructure, while the issue at hand
+goes deeper than that. I'll let you guys figure this out.
 
-Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
----
- drivers/atm/idt77252.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/drivers/atm/idt77252.c b/drivers/atm/idt77252.c
-index f2e91b7d79f0..888695ccc2a7 100644
---- a/drivers/atm/idt77252.c
-+++ b/drivers/atm/idt77252.c
-@@ -1844,7 +1844,6 @@ add_rx_skb(struct idt77252_dev *card, int queue,
- {
- 	struct sk_buff *skb;
- 	dma_addr_t paddr;
--	u32 handle;
- 
- 	while (count--) {
- 		skb = dev_alloc_skb(size);
-@@ -1876,8 +1875,7 @@ add_rx_skb(struct idt77252_dev *card, int queue,
- 			 skb_end_pointer(skb) - skb->data, DMA_FROM_DEVICE);
- 
- outpoolrm:
--	handle = IDT77252_PRV_POOL(skb);
--	card->sbpool[POOL_QUEUE(handle)].skb[POOL_INDEX(handle)] = NULL;
-+	sb_pool_remove(card, skb);
- 
- outfree:
- 	dev_kfree_skb(skb);
--- 
-2.43.0
-
+> led to this problematic call chain:
+>
+>    pskb_expand_head+0x226/0x1a60 net/core/skbuff.c:2275
+>    netif_skb_check_for_xdp net/core/dev.c:5081 [inline]
+>    netif_receive_generic_xdp net/core/dev.c:5112 [inline]
+>    do_xdp_generic+0x9e3/0x15a0 net/core/dev.c:5180
+>
+> Having in mind that the syzkaller refers to
+> 6.13.0-rc7-syzkaller-00039-gc3812b15000c I wonder if we can leave this
+> report as-is, as the problem might be solved in the meantime??
+>
+> In any case I wonder, if we should add some code to re-check if the
+> headroom of the CAN-related skbs is still consistent and not changed in
+> size by other players. And maybe add some WARN_ON_ONCE() before dropping
+> the skb then.
+>
+> When the skb headroom is not safe to be used we need to be able to
+> identify and solve it.
+>
+> Best regards,
+> Oliver
+>
 
