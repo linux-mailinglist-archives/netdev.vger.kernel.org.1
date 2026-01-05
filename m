@@ -1,315 +1,549 @@
-Return-Path: <netdev+bounces-247083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D93B9CF447A
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 16:03:37 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFBE0CF4BA4
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 17:36:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 25BE33005014
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 15:03:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BA745305F337
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 16:15:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71217288C2D;
-	Mon,  5 Jan 2026 15:03:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DF503093CB;
+	Mon,  5 Jan 2026 16:10:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XNpSJ4bD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lErY2rJk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FD42D839B
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 15:03:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1178FFBF0
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 16:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767625414; cv=none; b=Pdy2kmDay3tAIAGQY8dLJkwYXRc2txcUOxG2VRGZkT8qw344LkWm+GePrjqGoFZ7vd6gY3r2P2QTyqVecxWYEN+GQgz5JrsQeS/oEreA3qgPGSSDHnKU9DT1zNC5dnfHfbmDB24iOwJwH4XEgEM17BJkHPaVeHBtLCJ8JLTujTQ=
+	t=1767629406; cv=none; b=njTM63UyLkR79KOaQYgS0YCKzFXI2I9LLJPJEuiZN4V+TFZnKrMZXutmCow64QosK+Q1SAZUpVK7C15JiTmRFdjLBfCutuHFvPcxunFJNdb8rFIQi5YbCufyXwLoTL7H1czoJbwClLmg1djFbC//4+wYE2ZR8zs4Ui2mIE0Bh78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767625414; c=relaxed/simple;
-	bh=Bqc8kf7olJFNyZ85h9R2plDas33cpQ3lvfLxu48tc5Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YyOkM2QbRq+DveujrOivYP/83npvsRZkb5lLLrWinIEw3TO/1KSPcvcNEB002qbA+TyIRxDO8gcBwOYm4Lox2uTatck/xEWq+CMJ+gkyDSjgTR9+1tIEgrVucd9OKVOea+YqapmLeuX+JvSJJAbvOkNTq3XGeGNzmmWXXgILasI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XNpSJ4bD; arc=none smtp.client-ip=209.85.216.46
+	s=arc-20240116; t=1767629406; c=relaxed/simple;
+	bh=rnP4jMxAZx+MNQHZJmxvQO5/55lEjH2zGrbWuBmZWWk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rfhEW1aKKmyh6ZmVMclAF5n3idf7nImweeDZnZaiejgHmC2FUJBbQ2kO+Bj3p7gq0Jmt8/2Mg5lt+6K882iDIH+7An7jNtZG3TOna93WR5p9ybRO0uV52nFdUPLzbpLi18fdvyR1ldQWxSPlPYoK1aBIZQCLMwrcoK6TUdDmLxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lErY2rJk; arc=none smtp.client-ip=209.85.161.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-34c93e0269cso1121284a91.1
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 07:03:32 -0800 (PST)
+Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-65cfb4beabcso7037eaf.3
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 08:10:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767625412; x=1768230212; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pmPGbGv/+IEVWw4Vjf2YgHPxMHf7wirNG9XH5nP++64=;
-        b=XNpSJ4bDUaEDYANWNOX2fPNJXTXoUC4HN3PV083iNOJQy4Tq7eon9M+ucEmWkKzBvT
-         jdsYpSVLAMDIZ8SSoqJe88Z1GTN9iatVbhM8xc5+dKhnfBda0eljxYaWgyT1SwasgfLa
-         RTThoF3GLCNX5FiZA2guQK1d54Q64GeWUeVBgMFNF+mlF0Oo7lUn9Fbpjnd4VsDcyALe
-         KKDo9kSBcbBKDZYTXTmA5BC9qOWs3r8pKdTNkhrjzuQ5qeXNaU8b4ixHE9U+HB5C9HGC
-         hcF4unnnl2pdwkCJe2UZDSEm5euTWNfr9YxFX5uUp6NsU3epa0pRLATTgKoMxSd4XIvT
-         fq/w==
+        d=gmail.com; s=20230601; t=1767629403; x=1768234203; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0Rm9UvQOG/gSoT2nxSfN+1KNcvsas/+A9Tf8OYXCky0=;
+        b=lErY2rJkYQmhSAUv1HnOb2ooFNcJ7fh+musn92tGhgLxgzVIpGzS1vRWZ4BtmOna7c
+         xJTulJqkEJf3/96wSJzTdnJVcPb8ae/ZXMKG72PsGBQNVndGFWy9V0c6s540NLClgyjO
+         OtMF3nZMfON8Na8aBiZIa86ccf2nk3VgsgcMFpQjsG2Gg1xtpg6BEzPMMG1AT8/wsd8a
+         JhXG3BIg0Y4RZxjbEiO6gagNDhv1pzJedfHpdw6Q4lfzhsnXx74tMsD8fvUBo//Mn5tw
+         iKOEnrqQHA72rW5xyEc4nrVGIvts46vsQi2fegG3U0SvhZdXp8ePPOKN/DSBxUKdNe7k
+         w+Nw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767625412; x=1768230212;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pmPGbGv/+IEVWw4Vjf2YgHPxMHf7wirNG9XH5nP++64=;
-        b=hxpaF0g+oNLtjlsB2+BbOASA8a6HyFco/ZQaFnuxyphFJMCyN39l1wO5BM1pqegnfx
-         RbomNbqDSDovsbbNN0AzUqY0Y6SN1SCGunVGwubfI5Q4AGjInZkvuSO4l+wMA/EibVuK
-         2yHn29LN4Vpk6Ud1dErb0M01imcUIwUAPxxbfw2IVbYGI9uGHH/v347PAl6gs+vYHfI9
-         eoUtG2H9opXnj+z+fnngNZBcyUDukAi/1TUhuENNhZmcJDjBFulJ48y4VmYrT1ksuZeA
-         X34BS6fSruK2idH+vLmCqdVqdupOEuwGvApN5E9NM3ri5xTvCyPufhc+M6J47vwA5JuF
-         FwFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVrjDNjafOyvLE4txQGIPC2BFCCDFJoripRt8xcIBHIjsOlWfEfaTQltLLuMJM8OVzaW5IHDOI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySJ7d9D8H+wXEHFvtf2C+wQkTesrB3XayS/qQq+tgghXxDjxcy
-	9C7KnnFDjsSrKqShpP58VerSFNvHM9Pw6LubVKEn+R9/4QYAbukBtbyh
-X-Gm-Gg: AY/fxX7FfPbqTJS9MxpowAjFDWY0W/WmudsibOsTgHQyTz+sDztBbvA/cso0zuhMmaz
-	+Mbq0HTe2fD9JpwGiB5rwiR7eDTygaSXOusRmTQBmv0m5tb0OIN00+2b9okw8OVV/LEMiv3yTUf
-	zcArmWg+BjabDc/Kp8kDO3kCZAHDP2BMSZ96VX3QVgnrAosRdaa3beQxYxkdIhJtxB9Em46ioNw
-	KwfR0JKF6TXJK5LEeaW2lpj8L9uptuPAppvkrqoAAkAflkdSQiz4K+UM2Ndpu9DHy8Sr5mQ7/Kz
-	ltC4pC2wPULb4x13eRj5CQJtbhbMESxxgJnlWjAZXdRT//OuhLgzy6eBoeXZGWQHQbelFwEP3S6
-	vunlY5weAt8C9MaNqgKn9uOMQU9vtikJmTEhcy8U/EZcIOyaRFJChg2YHJcYoa5diyL7Eog5dqJ
-	H35W7T1sLnQoP8nb6nhc1Y
-X-Google-Smtp-Source: AGHT+IEmHx3Qjx6Si7MPV4gjFWQocc4zknKs2BVbHtxZjrunVw6izvZH0s+aJisvVpCKFRSjQtzbMg==
-X-Received: by 2002:a17:90a:d883:b0:343:747e:2ca4 with SMTP id 98e67ed59e1d1-34f45399a2cmr5744005a91.9.1767625411847;
-        Mon, 05 Jan 2026 07:03:31 -0800 (PST)
-Received: from [192.168.0.118] ([14.187.47.150])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34f4776dff1sm6489321a91.15.2026.01.05.07.03.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Jan 2026 07:03:30 -0800 (PST)
-Message-ID: <a20950fe-455a-4c7b-b132-e8090e8d0c0f@gmail.com>
-Date: Mon, 5 Jan 2026 22:03:22 +0700
+        d=1e100.net; s=20230601; t=1767629403; x=1768234203;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0Rm9UvQOG/gSoT2nxSfN+1KNcvsas/+A9Tf8OYXCky0=;
+        b=m9q9TDCH1XwogsV1aBWjyl/2WTX5mm1b/Kl5XdfEVU/XQXpwdkDwUQz7iOD7Qi6JWc
+         2XnGugDeAfRFv054v5Q4hqLTlpkLjVtSiLTUhU9+7vsTTh3mVIkoTaelLGgUFy0CXghg
+         0oUVC0W19Qenm60p+wk+T4OIbUQpYEkWdCs+tGmSnFT8MAjnV7YpQKUNtPwf/yBJpPHJ
+         PaZQz+dgaIZN2xYFVt1eYHW8CFJspHgjaAQTQTGQAQmyQ8Kr3isixVENCEnN7YOZF7mD
+         e2JGDA7mmeOnAG5U9z7OlYKFRJILO7mO9sZk6VPFGPJEWV8GhfDwmMsxQQagk5ibzy8B
+         luxg==
+X-Gm-Message-State: AOJu0YyAQXZs3qKZ3dI2VQhKHWKUmmEtpO8safiAyIKm+QEWhFBWrnz8
+	CuHDHFEJrs/oHFZGi0LPMwjEZwyFk8GJilz+aTN0+jYd9Xxrcz9meQtaNHGZ1UJ7
+X-Gm-Gg: AY/fxX6yrG3eAryYr5PX11+RSxNXS7g+O7HQ+HxUbh6//2EqKBJZGOrC3GrfN5xpsZL
+	8enqE4MIxMrsNSEY2rgPqURazEita8kwtYX7OGw+DIkDFCpXaTTHD+7nkAIFzy9xAwdLz1P+oOH
+	LiqJQIGKRLRto1VmuOSuBoE4NgpV5gtZkmE1E+Mm6x6/TkbefjtkM9XaeSQ5HclVm6LM/+39rme
+	eQX8i0qKH+fuIm/uJRxdEtHyYYzGIm/Gj8hVE/+CWk+ySp2TMHbxRNpY66sWUl/Mz0RQLxraVPh
+	KNoAnGiwYDJaBsBa5MH3M9QKBtMK4A2xHGDa2JwlBtQvgCcUHcsfqCgcIbCawNgIpBIuIM0qbVW
+	9UzAZGUsIWwGybGGzGiWvxmZTjxSGhTr30UAyVemH9l1g4G4SYscWvzaD0Jc9cwtKSUrBi1oeMY
+	FDXwNLWxYJbRBtHU5VjruoEGREUD4OquN/SEDGmAtpAycAe/86rsQ=
+X-Google-Smtp-Source: AGHT+IGC+GHB4ZgPp8VVLsUBgzi3kfUnv3xubJM8TtiPesGj7lCzLGF+n773c5261kVGzKA++/hrzw==
+X-Received: by 2002:a05:622a:4183:b0:4f1:e97b:2896 with SMTP id d75a77b69052e-4f4abd753bfmr829905661cf.46.1767622090005;
+        Mon, 05 Jan 2026 06:08:10 -0800 (PST)
+Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4f4ac64a47esm368957221cf.24.2026.01.05.06.08.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 06:08:09 -0800 (PST)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	quic@lists.linux.dev
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Metzmacher <metze@samba.org>,
+	Moritz Buhl <mbuhl@openbsd.org>,
+	Tyler Fanelli <tfanelli@redhat.com>,
+	Pengtao He <hepengtao@xiaomi.com>,
+	Thomas Dreibholz <dreibh@simula.no>,
+	linux-cifs@vger.kernel.org,
+	Steve French <smfrench@gmail.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Tom Talpey <tom@talpey.com>,
+	kernel-tls-handshake@lists.linux.dev,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Steve Dickson <steved@redhat.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Alexander Aring <aahringo@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	John Ericson <mail@johnericson.me>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	"D . Wythe" <alibuda@linux.alibaba.com>,
+	Jason Baron <jbaron@akamai.com>,
+	illiliti <illiliti@protonmail.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Daniel Stenberg <daniel@haxx.se>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Subject: [PATCH net-next v6 00/16] net: introduce QUIC infrastructure and core subcomponents
+Date: Mon,  5 Jan 2026 09:04:26 -0500
+Message-ID: <cover.1767621882.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/3] virtio-net: don't schedule delayed refill
- worker
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, stable@vger.kernel.org
-References: <20260102152023.10773-1-minhquangbui99@gmail.com>
- <20260102152023.10773-2-minhquangbui99@gmail.com>
- <CACGkMEs9wCM8s4_r1HCQGj9mUDdTF+BqkF0rse+dzB3USprhMA@mail.gmail.com>
- <6bac1895-d4a3-4e98-8f39-358fa14102db@gmail.com>
- <20260104085846-mutt-send-email-mst@kernel.org>
- <f4ac3940-d99c-4f63-bab3-cc68731fc9f1@gmail.com>
- <20260104100912-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-In-Reply-To: <20260104100912-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 1/4/26 22:12, Michael S. Tsirkin wrote:
-> On Sun, Jan 04, 2026 at 09:54:30PM +0700, Bui Quang Minh wrote:
->> On 1/4/26 21:03, Michael S. Tsirkin wrote:
->>> On Sun, Jan 04, 2026 at 03:34:52PM +0700, Bui Quang Minh wrote:
->>>> On 1/4/26 13:09, Jason Wang wrote:
->>>>> On Fri, Jan 2, 2026 at 11:20 PM Bui Quang Minh <minhquangbui99@gmail.com> wrote:
->>>>>> When we fail to refill the receive buffers, we schedule a delayed worker
->>>>>> to retry later. However, this worker creates some concurrency issues
->>>>>> such as races and deadlocks. To simplify the logic and avoid further
->>>>>> problems, we will instead retry refilling in the next NAPI poll.
->>>>>>
->>>>>> Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
->>>>>> Reported-by: Paolo Abeni <pabeni@redhat.com>
->>>>>> Closes: https://netdev-ctrl.bots.linux.dev/logs/vmksft/drv-hw-dbg/results/400961/3-xdp-py/stderr
->>>>>> Cc: stable@vger.kernel.org
->>>>>> Suggested-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
->>>>>> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
->>>>>> ---
->>>>>>     drivers/net/virtio_net.c | 55 ++++++++++++++++++++++------------------
->>>>>>     1 file changed, 30 insertions(+), 25 deletions(-)
->>>>>>
->>>>>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->>>>>> index 1bb3aeca66c6..ac514c9383ae 100644
->>>>>> --- a/drivers/net/virtio_net.c
->>>>>> +++ b/drivers/net/virtio_net.c
->>>>>> @@ -3035,7 +3035,7 @@ static int virtnet_receive_packets(struct virtnet_info *vi,
->>>>>>     }
->>>>>>
->>>>>>     static int virtnet_receive(struct receive_queue *rq, int budget,
->>>>>> -                          unsigned int *xdp_xmit)
->>>>>> +                          unsigned int *xdp_xmit, bool *retry_refill)
->>>>>>     {
->>>>>>            struct virtnet_info *vi = rq->vq->vdev->priv;
->>>>>>            struct virtnet_rq_stats stats = {};
->>>>>> @@ -3047,12 +3047,8 @@ static int virtnet_receive(struct receive_queue *rq, int budget,
->>>>>>                    packets = virtnet_receive_packets(vi, rq, budget, xdp_xmit, &stats);
->>>>>>
->>>>>>            if (rq->vq->num_free > min((unsigned int)budget, virtqueue_get_vring_size(rq->vq)) / 2) {
->>>>>> -               if (!try_fill_recv(vi, rq, GFP_ATOMIC)) {
->>>>>> -                       spin_lock(&vi->refill_lock);
->>>>>> -                       if (vi->refill_enabled)
->>>>>> -                               schedule_delayed_work(&vi->refill, 0);
->>>>>> -                       spin_unlock(&vi->refill_lock);
->>>>>> -               }
->>>>>> +               if (!try_fill_recv(vi, rq, GFP_ATOMIC))
->>>>>> +                       *retry_refill = true;
->>>>>>            }
->>>>>>
->>>>>>            u64_stats_set(&stats.packets, packets);
->>>>>> @@ -3129,18 +3125,18 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
->>>>>>            struct send_queue *sq;
->>>>>>            unsigned int received;
->>>>>>            unsigned int xdp_xmit = 0;
->>>>>> -       bool napi_complete;
->>>>>> +       bool napi_complete, retry_refill = false;
->>>>>>
->>>>>>            virtnet_poll_cleantx(rq, budget);
->>>>>>
->>>>>> -       received = virtnet_receive(rq, budget, &xdp_xmit);
->>>>>> +       received = virtnet_receive(rq, budget, &xdp_xmit, &retry_refill);
->>>>> I think we can simply let virtnet_receive() to return the budget when
->>>>> reill fails.
->>>> That makes sense, I'll change it.
->>>>
->>>>>>            rq->packets_in_napi += received;
->>>>>>
->>>>>>            if (xdp_xmit & VIRTIO_XDP_REDIR)
->>>>>>                    xdp_do_flush();
->>>>>>
->>>>>>            /* Out of packets? */
->>>>>> -       if (received < budget) {
->>>>>> +       if (received < budget && !retry_refill) {
->>>>>>                    napi_complete = virtqueue_napi_complete(napi, rq->vq, received);
->>>>>>                    /* Intentionally not taking dim_lock here. This may result in a
->>>>>>                     * spurious net_dim call. But if that happens virtnet_rx_dim_work
->>>>>> @@ -3160,7 +3156,7 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
->>>>>>                    virtnet_xdp_put_sq(vi, sq);
->>>>>>            }
->>>>>>
->>>>>> -       return received;
->>>>>> +       return retry_refill ? budget : received;
->>>>>>     }
->>>>>>
->>>>>>     static void virtnet_disable_queue_pair(struct virtnet_info *vi, int qp_index)
->>>>>> @@ -3230,9 +3226,11 @@ static int virtnet_open(struct net_device *dev)
->>>>>>
->>>>>>            for (i = 0; i < vi->max_queue_pairs; i++) {
->>>>>>                    if (i < vi->curr_queue_pairs)
->>>>>> -                       /* Make sure we have some buffers: if oom use wq. */
->>>>>> -                       if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
->>>>>> -                               schedule_delayed_work(&vi->refill, 0);
->>>>>> +                       /* If this fails, we will retry later in
->>>>>> +                        * NAPI poll, which is scheduled in the below
->>>>>> +                        * virtnet_enable_queue_pair
->>>>>> +                        */
->>>>>> +                       try_fill_recv(vi, &vi->rq[i], GFP_KERNEL);
->>>>> Consider NAPI will be eventually scheduled, I wonder if it's still
->>>>> worth to refill here.
->>>> With GFP_KERNEL here, I think it's more likely to succeed than GFP_ATOMIC in
->>>> NAPI poll. Another small benefit is that the actual packet can happen
->>>> earlier. In case the receive buffer is empty and we don't refill here, the
->>>> #1 NAPI poll refill the buffer and the #2 NAPI poll can receive packets. The
->>>> #2 NAPI poll is scheduled in the interrupt handler because the #1 NAPI poll
->>>> will deschedule the NAPI and enable the device interrupt. In case we
->>>> successfully refill here, the #1 NAPI poll can receive packets right away.
->>>>
->>> Right. But I think this is a part that needs elucidating, not
->>> error handling.
->>>
->>> /* Pre-fill rq agressively, to make sure we are ready to get packets
->>>    * immediately.
->>>    * */
->>>
->>>>>>                    err = virtnet_enable_queue_pair(vi, i);
->>>>>>                    if (err < 0)
->>>>>> @@ -3473,15 +3471,15 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
->>>>>>                                    bool refill)
->>>>>>     {
->>>>>>            bool running = netif_running(vi->dev);
->>>>>> -       bool schedule_refill = false;
->>>>>>
->>>>>> -       if (refill && !try_fill_recv(vi, rq, GFP_KERNEL))
->>>>>> -               schedule_refill = true;
->>>>>> +       if (refill)
->>>>>> +               /* If this fails, we will retry later in NAPI poll, which is
->>>>>> +                * scheduled in the below virtnet_napi_enable
->>>>>> +                */
->>>>>> +               try_fill_recv(vi, rq, GFP_KERNEL);
->>>>> and here.
->>>>>
->>>>>> +
->>>>>>            if (running)
->>>>>>                    virtnet_napi_enable(rq);
->>> here the part that isn't clear is why are we refilling if !running
->>> and what handles failures in that case.
->> You are right, we should not refill when !running. I'll move the if (refill)
->> inside the if (running).
-> Sounds like a helper that does refill+virtnet_napi_enable
-> would be in order then?  fill_recv_aggressively(vi, rq) ?
+Introduction
+============
 
-I think the helper can make the code a little more complicated. In 
-virtnet_open(), the RX NAPI is enabled in virtnet_enable_queue_pair() so 
-we need to add a flag like enable_rx. Then change the virtnet_open() to
+The QUIC protocol, defined in RFC 9000, is a secure, multiplexed transport
+built on top of UDP. It enables low-latency connection establishment,
+stream-based communication with flow control, and supports connection
+migration across network paths, while ensuring confidentiality, integrity,
+and availability.
 
-     for (i = 0; i < vi->max_queue_pairs; i++) {
-         if (i < vi->curr_queue_pairs) {
-             fill_recv_aggressively(vi, rq);
-             err = virtnet_enable_queue_pair(..., enable_rx = false);
-             if (err < 0)
-                 goto err_enable_qp;
-         } else {
-             err = virtnet_enable_queue_pair(..., enable_rx = true);
-             if (err < 0)
-                 goto err_enable_qp;
-         }
+This implementation introduces QUIC support in Linux Kernel, offering
+several key advantages:
 
-     }
+- In-Kernel QUIC Support for Subsystems: Enables kernel subsystems
+  such as SMB and NFS to operate over QUIC with minimal changes. Once the
+  handshake is complete via the net/handshake APIs, data exchange proceeds
+  over standard in-kernel transport interfaces.
 
->
->>>>>> -
->>>>>> -       if (schedule_refill)
->>>>>> -               schedule_delayed_work(&vi->refill, 0);
->>>>>>     }
->>>>>>
->>>>>>     static void virtnet_rx_resume_all(struct virtnet_info *vi)
->>>>>> @@ -3777,6 +3775,7 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
->>>>>>            struct virtio_net_rss_config_trailer old_rss_trailer;
->>>>>>            struct net_device *dev = vi->dev;
->>>>>>            struct scatterlist sg;
->>>>>> +       int i;
->>>>>>
->>>>>>            if (!vi->has_cvq || !virtio_has_feature(vi->vdev, VIRTIO_NET_F_MQ))
->>>>>>                    return 0;
->>>>>> @@ -3829,11 +3828,17 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
->>>>>>            }
->>>>>>     succ:
->>>>>>            vi->curr_queue_pairs = queue_pairs;
->>>>>> -       /* virtnet_open() will refill when device is going to up. */
->>>>>> -       spin_lock_bh(&vi->refill_lock);
->>>>>> -       if (dev->flags & IFF_UP && vi->refill_enabled)
->>>>>> -               schedule_delayed_work(&vi->refill, 0);
->>>>>> -       spin_unlock_bh(&vi->refill_lock);
->>>>>> +       if (dev->flags & IFF_UP) {
->>>>>> +               /* Let the NAPI poll refill the receive buffer for us. We can't
->>>>>> +                * safely call try_fill_recv() here because the NAPI might be
->>>>>> +                * enabled already.
->>>>>> +                */
->>>>>> +               local_bh_disable();
->>>>>> +               for (i = 0; i < vi->curr_queue_pairs; i++)
->>>>>> +                       virtqueue_napi_schedule(&vi->rq[i].napi, vi->rq[i].vq);
->>>>>> +
->>>>>> +               local_bh_enable();
->>>>>> +       }
->>>>>>
->>>>>>            return 0;
->>>>>>     }
->>>>>> --
->>>>>> 2.43.0
->>>>>>
->>>>> Thanks
->>>>>
->>>> Thanks,
->>>> Quang Minh.
+- Standard Socket API Semantics: Implements core socket operations
+  (listen(), accept(), connect(), sendmsg(), recvmsg(), close(),
+  getsockopt(), setsockopt(), getsockname(), and getpeername()),
+  allowing user space to interact with QUIC sockets in a familiar,
+  POSIX-compliant way.
+
+- ALPN-Based Connection Dispatching: Supports in-kernel ALPN
+  (Application-Layer Protocol Negotiation) routing, allowing demultiplexing
+  of QUIC connections across different user-space processes based
+  on the ALPN identifiers.
+
+- Performance Enhancements: Handles all control messages in-kernel
+  to reduce syscall overhead, incorporates zero-copy mechanisms such as
+  sendfile() minimize data movement, and is also structured to support
+  future crypto hardware offloads.
+
+This implementation offers fundamental support for the following RFCs:
+
+- RFC9000 - QUIC: A UDP-Based Multiplexed and Secure Transport
+- RFC9001 - Using TLS to Secure QUIC
+- RFC9002 - QUIC Loss Detection and Congestion Control
+- RFC9221 - An Unreliable Datagram Extension to QUIC
+- RFC9287 - Greasing the QUIC Bit
+- RFC9368 - Compatible Version Negotiation for QUIC
+- RFC9369 - QUIC Version 2
+
+The socket APIs for QUIC follow the RFC draft [1]:
+
+- The Sockets API Extensions for In-kernel QUIC Implementations
+
+Implementation
+==============
+
+The central design is to implement QUIC within the kernel while delegating
+the handshake to userspace.
+
+Only the processing and creation of raw TLS Handshake Messages are handled
+in userspace, facilitated by a TLS library like GnuTLS. These messages are
+exchanged between kernel and userspace via sendmsg() and recvmsg(), with
+cryptographic details conveyed through control messages (cmsg).
+
+The entire QUIC protocol, aside from the TLS Handshake Messages processing
+and creation, is managed within the kernel. Rather than using a Upper Layer
+Protocol (ULP) layer, this implementation establishes a socket of type
+IPPROTO_QUIC (similar to IPPROTO_MPTCP), operating over UDP tunnels.
+
+For kernel consumers, they can initiate a handshake request from the kernel
+to userspace using the existing net/handshake netlink. The userspace
+component, such as tlshd service [2], then manages the processing
+of the QUIC handshake request.
+
+- Handshake Architecture:
+
+  ┌──────┐  ┌──────┐
+  │ APP1 │  │ APP2 │ ...
+  └──────┘  └──────┘
+  ┌──────────────────────────────────────────┐
+  │     {quic_client/server_handshake()}     │<─────────────┐
+  └──────────────────────────────────────────┘       ┌─────────────┐
+   {send/recvmsg()}      {set/getsockopt()}          │    tlshd    │
+   [CMSG handshake_info] [SOCKOPT_CRYPTO_SECRET]     └─────────────┘
+                         [SOCKOPT_TRANSPORT_PARAM_EXT]    │   ^
+                │ ^                  │ ^                  │   │
+  Userspace     │ │                  │ │                  │   │
+  ──────────────│─│──────────────────│─│──────────────────│───│───────
+  Kernel        │ │                  │ │                  │   │
+                v │                  v │                  v   │
+  ┌──────────────────┬───────────────────────┐       ┌─────────────┐
+  │ protocol, timer, │ socket (IPPROTO_QUIC) │<──┐   │ handshake   │
+  │                  ├───────────────────────┤   │   │netlink APIs │
+  │ common, family,  │ outqueue  |  inqueue  │   │   └─────────────┘
+  │                  ├───────────────────────┤   │      │       │
+  │ stream, connid,  │         frame         │   │   ┌─────┐ ┌─────┐
+  │                  ├───────────────────────┤   │   │     │ │     │
+  │ path, pnspace,   │         packet        │   │───│ SMB │ │ NFS │...
+  │                  ├───────────────────────┤   │   │     │ │     │
+  │ cong, crypto     │       UDP tunnels     │   │   └─────┘ └─────┘
+  └──────────────────┴───────────────────────┘   └──────┴───────┘
+
+- User Data Architecture:
+
+  ┌──────┐  ┌──────┐
+  │ APP1 │  │ APP2 │ ...
+  └──────┘  └──────┘
+   {send/recvmsg()}   {set/getsockopt()}              {recvmsg()}
+   [CMSG stream_info] [SOCKOPT_KEY_UPDATE]            [EVENT conn update]
+                      [SOCKOPT_CONNECTION_MIGRATION]  [EVENT stream update]
+                      [SOCKOPT_STREAM_OPEN/RESET/STOP]
+                │ ^               │ ^                     ^
+  Userspace     │ │               │ │                     │
+  ──────────────│─│───────────────│─│─────────────────────│───────────
+  Kernel        │ │               │ │                     │
+                v │               v │  ┌──────────────────┘
+  ┌──────────────────┬───────────────────────┐
+  │ protocol, timer, │ socket (IPPROTO_QUIC) │<──┐{kernel_send/recvmsg()}
+  │                  ├───────────────────────┤   │{kernel_set/getsockopt()}
+  │ common, family,  │ outqueue  |  inqueue  │   │{kernel_recvmsg()}
+  │                  ├───────────────────────┤   │
+  │ stream, connid,  │         frame         │   │   ┌─────┐ ┌─────┐
+  │                  ├───────────────────────┤   │   │     │ │     │
+  │ path, pnspace,   │         packet        │   │───│ SMB │ │ NFS │...
+  │                  ├───────────────────────┤   │   │     │ │     │
+  │ cong, crypto     │       UDP tunnels     │   │   └─────┘ └─────┘
+  └──────────────────┴───────────────────────┘   └──────┴───────┘
+
+Interface
+=========
+
+This implementation supports a mapping of QUIC into sockets APIs. Similar
+to TCP and SCTP, a typical Server and Client use the following system call
+sequence to communicate:
+
+    Client                             Server
+  ──────────────────────────────────────────────────────────────────────
+  sockfd = socket(IPPROTO_QUIC)      listenfd = socket(IPPROTO_QUIC)
+  bind(sockfd)                       bind(listenfd)
+                                     listen(listenfd)
+  connect(sockfd)
+  quic_client_handshake(sockfd)
+                                     sockfd = accept(listenfd)
+                                     quic_server_handshake(sockfd, cert)
+
+  sendmsg(sockfd)                    recvmsg(sockfd)
+  close(sockfd)                      close(sockfd)
+                                     close(listenfd)
+
+Please note that quic_client_handshake() and quic_server_handshake()
+functions are currently sourced from libquic [3]. These functions are
+responsible for receiving and processing the raw TLS handshake messages
+until the completion of the handshake process.
+
+For utilization by kernel consumers, it is essential to have tlshd
+service [2] installed and running in userspace. This service receives
+and manages kernel handshake requests for kernel sockets. In the kernel,
+the APIs closely resemble those used in userspace:
+
+    Client                             Server
+  ────────────────────────────────────────────────────────────────────────
+  __sock_create(IPPROTO_QUIC, &sock)  __sock_create(IPPROTO_QUIC, &sock)
+  kernel_bind(sock)                   kernel_bind(sock)
+                                      kernel_listen(sock)
+  kernel_connect(sock)
+  tls_client_hello_x509(args:{sock})
+                                      kernel_accept(sock, &newsock)
+                                      tls_server_hello_x509(args:{newsock})
+
+  kernel_sendmsg(sock)                kernel_recvmsg(newsock)
+  sock_release(sock)                  sock_release(newsock)
+                                      sock_release(sock)
+
+Please be aware that tls_client_hello_x509() and tls_server_hello_x509()
+are APIs from net/handshake/. They are used to dispatch the handshake
+request to the userspace tlshd service and subsequently block until the
+handshake process is completed.
+
+Use Cases
+=========
+
+- Samba
+
+  Stefan Metzmacher has integrated Linux QUIC into Samba for both client
+  and server roles [4].
+
+- tlshd
+
+  The tlshd daemon [2] facilitates Linux QUIC handshake requests from
+  kernel sockets. This is essential for enabling protocols like SMB
+  and NFS over QUIC.
+
+- curl
+
+  Linux QUIC is being integrated into curl [5] for HTTP/3. Example usage:
+
+  # curl --http3-only https://nghttp2.org:4433/
+  # curl --http3-only https://www.google.com/
+  # curl --http3-only https://facebook.com/
+  # curl --http3-only https://outlook.office.com/
+  # curl --http3-only https://cloudflare-quic.com/
+
+- httpd-portable
+
+  Moritz Buhl has deployed an HTTP/3 server over Linux QUIC [6] that is
+  accessible via Firefox and curl:
+
+  https://d.moritzbuhl.de/pub
+
+- NetPerfMeter
+
+  The latest NetPerfMeter release supports Linux QUIC and can be used to
+  run performance evaluations [10].
+
+Test Coverage
+=============
+
+The Coverage (gcov) of Functional and Interop Tests:
+
+https://d.moritzbuhl.de/lcov
+
+- Functional Tests
+
+  The libquic self-tests (make check) pass on all major architectures:
+  x86_64, i386, s390x, aarch64, ppc64le.
+
+- Interop tests
+
+  Interoperability was validated using the QUIC Interop Runner [7] against
+  all major userland QUIC stacks. Results are available at:
+
+  https://d.moritzbuhl.de/
+
+- Fuzzing via Syzkaller
+
+  Syzkaller has been running kernel fuzzing with QUIC for weeks using
+  tests/syzkaller/ in libquic [3]..
+
+- Performance Testing
+
+  Performance was benchmarked using iperf [8] over a 100G NIC with
+  using various MTUs and packet sizes:
+
+  - QUIC vs. kTLS:
+
+    UNIT        size:1024      size:4096      size:16384     size:65536
+    Gbits/sec   QUIC | kTLS    QUIC | kTLS    QUIC | kTLS    QUIC | kTLS
+    ────────────────────────────────────────────────────────────────────
+    mtu:1500    2.27 | 3.26    3.02 | 6.97    3.36 | 9.74    3.48 | 10.8
+    ────────────────────────────────────────────────────────────────────
+    mtu:9000    3.66 | 3.72    5.87 | 8.92    7.03 | 11.2    8.04 | 11.4
+
+  - QUIC(disable_1rtt_encryption) vs. TCP:
+
+    UNIT        size:1024      size:4096      size:16384     size:65536
+    Gbits/sec   QUIC | TCP     QUIC | TCP     QUIC | TCP     QUIC | TCP
+    ────────────────────────────────────────────────────────────────────
+    mtu:1500    3.09 | 4.59    4.46 | 14.2    5.07 | 21.3    5.18 | 23.9
+    ────────────────────────────────────────────────────────────────────
+    mtu:9000    4.60 | 4.65    8.41 | 14.0    11.3 | 28.9    13.5 | 39.2
+
+
+  The performance gap between QUIC and kTLS may be attributed to:
+
+  - The absence of Generic Segmentation Offload (GSO) for QUIC.
+  - An additional data copy on the transmission (TX) path.
+  - Extra encryption required for header protection in QUIC.
+  - A longer header length for the stream data in QUIC.
+
+Patches
+=======
+
+Note: This implementation is organized into five parts and submitted across
+two patchsets for review. This patchset includes Parts 1–2, while Parts 3–5
+will be submitted in a subsequent patchset. For complete series, see [9].
+
+1. Infrastructure (2):
+
+  net: define IPPROTO_QUIC and SOL_QUIC constants
+  net: build socket infrastructure for QUIC protocol
+
+2. Subcomponents (14):
+
+  quic: provide common utilities and data structures
+  quic: provide family ops for address and protocol
+  quic: provide quic.h header files for kernel and userspace
+  quic: add stream management
+  quic: add connection id management
+  quic: add path management
+  quic: add congestion control
+  quic: add packet number space
+  quic: add crypto key derivation and installation
+  quic: add crypto packet encryption and decryption
+  quic: add timer management
+  quic: add frame encoder and decoder base
+  quic: add packet builder base
+  quic: add packet parser base
+
+3. Data Processing (7):
+
+  quic: implement outqueue transmission and flow control
+  quic: implement outqueue sack and retransmission
+  quic: implement inqueue receiving and flow control
+  quic: implement frame creation functions
+  quic: implement frame processing functions
+  quic: implement packet creation functions
+  quic: implement packet processing functions
+
+4. Socket APIs (6):
+
+  quic: support bind/listen/connect/accept/close()
+  quic: support sendmsg() and recvmsg()
+  quic: support socket options related to interaction after handshake
+  quic: support socket options related to settings prior to handshake
+  quic: support socket options related to setup during handshake
+  quic: support socket ioctls and socket dump via procfs
+
+5. Documentation and Selftests (3):
+
+  quic: create sample test using handshake APIs for kernel consumers
+  Documentation: describe QUIC protocol interface in quic.rst
+  selftests: net: add tests for QUIC protocol
+
+Notice: The QUIC module is currently labeled as "EXPERIMENTAL".
+
+All contributors are recognized in the respective patches with the tag of
+'Signed-off-by:'. Special thanks to Moritz Buhl and Stefan Metzmacher whose
+practical use cases and insightful feedback, which have been instrumental
+in shaping the design and advancing the development.
+
+References
+==========
+
+[1]  https://datatracker.ietf.org/doc/html/draft-lxin-quic-socket-apis
+[2]  https://github.com/oracle/ktls-utils
+[3]  https://github.com/lxin/quic
+[4]  https://gitlab.com/samba-team/samba/-/merge_requests/4019
+[5]  https://github.com/moritzbuhl/curl/tree/linux_curl
+[6]  https://github.com/moritzbuhl/httpd-portable
+[7]  https://github.com/quic-interop/quic-interop-runner
+[8]  https://github.com/lxin/iperf
+[9]  https://github.com/lxin/net-next/commits/quic/
+[10] https://www.nntb.no/~dreibh/netperfmeter/
+
+Changes in v2-v6: See individual patch changelogs for details.
+
+Xin Long (16):
+  net: define IPPROTO_QUIC and SOL_QUIC constants
+  net: build socket infrastructure for QUIC protocol
+  quic: provide common utilities and data structures
+  quic: provide family ops for address and protocol
+  quic: provide quic.h header files for kernel and userspace
+  quic: add stream management
+  quic: add connection id management
+  quic: add path management
+  quic: add congestion control
+  quic: add packet number space
+  quic: add crypto key derivation and installation
+  quic: add crypto packet encryption and decryption
+  quic: add timer management
+  quic: add frame encoder and decoder base
+  quic: add packet builder base
+  quic: add packet parser base
+
+ Documentation/networking/ip-sysctl.rst |   52 +
+ MAINTAINERS                            |    9 +
+ include/linux/quic.h                   |   19 +
+ include/linux/socket.h                 |    1 +
+ include/uapi/linux/in.h                |    2 +
+ include/uapi/linux/quic.h              |  235 +++++
+ net/Kconfig                            |    1 +
+ net/Makefile                           |    1 +
+ net/quic/Kconfig                       |   36 +
+ net/quic/Makefile                      |    9 +
+ net/quic/common.c                      |  581 +++++++++++
+ net/quic/common.h                      |  204 ++++
+ net/quic/cong.c                        |  307 ++++++
+ net/quic/cong.h                        |  120 +++
+ net/quic/connid.c                      |  222 +++++
+ net/quic/connid.h                      |  162 ++++
+ net/quic/crypto.c                      | 1222 ++++++++++++++++++++++++
+ net/quic/crypto.h                      |   83 ++
+ net/quic/family.c                      |  372 ++++++++
+ net/quic/family.h                      |   33 +
+ net/quic/frame.c                       |  561 +++++++++++
+ net/quic/frame.h                       |  195 ++++
+ net/quic/packet.c                      |  953 ++++++++++++++++++
+ net/quic/packet.h                      |  130 +++
+ net/quic/path.c                        |  532 +++++++++++
+ net/quic/path.h                        |  172 ++++
+ net/quic/pnspace.c                     |  225 +++++
+ net/quic/pnspace.h                     |  150 +++
+ net/quic/protocol.c                    |  421 ++++++++
+ net/quic/protocol.h                    |   62 ++
+ net/quic/socket.c                      |  446 +++++++++
+ net/quic/socket.h                      |  214 +++++
+ net/quic/stream.c                      |  415 ++++++++
+ net/quic/stream.h                      |  123 +++
+ net/quic/timer.c                       |  196 ++++
+ net/quic/timer.h                       |   47 +
+ 36 files changed, 8513 insertions(+)
+ create mode 100644 include/linux/quic.h
+ create mode 100644 include/uapi/linux/quic.h
+ create mode 100644 net/quic/Kconfig
+ create mode 100644 net/quic/Makefile
+ create mode 100644 net/quic/common.c
+ create mode 100644 net/quic/common.h
+ create mode 100644 net/quic/cong.c
+ create mode 100644 net/quic/cong.h
+ create mode 100644 net/quic/connid.c
+ create mode 100644 net/quic/connid.h
+ create mode 100644 net/quic/crypto.c
+ create mode 100644 net/quic/crypto.h
+ create mode 100644 net/quic/family.c
+ create mode 100644 net/quic/family.h
+ create mode 100644 net/quic/frame.c
+ create mode 100644 net/quic/frame.h
+ create mode 100644 net/quic/packet.c
+ create mode 100644 net/quic/packet.h
+ create mode 100644 net/quic/path.c
+ create mode 100644 net/quic/path.h
+ create mode 100644 net/quic/pnspace.c
+ create mode 100644 net/quic/pnspace.h
+ create mode 100644 net/quic/protocol.c
+ create mode 100644 net/quic/protocol.h
+ create mode 100644 net/quic/socket.c
+ create mode 100644 net/quic/socket.h
+ create mode 100644 net/quic/stream.c
+ create mode 100644 net/quic/stream.h
+ create mode 100644 net/quic/timer.c
+ create mode 100644 net/quic/timer.h
+
+-- 
+2.47.1
 
 
