@@ -1,263 +1,183 @@
-Return-Path: <netdev+bounces-246913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3BB5CF2615
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 09:24:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A3FFCF2633
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 09:26:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 062AB30281B2
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 08:22:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D058D3051E9B
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 08:23:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D687313520;
-	Mon,  5 Jan 2026 08:22:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5615931352C;
+	Mon,  5 Jan 2026 08:23:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="wH4A9r1L"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OVpQPRID";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="aFnAwaAK"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-57-64.mail.qq.com (out162-62-57-64.mail.qq.com [162.62.57.64])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C8A22E3E9;
-	Mon,  5 Jan 2026 08:22:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752B43128D4
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 08:22:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767601333; cv=none; b=NC57RQ9auSlo4uiCnExxtV4M+gJoMmK5A+Tlr6WH3WbdYqILFmq2NgnRoNpiICfXp5IyQzDqcAyHfLDYTkMx9h0cKqrsN8JAaXCuS2pHF9X3FXYI/L5D0L3s9bzbI/yh6cG/+y6muDC4IM2YxkU37KTghK2g3VGO1G7pkDWEjkk=
+	t=1767601380; cv=none; b=B+XFRMAUWSYKncr9XlujyPczdKEwDam5ah1MnJKZ/51PyBa+qGS2J1LvIrLGV5lC0OI8KPjsMeQVmsD1f8fCLkzEalgzA6mae/TrUGn1o7Fu1kyL3myBXqpGblO4Q+lEZnn3yiJelu7Dz44u56lI4nXzq/Y3aVcs+HdVpdvf+pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767601333; c=relaxed/simple;
-	bh=bD55ltRsoH3ubLcAULmhBIrUO9GkpLMOMpLQ/Cau4m8=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=LNz6g0V8jrK0i2IBh+UcI17v28wdMXavB2HT6D+yzf5hfv7m6YnLjKWTD6Xt8jijtVm0AEvvJlstWaoHRCQoYzemodE1fZNQqqY+IcPOEfuyWQ7kJQ+Mg+M04QXJHo5Zt/vz41tK6qE/poAVWKLB7zzh3mxs/q4QXr9IiB9NjrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=wH4A9r1L; arc=none smtp.client-ip=162.62.57.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1767601319; bh=lXZuyiPqxgHVa4OJsj5vnpr+LBGAt5DcCj3yHiyEQoQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=wH4A9r1LK+aYSGQfyZwHi6+q3URFe8D5ty94H74eE4sM720xH4I33z8ajNaEQStc3
-	 5roHpeduXj2eaXUcJKFj/QDxH5CHMg8Yi4XeRQt5ybFY7njtpiY9zTrton+CXFF3qn
-	 fWfdp/qB8TccWzrS8vOPRaIvfheVCUa73fEIe0M8=
-Received: from localhost.localdomain ([61.144.111.35])
-	by newxmesmtplogicsvrszc50-0.qq.com (NewEsmtp) with SMTP
-	id 57925034; Mon, 05 Jan 2026 16:21:57 +0800
-X-QQ-mid: xmsmtpt1767601317te9acxqp2
-Message-ID: <tencent_6FE67BA7BE8376AB038A71ACAD4FF8A90006@qq.com>
-X-QQ-XMAILINFO: OIPiZ4jSkGWAR3rmek1NQfj50RkwmECUekHdPWHPKk507wzbluK5Co6bHHMYFY
-	 kERosLo8Gtgz61l8Nm/FJlDsX4HS9R5lVhSFVsZgqv1+qDjTgNoHNSpy5lFm4ym8FnR7UbrfFrlz
-	 39QSHF+VAvq+u2Sdfl5se80xQ+cDT5ybweyjV6VTGxcSnUnKfSWzMyOlb102mtY55sXdBr8Zn/UJ
-	 eLhT+toHXZbajg1LwBiJQvwvAxZdYz3eWAz7yQfwe1sQP86l3UPUGH3eExgB0DsxCD3vil602cR1
-	 k4d5EfHpImtZH+xRVmqKf4h/ejh1RduchTBk42PqGAcs6XEAMSFyf6yAIfrwSYIE2lwF++a+RTTJ
-	 f0W3m/rT+9VBt8IYizDsTZ9TK03URJm1ZWGeBYuCOIhatqB9S9M7YSzL4sLBvBd6ID3idI5pd9Y1
-	 VnHGtOP2Ww8EcFobcIrhxtxDTopwc7JEiirvUlQFFAPdH1Vmu441m9EU+bx+NiXA9uZn4H7QBoKp
-	 +Tl+phISV2FpjFVVOPabDlvBW+FKwuMYHg7Q5hLkHYP2RM1EoPRfYZWGsFSsK7Erl89DjySQZZVz
-	 xxV3xCP6O9H07rYVNdPAZcVV6n8Cg0uzIb8K64td2NDat87POq5rVfyuSXCceuB0vL1xt2hB+XVz
-	 KARwbwFIc7GaAIfD9p9zAbZfM6uXxjzCJVHyAuWVUXwz/WL1cEQ459jz2cNmpj/1PoKrewF5eA/6
-	 b5S7isLxKVH1VhO6YdeHQm2aPhpcfMywz5rouaH4UA8hIyurkw8Xo1r6pLzTdL82amK/DN16mYKj
-	 Ulo0iaBKdpfHQ30GoTbS1XtcoERBWn4VvO8q7zfzLsMu0xK0HY/PRPs5D9epA38BjNW7FaU5RIcs
-	 4zSdlKU9bGRKGYRQJrkEKu8dfxkCM59/8IYX+kUNEDYGEXU0r2WS7agvkqh4c5bPDVq6i/MRneb+
-	 DeZIJgn2dD+49kRiz/5KXbsKSxleHl79y8laLiehDBYpPkJ8Jjf1uDM6xfh6LUwW8uZSOCpBrYbX
-	 HVD78NQXvBcXGCFTuwh1Pwbi2K541ewM3MrvemRDP7/Ty7zVRy3f5pyjFj80pyxfDFRj8qi7/URb
-	 +AY4g44kLES8P/+l8=
-X-QQ-XMRINFO: NI4Ajvh11aEjEMj13RCX7UuhPEoou2bs1g==
-From: wujing <realwujing@qq.com>
-To: Andrew Morton <akpm@linux-foundation.org>,
-	Vlastimil Babka <vbabka@suse.cz>
-Cc: Matthew Wilcox <willy@infradead.org>,
-	Lance Yang <lance.yang@linux.dev>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Brendan Jackman <jackmanb@google.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Zi Yan <ziy@nvidia.com>,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Qiliang Yuan <yuanql9@chinatelecom.cn>,
-	wujing <realwujing@qq.com>
-Subject: [PATCH v2 1/1] mm/page_alloc: auto-tune min_free_kbytes on atomic allocation failure
-Date: Mon,  5 Jan 2026 16:21:52 +0800
-X-OQ-MSGID: <20260105082152.1309853-1-realwujing@qq.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20260105081720.1308764-1-realwujing@qq.com>
-References: <20260105081720.1308764-1-realwujing@qq.com>
+	s=arc-20240116; t=1767601380; c=relaxed/simple;
+	bh=1rF+5o+RxfvaZWaK/37ivP7Ic43xgdCjtd7a083Lyfc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Nas3WRBmyvApbTyNTfcvqwNcjj/s/jNgDQg2Er2IfS4IADgT09IhIBpECK7L2/GUX6mycGZljF77iNwpZ+UMorNnAKE5cA81PQJJEH9ianWB0BoglWHkb8A9dW2BgoVwfqdwh0yCroEdG9Qhis3o3ei87X9SWouXR8GlHwpNdEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OVpQPRID; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=aFnAwaAK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767601377;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=++MSvPbbaixtOH+VkhbpdT2tKuVIlO7zEYO24bBcB2o=;
+	b=OVpQPRIDj5fXqBg9A/hP4xVzLw8MYfD0RyVh4Bk3mpjidMcWQVlxb6UWCkDP88f6dbWF3F
+	SvhRQ9LrJEXf8a4sePL5O5s/gicfHgSC7GHHwSCZoSo54sbVX2pEdbD1EQjHEf1CDNwLaQ
+	fzhYe/ROFifr2sDRbPyDY0j+oMXFN/U=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-689-HZx_wo2TOMOxr-WWjPFbiw-1; Mon, 05 Jan 2026 03:22:55 -0500
+X-MC-Unique: HZx_wo2TOMOxr-WWjPFbiw-1
+X-Mimecast-MFC-AGG-ID: HZx_wo2TOMOxr-WWjPFbiw_1767601375
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4776079ada3so122516975e9.1
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 00:22:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1767601374; x=1768206174; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=++MSvPbbaixtOH+VkhbpdT2tKuVIlO7zEYO24bBcB2o=;
+        b=aFnAwaAKLu7zAhMf+1ZJkNmIT145xhfGYevQ+uwx4Dua/sOWHk6GFH5sAFW7CCCMFZ
+         0cya9z65tmnNTyvX8ggutiwfatl5uHID38vuE/UmtJgcJ4jlVipRomZHHhHg4cIFInDR
+         6fxzl+4UMlWcfjaV+B80TtPV4bNU/SlsWfmvdpHWeonjuIye9gFLQHa5ezv0cGiFYn1M
+         uPIv55VhcCeX+mAns+hZrOKdH37ATwCzhEooCCd6oH/t8AoUlfs90mZBEvbeNgJbXLLq
+         GSSl7PCZXbESwGZq0n141aAGd5Eg/NVjFtyyDdOp5ijpOTk8+jF8eE6VPD6Wf6vrFLzF
+         aNPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767601374; x=1768206174;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=++MSvPbbaixtOH+VkhbpdT2tKuVIlO7zEYO24bBcB2o=;
+        b=dTqL2tdHBqm4TjH79CVdPqmsDOQwhhaxwD9IcIVYipKCJNk4qd0XyI7Mn76WiizPdC
+         9ppcZ1iAjr2sK0k8wbbEb0nPcGfVcVl9OnOSQstwJpAa59Ikbp0sz9EC4WOmO0Hm6nBJ
+         e9IvXCjuyPE89GTK1VpsARsgI2cAG7oqN3+6KRJvn8RXhOOScMTERMwo/6cQm2ZiKBJL
+         UWp2+oWfKA8yRVy76SilUQHFCClzV3bhXzrDBGDvV6zGSklUeGjKX+TBurqrzW4zzodw
+         4lqWjZhSjuQS0TZ0oz0Be+homz7WCU8fz5rZRj/XzIr+izdlOIrGEeLBFYyKlORq7cUW
+         6l3w==
+X-Forwarded-Encrypted: i=1; AJvYcCWJmmcfk7FLm+yPchkpAE5yI9uRPRtgDryN1AgmTRqeHb2jTGoGJsScr2kOKZB5hDDSYOWfzec=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0m2U8r/EKz2/FH4MlKBAnC6h+S/pudZZYb5XEDLNG09V1uyMP
+	tfeNCZrHN9uyrYT174TPCvdu2+9ylA6wCFaenB+P/xX3jiqc4/I5wz1njfG5FnSRyoOfPwZxch0
+	XCKyJlbK4y+4QUufy4nCzQ1qBedN16uSJ/8jevUd5my/TZApHPFay7a3cfA==
+X-Gm-Gg: AY/fxX75xvtyuMDhSSLJLxCxF9UuoTBeKHo/x9Fr/63f4BAZaAkIf9JEhDX8igEFJbX
+	SrG+8yLoP6CsGxS9UJx0Tl7maAZUtSgm/0RITHsaGWmVBelksnWNuuoQHxY9Bj/+9bdfnYMDha5
+	6CyrIKCmXybHcPkOBf6XTsh14MqdJ35+ZKfC3040UwaA9AqfypjLemBhvL4EC2Lt4GH9TVkipFi
+	bn42S2D3yY7vzFPEnHVD1XnGCvMrrsKUNml2koZW99G+iNWkpEy+ZQHpGEuHDSLiYM0b7xCNCYC
+	UekFKMjQIH8WE5DKf1KvISZbAJu/Im80B4SHd9vHvdVvoJ8LFff2FJgMzxDpFmhcNsYXe8yuN90
+	VZy9RFc+MaKFL6FIqciyWNIPp+J4bobyl4A==
+X-Received: by 2002:a05:600c:4ed2:b0:475:e067:f23d with SMTP id 5b1f17b1804b1-47d1959eaaemr640737375e9.25.1767601374445;
+        Mon, 05 Jan 2026 00:22:54 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEXw2Pw2EoWGIJB0fy/EdgimCoNIlh1q5tf6OTMnGxG74FiSYxf17YyIIU15mHj+ck3a5eDtg==
+X-Received: by 2002:a05:600c:4ed2:b0:475:e067:f23d with SMTP id 5b1f17b1804b1-47d1959eaaemr640737005e9.25.1767601373905;
+        Mon, 05 Jan 2026 00:22:53 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d6ba30531sm56554215e9.1.2026.01.05.00.22.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 00:22:53 -0800 (PST)
+Date: Mon, 5 Jan 2026 03:22:50 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jason Wang <jasowang@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Petr Tesarik <ptesarik@suse.com>,
+	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Bartosz Golaszewski <brgl@kernel.org>, linux-doc@vger.kernel.org,
+	linux-crypto@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-scsi@vger.kernel.org, iommu@lists.linux.dev,
+	kvm@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH v2 00/15] fix DMA aligment issues around virtio
+Message-ID: <cover.1767601130.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 
-Introduce a mechanism to dynamically increase vm.min_free_kbytes when
-critical atomic allocations (GFP_ATOMIC, order-0) fail. This prevents
-recurring network packet drops or other atomic failures by proactively
-reserving more memory.
 
-The system increases min_free_kbytes by 50% upon failure, capped at 1%
-of total RAM. To prevent repeated adjustments during burst traffic, a
-10-second debounce window is enforced.
+Cong Wang reported dma debug warnings with virtio-vsock
+and proposed a patch, see:
 
-After traffic subsides, min_free_kbytes automatically decays by 5% every
-5 minutes. However, decay stops at 1.2x the initial value rather than
-returning to baseline. This ensures the system "remembers" previous
-pressure patterns and avoids repeated failures under similar load.
+https://lore.kernel.org/all/20251228015451.1253271-1-xiyou.wangcong@gmail.com/
 
-Observed failure logs:
-[38535641.026406] node 0: slabs: 941, objs: 54656, free: 0
-[38535641.037711] node 1: slabs: 349, objs: 22096, free: 272
-[38535641.049025] node 1: slabs: 349, objs: 22096, free: 272
-[38535642.795972] SLUB: Unable to allocate memory on node -1, gfp=0x480020(GFP_ATOMIC)
-[38535642.805017] cache: skbuff_head_cache, object size: 232, buffer size: 256, default order: 2, min order: 0
-[38535642.816311] node 0: slabs: 854, objs: 42320, free: 0
-[38535642.823066] node 1: slabs: 400, objs: 25360, free: 294
-[38535643.070199] SLUB: Unable to allocate memory on node -1, gfp=0x480020(GFP_ATOMIC)
-[38535643.078861] cache: skbuff_head_cache, object size: 232, buffer size: 256, default order: 2, min order: 0
-[38535643.089719] node 0: slabs: 841, objs: 41824, free: 0
-[38535643.096513] node 1: slabs: 393, objs: 24480, free: 272
-[38535643.484149] SLUB: Unable to allocate memory on node -1, gfp=0x480020(GFP_ATOMIC)
-[38535643.492831] cache: skbuff_head_cache, object size: 232, buffer size: 256, default order: 2, min order: 0
-[38535643.503666] node 0: slabs: 898, objs: 43120, free: 159
-[38535643.510140] node 1: slabs: 404, objs: 25424, free: 319
-[38535644.699224] SLUB: Unable to allocate memory on node -1, gfp=0x480020(GFP_ATOMIC)
-[38535644.707911] cache: skbuff_head_cache, object size: 232, buffer size: 256, default order: 2, min order: 0
-[38535644.718700] node 0: slabs: 1031, objs: 43328, free: 0
-[38535644.725059] node 1: slabs: 339, objs: 17616, free: 317
-[38535645.428345] SLUB: Unable to allocate memory on node -1, gfp=0x480020(GFP_ATOMIC)
-[38535645.436888] cache: skbuff_head_cache, object size: 232, buffer size: 256, default order: 2, min order: 0
-[38535645.447664] node 0: slabs: 940, objs: 40864, free: 144
-[38535645.454026] node 1: slabs: 322, objs: 19168, free: 383
-[38535645.556122] SLUB: Unable to allocate memory on node -1, gfp=0x480020(GFP_ATOMIC)
-[38535645.564576] cache: skbuff_head_cache, object size: 232, buffer size: 256, default order: 2, min order: 0
-[38535649.655523] warn_alloc: 59 callbacks suppressed
-[38535649.655527] swapper/100: page allocation failure: order:0, mode:0x480020(GFP_ATOMIC), nodemask=(null)
-[38535649.671692] swapper/100 cpuset=/ mems_allowed=0-1
+however, the issue is more widespread.
+This is an attempt to fix it systematically.
+Note: i2c and gio might also be affected, I am still looking
+into it. Help from maintainers welcome.
 
-Signed-off-by: wujing <realwujing@qq.com>
-Signed-off-by: Qiliang Yuan <yuanql9@chinatelecom.cn>
----
- mm/page_alloc.c | 85 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 85 insertions(+)
+Lightly tested.  Cursor/claude used liberally, mostly for
+refactoring/API updates/English.
 
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index c380f063e8b7..2f12d7a9ecbc 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -30,6 +30,7 @@
- #include <linux/oom.h>
- #include <linux/topology.h>
- #include <linux/sysctl.h>
-+#include <linux/workqueue.h>
- #include <linux/cpu.h>
- #include <linux/cpuset.h>
- #include <linux/pagevec.h>
-@@ -3975,6 +3976,16 @@ static void warn_alloc_show_mem(gfp_t gfp_mask, nodemask_t *nodemask)
- 	mem_cgroup_show_protected_memory(NULL);
- }
- 
-+/* Auto-tuning min_free_kbytes on atomic allocation failures (v2) */
-+static void decay_min_free_kbytes_workfn(struct work_struct *work);
-+static void boost_min_free_kbytes_workfn(struct work_struct *work);
-+static DECLARE_WORK(boost_min_free_kbytes_work, boost_min_free_kbytes_workfn);
-+static DECLARE_DELAYED_WORK(decay_min_free_kbytes_work, decay_min_free_kbytes_workfn);
-+static unsigned long last_boost_jiffies = 0;
-+static int initial_min_free_kbytes = 0;
-+#define BOOST_DEBOUNCE_MS 10000  /* 10 seconds debounce */
-+
-+
- void warn_alloc(gfp_t gfp_mask, nodemask_t *nodemask, const char *fmt, ...)
- {
- 	struct va_format vaf;
-@@ -4947,6 +4958,17 @@ __alloc_pages_slowpath(gfp_t gfp_mask, unsigned int order,
- 		goto retry;
- 	}
- fail:
-+	/* Auto-tuning: trigger boost if atomic allocation fails */
-+	if ((gfp_mask & GFP_ATOMIC) && order == 0) {
-+		unsigned long now = jiffies;
-+		
-+		/* Debounce: only boost once every 10 seconds */
-+		if (time_after(now, last_boost_jiffies + msecs_to_jiffies(BOOST_DEBOUNCE_MS))) {
-+			last_boost_jiffies = now;
-+			schedule_work(&boost_min_free_kbytes_work);
-+		}
-+	}
-+
- 	warn_alloc(gfp_mask, ac->nodemask,
- 			"page allocation failure: order:%u", order);
- got_pg:
-@@ -6526,6 +6548,10 @@ int __meminit init_per_zone_wmark_min(void)
- 	refresh_zone_stat_thresholds();
- 	setup_per_zone_lowmem_reserve();
- 
-+	/* Save initial value for auto-tuning decay mechanism */
-+	if (initial_min_free_kbytes == 0)
-+		initial_min_free_kbytes = min_free_kbytes;
-+
- #ifdef CONFIG_NUMA
- 	setup_min_unmapped_ratio();
- 	setup_min_slab_ratio();
-@@ -7682,3 +7708,62 @@ struct page *alloc_pages_nolock_noprof(gfp_t gfp_flags, int nid, unsigned int or
- 	return page;
- }
- EXPORT_SYMBOL_GPL(alloc_pages_nolock_noprof);
-+
-+static void boost_min_free_kbytes_workfn(struct work_struct *work)
-+{
-+	int new_min;
-+
-+	/* Cap at 1% of total RAM for safety */
-+	unsigned long total_kbytes = totalram_pages() << (PAGE_SHIFT - 10);
-+	int max_limit = total_kbytes / 100;
-+
-+	/* Responsive increase: 50% instead of doubling */
-+	new_min = min_free_kbytes + (min_free_kbytes / 2);
-+
-+	if (new_min > max_limit)
-+		new_min = max_limit;
-+
-+	if (new_min > min_free_kbytes) {
-+		min_free_kbytes = new_min;
-+		/* Update user_min_free_kbytes so it persists through recalculations */
-+		if (new_min > user_min_free_kbytes)
-+			user_min_free_kbytes = new_min;
-+		
-+		setup_per_zone_wmarks();
-+		
-+		/* Schedule decay after 5 minutes */
-+		schedule_delayed_work(&decay_min_free_kbytes_work, 
-+				      msecs_to_jiffies(300000));
-+		
-+		pr_info("Auto-tuning: atomic failure, increasing min_free_kbytes to %d\n", 
-+			min_free_kbytes);
-+	}
-+}
-+
-+static void decay_min_free_kbytes_workfn(struct work_struct *work)
-+{
-+	int new_min;
-+	int decay_floor;
-+	
-+	/* Decay by 5% */
-+	new_min = min_free_kbytes - (min_free_kbytes / 20);
-+	
-+	/* Don't go below 1.2x initial value (preserve learning effect) */
-+	decay_floor = initial_min_free_kbytes + (initial_min_free_kbytes / 5);
-+	if (new_min < decay_floor)
-+		new_min = decay_floor;
-+	
-+	if (new_min < min_free_kbytes) {
-+		min_free_kbytes = new_min;
-+		user_min_free_kbytes = new_min;
-+		setup_per_zone_wmarks();
-+		
-+		/* Schedule next decay if still above floor */
-+		if (new_min > decay_floor) {
-+			schedule_delayed_work(&decay_min_free_kbytes_work,
-+					      msecs_to_jiffies(300000));
-+		}
-+		
-+		pr_info("Auto-tuning: decaying min_free_kbytes to %d\n", min_free_kbytes);
-+	}
-+}
+DMA maintainers, could you please confirm the DMA core changes
+are ok with you?
+
+Thanks!
+
+
+Michael S. Tsirkin (15):
+  dma-mapping: add __dma_from_device_group_begin()/end()
+  docs: dma-api: document __dma_from_device_group_begin()/end()
+  dma-mapping: add DMA_ATTR_CPU_CACHE_CLEAN
+  docs: dma-api: document DMA_ATTR_CPU_CACHE_CLEAN
+  dma-debug: track cache clean flag in entries
+  virtio: add virtqueue_add_inbuf_cache_clean API
+  vsock/virtio: fix DMA alignment for event_list
+  vsock/virtio: use virtqueue_add_inbuf_cache_clean for events
+  virtio_input: fix DMA alignment for evts
+  virtio_scsi: fix DMA cacheline issues for events
+  virtio-rng: fix DMA alignment for data buffer
+  virtio_input: use virtqueue_add_inbuf_cache_clean for events
+  vsock/virtio: reorder fields to reduce padding
+  gpio: virtio: fix DMA alignment
+  gpio: virtio: reorder fields to reduce struct padding
+
+ Documentation/core-api/dma-api-howto.rst  | 52 ++++++++++++++
+ Documentation/core-api/dma-attributes.rst |  9 +++
+ drivers/char/hw_random/virtio-rng.c       |  3 +
+ drivers/gpio/gpio-virtio.c                | 15 ++--
+ drivers/scsi/virtio_scsi.c                | 17 +++--
+ drivers/virtio/virtio_input.c             |  5 +-
+ drivers/virtio/virtio_ring.c              | 83 ++++++++++++++++-------
+ include/linux/dma-mapping.h               | 20 ++++++
+ include/linux/virtio.h                    |  5 ++
+ kernel/dma/debug.c                        | 28 ++++++--
+ net/vmw_vsock/virtio_transport.c          |  8 ++-
+ 11 files changed, 205 insertions(+), 40 deletions(-)
+
 -- 
-2.39.5
+MST
 
 
