@@ -1,89 +1,89 @@
-Return-Path: <netdev+bounces-247208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53115CF5BF4
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 22:59:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D513CF5BF8
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 22:59:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 03D1A300E621
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 21:59:23 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C32E5300D41A
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 21:59:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E65D63126A3;
-	Mon,  5 Jan 2026 21:59:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 965FA311979;
+	Mon,  5 Jan 2026 21:59:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RKOh6zkE"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="U8Dn9MGk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f225.google.com (mail-pl1-f225.google.com [209.85.214.225])
+Received: from mail-yw1-f227.google.com (mail-yw1-f227.google.com [209.85.128.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6113A3126D7
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 21:59:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C4B1917FB
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 21:59:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767650360; cv=none; b=UeF1opaNjoQMLcmy8kz7B04TE8WmuteonxzqT5f3qlJtE4lFaxHJKy0ExEsG1cu3SGxCFN4sWlNR4z3GQLTBhcZ7EURBhvJhf1ER2cR3AgCCv//ojk34EBEG9+16g04aVPWqOluA7riDMG7K/vwhbBuanVEk5poGsTVu5YBaGgg=
+	t=1767650364; cv=none; b=e2NSH+v63i8CZAuqCkNmaD2Emqv7pbo3xTN3DfhICbQ2dAep9JnTnTW/JYmNPdb2FPzWLzNb4l1ypzmZYvyrJhmIMY7yPJvPrx2TO3ryyffIHGii+9mveNj0Vu4Y2naNujzvL97yPZ4SzodfEvVAy6tTGVnvAfEBXcviAu+xdMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767650360; c=relaxed/simple;
-	bh=ul1Ac3V/B60/F2WMkTXYIjv0mwsahIkaQoG0gRQ6OjA=;
+	s=arc-20240116; t=1767650364; c=relaxed/simple;
+	bh=CDOnC1OWW0FvWRGARPBHKvL7mi1uL4Moucfag83zdj4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WaDK470JVh6ywrGx2neClq8ytnXAL98DKuQ8UlJ6pOslJSjbkyNZPIh/A8ZOfNHcfanCylaowN5zjicJr1EKIlxzrKDE5HSDTB4zh+KijoPa78Rxon8Ri5RR5lUXTZsooiL4Wo9bH71PN950N2DVWXsWQ9Xx+iFfzqFxZZ6TJnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=RKOh6zkE; arc=none smtp.client-ip=209.85.214.225
+	 MIME-Version; b=Srqg/q/m3TdLFhl9+/ELIGomBGb+erFlJ5+gIRhNqqkjlCUfHYYsu8w3V6a4EePSyNJw90A3ZUstfHBJacpDOXGL05PONWAoDIihEbycm9otBO3dtH+442unGLNR0GPMZarsTLLWIny2FLV/rob5xETh3x5duEvUBV9NydxJtBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=U8Dn9MGk; arc=none smtp.client-ip=209.85.128.227
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f225.google.com with SMTP id d9443c01a7336-2a12ebe4b74so5225935ad.0
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 13:59:19 -0800 (PST)
+Received: by mail-yw1-f227.google.com with SMTP id 00721157ae682-7904a401d5cso4727017b3.3
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 13:59:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767650358; x=1768255158;
+        d=1e100.net; s=20230601; t=1767650361; x=1768255161;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Te25MviDlrxzlq2B2duHSN+1gL9C//NivqToMQtg1Ow=;
-        b=Sy1i+Vsgtv1yzNcnlnUxZSPN+WzU7sGUptgvQbllPuLNiXn2aK1JPkywOy4SwTFplB
-         i9MOLVqH2z3PEh27HluD62TXOrhIy7RPSOC4lZ6htQ192R4FKNr42m0gzLTeaIOt5zOt
-         KLLlkyDRdm1+ASkz8USXoXFamLo+wlaYxYGUcwa6c87+q7XC0Jiq4Pbr1wCYUOWoHMZk
-         npAD26ZuQhT+VeF2HQNT03COtGvWXvDQk5asm0O2mD3GkqhbMN3dzuCda+f+FPyTsx2A
-         QBiidii/0vsgdx2yh/OcstsqJxsYoOdrfNuovkJ6ZUzyHUfYkqsHog48tmySsMXy4V3U
-         YRMQ==
-X-Gm-Message-State: AOJu0YxplkopwENzFhBYOJbclgQFgttCsnrD863deHe5zucgdOMqJlWk
-	WWOrrzESnrgexqCjrBbRGurz+HP8Py2AwNus/hu6Ca8agb+thoekTYk5JXe+FTlPLpXDubr+2N6
-	FFdmf9ntieE7Er/TGqBIUD1T6TvhfKGqMxkFXwX+wmdBQrpQNBMurV+x3icx7TqQjLyUUJjHyCm
-	1TBRIDO0Fz+HDwUEYvecqwb91n4N5ehWqf9DEkJTd5U1RVoE/q8YRIAsiSdtVKVv+DtsUg7mLdZ
-	P1Qfpuh/pE=
-X-Gm-Gg: AY/fxX73GJeeEawDsWEvUgxKiL6ILsN0Y4WND4e6TizXcGCad1EzbaUeTrwVnhJdAV/
-	N+OzxsMFM/CW3KpRvs6M1u62nnK79LAmU3DjJcpoAxJm4s0uVZ7iYGPEPVjs1440BlaQZCNAZHE
-	17Hr+We/vxOQNPrBWQ3+WhTKutHtV5KDMI4WfcucSzSngq+CbJ4w9esew7N8KiPB0lrRGY1Dyh/
-	6e6vMGMeXIhWKiJD28msmELuRI8SjqPDV4ME+ql1+XaVO0m8gSMaZxfFHYbxAQXudk/Gvpj0oSV
-	FkPy/zQ8tfS2wDiKJISGUYP4IYHHKqI+rmBZr5GwKN9ZuL+bc7nm+baUnsCO0W0ZW5ZomQcTIAr
-	Aak6BXe2WtZw4xGNWstlONPsAIYz+r9zgH6/2b3DQB/Hi2Ae11tml+ORQrs98/Izp6/ZeMSXb2t
-	ixiLCRIHOqSvkpdbTSAIbsZbGFPjgAnuJ6BUbswiNY3Q==
-X-Google-Smtp-Source: AGHT+IGiJvWqe4SLcVfq96oW9mdXRzRiSlLatUfRxFBgo2F0tqTY3y8DwOJjUh6fzytciBvJ6fYV4Xd1wG7y
-X-Received: by 2002:a17:902:e88d:b0:295:5da6:600c with SMTP id d9443c01a7336-2a3e2d789dbmr10846545ad.2.1767650358530;
-        Mon, 05 Jan 2026 13:59:18 -0800 (PST)
+        bh=Iwxrm5t2JRxA/KQ4fQjsDmCmqLlB3vPGAh9wEVcyDFw=;
+        b=nGnYkPPUVG9YgHa2K34ixdVNZ5i8cwBSqC5flEXtxorHOSPNGwoXEii57TWcGzUSly
+         CyKg+WDidLBMkZiF0DaoIOr5kWqW3/EbBABuVZ4u2YdN2OYOj09z/rNuZPrrQcMOfxVS
+         xl+0zxUj7ANLKks5MFIReaya/pVDcgEAtHAQ9OpmYAHob1TzjnQBzEYk15RkeCdz11lO
+         k4CN9xeITJbFbYDXnlQTxyWls119VhbsHXSV0KxyWt5aQ6S1Rr6Wt2IJKzSQ26lgnA9U
+         vNH+/3i+VYibKZYXtW7o+O9iPYL6H91XT39mXQSqBpGlCxmcPRDTYhVJCtTHNQXgU9Qv
+         g0cQ==
+X-Gm-Message-State: AOJu0YwcC3hi4bCC+dokfj8dx66zqGnIveYzjTOaDv6UMxpg0xDu7Y6e
+	C+yrzcbky4HQ+jUmjGHGDta2MJB8/wy+DjUQ1XPU9fLQhFRwpQjPuAUgLnrlOM8dXIrLKFbsYX4
+	EIWezjNsVzRJlhTV6EKVvNr+uQIb3Biu2VdQC8p3hzzZOzDlwHjMYZF46cFu734GaRl09YSaMZJ
+	XIPmOmaF5JjAMtixOosUkZZtVCNtYv+diAn9ZEBJnVsLC0MZYCRiToK9Ljy0eVxscOYLOfeE18n
+	svRnShLLM0=
+X-Gm-Gg: AY/fxX429Z4JO3G6UatfVCa94oAKUmvQpTKuQ5FHIwnnTmn+894okizMpMye5mdxzG4
+	80hkoKFxMU/RGNbVBzln1C1DkD40pqtkyGtO+9B6MGhAac6+xsO28xs8UP567Pr/YJ9INdvx/jo
+	u/F5IZdF+fYDQQjYDZ00cd+K8wZWNDvQdtCc509WhvDyRRnYqqUUEDGbcSFu4mrO0gorZ0vQL0m
+	mhXK4KEIBZObvkEEyO4WFsIZBuz5EAuTjPUxQjSpX1/kahCjKx98gKcpgZsUccy25VhThOZrC0c
+	+3ha1g+5Zu67HKNjrIXWXcf+bHTiczLReS3cVAMvIBlEvknOUm2ni5lOexOd8RO5aAFfLvEghH8
+	hyRkGRpC7sNoB303bQcX5sxoFGNp/NQLSFc3IzJJ6wP2IDgSfsCn7JSbeUnR3AGB9bRCyvw9aqm
+	SlVq2s1JtC+snBXvhVPXT+hdDLz/86OlAGr36ubSXFhg==
+X-Google-Smtp-Source: AGHT+IEv3nQdguYvOoE+eY5JAHlkjhiUOeRc33YcCEIh22x6VxXothyeCZRommdKPPrc6jKmVSZZirtO9R1w
+X-Received: by 2002:a05:690c:3803:b0:78f:f362:ec4a with SMTP id 00721157ae682-790a8aec440mr9142547b3.38.1767650360816;
+        Mon, 05 Jan 2026 13:59:20 -0800 (PST)
 Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-2.dlp.protect.broadcom.com. [144.49.247.2])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2a3e3cae700sm412715ad.34.2026.01.05.13.59.18
+        by smtp-relay.gmail.com with ESMTPS id 00721157ae682-790aa583b83sm104417b3.8.2026.01.05.13.59.20
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 05 Jan 2026 13:59:18 -0800 (PST)
+        Mon, 05 Jan 2026 13:59:20 -0800 (PST)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4ee416413a8so4565761cf.1
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 13:59:17 -0800 (PST)
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-4ed79dd4a47so7268211cf.3
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 13:59:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1767650357; x=1768255157; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1767650360; x=1768255160; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Te25MviDlrxzlq2B2duHSN+1gL9C//NivqToMQtg1Ow=;
-        b=RKOh6zkEOysGxi5rWjF8PuS2gLj1OdEY8yHKeD+61cljUxrpc42OaIop8/tPJH7vCk
-         rXvhRNQeJ4fYJl4071Xd19f8ezdMkPkqMP3PoxJbBEXa7Rx3lf0ojNjtI3wXftm7lmsD
-         k1wRt+K3v65PtFY3VQSOMTqXxm9SiuCh4pLJY=
-X-Received: by 2002:a05:622a:2447:b0:4f1:bdba:8cfc with SMTP id d75a77b69052e-4ffa77dfa39mr13972011cf.65.1767650357323;
-        Mon, 05 Jan 2026 13:59:17 -0800 (PST)
-X-Received: by 2002:a05:622a:2447:b0:4f1:bdba:8cfc with SMTP id d75a77b69052e-4ffa77dfa39mr13971871cf.65.1767650356904;
-        Mon, 05 Jan 2026 13:59:16 -0800 (PST)
+        bh=Iwxrm5t2JRxA/KQ4fQjsDmCmqLlB3vPGAh9wEVcyDFw=;
+        b=U8Dn9MGkb2yvOVyVPsV8vnyTgguFkBgIJMut+eIScBhFMzboNYsPkNUenrSigOXa2y
+         pw87vkN7vX8IE7gJnde9pT+RTfwP+c4me8OWgta79asqMXvj5wKkKgvup2BiwLUd0q8S
+         5zgepPqbZ0VglHvWbT8O8eOxZ0ZH7QuwFSc/I=
+X-Received: by 2002:a05:622a:8c5:b0:4f1:b93e:d4d8 with SMTP id d75a77b69052e-4ffa7804999mr14139191cf.71.1767650359747;
+        Mon, 05 Jan 2026 13:59:19 -0800 (PST)
+X-Received: by 2002:a05:622a:8c5:b0:4f1:b93e:d4d8 with SMTP id d75a77b69052e-4ffa7804999mr14139021cf.71.1767650359373;
+        Mon, 05 Jan 2026 13:59:19 -0800 (PST)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ffa8d38e12sm1882051cf.3.2026.01.05.13.59.15
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ffa8d38e12sm1882051cf.3.2026.01.05.13.59.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 13:59:16 -0800 (PST)
+        Mon, 05 Jan 2026 13:59:18 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -93,10 +93,10 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com,
-	Somnath Kotur <somnath.kotur@broadcom.com>
-Subject: [PATCH net-next 5/6] bnxt_en: Use a larger RSS indirection table on P5_PLUS chips
-Date: Mon,  5 Jan 2026 13:58:32 -0800
-Message-ID: <20260105215833.46125-6-michael.chan@broadcom.com>
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Subject: [PATCH net-next 6/6] bnxt_en: Implement ethtool_ops -> get_link_ext_state()
+Date: Mon,  5 Jan 2026 13:58:33 -0800
+Message-ID: <20260105215833.46125-7-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.45.4
 In-Reply-To: <20260105215833.46125-1-michael.chan@broadcom.com>
 References: <20260105215833.46125-1-michael.chan@broadcom.com>
@@ -109,91 +109,122 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-The driver currently uses a chip supported RSS indirection table size
-just big enough to cover the number of RX rings.  Each table with 64
-entries requires one HW RSS context.  The HW supported table sizes are
-64, 128, 256, and 512 entries.  Using the smallest table size can cause
-unbalanced RSS packet distributions.  For example, if the number of
-rings is 48, the table size using existing logic will be 64.  32 rings
-will have a weight of 1 and 16 rings will have a weight of 2 when
-set to default even distribution.  This represents a 100% difference in
-weights between some of the rings.
+Map the link_down_reason from the FW to the ethtool link_ext_state
+when it is available.  Also log it to the link down dmesg when it is
+available.
 
-Newer FW has increased the RSS indirection table resource.  When the
-increased resource is detected, use the largest RSS indirection table
-size (512 entries) supported by the chip.  Using the same example
-above, the weights of the 48 rings will be either 10 or 11 when set to
-default even distribution.  The weight difference is only 10%.
-
-If there are thousands of VFs, there is a possiblity that we may not
-be able to allocate this larger RSS indirection table from the FW, so
-we add a check to fall back to the legacy scheme.
-
-Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 12 ++++++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt.h |  3 +++
- 2 files changed, 15 insertions(+)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 27 ++++++++++++++++++-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  1 +
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 21 +++++++++++++++
+ 3 files changed, 48 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 9ab9ebd57367..9efdc382ebd7 100644
+index 9efdc382ebd7..6104c23f1c55 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -6558,6 +6558,9 @@ int bnxt_get_nr_rss_ctxs(struct bnxt *bp, int rx_rings)
- 	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
- 		if (!rx_rings)
- 			return 0;
-+		if (bp->rss_cap & BNXT_RSS_CAP_LARGE_RSS_CTX)
-+			return BNXT_RSS_TABLE_MAX_TBL_P5;
-+
- 		return bnxt_calc_nr_ring_pages(rx_rings - 1,
- 					       BNXT_RSS_TABLE_ENTRIES_P5);
+@@ -11906,6 +11906,28 @@ static char *bnxt_report_fec(struct bnxt_link_info *link_info)
  	}
-@@ -8068,6 +8071,11 @@ static int __bnxt_reserve_rings(struct bnxt *bp)
- 	bp->rx_nr_rings = rx_rings;
- 	bp->cp_nr_rings = hwr.cp;
+ }
  
-+	/* Fall back if we cannot reserve enough HW RSS contexts */
-+	if ((bp->rss_cap & BNXT_RSS_CAP_LARGE_RSS_CTX) &&
-+	    hwr.rss_ctx < bnxt_get_total_rss_ctxs(bp, &hwr))
-+		bp->rss_cap &= ~BNXT_RSS_CAP_LARGE_RSS_CTX;
++static char *bnxt_link_down_reason(struct bnxt_link_info *link_info)
++{
++	u8 reason = link_info->link_down_reason;
 +
- 	if (!bnxt_rings_ok(bp, &hwr))
- 		return -ENOMEM;
- 
-@@ -9558,6 +9566,10 @@ int bnxt_hwrm_func_resc_qcaps(struct bnxt *bp, bool all)
- 	hw_resc->min_stat_ctxs = le16_to_cpu(resp->min_stat_ctx);
- 	hw_resc->max_stat_ctxs = le16_to_cpu(resp->max_stat_ctx);
- 
-+	if (hw_resc->max_rsscos_ctxs >=
-+	    hw_resc->max_vnics * BNXT_LARGE_RSS_TO_VNIC_RATIO)
-+		bp->rss_cap |= BNXT_RSS_CAP_LARGE_RSS_CTX;
++	/* Multiple bits can be set, we report 1 bit only in order of
++	 * priority.
++	 */
++	if (reason & PORT_PHY_QCFG_RESP_LINK_DOWN_REASON_RF)
++		return "(Remote fault)";
++	if (reason & PORT_PHY_QCFG_RESP_LINK_DOWN_REASON_OTP_SPEED_VIOLATION)
++		return "(OTP Speed limit violation)";
++	if (reason & PORT_PHY_QCFG_RESP_LINK_DOWN_REASON_CABLE_REMOVED)
++		return "(Cable removed)";
++	if (reason & PORT_PHY_QCFG_RESP_LINK_DOWN_REASON_MODULE_FAULT)
++		return "(Module fault)";
++	if (reason & PORT_PHY_QCFG_RESP_LINK_DOWN_REASON_BMC_REQUEST)
++		return "(BMC request down)";
++	if (reason & PORT_PHY_QCFG_RESP_LINK_DOWN_REASON_TX_LASER_DISABLED)
++		return "(TX laser disabled)";
++	return "";
++};
 +
- 	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
- 		u16 max_msix = le16_to_cpu(resp->max_msix);
+ void bnxt_report_link(struct bnxt *bp)
+ {
+ 	if (BNXT_LINK_IS_UP(bp)) {
+@@ -11963,8 +11985,10 @@ void bnxt_report_link(struct bnxt *bp)
+ 				    (fec & BNXT_FEC_AUTONEG) ? "on" : "off",
+ 				    bnxt_report_fec(&bp->link_info));
+ 	} else {
++		char *str = bnxt_link_down_reason(&bp->link_info);
++
+ 		netif_carrier_off(bp->dev);
+-		netdev_err(bp->dev, "NIC Link is Down\n");
++		netdev_err(bp->dev, "NIC Link is Down %s\n", str);
+ 	}
+ }
  
+@@ -12164,6 +12188,7 @@ int bnxt_update_link(struct bnxt *bp, bool chng_link_state)
+ 	link_info->phy_addr = resp->eee_config_phy_addr &
+ 			      PORT_PHY_QCFG_RESP_PHY_ADDR_MASK;
+ 	link_info->module_status = resp->module_status;
++	link_info->link_down_reason = resp->link_down_reason;
+ 
+ 	if (bp->phy_flags & BNXT_PHY_FL_EEE_CAP) {
+ 		struct ethtool_keee *eee = &bp->eee;
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 2a2d172fa6ed..476c5684a1eb 100644
+index 476c5684a1eb..aff781f167d4 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1369,6 +1369,8 @@ struct bnxt_hw_resc {
- 	u32	max_rx_wm_flows;
- };
+@@ -1555,6 +1555,7 @@ struct bnxt_link_info {
+ #define BNXT_LINK_STATE_DOWN	1
+ #define BNXT_LINK_STATE_UP	2
+ #define BNXT_LINK_IS_UP(bp)	((bp)->link_info.link_state == BNXT_LINK_STATE_UP)
++	u8			link_down_reason;
+ 	u8			active_lanes;
+ 	u8			duplex;
+ #define BNXT_LINK_DUPLEX_HALF	PORT_PHY_QCFG_RESP_DUPLEX_STATE_HALF
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+index a5ed6dd42bfc..0c9a29bbfa41 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+@@ -3432,6 +3432,26 @@ static u32 bnxt_get_link(struct net_device *dev)
+ 	return BNXT_LINK_IS_UP(bp);
+ }
  
-+#define BNXT_LARGE_RSS_TO_VNIC_RATIO	7
++static int bnxt_get_link_ext_state(struct net_device *dev,
++				   struct ethtool_link_ext_state_info *info)
++{
++	struct bnxt *bp = netdev_priv(dev);
++	u8 reason;
 +
- #if defined(CONFIG_BNXT_SRIOV)
- struct bnxt_vf_info {
- 	u16	fw_fid;
-@@ -2412,6 +2414,7 @@ struct bnxt {
- #define BNXT_RSS_CAP_ESP_V6_RSS_CAP		BIT(7)
- #define BNXT_RSS_CAP_MULTI_RSS_CTX		BIT(8)
- #define BNXT_RSS_CAP_IPV6_FLOW_LABEL_RSS_CAP	BIT(9)
-+#define BNXT_RSS_CAP_LARGE_RSS_CTX		BIT(10)
- 
- 	u8			rss_hash_key[HW_HASH_KEY_SIZE];
- 	u8			rss_hash_key_valid:1;
++	if (BNXT_LINK_IS_UP(bp))
++		return -ENODATA;
++
++	reason = bp->link_info.link_down_reason;
++	if (reason & PORT_PHY_QCFG_RESP_LINK_DOWN_REASON_CABLE_REMOVED) {
++		info->link_ext_state = ETHTOOL_LINK_EXT_STATE_NO_CABLE;
++		return 0;
++	} else if (reason & PORT_PHY_QCFG_RESP_LINK_DOWN_REASON_MODULE_FAULT) {
++		info->link_ext_state = ETHTOOL_LINK_EXT_STATE_MODULE;
++		return 0;
++	}
++	return -ENODATA;
++}
++
+ int bnxt_hwrm_nvm_get_dev_info(struct bnxt *bp,
+ 			       struct hwrm_nvm_get_dev_info_output *nvm_dev_info)
+ {
+@@ -5711,6 +5731,7 @@ const struct ethtool_ops bnxt_ethtool_ops = {
+ 	.get_eeprom             = bnxt_get_eeprom,
+ 	.set_eeprom		= bnxt_set_eeprom,
+ 	.get_link		= bnxt_get_link,
++	.get_link_ext_state	= bnxt_get_link_ext_state,
+ 	.get_link_ext_stats	= bnxt_get_link_ext_stats,
+ 	.get_eee		= bnxt_get_eee,
+ 	.set_eee		= bnxt_set_eee,
 -- 
 2.51.0
 
