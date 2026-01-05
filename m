@@ -1,213 +1,255 @@
-Return-Path: <netdev+bounces-247043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62BB0CF39FC
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 13:55:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC2BFCF3B23
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 14:05:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 58CA2300EA3A
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 12:55:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6E0153133E22
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 12:58:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 679583376AC;
-	Mon,  5 Jan 2026 12:52:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3388340275;
+	Mon,  5 Jan 2026 12:45:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=riscstar-com.20230601.gappssmtp.com header.i=@riscstar-com.20230601.gappssmtp.com header.b="3Z0uC/UH"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="brSQVMN7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D789F316198
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 12:52:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5200933FE12;
+	Mon,  5 Jan 2026 12:45:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767617542; cv=none; b=IdkC4DegEG1321M1/bKpwn7O8SiUeum1dM0M2zNE2tD9E3ztX/hF7w2pkhWnxGHeSXKEuKHQa80degF/oprHjX9vAQIFXfJaDq5Vt6NSXCdGnw+1WdUpRQW72W5cS9PQhaDgTeIzZGUydZL7XOd91tgN86EnvFFCJvohFsXyuvg=
+	t=1767617103; cv=none; b=dCs74QDgyxICL1UwQYmU2hBp039Yo2xyIK1XpD/D1Iw23aHy053lkzx7K0TBBxnUcb28NFtVithw31KE4cC4QeUWZpSk45kyKsoaeLRT0AElAQey3EHDtSd+RUk3ofa17SsfKurN3Ai20Au80hE8+I0zuArR6pbcf5Im0FSahKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767617542; c=relaxed/simple;
-	bh=N0gZejhpVIK3qi+zXOjdBby6xn4BUij6Dyqnfq1/VnA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ns6Yl6VxJbwn7ucnnO1AkRmPGi+u7vG7UK6t+OGyrNg0FrYvbGHp9knEU1r4sIE4ihPFEZVuMCp/SFVIPuZYfD+AuKViGgi+MphBVlbAgCNkCLHyDf5bioe18xxOgUAn9+23xUSQ6pjF1PgGD1N1Z8H/fNKz4U4KWeKU6KHrSdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com; spf=pass smtp.mailfrom=riscstar.com; dkim=pass (2048-bit key) header.d=riscstar-com.20230601.gappssmtp.com header.i=@riscstar-com.20230601.gappssmtp.com header.b=3Z0uC/UH; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riscstar.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riscstar.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-42fb5810d39so9321387f8f.2
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 04:52:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=riscstar-com.20230601.gappssmtp.com; s=20230601; t=1767617538; x=1768222338; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DIfhp3vJVBySXs5/naEXyaaROJC4kEOY5dOC0TJhcN0=;
-        b=3Z0uC/UHBVnzel8Jnhuk8T+cAwex0RTJSiYOheeNpc3vdOwwLJMBAffc5eAvD4KGOL
-         LGK2+inyZLpmTytw/dcj5wps4yJKiNGEqtTVmqt9haYtMuPWkkHivDr4xtyJ+ttb12Ha
-         rfZIWsPp4QYm17CPeymLbjcbS/AZMWvvB9y7ETcw6Pu0WL/DsaXiFxKww8/ccyrmPsvG
-         86rI/h3UvSFHPf/e2t8new9Nx/gn7C/thk5LZPTN1SdjtNmTmXmoCRCPK4zABE3WLbII
-         W7/0IjShWCirFI6WjQkTMAfwwZfi/GWyYgc7Buz1QSuu2YWxJSaD/AzfupN0+wO6jMeA
-         jaNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767617538; x=1768222338;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DIfhp3vJVBySXs5/naEXyaaROJC4kEOY5dOC0TJhcN0=;
-        b=qnVUbHJ5mkymx2I5VRwNAOHRiKHIZ9DptXAF0B2miZlm4yW9CX5n5L9rtmd/OfT/Fw
-         JGVkZmnT4Tv+jq7/FfI1BW95ZjZUxSLYNffeU4LBKKw0UAar8HVH6cji4/ZqsRut1vdk
-         zOh58deBR6i63s2JBcVR27BJsV4SFdiF6Ry8RlKtrIkSPPdV/JT/bljnI9ZKZr5kqSN5
-         /GTlSjPHJ7xxtJOfAni8F4mQ+g7r3QfD9QdWpj5uEIWnMX7FKx+9xuBUNGBvFn3dvRgl
-         X1yn8SrjcfECQMjx5CRfgBvCqudPUl52BmMarhkfCwP/sXpjTIFdXv+ivz1NGrxfdZhm
-         Ko4w==
-X-Forwarded-Encrypted: i=1; AJvYcCU3oYlFxn0YAsMmp6Yy4cjAfi08WYWZq5m1wwhyLIWu8Z4B51IySYhvfKQXSHOXfIhXVYuVoYc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5ZWmCOKG1M9pJ/30+XCkwfnlS951tpTHdiKBKQAy5EKl/1II3
-	QJa4pxPRysI4V2vGfW+67jyWNJ0YNtf8GggZuZPNI3WSV0Gn5+nXmHYxbx6M0svRPtA=
-X-Gm-Gg: AY/fxX4bxrw4Z+Xr3rBEpfUPQLCUmUFxA8FDmJVih8XW/TvW0Putbuctu8oEsnkOeBt
-	8tgIbBiiQVeyv0MVjURCJAvgWNij3v7WAYFTNr0hxTZpqY5bLkL9uzrCSgSdD1Oyl8+KSQuSHLe
-	4Ime5qZMMXLCRPjiswrMaJgGLJLph51JLZqZxDgQ28ljV7bca45illpB9eAHjWbieP8mYcjjkZU
-	Pq7VhykeooNZoffC6KKZ63mZMEdDhXy6qWMKFudpp3uHhCj5lqO+W2us2U7IGkOigCuCDbOOZZ2
-	7Rd/BK5Fkj5I9/fi7ZEUfQdiAiV4GARoVhLyd+EbiY5ljXz3hCLFeZgsU7WeNwzIDPb6yx7TN6t
-	pL7l6SHKtMnRsJRjBrr5eo667ILt/2XYumxFvaeP7dOj86iiQsscdz+37dlbpDYBOx3MWjwqoGm
-	O1Dzpso0908wBP1mWYaZxREHZetjr0dG8nYsQ3ki2BRzN3qKM9sI89PJHwjk1COg09OrF9J8s9T
-	O3ftLy/kO63ZSc6PQdz6cuV3hIswgGrZ6AJrxVHV3gMbK35qU1y02sZyEioCWJZPNbTzgF4x91F
-	KSRZdKA=
-X-Google-Smtp-Source: AGHT+IE4Mz004OZ0As7rWOFq5sPjHYJ4N8Pzam8+bOUXJdXGQOskOlJaecSDta7VRdPfx5XGGjwohQ==
-X-Received: by 2002:a05:6000:1844:b0:432:8504:b8a9 with SMTP id ffacd0b85a97d-4328504b8e1mr37753933f8f.62.1767617537725;
-        Mon, 05 Jan 2026 04:52:17 -0800 (PST)
-Received: from aspen.lan (aztw-34-b2-v4wan-166919-cust780.vm26.cable.virginm.net. [82.37.195.13])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324ea1b36fsm100029761f8f.5.2026.01.05.04.52.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 04:52:17 -0800 (PST)
-Date: Mon, 5 Jan 2026 12:52:14 +0000
-From: Daniel Thompson <daniel@riscstar.com>
-To: Marcos Paulo de Souza <mpdesouza@suse.com>
-Cc: Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jason Wessel <jason.wessel@windriver.com>,
-	Daniel Thompson <danielt@kernel.org>,
-	Douglas Anderson <dianders@chromium.org>,
-	Petr Mladek <pmladek@suse.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	John Ogness <john.ogness@linutronix.de>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jiri Slaby <jirislaby@kernel.org>, Breno Leitao <leitao@debian.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Kees Cook <kees@kernel.org>, Tony Luck <tony.luck@intel.com>,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jacky Huang <ychuang3@nuvoton.com>,
-	Shan-Chun Hung <schung@nuvoton.com>,
-	Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-	linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kgdb-bugreport@lists.sourceforge.net, linux-serial@vger.kernel.org,
-	netdev@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
-	linux-hardening@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	sparclinux@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 00/19] printk cleanup - part 3
-Message-ID: <aVuz_hpbrk8oSCVC@aspen.lan>
-References: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
+	s=arc-20240116; t=1767617103; c=relaxed/simple;
+	bh=kde+YF5V+DYYmMMob26eEC+xps34thGQHk+CSSqXeBE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PcX0N3PQzZV+Gr7m/fO7zQZPydkESkru78xfA2XzYmHKqCExnzVRbWFTQgIkioZOBUayH0SllCzpDwos2rks/EMuxecybiooIyEP/z/mI0zIs3HPT615aw355VIcUGgq8v/6ErH8/Z5akBQB4Ycyomk4egpzz/73n2IOOa+NweY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=brSQVMN7; arc=none smtp.client-ip=162.240.164.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject
+	:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=oBPTsdQ+5QIOEyqpw9EejEwAlJu22ofULxi/H8UNZbA=; b=brSQVMN7FjeSc2Fbit2wtuBftX
+	7fGHa72sFdSvSHkxwn6CCv8mdxFRKn23JbEY0U9jj44OFUm4GIkQv/7enuF0FDBaJL114NDictATW
+	YZuhKE1Lbb7PyqenJnHKNu2FgJEb5BI+n4GENjGIahLzQUchWnSzMZbnDseFg2KZiDEP7D9/XVaIK
+	svU8Qr6g+WGmU5hNbyFG5PLU+Rjt/O41/hq1hxt3ApE3HOO4G/vB+6PcH4jXK4oGcYO1zuQIl+MiV
+	Lgjl31R510y1lwj67dTUGmNnlEUqCVZK4XEqIyqkygjywFuM3UxUUY8F9w8xXASRRPBJ5KDARZCJP
+	Fb62Mbow==;
+Received: from [122.175.9.182] (port=7326 helo=cypher.couthit.local)
+	by server.couthit.com with esmtpa (Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1vcjgg-0000000Ezqj-36WM;
+	Mon, 05 Jan 2026 07:27:55 -0500
+From: Parvathi Pudi <parvathi@couthit.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	danishanwar@ti.com,
+	parvathi@couthit.com,
+	rogerq@kernel.org,
+	pmohan@couthit.com,
+	basharath@couthit.com,
+	afd@ti.com
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	alok.a.tiwari@oracle.com,
+	horms@kernel.org,
+	pratheesh@ti.com,
+	j-rameshbabu@ti.com,
+	vigneshr@ti.com,
+	praneeth@ti.com,
+	srk@ti.com,
+	rogerq@ti.com,
+	krishna@couthit.com,
+	mohan@couthit.com
+Subject: [PATCH net-next v11 0/3] STP/RSTP SWITCH support for PRU-ICSSM Ethernet driver
+Date: Mon,  5 Jan 2026 17:53:06 +0530
+Message-ID: <20260105122549.1808390-1-parvathi@couthit.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: parvathi@couthit.com
+X-Authenticated-Sender: server.couthit.com: parvathi@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-Hi Marcos
+Hi,
 
-On Sat, Dec 27, 2025 at 09:16:07AM -0300, Marcos Paulo de Souza wrote:
-> The parts 1 and 2 can be found here [1] and here[2].
->
-> The changes proposed in this part 3 are mostly to clarify the usage of
-> the interfaces for NBCON, and use the printk helpers more broadly.
-> Besides it, it also introduces a new way to register consoles
-> and drop thes the CON_ENABLED flag. It seems too much, but in reality
-> the changes are not complex, and as the title says, it's basically a
-> cleanup without changing the functional changes.
+The DUAL-EMAC patch series for Megabit Industrial Communication Sub-system
+(ICSSM), which provides the foundational support for Ethernet functionality
+over PRU-ICSS on the TI SOCs (AM335x, AM437x, and AM57x), was merged into
+net-next recently [1].
 
-I ran this patchset through the kgdb test suite and I'm afraid it is
-reporting functional changes.
+This patch series enhances the PRU-ICSSM Ethernet driver to support bridge
+(STP/RSTP) SWITCH mode, which has been implemented using the "switchdev"
+framework and interacts with the "mstp daemon" for STP and RSTP management
+in userspace.
 
-Specifically the earlycon support for kdb has regressed (FWIW the
-problem bisects down to the final patch in the series where CON_ENABLED
-is removed).
+When the  SWITCH mode is enabled, forwarding of Ethernet packets using
+either the traditional store-and-forward mechanism or via cut-through is
+offloaded to the two PRU based Ethernet interfaces available within the
+ICSSM. The firmware running on the PRU inspects the bridge port states and
+performs necessary checks before forwarding a packet. This improves the
+overall system performance and significantly reduces the packet forwarding
+latency.
 
-Reproduction on x86-64 KVM outside of the test suite should be easy:
+Protocol switching from Dual-EMAC to bridge (STP/RSTP) SWITCH mode can be
+done as follows.
 
-    make defconfig
-    scripts/config \
-        --enable DEBUG_INFO \
-	--enable DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT \
-	--enable DEBUG_FS \
-	--enable KALLSYMS_ALL \
-	--enable MAGIC_SYSRQ \
-	--enable KGDB \
-	--enable KGDB_TESTS \
-	--enable KGDB_KDB \
-	--enable KDB_KEYBOARD \
-	--enable LKDTM \
-	--enable SECURITY_LOCKDOWN_LSM
-    make olddefconfig
-    make -j$(nproc)
-    qemu-system-x86_64 \
-        -m 1G -smp 2 -nographic \
-	-kernel arch/x86/boot/bzImage \
-	-append "console=ttyS0,115200 kgdboc=ttyS0 earlycon=uart8250,io,0x3f8 kgdboc_earlycon kgdbwait"
+Assuming eth2 and eth3 are the two physical ports of the ICSS2 instance:
 
-In a successful test the kdb prompt will appear after only a few lines
-of output:
-~~~
-[    0.000000] Linux version 6.19.0-rc4-00020-g4b7f3b144021 (drt@wychelm) (gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44) #2 SMP PREEMPT_DYNAMIC Mon Jan 6
-[    0.000000] Command line: console=ttyS0,115200 kgdboc=ttyS0 earlycon=uart8250,io,0x3f8 kgdboc_earlycon kgdbwait
-[    0.000000] BIOS-provided physical RAM map:
-[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable
-[    0.000000] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff] reserved
-[    0.000000] BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff] reserved
-[    0.000000] BIOS-e820: [mem 0x0000000000100000-0x000000003ffdffff] usable
-[    0.000000] BIOS-e820: [mem 0x000000003ffe0000-0x000000003fffffff] reserved
-[    0.000000] BIOS-e820: [mem 0x00000000fffc0000-0x00000000ffffffff] reserved
-[    0.000000] BIOS-e820: [mem 0x000000fd00000000-0x000000ffffffffff] reserved
-[    0.000000] earlycon: uart8250 at I/O port 0x3f8 (options '')
-[    0.000000] printk: legacy bootconsole [uart8250] enabled
-[    0.000000] kgdboc: Going to register kgdb with earlycon 'uart'
-[    0.000000] KGDB: Registered I/O driver kgdboc_earlycon
-[    0.000000] KGDB: Waiting for connection from remote gdb...
+>> brctl addbr br0
+>> ip maddr add 01:80:c2:00:00:00 dev br0
+>> ip link set dev br0 address $(cat /sys/class/net/eth2/address)
+>> brctl addif br0 eth2
+>> brctl addif br0 eth3
+>> mstpd
+>> brctl stp br0 on
+# STP to RSTP mode
+>> mstpctl setforcevers br0 rstp
+>> ip link set dev br0 up
 
-Entering kdb (current=0x0000000000000000, pid 0) on processor 0 due to NonMaskable Interrupt @ 0xffffffff9101491f
-[0]kdb>
-~~~
+To revert back to the default dual EMAC mode, the steps are as follows:
 
-After this patchset is applied the earlycon triggers do not work
-correctly and we get:
-~~~
-[    0.000000] Linux version 6.19.0-rc4-00019-g882df99205ba (drt@wychelm) (gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44) #3 SMP PREEMPT_DYNAMIC Mon Jan 6
-[    0.000000] Command line: console=ttyS0,115200 kgdboc=ttyS0 earlycon=uart8250,io,0x3f8 kgdboc_earlycon kgdbwait
-[    0.000000] BIOS-provided physical RAM map:
-[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable
-[    0.000000] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff] reserved
-[    0.000000] BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff] reserved
-[    0.000000] BIOS-e820: [mem 0x0000000000100000-0x000000003ffdffff] usable
-[    0.000000] BIOS-e820: [mem 0x000000003ffe0000-0x000000003fffffff] reserved
-[    0.000000] BIOS-e820: [mem 0x00000000fffc0000-0x00000000ffffffff] reserved
-[    0.000000] BIOS-e820: [mem 0x000000fd00000000-0x000000ffffffffff] reserved
-[    0.000000] earlycon: uart8250 at I/O port 0x3f8 (options '')
-[    0.000000] kgdboc: No suitable earlycon yet, will try later
-...
-~~~
+>> ip link set dev br0 down
+>> brctl delif br0 eth2
+>> brctl delif br0 eth3
+>> brctl delbr br0
 
+The patches presented in this series have gone through the patch verification
+tools and no warnings or errors are reported.
 
-Daniel.
+Sample test logs obtained from AM33x, AM43x and AM57x verifying the
+functionality on Linux next kernel are available here:
+
+[Interface up Testing](https://gist.github.com/ParvathiPudi/28fc4a2abff0c6f617d80f09c4a12881)
+
+[Ping Testing](https://gist.github.com/ParvathiPudi/1f50c92e5c36b3d297bd4fc684b3d7fd)
+
+[Iperf Testing](https://gist.github.com/ParvathiPudi/1dc93b2a65f873e8ab85747fed6ea953)
+
+[1] https://lore.kernel.org/all/20250912104741.528721-1-parvathi@couthit.com/
+
+This is the v11 of the patch series [v1]. This version of the patchset
+has no changes from [v10] of the series.
+
+Changes from v10 to v11:
+
+*) Dropped the RFC tag.
+*) No code changes were made, only the version was updated.
+*) Rebased the series on latest net-next.
+
+Changes from v9 to v10:
+
+*) Added RFC tag as net-next is closed now.
+*) Addressed applicable AI review warnings, including clearing the host lock before returning on
+timeout, avoiding a race on hw_bridge_dev and adding a conditional check to avoid null
+pointer dereferences.
+*) Rebased the series on latest net-next.
+
+Changes from v8 to v9:
+
+*) Added RFC tag as net-next is closed now.
+*) Addressed  Jakub Kicinski comments on patch 1 and 2 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v7 to v8:
+
+*) Modified dev_hold/dev_put reference to netdev_hold/netdev_put in patch 2 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v6 to v7:
+
+*) Addressed Jakub Kicinski comments on patch 2 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v5 to v6:
+
+*) Addressed Simon Horman comments on patch 1, 2 and 3 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v4 to v5:
+
+*) Addressed ALOK TIWARI comments on patch 1 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v3 to v4:
+
+*) Addressed Andrew Lunn comments on patch 1 and 2 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v2 to v3:
+
+*) Dropped the RFC tag.
+*) Addressed  MD Danish Anwar comments on patch 3 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v1 to v2 :
+
+*) Added RFC tag as net-next is closed now.
+*) Updated the cover letter of the series to generalize and indicate support for
+both STP and RSTP along with subject change as per Andrew Lunn's suggestion.
+*) Addressed the Andrew Lunn's comments on patch 1 of the series.
+*) Rebased the series on latest net-next.
+
+[v1] https://lore.kernel.org/all/20250925141246.3433603-1-parvathi@couthit.com/
+[v2] https://lore.kernel.org/all/20251006104908.775891-1-parvathi@couthit.com/
+[v3] https://lore.kernel.org/all/20251014124018.1596900-1-parvathi@couthit.com/
+[v4] https://lore.kernel.org/all/20251110125539.31052-1-parvathi@couthit.com/
+[v5] https://lore.kernel.org/all/20251113101229.675141-1-parvathi@couthit.com/
+[v6] https://lore.kernel.org/all/20251124135800.2219431-1-parvathi@couthit.com/
+[v7] https://lore.kernel.org/all/20251126124602.2624264-1-parvathi@couthit.com/
+[v8] https://lore.kernel.org/all/20251126163056.2697668-1-parvathi@couthit.com/
+[v9] https://lore.kernel.org/all/20251205123146.462397-1-parvathi@couthit.com/
+[v10] https://lore.kernel.org/all/20251216132641.1313026-1-parvathi@couthit.com/
+
+Thanks and Regards,
+Parvathi.
+
+Roger Quadros (3):
+  net: ti: icssm-prueth: Add helper functions to configure and maintain
+    FDB
+  net: ti: icssm-prueth: Add switchdev support for icssm_prueth driver
+  net: ti: icssm-prueth: Add support for ICSSM RSTP switch
+
+ drivers/net/ethernet/ti/Makefile              |    2 +-
+ drivers/net/ethernet/ti/icssm/icssm_prueth.c  |  529 +++++++-
+ drivers/net/ethernet/ti/icssm/icssm_prueth.h  |   20 +-
+ .../ethernet/ti/icssm/icssm_prueth_fdb_tbl.h  |   76 ++
+ .../ethernet/ti/icssm/icssm_prueth_switch.c   | 1065 +++++++++++++++++
+ .../ethernet/ti/icssm/icssm_prueth_switch.h   |   37 +
+ drivers/net/ethernet/ti/icssm/icssm_switch.h  |  103 ++
+ .../net/ethernet/ti/icssm/icssm_switchdev.c   |  333 ++++++
+ .../net/ethernet/ti/icssm/icssm_switchdev.h   |   13 +
+ .../ti/icssm/icssm_vlan_mcast_filter_mmap.h   |  120 ++
+ 10 files changed, 2275 insertions(+), 23 deletions(-)
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_fdb_tbl.h
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_switch.c
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_switch.h
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_switchdev.c
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_switchdev.h
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_vlan_mcast_filter_mmap.h
+
+-- 
+2.43.0
+
 
