@@ -1,98 +1,133 @@
-Return-Path: <netdev+bounces-246975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08F09CF2F7A
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 11:24:39 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98C55CF30A7
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 11:47:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D48C2307896B
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 10:21:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8265F3002502
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 10:47:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C2373168E3;
-	Mon,  5 Jan 2026 10:21:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3947D316197;
+	Mon,  5 Jan 2026 10:46:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="f12n0v9H"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BYF5YiNx";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="AqIJNU23"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0975D3164CB;
-	Mon,  5 Jan 2026 10:21:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E193D314D3D
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 10:46:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767608501; cv=none; b=k92SooI6f7B3Nv+2BKGRJ8S+9YoviJrcTf+Iii0pA1EMg9BjIB2eP9gMl66sV6fT17h8HHdpDnRbgewH+3LpDLGiTcK96nE0UypeHatfsxiTmj8mevS1vbeSjjkiDjmxeyzVmJUWRAwHU27GIYXMk7OOn8C8PJgyoMSHUTsDdPM=
+	t=1767610018; cv=none; b=Iiv9fW0BoephahoPplI+mEb6uc9New26Mzg69DgM46HOgJZE9NXgPjKn2gInViKrx9yaHY33pN+t9o+aZN7tlRy0CMRE4GoCzE1fHKjuncGpUbC2O6bJ8wc09TIRj3XXar0dqntzo01BY9jEvt9rAm3xoUr9H8Ie8IeuVMn3SQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767608501; c=relaxed/simple;
-	bh=QJwR31LUjagdVEaSKK25/11zLr/1MNw+I0HRRvelUeE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bc4R3qRajoiJTPypAWqZQfk2xr5NBLqOlT98VQ1Uc1nEQq+bK2k0oqvk58bDc8agdfv75cq5YCTWD06LNJA1wIwR6/T6Lt3Wf+4zUmrc3DHXyX+5E50h2ownEfXqXGvLamVoYqSlnWtW56VCXshL96I5DaJ6SaUUWkppA8AFB5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=f12n0v9H; arc=none smtp.client-ip=220.197.31.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=LX
-	Da7p8qMOIcHKrHr4whPEp5/2uFN+0BctnZg49fC7g=; b=f12n0v9HB8vaRTTPba
-	5sNCx2vXMEVG9BLtlE4wsnknfFHpRzhhTBlHOQEN6/q8utWSWmp8YRHBKwIZlmbP
-	VEHMHFGhYuyJz7c5pfqzJxJDFkwchUEWARzblHLRvE/KKJgxoBjYsV7D4bjgZsuW
-	IU8TLcoNC3D541U8U2sezr+Aw=
-Received: from localhost.localdomain (unknown [])
-	by gzsmtp3 (Coremail) with SMTP id PigvCgDnrxNrkFtpVWA8KQ--.198S10;
-	Mon, 05 Jan 2026 18:21:02 +0800 (CST)
-From: Slark Xiao <slark_xiao@163.com>
-To: loic.poulain@oss.qualcomm.com,
-	ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	mani@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Slark Xiao <slark_xiao@163.com>
-Subject: [net-next v4 8/8] net: wwan: mhi_wwan_ctrl: Add NMEA channel support
-Date: Mon,  5 Jan 2026 18:20:18 +0800
-Message-Id: <20260105102018.62731-9-slark_xiao@163.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260105102018.62731-1-slark_xiao@163.com>
-References: <20260105102018.62731-1-slark_xiao@163.com>
+	s=arc-20240116; t=1767610018; c=relaxed/simple;
+	bh=R92sfuFN6VXvFyeKVBFJ2uVf3HN5zZU1eiBvYWPC9Mc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=LlF0zqRH6saz22kfMfsSiBGenQLMM+yEVCMvYIcJZorFO3fOcl3m2gryNqtLTVsbavFh3yOIQCP2ywpj/f9gu3+ZeO1b/qUvQAVVqWowIyoNXUBgGOPeHX0ooWIWeYFvWTz0llR6YRgzKGnuaIB+/fX0jT54w4XgVTzl3HxkZkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BYF5YiNx; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AqIJNU23; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767610015;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R92sfuFN6VXvFyeKVBFJ2uVf3HN5zZU1eiBvYWPC9Mc=;
+	b=BYF5YiNxj1IFt2k4vS6FjU+hJAPTJi/Qz8ADE0PpYHyU3kpQ7rQT4Or/Gers6b94KTH5TD
+	oOiuvdaD82H70oo74Z5XK197rckCM6VqqLqGpijKmBd1969IC+rZRaiufs8mND5KpJgl6K
+	ddbsJJpdcDgaMheJeWZmYF58kTy3XAg=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-135-4qZul1_dOqWbtJBB7oMGkA-1; Mon, 05 Jan 2026 05:46:53 -0500
+X-MC-Unique: 4qZul1_dOqWbtJBB7oMGkA-1
+X-Mimecast-MFC-AGG-ID: 4qZul1_dOqWbtJBB7oMGkA_1767610013
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b79fddf8e75so1225648166b.3
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 02:46:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1767610012; x=1768214812; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=R92sfuFN6VXvFyeKVBFJ2uVf3HN5zZU1eiBvYWPC9Mc=;
+        b=AqIJNU23+cyvHoACgS/1MqPnLi3XCNDBs3HjzrHQy0oHyrfMla3/tyDkuwtPEnWzqB
+         l5LcQ1ITM2SZecvKD3bGR63m7z/nzyoc6mEskdEMjb12G22RljestrxmVZdKPqW5OcTw
+         Sg6AH91AbmaUT/vT9MooPLTqifFfWyeH+Z9TKqlKSHGnwjTH1Eca5BUz9R+qYB+w0ruf
+         DwKe0LyRatFFjoKKY2GxrVTCCU18tp78Jtzecssp3uhQQX1BrN8QSKGqCnxPP6rTSQTe
+         +kXeWTVc9cR+LmvLxL/+6vzMYF9ECRGk64qBMD3DzUaSXOXEX4yWgy9yJd7BqBRRxkGM
+         XtXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767610012; x=1768214812;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=R92sfuFN6VXvFyeKVBFJ2uVf3HN5zZU1eiBvYWPC9Mc=;
+        b=eK5rDTQwK2fAnRIWxzYJbWNYjVEI1MTkUuged/WDxllWpCUto+wfq1hp56INm2aJv/
+         Xn/b7LH1r8rJ3cTrnTT2Xsh21PO6GjYsVLl8WgU3C+3hki/UCwl8TI9yWoPexjYZr1sg
+         FYRfwhBIeIoggGSqXNLqw4JX64tFxPQgKYAqmR4AIWlixjnQRjucW3c93qz7lNp+c2VC
+         6M1vAp9Ca8VTK4IrA6u8fiRa8BFNduTTljwE0DFZlvoGJm46beK+/PIa+GlYI29Knt1M
+         T9D78qkas6fr6b3YDo+zmIeDiYwm35lmcoye5IU2+gc5qVeg+VgvLieVRZhJiBGDnBuC
+         /2Gw==
+X-Forwarded-Encrypted: i=1; AJvYcCXG4yICPXFVsnwu/i0Byf4KyJjbIcDrgyEdRytHibs89IfjnjUR+fUaYglzNb6VEAkRJ5s0+do=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxl2JBCzhup2hJLM4FcHxhfNBM/9kA1IWpttGz17022VbSmFegt
+	x+FYsG8AP8Xc//mnJW1Z7Us6zlV8KHGuiPdvaEyskAz6xWkOHOhEJLocYD5RxsaDSx4H8erMCjt
+	tUM/d2b6l+vsTTsHOW/wVmxVLXfXAWrAOVizsEuXz/ThT7ygneD7XFTPHqA==
+X-Gm-Gg: AY/fxX6i+XELD6H8tjSBKbZ+3fI/7m9mX9jOZHAJbLrn2I0z/61EhAQsjk3lLvcsE6i
+	dAhBgzxCPsOy20jJ/pKEkj0jK0Crtyl+P0+uiA7O9r7qEg4q1A0+dEMJq8q6bpIy4wnlv7VxPzv
+	ikDe4+9gb/rrwtQPDu4412rYB0eHn+lN1T1blSSLGEDtpV74U0wDKvpMlPjLuVZxkDDZ7HDFS5u
+	RlUq5ArmT0I6yF2SNiKBk/vBJJFKrLVCgTyG8ypB631Glrxb3bEPw6XkBG+4DZFxyyr03SxMO3T
+	/4wSH6CtXPCSQN6y9Tw9jp0lUT0tHGxdU0DN8vv5lK97EZl9C5rcVSVhrnbBXpbGcMJZ/xcj1FT
+	GZ6tiD3TN3OBh7Ejjt81n5UXGzZKT09gQ1yr2
+X-Received: by 2002:a17:907:7fa8:b0:b73:572d:3b07 with SMTP id a640c23a62f3a-b8036fac50amr5432252066b.28.1767610012538;
+        Mon, 05 Jan 2026 02:46:52 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHxo3GoSY0pg7482wScLoSxSpKHDG2VZ6RLjUNgrk7dLDD62D65GmPP+NwI+HG9Zc8LUzQ0vg==
+X-Received: by 2002:a17:907:7fa8:b0:b73:572d:3b07 with SMTP id a640c23a62f3a-b8036fac50amr5432246466b.28.1767610012006;
+        Mon, 05 Jan 2026 02:46:52 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8037f0b12dsm5538526566b.48.2026.01.05.02.46.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 02:46:51 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 56B2D407E63; Mon, 05 Jan 2026 11:46:50 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: KaFai Wan <kafai.wan@linux.dev>, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com,
+ song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
+ kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, hawk@kernel.org, shuah@kernel.org,
+ aleksander.lobakin@intel.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc: KaFai Wan <kafai.wan@linux.dev>, Yinhao Hu <dddddd@hust.edu.cn>, Kaiyan
+ Mei <M202472210@hust.edu.cn>, Dongliang Mu <dzm91@hust.edu.cn>
+Subject: Re: [PATCH bpf-next 1/2] bpf, test_run: Fix user-memory-access
+ vulnerability for LIVE_FRAMES
+In-Reply-To: <20260104162350.347403-2-kafai.wan@linux.dev>
+References: <fa2be179-bad7-4ee3-8668-4903d1853461@hust.edu.cn>
+ <20260104162350.347403-1-kafai.wan@linux.dev>
+ <20260104162350.347403-2-kafai.wan@linux.dev>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Mon, 05 Jan 2026 11:46:50 +0100
+Message-ID: <87y0mc5obp.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PigvCgDnrxNrkFtpVWA8KQ--.198S10
-X-Coremail-Antispam: 1Uf129KBjvdXoWrKrW3Xw48Gr4fGrWDAF45Awb_yoWfWwbE9w
-	1DXF9rJrW5W34UKFsFgF13ZryfKw10qF4kXFnavrZYv347XryfWw1kZF4Dtr9Fkr17CF9F
-	9rnxWayFyw4fWjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sREK0P3UUUUU==
-X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/xtbCvw543GlbkI65KQAA3p
+Content-Type: text/plain
 
-For MHI WWAN device, we need a match between NMEA channel and
-WWAN_PORT_NMEA type. Then the GNSS subsystem could create the
-gnss device succssfully.
+KaFai Wan <kafai.wan@linux.dev> writes:
 
-Signed-off-by: Slark Xiao <slark_xiao@163.com>
----
- drivers/net/wwan/mhi_wwan_ctrl.c | 1 +
- 1 file changed, 1 insertion(+)
+> This fix reverts to the original version and ensures data_hard_start
+> correctly points to the xdp_frame structure, eliminating the security
+> risk.
 
-diff --git a/drivers/net/wwan/mhi_wwan_ctrl.c b/drivers/net/wwan/mhi_wwan_ctrl.c
-index e9f979d2d851..e13c0b078175 100644
---- a/drivers/net/wwan/mhi_wwan_ctrl.c
-+++ b/drivers/net/wwan/mhi_wwan_ctrl.c
-@@ -263,6 +263,7 @@ static const struct mhi_device_id mhi_wwan_ctrl_match_table[] = {
- 	{ .chan = "QMI", .driver_data = WWAN_PORT_QMI },
- 	{ .chan = "DIAG", .driver_data = WWAN_PORT_QCDM },
- 	{ .chan = "FIREHOSE", .driver_data = WWAN_PORT_FIREHOSE },
-+	{ .chan = "NMEA", .driver_data = WWAN_PORT_NMEA },
- 	{},
- };
- MODULE_DEVICE_TABLE(mhi, mhi_wwan_ctrl_match_table);
--- 
-2.25.1
+This is wrong. We should just be checking the meta_len on input to
+account for the size of xdp_frame. I'll send a patch.
+
+-Toke
 
 
