@@ -1,133 +1,124 @@
-Return-Path: <netdev+bounces-246980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98C55CF30A7
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 11:47:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2367ECF3077
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 11:42:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8265F3002502
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 10:47:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0BC1730552DB
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 10:39:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3947D316197;
-	Mon,  5 Jan 2026 10:46:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1576314B9F;
+	Mon,  5 Jan 2026 10:39:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BYF5YiNx";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="AqIJNU23"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Fz2JOjb4"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E193D314D3D
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 10:46:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C29AB2D8382;
+	Mon,  5 Jan 2026 10:39:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767610018; cv=none; b=Iiv9fW0BoephahoPplI+mEb6uc9New26Mzg69DgM46HOgJZE9NXgPjKn2gInViKrx9yaHY33pN+t9o+aZN7tlRy0CMRE4GoCzE1fHKjuncGpUbC2O6bJ8wc09TIRj3XXar0dqntzo01BY9jEvt9rAm3xoUr9H8Ie8IeuVMn3SQk=
+	t=1767609561; cv=none; b=i97XljJZhGKsRmxPXlaSKPaIZDMSDVSdDYmPnFoWXbXcYoLrL1t7FmNSDL4wYxD2JWo3y19xP15sVWJdaPfZ/AZ5m38w5Cf/KSjUpwB+jkbY6c/xLyVewA+vh49OT/BSk5H7BfgDfWAgyXIG22x83U2jBiGBxIUiGoyOOa543SA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767610018; c=relaxed/simple;
-	bh=R92sfuFN6VXvFyeKVBFJ2uVf3HN5zZU1eiBvYWPC9Mc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=LlF0zqRH6saz22kfMfsSiBGenQLMM+yEVCMvYIcJZorFO3fOcl3m2gryNqtLTVsbavFh3yOIQCP2ywpj/f9gu3+ZeO1b/qUvQAVVqWowIyoNXUBgGOPeHX0ooWIWeYFvWTz0llR6YRgzKGnuaIB+/fX0jT54w4XgVTzl3HxkZkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BYF5YiNx; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AqIJNU23; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767610015;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R92sfuFN6VXvFyeKVBFJ2uVf3HN5zZU1eiBvYWPC9Mc=;
-	b=BYF5YiNxj1IFt2k4vS6FjU+hJAPTJi/Qz8ADE0PpYHyU3kpQ7rQT4Or/Gers6b94KTH5TD
-	oOiuvdaD82H70oo74Z5XK197rckCM6VqqLqGpijKmBd1969IC+rZRaiufs8mND5KpJgl6K
-	ddbsJJpdcDgaMheJeWZmYF58kTy3XAg=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-135-4qZul1_dOqWbtJBB7oMGkA-1; Mon, 05 Jan 2026 05:46:53 -0500
-X-MC-Unique: 4qZul1_dOqWbtJBB7oMGkA-1
-X-Mimecast-MFC-AGG-ID: 4qZul1_dOqWbtJBB7oMGkA_1767610013
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b79fddf8e75so1225648166b.3
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 02:46:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767610012; x=1768214812; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=R92sfuFN6VXvFyeKVBFJ2uVf3HN5zZU1eiBvYWPC9Mc=;
-        b=AqIJNU23+cyvHoACgS/1MqPnLi3XCNDBs3HjzrHQy0oHyrfMla3/tyDkuwtPEnWzqB
-         l5LcQ1ITM2SZecvKD3bGR63m7z/nzyoc6mEskdEMjb12G22RljestrxmVZdKPqW5OcTw
-         Sg6AH91AbmaUT/vT9MooPLTqifFfWyeH+Z9TKqlKSHGnwjTH1Eca5BUz9R+qYB+w0ruf
-         DwKe0LyRatFFjoKKY2GxrVTCCU18tp78Jtzecssp3uhQQX1BrN8QSKGqCnxPP6rTSQTe
-         +kXeWTVc9cR+LmvLxL/+6vzMYF9ECRGk64qBMD3DzUaSXOXEX4yWgy9yJd7BqBRRxkGM
-         XtXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767610012; x=1768214812;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=R92sfuFN6VXvFyeKVBFJ2uVf3HN5zZU1eiBvYWPC9Mc=;
-        b=eK5rDTQwK2fAnRIWxzYJbWNYjVEI1MTkUuged/WDxllWpCUto+wfq1hp56INm2aJv/
-         Xn/b7LH1r8rJ3cTrnTT2Xsh21PO6GjYsVLl8WgU3C+3hki/UCwl8TI9yWoPexjYZr1sg
-         FYRfwhBIeIoggGSqXNLqw4JX64tFxPQgKYAqmR4AIWlixjnQRjucW3c93qz7lNp+c2VC
-         6M1vAp9Ca8VTK4IrA6u8fiRa8BFNduTTljwE0DFZlvoGJm46beK+/PIa+GlYI29Knt1M
-         T9D78qkas6fr6b3YDo+zmIeDiYwm35lmcoye5IU2+gc5qVeg+VgvLieVRZhJiBGDnBuC
-         /2Gw==
-X-Forwarded-Encrypted: i=1; AJvYcCXG4yICPXFVsnwu/i0Byf4KyJjbIcDrgyEdRytHibs89IfjnjUR+fUaYglzNb6VEAkRJ5s0+do=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxl2JBCzhup2hJLM4FcHxhfNBM/9kA1IWpttGz17022VbSmFegt
-	x+FYsG8AP8Xc//mnJW1Z7Us6zlV8KHGuiPdvaEyskAz6xWkOHOhEJLocYD5RxsaDSx4H8erMCjt
-	tUM/d2b6l+vsTTsHOW/wVmxVLXfXAWrAOVizsEuXz/ThT7ygneD7XFTPHqA==
-X-Gm-Gg: AY/fxX6i+XELD6H8tjSBKbZ+3fI/7m9mX9jOZHAJbLrn2I0z/61EhAQsjk3lLvcsE6i
-	dAhBgzxCPsOy20jJ/pKEkj0jK0Crtyl+P0+uiA7O9r7qEg4q1A0+dEMJq8q6bpIy4wnlv7VxPzv
-	ikDe4+9gb/rrwtQPDu4412rYB0eHn+lN1T1blSSLGEDtpV74U0wDKvpMlPjLuVZxkDDZ7HDFS5u
-	RlUq5ArmT0I6yF2SNiKBk/vBJJFKrLVCgTyG8ypB631Glrxb3bEPw6XkBG+4DZFxyyr03SxMO3T
-	/4wSH6CtXPCSQN6y9Tw9jp0lUT0tHGxdU0DN8vv5lK97EZl9C5rcVSVhrnbBXpbGcMJZ/xcj1FT
-	GZ6tiD3TN3OBh7Ejjt81n5UXGzZKT09gQ1yr2
-X-Received: by 2002:a17:907:7fa8:b0:b73:572d:3b07 with SMTP id a640c23a62f3a-b8036fac50amr5432252066b.28.1767610012538;
-        Mon, 05 Jan 2026 02:46:52 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHxo3GoSY0pg7482wScLoSxSpKHDG2VZ6RLjUNgrk7dLDD62D65GmPP+NwI+HG9Zc8LUzQ0vg==
-X-Received: by 2002:a17:907:7fa8:b0:b73:572d:3b07 with SMTP id a640c23a62f3a-b8036fac50amr5432246466b.28.1767610012006;
-        Mon, 05 Jan 2026 02:46:52 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8037f0b12dsm5538526566b.48.2026.01.05.02.46.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 02:46:51 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 56B2D407E63; Mon, 05 Jan 2026 11:46:50 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: KaFai Wan <kafai.wan@linux.dev>, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com,
- song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
- kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, hawk@kernel.org, shuah@kernel.org,
- aleksander.lobakin@intel.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc: KaFai Wan <kafai.wan@linux.dev>, Yinhao Hu <dddddd@hust.edu.cn>, Kaiyan
- Mei <M202472210@hust.edu.cn>, Dongliang Mu <dzm91@hust.edu.cn>
-Subject: Re: [PATCH bpf-next 1/2] bpf, test_run: Fix user-memory-access
- vulnerability for LIVE_FRAMES
-In-Reply-To: <20260104162350.347403-2-kafai.wan@linux.dev>
-References: <fa2be179-bad7-4ee3-8668-4903d1853461@hust.edu.cn>
- <20260104162350.347403-1-kafai.wan@linux.dev>
- <20260104162350.347403-2-kafai.wan@linux.dev>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Mon, 05 Jan 2026 11:46:50 +0100
-Message-ID: <87y0mc5obp.fsf@toke.dk>
+	s=arc-20240116; t=1767609561; c=relaxed/simple;
+	bh=auaWrlklStGyGtxL5JgH4a3smEJfo2D0fNwKvm7SaKo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ci135+EovxVX8FBQ3t/LjMPi1QuX2fxxNVKaZVVJoDg4JTCTtSZuwI8lFGTW+b/bFYtlRmCTnDZ8LsQ0QDSO3aSoF/A8dejiMdp6MqcF3/uT1jIzsp1p/uAZmgFe6jeng4m4UwV9xBPLfoIEc6gPcp/y449hcwMkWQvUHafAdMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Fz2JOjb4; arc=none smtp.client-ip=113.46.200.217
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=l3s7cX/ZeOHl9HnqSZY8U8DaJGP2WKlEP0TykuYXlbM=;
+	b=Fz2JOjb4Te8gnO7rj4dgrJ7j+hrcNBCFgX/jivMD93VAMHJGMXFOwHSVS4imda5hIQsfjhwCY
+	ZimlykASdKpWy8j/AGUGvXUPUaq5Iu5hmnLE+f9S5gPh7L5BQUjdwefwpb+HTSL8Iwl3jo/CjGF
+	Vt+tJckoOQUSnru8/0geYw0=
+Received: from mail.maildlp.com (unknown [172.19.163.104])
+	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dl9gL5NTDzcb14;
+	Mon,  5 Jan 2026 18:35:42 +0800 (CST)
+Received: from dggpemf100004.china.huawei.com (unknown [7.185.36.110])
+	by mail.maildlp.com (Postfix) with ESMTPS id 08AFD404AD;
+	Mon,  5 Jan 2026 18:39:11 +0800 (CST)
+Received: from huawei.com (10.175.121.217) by dggpemf100004.china.huawei.com
+ (7.185.36.110) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 5 Jan
+ 2026 18:39:09 +0800
+From: Cao Jiaqiang <caojiaqiang@huawei.com>
+To: <gregkh@linuxfoundation.org>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<shuah@kernel.org>
+CC: <stable@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<dsahern@kernel.org>, <vincent.wang@huawei.com>, <liujian56@huawei.com>,
+	<yi.zhang@huawei.com>, <caojiaqiang@huawei.com>
+Subject: [PATCH 5.15.y] selftests: net: test_vxlan_under_vrf: fix HV connectivity test
+Date: Mon, 5 Jan 2026 18:52:51 +0800
+Message-ID: <20260105105251.33854-1-caojiaqiang@huawei.com>
+X-Mailer: git-send-email 2.22.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ dggpemf100004.china.huawei.com (7.185.36.110)
 
-KaFai Wan <kafai.wan@linux.dev> writes:
+From: Andrea Righi <andrea.righi@canonical.com>
 
-> This fix reverts to the original version and ensures data_hard_start
-> correctly points to the xdp_frame structure, eliminating the security
-> risk.
+[ Upstream commit e7e4785fa30f9b5d1b60ed2d8e221891325dfc5f ]
 
-This is wrong. We should just be checking the meta_len on input to
-account for the size of xdp_frame. I'll send a patch.
+It looks like test_vxlan_under_vrf.sh is always failing to verify the
+connectivity test during the ping between the two simulated VMs.
 
--Toke
+This is due to the fact that veth-hv in each VM should have a distinct
+MAC address.
+
+Fix by setting a unique MAC address on each simulated VM interface.
+
+Without this fix:
+
+ $ sudo ./tools/testing/selftests/net/test_vxlan_under_vrf.sh
+ Checking HV connectivity                                           [ OK ]
+ Check VM connectivity through VXLAN (underlay in the default VRF)  [FAIL]
+
+With this fix applied:
+
+ $ sudo ./tools/testing/selftests/net/test_vxlan_under_vrf.sh
+ Checking HV connectivity                                           [ OK ]
+ Check VM connectivity through VXLAN (underlay in the default VRF)  [ OK ]
+ Check VM connectivity through VXLAN (underlay in a VRF)            [FAIL]
+
+NOTE: the connectivity test with the underlay VRF is still failing; it
+seems that ARP requests are blocked at the simulated hypervisor level,
+probably due to some missing ARP forwarding rules. This requires more
+investigation (in the meantime we may consider to set that test as
+expected failure - XFAIL).
+
+Signed-off-by: Andrea Righi <andrea.righi@canonical.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Cao Jiaqiang <caojiaqiang@huawei.com>
+---
+ tools/testing/selftests/net/test_vxlan_under_vrf.sh | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tools/testing/selftests/net/test_vxlan_under_vrf.sh b/tools/testing/selftests/net/test_vxlan_under_vrf.sh
+index 6fadc8e2f116..1fd1250ebc66 100755
+--- a/tools/testing/selftests/net/test_vxlan_under_vrf.sh
++++ b/tools/testing/selftests/net/test_vxlan_under_vrf.sh
+@@ -101,6 +101,8 @@ setup-vm() {
+     ip -netns hv-$id link set veth-tap master br0
+     ip -netns hv-$id link set veth-tap up
+ 
++    ip link set veth-hv address 02:1d:8d:dd:0c:6$id
++
+     ip link set veth-hv netns vm-$id
+     ip -netns vm-$id addr add 10.0.0.$id/24 dev veth-hv
+     ip -netns vm-$id link set veth-hv up
+-- 
+2.22.0
 
 
