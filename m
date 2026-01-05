@@ -1,137 +1,131 @@
-Return-Path: <netdev+bounces-246828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BFA0CF1893
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 01:59:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C984CF1999
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 03:04:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6F247300351B
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 00:59:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 10B12300C6C3
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 02:04:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE492BCF43;
-	Mon,  5 Jan 2026 00:59:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BD7230DD00;
+	Mon,  5 Jan 2026 02:04:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OGMpH0sd"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="q3Dg18ZH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F67A2F872
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 00:59:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A74C284884;
+	Mon,  5 Jan 2026 02:04:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767574753; cv=none; b=n/s1FDRbhjhx3sfoQ3gWYY5MO8WBkO8i+rKU4zrvWt3STJKIAywFkH6PgenMu+F3T8R8/aTCWRqDo3vrTKMZk1yyhx1htrymqv4VQxtZK0M5o4DzfZQV18Ll524yECtJlKds84FZyFGIPpc8lx7nZP9Jx/kjTZSWiMNPqaENMi0=
+	t=1767578663; cv=none; b=Xo2BkJoWTpnJ6fws2vZLcda4UhQQYuIjPXaUhL4Pjui8bfjMkO6HRSjFxXbNfZtAigBAJqQHfi5Cw6oBrBvmDAy3NEqk7BHP4vtDyiBAckQuS5VAKzhcA3EPaMLvI6Mw7eXyxHL3Q0q6fy9ONMaHL68PsO+Qt5yDyS6pKCYzLs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767574753; c=relaxed/simple;
-	bh=m96MFa3x8e4FGlWO6DaZSmBzfv+zmnOSQ9VL159FjGw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=TdkxnYSXli1GDyn9y2oSUaDO+SNnK2b/OHhj5ORTf/TiB0MxLXnVkcHP0eA01kxK79Xh5WUilj32TwA3FpYyzLLOjgzwO3K3rP7JgeNCb7aQ/Yy/fOJds7jPz6aXCznJzw8tYTLMSjU5xNZOpX5GQyxv//qft6+sOBmWX5G38nU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OGMpH0sd; arc=none smtp.client-ip=209.85.210.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-7c6d13986f8so1024032a34.0
-        for <netdev@vger.kernel.org>; Sun, 04 Jan 2026 16:59:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767574751; x=1768179551; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Qr6CL6ryUgvflNaOxP8c/DQAuzEeK0UQJCdZNd07Ekk=;
-        b=OGMpH0sdwC9y25HFGzCnFCjI7cEG/G9HfNigcD4qKhrVZwCl51nON8xi4LevjegChO
-         4GK5p5+mzr3AYdHdZK289aPyNveXffSqA50p4GkSDFs3VTScHxOmR175IkPMpcLfnmXy
-         AbnwpE/WdN75naviGh0KiL0JO3cT2Vo2FbmjEFJTdY830plwHxmAFVKI8yZ3TnZOSvXf
-         I38sQ1YEanRu0lebLvwjSCwDuukRaabajYwrL+bN2PEqxoVWVjfoCXCrS+85LyWZKDpi
-         Bq1TL/JhyIeBc4o2Y6MXP8GZmOnhm8tHLZpsmy6vPAcXcxzHcZCxKzmcOBPMAbWzHQWm
-         415w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767574751; x=1768179551;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Qr6CL6ryUgvflNaOxP8c/DQAuzEeK0UQJCdZNd07Ekk=;
-        b=ie9+Td2HTMy3ZqdySmv8KC35oSgTCNQLbe16yZgM7XTMNN+O+0iG11YZeSxFrWZm4Y
-         dueSoL4SNEivtIRdd5mBZYwggCMzebjHsZLaKU16e/4PB8Ybf3B98C4XPTtZAVm37ZQ8
-         voj4HTw2ZXjeplriPlR1szDmW9gs7u7Skc1WMSFJPNMm+AWxeOyL8MqBjlZDVFj54LYz
-         X4j4yWg/BbuyiW/nz6vXeqlWSCaUpCYGO9A4XTAjEIE4L7OknpRUM27XjbjFrKrMo1Z2
-         S9ZLX7nl/468+HZq9xMOSqnCay6zKuyEijkKYYcM94IeP07ofkJG1AJjsntogQa7lJsx
-         ydnQ==
-X-Gm-Message-State: AOJu0YywfR1flGb7PH5v48kkn6fYPuI3xZrJNiiqbdI+xOD6OosLXBLJ
-	1Daoz0ta0Y8RoMKme5m7nS66a8M950BgroWbKSnke+N5oOngeON1qVSysmjQpBto
-X-Gm-Gg: AY/fxX6J8ac3g+sVx1WM0rrjcGlThAfaKK/EsDKd78HWfwSWLGg82GgrC31QFr+eFHP
-	nytPS5LBSQ8h0f75sSdUmSs5XDrUWotFt5P4MQIL9vW113aEh0b8rd68xwuQe/hoCv3sqgNu2Vn
-	wE89LbwTwkX3STMufrNIAp+mirEMt/IToS2BEHfeR42K36NAxOKAmXu/+epRigjAX72HXTzVCOY
-	0sirkeff+hDJ78Yd+EgUEQoCGwMHHVcoukTsCLxxuWzOeg/nuofrOGhlZN6faFpPL8nDZCbIF9e
-	PlBCPpcZKFC/UaFkpJaRXvximnB06lOtC50IyytRUaIpZadhgt+LzwylNQoC4reXkpcpdiajq2+
-	cQoJZai3dX9JTrz9BDzhAFkjd7iNdEZqrG5H6QOjQ+k/MY7l2W5ANsC/5A3WlHxyVHY8NyPvONj
-	Jd+3cPZgM5ZyxmjM2QGIbyM31Uwy0wNUdACN0vjidgoUE=
-X-Google-Smtp-Source: AGHT+IGS48Hr0VVCmwPxOlboGr8KgZOtnvBFq7n3uRB3SVLRxLIoJAKMDjCKOIQCYrXwsJjmgs5E2A==
-X-Received: by 2002:a05:6830:3c1:b0:746:d097:9342 with SMTP id 46e09a7af769-7ce2bfacb60mr2724660a34.7.1767574751064;
-        Sun, 04 Jan 2026 16:59:11 -0800 (PST)
-Received: from shiv-machina.. (97-118-238-54.hlrn.qwest.net. [97.118.238.54])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cc667f9201sm32509377a34.26.2026.01.04.16.59.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Jan 2026 16:59:10 -0800 (PST)
-From: Shivani Gupta <shivani07g@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	syzbot+8f1c492ffa4644ff3826@syzkaller.appspotmail.com,
-	Shivani Gupta <shivani07g@gmail.com>
-Subject: [PATCH v2] net/sched: act_api: avoid dereferencing ERR_PTR in tcf_idrinfo_destroy
-Date: Mon,  5 Jan 2026 00:59:05 +0000
-Message-Id: <20260105005905.243423-1-shivani07g@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260102232116.204796-1-shivani07g@gmail.com>
-References: <20260102232116.204796-1-shivani07g@gmail.com>
+	s=arc-20240116; t=1767578663; c=relaxed/simple;
+	bh=VD2g4x30tYK0IfHuRuTFEHsGFn/v4l2BNWMOsIXqhR4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=bA5fjLX+N01AVJMkJHiEdUrC1aqnpmYZzs8wI/ml6qA59doxbWuTiq1iBiNULlWJwOBbeUkQ/HflD3cEgsMO7bmX1aOKiubnGfzp+q+/94hwzCJh95zuPpIyabyHc2O3WXq2kPqH9hg69wyig5lyKWl6j6qbYsf48x/VMqNrqIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=q3Dg18ZH; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1767578656;
+	bh=MOc4tm5hzHeN7w9Q5mQExScYl5WcFW9QovEg1i1Se3Q=;
+	h=Date:From:To:Cc:Subject:From;
+	b=q3Dg18ZH4rmLqswOG/zOHemv8hfDNAwIeVB24W48E+A6382/AXszIzLEokz5rcsfG
+	 g9ndmoxjmlrlPxcL/6rkKgr0oxPUV9A7HBS24u8TUaXSZ4NRYbG6EyEIEsDdEPy6c5
+	 W6UdjvZ9yxd6gZYZJSuDseWlyQKYCCQqtC5SAN+MzqImbgmD16RZqb89gGH073d3sL
+	 vCO46wTBXSUca/aCJAfRf309A1eDZbFTINC3BBSOIc7LJPCQVo+sAI/hEJXbuAVc6A
+	 Zj/m5V10NRqww/gtO4aKLYSa2YG2ExGwz9dQOdrE5CORI/UamKzZOWZ19/a+jSApt5
+	 EdTFtlLd6EXPw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4dkyKB6s4qz4wCZ;
+	Mon, 05 Jan 2026 13:04:14 +1100 (AEDT)
+Date: Mon, 5 Jan 2026 13:04:13 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>
+Cc: bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Chen
+ Ridong <chenridong@huawei.com>, JP Kobryn <inwardvessel@gmail.com>, Linux
+ Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>
+Subject: linux-next: manual merge of the bpf-next tree with the mm-unstable
+ tree
+Message-ID: <20260105130413.273ee0ee@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/QTThylcdXK9Df2AdQpaZlv1";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-syzbot reported a crash in tc_act_in_hw() during netns teardown where
-tcf_idrinfo_destroy() passed an ERR_PTR(-EBUSY) value as a tc_action
-pointer, leading to an invalid dereference.
+--Sig_/QTThylcdXK9Df2AdQpaZlv1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Guard against ERR_PTR entries when iterating the action IDR so teardown
-does not call tc_act_in_hw() on an error pointer.
+Hi all,
 
-Fixes: 84a7d6797e6a ("net/sched: acp_api: no longer acquire RTNL in tc_action_net_exit()")
-Link: https://syzkaller.appspot.com/bug?extid=8f1c492ffa4644ff3826
-Reported-by: syzbot+8f1c492ffa4644ff3826@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=8f1c492ffa4644ff3826
-Signed-off-by: Shivani Gupta <shivani07g@gmail.com>
----
-v2:
-- Drop WARN_ON_ONCE() as ERR_PTR can be expected in a corner case.
-- Add Fixes: tag.
+Today's linux-next merge of the bpf-next tree got a semantic conflict in:
 
- net/sched/act_api.c | 3 +++
- 1 file changed, 3 insertions(+)
+  include/linux/memcontrol.h
+  mm/memcontrol-v1.c
+  mm/memcontrol.c
 
-diff --git a/net/sched/act_api.c b/net/sched/act_api.c
-index ff6be5cfe2b0..5e0a196ce66a 100644
---- a/net/sched/act_api.c
-+++ b/net/sched/act_api.c
-@@ -940,6 +940,9 @@ void tcf_idrinfo_destroy(const struct tc_action_ops *ops,
- 	int ret;
- 
- 	idr_for_each_entry_ul(idr, p, tmp, id) {
-+		if (IS_ERR(p)) {
-+			continue;
-+		}
- 		if (tc_act_in_hw(p) && !mutex_taken) {
- 			rtnl_lock();
- 			mutex_taken = true;
--- 
-2.34.1
+between commit:
 
+  eb557e10dcac ("memcg: move mem_cgroup_usage memcontrol-v1.c")
+
+from the mm-unstable tree and commit:
+
+  99430ab8b804 ("mm: introduce BPF kfuncs to access memcg statistics and ev=
+ents")
+
+from the bpf-next tree producing this build failure:
+
+mm/memcontrol-v1.c:430:22: error: static declaration of 'mem_cgroup_usage' =
+follows non-static declaration
+  430 | static unsigned long mem_cgroup_usage(struct mem_cgroup *memcg, boo=
+l swap)
+      |                      ^~~~~~~~~~~~~~~~
+In file included from mm/memcontrol-v1.c:3:
+include/linux/memcontrol.h:953:15: note: previous declaration of 'mem_cgrou=
+p_usage' with type 'long unsigned int(struct mem_cgroup *, bool)' {aka 'lon=
+g unsigned int(struct mem_cgroup *, _Bool)'}
+  953 | unsigned long mem_cgroup_usage(struct mem_cgroup *memcg, bool swap);
+      |               ^~~~~~~~~~~~~~~~
+
+I fixed it up (I reverted the mm-unstable tree commit) and can carry the
+fix as necessary. This is now fixed as far as linux-next is concerned,
+but any non trivial conflicts should be mentioned to your upstream
+maintainer when your tree is submitted for merging.  You may also want
+to consider cooperating with the maintainer of the conflicting tree to
+minimise any particularly complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/QTThylcdXK9Df2AdQpaZlv1
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmlbHB0ACgkQAVBC80lX
+0Gx0UQf9GEIs+Ocj8boEp+QMp8DUQ1aNk3ovf1auZzQ8bFN3wB/0VeAdZRI0su/t
+CDEecB/ND0fkbO7Ts2lBRsv4qUl1Scu9WFulyrbK1ngXYJ2yfbSkuZQjANnS1b3w
+lIi1+oz1BV4/8ofHfcqpLuf8s2LFpDxbv4YnxFPwz6ku+meyZxKiyrvJ37Mb1OAD
+uGJl5t8hhnZM2E+weQ3VTgIzLcdVGnB1D8VdaxJRjGWKBnfR3yqXvOnh/jEPD0XT
+TVSXLZGu+GZyhhbanshyv2FoXZjNVYNzEvpLDcxHRIxt8jRGTYHVlkywVBraPeyV
+LGdu9L4ERO9m3sWIYeRw/W1fJ7dy2g==
+=KjcO
+-----END PGP SIGNATURE-----
+
+--Sig_/QTThylcdXK9Df2AdQpaZlv1--
 
