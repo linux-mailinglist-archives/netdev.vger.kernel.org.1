@@ -1,132 +1,150 @@
-Return-Path: <netdev+bounces-247171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA809CF5398
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 19:23:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EF57CF539B
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 19:24:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 008F4305BC2D
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 18:22:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9FC3B3019183
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 18:23:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67DEF33EAEC;
-	Mon,  5 Jan 2026 18:22:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81B7325716;
+	Mon,  5 Jan 2026 18:23:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H3v75Vej"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T1twbJKf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43E71338594
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 18:22:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB86303CB0
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 18:23:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767637355; cv=none; b=qJ8JhLwdDC22jliPRO2L2XKs0sUZyqFmOkG/5xLH/vmBE/3Qbz1VxD6930HgkstVhBVaD6tGlWxfPDK0eUVNyJYGStMGON4c9NXPmr9zm9b2RyNykg5Kgq4/F2q29gZQuttFyJ9KifYLzU95ESVr1Ts9/8oZfRi5ZsKF+rP9YcQ=
+	t=1767637388; cv=none; b=hNSnk7rHQ3TAxAT6uM7p/RqVfQ+584xg7cQ9v6BLrqdNA9048BVSufk6OnVIyvxuI0s/vvmjsQZGb1Eu51Zjdpejw/D/gQsmkkcY0+1hE1kwZtGhLh6SnXkFejP7aPnbext8BCGhdPRGackfJSexSIkOKUyAhvOLC8CFl1b3uhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767637355; c=relaxed/simple;
-	bh=t66+7KOAPUPEKD/IgPT6Ru7OImztlruilpFCWBeGF8Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oYlrgljIxZsZmqdU8dH4iqnuWdh7xUsxBZq4iFmwcUUGH6D/8n/vgLuAVfzBK3zXg+ASl+9xZquI9Si6v61Xz7GRpeD/mrKjx2Ks8OlExZ7MP1tODXF5YUqX28WVRw3YFh0cyZ1L1Xx2xxTUykqHK0rlvhXjTSN6e908bieL6+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H3v75Vej; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6D03C19421
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 18:22:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767637354;
-	bh=t66+7KOAPUPEKD/IgPT6Ru7OImztlruilpFCWBeGF8Y=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=H3v75VejZiNrQbIst6HHnXoO52ZM3Tx8ntiu3O/Msz5wcDsrWEc8ezPVnk8ri0yd0
-	 Rh4pTt3Y1cWmiQ+8Zqz8DMt6AS9L5KNl2AoTVCpLRVC55oTfl5yxL1WaxTN89d3qFI
-	 4nFGjxtFGBe1jeg5Zz2wK2BVB6yaLHaoFWgmC6b8QqTukyRg/VwujlzdlcSCcxeb2K
-	 IAyF4kf3P4BYFZzngnRRpQgVrJOLagl7A5Vb6d+TwEj/biXuDn0GVZA7P5PUbHnjDv
-	 153+Wyzg1IPiPc0lh5P84q+BSjuuAd9Fve1sNFowy8o9tn9TdtW2/7wqYzOeO6rg+D
-	 N8IFIInNNFTgw==
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-65b73eacdfcso41050eaf.2
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 10:22:34 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCV1+1s3GCus0IXwBYz+2/+XYZxlh4NyB0QjAAC4NFVhKgRXQAkVkKJQnYZG+98XmUynij0oTHM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEbJCnM2t6w/Ujfr1kRaXYfUrxY3fU6DEYBryWkGvJfze+OGGH
-	KW2pk2K0sJ0SB454+Shpeo5QLOV5jk1u/Wwj+f9Pr7EOAtSHX34YcKiLvdTsyfThgqochV2/wI3
-	wsYr+g1vWLrmhUTXNrqzor4L/xG29cW4=
-X-Google-Smtp-Source: AGHT+IHB172ZQGOi9ZR1u9PjyV58cNhnXMvGGbP/9JKsqng7N5nz0M5cIctutXbciJi9XeHJlW5h6fuqEMIqm3oSi7E=
-X-Received: by 2002:a05:6820:7802:b0:659:9a49:8e74 with SMTP id
- 006d021491bc7-65f47a463d7mr130879eaf.68.1767637353760; Mon, 05 Jan 2026
- 10:22:33 -0800 (PST)
+	s=arc-20240116; t=1767637388; c=relaxed/simple;
+	bh=k9OtXFkIqje/AIKDr9FzDdAQGPBa0Z+JbsPnAT8CraI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=pLscWrIp7AkISw/tnt99a/1NOmQL5aLdzpwy9We97mvkYktYkBv/D5DFxQofvSiT3LkPdsIS2p3i5xtg9IqVaoyEjbOJKc7R6RxnvpRGllT0EGjghNzIebJsIcp0SPK+LqIRa05ajbo8J3zXk1aqjO3Hfn7WnglLoOpQK4UzogI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T1twbJKf; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-c3e921afad1so94272a12.1
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 10:23:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767637387; x=1768242187; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Ms3aLacsOOIkp2oK0SNeT2U5HEsWh1y7ZpyB6UCuuEk=;
+        b=T1twbJKfvBv2BAF0etic1S1JEuu1Yn8uJQ+L6ozvOuwk+mkbY7jFjJnjCNBnSNrdsq
+         3/Yt8VnnIpMbo94NA2zSLgiC5zFdop+bHz7f7T3MR5k5S5tYN6CWf4LARU/UcgnJWH8p
+         VIH+v1ozDPeLd7K/bNcjf7W8e8nEptqzf6BTZw4LlU+360VeJSvP1oJpuyXBMF/aUszr
+         vRyVQFsD2BHahthTAjG1F5eDasiw8Jq5TmCrflSAo4mS0PmiNqknkgEd/UAatGTX+T+g
+         JMrt0BsztaGLX3RV03DGEG7aTAknX00CHHwTSEeCTmuWOmrLc7ZdAV0Fr4kejcnNy9mJ
+         GKCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767637387; x=1768242187;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ms3aLacsOOIkp2oK0SNeT2U5HEsWh1y7ZpyB6UCuuEk=;
+        b=BXuziIkGAe6tSqZJqOBQ54m1o3gE5NBZvBkmduXbVS6lumAzuwiX5mUrUQWkJxR42v
+         dp30U451hKOt6hWpPRXUPAerNdMK1ugxZ/ob4EmrpFQ76+jTup1sRLBqUKcd/dQiHfRy
+         ggISh50uhTXbPzE41uhcCy0ChdgWqqjkLJhqjCdNJFK/J1onFHCtpKv6iWZpCICU09Sl
+         wtYBkxc4lnlEGInC2XX6VHx7JLWwzKAHVRjf++7FXtBInWsHwv5Vs4/+qrMyGajcrv/o
+         /8Mt+pqiSm8CShWN9W7LJVeUIfR8bYY2zdiO6i3Z3uAvbm4S+eeX6SXJ0O5mTDtMp1Fh
+         9K1A==
+X-Gm-Message-State: AOJu0YzciVCcKogfXmGHe8aOT0Mz7Y/DEXG8EhOWNvU5GsvmUAEr/x0E
+	7lW56L0rkfQtJeeAI0qDfmhYq1z0EdyE3g3HMVaEnpFv7avSBFLBa5Qk
+X-Gm-Gg: AY/fxX7R0yRFd8sAc3Bhl3TakhBoGVkXOwFBiystsTQQT43D4SEKO4l8bfNA2ex4z3d
+	/cnBwV/JnG1nCjalXKXWu1V37HSWPMPm2LJ634mkeo1w4f6SmNCK+kzR+FktxQe3vhfomWzTWFv
+	5cMi3jEgTv8o9y2PU5ho7sjVK0p6/JkyYwIWXF0Pd6HffUcw/s1zMIGWz+fdKfzxIRm3rVpwoa1
+	2gxjmcahNM81IEUDt/LGOTrl6nsexlKP1fGPZ5bAioMRetpmJV8ESz8mw6SeANaBLF6qfcNuBxz
+	TII3rYEfllYow5qi6tRVggsgipqyVAdcZYAMqwdvqKapCejwmzeo+3YvLLXy4EW91yO6HtdIf6x
+	8lPisZ6Gqrz2eGQgH1Qjuk+nAyimfoUG1PgTeWsWlejGClYpCPQZFrZpNTXjhdSsutLY2UvGWrz
+	LUuhq0ttESUHTRy0KV2O9WweJAX6gzm/1bkJL9
+X-Google-Smtp-Source: AGHT+IGW7v0ICSXKYWEYUupKVRuUMgwDWFva4yxYPTG4kQGunsdTuh7n7fddYgADWUlpPt0RKxb9Aw==
+X-Received: by 2002:a05:7300:cd97:b0:2ae:5b71:d233 with SMTP id 5a478bee46e88-2b16f87bb54mr234020eec.19.1767637386466;
+        Mon, 05 Jan 2026 10:23:06 -0800 (PST)
+Received: from ?IPv6:2a03:83e0:115c:1:175e:3ec9:5deb:d470? ([2620:10d:c090:500::2:d7b1])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b16f02b24asm690718eec.0.2026.01.05.10.23.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 10:23:06 -0800 (PST)
+Message-ID: <17247510f876045d49deabba99f8b668633715a2.camel@gmail.com>
+Subject: Re: [PATCH bpf-next v2 11/16] bpf, verifier: Remove side effects
+ from may_access_direct_pkt_data
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>, bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>,  Alexei Starovoitov	 <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev	
+ <sdf@fomichev.me>, Simon Horman <horms@kernel.org>, Andrii Nakryiko	
+ <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu	
+ <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh	
+ <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, 	kernel-team@cloudflare.com
+Date: Mon, 05 Jan 2026 10:23:03 -0800
+In-Reply-To: <20260105-skb-meta-safeproof-netdevs-rx-only-v2-11-a21e679b5afa@cloudflare.com>
+References: 
+	<20260105-skb-meta-safeproof-netdevs-rx-only-v2-0-a21e679b5afa@cloudflare.com>
+	 <20260105-skb-meta-safeproof-netdevs-rx-only-v2-11-a21e679b5afa@cloudflare.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251225040104.982704-1-changwoo@igalia.com> <849b576e-9563-42ae-bd5c-756fb6dfd8de@arm.com>
-In-Reply-To: <849b576e-9563-42ae-bd5c-756fb6dfd8de@arm.com>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Mon, 5 Jan 2026 19:22:22 +0100
-X-Gmail-Original-Message-ID: <CAJZ5v0imU_DkW5-Pip3ze-MaHj+CAvc0LNkaLsTZuFbj33R0aA@mail.gmail.com>
-X-Gm-Features: AQt7F2rIqrdl4_Lfta-tfUzoW3gXGzlizLu8a9j9KJ9CU01qQlc9bEEV4GjzNSk
-Message-ID: <CAJZ5v0imU_DkW5-Pip3ze-MaHj+CAvc0LNkaLsTZuFbj33R0aA@mail.gmail.com>
-Subject: Re: [PATCH for 6.19 0/4] Revise the EM YNL spec to be clearer
-To: Lukasz Luba <lukasz.luba@arm.com>
-Cc: Changwoo Min <changwoo@igalia.com>, kernel-dev@igalia.com, linux-pm@vger.kernel.org, 
-	horms@kernel.org, pabeni@redhat.com, rafael@kernel.org, 
-	netdev@vger.kernel.org, edumazet@google.com, davem@davemloft.net, 
-	sched-ext@lists.linux.dev, linux-kernel@vger.kernel.org, lenb@kernel.org, 
-	pavel@kernel.org, donald.hunter@gmail.com, kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 30, 2025 at 10:44=E2=80=AFAM Lukasz Luba <lukasz.luba@arm.com> =
-wrote:
->
-> Hi Changwoo,
->
-> On 12/25/25 04:01, Changwoo Min wrote:
-> > This patch set addresses all the concerns raised at [1] to make the EM =
-YNL spec
-> > clearer. It includes the following changes:
-> >
-> > - Fix the lint errors (1/4).
-> > - Rename em.yaml to dev-energymodel.yaml (2/4).  =E2=80=9Cdev-energymod=
-el=E2=80=9D was used
-> >    instead of =E2=80=9Cdevice-energy-model=E2=80=9D, which was original=
-ly proposed [2], because
-> >    the netlink protocol name cannot exceed GENL_NAMSIZ(16). In addition=
-, docs
-> >    strings and flags attributes were added.
-> > - Change cpus' type from string to u64 array of CPU ids (3/4).
-> > - Add dump to get-perf-domains in the EM YNL spec (4/4). A user can fet=
-ch
-> >    either information about a specific performance domain with do or in=
-formation
-> >    about all performance domains with dump.
-> >
-> > This can be tested using the tool, tools/net/ynl/pyynl/cli.py, for exam=
-ple,
-> > with the following commands:
-> >
-> >    $> tools/net/ynl/pyynl/cli.py \
-> >       --spec Documentation/netlink/specs/dev-energymodel.yaml \
-> >       --dump get-perf-domains
-> >    $> tools/net/ynl/pyynl/cli.py \
-> >       --spec Documentation/netlink/specs/dev-energymodel.yaml \
-> >       --do get-perf-domains --json '{"perf-domain-id": 0}'
-> >    $> tools/net/ynl/pyynl/cli.py \
-> >       --spec Documentation/netlink/specs/dev-energymodel.yaml \
-> >       --do get-perf-table --json '{"perf-domain-id": 0}'
-> >    $> tools/net/ynl/pyynl/cli.py \
-> >       --spec Documentation/netlink/specs/dev-energymodel.yaml \
-> >       --subscribe event  --sleep 10
-> >
-> > [1] https://lore.kernel.org/lkml/CAD4GDZy-aeWsiY=3D-ATr+Y4PzhMX71DFd_mm=
-dMk4rxn3YG8U5GA@mail.gmail.com/
-> > [2] https://lore.kernel.org/lkml/CAJZ5v0gpYQwC=3D1piaX-PNoyeoYJ7uw=3DDt=
-AGdTVEXAsi4bnSdbA@mail.gmail.com/
->
-> My apologies, I've missed those conversations (not the best season).
->
-> So what would be the procedure here for the review?
-> Could Folks from netlink help here?
->
-> I will do my bit for the EM related stuff (to double-check them).
+On Mon, 2026-01-05 at 13:14 +0100, Jakub Sitnicki wrote:
+> The may_access_direct_pkt_data() helper sets env->seen_direct_write as a
+> side effect, which creates awkward calling patterns:
+>=20
+> - check_special_kfunc() has a comment warning readers about the side effe=
+ct
+> - specialize_kfunc() must save and restore the flag around the call
+>=20
+> Make the helper a pure function by moving the seen_direct_write flag
+> setting to call sites that need it.
+>=20
+> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+> ---
 
-I think that it'll be good to have this in 6.19 to avoid making a
-major release with an outdated EM YNL spec and I see that the review
-on the net side is complete, so are there any concerns about this?
+Acked-by: Eduard Zingerman <eddyz87@gmail.com>
+
+>  kernel/bpf/verifier.c | 33 ++++++++++++---------------------
+>  1 file changed, 12 insertions(+), 21 deletions(-)
+>=20
+> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> index 9394b0de2ef0..52d76a848f65 100644
+> --- a/kernel/bpf/verifier.c
+> +++ b/kernel/bpf/verifier.c
+> @@ -6151,13 +6151,9 @@ static bool may_access_direct_pkt_data(struct bpf_=
+verifier_env *env,
+>  		if (meta)
+>  			return meta->pkt_access;
+> =20
+> -		env->seen_direct_write =3D true;
+
+Note to reviewers:
+the call to may_access_direct_pkt_data() in check_func_arg() always
+has a non-NULL 'meta', so it is correct to skip setting
+'env->seen_direct_write' there, behavior does not change.
+
+>  		return true;
+> =20
+>  	case BPF_PROG_TYPE_CGROUP_SOCKOPT:
+> -		if (t =3D=3D BPF_WRITE)
+> -			env->seen_direct_write =3D true;
+> -
+>  		return true;
+> =20
+>  	default:
+
+[...]
 
