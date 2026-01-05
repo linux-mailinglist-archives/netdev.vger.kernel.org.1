@@ -1,119 +1,104 @@
-Return-Path: <netdev+bounces-247055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A1FBCF3BD2
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 14:17:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22860CF3CE3
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 14:29:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2823030215D5
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 13:17:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 917B830EA734
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 13:24:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6244729AB1D;
-	Mon,  5 Jan 2026 13:08:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7731D33E369;
+	Mon,  5 Jan 2026 13:24:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="H46ayQbX"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fkhxWcw0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8664B288C2D
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 13:08:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3402133DECD
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 13:24:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767618518; cv=none; b=q7oEmlpHTA1YdW+D9ktTaoLEUZhxPBpwBuqS5djgOuy6IHYdALHqvJw+sETpsgQpGxlH3aVXtG5xB63gOOaiO5E2JmHWFCzT9YLh/ynrVRUwAs4g3eu+zXAPkm4b+ZbfwWJjslRvXaBhiMHMguVLPo75RLuVUKgGrwgXdasPsVQ=
+	t=1767619468; cv=none; b=a3PqqPU5SMj20PQlIe9JDarL/Cp7o4XWQ5eZzAoqrnT868iQqeNcNeNyTYtf326ljeyQgeHiPiWwNgydXw9+k2I1iXVxlf4AgUvmfikLJGb+HgZQ03LTM6+1/HGqgDnhswA2crTu5l/3TRsG2gM7xk/jbybOJEZ6P+lF8Pdbz0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767618518; c=relaxed/simple;
-	bh=9QcjWnONpAVaP+Tie1zlDsm+KSktyvQl0mlt6LXj6hM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=UANdM6TOBA4JaAVCNZN/SsreC3OfZ/Y0lTak0uSUphg3qdPV+WHb1HtaDpDEb/YvLNqYjFdCLxBZ9BjdakFJ26oU1nFt2s6vleSDhYXcaqEc+XuRFhRU4PFDwos3/u7VHQj1IjX2M/fapxUYMZvEe2HGigECDPFpM5OZHQWXKe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=H46ayQbX; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 15A84C1E48A;
-	Mon,  5 Jan 2026 13:08:09 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 0D15C60726;
-	Mon,  5 Jan 2026 13:08:35 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B28F4103C8531;
-	Mon,  5 Jan 2026 14:08:32 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1767618514; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=25UrBuweM9vQ3iWdNpe4Hggb89zhueLdPDwP/UNaNP0=;
-	b=H46ayQbXqGWdPqKFRz/PZiA9RYL5dQL2gpTuSa6Dcm35cVMAhqpCRuCVOzJsjv4ft53DZo
-	ntXYJoEjti4XgVb0Qe5Dq4nLJsrgdxh+3ro0FMdeLUpKKxvo7qc8KftXcGv6dkDVs4F4zc
-	j9oM0V4dR9xXIKUF1BPNLNBamP1RKBSiVItsu2fVkxjEMmAf/IdsmnFIUoE7FjwcAglkMa
-	o4Rk+8EU8i07qgZJ6bYLUzcqbJ0yDX7D/IVzsBe5Xvm/dBm3DeMN+E0xU0ZeAxL+ma2XVR
-	JvypfKkN3DCufknO2kbxbJN4JgZAa6J3BSXkIbApZ01RfHXRv8XvQwSCGVPZ2Q==
-From: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Date: Mon, 05 Jan 2026 14:08:08 +0100
-Subject: [PATCH net-next 9/9] net: dsa: microchip: Wrap timestamp reading
- in a function
+	s=arc-20240116; t=1767619468; c=relaxed/simple;
+	bh=ME9tcwYyhEFkcAlT3lWouAPFCjBAMKMHb3ZkPMJxkaY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=PS62nc/OzaW1G9sMtc9sSnKb+v2hiNvTbP6rUk6icGKNQeYrgpoBXpl/1Po87aojrBfxbocSqRnNIZR9Rahpi7sn3tR1IiSCq6q4uEnVEnQC5V1jfv2O/PepB5Z6MzcZieliCY1wiS1wp4F+RX+p5cLNB+us0aVYo/bC2lStsfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fkhxWcw0; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <38dd70d77f8207395206564063b0a1a07dd1c6e7.camel@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1767619453;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ME9tcwYyhEFkcAlT3lWouAPFCjBAMKMHb3ZkPMJxkaY=;
+	b=fkhxWcw0ZntTKUjHRp4oOQZ92KF73o59A6whc0wPUZbFWMSAnJYPsWAU7UUScF6yUJaDlY
+	FmnEb2DaNumN4HYtM51JahqM1cjS+8/wiShD/lNXOaZCDolY8pbhSFdiREiqiaYYqa6dCY
+	91NKWF01xOVvYWmUB4crF2V5s8cj2AE=
+Subject: Re: [PATCH bpf-next 1/2] bpf, test_run: Fix user-memory-access
+ vulnerability for LIVE_FRAMES
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: KaFai Wan <kafai.wan@linux.dev>
+To: Toke =?ISO-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>, 
+ ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ martin.lau@linux.dev,  eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev,  john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com,  jolsa@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org,  pabeni@redhat.com, horms@kernel.org,
+ hawk@kernel.org, shuah@kernel.org,  aleksander.lobakin@intel.com,
+ bpf@vger.kernel.org, netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Cc: Yinhao Hu <dddddd@hust.edu.cn>, Kaiyan Mei <M202472210@hust.edu.cn>, 
+ Dongliang Mu <dzm91@hust.edu.cn>
+Date: Mon, 05 Jan 2026 21:22:54 +0800
+In-Reply-To: <87y0mc5obp.fsf@toke.dk>
+References: <fa2be179-bad7-4ee3-8668-4903d1853461@hust.edu.cn>
+	 <20260104162350.347403-1-kafai.wan@linux.dev>
+	 <20260104162350.347403-2-kafai.wan@linux.dev> <87y0mc5obp.fsf@toke.dk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260105-ksz-rework-v1-9-a68df7f57375@bootlin.com>
-References: <20260105-ksz-rework-v1-0-a68df7f57375@bootlin.com>
-In-Reply-To: <20260105-ksz-rework-v1-0-a68df7f57375@bootlin.com>
-To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Richard Cochran <richardcochran@gmail.com>
-Cc: Pascal Eberhard <pascal.eberhard@se.com>, 
- =?utf-8?q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-X-Mailer: b4 0.14.2
-X-Last-TLS-Session-Version: TLSv1.3
+X-Migadu-Flow: FLOW_OUT
 
-Timestamps are directly accessed through a register read in the
-interrupt handler. KSZ8463's logic to access it will be a bit more
-complex because the same interrupt can be triggered by two different
-timestamps being ready.
+On Mon, 2026-01-05 at 11:46 +0100, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+> KaFai Wan <kafai.wan@linux.dev> writes:
+>=20
+> > This fix reverts to the original version and ensures data_hard_start
+> > correctly points to the xdp_frame structure, eliminating the security
+> > risk.
+>=20
+> This is wrong. We should just be checking the meta_len on input to
+> account for the size of xdp_frame. I'll send a patch.
 
-Wrap the timestamp's reading in a dedicated function to ease the
-KSZ8463's integration in upcoming patches.
+Current version the actual limit of the max input meta_len for live frames =
+is=20
+XDP_PACKET_HEADROOM - sizeof(struct xdp_frame), not XDP_PACKET_HEADROOM.
 
-Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
----
- drivers/net/dsa/microchip/ksz_ptp.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+The original version not set xdp_buff->data_hard_start with xdp_frame,=C2=
+=A0
+I set it with the correct position by adding the headroom, so there is no n=
+eed=C2=A0
+for user to reduce the max input meta_len.
 
-diff --git a/drivers/net/dsa/microchip/ksz_ptp.c b/drivers/net/dsa/microchip/ksz_ptp.c
-index b3fff0643ea7a63aec924ec1cd9b451ecfeeab3d..4a2cc57a628f97bd51fcb11057bc4effda9205dd 100644
---- a/drivers/net/dsa/microchip/ksz_ptp.c
-+++ b/drivers/net/dsa/microchip/ksz_ptp.c
-@@ -967,6 +967,11 @@ void ksz_ptp_clock_unregister(struct dsa_switch *ds)
- 		ptp_clock_unregister(ptp_data->clock);
- }
- 
-+static int ksz_read_ts(struct ksz_port *port, u16 reg, u32 *ts)
-+{
-+	return ksz_read32(port->ksz_dev, reg, ts);
-+}
-+
- static irqreturn_t ksz_ptp_msg_thread_fn(int irq, void *dev_id)
- {
- 	struct ksz_ptp_irq *ptpmsg_irq = dev_id;
-@@ -980,7 +985,7 @@ static irqreturn_t ksz_ptp_msg_thread_fn(int irq, void *dev_id)
- 	dev = port->ksz_dev;
- 
- 	if (ptpmsg_irq->ts_en) {
--		ret = ksz_read32(dev, ptpmsg_irq->ts_reg, &tstamp_raw);
-+		ret = ksz_read_ts(port, ptpmsg_irq->ts_reg, &tstamp_raw);
- 		if (ret)
- 			return IRQ_NONE;
- 
+This patch is failed with the xdp_do_redirect test, I'll fix and send v2 if=
+=C2=A0
+you're ok with that.
+=20
+>=20
+> -Toke
+>=20
 
--- 
-2.52.0
-
+--=20
+Thanks,
+KaFai
 
