@@ -1,208 +1,166 @@
-Return-Path: <netdev+bounces-247156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3979ACF51A8
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 18:55:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ABC4CF5244
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 19:02:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 623943046113
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 17:54:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4E117309D6FD
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 17:57:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F32433F8D2;
-	Mon,  5 Jan 2026 17:54:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7402314B87;
+	Mon,  5 Jan 2026 17:57:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b="Lt5pjqMb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lAqUOQNB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-65-225.siemens.flowmailer.net (mta-65-225.siemens.flowmailer.net [185.136.65.225])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4AAC33B6F4
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 17:54:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243DC29D26E
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 17:57:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767635660; cv=none; b=Z9Rs8eTYDw38ijnLJFylestE2oRiZsw7FMqBd3B/Y2UJRkr4G13ya1tQV0g1JCNHuZpXUarcC7dwIlYWG/MHadRdSQagpn2lXx/vlom2ksHqHU6XENWYLyrxJ/inMecWmUrpIYaoxNbelpE+I7M7hgXnwKSvO7MBsv3JcRA6U7Y=
+	t=1767635823; cv=none; b=dIFfnqcUWIfl0Ccza5ejCPICek5ZvdaTTjAc7m81P9pawNxuxyeKjB66bDZCc6kQJzf7lPugTdhLxP24Urzhtwuxsk+CEOOlve2p9px5192uAAyi/3jsYxYIgA3X/b+6homCEpSLY8XbnMj6WjaPJiWub9x4lppFh44DoUVlAVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767635660; c=relaxed/simple;
-	bh=EBm/YQI9I0Cx3kFnWopwMJkeOGt2puAwe2xLZXInpPU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WLaX+ENzVeo7AflI4SCZeAw0ECHPmYeozU7Ph1c3U1bOyNzbVumgCm/tJRQicFni/K3QU6i2Xrkji1Q0DcSYiWi1MJpff2yBKk+7/S6fN8+O4yNB8wbiyNdFTYCpioAfe9x0pP3O1QgI7BR96yUaoFJ/JouA2oQ7CBedLEhPQ6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=Lt5pjqMb; arc=none smtp.client-ip=185.136.65.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-65-225.siemens.flowmailer.net with ESMTPSA id 20260105175415ec20a08427000207f5
-        for <netdev@vger.kernel.org>;
-        Mon, 05 Jan 2026 18:54:15 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
- d=siemens.com; i=alexander.sverdlin@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
- bh=+cNctosICkbQmisl8GDG+alFgnVkKRXfvi6QE6hmyKU=;
- b=Lt5pjqMbuTWBDA3l7Ins0mXnGK8lpRKao3PxSZbt8kU6hjr4B3/7O1/MzkR/HNp2vOkP/t
- RZxtHYINA6+ABCy/1icqC58Sg5sOuRcZf8j/7Uo0zkUV5w2kopZoooW2KEzYjRKa6qc/bD4o
- u0wM7CpG12bQnM/KIo6pUFFqyDRyawyiTpYauyiN4nDF+XvWlTzKqL6v9aoOv0vseDjt3f2h
- lzg3qi8j6IYstyuoCexly/UhgRGZ3vL7pGDobQG5jzFKzlyw1wqM9yWNMchcf0VXy/BPwDOO
- 1CHDabSKLkolCl18wDKcTHN2FRHPky490oI7WMUnI0lOYRyKHEDtf1kQ==;
-From: "A. Sverdlin" <alexander.sverdlin@siemens.com>
-To: netdev@vger.kernel.org
-Cc: Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Hauke Mehrtens <hauke@hauke-m.de>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Daniel Golle <daniel@makrotopia.org>
-Subject: [PATCH v3 2/2] net: dsa: mxl-gsw1xx: Support R(G)MII slew rate configuration
-Date: Mon,  5 Jan 2026 18:53:11 +0100
-Message-ID: <20260105175320.2141753-3-alexander.sverdlin@siemens.com>
-In-Reply-To: <20260105175320.2141753-1-alexander.sverdlin@siemens.com>
-References: <20260105175320.2141753-1-alexander.sverdlin@siemens.com>
+	s=arc-20240116; t=1767635823; c=relaxed/simple;
+	bh=yyksT/KuO1YXmCrqTz1hYIm3irFrpccprBVb5wdpCJo=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=f8N98E65yo76EU5S19NtMHR026o9I4UUV7fY7xCtL97zg3vNu7caDk8Iz4/1Wl/VRs7E/Iql/5rI1xrAgCbu/5enr9B81EcRgWLN3YlEDD3F3Yr8CPRtvvaQsyRZKnM3sIVEUhLmithPKb8EVGi5UvsteG9rEMt1Lb19xaDxQYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lAqUOQNB; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-790992528f6so2440657b3.1
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 09:57:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767635821; x=1768240621; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4ySbnyvHafzMvE6mhxVn5kVrIuI6aNt2bA+51RSU18M=;
+        b=lAqUOQNB85UsLFQr95yhN3Gri1CH+uOePm26PIOMAi1iymUNuZZZQhxeGD3Io3fKWP
+         EzNjUDltOtt/UaDzfCzpamuxY6YOqvqwFUOEDhhjsZ6/UhSTwlj5Bhwt2Ov2uaiE061X
+         Hp2Kkjg5FJ5PcVrs4q94voYOG0kdx+Ibov2JceNR0TQPocEJB/hMktS2ArnMw0VfKqg5
+         BGECzBzHSzNUzKDQiYfLbsEoI4wl5Jlct+DHvW3+lD62mO1Eu9lrlFAS/4EkS6c2GnWe
+         AMVJyr2QZoPAyw2USDvTyM5BZuYzr5U+2wICNO5mnz4GJwabqj/iWX9wu+ojrY+yJDeB
+         kmlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767635821; x=1768240621;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4ySbnyvHafzMvE6mhxVn5kVrIuI6aNt2bA+51RSU18M=;
+        b=B4JSd1kRQovP1kE9zpv45iL5foKltDgOBQwiJGgxCvPq3nadXJGii+BPXnpIwrcgEQ
+         DYJhJen4pPAwir+3MeKlvxo1RELhAaJFlbCupb1a3l6YgRfjWBIpyFNJD7i3Avv8OJiw
+         cl5zDE0YVKnm7c8i+SSGGC3JR4Rq4QX2jo8SrKuLZt8Zf5aNjLt1GaZ8C5LOdBdUbSrf
+         jGDd2Kb138NGzmOvKAzZwxBQYAOkb/eSCMrjIVd8FHAu6Gk9W0Lvd68m7lpPthngf/q2
+         dJx0uq6NOKxyLENmNOedc0aroEwRbTc+7rh5IgLo7VeQUEF62QS8qpyC9l56ojoaj6hY
+         wKqg==
+X-Gm-Message-State: AOJu0YzsLT5lgwmsk60KzxSqStQTEQn+IWbC5ZhYXmmweeTRJDnHwJiu
+	avCGosnX/jQHXvEmq7jBr6lYUmrhFmFYLrZngaD6ww4t0NmZxkWvtkF6
+X-Gm-Gg: AY/fxX7EOJaow2ML1vQjpqeeImZORpIL9zHhkdR79OZqruvVnCO75ZuP32+Qu5q10cy
+	8pDirXSBcyZlb94/jgCaJnBO6tuPmUpszub4ojazPTyI11wUNbhTlaYVZan8Pcvvt+Fw0l46JRB
+	nFrLLQ2sXl3XKTymkNtbKSMiUqtj5hYlmQkjn71aV1cyJkjF4+/L+0yM/baq10ZBhjKGyECGxLd
+	uNMEeQ/+SfeSlwMCf8E64SOuaXtG1bfvFxWbt+GrXvZCnjzFHhQfTs/frQ0h0EX1uzRPUrmgiOq
+	HMaestGnWSLrQw3bb1Kl/Nv8X4ZRau6NrZ0VkutI3OJ8/G6OZ3catBdvolIxf3s+BukNiXx21/5
+	AcI76pEj1JicE6mszkruGwHWE1VR5xV20GHLhey/TMXWEkzty0+O7L3dKHf2cutljRE+focTqQk
+	tHg1DkYQM4O7mJxQYI1Xd+D/36DB5Zqf1UmmFU9KvNe6DIQCsxyEW29yXb0aA=
+X-Google-Smtp-Source: AGHT+IFpQNXl+ICZpt37hJ1+yOTIe8l3+TdgX3xOEDoRUDv2+DitrKwMFXPd7G94f71FxBMTNRkpKQ==
+X-Received: by 2002:a05:690c:6c0f:b0:784:952f:922b with SMTP id 00721157ae682-790a8b5a735mr3435337b3.63.1767635820943;
+        Mon, 05 Jan 2026 09:57:00 -0800 (PST)
+Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-790a88ca88fsm1239117b3.41.2026.01.05.09.57.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 09:57:00 -0800 (PST)
+Date: Mon, 05 Jan 2026 12:57:00 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ horms@kernel.org, 
+ kuniyu@google.com, 
+ Willem de Bruijn <willemb@google.com>
+Message-ID: <willemdebruijn.kernel.4358c58491d1@gmail.com>
+In-Reply-To: <5ce5aea0-3700-4118-9657-7259f678f430@kernel.dk>
+References: <20260105163338.3461512-1-willemdebruijn.kernel@gmail.com>
+ <CANn89iL+AuhJw7-Ma4hQsgQ5X0vxOwToSr2mgVSbkSauy-TGkg@mail.gmail.com>
+ <willemdebruijn.kernel.2124bbf561b5e@gmail.com>
+ <5ce5aea0-3700-4118-9657-7259f678f430@kernel.dk>
+Subject: Re: [PATCH net-next] net: do not write to msg_get_inq in caller
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-456497:519-21489:flowmailer
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+Jens Axboe wrote:
+> On 1/5/26 10:42 AM, Willem de Bruijn wrote:
+> > Eric Dumazet wrote:
+> >> On Mon, Jan 5, 2026 at 5:33?PM Willem de Bruijn
+> >> <willemdebruijn.kernel@gmail.com> wrote:
+> >>>
+> >>> From: Willem de Bruijn <willemb@google.com>
+> >>>
+> >>> msg_get_inq is an input field from caller to callee. Don't set it in
+> >>> the callee, as the caller may not clear it on struct reuse.
+> >>>
+> >>> This is a kernel-internal variant of msghdr only, and the only user
+> >>> does reinitialize the field. So this is not critical.
+> >>>
+> >>> But it is more robust to avoid the write, and slightly simpler code.
+> >>>
+> >>> Callers set msg_get_inq to request the input queue length to be
+> >>> returned in msg_inq. This is equivalent to but independent from the
+> >>> SO_INQ request to return that same info as a cmsg (tp->recvmsg_inq).
+> >>> To reduce branching in the hot path the second also sets the msg_inq.
+> >>> That is WAI.
+> >>>
+> >>> This is a small follow-on to commit 4d1442979e4a ("af_unix: don't
+> >>> post cmsg for SO_INQ unless explicitly asked for"), which fixed the
+> >>> inverse.
+> >>>
+> >>> Also collapse two branches using a bitwise or.
+> >>>
+> >>> Link: https://lore.kernel.org/netdev/willemdebruijn.kernel.24d8030f7a3de@gmail.com/
+> >>> Signed-off-by: Willem de Bruijn <willemb@google.com>
+> >>> ---
+> >>
+> >> Patch looks sane to me, but the title is a bit confusing, I guess you meant
+> >>
+> >> "net: do not write to msg_get_inq in callee" ?
+> > 
+> > Indeed, thanks. Will fix.
+> > 
+> >>
+> >> Also, unix_stream_read_generic() is currently potentially adding a NULL deref
+> >> if u->recvmsg_inq is non zero, but msg is NULL ?
+> >>
+> >> If this is the case  we need a Fixes: tag.
+> > 
+> > Oh good point. state->msg can be NULL as of commit 2b514574f7e8 ("net:
+> > af_unix: implement splice for stream af_unix sockets"). That commit
+> > mentions "we mostly have to deal with a non-existing struct msghdr
+> > argument".
+> 
+> Worth noting that this is currently not possible, as io_uring should
+> be the only one setting ->recvmsg_inq and it would not do that via
+> splice. Should still be fixed of course.
 
-Support newly introduced slew-rate device tree property to configure
-R(G)MII interface pins slew rate. It might be used to reduce the radiated
-emissions.
+recvmsg_inq is written from setsockopt SO_INQ. Do you mean
+msg_get_inq?
 
-Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
----
-Changelog:
-v3:
-- use [pinctrl] standard "slew-rate" property as suggested by Rob
-  https://lore.kernel.org/all/20251219204324.GA3881969-robh@kernel.org/
-- better sorted struct gswip_hw_info initialisers as suggested by Daniel
-v2:
-- do not hijack gsw1xx_phylink_mac_select_pcs() for configuring the port,
-  introduce struct gswip_hw_info::port_setup callback
-- actively configure "normal" slew rate (if the new DT property is missing)
-- properly use regmap_set_bits() (v1 had reg and value mixed up)
+I think this is reachable with a setsockopt + splice:
 
- drivers/net/dsa/lantiq/lantiq_gswip.h        |  1 +
- drivers/net/dsa/lantiq/lantiq_gswip_common.c |  6 ++++
- drivers/net/dsa/lantiq/mxl-gsw1xx.c          | 31 ++++++++++++++++++++
- drivers/net/dsa/lantiq/mxl-gsw1xx.h          |  2 ++
- 4 files changed, 40 insertions(+)
+        do_cmsg = READ_ONCE(u->recvmsg_inq);
+        if (do_cmsg)
+                msg->msg_get_inq = 1;
 
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.h b/drivers/net/dsa/lantiq/lantiq_gswip.h
-index 2e0f2afbadbbc..8fc4c7cc5283a 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip.h
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip.h
-@@ -263,6 +263,7 @@ struct gswip_hw_info {
- 				 struct phylink_config *config);
- 	struct phylink_pcs *(*mac_select_pcs)(struct phylink_config *config,
- 					      phy_interface_t interface);
-+	int (*port_setup)(struct dsa_switch *ds, int port);
- };
- 
- struct gswip_gphy_fw {
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip_common.c b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-index e790f2ef75884..17a61e445f00f 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-@@ -425,6 +425,12 @@ static int gswip_port_setup(struct dsa_switch *ds, int port)
- 	struct gswip_priv *priv = ds->priv;
- 	int err;
- 
-+	if (priv->hw_info->port_setup) {
-+		err = priv->hw_info->port_setup(ds, port);
-+		if (err)
-+			return err;
-+	}
-+
- 	if (!dsa_is_cpu_port(ds, port)) {
- 		err = gswip_add_single_port_br(priv, port, true);
- 		if (err)
-diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.c b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-index f8ff8a604bf53..6c290bac537ad 100644
---- a/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-+++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-@@ -559,6 +559,34 @@ static struct phylink_pcs *gsw1xx_phylink_mac_select_pcs(struct phylink_config *
- 	}
- }
- 
-+static int gsw1xx_port_setup(struct dsa_switch *ds, int port)
-+{
-+	struct dsa_port *dp = dsa_to_port(ds, port);
-+	struct gsw1xx_priv *gsw1xx_priv;
-+	struct gswip_priv *gswip_priv;
-+	u32 rate;
-+	int ret;
-+
-+	if (dp->index != GSW1XX_MII_PORT)
-+		return 0;
-+
-+	gswip_priv = ds->priv;
-+	gsw1xx_priv = container_of(gswip_priv, struct gsw1xx_priv, gswip);
-+
-+	ret = of_property_read_u32(dp->dn, "slew-rate", &rate);
-+	/* Optional property */
-+	if (ret == -EINVAL)
-+		return 0;
-+	if (ret < 0 || rate > 1) {
-+		dev_err(&gsw1xx_priv->mdio_dev->dev, "Invalid slew-rate\n");
-+		return (ret < 0) ? ret : -EINVAL;
-+	}
-+
-+	return regmap_update_bits(gsw1xx_priv->shell, GSW1XX_SHELL_RGMII_SLEW_CFG,
-+				  RGMII_SLEW_CFG_DRV_TXD | RGMII_SLEW_CFG_DRV_TXC,
-+				  (RGMII_SLEW_CFG_DRV_TXD | RGMII_SLEW_CFG_DRV_TXC) * rate);
-+}
-+
- static struct regmap *gsw1xx_regmap_init(struct gsw1xx_priv *priv,
- 					 const char *name,
- 					 unsigned int reg_base,
-@@ -707,6 +735,7 @@ static const struct gswip_hw_info gsw12x_data = {
- 	.mac_select_pcs		= gsw1xx_phylink_mac_select_pcs,
- 	.phylink_get_caps	= &gsw1xx_phylink_get_caps,
- 	.supports_2500m		= true,
-+	.port_setup		= gsw1xx_port_setup,
- 	.pce_microcode		= &gsw1xx_pce_microcode,
- 	.pce_microcode_size	= ARRAY_SIZE(gsw1xx_pce_microcode),
- 	.tag_protocol		= DSA_TAG_PROTO_MXL_GSW1XX,
-@@ -720,6 +749,7 @@ static const struct gswip_hw_info gsw140_data = {
- 	.mac_select_pcs		= gsw1xx_phylink_mac_select_pcs,
- 	.phylink_get_caps	= &gsw1xx_phylink_get_caps,
- 	.supports_2500m		= true,
-+	.port_setup		= gsw1xx_port_setup,
- 	.pce_microcode		= &gsw1xx_pce_microcode,
- 	.pce_microcode_size	= ARRAY_SIZE(gsw1xx_pce_microcode),
- 	.tag_protocol		= DSA_TAG_PROTO_MXL_GSW1XX,
-@@ -732,6 +762,7 @@ static const struct gswip_hw_info gsw141_data = {
- 	.mii_port_reg_offset	= -GSW1XX_MII_PORT,
- 	.mac_select_pcs		= gsw1xx_phylink_mac_select_pcs,
- 	.phylink_get_caps	= gsw1xx_phylink_get_caps,
-+	.port_setup		= gsw1xx_port_setup,
- 	.pce_microcode		= &gsw1xx_pce_microcode,
- 	.pce_microcode_size	= ARRAY_SIZE(gsw1xx_pce_microcode),
- 	.tag_protocol		= DSA_TAG_PROTO_MXL_GSW1XX,
-diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.h b/drivers/net/dsa/lantiq/mxl-gsw1xx.h
-index 38e03c048a26c..8c0298b2b7663 100644
---- a/drivers/net/dsa/lantiq/mxl-gsw1xx.h
-+++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.h
-@@ -110,6 +110,8 @@
- #define   GSW1XX_RST_REQ_SGMII_SHELL		BIT(5)
- /* RGMII PAD Slew Control Register */
- #define  GSW1XX_SHELL_RGMII_SLEW_CFG		0x78
-+#define   RGMII_SLEW_CFG_DRV_TXC		BIT(2)
-+#define   RGMII_SLEW_CFG_DRV_TXD		BIT(3)
- #define   RGMII_SLEW_CFG_RX_2_5_V		BIT(4)
- #define   RGMII_SLEW_CFG_TX_2_5_V		BIT(5)
- 
--- 
-2.52.0
 
 
