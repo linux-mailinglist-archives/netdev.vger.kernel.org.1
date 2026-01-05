@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-247178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC9D1CF543D
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 19:48:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 616FBCF5440
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 19:48:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EDABB302DB30
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 18:48:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 63FE7302BB9C
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 18:48:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29C2433ADB5;
-	Mon,  5 Jan 2026 18:48:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41A7B338594;
+	Mon,  5 Jan 2026 18:48:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dW20XOiC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mZXHaE3b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB18B2F6911
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 18:48:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E06063009D4
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 18:48:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767638896; cv=none; b=iZhIkq7p0VKDkIG66BVJSnJiHXLJ3qBK4uLk7m7AsxwBrUbbG6GFNxkDGAdkVtPnNIKnwBd1STWBJbELhFimjMVhvwrg8EUsrTvy4Sx4s2wpoEeXN9eq6Tu/HCtqPC+IhIAzfM+bTIyTXKoKT1PnAhcL25lTSPi7nbbTPGa585Q=
+	t=1767638930; cv=none; b=nGu78StnbitO6AIoM3IrWDbc+rPMs3tzhQdPrUnt/DuWfKU382GQ6PADRyifqsqS3ZfOwBgbUUtnqv9b6npwcPV1KaaQp+Lwh6p7VLp/jJtqEQgT55gTXlgcm9nB7W5Af3a37XvRTPy06BjvNjWLeGri7JFRDiivLVqYo0uVqFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767638896; c=relaxed/simple;
-	bh=823ZyIiv6dLZZNtG94sIeR24IfpH1FUXwvJ8imTbqWU=;
+	s=arc-20240116; t=1767638930; c=relaxed/simple;
+	bh=fErRiiJwHiwz5/ivXZzt7DohWO5HJQPRcltM0RL8gWQ=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=NrtZfbrD7/hJyZEghvtb5BChdO7WqSqJsH7tnXCggEN2A2wzYuUHoKSNP3Kk+4Q66RYcnhDw74+Tfg6vUPI9MJVpsUoP71NpamhQ7EVUTmVf1OhHP6NoTTRF1VzQeO53UOlskmAC1HNVNKsD79CuJDBraygatI1NKMSVbt9u29E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dW20XOiC; arc=none smtp.client-ip=209.85.214.173
+	 Content-Type:MIME-Version; b=tFNbd0vFg4FvxMiA47/an68evP18uk964OaXqtuc+YBqiAhsAcicUXNiDHdVqkFY9CQfCvzks/VSAWhVevrW4ZUfoyTxt8vuQg4gGaFsuFoIvxUz1rpRzmaeu1ou2ilpnuZzSwwamO+DVh7atpq/Ph29s7qcDmoVMbUbyLCd6EM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mZXHaE3b; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2a0834769f0so2292995ad.2
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 10:48:13 -0800 (PST)
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-c0c24d0f4ceso111926a12.1
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 10:48:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767638893; x=1768243693; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1767638928; x=1768243728; darn=vger.kernel.org;
         h=mime-version:user-agent:content-transfer-encoding:references
          :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=823ZyIiv6dLZZNtG94sIeR24IfpH1FUXwvJ8imTbqWU=;
-        b=dW20XOiCTi9rOwCAi2T6NMJGlq3HQnpRfa1WopFFlecH1GaDQMVskHdQm3ARbfydIT
-         tfrgpspvvI/Ux6lGIMwLS81Hi3e8wLJ//4+eaHt1v8nUiLgZlQ2FUvOJuZtvG8WUCLJg
-         2Dwt5IQfjjj0AUk0j9MaoFPPG0s3dGRfW4Dyej1p93qgYTtXmP7YEn0tRAxstp9BmRxc
-         ePtAoIPV8UXs/cb0D0AG4hdgeTRGUiVyH7APrGXcivQ1aM1cKQrRH55mLIjyZcMLOa6n
-         dYqjGlaVTEy961p2ihTw3qvAkyBtgACncUp8ZaFNBjeIOArtMcX3u3wIn6+4IQOxVW90
-         8zgQ==
+        bh=fErRiiJwHiwz5/ivXZzt7DohWO5HJQPRcltM0RL8gWQ=;
+        b=mZXHaE3bjY1/TLHF5TyYuHdY4BwYSzdALTXna81bzobEbk+9KYSXjbYXXDhrZKrcBu
+         mlx3AHxaB2fq3Ei0pDazi224kQL2aA9tHqX4/uerpqJj455+XLed2fjgR8U4fxaHnsKt
+         3zRoFHAD80q+nNFor/EqO9phzG499/DoEuWG38GKWnX7RSKCkPaEm57loNjTfub7yaW1
+         swxb3aF2iUWqJwADBq4qmEP2IunJS487vkx1KvAkGOccxGmagWzmq5omj0l7XwS8sfRg
+         Urv7z04pRI70OmaqYoinlmbzUFLAVZvZy9rRHqsSRSK9WWVXBJxiFjLa25RfEI0Ea9Wn
+         Yzug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767638893; x=1768243693;
+        d=1e100.net; s=20230601; t=1767638928; x=1768243728;
         h=mime-version:user-agent:content-transfer-encoding:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=823ZyIiv6dLZZNtG94sIeR24IfpH1FUXwvJ8imTbqWU=;
-        b=nY7tVO7YEhjSsCombOm8V5yKxCfE/Pi95u8ABxFAUrYOx3qGadu9fRxQjbUlVrO5/U
-         ZrqsOQcj6loQn+9HRGprsPYgrI8esjdzDRLR8D0jf6SmqN5SWwuHuf0wQNzyj+hX3NP0
-         yefs7B3Cxhl9JR1vyUnSNtxMmjboc3Au6Bt59oW5UO4B407mXH6NNPvv/Mcijho5YgAy
-         ccXm8DvkaVcewiR0f4pVjY2Sj5boGVsCBvGX0bHcuyWKsxbrfSvmyF+MBfICAGhICNpN
-         lrwcAf/wcC4mWnfq5JyAj7347rptKTi5UUyhbaseOyatjzA19/gxUlMwgGRumqq91OBr
-         0Ljg==
-X-Gm-Message-State: AOJu0YwuSxOUyjrNr77d4Vi82geY52N7gib/nBhGQF9dB/lWEMj3Ei8v
-	Mz6inDuOSlm49ZWLPlP+s+t/vuh+GTYhg9Nhr68RZX38Use7cPRITidy
-X-Gm-Gg: AY/fxX7XCbX6+Udt2DvDrKv7sLXaDufWQUV4DfFFbtL2jYVL6L1hX2oNdjyDbhfVjne
-	sr97bMUH4RAAMSMfjKo9fHBpZGNagceAbxjnN9bPusv6QEjL5Dx1acWLryT7N8unQCJ/B0s2boH
-	keaw9w9umOVuaCfbzoG57IA9rqDHJC6h0FDujhLNA+xyo8vUADqHBlt3ePFZWGs6JAeCt/JNKPN
-	K7OvLwT9GQsnreBerPQsQumRO0H7vcd3byqAGHzEF6cHpu+dyfIMoq+U9ttTAFvFZCmW+L1azEJ
-	ea8RPapE5pIyQykcu2PkSd0kg2MlCf4DwUsEIA9vzVNcUv2d9Os/++HBvk4EGmgeNycZX56odFz
-	t03AtAR2TmQ2tp3J3khB7jD/Ny0Jw+2HbKIqZMe9/Jvf2B65qEUqFveOIkrOdhApD1qaZv9wYYa
-	+EJylIQaIBjWszpXmlcFFTwpH4yxtWCay35vuU
-X-Google-Smtp-Source: AGHT+IGADnk0qu5rOZ12dW8/R5G6hKBZVjkflPwlw1XupSRGqqWwvD2EvQkybFKsbIobCX9s/oFOkA==
-X-Received: by 2002:a05:7022:264b:b0:11b:9386:8259 with SMTP id a92af1059eb24-121f18f2f6dmr164053c88.46.1767638892921;
-        Mon, 05 Jan 2026 10:48:12 -0800 (PST)
+        bh=fErRiiJwHiwz5/ivXZzt7DohWO5HJQPRcltM0RL8gWQ=;
+        b=F9IGgltOkZnBXaf0llSoorJjtUZCZwBmIzqLi5070bWUYW3uJA1aD/9XuLp0j5g0B+
+         8i59T+4AIc7MtlUZHY+n1hNxDq7FUzhaGwlkrUIXyjY7nzWaupkzS2RNfErwj9/UPt9/
+         VOD9/PPcMCHuDegDZ+HpTAZSxLZmZ7ZWH9WauIpKKSyFI2K5KfQI87dVGL0tGwPGqjaD
+         NHqpyJgZAsDfI6huEE9y3OR9ZU0c7OAj6/tOMGEkCFPT4qjRP0FwYnqqWKnZSoE9vthe
+         QH9ZpzNt0H90bmUceNH5dJe/gSMVqROx78+7y6cy75uzIBQadDKAnJqQ3rIKTgdF5aDI
+         cGSw==
+X-Gm-Message-State: AOJu0Yy8UsP8sAdM9XLI2ky1PYBqjjft3kwTZWKRYY95GA5yLIp+V7rm
+	MjT+an5K0BxdUZWnDRag4yw+pntpTpxHV0QAUzQBHBGaQFcgv9I/+s65
+X-Gm-Gg: AY/fxX6E+LIQ/dWPw7L5suV/Rj1A+vm48QAvgYs+587Z0nXhzmyqRTNEAyaV1zcUuij
+	vUqMX9+tHRmZvtEQ8628g0xpM0mr8oKcPzRT5uQzu7rV2IrfKz+b7ns5nezw8d9LvkeEvH79dWK
+	uVxLW/CogYVSt+isDMQ8FN4ChhUiA2FdyCc386aQ1yBqr8Dd8RBBbZuVCOt3QMTWQRLhpIt7gvm
+	ZcCMs8rIu7L+CiOCl0H8ShytMCjm1EI1QjiHPpQ+hhDEmQ83y57zX0naMRYyVaGMVosNSfC5MAv
+	XCdWZupIxkIBv/01lRouJaUlnbUYxubuJ+97+uS5+Yl/HPcmdQRts/KXQKqOSQtwaMvInazoNsD
+	L0quun4bqd4Ce5KzyPqTR3BX+YZ/CVeJDKKsHTeTeHxpJ/AnDrZOQ8dTvIq4rCwzLOIolnCseeW
+	cyw1tU9kPPIu5qSYXFiLw/gEd5wNdxQwVQTzLb
+X-Google-Smtp-Source: AGHT+IHo4MCvN8bh9kZUcHAWtaL5GHodrDBMQruJzO/juSsyL4pCoBv0ojoMYJFRnRAh6v2+mBtL1g==
+X-Received: by 2002:a05:7301:70d:b0:2af:7f2:50b3 with SMTP id 5a478bee46e88-2b16f8389f0mr181239eec.5.1767638927938;
+        Mon, 05 Jan 2026 10:48:47 -0800 (PST)
 Received: from ?IPv6:2a03:83e0:115c:1:175e:3ec9:5deb:d470? ([2620:10d:c090:500::2:d7b1])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-121f1220a05sm1139671c88.4.2026.01.05.10.48.10
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b16f18e22csm709561eec.14.2026.01.05.10.48.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 10:48:12 -0800 (PST)
-Message-ID: <53f4ed220bbdfd1828dc5a54b9392e532ad9d9b6.camel@gmail.com>
-Subject: Re: [PATCH bpf-next v2 14/16] bpf, verifier: Track when data_meta
- pointer is loaded
+        Mon, 05 Jan 2026 10:48:47 -0800 (PST)
+Message-ID: <6b7a415fc9ede7adf7321a18d239c5054476ce17.camel@gmail.com>
+Subject: Re: [PATCH bpf-next v2 12/16] bpf, verifier: Turn seen_direct_write
+ flag into a bitmap
 From: Eduard Zingerman <eddyz87@gmail.com>
 To: Jakub Sitnicki <jakub@cloudflare.com>, bpf@vger.kernel.org
 Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
@@ -86,11 +86,11 @@ Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
  <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh	
  <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa
  <jolsa@kernel.org>, 	kernel-team@cloudflare.com
-Date: Mon, 05 Jan 2026 10:48:09 -0800
-In-Reply-To: <20260105-skb-meta-safeproof-netdevs-rx-only-v2-14-a21e679b5afa@cloudflare.com>
+Date: Mon, 05 Jan 2026 10:48:44 -0800
+In-Reply-To: <20260105-skb-meta-safeproof-netdevs-rx-only-v2-12-a21e679b5afa@cloudflare.com>
 References: 
 	<20260105-skb-meta-safeproof-netdevs-rx-only-v2-0-a21e679b5afa@cloudflare.com>
-	 <20260105-skb-meta-safeproof-netdevs-rx-only-v2-14-a21e679b5afa@cloudflare.com>
+	 <20260105-skb-meta-safeproof-netdevs-rx-only-v2-12-a21e679b5afa@cloudflare.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
@@ -102,13 +102,10 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
 On Mon, 2026-01-05 at 13:14 +0100, Jakub Sitnicki wrote:
-> Introduce PA_F_DATA_META_LOAD flag to track when a BPF program loads the
-> skb->data_meta pointer.
+> Convert seen_direct_write from a boolean to a bitmap (seen_packet_access)
+> in preparation for tracking additional packet access patterns.
 >=20
-> This information will be used by gen_prologue() to handle cases where the=
-re
-> is a gap between metadata end and skb->data, requiring metadata to be
-> realigned.
+> No functional change.
 >=20
 > Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 > ---
