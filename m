@@ -1,157 +1,131 @@
-Return-Path: <netdev+bounces-247113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DB64CF4C04
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 17:39:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E450CF4C10
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 17:39:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8A74B30CC03C
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 16:19:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B30883060A6B
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 16:20:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C674A34846A;
-	Mon,  5 Jan 2026 16:19:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B92D348880;
+	Mon,  5 Jan 2026 16:20:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lo/yI9IN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="itUsbM7N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DDA305046
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 16:19:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EB0A2C0261
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 16:20:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767629972; cv=none; b=EFw6NjGLg6t/2Jd6vi0H5ikZ1sxvik+XYuGd6X82QQHuAvEWbYzfQaCOqJ0to6VPgYYHoV9VKkQ3b8aDpZIFXknWZr+px6trsjmMuB0PsLqswCQK/LpkAyXROVm97nGNbtNV4G9V7SDhIXfZfoFAKa1BsvvOu3D/dZF1N8Yw/oc=
+	t=1767630039; cv=none; b=cGz3PvFd+0Id3BSaNhNKI+Y5b94Qda1PAgpuT/6BTCL4FCxsYsZyvk2cDftghLQuVSUom2dLf9VlSBVWZuKhigfqMbuVZp33y6/8yXJYwilsjfpF9P4pUShg0bjIJIiI8jpEIMNECgl3JaN5ysZpfvw+XZ7I+x38dwDWYwJJKRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767629972; c=relaxed/simple;
-	bh=a36Fpl8dK7Cm4QBDTUTt8YmQybW2yw4PWrJPCwvYWnU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CiViN0taA81Mqcb8IDuhn/vOGiZEt4FMLTx1/Am2vz7BqVyn1CP/kKnPjpD2kNxGAYSPdZp14k58OqW3p5QyZIWJCHXCSYSanq+g5G3gCKi53X9np9aNAg1PNgNxlJXRGf1NZvAR89qdv98Cg/HDEGoxuTUjtGBS2rWqklITpXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lo/yI9IN; arc=none smtp.client-ip=209.85.218.51
+	s=arc-20240116; t=1767630039; c=relaxed/simple;
+	bh=TC+sIFUON9nVvmZpcFIsoQC9+ToI3rAy/sYlWEUlz8I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HXZRtQfWslm5upV1llvQCQaKTOgfPuEgLg5q6FNsJ80inQA1qI+LJ/3OHYLs5u1g9/CIEa7F3dSwwt2dCya86YvRPopTdXN+YGyPW0HMOoRYR94md/c9RxtSq4/ZbHnvo7Bf07RwVVbWzG8dWBqaPyahl9WbHHoTNod2Tf53yAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=itUsbM7N; arc=none smtp.client-ip=209.85.167.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b76b5afdf04so24802966b.1
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 08:19:30 -0800 (PST)
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5957c929a5eso37379e87.1
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 08:20:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767629969; x=1768234769; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8vbHP6EgxfnPPG46ofBR2iGBWBGXr2Ynn4AlyB7dNSQ=;
-        b=Lo/yI9IN/AD9KALDdtHM0Xf+/VtyrtVeLXVbL7fjrj4NgvHuQadgw1fGDpXdLEIciz
-         v9WPY6jJDngis6tZNC62w3iW2c2cBCexjOUQlgbyOVCjUJOZmoDuMziqsfe3Q6kgJm7D
-         xwpgcwI1leMVUgCB/xonbc+J4VtdlGnKyAy83cLrvOMCawkejfQh6JTneTbRnyfqciuT
-         zyo3Xa4Zfuayalsbl6Qlx9HpxpSEu4zeVqwIEme39j8mUYi2IPXjjuzAnl4K1lyouDFQ
-         Tt2OD7WA/VyGSRKVRrM+SkcDF4YmB7opzU8yZLKwqzXL2zolYexa2cFvm5h6+DqEvKJd
-         Oz5Q==
+        d=gmail.com; s=20230601; t=1767630036; x=1768234836; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mJzjkm3pecgLjhv9B/Y7YFvMANhHKFZ3pW7TlSLWEvw=;
+        b=itUsbM7NYvAdEY7D+r6b2ZlyoGfBmwEWbsfOVvW78wnNSPtdfo7g5rlrJ9QW6nMUM3
+         FdG0xtO/R0uiYdsHNRX4gTdrys6vBaY3U9m+nMzHP/apSh8Td+U66ZtwLBCkGrYARdEk
+         yeaFYKXYXGpIwar6hYlzcWEtHpHNq6/6P33LzZCoeuKodcPwBEBrO+lTOeglVhYxwzi/
+         FsS5IO5Wgadc7jQdnH85iVYx+aZpUcnHiuW5aH6n628OExLXI/sGWN5zeqteYMsBhhL1
+         PQBLhW5ZWBd65lcJmOwx9xBaXscZSJElOdKdtFyDVa1+iGxqdn5RiepKGDwnOxfjtscf
+         jt4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767629969; x=1768234769;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8vbHP6EgxfnPPG46ofBR2iGBWBGXr2Ynn4AlyB7dNSQ=;
-        b=sxny4XNBWI0ZkQKvcjbcyOFbPmjX6LzFmbbiBK8omq/Eyqyckv+ElhF2DW1nasHtiK
-         neXzuNwSKHeShadTuug7pFXG4yfwgJNrCMxP9v7b1gdzQnHz+SwutWVq54VWjs4OJvsi
-         wE1hp21OmAAN+CO3rBcoS3ZdchzdhF5KjTuJIZ04zCexdUrXlAjUryxJbXnlelF5tf8T
-         BeZEYinelm8zJdJowbwFg+T2IJpFnefjse+AtYP2sEeRtg8W0kWqC3oINvWgFGH4HtZe
-         OLg2N5FF5yn+9KMayoNTcqHVSs3agb0kQmH1yZooEI/Qdk1Us1XVvmVPfct9S4tbRkMZ
-         oZEg==
-X-Forwarded-Encrypted: i=1; AJvYcCVeYf2vM3dcH38Q6uxAxFvt6oyle+rrJ0Dw/pk32gEPGUempe6HK3h/slz/Jut4Jxv+UddwTfI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDk58JgSVtlOO1Pi8NAASat5FYCkbGj/Bns5/oo16ARvW1ENm2
-	as9Y6hkIO6Q7G2ya76iSUjccRuwFrA1gVnUiZu7j5bKH5HIzIN93R/9Q
-X-Gm-Gg: AY/fxX4VDkinpXoaOKq0S3iBc0DwmoOQgQ4fIny6XUVSNgDdREKAp4wFBxbQTx8BRyc
-	tBUW2HFdG6U22Gy80v/4LU4uJkIZ+uSnv1MMVb2mNNFydkrf8US/bY3t7mdLaj5MWCi62mea0NE
-	m0QjZxkaukLta0ykTGfGVqk6fVBr8pNDitveUK8Gi2RnOAlsxk7K0d4vtigeki51xHp7Ofqwe2v
-	GmhUY541uoG5E/YMhQcbWvI8oxTav0cNdfhfuTKn+JTuQdzZwYbq/DWiHivUGGPd6pEpH5i/BkE
-	UOWwyMftHgoS5Mguwqhrqba1IXg7EJHr0eG52QzkAWcOEgfrQz+mavPe3LK5vV5A7xhHw88duMh
-	YxrS7Z+geEb7P+yp8vrF1MM9faw+F7YPHvcoOUhKmOSRo/rJlzD8gPh9eucOmJP+Jo3t4PkYhWG
-	Qq8xFbrK3YQ37fwFTusr9bLIa+Wg2LBW+rtWmaZNtt85MkFGjd8oGinth8yQimjfVfEannPQiYy
-	I8=
-X-Google-Smtp-Source: AGHT+IE7UBVxHf8IfqaF03Np4FiKfyEW4mW5ECPUq+FGOrE+adYr7A3rTwSvGxpJ/o2ddY5uk1NIUg==
-X-Received: by 2002:a17:906:f582:b0:b80:4478:d43f with SMTP id a640c23a62f3a-b8426a423d0mr32590366b.2.1767629969089;
-        Mon, 05 Jan 2026 08:19:29 -0800 (PST)
-Received: from [192.168.255.3] (217-8-142-46.pool.kielnet.net. [46.142.8.217])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b84265abec6sm32761566b.14.2026.01.05.08.19.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Jan 2026 08:19:28 -0800 (PST)
-Message-ID: <f976d637-defd-4e32-8a82-6705e69246d2@gmail.com>
-Date: Mon, 5 Jan 2026 17:19:27 +0100
+        d=1e100.net; s=20230601; t=1767630036; x=1768234836;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=mJzjkm3pecgLjhv9B/Y7YFvMANhHKFZ3pW7TlSLWEvw=;
+        b=E5q7mFJ9E1FmUTHfStH+BYLEIn8RktpwfBZME7L43DcVW9jKfQLVBT0mab0uLsLpb1
+         b+eot47wawYQVBnY9aK4DOb4cp09G2ht1m4O/clPpbvazbTl6Ra3o7Dp6s7HN0luKMwo
+         LXDwMvDsj/E5TkMMBk5NBgiUYTO4U7zwCBBC2MCcx+3kFnKE3FAtKXEOhztmhrB6S2LJ
+         SNSaGzj6RacnmtRQnTdkhAAX/EYDj2UmA7Cl6SxMh8kFQWal3DDcFXw8nuVoRzEjUgPW
+         dMNuSLyteE4avYkwlZbhSkOoiRGkfjendRH7Vy5wV+5PdoYfKd/7pKpX7k6TkWuCGfu/
+         EAYg==
+X-Gm-Message-State: AOJu0Yz47LaxPT+nHlQKbdXwHqkO8DYOS2o7sRu5j/0O1QkBx+m4C9HZ
+	QHFVAYyF6tQKYTWpbhsjtmSp1WTlyAYHr/aXHMu2UVC2D2Hr1FF2HyPnpKfIF7a1BKBezaRuJUL
+	YH8O9kvpwLg0ASx2N2eobRixER0pdL30=
+X-Gm-Gg: AY/fxX7K9krxpX2Pi4N3dYtKztFPnH6LLgcKISj2VxKeiBzo+o/bPUsAZQJNXNC5QY2
+	/p6tkD6RmrvzBZ+wKIJdIzbcKEkEhgEp8qQXsAKXix90SZE/Q5sX5h45jU32brqO9ALcAjg1hp2
+	JHqzpYBuQr12n7ssPWdzn0gPbdUJ4s1tnW3wxTW5H2VESCeSKNyx3K8HcUIGaWTAwD9uFjxu9gg
+	9++8iQhY2yXiKrqArTs6C1D0juQZAVkexpCmBZzM37UtwIrP4ipDV8Wwo4tbJU1YB/SIP/e0chS
+	oO9K9C5rYJXwCQFaD6TU6RFoZrk7RUlQadG0wM0GSThLj1s4UilQH7pVa64Yz4biUDa8aZmW874
+	9k28BNsVS+gmeemDIjtXLj2InxhcalzYflZ4j7K1lfcq0uASMmara
+X-Google-Smtp-Source: AGHT+IG5Jz/ag5o8sejFjKjJYkf9QzTISrKNSBIzM9XCKM2uAjGv2psf9FJzZqP5f/r0tsPt/8a9C/iuhthKF6gr7DU=
+X-Received: by 2002:a05:6512:ad6:b0:594:25a6:9996 with SMTP id
+ 2adb3069b0e04-59b65279ee6mr84667e87.10.1767630036267; Mon, 05 Jan 2026
+ 08:20:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net: sfp: add SMBus I2C block support
-Content-Language: en-US
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>
-References: <20260105154653.575397-1-jelonek.jonas@gmail.com>
- <aVvjyWzKuczNf3lt@shell.armlinux.org.uk>
-From: Jonas Jelonek <jelonek.jonas@gmail.com>
-In-Reply-To: <aVvjyWzKuczNf3lt@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260103-cstr-net-v2-0-8688f504b85d@gmail.com>
+In-Reply-To: <20260103-cstr-net-v2-0-8688f504b85d@gmail.com>
+From: Tamir Duberstein <tamird@gmail.com>
+Date: Mon, 5 Jan 2026 11:20:00 -0500
+X-Gm-Features: AQt7F2pUk6i6lWvK3YlDNQpXXEoolC-MQ1o1sooEnJ2c1np9nkuj4VmEjnNIWQs
+Message-ID: <CAJ-ks9kKmT7AMbqgWjKvy13iQ8Qpiwi3NpGe=B-YbMS4ape8xQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] rust: net: replace `kernel::c_str!` with C-Strings
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>, Trevor Gross <tmgross@umich.edu>, 
+	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Alice Ryhl <aliceryhl@google.com>, Danilo Krummrich <dakr@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Daniel Almeida <daniel.almeida@collabora.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Russell,
-
-On 05.01.26 17:16, Russell King (Oracle) wrote:
-> On Mon, Jan 05, 2026 at 03:46:53PM +0000, Jonas Jelonek wrote:
->> @@ -765,26 +794,70 @@ static int sfp_smbus_byte_write(struct sfp *sfp, bool a2, u8 dev_addr,
->>  		dev_addr++;
->>  	}
->>  
->> +	return data - (u8 *)buf;
-> A separate fix is being submitted for this.
+On Sat, Jan 3, 2026 at 9:24=E2=80=AFPM Tamir Duberstein <tamird@kernel.org>=
+ wrote:
 >
->> +}
->> +
->> +static int sfp_smbus_block_write(struct sfp *sfp, bool a2, u8 dev_addr,
->> +				 void *buf, size_t len)
->> +{
->> +	size_t block_size = sfp->i2c_block_size;
->> +	union i2c_smbus_data smbus_data;
->> +	u8 bus_addr = a2 ? 0x51 : 0x50;
->> +	u8 *data = buf;
->> +	u8 this_len;
->> +	int ret;
->> +
->> +	while (len) {
->> +		this_len = min(len, block_size);
->> +
->> +		smbus_data.block[0] = this_len;
->> +		memcpy(&smbus_data.block[1], data, this_len);
->> +		ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
->> +				     I2C_SMBUS_WRITE, dev_addr,
->> +				     I2C_SMBUS_I2C_BLOCK_DATA, &smbus_data);
->> +		if (ret)
->> +			return ret;
->> +
->> +		len -= this_len;
->> +		data += this_len;
->> +		dev_addr += this_len;
->> +	}
->> +
->>  	return 0;
-> This is wrong. As already said, the I2C accessors return the number of
-> bytes successfully transferred. Zero means no bytes were transferred,
-> which is an error.
+> C-String literals were added in Rust 1.77. Replace instances of
+> `kernel::c_str!` with C-String literals where possible.
 >
-> All callers to sfp_write() validate that the expected number of bytes
-> were written. Thus, returning zero will cause failures.
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+
+@Jakub are you able to take this through net-next?
+
+> ---
+> Changes in v2:
+> - Pick up Tomo and Daniel's tags.
+> - Link to v1: https://patch.msgid.link/20251222-cstr-net-v1-0-cd9e30a5467=
+e@gmail.com
 >
-
-yes. I totally messed up v2 but already pushed out a v3 that fixes that, and
-has the separate fix as a prerequisite.
-
-Sorry for the confusion.
-
-Best,
-Jonas
+> ---
+> Tamir Duberstein (2):
+>       rust: net: replace `kernel::c_str!` with C-Strings
+>       drivers: net: replace `kernel::c_str!` with C-Strings
+>
+>  drivers/net/phy/ax88796b_rust.rs | 7 +++----
+>  drivers/net/phy/qt2025.rs        | 5 ++---
+>  rust/kernel/net/phy.rs           | 6 ++----
+>  3 files changed, 7 insertions(+), 11 deletions(-)
+> ---
+> base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+> change-id: 20251222-cstr-net-3bfd7b35acc1
+>
+> Best regards,
+> --
+> Tamir Duberstein <tamird@gmail.com>
+>
 
