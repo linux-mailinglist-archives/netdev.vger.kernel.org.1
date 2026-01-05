@@ -1,126 +1,138 @@
-Return-Path: <netdev+bounces-246999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 105F0CF361F
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 12:57:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 963BACF365E
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 13:01:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5D3B7300E8E3
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 11:56:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A19023003FE7
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 12:01:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0212A335078;
-	Mon,  5 Jan 2026 11:49:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA37333291B;
+	Mon,  5 Jan 2026 12:01:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bA5rotvD"
+	dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b="PFcG9yP7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-internal.sh.cz (mail-internal.sh.cz [95.168.196.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90A57335060;
-	Mon,  5 Jan 2026 11:49:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB1E330D2A
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 12:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.168.196.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767613776; cv=none; b=d+zY6p2zNr/eiWqEimVj9deTVOZHwXTjGYyXaQXrmGqMRGvTCf2zfZS++PrBCw4N4yFTE/dXO5Dy2bSdlidRVZMWKpgVucgwU1UFicSv9Gpn1ae8XfoQIC04u5KSD/vFpPSWwo77MSNWFAuesa45JoTQixNxqq83CB0Vyhtklkc=
+	t=1767614473; cv=none; b=DTB05ee+lPIYoNweB0lJJcgfQXGo+kAOLydaIy8pum0fiwgXCK3BfMiG5Q6fP4zKLU4M6di+6t16w3vT4wU952dTTlt9ARrLsDWBLhiJImodWcb8pYUBO8btc+xtF2xXwLSyLaZa/IWxOQjD+1llI6kQowccR5tme4VH+QkfykU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767613776; c=relaxed/simple;
-	bh=yWu645PPDBjG4J1fJYBg5tusEONb7bKGLU7c13nDQJ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PTwXILZMeBWuTegz2yOlVGGJSR31gnswTzjyRmRaoNMhxVIEknYn8IOXZQRFcgm76XiR3z4P61h5w+XbMPC6tzlVQKEX5XOJ8gVXyePJgTgrBiMrBxzna2cPHcfkISHm83j1yCB98Ve0BvQuABzN9275FkjjLV8hsSetsXupumk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bA5rotvD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCB68C19421;
-	Mon,  5 Jan 2026 11:49:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767613775;
-	bh=yWu645PPDBjG4J1fJYBg5tusEONb7bKGLU7c13nDQJ4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bA5rotvDlyCaLm7EtL2iBPGJw/Au9k0G72MCu+EKs6p5iLzStc6XznizNcA8iQ6gV
-	 otTYllFnOWjne9l0Qs8D4fqOTWOBUg58fsvi0d4QVGhlSAdE0DmZMIXcwmUb6wQohE
-	 tlo+jPFzHYjExWA65Ik5GX7b+BHnYbN0PrS6+mhHW/wuP/pyOU01pQkm3pGWctuw7O
-	 qvFRuoKEHfG8sqj/7DFsjPba3EgP8I+1SToDrmWieg/ak9RtjY+12r+KuCjIESz63+
-	 ng0ogXey35ODFl1s572WpnSrfBVQdaz5liQ+iJF6kHfo3IAhJS7M08Hi7uAYn7mz8K
-	 jKspppuY0ls3g==
-Date: Mon, 5 Jan 2026 11:49:29 +0000
-From: Simon Horman <horms@kernel.org>
-To: Haiyang Zhang <haiyangz@linux.microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1767614473; c=relaxed/simple;
+	bh=18raZhmpFTwODA8sz/4MhjDdY+LXW9FNpXfqu0ATNjE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Dwm0Yynd/WVBX65LUokQc7wmEDLNeVRCvyYrSI1bfyGU/t7NNtniHTB45vIR+F9MsPm7nN2/rxKUcnevOBSV/r68bjepbkByAtFsPTwFbInm+ld4MOmr8fte0Q1R5Ka2HHipMVgV3A5Myg3t4V96DB1gltyHOMoTHLgDhPqJh8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com; spf=fail smtp.mailfrom=cdn77.com; dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b=PFcG9yP7; arc=none smtp.client-ip=95.168.196.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=cdn77.com
+DKIM-Signature: a=rsa-sha256; t=1767614159; x=1768218959; s=dkim2019; d=cdn77.com; c=relaxed/relaxed; v=1; bh=ovbISY9Hoz8IE0AR4zzdU++AVAbMMHC38b3c2Gj157k=; h=From:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Transfer-Encoding;
+   b=PFcG9yP7z9VoXEmIr2BqNkIJDeN4bHa0Jydvqgc9U8HL1ksQnG842hApeyJGmh8B+0yL3RZ+atosjVlQY0YS9YrVnAeFnEKQouVyI9+gWN2vdkqVYKPjmMPt+MF4cHtl9oDUuDZlP20jaEJ1VynrJaDCNXbLEni97iSFvHZ3LNY=
+Received: from osgiliath ([188.75.189.151])
+        by mail.sh.cz (14.2.0 build 9 ) with ASMTP (SSL) id 202601051255580699;
+        Mon, 05 Jan 2026 12:55:58 +0100
+From: Daniel Sedlak <daniel.sedlak@cdn77.com>
+To: Eric Dumazet <edumazet@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Long Li <longli@microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	Saurabh Sengar <ssengar@linux.microsoft.com>,
-	Aditya Garg <gargaditya@linux.microsoft.com>,
-	Dipayaan Roy <dipayanroy@linux.microsoft.com>,
-	Shiraz Saleem <shirazsaleem@microsoft.com>,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	paulros@microsoft.com
-Subject: Re: [PATCH RFC 1/2] net: mana: Add support for coalesced RX packets
- on CQE
-Message-ID: <20260105114929.GA330625@horms.kernel.org>
-References: <1765900682-22114-1-git-send-email-haiyangz@linux.microsoft.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org
+Cc: Daniel Sedlak <daniel.sedlak@cdn77.com>
+Subject: [PATCH net-next v2] tcp: clarify tcp_congestion_ops functions comments
+Date: Mon,  5 Jan 2026 12:55:33 +0100
+Message-ID: <20260105115533.1151442-1-daniel.sedlak@cdn77.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1765900682-22114-1-git-send-email-haiyangz@linux.microsoft.com>
+Content-Transfer-Encoding: 8bit
+X-CTCH: RefID="str=0001.0A2D031F.695BA6CF.0006,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0"; Spam="Unknown"; VOD="Unknown"
 
-On Tue, Dec 16, 2025 at 07:57:54AM -0800, Haiyang Zhang wrote:
-> From: Haiyang Zhang <haiyangz@microsoft.com>
-> 
-> Our NIC can have up to 4 RX packets on 1 CQE. To support this feature,
-> check and process the type CQE_RX_COALESCED_4. The default setting is
-> disabled, to avoid possible regression on latency.
-> 
-> And add ethtool handler to switch this feature. To turn it on, run:
->   ethtool -C <nic> rx-frames 4
-> To turn it off:
->   ethtool -C <nic> rx-frames 1
-> 
-> Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+The optional and required hints in the tcp_congestion_ops are information
+for the user of this interface to signalize its importance when
+implementing these functions.
 
-...
+However, cong_avoid comment incorrectly tells that it is required,
+in reality congestion control must provide one of either cong_avoid or
+cong_control.
 
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> index 0e2f4343ac67..1b9ed5c9bbff 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> @@ -397,6 +397,58 @@ static void mana_get_channels(struct net_device *ndev,
->  	channel->combined_count = apc->num_queues;
->  }
->  
-> +static int mana_get_coalesce(struct net_device *ndev,
-> +			     struct ethtool_coalesce *ec,
-> +			     struct kernel_ethtool_coalesce *kernel_coal,
-> +			     struct netlink_ext_ack *extack)
+In addition, min_tso_segs has not had any comment optional/required
+hints. So mark it as optional since it is used only in BBR.
 
-...
+Co-developed-by: Neal Cardwell <ncardwell@google.com>
+Signed-off-by: Neal Cardwell <ncardwell@google.com>
+Signed-off-by: Daniel Sedlak <daniel.sedlak@cdn77.com>
+---
+changelog:
+- Apply Neal's suggestion and add as Co-developed-by.
+- Link: https://lore.kernel.org/netdev/20251218105819.63906-1-daniel.sedlak@cdn77.com/
 
-> +	if (err) {
-> +		netdev_err(ndev, "Set rx-frames to %u failed:%d\n",
-> +			   ec->rx_max_coalesced_frames, err);
-> +		NL_SET_ERR_MSG_FMT(extack, "Set rx-frames to %u failed:%d\n",
-> +				   ec->rx_max_coalesced_frames, err);
+ include/net/tcp.h | 29 +++++++++++++++++++----------
+ 1 file changed, 19 insertions(+), 10 deletions(-)
 
-nit: I don't think the trailing '\n' is necessary here.
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 0deb5e9dd911..ef0fee58fde8 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -1243,12 +1243,27 @@ struct rate_sample {
+ struct tcp_congestion_ops {
+ /* fast path fields are put first to fill one cache line */
+ 
++	/* A congestion control (CC) must provide one of either:
++	 *
++	 * (a) a cong_avoid function, if the CC wants to use the core TCP
++	 *     stack's default functionality to implement a "classic"
++	 *     (Reno/CUBIC-style) response to packet loss, RFC3168 ECN,
++	 *     idle periods, pacing rate computations, etc.
++	 *
++	 * (b) a cong_control function, if the CC wants custom behavior and
++	 *      complete control of all congestion control behaviors.
++	 */
++	/* (a) "classic" response: calculate new cwnd.
++	 */
++	void (*cong_avoid)(struct sock *sk, u32 ack, u32 acked);
++	/* (b) "custom" response: call when packets are delivered to update
++	 * cwnd and pacing rate, after all the ca_state processing.
++	 */
++	void (*cong_control)(struct sock *sk, u32 ack, int flag, const struct rate_sample *rs);
++
+ 	/* return slow start threshold (required) */
+ 	u32 (*ssthresh)(struct sock *sk);
+ 
+-	/* do new cwnd calculation (required) */
+-	void (*cong_avoid)(struct sock *sk, u32 ack, u32 acked);
+-
+ 	/* call before changing ca_state (optional) */
+ 	void (*set_state)(struct sock *sk, u8 new_state);
+ 
+@@ -1261,15 +1276,9 @@ struct tcp_congestion_ops {
+ 	/* hook for packet ack accounting (optional) */
+ 	void (*pkts_acked)(struct sock *sk, const struct ack_sample *sample);
+ 
+-	/* override sysctl_tcp_min_tso_segs */
++	/* override sysctl_tcp_min_tso_segs (optional) */
+ 	u32 (*min_tso_segs)(struct sock *sk);
+ 
+-	/* call when packets are delivered to update cwnd and pacing rate,
+-	 * after all the ca_state processing. (optional)
+-	 */
+-	void (*cong_control)(struct sock *sk, u32 ack, int flag, const struct rate_sample *rs);
+-
+-
+ 	/* new value of cwnd after loss (required) */
+ 	u32  (*undo_cwnd)(struct sock *sk);
+ 	/* returns the multiplier used in tcp_sndbuf_expand (optional) */
 
-     Flagged by coccinelle.
+base-commit: 8f7aa3d3c7323f4ca2768a9e74ebbe359c4f8f88
+-- 
+2.52.0
 
-> +
-> +		apc->cqe_coalescing_enable = saved_cqe_coalescing_enable;
-> +	}
-> +
-> +	return err;
-> +}
-
-...
 
