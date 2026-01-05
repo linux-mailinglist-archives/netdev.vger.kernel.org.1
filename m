@@ -1,154 +1,140 @@
-Return-Path: <netdev+bounces-247135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1195BCF4D72
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 17:56:30 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 444A5CF4D60
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 17:55:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D5C3D3245691
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 16:44:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0D7AE301F3DD
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 16:53:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32092299947;
-	Mon,  5 Jan 2026 16:43:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D48A306B3B;
+	Mon,  5 Jan 2026 16:53:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SDbhuYD+";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="BfTT5jWW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c/uyUUYE"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 322D62749DC
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 16:43:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AEE430B520
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 16:53:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767631437; cv=none; b=IbUmWuj40XCRZiWBzV+yc4yVT1Z7/KAQAx3HG5Y1v8dRPUKXo3yrX4V8jUlwxAXkfscku3O+B54/b6KPrrTP4ShS1Qaq3arEwKcxCvK/zi+dZSquHPId7s729ZQbk/XEJInwCaECba6YKGfmoH/H+EqDQdWRPgkfiYYwfQSGjSc=
+	t=1767632028; cv=none; b=LyrQxWRZ69LTXRvUIvMFR0w8UdILYJ+UMLgc7p2R3CZcZoki8ERgImKpOXx+OY5FgTUbVn6a3Cee0zv63WPeJUkgzJh39qnKkotRGXTgVRGSugKEqt9ZhSNpXBm24hdf7cNktem7qZKp7QyqeBi9Q45HJquJKZWhYJc0neWRl5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767631437; c=relaxed/simple;
-	bh=V2RcMFWNxHXpx7Cbk1wLqeq5HUPDZY2CLps3fwdMAtY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=VPFTpmRtPLYwwW8L52BdtjBTqHc6aixCRzRhKKZSpO8SOlL9KCWWCsSeJ2JArYfJyepVkcx1yUCs7VRHP3ZGhGJECodZAcx3oLcrPqn1PqFnIsEQjmHivPHkdVB69ztvDschVsi/q5XuvHZ4eF5mO0nKWe7ygB1vmhC0YNybrcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SDbhuYD+; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=BfTT5jWW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767631434;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=V2RcMFWNxHXpx7Cbk1wLqeq5HUPDZY2CLps3fwdMAtY=;
-	b=SDbhuYD+zHAUYkGSI0OlEWCSzGeUpnfl+AiymGcVacGPTMAobII4Qs2vwmFG0ymq34KyTs
-	Hz95amezKtI5AQeU9Ribddsw666lmJjh+prizyutxZKbyScT2/mD9LVXENGbCnUhgLla37
-	x0IYEBWm9o2PBcJPeKpe78lGzIvM6PA=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-440-UAfGvuwgPWadyaVznIz7xQ-1; Mon, 05 Jan 2026 11:43:53 -0500
-X-MC-Unique: UAfGvuwgPWadyaVznIz7xQ-1
-X-Mimecast-MFC-AGG-ID: UAfGvuwgPWadyaVznIz7xQ_1767631432
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-64d1982d980so93990a12.2
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 08:43:52 -0800 (PST)
+	s=arc-20240116; t=1767632028; c=relaxed/simple;
+	bh=b646dHGOv+VV6aLwAkaxZ/Wf7u+I6uBXShgZx/JBC1I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=udCGnvY2i5xqPFj/Lp0k+sNyDPGYsgeDZpmfc7XL3NsW9JLIO7mbc5MllW8CoO/JW6dY5zRfPxcNSRm9aQzRwFLC4DwynEi42LQ7OzBEMwEO4FYZpxtjC5mmujAJARl7UBi6wDhydTjPyL9tFe6aiGQ41t1hc8bHMD6NN5cRXdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c/uyUUYE; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b79ea617f55so29048966b.3
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 08:53:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767631432; x=1768236232; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=V2RcMFWNxHXpx7Cbk1wLqeq5HUPDZY2CLps3fwdMAtY=;
-        b=BfTT5jWWW9XcWvj2mHWxy95/dLJmljmH225nTzmf9u01uoo+9HWhIKFHWalLCZq+Oo
-         XXcCsC3sMvGWfXDw1G3idF6qakzRnpWdKQn7MszfbcmtxleLFQVdi359RqvqUmtqOWeM
-         Zdmn5A9D/SZKOYilVIQWPq4Y+tzG6GtgU0+/OFC5dN6efNxIuXhLEopShYsuDXWUqwJB
-         kaRjDqLsHMx7CK41m8C7oa2wLcez1cYUFD1nqeG3pmjGCi46tanzzjphD3bXCqvsfqNt
-         udlNwWdAiOVT35KkUM0bus6VfS9XUXeL+u0u0dpkKKOegkhFVnUhuWrki729FpconX2d
-         7HjA==
+        d=gmail.com; s=20230601; t=1767632025; x=1768236825; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=l00UN7SRVhBQC6JXZrocYBm/aaGRNA8NKJUkQbam+Zc=;
+        b=c/uyUUYEkQKqmuVfIU9H6/4shBjRqZXfEevoZ4WpVBwOlvFEFnfHEtCZeaDhZp8vfL
+         SNIJdktdQheFb3ElDCeXPH1UoPDGIzHS58vCs/mmlTT52xztyOrPOENHQWK8bni8QkG6
+         mH45wyHtsPKijBh42qpI4YwqO+apOZlZWhn+Y5uw40eWF2xeeaEIYeeQBRFoObLYWc3o
+         xLpmabk4t73NleTzDC0XIE3JvAtGv3W07CUuVzkGm5+efgftgs8Zr22tP41uSc4AYKKs
+         WMs/X/BsZaPZSXJ7ksJa6GNObo2sDB5P+bQqkGKNmq2e5R44Z98YwEJZdFWW1VvDxrKz
+         2YMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767631432; x=1768236232;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=V2RcMFWNxHXpx7Cbk1wLqeq5HUPDZY2CLps3fwdMAtY=;
-        b=P3B2HLnqwGD7KTnOcmmLa4X6Gc83utBRawdhdBXk3ih0IYUTxJTCv71WA9S/st69va
-         u61J9ejlhZ5g3EthY91OoQr0yFWiqwZ/LItlwd2F0Qnz5T5Q7NkgXY+G92eSJQIKQjka
-         gYCjILUd3mmHgYJSRN2c6O8qeJNgx4x8qDCIyoqq3UT4iJeMeAv8LIrbOyweWJ4JMsAr
-         ZzvQZr3hX59dC19wHk06ts/ZqFzWMwZlsHUCjdhOXxiyxzm+rJQlcrkqjaJ22nt2WGVv
-         ejCF4J234NaWu4uPrFg3BE1SSYS+1o64iTCmSTf1XS3xNQ4rzXrCdh2yvo68t8GI8suc
-         RYPw==
-X-Forwarded-Encrypted: i=1; AJvYcCUbU5Wpwwi4g7n/TPsNYwZIz9Avn/uXCrq0ivlAN3+4AISQ9hi30ak9LH04xIr/WmeaghxvHZc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWYb03RPLx2hP+FsxL9sr/QKT7JxzabI9eZpUUAjnrR2Gt2HOv
-	ttctZ5DljATLNviHUHCDZnfnFLm0yZBiZ1RCWS83HMrdlFUbHrcl9atW7+uDF7bJQKpiMEVp2Qd
-	JUjK9pgd8W9bQLcjZu+3EVaY/s4z1o3Fp+OSHe8785DGqrP7kkoNfF8dMHA==
-X-Gm-Gg: AY/fxX7y4VOtYT9CkhLvzOxLla48fHR4+3gm/19WT63bEyU9du/vPS1EYeN+uuaw+zi
-	jFEtc/QOEophSFkcFP3aESjj0THLv8m4/oJt/VcLBlHQhzwCLUusN3lXvtsM695DY9Z/VTp2rBK
-	3rD/T2LXpbWsKI0IM+LAwY0akrg2zRbW9xfrZL5beUG+/WTIkR+sFeeGDUum4tNMV40Xd4PKwPo
-	871TAxmwSqwQkQYOUdRqYXkMAvTiC2heu1iPeVy6h/3RCUN5xFvqM1DKYvx8YujiHdYFjry2Pi8
-	IER/GYH5nw5Gw290b5pmkvX0xyOewWQLLA1fjxwIUwLT3xgCEcZitwqVkvNolrJiBKejDgmcaFq
-	q3MUqv2OoQcM0y3FFgcHH5zcjqBCpNCQs/VsB
-X-Received: by 2002:a05:6402:4414:b0:64b:ea6b:a884 with SMTP id 4fb4d7f45d1cf-65079561d9amr39794a12.17.1767631431859;
-        Mon, 05 Jan 2026 08:43:51 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH5+CYTAwrLc8azSOHqieZ/AYKr+pOh1WCTsnwOkUqmz4srueS6d/oRRO9LBMmPRJORe96YbQ==
-X-Received: by 2002:a05:6402:4414:b0:64b:ea6b:a884 with SMTP id 4fb4d7f45d1cf-65079561d9amr39766a12.17.1767631431378;
-        Mon, 05 Jan 2026 08:43:51 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6507618cc31sm222081a12.24.2026.01.05.08.43.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 08:43:50 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 18D1C407EDE; Mon, 05 Jan 2026 17:43:50 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: KaFai Wan <kafai.wan@linux.dev>, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com,
- song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
- kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, hawk@kernel.org, shuah@kernel.org,
- aleksander.lobakin@intel.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc: Yinhao Hu <dddddd@hust.edu.cn>, Kaiyan Mei <M202472210@hust.edu.cn>,
- Dongliang Mu <dzm91@hust.edu.cn>
-Subject: Re: [PATCH bpf-next 1/2] bpf, test_run: Fix user-memory-access
- vulnerability for LIVE_FRAMES
-In-Reply-To: <38dd70d77f8207395206564063b0a1a07dd1c6e7.camel@linux.dev>
-References: <fa2be179-bad7-4ee3-8668-4903d1853461@hust.edu.cn>
- <20260104162350.347403-1-kafai.wan@linux.dev>
- <20260104162350.347403-2-kafai.wan@linux.dev> <87y0mc5obp.fsf@toke.dk>
- <38dd70d77f8207395206564063b0a1a07dd1c6e7.camel@linux.dev>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Mon, 05 Jan 2026 17:43:50 +0100
-Message-ID: <87ms2s57sp.fsf@toke.dk>
+        d=1e100.net; s=20230601; t=1767632025; x=1768236825;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=l00UN7SRVhBQC6JXZrocYBm/aaGRNA8NKJUkQbam+Zc=;
+        b=tkJ473qZ+gGFJeId8yWdU45WyEXjUetZL9oz7iJloN9TI3Qyii3u/uA8QgSOLGXLkj
+         99OERxZNFYuV6P9xywlRUNZr28r1+46F5i5+XM20ky7/+ywMhZ23m7qFx5dMzoHr4AVY
+         uThIAwUZ5p4l0pMO8zIrLw9vbbOc9hiKwTZLOHi+ajH7dUGX5T0nfaQnU9mTh/Y30P8Q
+         IbBgbctmIOnw1pMQhgI3aBofrgs8Te6x189ElrRkphxpX+J9lVuThrqbb4idfuJA9zVR
+         jKxrzK7EEYEoDbfk9eIH8qumnl7GIvcsxP36Rwvzx66hY3bxYP0+jvGacUF0EwH9mTuP
+         zY2w==
+X-Forwarded-Encrypted: i=1; AJvYcCUBUHIwa02ZYswao5Y2OZDKVv80+brvS6dyDThNxFHVLSevD/05irgZINo+rd2gz/2xUNX/sLw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXZdpX9fbW4ukBiiDJQFVBtvcn2ORgzHjErq5ADnc++rLYSFuv
+	+e923PeO74SwSnFiP2hq7mxlSMTKsJ2N58ezAf8WbR6KVEfMYgpSt/Nv
+X-Gm-Gg: AY/fxX7zWR9ATPFUh3ZSf/oFqYfERJThWjPO6bUvKN8akPpeR1aqZWq8WByWU/niDY+
+	peI33Q3riEduGNZhZNAvb05XFg3TBz3yquk56Hq/uTeNBS0ftO7uCyfYArl0oRAEhymhf0RxRPk
+	5aGuOQoBTVgkUSWs68m1JtYC2uCLOY1IoDV+4EwwIfYJzFfx85Dx4VAUZXAAVXY58zOOkjnKRI+
+	ZGpSwmZm7zCYDRBuwusir8mB7y/ZJRINvPv9GVwFMgmV4WNn7/UWVGjd8BnAMpL99uacsvlYAjP
+	pTDoYPKEzdqdwhZJJED0GzilToSEIKW4DUoUQGuZ4kONZ/Roicvq5FVOep1cyjYPicxldcgSCw2
+	KVhcQYnwDiUZf+LADd8nlmMKhZvp8mfnoqhIM9h8UFtNmhEWITOfvUUAVa0l5TwmGAQRc8xr/AJ
+	M8LgBBWiTrK8l6odiIpyOqp3WWOZPG00qJ0TU1qa741ce/feLk3+WSnEULB6NsExay
+X-Google-Smtp-Source: AGHT+IF+Z26J3eqWANjwvz2aGbzwbHwj03Dvzld4yxgmdcITZPUnWCL1cmdrL77moI4imhMFx9RY5A==
+X-Received: by 2002:a17:907:971a:b0:b72:c261:3ad2 with SMTP id a640c23a62f3a-b8426bfc283mr45915466b.50.1767632024349;
+        Mon, 05 Jan 2026 08:53:44 -0800 (PST)
+Received: from [192.168.255.3] (217-8-142-46.pool.kielnet.net. [46.142.8.217])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842678bfe6sm32386166b.57.2026.01.05.08.53.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Jan 2026 08:53:44 -0800 (PST)
+Message-ID: <3c774e4d-b7a6-44e3-99f3-876f5ccb1ca3@gmail.com>
+Date: Mon, 5 Jan 2026 17:53:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] net: sfp: add SMBus I2C block support
+Content-Language: en-US
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>
+References: <20260105161242.578487-1-jelonek.jonas@gmail.com>
+ <aVvmu1YtiO9cXUw0@shell.armlinux.org.uk>
+From: Jonas Jelonek <jelonek.jonas@gmail.com>
+In-Reply-To: <aVvmu1YtiO9cXUw0@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-KaFai Wan <kafai.wan@linux.dev> writes:
+Hi Russell,
 
-> On Mon, 2026-01-05 at 11:46 +0100, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> KaFai Wan <kafai.wan@linux.dev> writes:
->>=20
->> > This fix reverts to the original version and ensures data_hard_start
->> > correctly points to the xdp_frame structure, eliminating the security
->> > risk.
->>=20
->> This is wrong. We should just be checking the meta_len on input to
->> account for the size of xdp_frame. I'll send a patch.
+On 05.01.26 17:28, Russell King (Oracle) wrote:
+> On Mon, Jan 05, 2026 at 04:12:42PM +0000, Jonas Jelonek wrote:
+>> base-commit: c303e8b86d9dbd6868f5216272973292f7f3b7f1
+>> prerequisite-patch-id: ae039dad1e17867fce9182b6b36ac3b1926b254a
+> This seems to be almost useless information. While base-commit exists
+> in the net-next tree, commit ae039dad1e17867fce9182b6b36ac3b1926b254a
+> doesn't exist in either net-next nor net trees.
 >
-> Current version the actual limit of the max input meta_len for live frame=
-s is=20
-> XDP_PACKET_HEADROOM - sizeof(struct xdp_frame), not
-> XDP_PACKET_HEADROOM.
+> My guess is you applied Maxime's patch locally, and that is the
+> commit ID of that patch.
 
-By "current version", you mean the patch I sent[0], right?
+This was supposed to be the stable patch-id obtained with 
+'git patch-id --stable'.
 
-If so, that was deliberate: the stack limits the maximum data_meta size
-to XDP_PACKET_HEADROOM - sizeof(struct xdp_frame), so there's no reason
-not to do the same for bpf_prog_run(). And some chance that diverging
-here will end up surfacing other bugs down the line.
+> Given that Maxime's patch is targetting the net tree (because it's
+> a fix), and your patch is new development, so is for net-next, you
+> either need to:
+> - wait until Maxime's patch has been merged, and then the net tree
+>   has been merged into net-next.
+> or:
+> - resend without Maxime's patch.
+>
+> In either case, please read https://docs.kernel.org/process/maintainer-netdev.html
+> In particular, the salient points are:
+> - no resends in under 24 hours (see point 1.6.7)
+> - specify the tree that your patch is targetting in the subject line
+>   (see point 1.6.1) E.g. [PATCH net-next v...] net: blah blah
+>
+> Thanks.
+>
 
--Toke
+Ack. I'll fix the points you mentioned.
+Thanks for your patience.
 
-[0] https://lore.kernel.org/r/20260105114747.1358750-1-toke@redhat.com
 
+Best,
+Jonas
 
