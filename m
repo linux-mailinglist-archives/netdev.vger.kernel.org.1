@@ -1,149 +1,247 @@
-Return-Path: <netdev+bounces-247033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC912CF3B1D
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 14:04:47 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E44DCF3900
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 13:39:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D430E30C9E60
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 12:57:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3DE9F30005AB
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 12:38:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DA6F346AD8;
-	Mon,  5 Jan 2026 12:46:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 003663191B0;
+	Mon,  5 Jan 2026 12:37:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="PLzJYIml"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H1WXK7ky";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eq9VP6sj"
 X-Original-To: netdev@vger.kernel.org
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45DD6346A02;
-	Mon,  5 Jan 2026 12:46:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFE4526C384
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 12:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767617219; cv=none; b=LRvDduoK+8QdjpIBLiJt9w0x3JgVlD3rWg2A6EVdJYa5Bs+XTxsNamQ3vGKFyG67ahSfgH6G/Ji2SRJwf1bp88aUtT6UGiJKVJcm7tIiEm5kbi9VG1KVSkt7zqhSoVgPJdzWRqOATY5J7OUqrKW0CnqQmGaDQ1UeefV4I0fcxyQ=
+	t=1767616663; cv=none; b=LHVOl9tJrKUpductfA6HCqRbpcP3qiAkjpY1FhjZoKWWBqE7TcrAqOiPso8zwnXj6nK9n+bhF71apaJhpOeKlH4y+FMDvGegp+5GWAzCZgMCTW1PH2o8x/WjkIKLxVgp8Fc4hDDtddPElN37/5shCHB3T8AleScICzhl3x3xJOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767617219; c=relaxed/simple;
-	bh=321yEr8YVsmjW3bML0bGo3Vdw9hbGBArRwRU7u8cNo4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tE5H+5z7aLZHZ2jVlbgOaXwiHjFRbCu5NlvtmsCy47DrdbgdNVqv/31VRVoSmg9w87h2gIONFavsCAvHxtjG3jLK28i+BVuvefH/cd9cLl8QMAlB97c0Eyt6IoW5xMy1EBRVwSVPRWyE1qWOQlJqdqCqpzYNxSaUIJvkm7r9BXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=PLzJYIml; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:In-Reply-To:
-	References; bh=Dvm+kvJHyY1KKCJtfQp8EPX7C/3KH3OKeCdRxBCMWeY=; t=1767617217;
-	x=1768049217; b=PLzJYImlfCTEI7mQXQ7prJGSMDoN8oXs1p+C9EDUvpXeMC3VmPdent9PtEwwZ
-	MQ75cDikmkQ2l0V1ykYP67PlQQ8/P7h694uhBfPPwF3RXz2rnr/zE3vLa7xhrWnaatNbSaXJs7CHc
-	ysdF8WU6f9694OvVFm7Rj9WmhR/Kz/gi2dpQHTL2lvc8CMw1+0PzNg56wrnTLVi8EWg1J3EMMRTE9
-	CrDLSA5l1i+k7j10w+kny5yplPt7x/BazTGVygX1N2xIucT5RuGXfwqdj7X1Ob2Z9kbMC5MnFM1+c
-	hHGPxQB8S3/Z+uRQcbVTde3pKwfXvpozoYWH6lLyElxZOHC6Vw==;
-Received: from [2a02:8108:8984:1d00:a0cf:1912:4be:477f]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128)
-	id 1vcjjg-001TXb-2m;
-	Mon, 05 Jan 2026 13:31:00 +0100
-Message-ID: <6498cffd-5bf9-490a-910d-f64ab9b7f330@leemhuis.info>
-Date: Mon, 5 Jan 2026 13:30:59 +0100
+	s=arc-20240116; t=1767616663; c=relaxed/simple;
+	bh=wLc+K6BlGcNsSRvAX+itXhvo8Atf/pzYe91W0J7xGew=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jAXzTtJ5TxRZkM53+9HNuL7Anumb428JkPmVdTVHbaQm4p82VpzGGzZU3c75WaXUvmiHp1ROgVdxT7F+TcDbQJ6CEcLUcn+YtvRWafzPeMAYBwqpWX+styr8QRu3Kb5W4V8f7PLOMwsvjdV5EQFt0mbmWHwbWvK2Q8jBaOwuMKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H1WXK7ky; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Eq9VP6sj; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767616659;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=v0XYhWIefjZGWouNSFIeJyo4tnXXaglCJukd6oVTUw8=;
+	b=H1WXK7kywqmNwLCbDAtiXH3CYEmj+BnnYbowIYfRlxRJh5DEdbI0SunlJ7T6HjWpe+LuPt
+	9A94Mp4GxVhW+0hqanjDRxFSSjwWDxQU4Tegtn44esAs3cjbIrxhNhgHbrVnKMrJ9na6Fh
+	Vg3asHNuOhGEQ7VvQLg/xh0aN084Vbw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-30-6MR6URuwNX--pM_vdM19ew-1; Mon, 05 Jan 2026 07:37:38 -0500
+X-MC-Unique: 6MR6URuwNX--pM_vdM19ew-1
+X-Mimecast-MFC-AGG-ID: 6MR6URuwNX--pM_vdM19ew_1767616657
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-431054c09e3so8510850f8f.0
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 04:37:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1767616657; x=1768221457; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=v0XYhWIefjZGWouNSFIeJyo4tnXXaglCJukd6oVTUw8=;
+        b=Eq9VP6sjxuj4fpuGOHuc4AZBvfHXrpCCOnPIPzUujno9eG7uEynix2xsUwCFeYLEX2
+         n4M0oaPhL31ZruKM6s4vKMiSNzS6rKwTJbX/iQmJYQbcHIEKwk4C2EiYrbQgPqMEFhuT
+         /+Stu7UAv9UdB8EUdFcVQg+zkqWn1gKxrCaQuoj4IjtvV4AYRJQqR7O/vf+yoDOjZiKO
+         lKBuBr6wFYLKJ7rudUdZUu8AZGbPLPG6rdlBUlHO7CYO9YmELzP+zYAEqbU0F66sbTOz
+         uuqkHWVPe71/f++6ZyR6hNwSgIMm2alWZQwxH45jEnIe8cmJxZ0o5Id66WIu9hwwUvj3
+         k6dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767616657; x=1768221457;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=v0XYhWIefjZGWouNSFIeJyo4tnXXaglCJukd6oVTUw8=;
+        b=EKnj7ocrsSc82CGx6QacI/+y9EBOu05yj1uc70NmocYPd/qmZe/qVxgxtajLFce7OQ
+         xkKSfbZKEiQSeXe5CYDbRUYkzl7l6dOgteWOM6JC52OBniZn14gt5yne1K9U/lVRa2vQ
+         xduCBlQ+27fK0SO1Zgw6qftXYdaz177SbiP7jGh2hG41VWPZMrpow1B7v56yZk0VPp7l
+         Q6IYPe7O3280jl3czW+aqgpjbcVvB74exxZx11l9QnmAbYWqTv1x3JS79i5meDqzw1cH
+         lW6wOAmXn7tJ2tKefBUgHPC6exgWqvPSCoU1GGvmGKAxY9jLndoHbBQPXBM+L6FatrJn
+         FsVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVxA82ncO4/hRQvoUYf/Cghlyj7djRtob2VBK4u0qL8GfepchaHynrxq0UtEwXrTpOBYO1gN4o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJTPQrCSkiwO4LjFRSgGIv6VMqnBlYDML/oxbNo7lD4v9nNXU5
+	K3fmiuYvAgdQsM1FksNDLWcSRuptHD2JBoKmRYpVEjldHB0nUsTUOHqXvr2j1HQuv7PhIcgE49g
+	JQtUXKWxN66RNyt3LKDFGwLnE9zpMmKZNrB+s3qr5GIubcDtjAs/moEcpqQ==
+X-Gm-Gg: AY/fxX7damntlGMyMb0F5x54iPxXHc0WTG9R2zYkGQas66jEhqxF9A3zx4WnsQmTsSo
+	3uMeH/ls9KI4MzHrT1if7b0YbeGEjyucOYVetqkuZG1f3p6VpusWy0tXdHO6w1wBEegpPidBMFl
+	0QT/4gyDfhSHo7TgU1wJQ7MsS3oWwCPV5Mp/whTIzzvbIE/rSi4Vr8zvrrYUqvclaI++HIiFa8h
+	WkQWPmCtWjLwppwJ0spKx2Zg25toZ+32MPbzg2WgJtzJEJuiFgk9C3LNYVVBk5wPI0d0F+stx4x
+	sO8BjE08+HPX7KsnslRK5dDahMEwGsdBpUMCxcoC/Es5q40PO+FN2AN+n/FhhePgourafOg2d2l
+	RhkUs5O2sZm28oZ8cqbig9ciUbn+U+8sSUw==
+X-Received: by 2002:a05:600c:6388:b0:477:7b16:5f88 with SMTP id 5b1f17b1804b1-47d1953345cmr554872785e9.6.1767616657316;
+        Mon, 05 Jan 2026 04:37:37 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG5CrfHKpTC4/iHV/NtFp0xVhQZAcSLZVRFoYkUoGChs4u9sh46HLHw+pax4aqs2/BHfMQ+jQ==
+X-Received: by 2002:a05:600c:6388:b0:477:7b16:5f88 with SMTP id 5b1f17b1804b1-47d1953345cmr554872465e9.6.1767616656787;
+        Mon, 05 Jan 2026 04:37:36 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4327791d2f3sm69930171f8f.11.2026.01.05.04.37.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 04:37:35 -0800 (PST)
+Date: Mon, 5 Jan 2026 07:37:31 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Petr Tesarik <ptesarik@suse.com>
+Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jason Wang <jasowang@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Bartosz Golaszewski <brgl@kernel.org>, linux-doc@vger.kernel.org,
+	linux-crypto@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-scsi@vger.kernel.org, iommu@lists.linux.dev,
+	kvm@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 05/15] dma-debug: track cache clean flag in entries
+Message-ID: <20260105073621-mutt-send-email-mst@kernel.org>
+References: <cover.1767601130.git.mst@redhat.com>
+ <0ffb3513d18614539c108b4548cdfbc64274a7d1.1767601130.git.mst@redhat.com>
+ <20260105105433.5b875ce3@mordecai>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [regression 5.10.y] Libvirt can no longer delete macvtap devices
- after backport of a6cec0bcd342 ("net: rtnetlink: add bulk delete support
- flag") to 5.10.y series (Debian 11)
-To: Ben Hutchings <benh@debian.org>,
- Roland Schwarzkopf <rschwarzkopf@mathematik.uni-marburg.de>,
- Nikolay Aleksandrov <razor@blackwall.org>, David Ahern <dsahern@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Sasha Levin <sashal@kernel.org>,
- debian-kernel@lists.debian.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Greg KH <gregkh@linuxfoundation.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org, regressions@lists.linux.dev, 1124549@bugs.debian.org
-References: <0b06eb09-b1a9-41f9-8655-67397be72b22@mathematik.uni-marburg.de>
- <aUMEVm1vb7bdhlcK@eldamar.lan>
- <e8bcfe99-5522-4430-9826-ed013f529403@mathematik.uni-marburg.de>
- <176608738558.457059.16166844651150713799@eldamar.lan>
- <d4b4a22e-c0cb-4e1f-8125-11e7a4f44562@leemhuis.info>
- <27c249d80c346a258cfbf32f1d131ad4fe64e77c.camel@debian.org>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: de-DE, en-US
-In-Reply-To: <27c249d80c346a258cfbf32f1d131ad4fe64e77c.camel@debian.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1767617217;2151dd91;
-X-HE-SMSGID: 1vcjjg-001TXb-2m
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260105105433.5b875ce3@mordecai>
 
-@stable team and/or @net maintainers: this imho needs a judgement call
-from your side. See below for details.
-
-On 1/2/26 21:18, Ben Hutchings wrote:
-> On Fri, 2025-12-19 at 10:19 +0100, Thorsten Leemhuis wrote:
->> On 12/18/25 20:50, Salvatore Bonaccorso wrote:
->>>
->>> Is there soemthing missing?
->>>
->>> Roland I think it would be helpful if you can test as well more recent
->>> stable series versions to confirm if the issue is present there as
->>> well or not, which might indicate a 5.10.y specific backporting
->>> problem.
->>
->> FWIW, it (as usual) would be very important to know if this happens with
->> mainline as well, as that determines if it's a general problem or a
->> backporting problem
-> [...]
+On Mon, Jan 05, 2026 at 10:54:33AM +0100, Petr Tesarik wrote:
+> On Mon, 5 Jan 2026 03:23:10 -0500
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
 > 
-> The bug is this:
+> > If a driver is buggy and has 2 overlapping mappings but only
+> > sets cache clean flag on the 1st one of them, we warn.
+> > But if it only does it for the 2nd one, we don't.
+> > 
+> > Fix by tracking cache clean flag in the entry.
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> >  kernel/dma/debug.c | 27 ++++++++++++++++++++++-----
+> >  1 file changed, 22 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/kernel/dma/debug.c b/kernel/dma/debug.c
+> > index 7e66d863d573..43d6a996d7a7 100644
+> > --- a/kernel/dma/debug.c
+> > +++ b/kernel/dma/debug.c
+> > @@ -63,6 +63,7 @@ enum map_err_types {
+> >   * @sg_mapped_ents: 'mapped_ents' from dma_map_sg
+> >   * @paddr: physical start address of the mapping
+> >   * @map_err_type: track whether dma_mapping_error() was checked
+> > + * @is_cache_clean: driver promises not to write to buffer while mapped
+> >   * @stack_len: number of backtrace entries in @stack_entries
+> >   * @stack_entries: stack of backtrace history
+> >   */
+> > @@ -76,7 +77,8 @@ struct dma_debug_entry {
+> >  	int		 sg_call_ents;
+> >  	int		 sg_mapped_ents;
+> >  	phys_addr_t	 paddr;
+> > -	enum map_err_types  map_err_type;
+> > +	enum map_err_types map_err_type;
 > 
-> - libvirtd wrongly used to use NLM_F_CREATE (0x400) and NLM_F_EXCL
->   (0x200) flags on an RTM_DELLINK operation.  These flags are only
->   semantically valid for NEW-type operations.
+> *nitpick* unnecessary change in white space (breaks git-blame).
 > 
-> - rtnetlink is rather lax about checking the flags on operations, so
->   these unsupported flags had no effect.
+> Other than that, LGTM. I'm not formally a reviewer, but FWIW:
 > 
-> - rtnetlink can now support NLM_F_BULK (0x200) on some DEL-type
->   operations.  If the flag is used but is not valid for the specific
->   operation then the operation now fails with EOPNOTSUPP.  Since
->   NLM_F_EXCL == NLM_F_BULK and RTM_DELLINK does not support bulk
->   operations, libvirtd now hits this error case.
+> Reviewed-by: Petr Tesarik <ptesarik@suse.com>
 > 
-> I have not tested with mainline, but in principle the same issue should
-> occur with any other kernel version that has commit a6cec0bcd342 "net:
-> rtnetlink: add bulk delete support flag"
+> Petr T
 
-FWIW, merged for v5.19-rc1 and backported to v5.10.246 as 1550f3673972c5
-End of October 2025 in parallel with 5b22f62724a0a0 ("net: rtnetlink:
-fix module reference count leak issue in rtnetlink_rcv_msg") [v6.0-rc2],
-which is a fix for the former.
 
-> together with an older version of libvirt.
-> 
-> This was fixed in libvirt commit 1334002340b, which appears to have gone
-> into version 7.1.0,
+I mean, yes it's not really required here, but the padding we had before
+was broken (two spaces not aligning to anything).
 
-Could not find that commit when looking briefly, but that version was
-released 2021-03-01.
+> > +	bool		 is_cache_clean;
+> >  #ifdef CONFIG_STACKTRACE
+> >  	unsigned int	stack_len;
+> >  	unsigned long	stack_entries[DMA_DEBUG_STACKTRACE_ENTRIES];
+> > @@ -472,12 +474,15 @@ static int active_cacheline_dec_overlap(phys_addr_t cln)
+> >  	return active_cacheline_set_overlap(cln, --overlap);
+> >  }
+> >  
+> > -static int active_cacheline_insert(struct dma_debug_entry *entry)
+> > +static int active_cacheline_insert(struct dma_debug_entry *entry,
+> > +				   bool *overlap_cache_clean)
+> >  {
+> >  	phys_addr_t cln = to_cacheline_number(entry);
+> >  	unsigned long flags;
+> >  	int rc;
+> >  
+> > +	*overlap_cache_clean = false;
+> > +
+> >  	/* If the device is not writing memory then we don't have any
+> >  	 * concerns about the cpu consuming stale data.  This mitigates
+> >  	 * legitimate usages of overlapping mappings.
+> > @@ -487,8 +492,16 @@ static int active_cacheline_insert(struct dma_debug_entry *entry)
+> >  
+> >  	spin_lock_irqsave(&radix_lock, flags);
+> >  	rc = radix_tree_insert(&dma_active_cacheline, cln, entry);
+> > -	if (rc == -EEXIST)
+> > +	if (rc == -EEXIST) {
+> > +		struct dma_debug_entry *existing;
+> > +
+> >  		active_cacheline_inc_overlap(cln);
+> > +		existing = radix_tree_lookup(&dma_active_cacheline, cln);
+> > +		/* A lookup failure here after we got -EEXIST is unexpected. */
+> > +		WARN_ON(!existing);
+> > +		if (existing)
+> > +			*overlap_cache_clean = existing->is_cache_clean;
+> > +	}
+> >  	spin_unlock_irqrestore(&radix_lock, flags);
+> >  
+> >  	return rc;
+> > @@ -583,20 +596,24 @@ DEFINE_SHOW_ATTRIBUTE(dump);
+> >   */
+> >  static void add_dma_entry(struct dma_debug_entry *entry, unsigned long attrs)
+> >  {
+> > +	bool overlap_cache_clean;
+> >  	struct hash_bucket *bucket;
+> >  	unsigned long flags;
+> >  	int rc;
+> >  
+> > +	entry->is_cache_clean = !!(attrs & DMA_ATTR_CPU_CACHE_CLEAN);
+> > +
+> >  	bucket = get_hash_bucket(entry, &flags);
+> >  	hash_bucket_add(bucket, entry);
+> >  	put_hash_bucket(bucket, flags);
+> >  
+> > -	rc = active_cacheline_insert(entry);
+> > +	rc = active_cacheline_insert(entry, &overlap_cache_clean);
+> >  	if (rc == -ENOMEM) {
+> >  		pr_err_once("cacheline tracking ENOMEM, dma-debug disabled\n");
+> >  		global_disable = true;
+> >  	} else if (rc == -EEXIST &&
+> > -		   !(attrs & (DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_CPU_CACHE_CLEAN)) &&
+> > +		   !(attrs & DMA_ATTR_SKIP_CPU_SYNC) &&
+> > +		   !(entry->is_cache_clean && overlap_cache_clean) &&
+> >  		   !(IS_ENABLED(CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC) &&
+> >  		     is_swiotlb_active(entry->dev))) {
+> >  		err_printk(entry->dev, entry,
 
-> but Debian 11 "bullseye" has 7.0.0.
-> 
-> We can certainly fix the libvirt side of this in Debian, but this also
-> sounds like a case where the kernel should work around known buggy user-
-> space.  On the other hand, this has been upstream for over 3 years so
-> maybe it doesn't make sense now.
-
-Yeah, I tend to the latter as well (the @net maintainers can speak up if
-the disagree). But we have one more middle-ground option here maybe the
-@stable team could do: revert the backports of 1550f3673972c5 and
-5b22f62724a0a0 from 5.10.y, unless they are strongly needed there.
-
-> Please let me know whether I (or anyone) should try to implement a
-> workaround for this in the kernel.
-
-Ciao, Thorsten
 
