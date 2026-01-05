@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-247091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9CDDCF4635
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 16:28:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6299FCF4830
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 16:51:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A8B2130230E0
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 15:26:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8EFA33118DF9
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 15:44:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FACC25A2CF;
-	Mon,  5 Jan 2026 15:26:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E939032C316;
+	Mon,  5 Jan 2026 15:34:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2vwEU2eG"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dgMuS7D1"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A9111C84D0;
-	Mon,  5 Jan 2026 15:26:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 370CB32B996;
+	Mon,  5 Jan 2026 15:34:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767626813; cv=none; b=n+LFltnhRSJff3Y3u7/ib9owgrIsIOC5i935lNQfR3fHBxb8gnYh0z9QzY1E3pqaAqoM/XmZlxWb10+KAEjCEcUK0gaqJ06PIwq5oYmVaPyrw0GrmPL2tRxVPbLyF5kIlc75v4EoNyc+YLLqoNsNV+naUKBLTpegpUXzgu8cw2E=
+	t=1767627274; cv=none; b=pwfymC90XdTvgB08bERoL0U285jYeBSeYBSID2iJHGwYdl4ma6ORWvD11/5ACEdK3oX/wdnfUmnk9IP1V6rFdelKqhsyHOQJ+Je2trI2q4j1somlxDRMYytpYJPa6jBNl5CFUg7j6LsN7l3vrCaMsE4dWeZZpnIlBewO+A8CweI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767626813; c=relaxed/simple;
-	bh=xz/PTjb0T5tqZ1oFEXNMyfRkMFounVQ0xM2RI3JAMpA=;
+	s=arc-20240116; t=1767627274; c=relaxed/simple;
+	bh=pFm1oPv5Ep5Yh2FQNd9XHx7ZenUP/jJeBeGNBYKkzis=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R79WoDMQ4eVaqkJ2PBa+m7QTphyACEn3wkOY2CPxuW5giFbmLKENlhJsrGvtYs9vvJm6r3lmPVpE1GL/Uac4Lz+v3liPL57Q8c43l8zMYWbhYSEztrAKK7X853YNL5W0g1vDj6MgBTEI7JwNG25Ae/pc4clQSiNtHKPs/CRIJfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2vwEU2eG; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=kIaFeiB6H1g5+0xzIt/tP2CTaBf7y2aUZh7oW36G425Ce3XVoTpYVdWeuYZNedUesKeq9Ki8cR5abNlMn21Do+RhOmW+A+ysdfaVtVCTDp5byW3bzQui+rKoUwpPdwm/k2Je6XBGVz7pm4t3MiRGhzO2ZMGbhgrmn7rxuoyMxt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dgMuS7D1; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -34,31 +34,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=HZ3xa3P/xVD4k6aRA4vAlvbRr8JEcexhofE4zzLTRUs=; b=2vwEU2eG0aUaJ3bNDwH4OOsDdR
-	n6K+LJiqiWFCDf3xWEand32l3DoMR00YAHydOCnaFPZAGSjcmS/Xq6pfOYzhVXW66Oza3yNXp7AN0
-	+35/3QTWslyDCbrrl5a/LkjDK8x4quyOHMFTjkNupeugsyPIiJsA4rL/HT3fEeWRF3HE=;
+	bh=Ltr0cu+4l4BDSYgyoyIgm92xPRorcWY2W147fXeYKIQ=; b=dgMuS7D1iXIwGlZxFal8AECT9Q
+	kg/b+9N7eVxDwqvh+L5RrgTNB4jOtKwXoPsHq1R54nlP8/35IgjHbo+rkoPesOSEEOfEoebTjxLYU
+	5Cd+zZmo1S7/6B8ycKB4dHSAkJFVCsBZVTkfuWwTnj5ju8t7v0OMd4izt69cszhfebtg=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vcmTg-001V8O-9t; Mon, 05 Jan 2026 16:26:40 +0100
-Date: Mon, 5 Jan 2026 16:26:40 +0100
+	id 1vcmbB-001VBF-Er; Mon, 05 Jan 2026 16:34:25 +0100
+Date: Mon, 5 Jan 2026 16:34:25 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Stefan Eichenberger <eichest@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, shawnguo@kernel.org,
-	s.hauer@pengutronix.de, kernel@pengutronix.de, festevam@gmail.com,
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, francesco.dolcini@toradex.com,
-	robh@kernel.org,
-	Stefan Eichenberger <stefan.eichenberger@toradex.com>
-Subject: Re: [PATCH RESEND net-next v2] net: stmmac: dwmac: Add a fixup for
- the Micrel KSZ9131 PHY
-Message-ID: <a597b9d6-2b32-461f-ac90-2db5bb20cdb2@lunn.ch>
-References: <20260105100245.19317-1-eichest@gmail.com>
- <6ee0d55a-69de-4c28-8d9d-d7755d5c0808@bootlin.com>
- <aVuxv3Pox-y5Dzln@eichest-laptop>
+To: Yeounsu Moon <yyyynoom@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: dlink: replace printk() with
+ netdev_{info,dbg}() in rio_probe1()
+Message-ID: <e56fcc20-bfd9-4b4d-815e-d6c3f9b20b5b@lunn.ch>
+References: <20260105130552.8721-2-yyyynoom@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,15 +60,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aVuxv3Pox-y5Dzln@eichest-laptop>
+In-Reply-To: <20260105130552.8721-2-yyyynoom@gmail.com>
 
-> Unfortunately, I'm afraid of breaking something on the platforms
-> that are already working, as this is an Ethernet controller
-> issue. As I understand it, the PHY works according to the standard.
+On Mon, Jan 05, 2026 at 10:05:53PM +0900, Yeounsu Moon wrote:
+> Replace rio_probe1() printk(KERN_INFO) messages with netdev_{info,dbg}().
+> 
+> Keep one netdev_info() line for device identification; move the rest to
+> netdev_dbg() to avoid spamming the kernel log.
+> 
+> Log rx_timeout on a separate line since netdev_*() prefixes each
+> message and the multi-line formatting looks broken otherwise.
+> 
+> No functional change intended.
+> 
+> Tested-on: D-Link DGE-550T Rev-A3
+> Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
 
-What is the exact wording of the standard? I'm assuming this is IEEE
-802.3?  Please could you quote the relevant part.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Thanks
-	Andrew
+    Andrew
 
