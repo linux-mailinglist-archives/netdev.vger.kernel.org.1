@@ -1,134 +1,297 @@
-Return-Path: <netdev+bounces-246935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EB10CF2723
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 09:34:47 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A552DCF26C9
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 09:31:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BA2F43003046
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 08:30:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 20C75300BD83
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 08:31:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E577E313534;
-	Mon,  5 Jan 2026 08:30:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="j2Po/Xi7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78401333745;
+	Mon,  5 Jan 2026 08:31:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4592B3321C6
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 08:29:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42EA5333445
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 08:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767601802; cv=none; b=IVsuNJbhDHbJhnQphjOlC3QMdQUm6PASaW2JcZMq0Be1dxu9Pf5pF4gCnxAe187RWJWZ2U54vOJeS6Co/4Y+Va4VbK7V2YRlAw/54HTw84QHkkzffzDpUdrXL0JM552Qcwws7y5k0N2w61058wkc+Z1fGqm2RhYeFutcJ9IIu0k=
+	t=1767601887; cv=none; b=B5zhEjVkeYuc3wBsBEuvQ/fHdN1GUD4pSlweQUcVl+9RS3JRJx+ml08s79iqUQYUvwNGmF/QV0IDCkzEDzPgjTgEpb+JoGXXQExrPcPdO/cYfy3ki47tRCR7BG75vj9TyLulHmVm8gHBQquZc3e+OOXBbTSClSX718CwiTJxTSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767601802; c=relaxed/simple;
-	bh=nM8EVblwSLdQyTQHyIHtfKOw93Opm3ygP22WtcRkBAA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H261Epm1I6Fakxk4dzFgePO5lHeVUDyiRFWXzCINojZQpCTA8CmnzNhNc2QpW/aNDbu+rhEWlilKQefKQAiGzk1oBqQsL6TbQQp4Lv+C8/y3yjPRpeyQVf1hRelJauYZsZFxat/SqP3Ju1evbsq0gmX/bq2IdNWt2hKCnZ1fp/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=j2Po/Xi7; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id CE5E5C1BEBF;
-	Mon,  5 Jan 2026 08:29:23 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 9FBA760726;
-	Mon,  5 Jan 2026 08:29:49 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A55B6103C8493;
-	Mon,  5 Jan 2026 09:29:42 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1767601788; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=DfsJgfq89NcdpaxSqnEswlB210yQtbFw+8vJX6OV+MU=;
-	b=j2Po/Xi7b7InYmhDQ+4gVMhiOr4oc5xuzhX1PRVP553JgwOpUuEyPmE3c9sb1TwhQFqC+3
-	13nRAUxWapXoj4O1Qah7nsadUusRWyZWdRMtZNZFZbOw1AdD8nbcM65eg2i3Wy3uCTfjcW
-	0Rrq4wndXLGaLCLvTsOUMDI7J4b5iBri/fGQ/qnRC+W//iewhXTMODXvgmPCLVKEojBol2
-	/1y/A0yaaTCl0MAmR6LO+5mN4tCNffQhAGES+nS//THb+4zq7lrXyesEbr+jU6HAEg742v
-	ssr843qWeYS7dqHWkDYYpxvbSxnnU41B7oUVzqWrmeGz12xBOOlaoudkJK77Rg==
-Message-ID: <29295127-e54f-4954-8a63-03289c113a1f@bootlin.com>
-Date: Mon, 5 Jan 2026 09:29:41 +0100
+	s=arc-20240116; t=1767601887; c=relaxed/simple;
+	bh=HNmhhznQJuu33DLS+2t6q801usE+P2O3v/lqJE76mfo=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=q2BpBq62fANBBTEyvvxawtaSXtsZrVcP+Y4JLHf9P/XKWPlZMGjspHh8D+tGCpiaagkA0rg6mFtqyDMv9zlR2XCEddRRNM4dLVVFicQTPBqLWkufGEV7UT1GWsQjpX5084jRaTHu0Rc1s4GWuji5MdXfsyVZpWgRMsa3FhKoDVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-656cc4098f3so28007244eaf.2
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 00:31:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767601884; x=1768206684;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9+E81ZK8kW7VMQC24dUJUhLhJ8nIdci8AoW4+w+wf2o=;
+        b=UKOUjSpd5pOPJoPviSvC/tFmwB6aQ98sDqQnCNnKzvsdR1VJXzA5yp5QFJkryOTc8t
+         BYpJFKvOxIc6H+zRqTMPz7j7ygA6y6SWh+0yVpxAhWnytCGDu/JleuS3OTcxW+y4RRtV
+         ZU73om2azcpFdCRvQlqGKGMJ1WYqb2BMSmittK/8p+/VMnnBeTZQp19sk8LMqVG+uSXt
+         YzNmxsWSAzt4mejXETmkmlKyLsyQEbLR05wmJKMyqf8fAq3mtH2LIuSIjBrphSm/wH82
+         hHU36vUNG+5+JNMwc/AKQGBhX8HnYds9rOU6K9p3n1vWu22mZu4wd6bAjrHAKcca5Yot
+         xecg==
+X-Forwarded-Encrypted: i=1; AJvYcCUkTfPFnx3sBjgtI4LXYK52nNvBeHJYRqI0GNola41dAU0RbUamnDR7cpRVBO+SSphEwgrtw6o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9IMfl2nT3KBl3NI6PC6ui9r7k8t4KAgdD8dwhuG83DeO+0W+Y
+	8ddu5NFddA+qI2d+USL/zv0N5VIYCBRFsMBKzE9ZRdsKCX4cMsfW5Ae6dtBGI2MYLn3TyhBDkYs
+	ImOkQknzyNtXo0b1d3vkLyd/VPh9HAkrU5Px0GMZr+j2WYZGKrY1LT+GfGiY=
+X-Google-Smtp-Source: AGHT+IEdh0N1IsuCsTnZ+LDmkPk3wrN1GE3rg7IbJKz0xbqKlhXEd2WjJB7m1DqbuJTt3U2VLT2UILkrQkas9cqJGZC+cLxEcyF+
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: sfp: add SMBus I2C block support
-To: Jakub Kicinski <kuba@kernel.org>, Jonas Jelonek <jelonek.jonas@gmail.com>
-Cc: Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
-References: <20251228213331.472887-1-jelonek.jonas@gmail.com>
- <20260104080534.769d4f87@kernel.org>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20260104080534.769d4f87@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+X-Received: by 2002:a05:6820:162a:b0:656:8548:d866 with SMTP id
+ 006d021491bc7-65d0e9324e2mr20576414eaf.1.1767601884251; Mon, 05 Jan 2026
+ 00:31:24 -0800 (PST)
+Date: Mon, 05 Jan 2026 00:31:24 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <695b76dc.050a0220.1c9965.0029.GAE@google.com>
+Subject: [syzbot] [netfilter?] possible deadlock in nf_tables_dumpreset_rules
+From: syzbot <syzbot+ee287f5effa60050d9ac@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	fw@strlen.de, horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	phil@nwl.cc, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi folks,
+Hello,
 
-On 04/01/2026 17:05, Jakub Kicinski wrote:
-> On Sun, 28 Dec 2025 21:33:31 +0000 Jonas Jelonek wrote:
->> +static int sfp_smbus_block_write(struct sfp *sfp, bool a2, u8 dev_addr,
->> +				 void *buf, size_t len)
->> +{
->> +	size_t block_size = sfp->i2c_block_size;
->> +	union i2c_smbus_data smbus_data;
->> +	u8 bus_addr = a2 ? 0x51 : 0x50;
->> +	u8 *data = buf;
->> +	u8 this_len;
->> +	int ret;
->> +
->> +	while (len) {
->> +		this_len = min(len, block_size);
->> +
->> +		smbus_data.block[0] = this_len;
->> +		memcpy(&smbus_data.block[1], data, this_len);
->> +		ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
->> +				     I2C_SMBUS_WRITE, dev_addr,
->> +				     I2C_SMBUS_I2C_BLOCK_DATA, &smbus_data);
->> +		if (ret)
->> +			return ret;
->> +
->> +		len -= this_len;
->> +		data += this_len;
->> +		dev_addr += this_len;
->> +	}
->> +
->> +	return 0;
->> +}
-> 
-> AI code review says:
-> 
->  Should this return the number of bytes written instead of 0?
-> 
->  The existing sfp_i2c_write() returns the byte count on success, and several
->  callers depend on this return value:
-> 
->  sfp_cotsworks_fixup_check() checks:
->     err = sfp_write(sfp, false, SFP_PHYS_ID, &id->base, 3);
->     if (err != 3) { ... error path ... }
-> 
->  sfp_sm_mod_hpower() via sfp_modify_u8() checks:
->     if (err != sizeof(u8)) { ... error path ... }
-> 
->  With this function returning 0 on success, these checks will always fail,
->  causing high-power SFP modules to fail initialization with "failed to enable
->  high power" errors, and Cotsworks module EEPROM fixups to fail with "Failed
->  to rewrite module EEPROM" errors.
-> 
-> Either way, you'll need to repost, net-next was closed when you posted.
+syzbot found the following issue on:
 
-Looks like I made the same mistake in sfp_smbus_byte_write(). I'll send
-a fix for that/
+HEAD commit:    54e82e93ca93 Merge tag 'core_urgent_for_v6.19_rc4' of git:..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=10b1ee22580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8bfa57a8c0ab3aa8
+dashboard link: https://syzkaller.appspot.com/bug?extid=ee287f5effa60050d9ac
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: i386
 
-Maxime
+Unfortunately, I don't have any reproducer for this issue yet.
 
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-54e82e93.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c7af41d4f0f4/vmlinux-54e82e93.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/02aa2250dd4f/bzImage-54e82e93.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ee287f5effa60050d9ac@syzkaller.appspotmail.com
+
+netlink: 48 bytes leftover after parsing attributes in process `syz.8.6539'.
+======================================================
+WARNING: possible circular locking dependency detected
+syzkaller #0 Tainted: G             L     
+------------------------------------------------------
+syz.8.6539/2008 is trying to acquire lock:
+ffff888052e32cd8 (&nft_net->commit_mutex){+.+.}-{4:4}, at: nf_tables_dumpreset_rules+0x6f/0xa0 net/netfilter/nf_tables_api.c:3913
+
+but task is already holding lock:
+ffff888025cb16f0 (nlk_cb_mutex-NETFILTER){+.+.}-{4:4}, at: __netlink_dump_start+0x150/0x990 net/netlink/af_netlink.c:2404
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #2 (nlk_cb_mutex-NETFILTER){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:614 [inline]
+       __mutex_lock+0x1aa/0x1ca0 kernel/locking/mutex.c:776
+       __netlink_dump_start+0x150/0x990 net/netlink/af_netlink.c:2404
+       netlink_dump_start include/linux/netlink.h:341 [inline]
+       ip_set_dump+0x17f/0x210 net/netfilter/ipset/ip_set_core.c:1717
+       nfnetlink_rcv_msg+0x9fc/0x1200 net/netfilter/nfnetlink.c:302
+       netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2550
+       nfnetlink_rcv+0x1b3/0x430 net/netfilter/nfnetlink.c:669
+       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+       netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1344
+       netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1894
+       sock_sendmsg_nosec net/socket.c:727 [inline]
+       __sock_sendmsg net/socket.c:742 [inline]
+       ____sys_sendmsg+0xa5d/0xc30 net/socket.c:2592
+       ___sys_sendmsg+0x134/0x1d0 net/socket.c:2646
+       __sys_sendmsg+0x16d/0x220 net/socket.c:2678
+       do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
+       __do_fast_syscall_32+0xe8/0x680 arch/x86/entry/syscall_32.c:307
+       do_fast_syscall_32+0x32/0x80 arch/x86/entry/syscall_32.c:332
+       entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+
+-> #1 (nfnl_subsys_ipset){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:614 [inline]
+       __mutex_lock+0x1aa/0x1ca0 kernel/locking/mutex.c:776
+       ip_set_nfnl_get_byindex+0x7c/0x290 net/netfilter/ipset/ip_set_core.c:909
+       set_target_v1_checkentry+0x1ac/0x570 net/netfilter/xt_set.c:313
+       xt_check_target+0x27c/0xa40 net/netfilter/x_tables.c:1038
+       nft_target_init+0x459/0x7d0 net/netfilter/nft_compat.c:267
+       nf_tables_newexpr net/netfilter/nf_tables_api.c:3550 [inline]
+       nf_tables_newrule+0xedd/0x2910 net/netfilter/nf_tables_api.c:4419
+       nfnetlink_rcv_batch+0x190d/0x2350 net/netfilter/nfnetlink.c:526
+       nfnetlink_rcv_skb_batch net/netfilter/nfnetlink.c:649 [inline]
+       nfnetlink_rcv+0x3c1/0x430 net/netfilter/nfnetlink.c:667
+       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+       netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1344
+       netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1894
+       sock_sendmsg_nosec net/socket.c:727 [inline]
+       __sock_sendmsg net/socket.c:742 [inline]
+       ____sys_sendmsg+0xa5d/0xc30 net/socket.c:2592
+       ___sys_sendmsg+0x134/0x1d0 net/socket.c:2646
+       __sys_sendmsg+0x16d/0x220 net/socket.c:2678
+       do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
+       __do_fast_syscall_32+0xe8/0x680 arch/x86/entry/syscall_32.c:307
+       do_fast_syscall_32+0x32/0x80 arch/x86/entry/syscall_32.c:332
+       entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+
+-> #0 (&nft_net->commit_mutex){+.+.}-{4:4}:
+       check_prev_add kernel/locking/lockdep.c:3165 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+       validate_chain kernel/locking/lockdep.c:3908 [inline]
+       __lock_acquire+0x1669/0x2890 kernel/locking/lockdep.c:5237
+       lock_acquire kernel/locking/lockdep.c:5868 [inline]
+       lock_acquire+0x179/0x330 kernel/locking/lockdep.c:5825
+       __mutex_lock_common kernel/locking/mutex.c:614 [inline]
+       __mutex_lock+0x1aa/0x1ca0 kernel/locking/mutex.c:776
+       nf_tables_dumpreset_rules+0x6f/0xa0 net/netfilter/nf_tables_api.c:3913
+       netlink_dump+0x539/0xd30 net/netlink/af_netlink.c:2325
+       __netlink_dump_start+0x6d6/0x990 net/netlink/af_netlink.c:2440
+       netlink_dump_start include/linux/netlink.h:341 [inline]
+       nft_netlink_dump_start_rcu+0x81/0x1f0 net/netfilter/nf_tables_api.c:1309
+       nf_tables_getrule_reset+0x56b/0x6b0 net/netfilter/nf_tables_api.c:4053
+       nfnetlink_rcv_msg+0x583/0x1200 net/netfilter/nfnetlink.c:290
+       netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2550
+       nfnetlink_rcv+0x1b3/0x430 net/netfilter/nfnetlink.c:669
+       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+       netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1344
+       netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1894
+       sock_sendmsg_nosec net/socket.c:727 [inline]
+       __sock_sendmsg net/socket.c:742 [inline]
+       ____sys_sendmsg+0xa5d/0xc30 net/socket.c:2592
+       ___sys_sendmsg+0x134/0x1d0 net/socket.c:2646
+       __sys_sendmsg+0x16d/0x220 net/socket.c:2678
+       do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
+       __do_fast_syscall_32+0xe8/0x680 arch/x86/entry/syscall_32.c:307
+       do_fast_syscall_32+0x32/0x80 arch/x86/entry/syscall_32.c:332
+       entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+
+other info that might help us debug this:
+
+Chain exists of:
+  &nft_net->commit_mutex --> nfnl_subsys_ipset --> nlk_cb_mutex-NETFILTER
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(nlk_cb_mutex-NETFILTER);
+                               lock(nfnl_subsys_ipset);
+                               lock(nlk_cb_mutex-NETFILTER);
+  lock(&nft_net->commit_mutex);
+
+ *** DEADLOCK ***
+
+1 lock held by syz.8.6539/2008:
+ #0: ffff888025cb16f0 (nlk_cb_mutex-NETFILTER){+.+.}-{4:4}, at: __netlink_dump_start+0x150/0x990 net/netlink/af_netlink.c:2404
+
+stack backtrace:
+CPU: 2 UID: 0 PID: 2008 Comm: syz.8.6539 Tainted: G             L      syzkaller #0 PREEMPT(full) 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+ print_circular_bug+0x275/0x340 kernel/locking/lockdep.c:2043
+ check_noncircular+0x146/0x160 kernel/locking/lockdep.c:2175
+ check_prev_add kernel/locking/lockdep.c:3165 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+ validate_chain kernel/locking/lockdep.c:3908 [inline]
+ __lock_acquire+0x1669/0x2890 kernel/locking/lockdep.c:5237
+ lock_acquire kernel/locking/lockdep.c:5868 [inline]
+ lock_acquire+0x179/0x330 kernel/locking/lockdep.c:5825
+ __mutex_lock_common kernel/locking/mutex.c:614 [inline]
+ __mutex_lock+0x1aa/0x1ca0 kernel/locking/mutex.c:776
+ nf_tables_dumpreset_rules+0x6f/0xa0 net/netfilter/nf_tables_api.c:3913
+ netlink_dump+0x539/0xd30 net/netlink/af_netlink.c:2325
+ __netlink_dump_start+0x6d6/0x990 net/netlink/af_netlink.c:2440
+ netlink_dump_start include/linux/netlink.h:341 [inline]
+ nft_netlink_dump_start_rcu+0x81/0x1f0 net/netfilter/nf_tables_api.c:1309
+ nf_tables_getrule_reset+0x56b/0x6b0 net/netfilter/nf_tables_api.c:4053
+ nfnetlink_rcv_msg+0x583/0x1200 net/netfilter/nfnetlink.c:290
+ netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2550
+ nfnetlink_rcv+0x1b3/0x430 net/netfilter/nfnetlink.c:669
+ netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+ netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1344
+ netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1894
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0xa5d/0xc30 net/socket.c:2592
+ ___sys_sendmsg+0x134/0x1d0 net/socket.c:2646
+ __sys_sendmsg+0x16d/0x220 net/socket.c:2678
+ do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
+ __do_fast_syscall_32+0xe8/0x680 arch/x86/entry/syscall_32.c:307
+ do_fast_syscall_32+0x32/0x80 arch/x86/entry/syscall_32.c:332
+ entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+RIP: 0023:0xf702d579
+Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
+RSP: 002b:00000000f4f9f55c EFLAGS: 00000296 ORIG_RAX: 0000000000000172
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000080000240
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000296 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
+----------------
+Code disassembly (best guess), 2 bytes skipped:
+   0:	10 06                	adc    %al,(%rsi)
+   2:	03 74 b4 01          	add    0x1(%rsp,%rsi,4),%esi
+   6:	10 07                	adc    %al,(%rdi)
+   8:	03 74 b0 01          	add    0x1(%rax,%rsi,4),%esi
+   c:	10 08                	adc    %cl,(%rax)
+   e:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
+  1e:	00 51 52             	add    %dl,0x52(%rcx)
+  21:	55                   	push   %rbp
+  22:	89 e5                	mov    %esp,%ebp
+  24:	0f 34                	sysenter
+  26:	cd 80                	int    $0x80
+* 28:	5d                   	pop    %rbp <-- trapping instruction
+  29:	5a                   	pop    %rdx
+  2a:	59                   	pop    %rcx
+  2b:	c3                   	ret
+  2c:	90                   	nop
+  2d:	90                   	nop
+  2e:	90                   	nop
+  2f:	90                   	nop
+  30:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
+  37:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
