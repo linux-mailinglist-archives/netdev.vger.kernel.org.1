@@ -1,97 +1,119 @@
-Return-Path: <netdev+bounces-247134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A8E9CF4D66
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 17:55:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1195BCF4D72
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 17:56:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 00A53322196E
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 16:44:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D5C3D3245691
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 16:44:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFA041D8E10;
-	Mon,  5 Jan 2026 16:42:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32092299947;
+	Mon,  5 Jan 2026 16:43:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YpvcwbQm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SDbhuYD+";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="BfTT5jWW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C2430DEC1
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 16:42:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 322D62749DC
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 16:43:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767631350; cv=none; b=rE2dxdVbvO/pCOVau6SGqKU0YmcOlXCTmM2nLqPeyCtBN8OOCqM9YUt26rWqvE6elnXSo2iujcl5q//5aE93KgmUl5iRcKbanhFCgW+Kc54R1cM3uGoCZcvVBEp1xQAZHB4Gc9ZJeFHeDXBfkJMsNsXbEr/NPdN9bI4eNqwFAWM=
+	t=1767631437; cv=none; b=IbUmWuj40XCRZiWBzV+yc4yVT1Z7/KAQAx3HG5Y1v8dRPUKXo3yrX4V8jUlwxAXkfscku3O+B54/b6KPrrTP4ShS1Qaq3arEwKcxCvK/zi+dZSquHPId7s729ZQbk/XEJInwCaECba6YKGfmoH/H+EqDQdWRPgkfiYYwfQSGjSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767631350; c=relaxed/simple;
-	bh=m1cWU1c28IHidxYRJfjMgPQezz6qGL1YM01BII9uEjs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V+LJw+4joQnh96zfIrhFIGa/qSnC0Xy2MK10XQolq1WNoCn67WrCy0xm6YaXN29YCKNGDuwDAksd6Y/ALVm0RDhcL+4k3Qegtetbuhqt7pfvnOc9VyBaFcopraJUtJpNx6snI+Jqihvyap7tnAyiAS+OrrNRhZSf5/7mkUNRTbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YpvcwbQm; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-47d3ba3a4deso732865e9.2
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 08:42:27 -0800 (PST)
+	s=arc-20240116; t=1767631437; c=relaxed/simple;
+	bh=V2RcMFWNxHXpx7Cbk1wLqeq5HUPDZY2CLps3fwdMAtY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=VPFTpmRtPLYwwW8L52BdtjBTqHc6aixCRzRhKKZSpO8SOlL9KCWWCsSeJ2JArYfJyepVkcx1yUCs7VRHP3ZGhGJECodZAcx3oLcrPqn1PqFnIsEQjmHivPHkdVB69ztvDschVsi/q5XuvHZ4eF5mO0nKWe7ygB1vmhC0YNybrcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SDbhuYD+; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=BfTT5jWW; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767631434;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V2RcMFWNxHXpx7Cbk1wLqeq5HUPDZY2CLps3fwdMAtY=;
+	b=SDbhuYD+zHAUYkGSI0OlEWCSzGeUpnfl+AiymGcVacGPTMAobII4Qs2vwmFG0ymq34KyTs
+	Hz95amezKtI5AQeU9Ribddsw666lmJjh+prizyutxZKbyScT2/mD9LVXENGbCnUhgLla37
+	x0IYEBWm9o2PBcJPeKpe78lGzIvM6PA=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-440-UAfGvuwgPWadyaVznIz7xQ-1; Mon, 05 Jan 2026 11:43:53 -0500
+X-MC-Unique: UAfGvuwgPWadyaVznIz7xQ-1
+X-Mimecast-MFC-AGG-ID: UAfGvuwgPWadyaVznIz7xQ_1767631432
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-64d1982d980so93990a12.2
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 08:43:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767631345; x=1768236145; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=OyCREwze6wuRU2UsbFO8TEdIlanzdvvtH1ABUGO9pDk=;
-        b=YpvcwbQm1Ws8kOnBUDebthH7pvpr+9K1tOO6q41ET3aQT3gSf0QPKEjIH7nFGXScZl
-         nbvPh+zzM+mEpGmIJsqK85m7URuRjmo92MoOVdjG9YaDLr/LxU6NoIyG3FAp9hK4DI4d
-         /sHcowifOP/wrfNVb+Wwhb4ZYIA37cIUtY0M2ojV1pMpyqCOpAAP7FggUhxLyFln4kg8
-         fZPdcJFwhjLs/jQ0tcDd1Y8pKfm82Kmw3dDCyaax6DiTnR2FgJ8qB22eJyFqK2dpPm5w
-         JJzC9Qn6D6R8PB3HEtVk+UeytTw8chSRaGZAfK7O796k+BgpbiDZbW7wPZdTpjDp5eOC
-         EDUA==
+        d=redhat.com; s=google; t=1767631432; x=1768236232; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=V2RcMFWNxHXpx7Cbk1wLqeq5HUPDZY2CLps3fwdMAtY=;
+        b=BfTT5jWWW9XcWvj2mHWxy95/dLJmljmH225nTzmf9u01uoo+9HWhIKFHWalLCZq+Oo
+         XXcCsC3sMvGWfXDw1G3idF6qakzRnpWdKQn7MszfbcmtxleLFQVdi359RqvqUmtqOWeM
+         Zdmn5A9D/SZKOYilVIQWPq4Y+tzG6GtgU0+/OFC5dN6efNxIuXhLEopShYsuDXWUqwJB
+         kaRjDqLsHMx7CK41m8C7oa2wLcez1cYUFD1nqeG3pmjGCi46tanzzjphD3bXCqvsfqNt
+         udlNwWdAiOVT35KkUM0bus6VfS9XUXeL+u0u0dpkKKOegkhFVnUhuWrki729FpconX2d
+         7HjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767631345; x=1768236145;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OyCREwze6wuRU2UsbFO8TEdIlanzdvvtH1ABUGO9pDk=;
-        b=Zm/7Q7Qj+9WPdXLfp9s3RZKaNzZ27Il+RHhZTl+GQedwbvcKQixtEL7x2Kf1z7gDhd
-         z3K7Wy50bUm/EZRKRnJaaec62HKsqL3PtqqdV2cZRTdecQo0S/hJxUfi7EhipIoAFRw8
-         bJA6aeY4yirIxYS6Q5BloW+LCyQs6ngDUlCN1xoRa4sy+Vdd/f2vxqFOe4QsAvQ0w7eW
-         if/cnOfp5VUBrKuyATFDEbyThpdEM1W9JNGei2Rd8IHJ1FAh5qzTl3qoir+1tp6njFRk
-         +9sXSpXubtxxnuTLraP8C9th4jUaWpH/Gg5izKNcX2rJutwzYvYuX1FZjWcCxNW3Cnv+
-         QSng==
-X-Forwarded-Encrypted: i=1; AJvYcCWxaQyxzQvGzyK2JEn8fL7fdtR5TxVJKCf1fg8IZS3aug6251tFVR/jkJvucZvzL4nbwsraKx0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtFYmtnU17/l9Iy4i9kNW/3Yfvh3MoA4gK+E8tuWVzosCCPwpo
-	7YSaNafunDN/5ltks7Rgrgd3IM3yb2sHQw7EKiC2XwdJVwudQ17SY+cS
-X-Gm-Gg: AY/fxX6qsn547PMllOPmT28QNFAoZd+AepZNK8BSQ1Hkueg6dBHkzWx0rpyhb5QokWU
-	qDg2uAHAy53qlov+rvW1ylawfNu61sNpAwhvK2MLATMCwu7A5OdW+M/KqAiJLhxeLfZI8HPya2D
-	oZZMK+j0UxlpGMeZmkNin6EtFcMgdMixPh/fmnfnLJIn4TPuO7kwG7SstfbNkjQxfyz51rCZJA0
-	CKtfp4A89TzoQbGArnI/FKSrt7UmngLGIpyVER3ts77OG8zbsJX3p3rUqidNgLP5kMCv2MVKlgH
-	QZXboY1t/J6o7CESeDPTTWHRIxAXyKHljxWe6ZQTfnt/jCAjImD+UWI0yBkj5s/TfCDPsW7BulG
-	ma3tbn+9mY6VrZPw0G5pL3Bx8vtAFRyfCxHGLVm3nucXwv+3Mojn+6chuucBSil/RNJVgmwYOGg
-	CuZS8JByJW0SM=
-X-Google-Smtp-Source: AGHT+IE/JjorzXLwwkJgsbApvm+a3QMCRUUp3o9LGdUjHP2iI1zq9V8yb9BydDK6HAKwFcoQXH8UFg==
-X-Received: by 2002:a05:600c:1c29:b0:46e:37a7:48d1 with SMTP id 5b1f17b1804b1-47d1959d4bamr704429525e9.34.1767631345377;
-        Mon, 05 Jan 2026 08:42:25 -0800 (PST)
-Received: from eichest-laptop ([2a02:168:af72:0:20bb:19ed:fbb2:7e2d])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bca532c6sm442805f8f.27.2026.01.05.08.42.24
+        d=1e100.net; s=20230601; t=1767631432; x=1768236232;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=V2RcMFWNxHXpx7Cbk1wLqeq5HUPDZY2CLps3fwdMAtY=;
+        b=P3B2HLnqwGD7KTnOcmmLa4X6Gc83utBRawdhdBXk3ih0IYUTxJTCv71WA9S/st69va
+         u61J9ejlhZ5g3EthY91OoQr0yFWiqwZ/LItlwd2F0Qnz5T5Q7NkgXY+G92eSJQIKQjka
+         gYCjILUd3mmHgYJSRN2c6O8qeJNgx4x8qDCIyoqq3UT4iJeMeAv8LIrbOyweWJ4JMsAr
+         ZzvQZr3hX59dC19wHk06ts/ZqFzWMwZlsHUCjdhOXxiyxzm+rJQlcrkqjaJ22nt2WGVv
+         ejCF4J234NaWu4uPrFg3BE1SSYS+1o64iTCmSTf1XS3xNQ4rzXrCdh2yvo68t8GI8suc
+         RYPw==
+X-Forwarded-Encrypted: i=1; AJvYcCUbU5Wpwwi4g7n/TPsNYwZIz9Avn/uXCrq0ivlAN3+4AISQ9hi30ak9LH04xIr/WmeaghxvHZc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWYb03RPLx2hP+FsxL9sr/QKT7JxzabI9eZpUUAjnrR2Gt2HOv
+	ttctZ5DljATLNviHUHCDZnfnFLm0yZBiZ1RCWS83HMrdlFUbHrcl9atW7+uDF7bJQKpiMEVp2Qd
+	JUjK9pgd8W9bQLcjZu+3EVaY/s4z1o3Fp+OSHe8785DGqrP7kkoNfF8dMHA==
+X-Gm-Gg: AY/fxX7y4VOtYT9CkhLvzOxLla48fHR4+3gm/19WT63bEyU9du/vPS1EYeN+uuaw+zi
+	jFEtc/QOEophSFkcFP3aESjj0THLv8m4/oJt/VcLBlHQhzwCLUusN3lXvtsM695DY9Z/VTp2rBK
+	3rD/T2LXpbWsKI0IM+LAwY0akrg2zRbW9xfrZL5beUG+/WTIkR+sFeeGDUum4tNMV40Xd4PKwPo
+	871TAxmwSqwQkQYOUdRqYXkMAvTiC2heu1iPeVy6h/3RCUN5xFvqM1DKYvx8YujiHdYFjry2Pi8
+	IER/GYH5nw5Gw290b5pmkvX0xyOewWQLLA1fjxwIUwLT3xgCEcZitwqVkvNolrJiBKejDgmcaFq
+	q3MUqv2OoQcM0y3FFgcHH5zcjqBCpNCQs/VsB
+X-Received: by 2002:a05:6402:4414:b0:64b:ea6b:a884 with SMTP id 4fb4d7f45d1cf-65079561d9amr39794a12.17.1767631431859;
+        Mon, 05 Jan 2026 08:43:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH5+CYTAwrLc8azSOHqieZ/AYKr+pOh1WCTsnwOkUqmz4srueS6d/oRRO9LBMmPRJORe96YbQ==
+X-Received: by 2002:a05:6402:4414:b0:64b:ea6b:a884 with SMTP id 4fb4d7f45d1cf-65079561d9amr39766a12.17.1767631431378;
+        Mon, 05 Jan 2026 08:43:51 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6507618cc31sm222081a12.24.2026.01.05.08.43.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 08:42:24 -0800 (PST)
-Date: Mon, 5 Jan 2026 17:42:23 +0100
-From: Stefan Eichenberger <eichest@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, shawnguo@kernel.org,
-	s.hauer@pengutronix.de, kernel@pengutronix.de, festevam@gmail.com,
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, francesco.dolcini@toradex.com,
-	robh@kernel.org,
-	Stefan Eichenberger <stefan.eichenberger@toradex.com>
-Subject: Re: [PATCH RESEND net-next v2] net: stmmac: dwmac: Add a fixup for
- the Micrel KSZ9131 PHY
-Message-ID: <aVvp70S2Lr3o_jyB@eichest-laptop>
-References: <20260105100245.19317-1-eichest@gmail.com>
- <6ee0d55a-69de-4c28-8d9d-d7755d5c0808@bootlin.com>
- <aVuxv3Pox-y5Dzln@eichest-laptop>
- <a597b9d6-2b32-461f-ac90-2db5bb20cdb2@lunn.ch>
+        Mon, 05 Jan 2026 08:43:50 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 18D1C407EDE; Mon, 05 Jan 2026 17:43:50 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: KaFai Wan <kafai.wan@linux.dev>, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com,
+ song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
+ kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, hawk@kernel.org, shuah@kernel.org,
+ aleksander.lobakin@intel.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc: Yinhao Hu <dddddd@hust.edu.cn>, Kaiyan Mei <M202472210@hust.edu.cn>,
+ Dongliang Mu <dzm91@hust.edu.cn>
+Subject: Re: [PATCH bpf-next 1/2] bpf, test_run: Fix user-memory-access
+ vulnerability for LIVE_FRAMES
+In-Reply-To: <38dd70d77f8207395206564063b0a1a07dd1c6e7.camel@linux.dev>
+References: <fa2be179-bad7-4ee3-8668-4903d1853461@hust.edu.cn>
+ <20260104162350.347403-1-kafai.wan@linux.dev>
+ <20260104162350.347403-2-kafai.wan@linux.dev> <87y0mc5obp.fsf@toke.dk>
+ <38dd70d77f8207395206564063b0a1a07dd1c6e7.camel@linux.dev>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Mon, 05 Jan 2026 17:43:50 +0100
+Message-ID: <87ms2s57sp.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,50 +121,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a597b9d6-2b32-461f-ac90-2db5bb20cdb2@lunn.ch>
+Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+KaFai Wan <kafai.wan@linux.dev> writes:
 
-On Mon, Jan 05, 2026 at 04:26:40PM +0100, Andrew Lunn wrote:
-> > Unfortunately, I'm afraid of breaking something on the platforms
-> > that are already working, as this is an Ethernet controller
-> > issue. As I understand it, the PHY works according to the standard.
-> 
-> What is the exact wording of the standard? I'm assuming this is IEEE
-> 802.3?  Please could you quote the relevant part.
+> On Mon, 2026-01-05 at 11:46 +0100, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> KaFai Wan <kafai.wan@linux.dev> writes:
+>>=20
+>> > This fix reverts to the original version and ensures data_hard_start
+>> > correctly points to the xdp_frame structure, eliminating the security
+>> > risk.
+>>=20
+>> This is wrong. We should just be checking the meta_len on input to
+>> account for the size of xdp_frame. I'll send a patch.
+>
+> Current version the actual limit of the max input meta_len for live frame=
+s is=20
+> XDP_PACKET_HEADROOM - sizeof(struct xdp_frame), not
+> XDP_PACKET_HEADROOM.
 
-Yes this is correct. ERR050694 from NXP states:
-The IEEE 802.3 standard states that, in MII/GMII modes, the byte
-preceding the SFD (0xD5), SMD-S (0xE6,0x4C, 0x7F, or 0xB3), or SMD-C
-(0x61, 0x52, 0x9E, or 0x2A) byte can be a non-PREAMBLE byte or there can
-be no preceding preamble byte. The MAC receiver must successfully
-receive a packet without any preamble(0x55) byte preceding the SFD,
-SMD-S, or SMD-C byte.
-However due to the defect, in configurations where frame preemption is
-enabled, when preamble byte does not precede the SFD, SMD-S, or SMD-C
-byte, the received packet is discarded by the MAC receiver. This is
-because, the start-of-packet detection logic of the MAC receiver
-incorrectly checks for a preamble byte.
+By "current version", you mean the patch I sent[0], right?
 
-NXP refers to IEEE 802.3 where in clause 35.2.3.2.2 Receive case (GMII)
-they show two tables one where the preamble is preceding the SFD and one
-where it is not. The text says:
-The operation of 1000 Mb/s PHYs can result in shrinkage of the preamble
-between transmission at the source GMII and reception at the destination
-GMII. Table 35–3 depicts the case where no preamble bytes are conveyed
-across the GMII. This case may not be possible with a specific PHY, but
-illustrates the minimum preamble with which MAC shall be able to
-operate. Table 35–4 depicts the case where the entire preamble is
-conveyed across the GMII.
+If so, that was deliberate: the stack limits the maximum data_meta size
+to XDP_PACKET_HEADROOM - sizeof(struct xdp_frame), so there's no reason
+not to do the same for bpf_prog_run(). And some chance that diverging
+here will end up surfacing other bugs down the line.
 
-We would change the behavior from "no preamble is preceding SFD" to "the
-enitre preamble is preceding SFD". Both are listed in the standard and
-shall be supported by the MAC.
+-Toke
 
-I hope this helps.
+[0] https://lore.kernel.org/r/20260105114747.1358750-1-toke@redhat.com
 
-Regards,
-Stefan
 
