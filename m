@@ -1,126 +1,93 @@
-Return-Path: <netdev+bounces-247030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E44DCF3900
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 13:39:06 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F013BCF39B1
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 13:47:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3DE9F30005AB
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 12:38:00 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 429693031716
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 12:43:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 003663191B0;
-	Mon,  5 Jan 2026 12:37:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E57C33506C;
+	Mon,  5 Jan 2026 12:42:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H1WXK7ky";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eq9VP6sj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g9ZsNLL0"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFE4526C384
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 12:37:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFC2A333451
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 12:42:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767616663; cv=none; b=LHVOl9tJrKUpductfA6HCqRbpcP3qiAkjpY1FhjZoKWWBqE7TcrAqOiPso8zwnXj6nK9n+bhF71apaJhpOeKlH4y+FMDvGegp+5GWAzCZgMCTW1PH2o8x/WjkIKLxVgp8Fc4hDDtddPElN37/5shCHB3T8AleScICzhl3x3xJOE=
+	t=1767616966; cv=none; b=Lm/UMbxnFoHmQsNWCOkBUoidcKfnZktQS7QJe45CFz08k6v6J1y/hXwPsV4xZaupcVTFaBhL6HuwlCKiJ+q4jYUKOYgOe272gJCK1o6RURflDrP9A0F9qYLlbVv6Ty/etbttdm6y30XaihJT3zU6MDaFTCs5rph+au8Mx+W7sd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767616663; c=relaxed/simple;
-	bh=wLc+K6BlGcNsSRvAX+itXhvo8Atf/pzYe91W0J7xGew=;
+	s=arc-20240116; t=1767616966; c=relaxed/simple;
+	bh=LZWEskBsU8lieDU1+oZ44DvMo4dcwO7j0DMpykCV7Zg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jAXzTtJ5TxRZkM53+9HNuL7Anumb428JkPmVdTVHbaQm4p82VpzGGzZU3c75WaXUvmiHp1ROgVdxT7F+TcDbQJ6CEcLUcn+YtvRWafzPeMAYBwqpWX+styr8QRu3Kb5W4V8f7PLOMwsvjdV5EQFt0mbmWHwbWvK2Q8jBaOwuMKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H1WXK7ky; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Eq9VP6sj; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767616659;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v0XYhWIefjZGWouNSFIeJyo4tnXXaglCJukd6oVTUw8=;
-	b=H1WXK7kywqmNwLCbDAtiXH3CYEmj+BnnYbowIYfRlxRJh5DEdbI0SunlJ7T6HjWpe+LuPt
-	9A94Mp4GxVhW+0hqanjDRxFSSjwWDxQU4Tegtn44esAs3cjbIrxhNhgHbrVnKMrJ9na6Fh
-	Vg3asHNuOhGEQ7VvQLg/xh0aN084Vbw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-30-6MR6URuwNX--pM_vdM19ew-1; Mon, 05 Jan 2026 07:37:38 -0500
-X-MC-Unique: 6MR6URuwNX--pM_vdM19ew-1
-X-Mimecast-MFC-AGG-ID: 6MR6URuwNX--pM_vdM19ew_1767616657
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-431054c09e3so8510850f8f.0
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 04:37:38 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=EP1phLn9FIJ4AUwqidhbtSQLQGS+CPh9+YcOlRjfJ4F+/gpGP91EpqlWAzL6xymN90Wx2TWzJP8+/tZ6Dn5RKyG/rdq4bdQz5hJPK8lEHWE3+efUXbJf6WcVcex0giCxHG/mdkKpChsP78UzT9FGiMybVhnQsXMYwcWnOdA45Bc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g9ZsNLL0; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-477ba2c1ca2so152135945e9.2
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 04:42:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767616657; x=1768221457; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1767616962; x=1768221762; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=v0XYhWIefjZGWouNSFIeJyo4tnXXaglCJukd6oVTUw8=;
-        b=Eq9VP6sjxuj4fpuGOHuc4AZBvfHXrpCCOnPIPzUujno9eG7uEynix2xsUwCFeYLEX2
-         n4M0oaPhL31ZruKM6s4vKMiSNzS6rKwTJbX/iQmJYQbcHIEKwk4C2EiYrbQgPqMEFhuT
-         /+Stu7UAv9UdB8EUdFcVQg+zkqWn1gKxrCaQuoj4IjtvV4AYRJQqR7O/vf+yoDOjZiKO
-         lKBuBr6wFYLKJ7rudUdZUu8AZGbPLPG6rdlBUlHO7CYO9YmELzP+zYAEqbU0F66sbTOz
-         uuqkHWVPe71/f++6ZyR6hNwSgIMm2alWZQwxH45jEnIe8cmJxZ0o5Id66WIu9hwwUvj3
-         k6dg==
+        bh=6FWi4UMmKWtBKBjWiuhONQOF6ehNZanQAGIzU2PCLHY=;
+        b=g9ZsNLL0degBRV8j8ia6B6b5I97aSzBnvuD/vcuWXI9JfdfNcyK9yX9tutX9oJTUIi
+         vdwyDqUh8aIRoHTKbP20eU2WoWdM/TcM5+BxDzuguCrnfYDLhGqOljlN6avdiabJp2vD
+         xTVYfib1EkHoYhiJslunVFQqOk9UgfNSmr1ui8aMRcLjiBG/hu3s/eAPtZNtFNMbgDV1
+         kZF1N2AZL6tE0fgGeO/I+hzXkiyjlt9IMyTAbZXYqznTL2ggZV1SmYopbmEqaYBl5NnO
+         vDNJ1KGJ20EgjRLN1h0OqfQhhGLDPqx9BhsnasGVNw4rDRSmX+tcvrNhAiyiKFmQjOhc
+         q4QA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767616657; x=1768221457;
+        d=1e100.net; s=20230601; t=1767616962; x=1768221762;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=v0XYhWIefjZGWouNSFIeJyo4tnXXaglCJukd6oVTUw8=;
-        b=EKnj7ocrsSc82CGx6QacI/+y9EBOu05yj1uc70NmocYPd/qmZe/qVxgxtajLFce7OQ
-         xkKSfbZKEiQSeXe5CYDbRUYkzl7l6dOgteWOM6JC52OBniZn14gt5yne1K9U/lVRa2vQ
-         xduCBlQ+27fK0SO1Zgw6qftXYdaz177SbiP7jGh2hG41VWPZMrpow1B7v56yZk0VPp7l
-         Q6IYPe7O3280jl3czW+aqgpjbcVvB74exxZx11l9QnmAbYWqTv1x3JS79i5meDqzw1cH
-         lW6wOAmXn7tJ2tKefBUgHPC6exgWqvPSCoU1GGvmGKAxY9jLndoHbBQPXBM+L6FatrJn
-         FsVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVxA82ncO4/hRQvoUYf/Cghlyj7djRtob2VBK4u0qL8GfepchaHynrxq0UtEwXrTpOBYO1gN4o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJTPQrCSkiwO4LjFRSgGIv6VMqnBlYDML/oxbNo7lD4v9nNXU5
-	K3fmiuYvAgdQsM1FksNDLWcSRuptHD2JBoKmRYpVEjldHB0nUsTUOHqXvr2j1HQuv7PhIcgE49g
-	JQtUXKWxN66RNyt3LKDFGwLnE9zpMmKZNrB+s3qr5GIubcDtjAs/moEcpqQ==
-X-Gm-Gg: AY/fxX7damntlGMyMb0F5x54iPxXHc0WTG9R2zYkGQas66jEhqxF9A3zx4WnsQmTsSo
-	3uMeH/ls9KI4MzHrT1if7b0YbeGEjyucOYVetqkuZG1f3p6VpusWy0tXdHO6w1wBEegpPidBMFl
-	0QT/4gyDfhSHo7TgU1wJQ7MsS3oWwCPV5Mp/whTIzzvbIE/rSi4Vr8zvrrYUqvclaI++HIiFa8h
-	WkQWPmCtWjLwppwJ0spKx2Zg25toZ+32MPbzg2WgJtzJEJuiFgk9C3LNYVVBk5wPI0d0F+stx4x
-	sO8BjE08+HPX7KsnslRK5dDahMEwGsdBpUMCxcoC/Es5q40PO+FN2AN+n/FhhePgourafOg2d2l
-	RhkUs5O2sZm28oZ8cqbig9ciUbn+U+8sSUw==
-X-Received: by 2002:a05:600c:6388:b0:477:7b16:5f88 with SMTP id 5b1f17b1804b1-47d1953345cmr554872785e9.6.1767616657316;
-        Mon, 05 Jan 2026 04:37:37 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG5CrfHKpTC4/iHV/NtFp0xVhQZAcSLZVRFoYkUoGChs4u9sh46HLHw+pax4aqs2/BHfMQ+jQ==
-X-Received: by 2002:a05:600c:6388:b0:477:7b16:5f88 with SMTP id 5b1f17b1804b1-47d1953345cmr554872465e9.6.1767616656787;
-        Mon, 05 Jan 2026 04:37:36 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4327791d2f3sm69930171f8f.11.2026.01.05.04.37.33
+        bh=6FWi4UMmKWtBKBjWiuhONQOF6ehNZanQAGIzU2PCLHY=;
+        b=a1QYm16hLMOBadEJdEZ5fJFSOpaOJU+FcjjpHebAIOH5oJcCNxCiNjGolmgWgCP7Aq
+         Y4Y8HE0eaflO7a9pFnJ2z5Kz+aM/0AYJMOEGaYBriU0JuA/tMy3hw62kce3eCuozTEzJ
+         s0Qakzy9AV3YuCyn/SeK7T41O9z0qnewQol+SqSJEQ8y10fn7sTQZKnwsG7e1B+kom0e
+         tXU8y/c06ItnszX7rdmO2WiWtKag7TiWIGF4wg/ay2n5/UrIXjozi8Xb5fhb4FpGajVI
+         3riYO2pS2HBGj6FVKyMfiSraLHG2kU7wITgfvSJkqUiuVDfdAKfFo2kJYXCEBBozSLgA
+         wM2A==
+X-Forwarded-Encrypted: i=1; AJvYcCW7lF46pCQArDfjrctjdrXVdWVGQRQjgii5THGLRBwjkVD3pyM4pteoSk5xapHKyf5Js6umfAE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywv2n81p55pIPGYQ6RCpLYu2QUUwxVrJX/R/CIrrgtNaqh3JVPq
+	s99IP72jfKwghWWuRCxjsCPbBzyuOsU5t05RHKoMrSH98xc+iGWXUqWv
+X-Gm-Gg: AY/fxX4z+WvG3yYJ2AyCspYzpWObCz+HHSfMkaYxli0pl4UGSelz/Jv43EffFp+sfid
+	uALyjH15ptH2kBMUcXwzVjo2+qrvqaG1D5SdIgyAXCzttiA5p1QfXA8Pb/0GhA5WubalOgHqoRF
+	Oos6ddWHDsu6yxb3s6Fw0kXWRqYSzOF5ozgtSVwXSp6pXTJLgdTu9GL+4L7nSHv6cRXaNC4KqHJ
+	MBtJc2vZHNVhEEWppzsPvhHrn9SyWYUUrN6EuTu8R/wkup+ZJhPbxKPS+ezWaoJgEyR6h7gmtn8
+	vjzi0gB5cYC2JsaS9yls3pVDsEC38Popm469GDySVgklyHDwpet+b8g9nzIXtKg/x6q7gVWriGj
+	2YJ5Udthw9MCXe/nnCGOWt9/y+fwPnb3BxR59VoOubtunxmqfkuIFoYejD/d2c6unfZ1zhe8qdc
+	LPi6edS3hTymo=
+X-Google-Smtp-Source: AGHT+IHtGtvg4uT3cboCMh8iga2sewapNAHrP9JvUocRuk9xAXBp5Q/b/VJsN4JJTeNeQfvMRiCunw==
+X-Received: by 2002:a05:600c:8287:b0:477:76bf:e1fb with SMTP id 5b1f17b1804b1-47d1955578bmr717393225e9.16.1767616961956;
+        Mon, 05 Jan 2026 04:42:41 -0800 (PST)
+Received: from eichest-laptop ([2a02:168:af72:0:20bb:19ed:fbb2:7e2d])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324eab2721sm100277452f8f.39.2026.01.05.04.42.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 04:37:35 -0800 (PST)
-Date: Mon, 5 Jan 2026 07:37:31 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Petr Tesarik <ptesarik@suse.com>
-Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jason Wang <jasowang@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Bartosz Golaszewski <brgl@kernel.org>, linux-doc@vger.kernel.org,
-	linux-crypto@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-scsi@vger.kernel.org, iommu@lists.linux.dev,
-	kvm@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 05/15] dma-debug: track cache clean flag in entries
-Message-ID: <20260105073621-mutt-send-email-mst@kernel.org>
-References: <cover.1767601130.git.mst@redhat.com>
- <0ffb3513d18614539c108b4548cdfbc64274a7d1.1767601130.git.mst@redhat.com>
- <20260105105433.5b875ce3@mordecai>
+        Mon, 05 Jan 2026 04:42:41 -0800 (PST)
+Date: Mon, 5 Jan 2026 13:42:39 +0100
+From: Stefan Eichenberger <eichest@gmail.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, shawnguo@kernel.org,
+	s.hauer@pengutronix.de, kernel@pengutronix.de, festevam@gmail.com,
+	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, francesco.dolcini@toradex.com,
+	robh@kernel.org,
+	Stefan Eichenberger <stefan.eichenberger@toradex.com>
+Subject: Re: [PATCH RESEND net-next v2] net: stmmac: dwmac: Add a fixup for
+ the Micrel KSZ9131 PHY
+Message-ID: <aVuxv3Pox-y5Dzln@eichest-laptop>
+References: <20260105100245.19317-1-eichest@gmail.com>
+ <6ee0d55a-69de-4c28-8d9d-d7755d5c0808@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -129,119 +96,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260105105433.5b875ce3@mordecai>
+In-Reply-To: <6ee0d55a-69de-4c28-8d9d-d7755d5c0808@bootlin.com>
 
-On Mon, Jan 05, 2026 at 10:54:33AM +0100, Petr Tesarik wrote:
-> On Mon, 5 Jan 2026 03:23:10 -0500
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+Hi Maxime,
+
+On Mon, Jan 05, 2026 at 01:23:46PM +0100, Maxime Chevallier wrote:
+> Hi Stefan,
 > 
-> > If a driver is buggy and has 2 overlapping mappings but only
-> > sets cache clean flag on the 1st one of them, we warn.
-> > But if it only does it for the 2nd one, we don't.
+> On 05/01/2026 11:02, Stefan Eichenberger wrote:
+> > From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
 > > 
-> > Fix by tracking cache clean flag in the entry.
+> > Add a fixup to the stmmac driver to keep the preamble before the SFD
+> > (Start Frame Delimiter) on the Micrel KSZ9131 PHY when the driver is
+> > used on an NXP i.MX8MP SoC.
 > > 
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> >  kernel/dma/debug.c | 27 ++++++++++++++++++++++-----
-> >  1 file changed, 22 insertions(+), 5 deletions(-)
+> > This allows to workaround errata ERR050694 of the NXP i.MX8MP that
+> > states:
+> > ENET_QOS: MAC incorrectly discards the received packets when Preamble
+> > Byte does not precede SFD or SMD.
 > > 
-> > diff --git a/kernel/dma/debug.c b/kernel/dma/debug.c
-> > index 7e66d863d573..43d6a996d7a7 100644
-> > --- a/kernel/dma/debug.c
-> > +++ b/kernel/dma/debug.c
-> > @@ -63,6 +63,7 @@ enum map_err_types {
-> >   * @sg_mapped_ents: 'mapped_ents' from dma_map_sg
-> >   * @paddr: physical start address of the mapping
-> >   * @map_err_type: track whether dma_mapping_error() was checked
-> > + * @is_cache_clean: driver promises not to write to buffer while mapped
-> >   * @stack_len: number of backtrace entries in @stack_entries
-> >   * @stack_entries: stack of backtrace history
-> >   */
-> > @@ -76,7 +77,8 @@ struct dma_debug_entry {
-> >  	int		 sg_call_ents;
-> >  	int		 sg_mapped_ents;
-> >  	phys_addr_t	 paddr;
-> > -	enum map_err_types  map_err_type;
-> > +	enum map_err_types map_err_type;
+> > The bit which disables this feature is not documented in the datasheet
+> > from Micrel, but has been found by NXP and Micrel following this
+> > discussion:
+> > https://community.nxp.com/t5/i-MX-Processors/iMX8MP-eqos-not-working-for-10base-t/m-p/2151032
+> > 
+> > It has been tested on Verdin iMX8MP from Toradex by forcing the PHY to
+> > 10MBit. Without bit 2 being set in the remote loopback register, no
+> > packets are received. With the bit set, reception works fine.
+> > 
+> > Signed-off-by: Stefan Eichenberger <stefan.eichenberger@toradex.com>
 > 
-> *nitpick* unnecessary change in white space (breaks git-blame).
+> I've also faced this issue, however I'm wondering wether this is the
+> correct approach to fix this. It seems that all Micrel / Microchip PHYs
+> have this behaviour of discaring the preamble at 10Mbps.
 > 
-> Other than that, LGTM. I'm not formally a reviewer, but FWIW:
+> Some of these phys have accessible control registers to re-enable it,
+> however this register/bit changes depending on the PHY model. For
+> example, on KSZ8041, this is register 0x14 bit 6.
 > 
-> Reviewed-by: Petr Tesarik <ptesarik@suse.com>
+> We may end-up with many many more fixups for this, basically for every
+> micrel/microchip PHY.
 > 
-> Petr T
+> Wouldn't it be safer to just always enable preamble at 10M for these
+> PHYs, regardless of the MAC that's connected to it ? Is there any risk
+> always having the preamble there ?
 
+This is what Rob also suggested:
+https://lore.kernel.org/all/20251215140330.GA2360845-robh@kernel.org/
 
-I mean, yes it's not really required here, but the padding we had before
-was broken (two spaces not aligning to anything).
+Unfortunately, I'm afraid of breaking something on the platforms that
+are already working, as this is an Ethernet controller issue. As I
+understand it, the PHY works according to the standard. Since the bit is
+undocumented, it seemed safer to only apply it to the i.MX8MP.
 
-> > +	bool		 is_cache_clean;
-> >  #ifdef CONFIG_STACKTRACE
-> >  	unsigned int	stack_len;
-> >  	unsigned long	stack_entries[DMA_DEBUG_STACKTRACE_ENTRIES];
-> > @@ -472,12 +474,15 @@ static int active_cacheline_dec_overlap(phys_addr_t cln)
-> >  	return active_cacheline_set_overlap(cln, --overlap);
-> >  }
-> >  
-> > -static int active_cacheline_insert(struct dma_debug_entry *entry)
-> > +static int active_cacheline_insert(struct dma_debug_entry *entry,
-> > +				   bool *overlap_cache_clean)
-> >  {
-> >  	phys_addr_t cln = to_cacheline_number(entry);
-> >  	unsigned long flags;
-> >  	int rc;
-> >  
-> > +	*overlap_cache_clean = false;
-> > +
-> >  	/* If the device is not writing memory then we don't have any
-> >  	 * concerns about the cpu consuming stale data.  This mitigates
-> >  	 * legitimate usages of overlapping mappings.
-> > @@ -487,8 +492,16 @@ static int active_cacheline_insert(struct dma_debug_entry *entry)
-> >  
-> >  	spin_lock_irqsave(&radix_lock, flags);
-> >  	rc = radix_tree_insert(&dma_active_cacheline, cln, entry);
-> > -	if (rc == -EEXIST)
-> > +	if (rc == -EEXIST) {
-> > +		struct dma_debug_entry *existing;
-> > +
-> >  		active_cacheline_inc_overlap(cln);
-> > +		existing = radix_tree_lookup(&dma_active_cacheline, cln);
-> > +		/* A lookup failure here after we got -EEXIST is unexpected. */
-> > +		WARN_ON(!existing);
-> > +		if (existing)
-> > +			*overlap_cache_clean = existing->is_cache_clean;
-> > +	}
-> >  	spin_unlock_irqrestore(&radix_lock, flags);
-> >  
-> >  	return rc;
-> > @@ -583,20 +596,24 @@ DEFINE_SHOW_ATTRIBUTE(dump);
-> >   */
-> >  static void add_dma_entry(struct dma_debug_entry *entry, unsigned long attrs)
-> >  {
-> > +	bool overlap_cache_clean;
-> >  	struct hash_bucket *bucket;
-> >  	unsigned long flags;
-> >  	int rc;
-> >  
-> > +	entry->is_cache_clean = !!(attrs & DMA_ATTR_CPU_CACHE_CLEAN);
-> > +
-> >  	bucket = get_hash_bucket(entry, &flags);
-> >  	hash_bucket_add(bucket, entry);
-> >  	put_hash_bucket(bucket, flags);
-> >  
-> > -	rc = active_cacheline_insert(entry);
-> > +	rc = active_cacheline_insert(entry, &overlap_cache_clean);
-> >  	if (rc == -ENOMEM) {
-> >  		pr_err_once("cacheline tracking ENOMEM, dma-debug disabled\n");
-> >  		global_disable = true;
-> >  	} else if (rc == -EEXIST &&
-> > -		   !(attrs & (DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_CPU_CACHE_CLEAN)) &&
-> > +		   !(attrs & DMA_ATTR_SKIP_CPU_SYNC) &&
-> > +		   !(entry->is_cache_clean && overlap_cache_clean) &&
-> >  		   !(IS_ENABLED(CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC) &&
-> >  		     is_swiotlb_active(entry->dev))) {
-> >  		err_printk(entry->dev, entry,
+However, if this is preferred, I am also happy to always enable the
+preamble. In theory, I don't see any reason why it should break
+anything.
 
+Regards,
+Stefan
 
