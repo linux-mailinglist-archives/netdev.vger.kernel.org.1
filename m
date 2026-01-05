@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-246930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E358CF264C
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 09:27:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AD6ECF2672
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 09:27:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9DD49300252A
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 08:27:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 44C88300AC6A
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 08:27:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5475A331224;
-	Mon,  5 Jan 2026 08:26:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C2993314B9;
+	Mon,  5 Jan 2026 08:26:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="nWSSKglL";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="m2V5ETSY"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="xIETlA3j";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="D5HIgG6F"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E92AE32E6B4;
-	Mon,  5 Jan 2026 08:25:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9262E33123D;
+	Mon,  5 Jan 2026 08:26:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767601560; cv=none; b=Rd38tzWOxfN3dLlqtp1eoflqIsdO6gvc65LNImqkRNqMn8f4GM117ggkwrEKOLelDogFaYo3f4sXPpBkj0/aABAHnCO/IBwdeuMeTY8Qb+HpXK8C1/pOuLvaEBw8EVzGLLYDNpO3hfe38Ta0aFW3FqBWVTXo/sZk15sMkuie0Z8=
+	t=1767601614; cv=none; b=OXarkkMaE2KX28r+npPdv+FbmQmA7i4bpRgQtHaVhyEkuoLh12/fDErMDiE0lxf6lzbF/OWFOK8Bf5xoaBTC4tDQi7VVZDI7Jd8SvjYiSEV2yKanzazjU7f+Q2oywsoxXMHOqcwkJg1mHRh41ZFXe4wHjxOUXQ3LlhAlSizBnlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767601560; c=relaxed/simple;
-	bh=F0BXKGEIbQEgNDpnR4sFqfVyBXsRDo0ukaJR9qC1Fkg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=QNSZVHQDHV9+cPsc2dKQmAEyhDMfYuBftpkuX3IIBKPJkcZWJ9O1eULDqH+YdSAf5BQ4qBddv6hIszpjP0IMUQncFUEm0gGUyBN9Sxms4Vf1FI6letf37IUB8mRvduAjIfL9kNrtv8b2St0q88V3Ox5GQ5c0eVzGU5HvJyFQJR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=nWSSKglL; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=m2V5ETSY; arc=none smtp.client-ip=193.142.43.55
+	s=arc-20240116; t=1767601614; c=relaxed/simple;
+	bh=PlSAHLIcPqEr0WSD9F/zyyFIGslt4XFL2PegPLaRmw4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=b94/+SSnpuoFji+2lk761jN8XDHWTuSMCmzonxok2nOdxFbCYWKESiaNemi9qoy1RytctKIAHvsOSBZWYv/bzUFEdvPH+FNnuINSoRdoyOyL5CmOJDyVSsarkqc5oK14d8Ozyj7mSqjOJcdRsH2oeg5KGun5Z7c5dauK8rPG/so=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=xIETlA3j; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=D5HIgG6F; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1767601556;
+	s=2020; t=1767601610;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=iomAiraVidAewY3lmJu2od0SPuPOGXSVoNfq8xPpxJ4=;
-	b=nWSSKglLmp7/eMP8nNDM6vrYHRfHBOQTAiOT8zKJaWCE+nktUo2aokh8aI3ImWVItHeIl2
-	30iVoK3GBcpuit5sL7ev/V7jRlMygpMGPM6E/uHVmRfG58UBmH8SsMcOinRpPLOuuc1QLM
-	ybuRK+dzlE44E4Cys2aWy7QOeRcnxaLVkVBeGrCxMopEPWmKywtcBQ3olFS8BQaOtITgLf
-	dWx5EKseWRiOZRh7ZXC33opAP6moL2/W90accepPsi7dCtzoVvBkabECN/ivUz+2Uqa8+S
-	n3/rKvTrGQ8XU9BdRlq52Xc/QELnMg4+tt11RSX3U/AYv4v2dG3Q1TFGSYmfNA==
+	bh=MZ8esC/5910O5pzfA0ceSYS5IgjotIwLmMG2zA9Ur3k=;
+	b=xIETlA3jQGYDshg3ErxHFBiTLp6oYnCuJZfGza8BClNYy8AVD/kH4KHmRjBCYO/kEj1vmK
+	ESLOFCUcgvipO8g0UdY+CSMgW7Uh9vMj3kiqwVI9OONVbtzY1UoROfPULzYuxh8oP/W8Tb
+	yoJDe8pR/KOTRQWPRfflVtStCY5KtfA6Cw2DhRgBSoRWrTMBZ2jOElhHz2AbTF8+3yLK39
+	dO37yO4wDvEVUywECUQ0IEZWV9cZHp3IhxBzIVO76p8Sv7+od3JqWqvX2VOCvIUDv6tqA5
+	l8hoxEt721nAQZGzpCt8uZKMsAl7TXo56N3ysp1ra3JufV0xGwbF4yWsjGLL0A==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1767601556;
+	s=2020e; t=1767601610;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=iomAiraVidAewY3lmJu2od0SPuPOGXSVoNfq8xPpxJ4=;
-	b=m2V5ETSYA+AAksePtKRl2SD9H+s59ZvuDemc1NOyEhpaSKvY+UBYMGcwal2eg4vTfz//+Y
-	K0MBhOtdTKFyVEAQ==
-Date: Mon, 05 Jan 2026 09:25:55 +0100
-Subject: [PATCH net-next] net: uapi: Provide an UAPI definition of 'struct
- sockaddr'
+	bh=MZ8esC/5910O5pzfA0ceSYS5IgjotIwLmMG2zA9Ur3k=;
+	b=D5HIgG6Ff2QERGyxoy5cDoFCDZj4lbQBjaQqi+G20IgtMv+Sa0fvdXklcTzGqSbH27mMVm
+	DY9IFpfp/2OkCBBw==
+Subject: [PATCH RFC net-next 0/3] uapi: Use UAPI definitions of INT_MAX and
+ INT_MIN
+Date: Mon, 05 Jan 2026 09:26:46 +0100
+Message-Id: <20260105-uapi-limits-v1-0-023bc7a13037@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,148 +61,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20260105-uapi-sockaddr-v1-1-b7653aba12a5@linutronix.de>
-X-B4-Tracking: v=1; b=H4sIAJJ1W2kC/x3MQQqAIBBA0avErBvIoZK6SrQQHWsILLRCiO6et
- HyL/x9IHIUTjNUDkW9JsocCVVdgVxMWRnHFQA11iojwModg2u1mnItovWpY99RqGqA0R2Qv+f9
- NEPjEwPmE+X0/S41aq2kAAAA=
-X-Change-ID: 20251222-uapi-sockaddr-cf10e7624729
-To: Eric Dumazet <edumazet@google.com>, 
- Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemb@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-api@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, 
+X-B4-Tracking: v=1; b=H4sIAMZ1W2kC/x2MwQpAQBQAf0Xv7BXLqnVVPsBVDloPr1jaXVLy7
+ 5bjTM3c4MgyOSijGyyd7HgzAdI4Aj33ZiLkITCIRMhUCIVHvzMuvLJ3KAudS62yQmkFodgtjXz
+ 9txaauvqcIY+GLg/d87xGkpaVbgAAAA==
+X-Change-ID: 20251229-uapi-limits-56c45c9369c9
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Andrew Lunn <andrew@lunn.ch>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, 
+ Phil Sutter <phil@nwl.cc>
+Cc: Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+ coreteam@netfilter.org, 
  =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1767601555; l=4018;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1767601610; l=936;
  i=thomas.weissschuh@linutronix.de; s=20240209; h=from:subject:message-id;
- bh=F0BXKGEIbQEgNDpnR4sFqfVyBXsRDo0ukaJR9qC1Fkg=;
- b=+I/qcHQzJobm848ZdicumfKVxZIq5NV0lyRX410kNtzxyPvyrXtlW+t4seoD6lIEOrLdduxY/
- XNiqcVgytBrC6QmA9VNd5M89I7FZdLRhJ9ajIpFVm9kxXMmr25AOd26
+ bh=PlSAHLIcPqEr0WSD9F/zyyFIGslt4XFL2PegPLaRmw4=;
+ b=i+eKk6Ljv1e9zzV7oMX7y7EdJ0RKmOzKqNNlOG3ig20oos1onvLlwWebdVYibX5UVYC400clo
+ NFvzmG+Ra4pANXLy7U9XTlAUVnd6SdSIT2YRmP1SpZZUzo9H7DFIMmR
 X-Developer-Key: i=thomas.weissschuh@linutronix.de; a=ed25519;
  pk=pfvxvpFUDJV2h2nY0FidLUml22uGLSjByFbM6aqQQws=
 
-Various UAPI headers reference 'struct sockaddr'. Currently the
-definition of this struct is pulled in from the libc header
-sys/socket.h. This is problematic as it introduces a dependency
-on a full userspace toolchain.
+Using <limits.h> to gain access to INT_MAX and INT_MIN introduces a
+dependency on a libc, which UAPI headers should not do.
 
-Instead expose a custom but compatible definition of 'struct sockaddr'
-in the UAPI headers. It is guarded by the libc compatibility
-infrastructure to avoid potential conflicts.
-
-The compatibility symbol won't be supported by glibc right away,
-but right now __UAPI_DEF_IF_IFNAMSIZ is not supported either,
-so including the libc headers before the UAPI headers is broken anyways.
+Introduce and use equivalent UAPI constants.
 
 Signed-off-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
 ---
- include/linux/socket.h           | 10 ----------
- include/uapi/linux/if.h          |  4 ----
- include/uapi/linux/libc-compat.h | 12 ++++++++++++
- include/uapi/linux/socket.h      | 14 ++++++++++++++
- 4 files changed, 26 insertions(+), 14 deletions(-)
+Thomas Weißschuh (3):
+      uapi: add INT_MAX and INT_MIN constants
+      ethtool: uapi: Use UAPI definition of INT_MAX
+      netfilter: uapi: Use UAPI definition of INT_MAX and INT_MIN
 
-diff --git a/include/linux/socket.h b/include/linux/socket.h
-index ec715ad4bf25..8363d4e0a044 100644
---- a/include/linux/socket.h
-+++ b/include/linux/socket.h
-@@ -28,16 +28,6 @@ extern void socket_seq_show(struct seq_file *seq);
- 
- typedef __kernel_sa_family_t	sa_family_t;
- 
--/*
-- *	1003.1g requires sa_family_t and that sa_data is char.
-- */
--
--/* Deprecated for in-kernel use. Use struct sockaddr_unsized instead. */
--struct sockaddr {
--	sa_family_t	sa_family;	/* address family, AF_xxx	*/
--	char		sa_data[14];	/* 14 bytes of protocol address	*/
--};
--
- /**
-  * struct sockaddr_unsized - Unspecified size sockaddr for callbacks
-  * @sa_family: Address family (AF_UNIX, AF_INET, AF_INET6, etc.)
-diff --git a/include/uapi/linux/if.h b/include/uapi/linux/if.h
-index 797ba2c1562a..a4bc54196a07 100644
---- a/include/uapi/linux/if.h
-+++ b/include/uapi/linux/if.h
-@@ -25,10 +25,6 @@
- #include <linux/socket.h>		/* for "struct sockaddr" et al	*/
- #include <linux/compiler.h>		/* for "__user" et al           */
- 
--#ifndef __KERNEL__
--#include <sys/socket.h>			/* for struct sockaddr.		*/
--#endif
--
- #if __UAPI_DEF_IF_IFNAMSIZ
- #define	IFNAMSIZ	16
- #endif /* __UAPI_DEF_IF_IFNAMSIZ */
-diff --git a/include/uapi/linux/libc-compat.h b/include/uapi/linux/libc-compat.h
-index 0eca95ccb41e..13a06ce4e825 100644
---- a/include/uapi/linux/libc-compat.h
-+++ b/include/uapi/linux/libc-compat.h
-@@ -140,6 +140,13 @@
- 
- #endif /* _NETINET_IN_H */
- 
-+/* Definitions for socket.h */
-+#if defined(_SYS_SOCKET_H)
-+#define __UAPI_DEF_SOCKADDR		0
-+#else
-+#define __UAPI_DEF_SOCKADDR		1
-+#endif
-+
- /* Definitions for xattr.h */
- #if defined(_SYS_XATTR_H)
- #define __UAPI_DEF_XATTR		0
-@@ -221,6 +228,11 @@
- #define __UAPI_DEF_IP6_MTUINFO		1
- #endif
- 
-+/* Definitions for socket.h */
-+#ifndef __UAPI_DEF_SOCKADDR
-+#define __UAPI_DEF_SOCKADDR		1
-+#endif
-+
- /* Definitions for xattr.h */
- #ifndef __UAPI_DEF_XATTR
- #define __UAPI_DEF_XATTR		1
-diff --git a/include/uapi/linux/socket.h b/include/uapi/linux/socket.h
-index d3fcd3b5ec53..35d7d5f4b1a8 100644
---- a/include/uapi/linux/socket.h
-+++ b/include/uapi/linux/socket.h
-@@ -2,6 +2,8 @@
- #ifndef _UAPI_LINUX_SOCKET_H
- #define _UAPI_LINUX_SOCKET_H
- 
-+#include <linux/libc-compat.h>          /* for compatibility with glibc */
-+
- /*
-  * Desired design of maximum size and alignment (see RFC2553)
-  */
-@@ -26,6 +28,18 @@ struct __kernel_sockaddr_storage {
- 	};
- };
- 
-+/*
-+ *	1003.1g requires sa_family_t and that sa_data is char.
-+ */
-+
-+/* Deprecated for in-kernel use. Use struct sockaddr_unsized instead. */
-+#if __UAPI_DEF_SOCKADDR
-+struct sockaddr {
-+	__kernel_sa_family_t	sa_family;	/* address family, AF_xxx	*/
-+	char			sa_data[14];	/* 14 bytes of protocol address	*/
-+};
-+#endif /* __UAPI_DEF_SOCKADDR */
-+
- #define SOCK_SNDBUF_LOCK	1
- #define SOCK_RCVBUF_LOCK	2
- 
-
+ include/uapi/linux/ethtool.h          | 7 ++-----
+ include/uapi/linux/limits.h           | 3 +++
+ include/uapi/linux/netfilter_bridge.h | 9 +++------
+ include/uapi/linux/netfilter_ipv4.h   | 9 ++++-----
+ include/uapi/linux/netfilter_ipv6.h   | 7 +++----
+ 5 files changed, 15 insertions(+), 20 deletions(-)
 ---
 base-commit: dbf8fe85a16a33d6b6bd01f2bc606fc017771465
-change-id: 20251222-uapi-sockaddr-cf10e7624729
+change-id: 20251229-uapi-limits-56c45c9369c9
 
 Best regards,
 -- 
