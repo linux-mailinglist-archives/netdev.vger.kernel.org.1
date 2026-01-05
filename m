@@ -1,129 +1,98 @@
-Return-Path: <netdev+bounces-246872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EFE6CF1D2B
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 05:57:20 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AECE1CF2066
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 06:50:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5632F3007C8F
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 04:57:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 917593000930
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 05:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5CCB324B23;
-	Mon,  5 Jan 2026 04:57:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61822283FD9;
+	Mon,  5 Jan 2026 05:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ho85gyha"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EvUXFoYx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE048324712
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 04:57:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD645478D
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 05:50:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767589036; cv=none; b=WqBfpsqci2rr5dH1B0HCAgQWxz3xWfKHFqGfd0kJ5OsGjDOWNM1lBA6sKDqhHftfTgRt74obleVhYP4KsZFJNs/hb1A3aUVIYG75kmAemNNSAjkRTPt8cxui5rfYQco4LuJ09XfAuHPt8NFkDXnJghF+tK+86sHmBDPEDYJ9NO8=
+	t=1767592226; cv=none; b=ZEjhdertRyPn0qp8Ul00IYZq/KjLamrQQATwoZ6qznhEmbQU/Fwjisiy4eLpmNUFlrORJit8FmlzSf+LXZQfdVjGxl6JrkZWlBfZGPU8CUDdJK8uuRiMmjFYFVAonFiaPsoox67oQaVbE8Ih5E+8umHIgYyRFqI/PHs+H/PRJck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767589036; c=relaxed/simple;
-	bh=wdM/b8hJbUaslNLfaUyaSG8t8yHTFzri8J0kMFatf2M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kVsJ/vNnbigmT2d03o67E8nIIT2jYh/TP0UaCI1FslmKGrpHLabVt+PA1qQpqjv9UmK9eez8uUPjuew/MYb0P2Y2UbSsDrLOSJ0GAlZfBzwUb2KBzq7N47a/akdEozEWzEnwWHjNJcjV9t6TtA63EUmOqJ6KlcChHuc7pRrNzxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ho85gyha; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-34c3259da34so14381860a91.2
-        for <netdev@vger.kernel.org>; Sun, 04 Jan 2026 20:57:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1767589034; x=1768193834; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EOEgCzmZP0GTJHcnce/bEe96Bif2a5t1CJ7MWxViYzU=;
-        b=ho85gyhaKzhQd2LkobbDGyUs+P/owvm/KOpiZS4dO+Gf4YuFWvgFamob9qdCJ9r9lk
-         CLr9/RyFtHqQFUBotNoAM7KhHAtZt1Jp5d0KrfTfEbwagr6SxMdsx/4fE0BSAkcxMDYW
-         hBxIWUZzrdi1VxRIajuMMCUWM94J/ABCw0OqR1S9Q7KJQTpTvaIEnHNlkPc5J/4jESGd
-         XTIkIW6zDUqzcVTAuqoCRGwL3BR2rGk9MaM3FmQJSNYeqluqV2cf553LNAaO+Ru5IIr6
-         vpnPaBULT5dfb6ydqqvBTOTjU7RSO1ix7RqULQUiOx2UaSolPasj3CB9WpJAXHp8n2jn
-         ZWag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767589034; x=1768193834;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EOEgCzmZP0GTJHcnce/bEe96Bif2a5t1CJ7MWxViYzU=;
-        b=wEUX1tf37D+2bmPOmu5Ux+BQTLq8YLfM2frLarEFIl9+FUyY+dkx2bqivGJmrWPKar
-         kGsmsZXWIuhVNfbfwa+k/2mD0YjMal529zu30eddqQdH+RFvTJeHc2iq2EfAr1an0+EH
-         mxQVIymT7ZJC0vQ6vlB6xT49b3awbUomqqoUc08aA8RFcRFLZBeJJtHt8S/bcOG4ZzmM
-         q0i9hHIFQ+enc7cFahqyC7tlOqZAPL+p9jkDUxJG7qAdWWeiQPZoFanRwNNqrnqIeEB8
-         MSTW8XZjCxyZ3DaVLlZz1QXccAOy+UeKaBBTBJ/VNqtkyZKG54We0jm64jKObYXlD05x
-         r1wg==
-X-Forwarded-Encrypted: i=1; AJvYcCUdRlAx3ccZZxYNG+/OKUzknAiLG0thtc6rJ7otazKjbgnI1xl5n7mYFPscdAoXU7FJoDk+Rw0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOnYqxDL+KAD26CjegYOT8Gate4uqh3gGEg2kLRBjRmlhdC+Z+
-	duC9a/9/Q4Wd/7vFozgiIm8De1Y2KPwZ1OmMPw9ocSq7THJYJrE3sj1H7MOXrMfuk+M=
-X-Gm-Gg: AY/fxX5CJAZPVnxK9xKvsSJOu90iNKiZifMEN1wwWe99b93QqxrYRul4ajcTNsBvrJe
-	zD2WcNxNli3qdPqUUZbjM71W1jP44Am/UpFoCooATbITImHJZD40HT4KUKFh+vHLFR2bXSAUl05
-	7BayKutqZxYODb4y/58ZRJRqXtFfKNVEpL0vQHV+YRxNPx+1D0FwH71J8dnj15UHEaQUr1nC+Rz
-	+B+J5IucXoOX9dA98t5SfKSXlsAux3eHR4ro3xfq9EgSwWE2bmNgk7dhsZ2UF9Q8XV0JHHzFSPc
-	8NFTPcjBkhLjphawKWMFRYRHet2AKv+WZ2s2wzAvOErzAchPs9JClgE18D8y0yk3Or4a8+1qgQW
-	v0ZCmbJlywCMXkVr12nV3Aoo2Pa8R029dfTFq29QajymaoPEfqwNQesCf/q1AbEgHedXV4pPO36
-	/RP+psNx70wmHX2u6MODkAQw==
-X-Google-Smtp-Source: AGHT+IECK/LcBFPZYYyRh4cCx6nIWU2Vivu4V4Wo0++VXRb6DotO+ATVsJPLekWH+2yfoIoKe3qHow==
-X-Received: by 2002:a17:90b:278d:b0:32e:3c57:8a9e with SMTP id 98e67ed59e1d1-34e921f0439mr39742351a91.35.1767589033897;
-        Sun, 04 Jan 2026 20:57:13 -0800 (PST)
-Received: from localhost ([122.172.80.63])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34f476ec31dsm4899585a91.3.2026.01.04.20.57.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Jan 2026 20:57:13 -0800 (PST)
-Date: Mon, 5 Jan 2026 10:27:11 +0530
-From: Viresh Kumar <viresh.kumar@linaro.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Olivia Mackall <olivia@selenic.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Marek Szyprowski <m.szyprowski@samsung.com>, 
-	Robin Murphy <robin.murphy@arm.com>, Stefano Garzarella <sgarzare@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Petr Tesarik <ptesarik@suse.com>, Leon Romanovsky <leon@kernel.org>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-scsi@vger.kernel.org, iommu@lists.linux.dev, 
-	kvm@vger.kernel.org, netdev@vger.kernel.org, 
-	"Enrico Weigelt, metux IT consult" <info@metux.net>, Viresh Kumar <vireshk@kernel.org>, 
-	Linus Walleij <linusw@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
-	linux-gpio@vger.kernel.org
-Subject: Re: [PATCH RFC 15/13] gpio: virtio: reorder fields to reduce struct
- padding
-Message-ID: <w6to6itartzrxgapaj6dys2q3yqqoz3zetpb5bejnjb4heof2c@jkhmal3chyn2>
-References: <cover.1767089672.git.mst@redhat.com>
- <55e9351282f530e2302e11497c6339c4a2e74471.1767112757.git.mst@redhat.com>
+	s=arc-20240116; t=1767592226; c=relaxed/simple;
+	bh=V4KqZ3driE22w5/F97L1WeQ7I+Gqva5pvc8F8ol3oyk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hQD6B5AqP5mzGNZKr0Wzso0FcqtaCb48E55qqBGwdYmKO87uoebe5Fdzrq18aMPT267nkLSr/5boVRiOvurLpVQ/pWACceZ5mN2jIelfPMF3TML3Y3+eCSm8Lk8FuC5Da8sVVH1kTbeE91WcNb1yhRc4LdtKEg7aBCvCFi4gP7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EvUXFoYx; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <7a2d0d37-bcca-454f-85c3-063906ecd042@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1767592212;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V4KqZ3driE22w5/F97L1WeQ7I+Gqva5pvc8F8ol3oyk=;
+	b=EvUXFoYxVWa/4DMrkhSmRnxwi2VMErcYLJXiOHBH2ZN21LtOHFGQ1HW38zsN6YgvrsPdGq
+	62BwHeUixth06jLLS+oF3xW5CJJugPZTyVS4tOfCodTndgieesgjOVVWEWkUAYLCzx4JyY
+	4VboiG+6LWkoraGtFHMwmO25hnNDHKM=
+Date: Sun, 4 Jan 2026 21:50:04 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <55e9351282f530e2302e11497c6339c4a2e74471.1767112757.git.mst@redhat.com>
+Subject: Re: [PATCH] bpf-next: Prevent out of bound buffer write in
+ __bpf_get_stack
+Content-Language: en-GB
+To: Arnaud Lecomte <contact@arnaud-lcm.com>,
+ syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
+Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com,
+ john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
+ linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org,
+ sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com,
+ Brahmajit Das <listout@listout.xyz>
+References: <20260104205220.980752-1-contact@arnaud-lcm.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <20260104205220.980752-1-contact@arnaud-lcm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On 30-12-25, 11:40, Michael S. Tsirkin wrote:
-> Reorder struct virtio_gpio_line fields to place the DMA buffers (req/res)
-> last. This eliminates the need for __dma_from_device_aligned_end padding
-> after the DMA buffer, since struct tail padding naturally protects it,
-> making the struct a bit smaller.
-> 
-> Size reduction estimation when ARCH_DMA_MINALIGN=128:
-> - request is 8 bytes
-> - response is 2 bytes
-> - removing _end saves up to 128-6=122 bytes padding to align rxlen field
-> 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  drivers/gpio/gpio-virtio.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
 
-Acked-by: Viresh Kumar <viresh.kumar@linaro.org>
 
--- 
-viresh
+On 1/4/26 12:52 PM, Arnaud Lecomte wrote:
+> Syzkaller reported a KASAN slab-out-of-bounds write in __bpf_get_stack()
+> during stack trace copying.
+>
+> The issue occurs when: the callchain entry (stored as a per-cpu variable)
+> grow between collection and buffer copy, causing it to exceed the initially
+> calculated buffer size based on max_depth.
+>
+> The callchain collection intentionally avoids locking for performance
+> reasons, but this creates a window where concurrent modifications can
+> occur during the copy operation.
+>
+> To prevent this from happening, we clamp the trace len to the max
+> depth initially calculated with the buffer size and the size of
+> a trace.
+>
+> Reported-by: syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/all/691231dc.a70a0220.22f260.0101.GAE@google.com/T/
+> Fixes: e17d62fedd10 ("bpf: Refactor stack map trace depth calculation into helper function")
+> Tested-by: syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
+> Cc: Brahmajit Das <listout@listout.xyz>
+> Signed-off-by: Arnaud Lecomte <contact@arnaud-lcm.com>
+
+LGTM.
+
+Acked-by: Yonghong Song <yonghong.song@linux.dev>
+
 
