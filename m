@@ -1,253 +1,322 @@
-Return-Path: <netdev+bounces-246948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5C12CF2AC6
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 10:16:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00B0BCF2B9C
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 10:25:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id BC06B3002974
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 09:16:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 938513019BDF
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 09:22:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6260329E46;
-	Mon,  5 Jan 2026 09:16:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFDE732B9B1;
+	Mon,  5 Jan 2026 09:22:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aYsHIRYZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YMvZx21H";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="K5FpqTwa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59CCD32B9AD
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 09:16:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C243529BDA9
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 09:22:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767604588; cv=none; b=sb0NEQB12PG7OmprFEx4b4+cWwMZnfjjOBG/Aim0U7Lv49kJ396iht5GwzrXx6TOtO6XLEJiVuuqhKFpLK7uORfmfALtVn+KVSA6ChZWqxM8b2mkU9uQVOaK6TKWgKZ222WzrScT4Cy/IVAXHxOxVwQyEX5/ywFzSCEPiQiJPOI=
+	t=1767604966; cv=none; b=jmK7lXF9zzlOJEycNGUEBT1tktCv0dZ3N+1cqLtPckZkEO2QHMTOhdoqBG8fE+wmxksyC1Phf6/YWK5AoiQjFRVuf4+yqNtKkztlq6CGrj7ptKtF8FZ1uzoCFdYTPHLnQlFv42JuFQmwoUJFzuCOMsJdCOTtAGKxyRAaT+AjS+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767604588; c=relaxed/simple;
-	bh=OWC+AHxZdxUuVZM/YaeSNjU/c5cKFkHpncudd9Oa0yE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FuR03or/OjsVCX3oRUnyG9tlYtOUg7cAyqyjI5a/VxxPb3OXV4qyflrfFb7WpBMBWwAZeLQbS9JtIs1WmwbrT0mft3cH5aM5LDfEpGzOoZ+1SGYhEZ/3fEO6daoLAlahK04yjprItb4ga5toZFwh3d7q2W4DArh162WC2VNXYpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=aYsHIRYZ; arc=none smtp.client-ip=209.85.160.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-3eae4e590a4so7202264fac.1
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 01:16:22 -0800 (PST)
+	s=arc-20240116; t=1767604966; c=relaxed/simple;
+	bh=1mAO8TaNFrqSuFlOgOErbXbczeaXOrgYrJMViqJm3wQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uPi5kz0cBsahJPrnZcPq+AAdpsJLB9FH54DxpATJgtbKfPx3RuMm0fB4Trtz1hyBSuB9fYFqOr7p8HPtK1yEKbPI63WIJYrNPji5+vT7mlKE3ioo9C5mo11at9nDseFgX9YKjne+Xzq+arotuBUhtAHBpscF7rmsbla8N3HRFWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YMvZx21H; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=K5FpqTwa; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767604963;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=M8sPLXi8z53Y798B/D5K785FXLS0Gm27N/WjbQoRYSQ=;
+	b=YMvZx21HZXcdb7MMEiYf0P1brGFNIA6Vims7TWUtszblCWlh2P1mGsG7WCKRkOG1BvTIim
+	2NdRXzQloe3CVBb/o/aRcQQqx/4aYPMI2yXHo/5X7ZN/5UqjkXvdVssIfmJrbaFat8BtsE
+	YYAE+/BTA3tIdN1juB3B4BnyGzuElKA=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-382-aBCt_tmJOC--0W_7SkV8QQ-1; Mon, 05 Jan 2026 04:22:42 -0500
+X-MC-Unique: aBCt_tmJOC--0W_7SkV8QQ-1
+X-Mimecast-MFC-AGG-ID: aBCt_tmJOC--0W_7SkV8QQ_1767604962
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-430fc153d50so10765706f8f.1
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 01:22:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1767604581; x=1768209381; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xS4Pieemzy4r1o+XZyR7jxfKf1/JCiqumXmtg6ZAf0Y=;
-        b=aYsHIRYZmEqubVaB/nFOB2ZSyZ5mdUAJQ2e8vK7U6xa1ASeFd6LWH955d9+nh53ktb
-         xr1P49S3syRT14RFGDCfbl+SIJj8H1shK6l/HJyqERcZfy8YT9XcW9ovCyPlV1JPbept
-         stVuPPdDv4O0rskrIVR6VeYaEnAM5RPbtavEumXMM3wqDI/5YZbPJj/fIsEwMgjbttlW
-         vq78fx3LM7I7y53tg3lpxh5jqIHVy7So3PmCqVqS6shGFcQdOC2kuMGEH3Kt5Owzm2Qm
-         rjvtr+TvOeiiwnoqs3PniCzuVCCjBVzPM3FD6VXVz+bPcHzpEmbFp1Ii0V1COQygdl4e
-         lteA==
+        d=redhat.com; s=google; t=1767604961; x=1768209761; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=M8sPLXi8z53Y798B/D5K785FXLS0Gm27N/WjbQoRYSQ=;
+        b=K5FpqTwauBFkjkwRx8wGVFkdKh2Luj/yf/Wbyv9e5YG3lCgQfttbuJIcFOzpcgoN2Z
+         GQznc6cmJsaKLGKcXL4+kGjpoBT5hZJ0CzgeREcqtojxA9LnTsuXpsM+TPA6sYJKZwwV
+         PEBatd3gwF8WpBZHBwDq3HRjUqO3zVti23o1vxyZQY3aX2+28pS6lhJyJdDPAuVpYBi/
+         05NM7aRrQwkVMx4qx/7Ts23UqxfbMQJlGxS9aPdeQb+kSOowdJrpJxvnW8jaqvWctWpo
+         BMjsTdNzlHBsuAbor6gKtAyMcmPgD8In/vPjNmXJQydgWLYlNiZLrjw7S2Nnh3MJN1VL
+         Gz0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767604581; x=1768209381;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xS4Pieemzy4r1o+XZyR7jxfKf1/JCiqumXmtg6ZAf0Y=;
-        b=aNPel38xyWIBaRR+2FKwifHwcVey+tfm5s3SV4Wnhp1wTDoLVs2ScedCKegcljzAeE
-         BQnS83fESuCeT+7HMPxbprdQyt6VdQ38yzLSkuRfRiQQIEn43k6h/u8G+ovXYlNNHQu1
-         9SxVUUw/IDNReqlj8GEJvWlqKd0k/v95QOZOZpV6WG2knjfSX+NzNvqjp2l5kb9oWzgl
-         VGqdACCNaiC45HXQfuTJx6FNze0JHqPx9cUfcHoBbCDbt5eV3AtITmiaUvMoWqZ1D5+T
-         oL0nSXDhMW0tQ5vMH/BHAWOiEIgeQZ05wOxpO0HnauwH7lbJRiMruH/jE7hCofFAUibu
-         JFuA==
-X-Forwarded-Encrypted: i=1; AJvYcCWepcQ6NhC5QBMf5QsSyJxLRK7Z6wzizf+YUQPWPi8kSvSIYKVPE4eKMYprkgXuDzAGth4sK+s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8pXOCevyJlGFF5nrl5PmSgHmNBRENqToZUIq9JuL2LAx7EWsq
-	ODGp3kVfzJDGCh+jp4P0H/j2LlEL0PmQUNDEWT7+N0d6BPudKaR4iSdycVzVKg3vzsB64wUQpSk
-	44wm0sExqJomMR/su5hCSP+jCUo8d52VYTwxCz2w65A==
-X-Gm-Gg: AY/fxX6bH5mC5ZaL+k552uDT40oKk17rQMGgBRJ5wL5WFcTY95iYVFALe5dBgMYNl97
-	sdYj1Dj3hpAzf9Xc4WZTUHSZXBqXITNKXioZU/DsLWoO+PuGnya0YKnA4Fkharyr5y5vUMjbJYl
-	AZgkFiYYFpTDdpIl89YF2BI/Hje/JUpqne3LSUq+eVMlCsFbWeSC+xcftdYKixXb3JskbhGmi20
-	/O4xU5oO5cP69gBHGfhPbFpjCTnPBGn+sdfME+Pyv6QQ+MYCbtyRE4TRFIBf1nwpVTR6HvGuIIo
-	OwSgUhLz8TJWQxNx1Rmy04xPmQ==
-X-Google-Smtp-Source: AGHT+IHdtu3uK1YvLPvRXmBmsYletnr+Fy6yEnWw7FcQJMBZUAFsUyE2L/0PG3GpU/2KGeBY95bkFD0S8glmAzrpFaU=
-X-Received: by 2002:a05:6820:2289:b0:65c:f9c1:cba0 with SMTP id
- 006d021491bc7-65d0ea16a88mr23376881eaf.37.1767604581140; Mon, 05 Jan 2026
- 01:16:21 -0800 (PST)
+        d=1e100.net; s=20230601; t=1767604961; x=1768209761;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=M8sPLXi8z53Y798B/D5K785FXLS0Gm27N/WjbQoRYSQ=;
+        b=Ha8EtYRDadljo2vh9Zek00dodMop2zOIGh2eO/BFlbKY1SwZUt/VaaxPMwa2jTPHE7
+         J0b9zlAj0MCGcBYtz4zvoXH+dDWkK0WbaUrapxk1t5WcGuOuJpGyb4oM/TcH24V9XSDZ
+         nVcrY1mDmD9rRjEG+k4Ek+miFLskMiB/wac5dBhtbneIVEnLOS5ItCMVp9WfKUixCykS
+         OewXtgjFzleOjWCGHkn2eFaSKIVIHi/q0W5r2VCIMjSzA+tLIQ0Nk4QBS0fC6YXoF5t9
+         jOB4V9E5675KChgAR3rNI6NatDmvkXV+2bS1S05T2xc6v9qlq2GPd3SiBI5SdoLjWtyw
+         h47A==
+X-Forwarded-Encrypted: i=1; AJvYcCWQAKIz08O2bFhHwpwRV/GRGtDOpl6UpOfIeZ2tOkWmE1OxWMxeF1jijPHwzXcTecADx6quS88=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwzodS6rOWPPfscJv5HOrWygasvKDtO7ruiCLmm4BmLJfCDLysd
+	1HlY1OQXesyyuu+TSIcWRHbf/MvIiYrZ80sJHcNZtqwa4CxeUo8K52cVfjeIsbABT2FSpZjrCho
+	ezLUuPJsvr3nyTvr+zcnJxm1y1UGXIB4pqwknqyLeaoO9ttTkyEij/kHMSg==
+X-Gm-Gg: AY/fxX4+31DzS8M8tq9dyCpaf821FqY5XLBFoowMpZhyu+nL8AM87kUpiSWM6lHixG5
+	vRoarRGXASWz8iXZd3KLV+gxJLENfbZtnBCxQNdnFD8RXyLgMc9VroNGYrXBNLyyvQ5Eurv8tvv
+	rM3JOBKSZLdh0/9JGlfWk4xpkS+gpnpkuaRv/xqXncPy5YaiMNaLC59sNdsxQ1N1PaMwFDdL6yH
+	rmnSzZe0nncpEddnGPHf9vNIbbHnb9rJsV19hmgSA9xX6ahF5jtr49+jb6PHuAW1Gr6jmgc8q/m
+	N6xADF8aoA8fRQd1GTrbqGwtFsew8/GfvmunZ5treMwd9Qtz/r+3yQmMrtewiIJp2nCFLaiROrt
+	ae+yB370EfBngrRE4MzXqLAuNS3INmkYupw==
+X-Received: by 2002:a05:6000:200e:b0:430:fcf5:4937 with SMTP id ffacd0b85a97d-4324e4c3e1emr60049309f8f.7.1767604961291;
+        Mon, 05 Jan 2026 01:22:41 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG8MkrOB5s1jG8hqd7qchhn87qg7+0lRnOMlFt5NmlAFLJ/ziS9TQF7ciWhElrhObULO1LePQ==
+X-Received: by 2002:a05:6000:200e:b0:430:fcf5:4937 with SMTP id ffacd0b85a97d-4324e4c3e1emr60049275f8f.7.1767604960740;
+        Mon, 05 Jan 2026 01:22:40 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324ea830f3sm98650003f8f.22.2026.01.05.01.22.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 01:22:39 -0800 (PST)
+Date: Mon, 5 Jan 2026 04:22:37 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: syzbot <syzbot+a9528028ab4ca83e8bac@syzkaller.appspotmail.com>
+Cc: eperezma@redhat.com, jasowang@redhat.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev
+Subject: Re: [syzbot] INFO: task hung in vhost_worker_killed (2)
+Message-ID: <20260105042045-mutt-send-email-mst@kernel.org>
+References: <695b796e.050a0220.1c9965.002a.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1765791463.git.u.kleine-koenig@baylibre.com>
- <CAHUa44FrDZbvRvfN8obf80_k=Eqxe9YxHpjaE5jU7nkxPUwfag@mail.gmail.com>
- <20251218135332f323fa91@mail.local> <CAHUa44GpW5aO26GDyL9RZub9vVYvVcJ7etwO0yXBN_mUi0W4AA@mail.gmail.com>
-In-Reply-To: <CAHUa44GpW5aO26GDyL9RZub9vVYvVcJ7etwO0yXBN_mUi0W4AA@mail.gmail.com>
-From: Jens Wiklander <jens.wiklander@linaro.org>
-Date: Mon, 5 Jan 2026 10:16:09 +0100
-X-Gm-Features: AQt7F2q8lTcIoa5xBnvz2Mkjx2axWX5OMGPJpQNfFM5WoFI2KGlEdVoT6sJvPQg
-Message-ID: <CAHUa44HqRbCJTXsrTCm0G5iwtkQtq+Si=yOspCjpAn-N2uVSVg@mail.gmail.com>
-Subject: Re: [PATCH v2 00/17] tee: Use bus callbacks instead of driver callbacks
-To: Alexandre Belloni <alexandre.belloni@bootlin.com>
-Cc: =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@baylibre.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Sumit Garg <sumit.garg@kernel.org>, 
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	=?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Ard Biesheuvel <ardb@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Sumit Garg <sumit.garg@oss.qualcomm.com>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, 
-	Sudeep Holla <sudeep.holla@arm.com>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
-	=?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>, 
-	Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
-	James Bottomley <James.Bottomley@hansenpartnership.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Mimi Zohar <zohar@linux.ibm.com>, David Howells <dhowells@redhat.com>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Peter Huewe <peterhuewe@gmx.de>, op-tee@lists.trustedfirmware.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-rtc@vger.kernel.org, 
-	linux-efi@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, 
-	Cristian Marussi <cristian.marussi@arm.com>, arm-scmi@vger.kernel.org, 
-	linux-mips@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-integrity@vger.kernel.org, keyrings@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <695b796e.050a0220.1c9965.002a.GAE@google.com>
 
-Hi,
+On Mon, Jan 05, 2026 at 12:42:22AM -0800, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    349bd28a86f2 Merge tag 'vfio-v6.19-rc4' of https://github...
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=13ccf29a580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=a94030c847137a18
+> dashboard link: https://syzkaller.appspot.com/bug?extid=a9528028ab4ca83e8bac
+> compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13a67222580000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/47d669d196ca/disk-349bd28a.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/f856a256a5eb/vmlinux-349bd28a.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/0f8e3de3614b/bzImage-349bd28a.xz
+> mounted in repro #1: https://storage.googleapis.com/syzbot-assets/3eec5fbffba2/mount_0.gz
+> mounted in repro #2: https://storage.googleapis.com/syzbot-assets/c9eff1484b09/mount_6.gz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+a9528028ab4ca83e8bac@syzkaller.appspotmail.com
+> 
+> INFO: task vhost-7617:7618 blocked for more than 143 seconds.
+>       Not tainted syzkaller #0
+> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> task:vhost-7617      state:D stack:29600 pid:7618  tgid:7593  ppid:5977   task_flags:0x404440 flags:0x00080000
+> Call Trace:
+>  <TASK>
+>  context_switch kernel/sched/core.c:5256 [inline]
+>  __schedule+0x149b/0x4fd0 kernel/sched/core.c:6863
+>  __schedule_loop kernel/sched/core.c:6945 [inline]
+>  schedule+0x165/0x360 kernel/sched/core.c:6960
+>  schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:7017
+>  __mutex_lock_common kernel/locking/mutex.c:692 [inline]
+>  __mutex_lock+0x7e6/0x1350 kernel/locking/mutex.c:776
+>  vhost_worker_killed+0x12b/0x390 drivers/vhost/vhost.c:476
+>  vhost_task_fn+0x3d1/0x430 kernel/vhost_task.c:62
+>  ret_from_fork+0x510/0xa50 arch/x86/kernel/process.c:158
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
+>  </TASK>
+> 
+> Showing all locks held in the system:
+> 1 lock held by khungtaskd/32:
+>  #0: ffffffff8df41aa0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+>  #0: ffffffff8df41aa0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:867 [inline]
+>  #0: ffffffff8df41aa0 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x2e/0x180 kernel/locking/lockdep.c:6775
+> 2 locks held by getty/5579:
+>  #0: ffff88814e3cb0a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
+>  #1: ffffc9000332b2f0 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x449/0x1460 drivers/tty/n_tty.c:2211
+> 1 lock held by syz-executor/5978:
+>  #0: ffffffff8df475f8 (rcu_state.exp_mutex){+.+.}-{4:4}, at: exp_funnel_lock kernel/rcu/tree_exp.h:311 [inline]
+>  #0: ffffffff8df475f8 (rcu_state.exp_mutex){+.+.}-{4:4}, at: synchronize_rcu_expedited+0x2b1/0x6e0 kernel/rcu/tree_exp.h:956
+> 2 locks held by syz.5.259/7601:
+> 3 locks held by vhost-7617/7618:
+>  #0: ffff888054cc68e8 (&vtsk->exit_mutex){+.+.}-{4:4}, at: vhost_task_fn+0x322/0x430 kernel/vhost_task.c:54
+>  #1: ffff888024646a80 (&worker->mutex){+.+.}-{4:4}, at: vhost_worker_killed+0x57/0x390 drivers/vhost/vhost.c:470
+>  #2: ffff8880550c0258 (&vq->mutex){+.+.}-{4:4}, at: vhost_worker_killed+0x12b/0x390 drivers/vhost/vhost.c:476
+> 1 lock held by syz-executor/7850:
+>  #0: ffffffff8df475f8 (rcu_state.exp_mutex){+.+.}-{4:4}, at: exp_funnel_lock kernel/rcu/tree_exp.h:343 [inline]
+>  #0: ffffffff8df475f8 (rcu_state.exp_mutex){+.+.}-{4:4}, at: synchronize_rcu_expedited+0x36e/0x6e0 kernel/rcu/tree_exp.h:956
+> 1 lock held by syz.2.640/9940:
+> 4 locks held by syz.3.641/9946:
+> 3 locks held by syz.1.642/9954:
+> 
+> =============================================
+> 
+> NMI backtrace for cpu 0
+> CPU: 0 UID: 0 PID: 32 Comm: khungtaskd Not tainted syzkaller #0 PREEMPT(full) 
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+> Call Trace:
+>  <TASK>
+>  dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+>  nmi_cpu_backtrace+0x274/0x2d0 lib/nmi_backtrace.c:113
+>  nmi_trigger_cpumask_backtrace+0x17a/0x300 lib/nmi_backtrace.c:62
+>  trigger_all_cpu_backtrace include/linux/nmi.h:160 [inline]
+>  __sys_info lib/sys_info.c:157 [inline]
+>  sys_info+0x135/0x170 lib/sys_info.c:165
+>  check_hung_uninterruptible_tasks kernel/hung_task.c:346 [inline]
+>  watchdog+0xf95/0xfe0 kernel/hung_task.c:515
+>  kthread+0x711/0x8a0 kernel/kthread.c:463
+>  ret_from_fork+0x510/0xa50 arch/x86/kernel/process.c:158
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
+>  </TASK>
+> Sending NMI from CPU 0 to CPUs 1:
+> NMI backtrace for cpu 1
+> CPU: 1 UID: 0 PID: 5961 Comm: syz-executor Not tainted syzkaller #0 PREEMPT(full) 
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+> RIP: 0010:wq_watchdog_touch+0xb4/0x160 kernel/workqueue.c:7654
+> Code: d8 48 c1 e8 03 42 80 3c 38 00 74 08 48 89 df e8 e2 ba 9b 00 49 c7 c6 78 52 80 92 4c 03 33 4c 89 f0 48 c1 e8 03 42 80 3c 38 00 <74> 08 4c 89 f7 e8 b2 bb 9b 00 49 89 2e eb 18 e8 88 9a 35 00 48 8d
+> RSP: 0018:ffffc90003157480 EFLAGS: 00000046
+> RAX: 1ffff110170e484f RBX: ffffffff8d9aedd8 RCX: ffff88807d8b9e80
+> RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000008
+> RBP: 0000000100002ff4 R08: ffff888022760237 R09: 1ffff110044ec046
+> R10: dffffc0000000000 R11: ffffffff8b583250 R12: 00000000000036b0
+> R13: 0000000100002326 R14: ffff8880b8724278 R15: dffffc0000000000
+> FS:  0000555582bd2500(0000) GS:ffff888125f1f000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000000000000 CR3: 0000000077fb2000 CR4: 0000000000350ef0
+> Call Trace:
+>  <TASK>
+>  touch_nmi_watchdog include/linux/nmi.h:149 [inline]
+>  wait_for_lsr+0x16a/0x2f0 drivers/tty/serial/8250/8250_port.c:1968
+>  fifo_wait_for_lsr drivers/tty/serial/8250/8250_port.c:3234 [inline]
+>  serial8250_console_fifo_write drivers/tty/serial/8250/8250_port.c:3257 [inline]
+>  serial8250_console_write+0x1301/0x1b60 drivers/tty/serial/8250/8250_port.c:3342
+>  console_emit_next_record kernel/printk/printk.c:3129 [inline]
+>  console_flush_one_record kernel/printk/printk.c:3215 [inline]
+>  console_flush_all+0x713/0xb00 kernel/printk/printk.c:3289
+>  __console_flush_and_unlock kernel/printk/printk.c:3319 [inline]
+>  console_unlock+0xbb/0x190 kernel/printk/printk.c:3359
+>  vprintk_emit+0x47b/0x550 kernel/printk/printk.c:2426
+>  _printk+0xcf/0x120 kernel/printk/printk.c:2451
+>  __nilfs_msg+0x349/0x410 fs/nilfs2/super.c:78
+>  nilfs_segctor_destroy fs/nilfs2/segment.c:2798 [inline]
+>  nilfs_detach_log_writer+0x697/0xa30 fs/nilfs2/segment.c:2882
+>  nilfs_put_super+0x4d/0x150 fs/nilfs2/super.c:509
+>  generic_shutdown_super+0x135/0x2c0 fs/super.c:643
+>  kill_block_super+0x44/0x90 fs/super.c:1722
+>  deactivate_locked_super+0xbc/0x130 fs/super.c:474
+>  cleanup_mnt+0x425/0x4c0 fs/namespace.c:1318
+>  task_work_run+0x1d4/0x260 kernel/task_work.c:233
+>  resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
+>  __exit_to_user_mode_loop kernel/entry/common.c:44 [inline]
+>  exit_to_user_mode_loop+0xef/0x4e0 kernel/entry/common.c:75
+>  __exit_to_user_mode_prepare include/linux/irq-entry-common.h:226 [inline]
+>  syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:256 [inline]
+>  syscall_exit_to_user_mode_work include/linux/entry-common.h:159 [inline]
+>  syscall_exit_to_user_mode include/linux/entry-common.h:194 [inline]
+>  do_syscall_64+0x2b7/0xf80 arch/x86/entry/syscall_64.c:100
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7efe38790a77
+> Code: a8 ff ff ff f7 d8 64 89 01 48 83 c8 ff c3 0f 1f 44 00 00 31 f6 e9 09 00 00 00 66 0f 1f 84 00 00 00 00 00 b8 a6 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 01 c3 48 c7 c2 a8 ff ff ff f7 d8 64 89 02 b8
+> RSP: 002b:00007ffc337cbd88 EFLAGS: 00000246 ORIG_RAX: 00000000000000a6
+> RAX: 0000000000000000 RBX: 00007efe38813d7d RCX: 00007efe38790a77
+> RDX: 0000000000000000 RSI: 0000000000000009 RDI: 00007ffc337cbe40
+> RBP: 00007ffc337cbe40 R08: 0000000000000000 R09: 0000000000000000
+> R10: 00000000ffffffff R11: 0000000000000246 R12: 00007ffc337cced0
+> R13: 00007efe38813d7d R14: 0000000000067345 R15: 00007ffc337ccf10
+>  </TASK>
+> 
+> 
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> 
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+> 
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
+> 
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+> 
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+> 
+> If you want to undo deduplication, reply with:
+> #syz undup
 
-On Thu, Dec 18, 2025 at 5:29=E2=80=AFPM Jens Wiklander
-<jens.wiklander@linaro.org> wrote:
->
-> On Thu, Dec 18, 2025 at 2:53=E2=80=AFPM Alexandre Belloni
-> <alexandre.belloni@bootlin.com> wrote:
-> >
-> > On 18/12/2025 08:21:27+0100, Jens Wiklander wrote:
-> > > Hi,
-> > >
-> > > On Mon, Dec 15, 2025 at 3:17=E2=80=AFPM Uwe Kleine-K=C3=B6nig
-> > > <u.kleine-koenig@baylibre.com> wrote:
-> > > >
-> > > > Hello,
-> > > >
-> > > > the objective of this series is to make tee driver stop using callb=
-acks
-> > > > in struct device_driver. These were superseded by bus methods in 20=
-06
-> > > > (commit 594c8281f905 ("[PATCH] Add bus_type probe, remove, shutdown
-> > > > methods.")) but nobody cared to convert all subsystems accordingly.
-> > > >
-> > > > Here the tee drivers are converted. The first commit is somewhat
-> > > > unrelated, but simplifies the conversion (and the drivers). It
-> > > > introduces driver registration helpers that care about setting the =
-bus
-> > > > and owner. (The latter is missing in all drivers, so by using these
-> > > > helpers the drivers become more correct.)
-> > > >
-> > > > v1 of this series is available at
-> > > > https://lore.kernel.org/all/cover.1765472125.git.u.kleine-koenig@ba=
-ylibre.com
-> > > >
-> > > > Changes since v1:
-> > > >
-> > > >  - rebase to v6.19-rc1 (no conflicts)
-> > > >  - add tags received so far
-> > > >  - fix whitespace issues pointed out by Sumit Garg
-> > > >  - fix shutdown callback to shutdown and not remove
-> > > >
-> > > > As already noted in v1's cover letter, this series should go in dur=
-ing a
-> > > > single merge window as there are runtime warnings when the series i=
-s
-> > > > only applied partially. Sumit Garg suggested to apply the whole ser=
-ies
-> > > > via Jens Wiklander's tree.
-> > > > If this is done the dependencies in this series are honored, in cas=
-e the
-> > > > plan changes: Patches #4 - #17 depend on the first two.
-> > > >
-> > > > Note this series is only build tested.
-> > > >
-> > > > Uwe Kleine-K=C3=B6nig (17):
-> > > >   tee: Add some helpers to reduce boilerplate for tee client driver=
-s
-> > > >   tee: Add probe, remove and shutdown bus callbacks to tee_client_d=
-river
-> > > >   tee: Adapt documentation to cover recent additions
-> > > >   hwrng: optee - Make use of module_tee_client_driver()
-> > > >   hwrng: optee - Make use of tee bus methods
-> > > >   rtc: optee: Migrate to use tee specific driver registration funct=
-ion
-> > > >   rtc: optee: Make use of tee bus methods
-> > > >   efi: stmm: Make use of module_tee_client_driver()
-> > > >   efi: stmm: Make use of tee bus methods
-> > > >   firmware: arm_scmi: optee: Make use of module_tee_client_driver()
-> > > >   firmware: arm_scmi: Make use of tee bus methods
-> > > >   firmware: tee_bnxt: Make use of module_tee_client_driver()
-> > > >   firmware: tee_bnxt: Make use of tee bus methods
-> > > >   KEYS: trusted: Migrate to use tee specific driver registration
-> > > >     function
-> > > >   KEYS: trusted: Make use of tee bus methods
-> > > >   tpm/tpm_ftpm_tee: Make use of tee specific driver registration
-> > > >   tpm/tpm_ftpm_tee: Make use of tee bus methods
-> > > >
-> > > >  Documentation/driver-api/tee.rst             | 18 +----
-> > > >  drivers/char/hw_random/optee-rng.c           | 26 ++----
-> > > >  drivers/char/tpm/tpm_ftpm_tee.c              | 31 +++++---
-> > > >  drivers/firmware/arm_scmi/transports/optee.c | 32 +++-----
-> > > >  drivers/firmware/broadcom/tee_bnxt_fw.c      | 30 ++-----
-> > > >  drivers/firmware/efi/stmm/tee_stmm_efi.c     | 25 ++----
-> > > >  drivers/rtc/rtc-optee.c                      | 27 ++-----
-> > > >  drivers/tee/tee_core.c                       | 84 ++++++++++++++++=
-++++
-> > > >  include/linux/tee_drv.h                      | 12 +++
-> > > >  security/keys/trusted-keys/trusted_tee.c     | 17 ++--
-> > > >  10 files changed, 164 insertions(+), 138 deletions(-)
-> > > >
-> > > > base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
-> > > > --
-> > > > 2.47.3
-> > > >
-> > >
-> > > Thank you for the nice cleanup, Uwe.
-> > >
-> > > I've applied patch 1-3 to the branch tee_bus_callback_for_6.20 in my
-> > > tree at https://git.kernel.org/pub/scm/linux/kernel/git/jenswi/linux-=
-tee.git/
-> > >
-> > > The branch is based on v6.19-rc1, and I'll try to keep it stable for
-> > > others to depend on, if needed. Let's see if we can agree on taking
-> > > the remaining patches via that branch.
-> >
-> > 6 and 7 can go through your branch.
->
-> Good, I've added them to my branch now.
 
-This entire patch set should go in during a single merge window. I
-will not send any pull request until I'm sure all patches will be
-merged.
+Yea well
 
-So far (if I'm not mistaken), only the patches I've already added to
-next have appeared next. I can take the rest of the patches, too, but
-I need OK for the following:
+static void vhost_worker_killed(void *data)
+{
+        struct vhost_worker *worker = data;
+        struct vhost_dev *dev = worker->dev;
+        struct vhost_virtqueue *vq;
+        int i, attach_cnt = 0;
+        
+        mutex_lock(&worker->mutex);
+        worker->killed = true;
+        
+        for (i = 0; i < dev->nvqs; i++) {
+                vq = dev->vqs[i];
+        
+                mutex_lock(&vq->mutex);
+                if (worker ==
+                    rcu_dereference_check(vq->worker,
+                                          lockdep_is_held(&vq->mutex))) {
+                        rcu_assign_pointer(vq->worker, NULL);
+                        attach_cnt++;
+                }
+                mutex_unlock(&vq->mutex);
+        }
+        
+        worker->attachment_cnt -= attach_cnt;
+        if (attach_cnt)
+                synchronize_rcu();
+        /*
+         * Finish vhost_worker_flush calls and any other works that snuck in
+         * before the synchronize_rcu.
+         */ 
+        vhost_run_work_list(worker);
+        mutex_unlock(&worker->mutex);
+}
 
-Jarkko, you seem happy with the following patches
-- KEYS: trusted: Migrate to use tee specific driver registration function
-- KEYS: trusted: Make use of tee bus methods
-- tpm/tpm_ftpm_tee: Make use of tee specific driver registration
-- tpm/tpm_ftpm_tee: Make use of tee bus methods
-OK if I take them via my tree, or would you rather take them yourself?
 
-Herbert, you seem happy with the following patches
-- hwrng: optee - Make use of module_tee_client_driver()
-- hwrng: optee - Make use of tee bus methods
-OK if I take them via my tree, or would you rather take them yourself?
+taking vq mutex in a kill handler is probably not wise.
+we should have a separate lock just for handling worker
+assignment.
 
-Sudeep, you seem happy with the following patches
-- firmware: arm_scmi: optee: Make use of module_tee_client_driver()
-- firmware: arm_scmi: Make use of tee bus methods
-OK if I take them via my tree, or would you rather take them yourself?
 
-Michael, Pavan, are you OK with the following patches
-- firmware: tee_bnxt: Make use of module_tee_client_driver()
-- firmware: tee_bnxt: Make use of tee bus methods
-OK if I take them via my tree, or would you rather take them yourself?
 
-Thanks,
-Jens
 
