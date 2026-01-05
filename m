@@ -1,104 +1,315 @@
-Return-Path: <netdev+bounces-247082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A022ACF4395
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 15:48:49 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D93B9CF447A
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 16:03:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 68E933004EF5
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 14:48:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 25BE33005014
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 15:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 855652C08D5;
-	Mon,  5 Jan 2026 14:48:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71217288C2D;
+	Mon,  5 Jan 2026 15:03:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ue5F62vf";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="+yPU6Mvk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XNpSJ4bD"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8E617736;
-	Mon,  5 Jan 2026 14:48:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FD42D839B
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 15:03:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767624525; cv=none; b=lYllaFDSs7Qv1FNemLgLhiC0MqMY2mUsjcuLSoLxYW/jZLufOGCgY9uOOh8YzME9cZQ4XILUrpidE0mDgJ6P47+D5mY0edz3AHMI+H2eJ+Vo8yF9bEJZkQFFv/+FNKHCVUAvB0z+n0vnpggUpx3gzGICFJtccMlsok28EraRr/g=
+	t=1767625414; cv=none; b=Pdy2kmDay3tAIAGQY8dLJkwYXRc2txcUOxG2VRGZkT8qw344LkWm+GePrjqGoFZ7vd6gY3r2P2QTyqVecxWYEN+GQgz5JrsQeS/oEreA3qgPGSSDHnKU9DT1zNC5dnfHfbmDB24iOwJwH4XEgEM17BJkHPaVeHBtLCJ8JLTujTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767624525; c=relaxed/simple;
-	bh=D8ZDylyNaO7a1YULuB3qtg+Imwuj9iNUix8M4auAjSI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Maui3gcgyCYAf5IwmRzN6waDtsOQGKa2CMLI1oO1Hv4POZiKb5zjSWJI/5v4W0nPxEVwj6aNVpTcZgBsAW8lUAJN5sGfD3/btilboUITRxJY/oyDQQxQEiv5WSeDW/R1wXiNPXxs0OltAQJNSC3HApMgy1uMWyHZic4Yw2Q3Tu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ue5F62vf; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=+yPU6Mvk; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Mon, 5 Jan 2026 15:48:38 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1767624521;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RK1ege7lL4G3FEhJT1V+htfNNauc/205k+U2T2Cmj9o=;
-	b=ue5F62vfvt6ZfGnmKmiEWSUkM+X5yhpLERp++1iIms0aLYWdto/WPwaYW52lpK4DRnnzlA
-	cJIG9/CtescuCTLW3LEVMeUORVCla0We10fEN29cuMEJZ/j7N6jE0MYZxS7wMooouVggJ7
-	PtNYUIAlv6lB5/1M5UrbK13hU/7UKNOtQQoS8Kc6Tkq+yBcJh+YMMkie9ItbHKGYNNpY7U
-	yZZ1yAiqHSh11PD4oVgdtZtlA+K5uypZgdozwrs6He3doCYoaxKZI/g449u9PM10PxwH3l
-	c8Y2Qh1Vx0a54sjVPtM82RGAb2CoXzXeKLsSKsjk3xSSOwV732lqDfZem77MIA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1767624521;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RK1ege7lL4G3FEhJT1V+htfNNauc/205k+U2T2Cmj9o=;
-	b=+yPU6MvkityWZ4a4DJYeJbcwJo5jznELU4QSjMKh4VhISWNykdlebWlhQ359YMiWc90yeB
-	15YzfxtW5qS41RAA==
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
-	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, Arnd Bergmann <arnd@arndb.de>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	coreteam@netfilter.org
-Subject: Re: [PATCH RFC net-next 1/3] uapi: add INT_MAX and INT_MIN constants
-Message-ID: <20260105154705-2301e4f2-948f-422d-bfed-81725ac82bc8@linutronix.de>
-References: <20260105-uapi-limits-v1-0-023bc7a13037@linutronix.de>
- <20260105-uapi-limits-v1-1-023bc7a13037@linutronix.de>
- <ae78ddb2-7b5f-4d3b-adef-97b0ab363a30@lunn.ch>
+	s=arc-20240116; t=1767625414; c=relaxed/simple;
+	bh=Bqc8kf7olJFNyZ85h9R2plDas33cpQ3lvfLxu48tc5Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YyOkM2QbRq+DveujrOivYP/83npvsRZkb5lLLrWinIEw3TO/1KSPcvcNEB002qbA+TyIRxDO8gcBwOYm4Lox2uTatck/xEWq+CMJ+gkyDSjgTR9+1tIEgrVucd9OKVOea+YqapmLeuX+JvSJJAbvOkNTq3XGeGNzmmWXXgILasI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XNpSJ4bD; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-34c93e0269cso1121284a91.1
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 07:03:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767625412; x=1768230212; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pmPGbGv/+IEVWw4Vjf2YgHPxMHf7wirNG9XH5nP++64=;
+        b=XNpSJ4bDUaEDYANWNOX2fPNJXTXoUC4HN3PV083iNOJQy4Tq7eon9M+ucEmWkKzBvT
+         jdsYpSVLAMDIZ8SSoqJe88Z1GTN9iatVbhM8xc5+dKhnfBda0eljxYaWgyT1SwasgfLa
+         RTThoF3GLCNX5FiZA2guQK1d54Q64GeWUeVBgMFNF+mlF0Oo7lUn9Fbpjnd4VsDcyALe
+         KKDo9kSBcbBKDZYTXTmA5BC9qOWs3r8pKdTNkhrjzuQ5qeXNaU8b4ixHE9U+HB5C9HGC
+         hcF4unnnl2pdwkCJe2UZDSEm5euTWNfr9YxFX5uUp6NsU3epa0pRLATTgKoMxSd4XIvT
+         fq/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767625412; x=1768230212;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pmPGbGv/+IEVWw4Vjf2YgHPxMHf7wirNG9XH5nP++64=;
+        b=hxpaF0g+oNLtjlsB2+BbOASA8a6HyFco/ZQaFnuxyphFJMCyN39l1wO5BM1pqegnfx
+         RbomNbqDSDovsbbNN0AzUqY0Y6SN1SCGunVGwubfI5Q4AGjInZkvuSO4l+wMA/EibVuK
+         2yHn29LN4Vpk6Ud1dErb0M01imcUIwUAPxxbfw2IVbYGI9uGHH/v347PAl6gs+vYHfI9
+         eoUtG2H9opXnj+z+fnngNZBcyUDukAi/1TUhuENNhZmcJDjBFulJ48y4VmYrT1ksuZeA
+         X34BS6fSruK2idH+vLmCqdVqdupOEuwGvApN5E9NM3ri5xTvCyPufhc+M6J47vwA5JuF
+         FwFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVrjDNjafOyvLE4txQGIPC2BFCCDFJoripRt8xcIBHIjsOlWfEfaTQltLLuMJM8OVzaW5IHDOI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySJ7d9D8H+wXEHFvtf2C+wQkTesrB3XayS/qQq+tgghXxDjxcy
+	9C7KnnFDjsSrKqShpP58VerSFNvHM9Pw6LubVKEn+R9/4QYAbukBtbyh
+X-Gm-Gg: AY/fxX7FfPbqTJS9MxpowAjFDWY0W/WmudsibOsTgHQyTz+sDztBbvA/cso0zuhMmaz
+	+Mbq0HTe2fD9JpwGiB5rwiR7eDTygaSXOusRmTQBmv0m5tb0OIN00+2b9okw8OVV/LEMiv3yTUf
+	zcArmWg+BjabDc/Kp8kDO3kCZAHDP2BMSZ96VX3QVgnrAosRdaa3beQxYxkdIhJtxB9Em46ioNw
+	KwfR0JKF6TXJK5LEeaW2lpj8L9uptuPAppvkrqoAAkAflkdSQiz4K+UM2Ndpu9DHy8Sr5mQ7/Kz
+	ltC4pC2wPULb4x13eRj5CQJtbhbMESxxgJnlWjAZXdRT//OuhLgzy6eBoeXZGWQHQbelFwEP3S6
+	vunlY5weAt8C9MaNqgKn9uOMQU9vtikJmTEhcy8U/EZcIOyaRFJChg2YHJcYoa5diyL7Eog5dqJ
+	H35W7T1sLnQoP8nb6nhc1Y
+X-Google-Smtp-Source: AGHT+IEmHx3Qjx6Si7MPV4gjFWQocc4zknKs2BVbHtxZjrunVw6izvZH0s+aJisvVpCKFRSjQtzbMg==
+X-Received: by 2002:a17:90a:d883:b0:343:747e:2ca4 with SMTP id 98e67ed59e1d1-34f45399a2cmr5744005a91.9.1767625411847;
+        Mon, 05 Jan 2026 07:03:31 -0800 (PST)
+Received: from [192.168.0.118] ([14.187.47.150])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34f4776dff1sm6489321a91.15.2026.01.05.07.03.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Jan 2026 07:03:30 -0800 (PST)
+Message-ID: <a20950fe-455a-4c7b-b132-e8090e8d0c0f@gmail.com>
+Date: Mon, 5 Jan 2026 22:03:22 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 1/3] virtio-net: don't schedule delayed refill
+ worker
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, stable@vger.kernel.org
+References: <20260102152023.10773-1-minhquangbui99@gmail.com>
+ <20260102152023.10773-2-minhquangbui99@gmail.com>
+ <CACGkMEs9wCM8s4_r1HCQGj9mUDdTF+BqkF0rse+dzB3USprhMA@mail.gmail.com>
+ <6bac1895-d4a3-4e98-8f39-358fa14102db@gmail.com>
+ <20260104085846-mutt-send-email-mst@kernel.org>
+ <f4ac3940-d99c-4f63-bab3-cc68731fc9f1@gmail.com>
+ <20260104100912-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+In-Reply-To: <20260104100912-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ae78ddb2-7b5f-4d3b-adef-97b0ab363a30@lunn.ch>
 
-On Mon, Jan 05, 2026 at 03:37:14PM +0100, Andrew Lunn wrote:
-> On Mon, Jan 05, 2026 at 09:26:47AM +0100, Thomas Wei�schuh wrote:
-> > Some UAPI headers use INT_MAX and INT_MIN. Currently they include
-> > <limits.h> for their definitions, which introduces a problematic
-> > dependency on libc.
-> > 
-> > Add custom, namespaced definitions of INT_MAX and INT_MIN using the
-> > same values as the regular kernel code.
-> 
-> Maybe a dumb question.
-> 
-> > +#define __KERNEL_INT_MAX ((int)(~0U >> 1))
-> > +#define __KERNEL_INT_MIN (-__KERNEL_INT_MAX - 1)
-> 
-> How does this work for a 32 bit userspace on top of a 64 bit kernel?
+On 1/4/26 22:12, Michael S. Tsirkin wrote:
+> On Sun, Jan 04, 2026 at 09:54:30PM +0700, Bui Quang Minh wrote:
+>> On 1/4/26 21:03, Michael S. Tsirkin wrote:
+>>> On Sun, Jan 04, 2026 at 03:34:52PM +0700, Bui Quang Minh wrote:
+>>>> On 1/4/26 13:09, Jason Wang wrote:
+>>>>> On Fri, Jan 2, 2026 at 11:20 PM Bui Quang Minh <minhquangbui99@gmail.com> wrote:
+>>>>>> When we fail to refill the receive buffers, we schedule a delayed worker
+>>>>>> to retry later. However, this worker creates some concurrency issues
+>>>>>> such as races and deadlocks. To simplify the logic and avoid further
+>>>>>> problems, we will instead retry refilling in the next NAPI poll.
+>>>>>>
+>>>>>> Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
+>>>>>> Reported-by: Paolo Abeni <pabeni@redhat.com>
+>>>>>> Closes: https://netdev-ctrl.bots.linux.dev/logs/vmksft/drv-hw-dbg/results/400961/3-xdp-py/stderr
+>>>>>> Cc: stable@vger.kernel.org
+>>>>>> Suggested-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+>>>>>> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+>>>>>> ---
+>>>>>>     drivers/net/virtio_net.c | 55 ++++++++++++++++++++++------------------
+>>>>>>     1 file changed, 30 insertions(+), 25 deletions(-)
+>>>>>>
+>>>>>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>>>>>> index 1bb3aeca66c6..ac514c9383ae 100644
+>>>>>> --- a/drivers/net/virtio_net.c
+>>>>>> +++ b/drivers/net/virtio_net.c
+>>>>>> @@ -3035,7 +3035,7 @@ static int virtnet_receive_packets(struct virtnet_info *vi,
+>>>>>>     }
+>>>>>>
+>>>>>>     static int virtnet_receive(struct receive_queue *rq, int budget,
+>>>>>> -                          unsigned int *xdp_xmit)
+>>>>>> +                          unsigned int *xdp_xmit, bool *retry_refill)
+>>>>>>     {
+>>>>>>            struct virtnet_info *vi = rq->vq->vdev->priv;
+>>>>>>            struct virtnet_rq_stats stats = {};
+>>>>>> @@ -3047,12 +3047,8 @@ static int virtnet_receive(struct receive_queue *rq, int budget,
+>>>>>>                    packets = virtnet_receive_packets(vi, rq, budget, xdp_xmit, &stats);
+>>>>>>
+>>>>>>            if (rq->vq->num_free > min((unsigned int)budget, virtqueue_get_vring_size(rq->vq)) / 2) {
+>>>>>> -               if (!try_fill_recv(vi, rq, GFP_ATOMIC)) {
+>>>>>> -                       spin_lock(&vi->refill_lock);
+>>>>>> -                       if (vi->refill_enabled)
+>>>>>> -                               schedule_delayed_work(&vi->refill, 0);
+>>>>>> -                       spin_unlock(&vi->refill_lock);
+>>>>>> -               }
+>>>>>> +               if (!try_fill_recv(vi, rq, GFP_ATOMIC))
+>>>>>> +                       *retry_refill = true;
+>>>>>>            }
+>>>>>>
+>>>>>>            u64_stats_set(&stats.packets, packets);
+>>>>>> @@ -3129,18 +3125,18 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
+>>>>>>            struct send_queue *sq;
+>>>>>>            unsigned int received;
+>>>>>>            unsigned int xdp_xmit = 0;
+>>>>>> -       bool napi_complete;
+>>>>>> +       bool napi_complete, retry_refill = false;
+>>>>>>
+>>>>>>            virtnet_poll_cleantx(rq, budget);
+>>>>>>
+>>>>>> -       received = virtnet_receive(rq, budget, &xdp_xmit);
+>>>>>> +       received = virtnet_receive(rq, budget, &xdp_xmit, &retry_refill);
+>>>>> I think we can simply let virtnet_receive() to return the budget when
+>>>>> reill fails.
+>>>> That makes sense, I'll change it.
+>>>>
+>>>>>>            rq->packets_in_napi += received;
+>>>>>>
+>>>>>>            if (xdp_xmit & VIRTIO_XDP_REDIR)
+>>>>>>                    xdp_do_flush();
+>>>>>>
+>>>>>>            /* Out of packets? */
+>>>>>> -       if (received < budget) {
+>>>>>> +       if (received < budget && !retry_refill) {
+>>>>>>                    napi_complete = virtqueue_napi_complete(napi, rq->vq, received);
+>>>>>>                    /* Intentionally not taking dim_lock here. This may result in a
+>>>>>>                     * spurious net_dim call. But if that happens virtnet_rx_dim_work
+>>>>>> @@ -3160,7 +3156,7 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
+>>>>>>                    virtnet_xdp_put_sq(vi, sq);
+>>>>>>            }
+>>>>>>
+>>>>>> -       return received;
+>>>>>> +       return retry_refill ? budget : received;
+>>>>>>     }
+>>>>>>
+>>>>>>     static void virtnet_disable_queue_pair(struct virtnet_info *vi, int qp_index)
+>>>>>> @@ -3230,9 +3226,11 @@ static int virtnet_open(struct net_device *dev)
+>>>>>>
+>>>>>>            for (i = 0; i < vi->max_queue_pairs; i++) {
+>>>>>>                    if (i < vi->curr_queue_pairs)
+>>>>>> -                       /* Make sure we have some buffers: if oom use wq. */
+>>>>>> -                       if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
+>>>>>> -                               schedule_delayed_work(&vi->refill, 0);
+>>>>>> +                       /* If this fails, we will retry later in
+>>>>>> +                        * NAPI poll, which is scheduled in the below
+>>>>>> +                        * virtnet_enable_queue_pair
+>>>>>> +                        */
+>>>>>> +                       try_fill_recv(vi, &vi->rq[i], GFP_KERNEL);
+>>>>> Consider NAPI will be eventually scheduled, I wonder if it's still
+>>>>> worth to refill here.
+>>>> With GFP_KERNEL here, I think it's more likely to succeed than GFP_ATOMIC in
+>>>> NAPI poll. Another small benefit is that the actual packet can happen
+>>>> earlier. In case the receive buffer is empty and we don't refill here, the
+>>>> #1 NAPI poll refill the buffer and the #2 NAPI poll can receive packets. The
+>>>> #2 NAPI poll is scheduled in the interrupt handler because the #1 NAPI poll
+>>>> will deschedule the NAPI and enable the device interrupt. In case we
+>>>> successfully refill here, the #1 NAPI poll can receive packets right away.
+>>>>
+>>> Right. But I think this is a part that needs elucidating, not
+>>> error handling.
+>>>
+>>> /* Pre-fill rq agressively, to make sure we are ready to get packets
+>>>    * immediately.
+>>>    * */
+>>>
+>>>>>>                    err = virtnet_enable_queue_pair(vi, i);
+>>>>>>                    if (err < 0)
+>>>>>> @@ -3473,15 +3471,15 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
+>>>>>>                                    bool refill)
+>>>>>>     {
+>>>>>>            bool running = netif_running(vi->dev);
+>>>>>> -       bool schedule_refill = false;
+>>>>>>
+>>>>>> -       if (refill && !try_fill_recv(vi, rq, GFP_KERNEL))
+>>>>>> -               schedule_refill = true;
+>>>>>> +       if (refill)
+>>>>>> +               /* If this fails, we will retry later in NAPI poll, which is
+>>>>>> +                * scheduled in the below virtnet_napi_enable
+>>>>>> +                */
+>>>>>> +               try_fill_recv(vi, rq, GFP_KERNEL);
+>>>>> and here.
+>>>>>
+>>>>>> +
+>>>>>>            if (running)
+>>>>>>                    virtnet_napi_enable(rq);
+>>> here the part that isn't clear is why are we refilling if !running
+>>> and what handles failures in that case.
+>> You are right, we should not refill when !running. I'll move the if (refill)
+>> inside the if (running).
+> Sounds like a helper that does refill+virtnet_napi_enable
+> would be in order then?  fill_recv_aggressively(vi, rq) ?
+
+I think the helper can make the code a little more complicated. In 
+virtnet_open(), the RX NAPI is enabled in virtnet_enable_queue_pair() so 
+we need to add a flag like enable_rx. Then change the virtnet_open() to
+
+     for (i = 0; i < vi->max_queue_pairs; i++) {
+         if (i < vi->curr_queue_pairs) {
+             fill_recv_aggressively(vi, rq);
+             err = virtnet_enable_queue_pair(..., enable_rx = false);
+             if (err < 0)
+                 goto err_enable_qp;
+         } else {
+             err = virtnet_enable_queue_pair(..., enable_rx = true);
+             if (err < 0)
+                 goto err_enable_qp;
+         }
+
+     }
+
 >
-> And do we need to be careful with KERNEL in the name, in that for a 32
-> bit userspace, this is going to be 32bit max int, when in fact the
-> kernel is using 64 bit max int?
+>>>>>> -
+>>>>>> -       if (schedule_refill)
+>>>>>> -               schedule_delayed_work(&vi->refill, 0);
+>>>>>>     }
+>>>>>>
+>>>>>>     static void virtnet_rx_resume_all(struct virtnet_info *vi)
+>>>>>> @@ -3777,6 +3775,7 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
+>>>>>>            struct virtio_net_rss_config_trailer old_rss_trailer;
+>>>>>>            struct net_device *dev = vi->dev;
+>>>>>>            struct scatterlist sg;
+>>>>>> +       int i;
+>>>>>>
+>>>>>>            if (!vi->has_cvq || !virtio_has_feature(vi->vdev, VIRTIO_NET_F_MQ))
+>>>>>>                    return 0;
+>>>>>> @@ -3829,11 +3828,17 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
+>>>>>>            }
+>>>>>>     succ:
+>>>>>>            vi->curr_queue_pairs = queue_pairs;
+>>>>>> -       /* virtnet_open() will refill when device is going to up. */
+>>>>>> -       spin_lock_bh(&vi->refill_lock);
+>>>>>> -       if (dev->flags & IFF_UP && vi->refill_enabled)
+>>>>>> -               schedule_delayed_work(&vi->refill, 0);
+>>>>>> -       spin_unlock_bh(&vi->refill_lock);
+>>>>>> +       if (dev->flags & IFF_UP) {
+>>>>>> +               /* Let the NAPI poll refill the receive buffer for us. We can't
+>>>>>> +                * safely call try_fill_recv() here because the NAPI might be
+>>>>>> +                * enabled already.
+>>>>>> +                */
+>>>>>> +               local_bh_disable();
+>>>>>> +               for (i = 0; i < vi->curr_queue_pairs; i++)
+>>>>>> +                       virtqueue_napi_schedule(&vi->rq[i].napi, vi->rq[i].vq);
+>>>>>> +
+>>>>>> +               local_bh_enable();
+>>>>>> +       }
+>>>>>>
+>>>>>>            return 0;
+>>>>>>     }
+>>>>>> --
+>>>>>> 2.43.0
+>>>>>>
+>>>>> Thanks
+>>>>>
+>>>> Thanks,
+>>>> Quang Minh.
 
-'int' is always 32 bit on Linux.
-
-
-Thomas
 
