@@ -1,138 +1,175 @@
-Return-Path: <netdev+bounces-246991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFC2ACF33DC
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 12:27:23 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2EFFCF3424
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 12:31:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 57192300E42D
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 11:26:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CBCC6305FC89
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 11:28:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 239D6340DA6;
-	Mon,  5 Jan 2026 11:17:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 635CD330B26;
+	Mon,  5 Jan 2026 11:27:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fel.cvut.cz header.i=@fel.cvut.cz header.b="RWjUJ3Qf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GT8WVbMX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpx.fel.cvut.cz (smtpx.feld.cvut.cz [147.32.210.153])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538EF340A6A;
-	Mon,  5 Jan 2026 11:17:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=147.32.210.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C70C233066E
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 11:27:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767611854; cv=none; b=WY619DVf+nF0aa2uG5dBhjM5t/kzkWYJX/0jYIK35A1XU92CTloTavTy0gpxWPwKv64i1sCIUUO4PXI69EOtdDX8dryIl1askG/gMWy+6yYBcdgQtPM8a076LMcDg0tPW5zol2S2m0yQxw8Pd0HEBoVZCYMii9yE6ja44Z+V71Q=
+	t=1767612450; cv=none; b=AH61pyi34wwU1U6Ryp8+w9xeGpuN3PU9B8k9bVUQg+kSiybVoXObLWxFfTl5NUacnJtJl8HyTh2Vn8gE3Mwjw55gkXte1xNsYiFCgASyrsh9+/+QhuKZPPpk5mj2PjsbZgDPaQ5tiYRgEfR83NB8WX1xe+6H4L/wKlYOm3iAdRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767611854; c=relaxed/simple;
-	bh=TGf6Xx6EH00BglDDqkVDcwkNf66EGGQew7JsrhRqn2Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OyYjqAYaLnChhrR3oxJnlucLp4zbTbf76n9GQD983q6WczNjZovlzNajVHU2I44nD66VH1dAxDMukkBMN8YLN5fw0f7zLp11ckwFXZzbOF0OtqOvak7dhyRwZzsKFtIo9kQC0Ndh2zw1eJfiyYRty2NJAU8BLP3n29XdrePA0Sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fel.cvut.cz; spf=pass smtp.mailfrom=fel.cvut.cz; dkim=pass (2048-bit key) header.d=fel.cvut.cz header.i=@fel.cvut.cz header.b=RWjUJ3Qf; arc=none smtp.client-ip=147.32.210.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fel.cvut.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fel.cvut.cz
-Received: from localhost (unknown [192.168.200.27])
-	by smtpx.fel.cvut.cz (Postfix) with ESMTP id C40092A6C1;
-	Mon, 05 Jan 2026 12:17:21 +0100 (CET)
-X-Virus-Scanned: IMAP STYX AMAVIS
-Received: from smtpx.fel.cvut.cz ([192.168.200.2])
- by localhost (cerokez-250.feld.cvut.cz [192.168.200.27]) (amavis, port 10060)
- with ESMTP id EmTVYg8_ynXu; Mon,  5 Jan 2026 12:17:20 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fel.cvut.cz;
-	s=felmail; t=1767611840;
-	bh=39GTysQ2XB6nQtWthRK9kPEZbFJ8UXpWexiHu0yeSGc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=RWjUJ3QfZod/XZfb1byB+7qSEAmyXtkxTF9EqiI+pg0N7fufgBAbEIxwgE2x8O49t
-	 rmGRJgtyn4W+KABlLyYWPiSvxKd840fVFYwVe/DlWJhYDoDuIqPrL7VPKlo0paup1N
-	 KAC1mFeqIaTjcS4oZNXlQ1SoLGG7kgrrjUkstx0jWyMEDJKokH8635sLs0tkbgnaNk
-	 P+/880+rQjyJZ1UhFE/BDgYYjl9hkvreDH83AiLdm5aLL+wWRHJnuHx4jOnHOkH33+
-	 CSagkNsEKWnPhihEiDGvJVGw70RrhejwLzKTAeaxkhVB4CZ4+qU6+UlzK4n2+T5YmG
-	 d+cj6XouootYQ==
-Received: from fel.cvut.cz (unknown [147.32.86.152])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pisa)
-	by smtpx.fel.cvut.cz (Postfix) with ESMTPSA id CB8CD2A9CC;
-	Mon, 05 Jan 2026 12:17:19 +0100 (CET)
-From: Pavel Pisa <pisa@fel.cvut.cz>
-To: linux-can@vger.kernel.org,
-	"Marc Kleine-Budde" <mkl@pengutronix.de>,
-	David Laight <david.laight.linux@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrea Daoud <andreadaoud6@gmail.com>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Cc: Jiri Novak <jnovak@fel.cvut.cz>,
-	Ondrej Ille <ondrej.ille@gmail.com>,
-	Pavel Pisa <pisa@fel.cvut.cz>
-Subject: [PATCH v2] can: ctucanfd: fix SSP_SRC in cases when bit-rate is higher than 1 MBit.
-Date: Mon,  5 Jan 2026 12:16:20 +0100
-Message-ID: <20260105111620.16580-1-pisa@fel.cvut.cz>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1767612450; c=relaxed/simple;
+	bh=VUXdc9hwk0T2er9DTckmrZex4qeCTOgDcVRoChu5qdY=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=jIHn8Zg7aw1sDYxeQGELNVvp1m1YVkWtvbd5YQf0/wy09iRXklYRaYO7q/f8zZ9Vi4aVljXlGMmXugPP6SDF2HE7TCYJgF0Zag2Ro83GmOHHEgeRYh965Sb/aKmMT2CX0bAMiqZytVS1+c35qPyieuyDGE9QFIK+3vPSasW9hYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GT8WVbMX; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-42fb6ce71c7so11396374f8f.1
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 03:27:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767612443; x=1768217243; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2qHDzkZJACXcp+eQuf4jUc4YyVkIXXCNoOh0gjbwoPI=;
+        b=GT8WVbMXD21yXh5A1tsJXqAr0ScK130QqyKqO+2dPqIgMxTD/Frhr1f+s+nnimJ6Kv
+         bLsObw+XWNwICqT8lFmdv0l/yMEG6uAInIEd+rt1+IZ3qeQaIcUuTzBpdvGKKCYJMGDg
+         MXhA5GoI7c0KwTP3qZl4nB8nAWXj+1xsJa1EgYNfRhk8VXZQTF1Y7pi/9t8Jtaq5u9K5
+         uG6KIt/xdc3/t9IjzgOzlfMKB9DleqOCcAPJxE5kKRhDe8K9m7ic46iwr2u3ocaOVjqc
+         KJMRfl7W/FjlSyL+e/AkVd8fD6WnQu1d3egnQt8Ccyiad0RoWF6KZRmtJYioBakDHJDf
+         cG8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767612443; x=1768217243;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2qHDzkZJACXcp+eQuf4jUc4YyVkIXXCNoOh0gjbwoPI=;
+        b=apNuPTEx1bloP9nEaLXgigZBfmEPCz/jRGg/OKFpG7fFWAoMUwBdG9ipWR627p3MQ1
+         hsBMt8nOYAzE446qhn6Nh8+LAXpXoVVpxmn/zrlB1uYU6G/RyIWb7Nvfu1APRwfqga31
+         emEbghPRlyS1B8PJoH1yXWqx97gKzgTtpHYul6KJhpjwHoPLdnUZ1nIfyuvBxXFL4LR9
+         qZZp31Dq4xTmolz7Ak1r29+TfBHKGRmH8VWSzVDxlWs0g0W5fKxkyc5+SksOOzTQg9wA
+         tgr5FbgmltJdxAvw9ijvlQuJn3PN0dDutjqMANaQdLXnxkCRvLJEASdybwaCiNh8I+IK
+         mOnw==
+X-Forwarded-Encrypted: i=1; AJvYcCVMqWRaZmVRWe6ZRmcNDZq6eVqYnKlNr3oOAqKpNSDAT7/4CYqBxgy4/O9/NvImpmIEuCHmzqE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhSGq2Cn0abxpsgLkqcuW8ke+6KIT1Gcq2MlDwLkBOSm2e7kUu
+	pqpsvDw+ZjxjtNKZKXJbn1JFvpVYjTfm0ctRLqlpvKKb0HrTy91UUdma
+X-Gm-Gg: AY/fxX6PpkadFbStdX3Vftu3Q4rRAhwaM976uEVVqMJ2tjtvlgqPD4aS2OrHLHM05Ct
+	n+d1qIiAo09qeTUCzkt/eFbgT/fbIqE86yZ83n6oQ6szBXksU/nnc1PQNZn76IB8b4nONGwZ787
+	JyQgXWnsdJVc8OU83guC97anHNGALPmgBCpeXcqNGIJZkLif8yOXZgOwjE+ukIpyY4C4uCMrgW8
+	WsjGMpBSGzBFoxEJPfN0C9rLq2Pn4fI9Y6CqVogaQ7+xIRAGyBdCl+QWVbOeOQOLwS+53cFynjQ
+	TNLbBglHgxM5dQPBFZKSdnlUN7mJ6CuXw3ZrMJQvRgacS8GpTVrm3AHlymT6wVHYG9e7C5z+SZx
+	xw6MWxMgcvE0ScE6LTcnE/FLjJI+lvDZFU+dhyUq3ts47l7ge334/F+Xo361wWMwNATiGKynUYs
+	ZAmXXU3wTqxcOChUcL0kmcSe0=
+X-Google-Smtp-Source: AGHT+IEe3zf1IkKFKkWJiFRWFG2kWewA423+4tt5YeHwRg6lgVblS3TIR8XO7sEvsL2qPIhcXvtY5g==
+X-Received: by 2002:a05:6000:25ca:b0:431:5d2:4526 with SMTP id ffacd0b85a97d-4324e4c9df3mr65957051f8f.19.1767612442851;
+        Mon, 05 Jan 2026 03:27:22 -0800 (PST)
+Received: from imac ([2a02:8010:60a0:0:fc71:3122:e892:1c45])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4327791d2f3sm69505535f8f.11.2026.01.05.03.27.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 03:27:21 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Changwoo Min <changwoo@igalia.com>
+Cc: lukasz.luba@arm.com,  rafael@kernel.org,  kuba@kernel.org,
+  davem@davemloft.net,  edumazet@google.com,  pabeni@redhat.com,
+  horms@kernel.org,  lenb@kernel.org,  pavel@kernel.org,
+  kernel-dev@igalia.com,  linux-pm@vger.kernel.org,
+  netdev@vger.kernel.org,  sched-ext@lists.linux.dev,
+  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH for 6.19 4/4] PM: EM: Add dump to get-perf-domains in
+ the EM YNL spec
+In-Reply-To: <20251225040104.982704-5-changwoo@igalia.com>
+Date: Mon, 05 Jan 2026 11:19:16 +0000
+Message-ID: <m2bjj8i9xn.fsf@gmail.com>
+References: <20251225040104.982704-1-changwoo@igalia.com>
+	<20251225040104.982704-5-changwoo@igalia.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-From: Ondrej Ille <ondrej.ille@gmail.com>
+Changwoo Min <changwoo@igalia.com> writes:
 
-The Secondary Sample Point Source field has been
-set to an incorrect value by some mistake in the
-past
+> Add dump to get-perf-domains, so that a user can fetch either information
+> about a specific performance domain with do or information about all
+> performance domains with dump. The YNL spec, autogenerated files, and
+> the do implementation are updated, and the dump implementation is added.
+>
+> Suggested-by: Donald Hunter <donald.hunter@gmail.com>
+> Signed-off-by: Changwoo Min <changwoo@igalia.com>
+> ---
+>  .../netlink/specs/dev-energymodel.yaml        | 12 ++++
+>  include/uapi/linux/dev_energymodel.h          |  3 +-
+>  kernel/power/em_netlink.c                     | 58 +++++++++++++++++--
+>  kernel/power/em_netlink_autogen.c             | 16 ++++-
+>  kernel/power/em_netlink_autogen.h             |  2 +
+>  5 files changed, 82 insertions(+), 9 deletions(-)
+>
+> diff --git a/Documentation/netlink/specs/dev-energymodel.yaml b/Documentation/netlink/specs/dev-energymodel.yaml
+> index af8b8f72f722..1843e68faacf 100644
+> --- a/Documentation/netlink/specs/dev-energymodel.yaml
+> +++ b/Documentation/netlink/specs/dev-energymodel.yaml
+> @@ -47,6 +47,11 @@ attribute-sets:
+>      doc: >-
+>        Information on all the performance domains.
+>      attributes:
+> +      -
+> +        name: perf-domain-id
+> +        type: u32
+> +        doc: >-
+> +          A unique ID number for each performance domain.
+>        -
+>          name: perf-domain
+>          type: nest
+> @@ -136,6 +141,13 @@ operations:
+>        attribute-set: perf-domains
 
-  0b01 - SSP_SRC_NO_SSP - SSP is not used.
+I think this can be changed to 'perf-domain' and you could remove
+the 'perf-domains' attribute-set.
 
-for data bitrates above 1 MBit/s. The correct/default
-value already used for lower bitrates is
+>        doc: Get the list of information for all performance domains.
+>        do:
+> +        request:
+> +          attributes:
+> +            - perf-domain-id
+> +        reply:
+> +          attributes:
+> +            - perf-domain
 
-  0b00 - SSP_SRC_MEAS_N_OFFSET - SSP position = TRV_DELAY
-         (Measured Transmitter delay) + SSP_OFFSET.
+If you use 'perf-domain' then the reply attributes would be:
 
-The related configuration register structure is described
-in section 3.1.46 SSP_CFG of the CTU CAN FD
-IP CORE Datasheet.
+  reply:
+    attributes: &perf-domain-attrs
+      - pad
+      - perf-domain-id
+      - flags
+      - cpus
 
-The analysis leading to the proper configuration
-is described in section 2.8.3 Secondary sampling point
-of the datasheet.
+> +      dump:
+>          reply:
+>            attributes:
+>              - perf-domain
 
-The change has been tested on AMD/Xilinx Zynq
-with the next CTU CN FD IP core versions:
+You can then change the dump reply to be:
 
- - 2.6 aka master in the "integration with Zynq-7000 system" test
-   6.12.43-rt12+ #1 SMP PREEMPT_RT kernel with CTU CAN FD git
-   driver (change already included in the driver repo)
- - older 2.5 snapshot with mainline kernels with this patch
-   applied locally in the multiple CAN latency tester nightly runs
-   6.18.0-rc4-rt3-dut #1 SMP PREEMPT_RT
-   6.19.0-rc3-dut
+  dump:
+    reply:
+      attributes: *perf-domain-attrs
 
-The logs, the datasheet and sources are available at
+The dump reply for multiple perf domains would then look like this, no
+need for the 'perf-domains' wrapper:
 
- https://canbus.pages.fel.cvut.cz/
-
-Signed-off-by: Ondrej Ille <ondrej.ille@gmail.com>
-Signed-off-by: Pavel Pisa <pisa@fel.cvut.cz>
----
- drivers/net/can/ctucanfd/ctucanfd_base.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/can/ctucanfd/ctucanfd_base.c b/drivers/net/can/ctucanfd/ctucanfd_base.c
-index 1e6b9e3dc2fe..0ea1ff28dfce 100644
---- a/drivers/net/can/ctucanfd/ctucanfd_base.c
-+++ b/drivers/net/can/ctucanfd/ctucanfd_base.c
-@@ -310,7 +310,7 @@ static int ctucan_set_secondary_sample_point(struct net_device *ndev)
- 		}
- 
- 		ssp_cfg = FIELD_PREP(REG_TRV_DELAY_SSP_OFFSET, ssp_offset);
--		ssp_cfg |= FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x1);
-+		ssp_cfg |= FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x0);
- 	}
- 
- 	ctucan_write32(priv, CTUCANFD_TRV_DELAY, ssp_cfg);
--- 
-2.47.3
-
+[{'perf-domain-id': ...,
+  'flags': ...,
+  'cpus': [1, 2, 3]},
+ {'perf-domain-id': ...,
+  'flags': ...,
+  'cpus': [1, 2, 3]}]
 
