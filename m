@@ -1,153 +1,201 @@
-Return-Path: <netdev+bounces-246998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE6A6CF357D
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 12:48:43 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B3B0CF3566
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 12:48:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 45A7330380FD
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 11:48:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C7C723003FC5
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 11:48:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21C4D32FA34;
-	Mon,  5 Jan 2026 11:48:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B192D32863E;
+	Mon,  5 Jan 2026 11:48:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e1CPeIYq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gJVt47Yk";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="tEiLZn92"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A081333447
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 11:48:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745592F5A3E
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 11:47:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767613685; cv=none; b=SwLUgBY66UUwRP8AaHIYz7Eti3Jd1Ae3h51/aTKGj1N/D2bXVUZCIi48hn/hfBmTUT8rO8Fx5+2r2/9WRkI5c9RaE08rFfz/fkCdqg9mibAduK8A3UV2AsAqpc4x+QwKdcJvBoAnf+qd595+rLKOZPIET2axnB2ApI9dXz1FDBo=
+	t=1767613680; cv=none; b=SmnTvfv/MTsxYdthPQ5AibQa9hoyedn0GACOQebJcSrKVB+/Y0X+tMiAIZLPj6O6gXUfKIDKLl5vDUQ0j8V5mF+PV/1i6cgeMcyJ/WinsL4wsxQdBgaddQnxMrlm3E/mz897y2mNUUbHnnrvaDSNhvyow1UDJu2LimTCxtyJDYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767613685; c=relaxed/simple;
-	bh=9KuF5mVTCYqNpYTWSGEzNxM1NAUHaHIt1frKONRl/3c=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MbizIGQlFoNgFTL00UcD4Ap/dK88ymFjUjxv41LgkG15Q0aRcovLoWdTYgzb3iGjm6atV2fAcz9IoQEBvSaox5Fjwv53KAEAEKpqVWZ/2DHByTEqOFei+cwBG27IfNm3v+Q06vDg1JHjbjhuYZxWdV9XZZ6INrtkGUVs5Fkpm/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e1CPeIYq; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-47d3ffa5f33so36534025e9.2
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 03:48:03 -0800 (PST)
+	s=arc-20240116; t=1767613680; c=relaxed/simple;
+	bh=Ge4t427bDOOVbbyxmm6WKToUT86Yj4z7o+/cHmkHI+U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tvczbbyx/7R6meIxHTmCVAxqUupDSQL3dLwvlGKagmYPRxwdMoVT6yyDMqnHHBReezLnN9Vrl8kC3eu7KNQkVEG0cO1RAGDdLPb2aBSHdcQ/jfVPvBd9Zf6t55zZQfwdcmzahW87lvS33thhLlmWA7t8YGrU0IQ8YBkpogxavWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gJVt47Yk; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=tEiLZn92; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767613677;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FTq0SRVG2GhbxGwoJ2wHpDXS98n9lOz+EoWA2XjToqk=;
+	b=gJVt47YkL+6vTkuRy7dPyvSoD9jKjHAwUCSWtqHGyjwS9uDDwQWnfiMRKgWQCuBgPL3Adk
+	YGVL8dOgULWpcl5i1kktFY1oSbOooGN1S1Itjev4rv9LttXh1j6BxHDHOT/LKD133UqFU6
+	MLf6N1UomIlKLnMM9YItoRsPVZacIcc=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-532-ilM7afWHNfqRN2n7YrxWpA-1; Mon, 05 Jan 2026 06:47:56 -0500
+X-MC-Unique: ilM7afWHNfqRN2n7YrxWpA-1
+X-Mimecast-MFC-AGG-ID: ilM7afWHNfqRN2n7YrxWpA_1767613675
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-b7ce2f26824so1245310466b.1
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 03:47:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767613681; x=1768218481; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1767613675; x=1768218475; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0c7x1KuoCO36lV/cUbw2RbaoUEVJdub9OudTswrskL8=;
-        b=e1CPeIYqqLxhaGhQhEAFUgiFi3kRex4k/G1yNOl/C+sz70vye3TpgcVztmpo+9xu9K
-         RdcrHg9wGVad2cynGGGE3DQS+Npv0odgsCGBymJ+l6xRZabra0GEgoxZvpNvyznz8nKD
-         Guik2Bwd3XFgy8yqQODXasy1JepllAfWtTV+kRf1FKepERZGCx7cO+tHEX4e3V9D5fwe
-         e+snLowISA53rBynxc1JiWae22Izm42JrpLbSeYkqR0XRHoq1jn82bWm9/g/BDDqC0xi
-         eDJWWFMxkLCpLxhOm+izU6Cw5PZ0L+4GwJGwH7Kk4FHMSpAujy3+PZ5b6DHR66Wp1610
-         dkLw==
+        bh=FTq0SRVG2GhbxGwoJ2wHpDXS98n9lOz+EoWA2XjToqk=;
+        b=tEiLZn92WwFVrPmGWgHjbkHAmtFaZqjaqUvTfWi9l7wwcD3/AK1nJivx7yMTGAM81+
+         Xe2/EcWcy4ccGN919XN6wHb8nsJbgqFyk3e7Dl7ney5jdDIOWKB9yJ5TVfaXvy8bK8i4
+         kf+UwBAR5t0qaGUkhDLNlBmLd4piCTymf3biDnDYud2B7ZWGQtE0BOe9WOEo8jlk8tqb
+         FD83kVN1gvNlR3J9cbsyC/GLPvRew9Zu1HgduIeAJt0wNkBTQmfmtpyWbgdNAykqwSnd
+         rjC/07zC8CIDbt1lb5L7UkB5ZflzrU4T4/8glGqNytJS59L7wH05tQSj3xzX2dhrRJ4T
+         nAoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767613681; x=1768218481;
+        d=1e100.net; s=20230601; t=1767613675; x=1768218475;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0c7x1KuoCO36lV/cUbw2RbaoUEVJdub9OudTswrskL8=;
-        b=eOLDg5rBr2eTqLiep65FHNi+tu3h3UASkAThpDWWC0d9PySjPRjnGTVqmCgZCWb5sj
-         6Ttc4PXaoDUASm8ay7M4cW2GzUwaTWGni3EsFGgRy8oq0FUMBdfhpudUicodv0QRwI1W
-         /5BvtYO2tp8kAjZwQiOvdJ0/RpeScaj1q7eP9HWxOzXN9xVlaS/9tk56i6fgWvQjXigz
-         ks1lNyrb9OrIQqRfkOJsn2PiLjGT2GNTf1JP1CXEg7g0H8VJVWRhdCuv1cKn2DE/mIRM
-         1BLXaQn3DWy/v8RW/+/pixP2n5K7cb2d6LQ2CusS7ZhLHmCUWlbQx0BVxBBkKrGAh7IC
-         gUJw==
-X-Gm-Message-State: AOJu0Yz4bhJRxujCcZYoKj0I5DWsVNj1zKAFdSu/J6GzB5UvNfI4r49L
-	b2XbZhgZgtHaNdPlUq2zm5nkeLqUF5A38pre1rV1kG8bj8lJCrIqnbkk+QaTTy9L
-X-Gm-Gg: AY/fxX4/dmfHh8yjpc+5MElghlcmx/b6SES/onv8L8gc+b3o34C/U0G3hE4h1GoQJmc
-	07P6Rx53StT67564OLNHbyO/GdjqhIyUSOAXk71kQ2sfuUMoMnzQ8WBPV68qtLE/PQvqFOeFIjO
-	98YrYo7uWTK8LJt7PepyEb876pGUpnWEWhYkyzT4un8p8W3bv54jq4UL7DWl9kNdYywN2TFG8yA
-	p52th8cB8I996GlL82EpeP4PMgAVLwOCzgjiVaSi6fmUerS6DkYYYeQIWmzTjNZF5Fy5ooQb0uc
-	dGKk0zL6f5a/rLgc+w4XUqrXGNm4htUb5wyW3Js5uDOl8cMBDpDgcGNC2T5yPm3Vk6MI6I6zw5+
-	Nl6YuTMRNld9JWmD4cM59tQEBC33CulSWOHFFhygbs13CMjv1o6qbkGMcgScRbG7oiXboMwx4f9
-	Ag
-X-Google-Smtp-Source: AGHT+IHKI7pXBundH6Aldzu3XpW85g+I64MiD5fidXc/xSwpMM10ybpQYDIOpGVHUtF2nmtmcb5RbA==
-X-Received: by 2002:a05:600c:310c:b0:46e:32dd:1b1a with SMTP id 5b1f17b1804b1-47d1953b941mr483080275e9.7.1767613681409;
-        Mon, 05 Jan 2026 03:48:01 -0800 (PST)
-Received: from wdesk. ([5.213.159.39])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d6ba7090esm56459345e9.7.2026.01.05.03.47.58
+        bh=FTq0SRVG2GhbxGwoJ2wHpDXS98n9lOz+EoWA2XjToqk=;
+        b=rGLnkSjR/zjpZHKYfAJ1VT3dpgtpB8uX2Tkgp1PuL78gDCAUpnJGYJnXd0VIX5vuAI
+         O+WvpCanoI8rgffk2pNXIskYXw4iWmkv7oCRWOe0sjoiGJl/7aM6pi1LA2HDlFdRS13j
+         nK2i1CVDsm66OATp5gEO9dpsExCPt81vtvEsIn5QeHcvWYyGMFx8Z8XpHTGTCOfvKqE2
+         Hf91KgP/0S7qH6g00cjSDlqeFsonVckljyp6iq2tgrGP2UfvUsModjELpxDuYulvq/PB
+         Jie1s2e0O0/47k8mwtCPlM8ZmATnW6dRnapLrzCQoz6jG/nBQcEgbHluAJe5u5S+XHEk
+         NdSg==
+X-Forwarded-Encrypted: i=1; AJvYcCUZOXkTxaoLU++uLYojcvjIskFxUSQpPC+cS6usef5SemNAsdWOkSgvZ08JXEBfSBpO5F9p6rE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxq9Wwu7JHNLywIOxOD7izg7JOrnK+hf8+GKIXzXgTI4LQ492oq
+	DgWfE8Wd/tQ86Gl+8FuackDPVmPvwWDuRHdbYviujvafRvezg4Gj9fUgo1fLGTd1pgrxFT9jlCX
+	OuHODR31yvaQ0x1z6wjvnncHzpQ8/sV06r6ySmd15a9XjyUzGQwYa39k0zw==
+X-Gm-Gg: AY/fxX6O60LT5xwSkXon/ITDjX5ZuCEL7XVGlRkvocht0a+imtgIthaNxO2O9w42a5K
+	ddmiSjX6iVLXHzdPOk6QjlYbfXGlUDynxIO0Br5gGJdFzn7Q6Ke1rv7Kp4FG2LTdjnCJd4wjZRq
+	hOrd0UB1hrhqUSa2g/lFp/NPuobJQ3Z/AglzIzTIFqdMKSrQwqZXlVymI3Dxoa8oRnBbWSz6/wV
+	x7oezFb7oBS9QvUHvE6tpR2QbM/trRbcNA63YiuSihFL33PzBQp6ZIJGNklZMwzp1k+KZsyoqGt
+	Lv+YCFBexJ0ARaj5AOlX1tdtjclFNNkzEsp9MSoXh9ABmyKyppMxBwBcIGC//6hNSFFrrKqiZet
+	DQfWTkfLwmzxLU0myHifdrnfB5prXg+oknRKb
+X-Received: by 2002:a17:907:cb09:b0:b83:8fc:c64b with SMTP id a640c23a62f3a-b8308fcf401mr2519598166b.38.1767613674990;
+        Mon, 05 Jan 2026 03:47:54 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFOO1wGyvAPubPA3xIUEgRxLSshivKNVRBI838uDhukv4Vv0lIJ9Qr6trIs7oNMz6CK4yHlTQ==
+X-Received: by 2002:a17:907:cb09:b0:b83:8fc:c64b with SMTP id a640c23a62f3a-b8308fcf401mr2519595466b.38.1767613674496;
+        Mon, 05 Jan 2026 03:47:54 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8037a5bdfesm5519158466b.10.2026.01.05.03.47.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 03:48:00 -0800 (PST)
-From: Mahdi Faramarzpour <mahdifrmx@gmail.com>
-To: netdev@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	Mahdi Faramarzpour <mahdifrmx@gmail.com>
-Subject: [PATCH net-next] udp: add drop count for packets in udp_prod_queue
-Date: Mon,  5 Jan 2026 15:17:32 +0330
-Message-Id: <20260105114732.140719-1-mahdifrmx@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Mon, 05 Jan 2026 03:47:53 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 1E9E3407E7D; Mon, 05 Jan 2026 12:47:53 +0100 (CET)
+From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Cc: Yinhao Hu <dddddd@hust.edu.cn>,
+	Kaiyan Mei <M202472210@hust.edu.cn>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH bpf 1/2] bpf, test_run: Subtract size of xdp_frame from allowed metadata size
+Date: Mon,  5 Jan 2026 12:47:45 +0100
+Message-ID: <20260105114747.1358750-1-toke@redhat.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This commit adds SNMP drop count increment for the packets in
-per NUMA queues which were introduced in commit b650bf0977d3
-("udp: remove busylock and add per NUMA queues").
+The xdp_frame structure takes up part of the XDP frame headroom,
+limiting the size of the metadata. However, in bpf_test_run, we don't
+take this into account, which makes it possible for userspace to supply
+a metadata size that is too large (taking up the entire headroom).
 
-Signed-off-by: Mahdi Faramarzpour <mahdifrmx@gmail.com>
+If userspace supplies such a large metadata size in live packet mode,
+the xdp_update_frame_from_buff() call in xdp_test_run_init_page() call
+will fail, after which packet transmission proceeds with an
+uninitialised frame structure, leading to the usual Bad Stuff.
+
+The commit in the Fixes tag fixed a related bug where the second check
+in xdp_update_frame_from_buff() could fail, but did not add any
+additional constraints on the metadata size. Complete the fix by adding
+an additional check on the metadata size. Reorder the checks slightly to
+make the logic clearer and add a comment.
+
+Link: https://lore.kernel.org/r/fa2be179-bad7-4ee3-8668-4903d1853461@hust.edu.cn
+Fixes: b6f1f780b393 ("bpf, test_run: Fix packet size check for live packet mode")
+Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
+Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
+Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
 ---
- net/ipv4/udp.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+ net/bpf/test_run.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index ffe074cb5..19ab44e46 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -1709,6 +1709,11 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
- 	int dropcount;
- 	int nb = 0;
+diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+index 655efac6f133..e6c0ad204b92 100644
+--- a/net/bpf/test_run.c
++++ b/net/bpf/test_run.c
+@@ -1294,8 +1294,6 @@ int bpf_prog_test_run_xdp(struct bpf_prog *prog, const union bpf_attr *kattr,
+ 			batch_size = NAPI_POLL_WEIGHT;
+ 		else if (batch_size > TEST_XDP_MAX_BATCH)
+ 			return -E2BIG;
+-
+-		headroom += sizeof(struct xdp_page_head);
+ 	} else if (batch_size) {
+ 		return -EINVAL;
+ 	}
+@@ -1308,16 +1306,26 @@ int bpf_prog_test_run_xdp(struct bpf_prog *prog, const union bpf_attr *kattr,
+ 		/* There can't be user provided data before the meta data */
+ 		if (ctx->data_meta || ctx->data_end > kattr->test.data_size_in ||
+ 		    ctx->data > ctx->data_end ||
+-		    unlikely(xdp_metalen_invalid(ctx->data)) ||
+ 		    (do_live && (kattr->test.data_out || kattr->test.ctx_out)))
+ 			goto free_ctx;
+-		/* Meta data is allocated from the headroom */
+-		headroom -= ctx->data;
  
-+	struct {
-+		int mem4;
-+		int mem6;
-+	} err_count = { 0, 0 };
+ 		meta_sz = ctx->data;
++		if (xdp_metalen_invalid(meta_sz) || meta_sz > headroom - sizeof(struct xdp_frame))
++			goto free_ctx;
 +
- 	rmem = atomic_read(&sk->sk_rmem_alloc);
- 	rcvbuf = READ_ONCE(sk->sk_rcvbuf);
- 	size = skb->truesize;
-@@ -1760,6 +1765,10 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
- 		total_size += size;
- 		err = udp_rmem_schedule(sk, size);
- 		if (unlikely(err)) {
-+			if (skb->protocol == htons(ETH_P_IP))
-+				err_count.mem4++;
-+			else
-+				err_count.mem6++;
- 			/*  Free the skbs outside of locked section. */
- 			skb->next = to_drop;
- 			to_drop = skb;
-@@ -1797,10 +1806,18 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
- 			skb = to_drop;
- 			to_drop = skb->next;
- 			skb_mark_not_on_list(skb);
--			/* TODO: update SNMP values. */
- 			sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_PROTO_MEM);
- 		}
- 		numa_drop_add(&udp_sk(sk)->drop_counters, nb);
-+
-+		SNMP_ADD_STATS(__UDPX_MIB(sk, true), UDP_MIB_MEMERRORS,
-+			       err_count.mem4);
-+		SNMP_ADD_STATS(__UDPX_MIB(sk, true), UDP_MIB_INERRORS,
-+			       err_count.mem4);
-+		SNMP_ADD_STATS(__UDPX_MIB(sk, false), UDP_MIB_MEMERRORS,
-+			       err_count.mem6);
-+		SNMP_ADD_STATS(__UDPX_MIB(sk, false), UDP_MIB_INERRORS,
-+			       err_count.mem6);
++		/* Meta data is allocated from the headroom */
++		headroom -= meta_sz;
+ 		linear_sz = ctx->data_end;
  	}
  
- 	atomic_sub(total_size, &udp_prod_queue->rmem_alloc);
++	/* The xdp_page_head structure takes up space in each page, limiting the
++         * size of the packet data; add the extra size to headroom here to make
++         * sure it's accounted in the length checks below, but not in the
++         * metadata size check above.
++         */
++        if (do_live)
++		headroom += sizeof(struct xdp_page_head);
++
+ 	max_linear_sz = PAGE_SIZE - headroom - tailroom;
+ 	linear_sz = min_t(u32, linear_sz, max_linear_sz);
+ 
 -- 
-2.34.1
+2.52.0
 
 
