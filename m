@@ -1,195 +1,154 @@
-Return-Path: <netdev+bounces-246911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FA0CCF25B2
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 09:18:48 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2E7ACF25A6
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 09:17:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5E4583024895
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 08:16:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4D27B3002D42
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 08:17:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4A9F30F53B;
-	Mon,  5 Jan 2026 08:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA59631283B;
+	Mon,  5 Jan 2026 08:17:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="hdTqEWRZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out162-62-57-210.mail.qq.com (out162-62-57-210.mail.qq.com [162.62.57.210])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D0630FC3E
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 08:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5855310655;
+	Mon,  5 Jan 2026 08:17:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767600471; cv=none; b=qOrG54dGO+pCzy1yYmXNIysNQAe7VPKFfwkc0HZTioYuYH6pCl3fSPzoeeLAhdEIfzUpFY5DioZA/eiaJfPcUFf8DlZ4atJeMcFSwSBnw4TAFuFZZyqR/CovEpdCFWqn1x6zoVC5L96fTqXt1/rFIqQpOZf7xGuWSzthmbftM30=
+	t=1767601060; cv=none; b=aQ53LYWP4fE6ryzo4+AqImlDQjZqZh8Blbx9gtXWDDKFm1tp/viRXIn3hvwrqHkFEKMsprGRBA8TPZA13jf+9uALkMphTi3XoFRjGVFjgOIVTKAFhrZz6TixTW+J6CrO5pFWxrl1DjM0Y7tjtmnSxnB0rthGIsKjHknb8XXHIBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767600471; c=relaxed/simple;
-	bh=+1bctg667aRanH1CShcLTh9m+oXKRz4xIo67q69BeDI=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=MPDg8583NHHw8zPDYiq7Jv/Q3aScO/2rzIvzJhOTAoDxo5tMdYAKeks+El27vntFVwVrP3alV0ugmup62VROR3eXs00+ycO1PTpc8izleNc+u8rt1+XeMR5ix/PGT36AbFBMJSEgQfBf3tFoIx+PgDtBmSGT97Awp6VwSaXck0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-656bc3a7ab3so27885767eaf.2
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 00:07:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767600469; x=1768205269;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8Q7bwXe1w82Wbe5GH1+5+rvT/qd3jtUecI7tiDnQ/ow=;
-        b=I5Jtil0nX5hIovng+8GQi0i8y8MpW/lFS6WneFS4AotioRN2HONwuApk7ZKKdPXUui
-         WnKEFUMXsJe/3IgNQyB5Ikwiir5aULn29rIZl+188i2jf+KWbsbIH1GV3Jkon314k5Ux
-         20tydJ4xR8v71AleLqVG8opo0qGMHQhCQkAsgT97tSwh8lYFiKxuYnlLlsqhvnRPbhdl
-         rh2cRzresA+mype2+pTgZr3QAr+Qy7851H6sCL2KIJzKef8agQ1Bq8ffhJsdquCvtg/r
-         Ulsst1qj3gFeFnIthW+vtU6ZGwxCpmS5pcnOt5E93z+HjuzM/vIbdr+olS87mvdLVj14
-         n+qw==
-X-Forwarded-Encrypted: i=1; AJvYcCUx4FmlpLSSiPGP4SPYHpPJ95Zc2j1p+wOXIY8qD4sJVzjk9Kl8BVkThy1SNf977GnhPi4e5Bo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDcWwqXVCNjYFMwDv8RNnZCr2N4TC+olSQDT86WiI34VTZQCK4
-	BHjgLtW5rbUOibjodbtHoDUzLz4d6pAr35qHe1p2POuHPTR9Gk69QUc1AXWA+Klvs21JyoHLPty
-	nXv3AOOH5v0XSOonUIZwxvyeUW+2J1D67v9//rQrDOnXpa64v1zdGnWNyFMw=
-X-Google-Smtp-Source: AGHT+IHsyixyzn5IdlKAFnH9GWXwAiEi58bpyJL4eqyfKJMQEi2gywweYz0HPc0BgLUHpxiWmUYf5OBBb1BhWlrgYrAdMnant7Z/
+	s=arc-20240116; t=1767601060; c=relaxed/simple;
+	bh=zKb6CEYkVPozCJjHj/3qRQAdm4aEU4Yi0el+RO9isVI=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=NZwJWr9FRCpUHuLi0k8N/HQ97QMZcy5NQAokSns5c+MhrY5gQRmrd2VOnzp6GnXKv0TtRCByKVRhXkJ10jGi9ZYfBoKBlPstQo0fj+wlHO8ZtQP8oUPn/k4tkI6UvSzKR+7h3J/Gss5+VNxnpw7GgnQMN5KEg1TTxQUQXV7yd8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=hdTqEWRZ; arc=none smtp.client-ip=162.62.57.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1767601049; bh=q8PYrconV/pGJiTnOLgaKM2tzH4gfcBembmmbwnpvAg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=hdTqEWRZZWPDJwd3bZ2B0A7tSviL085doleiZq9OnhhTf584ryjuvVTtVm08gs58H
+	 BgOUn0GfPZbCg3C83HXjOHDI88rD0fzkiHVA822lU0DgkJkVP2G/q6xvKuDcEJJzsr
+	 LFSwVZb8zXDZ6ypIp+skuDsg1ZuXezvu5uy0p7Fk=
+Received: from localhost.localdomain ([61.144.111.35])
+	by newxmesmtplogicsvrszc41-0.qq.com (NewEsmtp) with SMTP
+	id 45A9DAB2; Mon, 05 Jan 2026 16:17:26 +0800
+X-QQ-mid: xmsmtpt1767601046tk0l7qgbj
+Message-ID: <tencent_D4B501852276CE87F53409B3B5F3C9E1AD05@qq.com>
+X-QQ-XMAILINFO: NmRjDopJZVxOiiFfNjyLDiYDUwlNR5+8OwxpXYAXJbW8qwmg8vv2SEkbkJsbX2
+	 wYqNjcF+OIx010iKB4ApHEReDpa+28vnTwSdNNr7co7vFj0pZWfIjedNG2bv/niz++w+2PG1QAgH
+	 a5F7455f7z7shUrT/1eXFFuvA+scWhR+jOHw74V1ISIIz23jOnRnVvjU4Tg4bfhh0GhEUVaGmwAx
+	 HegTb2zFKG1F+HMUp/boF/OX2mlgP+kGOz7MBVygSUki+zQ/BxbKb4m3e/pBKSye54CKsnK766bd
+	 ejjwJJjXwToCkcw3+d8U26jy5HSmnhiLyMIW/bTMEQJZkTCKPcBkuQHD3OHCL9nop8F8tZXh4DNW
+	 EDrx060/F5WTGGvlRBInzlPTnQCPInk6RpnEGoKx8wBuBOLeNzRAoclXVHdpmYOBEzOwdnnYZ5Gv
+	 77dWhxFUuag4y73dX4pv0VrUPDrzdEguIzbRntAzGUvgKWeTcEj06l+jQAUc07DFy0k/oiYBnQMy
+	 +8hlip++5/uG/Q2G0op1UE1oo/1fOgEDZooj28h088gef8dLeMRe/+Lm+svomIwmp0MS7V81XQd/
+	 6OPiAym5XNua3KHtIb79qqx0GEOiy5aB6bwNi3IZDPLUv90puw/D10o6RXtCG2UEiKNHZUVNOF/X
+	 HGzGSrfb2PZkbmZ4Rkez9r1KCvysaPgDc72h7v+dVEhsTHsMGlJBhTLgvlB0BgGnZ9/5Vzk1bKVG
+	 YyJUZGY2BtJrtsQMb45NiQj62zTwb6BaIKliw0zD5NP9ymZr9IAWEbIMLiIQwYbuXPpwXIsFHx37
+	 WU0HMaafcpEJZp+9x/O0I17FIL/BHvwco02yjb9wQ1DYi3eKtDgb2OKTC6sjIX0apq0Koz80h96O
+	 14hMnrF+d9DgO+JmrMYdhGLF5CQqcs3KLm/lVuFBErZr+Rp5aBYvUQeAatwsRT+6OYgW3w0kSctA
+	 BTq+dA/9+DRpd4qhW3E94UdCENLAlE14L4RbidLowwkX/Z3g/CTQuX9njzVNUC5s6JS45iVzElzW
+	 vYigj4ttrJr3eTlxx5VuwSbYaPOV3+sam5dZ/3Ynaz5xHB/haL
+X-QQ-XMRINFO: MPJ6Tf5t3I/ylTmHUqvI8+Wpn+Gzalws3A==
+From: wujing <realwujing@qq.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Vlastimil Babka <vbabka@suse.cz>
+Cc: Matthew Wilcox <willy@infradead.org>,
+	Lance Yang <lance.yang@linux.dev>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Brendan Jackman <jackmanb@google.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Zi Yan <ziy@nvidia.com>,
+	linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Qiliang Yuan <yuanql9@chinatelecom.cn>,
+	wujing <realwujing@qq.com>
+Subject: [PATCH v2 0/1] mm/page_alloc: dynamic min_free_kbytes adjustment
+Date: Mon,  5 Jan 2026 16:17:19 +0800
+X-OQ-MSGID: <20260105081720.1308764-1-realwujing@qq.com>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <tencent_C5AD9528AAB1853E24A7DC98A19D700E3808@qq.com>
+References: <tencent_C5AD9528AAB1853E24A7DC98A19D700E3808@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:442:b0:65f:1ab0:cdca with SMTP id
- 006d021491bc7-65f1ab0d383mr3332697eaf.1.1767600469011; Mon, 05 Jan 2026
- 00:07:49 -0800 (PST)
-Date: Mon, 05 Jan 2026 00:07:48 -0800
-In-Reply-To: <20260104162350.347403-1-kafai.wan@linux.dev>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <695b7154.050a0220.a1b6.039c.GAE@google.com>
-Subject: [syzbot ci] Re: bpf, test_run: Fix user-memory-access vulnerability
- for LIVE_FRAMES
-From: syzbot ci <syzbot+ci232191c023a10d57@syzkaller.appspotmail.com>
-To: aleksander.lobakin@intel.com, andrii@kernel.org, ast@kernel.org, 
-	bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net, 
-	dddddd@hust.edu.cn, dzm91@hust.edu.cn, eddyz87@gmail.com, edumazet@google.com, 
-	haoluo@google.com, hawk@kernel.org, horms@kernel.org, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kafai.wan@linux.dev, 
-	kpsingh@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, m202472210@hust.edu.cn, martin.lau@linux.dev, 
-	netdev@vger.kernel.org, pabeni@redhat.com, sdf@fomichev.me, shuah@kernel.org, 
-	song@kernel.org, toke@redhat.com, yonghong.song@linux.dev
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot ci has tested the following series
+This is v2 of the auto-tuning patch, addressing feedback from Andrew Morton
+and Matthew Wilcox.
 
-[v1] bpf, test_run: Fix user-memory-access vulnerability for LIVE_FRAMES
-https://lore.kernel.org/all/20260104162350.347403-1-kafai.wan@linux.dev
-* [PATCH bpf-next 1/2] bpf, test_run: Fix user-memory-access vulnerability for LIVE_FRAMES
-* [PATCH bpf-next 2/2] selftests/bpf: Add test for xdp_md context with LIVE_FRAMES in BPF_PROG_TEST_RUN
+## Responses to Andrew Morton's feedback:
 
-and found the following issue:
-BUG: missing reserved tailroom
+> "But no attempt to reduce it again after the load spike has gone away."
 
-Full report is available here:
-https://ci.syzbot.org/series/688d9198-9fed-495e-9113-3d4187428ee3
+v2 implements a decay mechanism: min_free_kbytes automatically reduces by 5%
+every 5 minutes after being increased. However, it stops at 1.2x the initial
+value rather than returning to baseline, ensuring the system "remembers"
+previous pressure patterns.
 
-***
+> "Probably this should be selectable and tunable via a kernel boot parameter
+> or a procfs tunable."
 
-BUG: missing reserved tailroom
+Per Matthew Wilcox's preference to avoid new tunables, v2 implements an
+algorithm designed to work automatically without configuration. The parameters
+(50% increase, 5% decay, 10s debounce) are chosen to be responsive yet stable.
 
-tree:      bpf-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/bpf/bpf-next.git
-base:      a069190b590e108223cd841a1c2d0bfb92230ecc
-arch:      amd64
-compiler:  Debian clang version 21.1.8 (++20251202083448+f68f64eb8130-1~exp1~20251202083504.46), Debian LLD 21.1.8
-config:    https://ci.syzbot.org/builds/3375fbfc-d3f8-45a8-8db2-62ac76ebb7b4/config
-C repro:   https://ci.syzbot.org/findings/37614d32-0f44-4a1c-9822-586c95cfeb11/c_repro
-syz repro: https://ci.syzbot.org/findings/37614d32-0f44-4a1c-9822-586c95cfeb11/syz_repro
+> "Can I suggest that you engage with [the networking people]? netdev@"
 
-------------[ cut here ]------------
-XDP_WARN: xdp_update_frame_from_buff(line:414): Driver BUG: missing reserved tailroom
-WARNING: net/core/xdp.c:618 at xdp_warn+0x1d/0x40 net/core/xdp.c:618, CPU#1: syz.0.17/5990
-Modules linked in:
-CPU: 1 UID: 0 PID: 5990 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:xdp_warn+0x25/0x40 net/core/xdp.c:618
-Code: 90 90 90 90 90 f3 0f 1e fa 41 57 41 56 53 89 d3 49 89 f6 49 89 ff e8 da 83 63 f8 48 8d 3d e3 de 70 06 4c 89 f6 89 da 4c 89 f9 <67> 48 0f b9 3a 5b 41 5e 41 5f c3 cc cc cc cc cc 66 66 2e 0f 1f 84
-RSP: 0018:ffffc90004427580 EFLAGS: 00010293
-RAX: ffffffff895fc996 RBX: 000000000000019e RCX: ffffffff8c94c7e0
-RDX: 000000000000019e RSI: ffffffff8da38c06 RDI: ffffffff8fd0a880
-RBP: 0000000000000f68 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: ffff8881b4ae3ec0
-R13: ffff8881b4ae3198 R14: ffffffff8da38c06 R15: ffffffff8c94c7e0
-FS:  000055555699b500(0000) GS:ffff8882a9a1f000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b30463fff CR3: 0000000175022000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- xdp_update_frame_from_buff include/net/xdp.h:414 [inline]
- xdp_test_run_init_page+0x482/0x590 net/bpf/test_run.c:143
- page_pool_set_pp_info net/core/page_pool.c:716 [inline]
- __page_pool_alloc_netmems_slow+0x33c/0x710 net/core/page_pool.c:631
- page_pool_alloc_netmems net/core/page_pool.c:667 [inline]
- page_pool_alloc_pages+0xe6/0x1f0 net/core/page_pool.c:675
- page_pool_dev_alloc_pages include/net/page_pool/helpers.h:96 [inline]
- xdp_test_run_batch net/bpf/test_run.c:294 [inline]
- bpf_test_run_xdp_live+0x714/0x1cf0 net/bpf/test_run.c:378
- bpf_prog_test_run_xdp+0x7d2/0x1120 net/bpf/test_run.c:1387
- bpf_prog_test_run+0x2c7/0x340 kernel/bpf/syscall.c:4698
- __sys_bpf+0x643/0x950 kernel/bpf/syscall.c:6220
- __do_sys_bpf kernel/bpf/syscall.c:6315 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:6313 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6313
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xf0/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f389319acb9
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc43c08dd8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 00007f3893405fa0 RCX: 00007f389319acb9
-RDX: 0000000000000048 RSI: 0000200000000600 RDI: 000000000000000a
-RBP: 00007f3893208bf7 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f3893405fac R14: 00007f3893405fa0 R15: 00007f3893405fa0
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	90                   	nop
-   1:	90                   	nop
-   2:	90                   	nop
-   3:	90                   	nop
-   4:	90                   	nop
-   5:	f3 0f 1e fa          	endbr64
-   9:	41 57                	push   %r15
-   b:	41 56                	push   %r14
-   d:	53                   	push   %rbx
-   e:	89 d3                	mov    %edx,%ebx
-  10:	49 89 f6             	mov    %rsi,%r14
-  13:	49 89 ff             	mov    %rdi,%r15
-  16:	e8 da 83 63 f8       	call   0xf86383f5
-  1b:	48 8d 3d e3 de 70 06 	lea    0x670dee3(%rip),%rdi        # 0x670df05
-  22:	4c 89 f6             	mov    %r14,%rsi
-  25:	89 da                	mov    %ebx,%edx
-  27:	4c 89 f9             	mov    %r15,%rcx
-* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
-  2f:	5b                   	pop    %rbx
-  30:	41 5e                	pop    %r14
-  32:	41 5f                	pop    %r15
-  34:	c3                   	ret
-  35:	cc                   	int3
-  36:	cc                   	int3
-  37:	cc                   	int3
-  38:	cc                   	int3
-  39:	cc                   	int3
-  3a:	66                   	data16
-  3b:	66                   	data16
-  3c:	2e                   	cs
-  3d:	0f                   	.byte 0xf
-  3e:	1f                   	(bad)
-  3f:	84                   	.byte 0x84
+Done - netdev@ is now CC'd on this v2 submission.
 
+## Responses to Matthew Wilcox's feedback:
 
-***
+> "Is doubling too aggressive? Would an increase of, say, 10% or 20% be more
+> appropriate?"
 
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
+v2 uses a 50% increase (compromise between responsiveness and conservatism).
+20% felt too slow for burst traffic scenarios based on our observations.
 
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+> "Do we have to wait for failure before increasing? Could we schedule the
+> increase for when we get to within, say, 10% of the current limit?"
+
+We considered proactive monitoring but concluded it would add overhead and
+complexity. The debounce mechanism (10s) ensures we don't thrash while still
+being reactive.
+
+> "Hm, how would we do that? Automatically decay by 5%, 300 seconds after
+> increasing; then schedule another decay for 300 seconds after that..."
+
+Exactly as you suggested! v2 implements this decay chain. The only addition
+is stopping at 1.2x baseline to preserve learning.
+
+> "Ugh, please, no new tunables. Let's just implement an algorithm that works."
+
+Agreed - v2 has zero new tunables.
+
+## Changes in v2:
+- Reduced aggressiveness: +50% increase instead of doubling
+- Added debounce: Only trigger once per 10 seconds to prevent storms
+- Added decay: Automatically reduce by 5% every 5 minutes
+- Preserve learning: Decay stops at 1.2x initial value, not baseline
+- Engaged networking community (netdev@)
+
+Thanks for the thoughtful reviews!
+
+wujing (1):
+  mm/page_alloc: auto-tune min_free_kbytes on atomic allocation failure
+
+ mm/page_alloc.c | 85 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 85 insertions(+)
+
+-- 
+2.39.5
+
 
