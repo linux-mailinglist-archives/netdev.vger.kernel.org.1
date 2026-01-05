@@ -1,94 +1,89 @@
-Return-Path: <netdev+bounces-247154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E153CF5178
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 18:53:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A836CF5166
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 18:53:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 96209300C37D
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 17:53:38 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E803E30090EE
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 17:53:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AFBD2FD697;
-	Mon,  5 Jan 2026 17:53:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B2D52FD697;
+	Mon,  5 Jan 2026 17:53:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gT0PyL0T"
+	dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b="IEsmvlJg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out28-195.mail.aliyun.com (out28-195.mail.aliyun.com [115.124.28.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33BA029D29F
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 17:53:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAFB22E65D;
+	Mon,  5 Jan 2026 17:52:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767635614; cv=none; b=DQAGzne6K1oEUq18PikvGXX60E9YbsEbuBaQQuo7jwgzAkX77pTGaqMgndZ78+FAuPf9odPYYYAC+Y+2FmMOeeArBdc/l3WP8Ah9BF80+fUb8vAfxuriyjlbcvDAKXCmIjGI0WLZSlNfpbqsUJio7k16PN87O98v4n7ZUgNjb7U=
+	t=1767635583; cv=none; b=sFSzhKYQGzF6Z1jaa+UZBAycpFieJaoQP9xnNkC5rVF6d2/0bJNyJndauunTL5gZTL6fx7SF70VD/6PO1BxpzJErFF7t4X9Nm9SV4jrbllKStx+iUCS/2tbsVHOuVwxvKN6fLV4744lNnE2ACaCgHldj908B3x7SXTa1FoAkHVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767635614; c=relaxed/simple;
-	bh=nABzmWxuB+rVqiUOBeWCAF53JK/C20rg+r1tYe4LRgs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=G2NKVKK9pexkOVqL5vK7c/+QZCogRxaFpgRppSys7OOLZ4DpQD/chJ9SxyXvSGJ+4tVUxSjhsbjFGJvpO590ljn1YD8pjgTnr4rZbUD1TfcT9W+2WhFRpHkbJs0qyKcVEOBYp6MEtlf+nAItWtG93YZmEMoDA8+QO/T3gbuMFik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gT0PyL0T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C33CDC116D0;
-	Mon,  5 Jan 2026 17:53:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767635613;
-	bh=nABzmWxuB+rVqiUOBeWCAF53JK/C20rg+r1tYe4LRgs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gT0PyL0Ts9zxG3PyNTFIjd9qraHbDf7L2HCeqF6t/suJWfYU7Z1XpreNvs+eBNMBT
-	 vt1EBpLZpwinFeUK6pMzKvPnI/hvfp1MICIGqeGgJb+7GlB0U+KZU7llIwfWVwBUWQ
-	 uJ2D7QOnfTq/2dpurUZeUCnv2k8Vj8ZWdntnF7KeL4ubgvR9e2imSZBmy3jn72Vu7J
-	 xWsqmAoHJNV2MuqTUVxAG2WrfIKEY3qpff1Qdn8LYTf0GRiKYDrAR7/MPZjvjjZI43
-	 oVHIpDAf03K1TPL1FvCW0gbJjuRqLwkKfvkHabUBHLyj3nMtSrjCndw0u2rlOzMHqJ
-	 tDxLB3dulHRxg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B8C7380A962;
-	Mon,  5 Jan 2026 17:50:13 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1767635583; c=relaxed/simple;
+	bh=Jo37RxW7ZeS/FnBGnolxYG37UdjVp/fjKHE41qK6t4Q=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=OEph8yRrVc/CFxwHLjlAxIXo4KY9HdL190ZdjrlZQLeKs6mEisbhrB98jypalEnHqV73xPXIwYttXWYAP5Ggf4GAYhqFCQ6wsSDOyR5Szit/ByGTWIt3KveyGZpTrPkPCpeImtsfncUeeqc0GDNBaVgV3xN/VX5Kn0wmwVXrmto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com; spf=pass smtp.mailfrom=antgroup.com; dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b=IEsmvlJg; arc=none smtp.client-ip=115.124.28.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=antgroup.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=antgroup.com; s=default;
+	t=1767635576; h=From:To:Subject:Date:Message-Id;
+	bh=N1oHDrUlpV7L/b2GZ8I+0kNj8ML9zNxhHZs4DZQ5gDM=;
+	b=IEsmvlJgvbvp6a8rBxtP4V9ujykkURybfWF4WnjAFrIhFiI6NfQmqgxek6aN5RZ1ar0TMMTfzW9TIMYF4/t6L1MZICbmncmPNFNqFjB20Ca0jPHT6BXLp+xz6PWLCRfy9PF9B82FQU3b7VUk+n992dQYqJIiu6sPvnAqhHEJzbE=
+Received: from localhost(mailfrom:fangwu.lcc@antgroup.com fp:SMTPD_---.g-aLsst_1767635575 cluster:ay29)
+          by smtp.aliyun-inc.com;
+          Tue, 06 Jan 2026 01:52:55 +0800
+From: "=?UTF-8?B?5YiY6IGq6IGqKOaWueWLvyk=?=" <fangwu.lcc@antgroup.com>
+To: edumazet@google.com,
+	ncardwell@google.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	netdev@vger.kernel.org
+Cc:  <kuniyu@google.com>,
+   <dsahern@kernel.org>,
+   <pabeni@redhat.com>,
+   <horms@kernel.org>,
+   <linux-kernel@vger.kernel.org>,
+  "=?UTF-8?B?5YiY6IGq6IGqKOaWueWLvyk=?=" <fangwu.lcc@antgroup.com>
+Subject: [PATCH net-next] tcp: fix error handling of tcp_retransmit_skb
+Date: Tue, 06 Jan 2026 01:52:54 +0800
+Message-Id: <20260105175254.2708866-1-fangwu.lcc@antgroup.com>
+X-Mailer: git-send-email 2.17.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH ethtool] ethtool: Fix declaration after label compilation
- error
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176763541204.1244814.16112254991041079076.git-patchwork-notify@kernel.org>
-Date: Mon, 05 Jan 2026 17:50:12 +0000
-References: <20251231112533.303145-1-gal@nvidia.com>
-In-Reply-To: <20251231112533.303145-1-gal@nvidia.com>
-To: Gal Pressman <gal@nvidia.com>
-Cc: mkubecek@suse.cz, c-vankar@ti.com, netdev@vger.kernel.org,
- cjubran@nvidia.com
 
-Hello:
+The tcp_retransmit_timer() function checks if tcp_retransmit_skb()
+returns a value greater than 0, but tcp_retransmit_skb() returns
+0 on success and negative error codes on failure. This means the
+error handling branch is never executed when retransmission fails.
 
-This patch was applied to ethtool/ethtool.git (master)
-by Michal Kubecek <mkubecek@suse.cz>:
+Fix this by changing the condition to check for != 0 instead of > 0.
 
-On Wed, 31 Dec 2025 13:25:33 +0200 you wrote:
-> Wrap case blocks in braces to allow variable declarations after case
-> labels, fixing C89 compilation errors:
-> 
->   am65-cpsw-nuss.c: In function 'cpsw_dump_ale':
->   am65-cpsw-nuss.c:423:4: error: a label can only be part of a statement and a declaration is not a statement
->       u32 oui_entry = cpsw_ale_get_oui_addr(ale_pos);
->       ^~~
->   am65-cpsw-nuss.c:432:4: error: a label can only be part of a statement and a declaration is not a statement
->       u32 vlan_entry_type = cpsw_ale_get_vlan_entry_type(ale_pos);
->       ^~~
-> 
-> [...]
+Signed-off-by: Liu Congcong <fangwu.lcc@antgroup.com>
+---
+ net/ipv4/tcp_timer.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Here is the summary with links:
-  - [ethtool] ethtool: Fix declaration after label compilation error
-    https://git.kernel.org/pub/scm/network/ethtool/ethtool.git/commit/?id=8e5c615a319f
-
-You are awesome, thank you!
+diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+index 160080c9021d..4fbb387e7e7b 100644
+--- a/net/ipv4/tcp_timer.c
++++ b/net/ipv4/tcp_timer.c
+@@ -624,7 +624,7 @@ void tcp_retransmit_timer(struct sock *sk)
+ 	tcp_enter_loss(sk);
+ 
+ 	tcp_update_rto_stats(sk);
+-	if (tcp_retransmit_skb(sk, tcp_rtx_queue_head(sk), 1) > 0) {
++	if (tcp_retransmit_skb(sk, tcp_rtx_queue_head(sk), 1)) {
+ 		/* Retransmission failed because of local congestion,
+ 		 * Let senders fight for local resources conservatively.
+ 		 */
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.17.0
 
 
