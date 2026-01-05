@@ -1,176 +1,188 @@
-Return-Path: <netdev+bounces-247169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32C91CF52EF
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 19:13:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02527CF5344
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 19:17:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8C38A3009680
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 18:13:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 46C19302515D
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 18:14:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E6DD321434;
-	Mon,  5 Jan 2026 18:13:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2C1F33B6DD;
+	Mon,  5 Jan 2026 18:14:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QcI2THXL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LMS0fZK+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFED729E110
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 18:13:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFB9424291E
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 18:14:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767636795; cv=none; b=EI0/mGQBO4p6qKv9DNLrS2AUK3Xt5nj0PxRXKcG/wg7L6aJpw6B8HbQSSlIMxS+jk0CLu2asu0gWwOdI6PhRdf6mkoGQ988iMi3xei7o/PgrIyKDoHLQWXeW2ld7U+G3m6o/ZkaQsw3N8L3GcVVx1IoSMe54J4T6Or3ZR/ip5zE=
+	t=1767636858; cv=none; b=U8X814vNlTc9V4TXys3Y2eQ3Vlv8F9Esnc5Cjn0Q4U7AXLEI9eDn5K2+K56/5ZGRw0uxWI1qrCmDv+NJVjeuaUEFtSTqdeMxTSReVwjqHC9abq43yRQ3OP2Y7HbMf4IrebV1TvHTuqDHN2rhF4Zf5Jy+87Nr10Hi0g8mD8hG+TE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767636795; c=relaxed/simple;
-	bh=AxsNtW7F2bFULsfvzoCdSkWwUqf03UkhpL1ZuvUARS4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FpVSgjs6TgrkGpTS6lAE23zgWJVGDZ3uuXqicflcjQ2j+u9QBK+S8RjQW43+Qu14BiHAs9EE4S0TALheFgYiZcqO/w/lAXgaSA4i1MsvEnLdr037sPV/QLFdOg3bDGV4CWw0JSJnsLjqI27dRFSCMp9oHt6BiRlliEFY/OdN/V0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QcI2THXL; arc=none smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-88a35a00506so1770836d6.2
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 10:13:13 -0800 (PST)
+	s=arc-20240116; t=1767636858; c=relaxed/simple;
+	bh=bqtNUILbm6lJat/9Xu0gpKiAI1RZvgXVDpApnTxDQMU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=phRiL+z5ujClaAAar/q1/oKkx0OzfRoJ8jqMNneFp7bgZHP7lFJATximpuKtLcUGLNPx5gxJNfraQU4jB5mJsEJv53YaNDcwSH2BN7GD8ExAbKcJRHBbX+3o03Dur6UOi2IVekF6mBZ0sXN38Hk+V2CSHvHfU5GgOMWWQu3FZgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LMS0fZK+; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-430f9ffd4e8so1027122f8f.0
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 10:14:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767636793; x=1768241593; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cVQVt6gSgy+Mn6U5bd+n6K1V0swCxotuYlZNDyyC5QY=;
-        b=QcI2THXLM5Jau8rKFQhWbsayXMJTla0JjFXo/IFCZ+wJaoYWvC+hH6Oe/dLYlg02H2
-         oOdFS0+Tj2WPwQ/sZRTBcT0H5DKXiZMMabT4a7Vd1PV2TnOPLq4kbNSmu3l3+r0VhW0L
-         7omvb3nRT2fxkLSRpEc6ixg95waowX0uL185SGlNhfUTvyaucTepjcNu+iHw6CqPfsq9
-         qM3oVRZtHRfrp/7ZTTfmgun4DRydGzMaaf7MI5XbZp6JzBY3bSNWa/heUjz5TpV3VJep
-         GRZbXufp1zPVLRgvPQ6TLIHNhTdRmBuZLd7IPO37IHC7XO/KqwDESf00aVHxe8v+908m
-         /ejg==
+        d=gmail.com; s=20230601; t=1767636855; x=1768241655; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=/oP9O+J1jrunuk+Y661pj013SgRFAFyNbhxBfEwCmlA=;
+        b=LMS0fZK+OcvnH2SLJUlfefKr5m2N44kV8AVnzvzSavD+dOeuKvn0xwu6F0AKfW3qCu
+         r3dtXyUjGdpyFV8SvoZ0RU7u05UyCyiMV4BRB2bfaCmpddUGrbgE69Slr562+ULf3FRJ
+         gXc6VFYne2jdZb+1X/fZ/NbSn+b8xRQH5a692xPH2J2PpLt0+bb28Jk01n58fdWnphLv
+         Rpx9rMXDGWlL9q5buhbwk0MlNiIeJSPDNesd1H+6s6wD0l/MIOnIekqr65xF7jOHbp2r
+         8eWPLNcRX+dPpJUuNSDEf5+Jh6MNMkSAp268mq/MykE/K6P+4gPpOPi0B4NYitH21ekf
+         9uig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767636793; x=1768241593;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=cVQVt6gSgy+Mn6U5bd+n6K1V0swCxotuYlZNDyyC5QY=;
-        b=v74ORNMIWyGYAWeK1/WxgfupNchiuTlxKp3NJcXGSkQyIUJamsMnzxl9M5R66gzAbJ
-         yvGvZIDttc6QOdE/3HfhNfyh8t12qBMWYIWrGREM7lfI+2Sjdzf1mXTj0LfnE2+hIqIa
-         /9y4XNscQ73w9bG/Oc3MIt6//jhhDi8aozhpzduAd7qyFTnLZ+8n5hzz8Kp0B2kaEdWc
-         yMxol/06Ixf20Usm8yCwp6FblCVwQq7BVPg4Z9shT83p7tNr2QfzFfj6gtDXJSg/EVTj
-         HYb8BTwQMoXRrRkdJZcasZNPbULMl1zg5q/WAmMyKd3E8YzrdQCOWV/UUXpXfNfUDRaX
-         npgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWxZ+WQU+bHKICUoFB9bIZQ981NFmbtkV/xNmBiKqOTX+fe7HRFyb4cXf0oyZijQVbTcN2hb7Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz13qseWu8xZL459+BDYUtmamnAQn7ruly5uAtna5x6Eo9trU++
-	I79QwXdgmmxcHtIxb/JMXhMwhTn6MUMqHDIGWYuLtf5RoPN4cQhdwdzxAPwpg9jwVpsdm+4HJlS
-	QDZ5I0ZsOFxF2Zu+vA44ahbzMm18qzvjSdpATPjwY
-X-Gm-Gg: AY/fxX5Iirx2WiLlikpMJWYVK8Fbxk++0eSLFC/X499tyjjXzBTdhZy4Ma4nFRrxtZR
-	fq5tZFbLJUPs+J+aL25JlNo3trEwhHg7i7ZVY9LxfbjbdXSdV1dEg6+qUk74RiXGccqBO8/SZi+
-	mTyneSISORcJuO/i3LoEPQ/57r0KhcLH/KwwjihrX5N0gyxIoXEIleTF4to+DeFmEgEga9hSN0d
-	XBXXPvGrjqrOTJ52/lwbj5pW/NpJbGGPGiRLD/L/g2MwyD5OubGpRxyb38egSyky2K5jH5A
-X-Google-Smtp-Source: AGHT+IFU4D9IUPpGO3djQTNdrDxJzdR4bRgx7H1Ci/Nj5vabK00V6Gq4wgWg6VZCAQQDo0wtcIvGBKvjiOMQvX+nSLw=
-X-Received: by 2002:a05:6214:246f:b0:889:7c5b:8134 with SMTP id
- 6a1803df08f44-89075e2a974mr7465266d6.27.1767636792454; Mon, 05 Jan 2026
- 10:13:12 -0800 (PST)
+        d=1e100.net; s=20230601; t=1767636855; x=1768241655;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/oP9O+J1jrunuk+Y661pj013SgRFAFyNbhxBfEwCmlA=;
+        b=qN/BwNoSdBeUPvUiHQa7zPigBG0d1U6GnDAL2SwvkLZBOX7OKGxNSIvvMNn4TfJzQG
+         l95TYi7KqTJGhuaqBePWl2QRitpfIotakLLu8mBS+GnSOOgmAu8EKbSru62yVFY3W673
+         eczPh6sslQL4B0CzcKOBYfufDPJrRhu4lZkK0kFkWmbgOnS1QT+mL/hVXAbTGke2IdnE
+         WG5RTgTRn16WdS5VtuRS6reUpw2EupyDFDX+XgBlnnxtWudNxKFSFjVqPlsqwaS4xHqw
+         OcXalcgMJcTMmTLzPjKEQ6OPm+G9xSEdwx+FyhzO1tTTzP80zKRxg/6coojEA4rpoILJ
+         yfKg==
+X-Forwarded-Encrypted: i=1; AJvYcCX298tjGtZU/KXmJJBeXbQTXB6sQIAHJtljEvvSvIRVea+zqwPxNuTp4/2MxCyXEJn46+4LNTo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwpQK4tqo9bTR1gFdNeUR4rtquT1d+ijBPBdE1jmBtsVjwkoVs
+	YzrXbFwXElPhnVJZd6+FDxhjIXCT4yIG1J/VAiCSiKsEEM0Pd8mC5ovp
+X-Gm-Gg: AY/fxX6U6NDH+E1acYIRc+FDdlrPZcBTGYHP5M/6Mk2QMvTm62q3ykyeiEXFFM/FWm5
+	TnsL3/zSV68hFMY4LI+xA2/vUvO2gjEjr/8Xdr0/lpR1pyntSCVwhzyRE+jKTv5xSruLG2jtSTI
+	BNcO9u4nqMkNftxj1Yq56EDcI3loac49K+BoxuYMHPE5Iawu9bRvpsD3ztJNFKvGA/Uq5RZKMOv
+	CKWDoTqXvVZ0RvLPxkwbrNb7c7jOxZp6tjXlkRUJ6ytipX6PWaAYp2Gj8hUWTJrumM0nWTQ00Ok
+	Ay0lP9jx4arpRN32JD3cpbhejY69NCfW/vLlCUUHpKfxF8y6ZgnhErHrXgQhZgEqVcPZLC4ZT2T
+	mKAa+EoaiEvivn1oyMZrFuLLR7J/7NvL/yZfIqWjRtfri1d2bzPKCQjQwig2jmoyhOKeAKchCyi
+	LuykfQCSYG17ZEg7uEZ/LKaqQlKGvVx4tsIwssLcNOEsR4s1HjvEUfHIs=
+X-Google-Smtp-Source: AGHT+IE/WbbnXt6m79lszz8chS7NFY/jLDyt4rB9ShhndFA1aa1Z8u6f+/lIFkSh4Lfi6OF6YByoxQ==
+X-Received: by 2002:a05:6000:26ce:b0:430:f3bd:71f8 with SMTP id ffacd0b85a97d-432bcfde915mr70237f8f.25.1767636855046;
+        Mon, 05 Jan 2026 10:14:15 -0800 (PST)
+Received: from eldamar.lan (c-82-192-244-13.customer.ggaweb.ch. [82.192.244.13])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bca5a132sm688291f8f.39.2026.01.05.10.14.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 10:14:14 -0800 (PST)
+Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
+Received: by eldamar.lan (Postfix, from userid 1000)
+	id 44C5FBE2EE7; Mon, 05 Jan 2026 19:14:13 +0100 (CET)
+Date: Mon, 5 Jan 2026 19:14:13 +0100
+From: Salvatore Bonaccorso <carnil@debian.org>
+To: Thorsten Leemhuis <regressions@leemhuis.info>
+Cc: Ben Hutchings <benh@debian.org>,
+	Roland Schwarzkopf <rschwarzkopf@mathematik.uni-marburg.de>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Sasha Levin <sashal@kernel.org>, debian-kernel@lists.debian.org,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Greg KH <gregkh@linuxfoundation.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	regressions@lists.linux.dev, 1124549@bugs.debian.org
+Subject: Re: [regression 5.10.y] Libvirt can no longer delete macvtap devices
+ after backport of a6cec0bcd342 ("net: rtnetlink: add bulk delete support
+ flag") to 5.10.y series (Debian 11)
+Message-ID: <aVv_dewfbbgQ5o0J@eldamar.lan>
+Mail-Followup-To: Thorsten Leemhuis <regressions@leemhuis.info>,
+	Ben Hutchings <benh@debian.org>,
+	Roland Schwarzkopf <rschwarzkopf@mathematik.uni-marburg.de>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Sasha Levin <sashal@kernel.org>, debian-kernel@lists.debian.org,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Greg KH <gregkh@linuxfoundation.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	regressions@lists.linux.dev, 1124549@bugs.debian.org
+References: <0b06eb09-b1a9-41f9-8655-67397be72b22@mathematik.uni-marburg.de>
+ <aUMEVm1vb7bdhlcK@eldamar.lan>
+ <e8bcfe99-5522-4430-9826-ed013f529403@mathematik.uni-marburg.de>
+ <176608738558.457059.16166844651150713799@eldamar.lan>
+ <d4b4a22e-c0cb-4e1f-8125-11e7a4f44562@leemhuis.info>
+ <27c249d80c346a258cfbf32f1d131ad4fe64e77c.camel@debian.org>
+ <6498cffd-5bf9-490a-910d-f64ab9b7f330@leemhuis.info>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260105175254.2708866-1-fangwu.lcc@antgroup.com>
-In-Reply-To: <20260105175254.2708866-1-fangwu.lcc@antgroup.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 5 Jan 2026 19:13:01 +0100
-X-Gm-Features: AQt7F2qJqiElSpacw9AGzXU6JMiQSC_ZhSUC0fVz1SuZF4NfyOrVY3QFG0LEMDU
-Message-ID: <CANn89i+A1FDBt70NG_VDExQTp5fzJpVMSAwngdbv-dwRPPfCqQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: fix error handling of tcp_retransmit_skb
-To: =?UTF-8?B?5YiY6IGq6IGqKOaWueWLvyk=?= <fangwu.lcc@antgroup.com>
-Cc: ncardwell@google.com, davem@davemloft.net, kuba@kernel.org, 
-	netdev@vger.kernel.org, kuniyu@google.com, dsahern@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6498cffd-5bf9-490a-910d-f64ab9b7f330@leemhuis.info>
 
-On Mon, Jan 5, 2026 at 6:53=E2=80=AFPM =E5=88=98=E8=81=AA=E8=81=AA(=E6=96=
-=B9=E5=8B=BF) <fangwu.lcc@antgroup.com> wrote:
->
-> The tcp_retransmit_timer() function checks if tcp_retransmit_skb()
-> returns a value greater than 0, but tcp_retransmit_skb() returns
-> 0 on success and negative error codes on failure.
+Hi,
 
-This seems like a bogus claim to me.
+On Mon, Jan 05, 2026 at 01:30:59PM +0100, Thorsten Leemhuis wrote:
+> @stable team and/or @net maintainers: this imho needs a judgement call
+> from your side. See below for details.
+> 
+> On 1/2/26 21:18, Ben Hutchings wrote:
+> > On Fri, 2025-12-19 at 10:19 +0100, Thorsten Leemhuis wrote:
+> >> On 12/18/25 20:50, Salvatore Bonaccorso wrote:
+> >>>
+> >>> Is there soemthing missing?
+> >>>
+> >>> Roland I think it would be helpful if you can test as well more recent
+> >>> stable series versions to confirm if the issue is present there as
+> >>> well or not, which might indicate a 5.10.y specific backporting
+> >>> problem.
+> >>
+> >> FWIW, it (as usual) would be very important to know if this happens with
+> >> mainline as well, as that determines if it's a general problem or a
+> >> backporting problem
+> > [...]
+> > 
+> > The bug is this:
+> > 
+> > - libvirtd wrongly used to use NLM_F_CREATE (0x400) and NLM_F_EXCL
+> >   (0x200) flags on an RTM_DELLINK operation.  These flags are only
+> >   semantically valid for NEW-type operations.
+> > 
+> > - rtnetlink is rather lax about checking the flags on operations, so
+> >   these unsupported flags had no effect.
+> > 
+> > - rtnetlink can now support NLM_F_BULK (0x200) on some DEL-type
+> >   operations.  If the flag is used but is not valid for the specific
+> >   operation then the operation now fails with EOPNOTSUPP.  Since
+> >   NLM_F_EXCL == NLM_F_BULK and RTM_DELLINK does not support bulk
+> >   operations, libvirtd now hits this error case.
+> > 
+> > I have not tested with mainline, but in principle the same issue should
+> > occur with any other kernel version that has commit a6cec0bcd342 "net:
+> > rtnetlink: add bulk delete support flag"
+> 
+> FWIW, merged for v5.19-rc1 and backported to v5.10.246 as 1550f3673972c5
+> End of October 2025 in parallel with 5b22f62724a0a0 ("net: rtnetlink:
+> fix module reference count leak issue in rtnetlink_rcv_msg") [v6.0-rc2],
+> which is a fix for the former.
+> 
+> > together with an older version of libvirt.
+> > 
+> > This was fixed in libvirt commit 1334002340b, which appears to have gone
+> > into version 7.1.0,
+> 
+> Could not find that commit when looking briefly, but that version was
+> released 2021-03-01.
 
-tcp_retransmit_skb() can and should return >0 in some cases.
+For reference it is this one I think:
+https://gitlab.com/libvirt/libvirt/-/commit/81334002340be6bd3a1a34c6584a85fe25cc049c
 
-Time to provide a packetdrill test I guess.
-
-   0 socket(..., SOCK_STREAM, IPPROTO_TCP) =3D 3
-   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) =3D 0
-   +0 bind(3, ..., ...) =3D 0
-   +0 listen(3, 1) =3D 0
-
-   +0 < S 0:0(0) win 32792 <mss 1000,sackOK,nop,nop,nop,wscale 7>
-   +0 > S. 0:0(0) ack 1 <mss 1460,nop,nop,sackOK,nop,wscale 8>
-
- +.02 < . 1:1(0) ack 1 win 257
-   +0 accept(3, ..., ...) =3D 4
-   // Set a 5s timeout
-   +0 setsockopt(4, SOL_TCP, TCP_USER_TIMEOUT, [5000], 4) =3D 0
-   +0 write(4, ..., 11000) =3D 11000
-   +0 > P. 1:10001(10000) ack 1
-
-// TLP
- +.04~+.05 > P. 10001:11001(1000) ack 1
-   +0 %{ assert tcpi_retransmits =3D=3D 0, tcpi_retransmits;\
-         assert tcpi_backoff     =3D=3D 0, tcpi_backoff }%
-
-   // Emulate a congestion  - no packets can get out for 3 seconds
-   // Check that we retry every 500ms (6 rounds) w/o backoff
-   +0 `tc qdisc replace dev tun0 root pfifo limit 0`
-   +3 %{ assert tcpi_retransmits =3D=3D 6, tcpi_retransmits;\
-         assert tcpi_backoff     =3D=3D 0, tcpi_backoff }%
-
-   // Congestion is now relieved - the next retry should show up some time
-   // Hopefully qdisc in the future can inform TCP right away to retry.
-   +0 `tc qdisc replace dev tun0 root pfifo limit 1000`
- +.21~+.26 > . 1:1001(1000) ack 1
- +.02 < . 1:1(0) ack 1001 win 257
-   +0 > . 1001:3001(2000) ack 1
-   // Test the recurring timeout counter is reset. The backoff counter
-   // remains one until a new RTT sample is acquired. We do not get a new
-   // RTT sample b/c the ACK acks a rtx w/o TS options
-   +0 %{ assert tcpi_retransmits =3D=3D 0, tcpi_retransmits;\
-         assert tcpi_backoff     =3D=3D 1, tcpi_backoff }%
-
-   // Emulate a longer local congestion - the next ACK should trigger
-   // more transmission but none can succeed.
-   +0 `tc qdisc replace dev tun0 root pfifo limit 0`
-   +.02 < . 1:1(0) ack 3001 win 257
-
-   // Socket has timed out after +5s of lack of progress as specified above
-   +5.1 write(4, ..., 100) =3D -1 (ETIMEDOUT)
-
-
-> This means the
-> error handling branch is never executed when retransmission fails.
->
-> Fix this by changing the condition to check for !=3D 0 instead of > 0.
->
-> Signed-off-by: Liu Congcong <fangwu.lcc@antgroup.com>
-> ---
->  net/ipv4/tcp_timer.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
-> index 160080c9021d..4fbb387e7e7b 100644
-> --- a/net/ipv4/tcp_timer.c
-> +++ b/net/ipv4/tcp_timer.c
-> @@ -624,7 +624,7 @@ void tcp_retransmit_timer(struct sock *sk)
->         tcp_enter_loss(sk);
->
->         tcp_update_rto_stats(sk);
-> -       if (tcp_retransmit_skb(sk, tcp_rtx_queue_head(sk), 1) > 0) {
-> +       if (tcp_retransmit_skb(sk, tcp_rtx_queue_head(sk), 1)) {
->                 /* Retransmission failed because of local congestion,
->                  * Let senders fight for local resources conservatively.
->                  */
-> --
-> 2.17.0
->
+Regards,
+Salvatore
 
