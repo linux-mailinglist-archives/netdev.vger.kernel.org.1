@@ -1,216 +1,207 @@
-Return-Path: <netdev+bounces-247201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57DBCCF5BA7
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 22:55:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E8111CF5BC3
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 22:56:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 89E59303C9E8
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 21:55:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A888C3033D79
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 21:56:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36EFD311975;
-	Mon,  5 Jan 2026 21:55:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4383D311973;
+	Mon,  5 Jan 2026 21:56:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="nw9SOhUQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EYjLYk6T"
 X-Original-To: netdev@vger.kernel.org
-Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012035.outbound.protection.outlook.com [52.101.48.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA2C31196F;
-	Mon,  5 Jan 2026 21:55:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.35
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767650103; cv=fail; b=Kvam77dNF8ZLx5+whQu9jpPA73SUiSj3OqensWXtmVjG9x7AsZf5H3wf2Uayyg+11rEiiAamuJ6acHgenlxqjyUqGg9db782Y6dxtRgytxCgYd3fu0tUp4Y7sn2ryDsT+ef7PBKLcrBGiWaWPKFGUye5a/tbDsVxP1f5p5ZCoLE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767650103; c=relaxed/simple;
-	bh=Ynsn4uUYgMH/VOCMLlweaqn4M5tUTAUaHtvnd7tJJEQ=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=nN95s0HMGswxc3fNaRnSZrQuM5u9Mjip8A3GEB6IbOXD0UL3tR3OPn1ug7PwRx7O3FfXqb9qp60zlipl/GLfCckLhUY9If64lbzep59P+i119/hoPOSI8dlOw6QqxYo6ya+iJb1f2Prlnqc0recjUtYd6uCcRkq+anwb7ymkYmI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=nw9SOhUQ; arc=fail smtp.client-ip=52.101.48.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=k2BHZ4Udg0bUrcgnw5qS8VVggs0q92rGnyvUVZVv2AXPsAVFMGRpOLRI+cMS5keqKanELGauskwz3lwHxmozICRmr2j7HvWq84LYlmt2kbWMWwmSg8xRDipXqBv/2dYSVf8BgfuK9iVehs6qpjK/L6vXy/Moc2U6gRzZLRNj0/2u5S7QMKE/gJecuOKymgb1IMJqdLW0GeyvykqY3I6PBIls4Do8helVUS1KBYm74Nq2jye+IaRx+9GOKxqlzGyxkOUoegnlKsbhtT5UUTTct+ajr8r+QbDgdguhf5n3y1ShALTYwi/T/Mpv56mv1TRh9z2evDICOk1/ST7jEmMhYw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nC3VV165M8Fz/EwV7stgKcy9K7tD+Nj1YaNELiMwWiY=;
- b=TUSmO9PxoN/lFVX3/ezOyD7WH14rO1sSrifoZFaVUSzHVz9X+e11skiAUyIWdO9Tbnwvr1BFNBVRFQ6bsjStqY/eMXUxqky3aKH14NB029SylB2kIE69furWrA9GzI55klpyptxHZMMboT0XGT5PwzhgR9mg0aRzm1dTCm6HsWfNIWnjC7SVAOTL36JTkW7EtJ8Dk/t8MeuvCpARCrfNZuPvlTo6qf3Zz8rP1Mium90Qcq141R+UxcEP80IB0uk9CUWqw6EDLeL7Q6COCEcnvxc8StKvDyNUfMzSmJKbRalxFS/z7CoXw3xrcb1Z2ZhCKV4jzgk17LWVrR54Ldt5Gg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nC3VV165M8Fz/EwV7stgKcy9K7tD+Nj1YaNELiMwWiY=;
- b=nw9SOhUQlZsGvqKKX4gL71c5XnNj9vnuN94OCW3DIz6qa7zDLuF8qtRrlo55EUOD3FyGWHoj45eXb2F4XKgP9/YPMWJUWvo5b1A9Xg9nk5Ksyq7qWi3+ooJK7K2tPE2/lSekomSkxlEDmYUb2qC0xtrZoOed+xEiz8Mkly11AqM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
- by SN7PR12MB8057.namprd12.prod.outlook.com (2603:10b6:806:34a::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9478.4; Mon, 5 Jan
- 2026 21:54:58 +0000
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::bfd5:ffcf:f153:636a]) by PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::bfd5:ffcf:f153:636a%5]) with mapi id 15.20.9478.004; Mon, 5 Jan 2026
- 21:54:58 +0000
-Message-ID: <bbb300d1-ccdc-4a4b-8110-1e2d27367620@amd.com>
-Date: Mon, 5 Jan 2026 13:55:10 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] atm: Fix dma_free_coherent() size
-To: Thomas Fourier <fourier.thomas@gmail.com>
-Cc: stable@vger.kernel.org, Chas Williams <3chas3@gmail.com>,
- chas williams - CONTRACTOR <chas@cmf.nrl.navy.mil>,
- "David S. Miller" <davem@davemloft.net>,
- linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260105211913.24049-2-fourier.thomas@gmail.com>
-Content-Language: en-US
-From: "Creeley, Brett" <bcreeley@amd.com>
-In-Reply-To: <20260105211913.24049-2-fourier.thomas@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR03CA0197.namprd03.prod.outlook.com
- (2603:10b6:a03:2ef::22) To PH0PR12MB7982.namprd12.prod.outlook.com
- (2603:10b6:510:28d::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DC1B3115A2
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 21:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767650205; cv=none; b=c9kJ9cZKIUp6kD+u9oYU2a76y67fqLw/gZjGZIezh1IjA16qD6UlqIC+ky6blWOPZ9jK7BqkWI3S29MC1ezKAqqbG8Wa2MnjO7jTTKKDBIbwyh1KQfOrmG98LhQ5LaDcONcKXbMs6QP7AaUCpE1l/QWLtlOUbE7XjiJkkN9lEas=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767650205; c=relaxed/simple;
+	bh=n5AEGPfY/J2s2Xsr++RQ6MPnAJKhMStGlZe2hzKbfw8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WyYKLQzSmnq02ByTUwFtCwMkciiDrJRX4vs1JiwQqazmMQAWcyIR1YzIrOFMlDVUbiS7OpIUiGuEw5k9tgMQxrG/S6BIMV+MfWdEECYUjy876iXyePn1eps77muzHPHZ0YHAdwcIGFETsTtu0l9OeA+KH66OGyBWV8NJizLc0zM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EYjLYk6T; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-4308d81fdf6so150859f8f.2
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 13:56:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767650201; x=1768255001; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wJdwe8k5Q1P9Ro2cKEv2Zqzqwu7CMlTZRcFtklLBD2I=;
+        b=EYjLYk6TyprWsplJ6AUUC1Rr/6puYbwU3EJer16kegw5r8UNpjhKQnAdosmUwuGYob
+         Wf46X9nhSXFo2ePZ2q5bKFA3aBkOnYHngF4pz2W2kg+Ivxo/xqK4P47w9nFB1ARWqhUz
+         GFlhs3bWsI86FzSCpYFLF9HwWNjyyt2szsC4/LeBxBTAfFpbiQw9J82y6FQBVwjm1DpX
+         YOkgudxDLnRKdaABAqMlc90RDrCSz7xzTD9SIC4t/IFhLq9fFfoQ1Tw7s6IYmiRbo2yy
+         l4hdAd0U6eLhnjt9zf6JSI79ecY4zjZY/ZQod18AeSaBwwr7drYnhBeJ//SRfDuCbp+P
+         azdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767650201; x=1768255001;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wJdwe8k5Q1P9Ro2cKEv2Zqzqwu7CMlTZRcFtklLBD2I=;
+        b=Tg5UGw5EeXUAX24FGdOO63Eg4PNxlqSIahkbya+HZkOHtldaOwucbFVB2evWBWf72/
+         dCqqnqUlLbls0FAeiK5MFRsNMuh8YbkXTcjzs+Lnw7fzniJGu9Z6j2Ei3O0yypfSFG33
+         Y6BMywbDgJlNN336pAXQHzM/OQrFSf/cka/balbBugbs8W/UBlpKyvMMx3W0kwO9vJ6u
+         rSYQpfueolI71iOWcqxp7NNgZ9IY9lYY2eJTwZH2FqYpF/GFQCpZggXJQaUoB4rn7jk6
+         sx8vYPzmJ4E7OuFe+b32PrUK1R8wgX/HnI6WE9R4eDQZumacI7UWt7Zc+bjSszyPVA4F
+         51Iw==
+X-Forwarded-Encrypted: i=1; AJvYcCWpiKT1Oi7Cm+iSObIQfIXLdiC0iYKvI/C+/26gkbyevmCg8Q42VX2oXLxHB1sqU3oyy0yISfM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZLDlJY2kIcRWyeG4O8von/ReAHB+9vfbXjuS6AnLSRAnBMRSZ
+	fzoCraJvshKyy6OShOfaL5deGLfIyEOOcYRIAaL2P0++38nRASeAcuwv
+X-Gm-Gg: AY/fxX5hJG2R4g6CrD0YIP0fdyQv1Y+l+j4IHXc6LdYSmkRv8gmJ6IvdxWVL1voxFmf
+	HuvyNar+TPAtDgphX03NBiOkTszBMNxwITa+0K8QUJ8JwKk7AjVlOFPLcolcLuR+WCUo6FmbPkQ
+	np3C6Ec/R8zAksbKDP87VaYxu/BGgn5Rkcrm3RFYiSpxDMqv6xQRUNDTqYTebJpaC04toe822WP
+	1qem96PJapWXXy0BL26SqjJSPenrL+nS4Db4Dh8pjqWeT1ZNhVd118OMoogBkLLYTfitgRFuKaY
+	HFVk42/kcRZP3qwq41rjxqyCCcdbVrOs4S/apQqEbicA2C88wAdELtDM1JbbFszTUHWQ8egJXt2
+	W6Rx27UoaHs6waO6IS9c8DFzck/oKilTP+MizbEJpGyfQFB0pQfVR0NXtd8BJ1wP80Zv53riK6Z
+	qdwMYwacWAy3+sWBvk8WaD1BrJg5eU6SgEwLxq8JgDLcPxPkgi9UxH4+//btmjRFU0Mlnax77Cy
+	eGmOzhb5VdbE3m3Dg==
+X-Google-Smtp-Source: AGHT+IHGWTXHufgkP5TAITSLOGuyx2/59UaIQV+tU5VX31oNq624podr7P03+PmlN9fNaGkmmRpKrQ==
+X-Received: by 2002:a05:6000:288d:b0:431:8ff:206b with SMTP id ffacd0b85a97d-432bca18e08mr1359809f8f.2.1767650201395;
+        Mon, 05 Jan 2026 13:56:41 -0800 (PST)
+Received: from [172.28.5.111] (static-qvn-qvu-073125.business.bouyguestelecom.com. [89.81.73.125])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5ee5eesm675521f8f.34.2026.01.05.13.56.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Jan 2026 13:56:41 -0800 (PST)
+Message-ID: <333ab7ce-55f4-4f19-a1a9-b3c86621e892@gmail.com>
+Date: Mon, 5 Jan 2026 22:56:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|SN7PR12MB8057:EE_
-X-MS-Office365-Filtering-Correlation-Id: 32009206-2ee1-4f4d-dfce-08de4ca5117e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?WTBsMXRvZEtOejJwL2pEZ2RSMjJYTlFTTUs2TU5ZYnVBZXJ4TzA4NHlGOXRG?=
- =?utf-8?B?dHI1SWIxRGt3Sld4M0g2cFphMDZxYktUYXRvNVJoZ2FEUm1ESDNvbHRzL2Ux?=
- =?utf-8?B?c1ZGQ1JBVWIrcU52TDI0cFRGdHlXOWl0Y0VxZUFmNTRtN2FTbmN6TGZZRTZ4?=
- =?utf-8?B?dlhmYzZxVnpUek1MU1Z1SVFqKzQ5MzNOVUFKRDBmSW4rZUhYNUpLakxkZ0dy?=
- =?utf-8?B?RWlqdmZYeFV0clJtR3lwdzhsck5xY2pkTVl3R0VjZGI0b2F5K0pRSSs2TkFD?=
- =?utf-8?B?VHJibzczUk90SmV2b3NIY3J0QTNTSmxTemZxREp3bnJ0S3gvNU1GMGV1dVRu?=
- =?utf-8?B?bDRZNVRaQmpjcWdSRnJqWXVuMVc5endLQnplc0s2cmdFRE13ZWJ4RUVKbXh1?=
- =?utf-8?B?Y0xTZVNKbkpxbXNveCtoTkg1NHZiTjRKeXdaU2hqTWFNN1JUOXV2VGt5UlUw?=
- =?utf-8?B?OXllcUM3dWVycEpFc0VGNkF6SEZ2RThxM2pkVVF1TkYxcUsvbFJnOGppMG9h?=
- =?utf-8?B?V0MxSXZMVjVDLzFOaGw5dzk4YjljUVorbE5NMU1JTmlhaU9qTlowb0hPQVp6?=
- =?utf-8?B?MGY0RHBod0hURGdrOHU1VFBTQndVU0lQbkNkbHprc2lBTmk0dTlsYnQ1L1Ri?=
- =?utf-8?B?dTEyODBUa09iZ1gvLzM3U2tpaW96VU01aWhOWE5ZQndjN1M2dkZnM0lBb3h4?=
- =?utf-8?B?SnZSSlpNSFc4OWJzYk9UQjJzSGM5WHNiWkRKUC8ydUFLbjhHamluODNsb0dJ?=
- =?utf-8?B?N2VNS0d0aDBzSGhJNWdUc2ZTNThIbHhwMDZxRTJEbUhlNDJLa09BVkZwdTM5?=
- =?utf-8?B?NXM2d1k2Q1VEdmFrdTlnSnBIeHh6UzFhelh0ZEtYQ3AvWEN6VnFvelZ4US9k?=
- =?utf-8?B?aTBGcnQ1SVJ2SnlpMHZwTnZidlZxZkpYNHpEVlEzakpncDhpWlB3bG9tUXJO?=
- =?utf-8?B?UlVDaUlkdEtKczJaR2ZHODB1OE9LM01La1BMWnRNQ2pGMWJGdVZXVGFiL01B?=
- =?utf-8?B?QW5Sa3ZldGVBRVZORmZkUTRVSnhSY1JnV1QyV1JPeFo4c3F3cXZEZU1sVktH?=
- =?utf-8?B?N2RtWWJOSmYyTjZqNTROVEpHaWkzcy93NXdPQmdvZjlPUEpzalpCbElPdlBo?=
- =?utf-8?B?WmY0eVJXTnNRaWp2Q0Y3OWRDbXZWdzEzZHNaUDhJM2Ria0VMS2FRbHpEcGh3?=
- =?utf-8?B?N3V6Uzdrb09GYUQ5RlA5TGo2VzAzMmVOSG9kK2RFM1hiRVhiM2NZWndhVUFP?=
- =?utf-8?B?b2xsSCtuOEUyajJ4YWVqVVduZkNWR1hnSmRHbTlPM050ZEo3M3FWQzZjT2Fk?=
- =?utf-8?B?b25aejdzVk53RkRSbklhWExSMXlvU1RqQjZOeWpCSWpLYlRSelpPZElwTlBG?=
- =?utf-8?B?RDhqTEpGSXUvbmZWOEg0NUZZSUJlNllSamgwaVpLYldrcU9WUHZBcVZ4LzVZ?=
- =?utf-8?B?N1ZlUmlBdE1CMVgrd1ZGVmxzZm1pSzdMVEVWN2NuLy9NUFVlM1YwUzRmTHF2?=
- =?utf-8?B?dmllSHUyMlpVQTNQbzBHZTBMaGovNG9sOG9GMHBMSXpjWUo0ZEZrams0NW54?=
- =?utf-8?B?aW1nRzgrejRSS0VzZ0E2UGNqa1NuWHF4Y3Zma0d5bzA2UkNtUzNKZDhFUzRh?=
- =?utf-8?B?VE5WYTBtKzA5QVR0NDhmYk5saWQ4aWlRM1A4U1hJaTIwSWFPRGk1VnlIQVN2?=
- =?utf-8?B?ZmFoMERUL2h0aG8rd21kR1lOQUlRRGxVczFUdWJmQXhmVVdMUUNqOC9vbjNI?=
- =?utf-8?B?aGZHTWJDZDh1Tmt2TW4yT1VNMmlDa1o0OFpDblVONkhaVDY3TXdyVUpzNmxr?=
- =?utf-8?B?ZVpFL3I5WDJTeGVDQ3UzWTBGeS83VjNpVjVLR2JwZGpEMjFYL1pQOTU4a3lu?=
- =?utf-8?B?NFFIQ1VoczgyNzNjbEY4emxMM3lKU2tLYzYvU2dqdVZEZSs2UWdKclpRT05x?=
- =?utf-8?Q?MxqHOvD0iL+Bc4DQW93icZfOPQ1hS/pG?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?a3hGTllwUDVwM1ZnRElKOVc5am9PdElpSTVYdnp1S25yK3ZBS25qMWFpNHc5?=
- =?utf-8?B?S2JuK0MwUXM1SzRRUDE5RFpTMi9BSVpGeWxWRnkwZ0w5RmNIc1V2WXpkTlly?=
- =?utf-8?B?Y2xqT1FlRDRaT1NmeGN3UGVhSFozaldIdDJVMlNwNitIWGkzR1BvbW1seVBJ?=
- =?utf-8?B?VGNTL2dtUGpHS1Zvb0NVQ1JWMEE5S0dTeFA2Y0RJKzY1OE5qdnJCc0g4ODVz?=
- =?utf-8?B?SDhRbUtkREJ2UmgxSjdPY2RESVQ1YUczYWV4MXVFY1RQc3AxUEJ2WVVRY2E2?=
- =?utf-8?B?SW8zRlpWaEpYZFlBVmVVcTIvVHQ3cTJzaThmMGJhNWtYUXU0V0kzN2I5QTI3?=
- =?utf-8?B?d0x0M0FwVWZjQVZBbHMrYjAzejNsM1FZbm95S09zRXJjSmpnVTkra3ROa2d2?=
- =?utf-8?B?bkRDUGcyZWU2OGFOdEs0eDVteVk2TitJNE5rZ3Z5OW9ZY0VBRG1tL0JXZVFx?=
- =?utf-8?B?dllrOEV3WUxWVjJ2NW1FQ2I0NHRPM2RrWnRZZ1FvQktzL3p6NDRYakdnM0o0?=
- =?utf-8?B?eXdvUzZ1a3hFbTkxUEFXVm5MSnBEUWRTTEV6UGVnSFVCaCt1V0FYTmFvSXRB?=
- =?utf-8?B?V0cxclFXcmhSemx3Yzd3QlYrNyt0ankrQk14YkR5UTU1SFZrSVRkbUw3endX?=
- =?utf-8?B?VUdvdzFBelpqdTAvcXpWK0Q1dUFOSkNBREhid2NxUUF3WTdYMlJiM0RxNTkw?=
- =?utf-8?B?Ulp2K2tYZms5cHo3dnJPQU9Nci83ekdkSWpJSG9sNTBFL1JBdkNnVWpCUytH?=
- =?utf-8?B?Uy9yYkpuVkViT1cvaVFPaFBtQ3ZpY2ZvZm5XdTlqK2ViQVJxODk2emdCMVBl?=
- =?utf-8?B?b0pOaDRweFdpK3pqNCs5akIrc0RVY3dwbDFTU0p4MklkenBjbEhqa2NuSFRK?=
- =?utf-8?B?VmUwZzd0SUdtd1IvWlZLRm5PK2dDWTdkVUN3d1BNaGZiMEVNQXF6RS9oeEl5?=
- =?utf-8?B?cDZWQWhNWHFDVUJCMGQ5NWFkQnZVb09IWEg2UVA5R1VsMXVSNGlxaVI2eTVt?=
- =?utf-8?B?a2ovRU9LaGRQZFI1Y2VFMSs5K1ViblVEampUMmlXN3FxYWdHam5lZlJla3VM?=
- =?utf-8?B?UkJNTzFUTFNGQjNsVHhqUTUvM0dWOGF5eXpQbWVGakVzWlZock1DZHU1K0JH?=
- =?utf-8?B?bXpFUEUxY2NMWXN6TW4wRStERklNS2lZcGx6TmhpNEswZFJiYWtCUTExZDlj?=
- =?utf-8?B?NmVzalJ1UW1LN25kKzlJK2lDVjg4YTVrRmxQdTltTTZKRElBVklDVVc0U05F?=
- =?utf-8?B?aWtwaXlHbEIwNm9kOXlTTVpzZDg5SWNiRHdGV3pKdXp6VW1Yak5ySGw4RDJt?=
- =?utf-8?B?alNNbzBPRmxndEVCdWVaRlgzRURKbWROZnRDREVISGRoM2xvZHVEUlNjYldP?=
- =?utf-8?B?Q2FkZ0d1QjUwWHI5ZWZEam5XUWsySjF1WEZIWGViemJ6MXZidW9KbWRQcXVL?=
- =?utf-8?B?SWZFSWIyNDh3V1ZyZ1lpUTl0T3ZwZEd4YlZVNXdLRHY0aGk4SEd2QmFyWHFp?=
- =?utf-8?B?OU1VM1VrNy9wMUZqUlpTdjFpRTlwenBIWkFHOTBLYnNMczkySFlmTDcwRmdM?=
- =?utf-8?B?OVdWVkpSUzFKV3YvakJXbUV0ZWc4ZTBKVXQwMk1lL09ZRGYxVEgwVmt1WE52?=
- =?utf-8?B?bUFtZnp1Sk1qb05EcGpTWUNJSkRwaE5yZ3VoMGgzZW1aNHlMVVFkTkZmVjBh?=
- =?utf-8?B?aURxYmNneXRCSkhZektmcjdCQ0c5WUREdElTNnA4bUF5RVFRcm1abUJXNlpn?=
- =?utf-8?B?Q2lxamp5QTExWUY5N21GeDRFTTIra3FCa1lKbFVhSU1sZHQrUFlCY3hzc0pk?=
- =?utf-8?B?elY0UjRWa3NKdTBOOGs3VjV1cnl3M3I0MW9mcGoya0dEQWlhQXU0NnlRd0tE?=
- =?utf-8?B?czA4Z1gvUDIzOU1ZNUpFZmcxc0FGT2ltdkpUS0o3djRPblQ5SDlxbXpXUjM4?=
- =?utf-8?B?THQ3VkVWWlcrQkt2UjVMMVAzY3VlZjVROFBUVDJLS0gxWVREZnl6QjZVamdK?=
- =?utf-8?B?SEVIcFE4V0hHRGs2V0ZqVWFGejV3ZExEd0dsM1o0aDVDLzBWeHRSdDB5SzFy?=
- =?utf-8?B?eC93bDhNN2tRb2ZxWkZqc0F4ZWpIb2VCQWFFb0phc0ZJNkZHN1BxWVAvQU5Q?=
- =?utf-8?B?MkpXSVdNNEUza3QzRUdZc29UYktWczFNVGx6NkRjM0hCQnJnbFdCVGFpWUZV?=
- =?utf-8?B?ZjN3My9JR09peXVtVjJPQk9NdTIxaXJsUGpZQlRpa2JjMWVkVlVvTml4bll1?=
- =?utf-8?B?OHlsNHpBdFdWRVVhWUNCRi9JTXIxTDJJN1YyU2ZxY2MwQ3JXSjZPTnU5MTZr?=
- =?utf-8?B?TlZnSHkwL1RmVk5DcCsyaUhud1JBZXFVK3k1b1RWOTBtOThYUFJxdz09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 32009206-2ee1-4f4d-dfce-08de4ca5117e
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2026 21:54:58.2219
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FKxGXJYFymtK7rsijLaa/6jSI/RrivB9BSJxmHXD5xJu/mIOxi7Qe9RVfyIYTh4kylFVhHL0HopW2vkgqExcow==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8057
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] ipv6: preserve insertion order for same-scope
+ addresses
+To: Yumei Huang <yuhuang@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc: sbrivio@redhat.com, david@gibson.dropbear.id.au, davem@davemloft.net,
+ dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, shuah@kernel.org
+References: <20260104032357.38555-1-yuhuang@redhat.com>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@gmail.com>
+In-Reply-To: <20260104032357.38555-1-yuhuang@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-
-
-On 1/5/2026 1:19 PM, Thomas Fourier wrote:
-> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
->
->
-> The size of the buffer is not the same when alloc'd with
-> dma_alloc_coherent() in he_init_tpdrq() and freed.
->
-> Fixes: ede58ef28e10 ("atm: remove deprecated use of pci api")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
+On 1/4/26 04:23, Yumei Huang wrote:
+> IPv6 addresses with the same scope are returned in reverse insertion
+> order, unlike IPv4. For example, when adding a -> b -> c, the list is
+> reported as c -> b -> a, while IPv4 preserves the original order.
+> 
+> This behavior causes:
+> 
+> a. When using `ip -6 a save` and `ip -6 a restore`, addresses are restored
+>     in the opposite order from which they were saved. See example below
+>     showing addresses added as 1::1, 1::2, 1::3 but displayed and saved
+>     in reverse order.
+> 
+>     # ip -6 a a 1::1 dev x
+>     # ip -6 a a 1::2 dev x
+>     # ip -6 a a 1::3 dev x
+>     # ip -6 a s dev x
+>     2: x: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN group default qlen 1000
+>         inet6 1::3/128 scope global tentative
+>         valid_lft forever preferred_lft forever
+>         inet6 1::2/128 scope global tentative
+>         valid_lft forever preferred_lft forever
+>         inet6 1::1/128 scope global tentative
+>         valid_lft forever preferred_lft forever
+>     # ip -6 a save > dump
+>     # ip -6 a d 1::1 dev x
+>     # ip -6 a d 1::2 dev x
+>     # ip -6 a d 1::3 dev x
+>     # ip a d ::1 dev lo
+>     # ip a restore < dump
+>     # ip -6 a s dev x
+>     2: x: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN group default qlen 1000
+>         inet6 1::1/128 scope global tentative
+>         valid_lft forever preferred_lft forever
+>         inet6 1::2/128 scope global tentative
+>         valid_lft forever preferred_lft forever
+>         inet6 1::3/128 scope global tentative
+>         valid_lft forever preferred_lft forever
+>     # ip a showdump < dump
+>      if1:
+>          inet6 ::1/128 scope host proto kernel_lo
+>          valid_lft forever preferred_lft forever
+>      if2:
+>          inet6 1::3/128 scope global tentative
+>          valid_lft forever preferred_lft forever
+>      if2:
+>          inet6 1::2/128 scope global tentative
+>          valid_lft forever preferred_lft forever
+>      if2:
+>          inet6 1::1/128 scope global tentative
+>          valid_lft forever preferred_lft forever
+> 
+> b. Addresses in pasta to appear in reversed order compared to host
+>     addresses.
+> 
+> The ipv6 addresses were added in reverse order by commit e55ffac60117
+> ("[IPV6]: order addresses by scope"), then it was changed by commit
+> 502a2ffd7376 ("ipv6: convert idev_list to list macros"), and restored by
+> commit b54c9b98bbfb ("ipv6: Preserve pervious behavior in
+> ipv6_link_dev_addr()."). However, this reverse ordering within the same
+> scope causes inconsistency with IPv4 and the issues described above.
+> 
+> This patch aligns IPv6 address ordering with IPv4 for consistency
+> by changing the comparison from >= to > when inserting addresses
+> into the address list. Also updates the ioam6 selftest to reflect
+> the new address ordering behavior. Combine these two changes into
+> one patch for bisectability.
+> 
+> Fixes: e55ffac60117 ("[IPV6]: order addresses by scope")
+> Link: https://bugs.passt.top/show_bug.cgi?id=175
+> Suggested-by: Stefano Brivio <sbrivio@redhat.com>
+> Signed-off-by: Yumei Huang <yuhuang@redhat.com>
 > ---
->   drivers/atm/he.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/atm/he.c b/drivers/atm/he.c
-> index ad91cc6a34fc..92a041d5387b 100644
-> --- a/drivers/atm/he.c
-> +++ b/drivers/atm/he.c
-> @@ -1587,7 +1587,8 @@ he_stop(struct he_dev *he_dev)
->                                    he_dev->tbrq_base, he_dev->tbrq_phys);
->
->          if (he_dev->tpdrq_base)
-> -               dma_free_coherent(&he_dev->pci_dev->dev, CONFIG_TBRQ_SIZE * sizeof(struct he_tbrq),
-> +               dma_free_coherent(&he_dev->pci_dev->dev,
-> +                                 CONFIG_TPDRQ_SIZE * sizeof(struct he_tpdrq),
+>   net/ipv6/addrconf.c                  | 2 +-
+>   tools/testing/selftests/net/ioam6.sh | 2 +-
+>   2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+> index 40e9c336f6c5..ca998bf46863 100644
+> --- a/net/ipv6/addrconf.c
+> +++ b/net/ipv6/addrconf.c
+> @@ -1013,7 +1013,7 @@ ipv6_link_dev_addr(struct inet6_dev *idev, struct inet6_ifaddr *ifp)
+>   	list_for_each(p, &idev->addr_list) {
+>   		struct inet6_ifaddr *ifa
+>   			= list_entry(p, struct inet6_ifaddr, if_list);
+> -		if (ifp_scope >= ipv6_addr_src_scope(&ifa->addr))
+> +		if (ifp_scope > ipv6_addr_src_scope(&ifa->addr))
+>   			break;
+>   	}
+>   
+> diff --git a/tools/testing/selftests/net/ioam6.sh b/tools/testing/selftests/net/ioam6.sh
+> index 845c26dd01a9..b2b99889942f 100755
+> --- a/tools/testing/selftests/net/ioam6.sh
+> +++ b/tools/testing/selftests/net/ioam6.sh
+> @@ -273,8 +273,8 @@ setup()
+>     ip -netns $ioam_node_beta link set ioam-veth-betaR name veth1 &>/dev/null
+>     ip -netns $ioam_node_gamma link set ioam-veth-gamma name veth0 &>/dev/null
+>   
+> -  ip -netns $ioam_node_alpha addr add 2001:db8:1::50/64 dev veth0 &>/dev/null
+>     ip -netns $ioam_node_alpha addr add 2001:db8:1::2/64 dev veth0 &>/dev/null
+> +  ip -netns $ioam_node_alpha addr add 2001:db8:1::50/64 dev veth0 &>/dev/null
+>     ip -netns $ioam_node_alpha link set veth0 up &>/dev/null
+>     ip -netns $ioam_node_alpha link set lo up &>/dev/null
+>     ip -netns $ioam_node_alpha route add 2001:db8:2::/64 \
 
-Sizes seem to align now. LGTM.
+For tools/testing/selftests/net/ioam6.sh:
 
-Reviewed-by: Brett Creeley <brett.creeley@amd.com>
->                                    he_dev->tpdrq_base, he_dev->tpdrq_phys);
->
->          dma_pool_destroy(he_dev->tpd_pool);
-> --
-> 2.43.0
->
->
-
+Acked-by: Justin Iurman <justin.iurman@gmail.com>
 
