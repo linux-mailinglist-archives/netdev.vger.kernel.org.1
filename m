@@ -1,66 +1,58 @@
-Return-Path: <netdev+bounces-247225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F998CF5FBD
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 00:27:20 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 945F1CF601E
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 00:37:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0F6DD306B79C
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 23:26:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 888523021689
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 23:37:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3F8F2F1FEA;
-	Mon,  5 Jan 2026 23:26:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 768A528750A;
+	Mon,  5 Jan 2026 23:37:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mF+KKnvf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VoGs25su"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E822DECA0;
-	Mon,  5 Jan 2026 23:26:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CEC727702E;
+	Mon,  5 Jan 2026 23:37:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767655599; cv=none; b=OIGqIAAx8nb32uMhDlzhpZ0Mm/qlz3Tc3wNj1OshlfmFyxgtFy2LcdQBByyjiBps05JkxqOrJkTnCNGTjecIIhkywDNrpvW+2/Eq8+ZZkS0kwuiKb0bsyDFCtd+r9eW4H8AJgodSW2x7SZ1Wb4hwWCe7l0zufGaNahVNM9EaTr4=
+	t=1767656251; cv=none; b=ip+6lkaVfw1IGG4T48b4+0JlOhcADxV755OZY7lJQcWaYi7X5FeOSaPLt5+Kb4I4KKz3ptPGLHMLiqtxfn5ETv+xrzNuL+gvK4dtEunSxQMdWp+fxw7zLNaHIE9WNhXLD4KV0+CwCQC13gqz4M+SaRVWZLxrC1gRizOrscMXyiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767655599; c=relaxed/simple;
-	bh=i3X5JOtfbCztF91Q37MouqIUBmed3uHYKQYaim1BFfE=;
+	s=arc-20240116; t=1767656251; c=relaxed/simple;
+	bh=E4SBxOLmdIbHhQWVj6ALwoTAYF3TwiAlEm9zSMfhBSE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CZRLrgBqH5+6fp010HbBU8Sy6bQDGvmc+Gj1ARgZk2RtAqqkmA5qYJSfTqVEKMwm1K4KvmweerUKACRoeLxXvKVqIYvMfErsX4EW6vGdB01z0yTpLRaQnRrEAia11KmSJlhpRlLbUddCIWVgNyPl78UH9TU4eYKWmui0IhATviM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mF+KKnvf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF9F1C116D0;
-	Mon,  5 Jan 2026 23:26:38 +0000 (UTC)
+	 MIME-Version:Content-Type; b=dGb1CQOFdIqzSqhbx8x6pS0r6rRDTSXEzB8wVVHb6FzVHzb4T6Pque3GliL7muNMXanWPBnQnFXytQC0zd/uMCdGTUvOyXNPgIK9ijdXbriREgve9jmrX5xXhqZBD5+ZjQsAQalF8A7eHWlOv+1h7pPFJwePAs/dPAcCkzDmuzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VoGs25su; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69BA7C19422;
+	Mon,  5 Jan 2026 23:37:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767655599;
-	bh=i3X5JOtfbCztF91Q37MouqIUBmed3uHYKQYaim1BFfE=;
+	s=k20201202; t=1767656250;
+	bh=E4SBxOLmdIbHhQWVj6ALwoTAYF3TwiAlEm9zSMfhBSE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mF+KKnvfXUt7RciOKVHr5JBP+mEofSM5/pG0M9wPV2nJwuNjShRJEF5tQqtf2eN/n
-	 fg8Sz4vPgf4/+rwtKzqn5c379f7ys5shBtrMyCpMrYPbFcnUm1nYls73ATJNOFDNrl
-	 3HFxn8O7sCBLjErGoOvY9pr8TCgSmPupU6DNTxF4GC90Zk238nU0tpozJ7DVT1LOVp
-	 /utf2Ce85Fz8MxPOZJOjcnxadSbR8Tb6tX7WtZDQMYracFdPdK9eXvyWqT4b8TzqN7
-	 tR85/yzPm7rtrTB5+wh4sHcyJ0KKovpPWu5HquWPZ6+CuRKoI7T4eRwNJBNeffiyEm
-	 PZ4/ylEWAi3KA==
-Date: Mon, 5 Jan 2026 15:26:38 -0800
+	b=VoGs25suSV0KvnZHllCdGaVSAaQz4FdSK56K1W0BQGG7Y8GX5CqhKXYUT8yEf3ixu
+	 A95ZAlyXt2LhCDsrXbeLRzU87id5qNhMEpTsbG2z3njMI6dNtsLX0JF920R7oN+bU8
+	 Z/eBbZSYxxaFdWEcyfJxfdGXTNIwGLAcN9+mJ48UmTHUBxnSsSq1PqRIgEhKV0ywSq
+	 mnIiQpFyRNZN4t1Z8LktnrBxFQrF9oAvPUKUZxj0Irxnj+VtBpwnS9t2+kMZwP3+me
+	 c/sap8UFG6qC0JZW4q8qLN2ootryZja0q6rNacjH6H0i7dfFh8Wl3LH0OGxQ6wGvSV
+	 6TW8zTxkCnxwg==
+Date: Mon, 5 Jan 2026 15:37:29 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Oliver Hartkopp <socketcan@hartkopp.net>
-Cc: mkl@pengutronix.de, Prithvi <activprithvi@gmail.com>, andrii@kernel.org,
- linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzkaller-bugs@googlegroups.com, netdev@vger.kernel.org
-Subject: Re: [bpf, xdp] headroom - was: Re: Question about to KMSAN:
- uninit-value in can_receive
-Message-ID: <20260105152638.74cfea6c@kernel.org>
-In-Reply-To: <fac5da75-2fc0-464c-be90-34220313af64@hartkopp.net>
-References: <20251117173012.230731-1-activprithvi@gmail.com>
-	<0c98b1c4-3975-4bf5-9049-9d7f10d22a6d@hartkopp.net>
-	<c2cead0a-06ed-4da4-a4e4-8498908aae3e@hartkopp.net>
-	<aSx++4VrGOm8zHDb@inspiron>
-	<d6077d36-93ed-4a6d-9eed-42b1b22cdffb@hartkopp.net>
-	<20251220173338.w7n3n4lkvxwaq6ae@inspiron>
-	<01190c40-d348-4521-a2ab-3e9139cc832e@hartkopp.net>
-	<20260102153611.63wipdy2meh3ovel@inspiron>
-	<20260102120405.34613b68@kernel.org>
-	<63c20aae-e014-44f9-a201-99e0e7abadcb@hartkopp.net>
-	<20260104074222.29e660ac@kernel.org>
-	<fac5da75-2fc0-464c-be90-34220313af64@hartkopp.net>
+To: Qingfang Deng <dqfext@gmail.com>
+Cc: David Yang <mmyangfl@gmail.com>, netdev@vger.kernel.org, Andrew Lunn
+ <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/2] net: dsa: yt921x: Protect MIB stats
+ with a lock
+Message-ID: <20260105153729.0e1241b9@kernel.org>
+In-Reply-To: <20260105025139.2348-1-dqfext@gmail.com>
+References: <20260105020905.3522484-1-mmyangfl@gmail.com>
+	<20260105020905.3522484-3-mmyangfl@gmail.com>
+	<20260105025139.2348-1-dqfext@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,31 +62,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 5 Jan 2026 14:47:08 +0100 Oliver Hartkopp wrote:
-> For the ifindex I would propose to store it in struct skb_shared_info:
+On Mon,  5 Jan 2026 10:51:39 +0800 Qingfang Deng wrote:
+> On Mon, 5 Jan 2026 10:09:01 +0800, David Yang wrote:
+> > 64bit variables might not be atomic on 32bit architectures, thus cannot
+> > be made lock-free. Protect them with a spin lock since get_stats64()
+> > cannot sleep.  
 > 
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index 86737076101d..f7233b8f461c 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -604,10 +604,15 @@ struct skb_shared_info {
->                  struct xsk_tx_metadata_compl xsk_meta;
->          };
->          unsigned int    gso_type;
->          u32             tskey;
-> 
-> +#if IS_ENABLED(CONFIG_CAN)
-> +       /* initial CAN iif to avoid routing back to it (can-gw) */
-> +       int can_iif;
-> +#endif
-> +
->          /*
->           * Warning : all fields before dataref are cleared in __alloc_skb()
->           */
->          atomic_t        dataref;
-> 
-> Would this be a suitable approach to get rid of struct can_skb_priv in 
-> your opinion?
+> Synchronizing both reads and updates with a spin lock is an overkill.
+> See include/linux/u64_stats_sync.h for a better approach.
 
-Possibly a naive question but why is skb_iif not working here?
+OTOH seq locks require error prone retry logic, YMMV.
 
