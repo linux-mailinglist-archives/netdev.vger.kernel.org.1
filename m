@@ -1,127 +1,157 @@
-Return-Path: <netdev+bounces-247112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D0C8CF4B20
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 17:32:04 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DB64CF4C04
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 17:39:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1FA49308FEFD
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 16:26:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8A74B30CC03C
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 16:19:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 576C2347FC3;
-	Mon,  5 Jan 2026 16:16:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C674A34846A;
+	Mon,  5 Jan 2026 16:19:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="w0TUrT4c"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lo/yI9IN"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC7A346FD4;
-	Mon,  5 Jan 2026 16:16:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DDA305046
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 16:19:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767629782; cv=none; b=l5Al6SqMK2/wQXMjrTWP8z10pI5c5UQXo4LRkvMcJT5bh+BqncdgmnvG9vfh8Q38F1eke/7Ex0PZ4zc1SCQiPyOQUPNOWOCmYTz0D7cZxyZdZ0iNZ67JSjcROswdKe1M1+keDJDW4fH1dBIhGvnU88nBLRgxD8cOdjZBPlh6ywI=
+	t=1767629972; cv=none; b=EFw6NjGLg6t/2Jd6vi0H5ikZ1sxvik+XYuGd6X82QQHuAvEWbYzfQaCOqJ0to6VPgYYHoV9VKkQ3b8aDpZIFXknWZr+px6trsjmMuB0PsLqswCQK/LpkAyXROVm97nGNbtNV4G9V7SDhIXfZfoFAKa1BsvvOu3D/dZF1N8Yw/oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767629782; c=relaxed/simple;
-	bh=9i67VTNE5FrtiAowIq8uSRUUDChaB5at4SSp/o9nPe0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=En+DYBR1TpM1xf1u02V3+FILqpgY5+Rphyxog7xP6dr2/dAis+SFcMkrWk/eP0KqSLiHEDTIv3DhI/t/HljsNZOMbdHtKGc8/GKHYPlr7CHegjOw2Pl/x+q0iQCZKaGlhnt+X7vXci0xtThsMxyQd4B4awFyzLFuz3p8iNAMhRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=w0TUrT4c; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=jdTxogabHUVvZFgfzUllqOqY7gjAS94xoT2KLAqZfG4=; b=w0TUrT4cle/QW2C1IgaR3L3msZ
-	DbdCDJ626YYs4V+t+2hOQlg0/coZ/eMue4bHhdfp6kfU47e7eqkU2XduqdVEq4vsgnQLyL+krYP+J
-	xGXzmx0pLgr3RRMNVRfH0iNDcIEEoEa8hrK+JzCvxOjrSAvhSL1y8R4mgNoOGiGnD2jiy8PF1k+Db
-	TMLPW4NoXT3y6oUU/djRt5eB+OQcwOEpIhUs4YUcdEE4FVjKKmX/Fq3PkfQq0YN7+YILktz4FjAei
-	6KNWYGdwX+Ux6P9YFGhvXjS9fzMRoWPeOI7C7KH/wOAYhfp/FIbKmihx/MMVMtT8BK/FxaxACBi1b
-	dLTx7H3Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60394)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vcnFd-0000000084D-079a;
-	Mon, 05 Jan 2026 16:16:13 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vcnFZ-000000007z0-3ngJ;
-	Mon, 05 Jan 2026 16:16:09 +0000
-Date: Mon, 5 Jan 2026 16:16:09 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jonas Jelonek <jelonek.jonas@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH v2] net: sfp: add SMBus I2C block support
-Message-ID: <aVvjyWzKuczNf3lt@shell.armlinux.org.uk>
-References: <20260105154653.575397-1-jelonek.jonas@gmail.com>
+	s=arc-20240116; t=1767629972; c=relaxed/simple;
+	bh=a36Fpl8dK7Cm4QBDTUTt8YmQybW2yw4PWrJPCwvYWnU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CiViN0taA81Mqcb8IDuhn/vOGiZEt4FMLTx1/Am2vz7BqVyn1CP/kKnPjpD2kNxGAYSPdZp14k58OqW3p5QyZIWJCHXCSYSanq+g5G3gCKi53X9np9aNAg1PNgNxlJXRGf1NZvAR89qdv98Cg/HDEGoxuTUjtGBS2rWqklITpXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lo/yI9IN; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b76b5afdf04so24802966b.1
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 08:19:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767629969; x=1768234769; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8vbHP6EgxfnPPG46ofBR2iGBWBGXr2Ynn4AlyB7dNSQ=;
+        b=Lo/yI9IN/AD9KALDdtHM0Xf+/VtyrtVeLXVbL7fjrj4NgvHuQadgw1fGDpXdLEIciz
+         v9WPY6jJDngis6tZNC62w3iW2c2cBCexjOUQlgbyOVCjUJOZmoDuMziqsfe3Q6kgJm7D
+         xwpgcwI1leMVUgCB/xonbc+J4VtdlGnKyAy83cLrvOMCawkejfQh6JTneTbRnyfqciuT
+         zyo3Xa4Zfuayalsbl6Qlx9HpxpSEu4zeVqwIEme39j8mUYi2IPXjjuzAnl4K1lyouDFQ
+         Tt2OD7WA/VyGSRKVRrM+SkcDF4YmB7opzU8yZLKwqzXL2zolYexa2cFvm5h6+DqEvKJd
+         Oz5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767629969; x=1768234769;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8vbHP6EgxfnPPG46ofBR2iGBWBGXr2Ynn4AlyB7dNSQ=;
+        b=sxny4XNBWI0ZkQKvcjbcyOFbPmjX6LzFmbbiBK8omq/Eyqyckv+ElhF2DW1nasHtiK
+         neXzuNwSKHeShadTuug7pFXG4yfwgJNrCMxP9v7b1gdzQnHz+SwutWVq54VWjs4OJvsi
+         wE1hp21OmAAN+CO3rBcoS3ZdchzdhF5KjTuJIZ04zCexdUrXlAjUryxJbXnlelF5tf8T
+         BeZEYinelm8zJdJowbwFg+T2IJpFnefjse+AtYP2sEeRtg8W0kWqC3oINvWgFGH4HtZe
+         OLg2N5FF5yn+9KMayoNTcqHVSs3agb0kQmH1yZooEI/Qdk1Us1XVvmVPfct9S4tbRkMZ
+         oZEg==
+X-Forwarded-Encrypted: i=1; AJvYcCVeYf2vM3dcH38Q6uxAxFvt6oyle+rrJ0Dw/pk32gEPGUempe6HK3h/slz/Jut4Jxv+UddwTfI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDk58JgSVtlOO1Pi8NAASat5FYCkbGj/Bns5/oo16ARvW1ENm2
+	as9Y6hkIO6Q7G2ya76iSUjccRuwFrA1gVnUiZu7j5bKH5HIzIN93R/9Q
+X-Gm-Gg: AY/fxX4VDkinpXoaOKq0S3iBc0DwmoOQgQ4fIny6XUVSNgDdREKAp4wFBxbQTx8BRyc
+	tBUW2HFdG6U22Gy80v/4LU4uJkIZ+uSnv1MMVb2mNNFydkrf8US/bY3t7mdLaj5MWCi62mea0NE
+	m0QjZxkaukLta0ykTGfGVqk6fVBr8pNDitveUK8Gi2RnOAlsxk7K0d4vtigeki51xHp7Ofqwe2v
+	GmhUY541uoG5E/YMhQcbWvI8oxTav0cNdfhfuTKn+JTuQdzZwYbq/DWiHivUGGPd6pEpH5i/BkE
+	UOWwyMftHgoS5Mguwqhrqba1IXg7EJHr0eG52QzkAWcOEgfrQz+mavPe3LK5vV5A7xhHw88duMh
+	YxrS7Z+geEb7P+yp8vrF1MM9faw+F7YPHvcoOUhKmOSRo/rJlzD8gPh9eucOmJP+Jo3t4PkYhWG
+	Qq8xFbrK3YQ37fwFTusr9bLIa+Wg2LBW+rtWmaZNtt85MkFGjd8oGinth8yQimjfVfEannPQiYy
+	I8=
+X-Google-Smtp-Source: AGHT+IE7UBVxHf8IfqaF03Np4FiKfyEW4mW5ECPUq+FGOrE+adYr7A3rTwSvGxpJ/o2ddY5uk1NIUg==
+X-Received: by 2002:a17:906:f582:b0:b80:4478:d43f with SMTP id a640c23a62f3a-b8426a423d0mr32590366b.2.1767629969089;
+        Mon, 05 Jan 2026 08:19:29 -0800 (PST)
+Received: from [192.168.255.3] (217-8-142-46.pool.kielnet.net. [46.142.8.217])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b84265abec6sm32761566b.14.2026.01.05.08.19.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Jan 2026 08:19:28 -0800 (PST)
+Message-ID: <f976d637-defd-4e32-8a82-6705e69246d2@gmail.com>
+Date: Mon, 5 Jan 2026 17:19:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260105154653.575397-1-jelonek.jonas@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net: sfp: add SMBus I2C block support
+Content-Language: en-US
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>
+References: <20260105154653.575397-1-jelonek.jonas@gmail.com>
+ <aVvjyWzKuczNf3lt@shell.armlinux.org.uk>
+From: Jonas Jelonek <jelonek.jonas@gmail.com>
+In-Reply-To: <aVvjyWzKuczNf3lt@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 05, 2026 at 03:46:53PM +0000, Jonas Jelonek wrote:
-> @@ -765,26 +794,70 @@ static int sfp_smbus_byte_write(struct sfp *sfp, bool a2, u8 dev_addr,
->  		dev_addr++;
->  	}
->  
-> +	return data - (u8 *)buf;
+Hi Russell,
 
-A separate fix is being submitted for this.
+On 05.01.26 17:16, Russell King (Oracle) wrote:
+> On Mon, Jan 05, 2026 at 03:46:53PM +0000, Jonas Jelonek wrote:
+>> @@ -765,26 +794,70 @@ static int sfp_smbus_byte_write(struct sfp *sfp, bool a2, u8 dev_addr,
+>>  		dev_addr++;
+>>  	}
+>>  
+>> +	return data - (u8 *)buf;
+> A separate fix is being submitted for this.
+>
+>> +}
+>> +
+>> +static int sfp_smbus_block_write(struct sfp *sfp, bool a2, u8 dev_addr,
+>> +				 void *buf, size_t len)
+>> +{
+>> +	size_t block_size = sfp->i2c_block_size;
+>> +	union i2c_smbus_data smbus_data;
+>> +	u8 bus_addr = a2 ? 0x51 : 0x50;
+>> +	u8 *data = buf;
+>> +	u8 this_len;
+>> +	int ret;
+>> +
+>> +	while (len) {
+>> +		this_len = min(len, block_size);
+>> +
+>> +		smbus_data.block[0] = this_len;
+>> +		memcpy(&smbus_data.block[1], data, this_len);
+>> +		ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
+>> +				     I2C_SMBUS_WRITE, dev_addr,
+>> +				     I2C_SMBUS_I2C_BLOCK_DATA, &smbus_data);
+>> +		if (ret)
+>> +			return ret;
+>> +
+>> +		len -= this_len;
+>> +		data += this_len;
+>> +		dev_addr += this_len;
+>> +	}
+>> +
+>>  	return 0;
+> This is wrong. As already said, the I2C accessors return the number of
+> bytes successfully transferred. Zero means no bytes were transferred,
+> which is an error.
+>
+> All callers to sfp_write() validate that the expected number of bytes
+> were written. Thus, returning zero will cause failures.
+>
 
-> +}
-> +
-> +static int sfp_smbus_block_write(struct sfp *sfp, bool a2, u8 dev_addr,
-> +				 void *buf, size_t len)
-> +{
-> +	size_t block_size = sfp->i2c_block_size;
-> +	union i2c_smbus_data smbus_data;
-> +	u8 bus_addr = a2 ? 0x51 : 0x50;
-> +	u8 *data = buf;
-> +	u8 this_len;
-> +	int ret;
-> +
-> +	while (len) {
-> +		this_len = min(len, block_size);
-> +
-> +		smbus_data.block[0] = this_len;
-> +		memcpy(&smbus_data.block[1], data, this_len);
-> +		ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> +				     I2C_SMBUS_WRITE, dev_addr,
-> +				     I2C_SMBUS_I2C_BLOCK_DATA, &smbus_data);
-> +		if (ret)
-> +			return ret;
-> +
-> +		len -= this_len;
-> +		data += this_len;
-> +		dev_addr += this_len;
-> +	}
-> +
->  	return 0;
+yes. I totally messed up v2 but already pushed out a v3 that fixes that, and
+has the separate fix as a prerequisite.
 
-This is wrong. As already said, the I2C accessors return the number of
-bytes successfully transferred. Zero means no bytes were transferred,
-which is an error.
+Sorry for the confusion.
 
-All callers to sfp_write() validate that the expected number of bytes
-were written. Thus, returning zero will cause failures.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Best,
+Jonas
 
