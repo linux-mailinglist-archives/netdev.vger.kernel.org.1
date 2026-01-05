@@ -1,217 +1,134 @@
-Return-Path: <netdev+bounces-246934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 737D7CF2715
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 09:33:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EB10CF2723
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 09:34:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7BC37308E982
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 08:27:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BA2F43003046
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 08:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96F5B331A76;
-	Mon,  5 Jan 2026 08:26:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E577E313534;
+	Mon,  5 Jan 2026 08:30:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="J/lGH1yV";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ZIAXgaRp"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="j2Po/Xi7"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D87223314AB;
-	Mon,  5 Jan 2026 08:26:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4592B3321C6
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 08:29:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767601615; cv=none; b=IuffSexxaVrCwbs6O2rg/45N8FK2p/nFMUMJrnPVnRieSsjZfspXbS6XphUtM8VQYO8FZyLcKrEWHB9yfLWGlwauH5xlFHBCagUwkxzdF9fOg+W5fZkFS2+bDosBHkDlR4bEiTFHwiibTD3nO0mQwJMTru+e7XfMGtjly6xTOFg=
+	t=1767601802; cv=none; b=IVsuNJbhDHbJhnQphjOlC3QMdQUm6PASaW2JcZMq0Be1dxu9Pf5pF4gCnxAe187RWJWZ2U54vOJeS6Co/4Y+Va4VbK7V2YRlAw/54HTw84QHkkzffzDpUdrXL0JM552Qcwws7y5k0N2w61058wkc+Z1fGqm2RhYeFutcJ9IIu0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767601615; c=relaxed/simple;
-	bh=P4/2AsT9n14c0ef4aSD1ALtr5hfCRfM8S6Cf4YlCz0I=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=EJIEmBPye5o5pmeOGFHH298AmdACF+jilvoiuJNnmsyUOPY7KJEpPeFcAEC2Syv+9dkO4gaYOBXZanuDdjSc4tPm7CLDwKYU/4CycmDSEzc9CVvg+9ihpIf4QzL0CnUEKkSyYuYZSs4iBRbWzuN6LdYd1kYnw1fFrQIEwlR3Z64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=J/lGH1yV; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ZIAXgaRp; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1767601612;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+IjD3h3khDbzYNe/aBGpfLpRCToA2hBBmeoprUDwalw=;
-	b=J/lGH1yV0CqsK7lMoSSr3DnEmr8bbIbbLfPIueCg7YHnRgNMF0kHnp+jLT+YuxQmN4X92C
-	d655+Bl2tCThO+1RX4n+dAyYrZQHObWtPmFrDvaQ2UtDwqRKM3u9E9ZUyusJBTZgc1xmQD
-	wMiv0ZGwuN7c4TF4sayXKwaeMbLBFFFZfQKgDWBKGc78VYLipYGJ4h8uW8W47k4ypeInbb
-	KkhLbA9e9KcQ+7iqc04hTMUHUzuu4V1FAczVIQxEedNlBkwdwbNloo5jQO0+jgu0isC6lz
-	57m+79FWsRkY4RPAqU4O9UBTH6v61ppHn/BgYEQ8ay3o68xUhl3m11kC8paITA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1767601612;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+IjD3h3khDbzYNe/aBGpfLpRCToA2hBBmeoprUDwalw=;
-	b=ZIAXgaRp8E+FxrBqV1a30iCVQsobmwftBdzvXn8owa0MmKkJuoy22J02rZ7b2wVJVrNAyq
-	VIpmLZu3as47VJDw==
-Date: Mon, 05 Jan 2026 09:26:49 +0100
-Subject: [PATCH RFC net-next 3/3] netfilter: uapi: Use UAPI definition of
- INT_MAX and INT_MIN
+	s=arc-20240116; t=1767601802; c=relaxed/simple;
+	bh=nM8EVblwSLdQyTQHyIHtfKOw93Opm3ygP22WtcRkBAA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=H261Epm1I6Fakxk4dzFgePO5lHeVUDyiRFWXzCINojZQpCTA8CmnzNhNc2QpW/aNDbu+rhEWlilKQefKQAiGzk1oBqQsL6TbQQp4Lv+C8/y3yjPRpeyQVf1hRelJauYZsZFxat/SqP3Ju1evbsq0gmX/bq2IdNWt2hKCnZ1fp/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=j2Po/Xi7; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id CE5E5C1BEBF;
+	Mon,  5 Jan 2026 08:29:23 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 9FBA760726;
+	Mon,  5 Jan 2026 08:29:49 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A55B6103C8493;
+	Mon,  5 Jan 2026 09:29:42 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1767601788; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=DfsJgfq89NcdpaxSqnEswlB210yQtbFw+8vJX6OV+MU=;
+	b=j2Po/Xi7b7InYmhDQ+4gVMhiOr4oc5xuzhX1PRVP553JgwOpUuEyPmE3c9sb1TwhQFqC+3
+	13nRAUxWapXoj4O1Qah7nsadUusRWyZWdRMtZNZFZbOw1AdD8nbcM65eg2i3Wy3uCTfjcW
+	0Rrq4wndXLGaLCLvTsOUMDI7J4b5iBri/fGQ/qnRC+W//iewhXTMODXvgmPCLVKEojBol2
+	/1y/A0yaaTCl0MAmR6LO+5mN4tCNffQhAGES+nS//THb+4zq7lrXyesEbr+jU6HAEg742v
+	ssr843qWeYS7dqHWkDYYpxvbSxnnU41B7oUVzqWrmeGz12xBOOlaoudkJK77Rg==
+Message-ID: <29295127-e54f-4954-8a63-03289c113a1f@bootlin.com>
+Date: Mon, 5 Jan 2026 09:29:41 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260105-uapi-limits-v1-3-023bc7a13037@linutronix.de>
-References: <20260105-uapi-limits-v1-0-023bc7a13037@linutronix.de>
-In-Reply-To: <20260105-uapi-limits-v1-0-023bc7a13037@linutronix.de>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Andrew Lunn <andrew@lunn.ch>, Pablo Neira Ayuso <pablo@netfilter.org>, 
- Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, 
- Phil Sutter <phil@nwl.cc>
-Cc: Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
- coreteam@netfilter.org, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1767601610; l=3712;
- i=thomas.weissschuh@linutronix.de; s=20240209; h=from:subject:message-id;
- bh=P4/2AsT9n14c0ef4aSD1ALtr5hfCRfM8S6Cf4YlCz0I=;
- b=3kbE7So0hiBtD8nxv9RU5JAhr0H365fotZ8m/pGC3lRQdLC1DaILXOwzSk+6+CbEQuZdVEFVc
- MlUAOh9yWfJCQEBW8rQlaaOgo19di8zwFbFKZvnr6CV9kqbEzLCW5ip
-X-Developer-Key: i=thomas.weissschuh@linutronix.de; a=ed25519;
- pk=pfvxvpFUDJV2h2nY0FidLUml22uGLSjByFbM6aqQQws=
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: sfp: add SMBus I2C block support
+To: Jakub Kicinski <kuba@kernel.org>, Jonas Jelonek <jelonek.jonas@gmail.com>
+Cc: Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
+References: <20251228213331.472887-1-jelonek.jonas@gmail.com>
+ <20260104080534.769d4f87@kernel.org>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20260104080534.769d4f87@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-Using <limits.h> to gain access to INT_MAX and INT_MIN introduces a
-dependency on a libc, which UAPI headers should not do.
+Hi folks,
 
-Use the equivalent UAPI constants.
+On 04/01/2026 17:05, Jakub Kicinski wrote:
+> On Sun, 28 Dec 2025 21:33:31 +0000 Jonas Jelonek wrote:
+>> +static int sfp_smbus_block_write(struct sfp *sfp, bool a2, u8 dev_addr,
+>> +				 void *buf, size_t len)
+>> +{
+>> +	size_t block_size = sfp->i2c_block_size;
+>> +	union i2c_smbus_data smbus_data;
+>> +	u8 bus_addr = a2 ? 0x51 : 0x50;
+>> +	u8 *data = buf;
+>> +	u8 this_len;
+>> +	int ret;
+>> +
+>> +	while (len) {
+>> +		this_len = min(len, block_size);
+>> +
+>> +		smbus_data.block[0] = this_len;
+>> +		memcpy(&smbus_data.block[1], data, this_len);
+>> +		ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
+>> +				     I2C_SMBUS_WRITE, dev_addr,
+>> +				     I2C_SMBUS_I2C_BLOCK_DATA, &smbus_data);
+>> +		if (ret)
+>> +			return ret;
+>> +
+>> +		len -= this_len;
+>> +		data += this_len;
+>> +		dev_addr += this_len;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+> 
+> AI code review says:
+> 
+>  Should this return the number of bytes written instead of 0?
+> 
+>  The existing sfp_i2c_write() returns the byte count on success, and several
+>  callers depend on this return value:
+> 
+>  sfp_cotsworks_fixup_check() checks:
+>     err = sfp_write(sfp, false, SFP_PHYS_ID, &id->base, 3);
+>     if (err != 3) { ... error path ... }
+> 
+>  sfp_sm_mod_hpower() via sfp_modify_u8() checks:
+>     if (err != sizeof(u8)) { ... error path ... }
+> 
+>  With this function returning 0 on success, these checks will always fail,
+>  causing high-power SFP modules to fail initialization with "failed to enable
+>  high power" errors, and Cotsworks module EEPROM fixups to fail with "Failed
+>  to rewrite module EEPROM" errors.
+> 
+> Either way, you'll need to repost, net-next was closed when you posted.
 
-Signed-off-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
----
- include/uapi/linux/netfilter_bridge.h | 9 +++------
- include/uapi/linux/netfilter_ipv4.h   | 9 ++++-----
- include/uapi/linux/netfilter_ipv6.h   | 7 +++----
- 3 files changed, 10 insertions(+), 15 deletions(-)
+Looks like I made the same mistake in sfp_smbus_byte_write(). I'll send
+a fix for that/
 
-diff --git a/include/uapi/linux/netfilter_bridge.h b/include/uapi/linux/netfilter_bridge.h
-index 1610fdbab98d..6ace6c8b211b 100644
---- a/include/uapi/linux/netfilter_bridge.h
-+++ b/include/uapi/linux/netfilter_bridge.h
-@@ -6,15 +6,12 @@
-  */
- 
- #include <linux/in.h>
-+#include <linux/limits.h>
- #include <linux/netfilter.h>
- #include <linux/if_ether.h>
- #include <linux/if_vlan.h>
- #include <linux/if_pppox.h>
- 
--#ifndef __KERNEL__
--#include <limits.h> /* for INT_MIN, INT_MAX */
--#endif
--
- /* Bridge Hooks */
- /* After promisc drops, checksum checks. */
- #define NF_BR_PRE_ROUTING	0
-@@ -31,14 +28,14 @@
- #define NF_BR_NUMHOOKS		6
- 
- enum nf_br_hook_priorities {
--	NF_BR_PRI_FIRST = INT_MIN,
-+	NF_BR_PRI_FIRST = __KERNEL_INT_MIN,
- 	NF_BR_PRI_NAT_DST_BRIDGED = -300,
- 	NF_BR_PRI_FILTER_BRIDGED = -200,
- 	NF_BR_PRI_BRNF = 0,
- 	NF_BR_PRI_NAT_DST_OTHER = 100,
- 	NF_BR_PRI_FILTER_OTHER = 200,
- 	NF_BR_PRI_NAT_SRC = 300,
--	NF_BR_PRI_LAST = INT_MAX,
-+	NF_BR_PRI_LAST = __KERNEL_INT_MAX,
- };
- 
- #endif /* _UAPI__LINUX_BRIDGE_NETFILTER_H */
-diff --git a/include/uapi/linux/netfilter_ipv4.h b/include/uapi/linux/netfilter_ipv4.h
-index 155e77d6a42d..e675534b2128 100644
---- a/include/uapi/linux/netfilter_ipv4.h
-+++ b/include/uapi/linux/netfilter_ipv4.h
-@@ -6,13 +6,12 @@
- #define _UAPI__LINUX_IP_NETFILTER_H
- 
- 
-+#include <linux/limits.h>
- #include <linux/netfilter.h>
- 
- /* only for userspace compatibility */
- #ifndef __KERNEL__
- 
--#include <limits.h> /* for INT_MIN, INT_MAX */
--
- /* IP Hooks */
- /* After promisc drops, checksum checks. */
- #define NF_IP_PRE_ROUTING	0
-@@ -28,7 +27,7 @@
- #endif /* ! __KERNEL__ */
- 
- enum nf_ip_hook_priorities {
--	NF_IP_PRI_FIRST = INT_MIN,
-+	NF_IP_PRI_FIRST = __KERNEL_INT_MIN,
- 	NF_IP_PRI_RAW_BEFORE_DEFRAG = -450,
- 	NF_IP_PRI_CONNTRACK_DEFRAG = -400,
- 	NF_IP_PRI_RAW = -300,
-@@ -41,8 +40,8 @@ enum nf_ip_hook_priorities {
- 	NF_IP_PRI_NAT_SRC = 100,
- 	NF_IP_PRI_SELINUX_LAST = 225,
- 	NF_IP_PRI_CONNTRACK_HELPER = 300,
--	NF_IP_PRI_CONNTRACK_CONFIRM = INT_MAX,
--	NF_IP_PRI_LAST = INT_MAX,
-+	NF_IP_PRI_CONNTRACK_CONFIRM = __KERNEL_INT_MAX,
-+	NF_IP_PRI_LAST = __KERNEL_INT_MAX,
- };
- 
- /* Arguments for setsockopt SOL_IP: */
-diff --git a/include/uapi/linux/netfilter_ipv6.h b/include/uapi/linux/netfilter_ipv6.h
-index 80aa9b0799af..6be21833f696 100644
---- a/include/uapi/linux/netfilter_ipv6.h
-+++ b/include/uapi/linux/netfilter_ipv6.h
-@@ -9,13 +9,12 @@
- #define _UAPI__LINUX_IP6_NETFILTER_H
- 
- 
-+#include <linux/limits.h>
- #include <linux/netfilter.h>
- 
- /* only for userspace compatibility */
- #ifndef __KERNEL__
- 
--#include <limits.h> /* for INT_MIN, INT_MAX */
--
- /* IP6 Hooks */
- /* After promisc drops, checksum checks. */
- #define NF_IP6_PRE_ROUTING	0
-@@ -32,7 +31,7 @@
- 
- 
- enum nf_ip6_hook_priorities {
--	NF_IP6_PRI_FIRST = INT_MIN,
-+	NF_IP6_PRI_FIRST = __KERNEL_INT_MIN,
- 	NF_IP6_PRI_RAW_BEFORE_DEFRAG = -450,
- 	NF_IP6_PRI_CONNTRACK_DEFRAG = -400,
- 	NF_IP6_PRI_RAW = -300,
-@@ -45,7 +44,7 @@ enum nf_ip6_hook_priorities {
- 	NF_IP6_PRI_NAT_SRC = 100,
- 	NF_IP6_PRI_SELINUX_LAST = 225,
- 	NF_IP6_PRI_CONNTRACK_HELPER = 300,
--	NF_IP6_PRI_LAST = INT_MAX,
-+	NF_IP6_PRI_LAST = __KERNEL_INT_MAX,
- };
- 
- 
-
--- 
-2.52.0
+Maxime
 
 
