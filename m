@@ -1,58 +1,60 @@
-Return-Path: <netdev+bounces-246862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B469ECF1BE3
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 04:45:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 89850CF1BF5
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 04:45:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 278073013EE6
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 03:45:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2242530274EB
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 03:45:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B14331ED7B;
-	Mon,  5 Jan 2026 03:44:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DACD314B89;
+	Mon,  5 Jan 2026 03:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U0GM2PGV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gH8AefoZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB5A2E8B66
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 03:44:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AAF2320A09
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 03:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767584699; cv=none; b=lLV51BUz2+WpZOfaJm8h68XgBqniUM6LoU8llp76YJXJFiWgQ63pg/X6EfWJp8AeMEkOPTqVr1/jsfgh/OuMP8FTKqfux4zcwrgzA1PkzUNzLQrhiHE6cGvWPIoIUI1PUNeq/JHJdvUwld0n9MGUxBfFSp+14DgHlcB8Q5mKbYY=
+	t=1767584702; cv=none; b=qxiJFbjSXjrNDKBbC2o/ey+4W/MVvxawkyJSlp0lDd7WuUQV99E07fhszOkgXIak2T7gwYWh0N42n2Ib8/K3bW9hibCjADsBrz2ftJWrtAS605Xmga7t9MT8znqOoqYEZI7i4cWB3j0/+faGelnJV0JgwCWjEs4tfZMWCJDP4Iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767584699; c=relaxed/simple;
-	bh=3f7WUVn73gc9SKewbhvcXuBFyXWc4GBP3OrT2ImPSzU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RHhj0YJVksYlwn/BnNgSu5wfVz7bd6y3PvFLuFL/zWNp3mzP/PkmyfhPkqtTbm/CoFZ29ScWhVhs4Z0BtuPtlFQiw8NkW82+LC6TuwHIEGPyQcEvYxTnBGvWjmkT1iFlGo2oFlVLivuRsK9s/7nYK7VS5x3md+OrU8DrXJOzl0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U0GM2PGV; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1767584702; c=relaxed/simple;
+	bh=me4c50WXRR8xB8plkzzqIpolCR7qnDaoGIMH+/D8XeQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=QuOrN5Spnc6q+YLal3CQsPpJkqSNG2leW3wLL2i4fjDbGpjuGQ1tXNN/q1n7sIgTvRV179Cp1szaFcEbQuVhDBcWtWBSFUI2kSP6OplMS4uCh5AZE0Y25RV7iUELF7pUqL73nNYMZS1vUu+mdVkl6fnGBOVTmIOE1YSZm0CHBUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gH8AefoZ; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767584696;
+	s=mimecast20190719; t=1767584699;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=xsJWLlyJIxAzBoXALzeg0UEorQME7drbhemnU8P8irM=;
-	b=U0GM2PGVzv+/nycW/vCXTujzru2HgBcRk+jEM1w6SjgdoZyg5Zy169A09ZRkhK8+ObutZu
-	CyRqVXiAqTfMA3bgGhAi3Iu1xcuajKXTc4J/O1+bB8xGF7X6P2vmDdBeWKqox8viAO0lLR
-	kwgxYFa2fR1lrDW1nAstbGmRq+WhGOo=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PctFfq/i0IRXmLnYYIwYR3vyYfcgXhxwyeKnIEI44lM=;
+	b=gH8AefoZYNBhGo6phetMoVW7UaLWw1wUytB+L+zwHb1YCnDnhFDj6UK5rPenSizIpbdzYD
+	g7/I8l0RnRox9wol1Z36hF/eZmgiTxca9+EIZL3EiowWzDqS9AQsYvLXdzCANBxmwaRgaT
+	A6cITAfc45AiMp0PQqUwgdyYB5mzGiM=
 Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-639-InEKffccPc6RGclbtO5efg-1; Sun,
- 04 Jan 2026 22:44:53 -0500
-X-MC-Unique: InEKffccPc6RGclbtO5efg-1
-X-Mimecast-MFC-AGG-ID: InEKffccPc6RGclbtO5efg_1767584691
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-556-G1AVutPTNwCZZ6S2VB2w3w-1; Sun,
+ 04 Jan 2026 22:44:58 -0500
+X-MC-Unique: G1AVutPTNwCZZ6S2VB2w3w-1
+X-Mimecast-MFC-AGG-ID: G1AVutPTNwCZZ6S2VB2w3w_1767584696
 Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BC0F51800343;
-	Mon,  5 Jan 2026 03:44:51 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 84CC018002E4;
+	Mon,  5 Jan 2026 03:44:56 +0000 (UTC)
 Received: from xudu-thinkpadx1carbongen9.nay.csb (unknown [10.66.60.72])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B2A4A180035A;
-	Mon,  5 Jan 2026 03:44:47 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 83A2D1800367;
+	Mon,  5 Jan 2026 03:44:52 +0000 (UTC)
 From: Xu Du <xudu@redhat.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -63,9 +65,11 @@ To: davem@davemloft.net,
 Cc: netdev@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 0/8] selftest: Extend tun/virtio coverage for GSO over UDP tunnel
-Date: Mon,  5 Jan 2026 11:44:35 +0800
-Message-ID: <cover.1767580224.git.xudu@redhat.com>
+Subject: [PATCH net-next v3 1/8] selftest: tun: Format tun.c existing code
+Date: Mon,  5 Jan 2026 11:44:36 +0800
+Message-ID: <88df7cbb60af5409daca4c94bf6467c6bc138824.1767580224.git.xudu@redhat.com>
+In-Reply-To: <cover.1767580224.git.xudu@redhat.com>
+References: <cover.1767580224.git.xudu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,42 +79,99 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-The primary goal is to add test validation for GSO when operating over
-UDP tunnels, a scenario which is not currently covered.
+In preparation for adding new tests for GSO over UDP tunnels,
+apply consistently the kernel style to the existing code.
 
-The design strategy is to extend the existing tun/tap testing infrastructure
-to support this new use-case, rather than introducing a new or parallel framework.
-This allows for better integration and re-use of existing test logic.
-
+Signed-off-by: Xu Du <xudu@redhat.com>
 ---
-v2 -> v3:
- - Re-send the patch series becasue Patchwork don't update them
+ tools/testing/selftests/net/tun.c | 25 +++++++++++++++----------
+ 1 file changed, 15 insertions(+), 10 deletions(-)
 
-v2: https://lore.kernel.org/all/cover.1767074545.git.xudu@redhat.com/
- - Addresse sporadic failures due to too early send.
- - Refactor environment address assign helper function.
- - Fix incorrect argument passing in build packet functions.
-
-v1: https://lore.kernel.org/netdev/cover.1763345426.git.xudu@redhat.com/
-
-Xu Du (8):
-  selftest: tun: Format tun.c existing code
-  selftest: tun: Introduce tuntap_helpers.h header for TUN/TAP testing
-  selftest: tun: Refactor tun_delete to use tuntap_helpers
-  selftest: tap: Refactor tap test to use tuntap_helpers
-  selftest: tun: Add helpers for GSO over UDP tunnel
-  selftest: tun: Add test for sending gso packet into tun
-  selftest: tun: Add test for receiving gso packet from tun
-  selftest: tun: Add test data for success and failure paths
-
- tools/testing/selftests/net/tap.c            | 287 +-----
- tools/testing/selftests/net/tun.c            | 917 ++++++++++++++++++-
- tools/testing/selftests/net/tuntap_helpers.h | 608 ++++++++++++
- 3 files changed, 1530 insertions(+), 282 deletions(-)
- create mode 100644 tools/testing/selftests/net/tuntap_helpers.h
-
-
-base-commit: 7b8e9264f55a9c320f398e337d215e68cca50131
+diff --git a/tools/testing/selftests/net/tun.c b/tools/testing/selftests/net/tun.c
+index 0efc67b0357a..128b0a5327d4 100644
+--- a/tools/testing/selftests/net/tun.c
++++ b/tools/testing/selftests/net/tun.c
+@@ -25,7 +25,7 @@ static int tun_attach(int fd, char *dev)
+ 	strcpy(ifr.ifr_name, dev);
+ 	ifr.ifr_flags = IFF_ATTACH_QUEUE;
+ 
+-	return ioctl(fd, TUNSETQUEUE, (void *) &ifr);
++	return ioctl(fd, TUNSETQUEUE, (void *)&ifr);
+ }
+ 
+ static int tun_detach(int fd, char *dev)
+@@ -36,7 +36,7 @@ static int tun_detach(int fd, char *dev)
+ 	strcpy(ifr.ifr_name, dev);
+ 	ifr.ifr_flags = IFF_DETACH_QUEUE;
+ 
+-	return ioctl(fd, TUNSETQUEUE, (void *) &ifr);
++	return ioctl(fd, TUNSETQUEUE, (void *)&ifr);
+ }
+ 
+ static int tun_alloc(char *dev)
+@@ -54,7 +54,7 @@ static int tun_alloc(char *dev)
+ 	strcpy(ifr.ifr_name, dev);
+ 	ifr.ifr_flags = IFF_TAP | IFF_NAPI | IFF_MULTI_QUEUE;
+ 
+-	err = ioctl(fd, TUNSETIFF, (void *) &ifr);
++	err = ioctl(fd, TUNSETIFF, (void *)&ifr);
+ 	if (err < 0) {
+ 		fprintf(stderr, "can't TUNSETIFF: %s\n", strerror(errno));
+ 		close(fd);
+@@ -67,9 +67,9 @@ static int tun_alloc(char *dev)
+ static int tun_delete(char *dev)
+ {
+ 	struct {
+-		struct nlmsghdr  nh;
++		struct nlmsghdr nh;
+ 		struct ifinfomsg ifm;
+-		unsigned char    data[64];
++		unsigned char data[64];
+ 	} req;
+ 	struct rtattr *rta;
+ 	int ret, rtnl;
+@@ -127,31 +127,36 @@ FIXTURE_TEARDOWN(tun)
+ 		close(self->fd2);
+ }
+ 
+-TEST_F(tun, delete_detach_close) {
++TEST_F(tun, delete_detach_close)
++{
+ 	EXPECT_EQ(tun_delete(self->ifname), 0);
+ 	EXPECT_EQ(tun_detach(self->fd, self->ifname), -1);
+ 	EXPECT_EQ(errno, 22);
+ }
+ 
+-TEST_F(tun, detach_delete_close) {
++TEST_F(tun, detach_delete_close)
++{
+ 	EXPECT_EQ(tun_detach(self->fd, self->ifname), 0);
+ 	EXPECT_EQ(tun_delete(self->ifname), 0);
+ }
+ 
+-TEST_F(tun, detach_close_delete) {
++TEST_F(tun, detach_close_delete)
++{
+ 	EXPECT_EQ(tun_detach(self->fd, self->ifname), 0);
+ 	close(self->fd);
+ 	self->fd = -1;
+ 	EXPECT_EQ(tun_delete(self->ifname), 0);
+ }
+ 
+-TEST_F(tun, reattach_delete_close) {
++TEST_F(tun, reattach_delete_close)
++{
+ 	EXPECT_EQ(tun_detach(self->fd, self->ifname), 0);
+ 	EXPECT_EQ(tun_attach(self->fd, self->ifname), 0);
+ 	EXPECT_EQ(tun_delete(self->ifname), 0);
+ }
+ 
+-TEST_F(tun, reattach_close_delete) {
++TEST_F(tun, reattach_close_delete)
++{
+ 	EXPECT_EQ(tun_detach(self->fd, self->ifname), 0);
+ 	EXPECT_EQ(tun_attach(self->fd, self->ifname), 0);
+ 	close(self->fd);
 -- 
 2.49.0
 
