@@ -1,137 +1,236 @@
-Return-Path: <netdev+bounces-247057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9D20CF3CE6
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 14:30:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FC34CF3E3F
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 14:44:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EBC5430024FF
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 13:30:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EE2A03062CED
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 13:40:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07E7021CC5A;
-	Mon,  5 Jan 2026 13:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33C1234106A;
+	Mon,  5 Jan 2026 13:40:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XkoXTaaj"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="evTaGoQ9"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE159225A35;
-	Mon,  5 Jan 2026 13:30:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89279341059
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 13:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767619806; cv=none; b=edNA4ogk6IHTtTL8bSiv2PUumuGlyaZlYkguF2MKj0kXsAcMImr9hO5ZwtDT7pT72/9XfKTblUOnjezk9Ql6wo7QePjNeipuj4wehrtCPIwwjYa+dYHSbWipZFUhwXDuA2TXz42VWaO1B26TSThsbtqVC8/I+50ctlgzog0Sis4=
+	t=1767620439; cv=none; b=mDTyq4aslFcEDQ0nBDsjBVnuwRAkX1eF9SBfWrkCCtISs1nf8bFNAzYQTTngwLDPdvNHQovhSn//QNT0SJuBRSahaI1VCtC6NE+dSPiAUCMwgUOAj15qRfkII/prX3BgnUiOxNeWWl6gjdaATdhk3Xeg5X1wDLw/PeuR/A3Oguk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767619806; c=relaxed/simple;
-	bh=o9jbkrV2OfQZyMx0HC5TQMvXRwI7iv6Z+cNosx+/llA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jrcYlpKyFVDmY37+mSwr5cUjzUv1nbNNZKRpqR1eqIAcSMjagfgubkqxK2mYdSCbNI46ZWbzgMovT5QshLrPC8Qwz+HmQvj28gur/NHaWKtDXX9BtjW4kd4n3O9vz1W1y5N/U7yn7anxTGo22awI59WQu2euBmfA9oqAiJUuoig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=XkoXTaaj; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ENgS81baeUqSqQTbQeVHYozi6bLe6j1KLZFc66IniKM=; b=XkoXTaajLV+WtJIuchJPd1HT+3
-	H8i9hrkMDG4sBZowsMW7EYkqzlRW5sOFKoVBQcL1tIySlfSLHwUouFY2YOG9mEqUoDus8dYzrSQNW
-	Pgev2zvy5nFp+f0MAxuWynpxgSRU/tZ9Eq3Yz/GWMGdTHWJp1/trZObfsOZWCG1o40btMp+TqeUWm
-	gKlffeurT29cKpKDAvZsoaRvJYgsyc7xMUfHN3iFwgXbMOpWs+KwCaZdsSMYtG8UYVXEa0O2mgEpz
-	000MCF7rUGdXQ4WAsUusHLdscEya5t+FC5IvcZMiN5tObe/zP0US2X4WxtPTmQqmb98DAGOi4+7li
-	xDMNbKNw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51660)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vckeX-000000007rH-3OTm;
-	Mon, 05 Jan 2026 13:29:45 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vckeS-000000007t1-3Z1h;
-	Mon, 05 Jan 2026 13:29:40 +0000
-Date: Mon, 5 Jan 2026 13:29:40 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Breno Leitao <leitao@debian.org>
-Cc: Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-team@meta.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net v2] bnxt_en: Fix NULL pointer crash in
- bnxt_ptp_enable during error cleanup
-Message-ID: <aVu8xIfFrIIFqR0P@shell.armlinux.org.uk>
-References: <20260105-bnxt-v2-1-9ac69edef726@debian.org>
+	s=arc-20240116; t=1767620439; c=relaxed/simple;
+	bh=x4FbGO9rb3oDBd7srLGxGoyKvyyHdSRpv19OZNd+OHs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XWBlQ0xYP3UJ5QY8dMxkUjrGzHsdbmWR0NnRlMkKhU6QMzV+r5a4Tyg1NUiFCMh2xHmGd1LsMOKD6UJYPWIYRaIc8BYtFeQNd2TE3dq1jcaJTlCUWyxKBWOxuZ3Tg2FhBS3y8rUnYwhLhO7DKDW5AuCGK2qDex3oVjix8/L6VuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=evTaGoQ9; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-47797676c62so14288535e9.1
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 05:40:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1767620435; x=1768225235; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f1KqtsDg02Q4tg0OrM0LKqtAMxJWRmTEsyj+AQ7lEeQ=;
+        b=evTaGoQ9l965cOyOTnh5VeYas0tCw9526mqa7n8ccT6uk26o1WsIjbUtdKQbDGbx4d
+         G2GkqZOAzx3cG8kDJBRARj1WHAcZp8JBG6V2+xoKtykO4SQSvnFxlQdkrRGYiPmjojNe
+         IdwH0iXrrYMhGOenSzOtBl69bfNzL4tIb/SQ1uszrJUVD4UZBKvBq7VjOkxVT86eauBU
+         fu3Rs0ay8tUh2p57vfgbGKbnK/vsXvASvojK4Kd7UM7Z3+BcDXgn5VILNDkNGCnCHFYk
+         jsL3Dpvs/yOtHsxPsOy2suz8e6pLKLJm8DEMC/vfNW05+rfyc9ywYYRerKXn/pw9sK+K
+         8gjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767620435; x=1768225235;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=f1KqtsDg02Q4tg0OrM0LKqtAMxJWRmTEsyj+AQ7lEeQ=;
+        b=fisZzhj2LsjLK8nkkIoXtvCNa/o7Fr+cPSGQU4cCXSePPG8WuIW1K/f6saeq9ubsl7
+         f8gvdQRewmnG08FLdjzof238BQ8z6X232cGyNBkmitmWfw/AS27vLO9lHJ0Y7HNzf3CR
+         XAYWPGVRjAzd2abpHYEGCBgaEXcdBp67WEl3o40Y6Rq59Xd5mEzzw72BaSFzoWoFoRhd
+         iFfX3FiA5bUCV/nUydBuHfPzpuWkQAp5BSeTl9M4GChHLVqds70P7RRO110l6szWiQeO
+         YKQVCjlR1YqjAmagUv3yg+tvyo6/2E/VVw4ViJB3i0huIgCi1SXOEY8TdHjT2Formkip
+         ET/w==
+X-Forwarded-Encrypted: i=1; AJvYcCWYRCZu5/8KrRu2ZxyeXuQu1Qro9YnuAqWV/b29mGcvHfCr0ki0c555W6R+CBiih3TYycXQOB4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyaAtYOHgjltd7Y1xz38aPO3UqvAE9QR//DmhHsm/pJuMbnBbKH
+	4hJlEEbyV4+ZsqPVjZoX/F4LSZwlB9nwDzlLcI3qEq8Xoy8NeDG2F714W5xbki2qYnE=
+X-Gm-Gg: AY/fxX7CeWT/au5g8cmBZAQeGvhEtGGPGurYK2pvj3WYyeZpTDWizm90w2jGIAzo4jN
+	G1N7/uTpiW4/5pTOp4lRYIRY0ZXG8TWql6815ir/EbAFHWbHQI1dLr46BS1sgbs3qp6EHu2SNxk
+	0kHxpD6tFlSW0FfRq2kaAlo0k9zcbjxfzd6KT2uo+gZdn0CF8drBkCTeCbRAH0ZaSJjfe5FKxy3
+	TaxX4BbfowsnZP8PwZZzygYekARmLi0Wtu5NX9KO+1Q+Q7mhLmIOZarQ99inr73/bhhf0VYZRhu
+	E5f2YYcXp8mePjweydzFHpDVwWSOeIfdLK/7U/6qhFZeN6/tbb/tiTtodqvF3j5sT1fsQHKPbFn
+	c/HX2y3UP3iiTvB0tBwK/f/GEEcelb9RVgfMI46fS+VbWZfJYZwal2X7GfnioBlOkkVBRXTPhkE
+	I7m/kgtMfmZpgZvHs4tyOliRR8y4e/XSuF0U1XHVJ8+YjzCH68Tt34FDfPQtnMWfJr6YMj24v32
+	EAQ
+X-Google-Smtp-Source: AGHT+IFwXSkFSnAzDpXmvBfpaag5Ig2x/hY7lR/fPaiKG8l/aTMnGjVbJNKYUdmZgkyBxJqwrNsd/A==
+X-Received: by 2002:a05:600c:4ed2:b0:477:9c9e:ec7e with SMTP id 5b1f17b1804b1-47d19597517mr371677315e9.6.1767620434763;
+        Mon, 05 Jan 2026 05:40:34 -0800 (PST)
+Received: from mordecai (dynamic-2a00-1028-83b8-1e7a-3010-3bd6-8521-caf1.ipv6.o2.cz. [2a00:1028:83b8:1e7a:3010:3bd6:8521:caf1])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d6be2ce32sm61878015e9.2.2026.01.05.05.40.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 05:40:34 -0800 (PST)
+Date: Mon, 5 Jan 2026 14:40:31 +0100
+From: Petr Tesarik <ptesarik@suse.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>, Olivia Mackall <olivia@selenic.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Eugenio =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, "James E.J. Bottomley"
+ <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Robin Murphy <robin.murphy@arm.com>, Stefano Garzarella
+ <sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Leon Romanovsky
+ <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, Bartosz Golaszewski
+ <brgl@kernel.org>, linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
+ virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
+ iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 05/15] dma-debug: track cache clean flag in entries
+Message-ID: <20260105144031.2520c81b@mordecai>
+In-Reply-To: <20260105073621-mutt-send-email-mst@kernel.org>
+References: <cover.1767601130.git.mst@redhat.com>
+	<0ffb3513d18614539c108b4548cdfbc64274a7d1.1767601130.git.mst@redhat.com>
+	<20260105105433.5b875ce3@mordecai>
+	<20260105073621-mutt-send-email-mst@kernel.org>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-suse-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260105-bnxt-v2-1-9ac69edef726@debian.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 05, 2026 at 04:00:16AM -0800, Breno Leitao wrote:
-> When bnxt_init_one() fails during initialization (e.g.,
-> bnxt_init_int_mode returns -ENODEV), the error path calls
-> bnxt_free_hwrm_resources() which destroys the DMA pool and sets
-> bp->hwrm_dma_pool to NULL. Subsequently, bnxt_ptp_clear() is called,
-> which invokes ptp_clock_unregister().
+On Mon, 5 Jan 2026 07:37:31 -0500
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
+
+> On Mon, Jan 05, 2026 at 10:54:33AM +0100, Petr Tesarik wrote:
+> > On Mon, 5 Jan 2026 03:23:10 -0500
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >   
+> > > If a driver is buggy and has 2 overlapping mappings but only
+> > > sets cache clean flag on the 1st one of them, we warn.
+> > > But if it only does it for the 2nd one, we don't.
+> > > 
+> > > Fix by tracking cache clean flag in the entry.
+> > > 
+> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > ---
+> > >  kernel/dma/debug.c | 27 ++++++++++++++++++++++-----
+> > >  1 file changed, 22 insertions(+), 5 deletions(-)
+> > > 
+> > > diff --git a/kernel/dma/debug.c b/kernel/dma/debug.c
+> > > index 7e66d863d573..43d6a996d7a7 100644
+> > > --- a/kernel/dma/debug.c
+> > > +++ b/kernel/dma/debug.c
+> > > @@ -63,6 +63,7 @@ enum map_err_types {
+> > >   * @sg_mapped_ents: 'mapped_ents' from dma_map_sg
+> > >   * @paddr: physical start address of the mapping
+> > >   * @map_err_type: track whether dma_mapping_error() was checked
+> > > + * @is_cache_clean: driver promises not to write to buffer while mapped
+> > >   * @stack_len: number of backtrace entries in @stack_entries
+> > >   * @stack_entries: stack of backtrace history
+> > >   */
+> > > @@ -76,7 +77,8 @@ struct dma_debug_entry {
+> > >  	int		 sg_call_ents;
+> > >  	int		 sg_mapped_ents;
+> > >  	phys_addr_t	 paddr;
+> > > -	enum map_err_types  map_err_type;
+> > > +	enum map_err_types map_err_type;  
+> > 
+> > *nitpick* unnecessary change in white space (breaks git-blame).
+> > 
+> > Other than that, LGTM. I'm not formally a reviewer, but FWIW:
+> > 
+> > Reviewed-by: Petr Tesarik <ptesarik@suse.com>
+> > 
+> > Petr T  
 > 
-> Since commit a60fc3294a37 ("ptp: rework ptp_clock_unregister() to
-> disable events"), ptp_clock_unregister() now calls
-> ptp_disable_all_events(), which in turn invokes the driver's .enable()
-> callback (bnxt_ptp_enable()) to disable PTP events before completing the
-> unregistration.
 > 
-> bnxt_ptp_enable() attempts to send HWRM commands via bnxt_ptp_cfg_pin()
-> and bnxt_ptp_cfg_event(), both of which call hwrm_req_init(). This
-> function tries to allocate from bp->hwrm_dma_pool, causing a NULL
-> pointer dereference:
+> I mean, yes it's not really required here, but the padding we had before
+> was broken (two spaces not aligning to anything).
 
-This has revealed a latent bug in this driver. All the time that the
-PTP clock is registered, userspace can interact with it, and thus
-bnxt_ptp_enable() can be called. ptp_clock_unregister() unpublishes
-that interface.
+Oh, you're right! Yes, then let's fix it now, because you touch the
+neighbouring line.
 
-ptp_clock_unregister() must always be called _before_ tearing down any
-resources that the PTP clock implementation may use.
+Sorry for the noise.
 
-From what you describe, it sounds like this patch fixes that.
+Petr T
 
-Looking at the driver, however, it looks very suspicious.
+> > > +	bool		 is_cache_clean;
+> > >  #ifdef CONFIG_STACKTRACE
+> > >  	unsigned int	stack_len;
+> > >  	unsigned long	stack_entries[DMA_DEBUG_STACKTRACE_ENTRIES];
+> > > @@ -472,12 +474,15 @@ static int active_cacheline_dec_overlap(phys_addr_t cln)
+> > >  	return active_cacheline_set_overlap(cln, --overlap);
+> > >  }
+> > >  
+> > > -static int active_cacheline_insert(struct dma_debug_entry *entry)
+> > > +static int active_cacheline_insert(struct dma_debug_entry *entry,
+> > > +				   bool *overlap_cache_clean)
+> > >  {
+> > >  	phys_addr_t cln = to_cacheline_number(entry);
+> > >  	unsigned long flags;
+> > >  	int rc;
+> > >  
+> > > +	*overlap_cache_clean = false;
+> > > +
+> > >  	/* If the device is not writing memory then we don't have any
+> > >  	 * concerns about the cpu consuming stale data.  This mitigates
+> > >  	 * legitimate usages of overlapping mappings.
+> > > @@ -487,8 +492,16 @@ static int active_cacheline_insert(struct dma_debug_entry *entry)
+> > >  
+> > >  	spin_lock_irqsave(&radix_lock, flags);
+> > >  	rc = radix_tree_insert(&dma_active_cacheline, cln, entry);
+> > > -	if (rc == -EEXIST)
+> > > +	if (rc == -EEXIST) {
+> > > +		struct dma_debug_entry *existing;
+> > > +
+> > >  		active_cacheline_inc_overlap(cln);
+> > > +		existing = radix_tree_lookup(&dma_active_cacheline, cln);
+> > > +		/* A lookup failure here after we got -EEXIST is unexpected. */
+> > > +		WARN_ON(!existing);
+> > > +		if (existing)
+> > > +			*overlap_cache_clean = existing->is_cache_clean;
+> > > +	}
+> > >  	spin_unlock_irqrestore(&radix_lock, flags);
+> > >  
+> > >  	return rc;
+> > > @@ -583,20 +596,24 @@ DEFINE_SHOW_ATTRIBUTE(dump);
+> > >   */
+> > >  static void add_dma_entry(struct dma_debug_entry *entry, unsigned long attrs)
+> > >  {
+> > > +	bool overlap_cache_clean;
+> > >  	struct hash_bucket *bucket;
+> > >  	unsigned long flags;
+> > >  	int rc;
+> > >  
+> > > +	entry->is_cache_clean = !!(attrs & DMA_ATTR_CPU_CACHE_CLEAN);
+> > > +
+> > >  	bucket = get_hash_bucket(entry, &flags);
+> > >  	hash_bucket_add(bucket, entry);
+> > >  	put_hash_bucket(bucket, flags);
+> > >  
+> > > -	rc = active_cacheline_insert(entry);
+> > > +	rc = active_cacheline_insert(entry, &overlap_cache_clean);
+> > >  	if (rc == -ENOMEM) {
+> > >  		pr_err_once("cacheline tracking ENOMEM, dma-debug disabled\n");
+> > >  		global_disable = true;
+> > >  	} else if (rc == -EEXIST &&
+> > > -		   !(attrs & (DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_CPU_CACHE_CLEAN)) &&
+> > > +		   !(attrs & DMA_ATTR_SKIP_CPU_SYNC) &&
+> > > +		   !(entry->is_cache_clean && overlap_cache_clean) &&
+> > >  		   !(IS_ENABLED(CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC) &&
+> > >  		     is_swiotlb_active(entry->dev))) {
+> > >  		err_printk(entry->dev, entry,  
+> 
 
-__bnxt_hwrm_ptp_qcfg() seems to be the place where PTP is setup and
-initialised (and ptp_clock_register() called in bnxt_ptp_init()).
-
-First, it looks like bnxt_ptp_init() will tear down an existing PTP
-clock via bnxt_ptp_free() before then re-registering it. That seems
-odd.
-
-Second, __bnxt_hwrm_ptp_qcfg() calls bnxt_ptp_clear() if
-bp->hwrm_spec_code < 0x10801 || !BNXT_CHIP_P5_PLUS(bp) is true or
-hwrm_req_init() fails. Is it really possible that we have the PTP
-clock registered when PTP isn't supported?
-
-Third, same concern but with __bnxt_hwrm_func_qcaps().
-
-My guess is that this has something to do with firmware, and maybe
-upgrading it at runtime - so if the firmware gets upgraded to a
-version that doesn't support PTP, the driver removes PTP. However,
-can PTP be used while firmware is being upgraded, and what happens
-if, e.g. bnxt_ptp_enable() were called mid-upgrade? Would that be
-safe?
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
