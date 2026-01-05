@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-247092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6299FCF4830
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 16:51:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A814CF4803
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 16:48:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8EFA33118DF9
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 15:44:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 24295310D774
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 15:42:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E939032C316;
-	Mon,  5 Jan 2026 15:34:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B646533858E;
+	Mon,  5 Jan 2026 15:35:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dgMuS7D1"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0LeuMVSp"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 370CB32B996;
-	Mon,  5 Jan 2026 15:34:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F65C334C1F;
+	Mon,  5 Jan 2026 15:35:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767627274; cv=none; b=pwfymC90XdTvgB08bERoL0U285jYeBSeYBSID2iJHGwYdl4ma6ORWvD11/5ACEdK3oX/wdnfUmnk9IP1V6rFdelKqhsyHOQJ+Je2trI2q4j1somlxDRMYytpYJPa6jBNl5CFUg7j6LsN7l3vrCaMsE4dWeZZpnIlBewO+A8CweI=
+	t=1767627353; cv=none; b=qw7N3P246RoOQMokV2HoJ7iATmMRTrwpn7N9g8xiDEqC4bOfPBAcSSQbYZqzO5D1W4QTwgJYleOavygLe6AHFBu46d4GrZ2de42sizUMlMHVp4klayMT+PCYYebT99wymUqXpodNjYj2gvTDIIn/j8tLkHvoxez47LKH3pjwJkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767627274; c=relaxed/simple;
-	bh=pFm1oPv5Ep5Yh2FQNd9XHx7ZenUP/jJeBeGNBYKkzis=;
+	s=arc-20240116; t=1767627353; c=relaxed/simple;
+	bh=1MTChmLrOZUO1PTrEDIoithmlLSAZlsyb/4VWReOOXw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kIaFeiB6H1g5+0xzIt/tP2CTaBf7y2aUZh7oW36G425Ce3XVoTpYVdWeuYZNedUesKeq9Ki8cR5abNlMn21Do+RhOmW+A+ysdfaVtVCTDp5byW3bzQui+rKoUwpPdwm/k2Je6XBGVz7pm4t3MiRGhzO2ZMGbhgrmn7rxuoyMxt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dgMuS7D1; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=lBrUry0JidEek7X1kZjsOqWQsdu41zXe5CbD8tr2ntdLbO0hCOch+SawBlbxKJU10mvmDYkYVsrzwko96dSlL/93k+sMmB/jCapO1AkrluceEofuN0QRGuESSfZuYInQ7xShiZ3O7IFBv/0mQ2VOnhd5n4ORj8stQDsbSEcBhEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0LeuMVSp; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -34,24 +34,28 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Ltr0cu+4l4BDSYgyoyIgm92xPRorcWY2W147fXeYKIQ=; b=dgMuS7D1iXIwGlZxFal8AECT9Q
-	kg/b+9N7eVxDwqvh+L5RrgTNB4jOtKwXoPsHq1R54nlP8/35IgjHbo+rkoPesOSEEOfEoebTjxLYU
-	5Cd+zZmo1S7/6B8ycKB4dHSAkJFVCsBZVTkfuWwTnj5ju8t7v0OMd4izt69cszhfebtg=;
+	bh=K7yq1732eMKsor7g4md0pKiQDNOJcbfUwif3tEqKzAE=; b=0LeuMVSptPSn/ReUPkVg0wSrce
+	YgsRflqh8J4MIf3nMliqMsxR8Ng+uuJcWbounPrNM3MV80WDj7bcPmvTwq3NHMBXk7f4uCPc2Iwpb
+	JQBftAqQ2LoqBjKlDZla7qj1qR0QoVrMBCxdvgc3AOM9F/0qjWogWNah30sD9dbxuhWI=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vcmbB-001VBF-Er; Mon, 05 Jan 2026 16:34:25 +0100
-Date: Mon, 5 Jan 2026 16:34:25 +0100
+	id 1vcmcO-001VC9-Nm; Mon, 05 Jan 2026 16:35:40 +0100
+Date: Mon, 5 Jan 2026 16:35:40 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Yeounsu Moon <yyyynoom@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+To: Francesco Dolcini <francesco@dolcini.it>
+Cc: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] net: dlink: replace printk() with
- netdev_{info,dbg}() in rio_probe1()
-Message-ID: <e56fcc20-bfd9-4b4d-815e-d6c3f9b20b5b@lunn.ch>
-References: <20260105130552.8721-2-yyyynoom@gmail.com>
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	imx@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: fec: Add stop mode support on
+ i.MX8DX/i.MX8QP
+Message-ID: <9acdb8d1-529e-46f2-8931-780287b8cb16@lunn.ch>
+References: <20260105152452.84338-1-francesco@dolcini.it>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,21 +64,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260105130552.8721-2-yyyynoom@gmail.com>
+In-Reply-To: <20260105152452.84338-1-francesco@dolcini.it>
 
-On Mon, Jan 05, 2026 at 10:05:53PM +0900, Yeounsu Moon wrote:
-> Replace rio_probe1() printk(KERN_INFO) messages with netdev_{info,dbg}().
+On Mon, Jan 05, 2026 at 04:24:50PM +0100, Francesco Dolcini wrote:
+> From: Francesco Dolcini <francesco.dolcini@toradex.com>
 > 
-> Keep one netdev_info() line for device identification; move the rest to
-> netdev_dbg() to avoid spamming the kernel log.
+> Add additional machines that requires communication to the SC firmware
+> to set the GPR bit required for stop mode support.
 > 
-> Log rx_timeout on a separate line since netdev_*() prefixes each
-> message and the multi-line formatting looks broken otherwise.
+> NXP i.MX8DX (fsl,imx8dx) is a low end version of i.MX8QXP (fsl,imx8qxp),
+> while NXP i.MX8QP (fsl,imx8qp) is a low end version of i.MX8QM
+> (fsl,imx8qm).
 > 
-> No functional change intended.
-> 
-> Tested-on: D-Link DGE-550T Rev-A3
-> Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
+> Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
