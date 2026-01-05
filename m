@@ -1,127 +1,127 @@
-Return-Path: <netdev+bounces-247111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD1BACF4AB1
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 17:27:09 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D0C8CF4B20
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 17:32:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 44909300D90D
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 16:26:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1FA49308FEFD
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 16:26:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 571D4346FDF;
-	Mon,  5 Jan 2026 16:16:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 576C2347FC3;
+	Mon,  5 Jan 2026 16:16:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ayzv1Gkz"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="w0TUrT4c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578D0346FCA
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 16:16:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC7A346FD4;
+	Mon,  5 Jan 2026 16:16:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767629780; cv=none; b=q55x+USqEosDlp0jY/oioOla7tSQwO9rjNzlmEXCzf2FS3ZoBsOvhTqPJZKRQK1rKIK0ZlOFbs+xs33r5SAtmV0BjvluxlDm3/6ooa/1P6py51wjG9R4RlTXemYJ3qEivWb0TPIqfz91QNBo+g2GNtZH3vTDcrNo7a8RpiOttq8=
+	t=1767629782; cv=none; b=l5Al6SqMK2/wQXMjrTWP8z10pI5c5UQXo4LRkvMcJT5bh+BqncdgmnvG9vfh8Q38F1eke/7Ex0PZ4zc1SCQiPyOQUPNOWOCmYTz0D7cZxyZdZ0iNZ67JSjcROswdKe1M1+keDJDW4fH1dBIhGvnU88nBLRgxD8cOdjZBPlh6ywI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767629780; c=relaxed/simple;
-	bh=24fnI8nAhGfjPILK+YRYQGQ1kkNBuj50/yvXc6+sXfw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZDstM7x12MPVyPfHgPwJ54J+7cO6Z/sW2ltCyvW5x86w8hKnFNytRvQ2LI24tDbWFQcgYCX2RAFXEv9qu+WlVvt8nG7ucwjCbTTiUr8qsG2eqGPa3yNqAVeArrxbQnhZeV+zi3uetQlCI/TsNJ0HrjDy2mZYE97JANfvnSpJl9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ayzv1Gkz; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-42b3b0d76fcso10080f8f.3
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 08:16:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767629777; x=1768234577; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=24fnI8nAhGfjPILK+YRYQGQ1kkNBuj50/yvXc6+sXfw=;
-        b=Ayzv1Gkzgv8qiuwgV4detegm0uhyRyOQQG3S1ylZuywG5CHrNIocYC18Sjl9YrsYnB
-         0/zplZpddcHF18xU5TfwWX76rrOetP5V/9zcJloerjYutjLiv354+GXu1qW+0A9mYS4S
-         jLKa/b+g4C//SI8va05PnhWUQupsqxZBjaRzYpsvo1X4RBsKKP9rOb8Q3IuBu/Hf9ZSd
-         Y/IW2yS6EJorer+HS2CtpZhfQtdkpRCgx2hbapqNvAZDOanyzoL6gqIaoXqRIOkFneLg
-         3WfrJGgZTUTEqBnuDAUscMpghu9ZvQ9zILsnwIfOSM0un9GeUfIodtUHIeHM4Tk1IEEe
-         pGLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767629777; x=1768234577;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=24fnI8nAhGfjPILK+YRYQGQ1kkNBuj50/yvXc6+sXfw=;
-        b=wWqGTn8+/pDqe0okUCY7JtlKZNR05HvuuOLdntYsazMFM2AaKW6T7R4fXys4C4KV21
-         B41l5ZlGgv7ncsAhbE5AgJTLHrIiPemArGCVazdmomk2GSTYbyXTLBP6iltvOKyKieiN
-         pMK8r4xYQFEW2yhmM1Q5iHWV3SQFOf0Nyiw33SZFojU0wP0u3AVj86HNh70kbHlRYLf2
-         37i6qvyECm4zIj0HvMpXqwOo8/gON+I8lOcpTM+QPgXFfkqxi7yeD0YSLNMph6FL9YsO
-         R9EZh+XTtbp7ifEUOsEp/SZJ1emkjPeIYcj6DfRiNJxmJqe0egkAZhRpoDZBLTAjKT3x
-         Sw6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUCn/dTgYxfGyMqNYEz8prDnYsHutvIlbH8qZ9H1lMIk2QPUITOfYhpoJctPjzNpvbPWrzAFOU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4ynJ7sO7rlYMsvJTdAt34IKyHRByemsLefmAZ8zfhh8StjwdR
-	MAqLA7nksSNgteQ3ysOwx81WkhojOXT4xHiSFPm39T2Vc2yNiN/4gIuXaYdhzB4q7kWyKqikIbh
-	G0+yyPkVUR/uPKs0069T1YQpCnFcnUXo=
-X-Gm-Gg: AY/fxX7xybgsfnXL12Rn/tQGwkYc65MnivCkvd9wpi4/Yo8AvOUY+zwGitx+j0m9o+h
-	0XTRZKNji8VVvlYQbQZMLRR+aVHXnMhN/SOeU5FubNpDD8sOnGTa14w/ofns9qwedYiaP7iTdQf
-	XrR5ys/5T/Itkf0H3fUYTenheGi3e8SLLHyoVEv5RkQayml0YcTRL7efRAPEkZJxr9UcVt2eZ2G
-	X0QrBsExIkzv7Slr5Y1ZjKcVK8LZ4BsSSzRuJr9H5iERnENwtefkC2ZYsVgc9mmV7X7IvmeBWQb
-	KISlu38wvRGm64iSi3LUgj2H4b+4
-X-Google-Smtp-Source: AGHT+IESHgflPXvOIachn8Weu/Gj1rT+55EATQkV3//kOCtswflw/4k0GsKSLk6uxqw29XlNeXlkKp2z/dgKR9Squ1U=
-X-Received: by 2002:a5d:5f55:0:b0:431:abb:942f with SMTP id
- ffacd0b85a97d-432bc9f60c8mr395235f8f.54.1767629776203; Mon, 05 Jan 2026
- 08:16:16 -0800 (PST)
+	s=arc-20240116; t=1767629782; c=relaxed/simple;
+	bh=9i67VTNE5FrtiAowIq8uSRUUDChaB5at4SSp/o9nPe0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=En+DYBR1TpM1xf1u02V3+FILqpgY5+Rphyxog7xP6dr2/dAis+SFcMkrWk/eP0KqSLiHEDTIv3DhI/t/HljsNZOMbdHtKGc8/GKHYPlr7CHegjOw2Pl/x+q0iQCZKaGlhnt+X7vXci0xtThsMxyQd4B4awFyzLFuz3p8iNAMhRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=w0TUrT4c; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=jdTxogabHUVvZFgfzUllqOqY7gjAS94xoT2KLAqZfG4=; b=w0TUrT4cle/QW2C1IgaR3L3msZ
+	DbdCDJ626YYs4V+t+2hOQlg0/coZ/eMue4bHhdfp6kfU47e7eqkU2XduqdVEq4vsgnQLyL+krYP+J
+	xGXzmx0pLgr3RRMNVRfH0iNDcIEEoEa8hrK+JzCvxOjrSAvhSL1y8R4mgNoOGiGnD2jiy8PF1k+Db
+	TMLPW4NoXT3y6oUU/djRt5eB+OQcwOEpIhUs4YUcdEE4FVjKKmX/Fq3PkfQq0YN7+YILktz4FjAei
+	6KNWYGdwX+Ux6P9YFGhvXjS9fzMRoWPeOI7C7KH/wOAYhfp/FIbKmihx/MMVMtT8BK/FxaxACBi1b
+	dLTx7H3Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60394)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vcnFd-0000000084D-079a;
+	Mon, 05 Jan 2026 16:16:13 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vcnFZ-000000007z0-3ngJ;
+	Mon, 05 Jan 2026 16:16:09 +0000
+Date: Mon, 5 Jan 2026 16:16:09 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jonas Jelonek <jelonek.jonas@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH v2] net: sfp: add SMBus I2C block support
+Message-ID: <aVvjyWzKuczNf3lt@shell.armlinux.org.uk>
+References: <20260105154653.575397-1-jelonek.jonas@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251126221724.897221-6-samitolvanen@google.com> <6482b711-4def-427a-a416-f59fe08e61d0@redhat.com>
-In-Reply-To: <6482b711-4def-427a-a416-f59fe08e61d0@redhat.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Mon, 5 Jan 2026 08:16:05 -0800
-X-Gm-Features: AQt7F2oB28_RiadtNKU61c30UF9BbaZnytAxnF0RGG3ahLw-g3EBYxabF3xNxQg
-Message-ID: <CAADnVQJVEEcRy9C99sPuo-LYPf_7Tu3AwF6gYx5nrk700Y1Eww@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v4 0/4] Use correct destructor kfunc types
-To: Viktor Malik <vmalik@redhat.com>
-Cc: bpf <bpf@vger.kernel.org>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	Sami Tolvanen <samitolvanen@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260105154653.575397-1-jelonek.jonas@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Jan 5, 2026 at 5:56=E2=80=AFAM Viktor Malik <vmalik@redhat.com> wro=
-te:
->
-> On 11/26/25 23:17, Sami Tolvanen wrote:
-> > Hi folks,
-> >
-> > While running BPF self-tests with CONFIG_CFI (Control Flow
-> > Integrity) enabled, I ran into a couple of failures in
-> > bpf_obj_free_fields() caused by type mismatches between the
-> > btf_dtor_kfunc_t function pointer type and the registered
-> > destructor functions.
-> >
-> > It looks like we can't change the argument type for these
-> > functions to match btf_dtor_kfunc_t because the verifier doesn't
-> > like void pointer arguments for functions used in BPF programs,
-> > so this series fixes the issue by adding stubs with correct types
-> > to use as destructors for each instance of this I found in the
-> > kernel tree.
-> >
-> > The last patch changes btf_check_dtor_kfuncs() to enforce the
-> > function type when CFI is enabled, so we don't end up registering
-> > destructors that panic the kernel.
->
-> Hi,
->
-> this seems to have slipped through the cracks so I'm bumping the thread.
-> It would be nice if we could merge this.
+On Mon, Jan 05, 2026 at 03:46:53PM +0000, Jonas Jelonek wrote:
+> @@ -765,26 +794,70 @@ static int sfp_smbus_byte_write(struct sfp *sfp, bool a2, u8 dev_addr,
+>  		dev_addr++;
+>  	}
+>  
+> +	return data - (u8 *)buf;
 
-It did. Please rebase, resend.
+A separate fix is being submitted for this.
+
+> +}
+> +
+> +static int sfp_smbus_block_write(struct sfp *sfp, bool a2, u8 dev_addr,
+> +				 void *buf, size_t len)
+> +{
+> +	size_t block_size = sfp->i2c_block_size;
+> +	union i2c_smbus_data smbus_data;
+> +	u8 bus_addr = a2 ? 0x51 : 0x50;
+> +	u8 *data = buf;
+> +	u8 this_len;
+> +	int ret;
+> +
+> +	while (len) {
+> +		this_len = min(len, block_size);
+> +
+> +		smbus_data.block[0] = this_len;
+> +		memcpy(&smbus_data.block[1], data, this_len);
+> +		ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
+> +				     I2C_SMBUS_WRITE, dev_addr,
+> +				     I2C_SMBUS_I2C_BLOCK_DATA, &smbus_data);
+> +		if (ret)
+> +			return ret;
+> +
+> +		len -= this_len;
+> +		data += this_len;
+> +		dev_addr += this_len;
+> +	}
+> +
+>  	return 0;
+
+This is wrong. As already said, the I2C accessors return the number of
+bytes successfully transferred. Zero means no bytes were transferred,
+which is an error.
+
+All callers to sfp_write() validate that the expected number of bytes
+were written. Thus, returning zero will cause failures.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
