@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-246944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F713CF2A27
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 10:10:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95888CF2B6C
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 10:23:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ACC4A304A112
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 09:06:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4F2E530222F2
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 09:17:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EEAB33123E;
-	Mon,  5 Jan 2026 09:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21A6B33508D;
+	Mon,  5 Jan 2026 09:06:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VQrsMO31"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GZFI05tU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0420232C33E;
-	Mon,  5 Jan 2026 09:03:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C12335067;
+	Mon,  5 Jan 2026 09:06:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767603797; cv=none; b=HJn0FbSWOXk5GnXNkRnqj8HOp/ryTHR2a9nHyNq7wU9xIT8q0jqAOsHq7Q23kdjPTxqDo1ztaV6o/EKVTv5Vfv7/+Vy/lznSXuzi84W11KS9nn+BpVdAjhPtVpdjW97Wx65qULlmTdiWY9pbEaADa+4phLQltE2aZWwYQbgcoDE=
+	t=1767603968; cv=none; b=LK+dBi206pZuNLza0F70FDpGa3pGnXSZswpsgR2V0IKswzFwOb6p1Es15ba7YrCbasY5Ia9TZgXqb/teH12fAq1t509rSMA5pblwfolyRL4+ZIOdETpz6yD0gZGLxjujZq0HwNMrpH+U6tLIqE53XXwkNMUjG/9Pj/77qozpmwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767603797; c=relaxed/simple;
-	bh=8vXTewXSrHJNcvfU5XxxfBAvi/sv6EPaP/XXsW+cvCM=;
+	s=arc-20240116; t=1767603968; c=relaxed/simple;
+	bh=peEnoxldRbRzDKvGHhMCLsWPsFLvytHX9Kqdw5HT/7Y=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RAGtpuSLUMPo2RZAajv5dYHuiMf1pxB2932yFtgsfAh6zVd+l9fPIW7FL1hsj+Kofdqds12lI3gxCf5A2sXxk00C2rWyogjIDCPRNZmpoxp+VRA0AjtpKHGPBNf3/ybM26wp8OZ0gGPT3ANwG/8igZsSWrhBP0UYJOnRtcAT/eE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VQrsMO31; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3451C2BCB6;
-	Mon,  5 Jan 2026 09:03:15 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=BwRBiiDTuYWA4hy2jbAvxfTXtXB9vr1LR7IumQRUZ2huKouJVxm8AiqiSheGtoyeS50KXWiK2rJNGBCziRzyhbfBlov92nD7bjQWVu475GBgBgzK/ytSyhjuwiEtPYXa82RstUCntOsUabA5h7dRSn81atrS1kDQ8ZwrqPWJTew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GZFI05tU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9933C4E694;
+	Mon,  5 Jan 2026 09:06:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767603796;
-	bh=8vXTewXSrHJNcvfU5XxxfBAvi/sv6EPaP/XXsW+cvCM=;
+	s=k20201202; t=1767603967;
+	bh=peEnoxldRbRzDKvGHhMCLsWPsFLvytHX9Kqdw5HT/7Y=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=VQrsMO31f35whw1OvqyzyD/ru/6ixeJrxJqPSihrTCg+MHcXEHSusMQXN/hY4PGjo
-	 7KdK1HTSSTcUXldEfr4r85VXwKlKItXgxOrS90enPT9z5nLTl4qRCH9GUPl7CydNsV
-	 +tndekfEl2Y/rhVnsJQid2JcGtCFnaqcRXuxQq2RhsljeKVt+t1NbH7ggrgOb/TxYD
-	 qN81C9cFNow3uGVreDH+5EF0zCBS57S49qXkXmPt0QgW9RHGZKRhE0DWbsE/ZRrak7
-	 78U3qCwPUG6LjsYdvW5TaMjEzN0YMgLFTggPba1Yok42Pz0Ux0tVBLBx2l1ehzF9CL
-	 wt/NJnGkuNnGg==
+	b=GZFI05tU2fVRmDAnoA4N8wUfDYxv69/f1M+3jEu5C+ESWtRSJQ0Bb7FeNzAVizoi1
+	 xSV6hwVUddZC6mB0g8zRDG+kq06NGrlDI5e0/7gRGOlNZXhpAqByFnRdVqZkCAjQMm
+	 h8C0TGZchhhbucxSObX1mbXE5ZmxwxZPUTAj3hegvPP8kluABAKJzTzAMm8NFGqFRH
+	 s4MK1YtNbhWC2LXsOkhw8vzBTgTVOmXyFteq2vdc7x4E7vNQIrMtlgtHyLBc9eyTjl
+	 RAz6QnI02c863v4iSslTpV6suwfsfJbNwcQgk6w9M6Su5q+U2XccHStx04Oxg7Djdp
+	 6V+2/K5/U0YFw==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Mon, 05 Jan 2026 10:02:56 +0100
-Subject: [PATCH net-next 1/2] dt-bindings: net: airoha: npu: Add BA memory
- region
+Date: Mon, 05 Jan 2026 10:02:57 +0100
+Subject: [PATCH net-next 2/2] net: airoha: npu: Init BA memory region if
+ provided via DTS
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,7 +51,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260105-airoha-ba-memory-region-v1-1-5b07a737c7a7@kernel.org>
+Message-Id: <20260105-airoha-ba-memory-region-v1-2-5b07a737c7a7@kernel.org>
 References: <20260105-airoha-ba-memory-region-v1-0-5b07a737c7a7@kernel.org>
 In-Reply-To: <20260105-airoha-ba-memory-region-v1-0-5b07a737c7a7@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -63,48 +63,33 @@ Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
 X-Mailer: b4 0.14.2
 
-Introduce Block Ack memory region used by NPU MT7996 (Eagle) offloading.
+Initialize NPU Block Ack memory region if reserved via DTS.
+Block Ack memory region is used by NPU MT7996 (Eagle) offloading.
 
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/airoha/airoha_npu.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml b/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml
-index 59c57f58116b568092446e6cfb7b6bd3f4f47b82..b3a2b36f6a121f90acf88a07b0f1733fa6da08a8 100644
---- a/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml
-+++ b/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml
-@@ -50,6 +50,12 @@ properties:
-           - description: NPU wlan offload RX buffers region
-           - description: NPU wlan offload TX buffers region
-           - description: NPU wlan offload TX packet identifiers region
-+      - items:
-+          - description: NPU firmware binary region
-+          - description: NPU wlan offload RX buffers region
-+          - description: NPU wlan offload TX buffers region
-+          - description: NPU wlan offload TX packet identifiers region
-+          - description: NPU wlan Block Ack buffers region
+diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/ethernet/airoha/airoha_npu.c
+index 68b7f9684dc7f3912493876ae937207f55b81330..00faca2a388aa4378b58560c14d8eec0cb6b0330 100644
+--- a/drivers/net/ethernet/airoha/airoha_npu.c
++++ b/drivers/net/ethernet/airoha/airoha_npu.c
+@@ -519,6 +519,14 @@ static int airoha_npu_wlan_init_memory(struct airoha_npu *npu)
+ 	if (err)
+ 		return err;
  
-   memory-region-names:
-     items:
-@@ -57,6 +63,7 @@ properties:
-       - const: pkt
-       - const: tx-pkt
-       - const: tx-bufid
-+      - const: ba
- 
- required:
-   - compatible
-@@ -93,7 +100,7 @@ examples:
-                      <GIC_SPI 122 IRQ_TYPE_LEVEL_HIGH>,
-                      <GIC_SPI 123 IRQ_TYPE_LEVEL_HIGH>;
-         memory-region = <&npu_firmware>, <&npu_pkt>, <&npu_txpkt>,
--                        <&npu_txbufid>;
--        memory-region-names = "firmware", "pkt", "tx-pkt", "tx-bufid";
-+                        <&npu_txbufid>, <&npu_ba>;
-+        memory-region-names = "firmware", "pkt", "tx-pkt", "tx-bufid", "ba";
-       };
-     };
++	if (of_property_match_string(npu->dev->of_node, "memory-region-names",
++				     "ba") >= 0) {
++		cmd = WLAN_FUNC_SET_WAIT_DRAM_BA_NODE_ADDR;
++		err = airoha_npu_wlan_set_reserved_memory(npu, 0, "ba", cmd);
++		if (err)
++			return err;
++	}
++
+ 	cmd = WLAN_FUNC_SET_WAIT_IS_FORCE_TO_CPU;
+ 	return airoha_npu_wlan_msg_send(npu, 0, cmd, &val, sizeof(val),
+ 					GFP_KERNEL);
 
 -- 
 2.52.0
