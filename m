@@ -1,54 +1,55 @@
-Return-Path: <netdev+bounces-247048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1230DCF3BDB
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 14:18:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 311E6CF3C1D
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 14:23:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E7D093004843
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 13:18:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ABF6F311C028
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 13:17:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F37622A4E8;
-	Mon,  5 Jan 2026 13:08:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C7DF2417C3;
+	Mon,  5 Jan 2026 13:08:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oM8dFMGs"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="bGHdgN8j"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D17B21CC55
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 13:08:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78B72223328
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 13:08:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767618508; cv=none; b=X5Qe9Qi5pI0puJqj0jxPqTPKgsRC0YdcVFT8wMwfYjdw2rT5Ln1rkbxyC1iTU0GUWwcVPBdogYAJgIC5HtOWfdIkWB5An4trni7lG1CZFrcGftTSnG0n7iZ9tzGW2yXdWy5oANlZKxT0bZZ5KEUQ1LoszbOa7FlXwEc/gjgdx50=
+	t=1767618509; cv=none; b=CGQynCj5EJnJeWlhSN9cvFS2AAxMN6dP9p3M34zUg14gV6uNAm5NuJty4P+4XerWbU5uYzN6R33SX5ehog9j/hx5yuJcPEgNjXa0reeZ7MXzXqrESyxYL3Y9qOD8eVHTeEoaJGkXyD+SDQO2980Bs42IY+xgOqx8p1HHeA2XLCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767618508; c=relaxed/simple;
-	bh=8agHYfGsTbdc3ErzqoR06YZ4Tg7PdxjqckMeQqhL/Zw=;
+	s=arc-20240116; t=1767618509; c=relaxed/simple;
+	bh=34BAacbaXCRPTlIufrTUReA/4diDnwLT3uTFDTsh6Pc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=tdwVa+fRydO1FZL1LU0LgnpFg28CyXNV2a4dNBS/tPCNKCymr3fIlcQZ8HdgToEIOzvFE/Otgn/oqDD/ZDNTOW//sga+DT4PxpTTNoH56tsXT/4sP6w9cdnMoa/GbSO9S6DZDWO6uzGQ54nlah4OFdgH3yytHmFLyd8gdcYKMVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=oM8dFMGs; arc=none smtp.client-ip=185.246.85.4
+	 In-Reply-To:To:Cc; b=IkICZwy7HQnlJrrUKGz0ZJoGY4CObd5vdMuIw4fHJgOWVLFx4MeQBqmtvzsvGGbibWwEgq4wFFqmulKTRy3KRXh8jy2dJbGd/AbOb716H6svv5tn1Pl8LTbVpXlYw3jRbhLYJT6U0HGWWgSuUgvN6AA505C0aBeIJk8Pyyoc+m8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=bGHdgN8j; arc=none smtp.client-ip=185.246.84.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 8AD9E4E41F7D;
-	Mon,  5 Jan 2026 13:08:24 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 270811A2662;
+	Mon,  5 Jan 2026 13:08:26 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 60EB160726;
-	Mon,  5 Jan 2026 13:08:24 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 51DDA103C8525;
-	Mon,  5 Jan 2026 14:08:22 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id EE83A60726;
+	Mon,  5 Jan 2026 13:08:25 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C4673103C852D;
+	Mon,  5 Jan 2026 14:08:23 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1767618503; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1767618505; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=jcHdHKeRfk2L2dJr+OgepAfuQM3d1EUGFfjpNce4V24=;
-	b=oM8dFMGsRhzfNp9RC6CRH3392rkU87OeLdXA9htqv/JOPCAVyy5JgY/D6b90sC6miEsaf2
-	DQ19oQHFh24woKTYI1xUMRyR2xxvR8dSb+qSXuIythF6jGeLbroCfK87zqrRl9MuLQ+aHB
-	AD7NT2xjfLC4NcKpqxdR4qwBNl8k0rlTn3Xmie0tawwQp1sgu6OaqItinfFsn3J5RLb4WE
-	nNLX0au9KkyceQ1y2rZlzhrSnd/I59hgFYDrp5tS+5T6ViGpA3eaJ1e2L1NRXyd+40lJQR
-	C/Pfi1SSxXhMnGbkfq8H87MocKl8W2DgbqwEW9RzBXslmr6M39XQuQ6JBqnwtw==
+	bh=kIZGUOgrlFFSG+MXDelX5nuX7CrC7Vxiyp0xlM4B0vU=;
+	b=bGHdgN8j7EJjPSIx4ITVX6ZVFhLUd/vSWynZVkvkdFiIp9OFm1mRPMblqk3CDEdnp6DISL
+	JZui9hKzy5hLRZDrVnKmq223SkukmlnWeXs/Sbyv7n2EJySr+lG7Vy+sxQRvwwULTFHZPh
+	PVuG6zBdinWFvF3lQnFzMvLgmAUYNJaVlpXazsQ2FS7uBWtDQgB8o0jRmTF8ctLaeyW+hx
+	kf3gtHP4TFX6o7j2zvq6weA7m3mKWOeyMM55BTg2DQrsC9EprM0rSGYvOBpb5FfVYNlr4c
+	485a/gFCrnqzJURi7y71mB6tGD243g9lcJbA5OtUdHTRqHtwhQiz9sh+BtdDlQ==
 From: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Date: Mon, 05 Jan 2026 14:08:01 +0100
-Subject: [PATCH net-next 2/9] net: dsa: microchip: Use dynamic irq offset
+Date: Mon, 05 Jan 2026 14:08:02 +0100
+Subject: [PATCH net-next 3/9] net: dsa: microchip: Use regs[] to access
+ REG_PTP_CLK_CTRL
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +58,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260105-ksz-rework-v1-2-a68df7f57375@bootlin.com>
+Message-Id: <20260105-ksz-rework-v1-3-a68df7f57375@bootlin.com>
 References: <20260105-ksz-rework-v1-0-a68df7f57375@bootlin.com>
 In-Reply-To: <20260105-ksz-rework-v1-0-a68df7f57375@bootlin.com>
 To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
@@ -73,69 +74,166 @@ Cc: Pascal Eberhard <pascal.eberhard@se.com>,
 X-Mailer: b4 0.14.2
 X-Last-TLS-Session-Version: TLSv1.3
 
-The PTP irq_chip operations use an hardcoded IRQ offset in the bit
-logic. This IRQ offset isn't the same on KSZ8463 than on others switches
-so it can't use the irq_chip operations.
+Accesses to the PTP_CLK_CTRL register are done through a hardcoded
+address which doesn't match with the KSZ8463's register layout.
 
-Convey the interrupt bit offset through a new attribute in struct ksz_irq
+Add a new entry for the PTP_CLK_CTRL register in the regs[] tables.
+Use the regs[] table to retrieve the PTP_CLK_CTRL register address
+when accessing it.
+Remove the macro defining the address to prevent further use.
 
 Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
 ---
- drivers/net/dsa/microchip/ksz_common.h | 1 +
- drivers/net/dsa/microchip/ksz_ptp.c    | 8 +++++---
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ drivers/net/dsa/microchip/ksz_common.c  |  2 ++
+ drivers/net/dsa/microchip/ksz_common.h  |  1 +
+ drivers/net/dsa/microchip/ksz_ptp.c     | 19 ++++++++++++-------
+ drivers/net/dsa/microchip/ksz_ptp_reg.h |  3 +--
+ 4 files changed, 16 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index c65188cd3c0a0ed8dd75ee195cebbe47b3a01ada..3add190e686260bb1807ba03b4b153abeead223e 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -108,6 +108,7 @@ struct ksz_irq {
- 	int irq_num;
- 	char name[16];
- 	struct ksz_device *dev;
-+	u16 irq0_offset;
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index fa392f952f9441cfbeb51498fc9411340b58747a..d7f407370c1cc59402d444e27ebe44e7a600b441 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -569,6 +569,7 @@ static const u16 ksz8463_regs[] = {
+ 	[S_START_CTRL]			= 0x01,
+ 	[S_BROADCAST_CTRL]		= 0x06,
+ 	[S_MULTICAST_CTRL]		= 0x04,
++	[PTP_CLK_CTRL]			= 0x0600,
  };
  
- struct ksz_ptp_irq {
+ static const u32 ksz8463_masks[] = {
+@@ -803,6 +804,7 @@ static const u16 ksz9477_regs[] = {
+ 	[REG_SW_PME_CTRL]		= 0x0006,
+ 	[REG_PORT_PME_STATUS]		= 0x0013,
+ 	[REG_PORT_PME_CTRL]		= 0x0017,
++	[PTP_CLK_CTRL]			= 0x0500,
+ };
+ 
+ static const u32 ksz9477_masks[] = {
+diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
+index 3add190e686260bb1807ba03b4b153abeead223e..8033cb9d84838705389e6ed52a5a54aaa8b49497 100644
+--- a/drivers/net/dsa/microchip/ksz_common.h
++++ b/drivers/net/dsa/microchip/ksz_common.h
+@@ -271,6 +271,7 @@ enum ksz_regs {
+ 	REG_SW_PME_CTRL,
+ 	REG_PORT_PME_STATUS,
+ 	REG_PORT_PME_CTRL,
++	PTP_CLK_CTRL,
+ };
+ 
+ enum ksz_masks {
 diff --git a/drivers/net/dsa/microchip/ksz_ptp.c b/drivers/net/dsa/microchip/ksz_ptp.c
-index 997e4a76d0a68448b0ebc76169150687bbc79673..0ac2865ba9c000fa58b974647c9c88287164cd1c 100644
+index 0ac2865ba9c000fa58b974647c9c88287164cd1c..68553d9f1e0e3a3cd6319d73b7f9bf6ee2fce7ce 100644
 --- a/drivers/net/dsa/microchip/ksz_ptp.c
 +++ b/drivers/net/dsa/microchip/ksz_ptp.c
-@@ -1008,7 +1008,7 @@ static irqreturn_t ksz_ptp_irq_thread_fn(int irq, void *dev_id)
- 		return IRQ_NONE;
+@@ -585,13 +585,14 @@ void ksz_port_deferred_xmit(struct kthread_work *work)
  
- 	for (n = 0; n < ptpirq->nirqs; ++n) {
--		if (data & BIT(n + KSZ_PTP_INT_START)) {
-+		if (data & BIT(n + ptpirq->irq0_offset)) {
- 			sub_irq = irq_find_mapping(ptpirq->domain, n);
- 			handle_nested_irq(sub_irq);
- 			++nhandled;
-@@ -1023,14 +1023,14 @@ static void ksz_ptp_irq_mask(struct irq_data *d)
+ static int _ksz_ptp_gettime(struct ksz_device *dev, struct timespec64 *ts)
  {
- 	struct ksz_irq *kirq = irq_data_get_irq_chip_data(d);
++	const u16 *regs = dev->info->regs;
+ 	u32 nanoseconds;
+ 	u32 seconds;
+ 	u8 phase;
+ 	int ret;
  
--	kirq->masked &= ~BIT(d->hwirq + KSZ_PTP_INT_START);
-+	kirq->masked &= ~BIT(d->hwirq + kirq->irq0_offset);
- }
+ 	/* Copy current PTP clock into shadow registers and read */
+-	ret = ksz_rmw16(dev, REG_PTP_CLK_CTRL, PTP_READ_TIME, PTP_READ_TIME);
++	ret = ksz_rmw16(dev, regs[PTP_CLK_CTRL], PTP_READ_TIME, PTP_READ_TIME);
+ 	if (ret)
+ 		return ret;
  
- static void ksz_ptp_irq_unmask(struct irq_data *d)
+@@ -676,6 +677,7 @@ static int ksz_ptp_settime(struct ptp_clock_info *ptp,
  {
- 	struct ksz_irq *kirq = irq_data_get_irq_chip_data(d);
+ 	struct ksz_ptp_data *ptp_data = ptp_caps_to_data(ptp);
+ 	struct ksz_device *dev = ptp_data_to_ksz_dev(ptp_data);
++	const u16 *regs = dev->info->regs;
+ 	int ret;
  
--	kirq->masked |= BIT(d->hwirq + KSZ_PTP_INT_START);
-+	kirq->masked |= BIT(d->hwirq + kirq->irq0_offset);
- }
+ 	mutex_lock(&ptp_data->lock);
+@@ -693,7 +695,7 @@ static int ksz_ptp_settime(struct ptp_clock_info *ptp,
+ 	if (ret)
+ 		goto unlock;
  
- static void ksz_ptp_irq_bus_lock(struct irq_data *d)
-@@ -1126,6 +1126,8 @@ int ksz_ptp_irq_setup(struct dsa_switch *ds, u8 p)
- 	ptpirq->reg_mask = ops->get_port_addr(p, REG_PTP_PORT_TX_INT_ENABLE__2);
- 	ptpirq->reg_status = ops->get_port_addr(p,
- 						REG_PTP_PORT_TX_INT_STATUS__2);
-+	ptpirq->irq0_offset = KSZ_PTP_INT_START;
-+
- 	snprintf(ptpirq->name, sizeof(ptpirq->name), "ptp-irq-%d", p);
+-	ret = ksz_rmw16(dev, REG_PTP_CLK_CTRL, PTP_LOAD_TIME, PTP_LOAD_TIME);
++	ret = ksz_rmw16(dev, regs[PTP_CLK_CTRL], PTP_LOAD_TIME, PTP_LOAD_TIME);
+ 	if (ret)
+ 		goto unlock;
  
- 	init_completion(&port->tstamp_msg_comp);
+@@ -723,6 +725,7 @@ static int ksz_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
+ {
+ 	struct ksz_ptp_data *ptp_data = ptp_caps_to_data(ptp);
+ 	struct ksz_device *dev = ptp_data_to_ksz_dev(ptp_data);
++	const u16 *regs = dev->info->regs;
+ 	u64 base, adj;
+ 	bool negative;
+ 	u32 data32;
+@@ -743,12 +746,12 @@ static int ksz_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
+ 		if (ret)
+ 			goto unlock;
+ 
+-		ret = ksz_rmw16(dev, REG_PTP_CLK_CTRL, PTP_CLK_ADJ_ENABLE,
++		ret = ksz_rmw16(dev, regs[PTP_CLK_CTRL], PTP_CLK_ADJ_ENABLE,
+ 				PTP_CLK_ADJ_ENABLE);
+ 		if (ret)
+ 			goto unlock;
+ 	} else {
+-		ret = ksz_rmw16(dev, REG_PTP_CLK_CTRL, PTP_CLK_ADJ_ENABLE, 0);
++		ret = ksz_rmw16(dev, regs[PTP_CLK_CTRL], PTP_CLK_ADJ_ENABLE, 0);
+ 		if (ret)
+ 			goto unlock;
+ 	}
+@@ -763,6 +766,7 @@ static int ksz_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
+ 	struct ksz_ptp_data *ptp_data = ptp_caps_to_data(ptp);
+ 	struct ksz_device *dev = ptp_data_to_ksz_dev(ptp_data);
+ 	struct timespec64 delta64 = ns_to_timespec64(delta);
++	const u16 *regs = dev->info->regs;
+ 	s32 sec, nsec;
+ 	u16 data16;
+ 	int ret;
+@@ -782,7 +786,7 @@ static int ksz_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
+ 	if (ret)
+ 		goto unlock;
+ 
+-	ret = ksz_read16(dev, REG_PTP_CLK_CTRL, &data16);
++	ret = ksz_read16(dev, regs[PTP_CLK_CTRL], &data16);
+ 	if (ret)
+ 		goto unlock;
+ 
+@@ -794,7 +798,7 @@ static int ksz_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
+ 	else
+ 		data16 |= PTP_STEP_DIR;
+ 
+-	ret = ksz_write16(dev, REG_PTP_CLK_CTRL, data16);
++	ret = ksz_write16(dev, regs[PTP_CLK_CTRL], data16);
+ 	if (ret)
+ 		goto unlock;
+ 
+@@ -882,9 +886,10 @@ static long ksz_ptp_do_aux_work(struct ptp_clock_info *ptp)
+ static int ksz_ptp_start_clock(struct ksz_device *dev)
+ {
+ 	struct ksz_ptp_data *ptp_data = &dev->ptp_data;
++	const u16 *regs = dev->info->regs;
+ 	int ret;
+ 
+-	ret = ksz_rmw16(dev, REG_PTP_CLK_CTRL, PTP_CLK_ENABLE, PTP_CLK_ENABLE);
++	ret = ksz_rmw16(dev, regs[PTP_CLK_CTRL], PTP_CLK_ENABLE, PTP_CLK_ENABLE);
+ 	if (ret)
+ 		return ret;
+ 
+diff --git a/drivers/net/dsa/microchip/ksz_ptp_reg.h b/drivers/net/dsa/microchip/ksz_ptp_reg.h
+index d71e85510cda56b6ddfefd4ed65564dfb4be7c88..bf8526390c2a2face12406c575a1ea3e4d42e3e6 100644
+--- a/drivers/net/dsa/microchip/ksz_ptp_reg.h
++++ b/drivers/net/dsa/microchip/ksz_ptp_reg.h
+@@ -15,8 +15,7 @@
+ #define LED_SRC_PTP_GPIO_2		BIT(2)
+ 
+ /* 5 - PTP Clock */
+-#define REG_PTP_CLK_CTRL		0x0500
+-
++/* REG_PTP_CLK_CTRL */
+ #define PTP_STEP_ADJ			BIT(6)
+ #define PTP_STEP_DIR			BIT(5)
+ #define PTP_READ_TIME			BIT(4)
 
 -- 
 2.52.0
