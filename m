@@ -1,114 +1,128 @@
-Return-Path: <netdev+bounces-247143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55377CF4F02
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 18:13:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AF8DCF4F87
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 18:22:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 753C83009D54
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 17:13:53 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 50EBA300DD81
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 17:22:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99FE930C359;
-	Mon,  5 Jan 2026 17:13:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C69E0337B8C;
+	Mon,  5 Jan 2026 17:22:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="TD43Gf2B"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZQofoQ/9"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF281EACD;
-	Mon,  5 Jan 2026 17:13:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 159B132C943
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 17:22:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767633232; cv=none; b=PmzrjgUQMLqHRIRSk80tzHW+uSvW/53ODm9u1pFTIlWDlKU+uTF5UKeS44tu77Yoc1EmasT/qE+thr+veobgES105ugjfNrM8spqjXqRt8ra/6cxCQU93XRsh5juF24Qh4bJ63ueDArL1f0tUSii8h/naK7aGH55zR6PdtKqofc=
+	t=1767633724; cv=none; b=Qrhw2Xj08Dbg4epcttykuuICmKCBV1SfHiinDQsdaaHMBek8uNI31aN/BtAiMxUfI0p7SJhYkF6HTFVx4BiaQO11/EXv8YlV5WKXNMsDv9aRA311E8eXziPN2ar+ARLCadzr6h1oaBAVfuQXIbcSuXaumnNghpZOR0AJxv4pEOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767633232; c=relaxed/simple;
-	bh=tyr4cn0jOghbwju0lZCBopNZ7oA6fmticVyw7sTQVEc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ap7dpEBupzDB3TqSOkwnkt4tJytlZh4WmZlL8uw3yjcVR9sWibUCzmUaVC+cdUJyPtN4zxJ//eKpLMm2BzId7af2PAxCRfeSwbl6cW3o0TRhi9EYkagzQWppIcBaGCotFniJqANDRyrFpL4B9BZIlWAmGMXuNaDnozmip7BpagM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=TD43Gf2B; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=JVvbf6VOOy5SlB6SsQX22t386bNPBzzZILoui+6wI4U=; b=TD43Gf2BisI77yaOolzQqByA+2
-	xB/NRJx2wlR48HnP9b1rtuGb4EXqz+y+2yf1rONl2yTtfQvLv3OV0i4oa9EfRju/rG5glojzVgwBt
-	+do0k240zNza+fOvX7ilC1ar9+JhDgihL68YVEm+LAmiOSXLJ63eDdA1L/SvWM9etxXJWSKhx+Pdr
-	TNVFQTc9OfWnN6LVQVgOoR5TgF7FR4io74ButH9s05/XQIbaomvPmJZJiXiKsluAnj0B1HMAZcZdF
-	SUXWQo9ci+/xjk8NTF5Eo3IY0bQfTnKVSH6TBLf1V7mN+oMhj7JEdd9UeOlmLS/UD4nI/TJZ/x0M+
-	gkmSAi4A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42846)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vco9K-000000008Ad-2CXW;
-	Mon, 05 Jan 2026 17:13:46 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vco9J-0000000082C-0xLP;
-	Mon, 05 Jan 2026 17:13:45 +0000
-Date: Mon, 5 Jan 2026 17:13:45 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jonas Jelonek <jelonek.jonas@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH v3] net: sfp: add SMBus I2C block support
-Message-ID: <aVvxSa2volDcLPZE@shell.armlinux.org.uk>
-References: <20260105161242.578487-1-jelonek.jonas@gmail.com>
- <aVvmu1YtiO9cXUw0@shell.armlinux.org.uk>
- <3c774e4d-b7a6-44e3-99f3-876f5ccb1ca3@gmail.com>
+	s=arc-20240116; t=1767633724; c=relaxed/simple;
+	bh=jpAj3DWhFAx2eK0iRqED6Htof1GSoEpawjbz2OaKA7w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iSeAgqLMbi8M7P49nvLnm2ai7ySjlfMtHg0jSxKWqnsVRbKNA3Ufud2O7PUFb1YCrhhemBNrJtBOqc8m76tTMhphRKClPjWQj68BEuWvclZrtahi6zVbJCxCEuzUg72HojEhvuIVyBjkcfCpbYWugM3o/3Fg7jdL1YM+PoxtGUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZQofoQ/9; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4ee1fca7a16so975911cf.3
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 09:22:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767633720; x=1768238520; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r9n7kq7yJ+X4StCqlThGUTc1cNfWeaJKbXKCromtapQ=;
+        b=ZQofoQ/93M7Y4UlRn728gTicKHpp011PqW+HZ1QLJmKfAVD3paeR+yByh57nlgQma7
+         2LKz8hql1zlI3QHwJqi+tK0CRGY/KWAkg/B1NdN1PIEYKGfiAyO5SulnnYdSVpTv7fgY
+         nfP3y1nsGkUey9SQlgZJdY+D+xiENq+Tuc1cgRbYlsWbnAAN46/vAJc5svXxBfTdflM1
+         CyDl3VZ/6DdMzObVscNk+5MuzLArTpLHPTf/YqZ1nKDrxwMcZENKEHgizb0SmG+suVSk
+         de3Z85Vb6rEQaa1vGboY3DeDzpXNz94zqvo+fZDIrmUdfMlEfKzZnevT3RInpaOgsaAr
+         aJ8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767633720; x=1768238520;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=r9n7kq7yJ+X4StCqlThGUTc1cNfWeaJKbXKCromtapQ=;
+        b=Mgk5Rqh0jqut5ZTxhq4QUbd6nEBCqTiGoN0HCSeC1v4MgiWgOud8ml2BUIRBI6lkvG
+         DC9jw5eiHWrXIFEQwtvuE43mWZnbs3s52sBrMDn19Nll/zQRWUNacbnr53caz5QahkZI
+         v43DHyhITrtysWBnY2tRixJn11ZotvthsxsyDGTNu+YACzAxFC/jHYrbBy4KuukyknFh
+         VVsQVxJ1hOXuVwjFTGMA7A5z19basgsfN0N+RThUwiAk/ubDx1MLHsQFQRrr2bbycTbk
+         KyU91oQpzg3J1wmvMjxZVpsIQCKU5hNUC10jCEXhZJ57uXcGcOFFUv+h0nkQsQZ8Akm/
+         +vSg==
+X-Gm-Message-State: AOJu0Yy5l2ZXVtyRs4SX6WIxVhW8A935DaWaaRt2i5YX6j0LMNqRAnib
+	9dXNcZypo2vPzsXTYqa+XRfux8QeXO4WODs/4YJmocU/6J6gyVulEqMwsulPqk0K2HlWgD+sJka
+	ePG48vs2LL/t7/SpmWqItq1vIRjzd0LMvlRtSVEif
+X-Gm-Gg: AY/fxX6IV2UVqwry69sIWI3M26qiizE5xL2rZC3PnXxfzFhEbNsMHkr5nNi9+1ichPz
+	O4eCscCAtzA5+sGibeO4qL0QWxtXbazlqs7DLF1KJmTiWVkn/vZkJfpNJGrU7rR9iuqczT0l0+q
+	qOK43Uc0HG9VirNoSPUmKxuuzrkDIGQrH+V2MkrD3nWAXLYDzxAn0Zaatk4z/b0T3+xMRr0tJkN
+	oQkPloCy3vX4jFXuJ31GncdtIKF51/k5JziGg0icVMFJXMFTByLirWDr90FY4odUZ678X08
+X-Google-Smtp-Source: AGHT+IHhFuRtc9OjJnmE3vtWZJxuVm0VzjkCr4QvpZEr4xmBGUGVpK2wERXnb3GdKq8KZoV/JSVMHLgRYVDPParxyfA=
+X-Received: by 2002:a05:622a:4a84:b0:4ec:f6ae:d5d9 with SMTP id
+ d75a77b69052e-4ffa77a8cccmr3596921cf.39.1767633719513; Mon, 05 Jan 2026
+ 09:21:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3c774e4d-b7a6-44e3-99f3-876f5ccb1ca3@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20260105163338.3461512-1-willemdebruijn.kernel@gmail.com>
+In-Reply-To: <20260105163338.3461512-1-willemdebruijn.kernel@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 5 Jan 2026 18:21:48 +0100
+X-Gm-Features: AQt7F2qRwerw5mD5cmZtLqkLC1AqnULrM0A7nFSyQKD8Q09H3L-DlFT-yKcpUSU
+Message-ID: <CANn89iL+AuhJw7-Ma4hQsgQ5X0vxOwToSr2mgVSbkSauy-TGkg@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: do not write to msg_get_inq in caller
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, axboe@kernel.dk, kuniyu@google.com, 
+	Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 05, 2026 at 05:53:42PM +0100, Jonas Jelonek wrote:
-> Hi Russell,
-> 
-> On 05.01.26 17:28, Russell King (Oracle) wrote:
-> > On Mon, Jan 05, 2026 at 04:12:42PM +0000, Jonas Jelonek wrote:
-> >> base-commit: c303e8b86d9dbd6868f5216272973292f7f3b7f1
-> >> prerequisite-patch-id: ae039dad1e17867fce9182b6b36ac3b1926b254a
-> > This seems to be almost useless information. While base-commit exists
-> > in the net-next tree, commit ae039dad1e17867fce9182b6b36ac3b1926b254a
-> > doesn't exist in either net-next nor net trees.
-> >
-> > My guess is you applied Maxime's patch locally, and that is the
-> > commit ID of that patch.
-> 
-> This was supposed to be the stable patch-id obtained with 
-> 'git patch-id --stable'.
+On Mon, Jan 5, 2026 at 5:33=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> From: Willem de Bruijn <willemb@google.com>
+>
+> msg_get_inq is an input field from caller to callee. Don't set it in
+> the callee, as the caller may not clear it on struct reuse.
+>
+> This is a kernel-internal variant of msghdr only, and the only user
+> does reinitialize the field. So this is not critical.
+>
+> But it is more robust to avoid the write, and slightly simpler code.
+>
+> Callers set msg_get_inq to request the input queue length to be
+> returned in msg_inq. This is equivalent to but independent from the
+> SO_INQ request to return that same info as a cmsg (tp->recvmsg_inq).
+> To reduce branching in the hot path the second also sets the msg_inq.
+> That is WAI.
+>
+> This is a small follow-on to commit 4d1442979e4a ("af_unix: don't
+> post cmsg for SO_INQ unless explicitly asked for"), which fixed the
+> inverse.
+>
+> Also collapse two branches using a bitwise or.
+>
+> Link: https://lore.kernel.org/netdev/willemdebruijn.kernel.24d8030f7a3de@=
+gmail.com/
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
+> ---
 
-Hmm, didn't know about that... but in this context, I wonder how
-useful it is. As a maintainer, given that patches submitted don't
-specify their patch-id, tracking down which patch is the
-pre-requisit would be a mammoth task, whereas a lore.kernel.org
-link would indicate the pre-requisit immediately.
+Patch looks sane to me, but the title is a bit confusing, I guess you meant
 
-lore.kernel.org links are easy:
+"net: do not write to msg_get_inq in callee" ?
 
-https://lore.kernel.org/r/<message id of the email containing the patch>
+Also, unix_stream_read_generic() is currently potentially adding a NULL der=
+ef
+if u->recvmsg_inq is non zero, but msg is NULL ?
 
-I can see patch-ids are useful for automation, but lore.kernel.org
-URLs are useful for humans.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+If this is the case  we need a Fixes: tag.
 
