@@ -1,557 +1,944 @@
-Return-Path: <netdev+bounces-247024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2A3ECF3802
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 13:24:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8E39CF385B
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 13:29:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2871A3079326
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 12:21:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E66BA3029D30
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 12:28:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40C67337B87;
-	Mon,  5 Jan 2026 12:15:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 010D933B96A;
+	Mon,  5 Jan 2026 12:28:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="I19lL5yQ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="clBNMYas"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D654C335087
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 12:15:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7195F33B6F9;
+	Mon,  5 Jan 2026 12:28:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767615303; cv=none; b=Vfv7Gq6rLqlhRu3JBehSVJjw5dHxZcMucSphi572DnJNYrNuk/aajDcRa9MQIl4GCLzO9mTcIFBvEsRSWlHgFCBqrkm8Uh+uliV65GUH4Fg0VRV78ASvkStzRdkW8r852dcOsPSnzlXtV9ZvE126VrlVqCBKirIHqDmXHek1iJQ=
+	t=1767616093; cv=none; b=UkQSvp3MUv8+WIgN9Ys+1pJRBt1wwWnw/nBH0QuXBHoRHMSe4mlF5B1Setf4u7NrbfzFsKWoqm8SQII1rXnvNTr/5Ye+xYAB0kxl2K1uoXIegXNzvRGAB7HRywVEu1HZongAL3V/ekUDNE10DBlqFez11kDtpRhUVqCKbf2uRLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767615303; c=relaxed/simple;
-	bh=2yfJWvOlqqUloBLLoW2q2HL2e2rpQjMwjyevyHCtMnA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=HiWGISgcxg10hjncetZLYgT4x2u6DYGbinMsa2p74L7Wgzct9Jvz1p4WpSTuXJdKKFxEDU4RCz1aYJfI+0pNpPIM63E6EKcrNZI9Ry+U5RbPlNBJM+90wwgcOQlWV4UGQY18g/EbPc4fQUUho1WEAS9zhxfjBHPu9CduF4hmVZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=I19lL5yQ; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-b83d6a06304so295778166b.2
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 04:15:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1767615299; x=1768220099; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XS7vl1A2g95R4uUTc/Kdk0kAxz/ZnaHSG7AuQrHZBxk=;
-        b=I19lL5yQFPPPTrS0Rv/H8nRsOm7a7OwueGOmhCazl2JMLdmfIFKiU8C17PlNnBx3qa
-         4+1iortz3lIbHh83rwjP6uBPxlsjaEanrF96mefLEDw3/x21qWpc4qS+VKAAKXlikaOO
-         2MfOeSmWHtE1I9uhRiC0m24j2oilE9BT5zqnx1Y6oH/dtqom+Dj3y2HhHlboWHk3qL6G
-         MpyfruWP1jgg3J8fJiXrSOwf208LGeRO/CDFCnKEJe11jNHrdaVDZqn/Dbb7vV7kddWK
-         jVs6Cdl/Ks0DCmPjK+T2jMzcgqUDLwotu0gJd+EgSEaSQYq7jwMzrF1cXn1iYoLdr+AT
-         AkQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767615299; x=1768220099;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=XS7vl1A2g95R4uUTc/Kdk0kAxz/ZnaHSG7AuQrHZBxk=;
-        b=N00LijFT3tokHg6blo6uGs+9/pCVmzgbyYJBnS9NP4cscnqz9JBOuEdGUyGR5gpHSm
-         WBCXhoMEkH8n095/6G8wOFT96655G1ognmEQDbJqZKzWzn5ryIP8YuzucjJUG7Tf/YFv
-         A1UvxHJBTI4wYw3njAlJmbuXyi9yCG2ISLPE55oucsgKtxap7wG9tJctl0XcDJWnHp/6
-         XiTk36+GDdQxXonueD+7P3vCgepVrg3xAHaMaL8LBjx6YaH6JXn4SJTwjHcdGzEqKgt7
-         25TQ/xmATdLL0K78g6bJiTgTrBoZK8rg0FvEefVPq5Y3MywC0yLLiFXg8XLhHoZ3LOGk
-         nY+Q==
-X-Gm-Message-State: AOJu0YzJIMibjoP/ppMw7icr2PjpODZZF+dV3+6yNx+SNr8DvFItU22O
-	xyUC1Zh0lUdd0xGh1fcuNKDhGeq7fl+6fxSYyeldbcgyn1IZkhpDQIC7vGRuT2Hb9Fo=
-X-Gm-Gg: AY/fxX4QQtLGRTW9UdXTJNK6FXoWI+KfGx3AHIfu1eG6RsbrKdkYN0U2d94aIdn/ezO
-	XE+QNo4Mnp8KatrG0qEzgZ7Z8uyEYoSadMbuZc3Tf1Vdb6XyjAMJAVlkAGv1Er31lMuICmlG6zw
-	eCATK63QqFjuRi4wLYZDBFSF26jP08uCRJl95y5tVZ8jGkLVk1L7eQdUUKvP3xZLLI67W3lnLy2
-	/I3Die1eSDPaXTnilcwRhnAdDR3EMl8tdV7j6G4Jvs/n3o+psOioYCbErmZel7zGmYdT7dtH0X/
-	i8YHlXr55bTiWXC7cd5/DSdzf4uatBga40qhLn5KtTiklj9J6GR09oArashIskisO+y6c4iZkcE
-	op7a4bYrL46r7J/I1igrorSsuB04GNai4DEYGnokknxVPihnL4FCrvgrh3V1zx4xdhGxcH0Au7g
-	qPVt8BiyDFaNGtLkWQNTq4ApYZ+KgAnjuw5vTUdBGrkoUhcZnumKY1tSUO+STkVq4m73atoQ==
-X-Google-Smtp-Source: AGHT+IHZMDRL+UUqEcBjsYh/+meX8k2tSH1WtJwNz1VoSvD8xlyueqHas3cXnYIUlmuaSmQmg2vJpQ==
-X-Received: by 2002:a17:907:3fa2:b0:b83:b7c5:de2c with SMTP id a640c23a62f3a-b83b7c5df7cmr1495285166b.10.1767615298660;
-        Mon, 05 Jan 2026 04:14:58 -0800 (PST)
-Received: from cloudflare.com (79.184.207.118.ipv4.supernova.orange.pl. [79.184.207.118])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8037a614acsm5587029066b.3.2026.01.05.04.14.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 04:14:58 -0800 (PST)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Mon, 05 Jan 2026 13:14:41 +0100
-Subject: [PATCH bpf-next v2 16/16] selftests/bpf: Test skb metadata access
- after L2 decapsulation
+	s=arc-20240116; t=1767616093; c=relaxed/simple;
+	bh=3V2JbXvt6U2PdOu98qmdYLIQiCcai8JBtTu9gsV5Nqk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Rm2NGcpKWsmVidCdEet9913U7XuMsaiYpd0VY/lwfdAi16M1K34hla18keyHl+dBRGBbMmjMX6l7KC+Kr1HlqhJqadawAoidp+ZczcH2IREaAsSNmB35ElBJ4WzNXZyPQ0h2fl6eRmkD+3ndjc+/1JnzVR/IwJvVsvAzMY6Aek4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=clBNMYas; arc=none smtp.client-ip=162.240.164.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=C8lNyr/GGXqEHMV8WdResxZxg9mTRAaraNyC1q855YA=; b=clBNMYaszaYmJdnxF01dTkZu+V
+	sj0vKE6OS4fCIVuR1LDxTDIMYWwxi6piy5PBSm+y4+as6s4jVMQmqMMgbafnlTK3McL63nu2z6cQG
+	82QQUC5prNxRaYGMd6MOLWaAgs7DeWRiL71OovlET7xDu5KsJALOQJJoDk88mclCSu7SD6kAzA4qS
+	SFyLGWVuvuRN4sSmCgLZLA0RWBiGALSBNP29iuzrxweeZthXrFWJN0esDM7Zl14dueO4x6UaWkW4/
+	f/B76lJpCh2WhvG6599hyhob/fD4W7xI07KQsK6QyjHAMoiUPrcxEFGucGZit8bLRfQYkfXmCDMbE
+	BKS5fVcA==;
+Received: from [122.175.9.182] (port=7326 helo=cypher.couthit.local)
+	by server.couthit.com with esmtpa (Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1vcjgs-0000000Ezqj-0iSr;
+	Mon, 05 Jan 2026 07:28:06 -0500
+From: Parvathi Pudi <parvathi@couthit.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	danishanwar@ti.com,
+	parvathi@couthit.com,
+	rogerq@kernel.org,
+	pmohan@couthit.com,
+	basharath@couthit.com,
+	afd@ti.com
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	alok.a.tiwari@oracle.com,
+	horms@kernel.org,
+	pratheesh@ti.com,
+	j-rameshbabu@ti.com,
+	vigneshr@ti.com,
+	praneeth@ti.com,
+	srk@ti.com,
+	rogerq@ti.com,
+	krishna@couthit.com,
+	mohan@couthit.com
+Subject: [PATCH net-next v11 1/3] net: ti: icssm-prueth: Add helper functions to configure and maintain FDB
+Date: Mon,  5 Jan 2026 17:53:07 +0530
+Message-ID: <20260105122549.1808390-2-parvathi@couthit.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260105122549.1808390-1-parvathi@couthit.com>
+References: <20260105122549.1808390-1-parvathi@couthit.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260105-skb-meta-safeproof-netdevs-rx-only-v2-16-a21e679b5afa@cloudflare.com>
-References: <20260105-skb-meta-safeproof-netdevs-rx-only-v2-0-a21e679b5afa@cloudflare.com>
-In-Reply-To: <20260105-skb-meta-safeproof-netdevs-rx-only-v2-0-a21e679b5afa@cloudflare.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Stanislav Fomichev <sdf@fomichev.me>, Simon Horman <horms@kernel.org>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
- kernel-team@cloudflare.com
-X-Mailer: b4 0.15-dev-07fe9
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: parvathi@couthit.com
+X-Authenticated-Sender: server.couthit.com: parvathi@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-Add tests to verify that XDP/skb metadata remains accessible after L2
-decapsulation now that metadata tracking has been decoupled from the MAC
-header offset.
+From: Roger Quadros <rogerq@ti.com>
 
-Use a 2-netns setup to test each L2 decapsulation path that resets the MAC
-header offset: GRE (IPv4/IPv6), VXLAN, GENEVE, L2TPv3, VLAN, QinQ, and
-MPLS. SRv6 and NSH are not tested due to setup complexity (SRv6 requires 4
-namespaces according to selftests/net/srv6_hl2encap_red_l2vpn_test.sh, NSH
-requires Open vSwitch).
+Introduce helper functions to configure and maintain Forwarding
+Database (FDB) tables to aid with the switch mode feature for PRU-ICSS
+ports. The PRU-ICSS FDB is maintained such that it is always in sync with
+the Linux bridge driver FDB.
 
-For each encapsulation type, test three access scenarios after L2 decap:
-- direct skb->data_meta pointer access
-- dynptr-based metadata access (bpf_dynptr_from_skb_meta)
-- metadata access after move or skb head realloc (bpf_skb_adjust_room)
+The FDB is used by the driver to determine whether to flood a packet,
+received from the user plane, to both ports or direct it to a specific port
+using the flags in the FDB table entry.
 
-Change test_xdp_meta.c to identify test packets by payload content instead
-of source MAC address, since L2 encapsulation pushes its own MAC header.
+The FDB is implemented in two main components: the Index table and the
+MAC Address table. Adding, deleting, and maintaining entries are handled
+by the PRUETH driver. There are two types of entries:
 
-Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+Dynamic: created from the received packets and are subject to aging.
+Static: created by the user and these entries never age out.
+
+8-bit hash value obtained using the source MAC address is used to identify
+the index to the Index/Hash table. A bucket-based approach is used to
+collate source MAC addresses with the same hash value. The Index/Hash table
+holds the bucket index (16-bit value) and the number of entries in the
+bucket with the same hash value (16-bit value). This table can hold up to
+256 entries, with each entry consuming 4 bytes of memory. The bucket index
+value points to the MAC address table indicating the start of MAC addresses
+having the same hash values.
+
+Each entry in the MAC Address table consists of:
+1. 6 bytes of the MAC address,
+2. 2-byte aging time, and
+3. 1-byte each for port information and flags respectively.
+
+When a new entry is added to the FDB, the hash value is calculated using an
+XOR operation on the 6-byte MAC address. The result is used as an index
+into the Hash/Index table to check if any entries exist. If no entries are
+present, the first available empty slot in the MAC Address table is
+allocated to insert this MAC address. If entries with the same hash value
+are already present, the new MAC address entry is added to the MAC Address
+table in such a way that it ensures all entries are grouped together and
+sorted in ascending MAC address order. This approach helps efficiently
+manage FDB entries.
+
+Signed-off-by: Roger Quadros <rogerq@ti.com>
+Signed-off-by: Andrew F. Davis <afd@ti.com>
+Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
+Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
 ---
- tools/testing/selftests/bpf/config                 |   6 +-
- .../bpf/prog_tests/xdp_context_test_run.c          | 292 +++++++++++++++++++++
- tools/testing/selftests/bpf/progs/test_xdp_meta.c  |  48 ++--
- 3 files changed, 325 insertions(+), 21 deletions(-)
+ drivers/net/ethernet/ti/Makefile              |   2 +-
+ drivers/net/ethernet/ti/icssm/icssm_prueth.h  |   3 +
+ .../ethernet/ti/icssm/icssm_prueth_fdb_tbl.h  |  76 +++
+ .../ethernet/ti/icssm/icssm_prueth_switch.c   | 603 ++++++++++++++++++
+ .../ethernet/ti/icssm/icssm_prueth_switch.h   |  20 +
+ drivers/net/ethernet/ti/icssm/icssm_switch.h  |  26 +
+ 6 files changed, 729 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_fdb_tbl.h
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_switch.c
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_switch.h
 
-diff --git a/tools/testing/selftests/bpf/config b/tools/testing/selftests/bpf/config
-index 558839e3c185..f867b7eff085 100644
---- a/tools/testing/selftests/bpf/config
-+++ b/tools/testing/selftests/bpf/config
-@@ -130,4 +130,8 @@ CONFIG_INFINIBAND=y
- CONFIG_SMC=y
- CONFIG_SMC_HS_CTRL_BPF=y
- CONFIG_DIBS=y
--CONFIG_DIBS_LO=y
-\ No newline at end of file
-+CONFIG_DIBS_LO=y
-+CONFIG_L2TP=y
-+CONFIG_L2TP_V3=y
-+CONFIG_L2TP_IP=y
-+CONFIG_L2TP_ETH=y
-diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-index ee94c281888a..dc7f936216db 100644
---- a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-+++ b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-@@ -8,9 +8,14 @@
- #define TX_NAME "veth1"
- #define TX_NETNS "xdp_context_tx"
- #define RX_NETNS "xdp_context_rx"
-+#define RX_MAC "02:00:00:00:00:01"
-+#define TX_MAC "02:00:00:00:00:02"
- #define TAP_NAME "tap0"
- #define DUMMY_NAME "dum0"
- #define TAP_NETNS "xdp_context_tuntap"
-+#define ENCAP_DEV "encap"
-+#define DECAP_RX_NETNS "xdp_context_decap_rx"
-+#define DECAP_TX_NETNS "xdp_context_decap_tx"
+diff --git a/drivers/net/ethernet/ti/Makefile b/drivers/net/ethernet/ti/Makefile
+index 93c0a4d0e33a..1fd149dd6115 100644
+--- a/drivers/net/ethernet/ti/Makefile
++++ b/drivers/net/ethernet/ti/Makefile
+@@ -4,7 +4,7 @@
+ #
  
- #define TEST_PAYLOAD_LEN 32
- static const __u8 test_payload[TEST_PAYLOAD_LEN] = {
-@@ -127,6 +132,7 @@ static int send_test_packet(int ifindex)
- 	/* We use the Ethernet header only to identify the test packet */
- 	struct ethhdr eth = {
- 		.h_source = { 0x12, 0x34, 0xDE, 0xAD, 0xBE, 0xEF },
-+		.h_proto = htons(ETH_P_IP),
- 	};
+ obj-$(CONFIG_TI_PRUETH) += icssm-prueth.o
+-icssm-prueth-y := icssm/icssm_prueth.o
++icssm-prueth-y := icssm/icssm_prueth.o icssm/icssm_prueth_switch.o
  
- 	memcpy(packet, &eth, sizeof(eth));
-@@ -155,6 +161,34 @@ static int send_test_packet(int ifindex)
- 	return -1;
- }
+ obj-$(CONFIG_TI_CPSW) += cpsw-common.o
+ obj-$(CONFIG_TI_DAVINCI_EMAC) += cpsw-common.o
+diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.h b/drivers/net/ethernet/ti/icssm/icssm_prueth.h
+index 8e7e0af08144..4b50133c5a72 100644
+--- a/drivers/net/ethernet/ti/icssm/icssm_prueth.h
++++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.h
+@@ -15,6 +15,7 @@
  
-+static int send_routed_packet(int af, const char *ip)
+ #include "icssm_switch.h"
+ #include "icssm_prueth_ptp.h"
++#include "icssm_prueth_fdb_tbl.h"
+ 
+ /* ICSSM size of redundancy tag */
+ #define ICSSM_LRE_TAG_SIZE	6
+@@ -248,6 +249,8 @@ struct prueth {
+ 	struct prueth_emac *emac[PRUETH_NUM_MACS];
+ 	struct net_device *registered_netdevs[PRUETH_NUM_MACS];
+ 
++	struct fdb_tbl *fdb_tbl;
++
+ 	unsigned int eth_type;
+ 	size_t ocmc_ram_size;
+ 	u8 emac_configured;
+diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth_fdb_tbl.h b/drivers/net/ethernet/ti/icssm/icssm_prueth_fdb_tbl.h
+new file mode 100644
+index 000000000000..9089259d96ea
+--- /dev/null
++++ b/drivers/net/ethernet/ti/icssm/icssm_prueth_fdb_tbl.h
+@@ -0,0 +1,76 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright (C) 2019-2021 Texas Instruments Incorporated - https://www.ti.com */
++#ifndef __NET_TI_PRUSS_FDB_TBL_H
++#define __NET_TI_PRUSS_FDB_TBL_H
++
++#include <linux/kernel.h>
++#include <linux/debugfs.h>
++#include "icssm_prueth.h"
++
++/* 4 bytes */
++struct fdb_index_tbl_entry {
++	/* Bucket Table index of first Bucket with this MAC address */
++	u16 bucket_idx;
++	u16 bucket_entries; /* Number of entries in this bucket */
++};
++
++/* 4 * 256 = 1024 = 0x200 bytes */
++struct fdb_index_array {
++	struct fdb_index_tbl_entry index_tbl_entry[FDB_INDEX_TBL_MAX_ENTRIES];
++};
++
++/* 10 bytes */
++struct fdb_mac_tbl_entry {
++	u8  mac[ETH_ALEN];
++	u16 age;
++	u8  port; /* 0 based: 0=port1, 1=port2 */
++	union {
++		struct {
++			u8  is_static:1;
++			u8  active:1;
++		};
++		u8 flags;
++	};
++};
++
++/* 10 * 256 = 2560 = 0xa00 bytes */
++struct fdb_mac_tbl_array {
++	struct fdb_mac_tbl_entry mac_tbl_entry[FDB_MAC_TBL_MAX_ENTRIES];
++};
++
++/* 1 byte */
++struct fdb_stp_config {
++	u8  state; /* per-port STP state (defined in FW header) */
++};
++
++/* 1 byte */
++struct fdb_flood_config {
++	u8 host_flood_enable:1;
++	u8 port1_flood_enable:1;
++	u8 port2_flood_enable:1;
++};
++
++/* 2 byte */
++struct fdb_arbitration {
++	u8  host_lock;
++	u8  pru_locks;
++};
++
++struct fdb_tbl {
++	/* fdb index table */
++	struct fdb_index_array __iomem *index_a;
++	/* fdb MAC table */
++	struct fdb_mac_tbl_array __iomem *mac_tbl_a;
++	/* port 1 stp config */
++	struct fdb_stp_config __iomem *port1_stp_cfg;
++	/* port 2 stp config */
++	struct fdb_stp_config __iomem *port2_stp_cfg;
++	/* per-port flood enable */
++	struct fdb_flood_config __iomem *flood_enable_flags;
++	/* fdb locking mechanism */
++	struct fdb_arbitration __iomem *locks;
++	/* total number of entries in hash table */
++	u16 total_entries;
++};
++
++#endif
+diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth_switch.c b/drivers/net/ethernet/ti/icssm/icssm_prueth_switch.c
+new file mode 100644
+index 000000000000..79a2ea5025f6
+--- /dev/null
++++ b/drivers/net/ethernet/ti/icssm/icssm_prueth_switch.c
+@@ -0,0 +1,603 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Texas Instruments PRUETH Switch Driver
++ *
++ * Copyright (C) 2020-2021 Texas Instruments Incorporated - https://www.ti.com
++ */
++#include <linux/etherdevice.h>
++#include <linux/kernel.h>
++#include <linux/remoteproc.h>
++#include <net/switchdev.h>
++#include "icssm_prueth.h"
++#include "icssm_prueth_switch.h"
++#include "icssm_prueth_fdb_tbl.h"
++
++#define FDB_IDX_TBL_ENTRY(n) (&prueth->fdb_tbl->index_a->index_tbl_entry[n])
++
++#define FDB_MAC_TBL_ENTRY(n) (&prueth->fdb_tbl->mac_tbl_a->mac_tbl_entry[n])
++
++#define FLAG_IS_STATIC	BIT(0)
++#define FLAG_ACTIVE	BIT(1)
++
++void icssm_prueth_sw_free_fdb_table(struct prueth *prueth)
 +{
-+	struct sockaddr_storage addr;
-+	socklen_t alen;
-+	int r, sock = -1;
++	if (prueth->emac_configured)
++		return;
 +
-+	r = make_sockaddr(af, ip, 42, &addr, &alen);
-+	if (!ASSERT_OK(r, "make_sockaddr"))
-+		goto err;
++	kfree(prueth->fdb_tbl);
++	prueth->fdb_tbl = NULL;
++}
 +
-+	sock = socket(af, SOCK_DGRAM, 0);
-+	if (!ASSERT_OK_FD(sock, "socket"))
-+		goto err;
++void icssm_prueth_sw_fdb_tbl_init(struct prueth *prueth)
++{
++	struct fdb_tbl *t = prueth->fdb_tbl;
++	void __iomem *sram_base;
++	u8 val;
 +
-+	r = sendto(sock, test_payload, sizeof(test_payload), 0,
-+		   (struct sockaddr *)&addr, alen);
-+	if (!ASSERT_EQ(r, sizeof(test_payload), "sendto"))
-+		goto err;
++	sram_base = prueth->mem[PRUETH_MEM_SHARED_RAM].va;
 +
-+	close(sock);
-+	return 0;
++	t->index_a = sram_base + V2_1_FDB_TBL_OFFSET;
++	t->mac_tbl_a = sram_base + FDB_MAC_TBL_OFFSET;
++	t->port1_stp_cfg = sram_base + FDB_PORT1_STP_CFG_OFFSET;
++	t->port2_stp_cfg = sram_base + FDB_PORT2_STP_CFG_OFFSET;
++	t->flood_enable_flags = sram_base + FDB_FLOOD_ENABLE_FLAGS_OFFSET;
++	t->locks = sram_base + FDB_LOCKS_OFFSET;
 +
-+err:
-+	if (sock >= 0)
-+		close(sock);
++	val = readb(t->flood_enable_flags);
++	/* host_flood_enable = 1 */
++	val |= BIT(0);
++	/* port1_flood_enable = 1 */
++	val |= BIT(1);
++	/* port2_flood_enable = 1 */
++	val |= BIT(2);
++	writeb(val, t->flood_enable_flags);
++
++	writeb(0, &t->locks->host_lock);
++	t->total_entries = 0;
++}
++
++static u8 icssm_pru_lock_done(struct fdb_tbl *fdb_tbl)
++{
++	return readb(&fdb_tbl->locks->pru_locks);
++}
++
++static int icssm_prueth_sw_fdb_spin_lock(struct fdb_tbl *fdb_tbl)
++{
++	u8 done;
++	int ret;
++
++	/* Take the host lock */
++	writeb(1, &fdb_tbl->locks->host_lock);
++
++	/* Wait for the PRUs to release their locks */
++	ret = read_poll_timeout(icssm_pru_lock_done, done, done == 0,
++				1, 10, false, fdb_tbl);
++	if (ret == -ETIMEDOUT)
++		writeb(0, &fdb_tbl->locks->host_lock);
++
++	return ret;
++}
++
++static void icssm_prueth_sw_fdb_spin_unlock(struct fdb_tbl *fdb_tbl)
++{
++	writeb(0, &fdb_tbl->locks->host_lock);
++}
++
++static u8 icssm_prueth_sw_fdb_hash(const u8 *mac)
++{
++	return (mac[0] ^ mac[1] ^ mac[2] ^ mac[3] ^ mac[4] ^ mac[5]);
++}
++
++static int
++icssm_prueth_sw_fdb_search(struct fdb_mac_tbl_array __iomem *mac_tbl,
++			   struct fdb_index_tbl_entry __iomem *bucket_info,
++			   const u8 *mac)
++{
++	unsigned int bucket_entries, mac_tbl_idx;
++	u8 tmp_mac[ETH_ALEN];
++	int i;
++
++	mac_tbl_idx = readw(&bucket_info->bucket_idx);
++	bucket_entries = readw(&bucket_info->bucket_entries);
++	for (i = 0; i < bucket_entries; i++, mac_tbl_idx++) {
++		memcpy_fromio(tmp_mac, mac_tbl->mac_tbl_entry[mac_tbl_idx].mac,
++			      ETH_ALEN);
++		if (ether_addr_equal(mac, tmp_mac))
++			return mac_tbl_idx;
++	}
++
++	return -ENODATA;
++}
++
++static int icssm_prueth_sw_fdb_find_open_slot(struct fdb_tbl *fdb_tbl)
++{
++	unsigned int i;
++	u8 flags;
++
++	for (i = 0; i < FDB_MAC_TBL_MAX_ENTRIES; i++) {
++		flags = readb(&fdb_tbl->mac_tbl_a->mac_tbl_entry[i].flags);
++		if (!(flags & FLAG_ACTIVE))
++			break;
++	}
++
++	return i;
++}
++
++static int
++icssm_prueth_sw_find_fdb_insert(struct fdb_tbl *fdb, struct prueth *prueth,
++				struct fdb_index_tbl_entry __iomem *bkt_info,
++				const u8 *mac, const u8 port)
++{
++	struct fdb_mac_tbl_array __iomem *mac_tbl = fdb->mac_tbl_a;
++	unsigned int bucket_entries, mac_tbl_idx;
++	struct fdb_mac_tbl_entry __iomem *e;
++	u8 mac_from_hw[ETH_ALEN];
++	s8 cmp;
++	int i;
++
++	mac_tbl_idx = readw(&bkt_info->bucket_idx);
++	bucket_entries = readw(&bkt_info->bucket_entries);
++
++	for (i = 0; i < bucket_entries; i++, mac_tbl_idx++) {
++		e = &mac_tbl->mac_tbl_entry[mac_tbl_idx];
++		memcpy_fromio(mac_from_hw, e->mac, ETH_ALEN);
++		cmp = memcmp(mac, mac_from_hw, ETH_ALEN);
++		if (cmp < 0) {
++			return mac_tbl_idx;
++		} else if (cmp == 0) {
++			if (readb(&e->port) != port) {
++				/* MAC is already in FDB, only port is
++				 * different. So just update the port.
++				 * Note: total_entries and bucket_entries
++				 * remain the same.
++				 */
++				writeb(port, &e->port);
++			}
++
++			/* MAC and port are the same, touch the fdb */
++			writew(0, &e->age);
++			return -EEXIST;
++		}
++	}
++
++	return mac_tbl_idx;
++}
++
++static int
++icssm_prueth_sw_fdb_empty_slot_left(struct fdb_mac_tbl_array __iomem *mac_tbl,
++				    unsigned int mac_tbl_idx)
++{
++	u8 flags;
++	int i;
++
++	for (i = mac_tbl_idx - 1; i > -1; i--) {
++		flags = readb(&mac_tbl->mac_tbl_entry[i].flags);
++		if (!(flags & FLAG_ACTIVE))
++			break;
++	}
++
++	return i;
++}
++
++static int
++icssm_prueth_sw_fdb_empty_slot_right(struct fdb_mac_tbl_array __iomem *mac_tbl,
++				     unsigned int mac_tbl_idx)
++{
++	u8 flags;
++	int i;
++
++	for (i = mac_tbl_idx; i < FDB_MAC_TBL_MAX_ENTRIES; i++) {
++		flags = readb(&mac_tbl->mac_tbl_entry[i].flags);
++		if (!(flags & FLAG_ACTIVE))
++			return i;
++	}
++
 +	return -1;
 +}
 +
- static int write_test_packet(int tap_fd)
- {
- 	__u8 packet[sizeof(struct ethhdr) + TEST_PAYLOAD_LEN];
-@@ -510,3 +544,261 @@ void test_xdp_context_tuntap(void)
- 
- 	test_xdp_meta__destroy(skel);
- }
-+
-+enum l2_encap_type {
-+	GRE4_ENCAP,
-+	GRE6_ENCAP,
-+	VXLAN_ENCAP,
-+	GENEVE_ENCAP,
-+	L2TPV3_ENCAP,
-+	VLAN_ENCAP,
-+	QINQ_ENCAP,
-+	MPLS_ENCAP,
-+};
-+
-+static bool l2_encap_uses_ipv6(enum l2_encap_type encap_type)
++static void icssm_prueth_sw_fdb_move_range_left(struct prueth *prueth,
++						u16 left, u16 right)
 +{
-+	return encap_type == GRE6_ENCAP;
-+}
++	struct fdb_mac_tbl_entry entry;
++	u32 sz = 0;
++	u16 i;
 +
-+static bool l2_encap_uses_routing(enum l2_encap_type encap_type)
-+{
-+	return encap_type == MPLS_ENCAP;
-+}
-+
-+static bool setup_l2_encap_dev(enum l2_encap_type encap_type,
-+			       const char *encap_dev, const char *lower_dev,
-+			       const char *net_prefix, const char *local_addr,
-+			       const char *remote_addr)
-+{
-+	switch (encap_type) {
-+	case GRE4_ENCAP:
-+		SYS(fail, "ip link add %s type gretap local %s remote %s",
-+		    encap_dev, local_addr, remote_addr);
-+		return true;
-+
-+	case GRE6_ENCAP:
-+		SYS(fail, "ip link add %s type ip6gretap local %s remote %s",
-+		    encap_dev, local_addr, remote_addr);
-+		return true;
-+
-+	case VXLAN_ENCAP:
-+		SYS(fail,
-+		    "ip link add %s type vxlan id 42 local %s remote %s dstport 4789",
-+		    encap_dev, local_addr, remote_addr);
-+		return true;
-+
-+	case GENEVE_ENCAP:
-+		SYS(fail,
-+		    "ip link add %s type geneve id 42 remote %s",
-+		    encap_dev, remote_addr);
-+		return true;
-+
-+	case L2TPV3_ENCAP:
-+		SYS(fail,
-+		    "ip l2tp add tunnel tunnel_id 42 peer_tunnel_id 42 encap ip local %s remote %s",
-+		    local_addr, remote_addr);
-+		SYS(fail,
-+		    "ip l2tp add session name %s tunnel_id 42 session_id 42 peer_session_id 42",
-+		    encap_dev);
-+		return true;
-+
-+	case VLAN_ENCAP:
-+		SYS(fail, "ip link set dev %s down", lower_dev);
-+		SYS(fail, "ethtool -K %s rx-vlan-hw-parse off", lower_dev);
-+		SYS(fail, "ethtool -K %s tx-vlan-hw-insert off", lower_dev);
-+		SYS(fail, "ip link set dev %s up", lower_dev);
-+		SYS(fail, "ip link add %s link %s type vlan id 42", encap_dev,
-+		    lower_dev);
-+		return true;
-+
-+	case QINQ_ENCAP:
-+		SYS(fail, "ip link set dev %s down", lower_dev);
-+		SYS(fail, "ethtool -K %s rx-vlan-hw-parse off", lower_dev);
-+		SYS(fail, "ethtool -K %s tx-vlan-hw-insert off", lower_dev);
-+		SYS(fail, "ethtool -K %s rx-vlan-stag-hw-parse off", lower_dev);
-+		SYS(fail, "ethtool -K %s tx-vlan-stag-hw-insert off", lower_dev);
-+		SYS(fail, "ip link set dev %s up", lower_dev);
-+		SYS(fail, "ip link add vlan.100 link %s type vlan proto 802.1ad id 100", lower_dev);
-+		SYS(fail, "ip link set dev vlan.100 up");
-+		SYS(fail, "ip link add %s link vlan.100 type vlan id 42", encap_dev);
-+		return true;
-+
-+	case MPLS_ENCAP:
-+		SYS(fail, "sysctl -wq net.mpls.platform_labels=65535");
-+		SYS(fail, "sysctl -wq net.mpls.conf.%s.input=1", lower_dev);
-+		SYS(fail, "ip route change %s encap mpls 42 via %s", net_prefix, remote_addr);
-+		SYS(fail, "ip -f mpls route add 42 dev lo");
-+		SYS(fail, "ip link set dev lo name %s", encap_dev);
-+
-+		return true;
++	sz = sizeof(struct fdb_mac_tbl_entry);
++	for (i = left; i < right; i++) {
++		memcpy_fromio(&entry, FDB_MAC_TBL_ENTRY(i + 1), sz);
++		memcpy_toio(FDB_MAC_TBL_ENTRY(i), &entry, sz);
 +	}
-+fail:
-+	return false;
 +}
 +
-+static void test_l2_decap(enum l2_encap_type encap_type,
-+			  struct bpf_program *xdp_prog,
-+			  struct bpf_program *tc_prog, bool *test_pass)
++static void icssm_prueth_sw_fdb_move_range_right(struct prueth *prueth,
++						 u16 left, u16 right)
 +{
-+	LIBBPF_OPTS(bpf_tc_hook, tc_hook, .attach_point = BPF_TC_INGRESS);
-+	LIBBPF_OPTS(bpf_tc_opts, tc_opts, .handle = 1, .priority = 1);
-+	const char *net, *rx_ip, *tx_ip, *addr_opts;
-+	int af, plen;
-+	struct netns_obj *rx_ns = NULL, *tx_ns = NULL;
-+	struct nstoken *nstoken = NULL;
-+	int lower_ifindex, upper_ifindex;
-+	int ret;
++	struct fdb_mac_tbl_entry entry;
++	u32 sz = 0;
++	u16 i;
 +
-+	if (l2_encap_uses_ipv6(encap_type)) {
-+		af = AF_INET6;
-+		net = "fd00::/64";
-+		rx_ip = "fd00::1";
-+		tx_ip = "fd00::2";
-+		plen = 64;
-+		addr_opts = "nodad";
-+	} else {
-+		af = AF_INET;
-+		net = "192.0.2.0/24";
-+		rx_ip = "192.0.2.1";
-+		tx_ip = "192.0.2.2";
-+		plen = 24;
-+		addr_opts = "";
++	sz = sizeof(struct fdb_mac_tbl_entry);
++	for (i = right; i > left; i--) {
++		memcpy_fromio(&entry, FDB_MAC_TBL_ENTRY(i - 1), sz);
++		memcpy_toio(FDB_MAC_TBL_ENTRY(i), &entry, sz);
++	}
++}
++
++static void icssm_prueth_sw_fdb_update_index_tbl(struct prueth *prueth,
++						 u16 left, u16 right)
++{
++	unsigned int hash, hash_prev;
++	u8 mac[ETH_ALEN];
++	unsigned int i;
++
++	/* To ensure we don't improperly update the
++	 * bucket index, initialize with an invalid
++	 * hash in case we are in leftmost slot
++	 */
++	hash_prev = 0xff;
++
++	if (left > 0) {
++		memcpy_fromio(mac, FDB_MAC_TBL_ENTRY(left - 1)->mac, ETH_ALEN);
++		hash_prev = icssm_prueth_sw_fdb_hash(mac);
 +	}
 +
-+	*test_pass = false;
++	/* For each moved element, update the bucket index */
++	for (i = left; i <= right; i++) {
++		memcpy_fromio(mac, FDB_MAC_TBL_ENTRY(i)->mac, ETH_ALEN);
++		hash = icssm_prueth_sw_fdb_hash(mac);
 +
-+	rx_ns = netns_new(DECAP_RX_NETNS, false);
-+	if (!ASSERT_OK_PTR(rx_ns, "create rx_ns"))
-+		return;
++		/* Only need to update buckets once */
++		if (hash != hash_prev)
++			writew(i, &FDB_IDX_TBL_ENTRY(hash)->bucket_idx);
 +
-+	tx_ns = netns_new(DECAP_TX_NETNS, false);
-+	if (!ASSERT_OK_PTR(tx_ns, "create tx_ns"))
-+		goto close;
++		hash_prev = hash;
++	}
++}
 +
-+	SYS(close, "ip link add " RX_NAME " address " RX_MAC " netns " DECAP_RX_NETNS
-+		   " type veth peer name " TX_NAME " address " TX_MAC " netns " DECAP_TX_NETNS);
++static struct fdb_mac_tbl_entry __iomem *
++icssm_prueth_sw_find_free_mac(struct prueth *prueth, struct fdb_index_tbl_entry
++			      __iomem *bucket_info, u8 suggested_mac_tbl_idx,
++			      bool *update_indexes, const u8 *mac)
++{
++	s16 empty_slot_idx = 0, left = 0, right = 0;
++	unsigned int mti = suggested_mac_tbl_idx;
++	struct fdb_mac_tbl_array __iomem *mt;
++	struct fdb_tbl *fdb;
++	u8 flags;
 +
-+	nstoken = open_netns(DECAP_RX_NETNS);
-+	if (!ASSERT_OK_PTR(nstoken, "setns rx_ns"))
-+		goto close;
++	fdb = prueth->fdb_tbl;
++	mt = fdb->mac_tbl_a;
 +
-+	SYS(close, "ip addr add %s/%u dev %s %s", rx_ip, plen, RX_NAME, addr_opts);
-+	SYS(close, "ip link set dev %s up", RX_NAME);
++	flags = readb(&FDB_MAC_TBL_ENTRY(mti)->flags);
++	if (!(flags & FLAG_ACTIVE)) {
++		/* Claim the entry */
++		flags |= FLAG_ACTIVE;
++		writeb(flags, &FDB_MAC_TBL_ENTRY(mti)->flags);
 +
-+	if (!setup_l2_encap_dev(encap_type, ENCAP_DEV, RX_NAME, net, rx_ip, tx_ip))
-+		goto close;
-+	SYS(close, "ip link set dev %s up", ENCAP_DEV);
++		return FDB_MAC_TBL_ENTRY(mti);
++	}
 +
-+	lower_ifindex = if_nametoindex(RX_NAME);
-+	if (!ASSERT_GE(lower_ifindex, 0, "if_nametoindex lower"))
-+		goto close;
++	if (fdb->total_entries == FDB_MAC_TBL_MAX_ENTRIES)
++		return NULL;
 +
-+	upper_ifindex = if_nametoindex(ENCAP_DEV);
-+	if (!ASSERT_GE(upper_ifindex, 0, "if_nametoindex upper"))
-+		goto close;
++	empty_slot_idx = icssm_prueth_sw_fdb_empty_slot_left(mt, mti);
++	if (empty_slot_idx == -1) {
++		/* Nothing available on the left. But table isn't full
++		 * so there must be space to the right,
++		 */
++		empty_slot_idx = icssm_prueth_sw_fdb_empty_slot_right(mt, mti);
 +
-+	ret = bpf_xdp_attach(lower_ifindex, bpf_program__fd(xdp_prog), 0, NULL);
-+	if (!ASSERT_GE(ret, 0, "bpf_xdp_attach"))
-+		goto close;
++		/* Shift right */
++		left = mti;
++		right = empty_slot_idx;
++		icssm_prueth_sw_fdb_move_range_right(prueth, left, right);
 +
-+	tc_hook.ifindex = upper_ifindex;
-+	ret = bpf_tc_hook_create(&tc_hook);
-+	if (!ASSERT_OK(ret, "bpf_tc_hook_create"))
-+		goto close;
++		/* Claim the entry */
++		flags = readb(&FDB_MAC_TBL_ENTRY(mti)->flags);
++		flags |= FLAG_ACTIVE;
++		writeb(flags, &FDB_MAC_TBL_ENTRY(mti)->flags);
 +
-+	tc_opts.prog_fd = bpf_program__fd(tc_prog);
-+	ret = bpf_tc_attach(&tc_hook, &tc_opts);
-+	if (!ASSERT_OK(ret, "bpf_tc_attach"))
-+		goto close;
++		memcpy_toio(FDB_MAC_TBL_ENTRY(mti)->mac, mac, ETH_ALEN);
 +
-+	close_netns(nstoken);
++		/* There is a chance we moved something in a
++		 * different bucket, update index table
++		 */
++		icssm_prueth_sw_fdb_update_index_tbl(prueth, left, right);
 +
-+	nstoken = open_netns(DECAP_TX_NETNS);
-+	if (!ASSERT_OK_PTR(nstoken, "setns tx_ns"))
-+		goto close;
++		return FDB_MAC_TBL_ENTRY(mti);
++	}
 +
-+	SYS(close, "ip addr add %s/%u dev %s %s", tx_ip, plen, TX_NAME, addr_opts);
-+	SYS(close, "ip neigh add %s lladdr %s nud permanent dev %s", rx_ip, RX_MAC, TX_NAME);
-+	SYS(close, "ip link set dev %s up", TX_NAME);
++	if (empty_slot_idx == mti - 1) {
++		/* There is space immediately left of the open slot,
++		 * which means the inserted MAC address
++		 * must be the lowest-valued MAC address in bucket.
++		 * Update bucket pointer accordingly.
++		 */
++		writew(empty_slot_idx, &bucket_info->bucket_idx);
 +
-+	if (!setup_l2_encap_dev(encap_type, ENCAP_DEV, TX_NAME, net, tx_ip, rx_ip))
-+		goto close;
-+	SYS(close, "ip link set dev %s up", ENCAP_DEV);
++		/* Claim the entry */
++		flags = readb(&FDB_MAC_TBL_ENTRY(mti)->flags);
++		flags |= FLAG_ACTIVE;
++		writeb(flags, &FDB_MAC_TBL_ENTRY(mti)->flags);
 +
-+	upper_ifindex = if_nametoindex(ENCAP_DEV);
-+	if (!ASSERT_GE(upper_ifindex, 0, "if_nametoindex upper"))
-+		goto close;
++		return FDB_MAC_TBL_ENTRY(empty_slot_idx);
++	}
 +
-+	if (l2_encap_uses_routing(encap_type))
-+		ret = send_routed_packet(af, rx_ip);
++	/* There is empty space to the left, shift MAC table entries left */
++	left = empty_slot_idx;
++	right = mti - 1;
++	icssm_prueth_sw_fdb_move_range_left(prueth, left, right);
++
++	/* Claim the entry */
++	flags = readb(&FDB_MAC_TBL_ENTRY(mti - 1)->flags);
++	flags |= FLAG_ACTIVE;
++	writeb(flags, &FDB_MAC_TBL_ENTRY(mti - 1)->flags);
++
++	memcpy_toio(FDB_MAC_TBL_ENTRY(mti - 1)->mac, mac, ETH_ALEN);
++
++	/* There is a chance we moved something in a
++	 * different bucket, update index table
++	 */
++	icssm_prueth_sw_fdb_update_index_tbl(prueth, left, right);
++
++	return FDB_MAC_TBL_ENTRY(mti - 1);
++}
++
++static int icssm_prueth_sw_insert_fdb_entry(struct prueth_emac *emac,
++					    const u8 *mac, u8 is_static)
++{
++	struct fdb_index_tbl_entry __iomem *bucket_info;
++	struct fdb_mac_tbl_entry __iomem *mac_info;
++	struct prueth *prueth = emac->prueth;
++	unsigned int hash_val, mac_tbl_idx;
++	struct prueth_emac *other_emac;
++	enum prueth_port other_port_id;
++	int total_fdb_entries;
++	struct fdb_tbl *fdb;
++	u8 flags;
++	s16 ret;
++	int err;
++	u16 val;
++
++	fdb = prueth->fdb_tbl;
++	other_port_id = (emac->port_id == PRUETH_PORT_MII0) ?
++			 PRUETH_PORT_MII1 : PRUETH_PORT_MII0;
++
++	other_emac = prueth->emac[other_port_id - 1];
++	if (!other_emac)
++		return -EINVAL;
++
++	err = icssm_prueth_sw_fdb_spin_lock(fdb);
++	if (err) {
++		dev_err(prueth->dev, "PRU lock timeout %d\n", err);
++		return err;
++	}
++
++	if (fdb->total_entries == FDB_MAC_TBL_MAX_ENTRIES) {
++		icssm_prueth_sw_fdb_spin_unlock(fdb);
++		return -ENOMEM;
++	}
++
++	if (ether_addr_equal(mac, emac->mac_addr) ||
++	    (ether_addr_equal(mac, other_emac->mac_addr))) {
++		icssm_prueth_sw_fdb_spin_unlock(fdb);
++		/* Don't insert fdb of own mac addr */
++		return -EINVAL;
++	}
++
++	/* Get the bucket that the mac belongs to */
++	hash_val = icssm_prueth_sw_fdb_hash(mac);
++	bucket_info = FDB_IDX_TBL_ENTRY(hash_val);
++
++	if (!readw(&bucket_info->bucket_entries)) {
++		mac_tbl_idx = icssm_prueth_sw_fdb_find_open_slot(fdb);
++		writew(mac_tbl_idx, &bucket_info->bucket_idx);
++	}
++
++	ret = icssm_prueth_sw_find_fdb_insert(fdb, prueth, bucket_info, mac,
++					      emac->port_id - 1);
++	if (ret < 0) {
++		icssm_prueth_sw_fdb_spin_unlock(fdb);
++		/* mac is already in fdb table */
++		return 0;
++	}
++
++	mac_tbl_idx = ret;
++
++	mac_info = icssm_prueth_sw_find_free_mac(prueth, bucket_info,
++						 mac_tbl_idx, NULL,
++						 mac);
++	if (!mac_info) {
++		/* Should not happen */
++		dev_warn(prueth->dev, "OUT of FDB MEM\n");
++		icssm_prueth_sw_fdb_spin_unlock(fdb);
++		return -ENOMEM;
++	}
++
++	memcpy_toio(mac_info->mac, mac, ETH_ALEN);
++	writew(0, &mac_info->age);
++	writeb(emac->port_id - 1, &mac_info->port);
++
++	flags = readb(&mac_info->flags);
++	if (is_static)
++		flags |= FLAG_IS_STATIC;
 +	else
-+		ret = send_test_packet(upper_ifindex);
-+	if (!ASSERT_OK(ret, "send packet"))
-+		goto close;
++		flags &= ~FLAG_IS_STATIC;
 +
-+	if (!ASSERT_TRUE(*test_pass, "test_pass"))
-+		dump_err_stream(tc_prog);
++	/* bit 1 - active */
++	flags |= FLAG_ACTIVE;
++	writeb(flags, &mac_info->flags);
 +
-+close:
-+	close_netns(nstoken);
-+	netns_free(rx_ns);
-+	netns_free(tx_ns);
++	val = readw(&bucket_info->bucket_entries);
++	val++;
++	writew(val, &bucket_info->bucket_entries);
++
++	fdb->total_entries++;
++
++	total_fdb_entries = fdb->total_entries;
++
++	icssm_prueth_sw_fdb_spin_unlock(fdb);
++
++	dev_dbg(prueth->dev, "added fdb: %pM port=%d total_entries=%u\n",
++		mac, emac->port_id, total_fdb_entries);
++
++	return 0;
 +}
 +
-+__printf(1, 2) static bool start_subtest(const char *fmt, ...)
++static int icssm_prueth_sw_delete_fdb_entry(struct prueth_emac *emac,
++					    const u8 *mac, u8 is_static)
 +{
-+	char *subtest_name;
-+	va_list ap;
-+	int r;
++	struct fdb_index_tbl_entry __iomem *bucket_info;
++	struct fdb_mac_tbl_entry __iomem *mac_info;
++	struct fdb_mac_tbl_array __iomem *mt;
++	unsigned int hash_val, mac_tbl_idx;
++	unsigned int idx, entries;
++	struct prueth *prueth;
++	int total_fdb_entries;
++	s16 ret, left, right;
++	struct fdb_tbl *fdb;
++	u8 flags;
++	int err;
++	u16 val;
 +
-+	va_start(ap, fmt);
-+	r = vasprintf(&subtest_name, fmt, ap);
-+	va_end(ap);
-+	if (!ASSERT_GE(r, 0, "format string"))
-+		return false;
++	prueth = emac->prueth;
++	fdb = prueth->fdb_tbl;
++	mt = fdb->mac_tbl_a;
 +
-+	r = test__start_subtest(subtest_name);
-+	free(subtest_name);
-+	return r;
-+}
-+
-+void test_xdp_context_l2_decap(void)
-+{
-+	const struct test {
-+		enum l2_encap_type encap_type;
-+		const char *encap_name;
-+	} tests[] = {
-+		{ GRE4_ENCAP, "gre4" },
-+		{ GRE6_ENCAP, "gre6" },
-+		{ VXLAN_ENCAP, "vxlan" },
-+		{ GENEVE_ENCAP, "geneve" },
-+		{ L2TPV3_ENCAP, "l2tpv3" },
-+		{ VLAN_ENCAP, "vlan" },
-+		{ QINQ_ENCAP, "qinq" },
-+		{ MPLS_ENCAP, "mpls" },
-+	};
-+	struct test_xdp_meta *skel;
-+	const struct test *t;
-+
-+	skel = test_xdp_meta__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open and load skeleton"))
-+		return;
-+
-+	for (t = tests; t < tests + ARRAY_SIZE(tests); t++) {
-+		if (start_subtest("%s_direct_access", t->encap_name))
-+			test_l2_decap(t->encap_type, skel->progs.ing_xdp,
-+				      skel->progs.ing_cls,
-+				      &skel->bss->test_pass);
-+		if (start_subtest("%s_dynptr_read", t->encap_name))
-+			test_l2_decap(t->encap_type, skel->progs.ing_xdp,
-+				      skel->progs.ing_cls_dynptr_read,
-+				      &skel->bss->test_pass);
-+		if (start_subtest("%s_helper_adjust_room", t->encap_name))
-+			test_l2_decap(t->encap_type, skel->progs.ing_xdp,
-+				      skel->progs.helper_skb_adjust_room,
-+				      &skel->bss->test_pass);
++	err = icssm_prueth_sw_fdb_spin_lock(fdb);
++	if (err) {
++		dev_err(prueth->dev, "PRU lock timeout %d\n", err);
++		return err;
 +	}
 +
-+	test_xdp_meta__destroy(skel);
++	if (fdb->total_entries == 0) {
++		icssm_prueth_sw_fdb_spin_unlock(fdb);
++		return 0;
++	}
++
++	/* Get the bucket that the mac belongs to */
++	hash_val = icssm_prueth_sw_fdb_hash(mac);
++	bucket_info = FDB_IDX_TBL_ENTRY(hash_val);
++
++	ret = icssm_prueth_sw_fdb_search(mt, bucket_info, mac);
++	if (ret < 0) {
++		icssm_prueth_sw_fdb_spin_unlock(fdb);
++		return ret;
++	}
++
++	mac_tbl_idx = ret;
++	mac_info = FDB_MAC_TBL_ENTRY(mac_tbl_idx);
++
++	/* Shift all elements in bucket to the left. No need to
++	 * update index table since only shifting within bucket.
++	 */
++	left = mac_tbl_idx;
++	idx = readw(&bucket_info->bucket_idx);
++	entries = readw(&bucket_info->bucket_entries);
++	right = idx + entries - 1;
++	icssm_prueth_sw_fdb_move_range_left(prueth, left, right);
++
++	/* Remove end of bucket from table */
++	mac_info = FDB_MAC_TBL_ENTRY(right);
++	flags = readb(&mac_info->flags);
++	/* active = 0 */
++	flags &= ~FLAG_ACTIVE;
++	writeb(flags, &mac_info->flags);
++	val = readw(&bucket_info->bucket_entries);
++	val--;
++	writew(val, &bucket_info->bucket_entries);
++	fdb->total_entries--;
++
++	total_fdb_entries = fdb->total_entries;
++
++	icssm_prueth_sw_fdb_spin_unlock(fdb);
++
++	dev_dbg(prueth->dev, "del fdb: %pM total_entries=%u\n",
++		mac, total_fdb_entries);
++
++	return 0;
 +}
-diff --git a/tools/testing/selftests/bpf/progs/test_xdp_meta.c b/tools/testing/selftests/bpf/progs/test_xdp_meta.c
-index 0a0f371a2dec..69130e250e84 100644
---- a/tools/testing/selftests/bpf/progs/test_xdp_meta.c
-+++ b/tools/testing/selftests/bpf/progs/test_xdp_meta.c
-@@ -280,18 +280,35 @@ int ing_cls_dynptr_offset_oob(struct __sk_buff *ctx)
- 	return TC_ACT_SHOT;
- }
- 
-+/* Test packets carry test metadata pattern as payload. */
-+static bool is_test_packet(struct xdp_md *ctx)
++
++int icssm_prueth_sw_do_purge_fdb(struct prueth_emac *emac)
 +{
-+	__u8 meta_have[META_SIZE];
-+	__u32 len;
-+	int ret;
++	struct fdb_index_tbl_entry __iomem *bucket_info;
++	struct prueth *prueth = emac->prueth;
++	u8 flags, mac[ETH_ALEN];
++	unsigned int hash_val;
++	struct fdb_tbl *fdb;
++	int ret, i;
++	u16 val;
 +
-+	len = bpf_xdp_get_buff_len(ctx);
-+	if (len < META_SIZE)
-+		return false;
-+	ret = bpf_xdp_load_bytes(ctx, len - META_SIZE, meta_have, META_SIZE);
-+	if (ret)
-+		return false;
-+	ret = __builtin_memcmp(meta_have, meta_want, META_SIZE);
-+	if (ret)
-+		return false;
++	fdb = prueth->fdb_tbl;
 +
-+	return true;
++	ret = icssm_prueth_sw_fdb_spin_lock(fdb);
++	if (ret) {
++		dev_err(prueth->dev, "PRU lock timeout %d\n", ret);
++		return ret;
++	}
++
++	if (fdb->total_entries == 0) {
++		icssm_prueth_sw_fdb_spin_unlock(fdb);
++		return 0;
++	}
++
++	for (i = 0; i < FDB_MAC_TBL_MAX_ENTRIES; i++) {
++		flags = readb(&fdb->mac_tbl_a->mac_tbl_entry[i].flags);
++		if ((flags & FLAG_ACTIVE) && !(flags & FLAG_IS_STATIC)) {
++			/* Get the bucket that the mac belongs to */
++			memcpy_fromio(mac, FDB_MAC_TBL_ENTRY(i)->mac,
++				      ETH_ALEN);
++			hash_val = icssm_prueth_sw_fdb_hash(mac);
++			bucket_info = FDB_IDX_TBL_ENTRY(hash_val);
++			flags &= ~FLAG_ACTIVE;
++			writeb(flags,
++			       &fdb->mac_tbl_a->mac_tbl_entry[i].flags);
++			val = readw(&bucket_info->bucket_entries);
++			val--;
++			writew(val, &bucket_info->bucket_entries);
++			fdb->total_entries--;
++		}
++	}
++
++	icssm_prueth_sw_fdb_spin_unlock(fdb);
++	return 0;
 +}
 +
- /* Reserve and clear space for metadata but don't populate it */
- SEC("xdp")
- int ing_xdp_zalloc_meta(struct xdp_md *ctx)
- {
--	struct ethhdr *eth = ctx_ptr(ctx, data);
- 	__u8 *meta;
- 	int ret;
- 
- 	/* Drop any non-test packets */
--	if (eth + 1 > ctx_ptr(ctx, data_end))
--		return XDP_DROP;
--	if (!check_smac(eth))
-+	if (!is_test_packet(ctx))
- 		return XDP_DROP;
- 
- 	ret = bpf_xdp_adjust_meta(ctx, -META_SIZE);
-@@ -310,33 +327,24 @@ int ing_xdp_zalloc_meta(struct xdp_md *ctx)
- SEC("xdp")
- int ing_xdp(struct xdp_md *ctx)
- {
--	__u8 *data, *data_meta, *data_end, *payload;
--	struct ethhdr *eth;
-+	__u8 *data, *data_meta;
- 	int ret;
- 
-+	/* Drop any non-test packets */
-+	if (!is_test_packet(ctx))
-+		return XDP_DROP;
++int icssm_prueth_sw_init_fdb_table(struct prueth *prueth)
++{
++	if (prueth->emac_configured)
++		return 0;
 +
- 	ret = bpf_xdp_adjust_meta(ctx, -META_SIZE);
- 	if (ret < 0)
- 		return XDP_DROP;
++	prueth->fdb_tbl = kmalloc(sizeof(*prueth->fdb_tbl), GFP_KERNEL);
++	if (!prueth->fdb_tbl)
++		return -ENOMEM;
++
++	icssm_prueth_sw_fdb_tbl_init(prueth);
++
++	return 0;
++}
++
++/**
++ * icssm_prueth_sw_fdb_add - insert fdb entry
++ *
++ * @emac: EMAC data structure
++ * @fdb: fdb info
++ *
++ */
++void icssm_prueth_sw_fdb_add(struct prueth_emac *emac,
++			     struct switchdev_notifier_fdb_info *fdb)
++{
++	icssm_prueth_sw_insert_fdb_entry(emac, fdb->addr, 1);
++}
++
++/**
++ * icssm_prueth_sw_fdb_del - delete fdb entry
++ *
++ * @emac: EMAC data structure
++ * @fdb: fdb info
++ *
++ */
++void icssm_prueth_sw_fdb_del(struct prueth_emac *emac,
++			     struct switchdev_notifier_fdb_info *fdb)
++{
++	icssm_prueth_sw_delete_fdb_entry(emac, fdb->addr, 1);
++}
+diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth_switch.h b/drivers/net/ethernet/ti/icssm/icssm_prueth_switch.h
+new file mode 100644
+index 000000000000..fd013ecdc707
+--- /dev/null
++++ b/drivers/net/ethernet/ti/icssm/icssm_prueth_switch.h
+@@ -0,0 +1,20 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright (C) 2020-2021 Texas Instruments Incorporated - https://www.ti.com
++ */
++
++#ifndef __NET_TI_PRUETH_SWITCH_H
++#define __NET_TI_PRUETH_SWITCH_H
++
++#include "icssm_prueth.h"
++#include "icssm_prueth_fdb_tbl.h"
++
++void icssm_prueth_sw_fdb_tbl_init(struct prueth *prueth);
++int icssm_prueth_sw_init_fdb_table(struct prueth *prueth);
++void icssm_prueth_sw_free_fdb_table(struct prueth *prueth);
++int icssm_prueth_sw_do_purge_fdb(struct prueth_emac *emac);
++void icssm_prueth_sw_fdb_add(struct prueth_emac *emac,
++			     struct switchdev_notifier_fdb_info *fdb);
++void icssm_prueth_sw_fdb_del(struct prueth_emac *emac,
++			     struct switchdev_notifier_fdb_info *fdb);
++
++#endif /* __NET_TI_PRUETH_SWITCH_H */
+diff --git a/drivers/net/ethernet/ti/icssm/icssm_switch.h b/drivers/net/ethernet/ti/icssm/icssm_switch.h
+index 8b494ffdcde7..4200ccb1b425 100644
+--- a/drivers/net/ethernet/ti/icssm/icssm_switch.h
++++ b/drivers/net/ethernet/ti/icssm/icssm_switch.h
+@@ -254,4 +254,30 @@
+ #define P0_COL_BUFFER_OFFSET	0xEE00
+ #define P0_Q1_BUFFER_OFFSET	0x0000
  
- 	data_meta = ctx_ptr(ctx, data_meta);
--	data_end  = ctx_ptr(ctx, data_end);
- 	data      = ctx_ptr(ctx, data);
- 
--	eth = (struct ethhdr *)data;
--	payload = data + sizeof(struct ethhdr);
--
--	if (payload + META_SIZE > data_end ||
--	    data_meta + META_SIZE > data)
--		return XDP_DROP;
--
--	/* The Linux networking stack may send other packets on the test
--	 * interface that interfere with the test. Just drop them.
--	 * The test packets can be recognized by their source MAC address.
--	 */
--	if (!check_smac(eth))
-+	if (data_meta + META_SIZE > data)
- 		return XDP_DROP;
- 
--	__builtin_memcpy(data_meta, payload, META_SIZE);
-+	__builtin_memcpy(data_meta, meta_want, META_SIZE);
- 	return XDP_PASS;
- }
- 
-
++#define V2_1_FDB_TBL_LOC          PRUETH_MEM_SHARED_RAM
++#define V2_1_FDB_TBL_OFFSET       0x2000
++
++#define FDB_INDEX_TBL_MAX_ENTRIES     256
++#define FDB_MAC_TBL_MAX_ENTRIES       256
++
++#define FDB_INDEX_TBL_OFFSET    V2_1_FDB_TBL_OFFSET
++#define FDB_INDEX_TBL_SIZE      (FDB_INDEX_TBL_MAX_ENTRIES * \
++				 sizeof(struct fdb_index_tbl_entry))
++
++#define FDB_MAC_TBL_OFFSET      (FDB_INDEX_TBL_OFFSET + FDB_INDEX_TBL_SIZE)
++#define FDB_MAC_TBL_SIZE        (FDB_MAC_TBL_MAX_ENTRIES * \
++				 sizeof(struct fdb_mac_tbl_entry))
++
++#define FDB_PORT1_STP_CFG_OFFSET        (FDB_MAC_TBL_OFFSET + FDB_MAC_TBL_SIZE)
++#define FDB_PORT_STP_CFG_SIZE           sizeof(struct fdb_stp_config)
++#define FDB_PORT2_STP_CFG_OFFSET        (FDB_PORT1_STP_CFG_OFFSET + \
++					 FDB_PORT_STP_CFG_SIZE)
++
++#define FDB_FLOOD_ENABLE_FLAGS_OFFSET   (FDB_PORT2_STP_CFG_OFFSET + \
++					FDB_PORT_STP_CFG_SIZE)
++#define FDB_FLOOD_ENABLE_FLAGS_SIZE     sizeof(struct fdb_flood_config)
++
++#define FDB_LOCKS_OFFSET        (FDB_FLOOD_ENABLE_FLAGS_OFFSET + \
++				 FDB_FLOOD_ENABLE_FLAGS_SIZE)
++
+ #endif /* __ICSS_SWITCH_H */
 -- 
 2.43.0
 
