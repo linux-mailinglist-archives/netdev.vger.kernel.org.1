@@ -1,164 +1,147 @@
-Return-Path: <netdev+bounces-247044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D2ECCF3BA7
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 14:11:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9E64CF3BB0
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 14:13:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 87D1C3006F4B
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 13:04:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0079430C5234
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 13:06:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E13D1DC9B5;
-	Mon,  5 Jan 2026 13:04:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4D381F5617;
+	Mon,  5 Jan 2026 13:06:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="HZPyjUoO";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="aDumdI4o"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JTtp/+uk"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07CD38632B;
-	Mon,  5 Jan 2026 13:04:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BE2E1DC9B5
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 13:06:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767618255; cv=none; b=DjpvV+I9TPFMvIN297ou5R2ObdSuolImXph4yskTJdusIc+KnxXXYzf9wWJZDsg8dCoHZet3lWDXUGn0cwTn80QXBBAhXrJyt3P+fXVxDVAi2Qyvry/xlKdKea6FTk8Oe2/4pJm8HwHBjuAkdz9Mw+TGNYZ8hIoPFXY60JfQg8U=
+	t=1767618387; cv=none; b=GwCDA84ni53Zxap8QCugmnJBSv0iJGUoxlFt9KntHjlsknA4RiKNKZO+Q0B8YH+EKSTgqfHGAOCKixXe7qv7H0exw848f4EckRQw3OVnjByK/2Ui9S+5qsXySNLk3UgCaDP5tvX1ZLBgcL0No1uTlIR+u06TipxzwCCG6hdS04c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767618255; c=relaxed/simple;
-	bh=Hchbw9WKDXgJCR0RJQZ0iueqga8miWKz3ZrW+rf/rC8=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=PI/e2vD8MbZTznXvq+qf3JgUgKlTEsoKQB7e7T/Zi+ldhJo5njLuaBdCFICs7dENNsg5NdfTzbE2DIYKXUvRL0k8GBS8841uml7MGILplkTtor8HiXbeJ+3SO2yU42CuS9pj0pJr5PgBzEi7qy50S1CbRHEgSIoMokzT+owMwbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=HZPyjUoO; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=aDumdI4o; arc=none smtp.client-ip=202.12.124.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id D75D57A0114;
-	Mon,  5 Jan 2026 08:04:11 -0500 (EST)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-04.internal (MEProxy); Mon, 05 Jan 2026 08:04:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1767618251;
-	 x=1767704651; bh=uAohc9GpQJJzncomxaFLEdU5W4KBJI1SLnN+hmqJsmE=; b=
-	HZPyjUoOkhAM/avFohXhnH2Fj+T14WjNDQ8UST1LAlOTQQms1BHZO0GxCSLvS3xs
-	ONDFsh+jUecpV2IN0qgStaOIlp7hEgyajz1p2+DcPmm4fVSC/C5A7WNLAjBXnOeK
-	vNtwnLLjKa+WJIfHuAzGdaf8bwToFEyQpt6S5pmWMkR5xTKHWwMJeg57QKWaVk2Q
-	wnp+rS2a6GrD6fmjAUXsY/utjXTEGnk1AYZYYzTY9e7T4xjTfV/bIkKEggVppvXn
-	qtCgejVML/9H2Gwq8yZWbhZ2WXNdbzzDGzWpbsk6NyttO4/hpjJ0zSqwkwDseyfm
-	qKdb423FNgiHGIFuYWw1PA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1767618251; x=
-	1767704651; bh=uAohc9GpQJJzncomxaFLEdU5W4KBJI1SLnN+hmqJsmE=; b=a
-	DumdI4o8r7C7V8GNk1rBNegx5V7Xg9kOX9OLXY2mVwnQ785EFNghRtl3KkvUy8ik
-	FWxtQhXU4D4Du+da65fI0xM3atgwik+AtX2VvAPVFGh5ns9F3j/KyUsChsC8536H
-	lW7JYgNDQ2vhxiKk2IZHxqGJbLuXGljs9FwL5UL2IxGdixoCMAD0fm7IqQ6zs8oA
-	skYnRW5SObUkII28Pqr4WJ3SNaf+UUH/Rnrgh8wHLgt8fYL47ykiaOA/zZ1G7Cmr
-	QMJPNhrh8dScJhYbs9+Dw1msLHQOLZB5e6mE6VnGa/stIVtRa7WcCfbZnxiB7A/e
-	E6pUXcbEiiRo/CyxqJkqw==
-X-ME-Sender: <xms:yrZbaY5Z5LlTSiEBNP8eiQiaQvN6zVi5XpPbBp_u5sg4AYErpXUgPw>
-    <xme:yrZbaUuJJt26VL2OxgzHSnjMc4-ec0rFS-yOlSLy2CUZyuUd009kdS5C0MtDpViM6
-    crvwn8SMiBAM3Liel0hCSVzrgQUAqDMWwhX4U1S04ThuhQy-K9AHRs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeljeefjecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefoggffhffvvefkjghfufgtgfesthhqredtredtjeenucfhrhhomhepfdetrhhnugcu
-    uegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtthgvrh
-    hnpedvhfdvkeeuudevfffftefgvdevfedvleehvddvgeejvdefhedtgeegveehfeeljeen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnug
-    esrghrnhgusgdruggvpdhnsggprhgtphhtthhopeduhedpmhhouggvpehsmhhtphhouhht
-    pdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhope
-    gvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgv
-    rhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtph
-    htthhopehthhhomhgrshdrfigvihhsshhstghhuhhhsehlihhnuhhtrhhonhhigidruggv
-    pdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtoheptghorhgvth
-    gvrghmsehnvghtfhhilhhtvghrrdhorhhgpdhrtghpthhtohepkhgrughlvggtsehnvght
-    fhhilhhtvghrrdhorhhgpdhrtghpthhtohepphgrsghlohesnhgvthhfihhlthgvrhdroh
-    hrgh
-X-ME-Proxy: <xmx:yrZbad9aJfyi4r09VKtrtKBlKZyyMvRTz3MFujmWfe-Qv0yjNlI0iQ>
-    <xmx:yrZbaSJ-ykZQtG3YYBnsRzjvljaUyQ050voMUUZTVjSSiDZQvnkJzQ>
-    <xmx:yrZbaaywxTV4hipjDVDraGJGq5YtImxElQuFA2IHxnq-eOZi3IyDvw>
-    <xmx:yrZbad2QCN9sQySCLAPxCSO-UVJ5nAFWrK-cl-GKPWEh5hSZFulMsg>
-    <xmx:y7ZbacMyESx44V_qWIYpXuU0XfX1GHBL07yygH4AqjJKnLmR4EnCCtiz>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 5602F700069; Mon,  5 Jan 2026 08:04:10 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1767618387; c=relaxed/simple;
+	bh=xqwkrhDPX9VUQAP8pCblwBHB+XqTPJYCfg5HSZkBpvI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VhtCgrhpNsz3O0T2FhIzQ/EczdTKQJwsbwhH7NUfYuZoSm4AvGol94RvSpx2dsoIxAX7An0hujwPeGzMAmGGBBMO0eSWXfsJ0nJ5XpOW12Ip6ytflznrc3qCmuEoZ3MR1STFH7jLtOcNLvWEbTix0vSincKgeJF5V90kZRgzEW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JTtp/+uk; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-29efd139227so184665095ad.1
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 05:06:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767618385; x=1768223185; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CrVouaSHTHvbzMm3C++Sc0NBpLBf0RPE14kza4yhpbA=;
+        b=JTtp/+ukgceqZ1HyXOmRgDb3Wc5K5132wA6/QOwHi9qQflan6U7uJ8MeWz3WCNUOHi
+         lhYpl6MNo/uv4IpP06AGIrvudtagwbCHgxuPwWxY33qSVZb7TNdKBSQEyEc3Wkym0btm
+         W1T2ZBdKDDsxDtOFXXY/fB+pELzQD3ql+LStBxS3yN0dV0aU+KBAf3MhcrcN/G8hAIOp
+         Mzu6dziqWMtz09dIm9WHYggOQmE1Y96tNqCGi0we2x22eAlRVLpjJJvzkKQBpEp/G4CQ
+         8Ax7msJTVZ8ImX7zROi9/yYwQHEmy/KwybLiXQtJzHy7cwA5SkzhUUPxLMhYMQO+/xyF
+         lFSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767618385; x=1768223185;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CrVouaSHTHvbzMm3C++Sc0NBpLBf0RPE14kza4yhpbA=;
+        b=emZvemxijM2kZhsSAYSXqOoiev0nmGNq7NyYetXSACawleYGOHpVYiL55FncmKAN/j
+         7Oca/IYWE6pH2jGAoBbR47wKXNpIyOXPoe3S93Pu+iPdsNRLuoSkAZubHM/rR+A5k1vC
+         u93cYhIHOqR/nKaGN8cdGsLbqMEZkgIIUqmcWU3GSwImyo/soBEpNZvM3WTPAsB++orh
+         FnYLPnPMFPf0LazRfMDE8eNl0DCgc/eUsKcJRB4JH2j/sPF4AfSWS2B6Uqk9wF8r5zti
+         Xw1TobRZks5wx/cjIQVGMcuWyFGvAvIfDb0vFE+pdmuNLKh9XibeXbWr2ItYaVflgPZr
+         ru1Q==
+X-Gm-Message-State: AOJu0YzszOjR1gwc7I6zt1YfHeICeYCIfrqgT2mTm4YzarneKPixCup/
+	i0MC8OKkFn85KNoHKXQTYOnTMGVaMjmsUX52gSoyn97trUR7ouvygcKg
+X-Gm-Gg: AY/fxX5Bxyey1E7XVhqLt0fiapeI+CfMDbfQUn6T3DTq+pVlPd09q+/M2Tn8X01jMQ9
+	UceWOVs+TlcHoycy4TeLEdBIOzm4j/Q/ngDekjxAqhTByeJbeP6yPJWt3bw8r55JMxldxswP3vY
+	S/5FCENYPfoNMaeX4jyVx1YTC9ySzVbXxYNxAR75UATS26DJsh/Vj6YQbTMLU7REKSqsNZyRgJr
+	JpmVMZJtA2zpw50E/DrjCMYYhizox/5ONY3DZ1xj/AiuCfVZBvfR90OMGgtcJ5nIJeCzLEocm/P
+	sJOV29B6DZEIAv1j2oF9Ob7Uw0jgMQisuxIWqXJDj4HrOudp9U0SA6dzMP8bFHfwZT+F5RbJkfS
+	4Uv2frcTiIDZf/Ay8Cg3zwJBBzQh36FBGsldqN5zBcS0Ik9j7d33ICho/Txe+IUzh/07P1tlUOT
+	EdqC7/mfxW
+X-Google-Smtp-Source: AGHT+IGeh7uE/eLUURJ6fn209BgBHdAtqIZG3AqpUS+K3MUFQCjOsM5uBI3x6ImMFR5rdjb0qq1f2w==
+X-Received: by 2002:a17:902:f78d:b0:2a0:e223:f6e6 with SMTP id d9443c01a7336-2a2f2830b0amr418839505ad.46.1767618385276;
+        Mon, 05 Jan 2026 05:06:25 -0800 (PST)
+Received: from mythos-cloud ([61.82.116.93])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a2f3d5d3e1sm445801785ad.76.2026.01.05.05.06.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 05:06:24 -0800 (PST)
+From: Yeounsu Moon <yyyynoom@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yeounsu Moon <yyyynoom@gmail.com>
+Subject: [PATCH net-next v2] net: dlink: replace printk() with netdev_{info,dbg}() in rio_probe1()
+Date: Mon,  5 Jan 2026 22:05:53 +0900
+Message-ID: <20260105130552.8721-2-yyyynoom@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AZiuWalixslg
-Date: Mon, 05 Jan 2026 14:02:17 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
- "Andrew Lunn" <andrew@lunn.ch>, "Pablo Neira Ayuso" <pablo@netfilter.org>,
- "Jozsef Kadlecsik" <kadlec@netfilter.org>, "Florian Westphal" <fw@strlen.de>,
- "Phil Sutter" <phil@nwl.cc>
-Cc: linux-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Message-Id: <d3554d2d-1344-45f3-a976-188d45415419@app.fastmail.com>
-In-Reply-To: <20260105-uapi-limits-v1-3-023bc7a13037@linutronix.de>
-References: <20260105-uapi-limits-v1-0-023bc7a13037@linutronix.de>
- <20260105-uapi-limits-v1-3-023bc7a13037@linutronix.de>
-Subject: Re: [PATCH RFC net-next 3/3] netfilter: uapi: Use UAPI definition of INT_MAX
- and INT_MIN
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jan 5, 2026, at 09:26, Thomas Wei=C3=9Fschuh wrote:
-> Using <limits.h> to gain access to INT_MAX and INT_MIN introduces a
-> dependency on a libc, which UAPI headers should not do.
->
-> Use the equivalent UAPI constants.
->
-> Signed-off-by: Thomas Wei=C3=9Fschuh <thomas.weissschuh@linutronix.de>
+Replace rio_probe1() printk(KERN_INFO) messages with netdev_{info,dbg}().
 
-I agree with the idea of the patch series, but I think this
-introduces a different problem:
+Keep one netdev_info() line for device identification; move the rest to
+netdev_dbg() to avoid spamming the kernel log.
 
->  #include <linux/in.h>
-> +#include <linux/limits.h>
+Log rx_timeout on a separate line since netdev_*() prefixes each
+message and the multi-line formatting looks broken otherwise.
 
-linux/limits.h is not always clean against limits.h. In glibc,
-you can include both in any order, but in musl, you cannot:
+No functional change intended.
 
-gcc -xc /dev/null -nostdinc -I /usr/include/aarch64-linux-musl -include =
-limits.h -include linux/limits.h  -o - -Wall  -c=20
-In file included from <command-line>:
-/usr/include/aarch64-linux-musl/linux/limits.h:7: warning: "NGROUPS_MAX"=
- redefined
-    7 | #define NGROUPS_MAX    65536    /* supplemental group IDs are av=
-ailable */
-      |=20
-In file included from <command-line>:
-/usr/include/aarch64-linux-musl/limits.h:48: note: this is the location =
-of the previous definition
-   48 | #define NGROUPS_MAX 32
+Tested-on: D-Link DGE-550T Rev-A3
+Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
+---
+Changelog:
+v2:
+- Keep one netdev_inf() line; switch the rest to netdev_dbg()
+v1: https://lore.kernel.org/netdev/20260104111849.10790-2-yyyynoom@gmail.com/
+---
+ drivers/net/ethernet/dlink/dl2k.c | 17 +++++++----------
+ 1 file changed, 7 insertions(+), 10 deletions(-)
 
-I can think of two alternative approaches here:
+diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
+index 846d58c769ea..69bfb8265d57 100644
+--- a/drivers/net/ethernet/dlink/dl2k.c
++++ b/drivers/net/ethernet/dlink/dl2k.c
+@@ -279,18 +279,15 @@ rio_probe1 (struct pci_dev *pdev, const struct pci_device_id *ent)
+ 
+ 	card_idx++;
+ 
+-	printk (KERN_INFO "%s: %s, %pM, IRQ %d\n",
+-		dev->name, np->name, dev->dev_addr, irq);
++	netdev_info(dev, "%s, %pM, IRQ %d", np->name, dev->dev_addr, irq);
+ 	if (tx_coalesce > 1)
+-		printk(KERN_INFO "tx_coalesce:\t%d packets\n",
+-				tx_coalesce);
+-	if (np->coalesce)
+-		printk(KERN_INFO
+-		       "rx_coalesce:\t%d packets\n"
+-		       "rx_timeout: \t%d ns\n",
+-				np->rx_coalesce, np->rx_timeout*640);
++		netdev_dbg(dev, "tx_coalesce:\t%d packets", tx_coalesce);
++	if (np->coalesce) {
++		netdev_dbg(dev, "rx_coalesce:\t%d packets", np->rx_coalesce);
++		netdev_dbg(dev, "rx_timeout: \t%d ns", np->rx_timeout * 640);
++	}
+ 	if (np->vlan)
+-		printk(KERN_INFO "vlan(id):\t%d\n", np->vlan);
++		netdev_dbg(dev, "vlan(id):\t%d", np->vlan);
+ 	return 0;
+ 
+ err_out_unmap_rx:
+-- 
+2.52.0
 
-- put the __KERNEL_INT_MIN into a different header -- either a new one
-  or maybe uapi/linux/types.h
-- use the compiler's built-in __INT_MIN__ instead of INT_MIN in
-  UAPI headers.
-
-On the other hand, there are a few other uapi headers
-that already include linux/limits.h:
-
-include/uapi/linux/auto_fs.h:#include <linux/limits.h>
-include/uapi/linux/fs.h:#include <linux/limits.h>
-include/uapi/linux/netfilter/xt_bpf.h:#include <linux/limits.h>
-include/uapi/linux/netfilter/xt_cgroup.h:#include <linux/limits.h>
-include/uapi/linux/netfilter/xt_hashlimit.h:#include <linux/limits.h>
-
-     Arnd
 
