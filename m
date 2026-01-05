@@ -1,91 +1,253 @@
-Return-Path: <netdev+bounces-246947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7337CF2A8A
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 10:15:16 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5C12CF2AC6
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 10:16:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F2B92300DB8C
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 09:15:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BC06B3002974
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 09:16:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2DD4329E5D;
-	Mon,  5 Jan 2026 09:15:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6260329E46;
+	Mon,  5 Jan 2026 09:16:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aYsHIRYZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689223277B8;
-	Mon,  5 Jan 2026 09:15:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59CCD32B9AD
+	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 09:16:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767604507; cv=none; b=MJYLqZTGg9NddGAu14wmB7y51Xq4B8saVWp/FknGNWRFa/DZnqIeEg7E8MDALW0DQeD2uSCTrj3weeqd2U1VkYKunYPiyDKi9FBLjKBi7/yP7jT+G43iUTI7ktz7Lh3kz4c20vNMr7ktuGgQKA9EbS+/iHQlrRq5jDnFBEWciko=
+	t=1767604588; cv=none; b=sb0NEQB12PG7OmprFEx4b4+cWwMZnfjjOBG/Aim0U7Lv49kJ396iht5GwzrXx6TOtO6XLEJiVuuqhKFpLK7uORfmfALtVn+KVSA6ChZWqxM8b2mkU9uQVOaK6TKWgKZ222WzrScT4Cy/IVAXHxOxVwQyEX5/ywFzSCEPiQiJPOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767604507; c=relaxed/simple;
-	bh=5xeBDXm0mn/Rr32z+Kky0hj3jinq3o9nItTJbx4ulGI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IZSVcaB8Z5H9+XxLcZRV13Eyy5X/McBpl5eei1oXDUXI7ln+wdGLilGvkaj02are8NObSIHIJX0D/EShg/BaMNMTVutHoBANNE4RFpBaqJAJ0zUgaRftI6K/SQy7sZEZcXroxMecgkew/uQc3GjfTmvofhWma3abZOSgXn5PcEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id CEED660351; Mon, 05 Jan 2026 10:15:00 +0100 (CET)
-Date: Mon, 5 Jan 2026 10:15:00 +0100
-From: Florian Westphal <fw@strlen.de>
-To: syzbot <syzbot+ee287f5effa60050d9ac@syzkaller.appspotmail.com>
-Cc: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com,
-	horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, pabeni@redhat.com,
-	pablo@netfilter.org, phil@nwl.cc, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [netfilter?] possible deadlock in
- nf_tables_dumpreset_rules
-Message-ID: <aVuBFErrvyjKv0v5@strlen.de>
-References: <695b76dc.050a0220.1c9965.0029.GAE@google.com>
+	s=arc-20240116; t=1767604588; c=relaxed/simple;
+	bh=OWC+AHxZdxUuVZM/YaeSNjU/c5cKFkHpncudd9Oa0yE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FuR03or/OjsVCX3oRUnyG9tlYtOUg7cAyqyjI5a/VxxPb3OXV4qyflrfFb7WpBMBWwAZeLQbS9JtIs1WmwbrT0mft3cH5aM5LDfEpGzOoZ+1SGYhEZ/3fEO6daoLAlahK04yjprItb4ga5toZFwh3d7q2W4DArh162WC2VNXYpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=aYsHIRYZ; arc=none smtp.client-ip=209.85.160.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-3eae4e590a4so7202264fac.1
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 01:16:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1767604581; x=1768209381; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xS4Pieemzy4r1o+XZyR7jxfKf1/JCiqumXmtg6ZAf0Y=;
+        b=aYsHIRYZmEqubVaB/nFOB2ZSyZ5mdUAJQ2e8vK7U6xa1ASeFd6LWH955d9+nh53ktb
+         xr1P49S3syRT14RFGDCfbl+SIJj8H1shK6l/HJyqERcZfy8YT9XcW9ovCyPlV1JPbept
+         stVuPPdDv4O0rskrIVR6VeYaEnAM5RPbtavEumXMM3wqDI/5YZbPJj/fIsEwMgjbttlW
+         vq78fx3LM7I7y53tg3lpxh5jqIHVy7So3PmCqVqS6shGFcQdOC2kuMGEH3Kt5Owzm2Qm
+         rjvtr+TvOeiiwnoqs3PniCzuVCCjBVzPM3FD6VXVz+bPcHzpEmbFp1Ii0V1COQygdl4e
+         lteA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767604581; x=1768209381;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=xS4Pieemzy4r1o+XZyR7jxfKf1/JCiqumXmtg6ZAf0Y=;
+        b=aNPel38xyWIBaRR+2FKwifHwcVey+tfm5s3SV4Wnhp1wTDoLVs2ScedCKegcljzAeE
+         BQnS83fESuCeT+7HMPxbprdQyt6VdQ38yzLSkuRfRiQQIEn43k6h/u8G+ovXYlNNHQu1
+         9SxVUUw/IDNReqlj8GEJvWlqKd0k/v95QOZOZpV6WG2knjfSX+NzNvqjp2l5kb9oWzgl
+         VGqdACCNaiC45HXQfuTJx6FNze0JHqPx9cUfcHoBbCDbt5eV3AtITmiaUvMoWqZ1D5+T
+         oL0nSXDhMW0tQ5vMH/BHAWOiEIgeQZ05wOxpO0HnauwH7lbJRiMruH/jE7hCofFAUibu
+         JFuA==
+X-Forwarded-Encrypted: i=1; AJvYcCWepcQ6NhC5QBMf5QsSyJxLRK7Z6wzizf+YUQPWPi8kSvSIYKVPE4eKMYprkgXuDzAGth4sK+s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8pXOCevyJlGFF5nrl5PmSgHmNBRENqToZUIq9JuL2LAx7EWsq
+	ODGp3kVfzJDGCh+jp4P0H/j2LlEL0PmQUNDEWT7+N0d6BPudKaR4iSdycVzVKg3vzsB64wUQpSk
+	44wm0sExqJomMR/su5hCSP+jCUo8d52VYTwxCz2w65A==
+X-Gm-Gg: AY/fxX6bH5mC5ZaL+k552uDT40oKk17rQMGgBRJ5wL5WFcTY95iYVFALe5dBgMYNl97
+	sdYj1Dj3hpAzf9Xc4WZTUHSZXBqXITNKXioZU/DsLWoO+PuGnya0YKnA4Fkharyr5y5vUMjbJYl
+	AZgkFiYYFpTDdpIl89YF2BI/Hje/JUpqne3LSUq+eVMlCsFbWeSC+xcftdYKixXb3JskbhGmi20
+	/O4xU5oO5cP69gBHGfhPbFpjCTnPBGn+sdfME+Pyv6QQ+MYCbtyRE4TRFIBf1nwpVTR6HvGuIIo
+	OwSgUhLz8TJWQxNx1Rmy04xPmQ==
+X-Google-Smtp-Source: AGHT+IHdtu3uK1YvLPvRXmBmsYletnr+Fy6yEnWw7FcQJMBZUAFsUyE2L/0PG3GpU/2KGeBY95bkFD0S8glmAzrpFaU=
+X-Received: by 2002:a05:6820:2289:b0:65c:f9c1:cba0 with SMTP id
+ 006d021491bc7-65d0ea16a88mr23376881eaf.37.1767604581140; Mon, 05 Jan 2026
+ 01:16:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <695b76dc.050a0220.1c9965.0029.GAE@google.com>
+References: <cover.1765791463.git.u.kleine-koenig@baylibre.com>
+ <CAHUa44FrDZbvRvfN8obf80_k=Eqxe9YxHpjaE5jU7nkxPUwfag@mail.gmail.com>
+ <20251218135332f323fa91@mail.local> <CAHUa44GpW5aO26GDyL9RZub9vVYvVcJ7etwO0yXBN_mUi0W4AA@mail.gmail.com>
+In-Reply-To: <CAHUa44GpW5aO26GDyL9RZub9vVYvVcJ7etwO0yXBN_mUi0W4AA@mail.gmail.com>
+From: Jens Wiklander <jens.wiklander@linaro.org>
+Date: Mon, 5 Jan 2026 10:16:09 +0100
+X-Gm-Features: AQt7F2q8lTcIoa5xBnvz2Mkjx2axWX5OMGPJpQNfFM5WoFI2KGlEdVoT6sJvPQg
+Message-ID: <CAHUa44HqRbCJTXsrTCm0G5iwtkQtq+Si=yOspCjpAn-N2uVSVg@mail.gmail.com>
+Subject: Re: [PATCH v2 00/17] tee: Use bus callbacks instead of driver callbacks
+To: Alexandre Belloni <alexandre.belloni@bootlin.com>
+Cc: =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@baylibre.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Sumit Garg <sumit.garg@kernel.org>, 
+	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	=?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
+	Ard Biesheuvel <ardb@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Sumit Garg <sumit.garg@oss.qualcomm.com>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, 
+	Sudeep Holla <sudeep.holla@arm.com>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
+	=?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>, 
+	Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
+	James Bottomley <James.Bottomley@hansenpartnership.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Mimi Zohar <zohar@linux.ibm.com>, David Howells <dhowells@redhat.com>, 
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, Peter Huewe <peterhuewe@gmx.de>, op-tee@lists.trustedfirmware.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-rtc@vger.kernel.org, 
+	linux-efi@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, 
+	Cristian Marussi <cristian.marussi@arm.com>, arm-scmi@vger.kernel.org, 
+	linux-mips@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-integrity@vger.kernel.org, keyrings@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzbot <syzbot+ee287f5effa60050d9ac@syzkaller.appspotmail.com> wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    54e82e93ca93 Merge tag 'core_urgent_for_v6.19_rc4' of git:..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=10b1ee22580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=8bfa57a8c0ab3aa8
-> dashboard link: https://syzkaller.appspot.com/bug?extid=ee287f5effa60050d9ac
-> compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> userspace arch: i386
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-54e82e93.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/c7af41d4f0f4/vmlinux-54e82e93.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/02aa2250dd4f/bzImage-54e82e93.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+ee287f5effa60050d9ac@syzkaller.appspotmail.com
-> 
-> netlink: 48 bytes leftover after parsing attributes in process `syz.8.6539'.
-> ======================================================
-> WARNING: possible circular locking dependency detected
-> syzkaller #0 Tainted: G             L     
-> ------------------------------------------------------
-> syz.8.6539/2008 is trying to acquire lock:
-> ffff888052e32cd8 (&nft_net->commit_mutex){+.+.}-{4:4}, at: nf_tables_dumpreset_rules+0x6f/0xa0 net/netfilter/nf_tables_api.c:3913
-> 
-> but task is already holding lock:
-> ffff888025cb16f0 (nlk_cb_mutex-NETFILTER){+.+.}-{4:4}, at: __netlink_dump_start+0x150/0x990 net/netlink/af_netlink.c:2404
- 
-> which lock already depends on the new lock.
+Hi,
 
-#syz dup: possible deadlock in nf_tables_dumpreset_obj
+On Thu, Dec 18, 2025 at 5:29=E2=80=AFPM Jens Wiklander
+<jens.wiklander@linaro.org> wrote:
+>
+> On Thu, Dec 18, 2025 at 2:53=E2=80=AFPM Alexandre Belloni
+> <alexandre.belloni@bootlin.com> wrote:
+> >
+> > On 18/12/2025 08:21:27+0100, Jens Wiklander wrote:
+> > > Hi,
+> > >
+> > > On Mon, Dec 15, 2025 at 3:17=E2=80=AFPM Uwe Kleine-K=C3=B6nig
+> > > <u.kleine-koenig@baylibre.com> wrote:
+> > > >
+> > > > Hello,
+> > > >
+> > > > the objective of this series is to make tee driver stop using callb=
+acks
+> > > > in struct device_driver. These were superseded by bus methods in 20=
+06
+> > > > (commit 594c8281f905 ("[PATCH] Add bus_type probe, remove, shutdown
+> > > > methods.")) but nobody cared to convert all subsystems accordingly.
+> > > >
+> > > > Here the tee drivers are converted. The first commit is somewhat
+> > > > unrelated, but simplifies the conversion (and the drivers). It
+> > > > introduces driver registration helpers that care about setting the =
+bus
+> > > > and owner. (The latter is missing in all drivers, so by using these
+> > > > helpers the drivers become more correct.)
+> > > >
+> > > > v1 of this series is available at
+> > > > https://lore.kernel.org/all/cover.1765472125.git.u.kleine-koenig@ba=
+ylibre.com
+> > > >
+> > > > Changes since v1:
+> > > >
+> > > >  - rebase to v6.19-rc1 (no conflicts)
+> > > >  - add tags received so far
+> > > >  - fix whitespace issues pointed out by Sumit Garg
+> > > >  - fix shutdown callback to shutdown and not remove
+> > > >
+> > > > As already noted in v1's cover letter, this series should go in dur=
+ing a
+> > > > single merge window as there are runtime warnings when the series i=
+s
+> > > > only applied partially. Sumit Garg suggested to apply the whole ser=
+ies
+> > > > via Jens Wiklander's tree.
+> > > > If this is done the dependencies in this series are honored, in cas=
+e the
+> > > > plan changes: Patches #4 - #17 depend on the first two.
+> > > >
+> > > > Note this series is only build tested.
+> > > >
+> > > > Uwe Kleine-K=C3=B6nig (17):
+> > > >   tee: Add some helpers to reduce boilerplate for tee client driver=
+s
+> > > >   tee: Add probe, remove and shutdown bus callbacks to tee_client_d=
+river
+> > > >   tee: Adapt documentation to cover recent additions
+> > > >   hwrng: optee - Make use of module_tee_client_driver()
+> > > >   hwrng: optee - Make use of tee bus methods
+> > > >   rtc: optee: Migrate to use tee specific driver registration funct=
+ion
+> > > >   rtc: optee: Make use of tee bus methods
+> > > >   efi: stmm: Make use of module_tee_client_driver()
+> > > >   efi: stmm: Make use of tee bus methods
+> > > >   firmware: arm_scmi: optee: Make use of module_tee_client_driver()
+> > > >   firmware: arm_scmi: Make use of tee bus methods
+> > > >   firmware: tee_bnxt: Make use of module_tee_client_driver()
+> > > >   firmware: tee_bnxt: Make use of tee bus methods
+> > > >   KEYS: trusted: Migrate to use tee specific driver registration
+> > > >     function
+> > > >   KEYS: trusted: Make use of tee bus methods
+> > > >   tpm/tpm_ftpm_tee: Make use of tee specific driver registration
+> > > >   tpm/tpm_ftpm_tee: Make use of tee bus methods
+> > > >
+> > > >  Documentation/driver-api/tee.rst             | 18 +----
+> > > >  drivers/char/hw_random/optee-rng.c           | 26 ++----
+> > > >  drivers/char/tpm/tpm_ftpm_tee.c              | 31 +++++---
+> > > >  drivers/firmware/arm_scmi/transports/optee.c | 32 +++-----
+> > > >  drivers/firmware/broadcom/tee_bnxt_fw.c      | 30 ++-----
+> > > >  drivers/firmware/efi/stmm/tee_stmm_efi.c     | 25 ++----
+> > > >  drivers/rtc/rtc-optee.c                      | 27 ++-----
+> > > >  drivers/tee/tee_core.c                       | 84 ++++++++++++++++=
+++++
+> > > >  include/linux/tee_drv.h                      | 12 +++
+> > > >  security/keys/trusted-keys/trusted_tee.c     | 17 ++--
+> > > >  10 files changed, 164 insertions(+), 138 deletions(-)
+> > > >
+> > > > base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+> > > > --
+> > > > 2.47.3
+> > > >
+> > >
+> > > Thank you for the nice cleanup, Uwe.
+> > >
+> > > I've applied patch 1-3 to the branch tee_bus_callback_for_6.20 in my
+> > > tree at https://git.kernel.org/pub/scm/linux/kernel/git/jenswi/linux-=
+tee.git/
+> > >
+> > > The branch is based on v6.19-rc1, and I'll try to keep it stable for
+> > > others to depend on, if needed. Let's see if we can agree on taking
+> > > the remaining patches via that branch.
+> >
+> > 6 and 7 can go through your branch.
+>
+> Good, I've added them to my branch now.
+
+This entire patch set should go in during a single merge window. I
+will not send any pull request until I'm sure all patches will be
+merged.
+
+So far (if I'm not mistaken), only the patches I've already added to
+next have appeared next. I can take the rest of the patches, too, but
+I need OK for the following:
+
+Jarkko, you seem happy with the following patches
+- KEYS: trusted: Migrate to use tee specific driver registration function
+- KEYS: trusted: Make use of tee bus methods
+- tpm/tpm_ftpm_tee: Make use of tee specific driver registration
+- tpm/tpm_ftpm_tee: Make use of tee bus methods
+OK if I take them via my tree, or would you rather take them yourself?
+
+Herbert, you seem happy with the following patches
+- hwrng: optee - Make use of module_tee_client_driver()
+- hwrng: optee - Make use of tee bus methods
+OK if I take them via my tree, or would you rather take them yourself?
+
+Sudeep, you seem happy with the following patches
+- firmware: arm_scmi: optee: Make use of module_tee_client_driver()
+- firmware: arm_scmi: Make use of tee bus methods
+OK if I take them via my tree, or would you rather take them yourself?
+
+Michael, Pavan, are you OK with the following patches
+- firmware: tee_bnxt: Make use of module_tee_client_driver()
+- firmware: tee_bnxt: Make use of tee bus methods
+OK if I take them via my tree, or would you rather take them yourself?
+
+Thanks,
+Jens
 
