@@ -1,202 +1,134 @@
-Return-Path: <netdev+bounces-247188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28CF2CF5747
-	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 21:02:56 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 618E9CF5859
+	for <lists+netdev@lfdr.de>; Mon, 05 Jan 2026 21:27:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2AEF43061285
-	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 20:02:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D19AD300ACA2
+	for <lists+netdev@lfdr.de>; Mon,  5 Jan 2026 20:27:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF073074B1;
-	Mon,  5 Jan 2026 20:02:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59833338F55;
+	Mon,  5 Jan 2026 20:27:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E5KOezfG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mY5HXawX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978802773C3
-	for <netdev@vger.kernel.org>; Mon,  5 Jan 2026 20:02:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F6FC3314DE;
+	Mon,  5 Jan 2026 20:27:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767643349; cv=none; b=IukPXLDxB3qDdynwHLyjHo4jQ0xRP0i4bap/IcoMXqt1178dYPJmujtgG8gnjn1H6cNVsEsVGcjl8pue5wtL9msnU4yKYk+KheiqPAFizXe6NlHy4k4LqmPw2jRhR+wtRx2bhEt5yO+0JDCILxnaNVR13/PMuScqWaqMJfIGSPY=
+	t=1767644837; cv=none; b=Dio0XIR0q/0/vFSvZ5Hh7PwcwaZ2G1+vehSQ6yC9nyNVLyS1QxDC/WBEvSVBH/i9Ve1+Mfl3Ba6qdpVGostbhLLjOgbWn5UyvsoJX0PlAkdgHYW+1OSvL/sTijADWrxUX7v9EXMziY3WekPPgjYQRii1J8VPNNoqPLvY0+dZHPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767643349; c=relaxed/simple;
-	bh=YQegPKcrMegEgLOVkMKugSgpWYEmPKvwTHFMUlsTBjc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J23mgDVQ/bIhKM4oRbxJyEdciu5UhOiaegsUO+ziBQU22ezhzbuiJGQddCROV176zT0J9WeM8HHr8uVNvk+WVPAP/2bVTaIAy+A/nbJ8kXkg/EpIRkuk/jNxgFA8cm0gvTJFVZ+uGxdJqEaqm2G7tduMoIMcUxx1KMWHitzcLtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E5KOezfG; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-42fb2314eb0so163417f8f.2
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 12:02:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767643346; x=1768248146; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nDlwYF2Xh46taUcCYeQ6K3i+m7OgRE8a63amvp2cLqM=;
-        b=E5KOezfGj3gP2oWNLagJavAea6J6hk54Kd6YXFrzfqK0NcrdKvDVAIn53MH75lRNJ1
-         g7+/VepC9SR3zAaCTZF3ZF4m8OirYnBLFt8w712C0RSoXJkQzH+ciRlclweTTFnitOfq
-         NT+13tGziITLENv5dEkjbWZkbizHoM9Rj4NBn6cqSbAaWTF9rq/mgKi6Vt6jZAP2sdAo
-         0zqNyXV9TVKIA8kpGvFiF6o7fz0ae0bC5aqUQhDJGMOMp1wctZMVps+vYS1yu0DIB745
-         X2nfRAZrtqPpMRZliJpWmaSjNLGE0Sm1Kdb7x95W4TSA5rgnWV2q3DC2eP/V/MQidmWk
-         FcYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767643346; x=1768248146;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=nDlwYF2Xh46taUcCYeQ6K3i+m7OgRE8a63amvp2cLqM=;
-        b=KZjvNDNOxuDbfY8uD0YpB93pRouxAfziSM3yc3GzIziJH2JxPr2YpBiQImKcyaa64j
-         sqMIkPL6ojaTPjK1DwcabHgWEKlZ3HN6eqo5txwW5yyRe53ZafOPn5yruN+t4o3Vhh7y
-         BPm4zHMaZ9QpDQzBjoi7P0JchnbREJ7W6Kp/vI+EzsOOMObOuIbT3E7kA81SjdP4rwt3
-         z5EG34umT8325iIQsU8j510Fxvtmn1K55uSTa7XpleVqAAapXVsmGovFr8guk4azVoKJ
-         eQi/PnjKCHWhgO/9t6bIb5muRPvITwEy1ZK0SCDyrUavhFd4OmdDXuop0bMwmvXZpvQU
-         HCdA==
-X-Forwarded-Encrypted: i=1; AJvYcCUwvuyg3T6cSvni5+nE6XU++yVGngkMaqOO6nMfqDXmLZ5XVMAekaaOp9l2j9+2NluhcRiE4EE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2mi9eL+BjRW6zxQNLhURA+lBYZS3+8SasQZLLl4UOYto79uIZ
-	HMmp4rxsT96MA8L0YV5f26LG0aE7ywFvrQKSjhidFzF8teKa30z2j4lnzwlE4coEkhT4dpOQnYx
-	/HID0y8WmeEww9I1NsPkEP8vX8+JfgQY=
-X-Gm-Gg: AY/fxX7tOZB24dD23UTMvTfiH7xFd++vG5zpRzl1ALiWwSon9UD0LwjXBIMKL+RU3Yx
-	OMft+V6eVbv5Vd3d/sMqFdPBNH1kDlCwxYpfarhbMpVIn3x6U8hP2Ft7XJGtdUOG4ZBrftpAqL1
-	Dy0OnGne+aokmcTOEwUi3eHhaeA5I1Hl/Sx/Dh3mdtY68YVKLSPdlpTFoI9hiQdmOOAVs41IyF2
-	F3BcGvTd/RqAxMSJheYiCi64ej1QWkiZrpNQrmAY9kNUUekXE1fMl2Dkhnj0nS04nr3IV+gQWyn
-	zWnFjQ00mgPGHPs4zqJ6iqTOkdak
-X-Google-Smtp-Source: AGHT+IHOnAg/ShTG5AnQyQZ1FnOjL633CK7YbUZ/C/RRFmc6h8tN7ObCBxJ3Km5eFhRyY44j7FfPae+CWlYu2VzgYIY=
-X-Received: by 2002:a05:6000:178f:b0:42f:bc61:d1bd with SMTP id
- ffacd0b85a97d-432bca525d4mr1214985f8f.45.1767643345605; Mon, 05 Jan 2026
- 12:02:25 -0800 (PST)
+	s=arc-20240116; t=1767644837; c=relaxed/simple;
+	bh=YXz0nmm5+HrBCxqz9vmblcyiqkrmFZDacZ2BnXGn8FA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ifT+teO5uZ4nt7e/LRrR9AHGWJojh+N5LzcBQX8aTPm2xhNJfdVSP1+IeuW6Vz/S+6vWLxDrPD+17ExR5tPB0Lel2Tr6DyeHJBAriWW3Zv8cv/Y1EhahUmg7/GJwryHmMaB1TIV3x1u9Z6e7OJxloB6RUoCXBr/1ueyg9B5DXCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mY5HXawX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A651C116D0;
+	Mon,  5 Jan 2026 20:27:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767644836;
+	bh=YXz0nmm5+HrBCxqz9vmblcyiqkrmFZDacZ2BnXGn8FA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=mY5HXawX4szDKq+1Z146LiVr0FgX8aQk9zFrsenGVppMfnkxGKXnW9BW7eSPSyT6h
+	 OAxsf0Fqvcsc+0NhPVueO1si7c2+KyS/8mu/MBQsQf5KP87I3eIBDv/PYP0eNAdZpW
+	 uEgLWP4udbrrwveryl6q0ZPcv8KzZ/S9fk6neW86UoOI/n2Qyt7nQDdcrFAeU/p6pF
+	 vF1t/0KcjXksZ1XqSskfaPJ570B62u966KhrcMn1Pd6G6Fx10I6wIJK20dOSEnZxkX
+	 vDg97TTaZDr7nBu6AaXLSINPEYKlKu5/U3wlS9Ge4H25Jrw9dvrR81fkJpO5xzqU9H
+	 +N2t2vSxE14ew==
+Message-ID: <c5851986-837b-4ffb-9bf7-3131cf9c05d1@kernel.org>
+Date: Mon, 5 Jan 2026 21:27:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260105-skb-meta-safeproof-netdevs-rx-only-v2-0-a21e679b5afa@cloudflare.com>
- <20260105-skb-meta-safeproof-netdevs-rx-only-v2-15-a21e679b5afa@cloudflare.com>
- <CAADnVQJbGosoXOCdyi=NZar966FVibKYobBgQ9BiyEH3=-HOsw@mail.gmail.com> <CAMB2axPivi+mZOXie=VnJM8nscqkHDjSrKT=Dhp5z_copEwxLQ@mail.gmail.com>
-In-Reply-To: <CAMB2axPivi+mZOXie=VnJM8nscqkHDjSrKT=Dhp5z_copEwxLQ@mail.gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Mon, 5 Jan 2026 12:02:14 -0800
-X-Gm-Features: AQt7F2qM8D-DQgNbBk6KF3eJYStgwWlZZnJYNEuUw080W31rVtOLsWe26-INukE
-Message-ID: <CAADnVQJ_hwMM0F-Fm=ELbk0-5q_AojRAjs_CyWKEjv9NdfJsQw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 15/16] bpf: Realign skb metadata for TC progs
- using data_meta
-To: Amery Hung <ameryhung@gmail.com>
-Cc: Jakub Sitnicki <jakub@cloudflare.com>, Martin KaFai Lau <martin.lau@kernel.org>, 
-	bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Simon Horman <horms@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	kernel-team <kernel-team@cloudflare.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] can: ctucanfd: fix SSP_SRC in cases when bit-rate is
+ higher than 1 MBit.
+To: Pavel Pisa <pisa@fel.cvut.cz>, linux-can@vger.kernel.org,
+ Marc Kleine-Budde <mkl@pengutronix.de>,
+ David Laight <david.laight.linux@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Andrea Daoud <andreadaoud6@gmail.com>,
+ Wolfgang Grandegger <wg@grandegger.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+Cc: Jiri Novak <jnovak@fel.cvut.cz>, Ondrej Ille <ondrej.ille@gmail.com>
+References: <20260105111620.16580-1-pisa@fel.cvut.cz>
+From: Vincent Mailhol <mailhol@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=mailhol@kernel.org; keydata=
+ xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
+ JFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbEBrZXJuZWwub3JnPsKZBBMWCgBBFiEE7Y9wBXTm
+ fyDldOjiq1/riG27mcIFAmdfB/kCGwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcC
+ F4AACgkQq1/riG27mcKBHgEAygbvORJOfMHGlq5lQhZkDnaUXbpZhxirxkAHwTypHr4A/joI
+ 2wLjgTCm5I2Z3zB8hqJu+OeFPXZFWGTuk0e2wT4JzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrb
+ YZzu0JG5w8gxE6EtQe6LmxKMqP6EyR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDl
+ dOjiq1/riG27mcIFAmceMvMCGwwFCQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8V
+ zsZwr/S44HCzcz5+jkxnVVQ5LZ4BANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
+In-Reply-To: <20260105111620.16580-1-pisa@fel.cvut.cz>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jan 5, 2026 at 11:43=E2=80=AFAM Amery Hung <ameryhung@gmail.com> wr=
-ote:
->
-> On Mon, Jan 5, 2026 at 11:14=E2=80=AFAM Alexei Starovoitov
-> <alexei.starovoitov@gmail.com> wrote:
-> >
-> > On Mon, Jan 5, 2026 at 4:15=E2=80=AFAM Jakub Sitnicki <jakub@cloudflare=
-.com> wrote:
-> > >
-> > >
-> > > +__bpf_kfunc_start_defs();
-> > > +
-> > > +__bpf_kfunc void bpf_skb_meta_realign(struct __sk_buff *skb_)
-> > > +{
-> > > +       struct sk_buff *skb =3D (typeof(skb))skb_;
-> > > +       u8 *meta_end =3D skb_metadata_end(skb);
-> > > +       u8 meta_len =3D skb_metadata_len(skb);
-> > > +       u8 *meta;
-> > > +       int gap;
-> > > +
-> > > +       gap =3D skb_mac_header(skb) - meta_end;
-> > > +       if (!meta_len || !gap)
-> > > +               return;
-> > > +
-> > > +       if (WARN_ONCE(gap < 0, "skb metadata end past mac header")) {
-> > > +               skb_metadata_clear(skb);
-> > > +               return;
-> > > +       }
-> > > +
-> > > +       meta =3D meta_end - meta_len;
-> > > +       memmove(meta + gap, meta, meta_len);
-> > > +       skb_shinfo(skb)->meta_end +=3D gap;
-> > > +
-> > > +       bpf_compute_data_pointers(skb);
-> > > +}
-> > > +
-> > > +__bpf_kfunc_end_defs();
-> > > +
-> > > +BTF_KFUNCS_START(tc_cls_act_hidden_ids)
-> > > +BTF_ID_FLAGS(func, bpf_skb_meta_realign)
-> > > +BTF_KFUNCS_END(tc_cls_act_hidden_ids)
-> > > +
-> > > +BTF_ID_LIST_SINGLE(bpf_skb_meta_realign_ids, func, bpf_skb_meta_real=
-ign)
-> > > +
-> > >  static int tc_cls_act_prologue(struct bpf_insn *insn_buf, u32 pkt_ac=
-cess_flags,
-> > >                                const struct bpf_prog *prog)
-> > >  {
-> > > -       return bpf_unclone_prologue(insn_buf, pkt_access_flags, prog,
-> > > -                                   TC_ACT_SHOT);
-> > > +       struct bpf_insn *insn =3D insn_buf;
-> > > +       int cnt;
-> > > +
-> > > +       if (pkt_access_flags & PA_F_DATA_META_LOAD) {
-> > > +               /* Realign skb metadata for access through data_meta =
-pointer.
-> > > +                *
-> > > +                * r6 =3D r1; // r6 will be "u64 *ctx"
-> > > +                * r0 =3D bpf_skb_meta_realign(r1); // r0 is undefine=
-d
-> > > +                * r1 =3D r6;
-> > > +                */
-> > > +               *insn++ =3D BPF_MOV64_REG(BPF_REG_6, BPF_REG_1);
-> > > +               *insn++ =3D BPF_CALL_KFUNC(0, bpf_skb_meta_realign_id=
-s[0]);
-> > > +               *insn++ =3D BPF_MOV64_REG(BPF_REG_1, BPF_REG_6);
-> > > +       }
-> >
-> > I see that we already did this hack with bpf_qdisc_init_prologue()
-> > and bpf_qdisc_reset_destroy_epilogue().
-> > Not sure why we went that route back then.
-> >
-> > imo much cleaner to do BPF_EMIT_CALL() and wrap
-> > BPF_CALL_1(bpf_skb_meta_realign, struct sk_buff *, skb)
-> >
-> > BPF_CALL_x doesn't make it an uapi helper.
-> > It's still a hidden kernel function,
-> > while this kfunc stuff looks wrong, since kfunc isn't really hidden.
-> >
-> > I suspect progs can call this bpf_skb_meta_realign() explicitly,
-> > just like they can call bpf_qdisc_init_prologue() ?
-> >
->
-> qdisc prologue and epilogue qdisc kfuncs should be hidden from users.
-> The kfunc filter, bpf_qdisc_kfunc_filter(), determines what kfunc are
-> actually exposed.
 
-I see.
 
-> BPF_CALL_x is simpler as there is no need for a kfunc filter to hide
-> it. However, IMO for qdisc they don't make too much difference since
-> bpf qdisc already needs the filter to limit .enqueue and .dequeue
-> specific kfunc.
->
-> Am I missing anything?
+Le 05/01/2026 à 12:16, Pavel Pisa a écrit :
+> From: Ondrej Ille <ondrej.ille@gmail.com>
+> 
+> The Secondary Sample Point Source field has been
+> set to an incorrect value by some mistake in the
+> past
+> 
+>   0b01 - SSP_SRC_NO_SSP - SSP is not used.
+> 
+> for data bitrates above 1 MBit/s. The correct/default
+> value already used for lower bitrates is
 
-Just weird to have kfuncs that are not really kfunc.
-A special bpf_qdisc_init_prologue_ids[] just to call it, etc
-BPF_EMIT_CALL() is lower cognitive load.
+Where does this 1 MBit/s threshold come from? Is this an empirical value?
+
+The check is normally done on the data BRP. For example we had some
+problems on the mcp251xfd, c.f. commit 5e1663810e11 ("can: mcp251xfd:
+fix TDC setting for low data bit rates").
+
+Can you use the TDC framework? Not only would you get a correct
+calculation for when to activate/deactivate TDC, you will also have the
+netlink reporting (refer to the above commit for an example).
+
+>   0b00 - SSP_SRC_MEAS_N_OFFSET - SSP position = TRV_DELAY
+>          (Measured Transmitter delay) + SSP_OFFSET.
+> 
+> The related configuration register structure is described
+> in section 3.1.46 SSP_CFG of the CTU CAN FD
+> IP CORE Datasheet.
+> 
+> The analysis leading to the proper configuration
+> is described in section 2.8.3 Secondary sampling point
+> of the datasheet.
+> 
+> The change has been tested on AMD/Xilinx Zynq
+> with the next CTU CN FD IP core versions:
+> 
+>  - 2.6 aka master in the "integration with Zynq-7000 system" test
+>    6.12.43-rt12+ #1 SMP PREEMPT_RT kernel with CTU CAN FD git
+>    driver (change already included in the driver repo)
+>  - older 2.5 snapshot with mainline kernels with this patch
+>    applied locally in the multiple CAN latency tester nightly runs
+>    6.18.0-rc4-rt3-dut #1 SMP PREEMPT_RT
+>    6.19.0-rc3-dut
+> 
+> The logs, the datasheet and sources are available at
+> 
+>  https://canbus.pages.fel.cvut.cz/
+> 
+> Signed-off-by: Ondrej Ille <ondrej.ille@gmail.com>
+> Signed-off-by: Pavel Pisa <pisa@fel.cvut.cz>
+
+
+Yours sincerely,
+Vincent Mailhol
+
 
