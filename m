@@ -1,46 +1,63 @@
-Return-Path: <netdev+bounces-247429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7210ACFB274
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 22:49:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0841CCFB0BA
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 22:10:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3C325309283A
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 21:46:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B129930341E4
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 21:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD598376BC7;
-	Tue,  6 Jan 2026 17:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CB012C158D;
+	Tue,  6 Jan 2026 21:09:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PE1VhAsa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="deJfgdyZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8820636D514
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 17:59:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D7F7E0FF;
+	Tue,  6 Jan 2026 21:09:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767722394; cv=none; b=Z1XJ8RTthjCA3qc2Sp1SYbqede0gjGBag1TsknbWN7cOFeyTW7AFOxtS1XQgFpymg5AD6egUFPqyERnL8eS63GMpC6LVrVTd1wgsRc9eu2w2WHB65iw8AWr7gHwGXdlrs8UO8iX+1pQe+Xjfr/JlKHwHb+c/aygIDbyyrdnVGhc=
+	t=1767733784; cv=none; b=Da9WKo3D3LXNPvuuqaEmGxUCrkxKr/1WWdH7yr5w2pLaKmDeb61qlJHjWWMWoCvDv2Alvmu6/qq1bTxZVTX6pJLuye6WxcLbrvUzB4nbe5GzwNuqmEowAO0v5rb8q8UZSLXCWm9XZbE5hqQIniLWaQOZ7dBySQyAew9TWeGChdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767722394; c=relaxed/simple;
-	bh=ctAcHFLjXWJnEFXRiYzF3EpnGIE1CYGwH0RzT3Ylcz0=;
+	s=arc-20240116; t=1767733784; c=relaxed/simple;
+	bh=gc8s8s4SMDnbfho5P/tSa23Hd6vkDDi4mF917YCDjXc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qXRMU4Euxk4fcHW23duaqpUK62aB/QCHJpGzrmMRSmYalBhNdk6ycXrwbvALRMjl0BCT7yhBCJvY3ganOxsoGP6avMaDTeYQAaOp2j6YJs9O0VrrT2RQa/dbywEtfUlbEO7CovLojhApuytC8YkawlC1v3dQOYuBBuVFQITXwns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PE1VhAsa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 251C6C116C6;
-	Tue,  6 Jan 2026 17:59:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767722394;
-	bh=ctAcHFLjXWJnEFXRiYzF3EpnGIE1CYGwH0RzT3Ylcz0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=PE1VhAsawbI1MdOSfpyJBTHr+K+edA1fPrZzKGSjodwZ1U4BM1jhi68ZVeoNxyOZc
-	 rR5/hgvUSfhW474oNiBDB6l2IqeBkyTDaEIXmblK0GBFN3nvg5WI+JyFit+IeQB4k8
-	 zK6B690d7/nYifsc3vs/MWnPD5glpSz/DeKIoRSGfhG+SxWvskoIIpaae0b/B6Lbwb
-	 s+bbgb1bgs3NKqVG07FBHQb55sbHWitpnnFPLDzyICjq/UKFQ1q/UISDtaI2AHR7po
-	 nDdyxouImNyCitFyoXp7/+SS7jKMb1hbRX6i4c2nYqpaTi4QKIUlCs/fRVBjb2ORBp
-	 gcSlv2ePYr3dQ==
-Message-ID: <f2ece8a4-1eaf-45c6-8861-27042d275b92@kernel.org>
-Date: Tue, 6 Jan 2026 10:59:53 -0700
+	 In-Reply-To:Content-Type; b=AloQXDd0b0rVmLpxgAO0IO6EGM+RMZQ5kwG3GTKl5s85Eaxa2NkO9brgWYzAphOZgiTVavkPjGw9a70HcrjjhN5QJ6fg69hYTLhQ51GhnxMu5qLhVx3McMr3wtZWyjLe0k85hglfTHKqJagrqyeBnRYpNw814hGYHSMH2CkjXWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=deJfgdyZ; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1767733782; x=1799269782;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=gc8s8s4SMDnbfho5P/tSa23Hd6vkDDi4mF917YCDjXc=;
+  b=deJfgdyZyUu5aKmY4oM3CULs6ZkAM7GKl0mL2uDMGM1DkchBREIhR25o
+   xg6BWdm7YC9xV/jYZj+IT9HNbxBg76Z71gq2U/tqaTJu+PrwCkKfYgxWX
+   B4Y9i4mudd8Yl3ae25nsn582+mq9wGk0I/Rz2CivJICwURnMy6pJGbmoL
+   GaUoBFayAd74yio766V8WoxPtevvKVQHAdjXX8AXnbPUgcce1JJLHaAGk
+   0P4uC83jTnwOaXl3WgPLD+lWOSO3BXAd5gajPznwSuKMsOf0pDaHHDlrf
+   +Q3TKM3xBpJrQPznXFxasfeDhFr7t/Wmlv9ZxtxLqt5e0Jmo1N275VDGf
+   w==;
+X-CSE-ConnectionGUID: e7Vx1SoEQrqFR4ChE6X/bQ==
+X-CSE-MsgGUID: xPHsm76lRiq1SQwJvYeHhg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11663"; a="72951168"
+X-IronPort-AV: E=Sophos;i="6.21,206,1763452800"; 
+   d="scan'208";a="72951168"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 13:09:41 -0800
+X-CSE-ConnectionGUID: HtX0w+g7Squd9ZT76KBc3w==
+X-CSE-MsgGUID: WCpEeaywTEiGKwqTHQwOWA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,206,1763452800"; 
+   d="scan'208";a="202762830"
+Received: from dnelso2-mobl.amr.corp.intel.com (HELO [10.125.109.101]) ([10.125.109.101])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 13:09:40 -0800
+Message-ID: <77ae1b02-ff32-4694-9b34-bc49c85c6c82@intel.com>
+Date: Tue, 6 Jan 2026 14:09:38 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,202 +65,119 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next 2/2] selftests: fib_tests: Add test cases for
- route lookup with oif
+Subject: Re: [RFC PATCH v3 35/35] Documentation: driver-api: ntb: Document
+ remote eDMA transport backend
+To: Koichiro Den <den@valinux.co.jp>, Frank.Li@nxp.com, ntb@lists.linux.dev,
+ linux-pci@vger.kernel.org, dmaengine@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: mani@kernel.org, kwilczynski@kernel.org, kishon@kernel.org,
+ bhelgaas@google.com, corbet@lwn.net, geert+renesas@glider.be,
+ magnus.damm@gmail.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, vkoul@kernel.org, joro@8bytes.org, will@kernel.org,
+ robin.murphy@arm.com, jdmason@kudzu.us, allenbh@gmail.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, Basavaraj.Natikar@amd.com,
+ Shyam-sundar.S-k@amd.com, kurt.schwemmer@microsemi.com, logang@deltatee.com,
+ jingoohan1@gmail.com, lpieralisi@kernel.org, utkarsh02t@gmail.com,
+ jbrunet@baylibre.com, dlemoal@kernel.org, arnd@arndb.de,
+ elfring@users.sourceforge.net
+References: <20251217151609.3162665-1-den@valinux.co.jp>
+ <20251217151609.3162665-36-den@valinux.co.jp>
 Content-Language: en-US
-To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, horms@kernel.org
-References: <20251224161801.824589-1-idosch@nvidia.com>
- <20251224161801.824589-2-idosch@nvidia.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20251224161801.824589-2-idosch@nvidia.com>
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <20251217151609.3162665-36-den@valinux.co.jp>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 12/24/25 9:18 AM, Ido Schimmel wrote:
-> Test that both address families respect the oif parameter when a
-> matching multipath route is found, regardless of the presence of a
-> source address.
-> 
-> Output without "ipv6: Honor oif when choosing nexthop for locally
-> generated traffic":
-> 
->  # ./fib_tests.sh -t "ipv4_mpath_oif ipv6_mpath_oif"
-> 
->  IPv4 multipath oif test
->      TEST: IPv4 multipath via first nexthop                              [ OK ]
->      TEST: IPv4 multipath via second nexthop                             [ OK ]
->      TEST: IPv4 multipath via first nexthop with source address          [ OK ]
->      TEST: IPv4 multipath via second nexthop with source address         [ OK ]
-> 
->  IPv6 multipath oif test
->      TEST: IPv6 multipath via first nexthop                              [ OK ]
->      TEST: IPv6 multipath via second nexthop                             [ OK ]
->      TEST: IPv6 multipath via first nexthop with source address          [FAIL]
->      TEST: IPv6 multipath via second nexthop with source address         [FAIL]
-> 
->  Tests passed:   6
->  Tests failed:   2
-> 
-> Output with "ipv6: Honor oif when choosing nexthop for locally generated
-> traffic":
-> 
->  # ./fib_tests.sh -t "ipv4_mpath_oif ipv6_mpath_oif"
-> 
->  IPv4 multipath oif test
->      TEST: IPv4 multipath via first nexthop                              [ OK ]
->      TEST: IPv4 multipath via second nexthop                             [ OK ]
->      TEST: IPv4 multipath via first nexthop with source address          [ OK ]
->      TEST: IPv4 multipath via second nexthop with source address         [ OK ]
-> 
->  IPv6 multipath oif test
->      TEST: IPv6 multipath via first nexthop                              [ OK ]
->      TEST: IPv6 multipath via second nexthop                             [ OK ]
->      TEST: IPv6 multipath via first nexthop with source address          [ OK ]
->      TEST: IPv6 multipath via second nexthop with source address         [ OK ]
-> 
->  Tests passed:   8
->  Tests failed:   0
-> 
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> ---
->  tools/testing/selftests/net/fib_tests.sh | 108 ++++++++++++++++++++++-
->  1 file changed, 107 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
-> index a88f797c549a..8ae0adbcafe9 100755
-> --- a/tools/testing/selftests/net/fib_tests.sh
-> +++ b/tools/testing/selftests/net/fib_tests.sh
-> @@ -12,7 +12,7 @@ TESTS="unregister down carrier nexthop suppress ipv6_notify ipv4_notify \
->         ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr \
->         ipv6_del_addr ipv4_mangle ipv6_mangle ipv4_bcast_neigh fib6_gc_test \
->         ipv4_mpath_list ipv6_mpath_list ipv4_mpath_balance ipv6_mpath_balance \
-> -       fib6_ra_to_static"
-> +       ipv4_mpath_oif ipv6_mpath_oif fib6_ra_to_static"
->  
->  VERBOSE=0
->  PAUSE_ON_FAIL=no
-> @@ -2776,6 +2776,110 @@ ipv6_mpath_balance_test()
->  	forwarding_cleanup
->  }
->  
-> +ipv4_mpath_oif_test_common()
-> +{
-> +	local get_param=$1; shift
-> +	local expected_oif=$1; shift
-> +	local test_name=$1; shift
-> +	local tmp_file
-> +
-> +	tmp_file=$(mktemp)
-> +
-> +	for i in {1..100}; do
-> +		$IP route get 203.0.113.${i} $get_param >> "$tmp_file"
-> +	done
-> +
-> +	[[ $(grep "$expected_oif" "$tmp_file" | wc -l) -eq 100 ]]
-> +	log_test $? 0 "$test_name"
-> +
-> +	rm "$tmp_file"
-> +}
-> +
-> +ipv4_mpath_oif_test()
-> +{
-> +	echo
-> +	echo "IPv4 multipath oif test"
-> +
-> +	setup
-> +
-> +	set -e
-> +	$IP link add dummy1 type dummy
-> +	$IP link set dev dummy1 up
-> +	$IP address add 192.0.2.1/28 dev dummy1
-> +	$IP address add 192.0.2.17/32 dev lo
-> +
-> +	$IP route add 203.0.113.0/24 \
-> +		nexthop via 198.51.100.2 dev dummy0 \
-> +		nexthop via 192.0.2.2 dev dummy1
-> +	set +e
-> +
-> +	ipv4_mpath_oif_test_common "oif dummy0" "dummy0" \
-> +		"IPv4 multipath via first nexthop"
-> +
-> +	ipv4_mpath_oif_test_common "oif dummy1" "dummy1" \
-> +		"IPv4 multipath via second nexthop"
-> +
-> +	ipv4_mpath_oif_test_common "oif dummy0 from 192.0.2.17" "dummy0" \
-> +		"IPv4 multipath via first nexthop with source address"
-> +
-> +	ipv4_mpath_oif_test_common "oif dummy1 from 192.0.2.17" "dummy1" \
-> +		"IPv4 multipath via second nexthop with source address"
-> +
-> +	cleanup
-> +}
-> +
-> +ipv6_mpath_oif_test_common()
-> +{
-> +	local get_param=$1; shift
-> +	local expected_oif=$1; shift
-> +	local test_name=$1; shift
-> +	local tmp_file
-> +
-> +	tmp_file=$(mktemp)
-> +
-> +	for i in {1..100}; do
-> +		$IP route get 2001:db8:10::${i} $get_param >> "$tmp_file"
-> +	done
-> +
-> +	[[ $(grep "$expected_oif" "$tmp_file" | wc -l) -eq 100 ]]
-> +	log_test $? 0 "$test_name"
-> +
-> +	rm "$tmp_file"
-> +}
-> +
-> +ipv6_mpath_oif_test()
-> +{
-> +	echo
-> +	echo "IPv6 multipath oif test"
-> +
-> +	setup
-> +
-> +	set -e
-> +	$IP link add dummy1 type dummy
-> +	$IP link set dev dummy1 up
-> +	$IP address add 2001:db8:2::1/64 dev dummy1
-> +	$IP address add 2001:db8:100::1/128 dev lo
-> +
-> +	$IP route add 2001:db8:10::/64 \
-> +		nexthop via 2001:db8:1::2 dev dummy0 \
-> +		nexthop via 2001:db8:2::2 dev dummy1
-> +	set +e
-> +
-> +	ipv6_mpath_oif_test_common "oif dummy0" "dummy0" \
-> +		"IPv6 multipath via first nexthop"
-> +
-> +	ipv6_mpath_oif_test_common "oif dummy1" "dummy1" \
-> +		"IPv6 multipath via second nexthop"
-> +
-> +	ipv6_mpath_oif_test_common "oif dummy0 from 2001:db8:100::1" "dummy0" \
-> +		"IPv6 multipath via first nexthop with source address"
-> +
-> +	ipv6_mpath_oif_test_common "oif dummy1 from 2001:db8:100::1" "dummy1" \
-> +		"IPv6 multipath via second nexthop with source address"
-> +
-> +	cleanup
-> +}
-> +
->  ################################################################################
->  # usage
->  
-> @@ -2861,6 +2965,8 @@ do
->  	ipv6_mpath_list)		ipv6_mpath_list_test;;
->  	ipv4_mpath_balance)		ipv4_mpath_balance_test;;
->  	ipv6_mpath_balance)		ipv6_mpath_balance_test;;
-> +	ipv4_mpath_oif)			ipv4_mpath_oif_test;;
-> +	ipv6_mpath_oif)			ipv6_mpath_oif_test;;
->  	fib6_ra_to_static)		fib6_ra_to_static;;
->  
->  	help) echo "Test names: $TESTS"; exit 0;;
 
-if VRF versions of the test also pass, I am good with the proposed change.
+
+On 12/17/25 8:16 AM, Koichiro Den wrote:
+> Add a description of the ntb_transport backend architecture and the new
+> remote eDMA backed mode introduced by CONFIG_NTB_TRANSPORT_EDMA and the
+> use_remote_edma module parameter.
+> 
+> Signed-off-by: Koichiro Den <den@valinux.co.jp>
+> ---
+>  Documentation/driver-api/ntb.rst | 58 ++++++++++++++++++++++++++++++++
+>  1 file changed, 58 insertions(+)
+> 
+> diff --git a/Documentation/driver-api/ntb.rst b/Documentation/driver-api/ntb.rst
+> index a49c41383779..eb7b889d17c4 100644
+> --- a/Documentation/driver-api/ntb.rst
+> +++ b/Documentation/driver-api/ntb.rst
+> @@ -132,6 +132,64 @@ Transport queue pair.  Network data is copied between socket buffers and the
+>  Transport queue pair buffer.  The Transport client may be used for other things
+>  besides Netdev, however no other applications have yet been written.
+>  
+> +Transport backends
+> +~~~~~~~~~~~~~~~~~~
+> +
+> +The ``ntb_transport`` core driver implements a generic "queue pair"
+> +abstraction on top of the memory windows exported by the NTB hardware. Each
+> +queue pair has a TX and an RX ring and is used by client drivers such as
+> +``ntb_netdev`` to exchange variable sized payloads with the peer.
+> +
+> +There are currently two ways for ``ntb_transport`` to move payload data
+> +between the local system memory and the peer:
+> +
+> +* The default backend copies data between the caller buffers and the TX/RX
+> +  rings in the memory windows using ``memcpy()`` on the local CPU or, when
+> +  the ``use_dma`` module parameter is set, a local DMA engine via the
+> +  standard dmaengine ``DMA_MEMCPY`` interface.
+> +
+> +* When ``CONFIG_NTB_TRANSPORT_EDMA`` is enabled in the kernel configuration
+> +  and the ``use_remote_edma`` module parameter is set at run time, a second
+> +  backend uses a DesignWare eDMA engine that resides on the endpoint side
+
+I would say "embedded DMA device" instead of a specific DesignWare eDMA engine to keep the transport generic. But provide a reference or link to DesignWare eDMA engine as reference.
+
+> +  of the NTB. In this mode the endpoint driver exposes a dedicated peer
+> +  memory window that contains the eDMA register block together with a small
+> +  control structure and per-channel linked-list rings only for read
+> +  channels. The host ioremaps this window and configures a dmaengine
+> +  device. The endpoint uses its local eDMA write channels for its TX
+> +  transfer, while the host side uses the remote eDMA read channels for its
+> +  TX transfer.
+
+Can you provide some more text on the data flow from one host to the other for eDMA vs via host based DMA in the current transport? i.e. currently for a transmit, user data gets copied into an skbuff by the network stack, and then the local host copies it into the ring buffer on the remote host via DMA write (or CPU). And the remote host then copies out of the ring buffer entry to a kernel skbuff and back to user space on the receiver side. How does it now work with eDMA? Also can the mechanism used by eDMA be achieved with a host DMA setup or is the eDMA mechanism specifically tied to the DW hardware design? Would be nice to move the ASCII data flow diagram in the cover to documentation so we don't lose that.
+
+DJ
+
+> +
+> +The ``ntb_transport`` core routes queue pair operations (enqueue,
+> +completion polling, link bring-up/teardown etc.) through a small
+> +backend-ops structure so that both implementations can coexist in the same
+> +module without affecting the public queue pair API used by clients. From a
+> +client driver's point of view (for example ``ntb_netdev``) the queue pair
+> +interface is the same regardless of which backend is active.
+> +
+> +When ``use_remote_edma`` is not enabled, ``ntb_transport`` behaves as in
+> +previous kernels before the optional ``use_remote_edma`` parameter was
+> +introduced, and continues to use the shared-memory backend. Existing
+> +configurations that do not select the eDMA backend therefore see no
+> +behavioural change.
+> +
+> +In the remote eDMA mode host-to-endpoint notifications are delivered via a
+> +dedicated DMA read channel located at the endpoint. In both the default
+> +backend mode and the remote eDMA mode, endpoint-to-host notifications are
+> +backed by native MSI support on DW EPC, even when ``use_msi=0``.  Because
+> +of this, the ``use_msi`` module parameter has no effect when
+> +``use_remote_edma=1`` on the host.
+> +
+> +At a high level, enabling the remote eDMA transport backend requires:
+> +
+> +* building the kernel with ``CONFIG_NTB_TRANSPORT`` and
+> +  ``CONFIG_NTB_TRANSPORT_EDMA`` enabled,
+> +* configuring the NTB endpoint so that it exposes a memory window containing
+> +  the eDMA register block, descriptor rings and control structure expected by
+> +  the helper driver, and
+> +* loading ``ntb_transport`` on the host with ``use_remote_edma=1`` so that
+> +  the eDMA-backed backend is selected instead of the default shared-memory
+> +  backend.
+> +
+>  NTB Ping Pong Test Client (ntb\_pingpong)
+>  -----------------------------------------
+>  
+
 
