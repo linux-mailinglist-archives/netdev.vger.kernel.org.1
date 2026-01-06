@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-247261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6DEFCF6540
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 02:39:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 404D4CF654F
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 02:40:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1211530F94F1
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 01:36:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 723553110218
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 01:36:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D7A73168F6;
-	Tue,  6 Jan 2026 01:36:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D5FB31618B;
+	Tue,  6 Jan 2026 01:36:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dx8dbEy8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yd2/jZKN"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2EC314D19
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 01:36:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5742031619B
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 01:36:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767663368; cv=none; b=m2SCNL4plYLgfm1aR2BcPG33dOpeLGCrsHtQdfsU8g20K1i4JATAioP75yERg8faKJS5oi9nrLgs04Veyg79DFDR32Q7bakxaGDiGj5K07xaUX7T5WHirVClhAlpBPHiVQUJb6kyoyiJUrtxDPxRGVvtJARp7dV2Go3cz5kEPos=
+	t=1767663373; cv=none; b=ud1Jni+3r6BrIJg48FAOLn4QJAKOuhVS8fRmMgS7G2encM/+HduWtY+RWgECaHIuNvgUIIgacvCU7UQ4dZLMVHe8BJu6mUp1d4oUqJLBr1rYca+ajXcnIBzRpZuMFLxflrMl/QOZRnzrOSpqY+BkKOeL6FzSNH7Oy8M7cKLPZlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767663368; c=relaxed/simple;
-	bh=ZZciuq5Tf0LFi6IDgCo6befS/ZmflvQrWFLLhulQW1k=;
+	s=arc-20240116; t=1767663373; c=relaxed/simple;
+	bh=uL092dlJuSSJTGC3YnxkXxk3fogYnWG29PGHbQ5sLEE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z+qiQvUqEchB3blrm/7zBjTgoUCNS7aW7S0KJFsAqQnmlwrQYMnbaUiyKYO2tUL+414Geg87GPyCyUf7Lo63E3SO6NIlbV5DdltsRGXwDumjaTclnWiHZ5s3h5OT+ILOR+YVg0xYXWIusN6Kp6K3STyz+bQEenvKxw85VrMH2sI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Dx8dbEy8; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=pKoAMgOAtNVkRzDzXynpj84SybjRsGWZtfi+yHS2/gMlacjP3LO7xjx1VcYyb5ODKxNpGFSaPMRsdMDqUXqWN7K1sQdjMKCB5FRID7OV5qHDpx4AFjjvcybVPyoGv9c6PHkBQKKfYzD7Wn3T+6gRjgLuvXcWccCWsSLyFPApQZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Yd2/jZKN; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767663364;
+	s=mimecast20190719; t=1767663371;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8VspJF4Fqgw1lmUXUVAn/WJv4En3EieXQ+eX82sdaQM=;
-	b=Dx8dbEy8Egtas+dTa5TbQ9yFb24fxImGscGdv60TGVs8W7FInBBcKH5esfVVU1Ho7sUuGD
-	U8LxiBFfQFXCMdXgk2z4mDt/6PtcHR68d9zo8zlj7TMVS2HqSpmL9FmvEGwrVuFI3L0CS8
-	SYa6txhIMdB0WlAcap4QD/Jvs/XIm/g=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=6zfvleqHF+vihvobQ9j/ZQshfIqfQXu1yeAQ6DhfoSA=;
+	b=Yd2/jZKNwpeIYpsWeN3DlXzHnA43Xk4ihSg+/vRuRad4Z7izm1DRz3eEYO3qnMAEOgfzVa
+	h+oqL2E5Z4DSBMK7VNKRXl76oUaZB2eCFc57PQeuHVovfPPKjhry11tuPVYmAJBmYQr3RX
+	Rg9zE7mEgeuLMBsqMpNOP6VV79hVcaI=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-126-Lol2DfMbPRuN93KAc_N4Zg-1; Mon,
- 05 Jan 2026 20:36:02 -0500
-X-MC-Unique: Lol2DfMbPRuN93KAc_N4Zg-1
-X-Mimecast-MFC-AGG-ID: Lol2DfMbPRuN93KAc_N4Zg_1767663361
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-180-ci2DhOxrNR6k4G63VYV6WQ-1; Mon,
+ 05 Jan 2026 20:36:07 -0500
+X-MC-Unique: ci2DhOxrNR6k4G63VYV6WQ-1
+X-Mimecast-MFC-AGG-ID: ci2DhOxrNR6k4G63VYV6WQ_1767663366
 Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 81047195608E;
-	Tue,  6 Jan 2026 01:36:01 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 16EF51800343;
+	Tue,  6 Jan 2026 01:36:06 +0000 (UTC)
 Received: from xudu-thinkpadx1carbongen9.nay.csb (unknown [10.66.60.72])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9E099180044F;
-	Tue,  6 Jan 2026 01:35:57 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 343F3180044F;
+	Tue,  6 Jan 2026 01:36:01 +0000 (UTC)
 From: Xu Du <xudu@redhat.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -65,9 +65,9 @@ To: davem@davemloft.net,
 Cc: netdev@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 7/8] selftest: tun: Add test for receiving gso packet from tun
-Date: Tue,  6 Jan 2026 09:35:20 +0800
-Message-ID: <0641b34b47b4ab0d612f0554c31bab068ee20e71.1767597114.git.xudu@redhat.com>
+Subject: [PATCH net-next v4 8/8] selftest: tun: Add test data for success and failure paths
+Date: Tue,  6 Jan 2026 09:35:21 +0800
+Message-ID: <89100ed7d241df962e31ec84090c8b99d6fa7206.1767597114.git.xudu@redhat.com>
 In-Reply-To: <cover.1767597114.git.xudu@redhat.com>
 References: <cover.1767597114.git.xudu@redhat.com>
 Precedence: bulk
@@ -79,234 +79,164 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-The test validate that GSO information are correctly exposed
-when reading packets from a TUN device.
+To improve the robustness and coverage of the TUN selftests, this
+patch expands the set of test data.
 
 Signed-off-by: Xu Du <xudu@redhat.com>
 ---
-v1 -> v2:
- - Use previous helper to simplify tunnel packet sending.
- - Treat read timeout (EAGAIN) as assertion failure.
- - Correct spelling of 'recieve' to 'receive'.
-
- tools/testing/selftests/net/tun.c | 194 ++++++++++++++++++++++++++++++
- 1 file changed, 194 insertions(+)
+ tools/testing/selftests/net/tun.c | 115 +++++++++++++++++++++++++++++-
+ 1 file changed, 113 insertions(+), 2 deletions(-)
 
 diff --git a/tools/testing/selftests/net/tun.c b/tools/testing/selftests/net/tun.c
-index ececc5ed4909..3a90e7c4bc5b 100644
+index 3a90e7c4bc5b..1676996fbdd0 100644
 --- a/tools/testing/selftests/net/tun.c
 +++ b/tools/testing/selftests/net/tun.c
-@@ -358,6 +358,116 @@ static int ip_route_check(const char *intf, int family, void *addr)
- 	return 0;
+@@ -57,6 +57,10 @@ static struct in6_addr param_ipaddr6_inner_src = {
+ 	{ { 0x20, 0x02, 0x0d, 0xb8, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 } },
+ };
+ 
++#ifndef BIT
++#define BIT(nr) (1UL << (nr))
++#endif
++
+ #define VN_ID 1
+ #define VN_PORT 4789
+ #define UDP_SRC_PORT 22
+@@ -72,6 +76,8 @@ static struct in6_addr param_ipaddr6_inner_src = {
+ #define UDP_TUNNEL_VXLAN_4IN6 0x04
+ #define UDP_TUNNEL_VXLAN_6IN6 0x08
+ 
++#define UDP_TUNNEL_MAX_SEGMENTS BIT(7)
++
+ #define UDP_TUNNEL_OUTER_IPV4 (UDP_TUNNEL_VXLAN_4IN4 | UDP_TUNNEL_VXLAN_6IN4)
+ #define UDP_TUNNEL_INNER_IPV4 (UDP_TUNNEL_VXLAN_4IN4 | UDP_TUNNEL_VXLAN_4IN6)
+ 
+@@ -547,6 +553,39 @@ FIXTURE_VARIANT(tun_vnet_udptnl)
+ 
+ /* clang-format off */
+ #define TUN_VNET_UDPTNL_VARIANT_ADD(type, desc)                              \
++	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_nogsosz_1byte) {         \
++		/* no GSO: send a single byte */                             \
++		.tunnel_type = type,                                         \
++		.data_size = 1,                                              \
++		.r_num_mss = 1,                                              \
++		.is_tap = true,                                              \
++		.no_gso = true,                                              \
++	};                                                                   \
++	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_nogsosz_1mss) {          \
++		/* no GSO: send a single MSS, fall back to no GSO */         \
++		.tunnel_type = type,                                         \
++		.data_size = UDP_TUNNEL_MSS(type),                           \
++		.r_num_mss = 1,                                              \
++		.is_tap = true,                                              \
++		.no_gso = true,                                              \
++	};                                                                   \
++	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_nogsosz_gtmss) {         \
++		/* no GSO: send a single MSS + 1B: fail */                   \
++		.tunnel_type = type,                                         \
++		.data_size = UDP_TUNNEL_MSS(type) + 1,                       \
++		.r_num_mss = 1,                                              \
++		.is_tap = true,                                              \
++		.no_gso = true,                                              \
++	};                                                                   \
++	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_1byte) {                 \
++		/* GSO: send 1 byte, gso 1 byte, fall back to no GSO */      \
++		.tunnel_type = type,                                         \
++		.gso_size = 1,                                               \
++		.data_size = 1,                                              \
++		.r_num_mss = 1,                                              \
++		.is_tap = true,                                              \
++		.no_gso = true,                                              \
++	};                                                                   \
+ 	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_1mss) {                  \
+ 		/* send a single MSS: fall back to no GSO */                 \
+ 		.tunnel_type = type,                                         \
+@@ -555,8 +594,65 @@ FIXTURE_VARIANT(tun_vnet_udptnl)
+ 		.r_num_mss = 1,                                              \
+ 		.is_tap = true,                                              \
+ 		.no_gso = true,                                              \
+-	};
+-/* clang-format on */
++	};                                                                   \
++	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_ltgso) {                 \
++		/* data <= MSS < gso: will fall back to no GSO */            \
++		.tunnel_type = type,                                         \
++		.gso_size = UDP_TUNNEL_MSS(type) + 1,                        \
++		.data_size = UDP_TUNNEL_MSS(type),                           \
++		.r_num_mss = 1,                                              \
++		.is_tap = true,                                              \
++		.no_gso = true,                                              \
++	};                                                                   \
++	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_gtgso) {                 \
++		/* GSO: a single MSS + 1B */                                 \
++		.tunnel_type = type,                                         \
++		.gso_size = UDP_TUNNEL_MSS(type),                            \
++		.data_size = UDP_TUNNEL_MSS(type) + 1,                       \
++		.r_num_mss = 2,                                              \
++		.is_tap = true,                                              \
++	};                                                                   \
++	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_2mss) {                  \
++		/* no GSO: send exactly 2 MSS */                             \
++		.tunnel_type = type,                                         \
++		.gso_size = UDP_TUNNEL_MSS(type),                            \
++		.data_size = UDP_TUNNEL_MSS(type) * 2,                       \
++		.r_num_mss = 2,                                              \
++		.is_tap = true,                                              \
++	};                                                                   \
++	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_maxbytes) {              \
++		/* GSO: send max bytes */                                    \
++		.tunnel_type = type,                                         \
++		.gso_size = UDP_TUNNEL_MSS(type),                            \
++		.data_size = UDP_TUNNEL_MAX(type, true),                     \
++		.r_num_mss = UDP_TUNNEL_MAX(type, true) /                    \
++			     UDP_TUNNEL_MSS(type) + 1,                       \
++		.is_tap = true,                                              \
++	};                                                                   \
++	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_over_maxbytes) {         \
++		/* GSO: send oversize max bytes: fail */                     \
++		.tunnel_type = type,                                         \
++		.gso_size = UDP_TUNNEL_MSS(type),                            \
++		.data_size = ETH_MAX_MTU,                                    \
++		.r_num_mss = ETH_MAX_MTU / UDP_TUNNEL_MSS(type) + 1,         \
++		.is_tap = true,                                              \
++	};                                                                   \
++	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_maxsegs) {               \
++		/* GSO: send max number of min sized segments */             \
++		.tunnel_type = type,                                         \
++		.gso_size = 1,                                               \
++		.data_size = UDP_TUNNEL_MAX_SEGMENTS,                        \
++		.r_num_mss = UDP_TUNNEL_MAX_SEGMENTS,                        \
++		.is_tap = true,                                              \
++	};                                                                   \
++	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_5byte) {                 \
++		/* GSO: send 5 bytes, gso 2 bytes */                         \
++		.tunnel_type = type,                                         \
++		.gso_size = 2,                                               \
++		.data_size = 5,                                              \
++		.r_num_mss = 3,                                              \
++		.is_tap = true,                                              \
++	} /* clang-format on */
+ 
+ TUN_VNET_UDPTNL_VARIANT_ADD(UDP_TUNNEL_VXLAN_4IN4, 4in4);
+ TUN_VNET_UDPTNL_VARIANT_ADD(UDP_TUNNEL_VXLAN_6IN4, 6in4);
+@@ -895,4 +991,19 @@ TEST_F(tun_vnet_udptnl, recv_gso_packet)
+ 	}
  }
  
-+static int send_gso_udp_msg(int socket, struct sockaddr_storage *addr,
-+			    uint8_t *send_buf, int send_len, int gso_size)
-+{
-+	char control[CMSG_SPACE(sizeof(uint16_t))] = { 0 };
-+	int alen = sockaddr_len(addr->ss_family);
-+	struct msghdr msg = { 0 };
-+	struct iovec iov = { 0 };
-+	int ret;
++XFAIL_ADD(tun_vnet_udptnl, 4in4_nogsosz_gtmss, recv_gso_packet);
++XFAIL_ADD(tun_vnet_udptnl, 6in4_nogsosz_gtmss, recv_gso_packet);
++XFAIL_ADD(tun_vnet_udptnl, 4in6_nogsosz_gtmss, recv_gso_packet);
++XFAIL_ADD(tun_vnet_udptnl, 6in6_nogsosz_gtmss, recv_gso_packet);
 +
-+	iov.iov_base = send_buf;
-+	iov.iov_len = send_len;
++XFAIL_ADD(tun_vnet_udptnl, 4in4_over_maxbytes, send_gso_packet);
++XFAIL_ADD(tun_vnet_udptnl, 6in4_over_maxbytes, send_gso_packet);
++XFAIL_ADD(tun_vnet_udptnl, 4in6_over_maxbytes, send_gso_packet);
++XFAIL_ADD(tun_vnet_udptnl, 6in6_over_maxbytes, send_gso_packet);
 +
-+	msg.msg_iov = &iov;
-+	msg.msg_iovlen = 1;
-+	msg.msg_name = addr;
-+	msg.msg_namelen = alen;
-+
-+	if (gso_size > 0) {
-+		struct cmsghdr *cmsg;
-+
-+		msg.msg_control = control;
-+		msg.msg_controllen = sizeof(control);
-+
-+		cmsg = CMSG_FIRSTHDR(&msg);
-+		cmsg->cmsg_level = SOL_UDP;
-+		cmsg->cmsg_type = UDP_SEGMENT;
-+		cmsg->cmsg_len = CMSG_LEN(sizeof(uint16_t));
-+		*(uint16_t *)CMSG_DATA(cmsg) = gso_size;
-+	}
-+
-+	ret = sendmsg(socket, &msg, 0);
-+	if (ret < 0)
-+		perror("sendmsg");
-+
-+	return ret;
-+}
-+
-+static int validate_hdrlen(uint8_t **cur, int *len, int x)
-+{
-+	if (*len < x)
-+		return -1;
-+	*cur += x;
-+	*len -= x;
-+	return 0;
-+}
-+
-+static int parse_udp_tunnel_vnet_packet(uint8_t *buf, int len, int tunnel_type,
-+					bool is_tap)
-+{
-+	struct ipv6hdr *iph6;
-+	struct udphdr *udph;
-+	struct iphdr *iph4;
-+	uint8_t *cur = buf;
-+
-+	if (validate_hdrlen(&cur, &len, TUN_VNET_TNL_SIZE))
-+		return -1;
-+
-+	if (is_tap) {
-+		if (validate_hdrlen(&cur, &len, ETH_HLEN))
-+			return -1;
-+	}
-+
-+	if (tunnel_type & UDP_TUNNEL_OUTER_IPV4) {
-+		iph4 = (struct iphdr *)cur;
-+		if (validate_hdrlen(&cur, &len, sizeof(struct iphdr)))
-+			return -1;
-+		if (iph4->version != 4 || iph4->protocol != IPPROTO_UDP)
-+			return -1;
-+	} else {
-+		iph6 = (struct ipv6hdr *)cur;
-+		if (validate_hdrlen(&cur, &len, sizeof(struct ipv6hdr)))
-+			return -1;
-+		if (iph6->version != 6 || iph6->nexthdr != IPPROTO_UDP)
-+			return -1;
-+	}
-+
-+	udph = (struct udphdr *)cur;
-+	if (validate_hdrlen(&cur, &len, sizeof(struct udphdr)))
-+		return -1;
-+	if (ntohs(udph->dest) != VN_PORT)
-+		return -1;
-+
-+	if (validate_hdrlen(&cur, &len, 8))
-+		return -1;
-+	if (validate_hdrlen(&cur, &len, ETH_HLEN))
-+		return -1;
-+
-+	if (tunnel_type & UDP_TUNNEL_INNER_IPV4) {
-+		iph4 = (struct iphdr *)cur;
-+		if (validate_hdrlen(&cur, &len, sizeof(struct iphdr)))
-+			return -1;
-+		if (iph4->version != 4 || iph4->protocol != IPPROTO_UDP)
-+			return -1;
-+	} else {
-+		iph6 = (struct ipv6hdr *)cur;
-+		if (validate_hdrlen(&cur, &len, sizeof(struct ipv6hdr)))
-+			return -1;
-+		if (iph6->version != 6 || iph6->nexthdr != IPPROTO_UDP)
-+			return -1;
-+	}
-+
-+	udph = (struct udphdr *)cur;
-+	if (validate_hdrlen(&cur, &len, sizeof(struct udphdr)))
-+		return -1;
-+	if (ntohs(udph->dest) != UDP_DST_PORT)
-+		return -1;
-+
-+	return len;
-+}
-+
- FIXTURE(tun)
- {
- 	char ifname[IFNAMSIZ];
-@@ -685,6 +795,68 @@ receive_gso_packet_from_tunnel(FIXTURE_DATA(tun_vnet_udptnl) * self,
- 	return total_len;
- }
- 
-+static int send_gso_packet_into_tunnel(FIXTURE_DATA(tun_vnet_udptnl) * self,
-+				       const FIXTURE_VARIANT(tun_vnet_udptnl) *
-+					       variant)
-+{
-+	int family = (variant->tunnel_type & UDP_TUNNEL_INNER_IPV4) ? AF_INET :
-+								      AF_INET6;
-+	uint8_t buf[MAX_VNET_TUNNEL_PACKET_SZ] = { 0 };
-+	int payload_len = variant->data_size;
-+	int gso_size = variant->gso_size;
-+	struct sockaddr_storage ssa, dsa;
-+
-+	assign_sockaddr_vars(family, 0, &ssa, &dsa);
-+	return send_gso_udp_msg(self->sock, &dsa, buf, payload_len, gso_size);
-+}
-+
-+static int
-+receive_gso_packet_from_tun(FIXTURE_DATA(tun_vnet_udptnl) * self,
-+			    const FIXTURE_VARIANT(tun_vnet_udptnl) * variant,
-+			    struct virtio_net_hdr_v1_hash_tunnel *vnet_hdr)
-+{
-+	struct timeval timeout = { .tv_sec = TIMEOUT_SEC };
-+	uint8_t buf[MAX_VNET_TUNNEL_PACKET_SZ];
-+	int tunnel_type = variant->tunnel_type;
-+	int payload_len = variant->data_size;
-+	bool is_tap = variant->is_tap;
-+	int ret, len, total_len = 0;
-+	int tun_fd = self->fd;
-+	fd_set fdset;
-+
-+	while (total_len < payload_len) {
-+		FD_ZERO(&fdset);
-+		FD_SET(tun_fd, &fdset);
-+
-+		ret = select(tun_fd + 1, &fdset, NULL, NULL, &timeout);
-+		if (ret <= 0) {
-+			perror("select");
-+			break;
-+		}
-+		if (!FD_ISSET(tun_fd, &fdset))
-+			continue;
-+
-+		len = read(tun_fd, buf, sizeof(buf));
-+		if (len <= 0) {
-+			if (len < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
-+				perror("read");
-+			break;
-+		}
-+
-+		len = parse_udp_tunnel_vnet_packet(buf, len, tunnel_type,
-+						   is_tap);
-+		if (len < 0)
-+			continue;
-+
-+		if (total_len == 0)
-+			memcpy(vnet_hdr, buf, TUN_VNET_TNL_SIZE);
-+
-+		total_len += len;
-+	}
-+
-+	return total_len;
-+}
-+
- TEST_F(tun_vnet_udptnl, send_gso_packet)
- {
- 	uint8_t pkt[MAX_VNET_TUNNEL_PACKET_SZ];
-@@ -701,4 +873,26 @@ TEST_F(tun_vnet_udptnl, send_gso_packet)
- 	ASSERT_EQ(r_num_mss, variant->r_num_mss);
- }
- 
-+TEST_F(tun_vnet_udptnl, recv_gso_packet)
-+{
-+	struct virtio_net_hdr_v1_hash_tunnel vnet_hdr = { 0 };
-+	struct virtio_net_hdr_v1 *vh = &vnet_hdr.hash_hdr.hdr;
-+	int ret, gso_type = VIRTIO_NET_HDR_GSO_UDP_L4;
-+
-+	ret = send_gso_packet_into_tunnel(self, variant);
-+	ASSERT_EQ(ret, variant->data_size);
-+
-+	memset(&vnet_hdr, 0, sizeof(vnet_hdr));
-+	ret = receive_gso_packet_from_tun(self, variant, &vnet_hdr);
-+	ASSERT_EQ(ret, variant->data_size);
-+
-+	if (!variant->no_gso) {
-+		ASSERT_EQ(vh->gso_size, variant->gso_size);
-+		gso_type |= (variant->tunnel_type & UDP_TUNNEL_OUTER_IPV4) ?
-+				    (VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV4) :
-+				    (VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV6);
-+		ASSERT_EQ(vh->gso_type, gso_type);
-+	}
-+}
++XFAIL_ADD(tun_vnet_udptnl, 4in4_over_maxbytes, recv_gso_packet);
++XFAIL_ADD(tun_vnet_udptnl, 6in4_over_maxbytes, recv_gso_packet);
++XFAIL_ADD(tun_vnet_udptnl, 4in6_over_maxbytes, recv_gso_packet);
++XFAIL_ADD(tun_vnet_udptnl, 6in6_over_maxbytes, recv_gso_packet);
 +
  TEST_HARNESS_MAIN
 -- 
