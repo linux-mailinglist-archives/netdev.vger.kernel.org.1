@@ -1,95 +1,73 @@
-Return-Path: <netdev+bounces-247493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84FF6CFB44D
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 23:36:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 488BCCFB4E2
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 23:58:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7960D3048BB7
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 22:36:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 642433038333
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 22:58:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28CA8231C9F;
-	Tue,  6 Jan 2026 22:36:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FB7B2E718F;
+	Tue,  6 Jan 2026 22:58:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tUiT7U1J"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 351691D5141;
-	Tue,  6 Jan 2026 22:36:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7126341C63;
+	Tue,  6 Jan 2026 22:58:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767738986; cv=none; b=rKkdYy6rSo5BmI+jejUD0Ar6WtWE9kSA4YoOFf0bqZhdhXgSK1Gp4UzHZjnfRnH89nbfeZjqnHNdFWfktqP3FMgSF+fQS75rGDXLeRvcb1Q4El3SR5SoCkgIb+64JxpBsmwvV4EAicf7CtKzdFQ4xNRclT6Cs3n1fkReFZ5hm5g=
+	t=1767740304; cv=none; b=QZNFaydRvI0rskJkbfy7vXORcPMGPyYTnWr3uhRhJh8LI7A8es4FKOO8Ay02eKBA9PYQTF4k4uA6KURgYFmFUcJoS4HjDBt6jRHMypkIq6udQ+eUTs830sLtDhg92cjeSXtjXiouCvM4ebAxGf/1a/JekqV78YKrJWoW0ukZWeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767738986; c=relaxed/simple;
-	bh=qsmAbwbOihyhUekwomrrbABdRnpkI8wXIYpb1kzmsDM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DeUIqTa9s/C4RVLNUJAr6gEnvB8z1BZ80jbgbkmuAUDIbhDubroRxHyfnqhYC5UW2niblgJe9JIOv/54pxOXum+sAWh6IvVIEJMYwZSA/UObsZxKSROaSfr745SRcq2d/evMUQyZguHMSI4bh/fG6jaiW6elJcmAXnawkaVEIao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vdFev-000000000PJ-3vrN;
-	Tue, 06 Jan 2026 22:36:14 +0000
-Date: Tue, 6 Jan 2026 22:36:09 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
-	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH RFC net-next v4 3/4] net: mdio: add unlocked mdiodev C45
- bus accessors
-Message-ID: <aV2OWT4g0jwfS548@makrotopia.org>
-References: <cover.1767718090.git.daniel@makrotopia.org>
- <36fbca0aaa0ca86450c565190931d987931ab958.1767718090.git.daniel@makrotopia.org>
- <aV1MGQirTHyFdv7Q@shell.armlinux.org.uk>
+	s=arc-20240116; t=1767740304; c=relaxed/simple;
+	bh=Eqzf3y9jgNy6E/dgJ3LKlxzK/khxC21x5RUGmdWptBs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ih/W73p9Vx+5CPFncBRABVSFYvX7uuP0q+6Ou61dFM/FTfDId1APJ4K2gxugIHZ8T/6tYE3fcwTGA2sQxzhX6nsCUJNq+uotNLUNfG/d87kURrJcnqS1YqR/+wDEwlLAmnZqpIfjjCpJ2GPJbSUWx2V3FAcK5t273l1PSSGEN/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tUiT7U1J; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA179C116C6;
+	Tue,  6 Jan 2026 22:58:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767740304;
+	bh=Eqzf3y9jgNy6E/dgJ3LKlxzK/khxC21x5RUGmdWptBs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tUiT7U1J3Ok0cVOkwRz8L47URpzh2t63VU/O8iMuf4Bisgc6zFi1dUcm+9qVpthv1
+	 9xrtlfcEp5jIHDwy/upiGfN5lEEIURWu6L3d+A2UiSzRuNaDHNTjpaPmwS6wu2Iv3D
+	 yhxTkMtRQAqs8PoeY7WLuRqqadx6kQqOe+YvfGn/89O66Yv/3884+7gbQNzWkzvrn5
+	 j9n7VYfVXOUPGbgZR7ibLZLEcxsZPEh1G7DcUO6hW55SsL77f8JUQZ4zRcVSgIJg1s
+	 9cVzLHmwKTtxxYtDXBXKUF9mWrNOPxDpeMddWrgGIYfBddarqgeQbyjJaya7uM6mf6
+	 7IR3x2hg0nXlA==
+Date: Tue, 6 Jan 2026 14:58:22 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Xu Du <xudu@redhat.com>, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4 0/8] selftest: Extend tun/virtio coverage
+ for GSO over UDP tunnel
+Message-ID: <20260106145822.3cd9b317@kernel.org>
+In-Reply-To: <willemdebruijn.kernel.3ae0df5f36144@gmail.com>
+References: <cover.1767597114.git.xudu@redhat.com>
+	<willemdebruijn.kernel.3ae0df5f36144@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aV1MGQirTHyFdv7Q@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 06, 2026 at 05:53:29PM +0000, Russell King (Oracle) wrote:
-> On Tue, Jan 06, 2026 at 05:14:57PM +0000, Daniel Golle wrote:
-> > +static inline int __mdiodev_c45_write(struct mdio_device *mdiodev, u32 devad,
-> > +				      u16 regnum, u16 val)
-> > +{
-> > +	return __mdiobus_c45_write(mdiodev->bus, mdiodev->addr, devad, regnum,
-> > +				 val);
-> 
-> Something doesn't look right here - missing a couple of spaces to
-> correctly align? I suspect checkpatch would spot it?
+On Tue, 06 Jan 2026 17:14:05 -0500 Willem de Bruijn wrote:
+> For instance, can the new netlink code be replaced by YNL, whether in
+> C or called from a script?
 
-Somehow those two spaces got dropped somewhere on the way. Strangely
-neither checkpatch.pl locally nor on patchwork[1] caught that -- maybe
-because 'return' statements are somehow treated differently?
-
-Anyway, fixed in my local tree now and going to be fixed in v5.
-
-Are you otherwise fine with adding those unlocked mdiodev c45 helpers?
-
-
-[1]: https://patchwork.kernel.org/project/netdevbpf/patch/36fbca0aaa0ca86450c565190931d987931ab958.1767718090.git.daniel@makrotopia.org/
++1 looks like YNL is already used in net/ tests, and it supports
+the operations in question, so that's a much better direction.
+Please let us (YNL maintainers) know if there's anything missing
+or not working, IDK how much use the rtnetlink support in YNL is
+getting.
 
