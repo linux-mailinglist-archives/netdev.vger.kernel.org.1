@@ -1,69 +1,165 @@
-Return-Path: <netdev+bounces-247275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40E9BCF6666
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 03:02:03 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A0F2CF663F
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 02:57:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CA23C30B65ED
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 01:57:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E5683303BF93
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 01:57:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A7891A256B;
-	Tue,  6 Jan 2026 01:57:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6999717C220;
+	Tue,  6 Jan 2026 01:57:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TcsWiQrY"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZhKOGEwT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1AC53A1E86;
-	Tue,  6 Jan 2026 01:57:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FFA4203710
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 01:57:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767664627; cv=none; b=G3jfyRCeJDrdpp9i/mkdGn//YIGc1unIN2oBA+5j2S8XtSjFIq/coFMb7fCyqoTE8cEUzvbBfo63U8xpT7vomG1ArZqu20OB8DdW2M0ZHjtRZlzC9BrNWS+T+GgYXVF3BqTgaNf7suK+YZTDehcWT9FOjS3ouw9PIPQ1RHtxE3s=
+	t=1767664671; cv=none; b=MIf/SYoU+CVdps59tQoGQtgx3jt/oOVt1W1YPN/zt39qWOnqAVeFdyFfUPvziYn1o9/Hs33X4/4HgxQA7NFfY57VvtMj9voijm496b/jlYpkU14V7p1qNHbwn2UlKbwvjGEp4CCGBMWXVayVnQawggRr4+Mz1pOY5b+AIwiVz1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767664627; c=relaxed/simple;
-	bh=LUCZvqk1WdSGXvspAPM9TM0I4FsNXF8+Iw2v1OJ+IKI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j0IsdhGIGToMFGRF6d1TCs8YkSkP7H3Ibj68cYNxCrIRjj36Ejmz1RDD617WrhxjiFl0UNRCMOg37FQedw/cGdJ6yNV/u1c4HZhaI6+VrCJZw3yx70/y1LoFeGo+KffsNqVPfH0vwZrWh2aEPsJotqoICQ735COw2XNv9aYJg+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TcsWiQrY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50651C116D0;
-	Tue,  6 Jan 2026 01:57:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767664626;
-	bh=LUCZvqk1WdSGXvspAPM9TM0I4FsNXF8+Iw2v1OJ+IKI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TcsWiQrY7f/AMxoq8B7609tONlNpdj5GNzT7nk2F0TnTndfQGJJkDi9KeAz4uYOi9
-	 ZqqcROfht0g/QXTWvSfJB14AIHzEQBYbBK8qiwZoFVjiJo4gFsFj4GxbSkGrSUZocl
-	 SIVAQDIIm+4bwu4KXLr9lA/O2ExhSDdyq0C5O7ThTCSt/Xea9ZkQPZBRxgtzQkEjyz
-	 0k4VXHJ2TytVauYtiivhzbxwZe6qPJQypGrc0fx5qGucuw77qwZ1DiqK01iaGIIXon
-	 Rm2L7+H2YoRXipBf0BWgEsflCUa6nnvyAYegLqtvAXBSf1ylcJDFu1i4Wu7mEzLw+3
-	 5katVhvynpzow==
-Date: Mon, 5 Jan 2026 17:57:05 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Xu Du <xudu@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, shuah@kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4 0/8] selftest: Extend tun/virtio coverage
- for GSO over UDP tunnel
-Message-ID: <20260105175705.598c8b0c@kernel.org>
-In-Reply-To: <cover.1767597114.git.xudu@redhat.com>
-References: <cover.1767597114.git.xudu@redhat.com>
+	s=arc-20240116; t=1767664671; c=relaxed/simple;
+	bh=XDT3YsSndGZ3dT6mtYQIgkaBur370JJH1rruyrfiZMM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=c8CnhL+k/lljSnnbX2G1Gmn6zIMMuus4ZxhsB7faff2X4dkCa9Zw9ruv+Gt/FV8o0VeNthgv+/x8ztrHtALBmhqffXA5qbfsnI3EafbtGtt6+ckAkSFo20tndPbAbLbii0XvEO8kzz/Qv7olvluSZXH8ljjaTAhnxbR+TZb0TsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZhKOGEwT; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1767664657;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1b5QfZCkossx3RfNN0wl6K3wnugBDe1dp1/qX9Ix0/s=;
+	b=ZhKOGEwTdZwp0QmvljAwBVoBkZBvc0uo/iZDPnnoolGEfXN945R//rRIlLq6VupDBMexDm
+	pMd5NTFsE4jTpRUg9FXqA1T+cQbrxAxF6XNAY0kbZhRXXaLic83holRXxGjHaIi3hDHmDj
+	Cf2obCt1dSc34/l+x8sgfs24DrO62zU=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: Menglong Dong <menglong8.dong@gmail.com>, ast@kernel.org,
+ Eduard Zingerman <eddyz87@gmail.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, tglx@linutronix.de,
+ mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+ hpa@zytor.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next v2 1/2] bpf,
+ x86: inline bpf_get_current_task() for x86_64
+Date: Tue, 06 Jan 2026 09:57:25 +0800
+Message-ID: <4704048.LvFx2qVVIh@7940hx>
+In-Reply-To: <08ab237ad7da8d1f6494cb434d9a5a46a599462c.camel@gmail.com>
+References:
+ <20260104131635.27621-1-dongml2@chinatelecom.cn>
+ <20260104131635.27621-2-dongml2@chinatelecom.cn>
+ <08ab237ad7da8d1f6494cb434d9a5a46a599462c.camel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
+X-Migadu-Flow: FLOW_OUT
 
-On Tue,  6 Jan 2026 09:35:13 +0800 Xu Du wrote:
-> v3 -> v4:
->  - Rebase onto the latest net-next tree to resolve merge conflicts.
+On 2026/1/6 01:45 Eduard Zingerman <eddyz87@gmail.com> write:
+> On Sun, 2026-01-04 at 21:16 +0800, Menglong Dong wrote:
+> > Inline bpf_get_current_task() and bpf_get_current_task_btf() for x86_64
+> > to obtain better performance. The instruction we use here is:
+> > 
+> >   65 48 8B 04 25 [offset] // mov rax, gs:[offset]
+> > 
+> > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> > ---
+> > v2:
+> > - check the variable type in emit_ldx_percpu_r0 with __verify_pcpu_ptr
+> > - remove the usage of const_current_task
+> > ---
+> >  arch/x86/net/bpf_jit_comp.c | 36 ++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 36 insertions(+)
+> > 
+> > diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+> > index e3b1c4b1d550..f5ff7c77aad7 100644
+> > --- a/arch/x86/net/bpf_jit_comp.c
+> > +++ b/arch/x86/net/bpf_jit_comp.c
+> > @@ -1300,6 +1300,25 @@ static void emit_st_r12(u8 **pprog, u32 size, u32 dst_reg, int off, int imm)
+> >  	emit_st_index(pprog, size, dst_reg, X86_REG_R12, off, imm);
+> >  }
+> >  
+> > +static void __emit_ldx_percpu_r0(u8 **pprog, __force unsigned long ptr)
+> > +{
+> > +	u8 *prog = *pprog;
+> > +
+> > +	/* mov rax, gs:[ptr] */
+> > +	EMIT2(0x65, 0x48);
+> > +	EMIT2(0x8B, 0x04);
+> > +	EMIT1(0x25);
+> > +	EMIT((u32)ptr, 4);
+> > +
+> > +	*pprog = prog;
+> > +}
+> > +
+> > +#define emit_ldx_percpu_r0(prog, variable)					\
+> > +	do {									\
+> > +		__verify_pcpu_ptr(&(variable));					\
+> > +		__emit_ldx_percpu_r0(&prog, (__force unsigned long)&(variable));\
+> > +	} while (0)
+> > +
+> >  static int emit_atomic_rmw(u8 **pprog, u32 atomic_op,
+> >  			   u32 dst_reg, u32 src_reg, s16 off, u8 bpf_size)
+> >  {
+> > @@ -2441,6 +2460,12 @@ st:			if (is_imm8(insn->off))
+> >  		case BPF_JMP | BPF_CALL: {
+> >  			u8 *ip = image + addrs[i - 1];
+> >  
+> > +			if (insn->src_reg == 0 && (insn->imm == BPF_FUNC_get_current_task ||
+> > +						   insn->imm == BPF_FUNC_get_current_task_btf)) {
+> 
+> I think this should be guarded by IS_ENABLED(CONFIG_SMP).
+> The current.h:get_current() used
+> arch/x86/include/asm/percpu.h:this_cpu_read_stable() that is unrolled
+> to __raw_cpu_read_stable(), which uses __force_percpu_arg(), which uses
+> __force_percpu_prefix, which is defined differently depending on CONFIG_SMP.
 
-I just told you not to repost in less than 24h.
-As a punishment if there's a v5 please wait until the next week
-with posting it.
+Yeah, I missed this part. I'll use BPF_MOV64_PERCPU_REG() in
+the next version, which should avoid this problem.
+
+Thanks!
+Menglong Dong
+
+> 
+> > +				emit_ldx_percpu_r0(prog, current_task);
+> > +				break;
+> > +			}
+> > +
+> >  			func = (u8 *) __bpf_call_base + imm32;
+> >  			if (src_reg == BPF_PSEUDO_CALL && tail_call_reachable) {
+> >  				LOAD_TAIL_CALL_CNT_PTR(stack_depth);
+> > @@ -4082,3 +4107,14 @@ bool bpf_jit_supports_timed_may_goto(void)
+> >  {
+> >  	return true;
+> >  }
+> > +
+> > +bool bpf_jit_inlines_helper_call(s32 imm)
+> > +{
+> > +	switch (imm) {
+> > +	case BPF_FUNC_get_current_task:
+> > +	case BPF_FUNC_get_current_task_btf:
+> > +		return true;
+> > +	default:
+> > +		return false;
+> > +	}
+> > +}
+> 
+
+
+
+
 
