@@ -1,153 +1,107 @@
-Return-Path: <netdev+bounces-247498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5319BCFB51A
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 00:05:30 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42798CFB550
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 00:13:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5AB0F304EBEE
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 23:05:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AD46E300CF39
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 23:13:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E48E2F99BD;
-	Tue,  6 Jan 2026 23:05:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC90C2FBDE6;
+	Tue,  6 Jan 2026 23:13:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X3+E/RqL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bD4TTabC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 283282D0C79
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 23:05:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17E62E542C;
+	Tue,  6 Jan 2026 23:13:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767740728; cv=none; b=an8UrOJKSvmX+/mcGntXUsmx0oELf/gskktye43uYt/zBPWr6zLVG22/HEap1RkMKTj/YrwDE0s+rO219DajE4Eji7W1l6aF3FU2cdnoP1XbHUYG81PWPoWoYoYgpc8zDDU7sSAB6KiuaP8U/pxGAdXN/R3uBAqhwgyHIAixlPg=
+	t=1767741194; cv=none; b=HCAWkWJ9+rTzSmDxSkjQlSpWhHbSxujZm3UlJ2ZECe/x/19Flt/7llEOXKnMwUHPl8W4SlrYZTytPaCrqw5R8PTpsJHTjW/diyRME5Xmy+2GIzEqe7u/GyXtlTXM3P9Xa2hxzfsgvoiW1uc70nu0JuogxTkUTdDGxsndFO14PpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767740728; c=relaxed/simple;
-	bh=P62+SexSZ9nGF5+uA7R+OXml7+ArJUyCTC0YFM/lEaE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u6mIwiOvG7Si+ZBzqvzSs8eJdvRdqYg9Ou0fngzF1VXUNDAv62G4HyDyGABmY+ejOiVIBK9Qfjm+oAe55DhxryBN9JFkK6NRwzMHXNFaRZrTYliIrSPC56LUO4gbOWk5878wQqq89n45H161frvveNbn7Jd04LVnuMRCNRGrbA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X3+E/RqL; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-477985aea2bso1938845e9.3
-        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 15:05:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767740724; x=1768345524; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=PxapFgVYnsCWIyo0CktW/IQv7jH9MgZJhnDM0z/8zDU=;
-        b=X3+E/RqLMUX6mOFwJPA6vJitAKiugRGLsHgmtL5BDloj5Ypf06fI02uDostSKvoAJ5
-         IpTt6LVGsQu9h0/zJuZH1BXk0FITV50JBQCRLQufHawsAdVBsHNWTYXdksbpmqAlcLJ2
-         JavIR7ZdExmqXGR0q3OU8jv+hO+o2wZPHGXQYlySFKh+YDveJ4ijyMt0aT1legeY5kyk
-         xhNxtyK9NjuafLKBdLTe9NwmlO7hr+uI9aas/LxR1Ai3wegF7FR8cAuma7YwJuTGhj5C
-         mMKpwNhdAMoV/6cwQK5b3gDnh+k3aKtfajz8KJYu3KPIsurZTkNrQZknc8w6BBWKp44L
-         Kd3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767740724; x=1768345524;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PxapFgVYnsCWIyo0CktW/IQv7jH9MgZJhnDM0z/8zDU=;
-        b=FhEp1yeee0JrNd6x/uY1xXu9oJKvlHeK7ES9N7WYPerkAP1WziG0pz40h0h/p1Eab7
-         hedZWMNqiqi38LpqSnAgiHrsOoRwU0tS0d2S5vx6CxVPcYsr/gqDC93j4f3yQTPtOhtI
-         fPx6Lx5fzYQLyDyKM3Aeo1Z9UZXWUPTI/oeed5OJttzFhaUxC75HfqsiwTzpnZ16bwQj
-         5vNJNL0uZsWBEVLfbQq1zB+rYmwQJ36GsdYR7ZdBG+MRVZoHM5adrgXqXeNi4eIz2RrZ
-         4K3hnJw98Bey2T5siOZ3+nhVNf1F2atgBZDmgaHCwUSnCMY8B9phFtOhPydvwtCvlsRn
-         UNBg==
-X-Forwarded-Encrypted: i=1; AJvYcCXbukKMd442QXw817cZXyvHDekJ5U71PkfEWuuNfUy/SRXeyysp7wtCBj8eMx30YHh2pMCevNQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgocMs1AP00bAjQTO31i6aeTzLuY0yLAmlZ8r2TUum6AUsN9qT
-	zGMk2itdkl639ro4FnCk8yQWAKVhwqVn8vMti40Dhqi6z2nG4TBkW1mH
-X-Gm-Gg: AY/fxX7aPARrKANTzaUUrk1qZ8vCqtyjcTLjCrDPk6KVI14obZwjbtieDaQf/jr6nYz
-	REGuQXzEBbJrnokejSS57cErysP4mqlf2U7Q95J3pB8a4NzrqUzvfPFd3K78Vy6LNNLXKJaokb2
-	xlRLqxleXOgb5BRsNY1aNj0BE5AjsC+0nYQkdiLOT3JE40hXHOrtH2SE+zOIXUP7mQEf9Lz7mOj
-	Sux59w70B+lu0FWMyKK/AapcCSx8R24rYJg85BU78g/7r55387hG/qiTNmRaDeNkV5ABXdtPet7
-	cUIZt8e3RP/0OliqMAbFe9t1gorBHaepGgKuQ6ibInthR6RNkqm/GYJEGO4J09uuD7d8A0FZQcU
-	h2/PLAPIivIscqSQJe4uBHLGM422ZDub0G1Auu3lvx1oaCHEwkRHj/iIni/S/Nclv7OrY4cTW0b
-	SdwA==
-X-Google-Smtp-Source: AGHT+IFHvR3PWQ5ize927SnFuctRZZ+ULpEdYthALC5LDfP2dC/UzHfGiLtVDJjdCER9VVpiUSBv+A==
-X-Received: by 2002:a05:600c:8284:b0:468:7a5a:14cc with SMTP id 5b1f17b1804b1-47d84b30091mr2875005e9.3.1767740724036;
-        Tue, 06 Jan 2026 15:05:24 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d804:300:2df7:9d78:6807:9af8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f410c86sm68232875e9.3.2026.01.06.15.05.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jan 2026 15:05:23 -0800 (PST)
-Date: Wed, 7 Jan 2026 01:05:20 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Sverdlin, Alexander" <alexander.sverdlin@siemens.com>
-Cc: "robh@kernel.org" <robh@kernel.org>,
-	"hauke@hauke-m.de" <hauke@hauke-m.de>,
-	"andrew@lunn.ch" <andrew@lunn.ch>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"daniel@makrotopia.org" <daniel@makrotopia.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>
-Subject: Re: [PATCH v3 2/2] net: dsa: mxl-gsw1xx: Support R(G)MII slew rate
- configuration
-Message-ID: <20260106230520.xhagmy76ddl7scfs@skbuf>
-References: <20260105175320.2141753-1-alexander.sverdlin@siemens.com>
- <20260105175320.2141753-3-alexander.sverdlin@siemens.com>
- <20260105193016.jlnsvgavlilhync7@skbuf>
- <ac648a7e6883e68026f67ae0544b544614006d8f.camel@siemens.com>
- <5cd460761e5b163ac2c5c5af859a53a9ad76d3ba.camel@siemens.com>
+	s=arc-20240116; t=1767741194; c=relaxed/simple;
+	bh=/ytDw2AdQR7uZ21ZJAztZBzoug6vYgK3l5h0rxyFnnQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NQDTMyVtW5UbtFbFZhUiwvbnb2DVBj+2GwDTmt6XDgB4p9pUJ97p62fDjJhHGzfkQ7L1KM4bbqVHB/IQYtnMWO5+igelCtJnQsNcB813KCxIkq9Mbxe6JtuF4OTy/wIHKvFTYAIuA8ZYFigVUTTVpGq2ggf9/WCvs939zcKdoj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bD4TTabC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A5F1C116C6;
+	Tue,  6 Jan 2026 23:13:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767741194;
+	bh=/ytDw2AdQR7uZ21ZJAztZBzoug6vYgK3l5h0rxyFnnQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bD4TTabCnqpOvjlPxal3FABWEJidSlDMLjfyCRwToqf8m7hgqGdU93Qvgqf22owUs
+	 +rVFeyA/D2wz9NWsOwNFRG/VYRdhtyMQ4ARGWJvGn1ZiWOX7W3PssEkna8Kyw24Zs9
+	 +pvJSTHE3Z5vzM05xtRR1L1lmXHD/wuXZGJe0EnCycRGDLHfGhd5hb8Va0iKzueAbA
+	 ZAYrRfjIZQdpcrI3LBuUuMisg8/NAaIuKBubDNPRYjfxupfGg2b66UfqVKCBDVQl8a
+	 D43/PFKptnxUxDn3RLNxbhQQNgGGq7fFvM9GZ0T1hv294UhdVe6+BjV1Owrmfrzf/3
+	 fMIfCHIk1/ofg==
+Date: Tue, 6 Jan 2026 15:13:13 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Thomas =?UTF-8?B?V2Vpw59zY2h1aA==?= <thomas.weissschuh@linutronix.de>
+Cc: Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima
+ <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn
+ <willemb@google.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-api@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH net-next] net: uapi: Provide an UAPI definition of
+ 'struct sockaddr'
+Message-ID: <20260106151313.1f8bd508@kernel.org>
+In-Reply-To: <20260106112714-d47c16e0-0020-4851-9c2a-f8849c9a0677@linutronix.de>
+References: <20260105-uapi-sockaddr-v1-1-b7653aba12a5@linutronix.de>
+	<20260105095713.0b312b26@kernel.org>
+	<20260106112714-d47c16e0-0020-4851-9c2a-f8849c9a0677@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5cd460761e5b163ac2c5c5af859a53a9ad76d3ba.camel@siemens.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 06, 2026 at 09:41:13AM +0000, Sverdlin, Alexander wrote:
-> Hello Vladimir, Rob!
-> 
-> On Mon, 2026-01-05 at 22:00 +0100, Alexander Sverdlin wrote:
-> > > > +	return regmap_update_bits(gsw1xx_priv->shell, GSW1XX_SHELL_RGMII_SLEW_CFG,
-> > > > +				  RGMII_SLEW_CFG_DRV_TXD | RGMII_SLEW_CFG_DRV_TXC,
-> > > > +				  (RGMII_SLEW_CFG_DRV_TXD | RGMII_SLEW_CFG_DRV_TXC) * rate);
-> > > 
-> > > I don't have a particularly strong EE background, but my understanding
-> > > is this:
-> > > 
-> > > RGMII MACs provide individual slew rate configuration for TXD[3:0] and
-> > > for TX_CLK because normally, you'd want to focus on the TX_CLK slew rate
-> > > (in the sense of reducing EMI) more than on the TXD[3:0] slew rate.
-> > > This is for 2 reasons:
-> > > (1) the EMI noise produced by TX_CLK is in a much narrower spectrum
-> > >     (runs at fixed 125/25/2.5 MHz) than TXD[3:0] (pseudo-random data).
-> > > (2) reducing the slew rate for TXD[3:0] risks introducing inter-symbol
-> > >     interference, risk which does not exist for TX_CLK
-> > > 
-> > > Your dt-binding does not permit configuring the slew rates separately,
-> > > even though the hardware permits that. Was it intentional?
-> > 
-> > thanks for the hint! This is definitely something I need to discuss with HW
-> > colleagues and get back to you!
-> 
-> Vladimir, according to the responsible HW colleague, it's OK and is desired
-> to have TXD in "slow" as long as Setup-/Hold-Timing is in spec.
-> 
-> I do understand, that this is board-specific. Do you propose to introduce
-> two separate properties?
-> 
-> Rob, in such case just "slew-rate" probably wouldn't fit any longer and
-> I'd need to go back to "maxlinear,slew-rate-txd" and "maxlinear,slew-rate-txc"
-> probably?
+On Tue, 6 Jan 2026 11:32:52 +0100 Thomas Wei=C3=9Fschuh wrote:
+> As for the failure in netdev CI however I am not so sure.
+> Looking at net-next-2026-01-05--12-00, the only failures triggered by my
+> change are also the ones from the bpf-ci. Are these the ones you meant,
+> or am I missing some others?
 
-I see Rob has reviewed the binding in this form already, but I think the
-rule of thumb that we could apply in this case is to still describe the
-clock and data slew rates separately. Like Russell points out in a separate
-thread, it's simpler to do this from the beginning rather than end up
-with 3 properties you'd have to maintain, if you later need individual
-control.
-https://lore.kernel.org/netdev/aTB0x6JGcGUM04UX@shell.armlinux.org.uk/
+Multiple things broke at once so slightly hard to fish the relevant
+stuff out from here:
 
-Sadly I don't have the expertise to give any advice on how that would
-translate into dt-bindings. Does it make sense to implement a full pin
-controller device driver for the registers GPIO_DRIVE0_CFG -> RGMII_SLEW_CFG?
+https://netdev.bots.linux.dev/contest.html?branch=3Dnet-next-2026-01-05--15=
+-00&pass=3D0&pw-n=3D0
+
+Here's one:
+
+make[1]: Entering directory '/home/virtme/testing/wt-3/tools/testing/selfte=
+sts/net'
+  CC       busy_poller
+In file included from [01m[K/usr/include/sys/socket.h:33[m[K,
+                 from [01m[K/usr/include/netinet/in.h:23[m[K,
+                 from [01m[K/usr/include/arpa/inet.h:22[m[K,
+                 from [01m[Kbusy_poller.c:14[m[K:
+[01m[K/usr/include/bits/socket.h:182:8:[m[K [01;31m[Kerror: [m[Kredefinitio=
+n of '[01m[Kstruct sockaddr[m[K'
+  182 | struct [01;31m[Ksockaddr[m[K
+      |        [01;31m[K^~~~~~~~[m[K
+In file included from [01m[K/home/virtme/testing/wt-3/usr/include/linux/net=
+link.h:6[m[K,
+                 from [01m[K/home/virtme/testing/wt-3/usr/include/linux/gen=
+etlink.h:6[m[K,
+                 from [01m[K/home/virtme/testing/wt-3/tools/testing/selftes=
+ts/../../../tools/net/ynl/lib/ynl.h:7[m[K,
+                 from [01m[Kbusy_poller.c:12[m[K:
+[01m[K/home/virtme/testing/wt-3/usr/include/linux/socket.h:37:8:[m[K [01;36=
+m[Knote: [m[Koriginally defined here
+   37 | struct [01;36m[Ksockaddr[m[K {
+      |        [01;36m[K^~~~~~~~[m[K
+make[1]: *** [../lib.mk:225: /home/virtme/testing/wt-3/tools/testing/selfte=
+sts/net/busy_poller] Error 1
+
+https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/460421/7-xfrm-policy=
+-sh/stdout
+
 
