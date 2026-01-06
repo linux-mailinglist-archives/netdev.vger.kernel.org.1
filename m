@@ -1,192 +1,127 @@
-Return-Path: <netdev+bounces-247454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97F8ACFAD91
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 21:00:33 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0E3CCFADF4
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 21:11:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0604A302BA52
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 19:55:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9C27430563CE
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 20:11:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17E0B2DF151;
-	Tue,  6 Jan 2026 19:55:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47F5934E745;
+	Tue,  6 Jan 2026 20:02:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kpx2AwBw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M10Zzc6+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 617942D1936
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 19:55:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20C0534DCE4;
+	Tue,  6 Jan 2026 20:02:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767729313; cv=none; b=KsbLumgWE04RNmy83TezUkcFURLZS5YvohjH8qJ8x2Hwar7RshcFhYv585Uc/o2CNTMUdGL6cOC9rifdYy6uwBBUnpbq700qBUV4kZV8u2RXDtZy/vC98KvI2O68kPRSqjgLsIgQTq8g3dwTkpUBLi2WbLP5qwASKv/e54GWPWw=
+	t=1767729730; cv=none; b=I24ghjfw82mhuv6RNHxxpVgrIt0tFY4vunIJxBq2ZRjgELgms5Lz/rYIgIM7aZgpzyYxbXWgDynIwcFRs5eyK9w3DbO03sbz8MpDwswEKIBkWMvs7/L7tJuBDacSQETJF0kITG9uHzYheJwDbbwfq7a5wo4i3euTXuuerjYcAP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767729313; c=relaxed/simple;
-	bh=ezRQarOjjBM21zauRZItcnGzBQWgx/j7g7YBZfAhrFA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oLa9yi12fgOSeAT2jIflJI5Xq1rtzNDADU/wuaGdS7GOoNi0w6dDESNi4XnoKhka/TCFr2qKHDkSJihU0cn4xSgSaeVCDHqG5Fxm2RPEfUFyOSj+kJecbY70dYMD7iWQc45L7iuZ73HfjWWGTba7VJAwutlXQ0pJA+wpOS4NwE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kpx2AwBw; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-64b791b5584so2178074a12.0
-        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 11:55:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767729310; x=1768334110; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BmSo9DVOGxS+EqfPBwMvHqn9WrIYsrAaibtCJtd/X8c=;
-        b=kpx2AwBwqmt402iWht+jAPHIOEBlGQ/Go+EXWvSs5dk42obdR8Hztd2zlKIrJzKQx5
-         fp5gWD5xjViZoTX+gg3Zqj9JUMOZg/v4g7n7X4Nbq8n0c0A70ohxm9GuAXmeftI3Hsft
-         zOLPcVAHN0D38x++HVtF2tFj1lWVDKYml+VJycdA7ZM3VLaR9csZbqaqJqoHvP9wu59Y
-         Wp35a0KQtmVR9XPTSJsVY6oHGt12QGk8fsQeC7VbXTc+12RQXAiNNzbZdQcKNIZwWstS
-         sb/99L0dvplQw4+PFleU3/saPlHf8cU5HpeAmwuxFm67n9LmgqaB45IhJgVhqtoO0gKD
-         iJYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767729310; x=1768334110;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BmSo9DVOGxS+EqfPBwMvHqn9WrIYsrAaibtCJtd/X8c=;
-        b=Ty9Sigh/LcgCqYRMUB6hbihWvS+EiwmBI3kwsZDXv4msfjC/a8UxH87WUjI7YBvw4t
-         D6OkVu+8uhjoCXrShrwkHIHulexxJYhJN/55+n0MaL5cSL5+kryk3c83WXsgfEXrPeTi
-         rVvN/j7E0Km8eVPvOQ1N+/wzUKeQCbLCxNoAioZtpg+YYQGdFHoXKVUDloGhACv9Bp4l
-         KHxv/YlQZszjYqrQt1qoyrNKIFt5R/BcaSuKvVnzstYSBzCXlOaMxPLRXeBmrpZQIy1t
-         jogqmj4bS6DrGXR+b87UOYRuKZ4eOAWgrFsSgwODHT5N17bz4J14ZGVxOk8wTc4MfmpY
-         e8nw==
-X-Forwarded-Encrypted: i=1; AJvYcCWfzwf61XZElEI48EJYXzTlrspHkoYxKOOkV+9Ff6smNVlpT20L8nafj7l0Pqtu9fS6u+L648M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy43P0OEEE8SvRRhwAdrQXBacZfUgaRIbtimcItSaWr815S0/ew
-	fnxu1ZxbMSFsK902p8PGhmdO8x8pzMbRB9/Kh+S4dbnCnow1966HtUkF
-X-Gm-Gg: AY/fxX6gn3/ama4HqGk2joplholkyb94Dlv7N3ZHWf3VhLLVfX8byzTVci5pGZOGW/D
-	jORAtAviifHUe0Y9SiohhlmKVsLcRouOTMm2G6v/5/TGTu0j+JSxk4iVeur5cKahRtLGhxf3n7Z
-	72hqD1HCm9f9U+f0wG+9Ghs5mtGNdVZ0ecEjD+DgC+mUYO0e+U8d69+wl5Ye84yztGQherO+x8q
-	T2XFvuXUD/TvXo9GvCz6b7FJIQ/S4xmhXdEPxfDVAi1cWOM+c3m7O/MJUcM9fpLv1q+l6JLKOe+
-	EOwNwVIpPG9lFxsXA1EjI2HojB1xwdSiJa1XyyyqXlvjcNGv37uIWkrMMPOouP0R0Jwfw1ZAwaj
-	0cjssnSbMDkmFYC+k3MMRhkZlyTU+IV6h0fQfLxrac1I2vi6HzrPBmI1B+urnhvjnB+D/R7LzmN
-	Ow75wQLU8Dp96UUKSP9EaYrtUAsLP93RmZ+3S63+uN6yl7IWzgHssY/DGO3T+vkHB7ZT0/yVcj1
-	g+lNMdz2OIdrNssqIca42022ayMVgEMEJifk/pofahNGMLXcoenvoOjB4Xb4kDdQQ==
-X-Google-Smtp-Source: AGHT+IGFE95wEtpfFwtjTiCcDiqd/x/VRp77b5we3rDpWf3zlfvwo6wItKcd0BaEkVYOWNXABbIVMg==
-X-Received: by 2002:a05:6402:42c4:b0:64b:7b73:7d50 with SMTP id 4fb4d7f45d1cf-65097de8202mr162574a12.1.1767729309560;
-        Tue, 06 Jan 2026 11:55:09 -0800 (PST)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6507b8c4454sm2902324a12.3.2026.01.06.11.55.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Jan 2026 11:55:09 -0800 (PST)
-Message-ID: <6d77bdc4-a385-43bf-a8a5-6787f99d2b7d@gmail.com>
-Date: Tue, 6 Jan 2026 20:55:07 +0100
+	s=arc-20240116; t=1767729730; c=relaxed/simple;
+	bh=jGhiLGxy4zzvBPe6LwhhiAf2P5iVXJGqVObOsAp19AI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RwZly9PBRG8VpDeI0hrJxBAezPWQmBkmOznkDKtYzqsySe4oBN7SHqlP4xq2RXoCqBPVv3ECuKq3wxgP8DyoLr66BbWS7hfvFfLq84ESbj2g5pq+EE6rzmYz3n+ZzeZptFT20nbpwTNojcvWt5BH1pxUlvIM4Sdz8jcEXBj3E68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M10Zzc6+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FCB1C116C6;
+	Tue,  6 Jan 2026 20:02:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767729729;
+	bh=jGhiLGxy4zzvBPe6LwhhiAf2P5iVXJGqVObOsAp19AI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=M10Zzc6+oRi4gGT6hBtUc0DgDs6hKLrMw3DlOMne7QpSy3MiXQuRaS8rP2d9RfZu9
+	 nc9B83J8YrSYpvHeY5GHdsvIEHfEC51KxgjX0O1w1og8k9OfAd5evSk3PlSGsIlViu
+	 XjPkc244FkDxceXwV8N+AK+f1DS5fY/iCZ7uhFxwPTGnUI/6pmRScqcD+gPHBLtfpU
+	 xh5Y7qs5Idz9xJnZx/SBq2KxpuDcsBp2v0AbgQovVsGQ2nri71Zi+xyqmXq+6IUFRi
+	 h8jAe5Xgus2oZJfHDcFdrua4LE7jxdEtuhBJy5ocpz3J57VIliSYRufZyplVPg8/0s
+	 UY28VNTewC+Zw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	sd@queasysnail.net,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next] selftests: tls: avoid flakiness in data_steal
+Date: Tue,  6 Jan 2026 12:02:05 -0800
+Message-ID: <20260106200205.1593915-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 nf-next 0/4] conntrack: bridge: add double vlan, pppoe
- and pppoe-in-q
-To: Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>
-Cc: netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
- bridge@lists.linux.dev, Simon Horman <horms@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Phil Sutter <phil@nwl.cc>, Ido Schimmel <idosch@nvidia.com>,
- Nikolay Aleksandrov <razor@blackwall.org>, Eric Dumazet
- <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
- Jozsef Kadlecsik <kadlec@netfilter.org>
-References: <20251109192427.617142-1-ericwouds@gmail.com>
-From: Eric Woudstra <ericwouds@gmail.com>
-Content-Language: en-US
-In-Reply-To: <20251109192427.617142-1-ericwouds@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+We see the following failure a few times a week:
 
+  #  RUN           global.data_steal ...
+  # tls.c:3280:data_steal:Expected recv(cfd, buf2, sizeof(buf2), MSG_DONTWAIT) (10000) == -1 (-1)
+  # data_steal: Test failed
+  #          FAIL  global.data_steal
+  not ok 8 global.data_steal
 
-On 11/9/25 8:24 PM, Eric Woudstra wrote:
-> Conntrack bridge only tracks untagged and 802.1q.
-> 
-> To make the bridge-fastpath experience more similar to the
-> forward-fastpath experience, introduce patches for double vlan,
-> pppoe and pppoe-in-q tagged packets to bridge conntrack and to
-> bridge filter chain.
-> 
-> Changes in v17:
-> 
-> - Add patch for nft_set_pktinfo_ipv4/6_validate() adding nhoff argument.
-> - Stopped using skb_set_network_header() in nft_set_bridge_pktinfo,
->    using the new offset for nft_set_pktinfo_ipv4/6_validate instead.
-> - When pskb_may_pull() fails in nft_set_bridge_pktinfo() set proto to 0,
->    resulting in pktinfo unspecified.
-> 
-> Changes in v16:
-> 
-> - Changed nft_chain_filter patch: Only help populating pktinfo offsets,
->    call nft_do_chain() with original network_offset.
-> - Changed commit messages.
-> - Removed kernel-doc comments.
-> 
-> Changes in v15:
-> 
-> - Do not munge skb->protocol.
-> - Introduce nft_set_bridge_pktinfo() helper.
-> - Introduce nf_ct_bridge_pre_inner() helper.
-> - nf_ct_bridge_pre(): Don't trim on ph->hdr.length, only compare to what
->    ip header claims and return NF_ACCEPT if it does not match.
-> - nf_ct_bridge_pre(): Renamed u32 data_len to pppoe_len.
-> - nf_ct_bridge_pre(): Reset network_header only when ret == NF_ACCEPT.
-> - nf_checksum(_partial)(): Use of skb_network_offset().
-> - nf_checksum(_partial)(): Use 'if (WARN_ON()) return 0' instead.
-> - nf_checksum(_partial)(): Added comments
-> 
-> Changes in v14:
-> 
-> - nf_checksum(_patial): Use DEBUG_NET_WARN_ON_ONCE(
->    !skb_pointer_if_linear()) instead of pskb_may_pull().
-> - nft_do_chain_bridge: Added default case ph->proto is neither
->    ipv4 nor ipv6.
-> - nft_do_chain_bridge: only reset network header when ret == NF_ACCEPT.
-> 
-> Changes in v13:
-> 
-> - Do not use pull/push before/after calling nf_conntrack_in() or
->    nft_do_chain().
-> - Add patch to correct calculating checksum when skb->data !=
->    skb_network_header(skb).
-> 
-> Changes in v12:
-> 
-> - Only allow tracking this traffic when a conntrack zone is set.
-> - nf_ct_bridge_pre(): skb pull/push without touching the checksum,
->    because the pull is always restored with push.
-> - nft_do_chain_bridge(): handle the extra header similar to
->    nf_ct_bridge_pre(), using pull/push.
-> 
-> Changes in v11:
-> 
-> - nft_do_chain_bridge(): Proper readout of encapsulated proto.
-> - nft_do_chain_bridge(): Use skb_set_network_header() instead of thoff.
-> - removed test script, it is now in separate patch.
-> 
-> v10 split from patch-set: bridge-fastpath and related improvements v9
-> 
-> Eric Woudstra (4):
->   netfilter: utils: nf_checksum(_partial) correct data!=networkheader
->   netfilter: bridge: Add conntrack double vlan and pppoe
->   netfilter: nft_set_pktinfo_ipv4/6_validate: Add nhoff argument
->   netfilter: nft_chain_filter: Add bridge double vlan and pppoe
-> 
->  include/net/netfilter/nf_tables_ipv4.h     | 21 +++--
->  include/net/netfilter/nf_tables_ipv6.h     | 21 +++--
->  net/bridge/netfilter/nf_conntrack_bridge.c | 92 ++++++++++++++++++----
->  net/netfilter/nft_chain_filter.c           | 59 ++++++++++++--
->  net/netfilter/utils.c                      | 28 +++++--
->  5 files changed, 176 insertions(+), 45 deletions(-)
-> 
+The 10000 bytes read suggests that the child process did a recv()
+of half of the data using the TLS ULP and we're now getting the
+remaining half. The intent of the test is to get the child to
+enter _TCP_ recvmsg handler, so it needs to enter the syscall before
+parent installed the TLS recvmsg with setsockopt(SOL_TLS).
 
-Can I kindly ask, what is the status of this patch-set?
+Instead of the 10msec sleep send 1 byte of data and wait for the
+child to consume it.
 
-Regards,
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: sd@queasysnail.net
+CC: shuah@kernel.org
+CC: linux-kselftest@vger.kernel.org
+---
+ tools/testing/selftests/net/tls.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-Eric
+diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
+index a4d16a460fbe..9e2ccea13d70 100644
+--- a/tools/testing/selftests/net/tls.c
++++ b/tools/testing/selftests/net/tls.c
+@@ -3260,17 +3260,25 @@ TEST(data_steal) {
+ 	ASSERT_EQ(setsockopt(cfd, IPPROTO_TCP, TCP_ULP, "tls", sizeof("tls")), 0);
+ 
+ 	/* Spawn a child and get it into the read wait path of the underlying
+-	 * TCP socket.
++	 * TCP socket (before kernel .recvmsg is replaced with the TLS one).
+ 	 */
+ 	pid = fork();
+ 	ASSERT_GE(pid, 0);
+ 	if (!pid) {
+-		EXPECT_EQ(recv(cfd, buf, sizeof(buf) / 2, MSG_WAITALL),
+-			  sizeof(buf) / 2);
++		EXPECT_EQ(recv(cfd, buf, sizeof(buf) / 2 + 1, MSG_WAITALL),
++			  sizeof(buf) / 2 + 1);
+ 		exit(!__test_passed(_metadata));
+ 	}
+ 
+-	usleep(10000);
++	/* Send a sync byte and poll until it's consumed to ensure
++	 * the child is in recv() before we proceed to install TLS.
++	 */
++	ASSERT_EQ(send(fd, buf, 1, 0), 1);
++	do {
++		usleep(500);
++	} while (recv(cfd, buf, 1, MSG_PEEK | MSG_DONTWAIT) == 1);
++	EXPECT_EQ(errno, EAGAIN);
++
+ 	ASSERT_EQ(setsockopt(fd, SOL_TLS, TLS_TX, &tls, tls.len), 0);
+ 	ASSERT_EQ(setsockopt(cfd, SOL_TLS, TLS_RX, &tls, tls.len), 0);
+ 
+-- 
+2.52.0
 
 
