@@ -1,110 +1,152 @@
-Return-Path: <netdev+bounces-247449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1FDECFACEF
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 20:56:09 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8332CFAC1D
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 20:45:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E882230693C9
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 19:40:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8A138301787C
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 19:44:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C284134D931;
-	Tue,  6 Jan 2026 19:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 215502D8777;
+	Tue,  6 Jan 2026 19:43:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NAL2DBx7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XgLJapAX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C5F634D92A
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 19:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48F3722652D
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 19:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767728426; cv=none; b=c3Q4mk5U+nuycy4U41R7AQSZtS0+5X3Fqu6hYYsuVMfQZHuHVxktSRed87Hg2vajHXZBSoGUEn42FlrYw2sU8OAATDQ3+7xeF0BR/bkzc7UXAC1Iz3isQRh1ETkxc1hvU7DKc+vKZehffv5AJmeu4SOndaATwwB1X94H7PIPciM=
+	t=1767728592; cv=none; b=og+Myd4kLmM6P1eDlslOBXqdwdW9wzlKakR/U9e9W9YXJwgb8Ui6qsWAT0eMZ5c/f6HNGA9O+ixMjreEXi40UsbqJ0iDAte4IPsIAu5X1BwNm4xI47MrFRJq6dWvEtY4JlNFn4hmSXFQ6scYk9YCL3xE211W2zRpZjIwdhdU00o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767728426; c=relaxed/simple;
-	bh=Bpj+kUXGLjy/1Cab0G2vytp5HKKFW17JhaMlcsKJ4Wo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=pzoPMbYNsSE+vx+ZsNysvO6eonDM37ORMU9Kn/PtpLMGgrKV5pf+5/5vRXTjZyGRBzVqr6mFzLXtvSms+g8Mcc0LUP+n2jmyyyNfGrP9rPQBi3xTFEwMFBluGDuawS9gBSlb5Fdm5W9c0D/jB9IeROyGSGKYag7ebChUshY2BkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NAL2DBx7; arc=none smtp.client-ip=209.85.222.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8b2e2342803so343385885a.3
-        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 11:40:24 -0800 (PST)
+	s=arc-20240116; t=1767728592; c=relaxed/simple;
+	bh=cQkCwpLfMHgFECHSgiTdiHx6C721NMxhQ4A1ljBuofk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PO3PDpMEOjlzALZVBtu+Fc2rWUlntQ8dJaQo2sD1cB+h7xDO15oXTrDfhZiwUXRLqCKpwYTs4yZwJX1o9tqKmxguTch9Qe9cWlJkVFiiMtexmwXBN4/XJvekFwtKsliS/l1ev4DHNPutRG3z8loUQSnAsS0eJrl2xYY4qPHFm8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XgLJapAX; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-79045634f45so16269607b3.1
+        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 11:43:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767728424; x=1768333224; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=BVyPkON0tFRX0Umd+GljmhhfNpEnkxl+zS2SbzJZQAc=;
-        b=NAL2DBx7pTbZL/HZ6DgCNnWA/mQRRj+WLPzJ7oepfKAI/1Qr5Po4p28ddIWMSCUojV
-         il4ay7RDpY0nmvjpL4CTfJ3vf0HnexkUqyU3heW//BIv58lZk9mdfxgACupQm6KhnzV0
-         PoiVQwXJtorV6LInrjeFG9VG9j+4BL+DTaID936w213mkwQ1GYkxbn3eFngpp4Sihw2N
-         iVgFgc7YiImyGng9ZZE3BEn+tAdvX7ocb9tyM8JRQOBis8cP5cEOLBPZrRIRX8aGiGx9
-         h8qolNYREnaqrPH/6xhOTI83s1I5r5ZSgAaGT3u8bcaDZPP/u9lCuNW7OOIHUtUZ3gtX
-         cAKw==
+        d=gmail.com; s=20230601; t=1767728587; x=1768333387; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=p7/Azh4zwRmV8HgO8z+Rp5x3OtBJOTRULAPqMlyrXYk=;
+        b=XgLJapAXBoPNglc9NVDTvu95shZPCAhHj1hmfgj0iyZXPK7uDzNetNrK+LZHzbGluR
+         gcbVt0pEDYsKvY/Gszc+Qeee0PRVcArlsJ3sYCgGw4PfA7bXNYNRPXpaDmEolsSDmnyS
+         ztIaHlPFC4g46Inop5IcIeKxSJB1clj3GxFfmxhISt4BFZGYWAO94akImL9Ta9FpRqr3
+         a5ItzFCtDMvk7yhiVu68gycnrZHhh3tEdGdb7vWINn32kOumPSWMtkIOl7cA9sVZgnSL
+         Ij+Cr00ubqnp5I5sayUD3BrDtgCJD6O6DLF2MlU6+iewP3KTwFNZHYVqDESVeZOFYNUa
+         2f0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767728424; x=1768333224;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BVyPkON0tFRX0Umd+GljmhhfNpEnkxl+zS2SbzJZQAc=;
-        b=DjHI9ExWUGFj2IpUrIYJGxgCYlwe2iNNw1sQK//t2Gcis7Ivss5D+LWiNXZMj37Sxo
-         xKOhZ1oQcfxTa0AsXYwOjjTGbpBz3k48cLC0uXv+lqtLFaoAZbPDCKaRJnvcAgdAsseE
-         qpP9cI1Y8NgrlzY0mInAfqKnif62rWYVR5BFhZALFGUoso8PrNOseWbxWVzb1TximwfY
-         yNQI0burwegme5VJdEf0/EWHPSQ5avvhGC5k8BNLJ++okQoUvoUH3rvhk/0POSP2ecxb
-         xiotsSJPZVQ69UAwUHwiaRlu59ZSKGA5gM3lw1Rl5Zg/N7gmxA6IZFclW+HOTgjvV05l
-         p57A==
-X-Forwarded-Encrypted: i=1; AJvYcCX2N0rWD7c7Myj+2j1ZhCx4ZOkJXgzzW71V32tJEyWcAhxclWsCKj0HqmnxuALcjNH/hrP8E+Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+zfDOTRenfDhCF3iWXNc2JZMMskQP6NwRPacMDf2lH1wnKWUV
-	+pFKeDNNKWRyPS9QSyRui9+mT/j9OI9b1nGKVk5ByQDlAcSdKkUzKQ6+V0/EZVHAW9DGteobynd
-	jOHAP04jVAQcsng==
-X-Google-Smtp-Source: AGHT+IFQrCYY+hgWUNsrMD4V+SFlwwJhPmxMuz9JmSAjBrhC9ZHia5CBr9ucTz/NbZ5bafTgoQ2BuPcPjsTfLg==
-X-Received: from qvbpj13.prod.google.com ([2002:a05:6214:4b0d:b0:888:b3a0:2c9])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:3947:b0:8a3:9bb4:9e4f with SMTP id af79cd13be357-8c37eb4c558mr551466885a.30.1767728424020;
- Tue, 06 Jan 2026 11:40:24 -0800 (PST)
-Date: Tue,  6 Jan 2026 19:40:22 +0000
+        d=1e100.net; s=20230601; t=1767728587; x=1768333387;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=p7/Azh4zwRmV8HgO8z+Rp5x3OtBJOTRULAPqMlyrXYk=;
+        b=og4J/DqSlvkqZTad1foyRC7kFDnrLYghXbfbHAmb4KKzAoLkAfV2Xz5PdmokGJD8tb
+         inMZK+o8TFIXD7IX1wNFhflt+P/5y5+5BWOHf/vKolkpT4c9D1NG2IZJphdwIujqwVkh
+         w6VJiYUqZXsXhPLySs3WXSW9Bipg38z1zPLdcw9ANHAdbSKANmQ1GSRw/pPsVwXVexl5
+         xpR8mFkL0h1vdXCV4lZ7Dw/Fgl2SYQv0hLqCHK9DPBwTA1WbLRwP64NA9q3zjmWrPgN9
+         8HHPEgXEGxX6uNYbAIAZFP3+co/Lmtm+hCNYI2AoNG+74TXNX0u+oS+B4bHqVDpoGh5X
+         dgIw==
+X-Forwarded-Encrypted: i=1; AJvYcCXT67XVEITH2xT5uOEOf85qaEM/rIINlLjGXHk6+MFpCQU/Y+y6FcVNHCNM0UkG2rmgIKqbGCQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmNDgpWdxxGvDHVOOHlpZceUb5Un0nJY4ZjBuK8ceudK/C7u5y
+	j7D7XB5BvIJ+nak/gLkHMVs2Q1BrHU/vBWxX8GmxUuX2MP7P++1sQ46mhz7v7t7lZe3M0/i5vz6
+	Wyt11hNL98GrbV5onFGsTdlsIsaDN9As=
+X-Gm-Gg: AY/fxX4CkchIU7T50PKhxr9Jrv6r1JkY8H2yzcMC9esaK/yIuZR6imF/PWzogE5eUah
+	fGVkNHmNNrwgkud1PRbcrmrmkdi/IQSi9UJt06aFNQZdWf9CVuDXzEAIgjOLSwcLmhHPmgTIU8F
+	4FVqPJDUvn3YASUfXfYo2q8y7SolKvD1Qy10/HE67Wv58IBX6hwmxjkAMFZNNQm52JqNZfx+/28
+	srTuNIeWAxQ18BwVoZN8p5bDgUDw4ooTnjGW6y5y5r4MQngX65T0QxvaIhhLpOF00as+qsLXTMN
+	4JWtc7ZMWJo=
+X-Google-Smtp-Source: AGHT+IFq1+DSiAXRqUWE1kc0JcF82BATUlLMIxXXAO0gDD9PD3IPczJG27PxqkLRnUeu4+f+nC+UN6DHny0PaZ8Pijg=
+X-Received: by 2002:a05:690e:1898:b0:63f:55de:63cc with SMTP id
+ 956f58d0204a3-64716b8e33cmr149478d50.31.1767728587032; Tue, 06 Jan 2026
+ 11:43:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
-Message-ID: <20260106194022.2133543-1-edumazet@google.com>
-Subject: [PATCH net] net: bridge: annotate data-race in br_fdb_update()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Nikolay Aleksandrov <razor@blackwall.org>
+MIME-Version: 1.0
+References: <20260105-skb-meta-safeproof-netdevs-rx-only-v2-0-a21e679b5afa@cloudflare.com>
+ <20260105-skb-meta-safeproof-netdevs-rx-only-v2-15-a21e679b5afa@cloudflare.com>
+ <CAADnVQJbGosoXOCdyi=NZar966FVibKYobBgQ9BiyEH3=-HOsw@mail.gmail.com>
+ <CAMB2axPivi+mZOXie=VnJM8nscqkHDjSrKT=Dhp5z_copEwxLQ@mail.gmail.com>
+ <e969a85c-94eb-4cb5-a7ac-524a16ccce01@linux.dev> <CAADnVQKB5vRJM4kJC5515snR6KHweE-Ld_W1wWgPSWATgiUCwg@mail.gmail.com>
+ <d267c646-1acc-4e5b-aa96-56759fca57d0@linux.dev> <CAMB2axM+Z9npytoRDb-D1xVQSSx__nW0GOPMOP_uMNU-ZE=AZA@mail.gmail.com>
+ <CAADnVQJ=kmVAZsgkG9P2nEBTUG3E4PrDG=Yz8tfeFysH4ZBqVw@mail.gmail.com>
+ <877btu8wz2.fsf@cloudflare.com> <CAMB2axNnCWp0-ow7Xbg2Go7G61N=Ls_e+DVNq5wBWFbqbFZn-A@mail.gmail.com>
+ <87qzs2imh3.fsf@cloudflare.com>
+In-Reply-To: <87qzs2imh3.fsf@cloudflare.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Tue, 6 Jan 2026 11:42:55 -0800
+X-Gm-Features: AQt7F2o23PNEu4IjMYve2RPbJIZtZVOwPPQtczTw_MCkphfX-k0Ojeorcl0AwDw
+Message-ID: <CAMB2axO3E30y2862=uMH-S-_KvCzsWyEfBK7gntgF0gyyVZg2g@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2 15/16] bpf: Realign skb metadata for TC progs
+ using data_meta
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Martin KaFai Lau <martin.lau@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Simon Horman <horms@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	kernel-team <kernel-team@cloudflare.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-fdb->updated is read and written locklessly.
+On Tue, Jan 6, 2026 at 11:12=E2=80=AFAM Jakub Sitnicki <jakub@cloudflare.co=
+m> wrote:
+>
+> On Tue, Jan 06, 2026 at 09:46 AM -08, Amery Hung wrote:
+> > On Tue, Jan 6, 2026 at 9:36=E2=80=AFAM Jakub Sitnicki <jakub@cloudflare=
+.com> wrote:
+> >> --- a/kernel/bpf/verifier.c
+> >> +++ b/kernel/bpf/verifier.c
+> >> @@ -21806,6 +21806,14 @@ static int convert_ctx_accesses(struct bpf_ve=
+rifier_env *env)
+> >>                         env->prog =3D new_prog;
+> >>                         delta +=3D cnt - 1;
+> >>
+> >> +                       /* gen_prologue emits function calls with targ=
+et address
+> >> +                        * relative to __bpf_call_base. Skip patch_cal=
+l_imm fixup.
+> >> +                        */
+> >> +                       for (i =3D 0; i < cnt - 1; i++) {
+> >> +                               if (bpf_helper_call(&env->prog->insnsi=
+[i]))
+> >> +                                       env->insn_aux_data[i].finalize=
+d_call =3D true;
+> >> +                       }
+> >> +
+> >>                         ret =3D add_kfunc_in_insns(env, insn_buf, cnt =
+- 1);
+> >
+> > And then we can get rid of this function as there is no use case for
+> > having a new kfunc in gen_{pro,epi}logue.
+>
+> Happy to convert bpf_{qdisc,testmod} gen_{pro,epi}logue to use
+> BPF_EMIT_CALL instead of BPF_CALL_KFUNC.
+>
+> If it's alright with you, I'd like to kill kfunc support in
+> {pro,epi}logue as a follow up.
+>
 
-Add READ_ONCE()/WRITE_ONCE() annotations.
+Totally. Appreciate it!
 
-Fixes: 31cbc39b6344 ("net: bridge: add option to allow activity notifications for any fdb entries")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>
----
- net/bridge/br_fdb.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Make sense to do in another patchset.
 
-diff --git a/net/bridge/br_fdb.c b/net/bridge/br_fdb.c
-index 58d22e2b85fc3551bd5aec9c20296ddfcecaa040..e7bd20f0e8d6b7b24aef43d7bed34adf171c34a8 100644
---- a/net/bridge/br_fdb.c
-+++ b/net/bridge/br_fdb.c
-@@ -1002,8 +1002,8 @@ void br_fdb_update(struct net_bridge *br, struct net_bridge_port *source,
- 			unsigned long now = jiffies;
- 			bool fdb_modified = false;
- 
--			if (now != fdb->updated) {
--				fdb->updated = now;
-+			if (now != READ_ONCE(fdb->updated)) {
-+				WRITE_ONCE(fdb->updated, now);
- 				fdb_modified = __fdb_mark_active(fdb);
- 			}
- 
--- 
-2.52.0.351.gbe84eed79e-goog
-
+> Looks like there will be a bit of churn in selftests to remove the
+> coverage. And this series is getting quite long.
 
