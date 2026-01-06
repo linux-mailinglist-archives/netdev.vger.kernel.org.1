@@ -1,164 +1,102 @@
-Return-Path: <netdev+bounces-247479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6381CFB1DB
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 22:42:41 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6E12CFB1F3
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 22:45:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E91E83017EF8
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 21:40:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 42C64300E62B
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 21:45:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11FD52EC096;
-	Tue,  6 Jan 2026 21:40:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E10DB324B27;
+	Tue,  6 Jan 2026 21:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="n2rJarLz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dOvi6VBY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D60942C11C9;
-	Tue,  6 Jan 2026 21:40:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB73C30B51A
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 21:45:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767735653; cv=none; b=HvQo8vi4ti9CADf39CaD+zDOs8hRvi5llCGJ0sqjoyvVNhE7W7Y9dJZjWlNH7qOXb0pAaW7hZBrRQS26T9iZ0Y7girrckXjJEcG6uMKaLeX7EgJ302w42tdAyvEixZ2UN1PeE9vnzSoPasmSsF9aUrrvSgUeIJ/J/535neF8Mk0=
+	t=1767735902; cv=none; b=uw0Ps9eefOdhsxnLjIyueXl4g3XJyFQGkgOysObD4Kr6Ral1IFJrdYl4vvHITn0rsSyfEkIl0TS+ZOymoswT6rL0HHsff3HqHwiXRp6gSdLyVAbXb3eYLDjOaxt2XnFikP5EIM4inP08EI4OMpzzmMKTgn1bhb8fuH2BCNCIM94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767735653; c=relaxed/simple;
-	bh=lt3ESn2LiHLMfhrKCphnHt3guZ9CwHi/PiRANsNm2Uo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nDnSGd3rpqz20PU9oEG+P9HR0vCEahGaTdGWvTNQcXbtImmvHlm3cq0cOtadO4CWdw55AfxTMstfYENSY0utcF3FULnDdSHsj6Tt9qz9klw3dEmR4k61Sfy1wFrVWKxBH7tyTGrMaShmS1ShdGDGlgGU7b4Oqnl5awfGkZiW1dM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=n2rJarLz; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1767735647;
-	bh=RgHPzQzSosAry1NZJDik9UsLNQ8sKedCtJPnPYXavI8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=n2rJarLzpSrDXVzAj6XFnTp96BghFEIcE0jbIwxXYXfWmqJHDwRAQvK+XjIgW32wz
-	 70KSA3uSe/XRfDUEfw+cm6wT7Rd/HI380hh+14Zmd4m6uSnxPXQ5lyk+c+Ld3sI7hT
-	 BYJAJEdk8AvcjbCzRkU6psU0wgNQprfI9DBMBnmnKTk/3RqcAXr3H0iW1pvJ+A8xUM
-	 9H/czwiezFtrCPi8LMN167LcEmfmUEm6f7qiwmIz6coTese99RwWSMAvylOMvhdzGp
-	 dRE/mc3hzUU+MAD04OHDaq43bxtNKGRWSOmEJZ/7ghsopy/OuKenCX3hGvvKOH78m1
-	 JCbh+LnKz2gXA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4dm4NF7334z4wGx;
-	Wed, 07 Jan 2026 08:40:45 +1100 (AEDT)
-Date: Wed, 7 Jan 2026 08:40:45 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Roman Gushchin <roman.gushchin@linux.dev>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Daniel Borkmann
- <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, Andrii
- Nakryiko <andrii@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
- bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Chen Ridong
- <chenridong@huawei.com>, JP Kobryn <inwardvessel@gmail.com>, Linux Kernel
- Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: Re: linux-next: manual merge of the bpf-next tree with the
- mm-unstable tree
-Message-ID: <20260107084045.6cf12b2b@canb.auug.org.au>
-In-Reply-To: <87tswz74jb.fsf@linux.dev>
-References: <20260105130413.273ee0ee@canb.auug.org.au>
-	<CAADnVQKkphWpwKE17bGQao36dH8xqCyV-iXDcagrO7s-VOPE-w@mail.gmail.com>
-	<87tswz74jb.fsf@linux.dev>
+	s=arc-20240116; t=1767735902; c=relaxed/simple;
+	bh=JttCpsSUeiclCS0amSNQoEaALqaunw0BGjw2O/ph5Qo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aHeUusI/7XC09O/MgVhPxd5BkvDA2X852dQM5hLm4ZinXDiIGfL3VqAMYL19gYa9LnAt/czXHbepBs0wmMKU3rxhjsL7qDv/9WA5XwT1DCDi1taVIrbm3VHEPbMVOAtZ2wt7bdlY7iEM+qZLymjuqP28BIrBpwv7tKQsGkVKF88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dOvi6VBY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B57CC2BC9E
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 21:45:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767735902;
+	bh=JttCpsSUeiclCS0amSNQoEaALqaunw0BGjw2O/ph5Qo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=dOvi6VBYNuCATAepaLqU1eErybfMwAvZncQAeneeK/QJYVEgP95Q6ApZEFND0Ytxd
+	 K0beUQ7PVksZuOq8FvAXItri5X4Kq6/j0LpAHLyzOEBtHppod0/GrH+LNIFgbl6gmm
+	 pw64g3olZWWkYeHqLJzmub9IAflpt/pt3hbQutRJusiJXZ1tD9OW75+2PFgVaBzEzB
+	 DdBFRgANp3bKJ+k6IORg4s7g4NSN1OoQHV2VSeJBaAWDcohkys9FlxJcXKc28iV4qh
+	 lYl0wv14Skb343IP40zLeiAh4iaknfV0EO/c79KW3h8X3yH0mCCKWOH92zWLoTLNAa
+	 F39h3mRZVkw+A==
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b79e7112398so237927566b.3
+        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 13:45:02 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXKJf7z4OrS/s8uLzogpRTb0Y4Pml+vH3t+kOMZCWEDXF91gAGMKsyGATjwMk4mjLxBDBKZEJA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1k4bsqI3ujr7TlSxCoTKgTlbYMFwMMQYIrwyVbWCnNZqMN9Ta
+	xa27nQerFGD1bbODxUZT01uicADQeb4ny0nKn/JNtCTS80NGjmaLtpfWOfvQFmIP+ma5RXYdeF/
+	FS5QS2ifch3/Q7MIL8ylnpwoDqPnkhA==
+X-Google-Smtp-Source: AGHT+IEjrvbEDUapgFRPfSRLcyQnp2+3eYc5vauPrFRqRHPMdnl9KlBHcpoL794w7RR12SXJM+/lcy7IprrngoUzQQ8=
+X-Received: by 2002:a17:907:7fa5:b0:b83:95c8:15d0 with SMTP id
+ a640c23a62f3a-b84453eb335mr40051766b.52.1767735900967; Tue, 06 Jan 2026
+ 13:45:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/uGLsXwKcDd4kwp+aLuz4vFb";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-
---Sig_/uGLsXwKcDd4kwp+aLuz4vFb
-Content-Type: text/plain; charset=UTF-8
+References: <20260106143620.126212-1-Frank.Li@nxp.com>
+In-Reply-To: <20260106143620.126212-1-Frank.Li@nxp.com>
+From: Rob Herring <robh@kernel.org>
+Date: Tue, 6 Jan 2026 15:44:49 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqJxKvrOWq6Y=nRzPz+W0HYGR1Egy8qcGnd_6XDFOCfcFQ@mail.gmail.com>
+X-Gm-Features: AQt7F2rxYuRKfsW2A7MFdTtlHTPtCjOh90uCeuQyt55itPQ6SCq66xhFomktgUY
+Message-ID: <CAL_JsqJxKvrOWq6Y=nRzPz+W0HYGR1Egy8qcGnd_6XDFOCfcFQ@mail.gmail.com>
+Subject: Re: [PATCH 1/1] dt-bindings: net: dsa: microchip: Make pinctrl
+ 'reset' optional
+To: Frank Li <Frank.Li@nxp.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>, 
+	"maintainer:MICROCHIP KSZ SERIES ETHERNET SWITCH DRIVER" <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Marek Vasut <marex@denx.de>, 
+	"open list:MICROCHIP KSZ SERIES ETHERNET SWITCH DRIVER" <netdev@vger.kernel.org>, 
+	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, 
+	m.felsch@pengutronix.de, imx@lists.linux.dev, shawnguo@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi all,
-
-On Mon, 05 Jan 2026 20:23:36 -0800 Roman Gushchin <roman.gushchin@linux.dev=
-> wrote:
+On Tue, Jan 6, 2026 at 8:36=E2=80=AFAM Frank Li <Frank.Li@nxp.com> wrote:
 >
-> Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
->=20
-> > On Sun, Jan 4, 2026 at 6:04=E2=80=AFPM Stephen Rothwell <sfr@canb.auug.=
-org.au> wrote: =20
-> >>
-> >> Today's linux-next merge of the bpf-next tree got a semantic conflict =
-in:
-> >>
-> >>   include/linux/memcontrol.h
-> >>   mm/memcontrol-v1.c
-> >>   mm/memcontrol.c
-> >>
-> >> between commit:
-> >>
-> >>   eb557e10dcac ("memcg: move mem_cgroup_usage memcontrol-v1.c")
-> >>
-> >> from the mm-unstable tree and commit:
-> >>
-> >>   99430ab8b804 ("mm: introduce BPF kfuncs to access memcg statistics a=
-nd events")
-> >>
-> >> from the bpf-next tree producing this build failure:
-> >>
-> >> mm/memcontrol-v1.c:430:22: error: static declaration of 'mem_cgroup_us=
-age' follows non-static declaration
-> >>   430 | static unsigned long mem_cgroup_usage(struct mem_cgroup *memcg=
-, bool swap)
-> >>       |                      ^~~~~~~~~~~~~~~~
-> >> In file included from mm/memcontrol-v1.c:3:
-> >> include/linux/memcontrol.h:953:15: note: previous declaration of
-> >> 'mem_cgroup_usage' with type 'long unsigned int(struct mem_cgroup *,
-> >> bool)' {aka 'long unsigned int(struct mem_cgroup *, _Bool)'}
-> >>   953 | unsigned long mem_cgroup_usage(struct mem_cgroup *memcg, bool =
-swap);
-> >>       |               ^~~~~~~~~~~~~~~~
-> >>
-> >> I fixed it up (I reverted the mm-unstable tree commit) and can carry t=
-he
-> >> fix as necessary. This is now fixed as far as linux-next is concerned,
-> >> but any non trivial conflicts should be mentioned to your upstream
-> >> maintainer when your tree is submitted for merging.  You may also want
-> >> to consider cooperating with the maintainer of the conflicting tree to
-> >> minimise any particularly complex conflicts. =20
-> >
-> > what's the proper fix here?
-> >
-> > Roman,
-> >
-> > looks like adding mem_cgroup_usage() to include/linux/memcontrol.h
-> > wasn't really necessary, since kfuncs don't use it anyway?
-> > Should we just remove that line in bpf-next? =20
->=20
-> Yep. It was used in the previous version, but not in the latest one.
->=20
-> Just sent an official fix.
+> Commit e469b87e0fb0d ("dt-bindings: net: dsa: microchip: Add strap
+> description to set SPI mode") required both 'default' and 'reset' pinctrl
+> states for all compatible devices. However, this requirement should be on=
+ly
+> applicable to KSZ8463.
+>
+> Make the 'reset' pinctrl state optional for all other Microchip DSA
+> devices while keeping it mandatory for KSZ8463.
+>
+> Fix below CHECK_DTBS warnings:
+>   arch/arm64/boot/dts/freescale/imx8mp-skov-basic.dtb: switch@5f (microch=
+ip,ksz9893): pinctrl-names: ['default'] is too short
+>         from schema $id: http://devicetree.org/schemas/net/dsa/microchip,=
+ksz.yaml#
+>
+> Signed-off-by: Frank Li <Frank.Li@nxp.com>
+> ---
+>  Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml | 3 +++
+>  1 file changed, 3 insertions(+)
 
-And with that now applied to the bpf-next tree, I will no longer revert
-the mm-unstable commit.
-
-Thanks.
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/uGLsXwKcDd4kwp+aLuz4vFb
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmldgV0ACgkQAVBC80lX
-0GxRVQf/Twa1J9FzjynS32iiUyX/z7YDLzpmdyTCVv/CsN2Reex55MtPNiyuqeO7
-bPTSWe4QsCKjuNXm313TDf9PDsXBZYwuaAFXKWFWkNR/six3xlPt3NVzUu++fXY1
-EDaGrA/rI86C6X1pC0Y5GUnacX+NeRz3Qpa7hZe8MIKFXfkye89732g2IKQwDB77
-XLLjWaAA1oWqIliP8Y2zg12giBx7MAib0Cfvkb/mf5uOQL2VWuBtgzCkSU+5jdQl
-z8+cIGyhX2mF/15IVrE+G9YZiq6Mjk6/xDFJthYz1yAJjutHiSmuqFvrjpHk1NI5
-dV7yI/yDwwdZtCRx/wEykSsK7CGuSw==
-=wvNN
------END PGP SIGNATURE-----
-
---Sig_/uGLsXwKcDd4kwp+aLuz4vFb--
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
