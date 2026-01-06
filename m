@@ -1,95 +1,75 @@
-Return-Path: <netdev+bounces-247495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4ECA1CFB4F3
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 00:00:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A8D2CFB505
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 00:02:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8D632301E179
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 22:59:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6CEDA30133B4
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 23:02:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E0352F4A15;
-	Tue,  6 Jan 2026 22:59:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEDD922A4FE;
+	Tue,  6 Jan 2026 23:02:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Z4wmsdPY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qDJW00s3"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 301812D8391;
-	Tue,  6 Jan 2026 22:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA414126C02
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 23:02:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767740392; cv=none; b=uqPcxpzWjuF65HSwCmQ0VOGy1r6D6+6Uv+QYa8UwXwWPUxX37RzaOhjs+/bpgXFKZW2xxV3IzLppfPozqaUS/1o5xb0lOC9UalEqjickA1eGsNrtiTp3ojO4Hjj74zHrP1TRRu+r3elKdLD8qoxvYCOYke6PXXaiy4dZOWNJnQE=
+	t=1767740535; cv=none; b=Y8vxNjpd5QRodoPij8ZfIjsxurIncUoZJqjTVyg/ji6OXLHqsuSxuBUcwcgIe4260dZJx0zlwf70/QSBl2mm0gz8CzArYtzqaOBAi5K19df51FnKV7k+ta7bhe94Mc6xODzsnFGsynM34WJLi4rrZUOmXz4ktiIEABAVz7ibnnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767740392; c=relaxed/simple;
-	bh=U1H58QHhYdfGZ/Cu86pwVcLw4VPdnqlWJEDMxCAsft4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OLsP27luQ/1ZeoTpufNTJSPfIfG5lXaYxBeciaOAInh0RKixdxs6v4XwCOHzjfG2sqnVLwblXG7D9JLJps4xTFZSiRzx8/O9tLmyFwaLASRqvompc/Up6XZqzCpmGkJyqIlo1TrP1aCpbxW3arOmB+QXNklDZllI86y/s8jUABs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Z4wmsdPY; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1204)
-	id AEACF2016FF9; Tue,  6 Jan 2026 14:59:50 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com AEACF2016FF9
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1767740390;
-	bh=THRVLoMZK7f2n4jbmsl/5riM7a1XGnPXbfvmvkCgp/Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z4wmsdPYMuj158pKn2D+GiXE0xpuI81rmoG3Lhuz15PJTyGn3hnAGw+BS2iRUvGJn
-	 ARWEDLYY9A4cz75hS/WT6UfddNNDKAza/igvC6MprCvw+xixTb/1jE94l74rchmZ+c
-	 U2aOgkbHUTf3JGbpt81PvdPD++h9NYyIFRVncnuI=
-Date: Tue, 6 Jan 2026 14:59:50 -0800
-From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
-	kotaranov@microsoft.com, horms@kernel.org,
-	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	dipayanroy@microsoft.com
-Subject: Re: [PATCH net-next, v6] net: mana: Implement ndo_tx_timeout and
- serialize queue resets per port.
-Message-ID: <20260106225950.GA11626@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20260103045705.GA3757@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <20260105173056.7c2c9d0a@kernel.org>
+	s=arc-20240116; t=1767740535; c=relaxed/simple;
+	bh=5LUs+6G8z+ZR20ZNfLVBfY6bcs4XjEBEeR9iiVww/78=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=p84LYg62ezNKjmFOmadvdYeMJxlTdWIpRpIFfWCNLbUqqu4WF0rjeRnfpy1iAMrKToRrLUfazeqn0kNsxd4fk15HTLgQgBGo1WUZ/zMNo1gV8JNQjUMiz0aZY/eFcjxeN6JszewZcW1wKVIQfHavUsOfdxfeho5BI+N7vSTcV6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qDJW00s3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2956C116C6;
+	Tue,  6 Jan 2026 23:02:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767740534;
+	bh=5LUs+6G8z+ZR20ZNfLVBfY6bcs4XjEBEeR9iiVww/78=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qDJW00s3nxJpZl3Rylte3NSOyAiLQJX/9uOMdjR6P7JaKNARUr/h2QvtinsqmK3TS
+	 kBIoVtaybYiEd3T37crTTF7ESBYi93zBxC2CrisoZfMfOlvIc1SExsl4aeWtM5K1Or
+	 KXQ0u78+msGNu457CJ9eq7UEAkofPhC5lVB07By7gMR4/0A+NsYNg67R+AYoRRtkEv
+	 wKoQtr5Edh5jLueumnEiWD0biQmXtL0BdSkSlnP8V0QNBjE+SxWU7M2JZzi9Pfp7JX
+	 VIEvD04i7uPQv0OCmRYULEauz7aLZ9UHgzrbexOK+QGkp0J0vJzgSbq+w5UcyDy2b7
+	 Ge38nWENm7n1g==
+Date: Tue, 6 Jan 2026 15:02:13 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mahdi Faramarzpour <mahdifrmx@gmail.com>
+Cc: netdev@vger.kernel.org, willemdebruijn.kernel@gmail.com,
+ davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org
+Subject: Re: [PATCH net-next] udp: add drop count for packets in
+ udp_prod_queue
+Message-ID: <20260106150213.18d064c5@kernel.org>
+In-Reply-To: <CA+KdSGN4uLo3kp1kN0TPCUt-Ak59k_Hr0w3tNtE106ybUFi2-Q@mail.gmail.com>
+References: <20260105114732.140719-1-mahdifrmx@gmail.com>
+	<20260105175406.3bd4f862@kernel.org>
+	<CA+KdSGN4uLo3kp1kN0TPCUt-Ak59k_Hr0w3tNtE106ybUFi2-Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260105173056.7c2c9d0a@kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 05, 2026 at 05:30:56PM -0800, Jakub Kicinski wrote:
-> On Fri, 2 Jan 2026 20:57:05 -0800 Dipayaan Roy wrote:
-> > +		apc = netdev_priv(ndev);
-> > +		disable_work_sync(&apc->queue_reset_work.work);
-> 
-> AI code review points out:
-> 
->   In mana_remove(), disable_work_sync() is called for each port's
->   queue_reset_work. However, when resuming=true, mana_probe() creates a new
->   workqueue but does not call mana_probe_port() (which contains INIT_WORK),
->   and there is no enable_work() call for queue_reset_work in the resume path.
-> 
->   The existing link_change_work handles this correctly: it is disabled in
->   mana_remove() and re-enabled with enable_work(&ac->link_change_work) in
->   mana_probe() when resuming=true.
-> 
->   Should enable_work(&apc->queue_reset_work.work) be called for each port in
->   the resuming path of mana_probe(), similar to how link_change_work is
->   handled? Otherwise TX timeout recovery appears to remain disabled after a
->   suspend/resume cycle.
-> -- 
-> pw-bot: cr
+On Tue, 6 Jan 2026 09:41:04 +0330 Mahdi Faramarzpour wrote:
+> > You must not submit more than one version of a patch within a 24h
+> > period.  
+> Hi Jakub and sorry for the noise, didn't know that. Is there any way to check
+> my patch against all patchwork checks ,specially the AI-reviewer
+> before submitting it?
 
-Thanks Jakub for pointing this out. I will send out a new version.
-
-Regards
-Dipayaan Roy
+Unfortunately we don't have sufficient funds to open up the access to
+AI reviews. But we are just using the public review prompts from Chris
+Mason https://lwn.net/Articles/1041694/ so if you have Gemini / Claude
+etc. access you can run them "locally".
 
