@@ -1,126 +1,104 @@
-Return-Path: <netdev+bounces-247339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5DF1CF7E22
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 11:52:00 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79AE0CF7D1A
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 11:37:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8DDFF3047DAE
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 10:51:45 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 146913021A6F
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 10:37:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0A2633AD90;
-	Tue,  6 Jan 2026 10:28:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 009DE34106A;
+	Tue,  6 Jan 2026 10:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GXIs3TeH"
+	dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b="smQWWFRk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.toke.dk (mail.toke.dk [45.145.95.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93497338F35
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 10:28:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E69340287
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 10:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.95.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767695312; cv=none; b=HE5MlfwV659rHRCZ88jqs1AM116vK7DKqS2eI6e0h+znrEzhyCp5uJhcIVYG+H53THS9ey9KHcE2md1iuCAdTNwP8YRjZ+Q2PbDT4rY9BQJAC/ZJmNo1ui3YDgeBHymEysmel790GU2++k8YR38ESyJ1Zw9rSpd0NsHwlEccChg=
+	t=1767695430; cv=none; b=Yr7wA4EJU4To83igzZvLgYaYlmEkBR3GmweN5wYYgZ0eklQD445vbV1mGsBsFiWAht/EwWQfhqtic79HkOwMRTOZ6CEFGaHAZROUoyXTHJ+gAxAFXD/BiTEfzDmFHJYwAl8NhGBr8eZJPXRFywj7mRjaaNwztkK1X9f3R4DWDJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767695312; c=relaxed/simple;
-	bh=nEu4WOz+vtpJU2TGs6EPbQkaMhnf0O8StNk988KhUnE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jCpO64bq8Datbf1Owy1CZ4IHfw5X6moOTskO235W3dQVS/qHdKZZDrrsB3FHLq2M01P6B56YUscgBhoFd77iFtt1Xhgojro2MMMcPjIuVtpeyDwCFybodrbsSFeIYWarcjyMUyzyzK/0V226TnGq5YY5UNhlNF1fUIVqdhHDoH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GXIs3TeH; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-64b9dfc146fso1392752a12.0
-        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 02:28:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767695309; x=1768300109; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=BAJkKuJpYWdtj8kvDzq7kj79D0dSrUm44Ey46PsxwVE=;
-        b=GXIs3TeHA8VrIpHmJG5jEUs57YX2R0imV5kGC02WUZV72JYuotVdUmXv7dSYnJW1M5
-         Rq17KQ/uBevK1F3UUKQSDmkOtrH5lSY7E2WlP3QLHD+RyxY2kGp9RUT2rVJJtbNJXOq6
-         MAlBS0orPUmhO8AUV69LO3KydnH1kwkjovd+3/Uok13OjLNLnEv5m/lr5d4M7IBhsqe3
-         hn0no5ZCGLvXPnIOgo1pTWDfCwip6pSv8F7DErEdvK34l7wgMrLstvf1wXeLOeuVh16f
-         K6aN35IGgvCKgBiGZobavl5+2lHz+GIhcAHB+RKMsYehhgUDs+QAuHfDluPsfVZSfblG
-         F6Dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767695309; x=1768300109;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BAJkKuJpYWdtj8kvDzq7kj79D0dSrUm44Ey46PsxwVE=;
-        b=DtED79YM9PX7TEy9Rg9sKIeXZSIkrODRe9ZlZwmZGJ6YQyYbWN5wc9JC4GEck/5dkJ
-         9qj9QGaz3c6akk45YRUdz/n8CbCa86rme09chj4ZM3uvskib+8Yc2KwYLYzn33sRGk4g
-         eETceDIawIz7AYckCSOpInYYrsP+bUQbWjXvUvEZ1/1xLOobiC9XlczjQo8snW/5Yghe
-         JgUgrnM+vZpIZcyCgSiOjA8j4SagF2X/kqkNCy3gs6yBb1/ylBVL2EFrXH4XFsOBzfLs
-         aRSbzsKNkPaN/ZH2fEiIfhXT1146S6fjt23V7fVxuIu/fu9ckLdGzn4NkhptRSaqesS3
-         HH3w==
-X-Gm-Message-State: AOJu0YzXc1f8TAKDw79V2bbz2BcBre8Tk88OZlU17qaT/7Q0CIgDeM43
-	WLmWgY2hZ5F//OOdfwqM3Icdpv+8Kzz1QNIvsTIJC0XdTz/mdcLi0XsPtPnKLeArLSGTXgHd7Zq
-	+eb4v9pGGGvuYFWRvr+NSXDwg0HICYz0=
-X-Gm-Gg: AY/fxX4Jqzo69jyDgApraD/8lFGhpsLAef5aM4SHn1714dOA0bN0OxgW0ZwB2v4vt3O
-	IlumpZkqvXlnqJoAvAA0VJJ2vCbJOTXpfuP0XvFgxq0XDrFdDq6wpCpzI0s6MhRJcLz+EKwGN+D
-	RqkHRDcyVvLNON8bGGyYDCQPrIRmpjCju4Mb2LqhE10aEfG0Fx6H2uV2NzWsfy5H1MfhkWm+2Vd
-	2SXeQGxYV8WMvi6ce+g63HsT1MCluqkU501KUgnXG7wVI7J+VONY4gnS9hWp2EKSCOMEOHDm0rv
-	ZtQJrsU6m0krldo3FB12O7nSMZA=
-X-Google-Smtp-Source: AGHT+IE596N+CStEx+ymFl4KP/IAg7DPwvIzsQgEPdelrrDg73nHTs58Enhoj6GXrimF8vBvgCjK+cC8m257+3fVL7o=
-X-Received: by 2002:aa7:c343:0:b0:64b:a52b:fa1b with SMTP id
- 4fb4d7f45d1cf-6507bc60919mr1656343a12.6.1767695308725; Tue, 06 Jan 2026
- 02:28:28 -0800 (PST)
+	s=arc-20240116; t=1767695430; c=relaxed/simple;
+	bh=uqx4UNio5IZHh0domM8JuvlnEo/PhdnFDKl+/fCu09A=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=a4TIXVjydTeq6nPHzFui0Hyro2z/1+RxG2fBlrDUg7jKgkc4gJh9XOHu+IAOGH7+G7eAlAmuVg1WMRd9u1NwSnhKBfR8oDOcqSBkmIGD1O0+qVAKUnlgv7JgYDjWnyqr8QzaFm2adIdXNcm7ymimU7efwxOGctK+0avw9gzF72s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk; spf=pass smtp.mailfrom=toke.dk; dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b=smQWWFRk; arc=none smtp.client-ip=45.145.95.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toke.dk
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=toke.dk; s=20161023;
+	t=1767695424; bh=uqx4UNio5IZHh0domM8JuvlnEo/PhdnFDKl+/fCu09A=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=smQWWFRkFDf0Yzu3ZSqtvimCM8d5274H0RdCyWUTgtRYG3s7HC60EziqBPvGRILfo
+	 tmSP3ZqsPqrNeBQj9jRLdparj6mUkD66dmNE0CsRM8ylbOYWtxhLT+n7f/eTMoHJgT
+	 DduSqs4LG02I8/ZV+ctmKj8vJZ4hG/AE551e44VyHaK/A4nudxX/ikjQMxNOrzuFMX
+	 J385VqHdTUFoL6Cz9EjbQKcsZlbMwXp4la/2ESaljJ1SPYN/K1KW2omV4gPDo82GWC
+	 u7oMVzCC/M42w1BGzG0Ri1yDqOEAftkGmxquO+bnvsb3KupWXUvrH2qJ+aQUdaMAZr
+	 qpGbi7+lSxLuQ==
+To: Victor Nogueira <victor@mojatatu.com>, Jamal Hadi Salim
+ <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
+ <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: Jonas =?utf-8?Q?K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>,
+ cake@lists.bufferbloat.net,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v5 6/6] selftests/tc-testing: add selftests for
+ cake_mq qdisc
+In-Reply-To: <04a4cfc3-ca15-49cf-89c1-17a4bc374caa@mojatatu.com>
+References: <20260105-mq-cake-sub-qdisc-v5-0-8a99b9db05e6@redhat.com>
+ <20260105-mq-cake-sub-qdisc-v5-6-8a99b9db05e6@redhat.com>
+ <04a4cfc3-ca15-49cf-89c1-17a4bc374caa@mojatatu.com>
+Date: Tue, 06 Jan 2026 11:30:23 +0100
+X-Clacks-Overhead: GNU Terry Pratchett
+Message-ID: <875x9f58zk.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260102180530.1559514-1-viswanathiyyappan@gmail.com> <20260102180530.1559514-2-viswanathiyyappan@gmail.com>
-In-Reply-To: <20260102180530.1559514-2-viswanathiyyappan@gmail.com>
-From: I Viswanath <viswanathiyyappan@gmail.com>
-Date: Tue, 6 Jan 2026 15:58:16 +0530
-X-Gm-Features: AQt7F2qFv-ofQsHt7p0xfCLNT_q5NACm8CoTMw_f6VL8XWeKj3K9Y8M7vOIoYlU
-Message-ID: <CAPrAcgNR+=GS0RxH_UP1Hz3U-HJL3_ZdGoy=hqkdS=iXL8zF8w@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 1/2] net: refactor set_rx_mode into snapshot
- and deferred I/O
-To: edumazet@google.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com, 
-	jasowang@redhat.com, xuanzhuo@linux.alibaba.com
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> +static void netif_free_cleanup_work(struct net_device *dev)
-> +{
-> +       if (!dev->cleanup_work)
-> +               return;
-> +
-> +       cancel_work_sync(&dev->cleanup_work->work);
-> +       kfree(dev->cleanup_work);
-> +       dev->cleanup_work = NULL;
-> +}
-> +
-> @@ -1682,6 +1882,16 @@ static int __dev_open(struct net_device *dev, struct netlink_ext_ack *extack)
->         if (!ret && ops->ndo_open)
->                 ret = ops->ndo_open(dev);
+Victor Nogueira <victor@mojatatu.com> writes:
+
+> On 05/01/2026 09:50, Toke H=C3=83=C2=B8iland-J=C3=83=C2=B8rgensen wrote:
+>> From: Jonas K=C3=B6ppeler <j.koeppeler@tu-berlin.de>
+>> [...]
+>> Test 18e0: Fail to install CAKE_MQ on single queue device
+>>  [...]
+>> +    {
+>> +        "id": "18e0",
+>> +        "name": "Fail to install CAKE_MQ on single queue device",
+>> +        "category": [
+>> +            "qdisc",
+>> +            "cake_mq"
+>> +        ],
+>> +        "plugins": {
+>> +            "requires": "nsPlugin"
+>> +        },
+>> +        "setup": [
+>> +            "echo \"1 1 1\" > /sys/bus/netdevsim/new_device"
+>> +        ],
+>> +        "cmdUnderTest": "$TC qdisc add dev $ETH handle 1: root cake_mq",
+>> +        "expExitCode": "2",
+>> +        "verifyCmd": "$TC qdisc show dev $ETH",
+>> +        "matchPattern": "qdisc (cake_mq 1: root|cake 0: parent 1:[1-4])=
+ bandwidth unlimited diffserv3 triple-isolate nonat nowash no-ack-filter sp=
+lit-gso rtt 100ms raw overhead 0 ",
+>> +        "matchCount": "0",
+>> +        "teardown": []
 >
-> +       if (!ret && dev->needs_cleanup_work) {
-> +               if (!dev->cleanup_work)
-> +                       ret = netif_alloc_cleanup_work(dev);
-> +               else
-> +                       cancel_work_sync(&dev->cleanup_work->work);
-> +       }
-> +
-> +       if (!ret && ops->ndo_write_rx_mode)
-> +               ret = netif_alloc_rx_mode_ctx(dev);
-> +
->         netpoll_poll_enable(dev);
+> Hi!
+>
+> This test is missing the device deletion on the teardown stage.
 
-This is the response to the AI review. Honestly impressed by how good
-the AI review is
+Ah, oops; will fix and respin, thanks for catching this!
 
-My bad, It should be flush_work() not cancel_work_sync() in
-__dev_open() and also in
-netif_free_cleanup_work(). These are the only places where execution
-needs to wait
-for completion of the cleanup work
-
-It's ok to just cancel rx_mode work so this issue is only with the cleanup work
+-Toke
 
