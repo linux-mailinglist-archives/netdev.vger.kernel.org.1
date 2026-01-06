@@ -1,117 +1,116 @@
-Return-Path: <netdev+bounces-247356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE2BACF84A7
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 13:22:12 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31024CF84E2
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 13:24:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DD5273019E36
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 12:21:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 255973016657
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 12:24:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85AC42F1FE2;
-	Tue,  6 Jan 2026 12:21:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9A4530FC2A;
+	Tue,  6 Jan 2026 12:24:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XxIX/Uc6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a2E8Nvme"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A7714C81;
-	Tue,  6 Jan 2026 12:21:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55EFC329E60
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 12:24:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767702099; cv=none; b=qG+lXnY7dRA9httSw2891+hwsOtmLJJv6ifDvPL9hoYgVyvUfSOlSbj3qXFGLYap7GbdD+1/Z/maZOvngXa9nQybzvrkM3quQtDERY+MrI3B1RYQy/OFI1MXw7xMGT4cghfJciyxeIVELvBlv8xH2G4yKBINn/WRo4DgxTjOc28=
+	t=1767702264; cv=none; b=X+Hy3rte46iZGbkDYdYlip2fUtx8u+ZBKzavcrlqeR6TQE5P9ZLaVxK/8dr6SkWo3BmxmIifm0pzp/fUt8SsX0NxAvMH/otsRdV+E7aefyNXrKj6OlvG3kBCbHrz1gtt1palkpCMB5JjXdLkLgArytHmfK7n+OasWuzAFM1S/AQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767702099; c=relaxed/simple;
-	bh=zKoDQhppgeJZ9g12tU8EVyMA0qPWRL9mN42OuCpgg2o=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=iVPXsc+CJoh9r+1NjpphV0KlTEQGJzUwPngwxqBR61OaMDRZsjAiad9U9qNePaL3pA1tYGPpkAitUr221YDv4vC+GQt8a5yf3J7GAbkplLx3+QLtHYItSTfKrog86wRFUQFLT/5SPmukJRbPUNy9q3y6G5WKC8Lp3GqC1nHcMnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XxIX/Uc6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67B30C116C6;
-	Tue,  6 Jan 2026 12:21:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767702099;
-	bh=zKoDQhppgeJZ9g12tU8EVyMA0qPWRL9mN42OuCpgg2o=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=XxIX/Uc67pW2srZGfx7L0M+e9v4WJplWlh+0kQ17cQgE3TXo+brUPnDmZLyRtoSUt
-	 NS+uIwMPQZ70cpM6y22JW6jE/dRqSDBuoaKh3TDd4eQ4IT4Jx15VdWTziP2iWd7hyT
-	 8OX2eLY4it+aWALZe6uARyvIyLy21rDK0Ye78wOqq/EzQrYHKYcMeEdEu4Z4w+nezL
-	 tzp4dBFmmOQZQbNRn7ffWbWe0RozvMjSW0zRQdrMreHOK30MtxQyiBnLFJ206BIfbe
-	 8CnAyOGc9R4FmPtyuFsNwRGbSDB0oM4sgN4C+vBUFcob0xOC+hjUtYbCLlYNR7KL28
-	 4JA9Jx+fmQb/A==
-From: Mark Brown <broonie@kernel.org>
-To: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
- nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, 
- claudiu.beznea@tuxon.dev, herbert@gondor.apana.org.au, davem@davemloft.net, 
- vkoul@kernel.org, andi.shyti@kernel.org, lee@kernel.org, 
- andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org, 
- pabeni@redhat.com, linusw@kernel.org, Steen.Hegelund@microchip.com, 
- daniel.machon@microchip.com, UNGLinuxDriver@microchip.com, 
- olivia@selenic.com, radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com, 
- gregkh@linuxfoundation.org, jirislaby@kernel.org, 
- lars.povlsen@microchip.com, devicetree@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
- linux-i2c@vger.kernel.org, netdev@vger.kernel.org, 
- linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org, 
- linux-serial@vger.kernel.org, linux-usb@vger.kernel.org, 
- Robert Marko <robert.marko@sartura.hr>
-Cc: luka.perkov@sartura.hr
-In-Reply-To: <20251229184004.571837-1-robert.marko@sartura.hr>
-References: <20251229184004.571837-1-robert.marko@sartura.hr>
-Subject: Re: (subset) [PATCH v4 00/15] Add support for Microchip LAN969x
-Message-Id: <176770209215.32810.211066871008391751.b4-ty@kernel.org>
-Date: Tue, 06 Jan 2026 12:21:32 +0000
+	s=arc-20240116; t=1767702264; c=relaxed/simple;
+	bh=JlzqUYVrnaHz2InO4ctyOyg/bXoPXsr+fDkAXeijmog=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RTpLoqvESqfYeNtqujyCHiH5uu1KapFrLZxshC1tyAbHgsIsoMqco0adwobnuypSAriII83oq+fvQmEwtpuogUKW70H+V/MUUdYp1WK503fMzT2T/WAKkBTrJgBQyPSMqZd1qMSJNMeHCApJrLJgVejmtKZR4mGdPhxwkkfWgSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a2E8Nvme; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-c13771b2cf9so750601a12.1
+        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 04:24:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767702262; x=1768307062; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kB/rXxT1WWg4PHV4NRzo/SLXv+EVmzodXTSgH+OphrE=;
+        b=a2E8Nvme9EpBL9ubeLjcOqxVi497ZlEPxxihYRbtcWv6EeQ6NR28teVjsbzApUVWp2
+         NGIdw3mPn9ONrn2NN/cTxTX49RXECuDWnHIWbVi5vWisJe953CJzcIoFp19qq5Cu8iDQ
+         IVlAO/C35FV5XHhvxFpyu6YbFdcpqezeUAdQOEqCtcWv7HvLNVrTzpXNsMYdi7gMjsnK
+         2tqv0hbEIJYrdjPu4HJGfvjufkfXDw7DS0VcjHvIeQqyYKzjnlAoL4IBJdhV3TGb2jcw
+         BYIEiO68BROb1vK1wLDltHW4xs09cTpPUfzEudnSS+XFkokQqu4kow6GN8oA26WCI2Y7
+         XI0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767702262; x=1768307062;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kB/rXxT1WWg4PHV4NRzo/SLXv+EVmzodXTSgH+OphrE=;
+        b=S4IaBsKka8om5a5Hu4Ps/jCVRzk2EGjoaTaAy+rtJTz8YL0qUZKXolHyJWUeiWf6qV
+         khQ90k6lep9LYBE9/pFao64KxlpH3j8jhYhKn6YRP/31uEG5pVBVF8t4LmniY6yMNJiq
+         CXVdZoDy5ay+nDohKWaZhDAJJVNCO4v52RSuQDmGOV0VwvK6CAmqhb/BzBOiQl4edPJz
+         iQva2WLL+bqVhHCgP8UrhUmVpPQj2RHQSOqvMp2eIReTTsg3DpPraed1MsJpxY3y6N+p
+         oBpP/b/Lq7zXjeUGTTEikoYm1bcT9oo+cKgJTD28Wcns7bskxhh83YZsVvDeIc0s6Mb1
+         4sUQ==
+X-Gm-Message-State: AOJu0YyK1hgZyZFMbX6XQlqbAoBasInaa3GWhniAfxnz56uLJksPkcrF
+	YG+1mWEu8JkAoq8nbPqLSTp4fekuH2G1NBiKR5fGNjAfng7XTukDDFWo
+X-Gm-Gg: AY/fxX5m7iO/FyW7Fx01EAhY+w/RZHPgI0PUuqBOMtpLYK6BSFmRCuYkRyyT7RxZyXk
+	IIwoRrSWHyqCU/T2n/htR7UEAWC1Orr6yKXook5kRUT5b6+bzO0VVlo60DNoOSDHGO4vXARznrp
+	Metnp4Sv8FYSqojMHUgvh9hRsDtfmcaCJx0huiSaYqk9z06UCvaIkALqYpSc882l3ZCmRo24+TE
+	+e4ktgFcDB3Fgn3mL8S6eHXMJSsHbMW1t+KY5HETIoWQxkIhZ4BUCLplSQtpQqGgNNPHVRreVpz
+	bv9GHtCjGKv9rbaZcQ5jrxAc+7t1jXS+oR8F+9ergYOR7MIOW+ejAVvpXLp9dPk6MHXvhp4WIP9
+	qKiSwD+AP6IXL4WY0v47GmZIgqXLA8Qn+kO5/Er8tH/heCFT2KmjhWH6KqyxS40/C7XVPAv+m3D
+	6GNwmyHNhr
+X-Google-Smtp-Source: AGHT+IE5qO/QJl5wEvjvpnvEPFTM4kWVtH2dV4GxlRkpfZ5jyYcH8cKefSIihAbFLcNxTEcNkVxuOw==
+X-Received: by 2002:a05:6a21:33a0:b0:364:13c3:3dd0 with SMTP id adf61e73a8af0-38982334d2fmr2587649637.36.1767702262563;
+        Tue, 06 Jan 2026 04:24:22 -0800 (PST)
+Received: from mythos-cloud ([61.82.116.93])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c4cbfe1ca23sm2311982a12.12.2026.01.06.04.24.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Jan 2026 04:24:22 -0800 (PST)
+From: Yeounsu Moon <yyyynoom@gmail.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yeounsu Moon <yyyynoom@gmail.com>
+Subject: [PATCH net-next] net: dlink: count tx_dropped when dropping skb on link down
+Date: Tue,  6 Jan 2026 21:23:51 +0900
+Message-ID: <20260106122350.21532-2-yyyynoom@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15-dev-47773
+Content-Transfer-Encoding: 8bit
 
-On Mon, 29 Dec 2025 19:37:41 +0100, Robert Marko wrote:
-> This series adds support for the Microchip LAN969x switch SoC family.
-> 
-> Series is a bit long since after discussions in previous versions, it was
-> recommended[1][2] to add SoC specific compatibles for device nodes so it
-> includes the required bindings updates.
-> 
-> [1] https://lore.kernel.org/all/20251203-splendor-cubbyhole-eda2d6982b46@spud/
-> [2] https://lore.kernel.org/all/173412c8-c2fb-4c38-8de7-5b1c2eebdbf9@microchip.com/
-> [3] https://lore.kernel.org/all/20251203-duly-leotard-86b83bd840c6@spud/
-> [4] https://lore.kernel.org/all/756ead5d-8c9b-480d-8ae5-71667575ab7c@kernel.org/
-> 
-> [...]
+Increment tx_dropped when dropping the skb due to link down.
 
-Applied to
+Tested-on: D-Link DGE-550T Rev-A3
+Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
+---
+ drivers/net/ethernet/dlink/dl2k.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/spi.git for-next
-
-Thanks!
-
-[04/15] dt-bindings: spi: at91: add microchip,lan9691-spi
-        commit: 96d337436fe0921177a6090aeb5bb214753654fc
-
-All being well this means that it will be integrated into the linux-next
-tree (usually sometime in the next 24 hours) and sent to Linus during
-the next merge window (or sooner if it is a bug fix), however if
-problems are discovered then the patch may be dropped or reverted.
-
-You may get further e-mails resulting from automated or manual testing
-and review of the tree, please engage with people reporting problems and
-send followup patches addressing any issues that are reported if needed.
-
-If any updates are required or you are submitting further changes they
-should be sent as incremental updates against current git, existing
-patches will not be replaced.
-
-Please add any relevant lists and maintainers to the CCs when replying
-to this mail.
-
-Thanks,
-Mark
+diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
+index 846d58c769ea..edc6cd64ac56 100644
+--- a/drivers/net/ethernet/dlink/dl2k.c
++++ b/drivers/net/ethernet/dlink/dl2k.c
+@@ -733,6 +733,7 @@ start_xmit (struct sk_buff *skb, struct net_device *dev)
+ 	u64 tfc_vlan_tag = 0;
+ 
+ 	if (np->link_status == 0) {	/* Link Down */
++		dev->stats.tx_dropped++;
+ 		dev_kfree_skb_any(skb);
+ 		return NETDEV_TX_OK;
+ 	}
+-- 
+2.52.0
 
 
