@@ -1,273 +1,155 @@
-Return-Path: <netdev+bounces-247369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5B2ACF8D32
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 15:41:54 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF825CF8D6A
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 15:45:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D5537300EA2A
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 14:41:53 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3D7E030069A9
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 14:45:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A528E312825;
-	Tue,  6 Jan 2026 14:41:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2AE7322A2E;
+	Tue,  6 Jan 2026 14:45:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D4D6onWl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1sq18a39"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4D5311C33
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 14:41:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767710512; cv=fail; b=hyy8bkljMTxdc0ykvQueq0Barb2faJEl0YBYFxqDUIbZXsPgVL5TeS1/XQ4WcJ7pT08Xg6WDa38JflP8ALCgtNoAZuOulpUuxLC9EE+bKbFuu6ByztbnCl9DKgNtEtTYsd2cOPUe5aBmcMhgNnFJkadSsAdmevrloUVTgvK3NJI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767710512; c=relaxed/simple;
-	bh=jk42+nssCHtSkMA4VvV4gZ8WnldLbDcJ/Lvw3WCTug0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=qtpjhVRia3IV1OxD7dZLk2J0Fb/hDe46rhLBiarSJbJn9EXy22FRaxJOwP5mhgLwBO9Fo8vTumZeWvsF/JSwcI/PuzYWpBCbuqil5hV6Rxj6NUg75/gikjsuiIndVYgWtjp9iMVGigxHGyseKAWk6naSHNAOFQUxJ4tFkCG1snU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D4D6onWl; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767710510; x=1799246510;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=jk42+nssCHtSkMA4VvV4gZ8WnldLbDcJ/Lvw3WCTug0=;
-  b=D4D6onWlgUAo4Cr6oSohtMNU18O469GbDY+YuzTLaKDOSGuFKb5miV95
-   qOeKMSdqswhlQj7qXBtYUB0LQwtYo2KQXrY7FN0goW3s1E+xEroM/K9DV
-   MJV/W/UEnflgwSQxeFqSNieFf4Ul7Id0PFHpcEi0PdTdqluNE9VFCHoNt
-   GpRtB6S5CQBKeIlLhkaOKWOSXz3fZytDRgH6ov4RsMP7lTltx8w97uceF
-   FwEKOytJSTZHpHM/nWcrN++fBUAxInyHpx/SjvpO+xlmGf3T9tQ9PW3vI
-   uzy3ubzKd7cfoVOPZ/6cWfUcltWd9iz9pFprM7+EtmHiuZP3GLfB9QU4Z
-   g==;
-X-CSE-ConnectionGUID: KlxTkg/1RxmLDIvBbvVfUQ==
-X-CSE-MsgGUID: 04zy64kiQPaHSDbIKpbJpQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11663"; a="72933316"
-X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
-   d="scan'208";a="72933316"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 06:41:49 -0800
-X-CSE-ConnectionGUID: eryDBHloTZ6yTcuUIRsQuw==
-X-CSE-MsgGUID: bq0XLabsR+aBACCCNb5YNg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,204,1763452800"; 
-   d="scan'208";a="202443004"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 06:41:49 -0800
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Tue, 6 Jan 2026 06:41:49 -0800
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Tue, 6 Jan 2026 06:41:49 -0800
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.5) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Tue, 6 Jan 2026 06:41:48 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TiULrNPtN8SZJ3k85EwK9s5Bgl9x+hR1G6ksrws0vEyL0E2EMK6G+KQ6+QoV3es74T3IdQAIspcCsDB33v2F0CtUuBWnniE5akHYAg04ApoNizxzfV6LBj1+zyWs6tDfYzbubnqf24xN9gSG6MQ7CnowvQIGVknaaTJKwRJHFDs7Q8319/QnS0TgvrwkGJ1RM9TYbu4otbzhw93ppqEnzwCTrlp3rsSMn5PFqpLHxkcWN3yYOwz+qj1+ImPHSe5bg+Exm2gMIKIJAi3E0KXI6VAAv6dpUfKaT+GzMlBJxduXgON1499/ICZ511Aco7Jz7Ym7+hxrt4amaWFUkvGMiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dKskHICDh8aUeWjBoYjuAhzy1MxbjY92y04Ol56nmOI=;
- b=wGUPFhEPpF8a0YW3h0PgD4O6emZ0XCLp9aRioah6GMDP78W8Ra1TMLCuk3IJxBlOUHqi8JRlGsb8MCDbduvLJHJ+D8bjGKEgvdpqO/c//NYQhbI0u6kuqJRuBeDuKYg7+1EOLsF/X1pjqmIcYLApZJAJR+Lvwz07Px+8txGVGYTyJx2uoASu2yTnTrRE9C9uRXS6lRMg5tInhmjnM8ACqrbeNkxlPWyvTcS5BhG+ZYYyI+/fXRStA/IXq5ZuE+9Vqo8BohrSbC+zO0N0uALMR1ghFQ6bJaaSA7Wn8FiIwUfKEYus3qJ6B2It/ghEi9K5A4MWnJB8jWu7LBf4DUwYcg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5556.namprd11.prod.outlook.com (2603:10b6:208:314::14)
- by DM3PPFA4B6D88E3.namprd11.prod.outlook.com (2603:10b6:f:fc00::f41) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.2; Tue, 6 Jan
- 2026 14:41:45 +0000
-Received: from BL1PR11MB5556.namprd11.prod.outlook.com
- ([fe80::4124:870:2b43:4467]) by BL1PR11MB5556.namprd11.prod.outlook.com
- ([fe80::4124:870:2b43:4467%6]) with mapi id 15.20.9478.004; Tue, 6 Jan 2026
- 14:41:45 +0000
-From: "Kamakshi, NelloreX" <nellorex.kamakshi@intel.com>
-To: "intel-wired-lan-bounces@osuosl.org" <intel-wired-lan-bounces@osuosl.org>
-CC: "pmenzel@molgen.mpg.de" <pmenzel@molgen.mpg.de>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Lobakin, Aleksander"
-	<aleksander.lobakin@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "kuba@kernel.org" <kuba@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "alok.a.tiwarilinux@gmail.com"
-	<alok.a.tiwarilinux@gmail.com>, "alok.a.tiwari@oracle.com"
-	<alok.a.tiwari@oracle.com>
-Subject: [Intel-wired-lan] [PATCH v2 net] i40e: fix src IP mask checks and
- memcpy argument names in cloud filter
-Thread-Topic: [Intel-wired-lan] [PATCH v2 net] i40e: fix src IP mask checks
- and memcpy argument names in cloud filter
-Thread-Index: AQHcUnY3aRyFcNinEUyQ9XIrRVbhYbVFTSoQgAADDAA=
-Date: Tue, 6 Jan 2026 14:41:45 +0000
-Message-ID: <BL1PR11MB555670AA62929815A84BC3D5F587A@BL1PR11MB5556.namprd11.prod.outlook.com>
-References: <20251110191344.278323-1-alok.a.tiwari@oracle.com>
- <PH0PR11MB50139E1973CFB73CFF221FCD9687A@PH0PR11MB5013.namprd11.prod.outlook.com>
-In-Reply-To: <PH0PR11MB50139E1973CFB73CFF221FCD9687A@PH0PR11MB5013.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5556:EE_|DM3PPFA4B6D88E3:EE_
-x-ms-office365-filtering-correlation-id: 583185d0-3d18-4fe5-c895-08de4d31b710
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|7416014|366016|376014|38070700021;
-x-microsoft-antispam-message-info: =?us-ascii?Q?pqnjw5mAjmpbL+OejPIZbjP49IQxnQAHUSOVA656xlV1DNyFXfUInUPyMdrM?=
- =?us-ascii?Q?irZGOkRKB7dm/tzHTL4Uqp1EdFJ5PLbt6bFknzkTWaICrsB2BkWY1tIDdSxL?=
- =?us-ascii?Q?rTB8Sk2SjlSOaXCBk9KJuDYinUMIrhMUsQQfZb1oom1l0iBY9dbMQY1Wlj54?=
- =?us-ascii?Q?LAAvNceK1o5qEIBOy84xVGywU5N8NHWDrbBsymyZdoQvl/RtCoB8zB35IQxB?=
- =?us-ascii?Q?A5IlfV1tZ32xWqJfpL4+0GEO20RsCr+FOJA7+GOhDPRFHxJniIZY6Wfnw0Uz?=
- =?us-ascii?Q?7eXk2ATTc+BTjOWj4TByCCVXRHBSpHU8Zq7pcS6NG5kazv57jhKTxhcZLrPa?=
- =?us-ascii?Q?PSgUd2kz0I9JPNeqSvdE2JkGwrohkPdOKPUimTVC1ZWHNJPAAc2JEEslus+9?=
- =?us-ascii?Q?iGHfN95vDIVVD2gDWYgG2Hq+9zOOxsxNHiGgd0t9sjySH70WbLyrYibsvgHT?=
- =?us-ascii?Q?c+zJa32eQ1v3mD0OFEFrc1Jw/gHtaX5CHsNPA0sHkWqMeSjk9pf9QgoYqf7F?=
- =?us-ascii?Q?sj87w1LLAnO6h04FmegPGSl+2fATsuepEfJRGN5PWXGfNU5AexS2ECmd3RBe?=
- =?us-ascii?Q?T3mntzpUtGcLxK73ZSjAaQ3fi9XriWLO4JoiG85+dOf1uisYZPPqHp7IXMb5?=
- =?us-ascii?Q?VXreD3DUEy5YB0dtZJzG9oXylWJttcR2gnxZz1s9IlVuE2NdP5/tHuxHSNSa?=
- =?us-ascii?Q?ng/LBVcFfio1PPhJBs45Ad/zOqzsXMPl4Q2w1qE3fcYeqk0M+bM7optCu4kf?=
- =?us-ascii?Q?KK0CcqV2ZNHRuNNEPVyGbXMP9Sg3svMAyEAQ0RFQ9euX+tWRDQF7iYzidDUb?=
- =?us-ascii?Q?XmNAIsGVMmhs/IjjAnEZ3BBub1VlFvBgYF5WEYf/g/M2nlTjul3t1w5Iah0u?=
- =?us-ascii?Q?O6/KUzyiIPo3W2NzFSQaLhFjMBwcCnKp9khvQTzlCXwCgTdp9cXvCSaQE9yq?=
- =?us-ascii?Q?yuprv5iz3MOAXbnNZaCAljhkSypTcLyBGD0g6tvsiOzQSUp5oJtuTwX0I+jE?=
- =?us-ascii?Q?SgXeaaSojrGSbqvAoaaUuTUoQrXfEaoweAf/Djt/iGrsSmPi9DPK4GkRHRSc?=
- =?us-ascii?Q?nPcBnHw/m8COnBg7iDvQpF9A9c9E2FLOAF8W9wVcRU9X/vB7Piy923OnK8q2?=
- =?us-ascii?Q?W1lx1pdt95996ZnwgUSg+kPft8CZmvO9rUI6YP4kL2FPLD4MBrL01YOuFKTe?=
- =?us-ascii?Q?wM/aO0rTU5lLFYeGSxTfLtdjXX23C6gjzoAy1RzVVVODEPEh45fAPiXnTQxG?=
- =?us-ascii?Q?5Gyws2H5wRaLle9KC4ayYsYoPsZEmL4doi3DXwdJepoET5Tqgbld6Qp+bg5b?=
- =?us-ascii?Q?n/2L/vNqJYFuabb1pbbHFhD1KVVAnhAZfzP8UNkqFgPW1sneFAKjHsO2xCTb?=
- =?us-ascii?Q?NFwJGbv5z6oQXmfGXU0P1aLnJtCt7qcgs38Eqz+GU1yt6I5GxQfmRsn7TSTZ?=
- =?us-ascii?Q?ZGc+tXx5mZZPTijHYa7sQuL74BYee982OlBAmw7Ohrxj7tg7egjcxp0iBvR3?=
- =?us-ascii?Q?pxL5U2VBfuU9kbxTBkWur8cRI04yb7IMaRLk?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5556.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(366016)(376014)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?gKRhaMyVpQG59IJWwF7QY2IiN1siH0pI21ecO8uRcdTtHVNAVAr5KIjgqpCy?=
- =?us-ascii?Q?Pyh/3SoBLwwIjN8nbx423xI47XYjOwc6JToPz5gdJd7ykT6NRz25KeB7Jwub?=
- =?us-ascii?Q?tRQ9ddlXfhpB+IB1m4LotCwrGzu7T0Jdi7s2qAiwhKf2jt4TDbfLvxlSSGwL?=
- =?us-ascii?Q?5z8nss9byKapcF1SqiwoQaWM+Zz32svmDdwNCWNQtHHpkiOgE1MuCC0oZ78b?=
- =?us-ascii?Q?DTv2QSzK2x7BqIngconmiHSS1+HghJ+DEiJGB8FhSQNtPdgQfRKfv02AeR2a?=
- =?us-ascii?Q?fqm1h6SBIxHhbyddkH/lEsXBt3lofBlvvbCTAYPedrdIQu8iMP3P6yx/a+Vv?=
- =?us-ascii?Q?U5TfWS5SwHSMx+TKxWgLlkkxw1erMni0WWfVQAsXSP/WvMOhXky7LfK6V1Or?=
- =?us-ascii?Q?Af7npFAf5T4p+8WT2Jd2QhWcZCIjjklCYK23ePDlIFUDGnnrMslG0S8xJ3vg?=
- =?us-ascii?Q?uiP9jTYdx4KBxiDZlHRBF6ybyZHs1OF+oBU9C4fxXcUSajiAZTqspuiDOOWM?=
- =?us-ascii?Q?t7R1ohRhYu9zi82Bvs9Q79uzLAIXqhEUQoh0gc7VaHEaDT2CBv8YTC9tte/z?=
- =?us-ascii?Q?FMHJkCIHcxh/WhR97q3FxmvcSaZC0XeIgsWmp6u2SorwAI6JgGOc6MmkD/kT?=
- =?us-ascii?Q?lU1Bo/ndUdgeg1ZferGkFklRwrMAzeUNsd9DxzoSLrlMBVBz54TRpgwstGWq?=
- =?us-ascii?Q?01DI3+OtIIjQ2ynhx0AUBNoUygA/yTj5oSGFTPUv8tUbTDeZmjPcjnqleNDd?=
- =?us-ascii?Q?h8N+ROr5WzZ7AfVjCo9MTVplmAaDRWoeJhd1xWr/tBGY45GEdRA28IlBcMI+?=
- =?us-ascii?Q?4NTyMvWwu6LeMJB/ayDy+VrZZb69bQ3HS1gexioclC10Dstb7Lgy61R4FwI/?=
- =?us-ascii?Q?jXGZTd8wTlVsW2NMd0aJL1SptK9Rr0AtBq1l/I8gcpo/O0421cNfcZwIWWed?=
- =?us-ascii?Q?q7G7ZUaNsf9uVwKeksJWrSB9MjbHAPDV/G4nZWGOsJHNNrVfG7PQ2OWFTLKB?=
- =?us-ascii?Q?V6Ws7vhMraRJdY7zMJP8YAJExprARlSzJ7OMZs8jjXLJQdXZ2EIGbmo7I17i?=
- =?us-ascii?Q?eY3SVTDvVQ6JzgHWaaz3iY3dIM0CBtgI0ZtCaTnBW4kdTGf4ZW1J006RWyW2?=
- =?us-ascii?Q?+lpNkQWkcQb2MHi8kOQEpe0f4OHhg+RHOAFORVDZtUjakbbTP9njkA9aTNmC?=
- =?us-ascii?Q?QDxCyVKfcHaq87fdSo4N6oI64y4agRb9mGssIgqMQEv9zF0YR3Sm/ILJrZlf?=
- =?us-ascii?Q?o5xk9TWHXybviK4At3qiVbqcIoxqxuhDb/Q9r4G//ESVXZ4Ih12IDY4Idunf?=
- =?us-ascii?Q?cwZBcvR6xTZ8QyeA1m0aXGDeu+FUEHUKEWfEtKAdMb5vxJRB+gYKszc1HJo+?=
- =?us-ascii?Q?PRYa6sWckmqjdigk4xWrIQCnKqcRi1Io6emCkj3TlzXlWAGdoxR6IVgAw43Z?=
- =?us-ascii?Q?v0Th6tmul6indR6/BUo8VcuhN9IfJobIgFfhVSCBr7MNvdqm8Yj4uFd3bQiu?=
- =?us-ascii?Q?ts3ymyagOyGVRrYdJIRlEm0440jhEvR99aPBD62er8uxFMJt/rhO5U4vhQGC?=
- =?us-ascii?Q?IwfFMN/EQfMo0z1XwbX9sieRipcxH8EpyqX/Bb8yXEEgScGJPjLQJxWLdb0b?=
- =?us-ascii?Q?4p5tXU1p0NZQwSsVB7bgtd+CRlvYFkDtYPFdRA4yWffm/oBlrpc12LPSKtOn?=
- =?us-ascii?Q?gH/lcMcPMfaNegTFOF8v9PQInptmj/u8XnNOtfhwBy9l4Wq3hbergzHXIZPw?=
- =?us-ascii?Q?PcSxHSLOIw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D4893148A5
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 14:45:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767710738; cv=none; b=Ea+hjALTAQwc2KeFXD56kt0L8ou0VMA4yeNawjNeV/OA4m8f2EP3+RgvPiKJvIYm4jUMI11XRhlKA0kkskB38UJi1oXIvg9lcaVH98ofE3N66G0CYlwvPHmLtyWOvQlOajpZ8Nj5OgBe+iNbe96QLJZ5GeoiGq8Qqzq6p6xLfS8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767710738; c=relaxed/simple;
+	bh=MXcN/pOAJwy4BtUAHs4dbprNtk0vHttBJQ8z8whRQR0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ptswQgua7tVVESQeYHF4ogiX4Xn6fmruStbjwhwHyJxQfnrSRjJULduRB+CPDQNl7CSOOIiRcdsjA6u4OmCiOEHhuLr7fIvuGm6UN8fXsldlfbCFOnnHtw+KSqRrKHrD95VkoeK42uIh5hWtk4lHRQVd3rOclqd3UVk9hJdAetw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1sq18a39; arc=none smtp.client-ip=209.85.219.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-890805821c0so10462396d6.3
+        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 06:45:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767710733; x=1768315533; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=pPpBsNk/345S502djG+Ob/2775ms1T1oODTL8+aqf1U=;
+        b=1sq18a39OXIr8fETWwjfI7f7pYHDlt/nQghLwLryNS33rkAjS9FFO6zMKScdGdFKoR
+         MarIIukAN3vivKxT5IDYSG8SpSHZ04VrXYMylOCsB/tuIP9H6G+5K92+fJ9Vj15NMb2I
+         6Um6z+gqC3Itjt0BNUoRNZNYBdX1QjNwWlLvqECKY5BcuH44aGR6KNb4SaAZWnUrvaiL
+         i9gLXErpt+O5//VJwwPDQiq5wMAu2yl1cmLx80koEiekmo1e+Vte6y3xrOPmofuFI1Hh
+         GO1u9wAyiAvBPTaD55bF4zsdp+S1WYOyX6ngCLtz6ddxx+y+0Jzt5lJUgGiQNuBYCpwv
+         YiuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767710733; x=1768315533;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pPpBsNk/345S502djG+Ob/2775ms1T1oODTL8+aqf1U=;
+        b=PRgp4Hk3ZNTKDgmaESS6GoSNdcRQnOMfE+Uf0rg9Dxf80ww+F0X+NrqeTb2SWyZVMj
+         PQt7s9PNeToce1ReRcVPdhQKBOsTXTnqEEL/wC2Vm8Xnn3udMpDoDxZGdYxCD3iJSTss
+         sQzc7+iC8hXsQSbsCJXwLh14BDMxiPuR+jj574s+dQ2QQAmJAzu4OkQ3oeTrhhMNchkJ
+         6MvubuNIJ3rZDxArv8qcqkINfpe83nyuB1+Yt0JenF0LSWuONL4ikekEp2RTdhPGgxs4
+         OPbacMfKmLvbNtHfSL7PFofuCrSK06p0yZtRMQGRXQb229ZW39hifZ2AnaM6Npsx7hoH
+         lp/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVyhy1wALpkz1KerARRGPX7r3m5RHnypfnfXL314C6LYc2JbCslVRoP2CkZpKjoYRGSWz8SiWU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBaSAQPC30CEgtfQNJXnmIcpUnYxole4ZDnVvDTMGgninCd9Cu
+	/DSVOENCdlFxSOApWIpIUkvKhxoMkoPTcAW0ylf4SQ2/WZizWevKxs6GOLy2n9DuAnUBuV8yByy
+	eHB0WIc3jyAhgjg==
+X-Google-Smtp-Source: AGHT+IG+oKscXdo2XOFHEg5/gkpepE7H+30uzh6nWF4MDtrAjGCrH1N8gJzT3QD8Kr79qFwdABvBH6vuFhntZA==
+X-Received: from qvbof4.prod.google.com ([2002:a05:6214:4344:b0:888:3b63:e0cb])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6214:29ec:b0:880:47e0:19e8 with SMTP id 6a1803df08f44-89075ea5cbbmr47222816d6.42.1767710733442;
+ Tue, 06 Jan 2026 06:45:33 -0800 (PST)
+Date: Tue,  6 Jan 2026 14:45:29 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5556.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 583185d0-3d18-4fe5-c895-08de4d31b710
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jan 2026 14:41:45.2725
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: UJ1qHtl7keI9wGIDZNA2TRRiaOVFnp/eQd+C7gl0xXRqzmalKOwy0l63ehXkLfyhQ1pnzBOVSoOmXbYdRo+XEpJXAtxfKk0TePerPBlqedY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PPFA4B6D88E3
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
+Message-ID: <20260106144529.1424886-1-edumazet@google.com>
+Subject: [PATCH v2 net] ip6_gre: use skb_vlan_inet_prepare() instead of pskb_inet_may_pull()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
+	syzbot+6023ea32e206eef7920a@syzkaller.appspotmail.com, 
+	Mazin Al Haddad <mazin@getstate.dev>
+Content-Type: text/plain; charset="UTF-8"
 
------Original Message-----
-From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of Alo=
-k Tiwari
-Sent: Tuesday, November 11, 2025 12:44 AM
-To: pmenzel@molgen.mpg.de; Kitszel, Przemyslaw <przemyslaw.kitszel@intel.co=
-m>; Lobakin, Aleksander <aleksander.lobakin@intel.com>; Nguyen, Anthony L <=
-anthony.l.nguyen@intel.com>; andrew+netdev@lunn.ch; kuba@kernel.org; davem@=
-davemloft.net; edumazet@google.com; pabeni@redhat.com; horms@kernel.org; in=
-tel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org
-Cc: alok.a.tiwarilinux@gmail.com; alok.a.tiwari@oracle.com
-Subject: [Intel-wired-lan] [PATCH v2 net] i40e: fix src IP mask checks and =
-memcpy argument names in cloud filter
+I added skb_vlan_inet_prepare() helper in the cited commit, hinting
+that we would need to use it more broadly.
 
-Fix following issues in the IPv4 and IPv6 cloud filter handling logic in bo=
-th the add and delete paths:
+syzbot confirmed this was the case in ip6_gre.
 
-- The source-IP mask check incorrectly compares mask.src_ip[0] against
-  tcf.dst_ip[0]. Update it to compare against tcf.src_ip[0]. This likely
-  goes unnoticed because the check is in an "else if" path that only
-  executes when dst_ip is not set, most cloud filter use cases focus on
-  destination-IP matching, and the buggy condition can accidentally
-  evaluate true in some cases.
+uninit-value in ip6table_mangle_hook+0x97d/0x9c0 net/ipv6/netfilter/ip6table_mangle.c:72
+ ip6t_mangle_out net/ipv6/netfilter/ip6table_mangle.c:56 [inline]
+ ip6table_mangle_hook+0x97d/0x9c0 net/ipv6/netfilter/ip6table_mangle.c:72
+ nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
+ nf_hook_slow+0xf4/0x400 net/netfilter/core.c:626
+ nf_hook include/linux/netfilter.h:269 [inline]
+ __ip6_local_out+0x5ac/0x640 net/ipv6/output_core.c:143
+ ip6_local_out+0x4c/0x210 net/ipv6/output_core.c:153
+ ip6tunnel_xmit+0x129/0x460 include/net/ip6_tunnel.h:161
+ ip6_tnl_xmit+0x341a/0x3860 net/ipv6/ip6_tunnel.c:1281
 
-- memcpy() for the IPv4 source address incorrectly uses
-  ARRAY_SIZE(tcf.dst_ip) instead of ARRAY_SIZE(tcf.src_ip), although
-  both arrays are the same size.
+Uninit was stored to memory at:
+ ip6_tnl_xmit+0x34f7/0x3860 net/ipv6/ip6_tunnel.c:1277
+ __gre6_xmit+0x14b9/0x1550 net/ipv6/ip6_gre.c:815
+ ip6gre_xmit_ipv4 net/ipv6/ip6_gre.c:839 [inline]
+ ip6gre_tunnel_xmit+0x18f7/0x2030 net/ipv6/ip6_gre.c:922
 
-- The IPv4 memcpy operations used ARRAY_SIZE(tcf.dst_ip) and ARRAY_SIZE
-  (tcf.src_ip), Update these to use sizeof(cfilter->ip.v4.dst_ip) and
-  sizeof(cfilter->ip.v4.src_ip) to ensure correct and explicit copy size.
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4091 [inline]
+ slab_alloc_node mm/slub.c:4134 [inline]
+ __do_kmalloc_node mm/slub.c:4263 [inline]
+ __kmalloc_node_track_caller_noprof+0x6c7/0xf90 mm/slub.c:4283
+ kmalloc_reserve+0x23e/0x4a0 net/core/skbuff.c:609
+ pskb_expand_head+0x226/0x1a60 net/core/skbuff.c:2275
+ skb_realloc_headroom+0x140/0x2b0 net/core/skbuff.c:2355
+ ip6_tnl_xmit+0x2106/0x3860 net/ipv6/ip6_tunnel.c:1227
+ __gre6_xmit+0x14b9/0x1550 net/ipv6/ip6_gre.c:815
+ ip6gre_xmit_ipv4 net/ipv6/ip6_gre.c:839 [inline]
+ ip6gre_tunnel_xmit+0x18f7/0x2030 net/ipv6/ip6_gre.c:922
 
-- In the IPv6 delete path, memcmp() uses sizeof(src_ip6) when comparing
-  dst_ip6 fields. Replace this with sizeof(dst_ip6) to make the intent
-  explicit, even though both fields are struct in6_addr.
-
-Fixes: e284fc280473 ("i40e: Add and delete cloud filter")
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Fixes: d8a6213d70ac ("geneve: fix header validation in geneve[6]_xmit_skb")
+Reported-by: syzbot+6023ea32e206eef7920a@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=6023ea32e206eef7920a
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Mazin Al Haddad <mazin@getstate.dev>
 ---
-v1 -> v2
-update patch subject line and replace ARRAY_SIZE with sizeof as suggested b=
-y Alex and added Reviewed-by Alex and Paul.
----
- drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
->
+v2: invert the conditions (Jakub)
+v1: https://lore.kernel.org/netdev/CANn89iK6uqJ8YEvzcz-EsS1piyay7hTdbC=S_z-Feho9YBeN_g@mail.gmail.com/T/#t
 
+ net/ipv6/ip6_gre.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Unable able to create  Ipv4 and Ipv6 filter with src_ip.
-
-Below are the commands I used to create the filters for IPV4 and IPV6.
-
-tc filter add dev eth0 protocol ipv6 parent ffff: prio 1 flower  src_ip 200=
-1:db8:0:f101::12 skip_sw hw_tc 1
-
-Error:
-RTNETLINK answers: Invalid argument
-We have an error talking to the kernel
-
-tc filter add dev eth0 protocol ip parent ffff: prio 1 flower src_ip 1.2.1.=
-1 skip_sw hw_tc 1
-
-Error:
-RTNETLINK answers: Invalid argument
-We have an error talking to the kernel
-
-
+diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
+index d19d86ed43766bbc8ec052113be02ab231a5272c..ca1571c63f40f90dd4fd53b526b6c481087f8320 100644
+--- a/net/ipv6/ip6_gre.c
++++ b/net/ipv6/ip6_gre.c
+@@ -881,7 +881,7 @@ static netdev_tx_t ip6gre_tunnel_xmit(struct sk_buff *skb,
+ 	__be16 payload_protocol;
+ 	int ret;
+ 
+-	if (!pskb_inet_may_pull(skb))
++	if (skb_vlan_inet_prepare(skb, false))
+ 		goto tx_err;
+ 
+ 	if (!ip6_tnl_xmit_ctl(t, &t->parms.laddr, &t->parms.raddr))
+@@ -929,7 +929,7 @@ static netdev_tx_t ip6erspan_tunnel_xmit(struct sk_buff *skb,
+ 	__u32 mtu;
+ 	int nhoff;
+ 
+-	if (!pskb_inet_may_pull(skb))
++	if (skb_vlan_inet_prepare(skb, false))
+ 		goto tx_err;
+ 
+ 	if (!ip6_tnl_xmit_ctl(t, &t->parms.laddr, &t->parms.raddr))
+-- 
+2.52.0.351.gbe84eed79e-goog
 
 
