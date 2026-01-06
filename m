@@ -1,92 +1,112 @@
-Return-Path: <netdev+bounces-247363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08557CF89C4
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 14:52:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE1E2CF8A8D
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 15:04:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C6515302E329
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 13:52:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0901330054B6
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 13:54:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 319AE3451BD;
-	Tue,  6 Jan 2026 13:44:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 731EE346FA0;
+	Tue,  6 Jan 2026 13:54:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2F6BrrXY"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fmt/StmZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BCAE3451AE;
-	Tue,  6 Jan 2026 13:44:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EFB9346FA4
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 13:54:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767707099; cv=none; b=Jcyvb8XHCI/LSrZX8s7rEz1ZtlpnbNGuUZNLXjIzuUISDTa5rxmlNEXNqXS2fb6MGRu5k7eMnPcJqgydaF+8HWNosH+s1UZEPG2CFaOfREdnkx6OWERGRRiBBWJql+kPwjBp64hV0ChRPGs21SG8Sa1OiJ5FChOc5wncTzFfttc=
+	t=1767707659; cv=none; b=mPIxBcqlbyPxSqJi+ZiQQLOJn/pTTWAhqLpGetEzJJaiy0P3OFjyW6Q9uas/67yNk4k4bIOZAzzJGRfAkad8hEg2hFzz0WXA3YGIo/bykZY9jufbsKf1ilgPZq4tHSaIAJdLO8Lrkd9gzzy8kYlHZPy9HBgmxJ+4+bD0kgfZKSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767707099; c=relaxed/simple;
-	bh=uxqJoj37/ZG6LJdRd5d07DaTXghuz7rGNM0Hi+qqwqs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iNBncP2Rk+V/3ZNh+vd9lI5yuRah3Jf6S3/fkqooB4uMEEXlyt8+t3Fo1yKgifd4anJ61bO/NPT3wvtLgILYxdXFo5XDnpWTIPoZCljaAZsjHiWK55sgJ3n+FKNm4h+BoD/ww17vg6PU1JVprKdjGtmkhRrhPL1a7uBfzTcrXOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2F6BrrXY; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=o0RudgO9iEA2ZXa1tQpeCXg4p6eGEhFPUYkddbZvK20=; b=2F6BrrXYDF+SPnzbOOS5IyT5NC
-	6T/2VWxHcEKD4yHtLiFoEIHs3qFzwFj2lPDXqQ3oOy+O1t8Fc+hFc8Kos+OmW7HERhVaKLeiuMclZ
-	85NUBLMb1mgoz63DshFJ610ocvRZvBzUFkDIp5hhqH8FgkYt/2ak1+Cn04cpWhNtDsqY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vd7Mf-001cxr-8j; Tue, 06 Jan 2026 14:44:49 +0100
-Date: Tue, 6 Jan 2026 14:44:49 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yeounsu Moon <yyyynoom@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dlink: count tx_dropped when dropping skb
- on link down
-Message-ID: <b6ff2078-86d7-4416-a914-e07ae13e2128@lunn.ch>
-References: <20260106122350.21532-2-yyyynoom@gmail.com>
+	s=arc-20240116; t=1767707659; c=relaxed/simple;
+	bh=7c0mUuNG2wSgyg9E9Bzh/8JnffEnQp+qh2iBn7T+okM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=dWI6EbCAU8n0MJUnbhWlDoD82cXM9LsIHBgDfZrxjmGY5UtPNeCy9V5Qhlo14sANiQwWtX3SeZFxQr1voxxt3O/DwLDTTIwp86isxZMxfR0GlujMhcDDYxzF9hU6MT9YziWzTyhuqJz90yaY3IzOlEhEI5Zymd4WrN/GDUhGxjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fmt/StmZ; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <0cb5a1103b1bac18fb0b35c6a5d4fd2ac537dddc.camel@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1767707653;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7c0mUuNG2wSgyg9E9Bzh/8JnffEnQp+qh2iBn7T+okM=;
+	b=fmt/StmZ0JLVFvTPU8yHfzpw/OzzQQ3Im0y655Al0L015XKS+Dbix3jVmEXBRsa8GYSFiJ
+	jNQ1V/tn9e9X7U5iCcrkimhl/5VLRNkWmyKaukJBaL8sQOV5mDlCb1dJSlQt2r3DEu9UH7
+	ZTy9TkFJ2Dxab6H3Zk0OgnOXUyLcM2s=
+Subject: Re: [PATCH bpf-next 1/2] bpf, test_run: Fix user-memory-access
+ vulnerability for LIVE_FRAMES
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: KaFai Wan <kafai.wan@linux.dev>
+To: Toke =?ISO-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>, 
+ ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ martin.lau@linux.dev,  eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev,  john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com,  jolsa@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org,  pabeni@redhat.com, horms@kernel.org,
+ hawk@kernel.org, shuah@kernel.org,  aleksander.lobakin@intel.com,
+ bpf@vger.kernel.org, netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Cc: Yinhao Hu <dddddd@hust.edu.cn>, Kaiyan Mei <M202472210@hust.edu.cn>, 
+ Dongliang Mu <dzm91@hust.edu.cn>
+Date: Tue, 06 Jan 2026 21:53:57 +0800
+In-Reply-To: <87ms2s57sp.fsf@toke.dk>
+References: <fa2be179-bad7-4ee3-8668-4903d1853461@hust.edu.cn>
+	 <20260104162350.347403-1-kafai.wan@linux.dev>
+	 <20260104162350.347403-2-kafai.wan@linux.dev> <87y0mc5obp.fsf@toke.dk>
+	 <38dd70d77f8207395206564063b0a1a07dd1c6e7.camel@linux.dev>
+	 <87ms2s57sp.fsf@toke.dk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260106122350.21532-2-yyyynoom@gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jan 06, 2026 at 09:23:51PM +0900, Yeounsu Moon wrote:
-> Increment tx_dropped when dropping the skb due to link down.
-> 
-> Tested-on: D-Link DGE-550T Rev-A3
-> Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
-> ---
->  drivers/net/ethernet/dlink/dl2k.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
-> index 846d58c769ea..edc6cd64ac56 100644
-> --- a/drivers/net/ethernet/dlink/dl2k.c
-> +++ b/drivers/net/ethernet/dlink/dl2k.c
-> @@ -733,6 +733,7 @@ start_xmit (struct sk_buff *skb, struct net_device *dev)
->  	u64 tfc_vlan_tag = 0;
->  
->  	if (np->link_status == 0) {	/* Link Down */
-> +		dev->stats.tx_dropped++;
+On Mon, 2026-01-05 at 17:43 +0100, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+> KaFai Wan <kafai.wan@linux.dev> writes:
+>=20
+> > On Mon, 2026-01-05 at 11:46 +0100, Toke H=C3=B8iland-J=C3=B8rgensen wro=
+te:
+> > > KaFai Wan <kafai.wan@linux.dev> writes:
+> > >=20
+> > > > This fix reverts to the original version and ensures data_hard_star=
+t
+> > > > correctly points to the xdp_frame structure, eliminating the securi=
+ty
+> > > > risk.
+> > >=20
+> > > This is wrong. We should just be checking the meta_len on input to
+> > > account for the size of xdp_frame. I'll send a patch.
+> >=20
+> > Current version the actual limit of the max input meta_len for live fra=
+mes is=20
+> > XDP_PACKET_HEADROOM - sizeof(struct xdp_frame), not
+> > XDP_PACKET_HEADROOM.
+>=20
+> By "current version", you mean the patch I sent[0], right?
+>=20
+> If so, that was deliberate: the stack limits the maximum data_meta size
+> to XDP_PACKET_HEADROOM - sizeof(struct xdp_frame), so there's no reason
+> not to do the same for bpf_prog_run(). And some chance that diverging
+> here will end up surfacing other bugs down the line.
+>=20
+Oh, I see. Thank you for your explanation.
+> -Toke
+>=20
+> [0] https://lore.kernel.org/r/20260105114747.1358750-1-toke@redhat.com
+>=20
 
-Do you see this being hit very often? It should be that as soon as you
-know the link is down, you tell the core, and it will stop calling
-start_xmit. If you see this counter being incremented a lot, it
-indicates there is a problem somewhere else.
-
-You might want to consider converting this driver to phylink.
-
-	  Andrew
+--=20
+Thanks,
+KaFai
 
