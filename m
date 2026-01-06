@@ -1,89 +1,138 @@
-Return-Path: <netdev+bounces-247249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52EB4CF6456
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 02:31:10 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED529CF645F
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 02:31:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 52C503032718
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 01:31:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 674AA3002154
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 01:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B89011F63CD;
-	Tue,  6 Jan 2026 01:30:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BDD51EF39E;
+	Tue,  6 Jan 2026 01:31:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bm1DeggK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CMGZkyea"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87BE141C71;
-	Tue,  6 Jan 2026 01:30:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1DD43B7A8
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 01:31:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767663058; cv=none; b=effQKOphf+O02DHAq03O98ye82zMqZ4LL/sNaa/mwDuH8cez21xIC2MfMVxfogn4nPViJUcn8H/6QPQehhBQAwwZqTrFe1WmBhLctc908YW7FtdT/1WWAFzXxUEDR4cHlM2MVkouy7G2Zg8wAqkFKCY6DMyo/wVcZEmEfLFuCB4=
+	t=1767663082; cv=none; b=f/VAM72NaH/HaS/4fPgNnPYMuSrjiG2kAxms99F4ppq7eLy174qb/fUJzPzMnPDUmNoMlj0o9+K0rXLwHsdRxPuKy8lfV/ZNbI/Q79T+xRXMoHIiJYV0qX5HCKqIN23mRLB1TGybLg56Y08i4fEyH/bF2NuYJSH8/p6fZbv8Ubo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767663058; c=relaxed/simple;
-	bh=4uAVm2ZWkiuaol1HXlcytM5IJJy/t7P3QPqqjdvoEqg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fVOyormnhTyzukfGSjOPc4OxgSe/9W+3sytvd2cnyRAC+RVdYOAAeQrdSRS/Gar3Cr5Q2SjP1EfiOExe2B219AMWyBZk+IzIncPbgxCe3Rngura1G8rgElLNOjjcUn4HtUPiu6mcMslmDXbyEEsFndJ5OPCYlAztB/pdEt+O8sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bm1DeggK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 814A5C19421;
-	Tue,  6 Jan 2026 01:30:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767663058;
-	bh=4uAVm2ZWkiuaol1HXlcytM5IJJy/t7P3QPqqjdvoEqg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bm1DeggKLEYdAQ0O/D1NZ5NhYiEfNHIfgb5AEOQ11rU3vesRjtutDI56YlV0dCuBr
-	 zYi6uVZ96gupWKqg1IUC5S80mC6SYBdACc3ypMAQmcW+QLAaVUIrUjLiojFMIKlR6l
-	 dvStgBAJ1BiL23pbccrRVW/rkCRO2qHHt9qaFtXowIIcMjVSzsl8RjEqJss8VMKUBX
-	 2MfVSJZmBexaGCRqY+ALgbwc+9J8WDLDDuZ1Rw0yf4EWMuu6iWlimWKspLoZuibTdP
-	 o/3mGbhA3mGhxMQ0jtWyCwvJ+KDIdfcOmFouNf2l/jf34nvI3WTimW1c4xojBbsIte
-	 GrOgH6ED9woow==
-Date: Mon, 5 Jan 2026 17:30:56 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
- kotaranov@microsoft.com, horms@kernel.org,
- shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
- ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
- linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- dipayanroy@microsoft.com
-Subject: Re: [PATCH net-next, v6] net: mana: Implement ndo_tx_timeout and
- serialize queue resets per port.
-Message-ID: <20260105173056.7c2c9d0a@kernel.org>
-In-Reply-To: <20260103045705.GA3757@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20260103045705.GA3757@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	s=arc-20240116; t=1767663082; c=relaxed/simple;
+	bh=XXlo8TVy0D+U60r4gF9lesILAKXn+1/8h93MrVZGXnY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UchirzVLt791Yj9nojCRXHEmpTZplF7uWvvZRRPPwcmFhN9QEhz6eH8n0ILLXHVTa0Roaxf8St0MDQeJyG/fIFsTwcCEArukeNYoVp0jqfH3kUTa6e75ZYB7OvkzAAK2mrgGXCYD30NQ1hqZBknliNIXKjTFv4kMCCL3UM4q4xU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CMGZkyea; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-34c1d84781bso514822a91.2
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 17:31:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767663080; x=1768267880; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=z4YAEli/oXuIfYQ/ot1/+zoBf8JMyj/sAgBytJYu+9E=;
+        b=CMGZkyeaUsHn372umWB6yy27yP7RoJipgdK7GBAoS0HGc76M+1KaFFSyyd4yaWEiV4
+         EqO/3zuFRNiQz5zUZ6nIpT6sfVh6zlVXQ76uslX+qQQeT0KSnFhwXRGQINfw7kSdZlMY
+         iDeDRt+rC/GHG9LdOtM1GVvNWyWqUFAGlfO1A2Gae6/d41rUgd3gDfORG1B2z4/5rn0i
+         64sh+hOqJjdqeURSU9loUJlZVFRDuoo8e+rrbZ7hOVhBGSpg6zDvODyElPhGSEgRE4iU
+         SZJEqZB8GAN6+VMiEwblx2rjFF6tStu6MZE/fK3+oO8KON6lmQY7BPnA3Qfb1KE7ifMF
+         Jwhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767663080; x=1768267880;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z4YAEli/oXuIfYQ/ot1/+zoBf8JMyj/sAgBytJYu+9E=;
+        b=TesULlLJA6ojLWM141HC87yBmrTJ3JxE+8dns5XeCCdaStcpSjJCFUteycnQj0OvAd
+         SuSdlbfQL1+pFPbJM3a+GWHTK26eybMCb8bjvE/2zlcFhiGB7UiMc334qXnqy4f08Pav
+         /SS14VMoeamvwvC3H6utF2wzY2QOxlQU8aaJRcVg2t+BA8t6IKcJLmCDGiw3tsc8JFCI
+         B5KhcrfM3GD4G1TJhfqgsqhedmaJOjb74HmO5ggt9RKy9MdhDg9hadbFceM8CuvbX6Zl
+         i9EEISFObZaIZSBaQSY1TR04jArPgrLeNGJRJbcx7fENrZpOl7uRihXVZF1xhD1MTl4x
+         Y1mQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUhfAjouYziHBo0/0q+JlU8aTwe+EKVmIyOmTuUkRMQzWCCQN2+vqPU5wk4dAAZeodExggUExw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpqYUo+8SRJvZe5o+cVznE8i1AW6Bz9qOT5toNC3haeyf+FAOu
+	DMJAUd6EsENFoFW6luy7HS8Jb78yjvkEtaYLiBxqP8AaqM7Fl/DiJNglNetjT5w5MV865g==
+X-Gm-Gg: AY/fxX7CQezJTvPgdyBRGzqBJgK7OuPTjhswIxd4lUZCXkqXLoZXuGHZB1r661JGghk
+	GjVxA1oIbXpJ5DX+UihFmnQIPVPMhJsp2IWGZYjgNdlNSnM9o+kkZO+i5j7vuwkGlv+9eDvOFhd
+	/lLQXZFrWQmg6OqD1XmrnN8c37ooGS5siSIMUzmUUrNoo9FPF54YZUyfKLVwOqdyifq7nKlvYUV
+	Mj4bS2UA7j0kbaxbjMK4wXQ0evyPJDXt3LK6G4tlxSDDeyk0XRDYUEvX55ICKS37FwJybjJSugV
+	J85bX2RykRDCNlfOdnGSTi2c0yGLcYtjojvc9QSjupTZbEdO8jrARfol4AyGhdu32PVR1sX3oVb
+	GGzuCi/POvrIK3Li7+zojeeLyxx55gr346zyTJK1DF0UD1najz48etVUVBtCoGOHw7FkBdzyKde
+	TqCIpd72gQzL3QPe0XUiqFhZpP8dJaymxnf8HpqONXI9YNqrj9Tf7RxCMm7xptZW1EOhw2
+X-Google-Smtp-Source: AGHT+IFFA/XN6UYnjtPDWZslaUtRHocpcB7HSI1R42TMlNz90/QyWyaCta2RK9pzyj2DIYG/Su5bMQ==
+X-Received: by 2002:a17:90a:c890:b0:340:bb51:17eb with SMTP id 98e67ed59e1d1-34f5f287947mr1004850a91.15.1767663080086;
+        Mon, 05 Jan 2026 17:31:20 -0800 (PST)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.25])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34f5fa947ecsm544110a91.6.2026.01.05.17.31.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 17:31:19 -0800 (PST)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	bjorn@kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com,
+	sdf@fomichev.me,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH bpf-next v4 0/2] xsk: introduce pre-allocated memory per xsk CQ
+Date: Tue,  6 Jan 2026 09:31:10 +0800
+Message-Id: <20260106013112.56250-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Fri, 2 Jan 2026 20:57:05 -0800 Dipayaan Roy wrote:
-> +		apc = netdev_priv(ndev);
-> +		disable_work_sync(&apc->queue_reset_work.work);
+From: Jason Xing <kernelxing@tencent.com>
 
-AI code review points out:
+This series was made based on the previous work[1] to fix the issue
+without causing too much performance impact through adding a
+pre-allocated memory for each xsk.
 
-  In mana_remove(), disable_work_sync() is called for each port's
-  queue_reset_work. However, when resuming=true, mana_probe() creates a new
-  workqueue but does not call mana_probe_port() (which contains INIT_WORK),
-  and there is no enable_work() call for queue_reset_work in the resume path.
+[1]: commit 30f241fcf52a ("xsk: Fix immature cq descriptor production")
+---
+v4
+link: https://lore.kernel.org/all/CAL+tcoB6eCogZXXxDQ58nxp-VxWFOPR2DP4pyLVxGtjXdWPQXA@mail.gmail.com/
+1. use u64 addr in xsk_cq_write_addr()
 
-  The existing link_change_work handles this correctly: it is disabled in
-  mana_remove() and re-enabled with enable_work(&ac->link_change_work) in
-  mana_probe() when resuming=true.
+v3
+link: https://lore.kernel.org/all/20251216052623.2697-1-kerneljasonxing@gmail.com/
+1. fix double free of lcq in xsk_clear_local_cq()
+2. keep lcq->prod align with cq->cached_prod, which can be found in
+xsk_cq_cancel_locked().
+3. move xsk_clear_local_cq() from xsk_release() to xsk_destruct() to
+avoid crash when using lcq in xsk_destruct_skb() after lcq is already freed.
 
-  Should enable_work(&apc->queue_reset_work.work) be called for each port in
-  the resuming path of mana_probe(), similar to how link_change_work is
-  handled? Otherwise TX timeout recovery appears to remain disabled after a
-  suspend/resume cycle.
+v2
+link: https://lore.kernel.org/all/20251209085950.96231-1-kerneljasonxing@gmail.com/
+1. add if condition to test if cq is NULL
+2. initialize the prod of local_cq
+
+Jason Xing (2):
+  xsk: introduce local_cq for each af_xdp socket
+  xsk: introduce a dedicated local completion queue for each xsk
+
+ include/net/xdp_sock.h |   8 ++
+ net/xdp/xsk.c          | 223 +++++++++++++++++++++--------------------
+ 2 files changed, 123 insertions(+), 108 deletions(-)
+
 -- 
-pw-bot: cr
+2.41.3
+
 
