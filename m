@@ -1,69 +1,115 @@
-Return-Path: <netdev+bounces-247382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9C0BCF90FD
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 16:28:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F35F6CF91A9
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 16:36:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0F38B30111AC
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 15:22:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EE706302E712
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 15:29:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BFA0345731;
-	Tue,  6 Jan 2026 15:22:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EB9C33CEB0;
+	Tue,  6 Jan 2026 15:29:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a2yrldDq";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="AaOtllve"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D2E729BD9A
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 15:22:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE288313267
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 15:29:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767712954; cv=none; b=Q4AqPLCV5kyXmIJTbTCsAWoC9xBlkwe6X5rB86PDlvHjcDtGlrUirTOfL/dPGllhW8zHeIib6SDiZUpVtF1KHHxq5ipmX8BQdRd4L/9viDQavBgxGfU71qlb6jNAJVNRMmsb7/zYEKxBbbfX+ejb/JG0oQoFNN2SP9yhic8dNjM=
+	t=1767713355; cv=none; b=Y3dBvXfEZ5RZ/PfhLT1TpRV2DQKRllxeYsPTKmtgCqz7rtvOHmPpQckxOi6ivK5F9YvIJgCCudTny051tJyTkDEuaaKE5YKfwdSPELx9cC8xQZIPNB2Hrw7ovQ2TTxwSuZq7H9nP3tMBcX5Y+WYx9sFuOeYDvDpIxGypnXg0iqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767712954; c=relaxed/simple;
-	bh=lnB1SuFK24iyU1ErIXFxzV0xHOtmPu6m7i52mplXliY=;
+	s=arc-20240116; t=1767713355; c=relaxed/simple;
+	bh=ORBUTAza06yVYLn8Gg5h7JdLV16kPZGZnkfL1uLRIPY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ML8pGfd5Qtdv6de2KLQsuuhGRD41SgLSZQ/th1aOPJvO+/v3wiPNyCnqh3IOuzkoudKWyHcu8CYNsU/NE1d9j+L9lEbyI8/3H/uuIs7RYB7iSByh1sHc7rfoiMT/kBWt53eiPcRwszoKkqpPfghKWKEJsDXriPzv7B7jRoAzuH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1vd8t3-0004tk-TA; Tue, 06 Jan 2026 16:22:21 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1vd8t3-009Mm0-0u;
-	Tue, 06 Jan 2026 16:22:21 +0100
-Received: from mfe by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1vd8t3-00ELDF-0T;
-	Tue, 06 Jan 2026 16:22:21 +0100
-Date: Tue, 6 Jan 2026 16:22:21 +0100
-From: Marco Felsch <m.felsch@pengutronix.de>
-To: Frank Li <Frank.li@nxp.com>
-Cc: Woojung Huh <woojung.huh@microchip.com>,
-	"maintainer:MICROCHIP KSZ SERIES ETHERNET SWITCH DRIVER" <UNGLinuxDriver@microchip.com>,
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=nEukyLVbkpuxSSObRzaZUwbCKGk8ElAcpn3hP8qVq/nRvACquM21nleNflsNDD09SHNJTIXfl44+Je1U3bKnjyS++pHgDx2rWS4bYFzY/orX/87xkr3qiXkq9/X2Cz1mmKBqMDGJ/xX9XZlpExp9pntE0GNtSLWWFukqajT7Oes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a2yrldDq; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AaOtllve; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767713352;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6mutPiJahqf07tX0K9jDs+Vqe+Q2f0S7Ia0chn9JrkM=;
+	b=a2yrldDqBs69zbkz3iUaSTBqaGGB5t44t3qZtUhpLz29YrJ/roSt1mtE3ojdUQgryx+Chj
+	BO0CWHhSOfgCATLIAUXlI9KVlahGrmZgzk7cWjIzOzE1od3Qlewrxah6ILoCfKxwd6rTeL
+	HFeTHs8DrZaff9+5PJ68bZmloFJIHuA=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-30-6xU-rnn0O-6VdF2SruD28Q-1; Tue, 06 Jan 2026 10:29:11 -0500
+X-MC-Unique: 6xU-rnn0O-6VdF2SruD28Q-1
+X-Mimecast-MFC-AGG-ID: 6xU-rnn0O-6VdF2SruD28Q_1767713350
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-b79fcc35ab2so150448766b.2
+        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 07:29:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1767713350; x=1768318150; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6mutPiJahqf07tX0K9jDs+Vqe+Q2f0S7Ia0chn9JrkM=;
+        b=AaOtllvenVvjWeWtkkiyOORyEOZ0bg1USex3MDtecTmShUSwYqny/lzE+39GbYspYE
+         XW6QE+tMvIDnpML4fvCfGo/UNHihVt+FBA2T9yQJxow4+mkcov5tPc/jo+85YEN/lv1S
+         cMCBpiPAKaCs9pZDoVCr+cVmtY/tUl068Eyak1Q6Sq+khFScb3FQtWusVSGFtGPP7qi4
+         lGtc3tt6oTcKutIWtZROeF4X7+V8+tdtOSZKars/Co0fxI0MZ2GCn7OD23t/tXOVTsXb
+         6F0exZGLEFsd74x/urofx1tbsI7WGuyBBVXMYF6VGJyAC6xkYsjv3moH2dleyfTf8ixh
+         Ae5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767713350; x=1768318150;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6mutPiJahqf07tX0K9jDs+Vqe+Q2f0S7Ia0chn9JrkM=;
+        b=gATlJCUyQzq/Dk9kL9hIo2kg6RG2sXIQdMHPmlrMnMfnby39J9oCeCn24veDn0hKNy
+         x/cd5dF9jWMgKFhF86y6kPxV3vLTnc6yTw5I1PNmd4DWF20eFMKCppTC8CH1LN4aaXay
+         9ZoXVK4KdcR5LhZWkFf2fDiPINlWdyBRLz5LHomnsYEtivNCMLDpZYZvvwHM4ufBe1yR
+         z8LyBlUBlWi83lZ1V4ylOiAF8IBW0H4mP6ujGYoyizjjFSpE02a2BCgLv+b16QkEDBXP
+         +hy2u83sUKSt9jpaEyk7QbVgIMGbTbLkfH0JhjbJPySz1XBOV5xqMEGDtpJcttQaG41a
+         HZ7w==
+X-Gm-Message-State: AOJu0YzdXlu9+T3JLoQ1ynqIfrDFnDmRK1iZ8HQu0TpLHahXWrdz+iEm
+	/tKSC+dq6nQlwW6Kou+fY5fr2YtkarG4ReX+Yga3lY1SqNRvSIxBFz7dEvJ/jATeZEzAMTsK9wA
+	4QIR1PDPDHkY8rnnnWLGo5C2RaM3wBU6iswSqDWQJzAwvIuUnXqyrfQGIcQ==
+X-Gm-Gg: AY/fxX4AW9GdqwSDAe4Il4XOvnE0RZA3Gry6Cj8p6sV6aAArUAkBrSeycU+0am6khIK
+	lLAWgIRPD5r+JBQcPR9fOzFU+freSHx7KH0qIM/W/81lcFsAynfWe5yj19JmU8k+TeL28JV4sEl
+	m4xnpDMzcWOtj6BUYHawBNG9b0sZJvPhgwHHUSZXd6KdGBvKdwzYPMs9NXcAVZI53Y8fpZ760eT
+	va7u+1tvmaVxptRlxWrEC+41w+z6Lfl7/JQudcA7j6Iv21lhOeZyT5RDIc6s5LUXVW0IF0e8R1l
+	kq6yEYkncPjDxHn0mRXsr5ASisIUFnmFi0nDmhS79gMqxO8X466UeFQlMz2aQt99XhgfUcLC9Kl
+	peRa5kkefWZSaINcc1sNzslbepLswvcyONQ==
+X-Received: by 2002:a17:907:97c7:b0:b80:11fd:793b with SMTP id a640c23a62f3a-b8426a6849bmr317261266b.19.1767713349827;
+        Tue, 06 Jan 2026 07:29:09 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGWb6y9xsvseC+MSQM10NdjJ3BS0aRkbGgQvy+bzZrBc9IB4ICJIxfQsaMFe9coDqIqquWjJA==
+X-Received: by 2002:a17:907:97c7:b0:b80:11fd:793b with SMTP id a640c23a62f3a-b8426a6849bmr317258866b.19.1767713349329;
+        Tue, 06 Jan 2026 07:29:09 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a27c760sm261977866b.24.2026.01.06.07.29.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Jan 2026 07:29:08 -0800 (PST)
+Date: Tue, 6 Jan 2026 10:29:05 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Bui Quang Minh <minhquangbui99@gmail.com>
+Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Marek Vasut <marex@denx.de>,
-	"open list:MICROCHIP KSZ SERIES ETHERNET SWITCH DRIVER" <netdev@vger.kernel.org>,
-	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>, imx@lists.linux.dev,
-	shawnguo@kernel.org
-Subject: Re: [PATCH 1/1] dt-bindings: net: dsa: microchip: Make pinctrl
- 'reset' optional
-Message-ID: <20260106152221.pfhnfndzox4kjqaz@pengutronix.de>
-References: <20260106143620.126212-1-Frank.Li@nxp.com>
- <20260106150245.exhf5soqdjv7nkb7@pengutronix.de>
- <aV0nA521iLnxYTVu@lizhi-Precision-Tower-5810>
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net v3 1/3] virtio-net: don't schedule delayed refill
+ worker
+Message-ID: <20260106100959-mutt-send-email-mst@kernel.org>
+References: <20260106150438.7425-1-minhquangbui99@gmail.com>
+ <20260106150438.7425-2-minhquangbui99@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,112 +118,122 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aV0nA521iLnxYTVu@lizhi-Precision-Tower-5810>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mfe@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20260106150438.7425-2-minhquangbui99@gmail.com>
 
-On 26-01-06, Frank Li wrote:
-> On Tue, Jan 06, 2026 at 04:02:45PM +0100, Marco Felsch wrote:
-> > Hi Frank,
-> >
-> > thanks for fixing this.
-> >
-> > On 26-01-06, Frank Li wrote:
-> > > Commit e469b87e0fb0d ("dt-bindings: net: dsa: microchip: Add strap
-> > > description to set SPI mode") required both 'default' and 'reset' pinctrl
-> > > states for all compatible devices. However, this requirement should be only
-> > > applicable to KSZ8463.
-> > >
-> > > Make the 'reset' pinctrl state optional for all other Microchip DSA
-> > > devices while keeping it mandatory for KSZ8463.
-> > >
-> > > Fix below CHECK_DTBS warnings:
-> > >   arch/arm64/boot/dts/freescale/imx8mp-skov-basic.dtb: switch@5f (microchip,ksz9893): pinctrl-names: ['default'] is too short
-> > > 	from schema $id: http://devicetree.org/schemas/net/dsa/microchip,ksz.yaml#
-> > >
-> >
-> > Fixes tag?
+On Tue, Jan 06, 2026 at 10:04:36PM +0700, Bui Quang Minh wrote:
+> When we fail to refill the receive buffers, we schedule a delayed worker
+> to retry later. However, this worker creates some concurrency issues.
+> For example, when the worker runs concurrently with virtnet_xdp_set,
+> both need to temporarily disable queue's NAPI before enabling again.
+> Without proper synchronization, a deadlock can happen when
+> napi_disable() is called on an already disabled NAPI. That
+> napi_disable() call will be stuck and so will the subsequent
+> napi_enable() call.
 > 
-> This one is only fix warning, some maintainer wants add fixes tags only for
-> user visualable issue.
+> To simplify the logic and avoid further problems, we will instead retry
+> refilling in the next NAPI poll.
 > 
-> If maintainer want, it can be added when apply, commit hash already in
-> commit message.
-> 
-> >
-> > > Signed-off-by: Frank Li <Frank.Li@nxp.com>
-> > > ---
-> > >  Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml | 3 +++
-> > >  1 file changed, 3 insertions(+)
-> > >
-> > > diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-> > > index a8c8009414ae0..8d4a3a9a33fcc 100644
-> > > --- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-> > > +++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-> > > @@ -40,6 +40,7 @@ properties:
-> > >        - const: reset
-> > >          description:
-> > >            Used during reset for strap configuration.
-> > > +    minItems: 1
-> >
-> > Does this mean that all others can now either specify 'reset' or
-> > 'default'? If yes, this seems wrong.
-> 
-> No,  It allow that
-> 	 case 1: "default"
-> 	 case 2: "default", "reset".
-> 
-> Don't allow 'reset' only.
+> Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
+> Reported-by: Paolo Abeni <pabeni@redhat.com>
+> Closes: https://netdev-ctrl.bots.linux.dev/logs/vmksft/drv-hw-dbg/results/400961/3-xdp-py/stderr
+> Cc: stable@vger.kernel.org
+> Suggested-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
 
-Ah okay, so it takes the list element-pos. into account, fingers
-crossed, that no one is going to change the order :-)
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-Thanks for the info, with that:
+and CC stable I think. Can you do that pls?
 
-Reviewed-by: Marco Felsch <m.felsch@pengutronix.de>
-
+> ---
+>  drivers/net/virtio_net.c | 48 +++++++++++++++++++++-------------------
+>  1 file changed, 25 insertions(+), 23 deletions(-)
 > 
-> Frank
-> 
-> >
-> > Regards,
-> >   Marco
-> >
-> > >
-> > >    reset-gpios:
-> > >      description:
-> > > @@ -153,6 +154,8 @@ allOf:
-> > >              const: microchip,ksz8463
-> > >      then:
-> > >        properties:
-> > > +        pinctrl-names:
-> > > +          minItems: 2
-> > >          straps-rxd-gpios:
-> > >            description:
-> > >              RXD0 and RXD1 pins, used to select SPI as bus interface.
-> > > --
-> > > 2.34.1
-> > >
-> > >
-> >
-> > --
-> > #gernperDu
-> > #CallMeByMyFirstName
-> >
-> > Pengutronix e.K.                           |                             |
-> > Steuerwalder Str. 21                       | https://www.pengutronix.de/ |
-> > 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-> > Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-9    |
-> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 1bb3aeca66c6..f986abf0c236 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -3046,16 +3046,16 @@ static int virtnet_receive(struct receive_queue *rq, int budget,
+>  	else
+>  		packets = virtnet_receive_packets(vi, rq, budget, xdp_xmit, &stats);
+>  
+> +	u64_stats_set(&stats.packets, packets);
+>  	if (rq->vq->num_free > min((unsigned int)budget, virtqueue_get_vring_size(rq->vq)) / 2) {
+> -		if (!try_fill_recv(vi, rq, GFP_ATOMIC)) {
+> -			spin_lock(&vi->refill_lock);
+> -			if (vi->refill_enabled)
+> -				schedule_delayed_work(&vi->refill, 0);
+> -			spin_unlock(&vi->refill_lock);
+> -		}
+> +		if (!try_fill_recv(vi, rq, GFP_ATOMIC))
+> +			/* We need to retry refilling in the next NAPI poll so
+> +			 * we must return budget to make sure the NAPI is
+> +			 * repolled.
+> +			 */
+> +			packets = budget;
+>  	}
+>  
+> -	u64_stats_set(&stats.packets, packets);
+>  	u64_stats_update_begin(&rq->stats.syncp);
+>  	for (i = 0; i < ARRAY_SIZE(virtnet_rq_stats_desc); i++) {
+>  		size_t offset = virtnet_rq_stats_desc[i].offset;
+> @@ -3230,9 +3230,10 @@ static int virtnet_open(struct net_device *dev)
+>  
+>  	for (i = 0; i < vi->max_queue_pairs; i++) {
+>  		if (i < vi->curr_queue_pairs)
+> -			/* Make sure we have some buffers: if oom use wq. */
+> -			if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
+> -				schedule_delayed_work(&vi->refill, 0);
+> +			/* Pre-fill rq agressively, to make sure we are ready to
+> +			 * get packets immediately.
+> +			 */
+> +			try_fill_recv(vi, &vi->rq[i], GFP_KERNEL);
+>  
+>  		err = virtnet_enable_queue_pair(vi, i);
+>  		if (err < 0)
+> @@ -3472,16 +3473,15 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
+>  				struct receive_queue *rq,
+>  				bool refill)
+>  {
+> -	bool running = netif_running(vi->dev);
+> -	bool schedule_refill = false;
+> +	if (netif_running(vi->dev)) {
+> +		/* Pre-fill rq agressively, to make sure we are ready to get
+> +		 * packets immediately.
+> +		 */
+> +		if (refill)
+> +			try_fill_recv(vi, rq, GFP_KERNEL);
+>  
+> -	if (refill && !try_fill_recv(vi, rq, GFP_KERNEL))
+> -		schedule_refill = true;
+> -	if (running)
+>  		virtnet_napi_enable(rq);
+> -
+> -	if (schedule_refill)
+> -		schedule_delayed_work(&vi->refill, 0);
+> +	}
+>  }
+>  
+>  static void virtnet_rx_resume_all(struct virtnet_info *vi)
+> @@ -3829,11 +3829,13 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
+>  	}
+>  succ:
+>  	vi->curr_queue_pairs = queue_pairs;
+> -	/* virtnet_open() will refill when device is going to up. */
+> -	spin_lock_bh(&vi->refill_lock);
+> -	if (dev->flags & IFF_UP && vi->refill_enabled)
+> -		schedule_delayed_work(&vi->refill, 0);
+> -	spin_unlock_bh(&vi->refill_lock);
+> +	if (dev->flags & IFF_UP) {
+> +		local_bh_disable();
+> +		for (int i = 0; i < vi->curr_queue_pairs; ++i)
+> +			virtqueue_napi_schedule(&vi->rq[i].napi, vi->rq[i].vq);
+> +
+> +		local_bh_enable();
+> +	}
+>  
+>  	return 0;
+>  }
+> -- 
+> 2.43.0
 
--- 
-#gernperDu 
-#CallMeByMyFirstName
-
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | https://www.pengutronix.de/ |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-9    |
 
