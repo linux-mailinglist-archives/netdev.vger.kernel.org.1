@@ -1,158 +1,126 @@
-Return-Path: <netdev+bounces-247418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB7E9CF9B42
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 18:32:13 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81CD2CF9C05
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 18:39:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 36B9F30621C9
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 17:24:38 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id EF812300D838
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 17:39:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A87FC35503A;
-	Tue,  6 Jan 2026 17:24:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32BFD2D23A6;
+	Tue,  6 Jan 2026 17:32:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bh62mNnQ"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YojZqzSl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D517635503F
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 17:24:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C9692BE7B2
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 17:32:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767720270; cv=none; b=C1YS6X6v37W/QhvupJd9kBQeEC9IO36RIzSciduimJSSDs0NZRUFO8izHzVz27o4CyJLaULz1BXVMl/YColdnyZ77RwweD1mLx1v20yqyVlNZhXG0FlN8jz2lnXd+JBxh+xBZ6a1QafotIWOpCTOhHnpXaT5xNohKy8Nbfbio+Q=
+	t=1767720750; cv=none; b=IZ0tpBgMIQ+7Y84H2ZCTbpQabg8rkdeNDNJtIQKy3gDKXVwnOaIYGR83a4ndIU4Zci1kL1xMJKTWHc5ik+fGzGXyLtS7PEQeZ03Kw42SivAZmV5SRtojeeQbdFJnVFWIeLy0ia6X4Qdjx9L+OhCj35p/BVSkmXg4QlCKuOh8M9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767720270; c=relaxed/simple;
-	bh=PBXmXFFdoiGQ/k66IOSvnkSFvlB00/dqkUW5CoM2QKM=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=WYrqCsuX3k2wUtmjXI7H1EHP3PJMSdqYIu0af+49oqgoJw3o8neqgM0wbROJtlACOKeZSPmLA0aaXfYBHkUwl31AyYHvWYDvL3KYPdMbyp3Uv1TbnTH7O/0UFBuuYdOsxoHl1BMwuBoG7oKQA6+uSJa0DDWhU8WYJbD0iu3QSQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bh62mNnQ; arc=none smtp.client-ip=209.85.219.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-890805821c0so16732686d6.3
-        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 09:24:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767720268; x=1768325068; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=l/AyzvVVbdSsrVuQYyqeT/KxjzeUSnesD4Ly6QNroPI=;
-        b=bh62mNnQydUPXuGyyzo0VCAA18jLOMO8qhByg+dpojh8OoYrhuCUwDn2nUVbTCl888
-         m+fGlDhCSlq2t9C4YMMMoTSu/bRM+pmdbpJ6mS4XFr4imSXUifZ3xXu9Ncdx0+xdm0PV
-         0JYPpsHSgHDU7jAi7WYvZPOGMfbNLBYoLP1RHW5oCuPubk2zOBVHgcOUs37cOPqFHEIO
-         Ge9vId14DgYgV2gR8xp6KVVlVOJ3mYXBX8tp7DRXocKwzQRdTLh1mbTbVVtutcrnYwEH
-         qvii4pr79opuVDJ+nSp/qGKDDARZx8G0zgUgO26FbLuNpvZxufoPskR/pL63AGBUTYVb
-         xmAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767720268; x=1768325068;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=l/AyzvVVbdSsrVuQYyqeT/KxjzeUSnesD4Ly6QNroPI=;
-        b=HFPO1mS0RpG+LnKDUEkUhmeSq/LWJx/qxLhRkyEJIIkKoYvmGLYxDm/9rCJ/FGPowI
-         exRXyb2jWKJmDKfb6kAkU6l6OIrophALlR6z6CqDntWfZTmwdkj0I6dgSdZnebLLliFt
-         Ih2nmGrOMFT7SFwCO11ZTZfNBJeEUsTQqWb8YyVbsYAtzDZ/S+3xPNqChWw0LUfaNl77
-         vtEw0vuPGC3biCp6xXS8FE6gte/EQZti1KyuUz5znSuvzGaC0QkbPX+k/f5KieU/5JRB
-         fcyDC6UPz+zF4sclPCDpPepSWTSTLlEsTR+LzUs4KI0GkqgLAtwpFOvNsB3pmFTT+joW
-         y1DQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW7fWtamYtlhwkziNUvXVCYaoWMDETar4VOomCedI6y2NlCgqgE28OcHaASrA0FHselW3Gh/yE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxR37yE3vB3TUVlH3f2d2DWeJ2NGRkSn0C+z7jfZgtqM6nihfvO
-	z8lw/q96iz2TTd2DUc0JsZ2pjRwgr/cE9wFJzHeFi02NKyBgDVShX5E08ft6D7YZe+z4LtcaYhl
-	CjVTVdb0D6s8Enw==
-X-Google-Smtp-Source: AGHT+IFylB4GuZqZoiyzcivHPgGUq82wrHAtnHVGuXZcQyDEtSqHxfQUZaASjOvv58IyXBqFBvA2v32BvzSJ4A==
-X-Received: from qknsq24.prod.google.com ([2002:a05:620a:4ad8:b0:8ba:ae63:9dfa])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:1a92:b0:8a3:1b83:1036 with SMTP id af79cd13be357-8c37eb815abmr475583185a.29.1767720267703;
- Tue, 06 Jan 2026 09:24:27 -0800 (PST)
-Date: Tue,  6 Jan 2026 17:24:26 +0000
+	s=arc-20240116; t=1767720750; c=relaxed/simple;
+	bh=dXbJQ480Ex7dHR/TXtplwSfA26VcQYxTj83EgCd/iNg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pa9SniwiA93ttyMX5lo92y4lv8Fg8WO6CO151S/u9uM9iZMvXcBRcyUII3l5UdgMvQyGGQVKIpc76PVot5udAp389Engv2nFoxLG6PVZdYdLs2BBS0cdfQ+4QpYaweBhiyRMwB6CiaYnLQnhFIIJmkX8cVf3hZcOrlrbfJBHNaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=YojZqzSl; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=UHId1Qxew/NssO1EEyaTdJ+wVXIuj2+vEjvBcEYjIJ4=; b=YojZqzSljUiPlnnPTIRtBrAbVL
+	OkuNKRKecPWAKJyNQnHwU5XIiRTq78/Bu7g88BvbJd+nKFolQnJtEkO3rC2bs6zg9GCwcIYG5QaLV
+	AWV/7RF5LxAKLKOTbqDoSQEj0TRZL7VHL21/N0mAv8qm4dQ3K/f53Qp+TOT0W3yfboGpvdvuGhjtu
+	QRY378Rcj4OTmyIxYSj+0t9dAbzwsXIU56RALZRO2mxAd6UhKc5GgkWyGkjxGE15/4psoMMCjcGDv
+	/LE1rL0PZy4UzJshJGkTY+UPtVAjEpBv3PBYkOnaXluTTSeEnLjjCKM2IgJm4Ha8PG2ydyh8XPG7G
+	yZoOenqA==;
+Received: from [50.53.43.113] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vdAuv-0000000DZhC-12Gz;
+	Tue, 06 Jan 2026 17:32:25 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: netdev@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	Edward Cree <ecree.xilinx@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-net-drivers@amd.com
+Subject: [PATCH v3 net-next] sfc: correct kernel-doc complaints
+Date: Tue,  6 Jan 2026 09:32:24 -0800
+Message-ID: <20260106173224.2010703-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
-Message-ID: <20260106172426.1760721-1-edumazet@google.com>
-Subject: [PATCH net] ipv4: ip_tunnel: spread netdev_lockdep_set_classes()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+1240b33467289f5ab50b@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Inspired by yet another syzbot report.
+Fix kernel-doc warnings by adding 3 missing struct member descriptions
+in struct efx_ef10_nic_data and removing preprocessor directives (which
+are not handled by kernel-doc).
 
-IPv6 tunnels call netdev_lockdep_set_classes() for each tunnel type,
-while IPv4 currently centralizes netdev_lockdep_set_classes() call from
-ip_tunnel_init().
+Fixes these 5 warnings:
+Warning: drivers/net/ethernet/sfc/nic.h:158 bad line: #ifdef CONFIG_SFC_SRIOV
+Warning: drivers/net/ethernet/sfc/nic.h:160 bad line: #endif
+Warning: drivers/net/ethernet/sfc/nic.h:204 struct member 'port_id'
+ not described in 'efx_ef10_nic_data'
+Warning: drivers/net/ethernet/sfc/nic.h:204 struct member 'vf_index'
+ not described in 'efx_ef10_nic_data'
+Warning: drivers/net/ethernet/sfc/nic.h:204 struct member 'licensed_features'
+ not described in 'efx_ef10_nic_data'
 
-Make ip_tunnel_init() a macro, so that we have different lockdep
-classes per tunnel type.
-
-Fixes: 0bef512012b1 ("net: add netdev_lockdep_set_classes() to virtual drivers")
-Reported-by: syzbot+1240b33467289f5ab50b@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/695d439f.050a0220.1c677c.0347.GAE@google.com/T/#u
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
 ---
- include/net/ip_tunnels.h | 13 ++++++++++++-
- net/ipv4/ip_tunnel.c     |  5 ++---
- 2 files changed, 14 insertions(+), 4 deletions(-)
+v2: update struct member descriptions based on Edward's comments.
+v3: no change, just resend after net-next is open.
 
-diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
-index ecae35512b9b449fa061d96e66eb4533d1816bef..4021e6a73e32b80145d9241e4aca5e7881f04c30 100644
---- a/include/net/ip_tunnels.h
-+++ b/include/net/ip_tunnels.h
-@@ -19,6 +19,7 @@
- #include <net/rtnetlink.h>
- #include <net/lwtunnel.h>
- #include <net/dst_cache.h>
-+#include <net/netdev_lock.h>
- 
- #if IS_ENABLED(CONFIG_IPV6)
- #include <net/ipv6.h>
-@@ -372,7 +373,17 @@ static inline void ip_tunnel_init_flow(struct flowi4 *fl4,
- 	fl4->flowi4_flags = flow_flags;
- }
- 
--int ip_tunnel_init(struct net_device *dev);
-+int __ip_tunnel_init(struct net_device *dev);
-+#define ip_tunnel_init(DEV)			\
-+({						\
-+	struct net_device *__dev = (DEV);	\
-+	int __res = __ip_tunnel_init(__dev);	\
-+						\
-+	if (!__res)				\
-+		netdev_lockdep_set_classes(__dev);\
-+	__res;					\
-+})
-+
- void ip_tunnel_uninit(struct net_device *dev);
- void  ip_tunnel_dellink(struct net_device *dev, struct list_head *head);
- struct net *ip_tunnel_get_link_net(const struct net_device *dev);
-diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
-index 158a30ae7c5f2f1fa39eea7c3d64e36fb5f7551a..50d0f5fe4e4c6d83ef18cdea3ca25aed582839f0 100644
---- a/net/ipv4/ip_tunnel.c
-+++ b/net/ipv4/ip_tunnel.c
-@@ -1281,7 +1281,7 @@ int ip_tunnel_changelink(struct net_device *dev, struct nlattr *tb[],
- }
- EXPORT_SYMBOL_GPL(ip_tunnel_changelink);
- 
--int ip_tunnel_init(struct net_device *dev)
-+int __ip_tunnel_init(struct net_device *dev)
- {
- 	struct ip_tunnel *tunnel = netdev_priv(dev);
- 	struct iphdr *iph = &tunnel->parms.iph;
-@@ -1308,10 +1308,9 @@ int ip_tunnel_init(struct net_device *dev)
- 
- 	if (tunnel->collect_md)
- 		netif_keep_dst(dev);
--	netdev_lockdep_set_classes(dev);
- 	return 0;
- }
--EXPORT_SYMBOL_GPL(ip_tunnel_init);
-+EXPORT_SYMBOL_GPL(__ip_tunnel_init);
- 
- void ip_tunnel_uninit(struct net_device *dev)
- {
--- 
-2.52.0.351.gbe84eed79e-goog
+NOTE: gmail usually blocks my email to Edward's gmail address;
+  gmail identifies it as spam.
 
+Cc: Edward Cree <ecree.xilinx@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: linux-net-drivers@amd.com
+---
+ drivers/net/ethernet/sfc/nic.h |    7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+--- linux-next-20260105.orig/drivers/net/ethernet/sfc/nic.h
++++ linux-next-20260105/drivers/net/ethernet/sfc/nic.h
+@@ -156,9 +156,9 @@ enum {
+  * @tx_dpcpu_fw_id: Firmware ID of the TxDPCPU
+  * @must_probe_vswitching: Flag: vswitching has yet to be setup after MC reboot
+  * @pf_index: The number for this PF, or the parent PF if this is a VF
+-#ifdef CONFIG_SFC_SRIOV
+- * @vf: Pointer to VF data structure
+-#endif
++ * @port_id: Ethernet address of owning PF, used for phys_port_id
++ * @vf_index: The number for this VF, or 0xFFFF if this is a VF
++ * @vf: for a PF, array of VF data structures indexed by VF's @vf_index
+  * @vport_mac: The MAC address on the vport, only for PFs; VFs will be zero
+  * @vlan_list: List of VLANs added over the interface. Serialised by vlan_lock.
+  * @vlan_lock: Lock to serialize access to vlan_list.
+@@ -166,6 +166,7 @@ enum {
+  * @udp_tunnels_dirty: flag indicating a reboot occurred while pushing
+  *	@udp_tunnels to hardware and thus the push must be re-done.
+  * @udp_tunnels_lock: Serialises writes to @udp_tunnels and @udp_tunnels_dirty.
++ * @licensed_features: Flags for licensed firmware features.
+  */
+ struct efx_ef10_nic_data {
+ 	struct efx_buffer mcdi_buf;
 
