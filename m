@@ -1,246 +1,115 @@
-Return-Path: <netdev+bounces-247242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EBF5CF61E4
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 01:54:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 80A74CF6223
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 01:58:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8C6C930693D7
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 00:53:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 501AF302AFF9
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 00:58:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CA4D1F63CD;
-	Tue,  6 Jan 2026 00:53:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 952211F8BD6;
+	Tue,  6 Jan 2026 00:58:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fel.cvut.cz header.i=@fel.cvut.cz header.b="ARugXRoZ"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="UUL7+GZ3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpx.fel.cvut.cz (smtpx.feld.cvut.cz [147.32.210.153])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F984A33;
-	Tue,  6 Jan 2026 00:53:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=147.32.210.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E0DB1C3BF7
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 00:58:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767660811; cv=none; b=ELrwdP6HfeY1wowyAHzOcfKmTNvZpHE+zc3D0KK+b9RVgQbCd2O8ENt2pgMThVF7lDwQz5xhMxiQb+ovMoScYPWLa7bpo9477Ztwpwq31VvzEVacTZPEb9aTm5Guk71tsd1GOW8YcL02W9ejpByp43UmchrhmnXa1JQq7t3HrrI=
+	t=1767661082; cv=none; b=asiRQxPosyhpHU7xU/cqjWkvcjgrpvNXrdPgqqv3JqmEDprQbO73bpjMYMLBHuCe637nfR4nvuF5dMUG1bXfOcmwAXQc+JYtqVb4zRlXPhrIC5CKl3+Xmcw3rB0rww41nhdgnL5LJdgKBest6kd3+EFV4Hu52CrJv73X9bz8QHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767660811; c=relaxed/simple;
-	bh=17z0exQ7SnMFSXdXXuhMDstFuqJF4KKZ0y/RjgFYiYQ=;
-	h=From:To:Subject:Date:Cc:References:In-Reply-To:MIME-Version:
-	 Content-Type:Content-Disposition:Message-Id; b=GVi0O0jLjfdJ0A6PIaa063GGXtBJCzWQ/bb85DgHFiQiP+6XIcJ4BzRauKUW5jXGR2rWKYcIVdF8eLofPAcZJF9LIZgHXkVIn6bIL6H7BwJ4GIHulCu8VF4ImycAnFS5RmyoFBO78Pzrh0o/SpbsBPu2Dx2Qc8E+fW+PR33gdHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fel.cvut.cz; spf=pass smtp.mailfrom=fel.cvut.cz; dkim=pass (2048-bit key) header.d=fel.cvut.cz header.i=@fel.cvut.cz header.b=ARugXRoZ; arc=none smtp.client-ip=147.32.210.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fel.cvut.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fel.cvut.cz
-Received: from localhost (unknown [192.168.200.27])
-	by smtpx.fel.cvut.cz (Postfix) with ESMTP id A2A3D11616;
-	Tue, 06 Jan 2026 01:53:24 +0100 (CET)
-X-Virus-Scanned: IMAP STYX AMAVIS
-Received: from smtpx.fel.cvut.cz ([192.168.200.2])
- by localhost (cerokez-250.feld.cvut.cz [192.168.200.27]) (amavis, port 10060)
- with ESMTP id AFthos-VVGwq; Tue,  6 Jan 2026 01:53:23 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fel.cvut.cz;
-	s=felmail; t=1767660803;
-	bh=gwEadOXuM8MSaAQONaiEvqD9GaYdaBSiDkJe/eYwSto=;
-	h=From:To:Subject:Date:Cc:References:In-Reply-To:From;
-	b=ARugXRoZMNBZb7m6oJaDjCpE/gYe4W7TAmGvTgVCOlT/FEu/Vm7U+Zv5aIKO+97o2
-	 +MDgibg25hQGmS5uwHVKkmp+x3Hy8CzFE7opVjQzP14jw739djnrZKUJFHiEuaD2vx
-	 1bD/UMH3q/x/tCu/dFzMIQ9+GbWlVHcESp4kBCC2QEm+xawC4CNIJlwPtzFd4bRhU3
-	 a9Yfd4KrjRbU63bXaMfr9AoLYr7VfKPrJwWn0KVLyoXsRKLtnH7T2fAq0X09RewT4R
-	 w/1wRlU2rKvP8MD8MnykwbVBfmH7CPpNZmCDIYx6q1BXM0y18We00N3FjrTmHMW79f
-	 X9nioHEUdM/Kw==
-Received: from baree.pikron.com (static-84-242-78-234.bb.vodafone.cz [84.242.78.234])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pisa)
-	by smtpx.fel.cvut.cz (Postfix) with ESMTPSA id 962AA11539;
-	Tue, 06 Jan 2026 01:53:22 +0100 (CET)
-From: Pavel Pisa <pisa@fel.cvut.cz>
-To: Vincent Mailhol <mailhol@kernel.org>,
- Ondrej Ille <ondrej.ille@gmail.com>
-Subject: Re: [PATCH v2] can: ctucanfd: fix SSP_SRC in cases when bit-rate is higher than 1 MBit.
-Date: Tue, 6 Jan 2026 01:53:21 +0100
-User-Agent: KMail/1.9.10
-Cc: linux-can@vger.kernel.org,
- "Marc Kleine-Budde" <mkl@pengutronix.de>,
- David Laight <david.laight.linux@gmail.com>,
- "David S. Miller" <davem@davemloft.net>,
- Andrea Daoud <andreadaoud6@gmail.com>,
- Wolfgang Grandegger <wg@grandegger.com>,
- Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org,
- Jiri Novak <jnovak@fel.cvut.cz>
-References: <20260105111620.16580-1-pisa@fel.cvut.cz> <c5851986-837b-4ffb-9bf7-3131cf9c05d1@kernel.org>
-In-Reply-To: <c5851986-837b-4ffb-9bf7-3131cf9c05d1@kernel.org>
-X-KMail-QuotePrefix: > 
+	s=arc-20240116; t=1767661082; c=relaxed/simple;
+	bh=KWvFDvXHT8S5dvDF1yI8ZG/GMpS/ULrliFX9M8TUh2Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QZpCMuzB6K3KePHYIKGqZEGSDYVcpehE4AA77EW+28y9+4RPRclKhnmWNWuysVqQbwl8ZA+vNi+7Yt9B7v1dy+BLUY/vPV2Ppoy1PCiyjajmVF3/dHyRHvnAHmrNIrsnEHzpAhWJxTFtooC5/RP00kH8RpysvnD3CXKn+Ll31BQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=UUL7+GZ3; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-8bc53dae8c2so58123885a.2
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 16:58:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1767661080; x=1768265880; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KWvFDvXHT8S5dvDF1yI8ZG/GMpS/ULrliFX9M8TUh2Y=;
+        b=UUL7+GZ3a2PmrXbs0RK+LBv4xwA/xKvTWh77jr057j3BFwrpeqPWoL0Cz50sF0Kll2
+         0MrO9BnnnIjJh1NK0+GoDzXJL/rrGji43Q9HMF8e06UtT8qQkGA1tW3vA1bm4Fgupd0q
+         bNW9Lb/6GOiiTMt+66QLpNN7wghp4cBP4Z7UApZxqVlqLrrRMdW+bqjulHm9WqG3gbpw
+         3EdpgPPeQy3so3TPap7EIoQspsL868iZGtbBaXjE5fpp92DJECwV9dOi3TGjZ10KIRr/
+         6Z/lnkJM0HI3njqeVnJSLLfoJbZQZxe0R43IwUWmflG9RB319lWnTrGF81kiIknBJSfl
+         /3UQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767661080; x=1768265880;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KWvFDvXHT8S5dvDF1yI8ZG/GMpS/ULrliFX9M8TUh2Y=;
+        b=STgnQ9A7VoPFdzaD103FPEEX4Jagm7vTxhxqQWupfJybqK0GGad/d3p298Z28R833c
+         nL2CqW/5zOw2dqudK3jb4iSz3CbBfxtFJ+DukUPoRVG9I+woahLopGxBqCTJ8wtZfYcc
+         dP5R4hUvqaoDFdy1ewrO0Jz7lIPj5cerLsmf4IXwAL+X8eDH+285E6UHzEOJfKY4d+Kc
+         cyinRHuseFFBB1C46jJHjdMagK3qNevDOL87m2E7iK7ns0o7iPtE0uQUtpDN8fu4Vqsy
+         S28uVZqyytFmfH0Aik6Y8cdobhCjj8nvaFKD5eCI2wJNr/7chcPSOnhqFipx5vCJiYJe
+         gPaw==
+X-Forwarded-Encrypted: i=1; AJvYcCVrq/rE0STk0yOeVAnMTVjwCjApjYS7OfF3M+HS2qplPJv2mk+4r/4lwWTYA0kuhfYXMiaMsoc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEpxcj46I8xEaYQadDaBb6VUxH9RN94PWDkPDRTirbd4jfY7Uv
+	6r+NamE826mzhG81+Zr1BTOQna7QrrJA3/ZPbpyHRVgaGJnGFZ1LSQi2Ex17/T9KBz4=
+X-Gm-Gg: AY/fxX5BvJYKQ8vW7l0NFbO47znMUfwXNN0A2HZgnMbPZMQ6NreGNuKv3CbKcysinaH
+	/lbJl2iuU/8ps/rxCI1J5KuvylsPvqU6alUAipSKHRpWMo10riR7nK+Dfezyg6OtAyZAkOsN40G
+	1XBmhTqj/8tlKKO0cKlmoYFbur7pkh+kRLg6O/o7QTvSkAl+Bo6MEIqiF8UV4+GACfh7hipte+6
+	Ydx00ikZERlxAD4t01T8aQ8n+XHT20aTU953MGiUQtQvR0sDCzIFrSQTfMPIhi0KPLfHqqwoq3H
+	GnLQKM8GUqhMBS2s9SD8TocrQ7Szv2HfQJtPiri3zL/1n5tv3/SUxBOfpItTPZa4Ufspwd/KBps
+	oVEZN701b/pwXIWHkP1KnYHzjsP7IBsy8g8GqD8m6DX/cUneOtEKjnhvemtQmto3HRPcnC9Lz2T
+	4pWZEvhogbHJ/EmJsXuZ5dv0gTM+ntfP6cDW0/5ziKD4mfz7YQvMAn9dbg+OOeGE12tMU=
+X-Google-Smtp-Source: AGHT+IGa0r5JunugmxLwRSZ3te7/5csaOdNw4asu9kfOiZSkSQ9900m9rT02+OnpqPMVecqSE44X0A==
+X-Received: by 2002:a05:620a:469e:b0:893:2ba8:eec8 with SMTP id af79cd13be357-8c37ec0439fmr206640185a.79.1767661079931;
+        Mon, 05 Jan 2026 16:57:59 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-112-119.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.112.119])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c37f4a6b5bsm65910185a.8.2026.01.05.16.57.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 16:57:59 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vcvOY-00000001EWh-2Hbg;
+	Mon, 05 Jan 2026 20:57:58 -0400
+Date: Mon, 5 Jan 2026 20:57:58 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Zhiping Zhang <zhipingz@meta.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
+	Yochai Cohen <yochai@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [RFC 2/2] Set steering-tag directly for PCIe P2P memory access
+Message-ID: <20260106005758.GM125261@ziepe.ca>
+References: <20251204081117.1987227-1-zhipingz@meta.com>
+ <20251227192303.3866551-1-zhipingz@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Message-Id: <202601060153.21682.pisa@fel.cvut.cz>
+In-Reply-To: <20251227192303.3866551-1-zhipingz@meta.com>
 
-Dear Vincent Mailhol,
+On Sat, Dec 27, 2025 at 11:22:54AM -0800, Zhiping Zhang wrote:
+> For p2p or dmabuf use cases, we pass in an ID or fd similar to CPU_ID when
+> allocating a dmah, and make a callback to the dmabuf exporter to get the
+> TPH value associated with the fd. That involves adding a new dmabuf operation
+> for the callback to get the TPH/tag value associated.
 
-thanks for pointing to Transmission Delay Compensation
-related code introduced in 5.16 kernel. I have noticed it
-in the past but not considered it yet and I think
-that we need minimal fixes to help users and
-allow change to propagate into stable series now.
+Ah, hum, that approach seems problematic since the dmah could be used
+with something that is not the exporting devices MMIO and this would
+allow userspace to subsitute in a wrong TPH which I think we should
+consider a security problem.
 
-More details inline
+I think you need to have the reg_mr_dmabuf itself enforce a TPH if the
+exporting DMABUF requests it that way we know the TPH and the MMIO
+addresses are properly linked together.
 
-On Monday 05 of January 2026 21:27:11 Vincent Mailhol wrote:
-> Le 05/01/2026 =C3=A0 12:16, Pavel Pisa a =C3=A9crit=C2=A0:
-> > From: Ondrej Ille <ondrej.ille@gmail.com>
-> >
-> > The Secondary Sample Point Source field has been
-> > set to an incorrect value by some mistake in the
-> > past
-> >
-> >   0b01 - SSP_SRC_NO_SSP - SSP is not used.
-> >
-> > for data bitrates above 1 MBit/s. The correct/default
-> > value already used for lower bitrates is
->
-> Where does this 1 MBit/s threshold come from? Is this an empirical value?
->
-> The check is normally done on the data BRP. For example we had some
-> problems on the mcp251xfd, c.f. commit 5e1663810e11 ("can: mcp251xfd:
-> fix TDC setting for low data bit rates").
-
-The CTU CAN FD check is done on data bitrate
-
-https://elixir.bootlin.com/linux/v6.18.3/source/drivers/net/can/ctucanfd/ct=
-ucanfd_base.c#L290
-
-  if (dbt->bitrate > 1000000)
-
-the line expands to
-
-  if (priv->can.fd.data_bittiming.bitrate > 1000000)
-
-The value computation has been defined by Ondrej Ille, main author
-of the CTU CAN FD IP core. The main driver author has been
-Martin Jerabek and there seems that we have made some mistake,
-flip in value in the past. But Ondrej Ille is the most competent
-for the core limits and intended behavior and SW support.
-He has invested to complete iso-16845 compliance testing
-framework re-implementation for detailed timing testing.
-There is even simulated environment with clocks jitters
-and delays equivalent to linear, start and other typologies
-run at each core update. The kudos for idea how to implement
-this without unacceptable time required for simulation
-goes to Martin Jerabek. But lot of scenarios are tested
-and Ondrej Ille can specify what is right and has been
-tested. May it be, even Jiri Novak can provide some input
-as well, because he uses CTU CAN FD to deliver more generations
-of CTU tester systems to car makers (mainly SkodaAuto)
-and the need of configurable IP core for these purposes was initial
-driver for the CTU CAN FD core design.
-
-The function of SSP is described in the datasheet and implementation
-in the CTU CAN FD IP CORE System Architecture manual or we can go
-to HDL design as well.
-
-I extrapolate that 1 Mbit/s has been chosen as the switching point,
-because controller and transceivers are expected to support
-arbitration bit rate to at least 1 Mbit/s according to CAN and CAN FD
-standards and there is no chance to use SSP during nominal bitrate.
-
-> Can you use the TDC framework?
-
-In longer term it would be right direction. But TRV_DELAY
-measurement is and should be considered as default for
-data bit rate and BRS set and then the transceiver delay
-should be fully compensated on CTU CAN FD.
-
-Problem was that the compensation was switched off by mistake
-in the encoded value.
-
-But when I study manuals and implementation again, I think that
-there is problem with data bitrate < 1 Mbit/s, because for these
-the compensation should be switched off or the data rate sample_point
-should be recomputed to SSP_OFFET because else sampling is done
-too early. Delay is not added to sampling point. So we should
-correct this to make case with BRS and switching to
-higher data rate (but under 1 Mbit/s) to be more reliable.
-
-There are some limitations in maximal values which can be
-set to SSP_OFFET field. It resolution is high, 10 ns typically
-for our IP CORE FPGA targets with the 100 MHz IP core clock.
-On silicon version, as I know, 80 MHz has been used in the
-last integration. So again, limit is around 2.5 usec or a little
-more for 80 MHz. This matches again mode switch at 1 Mbit/s
-or the other option could be switch when SSP_OFFET exceeds
-250 or some such value.
-
-> Not only would you get a correct=20
-> calculation for when to activate/deactivate TDC, you will also have the
-> netlink reporting (refer to the above commit for an example).
-
-Yes, I agree that availability of tuning and monitoring over
-netlink is nice added value. But at this moment I (personally)
-prefer the minimal fix to help actual users.
-
-I add there links to current CAN FD Transmission Delay Compensation
-support and definition in the Linux kernel code for future integration
-into CTU CAN FD IP core driver
-
-https://elixir.bootlin.com/linux/v6.18.3/source/include/linux/can/bittiming=
-=2Eh#L25
-
-https://elixir.bootlin.com/linux/v6.18.3/source/drivers/net/can/dev/calc_bi=
-ttiming.c#L174
-
-https://elixir.bootlin.com/linux/v6.18.3/source/drivers/net/can/spi/mcp251x=
-fd/mcp251xfd-core.c#L595
-
-and in the controller features announcement
-
-priv->can.ctrlmode_supported =3D CAN_CTRLMODE_LOOPBACK |
-		CAN_CTRLMODE_LISTENONLY | CAN_CTRLMODE_BERR_REPORTING |
-		CAN_CTRLMODE_FD | CAN_CTRLMODE_FD_NON_ISO |
-		CAN_CTRLMODE_CC_LEN8_DLC | CAN_CTRLMODE_TDC_AUTO |
-		CAN_CTRLMODE_TDC_MANUAL;
-
-Best wishes,
-
-Pavel
-
-> >   0b00 - SSP_SRC_MEAS_N_OFFSET - SSP position =3D TRV_DELAY
-> >          (Measured Transmitter delay) + SSP_OFFSET.
-> >
-> > The related configuration register structure is described
-> > in section 3.1.46 SSP_CFG of the CTU CAN FD
-> > IP CORE Datasheet.
-> >
-> > The analysis leading to the proper configuration
-> > is described in section 2.8.3 Secondary sampling point
-> > of the datasheet.
-> >
-> > The change has been tested on AMD/Xilinx Zynq
-> > with the next CTU CN FD IP core versions:
-> >
-> >  - 2.6 aka master in the "integration with Zynq-7000 system" test
-> >    6.12.43-rt12+ #1 SMP PREEMPT_RT kernel with CTU CAN FD git
-> >    driver (change already included in the driver repo)
-> >  - older 2.5 snapshot with mainline kernels with this patch
-> >    applied locally in the multiple CAN latency tester nightly runs
-> >    6.18.0-rc4-rt3-dut #1 SMP PREEMPT_RT
-> >    6.19.0-rc3-dut
-> >
-> > The logs, the datasheet and sources are available at
-> >
-> >  https://canbus.pages.fel.cvut.cz/
-> >
-> > Signed-off-by: Ondrej Ille <ondrej.ille@gmail.com>
-> > Signed-off-by: Pavel Pisa <pisa@fel.cvut.cz>
->
-> Yours sincerely,
-> Vincent Mailhol
-
+Jason
 
