@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-247388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 958A8CF94A9
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 17:17:36 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB2A3CF943C
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 17:08:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 48F24301BEB3
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 16:08:40 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0E438300EBA8
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 16:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAAF71E1DFC;
-	Tue,  6 Jan 2026 16:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2001823815B;
+	Tue,  6 Jan 2026 16:08:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ff+p43d0"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AqjvMWXe"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17D804C92
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 16:08:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204303A1E73
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 16:08:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767715719; cv=none; b=Xhp/Qio0Ebm4OFNlIQCr8CpayuEj+AXL6JkqgBTePfB75C5ae6Cvu7GFYbCS7mzlJuwLlyypEWBTgdTLVnu1n7Wpd4we4r65Rv56iRRMHf5ttFDP61OXcnBDZBl8r6XY5833xaYQ+gc4vNCPvP+y1PpQQPGkiNVm8CfPKkfm5O0=
+	t=1767715721; cv=none; b=BqtRvfdguaArIzhDlP6mHTYka9qoxdCK+XW+QJIvz0qwfwG2xJ65GXMWbfZo+bCGFdWCdZtoVoN3eD9eNQn/EEcKXP69ZhJlLTYK2bBuyt3rmL8RFQauftuHBsTj58VEZXn5BphpOwHb7XKCvZcD9PROR0jyYtF/eD/34llcGr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767715719; c=relaxed/simple;
-	bh=ex+KhyOVgb1LZHod4T7l/Ymwp/2jAiyyGQg2XSWvElM=;
+	s=arc-20240116; t=1767715721; c=relaxed/simple;
+	bh=mdYr1YryAu0zBl12yLb/d7Zs1w5c6gTKt/+089dV6T0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lnUirV2AmdlkyOPiHwbpYuOvwrMA9q2WnnnHCYS9qfpM1X+vZKAQfs9GFQspeB1192fq/O5V7fYXa3PBPgza+MojG74eGmEQp4P6KP4MkN+B2gUm2LszZ7IVKQHUa/Nj1AqEkfRGlzwgW5EB1sRDvhnd/E6d4OXIk4W2q0w2fUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ff+p43d0; arc=none smtp.client-ip=95.215.58.178
+	 MIME-Version; b=Y6P3/8VA0Np2qHVejYhdcbNWnSxrMkla8U20i6dEsbU6EnQ5LBK3gjRPnSFoNIW6Eq09K/Z9dp4yeA542jlef3B5TZaKehEGm1I7kc4BRHdOY9jQm2s8hEVvNroAUp+keo2RGWQbmsSLEvjC9IeuxmIgDAU13QKVcxWIBPGA2mM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AqjvMWXe; arc=none smtp.client-ip=95.215.58.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767715716;
+	t=1767715717;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uiFE/MDy3/0kWuab1HOvPeDsg2kjJJU5i9Ob7XHMbjQ=;
-	b=Ff+p43d06AbIxAQOcel7KNRq/Dpl0ay1qN8TsMT0eh9LY6l02l20m9ULdEijjnZBZ935Yq
-	X5HUrKLpvVlOjTGvVmSJLTYGrGac1+JPK2w1giNpo54euXgRhm9sXxP2Ld68Z0DR00wWAe
-	JgpCSEHctmD54rwnR2tpPRIDrC/Qrdo=
+	bh=t86369xywArR21M0qP80o3uJmGeNYRz9FG2Um0ECWo8=;
+	b=AqjvMWXekjBYW9YhvMlzGycDZoE/PzDqbvRAHEC21Q4JuTtC1VTUZMxXtZlSmgGgEHS50z
+	zWcNBCucR+pevPnkGGz6T0cTmSlqKcsiyfhlcMLjJs6sOK84l99vX3vylUTcOxPzdXr/0z
+	ZnsEge36OwNhKKhCgHc2bvRnV8Fn3Bw=
 From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Russell King <linux@armlinux.org.uk>,
@@ -56,9 +56,9 @@ Cc: Simon Horman <horms@kernel.org>,
 	Kory Maincent <kory.maincent@bootlin.com>,
 	netdev@vger.kernel.org,
 	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: [PATCH net-next v3 1/4] net: phy: micrel: improve HW timestamping config logic
-Date: Tue,  6 Jan 2026 16:07:20 +0000
-Message-ID: <20260106160723.3925872-2-vadim.fedorenko@linux.dev>
+Subject: [PATCH net-next v3 2/4] net: phy: micrel: add HW timestamp configuration reporting
+Date: Tue,  6 Jan 2026 16:07:21 +0000
+Message-ID: <20260106160723.3925872-3-vadim.fedorenko@linux.dev>
 In-Reply-To: <20260106160723.3925872-1-vadim.fedorenko@linux.dev>
 References: <20260106160723.3925872-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
@@ -70,78 +70,55 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The driver was adjusting stored values independently of what was
-actually supported and configured. Improve logic to store values
-once all checks are passing
+The driver stores HW timestamping configuration and can technically
+report it. Add callback to do it.
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
 Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 ---
- drivers/net/phy/micrel.c | 30 ++++++++++++++++++++++++------
- 1 file changed, 24 insertions(+), 6 deletions(-)
+ drivers/net/phy/micrel.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
 diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 05de68b9f719..c0aea74a559f 100644
+index c0aea74a559f..225d4adf28be 100644
 --- a/drivers/net/phy/micrel.c
 +++ b/drivers/net/phy/micrel.c
-@@ -3157,9 +3157,6 @@ static int lan8814_hwtstamp_set(struct mii_timestamper *mii_ts,
- 	int txcfg = 0, rxcfg = 0;
- 	int pkt_ts_enable;
+@@ -3147,6 +3147,18 @@ static void lan8814_flush_fifo(struct phy_device *phydev, bool egress)
+ 	lanphy_read_page_reg(phydev, LAN8814_PAGE_PORT_REGS, PTP_TSU_INT_STS);
+ }
  
--	ptp_priv->hwts_tx_type = config->tx_type;
--	ptp_priv->rx_filter = config->rx_filter;
--
- 	switch (config->rx_filter) {
- 	case HWTSTAMP_FILTER_NONE:
- 		ptp_priv->layer = 0;
-@@ -3187,6 +3184,18 @@ static int lan8814_hwtstamp_set(struct mii_timestamper *mii_ts,
- 		return -ERANGE;
- 	}
++static int lan8814_hwtstamp_get(struct mii_timestamper *mii_ts,
++				struct kernel_hwtstamp_config *config)
++{
++	struct kszphy_ptp_priv *ptp_priv =
++			  container_of(mii_ts, struct kszphy_ptp_priv, mii_ts);
++
++	config->tx_type = ptp_priv->hwts_tx_type;
++	config->rx_filter = ptp_priv->rx_filter;
++
++	return 0;
++}
++
+ static int lan8814_hwtstamp_set(struct mii_timestamper *mii_ts,
+ 				struct kernel_hwtstamp_config *config,
+ 				struct netlink_ext_ack *extack)
+@@ -4399,6 +4411,7 @@ static void lan8814_ptp_init(struct phy_device *phydev)
+ 	ptp_priv->mii_ts.rxtstamp = lan8814_rxtstamp;
+ 	ptp_priv->mii_ts.txtstamp = lan8814_txtstamp;
+ 	ptp_priv->mii_ts.hwtstamp_set = lan8814_hwtstamp_set;
++	ptp_priv->mii_ts.hwtstamp_get = lan8814_hwtstamp_get;
+ 	ptp_priv->mii_ts.ts_info  = lan8814_ts_info;
  
-+	switch (config->tx_type) {
-+	case HWTSTAMP_TX_OFF:
-+	case HWTSTAMP_TX_ON:
-+	case HWTSTAMP_TX_ONESTEP_SYNC:
-+		break;
-+	default:
-+		return -ERANGE;
-+	}
-+
-+	ptp_priv->hwts_tx_type = config->tx_type;
-+	ptp_priv->rx_filter = config->rx_filter;
-+
- 	if (ptp_priv->layer & PTP_CLASS_L2) {
- 		rxcfg = PTP_RX_PARSE_CONFIG_LAYER2_EN_;
- 		txcfg = PTP_TX_PARSE_CONFIG_LAYER2_EN_;
-@@ -5051,9 +5060,6 @@ static int lan8841_hwtstamp_set(struct mii_timestamper *mii_ts,
- 	int txcfg = 0, rxcfg = 0;
- 	int pkt_ts_enable;
+ 	phydev->mii_ts = &ptp_priv->mii_ts;
+@@ -5943,6 +5956,7 @@ static int lan8841_probe(struct phy_device *phydev)
+ 	ptp_priv->mii_ts.rxtstamp = lan8841_rxtstamp;
+ 	ptp_priv->mii_ts.txtstamp = lan8814_txtstamp;
+ 	ptp_priv->mii_ts.hwtstamp_set = lan8841_hwtstamp_set;
++	ptp_priv->mii_ts.hwtstamp_get = lan8814_hwtstamp_get;
+ 	ptp_priv->mii_ts.ts_info = lan8841_ts_info;
  
--	ptp_priv->hwts_tx_type = config->tx_type;
--	ptp_priv->rx_filter = config->rx_filter;
--
- 	switch (config->rx_filter) {
- 	case HWTSTAMP_FILTER_NONE:
- 		ptp_priv->layer = 0;
-@@ -5081,6 +5087,18 @@ static int lan8841_hwtstamp_set(struct mii_timestamper *mii_ts,
- 		return -ERANGE;
- 	}
- 
-+	switch (config->tx_type) {
-+	case HWTSTAMP_TX_OFF:
-+	case HWTSTAMP_TX_ON:
-+	case HWTSTAMP_TX_ONESTEP_SYNC:
-+		break;
-+	default:
-+		return -ERANGE;
-+	}
-+
-+	ptp_priv->hwts_tx_type = config->tx_type;
-+	ptp_priv->rx_filter = config->rx_filter;
-+
- 	/* Setup parsing of the frames and enable the timestamping for ptp
- 	 * frames
- 	 */
+ 	phydev->mii_ts = &ptp_priv->mii_ts;
 -- 
 2.47.3
 
