@@ -1,55 +1,61 @@
-Return-Path: <netdev+bounces-247248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E163ECF6441
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 02:30:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52EB4CF6456
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 02:31:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 76F71304DB72
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 01:27:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 52C503032718
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 01:31:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81B613A3ED;
-	Tue,  6 Jan 2026 01:27:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B89011F63CD;
+	Tue,  6 Jan 2026 01:30:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OztnDUW/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bm1DeggK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C35557640E
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 01:27:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87BE141C71;
+	Tue,  6 Jan 2026 01:30:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767662867; cv=none; b=ic5dlBmF3uBCX0ufhlP2OXy+TCgqPwjB7yxFB8bu4yo1nzpKLBXSAl+vDKdOF5vmLxOgcCs6Q2VIa6qfp6/OHbNxs7O85XcqDlhTw3IRDuLunrjmDackHIvUrJ5GNnKHN7NuiP13C3b46mcbKkiil3pe1jO2SBykA9cEaInJQks=
+	t=1767663058; cv=none; b=effQKOphf+O02DHAq03O98ye82zMqZ4LL/sNaa/mwDuH8cez21xIC2MfMVxfogn4nPViJUcn8H/6QPQehhBQAwwZqTrFe1WmBhLctc908YW7FtdT/1WWAFzXxUEDR4cHlM2MVkouy7G2Zg8wAqkFKCY6DMyo/wVcZEmEfLFuCB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767662867; c=relaxed/simple;
-	bh=HjmmbT7swPUwLz2gSCBCSLmFC0htS2vCSiQNmDztMQo=;
+	s=arc-20240116; t=1767663058; c=relaxed/simple;
+	bh=4uAVm2ZWkiuaol1HXlcytM5IJJy/t7P3QPqqjdvoEqg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MGoYuc/YTUmocHVQk7CFwQbsWUIQFkzi8YoHXRi/wJq0qt8fYZP1ITZ1p1j2SHzv1AkwBQMngry/uGeeQZ+GQ2+VD9nu9HDB75Lm4fc3C+tTYMNqD10YwPUMxbdLk0jxCKmow5tgbe75yBASoWmUMyTgCRe1eMAJNemSIDv7TVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OztnDUW/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2A8AC116D0;
-	Tue,  6 Jan 2026 01:27:46 +0000 (UTC)
+	 MIME-Version:Content-Type; b=fVOyormnhTyzukfGSjOPc4OxgSe/9W+3sytvd2cnyRAC+RVdYOAAeQrdSRS/Gar3Cr5Q2SjP1EfiOExe2B219AMWyBZk+IzIncPbgxCe3Rngura1G8rgElLNOjjcUn4HtUPiu6mcMslmDXbyEEsFndJ5OPCYlAztB/pdEt+O8sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bm1DeggK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 814A5C19421;
+	Tue,  6 Jan 2026 01:30:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767662867;
-	bh=HjmmbT7swPUwLz2gSCBCSLmFC0htS2vCSiQNmDztMQo=;
+	s=k20201202; t=1767663058;
+	bh=4uAVm2ZWkiuaol1HXlcytM5IJJy/t7P3QPqqjdvoEqg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OztnDUW/IqqWHPqoMLz7nnfz3BTXNvUJvK6w97FtsGBPVPyXOJAh340w+lD7G0NHP
-	 zloQ9g6/xn6owcg2BcUhn5yCZ/R6zx+arBIWjTs+yz2cl8N4gNgmbNi0pQOrSmRVGN
-	 vD85Tx3cw7rHV6DyTKfBd9TtJ7t+zykwMSOik8Mr15MI3XonRsthSZZkwarxE4MIe6
-	 OReHEmO23vijsbtkvrYmHr2DXa4KOcIJ8KskmxEOMM5u4AloAfEc62nAxdn7ItJna4
-	 LFIGZd3aksszBcsVglvGf2j6ON/2/S/oF9R1Pbly7q+7Kt0tDQagREO9+kmBnNMfKR
-	 2uwfl3qevfIrQ==
-Date: Mon, 5 Jan 2026 17:27:45 -0800
+	b=bm1DeggKLEYdAQ0O/D1NZ5NhYiEfNHIfgb5AEOQ11rU3vesRjtutDI56YlV0dCuBr
+	 zYi6uVZ96gupWKqg1IUC5S80mC6SYBdACc3ypMAQmcW+QLAaVUIrUjLiojFMIKlR6l
+	 dvStgBAJ1BiL23pbccrRVW/rkCRO2qHHt9qaFtXowIIcMjVSzsl8RjEqJss8VMKUBX
+	 2MfVSJZmBexaGCRqY+ALgbwc+9J8WDLDDuZ1Rw0yf4EWMuu6iWlimWKspLoZuibTdP
+	 o/3mGbhA3mGhxMQ0jtWyCwvJ+KDIdfcOmFouNf2l/jf34nvI3WTimW1c4xojBbsIte
+	 GrOgH6ED9woow==
+Date: Mon, 5 Jan 2026 17:30:56 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Rishikesh Jethwani <rjethwani@purestorage.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, saeedm@nvidia.com,
- tariqt@nvidia.com, mbloch@nvidia.com, borisp@nvidia.com,
- john.fastabend@gmail.com, sd@queasysnail.net, davem@davemloft.net
-Subject: Re: [PATCH v3 1/2] tls: TLS 1.3 hardware offload support
-Message-ID: <20260105172745.5cc67e79@kernel.org>
-In-Reply-To: <20260102184708.24618-2-rjethwani@purestorage.com>
-References: <20260102184708.24618-1-rjethwani@purestorage.com>
-	<20260102184708.24618-2-rjethwani@purestorage.com>
+To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
+ kotaranov@microsoft.com, horms@kernel.org,
+ shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+ ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ dipayanroy@microsoft.com
+Subject: Re: [PATCH net-next, v6] net: mana: Implement ndo_tx_timeout and
+ serialize queue resets per port.
+Message-ID: <20260105173056.7c2c9d0a@kernel.org>
+In-Reply-To: <20260103045705.GA3757@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20260103045705.GA3757@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,132 +65,25 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri,  2 Jan 2026 11:47:07 -0700 Rishikesh Jethwani wrote:
-> Add TLS 1.3 support to the kernel TLS hardware offload infrastructure,
-> enabling hardware acceleration for TLS 1.3 connections on capable NICs.
-> 
-> This patch implements the critical differences between TLS 1.2 and TLS 1.3
-> record formats for hardware offload:
-> 
-> TLS 1.2 record structure:
->   [Header (5)] + [Explicit IV (8)] + [Ciphertext] + [Tag (16)]
-> 
-> TLS 1.3 record structure:
->   [Header (5)] + [Ciphertext + ContentType (1)] + [Tag (16)]
-> 
-> Key changes:
-> 1. Content type handling: In TLS 1.3, the content type byte is appended
->    to the plaintext before encryption and tag computation. This byte must
->    be encrypted along with the ciphertext to compute the correct
->    authentication tag. Modified tls_device_record_close() to append
->    the content type before the tag for TLS 1.3 records.
-> 
-> 2. Version validation: Both tls_set_device_offload() and
->    tls_set_device_offload_rx() now accept TLS_1_3_VERSION in addition
->    to TLS_1_2_VERSION.
-> 
-> 3. Pre-populate dummy_page with valid record types for memory
->    allocation failure fallback path.
-> 
-> Note: TLS 1.3 protocol parameters (aad_size, tail_size, prepend_size)
-> are already handled by init_prot_info() in tls_sw.c.
+On Fri, 2 Jan 2026 20:57:05 -0800 Dipayaan Roy wrote:
+> +		apc = netdev_priv(ndev);
+> +		disable_work_sync(&apc->queue_reset_work.work);
 
-I don't see you handling re-keying, which is supported in SW.
+AI code review points out:
 
-> Testing:
-> Verified on Broadcom BCM957608 (Thor 2) and Mellanox ConnectX-6 Dx
-> (Crypto Enabled) using ktls_test. Both TX and RX hardware offload working
-> successfully with TLS 1.3 AES-GCM-128 and AES-GCM-256 cipher suites.
+  In mana_remove(), disable_work_sync() is called for each port's
+  queue_reset_work. However, when resuming=true, mana_probe() creates a new
+  workqueue but does not call mana_probe_port() (which contains INIT_WORK),
+  and there is no enable_work() call for queue_reset_work in the resume path.
 
-The kernel has come a long way in terms of HW testing since TLS was
-added. We now require in-tree selftests for new capabilities. Some
-relevant information here: https://github.com/linux-netdev/nipa/wiki
+  The existing link_change_work handles this correctly: it is disabled in
+  mana_remove() and re-enabled with enable_work(&ac->link_change_work) in
+  mana_probe() when resuming=true.
 
-> The upstream Broadcom bnxt_en driver does not yet support kTLS offload.
-> Testing was performed using the out-of-tree driver version
-> bnxt_en-1.10.3-235.1.154.0, which works without modifications.
-
-It's a bit odd to mention that you tested some out of tree code.
-Glad it works, but I don't see the relevance upstream. Please drop
-the mentions of Broadcom until the driver has TLS offload support added.
-
-> Signed-off-by: Rishikesh Jethwani <rjethwani@purestorage.com>
-> ---
->  net/tls/tls_device.c | 49 ++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 45 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
-> index 82ea407e520a..f57e96862b1c 100644
-> --- a/net/tls/tls_device.c
-> +++ b/net/tls/tls_device.c
-> @@ -319,6 +319,36 @@ static void tls_device_record_close(struct sock *sk,
->  	struct tls_prot_info *prot = &ctx->prot_info;
->  	struct page_frag dummy_tag_frag;
->  
-> +	/* TLS 1.3: append content type byte before tag.
-> +	 * Record structure: [Header (5)] + [Ciphertext + ContentType (1)] + [Tag (16)]
-> +	 * The content type is encrypted with the ciphertext for authentication.
-> +	 */
-> +	if (prot->version == TLS_1_3_VERSION) {
-> +		struct page_frag dummy_content_type_frag;
-> +		struct page_frag *content_type_pfrag = pfrag;
-> +
-> +		/* Validate record type range */
-> +		if (unlikely(record_type < TLS_RECORD_TYPE_CHANGE_CIPHER_SPEC ||
-> +			     record_type > TLS_RECORD_TYPE_ACK)) {
-> +			pr_err_once("tls_device: invalid record type %u\n",
-> +				    record_type);
-> +			return;
-
-This check is really odd. Why is it relevant, and yet not relevant
-enough to handle cleanly? On a quick look it appears that the user
-can set whatever content type they want.
-
-> +
-> +		if (unlikely(pfrag->size - pfrag->offset < prot->tail_size) &&
-> +		    !skb_page_frag_refill(prot->tail_size, pfrag, sk->sk_allocation)) {
-> +			/* Out of memory: use pre-populated dummy_page */
-> +			dummy_content_type_frag.page = dummy_page;
-> +			dummy_content_type_frag.offset = record_type;
-> +			content_type_pfrag = &dummy_content_type_frag;
-> +		} else {
-> +			/* Current pfrag has space or allocation succeeded - write content type */
-> +			*(unsigned char *)(page_address(pfrag->page) + pfrag->offset) =
-> +				record_type;
-
-wrap at 80chars and please refactor this long line into something more
-readable.
-
-> +		}
-> +		tls_append_frag(record, content_type_pfrag, prot->tail_size);
-> +	}
-> +
->  	/* append tag
->  	 * device will fill in the tag, we just need to append a placeholder
->  	 * use socket memory to improve coalescing (re-using a single buffer
-> @@ -335,7 +365,7 @@ static void tls_device_record_close(struct sock *sk,
->  
->  	/* fill prepend */
->  	tls_fill_prepend(ctx, skb_frag_address(&record->frags[0]),
-> -			 record->len - prot->overhead_size,
-> +			 (record->len - prot->overhead_size) + prot->tail_size,
->  			 record_type);
->  }
->  
-> @@ -1089,7 +1119,8 @@ int tls_set_device_offload(struct sock *sk)
->  	}
->  
->  	crypto_info = &ctx->crypto_send.info;
-> -	if (crypto_info->version != TLS_1_2_VERSION) {
-> +	if (crypto_info->version != TLS_1_2_VERSION &&
-> +	    crypto_info->version != TLS_1_3_VERSION) {
->  		rc = -EOPNOTSUPP;
->  		goto release_netdev;
->  	}
-
-Are all existing drivers rejecting TLS 1.3 sessions?
-These days we prefer for drivers to explicitly opt into new features 
-to avoid surprises.
+  Should enable_work(&apc->queue_reset_work.work) be called for each port in
+  the resuming path of mana_probe(), similar to how link_change_work is
+  handled? Otherwise TX timeout recovery appears to remain disabled after a
+  suspend/resume cycle.
 -- 
 pw-bot: cr
 
