@@ -1,162 +1,89 @@
-Return-Path: <netdev+bounces-247294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80F89CF67FB
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 03:44:45 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADC03CF688D
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 03:58:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DAFD8300C9A9
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 02:44:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AE246301693B
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 02:58:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF1A239562;
-	Tue,  6 Jan 2026 02:44:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0352225A3B;
+	Tue,  6 Jan 2026 02:58:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61CE20468E;
-	Tue,  6 Jan 2026 02:44:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03EDA22172C;
+	Tue,  6 Jan 2026 02:58:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767667479; cv=none; b=aGJj8yQxMSJI1UjIy1wNip69DSuA5HTKnDmJD3umP8lRBvwaPRwb4FXScbDh0475OVFLjI+JTOm7medB0B/6KLH3DIW2QEq7f2HWLeRIH7fcPKkMpCJLIF3MPjmgbeoh1UM9t9lRsy1z7OD4CG0s7xyfVRvIgn3Xf11hVaGiguM=
+	t=1767668292; cv=none; b=Pnt2yD87QilXHHv/5BBeImp8xoAEFQNMNKBl2Woap3Hvudx6A/9t1+2uvv91G7isq1MRiJ0UkjYv1xvuBuFi7Y203LPSMtbhjokR/v9bQPk56Z8oJaMv2wBhjLfihyMHDNA2fI52JCzWqw1BdS2aPqEAahIL8wsxo59NO7cT89Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767667479; c=relaxed/simple;
-	bh=xl8NxzKHk60ABfeTu1tc38ZYZqWuMncWIqmfh9j+rVE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fgNCpWOxVUzuWNfa12dzHi8vYcqEWUrO0lksE+XqZIpwHs6tCV+OSg5zp5WeNQSUKkQWIp8sOzbhPMkrK30pdg0/OJ6hNTTPegVlmrJIhmatZjoiy2qGqsk9tu6RheOvQxux7LPe2mTwW8Et8MKJ3wWvBLjrLWfQkBN7DD6b1+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.198])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4dlb862KVLzYQtgV;
-	Tue,  6 Jan 2026 10:43:34 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 2181340577;
-	Tue,  6 Jan 2026 10:44:34 +0800 (CST)
-Received: from [10.67.111.176] (unknown [10.67.111.176])
-	by APP4 (Coremail) with SMTP id gCh0CgA35vYQd1xp4sMoCw--.16779S2;
-	Tue, 06 Jan 2026 10:44:33 +0800 (CST)
-Message-ID: <014d87db-f389-4bba-be79-f5650ad08003@huaweicloud.com>
-Date: Tue, 6 Jan 2026 10:44:31 +0800
+	s=arc-20240116; t=1767668292; c=relaxed/simple;
+	bh=piHqaYT/Pg5JffobCD10YogGqPLXFXxpF9+T+W0urKg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j7d83mXJ44X3MuYQZKnKnUXuOG9ReGilhJy4SsdF9RoiLxahMIXTGsPC+r5Kg0dBfDHxrSfG/fUzAj659NHQG3xbSTtBRbiLvH9EL5dYWmJ7AN8HyUD0Q5W/VYGbaEiPy86zoc1f9dYMUaUrUDJ9xJE/J57GPFM2CbQcnOBS1ZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vcxGi-000000003tJ-1qgp;
+	Tue, 06 Jan 2026 02:58:00 +0000
+Date: Tue, 6 Jan 2026 02:57:56 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH RFC net-next v3 2/4] net: dsa: add tag formats for
+ MxL862xx switches
+Message-ID: <aVx6NABI_8gEEysQ@makrotopia.org>
+References: <cover.1765757027.git.daniel@makrotopia.org>
+ <de01f08a3c99921d439bc15eeafd94e759688554.1765757027.git.daniel@makrotopia.org>
+ <20251216203935.z5ss4sxbt6xc2444@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: linux-next: manual merge of the bpf-next tree with the
- mm-unstable tree
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
- Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Daniel Borkmann <daniel@iogearbox.net>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>, bpf <bpf@vger.kernel.org>,
- Networking <netdev@vger.kernel.org>, Chen Ridong <chenridong@huawei.com>,
- JP Kobryn <inwardvessel@gmail.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Next Mailing List <linux-next@vger.kernel.org>,
- Roman Gushchin <roman.gushchin@linux.dev>
-References: <20260105130413.273ee0ee@canb.auug.org.au>
- <CAADnVQKkphWpwKE17bGQao36dH8xqCyV-iXDcagrO7s-VOPE-w@mail.gmail.com>
-Content-Language: en-US
-From: Chen Ridong <chenridong@huaweicloud.com>
-In-Reply-To: <CAADnVQKkphWpwKE17bGQao36dH8xqCyV-iXDcagrO7s-VOPE-w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgA35vYQd1xp4sMoCw--.16779S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxZw1ruF48tF1UCFWkCw43trb_yoW5XrWrpF
-	ZrA3W3KayUArWrJF4Ska4j9a4fZw1xXw12yr9Ig348ZFy3tw1fXasxCws8CF15CF9YgF13
-	trZxtw1kGw43AaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
-	14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8
-	ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
-	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
-	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1
-	7KsUUUUUU==
-X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251216203935.z5ss4sxbt6xc2444@skbuf>
 
+On Tue, Dec 16, 2025 at 10:39:35PM +0200, Vladimir Oltean wrote:
+> On Mon, Dec 15, 2025 at 12:11:43AM +0000, Daniel Golle wrote:
+> > the actual tag format differs significantly, hence we need a dedicated
+> > tag driver for that.
+> 
+> Reusing the same EtherType for two different DSA tagging protocols is
+> very bad news, possibly with implications also for libpcap. Is the
+> EtherType configurable in the MXL862xx family?
 
-
-On 2026/1/6 10:15, Alexei Starovoitov wrote:
-> On Sun, Jan 4, 2026 at 6:04 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->>
->> Hi all,
->>
->> Today's linux-next merge of the bpf-next tree got a semantic conflict in:
->>
->>   include/linux/memcontrol.h
->>   mm/memcontrol-v1.c
->>   mm/memcontrol.c
->>
->> between commit:
->>
->>   eb557e10dcac ("memcg: move mem_cgroup_usage memcontrol-v1.c")
->>
->> from the mm-unstable tree and commit:
->>
->>   99430ab8b804 ("mm: introduce BPF kfuncs to access memcg statistics and events")
->>
->> from the bpf-next tree producing this build failure:
->>
->> mm/memcontrol-v1.c:430:22: error: static declaration of 'mem_cgroup_usage' follows non-static declaration
->>   430 | static unsigned long mem_cgroup_usage(struct mem_cgroup *memcg, bool swap)
->>       |                      ^~~~~~~~~~~~~~~~
->> In file included from mm/memcontrol-v1.c:3:
->> include/linux/memcontrol.h:953:15: note: previous declaration of 'mem_cgroup_usage' with type 'long unsigned int(struct mem_cgroup *, bool)' {aka 'long unsigned int(struct mem_cgroup *, _Bool)'}
->>   953 | unsigned long mem_cgroup_usage(struct mem_cgroup *memcg, bool swap);
->>       |               ^~~~~~~~~~~~~~~~
->>
->> I fixed it up (I reverted the mm-unstable tree commit) and can carry the
->> fix as necessary. This is now fixed as far as linux-next is concerned,
->> but any non trivial conflicts should be mentioned to your upstream
->> maintainer when your tree is submitted for merging.  You may also want
->> to consider cooperating with the maintainer of the conflicting tree to
->> minimise any particularly complex conflicts.
-> 
-> Hey All,
-> 
-> what's the proper fix here?
-> 
-> Roman,
-> 
-> looks like adding mem_cgroup_usage() to include/linux/memcontrol.h
-> wasn't really necessary, since kfuncs don't use it anyway?
-> Should we just remove that line in bpf-next?
-> 
-
-I agree, mem_cgroup_usage() is not declared in next.
-
-I'm wondering why there is a difference between next and bpf-next.
-
-> Just:
-> diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
-> index 6a5d65487b70..229ac9835adb 100644
-> --- a/include/linux/memcontrol.h
-> +++ b/include/linux/memcontrol.h
-> @@ -950,7 +950,6 @@ static inline void mod_memcg_page_state(struct page *page,
->  }
-> 
->  unsigned long memcg_events(struct mem_cgroup *memcg, int event);
-> -unsigned long mem_cgroup_usage(struct mem_cgroup *memcg, bool swap);
->  unsigned long memcg_page_state(struct mem_cgroup *memcg, int idx);
->  unsigned long memcg_page_state_output(struct mem_cgroup *memcg, int item);
->  bool memcg_stat_item_valid(int idx);
-> 
-> compiles fine.
-> 
-> If you agree pls send an official patch.
-> 
-
--- 
-Best regards,
-Ridong
-
+Only the egress EtherType can be configured, there is currently no way
+to configure the ingress EtherType the switch expects to receive on
+special-tag packets on the CPU port. MaxLinear, however, said they could
+in theory release a new firmware changing the EtherType to any suggested
+value, but it would be incompatible with existing downstream drivers in
+the field, obviously.
 
