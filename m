@@ -1,92 +1,152 @@
-Return-Path: <netdev+bounces-247441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B15D9CFA805
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 20:09:21 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21008CFAB00
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 20:32:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 48080305F528
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 19:08:08 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 408F43001BE0
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 19:31:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 718AE2C027B;
-	Tue,  6 Jan 2026 19:08:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D3E73559CB;
+	Tue,  6 Jan 2026 19:13:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JFQ5SAei"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="J1ZBZfYB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44142274FDF;
-	Tue,  6 Jan 2026 19:08:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8093559EC
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 19:12:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767726482; cv=none; b=jgp0ZmZjYCm907l9u+JrKp696He5b5lNPrd8NUrlGR0SwCHq4GHiknR6JLnER4/6PDD7QUih6Gp/Ypmuggm4yoFMnqOK9MAJoS6RFoLbUiezwO6WmfjnYBDcnfOllZ+0NQaS7bwYRJ4pzzzCSaE9Y/av3gDSfchSDnJ1yOmTVok=
+	t=1767726781; cv=none; b=R+L9basllmnn4UgMWQBUNQULBGgpzln5IbBeNCTU+txMfICrUWLgQkmF4uezSIlNu38WSEvk0Ly6I6oEKCLRawSvpiqxhFOo0wUUPUfnZ7dGmGlno+T2Yq1efk1zPweSrMGHss55D2RG8FDiclM4ZBCOXWFKkoycsRPsJziBbHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767726482; c=relaxed/simple;
-	bh=u9DkmJtck8Gc8X7zOPBHUnDaOOBZacRpl9q/C06riN0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mKHOt4nXzG2lDoZZ5dsMK97qBFc8Gxn+M2uE6j0sXbB/7EW2iJBCWD/C0bbZZQFtMBOUXWzSBztT1e8kRneVQZpFB3WOZ2+68wxWFuiafxfNBipjQxIA4k3nbt4ubqp0VoPb8JB5ri4IWM1rj9dTdTVxY+hDQSDo8rpVUP8BZTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JFQ5SAei; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BCBBC19422;
-	Tue,  6 Jan 2026 19:08:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767726481;
-	bh=u9DkmJtck8Gc8X7zOPBHUnDaOOBZacRpl9q/C06riN0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JFQ5SAeiBqjiwrJGCO0B7KsJHn/6wn0GLVEQG4Rl16FaTkv8L/Od3KLBU6TrweBG7
-	 2cqKgSdU8YQyshLZP4ZFg2WuN3Dw53KkGNFUCtk1NoQaqfVhv6Rvt0RHflV33LQ2B6
-	 BTw6e4rWTdVIf/4n28ye+uDgMU7kBZ1LoWDQUXjhqS7jMElwB0t7UN4RYe55ZqlOLg
-	 zAQD0YhaLu7D560lJVbOljv5INF/IlDEOdJAAJv+0YMVhyB3hV4kzgCP8IapNwBOdt
-	 cS6OxwoNZiblSwool7IVY89R68Aoa47PjrpjEfF5Dy0G+7ph5Vmreg3wwLmcx9eKLF
-	 HOA4qTQVmi9GA==
-Date: Tue, 6 Jan 2026 13:08:00 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: "A. Sverdlin" <alexander.sverdlin@siemens.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, devicetree@vger.kernel.org,
-	Daniel Golle <daniel@makrotopia.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
-	netdev@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
-	Hauke Mehrtens <hauke@hauke-m.de>,
-	Vladimir Oltean <olteanv@gmail.com>
-Subject: Re: [PATCH net-next v3 1/2] dt-bindings: net: dsa: lantiq,gswip: add
- MaxLinear R(G)MII slew rate
-Message-ID: <176772648028.2565771.5663023472968969071.robh@kernel.org>
-References: <20260105175825.2142205-1-alexander.sverdlin@siemens.com>
+	s=arc-20240116; t=1767726781; c=relaxed/simple;
+	bh=MTcyF5b+m7Nyqandj8JtczWsOLQSOo5LeGjHtbxWriw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=jxLHV7k9mZhtnt2YRK7+3pKlm7WCv/iqnZJrE/Ty4OQX/ds4/IkQS050pxk8YlnywlF0hPecGZMUzru/ouPCgdfGMT8ojOtubGTQzjHmdEI7rAjGvbYAG/XprLWM8RI5O1vklD+GshizyloliOe1hoPBKfiDRhXcMpqCReBnkyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=J1ZBZfYB; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b76b5afdf04so243274566b.1
+        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 11:12:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1767726778; x=1768331578; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NXWpgxUwvI+z5T2g0AYqNsPXHVO8gEezrOfJieXUNiU=;
+        b=J1ZBZfYBN/5Aqgd1hJT8EvXHE+m2mSbf6ghC7xxsR/O1bXxPVJ9TeF09lQq4rWbeBO
+         W2yCD7rvqI7+UWO/1L3W6rkbGBDygal0nssDjKyOx5s/YnfXTO9M+AczvxNQ75uzKMc2
+         OwMmdZ0Vahj4gAClUs1TJwdUNOrhudbVmfX+BLn23ratB5M5tkJHTf/8eltiEBCqx5YV
+         3Ilo+c+2VjixeugzzvRvdEaeP1Ps5I3GqnkkreyGoCqs3YQAW5S//rzUHzCWTyNG41aF
+         3kOBAYZ0l7Dr4nPgk42BPmU9s8ZOVkO1qg6GR4xm1poKxokoqPodgDAjifDaE3x7/nK5
+         Jyhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767726778; x=1768331578;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=NXWpgxUwvI+z5T2g0AYqNsPXHVO8gEezrOfJieXUNiU=;
+        b=CwUwP9AnpLhTwhVESCuPGtqy6OH8COOpmvwpXhKirB/2o6nijnkrbiqWLt31oJA4Of
+         83UuMUtoN4iifQNIg20vTwwdw6VdSuQjjSrf5Spt1umHLt6eTfQtYyB3rnQuRfzUvvpr
+         7psNeHDiTbKur5d67rp13N3thGSANlQyIiZBSGuknBiPCVXAFSdV9q07jEu6/RGcmYSO
+         w6SIhgFgBEALughPM+NBT3xbKX+l2GA8T3Qd5CkYXqB6ppJUFfeAr6l9dsKFTg1Kpeu3
+         ActIfaSyCgrYeiKCW4WcBB+lc7RYX4KYraFyyW5rCCnhyxF9ilwuVEnPFskcD/LWGdvv
+         TH0A==
+X-Forwarded-Encrypted: i=1; AJvYcCUaU89AiWxkK2cYJiI2NhTjYnxofVtHXlKrRd105mr1fYwQauhAAd/et9EXJvDVKszpi8C8xpg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyobVmcAYfxrgp+249YPLv7e88qstSXflkLqFi1AHjDa2kVKS0K
+	Ns95B1LFbKi9d/SITvuss0ZiHCm7+KqMEpg66Lus/vcuQ+CP5yyMbs7TWdMMDR1yaRI=
+X-Gm-Gg: AY/fxX4Cs7dz6qiEAPz+AfkgXGrhtL7cADApn+OhZQFqkcetw9aMxb032Noe2ZjQ9VD
+	4S9t6D7XfWMB3IFthb0X5JQR5OsrEFobaTbP1JekkmZxyeMDMASD2J/vz44lFvxoLF1IJKHrGfM
+	XD6jZBlQnROF9LPVMXQ8A/sEOusl9tjc30EWZqx0ah9HxrZ0mpKdlYA0AA+2kkRVZJS3k/We2W6
+	95+uJ8V55GguS7O7rFYZhgK4kME7gmC9+6MLQTpAZcCzsA5C4GZr8GO5mQ2Q3d+MUub5UlWxheg
+	JsO/Vxqy2g3uabUjkyOPmSYs085+aQzTkdKblvDj+mxqRwpjURxua68sltJ0pSonuimjt9JVxcD
+	lP1sSPHUOfdRt7FaFayegF+iqi+5V0raorE+Fu1ZdsS+2A1WBuTnqAjyVEDCCFbRVzoFUKTPJ+/
+	gy3w==
+X-Google-Smtp-Source: AGHT+IE3z7Gjd92GDSE6PNW2kogYeyhE4xgee7+KnxQ3/NwdbhBSJKfxfIGkZrdtzTRaaf5Uhcw0Uw==
+X-Received: by 2002:a17:907:3d0b:b0:b83:1326:7d45 with SMTP id a640c23a62f3a-b8445345f6dmr14494766b.32.1767726778155;
+        Tue, 06 Jan 2026 11:12:58 -0800 (PST)
+Received: from cloudflare.com ([2a09:bac5:5063:295f::41f:a])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a4d0290sm291076166b.32.2026.01.06.11.12.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Jan 2026 11:12:57 -0800 (PST)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Amery Hung <ameryhung@gmail.com>, Alexei Starovoitov
+ <alexei.starovoitov@gmail.com>,  Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Martin KaFai Lau <martin.lau@kernel.org>,  bpf <bpf@vger.kernel.org>,
+  Network Development <netdev@vger.kernel.org>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Alexei
+ Starovoitov <ast@kernel.org>,  Daniel Borkmann <daniel@iogearbox.net>,
+  Jesper Dangaard Brouer <hawk@kernel.org>,  John Fastabend
+ <john.fastabend@gmail.com>,  Stanislav Fomichev <sdf@fomichev.me>,  Simon
+ Horman <horms@kernel.org>,  Andrii Nakryiko <andrii@kernel.org>,  Eduard
+ Zingerman <eddyz87@gmail.com>,  Song Liu <song@kernel.org>,  Yonghong Song
+ <yonghong.song@linux.dev>,  KP Singh <kpsingh@kernel.org>,  Hao Luo
+ <haoluo@google.com>,  Jiri Olsa <jolsa@kernel.org>,  kernel-team
+ <kernel-team@cloudflare.com>
+Subject: Re: [PATCH bpf-next v2 15/16] bpf: Realign skb metadata for TC
+ progs using data_meta
+In-Reply-To: <CAMB2axNnCWp0-ow7Xbg2Go7G61N=Ls_e+DVNq5wBWFbqbFZn-A@mail.gmail.com>
+	(Amery Hung's message of "Tue, 6 Jan 2026 09:46:49 -0800")
+References: <20260105-skb-meta-safeproof-netdevs-rx-only-v2-0-a21e679b5afa@cloudflare.com>
+	<20260105-skb-meta-safeproof-netdevs-rx-only-v2-15-a21e679b5afa@cloudflare.com>
+	<CAADnVQJbGosoXOCdyi=NZar966FVibKYobBgQ9BiyEH3=-HOsw@mail.gmail.com>
+	<CAMB2axPivi+mZOXie=VnJM8nscqkHDjSrKT=Dhp5z_copEwxLQ@mail.gmail.com>
+	<e969a85c-94eb-4cb5-a7ac-524a16ccce01@linux.dev>
+	<CAADnVQKB5vRJM4kJC5515snR6KHweE-Ld_W1wWgPSWATgiUCwg@mail.gmail.com>
+	<d267c646-1acc-4e5b-aa96-56759fca57d0@linux.dev>
+	<CAMB2axM+Z9npytoRDb-D1xVQSSx__nW0GOPMOP_uMNU-ZE=AZA@mail.gmail.com>
+	<CAADnVQJ=kmVAZsgkG9P2nEBTUG3E4PrDG=Yz8tfeFysH4ZBqVw@mail.gmail.com>
+	<877btu8wz2.fsf@cloudflare.com>
+	<CAMB2axNnCWp0-ow7Xbg2Go7G61N=Ls_e+DVNq5wBWFbqbFZn-A@mail.gmail.com>
+Date: Tue, 06 Jan 2026 20:12:56 +0100
+Message-ID: <87qzs2imh3.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260105175825.2142205-1-alexander.sverdlin@siemens.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Jan 06, 2026 at 09:46 AM -08, Amery Hung wrote:
+> On Tue, Jan 6, 2026 at 9:36=E2=80=AFAM Jakub Sitnicki <jakub@cloudflare.c=
+om> wrote:
+>> --- a/kernel/bpf/verifier.c
+>> +++ b/kernel/bpf/verifier.c
+>> @@ -21806,6 +21806,14 @@ static int convert_ctx_accesses(struct bpf_veri=
+fier_env *env)
+>>                         env->prog =3D new_prog;
+>>                         delta +=3D cnt - 1;
+>>
+>> +                       /* gen_prologue emits function calls with target=
+ address
+>> +                        * relative to __bpf_call_base. Skip patch_call_=
+imm fixup.
+>> +                        */
+>> +                       for (i =3D 0; i < cnt - 1; i++) {
+>> +                               if (bpf_helper_call(&env->prog->insnsi[i=
+]))
+>> +                                       env->insn_aux_data[i].finalized_=
+call =3D true;
+>> +                       }
+>> +
+>>                         ret =3D add_kfunc_in_insns(env, insn_buf, cnt - =
+1);
+>
+> And then we can get rid of this function as there is no use case for
+> having a new kfunc in gen_{pro,epi}logue.
 
-On Mon, 05 Jan 2026 18:58:21 +0100, A. Sverdlin wrote:
-> From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
-> 
-> Add new slew-rate uint32 property. This property is only applicable for
-> ports in R(G)MII mode and allows for slew rate reduction in comparison to
-> "normal" default configuration with the purpose to reduce radiated
-> emissions.
-> 
-> Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
-> ---
-> Changelog:
-> v3:
-> - use [pinctrl] standard "slew-rate" property as suggested by Rob
->   https://lore.kernel.org/all/20251219204324.GA3881969-robh@kernel.org/
-> v2:
-> - unchanged
-> 
->  .../devicetree/bindings/net/dsa/lantiq,gswip.yaml          | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
+Happy to convert bpf_{qdisc,testmod} gen_{pro,epi}logue to use
+BPF_EMIT_CALL instead of BPF_CALL_KFUNC.
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+If it's alright with you, I'd like to kill kfunc support in
+{pro,epi}logue as a follow up.
 
+Looks like there will be a bit of churn in selftests to remove the
+coverage. And this series is getting quite long.
 
