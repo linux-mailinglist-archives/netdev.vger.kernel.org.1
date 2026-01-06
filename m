@@ -1,143 +1,98 @@
-Return-Path: <netdev+bounces-247326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A02FCF75D5
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 09:55:01 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C754CF7633
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 10:04:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 301B530321C7
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 08:54:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id EE012301986E
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 09:04:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39988309F1C;
-	Tue,  6 Jan 2026 08:54:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80B0E28CF6F;
+	Tue,  6 Jan 2026 09:04:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lZwDaoWC"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ieYFmztc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8203E2D8390
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 08:54:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB12A1E50E
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 09:04:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767689698; cv=none; b=ltQLrLpIiv8+n5C7CIgo9IYnbLxAqWwPSckXYH5FZmedzcKb+QubaVNs9ycL+tz0GT8u1KlryTWeVsTHTveMo7UN3IdRA7PSAGXVs+ztY4GoSNppOegJHrVkzseRLPdFg42aeTKaLX6J4pa2MWUl73QtQWhbys5BQepmzthv1pY=
+	t=1767690246; cv=none; b=aos9tbCHgvQUL5mxRBKFNf5niWEFvTe5fj1GfKLe5zvCB+3U1dH76q2F265FlIyulcIa5QyRCpV5UNGHiZrXCSg5hN8ta37gBR8ZBSEPMHnkyEOGHv7L9NEFEh/v8T5wTv/UVGbW27kBevj2su0VkBpQ8j3pmUbdRq5CvCObgL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767689698; c=relaxed/simple;
-	bh=PudlsRY3cvqbF7BFTjTmjHdd6JA+NhtrLbq618w/VX0=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dZdAx5CW6zpTktYcLu3t8u978AwvahOkFkkbl/v1PGpLz5AzACp44EH+FTXTJeVUIQfNsRK0C07a3t9pZeKV2I+quqcK7ce1CegbRkQaDSmgOWfBXP6YfcrT6j3vEBVYRaO9DWPN417NvdCJBogR+WQNp/0iLaQykh5fTxfxlb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lZwDaoWC; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-42fb03c3cf2so360468f8f.1
-        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 00:54:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767689695; x=1768294495; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=5VFZIns8Sps8uOV+Lb1ng4HSSezSvHcqd+Ga21Q6rkY=;
-        b=lZwDaoWC0pLFrRoqBVNRfWw/rw97ABblYqrkhTHMC+N1lyTQ5JW/CT+h2HZjlhCiXL
-         /4chn7qXE8Gsukd7D9w+MbECleYtCrZrLt6axk5b0NX40FsXcOaV/qFYVTjrcZn/0YgH
-         BYMrMZHH+HKRtrg2kMSM6kSzvTZWAunT2JtZyWSLdHNaTJxXO8La4ThR24CQoMEX4LYG
-         d+VpoP4ftWiUOlDIVCljKijAqdSqzXB4eAeQ8oCYoqe9ukBP2uu7bUscbAVGjT2MpASg
-         GY1SjDsRg8Z65J3CxZTYNFlnhmAZIB4Cj/8puVaOkImWNuwPpz/ChiTG4Wwpd4V5U92q
-         tVFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767689695; x=1768294495;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5VFZIns8Sps8uOV+Lb1ng4HSSezSvHcqd+Ga21Q6rkY=;
-        b=hBGRCRw9mN359nWcICnOnk40mICMSo4nUMWq9bTNptONrQa8OZPQ7lTLSYC15m7Hx3
-         YMM82ENPywXpUhFkIZYkWBx5jyrx0ySTmxRRkfXS/+3CHzTuyie7h1jN878FyPSUW2V5
-         2TKIaqCd/34SXnY/g0PL0gs+vweH+DP/4gG+pLumK/e8ma6GrILxtlwYbJfRdtQ+ysYA
-         OwYI1bWMMvBXCf+mXsbC4po5+jUzjNm4ndvbv4LVWmxtKupMgifbTJ4kUcuEUeF7hnIp
-         VpLoTs65FNoisgEyO/BP9tFvFYmCfipf52zoLMH85VEQMWbGDHlGqf6TGVZqvnDnPOgO
-         TEFg==
-X-Forwarded-Encrypted: i=1; AJvYcCVJP3hWFf05aAD0WXhO3yoeUCyNoBn9Jo8XOfHpCpVb8+wlNVoRkUiW7rwJVzO2CrXWFOkUTiE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyi2jFq7w6I4y5hQw8W/IKmQsJmQj2nZSriubIcaJNRFWkQCIBK
-	hdJGFLoyA2regs6mfCaemLU/cHWCjcp19Gne549dX+sAq01bP/9oClgp
-X-Gm-Gg: AY/fxX4bPhahA+LVFCyUV3VefaGF0NkTXQfQL+/D+HT9pDXzSSF0YlEttT1JsSvD94Z
-	tq2CXwM8sc8eQjios5baXZ7YtpVIlwoF2EfZ0CJmvqr54y7X6JHM9NMZS6S1PU7NbGo+CCsjwJA
-	mgROmHu0iwWXJ3n4caEjIrLCcOYUvZyrVqOdD2lHxjRnW5F7JVr0yXrNXebS/nNJBqit6rho1Dk
-	YsIlNTBgAdfG4IjzwWiZozYOsbYaEe1XCquMTiVdb88UknftBZiEGQHTIxs40R7UPUZScVUXs08
-	DPqkWXWICDKnbyKjL7kTVoskPGRwwTIN2pY4ozu123fp8cy+qW8aYBChBhs5b4A/NyKud4QwRQp
-	nAzvrzTe4LD6kzNGZDs67FqAouPp6zF8e8CTqH4BnkfZ5AFXO7ytHoqZH7xRCyP9ZQ8YYnj9Qeh
-	Y=
-X-Google-Smtp-Source: AGHT+IH1yCSdo0wPw/fy27nRhjvHjHheYMekyT9VVsyxylC5DTp4JUsf3SZIIRTA7LE1dNPIlcouGw==
-X-Received: by 2002:a05:6000:200f:b0:431:b6e:8be3 with SMTP id ffacd0b85a97d-432bc9f6dccmr3306578f8f.38.1767689694636;
-        Tue, 06 Jan 2026 00:54:54 -0800 (PST)
-Received: from krava ([176.74.159.170])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5ee243sm3075703f8f.31.2026.01.06.00.54.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jan 2026 00:54:54 -0800 (PST)
-From: Jiri Olsa <olsajiri@gmail.com>
-X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
-Date: Tue, 6 Jan 2026 09:54:51 +0100
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-	Menglong Dong <menglong8.dong@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, jiang.biao@linux.dev,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>,
-	"H. Peter Anvin" <hpa@zytor.com>, bpf <bpf@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH bpf-next v6 00/10] bpf: fsession support
-Message-ID: <aVzN28i92roV1p4q@krava>
-References: <20260104122814.183732-1-dongml2@chinatelecom.cn>
- <CAADnVQ+cK1XvYrBPf3zuNmRF+2A=i-AKGaNV4SoeTUeGRLF2Fg@mail.gmail.com>
- <CAEf4Bza4fD5WWWBxJk0dd_xvgPR0ORZpcp1wiahyMPjvdoWG0w@mail.gmail.com>
+	s=arc-20240116; t=1767690246; c=relaxed/simple;
+	bh=dFQgB89Pz8WG7OQl524X15tPn4ydLchrwFvkgLAA35k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Yn1n+KukVOaGrGLmVmvcMIhFylI7X349YIeFaoydvtqMDLq2azUFgrtFmR3Llymjd414mP51X7Q012GuRQPKH/104xtw2NgZDlKRQOqM026yqCblXFI6chubGvFZhT+SPwhbbnNd3CwfRLakYQERwu6Egi1C6053J2S6pOQIdBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ieYFmztc; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 696941A2678;
+	Tue,  6 Jan 2026 09:04:00 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 3975460739;
+	Tue,  6 Jan 2026 09:04:00 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7A44F103C85E9;
+	Tue,  6 Jan 2026 10:03:55 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1767690239; h=from:subject:date:message-id:to:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=DZNOdJbxIgwwRa1m7oG0D5bgyhSt5x/PF6SFyJI/99Q=;
+	b=ieYFmztcgrKgnFTIHrL/65qr3DK1qAnxCjNpT7mdHk+lz+szVcHpPzhBFf28tI8Gdpyk/W
+	jk89Lzc4AGUK0wGM1Q+ombfYAXrZ3PrZm1YozRsvwwyihyxlxNQWH1wXD21+GNet3Al1kM
+	R8CKbu2DLWVroqVPq7TkbmrQ3CLHPFfAJSQbn8/L/D93MXHmG9DG/HiEVYgf+KfGVcMuBG
+	nUOUb8hoqfPT+rZEZv9uoYnV5l8VVl031vWYOaIR9gDkMKEVySWQ66PqL/JE+mlfkQULKk
+	qI0EdXHvGCuDPzcbpOa62f4MN30S/9Rm/llY6VGykbU5cOGsben8f3J9C9pEUA==
+Message-ID: <5bfe6271-1859-4700-8b70-4b3d8db4cef4@bootlin.com>
+Date: Tue, 6 Jan 2026 10:03:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAEf4Bza4fD5WWWBxJk0dd_xvgPR0ORZpcp1wiahyMPjvdoWG0w@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 4/5] net: phy: realtek: use paged access for
+ MDIO_MMD_VEND2 in C22 mode
+To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Michael Klein <michael@fossekall.de>, Aleksander Jan Bajkowski
+ <olek2@wp.pl>, Bevan Weiss <bevan.weiss@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <cover.1767630451.git.daniel@makrotopia.org>
+ <25aab7f02dac7c6022171455523e3db1435b0881.1767630451.git.daniel@makrotopia.org>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <25aab7f02dac7c6022171455523e3db1435b0881.1767630451.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Mon, Jan 05, 2026 at 03:20:13PM -0800, Andrii Nakryiko wrote:
-> On Mon, Jan 5, 2026 at 2:33 PM Alexei Starovoitov
-> <alexei.starovoitov@gmail.com> wrote:
-> >
-> > On Sun, Jan 4, 2026 at 4:28 AM Menglong Dong <menglong8.dong@gmail.com> wrote:
-> > >
-> > > In current solution, we can't reuse the existing bpf_session_cookie() and
-> > > bpf_session_is_return(), as their prototype is different from
-> > > bpf_fsession_is_return() and bpf_fsession_cookie(). In
-> > > bpf_fsession_cookie(), we need the function argument "void *ctx" to get
-> > > the cookie. However, the prototype of bpf_session_cookie() is "void".
-> >
-> > I think it's ok to change proto to bpf_session_cookie(void *ctx)
-> > for kprobe-session. It's not widely used yet, so proto change is ok
-> > if it helps to simplify this tramp-session code.
-> > I see that you adjust get_kfunc_ptr_arg_type(), so the verifier
-> > will enforce PTR_TO_CTX for kprobe and trampoline.
-> > Potentially can relax and enforce r1==ctx only for trampoline,
-> > but I would do it for both for consistency.
+Hi Daniel,
+
+On 05/01/2026 17:38, Daniel Golle wrote:
+> RTL822x cannot access MDIO_MMD_VEND2 via MII_MMD_CTRL/MII_MMD_DATA. A
+> mapping to use paged access needs to be used instead. All other MMD
+> devices can be accessed as usual.
 > 
-> Yeah, I'd support that. It's early enough that this shouldn't be
-> breaking a lot of users (if any).
+> Implement phy_read_mmd and phy_write_mmd using paged access for
+> MDIO_MMD_VEND2 in Clause-22 mode instead of relying on
+> MII_MMD_CTRL/MII_MMD_DATA. This allows eg. rtl822x_config_aneg to work
+> as expected in case the MDIO bus doesn't support Clause-45 access.
 > 
-> Jiri, do you guys use bpf_session_is_return() or bpf_session_cookie()
-> anywhere already?
+> Suggested-by: Bevan Weiss <bevan.weiss@gmail.com>
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 
-np, we can still adjust, it's in PR that's not merged yet
+This looks good to me
 
-jirka
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+Maxime
+
 
