@@ -1,159 +1,251 @@
-Return-Path: <netdev+bounces-247486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32948CFB3A9
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 23:15:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B7FECFB3B2
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 23:15:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D4996302412A
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 22:14:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 959CC3048EF6
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 22:14:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 388352848A8;
-	Tue,  6 Jan 2026 22:14:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27D5B314D0F;
+	Tue,  6 Jan 2026 22:14:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jjobh6QU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YIRL00bp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F6E130F530
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 22:14:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B33431195F;
+	Tue,  6 Jan 2026 22:14:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767737652; cv=none; b=eRA2ChmECp9Pog8Z0DY9Nfcx61gSnC8yC56wP4o+Np7K5nOCCl64HC/kKLzcUqQq9VF935NK5DNhYg9gfhD9kf0iSLnVCzl/pi8QZ2hLgbeJW5v3esJk5aqJQylmVI9svV86Nj3dLvAP8xewaiYsSrtXVr/+tYjWWZ9+NICeXmY=
+	t=1767737693; cv=none; b=Tz6qAvLjKKrMgsF8tfwL1o3+os8YE6WTTa/VSCQBSf+DL1yKn2iuG8jqbwKvLg0fgYVZfV7BZGrcT+lkiiyVVJKrA8Z6PRUtdCxTCbhgRX0Mu1gpIystITBE8Dz2AEY7W52tQWqGBhihQW4XQoyO20jTvY6lnZbvDbD+xq1cu10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767737652; c=relaxed/simple;
-	bh=BKVgYfecIlwaEfG2yIYO31DYcPw5TzZyRT9d/OzC59g=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=V92IDe7cnJMh9eMwxQPVJHUX8Y3rIndSH9rC3e/mUPaimINMhiBh4FByXLfeHmmgM4hLIfExnm+6FCLZUMau1UBVE2eILIBrCcypo06mi4TDL/rbioYp68GGlwawvrsKIyfM3RiwFpdPRyOjXAYj4/6dWLBS0iAddUjArEQ8LFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jjobh6QU; arc=none smtp.client-ip=209.85.128.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-78fba1a1b1eso5031377b3.1
-        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 14:14:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767737647; x=1768342447; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bXTAUGOjyeJOlTuz196szGLfvzOOt7OotlkuHVJJ76k=;
-        b=jjobh6QUB9YiJCKjS5JSiCLsJeXUFqsG5JMYxzEkuQjNwWWcaTAu24fGx4DI+boXha
-         MCRvD4W06vqO3EE2woQuV4/R88qWeswUeBnzhn1QbHJ5CP+/DfrUt5lq/X3tPTAerqIX
-         xbK+FGeJoWay9Xa8B5xjlD8hkhXUSpDDxskTeog0qT0q2A2lf4VLfHn0myaZYvb0lYII
-         fARBHrFCmhnIIMOCxTw1DO5OeIxeSpciRqPLl6iwPhHpmHuT2fsYKHkQ853RtCzIq2by
-         E0C6fm1SP/36xxR4JYbx+gVPME+2qyHcjE9QsnIwPN+YZOgfvwgvB/1eqaJW8COpCwKw
-         8/1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767737647; x=1768342447;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bXTAUGOjyeJOlTuz196szGLfvzOOt7OotlkuHVJJ76k=;
-        b=MlAw/YFVW1ER2Ra6/3/uRJJXRAMO2/XuJ5XCUbCK5vMvQ5fXICiWgWEYDzPSIoGk/M
-         QNAe+00OIm3DDw6SE0VzrmFHhN/NBZYyEINmqd96BJk0zvAI9hcAbYUhyRyQj7hND5PO
-         +bW58+uV5mCGQvX4a63Hlyg9gV7z9swZF8getF/uDF5UMyXDaEPNl0pq7PQskgNGSVpj
-         07ZUWvDWm+apMGi4VkBZx9qDVxRXb1rtf7fNe2EaKK6eEjcXQvA9ugTBw6liMvGUg4GX
-         Q29GP5YpqKkuozI1PAU3VI4rQZO4WC548yh/5vPmK9D+ce9FY97tLA03jIWGu8jY9AzK
-         5FsA==
-X-Gm-Message-State: AOJu0YzilS8d0cQGvXnSh4eoT379fE0zq5PQwpbeb8Ly4A0NKL3y+ctz
-	5Hj4Af4X/1FdzAogVKsI9p34rkGCOkgKNTHkIrgb9lLtc0yw8mW2dG3H
-X-Gm-Gg: AY/fxX6odnNmNdW21bAW+eSlswYTjZ8Sz3Fm6HCUEQ1lfMMUILlVM8AjBXQn0R7q6q/
-	tgt6VX8EMu9fyoUk688hxz15KqyHUs75cEkpGJEQ6jvs7xvDxBbGihD1B7pnDmqzV/xl2SNYyNx
-	KzQfJRquNKRnNmnlbzM6Noucztpi6dOnmtuNglvPwRzDuuv8YMRk9MfjDMm0lP9Zf58ze/0m1Be
-	VTaCYFA66GJ0+JZdR7dQ2ZIKAlAh7zAjiQIleQiebmC3vqOoYk2lzV+G/T4+qzl+Q5qvbT/nNxg
-	TtQ0pcIue8HQZ0MuQWmAoi1RrLTD1nVh6mW22ZTiSzpQGB7ne4uRTbtScy6T2Dbxl4QwpSG4D+1
-	PRwdJxqRpaoChbcgKsRuYaujHHVd2+WJZUjzZgInWMICEIy0NYxS8kjckWXgl1Zqi75Pa1jmbB8
-	xOQCBn72urdeD+nzCScHHmZioZvQ9dSQsJ8H41iNunRvzh8G58kqlXUR7wVjY=
-X-Google-Smtp-Source: AGHT+IFVw2/A2IyvOueA9fhhC+wh3ph13++iKFZyzR0whc4WRr2nxsaHNxNq0kyCG35wbd92xWDOPQ==
-X-Received: by 2002:a05:690e:d8a:b0:644:6c19:8a26 with SMTP id 956f58d0204a3-647166aa310mr513038d50.19.1767737646993;
-        Tue, 06 Jan 2026 14:14:06 -0800 (PST)
-Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-6470d89d607sm1338464d50.12.2026.01.06.14.14.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jan 2026 14:14:06 -0800 (PST)
-Date: Tue, 06 Jan 2026 17:14:05 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Xu Du <xudu@redhat.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- horms@kernel.org, 
- shuah@kernel.org
-Cc: netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.3ae0df5f36144@gmail.com>
-In-Reply-To: <cover.1767597114.git.xudu@redhat.com>
-References: <cover.1767597114.git.xudu@redhat.com>
-Subject: Re: [PATCH net-next v4 0/8] selftest: Extend tun/virtio coverage for
- GSO over UDP tunnel
+	s=arc-20240116; t=1767737693; c=relaxed/simple;
+	bh=nbmr59PqQ9dbfXlHOVrQowsAVDe2+R1bvbdbICTa28s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HoP8322YNb8lRFgU5J2Ffa25izqK1jAfZSXK1m6OYAnqDCyWdBGYqqD0ls1MWLjtTObwarUGMAqEDXkyy/gUvU75KEmjQY4JrlZ4b5LHHpdwiBQtpNwb2yFtGnTxwGpohG3H9LrHddsVCCosdYsmQ2qW0A5ii+d0IsU4Zw49eoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YIRL00bp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8F72C116C6;
+	Tue,  6 Jan 2026 22:14:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767737692;
+	bh=nbmr59PqQ9dbfXlHOVrQowsAVDe2+R1bvbdbICTa28s=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=YIRL00bpVfUjo9Lz2oKceSjk+gNbeVKsr34Pyens3FMUD7nqqZUgsvXTbP/7r/yKb
+	 dcxcFxm/fNdvHXkLKj2cC/sKRuzJRAYmpLyc+yzJHJIv6FfrAeH3JdNwGw1XViP0kg
+	 JccGySaDSEHklr2oNDbpWXfbLjNq993nEGvKAtxNxKLn4IwGC0dfE5gHkC3y2IwWDD
+	 5M+FrLEdw4O12cyu52B0ML9ji+nrmg7PoLjBo1HM10ERh0ezJ1X5QZjxUjmsKF3mS8
+	 JUiqCIZ4pO7oMPoK9yEy1JSqhynAFzEPQksdqE2JgbuWRXlxnc9Qt3j/LlKKHOgNQA
+	 W6vx0bhjRp4gA==
+Message-ID: <c3dd8234-3a7e-4277-89cf-1f4ccb2c0317@kernel.org>
+Date: Tue, 6 Jan 2026 23:14:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] can: ctucanfd: fix SSP_SRC in cases when bit-rate is
+ higher than 1 MBit.
+To: Pavel Pisa <pisa@fel.cvut.cz>, Ondrej Ille <ondrej.ille@gmail.com>
+Cc: linux-can@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>,
+ David Laight <david.laight.linux@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Andrea Daoud <andreadaoud6@gmail.com>,
+ Wolfgang Grandegger <wg@grandegger.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, Jiri Novak <jnovak@fel.cvut.cz>
+References: <20260105111620.16580-1-pisa@fel.cvut.cz>
+ <c5851986-837b-4ffb-9bf7-3131cf9c05d1@kernel.org>
+ <202601060153.21682.pisa@fel.cvut.cz>
+From: Vincent Mailhol <mailhol@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=mailhol@kernel.org; keydata=
+ xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
+ JFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbEBrZXJuZWwub3JnPsKZBBMWCgBBFiEE7Y9wBXTm
+ fyDldOjiq1/riG27mcIFAmdfB/kCGwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcC
+ F4AACgkQq1/riG27mcKBHgEAygbvORJOfMHGlq5lQhZkDnaUXbpZhxirxkAHwTypHr4A/joI
+ 2wLjgTCm5I2Z3zB8hqJu+OeFPXZFWGTuk0e2wT4JzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrb
+ YZzu0JG5w8gxE6EtQe6LmxKMqP6EyR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDl
+ dOjiq1/riG27mcIFAmceMvMCGwwFCQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8V
+ zsZwr/S44HCzcz5+jkxnVVQ5LZ4BANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
+In-Reply-To: <202601060153.21682.pisa@fel.cvut.cz>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Xu Du wrote:
-> The primary goal is to add test validation for GSO when operating over
-> UDP tunnels, a scenario which is not currently covered.
+On 06/01/2026 at 01:53, Pavel Pisa wrote:
+> Dear Vincent Mailhol,
 > 
-> The design strategy is to extend the existing tun/tap testing infrastructure
-> to support this new use-case, rather than introducing a new or parallel framework.
-> This allows for better integration and re-use of existing test logic.
+> thanks for pointing to Transmission Delay Compensation
+> related code introduced in 5.16 kernel. I have noticed it
+> in the past but not considered it yet and I think
+> that we need minimal fixes to help users and
+> allow change to propagate into stable series now.
 > 
-> ---
-> v3 -> v4:
->  - Rebase onto the latest net-next tree to resolve merge conflicts.
+> More details inline
 > 
-> v3: https://lore.kernel.org/netdev/cover.1767580224.git.xudu@redhat.com/
->  - Re-send the patch series becasue Patchwork don't update them.
+> On Monday 05 of January 2026 21:27:11 Vincent Mailhol wrote:
+>> Le 05/01/2026 à 12:16, Pavel Pisa a écrit :
+>>> From: Ondrej Ille <ondrej.ille@gmail.com>
+>>>
+>>> The Secondary Sample Point Source field has been
+>>> set to an incorrect value by some mistake in the
+>>> past
+>>>
+>>>   0b01 - SSP_SRC_NO_SSP - SSP is not used.
+>>>
+>>> for data bitrates above 1 MBit/s. The correct/default
+>>> value already used for lower bitrates is
+>>
+>> Where does this 1 MBit/s threshold come from? Is this an empirical value?
+>>
+>> The check is normally done on the data BRP. For example we had some
+>> problems on the mcp251xfd, c.f. commit 5e1663810e11 ("can: mcp251xfd:
+>> fix TDC setting for low data bit rates").
 > 
-> v2: https://lore.kernel.org/netdev/cover.1767074545.git.xudu@redhat.com/
->  - Addresse sporadic failures due to too early send.
->  - Refactor environment address assign helper function.
->  - Fix incorrect argument passing in build packet functions.
+> The CTU CAN FD check is done on data bitrate
 > 
-> v1: https://lore.kernel.org/netdev/cover.1763345426.git.xudu@redhat.com/
+> https://elixir.bootlin.com/linux/v6.18.3/source/drivers/net/can/ctucanfd/ctucanfd_base.c#L290
 > 
-> Xu Du (8):
->   selftest: tun: Format tun.c existing code
-
-We generally don't do such refactoring changes. But in this case for a
-test and when the changes are minimal, it's ok. Thanks for pulling
-then into a separate commit.
-
->   selftest: tun: Introduce tuntap_helpers.h header for TUN/TAP testing
->   selftest: tun: Refactor tun_delete to use tuntap_helpers
->   selftest: tap: Refactor tap test to use tuntap_helpers
->   selftest: tun: Add helpers for GSO over UDP tunnel
->   selftest: tun: Add test for sending gso packet into tun
->   selftest: tun: Add test for receiving gso packet from tun
->   selftest: tun: Add test data for success and failure paths
+>   if (dbt->bitrate > 1000000)
 > 
->  tools/testing/selftests/net/tap.c            | 281 +-----
->  tools/testing/selftests/net/tun.c            | 919 ++++++++++++++++++-
->  tools/testing/selftests/net/tuntap_helpers.h | 602 ++++++++++++
->  3 files changed, 1526 insertions(+), 276 deletions(-)
->  create mode 100644 tools/testing/selftests/net/tuntap_helpers.h
+> the line expands to
+> 
+>   if (priv->can.fd.data_bittiming.bitrate > 1000000)
+> 
+> The value computation has been defined by Ondrej Ille, main author
+> of the CTU CAN FD IP core. The main driver author has been
+> Martin Jerabek and there seems that we have made some mistake,
+> flip in value in the past. But Ondrej Ille is the most competent
+> for the core limits and intended behavior and SW support.
+> He has invested to complete iso-16845 compliance testing
+> framework re-implementation for detailed timing testing.
+> There is even simulated environment with clocks jitters
+> and delays equivalent to linear, start and other typologies
+> run at each core update. The kudos for idea how to implement
+> this without unacceptable time required for simulation
+> goes to Martin Jerabek. But lot of scenarios are tested
+> and Ondrej Ille can specify what is right and has been
+> tested. May it be, even Jiri Novak can provide some input
+> as well, because he uses CTU CAN FD to deliver more generations
+> of CTU tester systems to car makers (mainly SkodaAuto)
+> and the need of configurable IP core for these purposes was initial
+> driver for the CTU CAN FD core design.
+> 
+> The function of SSP is described in the datasheet and implementation
+> in the CTU CAN FD IP CORE System Architecture manual or we can go
+> to HDL design as well.
+> 
+> I extrapolate that 1 Mbit/s has been chosen as the switching point,
+> because controller and transceivers are expected to support
+> arbitration bit rate to at least 1 Mbit/s according to CAN and CAN FD
+> standards and there is no chance to use SSP during nominal bitrate.
+> 
+>> Can you use the TDC framework?
+> 
+> In longer term it would be right direction. But TRV_DELAY
+> measurement is and should be considered as default for
+> data bit rate and BRS set and then the transceiver delay
+> should be fully compensated on CTU CAN FD.
+> 
+> Problem was that the compensation was switched off by mistake
+> in the encoded value.
+> 
+> But when I study manuals and implementation again, I think that
+> there is problem with data bitrate < 1 Mbit/s, because for these
+> the compensation should be switched off or the data rate sample_point
+> should be recomputed to SSP_OFFET because else sampling is done
+> too early. Delay is not added to sampling point. So we should
+> correct this to make case with BRS and switching to
+> higher data rate (but under 1 Mbit/s) to be more reliable.
 
-That's a lot of code, also to maintain long term.
+Any issue that we witnessed in the past with low bitrates were only on
+the drivers which had an hand coded TDC logic. Migrating those drivers
+to the kernel TDC framework solved those issues without the need of an
+additional check on the bitrate.
 
-Is there an alternative that has less code churn? For instance, can
-the new netlink code be replaced by YNL, whether in C or called from
-a script?
+If you can show me a bus off condition in your device when using the
+kernel TDC framework or if you can point me to publications from CAN in
+Automation or similar which supports the idea of the 1 Mbit/s check,
+then I can add that extra check to the framework. Otherwise, I would
+like to drop this idea.
 
-For instance patch 5 which sets up an env, is probably more concisely
-written as a script. That may or may not work with the existing KUnit
-framework.
+> There are some limitations in maximal values which can be
+> set to SSP_OFFET field. It resolution is high, 10 ns typically
+> for our IP CORE FPGA targets with the 100 MHz IP core clock.
+> On silicon version, as I know, 80 MHz has been used in the
+> last integration. So again, limit is around 2.5 usec or a little
+> more for 80 MHz. This matches again mode switch at 1 Mbit/s
+> or the other option could be switch when SSP_OFFET exceeds
+> 250 or some such value.
 
-Iff not, it would be better if the code moved out of existing files
-into tuntap_helpers.h is moved in a separate NOOP move patch. Such as
-netlink (e.g., rtattr_add) and the build_.. functions.
+Do you see any actual incompatibilities with the kernel TDC framework on
+the offset maximum value?
 
+>> Not only would you get a correct 
+>> calculation for when to activate/deactivate TDC, you will also have the
+>> netlink reporting (refer to the above commit for an example).
+> 
+> Yes, I agree that availability of tuning and monitoring over
+> netlink is nice added value. But at this moment I (personally)
+> prefer the minimal fix to help actual users.
+
+We can also backport the fix if using the TDC framework. The ctucanfd
+driver was introduced after the TDC framework so it will apply smoothly
+to stable.
+
+> I add there links to current CAN FD Transmission Delay Compensation
+> support and definition in the Linux kernel code for future integration
+> into CTU CAN FD IP core driver
+> 
+> https://elixir.bootlin.com/linux/v6.18.3/source/include/linux/can/bittiming.h#L25
+> 
+> https://elixir.bootlin.com/linux/v6.18.3/source/drivers/net/can/dev/calc_bittiming.c#L174
+> 
+> https://elixir.bootlin.com/linux/v6.18.3/source/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c#L595
+> 
+> and in the controller features announcement
+> 
+> priv->can.ctrlmode_supported = CAN_CTRLMODE_LOOPBACK |
+> 		CAN_CTRLMODE_LISTENONLY | CAN_CTRLMODE_BERR_REPORTING |
+> 		CAN_CTRLMODE_FD | CAN_CTRLMODE_FD_NON_ISO |
+> 		CAN_CTRLMODE_CC_LEN8_DLC | CAN_CTRLMODE_TDC_AUTO |
+> 		CAN_CTRLMODE_TDC_MANUAL;
+> 
+> Best wishes,
+> 
+> Pavel
+> 
+>>>   0b00 - SSP_SRC_MEAS_N_OFFSET - SSP position = TRV_DELAY
+>>>          (Measured Transmitter delay) + SSP_OFFSET.
+>>>
+>>> The related configuration register structure is described
+>>> in section 3.1.46 SSP_CFG of the CTU CAN FD
+>>> IP CORE Datasheet.
+>>>
+>>> The analysis leading to the proper configuration
+>>> is described in section 2.8.3 Secondary sampling point
+>>> of the datasheet.
+>>>
+>>> The change has been tested on AMD/Xilinx Zynq
+>>> with the next CTU CN FD IP core versions:
+>>>
+>>>  - 2.6 aka master in the "integration with Zynq-7000 system" test
+>>>    6.12.43-rt12+ #1 SMP PREEMPT_RT kernel with CTU CAN FD git
+>>>    driver (change already included in the driver repo)
+>>>  - older 2.5 snapshot with mainline kernels with this patch
+>>>    applied locally in the multiple CAN latency tester nightly runs
+>>>    6.18.0-rc4-rt3-dut #1 SMP PREEMPT_RT
+>>>    6.19.0-rc3-dut
+>>>
+>>> The logs, the datasheet and sources are available at
+>>>
+>>>  https://canbus.pages.fel.cvut.cz/
+
+
+Yours sincerely,
+Vincent Mailhol
 
 
