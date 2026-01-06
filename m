@@ -1,219 +1,89 @@
-Return-Path: <netdev+bounces-247322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94802CF7522
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 09:33:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9938FCF755F
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 09:45:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EEB7130EECF1
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 08:31:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E31953022F0C
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 08:45:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C889130AD1D;
-	Tue,  6 Jan 2026 08:31:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52BBC309EF7;
+	Tue,  6 Jan 2026 08:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="lHtjVPyj"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="xtJTlPZr"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA8A61FF1B5;
-	Tue,  6 Jan 2026 08:31:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 371DDDF76;
+	Tue,  6 Jan 2026 08:44:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767688270; cv=none; b=kkFZ+Ohl+VS2hptsxwkeStcIzAnZtOUnR5U8owJqj908UGTHvQxaU6GkJiJ46rxsZGPK6NjNgk8AI6X+hsQaYr00GVdzee8pJiIlMkeNmt7At5kfoLJoAhigQoetWaJGb2uf3Z1MISO8vfE33x42322co73iV41c06tqMFUMCJ4=
+	t=1767689102; cv=none; b=hlfhVb52NzLym74nptEyGS6IsIh1DMwQgE0y2BhM6+zTrmif5lnHqPPmCR5BaUsyxwjYRyvhgGxTMjNTYHVhjqqKfcG8MrNhEd7FfrmPUYbdrUFtDmMe82YxQ447fqAL2b+gjQnVlJ3g4mZcBHegDPmA6UjHKDCeTYl8e/DjxH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767688270; c=relaxed/simple;
-	bh=5O68Oo60UA1CdvhZ/kryCFZIBnlmEuOIkazao4wamUQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HLVAUrsopF+aWYAKu56c7/Vr/hVfsGTlS68GmtXs+IF1v/Y3N8EotUISe/TT8z+1UBYniYZsEo0eK+d2sIsTwubdfvJwzL2Hr2OSsFLgsSB4idyn+TmvpF/Sze6haxEHD9eeWjEXcOBtddKQ0Mq6uiPWQbrmh1TWNQP7AQBkpAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=lHtjVPyj; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6068UVjsC438984, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1767688232;
-	bh=IpSLYzfXywRiobl7Hj9ZodIibNeE4SLgduvAv+unPJI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=lHtjVPyjO6NPfGE6vVSIr66zP/vlGCxQmkd84rFgeKy0l0zLNJRRWY/ALlVofHHS0
-	 spHkOggDiXR1FvNJqDC3kjmSm7wzDnivwNu6ltruFeo6g+MwY8ag0dZjbMpFOpWxCk
-	 OT7WpFG/R+3hdvfuDieSY0hd9mWeZGXBkAywrGuZGr7hJ5wJ785JeXgIyRjsfuM7fo
-	 oZUMWLBBRNtlsv14m2IBq0OJvrq3M+3FL8F1mJYRLowBG9B/OzXw9C87RCp+YaGXlU
-	 77ysEOAvpmJ2Iw71yohdh9s8EFfI/TRU/rMjtEoTTjBDVGrajVBORHhGJgJIqAGmiA
-	 3rwfUadMqtCMw==
-Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103])
-	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 6068UVjsC438984
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 6 Jan 2026 16:30:32 +0800
-Received: from RS-EX-MBS1.realsil.com.cn (172.29.17.101) by
- RS-EX-MBS3.realsil.com.cn (172.29.17.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.39; Tue, 6 Jan 2026 16:30:31 +0800
-Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS1.realsil.com.cn
- (172.29.17.101) with Microsoft SMTP Server id 15.2.1748.39 via Frontend
- Transport; Tue, 6 Jan 2026 16:30:31 +0800
-From: javen <javen_xu@realsil.com.cn>
-To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Javen Xu
-	<javen_xu@realsil.com.cn>
-Subject: [PATCH net-next 2/2] r8169: enable LTR support
-Date: Tue, 6 Jan 2026 16:30:12 +0800
-Message-ID: <20260106083012.164-3-javen_xu@realsil.com.cn>
-X-Mailer: git-send-email 2.50.1.windows.1
-In-Reply-To: <20260106083012.164-1-javen_xu@realsil.com.cn>
-References: <20260106083012.164-1-javen_xu@realsil.com.cn>
+	s=arc-20240116; t=1767689102; c=relaxed/simple;
+	bh=94bAVZ52l0KeJaZiEMSm/OASvaUJtYZtqxylN11cdcI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=G59XsmdeGQrgrsEGdLlV8LODJg8TG0stIzsUbMrvSQ84SpJ6Bbz4CnnZcPXwfkL/IW1cBmf1At17Z5YLmYOJ1boAgGOAVf08PPSvBOL5kk4WZPNL+67+JHBUUMkNuQ9tXOmdnoHtNoL4x/RJPJuLGE52oj4KP5wvoHv/7RhvfCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=xtJTlPZr; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 2D536C1E4A6;
+	Tue,  6 Jan 2026 08:44:26 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 27A8260739;
+	Tue,  6 Jan 2026 08:44:52 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id DA65A103C8144;
+	Tue,  6 Jan 2026 09:44:44 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1767689091; h=from:subject:date:message-id:to:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=tamMdge4qbsDWP+XZCmZSUNv3pozpuz2jKgDkw1Lk/4=;
+	b=xtJTlPZr7MGvTIQfcBMHcsgDXGaeuE+y6On4q2uscEfxBNs9yTcAJC0HP6OyFv1mLrRkGw
+	7Z1TibJso+LQnBlQwZqoz825oY9dy9m84fcgtNhsaF1rXAOMvIe3EyveRGcExoAaX9OFYx
+	0SdLp3KGeT0NcfQFoie4iHpnsLIfwBYzRU2szeYMFOJe/RIB6qav4cSJ/u027jpvkOGTvw
+	21gCYSpa52o5Va4eO4O9KRPZldUnSEbiNPwqZTOFfIZDBGrY9R3inoJeTKgenjZmUdi4eD
+	6pnb2mfC+6xdvkSgkUc5AAano+RxvzMFagAeFqrkjQ3hSWkk43KP28lRKugzPA==
+Message-ID: <2c63fc58-7081-4e6b-a8ee-3d1e9aaffbe9@bootlin.com>
+Date: Tue, 6 Jan 2026 09:44:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/5] net: phy: realtek: fix whitespace in
+ struct phy_driver initializers
+To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Michael Klein <michael@fossekall.de>, Aleksander Jan Bajkowski
+ <olek2@wp.pl>, Bevan Weiss <bevan.weiss@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <cover.1767630451.git.daniel@makrotopia.org>
+ <42b0fac53c5c5646707ce3f3a6dacd2bc082a5b2.1767630451.git.daniel@makrotopia.org>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <42b0fac53c5c5646707ce3f3a6dacd2bc082a5b2.1767630451.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-From: Javen Xu <javen_xu@realsil.com.cn>
+Hello Daniel,
 
-This patch will enable
-RTL8168FP/RTL8168EP/RTL8168H/RTL8125/RTL8126/RTL8127 LTR support.
+On 05/01/2026 17:37, Daniel Golle wrote:
+> Consistently use tabs instead of spaces in struct phy_driver
+> initializers.
+> 
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 
-Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
----
- drivers/net/ethernet/realtek/r8169_main.c | 98 +++++++++++++++++++++++
- 1 file changed, 98 insertions(+)
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index f9df6aadacce..97abf95502dc 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -2919,6 +2919,101 @@ static void rtl_disable_exit_l1(struct rtl8169_private *tp)
- 	}
- }
- 
-+static void rtl_enable_ltr(struct rtl8169_private *tp)
-+{
-+	switch (tp->mac_version) {
-+	case RTL_GIGA_MAC_VER_80:
-+		r8168_mac_ocp_write(tp, 0xcdd0, 0x9003);
-+		r8168_mac_ocp_modify(tp, 0xe034, 0x0000, 0xc000);
-+		r8168_mac_ocp_modify(tp, 0xe0a2, 0x0000, BIT(0));
-+		r8168_mac_ocp_write(tp, 0xcdd2, 0x8c09);
-+		r8168_mac_ocp_write(tp, 0xcdd8, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdd4, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdda, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdd6, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcddc, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcde8, 0x887a);
-+		r8168_mac_ocp_write(tp, 0xcdea, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdec, 0x8c09);
-+		r8168_mac_ocp_write(tp, 0xcdee, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdf0, 0x8a62);
-+		r8168_mac_ocp_write(tp, 0xcdf2, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdf4, 0x883e);
-+		r8168_mac_ocp_write(tp, 0xcdf6, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdf8, 0x8849);
-+		r8168_mac_ocp_write(tp, 0xcdfa, 0x9003);
-+		r8168_mac_ocp_modify(tp, 0xe032, 0x0000, BIT(14));
-+		break;
-+	case RTL_GIGA_MAC_VER_70:
-+		r8168_mac_ocp_write(tp, 0xcdd0, 0x9003);
-+		r8168_mac_ocp_modify(tp, 0xe034, 0x0000, 0xc000);
-+		r8168_mac_ocp_modify(tp, 0xe0a2, 0x0000, BIT(0));
-+		r8168_mac_ocp_write(tp, 0xcdd2, 0x8c09);
-+		r8168_mac_ocp_write(tp, 0xcdd8, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdd4, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdda, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdd6, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcddc, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcde8, 0x887a);
-+		r8168_mac_ocp_write(tp, 0xcdea, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdec, 0x8c09);
-+		r8168_mac_ocp_write(tp, 0xcdee, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdf0, 0x8a62);
-+		r8168_mac_ocp_write(tp, 0xcdf2, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdf4, 0x883e);
-+		r8168_mac_ocp_write(tp, 0xcdf6, 0x9003);
-+		r8168_mac_ocp_modify(tp, 0xe032, 0x0000, BIT(14));
-+		break;
-+	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_66:
-+		r8168_mac_ocp_write(tp, 0xcdd0, 0x9003);
-+		r8168_mac_ocp_modify(tp, 0xe034, 0x0000, 0xc000);
-+		r8168_mac_ocp_modify(tp, 0xe0a2, 0x0000, BIT(0));
-+		r8168_mac_ocp_write(tp, 0xcdd2, 0x889c);
-+		r8168_mac_ocp_write(tp, 0xcdd8, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdd4, 0x8c30);
-+		r8168_mac_ocp_write(tp, 0xcdda, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdd6, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcddc, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcde8, 0x883e);
-+		r8168_mac_ocp_write(tp, 0xcdea, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdec, 0x889c);
-+		r8168_mac_ocp_write(tp, 0xcdee, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdf0, 0x8C09);
-+		r8168_mac_ocp_write(tp, 0xcdf2, 0x9003);
-+		r8168_mac_ocp_modify(tp, 0xe032, 0x0000, BIT(14));
-+		break;
-+	case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_52:
-+		r8168_mac_ocp_modify(tp, 0xe034, 0x0000, 0xc000);
-+		r8168_mac_ocp_modify(tp, 0xe0a2, 0x0000, BIT(0));
-+		r8168_mac_ocp_write(tp, 0xe02c, 0x1880);
-+		r8168_mac_ocp_write(tp, 0xe02e, 0x4880);
-+		r8168_mac_ocp_write(tp, 0xcdd8, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdda, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcddc, 0x9003);
-+		r8168_mac_ocp_write(tp, 0xcdd2, 0x883c);
-+		r8168_mac_ocp_write(tp, 0xcdd4, 0x8c12);
-+		r8168_mac_ocp_write(tp, 0xcdd6, 0x9003);
-+		RTL_W8(tp, 0xb6, RTL_R8(tp, 0xb6) | BIT(0));
-+		break;
-+	default:
-+		return;
-+	}
-+	/* chip can trigger LTR */
-+	r8168_mac_ocp_modify(tp, 0xe032, 0x0003, BIT(0));
-+}
-+
-+static void rtl_disable_ltr(struct rtl8169_private *tp)
-+{
-+	switch (tp->mac_version) {
-+	case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_80:
-+		r8168_mac_ocp_modify(tp, 0xe032, 0x0003, 0);
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
- static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
- {
- 	u8 val8;
-@@ -2947,6 +3042,7 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
- 			break;
- 		}
- 
-+		rtl_enable_ltr(tp);
- 		switch (tp->mac_version) {
- 		case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_48:
- 		case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_LAST:
-@@ -2968,6 +3064,7 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
- 			break;
- 		}
- 
-+		rtl_disable_ltr(tp);
- 		switch (tp->mac_version) {
- 		case RTL_GIGA_MAC_VER_70:
- 		case RTL_GIGA_MAC_VER_80:
-@@ -4811,6 +4908,7 @@ static void rtl8169_down(struct rtl8169_private *tp)
- 
- 	rtl8169_cleanup(tp);
- 	rtl_disable_exit_l1(tp);
-+	rtl_disable_ltr(tp);
- 	rtl_prepare_power_down(tp);
- 
- 	if (tp->dash_type != RTL_DASH_NONE && !tp->saved_wolopts)
--- 
-2.43.0
+Maxime
 
 
