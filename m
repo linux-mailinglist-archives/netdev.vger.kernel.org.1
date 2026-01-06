@@ -1,1139 +1,229 @@
-Return-Path: <netdev+bounces-247415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F0A4CF9A0A
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 18:22:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62B6CCF9A95
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 18:25:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9E492300A355
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 17:15:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 055F230C9019
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 17:17:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ACEB346796;
-	Tue,  6 Jan 2026 17:15:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8414033B97F;
+	Tue,  6 Jan 2026 17:17:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f78.google.com (mail-ot1-f78.google.com [209.85.210.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D289C345CD3;
-	Tue,  6 Jan 2026 17:15:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8538633A71A
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 17:17:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767719717; cv=none; b=oBr245YFE47KPM2jsmFEPULDj/5Du5xLWU90r82gtk06VclGMESHW4jl4B0UYrJB7qEylQHU19ZyxqIM2clsek2ONFOOvRfUe15mfjUgounNoNXi+ypS9d878f9/sGmKlx4igVs+c5T8bYiLvOU6aKKCGF7oOcpsDnhl5+wZLQ4=
+	t=1767719842; cv=none; b=PapNkW7Gf2kM/91dSgH4l9EDci+D0i2H9ba8b/04x3V3WSwKSFVRkR3qyBNlEcgaAjWxZUI6BUfA+uarwfTZbepGgh9FMFj+X917dSo1ojUfuc/t6n6k6snHZG6BDdlaTvugdVzFep226yCEksb/cP/RiqaSeL9V1kqeVtd3NfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767719717; c=relaxed/simple;
-	bh=wMTfK/c2EBU7KxF7RI7HE13+TIIg5WzXlR/rwDEmWDY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X+G8H5C0eTSLMhJNTGVsC3WuyanVows9w/6tcDAs5gZejMVKrXCFY/zmcJn4I9kNrFQckajZn9hHSZZu5wh7vzowBqwfu9ZhaFvgJzqQgVN+XRJfAKIq6ZeGLRR8N+YzxM/TtD4XFR3wnbnk24OVKw/EurnyOp//zk4LCzGH2Kg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vdAeE-000000007RW-08jn;
-	Tue, 06 Jan 2026 17:15:10 +0000
-Date: Tue, 6 Jan 2026 17:15:06 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
-	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: [PATCH RFC net-next v4 4/4] net: dsa: add basic initial driver for
- MxL862xx switches
-Message-ID: <ae7a87c0893ea3c8068d114d1fcd3f6b8e295e20.1767718090.git.daniel@makrotopia.org>
-References: <cover.1767718090.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1767719842; c=relaxed/simple;
+	bh=SyKTxziXINkqDY6EGLB6a7h/LYkeE55+ykwcvnsBud0=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=A4z6XbEbkN7VmJefxBJaMnlbod+Xh+tBVnRSYvI3qmT4Wy8IUeUqunoV8TbMKPo1ZngLtN3l60SqgsaSu2LPJqaIrpkuDx5kAoMUbEr3TsxYpYbjRSORK7mXZE8MmFevlboUOPbKqQqCKNA3AbzMkab9bvGFsuDWCLzmEk9ix90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f78.google.com with SMTP id 46e09a7af769-7c6ce3b9fa0so1977497a34.0
+        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 09:17:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767719839; x=1768324639;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jm8yNAlKu7VH2E2l51BOu8CoL70R28ASDalw1g7qkCM=;
+        b=nEGDe9TwHzg4jgD2p0Ykjn5TIsBQKOI4e3wsLLLggEFFehoWoG2T40sJgLOLVjROSY
+         GOW6lHkR8kZaGKDeZ70vrEmbM6hibdeKIfPaEZXWXH6G66bn58/8IgmjI6klyOLwnnJQ
+         qEcw0FRueRR22Gs/qqFbJndL93hrY3Ucio82mHxGn9HvJRPq84/1Psz4NCCbVSDW/t8e
+         qg95LtMeYJz+rrEv5DpQPoGR6lvVUb24I3qotTvb86OQxME3mWAjVtmiay7IsyFb9ueq
+         +9mklUUGxTvFYBZXLyuNRXa1+blHsPI8xviLR0KCzvuK1uvnw6ACKqvj/L2g9Mglbreo
+         +iWA==
+X-Forwarded-Encrypted: i=1; AJvYcCXu0B87wL0jxhhfQcdbf+LMBF1gfjubgpsGmYQu+lhwQyxjJwggOeI22INc1pv2tX5GXiAiJlE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypY+sHeWiGygWZMQYGHVBF8OewQCoh456x2cqfS57rPDsbrgeq
+	wXTWHDdrHlLkrn+BTAM02xJ1OU+q1s2eK5EVWJjDGPn7zncoHVgPA9lXDFT3cHN79TORD3AMiUr
+	NSczN4uH4h6y6O0L5TKL6OqxnTSxn5CD/msGW0+I9a0nUPtJ7dzyh3sPQtN8=
+X-Google-Smtp-Source: AGHT+IEL1/7yIfN9Zy/2mMts49PjFqKqheDGsO3sk8OhiM6EP3OwcgEO66gqyquqLx0STswmUYqqXQEbeRFmixHKpTovkmn36jIv
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1767718090.git.daniel@makrotopia.org>
+X-Received: by 2002:a05:6820:8410:b0:65d:ba7:f671 with SMTP id
+ 006d021491bc7-65f4799cd5dmr1189202eaf.11.1767719839108; Tue, 06 Jan 2026
+ 09:17:19 -0800 (PST)
+Date: Tue, 06 Jan 2026 09:17:19 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <695d439f.050a0220.1c677c.0347.GAE@google.com>
+Subject: [syzbot] [net?] possible deadlock in sch_direct_xmit (5)
+From: syzbot <syzbot+1240b33467289f5ab50b@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-Add very basic DSA driver for MaxLinear's MxL862xx switches.
+Hello,
 
-In contrast to previous MaxLinear switches the MxL862xx has a built-in
-processor that runs a sophisticated firmware based on Zephyr RTOS.
-Interaction between the host and the switch hence is organized using a
-software API of that firmware rather than accessing hardware registers
-directly.
+syzbot found the following issue on:
 
-Add descriptions of the most basic firmware API calls to access the
-built-in MDIO bus hosting the 2.5GE PHYs, basic port control as well as
-setting up the CPU port.
+HEAD commit:    d4b779985a6c Merge tag 'for-6.17/dm-fixes' of git://git.ke..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=13644f62580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4d8792ecb6308d0f
+dashboard link: https://syzkaller.appspot.com/bug?extid=1240b33467289f5ab50b
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17644f62580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=130d8712580000
 
-Implement a very basic DSA driver using that API which is sufficient to
-get packets flowing between the user ports and the CPU port.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/8c0e2ca1cac7/disk-d4b77998.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/ff3a75e765b0/vmlinux-d4b77998.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/f043b7730989/bzImage-d4b77998.xz
 
-The firmware offers all features one would expect from a modern switch
-hardware, they will be added one by one in follow-up patch series.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1240b33467289f5ab50b@syzkaller.appspotmail.com
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+============================================
+WARNING: possible recursive locking detected
+syzkaller #0 Not tainted
+--------------------------------------------
+kworker/0:1/10 is trying to acquire lock:
+ffff888079139d58 (&qdisc_xmit_lock_key#3){+...}-{3:3}, at: spin_lock include/linux/spinlock.h:351 [inline]
+ffff888079139d58 (&qdisc_xmit_lock_key#3){+...}-{3:3}, at: __netif_tx_lock include/linux/netdevice.h:4659 [inline]
+ffff888079139d58 (&qdisc_xmit_lock_key#3){+...}-{3:3}, at: sch_direct_xmit+0x153/0x4b0 net/sched/sch_generic.c:342
+
+but task is already holding lock:
+ffff88807de56158 (&qdisc_xmit_lock_key#3){+...}-{3:3}, at: spin_lock include/linux/spinlock.h:351 [inline]
+ffff88807de56158 (&qdisc_xmit_lock_key#3){+...}-{3:3}, at: __netif_tx_lock include/linux/netdevice.h:4659 [inline]
+ffff88807de56158 (&qdisc_xmit_lock_key#3){+...}-{3:3}, at: __dev_queue_xmit+0x1676/0x3b50 net/core/dev.c:4721
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(&qdisc_xmit_lock_key#3);
+  lock(&qdisc_xmit_lock_key#3);
+
+ *** DEADLOCK ***
+
+ May be due to missing lock nesting notation
+
+12 locks held by kworker/0:1/10:
+ #0: ffff88802f2e1548 ((wq_completion)mld){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3211 [inline]
+ #0: ffff88802f2e1548 ((wq_completion)mld){+.+.}-{0:0}, at: process_scheduled_works+0x9b4/0x17b0 kernel/workqueue.c:3319
+ #1: ffffc900000f7bc0 ((work_completion)(&(&idev->mc_ifc_work)->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3212 [inline]
+ #1: ffffc900000f7bc0 ((work_completion)(&(&idev->mc_ifc_work)->work)){+.+.}-{0:0}, at: process_scheduled_works+0x9ef/0x17b0 kernel/workqueue.c:3319
+ #2: ffff888079a43538 (&idev->mc_lock){+.+.}-{4:4}, at: mld_ifc_work+0x2d/0xd60 net/ipv6/mcast.c:2697
+ #3: ffffffff8e13a0e0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #3: ffffffff8e13a0e0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ #3: ffffffff8e13a0e0 (rcu_read_lock){....}-{1:3}, at: mld_sendpack+0x1de/0xd80 net/ipv6/mcast.c:1832
+ #4: ffffffff8e13a0e0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #4: ffffffff8e13a0e0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ #4: ffffffff8e13a0e0 (rcu_read_lock){....}-{1:3}, at: ip6_finish_output2+0x701/0x16a0 net/ipv6/ip6_output.c:126
+ #5: ffffffff8e13a140 (rcu_read_lock_bh){....}-{1:3}, at: local_bh_disable include/linux/bottom_half.h:20 [inline]
+ #5: ffffffff8e13a140 (rcu_read_lock_bh){....}-{1:3}, at: rcu_read_lock_bh include/linux/rcupdate.h:892 [inline]
+ #5: ffffffff8e13a140 (rcu_read_lock_bh){....}-{1:3}, at: __dev_queue_xmit+0x27b/0x3b50 net/core/dev.c:4650
+ #6: ffff88807de56158 (&qdisc_xmit_lock_key#3){+...}-{3:3}, at: spin_lock include/linux/spinlock.h:351 [inline]
+ #6: ffff88807de56158 (&qdisc_xmit_lock_key#3){+...}-{3:3}, at: __netif_tx_lock include/linux/netdevice.h:4659 [inline]
+ #6: ffff88807de56158 (&qdisc_xmit_lock_key#3){+...}-{3:3}, at: __dev_queue_xmit+0x1676/0x3b50 net/core/dev.c:4721
+ #7: ffffffff8e13a0e0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #7: ffffffff8e13a0e0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ #7: ffffffff8e13a0e0 (rcu_read_lock){....}-{1:3}, at: ip_output+0x60/0x3c0 net/ipv4/ip_output.c:431
+ #8: ffffffff8e13a0e0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #8: ffffffff8e13a0e0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ #8: ffffffff8e13a0e0 (rcu_read_lock){....}-{1:3}, at: ip_finish_output2+0x452/0x1160 net/ipv4/ip_output.c:228
+ #9: ffffffff8e13a0e0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #9: ffffffff8e13a0e0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:841 [inline]
+ #9: ffffffff8e13a0e0 (rcu_read_lock){....}-{1:3}, at: arp_xmit+0x23/0x270 net/ipv4/arp.c:662
+ #10: ffffffff8e13a140 (rcu_read_lock_bh){....}-{1:3}, at: local_bh_disable include/linux/bottom_half.h:20 [inline]
+ #10: ffffffff8e13a140 (rcu_read_lock_bh){....}-{1:3}, at: rcu_read_lock_bh include/linux/rcupdate.h:892 [inline]
+ #10: ffffffff8e13a140 (rcu_read_lock_bh){....}-{1:3}, at: __dev_queue_xmit+0x27b/0x3b50 net/core/dev.c:4650
+ #11: ffff88807ec9a258 (dev->qdisc_tx_busylock ?: &qdisc_tx_busylock#3){+...}-{3:3}, at: spin_trylock include/linux/spinlock.h:361 [inline]
+ #11: ffff88807ec9a258 (dev->qdisc_tx_busylock ?: &qdisc_tx_busylock#3){+...}-{3:3}, at: qdisc_run_begin include/net/sch_generic.h:197 [inline]
+ #11: ffff88807ec9a258 (dev->qdisc_tx_busylock ?: &qdisc_tx_busylock#3){+...}-{3:3}, at: __dev_xmit_skb net/core/dev.c:4101 [inline]
+ #11: ffff88807ec9a258 (dev->qdisc_tx_busylock ?: &qdisc_tx_busylock#3){+...}-{3:3}, at: __dev_queue_xmit+0x138a/0x3b50 net/core/dev.c:4691
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 10 Comm: kworker/0:1 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/18/2025
+Workqueue: mld mld_ifc_work
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ print_deadlock_bug+0x28b/0x2a0 kernel/locking/lockdep.c:3041
+ check_deadlock kernel/locking/lockdep.c:3093 [inline]
+ validate_chain+0x1a3f/0x2140 kernel/locking/lockdep.c:3895
+ __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5237
+ lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
+ __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+ _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
+ spin_lock include/linux/spinlock.h:351 [inline]
+ __netif_tx_lock include/linux/netdevice.h:4659 [inline]
+ sch_direct_xmit+0x153/0x4b0 net/sched/sch_generic.c:342
+ __dev_xmit_skb net/core/dev.c:4114 [inline]
+ __dev_queue_xmit+0x1857/0x3b50 net/core/dev.c:4691
+ NF_HOOK+0x310/0x3a0 include/linux/netfilter.h:-1
+ arp_xmit+0x16c/0x270 net/ipv4/arp.c:664
+ arp_solicit+0xc1d/0xe60 net/ipv4/arp.c:392
+ neigh_probe net/core/neighbour.c:1098 [inline]
+ __neigh_event_send+0xf6d/0x1560 net/core/neighbour.c:1271
+ neigh_event_send_probe include/net/neighbour.h:471 [inline]
+ neigh_event_send include/net/neighbour.h:477 [inline]
+ neigh_resolve_output+0x198/0x750 net/core/neighbour.c:1579
+ neigh_output include/net/neighbour.h:547 [inline]
+ ip_finish_output2+0xd3d/0x1160 net/ipv4/ip_output.c:235
+ NF_HOOK_COND include/linux/netfilter.h:307 [inline]
+ ip_output+0x2a1/0x3c0 net/ipv4/ip_output.c:436
+ iptunnel_xmit+0x592/0xa40 net/ipv4/ip_tunnel_core.c:84
+ ip_tunnel_xmit+0x1c41/0x2390 net/ipv4/ip_tunnel.c:859
+ __gre_xmit net/ipv4/ip_gre.c:488 [inline]
+ ipgre_xmit+0x89e/0xc50 net/ipv4/ip_gre.c:692
+ __netdev_start_xmit include/linux/netdevice.h:5222 [inline]
+ netdev_start_xmit include/linux/netdevice.h:5231 [inline]
+ xmit_one net/core/dev.c:3839 [inline]
+ dev_hard_start_xmit+0x2d7/0x830 net/core/dev.c:3855
+ __dev_queue_xmit+0x1b8d/0x3b50 net/core/dev.c:4725
+ neigh_output include/net/neighbour.h:547 [inline]
+ ip6_finish_output2+0x11fb/0x16a0 net/ipv6/ip6_output.c:141
+ NF_HOOK+0x9e/0x380 include/linux/netfilter.h:318
+ mld_sendpack+0x800/0xd80 net/ipv6/mcast.c:1860
+ mld_send_cr net/ipv6/mcast.c:2159 [inline]
+ mld_ifc_work+0x83e/0xd60 net/ipv6/mcast.c:2698
+ process_one_work kernel/workqueue.c:3236 [inline]
+ process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3319
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3400
+ kthread+0x70e/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x436/0x7d0 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+
 ---
-RFC v4:
- * poll switch readiness after reset
- * implement driver shutdown
- * added port_fast_aging API call and driver op
- * unified port setup in new .port_setup op
- * improve comment explaining special handlign for unaligned API read
- * various typos
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-RFC v3:
- * fix return value being uninitialized on error in mxl862xx_api_wrap()
- * add missing descrition in kerneldoc comment of
-   struct mxl862xx_ss_sp_tag
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-RFC v2:
- * make use of struct mdio_device
- * add phylink_mac_ops stubs
- * drop leftover nonsense from mxl862xx_phylink_get_caps()
- * use __le32 instead of enum types in over-the-wire structs
- * use existing MDIO_* macros whenever possible
- * simplify API constants to be more readable
- * use readx_poll_timeout instead of open-coding poll timeout loop
- * add mxl862xx_reg_read() and mxl862xx_reg_write() helpers
- * demystify error codes returned by the firmware
- * add #defines for mxl862xx_ss_sp_tag member values
- * move reset to dedicated function, clarify magic number being the
-   reset command ID
----
- MAINTAINERS                              |   1 +
- drivers/net/dsa/Kconfig                  |   2 +
- drivers/net/dsa/Makefile                 |   1 +
- drivers/net/dsa/mxl862xx/Kconfig         |  12 +
- drivers/net/dsa/mxl862xx/Makefile        |   3 +
- drivers/net/dsa/mxl862xx/mxl862xx-api.h  | 177 ++++++++++
- drivers/net/dsa/mxl862xx/mxl862xx-cmd.h  |  32 ++
- drivers/net/dsa/mxl862xx/mxl862xx-host.c | 230 ++++++++++++
- drivers/net/dsa/mxl862xx/mxl862xx-host.h |   5 +
- drivers/net/dsa/mxl862xx/mxl862xx.c      | 428 +++++++++++++++++++++++
- drivers/net/dsa/mxl862xx/mxl862xx.h      |  24 ++
- 11 files changed, 915 insertions(+)
- create mode 100644 drivers/net/dsa/mxl862xx/Kconfig
- create mode 100644 drivers/net/dsa/mxl862xx/Makefile
- create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-api.h
- create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-cmd.h
- create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-host.c
- create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-host.h
- create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx.c
- create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx.h
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0975bf16bd7a3..85af0d7a09e77 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -15618,6 +15618,7 @@ M:	Daniel Golle <daniel@makrotopia.org>
- L:	netdev@vger.kernel.org
- S:	Maintained
- F:	Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml
-+F:	drivers/net/dsa/mxl862xx/
- F:	net/dsa/tag_mxl862xx.c
- 
- MCAN DEVICE DRIVER
-diff --git a/drivers/net/dsa/Kconfig b/drivers/net/dsa/Kconfig
-index 7eb301fd987d1..18f6e8b7f4cb2 100644
---- a/drivers/net/dsa/Kconfig
-+++ b/drivers/net/dsa/Kconfig
-@@ -74,6 +74,8 @@ source "drivers/net/dsa/microchip/Kconfig"
- 
- source "drivers/net/dsa/mv88e6xxx/Kconfig"
- 
-+source "drivers/net/dsa/mxl862xx/Kconfig"
-+
- source "drivers/net/dsa/ocelot/Kconfig"
- 
- source "drivers/net/dsa/qca/Kconfig"
-diff --git a/drivers/net/dsa/Makefile b/drivers/net/dsa/Makefile
-index 16de4ba3fa388..f5a463b87ec25 100644
---- a/drivers/net/dsa/Makefile
-+++ b/drivers/net/dsa/Makefile
-@@ -20,6 +20,7 @@ obj-y				+= hirschmann/
- obj-y				+= lantiq/
- obj-y				+= microchip/
- obj-y				+= mv88e6xxx/
-+obj-y				+= mxl862xx/
- obj-y				+= ocelot/
- obj-y				+= qca/
- obj-y				+= realtek/
-diff --git a/drivers/net/dsa/mxl862xx/Kconfig b/drivers/net/dsa/mxl862xx/Kconfig
-new file mode 100644
-index 0000000000000..3722260da7d82
---- /dev/null
-+++ b/drivers/net/dsa/mxl862xx/Kconfig
-@@ -0,0 +1,12 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+config NET_DSA_MXL862
-+	tristate "MaxLinear MxL862xx"
-+	depends on NET_DSA
-+	select MAXLINEAR_GPHY
-+	select NET_DSA_TAG_MXL_862XX
-+	help
-+	  This enables support for the MaxLinear MxL862xx switch family.
-+	  These switches have two 10GE SerDes interfaces, one typically
-+	  used as CPU port.
-+	   MxL86282 has eight 2.5 Gigabit PHYs
-+	   MxL86252 has five 2.5 Gigabit PHYs
-diff --git a/drivers/net/dsa/mxl862xx/Makefile b/drivers/net/dsa/mxl862xx/Makefile
-new file mode 100644
-index 0000000000000..d23dd3cd511d4
---- /dev/null
-+++ b/drivers/net/dsa/mxl862xx/Makefile
-@@ -0,0 +1,3 @@
-+# SPDX-License-Identifier: GPL-2.0
-+obj-$(CONFIG_NET_DSA_MXL862) += mxl862xx_dsa.o
-+mxl862xx_dsa-y := mxl862xx.o mxl862xx-host.o
-diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-api.h b/drivers/net/dsa/mxl862xx/mxl862xx-api.h
-new file mode 100644
-index 0000000000000..19ee7614f0831
---- /dev/null
-+++ b/drivers/net/dsa/mxl862xx/mxl862xx-api.h
-@@ -0,0 +1,177 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+
-+#include <linux/if_ether.h>
-+
-+/**
-+ * struct mdio_relay_data - relayed access to the switch internal MDIO bus
-+ * @data: data to be read or written
-+ * @phy: PHY index
-+ * @mmd: MMD device
-+ * @reg: register index
-+ */
-+struct mdio_relay_data {
-+	__le16 data;
-+	u8 phy;
-+	u8 mmd;
-+	__le16 reg;
-+} __packed;
-+
-+/* Register access parameter to directly modify internal registers */
-+struct mxl862xx_register_mod {
-+	__le16 addr;
-+	__le16 data;
-+	__le16 mask;
-+} __packed;
-+
-+/**
-+ * enum mxl862xx_mac_clear_type - MAC table clear type
-+ * @MXL862XX_MAC_CLEAR_PHY_PORT: clear dynamic entries based on port_id
-+ * @MXL862XX_MAC_CLEAR_DYNAMIC: clear all dynamic entries
-+ */
-+enum mxl862xx_mac_clear_type {
-+	MXL862XX_MAC_CLEAR_PHY_PORT = 0,
-+	MXL862XX_MAC_CLEAR_DYNAMIC,
-+};
-+
-+/**
-+ * struct mxl862xx_mac_table_clear - MAC table clear
-+ * @type: see &enum mxl862xx_mac_clear_type
-+ * @port_id: physical port id
-+ */
-+struct mxl862xx_mac_table_clear {
-+	u8 type;
-+	u8 port_id;
-+} __packed;
-+
-+/**
-+ * enum mxl862xx_age_timer - Aging Timer Value.
-+ * @MXL862XX_AGETIMER_1_SEC: 1 second aging time
-+ * @MXL862XX_AGETIMER_10_SEC: 10 seconds aging time
-+ * @MXL862XX_AGETIMER_300_SEC: 300 seconds aging time
-+ * @MXL862XX_AGETIMER_1_HOUR: 1 hour aging time
-+ * @MXL862XX_AGETIMER_1_DAY: 24 hours aging time
-+ * @MXL862XX_AGETIMER_CUSTOM: Custom aging time in seconds
-+ */
-+enum mxl862xx_age_timer {
-+	MXL862XX_AGETIMER_1_SEC = 1,
-+	MXL862XX_AGETIMER_10_SEC,
-+	MXL862XX_AGETIMER_300_SEC,
-+	MXL862XX_AGETIMER_1_HOUR,
-+	MXL862XX_AGETIMER_1_DAY,
-+	MXL862XX_AGETIMER_CUSTOM,
-+};
-+
-+/**
-+ * struct mxl862xx_cfg -  Global Switch configuration Attributes
-+ * @mac_table_age_timer: See &enum mxl862xx_age_timer
-+ * @age_timer: Custom MAC table aging timer in seconds
-+ * @max_packet_len: Maximum Ethernet packet length.
-+ * @learning_limit_action: Automatic MAC address table learning limitation consecutive action
-+ * @mac_locking_action: Accept or discard MAC port locking violation packets
-+ * @mac_spoofing_action: Accept or discard MAC spoofing and port MAC locking violation packets
-+ * @pause_mac_mode_src: Pause frame MAC source address mode
-+ * @pause_mac_src: Pause frame MAC source address
-+ */
-+struct mxl862xx_cfg {
-+	__le32 mac_table_age_timer; /* enum mxl862xx_age_timer */
-+	__le32 age_timer;
-+	__le16 max_packet_len;
-+	u8 learning_limit_action;
-+	u8 mac_locking_action;
-+	u8 mac_spoofing_action;
-+	u8 pause_mac_mode_src;
-+	u8 pause_mac_src[ETH_ALEN];
-+} __packed;
-+
-+#define MXL862XX_SS_SP_TAG_MASK_RX			BIT(0)
-+#define MXL862XX_SS_SP_TAG_MASK_TX			BIT(1)
-+#define MXL862XX_SS_SP_TAG_MASK_RX_PEN			BIT(2)
-+#define MXL862XX_SS_SP_TAG_MASK_TX_PEN			BIT(3)
-+
-+#define MXL862XX_SS_SP_TAG_RX_NO_TAG_NO_INSERT		0
-+#define MXL862XX_SS_SP_TAG_RX_NO_TAG_INSERT		1
-+#define MXL862XX_SS_SP_TAG_RX_TAG_NO_INSERT		2
-+
-+#define MXL862XX_SS_SP_TAG_TX_NO_TAG_NO_REMOVE		0
-+#define MXL862XX_SS_SP_TAG_TX_TAG_REPLACE		1
-+#define MXL862XX_SS_SP_TAG_TX_TAG_NO_REMOVE		2
-+#define MXL862XX_SS_SP_TAG_TX_TAG_REMOVE		3
-+
-+/**
-+ * struct mxl862xx_ss_sp_tag - Special tag port settings
-+ * @pid: port ID (1~16)
-+ * @mask: bit value 1 to indicate valid field
-+ *	0 - rx
-+ *	1 - tx
-+ *	2 - rx_pen
-+ *	3 - tx_pen
-+ * @rx: RX special tag mode
-+ *	0 - packet does NOT have special tag and special tag is NOT inserted
-+ *	1 - packet does NOT have special tag and special tag is inserted
-+ *	2 - packet has special tag and special tag is NOT inserted
-+ * @tx: TX special tag mode
-+ *	0 - packet does NOT have special tag and special tag is NOT removed
-+ *	1 - packet has special tag and special tag is replaced
-+ *	2 - packet has special tag and special tag is NOT removed
-+ *	3 - packet has special tag and special tag is removed
-+ * @rx_pen: RX special tag info over preamble
-+ *	0 - special tag info inserted from byte 2 to 7 are all 0
-+ *	1 - special tag byte 5 is 16, other bytes from 2 to 7 are 0
-+ *	2 - special tag byte 5 is from preamble field, others are 0
-+ *	3 - special tag byte 2 to 7 are from preabmle field
-+ * @tx_pen: TX special tag info over preamble
-+ *	0 - disabled
-+ *	1 - enabled
-+ */
-+struct mxl862xx_ss_sp_tag {
-+	u8 pid;
-+	u8 mask;
-+	u8 rx;
-+	u8 tx;
-+	u8 rx_pen;
-+	u8 tx_pen;
-+} __packed;
-+
-+/**
-+ * enum mxl862xx_logical_port_mode - Logical port mode
-+ * @MXL862XX_LOGICAL_PORT_8BIT_WLAN: WLAN with 8-bit station ID
-+ * @MXL862XX_LOGICAL_PORT_9BIT_WLAN: WLAN with 9-bit station ID
-+ * @MXL862XX_LOGICAL_PORT_ETHERNET: Ethernet port
-+ * @MXL862XX_LOGICAL_PORT_OTHER: Others
-+ */
-+enum mxl862xx_logical_port_mode {
-+	MXL862XX_LOGICAL_PORT_8BIT_WLAN = 0,
-+	MXL862XX_LOGICAL_PORT_9BIT_WLAN,
-+	MXL862XX_LOGICAL_PORT_ETHERNET,
-+	MXL862XX_LOGICAL_PORT_OTHER = 0xFF,
-+};
-+
-+/**
-+ * struct mxl862xx_ctp_port_assignment - CTP Port Assignment/association with logical port
-+ * @logical_port_id: Logical Port Id. The valid range is hardware dependent
-+ * @first_ctp_port_id: First CTP Port ID mapped to above logical port ID
-+ * @number_of_ctp_port: Total number of CTP Ports mapped above logical port ID
-+ * @mode: See &enum mxl862xx_logical_port_mode
-+ * @bridge_port_id: Bridge ID (FID)
-+ */
-+struct mxl862xx_ctp_port_assignment {
-+	u8 logical_port_id;
-+	__le16 first_ctp_port_id;
-+	__le16 number_of_ctp_port;
-+	__le32 mode; /* enum mxl862xx_logical_port_mode */
-+	__le16 bridge_port_id;
-+} __packed;
-+
-+/**
-+ * struct mxl862xx_sys_fw_image_version - Firmware version information
-+ * @iv_major: firmware major version
-+ * @iv_minor: firmware minor version
-+ * @iv_revision: firmware revision
-+ * @iv_build_num: firmware build number
-+ */
-+struct mxl862xx_sys_fw_image_version {
-+	u8 iv_major;
-+	u8 iv_minor;
-+	__le16 iv_revision;
-+	__le32 iv_build_num;
-+} __packed;
-diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-cmd.h b/drivers/net/dsa/mxl862xx/mxl862xx-cmd.h
-new file mode 100644
-index 0000000000000..79e66aa622ea2
---- /dev/null
-+++ b/drivers/net/dsa/mxl862xx/mxl862xx-cmd.h
-@@ -0,0 +1,32 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+
-+#define MXL862XX_MMD_DEV		30
-+#define MXL862XX_MMD_REG_CTRL		0
-+#define MXL862XX_MMD_REG_LEN_RET	1
-+#define MXL862XX_MMD_REG_DATA_FIRST	2
-+#define MXL862XX_MMD_REG_DATA_LAST	95
-+#define MXL862XX_MMD_REG_DATA_MAX_SIZE \
-+	(MXL862XX_MMD_REG_DATA_LAST - MXL862XX_MMD_REG_DATA_FIRST + 1)
-+
-+#define MXL862XX_COMMON_MAGIC		0x100
-+#define MXL862XX_CTP_MAGIC		0x500
-+#define MXL862XX_SWMAC_MAGIC		0xa00
-+#define MXL862XX_SS_MAGIC		0x1600
-+#define GPY_GPY2XX_MAGIC		0x1800
-+#define SYS_MISC_MAGIC			0x1900
-+
-+#define MXL862XX_COMMON_CFGGET		(MXL862XX_COMMON_MAGIC + 0x9)
-+#define MXL862XX_COMMON_REGISTERMOD	(MXL862XX_COMMON_MAGIC + 0x11)
-+
-+#define MXL862XX_CTP_PORTASSIGNMENTSET	(MXL862XX_CTP_MAGIC + 0x3)
-+
-+#define MXL862XX_MAC_TABLECLEARCOND	(MXL862XX_SWMAC_MAGIC + 0x8)
-+
-+#define MXL862XX_SS_SPTAG_SET		(MXL862XX_SS_MAGIC + 0x02)
-+
-+#define INT_GPHY_READ			(GPY_GPY2XX_MAGIC + 0x01)
-+#define INT_GPHY_WRITE			(GPY_GPY2XX_MAGIC + 0x02)
-+
-+#define SYS_MISC_FW_VERSION		(SYS_MISC_MAGIC + 0x02)
-+
-+#define MMD_API_MAXIMUM_ID		0x7fff
-diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-host.c b/drivers/net/dsa/mxl862xx/mxl862xx-host.c
-new file mode 100644
-index 0000000000000..73334a8c9d867
---- /dev/null
-+++ b/drivers/net/dsa/mxl862xx/mxl862xx-host.c
-@@ -0,0 +1,230 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Based upon the Maxlinear SDK driver
-+ *
-+ * Copyright (C) 2025 Daniel Golle <daniel@makrotopia.org>
-+ * Copyright (C) 2025 John Crispin <john@phrozen.org>
-+ * Copyright (C) 2024 MaxLinear Inc.
-+ */
-+
-+#include <linux/bits.h>
-+#include <linux/iopoll.h>
-+#include <net/dsa.h>
-+#include "mxl862xx.h"
-+#include "mxl862xx-host.h"
-+
-+#define CTRL_BUSY_MASK			BIT(15)
-+
-+#define MXL862XX_MMD_REG_CTRL		0
-+#define MXL862XX_MMD_REG_LEN_RET	1
-+#define MXL862XX_MMD_REG_DATA_FIRST	2
-+#define MXL862XX_MMD_REG_DATA_LAST	95
-+#define MXL862XX_MMD_REG_DATA_MAX_SIZE \
-+		(MXL862XX_MMD_REG_DATA_LAST - MXL862XX_MMD_REG_DATA_FIRST + 1)
-+
-+#define MMD_API_SET_DATA_0		2
-+#define MMD_API_GET_DATA_0		5
-+#define MMD_API_RST_DATA		8
-+
-+#define MXL862XX_SWITCH_RESET 0x9907
-+
-+static int mxl862xx_reg_read(struct mxl862xx_priv *priv, u32 addr)
-+{
-+	return __mdiodev_c45_read(priv->mdiodev, MDIO_MMD_VEND1, addr);
-+}
-+
-+static int mxl862xx_reg_write(struct mxl862xx_priv *priv, u32 addr, u16 data)
-+{
-+	return __mdiodev_c45_write(priv->mdiodev, MDIO_MMD_VEND1, addr, data);
-+}
-+
-+static int mxl862xx_ctrl_read(struct mxl862xx_priv *priv)
-+{
-+	return mxl862xx_reg_read(priv, MXL862XX_MMD_REG_CTRL);
-+}
-+
-+static int mxl862xx_busy_wait(struct mxl862xx_priv *priv)
-+{
-+	int val;
-+
-+	return readx_poll_timeout(mxl862xx_ctrl_read, priv, val,
-+				  !(val & CTRL_BUSY_MASK), 15, 10000);
-+}
-+
-+static int mxl862xx_set_data(struct mxl862xx_priv *priv, u16 words)
-+{
-+	int ret;
-+	u16 cmd;
-+
-+	ret = mxl862xx_reg_write(priv, MXL862XX_MMD_REG_LEN_RET,
-+				 MXL862XX_MMD_REG_DATA_MAX_SIZE * sizeof(u16));
-+	if (ret < 0)
-+		return ret;
-+
-+	cmd = words / MXL862XX_MMD_REG_DATA_MAX_SIZE - 1;
-+	if (!(cmd < 2))
-+		return -EINVAL;
-+
-+	cmd += MMD_API_SET_DATA_0;
-+	ret = mxl862xx_reg_write(priv, MXL862XX_MMD_REG_CTRL,
-+				 cmd | CTRL_BUSY_MASK);
-+	if (ret < 0)
-+		return ret;
-+
-+	return mxl862xx_busy_wait(priv);
-+}
-+
-+static int mxl862xx_get_data(struct mxl862xx_priv *priv, u16 words)
-+{
-+	int ret;
-+	u16 cmd;
-+
-+	ret = mxl862xx_reg_write(priv, MXL862XX_MMD_REG_LEN_RET,
-+				 MXL862XX_MMD_REG_DATA_MAX_SIZE * sizeof(u16));
-+	if (ret < 0)
-+		return ret;
-+
-+	cmd = words / MXL862XX_MMD_REG_DATA_MAX_SIZE;
-+	if (!(cmd > 0 && cmd < 3))
-+		return -EINVAL;
-+
-+	cmd += MMD_API_GET_DATA_0;
-+	ret = mxl862xx_reg_write(priv, MXL862XX_MMD_REG_CTRL,
-+				 cmd | CTRL_BUSY_MASK);
-+	if (ret < 0)
-+		return ret;
-+
-+	return mxl862xx_busy_wait(priv);
-+}
-+
-+static int mxl862xx_send_cmd(struct mxl862xx_priv *priv, u16 cmd, u16 size,
-+			     bool quiet)
-+{
-+	int ret;
-+
-+	ret = mxl862xx_reg_write(priv, MXL862XX_MMD_REG_LEN_RET, size);
-+	if (ret)
-+		return ret;
-+
-+	ret = mxl862xx_reg_write(priv, MXL862XX_MMD_REG_CTRL,
-+				 cmd | CTRL_BUSY_MASK);
-+	if (ret)
-+		return ret;
-+
-+	ret = mxl862xx_busy_wait(priv);
-+	if (ret)
-+		return ret;
-+
-+	ret = mxl862xx_reg_read(priv, MXL862XX_MMD_REG_LEN_RET);
-+	/* handle errors returned by the firmware as -EIO
-+	 * The firmware is based on Zephyr OS and uses the errors as
-+	 * defined in errno.h of Zephyr OS. See
-+	 * https://github.com/zephyrproject-rtos/zephyr/blob/v3.7.0/lib/libc/minimal/include/errno.h
-+	 */
-+	if ((s16)ret < 0) {
-+		if (!quiet)
-+			dev_err(&priv->mdiodev->dev,
-+				"CMD %04x returned error %d\n", cmd, (s16)ret);
-+		return -EIO;
-+	}
-+
-+	return ret;
-+}
-+
-+int mxl862xx_api_wrap(struct mxl862xx_priv *priv, u16 cmd, void *_data,
-+		      u16 size, bool read, bool quiet)
-+{
-+	__le16 *data = _data;
-+	u16 max, i;
-+	int ret, cmd_ret;
-+
-+	dev_dbg(&priv->mdiodev->dev, "CMD %04x DATA %*ph\n", cmd, size, data);
-+
-+	mutex_lock_nested(&priv->mdiodev->bus->mdio_lock, MDIO_MUTEX_NESTED);
-+
-+	max = (size + 1) / 2;
-+
-+	ret = mxl862xx_busy_wait(priv);
-+	if (ret < 0)
-+		goto out;
-+
-+	for (i = 0; i < max; i++) {
-+		u16 off = i % MXL862XX_MMD_REG_DATA_MAX_SIZE;
-+
-+		if (i && off == 0) {
-+			/* Send command to set data when every
-+			 * MXL862XX_MMD_REG_DATA_MAX_SIZE of WORDs are written.
-+			 */
-+			ret = mxl862xx_set_data(priv, i);
-+			if (ret < 0)
-+				goto out;
-+		}
-+
-+		ret = mxl862xx_reg_write(priv, MXL862XX_MMD_REG_DATA_FIRST + off,
-+					 le16_to_cpu(data[i]));
-+		if (ret < 0)
-+			goto out;
-+	}
-+
-+	ret = mxl862xx_send_cmd(priv, cmd, size, quiet);
-+	if (ret < 0 || !read)
-+		goto out;
-+
-+	/* store result of mxl862xx_send_cmd() */
-+	cmd_ret = ret;
-+
-+	for (i = 0; i < max; i++) {
-+		u16 off = i % MXL862XX_MMD_REG_DATA_MAX_SIZE;
-+
-+		if (i && off == 0) {
-+			/* Send command to fetch next batch of data when every
-+			 * MXL862XX_MMD_REG_DATA_MAX_SIZE of WORDs are read.
-+			 */
-+			ret = mxl862xx_get_data(priv, i);
-+			if (ret < 0)
-+				goto out;
-+		}
-+
-+		ret = mxl862xx_reg_read(priv, MXL862XX_MMD_REG_DATA_FIRST + off);
-+		if (ret < 0)
-+			goto out;
-+
-+		if ((i * 2 + 1) == size) {
-+			/* Special handling for last BYTE if it's not WORD
-+			 * aligned to avoid writing beyond the allocated data
-+			 * structure.
-+			 */
-+			*(uint8_t *)&data[i] = ret & 0xff;
-+		} else {
-+			data[i] = cpu_to_le16((u16)ret);
-+		}
-+	}
-+
-+	/* on success return the result of the mxl862xx_send_cmd() */
-+	ret = cmd_ret;
-+
-+	dev_dbg(&priv->mdiodev->dev, "RET %d DATA %*ph\n", ret, size, data);
-+
-+out:
-+	mutex_unlock(&priv->mdiodev->bus->mdio_lock);
-+
-+	return ret;
-+}
-+
-+int mxl862xx_reset(struct mxl862xx_priv *priv)
-+{
-+	int ret;
-+
-+	mutex_lock_nested(&priv->mdiodev->bus->mdio_lock, MDIO_MUTEX_NESTED);
-+
-+	/* Software reset */
-+	ret = mxl862xx_reg_write(priv, MXL862XX_MMD_REG_LEN_RET, 0);
-+	if (ret)
-+		goto out;
-+
-+	ret = mxl862xx_reg_write(priv, MXL862XX_MMD_REG_CTRL, MXL862XX_SWITCH_RESET);
-+out:
-+	mutex_unlock(&priv->mdiodev->bus->mdio_lock);
-+
-+	return ret;
-+}
-diff --git a/drivers/net/dsa/mxl862xx/mxl862xx-host.h b/drivers/net/dsa/mxl862xx/mxl862xx-host.h
-new file mode 100644
-index 0000000000000..0f558193d9d48
---- /dev/null
-+++ b/drivers/net/dsa/mxl862xx/mxl862xx-host.h
-@@ -0,0 +1,5 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+
-+int mxl862xx_api_wrap(struct mxl862xx_priv *priv, u16 cmd, void *data, u16 size,
-+		      bool read, bool quiet);
-+int mxl862xx_reset(struct mxl862xx_priv *priv);
-diff --git a/drivers/net/dsa/mxl862xx/mxl862xx.c b/drivers/net/dsa/mxl862xx/mxl862xx.c
-new file mode 100644
-index 0000000000000..8ec4e7c08a118
---- /dev/null
-+++ b/drivers/net/dsa/mxl862xx/mxl862xx.c
-@@ -0,0 +1,428 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Driver for MaxLinear MxL862xx switch family
-+ *
-+ * Copyright (C) 2024 MaxLinear Inc.
-+ * Copyright (C) 2025 John Crispin <john@phrozen.org>
-+ * Copyright (C) 2025 Daniel Golle <daniel@makrotopia.org>
-+ */
-+
-+#include <linux/module.h>
-+#include <linux/delay.h>
-+#include <linux/of_device.h>
-+#include <linux/of_mdio.h>
-+#include <linux/phy.h>
-+#include <linux/phylink.h>
-+#include <net/dsa.h>
-+
-+#include "mxl862xx.h"
-+#include "mxl862xx-api.h"
-+#include "mxl862xx-cmd.h"
-+#include "mxl862xx-host.h"
-+
-+#define MXL862XX_API_WRITE(dev, cmd, data) \
-+	mxl862xx_api_wrap(dev, cmd, &(data), sizeof((data)), false, false)
-+#define MXL862XX_API_READ(dev, cmd, data) \
-+	mxl862xx_api_wrap(dev, cmd, &(data), sizeof((data)), true, false)
-+#define MXL862XX_API_READ_QUIET(dev, cmd, data) \
-+	mxl862xx_api_wrap(dev, cmd, &(data), sizeof((data)), true, true)
-+
-+#define DSA_MXL_PORT(port)		((port) + 1)
-+
-+#define MXL862XX_SDMA_PCTRLP(p)		(0xbc0 + ((p) * 0x6))
-+#define MXL862XX_SDMA_PCTRL_EN		BIT(0)
-+
-+#define MXL862XX_FDMA_PCTRLP(p)		(0xa80 + ((p) * 0x6))
-+#define MXL862XX_FDMA_PCTRL_EN		BIT(0)
-+
-+#define MXL862XX_READY_TIMEOUT_MS	10000
-+#define MXL862XX_READY_POLL_MS		100
-+
-+/* PHY access via firmware relay */
-+static int mxl862xx_phy_read_mmd(struct mxl862xx_priv *priv, int port,
-+				 int devadd, int reg)
-+{
-+	struct mdio_relay_data param = {
-+		.phy = port,
-+		.mmd = devadd,
-+		.reg = cpu_to_le16(reg),
-+	};
-+	int ret;
-+
-+	ret = MXL862XX_API_READ(priv, INT_GPHY_READ, param);
-+	if (ret)
-+		return ret;
-+
-+	return le16_to_cpu(param.data);
-+}
-+
-+static int mxl862xx_phy_write_mmd(struct mxl862xx_priv *priv, int port,
-+				  int devadd, int reg, u16 data)
-+{
-+	struct mdio_relay_data param = {
-+		.phy = port,
-+		.mmd = devadd,
-+		.reg = cpu_to_le16(reg),
-+		.data = cpu_to_le16(data),
-+	};
-+
-+	return MXL862XX_API_WRITE(priv, INT_GPHY_WRITE, param);
-+}
-+
-+static int mxl862xx_phy_read(struct dsa_switch *ds, int port, int reg)
-+{
-+	return mxl862xx_phy_read_mmd(ds->priv, port, 0, reg);
-+}
-+
-+static int mxl862xx_phy_write(struct dsa_switch *ds, int port, int reg, u16 data)
-+{
-+	return mxl862xx_phy_write_mmd(ds->priv, port, 0, reg, data);
-+}
-+
-+static int mxl862xx_configure_tag_proto(struct dsa_switch *ds, int port, bool enable)
-+{
-+	struct mxl862xx_ctp_port_assignment assign = {
-+		.number_of_ctp_port = cpu_to_le16(enable ? (32 - DSA_MXL_PORT(port)) : 1),
-+		.logical_port_id = DSA_MXL_PORT(port),
-+		.first_ctp_port_id = cpu_to_le16(DSA_MXL_PORT(port)),
-+		.mode = cpu_to_le32(MXL862XX_LOGICAL_PORT_ETHERNET),
-+	};
-+	struct mxl862xx_ss_sp_tag tag = {
-+		.pid = DSA_MXL_PORT(port),
-+		.mask = MXL862XX_SS_SP_TAG_MASK_RX | MXL862XX_SS_SP_TAG_MASK_TX,
-+		.rx = enable ? MXL862XX_SS_SP_TAG_RX_TAG_NO_INSERT :
-+			       MXL862XX_SS_SP_TAG_RX_NO_TAG_INSERT,
-+		.tx = enable ? MXL862XX_SS_SP_TAG_TX_TAG_NO_REMOVE :
-+			       MXL862XX_SS_SP_TAG_TX_TAG_REMOVE,
-+	};
-+	int ret;
-+
-+	ret = MXL862XX_API_WRITE(ds->priv, MXL862XX_SS_SPTAG_SET, tag);
-+	if (ret)
-+		return ret;
-+
-+	return MXL862XX_API_WRITE(ds->priv, MXL862XX_CTP_PORTASSIGNMENTSET, assign);
-+}
-+
-+static int mxl862xx_port_state(struct dsa_switch *ds, int port, bool enable)
-+{
-+	struct mxl862xx_register_mod sdma = {
-+		.addr = cpu_to_le16(MXL862XX_SDMA_PCTRLP(DSA_MXL_PORT(port))),
-+		.data = cpu_to_le16(enable ? MXL862XX_SDMA_PCTRL_EN : 0),
-+		.mask = cpu_to_le16(MXL862XX_SDMA_PCTRL_EN),
-+	};
-+	struct mxl862xx_register_mod fdma = {
-+		.addr = cpu_to_le16(MXL862XX_FDMA_PCTRLP(DSA_MXL_PORT(port))),
-+		.data = cpu_to_le16(enable ? MXL862XX_FDMA_PCTRL_EN : 0),
-+		.mask = cpu_to_le16(MXL862XX_FDMA_PCTRL_EN),
-+	};
-+	int ret;
-+
-+	ret = MXL862XX_API_WRITE(ds->priv, MXL862XX_COMMON_REGISTERMOD, sdma);
-+	if (ret)
-+		return ret;
-+
-+	return MXL862XX_API_WRITE(ds->priv, MXL862XX_COMMON_REGISTERMOD, fdma);
-+}
-+
-+static int mxl862xx_port_enable(struct dsa_switch *ds, int port,
-+				struct phy_device *phydev)
-+{
-+	return mxl862xx_port_state(ds, port, true);
-+}
-+
-+static void mxl862xx_port_disable(struct dsa_switch *ds, int port)
-+{
-+	mxl862xx_port_state(ds, port, false);
-+}
-+
-+static void mxl862xx_port_fast_age(struct dsa_switch *ds, int port)
-+{
-+	struct mxl862xx_mac_table_clear param = {
-+		.type = MXL862XX_MAC_CLEAR_PHY_PORT,
-+		.port_id = DSA_MXL_PORT(port),
-+	};
-+
-+	if (MXL862XX_API_WRITE(ds->priv, MXL862XX_MAC_TABLECLEARCOND, param))
-+		dev_err(ds->dev, "failed to clear fdb on port %d\n", port);
-+}
-+
-+static int mxl862xx_phy_read_mii_bus(struct mii_bus *bus, int port, int regnum)
-+{
-+	return mxl862xx_phy_read_mmd(bus->priv, port, 0, regnum);
-+}
-+
-+static int mxl862xx_phy_write_mii_bus(struct mii_bus *bus, int port,
-+				      int regnum, u16 val)
-+{
-+	return mxl862xx_phy_write_mmd(bus->priv, port, 0, regnum, val);
-+}
-+
-+static int mxl862xx_phy_read_c45_mii_bus(struct mii_bus *bus, int port,
-+					 int devadd, int regnum)
-+{
-+	return mxl862xx_phy_read_mmd(bus->priv, port, devadd, regnum);
-+}
-+
-+static int mxl862xx_phy_write_c45_mii_bus(struct mii_bus *bus, int port,
-+					  int devadd, int regnum, u16 val)
-+{
-+	return mxl862xx_phy_write_mmd(bus->priv, port, devadd, regnum, val);
-+}
-+
-+static int mxl862xx_setup_mdio(struct dsa_switch *ds)
-+{
-+	struct mxl862xx_priv *priv = ds->priv;
-+	struct device *dev = ds->dev;
-+	struct device_node *mdio_np;
-+	struct mii_bus *bus;
-+	static int idx;
-+	int ret;
-+
-+	bus = devm_mdiobus_alloc(dev);
-+	if (!bus)
-+		return -ENOMEM;
-+
-+	bus->priv = priv;
-+	ds->user_mii_bus = bus;
-+	bus->name = KBUILD_MODNAME "-mii";
-+	snprintf(bus->id, MII_BUS_ID_SIZE, KBUILD_MODNAME "-%d", idx++);
-+	bus->read_c45 = mxl862xx_phy_read_c45_mii_bus;
-+	bus->write_c45 = mxl862xx_phy_write_c45_mii_bus;
-+	bus->read = mxl862xx_phy_read_mii_bus;
-+	bus->write = mxl862xx_phy_write_mii_bus;
-+	bus->parent = dev;
-+	bus->phy_mask = ~ds->phys_mii_mask;
-+
-+	mdio_np = of_get_child_by_name(dev->of_node, "mdio");
-+	if (!mdio_np)
-+		return -ENODEV;
-+
-+	ret = devm_of_mdiobus_register(dev, bus, mdio_np);
-+	of_node_put(mdio_np);
-+
-+	return ret;
-+}
-+
-+static void mxl862xx_phylink_get_caps(struct dsa_switch *ds, int port,
-+				      struct phylink_config *config)
-+{
-+	config->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE | MAC_10 |
-+				   MAC_100 | MAC_1000 | MAC_2500FD;
-+
-+	__set_bit(PHY_INTERFACE_MODE_INTERNAL,
-+		  config->supported_interfaces);
-+}
-+
-+static enum dsa_tag_protocol mxl862xx_get_tag_protocol(struct dsa_switch *ds,
-+						       int port,
-+						       enum dsa_tag_protocol m)
-+{
-+	return DSA_TAG_PROTO_MXL862;
-+}
-+
-+static int mxl862xx_wait_ready(struct dsa_switch *ds)
-+{
-+	struct mxl862xx_sys_fw_image_version ver = {};
-+	unsigned long start = jiffies, timeout;
-+	struct mxl862xx_priv *priv = ds->priv;
-+	struct mxl862xx_cfg cfg = {};
-+	int ret;
-+
-+	timeout = start + msecs_to_jiffies(MXL862XX_READY_TIMEOUT_MS);
-+	do {
-+		ret = MXL862XX_API_READ_QUIET(priv, SYS_MISC_FW_VERSION, ver);
-+		if (ret == 0 && (ver.iv_major || ver.iv_minor)) {
-+			ret = MXL862XX_API_READ_QUIET(priv, MXL862XX_COMMON_CFGGET, cfg);
-+			if (ret == 0) {
-+				dev_info(ds->dev, "switch ready after %ums, firmware %u.%u.%u (build %u)\n",
-+					 jiffies_to_msecs(jiffies - start),
-+					 ver.iv_major, ver.iv_minor,
-+					 le16_to_cpu(ver.iv_revision),
-+					 le32_to_cpu(ver.iv_build_num));
-+				return 0;
-+			}
-+		}
-+		msleep(MXL862XX_READY_POLL_MS);
-+	} while (time_before(jiffies, timeout));
-+
-+	dev_err(ds->dev, "switch not responding after reset\n");
-+	return -ETIMEDOUT;
-+}
-+
-+static int mxl862xx_setup(struct dsa_switch *ds)
-+{
-+	struct mxl862xx_priv *priv = ds->priv;
-+	int ret;
-+
-+	ret = mxl862xx_reset(priv);
-+	if (ret)
-+		return ret;
-+
-+	ret = mxl862xx_wait_ready(ds);
-+	if (ret)
-+		return ret;
-+
-+	ret = mxl862xx_setup_mdio(ds);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
-+}
-+
-+static int mxl862xx_port_setup(struct dsa_switch *ds, int port)
-+{
-+	bool is_cpu_port = dsa_is_cpu_port(ds, port);
-+	int ret;
-+
-+	ret = mxl862xx_configure_tag_proto(ds, port, is_cpu_port);
-+	if (ret)
-+		return ret;
-+
-+	ret = mxl862xx_port_state(ds, port, is_cpu_port);
-+	if (ret)
-+		return ret;
-+
-+	mxl862xx_port_fast_age(ds, port);
-+
-+	return 0;
-+}
-+
-+static const struct dsa_switch_ops mxl862xx_switch_ops = {
-+	.get_tag_protocol = mxl862xx_get_tag_protocol,
-+	.phylink_get_caps = mxl862xx_phylink_get_caps,
-+	.phy_read = mxl862xx_phy_read,
-+	.phy_write = mxl862xx_phy_write,
-+	.port_disable = mxl862xx_port_disable,
-+	.port_enable = mxl862xx_port_enable,
-+	.port_fast_age = mxl862xx_port_fast_age,
-+	.setup = mxl862xx_setup,
-+	.port_setup = mxl862xx_port_setup,
-+};
-+
-+static void mxl862xx_phylink_mac_config(struct phylink_config *config,
-+					unsigned int mode,
-+					const struct phylink_link_state *state)
-+{
-+}
-+
-+static void mxl862xx_phylink_mac_link_down(struct phylink_config *config,
-+					   unsigned int mode,
-+					   phy_interface_t interface)
-+{
-+}
-+
-+static void mxl862xx_phylink_mac_link_up(struct phylink_config *config,
-+					 struct phy_device *phydev,
-+					 unsigned int mode,
-+					 phy_interface_t interface,
-+					 int speed, int duplex,
-+					 bool tx_pause, bool rx_pause)
-+{
-+}
-+
-+static struct phylink_pcs *
-+mxl862xx_phylink_mac_select_pcs(struct phylink_config *config,
-+				phy_interface_t interface)
-+{
-+	return NULL;
-+}
-+
-+static const struct phylink_mac_ops mxl862xx_phylink_mac_ops = {
-+	.mac_config = mxl862xx_phylink_mac_config,
-+	.mac_link_down = mxl862xx_phylink_mac_link_down,
-+	.mac_link_up = mxl862xx_phylink_mac_link_up,
-+	.mac_select_pcs = mxl862xx_phylink_mac_select_pcs,
-+};
-+
-+static int mxl862xx_probe(struct mdio_device *mdiodev)
-+{
-+	struct device *dev = &mdiodev->dev;
-+	struct mxl862xx_priv *priv;
-+	struct dsa_switch *ds;
-+	int ret;
-+
-+	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-+	if (!priv)
-+		return -ENOMEM;
-+
-+	priv->mdiodev = mdiodev;
-+	priv->hw_info = of_device_get_match_data(dev);
-+	if (!priv->hw_info)
-+		return -EINVAL;
-+
-+	ds = devm_kzalloc(dev, sizeof(*ds), GFP_KERNEL);
-+	if (!ds)
-+		return -ENOMEM;
-+
-+	priv->ds = ds;
-+	ds->dev = dev;
-+	ds->priv = priv;
-+	ds->ops = &mxl862xx_switch_ops;
-+	ds->phylink_mac_ops = &mxl862xx_phylink_mac_ops;
-+	ds->num_ports = priv->hw_info->max_ports;
-+
-+	dev_set_drvdata(dev, ds);
-+
-+	ret = dsa_register_switch(ds);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
-+}
-+
-+static void mxl862xx_remove(struct mdio_device *mdiodev)
-+{
-+	struct dsa_switch *ds = dev_get_drvdata(&mdiodev->dev);
-+
-+	if (!ds)
-+		return;
-+
-+	dsa_unregister_switch(ds);
-+}
-+
-+static void mxl862xx_shutdown(struct mdio_device *mdiodev)
-+{
-+	struct dsa_switch *ds = dev_get_drvdata(&mdiodev->dev);
-+
-+	if (!ds)
-+		return;
-+
-+	dsa_switch_shutdown(ds);
-+
-+	dev_set_drvdata(&mdiodev->dev, NULL);
-+}
-+
-+static const struct mxl862xx_hw_info mxl86282_data = {
-+	.max_ports = MXL862XX_MAX_PORT_NUM,
-+	.phy_ports = MXL86282_PHY_PORT_NUM,
-+	.ext_ports = MXL86282_EXT_PORT_NUM,
-+};
-+
-+static const struct mxl862xx_hw_info mxl86252_data = {
-+	.max_ports = MXL862XX_MAX_PORT_NUM,
-+	.phy_ports = MXL86252_PHY_PORT_NUM,
-+	.ext_ports = MXL86252_EXT_PORT_NUM,
-+};
-+
-+static const struct of_device_id mxl862xx_of_match[] = {
-+	{ .compatible = "maxlinear,mxl86282", .data = &mxl86282_data },
-+	{ .compatible = "maxlinear,mxl86252", .data = &mxl86252_data },
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(of, mxl862xx_of_match);
-+
-+static struct mdio_driver mxl862xx_driver = {
-+	.probe  = mxl862xx_probe,
-+	.remove = mxl862xx_remove,
-+	.shutdown = mxl862xx_shutdown,
-+	.mdiodrv.driver = {
-+		.name = "mxl862xx",
-+		.of_match_table = mxl862xx_of_match,
-+	},
-+};
-+
-+mdio_module_driver(mxl862xx_driver);
-+
-+MODULE_DESCRIPTION("Driver for MaxLinear MxL862xx switch family");
-+MODULE_LICENSE("GPL");
-diff --git a/drivers/net/dsa/mxl862xx/mxl862xx.h b/drivers/net/dsa/mxl862xx/mxl862xx.h
-new file mode 100644
-index 0000000000000..66d194db8d6dd
---- /dev/null
-+++ b/drivers/net/dsa/mxl862xx/mxl862xx.h
-@@ -0,0 +1,24 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+
-+#define MXL862XX_MAX_PHY_PORT_NUM	8
-+#define MXL862XX_MAX_EXT_PORT_NUM	7
-+#define MXL862XX_MAX_PORT_NUM		(MXL862XX_MAX_PHY_PORT_NUM + \
-+					 MXL862XX_MAX_EXT_PORT_NUM)
-+
-+#define MXL86252_PHY_PORT_NUM		5
-+#define MXL86282_PHY_PORT_NUM		8
-+
-+#define MXL86252_EXT_PORT_NUM		2
-+#define MXL86282_EXT_PORT_NUM		2
-+
-+struct mxl862xx_hw_info {
-+	u8 max_ports;
-+	u8 phy_ports;
-+	u8 ext_ports;
-+};
-+
-+struct mxl862xx_priv {
-+	struct dsa_switch *ds;
-+	struct mdio_device *mdiodev;
-+	const struct mxl862xx_hw_info *hw_info;
-+};
--- 
-2.52.0
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
