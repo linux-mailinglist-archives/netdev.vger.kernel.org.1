@@ -1,165 +1,164 @@
-Return-Path: <netdev+bounces-247276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A0F2CF663F
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 02:57:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92A34CF6675
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 03:04:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E5683303BF93
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 01:57:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 83C55301FF94
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 02:02:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6999717C220;
-	Tue,  6 Jan 2026 01:57:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E96C21FF47;
+	Tue,  6 Jan 2026 02:02:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZhKOGEwT"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="oW3XSoEO"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FFA4203710
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 01:57:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA28155C97;
+	Tue,  6 Jan 2026 02:02:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767664671; cv=none; b=MIf/SYoU+CVdps59tQoGQtgx3jt/oOVt1W1YPN/zt39qWOnqAVeFdyFfUPvziYn1o9/Hs33X4/4HgxQA7NFfY57VvtMj9voijm496b/jlYpkU14V7p1qNHbwn2UlKbwvjGEp4CCGBMWXVayVnQawggRr4+Mz1pOY5b+AIwiVz1g=
+	t=1767664945; cv=none; b=nSAV5gebvrfK4kTAnGDHeIuk52upl6e5BGll7XYJIdD32n4hQIenGCg42G5X+Zw8tl3GbJYv2IsE90iFYM8oTCMhUC81kqF4bECRtRocawxx6Nk3o97PilwLFlP8bn1l9K9nhRyl3nzfL1MvXNThI4/TyHXL3rIKGi3KfWejn1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767664671; c=relaxed/simple;
-	bh=XDT3YsSndGZ3dT6mtYQIgkaBur370JJH1rruyrfiZMM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c8CnhL+k/lljSnnbX2G1Gmn6zIMMuus4ZxhsB7faff2X4dkCa9Zw9ruv+Gt/FV8o0VeNthgv+/x8ztrHtALBmhqffXA5qbfsnI3EafbtGtt6+ckAkSFo20tndPbAbLbii0XvEO8kzz/Qv7olvluSZXH8ljjaTAhnxbR+TZb0TsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZhKOGEwT; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767664657;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1b5QfZCkossx3RfNN0wl6K3wnugBDe1dp1/qX9Ix0/s=;
-	b=ZhKOGEwTdZwp0QmvljAwBVoBkZBvc0uo/iZDPnnoolGEfXN945R//rRIlLq6VupDBMexDm
-	pMd5NTFsE4jTpRUg9FXqA1T+cQbrxAxF6XNAY0kbZhRXXaLic83holRXxGjHaIi3hDHmDj
-	Cf2obCt1dSc34/l+x8sgfs24DrO62zU=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Menglong Dong <menglong8.dong@gmail.com>, ast@kernel.org,
- Eduard Zingerman <eddyz87@gmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
- hpa@zytor.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next v2 1/2] bpf,
- x86: inline bpf_get_current_task() for x86_64
-Date: Tue, 06 Jan 2026 09:57:25 +0800
-Message-ID: <4704048.LvFx2qVVIh@7940hx>
-In-Reply-To: <08ab237ad7da8d1f6494cb434d9a5a46a599462c.camel@gmail.com>
-References:
- <20260104131635.27621-1-dongml2@chinatelecom.cn>
- <20260104131635.27621-2-dongml2@chinatelecom.cn>
- <08ab237ad7da8d1f6494cb434d9a5a46a599462c.camel@gmail.com>
+	s=arc-20240116; t=1767664945; c=relaxed/simple;
+	bh=sC8THeOWYJ2BcxnAKBPtBAQ3vpRao174cklxG6HR3Xk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hdYzh1J2O3CP2lKp92IAsSyC+cT1q/4NFzxWmH1fhK7qs4wO7vCuVX+dm0pH8PdkK2KDI2+5bRwyvqr0oM/3eYvgHr9k2cyEGAskrjFzE4q58B1iHWVM279C3pTtVtU4k8TmJX9YN2QAjTMDnIC3FCP6HyrOHLyifWHwkzDkFZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=oW3XSoEO; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: b948187eeaa311f08a742f2735aaa5e5-20260106
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=ozFm2cUi7R2uaTVnYXyGlphaCfb41GyYxTe1x77jtUY=;
+	b=oW3XSoEOX3MPQO7pg4ANHGDb/VOEAmR0axX5c/Pq6ze+haYzHupx/5umgR2vwtSQWVXjZgfkosLt8BxYFU6hgzpM9V6bO2UG+pYfRX0dTkigogKLex8d2MKXbnf9xW9pIUTS3hsbDhFCh7gTLQK8FfDtCr4fd25wVny0C2uTSU4=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.9,REQID:222f18f4-018c-49be-afd1-8c99c4201ba2,IP:0,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:0
+X-CID-META: VersionHash:5047765,CLOUDID:4c02201c-569f-4a0f-9948-b21a1d8a5571,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102|836|888|898,TC:-5,Content:0|15|5
+	0,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OS
+	A:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: b948187eeaa311f08a742f2735aaa5e5-20260106
+Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw01.mediatek.com
+	(envelope-from <shiming.cheng@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 756133105; Tue, 06 Jan 2026 10:02:15 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ mtkmbs13n1.mediatek.inc (172.21.101.193) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Tue, 6 Jan 2026 10:02:14 +0800
+Received: from mbjsdccf07.mediatek.inc (10.15.20.246) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.2562.29 via Frontend Transport; Tue, 6 Jan 2026 10:02:13 +0800
+From: Shiming Cheng <shiming.cheng@mediatek.com>
+To: <willemdebruijn.kernel@gmail.com>, <willemb@google.com>,
+	<edumazet@google.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <matthias.bgg@gmail.com>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+CC: <Lena.Wang@mediatek.com>, Shiming Cheng <shiming.cheng@mediatek.com>
+Subject: [PATCH] net: fix udp gso skb_segment after pull from frag_list
+Date: Tue, 6 Jan 2026 10:02:03 +0800
+Message-ID: <20260106020208.7520-1-shiming.cheng@mediatek.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-MTK: N
 
-On 2026/1/6 01:45 Eduard Zingerman <eddyz87@gmail.com> write:
-> On Sun, 2026-01-04 at 21:16 +0800, Menglong Dong wrote:
-> > Inline bpf_get_current_task() and bpf_get_current_task_btf() for x86_64
-> > to obtain better performance. The instruction we use here is:
-> > 
-> >   65 48 8B 04 25 [offset] // mov rax, gs:[offset]
-> > 
-> > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> > ---
-> > v2:
-> > - check the variable type in emit_ldx_percpu_r0 with __verify_pcpu_ptr
-> > - remove the usage of const_current_task
-> > ---
-> >  arch/x86/net/bpf_jit_comp.c | 36 ++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 36 insertions(+)
-> > 
-> > diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
-> > index e3b1c4b1d550..f5ff7c77aad7 100644
-> > --- a/arch/x86/net/bpf_jit_comp.c
-> > +++ b/arch/x86/net/bpf_jit_comp.c
-> > @@ -1300,6 +1300,25 @@ static void emit_st_r12(u8 **pprog, u32 size, u32 dst_reg, int off, int imm)
-> >  	emit_st_index(pprog, size, dst_reg, X86_REG_R12, off, imm);
-> >  }
-> >  
-> > +static void __emit_ldx_percpu_r0(u8 **pprog, __force unsigned long ptr)
-> > +{
-> > +	u8 *prog = *pprog;
-> > +
-> > +	/* mov rax, gs:[ptr] */
-> > +	EMIT2(0x65, 0x48);
-> > +	EMIT2(0x8B, 0x04);
-> > +	EMIT1(0x25);
-> > +	EMIT((u32)ptr, 4);
-> > +
-> > +	*pprog = prog;
-> > +}
-> > +
-> > +#define emit_ldx_percpu_r0(prog, variable)					\
-> > +	do {									\
-> > +		__verify_pcpu_ptr(&(variable));					\
-> > +		__emit_ldx_percpu_r0(&prog, (__force unsigned long)&(variable));\
-> > +	} while (0)
-> > +
-> >  static int emit_atomic_rmw(u8 **pprog, u32 atomic_op,
-> >  			   u32 dst_reg, u32 src_reg, s16 off, u8 bpf_size)
-> >  {
-> > @@ -2441,6 +2460,12 @@ st:			if (is_imm8(insn->off))
-> >  		case BPF_JMP | BPF_CALL: {
-> >  			u8 *ip = image + addrs[i - 1];
-> >  
-> > +			if (insn->src_reg == 0 && (insn->imm == BPF_FUNC_get_current_task ||
-> > +						   insn->imm == BPF_FUNC_get_current_task_btf)) {
-> 
-> I think this should be guarded by IS_ENABLED(CONFIG_SMP).
-> The current.h:get_current() used
-> arch/x86/include/asm/percpu.h:this_cpu_read_stable() that is unrolled
-> to __raw_cpu_read_stable(), which uses __force_percpu_arg(), which uses
-> __force_percpu_prefix, which is defined differently depending on CONFIG_SMP.
+Commit 3382a1ed7f77 ("net: fix udp gso skb_segment after  pull from
+frag_list")
+if gso_type is not SKB_GSO_FRAGLIST but skb->head_frag is zero,
+then detected invalid geometry in frag_list skbs and call
+skb_segment. But some packets with modified geometry can also hit
+bugs in that code. Instead, linearize all these packets that fail
+the basic invariants on gso fraglist skbs. That is more robust.
+call stack information, see below.
 
-Yeah, I missed this part. I'll use BPF_MOV64_PERCPU_REG() in
-the next version, which should avoid this problem.
+Valid SKB_GSO_FRAGLIST skbs
+- consist of two or more segments
+- the head_skb holds the protocol headers plus first gso_size
+- one or more frag_list skbs hold exactly one segment
+- all but the last must be gso_size
 
-Thanks!
-Menglong Dong
+Optional datapath hooks such as NAT and BPF (bpf_skb_pull_data) can
+modify fraglist skbs, breaking these invariants.
 
-> 
-> > +				emit_ldx_percpu_r0(prog, current_task);
-> > +				break;
-> > +			}
-> > +
-> >  			func = (u8 *) __bpf_call_base + imm32;
-> >  			if (src_reg == BPF_PSEUDO_CALL && tail_call_reachable) {
-> >  				LOAD_TAIL_CALL_CNT_PTR(stack_depth);
-> > @@ -4082,3 +4107,14 @@ bool bpf_jit_supports_timed_may_goto(void)
-> >  {
-> >  	return true;
-> >  }
-> > +
-> > +bool bpf_jit_inlines_helper_call(s32 imm)
-> > +{
-> > +	switch (imm) {
-> > +	case BPF_FUNC_get_current_task:
-> > +	case BPF_FUNC_get_current_task_btf:
-> > +		return true;
-> > +	default:
-> > +		return false;
-> > +	}
-> > +}
-> 
+In extreme cases they pull one part of data into skb linear. For UDP,
+this  causes three payloads with lengths of (11,11,10) bytes were
+pulled tail to become (12,10,10) bytes.
 
+The skbs no longer meets the above SKB_GSO_FRAGLIST conditions because
+payload was pulled into head_skb, it needs to be linearized before pass
+to regular skb_segment.
 
+  skb_segment+0xcd0/0xd14
+  __udp_gso_segment+0x334/0x5f4
+  udp4_ufo_fragment+0x118/0x15c
+  inet_gso_segment+0x164/0x338
+  skb_mac_gso_segment+0xc4/0x13c
+  __skb_gso_segment+0xc4/0x124
+  validate_xmit_skb+0x9c/0x2c0
+  validate_xmit_skb_list+0x4c/0x80
+  sch_direct_xmit+0x70/0x404
+  __dev_queue_xmit+0x64c/0xe5c
+  neigh_resolve_output+0x178/0x1c4
+  ip_finish_output2+0x37c/0x47c
+  __ip_finish_output+0x194/0x240
+  ip_finish_output+0x20/0xf4
+  ip_output+0x100/0x1a0
+  NF_HOOK+0xc4/0x16c
+  ip_forward+0x314/0x32c
+  ip_rcv+0x90/0x118
+  __netif_receive_skb+0x74/0x124
+  process_backlog+0xe8/0x1a4
+  __napi_poll+0x5c/0x1f8
+  net_rx_action+0x154/0x314
+  handle_softirqs+0x154/0x4b8
 
+  [118.376811] [C201134] rxq0_pus: [name:bug&]kernel BUG at net/core/skbuff.c:4278!
+  [118.376829] [C201134] rxq0_pus: [name:traps&]Internal error: Oops - BUG: 00000000f2000800 [#1]
+  [118.470774] [C201134] rxq0_pus: [name:mrdump&]Kernel Offset: 0x178cc00000 from 0xffffffc008000000
+  [118.470810] [C201134] rxq0_pus: [name:mrdump&]PHYS_OFFSET: 0x40000000
+  [118.470827] [C201134] rxq0_pus: [name:mrdump&]pstate: 60400005 (nZCv daif +PAN -UAO)
+  [118.470848] [C201134] rxq0_pus: [name:mrdump&]pc : [0xffffffd79598aefc] skb_segment+0xcd0/0xd14
+  [118.470900] [C201134] rxq0_pus: [name:mrdump&]lr : [0xffffffd79598a5e8] skb_segment+0x3bc/0xd14
+  [118.470928] [C201134] rxq0_pus: [name:mrdump&]sp : ffffffc008013770
+
+Fixes: 3382a1ed7f77 ("net: fix udp gso skb_segment after pull from frag_list")
+Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
+---
+ net/ipv4/udp_offload.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+index 19d0b5b09ffa..606d9ce8c98e 100644
+--- a/net/ipv4/udp_offload.c
++++ b/net/ipv4/udp_offload.c
+@@ -535,6 +535,12 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+ 			uh->check = ~udp_v4_check(gso_skb->len,
+ 						  ip_hdr(gso_skb)->saddr,
+ 						  ip_hdr(gso_skb)->daddr, 0);
++	} else if (skb_shinfo(gso_skb)->frag_list && gso_skb->head_frag == 0) {
++		if (skb_pagelen(gso_skb) - sizeof(*uh) != skb_shinfo(gso_skb)->gso_size) {
++			ret = __skb_linearize(gso_skb);
++			if (ret)
++				return ERR_PTR(ret);
++		}
+ 	}
+ 
+ 	skb_pull(gso_skb, sizeof(*uh));
+-- 
+2.45.2
 
 
