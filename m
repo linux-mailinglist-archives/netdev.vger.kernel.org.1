@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-247232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7349FCF6149
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 01:25:24 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D63DECF612D
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 01:23:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1898030A5666
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 00:23:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 531B630312FD
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 00:23:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 502DB18EFD1;
-	Tue,  6 Jan 2026 00:23:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F774194C96;
+	Tue,  6 Jan 2026 00:23:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B0saJUTm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ntrkh5e0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205CA4503B;
-	Tue,  6 Jan 2026 00:23:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A5118FDBD;
+	Tue,  6 Jan 2026 00:23:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767659011; cv=none; b=H0miN0llEkY2myuopX+XrvAXcII1ga/I+znFt9p4NDDzzrdInFpCR7VmUWeh80clN1wOvG1rf22T7xQuo8lMkWsbjM33/SPdea0e8oyGNQQQ5zla/NCxR8AsdFQGi2CAsnxFMu+7LklYNA/ytGxEZZdAUTPwSTLTu8udLE8xc7w=
+	t=1767659017; cv=none; b=UBCDiE6j1fie3XU0UVBO4NUvIq3IuF7iLjUdCTGJdXzSp/F2NQwNMW1ptVxjpFJd1xSJ0Kk0PMQbe55LinO252AKEUHb86Ik8RgnydUsoS8Zlo8uiKYnXxpm8brP/gZAKkBQ9wSzQlc8LwjklvV6xM2SIqSbfcuhUODDENxjmQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767659011; c=relaxed/simple;
-	bh=FkQJugMtiM3edkXSgz/p3etKu0tymVFXmj0cd+7bLzM=;
+	s=arc-20240116; t=1767659017; c=relaxed/simple;
+	bh=4CFH24A7nD4o/ms2FkVY+4LBWnHh4HtO/x3xwT/UC6g=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=oX7dgicJE3gZuYr+oLQaJfIPP57fU9gV43wHlAQgsSGXwgf0CN5qL+ZNLbadN3Mo+YsqRm+rJMWQALJAB2bwYj1RsfUrIAzLXdidoh4JZZXp+G7rCnqTAu0ciKQT/1ORb3Xuf1ErkgvC979tuk7AnbfFAWC0hsokpF5rOuGKSAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B0saJUTm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AABB2C116D0;
-	Tue,  6 Jan 2026 00:23:30 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=qMWJEva5w6eTgNWBjnOvz1/rp1B3zkK/p3viV35Reg3+edbNOnK7QRcPSC9YbEfMQnBwKkky7uRIXBUYi9GCxFrGHD9IviEHFUyD8ZQesEfFrtqxMJoeFg+lbkmhsdHSaUEMnOtJoEugSeYSpGE86vjok54i0jNk5oSG8p4ZxqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ntrkh5e0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 276FFC116D0;
+	Tue,  6 Jan 2026 00:23:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767659010;
-	bh=FkQJugMtiM3edkXSgz/p3etKu0tymVFXmj0cd+7bLzM=;
+	s=k20201202; t=1767659017;
+	bh=4CFH24A7nD4o/ms2FkVY+4LBWnHh4HtO/x3xwT/UC6g=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=B0saJUTmW+9pYK1Ndc8XfM+sywGG2C2AVMUlKGzv+J8+0kfs5M8UF0P9Y8Sp9HcfF
-	 wkcqxQCsxblq9fkqDzgIpMQbnixXLok7e5wcGKSuuSxwbxa/r20XdU1DjoGbPUhM4f
-	 /kvAHo+t8rzEKmC+r3aDa78qo6JYJbFaci8PRqXTsaMUMkEt3w/b0n2W5whFMZWj41
-	 Gj1Q/MlJyYd32s6KbvayO4own/lSrxsERH7iYbt+XYYM5DaIe7oM4F3r25GJmHopUI
-	 IxdGi16bZktJ4P6TLKb1vKQYiWntsjEp7lURDTE4hrSFB5RmLNlOQ+JdBNLJLecSn1
-	 GvlZ56jyn0xQg==
+	b=Ntrkh5e0nRoVe+UU7SBBgIHJG0p0kc93+43GMUbtQXJoyYSE9uyO30iX9GFZb+epe
+	 5+Qjy9ehM3btEdEspKBL4cW7+meQs1SYgtY+A5JqaINAxDsx4T1v62kiHY0IdtKDb/
+	 V2lpzztRVXV8hwvIemnMspIu2NuHQvaOK0PdURisTDZQ492HvogigWfmlOCxegL1kQ
+	 e0Lj4WT0aDQ/nUjZ0N7+m1Tlx9ShMXaxw4cIu/56lKP3VkCrYXtZ2LTSmxrDYEq6ov
+	 vJ1SomDiRjA1uAxVKZsrQqXdSu0RBi9I+iImuDZ7e1ec+78uQIaNxXundFY1CF3kgX
+	 HwZAgNUDso8qg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2921380A966;
-	Tue,  6 Jan 2026 00:20:09 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 787CC380A966;
+	Tue,  6 Jan 2026 00:20:16 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,41 +50,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 0/2] vsock: Fix SO_ZEROCOPY on accept()ed vsocks
+Subject: Re: [PATCH] ipv4: Improve martian logs
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176765880886.1339098.1816013427410821419.git-patchwork-notify@kernel.org>
-Date: Tue, 06 Jan 2026 00:20:08 +0000
-References: 
- <20251229-vsock-child-sock-custom-sockopt-v2-0-64778d6c4f88@rbox.co>
-In-Reply-To: 
- <20251229-vsock-child-sock-custom-sockopt-v2-0-64778d6c4f88@rbox.co>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: sgarzare@redhat.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- avkrasnov@salutedevices.com, virtualization@lists.linux.dev,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <176765881502.1339098.67084176474742392.git-patchwork-notify@kernel.org>
+Date: Tue, 06 Jan 2026 00:20:15 +0000
+References: <20260101125114.2608-1-cve@cve.cx>
+In-Reply-To: <20260101125114.2608-1-cve@cve.cx>
+To: Clara Engler <cve@cve.cx>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, davem@davemloft.net,
+ dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 29 Dec 2025 20:43:09 +0100 you wrote:
-> vsock has its own handling of setsockopt(SO_ZEROCOPY). Which works just
-> fine unless socket comes from a call to accept(). Because
-> SOCK_CUSTOM_SOCKOPT flag is missing, attempting to set the option always
-> results in errno EOPNOTSUPP.
+On Thu,  1 Jan 2026 13:51:14 +0100 you wrote:
+> At the current moment, the logs for martian packets are as follows:
+> ```
+> martian source {DST} from {SRC}, on dev {DEV}
+> martian destination {DST} from {SRC}, dev {DEV}
+> ```
 > 
-> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> These messages feel rather hard to understand in production, especially
+> the "martian source" one, mostly because it is grammatically ambitious
+> to parse which part is now the source address and which part is the
+> destination address.  For example, "{DST}" may there be interpreted as
+> the actual source address due to following the word "source", thereby
+> implying the actual source address to be the destination one.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2,1/2] vsock: Make accept()ed sockets use custom setsockopt()
-    https://git.kernel.org/netdev/net/c/ce5e612dd411
-  - [net,v2,2/2] vsock/test: Test setting SO_ZEROCOPY on accept()ed socket
-    https://git.kernel.org/netdev/net/c/caa20e9e155b
+  - ipv4: Improve martian logs
+    https://git.kernel.org/netdev/net-next/c/48a4aa9d9c39
 
 You are awesome, thank you!
 -- 
