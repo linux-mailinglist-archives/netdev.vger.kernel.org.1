@@ -1,267 +1,141 @@
-Return-Path: <netdev+bounces-247317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B598ECF71AB
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 08:45:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DBC64CF748F
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 09:24:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9BEAD300E011
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 07:43:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 66B19314B61A
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 08:18:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7746930AD11;
-	Tue,  6 Jan 2026 07:42:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 679E232549B;
+	Tue,  6 Jan 2026 07:57:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jw29zZzF";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="qmxw2hJW"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 285A130ACE6;
-	Tue,  6 Jan 2026 07:42:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5A8324B32
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 07:57:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767685379; cv=none; b=QR25lWqebIIurC3XHPVnGp7U1Jo/hG5fbB18GDLSDWU+i4+Xnu4MGezI0DuNiTdbdXAgj1GMekdpBxMStG+bCD5kGCzjVoMxQtCrYxdfbh8+WUvpgxqgTuhEtNzxXHZWEpBvUDa5C7SKtDGwN+O50b+ur+r+faxU40o/SYqS67I=
+	t=1767686244; cv=none; b=QRrN4A0Cl8cMQK1QGe1+LlGMSu7edub1a/O6mGIdPSANn5dnMpzea683hFnWRXi+Fk5Wn6sL2yCLmDsHykbwacHi4sH7foHMSAELMTv5RFnGau5onpbOqMUe3sauoNuU0icDTLwEFU9SzDNafPt0sV60/cl4e9ba9zFiI74noqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767685379; c=relaxed/simple;
-	bh=FnFVktoPWBOSCK8MVWM+2l2bWZ056ZdA91400Wd8JfE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uO/3MCrBWA95fJa4RN4Faj/mzBqc3d7PdBmqVai5MNu+rqhHGXgsjXWr4XmHgrGfuDGgcerXUVZEsdIfGz/IrDjvs87Ig/dSrsufDyJfls4GPipiuAaNbQHCfVS8j5Du8a7qjDEC4gkfTPdh4DUS5XfTtoQ1gH8sfrzKGzbzDCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [192.168.0.114] (unknown [114.241.82.145])
-	by APP-05 (Coremail) with SMTP id zQCowABX6AvAvFxpa_ebAw--.32437S2;
-	Tue, 06 Jan 2026 15:41:52 +0800 (CST)
-Message-ID: <c652e45c-fedc-4bcd-9310-fc428e0e6c57@iscas.ac.cn>
-Date: Tue, 6 Jan 2026 15:41:52 +0800
+	s=arc-20240116; t=1767686244; c=relaxed/simple;
+	bh=2dfXE3T5FZ6K7+lqEmh5QGLTAful/RxL5/OXaLyX+Qg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jsMIreYQ4f82L1kpfPXcp753tuhPv1U5kToelBXBFfD8jZha45JHaL3Se9Mw1EFSYms/Jog5mSn3PFBbPXv0+bs/+Jh6hOPtrCzEBLYJr0AJmMIejR92edMdI03DQU3C9z7Ml5zWCaAPbs53KM5DRP85PCx7gA+zKe7M1ViRlU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jw29zZzF; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qmxw2hJW; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767686240;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=I4TYkMIrp7AW9u8pmueM8oRPi406uK0ebNKTuLEzFRw=;
+	b=Jw29zZzFglG919JgI7i0xklQ2oObYZyc5leVLnIfHti9CJweJNPNRzG8C5PabdVmP4/3fY
+	M+7UoQk0lJjSmBkBb7s9m1F/B8AYBTpQLUP/nNuyP4dtnrpMhO1TRrPHTSZfGnUDm1nqke
+	v82l+dtoQG1lYYlghba+tsFch4GvB/Y=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-690-RGgkfVoKNb6h6qBbbQllZA-1; Tue, 06 Jan 2026 02:57:18 -0500
+X-MC-Unique: RGgkfVoKNb6h6qBbbQllZA-1
+X-Mimecast-MFC-AGG-ID: RGgkfVoKNb6h6qBbbQllZA_1767686238
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-43065ad16a8so338580f8f.1
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 23:57:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1767686238; x=1768291038; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=I4TYkMIrp7AW9u8pmueM8oRPi406uK0ebNKTuLEzFRw=;
+        b=qmxw2hJW+AO3suKcri3g0TiipoHvog8sdITC2QHMfTikjaSmpW7cDwLvgpyCmWE3BV
+         YZHTlAhNH3Ld77C3rSJDl7qLfmi6uonpPkNtWk2AoqMX1zsl1asvQM/7pULYuKhgRPAl
+         uG8kydPbhb5+EZomulY6MR54kupmNG/Cj2BjPTpR6IMirp5RPjC0P5NDFK0sE7n6mPZB
+         ZkPckHR/fFFL4RRyxt2toE+qHQ8APlZ4j3qxH+0Pzer9qpfAmiDlebvJc36bjL6bSBlg
+         0bt2USGb2uDkIx9JDAElaNdi2VekN5kHFbsMifBSGSs9F4FOQ7/QCGiM1nE8jYaL273T
+         oskg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767686238; x=1768291038;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I4TYkMIrp7AW9u8pmueM8oRPi406uK0ebNKTuLEzFRw=;
+        b=Y+zG1741hZE+UIBqWJI47/JXhLoI3//4ExPA+mFl4GzifTMpYuYGksV6QVoW2Kd/Ro
+         MSyzJG5Te/snB77yevLfgJth6l8IAejtwvYcZkQtIs4lgexUHh9toMGxoGiJ3mwH/+NX
+         f/kYHiqbPukaKo2Wvzmg52t5W/aR2D0DBsnpsTvqvHMmfiBB/TKVi2GQ+cxIT8r/PjeC
+         yagog3IqnM9Uhhmhu/dTWE7EkMQgkVEpiYmMTtyDbsIYYB37v6EUDOSILgEGMTGxCCst
+         E4erICsNloxE/gVIjY/mvrRk6l8AC5IOIy/EV6ZVsM1G/MB1V46LsfjSMPpNs4kzn7p8
+         ZILw==
+X-Forwarded-Encrypted: i=1; AJvYcCW9GdygPnxB1R5QQlxy5hPqWNW1A6cgn5juSIrfu7covBnmam6Sr98l10+Rx0MUgMr6ChA7HGo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeR2V+PIyLcFWsx8zFRwJFw38MrPdsDsPZMt7X0pw5hcLdUqgy
+	fkHA9dVKZOOdjJYU3QRxLV0/JShiMDmWB1/seW0rlwpCTUGrvPSEUFCAM4tyX1aognnTYrZdPl5
+	NomTMpCcUdx3bPOZRtj6Lh7HjQR2lgkJ6jAnrLd7LxmsZ2vJfeiogbW8yyg==
+X-Gm-Gg: AY/fxX5t3xy87BcUwrNdu5tYjNkYKRM5QW55OZOaPNKtHRJnj0AW+wHnqx5uU0Ese8L
+	DWoiTU8Bes1pbjJP2oRAUza0nl4bRN5mIWdGpKd4OPHYGAHq4xGT5QKmgy0JHSWwrR+c2zP3rHf
+	4gDmHx3gDkQrPj4betwU5xxlGCHMCch0okGOB9H7dAqMtzz4HwdmNP1arIftebc7UlBhiOGO9CQ
+	+EJLluH/yJEBPTGH4GliqvyVYGzYxvGCeLUZSfxMLj3F8BT03WTnMEeGkMtsctAZ/Hgv4WneI/c
+	wn+RMQFtr+j+UI0a6QmjMtOAf2xMs5feNb6Dh42vHoX8Ga0ZadqFuNC1WF+GaaIjisKl8P1L1hl
+	VRZFgzNwnwdTrpahkNZmhBh73kvZfF+QIgw==
+X-Received: by 2002:a05:600c:444d:b0:46e:32d4:46a1 with SMTP id 5b1f17b1804b1-47d7f09ca36mr23148225e9.22.1767686237595;
+        Mon, 05 Jan 2026 23:57:17 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHkOtxCvNvgEtYJhHLldkg64fSo56Dqfda5jX1IeA0WMV+CtMRCrIRIjLAWwju8ZN5FopMEIQ==
+X-Received: by 2002:a05:600c:444d:b0:46e:32d4:46a1 with SMTP id 5b1f17b1804b1-47d7f09ca36mr23148085e9.22.1767686237184;
+        Mon, 05 Jan 2026 23:57:17 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f65d9f0sm28518895e9.12.2026.01.05.23.57.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jan 2026 23:57:16 -0800 (PST)
+Date: Tue, 6 Jan 2026 02:57:14 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Hillf Danton <hdanton@sina.com>
+Cc: syzbot <syzbot+a9528028ab4ca83e8bac@syzkaller.appspotmail.com>,
+	eperezma@redhat.com, jasowang@redhat.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev
+Subject: Re: [syzbot] INFO: task hung in vhost_worker_killed (2)
+Message-ID: <20260106024033-mutt-send-email-mst@kernel.org>
+References: <695b796e.050a0220.1c9965.002a.GAE@google.com>
+ <20260106014632.2007-1-hdanton@sina.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] PCI/MSI: Conservatively generalize no_64bit_msi into
- msi_addr_mask
-To: "Creeley, Brett" <bcreeley@amd.com>,
- Madhavan Srinivasan <maddy@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
- Alex Deucher <alexander.deucher@amd.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Brett Creeley <brett.creeley@amd.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Bjorn Helgaas <bhelgaas@google.com>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>
-Cc: Han Gao <gaohan@iscas.ac.cn>, linuxppc-dev@lists.ozlabs.org,
- linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
- dri-devel@lists.freedesktop.org, netdev@vger.kernel.org,
- linux-pci@vger.kernel.org, linux-sound@vger.kernel.org
-References: <20251224-pci-msi-addr-mask-v1-0-05a6fcb4b4c0@iscas.ac.cn>
- <20251224-pci-msi-addr-mask-v1-1-05a6fcb4b4c0@iscas.ac.cn>
- <641c55d4-5c18-4b81-be04-404e6bb3fbb1@amd.com>
-Content-Language: en-US
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-In-Reply-To: <641c55d4-5c18-4b81-be04-404e6bb3fbb1@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-CM-TRANSID:zQCowABX6AvAvFxpa_ebAw--.32437S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxtF17AF4DGF4UKr1ruF43trb_yoWxAw4fpa
-	ykGFWSyFW8K3yUta9Fy3WUZF1Yva1qgrWrWrW7K3sa93ZIvFy8JFnayry3Gwn7Xr4kCF40
-	qr1jgw1jgFnIk3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvC14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY
-	04v7MxkF7I0En4kS14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
-	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
-	b7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
-	vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAI
-	cVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2Kf
-	nxnUUI43ZEXa7sRidbbtUUUUU==
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260106014632.2007-1-hdanton@sina.com>
 
-On 1/6/26 02:05, Creeley, Brett wrote:
-> On 12/23/2025 7:10 PM, Vivian Wang wrote:
->> Caution: This message originated from an External Source. Use proper c=
-aution when opening attachments, clicking links, or responding.
->>
->>
->> Some PCI devices have PCI_MSI_FLAGS_64BIT in the MSI capability, but
->> implement less than 64 address bits. This breaks on platforms where su=
-ch
->> a device is assigned an MSI address higher than what's reachable.
->>
->> Currently, we deal with this with a single no_64bit_msi flag, and
->> (notably on powerpc) use 32-bit MSI address for these devices. However=
-,
->> on some platforms the MSI doorbell address is above 32-bit but within
->> device ability.
->>
->> As a first step, conservatively generalize the single-bit flag
->> no_64bit_msi into msi_addr_mask. (The name msi_addr_mask is chosen to
->> avoid confusion with msi_mask.)
->>
->> The translation is essentially:
->>
->> - no_64bit_msi =3D 1    ->    msi_addr_mask =3D DMA_BIT_MASK(32)
->> - no_64bit_msi =3D 0    ->    msi_addr_mask =3D DMA_BIT_MASK(64)
->> - if (no_64bit_msi)   ->    if (msi_addr_mask < DMA_BIT_MASK(64))
->>
->> Since no values other than DMA_BIT_MASK(32) and DMA_BIT_MASK(64) is
->> used, no functional change is intended. Future patches that make use o=
-f
->> intermediate values of msi_addr_mask will follow, allowing devices tha=
-t
->> cannot use full 64-bit addresses for MSI to work on platforms with MSI=
+On Tue, Jan 06, 2026 at 09:46:30AM +0800, Hillf Danton wrote:
+> > taking vq mutex in a kill handler is probably not wise.
+> > we should have a separate lock just for handling worker
+> > assignment.
+> > 
+> Better not before showing us the root cause of the hung to
+> avoid adding a blind lock.
 
->> doorbell above 32-bit address space.
->>
->> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
->>
->> ---
->>
->> checkpatch complains about the comment include/linux/pci.h, which I ha=
-ve
->> formatted similarly with other comments in the vicinity.
->> ---
->>   arch/powerpc/platforms/powernv/pci-ioda.c           | 2 +-
->>   arch/powerpc/platforms/pseries/msi.c                | 4 ++--
->>   drivers/gpu/drm/radeon/radeon_irq_kms.c             | 2 +-
->>   drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c | 2 +-
->>   drivers/pci/msi/msi.c                               | 2 +-
->>   drivers/pci/msi/pcidev_msi.c                        | 2 +-
->>   drivers/pci/probe.c                                 | 7 +++++++
->>   include/linux/pci.h                                 | 8 +++++++-
->>   sound/hda/controllers/intel.c                       | 2 +-
->>   9 files changed, 22 insertions(+), 9 deletions(-)
->>
->> diff --git a/arch/powerpc/platforms/powernv/pci-ioda.c b/arch/powerpc/=
-platforms/powernv/pci-ioda.c
->> index b0c1d9d16fb5..1c78fdfb7b03 100644
->> --- a/arch/powerpc/platforms/powernv/pci-ioda.c
->> +++ b/arch/powerpc/platforms/powernv/pci-ioda.c
->> @@ -1666,7 +1666,7 @@ static int __pnv_pci_ioda_msi_setup(struct pnv_p=
-hb *phb, struct pci_dev *dev,
->>                  return -ENXIO;
->>
->>          /* Force 32-bit MSI on some broken devices */
->> -       if (dev->no_64bit_msi)
->> +       if (dev->msi_addr_mask < DMA_BIT_MASK(64))
->>                  is_64 =3D 0;
->>
->>          /* Assign XIVE to PE */
->> diff --git a/arch/powerpc/platforms/pseries/msi.c b/arch/powerpc/platf=
-orms/pseries/msi.c
->> index a82aaa786e9e..7473c7ca1db0 100644
->> --- a/arch/powerpc/platforms/pseries/msi.c
->> +++ b/arch/powerpc/platforms/pseries/msi.c
->> @@ -383,7 +383,7 @@ static int rtas_prepare_msi_irqs(struct pci_dev *p=
-dev, int nvec_in, int type,
->>           */
->>   again:
->>          if (type =3D=3D PCI_CAP_ID_MSI) {
->> -               if (pdev->no_64bit_msi) {
->> +               if (pdev->msi_addr_mask < DMA_BIT_MASK(64)) {
->>                          rc =3D rtas_change_msi(pdn, RTAS_CHANGE_32MSI=
-_FN, nvec);
->>                          if (rc < 0) {
->>                                  /*
->> @@ -409,7 +409,7 @@ static int rtas_prepare_msi_irqs(struct pci_dev *p=
-dev, int nvec_in, int type,
->>                  if (use_32bit_msi_hack && rc > 0)
->>                          rtas_hack_32bit_msi_gen2(pdev);
->>          } else {
->> -               if (pdev->no_64bit_msi)
->> +               if (pdev->msi_addr_mask < DMA_BIT_MASK(64))
->>                          rc =3D rtas_change_msi(pdn, RTAS_CHANGE_32MSI=
-X_FN, nvec);
->>                  else
->>                          rc =3D rtas_change_msi(pdn, RTAS_CHANGE_MSIX_=
-FN, nvec);
->> diff --git a/drivers/gpu/drm/radeon/radeon_irq_kms.c b/drivers/gpu/drm=
-/radeon/radeon_irq_kms.c
->> index 9961251b44ba..d550554a6f3f 100644
->> --- a/drivers/gpu/drm/radeon/radeon_irq_kms.c
->> +++ b/drivers/gpu/drm/radeon/radeon_irq_kms.c
->> @@ -252,7 +252,7 @@ static bool radeon_msi_ok(struct radeon_device *rd=
-ev)
->>           */
->>          if (rdev->family < CHIP_BONAIRE) {
->>                  dev_info(rdev->dev, "radeon: MSI limited to 32-bit\n"=
-);
->> -               rdev->pdev->no_64bit_msi =3D 1;
->> +               rdev->pdev->msi_addr_mask =3D DMA_BIT_MASK(32);
->>          }
->>
->>          /* force MSI on */
->> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c b/dri=
-vers/net/ethernet/pensando/ionic/ionic_bus_pci.c
->> index 70d86c5f52fb..0671deae9a28 100644
->> --- a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
->> +++ b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
->> @@ -331,7 +331,7 @@ static int ionic_probe(struct pci_dev *pdev, const=
- struct pci_device_id *ent)
->>
->>   #ifdef CONFIG_PPC64
->>          /* Ensure MSI/MSI-X interrupts lie within addressable physica=
-l memory */
->> -       pdev->no_64bit_msi =3D 1;
->> +       pdev->msi_addr_mask =3D DMA_BIT_MASK(32);
-> I know this is just an intermediate commit in the series, but does this=
+Well I think it's pretty clear but the issue is that just another lock
+is not enough, we have bigger problems with this mutex.
 
-> retain the original intent?
-I do believe so, yes. The no_64bit_msi bit's meaning is the negation of
-this bit found in the MSI capability:
+It's held around userspace accesses so if the vhost thread gets into
+uninterruptible sleep holding that, a userspace thread trying to take it
+with mutex_lock will be uninterruptible.
 
-=C2=A0 =C2=A0 #define=C2=A0 PCI_MSI_FLAGS_64BIT=C2=A0 =C2=A0 0x0080=C2=A0=
- =C2=A0 /* 64-bit addresses allowed */
+So it propagates the uninterruptible status between vhost and a
+userspace thread.
 
-PCI_MSI_FLAGS_64BIT is set if this function handles PCI_MSI_ADDRESS_HI
-and cleared if doesn't handle=C2=A0PCI_MSI_ADDRESS_HI. So=C2=A0with "no 6=
-4bit",
-only PCI_MSI_ADDRESS_LO is usable, and MSI is limited to 32 bits. See
-also old handling here:
+It's not a new issue but the new(ish) thread management APIs make
+it more visible.
 
->> diff --git a/drivers/pci/msi/pcidev_msi.c b/drivers/pci/msi/pcidev_msi=
-=2Ec
->> index 5520aff53b56..0b0346813092 100644
->> --- a/drivers/pci/msi/pcidev_msi.c
->> +++ b/drivers/pci/msi/pcidev_msi.c
->> @@ -24,7 +24,7 @@ void pci_msi_init(struct pci_dev *dev)
->>          }
->>
->>          if (!(ctrl & PCI_MSI_FLAGS_64BIT))
->> -               dev->no_64bit_msi =3D 1;
->> +               dev->msi_addr_mask =3D DMA_BIT_MASK(32);
->>   }
->>
->>   void pci_msix_init(struct pci_dev *dev)
-=2E.. and the old definition of the flag here, where the comment
-explicitly says no_64bit_msi means 32-bit:
->> diff --git a/drivers/pci/probe.c b/drivers/pci/probe.c
->> index 41183aed8f5d..a2bff57176a3 100644
->> --- a/drivers/pci/probe.c
->> +++ b/drivers/pci/probe.c
->>
->> [...]
->>
->> @@ -441,7 +448,6 @@ struct pci_dev {
->>
->>          unsigned int    is_busmaster:1;         /* Is busmaster */
->>          unsigned int    no_msi:1;               /* May not use MSI */=
+Here it's the kill handler that got hung but it's not really limited
+to that, any ioctl can do that, and I do not want to add another
+lock on data path.
 
->> -       unsigned int    no_64bit_msi:1;         /* May only use 32-bit=
- MSIs */
->>          unsigned int    block_cfg_access:1;     /* Config space acces=
-s blocked */
->>          unsigned int    broken_parity_status:1; /* Generates false po=
-sitive parity */
->>          unsigned int    irq_reroute_variant:2;  /* Needs IRQ reroutin=
-g variant */
-Vivian "dramforever" Wang
+-- 
+MST
 
 
