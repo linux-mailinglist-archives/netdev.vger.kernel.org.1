@@ -1,76 +1,117 @@
-Return-Path: <netdev+bounces-247354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15E6BCF83F4
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 13:14:33 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE2BACF84A7
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 13:22:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E6FFD300D400
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 12:07:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DD5273019E36
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 12:21:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92AA6327204;
-	Tue,  6 Jan 2026 12:07:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85AC42F1FE2;
+	Tue,  6 Jan 2026 12:21:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Wyraz/xJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XxIX/Uc6"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4123322B79
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 12:07:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A7714C81;
+	Tue,  6 Jan 2026 12:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767701235; cv=none; b=Z2YQCAomyYco+XcdJ6nJsCdnldoU6yPhKtGZDl+vG//D8JBRZW6BCVVDhMXU82jesD0SKEpAC0b/Qmdt8iSSg4u9/kuiO8cPuF17WyW3lEK6oTr4nyax4TRJ4cJSNR7b37GxSPJkrmW7sv/higLzSJe9A6yHaPHp6mgTQOHD7uU=
+	t=1767702099; cv=none; b=qG+lXnY7dRA9httSw2891+hwsOtmLJJv6ifDvPL9hoYgVyvUfSOlSbj3qXFGLYap7GbdD+1/Z/maZOvngXa9nQybzvrkM3quQtDERY+MrI3B1RYQy/OFI1MXw7xMGT4cghfJciyxeIVELvBlv8xH2G4yKBINn/WRo4DgxTjOc28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767701235; c=relaxed/simple;
-	bh=a7zAKSyFvmFAFoFGg9nI8dmzMLb+e6EHwSnLvS4equc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UKNS7Ipvih7B1DJaOeSsy0zlHZNwrpNHc0fKyrGSjuS/TquAyHAbsCcT1gJdGr14gMn65JHA0Uz4fjijBr9dDDdQC1uPZzA99BkOM5XdsyMyhnSvqyuAd3DPehUS3ECtN4PuirHwKC4YEIpyZkzv3EjsT8NcjkzF+EBZWjHCteo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Wyraz/xJ; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <e1b21ca9-a26f-4584-b74a-c006df5fde0e@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767701230;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=c0+BD0XsrZowSSpQicE7vkh6dvPYdYl9b712kH3qHrM=;
-	b=Wyraz/xJEDOu8YdP/Oo9wHViDY0mb/5YqFwdUfBecCn954fJid5fGPpKCoIURm0vdda4zN
-	1PMkqM9Z3X8avpxp8HhpaERwJYmoq4OeHaskIWKBQBPdoz3Xx12zX5bj/+ZMZRKuqgbDDY
-	S/ckErbi3juEQk9CTZFU41OZW5GRJok=
-Date: Tue, 6 Jan 2026 12:07:00 +0000
+	s=arc-20240116; t=1767702099; c=relaxed/simple;
+	bh=zKoDQhppgeJZ9g12tU8EVyMA0qPWRL9mN42OuCpgg2o=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=iVPXsc+CJoh9r+1NjpphV0KlTEQGJzUwPngwxqBR61OaMDRZsjAiad9U9qNePaL3pA1tYGPpkAitUr221YDv4vC+GQt8a5yf3J7GAbkplLx3+QLtHYItSTfKrog86wRFUQFLT/5SPmukJRbPUNy9q3y6G5WKC8Lp3GqC1nHcMnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XxIX/Uc6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67B30C116C6;
+	Tue,  6 Jan 2026 12:21:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767702099;
+	bh=zKoDQhppgeJZ9g12tU8EVyMA0qPWRL9mN42OuCpgg2o=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=XxIX/Uc67pW2srZGfx7L0M+e9v4WJplWlh+0kQ17cQgE3TXo+brUPnDmZLyRtoSUt
+	 NS+uIwMPQZ70cpM6y22JW6jE/dRqSDBuoaKh3TDd4eQ4IT4Jx15VdWTziP2iWd7hyT
+	 8OX2eLY4it+aWALZe6uARyvIyLy21rDK0Ye78wOqq/EzQrYHKYcMeEdEu4Z4w+nezL
+	 tzp4dBFmmOQZQbNRn7ffWbWe0RozvMjSW0zRQdrMreHOK30MtxQyiBnLFJ206BIfbe
+	 8CnAyOGc9R4FmPtyuFsNwRGbSDB0oM4sgN4C+vBUFcob0xOC+hjUtYbCLlYNR7KL28
+	 4JA9Jx+fmQb/A==
+From: Mark Brown <broonie@kernel.org>
+To: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
+ nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, 
+ claudiu.beznea@tuxon.dev, herbert@gondor.apana.org.au, davem@davemloft.net, 
+ vkoul@kernel.org, andi.shyti@kernel.org, lee@kernel.org, 
+ andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org, 
+ pabeni@redhat.com, linusw@kernel.org, Steen.Hegelund@microchip.com, 
+ daniel.machon@microchip.com, UNGLinuxDriver@microchip.com, 
+ olivia@selenic.com, radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com, 
+ gregkh@linuxfoundation.org, jirislaby@kernel.org, 
+ lars.povlsen@microchip.com, devicetree@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
+ linux-i2c@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org, 
+ linux-serial@vger.kernel.org, linux-usb@vger.kernel.org, 
+ Robert Marko <robert.marko@sartura.hr>
+Cc: luka.perkov@sartura.hr
+In-Reply-To: <20251229184004.571837-1-robert.marko@sartura.hr>
+References: <20251229184004.571837-1-robert.marko@sartura.hr>
+Subject: Re: (subset) [PATCH v4 00/15] Add support for Microchip LAN969x
+Message-Id: <176770209215.32810.211066871008391751.b4-ty@kernel.org>
+Date: Tue, 06 Jan 2026 12:21:32 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 3/6] bnxt_en: Add support for FEC bin histograms
-To: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com,
- andrew.gospodarek@broadcom.com, Hongguang Gao <hongguang.gao@broadcom.com>,
- Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
-References: <20260105215833.46125-1-michael.chan@broadcom.com>
- <20260105215833.46125-4-michael.chan@broadcom.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20260105215833.46125-4-michael.chan@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-Mailer: b4 0.15-dev-47773
 
-On 05/01/2026 21:58, Michael Chan wrote:
-> Fill in the struct ethtool_fec_hist passed to the bnxt_get_fec_stats()
-> callback if the FW supports the feature.  Bins 0 to 15 inclusive are
-> available when the feature is supported.
+On Mon, 29 Dec 2025 19:37:41 +0100, Robert Marko wrote:
+> This series adds support for the Microchip LAN969x switch SoC family.
 > 
-> Reviewed-by: Hongguang Gao <hongguang.gao@broadcom.com>
-> Reviewed-by: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> Series is a bit long since after discussions in previous versions, it was
+> recommended[1][2] to add SoC specific compatibles for device nodes so it
+> includes the required bindings updates.
+> 
+> [1] https://lore.kernel.org/all/20251203-splendor-cubbyhole-eda2d6982b46@spud/
+> [2] https://lore.kernel.org/all/173412c8-c2fb-4c38-8de7-5b1c2eebdbf9@microchip.com/
+> [3] https://lore.kernel.org/all/20251203-duly-leotard-86b83bd840c6@spud/
+> [4] https://lore.kernel.org/all/756ead5d-8c9b-480d-8ae5-71667575ab7c@kernel.org/
+> 
+> [...]
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Applied to
+
+   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/spi.git for-next
+
+Thanks!
+
+[04/15] dt-bindings: spi: at91: add microchip,lan9691-spi
+        commit: 96d337436fe0921177a6090aeb5bb214753654fc
+
+All being well this means that it will be integrated into the linux-next
+tree (usually sometime in the next 24 hours) and sent to Linus during
+the next merge window (or sooner if it is a bug fix), however if
+problems are discovered then the patch may be dropped or reverted.
+
+You may get further e-mails resulting from automated or manual testing
+and review of the tree, please engage with people reporting problems and
+send followup patches addressing any issues that are reported if needed.
+
+If any updates are required or you are submitting further changes they
+should be sent as incremental updates against current git, existing
+patches will not be replaced.
+
+Please add any relevant lists and maintainers to the CCs when replying
+to this mail.
+
+Thanks,
+Mark
+
 
