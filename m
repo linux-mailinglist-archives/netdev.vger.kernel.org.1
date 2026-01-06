@@ -1,128 +1,182 @@
-Return-Path: <netdev+bounces-247477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 391FECFB17B
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 22:34:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC126CFB196
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 22:37:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AA76430608A3
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 21:26:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1B74330402E1
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 21:33:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 871A930B509;
-	Tue,  6 Jan 2026 21:26:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 703763019C5;
+	Tue,  6 Jan 2026 21:33:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="l+D9DPAa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OgwSTlDc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEF522FD7C3
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 21:26:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3FE2FFF8C
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 21:33:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767734800; cv=none; b=L2PSLww/0YB6i5MAZYBhe9o5qSosIlzdv0KfNbDqz52orY8ytiHYRRUv74GdegFKW87QOL1hvYpTlfkb9ieat77PMtazbSjQLLbwqZnhUKeheatvLUOsQfrf5ExyNWhayvkmPzFRjcEn6vX2Hh1zGxtDgjAS9yU7vqrecbU/gog=
+	t=1767735199; cv=none; b=Nx+fzgQ1yy86G/bfiLaxwfDOnR3pdaQZrngZsjYlJpz7Palr1BMQyWonG2OKYET1DcnTpdeV4e5H0BaXepybbeRLDPfJfW+LAWJdDHtcRgsZObvdOBl6401oqY/5FQi9jdkRe2yTIyrqiKKeEWE6Hh9GwAVO5nuOlw1JOxG8M1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767734800; c=relaxed/simple;
-	bh=aUbpclKNNPZ/FcDG092oROSFXqvaWQ0j0R4+pN1M0YM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iZTuXJjrDZ+kv0zQsDDIqeilk+blgB+ssL1ZxXA9oas7YnsHpmCPOmKh8v4+Qr6nE7j1jAFwn+gZhAS1h5X+DnLn674PsIHYnEJWfViegYy/Of+usgw8rB2jS2zv8w5wmJts6rAUyd1vUVq7yngc4dq3Wm54SX6Lbf2WPLxLqQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=l+D9DPAa; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-477770019e4so11885215e9.3
-        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 13:26:38 -0800 (PST)
+	s=arc-20240116; t=1767735199; c=relaxed/simple;
+	bh=7LLO7u3QjBG9Js7UME2/gC0/IEcEAOaQyBbMSBiKJjc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BT7ya+JipIgqWzCDEbGjrlVNm9SHe1jU3CLv16TmVz3pGG9YAbtgVBh/cxgG1clC80oGJpfSK9aR8xa1QY0cRKhfdjcMFdqwwkrFRot0oQhOuiNXqM9aUc2TIDEXwJaCdjJdQuf/gHsaqnXB5lCytN3bD1roJoUhHXK0fNA18Ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OgwSTlDc; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4ed82ee9e57so17120361cf.0
+        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 13:33:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1767734797; x=1768339597; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2Jt+7l7BbPrvEn58gLJdPpzydFRZkJoL0Eyp340A9r4=;
-        b=l+D9DPAao2Tw1/yKUKeC/huVIXRhxrdHfPvZWagaRy6YLbnuIGuAJY/9XzqZwjnJ8g
-         q1ypTdhRCJTWeUTXb/J/cB8QS+Mkds8trcLq6zbUT5RZWR/z2I9yxQ2Pe/mkQ09NorwJ
-         xgdWUXoN/fJp1xpDSaj5rUYmIV4ys9boamSK6lwnImGRrd2iGwdZrIWiqjMVvlgvXiZn
-         l8hEEdODBVsM29sgB9RZbQo7CJKmTVqLrowPZVKDhXZ/7o1VhEJJ69qzjdOepjp5VSHB
-         fOexcf6NmkWrNy+ArxwelULLY4/vWUgHamu2erJTpe9SDyUVxwcdH3TFBe4jqvlnM/Ow
-         jaMA==
+        d=google.com; s=20230601; t=1767735197; x=1768339997; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CKIpeFM/k2sxjcrVvzAGm+2cor55rMuO3jvU5ytT7JA=;
+        b=OgwSTlDcUc4xJ88hgJXtq++89hBV9RvhACACg4KPgLkYnMq7YShPn5/WoXKuBzve2H
+         t+X9EnNqssZRhF/XryTtyCnNMXXc+afjPDuV67QSPmjAQ8XcYK3hJW8f9h2HeMmBO46/
+         yZPyoQqPps5w+/vpAtSrZsJJozyUFE4erjSfb4yrSjybxs3s0yZC6lIDTiW7AwQVWoN4
+         QcKcm1uIkgaaoPeQuy4UbaLzlNZ5MeYCxsoa6BojKJePu3DVRboHXrgvWWuVoycuwkla
+         Q411vK2agxEfBWlle1vNyT63ATehMRYPye2QNtGnV85u9TEllY8SbgbT0shV9ApF5EVr
+         KPcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767734797; x=1768339597;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2Jt+7l7BbPrvEn58gLJdPpzydFRZkJoL0Eyp340A9r4=;
-        b=V4uNKa+AsHV79Z0/altq00R8E4a8voG4yn9YNvE2vxzfUK1wU+S5inTED/CX1fuOCw
-         whA+2WmFWE5YQXyyPrn6cLyQyal2ymgnm9zObx7OsCqWbrApshsq4mBJAtd31Mk5g2bz
-         ufNCYeODlEspcbwoUtMWSICyRn6sRgplC1m4exFrhQgp+P6WHqiAjB/0C4M5krlKfYyX
-         r2ffZ/UKVyTecvE6G0ZqjRq4+EP5p5ciUZXVcssPedfkgpjzXNtqlZIUelOFqpPjaGYP
-         LKD1TY2kuPUvlw4UHjoScolmPZtgPX688Kq1VeBzntmoIWQ+YhjStfxK4gjpqbzQY20W
-         X8fA==
-X-Forwarded-Encrypted: i=1; AJvYcCULu/rnuJGsCooXof303qywpqhEBQvImIEqaim0wcDJ3NK4yM5eXnE1Zk7hIPBJF8HWnqP+FtM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxuOVs4E4WiTw7iLj6MxvRAaUtI72Xb1LoWN+4r6DkS1+qn7oyC
-	hAKZ6s6m/pIRoRTjTxmEf4BrBzB2aWG7rEAupa+kishUL/9JiO5ymT2gUJPRGYhG/R0=
-X-Gm-Gg: AY/fxX6xqwKTiMYrqUuUK2Xd9WcYzmPqNd0T3jOiOuwtyiqZZitkgVhzQvnZ6UZ2w7O
-	xmW2p6OUU9a6VphUGoMvm4nmnq6XfW0jJR2YGxq46ApNs2RgqoBjJPuMLXuScT/r8ZHmo2pSFID
-	ISVTJK52vDqIaYqtkKUsSL/GWZgxM08O4Rrr2rD0N3l+EvAjixLWCWmZps/EoAAlXHE6aaYvQ0x
-	9DKs5IjUt+ZkE5tfmPYAfvY+3e5j1/M9J0QJVJJH3RCKl68U+wHNZpkLHeQuLnVY23WC50dr9gL
-	UnH1eZKcgHTjcxjStBqI0bZ6dx8lpM6hHcJNZyiteRYykUKWRW5fJ/1R1p+jlSoKB2+f8uFcjt6
-	YR6dZd8FdTTOSnIbmnwqwTCC2lrqDtnq6+lHgqSp/8vGLo7g5c3kbQdSKH57S/DptzHsBXz4hZP
-	XLAU1skGr6zlZ8F4pBuBCxByn7y088/s469E4U9B5H/+M3Bu0RezwS2DXEvkHhlhZ8kODFWw==
-X-Google-Smtp-Source: AGHT+IH3QaJawKDCtD5DCiDkgBXd7Le26CBUQttPpH4XyhUk7b+IRhWrHzS8o2rYfRe+Y3Hws+PbtA==
-X-Received: by 2002:a05:600c:8b2c:b0:477:7f4a:44b0 with SMTP id 5b1f17b1804b1-47d84b3ea06mr2815095e9.33.1767734796773;
-        Tue, 06 Jan 2026 13:26:36 -0800 (PST)
-Received: from [192.168.0.161] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5ee893sm6373283f8f.37.2026.01.06.13.26.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Jan 2026 13:26:36 -0800 (PST)
-Message-ID: <f3bf9a76-c110-481a-a89a-c54d5856cfe3@blackwall.org>
-Date: Tue, 6 Jan 2026 23:26:35 +0200
+        d=1e100.net; s=20230601; t=1767735197; x=1768339997;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=CKIpeFM/k2sxjcrVvzAGm+2cor55rMuO3jvU5ytT7JA=;
+        b=dyVAxeQdJOIUts/sO3KpFjEgNSVQ7pm/+o8n1WnHdz97sFey/zRQdse4+oubNZrnu3
+         jlnoMJLCdgCY2RT8V7AafEQVhZoBQLaFmgESLmbfB6kUDDugvCkF9jEIv5U1k5AoYb+w
+         Yt+4UQ9LSm2bfvGIO8WkKV+f6N/6chS4N4jKw5zwpaCSAEEAM5NMfudkH0vG7Klw4isT
+         dweleL/jcSLTepKk07Ml0sg+63uyULLt7oEJy5Ft6bWdppx7x/LdrkrLFHJo3n1cq9tl
+         i2Qb3Akrbhj/SMpJSNiSEnAtgHkPnLLeo20xtoMrj4gz/GFCddu0qvYBDsTfrojJJmPu
+         GWmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUQYOQDq7d6WvmLCmMF/7xMo38X0JLbVbKIP7yDb0Bx4w+mDSQU/t+RbbEv0qzEZ9v6aoJ+ouI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtfDSKPoxrX72XyU6L4sGebgZI3Fd3BueQAUTDTtURxGhT5F05
+	kQ6Qq2TF74Uy8AHeqHimyQLjqRRd0L2a2fwpfAHaUyW2wOGDs4OZvhVut1qPhG83/nsQg3PFrGu
+	a1yudvLeJucozprh1g4aA+90wJoooI/P/SFvB5N9C
+X-Gm-Gg: AY/fxX5bLU1x/xQ87JVFuIqSnQ/1VoY/Mu/PAj1BoOyST5JNPzd70KO1vVIEkV1ttlC
+	vnAlTsx9XZSqea25y2r9SU4AMAmd+6+WuSsSN4QMYX2idOH/PlNhJc9SLKaYb+PF897C8G62K86
+	UFaKFBdPaQt6UCa/FPXyC6qWzE0xred5hZL1L9KUz749dOJV2SRxCNn8w7tRj9qBqrba/9z1NA/
+	E1CxBTu6ggNf2KALMA/Joo9nRE/rvZVXdaeSfKJcbgAvPKf2LwP6lGylQoDMVXVoA09CS8=
+X-Google-Smtp-Source: AGHT+IHOc7B5Sd4TiX6lGKWl1pO1JiY0feHNZ4dJfN2UaqxRVHlBy/ogmX5pfTne+WRxZExvZMcq1zX1PLDHq3FAtPs=
+X-Received: by 2002:a05:622a:155:b0:4f1:bd73:ac6f with SMTP id
+ d75a77b69052e-4ffb4a1d354mr5443281cf.74.1767735196415; Tue, 06 Jan 2026
+ 13:33:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: bridge: annotate data-race in br_fdb_update()
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com
-References: <20260106194022.2133543-1-edumazet@google.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20260106194022.2133543-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20260106144529.1424886-1-edumazet@google.com> <20260106095648.07a870f1@kernel.org>
+ <CANn89iJnXg892OU13PeJMGvBKw90fJdqDaAmJ867Rptsm0zgNA@mail.gmail.com>
+ <20260106123151.03a984bb@kernel.org> <CANn89iL_Sa_ez340w2eyM_rfCnOH-UV9-zo1sYv65_hdQ-_W6g@mail.gmail.com>
+In-Reply-To: <CANn89iL_Sa_ez340w2eyM_rfCnOH-UV9-zo1sYv65_hdQ-_W6g@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 6 Jan 2026 22:33:05 +0100
+X-Gm-Features: AQt7F2rCltBFuuzSlrBFxlJJwtt1oYxUI838c0oENf0aJKORLyuZWmah8kZ1gwU
+Message-ID: <CANn89iKVaigLaffUqXE+UX+Tr88apSa1Ciavi1rLr+G3sMzkLw@mail.gmail.com>
+Subject: Re: [PATCH v2 net] ip6_gre: use skb_vlan_inet_prepare() instead of pskb_inet_may_pull()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, syzbot+6023ea32e206eef7920a@syzkaller.appspotmail.com, 
+	Mazin Al Haddad <mazin@getstate.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 06/01/2026 21:40, Eric Dumazet wrote:
-> fdb->updated is read and written locklessly.
-> 
-> Add READ_ONCE()/WRITE_ONCE() annotations.
-> 
-> Fixes: 31cbc39b6344 ("net: bridge: add option to allow activity notifications for any fdb entries")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Nikolay Aleksandrov <razor@blackwall.org>
-> ---
->   net/bridge/br_fdb.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bridge/br_fdb.c b/net/bridge/br_fdb.c
-> index 58d22e2b85fc3551bd5aec9c20296ddfcecaa040..e7bd20f0e8d6b7b24aef43d7bed34adf171c34a8 100644
-> --- a/net/bridge/br_fdb.c
-> +++ b/net/bridge/br_fdb.c
-> @@ -1002,8 +1002,8 @@ void br_fdb_update(struct net_bridge *br, struct net_bridge_port *source,
->   			unsigned long now = jiffies;
->   			bool fdb_modified = false;
->   
-> -			if (now != fdb->updated) {
-> -				fdb->updated = now;
-> +			if (now != READ_ONCE(fdb->updated)) {
-> +				WRITE_ONCE(fdb->updated, now);
->   				fdb_modified = __fdb_mark_active(fdb);
->   			}
->   
+On Tue, Jan 6, 2026 at 10:25=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Tue, Jan 6, 2026 at 9:31=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+> >
+> > On Tue, 6 Jan 2026 20:33:40 +0100 Eric Dumazet wrote:
+> > > For some reason I am unable to run this test from a virtme-ng instanc=
+e.
+> > >
+> > > I guess I wlll not make a new version of this patch, maybe Florian ca=
+n
+> > > take over.
+> >
+> > Hm, no complications seen here:
+> >
+> > $ vng -r --user root
+> > ..
+> > prompt# cd tools/testing/selftests/net/
+> > prompt# ./gre_gso.sh
+> >
+> >     TEST: GREv6/v4 - copy file w/ TSO                                  =
+ [ OK ]
+> >     TEST: GREv6/v4 - copy file w/ GSO                                  =
+ [ OK ]
+> > 2026/01/06 15:30:35 socat[1704] W exiting on signal 15
+> >     TEST: GREv6/v6 - copy file w/ TSO                                  =
+ [ OK ]
+> >     TEST: GREv6/v6 - copy file w/ GSO                                  =
+ [ OK ]
+> > 2026/01/06 15:30:35 socat[1721] W exiting on signal 15
+> >
+> > Tests passed:   4
+> > Tests failed:   0
+> >
+> >
+> > Happy to give you access to the netdev machine to experiment there
+> > if that helps, just send me an SSH key.
+>
+> My vng launch script had the -v option ( --verbose, -v   Increase
+> console output verbosity), and this was causing issues.
+>
+>
+> Anyway, using my v2 patch on top of current net-tree
+> (238e03d0466239410) seems fine to me, no error at all,
+> not sure why your bot is unhappy.
+>
+> Could multiple patches have been tested together, one having a side effec=
+t ?
+>
+> [hi on] edumazet@edumazet1:~/git/net-next$ vng  -r --user root --cpus
+> 4 --memory 4G
+> /usr/lib/tmpfiles.d/legacy.conf:14: Duplicate line for path
+> "/run/lock", ignoring.
+>           _      _
+>    __   _(_)_ __| |_ _ __ ___   ___       _ __   __ _
+>    \ \ / / |  __| __|  _   _ \ / _ \_____|  _ \ / _  |
+>     \ V /| | |  | |_| | | | | |  __/_____| | | | (_| |
+>      \_/ |_|_|   \__|_| |_| |_|\___|     |_| |_|\__  |
+>                                                 |___/
+>    kernel version: 6.16.12-1rodete2-amd64 x86_64
+>    (CTRL+d to exit)
+>
+> Illegal instruction        shell-history-configtool configure-interactive=
+ly
+> root@virtme-ng:/usr/local/google/home/edumazet/git/net-next# cd
+> tools/testing/selftests/net/
+> root@virtme-ng:/usr/local/google/home/edumazet/git/net-next/tools/testing=
+/selftests/net#
+> ./gre_gso.sh
+>     TEST: GREv6/v4 - copy file w/ TSO                                   [=
+ OK ]
+>     TEST: GREv6/v4 - copy file w/ GSO                                   [=
+ OK ]
+> 2026/01/06 21:25:27 socat[1214] W exiting on signal 15
+>     TEST: GREv6/v6 - copy file w/ TSO                                   [=
+ OK ]
+>     TEST: GREv6/v6 - copy file w/ GSO                                   [=
+ OK ]
+> 2026/01/06 21:25:27 socat[1229] W exiting on signal 15
+>
+> Tests passed:   4
+> Tests failed:   0
+> root@virtme-ng:/usr/local/google/home/edumazet/git/net-next/tools/testing=
+/selftests/net#
 
-Thanks,
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+Ah of course my script had '-r arch/x86/boot/bzImage'
+
+I will test more tomorrow.
 
