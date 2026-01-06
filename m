@@ -1,130 +1,284 @@
-Return-Path: <netdev+bounces-247445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 456BBCFAC6B
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 20:48:29 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50433CFAA85
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 20:29:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7C9F631A0F02
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 19:32:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 268013013D4D
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 19:29:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7863D34D38B;
-	Tue,  6 Jan 2026 19:22:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AABF824679C;
+	Tue,  6 Jan 2026 19:26:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JegGPYB9"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Fj1Xaccs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E282E0914
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 19:22:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489FC20DD51
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 19:26:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767727325; cv=none; b=o1MfMXydTtyas3PXtKa8WTJQ6MHbJhgYdBXlKA/GgkA3p8ZKe7YA7WFEyW0RgViNr8bMslwMJoUvgrq+BLZMdRgEfA+iDIOAxlCd6jvMOWgv6v33cRzvhEhHRhciqgllpL76hBRvk1ZgK/EurLyQE9kGqRPT5xh4ovjwncen6H8=
+	t=1767727598; cv=none; b=rjctug6DNUgLfI7LRWlRJjk/KtrL3Jwl9tOyBlQ7ya1u1Bhqe7Lo5kjCE9548oJonJPmv7EOfhY86Bd2YJJ/CIdOrKZzFPG86VhWM31SiyEq4gdRdzPpMjJTk5IJps+Hhc+yj29JzDlRBY2w58qa/fA1edEihOVCU4NJt3Mjwt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767727325; c=relaxed/simple;
-	bh=LBPKI5Dvy0WUuYLzMgHVotBvRKNK1svGv5Pedc2vrgI=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=urRkArv1LRbcbEu2OkwTWt1hafR/Y0UyxMlMglUfCzwICgc9Pyq77WSlD3bdxf7Ikq6SZ9TWOiDrptY5UP+HWW4oyZJJnIMCMDJsmI10Dvx7dEzW3UoXOgpKd+I7C0NyJRZOIdO+U7gQftxdzOuCJg2N5YTjxm1eJbjHsS5K028=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JegGPYB9; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-78c66bdf675so14201487b3.2
-        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 11:22:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767727323; x=1768332123; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ne0MOt5p3LXoKMabS12zcHuX9vTa/qErRD1UOPBEfLg=;
-        b=JegGPYB9qjGDivWAcOkRFU+9GhjOdthE+0ByAeDaeFwme6m8F50GAbkboiNsHHxTjJ
-         iaOlaSPTjEYlhSf9p7nTQEApPm5qSMM76AU4WMcuhBuFQgMUClu61f6aQLAZhqpcKSdZ
-         x3I1g5INA7iZu0GtgYPtSPMNZHkRBKc36pLzF7G8HWO35gy21nCkyk58LsssWgOWBjQS
-         +2IWqrnjB0tibeBtJYSWpf/2Z/ooJQJtkVben9pohDwb79lr/Uqpt1smfogRcRL74gBa
-         YPWuLP49dcG827P2FGi5fxUtzEJTHFRiWEe9dGIrGyonejb1EaEksEyNPgwbHys+jTtV
-         sPpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767727323; x=1768332123;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ne0MOt5p3LXoKMabS12zcHuX9vTa/qErRD1UOPBEfLg=;
-        b=d/JZk4zBeHfzCJ+YInKeEuLZQoN2fymtgR1MdBvSqGSMMd1QK11mrFRK5qUhc7LurE
-         qJY7I9BVNrQUpV3Z5dohPBEeH/h6E0qNmNVk6ebZ6Fkhfeo6Td/3pk3Z7BK0w5S8be6D
-         MC8gORzww/YprJi3VIW4Cov5QCY0jBT8U8W+G8x0139B9G89C+QBOuT02FdH8wN/5/1q
-         rAaGMFLj148TiimAyc0xIYMw8VkgR1OXUQVcDAKei484EKNoWAFQ5FkiSvNupVTdhZxu
-         PYwPicQ11DCSlaX0ySzsgWS0cTXVoEWIKF/NeP6XKSMZPQgnMZQpW0P/5QBCux7eRNy/
-         Jmpw==
-X-Gm-Message-State: AOJu0Yzb6cMyE5dH678HhPyx6f9tmUG5OsU4pvTCJm9Ozjw9n+WbaPAt
-	zd1QlJVpnVIpULfSVgKL1F2jnRwqu+DZTeF9TJtlGEWIyUkpJQsgVcTQ
-X-Gm-Gg: AY/fxX7ti/0TaojNVSF+VHbsXZBAIGWMZK+czJSCISfBJZLnAsuEuQqJS3m3kz+ChAL
-	uM6NC50j+L5QHBc4L8fta6Evr2ET1m/I/nraWRp/gHr4Bn1RM1X6aZel1P1uUo8RpGpOPl7DIEL
-	XvB7sRO/Hw+XCOazTFfyCy/8LEXfqEAqu9yGicsNxpVPiVHJY3cfTCaSYVzbKCyPwOd26wjXKEC
-	dVdNeKykoux+XlkWmtVZbgyipInt2gBp+WvyXBQpcWriq7IvmCZK7xCzc/cMRmEyyLI2+6L7DJY
-	BbIITK/IfYqA4BSZrBR3S+hsEsZcEAZ2bKC36e3dQC+ekuooLc9UsEZTmqWW6lpr/mM3TEwr0vE
-	X4uPImzsI56HqMCJAG+4sLssPrAgRqAzrQ+1YtX2sJ/zv9zLFSWsN9qYi2/v6ltChL2LR7hsAOL
-	8EuarkMhEFUXehjo4gHfsbuupdu5AWTQTU9pEMeOlreFWIG6gepPgzzFCPCj17t7dka5frgg==
-X-Google-Smtp-Source: AGHT+IFF0b8UOTScZh1/g1SvUdtIQQLHfKpR5K8lF9AvD8//G1tznl87AagKs9yzLwqMIOv6dFVSNw==
-X-Received: by 2002:a05:690e:11ca:b0:644:7a37:e8bf with SMTP id 956f58d0204a3-64716c66560mr79257d50.55.1767727322824;
-        Tue, 06 Jan 2026 11:22:02 -0800 (PST)
-Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-6470d80dab9sm1195102d50.7.2026.01.06.11.22.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jan 2026 11:22:02 -0800 (PST)
-Date: Tue, 06 Jan 2026 14:22:01 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Mahdi Faramarzpour <mahdifrmx@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, 
- willemdebruijn.kernel@gmail.com, 
- davem@davemloft.net, 
- dsahern@kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- horms@kernel.org
-Message-ID: <willemdebruijn.kernel.36ecbd32a1f0d@gmail.com>
-In-Reply-To: <CA+KdSGN4uLo3kp1kN0TPCUt-Ak59k_Hr0w3tNtE106ybUFi2-Q@mail.gmail.com>
-References: <20260105114732.140719-1-mahdifrmx@gmail.com>
- <20260105175406.3bd4f862@kernel.org>
- <CA+KdSGN4uLo3kp1kN0TPCUt-Ak59k_Hr0w3tNtE106ybUFi2-Q@mail.gmail.com>
-Subject: Re: [PATCH net-next] udp: add drop count for packets in
- udp_prod_queue
+	s=arc-20240116; t=1767727598; c=relaxed/simple;
+	bh=rEXURhxxqLJlNxkqpMsZ06/rDEKN8IdxY7vYnW1GsR0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=onm8Y2rBIN4YYkEwQLFwxDgUIXghCe+a8+V6oz/bOl7zjpVbzwSjb3GhWqYQXxA4fMqvlBa2OxoV0L65nPEbrOFYljQIw/Wk6M01EyeBfrDOFIhouJwvLq/ihALdvLIiO9A2e2oeneviN9BULx0vF/SXhRvcPPdFQX6jfLojg6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Fj1Xaccs; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <97983e82-698a-4042-9417-f9d9c1247e77@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1767727584;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e8Uv8ViAxWsHdMXcBt3qZfhJJPVyoN2bV3IhBd0MKqI=;
+	b=Fj1XaccsM8tAaJ6yXQgYuvaedm/5E8T3WwjZ5YHl5OcO+68ianotJqnNyrWaqLLtvFkFET
+	r53GUxCF5eZ5muXC6P8OHoUe4qQZmjwMi77Vqy5u3ZAtx5C4s9jp+2reo5ZXw/GxG1vRC5
+	q5M1rHfdrurF1GM/WDhuzbca4MhqB9I=
+Date: Tue, 6 Jan 2026 14:26:00 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [RFC PATCH 2/2] net: axienet: Fix resource release ordering
+To: Suraj Gupta <suraj.gupta2@amd.com>, mturquette@baylibre.com,
+ sboyd@kernel.org, radhey.shyam.pandey@amd.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, michal.simek@amd.com
+Cc: linux@armlinux.org.uk, linux-clk@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+References: <20260102085454.3439195-1-suraj.gupta2@amd.com>
+ <20260102085454.3439195-3-suraj.gupta2@amd.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <20260102085454.3439195-3-suraj.gupta2@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Mahdi Faramarzpour wrote:
-> On Tue, Jan 6, 2026 at 5:24=E2=80=AFAM Jakub Kicinski <kuba@kernel.org>=
- wrote:
-> >
-> > On Mon,  5 Jan 2026 15:17:32 +0330 Mahdi Faramarzpour wrote:
-> > > This commit adds SNMP drop count increment for the packets in
-> > > per NUMA queues which were introduced in commit b650bf0977d3
-> > > ("udp: remove busylock and add per NUMA queues").
+On 1/2/26 03:54, Suraj Gupta wrote:
+> From: Sean Anderson <sean.anderson@linux.dev>
+> 
+> Device-managed resources are released after manually-managed resources.
+> Therefore, once any manually-managed resource is acquired, all further
+> resources must be manually-managed too.
+> 
+> Convert all resources before the MDIO bus is created into device-managed
+> resources. In all cases but one there are already devm variants available.
+> 
+> Fixes: 46aa27df8853 ("net: axienet: Use devm_* calls")
+> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+> Co-developed-by: Suraj Gupta <suraj.gupta2@amd.com>
+> Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
+> ---
+>  .../net/ethernet/xilinx/xilinx_axienet_main.c | 83 ++++++-------------
+>  1 file changed, 27 insertions(+), 56 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> index 284031fb2e2c..998bacd508b8 100644
+> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> @@ -2787,7 +2787,7 @@ static int axienet_probe(struct platform_device *pdev)
+>  	int addr_width = 32;
+>  	u32 value;
+>  
+> -	ndev = alloc_etherdev(sizeof(*lp));
+> +	ndev = devm_alloc_etherdev(&pdev->dev, sizeof(*lp));
+>  	if (!ndev)
+>  		return -ENOMEM;
+>  
+> @@ -2815,41 +2815,32 @@ static int axienet_probe(struct platform_device *pdev)
+>  	seqcount_mutex_init(&lp->hw_stats_seqcount, &lp->stats_lock);
+>  	INIT_DEFERRABLE_WORK(&lp->stats_work, axienet_refresh_stats);
+>  
+> -	lp->axi_clk = devm_clk_get_optional(&pdev->dev, "s_axi_lite_clk");
+> +	lp->axi_clk = devm_clk_get_optional_enabled(&pdev->dev,
+> +						    "s_axi_lite_clk");
+>  	if (!lp->axi_clk) {
+>  		/* For backward compatibility, if named AXI clock is not present,
+>  		 * treat the first clock specified as the AXI clock.
+>  		 */
+> -		lp->axi_clk = devm_clk_get_optional(&pdev->dev, NULL);
+> -	}
+> -	if (IS_ERR(lp->axi_clk)) {
+> -		ret = PTR_ERR(lp->axi_clk);
+> -		goto free_netdev;
+> -	}
+> -	ret = clk_prepare_enable(lp->axi_clk);
+> -	if (ret) {
+> -		dev_err(&pdev->dev, "Unable to enable AXI clock: %d\n", ret);
+> -		goto free_netdev;
+> +		lp->axi_clk = devm_clk_get_optional_enabled(&pdev->dev, NULL);
+>  	}
+> +	if (IS_ERR(lp->axi_clk))
+> +		return dev_err_probe(&pdev->dev, PTR_ERR(lp->axi_clk),
+> +				     "could not get AXI clock\n");
+>  
+>  	lp->misc_clks[0].id = "axis_clk";
+>  	lp->misc_clks[1].id = "ref_clk";
+>  	lp->misc_clks[2].id = "mgt_clk";
+>  
+> -	ret = devm_clk_bulk_get_optional(&pdev->dev, XAE_NUM_MISC_CLOCKS, lp->misc_clks);
+> -	if (ret)
+> -		goto cleanup_clk;
+> -
+> -	ret = clk_bulk_prepare_enable(XAE_NUM_MISC_CLOCKS, lp->misc_clks);
+> +	ret = devm_clk_bulk_get_optional_enable(&pdev->dev, XAE_NUM_MISC_CLOCKS,
+> +						lp->misc_clks);
+>  	if (ret)
+> -		goto cleanup_clk;
+> +		return dev_err_probe(&pdev->dev, ret,
+> +				     "could not get/enable misc. clocks\n");
+>  
+>  	/* Map device registers */
+>  	lp->regs = devm_platform_get_and_ioremap_resource(pdev, 0, &ethres);
+> -	if (IS_ERR(lp->regs)) {
+> -		ret = PTR_ERR(lp->regs);
+> -		goto cleanup_clk;
+> -	}
+> +	if (IS_ERR(lp->regs))
+> +		return PTR_ERR(lp->regs);
+>  	lp->regs_start = ethres->start;
+>  
+>  	/* Setup checksum offload, but default to off if not specified */
+> @@ -2918,19 +2909,17 @@ static int axienet_probe(struct platform_device *pdev)
+>  			lp->phy_mode = PHY_INTERFACE_MODE_1000BASEX;
+>  			break;
+>  		default:
+> -			ret = -EINVAL;
+> -			goto cleanup_clk;
+> +			return -EINVAL;
+>  		}
+>  	} else {
+>  		ret = of_get_phy_mode(pdev->dev.of_node, &lp->phy_mode);
+>  		if (ret)
+> -			goto cleanup_clk;
+> +			return ret;
+>  	}
+>  	if (lp->switch_x_sgmii && lp->phy_mode != PHY_INTERFACE_MODE_SGMII &&
+>  	    lp->phy_mode != PHY_INTERFACE_MODE_1000BASEX) {
+>  		dev_err(&pdev->dev, "xlnx,switch-x-sgmii only supported with SGMII or 1000BaseX\n");
+> -		ret = -EINVAL;
+> -		goto cleanup_clk;
+> +		return -EINVAL;
+>  	}
+>  
+>  	if (!of_property_present(pdev->dev.of_node, "dmas")) {
+> @@ -2945,7 +2934,7 @@ static int axienet_probe(struct platform_device *pdev)
+>  				dev_err(&pdev->dev,
+>  					"unable to get DMA resource\n");
+>  				of_node_put(np);
+> -				goto cleanup_clk;
+> +				return ret;
+>  			}
+>  			lp->dma_regs = devm_ioremap_resource(&pdev->dev,
+>  							     &dmares);
+> @@ -2962,19 +2951,17 @@ static int axienet_probe(struct platform_device *pdev)
+>  		}
+>  		if (IS_ERR(lp->dma_regs)) {
+>  			dev_err(&pdev->dev, "could not map DMA regs\n");
+> -			ret = PTR_ERR(lp->dma_regs);
+> -			goto cleanup_clk;
+> +			return PTR_ERR(lp->dma_regs);
+>  		}
+>  		if (lp->rx_irq <= 0 || lp->tx_irq <= 0) {
+>  			dev_err(&pdev->dev, "could not determine irqs\n");
+> -			ret = -ENOMEM;
+> -			goto cleanup_clk;
+> +			return -ENOMEM;
+>  		}
+>  
+>  		/* Reset core now that clocks are enabled, prior to accessing MDIO */
+>  		ret = __axienet_device_reset(lp);
+>  		if (ret)
+> -			goto cleanup_clk;
+> +			return ret;
+>  
+>  		/* Autodetect the need for 64-bit DMA pointers.
+>  		 * When the IP is configured for a bus width bigger than 32 bits,
+> @@ -3001,14 +2988,13 @@ static int axienet_probe(struct platform_device *pdev)
+>  		}
+>  		if (!IS_ENABLED(CONFIG_64BIT) && lp->features & XAE_FEATURE_DMA_64BIT) {
+>  			dev_err(&pdev->dev, "64-bit addressable DMA is not compatible with 32-bit architecture\n");
+> -			ret = -EINVAL;
+> -			goto cleanup_clk;
+> +			return -EINVAL;
+>  		}
+>  
+>  		ret = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(addr_width));
+>  		if (ret) {
+>  			dev_err(&pdev->dev, "No suitable DMA available\n");
+> -			goto cleanup_clk;
+> +			return ret;
+>  		}
+>  		netif_napi_add(ndev, &lp->napi_rx, axienet_rx_poll);
+>  		netif_napi_add(ndev, &lp->napi_tx, axienet_tx_poll);
+> @@ -3018,15 +3004,12 @@ static int axienet_probe(struct platform_device *pdev)
+>  
+>  		lp->eth_irq = platform_get_irq_optional(pdev, 0);
+>  		if (lp->eth_irq < 0 && lp->eth_irq != -ENXIO) {
+> -			ret = lp->eth_irq;
+> -			goto cleanup_clk;
+> +			return lp->eth_irq;
+>  		}
+>  		tx_chan = dma_request_chan(lp->dev, "tx_chan0");
+> -		if (IS_ERR(tx_chan)) {
+> -			ret = PTR_ERR(tx_chan);
+> -			dev_err_probe(lp->dev, ret, "No Ethernet DMA (TX) channel found\n");
+> -			goto cleanup_clk;
+> -		}
+> +		if (IS_ERR(tx_chan))
+> +			return dev_err_probe(lp->dev, PTR_ERR(tx_chan),
+> +					     "No Ethernet DMA (TX) channel found\n");
+>  
+>  		cfg.reset = 1;
+>  		/* As name says VDMA but it has support for DMA channel reset */
+> @@ -3034,7 +3017,7 @@ static int axienet_probe(struct platform_device *pdev)
+>  		if (ret < 0) {
+>  			dev_err(&pdev->dev, "Reset channel failed\n");
+>  			dma_release_channel(tx_chan);
+> -			goto cleanup_clk;
+> +			return ret;
+>  		}
+>  
+>  		dma_release_channel(tx_chan);
+> @@ -3139,13 +3122,6 @@ static int axienet_probe(struct platform_device *pdev)
+>  		put_device(&lp->pcs_phy->dev);
+>  	if (lp->mii_bus)
+>  		axienet_mdio_teardown(lp);
+> -cleanup_clk:
+> -	clk_bulk_disable_unprepare(XAE_NUM_MISC_CLOCKS, lp->misc_clks);
+> -	clk_disable_unprepare(lp->axi_clk);
+> -
+> -free_netdev:
+> -	free_netdev(ndev);
+> -
+>  	return ret;
+>  }
+>  
+> @@ -3163,11 +3139,6 @@ static void axienet_remove(struct platform_device *pdev)
+>  		put_device(&lp->pcs_phy->dev);
+>  
+>  	axienet_mdio_teardown(lp);
+> -
+> -	clk_bulk_disable_unprepare(XAE_NUM_MISC_CLOCKS, lp->misc_clks);
+> -	clk_disable_unprepare(lp->axi_clk);
+> -
+> -	free_netdev(ndev);
+>  }
+>  
+>  static void axienet_shutdown(struct platform_device *pdev)
 
-Can you give some rationale why the existing counters are insufficient
-and why you chose to change then number of counters you suggest
-between revisions of your patch?
+Reviewed-by: Sean Anderson <sean.anderson@linux.dev>
 
-This code adds some cost to the hot path. The blamed commit added
-drop counters, most likely weighing the value of counters against
-their cost. I don't immediately see reason to revisit that.
-
-> >
-> > You must not submit more than one version of a patch within a 24h
-> > period.
-> Hi Jakub and sorry for the noise, didn't know that. Is there any way to=
- check
-> my patch against all patchwork checks ,specially the AI-reviewer
-> before submitting it?
-
-See https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html=
-
-
+I think you should resend this without RFC now that the merge window is open.
 
