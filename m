@@ -1,135 +1,139 @@
-Return-Path: <netdev+bounces-247358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6771CF8533
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 13:33:29 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4D95CF8626
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 13:48:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A9C11301B59D
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 12:33:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5125D3012C76
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 12:48:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33228322C7F;
-	Tue,  6 Jan 2026 12:33:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BFD8327BF6;
+	Tue,  6 Jan 2026 12:48:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iqD4vSD8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L2raWdsU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+Received: from mail-yw1-f195.google.com (mail-yw1-f195.google.com [209.85.128.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8391E868
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 12:33:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00317320CB1
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 12:48:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767702793; cv=none; b=mn7MQ3WHA/cHHHTIbGDjWLg0Ruj7nm7G9mBUZCTQ9zgMgc4o+sZm4BAmAc5Kp7YAX4hP2tzfNhwBeKpZqLu86oPG1fbQSLZvLigGpggiimAke+Il4k5rFoOKcaSLD1ZtswY3XKq6vKIJuW8xmoDy+adGdE12ndy2GL75b3O5iyA=
+	t=1767703720; cv=none; b=WwXNxzj/f+wHbdl+WoZ8eZ9fp6pFs1Y55vWCunxnk/Mf8UcEUKnw7uvUWe9mItGT/7U0yaCoRPQo4VsfQunFjrPI8RnY6nS0MbpKVncIbrRps1xiOh94TTbyxicQ7ss3nrweNW9lh8z/T91uKheRuhO1l4yLg3El1MPYtKoV+bA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767702793; c=relaxed/simple;
-	bh=DmmMG6Xd0V+yKRI0NieT+ZD/F0sL4CohjJmMoYF0Ok8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G0afDZ1q/3hJ74stEsknbQ6Lr+XjwzbPQSIsVDn+kx79HKU6Aj0U7XFZP9Byq2ZP5ud44vxpu7rE0mXGmHHvWh3eoGInk48DLzBhABgbaHRWpI02/5EsneQZim9ePvRMsRc7YavCI8CUAH0wrZrUKjgw5kRQ9K2YLRdiFE/QWpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iqD4vSD8; arc=none smtp.client-ip=209.85.215.173
+	s=arc-20240116; t=1767703720; c=relaxed/simple;
+	bh=BBii3Mq4q0YqkEg21YmRCOxXIkp+RWiyrkBYvkUYnvg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=G50dqu/NICpo3+fagpBxUbVfr8mDXaHu+bebLAZTxNVosGgU8/vYBk2x9TfDHy0w1XclLIRyNCEBVbOoraAlA8rk3ovSm5+uNALswzlR80t8b2eWyL1lqY0MAAhaVp9asrk26ZFjQHi0EOS2qT5+Odvj545TJ00IksFwYgI41MM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L2raWdsU; arc=none smtp.client-ip=209.85.128.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-bd1b0e2c1eeso704082a12.0
-        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 04:33:11 -0800 (PST)
+Received: by mail-yw1-f195.google.com with SMTP id 00721157ae682-78fdb90b670so9540537b3.2
+        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 04:48:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767702791; x=1768307591; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FoD+zbo2HQpI2DIEJb0/r0C6yD/iXNrlDMtyH30+9Sk=;
-        b=iqD4vSD8N5GApOyWDEzmPtJg2hrrhnWXITmV7mi8xoLwYmjBneyZE6VdG4TJt9Y0ax
-         JoYDnMwxHs1J10HHsqhR9Q6QcePB1/NPdo5mgug8nqibwkKtdyte9r+jD0vLnLIyqOq+
-         tbIZGHEi9glaD+EEzCG+oGMleEnUjyc4dypHEm3TI0xzVYbcmH5dBkOddBQDF5FWzAbH
-         iS/62jcqZ4PswWZQYvSei3a868eUQPkYrdcF3lBFjj2JCy2kAfWdW2SHxLQh7SFEDbP4
-         1MR5CHOcuyCvpCHNP7rtpAq9dnBqF2M59xcuN742luVhOHOWk6FT+HHemLz8zHXEY/hl
-         5cTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767702791; x=1768307591;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1767703718; x=1768308518; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FoD+zbo2HQpI2DIEJb0/r0C6yD/iXNrlDMtyH30+9Sk=;
-        b=wPBbI1djUDmuMpyumobBY+ACU41EcHBi1z1dSen2gyQyVvhJlDXdn2VzF74irfH5vS
-         ODZWH3p4oZVSB+dpj18y4jDvo3wA2mbsmusyxE+JoH/PpjQnb/Fhbh01YdmGM/ysjYbH
-         1IkQ95RjSYA2RGYBtS5EG2P+ZcIJqp5qxMmMcWgmPJJodLERP5VnbELDVaGJd/1nhYcS
-         ad2KsW3Cr5xK8pcXT0+rrqjKuxiSmHwn4FZ5EC6la8oirmNxXdruPX3O6EB52GltWbVl
-         BSglSQsLKGmibeosE22dj6aJNyCBw3Cib2TyvesxfuWKbrxl9z2NlHXGQmRYBrt5YYkW
-         ieEA==
-X-Gm-Message-State: AOJu0YzNckGrLoQOxx12W7KrfpeqS6Gaio2+kPydogD1GYdPrhrEiEmd
-	8XQOz+cE3RcReEhLTawwFnonLyDJI0c6e/+IknUZsEXEkCaeJdvNcpPubcH+MTXWs88=
-X-Gm-Gg: AY/fxX60soAzPCF9qpHGljZkFrnzqrYZFmUWyOQLrES9tSfnSa3GLSReGF+TFo2lhtG
-	Ow+NXWIs0uI1G897urvqEsRQzVFyjypU73FnQsrPFc/qhxihxFuagHPRRJIzaktDCX5X2YRsHiG
-	eoCmBYcqTBaZNDN1KSDpbZ3isQTZdwxHoq4/j88+kQSTF09i9EOPmNMducfsrYfH4uvb7wXyDfQ
-	a8YoeIpe3NJlRIXPwoHljTISKjkkyE2SM4XIc2vsLuQhiWOKY4oTTShMEdWP6whIUgBYrZkoket
-	iVxUB3doB/zfYpbNIJbM29CENxp7wwneDqErD209Ma2PwR2qRT8J49obAWpXd0SDFroNpysD9cg
-	PlngUMr0915oWbn+3m1r011mBHgJZN/kMrueKj1l8oCbsoTb8WJzK2kgP6oPHoaMYx1O1BU1qKd
-	6D+LLojg==
-X-Google-Smtp-Source: AGHT+IHnt1uQG57rcHloEdBPY1GTBpeMHJ/klaJ/TO+ZT4cbOqNaxyJIWbnilirm+kduEvNaekazbQ==
-X-Received: by 2002:a05:6a21:3386:b0:366:14ac:e1e5 with SMTP id adf61e73a8af0-3898242d82emr2549255637.75.1767702790930;
-        Tue, 06 Jan 2026 04:33:10 -0800 (PST)
-Received: from oslab.. ([2402:f000:4:1006:809:0:a77:18ea])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34f5fb74435sm2223417a91.14.2026.01.06.04.33.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jan 2026 04:33:10 -0800 (PST)
-From: Tuo Li <islituo@gmail.com>
-To: ayush.sawal@chelsio.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kernelxing@tencent.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Tuo Li <islituo@gmail.com>
-Subject: [PATCH] chcr_ktls: add a defensive NULL check to prevent a possible null-pointer dereference in chcr_ktls_dev_del()
-Date: Tue,  6 Jan 2026 20:33:02 +0800
-Message-ID: <20260106123302.166220-1-islituo@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        bh=BBii3Mq4q0YqkEg21YmRCOxXIkp+RWiyrkBYvkUYnvg=;
+        b=L2raWdsUkwJ5krRvoFG/1CPkIdJL08RThTfeUjxmx5xdXKzBHJTtRnihrJyLNpd+8o
+         J0s52AdnOkb+u9PnHChyAD9Qe/CIadRtu0XRPzr68X1R2QaYaoojdKave+VV+iCOe/oU
+         FSLdCns/KVvGZIpDZZt3wHzjla30niWxnCFVty8Q/oEaWG9BCkMbXZxC5FgF01T+w5B+
+         aeOIcEBMaoRwsY7NUk727SOEY4SxyJRkXDEXTyYkyLbAq2ibA6+iYEt5e+fsm4aJfEQs
+         QXcW5ijedpZOsLuHcy7RhXr4fI39hJcaATycIRnbkvX20kDqxJf8u1mmLT3UIDsbQpVH
+         Ge/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767703718; x=1768308518;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=BBii3Mq4q0YqkEg21YmRCOxXIkp+RWiyrkBYvkUYnvg=;
+        b=KOjDsNKb65IPtWZPhb0FjHIKhsUrnFVU49My0SPGBP2HNfSTHo4+t4ln1WhHw7m1qI
+         +92WUkLbp/cHYiB37aR/R1A+ehEbOCsrrqdr+VVFyUSnh1+jNWaSQdNECJrF4jgcNMUT
+         HPX1ft3ewGEWJbK+uK1UMC4fbRbqocaZbajZaLfn+N/iOxw5tZqNZGHowVRb6OE6JlMo
+         JVKfKR958Utwb0szyjqY4uv8FaEHigKxthpNa5G48mWbJCBzPsA+K2UXSffcWYzE7znH
+         8ze0CWO3++iJsPB62xK4Puy2cy8/osQlo38mwLBtvMkCqeQ5wVXyOlYGzZcaAnfx6vEd
+         LVCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV690wOCFLXmt4SRVM+aiByUUdxmb4XPeiT/jyEYYFKV/6GHz+jsDCcwzAbeIHLn2oHNjpr6cg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdA1apk+sThZ2+yvBjTlWC9yNceiru+fOGsV98D7hK8FB5nSga
+	ekT7qQigZmmk/w3fgWhymun+/z9oXpjNCJ8wN6da+oeoYW+iU0KWyuSRS/Xt4yWXR6BdqMGIc0y
+	t9QP4QbM0e64yaiQuVAFiybli9sz3rp0=
+X-Gm-Gg: AY/fxX7saStfAOQuYOgEXBPuIJfZseDYZaj8VjZDmVQbhjFJt8Rq7iV/ymP3UydK/+N
+	fSxk7453BWBQaPYVqNgtbmNQ8E/gDtLZkb8dTw8TvipVnlbr2bVb8JFUCErrllhNvs71GjfWm42
+	iXjj+6XN9KTQ7fsbqWH5i5ZGzlLRs/ClW5LKcaiRLmvWaxPrurh+0FQSOsKflp7++8lt79+5nya
+	imi//enqt65YiFj32DooTU4cmTXaAKE+XStQkqLxNIk9v/a1EIsOJeuHbt/VaZ/EkBYX+E=
+X-Google-Smtp-Source: AGHT+IF8KI89KLf3bKzqNc4G6bPsWOgabSD/4ejctOlkcIk8jmKq5n+X1mNRYhKI+jrfFGHOQ4AKo7Gs2QW00RTYVCc=
+X-Received: by 2002:a05:690c:6305:b0:787:f69e:d156 with SMTP id
+ 00721157ae682-790a8a341cbmr23366437b3.1.1767703718010; Tue, 06 Jan 2026
+ 04:48:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260104122814.183732-1-dongml2@chinatelecom.cn>
+ <CAADnVQ+cK1XvYrBPf3zuNmRF+2A=i-AKGaNV4SoeTUeGRLF2Fg@mail.gmail.com>
+ <CAEf4Bza4fD5WWWBxJk0dd_xvgPR0ORZpcp1wiahyMPjvdoWG0w@mail.gmail.com> <aVzN28i92roV1p4q@krava>
+In-Reply-To: <aVzN28i92roV1p4q@krava>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Tue, 6 Jan 2026 20:48:27 +0800
+X-Gm-Features: AQt7F2oMLxxCEkG2LRnAb9qTRqDKHwSyzwbk6vVaBtzJHaof8kpyIcVVg2wTECc
+Message-ID: <CADxym3Z5vPsNktM6ehc5E=9HBqdYwRRyFcyfDLASoz0bjMGQcg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v6 00/10] bpf: fsession support
+To: Jiri Olsa <olsajiri@gmail.com>
+Cc: Andrii Nakryiko <andrii.nakryiko@gmail.com>, 
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, jiang.biao@linux.dev, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, bpf <bpf@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In this function, u_ctx is guarded by an if statement, which indicates that
-it may be NULL:
+On Tue, Jan 6, 2026 at 4:54=E2=80=AFPM Jiri Olsa <olsajiri@gmail.com> wrote=
+:
+>
+> On Mon, Jan 05, 2026 at 03:20:13PM -0800, Andrii Nakryiko wrote:
+> > On Mon, Jan 5, 2026 at 2:33=E2=80=AFPM Alexei Starovoitov
+> > <alexei.starovoitov@gmail.com> wrote:
+> > >
+> > > On Sun, Jan 4, 2026 at 4:28=E2=80=AFAM Menglong Dong <menglong8.dong@=
+gmail.com> wrote:
+> > > >
+> > > > In current solution, we can't reuse the existing bpf_session_cookie=
+() and
+> > > > bpf_session_is_return(), as their prototype is different from
+> > > > bpf_fsession_is_return() and bpf_fsession_cookie(). In
+> > > > bpf_fsession_cookie(), we need the function argument "void *ctx" to=
+ get
+> > > > the cookie. However, the prototype of bpf_session_cookie() is "void=
+".
+> > >
+> > > I think it's ok to change proto to bpf_session_cookie(void *ctx)
+> > > for kprobe-session. It's not widely used yet, so proto change is ok
+> > > if it helps to simplify this tramp-session code.
+> > > I see that you adjust get_kfunc_ptr_arg_type(), so the verifier
+> > > will enforce PTR_TO_CTX for kprobe and trampoline.
+> > > Potentially can relax and enforce r1=3D=3Dctx only for trampoline,
+> > > but I would do it for both for consistency.
+> >
+> > Yeah, I'd support that. It's early enough that this shouldn't be
+> > breaking a lot of users (if any).
+> >
+> > Jiri, do you guys use bpf_session_is_return() or bpf_session_cookie()
+> > anywhere already?
+>
+> np, we can still adjust, it's in PR that's not merged yet
 
-  u_ctx = tx_info->adap->uld[CXGB4_ULD_KTLS].handle;
-  if (u_ctx && u_ctx->detach)
-    return;
+Nice, wait for me :)
 
-Consequently, a potential null-pointer dereference may occur when
-tx_info->tid != -1, as shown below:
-
-  if (tx_info->tid != -1) {
-    ...
-    xa_erase(&u_ctx->tid_list, tx_info->tid);
-  }
-
-Therefore, add a defensive NULL check to prevent this issue.
-
-Fixes: 65e302a9bd57 ("cxgb4/ch_ktls: Clear resources when pf4 device is removed")
-Signed-off-by: Tuo Li <islituo@gmail.com>
----
- drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c b/drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c
-index 4e2096e49684..79292314a012 100644
---- a/drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c
-+++ b/drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c
-@@ -389,7 +389,8 @@ static void chcr_ktls_dev_del(struct net_device *netdev,
- 		cxgb4_remove_tid(&tx_info->adap->tids, tx_info->tx_chan,
- 				 tx_info->tid, tx_info->ip_family);
- 
--		xa_erase(&u_ctx->tid_list, tx_info->tid);
-+		if (u_ctx)
-+			xa_erase(&u_ctx->tid_list, tx_info->tid);
- 	}
- 
- 	port_stats = &tx_info->adap->ch_ktls_stats.ktls_port[tx_info->port_id];
--- 
-2.43.0
-
+>
+> jirka
 
