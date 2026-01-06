@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-247267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B5F0CF6582
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 02:47:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FD50CF6633
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 02:57:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0CC91302FA18
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 01:46:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E7EBE30DB5FD
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 01:51:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFAF0305976;
-	Tue,  6 Jan 2026 01:40:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C56731AA8B;
+	Tue,  6 Jan 2026 01:41:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lSIu/08T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m61wEo2W"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A9C2F4A14;
-	Tue,  6 Jan 2026 01:40:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F10318138;
+	Tue,  6 Jan 2026 01:41:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767663646; cv=none; b=IlWk++OOJSlBTdHk3azihSo832OMDkLtdoNc81c4SSqps+v6PaCK0jwaEWCUr/uT538nXv/+M7f5LSy+pqvEfy4BXarYaUWo2uFnhZPAr7/7qgdCdoGBmjdT5g0bSmY+rWk5Hc/6WHuOwu0go+wktdxFPDIIFy6hd6lRwXi6sEQ=
+	t=1767663702; cv=none; b=VuCO0AIFhcPSQ8TYSR1M8L9NLouypw5DB/NOnSm8ri0mxTPo4eQp2MHfF90vuAtDqNTj3DS2W4PnPZJJYcBN2Km7MnVoKVtAm5Ez97VKU/ZjaErtV6XS9aAXWbof3Msuy5+OTXRMnmTn2Z0s/ucRkNdb1NSzWafAJHFqL2Txni4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767663646; c=relaxed/simple;
-	bh=MiO0RDJKgdO1s44EJmn/1ChzLwDRt3aO6tHdyCQH5iU=;
+	s=arc-20240116; t=1767663702; c=relaxed/simple;
+	bh=ujW7u+Y1VhHmOg9SXX9p5QNo2NFrWNF4bD49udhNf08=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k/ncHoqgUNCmVJtQx3UYCHoOTBzs0ruz7UUauUivQHqNwD9P5i7IqMyqySaB0Vauk6vIT5uz5NkAu1HWTGVQoCAlEPm2Q89mnRaLPvuXvummCQ4WyoD5dF/Y7/SSXhJV246TTAMeZH/skaMRWKIPoUB2idjXr68d5BX0V7AdIbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lSIu/08T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 648B2C116D0;
-	Tue,  6 Jan 2026 01:40:45 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Wl0ObbFYArE4it5gviF9Ui7Y1v0Jxi5NA7Oc4OhuqSkJ9cFXfJ6zZ7nlxV0XdqiggP1Xr9f01aCW2biacrCSh9wUHEF65ZqFjYNWZ5/mo+96Yc8S9myCowRZH6QshcwOcps3+bhqoRbxbK5Mi/m9BPOaVEyuIAd6lvFymK7Y5AQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m61wEo2W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2F3EC116D0;
+	Tue,  6 Jan 2026 01:41:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767663646;
-	bh=MiO0RDJKgdO1s44EJmn/1ChzLwDRt3aO6tHdyCQH5iU=;
+	s=k20201202; t=1767663701;
+	bh=ujW7u+Y1VhHmOg9SXX9p5QNo2NFrWNF4bD49udhNf08=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lSIu/08TSKHu9TwKdJWN+ywNeeg8yoeJnEj6SdKgrHl5EVPlnHOs4nYDVnJwaz/cm
-	 fefRiql+BLYjP440jzI/haiRsAKSKO4BdfeIcXQJaR/5IIJlOrzvbjgaVAk1n3CEFt
-	 hpOmPvzVpcc/PVVR+QMZWO/EjOyGZR+hynGTgfBJB22jOMOQJX/oe9mT3Oxauu3t65
-	 KQ5djh1hcC4ZUnPEDvuOPzD6i549cScXKQhovP8vTnjXOQPn4+sGLv8+RqzRGosujH
-	 hM4m3RyzRLKvcHB8iRS63Ov8+GM/3sA4EfFLaFHFyIh4oqm7q3QWQuC6nc5/XXCx6R
-	 YW0ZO3VZCk5bA==
-Date: Mon, 5 Jan 2026 17:40:44 -0800
+	b=m61wEo2W6z6OO84mN5AWeqYSH8SaZC4Gt6OnuUYLHs4QfYX0rY9cyw7bfKfRflzjE
+	 uBo+BL2biShqPQiPMu826cbQyHyRIICAuwpNWGO2S7pd0WRxwB01MSUQXEv4F7s+5K
+	 Q3U6coNBuS5v7PcMKnuYLpKHC9IlduyIr1kmdX1pDPhGNzSgqc2EG/ReypR+0Eg4Jk
+	 50izazflm3H4b+LaX80+kCqoB8QRZZV9KcGyU6RJG9nu7G+//1iX8ayi/wY26eQwjS
+	 BX1fVYzkDctyK/mXsHZST7fj8mk50VaBfoYekBmx8UQ1DJljGiYUGxT5k1PLXPc+Ol
+	 4b0xdkOCuEvDw==
+Date: Mon, 5 Jan 2026 17:41:40 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Fan Gong <gongfan1@huawei.com>
 Cc: Zhu Yikai <zhuyikai1@h-partners.com>, <netdev@vger.kernel.org>, "David
@@ -52,12 +52,11 @@ Cc: Zhu Yikai <zhuyikai1@h-partners.com>, <netdev@vger.kernel.org>, "David
  <shenchenyang1@hisilicon.com>, Zhou Shuai <zhoushuai28@huawei.com>, Wu Like
  <wulike1@huawei.com>, Shi Jing <shijing34@huawei.com>, Luo Yang
  <luoyang82@h-partners.com>
-Subject: Re: [PATCH net-next v08 7/9] hinic3: Add adaptive IRQ coalescing
- with DIM
-Message-ID: <20260105174044.3da6585d@kernel.org>
-In-Reply-To: <4c3ebb442eacab854679702873e6b72091f78a7b.1767495881.git.zhuyikai1@h-partners.com>
+Subject: Re: [PATCH net-next v08 8/9] hinic3: Add mac filter ops
+Message-ID: <20260105174140.1c2b9021@kernel.org>
+In-Reply-To: <8555005e3263a6de0d43be148f1d20ecab145eb0.1767495881.git.zhuyikai1@h-partners.com>
 References: <cover.1767495881.git.zhuyikai1@h-partners.com>
-	<4c3ebb442eacab854679702873e6b72091f78a7b.1767495881.git.zhuyikai1@h-partners.com>
+	<8555005e3263a6de0d43be148f1d20ecab145eb0.1767495881.git.zhuyikai1@h-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,35 +68,65 @@ Content-Transfer-Encoding: 7bit
 
 AI code review points out:
 
-> @@ -150,6 +236,9 @@ int hinic3_qps_irq_init(struct net_device *netdev)
->  			goto err_release_irqs;
->  		}
->
-> +		INIT_WORK(&irq_cfg->rxq->dim.work, hinic3_rx_dim_work);
-> +		irq_cfg->rxq->dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_CQE;
+> +static int hinic3_mac_filter_sync_hw(struct net_device *netdev,
+> +				     struct list_head *del_list,
+> +				     struct list_head *add_list,
+> +				     int *add_count)
+> +{
+> +	struct hinic3_mac_filter *ftmp;
+> +	struct hinic3_mac_filter *f;
+> +	int err;
 > +
->  		hinic3_set_msix_auto_mask_state(nic_dev->hwdev,
->  						irq_cfg->msix_entry_idx,
->  						HINIC3_SET_MSIX_AUTO_MASK);
-> @@ -164,6 +253,9 @@ int hinic3_qps_irq_init(struct net_device *netdev)
->  		q_id--;
->  		irq_cfg = &nic_dev->q_params.irq_cfg[q_id];
->  		qp_del_napi(irq_cfg);
+> +	if (!list_empty(del_list)) {
+> +		list_for_each_entry_safe(f, ftmp, del_list, list) {
+> +			/* ignore errors when deleting mac */
+> +			hinic3_filter_addr_unsync(netdev, f->addr);
+> +			list_del(&f->list);
+> +			kfree(f);
+> +		}
+> +	}
 > +
-> +		disable_work_sync(&irq_cfg->rxq->dim.work);
+> +	if (!list_empty(add_list)) {
+> +		list_for_each_entry_safe(f, ftmp, add_list, list) {
+> +			if (f->state != HINIC3_MAC_HW_SYNCING)
+> +				continue;
 > +
->  		hinic3_set_msix_state(nic_dev->hwdev, irq_cfg->msix_entry_idx,
->  				      HINIC3_MSIX_DISABLE);
+> +			err = hinic3_filter_addr_sync(netdev, f->addr);
+> +			if (err) {
+> +				netdev_err(netdev, "Failed to add mac\n");
+> +				return err;
+> +			}
+> +
+> +			f->state = HINIC3_MAC_HW_SYNCED;
+> +			(*add_count)++;
+> +		}
+> +	}
+> +
+> +	return 0;
+> +}
 
-The error path in hinic3_qps_irq_init() calls disable_work_sync() to cancel
-the DIM work before cleanup. However, hinic3_qps_irq_uninit() does not have
-a corresponding cancel_work_sync() or disable_work_sync() call.
+[ ... ]
 
-The DIM work is scheduled via net_dim()->schedule_work() from hinic3_poll().
-If the interface is closed while DIM work is pending or running,
-hinic3_rx_dim_work() could access rxq->netdev and rxq->q_id after the
-queues have been torn down in hinic3_close_channel()->hinic3_qps_irq_uninit().
+> +	err = hinic3_mac_filter_sync_hw(netdev, &tmp_del_list,
+> +					&tmp_add_list, &add_count);
+> +	if (err) {
+> +		/* there were errors, delete all mac in hw */
+> +		hinic3_undo_add_filter_entries(mac_filter_list, &tmp_add_list);
 
-Should hinic3_qps_irq_uninit() call cancel_work_sync() for the DIM work
-to prevent a potential use-after-free?
+[ ... ]
+
+> +		hinic3_mac_filter_sync_hw(netdev, &tmp_del_list,
+> +					  &tmp_add_list, NULL);
+                                                  ^^^^
+
+Can this NULL pointer dereference add_count in hinic3_mac_filter_sync_hw()?
+
+When hinic3_filter_addr_sync() fails in the first call to
+hinic3_mac_filter_sync_hw(), the function returns early with an error.
+At that point tmp_add_list may still contain entries with state
+HINIC3_MAC_HW_SYNCING (entries that were not yet processed).
+
+The second call passes NULL for add_count. If tmp_add_list is not empty
+and has entries with HINIC3_MAC_HW_SYNCING state, the code will execute
+(*add_count)++ with add_count being NULL.
 
