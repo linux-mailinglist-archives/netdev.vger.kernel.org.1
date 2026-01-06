@@ -1,89 +1,131 @@
-Return-Path: <netdev+bounces-247295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADC03CF688D
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 03:58:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68153CF68D0
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 04:05:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AE246301693B
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 02:58:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1DFD0304B061
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 03:05:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0352225A3B;
-	Tue,  6 Jan 2026 02:58:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A098287E;
+	Tue,  6 Jan 2026 03:05:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xZX8hYSP"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03EDA22172C;
-	Tue,  6 Jan 2026 02:58:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39847D27E;
+	Tue,  6 Jan 2026 03:05:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767668292; cv=none; b=Pnt2yD87QilXHHv/5BBeImp8xoAEFQNMNKBl2Woap3Hvudx6A/9t1+2uvv91G7isq1MRiJ0UkjYv1xvuBuFi7Y203LPSMtbhjokR/v9bQPk56Z8oJaMv2wBhjLfihyMHDNA2fI52JCzWqw1BdS2aPqEAahIL8wsxo59NO7cT89Y=
+	t=1767668720; cv=none; b=EsD4vRbK6aL39jPwOATL0//CuZafVfODv3KJMDeFyn78KtDclSDQCf4Qc+I8tmVWn2OxkpZ63oCStsBLJOyUfEVyATRdIn2jR3WBGI03HcA5X/Rj2M38frZ6vka4bt7avNO+jWLCrzuY8gxG4mIBM0jCq6ThmIqhP+3JjiNiKeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767668292; c=relaxed/simple;
-	bh=piHqaYT/Pg5JffobCD10YogGqPLXFXxpF9+T+W0urKg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j7d83mXJ44X3MuYQZKnKnUXuOG9ReGilhJy4SsdF9RoiLxahMIXTGsPC+r5Kg0dBfDHxrSfG/fUzAj659NHQG3xbSTtBRbiLvH9EL5dYWmJ7AN8HyUD0Q5W/VYGbaEiPy86zoc1f9dYMUaUrUDJ9xJE/J57GPFM2CbQcnOBS1ZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vcxGi-000000003tJ-1qgp;
-	Tue, 06 Jan 2026 02:58:00 +0000
-Date: Tue, 6 Jan 2026 02:57:56 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
-	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH RFC net-next v3 2/4] net: dsa: add tag formats for
- MxL862xx switches
-Message-ID: <aVx6NABI_8gEEysQ@makrotopia.org>
-References: <cover.1765757027.git.daniel@makrotopia.org>
- <de01f08a3c99921d439bc15eeafd94e759688554.1765757027.git.daniel@makrotopia.org>
- <20251216203935.z5ss4sxbt6xc2444@skbuf>
+	s=arc-20240116; t=1767668720; c=relaxed/simple;
+	bh=zxrz2lbJbmIsduvUiQCtmTi2f5ZF/2WlT5NgRfCZPwg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RyO6xkTsoe1LeTwZXjQ4zbV407q1ifQUwa0Nw4STniIlO22mveAb+JuhyRqxELsICRrAszCBX4S32sQKh4ke2kJJCrB+++3tjDqf9kdJ+nNpXM7cCP2ARiC+6jTTUdG4YTe+P14++VMF3gLKCf0mLcEF8Sxv56LroBK+CrKk6mM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xZX8hYSP; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1767668704;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WNt1Of0i9x64BslwslxqHsf9KuidTP+1Zvtct7Ztk+o=;
+	b=xZX8hYSPJDU3aSn7s7JeDOBqOlhwq1BVRqrnm1BSAewy7yeOs77IE1bFZ+ZjdmBNxqOdFb
+	RpjaAlty6u8jnN7r48ZsB2r7kVTPnLItUqy02+FrU+bLjotmzsBRMnZTbuAm79CCYC4/yG
+	FNR4dYJkDxFxD9rkxo4LHqPM0fkZe44=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: Menglong Dong <menglong8.dong@gmail.com>,
+ Andrii Nakryiko <andrii.nakryiko@gmail.com>, ast@kernel.org
+Cc: andrii@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, jiang.biao@linux.dev, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next v6 00/10] bpf: fsession support
+Date: Tue, 06 Jan 2026 11:04:47 +0800
+Message-ID: <3389151.aeNJFYEL58@7940hx>
+In-Reply-To:
+ <CAEf4BzbCyMWr5tq5i45SB3jPvUFd4zOAYwJG3KBBeaoWmEq8kw@mail.gmail.com>
+References:
+ <20260104122814.183732-1-dongml2@chinatelecom.cn>
+ <CAEf4BzbCyMWr5tq5i45SB3jPvUFd4zOAYwJG3KBBeaoWmEq8kw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251216203935.z5ss4sxbt6xc2444@skbuf>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Dec 16, 2025 at 10:39:35PM +0200, Vladimir Oltean wrote:
-> On Mon, Dec 15, 2025 at 12:11:43AM +0000, Daniel Golle wrote:
-> > the actual tag format differs significantly, hence we need a dedicated
-> > tag driver for that.
-> 
-> Reusing the same EtherType for two different DSA tagging protocols is
-> very bad news, possibly with implications also for libpcap. Is the
-> EtherType configurable in the MXL862xx family?
+On 2026/1/6 05:20 Andrii Nakryiko <andrii.nakryiko@gmail.com> write:
+> On Sun, Jan 4, 2026 at 4:28=E2=80=AFAM Menglong Dong <menglong8.dong@gmai=
+l.com> wrote:
+> >
+> > Hi, all.
+> >
+[......]
+> > Maybe it's possible to reuse the existing bpf_session_cookie() and
+> > bpf_session_is_return(). First, we move the nr_regs from stack to struct
+> > bpf_tramp_run_ctx, as Andrii suggested before. Then, we define the sess=
+ion
+> > cookies as flexible array in bpf_tramp_run_ctx like this:
+> >     struct bpf_tramp_run_ctx {
+> >         struct bpf_run_ctx run_ctx;
+> >         u64 bpf_cookie;
+> >         struct bpf_run_ctx *saved_run_ctx;
+> >         u64 func_meta; /* nr_args, cookie_index, etc */
+> >         u64 fsession_cookies[];
+> >     };
+> >
+> > The problem of this approach is that we can't inlined the bpf helper
+> > anymore, such as get_func_arg, get_func_ret, get_func_arg_cnt, etc, as
+> > we can't use the "current" in BPF assembly.
+> >
+>=20
+> We can, as Alexei suggested on your other patch set. Is this still a
+> valid concern?
 
-Only the egress EtherType can be configured, there is currently no way
-to configure the ingress EtherType the switch expects to receive on
-special-tag packets on the CPU port. MaxLinear, however, said they could
-in theory release a new firmware changing the EtherType to any suggested
-value, but it would be incompatible with existing downstream drivers in
-the field, obviously.
+Yeah, with the support of BPF_MOV64_PERCPU_REG, it's much easier
+now.
+
+So what approach should I use now? Change the prototype of
+bpf_session_is_return/bpf_session_cookie, as Alexei suggested, or
+use the approach here? I think both works, and I'm a little torn
+now. Any suggestions?
+
+Thanks!
+Menglong Dong
+
+>=20
+> I think having separate duplicated ksession and fsession specific
+> bpf_[f]session_{is_return,session_cookie}() APIs is really bad and
+> confusing long-term.
+>=20
+> > So maybe it's better to use the new kfunc for now? And I'm analyzing th=
+at
+>=20
+> there is no "for now", this decision will be with us for a really long ti=
+me...
+>=20
+> > if it is possible to inline "current" in verifier. Maybe we can convert=
+ to
+> > the solu
+[......]
+> >
+>=20
+
+
+
+
 
