@@ -1,125 +1,67 @@
-Return-Path: <netdev+bounces-247372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC6C1CF8E54
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 15:54:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE5D4CF8F1E
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 16:03:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C9B0A307751E
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 14:52:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C24BE300CBA3
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 15:03:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F629334389;
-	Tue,  6 Jan 2026 14:51:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fz+VC9XS";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="FM0Ydb5f"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D4DA332EA7;
+	Tue,  6 Jan 2026 15:03:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B6F329389
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 14:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6EC33344A
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 15:03:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767711117; cv=none; b=kbPu0wpUMSe8IMHRlWq9H0Qe3SomwfM+pUJO989TIrA1pXTxX2ecKrVCm5q9ngdoRfvBAF1DErL9CiZ6xzBAJGHtQuP99Kmm6pBvt8njfQ65jbgVMMsbkgw16CzH4zRZQZZZ/oiDPg5kCpyS40WIOPg0d4Rvvht/v2Wo27AgLc8=
+	t=1767711789; cv=none; b=BleP2uvyqkYn4qrqAdlwkAjRSua97K2OrLXCVFEbbnQ+RbMtbH5AIiz4Gf/0/8viVnBWmBSLogbm2o30sSkDPE4x3reZR105ryLPdrnweuu/wu9GJGn3p6DEYGm7kds5iPmqOW3jBxXVHx2NURLm0+OL1OEWm6j2LizUQMZbQKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767711117; c=relaxed/simple;
-	bh=OtGN4S8+ZWGuAfn6+2YZp7eQlkz7c6TNLgozVUvUCR0=;
+	s=arc-20240116; t=1767711789; c=relaxed/simple;
+	bh=pxuP43jF8Zq37MeH5HyDwYWFmVdeIugMPp451ACUZtc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aKAR4LwwBUKLGYKV6kmc7yf4B7Y8RhV+4se5th9vZKbffzuEpoyz4DiBkIYlutZwhZVfKb6+U+UW0hz6spmjShdn+9zb1MbfyhlYOBK6pkDDGWEH7YXtwrjc+e59uxahlWwrBk3BSzxJyqyXd29V3kkFDXLRelDj3Ah+2oYn2qg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fz+VC9XS; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=FM0Ydb5f; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767711114;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v8xGpc9e0AHSzqXJdY4dTy2UmvNhNHIufeUOIUm/LzQ=;
-	b=Fz+VC9XSu90CRjcNJLIQR8xNtUCj1ZW9XBpV149bIDT3Qr89/Nk65oqEc5xrAecMOx92BB
-	/eVHwbykvUmFSB34jwHAAn/uyuIlef66Ue5PPttGQ9H7uxgGnM+fWAImpDIr9g9yUZAcvM
-	V8YPZK/Xk9Uqsfepli/BQQXn1xTY/Bc=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-210-fC7qFDxRM_uVPgYF-figRA-1; Tue, 06 Jan 2026 09:51:53 -0500
-X-MC-Unique: fC7qFDxRM_uVPgYF-figRA-1
-X-Mimecast-MFC-AGG-ID: fC7qFDxRM_uVPgYF-figRA_1767711112
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-430f5dcd4cdso530514f8f.2
-        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 06:51:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767711112; x=1768315912; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=v8xGpc9e0AHSzqXJdY4dTy2UmvNhNHIufeUOIUm/LzQ=;
-        b=FM0Ydb5fdan6x+pkR1pJDikE+5rPe3WwNvtNRo0JY14Evid+8FAayK9PXBBE19NE0V
-         6zmoqhY0DFOh8fYaTQ2w8a69KO0ECm6f9yz6/NSy6/VZS/jtDSpgR87LSsEQVtgtQI6C
-         Bm4swC4PpZaaXSSi+1Oswc7hFfYQjX22ZoqFwC51cURGKJrO06ZoOhjZ5eZZRNVMGH/R
-         j7RZUi/wX1uXswo38RIPdWsCg4iwKcSnQ4YDfJ6vEwh4pq+EaWgBUP7DDSaV301bGKCp
-         3WN9O3bTncPfs2vWtO7odr14bTSpvCTRf7UV8cA+BVh7m6Bzvi2UTfoEFMptn9FMl/Kb
-         oPKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767711112; x=1768315912;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v8xGpc9e0AHSzqXJdY4dTy2UmvNhNHIufeUOIUm/LzQ=;
-        b=RyFb0W5U/kSi+oVnScxfgl2s3ywy8CUysnSwWK5FuQVx/Jq17LaURGePeHyalSQBFN
-         Io46x47//YMCW14F4on8yyUyR6MOUPtttjWCw2Je+XXWbHAQE+XjtWNO+St061BGoEan
-         lAeBCF3q1oHScp/flYSeQ0mqhqA6XNK7ji9IckJZBhFDVd3FLTNPkoZC7vYMQCiSKWPO
-         vu9qWtwmpHpxe3TkXfE2FiHav8+zK295AUBf7YIBuUHBHfDNBIFrDxXiRSzgwEtiRSCE
-         ho04EvvOK2WGuivDTnNHCdUIB5RVVD6gEiRcPnio9I4TVdJoObyEU96Ts5YYOQeJkd6v
-         YMpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXGvtif7f+ZPpQD+aPC+lcnUDhsejJJBDpnwzyknenVyYaskSgPW7TuhCKAQ5ZD3DjYi8z22/g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOUsFAZF6h1wU4VDRFtIyMMirEn6m69TaCqTJr5CmfTu5VlVSM
-	Vf7H7kBgT8W7Ux9QHPhAIXK8WWL76HCHJRQeLa9ppI7C9QiN1VJXBcAFjyKO+AO7TkLVcKCB/Xm
-	5jx3AHSXOaKNJ7vBPEcaY2VGWhEr+Gfi3kT8vhxtUr884I2WFFP/g/jU4Xg==
-X-Gm-Gg: AY/fxX7GBeE+k6UHWtVn/JB64892/WnJiUnnFKMUH9/kBUY23yy6mDx6KYwdpsVNef9
-	HOOTXWW6wTvWcnQT6+mGAPT2DNCWgIb6UhoLQZQdIP2W3iDU6xk3IsnjKDd53fzPWYZDtTWx9rL
-	q8ciVYizGtG+THT8uVGDgwq72ekgKxYbipeKbAnoeKFi9rVYx6jF0yP6FdBx4J4hCYbmPvR2X0e
-	uZVeBDl6kRBIjDuFLTaswcrtFlG6eGsHwGKl34DKCPreeB3GWAns1G8NLtCSb0/MWaQ/eYtnmIy
-	YuXlMVhpW2qzbAKKHK1PDL8blqyVgU7LGb827n9uOBoYNdrn3/QKGHIdCWcy/wNhG3D7bmcEVPM
-	IUV27SlY4FVSe6zIAid30k+oh+b5lI0xuyg==
-X-Received: by 2002:a05:6000:200f:b0:431:b6e:8be3 with SMTP id ffacd0b85a97d-432bc9f6dccmr4753177f8f.38.1767711112100;
-        Tue, 06 Jan 2026 06:51:52 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGOynDA9QP29UwN/sUhG6OCzOdNXrD0Y6rHdaimQHcJZW2G3EKin+vfxrhBk6BDORYTgSmwkg==
-X-Received: by 2002:a05:6000:200f:b0:431:b6e:8be3 with SMTP id ffacd0b85a97d-432bc9f6dccmr4753140f8f.38.1767711111656;
-        Tue, 06 Jan 2026 06:51:51 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5ede7esm4752453f8f.32.2026.01.06.06.51.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jan 2026 06:51:51 -0800 (PST)
-Date: Tue, 6 Jan 2026 09:51:46 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Cong Wang <xiyou.wangcong@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jason Wang <jasowang@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=KX0IvMBp2ks6kjuvBwL+25ZWBd117tSIeY4LLFQNJOcLQJsglH6bslEJlSKASI6BIEjXh3ggkf6gOWvf5bYwnS7+IbuQzNvo1kOZjUAurZphI8Z7b2g3e8qsSUO/nIuQfcwUciZlY2pkhgs8PSxZlnwmyadUwlFsXGEPcRYvtnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mfe@pengutronix.de>)
+	id 1vd8a6-0002YB-RS; Tue, 06 Jan 2026 16:02:46 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mfe@pengutronix.de>)
+	id 1vd8a5-009MUE-1X;
+	Tue, 06 Jan 2026 16:02:45 +0100
+Received: from mfe by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <mfe@pengutronix.de>)
+	id 1vd8a5-00EKwR-16;
+	Tue, 06 Jan 2026 16:02:45 +0100
+Date: Tue, 6 Jan 2026 16:02:45 +0100
+From: Marco Felsch <m.felsch@pengutronix.de>
+To: Frank Li <Frank.Li@nxp.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>,
+	"maintainer:MICROCHIP KSZ SERIES ETHERNET SWITCH DRIVER" <UNGLinuxDriver@microchip.com>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Petr Tesarik <ptesarik@suse.com>,
-	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Bartosz Golaszewski <brgl@kernel.org>, linux-doc@vger.kernel.org,
-	linux-crypto@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-scsi@vger.kernel.org, iommu@lists.linux.dev,
-	kvm@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 10/15] virtio_scsi: fix DMA cacheline issues for events
-Message-ID: <20260106095044-mutt-send-email-mst@kernel.org>
-References: <cover.1767601130.git.mst@redhat.com>
- <8801aeef7576a155299f19b6887682dd3a272aba.1767601130.git.mst@redhat.com>
- <20260105181939.GA59391@fedora>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Marek Vasut <marex@denx.de>,
+	"open list:MICROCHIP KSZ SERIES ETHERNET SWITCH DRIVER" <netdev@vger.kernel.org>,
+	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>, imx@lists.linux.dev,
+	shawnguo@kernel.org
+Subject: Re: [PATCH 1/1] dt-bindings: net: dsa: microchip: Make pinctrl
+ 'reset' optional
+Message-ID: <20260106150245.exhf5soqdjv7nkb7@pengutronix.de>
+References: <20260106143620.126212-1-Frank.Li@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -128,47 +70,76 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260105181939.GA59391@fedora>
+In-Reply-To: <20260106143620.126212-1-Frank.Li@nxp.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mfe@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, Jan 05, 2026 at 01:19:39PM -0500, Stefan Hajnoczi wrote:
-> On Mon, Jan 05, 2026 at 03:23:29AM -0500, Michael S. Tsirkin wrote:
-> > @@ -61,7 +62,7 @@ struct virtio_scsi_cmd {
-> >  
-> >  struct virtio_scsi_event_node {
-> >  	struct virtio_scsi *vscsi;
-> > -	struct virtio_scsi_event event;
-> > +	struct virtio_scsi_event *event;
-> >  	struct work_struct work;
-> >  };
-> >  
-> > @@ -89,6 +90,11 @@ struct virtio_scsi {
-> >  
-> >  	struct virtio_scsi_vq ctrl_vq;
-> >  	struct virtio_scsi_vq event_vq;
-> > +
-> > +	__dma_from_device_group_begin();
-> > +	struct virtio_scsi_event events[VIRTIO_SCSI_EVENT_LEN];
-> > +	__dma_from_device_group_end();
-> 
-> If the device emits two events in rapid succession, could the CPU see
-> stale data for the second event because it already holds the cache line
-> for reading the first event?
-> 
-> In other words, it's not obvious to me that the DMA warnings are indeed
-> spurious and should be silenced here.
-> 
-> It seems safer and simpler to align and pad the struct virtio_scsi_event
-> field in struct virtio_scsi_event_node rather than packing these structs
-> into a single array here they might share cache lines.
-> 
-> Stefan
+Hi Frank,
 
+thanks for fixing this.
 
+On 26-01-06, Frank Li wrote:
+> Commit e469b87e0fb0d ("dt-bindings: net: dsa: microchip: Add strap
+> description to set SPI mode") required both 'default' and 'reset' pinctrl
+> states for all compatible devices. However, this requirement should be only
+> applicable to KSZ8463.
+> 
+> Make the 'reset' pinctrl state optional for all other Microchip DSA
+> devices while keeping it mandatory for KSZ8463.
+> 
+> Fix below CHECK_DTBS warnings:
+>   arch/arm64/boot/dts/freescale/imx8mp-skov-basic.dtb: switch@5f (microchip,ksz9893): pinctrl-names: ['default'] is too short
+> 	from schema $id: http://devicetree.org/schemas/net/dsa/microchip,ksz.yaml#
+> 
 
-To add to what I wrote, that's a lot of overhead: 8 * 128 - about 1K on
-some platforms, and these happen to be low end ones.
+Fixes tag?
+
+> Signed-off-by: Frank Li <Frank.Li@nxp.com>
+> ---
+>  Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> index a8c8009414ae0..8d4a3a9a33fcc 100644
+> --- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> +++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> @@ -40,6 +40,7 @@ properties:
+>        - const: reset
+>          description:
+>            Used during reset for strap configuration.
+> +    minItems: 1
+
+Does this mean that all others can now either specify 'reset' or
+'default'? If yes, this seems wrong.
+
+Regards,
+  Marco
+
+>  
+>    reset-gpios:
+>      description:
+> @@ -153,6 +154,8 @@ allOf:
+>              const: microchip,ksz8463
+>      then:
+>        properties:
+> +        pinctrl-names:
+> +          minItems: 2
+>          straps-rxd-gpios:
+>            description:
+>              RXD0 and RXD1 pins, used to select SPI as bus interface.
+> -- 
+> 2.34.1
+> 
+> 
 
 -- 
-MST
+#gernperDu 
+#CallMeByMyFirstName
 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | https://www.pengutronix.de/ |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-9    |
 
