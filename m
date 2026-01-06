@@ -1,75 +1,77 @@
-Return-Path: <netdev+bounces-247250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED529CF645F
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 02:31:24 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CADACF6465
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 02:31:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 674AA3002154
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 01:31:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3F898303A954
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 01:31:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BDD51EF39E;
-	Tue,  6 Jan 2026 01:31:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8059272E56;
+	Tue,  6 Jan 2026 01:31:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CMGZkyea"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cizdRs/4"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1DD43B7A8
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 01:31:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16A1B1EF39E
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 01:31:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767663082; cv=none; b=f/VAM72NaH/HaS/4fPgNnPYMuSrjiG2kAxms99F4ppq7eLy174qb/fUJzPzMnPDUmNoMlj0o9+K0rXLwHsdRxPuKy8lfV/ZNbI/Q79T+xRXMoHIiJYV0qX5HCKqIN23mRLB1TGybLg56Y08i4fEyH/bF2NuYJSH8/p6fZbv8Ubo=
+	t=1767663086; cv=none; b=glcwbO6p9ifJ+3fr4I4wAWBWyoe+h4VfVK2agdKebOORoInyO/E0QizYDv9ekadm7Zx6PFt8vxvu6+7il4YRBjmviQTskjyTm5JUrxlrHdp8ITjakN/jhxDUwJbV6TsrspNVd0aSYFAQ7jjSAXf0xCTGhv+6Ay6fq55qRK2pjHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767663082; c=relaxed/simple;
-	bh=XXlo8TVy0D+U60r4gF9lesILAKXn+1/8h93MrVZGXnY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UchirzVLt791Yj9nojCRXHEmpTZplF7uWvvZRRPPwcmFhN9QEhz6eH8n0ILLXHVTa0Roaxf8St0MDQeJyG/fIFsTwcCEArukeNYoVp0jqfH3kUTa6e75ZYB7OvkzAAK2mrgGXCYD30NQ1hqZBknliNIXKjTFv4kMCCL3UM4q4xU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CMGZkyea; arc=none smtp.client-ip=209.85.216.49
+	s=arc-20240116; t=1767663086; c=relaxed/simple;
+	bh=iFOjWoPhxg3t7eBaMyFBLT+tXL3mjtPxiiafXceNxzE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=iBv/iVLig7K9g0wcwVHKyctSTVkE3ydM0BdIvHsLWVfN0CL8N8Cr4DxplOQ174Ng06oxSWWsvInMuK0NdgCgWMmaV+FYSEb53DBgbciFCwdMuo/aq50hDkSoIpuDiK9lSDXQ7cW587ZDT4mEA+MzjUiVwW1o6JmUVOaLvE7LSFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cizdRs/4; arc=none smtp.client-ip=209.85.216.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-34c1d84781bso514822a91.2
-        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 17:31:20 -0800 (PST)
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-34b75f7a134so488632a91.0
+        for <netdev@vger.kernel.org>; Mon, 05 Jan 2026 17:31:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767663080; x=1768267880; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=z4YAEli/oXuIfYQ/ot1/+zoBf8JMyj/sAgBytJYu+9E=;
-        b=CMGZkyeaUsHn372umWB6yy27yP7RoJipgdK7GBAoS0HGc76M+1KaFFSyyd4yaWEiV4
-         EqO/3zuFRNiQz5zUZ6nIpT6sfVh6zlVXQ76uslX+qQQeT0KSnFhwXRGQINfw7kSdZlMY
-         iDeDRt+rC/GHG9LdOtM1GVvNWyWqUFAGlfO1A2Gae6/d41rUgd3gDfORG1B2z4/5rn0i
-         64sh+hOqJjdqeURSU9loUJlZVFRDuoo8e+rrbZ7hOVhBGSpg6zDvODyElPhGSEgRE4iU
-         SZJEqZB8GAN6+VMiEwblx2rjFF6tStu6MZE/fK3+oO8KON6lmQY7BPnA3Qfb1KE7ifMF
-         Jwhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767663080; x=1768267880;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1767663084; x=1768267884; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=z4YAEli/oXuIfYQ/ot1/+zoBf8JMyj/sAgBytJYu+9E=;
-        b=TesULlLJA6ojLWM141HC87yBmrTJ3JxE+8dns5XeCCdaStcpSjJCFUteycnQj0OvAd
-         SuSdlbfQL1+pFPbJM3a+GWHTK26eybMCb8bjvE/2zlcFhiGB7UiMc334qXnqy4f08Pav
-         /SS14VMoeamvwvC3H6utF2wzY2QOxlQU8aaJRcVg2t+BA8t6IKcJLmCDGiw3tsc8JFCI
-         B5KhcrfM3GD4G1TJhfqgsqhedmaJOjb74HmO5ggt9RKy9MdhDg9hadbFceM8CuvbX6Zl
-         i9EEISFObZaIZSBaQSY1TR04jArPgrLeNGJRJbcx7fENrZpOl7uRihXVZF1xhD1MTl4x
-         Y1mQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUhfAjouYziHBo0/0q+JlU8aTwe+EKVmIyOmTuUkRMQzWCCQN2+vqPU5wk4dAAZeodExggUExw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpqYUo+8SRJvZe5o+cVznE8i1AW6Bz9qOT5toNC3haeyf+FAOu
-	DMJAUd6EsENFoFW6luy7HS8Jb78yjvkEtaYLiBxqP8AaqM7Fl/DiJNglNetjT5w5MV865g==
-X-Gm-Gg: AY/fxX7CQezJTvPgdyBRGzqBJgK7OuPTjhswIxd4lUZCXkqXLoZXuGHZB1r661JGghk
-	GjVxA1oIbXpJ5DX+UihFmnQIPVPMhJsp2IWGZYjgNdlNSnM9o+kkZO+i5j7vuwkGlv+9eDvOFhd
-	/lLQXZFrWQmg6OqD1XmrnN8c37ooGS5siSIMUzmUUrNoo9FPF54YZUyfKLVwOqdyifq7nKlvYUV
-	Mj4bS2UA7j0kbaxbjMK4wXQ0evyPJDXt3LK6G4tlxSDDeyk0XRDYUEvX55ICKS37FwJybjJSugV
-	J85bX2RykRDCNlfOdnGSTi2c0yGLcYtjojvc9QSjupTZbEdO8jrARfol4AyGhdu32PVR1sX3oVb
-	GGzuCi/POvrIK3Li7+zojeeLyxx55gr346zyTJK1DF0UD1najz48etVUVBtCoGOHw7FkBdzyKde
-	TqCIpd72gQzL3QPe0XUiqFhZpP8dJaymxnf8HpqONXI9YNqrj9Tf7RxCMm7xptZW1EOhw2
-X-Google-Smtp-Source: AGHT+IFFA/XN6UYnjtPDWZslaUtRHocpcB7HSI1R42TMlNz90/QyWyaCta2RK9pzyj2DIYG/Su5bMQ==
-X-Received: by 2002:a17:90a:c890:b0:340:bb51:17eb with SMTP id 98e67ed59e1d1-34f5f287947mr1004850a91.15.1767663080086;
-        Mon, 05 Jan 2026 17:31:20 -0800 (PST)
+        bh=36dhxZqhoIQQhhEMrHz1gupE6TH8vQ91Ce45pP+oIbU=;
+        b=cizdRs/4iMXJM0qhCIRftpm6RvSPGVCE667I5lpyfe3UtY14krYdfxM4BnjBvUYu+N
+         DdfmsKgCoBn2Y4xkp1ZDYOzAvd4UlIRt+13ooqCxkDMJAmry1kxFn/LGCVyjpDGmQCk3
+         9/2JWRc14m/Nj7J0CZxEDCJcOcNqUt0s6pml+zQ8iLDN8nrq4h5XOWOzVm95i/iBDDkz
+         5my8zvoHJhe8Ma6uXzD/WhFTdH8l4e+4/324YRP3DGxpwQSuUErRrqO4wodL5JbCoiAb
+         Sxk3yJ52NYLfS08cT9+hpyWPOXdUYGZY7OMmIh+PinQqyyfBbDqTg75jjWF638PL0elO
+         ZTTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767663084; x=1768267884;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=36dhxZqhoIQQhhEMrHz1gupE6TH8vQ91Ce45pP+oIbU=;
+        b=NLHh83jHPrNkZnlo0gdECdcpihLZQzgZEpHpuach18GdeFYLJz04sBGpgo89Wtux/J
+         f0LmQnvmdnlqNnBI6LafyjDiRJ7EO6BR+97T0+vCWu/F212osRBNpne3fpp//PsgaDHN
+         yhCv3aof+chV6+WvpL4O+8671qIf9pZ9FUNi+mvr5oJ1Zq6OLinuB0sBKss0f/pQRH0f
+         G3tfF0dVagi0IAznBqk9iyUy/ubxrBe1a94mcXdOOs7bbkcffTQPnPl7RF7ncgR//6nZ
+         jiZu1edzg0Tboc0+whT8thAkwJKyQyyXjR7UcXobDu0J2ZS4NAFTZkMl4FyBel5/CCH5
+         5A2w==
+X-Forwarded-Encrypted: i=1; AJvYcCUdzXPmr5chlaq8P0GXFUb6evtFFaG6LFYL10bHy3Gt7qz7OGtIJnd7xOoSRF9L956Llfu14qM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRfV6k6C1UEnIX8p98+VYalIiqcvAn8uDZbdy3UtFetfEbpjAu
+	x6qK3NmWHbrnEIgS5sLGdd5ldYMhUx9TR7WHk40i16LhcjlniIGlbKfr
+X-Gm-Gg: AY/fxX4dXlKySYymhv/Hw7Sn0aQgzK6JJGl3g4EQdxaKCiJ/t1wHRj+P56Y9EQbUWJb
+	K34G90F1VC33wR2V57sPH18gg2T+ljwglVSQG71BtzOWgC2KQRE5HWArAHgbnD0pFryHldA3VXa
+	p7Y5NhvqpWm3ZbPzBc17NtyzELuLwTUBWNoTY/Lb28SkxgfJbjfNLX0/rfRM0lhf+WM9L6ZAaNS
+	uPe0Wl5Vosh65jyyeUxqfmDG8H2w1/p880N3sTZ2EFZLjjkVFsSapF7Hr1rTBzqXO+q1TxIGaEp
+	rzYHnfgAnGvAJrpVKcw5rQ39ENxspg+hNK7vGuT38hIkg64+7H3Wz4efV3XLEuhUy+Wmr2rdOU/
+	8TlZVQFqYCaTweVfp9rwnZK6SQAhzPfCs9KvC89kLWYHsoREw7RoSF0bEPKXJOhXwHB5MOs/8aD
+	ic9W/3I75fLkPEM26WkelnmZ0AwuU8fuBT3QptIKNfybMzwlKzaTqMXGYqvw==
+X-Google-Smtp-Source: AGHT+IErBTNSHUDX0zHCfa/WUUuMGzglARLgnRlxXuYU2Hb7tlAOlT4KteEsa05VTV0DkrnjSf9tHw==
+X-Received: by 2002:a17:90b:33cf:b0:340:bc27:97bd with SMTP id 98e67ed59e1d1-34f5f280ebbmr949225a91.9.1767663084319;
+        Mon, 05 Jan 2026 17:31:24 -0800 (PST)
 Received: from KERNELXING-MB0.tencent.com ([43.132.141.25])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34f5fa947ecsm544110a91.6.2026.01.05.17.31.16
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34f5fa947ecsm544110a91.6.2026.01.05.17.31.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 17:31:19 -0800 (PST)
+        Mon, 05 Jan 2026 17:31:23 -0800 (PST)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -87,10 +89,12 @@ To: davem@davemloft.net,
 Cc: bpf@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH bpf-next v4 0/2] xsk: introduce pre-allocated memory per xsk CQ
-Date: Tue,  6 Jan 2026 09:31:10 +0800
-Message-Id: <20260106013112.56250-1-kerneljasonxing@gmail.com>
+Subject: [PATCH bpf-next v4 1/2] xsk: introduce local_cq for each af_xdp socket
+Date: Tue,  6 Jan 2026 09:31:11 +0800
+Message-Id: <20260106013112.56250-2-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20260106013112.56250-1-kerneljasonxing@gmail.com>
+References: <20260106013112.56250-1-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,37 +105,147 @@ Content-Transfer-Encoding: 8bit
 
 From: Jason Xing <kernelxing@tencent.com>
 
-This series was made based on the previous work[1] to fix the issue
-without causing too much performance impact through adding a
-pre-allocated memory for each xsk.
+This is a prep that will be used to store the addr(s) of descriptors so
+that each skb going to the end of life can publish corresponding addr(s)
+in its completion queue that can be read by userspace.
 
-[1]: commit 30f241fcf52a ("xsk: Fix immature cq descriptor production")
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
-v4
-link: https://lore.kernel.org/all/CAL+tcoB6eCogZXXxDQ58nxp-VxWFOPR2DP4pyLVxGtjXdWPQXA@mail.gmail.com/
-1. use u64 addr in xsk_cq_write_addr()
+ include/net/xdp_sock.h |  8 +++++++
+ net/xdp/xsk.c          | 54 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 62 insertions(+)
 
-v3
-link: https://lore.kernel.org/all/20251216052623.2697-1-kerneljasonxing@gmail.com/
-1. fix double free of lcq in xsk_clear_local_cq()
-2. keep lcq->prod align with cq->cached_prod, which can be found in
-xsk_cq_cancel_locked().
-3. move xsk_clear_local_cq() from xsk_release() to xsk_destruct() to
-avoid crash when using lcq in xsk_destruct_skb() after lcq is already freed.
-
-v2
-link: https://lore.kernel.org/all/20251209085950.96231-1-kerneljasonxing@gmail.com/
-1. add if condition to test if cq is NULL
-2. initialize the prod of local_cq
-
-Jason Xing (2):
-  xsk: introduce local_cq for each af_xdp socket
-  xsk: introduce a dedicated local completion queue for each xsk
-
- include/net/xdp_sock.h |   8 ++
- net/xdp/xsk.c          | 223 +++++++++++++++++++++--------------------
- 2 files changed, 123 insertions(+), 108 deletions(-)
-
+diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
+index 23e8861e8b25..c53ab2609d8c 100644
+--- a/include/net/xdp_sock.h
++++ b/include/net/xdp_sock.h
+@@ -45,6 +45,12 @@ struct xsk_map {
+ 	struct xdp_sock __rcu *xsk_map[];
+ };
+ 
++struct local_cq {
++	u32 prod ____cacheline_aligned_in_smp;
++	u32 ring_mask ____cacheline_aligned_in_smp;
++	u64 desc[] ____cacheline_aligned_in_smp;
++};
++
+ struct xdp_sock {
+ 	/* struct sock must be the first member of struct xdp_sock */
+ 	struct sock sk;
+@@ -89,6 +95,8 @@ struct xdp_sock {
+ 	struct mutex mutex;
+ 	struct xsk_queue *fq_tmp; /* Only as tmp storage before bind */
+ 	struct xsk_queue *cq_tmp; /* Only as tmp storage before bind */
++	/* Maintain addr(s) of descriptors locally */
++	struct local_cq *lcq;
+ };
+ 
+ /*
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index f093c3453f64..f41e0b480aa4 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -1212,6 +1212,34 @@ static void xsk_delete_from_maps(struct xdp_sock *xs)
+ 	}
+ }
+ 
++/* Initialize local compeletion queue for each xsk */
++static int xsk_init_local_cq(struct xdp_sock *xs)
++{
++	struct xsk_queue *cq = xs->pool->cq;
++	size_t size;
++
++	if (!cq || !cq->nentries)
++		return -EINVAL;
++
++	size = struct_size_t(struct local_cq, desc, cq->nentries);
++	xs->lcq = vmalloc(size);
++	if (!xs->lcq)
++		return -ENOMEM;
++	xs->lcq->ring_mask = cq->nentries - 1;
++	xs->lcq->prod = 0;
++
++	return 0;
++}
++
++static void xsk_clear_local_cq(struct xdp_sock *xs)
++{
++	if (!xs->lcq)
++		return;
++
++	vfree(xs->lcq);
++	xs->lcq = NULL;
++}
++
+ static int xsk_release(struct socket *sock)
+ {
+ 	struct sock *sk = sock->sk;
+@@ -1360,9 +1388,18 @@ static int xsk_bind(struct socket *sock, struct sockaddr_unsized *addr, int addr
+ 				goto out_unlock;
+ 			}
+ 
++			err = xsk_init_local_cq(xs);
++			if (err) {
++				xp_destroy(xs->pool);
++				xs->pool = NULL;
++				sockfd_put(sock);
++				goto out_unlock;
++			}
++
+ 			err = xp_assign_dev_shared(xs->pool, umem_xs, dev,
+ 						   qid);
+ 			if (err) {
++				xsk_clear_local_cq(xs);
+ 				xp_destroy(xs->pool);
+ 				xs->pool = NULL;
+ 				sockfd_put(sock);
+@@ -1380,6 +1417,13 @@ static int xsk_bind(struct socket *sock, struct sockaddr_unsized *addr, int addr
+ 			xp_get_pool(umem_xs->pool);
+ 			xs->pool = umem_xs->pool;
+ 
++			err = xsk_init_local_cq(xs);
++			if (err) {
++				xp_put_pool(xs->pool);
++				xs->pool = NULL;
++				sockfd_put(sock);
++				goto out_unlock;
++			}
+ 			/* If underlying shared umem was created without Tx
+ 			 * ring, allocate Tx descs array that Tx batching API
+ 			 * utilizes
+@@ -1387,6 +1431,7 @@ static int xsk_bind(struct socket *sock, struct sockaddr_unsized *addr, int addr
+ 			if (xs->tx && !xs->pool->tx_descs) {
+ 				err = xp_alloc_tx_descs(xs->pool, xs);
+ 				if (err) {
++					xsk_clear_local_cq(xs);
+ 					xp_put_pool(xs->pool);
+ 					xs->pool = NULL;
+ 					sockfd_put(sock);
+@@ -1409,8 +1454,16 @@ static int xsk_bind(struct socket *sock, struct sockaddr_unsized *addr, int addr
+ 			goto out_unlock;
+ 		}
+ 
++		err = xsk_init_local_cq(xs);
++		if (err) {
++			xp_destroy(xs->pool);
++			xs->pool = NULL;
++			goto out_unlock;
++		}
++
+ 		err = xp_assign_dev(xs->pool, dev, qid, flags);
+ 		if (err) {
++			xsk_clear_local_cq(xs);
+ 			xp_destroy(xs->pool);
+ 			xs->pool = NULL;
+ 			goto out_unlock;
+@@ -1836,6 +1889,7 @@ static void xsk_destruct(struct sock *sk)
+ 	if (!sock_flag(sk, SOCK_DEAD))
+ 		return;
+ 
++	xsk_clear_local_cq(xs);
+ 	if (!xp_put_pool(xs->pool))
+ 		xdp_put_umem(xs->umem, !xs->pool);
+ }
 -- 
 2.41.3
 
