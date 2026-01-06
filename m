@@ -1,182 +1,164 @@
-Return-Path: <netdev+bounces-247478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC126CFB196
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 22:37:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E6381CFB1DB
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 22:42:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1B74330402E1
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 21:33:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E91E83017EF8
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 21:40:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 703763019C5;
-	Tue,  6 Jan 2026 21:33:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11FD52EC096;
+	Tue,  6 Jan 2026 21:40:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OgwSTlDc"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="n2rJarLz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3FE2FFF8C
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 21:33:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D60942C11C9;
+	Tue,  6 Jan 2026 21:40:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767735199; cv=none; b=Nx+fzgQ1yy86G/bfiLaxwfDOnR3pdaQZrngZsjYlJpz7Palr1BMQyWonG2OKYET1DcnTpdeV4e5H0BaXepybbeRLDPfJfW+LAWJdDHtcRgsZObvdOBl6401oqY/5FQi9jdkRe2yTIyrqiKKeEWE6Hh9GwAVO5nuOlw1JOxG8M1k=
+	t=1767735653; cv=none; b=HvQo8vi4ti9CADf39CaD+zDOs8hRvi5llCGJ0sqjoyvVNhE7W7Y9dJZjWlNH7qOXb0pAaW7hZBrRQS26T9iZ0Y7girrckXjJEcG6uMKaLeX7EgJ302w42tdAyvEixZ2UN1PeE9vnzSoPasmSsF9aUrrvSgUeIJ/J/535neF8Mk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767735199; c=relaxed/simple;
-	bh=7LLO7u3QjBG9Js7UME2/gC0/IEcEAOaQyBbMSBiKJjc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BT7ya+JipIgqWzCDEbGjrlVNm9SHe1jU3CLv16TmVz3pGG9YAbtgVBh/cxgG1clC80oGJpfSK9aR8xa1QY0cRKhfdjcMFdqwwkrFRot0oQhOuiNXqM9aUc2TIDEXwJaCdjJdQuf/gHsaqnXB5lCytN3bD1roJoUhHXK0fNA18Ts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OgwSTlDc; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4ed82ee9e57so17120361cf.0
-        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 13:33:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767735197; x=1768339997; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CKIpeFM/k2sxjcrVvzAGm+2cor55rMuO3jvU5ytT7JA=;
-        b=OgwSTlDcUc4xJ88hgJXtq++89hBV9RvhACACg4KPgLkYnMq7YShPn5/WoXKuBzve2H
-         t+X9EnNqssZRhF/XryTtyCnNMXXc+afjPDuV67QSPmjAQ8XcYK3hJW8f9h2HeMmBO46/
-         yZPyoQqPps5w+/vpAtSrZsJJozyUFE4erjSfb4yrSjybxs3s0yZC6lIDTiW7AwQVWoN4
-         QcKcm1uIkgaaoPeQuy4UbaLzlNZ5MeYCxsoa6BojKJePu3DVRboHXrgvWWuVoycuwkla
-         Q411vK2agxEfBWlle1vNyT63ATehMRYPye2QNtGnV85u9TEllY8SbgbT0shV9ApF5EVr
-         KPcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767735197; x=1768339997;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=CKIpeFM/k2sxjcrVvzAGm+2cor55rMuO3jvU5ytT7JA=;
-        b=dyVAxeQdJOIUts/sO3KpFjEgNSVQ7pm/+o8n1WnHdz97sFey/zRQdse4+oubNZrnu3
-         jlnoMJLCdgCY2RT8V7AafEQVhZoBQLaFmgESLmbfB6kUDDugvCkF9jEIv5U1k5AoYb+w
-         Yt+4UQ9LSm2bfvGIO8WkKV+f6N/6chS4N4jKw5zwpaCSAEEAM5NMfudkH0vG7Klw4isT
-         dweleL/jcSLTepKk07Ml0sg+63uyULLt7oEJy5Ft6bWdppx7x/LdrkrLFHJo3n1cq9tl
-         i2Qb3Akrbhj/SMpJSNiSEnAtgHkPnLLeo20xtoMrj4gz/GFCddu0qvYBDsTfrojJJmPu
-         GWmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUQYOQDq7d6WvmLCmMF/7xMo38X0JLbVbKIP7yDb0Bx4w+mDSQU/t+RbbEv0qzEZ9v6aoJ+ouI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtfDSKPoxrX72XyU6L4sGebgZI3Fd3BueQAUTDTtURxGhT5F05
-	kQ6Qq2TF74Uy8AHeqHimyQLjqRRd0L2a2fwpfAHaUyW2wOGDs4OZvhVut1qPhG83/nsQg3PFrGu
-	a1yudvLeJucozprh1g4aA+90wJoooI/P/SFvB5N9C
-X-Gm-Gg: AY/fxX5bLU1x/xQ87JVFuIqSnQ/1VoY/Mu/PAj1BoOyST5JNPzd70KO1vVIEkV1ttlC
-	vnAlTsx9XZSqea25y2r9SU4AMAmd+6+WuSsSN4QMYX2idOH/PlNhJc9SLKaYb+PF897C8G62K86
-	UFaKFBdPaQt6UCa/FPXyC6qWzE0xred5hZL1L9KUz749dOJV2SRxCNn8w7tRj9qBqrba/9z1NA/
-	E1CxBTu6ggNf2KALMA/Joo9nRE/rvZVXdaeSfKJcbgAvPKf2LwP6lGylQoDMVXVoA09CS8=
-X-Google-Smtp-Source: AGHT+IHOc7B5Sd4TiX6lGKWl1pO1JiY0feHNZ4dJfN2UaqxRVHlBy/ogmX5pfTne+WRxZExvZMcq1zX1PLDHq3FAtPs=
-X-Received: by 2002:a05:622a:155:b0:4f1:bd73:ac6f with SMTP id
- d75a77b69052e-4ffb4a1d354mr5443281cf.74.1767735196415; Tue, 06 Jan 2026
- 13:33:16 -0800 (PST)
+	s=arc-20240116; t=1767735653; c=relaxed/simple;
+	bh=lt3ESn2LiHLMfhrKCphnHt3guZ9CwHi/PiRANsNm2Uo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nDnSGd3rpqz20PU9oEG+P9HR0vCEahGaTdGWvTNQcXbtImmvHlm3cq0cOtadO4CWdw55AfxTMstfYENSY0utcF3FULnDdSHsj6Tt9qz9klw3dEmR4k61Sfy1wFrVWKxBH7tyTGrMaShmS1ShdGDGlgGU7b4Oqnl5awfGkZiW1dM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=n2rJarLz; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1767735647;
+	bh=RgHPzQzSosAry1NZJDik9UsLNQ8sKedCtJPnPYXavI8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=n2rJarLzpSrDXVzAj6XFnTp96BghFEIcE0jbIwxXYXfWmqJHDwRAQvK+XjIgW32wz
+	 70KSA3uSe/XRfDUEfw+cm6wT7Rd/HI380hh+14Zmd4m6uSnxPXQ5lyk+c+Ld3sI7hT
+	 BYJAJEdk8AvcjbCzRkU6psU0wgNQprfI9DBMBnmnKTk/3RqcAXr3H0iW1pvJ+A8xUM
+	 9H/czwiezFtrCPi8LMN167LcEmfmUEm6f7qiwmIz6coTese99RwWSMAvylOMvhdzGp
+	 dRE/mc3hzUU+MAD04OHDaq43bxtNKGRWSOmEJZ/7ghsopy/OuKenCX3hGvvKOH78m1
+	 JCbh+LnKz2gXA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4dm4NF7334z4wGx;
+	Wed, 07 Jan 2026 08:40:45 +1100 (AEDT)
+Date: Wed, 7 Jan 2026 08:40:45 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Roman Gushchin <roman.gushchin@linux.dev>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Daniel Borkmann
+ <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, Andrii
+ Nakryiko <andrii@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
+ bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Chen Ridong
+ <chenridong@huawei.com>, JP Kobryn <inwardvessel@gmail.com>, Linux Kernel
+ Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: Re: linux-next: manual merge of the bpf-next tree with the
+ mm-unstable tree
+Message-ID: <20260107084045.6cf12b2b@canb.auug.org.au>
+In-Reply-To: <87tswz74jb.fsf@linux.dev>
+References: <20260105130413.273ee0ee@canb.auug.org.au>
+	<CAADnVQKkphWpwKE17bGQao36dH8xqCyV-iXDcagrO7s-VOPE-w@mail.gmail.com>
+	<87tswz74jb.fsf@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260106144529.1424886-1-edumazet@google.com> <20260106095648.07a870f1@kernel.org>
- <CANn89iJnXg892OU13PeJMGvBKw90fJdqDaAmJ867Rptsm0zgNA@mail.gmail.com>
- <20260106123151.03a984bb@kernel.org> <CANn89iL_Sa_ez340w2eyM_rfCnOH-UV9-zo1sYv65_hdQ-_W6g@mail.gmail.com>
-In-Reply-To: <CANn89iL_Sa_ez340w2eyM_rfCnOH-UV9-zo1sYv65_hdQ-_W6g@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 6 Jan 2026 22:33:05 +0100
-X-Gm-Features: AQt7F2rCltBFuuzSlrBFxlJJwtt1oYxUI838c0oENf0aJKORLyuZWmah8kZ1gwU
-Message-ID: <CANn89iKVaigLaffUqXE+UX+Tr88apSa1Ciavi1rLr+G3sMzkLw@mail.gmail.com>
-Subject: Re: [PATCH v2 net] ip6_gre: use skb_vlan_inet_prepare() instead of pskb_inet_may_pull()
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, syzbot+6023ea32e206eef7920a@syzkaller.appspotmail.com, 
-	Mazin Al Haddad <mazin@getstate.dev>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/uGLsXwKcDd4kwp+aLuz4vFb";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/uGLsXwKcDd4kwp+aLuz4vFb
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 6, 2026 at 10:25=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Tue, Jan 6, 2026 at 9:31=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
-> >
-> > On Tue, 6 Jan 2026 20:33:40 +0100 Eric Dumazet wrote:
-> > > For some reason I am unable to run this test from a virtme-ng instanc=
-e.
-> > >
-> > > I guess I wlll not make a new version of this patch, maybe Florian ca=
-n
-> > > take over.
-> >
-> > Hm, no complications seen here:
-> >
-> > $ vng -r --user root
-> > ..
-> > prompt# cd tools/testing/selftests/net/
-> > prompt# ./gre_gso.sh
-> >
-> >     TEST: GREv6/v4 - copy file w/ TSO                                  =
- [ OK ]
-> >     TEST: GREv6/v4 - copy file w/ GSO                                  =
- [ OK ]
-> > 2026/01/06 15:30:35 socat[1704] W exiting on signal 15
-> >     TEST: GREv6/v6 - copy file w/ TSO                                  =
- [ OK ]
-> >     TEST: GREv6/v6 - copy file w/ GSO                                  =
- [ OK ]
-> > 2026/01/06 15:30:35 socat[1721] W exiting on signal 15
-> >
-> > Tests passed:   4
-> > Tests failed:   0
-> >
-> >
-> > Happy to give you access to the netdev machine to experiment there
-> > if that helps, just send me an SSH key.
->
-> My vng launch script had the -v option ( --verbose, -v   Increase
-> console output verbosity), and this was causing issues.
->
->
-> Anyway, using my v2 patch on top of current net-tree
-> (238e03d0466239410) seems fine to me, no error at all,
-> not sure why your bot is unhappy.
->
-> Could multiple patches have been tested together, one having a side effec=
-t ?
->
-> [hi on] edumazet@edumazet1:~/git/net-next$ vng  -r --user root --cpus
-> 4 --memory 4G
-> /usr/lib/tmpfiles.d/legacy.conf:14: Duplicate line for path
-> "/run/lock", ignoring.
->           _      _
->    __   _(_)_ __| |_ _ __ ___   ___       _ __   __ _
->    \ \ / / |  __| __|  _   _ \ / _ \_____|  _ \ / _  |
->     \ V /| | |  | |_| | | | | |  __/_____| | | | (_| |
->      \_/ |_|_|   \__|_| |_| |_|\___|     |_| |_|\__  |
->                                                 |___/
->    kernel version: 6.16.12-1rodete2-amd64 x86_64
->    (CTRL+d to exit)
->
-> Illegal instruction        shell-history-configtool configure-interactive=
-ly
-> root@virtme-ng:/usr/local/google/home/edumazet/git/net-next# cd
-> tools/testing/selftests/net/
-> root@virtme-ng:/usr/local/google/home/edumazet/git/net-next/tools/testing=
-/selftests/net#
-> ./gre_gso.sh
->     TEST: GREv6/v4 - copy file w/ TSO                                   [=
- OK ]
->     TEST: GREv6/v4 - copy file w/ GSO                                   [=
- OK ]
-> 2026/01/06 21:25:27 socat[1214] W exiting on signal 15
->     TEST: GREv6/v6 - copy file w/ TSO                                   [=
- OK ]
->     TEST: GREv6/v6 - copy file w/ GSO                                   [=
- OK ]
-> 2026/01/06 21:25:27 socat[1229] W exiting on signal 15
->
-> Tests passed:   4
-> Tests failed:   0
-> root@virtme-ng:/usr/local/google/home/edumazet/git/net-next/tools/testing=
-/selftests/net#
+Hi all,
 
-Ah of course my script had '-r arch/x86/boot/bzImage'
+On Mon, 05 Jan 2026 20:23:36 -0800 Roman Gushchin <roman.gushchin@linux.dev=
+> wrote:
+>
+> Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
+>=20
+> > On Sun, Jan 4, 2026 at 6:04=E2=80=AFPM Stephen Rothwell <sfr@canb.auug.=
+org.au> wrote: =20
+> >>
+> >> Today's linux-next merge of the bpf-next tree got a semantic conflict =
+in:
+> >>
+> >>   include/linux/memcontrol.h
+> >>   mm/memcontrol-v1.c
+> >>   mm/memcontrol.c
+> >>
+> >> between commit:
+> >>
+> >>   eb557e10dcac ("memcg: move mem_cgroup_usage memcontrol-v1.c")
+> >>
+> >> from the mm-unstable tree and commit:
+> >>
+> >>   99430ab8b804 ("mm: introduce BPF kfuncs to access memcg statistics a=
+nd events")
+> >>
+> >> from the bpf-next tree producing this build failure:
+> >>
+> >> mm/memcontrol-v1.c:430:22: error: static declaration of 'mem_cgroup_us=
+age' follows non-static declaration
+> >>   430 | static unsigned long mem_cgroup_usage(struct mem_cgroup *memcg=
+, bool swap)
+> >>       |                      ^~~~~~~~~~~~~~~~
+> >> In file included from mm/memcontrol-v1.c:3:
+> >> include/linux/memcontrol.h:953:15: note: previous declaration of
+> >> 'mem_cgroup_usage' with type 'long unsigned int(struct mem_cgroup *,
+> >> bool)' {aka 'long unsigned int(struct mem_cgroup *, _Bool)'}
+> >>   953 | unsigned long mem_cgroup_usage(struct mem_cgroup *memcg, bool =
+swap);
+> >>       |               ^~~~~~~~~~~~~~~~
+> >>
+> >> I fixed it up (I reverted the mm-unstable tree commit) and can carry t=
+he
+> >> fix as necessary. This is now fixed as far as linux-next is concerned,
+> >> but any non trivial conflicts should be mentioned to your upstream
+> >> maintainer when your tree is submitted for merging.  You may also want
+> >> to consider cooperating with the maintainer of the conflicting tree to
+> >> minimise any particularly complex conflicts. =20
+> >
+> > what's the proper fix here?
+> >
+> > Roman,
+> >
+> > looks like adding mem_cgroup_usage() to include/linux/memcontrol.h
+> > wasn't really necessary, since kfuncs don't use it anyway?
+> > Should we just remove that line in bpf-next? =20
+>=20
+> Yep. It was used in the previous version, but not in the latest one.
+>=20
+> Just sent an official fix.
 
-I will test more tomorrow.
+And with that now applied to the bpf-next tree, I will no longer revert
+the mm-unstable commit.
+
+Thanks.
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/uGLsXwKcDd4kwp+aLuz4vFb
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmldgV0ACgkQAVBC80lX
+0GxRVQf/Twa1J9FzjynS32iiUyX/z7YDLzpmdyTCVv/CsN2Reex55MtPNiyuqeO7
+bPTSWe4QsCKjuNXm313TDf9PDsXBZYwuaAFXKWFWkNR/six3xlPt3NVzUu++fXY1
+EDaGrA/rI86C6X1pC0Y5GUnacX+NeRz3Qpa7hZe8MIKFXfkye89732g2IKQwDB77
+XLLjWaAA1oWqIliP8Y2zg12giBx7MAib0Cfvkb/mf5uOQL2VWuBtgzCkSU+5jdQl
+z8+cIGyhX2mF/15IVrE+G9YZiq6Mjk6/xDFJthYz1yAJjutHiSmuqFvrjpHk1NI5
+dV7yI/yDwwdZtCRx/wEykSsK7CGuSw==
+=wvNN
+-----END PGP SIGNATURE-----
+
+--Sig_/uGLsXwKcDd4kwp+aLuz4vFb--
 
