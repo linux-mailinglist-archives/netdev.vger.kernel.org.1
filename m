@@ -1,73 +1,95 @@
-Return-Path: <netdev+bounces-247494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 488BCCFB4E2
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 23:58:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ECA1CFB4F3
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 00:00:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 642433038333
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 22:58:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8D632301E179
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 22:59:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FB7B2E718F;
-	Tue,  6 Jan 2026 22:58:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E0352F4A15;
+	Tue,  6 Jan 2026 22:59:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tUiT7U1J"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Z4wmsdPY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7126341C63;
-	Tue,  6 Jan 2026 22:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 301812D8391;
+	Tue,  6 Jan 2026 22:59:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767740304; cv=none; b=QZNFaydRvI0rskJkbfy7vXORcPMGPyYTnWr3uhRhJh8LI7A8es4FKOO8Ay02eKBA9PYQTF4k4uA6KURgYFmFUcJoS4HjDBt6jRHMypkIq6udQ+eUTs830sLtDhg92cjeSXtjXiouCvM4ebAxGf/1a/JekqV78YKrJWoW0ukZWeM=
+	t=1767740392; cv=none; b=uqPcxpzWjuF65HSwCmQ0VOGy1r6D6+6Uv+QYa8UwXwWPUxX37RzaOhjs+/bpgXFKZW2xxV3IzLppfPozqaUS/1o5xb0lOC9UalEqjickA1eGsNrtiTp3ojO4Hjj74zHrP1TRRu+r3elKdLD8qoxvYCOYke6PXXaiy4dZOWNJnQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767740304; c=relaxed/simple;
-	bh=Eqzf3y9jgNy6E/dgJ3LKlxzK/khxC21x5RUGmdWptBs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ih/W73p9Vx+5CPFncBRABVSFYvX7uuP0q+6Ou61dFM/FTfDId1APJ4K2gxugIHZ8T/6tYE3fcwTGA2sQxzhX6nsCUJNq+uotNLUNfG/d87kURrJcnqS1YqR/+wDEwlLAmnZqpIfjjCpJ2GPJbSUWx2V3FAcK5t273l1PSSGEN/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tUiT7U1J; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA179C116C6;
-	Tue,  6 Jan 2026 22:58:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767740304;
-	bh=Eqzf3y9jgNy6E/dgJ3LKlxzK/khxC21x5RUGmdWptBs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tUiT7U1J3Ok0cVOkwRz8L47URpzh2t63VU/O8iMuf4Bisgc6zFi1dUcm+9qVpthv1
-	 9xrtlfcEp5jIHDwy/upiGfN5lEEIURWu6L3d+A2UiSzRuNaDHNTjpaPmwS6wu2Iv3D
-	 yhxTkMtRQAqs8PoeY7WLuRqqadx6kQqOe+YvfGn/89O66Yv/3884+7gbQNzWkzvrn5
-	 j9n7VYfVXOUPGbgZR7ibLZLEcxsZPEh1G7DcUO6hW55SsL77f8JUQZ4zRcVSgIJg1s
-	 9cVzLHmwKTtxxYtDXBXKUF9mWrNOPxDpeMddWrgGIYfBddarqgeQbyjJaya7uM6mf6
-	 7IR3x2hg0nXlA==
-Date: Tue, 6 Jan 2026 14:58:22 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Xu Du <xudu@redhat.com>, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4 0/8] selftest: Extend tun/virtio coverage
- for GSO over UDP tunnel
-Message-ID: <20260106145822.3cd9b317@kernel.org>
-In-Reply-To: <willemdebruijn.kernel.3ae0df5f36144@gmail.com>
-References: <cover.1767597114.git.xudu@redhat.com>
-	<willemdebruijn.kernel.3ae0df5f36144@gmail.com>
+	s=arc-20240116; t=1767740392; c=relaxed/simple;
+	bh=U1H58QHhYdfGZ/Cu86pwVcLw4VPdnqlWJEDMxCAsft4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OLsP27luQ/1ZeoTpufNTJSPfIfG5lXaYxBeciaOAInh0RKixdxs6v4XwCOHzjfG2sqnVLwblXG7D9JLJps4xTFZSiRzx8/O9tLmyFwaLASRqvompc/Up6XZqzCpmGkJyqIlo1TrP1aCpbxW3arOmB+QXNklDZllI86y/s8jUABs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Z4wmsdPY; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id AEACF2016FF9; Tue,  6 Jan 2026 14:59:50 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com AEACF2016FF9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1767740390;
+	bh=THRVLoMZK7f2n4jbmsl/5riM7a1XGnPXbfvmvkCgp/Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Z4wmsdPYMuj158pKn2D+GiXE0xpuI81rmoG3Lhuz15PJTyGn3hnAGw+BS2iRUvGJn
+	 ARWEDLYY9A4cz75hS/WT6UfddNNDKAza/igvC6MprCvw+xixTb/1jE94l74rchmZ+c
+	 U2aOgkbHUTf3JGbpt81PvdPD++h9NYyIFRVncnuI=
+Date: Tue, 6 Jan 2026 14:59:50 -0800
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
+	kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	dipayanroy@microsoft.com
+Subject: Re: [PATCH net-next, v6] net: mana: Implement ndo_tx_timeout and
+ serialize queue resets per port.
+Message-ID: <20260106225950.GA11626@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20260103045705.GA3757@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20260105173056.7c2c9d0a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260105173056.7c2c9d0a@kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Tue, 06 Jan 2026 17:14:05 -0500 Willem de Bruijn wrote:
-> For instance, can the new netlink code be replaced by YNL, whether in
-> C or called from a script?
+On Mon, Jan 05, 2026 at 05:30:56PM -0800, Jakub Kicinski wrote:
+> On Fri, 2 Jan 2026 20:57:05 -0800 Dipayaan Roy wrote:
+> > +		apc = netdev_priv(ndev);
+> > +		disable_work_sync(&apc->queue_reset_work.work);
+> 
+> AI code review points out:
+> 
+>   In mana_remove(), disable_work_sync() is called for each port's
+>   queue_reset_work. However, when resuming=true, mana_probe() creates a new
+>   workqueue but does not call mana_probe_port() (which contains INIT_WORK),
+>   and there is no enable_work() call for queue_reset_work in the resume path.
+> 
+>   The existing link_change_work handles this correctly: it is disabled in
+>   mana_remove() and re-enabled with enable_work(&ac->link_change_work) in
+>   mana_probe() when resuming=true.
+> 
+>   Should enable_work(&apc->queue_reset_work.work) be called for each port in
+>   the resuming path of mana_probe(), similar to how link_change_work is
+>   handled? Otherwise TX timeout recovery appears to remain disabled after a
+>   suspend/resume cycle.
+> -- 
+> pw-bot: cr
 
-+1 looks like YNL is already used in net/ tests, and it supports
-the operations in question, so that's a much better direction.
-Please let us (YNL maintainers) know if there's anything missing
-or not working, IDK how much use the rtnetlink support in YNL is
-getting.
+Thanks Jakub for pointing this out. I will send out a new version.
+
+Regards
+Dipayaan Roy
 
