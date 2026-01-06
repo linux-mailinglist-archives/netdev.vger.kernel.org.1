@@ -1,94 +1,90 @@
-Return-Path: <netdev+bounces-247425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0553CFA42E
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 19:46:53 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7EDDCF9EBD
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 19:04:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9C43132DA34D
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 18:00:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 77C9C3044366
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 18:04:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 237B2366577;
-	Tue,  6 Jan 2026 17:54:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B833F2FFDD6;
+	Tue,  6 Jan 2026 17:56:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="qSJdaJpA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mA1IAUJ8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B42BC36657D
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 17:54:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 721162F9984
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 17:56:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767722083; cv=none; b=o++PyQYFw9uq0WQeocj4vDI3dud/tGAHWjNIJAGigJLarXjFkhV8s1ERfN6ntG8395OY3MybBzHyEhGNNSDTpTE2qITuGuGUm76WKwI9e+lC4Q/X6xLRJmrQsRcYfyfBMytfTf+HvYoS6s9kh4S818OWsMnX3lsPASBwbCR8Eu8=
+	t=1767722210; cv=none; b=sUbk0/YzNIvq7Fi1jrjAE4Ro77RiswGoMbzQ6QxIpxCudXGNX4COWE430d/P0FTVODPVJ618+RpmIYk6AmGzKeK78hDGPgVvKHRukn+Lf/gDUMzxih24VEP1lTebnZ7xRHJz8YbCggBqb4P1IVTj0YVm/V9ZJtvq6NNPaP7viQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767722083; c=relaxed/simple;
-	bh=Vi6eMOHqUflJf+yDJcRrDwfOT5w3edGMWPaLQFX+kc4=;
+	s=arc-20240116; t=1767722210; c=relaxed/simple;
+	bh=fs/yg4XuRPTPaStP+CSYTKfQJTQA27E3x3kVXfla8LU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Tr7iAqLslKJdWTpFlPz2UsuI2GBDmvERmCO3APfnWE8mzrksgB4/XlqbEyi8JZ75u5agM1I4Fnsq2RSUyauIvuuKOj4yH3RxV/7oSur8rdSQKDJuCvups+EamkVU0tIXMgD034PzA6tdV5NCihzjcRF+JHvb6CWXY5pQ5HzwT2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=qSJdaJpA; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 12F8B1A26A6;
-	Tue,  6 Jan 2026 17:54:39 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id D2B7960739;
-	Tue,  6 Jan 2026 17:54:38 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id CDCE5103C80A9;
-	Tue,  6 Jan 2026 18:54:33 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1767722077; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=2ElzZugsBSoaESz+H/NavZAykvuMLbFqdBNVzKVU2+w=;
-	b=qSJdaJpAmR6c3G5bguqVRzJrdGqhC/nsXL+Dh6ymFQtY8lHSsx6Rxlba5u007BIWaOB1v8
-	ltL9I2FtCd0MAtLt8IGFHw7oXGCTuGGrfuCfKsd1k4+aToyoIE3v+OKS80JYpOujxclqro
-	vkVP05Fg4V6oQ9pCvvhX+Nb+6o4GE5WAk0gSw6HHmkXbXIUCREFWkFxOiVYpVBRAuw13Hm
-	xR68ZDW5uHrsTnsvpi/bNqHWMs0ENs1ZFtbQ+WGHyaxDVXxd1nj0bYXsIA4tN5hFYsW/o4
-	qvzXCDBXtj30dMa0V6jHXTjWE4UpqkeMkFtZBfnqPt6l238t5wN09l0+Dz91wA==
-Date: Tue, 6 Jan 2026 18:54:32 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Russell King
- <linux@armlinux.org.uk>, Heiner Kallweit <hkallweit1@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Simon
- Horman <horms@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>, Jacob
- Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v3 1/4] net: phy: micrel: improve HW
- timestamping config logic
-Message-ID: <20260106185432.62086ff9@kmaincent-XPS-13-7390>
-In-Reply-To: <20260106160723.3925872-2-vadim.fedorenko@linux.dev>
-References: <20260106160723.3925872-1-vadim.fedorenko@linux.dev>
-	<20260106160723.3925872-2-vadim.fedorenko@linux.dev>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	 MIME-Version:Content-Type; b=CeTX3J2xExc3B1jPXmJmiaxhgOmkskD7WvbNy1+MP2on4u060vJroauDIoG28jpyiA+b+4cdgMLdDvYPXKKN9mf6LDEyfOIqMAMoBEvGnJicPPKyxb45TOPEQ+fCnsJj20nTv4v6aIJj4YvLRfKjIA10KimgBfqf77gBdW8sSV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mA1IAUJ8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB5BCC116C6;
+	Tue,  6 Jan 2026 17:56:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767722210;
+	bh=fs/yg4XuRPTPaStP+CSYTKfQJTQA27E3x3kVXfla8LU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mA1IAUJ88z4e6iQixoHwzgreu2cWlcivEyat6dnNm5kCofOEj6WiGXOElW+MHJ24e
+	 dDDzqT+VuBTbc+7zi6cpBC7V+HdYGZjEo/hKkdcnrMnWnXSIEQ3JWQo7Jhno4mvuAg
+	 vBKjadpCd7YrSSRmVBbt5fpZVgNrBz5sm5A51ll3pmuLGk/9R9nMa4j3vacaFghHV6
+	 NIyKpSGmLysdvVbnRGylLZwzMeVp7lPG7Kc+UtZmaQWayhayUzWPqA7N1Y/ugpX8Tu
+	 FJDO49R9jOb7XlsrL5xOh+aXtEP1q1nfpjj78g47m+JwJHPFz8zX9KHldqICYHtt7d
+	 e8aFiSlVr03WQ==
+Date: Tue, 6 Jan 2026 09:56:48 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Florian Westphal
+ <fw@strlen.de>, netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ syzbot+6023ea32e206eef7920a@syzkaller.appspotmail.com, Mazin Al Haddad
+ <mazin@getstate.dev>
+Subject: Re: [PATCH v2 net] ip6_gre: use skb_vlan_inet_prepare() instead of
+ pskb_inet_may_pull()
+Message-ID: <20260106095648.07a870f1@kernel.org>
+In-Reply-To: <20260106144529.1424886-1-edumazet@google.com>
+References: <20260106144529.1424886-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue,  6 Jan 2026 16:07:20 +0000
-Vadim Fedorenko <vadim.fedorenko@linux.dev> wrote:
+On Tue,  6 Jan 2026 14:45:29 +0000 Eric Dumazet wrote:
+> v2: invert the conditions (Jakub)
 
-> The driver was adjusting stored values independently of what was
-> actually supported and configured. Improve logic to store values
-> once all checks are passing
->=20
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Thanks! Much better now, but still failing 
+tools/testing/selftests/net/gre_gso.sh
 
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+TAP version 13
+1..1
+# timeout set to 3600
+# selftests: net: gre_gso.sh
+# 2.16 [+2.16]     TEST: GREv6/v4 - copy file w/ TSO                                   [ OK ]
+# 3.16 [+1.01] 2026/01/06 10:32:57 socat[20546] W exiting on signal 15
+# 3.17 [+0.01] 2026/01/06 10:32:57 socat[20546] W exiting on signal 15
+# 3.17 [+0.00]     TEST: GREv6/v4 - copy file w/ GSO                                   [FAIL]
+# 3.18 [+0.01] 2026/01/06 10:32:57 socat[20533] W exiting on signal 15
+# 3.19 [+0.00]     TEST: GREv6/v6 - copy file w/ TSO                                   [ OK ]
+# 4.19 [+1.00] 2026/01/06 10:32:59 socat[20559] W exiting on signal 15
+# 4.19 [+0.01]     TEST: GREv6/v6 - copy file w/ GSO                                   [FAIL]
+# 4.20 [+0.01] 2026/01/06 10:32:59 socat[20549] W exiting on signal 15
+# 4.22 [+0.02] 2026/01/06 10:32:59 socat[20560] W exiting on signal 15
+# 4.23 [+0.01] 
+# 4.23 [+0.00] Tests passed:   2
+# 4.23 [+0.00] Tests failed:   2
+not ok 1 selftests: net: gre_gso.sh # exit=1
 
-Thank you!
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+https://netdev-ctrl.bots.linux.dev/logs/vmksft/net/results/461862/65-gre-gso-sh/stdout
 
