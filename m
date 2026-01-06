@@ -1,87 +1,89 @@
-Return-Path: <netdev+bounces-247357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31024CF84E2
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 13:24:37 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6771CF8533
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 13:33:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 255973016657
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 12:24:31 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A9C11301B59D
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 12:33:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9A4530FC2A;
-	Tue,  6 Jan 2026 12:24:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33228322C7F;
+	Tue,  6 Jan 2026 12:33:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a2E8Nvme"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iqD4vSD8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55EFC329E60
-	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 12:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8391E868
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 12:33:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767702264; cv=none; b=X+Hy3rte46iZGbkDYdYlip2fUtx8u+ZBKzavcrlqeR6TQE5P9ZLaVxK/8dr6SkWo3BmxmIifm0pzp/fUt8SsX0NxAvMH/otsRdV+E7aefyNXrKj6OlvG3kBCbHrz1gtt1palkpCMB5JjXdLkLgArytHmfK7n+OasWuzAFM1S/AQ=
+	t=1767702793; cv=none; b=mn7MQ3WHA/cHHHTIbGDjWLg0Ruj7nm7G9mBUZCTQ9zgMgc4o+sZm4BAmAc5Kp7YAX4hP2tzfNhwBeKpZqLu86oPG1fbQSLZvLigGpggiimAke+Il4k5rFoOKcaSLD1ZtswY3XKq6vKIJuW8xmoDy+adGdE12ndy2GL75b3O5iyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767702264; c=relaxed/simple;
-	bh=JlzqUYVrnaHz2InO4ctyOyg/bXoPXsr+fDkAXeijmog=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RTpLoqvESqfYeNtqujyCHiH5uu1KapFrLZxshC1tyAbHgsIsoMqco0adwobnuypSAriII83oq+fvQmEwtpuogUKW70H+V/MUUdYp1WK503fMzT2T/WAKkBTrJgBQyPSMqZd1qMSJNMeHCApJrLJgVejmtKZR4mGdPhxwkkfWgSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a2E8Nvme; arc=none smtp.client-ip=209.85.215.170
+	s=arc-20240116; t=1767702793; c=relaxed/simple;
+	bh=DmmMG6Xd0V+yKRI0NieT+ZD/F0sL4CohjJmMoYF0Ok8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G0afDZ1q/3hJ74stEsknbQ6Lr+XjwzbPQSIsVDn+kx79HKU6Aj0U7XFZP9Byq2ZP5ud44vxpu7rE0mXGmHHvWh3eoGInk48DLzBhABgbaHRWpI02/5EsneQZim9ePvRMsRc7YavCI8CUAH0wrZrUKjgw5kRQ9K2YLRdiFE/QWpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iqD4vSD8; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-c13771b2cf9so750601a12.1
-        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 04:24:23 -0800 (PST)
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-bd1b0e2c1eeso704082a12.0
+        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 04:33:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767702262; x=1768307062; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1767702791; x=1768307591; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kB/rXxT1WWg4PHV4NRzo/SLXv+EVmzodXTSgH+OphrE=;
-        b=a2E8Nvme9EpBL9ubeLjcOqxVi497ZlEPxxihYRbtcWv6EeQ6NR28teVjsbzApUVWp2
-         NGIdw3mPn9ONrn2NN/cTxTX49RXECuDWnHIWbVi5vWisJe953CJzcIoFp19qq5Cu8iDQ
-         IVlAO/C35FV5XHhvxFpyu6YbFdcpqezeUAdQOEqCtcWv7HvLNVrTzpXNsMYdi7gMjsnK
-         2tqv0hbEIJYrdjPu4HJGfvjufkfXDw7DS0VcjHvIeQqyYKzjnlAoL4IBJdhV3TGb2jcw
-         BYIEiO68BROb1vK1wLDltHW4xs09cTpPUfzEudnSS+XFkokQqu4kow6GN8oA26WCI2Y7
-         XI0g==
+        bh=FoD+zbo2HQpI2DIEJb0/r0C6yD/iXNrlDMtyH30+9Sk=;
+        b=iqD4vSD8N5GApOyWDEzmPtJg2hrrhnWXITmV7mi8xoLwYmjBneyZE6VdG4TJt9Y0ax
+         JoYDnMwxHs1J10HHsqhR9Q6QcePB1/NPdo5mgug8nqibwkKtdyte9r+jD0vLnLIyqOq+
+         tbIZGHEi9glaD+EEzCG+oGMleEnUjyc4dypHEm3TI0xzVYbcmH5dBkOddBQDF5FWzAbH
+         iS/62jcqZ4PswWZQYvSei3a868eUQPkYrdcF3lBFjj2JCy2kAfWdW2SHxLQh7SFEDbP4
+         1MR5CHOcuyCvpCHNP7rtpAq9dnBqF2M59xcuN742luVhOHOWk6FT+HHemLz8zHXEY/hl
+         5cTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767702262; x=1768307062;
+        d=1e100.net; s=20230601; t=1767702791; x=1768307591;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kB/rXxT1WWg4PHV4NRzo/SLXv+EVmzodXTSgH+OphrE=;
-        b=S4IaBsKka8om5a5Hu4Ps/jCVRzk2EGjoaTaAy+rtJTz8YL0qUZKXolHyJWUeiWf6qV
-         khQ90k6lep9LYBE9/pFao64KxlpH3j8jhYhKn6YRP/31uEG5pVBVF8t4LmniY6yMNJiq
-         CXVdZoDy5ay+nDohKWaZhDAJJVNCO4v52RSuQDmGOV0VwvK6CAmqhb/BzBOiQl4edPJz
-         iQva2WLL+bqVhHCgP8UrhUmVpPQj2RHQSOqvMp2eIReTTsg3DpPraed1MsJpxY3y6N+p
-         oBpP/b/Lq7zXjeUGTTEikoYm1bcT9oo+cKgJTD28Wcns7bskxhh83YZsVvDeIc0s6Mb1
-         4sUQ==
-X-Gm-Message-State: AOJu0YyK1hgZyZFMbX6XQlqbAoBasInaa3GWhniAfxnz56uLJksPkcrF
-	YG+1mWEu8JkAoq8nbPqLSTp4fekuH2G1NBiKR5fGNjAfng7XTukDDFWo
-X-Gm-Gg: AY/fxX5m7iO/FyW7Fx01EAhY+w/RZHPgI0PUuqBOMtpLYK6BSFmRCuYkRyyT7RxZyXk
-	IIwoRrSWHyqCU/T2n/htR7UEAWC1Orr6yKXook5kRUT5b6+bzO0VVlo60DNoOSDHGO4vXARznrp
-	Metnp4Sv8FYSqojMHUgvh9hRsDtfmcaCJx0huiSaYqk9z06UCvaIkALqYpSc882l3ZCmRo24+TE
-	+e4ktgFcDB3Fgn3mL8S6eHXMJSsHbMW1t+KY5HETIoWQxkIhZ4BUCLplSQtpQqGgNNPHVRreVpz
-	bv9GHtCjGKv9rbaZcQ5jrxAc+7t1jXS+oR8F+9ergYOR7MIOW+ejAVvpXLp9dPk6MHXvhp4WIP9
-	qKiSwD+AP6IXL4WY0v47GmZIgqXLA8Qn+kO5/Er8tH/heCFT2KmjhWH6KqyxS40/C7XVPAv+m3D
-	6GNwmyHNhr
-X-Google-Smtp-Source: AGHT+IE5qO/QJl5wEvjvpnvEPFTM4kWVtH2dV4GxlRkpfZ5jyYcH8cKefSIihAbFLcNxTEcNkVxuOw==
-X-Received: by 2002:a05:6a21:33a0:b0:364:13c3:3dd0 with SMTP id adf61e73a8af0-38982334d2fmr2587649637.36.1767702262563;
-        Tue, 06 Jan 2026 04:24:22 -0800 (PST)
-Received: from mythos-cloud ([61.82.116.93])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c4cbfe1ca23sm2311982a12.12.2026.01.06.04.24.20
+        bh=FoD+zbo2HQpI2DIEJb0/r0C6yD/iXNrlDMtyH30+9Sk=;
+        b=wPBbI1djUDmuMpyumobBY+ACU41EcHBi1z1dSen2gyQyVvhJlDXdn2VzF74irfH5vS
+         ODZWH3p4oZVSB+dpj18y4jDvo3wA2mbsmusyxE+JoH/PpjQnb/Fhbh01YdmGM/ysjYbH
+         1IkQ95RjSYA2RGYBtS5EG2P+ZcIJqp5qxMmMcWgmPJJodLERP5VnbELDVaGJd/1nhYcS
+         ad2KsW3Cr5xK8pcXT0+rrqjKuxiSmHwn4FZ5EC6la8oirmNxXdruPX3O6EB52GltWbVl
+         BSglSQsLKGmibeosE22dj6aJNyCBw3Cib2TyvesxfuWKbrxl9z2NlHXGQmRYBrt5YYkW
+         ieEA==
+X-Gm-Message-State: AOJu0YzNckGrLoQOxx12W7KrfpeqS6Gaio2+kPydogD1GYdPrhrEiEmd
+	8XQOz+cE3RcReEhLTawwFnonLyDJI0c6e/+IknUZsEXEkCaeJdvNcpPubcH+MTXWs88=
+X-Gm-Gg: AY/fxX60soAzPCF9qpHGljZkFrnzqrYZFmUWyOQLrES9tSfnSa3GLSReGF+TFo2lhtG
+	Ow+NXWIs0uI1G897urvqEsRQzVFyjypU73FnQsrPFc/qhxihxFuagHPRRJIzaktDCX5X2YRsHiG
+	eoCmBYcqTBaZNDN1KSDpbZ3isQTZdwxHoq4/j88+kQSTF09i9EOPmNMducfsrYfH4uvb7wXyDfQ
+	a8YoeIpe3NJlRIXPwoHljTISKjkkyE2SM4XIc2vsLuQhiWOKY4oTTShMEdWP6whIUgBYrZkoket
+	iVxUB3doB/zfYpbNIJbM29CENxp7wwneDqErD209Ma2PwR2qRT8J49obAWpXd0SDFroNpysD9cg
+	PlngUMr0915oWbn+3m1r011mBHgJZN/kMrueKj1l8oCbsoTb8WJzK2kgP6oPHoaMYx1O1BU1qKd
+	6D+LLojg==
+X-Google-Smtp-Source: AGHT+IHnt1uQG57rcHloEdBPY1GTBpeMHJ/klaJ/TO+ZT4cbOqNaxyJIWbnilirm+kduEvNaekazbQ==
+X-Received: by 2002:a05:6a21:3386:b0:366:14ac:e1e5 with SMTP id adf61e73a8af0-3898242d82emr2549255637.75.1767702790930;
+        Tue, 06 Jan 2026 04:33:10 -0800 (PST)
+Received: from oslab.. ([2402:f000:4:1006:809:0:a77:18ea])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34f5fb74435sm2223417a91.14.2026.01.06.04.33.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jan 2026 04:24:22 -0800 (PST)
-From: Yeounsu Moon <yyyynoom@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
+        Tue, 06 Jan 2026 04:33:10 -0800 (PST)
+From: Tuo Li <islituo@gmail.com>
+To: ayush.sawal@chelsio.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	kernelxing@tencent.com
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Yeounsu Moon <yyyynoom@gmail.com>
-Subject: [PATCH net-next] net: dlink: count tx_dropped when dropping skb on link down
-Date: Tue,  6 Jan 2026 21:23:51 +0900
-Message-ID: <20260106122350.21532-2-yyyynoom@gmail.com>
-X-Mailer: git-send-email 2.52.0
+	Tuo Li <islituo@gmail.com>
+Subject: [PATCH] chcr_ktls: add a defensive NULL check to prevent a possible null-pointer dereference in chcr_ktls_dev_del()
+Date: Tue,  6 Jan 2026 20:33:02 +0800
+Message-ID: <20260106123302.166220-1-islituo@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,27 +92,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Increment tx_dropped when dropping the skb due to link down.
+In this function, u_ctx is guarded by an if statement, which indicates that
+it may be NULL:
 
-Tested-on: D-Link DGE-550T Rev-A3
-Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
+  u_ctx = tx_info->adap->uld[CXGB4_ULD_KTLS].handle;
+  if (u_ctx && u_ctx->detach)
+    return;
+
+Consequently, a potential null-pointer dereference may occur when
+tx_info->tid != -1, as shown below:
+
+  if (tx_info->tid != -1) {
+    ...
+    xa_erase(&u_ctx->tid_list, tx_info->tid);
+  }
+
+Therefore, add a defensive NULL check to prevent this issue.
+
+Fixes: 65e302a9bd57 ("cxgb4/ch_ktls: Clear resources when pf4 device is removed")
+Signed-off-by: Tuo Li <islituo@gmail.com>
 ---
- drivers/net/ethernet/dlink/dl2k.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
-index 846d58c769ea..edc6cd64ac56 100644
---- a/drivers/net/ethernet/dlink/dl2k.c
-+++ b/drivers/net/ethernet/dlink/dl2k.c
-@@ -733,6 +733,7 @@ start_xmit (struct sk_buff *skb, struct net_device *dev)
- 	u64 tfc_vlan_tag = 0;
+diff --git a/drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c b/drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c
+index 4e2096e49684..79292314a012 100644
+--- a/drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c
++++ b/drivers/net/ethernet/chelsio/inline_crypto/ch_ktls/chcr_ktls.c
+@@ -389,7 +389,8 @@ static void chcr_ktls_dev_del(struct net_device *netdev,
+ 		cxgb4_remove_tid(&tx_info->adap->tids, tx_info->tx_chan,
+ 				 tx_info->tid, tx_info->ip_family);
  
- 	if (np->link_status == 0) {	/* Link Down */
-+		dev->stats.tx_dropped++;
- 		dev_kfree_skb_any(skb);
- 		return NETDEV_TX_OK;
+-		xa_erase(&u_ctx->tid_list, tx_info->tid);
++		if (u_ctx)
++			xa_erase(&u_ctx->tid_list, tx_info->tid);
  	}
+ 
+ 	port_stats = &tx_info->adap->ch_ktls_stats.ktls_port[tx_info->port_id];
 -- 
-2.52.0
+2.43.0
 
 
