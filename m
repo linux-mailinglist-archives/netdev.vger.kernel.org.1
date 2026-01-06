@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-247455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0E3CCFADF4
-	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 21:11:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A5789CFADC7
+	for <lists+netdev@lfdr.de>; Tue, 06 Jan 2026 21:07:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9C27430563CE
-	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 20:11:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B2767304D489
+	for <lists+netdev@lfdr.de>; Tue,  6 Jan 2026 20:07:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47F5934E745;
-	Tue,  6 Jan 2026 20:02:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1AE084039;
+	Tue,  6 Jan 2026 20:07:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M10Zzc6+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BqQlo9Sp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20C0534DCE4;
-	Tue,  6 Jan 2026 20:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B120F18FDDE
+	for <netdev@vger.kernel.org>; Tue,  6 Jan 2026 20:07:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767729730; cv=none; b=I24ghjfw82mhuv6RNHxxpVgrIt0tFY4vunIJxBq2ZRjgELgms5Lz/rYIgIM7aZgpzyYxbXWgDynIwcFRs5eyK9w3DbO03sbz8MpDwswEKIBkWMvs7/L7tJuBDacSQETJF0kITG9uHzYheJwDbbwfq7a5wo4i3euTXuuerjYcAP8=
+	t=1767730032; cv=none; b=GyE6WHAsxURBZ1JTPlS64yXVMp2H0aauS5XCzDmoG+qEwEEIf19LxaEAF2I2IcWb3Gxzz1m0IUHXV1CWff3VLNCiuKzTSIxumk0G63x+dFdFQq7nIqZObQZg9MkWPmoBDB5s35KM0wN+PCrutu9QvLa7ki4UVMoHMtFRYaEaKrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767729730; c=relaxed/simple;
-	bh=jGhiLGxy4zzvBPe6LwhhiAf2P5iVXJGqVObOsAp19AI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RwZly9PBRG8VpDeI0hrJxBAezPWQmBkmOznkDKtYzqsySe4oBN7SHqlP4xq2RXoCqBPVv3ECuKq3wxgP8DyoLr66BbWS7hfvFfLq84ESbj2g5pq+EE6rzmYz3n+ZzeZptFT20nbpwTNojcvWt5BH1pxUlvIM4Sdz8jcEXBj3E68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M10Zzc6+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FCB1C116C6;
-	Tue,  6 Jan 2026 20:02:09 +0000 (UTC)
+	s=arc-20240116; t=1767730032; c=relaxed/simple;
+	bh=RerS10tdGvxmr5wE9qZhyY43jpR79dFvZM8tPStvoEE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Dzj4JUtJsfWsh9pWQjuGEoe1SUa4PzHn7ZKaReIGAD0hhcJ4pc/FoKbzhGVkvD3Ai6DKRWCjmG3pWv5y9EI3ghmRrGkK+E/tsRTq2k/rEBxrLZtCcAJmuKgh5HmTH2YyZd5Ip2u+NGlKksne+uraAWNLJL+A2NSVsPkfLaOL9ug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BqQlo9Sp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD248C116C6;
+	Tue,  6 Jan 2026 20:07:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767729729;
-	bh=jGhiLGxy4zzvBPe6LwhhiAf2P5iVXJGqVObOsAp19AI=;
+	s=k20201202; t=1767730032;
+	bh=RerS10tdGvxmr5wE9qZhyY43jpR79dFvZM8tPStvoEE=;
 	h=From:To:Cc:Subject:Date:From;
-	b=M10Zzc6+oRi4gGT6hBtUc0DgDs6hKLrMw3DlOMne7QpSy3MiXQuRaS8rP2d9RfZu9
-	 nc9B83J8YrSYpvHeY5GHdsvIEHfEC51KxgjX0O1w1og8k9OfAd5evSk3PlSGsIlViu
-	 XjPkc244FkDxceXwV8N+AK+f1DS5fY/iCZ7uhFxwPTGnUI/6pmRScqcD+gPHBLtfpU
-	 xh5Y7qs5Idz9xJnZx/SBq2KxpuDcsBp2v0AbgQovVsGQ2nri71Zi+xyqmXq+6IUFRi
-	 h8jAe5Xgus2oZJfHDcFdrua4LE7jxdEtuhBJy5ocpz3J57VIliSYRufZyplVPg8/0s
-	 UY28VNTewC+Zw==
+	b=BqQlo9SpI9QKrr6bFJdA57oZAypHt12nvOP+lNtXqrsMzxW1+N0295HwBaZY2Pr6t
+	 PoCwJw8xK5thHcq2pS3bdfaGA4dkT2eXhVoGiL9HxW+pu+OKBgmyjWKaR1sG6jRINR
+	 Jo1FkZWni83fT9l65/xq55EehgPkmpjT9JvKato327WgQwJFWOjLbNfDofG4JUL/VG
+	 MdD/GTcIcGc4mUfZ2YE0c64Xi2vcMbIgML4ZpJ/sVuRjT665oQCWha3Tddn9fe+qXO
+	 HRviuk5tm9VVUC/q0djisj6HUMnq71N4LehLb2k54GZPDK8vxgztlaP7udnS1O6e5E
+	 Vg4vnATNIKSXA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -46,12 +46,11 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	horms@kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
-	sd@queasysnail.net,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next] selftests: tls: avoid flakiness in data_steal
-Date: Tue,  6 Jan 2026 12:02:05 -0800
-Message-ID: <20260106200205.1593915-1-kuba@kernel.org>
+	john.fastabend@gmail.com,
+	sd@queasysnail.net
+Subject: [PATCH net] MAINTAINERS: add docs and selftest to the TLS file list
+Date: Tue,  6 Jan 2026 12:07:06 -0800
+Message-ID: <20260106200706.1596250-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -61,66 +60,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We see the following failure a few times a week:
-
-  #  RUN           global.data_steal ...
-  # tls.c:3280:data_steal:Expected recv(cfd, buf2, sizeof(buf2), MSG_DONTWAIT) (10000) == -1 (-1)
-  # data_steal: Test failed
-  #          FAIL  global.data_steal
-  not ok 8 global.data_steal
-
-The 10000 bytes read suggests that the child process did a recv()
-of half of the data using the TLS ULP and we're now getting the
-remaining half. The intent of the test is to get the child to
-enter _TCP_ recvmsg handler, so it needs to enter the syscall before
-parent installed the TLS recvmsg with setsockopt(SOL_TLS).
-
-Instead of the 10msec sleep send 1 byte of data and wait for the
-child to consume it.
+The TLS MAINTAINERS entry does not seem to cover the selftest
+or docs. Add those. While at it remove the unnecessary wildcard
+from net/tls/, there are no subdirectories anyway so this change
+has no impact today.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
+CC: john.fastabend@gmail.com
 CC: sd@queasysnail.net
-CC: shuah@kernel.org
-CC: linux-kselftest@vger.kernel.org
 ---
- tools/testing/selftests/net/tls.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ MAINTAINERS | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
-index a4d16a460fbe..9e2ccea13d70 100644
---- a/tools/testing/selftests/net/tls.c
-+++ b/tools/testing/selftests/net/tls.c
-@@ -3260,17 +3260,25 @@ TEST(data_steal) {
- 	ASSERT_EQ(setsockopt(cfd, IPPROTO_TCP, TCP_ULP, "tls", sizeof("tls")), 0);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 765ad2daa218..2079356a75fc 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -18418,9 +18418,11 @@ M:	Jakub Kicinski <kuba@kernel.org>
+ M:	Sabrina Dubroca <sd@queasysnail.net>
+ L:	netdev@vger.kernel.org
+ S:	Maintained
++F:	Documentation/networking/tls*
+ F:	include/net/tls.h
+ F:	include/uapi/linux/tls.h
+-F:	net/tls/*
++F:	net/tls/
++F:	tools/testing/selftests/net/tls.c
  
- 	/* Spawn a child and get it into the read wait path of the underlying
--	 * TCP socket.
-+	 * TCP socket (before kernel .recvmsg is replaced with the TLS one).
- 	 */
- 	pid = fork();
- 	ASSERT_GE(pid, 0);
- 	if (!pid) {
--		EXPECT_EQ(recv(cfd, buf, sizeof(buf) / 2, MSG_WAITALL),
--			  sizeof(buf) / 2);
-+		EXPECT_EQ(recv(cfd, buf, sizeof(buf) / 2 + 1, MSG_WAITALL),
-+			  sizeof(buf) / 2 + 1);
- 		exit(!__test_passed(_metadata));
- 	}
- 
--	usleep(10000);
-+	/* Send a sync byte and poll until it's consumed to ensure
-+	 * the child is in recv() before we proceed to install TLS.
-+	 */
-+	ASSERT_EQ(send(fd, buf, 1, 0), 1);
-+	do {
-+		usleep(500);
-+	} while (recv(cfd, buf, 1, MSG_PEEK | MSG_DONTWAIT) == 1);
-+	EXPECT_EQ(errno, EAGAIN);
-+
- 	ASSERT_EQ(setsockopt(fd, SOL_TLS, TLS_TX, &tls, tls.len), 0);
- 	ASSERT_EQ(setsockopt(cfd, SOL_TLS, TLS_RX, &tls, tls.len), 0);
- 
+ NETWORKING [SOCKETS]
+ M:	Eric Dumazet <edumazet@google.com>
 -- 
 2.52.0
 
