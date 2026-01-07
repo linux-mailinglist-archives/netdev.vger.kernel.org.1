@@ -1,111 +1,414 @@
-Return-Path: <netdev+bounces-247763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FE2DCFE80E
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 16:14:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42253CFE7BD
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 16:10:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AFE91307B810
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 15:10:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4246330DD891
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 15:02:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBC6A340A69;
-	Wed,  7 Jan 2026 14:16:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3C4341654;
+	Wed,  7 Jan 2026 14:23:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zohomail.in header.i=kshitiz.bartariya@zohomail.in header.b="Ia/hipUu"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="TP/eXHNw"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender-pp-o93.zoho.in (sender-pp-o93.zoho.in [103.117.158.93])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4631340A63
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 14:16:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=103.117.158.93
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767795405; cv=pass; b=Mgq11xhxc/eZzuLDfGPa8K1wd42RJL9P+P8VwONZMP4677aab50QjbG9bBe7UZU06vLugN0IhP0xbXjnZbvPw6j7VpM+wYmpxtl+rA8oIDSwVEM16zDtIOVqaK4+dxNh1/xs9fFAHJFHSJLYKExM8e8ryW1xHHS+m8MJwnMcqPc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767795405; c=relaxed/simple;
-	bh=5tWfp6lTjiR/sOdjnzTVc4X9rNUVtckGPL72yiDsgpQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Knkmja0SZ106LshVFHMfPpV9OYzv0kAo0V3IGMOvb0e8BQ98wCY551JqrJx/vreR82dsZkRNnBZCJ6lqXKA0VOSKc5ONk2xJkyDW1WPDCFu60bPIXX3HYx4O2CtkDExtf0R7xuNBBFoFdt/67VN8VdymOAHZ1eAsOFSYWHhXhE4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=zohomail.in; spf=pass smtp.mailfrom=zohomail.in; dkim=pass (1024-bit key) header.d=zohomail.in header.i=kshitiz.bartariya@zohomail.in header.b=Ia/hipUu; arc=pass smtp.client-ip=103.117.158.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=zohomail.in
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zohomail.in
-ARC-Seal: i=1; a=rsa-sha256; t=1767795363; cv=none; 
-	d=zohomail.in; s=zohoarc; 
-	b=P965lIA2fVmbqVZHpwAbPCIoZj5H05jBrQ+DjXaEH+KRsxkokPEngtPm6B3z65OqY4x4ayLk4sIwJxEGE/DpJnznz1T+NLxMRRsbRmy9MY2r4ROQgwm9AyG2qvboKFFVXPZFOOCTAINHM/E8pgAvbovPM4dU9R1/JSjq6R7RV2s=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
-	t=1767795363; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=8CnP4gzfUddA+inPqcTXFd8UiJ4Xselc0fuYBMujNS4=; 
-	b=ASmQpBRWPyzJYu4vvRpPs3N+5kx2iqAS9fqYr+AO43FKltHRrMlgXUiY3zRlAgS8FIt3rAP0MmkgOgWP5t5O3HhKMIroa+poXkQASlxrbpbG2Yd2nZkCdLpmFOEJwjzNiksk8R1990E/JYUDlnywd+7/XSWYjB6STQhjvr6oBMw=
-ARC-Authentication-Results: i=1; mx.zohomail.in;
-	dkim=pass  header.i=zohomail.in;
-	spf=pass  smtp.mailfrom=kshitiz.bartariya@zohomail.in;
-	dmarc=pass header.from=<kshitiz.bartariya@zohomail.in>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1767795363;
-	s=zoho; d=zohomail.in; i=kshitiz.bartariya@zohomail.in;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=8CnP4gzfUddA+inPqcTXFd8UiJ4Xselc0fuYBMujNS4=;
-	b=Ia/hipUu8ywUJ2GqDWONHJFp5LwWQypxVIuLbrDtZwvmqGqx0MKOa7njNHBrWgul
-	fVQGA2ntVyrBa24JSg0YkbyFNfneLGmwPGZKR7nL4Cfs/tfrvJZa64pku5d9qdSwNyX
-	4NquohNBZ8Br2gqaPp5Z4I59SgiwJoaKotJgDRoA=
-Received: by mx.zoho.in with SMTPS id 1767795355995620.6722509294242;
-	Wed, 7 Jan 2026 19:45:55 +0530 (IST)
-From: Kshitiz Bartariya <kshitiz.bartariya@zohomail.in>
-To: netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kshitiz Bartariya <kshitiz.bartariya@zohomail.in>
-Subject: =?UTF-8?q?=5BPATCH=C2=A0net-next=5D=20=5F=5Fudp=5Fenqueue=5Fschedule=5Fskb=28=29=20drops=20packets=20when=20there=20is=20no=20buffer=20space=20available=2C=20but=20currently=20does=20not=20update=20UDP=20SNMP=20counters=2E?=
-Date: Wed,  7 Jan 2026 19:45:36 +0530
-Message-ID: <20260107141541.1985-1-kshitiz.bartariya@zohomail.in>
-X-Mailer: git-send-email 2.50.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069CB32E6A3
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 14:23:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767795836; cv=none; b=GSCHpqXsuztoDVHRNy0g8ZM/jwtGx2o0yn+7g9OdqZ63gLerIff04Oveu41A6WQj9aTg5TLCI3Cb0xqf4ZafVcwaKj6pjUkOxbQYVcqJR0XMW4cMziZgaiBRnPdQl95JN0+fJDFRaDszSpo3rII0mHXitfpHDFvTgpaz/JKoY8A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767795836; c=relaxed/simple;
+	bh=a8vDcpbPYMfbNysE7qf6k6fF4jGeW3i+glF02ZVNNhU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=pz3yrUtfz23TvjGnvwzYaa9871rmpzxDK8l4Jn+Bj07e8figGuYHXToI4xJp6lY9llQwJnXUQ4NfOQA0hR1AaVn3fvFfwIR1fu4MGg3bYFjLq9d6050Zw0H+IY2zdoa4/dB3k4tUuccryQwvqOkV1kcdkRVuMZIOv/EBll6+l20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=TP/eXHNw; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-64b9cb94ff5so2942176a12.2
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 06:23:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1767795832; x=1768400632; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JBVMBb/APMLSOerd9JPa7bBGnobTH7lXEbSuGohgvIA=;
+        b=TP/eXHNwpgZvLQ9l77YQjZBya+B/7bsYdALv1HLBTbDzb9onGIya4yJYZbdKX7ob6o
+         jEhgJSrvI0ZmIFVCb5gGooZnlPf0OSD8sxvnRHUChpyzAvkLHcWMJO96ml+NHTsou3Z3
+         09nuIGNviVakE45u3Q5fK2sZ+ZlFSnSrjlDlf51cxdjLCk0ulPNFOvB7RNzQsyu+FAXV
+         KtlokiofBPoLCGKP0SlNOzzV5X4HuHAeHcbvOLHd1f4uIBHTzIV1fpV1lBdZckG8g0XM
+         2uf98hD5mAYIK/vpuPeqc7ATVut4ZIzZXSL8Xw07aQ6Uo1bjxs/AResPWpEAti/xWeWu
+         ax6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767795832; x=1768400632;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JBVMBb/APMLSOerd9JPa7bBGnobTH7lXEbSuGohgvIA=;
+        b=YBVvB94bGZ/HFVATwApKQPLTWFnWuFYILeh9drTAXCdDT5gL0SjQ+7eOx06d9sN5+8
+         PiAmH7c7dK06Me2P+9bC/+7ffbrCV3dLLqr3cKz3+rG3eUhio+qxgBfYcIg7gMLFxnG+
+         DrS8nVsc8EdrmyKReEtXsPhxLcfqvZ/C4qemkOzqHnxNQ6CqRSUB9PBlmOsrRhq1ak2T
+         JGHHeuGpgym5+GGcN7v0+xQjdtdYOx9VJoPKEH/gXYr4eGUfoMXOaqCtDZd9LXVRNYKj
+         BkgB/48rPeTBa3wJCyBbJ59J2ACPNHIrKWGUDwAMW0Z4ULpc23J2yJi0GBy1YMWNajhk
+         rQIg==
+X-Forwarded-Encrypted: i=1; AJvYcCXhsEDle0hBKf4dyu+wPWEgvYDCMMRajvHlNhQXOw1hVGhDWKvIbMiEVUt5gKgVQiqh5lQQpsk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOm1Ew4Yqszvhq7+CZc3IL1g+1JcEwCe2+/wFvMHtRxHmEQ9Ma
+	V/fIDBHjc6bOY3lZNoS5kMfy3BzoLaMiKvbSOOGM0gA4dx5FdYIb+J89WRY/AEiLo7E=
+X-Gm-Gg: AY/fxX4qYpSB/T+BHAn5O0kcYy5YKFBWMcxO+IPo/LymukDrplxlWZcEtwfHcn4anQ7
+	z0gxouxYlK33EXf7+uW1fVOM9hZ5zU0ceigELax7IpqTcQuTivAos8ZCDnOsAGYnoG7Vd8U0Lqx
+	zq9DHF4J4nvyX3S/U7OF2cxbizPqWWdd646GHgl1SabL9Cc6DM6nlb3CCWDl2iGVPf1CNCW9IYt
+	HiJhhThkNZFdYia81UfzoSXE+SWYqu9Ff7akC23cEF+NgnrrqiWwQlMqlVeExn9iOeWM7qXwj3V
+	RTB/QIwQ7P7Kf1476azldIQIXL8XhHYxO3OI5s1kmnFCZGhv4iE0q/l9f9P4qlPKSPaRoWEItXf
+	e0iRJ2qqbudjaDWsGH6958jzTczowKGOHuwH/qQWrKhqlkL09TeESJkqfEdROq4jOvz9HyinSXZ
+	lQP36CPvz7ClnLEGqRcDXU9M3ttDchjs5dPzDZcK41PSFTNYdSt/q6iC5OkIY=
+X-Google-Smtp-Source: AGHT+IHC3TOcqtbVoxe1Wynwn2n01sOMbR1eyayRz1nHq97srelpzusiLnmdeLMvuwyovffayj+MRA==
+X-Received: by 2002:aa7:d710:0:b0:649:b4d8:7946 with SMTP id 4fb4d7f45d1cf-65097e5d9e2mr1891900a12.23.1767795832061;
+        Wed, 07 Jan 2026 06:23:52 -0800 (PST)
+Received: from cloudflare.com (79.184.207.118.ipv4.supernova.orange.pl. [79.184.207.118])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6507b8c4454sm4857073a12.3.2026.01.07.06.23.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Jan 2026 06:23:51 -0800 (PST)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: bpf@vger.kernel.org,  John Fastabend <john.fastabend@gmail.com>,  "David
+ S. Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,
+  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
+  Simon Horman <horms@kernel.org>,  Neal Cardwell <ncardwell@google.com>,
+  Kuniyuki Iwashima <kuniyu@google.com>,  David Ahern <dsahern@kernel.org>,
+  Alexei Starovoitov <ast@kernel.org>,  Daniel Borkmann
+ <daniel@iogearbox.net>,  Andrii Nakryiko <andrii@kernel.org>,  Martin
+ KaFai Lau <martin.lau@linux.dev>,  Eduard Zingerman <eddyz87@gmail.com>,
+  Song Liu <song@kernel.org>,  Yonghong Song <yonghong.song@linux.dev>,  KP
+ Singh <kpsingh@kernel.org>,  Stanislav Fomichev <sdf@fomichev.me>,  Hao
+ Luo <haoluo@google.com>,  Jiri Olsa <jolsa@kernel.org>,  Shuah Khan
+ <shuah@kernel.org>,  Stefano Garzarella <sgarzare@redhat.com>,  Michal
+ Luczaj <mhal@rbox.co>,  Cong Wang <cong.wang@bytedance.com>,
+  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
+  linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH bpf-next v5 2/3] bpf, sockmap: Fix FIONREAD for sockmap
+In-Reply-To: <20260106051458.279151-3-jiayuan.chen@linux.dev> (Jiayuan Chen's
+	message of "Tue, 6 Jan 2026 13:14:28 +0800")
+References: <20260106051458.279151-1-jiayuan.chen@linux.dev>
+	<20260106051458.279151-3-jiayuan.chen@linux.dev>
+Date: Wed, 07 Jan 2026 15:23:50 +0100
+Message-ID: <87ikddijrd.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+Content-Type: text/plain
 
-Update UDP_MIB_MEMERRORS and UDP_MIB_INERRORS when packets are dropped
-due to memory pressure, for both UDP and UDPLite sockets.
+On Tue, Jan 06, 2026 at 01:14 PM +08, Jiayuan Chen wrote:
+> A socket using sockmap has its own independent receive queue: ingress_msg.
+> This queue may contain data from its own protocol stack or from other
+> sockets.
+>
+> Therefore, for sockmap, relying solely on copied_seq and rcv_nxt to
+> calculate FIONREAD is not enough.
+>
+> This patch adds a new ingress_size field in the psock structure to record
+> the data length in ingress_msg. Additionally, we implement new ioctl
+> interfaces for TCP and UDP to intercept FIONREAD operations. While Unix
+> and VSOCK also support sockmap and have similar FIONREAD calculation
+> issues, fixing them would require more extensive changes
+> (please let me know if modifications are needed). I believe it's not
+> appropriate to include those changes under this fix patch.
 
-This removes a long-standing TODO and makes UDP statistics consistent
-with actual drop behavior.
+Nit: These last two lines don't really belong in the commit message.
+Side notes for reviewers can be added after the "---" marker.
 
-Signed-off-by: Kshitiz Bartariya <kshitiz.bartariya@zohomail.in>
----
- net/ipv4/udp.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+> Previous work by John Fastabend made some efforts towards FIONREAD support:
+> commit e5c6de5fa025 ("bpf, sockmap: Incorrectly handling copied_seq")
+> Although the current patch is based on the previous work by John Fastabend,
+> it is acceptable for our Fixes tag to point to the same commit.
+>
+>                                                      FD1:read()
+>                                                      --  FD1->copied_seq++
+>                                                          |  [read data]
+>                                                          |
+>                                 [enqueue data]           v
+>                   [sockmap]     -> ingress to self ->  ingress_msg queue
+> FD1 native stack  ------>                                 ^
+> -- FD1->rcv_nxt++               -> redirect to other      | [enqueue data]
+>                                        |                  |
+>                                        |             ingress to FD1
+>                                        v                  ^
+>                                       ...                 |  [sockmap]
+>                                                      FD2 native stack
+>
+> Fixes: 04919bed948dc ("tcp: Introduce tcp_read_skb()")
+> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> ---
+>  include/linux/skmsg.h | 67 +++++++++++++++++++++++++++++++++++++++++--
+>  net/core/skmsg.c      |  3 ++
+>  net/ipv4/tcp_bpf.c    | 21 ++++++++++++++
+>  net/ipv4/udp_bpf.c    | 25 +++++++++++++---
+>  4 files changed, 110 insertions(+), 6 deletions(-)
+>
+> diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+> index 0323a2b6cf5e..1fa03953043f 100644
+> --- a/include/linux/skmsg.h
+> +++ b/include/linux/skmsg.h
+> @@ -97,6 +97,7 @@ struct sk_psock {
+>  	struct sk_buff_head		ingress_skb;
+>  	struct list_head		ingress_msg;
+>  	spinlock_t			ingress_lock;
+> +	ssize_t				ingress_size;
 
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 9c87067c74bc..66c06f468240 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -1794,11 +1794,16 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
- 	}
- 
- 	if (unlikely(to_drop)) {
-+		const bool is_udplite = IS_UDPLITE(sk);
-+
- 		for (nb = 0; to_drop != NULL; nb++) {
- 			skb = to_drop;
- 			to_drop = skb->next;
- 			skb_mark_not_on_list(skb);
--			/* TODO: update SNMP values. */
-+
-+			UDP_INC_STATS(sock_net(sk), UDP_MIB_MEMERRORS, is_udplite);
-+			UDP_INC_STATS(sock_net(sk), UDP_MIB_INERRORS, is_udplite);
-+
- 			sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_PROTO_MEM);
- 		}
- 		numa_drop_add(&udp_sk(sk)->drop_counters, nb);
--- 
-2.50.1 (Apple Git-155)
+The name is not great because we also already have `ingress_bytes`.
+I suggest to rename and add a doc string. Also we don't expect the count
+to ever be negative. Why ssize_t when we store all other byte counts
+there as u32?
 
+        /** @msg_tot_len: Total bytes queued in ingress_msg list. */
+        u32                             msg_tot_len;
+
+>  	unsigned long			state;
+>  	struct list_head		link;
+>  	spinlock_t			link_lock;
+> @@ -321,6 +322,27 @@ static inline void sock_drop(struct sock *sk, struct sk_buff *skb)
+>  	kfree_skb(skb);
+>  }
+>  
+> +static inline ssize_t sk_psock_get_msg_size_nolock(struct sk_psock *psock)
+> +{
+> +	/* Used by ioctl to read ingress_size only; lock-free for performance */
+> +	return READ_ONCE(psock->ingress_size);
+> +}
+> +
+> +static inline void sk_psock_inc_msg_size_locked(struct sk_psock *psock, ssize_t diff)
+> +{
+> +	/* Use WRITE_ONCE to ensure correct read in sk_psock_get_msg_size_nolock().
+> +	 * ingress_lock should be held to prevent concurrent updates to ingress_size
+> +	 */
+> +	WRITE_ONCE(psock->ingress_size, psock->ingress_size + diff);
+> +}
+> +
+> +static inline void sk_psock_inc_msg_size(struct sk_psock *psock, ssize_t diff)
+
+Not sure about this function name. "inc" usually means increment by one.
+Was that modeled after some existing interface?
+
+If not, I'd switch rename to sk_psock_msg_len_add(..., int delta)
+
+Following the naming convention from sk_forward_alloc_add(),
+skb_frag_size_add(), skb_len_add(), etc.
+
+> +{
+> +	spin_lock_bh(&psock->ingress_lock);
+> +	sk_psock_inc_msg_size_locked(psock, diff);
+> +	spin_unlock_bh(&psock->ingress_lock);
+> +}
+> +
+>  static inline bool sk_psock_queue_msg(struct sk_psock *psock,
+>  				      struct sk_msg *msg)
+>  {
+> @@ -329,6 +351,7 @@ static inline bool sk_psock_queue_msg(struct sk_psock *psock,
+>  	spin_lock_bh(&psock->ingress_lock);
+>  	if (sk_psock_test_state(psock, SK_PSOCK_TX_ENABLED)) {
+>  		list_add_tail(&msg->list, &psock->ingress_msg);
+> +		sk_psock_inc_msg_size_locked(psock, msg->sg.size);
+>  		ret = true;
+>  	} else {
+>  		sk_msg_free(psock->sk, msg);
+> @@ -345,18 +368,25 @@ static inline struct sk_msg *sk_psock_dequeue_msg(struct sk_psock *psock)
+>  
+>  	spin_lock_bh(&psock->ingress_lock);
+>  	msg = list_first_entry_or_null(&psock->ingress_msg, struct sk_msg, list);
+> -	if (msg)
+> +	if (msg) {
+>  		list_del(&msg->list);
+> +		sk_psock_inc_msg_size_locked(psock, -msg->sg.size);
+> +	}
+>  	spin_unlock_bh(&psock->ingress_lock);
+>  	return msg;
+>  }
+>  
+> +static inline struct sk_msg *sk_psock_peek_msg_locked(struct sk_psock *psock)
+> +{
+> +	return list_first_entry_or_null(&psock->ingress_msg, struct sk_msg, list);
+> +}
+> +
+>  static inline struct sk_msg *sk_psock_peek_msg(struct sk_psock *psock)
+>  {
+>  	struct sk_msg *msg;
+>  
+>  	spin_lock_bh(&psock->ingress_lock);
+> -	msg = list_first_entry_or_null(&psock->ingress_msg, struct sk_msg, list);
+> +	msg = sk_psock_peek_msg_locked(psock);
+>  	spin_unlock_bh(&psock->ingress_lock);
+>  	return msg;
+>  }
+> @@ -523,6 +553,39 @@ static inline bool sk_psock_strp_enabled(struct sk_psock *psock)
+>  	return !!psock->saved_data_ready;
+>  }
+>  
+> +/* for tcp only, sk is locked */
+> +static inline ssize_t sk_psock_msg_inq(struct sock *sk)
+> +{
+> +	struct sk_psock *psock;
+> +	ssize_t inq = 0;
+> +
+> +	psock = sk_psock_get(sk);
+> +	if (likely(psock)) {
+> +		inq = sk_psock_get_msg_size_nolock(psock);
+> +		sk_psock_put(sk, psock);
+> +	}
+> +	return inq;
+> +}
+> +
+> +/* for udp only, sk is not locked */
+> +static inline ssize_t sk_msg_first_length(struct sock *sk)
+
+s/_length/_len/
+
+> +{
+> +	struct sk_psock *psock;
+> +	struct sk_msg *msg;
+> +	ssize_t inq = 0;
+> +
+> +	psock = sk_psock_get(sk);
+> +	if (likely(psock)) {
+> +		spin_lock_bh(&psock->ingress_lock);
+> +		msg = sk_psock_peek_msg_locked(psock);
+> +		if (msg)
+> +			inq = msg->sg.size;
+> +		spin_unlock_bh(&psock->ingress_lock);
+> +		sk_psock_put(sk, psock);
+> +	}
+> +	return inq;
+> +}
+> +
+>  #if IS_ENABLED(CONFIG_NET_SOCK_MSG)
+>  
+>  #define BPF_F_STRPARSER	(1UL << 1)
+> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+> index d73e03f7713a..c959d52a62b2 100644
+> --- a/net/core/skmsg.c
+> +++ b/net/core/skmsg.c
+> @@ -455,6 +455,7 @@ int __sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg
+>  					atomic_sub(copy, &sk->sk_rmem_alloc);
+>  				}
+>  				msg_rx->sg.size -= copy;
+> +				sk_psock_inc_msg_size(psock, -copy);
+>  
+>  				if (!sge->length) {
+>  					sk_msg_iter_var_next(i);
+> @@ -819,9 +820,11 @@ static void __sk_psock_purge_ingress_msg(struct sk_psock *psock)
+>  		list_del(&msg->list);
+>  		if (!msg->skb)
+>  			atomic_sub(msg->sg.size, &psock->sk->sk_rmem_alloc);
+> +		sk_psock_inc_msg_size(psock, -((ssize_t)msg->sg.size));
+
+Cast won't be needed after you switch param type to `int`.
+
+>  		sk_msg_free(psock->sk, msg);
+>  		kfree(msg);
+>  	}
+> +	WARN_ON_ONCE(psock->ingress_size);
+>  }
+>  
+>  static void __sk_psock_zap_ingress(struct sk_psock *psock)
+> diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
+> index 6332fc36ffe6..a9c758868f13 100644
+> --- a/net/ipv4/tcp_bpf.c
+> +++ b/net/ipv4/tcp_bpf.c
+> @@ -10,6 +10,7 @@
+>  
+>  #include <net/inet_common.h>
+>  #include <net/tls.h>
+> +#include <asm/ioctls.h>
+>  
+>  void tcp_eat_skb(struct sock *sk, struct sk_buff *skb)
+>  {
+> @@ -332,6 +333,25 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
+>  	return copied;
+>  }
+>  
+> +static int tcp_bpf_ioctl(struct sock *sk, int cmd, int *karg)
+> +{
+> +	bool slow;
+> +
+> +	/* we only care about FIONREAD */
+
+Nit: This comment seems redundant. The expression is obvious.
+
+> +	if (cmd != SIOCINQ)
+> +		return tcp_ioctl(sk, cmd, karg);
+> +
+> +	/* works similar as tcp_ioctl */
+> +	if (sk->sk_state == TCP_LISTEN)
+> +		return -EINVAL;
+> +
+> +	slow = lock_sock_fast(sk);
+> +	*karg = sk_psock_msg_inq(sk);
+> +	unlock_sock_fast(sk, slow);
+> +
+> +	return 0;
+> +}
+> +
+>  static int tcp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+>  			   int flags, int *addr_len)
+>  {
+> @@ -610,6 +630,7 @@ static void tcp_bpf_rebuild_protos(struct proto prot[TCP_BPF_NUM_CFGS],
+>  	prot[TCP_BPF_BASE].close		= sock_map_close;
+>  	prot[TCP_BPF_BASE].recvmsg		= tcp_bpf_recvmsg;
+>  	prot[TCP_BPF_BASE].sock_is_readable	= sk_msg_is_readable;
+> +	prot[TCP_BPF_BASE].ioctl		= tcp_bpf_ioctl;
+>  
+>  	prot[TCP_BPF_TX]			= prot[TCP_BPF_BASE];
+>  	prot[TCP_BPF_TX].sendmsg		= tcp_bpf_sendmsg;
+> diff --git a/net/ipv4/udp_bpf.c b/net/ipv4/udp_bpf.c
+> index 0735d820e413..cc1156aef14d 100644
+> --- a/net/ipv4/udp_bpf.c
+> +++ b/net/ipv4/udp_bpf.c
+> @@ -5,6 +5,7 @@
+>  #include <net/sock.h>
+>  #include <net/udp.h>
+>  #include <net/inet_common.h>
+> +#include <asm/ioctls.h>
+>  
+>  #include "udp_impl.h"
+>  
+> @@ -111,12 +112,28 @@ enum {
+>  static DEFINE_SPINLOCK(udpv6_prot_lock);
+>  static struct proto udp_bpf_prots[UDP_BPF_NUM_PROTS];
+>  
+> +static int udp_bpf_ioctl(struct sock *sk, int cmd, int *karg)
+> +{
+> +	/* we only care about FIONREAD */
+> +	if (cmd != SIOCINQ)
+> +		return udp_ioctl(sk, cmd, karg);
+> +
+> +	/* works similar as udp_ioctl.
+> +	 * man udp(7): "FIONREAD (SIOCINQ): Returns the size of the next
+> +	 * pending datagram in the integer in bytes, or 0 when no datagram
+> +	 * is pending."
+> +	 */
+
+Not sure we need to quote man pages here.
+
+> +	*karg = sk_msg_first_length(sk);
+> +	return 0;
+> +}
+> +
+>  static void udp_bpf_rebuild_protos(struct proto *prot, const struct proto *base)
+>  {
+> -	*prot        = *base;
+> -	prot->close  = sock_map_close;
+> -	prot->recvmsg = udp_bpf_recvmsg;
+> -	prot->sock_is_readable = sk_msg_is_readable;
+> +	*prot			= *base;
+> +	prot->close		= sock_map_close;
+> +	prot->recvmsg		= udp_bpf_recvmsg;
+> +	prot->sock_is_readable	= sk_msg_is_readable;
+> +	prot->ioctl		= udp_bpf_ioctl;
+>  }
+>  
+>  static void udp_bpf_check_v6_needs_rebuild(struct proto *ops)
 
