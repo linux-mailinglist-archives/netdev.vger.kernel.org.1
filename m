@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-247544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6B28CFB94D
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 02:23:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75D8DCFB974
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 02:27:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 46534300AC8A
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 01:23:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0C1DC3073E0B
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 01:23:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA72F13B7A3;
-	Wed,  7 Jan 2026 01:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CADCB1FC7FB;
+	Wed,  7 Jan 2026 01:23:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m2sIklyE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pKmVmEFA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861E93FCC
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 01:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD5D1DDC07;
+	Wed,  7 Jan 2026 01:23:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767749017; cv=none; b=C6g3bLpUUqW33jnT/VrxLrTqquKX6Un6AdlZ7fMLuMTgNH8V+vd/atk2k2HvfVYzWyjlXv3WNr1rbNwEhEdgEmMQGRKEO1jB4O6FKMWhXH6w2iCGNYVZlUtSotOYNyQbTolsJRAWc7CDwWX+weMT3hOzTRMn5CpjhRqFjxGH+y0=
+	t=1767749018; cv=none; b=A3KOMtTpe2fuRTmDi8gvKB+ES651Q/p3FbY+TxcwbIygtBA8mWyrikx0zSxj5EOkBg6ZZAyR9g00iiVIPqxPFF+Z8lUUhLTTah8xVijW5DWjzTr5jjlHyDmbgVAdYce2hlJZymv/qmGYACOUG22ZzMsBlME8j+kL3kZvuR81LXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767749017; c=relaxed/simple;
-	bh=5cFJO5s3wQK+4Ifp8ZJthLIPbVJ6jfkCvYSf0lyofR4=;
+	s=arc-20240116; t=1767749018; c=relaxed/simple;
+	bh=dotjOuG6ppUKuShkbdNj41kB5q26Y+gu03zECLoUz9g=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GAKHCUDJ5jcrQuo0kKhm06cUtNdSerOi/jECf2ZH/W9x0Cktax8EZZH0J/Y+OJ3C48eMnwfJQxtoYw3e11SS2MX6zhzke0Dv22day96m+S1THpB8EYuUTo1bxey7yEavBWbAcJd7sIO6roNXhZXg32OPu+WfJZpc3S+FkicZKA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m2sIklyE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16701C116C6;
-	Wed,  7 Jan 2026 01:23:37 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=o6ZJ/1ycYmNjjbpXiCwMQrNlkphFjiABL7Q6yFBvPfbFZ9tP6teIv9u7/LbCbv++MFJZFlk9BtPEiLIinAc4F9aRXAsTPVsVQrx1Tu843gHI2AlMaLyE13jII3TtahS8Ex1omO2MZXnmQuYAUN2XOUv/Sv18fPFZab/zFy+lvw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pKmVmEFA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F3B5C116C6;
+	Wed,  7 Jan 2026 01:23:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767749017;
-	bh=5cFJO5s3wQK+4Ifp8ZJthLIPbVJ6jfkCvYSf0lyofR4=;
+	s=k20201202; t=1767749018;
+	bh=dotjOuG6ppUKuShkbdNj41kB5q26Y+gu03zECLoUz9g=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=m2sIklyEBO/CYs87pAiZmQ0zUYGPZraIpqStPxRNwuP0iqIouTC1ySo5YrGMhJBwM
-	 sKoxSIjDrplOvYKegAUM6rD1Q+kGMb9Dc/b6+qi/TnSSJLOBQB19RtFVTOLiXQknGM
-	 BnPNgh2BRkqKoq3wzFlJS0QQi13oA7LLt3WJRP5rZL2Ws4b466LEmpfxsRZSLF0RM7
-	 s/yRLd985tmyAXW2s2hsp8kVC2/L9liGveDwtEy3+JgvLTUhs/cDWpOmJle/3RK48+
-	 Puqp/4173YlxUf6JynVZ9/Caj0l0mEURC2b+FIxoNQFSk1EXIxdYwkJB1+yBp5sTvu
-	 /kRc4Yv2cNbhQ==
+	b=pKmVmEFA+tNG3+8wsdGvNANk+FWfNdX24wdBd4+ArVqH5YEPB4KMpiQfvYUQ9g6Bh
+	 iqHuecvsB0KjT/RmW9f4gjRf/B+TJjzegoLI1q84/vHTbtDeKdaR0iXJk0CvT++3yf
+	 XwKGrmjOlOEN6WbWeNGymDsVIrjl/oIpPQOHpKt4MJ7572SjTut2HazzRmx2kEWj2Y
+	 hqT5ppOUcfOYvULy7N9xjAQJMEvJmlg7R+XDdPifZW1g7UpvDHCy3wHK8uHELyR1Tm
+	 aeWOx5tbbXjn0ZnvqusgsxEMOOFOYJ+e0SDUlz6UrdmEMuzBraYdxhjI5cbIdwbhle
+	 xmO5Ip2ZuQwWA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B5A58380CEF5;
-	Wed,  7 Jan 2026 01:20:15 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2869380CEF5;
+	Wed,  7 Jan 2026 01:20:16 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,38 +50,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: airoha: Use gdm port enum value whenever
- possible
+Subject: Re: [PATCH net-next v2] net: fec: Add stop mode support on
+ i.MX8DX/i.MX8QP
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176774881426.2188953.14906966324669227872.git-patchwork-notify@kernel.org>
-Date: Wed, 07 Jan 2026 01:20:14 +0000
-References: <20260105-airoha-use-port-idx-enum-v1-1-503ca5763858@kernel.org>
-In-Reply-To: <20260105-airoha-use-port-idx-enum-v1-1-503ca5763858@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+ <176774881577.2188953.15980756809721233406.git-patchwork-notify@kernel.org>
+Date: Wed, 07 Jan 2026 01:20:15 +0000
+References: <20260105152452.84338-1-francesco@dolcini.it>
+In-Reply-To: <20260105152452.84338-1-francesco@dolcini.it>
+To: Francesco Dolcini <francesco@dolcini.it>
+Cc: wei.fang@nxp.com, shenwei.wang@nxp.com, xiaoning.wang@nxp.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, francesco.dolcini@toradex.com,
+ imx@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 05 Jan 2026 10:40:47 +0100 you wrote:
-> Use AIROHA_GDMx_IDX enum value whenever possible.
-> This patch is just cosmetic changes and does not introduce any logic one.
+On Mon,  5 Jan 2026 16:24:50 +0100 you wrote:
+> From: Francesco Dolcini <francesco.dolcini@toradex.com>
 > 
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->  drivers/net/ethernet/airoha/airoha_eth.c | 40 +++++++++++++++++---------------
->  1 file changed, 21 insertions(+), 19 deletions(-)
+> Add additional machines that requires communication to the SC firmware
+> to set the GPR bit required for stop mode support.
+> 
+> NXP i.MX8DX (fsl,imx8dx) is a low end version of i.MX8QXP (fsl,imx8qxp),
+> while NXP i.MX8QP (fsl,imx8qp) is a low end version of i.MX8QM
+> (fsl,imx8qm).
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: airoha: Use gdm port enum value whenever possible
-    https://git.kernel.org/netdev/net-next/c/4d513329b87c
+  - [net-next,v2] net: fec: Add stop mode support on i.MX8DX/i.MX8QP
+    https://git.kernel.org/netdev/net-next/c/3f049b653450
 
 You are awesome, thank you!
 -- 
