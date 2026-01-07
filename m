@@ -1,101 +1,122 @@
-Return-Path: <netdev+bounces-247733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E132CFDE13
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 14:17:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70FD7CFDF21
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 14:30:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9AF07305A2EC
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 13:09:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D2BBE3019BB0
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 13:19:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3999F31B123;
-	Wed,  7 Jan 2026 13:09:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59B9032827A;
+	Wed,  7 Jan 2026 13:19:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dRQBrpQa"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="bDdea52p"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55FDE2E6CDF;
-	Wed,  7 Jan 2026 13:09:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D001328257;
+	Wed,  7 Jan 2026 13:19:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767791397; cv=none; b=nLWs9L1qZwO8Z9GKAhDXvw+qo08VDo9OOaDOM+3H7nYqJjSVaLRuFUjN4AwJ4W7TP8wngTzN0sLOmqdoO15M9A//qDnMYrkwj7XkNpBdtpLu0DVEX3d7LwdUJOY0HLpXThi2xOAcMQRCUR7/4PPfAsVK33rK66klz9UnaDdFuR4=
+	t=1767791959; cv=none; b=ELubsTtbbpqns40kVykxs+R5rvjWO79UesH9OtQk9ic92enAhMCeiG1ojG77m2W2LxTb+Q20Twvpju34IsLDwMtxbb51BNMccMQBVg6GfsoMBo0c+TF0XSP0bBUQ1YjYAIv1qxRMdeCCX73kgY+cTRd0sYsXWomu+1ik5JvCYKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767791397; c=relaxed/simple;
-	bh=x/fNEulSRFDJgkxg1u+6OwWgONJb1XcQNk5uCqGNPN0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DCTZvqyvwxqkQC35ajs6ewoeBRAoGDDt8qf7KVoKXCWOxn9AnjUB8nliH+sAv1eItAH22nqYwgl1Qt2qN4pp4ITHWVIwVGhv3e4glQ0JMCV4t1ac+Uvx+aV75Ah4Q0Uojv9hIV/WTqh6QJ16tPhbNlpr+dgrTo66lQperNLA2Eo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dRQBrpQa; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=J6Ca6UBs+bAIAtRFT9FF73/v9UNst9Zsyj6ukXXcpkA=; b=dRQBrpQaqrrCbwAadcDw0qQoJI
-	F+pcYoNk4xUZ+tD4+9Y4cHhovYRhDxjFZxlwgT3+31px3vxce2lYjCCyfZ92W3v9C0YIL01LeGZi5
-	1PHa4IyqnilxyiGbcPp3ZB22+SEYNcNqCC/erGrgYMHxu7Q5SaqHzkVSPCyeWzUlGf6U=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vdTIG-001nn0-5f; Wed, 07 Jan 2026 14:09:44 +0100
-Date: Wed, 7 Jan 2026 14:09:44 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	Frank.Sae@motor-comm.com, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, shenjian15@huawei.com,
-	liuyonglong@huawei.com, chenhao418@huawei.com,
-	jonathan.cameron@huawei.com, salil.mehta@huawei.com,
-	shiyongbang@huawei.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC net-next 2/6] net: phy: add support to set default
- rules
-Message-ID: <970a1e2d-c1b1-4b96-9e8e-71aea6b6dc44@lunn.ch>
-References: <20251215125705.1567527-1-shaojijie@huawei.com>
- <20251215125705.1567527-3-shaojijie@huawei.com>
- <fe22ae64-2a09-45ce-8dbf-a4683745e21c@lunn.ch>
- <647f91c7-72c2-4e9d-a26d-3f1b5ee42b21@huawei.com>
- <4e884fc2-9f64-48dd-b0be-e9bb6ec0582d@lunn.ch>
- <3c82f4e1-0702-4617-b40c-d7f1cbd5a1de@huawei.com>
+	s=arc-20240116; t=1767791959; c=relaxed/simple;
+	bh=kJ3NISw2DX0W/sPkTkQ38NAffUlq7AQ+JTvOdtzgOtE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hG2nn/4QSeCSuZzFaBxAnGLv9xm+pugLg4aWtJGrG4MdNct1jc+DJDc3cBIoG6oOcFi8g2Id/rtNiDg/cGu1epnvFsGuQtiy02eVL279YuXnPnSXokRnVYMP7DeDZnNSLR4reGWTUX2jsO3QYytrDSdMrEAuvx40ipW5fgV/3XQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=bDdea52p; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6071DbLp2795403;
+	Wed, 7 Jan 2026 05:19:09 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=hH3OugolXYCmIENIepGzs+x
+	2CZ5v/p7C+ZxQE744/1A=; b=bDdea52p5B21k11xEYUWedO8xlU0ZFX8czzUCY4
+	hlUPEE/CR4kBtOlcqbBqFKyl0ZC1g1gbTJ+OgEFGhFHEW5cWhiAddyAyGaPp5AlG
+	9Bic5OZLZ7z+81fBSyE5dOvxBX5GoS8AT166QdxZR2ecGdTNj/8mb3D0IGeFcvtb
+	3jVUyYFc7VrQGZ4Bi10h2VQseNEbj19yJeaJ80hTynlaKw6elviOD2KB+9P6u/ae
+	1iZjeTyGqry4M+ZHnBn+Wm6Ord6CtiBs/qcMbPqs0KNbON0NSs8UFLyk16aXCF02
+	kBE0ba2yJXGU8DBtp0wlpPE69Nw91VDjWUQ+mQDsRlgHohA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bgf3fw1h0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 07 Jan 2026 05:19:09 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 7 Jan 2026 05:19:22 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Wed, 7 Jan 2026 05:19:22 -0800
+Received: from sapphire1.sclab.marvell.com (unknown [10.111.132.245])
+	by maili.marvell.com (Postfix) with ESMTP id C7C733F704A;
+	Wed,  7 Jan 2026 05:19:07 -0800 (PST)
+From: Vimlesh Kumar <vimleshk@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sedara@marvell.com>, <srasheed@marvell.com>, <hgani@marvell.com>,
+        "Vimlesh Kumar" <vimleshk@marvell.com>
+Subject: [PATCH net v3 0/3] disable interrupts and ensure dbell updation
+Date: Wed, 7 Jan 2026 13:18:53 +0000
+Message-ID: <20260107131857.3434352-1-vimleshk@marvell.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3c82f4e1-0702-4617-b40c-d7f1cbd5a1de@huawei.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=PLgCOPqC c=1 sm=1 tr=0 ts=695e5d4d cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
+ a=6bxer7aP3YgKHE6BY9wA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA3MDEwMiBTYWx0ZWRfXw/Szx9cxalBP
+ lGeBRpZSao4asHDXd5fsU2z4xF9avPUjwAfvZVDJeIKhYpbQVBk/vAJCX8NuYdSVU9xNnOvL1XD
+ ukLnv/3OXNU2kxk4PjhY3FVaf8/6AI+sAeGjnfIneaox5Dak0pbbr68PAvqyimi6O2I5TXmgLCu
+ 0RHlG87TulS7lMgW8ds/+GPuAm20A5R0GSAIBGOMHHDdGTDT08Cx0gPoTe94HLzMdkOexL1DXRq
+ IEj1LvLv8uBjZRXvhhFyU70/pFcu34YZeIxy2g5CMfoYA+Q5ToY+idfnsfuoL3tz1K5qSICWkFN
+ mlvoe3w0ad6NkpP92lsE2A9/Dz8VR5DJQpVm1CrBqb3jsbI21IJ9v6XQJgWzdjwGxXFHdUW5yFA
+ XHZ9sxw8GDV8z8tXTa2AirIHSIaP1X0MzfCSe5ln5xzFwJmOkvYdQjoDdBXTLO8o7a+lPAcizp/
+ KQbVhVz6oSgKxaa0cVA==
+X-Proofpoint-GUID: ZhMxJZedeQEZQZrup1kuflJRL5nPIAHa
+X-Proofpoint-ORIG-GUID: ZhMxJZedeQEZQZrup1kuflJRL5nPIAHa
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-07_01,2026-01-06_01,2025-10-01_01
 
-On Thu, Dec 18, 2025 at 09:35:44AM +0800, Jijie Shao wrote:
-> 
-> on 2025/12/17 21:53, Andrew Lunn wrote:
-> > > Some of our boards have only one LED, and we want to indicate both
-> > > link and active(TX and RX) status simultaneously.
-> > Configuration is generally policy, which is normally done in
-> > userspace. I would suggest a udev rule.
-> > 
-> > 	Andrew
-> 
-> Yes, the PHY LED framework supports configuration from user space,
-> allowing users to configure their preferred policies according to their own requirements.
-> I believe this is the original intention of the LED framework.
-> 
-> However, we cannot require users to actively configure policies,
-> nor can we restrict the types of OS versions they use.
-> Therefore, I personally think that the driver should still provide a reasonable default policy
-> to ensure that the LED behavior meets the needs of most scenarios.
+Disable per ring interrupts when netdev goes down and ensure dbell BADDR
+updation for both PFs and VFs by adding wait and check for updated value.
 
-As i said, DT describes hardware, the fact there is an LED, what bus
-it is on, colour etc, is describing hardware. How you blink it is
-policy, so i expect the DT Maintainers will push back on putting
-policy into DT.
+Vimlesh Kumar (3):
+  octeon_ep: disable per ring interrupts
+  octeon_ep: ensure dbell BADDR updation
+  octeon_ep_vf: ensure dbell BADDR updation
 
-So i think your best way forwards is as Russell suggests, some form of
-firmware sets the LED before Linux takes control of it. Or udev.
+V3:
+- Use reverse christmas tree order variable declaration.
+- Return error if timeout happens during setup oq.
+ 
+V2: https://lore.kernel.org/all/20251219100751.3063135-1-vimleshk@marvell.com/
+ 
+V1: https://lore.kernel.org/all/20251212122304.2562229-1-vimleshk@marvell.com/
 
-	Andrew
+ .../marvell/octeon_ep/octep_cn9k_pf.c         | 21 ++++--
+ .../marvell/octeon_ep/octep_cnxk_pf.c         | 64 +++++++++++++++----
+ .../ethernet/marvell/octeon_ep/octep_main.h   |  2 +-
+ .../marvell/octeon_ep/octep_regs_cn9k_pf.h    |  1 +
+ .../marvell/octeon_ep/octep_regs_cnxk_pf.h    |  1 +
+ .../net/ethernet/marvell/octeon_ep/octep_rx.c |  4 +-
+ .../marvell/octeon_ep_vf/octep_vf_cn9k.c      |  3 +-
+ .../marvell/octeon_ep_vf/octep_vf_cnxk.c      | 39 ++++++++++-
+ .../marvell/octeon_ep_vf/octep_vf_main.h      |  2 +-
+ .../marvell/octeon_ep_vf/octep_vf_rx.c        |  4 +-
+ 10 files changed, 118 insertions(+), 23 deletions(-)
+
+-- 
+2.47.0
+
 
