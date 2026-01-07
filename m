@@ -1,160 +1,117 @@
-Return-Path: <netdev+bounces-247612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 116B9CFC4B5
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 08:13:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D108CFC4C1
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 08:14:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BB5A13065E29
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 07:11:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 014F2300FE21
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 07:12:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7733285C91;
-	Wed,  7 Jan 2026 07:11:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 171461FBEA8;
+	Wed,  7 Jan 2026 07:11:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TEc/8HEN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E3OC9YTE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f196.google.com (mail-dy1-f196.google.com [74.125.82.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD7CE274B5C;
-	Wed,  7 Jan 2026 07:11:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE25225791
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 07:11:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767769877; cv=none; b=lAkJkGbhxczu3OTIapABIyRlNHnyJ32A4EXapNK5y1WRQfM9btr337D+A1Z3DvhmiJtt0T/cyjxyPoiEMXRldv6EW79y6anrBqRO1dTgCghk/o83CGgNyh7/JDsTeri7xb6bca7AwFgeiFpNmhpEY11mL/D3OINz97kwdNhfWNM=
+	t=1767769919; cv=none; b=UnTXfKVukWwnUY9dKauOUbaNOEUVkci4w/bsaLnnrWUQysQ3M25MuWTqPSqlVhiPlP2sZF++/kSvLYE881x21xBYbSmTr7uXErlpdHXsdIpcFIkeCVWL3mzV4q2kweDWYTPIW2sHIvPdARs9flswMnNglWoS6/89eAiRXF3O7fI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767769877; c=relaxed/simple;
-	bh=bwEIRLY/Wo384cNTsyioBloALZxdiG3+w69ClunqFwc=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=jJM1YnUABC9rwuFZ++QZIM0ibGn94GkXm8ZmXUPvlO8AXBw6WTlr6Sf1QZRpbjXg+QFtW130IIcR998eOTWYcN9jl9jY1lip5GWtKKTWLCqTVz01EZep6nKpR9YBS2Lle9SgSlKv52biCHfuXPWWU+Wh67MVzd5S5wQIehHgFQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TEc/8HEN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4F6EC4CEF7;
-	Wed,  7 Jan 2026 07:11:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767769877;
-	bh=bwEIRLY/Wo384cNTsyioBloALZxdiG3+w69ClunqFwc=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=TEc/8HENb5QI8im69ypSXiWkoYr3ug6+c3W6gQv3Slv3R1VOZChMaMUyhH5SJVOPN
-	 fKSECaE63tGjFzmoRkx7sh8edOCsuRPn7BXwzBlQ5WTpTclLs8OLldsLinMWpkaRRw
-	 ds6NLshFd8yd3SpXEeZyZZSDqf5aL6ySk7Iug9KxYL6kcmwNi6BoN/5AzKVSKErLUR
-	 JaMq9/Fy9d1uJdqTr4lyteefgt2uf2v3LQM2nytOSd+gNC0JGGLUwwWVrSHrS86S8N
-	 u64ZyE0LYcTClqxys3HA1ZCuZ5LaGwMIndPtZtl/64DpJY62Uz+H3CVDgX8wQifbJ7
-	 Fs1Q3TMo5Dvig==
-Content-Type: multipart/mixed; boundary="===============1006339552054496715=="
+	s=arc-20240116; t=1767769919; c=relaxed/simple;
+	bh=WN4KWu9Z8YPUdjgdEWzrDq++WcBFuYaE18qeAhBUFQ8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ikz9vt3TVvGJjhPfRkwBe1j8nGurWUw4sM17kTG0wevKQ1THzXv2lqb2ck34PPoZIbMvZEcACNWpeZagF8xqeHcqBOTJaFar2kKKuLrMny2jTCBC/dINKeXN1hHjDbbkBVIQ17+pE2TPO9OPGcVKTSIeBkRDgMWtCrUIyV8P0Ak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E3OC9YTE; arc=none smtp.client-ip=74.125.82.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f196.google.com with SMTP id 5a478bee46e88-2b04fb5c7a7so1109692eec.1
+        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 23:11:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767769917; x=1768374717; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Qw03kL8k5g6FpQDEJuydGBc7rwkI+zAgYvaC4pQzK1E=;
+        b=E3OC9YTEScM3DloWocTbSn9XyLNzxHKlha4lJglShKZtPkiRbe8uzQCBa48lBDB7T+
+         6d1cpdRnv9C/AvSdiyu2DLC2UMPuBR+rdCGpJh6D2yk9CKgeXLaCRqJ1K/HtnYxuNoa0
+         99xGsTl0n0ZxLkchV8pMTwTxpMzioMJXzvu1CFeujQpj2+A4Em4pMt87fSmq4Zxe0gwz
+         ujrtpDzR/aKV9/m48+X3l6VAtKhrU0DBPBNNvKECzG52AAQqHwJkgZyJiZfyIdDD1l3N
+         Uj/m1VIeVsIC2ocl/paR3p9PvIvkOincmjgX59h2/Av97TyTcCDxfNrA7UcIZMLZH7ab
+         YqVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767769917; x=1768374717;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Qw03kL8k5g6FpQDEJuydGBc7rwkI+zAgYvaC4pQzK1E=;
+        b=lxNp83wAvPmfks10ueyckJ9eNMjHj7tlVPC9j8RhEfwQTUU46eXqCdmyqDwP2DmkQa
+         JNKASg4v0CoNF5/TjtO08Jbvh5B9u0m5FpDG8+wwTn3cIeiNUgduqxPHwXawZGIYxm4z
+         5PqUWImZoJnvWNzC0O9JeZReUF8RnLEvL29mpnwwF9Vmk7LwSSLfCX5/9A45Bp3/GcHX
+         hcmHfWzgrUuFasktTWrnXZr5ywj+BSUAxnIVjA0Ydf0q1VEsrbJkPBEWVstnHIbEeyc1
+         rdjqCv3IlDBq8a/0C+cJt/Oi+U2KIIae6T5F8z4mhBEAtLtKpQifVqqBgzOe/wFL6AFZ
+         Rdug==
+X-Gm-Message-State: AOJu0YwyAo3kKKgDEVWBKZE3F2o1p1E1xUqI28u28xBy9xw7YjA3qBwV
+	/9JyJLIiZ7ShF4BpKVmc/HPfy5I8sJ0Bp75T3LYZ8vSD+L8g6b+XLvZJ2gX+8/dO
+X-Gm-Gg: AY/fxX5PfmTTePw2iBZMM9Sc/hYkPacOhVaJpwRJpsLu5R9E6Wz1ii0PEVNOHKLBNe3
+	oKdpXEgHbZjlwYlN0L6gfDVLquy6HM1tAfIt5jmjn/PLZburPnYqAoHqm8UwKaFRfo7T4x4BIOc
+	a8lh/zp3Frhl9wvOXEkQe7DvMzRC5at71TxdzfI1C9Vgm4R5vHN1oZq2arfvmECmO65tmtlxGz9
+	i8A5nVHFep04M/E9Gsd1Cmz/z8VvCWjajV3OzKNVt3Varck21W+IFjRdymsuDfLJsPjGX4ZoKXu
+	K6f+u0ik7qTbryPKG87EqIYQ7ilIX4l33MOgz7AYCg8iHyOCLzE81w+hrxefh74lIGqxTxsD8cI
+	uBWTtqkLmY0c4bpznDbiLd+yl3xVmJWiPQ/hOs8Xvr/I3FNOb9mgxA4U7Tky7gxv37+NPXeubZV
+	G4J2GvqZ01Iz3Qe17it0HCZ3f+4CjVel15R7RaaeREmTCCOu0cJRNLJhMo6aRWlfvN6xr3heHwb
+	GY6rhiFhAlw/NexfcqwTrZ3KQAk5EX4Smk9+aPgpSqs/7Y/h4furG3W3DV74EGh7lq+TQ1fBeDH
+	KFIP
+X-Google-Smtp-Source: AGHT+IFHTumoxGrmooLIYTheL8D/QlOQxxjNoUqx3pYmtECmJliyDvLUzHHiqiprweDws8Z0rK07+A==
+X-Received: by 2002:a05:7300:640f:b0:2a4:3594:72e6 with SMTP id 5a478bee46e88-2b17d2f0e31mr1605460eec.21.1767769916617;
+        Tue, 06 Jan 2026 23:11:56 -0800 (PST)
+Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b170673bc0sm6450959eec.5.2026.01.06.23.11.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Jan 2026 23:11:56 -0800 (PST)
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Subject: [PATCH net-next] docs: 3c509: remove note about card detection failing with overclock
+Date: Tue,  6 Jan 2026 23:11:45 -0800
+Message-ID: <20260107071146.30083-1-enelsonmoore@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <598aec184ed820be7f244c2c14b1c0b75442e7567eb52abb15dd6875053c4958@mail.kernel.org>
-In-Reply-To: <20260107064352.291069-8-dongml2@chinatelecom.cn>
-References: <20260107064352.291069-8-dongml2@chinatelecom.cn>
-Subject: Re: [PATCH bpf-next v7 07/11] bpf,x86: add fsession support for x86_64
-From: bot+bpf-ci@kernel.org
-To: menglong8.dong@gmail.com,ast@kernel.org,andrii@kernel.org
-Cc: daniel@iogearbox.net,martin.lau@linux.dev,eddyz87@gmail.com,song@kernel.org,yonghong.song@linux.dev,john.fastabend@gmail.com,kpsingh@kernel.org,sdf@fomichev.me,haoluo@google.com,jolsa@kernel.org,davem@davemloft.net,dsahern@kernel.org,tglx@linutronix.de,mingo@redhat.com,jiang.biao@linux.dev,bp@alien8.de,dave.hansen@linux.intel.com,x86@kernel.org,hpa@zytor.com,bpf@vger.kernel.org,netdev@vger.kernel.org,linux-kernel@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Wed,  7 Jan 2026 07:11:16 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 
---===============1006339552054496715==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The id_read_eeprom() function has been fixed to use a time-based
+delay, so this issue can no longer occur.
 
-> diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
-> index a87304161d45..32c13175bc65 100644
-> --- a/arch/x86/net/bpf_jit_comp.c
-> +++ b/arch/x86/net/bpf_jit_comp.c
-> @@ -3094,12 +3094,17 @@ static int emit_cond_near_jump(u8 **pprog, void *func, void *ip, u8 jmp_cond)
->  static int invoke_bpf(const struct btf_func_model *m, u8 **pprog,
->  		      struct bpf_tramp_links *tl, int stack_size,
->  		      int run_ctx_off, bool save_ret,
-> -		      void *image, void *rw_image)
-> +		      void *image, void *rw_image, u64 func_meta)
->  {
->  	int i;
->  	u8 *prog = *pprog;
->
->  	for (i = 0; i < tl->nr_links; i++) {
-> +		if (tl->links[i]->link.prog->call_session_cookie) {
-> +			/* 'stack_size + 8' is the offset of func_md in stack */
-> +			emit_st_r0_imm64(&prog, func_meta, stack_size + 8);
-> +			func_meta -= (1 << BPF_TRAMP_M_COOKIE);
-> +		}
-
-This decrement of func_meta is problematic for fsession programs. When
-invoke_bpf() is called for fentry, func_meta gets decremented for each
-program with call_session_cookie. Later, when invoke_bpf() is called
-for fexit, it receives this already-decremented func_meta value.
-
-Since fsession programs appear in both fentry and fexit lists (same
-program object), call_session_cookie is true for both. The fexit part
-will see a different cookie offset than the fentry part saw.
-
-For example, with one fsession program:
-  - fentry stores func_meta with cookie offset N, then decrements to N-1
-  - fexit receives N-1, stores it, and the BPF program reads offset N-1
-
-Should the func_meta offset be reset for fexit so that each fsession
-program's fentry and fexit parts access the same cookie slot?
-
-[ ... ]
-
-> @@ -3383,9 +3395,19 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *rw_im
->  		}
->  	}
->
-> +	if (bpf_fsession_cnt(tlinks)) {
-> +		/* clear all the session cookies' value */
-> +		for (int i = 0; i < cookie_cnt; i++)
-> +			emit_st_r0_imm64(&prog, 0, cookie_off - 8 * i);
-> +		/* clear the return value to make sure fentry always get 0 */
-> +		emit_st_r0_imm64(&prog, 0, 8);
-> +	}
-> +	func_meta = nr_regs + (((cookie_off - regs_off) / 8) << BPF_TRAMP_M_COOKIE);
-> +
->  	if (fentry->nr_links) {
->  		if (invoke_bpf(m, &prog, fentry, regs_off, run_ctx_off,
-> -			       flags & BPF_TRAMP_F_RET_FENTRY_RET, image, rw_image))
-> +			       flags & BPF_TRAMP_F_RET_FENTRY_RET, image, rw_image,
-> +			       func_meta))
->  			return -EINVAL;
->  	}
-
-[ ... ]
-
-> @@ -3445,9 +3467,14 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *rw_im
->  		}
->  	}
->
-> +	/* set the "is_return" flag for fsession */
-> +	func_meta += (1 << BPF_TRAMP_M_IS_RETURN);
-> +	if (bpf_fsession_cnt(tlinks))
-> +		emit_st_r0_imm64(&prog, func_meta, nregs_off);
-> +
->  	if (fexit->nr_links) {
->  		if (invoke_bpf(m, &prog, fexit, regs_off, run_ctx_off,
-> -			       false, image, rw_image)) {
-> +			       false, image, rw_image, func_meta)) {
-
-At this point func_meta has already been decremented during the fentry
-invoke_bpf() call above. When invoke_bpf() processes the fexit list and
-encounters an fsession program (which has call_session_cookie set since
-it is the same program object), it will store this modified func_meta.
-
-The cookie offset encoded in func_meta will be different from what the
-fentry part stored, causing bpf_session_cookie() to return a pointer to
-a different memory location for fexit than for fentry.
-
-> +			ret = -EINVAL;
-> +			goto cleanup;
-> +		}
-
-
+Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 ---
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+ .../networking/device_drivers/ethernet/3com/3c509.rst       | 6 ------
+ 1 file changed, 6 deletions(-)
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/20773233136
+diff --git a/Documentation/networking/device_drivers/ethernet/3com/3c509.rst b/Documentation/networking/device_drivers/ethernet/3com/3c509.rst
+index 47f706bacdd9..99ec25225e56 100644
+--- a/Documentation/networking/device_drivers/ethernet/3com/3c509.rst
++++ b/Documentation/networking/device_drivers/ethernet/3com/3c509.rst
+@@ -177,12 +177,6 @@ While the updated driver works with most PnP BIOS programs, it does not work
+ with all. This can be fixed by disabling PnP support using the 3Com-supplied
+ setup program.
+ 
+-3c509 card is not detected on overclocked machines
+-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-
+-Increase the delay time in id_read_eeprom() from the current value, 500,
+-to an absurdly high value, such as 5000.
+-
+ 
+ Decoding Status and Error Messages
+ ----------------------------------
+-- 
+2.43.0
 
---===============1006339552054496715==--
 
