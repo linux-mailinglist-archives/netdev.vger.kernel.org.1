@@ -1,154 +1,95 @@
-Return-Path: <netdev+bounces-247809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB3F1CFED26
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 17:18:59 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C14FECFEC3E
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 17:02:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D28E3300AC4D
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 16:18:57 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B278130019DD
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 16:02:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B935E33468C;
-	Wed,  7 Jan 2026 15:50:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B4E538B996;
+	Wed,  7 Jan 2026 15:55:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="M99Ftjyi";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="G8vU6iBr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="atRHehhy"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE48932AAA4;
-	Wed,  7 Jan 2026 15:50:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B6A33A981A;
+	Wed,  7 Jan 2026 15:55:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767801046; cv=none; b=JHvxRAklRNs1hczfmVHFjYBf26m3l/0ViCsjJi+/Xh5lm9WwV2Gt3p3aQRVtwFTSb574RXbdTPYgFMlub5W0FV/gcMQKHJAiGonc5DXRojVdB/r1BfKQh91+D3KoIx1hMV4FlFQSuf+r4jafVRMIrxnQcx1GZsvnjcv5GgnqiXw=
+	t=1767801323; cv=none; b=nJNFEtNm966DxEW38q2mgadqQekFrltJvuDRD+c2R2Ri5JTsTpV31338rLy7g2ZtIhZRPMXF3Af/OR9jL9XwzqpHh7ve7UsYCDU+fp07NIqYtB+OPXr4BeSj+m8204NhhXuSxd456NorIcLDMA47kw5n8Aqn4HBlMGEhQxrwkuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767801046; c=relaxed/simple;
-	bh=RUJXvBKgnBa2BvDzolVyJr4BB5nXdL3G8r5M9Sf/fLY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=bs4A4YOtNh/OAKa3SMs8S+WQceII4rsFKjDaQgkJb7UCSuSLYH+1ui/4qOHOJfvWZ27GqMguDy1IczrxA9HZHIslXa0EEHqIlrw6unu28Vrh+mrr+3SDo91b6jB/CbCrGpmH2x0ySS79XIqYDh0aWZtvUEa20fVwjWW+/gnv/4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=M99Ftjyi; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=G8vU6iBr; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: John Ogness <john.ogness@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1767801042;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1Rm/7Yl4bpOaIPKVVo5GHbdqhgHWVg68x5xjBPiNLTk=;
-	b=M99FtjyibaQzmBBjBmYtoBMMbUpcKn/9hKJCnkgU9NvSqVqFfBfX+8WXhRl8ykjViYvXdV
-	mbFfhGXsO0gWKFj3hwYtcz8NYAblHrQCJPORVJjFWRDTApdqdi+iBqA2ysbYIHQk+CxErv
-	NzGHYCnTp9boTZnn3484lT5Wm0KH1bya/1G4cItNvb1jLmjoMfbt5IB71/mym1/EvtcbaG
-	jYDbcxpJ1rzB8ytKK9JmBfza85dOyuJLBhelgQeD4s2fsaA1/cUerLZ2mQzdijrY6BGCVc
-	tOzQo0oJOHb5BDnlDc7NJluRlE2PhU6emabaZkuOZ/CeMTE/mlthtlurTWv0dA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1767801042;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1Rm/7Yl4bpOaIPKVVo5GHbdqhgHWVg68x5xjBPiNLTk=;
-	b=G8vU6iBreXFwoK0G2p/YlLJCLfaFVcBw1A7hJXrQLXhqPSLTt0bjbDaSdmVSwl+Kift8GS
-	oEYXQtbOfznUM1Cg==
-To: Breno Leitao <leitao@debian.org>, pmladek@suse.com, mpdesouza@suse.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- asantostc@gmail.com, efault@gmx.de, gustavold@gmail.com,
- calvin@wbinvd.org, jv@jvosburgh.net, kernel-team@meta.com, Petr Mladek
- <pmladek@suse.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, rostedt@goodmis.org
-Subject: Re: [PATCH net-next 0/2] net: netconsole: convert to NBCON console
- infrastructure
-In-Reply-To: <5mpei32y7sl5jmi2ciim4crxbc55zztiucxxsdd633mvzxlk7n@fowtsefym5y6>
-References: <20251222-nbcon-v1-0-65b43c098708@debian.org>
- <5mpei32y7sl5jmi2ciim4crxbc55zztiucxxsdd633mvzxlk7n@fowtsefym5y6>
-Date: Wed, 07 Jan 2026 16:56:41 +0106
-Message-ID: <87zf6pfmlq.fsf@jogness.linutronix.de>
+	s=arc-20240116; t=1767801323; c=relaxed/simple;
+	bh=kYVwO3rYvaj9FbefwMJ9YShwPb9d1RsDG3k8NGmOwBA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U2L0+KnblnbyHCliERPfEt/bKNyhJQwRerM0hlKpTWLe0WflN+wImEZ05DjLkjeDcuFC3t15iGeJroAPbGV7BjvaXuTSBchBBczDzgkmfxrhlI6wj/pqUFH9Z6c4oMBNJFDwjsmUISTd9+H/gFKjbjHsrGqw6KNvtyLElt1LJ8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=atRHehhy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BE47C4CEF1;
+	Wed,  7 Jan 2026 15:55:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767801321;
+	bh=kYVwO3rYvaj9FbefwMJ9YShwPb9d1RsDG3k8NGmOwBA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=atRHehhyJpnBldSqmxhxLHSYnEqjnhYnG+rxBy6VF2QvfzR1B7GxWBiDIF2+nJsOb
+	 B6mhe/nJ0SHuMiKBgH1cvXMIbaJOD4NyLPIKHbnBDez2HTc0AEe/A0IvBzYJHbpIhl
+	 z5sKmwFaFyKqPaU9bxFlknevQc9J0JIVamfm8lAFMP/XGFuozNkTJjHhPkWrVJZ8V6
+	 hlN9QtJP91XRQg0sj6CSLLccDd6+cq5OP+Cl6Vy5FExDjQ/VeD0idijLvw1bOe+Gk6
+	 OJvubP5JeQN7YBa+Gcb5yYjv9TbSuNV1a8B8F5sYeIxnkAKEHm6Ofd7t9QfwjsWqmK
+	 TCDO/teg7edng==
+Date: Wed, 7 Jan 2026 15:55:17 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH 04/15] net: ftgmac100: Use devm_alloc_etherdev()
+Message-ID: <20260107155517.GC345651@kernel.org>
+References: <20260105-ftgmac-cleanup-v1-0-b68e4a3d8fbe@aspeedtech.com>
+ <20260105-ftgmac-cleanup-v1-4-b68e4a3d8fbe@aspeedtech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260105-ftgmac-cleanup-v1-4-b68e4a3d8fbe@aspeedtech.com>
 
-Hi Breno,
+On Mon, Jan 05, 2026 at 03:08:50PM +0800, Jacky Chou wrote:
+> From: Andrew Lunn <andrew@lunn.ch>
+> 
+> Make use of devm_alloc_etherdev() to simplify cleanup.
+> 
+> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+> ---
+>  drivers/net/ethernet/faraday/ftgmac100.c | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
+> index f07167cabf39..75c7ab43e7e9 100644
+> --- a/drivers/net/ethernet/faraday/ftgmac100.c
+> +++ b/drivers/net/ethernet/faraday/ftgmac100.c
+> @@ -1877,10 +1877,9 @@ static int ftgmac100_probe(struct platform_device *pdev)
+>  		return irq;
+>  
+>  	/* setup net_device */
+> -	netdev = alloc_etherdev(sizeof(*priv));
+> +	netdev = devm_alloc_etherdev(&pdev->dev, sizeof(*priv));
+>  	if (!netdev) {
+> -		err = -ENOMEM;
+> -		goto err_alloc_etherdev;
+> +		return -ENOMEM;
+>  	}
 
-On 2026-01-07, Breno Leitao <leitao@debian.org> wrote:
-> On Mon, Dec 22, 2025 at 06:52:09AM -0800, Breno Leitao wrote:
->> This series adds support for the nbcon (new buffer console) infrastructure
->> to netconsole, enabling lock-free, priority-based console operations that
->> are safer in crash scenarios.
->
-> I've been reflecting further on this port and encountered a potential
-> roadblock that I'd like to discuss to ensure I'm heading in the right
-> direction.
->
-> Netconsole appends additional data (sysdata) to messages, specifically
-> the CPU and task_struct->comm fields.
->
-> Basically, it appends current->comm and raw_smp_processor_id()
-> when sending a message.
-> (For more details, see sysdata_append_cpu_nr() and
-> sysdata_append_taskname())
+nit: There is no longer any need for {} here.
 
-I was not aware of this netconsole feature until now.
-
-> With nbcon, since netconsole will operate on a separate thread, this
-> sysdata may become inaccurate (the data would reflect the printk thread
-> rather than the original task or CPU that generated the message).
-
-Note that even with legacy consoles there was never a guarantee that the
-printing context is the same CPU/task as the printk() caller. It was
-just much more likely.
-
-> Upon reviewing the printk subsystem, I noticed that struct
-> printk_info->caller_id stores similar information, but not exactly the
-> same. It contains either the CPU *or* the task, not both, and this data
-> isn't easily accessible from within the ->write_thread() context. 
->
-> One possible solution that comes to my mind is to pass both the CPU ID
-> and the task_struct/vpid to struct printk_info, and then integrate this
-> into struct nbcon_write_context *wctxt somehow.
->
-> This way, netconsole could reliably query the original CPU and task that
-> generated the message, regardless of where the netconsole code is
-> executed.
-
-But by the time the printer is active, that task may no longer exist,
-may have migrated to a different CPU and/or may be sleeping.
-
-IIUC, basically you want to attach console-specific additional
-information to ringbuffer records, but only that specific console should
-see/use the additional information. In this case it could be up to 4+16
-additional bytes (depending on @sysdata_fields).
-
-A while ago we had a discussion[0] about adding custom
-information. There I even went so far as to suggest supporting things
-like a new boot argument:
-
-    printk.format=ts,cpu,comm,pid,in_atomic
-
-(which could also be console-specific)
-
-The result of the discussion was killing off dictionaries (that allowed
-variable length custom data) and replacing them with the dev_printk_info
-struct.
-
-I am just pointing out that this kind of discussion has existed in the
-past and not suggesting that we should reintroduce dictionaries.
-
-
-A simple fix could be to add an extra 36-byte struct to both
-dev_printk_info and nbcon_write_context that exists conditionally on
-CONFIG_NETCONSOLE_DYNAMIC.
-
-vprintk_store() would set the extra data to dev_printk_info.
-
-nbcon_emit_next_record() would copy the data to nbcon_write_context.
-
-John Ogness
-
-[0] https://lore.kernel.org/lkml/20200904082438.20707-1-changki.kim@samsung.com
+...
 
