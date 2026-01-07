@@ -1,248 +1,222 @@
-Return-Path: <netdev+bounces-247898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F002D0055A
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 23:36:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D9C72D0057B
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 23:38:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B2ED2302CB86
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 22:34:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A519D3008FA0
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 22:37:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79AD02C11DB;
-	Wed,  7 Jan 2026 22:34:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71653296BB6;
+	Wed,  7 Jan 2026 22:37:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X8aOVzfE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LjPI3GVO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0CF023373D
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 22:34:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767825254; cv=fail; b=eSeXYYJEgdQhF0W9JTJpvzQPhJbLiMH68zqfbKK256gh0KvTVP8kW8hFhjgY3JP88M65cJ/CX7H6aGi//W7yLhzUZEK3+/crn6DLQnifH9pL9yAki/LfWXiE5vjWZMM64OgLr76j2pF7fDzk25UD1ONJjsucmNjTfBUOIouUIvo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767825254; c=relaxed/simple;
-	bh=DtHYxvkfAE2rd0ZXirfId35LODjxHW6uFxgrt7BhX5A=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=KbRcCuEIl09YkEPGVQl1cZU02KJ1esGfqCLFYTDcCPrEw4NdS9ujHthcE2NlhYhFR+nBMTHiIvSezUa4I6xjAHaAoCvWxfdGplrH0Qces+nnfIW+ZfZrWj/xSieYLbUJ1xA8NbRWtV1BOaHjwp5yTgcrws5qBpO3jxTw5VinovY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X8aOVzfE; arc=fail smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767825253; x=1799361253;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=DtHYxvkfAE2rd0ZXirfId35LODjxHW6uFxgrt7BhX5A=;
-  b=X8aOVzfE5PynzHrPPmz7Icn1UjoTibYK8KTLas+3NsY0MjQ/QCvhQe+E
-   caNy9PDqYjIZ60Aw1YGHst1OpRtTepTI1xPk8hPzjNLHK2TPhg8k4VrfL
-   nuaaKjY2T1kBsiMJFK35mILpVCb8YJWDT7WAgkcMa+AS9P/ZaZ9dD3k8k
-   MUMDJxQA3ma/h7M8/uyheC2tR41UPLmPwarhyVMErEYFHYoIPDfvGDCom
-   qcRGeydiuFEVLJFYDi/v1HkHkGzdDIY4TeGA3spoXjMAePcY+KmGZwkBN
-   ZRejGUk1X2uVTIFQXC87VOrw3j3qgCILg6nXzVw2gD4zpLCceS6AyeH0o
-   Q==;
-X-CSE-ConnectionGUID: yCTML+4PRlOrlLA4hgVcfw==
-X-CSE-MsgGUID: 1c/GBXunSfeAkKjU5p9FTA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11664"; a="79843285"
-X-IronPort-AV: E=Sophos;i="6.21,209,1763452800"; 
-   d="scan'208";a="79843285"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2026 14:34:10 -0800
-X-CSE-ConnectionGUID: iAxW/y3TSs+rg2Ftfl+uOQ==
-X-CSE-MsgGUID: rTf+h+VIQW2e745EwasDEQ==
-X-ExtLoop1: 1
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2026 14:34:10 -0800
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Wed, 7 Jan 2026 14:34:09 -0800
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Wed, 7 Jan 2026 14:34:09 -0800
-Received: from MW6PR02CU001.outbound.protection.outlook.com (52.101.48.57) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Wed, 7 Jan 2026 14:34:09 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TA84QrT9quz/juzwz+4tG8rjK6BAn3PTuK84ARMyqJx/buKNWEPM0kukrcK5x8fSBWWDFADIzrns18W4lY57lBCakNNMw2B3D73kOTaLA/BiCYA61TR2+VnYfyXaZBZdPNgxcouu3JjaKL9Kd7ybPgeFw4R6x0DDrqj3DnvzuumhWgd6JAWZxWAZVdzjTQl7UDm5SMeuLkd7+jB8j/SiV0xaKnXJFOIO+swgYUaHVkRKYdU7L/B8hHWkEufVSMQeaVYe5JbOYlrCup6NSZkzW+RcChIpC0InlPX/ShrH4grsrlTN7gzISFjf9KCUxrvhHV2tq1RP/Sc01c+qreuxdg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BcQn4RkLi90LCh34PkgZX1g9xckgGyBH9HQWycs//FY=;
- b=cH8QcgSMKHPVz7dumkveFE1wMCsFQzVIi9MWKpoNQ6/SAqiH10UQ0AybhiQ/qvrkUehYRbLQ1QkTLqun8RhZatuKzQ5LR/TNCQ+pP9Y7+Ab4+RttzgQO9Xkn92B0ZtUSUQ+AO4UmBPYVkV1z6t6qThkgVGyUu7vHPhbTk6ZJYYx/t9HQ3cc3M/Iygg7i95UCSgCSBDOZaTv23ONxFt7E4mWqLbwEOPWjKVvsWiRToaGqDOO81X4GHTZFzXDG+TjJ8vdGiUGIf/pw+QLbqDKCYxBg/gPHNV8Tb+JtjCJdKJfqCnqeY84iCgtvblrFQoNttlNU5FrsWywJMOqnku9Y3Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SJ1PR11MB6083.namprd11.prod.outlook.com (2603:10b6:a03:48a::9)
- by SN7PR11MB6797.namprd11.prod.outlook.com (2603:10b6:806:263::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.2; Wed, 7 Jan
- 2026 22:34:08 +0000
-Received: from SJ1PR11MB6083.namprd11.prod.outlook.com
- ([fe80::3454:2577:75f2:60a6]) by SJ1PR11MB6083.namprd11.prod.outlook.com
- ([fe80::3454:2577:75f2:60a6%3]) with mapi id 15.20.9499.002; Wed, 7 Jan 2026
- 22:34:08 +0000
-Date: Wed, 7 Jan 2026 14:34:06 -0800
-From: "Luck, Tony" <tony.luck@intel.com>
-To: Eric Dumazet <edumazet@google.com>
-CC: Eric Dumazet <eric.dumazet@gmail.com>, "David S . Miller"
-	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, netdev <netdev@vger.kernel.org>, Christophe Leroy
-	<christophe.leroy@csgroup.eu>, Willy Tarreau <w@1wt.eu>, Reinette Chatre
-	<reinette.chatre@intel.com>
-Subject: Re: [PATCH net-next] once: add DO_ONCE_SLOW() for sleepable contexts
-Message-ID: <aV7fXuvIMNOP0Kp8@agluck-desk3>
-References: <20221001205102.2319658-1-eric.dumazet@gmail.com>
- <aV7JKsNpsmnf5oQL@agluck-desk3>
- <CANn89iK72b5bSjq0MeedXJ5Onk22Pnw6cjNr0cAYP_-hv8RhAQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iK72b5bSjq0MeedXJ5Onk22Pnw6cjNr0cAYP_-hv8RhAQ@mail.gmail.com>
-X-ClientProxiedBy: SJ0PR03CA0077.namprd03.prod.outlook.com
- (2603:10b6:a03:331::22) To SJ1PR11MB6083.namprd11.prod.outlook.com
- (2603:10b6:a03:48a::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B827B29D293
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 22:37:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767825475; cv=none; b=c6OzmaTuWbAMzQlS7xNJlXK8+FsYQknaoowJTLNPE00NpAk77EP1navA56mb1tYxK+NN/AouViv+QOGrJOl4lkYER1UHV5L4d8ppenZwyKhW9CUchuSURYDaAwpVC2TmCiqXnoRWWwJgLMYuRAyoLX9KROJL3CK+/H8hIWg0IFc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767825475; c=relaxed/simple;
+	bh=3sYY1Qc99ANJJ3YHG4zUW4xeZ/NUoAuHhB0LQiDLB+o=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=hvWH3vBw7XaY9FimtwWnq8+99xx1diqNmrdi9cqPSam3mMz+rFf2c95vhZrehhetIh7YheFFjNZAImYMoMef1uX/wDi6CFSPAO+ROSs9s/b8AF6hEomBOGM7knji6ZK5IoxuBfCYpG4zlpfH1rieSTQ9908xaTJ/sJVh+nliaQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LjPI3GVO; arc=none smtp.client-ip=74.125.224.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-64661975669so2758874d50.3
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 14:37:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767825473; x=1768430273; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rRBooldm41LgTFya8OY2OmgrhoB+H6pwWMX8YIfPpgc=;
+        b=LjPI3GVORmk8ypUUIx1xghnyZ6IJ2/7mUaCAYX9Af/FRijV8SUeHjAPNDCdii7hO7e
+         jZEVr6THrNb0xvwfqqUzEtcsD+9jjmJdAv51JSUq3SreGb9py66hCQEUmdSbnGk6a5gF
+         z/dxvkicbOHecx4MkYWFtpmeUfH4wDQJwPKCihDBMOtNLJsGG2bV56etNXQ5Wp9xNL+M
+         kzulICo+BhrRxnS60KjSivHOSspCEvC6beYehJN5jFbhKSQtquy2rEuETF5OzfFNl4N3
+         1DDs/SsWZwpSt647u5/2cBfua+vPYvT//kk3xeOJDeGrkzc0RLe66zRWN26DFVuzsG0e
+         eC2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767825473; x=1768430273;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rRBooldm41LgTFya8OY2OmgrhoB+H6pwWMX8YIfPpgc=;
+        b=WYcywufbnxLEA4YPwTfxilQM4hb1NAcUCjg9+IJMDYE8HaZKgodlS3Y4E7HQTeJjfV
+         3czjC5ve9nP+woNdc30QyYjojSKjxbU+dAXtjWVnpca4QnTSFNKgyUYDz9+O7Wqzz9ea
+         eVcAs/BRmLIQKFNK4eFAaQ4xWRbsjIR3JNz1hoPZQOTz4Qa7cMsL1AR94rc3BpdpvhfV
+         28WZ7Y9/lEXeh6kU+taTtTx81ORG/M7OdUiVtD4nMNEGjzTLpbTYgg4GefjTkS7r1cAs
+         k/NA5sCF09D5k+fcJslXAV3TkiLePUh0Vcuvo3wzbilxZy2GJ4bTlNCFDfoRFwfBMZi7
+         Ht0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVHrKCVDCPcMb8ynWykLevUEuw88UGhAWSYpZ2QsKsvooN7Aaxq6dz/RfzMS/glLvyPk824NV8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7zsiEqb3z6tnbRMu+dBCrEWWBX7D1SXcE95zuWDGpcpb3xwpi
+	UDUgWij8CrYZ+5HGdZQx7DpLbJooF70nXmV5LR76ST5Ksm44RgbpGkM9
+X-Gm-Gg: AY/fxX4ZcfJVfY8HuWEJyP+fM/N8WM72ayh2Su840objyQY7DMjouvdvWwAGI0e3Ghr
+	miV6FqmlnM2TvDGwhZuHjX0WI2UNymudCMvsg7bbCWswJhnPTiPjXp4vP0oD68SZh/WORl4Qxat
+	G05F78ofMTw7FPVTS9X3xV809sSTUYY32R2enRM8w+VnQH0ejxlqlyEcm+gSYQNHzbWQjcDZ+c2
+	42lr6VMiKrN490qOUhqRDUUAizYs2z8WiMOgF7Bybms7bTW1qtOo6u6E1qwpD0zOEzPr2snuNz/
+	uVypJN1zIY3Ao8vavJaZ4ykfmCV5P758d7Z3LgA+WhzISdM4/fuo2IHJShr2JGF0vWrJjUBZ/jX
+	gV8R4erEu6u2DUMQvedtDkL/tgh+SCszr/iS1c3GsY+jd2sq7BtFPWlwHDW+OpLdKq5z+KXhomY
+	Vg9S33TtD7sbIVwlQXxcFg8w4tJ3kLWgx5GF4hmw+VARK+xj/Qafd9bbbEvV6O7scCBuyKJw==
+X-Google-Smtp-Source: AGHT+IF/8f9U9sqa7mM9SBQb1x2OJFmJf1sey+yIn+cZklw5qMjQJkjZ/u8ty8LccSyX86FFECR19A==
+X-Received: by 2002:a05:690e:1481:b0:645:556b:62a4 with SMTP id 956f58d0204a3-64716b5fd1cmr3379646d50.7.1767825472692;
+        Wed, 07 Jan 2026 14:37:52 -0800 (PST)
+Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-6470d8b241csm2582233d50.19.2026.01.07.14.37.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Jan 2026 14:37:51 -0800 (PST)
+Date: Wed, 07 Jan 2026 17:37:51 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Mahdi Faramarzpour <mahdifrmx@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, 
+ netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ dsahern@kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ horms@kernel.org
+Message-ID: <willemdebruijn.kernel.22b9558f6c8d6@gmail.com>
+In-Reply-To: <CA+KdSGOW0+V9KTA6CebvJ5dSqBxCV5XFAJshJByQ36=GWX6yiQ@mail.gmail.com>
+References: <20260105114732.140719-1-mahdifrmx@gmail.com>
+ <20260105175406.3bd4f862@kernel.org>
+ <CA+KdSGN4uLo3kp1kN0TPCUt-Ak59k_Hr0w3tNtE106ybUFi2-Q@mail.gmail.com>
+ <willemdebruijn.kernel.36ecbd32a1f0d@gmail.com>
+ <CA+KdSGOzzb=vMWh6UG-OFSQgEapS4Ckwf5K8hwYy8hz4N9RVMg@mail.gmail.com>
+ <willemdebruijn.kernel.21c4d3b7b8f9d@gmail.com>
+ <CA+KdSGOW0+V9KTA6CebvJ5dSqBxCV5XFAJshJByQ36=GWX6yiQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] udp: add drop count for packets in
+ udp_prod_queue
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PR11MB6083:EE_|SN7PR11MB6797:EE_
-X-MS-Office365-Filtering-Correlation-Id: b1f78b8b-c334-4037-f0ef-08de4e3cdeee
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?OUF6Q0l0MjJYajE1TjVXbnZzRHQ2NjFtZndCVGt2N2VOYlZrbEZDWlFDVWcv?=
- =?utf-8?B?YXdvTVkzUzVzRjg5ck5LT3JhdXNWd3cyN3pPU2ltdW5IY0VEdFZKdEFCL0FB?=
- =?utf-8?B?bTU5NUxwMFZxZVdFdklXYWZUcU1nZ1E3RDhwSEp2NmdORGsrV0FJM3VWc1hD?=
- =?utf-8?B?ZVQ1WGJYMVFYbU9TU2o0V2NZREtHSmJOSUF3MEowUWlMbWg1QkszdnNRdmUv?=
- =?utf-8?B?SHpISWRUTnJxcDRpd3ZEU3JaeGM4SWZyK1EybjNhTFpaM1BRV0QrcnRqSHdL?=
- =?utf-8?B?NEEvUm41SlRYZmkxSzErSGxxRTcxa3UxR0lVc2M4SDd6ZER0WGlvZzZBNitx?=
- =?utf-8?B?VjVPTmROeUZkQkxIQ0diNnlzZHVKemlmdDhYcDk2V2RvZVVHN2RSODA0UUxZ?=
- =?utf-8?B?MnZPWFZKUDBzU2JENlM3UXNuMXUwWGt4cjdhREdvbmhqQ3QxM0JUSE1XZVY0?=
- =?utf-8?B?TjNqSDR3WGI1WW5UcUs3a0JERVBQZHdwSy8ydzJLZ0lRMG5IU3N5bU9WQ3F2?=
- =?utf-8?B?c3NiUWY5WmlhUk1uTkhsN053NXRzOXpLeVJIU3MrYlFNeDBaZE95RmRra1ZN?=
- =?utf-8?B?T21iWXk1MkJmb1NISEtCWTNQUHE5Q0s5SWtwV1FxMTRaS0lxaU5uQWZxT3BH?=
- =?utf-8?B?Rm40ZTNsNi9LOVB2d2hHYThjMWh5dktPZmtIKy9OWHpuUFVEWm5lbVVHTTh5?=
- =?utf-8?B?WU5VSW1ySUZwZGFGMHB3NkxhVytyM0pMbm5yTVl4ZXRtVC8vekpROU15S0RB?=
- =?utf-8?B?eEV2eXczdHJwZ1RmYkZ4VSsyaXM3Nm9jUkRIRlpFekRIYS9VVEl5VVhaSXJ4?=
- =?utf-8?B?MU5hWm56N0NMb0VVRXNiTHBqam5IUklkYjlpS0hJT2h3R2pyZEZ4U01ZVUlh?=
- =?utf-8?B?S3FXRUR1d2NaUXRpVGdraUpNMGVSYWVwQW42U0JKYVptOUVTRDg4Y2dXTFFk?=
- =?utf-8?B?WWJxWFE0THlHUzZsVFZnOG0ycktqM1VSS0pabi9leUtKZVgzdWh1dlhiZFZS?=
- =?utf-8?B?VUZ2OXFzeVE3S2hyMXhTOExvcXZsN2JMeFNVeUZBYiszTE4rQWdRTjFybVky?=
- =?utf-8?B?Tkd5clBCWmtDUUx3ZXFVUkFwMUhXditGSy9EelQrellxWERwN3F6MFpMQlAz?=
- =?utf-8?B?Zk9DdTNudEdvTjZCYW1sN3liY1dvNDFxcnprR1YrNGpTZEVoY0dYUnY0dDBP?=
- =?utf-8?B?bHYwK3QvTHo0Ky9yWnBXTnB6RU83MkRobFR5Q2k5T09BaFhiUE5HdEYvUTc0?=
- =?utf-8?B?cmJFaE9za1JxM1h0S2tvN2FaVkhuTDJwQlVHUWhId0VDTjlLY0dCQW9BVWxS?=
- =?utf-8?B?YmRKWTB5eDYxL29KaDlWWHlPSHk2T3paM3Uzblp2UWpoTmFTaXNHUDBxbHY5?=
- =?utf-8?B?aXNQVm5TdjRFRDF1ZmpVc3dUZVJ5Q0FBTkZIeUh5WW9jZGp0NTBpd1JYTlM0?=
- =?utf-8?B?VURGb2xDWTZVZ1ZmMnY1cnQ1NVphOGZDZWJSZ3hMTjZMcVAzNHRhckJ4cTB3?=
- =?utf-8?B?UTZlbGlvLzNlZExIeSsyNUpKbnlSTUwvZzhDeC9SRjdFenBLZEoyUDcyL3Jr?=
- =?utf-8?B?dVhUUzdXb0d5UHJLVkRQQUV1RWRiSDlhUmpqKy9LTGlGczhrK2YwaTlWeWFr?=
- =?utf-8?B?ZEJOZlJCL1gvWDVsNFF3L2pHSG4velBNNkNnYzFldWlRNThPVVRzcnNZSU9H?=
- =?utf-8?B?d01tUTNXS0pyUm5yQnVLTHdPek0zcC80OUlCZUlmNDl3Mjh0Qm9idUhBZEIw?=
- =?utf-8?B?dXJoWUt6eUpITGdhMFVhK1RyVDN6dkoxRC9GcGRwUVdlZGtxQWRtMnkrUEor?=
- =?utf-8?B?N1dYMG5aaHh2ZTdHd2NEM2ZUdjJPaXlUanBtV042MG5VdEFxYW9ydUFLckZz?=
- =?utf-8?B?QmtKV1pjR0RPYVlwMFQxRjBoQ3hQSDhyWmJ4cDl0blNDRnlPU1JzQVY5UFJq?=
- =?utf-8?Q?pC6KtN3lj/rIhHi7sSzZybRBZYQW0zwL?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR11MB6083.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MW5ZWDZqNndRNGhUUUtKN3IxazZCd0FFSUZacVZnZmV6b2R4Zko1YnFMQzB4?=
- =?utf-8?B?QzRReUFEY2VheDRFbXFFamY3UCs4Q3hmbFFJTG5mU3VMWGs0ZlBDQVNjL3FE?=
- =?utf-8?B?SHUwanNSSWM2MTZKbEtWRUxKTzB1RmVSVTJiMWp4TUhURkNCYmo4NFlLYVJa?=
- =?utf-8?B?bml1cDNCRkdwQVIvQjg3R2JjRHhHZk91WEJxcnNOb0FkeUJSZUxRZGcySkJY?=
- =?utf-8?B?REtCMmdGeG1FNnhYMXNsaFp2TU03OWRYWkl1Uk9ySFZBcDYwZndQaDFwUExK?=
- =?utf-8?B?WUYrMEhhWkpaYjcyeXZTSlZ5NVk1clRUUlBuOGpWT2xRMmV0V3BpUklHWERt?=
- =?utf-8?B?Um1ka09ocWZTMlVvS29yWWRsM3RzOE9YS2lEM3FJMDQreDVQa1ZDalMzSGlD?=
- =?utf-8?B?TVkzQStmbWRML1k2Tk1pQkhzeGMrOFIxSUQ2Y2NMbUJxODJQQUVVWTN6blN1?=
- =?utf-8?B?Y2k2ZlpxMFJ0M2VKaVk0Nm9vTEJjV0g5TUQ3eElJeHV6bnU1Qjl3NlBCWVZU?=
- =?utf-8?B?YzJidHY5cEV6Q2plMnF5dXhOd0R2NEdvU2tZRVJsSWpIejlYVktNT3FRRGZV?=
- =?utf-8?B?SzBCbVF6UFJ0V3AzNUo3OXJQbDRGTmtGa2F5QVdteWMyMXNhSUV6UGdvdXNo?=
- =?utf-8?B?cFViNk5oUS80YVNMdFl3ci85eTh6UnlNM1ppdHBUM3BsTk9RZzRkdXJWc2pQ?=
- =?utf-8?B?ZUdEN01yNFAyQ3JWMm05S1EvME1SMTQxblVabHQySGFHSWV2N1F0MnA3a25w?=
- =?utf-8?B?bFpYd0hkQ0Q0MjdwcGtWY1dlZ2ZnMnVpTzQwRm1qSDAzbUsvQUZnQ1E2RU1k?=
- =?utf-8?B?d2Rnc0d0bTV4Ym40UUVOdUx6Zk0vV3AxVlo3dlRESC9yeHpZU2VsRXJkUjZH?=
- =?utf-8?B?K2p4ZC93UllqRnlySnptdS85dUdrc2ppNG9nT3BLZnUzaUJydGFWUEh6ZTRm?=
- =?utf-8?B?eW1aWGdiVnZzUTJuSmZscGZVSkp2ekpsUzZiaFRmMkwzRThyMEc2Y0p6b3lD?=
- =?utf-8?B?YWJiUkFocFJ4dFRMVE5nQTlpL2gzYUpuSGwveEpUaXNxeTdxQ0xsSjhXMHBt?=
- =?utf-8?B?QTAwV21nTDZxT3NZS0FpNU1yZlBMNmJCb0NKekpob1NvOXh1Yy9lOWZaRXFu?=
- =?utf-8?B?cUNaY3c4V2wxam50d3BhYWRyWjkzVE0vSUluak9ONlB3NGdZV2VSQVg3WGVr?=
- =?utf-8?B?QjJnK0dNSXJKcFY0T3owSHo4RTg5S0svVzU5Z0RXVUFQN21lU0Y2cTNsMHUz?=
- =?utf-8?B?T1Axdy9aUXVmQ1hiSXJ4Z09OUWxNZVUyd2hEYTRkdDFmQ1RXK2ZtL2cxQmEw?=
- =?utf-8?B?L1FuR3l4aHpnbVphT3h0bjM2ZFgvamVxc2FSeXBwMTd4RDdiL1oxQUZFenRN?=
- =?utf-8?B?Y1VnQkljMVE4ZXhsVi9PMWx3MHg2aCtwSHJISERXdDc4T2VxdVhvWUwvdmJ6?=
- =?utf-8?B?cnlsYjRtTzJqdmxmT0pTbnVFbE1jb1QrVkJySDZSQ2dGZXQzQ1AxTXVaZk1D?=
- =?utf-8?B?SWNCUWR4UTRHdUlXZDlUZHh4QkhEUmNhMHNnQzBOM2JYeEpQN0RWTUoxY09v?=
- =?utf-8?B?MllscFBSQkdNOE5hcTBIR3N1czk5aC9jSFdYdTF0bTc0cXJwaXNYdVpMb3Ji?=
- =?utf-8?B?STVueHZ6Y0lCSno5cW5DZ2xrN2lvcU1nbWtKKy83YVQ5UnpoRTVRakcvQWFh?=
- =?utf-8?B?NVowRE1hWUN3QjFERW1nSnE4dzQyb2U4aU9PTk9KQUdHaG84R1pVUzk3TVhw?=
- =?utf-8?B?cUhETk5VNGdLQUZvUTRrQ2xQb2xZdUJiZkJZQ0NhcDJZTXJDb2xBTXEzZnhz?=
- =?utf-8?B?MUhJMEM2WnVUdGZUZHl3VXJUMThzMXlqOGRtQUJSQW5wbDhIWFNmeUhnS2lN?=
- =?utf-8?B?VlJQUDFSTU0vc0xiT1crUlJwYzFnSXR3NmNXa0xycnQxcWxYOFRlQldrMGw0?=
- =?utf-8?B?NnNvdndrZWlSV3NCTk5jQVNKRHhPdmFjU3J2ZXYyVmNCYnNXVDUwcTE4WmxS?=
- =?utf-8?B?eEpVOUNUbmhSMm9wUkUycWpLVFloUVRMUytYSEFncVcvZkNnQVBBenBXaExv?=
- =?utf-8?B?bTltRm4xRGJGUjNGLzkrVThqUm9wY0FPdjhjMWV1YjZiSlFaSzkyL3Y4dC82?=
- =?utf-8?B?NzZxVitldVphWkF4WWlHeGtvcUg5dlhWRWs1YjFoZ3RpWDJUOGo1Zi8wQTlO?=
- =?utf-8?B?VnZSc01xZ25BTW04UmpPUkcwWngxajdJZlRPV1JPWWhESjQrWWdod3E4eTJI?=
- =?utf-8?B?Q0YzT1lIQmFnTjNCNTNrNWlHZ3pyVlVzMmh6VjIveURKMkI2V3M0WE02Qll5?=
- =?utf-8?B?K3ptVFRNQnZjVkFqdXB4bUhITE9rVFM1ZytOTXNsR1MyNDlqLy84Zz09?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b1f78b8b-c334-4037-f0ef-08de4e3cdeee
-X-MS-Exchange-CrossTenant-AuthSource: SJ1PR11MB6083.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2026 22:34:07.9464
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YfKJnzHIr2tP7KuLXKs9o8aJwHAulSu0OstIiXzsrGBFszHdH4Spcnk0bPipXNfzkZVnWvpX8oviZr40WQbcWg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6797
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 07, 2026 at 10:17:52PM +0100, Eric Dumazet wrote:
-> On Wed, Jan 7, 2026 at 9:59 PM Luck, Tony <tony.luck@intel.com> wrote:
+Mahdi Faramarzpour wrote:
+> On Wed, Jan 7, 2026 at 6:39=E2=80=AFPM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
 > >
-> > On Sat, Oct 01, 2022 at 01:51:02PM -0700, Eric Dumazet wrote:
-> > > +void __do_once_slow_done(bool *done, struct static_key_true *once_key,
-> > > +                      struct module *mod)
-> > > +     __releases(once_mutex)
-> > > +{
-> > > +     *done = true;
-> > > +     mutex_unlock(&once_mutex);
-> > > +     once_disable_jump(once_key, mod);
+> > Mahdi Faramarzpour wrote:
+> > > On Tue, Jan 6, 2026 at 10:52=E2=80=AFPM Willem de Bruijn
+> > > <willemdebruijn.kernel@gmail.com> wrote:
+> > > >
+> > > > Mahdi Faramarzpour wrote:
+> > > > > On Tue, Jan 6, 2026 at 5:24=E2=80=AFAM Jakub Kicinski <kuba@ker=
+nel.org> wrote:
+> > > > > >
+> > > > > > On Mon,  5 Jan 2026 15:17:32 +0330 Mahdi Faramarzpour wrote:
+> > > > > > > This commit adds SNMP drop count increment for the packets =
+in
+> > > > > > > per NUMA queues which were introduced in commit b650bf0977d=
+3
+> > > > > > > ("udp: remove busylock and add per NUMA queues").
+> > > >
+> > > > Can you give some rationale why the existing counters are insuffi=
+cient
+> > > > and why you chose to change then number of counters you suggest
+> > > > between revisions of your patch?
+> > > >
+> > > The difference between revisions is due to me realizing that the on=
+ly error the
+> > > udp_rmem_schedule returns is ENOBUFS, which is mapped to UDP_MIB_ME=
+MERRORS
+> > > (refer to function __udp_queue_rcv_skb), and thus UDP_MIB_RCVBUFERR=
+ORS
+> > > need not increase.
 > >
-> > This seems to have been cut & pasted from __do_once_done(). But is there
-> > a reason for the "sleepable" version to defer resetting the static key
-> > in a work queue? Can't we just inline do:
+> > I see. Please make such a note in the revision changelog. See also
 > >
-> >         BUG_ON(!static_key_enabled(once_key));
-> >         static_branch_disable(once_key);
+> > https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html=
+#changes-requested
 > >
-> > > +}
-> >
-> > -Tony
-> >
-> > Credit to Reinette for raising this question. Blame me if I didn't spot
-> > why a work queue is needed.
-> 
-> Note this is used from one single place, one time...
+> Ok.
+> =
 
-Boris pointed me to <linux/once.h> when reviewing a patch with open-coded
-"do this once" section. So there may be about to be a second user. Perhaps
-more to follow as the DO_ONCE*() macros look to be a very neat, concise,
-and obvious way to call a function just once.
+> > > > This code adds some cost to the hot path. The blamed commit added=
 
-> Why would you care ?
+> > > > drop counters, most likely weighing the value of counters against=
 
-It looks like unnecessary overhead, but I wondered if there was
-something I was missing. Some reason why the SLEEPABLE version
-needed to delay clearing the static key to a work queue.
+> > > > their cost. I don't immediately see reason to revisit that.
+> > > >
+> > > AFAIU the drop_counter is per socket, while the counters added in t=
+his
+> > > patch correspond
+> > > to /proc/net/{snmp,snmp6} pseudofiles. This patch implements the to=
+do
+> > > comment added in
+> > > the blamed commit.
+> >
+> > Ah indeed.
+> >
+> > The entire logic can be inside the unlikely(to_drop) branch right?
+> > No need to initialize the counters in the hot path, or do the
+> > skb->protocol earlier?
+> >
+> Right.
+> =
 
--Tony
+> > The previous busylock approach could also drop packets at this stage
+> > (goto uncharge_drop), and the skb is also dropped if exceeding rcvbuf=
+.
+> > Neither of those conditions update SNMP stats. I'd like to understand=
+
+> > what makes this case different.
+> >
+> The difference comes from the intermediate udp_prod_queue which contain=
+s
+> packets from calls to __udp_enqueue_schedule_skb that reached this bran=
+ch:
+> =
+
+>     if (!llist_add(&skb->ll_node, &udp_prod_queue->ll_root))
+>         return 0;
+> =
+
+> these packets might be dropped in batch later by the call that reaches =
+the
+> unlikely(to_drop) branch, and thus SNMP stats must increase. Note that =
+such
+> packets are only dropped due to the ENOBUFS returned from udp_rmem_sche=
+dule.
+
+Understood.
+
+The difference with the other drops is that those are on the skb that
+is being passed to __udp_enqueue_schedule_skb, and are accounted to
+the SNMP stats in the caller when __udp_enqueue_schedule_skb returns
+with an error.
+
+The skbs queued here cannot be accounted that way, so require
+additional separate SNMP adds.
+
+> > > > > >
+> > > > > > You must not submit more than one version of a patch within a=
+ 24h
+> > > > > > period.
+> > > > > Hi Jakub and sorry for the noise, didn't know that. Is there an=
+y way to check
+> > > > > my patch against all patchwork checks ,specially the AI-reviewe=
+r
+> > > > > before submitting it?
+> > > >
+> > > > See https://www.kernel.org/doc/html/latest/process/maintainer-net=
+dev.html
+> > > >
+> > > thanks.
+> >
+> >
+
+
 
