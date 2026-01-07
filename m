@@ -1,383 +1,184 @@
-Return-Path: <netdev+bounces-247614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14914CFC4D1
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 08:19:20 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5744CCFC513
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 08:22:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D809C3012751
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 07:19:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 54F043023D20
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 07:22:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EDDD1FBEA8;
-	Wed,  7 Jan 2026 07:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F76222FE11;
+	Wed,  7 Jan 2026 07:22:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hKrBQXeV"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ROroWRh/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f196.google.com (mail-dy1-f196.google.com [74.125.82.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995AA7DA66
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 07:19:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD27526560D;
+	Wed,  7 Jan 2026 07:22:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767770357; cv=none; b=kgbfzSIdJxOYQ46NXiL+rJf9kqWnpH5hIz8El3ERAsks///kAwdZqHp3g/RpdEj5OjjHX7hSxaX6ZhDbpjgFe1y02By26nZc+bsvWJ1WPxJt2ea3eDgLAEjf6qA9Wa9B6wX8zrE7YKYBSXTzR0XJG0xYO8YXtu/ChEvuwS4PsJA=
+	t=1767770567; cv=none; b=gHjUpNwyAJaymoIrO1xR7fVz9uh7vZEbLc7D3RHVPS0z818KV2bZgHf0wVKo7GKXZxYYbZniA/Aw5M9znSem+duW9bndsb+DJQMt4TmTflCTeaglw/hQ0h4SELOn2VShKO2ZbzdWSSGPd5C1+KEBtBYVt1B1JmG/komBziwxew8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767770357; c=relaxed/simple;
-	bh=qODfchQt2Ax4LN1GlAt6JHGtFYLrEQDmIa9eWQEJ3lA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AD+6NuXksEZg7YhNxzzszPt5siprOlbbRWLjbYU9OhWZFK6HzaVyf3p50IqJnkeGI9FePLJYrMIyKi8OVzR88Ardvr7vUWoXgbgmu0thc4t8mnRdNTEyQ8IDSv60hr0B4XDSXzRkGYwi2Zpnwx1BfWk2/xRR+EdMdvNEXRP5IzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hKrBQXeV; arc=none smtp.client-ip=74.125.82.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f196.google.com with SMTP id 5a478bee46e88-2ae2eb49b4bso1926643eec.0
-        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 23:19:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767770355; x=1768375155; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=O4CflCTYa9b6bwo3NxQIh+T3QRujVuSG4vE5IJ1V1UQ=;
-        b=hKrBQXeV1fQdwmEG1tFm5M3z/bOfB31kkSrhIo4niIyoacJU6fdJr8P5XCy+G3oyLd
-         9Jkzyoultle1IKVle5Tg8uaMVNU7LpPlJYlWezmxGPRRbQ8/CtJVskXRsDM4qiBkj+BE
-         030ePciPkn5P8xERYEG+tBg9tbqElBahBdQYY4Nsa1t59gfLgrCam4SMqZxkQ8KKA3dD
-         2V04ufNRe3H9A4+Mg5m2rynFn2sppItn5YDf5+MsUxq8iHBDUUzGmET38OIiyrms5fZV
-         nDWA8zIPIaID7ErbH1dOAAWqwL8uqp56rtiV7Nhu+0hDWcyXNEPfmKXh7ty7dJ+ptVuB
-         Lt/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767770355; x=1768375155;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O4CflCTYa9b6bwo3NxQIh+T3QRujVuSG4vE5IJ1V1UQ=;
-        b=Y0rJpYCqgXrZQ1tbGASLs8m/qPet4hyK5jHlLeAHin/yAeQYVF3az5J9P+fG67mz5d
-         qsHlMtb+6nR0PM60Z7QO3d18SADUqKfPv3X+Cb3btWYfJE7WqJPeLnGL5m2WXa3IRk9y
-         FabxKFas+25KD3F9WfuDHBozRTt4JNdSOGRWe/rYo+i0mkNjjkcPdWaocAftPq9qUCd9
-         BbTewxN3QoBa9MIRW6CKVFXUtw4eyIX6QyxM3+IRXrRUEIFvfLUZQlngNg0dx3A9Cxb3
-         7cKY60T6hu21E5z/DQ1ZehB7SfpLPXEIPUU8WHoFhsqCFai4xhiJ6dAe58A76VbT/XlG
-         GyVg==
-X-Gm-Message-State: AOJu0YzdGLAhgH2v0oS65eAbCwE4TpD3GbWxNup1YYlAD8aJ5FbKOc1h
-	tgPA+IxW2g4Q1NDxKhGCnEzcmcX4wGPP8qJ/rBbbb5EWFmMvD3bF/x18pmE3T8ir
-X-Gm-Gg: AY/fxX5WOmCYDO4t1x15ni8f1rjGPDeOuZx+EJUcnR1i7PSdLvMNoz7vIEcPkg61Bnp
-	jKW4T7OhqzlDt/0hBH2l/gZLNk2OJdKSh1bqCAuypvjwMeSfMT3FxBM8XBGBXEYqRIi7MeccLES
-	mZDSWrtt1PEmNWvyc1+IXE15Fg/S4J8r3eE0dT69gY7K+YOMkrdlK9tXBKk2V2mvsVrOiT4/1bR
-	Y9OEWm3ZdXWgmIkMjPV6mV+AJvc5kB++RiyWSKjc/ow1PRo0ob/r3Sx0MjLrNEisrxLdUX37MwG
-	XHKjNJCFaPj2HrF95rYeq5f1jKMQUT1WUGnzYWEZlKXn5wXZzP+hq7GKP/6MAx+eafGevoz1QhD
-	MZw/gixyimokRAaadK4UPnpFO1iLNrQcelyEy6UBQWb5x9/72AGV8fcPWOu/hXqZPEdPA1IXGqk
-	Ats3Q6sSx8WkVvC7YN8Qu2Byk45fKFEKlKbJGOfC7m0tW9DYZNth2JYAqvS6jGSojBv5XytcNCF
-	QjZudlyQPhUpcZCfW1ua1GZBqUIXOA+KRGAbfkANNpZS/zcj/mhO7Px0/0REiCg0E0/DCl0X7+7
-	pZNB
-X-Google-Smtp-Source: AGHT+IF99bd2OqpEi5lpjV4DoG84mdbYHhxzaWY2/G27fliRjdiqWHYPxta0mr6ynJnV6I7fneodWA==
-X-Received: by 2002:a05:7300:6ca7:b0:2ae:5d27:ff49 with SMTP id 5a478bee46e88-2b17d1e4b87mr1416688eec.7.1767770354487;
-        Tue, 06 Jan 2026 23:19:14 -0800 (PST)
-Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b1706a5d3dsm5739393eec.13.2026.01.06.23.19.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jan 2026 23:19:14 -0800 (PST)
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Subject: [PATCH net-next] pcnet32: remove VLB support
-Date: Tue,  6 Jan 2026 23:18:31 -0800
-Message-ID: <20260107071831.32895-1-enelsonmoore@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1767770567; c=relaxed/simple;
+	bh=bfibTL1ji1QmvEFkfxm914aa635piGfHWOJFwEjtWWo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=a6+/kijPbFpoAz8/RoNHHUQ1nspHdSXEWe17st055OViMh9b7h6T7b/HtAis8SrZwpCYI1tOe1LGgAKnyDnUtiPH9ATW0uZih2aGOHYgbitDUw+sVR60ZxHLpp4aZ816DZ7q1C4LDIqCloKnrJtphwbhQlkQsX6+T6wOMq50qpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ROroWRh/; arc=none smtp.client-ip=220.197.31.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
+	Message-ID; bh=bfibTL1ji1QmvEFkfxm914aa635piGfHWOJFwEjtWWo=; b=R
+	OroWRh/p1KiCUmvUHi5GDByDgXGk0lKvoHG306YhYCJjShF/hqDrEiSt8l2SEIyY
+	8HKBBgU70whZAxrzgDs9NOlStkJKwEmMhdYr8VL78VMlTmprT6RiqccuKfrVQxTi
+	RVloURTMEgtKka2qB5DGf+ltK6/HM/a2QjUB/zzoCM=
+Received: from slark_xiao$163.com (
+ [2408:8459:3860:79dc:e48d:3bf1:6788:3ccb] ) by ajax-webmail-wmsvr-40-127
+ (Coremail) ; Wed, 7 Jan 2026 15:21:36 +0800 (CST)
+Date: Wed, 7 Jan 2026 15:21:36 +0800 (CST)
+From: "Slark Xiao" <slark_xiao@163.com>
+To: "Sai Krishna Gajula" <saikrishnag@marvell.com>
+Cc: "loic.poulain@oss.qualcomm.com" <loic.poulain@oss.qualcomm.com>,
+	"ryazanov.s.a@gmail.com" <ryazanov.s.a@gmail.com>,
+	"johannes@sipsolutions.net" <johannes@sipsolutions.net>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"mani@kernel.org" <mani@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re:RE: [net-next v4 2/8] net: wwan: core: split port creation and
+ registration
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
+ 20250723(a044bf12) Copyright (c) 2002-2026 www.mailtech.cn 163com
+In-Reply-To: <BYAPR18MB37352E69CB7B685926A574B9A087A@BYAPR18MB3735.namprd18.prod.outlook.com>
+References: <20260105102018.62731-1-slark_xiao@163.com>
+ <20260105102018.62731-3-slark_xiao@163.com>
+ <BYAPR18MB37352E69CB7B685926A574B9A087A@BYAPR18MB3735.namprd18.prod.outlook.com>
+X-NTES-SC: AL_Qu2dBfucv0wi4CKYbOkfmk8Sg+84W8K3v/0v1YVQOpF8jA/p8D8rXnZKEETb8uSdCjyerB63dQJQxMhbR6tAWYkJN/tAhSi1vA9F6tRMsVCUvg==
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Message-ID: <65a926ef.5e4a.19b97551cdb.Coremail.slark_xiao@163.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:fygvCgCHxLeACV5pnN5RAA--.17344W
+X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/xtbCvwBUuGleCYAluQAA3x
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
 
-This allows the code managing device instances to be simplified
-significantly. The VLB bus is very obsolete and last appeared on
-P5 Pentium-era hardware. Support for it has been removed from
-other drivers, and it is highly unlikely anyone is using it with
-modern Linux kernels.
-
-Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
----
- drivers/net/ethernet/amd/pcnet32.c | 144 ++++-------------------------
- 1 file changed, 20 insertions(+), 124 deletions(-)
-
-diff --git a/drivers/net/ethernet/amd/pcnet32.c b/drivers/net/ethernet/amd/pcnet32.c
-index 9eaefa0f5e80..7a63426af641 100644
---- a/drivers/net/ethernet/amd/pcnet32.c
-+++ b/drivers/net/ethernet/amd/pcnet32.c
-@@ -75,17 +75,8 @@ MODULE_DEVICE_TABLE(pci, pcnet32_pci_tbl);
- 
- static int cards_found;
- 
--/*
-- * VLB I/O addresses
-- */
--static unsigned int pcnet32_portlist[] =
--    { 0x300, 0x320, 0x340, 0x360, 0 };
--
- static int pcnet32_debug;
- static int tx_start = 1;	/* Mapping -- 0:20, 1:64, 2:128, 3:~220 (depends on chip vers) */
--static int pcnet32vlb;		/* check for VLB cards ? */
--
--static struct net_device *pcnet32_dev;
- 
- static int max_interrupt_work = 2;
- static int rx_copybreak = 200;
-@@ -285,13 +276,11 @@ struct pcnet32_private {
- 	char			tx_full;
- 	char			phycount;	/* number of phys found */
- 	int			options;
--	unsigned int		shared_irq:1,	/* shared irq possible */
--				dxsuflo:1,   /* disable transmit stop on uflo */
-+	unsigned int		dxsuflo:1,   /* disable transmit stop on uflo */
- 				mii:1,		/* mii port available */
- 				autoneg:1,	/* autoneg enabled */
- 				port_tp:1,	/* port set to TP */
- 				fdx:1;		/* full duplex enabled */
--	struct net_device	*next;
- 	struct mii_if_info	mii_if;
- 	struct timer_list	watchdog_timer;
- 	u32			msg_enable;	/* debug message level */
-@@ -305,7 +294,7 @@ struct pcnet32_private {
- };
- 
- static int pcnet32_probe_pci(struct pci_dev *, const struct pci_device_id *);
--static int pcnet32_probe1(unsigned long, int, struct pci_dev *);
-+static int pcnet32_probe1(unsigned long, struct pci_dev *);
- static int pcnet32_open(struct net_device *);
- static int pcnet32_init_ring(struct net_device *);
- static netdev_tx_t pcnet32_start_xmit(struct sk_buff *,
-@@ -798,12 +787,8 @@ static void pcnet32_get_drvinfo(struct net_device *dev,
- 	struct pcnet32_private *lp = netdev_priv(dev);
- 
- 	strscpy(info->driver, DRV_NAME, sizeof(info->driver));
--	if (lp->pci_dev)
--		strscpy(info->bus_info, pci_name(lp->pci_dev),
--			sizeof(info->bus_info));
--	else
--		snprintf(info->bus_info, sizeof(info->bus_info),
--			"VLB 0x%lx", dev->base_addr);
-+	strscpy(info->bus_info, pci_name(lp->pci_dev),
-+		sizeof(info->bus_info));
- }
- 
- static u32 pcnet32_get_link(struct net_device *dev)
-@@ -1506,28 +1491,6 @@ static const struct ethtool_ops pcnet32_ethtool_ops = {
- 	.set_link_ksettings	= pcnet32_set_link_ksettings,
- };
- 
--/* only probes for non-PCI devices, the rest are handled by
-- * pci_register_driver via pcnet32_probe_pci */
--
--static void pcnet32_probe_vlbus(unsigned int *pcnet32_portlist)
--{
--	unsigned int *port, ioaddr;
--
--	/* search for PCnet32 VLB cards at known addresses */
--	for (port = pcnet32_portlist; (ioaddr = *port); port++) {
--		if (request_region
--		    (ioaddr, PCNET32_TOTAL_SIZE, "pcnet32_probe_vlbus")) {
--			/* check if there is really a pcnet chip on that ioaddr */
--			if ((inb(ioaddr + 14) == 0x57) &&
--			    (inb(ioaddr + 15) == 0x57)) {
--				pcnet32_probe1(ioaddr, 0, NULL);
--			} else {
--				release_region(ioaddr, PCNET32_TOTAL_SIZE);
--			}
--		}
--	}
--}
--
- static int
- pcnet32_probe_pci(struct pci_dev *pdev, const struct pci_device_id *ent)
- {
-@@ -1564,7 +1527,7 @@ pcnet32_probe_pci(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto err_disable_dev;
- 	}
- 
--	err = pcnet32_probe1(ioaddr, 1, pdev);
-+	err = pcnet32_probe1(ioaddr, pdev);
- 
- err_disable_dev:
- 	if (err < 0)
-@@ -1588,12 +1551,9 @@ static const struct net_device_ops pcnet32_netdev_ops = {
- #endif
- };
- 
--/* pcnet32_probe1
-- *  Called from both pcnet32_probe_vlbus and pcnet_probe_pci.
-- *  pdev will be NULL when called from pcnet32_probe_vlbus.
-- */
-+/* Called from pcnet_probe_pci. */
- static int
--pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
-+pcnet32_probe1(unsigned long ioaddr, struct pci_dev *pdev)
- {
- 	struct pcnet32_private *lp;
- 	int i, media;
-@@ -1640,13 +1600,8 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
- 
- 	switch (chip_version) {
- 	case 0x2420:
--		chipname = "PCnet/PCI 79C970";	/* PCI */
--		break;
--	case 0x2430:
--		if (shared)
--			chipname = "PCnet/PCI 79C970";	/* 970 gives the wrong chip id back */
--		else
--			chipname = "PCnet/32 79C965";	/* 486/VL bus */
-+	case 0x2430: /* Some give the wrong chip id back */
-+		chipname = "PCnet/PCI 79C970";
- 		break;
- 	case 0x2621:
- 		chipname = "PCnet/PCI II 79C970A";	/* PCI */
-@@ -1752,8 +1707,7 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
- 		goto err_release_region;
- 	}
- 
--	if (pdev)
--		SET_NETDEV_DEV(dev, &pdev->dev);
-+	SET_NETDEV_DEV(dev, &pdev->dev);
- 
- 	if (pcnet32_debug & NETIF_MSG_PROBE)
- 		pr_info("%s at %#3lx,", chipname, ioaddr);
-@@ -1856,7 +1810,6 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
- 	spin_lock_init(&lp->lock);
- 
- 	lp->name = chipname;
--	lp->shared_irq = shared;
- 	lp->tx_ring_size = TX_RING_SIZE;	/* default tx ring size */
- 	lp->rx_ring_size = RX_RING_SIZE;	/* default rx ring size */
- 	lp->tx_mod_mask = lp->tx_ring_size - 1;
-@@ -1920,32 +1873,10 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
- 	a->write_csr(ioaddr, 1, (lp->init_dma_addr & 0xffff));
- 	a->write_csr(ioaddr, 2, (lp->init_dma_addr >> 16));
- 
--	if (pdev) {		/* use the IRQ provided by PCI */
--		dev->irq = pdev->irq;
--		if (pcnet32_debug & NETIF_MSG_PROBE)
--			pr_cont(" assigned IRQ %d\n", dev->irq);
--	} else {
--		unsigned long irq_mask = probe_irq_on();
--
--		/*
--		 * To auto-IRQ we enable the initialization-done and DMA error
--		 * interrupts. For ISA boards we get a DMA error, but VLB and PCI
--		 * boards will work.
--		 */
--		/* Trigger an initialization just for the interrupt. */
--		a->write_csr(ioaddr, CSR0, CSR0_INTEN | CSR0_INIT);
--		mdelay(1);
--
--		dev->irq = probe_irq_off(irq_mask);
--		if (!dev->irq) {
--			if (pcnet32_debug & NETIF_MSG_PROBE)
--				pr_cont(", failed to detect IRQ line\n");
--			ret = -ENODEV;
--			goto err_free_ring;
--		}
--		if (pcnet32_debug & NETIF_MSG_PROBE)
--			pr_cont(", probed IRQ %d\n", dev->irq);
--	}
-+	/* use the IRQ provided by PCI */
-+	dev->irq = pdev->irq;
-+	if (pcnet32_debug & NETIF_MSG_PROBE)
-+		pr_cont(" assigned IRQ %d\n", dev->irq);
- 
- 	/* Set the mii phy_id so that we can query the link state */
- 	if (lp->mii) {
-@@ -1987,12 +1918,7 @@ pcnet32_probe1(unsigned long ioaddr, int shared, struct pci_dev *pdev)
- 	if (register_netdev(dev))
- 		goto err_free_ring;
- 
--	if (pdev) {
--		pci_set_drvdata(pdev, dev);
--	} else {
--		lp->next = pcnet32_dev;
--		pcnet32_dev = dev;
--	}
-+	pci_set_drvdata(pdev, dev);
- 
- 	if (pcnet32_debug & NETIF_MSG_PROBE)
- 		pr_info("%s: registered as %s\n", dev->name, lp->name);
-@@ -2100,8 +2026,7 @@ static int pcnet32_open(struct net_device *dev)
- 	unsigned long flags;
- 
- 	if (request_irq(dev->irq, pcnet32_interrupt,
--			lp->shared_irq ? IRQF_SHARED : 0, dev->name,
--			(void *)dev)) {
-+			IRQF_SHARED, dev->name, (void *)dev)) {
- 		return -EAGAIN;
- 	}
- 
-@@ -2157,7 +2082,7 @@ static int pcnet32_open(struct net_device *dev)
- 	lp->a->write_csr(ioaddr, 124, val);
- 
- 	/* Allied Telesyn AT 2700/2701 FX are 100Mbit only and do not negotiate */
--	if (pdev && pdev->subsystem_vendor == PCI_VENDOR_ID_AT &&
-+	if (pdev->subsystem_vendor == PCI_VENDOR_ID_AT &&
- 	    (pdev->subsystem_device == PCI_SUBDEVICE_ID_AT_2700FX ||
- 	     pdev->subsystem_device == PCI_SUBDEVICE_ID_AT_2701FX)) {
- 		if (lp->options & PCNET32_PORT_ASEL) {
-@@ -2970,10 +2895,9 @@ static struct pci_driver pcnet32_driver = {
- 	},
- };
- 
--/* An additional parameter that may be passed in... */
-+/* Additional parameters that may be passed in... */
- static int debug = -1;
- static int tx_start_pt = -1;
--static int pcnet32_have_pci;
- 
- module_param(debug, int, 0);
- MODULE_PARM_DESC(debug, DRV_NAME " debug level");
-@@ -2985,8 +2909,6 @@ MODULE_PARM_DESC(rx_copybreak,
- 		 DRV_NAME " copy breakpoint for copy-only-tiny-frames");
- module_param(tx_start_pt, int, 0);
- MODULE_PARM_DESC(tx_start_pt, DRV_NAME " transmit start point (0-3)");
--module_param(pcnet32vlb, int, 0);
--MODULE_PARM_DESC(pcnet32vlb, DRV_NAME " Vesa local bus (VLB) support (0/1)");
- module_param_array(options, int, NULL, 0);
- MODULE_PARM_DESC(options, DRV_NAME " initial option setting(s) (0-15)");
- module_param_array(full_duplex, int, NULL, 0);
-@@ -3010,38 +2932,12 @@ static int __init pcnet32_init_module(void)
- 	if ((tx_start_pt >= 0) && (tx_start_pt <= 3))
- 		tx_start = tx_start_pt;
- 
--	/* find the PCI devices */
--	if (!pci_register_driver(&pcnet32_driver))
--		pcnet32_have_pci = 1;
--
--	/* should we find any remaining VLbus devices ? */
--	if (pcnet32vlb)
--		pcnet32_probe_vlbus(pcnet32_portlist);
--
--	if (cards_found && (pcnet32_debug & NETIF_MSG_PROBE))
--		pr_info("%d cards_found\n", cards_found);
--
--	return (pcnet32_have_pci + cards_found) ? 0 : -ENODEV;
-+	return pci_register_driver(&pcnet32_driver);
- }
- 
- static void __exit pcnet32_cleanup_module(void)
- {
--	struct net_device *next_dev;
--
--	while (pcnet32_dev) {
--		struct pcnet32_private *lp = netdev_priv(pcnet32_dev);
--		next_dev = lp->next;
--		unregister_netdev(pcnet32_dev);
--		pcnet32_free_ring(pcnet32_dev);
--		release_region(pcnet32_dev->base_addr, PCNET32_TOTAL_SIZE);
--		dma_free_coherent(&lp->pci_dev->dev, sizeof(*lp->init_block),
--				  lp->init_block, lp->init_dma_addr);
--		free_netdev(pcnet32_dev);
--		pcnet32_dev = next_dev;
--	}
--
--	if (pcnet32_have_pci)
--		pci_unregister_driver(&pcnet32_driver);
-+	pci_unregister_driver(&pcnet32_driver);
- }
- 
- module_init(pcnet32_init_module);
--- 
-2.43.0
-
+CgpBdCAyMDI2LTAxLTA3IDAwOjQ5OjUwLCAiU2FpIEtyaXNobmEgR2FqdWxhIiA8c2Fpa3Jpc2hu
+YWdAbWFydmVsbC5jb20+IHdyb3RlOgo+Cj4+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tCj4+
+IEZyb206IFNsYXJrIFhpYW8gPHNsYXJrX3hpYW9AMTYzLmNvbT4KPj4gU2VudDogTW9uZGF5LCBK
+YW51YXJ5IDUsIDIwMjYgMzo1MCBQTQo+PiBUbzogbG9pYy5wb3VsYWluQG9zcy5xdWFsY29tbS5j
+b207IHJ5YXphbm92LnMuYUBnbWFpbC5jb207Cj4+IGpvaGFubmVzQHNpcHNvbHV0aW9ucy5uZXQ7
+IGFuZHJldytuZXRkZXZAbHVubi5jaDsKPj4gZGF2ZW1AZGF2ZW1sb2Z0Lm5ldDsgZWR1bWF6ZXRA
+Z29vZ2xlLmNvbTsga3ViYUBrZXJuZWwub3JnOwo+PiBwYWJlbmlAcmVkaGF0LmNvbTsgbWFuaUBr
+ZXJuZWwub3JnCj4+IENjOiBuZXRkZXZAdmdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJuZWxAdmdl
+ci5rZXJuZWwub3JnCj4+IFN1YmplY3Q6IFtuZXQtbmV4dCB2NCAyLzhdIG5ldDogd3dhbjogY29y
+ZTogc3BsaXQgcG9ydCBjcmVhdGlvbiBhbmQKPj4gcmVnaXN0cmF0aW9uCj4+IAo+PiBGcm9tOiBT
+ZXJnZXkgUnlhemFub3YgPHJ5YXphbm92LuKAinMu4oCKYUDigIpnbWFpbC7igIpjb20+IFVwY29t
+aW5nIEdOU1MgKE5NRUEpCj4+IHBvcnQgdHlwZSBzdXBwb3J0IHJlcXVpcmVzIGV4cG9ydGluZyBp
+dCB2aWEgdGhlIEdOU1Mgc3Vic3lzdGVtLiBPbiBhbm90aGVyCj4+IGhhbmQsIHdlIHN0aWxsIG5l
+ZWQgdG8gZG8gYmFzaWMgV1dBTiBjb3JlIHdvcms6IGZpbmQgb3IgYWxsb2NhdGUgdGhlIFdXQU4K
+Pj4gZGV2aWNlLCBtYWtlIGl0IHRoZSAKPj4gRnJvbTogU2VyZ2V5IFJ5YXphbm92IDxyeWF6YW5v
+di5zLmFAZ21haWwuY29tPgo+PiAKPj4gVXBjb21pbmcgR05TUyAoTk1FQSkgcG9ydCB0eXBlIHN1
+cHBvcnQgcmVxdWlyZXMgZXhwb3J0aW5nIGl0IHZpYSB0aGUgR05TUwo+PiBzdWJzeXN0ZW0uIE9u
+IGFub3RoZXIgaGFuZCwgd2Ugc3RpbGwgbmVlZCB0byBkbyBiYXNpYyBXV0FOIGNvcmUKPj4gd29y
+azogZmluZCBvciBhbGxvY2F0ZSB0aGUgV1dBTiBkZXZpY2UsIG1ha2UgaXQgdGhlIHBvcnQgcGFy
+ZW50LCBldGMuIFRvIHJldXNlCj4+IGFzIG11Y2ggY29kZSBhcyBwb3NzaWJsZSwgc3BsaXQgdGhl
+IHBvcnQgY3JlYXRpb24gZnVuY3Rpb24gaW50byB0aGUgcmVnaXN0cmF0aW9uCj4+IG9mIGEgcmVn
+dWxhciBXV0FOIHBvcnQgZGV2aWNlLCBhbmQgYmFzaWMgcG9ydCBzdHJ1Y3QgaW5pdGlhbGl6YXRp
+b24uCj4+IAo+PiBUbyBiZSBhYmxlIHRvIHVzZSBwdXRfZGV2aWNlKCkgdW5pZm9ybWx5LCBicmVh
+ayB0aGUgZGV2aWNlX3JlZ2lzdGVyKCkgY2FsbCBpbnRvCj4+IGRldmljZV9pbml0aWFsaXplKCkg
+YW5kIGRldmljZV9hZGQoKSBhbmQgY2FsbCBkZXZpY2UgaW5pdGlhbGl6YXRpb24gZWFybGllci4K
+Pj4gCj4+IFNpZ25lZC1vZmYtYnk6IFNlcmdleSBSeWF6YW5vdiA8cnlhemFub3Yucy5hQGdtYWls
+LmNvbT4KPj4gLS0tCj4+ICBkcml2ZXJzL25ldC93d2FuL3d3YW5fY29yZS5jIHwgNjYgKysrKysr
+KysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tCj4+ICAxIGZpbGUgY2hhbmdlZCwgNDAgaW5z
+ZXJ0aW9ucygrKSwgMjYgZGVsZXRpb25zKC0pCj4+IAo+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9u
+ZXQvd3dhbi93d2FuX2NvcmUuYyBiL2RyaXZlcnMvbmV0L3d3YW4vd3dhbl9jb3JlLmMKPj4gaW5k
+ZXggYWRlOGJiZmZjOTNlLi5lZGVlNWZmNDhmMjggMTAwNjQ0Cj4+IC0tLSBhL2RyaXZlcnMvbmV0
+L3d3YW4vd3dhbl9jb3JlLmMKPj4gKysrIGIvZHJpdmVycy9uZXQvd3dhbi93d2FuX2NvcmUuYwo+
+PiBAQCAtMzYxLDcgKzM2MSw4IEBAIHN0YXRpYyB2b2lkIHd3YW5fcG9ydF9kZXN0cm95KHN0cnVj
+dCBkZXZpY2UgKmRldikgIHsKPj4gIAlzdHJ1Y3Qgd3dhbl9wb3J0ICpwb3J0ID0gdG9fd3dhbl9w
+b3J0KGRldik7Cj4+IAo+PiAtCWlkYV9mcmVlKCZtaW5vcnMsIE1JTk9SKHBvcnQtPmRldi5kZXZ0
+KSk7Cj4+ICsJaWYgKGRldi0+Y2xhc3MgPT0gJnd3YW5fY2xhc3MpCj4+ICsJCWlkYV9mcmVlKCZt
+aW5vcnMsIE1JTk9SKGRldi0+ZGV2dCkpOwo+PiAgCW11dGV4X2Rlc3Ryb3koJnBvcnQtPmRhdGFf
+bG9jayk7Cj4+ICAJbXV0ZXhfZGVzdHJveSgmcG9ydC0+b3BzX2xvY2spOwo+PiAgCWtmcmVlKHBv
+cnQpOwo+PiBAQCAtNDQwLDYgKzQ0MSw0MSBAQCBzdGF0aWMgaW50IF9fd3dhbl9wb3J0X2Rldl9h
+c3NpZ25fbmFtZShzdHJ1Y3QKPj4gd3dhbl9wb3J0ICpwb3J0LCBjb25zdCBjaGFyICpmbXQpCj4+
+ICAJcmV0dXJuIGRldl9zZXRfbmFtZSgmcG9ydC0+ZGV2LCAiJXMiLCBidWYpOyAgfQo+PiAKPj4g
+Ky8qIFJlZ2lzdGVyIGEgcmVndWxhciBXV0FOIHBvcnQgZGV2aWNlIChlLmcuIEFULCBNQklNLCBl
+dGMuKSAqLyBzdGF0aWMKPj4gK2ludCB3d2FuX3BvcnRfcmVnaXN0ZXJfd3dhbihzdHJ1Y3Qgd3dh
+bl9wb3J0ICpwb3J0KSB7Cj4KPkFzIHBlciBrZXJuZWwgc3R5bGUsIGJyYWNlcyBuZWVkIHRvIGJl
+IG9uIG5leHQgbGluZSAKPmludCB3d2FuX3BvcnRfcmVnaXN0ZXJfd3dhbihzdHJ1Y3Qgd3dhbl9w
+b3J0ICpwb3J0KSAKPnsKPi4uLgo+fQo+Cj4+ICsJc3RydWN0IHd3YW5fZGV2aWNlICp3d2FuZGV2
+ID0gdG9fd3dhbl9kZXYocG9ydC0+ZGV2LnBhcmVudCk7Cj4+ICsJY2hhciBuYW1lZm10WzB4MjBd
+Owo+PiArCWludCBtaW5vciwgZXJyOwo+PiArCj4+ICsJLyogQSBwb3J0IGlzIGV4cG9zZWQgYXMg
+Y2hhcmFjdGVyIGRldmljZSwgZ2V0IGEgbWlub3IgKi8KPj4gKwltaW5vciA9IGlkYV9hbGxvY19y
+YW5nZSgmbWlub3JzLCAwLCBXV0FOX01BWF9NSU5PUlMgLSAxLAo+PiBHRlBfS0VSTkVMKTsKPj4g
+KwlpZiAobWlub3IgPCAwKQo+PiArCQlyZXR1cm4gbWlub3I7Cj4+ICsKPj4gKwlwb3J0LT5kZXYu
+Y2xhc3MgPSAmd3dhbl9jbGFzczsKPj4gKwlwb3J0LT5kZXYuZGV2dCA9IE1LREVWKHd3YW5fbWFq
+b3IsIG1pbm9yKTsKPj4gKwo+PiArCS8qIGFsbG9jYXRlIHVuaXF1ZSBuYW1lIGJhc2VkIG9uIHd3
+YW4gZGV2aWNlIGlkLCBwb3J0IHR5cGUgYW5kCj4+IG51bWJlciAqLwo+PiArCXNucHJpbnRmKG5h
+bWVmbXQsIHNpemVvZihuYW1lZm10KSwgInd3YW4ldSVzJSVkIiwgd3dhbmRldi0KPj4gPmlkLAo+
+PiArCQkgd3dhbl9wb3J0X3R5cGVzW3BvcnQtPnR5cGVdLmRldnN1Zik7Cj4+ICsKPj4gKwkvKiBT
+ZXJpYWxpemUgcG9ydHMgcmVnaXN0cmF0aW9uICovCj4+ICsJbXV0ZXhfbG9jaygmd3dhbl9yZWdp
+c3Rlcl9sb2NrKTsKPj4gKwo+PiArCV9fd3dhbl9wb3J0X2Rldl9hc3NpZ25fbmFtZShwb3J0LCBu
+YW1lZm10KTsKPj4gKwllcnIgPSBkZXZpY2VfYWRkKCZwb3J0LT5kZXYpOwo+PiArCj4+ICsJbXV0
+ZXhfdW5sb2NrKCZ3d2FuX3JlZ2lzdGVyX2xvY2spOwo+PiArCj4+ICsJaWYgKGVycikKPj4gKwkJ
+cmV0dXJuIGVycjsKPlBsZWFzZSBjaGVjaywgaWYgZnJlZWluZyB3aXRoIGlkYV9mcmVlIGlzIHJl
+cXVpcmVkIGJlZm9yZSByZXR1cm5pbmcgZXJyLgo+aWYgKGVycikgewo+ICAgIGlkYV9mcmVlKCZt
+aW5vcnMsIG1pbm9yKTsKPiAgICByZXR1cm4gZXJyOwo+fQpZZXMsIHlvdSBhcmUgcmlnaHQuCkFu
+ZCBwYXRjaCA3LzggbW9kaWZpZXMgdGhpcyBmaWxlIGFzIHdlbGwuIFdlIG5lZWQgdG8gYWxpZ24g
+d2l0aCB0aGF0IGNoYW5nZXMKc2luY2UgdGhlcmUgYXJlIHNvbWUgaXNzdWVzKHdlIHN0aWxsIGFs
+bG9jYXRlcyB0aGUgbWlub3IgZXZlbiB0aGUgY2RldiBpcwpmYWxzZSkuIFRoaXMgd291bGQgbGVh
+ZCB0byB0aGUgcmVsZWFzZSBmdW5jdGlvbiBjYW4ndCByZWxlYXNlIHRoZSBjb3JyZWN0CmRldnQu
+Cj4+ICsKPj4gKwlkZXZfaW5mbygmd3dhbmRldi0+ZGV2LCAicG9ydCAlcyBhdHRhY2hlZFxuIiwg
+ZGV2X25hbWUoJnBvcnQtCj4+ID5kZXYpKTsKPj4gKwo+PiArCXJldHVybiAwOwo+PiArfQo+PiAr
+Cj4+ICBzdHJ1Y3Qgd3dhbl9wb3J0ICp3d2FuX2NyZWF0ZV9wb3J0KHN0cnVjdCBkZXZpY2UgKnBh
+cmVudCwKPj4gIAkJCQkgICBlbnVtIHd3YW5fcG9ydF90eXBlIHR5cGUsCj4+ICAJCQkJICAgY29u
+c3Qgc3RydWN0IHd3YW5fcG9ydF9vcHMgKm9wcywgQEAgLQo+PiA0NDgsOCArNDg0LDcgQEAgc3Ry
+dWN0IHd3YW5fcG9ydCAqd3dhbl9jcmVhdGVfcG9ydChzdHJ1Y3QgZGV2aWNlCj4+ICpwYXJlbnQs
+ICB7Cj4+ICAJc3RydWN0IHd3YW5fZGV2aWNlICp3d2FuZGV2Owo+PiAgCXN0cnVjdCB3d2FuX3Bv
+cnQgKnBvcnQ7Cj4+IC0JY2hhciBuYW1lZm10WzB4MjBdOwo+PiAtCWludCBtaW5vciwgZXJyOwo+
+PiArCWludCBlcnI7Cj4+IAo+PiAgCWlmICh0eXBlID4gV1dBTl9QT1JUX01BWCB8fCAhb3BzKQo+
+PiAgCQlyZXR1cm4gRVJSX1BUUigtRUlOVkFMKTsKPj4gQEAgLTQ2MSwxNyArNDk2LDkgQEAgc3Ry
+dWN0IHd3YW5fcG9ydCAqd3dhbl9jcmVhdGVfcG9ydChzdHJ1Y3QgZGV2aWNlCj4+ICpwYXJlbnQs
+Cj4+ICAJaWYgKElTX0VSUih3d2FuZGV2KSkKPj4gIAkJcmV0dXJuIEVSUl9DQVNUKHd3YW5kZXYp
+Owo+PiAKPj4gLQkvKiBBIHBvcnQgaXMgZXhwb3NlZCBhcyBjaGFyYWN0ZXIgZGV2aWNlLCBnZXQg
+YSBtaW5vciAqLwo+PiAtCW1pbm9yID0gaWRhX2FsbG9jX3JhbmdlKCZtaW5vcnMsIDAsIFdXQU5f
+TUFYX01JTk9SUyAtIDEsCj4+IEdGUF9LRVJORUwpOwo+PiAtCWlmIChtaW5vciA8IDApIHsKPj4g
+LQkJZXJyID0gbWlub3I7Cj4+IC0JCWdvdG8gZXJyb3Jfd3dhbmRldl9yZW1vdmU7Cj4+IC0JfQo+
+PiAtCj4+ICAJcG9ydCA9IGt6YWxsb2Moc2l6ZW9mKCpwb3J0KSwgR0ZQX0tFUk5FTCk7Cj4+ICAJ
+aWYgKCFwb3J0KSB7Cj4+ICAJCWVyciA9IC1FTk9NRU07Cj4+IC0JCWlkYV9mcmVlKCZtaW5vcnMs
+IG1pbm9yKTsKPj4gIAkJZ290byBlcnJvcl93d2FuZGV2X3JlbW92ZTsKPj4gIAl9Cj4+IAo+PiBA
+QCAtNDg1LDI3ICs1MTIsMTQgQEAgc3RydWN0IHd3YW5fcG9ydCAqd3dhbl9jcmVhdGVfcG9ydChz
+dHJ1Y3QgZGV2aWNlCj4+ICpwYXJlbnQsCj4+ICAJbXV0ZXhfaW5pdCgmcG9ydC0+ZGF0YV9sb2Nr
+KTsKPj4gCj4+ICAJcG9ydC0+ZGV2LnBhcmVudCA9ICZ3d2FuZGV2LT5kZXY7Cj4+IC0JcG9ydC0+
+ZGV2LmNsYXNzID0gJnd3YW5fY2xhc3M7Cj4+ICAJcG9ydC0+ZGV2LnR5cGUgPSAmd3dhbl9wb3J0
+X2Rldl90eXBlOwo+PiAtCXBvcnQtPmRldi5kZXZ0ID0gTUtERVYod3dhbl9tYWpvciwgbWlub3Ip
+Owo+PiAgCWRldl9zZXRfZHJ2ZGF0YSgmcG9ydC0+ZGV2LCBkcnZkYXRhKTsKPj4gKwlkZXZpY2Vf
+aW5pdGlhbGl6ZSgmcG9ydC0+ZGV2KTsKPj4gCj4+IC0JLyogYWxsb2NhdGUgdW5pcXVlIG5hbWUg
+YmFzZWQgb24gd3dhbiBkZXZpY2UgaWQsIHBvcnQgdHlwZSBhbmQKPj4gbnVtYmVyICovCj4+IC0J
+c25wcmludGYobmFtZWZtdCwgc2l6ZW9mKG5hbWVmbXQpLCAid3dhbiV1JXMlJWQiLCB3d2FuZGV2
+LQo+PiA+aWQsCj4+IC0JCSB3d2FuX3BvcnRfdHlwZXNbcG9ydC0+dHlwZV0uZGV2c3VmKTsKPj4g
+LQo+PiAtCS8qIFNlcmlhbGl6ZSBwb3J0cyByZWdpc3RyYXRpb24gKi8KPj4gLQltdXRleF9sb2Nr
+KCZ3d2FuX3JlZ2lzdGVyX2xvY2spOwo+PiAtCj4+IC0JX193d2FuX3BvcnRfZGV2X2Fzc2lnbl9u
+YW1lKHBvcnQsIG5hbWVmbXQpOwo+PiAtCWVyciA9IGRldmljZV9yZWdpc3RlcigmcG9ydC0+ZGV2
+KTsKPj4gLQo+PiAtCW11dGV4X3VubG9jaygmd3dhbl9yZWdpc3Rlcl9sb2NrKTsKPj4gLQo+PiAr
+CWVyciA9IHd3YW5fcG9ydF9yZWdpc3Rlcl93d2FuKHBvcnQpOwo+PiAgCWlmIChlcnIpCj4+ICAJ
+CWdvdG8gZXJyb3JfcHV0X2RldmljZTsKPj4gCj4+IC0JZGV2X2luZm8oJnd3YW5kZXYtPmRldiwg
+InBvcnQgJXMgYXR0YWNoZWRcbiIsIGRldl9uYW1lKCZwb3J0LQo+PiA+ZGV2KSk7Cj4+ICAJcmV0
+dXJuIHBvcnQ7Cj4+IAo+PiAgZXJyb3JfcHV0X2RldmljZToKPj4gLS0KPj4gMi4yNS4xCj4+IAo+
+Cg==
 
