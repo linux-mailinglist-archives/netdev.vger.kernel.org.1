@@ -1,558 +1,199 @@
-Return-Path: <netdev+bounces-247781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ECE3CFE535
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 15:35:47 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ABF1CFE69D
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 15:54:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 50416300A6F2
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 14:35:37 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7004C30090D3
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 14:52:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BACA334E74D;
-	Wed,  7 Jan 2026 14:28:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A203354ADF;
+	Wed,  7 Jan 2026 14:33:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="RSMW2zYS"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="XBnBl2LE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011050.outbound.protection.outlook.com [52.101.70.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A17AA34DB49
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 14:28:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767796114; cv=none; b=Nxz7k2qbhvKhRlJiI6cS/ceEEfZrEKzv8U+jmvEkIx1kw6UUu1Yg75nrMBVtT4BRCenbgCi3dVot75g2cgwVMDN1yeuxxYrn1mWhOxGORMcy5v5tQvEyAMbvuPL6ToVh/cOFhw01pwAJuonGFb/eD6l3p2kEWw2FhPpcGMEHFWQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767796114; c=relaxed/simple;
-	bh=2yfJWvOlqqUloBLLoW2q2HL2e2rpQjMwjyevyHCtMnA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=hhIokwzyXYM8Z3MnSZteU5fRFLP2yP40HXMFi+PfAE/E3WDHlo7WcBjnRr9jrFsIycLNKBV28SnjdbbxaZTBb55Gj8PMOt/du6ynlVEYDBfN2Qe+koX07dIac8ktsmk1fvXgth0d7R4hIxI9SnFgqNZlQQ5lmd5BgRLsLcy2sBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=RSMW2zYS; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-64b9cb94ff5so2949127a12.2
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 06:28:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1767796110; x=1768400910; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XS7vl1A2g95R4uUTc/Kdk0kAxz/ZnaHSG7AuQrHZBxk=;
-        b=RSMW2zYSBwksg0aMidk4G7oc5BCuoKqGFuEEJCyGNSgyXGmiRaRbHkGaJkgPRyTxGg
-         Sp8pZFfe1QQZydmsNd6dbscwy1rc72ukZh6g+PJRmRtIDDz8n/kmxOEWicqRXWOF+Owj
-         95TY18uyVpZ2IKjjBcEO9b5VHmsFuxhjlWio0Ek3zJC8l4X6xwGqtCaMScDDrkcWYHAX
-         B/pcgIpTfrEuxJqFq5ypG9KwI3eakYfUh4bEheNmQYFNqniqNFfUeuhW2RDXkpokorGN
-         Z99jeZ/e3TRwT47Ha7LjNUD4fO0cK88CIQOmEXr3mOhwgjulMhKEeLJQZnWW8BWyeWRe
-         QKgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767796110; x=1768400910;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=XS7vl1A2g95R4uUTc/Kdk0kAxz/ZnaHSG7AuQrHZBxk=;
-        b=JSmmnt41itp3b+Q1OrO3fBhuwXc5bk9aBONrcoNNIDTOarN419mwllXG89qKIpjnOq
-         JPeUlAwbI+/gohMrHMqPDPHf2dT8uys8kBqKrwRUvsDCNg1bCpKIL8nhy5KO4bVUS0TL
-         b6xGqW65WN2ebR5SsDZE0rDFITrhNAxvvvdxB0e7YvBj65ctv3wHbvXivM96e0xRMSZN
-         7GoG8sHOEfmBz4qOjWUPn6dZ0BSWNmHktfIOC0N5pZyxbstxFTbC9poIDU0DWwEFKAeb
-         cMdpxgRIJtBaIxQWIH2TDxcFI1cwi6tNO10hyUuRcb8RkPv+MgXN9e7LOeqP3giT55KF
-         0Lxg==
-X-Gm-Message-State: AOJu0Yxl5wmUm1tBrY6FmvJWjtYmjdOI8PDJUULtB7KpOYu5s72DI9c/
-	gOx3IWt9rbTYllCWehnShzbRjMvPRL+WpPL4KN6aJx/F5DDOE/h2C5YoIBkAfKMmMwM=
-X-Gm-Gg: AY/fxX5xsC3Xg/Ul7Q9PNMCyi/WKaT9CrV5hlouxKJglMo64PwhajPsmowOYIH7bz3L
-	+SID1ZG10FeAJrTmIDkxLBOnDWJ0RBYkTmK5LlN76rHrFtkQ05xRj6uDLo6lWTS/+TRAQpxdieN
-	chHcSWkYX6UYpp03R7jTJa7BtSmvxqqaI98aGeXr3syxA6GmWVuHIXX/VBlGFCB6cE1vybaRDMg
-	ZuZ2DwBxnH5GmWzlPrKl23Z92U6ZEa3+cWWLjKA6Sf7fS+9SI9BU4WwkZrycENeoHTGHkaiz8b6
-	e31PBXb9i0e7J4hqqcA+yoqJLjlR//qkylH7Z7dvNNumaj8zoTArNIWwzKmJpgsMdnUNecf769E
-	apGF9R211uh1OO4HiBf6rJjz67rL1paEAG3AcZrF1L2/Hj81dSrGVjuQg0S/GbLEkc86eks+mAd
-	laChHzFwJUEffoucz263DyFBwqr5v975Bc6z1k6GIzYeqP5FX2+u/HkWlZKHo=
-X-Google-Smtp-Source: AGHT+IFQl5R689xG1i7esCxA5HesUcVozOYM43V8+opdqR4JqR2/WOdF5f0iP0MwoQ/isJt44OJLnw==
-X-Received: by 2002:aa7:c993:0:b0:64b:993f:ce05 with SMTP id 4fb4d7f45d1cf-65097e5da1fmr1870221a12.24.1767796109821;
-        Wed, 07 Jan 2026 06:28:29 -0800 (PST)
-Received: from cloudflare.com (79.184.207.118.ipv4.supernova.orange.pl. [79.184.207.118])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6507b22c3absm4928033a12.0.2026.01.07.06.28.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 06:28:29 -0800 (PST)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Wed, 07 Jan 2026 15:28:17 +0100
-Subject: [PATCH bpf-next v3 17/17] selftests/bpf: Test skb metadata access
- after L2 decapsulation
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F086352949;
+	Wed,  7 Jan 2026 14:33:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767796423; cv=fail; b=jUtuOoQ9/pd5jGQSiMyToywr6dHNxVJ9e50vhu3/1E9f5knkLdTnS8G9+K6QLayR8hK0rZKLFY6nPVnr3HoCN4eDwCo2qaEgvUyToPYLYFQbAtzxauxy3vqRnOAiPG4drDEdjA3yIvkLSQyW+9mlaNYjXzX7F0coOIu/iR6thJQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767796423; c=relaxed/simple;
+	bh=wQaC0SBeS9YnIOly2AJWxl9gfuwQhnF0JX78OvD9Awg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=ZjBA3nPBDG0djumc3uIWX7D+eIXXnBnxSHwujRdzOvrRREVJECUQDJBx+ASO0+npzkB2Cvre37S2XNMcn7CdxAEORkv41c3EDIfVITU/J23+WsKpLrQb2T9l2WErgI2sGKUdHRP8AMFVOgvtH4WQKiNWu68qHiR3S7EIQpWCVsM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=XBnBl2LE; arc=fail smtp.client-ip=52.101.70.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=g38ev6E+zbtLi1VM7Dj0pzkH1vTOdEdtKaelAUh6fB7bqoLQxSBbBlo13uSe1qUFTKNX5Q3GGUsviju13tXlkCEaQ5YH3cM8FXoEkalHSOYJIeRFxyFw77CDkySdRq64uwM/hvIa0x9WaYJ38CwF4OLxCuiB51/p+NCDpfX2Jj6FlpyAarSMxfrcBOcJvljZkJOI63kkZ8GpmZvGNFNKEZUcQ7mLB35c0yNUGLdYGc3dtQ1JMAQwAG5zD+LWTYr5US+C/YAmtGStZfRkZ8957B1h5CMZBu5U3Y+EhWjTSWAXzPsDpuRtkijPI8R+MeZDXyWJcUoM8W2RMqGV4L88pg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dF1mbS1bhK9eipsoxt/w0VjfPcEAMVlu4G6pkBziQ1s=;
+ b=ZkpX9/FM/w0uvGDOU/SlPeczoTPvHW1MRu6rDbpivnKOTYUNoioN3AY8fB4EuBqyH8Is4+eSXfsN78U8Ylw7YVxejWkNhwarU35oJ1mxkEzJdGb4vk690Gqp+dObCRNT2QzINezOKOpFEVyxTYNwZa4WYBR3/TH3Cyl44JFxT+wynj7XYYE8gqiwckFeiTe6jjotkFyWwdDuaXzxQfyeAKxqlCVVzMa+cy+KmkI2DvQJHKpOdPtSNIUxCbghoxmLWM9A/VLnQx2XRxmUcKXmWLuJ1N+/T8LUdjMVsbZlAkSfn5kXlMeLP+1Zy4FkT2BO+cwGJ1tO11bOP/EdoFeWpQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dF1mbS1bhK9eipsoxt/w0VjfPcEAMVlu4G6pkBziQ1s=;
+ b=XBnBl2LE1tLMMQbAdKOD19E7D7OeFCgfpasgY0jc33e/FQE3p39tAc+LO0inzphT4x3RMpV/bsVxHps69NrjRZwAQpBvd+HxEKZkxJ8hyRENXShCyGfQq+l4FP/TSaMa0hDs1kWTVfR96r/qOHxwUqqvFb1Ziv52LVbGh457AuS8ZeMgGDdc14wrtLKyRB1CWEI/5NmIK4FOA5W1k01XGdIeaFsjp8liAQAyXR9tsH1W3o8hr9CfKy17dvw3Hy2Mw4O9RwONSPKGO++mx3YrlApHzaURgWNOjCE7qpSbdxnULlZ3Y1PZx6NKtQsY3NDG2V5sxLuMG7GhcVQCv6GGdQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DU2PR04MB8951.eurprd04.prod.outlook.com (2603:10a6:10:2e2::22)
+ by DB8PR04MB6794.eurprd04.prod.outlook.com (2603:10a6:10:11b::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9478.5; Wed, 7 Jan
+ 2026 14:33:38 +0000
+Received: from DU2PR04MB8951.eurprd04.prod.outlook.com
+ ([fe80::753c:468d:266:196]) by DU2PR04MB8951.eurprd04.prod.outlook.com
+ ([fe80::753c:468d:266:196%4]) with mapi id 15.20.9478.004; Wed, 7 Jan 2026
+ 14:33:38 +0000
+Date: Wed, 7 Jan 2026 09:33:27 -0500
+From: Frank Li <Frank.li@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, imx@lists.linux.dev
+Subject: Re: [PATCH net] net: enetc: fix build warning when PAGE_SIZE is
+ greater than 128K
+Message-ID: <aV5utzwO6WZS0aT8@lizhi-Precision-Tower-5810>
+References: <20260107091204.1980222-1-wei.fang@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260107091204.1980222-1-wei.fang@nxp.com>
+X-ClientProxiedBy: BYAPR05CA0095.namprd05.prod.outlook.com
+ (2603:10b6:a03:e0::36) To DU2PR04MB8951.eurprd04.prod.outlook.com
+ (2603:10a6:10:2e2::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260107-skb-meta-safeproof-netdevs-rx-only-v3-17-0d461c5e4764@cloudflare.com>
-References: <20260107-skb-meta-safeproof-netdevs-rx-only-v3-0-0d461c5e4764@cloudflare.com>
-In-Reply-To: <20260107-skb-meta-safeproof-netdevs-rx-only-v3-0-0d461c5e4764@cloudflare.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Stanislav Fomichev <sdf@fomichev.me>, Simon Horman <horms@kernel.org>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
- kernel-team@cloudflare.com
-X-Mailer: b4 0.15-dev-07fe9
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DU2PR04MB8951:EE_|DB8PR04MB6794:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8a222753-cf79-4ae2-3e73-08de4df9beff
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|19092799006|52116014|1800799024|366016|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?pLrXDCehZVIbvw305a4IEVkysHvFM77ixNMTVRIuEDu+FiuyPAsYGh9Mi/rG?=
+ =?us-ascii?Q?6WJ813/k6fApkbHYYUhcpTfKAstv7x5Ffcz0KBtrVFctDv3nmPGlcqcVhs+C?=
+ =?us-ascii?Q?g63ssPCtOkXyeJb2x+TYXbbKGKxlRL0PXVCiIQYxKka6Zb6bDTYxpnHVd2DJ?=
+ =?us-ascii?Q?dLPPodDNSL6YfD72atRTEN+J4TU+87Ag62kGkc3N4FT+FhqGFjbsi0TZXUa1?=
+ =?us-ascii?Q?xbMq+lXFd9HsUWRY6LnVCJsaH9K8rs93/SIiBohkh9CtEu8UEYmy0Gdb36Ys?=
+ =?us-ascii?Q?C/y+Yf7raKPUO2BWd2PrmGKyYx3gbVc2HdnbOo2bRfprQsrKBV4uqFpSEUAj?=
+ =?us-ascii?Q?EexdSl+2yyP4ZIZ477QS/TMzu8bHmgm4jUPV7R216jE7UwFSgoeqwOOxQFql?=
+ =?us-ascii?Q?AY5ryox7MiIVg3tgsDhIp+kiz1LeOdYjTFLAEnkVanVoOAnxCtrFsfUV1y9n?=
+ =?us-ascii?Q?H6dDNs+gJWWVnByKAMyenC1gktKaNaOFwjQB0qPvrJx6OMqZfk8dfXZjeRy5?=
+ =?us-ascii?Q?1qUxgb/sm2OW0yV1rySfMMiEjddSNeb6zVpHBLtY7jGM1a/OHgm5pHfGTJj/?=
+ =?us-ascii?Q?GXxSt786fNO4QcGsRSjjFsgpfm8AbhC61edEMe3ShYZ89DHpdSd3oyEzptX6?=
+ =?us-ascii?Q?fU63aLGG3xCgZvE8ArbXzmJz+qGYXdud4pHhKuxQyRBie7+8KJGnW+qflkfK?=
+ =?us-ascii?Q?Nxz999N3cTCiRDahA4sRh1ndVxQvWDkcVWB0hudAUb64h0Hw9qN4VynrGKbj?=
+ =?us-ascii?Q?MVBQ8YkzcCVPynwG9zPjRr/hgWisPj7Q0oh9CDsQMU66buQGfp2y7CzmGCDy?=
+ =?us-ascii?Q?ElnwR/oHtC8veYLAb9WG8i3q2HQp1vGoL441S7v2sqWNJmYORPRoR38e7bWB?=
+ =?us-ascii?Q?PjZ+jS2/tXheTWevMilRNGngo2JplwdSVJT+CCMWY+jIVmblCmZ+uDD1/UY0?=
+ =?us-ascii?Q?Zxut+muOCkIoJnfb4/VJTXhsIt+nyWiga/ZUghdzQrlED6fnN5GpQUiLrR8Z?=
+ =?us-ascii?Q?TCnpo0kqh5t4WTdIoDxJ0Di0Oj3POfPtlERfYcjjYp9VSPcIuWf3pS38fsyQ?=
+ =?us-ascii?Q?36FGyFpUP1qkVQMs36ndetasJqwW5LK0C+LxkXToqJGXaJr7P4ZOsaxTCKUV?=
+ =?us-ascii?Q?PpZJs3oip5Q78wUBOEuESpDWDNKc6en1ICBahvzZX4Xo7ghG+R0xRBzTZSMV?=
+ =?us-ascii?Q?+XN+yUTN52cQeFkFM79KhytmGm2HROJmHV60/rCx7OK7PJmFxhR7btTYJIP/?=
+ =?us-ascii?Q?UrazUJfVtRvwU8vzo2dQJsDFl34rexcGuf2L0JcwmhYe8GfijAxfroea3FxO?=
+ =?us-ascii?Q?WR934iGuctYk6l7ibBstnNodEIQ1gen4eE9w2KSjJJEjxraptrFBQv9Bml+W?=
+ =?us-ascii?Q?Sc7kUV5yXfIx5cUMheIColIj4gaicJAheNbu+6gho/98qamWyk0zzGVRhohp?=
+ =?us-ascii?Q?GLB8QJ0zbnz5XACn2bzk1sj7OUDA+8EF0JMj8I3bBrNCoP+nYy5oHSsHUCX1?=
+ =?us-ascii?Q?Gpjx0gzNV7IgcdsZmjdmHKebw0q/Z0QkmW+W?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU2PR04MB8951.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(19092799006)(52116014)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?SCVnTGwAlqfowCcv2qJWPtqUqRMAS3pIzDEACOEJDKA05smVLcrB4lb7BWLT?=
+ =?us-ascii?Q?bE6IEx+IaiMcMyhxSKzneD1uS+jtwtdJvmPaoSSUgUubPiKvydrtQQWCIXlW?=
+ =?us-ascii?Q?jClwQYOmrmjORClVTJX5lpMivFgSfYJROST30v095J52bushkZukG5bMLgAs?=
+ =?us-ascii?Q?ifZN2FmkSEoJNxZ7AUIxMJk5cLG0x6KAAFHhxmxlKK1BQVCX24k/K+xIYIU+?=
+ =?us-ascii?Q?WpNlR0pm0kHpNCO5sByvMaefPNMNsUYpo30lQvSuNhEAy4rLqPMKyBRRULH2?=
+ =?us-ascii?Q?+GQ+PPYfUxvmXkkYtKa4iZMHF9M6icM/WWnaI8XJejZ6uyBloe6cxjeVv2ZR?=
+ =?us-ascii?Q?FraaoWKa1ZdEzpIom9aHGNssUvWY6cpsgqcvnZoDJ3v6He3ibUzMC8NuIpez?=
+ =?us-ascii?Q?EGSkdy5MmTWSE4ax9smlC4+ubqVJMBBV0EjKXfFekyX7Md6+CUbCm77ZGxeP?=
+ =?us-ascii?Q?L4jb7jKQwu0adr/G6a3YtFeSA/pTgeryKJGuR7T6u7tUN89q8GxO+HPo8vBo?=
+ =?us-ascii?Q?c+OoVAQ/WkzVkTzK0Ha6mlO1dsTVY1oclHQLfiv7S6hIRlRm93gDHGNOVmaw?=
+ =?us-ascii?Q?qER2wix7le+B4cXrDWQ7+1Z6QUdVZ0tAUamgqv1RdP3ZHq34gKgG1rnP6VlY?=
+ =?us-ascii?Q?CtnMVWFHtVcP9rA1Bw+xzcPYF9VMe3sR5qZAuVjwiW90cMEndVjfmi0spHan?=
+ =?us-ascii?Q?tb/Y6yVJwx03E/o7zl4E3Uzl3/bsjxP0UQjDocefY2ogmMFlBT9/Gu3zu7WG?=
+ =?us-ascii?Q?pqAIQEt0YgKECM1CnTgyzoYj+Z2Dsjah5CGg+JKUAiGHRxGd+Bg1bR1Q+9TE?=
+ =?us-ascii?Q?L8JmohBPoT7R82qwgkz4S1E0c+NsM9Y1dCcBhLo3mIaKpYmEJT/FV81k+eMB?=
+ =?us-ascii?Q?AMNUUnsH+Sfa2Fy9tVm61GeJaiIKqnLJKByRk+QKVsv9ZyeuDrcmDdw/IgAe?=
+ =?us-ascii?Q?bfDbVoCPt5wsd3MEhmJomt6z1+ieATIns96OuO8xKAd5R9MOLayQEQJoFPDc?=
+ =?us-ascii?Q?3T/yEGfDEPHlpV0332rZSiW7wv4OjVnkDZM9ga8yEmqwLvj6lbP+65wiaDJ9?=
+ =?us-ascii?Q?V0WfF7ng135KsQ2Wrz8WEpAvB4MZyzcY4zOFu+bwa5gObPkz14sn2EbPhHe7?=
+ =?us-ascii?Q?3pFrqVXHktkc2lGleXpbuHgPgUbQe7ZlUeaI5WUO58SGD8rtMN9kbpL9BAID?=
+ =?us-ascii?Q?W3W2rKQ1SFBg6kXQbBJfgRQq4t3EFYNfLH7ae38OMSSE2199tKSvQ/fvDxO+?=
+ =?us-ascii?Q?skh6tmguwy1TEFUEnU3VpU/V2vm3aNyey4nmzuwlz8HNSEviRx7gNNU8dK7k?=
+ =?us-ascii?Q?dwX/mSXluWsZLg8ygfHTcA7Bbi4RvfCBFuOBWrs1etf0CAtf+L6ZarXcyH2a?=
+ =?us-ascii?Q?fdDgGDkz6leSZAlH17D8wRm4oM+5jdab5YCMj4f/2lyrOcEkzdMrSp0lqA01?=
+ =?us-ascii?Q?od2EyRwRR1q+MGdtA491tQ07/3nk013PiSF1hfXgRDFm8jbe2g4zzxyJcPRM?=
+ =?us-ascii?Q?s36mcht2Va8URAVuQEVgLH3XNNCayLKYSqk5iSXjvdHXblj+Xq3axFiOVhh+?=
+ =?us-ascii?Q?Kebz6yD/zRv5bUQJv5oHWSx1PY/C5QNMJI6miwk6il909b1XqoZq5pMQm5+9?=
+ =?us-ascii?Q?PqFgOR7BMA8Cyy55NxYatAqlj5LLbXFmfNbdGaA9S6K0AWczMwJ1flRwhKAw?=
+ =?us-ascii?Q?HIDVBYQ7Bbx3N1ufVttl3j119QpEzRv8RwgbdtBeHdlkkzwM?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8a222753-cf79-4ae2-3e73-08de4df9beff
+X-MS-Exchange-CrossTenant-AuthSource: DU2PR04MB8951.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2026 14:33:38.3337
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MgknQECpZ1f4OSoDe9mN4LwEa5FcBDJ6+SsPF/Amrp1ETSNGSbumKq+3YNwSSFKK5q2CB/VUD1nLgfJcCyHq/Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR04MB6794
 
-Add tests to verify that XDP/skb metadata remains accessible after L2
-decapsulation now that metadata tracking has been decoupled from the MAC
-header offset.
+On Wed, Jan 07, 2026 at 05:12:04PM +0800, Wei Fang wrote:
+> The max buffer size of ENETC RX BD is 0xFFFF bytes, so if the PAGE_SIZE
+> is greater than 128K, ENETC_RXB_DMA_SIZE and ENETC_RXB_DMA_SIZE_XDP will
+> be greater than 0xFFFF, thus causing a build warning.
+>
+> This will not cause any practical issues because ENETC is currently only
+> used on the ARM64 platform, and the max PAGE_SIZE is 64K. So this patch
+> is only for fixing the build warning that occurs when compiling ENETC
+> drivers for other platforms.
+>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202601050637.kHEKKOG7-lkp@intel.com/
+> Fixes: e59bc32df2e9 ("net: enetc: correct the value of ENETC_RXB_TRUESIZE")
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
 
-Use a 2-netns setup to test each L2 decapsulation path that resets the MAC
-header offset: GRE (IPv4/IPv6), VXLAN, GENEVE, L2TPv3, VLAN, QinQ, and
-MPLS. SRv6 and NSH are not tested due to setup complexity (SRv6 requires 4
-namespaces according to selftests/net/srv6_hl2encap_red_l2vpn_test.sh, NSH
-requires Open vSwitch).
+Reviewed-by: Frank Li <Frank.Li@nxp.com>
 
-For each encapsulation type, test three access scenarios after L2 decap:
-- direct skb->data_meta pointer access
-- dynptr-based metadata access (bpf_dynptr_from_skb_meta)
-- metadata access after move or skb head realloc (bpf_skb_adjust_room)
-
-Change test_xdp_meta.c to identify test packets by payload content instead
-of source MAC address, since L2 encapsulation pushes its own MAC header.
-
-Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
----
- tools/testing/selftests/bpf/config                 |   6 +-
- .../bpf/prog_tests/xdp_context_test_run.c          | 292 +++++++++++++++++++++
- tools/testing/selftests/bpf/progs/test_xdp_meta.c  |  48 ++--
- 3 files changed, 325 insertions(+), 21 deletions(-)
-
-diff --git a/tools/testing/selftests/bpf/config b/tools/testing/selftests/bpf/config
-index 558839e3c185..f867b7eff085 100644
---- a/tools/testing/selftests/bpf/config
-+++ b/tools/testing/selftests/bpf/config
-@@ -130,4 +130,8 @@ CONFIG_INFINIBAND=y
- CONFIG_SMC=y
- CONFIG_SMC_HS_CTRL_BPF=y
- CONFIG_DIBS=y
--CONFIG_DIBS_LO=y
-\ No newline at end of file
-+CONFIG_DIBS_LO=y
-+CONFIG_L2TP=y
-+CONFIG_L2TP_V3=y
-+CONFIG_L2TP_IP=y
-+CONFIG_L2TP_ETH=y
-diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-index ee94c281888a..dc7f936216db 100644
---- a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-+++ b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-@@ -8,9 +8,14 @@
- #define TX_NAME "veth1"
- #define TX_NETNS "xdp_context_tx"
- #define RX_NETNS "xdp_context_rx"
-+#define RX_MAC "02:00:00:00:00:01"
-+#define TX_MAC "02:00:00:00:00:02"
- #define TAP_NAME "tap0"
- #define DUMMY_NAME "dum0"
- #define TAP_NETNS "xdp_context_tuntap"
-+#define ENCAP_DEV "encap"
-+#define DECAP_RX_NETNS "xdp_context_decap_rx"
-+#define DECAP_TX_NETNS "xdp_context_decap_tx"
- 
- #define TEST_PAYLOAD_LEN 32
- static const __u8 test_payload[TEST_PAYLOAD_LEN] = {
-@@ -127,6 +132,7 @@ static int send_test_packet(int ifindex)
- 	/* We use the Ethernet header only to identify the test packet */
- 	struct ethhdr eth = {
- 		.h_source = { 0x12, 0x34, 0xDE, 0xAD, 0xBE, 0xEF },
-+		.h_proto = htons(ETH_P_IP),
- 	};
- 
- 	memcpy(packet, &eth, sizeof(eth));
-@@ -155,6 +161,34 @@ static int send_test_packet(int ifindex)
- 	return -1;
- }
- 
-+static int send_routed_packet(int af, const char *ip)
-+{
-+	struct sockaddr_storage addr;
-+	socklen_t alen;
-+	int r, sock = -1;
-+
-+	r = make_sockaddr(af, ip, 42, &addr, &alen);
-+	if (!ASSERT_OK(r, "make_sockaddr"))
-+		goto err;
-+
-+	sock = socket(af, SOCK_DGRAM, 0);
-+	if (!ASSERT_OK_FD(sock, "socket"))
-+		goto err;
-+
-+	r = sendto(sock, test_payload, sizeof(test_payload), 0,
-+		   (struct sockaddr *)&addr, alen);
-+	if (!ASSERT_EQ(r, sizeof(test_payload), "sendto"))
-+		goto err;
-+
-+	close(sock);
-+	return 0;
-+
-+err:
-+	if (sock >= 0)
-+		close(sock);
-+	return -1;
-+}
-+
- static int write_test_packet(int tap_fd)
- {
- 	__u8 packet[sizeof(struct ethhdr) + TEST_PAYLOAD_LEN];
-@@ -510,3 +544,261 @@ void test_xdp_context_tuntap(void)
- 
- 	test_xdp_meta__destroy(skel);
- }
-+
-+enum l2_encap_type {
-+	GRE4_ENCAP,
-+	GRE6_ENCAP,
-+	VXLAN_ENCAP,
-+	GENEVE_ENCAP,
-+	L2TPV3_ENCAP,
-+	VLAN_ENCAP,
-+	QINQ_ENCAP,
-+	MPLS_ENCAP,
-+};
-+
-+static bool l2_encap_uses_ipv6(enum l2_encap_type encap_type)
-+{
-+	return encap_type == GRE6_ENCAP;
-+}
-+
-+static bool l2_encap_uses_routing(enum l2_encap_type encap_type)
-+{
-+	return encap_type == MPLS_ENCAP;
-+}
-+
-+static bool setup_l2_encap_dev(enum l2_encap_type encap_type,
-+			       const char *encap_dev, const char *lower_dev,
-+			       const char *net_prefix, const char *local_addr,
-+			       const char *remote_addr)
-+{
-+	switch (encap_type) {
-+	case GRE4_ENCAP:
-+		SYS(fail, "ip link add %s type gretap local %s remote %s",
-+		    encap_dev, local_addr, remote_addr);
-+		return true;
-+
-+	case GRE6_ENCAP:
-+		SYS(fail, "ip link add %s type ip6gretap local %s remote %s",
-+		    encap_dev, local_addr, remote_addr);
-+		return true;
-+
-+	case VXLAN_ENCAP:
-+		SYS(fail,
-+		    "ip link add %s type vxlan id 42 local %s remote %s dstport 4789",
-+		    encap_dev, local_addr, remote_addr);
-+		return true;
-+
-+	case GENEVE_ENCAP:
-+		SYS(fail,
-+		    "ip link add %s type geneve id 42 remote %s",
-+		    encap_dev, remote_addr);
-+		return true;
-+
-+	case L2TPV3_ENCAP:
-+		SYS(fail,
-+		    "ip l2tp add tunnel tunnel_id 42 peer_tunnel_id 42 encap ip local %s remote %s",
-+		    local_addr, remote_addr);
-+		SYS(fail,
-+		    "ip l2tp add session name %s tunnel_id 42 session_id 42 peer_session_id 42",
-+		    encap_dev);
-+		return true;
-+
-+	case VLAN_ENCAP:
-+		SYS(fail, "ip link set dev %s down", lower_dev);
-+		SYS(fail, "ethtool -K %s rx-vlan-hw-parse off", lower_dev);
-+		SYS(fail, "ethtool -K %s tx-vlan-hw-insert off", lower_dev);
-+		SYS(fail, "ip link set dev %s up", lower_dev);
-+		SYS(fail, "ip link add %s link %s type vlan id 42", encap_dev,
-+		    lower_dev);
-+		return true;
-+
-+	case QINQ_ENCAP:
-+		SYS(fail, "ip link set dev %s down", lower_dev);
-+		SYS(fail, "ethtool -K %s rx-vlan-hw-parse off", lower_dev);
-+		SYS(fail, "ethtool -K %s tx-vlan-hw-insert off", lower_dev);
-+		SYS(fail, "ethtool -K %s rx-vlan-stag-hw-parse off", lower_dev);
-+		SYS(fail, "ethtool -K %s tx-vlan-stag-hw-insert off", lower_dev);
-+		SYS(fail, "ip link set dev %s up", lower_dev);
-+		SYS(fail, "ip link add vlan.100 link %s type vlan proto 802.1ad id 100", lower_dev);
-+		SYS(fail, "ip link set dev vlan.100 up");
-+		SYS(fail, "ip link add %s link vlan.100 type vlan id 42", encap_dev);
-+		return true;
-+
-+	case MPLS_ENCAP:
-+		SYS(fail, "sysctl -wq net.mpls.platform_labels=65535");
-+		SYS(fail, "sysctl -wq net.mpls.conf.%s.input=1", lower_dev);
-+		SYS(fail, "ip route change %s encap mpls 42 via %s", net_prefix, remote_addr);
-+		SYS(fail, "ip -f mpls route add 42 dev lo");
-+		SYS(fail, "ip link set dev lo name %s", encap_dev);
-+
-+		return true;
-+	}
-+fail:
-+	return false;
-+}
-+
-+static void test_l2_decap(enum l2_encap_type encap_type,
-+			  struct bpf_program *xdp_prog,
-+			  struct bpf_program *tc_prog, bool *test_pass)
-+{
-+	LIBBPF_OPTS(bpf_tc_hook, tc_hook, .attach_point = BPF_TC_INGRESS);
-+	LIBBPF_OPTS(bpf_tc_opts, tc_opts, .handle = 1, .priority = 1);
-+	const char *net, *rx_ip, *tx_ip, *addr_opts;
-+	int af, plen;
-+	struct netns_obj *rx_ns = NULL, *tx_ns = NULL;
-+	struct nstoken *nstoken = NULL;
-+	int lower_ifindex, upper_ifindex;
-+	int ret;
-+
-+	if (l2_encap_uses_ipv6(encap_type)) {
-+		af = AF_INET6;
-+		net = "fd00::/64";
-+		rx_ip = "fd00::1";
-+		tx_ip = "fd00::2";
-+		plen = 64;
-+		addr_opts = "nodad";
-+	} else {
-+		af = AF_INET;
-+		net = "192.0.2.0/24";
-+		rx_ip = "192.0.2.1";
-+		tx_ip = "192.0.2.2";
-+		plen = 24;
-+		addr_opts = "";
-+	}
-+
-+	*test_pass = false;
-+
-+	rx_ns = netns_new(DECAP_RX_NETNS, false);
-+	if (!ASSERT_OK_PTR(rx_ns, "create rx_ns"))
-+		return;
-+
-+	tx_ns = netns_new(DECAP_TX_NETNS, false);
-+	if (!ASSERT_OK_PTR(tx_ns, "create tx_ns"))
-+		goto close;
-+
-+	SYS(close, "ip link add " RX_NAME " address " RX_MAC " netns " DECAP_RX_NETNS
-+		   " type veth peer name " TX_NAME " address " TX_MAC " netns " DECAP_TX_NETNS);
-+
-+	nstoken = open_netns(DECAP_RX_NETNS);
-+	if (!ASSERT_OK_PTR(nstoken, "setns rx_ns"))
-+		goto close;
-+
-+	SYS(close, "ip addr add %s/%u dev %s %s", rx_ip, plen, RX_NAME, addr_opts);
-+	SYS(close, "ip link set dev %s up", RX_NAME);
-+
-+	if (!setup_l2_encap_dev(encap_type, ENCAP_DEV, RX_NAME, net, rx_ip, tx_ip))
-+		goto close;
-+	SYS(close, "ip link set dev %s up", ENCAP_DEV);
-+
-+	lower_ifindex = if_nametoindex(RX_NAME);
-+	if (!ASSERT_GE(lower_ifindex, 0, "if_nametoindex lower"))
-+		goto close;
-+
-+	upper_ifindex = if_nametoindex(ENCAP_DEV);
-+	if (!ASSERT_GE(upper_ifindex, 0, "if_nametoindex upper"))
-+		goto close;
-+
-+	ret = bpf_xdp_attach(lower_ifindex, bpf_program__fd(xdp_prog), 0, NULL);
-+	if (!ASSERT_GE(ret, 0, "bpf_xdp_attach"))
-+		goto close;
-+
-+	tc_hook.ifindex = upper_ifindex;
-+	ret = bpf_tc_hook_create(&tc_hook);
-+	if (!ASSERT_OK(ret, "bpf_tc_hook_create"))
-+		goto close;
-+
-+	tc_opts.prog_fd = bpf_program__fd(tc_prog);
-+	ret = bpf_tc_attach(&tc_hook, &tc_opts);
-+	if (!ASSERT_OK(ret, "bpf_tc_attach"))
-+		goto close;
-+
-+	close_netns(nstoken);
-+
-+	nstoken = open_netns(DECAP_TX_NETNS);
-+	if (!ASSERT_OK_PTR(nstoken, "setns tx_ns"))
-+		goto close;
-+
-+	SYS(close, "ip addr add %s/%u dev %s %s", tx_ip, plen, TX_NAME, addr_opts);
-+	SYS(close, "ip neigh add %s lladdr %s nud permanent dev %s", rx_ip, RX_MAC, TX_NAME);
-+	SYS(close, "ip link set dev %s up", TX_NAME);
-+
-+	if (!setup_l2_encap_dev(encap_type, ENCAP_DEV, TX_NAME, net, tx_ip, rx_ip))
-+		goto close;
-+	SYS(close, "ip link set dev %s up", ENCAP_DEV);
-+
-+	upper_ifindex = if_nametoindex(ENCAP_DEV);
-+	if (!ASSERT_GE(upper_ifindex, 0, "if_nametoindex upper"))
-+		goto close;
-+
-+	if (l2_encap_uses_routing(encap_type))
-+		ret = send_routed_packet(af, rx_ip);
-+	else
-+		ret = send_test_packet(upper_ifindex);
-+	if (!ASSERT_OK(ret, "send packet"))
-+		goto close;
-+
-+	if (!ASSERT_TRUE(*test_pass, "test_pass"))
-+		dump_err_stream(tc_prog);
-+
-+close:
-+	close_netns(nstoken);
-+	netns_free(rx_ns);
-+	netns_free(tx_ns);
-+}
-+
-+__printf(1, 2) static bool start_subtest(const char *fmt, ...)
-+{
-+	char *subtest_name;
-+	va_list ap;
-+	int r;
-+
-+	va_start(ap, fmt);
-+	r = vasprintf(&subtest_name, fmt, ap);
-+	va_end(ap);
-+	if (!ASSERT_GE(r, 0, "format string"))
-+		return false;
-+
-+	r = test__start_subtest(subtest_name);
-+	free(subtest_name);
-+	return r;
-+}
-+
-+void test_xdp_context_l2_decap(void)
-+{
-+	const struct test {
-+		enum l2_encap_type encap_type;
-+		const char *encap_name;
-+	} tests[] = {
-+		{ GRE4_ENCAP, "gre4" },
-+		{ GRE6_ENCAP, "gre6" },
-+		{ VXLAN_ENCAP, "vxlan" },
-+		{ GENEVE_ENCAP, "geneve" },
-+		{ L2TPV3_ENCAP, "l2tpv3" },
-+		{ VLAN_ENCAP, "vlan" },
-+		{ QINQ_ENCAP, "qinq" },
-+		{ MPLS_ENCAP, "mpls" },
-+	};
-+	struct test_xdp_meta *skel;
-+	const struct test *t;
-+
-+	skel = test_xdp_meta__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open and load skeleton"))
-+		return;
-+
-+	for (t = tests; t < tests + ARRAY_SIZE(tests); t++) {
-+		if (start_subtest("%s_direct_access", t->encap_name))
-+			test_l2_decap(t->encap_type, skel->progs.ing_xdp,
-+				      skel->progs.ing_cls,
-+				      &skel->bss->test_pass);
-+		if (start_subtest("%s_dynptr_read", t->encap_name))
-+			test_l2_decap(t->encap_type, skel->progs.ing_xdp,
-+				      skel->progs.ing_cls_dynptr_read,
-+				      &skel->bss->test_pass);
-+		if (start_subtest("%s_helper_adjust_room", t->encap_name))
-+			test_l2_decap(t->encap_type, skel->progs.ing_xdp,
-+				      skel->progs.helper_skb_adjust_room,
-+				      &skel->bss->test_pass);
-+	}
-+
-+	test_xdp_meta__destroy(skel);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/test_xdp_meta.c b/tools/testing/selftests/bpf/progs/test_xdp_meta.c
-index 0a0f371a2dec..69130e250e84 100644
---- a/tools/testing/selftests/bpf/progs/test_xdp_meta.c
-+++ b/tools/testing/selftests/bpf/progs/test_xdp_meta.c
-@@ -280,18 +280,35 @@ int ing_cls_dynptr_offset_oob(struct __sk_buff *ctx)
- 	return TC_ACT_SHOT;
- }
- 
-+/* Test packets carry test metadata pattern as payload. */
-+static bool is_test_packet(struct xdp_md *ctx)
-+{
-+	__u8 meta_have[META_SIZE];
-+	__u32 len;
-+	int ret;
-+
-+	len = bpf_xdp_get_buff_len(ctx);
-+	if (len < META_SIZE)
-+		return false;
-+	ret = bpf_xdp_load_bytes(ctx, len - META_SIZE, meta_have, META_SIZE);
-+	if (ret)
-+		return false;
-+	ret = __builtin_memcmp(meta_have, meta_want, META_SIZE);
-+	if (ret)
-+		return false;
-+
-+	return true;
-+}
-+
- /* Reserve and clear space for metadata but don't populate it */
- SEC("xdp")
- int ing_xdp_zalloc_meta(struct xdp_md *ctx)
- {
--	struct ethhdr *eth = ctx_ptr(ctx, data);
- 	__u8 *meta;
- 	int ret;
- 
- 	/* Drop any non-test packets */
--	if (eth + 1 > ctx_ptr(ctx, data_end))
--		return XDP_DROP;
--	if (!check_smac(eth))
-+	if (!is_test_packet(ctx))
- 		return XDP_DROP;
- 
- 	ret = bpf_xdp_adjust_meta(ctx, -META_SIZE);
-@@ -310,33 +327,24 @@ int ing_xdp_zalloc_meta(struct xdp_md *ctx)
- SEC("xdp")
- int ing_xdp(struct xdp_md *ctx)
- {
--	__u8 *data, *data_meta, *data_end, *payload;
--	struct ethhdr *eth;
-+	__u8 *data, *data_meta;
- 	int ret;
- 
-+	/* Drop any non-test packets */
-+	if (!is_test_packet(ctx))
-+		return XDP_DROP;
-+
- 	ret = bpf_xdp_adjust_meta(ctx, -META_SIZE);
- 	if (ret < 0)
- 		return XDP_DROP;
- 
- 	data_meta = ctx_ptr(ctx, data_meta);
--	data_end  = ctx_ptr(ctx, data_end);
- 	data      = ctx_ptr(ctx, data);
- 
--	eth = (struct ethhdr *)data;
--	payload = data + sizeof(struct ethhdr);
--
--	if (payload + META_SIZE > data_end ||
--	    data_meta + META_SIZE > data)
--		return XDP_DROP;
--
--	/* The Linux networking stack may send other packets on the test
--	 * interface that interfere with the test. Just drop them.
--	 * The test packets can be recognized by their source MAC address.
--	 */
--	if (!check_smac(eth))
-+	if (data_meta + META_SIZE > data)
- 		return XDP_DROP;
- 
--	__builtin_memcpy(data_meta, payload, META_SIZE);
-+	__builtin_memcpy(data_meta, meta_want, META_SIZE);
- 	return XDP_PASS;
- }
- 
-
--- 
-2.43.0
-
+> ---
+>  drivers/net/ethernet/freescale/enetc/enetc.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/freescale/enetc/enetc.h b/drivers/net/ethernet/freescale/enetc/enetc.h
+> index dce27bd67a7d..aecd40aeef9c 100644
+> --- a/drivers/net/ethernet/freescale/enetc/enetc.h
+> +++ b/drivers/net/ethernet/freescale/enetc/enetc.h
+> @@ -79,9 +79,9 @@ struct enetc_lso_t {
+>  #define ENETC_RXB_TRUESIZE	(PAGE_SIZE >> 1)
+>  #define ENETC_RXB_PAD		NET_SKB_PAD /* add extra space if needed */
+>  #define ENETC_RXB_DMA_SIZE	\
+> -	(SKB_WITH_OVERHEAD(ENETC_RXB_TRUESIZE) - ENETC_RXB_PAD)
+> +	min(SKB_WITH_OVERHEAD(ENETC_RXB_TRUESIZE) - ENETC_RXB_PAD, 0xffff)
+>  #define ENETC_RXB_DMA_SIZE_XDP	\
+> -	(SKB_WITH_OVERHEAD(ENETC_RXB_TRUESIZE) - XDP_PACKET_HEADROOM)
+> +	min(SKB_WITH_OVERHEAD(ENETC_RXB_TRUESIZE) - XDP_PACKET_HEADROOM, 0xffff)
+>
+>  struct enetc_rx_swbd {
+>  	dma_addr_t dma;
+> --
+> 2.34.1
+>
 
