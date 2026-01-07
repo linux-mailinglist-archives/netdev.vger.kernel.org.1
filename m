@@ -1,176 +1,174 @@
-Return-Path: <netdev+bounces-247890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1A54D003F4
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 22:53:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E8E2D00427
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 22:58:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AC0A830DF72C
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 21:47:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 002FD3033D65
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 21:54:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AB4D2FD675;
-	Wed,  7 Jan 2026 21:46:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B4A318BBC;
+	Wed,  7 Jan 2026 21:54:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YDgOLQli"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="ZTcugHZU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B02315772
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 21:46:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CD762D3231
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 21:54:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767822415; cv=none; b=hc6wFduC02uUXlUn3pF/XnQHQUtvvbEhKadicfI0oBBtmU2DwZ8l6IspQQbiPHO/v1ei2kICZ0o5UbD/ZHrdBydbpLssTUbccWoBs+OaSAvmnKT8aFHEC7xEfoLu6d3kt6thxnbPYDbpzQotic12/Y2M7sksekNH/gpWV5BRwIc=
+	t=1767822856; cv=none; b=tO+pFqo6r+nULBGHZeSNQ8SxI/itA8R6HyyO4ERz4lDl1jOp2b9tnxQ3q4N89qBxO+abdqohAgajzwJfVaOlDneEISWPjM02L8m6k5KLDaaA45LRAvpmcPPvgoLmm4eSe7KMGH643TIzxHaGKgfeV4Pkj4FKbB9LOdNJx7n24y0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767822415; c=relaxed/simple;
-	bh=B+rmMcPAukV8wuSRaPIjiyTdfpSg4OhxtOun7+AHguA=;
+	s=arc-20240116; t=1767822856; c=relaxed/simple;
+	bh=/MejwX65hDKfR53cfS2/woBJf8a6swBHRdIPDU/11ww=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Pkqq9xqz9qgf5toLgUgPHnQYNx4pP6gy60Vv6UQPfdPused59iYH/YixQ42bBfh53kM2jwNrDqkKd3nE/jk1PSvY6szeekiHdb9GbC6C2D+JoSM2YqxLJxoXJ8VWzl9+d3qeOGDDuarvLZcrH0t1LJkq0fGW+WcwyTwDkNJs510=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YDgOLQli; arc=none smtp.client-ip=209.85.128.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-79045634f45so30167997b3.1
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 13:46:52 -0800 (PST)
+	 To:Cc:Content-Type; b=J4HIIkvSkq2NP87NAjUrkcYsKmNJiRzzfiWtjd5FSF5V4e3+qvwnue/9euW6KdodtwipAZimqdrnW7HFc7DZX3h12gXR67DBzI+zcezicvyChqslF1x33FDGckCOG8BiZmxMmn8tt8IQOYwd5//jtx9vuWgyW90ZOLs06Kt4Hvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=ZTcugHZU; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-bc2abdcfc6fso1102729a12.2
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 13:54:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767822411; x=1768427211; darn=vger.kernel.org;
+        d=paul-moore.com; s=google; t=1767822855; x=1768427655; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ba5UnTHKPwT9HtMYOwC8JNbAeWdAQbjjXolShjBiZf0=;
-        b=YDgOLQli5rA0w/vIivaXNTTwqvt7ChuppKarzhzoEKmH0Qioi+ttZr6LZdakV78aO7
-         pdGyeHtSU3xAH7wLHxvaSYAw2Im32PWOWe3RS9OUu8hb6YK0TnNpbIWKkvVyi0NvJMKw
-         6mo0uUEQBMg8FonuGuAzf5tRZadB+JyN7egLSCvuJBNi3UQz8g+/Dn0ST1KcoBIlB3BP
-         M8ctz/YMLobOjjSFfOxNlPTbMG7kglJxtQBeqwvueozkZLNNDaYxaNlQm5H/u+LC7XQO
-         kdkN8K0csC7flLgCMjg5nIlHDR2/Hs8noTu6hG30BFEs1dfhW66AkcxQobg8OXWD0Z9o
-         x7MQ==
+        bh=glsfhtDUmyowawtGUoJCa771AHF+/UGGwRgXKhqc+y8=;
+        b=ZTcugHZUC9ieAvB/Va+V/ITTY/Xwf6Lz0B1lrUMRZQ+KCemYKW4dX1K0896uVuW+W4
+         e5i4ws1vBBt2uB3x4ymUPA3We4Q5yv8d9K/I8oD3FBg0EFuwCbmDwhq9yUmpyski7J1G
+         /poj3Un56Ozsy0VCv7nuGcjU7q6AZ07jhWRPwM3SFCsyrzpaBLJmmGvNlzR8g2ErqhU4
+         J9f9rSIpEkW8pICt1nch4RDsN3cGauucZ3/LFroj1BGMS0lNiBa+vaE67aaBLAyr6dud
+         JYF2GHlJgclRhJmCwagfY9OJcliIbn3WK+RMzjm4kKncfQOf8GvxwImwolAtrFsk8cbv
+         DkFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767822411; x=1768427211;
+        d=1e100.net; s=20230601; t=1767822855; x=1768427655;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Ba5UnTHKPwT9HtMYOwC8JNbAeWdAQbjjXolShjBiZf0=;
-        b=KjQEA702mBAh486DZAJg3qZLQv8uBY9RrDeCSHNnLSAcUp7o6x0lJbriUGfZxRzCjD
-         FBAnfYbdPxBU2HYX+RBO3e7Bug2q/MZ0zDAlSmNOd+xZmmo48rA9J8qCUD5j0Kw0/VmR
-         msP/OYA25AO7nNaGGGiZC+KhbvW2dV06JBL1cgltAuotrdhsteyAWZ6NXLr33IeD2MN8
-         ypfvijpHVZ6A3DNKjmOR46IzIs3maW0rVDCB+qYyF5V9RoVRXqY2bwV1WhW3iUFVnjnh
-         xZ2Brtv7TB9c8TaAYzUlD0RTrCqmwmDViFS4iK34lgCWUC2reJCf7zSVIvvzLD1SXCS3
-         bAdw==
-X-Forwarded-Encrypted: i=1; AJvYcCUJPX/larJz73gIHs1jJCh5NuW6CrXHeQKX6yrPSRUeqxW8vQEinfIqlbfC4in0cSyqHFfwGxM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRB8zOba0DU7+baWyOS3ky5nvFuSseQsZ5srhNpcCuVFclJUqF
-	WMgPzF1i+9lYx1zT1uDlCd+s3+pRYpz6D9ZUmmLs2Und3Esd6xo1pT706tazjw4yqKdI00yZADg
-	6GDXrU3IwJEXdjfkGxleB5YifHVtKfhk=
-X-Gm-Gg: AY/fxX4n5Y/9fBUrA6o/WOZMJCuDABFCQHIbsDS625Qhv2+mnooSyuO8UyurlYkh8PR
-	Q8jkusDEdK8YWhwrVtwWf2YXaTzl9T8NDYL9e/TO0jqRvlj+Lj76x57SSYpogBrF0c47L4euNqK
-	OqXFFlpGjYJEU7axZe5r4O3fPAt1UBZ/s+wCHTZP6e3JDG/HwrJPWDBJl2us9UgTU3aNhW70UtW
-	R2/C+Q7gz2Jo02Zu4+P+bLsJwKIK3k5G2gjyRnooR3udo0FJgyhGX1UvmVrU7UwEEGb7fjZzxHR
-	jFUWpA==
-X-Google-Smtp-Source: AGHT+IGll6GkDJRECp3vd3uBcAowUXr9H4G/cY7soax6Ov9ZEYpUbqrQTLmg9LVPS73K73iw6iSr8M877BSFbOfz4Z4=
-X-Received: by 2002:a53:cb8c:0:b0:646:68b4:a7e with SMTP id
- 956f58d0204a3-64716b3aa6cmr2541573d50.18.1767822411069; Wed, 07 Jan 2026
- 13:46:51 -0800 (PST)
+        bh=glsfhtDUmyowawtGUoJCa771AHF+/UGGwRgXKhqc+y8=;
+        b=R4aXm+oJEH66cyuI7cRjszzFhc5uEeHMIrMpLkqFke48jFAfEPsQBP1Mga/lrbVmfJ
+         xj7h/poreAT72Vv7AkJRsx3S6BQgvy5eIplxtF3PtdD2NhBl/jo+W+Az4awgk64yTavP
+         T6w4Hgeg5h59vcdDDzX+JWY0BQbdrC1yT+7igUg7x/mmlq8sDiUozOQ8gXjJjexTjzJo
+         HJ71zl8QwcyvGg8+n6y5nm+G1tswqLmGhdCB8decgT8OInutWKi6S67Loh5QK6UuNtLd
+         yBzGlz418xK+nL5oZo9Ido62wXteCsmHLNHbt/bfLLxLrryojjbz+FJBmVIjfLUvNxan
+         OfSw==
+X-Forwarded-Encrypted: i=1; AJvYcCW7N203BXWL0sHV+nYDd0nTSWs6Cy5eT4opwC8ZssLknIphJpyku+OwCUs5ylXRSYegWSj8ONs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwV/TjJ69PDiC2UH1H8t6NIWiP3iVlykUIyBewXYcHagm9mHFtW
+	tOhIPmF2lcBcf6M7HZJBR+H+FoVlFG+h2dBHV2cINU6i7xuAfuxUXuryBP+jPswh4krKvNiLWlu
+	nMHBtAyQlCuizQ7Hu+JqK2Nu0fG38y/DE1ua23BMU
+X-Gm-Gg: AY/fxX50vySHabMfqIg1azA8OOX2nNaoBc+hoa6qcNaldk3USgrqL2xQzL67blbV8UJ
+	dx6NHcFt10msaNiqR2C1l5/dcyWOvEEuYHUvJU7Ej2RTSNyZKoKg959cTRv7J/ujBMSMCx+OwAh
+	V6UXv3YJopUqjoX29SDNZutLs35WDtqJOnaJhmojqbrBzO8cXvOmgat7Jb/2VfvSlY1kaTU3+Yz
+	GVNIKf38yp9Y3IOQ+MUcUvZUwuCw5P+dbzgXrGWZytg86Z+6+kgs3hLZaZlymQJPDUy0xo=
+X-Google-Smtp-Source: AGHT+IGmDa04TwAFrUVZIKE0bCmyIfgat7wJWWL+XRgau6V3p4p1z6v7uRzUa5yn29Rvvq5RrrPOJUM02YqDMGwe8b8=
+X-Received: by 2002:a17:90b:1650:b0:340:d1b5:bfda with SMTP id
+ 98e67ed59e1d1-34f68c33781mr3244535a91.3.1767822854607; Wed, 07 Jan 2026
+ 13:54:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260105114732.140719-1-mahdifrmx@gmail.com> <20260105175406.3bd4f862@kernel.org>
- <CA+KdSGN4uLo3kp1kN0TPCUt-Ak59k_Hr0w3tNtE106ybUFi2-Q@mail.gmail.com>
- <willemdebruijn.kernel.36ecbd32a1f0d@gmail.com> <CA+KdSGOzzb=vMWh6UG-OFSQgEapS4Ckwf5K8hwYy8hz4N9RVMg@mail.gmail.com>
- <willemdebruijn.kernel.21c4d3b7b8f9d@gmail.com>
-In-Reply-To: <willemdebruijn.kernel.21c4d3b7b8f9d@gmail.com>
-From: Mahdi Faramarzpour <mahdifrmx@gmail.com>
-Date: Thu, 8 Jan 2026 01:16:39 +0330
-X-Gm-Features: AQt7F2qMoi56gSvYyITmgBSAIsgANYbxOWU4X9u9jh7cwQNo5oHKjma4fVDQcAs
-Message-ID: <CA+KdSGOW0+V9KTA6CebvJ5dSqBxCV5XFAJshJByQ36=GWX6yiQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] udp: add drop count for packets in udp_prod_queue
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, davem@davemloft.net, 
-	dsahern@kernel.org, edumazet@google.com, pabeni@redhat.com, horms@kernel.org
+References: <20251231213314.2979118-1-utilityemal77@gmail.com>
+In-Reply-To: <20251231213314.2979118-1-utilityemal77@gmail.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Wed, 7 Jan 2026 16:54:02 -0500
+X-Gm-Features: AQt7F2qw6OaC4MXbk1CPG_jNqQef9CEQ0d5ZkvwF0tURdpz-_nm5g4KzXb8fLmg
+Message-ID: <CAHC9VhQF26sVYoKxZ_7x2nL1HxuK0zeH013e8ugigz9B+Kpkjg@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/1] lsm: Add hook unix_path_connect
+To: Justin Suess <utilityemal77@gmail.com>
+Cc: James Morris <jmorris@namei.org>, "Serge E . Hallyn" <serge@hallyn.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Simon Horman <horms@kernel.org>, 
+	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	=?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
+	linux-security-module@vger.kernel.org, Tingmao Wang <m@maowtm.org>, 
+	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 7, 2026 at 6:39=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
+On Wed, Dec 31, 2025 at 4:33=E2=80=AFPM Justin Suess <utilityemal77@gmail.c=
+om> wrote:
 >
-> Mahdi Faramarzpour wrote:
-> > On Tue, Jan 6, 2026 at 10:52=E2=80=AFPM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > Mahdi Faramarzpour wrote:
-> > > > On Tue, Jan 6, 2026 at 5:24=E2=80=AFAM Jakub Kicinski <kuba@kernel.=
-org> wrote:
-> > > > >
-> > > > > On Mon,  5 Jan 2026 15:17:32 +0330 Mahdi Faramarzpour wrote:
-> > > > > > This commit adds SNMP drop count increment for the packets in
-> > > > > > per NUMA queues which were introduced in commit b650bf0977d3
-> > > > > > ("udp: remove busylock and add per NUMA queues").
-> > >
-> > > Can you give some rationale why the existing counters are insufficien=
-t
-> > > and why you chose to change then number of counters you suggest
-> > > between revisions of your patch?
-> > >
-> > The difference between revisions is due to me realizing that the only e=
-rror the
-> > udp_rmem_schedule returns is ENOBUFS, which is mapped to UDP_MIB_MEMERR=
-ORS
-> > (refer to function __udp_queue_rcv_skb), and thus UDP_MIB_RCVBUFERRORS
-> > need not increase.
+> Hi,
 >
-> I see. Please make such a note in the revision changelog. See also
+> This patch introduces a new LSM hook unix_path_connect.
 >
-> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#cha=
-nges-requested
+> The idea for this patch and the hook came from G=C3=BCnther Noack, who
+> is cc'd. Much credit to him for the idea and discussion.
 >
-Ok.
+> This patch is based on the lsm next branch.
+>
+> Motivation
+> ---
+>
+> For AF_UNIX sockets bound to a filesystem path (aka named sockets), one
+> identifying object from a policy perspective is the path passed to
+> connect(2). However, this operation currently restricts LSMs that rely
+> on VFS-based mediation, because the pathname resolved during connect()
+> is not preserved in a form visible to existing hooks before connection
+> establishment. As a result, LSMs such as Landlock cannot currently
+> restrict connections to named UNIX domain sockets by their VFS path.
+>
+> This gap has been discussed previously (e.g. in the context of Landlock's
+> path-based access controls). [1] [2]
+>
+> I've cc'd the netdev folks as well on this, as the placement of this hook=
+ is
+> important and in a core unix socket function.
+>
+> Design Choices
+> ---
+>
+> The hook is called in net/unix/af_unix.c in the function unix_find_bsd().
+>
+> The hook takes a single parameter, a const struct path* to the named unix
+> socket to which the connection is being established.
+>
+> The hook takes place after normal permissions checks, and after the
+> inode is determined to be a socket. It however, takes place before
+> the socket is actually connected to.
+>
+> If the hook returns non-zero it will do a put on the path, and return.
+>
+> References
+> ---
+>
+> [1]: https://github.com/landlock-lsm/linux/issues/36#issue-2354007438
+> [2]: https://lore.kernel.org/linux-security-module/cover.1767115163.git.m=
+@maowtm.org/
+>
+> Kind Regards,
+> Justin Suess
+>
+> Justin Suess (1):
+>   lsm: Add hook unix_path_connect
+>
+>  include/linux/lsm_hook_defs.h |  1 +
+>  include/linux/security.h      |  6 ++++++
+>  net/unix/af_unix.c            |  8 ++++++++
+>  security/security.c           | 16 ++++++++++++++++
+>  4 files changed, 31 insertions(+)
 
-> > > This code adds some cost to the hot path. The blamed commit added
-> > > drop counters, most likely weighing the value of counters against
-> > > their cost. I don't immediately see reason to revisit that.
-> > >
-> > AFAIU the drop_counter is per socket, while the counters added in this
-> > patch correspond
-> > to /proc/net/{snmp,snmp6} pseudofiles. This patch implements the todo
-> > comment added in
-> > the blamed commit.
->
-> Ah indeed.
->
-> The entire logic can be inside the unlikely(to_drop) branch right?
-> No need to initialize the counters in the hot path, or do the
-> skb->protocol earlier?
->
-Right.
+A couple of things related to the documentation aspects of this patch.
+First, since this is just a single patch, and will need to be part of
+a larger patchset to gain acceptance[1], please skip the cover letter
+and ensure that the patch's description contains all the important
+information.  Similarly, while it is fine to include references to
+other sources of discussion in the patch's description, the links
+should not replace a proper explanation of the patch.  Whenever you
+are writing a patch description, imagine yourself ten years in the
+future, on a plane with no/terrible network access, trying to debug an
+issue and all you have for historical information is the git log.  I
+promise you, it's not as outlandish as it might seem ;)
 
-> The previous busylock approach could also drop packets at this stage
-> (goto uncharge_drop), and the skb is also dropped if exceeding rcvbuf.
-> Neither of those conditions update SNMP stats. I'd like to understand
-> what makes this case different.
->
-The difference comes from the intermediate udp_prod_queue which contains
-packets from calls to __udp_enqueue_schedule_skb that reached this branch:
+[1] See my other reply regarding new LSM hook guidance; this patch
+will need to be part of a larger patchset that actually makes use of
+this hook.
 
-    if (!llist_add(&skb->ll_node, &udp_prod_queue->ll_root))
-        return 0;
-
-these packets might be dropped in batch later by the call that reaches the
-unlikely(to_drop) branch, and thus SNMP stats must increase. Note that such
-packets are only dropped due to the ENOBUFS returned from udp_rmem_schedule=
-.
-
-> > > > >
-> > > > > You must not submit more than one version of a patch within a 24h
-> > > > > period.
-> > > > Hi Jakub and sorry for the noise, didn't know that. Is there any wa=
-y to check
-> > > > my patch against all patchwork checks ,specially the AI-reviewer
-> > > > before submitting it?
-> > >
-> > > See https://www.kernel.org/doc/html/latest/process/maintainer-netdev.=
-html
-> > >
-> > thanks.
->
->
+--=20
+paul-moore.com
 
