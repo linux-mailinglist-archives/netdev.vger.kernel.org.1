@@ -1,285 +1,254 @@
-Return-Path: <netdev+bounces-247702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3033CFDA76
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 13:27:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06956CFDA9A
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 13:29:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1BB17304569E
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 12:22:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E766530AC778
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 12:22:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14E8E3161BA;
-	Wed,  7 Jan 2026 12:22:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D73F9314D13;
+	Wed,  7 Jan 2026 12:22:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NRXN1+RR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fHy6lYO6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20CF43161A8
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 12:22:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EA0D314A77
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 12:22:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767788536; cv=none; b=Cc9ffNEz1JTnkh/10Bo7/q17ctKty47ynyUqcXviIhjSEbnbjbxqr25Jue3z/rSz4A9DQYy4mELvwmgAfRJo9cCliifXiPXktQZ3nycYYxMcc4pBE9RH+x7cm91cxIL8b+pQF0EtJh+/DsExsnqKF6m0cKpj4Xk8o7gADZkngf8=
+	t=1767788550; cv=none; b=aQqmdc7mUHS2fjSM04oETr2cdTqreKfvY6OQq7IEKXl7pt2EFavkhsK80PDqu04CIPq67MHzHhO/RZ+0qZj5xTKbhHnAUY5x+bfwp7ATUBNlxN56wvZAh5qfw8DYM1mCGKYgmL8K2IOBIt81EK4qLmm4zyl3chyTnDVhrb/4oJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767788536; c=relaxed/simple;
-	bh=LXy2Ua1cUOSGWHBNdtUnsbR39WZkmXzM0hJK6m/a3KQ=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=q45zemp5fy+LYYi6jtIys3DjPwSiGuWf1wbwVU2sMFHaGNgAqSjYzUXAOHv5xXlnV3V5v0HWGuZ+9vCTkCZy7MvtcbMD0gx/cg4l/S70d7KhWxG1Q410bjerElKr3SJRqse+K+aVv12YmZjtU/I0gH/6bEQLHhEQQOZ3sORE5fM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NRXN1+RR; arc=none smtp.client-ip=209.85.221.51
+	s=arc-20240116; t=1767788550; c=relaxed/simple;
+	bh=6oDFp6ikqBgS4NvjQlEcN+NYxI3tGIrBI1QcoO9lYMw=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=eJfIwqvDVv/7Wky2edz+6KgTZrePugz1R8fY+feqUJNO0FqzS6FiDBWuMsZ2OSILIaIofZ1ltrJ0UhiI9oH23YbBnFLZezeBM6L8t9AOMKeMIEhUK3ZFXDnpqKGHwOkXs2Hblxh2+IFnllrjD+VTJ33Q+bgtf+dol8/0+YNHipM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fHy6lYO6; arc=none smtp.client-ip=209.85.216.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-42b3c5defb2so1017173f8f.2
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 04:22:13 -0800 (PST)
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-34ab8e0df53so1755338a91.3
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 04:22:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767788532; x=1768393332; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20230601; t=1767788549; x=1768393349; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=uN8D9zqUx9hP6RtZocuSaBDdTng6nEw0sA37guFjwQ4=;
-        b=NRXN1+RRNkQ7mKgu5WGlHn+4slocIXbevPh0nbkziTpQlR754cABtNinS36Fk5sTpM
-         U/DnMNA79oC36nc2RwDgUQKU2/ymfL2lvcjg3rV4btX9ybityBBv0nT3CIgOMLf+PJrx
-         Lj91wej5KBDuXSdihL1QHQhdiWQT2sp4lQiyY1cG8AaCD1p1GLr/3lnxAPpGoEl8gsz1
-         AmFgfWCMFpnwMcGhv+fg+Ve453IWtxtyHaJp5CWsIJEtmdtqdAUNhJdp9CmBZePwvxCV
-         4/lNTeBRKYeEUxFmaJD2FBeuI/1fgsXJSVIykkcbOgpfEI+JHFXjAatAZDT9B9tkllPd
-         jm7g==
+        bh=ZxLt1bPb5cLdWg0B5PWvieuskeOyEx2nDLq7pSp3TII=;
+        b=fHy6lYO6jp3lRLyMYZe3IygWIqqN7HP2cXK33FZo2crbhXlFtHJRk4jECq3kmTY7Jg
+         z6EFkPFOCMC9YGdp+9txFypWOgbu7Ka98dxPJoypWsEiiJ3ZoxY3lxzZQ4FLPNdKD3J6
+         YE9atPKkJN+s+Hiu4+nxo8PtSh3ZlAn21OnVrvbGqUffnxC8ZhNh7tB4wW2n9RFGE6Ir
+         4YWp+1yrvHyvT3wvUjSaAz5AlnCzpdDaFpHJPRqiRhjFHmE6mBt2rEuQX2LVJ+exrlnX
+         Vb4XUuuIP5D6YLY1HmNenG+mF7KQ0RW/otIr1SzC3qycaDPPKbPklOp2Y0qh+D8v/aYH
+         tg1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767788532; x=1768393332;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+        d=1e100.net; s=20230601; t=1767788549; x=1768393349;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=uN8D9zqUx9hP6RtZocuSaBDdTng6nEw0sA37guFjwQ4=;
-        b=NfSU1686G8zv9foTjY85wBHr0XilVIZX8VqtjXxoEHXWUr/EprssNe0Q8loZlJ8dbY
-         jUG4TXOBQQBGPlDdHJTRzblfz0T7xtIhzOxv9MTxdAGnkZzIZEk3mnguk9lIEfTcnfK7
-         m+W0jIpPuIEHKg+iRaiT3WmJMHpc2UyjA2QQU6FhvdAeMnEnmlmvDi6/4Jk1+ujEkvrj
-         ArPxGp3K/3zRiLDhviudf7t2RMQ9Y/XZSN9sTJwrNqEZ16BSyd2pGI/j4HDTeBUWWb4M
-         Zj9HLiCqvxQ4HxkIC7uGR5m0fit5IMqkmzIBYPRICvEwgrUIvw8TPv/z5NKfsF5un53o
-         DbrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVQ4Jnh0HoOlSlBTPpf0AsG99A9hsK4rBvJYEexejykWokQtZHob/VR+q0cT7tqtd6ow8Y1VGg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyM65j7in+ttzhVgmRDJwadR6hr61RY1/TxrpTnrE+5ZWKlPaoA
-	5HEWPUn+xsaUhpGUtNyQTdcnPb/Mp79iqRrs5G0saGUO+tKaXMmilj4Z
-X-Gm-Gg: AY/fxX7znkjrXIIjDHs+cY83NLWRTO2f6U7z0zWvV/sdLLRokG9X03GB6cTKwu7+kBi
-	RdD3O8fpHVfQuWQipl9WkYw0InNYoXr/r456zLwkTmGmMuGbsHXzb6UP5zrhdoWijHf+17inqvA
-	/90DYqzFuvg7Rgjjcj5VnYCNw2kcreU1lkI2V3RLdT2xXTaNchrm/9w9A1ht0x7tw0LX6dmclmY
-	yclzV90ukK/cXlfCy7la0X8IZNLSCyq4rwkHA0XKjx97rbvSoR/qXr/hQuHnwNzKV64dKvEm+L4
-	zmeV3Nf583MNp/bNxs0+I0UCDH2tRlyKA9BF+od3DXULJmiEsC56hYuB8bYduVuNJzImInDMB5v
-	GLKNmzpaeXPdQLO3WuIdxCg5NsH+uOcG7imZ19/4c0FGdPndxf9qJ03GYN6lXLmdD1Ll7x/AvTI
-	1CEw4nBaRNrZs6MkE6VSu1Dc4jLr3b
-X-Google-Smtp-Source: AGHT+IGr9TUwQpcofSbPB7NYJIiUrsvqauRvD/eEo4Cw0ZOENCc6OAYe73MHpEeICsPVDw5iyoM7jA==
-X-Received: by 2002:a5d:64c7:0:b0:42f:b690:6788 with SMTP id ffacd0b85a97d-432c378a0d4mr3006796f8f.10.1767788532034;
-        Wed, 07 Jan 2026 04:22:12 -0800 (PST)
-Received: from imac.lan ([2a02:8010:60a0:0:bc70:fb0c:12b6:3a41])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0e16f4sm10417107f8f.11.2026.01.07.04.22.10
+        bh=ZxLt1bPb5cLdWg0B5PWvieuskeOyEx2nDLq7pSp3TII=;
+        b=uCI8NtvAtxhLcAji/mqavdAZtAzQYZveKVDRc/VIj6uavFG2tkUeC7VxOIH+XpzEnO
+         Yo/pKWMZlmJzUo1m3BGQCQ+Dm+GyNWU7Oh6gxt+6EBUfJa60QuGGx38gw9YRWnjuf3lO
+         nuLcpmx5UDSLH9/3GHj5Q56PKmS9Ol9gKDfLHhbgzd2KndiDRnhFD49IOluYHp8xZlk0
+         VnMDheyUqwmscgghGNoaGoyex6Ni6L5pe+TzXLPaD/iazU3ezeAClVchC68pVU4wAJ93
+         EV2oU82tFtPwKKRjagRlzCsJibr5CS/aPFvrdIv8dbodfNZ0Bfk5fUxl8PLMekrkm/E6
+         DwGw==
+X-Forwarded-Encrypted: i=1; AJvYcCXeoCj9reEiKDFtTZRsuHdeWSD29AWXQnF3QGuNgnhdsohOnbc9l2CqrqrohkCs3VkLdhFK4/8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyH/1pLbGjorqeOPGilphEiB9vtM9SX9PD0paAxz4XaP/6eNzb8
+	LtXwCUWmX5k7Sc+eWJV4AekBV7D/MaTJAyXUJ1g2JB5oPLcz/gh/BzQY
+X-Gm-Gg: AY/fxX720RSxjYL5tR1cjAEgc2dRhN+5dWPlcZPiTJz1UZjySCG38haT99qQDL/GgXV
+	E56lLEze0uOTh3WGLG+xaYA3EAbO+ajkJC0TxfksEIndE6REbZVsJE5fzvQQAdJPyNin5AFzgYP
+	pcxQcmg0T0ztJsO0zCdniM/ZLmePxjIUPtSknMXHO8r+ySnFr3xog0PUZ0zLPta3SGDBQub4nlg
+	ZaO3/v6GV751y/xMLgCbsLeQvHRpfFpF5XxnJsJYyCNkj6gamwWf45WbldacSSX9vKm+tq9Hl6e
+	0dU7tLtHRsb73HEcilBMMljgNVeqHGlvdYSNrDWESfPE3Rl6ciJ0X2tQ9orB9LUDdYdQAv0aM09
+	yIGJRcxCY53O24aZdzNHyO+FB+QkM278g/xGphfSZXSzGBMGXZ63642X0TM+rSCnxbeTR/7yz9K
+	gXwb5FUg0Af30d5nUo9Bn0yA==
+X-Google-Smtp-Source: AGHT+IGMhHuRS5o+GTE6fiL+UGv/YA7yMKM0gxu6LQ29zfgnf2FGe0JFwDg0odk/A2Q3yA/ZyxafNA==
+X-Received: by 2002:a17:90b:4ad1:b0:34c:7d65:e4a with SMTP id 98e67ed59e1d1-34f68c62b7fmr2222804a91.31.1767788548263;
+        Wed, 07 Jan 2026 04:22:28 -0800 (PST)
+Received: from [127.0.0.1] ([188.253.121.153])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34f5f8b1526sm5025946a91.14.2026.01.07.04.22.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 04:22:11 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	"Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
-	Gal Pressman <gal@nvidia.com>,
-	Jan Stancek <jstancek@redhat.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Nimrod Oren <noren@nvidia.com>,
-	netdev@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	=?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
-	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Ruben Wauters <rubenru09@aol.com>,
-	linux-doc@vger.kernel.org
-Subject: [PATCH net-next v1 08/13] tools: ynl: ethtool: fix pylint issues
-Date: Wed,  7 Jan 2026 12:21:38 +0000
-Message-ID: <20260107122143.93810-9-donald.hunter@gmail.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260107122143.93810-1-donald.hunter@gmail.com>
-References: <20260107122143.93810-1-donald.hunter@gmail.com>
+        Wed, 07 Jan 2026 04:22:27 -0800 (PST)
+From: Zesen Liu <ftyghome@gmail.com>
+Date: Wed, 07 Jan 2026 20:21:38 +0800
+Subject: [PATCH bpf 1/2] bpf: Fix memory access flags in helper prototypes
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260107-helper_proto-v1-1-e387e08271cc@gmail.com>
+References: <20260107-helper_proto-v1-0-e387e08271cc@gmail.com>
+In-Reply-To: <20260107-helper_proto-v1-0-e387e08271cc@gmail.com>
+To: Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski <mattbobrowski@google.com>, 
+ Steven Rostedt <rostedt@goodmis.org>, 
+ Masami Hiramatsu <mhiramat@kernel.org>, 
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>
+Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Shuran Liu <electronlsr@gmail.com>, Peili Gao <gplhust955@gmail.com>, 
+ Haoran Ni <haoran.ni.cs@gmail.com>, Zesen Liu <ftyghome@gmail.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5550; i=ftyghome@gmail.com;
+ h=from:subject:message-id; bh=6oDFp6ikqBgS4NvjQlEcN+NYxI3tGIrBI1QcoO9lYMw=;
+ b=kA0DAAoWjB93TexNMocByyZiAGleT/Sj3Tw1qRS4iEQ5ZKqX/Zr0iIRtDyzucPnnik5D1j16s
+ Ih1BAAWCgAdFiEEjfgx3alpNzO2PKDBjB93TexNMocFAmleT/QACgkQjB93TexNMocb3AEA8+Sn
+ cCnGk681RIuEzT5Q4i2a/JxVXbY5lQnUlvxzD74BAMI+ocInMSeAHlMOLy27XdeCylBYw9c9DjP
+ yt7LIErQP
+X-Developer-Key: i=ftyghome@gmail.com; a=openpgp;
+ fpr=8DF831DDA9693733B63CA0C18C1F774DEC4D3287
 
-Fix or suppress all the pylint issues in ethtool.py, except for
-TODO (fixme) items.
+After commit 37cce22dbd51 ("bpf: verifier: Refactor helper access type tracking"),
+the verifier started relying on the access type flags in helper
+function prototypes to perform memory access optimizations.
 
-Suppress:
+Currently, several helper functions utilizing ARG_PTR_TO_MEM lack the
+corresponding MEM_RDONLY or MEM_WRITE flags. This omission causes the
+verifier to incorrectly assume that the buffer contents are unchanged
+across the helper call. Consequently, the verifier may optimize away
+subsequent reads based on this wrong assumption, leading to correctness
+issues.
 
-- too-many-locals
-- too-many-branches
-- too-many-statements
-- too-many-return-statements
-- import-error
+For bpf_get_stack_proto_raw_tp, the original MEM_RDONLY was incorrect
+since the helper writes to the buffer. Change it to ARG_PTR_TO_UNINIT_MEM
+which correctly indicates write access to potentially uninitialized memory.
 
-Fix:
+Similar issues were recently addressed for specific helpers in commit
+ac44dcc788b9 ("bpf: Fix verifier assumptions of bpf_d_path's output buffer")
+and commit 2eb7648558a7 ("bpf: Specify access type of bpf_sysctl_get_name args").
 
-- missing-module-docstring
-- redefined-outer-name
-- dangerous-default-value
-- use-dict-literal
-- missing-function-docstring
-- global-variable-undefined
-- expression-not-assigned
-- inconsistent-return-statements
-- wrong-import-order
+Fix these prototypes by adding the correct memory access flags.
 
-Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+Fixes: 37cce22dbd51 ("bpf: verifier: Refactor helper access type tracking")
+Co-developed-by: Shuran Liu <electronlsr@gmail.com>
+Signed-off-by: Shuran Liu <electronlsr@gmail.com>
+Co-developed-by: Peili Gao <gplhust955@gmail.com>
+Signed-off-by: Peili Gao <gplhust955@gmail.com>
+Co-developed-by: Haoran Ni <haoran.ni.cs@gmail.com>
+Signed-off-by: Haoran Ni <haoran.ni.cs@gmail.com>
+Signed-off-by: Zesen Liu <ftyghome@gmail.com>
 ---
- tools/net/ynl/pyynl/ethtool.py | 46 +++++++++++++++++++++++-----------
- 1 file changed, 31 insertions(+), 15 deletions(-)
+ kernel/bpf/helpers.c     | 2 +-
+ kernel/bpf/syscall.c     | 2 +-
+ kernel/trace/bpf_trace.c | 6 +++---
+ net/core/filter.c        | 8 ++++----
+ 4 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/tools/net/ynl/pyynl/ethtool.py b/tools/net/ynl/pyynl/ethtool.py
-index 40a8ba8d296f..f1a2a2a89985 100755
---- a/tools/net/ynl/pyynl/ethtool.py
-+++ b/tools/net/ynl/pyynl/ethtool.py
-@@ -1,5 +1,10 @@
- #!/usr/bin/env python3
- # SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
-+#
-+# pylint: disable=too-many-locals, too-many-branches, too-many-statements
-+# pylint: disable=too-many-return-statements
-+
-+""" YNL ethtool utility """
+diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
+index db72b96f9c8c..f66284f8ec2c 100644
+--- a/kernel/bpf/helpers.c
++++ b/kernel/bpf/helpers.c
+@@ -1077,7 +1077,7 @@ const struct bpf_func_proto bpf_snprintf_proto = {
+ 	.func		= bpf_snprintf,
+ 	.gpl_only	= true,
+ 	.ret_type	= RET_INTEGER,
+-	.arg1_type	= ARG_PTR_TO_MEM_OR_NULL,
++	.arg1_type	= ARG_PTR_TO_MEM_OR_NULL | MEM_WRITE,
+ 	.arg2_type	= ARG_CONST_SIZE_OR_ZERO,
+ 	.arg3_type	= ARG_PTR_TO_CONST_STR,
+ 	.arg4_type	= ARG_PTR_TO_MEM | PTR_MAYBE_NULL | MEM_RDONLY,
+diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
+index 4ff82144f885..ee116a3b7baf 100644
+--- a/kernel/bpf/syscall.c
++++ b/kernel/bpf/syscall.c
+@@ -6407,7 +6407,7 @@ static const struct bpf_func_proto bpf_kallsyms_lookup_name_proto = {
+ 	.func		= bpf_kallsyms_lookup_name,
+ 	.gpl_only	= false,
+ 	.ret_type	= RET_INTEGER,
+-	.arg1_type	= ARG_PTR_TO_MEM,
++	.arg1_type	= ARG_PTR_TO_MEM | MEM_RDONLY,
+ 	.arg2_type	= ARG_CONST_SIZE_OR_ZERO,
+ 	.arg3_type	= ARG_ANYTHING,
+ 	.arg4_type	= ARG_PTR_TO_FIXED_SIZE_MEM | MEM_UNINIT | MEM_WRITE | MEM_ALIGNED,
+diff --git a/kernel/trace/bpf_trace.c b/kernel/trace/bpf_trace.c
+index fe28d86f7c35..59c2394981c7 100644
+--- a/kernel/trace/bpf_trace.c
++++ b/kernel/trace/bpf_trace.c
+@@ -1022,7 +1022,7 @@ const struct bpf_func_proto bpf_snprintf_btf_proto = {
+ 	.func		= bpf_snprintf_btf,
+ 	.gpl_only	= false,
+ 	.ret_type	= RET_INTEGER,
+-	.arg1_type	= ARG_PTR_TO_MEM,
++	.arg1_type	= ARG_PTR_TO_MEM | MEM_WRITE,
+ 	.arg2_type	= ARG_CONST_SIZE,
+ 	.arg3_type	= ARG_PTR_TO_MEM | MEM_RDONLY,
+ 	.arg4_type	= ARG_CONST_SIZE,
+@@ -1526,7 +1526,7 @@ static const struct bpf_func_proto bpf_read_branch_records_proto = {
+ 	.gpl_only       = true,
+ 	.ret_type       = RET_INTEGER,
+ 	.arg1_type      = ARG_PTR_TO_CTX,
+-	.arg2_type      = ARG_PTR_TO_MEM_OR_NULL,
++	.arg2_type      = ARG_PTR_TO_MEM_OR_NULL | MEM_WRITE,
+ 	.arg3_type      = ARG_CONST_SIZE_OR_ZERO,
+ 	.arg4_type      = ARG_ANYTHING,
+ };
+@@ -1661,7 +1661,7 @@ static const struct bpf_func_proto bpf_get_stack_proto_raw_tp = {
+ 	.gpl_only	= true,
+ 	.ret_type	= RET_INTEGER,
+ 	.arg1_type	= ARG_PTR_TO_CTX,
+-	.arg2_type	= ARG_PTR_TO_MEM | MEM_RDONLY,
++	.arg2_type	= ARG_PTR_TO_UNINIT_MEM,
+ 	.arg3_type	= ARG_CONST_SIZE_OR_ZERO,
+ 	.arg4_type	= ARG_ANYTHING,
+ };
+diff --git a/net/core/filter.c b/net/core/filter.c
+index 616e0520a0bb..6e07bb994aa7 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -6399,7 +6399,7 @@ static const struct bpf_func_proto bpf_xdp_fib_lookup_proto = {
+ 	.gpl_only	= true,
+ 	.ret_type	= RET_INTEGER,
+ 	.arg1_type      = ARG_PTR_TO_CTX,
+-	.arg2_type      = ARG_PTR_TO_MEM,
++	.arg2_type      = ARG_PTR_TO_MEM | MEM_WRITE,
+ 	.arg3_type      = ARG_CONST_SIZE,
+ 	.arg4_type	= ARG_ANYTHING,
+ };
+@@ -6454,7 +6454,7 @@ static const struct bpf_func_proto bpf_skb_fib_lookup_proto = {
+ 	.gpl_only	= true,
+ 	.ret_type	= RET_INTEGER,
+ 	.arg1_type      = ARG_PTR_TO_CTX,
+-	.arg2_type      = ARG_PTR_TO_MEM,
++	.arg2_type      = ARG_PTR_TO_MEM | MEM_WRITE,
+ 	.arg3_type      = ARG_CONST_SIZE,
+ 	.arg4_type	= ARG_ANYTHING,
+ };
+@@ -8010,7 +8010,7 @@ static const struct bpf_func_proto bpf_tcp_raw_gen_syncookie_ipv4_proto = {
+ 	.ret_type	= RET_INTEGER,
+ 	.arg1_type	= ARG_PTR_TO_FIXED_SIZE_MEM,
+ 	.arg1_size	= sizeof(struct iphdr),
+-	.arg2_type	= ARG_PTR_TO_MEM,
++	.arg2_type	= ARG_PTR_TO_MEM | MEM_RDONLY,
+ 	.arg3_type	= ARG_CONST_SIZE_OR_ZERO,
+ };
  
- import argparse
- import pathlib
-@@ -10,8 +15,10 @@ import os
+@@ -8042,7 +8042,7 @@ static const struct bpf_func_proto bpf_tcp_raw_gen_syncookie_ipv6_proto = {
+ 	.ret_type	= RET_INTEGER,
+ 	.arg1_type	= ARG_PTR_TO_FIXED_SIZE_MEM,
+ 	.arg1_size	= sizeof(struct ipv6hdr),
+-	.arg2_type	= ARG_PTR_TO_MEM,
++	.arg2_type	= ARG_PTR_TO_MEM | MEM_RDONLY,
+ 	.arg3_type	= ARG_CONST_SIZE_OR_ZERO,
+ };
  
- # pylint: disable=no-name-in-module,wrong-import-position
- sys.path.append(pathlib.Path(__file__).resolve().parent.as_posix())
--from lib import YnlFamily
-+# pylint: disable=import-error
- from cli import schema_dir, spec_dir
-+from lib import YnlFamily
-+
- 
- def args_to_req(ynl, op_name, args, req):
-     """
-@@ -49,7 +56,8 @@ def print_field(reply, *desc):
-         return
- 
-     if len(desc) == 0:
--        return print_field(reply, *zip(reply.keys(), reply.keys()))
-+        print_field(reply, *zip(reply.keys(), reply.keys()))
-+        return
- 
-     for spec in desc:
-         try:
-@@ -89,11 +97,12 @@ def doit(ynl, args, op_name):
-     args_to_req(ynl, op_name, args.args, req)
-     ynl.do(op_name, req)
- 
--def dumpit(ynl, args, op_name, extra = {}):
-+def dumpit(ynl, args, op_name, extra=None):
-     """
-     Prepare request header, parse arguments and dumpit (filtering out the
-     devices we're not interested in).
-     """
-+    extra = extra or {}
-     reply = ynl.dump(op_name, { 'header': {} } | extra)
-     if not reply:
-         return {}
-@@ -115,9 +124,9 @@ def bits_to_dict(attr):
-     """
-     ret = {}
-     if 'bits' not in attr:
--        return dict()
-+        return {}
-     if 'bit' not in attr['bits']:
--        return dict()
-+        return {}
-     for bit in attr['bits']['bit']:
-         if bit['name'] == '':
-             continue
-@@ -127,6 +136,8 @@ def bits_to_dict(attr):
-     return ret
- 
- def main():
-+    """ YNL ethtool utility """
-+
-     parser = argparse.ArgumentParser(description='ethtool wannabe')
-     parser.add_argument('--json', action=argparse.BooleanOptionalAction)
-     parser.add_argument('--show-priv-flags', action=argparse.BooleanOptionalAction)
-@@ -156,7 +167,7 @@ def main():
-     # TODO:                       rss-get
-     parser.add_argument('device', metavar='device', type=str)
-     parser.add_argument('args', metavar='args', type=str, nargs='*')
--    global args
-+
-     args = parser.parse_args()
- 
-     spec = os.path.join(spec_dir(), 'ethtool.yaml')
-@@ -170,13 +181,16 @@ def main():
-         return
- 
-     if args.set_eee:
--        return doit(ynl, args, 'eee-set')
-+        doit(ynl, args, 'eee-set')
-+        return
- 
-     if args.set_pause:
--        return doit(ynl, args, 'pause-set')
-+        doit(ynl, args, 'pause-set')
-+        return
- 
-     if args.set_coalesce:
--        return doit(ynl, args, 'coalesce-set')
-+        doit(ynl, args, 'coalesce-set')
-+        return
- 
-     if args.set_features:
-         # TODO: parse the bitmask
-@@ -184,10 +198,12 @@ def main():
-         return
- 
-     if args.set_channels:
--        return doit(ynl, args, 'channels-set')
-+        doit(ynl, args, 'channels-set')
-+        return
- 
-     if args.set_ring:
--        return doit(ynl, args, 'rings-set')
-+        doit(ynl, args, 'rings-set')
-+        return
- 
-     if args.show_priv_flags:
-         flags = bits_to_dict(dumpit(ynl, args, 'privflags-get')['flags'])
-@@ -338,25 +354,25 @@ def main():
-         print(f'Time stamping parameters for {args.device}:')
- 
-         print('Capabilities:')
--        [print(f'\t{v}') for v in bits_to_dict(tsinfo['timestamping'])]
-+        _ = [print(f'\t{v}') for v in bits_to_dict(tsinfo['timestamping'])]
- 
-         print(f'PTP Hardware Clock: {tsinfo.get("phc-index", "none")}')
- 
-         if 'tx-types' in tsinfo:
-             print('Hardware Transmit Timestamp Modes:')
--            [print(f'\t{v}') for v in bits_to_dict(tsinfo['tx-types'])]
-+            _ = [print(f'\t{v}') for v in bits_to_dict(tsinfo['tx-types'])]
-         else:
-             print('Hardware Transmit Timestamp Modes: none')
- 
-         if 'rx-filters' in tsinfo:
-             print('Hardware Receive Filter Modes:')
--            [print(f'\t{v}') for v in bits_to_dict(tsinfo['rx-filters'])]
-+            _ = [print(f'\t{v}') for v in bits_to_dict(tsinfo['rx-filters'])]
-         else:
-             print('Hardware Receive Filter Modes: none')
- 
-         if 'stats' in tsinfo and tsinfo['stats']:
-             print('Statistics:')
--            [print(f'\t{k}: {v}') for k, v in tsinfo['stats'].items()]
-+            _ = [print(f'\t{k}: {v}') for k, v in tsinfo['stats'].items()]
- 
-         return
- 
+
 -- 
-2.52.0
+2.43.0
 
 
