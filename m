@@ -1,203 +1,118 @@
-Return-Path: <netdev+bounces-247712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49A9DCFDBD8
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 13:47:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F843CFDC32
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 13:51:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6AE5F306306E
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 12:46:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2F4A230E49FC
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 12:45:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70855322B63;
-	Wed,  7 Jan 2026 12:35:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C22E5328B4D;
+	Wed,  7 Jan 2026 12:37:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="mclLOmd+";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="XlQZGwjG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FG4AcyXA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45D2320CAA
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 12:35:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95256328B43;
+	Wed,  7 Jan 2026 12:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767789343; cv=none; b=G5zwzANol4ZGXRbOygrCHKCgOjjX/ZNVgZa6qy9X43hkyoGTjazlQL6vkFLg7EHLrHiW5Jd4oG2SQUAoxBJbpe9Ozjn8f/Fp1N1HN2MZyhHlxWqxaZ3rb6tjH+ccEfRpQ6SjUUONKTj+d3Baw27R9HnOELIFYQ+7a3L4HUWe2Ew=
+	t=1767789460; cv=none; b=OnNKRHWeuVYS+vd+Mk2FhC01RJts0WW4IbI417EDKCezzuNPKQPqc//VB8mMUH/FqcLcIbLnhZ+vznMi7noka9JM4LHYyS4HCzeueOqL3YdZz8/u+G9o+nNE57DV+MT5ELfJd3Ji68Q+/XOXKXIPkMiGgKq8gzUYf+IW4eXU/KQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767789343; c=relaxed/simple;
-	bh=Z3/xgfDcR9ktiH/1Lr6yEevZOzIdj4I2wJegVeEfRBk=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=IHcSMzOryFaXlFKwtWa1fanpGHOaAWzwv+hqotwyqXodxkNAHJHNi1gdTS1CMx5QQFFYCDeOgNHAPnQhKkG0D58cMkIf0rXRsFuELk4ZKcDe+sGApRmAsiDGJ6IRKJkp8iuk7GefKTn4HJFQ+lb6Fx8Y8uvuqA2FYw4XPMVhAWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=mclLOmd+; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=XlQZGwjG; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 607C4cjn1642893
-	for <netdev@vger.kernel.org>; Wed, 7 Jan 2026 12:35:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	bC0wC25dWX1u9h804y9npqlSPE9Pd9D9e+NxLaj/2I4=; b=mclLOmd+Va5hvkJq
-	I73xotDuEPUPz/8m5HsSnCU2taxUQmDmbgWwX2kQiNnHkhINHy4wAu/OF8+lAHj6
-	us43TEwIv7ZhVpfrB1Se+qnRMlQZl1iCbUaZR/3eHNGfAsFuqqpSUUS96cDuuUx+
-	ZLlHwR0Brvrg+1PbspBuw8bdVWa/DHSW32cuEz8IGNlqzF4XHbJqoPX1SJXRRUXz
-	Fjy0QqYySQOnlI2zDl6f1WCC9W4NtsUTogulzaqgBP6xP24vdlN5szN2LZZieHAj
-	/muaIpc5NfmykX6B/YGgwvXn/3ST1QLhP6EFkIX0vw2Y573ssJ+AhZ0QWCs3/Olv
-	PGFzGw==
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bhgsfhd11-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 12:35:40 +0000 (GMT)
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-7d5564057d0so4557131b3a.0
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 04:35:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1767789340; x=1768394140; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bC0wC25dWX1u9h804y9npqlSPE9Pd9D9e+NxLaj/2I4=;
-        b=XlQZGwjGxG5YenVFmIu/3eDb2V00tLRTBuxwOqBeXMhYWkzLI7e+gS75qHILGs1rzd
-         SMqTItWoiE3KR6BxbIPf1rZ1S6B8ohKSc2hFnwVPcDLkI/3No+x55umzk98V675Glqwy
-         2hSxlzNtTbU0+jO/ekIhAcaS/FWWOIFEdLqgt91wFK0O6GQJUX0FPRP7+jWuHyEKNnt1
-         NWQqoBFVBXMjBr54r1mclJk/OZPSd9Pr5Y3/R0x5HKaJBpbz0m7gUm0wWZPPluBbMYKy
-         bZ9/Pstlhs4OLQFG3XYLRFUPjeLlC6CZIOZxRxvUwMe0U/ux1mIZXdHCiPqFkcSIzJmH
-         rB4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767789340; x=1768394140;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=bC0wC25dWX1u9h804y9npqlSPE9Pd9D9e+NxLaj/2I4=;
-        b=ddRiKJ1IeDaGSbcltkaZIf32/X0/R/a+byjiVtqU00B+hrjRWKWLV3IJOlqiLIsv2c
-         GnG0mOFLTvrdVXPeRH9OBYQqs1VH5tFvNdFAxR2cTXKlOUBaNTbD+UJAgglanBSt0JTx
-         iZme5JyZiy/sZXUUEKbmrcz0iPzq3iaEyYtfNGSYhVBLXezkP+z8eVX0vFQY4zm4dOEn
-         iOcWPyh7BQURM/Q/ApandVYaH3EOq4cE5zG3xC0UTsjZPr8oSUfXx6A6p+cuGte/c9Ms
-         f83gT4xa2OKL+Z3ZwFlheb1qhtyIjsdstrKHvFXtnJcrjiGMFkEjo2xNvJILDG+wn5dK
-         lopA==
-X-Forwarded-Encrypted: i=1; AJvYcCUWIMEOKuBZy1Fjm3jw99+zeg2SIVC1kaO93wUwYoaRt2KjWVWS4fZ8WoS37o7ARHSs0D14iOo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAPGkEkSuJO0oo0fQWNn3dxTX4MeWHBMF8YA9hKFDFXTyH6Ib6
-	hzjTHQ2uESZr0zJblGUZS/kH6rrpwZQ1MsJhBiU9p4bzG8GxHjmMTXlOcIYtxjo+J3gZdjoEs1x
-	GWlyNOAFtusVQV71GKsBlgW728qIiOr+6mYqVIirpdTYRipa1o2egFh56/lU=
-X-Gm-Gg: AY/fxX6ddMOzs9BR/dLO20g/zzgYs/RMmOq8CAK5NeA/Tt1t6qNmunR6EsMqJGBTy7e
-	lLeOqmWghwE6g2NBhHL8sh4qJum5AVZLBu/1mBpd+e1KRe/LbYrpC+R/dy81wd8mfFzWKfxG/70
-	VOJ0YCtYaqZjlF8fV3W+52zYc/xQAb7y2ONGB3bFPbpPbdoiOdtkT6BHtduohqaJhrZxAxAKW7r
-	C9cFZsShJpfWcKBViC+D5dPP7QYuXlcT0c4CGeap39f+Wgs065kAy9Maxx2VAQPnGTsmkq+Ph4c
-	G7o9GQSuehdeCAxZapXu4ZBhNWHM7Ylpmug8/Bd/lTDJK2Ay17bMBW60nb7cQ9J9Ei7Q6y3XCF8
-	v17mmLbE=
-X-Received: by 2002:a05:6a00:348a:b0:800:902d:9fdb with SMTP id d2e1a72fcca58-81b7d861859mr2145552b3a.5.1767789339622;
-        Wed, 07 Jan 2026 04:35:39 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH93fKUDfasuP5q8gHkOnrMUzHklFoNL76RVcQSiBJyvyfD7E4zZeOiwuGWUMy40Gzp59Romg==
-X-Received: by 2002:a05:6a00:348a:b0:800:902d:9fdb with SMTP id d2e1a72fcca58-81b7d861859mr2145512b3a.5.1767789338774;
-        Wed, 07 Jan 2026 04:35:38 -0800 (PST)
-Received: from [192.168.1.102] ([120.60.59.91])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-819c59e7c16sm4940286b3a.53.2026.01.07.04.35.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 04:35:38 -0800 (PST)
-From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-X-Google-Original-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-        Ryder Lee <ryder.lee@mediatek.com>,
-        Jianjun Wang <jianjun.wang@mediatek.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Lorenzo Pieralisi <lpieralisi@kernel.org>,
-        =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-        Chunfeng Yun <chunfeng.yun@mediatek.com>,
-        Vinod Koul <vkoul@kernel.org>,
-        Kishon Vijay Abraham I <kishon@kernel.org>, Lee Jones <lee@kernel.org>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
-        Felix Fietkau <nbd@nbd.name>, Sjoerd Simons <sjoerd@collabora.com>
-Cc: kernel@collabora.com, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linux-pci@vger.kernel.org,
-        linux-phy@lists.infradead.org, netdev@vger.kernel.org,
-        Daniel Golle <daniel@makrotopia.org>,
-        Bryan Hinton <bryan@bryanhinton.com>,
-        Conor Dooley <conor.dooley@microchip.com>
-In-Reply-To: <20251223-openwrt-one-network-v5-0-7d1864ea3ad5@collabora.com>
-References: <20251223-openwrt-one-network-v5-0-7d1864ea3ad5@collabora.com>
-Subject: Re: (subset) [PATCH v5 0/8] arm64: dts: mediatek: Add Openwrt One
- AP functionality
-Message-Id: <176778933103.573787.15149542478385360900.b4-ty@kernel.org>
-Date: Wed, 07 Jan 2026 18:05:31 +0530
+	s=arc-20240116; t=1767789460; c=relaxed/simple;
+	bh=0fdwo4lgufSfE9d3Q035mLW/81LeqImK6RZ94JeFmaE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RgXOuiUA9wyZWGwr6ujRopSyG7Gf/gNjVszMdXFPvk3xxaxXkPZv6fjUzULvv65A68qtML+ffu5JCxO6rnlL3TBNudDwvA8fyR+faVotNY1+V/XV8cdlu+tWfgsEMtsJ4LCeG5MCr4JathPaYKwbUzluLOCNqEMi/ooSqas+tQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FG4AcyXA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A249C4CEF7;
+	Wed,  7 Jan 2026 12:37:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767789460;
+	bh=0fdwo4lgufSfE9d3Q035mLW/81LeqImK6RZ94JeFmaE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=FG4AcyXA+6wZPSqy0OGwlMeMosAAYloIEzCYYBCpSwwiN9WTI6Ekv0miPFAGYNLE8
+	 tr+hv12ShS2Wp+ssN4C/hO42kRpb9D+ftpX4wOrgYF1ntW226WSI7cPJl7aRBCl6u1
+	 1J6uPaSKQlCVe5lGwp1djOU884q938Juq4jMxQFk2UZC+53f2qMc6YwkMcuyaxeSSQ
+	 Y955ol0vshqAgiY5XzeNXvjSQIB9kvC2E4UbD4lupsBPOcefDCm0QjarFimoRp4iau
+	 KWIgiQF5JXeTSUArgZaPZ5C1hIk4mQ1hUzCFls9qiWMTD74s16CE8G+BCacVKsnjdW
+	 k1Lsu/pdKWglg==
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+To: Linux PM <linux-pm@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
+ Brian Norris <briannorris@chromium.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Siddharth Vadapalli <s-vadapalli@ti.com>,
+ Roger Quadros <rogerq@kernel.org>, netdev@vger.kernel.org,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, Simon Horman <horms@kernel.org>
+Subject:
+ [RESEND][PATCH v2 2/3] net: cadence: macb: Discard pm_runtime_put() return
+ value
+Date: Wed, 07 Jan 2026 13:35:58 +0100
+Message-ID: <2252292.irdbgypaU6@rafael.j.wysocki>
+Organization: Linux Kernel Development
+In-Reply-To: <2816529.mvXUDI8C0e@rafael.j.wysocki>
+References:
+ <6245770.lOV4Wx5bFT@rafael.j.wysocki> <2816529.mvXUDI8C0e@rafael.j.wysocki>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA3MDA5NiBTYWx0ZWRfX1Rs5GCo1PbH8
- IZP66XnE2dhaCKDTGVdEcE5TutsnM9yC+Phmvh5G0OrUdyE4jyWlWWWoruKpvOXnUNSOw4bgFPt
- +laHEzgSknTozmeBtIsDNWmwsFFrhcKrWmPrRyLKdoYBSAfGn1qTVLFdhKRbdMoGIzVqnOIiFd6
- ZHFweKpcsAGAlCCTjO/8aXoEDi+OnAqVo44kW4kI/kDTHQrM3zvVGb9DkG3V4LP0943yhFASL4O
- 8LqlQD3GPFXEgVivAgYcGL1TjNPPeJccmx/gMHONS8bxq9C9ZEjvjsRQAIXpnOzkcmygee3poPV
- epWVO0PcUOF4OSMyLy741WeoNgNi6HK1Rrgvrqx8HqqEJeg/8IT+UGgXDNi2xkCyGSLGqW9FpKs
- qyHd5wzxheCFUzgPNwwZSBHK6dHCLgQb9UhAEgMEEV8EsecLs616T76hsEZHzzabnmJWRBrbYT7
- 6t4jZDdNTv1grJF5jfg==
-X-Proofpoint-GUID: wv5G8PvShsWBDyl8sKAHEL8XDOCdH-kT
-X-Proofpoint-ORIG-GUID: wv5G8PvShsWBDyl8sKAHEL8XDOCdH-kT
-X-Authority-Analysis: v=2.4 cv=Abi83nXG c=1 sm=1 tr=0 ts=695e531c cx=c_pps
- a=WW5sKcV1LcKqjgzy2JUPuA==:117 a=jZ9eb5YeB6VHmQ1DXVOWBw==:17
- a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=QX4gbG5DAAAA:8
- a=w7wmWQyBmLUzaIw334oA:9 a=QEXdDO2ut3YA:10 a=OpyuDcXvxspvyRM73sMx:22
- a=AbAUZ8qAyYyZVLSsDulk:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-07_01,2026-01-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 suspectscore=0 phishscore=0 impostorscore=0 adultscore=0
- malwarescore=0 clxscore=1011 lowpriorityscore=0 spamscore=0
- priorityscore=1501 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2512120000
- definitions=main-2601070096
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="UTF-8"
 
+From: "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
 
-On Tue, 23 Dec 2025 13:37:50 +0100, Sjoerd Simons wrote:
-> Significant changes in V5:
->   * Rebase against linux v6.19-rc2, dropping merged patches
->   * Drop note about disable pci_aspm in cover letter, not required anymore
-> Significant changes in V4:
->   * Drop patches that were picked up
->   * Improve mediatek,net dt bindings:
->     - Move back to V2 version (widening global constraint, constraining
->       per compatible)
->     - Ensure all compatibles are constraint in the amount of WEDs (2 for
->       everything apart from mt7981). Specifically adding constraints for
->       mediatek,mt7622-eth and ralink,rt5350-eth
-> Significant changes in V3:
->   * Drop patches that were picked up
->   * Re-order patches so changes that don't require dt binding changes
->     come first (Requested by Angelo)
->   * Specify drive power directly rather then using MTK_DRIVE_...
->   * Simply mediatek,net binding changes to avoid accidental changes to
->     other compatibles then mediatek,mt7981-eth
-> Significant changes in V2:
->   * https://lore.kernel.org/lkml/20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com/
->   * Only introduce labels in mt7981b.dtsi when required
->   * Switch Airoha EN8811H phy irq to level rather then edge triggered
->   * Move uart0 pinctrl from board dts to soc dtsi
->   * Only overwrite constraints with non-default values in MT7981 bindings
->   * Make SPI NOR nvmem cell labels more meaningfull
->   * Seperate fixing and disable-by-default for the mt7981 in seperate
->     patches
-> 
-> [...]
+Passing pm_runtime_put() return value to the callers is not particularly
+useful.
 
-Applied, thanks!
+Returning an error code from pm_runtime_put() merely means that it has
+not queued up a work item to check whether or not the device can be
+suspended and there are many perfectly valid situations in which that
+can happen, like after writing "on" to the devices' runtime PM "control"
+attribute in sysfs for one example.  It also happens when the kernel is
+configured with CONFIG_PM unset.
 
-[1/8] dt-bindings: PCI: mediatek-gen3: Add MT7981 PCIe compatible
-      commit: 407cc7ff3e99f6bca9b4ca2561d3f9e7192652fe
+Accordingly, update at91ether_close() to simply discard the return
+value of pm_runtime_put() and always return success to the caller.
 
-Best regards,
+This will facilitate a planned change of the pm_runtime_put() return
+type to void in the future.
+
+Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
+---
+
+v1 -> v2: Added Acked-by from Nicolas
+
+---
+ drivers/net/ethernet/cadence/macb_main.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index e461f5072884..1079613953bc 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -4810,7 +4810,9 @@ static int at91ether_close(struct net_device *dev)
+ 
+ 	at91ether_stop(lp);
+ 
+-	return pm_runtime_put(&lp->pdev->dev);
++	pm_runtime_put(&lp->pdev->dev);
++
++	return 0;
+ }
+ 
+ /* Transmit packet */
 -- 
-Manivannan Sadhasivam <mani@kernel.org>
+2.51.0
+
+
+
 
 
