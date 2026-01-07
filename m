@@ -1,227 +1,121 @@
-Return-Path: <netdev+bounces-247640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AB62CFCB1D
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 09:58:08 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E74AFCFCB3C
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 10:00:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 340253006F72
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 08:58:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C9F99301595C
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 09:00:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 500D32E7BD9;
-	Wed,  7 Jan 2026 08:58:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B553B2EFDBB;
+	Wed,  7 Jan 2026 09:00:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="iJ4cpKWA"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="E+abYr6c"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE84D2E6CD2;
-	Wed,  7 Jan 2026 08:58:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FA962EFD91
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 09:00:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767776286; cv=none; b=Zf1ly+3E8sU36JFqx4I0qnSxQaD6ror2+OTxOmFv0x0Mj1u35DSQJP3VWz25gG3+hoxxu0U6fZ+AIIQyGh2g8Yw4vPP32qxTzQcYpsrNCfryH6xVN7H7T5BLZeewUJC8CLnqh+ADaRCOgl5OVi8617yDp+V3y8rlTj0UgxTn+JY=
+	t=1767776413; cv=none; b=ps98jZ50EnW0a0rTEx3KAFQ9hAIqJcy10n1sN9OgqcF3y2KVKi4DOcgMIXTwGxTW1/oeSgsVAc+xqMwHYDfHCwdE6W25e6UmCF+39G/G/ZDmHuAFThGy8yl+FEt2mzCbIF+I4sGL4q8zYxjvJoWkX1P0kPhBDoWKMQrt4ktZGww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767776286; c=relaxed/simple;
-	bh=GlMMQjr1dURdyGo2nYyQ7BOuVwuyAEJ1lPZDrWYTLW4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YGyaM3IJBy/e9SLU3WktzP2vYJPA+DEDw4dPKMuIx2bYoWcrR2NxQbnX1g6gZvHxVkaq2CmbegxndpXgwuJzDgsDyFAH9hbqKCKjZ11ibbISTmOFuh+ktnUFdIzjlhY4AHe07gD4ZPJFlqqR9O1Unrg8Phgqb4sq3apwM8H9r+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=iJ4cpKWA; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6078v9aaD2676479, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
-	s=dkim; t=1767776230;
-	bh=1io93cKiGNyt5BinTDpqXCR0kXPMTV8HLUSBnjZi0fk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=iJ4cpKWA9lG9O+fujAIlOUuyHVIbUDYqn8tOhjofOcj+OgZVB+1G+trc5xa7bZExw
-	 J+Jz/WSoM9mbL8UueDIkGgZ0z5dpuLop+ZpGraURVgQItm66AttV8E0gUAIVK+hFUL
-	 4IBCApe3Yk4TYvcDLxJGkSC9NCbIImkgOEfPRrZ61Z4ctdNEwAqkxbxjtmf+G3nknG
-	 UJs2rqPVWiC2rFlC7l7GdDx/RbRc66dIxXX4u7UeIQFgK/b1f0ExmYp+vLYGs2Rj61
-	 SYKkCbR6zDyPRAxvf727JoToZqmtnSyFUhhP2Hjsl1H1TN0rWj+AixTLclBKCUQmqJ
-	 3bZbiScMjUxIA==
-Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
-	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 6078v9aaD2676479
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 7 Jan 2026 16:57:10 +0800
-Received: from RS-EX-MBS2.realsil.com.cn (172.29.17.102) by
- RS-EX-MBS2.realsil.com.cn (172.29.17.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.39; Wed, 7 Jan 2026 16:57:10 +0800
-Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS2.realsil.com.cn
- (172.29.17.102) with Microsoft SMTP Server id 15.2.1748.39 via Frontend
- Transport; Wed, 7 Jan 2026 16:57:10 +0800
-From: javen <javen_xu@realsil.com.cn>
-To: <hkallweit1@gmail.com>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <horms@kernel.org>, <javen_xu@realsil.com.cn>, <kuba@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <nic_swsd@realtek.com>, <pabeni@redhat.com>
-Subject: RE: [PATCH net-next 2/2] r8169: enable LTR support
-Date: Wed, 7 Jan 2026 16:57:08 +0800
-Message-ID: <20260107085708.936-1-javen_xu@realsil.com.cn>
-X-Mailer: git-send-email 2.50.1.windows.1
-In-Reply-To: <847e626b-c103-4884-beca-f8b0e74e3613@gmail.com>
-References: <847e626b-c103-4884-beca-f8b0e74e3613@gmail.com>
+	s=arc-20240116; t=1767776413; c=relaxed/simple;
+	bh=sCCKbuk7YySNPrAfx7Wit6Unf7q4zglc26Z3x5eiZSY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C++nuSs97kBBVdGRfLjhOEOJw22PilHu+V87w7arSEH8WvlnGU7/RZ0fdRXxQnCDMIVqdIgZehekXeX6XSljHipbOF/Xa4EBmah5lGJgRbfRJkpEzKUJFGL/tmTpETDxehioKvnkqc659YyVqLsIIyfUr5obqHFZzsXYfNaDkME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=E+abYr6c; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-47d3ffa5f33so8653525e9.2
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 01:00:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall.org; s=google; t=1767776409; x=1768381209; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1adH5GFfbTcDA1IlM7DzqcktsNMYGE1xewRyGNUxKI0=;
+        b=E+abYr6chgK0pz9hJE3wo2vMtJ5/xsK59euDpyCKTJHt1BZcGGI6rfl7y7FQlOeWMk
+         DyPcuIVhgDGNYEKuKVOtTPPmeLYbJscpA2BTou2050DwGcpLF873FOZQ30okKQlGoYR/
+         9c8pHyCAA1Z36rZwMIQ6ak1PsPLhdcUZkr8q1wDIkLYD2LsbZgAUvHtkvCoBQLODRlmI
+         KswPp8xd+dg+HGUTAj5KobCNcBPo+KYo85S/vdMG2p9CjU0xGBBcUEY1lLwQHeIbxG89
+         IJGclSSG0prQCUmtYcutdYOA/m9cRavQS42hIJNax6BHTSWRFMzY4ZUQlfvZSFfz8Zbl
+         fzRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767776409; x=1768381209;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1adH5GFfbTcDA1IlM7DzqcktsNMYGE1xewRyGNUxKI0=;
+        b=FCcPH9zM2dh3J9UWX+6pU+7QTk7kycculeto1D9lTpXhGYEp9opnuSOGEqa2IDDEU5
+         iND5i9pMTOTTKnPQOUGM9Vr+tCxpv1xNxc+EkZ0kGZqThnbfN351Hm6VxmH8PId/adtz
+         lTb7R/knWJYC2ZjwrLUP7cvNHUz/n3C21d+Jscdt3LbWGUI+Ok2mtoF7PD8bX3z8E0Au
+         9h3COSlHFf3RZ7DgSJZyyb94e+TOFS8sHCUqep2YGWcO2GIWdaOb24zyQBOT6Ce0lg/4
+         bXRunH8ETgJ7xk4srz2sJUB2M35QSlpIFyDSznRA655qk23FJmP/5fWeCz6c9rLYkTu1
+         99HA==
+X-Forwarded-Encrypted: i=1; AJvYcCWzNQmdu1Sv21s/h9dTuiC/dRkeqzimnmzBshmVo6TaMGgMWu8QZbPgDz3UF3h2ce0k35Is9no=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtHEu+840N4adLADOc56m9M1640HPkwsTtTI7bIB9EJzPbssMC
+	JeD/ayfeEqC2qsfJHrC9Wuu62w/5wsxyEk66mWPSAZtWZ9rxq4s3n+8iLCVrd2hCMP8=
+X-Gm-Gg: AY/fxX5xMJLlXIqEgKaCfApEXs/fQ5dtsit9X1do47fkuZay72jRlDdSx+PFeGhscMQ
+	JEEn1mGwzoGlQ5kQRZOhRlaoXUc/9ja27V3cPe+h0NXat5jXFeD+DQjD5gvVERlYRQJsKTJ73Qr
+	EINqMHAb+1DAoQWQIZ1L1iMbSbJw7g3jzmHLtu108TfR/ZmzNlfcQ5MpGxBqgjHU3oems1yP43l
+	uPUActfuqlhorU2c+lQ/GxeR7L4Sy2X1EKslVF42KZVkBuRgkbIo6kB0P1qFmdqZEkTx3MrPqF+
+	b2Ud5bxfM2JsGASJhIH75e88oWO5n4CbcpIcVAP8yG3EIJ9NpSpu6er+94Dvzd3T6KAl7tfSWz+
+	XK9k8TUapr70erMZ5fbhqZCJd33lyw03U3QijBPSYzU/dW/ZkGGT0yblKL4L8tHl1WFUHjv1IEw
+	rHqDxqQzFbtXZRfBmRHUp6bAYrDNTvw9K+46KELrpDBX3DJ3txvYJZnFY5LDMEClsLPD6YbXUSe
+	Og063LM
+X-Google-Smtp-Source: AGHT+IFWhSNgmVk+6HHKRdOSdipnHsEqXnmQkobGqaQcY2yH5rav/ISt5Lb5pCzRNv8s42WPABAMew==
+X-Received: by 2002:a05:600c:6815:b0:471:1716:11c4 with SMTP id 5b1f17b1804b1-47d84b61379mr19011795e9.34.1767776409131;
+        Wed, 07 Jan 2026 01:00:09 -0800 (PST)
+Received: from [192.168.0.161] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f7053f5sm84386825e9.14.2026.01.07.01.00.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 07 Jan 2026 01:00:08 -0800 (PST)
+Message-ID: <40b42159-d7d7-44a4-9312-24cf87fd532b@blackwall.org>
+Date: Wed, 7 Jan 2026 11:00:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net] net: bridge: annotate data-races around
+ fdb->{updated,used}
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com, Ido Schimmel <idosch@nvidia.com>
+References: <20260107083219.3219130-1-edumazet@google.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20260107083219.3219130-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-We generally do not recommend disabling LTR. LTR works in concert=0D
-with ASPM to reduce power consumption while maintaining performance.=0D
-There is no LTR-related bug in the existing code. The issue observed=0D
-on the customer=E2=80=99s evaluation platform is that the link cannot enter=
-=0D
-L1.1/L1.2 without LTR support. This patch enables LTR to allow the=0D
-device and platform to reach those low power states. Therefore, this=0D
-patch should be considered as a new feature.=0D
-After a hardware reset, LTR Enable defaults to 0 (disabled). Driver=0D
-must program the related registers to enable LTR.=0D
-We will replace some register numbers with names according to the=0D
-datasheet in the next patch.=0D
-=0D
-> > Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>=0D
-> > ---=0D
-> >  drivers/net/ethernet/realtek/r8169_main.c | 98 =0D
-> > +++++++++++++++++++++++=0D
-> >  1 file changed, 98 insertions(+)=0D
-> >=0D
-> > diff --git a/drivers/net/ethernet/realtek/r8169_main.c =0D
-> > b/drivers/net/ethernet/realtek/r8169_main.c=0D
-> > index f9df6aadacce..97abf95502dc 100644=0D
-> > --- a/drivers/net/ethernet/realtek/r8169_main.c=0D
-> > +++ b/drivers/net/ethernet/realtek/r8169_main.c=0D
-> > @@ -2919,6 +2919,101 @@ static void rtl_disable_exit_l1(struct rtl8169_=
-private *tp)=0D
-> >       }=0D
-> >  }=0D
-> >=0D
-> > +static void rtl_enable_ltr(struct rtl8169_private *tp) {=0D
-> > +     switch (tp->mac_version) {=0D
-> > +     case RTL_GIGA_MAC_VER_80:=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdd0, 0x9003);=0D
-> > +             r8168_mac_ocp_modify(tp, 0xe034, 0x0000, 0xc000);=0D
-> > +             r8168_mac_ocp_modify(tp, 0xe0a2, 0x0000, BIT(0));=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdd2, 0x8c09);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdd8, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdd4, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdda, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdd6, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcddc, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcde8, 0x887a);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdea, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdec, 0x8c09);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdee, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdf0, 0x8a62);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdf2, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdf4, 0x883e);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdf6, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdf8, 0x8849);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdfa, 0x9003);=0D
-> > +             r8168_mac_ocp_modify(tp, 0xe032, 0x0000, BIT(14));=0D
-> > +             break;=0D
-> > +     case RTL_GIGA_MAC_VER_70:=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdd0, 0x9003);=0D
-> > +             r8168_mac_ocp_modify(tp, 0xe034, 0x0000, 0xc000);=0D
-> > +             r8168_mac_ocp_modify(tp, 0xe0a2, 0x0000, BIT(0));=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdd2, 0x8c09);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdd8, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdd4, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdda, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdd6, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcddc, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcde8, 0x887a);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdea, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdec, 0x8c09);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdee, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdf0, 0x8a62);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdf2, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdf4, 0x883e);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdf6, 0x9003);=0D
-> > +             r8168_mac_ocp_modify(tp, 0xe032, 0x0000, BIT(14));=0D
-> > +             break;=0D
-> > +     case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_66:=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdd0, 0x9003);=0D
-> > +             r8168_mac_ocp_modify(tp, 0xe034, 0x0000, 0xc000);=0D
-> > +             r8168_mac_ocp_modify(tp, 0xe0a2, 0x0000, BIT(0));=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdd2, 0x889c);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdd8, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdd4, 0x8c30);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdda, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdd6, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcddc, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcde8, 0x883e);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdea, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdec, 0x889c);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdee, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdf0, 0x8C09);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdf2, 0x9003);=0D
-> > +             r8168_mac_ocp_modify(tp, 0xe032, 0x0000, BIT(14));=0D
-> > +             break;=0D
-> > +     case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_52:=0D
-> > +             r8168_mac_ocp_modify(tp, 0xe034, 0x0000, 0xc000);=0D
-> > +             r8168_mac_ocp_modify(tp, 0xe0a2, 0x0000, BIT(0));=0D
-> > +             r8168_mac_ocp_write(tp, 0xe02c, 0x1880);=0D
-> > +             r8168_mac_ocp_write(tp, 0xe02e, 0x4880);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdd8, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdda, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcddc, 0x9003);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdd2, 0x883c);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdd4, 0x8c12);=0D
-> > +             r8168_mac_ocp_write(tp, 0xcdd6, 0x9003);=0D
-> > +             RTL_W8(tp, 0xb6, RTL_R8(tp, 0xb6) | BIT(0));=0D
-> > +             break;=0D
-> > +     default:=0D
-> > +             return;=0D
-> > +     }=0D
-> > +     /* chip can trigger LTR */=0D
-> > +     r8168_mac_ocp_modify(tp, 0xe032, 0x0003, BIT(0)); }=0D
-> > +=0D
-> > +static void rtl_disable_ltr(struct rtl8169_private *tp) {=0D
-> > +     switch (tp->mac_version) {=0D
-> > +     case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_80:=0D
-> > +             r8168_mac_ocp_modify(tp, 0xe032, 0x0003, 0);=0D
-> > +             break;=0D
-> > +     default:=0D
-> > +             break;=0D
-> > +     }=0D
-> > +}=0D
-> > +=0D
-> >  static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, =0D
-> > bool enable)  {=0D
-> >       u8 val8;=0D
-> > @@ -2947,6 +3042,7 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8=
-169_private *tp, bool enable)=0D
-> >                       break;=0D
-> >               }=0D
-> >=0D
-> > +             rtl_enable_ltr(tp);=0D
-> >               switch (tp->mac_version) {=0D
-> >               case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_48:=0D
-> >               case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_LAST:=0D
-> > @@ -2968,6 +3064,7 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8=
-169_private *tp, bool enable)=0D
-> >                       break;=0D
-> >               }=0D
-> >=0D
-> > +             rtl_disable_ltr(tp);=0D
-> >               switch (tp->mac_version) {=0D
-> >               case RTL_GIGA_MAC_VER_70:=0D
-> >               case RTL_GIGA_MAC_VER_80:=0D
-> > @@ -4811,6 +4908,7 @@ static void rtl8169_down(struct rtl8169_private =
-=0D
-> > *tp)=0D
-> >=0D
-> >       rtl8169_cleanup(tp);=0D
-> >       rtl_disable_exit_l1(tp);=0D
-> > +     rtl_disable_ltr(tp);=0D
-> >       rtl_prepare_power_down(tp);=0D
-> >=0D
-> >       if (tp->dash_type !=3D RTL_DASH_NONE && !tp->saved_wolopts)=0D
+On 07/01/2026 10:32, Eric Dumazet wrote:
+> fdb->updated and fdb->used are read and written locklessly.
+> 
+> Add READ_ONCE()/WRITE_ONCE() annotations.
+> 
+> Fixes: 31cbc39b6344 ("net: bridge: add option to allow activity notifications for any fdb entries")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Nikolay Aleksandrov <razor@blackwall.org>
+> ---
+> v2: annotate all problematic fdb->updated and fdb->used reads/writes.
+> v1: https://lore.kernel.org/netdev/CANn89iL8-e_jphcg49eX=zdWrOeuA-AJDL0qhsTrApA4YnOFEg@mail.gmail.com/T/#mf99b76469697813939abe745f42ace3e201ef6f4
+> 
+>   net/bridge/br_fdb.c | 28 ++++++++++++++++------------
+>   1 file changed, 16 insertions(+), 12 deletions(-)
+> 
+
++CC Ido
+
+Oh you took care of ->used as well, even better. Thanks!
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+
 
