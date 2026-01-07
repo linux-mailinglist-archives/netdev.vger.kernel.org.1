@@ -1,184 +1,672 @@
-Return-Path: <netdev+bounces-247615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5744CCFC513
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 08:22:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14049CFC543
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 08:26:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 54F043023D20
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 07:22:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AA9BD3014A30
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 07:24:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F76222FE11;
-	Wed,  7 Jan 2026 07:22:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DC642505AA;
+	Wed,  7 Jan 2026 07:24:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ROroWRh/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Js4DezRo"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f65.google.com (mail-dl1-f65.google.com [74.125.82.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD27526560D;
-	Wed,  7 Jan 2026 07:22:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8B9155C97
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 07:24:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767770567; cv=none; b=gHjUpNwyAJaymoIrO1xR7fVz9uh7vZEbLc7D3RHVPS0z818KV2bZgHf0wVKo7GKXZxYYbZniA/Aw5M9znSem+duW9bndsb+DJQMt4TmTflCTeaglw/hQ0h4SELOn2VShKO2ZbzdWSSGPd5C1+KEBtBYVt1B1JmG/komBziwxew8=
+	t=1767770649; cv=none; b=E+qiBjEEF4xQvjlyrvSVHkYKhqKGLoJuESJXbm/DK8T6oJgpHp0iakx2OmdIzSPPC99UtOrjFm+EwaY79VZ9srn6JDN2gBe62KYajmOAUYbpIeuHcwOZlZ7+sfYlohmuXjpxHv07FuPiBMtskGWs4eAZdFEVGSEXmdRhldXJoQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767770567; c=relaxed/simple;
-	bh=bfibTL1ji1QmvEFkfxm914aa635piGfHWOJFwEjtWWo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=a6+/kijPbFpoAz8/RoNHHUQ1nspHdSXEWe17st055OViMh9b7h6T7b/HtAis8SrZwpCYI1tOe1LGgAKnyDnUtiPH9ATW0uZih2aGOHYgbitDUw+sVR60ZxHLpp4aZ816DZ7q1C4LDIqCloKnrJtphwbhQlkQsX6+T6wOMq50qpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ROroWRh/; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=bfibTL1ji1QmvEFkfxm914aa635piGfHWOJFwEjtWWo=; b=R
-	OroWRh/p1KiCUmvUHi5GDByDgXGk0lKvoHG306YhYCJjShF/hqDrEiSt8l2SEIyY
-	8HKBBgU70whZAxrzgDs9NOlStkJKwEmMhdYr8VL78VMlTmprT6RiqccuKfrVQxTi
-	RVloURTMEgtKka2qB5DGf+ltK6/HM/a2QjUB/zzoCM=
-Received: from slark_xiao$163.com (
- [2408:8459:3860:79dc:e48d:3bf1:6788:3ccb] ) by ajax-webmail-wmsvr-40-127
- (Coremail) ; Wed, 7 Jan 2026 15:21:36 +0800 (CST)
-Date: Wed, 7 Jan 2026 15:21:36 +0800 (CST)
-From: "Slark Xiao" <slark_xiao@163.com>
-To: "Sai Krishna Gajula" <saikrishnag@marvell.com>
-Cc: "loic.poulain@oss.qualcomm.com" <loic.poulain@oss.qualcomm.com>,
-	"ryazanov.s.a@gmail.com" <ryazanov.s.a@gmail.com>,
-	"johannes@sipsolutions.net" <johannes@sipsolutions.net>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"mani@kernel.org" <mani@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re:RE: [net-next v4 2/8] net: wwan: core: split port creation and
- registration
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
- 20250723(a044bf12) Copyright (c) 2002-2026 www.mailtech.cn 163com
-In-Reply-To: <BYAPR18MB37352E69CB7B685926A574B9A087A@BYAPR18MB3735.namprd18.prod.outlook.com>
-References: <20260105102018.62731-1-slark_xiao@163.com>
- <20260105102018.62731-3-slark_xiao@163.com>
- <BYAPR18MB37352E69CB7B685926A574B9A087A@BYAPR18MB3735.namprd18.prod.outlook.com>
-X-NTES-SC: AL_Qu2dBfucv0wi4CKYbOkfmk8Sg+84W8K3v/0v1YVQOpF8jA/p8D8rXnZKEETb8uSdCjyerB63dQJQxMhbR6tAWYkJN/tAhSi1vA9F6tRMsVCUvg==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1767770649; c=relaxed/simple;
+	bh=5dP2+iwx8rVmgry+XzEPlq/1BvsYAvrv2zohd9FiF3U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fgnHszZdXUZg+b5h19qsAeDgYOsLARcD/NSlFlZhR9K13HKijjfZM25pGTQInexCst/7PtrmrJRxSYXuDAqwEWdsIoiAG5FxTMp29t2ZLF8M7v9wM/aHSXoDZBUXi3woetk8PN+yqnmeLieMlrOOnWh4MNi+GJmAJgnd1OKyUtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Js4DezRo; arc=none smtp.client-ip=74.125.82.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f65.google.com with SMTP id a92af1059eb24-11f3e3f0cacso1456363c88.0
+        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 23:24:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767770646; x=1768375446; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MMJksMeWEMNDkEUjoTDixVItJ2+0zlEAIWm0TJkG2Y8=;
+        b=Js4DezRoNJgp90XB0ebN40zxBv008A8sxm/IYGSLRv7FtKYTEu5vBKZFbN8R2hQSM0
+         Y65BDDkBTK2IxcISdKXShBukspHHMTDy5vpTuqpC8CqSz/kAxpBeOImeIpC1OwMPzWEO
+         3JT+AkeNhUZIDeDRZQqJfaP2rdREgXTsKrhbgskUAjRE9D/Zss1GG5a2dQjduT3nvsl9
+         9gZ0v9FXk3wdazzihK8tROzuQer+j3V8idx1oT3JqY0KprcbKt0QBZMWwiPtcJ+L3Hfb
+         6HV9GzjUpBjZyVmR5YdBt57+3CC6zOJMSKu9dKvgQBoIVylpT41BWSTq8WhhR68k+BaR
+         65Ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767770646; x=1768375446;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MMJksMeWEMNDkEUjoTDixVItJ2+0zlEAIWm0TJkG2Y8=;
+        b=EBZc5500yXdJokdEl0pCm4fB3XmlpV8yxaoMoYQuG1G9YUKyA5gPnrXW8Kc599cH0U
+         y9LiFHqkU97L/MUzCcz+hPYYIPLxeSjmFf+RsqyVS9OhVr02Hz3itKB0+OeKAzufCihP
+         dtDi+4nfhyMcx3Y1J1RgAf2xPxoXlUboKd/ZF7RbqiTU4HaaKczSqYRYlJBXsePTfXlE
+         L094eMD0EtRAXwDfHwDhBl5O1/UIspG60UrRRHj3VMJLbsmBgRqbGJu/LEmhPpT7MPNj
+         AmiXEvQFVhn09GVQidoSvbKzueWSPF0f+fQVWdu8Fk5yp3QPUiEuko9+f1pzZczZeiQU
+         Me5g==
+X-Gm-Message-State: AOJu0YzYCfuAot6hFtU6u23BuDAKJUXDsjMQqNugIf32T35wIlAGKESP
+	jMbseOWSLMT1iMrpmNG7DbMnxGA4VV3ohcT1YYBnqTaD2PQis+McchtQOPekudvG
+X-Gm-Gg: AY/fxX6HknUd7rlFMf4ZBdrtDE6+WzGaR9K3VNKKaEKgEos1p1Pg2CLMchWWzGWAGT/
+	fHP9ZAy0l1rd1iRGt2DjydzoZFLhlaH7UxvDj+61BXIg6GXxd0yEVNBqp+WwxWEftx63eGG7A7S
+	22+71d+G+MNR9RWKoyZuDYRl2h0oyS1XvDF8d+jPCoNBzU1BqTIoJZ11OUymtRNzeIW7yB5MQWp
+	lcCyCWIOaPYhfDjDKEmEfrWE/lwKer+D4vrxVMcFxOxbquW+tI/rlJGU2I9ixhXjbPnatZKh0P1
+	PgGUuCFN60U9lypHu7biaKRRsP5ybCgPP8IOhQWso/q1SskS8ZpqhyjED/DU0Dn0LSejI8Zzw9k
+	to4kkZaYSQO9cd0POMcafvDh1qf3tzJuMwbA8c4qnc4OwwEoWbw9eRuNXiYvbKDlrMB9mEkyx+h
+	WrrJ0FqiTyiNinDTuRwcFyt3gdHz2qxbQ0atpTjjtImGsKRJFJ+C/ckMD0PPJYzACwYrSairLUS
+	JzdIYlaT9Bz5+QmOTcQgty/r22mP3doVE0uxtXBtPE635j13oghlVICWVOfXXwVWwuswVW0DjTo
+	Mf1v
+X-Google-Smtp-Source: AGHT+IFaukRmiCLL80qqHQMKRDdc1LZ3wTNWR8Gz0oRvxn3H0Lwi8ZEo57lVoca9bbN8o3QUOlqOnQ==
+X-Received: by 2002:a05:7022:41a7:b0:11b:9386:8254 with SMTP id a92af1059eb24-121f8b65e84mr1453818c88.41.1767770645866;
+        Tue, 06 Jan 2026 23:24:05 -0800 (PST)
+Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-121f248c16fsm9243123c88.10.2026.01.06.23.24.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Jan 2026 23:24:05 -0800 (PST)
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Subject: [PATCH net-next] net: ethernet: tehuti: remove function tracing macros
+Date: Tue,  6 Jan 2026 23:24:01 -0800
+Message-ID: <20260107072401.36434-1-enelsonmoore@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <65a926ef.5e4a.19b97551cdb.Coremail.slark_xiao@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:fygvCgCHxLeACV5pnN5RAA--.17344W
-X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/xtbCvwBUuGleCYAluQAA3x
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+Content-Transfer-Encoding: 8bit
 
-CgpBdCAyMDI2LTAxLTA3IDAwOjQ5OjUwLCAiU2FpIEtyaXNobmEgR2FqdWxhIiA8c2Fpa3Jpc2hu
-YWdAbWFydmVsbC5jb20+IHdyb3RlOgo+Cj4+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tCj4+
-IEZyb206IFNsYXJrIFhpYW8gPHNsYXJrX3hpYW9AMTYzLmNvbT4KPj4gU2VudDogTW9uZGF5LCBK
-YW51YXJ5IDUsIDIwMjYgMzo1MCBQTQo+PiBUbzogbG9pYy5wb3VsYWluQG9zcy5xdWFsY29tbS5j
-b207IHJ5YXphbm92LnMuYUBnbWFpbC5jb207Cj4+IGpvaGFubmVzQHNpcHNvbHV0aW9ucy5uZXQ7
-IGFuZHJldytuZXRkZXZAbHVubi5jaDsKPj4gZGF2ZW1AZGF2ZW1sb2Z0Lm5ldDsgZWR1bWF6ZXRA
-Z29vZ2xlLmNvbTsga3ViYUBrZXJuZWwub3JnOwo+PiBwYWJlbmlAcmVkaGF0LmNvbTsgbWFuaUBr
-ZXJuZWwub3JnCj4+IENjOiBuZXRkZXZAdmdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJuZWxAdmdl
-ci5rZXJuZWwub3JnCj4+IFN1YmplY3Q6IFtuZXQtbmV4dCB2NCAyLzhdIG5ldDogd3dhbjogY29y
-ZTogc3BsaXQgcG9ydCBjcmVhdGlvbiBhbmQKPj4gcmVnaXN0cmF0aW9uCj4+IAo+PiBGcm9tOiBT
-ZXJnZXkgUnlhemFub3YgPHJ5YXphbm92LuKAinMu4oCKYUDigIpnbWFpbC7igIpjb20+IFVwY29t
-aW5nIEdOU1MgKE5NRUEpCj4+IHBvcnQgdHlwZSBzdXBwb3J0IHJlcXVpcmVzIGV4cG9ydGluZyBp
-dCB2aWEgdGhlIEdOU1Mgc3Vic3lzdGVtLiBPbiBhbm90aGVyCj4+IGhhbmQsIHdlIHN0aWxsIG5l
-ZWQgdG8gZG8gYmFzaWMgV1dBTiBjb3JlIHdvcms6IGZpbmQgb3IgYWxsb2NhdGUgdGhlIFdXQU4K
-Pj4gZGV2aWNlLCBtYWtlIGl0IHRoZSAKPj4gRnJvbTogU2VyZ2V5IFJ5YXphbm92IDxyeWF6YW5v
-di5zLmFAZ21haWwuY29tPgo+PiAKPj4gVXBjb21pbmcgR05TUyAoTk1FQSkgcG9ydCB0eXBlIHN1
-cHBvcnQgcmVxdWlyZXMgZXhwb3J0aW5nIGl0IHZpYSB0aGUgR05TUwo+PiBzdWJzeXN0ZW0uIE9u
-IGFub3RoZXIgaGFuZCwgd2Ugc3RpbGwgbmVlZCB0byBkbyBiYXNpYyBXV0FOIGNvcmUKPj4gd29y
-azogZmluZCBvciBhbGxvY2F0ZSB0aGUgV1dBTiBkZXZpY2UsIG1ha2UgaXQgdGhlIHBvcnQgcGFy
-ZW50LCBldGMuIFRvIHJldXNlCj4+IGFzIG11Y2ggY29kZSBhcyBwb3NzaWJsZSwgc3BsaXQgdGhl
-IHBvcnQgY3JlYXRpb24gZnVuY3Rpb24gaW50byB0aGUgcmVnaXN0cmF0aW9uCj4+IG9mIGEgcmVn
-dWxhciBXV0FOIHBvcnQgZGV2aWNlLCBhbmQgYmFzaWMgcG9ydCBzdHJ1Y3QgaW5pdGlhbGl6YXRp
-b24uCj4+IAo+PiBUbyBiZSBhYmxlIHRvIHVzZSBwdXRfZGV2aWNlKCkgdW5pZm9ybWx5LCBicmVh
-ayB0aGUgZGV2aWNlX3JlZ2lzdGVyKCkgY2FsbCBpbnRvCj4+IGRldmljZV9pbml0aWFsaXplKCkg
-YW5kIGRldmljZV9hZGQoKSBhbmQgY2FsbCBkZXZpY2UgaW5pdGlhbGl6YXRpb24gZWFybGllci4K
-Pj4gCj4+IFNpZ25lZC1vZmYtYnk6IFNlcmdleSBSeWF6YW5vdiA8cnlhemFub3Yucy5hQGdtYWls
-LmNvbT4KPj4gLS0tCj4+ICBkcml2ZXJzL25ldC93d2FuL3d3YW5fY29yZS5jIHwgNjYgKysrKysr
-KysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tCj4+ICAxIGZpbGUgY2hhbmdlZCwgNDAgaW5z
-ZXJ0aW9ucygrKSwgMjYgZGVsZXRpb25zKC0pCj4+IAo+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9u
-ZXQvd3dhbi93d2FuX2NvcmUuYyBiL2RyaXZlcnMvbmV0L3d3YW4vd3dhbl9jb3JlLmMKPj4gaW5k
-ZXggYWRlOGJiZmZjOTNlLi5lZGVlNWZmNDhmMjggMTAwNjQ0Cj4+IC0tLSBhL2RyaXZlcnMvbmV0
-L3d3YW4vd3dhbl9jb3JlLmMKPj4gKysrIGIvZHJpdmVycy9uZXQvd3dhbi93d2FuX2NvcmUuYwo+
-PiBAQCAtMzYxLDcgKzM2MSw4IEBAIHN0YXRpYyB2b2lkIHd3YW5fcG9ydF9kZXN0cm95KHN0cnVj
-dCBkZXZpY2UgKmRldikgIHsKPj4gIAlzdHJ1Y3Qgd3dhbl9wb3J0ICpwb3J0ID0gdG9fd3dhbl9w
-b3J0KGRldik7Cj4+IAo+PiAtCWlkYV9mcmVlKCZtaW5vcnMsIE1JTk9SKHBvcnQtPmRldi5kZXZ0
-KSk7Cj4+ICsJaWYgKGRldi0+Y2xhc3MgPT0gJnd3YW5fY2xhc3MpCj4+ICsJCWlkYV9mcmVlKCZt
-aW5vcnMsIE1JTk9SKGRldi0+ZGV2dCkpOwo+PiAgCW11dGV4X2Rlc3Ryb3koJnBvcnQtPmRhdGFf
-bG9jayk7Cj4+ICAJbXV0ZXhfZGVzdHJveSgmcG9ydC0+b3BzX2xvY2spOwo+PiAgCWtmcmVlKHBv
-cnQpOwo+PiBAQCAtNDQwLDYgKzQ0MSw0MSBAQCBzdGF0aWMgaW50IF9fd3dhbl9wb3J0X2Rldl9h
-c3NpZ25fbmFtZShzdHJ1Y3QKPj4gd3dhbl9wb3J0ICpwb3J0LCBjb25zdCBjaGFyICpmbXQpCj4+
-ICAJcmV0dXJuIGRldl9zZXRfbmFtZSgmcG9ydC0+ZGV2LCAiJXMiLCBidWYpOyAgfQo+PiAKPj4g
-Ky8qIFJlZ2lzdGVyIGEgcmVndWxhciBXV0FOIHBvcnQgZGV2aWNlIChlLmcuIEFULCBNQklNLCBl
-dGMuKSAqLyBzdGF0aWMKPj4gK2ludCB3d2FuX3BvcnRfcmVnaXN0ZXJfd3dhbihzdHJ1Y3Qgd3dh
-bl9wb3J0ICpwb3J0KSB7Cj4KPkFzIHBlciBrZXJuZWwgc3R5bGUsIGJyYWNlcyBuZWVkIHRvIGJl
-IG9uIG5leHQgbGluZSAKPmludCB3d2FuX3BvcnRfcmVnaXN0ZXJfd3dhbihzdHJ1Y3Qgd3dhbl9w
-b3J0ICpwb3J0KSAKPnsKPi4uLgo+fQo+Cj4+ICsJc3RydWN0IHd3YW5fZGV2aWNlICp3d2FuZGV2
-ID0gdG9fd3dhbl9kZXYocG9ydC0+ZGV2LnBhcmVudCk7Cj4+ICsJY2hhciBuYW1lZm10WzB4MjBd
-Owo+PiArCWludCBtaW5vciwgZXJyOwo+PiArCj4+ICsJLyogQSBwb3J0IGlzIGV4cG9zZWQgYXMg
-Y2hhcmFjdGVyIGRldmljZSwgZ2V0IGEgbWlub3IgKi8KPj4gKwltaW5vciA9IGlkYV9hbGxvY19y
-YW5nZSgmbWlub3JzLCAwLCBXV0FOX01BWF9NSU5PUlMgLSAxLAo+PiBHRlBfS0VSTkVMKTsKPj4g
-KwlpZiAobWlub3IgPCAwKQo+PiArCQlyZXR1cm4gbWlub3I7Cj4+ICsKPj4gKwlwb3J0LT5kZXYu
-Y2xhc3MgPSAmd3dhbl9jbGFzczsKPj4gKwlwb3J0LT5kZXYuZGV2dCA9IE1LREVWKHd3YW5fbWFq
-b3IsIG1pbm9yKTsKPj4gKwo+PiArCS8qIGFsbG9jYXRlIHVuaXF1ZSBuYW1lIGJhc2VkIG9uIHd3
-YW4gZGV2aWNlIGlkLCBwb3J0IHR5cGUgYW5kCj4+IG51bWJlciAqLwo+PiArCXNucHJpbnRmKG5h
-bWVmbXQsIHNpemVvZihuYW1lZm10KSwgInd3YW4ldSVzJSVkIiwgd3dhbmRldi0KPj4gPmlkLAo+
-PiArCQkgd3dhbl9wb3J0X3R5cGVzW3BvcnQtPnR5cGVdLmRldnN1Zik7Cj4+ICsKPj4gKwkvKiBT
-ZXJpYWxpemUgcG9ydHMgcmVnaXN0cmF0aW9uICovCj4+ICsJbXV0ZXhfbG9jaygmd3dhbl9yZWdp
-c3Rlcl9sb2NrKTsKPj4gKwo+PiArCV9fd3dhbl9wb3J0X2Rldl9hc3NpZ25fbmFtZShwb3J0LCBu
-YW1lZm10KTsKPj4gKwllcnIgPSBkZXZpY2VfYWRkKCZwb3J0LT5kZXYpOwo+PiArCj4+ICsJbXV0
-ZXhfdW5sb2NrKCZ3d2FuX3JlZ2lzdGVyX2xvY2spOwo+PiArCj4+ICsJaWYgKGVycikKPj4gKwkJ
-cmV0dXJuIGVycjsKPlBsZWFzZSBjaGVjaywgaWYgZnJlZWluZyB3aXRoIGlkYV9mcmVlIGlzIHJl
-cXVpcmVkIGJlZm9yZSByZXR1cm5pbmcgZXJyLgo+aWYgKGVycikgewo+ICAgIGlkYV9mcmVlKCZt
-aW5vcnMsIG1pbm9yKTsKPiAgICByZXR1cm4gZXJyOwo+fQpZZXMsIHlvdSBhcmUgcmlnaHQuCkFu
-ZCBwYXRjaCA3LzggbW9kaWZpZXMgdGhpcyBmaWxlIGFzIHdlbGwuIFdlIG5lZWQgdG8gYWxpZ24g
-d2l0aCB0aGF0IGNoYW5nZXMKc2luY2UgdGhlcmUgYXJlIHNvbWUgaXNzdWVzKHdlIHN0aWxsIGFs
-bG9jYXRlcyB0aGUgbWlub3IgZXZlbiB0aGUgY2RldiBpcwpmYWxzZSkuIFRoaXMgd291bGQgbGVh
-ZCB0byB0aGUgcmVsZWFzZSBmdW5jdGlvbiBjYW4ndCByZWxlYXNlIHRoZSBjb3JyZWN0CmRldnQu
-Cj4+ICsKPj4gKwlkZXZfaW5mbygmd3dhbmRldi0+ZGV2LCAicG9ydCAlcyBhdHRhY2hlZFxuIiwg
-ZGV2X25hbWUoJnBvcnQtCj4+ID5kZXYpKTsKPj4gKwo+PiArCXJldHVybiAwOwo+PiArfQo+PiAr
-Cj4+ICBzdHJ1Y3Qgd3dhbl9wb3J0ICp3d2FuX2NyZWF0ZV9wb3J0KHN0cnVjdCBkZXZpY2UgKnBh
-cmVudCwKPj4gIAkJCQkgICBlbnVtIHd3YW5fcG9ydF90eXBlIHR5cGUsCj4+ICAJCQkJICAgY29u
-c3Qgc3RydWN0IHd3YW5fcG9ydF9vcHMgKm9wcywgQEAgLQo+PiA0NDgsOCArNDg0LDcgQEAgc3Ry
-dWN0IHd3YW5fcG9ydCAqd3dhbl9jcmVhdGVfcG9ydChzdHJ1Y3QgZGV2aWNlCj4+ICpwYXJlbnQs
-ICB7Cj4+ICAJc3RydWN0IHd3YW5fZGV2aWNlICp3d2FuZGV2Owo+PiAgCXN0cnVjdCB3d2FuX3Bv
-cnQgKnBvcnQ7Cj4+IC0JY2hhciBuYW1lZm10WzB4MjBdOwo+PiAtCWludCBtaW5vciwgZXJyOwo+
-PiArCWludCBlcnI7Cj4+IAo+PiAgCWlmICh0eXBlID4gV1dBTl9QT1JUX01BWCB8fCAhb3BzKQo+
-PiAgCQlyZXR1cm4gRVJSX1BUUigtRUlOVkFMKTsKPj4gQEAgLTQ2MSwxNyArNDk2LDkgQEAgc3Ry
-dWN0IHd3YW5fcG9ydCAqd3dhbl9jcmVhdGVfcG9ydChzdHJ1Y3QgZGV2aWNlCj4+ICpwYXJlbnQs
-Cj4+ICAJaWYgKElTX0VSUih3d2FuZGV2KSkKPj4gIAkJcmV0dXJuIEVSUl9DQVNUKHd3YW5kZXYp
-Owo+PiAKPj4gLQkvKiBBIHBvcnQgaXMgZXhwb3NlZCBhcyBjaGFyYWN0ZXIgZGV2aWNlLCBnZXQg
-YSBtaW5vciAqLwo+PiAtCW1pbm9yID0gaWRhX2FsbG9jX3JhbmdlKCZtaW5vcnMsIDAsIFdXQU5f
-TUFYX01JTk9SUyAtIDEsCj4+IEdGUF9LRVJORUwpOwo+PiAtCWlmIChtaW5vciA8IDApIHsKPj4g
-LQkJZXJyID0gbWlub3I7Cj4+IC0JCWdvdG8gZXJyb3Jfd3dhbmRldl9yZW1vdmU7Cj4+IC0JfQo+
-PiAtCj4+ICAJcG9ydCA9IGt6YWxsb2Moc2l6ZW9mKCpwb3J0KSwgR0ZQX0tFUk5FTCk7Cj4+ICAJ
-aWYgKCFwb3J0KSB7Cj4+ICAJCWVyciA9IC1FTk9NRU07Cj4+IC0JCWlkYV9mcmVlKCZtaW5vcnMs
-IG1pbm9yKTsKPj4gIAkJZ290byBlcnJvcl93d2FuZGV2X3JlbW92ZTsKPj4gIAl9Cj4+IAo+PiBA
-QCAtNDg1LDI3ICs1MTIsMTQgQEAgc3RydWN0IHd3YW5fcG9ydCAqd3dhbl9jcmVhdGVfcG9ydChz
-dHJ1Y3QgZGV2aWNlCj4+ICpwYXJlbnQsCj4+ICAJbXV0ZXhfaW5pdCgmcG9ydC0+ZGF0YV9sb2Nr
-KTsKPj4gCj4+ICAJcG9ydC0+ZGV2LnBhcmVudCA9ICZ3d2FuZGV2LT5kZXY7Cj4+IC0JcG9ydC0+
-ZGV2LmNsYXNzID0gJnd3YW5fY2xhc3M7Cj4+ICAJcG9ydC0+ZGV2LnR5cGUgPSAmd3dhbl9wb3J0
-X2Rldl90eXBlOwo+PiAtCXBvcnQtPmRldi5kZXZ0ID0gTUtERVYod3dhbl9tYWpvciwgbWlub3Ip
-Owo+PiAgCWRldl9zZXRfZHJ2ZGF0YSgmcG9ydC0+ZGV2LCBkcnZkYXRhKTsKPj4gKwlkZXZpY2Vf
-aW5pdGlhbGl6ZSgmcG9ydC0+ZGV2KTsKPj4gCj4+IC0JLyogYWxsb2NhdGUgdW5pcXVlIG5hbWUg
-YmFzZWQgb24gd3dhbiBkZXZpY2UgaWQsIHBvcnQgdHlwZSBhbmQKPj4gbnVtYmVyICovCj4+IC0J
-c25wcmludGYobmFtZWZtdCwgc2l6ZW9mKG5hbWVmbXQpLCAid3dhbiV1JXMlJWQiLCB3d2FuZGV2
-LQo+PiA+aWQsCj4+IC0JCSB3d2FuX3BvcnRfdHlwZXNbcG9ydC0+dHlwZV0uZGV2c3VmKTsKPj4g
-LQo+PiAtCS8qIFNlcmlhbGl6ZSBwb3J0cyByZWdpc3RyYXRpb24gKi8KPj4gLQltdXRleF9sb2Nr
-KCZ3d2FuX3JlZ2lzdGVyX2xvY2spOwo+PiAtCj4+IC0JX193d2FuX3BvcnRfZGV2X2Fzc2lnbl9u
-YW1lKHBvcnQsIG5hbWVmbXQpOwo+PiAtCWVyciA9IGRldmljZV9yZWdpc3RlcigmcG9ydC0+ZGV2
-KTsKPj4gLQo+PiAtCW11dGV4X3VubG9jaygmd3dhbl9yZWdpc3Rlcl9sb2NrKTsKPj4gLQo+PiAr
-CWVyciA9IHd3YW5fcG9ydF9yZWdpc3Rlcl93d2FuKHBvcnQpOwo+PiAgCWlmIChlcnIpCj4+ICAJ
-CWdvdG8gZXJyb3JfcHV0X2RldmljZTsKPj4gCj4+IC0JZGV2X2luZm8oJnd3YW5kZXYtPmRldiwg
-InBvcnQgJXMgYXR0YWNoZWRcbiIsIGRldl9uYW1lKCZwb3J0LQo+PiA+ZGV2KSk7Cj4+ICAJcmV0
-dXJuIHBvcnQ7Cj4+IAo+PiAgZXJyb3JfcHV0X2RldmljZToKPj4gLS0KPj4gMi4yNS4xCj4+IAo+
-Cg==
+These function tracing macros clutter the code and provide
+no value over ftrace. Remove them.
+
+Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+---
+ drivers/net/ethernet/tehuti/tehuti.c | 103 +++++++--------------------
+ drivers/net/ethernet/tehuti/tehuti.h |  13 ----
+ 2 files changed, 26 insertions(+), 90 deletions(-)
+
+diff --git a/drivers/net/ethernet/tehuti/tehuti.c b/drivers/net/ethernet/tehuti/tehuti.c
+index 2cee1f05ac47..c23a328bfcdc 100644
+--- a/drivers/net/ethernet/tehuti/tehuti.c
++++ b/drivers/net/ethernet/tehuti/tehuti.c
+@@ -161,7 +161,7 @@ bdx_fifo_init(struct bdx_priv *priv, struct fifo *f, int fsz_type,
+ 				   &f->da, GFP_ATOMIC);
+ 	if (!f->va) {
+ 		pr_err("dma_alloc_coherent failed\n");
+-		RET(-ENOMEM);
++		return -ENOMEM;
+ 	}
+ 	f->reg_CFG0 = reg_CFG0;
+ 	f->reg_CFG1 = reg_CFG1;
+@@ -174,7 +174,7 @@ bdx_fifo_init(struct bdx_priv *priv, struct fifo *f, int fsz_type,
+ 	WRITE_REG(priv, reg_CFG0, (u32) ((f->da & TX_RX_CFG0_BASE) | fsz_type));
+ 	WRITE_REG(priv, reg_CFG1, H32_64(f->da));
+ 
+-	RET(0);
++	return 0;
+ }
+ 
+ /**
+@@ -184,13 +184,11 @@ bdx_fifo_init(struct bdx_priv *priv, struct fifo *f, int fsz_type,
+  */
+ static void bdx_fifo_free(struct bdx_priv *priv, struct fifo *f)
+ {
+-	ENTER;
+ 	if (f->va) {
+ 		dma_free_coherent(&priv->pdev->dev,
+ 				  f->memsz + FIFO_EXTRA_SPACE, f->va, f->da);
+ 		f->va = NULL;
+ 	}
+-	RET();
+ }
+ 
+ /**
+@@ -254,7 +252,6 @@ static irqreturn_t bdx_isr_napi(int irq, void *dev)
+ 	struct bdx_priv *priv = netdev_priv(ndev);
+ 	u32 isr;
+ 
+-	ENTER;
+ 	isr = (READ_REG(priv, regISR) & IR_RUN);
+ 	if (unlikely(!isr)) {
+ 		bdx_enable_interrupts(priv);
+@@ -267,7 +264,7 @@ static irqreturn_t bdx_isr_napi(int irq, void *dev)
+ 	if (isr & (IR_RX_DESC_0 | IR_TX_FREE_0)) {
+ 		if (likely(napi_schedule_prep(&priv->napi))) {
+ 			__napi_schedule(&priv->napi);
+-			RET(IRQ_HANDLED);
++			return IRQ_HANDLED;
+ 		} else {
+ 			/* NOTE: we get here if intr has slipped into window
+ 			 * between these lines in bdx_poll:
+@@ -283,7 +280,7 @@ static irqreturn_t bdx_isr_napi(int irq, void *dev)
+ 	}
+ 
+ 	bdx_enable_interrupts(priv);
+-	RET(IRQ_HANDLED);
++	return IRQ_HANDLED;
+ }
+ 
+ static int bdx_poll(struct napi_struct *napi, int budget)
+@@ -291,7 +288,6 @@ static int bdx_poll(struct napi_struct *napi, int budget)
+ 	struct bdx_priv *priv = container_of(napi, struct bdx_priv, napi);
+ 	int work_done;
+ 
+-	ENTER;
+ 	bdx_tx_cleanup(priv);
+ 	work_done = bdx_rx_receive(priv, &priv->rxd_fifo0, budget);
+ 	if ((work_done < budget) ||
+@@ -324,7 +320,6 @@ static int bdx_fw_load(struct bdx_priv *priv)
+ 	int master, i;
+ 	int rc;
+ 
+-	ENTER;
+ 	master = READ_REG(priv, regINIT_SEMAPHORE);
+ 	if (!READ_REG(priv, regINIT_STATUS) && master) {
+ 		rc = request_firmware(&fw, "tehuti/bdx.bin", &priv->pdev->dev);
+@@ -354,10 +349,10 @@ static int bdx_fw_load(struct bdx_priv *priv)
+ 			    READ_REG(priv, regVPC),
+ 			    READ_REG(priv, regVIC),
+ 			    READ_REG(priv, regINIT_STATUS), i);
+-		RET(rc);
++		return rc;
+ 	} else {
+ 		DBG("%s: firmware loading success\n", priv->ndev->name);
+-		RET(0);
++		return 0;
+ 	}
+ }
+ 
+@@ -365,7 +360,6 @@ static void bdx_restore_mac(struct net_device *ndev, struct bdx_priv *priv)
+ {
+ 	u32 val;
+ 
+-	ENTER;
+ 	DBG("mac0=%x mac1=%x mac2=%x\n",
+ 	    READ_REG(priv, regUNC_MAC0_A),
+ 	    READ_REG(priv, regUNC_MAC1_A), READ_REG(priv, regUNC_MAC2_A));
+@@ -380,7 +374,6 @@ static void bdx_restore_mac(struct net_device *ndev, struct bdx_priv *priv)
+ 	DBG("mac0=%x mac1=%x mac2=%x\n",
+ 	    READ_REG(priv, regUNC_MAC0_A),
+ 	    READ_REG(priv, regUNC_MAC1_A), READ_REG(priv, regUNC_MAC2_A));
+-	RET();
+ }
+ 
+ /**
+@@ -392,7 +385,6 @@ static int bdx_hw_start(struct bdx_priv *priv)
+ 	int rc = -EIO;
+ 	struct net_device *ndev = priv->ndev;
+ 
+-	ENTER;
+ 	bdx_link_changed(priv);
+ 
+ 	/* 10G overall max length (vlan, eth&ip header, ip payload, crc) */
+@@ -431,28 +423,24 @@ static int bdx_hw_start(struct bdx_priv *priv)
+ 		goto err_irq;
+ 	bdx_enable_interrupts(priv);
+ 
+-	RET(0);
++	return 0;
+ 
+ err_irq:
+-	RET(rc);
++	return rc;
+ }
+ 
+ static void bdx_hw_stop(struct bdx_priv *priv)
+ {
+-	ENTER;
+ 	bdx_disable_interrupts(priv);
+ 	free_irq(priv->pdev->irq, priv->ndev);
+ 
+ 	netif_carrier_off(priv->ndev);
+ 	netif_stop_queue(priv->ndev);
+-
+-	RET();
+ }
+ 
+ static int bdx_hw_reset_direct(void __iomem *regs)
+ {
+ 	u32 val, i;
+-	ENTER;
+ 
+ 	/* reset sequences: read, write 1, read, write 0 */
+ 	val = readl(regs + regCLKPLL);
+@@ -475,7 +463,6 @@ static int bdx_hw_reset_direct(void __iomem *regs)
+ static int bdx_hw_reset(struct bdx_priv *priv)
+ {
+ 	u32 val, i;
+-	ENTER;
+ 
+ 	if (priv->port == 0) {
+ 		/* reset sequences: read, write 1, read, write 0 */
+@@ -500,7 +487,6 @@ static int bdx_sw_reset(struct bdx_priv *priv)
+ {
+ 	int i;
+ 
+-	ENTER;
+ 	/* 1. load MAC (obsolete) */
+ 	/* 2. disable Rx (and Tx) */
+ 	WRITE_REG(priv, regGMAC_RXF_A, 0);
+@@ -547,16 +533,15 @@ static int bdx_sw_reset(struct bdx_priv *priv)
+ 	for (i = regTXD_WPTR_0; i <= regTXF_RPTR_3; i += 0x10)
+ 		DBG("%x = %x\n", i, READ_REG(priv, i) & TXF_WPTR_WR_PTR);
+ 
+-	RET(0);
++	return 0;
+ }
+ 
+ /* bdx_reset - performs right type of reset depending on hw type */
+ static int bdx_reset(struct bdx_priv *priv)
+ {
+-	ENTER;
+-	RET((priv->pdev->device == 0x3009)
++	return (priv->pdev->device == 0x3009)
+ 	    ? bdx_hw_reset(priv)
+-	    : bdx_sw_reset(priv));
++	    : bdx_sw_reset(priv);
+ }
+ 
+ /**
+@@ -574,7 +559,6 @@ static int bdx_close(struct net_device *ndev)
+ {
+ 	struct bdx_priv *priv = NULL;
+ 
+-	ENTER;
+ 	priv = netdev_priv(ndev);
+ 
+ 	napi_disable(&priv->napi);
+@@ -583,7 +567,7 @@ static int bdx_close(struct net_device *ndev)
+ 	bdx_hw_stop(priv);
+ 	bdx_rx_free(priv);
+ 	bdx_tx_free(priv);
+-	RET(0);
++	return 0;
+ }
+ 
+ /**
+@@ -603,7 +587,6 @@ static int bdx_open(struct net_device *ndev)
+ 	struct bdx_priv *priv;
+ 	int rc;
+ 
+-	ENTER;
+ 	priv = netdev_priv(ndev);
+ 	bdx_reset(priv);
+ 	if (netif_running(ndev))
+@@ -624,11 +607,11 @@ static int bdx_open(struct net_device *ndev)
+ 
+ 	print_fw_id(priv->nic);
+ 
+-	RET(0);
++	return 0;
+ 
+ err:
+ 	bdx_close(ndev);
+-	RET(rc);
++	return rc;
+ }
+ 
+ static int bdx_range_check(struct bdx_priv *priv, u32 offset)
+@@ -644,14 +627,12 @@ static int bdx_siocdevprivate(struct net_device *ndev, struct ifreq *ifr,
+ 	u32 data[3];
+ 	int error;
+ 
+-	ENTER;
+-
+ 	DBG("jiffies=%ld cmd=%d\n", jiffies, cmd);
+ 	if (cmd != SIOCDEVPRIVATE) {
+ 		error = copy_from_user(data, udata, sizeof(data));
+ 		if (error) {
+ 			pr_err("can't copy from user\n");
+-			RET(-EFAULT);
++			return -EFAULT;
+ 		}
+ 		DBG("%d 0x%x 0x%x\n", data[0], data[1], data[2]);
+ 	} else {
+@@ -672,7 +653,7 @@ static int bdx_siocdevprivate(struct net_device *ndev, struct ifreq *ifr,
+ 		    data[2]);
+ 		error = copy_to_user(udata, data, sizeof(data));
+ 		if (error)
+-			RET(-EFAULT);
++			return -EFAULT;
+ 		break;
+ 
+ 	case BDX_OP_WRITE:
+@@ -684,7 +665,7 @@ static int bdx_siocdevprivate(struct net_device *ndev, struct ifreq *ifr,
+ 		break;
+ 
+ 	default:
+-		RET(-EOPNOTSUPP);
++		return -EOPNOTSUPP;
+ 	}
+ 	return 0;
+ }
+@@ -702,11 +683,10 @@ static void __bdx_vlan_rx_vid(struct net_device *ndev, uint16_t vid, int enable)
+ 	struct bdx_priv *priv = netdev_priv(ndev);
+ 	u32 reg, bit, val;
+ 
+-	ENTER;
+ 	DBG2("vid=%d value=%d\n", (int)vid, enable);
+ 	if (unlikely(vid >= 4096)) {
+ 		pr_err("invalid VID: %u (> 4096)\n", vid);
+-		RET();
++		return;
+ 	}
+ 	reg = regVLAN_0 + (vid / 32) * 4;
+ 	bit = 1 << vid % 32;
+@@ -718,7 +698,6 @@ static void __bdx_vlan_rx_vid(struct net_device *ndev, uint16_t vid, int enable)
+ 		val &= ~bit;
+ 	DBG2("new val %x\n", val);
+ 	WRITE_REG(priv, reg, val);
+-	RET();
+ }
+ 
+ /**
+@@ -754,14 +733,13 @@ static int bdx_vlan_rx_kill_vid(struct net_device *ndev, __be16 proto, u16 vid)
+  */
+ static int bdx_change_mtu(struct net_device *ndev, int new_mtu)
+ {
+-	ENTER;
+ 
+ 	WRITE_ONCE(ndev->mtu, new_mtu);
+ 	if (netif_running(ndev)) {
+ 		bdx_close(ndev);
+ 		bdx_open(ndev);
+ 	}
+-	RET(0);
++	return 0;
+ }
+ 
+ static void bdx_setmulti(struct net_device *ndev)
+@@ -772,7 +750,6 @@ static void bdx_setmulti(struct net_device *ndev)
+ 	    GMAC_RX_FILTER_AM | GMAC_RX_FILTER_AB | GMAC_RX_FILTER_OSEN;
+ 	int i;
+ 
+-	ENTER;
+ 	/* IMF - imperfect (hash) rx multicat filter */
+ 	/* PMF - perfect rx multicat filter */
+ 
+@@ -819,7 +796,6 @@ static void bdx_setmulti(struct net_device *ndev)
+ 	WRITE_REG(priv, regGMAC_RXF_A, rxf_val);
+ 	/* enable RX */
+ 	/* FIXME: RXE(ON) */
+-	RET();
+ }
+ 
+ static int bdx_set_mac(struct net_device *ndev, void *p)
+@@ -827,21 +803,19 @@ static int bdx_set_mac(struct net_device *ndev, void *p)
+ 	struct bdx_priv *priv = netdev_priv(ndev);
+ 	struct sockaddr *addr = p;
+ 
+-	ENTER;
+ 	/*
+ 	   if (netif_running(dev))
+ 	   return -EBUSY
+ 	 */
+ 	eth_hw_addr_set(ndev, addr->sa_data);
+ 	bdx_restore_mac(ndev, priv);
+-	RET(0);
++	return 0;
+ }
+ 
+ static int bdx_read_mac(struct bdx_priv *priv)
+ {
+ 	u16 macAddress[3], i;
+ 	u8 addr[ETH_ALEN];
+-	ENTER;
+ 
+ 	macAddress[2] = READ_REG(priv, regUNC_MAC0_A);
+ 	macAddress[2] = READ_REG(priv, regUNC_MAC0_A);
+@@ -854,7 +828,7 @@ static int bdx_read_mac(struct bdx_priv *priv)
+ 		addr[i * 2] = macAddress[i] >> 8;
+ 	}
+ 	eth_hw_addr_set(priv->ndev, addr);
+-	RET(0);
++	return 0;
+ }
+ 
+ static u64 bdx_read_l2stat(struct bdx_priv *priv, int reg)
+@@ -987,7 +961,6 @@ static inline void bdx_rxdb_free_elem(struct rxdb *db, int n)
+ 
+ static int bdx_rx_init(struct bdx_priv *priv)
+ {
+-	ENTER;
+ 
+ 	if (bdx_fifo_init(priv, &priv->rxd_fifo0.m, priv->rxd_size,
+ 			  regRXD_CFG0_0, regRXD_CFG1_0,
+@@ -1021,7 +994,6 @@ static void bdx_rx_free_skbs(struct bdx_priv *priv, struct rxf_fifo *f)
+ 	struct rxdb *db = priv->rxdb;
+ 	u16 i;
+ 
+-	ENTER;
+ 	DBG("total=%d free=%d busy=%d\n", db->nelem, bdx_rxdb_available(db),
+ 	    db->nelem - bdx_rxdb_available(db));
+ 	while (bdx_rxdb_available(db) > 0) {
+@@ -1047,7 +1019,6 @@ static void bdx_rx_free_skbs(struct bdx_priv *priv, struct rxf_fifo *f)
+  */
+ static void bdx_rx_free(struct bdx_priv *priv)
+ {
+-	ENTER;
+ 	if (priv->rxdb) {
+ 		bdx_rx_free_skbs(priv, &priv->rxf_fifo0);
+ 		bdx_rxdb_destroy(priv->rxdb);
+@@ -1055,8 +1026,6 @@ static void bdx_rx_free(struct bdx_priv *priv)
+ 	}
+ 	bdx_fifo_free(priv, &priv->rxf_fifo0.m);
+ 	bdx_fifo_free(priv, &priv->rxd_fifo0.m);
+-
+-	RET();
+ }
+ 
+ /*************************************************************************
+@@ -1084,7 +1053,6 @@ static void bdx_rx_alloc_skbs(struct bdx_priv *priv, struct rxf_fifo *f)
+ 	int dno, delta, idx;
+ 	struct rxdb *db = priv->rxdb;
+ 
+-	ENTER;
+ 	dno = bdx_rxdb_available(db) - 1;
+ 	while (dno > 0) {
+ 		skb = netdev_alloc_skb(priv->ndev, f->m.pktsz + NET_IP_ALIGN);
+@@ -1119,14 +1087,12 @@ static void bdx_rx_alloc_skbs(struct bdx_priv *priv, struct rxf_fifo *f)
+ 	}
+ 	/*TBD: to do - delayed rxf wptr like in txd */
+ 	WRITE_REG(priv, f->m.reg_WPTR, f->m.wptr & TXF_WPTR_WR_PTR);
+-	RET();
+ }
+ 
+ static inline void
+ NETIF_RX_MUX(struct bdx_priv *priv, u32 rxd_val1, u16 rxd_vlan,
+ 	     struct sk_buff *skb)
+ {
+-	ENTER;
+ 	DBG("rxdd->flags.bits.vtag=%d\n", GET_RXD_VTAG(rxd_val1));
+ 	if (GET_RXD_VTAG(rxd_val1)) {
+ 		DBG("%s: vlan rcv vlan '%x' vtag '%x'\n",
+@@ -1146,7 +1112,6 @@ static void bdx_recycle_skb(struct bdx_priv *priv, struct rxd_desc *rxdd)
+ 	struct rxdb *db;
+ 	int delta;
+ 
+-	ENTER;
+ 	DBG("priv=%p rxdd=%p\n", priv, rxdd);
+ 	f = &priv->rxf_fifo0;
+ 	db = priv->rxdb;
+@@ -1170,7 +1135,6 @@ static void bdx_recycle_skb(struct bdx_priv *priv, struct rxd_desc *rxdd)
+ 			DBG("wrapped descriptor\n");
+ 		}
+ 	}
+-	RET();
+ }
+ 
+ /**
+@@ -1202,7 +1166,6 @@ static int bdx_rx_receive(struct bdx_priv *priv, struct rxd_fifo *f, int budget)
+ 	u16 len;
+ 	u16 rxd_vlan;
+ 
+-	ENTER;
+ 	max_done = budget;
+ 
+ 	f->m.wptr = READ_REG(priv, f->m.reg_WPTR) & TXF_WPTR_WR_PTR;
+@@ -1292,7 +1255,7 @@ static int bdx_rx_receive(struct bdx_priv *priv, struct rxd_fifo *f, int budget)
+ 
+ 	bdx_rx_alloc_skbs(priv, &priv->rxf_fifo0);
+ 
+-	RET(done);
++	return done;
+ }
+ 
+ /*************************************************************************
+@@ -1597,7 +1560,6 @@ static netdev_tx_t bdx_tx_transmit(struct sk_buff *skb,
+ 	int len;
+ 	unsigned long flags;
+ 
+-	ENTER;
+ 	local_irq_save(flags);
+ 	spin_lock(&priv->tx_lock);
+ 
+@@ -1699,7 +1661,6 @@ static void bdx_tx_cleanup(struct bdx_priv *priv)
+ 	struct txdb *db = &priv->txdb;
+ 	int tx_level = 0;
+ 
+-	ENTER;
+ 	f->m.wptr = READ_REG(priv, f->m.reg_WPTR) & TXF_WPTR_MASK;
+ 	BDX_ASSERT(f->m.rptr >= f->m.memsz);	/* started with valid rptr */
+ 
+@@ -1760,7 +1721,6 @@ static void bdx_tx_free_skbs(struct bdx_priv *priv)
+ {
+ 	struct txdb *db = &priv->txdb;
+ 
+-	ENTER;
+ 	while (db->rptr != db->wptr) {
+ 		if (likely(db->rptr->len))
+ 			dma_unmap_page(&priv->pdev->dev, db->rptr->addr.dma,
+@@ -1769,13 +1729,11 @@ static void bdx_tx_free_skbs(struct bdx_priv *priv)
+ 			dev_kfree_skb(db->rptr->addr.skb);
+ 		bdx_tx_db_inc_rptr(db);
+ 	}
+-	RET();
+ }
+ 
+ /* bdx_tx_free - frees all Tx resources */
+ static void bdx_tx_free(struct bdx_priv *priv)
+ {
+-	ENTER;
+ 	bdx_tx_free_skbs(priv);
+ 	bdx_fifo_free(priv, &priv->txd_fifo0.m);
+ 	bdx_fifo_free(priv, &priv->txf_fifo0.m);
+@@ -1824,7 +1782,6 @@ static void bdx_tx_push_desc(struct bdx_priv *priv, void *data, int size)
+ static void bdx_tx_push_desc_safe(struct bdx_priv *priv, void *data, int size)
+ {
+ 	int timer = 0;
+-	ENTER;
+ 
+ 	while (size > 0) {
+ 		/* we substruct 8 because when fifo is full rptr == wptr
+@@ -1846,7 +1803,6 @@ static void bdx_tx_push_desc_safe(struct bdx_priv *priv, void *data, int size)
+ 		size -= avail;
+ 		data += avail;
+ 	}
+-	RET();
+ }
+ 
+ static const struct net_device_ops bdx_netdev_ops = {
+@@ -1889,11 +1845,9 @@ bdx_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	struct pci_nic *nic;
+ 	int err, port;
+ 
+-	ENTER;
+-
+ 	nic = vmalloc(sizeof(*nic));
+ 	if (!nic)
+-		RET(-ENOMEM);
++		return -ENOMEM;
+ 
+     /************** pci *****************/
+ 	err = pci_enable_device(pdev);
+@@ -2044,7 +1998,7 @@ bdx_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 
+ 		print_eth_id(ndev);
+ 	}
+-	RET(0);
++	return 0;
+ 
+ err_out_free:
+ 	free_netdev(ndev);
+@@ -2057,7 +2011,7 @@ bdx_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ err_pci:
+ 	vfree(nic);
+ 
+-	RET(err);
++	return err;
+ }
+ 
+ /****************** Ethtool interface *********************/
+@@ -2412,8 +2366,6 @@ static void bdx_remove(struct pci_dev *pdev)
+ 	pci_release_regions(pdev);
+ 	pci_disable_device(pdev);
+ 	vfree(nic);
+-
+-	RET();
+ }
+ 
+ static struct pci_driver bdx_pci_driver = {
+@@ -2434,19 +2386,16 @@ static void __init print_driver_id(void)
+ 
+ static int __init bdx_module_init(void)
+ {
+-	ENTER;
+ 	init_txd_sizes();
+ 	print_driver_id();
+-	RET(pci_register_driver(&bdx_pci_driver));
++	return pci_register_driver(&bdx_pci_driver);
+ }
+ 
+ module_init(bdx_module_init);
+ 
+ static void __exit bdx_module_exit(void)
+ {
+-	ENTER;
+ 	pci_unregister_driver(&bdx_pci_driver);
+-	RET();
+ }
+ 
+ module_exit(bdx_module_exit);
+diff --git a/drivers/net/ethernet/tehuti/tehuti.h b/drivers/net/ethernet/tehuti/tehuti.h
+index 47a2d3e5f8ed..030a7a0f1479 100644
+--- a/drivers/net/ethernet/tehuti/tehuti.h
++++ b/drivers/net/ethernet/tehuti/tehuti.h
+@@ -534,22 +534,9 @@ struct txd_desc {
+ 
+ #ifdef DEBUG
+ 
+-#define ENTER						\
+-do {							\
+-	pr_err("%s:%-5d: ENTER\n", __func__, __LINE__); \
+-} while (0)
+-
+-#define RET(args...)					 \
+-do {							 \
+-	pr_err("%s:%-5d: RETURN\n", __func__, __LINE__); \
+-	return args;					 \
+-} while (0)
+-
+ #define DBG(fmt, args...)					\
+ 	pr_err("%s:%-5d: " fmt, __func__, __LINE__, ## args)
+ #else
+-#define ENTER do {  } while (0)
+-#define RET(args...)   return args
+ #define DBG(fmt, args...)			\
+ do {						\
+ 	if (0)					\
+-- 
+2.43.0
+
 
