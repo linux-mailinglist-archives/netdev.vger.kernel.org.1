@@ -1,140 +1,116 @@
-Return-Path: <netdev+bounces-247671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9F07CFD243
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 11:21:55 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 651EBCFD2D7
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 11:30:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EA9FE3047199
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 10:17:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 11D0D3002D1B
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 10:30:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 240172E8882;
-	Wed,  7 Jan 2026 10:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D4DA326D69;
+	Wed,  7 Jan 2026 10:30:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X1+qLOGb"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=gaisler.com header.i=@gaisler.com header.b="GapqslJR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-out3.simply.com (smtp-out3.simply.com [94.231.106.210])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7844E2DEA67
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 10:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A20A1326933;
+	Wed,  7 Jan 2026 10:30:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.231.106.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767781077; cv=none; b=I22v9GUgF8CK4g+KzxxmsdzTq/+1TxberQI8a6ErvWFMKmWwfoiRDP+N7mONUd/oYfNCSKcTLFYYVbY0v1qSS+Wo0zidPodxjtJ7g4525WwdW/N4qiRi+5hlafw2DhOqcdbh5+Luh0xwvonctdQ25DK4tKZuqwU20SzNowCVFb8=
+	t=1767781819; cv=none; b=tSFmpAhYG6Jnwt1p5O0feAcRYa+Fd9jrA72fSYvQFXmN9m5KR+N0tCEXAtgWnct0thsVOBafW1mnSk8IlgYxMzPz5IMiE+nGYzW45DVey+t65iLxuN6iUjSKIWWDJZbuB8lE99MhDCySGdoatb4zbnxBlzLS0IvuId40J4hI7VA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767781077; c=relaxed/simple;
-	bh=sZ3mYpTbv/XotPCF4CdZdQgefByrsCZvWPwwcFuFdu8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BlNYTq4/NN/0X6IfFG2JPMoZSq3Pt8ZPNWAUZw1UdWpcgbQc8t1KNBCg65Mn/Q1R2pJz8XFY9zgyX82uk5Fejp1y8Ns3Ilo8gOQgbu1bbZtzY+pNqR2kOQeOw3Seo/ZU46MqECRPhho7xLzpHUFNytsNdhMbCF+q2BCTIbz0d/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X1+qLOGb; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-4327555464cso1046328f8f.1
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 02:17:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767781074; x=1768385874; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=zz5VqpciYzlzrDKhkNf3p0wOlTe+spDWVku/imh0wW8=;
-        b=X1+qLOGbt8H+g5qDNZHBIy5tvYG6wB4JoYWcV87piCyg0xaFyFq5Cjp9HmMOzAcxr9
-         Vamw4onaXp0qIxWm65AHgC2wbfi9h+HRGuBZ4kmnTcwf4CF6ydHJ1Xsysd8zX34hxO4w
-         h5YFR6c/qoZEfwq55dHv4JM4GnztZIPPt8aszg4V1BmxsNOKVa+beYRDylNWv04pjTwJ
-         vRYxg/aBVaZnNfMkXqteBL0GzinOJuch267whNRTL3Da9EhjQdc+bUmLCvzQlnBD6x7D
-         38bspZlPuXqGcY0RDICLUfYLnztecMnbeoWPODWiyv3qb5vYN7RAX3e+kExTbYfQL9t9
-         Ub2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767781074; x=1768385874;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zz5VqpciYzlzrDKhkNf3p0wOlTe+spDWVku/imh0wW8=;
-        b=CcbMBhuQv2SyGCwTlwMTbEMdQjXzIzpvNmPUydCHR9m7ZsmTfw65W6Z7Hqb1Gry8+y
-         daVstXwty8Q/bz+3SYNwShvV6ilY2udGHaEINPSsBJ23+7UqtXURQK4UXu1nTfCBfU2U
-         pTDdOr86k6Xm5As+YNnzylD6JeGM93GE8nSnQ0WKo/d/2RZQGJaDNvcnjJ5wZd/M5TYS
-         UEIfmNplPJCOR6rW2bf202nluhz93vZG9xfs7Q2k3InqpNVBLOwGz9jRf/G3y2uf4Oyi
-         okfomkegdL4i7psdmeZN43rIXbljP/SwEHwHY5G0d1Q00lCAZYR6TOw9BFdVupij3H7F
-         hLwA==
-X-Gm-Message-State: AOJu0YxEr/0pIyz3jP5ITs5ybeeYBVByBaoi48E7tmUnUaGKko+KzgRu
-	jdH8vNw4Va4QaS6eVKWzr9nfjne+9Qy8jYzc9I+QGuM1U1/oMCZt6M/OkE6BFQ==
-X-Gm-Gg: AY/fxX6Xa0bMFKPFpYsa1GkpmWAWF8dlWztMm+t0al7mLikzWkdssEDmATYBS/z/lma
-	eB/ocOld5WaV7kXNYu6B1eelkdVEqF4/5ENVHCj9hStygxlZxJf2jzV3Qqzb8wNoTdv1kVNI2xu
-	6KM0j55vnD2061vBp1bffw8b6URnyrwkP5LL+Ydl1pYQPK5VDy6EXmFflN3yrKT2WZrjqLP0w+p
-	HoeHfLILpFWnv5z4YMcFkxO3a5hlW1LWYct+J4TTO4AdA8znboqFF3VZJyjcpFkAoMw59cfgyzn
-	xonSe2tCQqWe+707eap46r5oYN5cGj9ZYu00K3uV9WmuH5BwrM8wGIFbXRDniKkxnflojxsM2Nq
-	cwt++OYF9AdVS3f3L/wY1HCPVwieHVSHuR8ZplAtuAFsE5Ina6bh/8r3zYs7SX9S2JsJ5+J+NeJ
-	fdyFcl1+nf07mJJqoo3H8=
-X-Google-Smtp-Source: AGHT+IGVy0IzKXT0arvwyJMRyYIHdNRpHdjTMklcKCCT8hfx7RIZD2RcwFg53tOX3u+ah11y3aFn3w==
-X-Received: by 2002:a05:6000:40dc:b0:432:5bf9:cf2e with SMTP id ffacd0b85a97d-432c377298amr2547801f8f.13.1767781073405;
-        Wed, 07 Jan 2026 02:17:53 -0800 (PST)
-Received: from [192.168.1.187] ([161.230.67.253])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0e6784sm9281054f8f.19.2026.01.07.02.17.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 02:17:53 -0800 (PST)
-Message-ID: <019bcd38dadb138fda4cf8b113c13b77a4581168.camel@gmail.com>
-Subject: Re: [PATCH v2 1/2] net: phy: adin: enable configuration of the LP
- Termination Register
-From: Nuno =?ISO-8859-1?Q?S=E1?= <noname.nuno@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>, Osose Itua
- <osose.itua@savoirfairelinux.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, michael.hennerich@analog.com, 
-	jerome.oufella@savoirfairelinux.com
-Date: Wed, 07 Jan 2026 10:18:35 +0000
-In-Reply-To: <a587cedd-9450-4c58-bc39-ecbdd525ef65@lunn.ch>
-References: <20251222222210.3651577-1-osose.itua@savoirfairelinux.com>
-	 <20251222222210.3651577-2-osose.itua@savoirfairelinux.com>
-	 <a587cedd-9450-4c58-bc39-ecbdd525ef65@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.2 
+	s=arc-20240116; t=1767781819; c=relaxed/simple;
+	bh=QDNik1P9OvsgAtFchTw4BckF/mSE1cSKBVO0iEJIHME=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Mzm63Kc2/EyFtIP7D43GS3+oqppwzBuC1PWMzdpv+tsy2xMirsMcmABJ8FWinKmSYxaRllfxQclfe/O0adFOnVHEQvua182APa5IxC79EMy/ISgKuUVHuLCYjJWkgckfKT9MGi1+ETAsy74wHmaxv56diRDhDOVV8eN9SzzWzf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gaisler.com; spf=pass smtp.mailfrom=gaisler.com; dkim=fail (0-bit key) header.d=gaisler.com header.i=@gaisler.com header.b=GapqslJR reason="key not found in DNS"; arc=none smtp.client-ip=94.231.106.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gaisler.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gaisler.com
+Received: from localhost (localhost [127.0.0.1])
+	by smtp.simply.com (Simply.com) with ESMTP id 4dmPHX1tZwz1DDr1;
+	Wed,  7 Jan 2026 11:22:48 +0100 (CET)
+Received: from [10.10.15.21] (h-98-128-223-123.NA.cust.bahnhof.se [98.128.223.123])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by smtp.simply.com (Simply.com) with ESMTPSA id 4dmPHS5YrMz1DDdR;
+	Wed,  7 Jan 2026 11:22:44 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gaisler.com;
+	s=simplycom2; t=1767781367;
+	bh=5sCdqnj/RCGcOZ4N1FNFLLmFTy7auxTIhL2QEEcNqFg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=GapqslJRt7PAo/OPdy40/uiS8yl/fdKamd8Ti7v8KhTSWM+dyJpM0kA09WqDkvmTF
+	 JDac2AP0hk4IXLuaOc19G85CIClqVXmQFScccHC7rgNcYdl16DovAFndj0u/scyZuZ
+	 rFnlzmQeoXkgQ81qRhHQTXrNih6T2iluIH43PJMds/ZZIo6rm/VM9YDeYihibbVdmg
+	 uDvdrF41naRrcWhAD/3/BJoa7qr9vCUPqLxuLP48CDDioxfF0rw5/F8n0Js/OfpQsy
+	 f1VR1SCUMB9l0JY24lstr5qvSKP50VGC6KkhF0cw5Ng7hX+p9V4PT5L0p7hEJpFlek
+	 UmVwAHzAgacCA==
+Message-ID: <836139d1-1425-4381-bb84-6c2654a4d239@gaisler.com>
+Date: Wed, 7 Jan 2026 11:22:44 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/19] printk cleanup - part 3
+To: Marcos Paulo de Souza <mpdesouza@suse.com>,
+ Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Jason Wessel <jason.wessel@windriver.com>,
+ Daniel Thompson <danielt@kernel.org>,
+ Douglas Anderson <dianders@chromium.org>, Petr Mladek <pmladek@suse.com>,
+ Steven Rostedt <rostedt@goodmis.org>, John Ogness
+ <john.ogness@linutronix.de>, Sergey Senozhatsky <senozhatsky@chromium.org>,
+ Jiri Slaby <jirislaby@kernel.org>, Breno Leitao <leitao@debian.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Geert Uytterhoeven <geert@linux-m68k.org>, Kees Cook <kees@kernel.org>,
+ Tony Luck <tony.luck@intel.com>, "Guilherme G. Piccoli"
+ <gpiccoli@igalia.com>, Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jacky Huang <ychuang3@nuvoton.com>, Shan-Chun Hung <schung@nuvoton.com>,
+ Laurentiu Tudor <laurentiu.tudor@nxp.com>
+Cc: linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
+ kgdb-bugreport@lists.sourceforge.net, linux-serial@vger.kernel.org,
+ netdev@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
+ linux-hardening@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ sparclinux@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
+References: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
+Content-Language: en-US
+From: Andreas Larsson <andreas@gaisler.com>
+In-Reply-To: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, 2025-12-23 at 10:36 +0100, Andrew Lunn wrote:
-> > +static int adin_config_zptm100(struct phy_device *phydev)
-> > +{
-> > +	struct device *dev =3D &phydev->mdio.dev;
-> > +	int reg;
-> > +	int rc;
-> > +
-> > +	if (!(device_property_read_bool(dev, "adi,low-cmode-impedance")))
-> > +		return 0;
-> > +
-> > +	/* set to 0 to configure for lowest common-mode impedance */
-> > +	rc =3D phy_write_mmd(phydev, MDIO_MMD_VEND1, ADIN1300_B_100_ZPTM_DIMR=
-X, 0x0);
-> > +	if (rc < 0)
-> > +		return rc;
-> > +
-> > +	reg =3D phy_read_mmd(phydev, MDIO_MMD_VEND1, ADIN1300_B_100_ZPTM_DIMR=
-X);
-> > +	if (reg < 0)
-> > +		return reg;
-> > +
-> > +	if (!(reg & ADIN1300_B_100_ZPTM_EN_DIMRX)) {
-> > +		phydev_err(phydev, "Failed to set lowest common-mode impedance.\n");
-> > +		return -EINVAL;
-> > +	}
->=20
-> Under what condition do you think this could happen? Do you think
-> there are variants of the hardware which do not have this register?
->=20
-> 	Andrew
+On 2025-12-27 13:16, Marcos Paulo de Souza wrote:
+> The parts 1 and 2 can be found here [1] and here[2].
+> 
+> The changes proposed in this part 3 are mostly to clarify the usage of
+> the interfaces for NBCON, and use the printk helpers more broadly.
+> Besides it, it also introduces a new way to register consoles
+> and drop thes the CON_ENABLED flag. It seems too much, but in reality
+> the changes are not complex, and as the title says, it's basically a
+> cleanup without changing the functional changes.
 
-I think he's just reading back the register to make sure the value was real=
-ly updated...
-If we were going to that for every write our lives would be miserable :).
+Hi,
 
-I looked at both adin1200 and adin1300 and they support this in the same wa=
-y so the above
-should just be:
+Patches 7-17 all say "replacing the CON_ENABLE flag" in their
+descriptions, which should rather be "replacing the CON_ENABLED flag".
 
-return phy_write_mmd()...
+Cheers,
+Andreas
 
-- Nuno S=C3=A1
 
