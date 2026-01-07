@@ -1,117 +1,144 @@
-Return-Path: <netdev+bounces-247687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 830F2CFD7E1
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 12:52:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09EC7CFD87F
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 13:04:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BAFF23015975
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 11:52:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7F889303ADD0
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 11:57:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45C963128B4;
-	Wed,  7 Jan 2026 11:52:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B45D2306B12;
+	Wed,  7 Jan 2026 11:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LeOVqk9+"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 211052F7444;
-	Wed,  7 Jan 2026 11:52:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2C7238166;
+	Wed,  7 Jan 2026 11:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767786732; cv=none; b=dwds5F2aAYdHFuPXSIDmB0whQfoR2RGTJM1OEQxxmc4lupsSmgSkTwmpe4iI/fSQHAMRzmW2aKFuLvH4gYog6sZ5cikI5S08RvIpKgkuEKmrUjxne8sZaEQOOW0UG3HODWacFwwpxp2ICWCRzohsfl+iq9Fq0M22R5dHtRY/tSc=
+	t=1767787023; cv=none; b=eImndedoxtpdBeEKAbFojQdvPfOo1JJr0qWpY2Ulp4xJOJovB6gnSSJZIeDa45deCIxmtQQLyOFMdScfuCCxsAj6xVSv32bhhU4cIXlqw8Jnbv0cGDglmWrNw+5wvIGeafJEMX1FOQrtpuz6pMR7oyKWh+Ajk9rznKCnXgOv21s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767786732; c=relaxed/simple;
-	bh=1Fchlxf4hNZLgwVE8WYe2dz3lUN9r/xoRIw5B7bqDRE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dO/2Tqu5GdcpqAsnjaEUXC2/YaIQwmYfqJSI9bAcw/dtLRNLXnGZgs+DlqV75oPaXMENhIfj4XOwOh1YKL4v2nrEd9WDZMQYswoUcV2fIQ/oAwzCL89OgI5usLkb6SkfJf9xpe08mb6xZUNW6dfm6niaXIITbDGDfk7FIlA3icE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A1DF6497;
-	Wed,  7 Jan 2026 03:52:02 -0800 (PST)
-Received: from [10.57.12.220] (unknown [10.57.12.220])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2FDD63F6A8;
-	Wed,  7 Jan 2026 03:52:07 -0800 (PST)
-Message-ID: <08b09d21-0c59-4c0d-8b21-3883e76964d2@arm.com>
-Date: Wed, 7 Jan 2026 11:52:06 +0000
+	s=arc-20240116; t=1767787023; c=relaxed/simple;
+	bh=mNpHcF+MwpeYkX9EkT3dgyo2t+tch8FndQ1ofJbAPRQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lib/rEo2TrXGAw+PwoEEnmtV50OFHN2E6F4GrqAT+AFvXbCPDYi94svYY6vv8LQbQ5WLrW2OlLuKOsxW1JsMBKQSDjELNCqMO2KZ2DW1fn/romiRl0LMmSmjxI0RMQtPMDLdLxwMzcboqKBzUsdnDvAxuvRSx7hgpxBlLAoFMGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LeOVqk9+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7530C2BC86;
+	Wed,  7 Jan 2026 11:56:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767787023;
+	bh=mNpHcF+MwpeYkX9EkT3dgyo2t+tch8FndQ1ofJbAPRQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LeOVqk9+TU5kCP+FDRa6whXFCQVaVEbDllyqM6h//SAX5uiVAXQ8VG7Am0rvJsC1H
+	 GqoHmEPSiac74Rt53FFrHdVYKM4/rFVqh30AdgVeV6vLWbAjvELEI1HTUOnJqZhRcl
+	 WUKTPSBfeNtl/h9hRKM1nu0OKjKz29OOH9dTct1GoghBZrfukj/3dyGolifM9h+2bh
+	 wbVLW2c8CGbXntqacDOCLSp8UU61M7HCX59PbmrBJjXYcCtF5Cx56s4+CUuypQTiMs
+	 aUdEwgtI6C7dlhy4lPby3E841CBfyCwkeyWL2UmPv7fe8h0pBCK+OfBWitaUqoPHxs
+	 uX/nyikfJSLNw==
+Date: Wed, 7 Jan 2026 11:56:53 +0000
+From: Simon Horman <horms@kernel.org>
+To: Frederic Weisbecker <frederic@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chen Ridong <chenridong@huawei.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 13/33] sched/isolation: Convert housekeeping cpumasks to
+ rcu pointers
+Message-ID: <20260107115653.GA196631@kernel.org>
+References: <20260101221359.22298-1-frederic@kernel.org>
+ <20260101221359.22298-14-frederic@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH for 6.19 0/4] Revise the EM YNL spec to be clearer
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: Changwoo Min <changwoo@igalia.com>, kernel-dev@igalia.com,
- linux-pm@vger.kernel.org, horms@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, edumazet@google.com, davem@davemloft.net,
- sched-ext@lists.linux.dev, linux-kernel@vger.kernel.org, lenb@kernel.org,
- pavel@kernel.org, donald.hunter@gmail.com, kuba@kernel.org
-References: <20251225040104.982704-1-changwoo@igalia.com>
- <849b576e-9563-42ae-bd5c-756fb6dfd8de@arm.com>
- <CAJZ5v0imU_DkW5-Pip3ze-MaHj+CAvc0LNkaLsTZuFbj33R0aA@mail.gmail.com>
-Content-Language: en-US
-From: Lukasz Luba <lukasz.luba@arm.com>
-In-Reply-To: <CAJZ5v0imU_DkW5-Pip3ze-MaHj+CAvc0LNkaLsTZuFbj33R0aA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260101221359.22298-14-frederic@kernel.org>
 
-Hi Rafael,
-
-On 1/5/26 18:22, Rafael J. Wysocki wrote:
-> On Tue, Dec 30, 2025 at 10:44 AM Lukasz Luba <lukasz.luba@arm.com> wrote:
->>
->> Hi Changwoo,
->>
->> On 12/25/25 04:01, Changwoo Min wrote:
->>> This patch set addresses all the concerns raised at [1] to make the EM YNL spec
->>> clearer. It includes the following changes:
->>>
->>> - Fix the lint errors (1/4).
->>> - Rename em.yaml to dev-energymodel.yaml (2/4).  “dev-energymodel” was used
->>>     instead of “device-energy-model”, which was originally proposed [2], because
->>>     the netlink protocol name cannot exceed GENL_NAMSIZ(16). In addition, docs
->>>     strings and flags attributes were added.
->>> - Change cpus' type from string to u64 array of CPU ids (3/4).
->>> - Add dump to get-perf-domains in the EM YNL spec (4/4). A user can fetch
->>>     either information about a specific performance domain with do or information
->>>     about all performance domains with dump.
->>>
->>> This can be tested using the tool, tools/net/ynl/pyynl/cli.py, for example,
->>> with the following commands:
->>>
->>>     $> tools/net/ynl/pyynl/cli.py \
->>>        --spec Documentation/netlink/specs/dev-energymodel.yaml \
->>>        --dump get-perf-domains
->>>     $> tools/net/ynl/pyynl/cli.py \
->>>        --spec Documentation/netlink/specs/dev-energymodel.yaml \
->>>        --do get-perf-domains --json '{"perf-domain-id": 0}'
->>>     $> tools/net/ynl/pyynl/cli.py \
->>>        --spec Documentation/netlink/specs/dev-energymodel.yaml \
->>>        --do get-perf-table --json '{"perf-domain-id": 0}'
->>>     $> tools/net/ynl/pyynl/cli.py \
->>>        --spec Documentation/netlink/specs/dev-energymodel.yaml \
->>>        --subscribe event  --sleep 10
->>>
->>> [1] https://lore.kernel.org/lkml/CAD4GDZy-aeWsiY=-ATr+Y4PzhMX71DFd_mmdMk4rxn3YG8U5GA@mail.gmail.com/
->>> [2] https://lore.kernel.org/lkml/CAJZ5v0gpYQwC=1piaX-PNoyeoYJ7uw=DtAGdTVEXAsi4bnSdbA@mail.gmail.com/
->>
->> My apologies, I've missed those conversations (not the best season).
->>
->> So what would be the procedure here for the review?
->> Could Folks from netlink help here?
->>
->> I will do my bit for the EM related stuff (to double-check them).
+On Thu, Jan 01, 2026 at 11:13:38PM +0100, Frederic Weisbecker wrote:
+> HK_TYPE_DOMAIN's cpumask will soon be made modifiable by cpuset.
+> A synchronization mechanism is then needed to synchronize the updates
+> with the housekeeping cpumask readers.
 > 
-> I think that it'll be good to have this in 6.19 to avoid making a
-> major release with an outdated EM YNL spec and I see that the review
-> on the net side is complete, so are there any concerns about this?
+> Turn the housekeeping cpumasks into RCU pointers. Once a housekeeping
+> cpumask will be modified, the update side will wait for an RCU grace
+> period and propagate the change to interested subsystem when deemed
+> necessary.
+> 
+> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> ---
+>  kernel/sched/isolation.c | 58 +++++++++++++++++++++++++---------------
+>  kernel/sched/sched.h     |  1 +
+>  2 files changed, 37 insertions(+), 22 deletions(-)
+> 
+> diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
+> index 11a623fa6320..83be49ec2b06 100644
+> --- a/kernel/sched/isolation.c
+> +++ b/kernel/sched/isolation.c
+> @@ -21,7 +21,7 @@ DEFINE_STATIC_KEY_FALSE(housekeeping_overridden);
+>  EXPORT_SYMBOL_GPL(housekeeping_overridden);
+>  
+>  struct housekeeping {
+> -	cpumask_var_t cpumasks[HK_TYPE_MAX];
+> +	struct cpumask __rcu *cpumasks[HK_TYPE_MAX];
+>  	unsigned long flags;
+>  };
+>  
+> @@ -33,17 +33,28 @@ bool housekeeping_enabled(enum hk_type type)
+>  }
+>  EXPORT_SYMBOL_GPL(housekeeping_enabled);
+>  
+> +const struct cpumask *housekeeping_cpumask(enum hk_type type)
+> +{
+> +	if (static_branch_unlikely(&housekeeping_overridden)) {
+> +		if (housekeeping.flags & BIT(type)) {
+> +			return rcu_dereference_check(housekeeping.cpumasks[type], 1);
+> +		}
+> +	}
+> +	return cpu_possible_mask;
+> +}
+> +EXPORT_SYMBOL_GPL(housekeeping_cpumask);
+> +
 
-I'm sorry for delay.
-I don't see concerns. It LGTM so far, I can see that there will be v2
-with minor change.
+Hi Frederic,
 
-Regards,
-Lukasz
+I think this patch should also update the access to housekeeping.cpumasks
+in housekeeping_setup(), on line 200, to use housekeeping_cpumask().
 
+As is, sparse flags __rcu a annotation miss match there.
+
+  kernel/sched/isolation.c:200:80: warning: incorrect type in argument 3 (different address spaces)
+  kernel/sched/isolation.c:200:80:    expected struct cpumask const *srcp3
+  kernel/sched/isolation.c:200:80:    got struct cpumask [noderef] __rcu *
+
+...
 
