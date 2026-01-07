@@ -1,95 +1,78 @@
-Return-Path: <netdev+bounces-247827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33AC7CFFB50
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 20:21:02 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 825E3CFFB59
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 20:21:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C88323019365
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 19:20:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B065D300B020
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 19:20:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94878357704;
-	Wed,  7 Jan 2026 16:57:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WNb+a3iI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79B50350A25;
+	Wed,  7 Jan 2026 16:58:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B8B3A0B05
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 16:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E793451C6
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 16:58:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767805078; cv=none; b=CYNRvj4CwSKKJNjPTNBqWcaWuW9JoFu3Kr3lQ4oejI2/mByao6owUWOjMzSnr9z26aGuPonKS14I1s1VP1SgTXzGh98gYHdS8PyTFMxLkfICvHWX5N5Rv3QIz7I06WJi09T51ZmSf71xte0A82gSt14uwZ4wMZL04lrAOKoIv/Y=
+	t=1767805128; cv=none; b=Dy/r1TFaQvxpwidde4nDS0AYxWZ1pHg8Q69Hi6mmNW+3sm2QrnKvs7EYOvx7R1eMfSEBgKxo90RH+cLsII9lG+8QOR4Y/lfGdEEzdW8Ri1HU8PvoEXa7nTnqQZNjIsHUp6ScgJTxgSc6ycZbJio7kQHA1E0yPJNTg7Jz+4yqHYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767805078; c=relaxed/simple;
-	bh=oTh/Bm7Bvc5pQDGtio2WHmCSYQcQfl+HLeQb6+ZuPa4=;
+	s=arc-20240116; t=1767805128; c=relaxed/simple;
+	bh=m5WDIZIi3d768WXw2bEW3UP2IIBOeDrI8x3vS1dMkQQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jCdqDpflgH8vz1SJbvcMAxH/OsF/RNw7ktcsj7j094jsRc4tjpd/dtqPCvIdwHNk8PMwnU9uaqYmOfmAOFhQaqTPcWKGoamDtAT0ZVd2BAw8aFqehz21JQHcSVHu92KiZuYVxTwPyHMyHcnMmO/d5J4nm55bVkAneh8zUqNfQPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WNb+a3iI; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-477ba2c1ca2so24469645e9.2
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 08:57:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767805070; x=1768409870; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=9cVSMIV0M1vHEkGoca4IYHePZY2mIben9Mxd1bnOl0g=;
-        b=WNb+a3iI069+UVfkyi0mdxhz3UHcXoR2Dks6g/Zr5duayBmAFceV4VkycZSQSpNejh
-         HLZlFMYjlGHuAd5pKPpyck8hVhyA2qdSQS6CJ0AFLDAqOnmDIgtA5UrRPi6TgeY3OBXb
-         M7jL5UtGiyEB5/LAvkngUsdz8mpiVg5rAWbvbWb69JZ3mBVLfT4SVX43b32nfuvyPxDS
-         oVaOjdXCtPvHyFZkhXo97/vde6t2f3pdnBRP4enQVaZtjMSYvHnmG3e3qQ/L9D7r8sEL
-         vxr5lm3h5pey/t84dNgdBxUxJDBVt3m5XkrlodFszwtaV2LuITUgssDn6gLTPFbCNLb7
-         sLsw==
+	 Content-Type:Content-Disposition:In-Reply-To; b=aaGxMAhaNiSo5ZB3IWo6bK5fL9qIZ1xGgEer5w/52fdQVaO4MA3msPK9oAQxo7a8/dm5Q3GncMOqU/DYV7a39SaxZmEn8cgWGxc2P+nqwGxWUqTiXz5LRumeq/RLhDm6kqxyM0wN81llghwrE5HIJcJrzINmXqalXlz804mDPSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7c7503c73b4so1205286a34.3
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 08:58:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767805070; x=1768409870;
+        d=1e100.net; s=20230601; t=1767805122; x=1768409922;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9cVSMIV0M1vHEkGoca4IYHePZY2mIben9Mxd1bnOl0g=;
-        b=wKIp60E2Bhl9LXrl/aHPoIuG+r4G5ncxhbF6hMHuxY1s3J2NGc1HvccpOt11crG+cb
-         aOT40grPuBkQtTlXz6XaWg+5m4kgMB+Ju6LYphL4QPFYKwSeS3WKQZ2BVJXFyWm2gsuc
-         H3OA8BVVLViooX51UmwBgLGZxx+Ot/IrV2hvvCShskZhrKu6G9eDOELcUKD3qGJyZOkN
-         SNnNa0NUOG9S9r9dJGhSmdNgvNvzkkUftYVsl/6Z7uytSFScHQ9nIn5sDYgshyY+pnX5
-         5fGP9T9kQmp87Alyux7dmhwSiV/IZ32hdqjHDeuvC2duv/i8RyEC5zp55z6YwMiqbpHF
-         /Ezw==
-X-Forwarded-Encrypted: i=1; AJvYcCW4WEZh2AySPNzrJLaA2g2dTGPzfWDwVqFFbLBmRIZzyWyG1qOrmQcI5LEaNamOn1FQ9V/XuVg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKe7mNBry/OBHO/nDSo7ePIHhf+kblb1qd68P9gH/lkU13dad2
-	t1XzB5EV5gV9NWj7TYzlDZpZWqzRQZp8r7O2vktfTUkAWsqT0SYK7tC5nHwbHN2wCg==
-X-Gm-Gg: AY/fxX4gWqZuY9dOboIbqrA5dDVVC7j27rx93QPKM8g/z3wAUVqUDpnsuEBB5vvH7zx
-	wpXlqO+bvtWS7YSuV6bSlUyWCcWipwdQi26pN92TnaFOpfmXJvOK63D3TdRUqFyxpDHDqiS0mzZ
-	+WkblnDEEYUOQpuP9vhl2elOm8FUt8fgv/v11vDglZuTldNkyusceYHfOcAA3LvgnTsccwAiIvr
-	zpQxLWTfHm2iSjRiZWaaw+QG6BHZ1b7lLC+VWV/06Bp6xViV856lDv/5ND3rGykhOfnQZ7epDbl
-	6RCdQacvikHezUXsiLroSEP6veOLAoJliUZMGIoGdg8Hjj3RvuMhNL19ABQqLocZcA3QYXa2UtC
-	uce5wpCgGnHJLyz0EigeIpPXwyNZiNmaTFy5ZffLOvkTppe5RGJJ/0kdnYX6hwcONnIvu3IHbYc
-	kwzZNcMRXtkuyLT3wSRRa/vr0xEEDTKWU47wzUJ1nsCw==
-X-Google-Smtp-Source: AGHT+IFNWlJitUC1NSOuwXl+nF0iGIoib1vo+UR+IFwK8+8wYGCEbPSdCgCOi3fSLDFCBKtQyHctnQ==
-X-Received: by 2002:a05:600c:8b2c:b0:477:7f4a:44b0 with SMTP id 5b1f17b1804b1-47d84b3ea06mr36754095e9.33.1767805069507;
-        Wed, 07 Jan 2026 08:57:49 -0800 (PST)
-Received: from google.com ([2a00:79e0:288a:8:aaba:e2c1:29df:3e24])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f41f5e0sm104518655e9.8.2026.01.07.08.57.48
+        bh=9ICq+3QhS1/QYa5EnJldE7FUJw5ckZTY5TKUvUBnPks=;
+        b=sZ6YDYc1fxXQu3qGR/OVphiaF/HBpYcTeRBoG0DW89PddQawfQodZS4m91H0wSsgWv
+         JzdpEZp3Lq7YTCGFE0NWCNIhvmttgexR+tDsG3WOUFFKL73PNsnXZXFd7V0E0KGjGXGM
+         JwsLZYljb6tIaM6BHVlVsj7jJpIEiD/6pe3FERK2X5oSpCLAcHakYWzAOQ4r8jlaJnBa
+         H5cN7vifDZSs/h3dj+KAv1E2UGYgQlZtLOATh25HXLeai3WZa3t7Dudj+koYLlHxmz1z
+         bfJqli6T6VrpElAkwuDiRjHkfo5+en/w9el2E0HI1G5G7vlYcHpwr+5iNB52HALvE4GN
+         ziAw==
+X-Forwarded-Encrypted: i=1; AJvYcCVzfZeOtFMpbhJIuo5ctnsUJUwZ1JT3KUBhDIQkRsVGw2+J/zkBj1wM0Shhs5RvEfSN/nvOnD8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGijV45rud4vtUigNA/PIAMfMZ8UvkhOhssozdWVnxZBKT5tSz
+	P4LliH07el0IyuveTVXAstH+iJHDKoWtFJCxNplpkLAzDyhdBjNIr6ec
+X-Gm-Gg: AY/fxX584AF1bTrvH/qn3syR6SB70Zt1aL9nKhbkFo/tfUEBb+4o3EHHKJwnCXDkbxo
+	IRoDs19UKzw83EKUYK4Vjs4jjkje5jNjFLMsASG/gWF5lZBrBO9iRcCNnUAQzqXBc6p6kvdJYQ6
+	XHg1/UZk7hvVVKTfnz0xeVk1qx4z+8XjkGdr/+l1UzaYMCvgv/6OMaKoiOyZ2fobgbdR++SD8bK
+	SZbpP5apMrK3T+utppFDW4sA0fdESOyKMNYPF0uoreGesThpDiwk+8HPK1MmkfoOw1yYI57sbGz
+	2NLcuFrIa13K43QVXsGZqRxYqT/ZAktWxBWq+aQ6KvDcB/CeAf9+xS5IPO/9DdUluLGbbvx+ufs
+	Hb9MktTiWIJfxvmE3OVeeVG9FnDntGKvPrxmPb4vwClnz4EeMv8COsdC5tnWubqVJ9zBOA4jB3j
+	9C32A/FcGyP5HZhQ==
+X-Google-Smtp-Source: AGHT+IFc13I3F2mIIe4Fwfz9kARgujMXq0dFx1fcCN8Gp8WazR5CBs3+RoMWkUBSEgtOxvi0tOnklw==
+X-Received: by 2002:a05:6830:25d0:b0:7c6:a62d:8663 with SMTP id 46e09a7af769-7ce508db6b5mr1908773a34.11.1767805122167;
+        Wed, 07 Jan 2026 08:58:42 -0800 (PST)
+Received: from gmail.com ([2a03:2880:10ff:56::])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7ce478af813sm3717716a34.19.2026.01.07.08.58.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 08:57:48 -0800 (PST)
-Date: Wed, 7 Jan 2026 17:57:43 +0100
-From: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>
-To: Justin Suess <utilityemal77@gmail.com>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>, Paul Moore <paul@paul-moore.com>,
-	James Morris <jmorris@namei.org>,
-	"Serge E . Hallyn" <serge@hallyn.com>,
-	Simon Horman <horms@kernel.org>,
-	=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
-	linux-security-module@vger.kernel.org, Tingmao Wang <m@maowtm.org>,
-	netdev@vger.kernel.org, Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>
-Subject: Re: [RFC PATCH 0/1] lsm: Add hook unix_path_connect
-Message-ID: <aV6Qh39jVg8trMlg@google.com>
-References: <20251231213314.2979118-1-utilityemal77@gmail.com>
- <CAAVpQUCF3uES6j22P1TYzgKByw+E4EqpM=+OFyqtRGStGWxH+Q@mail.gmail.com>
- <aVuaqij9nXhLfAvN@google.com>
- <CAAVpQUB6gnfovRZAg_BfVKPuS868dFj7HxthbxRL-nZvcsOzCg@mail.gmail.com>
- <2da3f1ae-1fe1-40c4-8748-9fb371e696f0@gmail.com>
+        Wed, 07 Jan 2026 08:58:41 -0800 (PST)
+Date: Wed, 7 Jan 2026 08:58:39 -0800
+From: Breno Leitao <leitao@debian.org>
+To: John Ogness <john.ogness@linutronix.de>
+Cc: pmladek@suse.com, mpdesouza@suse.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, gustavold@gmail.com, 
+	calvin@wbinvd.org, jv@jvosburgh.net, kernel-team@meta.com, 
+	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, rostedt@goodmis.org
+Subject: Re: [PATCH net-next 0/2] net: netconsole: convert to NBCON console
+ infrastructure
+Message-ID: <4dwhhlnuv2n3f7d3hqoulcnsg6ljucd6v47kqcszcwcshfoqno@rzxvg456q4fi>
+References: <20251222-nbcon-v1-0-65b43c098708@debian.org>
+ <5mpei32y7sl5jmi2ciim4crxbc55zztiucxxsdd633mvzxlk7n@fowtsefym5y6>
+ <87zf6pfmlq.fsf@jogness.linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,103 +82,87 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2da3f1ae-1fe1-40c4-8748-9fb371e696f0@gmail.com>
+In-Reply-To: <87zf6pfmlq.fsf@jogness.linutronix.de>
 
-On Wed, Jan 07, 2026 at 07:19:02AM -0500, Justin Suess wrote:
-> On 1/7/26 02:33, Kuniyuki Iwashima wrote:
-> > +VFS maintainers
+Hi John,
+
+On Wed, Jan 07, 2026 at 04:56:41PM +0106, John Ogness wrote:
+> On 2026-01-07, Breno Leitao <leitao@debian.org> wrote:
+> > Upon reviewing the printk subsystem, I noticed that struct
+> > printk_info->caller_id stores similar information, but not exactly the
+> > same. It contains either the CPU *or* the task, not both, and this data
+> > isn't easily accessible from within the ->write_thread() context. 
 > >
-> > On Mon, Jan 5, 2026 at 3:04 AM Günther Noack <gnoack@google.com> wrote:
-> >> Hello!
-> >>
-> >> On Sun, Jan 04, 2026 at 11:46:46PM -0800, Kuniyuki Iwashima wrote:
-> >>> On Wed, Dec 31, 2025 at 1:33 PM Justin Suess <utilityemal77@gmail.com> wrote:
-> >>>> Motivation
-> >>>> ---
-> >>>>
-> >>>> For AF_UNIX sockets bound to a filesystem path (aka named sockets), one
-> >>>> identifying object from a policy perspective is the path passed to
-> >>>> connect(2). However, this operation currently restricts LSMs that rely
-> >>>> on VFS-based mediation, because the pathname resolved during connect()
-> >>>> is not preserved in a form visible to existing hooks before connection
-> >>>> establishment.
-> >>> Why can't LSM use unix_sk(other)->path in security_unix_stream_connect()
-> >>> and security_unix_may_send() ?
-> >> Thanks for bringing it up!
-> >>
-> >> That path is set by the process that acts as the listening side for
-> >> the socket.  The listening and the connecting process might not live
-> >> in the same mount namespace, and in that case, it would not match the
-> >> path which is passed by the client in the struct sockaddr_un.
-> > Thanks for the explanation !
+> > One possible solution that comes to my mind is to pass both the CPU ID
+> > and the task_struct/vpid to struct printk_info, and then integrate this
+> > into struct nbcon_write_context *wctxt somehow.
 > >
-> > So basically what you need is resolving unix_sk(sk)->addr.name
-> > by kern_path() and comparing its d_backing_inode(path.dentry)
-> > with d_backing_inode (unix_sk(sk)->path.dendtry).
-> >
-> > If the new hook is only used by Landlock, I'd prefer doing that on
-> > the existing connect() hooks.
-> I see. Did you have a particular hook in mind to extend?
+> > This way, netconsole could reliably query the original CPU and task that
+> > generated the message, regardless of where the netconsole code is
+> > executed.
 > 
-> One complication I see is whatever hook this gets added to
-> would also need CONFIG_SECURITY_PATH, since logically this restriction
-> would fall under it:
+> But by the time the printer is active, that task may no longer exist,
+> may have migrated to a different CPU and/or may be sleeping.
 > 
-> From security/Kconfig:
+> IIUC, basically you want to attach console-specific additional
+> information to ringbuffer records, but only that specific console should
+> see/use the additional information. In this case it could be up to 4+16
+> additional bytes (depending on @sysdata_fields).
 > 
-> config SECURITY_PATH
->     bool "Security hooks for pathname based access control"
->     depends on SECURITY
->     help
->       This enables the security hooks for pathname based access control.
->       If enabled, a security module can use these hooks to
->       implement pathname based access controls.
->       If you are unsure how to answer this question, answer N.
+> A while ago we had a discussion[0] about adding custom
+
+Thanks for sharing that discussion link—very helpful context!
+
+> information. There I even went so far as to suggest supporting things
+> like a new boot argument:
 > 
-> config SECURITY_NETWORK
->     bool "Socket and Networking Security Hooks"
->     depends on SECURITY
->     help
->       This enables the socket and networking security hooks.
->       If enabled, a security module can use these hooks to
->       implement socket and networking access controls.
->       If you are unsure how to answer this question, answer N.
+>     printk.format=ts,cpu,comm,pid,in_atomic
+>
+> (which could also be console-specific)
+
+This is essentially what we ended up implementing in netconsole.
+
+Netconsole makes this straightforward and efficient since I don't need to worry
+about ring buffer space. The approach is simple: receive the char *msg, copy it
+to a bounce buffer, append raw_smp_processor_id(), current->comm, etc., send
+the packet, and free the buffer. No impact on the ring buffer or other side
+effects.
+
+> The result of the discussion was killing off dictionaries (that allowed
+> variable length custom data) and replacing them with the dev_printk_info
+> struct.
 > 
-> Logically, this type of access control falls under both categories, so must be
-> gated by both features. No existing LSM hooks are gated by both afaik, so
-> there is not really an existing logical place to extend an existing hook without
-> changing what features are required to be enabled for existing users.
+> I am just pointing out that this kind of discussion has existed in the
+> past and not suggesting that we should reintroduce dictionaries.
 > 
-> I do see more uses for this hook that just landlock, bpf lsm hooks
-> or other non-labeling LSMs like apparmor or TOMOYO could take advantage
-> of this as well.
+> A simple fix could be to add an extra 36-byte struct to both
+> dev_printk_info and nbcon_write_context that exists conditionally on
+> CONFIG_NETCONSOLE_DYNAMIC.
 
-Apologies, I overlooked your reply earlier today.
+I believe we can achieve this with less than 36 bytes per entry. Taking
+inspiration from printk_caller_id(), we could store both the PID and
+smp_processor_id() more compactly, 8 bytes total ?!
 
-The existing hooks that are called from af_unix.c are:
+Something like the following should address netconsole's needs:
 
-- security_unix_stream_connect() for SOCK_STREAM unix(7) sockets
-- security_unix_may_send() for SOCK_DGRAM unix(7) sockets
+	diff --git a/include/linux/dev_printk.h b/include/linux/dev_printk.h
+	index eb2094e43050..908cb891af0d 100644
+	--- a/include/linux/dev_printk.h
+	+++ b/include/linux/dev_printk.h
+	@@ -27,6 +27,10 @@ struct device;
+	struct dev_printk_info {
+		char subsystem[PRINTK_INFO_SUBSYSTEM_LEN];
+		char device[PRINTK_INFO_DEVICE_LEN];
+	+#ifdef CONFIG_DEV_PRINTK_ENRICHED_CTX 		/* Something that I can select when CONFIG_NETCONSOLE_DYNAMIC is selected */
+	+       pid_t pid;
+	+       int cpu;
+	+#endif
+	};
 
-Apart from that, at a higher level, there are also
+> vprintk_store() would set the extra data to dev_printk_info.
+> 
+> nbcon_emit_next_record() would copy the data to nbcon_write_context.
 
-- security_socket_connect()
-- security_socket_sendmsg() and security_socket_recvmsg()
-
-These are used from net/socket.c.
-
-For the connectionless dgram Unix sockets, we would need to tell apart the cases
-where sendmsg()/recvmsg() are used with and without a sockaddr.  (Dgram sockets
-can be either connected with connect() and then have a fixed sockaddr, or they
-can be passed a remote sockaddr with each message send and receive operation.)
-This can told apart in security_socket_sendmsg() from the msg argument, but it
-doesn't look like we could tell it apart from security_unix_may_send().
-
-Landlock already depends on CONFIG_SECURITY_NETWORK and CONFIG_SECURITY_PATH,
-so we would not need to have further #ifdefs to use one of these hooks.
-
-There are other difficulties I found which worry me and which I listed in the
-other mail at https://lore.kernel.org/all/aV5WTGvQB0XI8Q_N@google.com/.
-
-—Günther
+Thanks. Let me prototype this and see how it turns out.
+--breno
 
