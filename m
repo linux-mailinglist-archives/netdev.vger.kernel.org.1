@@ -1,370 +1,334 @@
-Return-Path: <netdev+bounces-247814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E227FCFEC6E
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 17:06:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EA79CFED83
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 17:23:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CD4863059921
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 15:59:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C68DA3273610
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 16:08:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B981C36AB76;
-	Wed,  7 Jan 2026 15:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC301349AFF;
+	Wed,  7 Jan 2026 16:00:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="gTbsO4XS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dE6e7xD1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A2DE3A89C1
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 15:59:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E91737E302
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 16:00:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767801593; cv=none; b=fEKg2T9riAa5cQsYH3Usfm36HD0RQnIitteplNmFQmWYEAJxMDlKNTvzq3CJvx3LkOuPtyv+dDHeaH6Oj7O3MknHztszzObtArE+UsQXZjWkAn09i9lnSdu3D8wGAmJpbzrpmu+2GZY0/Hj6SE7Mwf9ovwXt0b57UNaCxW73Ugo=
+	t=1767801643; cv=none; b=PCJLoXjJi73tJgdiLGIZSLhbq/O5FhmUpxGekfbPCclr1xKhhfIgIgvGjyPogYPmzIUy6CPtv5J0/vR4xZafyJNsSeRAvVg2pWCun52epTzydFvDdGL86Q0rioxs+e3W6uRPBkYV2Qp90vMvvOrgBV3yK1VLZ/2Maum6tHmGC7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767801593; c=relaxed/simple;
-	bh=YDxCfBVL9bkBjoKLy+kHl0X3j7N8WFSP8OQpNKbOPKA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pr4QSKjrBFgVIsKAOzs+asG7TONpEWeF+I+d/5xEWroOIpWyROddO+v2gkDZxLNosO0FSX2ayCHXQpohUL+B5LuWqrads/0/yE5phA52RC0DQcL45wvZ996BVJmmXK3GdJAeKi/l3BefAT8c2XsgtFhOK+gEC/ggXsaOP+M+Qus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=gTbsO4XS; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-47d3ffb0f44so14903765e9.3
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 07:59:46 -0800 (PST)
+	s=arc-20240116; t=1767801643; c=relaxed/simple;
+	bh=V3yFCLd9PnVMfu7x+nHp0SpZEvla9oNDdMZsT+rOXik=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=scXu0rovz10GC/Z6x78nSv6Jz4uaOH2KDDh0DzZbjQyQpAxsLRrJ63sMzX4YpHjyHiq5tMbmfk5+8vEwgeC2PyGyRW/lfBKERvS1ekFkCrYh684YDQPvX3RANvcUSKtsen3jX5kk2hWhN3Gp5/xQmPi7bglJKTRZcRm5HCGVIrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dE6e7xD1; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-79028cb7f92so23083857b3.2
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 08:00:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1767801582; x=1768406382; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XcBi7VB/+yzKywmy1I6V+/p4GHHR/86XUIPprAw/n/Y=;
-        b=gTbsO4XS2NYTYeWWid6v/TgBriaX3NTIFnfPRKieqiKTxrwMs/L3BC6K/ISb0HDYzR
-         A9NrXZVOrcdx9ToE02fTCcBMUCMKGsKOYpJvbCmAvA3E0jLX1bm8012LBUN1p6U0o/rI
-         kYopl6V6YNSuAwPdHgd4jSvtLSY1CpO0RJkyuNDu1d66n7M36t7Ys13vsOgHpn839Bop
-         BYAy4dqb2PzpNGLFHbr6uNcaF8n/f3lX7PbsPiQ9QpvP1sUWUDc66oilcPPjMkbh8CUg
-         qRM3REU39OXn8H4dAZ6LQ7lsceNlbFpSbqCIZJRs3sepCuerlk/VjylgavmveVqzTwJ5
-         JPGQ==
+        d=gmail.com; s=20230601; t=1767801630; x=1768406430; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mKuJmVtg3asklMBFCrlbhLX2/3v2lEn9vcJXzl+ABfY=;
+        b=dE6e7xD1euqcaQLNRahzvCLxF39BO3Rwnx/Hdu2gZhZFq4WajHYTyl0ZdAOVzEU4vf
+         7hGnl+0OQvf9wEPvD7LxOtc7oPijkyJIHZ2YegaE+JRwtPhVyx4H1z5bQAmKgo41aD9G
+         deXsRvXrTzOxhl6oVOdmGVUIsL3uRJFAHo9ICNtHVBagQIpvhF93rwsfssEfpnDyUzMB
+         ciiInBgkry6lWBesFrd4nzFAvXFDYkH2idQ0mhuwZB/j7if6PceIqEGeoXt6S6o0Z4Ni
+         n9GXEctiQfeVozs3Qp2/ADLrJI5MEukA/nTd4advhyagPOP1AS4fT7eNJbyT8vEEXpWk
+         OacA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767801582; x=1768406382;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XcBi7VB/+yzKywmy1I6V+/p4GHHR/86XUIPprAw/n/Y=;
-        b=pCxx2R7cdyKHwHGAnw8IJGlkbcpEY7Fp6fWpLPzGtWh1HMglo1s6PzfgnlxJqGl5Gt
-         a9VofR+M2RS5CkPs4XnJ01fwDdWySI+KFiLFN72mGekKrNQ5y4JBMTc/OnsuyEzWo5lg
-         czJwmZOQQpDxdOFqVy4mXbV8LNoA3FXoV+B84kMTdpTWD5hh1HzWGU3YXe8T1O1cqL8M
-         MUzGZh/8h/TylHTa/+YEwdssXo4It4qtGtqdUCVLAKma+Tulq+63tK/r12EBfybDZmg7
-         DJKy2o/nbzNfBuJebUcSxZo6RGUGnwC8Q6B3xwbApWlolyjIAiT2XHtsEcBQqhLPVvOf
-         3V4w==
-X-Forwarded-Encrypted: i=1; AJvYcCUDzmOWfYc3OdOJIpe3Ny5q3ZVkmEqHzZK68ur4AZnWyToMIonWF/OiHZsLIjyZX9DOmzre3GU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxmsMF8LH3INWwSSJYldOFFobLCzvbIae5zELlo5epjhywQWxB
-	lijZVMVY8l4AF+m31GGS907eugEOs1FKcdojn+62cygYByG3KgwWzk/bb4bIRwMiQdQ=
-X-Gm-Gg: AY/fxX4BKaGTFIg38zUlEOqgQe+nLqg1w/VIOyE5FXKNsH4iinBQZ/WXDPpT5btpjRm
-	X8reB/qGjjh9DMXjjn5yPG6K/28rLUZdZLgcN6REVWfKJ9jym7hVaikPVXxJn5wyv8BjdoRNG+8
-	YrQRgyAkCKpDB8EWwvzvnm0BznJry8Djx8ewOimmnutXi1NEAIbn+LnrYfYiPJH2TDJLwYx6ZM4
-	xhjsACauXjISljbQAqQLbAwXOP6pVex6BbZhSiviSgkeCUWBgTo/Nu28QGal2a4OUCgH2Jg0pSn
-	FN4yjxvU5DlFFKLnDUxrNHwVgxqS+img00UIC2h+SW0A1Yf5fLJ+en/lxXADH4lFROfhB/nU0OE
-	U1Ya+Kj2DXluaa4lFSbAteAqxqQXNRqeQbf+tq7hN72Kn0cin15fWYlnwQ5Y0bpTuMEKSG8hlgy
-	0n+kJ4f9aE720QUAvqm4KhFoUx
-X-Google-Smtp-Source: AGHT+IFjp/d1CD2wKCPtCqrirwoPPsZ0u9aXD3mLadUtxpd0+q/JXwTm9lSdGLshtzlqlgE+qhzyAA==
-X-Received: by 2002:a05:600c:1988:b0:477:fad:acd9 with SMTP id 5b1f17b1804b1-47d84b54025mr31093575e9.34.1767801582072;
-        Wed, 07 Jan 2026 07:59:42 -0800 (PST)
-Received: from pathway.suse.cz ([176.114.240.130])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d8662ffaasm16069895e9.6.2026.01.07.07.59.41
+        d=1e100.net; s=20230601; t=1767801630; x=1768406430;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mKuJmVtg3asklMBFCrlbhLX2/3v2lEn9vcJXzl+ABfY=;
+        b=he2kw7Uo3gGQZq3+ZUmKOdunUTsKTHb3zFOWIvJnMS+gzZucd0BlUOGN8uC/Ct63Se
+         mfPGCLaTLS8GsI4Xwq76aQvCWC3X4j9euTLdcNBxaUUpVCz0Ae3mRSEMLqX70fwzAH13
+         9lFUuRYC12rK9AJ1k/2xO0KpGFgcKZIM/XBz1NZ9gJm6U/dbtO0U60DxyYYXhYHJ5r7y
+         wktgv4jm7QiQBPO0HAWMkuL8CT8JsrSIDfMxeJyOPFQ7UZmfR4rTiBSD0g3AUazFwM55
+         DSDYrxVJgk/roXsyRQob4hs/3a87L6tY5nUdxC4qUcGB8gdzkHKCnR/TphG1b3a9+TnK
+         5jqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUFWO2Rthg2mQlXKYTgUxy/Y89FUo+iBR9/hyHCW8WISka0r5Lpt1sEW463WFnI5iAO4mQ5+Ao=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJcNRFD0LXuu43aKN64HON+tmUQdEaXyd+rYiwty1pjt0CnhjR
+	Yui3mgtgZEHd8yayXSI4gpfj1IOaJbr/II8/cA9AiXLYWNLudV/S+GnC
+X-Gm-Gg: AY/fxX5mdIgj3SuNy5IkghSdnHDBJP4odH7UreRv3k9WCf3vuYckk79fqXxklEmmiUP
+	2Jg7sgvzcG3hEWgm2S/VfeVMJyGbqHCAidLHh2skqbECH/QNLc+ZS4JdaFJFDVZFuWEdqS5BTaa
+	amFwY+TrPH77ma5T/7dgTtOFyH3WD+hI3wvk9Dz3BQDh0p1WZBqGu/M0/w4rX1YQ6dL98KY/nyF
+	N7q4tpq5/aabPRELYVe/iidjTlgghsKzGpE/Uc/XMD7QnCLGP/ZEytHH/wcTh8Q6y7MgJB4jKfX
+	FF3GSjAZ2S3wg5k94H/0ECWjXkOIUtYyOAHgvHk1q3rcfzF0DRt/0/tdnLBggn24WAt/KHWQ7d+
+	EL72GJW8Q1t0cfSdmxf0G65m6kqvIS3HRxVtyBq8Mx96/X4UEMehQDIdgznDxTZ4oo6VMatc0qg
+	di1enOjOnmyALSg67o3nedv1e9F2Gn+p4D8yPsh+yNxbOLV3TnOMn0rk45EKapXpKrg0ykPQ==
+X-Google-Smtp-Source: AGHT+IENzg5gdOHTV4hmC7unf9naU5HuQ8dAAid7AZBkkLIIIE805RAtFCRblQ/FhYXDav/dy1Pfwg==
+X-Received: by 2002:a05:690c:fc8:b0:790:4bcc:764f with SMTP id 00721157ae682-790b5828109mr29090427b3.55.1767801628394;
+        Wed, 07 Jan 2026 08:00:28 -0800 (PST)
+Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-790aa6dcd4asm19864067b3.52.2026.01.07.08.00.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 07:59:41 -0800 (PST)
-Date: Wed, 7 Jan 2026 16:59:39 +0100
-From: Petr Mladek <pmladek@suse.com>
-To: Lance Yang <lance.yang@linux.dev>
-Cc: syzbot <syzbot+085983798339fb1b6e51@syzkaller.appspotmail.com>,
-	syzkaller-bugs@googlegroups.com, netdev@vger.kernel.org,
-	akpm@linux-foundation.org, linux-kernel@vger.kernel.org,
-	mhiramat@kernel.org, John Ogness <john.ogness@linutronix.de>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>, bpf@vger.kernel.org
-Subject: Re: [syzbot] [kernel?] INFO: rcu detected stall in watchdog (2)
-Message-ID: <aV6C68oZgbIGEXiV@pathway.suse.cz>
-References: <694a2745.050a0220.19928e.0016.GAE@google.com>
- <4b3462bb-1cb5-4240-a57a-49b0f39f233f@linux.dev>
+        Wed, 07 Jan 2026 08:00:27 -0800 (PST)
+Date: Wed, 07 Jan 2026 11:00:27 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: =?UTF-8?B?U2hpbWluZyBDaGVuZyAo5oiQ6K+X5piOKQ==?= <Shiming.Cheng@mediatek.com>, 
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+ "kuba@kernel.org" <kuba@kernel.org>, 
+ "willemb@google.com" <willemb@google.com>, 
+ "pabeni@redhat.com" <pabeni@redhat.com>, 
+ "willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>, 
+ "edumazet@google.com" <edumazet@google.com>, 
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+ "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>, 
+ "davem@davemloft.net" <davem@davemloft.net>
+Cc: =?UTF-8?B?TGVuYSBXYW5nICjnjovlqJwp?= <Lena.Wang@mediatek.com>
+Message-ID: <willemdebruijn.kernel.c616acad800d@gmail.com>
+In-Reply-To: <1f232ad5c879a30ac94586a56a387d9d48a95765.camel@mediatek.com>
+References: <20260106020208.7520-1-shiming.cheng@mediatek.com>
+ <willemdebruijn.kernel.f3b2fe8186f4@gmail.com>
+ <1f232ad5c879a30ac94586a56a387d9d48a95765.camel@mediatek.com>
+Subject: Re: [PATCH] net: fix udp gso skb_segment after pull from frag_list
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4b3462bb-1cb5-4240-a57a-49b0f39f233f@linux.dev>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Adding John, tracing, and BPF people into Cc.
+Shiming Cheng (=E6=88=90=E8=AF=97=E6=98=8E) wrote:
+> Dear Willem
+> =
 
-On Tue 2025-12-23 17:35:42, Lance Yang wrote:
-> 
-> 
-> On 2025/12/23 13:23, syzbot wrote:
-> > Hello,
-> > 
-> > syzbot found the following issue on:
-> > 
-> > HEAD commit:    7b8e9264f55a Merge tag 'net-6.19-rc2' of git://git.kernel...
-> > git tree:       net-next
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=1207562a580000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=a94030c847137a18
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=085983798339fb1b6e51
-> > compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=174cab1a580000
-> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=122e777c580000
-> > 
-> > Downloadable assets:
-> > disk image: https://storage.googleapis.com/syzbot-assets/8974d9d662d1/disk-7b8e9264.raw.xz
-> > vmlinux: https://storage.googleapis.com/syzbot-assets/127f2bb7aa37/vmlinux-7b8e9264.xz
-> > kernel image: https://storage.googleapis.com/syzbot-assets/2dc3e335ca80/bzImage-7b8e9264.xz
-> > 
-> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > Reported-by: syzbot+085983798339fb1b6e51@syzkaller.appspotmail.com
-> > 
-> > rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-> > rcu: 	(detected by 0, t=10502 jiffies, g=18609, q=500 ncpus=2)
-> > rcu: All QSes seen, last rcu_preempt kthread activity 10502 (4294978752-4294968250), jiffies_till_next_fqs=1, root ->qsmask 0x0
-> > rcu: rcu_preempt kthread starved for 10502 jiffies! g18609 f0x2 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=1
-> > rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-> > rcu: RCU grace-period kthread stack dump:
-> > task:rcu_preempt     state:R  running task     stack:27272 pid:16    tgid:16    ppid:2      task_flags:0x208040 flags:0x00080000
-> > Call Trace:
-> >   <TASK>
-> >   context_switch kernel/sched/core.c:5256 [inline]
-> >   __schedule+0x14bc/0x5000 kernel/sched/core.c:6863
-> >   __schedule_loop kernel/sched/core.c:6945 [inline]
-> >   schedule+0x165/0x360 kernel/sched/core.c:6960
-> >   schedule_timeout+0x12b/0x270 kernel/time/sleep_timeout.c:99
-> >   rcu_gp_fqs_loop+0x301/0x1540 kernel/rcu/tree.c:2083
-> >   rcu_gp_kthread+0x99/0x390 kernel/rcu/tree.c:2285
-> >   kthread+0x711/0x8a0 kernel/kthread.c:463
-> >   ret_from_fork+0x599/0xb30 arch/x86/kernel/process.c:158
-> >   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
-> >   </TASK>
-> > rcu: Stack dump where RCU GP kthread last ran:
-> > Sending NMI from CPU 0 to CPUs 1:
-> > NMI backtrace for cpu 1
-> > CPU: 1 UID: 0 PID: 31 Comm: khungtaskd Not tainted syzkaller #0 PREEMPT(full)
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-> > RIP: 0010:check_kcov_mode kernel/kcov.c:183 [inline]
-> > RIP: 0010:write_comp_data kernel/kcov.c:246 [inline]
-> > RIP: 0010:__sanitizer_cov_trace_switch+0x97/0x130 kernel/kcov.c:351
+> frag_list assignment trigger:
+> frag_list is assigned to the next skb without to enable device feature
+> NETIF_F_GRO_FRAGLIST if head_frag is zero.
 
-I am a bit confused here.
+Thanks for the trace, so this is a regular GRO packet using
+skb_gro_receive that ended up having to use frag_list.
 
-  1. Why there are 3 RIP entries?
+> After packet in fraglist is processed by BPF pull tial, performing GSO
+> segmentation directly will cause problems.
 
-  2. Why RIP points to kcov code? The last return address on stack
-     is rb_event_length() which does not seem to call kcov code...
+That's peculiar. For such packets, there is no expectation that all
+frag_list skbs hold an exact segment.
 
-  3. Who calls __sanitizer_cov_trace_switch()? It seems to be
-     an exported symbol which is not directly called from kernel.
+It would be helpful if the stack trace can be extended to show the
+line numbers. And/or if you can show the BUG that is being hit in
+skb_segment.
 
-Note that I am not familiar with the kcov code and how it is used.
+I agree that we probably just need to detect such modified packets and
+linearize them. But let's get a more detailed root cause first.
 
-> > Code: 54 53 48 8b 54 24 20 65 4c 8b 04 25 08 b0 7e 92 45 31 c9 eb 08 49 ff c1 4c 39 c8 74 77 4e 8b 54 ce 10 65 44 8b 1d c9 f7 bc 10 <41> 81 e3 00 01 ff 00 74 13 41 81 fb 00 01 00 00 75 d9 41 83 b8 6c
-> > RSP: 0018:ffffc90000a082e0 EFLAGS: 00000016
-> > RAX: 0000000000000020 RBX: 0000000000000004 RCX: 0000000000000005
-> > RDX: ffffffff81c39275 RSI: ffffffff8df9a280 RDI: 0000000000000004
-> > RBP: 0000006100d347d2 R08: ffff88801e2b0000 R09: 000000000000001b
-> > R10: 000000000000001b R11: 0000000080010005 R12: dffffc0000000000
-> > R13: ffff88801bed6010 R14: ffff88801bed64c0 R15: 00000000000667c4
-> > FS:  0000000000000000(0000) GS:ffff888125f35000(0000) knlGS:0000000000000000
-> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > CR2: 000055d3cfba3a38 CR3: 00000000727a4000 CR4: 00000000003526f0
-> > Call Trace:
-> >   <IRQ>
-> >   rb_event_length+0x45/0x400 kernel/trace/ring_buffer.c:222
-> >   rb_read_data_buffer+0x438/0x580 kernel/trace/ring_buffer.c:1858
-> >   check_buffer+0x28a/0x750 kernel/trace/ring_buffer.c:4410
-> >   __rb_reserve_next+0x592/0xdb0 kernel/trace/ring_buffer.c:4509
-> >   rb_reserve_next_event kernel/trace/ring_buffer.c:4646 [inline]
-> >   ring_buffer_lock_reserve+0xbb5/0x1010 kernel/trace/ring_buffer.c:4705
-> >   __trace_buffer_lock_reserve kernel/trace/trace.c:1079 [inline]
-> >   trace_event_buffer_lock_reserve+0x1d0/0x6f0 kernel/trace/trace.c:2808
-> >   trace_event_buffer_reserve+0x248/0x340 kernel/trace/trace_events.c:672
-> >   do_trace_event_raw_event_bpf_trace_printk kernel/trace/bpf_trace.h:11 [inline]
-> >   trace_event_raw_event_bpf_trace_printk+0x100/0x260 kernel/trace/bpf_trace.h:11
-> >   __do_trace_bpf_trace_printk kernel/trace/bpf_trace.h:11 [inline]
-> >   trace_bpf_trace_printk+0x153/0x1b0 kernel/trace/bpf_trace.h:11
-> >   ____bpf_trace_printk kernel/trace/bpf_trace.c:379 [inline]
-> >   bpf_trace_printk+0x11e/0x190 kernel/trace/bpf_trace.c:362
-> >   bpf_prog_b1367f0be6c54012+0x39/0x3f
-> >   bpf_dispatcher_nop_func include/linux/bpf.h:1378 [inline]
-> >   __bpf_prog_run include/linux/filter.h:723 [inline]
-> >   bpf_prog_run include/linux/filter.h:730 [inline]
-> >   __bpf_trace_run kernel/trace/bpf_trace.c:2075 [inline]
-> >   bpf_trace_run1+0x27f/0x4c0 kernel/trace/bpf_trace.c:2115
-> >   __bpf_trace_rcu_utilization+0xa1/0xf0 include/trace/events/rcu.h:27
-> >   __traceiter_rcu_utilization+0x7a/0xb0 include/trace/events/rcu.h:27
-> >   __do_trace_rcu_utilization include/trace/events/rcu.h:27 [inline]
-> >   trace_rcu_utilization+0x191/0x1c0 include/trace/events/rcu.h:27
-> >   rcu_sched_clock_irq+0xd3/0x1280 kernel/rcu/tree.c:2693
-> >   update_process_times+0x23c/0x2f0 kernel/time/timer.c:2474
-> >   tick_sched_handle kernel/time/tick-sched.c:298 [inline]
-> >   tick_nohz_handler+0x3e9/0x710 kernel/time/tick-sched.c:319
-> >   __run_hrtimer kernel/time/hrtimer.c:1777 [inline]
-> >   __hrtimer_run_queues+0x4d0/0xc30 kernel/time/hrtimer.c:1841
-> >   hrtimer_interrupt+0x45b/0xaa0 kernel/time/hrtimer.c:1903
-> >   local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1045 [inline]
-> >   __sysvec_apic_timer_interrupt+0x102/0x3e0 arch/x86/kernel/apic/apic.c:1062
-> >   instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1056 [inline]
-> >   sysvec_apic_timer_interrupt+0xa1/0xc0 arch/x86/kernel/apic/apic.c:1056
-> >   </IRQ>
-> >   <TASK>
-> >   asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
-> > RIP: 0010:console_trylock_spinning kernel/printk/printk.c:2037 [inline]
-> 
-> The khungtaskd was trying to print something
+> =
 
-The "full" log at
-https://syzkaller.appspot.com/text?tag=CrashLog&x=1207562a580000
-shows the following:
+> udp_gro_receive_segment
+>   skb_gro_receive
+>    if (skb->head_frag=3D=3D0)
+>      goto merge;
+> =
 
-[  416.485474][    C0] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-[  416.492530][    C0] rcu: 	(detected by 0, t=10502 jiffies, g=18609, q=500 ncpus=2)
-[  416.500319][    C0] rcu: All QSes seen, last rcu_preempt kthread activity 10502 (4294978752-4294968250), jiffies_till_next_fqs=1, root ->qsmask 0x0
-[  416.513804][    C0] rcu: rcu_preempt kthread starved for 10502 jiffies! g18609 f0x2 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=1
-[  416.525197][    C0] rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-[  416.535358][    C0] rcu: RCU grace-period kthread stack dump:
-[  416.541258][    C0] task:rcu_preempt     state:R  running task     stack:27272 pid:16    tgid:16    ppid:2      task_flags:0x208040 flags:0x00080000
-[  416.554783][    C0] Call Trace:
-[  416.558097][    C0]  <TASK>
-[  416.561050][    C0]  __schedule+0x14bc/0x5000
-[  416.565598][    C0]  ? lockdep_hardirqs_on+0x98/0x140
-[...]
-[  416.611648][    C0]  rcu_gp_fqs_loop+0x301/0x1540
-[  416.616548][    C0]  ? __pfx_rcu_gp_init+0x10/0x10
-[  416.617417][   T31] INFO: task kworker/u8:12:4866 blocked for more than 157 seconds.
-[  416.621584][    C0]  ? lockdep_hardirqs_on+0x98/0x140
-[...]
+> =
 
-So, the hung task detector detected that "kworker/u8:12:4866" was in
-TASK_UNINTERRUPTIBLE for more that 157 seconds.
+> merge:
+>         /* sk ownership - if any - completely transferred to the
+> aggregated packet */
+>         skb->destructor =3D NULL;
+>         skb->sk =3D NULL;
+>         delta_truesize =3D skb->truesize;
+>         if (offset > headlen) {
+>                 unsigned int eat =3D offset - headlen;
+> =
 
-Note that this task should not cause RCU stall. The hung task is sleeping...
+>                 skb_frag_off_add(&skbinfo->frags[0], eat);
+>                 skb_frag_size_sub(&skbinfo->frags[0], eat);
+>                 skb->data_len -=3D eat;
+>                 skb->len -=3D eat;
+>                 offset =3D headlen;
+>         }
+> =
 
-Anyway, this is the line which was added by the printk() on CPU1
-from watchdog() function.
+>         __skb_pull(skb, offset);
+> =
 
->  and got stuck in console_trylock_spinning ...
+>         if (NAPI_GRO_CB(p)->last =3D=3D p)
+>                 skb_shinfo(p)->frag_list =3D skb;   =
 
-The time spent in console_trylock_spinning should be limited
-by the lenght of a single printk record and speed of the console.
+>         <<< here frag_list is assigned to the next skb without to
+> enable device feature NETIF_F_GRO_FRAGLIST if head_frag is zero
+>         else
+>                 NAPI_GRO_CB(p)->last->next =3D skb;
+>         NAPI_GRO_CB(p)->last =3D skb;
+>         __skb_header_release(skb);
+>         lp =3D p;
+> =
 
-The spinning is allowed only around single record flush,
-see console_lock_spinning_enable() in console_emit_next_record()
-or nbcon_legacy_emit_next_record().
+> =
 
-It should not take more than 1sec even on pretty slow serial consoles.
-Unless something went wrong, of course...
+> =
 
-But wait!
+> =
 
-The RCU report says:
+> On Tue, 2026-01-06 at 14:15 -0500, Willem de Bruijn wrote:
+> > External email : Please do not click links or open attachments until
+> > you have verified the sender or the content.
+> > =
 
-  [  416.492530][    C0] rcu: 	(detected by 0, t=10502 jiffies, g=18609, q=500 ncpus=2)
+> > =
 
-There seems to be two CPUs, aka CPU0 and CPU1. And the backtrace from
-CPU1 was taken via NMI:
+> > Shiming Cheng wrote:
+> > > Commit 3382a1ed7f77 ("net: fix udp gso skb_segment after  pull from=
 
-  [  416.622108][    C0] Sending NMI from CPU 0 to CPUs 1:
-  [  416.622135][    C1] NMI backtrace for cpu 1
-  [  416.622148][    C1] CPU: 1 UID: 0 PID: 31 Comm: khungtaskd Not tainted syzkaller #0 PREEMPT(full) 
+> > > frag_list")
+> > > if gso_type is not SKB_GSO_FRAGLIST but skb->head_frag is zero,
+> > =
 
-It means that CPU1 should not be blocked in console_lock_spinning_enable()
-when the other CPU0 is calling __schedule() in rcu_gp_kthread() and
-detects the RCU stall. It is not in a code where spinning is allowed,
-definitely.
+> > What codepath triggers this scenario?
+> > =
 
-Possibilities:
+> > We should make sure that the fix covers all such instances. Likely
+> > instances of where some module in the datapath, like a BPF program,
+> > modifies a valid skb into one that is not safe to pass to
+> > skb_segment.
+> > =
 
-1. The stall might be caused by the BPF or tracing code which is
-   called in IRQ context from hrtimer_interrupt().
+> > I don't fully understand yet that skb->head_frag =3D=3D 0 is the only=
 
-2. The backtrace might be misleading. There are only two CPUs.
-   Maybe the rcu_preempt kthread was scheduled after the system
-   got unstuck => backtraces might be from a state when the system is
-   already running "properly".
+> > such condition in scope.
+> > =
 
-3. printk() causes stalls. And there were many lines added between
-   213s and 237s. From the full log:
+> > > then detected invalid geometry in frag_list skbs and call
+> > > skb_segment. But some packets with modified geometry can also hit
+> > > bugs in that code. Instead, linearize all these packets that fail
+> > > the basic invariants on gso fraglist skbs. That is more robust.
+> > > call stack information, see below.
+> > > =
 
-   [  213.498587][ T5898] Bluetooth: hci0: unexpected cc 0x0c03 length: 249 > 1
-   [  213.517072][ T5898] Bluetooth: hci0: unexpected cc 0x1003 length: 249 > 9
-   [ ... 279 lines, 31kB printed ...]
-   [  237.623198][   T13] netdevsim netdevsim3 netdevsim2: set [1, 0] type 2 family 0 port 6081 - 0
-   [  237.831401][ T6144] veth1_vlan: entered promiscuous mode
+> > > Valid SKB_GSO_FRAGLIST skbs
+> > > - consist of two or more segments
+> > > - the head_skb holds the protocol headers plus first gso_size
+> > > - one or more frag_list skbs hold exactly one segment
+> > > - all but the last must be gso_size
+> > > =
 
-   So this might cause stall in theory.
+> > > Optional datapath hooks such as NAT and BPF (bpf_skb_pull_data) can=
 
-   The strange thing is that the stall was reported almost 200s later:
+> > > modify fraglist skbs, breaking these invariants.
+> > > =
 
-   [  416.485474][    C0] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-   [  416.492530][    C0] rcu: 	(detected by 0, t=10502 jiffies, g=18609, q=500 ncpus=2)
+> > > In extreme cases they pull one part of data into skb linear. For
+> > > UDP,
+> > > this  causes three payloads with lengths of (11,11,10) bytes were
+> > > pulled tail to become (12,10,10) bytes.
+> > > =
 
-   It is possible that only CPU1 was doing some real job during this time.
-   And CPU0 was busy flushing the 31kB lines in an atomic context.
+> > > The skbs no longer meets the above SKB_GSO_FRAGLIST conditions
+> > > because
+> > > payload was pulled into head_skb, it needs to be linearized before
+> > > pass
+> > > to regular skb_segment.
+> > =
 
-   Does anyone know how long was the RCU stall?
-   How long are t=10502 jiffies in this case?
+> > Most of this commit message duplicates the text in commit
+> > 3382a1ed7f77
+> > ("net: fix udp gso skb_segment after  pull from frag_list"). And
+> > somewhat garbles it, as in the first sentence.
+> > =
 
-Best Regards,
-Petr
+> > But this is a different datapath, not related to SKB_GSO_FRAGLIST.
+> > So the fixes tag is also incorrect. The blamed commit fixes an issue
+> > with fraglist GRO. This new issue is with skbs that have a fraglist,
+> > but not one created with that feature. (the naming is confusing, but
+> > fraglist-gro is only one use of the skb frag_list).
+> > =
 
-> While waiting there, a timer interrupt fired and ran a BPF program
-> that traces RCU events with bpf_trace_printk.
-> 
-> So both printk being slow and BPF/tracing running in the interrupt
-> seem to be contributing to the RCU stall :(
->
-> #syz set subsystems: bpf, trace
-> 
-> 
-> > RIP: 0010:vprintk_emit+0x4d0/0x5f0 kernel/printk/printk.c:2425
-> > Code: 0f 84 34 ff ff ff e8 cf 62 20 00 fb eb 44 e8 c7 62 20 00 e8 82 72 ba 09 4d 85 f6 74 94 e8 b8 62 20 00 fb 48 c7 c7 e0 58 f3 8d <31> f6 ba 01 00 00 00 31 c9 41 b8 01 00 00 00 45 31 c9 53 e8 28 26
-> > RSP: 0018:ffffc90000a77a80 EFLAGS: 00000293
-> > RAX: ffffffff81a14f98 RBX: ffffffff81a14df1 RCX: ffff88801e2b0000
-> > RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff8df358e0
-> > RBP: ffffc90000a77b90 R08: ffffffff8f822077 R09: 1ffffffff1f0440e
-> > R10: dffffc0000000000 R11: fffffbfff1f0440f R12: 0000000000000000
-> > R13: 0000000000000040 R14: 0000000000000200 R15: 1ffff9200014ef54
-> >   _printk+0xcf/0x120 kernel/printk/printk.c:2451
-> >   check_hung_task kernel/hung_task.c:255 [inline]
-> >   check_hung_uninterruptible_tasks kernel/hung_task.c:331 [inline]
-> >   watchdog+0xb35/0xfe0 kernel/hung_task.c:515
-> >   kthread+0x711/0x8a0 kernel/kthread.c:463
-> >   ret_from_fork+0x599/0xb30 arch/x86/kernel/process.c:158
-> >   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
-> >   </TASK>
-> > 
-> > 
-> > ---
-> > This report is generated by a bot. It may contain errors.
-> > See https://goo.gl/tpsmEJ for more information about syzbot.
-> > syzbot engineers can be reached at syzkaller@googlegroups.com.
-> > 
-> > syzbot will keep track of this issue. See:
-> > https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> > 
-> > If the report is already addressed, let syzbot know by replying with:
-> > #syz fix: exact-commit-title
-> > 
-> > If you want syzbot to run the reproducer, reply with:
-> > #syz test: git://repo/address.git branch-or-commit-hash
-> > If you attach or paste a git patch, syzbot will apply it before testing.
-> > 
-> > If you want to overwrite report's subsystems, reply with:
-> > #syz set subsystems: new-subsystem
-> > (See the list of subsystem names on the web dashboard)
-> > 
-> > If the report is a duplicate of another one, reply with:
-> > #syz dup: exact-subject-of-another-report
-> > 
-> > If you want to undo deduplication, reply with:
-> > #syz undup
+> > >   skb_segment+0xcd0/0xd14
+> > >   __udp_gso_segment+0x334/0x5f4
+> > >   udp4_ufo_fragment+0x118/0x15c
+> > >   inet_gso_segment+0x164/0x338
+> > >   skb_mac_gso_segment+0xc4/0x13c
+> > >   __skb_gso_segment+0xc4/0x124
+> > >   validate_xmit_skb+0x9c/0x2c0
+> > >   validate_xmit_skb_list+0x4c/0x80
+> > >   sch_direct_xmit+0x70/0x404
+> > >   __dev_queue_xmit+0x64c/0xe5c
+> > >   neigh_resolve_output+0x178/0x1c4
+> > >   ip_finish_output2+0x37c/0x47c
+> > >   __ip_finish_output+0x194/0x240
+> > >   ip_finish_output+0x20/0xf4
+> > >   ip_output+0x100/0x1a0
+> > >   NF_HOOK+0xc4/0x16c
+> > >   ip_forward+0x314/0x32c
+> > >   ip_rcv+0x90/0x118
+> > >   __netif_receive_skb+0x74/0x124
+> > >   process_backlog+0xe8/0x1a4
+> > >   __napi_poll+0x5c/0x1f8
+> > >   net_rx_action+0x154/0x314
+> > >   handle_softirqs+0x154/0x4b8
+> > > =
+
+> > >   [118.376811] [C201134] rxq0_pus: [name:bug&]kernel BUG at
+> > > net/core/skbuff.c:4278!
+> > >   [118.376829] [C201134] rxq0_pus: [name:traps&]Internal error:
+> > > Oops - BUG: 00000000f2000800 [#1]
+> > >   [118.470774] [C201134] rxq0_pus: [name:mrdump&]Kernel Offset:
+> > > 0x178cc00000 from 0xffffffc008000000
+> > >   [118.470810] [C201134] rxq0_pus: [name:mrdump&]PHYS_OFFSET:
+> > > 0x40000000
+> > >   [118.470827] [C201134] rxq0_pus: [name:mrdump&]pstate: 60400005
+> > > (nZCv daif +PAN -UAO)
+> > >   [118.470848] [C201134] rxq0_pus: [name:mrdump&]pc :
+> > > [0xffffffd79598aefc] skb_segment+0xcd0/0xd14
+> > >   [118.470900] [C201134] rxq0_pus: [name:mrdump&]lr :
+> > > [0xffffffd79598a5e8] skb_segment+0x3bc/0xd14
+> > >   [118.470928] [C201134] rxq0_pus: [name:mrdump&]sp :
+> > > ffffffc008013770
+> > > =
+
+> > > Fixes: 3382a1ed7f77 ("net: fix udp gso skb_segment after pull from
+> > > frag_list")
+> > > Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
+> > > ---
+> > >  net/ipv4/udp_offload.c | 6 ++++++
+> > >  1 file changed, 6 insertions(+)
+> > > =
+
+> > > diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+> > > index 19d0b5b09ffa..606d9ce8c98e 100644
+> > > --- a/net/ipv4/udp_offload.c
+> > > +++ b/net/ipv4/udp_offload.c
+> > > @@ -535,6 +535,12 @@ struct sk_buff *__udp_gso_segment(struct
+> > > sk_buff *gso_skb,
+> > >                       uh->check =3D ~udp_v4_check(gso_skb->len,
+> > >                                                 ip_hdr(gso_skb)-
+> > > >saddr,
+> > >                                                 ip_hdr(gso_skb)-
+> > > >daddr, 0);
+> > > +     } else if (skb_shinfo(gso_skb)->frag_list && gso_skb-
+> > > >head_frag =3D=3D 0) {
+> > > +             if (skb_pagelen(gso_skb) - sizeof(*uh) !=3D
+> > > skb_shinfo(gso_skb)->gso_size) {
+> > > +                     ret =3D __skb_linearize(gso_skb);
+> > > +                     if (ret)
+> > > +                             return ERR_PTR(ret);
+> > > +             }
+> > >       }
+> > > =
+
+> > >       skb_pull(gso_skb, sizeof(*uh));
+> > > --
+> > > 2.45.2
+> > > =
+
+> > =
+
+> > =
+
+
+
 
