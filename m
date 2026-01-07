@@ -1,57 +1,60 @@
-Return-Path: <netdev+bounces-247563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9C09CFBB20
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 03:19:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C001CFBB74
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 03:27:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C1281303A3D5
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 02:19:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 18A1B3030584
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 02:22:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D42B2239562;
-	Wed,  7 Jan 2026 02:19:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3696522541B;
+	Wed,  7 Jan 2026 02:22:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KBkkaUiU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lt2hRUAX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B027B190473
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 02:19:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09F95207A32;
+	Wed,  7 Jan 2026 02:22:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767752368; cv=none; b=QYE+lnt+vYYZfEaFUvUZ5Kj6H7T/GyAOPmQSEuhQUB+h/h4LGs1EhZFZCPJ7gPoetSs783Yl9ZUEcDNjTCNlrsI60LBnxqSb4assnNvy/VBJVvtcGDnSNeIAO+0m8JwYxVrBzs/hkM8YB+tfcxkL8f2uZc+QJzQg03yefl8cumM=
+	t=1767752567; cv=none; b=l0sJKBkNET4YBPmi0la7e4jI6D1nww5w6BAeQTs4GaPKpFm5VdBndexo3x6wEePX1Qirmh4wwSv+26YL1WRKR6B0A/PRa+w5jL2OGOyIlj5peTgl6l3oYtRXjuAusa7646x8NSXTS2c+R5e6jX+0PC0jIvcBRx8mpF83B04Pu2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767752368; c=relaxed/simple;
-	bh=IaTD99UxI1gvP3iqLsGRM4oC4hvzuQXUQkvfDmzxJ+M=;
+	s=arc-20240116; t=1767752567; c=relaxed/simple;
+	bh=PNW4HVVxZ8G3oxjVQkL+mo9ujZl8FvRW/0AILaRzqCE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SlZYUHGms2UTSWb1VroaI20FPAUlY6pUnPyh1vbuf6GWfK/j9LYOydI4nxm5nZ5d84dAaU0xJmxi3qOfMRo2h1thcNu7cppZtE0hkkP6fT7O7GZInc8mT+IwDo/Bpg8FIlVnTg1zJ4eLAk0RuHMy0AmeruW3srjJjONrWg5yhjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KBkkaUiU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0856C116C6;
-	Wed,  7 Jan 2026 02:19:27 +0000 (UTC)
+	 MIME-Version:Content-Type; b=S3/m02KsPRcPLr2CIGs1kzxTXnCVa3oG7c0T8D8frzNjTIs7+Rn0OT6CL9PTzcDUIShr5Mm+BTcoUsL6BgIOmOLSTrPAQ0pm8PxD2b0XsdtqxlIZ8Sgf2JXFPS70JcaA04eKl71h78BfVZfFRzgv44o8Xk6IaqHix++HubV160w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lt2hRUAX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2203DC116C6;
+	Wed,  7 Jan 2026 02:22:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767752368;
-	bh=IaTD99UxI1gvP3iqLsGRM4oC4hvzuQXUQkvfDmzxJ+M=;
+	s=k20201202; t=1767752565;
+	bh=PNW4HVVxZ8G3oxjVQkL+mo9ujZl8FvRW/0AILaRzqCE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KBkkaUiU7gXFg0kYPFdGdFzSdb5ixHPFZkPgEEuYYJDeUTOkPtRXX0fmWGgxLZntG
-	 zLTUKpkMlJ9aJWwtCqrRrlo6EkOpCoO+OkTS4wX+HhofIksOYhTOzWV2S+m5jGs5ct
-	 gIRFfvvJaCkGe5Dp5X7+7ifO+vIK9x+iYsOZCBRSIk0VXUVutd44Ej3oLQVuXBNHEy
-	 4R7QgnoLdEK37C3gu/DlBWbZnpG6PqNy/NOV3WeMVXnLPNKfrL6Ht390JdEehhvQbc
-	 ADsbLe53ZPtd4MPAHa8XKZ+gxilVZ7emwpoSXyFQjFhAyuRYNnCYtbapC7plVnBR15
-	 n+mYZqpBOZ4dw==
-Date: Tue, 6 Jan 2026 18:19:26 -0800
+	b=Lt2hRUAXcMoRQ01j7oO9zAtSwb4KyRih5epLEMLZuvgElDzFj6hvnFLm1vzUizbL8
+	 MoXshNzec5Fn+dBocb5dcalWORKg1JMipCWcdSpZnUsY7phvWMm44t5IaH1EyIgles
+	 RhohDfnPYrRg8oOwQ6uruEY9yUX0/W/qchElRQFVSZu8IZ1sJ/SBG7KxBo/YAfIW2L
+	 Z2A/uMQrDel92WcVe19KTsmtVaTIYpqu5MMnhzT8YJTJfhb9GCtnnTFNqzvkJko61Y
+	 zprNKcZaz6sRYApBezD/hKx5y3Cj8ZhSdHVSZAuX3/fne1QOoJbSKbYgzo5I4PWyXW
+	 3IDM7Bk6Zz2Tg==
+Date: Tue, 6 Jan 2026 18:22:44 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com,
- andrew.gospodarek@broadcom.com, Somnath Kotur <somnath.kotur@broadcom.com>,
- Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Subject: Re: [PATCH net-next 4/6] bnxt_en: Defrag the NVRAM region when
- resizing UPDATE region fails
-Message-ID: <20260106181926.4d561295@kernel.org>
-In-Reply-To: <20260105215833.46125-5-michael.chan@broadcom.com>
-References: <20260105215833.46125-1-michael.chan@broadcom.com>
-	<20260105215833.46125-5-michael.chan@broadcom.com>
+To: Joshua Washington <joshwash@google.com>
+Cc: netdev@vger.kernel.org, Harshitha Ramamurthy <hramamurthy@google.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, Ankit Garg
+ <nktgrg@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ Catherine Sullivan <csully@google.com>, Luigi Rizzo <lrizzo@google.com>,
+ Jon Olson <jonolson@google.com>, Sagi Shahar <sagis@google.com>, Bailey
+ Forrest <bcf@google.com>, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+Subject: Re: [PATCH net 0/2] gve: fix crashes on invalid TX queue indices
+Message-ID: <20260106182244.7188a8f6@kernel.org>
+In-Reply-To: <20260105232504.3791806-1-joshwash@google.com>
+References: <20260105232504.3791806-1-joshwash@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,15 +64,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon,  5 Jan 2026 13:58:31 -0800 Michael Chan wrote:
-> +			if (rc == -ENOSPC) {
-> +				if (retry || bnxt_hwrm_nvm_defrag(bp))
-> +					break;
-> +				retry = true;
-> +			}
-> +		} while (rc == -ENOSPC && retry);
+On Mon,  5 Jan 2026 15:25:02 -0800 Joshua Washington wrote:
+> This series fixes a kernel panic in the GVE driver caused by
+> out-of-bounds array access when the network stack provides an invalid
+> TX queue index.
 
-Since there's an explicit break under rc == ENOSPC + retry
-the while loop doesn't need to check retry.
-Something needs to be cleaned up here
+Do you know how? I seem to recall we had such issues due to bugs
+in the qdisc layer, most of which were fixed.
+
+Fixing this at the source, if possible, would be far preferable
+to sprinkling this condition to all the drivers.
 
