@@ -1,133 +1,218 @@
-Return-Path: <netdev+bounces-247603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E1B6CFC451
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 08:01:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0460CFC457
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 08:01:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D4015301E16E
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 06:58:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F411C304A8D5
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 06:59:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 143C4225402;
-	Wed,  7 Jan 2026 06:58:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ABC0274B3B;
+	Wed,  7 Jan 2026 06:59:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FnuN3wE8"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qy4B+2QW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f66.google.com (mail-dl1-f66.google.com [74.125.82.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E3221A92F
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 06:58:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14E19225402
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 06:59:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767769095; cv=none; b=QyVbTDz57M4tN77h/d/aRos8+ZcdxVho/XFTyMajtXBNx8rRdsBVopZ6/qszVIf6Ce9ZDWuKoISSWSnZR766R8NG5Ol1ON8VuIgpHzgYZNInnms1NpcpqxMXQgGvtyE6J4UdMj1fyMZvmbiEMDHaurf4D8ONzjOrG4NVvkS2OyA=
+	t=1767769193; cv=none; b=RW+ivmSmZdLdL3QTUKpnVwls1zLlZDh9BrBO32QvkIAU+UPDDIo1HNih0nvyzEy1wiJDE/IjgX/Tt7jaEgKtLZaywdKAB6YLSGCtMNPBGWTcc10Yc3a3mM0RKvpkN9uKyEqBhZIJhZUXLtsDiVCtZPOhRdSBUSQzHiro7J2mHxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767769095; c=relaxed/simple;
-	bh=mlN9zkh9M3tZt5lOx2N1rJAxHiAi5K7DEEmHZYCmjS4=;
+	s=arc-20240116; t=1767769193; c=relaxed/simple;
+	bh=haXUM8NiZ+OKjrpNIs/REj7ESu9ButIA4SUKcQMQlDQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nqNlOgq2dbwfrG8UUinrk0ih7oEi7ep0hqmnYEMx6KitXfQLimsjpkHvIIQnysKVsLQgDfFWmReSOkP4X5HipNYuk7KzzYbLH7sLoXatab955wz9DyvleChKZmUu4Pn2XmmtahoKXOEL3zeQmd1j92stBzpsPj6smJVg29WtGsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FnuN3wE8; arc=none smtp.client-ip=74.125.82.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f66.google.com with SMTP id a92af1059eb24-121b14efeb8so2091368c88.1
-        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 22:58:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767769093; x=1768373893; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JxFsfTf/n8/5lnAFGn+tLoUnsynlfYu93KTb4EE0l88=;
-        b=FnuN3wE869VzzPBLYs1itRQtWSy7RykP3gmEFf2vbDTHSP32QEaw1o09bXX5ofdzxF
-         eoCJ2AEkiphTFWHCAbMehr/z/SvH9/cic4z2oIHeBIMLU6GRJW4oLWG8Sef57MTDtsam
-         OO/CdJtITJsLuEcXjrv+9mLLLhdzvW254ygoKijcJC+HSXqyI1ZShQoY3rCIPLKMfqjy
-         TkBpEkLzGvtxcpIz7bFJhvJZ1KzLm3QLkMBLFiTELLr4/LxxqI3yzm8F9DHSQm+MNb2w
-         pzkdQJnvg8iBY0t4tNcEhhkUFA292jO/1TeJLFWO1ni45AISLCjbEmC8tLNGlG40KQ0b
-         Y2yA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767769093; x=1768373893;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=JxFsfTf/n8/5lnAFGn+tLoUnsynlfYu93KTb4EE0l88=;
-        b=jMfy4clmpodwt22x4daPEMiOQat04lVYI3GOUu8U65JmplY4ZkIcc1YuFnRu/WijL5
-         qnBsFhX1WVHMy6il1GVJbr6d4KFhNZq6utMivqgzS5NpjblU2QDT9gO/Q3hS3lvRSDSj
-         /8K5GwCwTsG4Usc6ZPGFYM60qTV9s8dWx7N76oHgEMubF1wKsDWaqXvbhUwn64rNxlYJ
-         XWrXYDwVq2sXEETNZeWZudrNzgV1FAvgvK34m8p0kfUph7i/g1jEAgnrUwfqNh70gx2+
-         vB7/JkxIVr6HbMK05b9pPpgvLIgUowGOzsJ7LqPaHWHznkKH+VJIl8HUX0ZUWWWWOIeJ
-         Oa7w==
-X-Gm-Message-State: AOJu0YxRwWeZ/bbWWJjOC78EyWK3lg40W1F4BXeQPvY9lEXhMvoFf1Ms
-	7PBbmGVT/4zclHCbRjf2bLSOATq6ABXn/J25gFTjCf5jdurDWNWZGLfdlhPqyPRN
-X-Gm-Gg: AY/fxX7e+Fa6VzhlO38bQfwo3gmgphnuCN7038QGvX7zlniaFPQah758KQk+m8f59PV
-	butO0o8P7nkGlBsXXu/1MOdzdd1JXN0mnY2UD5cAc3iSKTkm1O3uYUtXI/MZY/dp4mwKb3XSMfg
-	76njsWOqGqhLh6wzO7u7TfbFRUxYx7iDdUSiithstxEJmzFMa4bKy+4CP4zjIOa8Zr7xNtBsEbk
-	P+qSis+PukAo7Ms6NH1tYJjWV2xz6evpWC8beYB2gR6YZvo3o5nUafkuE1dLW/yWaMdsqAneztn
-	gka+4cbDPl+xntQD/24qsyjhQ583/kb0XijZEQIVtaPD/NROM68uXj6OFCCB2qJ2YM4mCabIzLX
-	X1WWuKnC3CUFxI88AGz80Fg3xDCnXdJ45tDa3fgFrbEreTfvUN1Gt0zEfbhkt8yFM2YokP82qKf
-	zJKg0h4UrW5O/y0e0aHKObpnhkm4Kb/Of18O1j1xTUSeDPdMlFRL9/qtJJM0mIEpT1fOdUYiz3G
-	qSdKaRSa5kxVYjPCJP5QNNBz89gJmkGI7/WcavS4+UMZk8T0JDQUG0Vn1SuSEac4+exVsiCC9/2
-	6CjD
-X-Google-Smtp-Source: AGHT+IG+ilWamkzHvJ5ey+yqNu8KjuQBJwMBYc9xY+8PsP8BHYX1pfI+Q03wqWCpLFd5cutwt/Qt7w==
-X-Received: by 2002:a05:7022:e07:b0:11f:3483:bbb0 with SMTP id a92af1059eb24-121f8ae75e8mr1053511c88.19.1767769092457;
-        Tue, 06 Jan 2026 22:58:12 -0800 (PST)
-Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-121f243421esm9145379c88.2.2026.01.06.22.58.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jan 2026 22:58:12 -0800 (PST)
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Subject: [PATCH net-next] net: usb: smsc95xx: use phy_do_ioctl_running function
-Date: Tue,  6 Jan 2026 22:57:49 -0800
-Message-ID: <20260107065749.21800-2-enelsonmoore@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260107065749.21800-1-enelsonmoore@gmail.com>
-References: <20260107065749.21800-1-enelsonmoore@gmail.com>
+	 MIME-Version:Content-Type; b=beWTy1z+JHE23yVOMUeCef0uL31k9A7WaXK4dhEo2joVSZ+Oxrv78u3qo2W1hjdLd11OUFbI546VhnVxVQrOOLtKotW8FgaN1dMgHQkcU71GLa3NbB85OtSqgzFAtofQBBba20CxY8slbdXrZ2V6xOmw1/HL8AnIEtivRfD3YQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qy4B+2QW; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1767769179;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6/UUn689YoV4jOLODHTjr2eRQnXX+WILjGReLI+8SkE=;
+	b=qy4B+2QWFvLMG+PY8oDqF4linJkP+zxFmWwrTdI/9UVote+4XCqTVC7ogcZepF2ilYC2f2
+	ZK1j6scDsoxx12vxwyuLQmiqgL1VZ36UpzyJ6t7s8kWZjVLvDSWczsSmWHkaMz2ubQ4h4y
+	0fq2cs4nNVQvErd3P/Xh1ljlyW8ToXM=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: ast@kernel.org, andrii@kernel.org,
+ Menglong Dong <menglong8.dong@gmail.com>
+Cc: daniel@iogearbox.net, martin.lau@linux.dev, eddyz87@gmail.com,
+ song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
+ kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
+ davem@davemloft.net, dsahern@kernel.org, tglx@linutronix.de,
+ mingo@redhat.com, jiang.biao@linux.dev, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next v7 00/11] bpf: fsession support
+Date: Wed, 07 Jan 2026 14:59:23 +0800
+Message-ID: <2815019.mvXUDI8C0e@7940hx>
+In-Reply-To: <20260107064352.291069-1-dongml2@chinatelecom.cn>
+References: <20260107064352.291069-1-dongml2@chinatelecom.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
+X-Migadu-Flow: FLOW_OUT
 
-The smsc95xx_ioctl function behaves identically to the
-phy_do_ioctl_running function. Remove it and use the
-phy_do_ioctl_running function directly instead.
+On 2026/1/7 14:43 Menglong Dong <menglong8.dong@gmail.com> write:
+> Hi, all.
+> 
+> No changes in this version, just a rebase to deal with conflicts.
 
-Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
----
- drivers/net/usb/smsc95xx.c | 10 +---------
- 1 file changed, 1 insertion(+), 9 deletions(-)
+Ah, this message is not correct. Pls see the change log part for
+the changes of this version, which is:
 
-diff --git a/drivers/net/usb/smsc95xx.c b/drivers/net/usb/smsc95xx.c
-index de733e0488bf..c65402d850c9 100644
---- a/drivers/net/usb/smsc95xx.c
-+++ b/drivers/net/usb/smsc95xx.c
-@@ -854,14 +854,6 @@ static const struct ethtool_ops smsc95xx_ethtool_ops = {
- 	.set_pauseparam	= smsc95xx_set_pauseparam,
- };
- 
--static int smsc95xx_ioctl(struct net_device *netdev, struct ifreq *rq, int cmd)
--{
--	if (!netif_running(netdev))
--		return -EINVAL;
--
--	return phy_mii_ioctl(netdev->phydev, rq, cmd);
--}
--
- static void smsc95xx_init_mac_address(struct usbnet *dev)
- {
- 	u8 addr[ETH_ALEN];
-@@ -1139,7 +1131,7 @@ static const struct net_device_ops smsc95xx_netdev_ops = {
- 	.ndo_get_stats64	= dev_get_tstats64,
- 	.ndo_set_mac_address 	= eth_mac_addr,
- 	.ndo_validate_addr	= eth_validate_addr,
--	.ndo_eth_ioctl		= smsc95xx_ioctl,
-+	.ndo_eth_ioctl		= phy_do_ioctl_running,
- 	.ndo_set_rx_mode	= smsc95xx_set_multicast,
- 	.ndo_set_features	= smsc95xx_set_features,
- };
--- 
-2.43.0
+Changes since v6:
+* change the prototype of bpf_session_cookie() and bpf_session_is_return(),
+  and reuse them instead of introduce new kfunc for fsession.
+
+> 
+> overall
+> -------
+> Sometimes, we need to hook both the entry and exit of a function with
+> TRACING. Therefore, we need define a FENTRY and a FEXIT for the target
+> function, which is not convenient.
+> 
+> Therefore, we add a tracing session support for TRACING. Generally
+> speaking, it's similar to kprobe session, which can hook both the entry
+> and exit of a function with a single BPF program.
+> 
+> We allow the usage of bpf_get_func_ret() to get the return value in the
+> fentry of the tracing session, as it will always get "0", which is safe
+> enough and is OK.
+> 
+> Session cookie is also supported with the kfunc bpf_session_cookie().
+> In order to limit the stack usage, we limit the maximum number of cookies
+> to 4.
+> 
+> kfunc design
+> ------------
+> In order to keep consistency with existing kfunc, we don't introduce new
+> kfunc for fsession. Instead, we reuse the existing kfunc
+> bpf_session_cookie() and bpf_session_is_return().
+> 
+> The prototype of bpf_session_cookie() and bpf_session_is_return() don't
+> satisfy our needs, so we change their prototype by adding the argument
+> "void *ctx" to them.
+> 
+> We introduce the function bpf_fsession_is_return() and
+> bpf_fsession_cookie(), and change the calling to bpf_session_cookie() and
+> bpf_session_is_return() to them in verifier for fsession.
+> 
+> architecture
+> ------------
+> The fsession stuff is arch related, so the -EOPNOTSUPP will be returned if
+> it is not supported yet by the arch. In this series, we only support
+> x86_64. And later, other arch will be implemented.
+> 
+> Changes since v6:
+> * change the prototype of bpf_session_cookie() and bpf_session_is_return(),
+>   and reuse them instead of introduce new kfunc for fsession.
+> 
+> Changes since v5:
+> * No changes in this version, just a rebase to deal with conflicts.
+> 
+> Changes since v4:
+> * use fsession terminology consistently in all patches
+> * 1st patch:
+>   - use more explicit way in __bpf_trampoline_link_prog()
+> * 4th patch:
+>   - remove "cookie_cnt" in struct bpf_trampoline
+> * 6th patch:
+>   - rename nr_regs to func_md
+>   - define cookie_off in a new line
+> * 7th patch:
+>   - remove the handling of BPF_TRACE_SESSION in legacy fallback path for
+>     BPF_RAW_TRACEPOINT_OPEN
+> 
+> Changes since v3:
+> * instead of adding a new hlist to progs_hlist in trampoline, add the bpf
+>   program to both the fentry hlist and the fexit hlist.
+> * introduce the 2nd patch to reuse the nr_args field in the stack to
+>   store all the information we need(except the session cookies).
+> * limit the maximum number of cookies to 4.
+> * remove the logic to skip fexit if the fentry return non-zero.
+> 
+> Changes since v2:
+> * squeeze some patches:
+>   - the 2 patches for the kfunc bpf_tracing_is_exit() and
+>     bpf_fsession_cookie() are merged into the second patch.
+>   - the testcases for fsession are also squeezed.
+> 
+> * fix the CI error by move the testcase for bpf_get_func_ip to
+>   fsession_test.c
+> 
+> Changes since v1:
+> * session cookie support.
+>   In this version, session cookie is implemented, and the kfunc
+>   bpf_fsession_cookie() is added.
+> 
+> * restructure the layout of the stack.
+>   In this version, the session stuff that stored in the stack is changed,
+>   and we locate them after the return value to not break
+>   bpf_get_func_ip().
+> 
+> * testcase enhancement.
+>   Some nits in the testcase that suggested by Jiri is fixed. Meanwhile,
+>   the testcase for get_func_ip and session cookie is added too.
+> 
+> Menglong Dong (11):
+>   bpf: add fsession support
+>   bpf: use last 8-bits for the nr_args in trampoline
+>   bpf: change prototype of bpf_session_{cookie,is_return}
+>   bpf: support fsession for bpf_session_is_return
+>   bpf: support fsession for bpf_session_cookie
+>   bpf,x86: introduce emit_st_r0_imm64() for trampoline
+>   bpf,x86: add fsession support for x86_64
+>   libbpf: add fsession support
+>   selftests/bpf: add testcases for fsession
+>   selftests/bpf: add testcases for fsession cookie
+>   selftests/bpf: test fsession mixed with fentry and fexit
+> 
+>  arch/x86/net/bpf_jit_comp.c                   |  48 ++++-
+>  include/linux/bpf.h                           |  40 ++++
+>  include/uapi/linux/bpf.h                      |   1 +
+>  kernel/bpf/btf.c                              |   2 +
+>  kernel/bpf/syscall.c                          |  18 +-
+>  kernel/bpf/trampoline.c                       |  53 ++++-
+>  kernel/bpf/verifier.c                         |  79 +++++--
+>  kernel/trace/bpf_trace.c                      |  50 +++--
+>  net/bpf/test_run.c                            |   1 +
+>  net/core/bpf_sk_storage.c                     |   1 +
+>  tools/bpf/bpftool/common.c                    |   1 +
+>  tools/include/uapi/linux/bpf.h                |   1 +
+>  tools/lib/bpf/bpf.c                           |   1 +
+>  tools/lib/bpf/libbpf.c                        |   3 +
+>  tools/testing/selftests/bpf/bpf_kfuncs.h      |   4 +-
+>  .../selftests/bpf/prog_tests/fsession_test.c  | 115 ++++++++++
+>  .../bpf/prog_tests/tracing_failure.c          |   2 +-
+>  .../selftests/bpf/progs/fsession_test.c       | 198 ++++++++++++++++++
+>  .../bpf/progs/kprobe_multi_session_cookie.c   |  12 +-
+>  .../bpf/progs/uprobe_multi_session.c          |   4 +-
+>  .../bpf/progs/uprobe_multi_session_cookie.c   |  12 +-
+>  .../progs/uprobe_multi_session_recursive.c    |   8 +-
+>  22 files changed, 583 insertions(+), 71 deletions(-)
+>  create mode 100644 tools/testing/selftests/bpf/prog_tests/fsession_test.c
+>  create mode 100644 tools/testing/selftests/bpf/progs/fsession_test.c
+> 
+> -- 
+> 2.52.0
+> 
+> 
+> 
+
+
+
 
 
