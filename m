@@ -1,222 +1,120 @@
-Return-Path: <netdev+bounces-247899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9C72D0057B
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 23:38:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F1EBD0063E
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 00:25:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A519D3008FA0
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 22:37:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 51F933013380
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 23:25:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71653296BB6;
-	Wed,  7 Jan 2026 22:37:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF19F2F39DE;
+	Wed,  7 Jan 2026 23:25:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LjPI3GVO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EOqKkyTv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
+Received: from mail-dl1-f42.google.com (mail-dl1-f42.google.com [74.125.82.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B827B29D293
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 22:37:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 491382EC0A6
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 23:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767825475; cv=none; b=c6OzmaTuWbAMzQlS7xNJlXK8+FsYQknaoowJTLNPE00NpAk77EP1navA56mb1tYxK+NN/AouViv+QOGrJOl4lkYER1UHV5L4d8ppenZwyKhW9CUchuSURYDaAwpVC2TmCiqXnoRWWwJgLMYuRAyoLX9KROJL3CK+/H8hIWg0IFc=
+	t=1767828347; cv=none; b=LCY8MDPzAv448RsvJCmVexsKfnU/VUXWiGfTB6O4PVV7rcVqLbcjYq27Gxhzb1g7O0Csx8woYrwgUzVkg4wePhSWnoN/6GGwR+1MW7YTpgGTIDOFDnKqLc2gYdMfCGSGzXim+DvtomBqJRmooAN5he5VzWwt2VBfLOHxosUySBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767825475; c=relaxed/simple;
-	bh=3sYY1Qc99ANJJ3YHG4zUW4xeZ/NUoAuHhB0LQiDLB+o=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=hvWH3vBw7XaY9FimtwWnq8+99xx1diqNmrdi9cqPSam3mMz+rFf2c95vhZrehhetIh7YheFFjNZAImYMoMef1uX/wDi6CFSPAO+ROSs9s/b8AF6hEomBOGM7knji6ZK5IoxuBfCYpG4zlpfH1rieSTQ9908xaTJ/sJVh+nliaQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LjPI3GVO; arc=none smtp.client-ip=74.125.224.46
+	s=arc-20240116; t=1767828347; c=relaxed/simple;
+	bh=xte6Op8c+gje52GWKjY1PXBRWaV8I69pg+nSgTFrkos=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fdbaypGnYpCw3BRN8vOZqR8LMqp9QNdq1EmEgf4OltYnrxtTmhsRt4uhE83zmsOBOXeEvERmlmq4r9uLAiamrXC5rMyZDqviSuDkAqXCsoyfn4TpgEibTkFfFqZJNE0CL8X1zhLSdndY/CmQ7jCZfP3ogpvRp6vE+4iEshXVaUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EOqKkyTv; arc=none smtp.client-ip=74.125.82.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-64661975669so2758874d50.3
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 14:37:53 -0800 (PST)
+Received: by mail-dl1-f42.google.com with SMTP id a92af1059eb24-11f36012fb2so2865059c88.1
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 15:25:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767825473; x=1768430273; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rRBooldm41LgTFya8OY2OmgrhoB+H6pwWMX8YIfPpgc=;
-        b=LjPI3GVORmk8ypUUIx1xghnyZ6IJ2/7mUaCAYX9Af/FRijV8SUeHjAPNDCdii7hO7e
-         jZEVr6THrNb0xvwfqqUzEtcsD+9jjmJdAv51JSUq3SreGb9py66hCQEUmdSbnGk6a5gF
-         z/dxvkicbOHecx4MkYWFtpmeUfH4wDQJwPKCihDBMOtNLJsGG2bV56etNXQ5Wp9xNL+M
-         kzulICo+BhrRxnS60KjSivHOSspCEvC6beYehJN5jFbhKSQtquy2rEuETF5OzfFNl4N3
-         1DDs/SsWZwpSt647u5/2cBfua+vPYvT//kk3xeOJDeGrkzc0RLe66zRWN26DFVuzsG0e
-         eC2A==
+        d=gmail.com; s=20230601; t=1767828345; x=1768433145; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9aNw+LAmFxfJKjKyNuMyCvNOGzb5sDFR8RwzmkvIj88=;
+        b=EOqKkyTv+oWs+fnOm3pDJLCll7z+9dixDjAAQclx7mZJgFFQxyO6EAB3fRH5haVak4
+         XV6+lm9NHlQ/PJJQvTZ9GZ4oWi33zixR0ZZXBd9OT6jzKkeQHJeyXxlYApTRkXfiqCP8
+         C0o2qUa1m+HU48gkTwzzYf0HcfxrvqDDERQ8WCgUXqfm5MU4aL8DCoLX3hG4PKqvfjDz
+         PBk4GSpPtZyoy3mtaV9/ib2PYCMXr3hUKb0bv5i565p/Og8Jw7UIvMUDUCNQS/69Le6y
+         HZDe/ybAude53J4TMbAibRUTtiNwiWQCWOYg6c04rRX7D0yl/LS2Wbd6Q6CL4C1CNLFM
+         5jVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767825473; x=1768430273;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rRBooldm41LgTFya8OY2OmgrhoB+H6pwWMX8YIfPpgc=;
-        b=WYcywufbnxLEA4YPwTfxilQM4hb1NAcUCjg9+IJMDYE8HaZKgodlS3Y4E7HQTeJjfV
-         3czjC5ve9nP+woNdc30QyYjojSKjxbU+dAXtjWVnpca4QnTSFNKgyUYDz9+O7Wqzz9ea
-         eVcAs/BRmLIQKFNK4eFAaQ4xWRbsjIR3JNz1hoPZQOTz4Qa7cMsL1AR94rc3BpdpvhfV
-         28WZ7Y9/lEXeh6kU+taTtTx81ORG/M7OdUiVtD4nMNEGjzTLpbTYgg4GefjTkS7r1cAs
-         k/NA5sCF09D5k+fcJslXAV3TkiLePUh0Vcuvo3wzbilxZy2GJ4bTlNCFDfoRFwfBMZi7
-         Ht0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVHrKCVDCPcMb8ynWykLevUEuw88UGhAWSYpZ2QsKsvooN7Aaxq6dz/RfzMS/glLvyPk824NV8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7zsiEqb3z6tnbRMu+dBCrEWWBX7D1SXcE95zuWDGpcpb3xwpi
-	UDUgWij8CrYZ+5HGdZQx7DpLbJooF70nXmV5LR76ST5Ksm44RgbpGkM9
-X-Gm-Gg: AY/fxX4ZcfJVfY8HuWEJyP+fM/N8WM72ayh2Su840objyQY7DMjouvdvWwAGI0e3Ghr
-	miV6FqmlnM2TvDGwhZuHjX0WI2UNymudCMvsg7bbCWswJhnPTiPjXp4vP0oD68SZh/WORl4Qxat
-	G05F78ofMTw7FPVTS9X3xV809sSTUYY32R2enRM8w+VnQH0ejxlqlyEcm+gSYQNHzbWQjcDZ+c2
-	42lr6VMiKrN490qOUhqRDUUAizYs2z8WiMOgF7Bybms7bTW1qtOo6u6E1qwpD0zOEzPr2snuNz/
-	uVypJN1zIY3Ao8vavJaZ4ykfmCV5P758d7Z3LgA+WhzISdM4/fuo2IHJShr2JGF0vWrJjUBZ/jX
-	gV8R4erEu6u2DUMQvedtDkL/tgh+SCszr/iS1c3GsY+jd2sq7BtFPWlwHDW+OpLdKq5z+KXhomY
-	Vg9S33TtD7sbIVwlQXxcFg8w4tJ3kLWgx5GF4hmw+VARK+xj/Qafd9bbbEvV6O7scCBuyKJw==
-X-Google-Smtp-Source: AGHT+IF/8f9U9sqa7mM9SBQb1x2OJFmJf1sey+yIn+cZklw5qMjQJkjZ/u8ty8LccSyX86FFECR19A==
-X-Received: by 2002:a05:690e:1481:b0:645:556b:62a4 with SMTP id 956f58d0204a3-64716b5fd1cmr3379646d50.7.1767825472692;
-        Wed, 07 Jan 2026 14:37:52 -0800 (PST)
-Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-6470d8b241csm2582233d50.19.2026.01.07.14.37.51
+        d=1e100.net; s=20230601; t=1767828345; x=1768433145;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9aNw+LAmFxfJKjKyNuMyCvNOGzb5sDFR8RwzmkvIj88=;
+        b=k8kIazCI5HLkNpKYwV5zodECtBwxZKwF/rhDadmn/764pS7J/UgCAkalxSMeS5MPUZ
+         rWkFonXj4Q7PxXME72Y3WL0tOCeX3OzafAdZD8/1QOmoNmmkjskVPbc+ACOkp75YnpxW
+         xEUWAIjMkEz4ojmwLDElFGU/GaQ8PiTpvfD616U46JVOIFC3fxbN2ljttTmJW2bLgcA1
+         0IzMRGEYhLmTP92AgNwCfRCA7TK3ausR7O2pK3aFuPYZ3LjubP2MJFp4pmwChfHK4EgB
+         UchdDoX5VlpBVxb3QjCsbjuXGdiUhAWyutauh8eE3mpWgl/rwSedZoZOf7qjtw3JHDGy
+         fEwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUdgNYy+/3YjP4rRy0qOkmYayxteQjR+SLUQkz0gBvHAYDqHS+UhWbT8gvpzRQYbeExAqbmQj8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3I3SuSyUtNnabYDFtN6fswr9xZbRyffsZFPhk60IowJWItFPg
+	cSEag/pUyTFBqPVHVHZe1N8ScpSH3Swsponx9uTngL02q1E1PwyTMfCEqIG0sg==
+X-Gm-Gg: AY/fxX5gIE/iQUArvm9gq/IEUKv2zeCzToVP49STP5CvmFhyr+mHGCo+edQjeLmEUfv
+	lHqE8MO0g1Rk8zjw6ZXeR7lyMF5nc6q5aSGKzt9nxWbbYqDPF2NiXiXViiZDryEknx/VpqD4+8H
+	3Iy5KTTQs8+Nsu2zj4lyHVVNwQG/fO+sAFMpdkqQEEqW/pu6I6wc5S7wlH5n24pezp1KslMPrKJ
+	S1pPxxg0qMHrNWIlv3xgnYz++fPnp6JdGYf3K6WeUKLDNDaxWqk+8fZVx6jFqMoCPOluVqqZFbD
+	BfKe7Ua5a3dZPJ2gyce/LWq8uT+MH9zYk9iKJNIGGgFt/R7dLK9gLWnzVMDfFSytgDquadyULje
+	Evyi8mdjtaLX7Pnlz3Xy8cuPbGeXsMGGmS0DerLSolTER5evgCGuh41AHJ7tpRPP8lk3eFbwfOE
+	8R68ahCbgiKWYET2dIPQ==
+X-Google-Smtp-Source: AGHT+IG6/0LQJZ7aHjdnPJMlyL+x4aeRNV4gig/cDxiQgr/D8kMIOPK7cq0vOqYTJM9ACcNBNR1hJg==
+X-Received: by 2002:a05:7022:6b87:b0:119:e56b:91d1 with SMTP id a92af1059eb24-121f8ac007dmr2684640c88.2.1767828345111;
+        Wed, 07 Jan 2026 15:25:45 -0800 (PST)
+Received: from localhost ([2601:647:6802:dbc0:36c8:e8eb:df03:2fdc])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-121f243f6c7sm8977314c88.7.2026.01.07.15.25.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 14:37:51 -0800 (PST)
-Date: Wed, 07 Jan 2026 17:37:51 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Mahdi Faramarzpour <mahdifrmx@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
- netdev@vger.kernel.org, 
- davem@davemloft.net, 
- dsahern@kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- horms@kernel.org
-Message-ID: <willemdebruijn.kernel.22b9558f6c8d6@gmail.com>
-In-Reply-To: <CA+KdSGOW0+V9KTA6CebvJ5dSqBxCV5XFAJshJByQ36=GWX6yiQ@mail.gmail.com>
-References: <20260105114732.140719-1-mahdifrmx@gmail.com>
- <20260105175406.3bd4f862@kernel.org>
- <CA+KdSGN4uLo3kp1kN0TPCUt-Ak59k_Hr0w3tNtE106ybUFi2-Q@mail.gmail.com>
- <willemdebruijn.kernel.36ecbd32a1f0d@gmail.com>
- <CA+KdSGOzzb=vMWh6UG-OFSQgEapS4Ckwf5K8hwYy8hz4N9RVMg@mail.gmail.com>
- <willemdebruijn.kernel.21c4d3b7b8f9d@gmail.com>
- <CA+KdSGOW0+V9KTA6CebvJ5dSqBxCV5XFAJshJByQ36=GWX6yiQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] udp: add drop count for packets in
- udp_prod_queue
+        Wed, 07 Jan 2026 15:25:44 -0800 (PST)
+Date: Wed, 7 Jan 2026 15:25:43 -0800
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com, Neal Cardwell <ncardwell@google.com>
+Subject: Re: [PATCH net] net: add net.core.qdisc_max_burst
+Message-ID: <aV7rd0dNS2NBX5b+@pop-os.localdomain>
+References: <20260107104159.3669285-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260107104159.3669285-1-edumazet@google.com>
 
-Mahdi Faramarzpour wrote:
-> On Wed, Jan 7, 2026 at 6:39=E2=80=AFPM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Mahdi Faramarzpour wrote:
-> > > On Tue, Jan 6, 2026 at 10:52=E2=80=AFPM Willem de Bruijn
-> > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > >
-> > > > Mahdi Faramarzpour wrote:
-> > > > > On Tue, Jan 6, 2026 at 5:24=E2=80=AFAM Jakub Kicinski <kuba@ker=
-nel.org> wrote:
-> > > > > >
-> > > > > > On Mon,  5 Jan 2026 15:17:32 +0330 Mahdi Faramarzpour wrote:
-> > > > > > > This commit adds SNMP drop count increment for the packets =
-in
-> > > > > > > per NUMA queues which were introduced in commit b650bf0977d=
-3
-> > > > > > > ("udp: remove busylock and add per NUMA queues").
-> > > >
-> > > > Can you give some rationale why the existing counters are insuffi=
-cient
-> > > > and why you chose to change then number of counters you suggest
-> > > > between revisions of your patch?
-> > > >
-> > > The difference between revisions is due to me realizing that the on=
-ly error the
-> > > udp_rmem_schedule returns is ENOBUFS, which is mapped to UDP_MIB_ME=
-MERRORS
-> > > (refer to function __udp_queue_rcv_skb), and thus UDP_MIB_RCVBUFERR=
-ORS
-> > > need not increase.
-> >
-> > I see. Please make such a note in the revision changelog. See also
-> >
-> > https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html=
-#changes-requested
-> >
-> Ok.
-> =
+On Wed, Jan 07, 2026 at 10:41:59AM +0000, Eric Dumazet wrote:
+> In blamed commit, I added a check against the temporary queue
+> built in __dev_xmit_skb(). Idea was to drop packets early,
+> before any spinlock was acquired.
+> 
+> if (unlikely(defer_count > READ_ONCE(q->limit))) {
+> 	kfree_skb_reason(skb, SKB_DROP_REASON_QDISC_DROP);
+> 	return NET_XMIT_DROP;
+> }
+> 
+> It turned out that HTB Qdisc has a zero q->limit.
+> HTB limits packets on a per-class basis.
+> Some of our tests became flaky.
 
-> > > > This code adds some cost to the hot path. The blamed commit added=
+Hm, if q->limit is the problem here, why not introduce a new Qdisc
+option for this?
 
-> > > > drop counters, most likely weighing the value of counters against=
+> 
+> Add a new sysctl : net.core.qdisc_max_burst to control
+> how many packets can be stored in the temporary lockless queue.
 
-> > > > their cost. I don't immediately see reason to revisit that.
-> > > >
-> > > AFAIU the drop_counter is per socket, while the counters added in t=
-his
-> > > patch correspond
-> > > to /proc/net/{snmp,snmp6} pseudofiles. This patch implements the to=
-do
-> > > comment added in
-> > > the blamed commit.
-> >
-> > Ah indeed.
-> >
-> > The entire logic can be inside the unlikely(to_drop) branch right?
-> > No need to initialize the counters in the hot path, or do the
-> > skb->protocol earlier?
-> >
-> Right.
-> =
+This becomes global instead of per-Qdisc. If this is intended, you might
+want to document it explicitly in the documentation.
 
-> > The previous busylock approach could also drop packets at this stage
-> > (goto uncharge_drop), and the skb is also dropped if exceeding rcvbuf=
-.
-> > Neither of those conditions update SNMP stats. I'd like to understand=
-
-> > what makes this case different.
-> >
-> The difference comes from the intermediate udp_prod_queue which contain=
-s
-> packets from calls to __udp_enqueue_schedule_skb that reached this bran=
-ch:
-> =
-
->     if (!llist_add(&skb->ll_node, &udp_prod_queue->ll_root))
->         return 0;
-> =
-
-> these packets might be dropped in batch later by the call that reaches =
-the
-> unlikely(to_drop) branch, and thus SNMP stats must increase. Note that =
-such
-> packets are only dropped due to the ENOBUFS returned from udp_rmem_sche=
-dule.
-
-Understood.
-
-The difference with the other drops is that those are on the skb that
-is being passed to __udp_enqueue_schedule_skb, and are accounted to
-the SNMP stats in the caller when __udp_enqueue_schedule_skb returns
-with an error.
-
-The skbs queued here cannot be accounted that way, so require
-additional separate SNMP adds.
-
-> > > > > >
-> > > > > > You must not submit more than one version of a patch within a=
- 24h
-> > > > > > period.
-> > > > > Hi Jakub and sorry for the noise, didn't know that. Is there an=
-y way to check
-> > > > > my patch against all patchwork checks ,specially the AI-reviewe=
-r
-> > > > > before submitting it?
-> > > >
-> > > > See https://www.kernel.org/doc/html/latest/process/maintainer-net=
-dev.html
-> > > >
-> > > thanks.
-> >
-> >
-
-
+Regards,
+Cong
 
