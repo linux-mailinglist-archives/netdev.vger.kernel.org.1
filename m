@@ -1,121 +1,110 @@
-Return-Path: <netdev+bounces-247641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E74AFCFCB3C
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 10:00:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FB14CFCB5B
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 10:02:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C9F99301595C
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 09:00:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3626430550FA
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 09:01:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B553B2EFDBB;
-	Wed,  7 Jan 2026 09:00:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29DC42F60A7;
+	Wed,  7 Jan 2026 09:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="E+abYr6c"
+	dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b="AGBV2z37"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mta-65-227.siemens.flowmailer.net (mta-65-227.siemens.flowmailer.net [185.136.65.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FA962EFD91
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 09:00:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC2D2F4A14
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 09:01:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767776413; cv=none; b=ps98jZ50EnW0a0rTEx3KAFQ9hAIqJcy10n1sN9OgqcF3y2KVKi4DOcgMIXTwGxTW1/oeSgsVAc+xqMwHYDfHCwdE6W25e6UmCF+39G/G/ZDmHuAFThGy8yl+FEt2mzCbIF+I4sGL4q8zYxjvJoWkX1P0kPhBDoWKMQrt4ktZGww=
+	t=1767776480; cv=none; b=K9KPCQOdXZyN/GARzhrG0quxqbWAMSLAmv3ganvqzhpd/ZZFofq6DTDze0HubVR2oHXdPmuvEs6extz5PWrTG9Jikjc1oG3XN6NdBkIvJ+WBn6HibeccbAvbMMaQlrl0cMSugWtcX2RxtX5qUdwkC1urG+QOvGDykmqSeeHrKPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767776413; c=relaxed/simple;
-	bh=sCCKbuk7YySNPrAfx7Wit6Unf7q4zglc26Z3x5eiZSY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C++nuSs97kBBVdGRfLjhOEOJw22PilHu+V87w7arSEH8WvlnGU7/RZ0fdRXxQnCDMIVqdIgZehekXeX6XSljHipbOF/Xa4EBmah5lGJgRbfRJkpEzKUJFGL/tmTpETDxehioKvnkqc659YyVqLsIIyfUr5obqHFZzsXYfNaDkME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=E+abYr6c; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-47d3ffa5f33so8653525e9.2
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 01:00:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1767776409; x=1768381209; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1adH5GFfbTcDA1IlM7DzqcktsNMYGE1xewRyGNUxKI0=;
-        b=E+abYr6chgK0pz9hJE3wo2vMtJ5/xsK59euDpyCKTJHt1BZcGGI6rfl7y7FQlOeWMk
-         DyPcuIVhgDGNYEKuKVOtTPPmeLYbJscpA2BTou2050DwGcpLF873FOZQ30okKQlGoYR/
-         9c8pHyCAA1Z36rZwMIQ6ak1PsPLhdcUZkr8q1wDIkLYD2LsbZgAUvHtkvCoBQLODRlmI
-         KswPp8xd+dg+HGUTAj5KobCNcBPo+KYo85S/vdMG2p9CjU0xGBBcUEY1lLwQHeIbxG89
-         IJGclSSG0prQCUmtYcutdYOA/m9cRavQS42hIJNax6BHTSWRFMzY4ZUQlfvZSFfz8Zbl
-         fzRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767776409; x=1768381209;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1adH5GFfbTcDA1IlM7DzqcktsNMYGE1xewRyGNUxKI0=;
-        b=FCcPH9zM2dh3J9UWX+6pU+7QTk7kycculeto1D9lTpXhGYEp9opnuSOGEqa2IDDEU5
-         iND5i9pMTOTTKnPQOUGM9Vr+tCxpv1xNxc+EkZ0kGZqThnbfN351Hm6VxmH8PId/adtz
-         lTb7R/knWJYC2ZjwrLUP7cvNHUz/n3C21d+Jscdt3LbWGUI+Ok2mtoF7PD8bX3z8E0Au
-         9h3COSlHFf3RZ7DgSJZyyb94e+TOFS8sHCUqep2YGWcO2GIWdaOb24zyQBOT6Ce0lg/4
-         bXRunH8ETgJ7xk4srz2sJUB2M35QSlpIFyDSznRA655qk23FJmP/5fWeCz6c9rLYkTu1
-         99HA==
-X-Forwarded-Encrypted: i=1; AJvYcCWzNQmdu1Sv21s/h9dTuiC/dRkeqzimnmzBshmVo6TaMGgMWu8QZbPgDz3UF3h2ce0k35Is9no=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtHEu+840N4adLADOc56m9M1640HPkwsTtTI7bIB9EJzPbssMC
-	JeD/ayfeEqC2qsfJHrC9Wuu62w/5wsxyEk66mWPSAZtWZ9rxq4s3n+8iLCVrd2hCMP8=
-X-Gm-Gg: AY/fxX5xMJLlXIqEgKaCfApEXs/fQ5dtsit9X1do47fkuZay72jRlDdSx+PFeGhscMQ
-	JEEn1mGwzoGlQ5kQRZOhRlaoXUc/9ja27V3cPe+h0NXat5jXFeD+DQjD5gvVERlYRQJsKTJ73Qr
-	EINqMHAb+1DAoQWQIZ1L1iMbSbJw7g3jzmHLtu108TfR/ZmzNlfcQ5MpGxBqgjHU3oems1yP43l
-	uPUActfuqlhorU2c+lQ/GxeR7L4Sy2X1EKslVF42KZVkBuRgkbIo6kB0P1qFmdqZEkTx3MrPqF+
-	b2Ud5bxfM2JsGASJhIH75e88oWO5n4CbcpIcVAP8yG3EIJ9NpSpu6er+94Dvzd3T6KAl7tfSWz+
-	XK9k8TUapr70erMZ5fbhqZCJd33lyw03U3QijBPSYzU/dW/ZkGGT0yblKL4L8tHl1WFUHjv1IEw
-	rHqDxqQzFbtXZRfBmRHUp6bAYrDNTvw9K+46KELrpDBX3DJ3txvYJZnFY5LDMEClsLPD6YbXUSe
-	Og063LM
-X-Google-Smtp-Source: AGHT+IFWhSNgmVk+6HHKRdOSdipnHsEqXnmQkobGqaQcY2yH5rav/ISt5Lb5pCzRNv8s42WPABAMew==
-X-Received: by 2002:a05:600c:6815:b0:471:1716:11c4 with SMTP id 5b1f17b1804b1-47d84b61379mr19011795e9.34.1767776409131;
-        Wed, 07 Jan 2026 01:00:09 -0800 (PST)
-Received: from [192.168.0.161] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f7053f5sm84386825e9.14.2026.01.07.01.00.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Jan 2026 01:00:08 -0800 (PST)
-Message-ID: <40b42159-d7d7-44a4-9312-24cf87fd532b@blackwall.org>
-Date: Wed, 7 Jan 2026 11:00:07 +0200
+	s=arc-20240116; t=1767776480; c=relaxed/simple;
+	bh=h6ApTiTwg8L2Zs+CiXLe7baU1ubSbYWGTo+W6va/b2g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ka5g91TAaGohlktoWrY32eSkTdzXGyv4zgAQaBQ8VrtjFe+lODPx7xMmCoETDGPSAC0FjuISE0PfWNGaCf1652VxFR9c0zL3r0Xn6wq0lvlPmyCnc16AGn50c70lmZDfFpQuARW+I0aNdxug8HOnxAd9wtfBBDxlFnorPO2nfHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=AGBV2z37; arc=none smtp.client-ip=185.136.65.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
+Received: by mta-65-227.siemens.flowmailer.net with ESMTPSA id 202601070900212fa5d14699000207c9
+        for <netdev@vger.kernel.org>;
+        Wed, 07 Jan 2026 10:01:08 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
+ d=siemens.com; i=alexander.sverdlin@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
+ bh=YsJcn0UDZbMXRVIrX9SQ3/eX+cIo25sjoGMxd4LNHzM=;
+ b=AGBV2z37dDzOpdAzk4G2E1vSXTT/OhKbMnEm3UWJnSsEIU15zVFOZ3AhyBL7C5WAMwWt6l
+ hAZ/WO4ORbNXOVxRH6iQhMw27ls7q0Chovg4S6Sq5oMYTKF2ufNJjgrxjafp5N8QcFlaDxY9
+ Y4qExsBLv2bTPOjFBBmkhZjWE4FruOXPgH3febX30gQ5wfqwww9L8gMzRDk6O5647vs7h2xw
+ HiG7uR2p2ifeahQYt+kh8pFGjVURbDTBJMOpCC0DEQAy6yTcuqZSnyh48FjyApP6KHfmT9FS
+ 3uIiW/j+fI4kjVy3uuL9KOb51yCajnadk93h3NKfGVfMXG5PuE3iXRAg==;
+From: "A. Sverdlin" <alexander.sverdlin@siemens.com>
+To: netdev@vger.kernel.org
+Cc: Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Hauke Mehrtens <hauke@hauke-m.de>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Daniel Golle <daniel@makrotopia.org>
+Subject: [PATCH net-next v4 0/2] dsa: mxl-gsw1xx: Support R(G)MII slew rate configuration
+Date: Wed,  7 Jan 2026 10:00:15 +0100
+Message-ID: <20260107090019.2257867-1-alexander.sverdlin@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net] net: bridge: annotate data-races around
- fdb->{updated,used}
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com, Ido Schimmel <idosch@nvidia.com>
-References: <20260107083219.3219130-1-edumazet@google.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20260107083219.3219130-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-456497:519-21489:flowmailer
 
-On 07/01/2026 10:32, Eric Dumazet wrote:
-> fdb->updated and fdb->used are read and written locklessly.
-> 
-> Add READ_ONCE()/WRITE_ONCE() annotations.
-> 
-> Fixes: 31cbc39b6344 ("net: bridge: add option to allow activity notifications for any fdb entries")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Nikolay Aleksandrov <razor@blackwall.org>
-> ---
-> v2: annotate all problematic fdb->updated and fdb->used reads/writes.
-> v1: https://lore.kernel.org/netdev/CANn89iL8-e_jphcg49eX=zdWrOeuA-AJDL0qhsTrApA4YnOFEg@mail.gmail.com/T/#mf99b76469697813939abe745f42ace3e201ef6f4
-> 
->   net/bridge/br_fdb.c | 28 ++++++++++++++++------------
->   1 file changed, 16 insertions(+), 12 deletions(-)
-> 
+From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
 
-+CC Ido
+Maxlinear GSW1xx switches offer slew rate configuration bits for R(G)MII
+interface. The default state of the configuration bits is "normal", while
+"slow" can be used to reduce the radiated emissions. Add the support for
+the latter option into the driver as well as the new DT bindings.
 
-Oh you took care of ->used as well, even better. Thanks!
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+Changelog:
+v4:
+- separate properties for TXD and TXC pads
+v3:
+- use [pinctrl] standard "slew-rate" property as suggested by Rob
+  https://lore.kernel.org/all/20251219204324.GA3881969-robh@kernel.org/
+- better sorted struct gswip_hw_info initialisers as suggested by Daniel
+- https://lore.kernel.org/all/20260105175320.2141753-1-alexander.sverdlin@siemens.com/
+v2:
+- do not hijack gsw1xx_phylink_mac_select_pcs() for configuring the port,
+  introduce struct gswip_hw_info::port_setup callback
+- actively configure "normal" slew rate (if the new DT property is missing)
+- properly use regmap_set_bits() (v1 had reg and value mixed up)
+- https://lore.kernel.org/all/20251216121705.65156-1-alexander.sverdlin@siemens.com/
+v1:
+- https://lore.kernel.org/all/20251212204557.2082890-1-alexander.sverdlin@siemens.com/
+
+Alexander Sverdlin (2):
+  dt-bindings: net: dsa: lantiq,gswip: add MaxLinear R(G)MII slew rate
+  net: dsa: mxl-gsw1xx: Support R(G)MII slew rate configuration
+
+ .../bindings/net/dsa/lantiq,gswip.yaml        | 14 +++++++
+ drivers/net/dsa/lantiq/lantiq_gswip.h         |  1 +
+ drivers/net/dsa/lantiq/lantiq_gswip_common.c  |  6 +++
+ drivers/net/dsa/lantiq/mxl-gsw1xx.c           | 40 +++++++++++++++++++
+ drivers/net/dsa/lantiq/mxl-gsw1xx.h           |  2 +
+ 5 files changed, 63 insertions(+)
+
+-- 
+2.52.0
 
 
