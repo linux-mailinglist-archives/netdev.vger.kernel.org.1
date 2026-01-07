@@ -1,155 +1,180 @@
-Return-Path: <netdev+bounces-247807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16D0DCFEADF
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 16:50:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A1097CFEB0F
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 16:51:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 94D13305574A
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 15:44:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6E8DB3053395
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 15:44:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF5F538B9B1;
-	Wed,  7 Jan 2026 15:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GYK6Iwmc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3936337F741;
+	Wed,  7 Jan 2026 15:44:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+Received: from mail-oi1-f208.google.com (mail-oi1-f208.google.com [209.85.167.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4048A38B9A6
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 15:44:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1ED37F73E
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 15:44:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767800643; cv=none; b=i7+ZoorAyT+gQ6+0yVFshfqy04goPi1y27CdIEyqJ6kdRBxtokQ+Nh48BvawvVE/t+IuyjBGsUKwOfIpQL7r1IuLCwnntGqokOYlBDIYngXEQPwjFsbwJ5ad6kocU3FiIPB4hTkKuWAXVh8Q5bevylmLPmK+1/cX0f8WJ2M1ksI=
+	t=1767800666; cv=none; b=GZ9tgLvS0YbmfBYXtlAFgfmAfCV1vTTVxGwtWESMdxfEDLJdzF9dX2TRUHFIgNICpzjAlpKkC3ylGkmg/CmBfUvdVtjfbTlM5lterEICLAWku7vHg/0SeH0X0RIwqtR9l6bY6OFSOkRZgZJJ9BUpxjirH0pTa/JcPbK4uu4CVw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767800643; c=relaxed/simple;
-	bh=Sa9ZWzE29qrQrBl4qGZ0Nd3XS5vjlGNg1hHVfusfLs8=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=o/PXZI5/g5PHradBeJcbKaODS/GEgDN1S99JetZ3ioDR/M3VbwS/VNBaylHqe4pUi8Xlc3/i3TQeWr/l0L2jRXpRN3YDVRq7iGCXElUkACRZjtSr6erA/8LkOS2k5ogndrManB0V+s4cv29Cmc6mi4Ac2lWn5bTyN/I5NtSKGR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GYK6Iwmc; arc=none smtp.client-ip=209.85.128.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-78fcb465733so24625547b3.3
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 07:44:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767800641; x=1768405441; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i8f04eHjfvnkHYorhM7bm3sfteEWTpTlDP3O4cfOEtM=;
-        b=GYK6IwmcojGLrztPFveLuzWlGrMp6NGim1Vg9jN10zpn4RHToNAv0cFK7z1Ecr08Za
-         AfTpOn5HXIl5A5D8J3H/3JOC1R5MulBsNizKuEdu2we1Z2zQPsIQY3YuWtJ45edOBkI6
-         CR9WBzd8ebWNyi8TCmf0+0bDE9NFGFGI1x91xYYOsmFIrG8Ua1xfGee9kKZvlhh+wP3f
-         lD9L/aI5eFxc+Zg5Dgx3iGj3gURyLO091qDAruyp5smOg+OS6FnJg41c2SboY8AEv1ax
-         02kl7BIwWgtMmmn/A+YJPZKroW4da3P/r/z5NfQozaulTT5oW8r5jID6w44TWexhrn5W
-         bjWQ==
+	s=arc-20240116; t=1767800666; c=relaxed/simple;
+	bh=WO1564Ykb41trgvyAO2JS4X1tQNn2QdoLHhJ1Csvrao=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=fHDwQoDha4XiXe7P9/AKNmFe3nU+08Rnr98pkju7KCjH9XWd/QEtGK2lbTEL6V/v1WIWVMi3H0leVb8wuXorrq4U7vr/8g3bCHjLYCvGmm9EK/ivp1TbDNUkxd+YtIyFs0vKvVy+tHrYhehVz0PCZ1aHQ/ednIW15aDVQdEEK+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f208.google.com with SMTP id 5614622812f47-459bcc4d8bcso2777835b6e.1
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 07:44:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767800641; x=1768405441;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+        d=1e100.net; s=20230601; t=1767800662; x=1768405462;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=i8f04eHjfvnkHYorhM7bm3sfteEWTpTlDP3O4cfOEtM=;
-        b=l6iCDsJ8CsCxhqpfzFQutKDpymnT3TAAfTxSH8ysSJoGxbW3tJHBbBRu/OaBUSb7Gq
-         DNflqmMmlG/tA0YjemcaVd91EPXI92k+3cmVYt/mLYGqtuA9tnAuKOIowKeH+84QGSTJ
-         EPsJV/6J83ljB+guhsJx5DOGr9cMS2GYlBK1vzw9hwD3+zDUFAVEjqDzsebwmuKcLXqm
-         eR4hsVeVsrw1RTh0hKHvs64pztBsz+nIU0YrcC3hUJdDWXneYnTQmcA2y4rMsZvTzo7u
-         O9i4m5eiazwNJCCp8aaJE9MBfRUGpfj294AsJR1atE04Hqj48+Tu2oW5M5IoZfz1eC8A
-         c6mg==
-X-Forwarded-Encrypted: i=1; AJvYcCUqECPBiGGv6qu/BS5l2pDZyIeOjKcWrGJzfm7oF4qCRBUIVG4bVX1gZzSMMwbc+JxHYx1+XV0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzr1V5Joj+oisF1GJMfdF7cFh0qtZuGCyUOTDwmHTRG3+O1KFNP
-	9vCKoH9ySAI2fdT9R1q7VRclGQ5+yIDRJ3eWxS2ZVrw9Hq41I8w8ASR43pdEDQ==
-X-Gm-Gg: AY/fxX6QVb7slbDECm+PNGEmAvqD1vKqFvr6hK2+QFOk+S6N7C7s0jBI4G0fGLqfqPR
-	ww3t8tCbcDVgicp8WsXjtMfLUfBUFope2BGwvj/Dlup9A3Icku/AMhBuC3molJMrOfKNrzc/ZA2
-	oAKPeC+Lsi8M9Vl2gFY9HnaIQg/mSYTpc1RoP/W3KKW6PsJMOlvHxy4uujptIaw/RNHfLZklHbD
-	l7INbi/qMEziGnvNs4PAE3g4+M0TvbgN9IAt48f9u8LgFGK3CFCXPGulPcMjDPMk7FXojcn3xb7
-	Y+y+bnT2fKRao3Kmb2jlt6OAAsGc6u0zSJVJfm/VwkUYQbGwAFdK5OAb0/n650HjsLiDblnAnlS
-	qWzHu22p4jYx54vIvgr9OSnlJ497UAeo9TUIjFL9FWZWawjkVBtQvNiBBLDxkh66PRpWFm6Tqdj
-	vsoA8Rg1D79o1R4yLCIe4O62grxPJ/Jhf5VUYy1yvn0Ghy4xtifKpCVYnl7Dk=
-X-Google-Smtp-Source: AGHT+IEFFSiNXKDV1HnAD3Zg/sQPsGaeIN8FIPZnBaaRsTUeL+P2OUb/fto4XbVbM+NqywPmBogltg==
-X-Received: by 2002:a05:690e:1202:b0:644:ca2b:b659 with SMTP id 956f58d0204a3-64716c89b6bmr2570788d50.64.1767800641000;
-        Wed, 07 Jan 2026 07:44:01 -0800 (PST)
-Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-790aa670b21sm19793267b3.33.2026.01.07.07.44.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 07:44:00 -0800 (PST)
-Date: Wed, 07 Jan 2026 10:44:00 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Kshitiz Bartariya <kshitiz.bartariya@zohomail.in>, 
- netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Kshitiz Bartariya <kshitiz.bartariya@zohomail.in>, 
- mahdifrmx@gmail.com
-Message-ID: <willemdebruijn.kernel.368719d33bc5@gmail.com>
-In-Reply-To: <20260107141541.1985-1-kshitiz.bartariya@zohomail.in>
-References: <20260107141541.1985-1-kshitiz.bartariya@zohomail.in>
-Subject: =?UTF-8?Q?Re:_[PATCH=C2=A0net-next]_=5F=5Fudp=5Fenqueue=5Fschedu?=
- =?UTF-8?Q?le=5Fskb=28=29_drops_packets_when_there_is_no_buffer_space_availa?=
- =?UTF-8?Q?ble,_but_currently_does_not_update_UDP_SNMP_counters.?=
+        bh=gcjd/LFVweR/hgLXJ78SKHVFtJprh20I5fqcQLT0jgk=;
+        b=KrurMKtYpKhucGO299bYi80v+lJsHNXACxBL0vco58NInfisyFijAM3Nz0jBJULQ/j
+         qXhHX5+N7KIlTKz5M+tCvXk38pIM6HucpjO9kEVvCqPv6oGyqQu0QiaFd47ACAsp497d
+         dwUgmnNagRvxBXHNc/19+ljjlEFjnHDs5ODdoWoCkVT/6i69ZUH2bVKZhkvBDv2otQAC
+         EOP4rln+GLj51thAd5eIU+lsh0HOqHe4cLbx35mKVjkxIGfLINuph8SdbINr2gkZbZ8d
+         OO26Ta7aGOCmx3s+QytVjXCv/onzsTv5hn6ICdh7770/X4gwBRKbcHlydQUFHmEaF6pQ
+         s/zg==
+X-Forwarded-Encrypted: i=1; AJvYcCXnygvdBGce3uYbbE5IBazOLjsoFbxXpDs8G6FCFeQ5JlCVc6+ZtLZdmJSaLMEdDEHb9dkq1Js=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBaz30Stc0FuCCzM13q7nA1rASSs1ZZsr7napfAeQfjmgjWgiz
+	3OQpm1mThvhtFgouo6p8XgVjJCOim8/i5Ku/f7IBEcD2/sXuYA+aCY6He9bfSnyy+8kQkCcbrGD
+	+UAblQ17+nFba+lh+7PmvLdkbFnre6mQtzrXlYIrFRjz+zoKd68t4ITvUrMk=
+X-Google-Smtp-Source: AGHT+IFdV4ZIGwks3eQ9jBrW++CfUWYS8g6wXep79BMiChW5OgoOxRJUVpiv3mo6mqDvcdLAi0lJo5genOdb9AFal/YzTfo8btN+
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+X-Received: by 2002:a05:6820:5292:b0:65c:fa23:2d00 with SMTP id
+ 006d021491bc7-65f54ed1b57mr776379eaf.9.1767800662423; Wed, 07 Jan 2026
+ 07:44:22 -0800 (PST)
+Date: Wed, 07 Jan 2026 07:44:22 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <695e7f56.050a0220.1c677c.036c.GAE@google.com>
+Subject: [syzbot] [net?] [nfc?] WARNING: locking bug in nci_close_device (3)
+From: syzbot <syzbot+f9c5fd1a0874f9069dce@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	krzk@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Kshitiz Bartariya wrote:
-> Update UDP_MIB_MEMERRORS and UDP_MIB_INERRORS when packets are dropped
-> due to memory pressure, for both UDP and UDPLite sockets.
-> 
-> This removes a long-standing TODO and makes UDP statistics consistent
-> with actual drop behavior.
-> 
-> Signed-off-by: Kshitiz Bartariya <kshitiz.bartariya@zohomail.in>
+Hello,
 
-This is addressing the same open TODO as the patch under review
+syzbot found the following issue on:
 
-https://lore.kernel.org/netdev/20260105114732.140719-1-mahdifrmx@gmail.com/
+HEAD commit:    dbf8fe85a16a Merge tag 'net-6.19-rc4' of git://git.kernel...
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=109dffb4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a94030c847137a18
+dashboard link: https://syzkaller.appspot.com/bug?extid=f9c5fd1a0874f9069dce
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
 
-It does so in the single basic block, as suggested here
+Unfortunately, I don't have any reproducer for this issue yet.
 
-https://lore.kernel.org/netdev/willemdebruijn.kernel.21c4d3b7b8f9d@gmail.com/
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/9dc5ccb3a40b/disk-dbf8fe85.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/7b9d75d2c0c2/vmlinux-dbf8fe85.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/37f71f0365c9/bzImage-dbf8fe85.xz
 
-But these updates are expensive, so better to batch them as in the
-other patch.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+f9c5fd1a0874f9069dce@syzkaller.appspotmail.com
 
-> ---
->  net/ipv4/udp.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index 9c87067c74bc..66c06f468240 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -1794,11 +1794,16 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
->  	}
->  
->  	if (unlikely(to_drop)) {
-> +		const bool is_udplite = IS_UDPLITE(sk);
-> +
->  		for (nb = 0; to_drop != NULL; nb++) {
->  			skb = to_drop;
->  			to_drop = skb->next;
->  			skb_mark_not_on_list(skb);
-> -			/* TODO: update SNMP values. */
-> +
-> +			UDP_INC_STATS(sock_net(sk), UDP_MIB_MEMERRORS, is_udplite);
-> +			UDP_INC_STATS(sock_net(sk), UDP_MIB_INERRORS, is_udplite);
-> +
->  			sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_PROTO_MEM);
->  		}
->  		numa_drop_add(&udp_sk(sk)->drop_counters, nb);
-> -- 
-> 2.50.1 (Apple Git-155)
-> 
+Bluetooth: hci1: Opcode 0x0c1a failed: -4
+Bluetooth: hci1: Error when powering off device on rfkill (-4)
+Bluetooth: hci2: Opcode 0x0c1a failed: -4
+Bluetooth: hci2: Error when powering off device on rfkill (-4)
+------------[ cut here ]------------
+DEBUG_LOCKS_WARN_ON(1)
+WARNING: kernel/locking/lockdep.c:238 at hlock_class kernel/locking/lockdep.c:238 [inline], CPU#1: syz.6.5778/26216
+WARNING: kernel/locking/lockdep.c:238 at check_wait_context kernel/locking/lockdep.c:4854 [inline], CPU#1: syz.6.5778/26216
+WARNING: kernel/locking/lockdep.c:238 at __lock_acquire+0x39e/0x2cf0 kernel/locking/lockdep.c:5187, CPU#1: syz.6.5778/26216
+Modules linked in:
+CPU: 1 UID: 0 PID: 26216 Comm: syz.6.5778 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+RIP: 0010:hlock_class kernel/locking/lockdep.c:238 [inline]
+RIP: 0010:check_wait_context kernel/locking/lockdep.c:4854 [inline]
+RIP: 0010:__lock_acquire+0x3a5/0x2cf0 kernel/locking/lockdep.c:5187
+Code: 17 00 4c 8b 74 24 08 75 27 90 e8 e6 94 ec 02 85 c0 74 1c 83 3d 2f 5d e4 0d 00 75 13 48 8d 3d 42 72 e7 0d 48 c7 c6 3a 0c 87 8d <67> 48 0f b9 3a 90 31 c0 0f b6 98 c4 00 00 00 41 8b 45 20 25 ff 1f
+RSP: 0018:ffffc9000c037680 EFLAGS: 00010046
+RAX: 0000000000000001 RBX: 0000000000040000 RCX: 0000000000080000
+RDX: ffffc90004e52000 RSI: ffffffff8d870c3a RDI: ffffffff8f8567c0
+RBP: 0000000000000003 R08: ffffffff8f8252a3 R09: 1ffffffff1f04a54
+R10: dffffc0000000000 R11: fffffbfff1f04a55 R12: 00000000000011bb
+R13: ffff888052a6aa28 R14: ffff888052a69e80 R15: ffff888052a6a9b0
+FS:  00007f462b1636c0(0000) GS:ffff888125f1f000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00002000000028c0 CR3: 00000000765dc000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ lock_acquire+0x107/0x340 kernel/locking/lockdep.c:5868
+ touch_wq_lockdep_map+0xcb/0x180 kernel/workqueue.c:3940
+ __flush_workqueue+0x121/0x14b0 kernel/workqueue.c:3982
+ nci_close_device+0x2e5/0x610 net/nfc/nci/core.c:567
+ nci_dev_down+0x3b/0x50 net/nfc/nci/core.c:639
+ nfc_dev_down+0x152/0x290 net/nfc/core.c:161
+ nfc_rfkill_set_block+0x2d/0x100 net/nfc/core.c:179
+ rfkill_set_block+0x1d2/0x440 net/rfkill/core.c:346
+ rfkill_fop_write+0x44b/0x570 net/rfkill/core.c:1301
+ vfs_write+0x27e/0xb30 fs/read_write.c:684
+ ksys_write+0x145/0x250 fs/read_write.c:738
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xec/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f462a38f749
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f462b163038 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 00007f462a5e6090 RCX: 00007f462a38f749
+RDX: 0000000000000008 RSI: 0000200000000080 RDI: 0000000000000006
+RBP: 00007f462a413f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f462a5e6128 R14: 00007f462a5e6090 R15: 00007ffea1921d88
+ </TASK>
+----------------
+Code disassembly (best guess), 1 bytes skipped:
+   0:	00 4c 8b 74          	add    %cl,0x74(%rbx,%rcx,4)
+   4:	24 08                	and    $0x8,%al
+   6:	75 27                	jne    0x2f
+   8:	90                   	nop
+   9:	e8 e6 94 ec 02       	call   0x2ec94f4
+   e:	85 c0                	test   %eax,%eax
+  10:	74 1c                	je     0x2e
+  12:	83 3d 2f 5d e4 0d 00 	cmpl   $0x0,0xde45d2f(%rip)        # 0xde45d48
+  19:	75 13                	jne    0x2e
+  1b:	48 8d 3d 42 72 e7 0d 	lea    0xde77242(%rip),%rdi        # 0xde77264
+  22:	48 c7 c6 3a 0c 87 8d 	mov    $0xffffffff8d870c3a,%rsi
+* 29:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
+  2e:	90                   	nop
+  2f:	31 c0                	xor    %eax,%eax
+  31:	0f b6 98 c4 00 00 00 	movzbl 0xc4(%rax),%ebx
+  38:	41 8b 45 20          	mov    0x20(%r13),%eax
+  3c:	25                   	.byte 0x25
+  3d:	ff 1f                	lcall  *(%rdi)
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
