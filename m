@@ -1,431 +1,155 @@
-Return-Path: <netdev+bounces-247805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 926AFCFED9E
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 17:25:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16D0DCFEADF
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 16:50:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 97C373024758
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 16:22:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 94D13305574A
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 15:44:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C7CE392B95;
-	Wed,  7 Jan 2026 15:39:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF5F538B9B1;
+	Wed,  7 Jan 2026 15:44:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Y0qmfyFY";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="lYpMtynK";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HYRUP9K6";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="586rW2Iu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GYK6Iwmc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9FD3A35A7
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 15:39:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4048A38B9A6
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 15:44:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767800353; cv=none; b=fiCGWyXi2pIW7W0YPZ/9LFIbBlVSgIjsj4/UAumuGzTEJaIF6chM94uF5KOdbeu29vj2w910ac7hVa35IfqGGaysLd3NkH75FzHVuKLoDnuc9HvalNsGpu2GOFpbxigTT7dBP51/IoANeqboeo9rWg8/np1QBqQyttkWjgwOleQ=
+	t=1767800643; cv=none; b=i7+ZoorAyT+gQ6+0yVFshfqy04goPi1y27CdIEyqJ6kdRBxtokQ+Nh48BvawvVE/t+IuyjBGsUKwOfIpQL7r1IuLCwnntGqokOYlBDIYngXEQPwjFsbwJ5ad6kocU3FiIPB4hTkKuWAXVh8Q5bevylmLPmK+1/cX0f8WJ2M1ksI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767800353; c=relaxed/simple;
-	bh=6OON2BwgoW5r8OD1ktKGQbg4zg4fXkDB3egXWuCcs6w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QBFO07umztzootf8U036JYRJoXEkGKz3FTlhVS/FKUtuOX9rk+wESLtqqyYbJ3OBiB4jLGkJ5heTjWC7p94kDLV6FfipWos/b11KDO7Mtt4SPhRaFm8hubRe8K2xhrK7NXFQZNmAsQl3LsfRYTjqH3V6hiTCG21zxJuYlNQAdWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Y0qmfyFY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=lYpMtynK; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HYRUP9K6; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=586rW2Iu; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 2A41E5C1FE;
-	Wed,  7 Jan 2026 15:38:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1767800340; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zQ0QCS3Fgqq7Cs7+suCwQnQWfuDnHC/54TkaNjVT/A4=;
-	b=Y0qmfyFYvRt56ts+ZiUkhLoSpSGL9twesU/Fw3WNI7ERPHPQMQSmp/ZUWsq6T/Ev9dQvmL
-	dz/+mJzzYIYpGdkrQO1AF1rigT+3vyyEKKUFYFutUarGXCy1ukg5EhuCWVn4PY0062OWqu
-	WgpoQ3uSXSQcAHjh0bxbkEewFeY5CgU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1767800340;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zQ0QCS3Fgqq7Cs7+suCwQnQWfuDnHC/54TkaNjVT/A4=;
-	b=lYpMtynKWm0Enzgwt+Bq7A2zXicDMuj/6tzEYxxnBBNcBlCqkfwASgkcMPj7xkWnl0K20G
-	+ysqE9pgpR7Z0jCA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1767800339; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zQ0QCS3Fgqq7Cs7+suCwQnQWfuDnHC/54TkaNjVT/A4=;
-	b=HYRUP9K6YK/HKOkXG8yX6rJreJ7Dd1K7/JiB5/IWbjwLLsawCCoJhQniJw1Efg8wsGeIlg
-	fjTNNDqDstS+pOSQi2KgoXHskFjWZ6EH82POb+/pbByQNIJw9aeXCDjR9xn7RYNSLptGRQ
-	WUaq/DbLQAzmndpX1afG0QRxn75uJBk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1767800339;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zQ0QCS3Fgqq7Cs7+suCwQnQWfuDnHC/54TkaNjVT/A4=;
-	b=586rW2Iur31QHb2T+3e+5n0JT+0lBpG5a6h92DFzv9Vhu6a99hZkxkD5XDeRcNkADXTPtL
-	cpm8mSxNExUSkTCw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 960EA3EA63;
-	Wed,  7 Jan 2026 15:38:58 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 4MOtIRJ+Xmn7CgAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Wed, 07 Jan 2026 15:38:58 +0000
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Fernando Fernandez Mancera <fmancera@suse.de>
-Subject: [PATCH 2/2 net-next v2] selftests: ipv6_icmp: add tests for ICMPv6 handling
-Date: Wed,  7 Jan 2026 16:38:41 +0100
-Message-ID: <20260107153841.5030-2-fmancera@suse.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260107153841.5030-1-fmancera@suse.de>
-References: <20260107153841.5030-1-fmancera@suse.de>
+	s=arc-20240116; t=1767800643; c=relaxed/simple;
+	bh=Sa9ZWzE29qrQrBl4qGZ0Nd3XS5vjlGNg1hHVfusfLs8=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=o/PXZI5/g5PHradBeJcbKaODS/GEgDN1S99JetZ3ioDR/M3VbwS/VNBaylHqe4pUi8Xlc3/i3TQeWr/l0L2jRXpRN3YDVRq7iGCXElUkACRZjtSr6erA/8LkOS2k5ogndrManB0V+s4cv29Cmc6mi4Ac2lWn5bTyN/I5NtSKGR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GYK6Iwmc; arc=none smtp.client-ip=209.85.128.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-78fcb465733so24625547b3.3
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 07:44:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767800641; x=1768405441; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i8f04eHjfvnkHYorhM7bm3sfteEWTpTlDP3O4cfOEtM=;
+        b=GYK6IwmcojGLrztPFveLuzWlGrMp6NGim1Vg9jN10zpn4RHToNAv0cFK7z1Ecr08Za
+         AfTpOn5HXIl5A5D8J3H/3JOC1R5MulBsNizKuEdu2we1Z2zQPsIQY3YuWtJ45edOBkI6
+         CR9WBzd8ebWNyi8TCmf0+0bDE9NFGFGI1x91xYYOsmFIrG8Ua1xfGee9kKZvlhh+wP3f
+         lD9L/aI5eFxc+Zg5Dgx3iGj3gURyLO091qDAruyp5smOg+OS6FnJg41c2SboY8AEv1ax
+         02kl7BIwWgtMmmn/A+YJPZKroW4da3P/r/z5NfQozaulTT5oW8r5jID6w44TWexhrn5W
+         bjWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767800641; x=1768405441;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=i8f04eHjfvnkHYorhM7bm3sfteEWTpTlDP3O4cfOEtM=;
+        b=l6iCDsJ8CsCxhqpfzFQutKDpymnT3TAAfTxSH8ysSJoGxbW3tJHBbBRu/OaBUSb7Gq
+         DNflqmMmlG/tA0YjemcaVd91EPXI92k+3cmVYt/mLYGqtuA9tnAuKOIowKeH+84QGSTJ
+         EPsJV/6J83ljB+guhsJx5DOGr9cMS2GYlBK1vzw9hwD3+zDUFAVEjqDzsebwmuKcLXqm
+         eR4hsVeVsrw1RTh0hKHvs64pztBsz+nIU0YrcC3hUJdDWXneYnTQmcA2y4rMsZvTzo7u
+         O9i4m5eiazwNJCCp8aaJE9MBfRUGpfj294AsJR1atE04Hqj48+Tu2oW5M5IoZfz1eC8A
+         c6mg==
+X-Forwarded-Encrypted: i=1; AJvYcCUqECPBiGGv6qu/BS5l2pDZyIeOjKcWrGJzfm7oF4qCRBUIVG4bVX1gZzSMMwbc+JxHYx1+XV0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzr1V5Joj+oisF1GJMfdF7cFh0qtZuGCyUOTDwmHTRG3+O1KFNP
+	9vCKoH9ySAI2fdT9R1q7VRclGQ5+yIDRJ3eWxS2ZVrw9Hq41I8w8ASR43pdEDQ==
+X-Gm-Gg: AY/fxX6QVb7slbDECm+PNGEmAvqD1vKqFvr6hK2+QFOk+S6N7C7s0jBI4G0fGLqfqPR
+	ww3t8tCbcDVgicp8WsXjtMfLUfBUFope2BGwvj/Dlup9A3Icku/AMhBuC3molJMrOfKNrzc/ZA2
+	oAKPeC+Lsi8M9Vl2gFY9HnaIQg/mSYTpc1RoP/W3KKW6PsJMOlvHxy4uujptIaw/RNHfLZklHbD
+	l7INbi/qMEziGnvNs4PAE3g4+M0TvbgN9IAt48f9u8LgFGK3CFCXPGulPcMjDPMk7FXojcn3xb7
+	Y+y+bnT2fKRao3Kmb2jlt6OAAsGc6u0zSJVJfm/VwkUYQbGwAFdK5OAb0/n650HjsLiDblnAnlS
+	qWzHu22p4jYx54vIvgr9OSnlJ497UAeo9TUIjFL9FWZWawjkVBtQvNiBBLDxkh66PRpWFm6Tqdj
+	vsoA8Rg1D79o1R4yLCIe4O62grxPJ/Jhf5VUYy1yvn0Ghy4xtifKpCVYnl7Dk=
+X-Google-Smtp-Source: AGHT+IEFFSiNXKDV1HnAD3Zg/sQPsGaeIN8FIPZnBaaRsTUeL+P2OUb/fto4XbVbM+NqywPmBogltg==
+X-Received: by 2002:a05:690e:1202:b0:644:ca2b:b659 with SMTP id 956f58d0204a3-64716c89b6bmr2570788d50.64.1767800641000;
+        Wed, 07 Jan 2026 07:44:01 -0800 (PST)
+Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-790aa670b21sm19793267b3.33.2026.01.07.07.44.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Jan 2026 07:44:00 -0800 (PST)
+Date: Wed, 07 Jan 2026 10:44:00 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Kshitiz Bartariya <kshitiz.bartariya@zohomail.in>, 
+ netdev@vger.kernel.org
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ David Ahern <dsahern@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Kshitiz Bartariya <kshitiz.bartariya@zohomail.in>, 
+ mahdifrmx@gmail.com
+Message-ID: <willemdebruijn.kernel.368719d33bc5@gmail.com>
+In-Reply-To: <20260107141541.1985-1-kshitiz.bartariya@zohomail.in>
+References: <20260107141541.1985-1-kshitiz.bartariya@zohomail.in>
+Subject: =?UTF-8?Q?Re:_[PATCH=C2=A0net-next]_=5F=5Fudp=5Fenqueue=5Fschedu?=
+ =?UTF-8?Q?le=5Fskb=28=29_drops_packets_when_there_is_no_buffer_space_availa?=
+ =?UTF-8?Q?ble,_but_currently_does_not_update_UDP_SNMP_counters.?=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-6.80 / 50.00];
-	REPLY(-4.00)[];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-0.996];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_COUNT_TWO(0.00)[2];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[ipv6_icmp.sh:url,suse.de:mid,suse.de:email,lib.sh:url];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_TLS_ALL(0.00)[]
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spam-Score: -6.80
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Test ICMPv6 to link local address and local address, also VRF based
-tests. In addition, this test set could be extended to cover more
-situations in the future.
+Kshitiz Bartariya wrote:
+> Update UDP_MIB_MEMERRORS and UDP_MIB_INERRORS when packets are dropped
+> due to memory pressure, for both UDP and UDPLite sockets.
+> 
+> This removes a long-standing TODO and makes UDP statistics consistent
+> with actual drop behavior.
+> 
+> Signed-off-by: Kshitiz Bartariya <kshitiz.bartariya@zohomail.in>
 
-ICMPv6 to local addresses
-    TEST: Ping to link local address                                    [OK]
-    TEST: Ping to link local address from ::1                           [OK]
-    TEST: Ping to local address                                         [OK]
-    TEST: Ping to local address from ::1                                [OK]
+This is addressing the same open TODO as the patch under review
 
-ICMPv6 to VRF based local address
-    TEST: Ping to link local address on VRF context                     [OK]
-    TEST: Ping to link local address from ::1 on VRF context            [OK]
-    TEST: Ping to local address on VRF context                          [OK]
-    TEST: Ping to local address from ::1 on VRF context                 [OK]
+https://lore.kernel.org/netdev/20260105114732.140719-1-mahdifrmx@gmail.com/
 
-Tests passed:   8
-Tests failed:   0
+It does so in the single basic block, as suggested here
 
-Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
----
-v2: shellcheck fixes, added VRF based tests and simplified linklocal
-address parsing
----
- tools/testing/selftests/net/Makefile     |   1 +
- tools/testing/selftests/net/ipv6_icmp.sh | 244 +++++++++++++++++++++++
- 2 files changed, 245 insertions(+)
- create mode 100755 tools/testing/selftests/net/ipv6_icmp.sh
+https://lore.kernel.org/netdev/willemdebruijn.kernel.21c4d3b7b8f9d@gmail.com/
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index b66ba04f19d9..4d29b47bb084 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -47,6 +47,7 @@ TEST_PROGS := \
- 	ip_local_port_range.sh \
- 	ipv6_flowlabel.sh \
- 	ipv6_force_forwarding.sh \
-+	ipv6_icmp.sh \
- 	ipv6_route_update_soft_lockup.sh \
- 	l2_tos_ttl_inherit.sh \
- 	l2tp.sh \
-diff --git a/tools/testing/selftests/net/ipv6_icmp.sh b/tools/testing/selftests/net/ipv6_icmp.sh
-new file mode 100755
-index 000000000000..4ac0954e2963
---- /dev/null
-+++ b/tools/testing/selftests/net/ipv6_icmp.sh
-@@ -0,0 +1,244 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# This test is for checking IPv6 ICMP behavior in different situations.
-+source lib.sh
-+ret=0
-+nfail=0
-+
-+# all tests in this script, can be overridden with -t option
-+TESTS="icmpv6_to_local_address icmpv6_to_vrf_based_local_address"
-+
-+VERBOSE=0
-+PAUSE_ON_FAIL=no
-+PAUSE=no
-+
-+which ping6 > /dev/null 2>&1 && ping6=$(which ping6) || ping6=$(which ping)
-+
-+log_test()
-+{
-+	local rc=$1
-+	local expected=$2
-+	local msg="$3"
-+
-+	if [ "${rc}" -eq "${expected}" ]; then
-+		printf "    TEST: %-60s  [OK]\n" "${msg}"
-+		nsuccess=$((nsuccess+1))
-+	else
-+		ret=1
-+		nfail=$((nfail+1))
-+		printf "    TEST: %-60s  [FAIL]\n" "${msg}"
-+		if [ "${PAUSE_ON_FAIL}" = "yes" ]; then
-+		echo
-+			echo "hit enter to continue, 'q' to quit"
-+			read -r a
-+			[ "$a" = "q" ] && exit 1
-+		fi
-+	fi
-+
-+	if [ "${PAUSE}" = "yes" ]; then
-+		echo
-+		echo "hit enter to continue, 'q' to quit"
-+		read -r a
-+		[ "$a" = "q" ] && exit 1
-+	fi
-+}
-+
-+setup()
-+{
-+	set -e
-+	setup_ns ns1
-+	IP="$(which ip) -netns $ns1"
-+	NS_EXEC="$(which ip) netns exec $ns1"
-+
-+	$IP link add dummy0 type dummy
-+	$IP link set dev dummy0 up
-+	$IP -6 address add 2001:db8:1::1/64 dev dummy0 nodad
-+	set +e
-+}
-+
-+cleanup()
-+{
-+	$IP link del dev dummy0 &> /dev/null
-+	cleanup_ns "$ns1"
-+}
-+
-+get_linklocal()
-+{
-+	local dev=$1
-+	local addr
-+
-+	addr=$($IP -j -6 addr show dev "${dev}" scope link | jq -r '.[].addr_info[1].local')
-+
-+	[ -z "$addr" ] && return 1
-+
-+	echo "$addr"
-+
-+	return 0
-+}
-+
-+run_cmd()
-+{
-+	local cmd="$1"
-+	local out
-+	local stderr="2>/dev/null"
-+
-+	if [ "$VERBOSE" = "1" ]; then
-+		printf "    COMMAND: %s\n" "$cmd"
-+		stderr=
-+	fi
-+
-+	out=$(eval "$cmd" $stderr)
-+	rc=$?
-+	if [ "$VERBOSE" = "1" ] && [ -n "$out" ]; then
-+		echo "    $out"
-+	fi
-+
-+	[ "$VERBOSE" = "1" ] && echo
-+
-+	return $rc
-+}
-+
-+icmpv6_to_local_address()
-+{
-+	local rc
-+	local lldummy
-+
-+	echo
-+	echo "ICMPv6 to local addresses"
-+
-+	setup
-+
-+	lldummy=$(get_linklocal dummy0)
-+
-+	if [ -z "$lldummy" ]; then
-+		echo "Failed to get link local address for dummy0"
-+		return 1
-+	fi
-+
-+	# ping6 to link local address
-+	run_cmd "$NS_EXEC ${ping6} -c 3 $lldummy%dummy0"
-+	log_test $? 0 "Ping to link local address"
-+
-+	# ping6 to link local address from localhost (::1)
-+	run_cmd "$NS_EXEC ${ping6} -c 3 -I ::1 $lldummy%dummy0"
-+	log_test $? 0 "Ping to link local address from ::1"
-+
-+	# ping6 to local address
-+	run_cmd "$NS_EXEC ${ping6} -c 3 2001:db8:1::1"
-+	log_test $? 0 "Ping to local address"
-+
-+	# ping6 to local address from localhost (::1)
-+	run_cmd "$NS_EXEC ${ping6} -c 3 -I ::1 2001:db8:1::1"
-+	log_test $? 0 "Ping to local address from ::1"
-+}
-+
-+icmpv6_to_vrf_based_local_address()
-+{
-+	local rc
-+	local lldummy
-+
-+	echo
-+	echo "ICMPv6 to VRF based local address"
-+
-+	setup
-+
-+	lldummy=$(get_linklocal dummy0)
-+
-+	if [ -z "$lldummy" ]; then
-+		echo "Failed to get link local address for dummy0"
-+		return 1
-+	fi
-+
-+	run_cmd "$NS_EXEC sysctl -w net.ipv6.conf.all.keep_addr_on_down=1"
-+
-+	# create VRF and setup
-+	run_cmd "$IP link add vrf0 type vrf table 10"
-+	run_cmd "$IP link set vrf0 up"
-+	run_cmd "$IP link set dummy0 master vrf0"
-+
-+	# route to reach 2001:db8::1/128 on VRF device and back to ::1
-+	run_cmd "$IP -6 route add 2001:db8:1::1/64 dev vrf0"
-+	run_cmd "$IP -6 route add ::1/128 dev vrf0 table 10"
-+
-+	# ping6 to link local address
-+	run_cmd "$NS_EXEC ${ping6} -c 3 $lldummy%dummy0"
-+	log_test $? 0 "Ping to link local address on VRF context"
-+
-+	# ping6 to link local address from localhost (::1)
-+	run_cmd "$NS_EXEC ${ping6} -c 3 -I ::1 $lldummy%dummy0"
-+	log_test $? 0 "Ping to link local address from ::1 on VRF context"
-+
-+	# ping6 to local address
-+	run_cmd "$NS_EXEC ${ping6} -c 3 2001:db8:1::1"
-+	log_test $? 0 "Ping to local address on VRF context"
-+
-+	# ping6 to local address from localhost (::1)
-+	run_cmd "$NS_EXEC ${ping6} -c 3 -I ::1 2001:db8:1::1"
-+	log_test $? 0 "Ping to local address from ::1 on VRF context"
-+}
-+
-+################################################################################
-+# usage
-+
-+usage()
-+{
-+	cat <<EOF
-+usage: ${0##*/} OPTS
-+
-+    -t <test>   Test(s) to run (default: all)
-+                (options: $TESTS)
-+    -p          Pause on fail
-+    -P          Pause after each test before cleanup
-+    -v          Verbose mode (show commands and output)
-+EOF
-+}
-+
-+################################################################################
-+# main
-+
-+trap cleanup EXIT
-+
-+while getopts :t:pPhv o
-+do
-+	case $o in
-+		t) TESTS=$OPTARG;;
-+		p) PAUSE_ON_FAIL=yes;;
-+		P) PAUSE=yes;;
-+		v) VERBOSE=$((VERBOSE + 1));;
-+		h) usage; exit 0;;
-+		*) usage; exit 1;;
-+	esac
-+done
-+
-+[ "${PAUSE}" = "yes" ] && PAUSE_ON_FAIL=no
-+
-+if [ "$(id -u)" -ne 0 ];then
-+	echo "SKIP: Need root privileges"
-+	exit "$ksft_skip"
-+fi
-+
-+if [ ! -x "$(command -v ip)" ]; then
-+	echo "SKIP: Could not run test without ip tool"
-+	exit "$ksft_skip"
-+fi
-+
-+# start clean
-+cleanup &> /dev/null
-+
-+for t in $TESTS
-+do
-+	case $t in
-+	icmpv6_to_local_address)		icmpv6_to_local_address;;
-+	icmpv6_to_vrf_based_local_address)	icmpv6_to_vrf_based_local_address;;
-+
-+	help) echo "Test names: $TESTS"; exit 0;;
-+	esac
-+done
-+
-+if [ "$TESTS" != "none" ]; then
-+	printf "\nTests passed: %3d\n" "${nsuccess}"
-+	printf "Tests failed: %3d\n" "${nfail}"
-+fi
-+
-+exit $ret
--- 
-2.52.0
+But these updates are expensive, so better to batch them as in the
+other patch.
+
+> ---
+>  net/ipv4/udp.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> index 9c87067c74bc..66c06f468240 100644
+> --- a/net/ipv4/udp.c
+> +++ b/net/ipv4/udp.c
+> @@ -1794,11 +1794,16 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
+>  	}
+>  
+>  	if (unlikely(to_drop)) {
+> +		const bool is_udplite = IS_UDPLITE(sk);
+> +
+>  		for (nb = 0; to_drop != NULL; nb++) {
+>  			skb = to_drop;
+>  			to_drop = skb->next;
+>  			skb_mark_not_on_list(skb);
+> -			/* TODO: update SNMP values. */
+> +
+> +			UDP_INC_STATS(sock_net(sk), UDP_MIB_MEMERRORS, is_udplite);
+> +			UDP_INC_STATS(sock_net(sk), UDP_MIB_INERRORS, is_udplite);
+> +
+>  			sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_PROTO_MEM);
+>  		}
+>  		numa_drop_add(&udp_sk(sk)->drop_counters, nb);
+> -- 
+> 2.50.1 (Apple Git-155)
+> 
+
 
 
