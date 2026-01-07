@@ -1,53 +1,70 @@
-Return-Path: <netdev+bounces-247665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA4C6CFD19D
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 11:06:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F469CFD200
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 11:12:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8DBFA3101E04
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 09:58:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B6ACC30249F6
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 10:08:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E7432F77B;
-	Wed,  7 Jan 2026 09:58:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8CCC30CD95;
+	Wed,  7 Jan 2026 10:08:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BEHEs6r1"
+	dkim=pass (2048-bit key) header.d=hale.at header.i=@hale.at header.b="PrwA6QEc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from gw.hale.at (gw.hale.at [89.26.116.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1C82F9985
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 09:58:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1762DF703;
+	Wed,  7 Jan 2026 10:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.26.116.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767779932; cv=none; b=lZg/rsCLP2UvDNY4HPKzOtxZm+57dDpAe3cyI8KbrYxCaPLkaF9r1g8PQQrMU/o7zPUdvOu9AdzqFN5Q03jpUBw9mwSaXKfOkOluCYfgRJ2uuK/B4tdk20CaReRR4uWgiI51iO3yaYGoMYXAnWXVkJEluxf0k+EcXakX+1uwsKs=
+	t=1767780505; cv=none; b=jNplvITDpYysXHSBw/CReDtNU6Kox+LoCjMP8ghLbUagmhPrivbRXLpTMvIHhDpQxTeXdZ7VORrGNAHa+p3nrGpYgPKyeEUvE1shEfHas8QRrO2/01WkRnk3r3IgJAdG2FP8+GWOw5bN1AHoc829TwyEE1mullM41Ek+gIgpc5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767779932; c=relaxed/simple;
-	bh=EtZ82ALavMPEoWy9HIhTbm4rA+XrdAc5HNg2q8pTQTI=;
+	s=arc-20240116; t=1767780505; c=relaxed/simple;
+	bh=2FtAYjtwemC6AXNTTViR1w+x3CC1AkWt/hYVTMmYfqQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VNS7kshrmoyjaSwnSQ5e1//wYsgx7zOzS1i7qbspcJbzF8vdJODiApSz0s/jXadFE8RxpZqHaYi+XNazWEOIAS8GlGA0Npc2teXl6JnSLFv/CxRrdnNAiSc5Y5tgNmfOkhd3getFdKfmEvAqaYorrkEbShKzd9aJOAFrVQF7UuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BEHEs6r1; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 3CF24C1EC91;
-	Wed,  7 Jan 2026 09:58:23 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 57452606F8;
-	Wed,  7 Jan 2026 09:58:49 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2C1C8103C870F;
-	Wed,  7 Jan 2026 10:58:44 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1767779928; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=3hqTdpXOizZ/e9efl1zQ2snYZOE+pxVId2PVKDUTgJc=;
-	b=BEHEs6r1YL8i+F08IwjLuqAouIREj5O/2e9GWe4vgGbbEyhzWkbr64R3BK2pzfTioswwXs
-	U+Zys/9/TLtk2lV08nZX3Z0xw4ok1YQpSCtd8hddmGsy1Ndyc7+OJ6XFPsohj4Rb2pNztb
-	YNlaAW2nn2P3qT1WkJdDBdAZA0wYpJtuljWX3mX8+NLkm6ebxl0z+fBgOqCfcOyM+1QRR2
-	3Ff7+5B129SsxIepu3zGbxaHN0rJT8Vb7KTcDh72efCpEXpiTWXEn9wOupMWKA9R9WVfFp
-	mJLnLWJ+Xbte0JvJegJNZFXJvNsr3ri8RLgJruiOoMkjjodCCJehDNjQufnaLQ==
-Message-ID: <02415558-ef2c-4b49-8be8-997376d1ecc0@bootlin.com>
-Date: Wed, 7 Jan 2026 10:58:43 +0100
+	 In-Reply-To:Content-Type; b=He4+1+qQ2PuFDH+NzeNoqs/F4myCSzdrd8aeGM4Z4OCr7Oe38MW26+a5iYSLKh94YZBBfnBADhxmbghfZ5I3SN7LuFs2Gvj01jg0YQIaAKFJ+3O+fCwsOX4mGEMyTpf8mmjjmBWtopGyooPReNuPHPIVM1OJOEyGyCg23xmaxno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hale.at; spf=pass smtp.mailfrom=hale.at; dkim=pass (2048-bit key) header.d=hale.at header.i=@hale.at header.b=PrwA6QEc; arc=none smtp.client-ip=89.26.116.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hale.at
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hale.at
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=hale.at; i=@hale.at; q=dns/txt; s=mail;
+  t=1767780502; x=1799316502;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=2FtAYjtwemC6AXNTTViR1w+x3CC1AkWt/hYVTMmYfqQ=;
+  b=PrwA6QEcmyFISlZV5FmZNU7uKxSDi3DNKJpNgMm/+FspMEDyPL6dmQPL
+   jX+5N8B1gzDV4P08zTg4PhrSpHkplBjNVWQhFf50nF2Ot6FWYWI/QGFKJ
+   fm5e78Z7KMPRQDNbfeilXdFC1TninWsFIzjyjZ5SycON7f4tpxBy7E82v
+   tS4LEpoRgqTWNqqUlG5bfWcHbSJkBpMT5ogQQibDtzeLU+VpvwG9t1Jzy
+   nFtJ8td+vL9el7eoCfyNJ09RtEGhJd1WwBml8Y7FPufH9Mbzy/Whcn7F6
+   ql4ENp1Ksbrr4E7tNBRGhr8ijXV3QaNN9D+ZEdhqtSJMWSkK0XpV0BQMj
+   Q==;
+X-CSE-ConnectionGUID: LdtWPZbVQvO0uTSQwb7yYQ==
+X-CSE-MsgGUID: svEX99OOT/a8GRfQ24yBsw==
+IronPort-SDR: 695e3037_3PYCAJZ3HiCULLLbcMYzfxrEQYTB1dBTRFUN863/7JAaQbV
+ 1yktmv3B+lTOWmGAuned9dMEh0ysexRIYhA1lHg==
+X-IronPort-AV: E=Sophos;i="6.21,207,1763420400"; 
+   d="scan'208";a="1570736"
+Received: from unknown (HELO mail4.hale.at) ([192.168.100.5])
+  by mgmt.hale.at with ESMTP; 07 Jan 2026 11:06:48 +0100
+Received: from mail4.hale.at (localhost.localdomain [127.0.0.1])
+	by mail4.hale.at (Postfix) with ESMTPS id B4ABD1300675;
+	Wed,  7 Jan 2026 11:06:27 +0100 (CET)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail4.hale.at (Postfix) with ESMTP id 9CE26130074F;
+	Wed,  7 Jan 2026 11:06:27 +0100 (CET)
+X-Virus-Scanned: amavis at mail4.hale.at
+Received: from mail4.hale.at ([127.0.0.1])
+ by localhost (mail4.hale.at [127.0.0.1]) (amavis, port 10026) with ESMTP
+ id vztAj6aZBBhO; Wed,  7 Jan 2026 11:06:27 +0100 (CET)
+Received: from [192.168.100.117] (entw47 [192.168.100.117])
+	by mail4.hale.at (Postfix) with ESMTPSA id 7BE701300675;
+	Wed,  7 Jan 2026 11:06:27 +0100 (CET)
+Message-ID: <4d6a1f0b-946e-4acb-bfe4-1e9317fd144e@hale.at>
+Date: Wed, 7 Jan 2026 11:06:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,35 +72,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 5/9] net: stmmac: descs: use u32 for descriptors
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>
-References: <aV1w9yxPwL990yZJ@shell.armlinux.org.uk>
- <E1vdDiK-00000002E1j-3xlF@rmk-PC.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net v4] net: nfc: nci: Fix parameter validation for packet
+ data
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Deepak Sharma <deepak.sharma.472935@gmail.com>,
+ Krzysztof Kozlowski <krzk@kernel.org>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, Simon Horman
+ <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Michael Thalmeier <michael@thalmeier.at>, stable@vger.kernel.org
+References: <20251223072552.297922-1-michael.thalmeier@hale.at>
+ <20260104101323.1ac8b478@kernel.org>
+From: Michael Thalmeier <michael.thalmeier@hale.at>
 Content-Language: en-US
-In-Reply-To: <E1vdDiK-00000002E1j-3xlF@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20260104101323.1ac8b478@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
 
-
-
-On 06/01/2026 21:31, Russell King (Oracle) wrote:
-> Use u32 rather than unsigned int for 32-bit descriptor variables.
-> This will allow the u32 bitfield helpers to be used.
+Am 04.01.26 um 19:13 schrieb Jakub Kicinski:
+> On Tue, 23 Dec 2025 08:25:52 +0100 Michael Thalmeier wrote:
+>> diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
+>> index 418b84e2b260..a5cafcd10cc3 100644
+>> --- a/net/nfc/nci/ntf.c
+>> +++ b/net/nfc/nci/ntf.c
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+>> @@ -380,6 +384,10 @@ static int nci_rf_discover_ntf_packet(struct nci_dev *ndev,
+>>   	pr_debug("rf_tech_specific_params_len %d\n",
+>>   		 ntf.rf_tech_specific_params_len);
+>>   
+>> +	if (skb->len < (data - skb->data) +
+>> +			ntf.rf_tech_specific_params_len + sizeof(ntf.ntf_type))
+>> +		return -EINVAL;
+> 
+> Are we validating ntf.rf_tech_specific_params_len against the
+> extraction logic in nci_extract_rf_params_nfca_passive_poll()
+> and friends?
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+You are right. The current patch is only validating that the received 
+packet is consistent in the way that the rf_tech_specific_params_len 
+number of bytes is also contained in the buffer.
 
-Maxime
-
+There is currently no code that validates that 
+nci_extract_rf_params_nfca_passive_poll and friends only access the 
+given number of bytes in their logic.
+And to be frank, I do not know how to implement this without either 
+cluttering the code with validation logic or re-implementing half the 
+parsing logic for length validation.
 
