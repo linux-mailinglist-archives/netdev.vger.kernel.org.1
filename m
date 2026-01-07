@@ -1,177 +1,142 @@
-Return-Path: <netdev+bounces-247803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 193F9CFEB2D
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 16:52:41 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A760CFED80
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 17:23:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B54B9310C248
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 15:46:43 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 77B7830012C5
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 16:21:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503D1395DB7;
-	Wed,  7 Jan 2026 15:34:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="eQ7TJO44";
-	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="LSQQ2Z5j"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F9F1395240;
+	Wed,  7 Jan 2026 15:34:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE82395D90;
-	Wed,  7 Jan 2026 15:34:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767800071; cv=pass; b=l0R/xKYpQgeuRQ0UHeyO6M3ifbbWdoQnGPx9ZFbWsWVgCkOyqRhrPEy/3R362wNGO2TFO2szHcdyKFZEm8RlWKWbM5FfoD9yDLvv7olVgZFtFZdGMo/oAiEM8QWQ33XZ3VVNPd8qPiWTBxk6Ta1IFJ9v9cyTvJKZO6kRioQu3Xc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767800071; c=relaxed/simple;
-	bh=UZZarDGIHnVTIoQ8enN9Zph0GfAT5H+xlYSwfaS7/b4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JuX3Z8oUjsDXpbHfAz3VqzmKBUyG86UCToK52HxcGBiCH26Yf61ALP8+l7ccsT0XSEDk9DxeWRwtRlyIDQLK6Dr9ZBbt+EkQhwpD3D3sHgzZx0tP84ayiu0Ba87zU3IWVnKSs1Zv8ZwmblgvM+VkMZNRzQHj3MDXKYJyGSRy6yA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=eQ7TJO44; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=LSQQ2Z5j; arc=pass smtp.client-ip=85.215.255.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
-ARC-Seal: i=1; a=rsa-sha256; t=1767800059; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=Y8AqzZECsUtKXD47IaJyz6CUOMhsEeJ2E7JoIdJFvlyNY1UeyMq6GgKvgrE5CLetxA
-    SUdQqWz31eQlqXhxzlQPWoOP08eVUFqhPb70uTGNckwGUvsaYHLo6VzsCcgZ75g6pBTb
-    n3Reh5VFmdDfzBvYU3yJpdjzC0Ld6u7S731RTSW84M7wEWmtSiS/hSzhwJLxn+ORJQvQ
-    AQBWde5p2DgY9QXZhlzR2fQO6nf/KEsuScsnkYIxzNWLN7J6gnpfjV72qTIxjzULOzvk
-    mcEwvBKukPX4uaisENRVIweQD56po/fODN1r+hydZOhmwrzKW/+LBCWlpiBL0cqJsXSm
-    j9Kw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1767800059;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=9NgbAeqzyHQXGFfVjBUF3lSa3PSH4LNlvLsaHRyC/Ro=;
-    b=YWP9OQI1zSmmJP2ITyacR0ZakUnMVU0t+BGVaXtJ8SJLPLVgiVDXyHJA6DWcHL0Z4o
-    zm29yFOtcY4CYQ8S6GxlCa6DJTbzvDfWZusWZA8lToJ6z8lrFjKayfWysWbPQx1jLljP
-    m7EJIf3aTNJY66xmSo1UG02F2IdQZ2LBcNqpdQnxmkjlEZIn9B/NbEND+37omU+Pz6lf
-    bRJAbQXaiWugWSGiRsI6kf4C1knEZN4EVfBcP1ciS+Yj7VJdkBme3vsk8Ak+z2gQ4aV5
-    gcm4dXoHRMBN7dO9IcU9IBMyzq/ityw7xQczMsd/Jj0EPg03SheO/BlHDLlc6U13DksI
-    3lrA==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1767800059;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=9NgbAeqzyHQXGFfVjBUF3lSa3PSH4LNlvLsaHRyC/Ro=;
-    b=eQ7TJO44rUjF23D9lQY1Lna/TzxzECfBfaB6cED4gcnQDlxYWLnk+8DA6fDUUUPPfK
-    j1fmN7f978eJ6LAUTZLOBqsWhjKSIds/9QBDz21ZhLsJ6gDAmYQ/76MLd3oF2zsu6U8V
-    2YPcjxRquEv7Pwq1MeKw6BKqtIuJTiwEgSlELwZokCRuI5x3453hjE6UwgcwY0EdM+js
-    UaTuje/YsIEIgWyFGAt0+86ojGkZ+yNpSwmx+6mDMhvucgyzSY1DGsbAVOljPGItfIRf
-    sQyVCVk3oKZCfALboZzH9UGqOpKmVdP3eVAZQS+lV9NMAkj3Dgn3V3gWyIVM/nn+yaTD
-    Oz8A==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1767800059;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=9NgbAeqzyHQXGFfVjBUF3lSa3PSH4LNlvLsaHRyC/Ro=;
-    b=LSQQ2Z5jZVIUPlGGD3ht5/t24eB9Cxae7AFDLH2XkKZLBAjhvsMGE/Nv/WummSvYVX
-    TmKA2xfY71cTF/2A80AQ==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeFQ7s8bGWj0Q=="
-Received: from [IPV6:2a00:6020:4a38:6800::9f3]
-    by smtp.strato.de (RZmta 54.1.0 AUTH)
-    with ESMTPSA id K0e68b207FYJD0i
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Wed, 7 Jan 2026 16:34:19 +0100 (CET)
-Message-ID: <8b55ae26-daba-4b2e-a10b-4be367fb42d0@hartkopp.net>
-Date: Wed, 7 Jan 2026 16:34:13 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA87394488
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 15:34:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.78
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767800063; cv=none; b=kRI0ewnt2znmB3pqcopK/F/+y/H4NVY88Gmb11Qt0dz9hxOL/A6tSetrZSmLEdfDHHbml5Ibhqe9AcG6QrncwdG1jsPyNpG1zcP4SQc4ee29tj1aBNQgKNTedry3L7gKf5K61X5VLZsaifpITbTYbzFgqjM2fipLjw5yQRy/bfw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767800063; c=relaxed/simple;
+	bh=+jcXT0Qd0MP/qXpaY/rIBJ8LHVp0WyD94cq6v1/lYNA=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=FROOJ2fwvrvBCqeWibtQaZhlxUovQ1+kf0BnfGX7/JhLnXuy0okRGaeAix531ozx1iR1OFDjUwbyXKErTKCt1BXtS5EaGtcmfwfG81HoX+Q2l2oGbR3y7rIOWEIAeJDMZT9AEl1WjG2A05GZrIiqwZ1Z8zBKGwPi5wCn7IYzLD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-65746235dd4so547835eaf.3
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 07:34:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767800060; x=1768404860;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vFGKIQl/QbaqT2n6c9mJgM64BLFaT5MMFGibHivKdeQ=;
+        b=CpZHlcYlqPafT6ieDiqRH6pS2vVKw/tIV28z0qKw7xFJylUgimg7DiBpaIsWReVoWP
+         rwQlyMeIWFhOR0/yG4D01lYUwnDgPpnCRIOGD6pAWzQLUk3sY2l84h2F09O5/C9iCVpk
+         DIKvSEtjuT1Hc3ZXrQk8aTc41RvzJq2csHVfQ6/Vscz5HRv1wVGjAaPALNUrtaiABnUB
+         k9/bhwGY2O+p2Zm0sn43vfTrjBTR6SSaRnSZ83H3TFg5h+6oOHkx4Az2S7+br9t4kY5t
+         cWCxjO1S8DaLesoOT4gT/gduNUgItfHWaujWM1JHq9j9xd95LW+xU4tpFAh8l0AITjG4
+         8A4w==
+X-Forwarded-Encrypted: i=1; AJvYcCWNgbUNUYrLXBeRFEdJhxYtOQSRuuynMZz7nNzSaVmNd9ZbpiJSPmQxqzWXdeuvpr+0JRUcjpk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8MLO41/CeJuDW3ldywQAaIHbWEglCk2aKjp8uYT0D4GdB9Nqa
+	WxOFwEi2kn9QN8lyjM46WRwECeb7MOGV866sSUVpSy8dgTCaZ6WNgivqVpCoNohSkJcM/E5eswR
+	TrCdhQtBmqgshQGPMid3WTlYGwSGKK+7iaRaDZItW2gIA+zLTG/5O/bModVY=
+X-Google-Smtp-Source: AGHT+IGF2wQGBSRYfqIMGfsewhBc+zagOQzvOfUtyUbX89hNVPwEDqMoVzj0pFQ7GyGSefeBwC/Iqsq55wcl6bC4YMqkLBWgQBvM
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [bpf, xdp] headroom - was: Re: Question about to KMSAN:
- uninit-value in can_receive
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: mkl@pengutronix.de, Prithvi <activprithvi@gmail.com>, andrii@kernel.org,
- linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzkaller-bugs@googlegroups.com, netdev@vger.kernel.org
-References: <20251117173012.230731-1-activprithvi@gmail.com>
- <0c98b1c4-3975-4bf5-9049-9d7f10d22a6d@hartkopp.net>
- <c2cead0a-06ed-4da4-a4e4-8498908aae3e@hartkopp.net>
- <aSx++4VrGOm8zHDb@inspiron>
- <d6077d36-93ed-4a6d-9eed-42b1b22cdffb@hartkopp.net>
- <20251220173338.w7n3n4lkvxwaq6ae@inspiron>
- <01190c40-d348-4521-a2ab-3e9139cc832e@hartkopp.net>
- <20260102153611.63wipdy2meh3ovel@inspiron>
- <20260102120405.34613b68@kernel.org>
- <63c20aae-e014-44f9-a201-99e0e7abadcb@hartkopp.net>
- <20260104074222.29e660ac@kernel.org>
- <fac5da75-2fc0-464c-be90-34220313af64@hartkopp.net>
- <20260105152638.74cfea6c@kernel.org>
- <904fa297-b657-4f5b-9999-b8cfcc11bfa9@hartkopp.net>
- <20260106162306.0649424c@kernel.org>
-Content-Language: en-US
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-In-Reply-To: <20260106162306.0649424c@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6820:1610:b0:65d:1636:5442 with SMTP id
+ 006d021491bc7-65f54f6b90amr1254931eaf.56.1767800059693; Wed, 07 Jan 2026
+ 07:34:19 -0800 (PST)
+Date: Wed, 07 Jan 2026 07:34:19 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <695e7cfb.050a0220.1c677c.036b.GAE@google.com>
+Subject: [syzbot] [afs?] [net?] KCSAN: data-race in rxrpc_peer_keepalive_worker
+ / rxrpc_send_data_packet
+From: syzbot <syzbot+6182afad5045e6703b3d@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dhowells@redhat.com, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, linux-afs@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, marc.dionne@auristor.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hello Jakub,
+Hello,
 
-On 07.01.26 01:23, Jakub Kicinski wrote:
-> On Tue, 6 Jan 2026 13:04:41 +0100 Oliver Hartkopp wrote:
->> When such skb is echo'ed back after successful transmission via
->> netif_rx() this leads to skb->skb_iif = skb->dev->ifindex;
->>
->> To prevent a loopback the CAN frame must not be sent back to the
->> originating interface - even when it has been routed to different CAN
->> interfaces in the meantime (which always overwrites skb_iif).
->>
->> Therefore we need to maintain the "real original" incoming interface.
-> 
-> Alternatively perhaps for this particular use case you could use
-> something like metadata_dst to mark the frame as forwarded / annotate
-> with the originating ifindex?
+syzbot found the following issue on:
 
-I looked into it and the way how skb_dst is shared in the union behind 
-cb[] does not look very promising for skbs that wander up and down in 
-the network layer. And it is pretty complex to just store a single 
-interface index integer value.
+HEAD commit:    30f09200cc4a Merge tag 'arm64-fixes' of git://git.kernel.o..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=13446e12580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=655255e3ef31c19b
+dashboard link: https://syzkaller.appspot.com/bug?extid=6182afad5045e6703b3d
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
 
-While looking into _sk_redir to see how the _skb_refdst union is used, 
-I've seen that the _sk_redir function was removed from struct tcp_skb_cb 
-(commit e3526bb92a208).
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Today we use skb->cb only for passing (address) information from the 
-network layer to the socket layer and user space. But the space in cb[] 
-could also hold the content we currently store in the problematic skb 
-headroom.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/445be400b5e4/disk-30f09200.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/8be295d83690/vmlinux-30f09200.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/ae2ac2a81686/bzImage-30f09200.xz
 
-Would using skb->cb be a good approach for CAN skbs (that do not have 
-any of the Ethernet/TCP/IP requirements/features) or will there still be 
-networking code (besides CAN drivers and CAN network layer) that writes 
-into cb[] when passing the CAN skb up and down in the stack?
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+6182afad5045e6703b3d@syzkaller.appspotmail.com
 
-/**
-  * struct can_skb_cb - private data inside CAN skb->cb
-  * cb[] is 64 bit aligned which is also recommended for struct sockaddr_can
-  * @magic:	to check if someone wrote to our CAN skb->cb space
-  * @flags:	extra flags for CAN_RAW and CAN_BCM sockets
-  * @can_addr:	socket address information to userspace
-  * @can_iif:	ifindex of the first interface the CAN frame appeared on
-  * @skbcnt:	atomic counter to have an unique id together with skb pointer
-  * @frame_len:	bql length cache of CAN frame in data link layer
-  */
-struct can_skb_cb {
-	u32 magic;
-	u32 flags;
-	struct sockaddr_can can_addr;
-	int can_iif;
-	int skbcnt;
-	unsigned int frame_len;
-};
+==================================================================
+BUG: KCSAN: data-race in rxrpc_peer_keepalive_worker / rxrpc_send_data_packet
 
-If not: We also don't have vlans nor inner[protocol|headers] in CAN 
-where we might store the 4 byte can_iif integer ...
+write to 0xffff8881044ab560 of 8 bytes by task 4063 on cpu 1:
+ rxrpc_send_data_packet+0x1593/0x1df0 net/rxrpc/output.c:714
+ rxrpc_transmit_fresh_data net/rxrpc/call_event.c:255 [inline]
+ rxrpc_transmit_some_data+0x63c/0x8b0 net/rxrpc/call_event.c:277
+ rxrpc_input_call_event+0x8bb/0xf30 net/rxrpc/call_event.c:401
+ rxrpc_io_thread+0x1c1e/0x21c0 net/rxrpc/io_thread.c:550
+ kthread+0x489/0x510 kernel/kthread.c:463
+ ret_from_fork+0x122/0x1b0 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
 
-Many thanks and best regards,
-Oliver
+read to 0xffff8881044ab560 of 8 bytes by task 3500 on cpu 0:
+ rxrpc_peer_keepalive_dispatch net/rxrpc/peer_event.c:268 [inline]
+ rxrpc_peer_keepalive_worker+0x44e/0x800 net/rxrpc/peer_event.c:341
+ process_one_work kernel/workqueue.c:3263 [inline]
+ process_scheduled_works+0x4ce/0x9d0 kernel/workqueue.c:3346
+ worker_thread+0x582/0x770 kernel/workqueue.c:3427
+ kthread+0x489/0x510 kernel/kthread.c:463
+ ret_from_fork+0x122/0x1b0 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+value changed: 0x0000000000000000 -> 0x0000000000000029
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 0 UID: 0 PID: 3500 Comm: kworker/u9:1 Not tainted syzkaller #0 PREEMPT(voluntary) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
+Workqueue: krxrpcd rxrpc_peer_keepalive_worker
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
