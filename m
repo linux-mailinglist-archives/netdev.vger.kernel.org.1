@@ -1,141 +1,131 @@
-Return-Path: <netdev+bounces-247622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71AA8CFC63C
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 08:36:25 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6536ECFC6BA
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 08:42:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C3EA330019C6
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 07:36:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6C071300D313
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 07:42:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E1A9254B19;
-	Wed,  7 Jan 2026 07:36:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35B2E29BDA0;
+	Wed,  7 Jan 2026 07:42:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MCBsAC68"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AJv1TC3U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f195.google.com (mail-dy1-f195.google.com [74.125.82.195])
+Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C30B27A92E
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 07:36:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10C029ACDB
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 07:42:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767771371; cv=none; b=LbnrCIC+X+jhzWmWiMJlLaeYGAmNUMal3NcoRSDcMC+oUAsgpISFrh5LyxthfuTJ5/LoD61TrwIRX0DWD50hOC5UJreVjLkXhdkQjUAi+IEAt63AU2NOWm7RxwHOYnwfWNjPLLnnsDRM4PCwHrBKevP6P2+Vh/nzEkl37XPToTs=
+	t=1767771731; cv=none; b=RRaGs/nHxA/wRNbPO+BD3mTIhFfIfFPGXMpuTFKg09igg8xyid9HE5E8pLcxL31i6faWmnO/bZvHgZ+3R/6gzP8Cbb9p/7CnY568Hr8x7cU0Ow8gCxUSfYBGWjyhf58iQ3uPJUkJwAVEsZM7oRqyv2llg+JwKBZVAkGwjBL0bjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767771371; c=relaxed/simple;
-	bh=QHuW9TLM9JTvdYNKW6C++l+j/zGPJSHVm7qNW2Vt0EY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JWYklPb+5EhGcAHTDgDb+5WRDbTiLJ2Gt5e4SeqjqcWuoWZ70ooM/6XYdiglaoYj7V9j5BFY3Ln+3vyXkZp4FRXg5a1wcKpJMZY9vcytL3/x88yF7tkHdgpniNLgU78q8MC6cLycW6+fkcuTauC03V0vDuNRqXJDmx/QItGhzMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MCBsAC68; arc=none smtp.client-ip=74.125.82.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f195.google.com with SMTP id 5a478bee46e88-2abe15d8a4bso2303867eec.0
-        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 23:36:09 -0800 (PST)
+	s=arc-20240116; t=1767771731; c=relaxed/simple;
+	bh=9QJNm5DRwKf59jnnJG5BlivpbtpgPTlbJeGEV0wdNpo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=r7T8lUX4NgQ4zatgzt/C9wpJ6eyePEUoDJ1uoRbibO85jNymbqOxdeBhWDxHo0GkYggbvt6JbQAbWwnKJcgnm7asXIBrMHrRJuyoC8N96H5kNS9yw3RCztjljdbHnIGKc3eunhY9LxMI+CpVn9ZvJ2rT8F3ntfkkznk4yFwUbb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AJv1TC3U; arc=none smtp.client-ip=74.125.82.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-121b14d0089so1268093c88.0
+        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 23:42:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767771368; x=1768376168; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4gg85tmSVBtoNhmhNk5MLKN1suGRMIEdQwJkzhQdPQE=;
-        b=MCBsAC68FzqCOmUcjK2dE1yqivkOEeb4Uk70pUI8QgMKVArdcd/Q4cZJZdW5oXCWrl
-         fk3WuNscRBXzUUNnFvFMOvVCyDm/vRQti9vN6bDmSZsUcrcYrOutbKAb9hayOraPH2yh
-         d75SWKBFXd/RhsO6hjjZ6TBSXj6p0FVzCOg9Si+12w6vWcOVbBSUzNp+btxhczftHdMv
-         jy7Ze/cVo7NtVP2UjM3nDS2niGDFp7Ge4drYc/TsuYeSwgeUasb6RVTDkKB9/g1FXVRF
-         X4FgU/93zUbASPXCekmY1tZDSZIUB9vuJnF43pte4FHsAHx211e1bJSxyVZEgqBX/6Un
-         ERfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767771368; x=1768376168;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1767771729; x=1768376529; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4gg85tmSVBtoNhmhNk5MLKN1suGRMIEdQwJkzhQdPQE=;
-        b=jS60daNh6HMY3940R81a8InBDt5P2gDS0cIhcpNuQ5nWT0jiOBOY41py+l8zhilIaE
-         4Q7ok8TIsDgy5QIdQAa3ZpnbOzS0IWhLwVEn8s33aNArNN833vWKi/E5XFL+X2in+EYn
-         tdkiNXZPCbsc7NTjwZGeVy1oAdou8eD1+sDw0IDQiWue1UnRTc6bsZhsND97lYhNULcg
-         x9br77T5jgBmZcp54aYBBh5M41T+52LirxlJrxyz5L5asEHvff1CnTqq6DU0GHUdG0j3
-         SIAVD9qaA1McBDDxzzFxcySCRNLE6kzTBirV7ASDvjj6EQw5Fd5DmhCceUwWvFK0Jz9N
-         xrSQ==
-X-Gm-Message-State: AOJu0YwcvRURpCicsHk1XKot7lKEoLl/+WHzWnh6VVH1auirffVUOtqx
-	vcrFbH1ehIiiMbklt7ShUOBbiSyyNNNrPJtVqQ0vpQF5etM3o0m8F0zZHR56eXzU
-X-Gm-Gg: AY/fxX61w4U3/JfJW+bDOStvH0EH2wNO5dgA+x+ZKN/lh7iJTZwQ04GLV4697/BtFBE
-	/djXkNawt21zhJGnIEt8ehihhKD4blcwNlwoAGDJP6W+KAst90uB79kg+t5YnR9zRuG71KiE/KB
-	smpRL+Rlfd02ohwgw0hXrEK+jYUkkSwZRQMXuBA1SkH8G2IF524UocM5nYyG1QpBvD1Pt3FktFA
-	id0DbldzK62o8SqQBPCMsSeWyzahocBC5lstQoRs5nxwnGLo146cuvo0LzkTDbpLD5Y46n/dV+0
-	eLj4CoveoIkaTETrQNdj4dHg7zH2lRNIXxw+yxrB2mbqK1ehAhvzVRnOkj0o+EFpdlcGYTKNduW
-	HZYGzdbi1WLXksMk1n1CgRIhmzvWJs1i6WzW6HPvEw65y8ChMpqL+OMoeNfHvaQlafAKiUn6Y/8
-	s05IRnG6pJ+9QOzbQmciZlMVd9NXi0K4o/tX3nfJNHBlzg+disGQ+3/w2AOgr3DHCb2VUkQkRmF
-	TB1LcSVc0YiQeqyVfHbT/Cdf6FlIGfSeJoiaPKv36EIljLK53SAivrubZK9wM5uZSzKDHXM5+Ku
-	WND0
-X-Google-Smtp-Source: AGHT+IEFceMrc2r/sYs+dsPvGYmxRe4C9QbcJMwc8dq++b01oa35NndQm+DAlRNCmixB5fSWZNO2Kg==
-X-Received: by 2002:a05:7300:ed13:b0:2ae:5cdc:214c with SMTP id 5a478bee46e88-2b17d30bff4mr1200117eec.39.1767771368408;
-        Tue, 06 Jan 2026 23:36:08 -0800 (PST)
-Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b17078ccf4sm6231156eec.16.2026.01.06.23.36.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jan 2026 23:36:08 -0800 (PST)
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Subject: [PATCH net-next] ibm: emac: remove unused emac_link_differs function
-Date: Tue,  6 Jan 2026 23:36:01 -0800
-Message-ID: <20260107073601.40829-1-enelsonmoore@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        bh=9QJNm5DRwKf59jnnJG5BlivpbtpgPTlbJeGEV0wdNpo=;
+        b=AJv1TC3UTsvKPwDwGGATFzCt9cfHdm2HzU78kn33DvQKcggtqolKHSd9VFZ77bOibg
+         7A0vdzi4NZwTLL10gL24GCOGnxD4S3Vyos6tdTs+cBfx8Y5fSrkCwz4KkBODUt4N70DI
+         I/o8dY6q16ALFfQwlq9rR+J4KCfQCigaLGbbsJnLTajWfPoP6Af0B0mcuw49tiLrhkOG
+         6N3CXk90lQHPMyC0tSvfO0dHRszeagLr1S9NE+i/fXWi/Obg0p/MsFFQfk9TycLCzBKu
+         EEWG5MUpXpw7QOXWSuHoh+hNvVyjgqo6RN9fQrGNJr0Fw05i3eYCy+TBZqRSVkFcdYfg
+         tJgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767771729; x=1768376529;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=9QJNm5DRwKf59jnnJG5BlivpbtpgPTlbJeGEV0wdNpo=;
+        b=PaYx61pBMRgIKCSqdZCRmMJkeP6W8Yub1BWjcbfy5iDX2+ms12PEjZXuvbMA/kHY51
+         ryazlszvnrpZNLWcrdP1F5OHzXjS0ZUII8KsZ8BniR+WljhoZIC5qQF6DvH6aJ5+SgcZ
+         iEVjDQp+2YBfOlpkNM/XiLaTPUNLH6bVqWmyxxvcMl8HHwqpbmKHbveI6HxNK61ABgXA
+         c3o0rILFk0/Lk7LjthpcqMqpUL1MzoFFHoduTjWFvHFkm0z5GoqhewqG/17dRDfmUlAO
+         UBtatNdnL9I1oAajJQ6L0wH6e4nmm7lu2jDSsDlqsjq+LCrHXDy2JOOUv9v9BCGt7fqi
+         dD8w==
+X-Gm-Message-State: AOJu0YwT+VQfzEIr1mjzpRE8qZddzb7BB6fc5t8IfXF+bV2ovDZ5yHoz
+	aeANdtQyeVdIouxIZpaEHRfNslsZAFrzv9WA1KYfAhDMihwx4Bn2oQaniMrKg/GzxtPvtRQbVP1
+	Tzs/sZx9YDzguX6cLuwiQTEYxcNxIuNwiBSZfIJYZ
+X-Gm-Gg: AY/fxX6u/zVllyHnunHkitb+UsCtuoQZwPFpjcy6tPFKwpkUaLFM/xFoLgJktj9Atye
+	P1Wo9FLdLFsvZ2Ic4wV8M7hQqM+Bg4a7N34C9oSOQBVf60BuP168PGXBo6RUNCHle9pIXS+41BV
+	/BZtsg/d43J16KjTINLcek/mkMUsrhlrkXv8lPNokpCjGFCRT9Yz+UZT+jLujr7iu/Ar2I0olLC
+	SEHZvesSb2Mmt+rCtvkZb6U+J43gVs3u2F39/gVfTeuOJ5HIW6rxqoppkpWrDZkyDdH5olPR+Wc
+	vLmaE1dhiqWFipYOJ8UBkfAWbUoJXek76y7BJw==
+X-Google-Smtp-Source: AGHT+IHMXLR1dSJfxcyCPbSrXs5AyyqzXdXaJh6E7kme9E9G8J/I/dysqiX5PT3nhKf5G1WZ9ncIEdRFyf1wJQpkyEQ=
+X-Received: by 2002:a05:7022:60a9:b0:11d:f440:b695 with SMTP id
+ a92af1059eb24-121f8b0dd2dmr1257647c88.16.1767771728310; Tue, 06 Jan 2026
+ 23:42:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260106150626.3944363-1-willemdebruijn.kernel@gmail.com>
+In-Reply-To: <20260106150626.3944363-1-willemdebruijn.kernel@gmail.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Tue, 6 Jan 2026 23:41:57 -0800
+X-Gm-Features: AQt7F2pi6DhNd2tylE6EKsDQMV7gSCWCOw0f6mbD4f7hrHwByqv-R09v8JtQlFI
+Message-ID: <CAAVpQUBRymieDppfa=QsS2Q9u9mkYoq+Rb-iCtKC7t=2bRrpbw@mail.gmail.com>
+Subject: Re: [PATCH net] net: do not write to msg_get_inq in callee
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	edumazet@google.com, pabeni@redhat.com, horms@kernel.org, axboe@kernel.dk, 
+	Willem de Bruijn <willemb@google.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
----
- drivers/net/ethernet/ibm/emac/core.c | 33 ----------------------------
- 1 file changed, 33 deletions(-)
+On Tue, Jan 6, 2026 at 7:06=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> From: Willem de Bruijn <willemb@google.com>
+>
+> NULL pointer dereference fix.
+>
+> msg_get_inq is an input field from caller to callee. Don't set it in
+> the callee, as the caller may not clear it on struct reuse.
+>
+> This is a kernel-internal variant of msghdr only, and the only user
+> does reinitialize the field. So this is not critical for that reason.
+> But it is more robust to avoid the write, and slightly simpler code.
+> And it fixes a bug, see below.
+>
+> Callers set msg_get_inq to request the input queue length to be
+> returned in msg_inq. This is equivalent to but independent from the
+> SO_INQ request to return that same info as a cmsg (tp->recvmsg_inq).
+> To reduce branching in the hot path the second also sets the msg_inq.
+> That is WAI.
+>
+> This is a fix to commit 4d1442979e4a ("af_unix: don't post cmsg for
+> SO_INQ unless explicitly asked for"), which fixed the inverse.
+>
+> Also avoid NULL pointer dereference in unix_stream_read_generic if
+> state->msg is NULL and msg->msg_get_inq is written. A NULL state->msg
+> can happen when splicing as of commit 2b514574f7e8 ("net: af_unix:
+> implement splice for stream af_unix sockets").
+>
+> Also collapse two branches using a bitwise or.
+>
+> Cc: stable@vger.kernel.org
+> Fixes: 4d1442979e4a ("af_unix: don't post cmsg for SO_INQ unless explicit=
+ly asked for")
+> Link: https://lore.kernel.org/netdev/willemdebruijn.kernel.24d8030f7a3de@=
+gmail.com/
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
 
-diff --git a/drivers/net/ethernet/ibm/emac/core.c b/drivers/net/ethernet/ibm/emac/core.c
-index 417dfa18daae..72936d47d011 100644
---- a/drivers/net/ethernet/ibm/emac/core.c
-+++ b/drivers/net/ethernet/ibm/emac/core.c
-@@ -1277,39 +1277,6 @@ static int emac_open(struct net_device *ndev)
- 	return -ENOMEM;
- }
- 
--/* BHs disabled */
--#if 0
--static int emac_link_differs(struct emac_instance *dev)
--{
--	u32 r = in_be32(&dev->emacp->mr1);
--
--	int duplex = r & EMAC_MR1_FDE ? DUPLEX_FULL : DUPLEX_HALF;
--	int speed, pause, asym_pause;
--
--	if (r & EMAC_MR1_MF_1000)
--		speed = SPEED_1000;
--	else if (r & EMAC_MR1_MF_100)
--		speed = SPEED_100;
--	else
--		speed = SPEED_10;
--
--	switch (r & (EMAC_MR1_EIFC | EMAC_MR1_APP)) {
--	case (EMAC_MR1_EIFC | EMAC_MR1_APP):
--		pause = 1;
--		asym_pause = 0;
--		break;
--	case EMAC_MR1_APP:
--		pause = 0;
--		asym_pause = 1;
--		break;
--	default:
--		pause = asym_pause = 0;
--	}
--	return speed != dev->phy.speed || duplex != dev->phy.duplex ||
--	    pause != dev->phy.pause || asym_pause != dev->phy.asym_pause;
--}
--#endif
--
- static void emac_link_timer(struct work_struct *work)
- {
- 	struct emac_instance *dev =
--- 
-2.43.0
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
+Thanks!
 
