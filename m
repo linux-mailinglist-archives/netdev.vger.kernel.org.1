@@ -1,174 +1,159 @@
-Return-Path: <netdev+bounces-247891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E8E2D00427
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 22:58:48 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BD24D00436
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 23:01:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 002FD3033D65
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 21:54:18 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3B98330031A2
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 22:01:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B4A318BBC;
-	Wed,  7 Jan 2026 21:54:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D81A02FB630;
+	Wed,  7 Jan 2026 22:01:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="ZTcugHZU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="To8+gMxo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CD762D3231
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 21:54:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384202F7AAC
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 22:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767822856; cv=none; b=tO+pFqo6r+nULBGHZeSNQ8SxI/itA8R6HyyO4ERz4lDl1jOp2b9tnxQ3q4N89qBxO+abdqohAgajzwJfVaOlDneEISWPjM02L8m6k5KLDaaA45LRAvpmcPPvgoLmm4eSe7KMGH643TIzxHaGKgfeV4Pkj4FKbB9LOdNJx7n24y0=
+	t=1767823286; cv=none; b=Kbf1Jl05bVjvp7j1wgqayzD46GHkKhWuu32bfGcZgmcL4YMt1w+VCppHIF7hStLcVB0fHBzH4haO2dtA9N46VRyRkrpR5tOSJdO4tp7vXCk6wFsKRQqehqdrZwSoM/i/WidPnEiUzCeWDg0J2dEmIv/7wWFce4S6o+EQew7VanA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767822856; c=relaxed/simple;
-	bh=/MejwX65hDKfR53cfS2/woBJf8a6swBHRdIPDU/11ww=;
+	s=arc-20240116; t=1767823286; c=relaxed/simple;
+	bh=YYrgN1/4b3uYrEh9czfhj31efOuWQwyB0QIyz0KcNhQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J4HIIkvSkq2NP87NAjUrkcYsKmNJiRzzfiWtjd5FSF5V4e3+qvwnue/9euW6KdodtwipAZimqdrnW7HFc7DZX3h12gXR67DBzI+zcezicvyChqslF1x33FDGckCOG8BiZmxMmn8tt8IQOYwd5//jtx9vuWgyW90ZOLs06Kt4Hvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=ZTcugHZU; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-bc2abdcfc6fso1102729a12.2
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 13:54:15 -0800 (PST)
+	 To:Cc:Content-Type; b=MgZxXFeeqIpz8VE5WfkbfQZYPjCRJzjkIzpatLLSKGCwgwcZNUUZJPVXz+0F17W+Ld3SLgAHboYJDKhJQGTIeDDgTKykWG89lTKmEAVRW+94bRX09yUxVX9MIi9tOSLU2Tre+vfNMpLSL9ruvQoDOfUAQkhvpeUnRjEc1rH1qe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=To8+gMxo; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-42e2d02a3c9so1894450f8f.3
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 14:01:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1767822855; x=1768427655; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1767823283; x=1768428083; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=glsfhtDUmyowawtGUoJCa771AHF+/UGGwRgXKhqc+y8=;
-        b=ZTcugHZUC9ieAvB/Va+V/ITTY/Xwf6Lz0B1lrUMRZQ+KCemYKW4dX1K0896uVuW+W4
-         e5i4ws1vBBt2uB3x4ymUPA3We4Q5yv8d9K/I8oD3FBg0EFuwCbmDwhq9yUmpyski7J1G
-         /poj3Un56Ozsy0VCv7nuGcjU7q6AZ07jhWRPwM3SFCsyrzpaBLJmmGvNlzR8g2ErqhU4
-         J9f9rSIpEkW8pICt1nch4RDsN3cGauucZ3/LFroj1BGMS0lNiBa+vaE67aaBLAyr6dud
-         JYF2GHlJgclRhJmCwagfY9OJcliIbn3WK+RMzjm4kKncfQOf8GvxwImwolAtrFsk8cbv
-         DkFg==
+        bh=PbVOCVA3+xNf5U98se1N6HGmg+GeYqwwN9lCOLrIIo0=;
+        b=To8+gMxobzuLscpw/eDYAGxxjrtwz9Oun/PI7aSPVNNC/FBK1deLZNK9+CveqpBgGr
+         7g2+ydAjL+Xr6Lmn6n2PF+uLK8fB2/6TJem/pNY+H+5TVd7EqAgdTrKMZ/gL8EtI0T63
+         St2tLgSQEyGX8dxi8FxvWWivZpJRSy0imDcO3aPMTzvXoyGWEDVYkY7/0+2VmNc3ymUV
+         l5JEUiD+AZnm891H6nd+q2h05xPOglt0BgTh+ZR0ozID4qg/XI0mdGUIZZzKIhA7t7d0
+         bzt5RrsxvbanZWWE5R2WImDhoY11IPOyspsbF77Ok6DoPy5PhTUA29srTIxLvlFk0MgA
+         253g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767822855; x=1768427655;
+        d=1e100.net; s=20230601; t=1767823283; x=1768428083;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=glsfhtDUmyowawtGUoJCa771AHF+/UGGwRgXKhqc+y8=;
-        b=R4aXm+oJEH66cyuI7cRjszzFhc5uEeHMIrMpLkqFke48jFAfEPsQBP1Mga/lrbVmfJ
-         xj7h/poreAT72Vv7AkJRsx3S6BQgvy5eIplxtF3PtdD2NhBl/jo+W+Az4awgk64yTavP
-         T6w4Hgeg5h59vcdDDzX+JWY0BQbdrC1yT+7igUg7x/mmlq8sDiUozOQ8gXjJjexTjzJo
-         HJ71zl8QwcyvGg8+n6y5nm+G1tswqLmGhdCB8decgT8OInutWKi6S67Loh5QK6UuNtLd
-         yBzGlz418xK+nL5oZo9Ido62wXteCsmHLNHbt/bfLLxLrryojjbz+FJBmVIjfLUvNxan
-         OfSw==
-X-Forwarded-Encrypted: i=1; AJvYcCW7N203BXWL0sHV+nYDd0nTSWs6Cy5eT4opwC8ZssLknIphJpyku+OwCUs5ylXRSYegWSj8ONs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwV/TjJ69PDiC2UH1H8t6NIWiP3iVlykUIyBewXYcHagm9mHFtW
-	tOhIPmF2lcBcf6M7HZJBR+H+FoVlFG+h2dBHV2cINU6i7xuAfuxUXuryBP+jPswh4krKvNiLWlu
-	nMHBtAyQlCuizQ7Hu+JqK2Nu0fG38y/DE1ua23BMU
-X-Gm-Gg: AY/fxX50vySHabMfqIg1azA8OOX2nNaoBc+hoa6qcNaldk3USgrqL2xQzL67blbV8UJ
-	dx6NHcFt10msaNiqR2C1l5/dcyWOvEEuYHUvJU7Ej2RTSNyZKoKg959cTRv7J/ujBMSMCx+OwAh
-	V6UXv3YJopUqjoX29SDNZutLs35WDtqJOnaJhmojqbrBzO8cXvOmgat7Jb/2VfvSlY1kaTU3+Yz
-	GVNIKf38yp9Y3IOQ+MUcUvZUwuCw5P+dbzgXrGWZytg86Z+6+kgs3hLZaZlymQJPDUy0xo=
-X-Google-Smtp-Source: AGHT+IGmDa04TwAFrUVZIKE0bCmyIfgat7wJWWL+XRgau6V3p4p1z6v7uRzUa5yn29Rvvq5RrrPOJUM02YqDMGwe8b8=
-X-Received: by 2002:a17:90b:1650:b0:340:d1b5:bfda with SMTP id
- 98e67ed59e1d1-34f68c33781mr3244535a91.3.1767822854607; Wed, 07 Jan 2026
- 13:54:14 -0800 (PST)
+        bh=PbVOCVA3+xNf5U98se1N6HGmg+GeYqwwN9lCOLrIIo0=;
+        b=pckejT5reMdcl5ucUfvegUPVGwQ+iH7pK8K7Nk8ECmvu7IUh72lr7PJeoNm5ma+5CS
+         bWtBAnJF5jxbPEOR73US3TdhL3oM7FbmJ4a91x2E0uSf7ZtdzM30OkyNs6rQyQ4lpUB6
+         gXQDZVCDNbwRZzYo5dPzAwOeTF5m2+5sXkEKH4apC8qCao8gNfg11tVmt/d+UqAtmuPr
+         Rqpbpri1Xim6VACwNjx1YBXZ0m8+Pbee0CEQ6rXbEqgX2Vbb+FTOd9oO+WKnbzC5+g/K
+         AsXDaDdT69g8jlerc9hXQI/G0yzMEkG6Y10v9XsblbqPAyRm/gzdNoLCw3P10iCqnRaL
+         R9aA==
+X-Forwarded-Encrypted: i=1; AJvYcCWnEjIjhRmZ85w/ObmntVMNCHiGSIutHYl4Zj40oBkUQxQDp3+lDDAAzIevJ2mdI67nNhIJG78=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxT2hM+B3hkdEMslSt/gpHfHYZPzuL5lzRna00arWs2vW0gu5/E
+	mZcbjx3BeaC2vbDqG59dshC/R6HPvLkPDR/L5/u7YB3wP4Tn3g8TGZtG7reVA5XvqooDd1tjyoB
+	FFI5WQkJcDJbzcss9SAI4kI3mJ0fmenc=
+X-Gm-Gg: AY/fxX6CGpXnbPbdwqFAdI/6T+S6LYc7JEd6eAw5jRTt91+HCF/zEGLEjy4Fwkafhlj
+	xfTRWZyM9JmBiTNVQ+AjCeptzQqMXniwJHojGr3u9legkLDWRFeASy8hLZrzbI7Lw0ohvdrv5DZ
+	afWGjnBkwF1W5Vli0gcQF6KcoT8YV01q6rTtWguiDW6grMA1miiuetzuGq7Jy8ODfIFo/0jeRV4
+	2UHfigxYkh/o+RyzAOyr7As27FVqwfL5FfNWqx/bA04Kh+UFACNj8LbE/jT36sbRJ+yFSW627+Q
+	oR+TmNElLOj8tEt9QJ1r0J304zFw
+X-Google-Smtp-Source: AGHT+IEdyOPZbDPif6fAIcsc+jEyvHVzWI1qQCxKOJRLKNXGewKU26ff6NB16EAqwPwYvPeC/wTX3Z8ltq/NDljKPKQ=
+X-Received: by 2002:a05:6000:2287:b0:431:5ac:1fc with SMTP id
+ ffacd0b85a97d-432c3790890mr5108810f8f.14.1767823283308; Wed, 07 Jan 2026
+ 14:01:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251231213314.2979118-1-utilityemal77@gmail.com>
-In-Reply-To: <20251231213314.2979118-1-utilityemal77@gmail.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Wed, 7 Jan 2026 16:54:02 -0500
-X-Gm-Features: AQt7F2qw6OaC4MXbk1CPG_jNqQef9CEQ0d5ZkvwF0tURdpz-_nm5g4KzXb8fLmg
-Message-ID: <CAHC9VhQF26sVYoKxZ_7x2nL1HxuK0zeH013e8ugigz9B+Kpkjg@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/1] lsm: Add hook unix_path_connect
-To: Justin Suess <utilityemal77@gmail.com>
-Cc: James Morris <jmorris@namei.org>, "Serge E . Hallyn" <serge@hallyn.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Simon Horman <horms@kernel.org>, 
-	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	=?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
-	linux-security-module@vger.kernel.org, Tingmao Wang <m@maowtm.org>, 
-	netdev@vger.kernel.org
+References: <20260107-skb-meta-safeproof-netdevs-rx-only-v3-0-0d461c5e4764@cloudflare.com>
+ <20260107-skb-meta-safeproof-netdevs-rx-only-v3-16-0d461c5e4764@cloudflare.com>
+In-Reply-To: <20260107-skb-meta-safeproof-netdevs-rx-only-v3-16-0d461c5e4764@cloudflare.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 7 Jan 2026 14:01:12 -0800
+X-Gm-Features: AQt7F2rZVzSbDVPQ7QFEgQKdB5_5SNHGgDXI0efgoxcd0dCh3XETY7iDFndTT_M
+Message-ID: <CAADnVQKR9Myx_ervEzNihoWm=6=_B4LebPhPezm9rOSReE1bjQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 16/17] bpf: Realign skb metadata for TC progs
+ using data_meta
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Simon Horman <horms@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	kernel-team <kernel-team@cloudflare.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 31, 2025 at 4:33=E2=80=AFPM Justin Suess <utilityemal77@gmail.c=
-om> wrote:
+On Wed, Jan 7, 2026 at 6:28=E2=80=AFAM Jakub Sitnicki <jakub@cloudflare.com=
+> wrote:
 >
-> Hi,
 >
-> This patch introduces a new LSM hook unix_path_connect.
->
-> The idea for this patch and the hook came from G=C3=BCnther Noack, who
-> is cc'd. Much credit to him for the idea and discussion.
->
-> This patch is based on the lsm next branch.
->
-> Motivation
-> ---
->
-> For AF_UNIX sockets bound to a filesystem path (aka named sockets), one
-> identifying object from a policy perspective is the path passed to
-> connect(2). However, this operation currently restricts LSMs that rely
-> on VFS-based mediation, because the pathname resolved during connect()
-> is not preserved in a form visible to existing hooks before connection
-> establishment. As a result, LSMs such as Landlock cannot currently
-> restrict connections to named UNIX domain sockets by their VFS path.
->
-> This gap has been discussed previously (e.g. in the context of Landlock's
-> path-based access controls). [1] [2]
->
-> I've cc'd the netdev folks as well on this, as the placement of this hook=
- is
-> important and in a core unix socket function.
->
-> Design Choices
-> ---
->
-> The hook is called in net/unix/af_unix.c in the function unix_find_bsd().
->
-> The hook takes a single parameter, a const struct path* to the named unix
-> socket to which the connection is being established.
->
-> The hook takes place after normal permissions checks, and after the
-> inode is determined to be a socket. It however, takes place before
-> the socket is actually connected to.
->
-> If the hook returns non-zero it will do a put on the path, and return.
->
-> References
-> ---
->
-> [1]: https://github.com/landlock-lsm/linux/issues/36#issue-2354007438
-> [2]: https://lore.kernel.org/linux-security-module/cover.1767115163.git.m=
-@maowtm.org/
->
-> Kind Regards,
-> Justin Suess
->
-> Justin Suess (1):
->   lsm: Add hook unix_path_connect
->
->  include/linux/lsm_hook_defs.h |  1 +
->  include/linux/security.h      |  6 ++++++
->  net/unix/af_unix.c            |  8 ++++++++
->  security/security.c           | 16 ++++++++++++++++
->  4 files changed, 31 insertions(+)
+> +static void bpf_skb_meta_realign(struct sk_buff *skb)
+> +{
+> +       u8 *meta_end =3D skb_metadata_end(skb);
+> +       u8 meta_len =3D skb_metadata_len(skb);
+> +       u8 *meta;
+> +       int gap;
+> +
+> +       gap =3D skb_mac_header(skb) - meta_end;
+> +       if (!meta_len || !gap)
+> +               return;
+> +
+> +       if (WARN_ONCE(gap < 0, "skb metadata end past mac header")) {
+> +               skb_metadata_clear(skb);
+> +               return;
+> +       }
+> +
+> +       meta =3D meta_end - meta_len;
+> +       memmove(meta + gap, meta, meta_len);
+> +       skb_shinfo(skb)->meta_end +=3D gap;
+> +
+> +       bpf_compute_data_pointers(skb);
+> +}
+> +
+>  static int tc_cls_act_prologue(struct bpf_insn *insn_buf, u32 pkt_access=
+_flags,
+>                                const struct bpf_prog *prog)
+>  {
+> -       return bpf_unclone_prologue(insn_buf, pkt_access_flags, prog,
+> -                                   TC_ACT_SHOT);
+> +       struct bpf_insn *insn =3D insn_buf;
+> +       int cnt;
+> +
+> +       if (pkt_access_flags & PA_F_DATA_META_LOAD) {
+> +               /* Realign skb metadata for access through data_meta poin=
+ter.
+> +                *
+> +                * r6 =3D r1; // r6 will be "u64 *ctx"
+> +                * r0 =3D bpf_skb_meta_realign(r1); // r0 is undefined
+> +                * r1 =3D r6;
+> +                */
+> +               BUILD_BUG_ON(!__same_type(&bpf_skb_meta_realign,
+> +                                         (void (*)(struct sk_buff *))NUL=
+L));
+> +               *insn++ =3D BPF_MOV64_REG(BPF_REG_6, BPF_REG_1);
+> +               *insn++ =3D BPF_EMIT_CALL(bpf_skb_meta_realign);
 
-A couple of things related to the documentation aspects of this patch.
-First, since this is just a single patch, and will need to be part of
-a larger patchset to gain acceptance[1], please skip the cover letter
-and ensure that the patch's description contains all the important
-information.  Similarly, while it is fine to include references to
-other sources of discussion in the patch's description, the links
-should not replace a proper explanation of the patch.  Whenever you
-are writing a patch description, imagine yourself ten years in the
-future, on a plane with no/terrible network access, trying to debug an
-issue and all you have for historical information is the git log.  I
-promise you, it's not as outlandish as it might seem ;)
+Not quite. drop this BUILD_BUG_ON(), since it's pointless and misleading.
+bpf_skb_meta_realign() has to be the one done with BPF_CALL_1(...).
+Otherwise above will work only on x86.
+In this case on arm64 too, but it's by accident.
+BPF_CALL* has to do ABI conversion from BPF to native.
 
-[1] See my other reply regarding new LSM hook guidance; this patch
-will need to be part of a larger patchset that actually makes use of
-this hook.
+For kfuncs that's what JITs do via btf_func_model machinery.
 
---=20
-paul-moore.com
+pw-bot: cr
 
