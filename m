@@ -1,223 +1,136 @@
-Return-Path: <netdev+bounces-247788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64E73CFEF04
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 17:46:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FC84CFE83E
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 16:16:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7265531392DD
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 16:38:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7E255303A0A2
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 15:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D841335CB6B;
-	Wed,  7 Jan 2026 14:57:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41DFD349AEE;
+	Wed,  7 Jan 2026 15:05:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XxX5J7Oj"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="CtEISEka"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 424E535CB6C
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 14:57:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26139348889
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 15:05:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767797845; cv=none; b=OEPWUfiW9R0r+pn/Jai6h7nsBGg42VqbMlNv0gs6vMTCX4MGDgLPTrpAKAc/1ShVolISvKzARkaeVA1FSTicD8wc0XU9s5qvcBbtE2TXeHSrt6Jhayn2ogJ6WVSy+XR/1qO622S5FkBfk5YFExb1wevjt4S69kJON1wtb4fCcNk=
+	t=1767798306; cv=none; b=jIUrholPT5fLsJXHfozT+DQZm8ydurbD3hlOL0+JBhrEwLEwtKYAJctY+00PQYR1gdfEsyxYhm8m4WCaLIcg8dd+wpiD0NGZHCyKh1Jkqg2QAJWGEc2G+TnWqDLlg9ULI5CZGvHA0h/PvwXUgzIpY0giaKcmMtQo+lhPTnYSzXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767797845; c=relaxed/simple;
-	bh=fvL5Aq5EZaylFLTAe6GwH7xU0V2ydU6nEzGXwuR9XUM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TsXpZ9o6PyNk86Cqku0KnWgReHdi1tTAOBAqUCeEP5W/npfUx9Mkc5BmmUhhaK+8yf+OU1EZFcNX70lTHhqD3qMhkKD8+mGSt3KA2/jXh/j0aWi2w47eU6+ju9oMRKh3ocj65DnVGAKjmo4NCfoq+qa/VHWfnOTUBXtil9xoN6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XxX5J7Oj; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-78fba1a1b1eso15386917b3.1
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 06:57:24 -0800 (PST)
+	s=arc-20240116; t=1767798306; c=relaxed/simple;
+	bh=D5FmglVvkl3g4DuAXZKkWi0EAt1o7Pm+KQPATu7ybOQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OkpMBuBQSkxCfaDmXahEMsiXU9nTZBxpEUFKc4UGML2+MQI9B0brwOYDJ78fkYZ5Uqr56urm2LAm5bQm0BhENnaEU2kLxNrtmZxfeyDnTvu2mexIxw4W9uLbT4e4WRzLmkxnawqaqHfTTJjgrc0G4aHmyUa5FHpjERXUEglA57M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=CtEISEka; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-47d1d8a49f5so14837205e9.3
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 07:05:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767797843; x=1768402643; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xlGENMu3o6cBLcDeYDff2G8dRuXoMZxnkdZNgTS5OtU=;
-        b=XxX5J7OjB0WroFzWmR8NHLYZDy6i7Uuph+plwWj5X9SITRrJxS6xQOXURg32LKLcbm
-         cDHOAlSY1lrYmwrP4VH8P4vspqezCRdN4LmU1zFDI/3KbfdjC1e4/hRX7YVGpWG+ONRe
-         VgpMBG8JF3Adixnzfe0VUg4EXl3jkdjjMySE/7dBDISxF9yfckbFXM31at5xFmY1NOQk
-         I58uW1eJ8S0qx9ySAliXdZq1kdiUVkMhnQFqMRIqx1HHuSKXvT/yxW6+MTW0QcSiUADv
-         +CNoPfGziGSWSaCV6bhqf5JJDLMhrdy/DqD8juHXT3UvYK1vbfaavM0VXd4Nb2ye7dFs
-         B64g==
+        d=suse.com; s=google; t=1767798302; x=1768403102; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=UZ/7ZMF+GZy1qUkEJEGh+CeH3UAPpaGuj74Mgzc+UGQ=;
+        b=CtEISEkaNSereDkNgutOh7W4rCw22UG1W2ZcLdcb+1OL/hlRe6fvz0JvcsMBNtYvm+
+         KPVuHN4H7/k9KzsHNuRnBGTrghn9pU3oCdqZADXMgU1im8/fZrpk0UFX7SIoieFQ2DfP
+         kRUnUZqTRe9TAbtN7v804XNFsbTJl8crfBpzhC5Uw9R79Oe+RLqISte6UiuG3sWDqBC7
+         WZV9lQ/oQb6vNgypSZbrQDWeeYWLauKuj1Uisv0c0bznKx9/3SAxl7VXf4zl3gbtlCOG
+         pMxHfaUZNckxIWJJ4aMf6xG0V+4jP+zZv2ssCvrGpjFoC/dR088k2aMezSPFbT2QzDhA
+         93kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767797843; x=1768402643;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xlGENMu3o6cBLcDeYDff2G8dRuXoMZxnkdZNgTS5OtU=;
-        b=IGVbFMwLmucxqF7wuvP4UKsnKZpunRVYKQzVszuB2O/oh9HWM2GSDI4VqNzVKmSKhv
-         1LdcJakt8vQ5+s9cjCk72jO+Yq8lMfOoYOzBsh6ULPGnX2Ijg2L3wJr1sdOpWso7olAm
-         BzHOkRX8WiXTS0ncxrC0X2TpTE/BaLQLUO2FwGVnnmMnAUBs+E1V6B8OHfmq28Fmp3ay
-         nOyb+Oh7IS28ptdhcNd07rlNK4+eNjiU5wZDt54X2J1YPZzY92djbZdhDQbukkabPva5
-         fiL4aZYv9aLZUJruDdMrbW2CZBCGxb17Wo7+tZHdTjxZnWjJMNnJfUjSQtfFG+yNFeZv
-         2rsw==
-X-Forwarded-Encrypted: i=1; AJvYcCW5fZ7StopJ15Mi5w7Q+5IhqdcE6FndlNBpl9ZmWMlj1N/ATnHM27VGYp+mRCjIRP0GEZqDbAY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqbbGzdf1X/ShhMB45lh+eJmo+KFwoUDNbmF1et2zRdJ5YzCy8
-	UNVBgX60hUz/XmBHzDNOHG9arSdRZnxxcY288h8I4IBoG0unBsOn8EH9brXLXcFKwkGiqDxxh0X
-	17SVEm/Sq42EGhqLXEGnNKFdqK/BBPjk=
-X-Gm-Gg: AY/fxX7mldX2rJ0SVBN5y+6shLY7U6KiRzubRZzcpuDIhjoOI9q+XunB2qGFSnwxwHQ
-	NPR93jVLTlR0bUZqoWeCEup+yWer0vHmqctYv373j6emYmrp680V4Faz66oDetsb03oYDSbrIoo
-	CujiYih8Aug7IpilzK2XxfDCo6j3D35jAXzK78YNWDMylRkTCK7Eq069O0lk3ZC/xBCdkmFZ0dq
-	tESebfP4rsWeOY3ITUdbwRhh7g+ry79Lw4BSBzNIBDjIBj1CQKfNUxwmzwXg0Z7U1TLZT8Clpxd
-	WDS3lr9PSIi+4wNQBaknS+Kso5WSLl9XaIZQKUpl///BGEGAZwDrx0c+lA==
-X-Google-Smtp-Source: AGHT+IHjTnt4JomhA1NrENsfN7U9oy8sOR4wHmf0Jm5V6vz/LIZBGXyI/1E3rqPv9Q1OLv5vv8dAFMlfW+nv2Sla2pY=
-X-Received: by 2002:a05:690e:1206:b0:63f:c019:23b2 with SMTP id
- 956f58d0204a3-6470d2dfce6mr5035512d50.28.1767797843191; Wed, 07 Jan 2026
- 06:57:23 -0800 (PST)
+        d=1e100.net; s=20230601; t=1767798302; x=1768403102;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UZ/7ZMF+GZy1qUkEJEGh+CeH3UAPpaGuj74Mgzc+UGQ=;
+        b=Eb8iaCszW5cSlDsOIDPNYgrbCNS0ce0VwNWU3F+udamA8r0QVo16owpqYxBOqpYsbU
+         IwK5SEEkBMMaod8mn0KDascd4oiBcfaiYZL9T2YiiypAriHuB/8uvLkxqZ+cU1UZRRbx
+         hNmYFIeHwp1OAyYUurvXFtBfn7jJwEzj+NS4CBrmLcyOS4/Hlwta7vPHVD2d2zHmlBvr
+         zRvTpc6BndyRe05w+xsRExDHghZcF+U9//viCcl2iK6JLyxQdoRHTLJoaGh7DdYmpFZz
+         2YDpIhPDghKJ51PpoojWHUbadwrSaPbgKjsL3M7lcvnh2Gcqw2SbQVqdSQQ4hoGutcSA
+         hyew==
+X-Forwarded-Encrypted: i=1; AJvYcCXhu14vcmKLgI/JxDDu3sSM97ISIrXm4T8hwom4m2KvpbbxTYf0ITjSZ7CMc4ayCYZm9Nd8Lzw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjYPFzl4TfHIzZ693z+8naPT0JkV2Jfexw7LQEp5espK7LlXd/
+	azVKSD+EWUacc7bySN8PVgKb7M1FMDgbc8TTe3lLf7Of/h821TwUv5dqoLuEWNNNMm8=
+X-Gm-Gg: AY/fxX6/3MWjj+p0x8+BV0RQ3x1XcYsyPFQ8ORh7SI+1YJeyB9n3/4zAIHLkggTcn2l
+	yGdO/+FqiBXQMWbXuVD8/kbtoa2DIo9ICXDDqp/r10K0ZJZ5c8oZe3fl9/iCyfo+U+YpDBtYOfb
+	5e/Y6YEDXWderkSipvW5w876sDJ84ZdbM68Z1xf08EqoNSV5LqLNMLwYQKrKgZ5fDXyau6HUFSx
+	0sa6M83Mo/F8PaQh/LTy7fLGYSXCWYno5XKj+3q8/d9SUNkNRDrY4W0XrOcgfy9yQgCFPy5RtcA
+	XuV537qeduXMUHk/dKOJv1/KkyoRDqZpjlz/s7VjP2b8/wiJDyl2bA1LBBxZGsLioGRRH7yTlaR
+	3I0V5hNdpEZO7DmpWKAjfR9UnWn5Z1mfo2ykTv+3+dkijb7l55DdBpH5hFVNXYqPMTmr2BpfDQq
+	taxYujNwXbX0ZhlU0rn0Yaq8sBOKzMWoPstNwj
+X-Google-Smtp-Source: AGHT+IEOYlyKev/JXhO6ZFSHDXlM8eUuok0NFZfe0rNvo/VSyQSXG3Dl2jreomEhLjqpb0WuT9HVpw==
+X-Received: by 2002:a05:600c:3110:b0:47d:3ffa:980e with SMTP id 5b1f17b1804b1-47d84b4101dmr28129435e9.28.1767798302280;
+        Wed, 07 Jan 2026 07:05:02 -0800 (PST)
+Received: from [192.168.3.33] (9.39.160.45.gramnet.com.br. [45.160.39.9])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5ee24esm10984075f8f.33.2026.01.07.07.04.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Jan 2026 07:05:01 -0800 (PST)
+Message-ID: <737d6c96a51b5975c9fd7ed302df014e0d5e4fe1.camel@suse.com>
+Subject: Re: [PATCH net-next 2/2] netconsole: convert to NBCON console
+ infrastructure
+From: Marcos Paulo de Souza <mpdesouza@suse.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, asantostc@gmail.com, 
+	efault@gmx.de, gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net, 
+	kernel-team@meta.com
+Date: Wed, 07 Jan 2026 12:04:55 -0300
+In-Reply-To: <l5u6w3ydgfbrah22dbm2vcpytqejfw6aomvzl5uzh5vssljqxd@suspm42neo2z>
+References: <20251222-nbcon-v1-2-65b43c098708@debian.org>
+	 <20260102035415.4094835-1-mpdesouza@suse.com>
+	 <l5u6w3ydgfbrah22dbm2vcpytqejfw6aomvzl5uzh5vssljqxd@suspm42neo2z>
+Autocrypt: addr=mpdesouza@suse.com; prefer-encrypt=mutual;
+ keydata=mDMEZ/0YqhYJKwYBBAHaRw8BAQdA4JZz0FED+JD5eKlhkNyjDrp6lAGmgR3LPTduPYGPT
+ Km0Kk1hcmNvcyBQYXVsbyBkZSBTb3V6YSA8bXBkZXNvdXphQHN1c2UuY29tPoiTBBMWCgA7FiEE2g
+ gC66iLbhUsCBoBemssEuRpLLUFAmf9GKoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AACgk
+ QemssEuRpLLWGxwD/S1I0bjp462FlKb81DikrOfWbeJ0FOJP44eRzmn20HmEBALBZIMrfIH2dJ5eM
+ GO8seNG8sYiP6JfRjl7Hyqca6YsE
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.2 (by Flathub.org) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260107-mgmt_ext_adv_sid-v1-1-1cb570c7adf7@amlogic.com>
-In-Reply-To: <20260107-mgmt_ext_adv_sid-v1-1-1cb570c7adf7@amlogic.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 7 Jan 2026 09:57:11 -0500
-X-Gm-Features: AQt7F2qhSo4nrnNS5S4zj0Jx6WYkEx_FVwcpIMkrACSlquB2R40vf7Q2LUdC8jk
-Message-ID: <CABBYNZ+a32Y9VM-XsECBjTwN_bXaPxuYALBL_6S8b+s1vQ8EZw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: mgmt: report extended advertising SID to userspace
-To: yang.li@amlogic.com
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Yang,
+On Tue, 2026-01-06 at 07:43 -0800, Breno Leitao wrote:
+> Hello Marcos,
+>=20
+> On Fri, Jan 02, 2026 at 12:54:14AM -0300, Marcos Paulo de Souza
+> wrote:
+> > On Mon, 22 Dec 2025 06:52:11 -0800 Breno Leitao <leitao@debian.org>
+> > wrote:
+> > > +		if (!nbcon_enter_unsafe(wctxt))
+> > > +			continue;
+> >=20
+> > In this case, I believe that it should return directly? If it can't
+> > enter in the
+> > unsafe region the output buffer is not reliable anymore, so
+> > retrying the send
+> > the buffer to a different target isn't correct anymore. Petr, John,
+> > do you
+> > agree?
+>=20
+> That makes sense. I undersatnd that the ownership will not be
+> re-acquired here by just looping through the netconsole targets,
+> right?
 
-On Wed, Jan 7, 2026 at 3:48=E2=80=AFAM Yang Li via B4 Relay
-<devnull+yang.li.amlogic.com@kernel.org> wrote:
->
-> From: Yang Li <yang.li@amlogic.com>
->
-> Add a new mgmt event to report the SID of extended advertising
-> to userspace. This allows userspace to obtain the SID before
-> initiating PA sync, without waiting for the next extended
-> advertising report to update the SID.
->
-> By providing the SID earlier, the PA sync flow can be simplified
-> and the overall latency reduced.
->
-> Link: https://github.com/bluez/bluez/issues/1758
+Yes, take a look into the drivers/tty/serial/*, some of the only
+reacquire the context to reset some hardware registers, since the
+printing context was lost. In this case, for you, I don't believe that
+you can't continue trying to send data to other targets, since the
+original data is gone.
 
-This is a new API so it can't possible fix the userspace issue above,
-there is clearly a bug when sid is set to 0xff we shall not proceed
-until it is resolved.
-
-> Signed-off-by: Yang Li <yang.li@amlogic.com>
-> ---
->  include/net/bluetooth/hci_core.h |  2 ++
->  include/net/bluetooth/mgmt.h     |  7 +++++++
->  net/bluetooth/hci_event.c        |  3 +++
->  net/bluetooth/mgmt.c             | 13 +++++++++++++
->  4 files changed, 25 insertions(+)
->
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci=
-_core.h
-> index a7bffb908c1e..81ef3e94e3af 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -2469,6 +2469,8 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr=
-_t *bdaddr, u8 link_type,
->                        u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
->                        u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_le=
-n,
->                        u64 instant);
-> +void mgmt_ext_adv_sid_changed(struct hci_dev *hdev, bdaddr_t *bdaddr,
-> +                                    u8 addr_type, u8 sid);
->  void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_ty=
-pe,
->                       u8 addr_type, s8 rssi, u8 *name, u8 name_len);
->  void mgmt_discovering(struct hci_dev *hdev, u8 discovering);
-> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-> index 8234915854b6..7ee38ebaccd8 100644
-> --- a/include/net/bluetooth/mgmt.h
-> +++ b/include/net/bluetooth/mgmt.h
-> @@ -1195,3 +1195,10 @@ struct mgmt_ev_mesh_device_found {
->  struct mgmt_ev_mesh_pkt_cmplt {
->         __u8    handle;
->  } __packed;
-> +
-> +#define MGMT_EV_EXT_ADV_SID_CHANGED            0x0033
-> +struct mgmt_ev_ext_adv_sid_changed {
-> +       struct mgmt_addr_info addr;
-> +       __u8    sid;
-> +} __packed;
-
-I rather have a new device found event, or somehow embed the SID into
-the existing one.
-
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 467710a42d45..f4463e71b424 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -6519,6 +6519,9 @@ static void hci_le_ext_adv_report_evt(struct hci_de=
-v *hdev, void *data,
->                                            info->rssi, info->data, info->=
-length,
->                                            !(evt_type & LE_EXT_ADV_LEGACY=
-_PDU),
->                                            false, instant);
-> +                       mgmt_ext_adv_sid_changed(hdev, &info->bdaddr,
-> +                                                     info->bdaddr_type,
-> +                                                     info->sid);
->                 }
->         }
->
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 5be9b8c91949..4e0f8c43e387 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -208,6 +208,7 @@ static const u16 mgmt_untrusted_events[] =3D {
->         MGMT_EV_EXT_INDEX_REMOVED,
->         MGMT_EV_EXT_INFO_CHANGED,
->         MGMT_EV_EXP_FEATURE_CHANGED,
-> +       MGMT_EV_EXT_ADV_SID_CHANGED,
->  };
->
->  #define CACHE_TIMEOUT  secs_to_jiffies(2)
-> @@ -10516,6 +10517,18 @@ void mgmt_device_found(struct hci_dev *hdev, bda=
-ddr_t *bdaddr, u8 link_type,
->         mgmt_adv_monitor_device_found(hdev, bdaddr, report_device, skb, N=
-ULL);
->  }
->
-> +void mgmt_ext_adv_sid_changed(struct hci_dev *hdev, bdaddr_t *bdaddr,
-> +                                    u8 addr_type, u8 sid)
-> +{
-> +       struct mgmt_ev_ext_adv_sid_changed ev;
-> +
-> +       bacpy(&ev.addr.bdaddr, bdaddr);
-> +       ev.addr.type =3D link_to_bdaddr(LE_LINK, addr_type);
-> +       ev.sid =3D sid;
-> +
-> +       mgmt_event(MGMT_EV_EXT_ADV_SID_CHANGED, hdev, &ev, sizeof(ev), NU=
-LL);
-> +}
-> +
->  void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_ty=
-pe,
->                       u8 addr_type, s8 rssi, u8 *name, u8 name_len)
->  {
->
-> ---
-> base-commit: 030d2c0e9c1d68e67f91c08704482ad9881583eb
-> change-id: 20260107-mgmt_ext_adv_sid-7ea503e46791
->
-> Best regards,
-> --
-> Yang Li <yang.li@amlogic.com>
->
->
-
-
---=20
-Luiz Augusto von Dentz
+In any case, the context reacquire method is nbcon_reacquire_nobuf.
 
