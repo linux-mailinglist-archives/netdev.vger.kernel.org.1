@@ -1,108 +1,129 @@
-Return-Path: <netdev+bounces-247717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C347CFDB69
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 13:42:07 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 678DFCFDB87
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 13:44:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B103A3001FDD
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 12:42:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0DEB830006C2
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 12:44:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39CA32FFF82;
-	Wed,  7 Jan 2026 12:42:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A8D313267;
+	Wed,  7 Jan 2026 12:44:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MIB5Incq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="goCb03/1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1549738DF9
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 12:42:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E29A30F950;
+	Wed,  7 Jan 2026 12:44:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767789722; cv=none; b=NKM9sY6u+fH6curDXa2UTamgdydRYUxr6DkDJKKit+Fz7eQZTjzIl/3xPdRRciH0GQFcLY5DbxwjNA7tSVvqYGPuqzgOiQyesrWiCL44UjVTrV2iF4wzA57FykrT4v9puvwtktU/WnRyHxHEnPnujHGOwO4f20aabEjyXfrr2jI=
+	t=1767789856; cv=none; b=kKPrJVlLO7UU+4G4geTWZrAWjBn4BMSybTzeembzWFrAOGNAsBYZYAxgx3OP3tZATVuySzik4Uuf3F9lhal1JVB1nZb89eAKbWH/b9uIpFWvU3IiMYaPadTxHfHaOqNggmWoN06iaFcsvTtNJ7XJtj/8DJDcyHeE7TG5xD+gA1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767789722; c=relaxed/simple;
-	bh=J/ai7KFn3Cfpu1PW1raz4q+T7q1x8y/x/f2wv9CjuQE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g1wJHQaKQDMJoG3h9x3Xsp6Vez6zXZLeV4Arq31aZw+mHkgVG0SZkQ0NVvJ/Y5WjDCD5FKKdhgxV+haxho/CtHCxLOKhVl1XVad7r+8LT0zqxlVZXnIZ0ULRsAUVdZqN7F6uUftYM/81Vtdp+TQmI+6Y8jRKGfevG5npALzbrJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MIB5Incq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9109C19421
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 12:42:01 +0000 (UTC)
+	s=arc-20240116; t=1767789856; c=relaxed/simple;
+	bh=iXJgNcThmxkm3TnRQjzZQuN8UzVODisYYjfRJTHl0yw=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=DU3R1Mv8QPXH6ssJemKWLvTrUrLpCHE7ABpHVZlWkRnc4+vIgcJYN8evfHC5l4lNsG9xHjsZeNsoc9puCpCfbST0CfeyWj90WIzjcMfD3hjOoIc8id0ph2H1JPdAdmtEBGyWqyjYYcBptLPVPDcc+eflOiYqBQMXfZ7dUxWe80g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=goCb03/1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57878C4CEF7;
+	Wed,  7 Jan 2026 12:44:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767789721;
-	bh=J/ai7KFn3Cfpu1PW1raz4q+T7q1x8y/x/f2wv9CjuQE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=MIB5IncqfGRfraXbXrmpffxoJsVOEiSMGJIgrDGuW6/2apZe//icEBUJRbplsB6op
-	 Kpv+mi5TfGCok3TymLzQmbneF3Dgpo+CNJGa54o6GpyMBZhRT66nzpRpQ1R0HIsISb
-	 D0sdULHxxWRCQcOoN1LVa9bQ+ESCEWnsgyo/6WuMp7pN3RDKXCw2F7JrnsH7vhTVPj
-	 3Hoq9PKp+888I77inBrP3cbk0aEtdFk8yrVb1c37iD8y5xvVL0Bh04ieYAGAX5Slfw
-	 3yTE5MoUYNJfXJAWEtV7Ipya9U9LzPOVPR82pKsncRGimhI/gl34RSve24LKr0Cyky
-	 IIelaneajPuLw==
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-7c6cc366884so1150047a34.1
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 04:42:01 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVaHOZ5xfF2vstrBx49ukcI0wpENp49WP+OVJv14Wz10gApzDl1zqHec67WcmrsxOhwZl/krlc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyyC2fkm9y1lUI6RHyXJsYV/nou/+ya1GagCgJ+xkTiAc3kOTf+
-	JgIUSk6cS9AYuMHWnH8i6iv69hOGDtdx+AwFlXg8w4WhTlUz/eEexAyo4tW5epM1z6mX51ZPtPH
-	rcMHPn4K01eed1b7LJscOZCbzowsPlmI=
-X-Google-Smtp-Source: AGHT+IHttT1Vk9rgD0sQJMCdtIyBGD9/zZtm4P/TXXzDuDiMnspXnxrq2j/u2sDX/hSmZJXyzknm1Az9AP+wgZaf8WA=
-X-Received: by 2002:a05:6820:4ecf:b0:65b:3907:b360 with SMTP id
- 006d021491bc7-65f54f71ae0mr681890eaf.62.1767789720832; Wed, 07 Jan 2026
- 04:42:00 -0800 (PST)
+	s=k20201202; t=1767789856;
+	bh=iXJgNcThmxkm3TnRQjzZQuN8UzVODisYYjfRJTHl0yw=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=goCb03/1Z1anQzE+U+wmwe4H6zr/zAZx923KbzvF85OpQwCerss7oIwJOa4aV68Tu
+	 wGabvxRnnBsb29JWa9tB1K82Rlvhd5yTjVYNxX3yG7QomgD2tNx2hGy+ZgBNTq2IgA
+	 lNRbl6fKYnOj9HOPFKQefmRxyLoEDNdRZDG+V65Mujz29Koj5XX3x0tCzZwe3CoIHn
+	 dhZ7bnd+Uk1QZokvoHOx+Aq7E7mMVpAJ3sYtcuFhKJGP1fBH6YfmP2OvmGG91DXVmR
+	 tZrjBQ6r+DCivv6p6HRoZ/ZN85MoJ8azsL1dOitqf8JwBG2TbAWY34fESr2E7Fe9x+
+	 GW+YSD9ERLKmQ==
+Content-Type: multipart/mixed; boundary="===============5691045705513337693=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <6245770.lOV4Wx5bFT@rafael.j.wysocki> <5973090.DvuYhMxLoT@rafael.j.wysocki>
- <20260106162905.14df3458@kernel.org>
-In-Reply-To: <20260106162905.14df3458@kernel.org>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Wed, 7 Jan 2026 13:41:49 +0100
-X-Gmail-Original-Message-ID: <CAJZ5v0gE-Nwxe-d-_P_z26fZckGq_nhzZ-qV_PEr85VkrYRCEA@mail.gmail.com>
-X-Gm-Features: AQt7F2rB_HX4dMfuGwDb8coml-RQF8Ua6wzXFjSg-QJhRjst_bGvQ5amEWvnNnQ
-Message-ID: <CAJZ5v0gE-Nwxe-d-_P_z26fZckGq_nhzZ-qV_PEr85VkrYRCEA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] net: Discard pm_runtime_put() return value
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Linux PM <linux-pm@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>, 
-	Brian Norris <briannorris@chromium.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
-	Roger Quadros <rogerq@kernel.org>, netdev@vger.kernel.org, 
-	Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
-	Simon Horman <horms@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Message-Id: <5be9eb70fb41e7278771d9ff1fe3493444a7c33d28f300f04fb8e3be73005ec4@mail.kernel.org>
+In-Reply-To: <20260107-helper_proto-v1-2-e387e08271cc@gmail.com>
+References: <20260107-helper_proto-v1-2-e387e08271cc@gmail.com>
+Subject: Re: [PATCH bpf 2/2] bpf: Require ARG_PTR_TO_MEM with memory flag
+From: bot+bpf-ci@kernel.org
+To: ftyghome@gmail.com,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,martin.lau@linux.dev,eddyz87@gmail.com,song@kernel.org,yonghong.song@linux.dev,john.fastabend@gmail.com,kpsingh@kernel.org,sdf@fomichev.me,haoluo@google.com,jolsa@kernel.org,mattbobrowski@google.com,rostedt@goodmis.org,mhiramat@kernel.org,mathieu.desnoyers@efficios.com,davem@davemloft.net,edumazet@google.com,kuba@kernel.org,pabeni@redhat.com,horms@kernel.org,dxu@dxuuu.xyz
+Cc: bpf@vger.kernel.org,linux-kernel@vger.kernel.org,linux-trace-kernel@vger.kernel.org,netdev@vger.kernel.org,electronlsr@gmail.com,gplhust955@gmail.com,haoran.ni.cs@gmail.com,ftyghome@gmail.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Wed,  7 Jan 2026 12:44:15 +0000 (UTC)
 
-On Wed, Jan 7, 2026 at 1:29=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
+--===============5691045705513337693==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> index f0ca69f888fa..c7ebddb66385 100644
+> --- a/kernel/bpf/verifier.c
+> +++ b/kernel/bpf/verifier.c
+> @@ -10349,10 +10349,27 @@ static bool check_btf_id_ok(const struct bpf_func_proto *fn)
+>  	return true;
+>  }
 >
-> On Sat, 03 Jan 2026 22:23:52 +0100 Rafael J. Wysocki wrote:
-> > Subject: [PATCH v2 1/3] net: Discard pm_runtime_put() return value
->
-> Sorry for noticing late -- looks like the subject prefix being 1/3
-> instead of 0/3 is throwing patchwork off.
+> +static bool check_mem_arg_rw_flag_ok(const struct bpf_func_proto *fn)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(fn->arg_type); i++) {
+> +		enum bpf_arg_type arg_type = fn->arg_type[i];
+> +
+> +		if (base_type(arg_type) != ARG_PTR_TO_MEM)
+> +			continue;
+> +		if (!(arg_type & (MEM_WRITE | MEM_RDONLY)))
+> +			return false;
 
-No worries.
+Does this check also apply to ARG_PTR_TO_FIXED_SIZE_MEM? Looking at the
+definition in include/linux/bpf.h:
 
-> Patchwork seems to have
-> mis-guessed that these are the first 3 patches of the missing ones
-> in your full 23 patch series, instead of treating this as a fresh
-> posting:
->
-> https://patchwork.kernel.org/project/netdevbpf/list/?series=3D1035812&sta=
-te=3D*
->
-> Could you resend one more time with the cover letter subject corrected?
+    ARG_PTR_TO_FIXED_SIZE_MEM = MEM_FIXED_SIZE | ARG_PTR_TO_MEM,
 
-Done:
+Since base_type() masks off the flags, base_type(ARG_PTR_TO_FIXED_SIZE_MEM)
+returns ARG_PTR_TO_MEM. But ARG_PTR_TO_FIXED_SIZE_MEM does not include
+MEM_WRITE or MEM_RDONLY in its definition.
 
-https://lore.kernel.org/linux-pm/2816529.mvXUDI8C0e@rafael.j.wysocki/
+Several helpers in net/core/filter.c use ARG_PTR_TO_FIXED_SIZE_MEM without
+additional flags:
 
-Interestingly enough, the kernel.org Patchwork seems to have got that right=
-:
+    bpf_tcp_raw_gen_syncookie_ipv4_proto:
+        .arg1_type = ARG_PTR_TO_FIXED_SIZE_MEM,
 
-https://patchwork.kernel.org/project/linux-pm/list/?series=3D1038125
+    bpf_tcp_raw_gen_syncookie_ipv6_proto:
+        .arg1_type = ARG_PTR_TO_FIXED_SIZE_MEM,
+
+    bpf_tcp_raw_check_syncookie_ipv4_proto:
+        .arg1_type = ARG_PTR_TO_FIXED_SIZE_MEM,
+        .arg2_type = ARG_PTR_TO_FIXED_SIZE_MEM,
+
+    bpf_tcp_raw_check_syncookie_ipv6_proto:
+        .arg1_type = ARG_PTR_TO_FIXED_SIZE_MEM,
+        .arg2_type = ARG_PTR_TO_FIXED_SIZE_MEM,
+
+Would these helpers fail check_func_proto() after this change, causing
+BPF programs using them to fail verification? Should these prototypes
+be updated to include MEM_RDONLY (since they read from the memory), or
+should the check skip ARG_PTR_TO_FIXED_SIZE_MEM?
+
+> +	}
+> +
+> +	return true;
+> +}
+
+[ ... ]
+
+
+---
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/20781625347
+
+--===============5691045705513337693==--
 
