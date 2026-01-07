@@ -1,197 +1,278 @@
-Return-Path: <netdev+bounces-247728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E85DBCFDD23
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 14:05:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ED5C6CFDD3E
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 14:06:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5A59A3083634
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 12:59:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 72050303196F
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 13:00:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ABDE3161BB;
-	Wed,  7 Jan 2026 12:59:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72A7B31812C;
+	Wed,  7 Jan 2026 13:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j7LlGH0S"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="DvfsDV/+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08DC314D13
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 12:59:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526A931A552
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 13:00:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767790759; cv=none; b=rIB4s/jPxpV1BngEWzJgfUultnl/Harc52PcY25sgdyIeID1SndeowVbwHSsIv9BidFEQQIfJZHFaO+hWstx8SIp93+x/14t0KFy3HVolti6GGU/mDtaXcKCnHfDYnzWtU2Y11ILpBFk0S+ZN46uxWFwzArLl3wq3qa2Loqd2mk=
+	t=1767790822; cv=none; b=dZlzhn+f/U7t3M+p0bhRnlQpg+o4rPh0vHpFo+aM8vJnMRzdF7lgvHX64fBzQ/iT/c2qTnQ6MWCq491tyEAElCbyD4lPOeb//O168HoUNav1X8jqV3BetWcNWYcBjOi8wIE382b9veWFaIgSnBTXi2fbNgnb8Le0o6D63iyIyoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767790759; c=relaxed/simple;
-	bh=yVRQvTYqks6WbGzMXjQJfIjrDLN7t/f8i40RrbFnp5E=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=O3TzCrEBVygPhLmZcAGBO2WBDkgpBkFNFF7XF9LhFPO0+QIzjRlmLUvgZ0s9d2ykPrt7ST/HTNMZ8YRmoYsM5xQCM/OrfAmADxOHLP0yf5N9immgWiaeewkWmQ1bYKnePlIhQy8l3B1lm1pmcaSV+bFEHEO6W0jUeEYovU/kAx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j7LlGH0S; arc=none smtp.client-ip=74.125.82.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-11bfa33cb7eso1797078c88.1
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 04:59:17 -0800 (PST)
+	s=arc-20240116; t=1767790822; c=relaxed/simple;
+	bh=gjLcioOKjCaArvb7NVQEop76HM4t8V/bf2T2jADtt1U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XL0M28DTd118s7RmMNOKxlL7v0hnq2TNGpqSBuEr7GR/2lfT+FC+KS404NYXnBphn9Wbgzd31YvVMGoPS4EhspcmtKzWIxTZs66rRKChqx68TSKSxaAUBlIMzeM8Tupyf4NJ4mtN9xjoewIwJPTXptEgIbyAuA3MXtWec0y2nWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=DvfsDV/+; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-47755de027eso12147045e9.0
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 05:00:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767790756; x=1768395556; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c90q6NkDlao/1+SazP175P0A95xZu097+S3xFQ88J8k=;
-        b=j7LlGH0Stx34iFsGShuJp5y2QTgVCiqKtqytfSCDwLD3K0/CmbH78JTONuQVQHLrft
-         +6YxENsuMAVtrbFjYutiQY2k/+Rzy/1gseYiJt4kpHrm+86im1suoeTx+XjiYBErqfYH
-         KplgodcEW52HX8eGb5z8gQxIJ4r6V7RDsAHgYGP5dj0HI7Ls4CvaTF9Diy3qURtsiVtQ
-         /lr1ufpBRYb9L4AFW6FQj1dW9HrBMunXqC8GzJGRQtbeASETUmsr8Rg7dZQd4EJ7hOqh
-         ys8m9qW0U4+ypnEHWNJdoFvcy9ECnl1tqPrAJ1+wAnuKS0EJ5OWKQRawI+I5ByigcAHU
-         WtCA==
+        d=suse.com; s=google; t=1767790818; x=1768395618; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=b8OM/wM0uqGFQsQ0XBq0KDPlvIR+dfDKEQPKcNmmmRA=;
+        b=DvfsDV/+t+DmuITWYJP/WCQHzd4uRUatvyLsinyOClSbHtAwdcM9UekwdbFZOf5cZW
+         hVRZzcrRshB4eB1fjid1nPS01GBXhExZ2giM7eagELOPZsNx5LyptVZnJYky7cutrizG
+         Qy96IYpHJVrqOjT1GQb0D4wP9mSTa9Wa0dPiucm4+yY3pFP+DG5EveYBVLGP8Tu/u79g
+         i6hYAkNSb6SxavRvVyMKawduPQ/9Kqmx03Ty+3VtiXL74juBGhMwHUp1WdyM0G5bR+jz
+         eYppZR6tv55yVJvG01V4JBrubLmegZjUOyxo6UMH+pcAMDDA39AEoy34/XWIgl6QngML
+         uMpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767790756; x=1768395556;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=c90q6NkDlao/1+SazP175P0A95xZu097+S3xFQ88J8k=;
-        b=dP37B087GHN1/XQustvQnIaPn8LJ6qBoaXPuHFU3il30SJqAMOmhBUoqo9itvZcxWm
-         B1jEm0WGloWESXVU/zfBMF+r/XG6ycNAlbpRLq1uMANv8SEZBtiO94cnFs5acDcCChYl
-         vBfOft+aymM2zGCM/qUtaqbMw7LSk2zAHQoazjK/8AKtsPb4q6B5B2/faMGdrAo/01OH
-         cxTR2D7MwRCCcjgSv9EySe7jck/koRqhJghFFmpd0g39aNMdXsofDkGYv+7OMWHKS5xD
-         e4bHfRgFuwQfg36IM63SvCckj3Gw6y6Tublu9SUsLXCO4JVuNKzICXMqfeyOjTsP5bWi
-         fPCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWuamOxEion5taoQfnosKWPqvfHDMvowho8Eff9/dz+g9Ulr8Xm9g6U+5/wk5XT+XqHf7Irtpc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/GyJLMJz2lmpqO4IcwG95j38E+8mJct/r4jjk21ZxjIA5Ipy2
-	5HHTasZEvxayStg6QyCWrNlXecrdWpTrtUkI0TD56piiOteEcnh6dFQV
-X-Gm-Gg: AY/fxX6N2Hwzx68+kUIXr2yb//XKpetNIFMJT96ayw25liV2/lEebYGpRZPenKS4s0p
-	wgW1ZtXusBV7IJv6GbOPcq/w9V/+007VzQNrDzq4FfUFWOjQVNRsEgc9iZR1Bw+KFIDDaoh5aDZ
-	YI9u+HFiR5lrG/aRvb8HT3064Go1fHeeGQuNHuYlGhfeVtPyErerDTyUg7dvCTL+5pf2VM4BAzH
-	MwW1jKYXlr1efW3WsENuSYTecWXGtikDuOhdHSZK3Oog7ucymfnreGKKwWdC+92ckcWnMbLnF5D
-	YL11Gopgash3Z0bQV6vWPwDAYeAz2yxgwobBbdVWOJHWn2R5j6fNMmXWD4/0AP7192vhNA1IBIP
-	0lu4xAJ7vC6ctvh9LAs1k4fXo8GNmll6wqB0qjdywT1uw8DsTA7aVE8VeQqfrooUvxuBpaCqIox
-	0LX24MrCZaNYBszA==
-X-Google-Smtp-Source: AGHT+IFyRoeDF8QLM4gvq4mXYpk3Y//U7k/g8364xasTSjDpFWrMntZUAZ1BhFLrd1yzMNyYI7sMdQ==
-X-Received: by 2002:a05:7022:113:b0:119:e55a:9bff with SMTP id a92af1059eb24-121f8b7b229mr1585926c88.27.1767790755982;
-        Wed, 07 Jan 2026 04:59:15 -0800 (PST)
-Received: from smtpclient.apple ([38.207.158.4])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-121f23b798asm7651266c88.0.2026.01.07.04.59.09
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 07 Jan 2026 04:59:15 -0800 (PST)
-Content-Type: text/plain;
-	charset=us-ascii
+        d=1e100.net; s=20230601; t=1767790819; x=1768395619;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b8OM/wM0uqGFQsQ0XBq0KDPlvIR+dfDKEQPKcNmmmRA=;
+        b=bL9PBf6s/vY09OV8sYmV47Epxc8ksFPf1cD6MqHxAHrQgOdgSHZH1i8AvH/9gn3S5w
+         94n+6Np68mTP6tfwwA4NZ8FK2y4iHmwKt3dgOIeC9Jq3kWr+xzfQKefcfjy4t3YHiMG2
+         upUDjWwthBP8zhFvU55u5eA2ySSyR1cw0Qfs+FnLz1FYbt7+5I9GGCUxNYllgwU4i1mf
+         o9uvACDMOqadS64BPOuA6osYRj12h55cbg61Od9N5R+f+siKXV5uhIvYS4kp7FAy+8r/
+         WxRNxuGIMIRqB8qjYWhZdB9aUH7R6SqxCcdtdOKhp8KfkHrkBwRspLY9TRROqj392/SQ
+         i3EA==
+X-Forwarded-Encrypted: i=1; AJvYcCXKi0YdvVygEGzlR8CmzoNKWLMZDjCBC00cT6hCjPZC3ht2gZk6mmsIR21yWzbV91Zf0TsFZE8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrNsAJDGdHtAVmt0Q03ixpbSenT/ToBOsdUmbB4kICaiJdEhLx
+	utV8avOzEXB4MmGWWNQRAw+kTX+zcpHRYcvCaAaV6LpyIRfk820wWEtwGmFcXza24xM=
+X-Gm-Gg: AY/fxX6BvEzSYKln2xKnM30TkkzSiPXIQwmXTULaBYC66z8GfW+UVwowJYzepXi6qB4
+	d/CLsT3E/wSOcwyREewN3E+7+E9+njemhuaaCbqf4qhbl0hMOlRNZTqTUi3nFUD6guSgQO4OkQ5
+	BkWI32+YSJ9IXABqJW5DTzBd5n6c4h+xUWVtYLm3/ahMLYGW3Xaj7yYkzTjKGcVprRVrrzuzwNK
+	fc/Na4c2BjtbS2ZdB9CrtmugrLJ65o9/izYdKm16vkxfxixuxjoCEU0hg6mUYgD3E65k3V6g4ke
+	/FBSnolKx028Bzkjx8v8scoLsjMXHUTExyhHuhTyMG9j+6RCpkGYhNzNuy1dBCucE7UU/jCBGwH
+	E7AE4fqH2DRq/30xEc0KBBuMDD/551sD2VXKVvcefgHtP0BEAShKHRMXs/BTaVkRYo+R8ZlLLk1
+	UvppuTbQ7Cc69xTg==
+X-Google-Smtp-Source: AGHT+IHXv9yotK6XG/wc2JBKVbd7hMIoqMUXk18WTbSVp9IFsDwfj8PCGizKHMxES3PasjFMQuD/Ng==
+X-Received: by 2002:a05:600c:c4a8:b0:477:54cd:2030 with SMTP id 5b1f17b1804b1-47d84b32788mr29119595e9.21.1767790818492;
+        Wed, 07 Jan 2026 05:00:18 -0800 (PST)
+Received: from pathway.suse.cz ([176.114.240.130])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d87189e54sm11153655e9.12.2026.01.07.05.00.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Jan 2026 05:00:17 -0800 (PST)
+Date: Wed, 7 Jan 2026 14:00:13 +0100
+From: Petr Mladek <pmladek@suse.com>
+To: syzbot <syzbot+9bc8c0586b39708784d9@syzkaller.appspotmail.com>
+Cc: anna.luese@v-bien.de, cem@kernel.org, davem@davemloft.net,
+	edumazet@google.com, horms@kernel.org, jhs@mojatatu.com,
+	jiri@resnulli.us, john.ogness@linutronix.de, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com, rostedt@goodmis.org,
+	senozhatsky@chromium.org, syzkaller-bugs@googlegroups.com,
+	xiyou.wangcong@gmail.com
+Subject: Re: [syzbot] [xfs?] INFO: task hung in xfs_file_fsync
+Message-ID: <aV5Y3UG7JMJ0iE_i@pathway.suse.cz>
+References: <686ea951.050a0220.385921.0015.GAE@google.com>
+ <686f0cd3.050a0220.385921.0023.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81.1.4\))
-Subject: Re: [PATCH bpf 2/2] bpf: Require ARG_PTR_TO_MEM with memory flag
-From: Zesen Liu <ftyghome@gmail.com>
-In-Reply-To: <20260107-helper_proto-v1-2-21fa523fccfd@gmail.com>
-Date: Wed, 7 Jan 2026 20:58:58 +0800
-Cc: bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org,
- netdev@vger.kernel.org,
- Shuran Liu <electronlsr@gmail.com>,
- Peili Gao <gplhust955@gmail.com>,
- Haoran Ni <haoran.ni.cs@gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <774A6E90-11F3-4EEB-B6DD-210FD4CAB267@gmail.com>
-References: <20260107-helper_proto-v1-0-21fa523fccfd@gmail.com>
- <20260107-helper_proto-v1-2-21fa523fccfd@gmail.com>
-To: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>,
- Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>,
- Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>,
- Matt Bobrowski <mattbobrowski@google.com>,
- Steven Rostedt <rostedt@goodmis.org>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Daniel Xu <dxu@dxuuu.xyz>
-X-Mailer: Apple Mail (2.3826.700.81.1.4)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <686f0cd3.050a0220.385921.0023.GAE@google.com>
 
-Hi,
+On Wed 2025-07-09 17:44:03, syzbot wrote:
+> syzbot has bisected this issue to:
+> 
+> commit 0161e2d6950fe66cf6ac1c10d945bae971f33667
+> Author: John Ogness <john.ogness@linutronix.de>
+> Date:   Mon Dec 9 11:17:46 2024 +0000
+> 
+>     printk: Defer legacy printing when holding printk_cpu_sync
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14b19a8c580000
 
-It seems my mail server blocked the cover letter (0/2) of this patchset. =
-Please ignore this thread, I will resend the complete series.
-Sorry for the noise.
+Just for record. It looks to me that the bisection was wrong.
+The original problem was:
 
-Thanks,
-Zesen Liu
+ci starts bisection 2025-07-09 13:22:22.587055103 +0000 UTC m=+182.380303436
+bisecting cause commit starting from d006330be3f782ff3fb7c3ed51e617e01f29a465
+building syzkaller on abade7941e7b8a888e052cda1a92805ab785c77e
+ensuring issue is reproducible on original commit d006330be3f782ff3fb7c3ed51e617e01f29a465
 
-> On Jan 7, 2026, at 20:16, Zesen Liu <ftyghome@gmail.com> wrote:
->=20
-> Add check to ensure that ARG_PTR_TO_MEM is used with either MEM_WRITE =
-or
-> MEM_RDONLY.
->=20
-> Using ARG_PTR_TO_MEM alone without tags does not make sense because:
->=20
-> - If the helper does not change the argument, missing MEM_RDONLY =
-causes the
-> verifier to incorrectly reject a read-only buffer.
-> - If the helper does change the argument, missing MEM_WRITE causes the
-> verifier to incorrectly assume the memory is unchanged, leading to =
-errors
-> in code optimization.
->=20
-> Co-developed-by: Shuran Liu <electronlsr@gmail.com>
-> Signed-off-by: Shuran Liu <electronlsr@gmail.com>
-> Co-developed-by: Peili Gao <gplhust955@gmail.com>
-> Signed-off-by: Peili Gao <gplhust955@gmail.com>
-> Co-developed-by: Haoran Ni <haoran.ni.cs@gmail.com>
-> Signed-off-by: Haoran Ni <haoran.ni.cs@gmail.com>
-> Signed-off-by: Zesen Liu <ftyghome@gmail.com>
-> ---
-> kernel/bpf/verifier.c | 17 +++++++++++++++++
-> 1 file changed, 17 insertions(+)
->=20
-> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> index f0ca69f888fa..c7ebddb66385 100644
-> --- a/kernel/bpf/verifier.c
-> +++ b/kernel/bpf/verifier.c
-> @@ -10349,10 +10349,27 @@ static bool check_btf_id_ok(const struct =
-bpf_func_proto *fn)
-> return true;
-> }
->=20
-> +static bool check_mem_arg_rw_flag_ok(const struct bpf_func_proto *fn)
-> +{
-> + int i;
-> +
-> + for (i =3D 0; i < ARRAY_SIZE(fn->arg_type); i++) {
-> + enum bpf_arg_type arg_type =3D fn->arg_type[i];
-> +
-> + if (base_type(arg_type) !=3D ARG_PTR_TO_MEM)
-> + continue;
-> + if (!(arg_type & (MEM_WRITE | MEM_RDONLY)))
-> + return false;
-> + }
-> +
-> + return true;
-> +}
-> +
-> static int check_func_proto(const struct bpf_func_proto *fn, int =
-func_id)
-> {
-> return check_raw_mode_ok(fn) &&
->       check_arg_pair_ok(fn) &&
-> +   check_mem_arg_rw_flag_ok(fn) &&
->       check_btf_id_ok(fn) ? 0 : -EINVAL;
-> }
->=20
->=20
-> --=20
-> 2.43.0
->=20
+testing commit d006330be3f782ff3fb7c3ed51e617e01f29a465 gcc
+compiler: Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+kernel signature: fd86d90e0d4e2b546bda0ba5ad3009b1c803f92f35eefc7a5a9a6a9779edb44a
+run #0: crashed: INFO: task hung in xfs_setfilesize
+run #1: crashed: INFO: task hung in xfs_setfilesize
+run #2: crashed: INFO: task hung in xfs_setfilesize
+run #3: crashed: INFO: task hung in process_measurement
+run #4: crashed: INFO: task hung in xfs_setfilesize
+run #5: crashed: INFO: task hung in process_measurement
+run #6: crashed: INFO: task hung in xfs_setfilesize
+run #7: crashed: INFO: task hung in process_measurement
+run #8: crashed: INFO: task hung in process_measurement
+run #9: crashed: INFO: task hung in xfs_setfilesize
+run #10: crashed: INFO: task hung in xfs_setfilesize
+run #11: crashed: INFO: task hung in xfs_setfilesize
+run #12: crashed: INFO: task hung in xfs_setfilesize
+run #13: crashed: INFO: task hung in xfs_setfilesize
+run #14: crashed: INFO: task hung in xfs_trans_alloc_inode
+run #15: crashed: INFO: task hung in xfs_trans_alloc_inode
+run #16: crashed: INFO: task hung in xfs_setfilesize
+run #17: crashed: INFO: task hung in xfs_setfilesize
+run #18: crashed: INFO: task hung in xfs_setfilesize
+run #19: crashed: INFO: task hung in xfs_setfilesize
+representative crash: INFO: task hung in xfs_setfilesize, types: [HANG]
 
+
+But the end of the bisection looks like:
+
+testing commit 4ca6c022279dddba1eca8ea580c82ea510ecf690 gcc
+compiler: Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+kernel signature: 03f8650641fe155806b39e47c854b91bf96ee0d5e9d18ff940235c5a21c89620
+run #0: OK
+run #1: OK
+run #2: OK
+run #3: crashed: BUG: MAX_LOCKDEP_KEYS too low!
+run #4: crashed: BUG: MAX_LOCKDEP_KEYS too low!
+run #5: crashed: BUG: MAX_LOCKDEP_KEYS too low!
+run #6: OK
+run #7: crashed: BUG: MAX_LOCKDEP_KEYS too low!
+run #8: OK
+run #9: OK
+run #10: OK
+run #11: crashed: BUG: MAX_LOCKDEP_KEYS too low!
+run #12: OK
+run #13: OK
+run #14: OK
+run #15: OK
+run #16: OK
+run #17: OK
+run #18: OK
+run #19: OK
+representative crash: BUG: MAX_LOCKDEP_KEYS too low!, types: [UNKNOWN]
+# git bisect bad 4ca6c022279dddba1eca8ea580c82ea510ecf690
+Bisecting: 4 revisions left to test after this (roughly 2 steps)
+[62de6e1685269e1637a6c6684c8be58cc8d4ff38] Merge tag 'sched-core-2025-01-21' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+
+testing commit 62de6e1685269e1637a6c6684c8be58cc8d4ff38 gcc
+compiler: Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+kernel signature: 8e4e982610da69c055ecca8aaca23f23a454eb4db0ee20d8bf6d5ae22aeebb01
+run #0: ignore: lost connection to test machine
+run #1: OK
+run #2: OK
+run #3: OK
+run #4: OK
+run #5: OK
+run #6: OK
+run #7: OK
+run #8: OK
+run #9: OK
+run #10: OK
+run #11: OK
+run #12: OK
+run #13: OK
+run #14: OK
+run #15: OK
+run #16: OK
+run #17: OK
+run #18: OK
+run #19: OK
+false negative chance: 0.001
+# git bisect good 62de6e1685269e1637a6c6684c8be58cc8d4ff38
+Bisecting: 2 revisions left to test after this (roughly 1 step)
+[0161e2d6950fe66cf6ac1c10d945bae971f33667] printk: Defer legacy printing when holding printk_cpu_sync
+
+testing commit 0161e2d6950fe66cf6ac1c10d945bae971f33667 gcc
+compiler: Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+kernel signature: 7566994b210981fb429e3b5e9ed670407710135484fee131b57299dc8b3071f7
+run #0: OK
+run #1: OK
+run #2: OK
+run #3: OK
+run #4: crashed: BUG: MAX_LOCKDEP_KEYS too low!
+run #5: crashed: BUG: MAX_LOCKDEP_KEYS too low!
+run #6: crashed: BUG: MAX_LOCKDEP_KEYS too low!
+run #7: crashed: BUG: MAX_LOCKDEP_KEYS too low!
+run #8: crashed: BUG: MAX_LOCKDEP_KEYS too low!
+run #9: crashed: BUG: MAX_LOCKDEP_KEYS too low!
+run #10: crashed: BUG: MAX_LOCKDEP_KEYS too low!
+run #11: crashed: BUG: MAX_LOCKDEP_KEYS too low!
+run #12: crashed: BUG: MAX_LOCKDEP_KEYS too low!
+run #13: crashed: BUG: MAX_LOCKDEP_KEYS too low!
+run #14: crashed: BUG: MAX_LOCKDEP_KEYS too low!
+run #15: crashed: BUG: MAX_LOCKDEP_KEYS too low!
+run #16: crashed: BUG: MAX_LOCKDEP_KEYS too low!
+run #17: OK
+run #18: OK
+run #19: OK
+representative crash: BUG: MAX_LOCKDEP_KEYS too low!, types: [UNKNOWN]
+# git bisect bad 0161e2d6950fe66cf6ac1c10d945bae971f33667
+Bisecting: 0 revisions left to test after this (roughly 0 steps)
+[f1c21cf470595c4561d4671fd499af94152175d5] printk: Remove redundant deferred check in vprintk()
+
+testing commit f1c21cf470595c4561d4671fd499af94152175d5 gcc
+compiler: Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+kernel signature: a7cc6b185bdb5074103099a969663e598b6c2f53f61168a0f2e7c1d9bc9e8426
+all runs: OK
+false negative chance: 0.001
+# git bisect good f1c21cf470595c4561d4671fd499af94152175d5
+0161e2d6950fe66cf6ac1c10d945bae971f33667 is the first bad commit
+commit 0161e2d6950fe66cf6ac1c10d945bae971f33667
+Author: John Ogness <john.ogness@linutronix.de>
+Date:   Mon Dec 9 12:23:46 2024 +0106
+
+    printk: Defer legacy printing when holding printk_cpu_sync
+
+
+Notice:
+=======
+
+The original test crashed with:
+
+    crashed: INFO: task hung in xfs_setfilesize
+
+But the bad commits around the potential bad commit are failing
+with
+
+    crashed: BUG: MAX_LOCKDEP_KEYS too low!
+
+
+Conclusion:
+===========
+
+I believe that the bisection went into a wrong direction.
+And the printk() change has nothing to do with a hung task.
+
+Best Regards,
+Petr
+
+> start commit:   d006330be3f7 Merge tag 'sound-6.16-rc6' of git://git.kerne..
+> git tree:       upstream
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=16b19a8c580000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=12b19a8c580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=b309c907eaab29da
+> dashboard link: https://syzkaller.appspot.com/bug?extid=9bc8c0586b39708784d9
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15e24a8c580000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10ed3582580000
+> 
+> Reported-by: syzbot+9bc8c0586b39708784d9@syzkaller.appspotmail.com
+> Fixes: 0161e2d6950f ("printk: Defer legacy printing when holding printk_cpu_sync")
+> 
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
