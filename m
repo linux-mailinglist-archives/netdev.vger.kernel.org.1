@@ -1,137 +1,139 @@
-Return-Path: <netdev+bounces-247782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBE04CFEF88
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 17:57:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E6D4DCFE7DB
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 16:10:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4ED70351AB8D
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 16:46:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0E394311CB50
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 15:03:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C0E534CFC7;
-	Wed,  7 Jan 2026 14:28:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9971C35773E;
+	Wed,  7 Jan 2026 14:53:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="DlnQabRy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ee91BQm2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E621F34D3AA
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 14:28:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F8C3355043;
+	Wed,  7 Jan 2026 14:53:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767796117; cv=none; b=L8DH5e7SyJIXn2kJKZPKHBpWgMN9cI31mNtTpfm++Twq3m36mod9QHhPNX7n/IKm2o5W0VdUcIXli/mJUHBKjO/FY4oJA312W5qX+ItEixU4RQxI+pj3902eVlGEHUoILJzRo1J3+9jB1GJjzLSyK0mgkLWUWeboGhA9GwTbo40=
+	t=1767797602; cv=none; b=ua1cGMzuV8ZKsdBMBoyOCq4811ioqeoCR2b3SrNZHM3L0Zgi+LsYINUjlqoffob5OfnCaD4U8GlKm8V9fQuaarcaKCrizTw3GqZBVQ0LrQSM6QOpnP9bFW/soLmBL62kBpE6OXJoJmzKH4QdICx/NsPuQUUDxSBnWA/GBVrFMOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767796117; c=relaxed/simple;
-	bh=1tuE34tqdRZ0Cq/ciIXf0IbqXReLHJ00YT+wtQPddnU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=JgbQtLsPcDiSp/o4RxcbO6nGwbT29bKLR7MbZyahwtYGOreCx3j2xv5PWnwzUn13gEs5I3VvtnsuwYbn1JHQMqNXVVwaBrL+WlbA2mepFD/0i1paQv9ug2WVqT6ye3svmwwaw2jJoFujkj3uix7gTfJBmCXI8hX3RxoQ/ZEkfHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=DlnQabRy; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-64c893f3a94so1357727a12.0
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 06:28:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1767796099; x=1768400899; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bvsM1sRJWYDcPZakX1MsPvBpIu+3P2Cxb3oshH7eLdY=;
-        b=DlnQabRyj5at5r0zIrQ4HSbSWQnhsf0koS8llLJgK6lIbulKZx/LWIyNaewmPLgCp2
-         lRdFT4bL491sghJdfJJqVpSL/FGPo4sLyJ4oBp/7VYyQwGlgWZ9e2SctojwXt1w8LnJI
-         PG4BkaAMRK3jC/L4GuzdP1nYFd77NfI2hhn0hKF8XWrLTKymYyOWpQmkOqdYefWLyNLG
-         EyH/c7JbXEPqkjUS0MrmEi08DlxIM6EjT882CkDj6Vw18JJCm8ozS8d6sDkfjt0EjzYC
-         n+9NgICnhXgF91NVu6sHh6VYWgvKhvouJ/G3I5+3j0grXVocXo+gh+cs5pQV9LxHo1Ss
-         F0SA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767796099; x=1768400899;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=bvsM1sRJWYDcPZakX1MsPvBpIu+3P2Cxb3oshH7eLdY=;
-        b=VZ4p2kkJIkWOsB1G/9T25soLJ0FI8lstH0zqXTJVYwEGtOgSs82DvM16LIHRsSqXd9
-         tLRdymywprKYsOIFHOqZennIyulVzMuGq0PevSXxpPqoGtnuiXjGw4fx4NbOiwkWZB2x
-         +rkdPIoFxjKh9F+ChI/zfB536ISoaEKaZxvpm0mNl0vJITHq+/zit+Vax0ts24PVdFFR
-         b2wHYpBhnj9J82CfIkJUT0Pq0HvrHMoeQAE+4C9/u2CHnmIhW3nTmAmmiOlAYSOJ0wBl
-         7dyoJJ/xtnRytsdi+Y0oTghMuLmpZhnvx+PwkpcptZdElNAXL4jNOcjGjRIgj1aFtNL/
-         aEKw==
-X-Gm-Message-State: AOJu0Yw4lrRKzmzmbryTRUOjTuuabQxPxD0g9KJGFnhFOChawxBs6hjI
-	7otTShPzgzY+ew2Nnc5ZanXYgOQ6ivlCn4aoTKETeUEH7XdxGUeh7Z0XlaqCEnqFqysw8zSBozt
-	QtKuk
-X-Gm-Gg: AY/fxX6d1nnVil7yWOlCZwOFAAwCJwZNOBp6qc2mTiHSx1uFqF63GNoV046ePzfxkL5
-	ysmMhlcMV0WSFX2qiB+rvcISxbvQiK96O2uhSxSZmwTrK2PIsHZqrnWkKMd+bb9ESSKpE1voad3
-	PVxZUbcdBtWYr7FYpmSjVaZ4nxXj0ja0MuTicoBukaOJaeEoF1uWZVW6YjgkRagj0+PlbWoOMj3
-	XpvC+4mmN/vQDwRXnxYJgslmooiToiS50AZccCCkicD32Q/DRiOgFuZLRbRWCdCLarfPMDEM9pn
-	FtJCy97dCSCzGN/e3MHf5oTVekoeUOGoQEq7TweSbLuupH/s4hvsG4YJKmW+bzdTBJkMWPK4zam
-	D/bmaAr24d8n3wzsMKV39I4u3695kwWgxJT5f+0voJH8OPeaxSLp9e5ur29dI9MlOrDYiTaCSXd
-	fbIW9f98IuO4T0QPfJ3r0B6LgPEFeKPoaISixWaKw2Ptab29LXse+Sx/Jk7Bo=
-X-Google-Smtp-Source: AGHT+IEecpe3jiGI8SXIV763BBgyluAV6tRhMtb46iFeU2sSBdZeRQkgSyXlUdzVAnEHk17J/a8jKA==
-X-Received: by 2002:a17:907:3c82:b0:b73:9222:6a64 with SMTP id a640c23a62f3a-b8444c5a808mr344054766b.3.1767796099347;
-        Wed, 07 Jan 2026 06:28:19 -0800 (PST)
-Received: from cloudflare.com (79.184.207.118.ipv4.supernova.orange.pl. [79.184.207.118])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a27bfbfsm520269466b.17.2026.01.07.06.28.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 06:28:18 -0800 (PST)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Wed, 07 Jan 2026 15:28:08 +0100
-Subject: [PATCH bpf-next v3 08/17] xsk: Call skb_metadata_set when
- skb->data points at metadata end
+	s=arc-20240116; t=1767797602; c=relaxed/simple;
+	bh=cArOAZu2vf19+VFBgmj/e+ZIi+kTdN9NBGzWcNSqNRs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WibXQ7vymCJ2nKWxmzL905RJPlFZqXOVFXPvQ1vkdrJmAoE+UvaPMWJq1ZNdHOE9/iJ5S6UYWhstYfvkneI8SlT03q08/AeH7I8bLkFDPK17RH6yKi2+/lEaocy7REeN5jEIb+PGghW8xynIcJTuaYJ/0icYYzhIkpKzvKHbcuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ee91BQm2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67932C4CEF1;
+	Wed,  7 Jan 2026 14:53:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767797602;
+	bh=cArOAZu2vf19+VFBgmj/e+ZIi+kTdN9NBGzWcNSqNRs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ee91BQm2IoeyYD6gcMxxj4z29bK0iUJ3krQ567hBuYTdzHHJuJrlfq9NCaAEIkY3Z
+	 QHAdCTRQKCowk9CH0Kp1UOoyg2/HEG7lwIOFJrTgmmtEBk6QBcvsBptAgKB8e60MJc
+	 /Ka6LO9rXmsoq1G3ywV20thWUY7fFO0ivnnLATSjnp6r1oJgdpsE8TvvwH9h96bHjo
+	 2a6kLNGNnfIlWDoRKnNtmkX41r89sO80mNZHLHXZB3jBTKmqEmqOVuSjO6fbLT/dzY
+	 g+cuqJd4TUBRUhGJg+hHo+lJ7uyZ01BUNfCzyS0n+A4caH9f9lZ+PLbasFMs92c0fz
+	 2V2poM+Zgmg3Q==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	shuah@kernel.org,
+	vladimir.oltean@nxp.com,
+	alexander.sverdlin@gmail.com,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next] selftests: forwarding: update PTP tcpdump patterns
+Date: Wed,  7 Jan 2026 06:53:19 -0800
+Message-ID: <20260107145320.1837464-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260107-skb-meta-safeproof-netdevs-rx-only-v3-8-0d461c5e4764@cloudflare.com>
-References: <20260107-skb-meta-safeproof-netdevs-rx-only-v3-0-0d461c5e4764@cloudflare.com>
-In-Reply-To: <20260107-skb-meta-safeproof-netdevs-rx-only-v3-0-0d461c5e4764@cloudflare.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Stanislav Fomichev <sdf@fomichev.me>, Simon Horman <horms@kernel.org>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
- kernel-team@cloudflare.com
-X-Mailer: b4 0.15-dev-07fe9
+Content-Transfer-Encoding: 8bit
 
-Prepare to track skb metadata location independently of MAC header offset.
+Recent version of tcpdump (tcpdump-4.99.6-1.fc43.x86_64) seems to have
+removed the spurious space after msg type in PTP info, e.g.:
 
-Following changes will make skb_metadata_set() record where metadata ends
-relative to skb->head. Hence the helper must be called when skb->data
-already points past the metadata area.
+ before:  PTPv2, majorSdoId: 0x0, msg type : sync msg, length: 44
+ after:   PTPv2, majorSdoId: 0x0, msg type: sync msg, length: 44
 
-Adjust AF_XDP to pull from skb->data before calling skb_metadata_set().
+Update our patterns to match both.
 
-Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/core/xdp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+CC: shuah@kernel.org
+CC: vladimir.oltean@nxp.com
+CC: alexander.sverdlin@gmail.com
+CC: linux-kselftest@vger.kernel.org
+---
+ .../net/forwarding/local_termination.sh        | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/net/core/xdp.c b/net/core/xdp.c
-index fee6d080ee85..f35661305660 100644
---- a/net/core/xdp.c
-+++ b/net/core/xdp.c
-@@ -768,8 +768,8 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp_buff *xdp)
+diff --git a/tools/testing/selftests/net/forwarding/local_termination.sh b/tools/testing/selftests/net/forwarding/local_termination.sh
+index 892895659c7e..1f2bf6e81847 100755
+--- a/tools/testing/selftests/net/forwarding/local_termination.sh
++++ b/tools/testing/selftests/net/forwarding/local_termination.sh
+@@ -306,39 +306,39 @@ run_test()
  
- 	metalen = xdp->data - xdp->data_meta;
- 	if (metalen > 0) {
--		skb_metadata_set(skb, metalen);
- 		__skb_pull(skb, metalen);
-+		skb_metadata_set(skb, metalen);
- 	}
+ 	if [ $skip_ptp = false ]; then
+ 		check_rcv $rcv_if_name "1588v2 over L2 transport, Sync" \
+-			"ethertype PTP (0x88f7).* PTPv2.* msg type : sync msg" \
++			"ethertype PTP (0x88f7).* PTPv2.* msg type *: sync msg" \
+ 			true "$test_name"
  
- 	skb_record_rx_queue(skb, rxq->queue_index);
-
+ 		check_rcv $rcv_if_name "1588v2 over L2 transport, Follow-Up" \
+-			"ethertype PTP (0x88f7).* PTPv2.* msg type : follow up msg" \
++			"ethertype PTP (0x88f7).* PTPv2.* msg type *: follow up msg" \
+ 			true "$test_name"
+ 
+ 		check_rcv $rcv_if_name "1588v2 over L2 transport, Peer Delay Request" \
+-			"ethertype PTP (0x88f7).* PTPv2.* msg type : peer delay req msg" \
++			"ethertype PTP (0x88f7).* PTPv2.* msg type *: peer delay req msg" \
+ 			true "$test_name"
+ 
+ 		check_rcv $rcv_if_name "1588v2 over IPv4, Sync" \
+-			"ethertype IPv4 (0x0800).* PTPv2.* msg type : sync msg" \
++			"ethertype IPv4 (0x0800).* PTPv2.* msg type *: sync msg" \
+ 			true "$test_name"
+ 
+ 		check_rcv $rcv_if_name "1588v2 over IPv4, Follow-Up" \
+-			"ethertype IPv4 (0x0800).* PTPv2.* msg type : follow up msg" \
++			"ethertype IPv4 (0x0800).* PTPv2.* msg type *: follow up msg" \
+ 			true "$test_name"
+ 
+ 		check_rcv $rcv_if_name "1588v2 over IPv4, Peer Delay Request" \
+-			"ethertype IPv4 (0x0800).* PTPv2.* msg type : peer delay req msg" \
++			"ethertype IPv4 (0x0800).* PTPv2.* msg type *: peer delay req msg" \
+ 			true "$test_name"
+ 
+ 		check_rcv $rcv_if_name "1588v2 over IPv6, Sync" \
+-			"ethertype IPv6 (0x86dd).* PTPv2.* msg type : sync msg" \
++			"ethertype IPv6 (0x86dd).* PTPv2.* msg type *: sync msg" \
+ 			true "$test_name"
+ 
+ 		check_rcv $rcv_if_name "1588v2 over IPv6, Follow-Up" \
+-			"ethertype IPv6 (0x86dd).* PTPv2.* msg type : follow up msg" \
++			"ethertype IPv6 (0x86dd).* PTPv2.* msg type *: follow up msg" \
+ 			true "$test_name"
+ 
+ 		check_rcv $rcv_if_name "1588v2 over IPv6, Peer Delay Request" \
+-			"ethertype IPv6 (0x86dd).* PTPv2.* msg type : peer delay req msg" \
++			"ethertype IPv6 (0x86dd).* PTPv2.* msg type *: peer delay req msg" \
+ 			true "$test_name"
+ 	fi
+ 
 -- 
-2.43.0
+2.52.0
 
 
