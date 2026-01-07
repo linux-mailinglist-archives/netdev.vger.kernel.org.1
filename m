@@ -1,260 +1,182 @@
-Return-Path: <netdev+bounces-247737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31AF9CFDF27
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 14:30:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76941CFE01C
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 14:40:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 689D53091F42
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 13:20:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6AC03312B674
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 13:31:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0EAE328608;
-	Wed,  7 Jan 2026 13:19:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E189E32E753;
+	Wed,  7 Jan 2026 13:22:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="BgEOvD49"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NQx0CCIK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D747F32824D;
-	Wed,  7 Jan 2026 13:19:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C48C32A3C3
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 13:22:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767791973; cv=none; b=MjPbKLuD2N3fvZE4rhv5Ucv5YrCz3lotkggPnAVCQmCRyIWRoVdJQtvGtyq5GyHEusT+YuxPGZT4+CS98UZqZBs5FvvAX99HD0PXR28SAYB4sZVnXezrmMqKzi0aYt7zvG7d4VAT7PBJWK0H1z1rqFyIa9gwVRIaQdb5PnUgp+M=
+	t=1767792149; cv=none; b=puAB+UNVNoUR6ZUe2yA+faWMjGYw63k4eT3SjH4L2uEi8z7OlD6px5cBbcdEEJB7EagHMKyu3Arn1/qFZM53gFGgjSE6QqmlpdOTwuWQw0j36dDUiNJJbBQsq2m1gPa3u+5Y+peCxNaSVCZZNRd6KwxROPu1TdfmLqLLOC13BA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767791973; c=relaxed/simple;
-	bh=XZgEfBRlm8Icq/d1lLQH/pTfgxm8Gb4CfGRr76LU9iY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V+oO6nagxt1y7wRIGw9vF4qz+gUuiUmkAso8EbjXxAQhpzGjb5ECb8HvJuceiDvtnii7/Ay7VZMjE8oKp5Es61vGGqWMno9UQYOaFLsV37I0QJV3s3LpKzM7EABKnXBtPGisintIq6DdzkJd1RrLIwYc30EgKBoD/ETfWdRhX4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=BgEOvD49; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6071Ldir2795726;
-	Wed, 7 Jan 2026 05:19:18 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=1
-	X8qP0tdIHTcwnkxPdknFT4VQWL38/oIaz5svLxCnlE=; b=BgEOvD49XKQarwQcv
-	YI6K/8CZpvcBVIfbpBIVsTyv+CTSA0ExSVemdQgkdOSr/Qm/HmUTYh6cJ5doB5qE
-	6ICttJXxpGonYjuy4Pa87owJM/VgFsdZYeKV3lqjyP8OMeZvr4wNJRdmTpe964CH
-	LRDansUTfPL8mhx9jwYQ9XeluyHA6nxSAaJQge6hQiolOubQa3ZQdsdq0vsB9mnH
-	yzKky5hog7VyXR1MWpbITEKggQvrpkSm/DCN1DnGrZgAEOtfMaQsTtEu5XGM+AYA
-	f6QcqCi20icLZlgzQnqxNpxx4gpb8nEZKiPwUfuitcMtrfSWtVrouB4mQcNEQ8QU
-	3nWLw==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bgf3fw1hd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 07 Jan 2026 05:19:18 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 7 Jan 2026 05:19:31 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Wed, 7 Jan 2026 05:19:31 -0800
-Received: from sapphire1.sclab.marvell.com (unknown [10.111.132.245])
-	by maili.marvell.com (Postfix) with ESMTP id 9E2443F704A;
-	Wed,  7 Jan 2026 05:19:16 -0800 (PST)
-From: Vimlesh Kumar <vimleshk@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sedara@marvell.com>, <srasheed@marvell.com>, <hgani@marvell.com>,
-        "Vimlesh Kumar" <vimleshk@marvell.com>,
-        Veerasenareddy Burru
-	<vburru@marvell.com>,
-        Satananda Burla <sburla@marvell.com>,
-        Andrew Lunn
-	<andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>
-Subject: [PATCH net v3 3/3] octeon_ep_vf: ensure dbell BADDR updation
-Date: Wed, 7 Jan 2026 13:18:56 +0000
-Message-ID: <20260107131857.3434352-4-vimleshk@marvell.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260107131857.3434352-1-vimleshk@marvell.com>
-References: <20260107131857.3434352-1-vimleshk@marvell.com>
+	s=arc-20240116; t=1767792149; c=relaxed/simple;
+	bh=Pj1sPigIp/NebNJ8oa/bhXNBS40dnz2XB0+eNSKkJvo=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Lm1D44u4Z1gRj/XAchDGaub/2NHjH8330DI15hVJm03V/7xtDLEPosMSFb+Y8R0PK4DLV8Ri+mrM69RGNJxyceRLazTjmcQqGRU6xdTFmAds6Fctv0QCXnsHj4aOHdQoir4NlUuD9I0BvU3T/6P8iDAwTe4gxLXUwZ2tODRfCmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NQx0CCIK; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-c026e074373so1230422a12.1
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 05:22:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767792147; x=1768396947; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eEP5iKdXQBSTEl9I4Q+Cs17dhqRzcqmuf37yAQk7v9Q=;
+        b=NQx0CCIKLBEIeqyxEiE0d9FQ4K07G9LezoF4vEX7m6lyj91LG4D1WMOLsD6C7mVZtv
+         hCQPLTUU0X0CuLTjyB4zk0PfaPeT+u2P/mvOLvZeWrZg+1yyUHxL+3ctux8g5qRvUSec
+         CDt9pvNHusss9nticdHHyRpUzS9yz1FI/Fe6328paOxMNcCuBB9htnASsrZR4brEWLEa
+         TmDckrqJTfLRilPKCqdGoPitGTvTEOlkNpYPFEwBk4y6HiKyTUXWR1fV8wEQywLUKdht
+         HqfHI8SHrlZJkAEkcfYKZcPQB9yp3eS+C+KoDMGUHn4rJmot/kJjkUF8rvvX5sXqdlcf
+         WewQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767792147; x=1768396947;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eEP5iKdXQBSTEl9I4Q+Cs17dhqRzcqmuf37yAQk7v9Q=;
+        b=tWtuu9lrOTk2R8Olp56osf4Yuq7bYytptG+XA+9nnYUHkPZAh96xdezZLv4SPRqPlE
+         b1iIop/fLobOIJnc185WD/SNhDhW2sWEBBE7G3WSuD+EL9JABiSsqSwvx3+hqLdnA6ep
+         QMu4GryPZCk1WAoKrK9NfrvUq6tL+AuPTmPi5RbXaKJXnvKrfUQ/b8YDvBgpnQTJAVtK
+         X46dbFSXPhkzA1EfgZ8qnohmfXxMgyALwYpiwbb4lcV9lcBz/Er47eK+1neUn2uLkcEO
+         xipK0IqS69gYZbIbHWpQgHV/4SgwNsgNuw3wLCNPiQM0xb2i9oJnFdbghUguDLgy4pN/
+         2OUg==
+X-Forwarded-Encrypted: i=1; AJvYcCWseE3coEO8n0YYwzY7ZlZXmJqoywZe5BklwRZV1YifM0fDLuar5DS+2PHH6dqVXcMwtY2R5S0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzl3BsgDJdXZc4/zoIeG2d8QJ5x3TvnJE4LpGPEJPa1vkd0rAGa
+	ASDuzmysvIUX9R5iCxr8/SV69PTQMzExaPstypgRUG+0OV6eTSHegEc0
+X-Gm-Gg: AY/fxX63Dbun3tpkCSherV3kP2ugJ4eEUMkBRY/PDTfcOXB/Xib57TjgPdMaqFD1Klr
+	7R+ymFZjYmdj+WPw3pTDNXWXbR/bB+VS7p2MsIIr0ZwZCnGc3Y5YB0kS83MQXZg/+Qlibqx1Is6
+	NIH8bKyY82eXOryCSGpdFSrgYYrQdr7MjOPAXu9hXv7lUsYCOePvCreXEiJZfrHDO2lFg8DSUsV
+	1IvOVz7C/gOCPjKriBffSPbObR3Q0agOfja4E6gyb2SkOl64m4eZLtYZPjVsDooks9axIeKcKIa
+	Q3bKHD1u2kAIlcyYKEJ8T9XFpwNqW3/5qiABtA42z1x8VFbZd1oA0Iq+a1Q5kYVXUXzd+wrc/T/
+	K3QY1h0pUtYB9zhCURyM8jwE0JemizNisVoCKjIA2RaYUNnbTkMv5hc2lrL4eSAFdyBH44tc2yr
+	91NseU3BzpPJU=
+X-Google-Smtp-Source: AGHT+IHRBhcmZTOAWCkmyvKGN/yIZEW3BGgNcWJLj8eAWLx29Gncqv2b/qbhRUayMjbaD/Ww+6ckVQ==
+X-Received: by 2002:a05:6a21:3389:b0:366:1e11:11e6 with SMTP id adf61e73a8af0-3898f88920bmr2498991637.4.1767792146339;
+        Wed, 07 Jan 2026 05:22:26 -0800 (PST)
+Received: from [127.0.0.1] ([188.253.121.152])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a3e3cc7912sm52511685ad.67.2026.01.07.05.22.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Jan 2026 05:22:25 -0800 (PST)
+From: Zesen Liu <ftyghome@gmail.com>
+Subject: [PATCH bpf v2 0/2] bpf: Fix memory access flags in helper
+ prototypes
+Date: Wed, 07 Jan 2026 21:21:41 +0800
+Message-Id: <20260107-helper_proto-v2-0-4c562bcca5a8@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=PLgCOPqC c=1 sm=1 tr=0 ts=695e5d56 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
- a=9s7rcsES4n5jIWhP9eIA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA3MDEwMiBTYWx0ZWRfX1RRc3EyiXZCj
- 4wyhtuPJ93ny+jfRKsMu+4gfqfOXLSIEoFVKWxUeLjFjcZ8+J52KdX0JrsImM8rKnuGJmHiQEbh
- zLPshSiPyzIUWidKM/AhzblbCGlToXxvy7dBygh/Bn2UzcwgPwzMMnNLnTBT+eodCR8Ms3ae7eQ
- GrCTrDju2a6sufiWrOJRBFE+xFOvnIIi9d3NcegoaWO/Snr3hLMBb51M2c5UdmQvK+4cz9hVD3X
- LHqYOCslbCt5/vRXljUbsVSxjztIjUV4xB/MMONDvI1dInkwz9W6M/yGEjqWE9YMchKuUqvrWnF
- XxA4+fXMIby45rMYvSFfYGMmAzge5SKGmvCGcO+/5VKD83OBD2OejTDeDnhOq/C28gktMAAT4Pf
- 0Dah08c9XVYrcgrgDj/xMIJr5H1liPY53RgVsj7Sw8L6SHbAQSc4NOoz8kql8npQ7uBaWNfqMAv
- oGRXhXss89hZMHchBow==
-X-Proofpoint-GUID: Mg6Uzxfj6zxL_9a35aaU4KMeI3aZbU6S
-X-Proofpoint-ORIG-GUID: Mg6Uzxfj6zxL_9a35aaU4KMeI3aZbU6S
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-07_01,2026-01-06_01,2025-10-01_01
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOVdXmkC/42NQQ6CMBREr2L+2pr2Ay268h6GGCi/0ARo0xKiI
+ dzdysoFC5czk/dmhUjBUoTbaYVAi43WTSng+QS6r6eOmG1TBuRYCETOeho8hacPbnbMNJJkLkr
+ MpYKE+EDGvnbdAxpvoEplb+Pswnu/WMQ+HdsWwThLrSTeXnPE9t6NtR0u2o1feYIkF1wdQcLUB
+ WZGa/M/RFmpiJeohNY/ULVt2wfT8Z2dFwEAAA==
+X-Change-ID: 20251220-helper_proto-fb6e64182467
+To: Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski <mattbobrowski@google.com>, 
+ Steven Rostedt <rostedt@goodmis.org>, 
+ Masami Hiramatsu <mhiramat@kernel.org>, 
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>
+Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Shuran Liu <electronlsr@gmail.com>, Peili Gao <gplhust955@gmail.com>, 
+ Haoran Ni <haoran.ni.cs@gmail.com>, Zesen Liu <ftyghome@gmail.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2233; i=ftyghome@gmail.com;
+ h=from:subject:message-id; bh=Pj1sPigIp/NebNJ8oa/bhXNBS40dnz2XB0+eNSKkJvo=;
+ b=kA0DAAoWjB93TexNMocByyZiAGleXgWghpdyHONMr/NpV7eozodgDA95HAb8EsuASP3dBahaG
+ Yh1BAAWCgAdFiEEjfgx3alpNzO2PKDBjB93TexNMocFAmleXgUACgkQjB93TexNMoforwEAn1i+
+ D08CVCAhApBR8MWrFoZWhJSQOkE1B/v9gIIQ+FsBAMLe3c6CqkH09nxBtAz7VkutkjMiFc4pH6a
+ WK3ueEEIC
+X-Developer-Key: i=ftyghome@gmail.com; a=openpgp;
+ fpr=8DF831DDA9693733B63CA0C18C1F774DEC4D3287
 
-Make sure the OUT DBELL base address reflects the
-latest values written to it.
+Hi,
 
-Fix:
-Add a wait until the OUT DBELL base address register
-is updated with the DMA ring descriptor address,
-and modify the setup_oq function to properly
-handle failures.
+This series adds missing memory access flags (MEM_RDONLY or MEM_WRITE) to
+several bpf helper function prototypes that use ARG_PTR_TO_MEM but lack the
+correct flag. It also adds a new check in verifier to ensure the flag is
+specified.
 
-Fixes: 2c0c32c72be29 ("octeon_ep_vf: add hardware configuration APIs")
-Signed-off-by: Sathesh Edara <sedara@marvell.com>
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
-Signed-off-by: Vimlesh Kumar <vimleshk@marvell.com>
+Missing memory access flags in helper prototypes can lead to critical
+correctness issues when the verifier tries to perform code optimization.
+After commit 37cce22dbd51 ("bpf: verifier: Refactor helper access type
+tracking"), the verifier relies on the memory access flags, rather than
+treating all arguments in helper functions as potentially modifying the
+pointed-to memory.
+
+Using ARG_PTR_TO_MEM alone without flags does not make sense because:
+
+- If the helper does not change the argument, missing MEM_RDONLY causes the
+   verifier to incorrectly reject a read-only buffer.
+- If the helper does change the argument, missing MEM_WRITE causes the
+   verifier to incorrectly assume the memory is unchanged, leading to
+   errors in code optimization.
+
+We have already seen several reports regarding this:
+
+- commit ac44dcc788b9 ("bpf: Fix verifier assumptions of bpf_d_path's
+   output buffer") adds MEM_WRITE to bpf_d_path;
+- commit 2eb7648558a7 ("bpf: Specify access type of bpf_sysctl_get_name
+   args") adds MEM_WRITE to bpf_sysctl_get_name.
+
+This series looks through all prototypes in the kernel and completes the
+flags. It also adds a new check (check_func_proto) in
+verifier.c to statically restrict ARG_PTR_TO_MEM from appearing without
+memory access flags. 
+
+Changelog
+=========
+
+v2:
+  - Add missing MEM_RDONLY flags to protos with ARG_PTR_TO_FIXED_SIZE_MEM.
+
+Thanks,
+
+Zesen Liu
+
 ---
-V3:
-- Use reverse christmas tree order variable declaration.
-- Return error if timeout happens during setup oq.
+Zesen Liu (2):
+      bpf: Fix memory access flags in helper prototypes
+      bpf: Require ARG_PTR_TO_MEM with memory flag
 
-V2: https://lore.kernel.org/all/20251219100751.3063135-4-vimleshk@marvell.com/
+ kernel/bpf/helpers.c     |  2 +-
+ kernel/bpf/syscall.c     |  2 +-
+ kernel/bpf/verifier.c    | 17 +++++++++++++++++
+ kernel/trace/bpf_trace.c |  6 +++---
+ net/core/filter.c        | 20 ++++++++++----------
+ 5 files changed, 32 insertions(+), 15 deletions(-)
+---
+base-commit: ab86d0bf01f6d0e37fd67761bb62918321b64efc
+change-id: 20251220-helper_proto-fb6e64182467
 
-V1: https://lore.kernel.org/all/20251212122304.2562229-4-vimleshk@marvell.com/
-
- .../marvell/octeon_ep_vf/octep_vf_cn9k.c      |  3 +-
- .../marvell/octeon_ep_vf/octep_vf_cnxk.c      | 39 +++++++++++++++++--
- .../marvell/octeon_ep_vf/octep_vf_main.h      |  2 +-
- .../marvell/octeon_ep_vf/octep_vf_rx.c        |  4 +-
- 4 files changed, 42 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cn9k.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cn9k.c
-index 88937fce75f1..4c769b27c278 100644
---- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cn9k.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cn9k.c
-@@ -196,7 +196,7 @@ static void octep_vf_setup_iq_regs_cn93(struct octep_vf_device *oct, int iq_no)
- }
- 
- /* Setup registers for a hardware Rx Queue  */
--static void octep_vf_setup_oq_regs_cn93(struct octep_vf_device *oct, int oq_no)
-+static int octep_vf_setup_oq_regs_cn93(struct octep_vf_device *oct, int oq_no)
- {
- 	struct octep_vf_oq *oq = oct->oq[oq_no];
- 	u32 time_threshold = 0;
-@@ -239,6 +239,7 @@ static void octep_vf_setup_oq_regs_cn93(struct octep_vf_device *oct, int oq_no)
- 	time_threshold = CFG_GET_OQ_INTR_TIME(oct->conf);
- 	reg_val = ((u64)time_threshold << 32) | CFG_GET_OQ_INTR_PKT(oct->conf);
- 	octep_vf_write_csr64(oct, CN93_VF_SDP_R_OUT_INT_LEVELS(oq_no), reg_val);
-+	return 0;
- }
- 
- /* Setup registers for a VF mailbox */
-diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cnxk.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cnxk.c
-index 1f79dfad42c6..a968b93a6794 100644
---- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cnxk.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cnxk.c
-@@ -199,11 +199,13 @@ static void octep_vf_setup_iq_regs_cnxk(struct octep_vf_device *oct, int iq_no)
- }
- 
- /* Setup registers for a hardware Rx Queue  */
--static void octep_vf_setup_oq_regs_cnxk(struct octep_vf_device *oct, int oq_no)
-+static int octep_vf_setup_oq_regs_cnxk(struct octep_vf_device *oct, int oq_no)
- {
- 	struct octep_vf_oq *oq = oct->oq[oq_no];
-+	unsigned long t_out_jiffies;
- 	u32 time_threshold = 0;
- 	u64 oq_ctl = ULL(0);
-+	u64 reg_ba_val;
- 	u64 reg_val;
- 
- 	reg_val = octep_vf_read_csr64(oct, CNXK_VF_SDP_R_OUT_CONTROL(oq_no));
-@@ -214,6 +216,38 @@ static void octep_vf_setup_oq_regs_cnxk(struct octep_vf_device *oct, int oq_no)
- 			reg_val = octep_vf_read_csr64(oct, CNXK_VF_SDP_R_OUT_CONTROL(oq_no));
- 		} while (!(reg_val & CNXK_VF_R_OUT_CTL_IDLE));
- 	}
-+	octep_vf_write_csr64(oct, CNXK_VF_SDP_R_OUT_WMARK(oq_no),
-+			     oq->max_count);
-+	/* Wait for WMARK to get applied */
-+	usleep_range(10, 15);
-+
-+	octep_vf_write_csr64(oct, CNXK_VF_SDP_R_OUT_SLIST_BADDR(oq_no),
-+			     oq->desc_ring_dma);
-+	octep_vf_write_csr64(oct, CNXK_VF_SDP_R_OUT_SLIST_RSIZE(oq_no),
-+			     oq->max_count);
-+	reg_ba_val = octep_vf_read_csr64(oct,
-+					 CNXK_VF_SDP_R_OUT_SLIST_BADDR(oq_no));
-+	if (reg_ba_val != oq->desc_ring_dma) {
-+		t_out_jiffies = jiffies + 10 * HZ;
-+		do {
-+			if (reg_ba_val == ULLONG_MAX)
-+				return -EFAULT;
-+			octep_vf_write_csr64(oct,
-+					     CNXK_VF_SDP_R_OUT_SLIST_BADDR
-+					     (oq_no), oq->desc_ring_dma);
-+			octep_vf_write_csr64(oct,
-+					     CNXK_VF_SDP_R_OUT_SLIST_RSIZE
-+					     (oq_no), oq->max_count);
-+			reg_ba_val =
-+			octep_vf_read_csr64(oct,
-+					    CNXK_VF_SDP_R_OUT_SLIST_BADDR
-+					    (oq_no));
-+		} while ((reg_ba_val != oq->desc_ring_dma) &&
-+			  time_before(jiffies, t_out_jiffies));
-+
-+		if (reg_ba_val != oq->desc_ring_dma)
-+			return -EAGAIN;
-+	}
- 
- 	reg_val &= ~(CNXK_VF_R_OUT_CTL_IMODE);
- 	reg_val &= ~(CNXK_VF_R_OUT_CTL_ROR_P);
-@@ -227,8 +261,6 @@ static void octep_vf_setup_oq_regs_cnxk(struct octep_vf_device *oct, int oq_no)
- 	reg_val |= (CNXK_VF_R_OUT_CTL_ES_P);
- 
- 	octep_vf_write_csr64(oct, CNXK_VF_SDP_R_OUT_CONTROL(oq_no), reg_val);
--	octep_vf_write_csr64(oct, CNXK_VF_SDP_R_OUT_SLIST_BADDR(oq_no), oq->desc_ring_dma);
--	octep_vf_write_csr64(oct, CNXK_VF_SDP_R_OUT_SLIST_RSIZE(oq_no), oq->max_count);
- 
- 	oq_ctl = octep_vf_read_csr64(oct, CNXK_VF_SDP_R_OUT_CONTROL(oq_no));
- 	/* Clear the ISIZE and BSIZE (22-0) */
-@@ -250,6 +282,7 @@ static void octep_vf_setup_oq_regs_cnxk(struct octep_vf_device *oct, int oq_no)
- 	reg_val &= ~GENMASK_ULL(31, 0);
- 	reg_val |= CFG_GET_OQ_WMARK(oct->conf);
- 	octep_vf_write_csr64(oct, CNXK_VF_SDP_R_OUT_WMARK(oq_no), reg_val);
-+	return 0;
- }
- 
- /* Setup registers for a VF mailbox */
-diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h
-index b9f13506f462..c74cd2369e90 100644
---- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h
-@@ -55,7 +55,7 @@ struct octep_vf_mmio {
- 
- struct octep_vf_hw_ops {
- 	void (*setup_iq_regs)(struct octep_vf_device *oct, int q);
--	void (*setup_oq_regs)(struct octep_vf_device *oct, int q);
-+	int (*setup_oq_regs)(struct octep_vf_device *oct, int q);
- 	void (*setup_mbox_regs)(struct octep_vf_device *oct, int mbox);
- 
- 	irqreturn_t (*non_ioq_intr_handler)(void *ioq_vector);
-diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
-index d70c8be3cfc4..6446f6bf0b90 100644
---- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
-@@ -171,7 +171,9 @@ static int octep_vf_setup_oq(struct octep_vf_device *oct, int q_no)
- 		goto oq_fill_buff_err;
- 
- 	octep_vf_oq_reset_indices(oq);
--	oct->hw_ops.setup_oq_regs(oct, q_no);
-+	if (oct->hw_ops.setup_oq_regs(oct, q_no))
-+		goto oq_fill_buff_err;
-+
- 	oct->num_oqs++;
- 
- 	return 0;
+Best regards,
 -- 
-2.47.0
+Zesen Liu <ftyghome@gmail.com>
 
 
