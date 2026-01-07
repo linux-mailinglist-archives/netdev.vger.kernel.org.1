@@ -1,123 +1,88 @@
-Return-Path: <netdev+bounces-247514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D59FCFB6EB
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 01:10:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 348E0CFB75E
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 01:25:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8987730BD0DD
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 00:07:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EA2ED3028F53
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 00:23:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E87F41DE8AE;
-	Wed,  7 Jan 2026 00:07:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28EE417C21C;
+	Wed,  7 Jan 2026 00:23:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SQsiKGNR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ksHrNXCU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 591231A0712
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 00:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E97FD1684A4;
+	Wed,  7 Jan 2026 00:23:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767744424; cv=none; b=tfCDpqnnexDkI0kOBe8+7+FX0d/1BzMzOmDhoe6SlcygaHDKeK9cDIjzAxQCQjQXPKfE6zv5BxHYyxywy18Fgvd/GTzt+WShg7Sno3cLlufzlhXBxKO0UmpyGG4bhP+aCtUElafMwI7GEvx0yTif5u7Bo3nFOdR68PQI9qilx8o=
+	t=1767745391; cv=none; b=YGg94VlFBZGyl05RfQqbUr/bYPeyvJVki9Z0vVQCvhgvclzXk8KRA8+f9SOdvozES/LmXOF1/jMLB7Z2OdFNYWxgsQV99dLfWJQwOo41K+WpfEboKyi9iZMoEfFIzZGWgxHHFLweo/TGdiFaQq8LWEoR3m4HXe/SNmFIxodZT1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767744424; c=relaxed/simple;
-	bh=QHq2WtYL9VcIfMhYPsn+EFICzpKkcRRDqYjmQVRG568=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WzO3DsWcZIXCvkZTbE4+XJtApYX+wetd6Su1GUxiV4Ep6TbudX9JxWIt+hlvfSB50x90Xm+0rt8x/5ePbuTBboRbcdk/ZWkkobNb0IFP8ZbOYdBBD0K07Kmxz/j3OD05JG6CNiLtwN5kO3tmiAuDHHI2s1tFmITTl+uU6VIUqX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SQsiKGNR; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767744424; x=1799280424;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=QHq2WtYL9VcIfMhYPsn+EFICzpKkcRRDqYjmQVRG568=;
-  b=SQsiKGNRipafgAJJ/Ii7rpsQd6QCdxRtBX7XMcL9wCRB6ACz9/W20VcV
-   EWRdxaBYIQpQnsmwWoVPIuInBAOnTrte/OhF9cvl8P3t3Dfufz1wDg1MG
-   /etL/K/KLpdYoFfMdCWmAtYgQl5qjf3BcWkAcQNQ5lFBJFOTojtyIIbFp
-   mkYKcQM9Ad7WQ4LzDbI1nadJ1BLng7ZByTeeCuSo4f2+TQnjULCJ1HuTW
-   vD1SJMQk0sa561Q9TbnG+5IEnLqBnZwbqwm5l/nJeNut8wJiIJzbs0DWG
-   2vnQ+am6A4eWkRoeHliVubjR0WX3Etw2gCwjo92sLtt21Y1Yyyc87v7eB
-   g==;
-X-CSE-ConnectionGUID: FIL1wBetQxW6dr3p9MOnkg==
-X-CSE-MsgGUID: WUmydXtARgWgESjSkzg/Hg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11663"; a="69161690"
-X-IronPort-AV: E=Sophos;i="6.21,206,1763452800"; 
-   d="scan'208";a="69161690"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2026 16:06:55 -0800
-X-CSE-ConnectionGUID: /SgQcFIGTXukQleDSryGNA==
-X-CSE-MsgGUID: s2joSnTISveXlnJCQ65TCw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,206,1763452800"; 
-   d="scan'208";a="207841216"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa005.jf.intel.com with ESMTP; 06 Jan 2026 16:06:55 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
-	anthony.l.nguyen@intel.com,
-	tatyana.e.nikolova@intel.com,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Krishneil Singh <krishneil.k.singh@intel.com>
-Subject: [PATCH net 13/13] idpf: fix aux device unplugging when rdma is not supported by vport
-Date: Tue,  6 Jan 2026 16:06:45 -0800
-Message-ID: <20260107000648.1861994-14-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20260107000648.1861994-1-anthony.l.nguyen@intel.com>
-References: <20260107000648.1861994-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1767745391; c=relaxed/simple;
+	bh=wY4FRjNX3BB8mXL+6r1lxCBoL1PogAM00UMTBb3+13Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kvh7wFdC7qtirp/Wpaup+PqUQEZAtiZ/LesbVE9UO3N406K/3ZXZzWS2Ysw60sj2C8aNjEtqniEC/sVHCM51vWr8n0tXeZ9b2l7HPefmnoxtm5zgzdx2s01QOGqDJKHqw4/eEjWMBsCgLrf/JZO7cWzaabkfVXAHQbp+NJmgp74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ksHrNXCU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00E7DC116C6;
+	Wed,  7 Jan 2026 00:23:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767745387;
+	bh=wY4FRjNX3BB8mXL+6r1lxCBoL1PogAM00UMTBb3+13Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ksHrNXCUkbJnUfD3/20A8m7nvyRRA70BY3IfWnP1qPnGaRsEMJUdFfGJ9JZsyerPT
+	 HFtHW5eKfGc/EYff3tfyqAEXIEaQ6+y/biYzV3QdfhUV0T4bQ5c+EfQNe6PW7h/9jG
+	 MOlxsB87MUCXsJil+HSkaCMQUM3a5cRxWQwmAimIvoXueN6zPdzSr26qoZMyw7BHDV
+	 ga446ZdysuFNvZSWe4ofIXJJwNdjpFrwt111LbfvWwVv9mgJQRCJCjzqB2WOiy9Iv1
+	 u3/H61qeuk2BA8r093A9BTraLOzx0BW+LNwvdJDc3doqSJfWhLpT/hJ9JkR0OKV6qd
+	 cA23ELIe/0ZGA==
+Date: Tue, 6 Jan 2026 16:23:06 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Oliver Hartkopp <socketcan@hartkopp.net>
+Cc: mkl@pengutronix.de, Prithvi <activprithvi@gmail.com>, andrii@kernel.org,
+ linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com, netdev@vger.kernel.org
+Subject: Re: [bpf, xdp] headroom - was: Re: Question about to KMSAN:
+ uninit-value in can_receive
+Message-ID: <20260106162306.0649424c@kernel.org>
+In-Reply-To: <904fa297-b657-4f5b-9999-b8cfcc11bfa9@hartkopp.net>
+References: <20251117173012.230731-1-activprithvi@gmail.com>
+	<0c98b1c4-3975-4bf5-9049-9d7f10d22a6d@hartkopp.net>
+	<c2cead0a-06ed-4da4-a4e4-8498908aae3e@hartkopp.net>
+	<aSx++4VrGOm8zHDb@inspiron>
+	<d6077d36-93ed-4a6d-9eed-42b1b22cdffb@hartkopp.net>
+	<20251220173338.w7n3n4lkvxwaq6ae@inspiron>
+	<01190c40-d348-4521-a2ab-3e9139cc832e@hartkopp.net>
+	<20260102153611.63wipdy2meh3ovel@inspiron>
+	<20260102120405.34613b68@kernel.org>
+	<63c20aae-e014-44f9-a201-99e0e7abadcb@hartkopp.net>
+	<20260104074222.29e660ac@kernel.org>
+	<fac5da75-2fc0-464c-be90-34220313af64@hartkopp.net>
+	<20260105152638.74cfea6c@kernel.org>
+	<904fa297-b657-4f5b-9999-b8cfcc11bfa9@hartkopp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Larysa Zaremba <larysa.zaremba@intel.com>
+On Tue, 6 Jan 2026 13:04:41 +0100 Oliver Hartkopp wrote:
+> When such skb is echo'ed back after successful transmission via 
+> netif_rx() this leads to skb->skb_iif = skb->dev->ifindex;
+> 
+> To prevent a loopback the CAN frame must not be sent back to the 
+> originating interface - even when it has been routed to different CAN 
+> interfaces in the meantime (which always overwrites skb_iif).
+> 
+> Therefore we need to maintain the "real original" incoming interface.
 
-If vport flags do not contain VIRTCHNL2_VPORT_ENABLE_RDMA, driver does not
-allocate vdev_info for this vport. This leads to kernel NULL pointer
-dereference in idpf_idc_vport_dev_down(), which references vdev_info for
-every vport regardless.
-
-Check, if vdev_info was ever allocated before unplugging aux device.
-
-Fixes: be91128c579c ("idpf: implement RDMA vport auxiliary dev create, init, and destroy")
-Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
-Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Tested-by: Krishneil Singh <krishneil.k.singh@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_idc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_idc.c b/drivers/net/ethernet/intel/idpf/idpf_idc.c
-index 7e20a07e98e5..6dad0593f7f2 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_idc.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_idc.c
-@@ -322,7 +322,7 @@ static void idpf_idc_vport_dev_down(struct idpf_adapter *adapter)
- 	for (i = 0; i < adapter->num_alloc_vports; i++) {
- 		struct idpf_vport *vport = adapter->vports[i];
- 
--		if (!vport)
-+		if (!vport || !vport->vdev_info)
- 			continue;
- 
- 		idpf_unplug_aux_dev(vport->vdev_info->adev);
--- 
-2.47.1
-
+Alternatively perhaps for this particular use case you could use
+something like metadata_dst to mark the frame as forwarded / annotate
+with the originating ifindex?
 
