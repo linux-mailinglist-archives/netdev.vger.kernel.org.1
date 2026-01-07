@@ -1,170 +1,178 @@
-Return-Path: <netdev+bounces-247793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C1CCCFE6F9
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 15:59:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12980CFE72A
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 16:02:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E4D0430133EB
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 14:59:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E1FA8300E17B
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 14:59:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A986B35CBCF;
-	Wed,  7 Jan 2026 14:59:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE28735CBB3;
+	Wed,  7 Jan 2026 14:59:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b="SJME2cUK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YziDo8/j"
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013063.outbound.protection.outlook.com [52.101.72.63])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C457934B69B;
-	Wed,  7 Jan 2026 14:59:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.63
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767797979; cv=fail; b=n8W7jMApLe4qIHyV5VOnNGVdHwf+di003/gmI5Nxt/2iL2DXSHGb4wQpNJLCtg35LrEMjy67uJpquEN6XuZasOlflQ8F82YJOD6ZySOxYGbXyF2y2gR/UJWt3kjf1NSpL3sp2c9mJbaFuLt/YGVkPkOXvJWr7BcFKmF3a5I+gO0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767797979; c=relaxed/simple;
-	bh=alS1/0hjqp6LxTpH/QEB5UyDrlF/27MsCyoybHnQNAk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gziXGcDIBzSJMFg0it7/3tisUIi6tDnfKlVrJ9av3EEHowtYJS0yMcZ78YYSlzu5tYLjDRDXdkaRox0OA5R8D4a8RZPbFppjVGoCJXYPnVOO7s3t/15WnQPzYMex5imlCQ89Y2Mc0/7fA8HR8/CedYLBB2a0giGAinGok6Ok08k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com; spf=fail smtp.mailfrom=nokia.com; dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b=SJME2cUK; arc=fail smtp.client-ip=52.101.72.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZF8Urh1gKLuKO9DqubU/cJmpieD0psRYPPJg1z5IYXvuXqcQYpNeOY8DmuUd8/jl8A0NbLJHlRNS8WPk/KbSjrQ7kIsvK+vfQ8dJ8C6ycnnBe8Kzh+tlGHx4+YTCQ9+VhdXYAgjR7QSAECQpQwAnGzcWXPRXWhqvYDJp8q2F1wwzc/T3EDJSWxmTIc4gFXuKOvWj9jMOVLHb6RTMFlqLzR4Jrr0oXr3H+DFdBu+73uv8uvIXH3So9gJs3z+6++GZm0lcxwQXUhfcQ3vMJBL8ds+dMIu5pArVj333amqcQj+SYbVpA7lyTUInC9R4e7ACRRHQz8RdQ39U6/Aq+K8yxw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yTcBCZNL23l+jM8tngrYTeGYe5XimJEMlEmIRary7tY=;
- b=Mgpputn6hOi+4xGcieFbTrLwQe/96eNiyQRzQEJndIAHmghYSovB6JFU2OjGOO3HIspWuZCnQ51hjZzbIJgrllSCTv/4th6KxH0xqvDQyyGfRl/yiTlmqKCo2yZR1raIkUH3xUfv38nxINElx772F0DCgpCrSMp2WY1cdPd/otc2qMsPigEedp8AiSmhyFPyYjfGwKi0h3D+FOAywpkvDeb1fkEabdNc55DJEPoMd0h/DxSJgrrVEU8zNLZXwVisedXNQCpmayGZXYRkHDTIdOnF1OCoAlwiPDNLkyrJech+J0gd1O8r4tkeLq9EvdMmY0Jp0vIPY/leM5QRu6//5Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 131.228.2.30) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nokia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nokia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yTcBCZNL23l+jM8tngrYTeGYe5XimJEMlEmIRary7tY=;
- b=SJME2cUKNL7b9lmlfpv2VSnbu+QlavEA9pySKmKKVVjtUoDgQsIU5GJA0fxun0a5PFT+HioeVLKVBUgCMDXlmcxQiuVim171SuiaK3XT6RdjGgRBSXc39dNAkMBdcepyKEi+Q3FSjkofHU/5x45l+9UdS7WePFP/CwL730zyZBMBvJ9HKYgypk5jaOV2gTbZVxf22C7+SeiTibMEb/0xhfWRlOFXYwnRiA6u2J48nIBSrh3t3Cnhkj4MbQJ3p4B+u2I+1qO2/SO/RZIU8mzeia7QouOaIJ3d2hEXCXWdMvghCfxTpsq1seSjmKzq8Vy+hfbdvA0vb9ezvtHBgA//9w==
-Received: from AM6P193CA0082.EURP193.PROD.OUTLOOK.COM (2603:10a6:209:88::23)
- by VI2PR07MB10154.eurprd07.prod.outlook.com (2603:10a6:800:27b::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.1; Wed, 7 Jan
- 2026 14:59:33 +0000
-Received: from AMS0EPF00000199.eurprd05.prod.outlook.com
- (2603:10a6:209:88:cafe::c4) by AM6P193CA0082.outlook.office365.com
- (2603:10a6:209:88::23) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9499.2 via Frontend Transport; Wed, 7
- Jan 2026 14:59:32 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 131.228.2.30)
- smtp.mailfrom=nokia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nokia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nokia.com designates
- 131.228.2.30 as permitted sender) receiver=protection.outlook.com;
- client-ip=131.228.2.30; helo=fihe01smtplvp01.emea.nsn-net.net; pr=C
-Received: from fihe01smtplvp01.emea.nsn-net.net (131.228.2.30) by
- AMS0EPF00000199.mail.protection.outlook.com (10.167.16.245) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9499.1
- via Frontend Transport; Wed, 7 Jan 2026 14:59:32 +0000
-Received: from uleclfsdev02.linsee.dyn.nesc.nokia.net.net (uleclfsdev02.linsee.dyn.nesc.nokia.net [10.47.240.2])
-	by fihe01smtplvp01.emea.nsn-net.net (Postfix) with ESMTP id B2EA3800009F;
-	Wed,  7 Jan 2026 16:59:31 +0200 (EET)
-From: Stefan Wiehler <stefan.wiehler@nokia.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Roger Quadros <rogerq@kernel.org>,
-	linux-omap@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Stefan Wiehler <stefan.wiehler@nokia.com>
-Subject: [PATCH net 3/3] net: ethernet: ti: cpsw_ale: Remove obsolete ALE_VERSION_IR4
-Date: Wed,  7 Jan 2026 15:58:19 +0100
-Message-ID: <20260107145846.3144585-4-stefan.wiehler@nokia.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20260107145846.3144585-1-stefan.wiehler@nokia.com>
-References: <20260107145846.3144585-1-stefan.wiehler@nokia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E544430E0F4
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 14:59:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767797960; cv=none; b=EIC5KEtPTXGOu+KbGfNj4/tsXJ9HKx9SD/OIPSWTCG8bNIgAPAxhKwkx8aEDgKd3ztK8UsefODByLD8NQJfJMXxiEPvOkacDgqzjlr8iO7tWs9mrpE264RK2uNgI6eGQ99iXibJHADpcbb7VGbziHyvvIyaMHo74jnJrb4j2jAQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767797960; c=relaxed/simple;
+	bh=lZz8ZAu8vrs8Ru98ohAatnW1AHr7PhD4PTK1H1/KWrk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=anpnnHIbO5LrduDhGWX72/IeW7wiOBbAFXGRzs5gxEhJ4Pve79FFLggtf95rGE2a8eeZ6ANCBBm7phIAKPYy15m1YW6ubY1mo/nuo12SM8Gh2s+fGqdUDcFE0hYaJVsNlxo/nthiIBDr+A/k7bAIqKpYROSmQskCgbW7cNECKv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YziDo8/j; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-4327790c4e9so1057534f8f.2
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 06:59:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767797957; x=1768402757; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=SV1cZScFIWK8ylac8dKg4D7bUheGaqaRyP9KVJQ7iTw=;
+        b=YziDo8/jjXzxLszplOUg1Yx6muPbjxZOE7bZ4LgGXuDk12djjYrsTa/4ZKQv2OSYjo
+         /twTzpNbYWievfgD0Wy4NGc6q/mDd1YTJ4ljI7aPky8IscuhbuY35FVMA5m7sNnfGvnY
+         //zEpK9WlpsGVuIRrpA8YRrFKk2+dVeHA1ZfdB+s4vJygrojTPAwc3VQXyDwwOTuizuG
+         D4k2ytcIy0nkM/8iah+f+CR5+V+7KLkKA9JNyFEKwbsqJO4NbNpj4iYxrS5RnZc6yjov
+         Vkp/ppKjuvvo/xEQ3I5Tb2Ffmm46xG87x8hmdcQV0mBGBv7m+jV80sAF0RK4xv/pxSNH
+         8Nkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767797957; x=1768402757;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SV1cZScFIWK8ylac8dKg4D7bUheGaqaRyP9KVJQ7iTw=;
+        b=Hfb3pQvsNtekjOfBNtbQEO+edggMM0JzxPSnBQDAeuGsS5wGUSVnCRriA5GzMmQzNX
+         WN1nh+NGBghfTyRCIjkqXXyuU0uCE3AWoP5nv6hJw/wA4VoQ4PqsnPPMUF8ZFi7C0Q69
+         FORDtWMZh0Y+o7u6q+yT+Lzy53BnNSeucZ20LLSAImFTTEeCutS83wq58MWHrDYcx8/k
+         l6gh8d1DDZwdleFh2nXiJ3arPjRvewCDfN3Xg5ImeFWNqtKn7/JY/f7Gl3uQvkCUQr6m
+         g0miSEGRhPTqCrbaMqT7FMQrObDm1FKbOXObgOCbBVapYP6P5sHKJu9tglfQr50rgFh5
+         +nkg==
+X-Gm-Message-State: AOJu0YwW7Kknubzi3sS/rM7UXpJHLZF0dORS4cCh1eJgBHxYfvGx2Tb/
+	QIKGFjwtytiFROa8DFoHpex879WDUvUk+urApLKV5ZGHK73iwPl+X4Fd
+X-Gm-Gg: AY/fxX5KdBxR627xL62Z1aSjbUh75UVbQ6cMVDoYKOiqKVmiww3zmDtVs83gNgkOQd9
+	llCLsJ9K6/Uk6aNXVqE5ihSOlzb/Lx7eLX6iq3vtC16Z0JssJ17MXqc3BgPbJuYaVBPmQdtWiap
+	SG51PmFMcjrtGG6a0OXehW9xIUnoGe2ncf7ZvOk+jGbmJlzIeb9cRxRYreuFUtHDEB9p8PWE3vi
+	3eRgMhHEDbMG9o96hJSWZxjcUltD4dXU9EDTXSku9xR0SrtBBGDRagOTkUpPENh+dhiKkzYK6Sd
+	zxFt//CAP10IQJ/VwbloyS7tqMECm0IYf0v/CJLC1Od+tUoJAFcHrJuEw6TE+jK7BKWTHzv/DZx
+	l/r9AeIyH1srY35VdlLpn4Hxf+40fBDDvX9ReQNos/IZOC7K6Ggg/7XVxeKmDF/lhExs4YOfNGJ
+	177eX98TWIiwUWu/bej+4WSXVext7XLoQrXiX+JaSwyJ7A1/DeKhYG5x7UXHCPHh5q8Q8=
+X-Google-Smtp-Source: AGHT+IG1YououSj/EXDwxzVarDQZ72uogU8BTCNy+0HLyFRU+zonnThKVMk8YKlAXuXT6L0Z4fcuMQ==
+X-Received: by 2002:a5d:5d11:0:b0:432:c0e6:cfcd with SMTP id ffacd0b85a97d-432c3632bc5mr3400757f8f.22.1767797957100;
+        Wed, 07 Jan 2026 06:59:17 -0800 (PST)
+Received: from 0.1.2.1.2.0.a.2.dynamic.cust.swisscom.net ([2a02:1210:8642:2b00:82ee:73ff:feb8:99e3])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5ee243sm10690182f8f.31.2026.01.07.06.59.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Jan 2026 06:59:16 -0800 (PST)
+Message-ID: <297860d547bb93b794e7b1cee4eb7b93b9e05e9d.camel@gmail.com>
+Subject: Re: [PATCH net-next] selftests: forwarding: update PTP tcpdump
+ patterns
+From: Alexander Sverdlin <alexander.sverdlin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+Date: Wed, 07 Jan 2026 15:59:17 +0100
+In-Reply-To: <20260107145320.1837464-1-kuba@kernel.org>
+References: <20260107145320.1837464-1-kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AMS0EPF00000199:EE_|VI2PR07MB10154:EE_
-Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: d159b907-6a4c-43dc-9310-08de4dfd5da4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|36860700013|82310400026|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?KyFEPdqbOrRuGqj7+iO+LaWLjNmsjLyIIJJekJsw9lq0kn1wMCqVH5WjTJ9j?=
- =?us-ascii?Q?TB7IMALK/mUqKNuncb/RXCvhoAQSAilMOf18jj9hDoBHwYDBvqDWxS/Hm7nX?=
- =?us-ascii?Q?Exbw8b7DvSTfI8J//ZukcnIf9IApT1NCegb39rUTbltmtfuuq2mR6S6E0fDF?=
- =?us-ascii?Q?FfIT27Tvk6Q9ck95AHyp3bwVV4IXDYAZ2z9YVusttAkDcD09v92DJKzwwc+Z?=
- =?us-ascii?Q?hwQ0d8NENK1/An3jo0enb68gThOpqaTu4Om+T3/3+zNh9Pkm+kmLK0urooRv?=
- =?us-ascii?Q?Q+5yBJrf8MJ4lKjoKjucl6jVTJ29rmbDK0dPhsFcXg7ktQrPwfQW1X/dzEoY?=
- =?us-ascii?Q?jYo8idFzWVl+SmEOvZyYlYbWj/UuJ1FLLiYH3HBchG/o4ZwUw9Cue1iH8789?=
- =?us-ascii?Q?zWRpMlwuZxDytZXzBOGflnYGFkU2b5EalGYHdGLkGM9+G6pqTsSu9Rg8CwkH?=
- =?us-ascii?Q?EK8T9WwiWZVfzv/rruydiuh0J5FJqPmLVD+VvHj7C9i44wHPIBDaIInbeoM0?=
- =?us-ascii?Q?8CWs7atStRDl8fv2mgEPj12Of+mf+7yEuIqyBoZdyPfE4hjJYGCUO2ogAPOV?=
- =?us-ascii?Q?NALmkcjYsi0Eq4SHKAjmNgYw+u6SWU347X6bT2dXyp/FGv1DFkrH6XW7CQVd?=
- =?us-ascii?Q?1QqHmISuj+ZfjYW2lLZBNNig51df7nVScVuMNPBKRLsTWMogX++OIl/9D3M3?=
- =?us-ascii?Q?ICcHlpYIM9Q8LAqm0RM8Gh5SGnDJnuuYqDRIrZ5Hgx7MmKXKuLJT81PIAt4h?=
- =?us-ascii?Q?9oulMPjrMOQfUqK+cZK+stZ+00QhjkJD7GQSYo0wOMilOiF0s3M+eeKly38Z?=
- =?us-ascii?Q?Zg7KhFzDr4uFb7ix4Ooo7qHERbjr6oqEHLm3TY+ZyrL/qOvLxxPJ817v02Ns?=
- =?us-ascii?Q?b/VqdxMYpR7JNl3TmMgVL+4McL2vh+RBpyPsTJISC5gAVk0OEaTfh/GcjR6h?=
- =?us-ascii?Q?ktY8vbf2jaGIs7bXt8LqJJ+zshezMpxej1OaRHKw4G4z5rh9T235C3xxQERh?=
- =?us-ascii?Q?g8qnV03uR8gaUY0ocu4iAwfv5pGKzRUaptB+o1tQXOfywcNC1cQwIHkJUHEX?=
- =?us-ascii?Q?ogL+me2OKRnfU4eW+ujR8KOhCjJY1ZvHvXxMDG3Izn0rCVyIjTGJlNd5yTmI?=
- =?us-ascii?Q?xb2xC2WzYCDroeIZVF0iQiDDROd78Fkg5+bx/9cZy6LjLKeERgcJ0PClw270?=
- =?us-ascii?Q?6HVfkxOZBn/cBVqYhhxb2tKK5dv42S0xYUYUpd5aT97H7TD20Qtf1DIKNLja?=
- =?us-ascii?Q?NyjeML2epDAZfxknoO1hbFFSA2Hg8iIh7k83CEB7jysp0xyu2JCik5FLaM2k?=
- =?us-ascii?Q?ytoZ9s9FVFncVKequ3I7QGR4TwDRP+Rxzgk6uzRKP3iis8yXqwJ4ptMzDQm0?=
- =?us-ascii?Q?g7Z9YxQyIvwlTnHIdtGk154SuiXXSiELW2+twNoZSwpMbqGWssN63CW0q3dn?=
- =?us-ascii?Q?XMVtasWsGSdnuBjJ5CIq69MyTlTL3SbORoc5VU90eOnR+Az3tfjCU1FsQeYi?=
- =?us-ascii?Q?6ZwcFy9NlS+GD24lr5tIp2//B3F5FBZP0WbTrT8f9SBZ805Wl+dI8Of/eTM4?=
- =?us-ascii?Q?IiLx4GsfsmAeraqYnz4=3D?=
-X-Forefront-Antispam-Report:
-	CIP:131.228.2.30;CTRY:FI;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:fihe01smtplvp01.emea.nsn-net.net;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(36860700013)(82310400026)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: nokia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2026 14:59:32.5375
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d159b907-6a4c-43dc-9310-08de4dfd5da4
-X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5d471751-9675-428d-917b-70f44f9630b0;Ip=[131.228.2.30];Helo=[fihe01smtplvp01.emea.nsn-net.net]
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TreatMessagesAsInternal-AMS0EPF00000199.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI2PR07MB10154
 
-This macro has never been used in the first place.
+Hi Jakub,
 
-Fixes: ca47130a744b ("net: netcp: ale: update to support unknown vlan controls for NU switch")
-Signed-off-by: Stefan Wiehler <stefan.wiehler@nokia.com>
----
- drivers/net/ethernet/ti/cpsw_ale.c | 2 --
- 1 file changed, 2 deletions(-)
+On Wed, 2026-01-07 at 06:53 -0800, Jakub Kicinski wrote:
+> Recent version of tcpdump (tcpdump-4.99.6-1.fc43.x86_64) seems to have
+> removed the spurious space after msg type in PTP info, e.g.:
+>=20
+> =C2=A0before:=C2=A0 PTPv2, majorSdoId: 0x0, msg type : sync msg, length: =
+44
+> =C2=A0after:=C2=A0=C2=A0 PTPv2, majorSdoId: 0x0, msg type: sync msg, leng=
+th: 44
+>=20
+> Update our patterns to match both.
+>=20
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-diff --git a/drivers/net/ethernet/ti/cpsw_ale.c b/drivers/net/ethernet/ti/cpsw_ale.c
-index aac4db3f7656..bb969dd435b4 100644
---- a/drivers/net/ethernet/ti/cpsw_ale.c
-+++ b/drivers/net/ethernet/ti/cpsw_ale.c
-@@ -23,8 +23,6 @@
- 
- #define BITMASK(bits)		(BIT(bits) - 1)
- 
--#define ALE_VERSION_1R4		0x0104
--
- /* ALE Registers */
- #define ALE_IDVER		0x00
- #define ALE_STATUS		0x04
--- 
-2.42.0
+Reviewed-by: Alexander Sverdlin <alexander.sverdlin@gmail.com>
 
+> ---
+> CC: shuah@kernel.org
+> CC: vladimir.oltean@nxp.com
+> CC: alexander.sverdlin@gmail.com
+> CC: linux-kselftest@vger.kernel.org
+> ---
+> =C2=A0.../net/forwarding/local_termination.sh=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 | 18 +++++++++---------
+> =C2=A01 file changed, 9 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/tools/testing/selftests/net/forwarding/local_termination.sh =
+b/tools/testing/selftests/net/forwarding/local_termination.sh
+> index 892895659c7e..1f2bf6e81847 100755
+> --- a/tools/testing/selftests/net/forwarding/local_termination.sh
+> +++ b/tools/testing/selftests/net/forwarding/local_termination.sh
+> @@ -306,39 +306,39 @@ run_test()
+> =C2=A0
+> =C2=A0	if [ $skip_ptp =3D false ]; then
+> =C2=A0		check_rcv $rcv_if_name "1588v2 over L2 transport, Sync" \
+> -			"ethertype PTP (0x88f7).* PTPv2.* msg type : sync msg" \
+> +			"ethertype PTP (0x88f7).* PTPv2.* msg type *: sync msg" \
+> =C2=A0			true "$test_name"
+> =C2=A0
+> =C2=A0		check_rcv $rcv_if_name "1588v2 over L2 transport, Follow-Up" \
+> -			"ethertype PTP (0x88f7).* PTPv2.* msg type : follow up msg" \
+> +			"ethertype PTP (0x88f7).* PTPv2.* msg type *: follow up msg" \
+> =C2=A0			true "$test_name"
+> =C2=A0
+> =C2=A0		check_rcv $rcv_if_name "1588v2 over L2 transport, Peer Delay Requ=
+est" \
+> -			"ethertype PTP (0x88f7).* PTPv2.* msg type : peer delay req msg" \
+> +			"ethertype PTP (0x88f7).* PTPv2.* msg type *: peer delay req msg" \
+> =C2=A0			true "$test_name"
+> =C2=A0
+> =C2=A0		check_rcv $rcv_if_name "1588v2 over IPv4, Sync" \
+> -			"ethertype IPv4 (0x0800).* PTPv2.* msg type : sync msg" \
+> +			"ethertype IPv4 (0x0800).* PTPv2.* msg type *: sync msg" \
+> =C2=A0			true "$test_name"
+> =C2=A0
+> =C2=A0		check_rcv $rcv_if_name "1588v2 over IPv4, Follow-Up" \
+> -			"ethertype IPv4 (0x0800).* PTPv2.* msg type : follow up msg" \
+> +			"ethertype IPv4 (0x0800).* PTPv2.* msg type *: follow up msg" \
+> =C2=A0			true "$test_name"
+> =C2=A0
+> =C2=A0		check_rcv $rcv_if_name "1588v2 over IPv4, Peer Delay Request" \
+> -			"ethertype IPv4 (0x0800).* PTPv2.* msg type : peer delay req msg" \
+> +			"ethertype IPv4 (0x0800).* PTPv2.* msg type *: peer delay req msg" \
+> =C2=A0			true "$test_name"
+> =C2=A0
+> =C2=A0		check_rcv $rcv_if_name "1588v2 over IPv6, Sync" \
+> -			"ethertype IPv6 (0x86dd).* PTPv2.* msg type : sync msg" \
+> +			"ethertype IPv6 (0x86dd).* PTPv2.* msg type *: sync msg" \
+> =C2=A0			true "$test_name"
+> =C2=A0
+> =C2=A0		check_rcv $rcv_if_name "1588v2 over IPv6, Follow-Up" \
+> -			"ethertype IPv6 (0x86dd).* PTPv2.* msg type : follow up msg" \
+> +			"ethertype IPv6 (0x86dd).* PTPv2.* msg type *: follow up msg" \
+> =C2=A0			true "$test_name"
+> =C2=A0
+> =C2=A0		check_rcv $rcv_if_name "1588v2 over IPv6, Peer Delay Request" \
+> -			"ethertype IPv6 (0x86dd).* PTPv2.* msg type : peer delay req msg" \
+> +			"ethertype IPv6 (0x86dd).* PTPv2.* msg type *: peer delay req msg" \
+> =C2=A0			true "$test_name"
+> =C2=A0	fi
+> =C2=A0
+
+--=20
+Alexander Sverdlin.
 
