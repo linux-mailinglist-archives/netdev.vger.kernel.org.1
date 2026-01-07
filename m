@@ -1,220 +1,154 @@
-Return-Path: <netdev+bounces-247644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15D6ACFCB5E
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 10:02:16 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66843CFCB58
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 10:01:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 74EA03060A5B
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 09:01:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 63DAD301594F
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 09:01:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98AD92F747A;
-	Wed,  7 Jan 2026 09:01:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9EE02DF151;
+	Wed,  7 Jan 2026 09:01:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b="Ht0tcx+y"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XnJKy1QJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-64-226.siemens.flowmailer.net (mta-64-226.siemens.flowmailer.net [185.136.64.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3AD2F5A35
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 09:01:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21DAE285C8D
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 09:01:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767776480; cv=none; b=XcvIewOhstolOoZ1L0RgU/crF761YSAgdvmmCDGNyj9YAwsoLIbSjp/LLYs2AarT/nTapgPAX4BapEr+tm9iT0mPz5AZxNi1q8O0EHt43ebeVAdiFrTeUYgvJrVp8ea5wb6u2haVKRrBeGdbjF0xzRb/ryympjkzMY2Vn95vUqo=
+	t=1767776496; cv=none; b=H972y79aRibLp9DHkyCp/hzeBZlHJ+HVDd4+/EPdjG8DkVLmy6/4+rU2eNwKPgDC8Lm6DUJX9MYaGiPXtKSwaxQvMo+ScAobjs85jSwYg17AUADvH+6vw4m2mXb5KGjFVzf2GxN/7+Z7QGZXTEUQkzADbNxWvBz9ialr3X139Lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767776480; c=relaxed/simple;
-	bh=H3OnxDRAS0shDLGQ0ZLvYwcLOKNCjkTwY0TUegqfDwU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CVIRLEAQsEZjeg510JKLMYzf4lxb9rlk0/Nkh61jHhszEG9MRtwqbwUICbiBpUVkUeQGHDkTB2lH577KY5HlnHP18cY0KywOoa/mG2go739/o8fWuZ++E+S3ZjRL+6xronGM0Mglb5XhZ56JhUbg2XVh3Hy7yYpVSsQfX0O9Gm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=Ht0tcx+y; arc=none smtp.client-ip=185.136.64.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-64-226.siemens.flowmailer.net with ESMTPSA id 202601070900224801a48a020002071c
-        for <netdev@vger.kernel.org>;
-        Wed, 07 Jan 2026 10:01:10 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
- d=siemens.com; i=alexander.sverdlin@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
- bh=XGRkifYiNIH0MU4OanM2O++Y3tzI7py9j4qll4AuISw=;
- b=Ht0tcx+yV0eHTJomDzPZ3/QgnNF6rKOuMqPEdYfHFc3I8rvs6TkBU6NRA1oDHB9BYYB4cP
- z06eX9w1Gdw9G+JBFRhScr/tZGINWdJLOQvSfy8gJ2ulZvoeYnqFAShQf1nUH9V+BX9OQsEh
- ev8btOB/TVUFqJVtujDzhdb787W5XqbTDo8Iwmiugqm6B/Uyah02UAq0Px5XOQnob6bUQF8s
- 4VJ4OxZKmzkzw0C0qrOfT3osby/G0K+Dymq2icU5XsBs57QIOHbu4CAer4Ns9qeY94ni+5L0
- EVTh/AvLI/O7+vO8ru2EirE444lGTdvbnyEENxjAdEP20kzNDkMYca2Q==;
-From: "A. Sverdlin" <alexander.sverdlin@siemens.com>
-To: netdev@vger.kernel.org
-Cc: Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Hauke Mehrtens <hauke@hauke-m.de>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Daniel Golle <daniel@makrotopia.org>
-Subject: [PATCH net-next v4 2/2] net: dsa: mxl-gsw1xx: Support R(G)MII slew rate configuration
-Date: Wed,  7 Jan 2026 10:00:17 +0100
-Message-ID: <20260107090019.2257867-3-alexander.sverdlin@siemens.com>
-In-Reply-To: <20260107090019.2257867-1-alexander.sverdlin@siemens.com>
-References: <20260107090019.2257867-1-alexander.sverdlin@siemens.com>
+	s=arc-20240116; t=1767776496; c=relaxed/simple;
+	bh=lajboQwmY46irx1tD0V6P2fuEJu9U2GvIdFGxGbxITk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bIBBEZcgl/qigt1tQvkq/sKoTILt5d2DfCQG46NbizcMe/PBoF7CMeoiKG8opHslUuZbf9oslJsEJmQgt6tizjH9P/qf5jhH7hOOJyicsTP4DQR0cEeRCU4yDFu4AGQgCK6eKFNgQ2dESgovzc49p6if4s/EV6oib8MPafsfLqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XnJKy1QJ; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4f34c5f2f98so18450961cf.1
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 01:01:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767776494; x=1768381294; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B++K+gndml/j8tqUz7axZIesXE+WhWbKqRea1ooJ200=;
+        b=XnJKy1QJAtkynA+OfMuLnKpEDiAMJ/jj5LWLVfmA3lXDQ/d2Tz5GUqwrQ1gTyWyD8Z
+         ps2+2MIxVFX4lMIBmXKHJXt9lV9Vs7u4JFYlsxTVsa5dCkgu0sGTdOpSGMwXwgX7LPet
+         ul/OKXkCDqXEm+ezuNSFNh693L4OUbzUAQ4hAXoqlhi/wT/IRlifgPl7RaeEYDvRN/h9
+         FVTFPdyWh04EhY/Z8C4ZI3/XzutGJnzdssIhsldV1o9u5/3QJnBMPDCna9VI2ZX6h5mG
+         Xtwqz2jWgD/tOBrW3E5saTnS4RxMS4HKbg2RT6KwM3MmxdNawC7mzndN/4SZiG+zXfhJ
+         ce2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767776494; x=1768381294;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=B++K+gndml/j8tqUz7axZIesXE+WhWbKqRea1ooJ200=;
+        b=R/q3Ag2w4a12PLZMIvAZxIEktrc7fLLwEiTrecjEos1H1+YKijVgx0xRS/kpvfneim
+         nl/bVpplL5M8q+9G2OUbZMQzfi3ssYV4t993bbl2RrMScaJT0RR9qva+4VbAmRqvHh5p
+         z7ZlSDIuTEwmdDxluWymDnbc3gzojmt4OEHQc4NogQxyA6TWp1JUJddJPvvTYADTQPDx
+         ErxKBxevMP48LDMTtexPsEN9KjSUqt2L6bYzf6OvU5IaGkYFsf/13KCeE8/zS54nE6tp
+         9GlJ8CDuA+hcfLG+/8HP1pjdyKZpRwx8COErjkbSzlYdt+Nglh9fimAi5b+K1YljT7kg
+         KwyA==
+X-Forwarded-Encrypted: i=1; AJvYcCWJTI15/khK6uDk3LZmaGiq1siJ6MWoYoKMx4oD0ZvgtvzaExyuv4fqNTDv/cbdPr/TeoHlefE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8n8rLRhpjaqCWWWdgFLFCFgmFq7v2dZbhyIqm1cY/0L6am007
+	Imis0yZS+u9qCdyLuvz8H5S+y2Hu0Ai/I9mg/gOMlK+GEzFvvIWpCzVLw2pDDWYk/Gs8aU/z8VH
+	urEcdsMjgJUdSfjeVt0aTBimzLSJB6UvuLub1xY86
+X-Gm-Gg: AY/fxX7UPCsVQd9O3KY4JqfVBhkkR4y1R5/XxofK+ElkSjbTmK+5EqOlWiDM73N+lhY
+	AAyleTgm87CTac3IXFVyREOZisPajfzmWRoLCXintWr4kmEGKG+Dmen/+1NJjzrGqJ0ZJDJf/BX
+	UDUrtezNLcGPIdIGnJ7Anm8Zw8QCvMlfvV4Lp4SN9lWbs4T7J5cVW7fBRHwbqgRPgaY7hdqjal0
+	7Cs7AoT7sxy8PGrWiyO085+qFbSttrTpZeWyco1brtfw9IG53rgpsA5VDqvwkvg3UawgA==
+X-Google-Smtp-Source: AGHT+IGoZLlsfI4enbPoVn9JD85jrSE2kaeR1eH1/pQa+gzAKSeCeKLmqgbsRbNNNgnQRSxPJSQkB0TntGC1dKaUoLo=
+X-Received: by 2002:ac8:7d0b:0:b0:4ec:f697:2c00 with SMTP id
+ d75a77b69052e-4ffb49e6e22mr19306771cf.42.1767776493643; Wed, 07 Jan 2026
+ 01:01:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-456497:519-21489:flowmailer
+References: <20260106144529.1424886-1-edumazet@google.com> <20260106095648.07a870f1@kernel.org>
+ <CANn89iJnXg892OU13PeJMGvBKw90fJdqDaAmJ867Rptsm0zgNA@mail.gmail.com> <aV4ddkDATvo9lBHi@strlen.de>
+In-Reply-To: <aV4ddkDATvo9lBHi@strlen.de>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 7 Jan 2026 10:01:22 +0100
+X-Gm-Features: AQt7F2r3Z4CpXt6clVFyIAqdtzn-jz3RNhGkFbTcNCpTjMOWOT5VfewdKk6wI7U
+Message-ID: <CANn89iKkThtD7VAN3OaOmC9=Ekiu2u-0TJ1BJaD+g7LCg9ARVQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net] ip6_gre: use skb_vlan_inet_prepare() instead of pskb_inet_may_pull()
+To: Florian Westphal <fw@strlen.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, syzbot+6023ea32e206eef7920a@syzkaller.appspotmail.com, 
+	Mazin Al Haddad <mazin@getstate.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+On Wed, Jan 7, 2026 at 9:46=E2=80=AFAM Florian Westphal <fw@strlen.de> wrot=
+e:
+>
+> Eric Dumazet <edumazet@google.com> wrote:
+> > On Tue, Jan 6, 2026 at 6:56=E2=80=AFPM Jakub Kicinski <kuba@kernel.org>=
+ wrote:
+> > >
+> > > On Tue,  6 Jan 2026 14:45:29 +0000 Eric Dumazet wrote:
+> > > > v2: invert the conditions (Jakub)
+> > >
+> > > Thanks! Much better now, but still failing
+> > > tools/testing/selftests/net/gre_gso.sh
+> > >
+> > > TAP version 13
+> > > 1..1
+> > > # timeout set to 3600
+> > > # selftests: net: gre_gso.sh
+> > > # 2.16 [+2.16]     TEST: GREv6/v4 - copy file w/ TSO                 =
+                  [ OK ]
+> > > # 3.16 [+1.01] 2026/01/06 10:32:57 socat[20546] W exiting on signal 1=
+5
+> > > # 3.17 [+0.01] 2026/01/06 10:32:57 socat[20546] W exiting on signal 1=
+5
+> > > # 3.17 [+0.00]     TEST: GREv6/v4 - copy file w/ GSO                 =
+                  [FAIL]
+> > > # 3.18 [+0.01] 2026/01/06 10:32:57 socat[20533] W exiting on signal 1=
+5
+> > > # 3.19 [+0.00]     TEST: GREv6/v6 - copy file w/ TSO                 =
+                  [ OK ]
+> > > # 4.19 [+1.00] 2026/01/06 10:32:59 socat[20559] W exiting on signal 1=
+5
+> > > # 4.19 [+0.01]     TEST: GREv6/v6 - copy file w/ GSO                 =
+                  [FAIL]
+> > > # 4.20 [+0.01] 2026/01/06 10:32:59 socat[20549] W exiting on signal 1=
+5
+> > > # 4.22 [+0.02] 2026/01/06 10:32:59 socat[20560] W exiting on signal 1=
+5
+> > > # 4.23 [+0.01]
+> > > # 4.23 [+0.00] Tests passed:   2
+> > > # 4.23 [+0.00] Tests failed:   2
+> > > not ok 1 selftests: net: gre_gso.sh # exit=3D1
+> > >
+> > > https://netdev-ctrl.bots.linux.dev/logs/vmksft/net/results/461862/65-=
+gre-gso-sh/stdout
+> >
+> > For some reason I am unable to run this test from a virtme-ng instance.
+> >
+> > I guess I wlll not make a new version of this patch, maybe Florian can
+> > take over.
+>
+> Its failing because nhoff is moved by 14 bytes, test passes after doing:
+>
+> -       if (skb_vlan_inet_prepare(skb, false))
+> +       if (skb_vlan_inet_prepare(skb, true))
 
-Support newly introduced maxlinear,slew-rate-txc and
-maxlinear,slew-rate-txd device tree properties to configure R(G)MII
-interface pins' slew rate. It might be used to reduce the radiated
-emissions.
+Thanks Florian.
 
-Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
----
-Changelog:
-v4:
-- separate properties for TXD and TXC pads
-v3:
-- use [pinctrl] standard "slew-rate" property as suggested by Rob
-  https://lore.kernel.org/all/20251219204324.GA3881969-robh@kernel.org/
-- better sorted struct gswip_hw_info initialisers as suggested by Daniel
-v2:
-- do not hijack gsw1xx_phylink_mac_select_pcs() for configuring the port,
-  introduce struct gswip_hw_info::port_setup callback
-- actively configure "normal" slew rate (if the new DT property is missing)
-- properly use regmap_set_bits() (v1 had reg and value mixed up)
+I finally understood that my virtme-ng problem with this test is that
+on my platform, /proc/sys/net/core/fb_tunnels_only_for_init_net was
+set to 2
 
- drivers/net/dsa/lantiq/lantiq_gswip.h        |  1 +
- drivers/net/dsa/lantiq/lantiq_gswip_common.c |  6 +++
- drivers/net/dsa/lantiq/mxl-gsw1xx.c          | 40 ++++++++++++++++++++
- drivers/net/dsa/lantiq/mxl-gsw1xx.h          |  2 +
- 4 files changed, 49 insertions(+)
-
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.h b/drivers/net/dsa/lantiq/lantiq_gswip.h
-index 2e0f2afbadbbc..8fc4c7cc5283a 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip.h
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip.h
-@@ -263,6 +263,7 @@ struct gswip_hw_info {
- 				 struct phylink_config *config);
- 	struct phylink_pcs *(*mac_select_pcs)(struct phylink_config *config,
- 					      phy_interface_t interface);
-+	int (*port_setup)(struct dsa_switch *ds, int port);
- };
- 
- struct gswip_gphy_fw {
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip_common.c b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-index e790f2ef75884..17a61e445f00f 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-@@ -425,6 +425,12 @@ static int gswip_port_setup(struct dsa_switch *ds, int port)
- 	struct gswip_priv *priv = ds->priv;
- 	int err;
- 
-+	if (priv->hw_info->port_setup) {
-+		err = priv->hw_info->port_setup(ds, port);
-+		if (err)
-+			return err;
-+	}
-+
- 	if (!dsa_is_cpu_port(ds, port)) {
- 		err = gswip_add_single_port_br(priv, port, true);
- 		if (err)
-diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.c b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-index f8ff8a604bf53..6afc7539fefbe 100644
---- a/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-+++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-@@ -559,6 +559,43 @@ static struct phylink_pcs *gsw1xx_phylink_mac_select_pcs(struct phylink_config *
- 	}
- }
- 
-+static int gsw1xx_rmii_slew_rate(const struct device_node *np, struct gsw1xx_priv *priv,
-+				 const char *prop, u16 mask)
-+{
-+	u32 rate;
-+	int ret;
-+
-+	ret = of_property_read_u32(np, prop, &rate);
-+	/* Optional property */
-+	if (ret == -EINVAL)
-+		return 0;
-+	if (ret < 0 || rate > 1) {
-+		dev_err(&priv->mdio_dev->dev, "Invalid %s value\n", prop);
-+		return (ret < 0) ? ret : -EINVAL;
-+	}
-+
-+	return regmap_update_bits(priv->shell, GSW1XX_SHELL_RGMII_SLEW_CFG, mask, mask * rate);
-+}
-+
-+static int gsw1xx_port_setup(struct dsa_switch *ds, int port)
-+{
-+	struct dsa_port *dp = dsa_to_port(ds, port);
-+	struct device_node *np = dp->dn;
-+	struct gsw1xx_priv *gsw1xx_priv;
-+	struct gswip_priv *gswip_priv;
-+
-+	if (dp->index != GSW1XX_MII_PORT)
-+		return 0;
-+
-+	gswip_priv = ds->priv;
-+	gsw1xx_priv = container_of(gswip_priv, struct gsw1xx_priv, gswip);
-+
-+	return gsw1xx_rmii_slew_rate(np, gsw1xx_priv,
-+				     "maxlinear,slew-rate-txc", RGMII_SLEW_CFG_DRV_TXC) ?:
-+	       gsw1xx_rmii_slew_rate(np, gsw1xx_priv,
-+				     "maxlinear,slew-rate-txd", RGMII_SLEW_CFG_DRV_TXD);
-+}
-+
- static struct regmap *gsw1xx_regmap_init(struct gsw1xx_priv *priv,
- 					 const char *name,
- 					 unsigned int reg_base,
-@@ -707,6 +744,7 @@ static const struct gswip_hw_info gsw12x_data = {
- 	.mac_select_pcs		= gsw1xx_phylink_mac_select_pcs,
- 	.phylink_get_caps	= &gsw1xx_phylink_get_caps,
- 	.supports_2500m		= true,
-+	.port_setup		= gsw1xx_port_setup,
- 	.pce_microcode		= &gsw1xx_pce_microcode,
- 	.pce_microcode_size	= ARRAY_SIZE(gsw1xx_pce_microcode),
- 	.tag_protocol		= DSA_TAG_PROTO_MXL_GSW1XX,
-@@ -720,6 +758,7 @@ static const struct gswip_hw_info gsw140_data = {
- 	.mac_select_pcs		= gsw1xx_phylink_mac_select_pcs,
- 	.phylink_get_caps	= &gsw1xx_phylink_get_caps,
- 	.supports_2500m		= true,
-+	.port_setup		= gsw1xx_port_setup,
- 	.pce_microcode		= &gsw1xx_pce_microcode,
- 	.pce_microcode_size	= ARRAY_SIZE(gsw1xx_pce_microcode),
- 	.tag_protocol		= DSA_TAG_PROTO_MXL_GSW1XX,
-@@ -732,6 +771,7 @@ static const struct gswip_hw_info gsw141_data = {
- 	.mii_port_reg_offset	= -GSW1XX_MII_PORT,
- 	.mac_select_pcs		= gsw1xx_phylink_mac_select_pcs,
- 	.phylink_get_caps	= gsw1xx_phylink_get_caps,
-+	.port_setup		= gsw1xx_port_setup,
- 	.pce_microcode		= &gsw1xx_pce_microcode,
- 	.pce_microcode_size	= ARRAY_SIZE(gsw1xx_pce_microcode),
- 	.tag_protocol		= DSA_TAG_PROTO_MXL_GSW1XX,
-diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.h b/drivers/net/dsa/lantiq/mxl-gsw1xx.h
-index 38e03c048a26c..8c0298b2b7663 100644
---- a/drivers/net/dsa/lantiq/mxl-gsw1xx.h
-+++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.h
-@@ -110,6 +110,8 @@
- #define   GSW1XX_RST_REQ_SGMII_SHELL		BIT(5)
- /* RGMII PAD Slew Control Register */
- #define  GSW1XX_SHELL_RGMII_SLEW_CFG		0x78
-+#define   RGMII_SLEW_CFG_DRV_TXC		BIT(2)
-+#define   RGMII_SLEW_CFG_DRV_TXD		BIT(3)
- #define   RGMII_SLEW_CFG_RX_2_5_V		BIT(4)
- #define   RGMII_SLEW_CFG_TX_2_5_V		BIT(5)
- 
--- 
-2.52.0
-
+Tests have a hidden dependency against this sysctl.
 
