@@ -1,263 +1,150 @@
-Return-Path: <netdev+bounces-247658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69C69CFD098
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 10:57:28 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2DDFCFCEDB
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 10:43:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7753C30FCF8B
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 09:47:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AE16F3020832
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 09:43:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9932630FC2A;
-	Wed,  7 Jan 2026 09:38:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 536673161B5;
+	Wed,  7 Jan 2026 09:43:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PsB5UQYB"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="ip4LOdV+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out203-205-221-205.mail.qq.com (out203-205-221-205.mail.qq.com [203.205.221.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7BB030B501
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 09:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815702F90C4;
+	Wed,  7 Jan 2026 09:43:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767778715; cv=none; b=t7N8eqaCMytN2UGN+OuqpJ5Cr5PSziWvHgYwNz+jJh707QIR2wTp3mMf7vYYWAvz6EPOEQXABwqFhsRTt1CydbkKUoREHtZ+fhVJHrqdF6K5mzH+yLleZj87lhjZK1F9hKYLPsKl72tynvwElRgV50+kzsVRXi8IrQo+nemhnIw=
+	t=1767778994; cv=none; b=RpBncHiYoyuo7LDwtuJ5XlkRPitlL5o19J57JMEqM1SJby0qAsFJ1d1AvuoLgyj0yfXyYdVIkKEcXihHktRTjETMnzPnBpH35IXcN+5pTCk2ZQlGX6cg9F7eTZOQyhBedhV5WPPnUI1JbS3fPgukC+eZH5+JZSmhZu/AI7eDjrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767778715; c=relaxed/simple;
-	bh=eHItNXSuFuiIX4AdsQWnDjqU/WQZ3vk3O/CYr5Z0/cA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ioay0XR0u+iSn13mdhqbMUEo2w+n9XdD1t2FS2rfyzpeWGu7ci/SUET/tx8QRlG2G1+rn6Am0jhjAiZy8dVbgNguMLaFuRbl86ere9Lp9OEDp7FO4YuHlqtPPY71lFmdgWnyRnHzYhRn931L9QhEOeqQQTTvYyDyp1J0b3fPMxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PsB5UQYB; arc=none smtp.client-ip=209.85.161.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-65ecd7fcf36so1002610eaf.1
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 01:38:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1767778710; x=1768383510; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lzcLdE5lW6KjrMioL4MVcYHG8ltNGC1zHqzO2YGzVIs=;
-        b=PsB5UQYBAZoi7z0hWcL+39f21zYQ6lVLIsVZh77ruPXbOslr7D9WUJ/9vNWIrXg43d
-         Lq1EKfflcFKl+wiiJ6WxKEfmAQVRmJuXVP9I3tht1b47lQnOJRJagdFBnzAcxA/bd0k0
-         ad9/Nqt53Hk5crV2ZW08Cq9hylzWf93Vdo7CtTKI55fG78WhNPJXB8qhVem5nztZ1KEZ
-         KMR1N0TDldtdHdnpKu64je8P/kcOwl+bMag3AGPdcrG8iBtRsvhM+p4Pxm5HN19quSvK
-         yl/GY0LO/wJ8F4uuILMzNPZS0AvVQ1MHFgw+a8+Bsb+fucCdHOIbDc+ApTBPL4j9ovCJ
-         LaUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767778710; x=1768383510;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=lzcLdE5lW6KjrMioL4MVcYHG8ltNGC1zHqzO2YGzVIs=;
-        b=ljO0WpC9afmnfhNKmC54BYRenWu355NUXRsEyPhpwvopCdRS9oIQ5SLoHTc390ChIi
-         dZYhG7yHeE5AYixZcjzt4vjsFBNRvkd6AzVbln9o33SjloG2cfTnLascr8On9XCsHYa/
-         /RLgy193PE6SLnq70Hp4DajrXYkVRgEPK4I5uWCcOTPIoiTUn1mu37ydBKxR/VHlIRUm
-         zog6H+prX+wMxuOYZHor3Qjo2lwlRrGPp0iqRrKgGykiNKBAfALAfHEdyT4BY1kTNnK0
-         KZSIjhgFUxUNBNbrC8zNZ62jPumdVegn3lSaYeca4ShDImB1sQJvkkjUfiCtFsWmXGhD
-         L6vg==
-X-Forwarded-Encrypted: i=1; AJvYcCWOhOCS1hwYdtUVYTk5AIlsNqoAhoEgkmp3ZKdKa6EOUvqEnlBOHymwJpaahEi1e0Vw+yeymWI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxL4tBQtr3uJnxJou/j1cs9iEt3AU98/8liApXPlCSrXwpmLnTy
-	yq93PWPuIsNh3D5rKvkmVHzO6QpnFFcMyKWUnJyofaNkMP6lCzpYsCrCO/6XIhlQCBfu3XVaCYh
-	EoyWkle7KIYYbfphokGZ+NxWKu3QY+6AmOMnW0U1PYA==
-X-Gm-Gg: AY/fxX7rJc/HX5DaMdinF8aDLkyVwpE2Uh15hNvkcq3CPuszNhKBbnRjSir0djh5sSk
-	d3KtvQNHa+VEl/7C+lLDqOHhYm9JvCdqCs0dfMqTIh7DMSCDWx0pYYaA3eINW5/5dkmUj/eoh8u
-	Q3yRZn1s8Aet9uqaftvGFrGw5vkH3tzeFBj0gReZ/RpX3xomzo96+j4B3A1j79WmGnce9PW/COg
-	oWMYh7ppthNuZ0WDMAag1gASE7GwwIqfY/8f8GZ8YVApQKtBGdOLBpsg8Kw9PeitSAqs3hm5+jR
-	BRCGUMS1eo8F4WQFW3SXJdZytA==
-X-Google-Smtp-Source: AGHT+IHSj3fyWcR8PeI71mFrFGfZpz1gtYlT37IzGcQAYuwipaKr7ifaf9acDpnsMoegGnuUM/krqm4/4tHZyu+YBdY=
-X-Received: by 2002:a05:6820:f02e:b0:659:9a49:8ff0 with SMTP id
- 006d021491bc7-65f54ef5252mr794898eaf.29.1767778710402; Wed, 07 Jan 2026
- 01:38:30 -0800 (PST)
+	s=arc-20240116; t=1767778994; c=relaxed/simple;
+	bh=e5Z9BMyTMDb2QZfqzAeyDiin2K0Q7WTCGMXvX7EV/tg=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=XDZYqX0r5jgDfyhzgwglN/MAHf8CmHAhyP4r/mTM3d2X8vGPfJ3lfQ8TVAscBWj+pNGV+9jPjILWdW8wL9jt5sOntVrB0Nybk9H3xhTv0g4Su5RiuswR9xmzhmfYk+Jz64wj2dxzS/EoyFkgXoYE6WEJvc4hhsORDs49j7KTfk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=ip4LOdV+; arc=none smtp.client-ip=203.205.221.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1767778984; bh=+bJiMBFBrn/FC4AjXuqOVF1bcIPRgzlAJLWD5B04d3M=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=ip4LOdV+bbQDUJllWRlm9u7e9/ldnFyJ8IPCY/1vjc/Je+SEofe47oa1gYXDfqTDX
+	 A1+oNQt4jhHsbtTgKPakV7EsWfkezreagd38EcS318iH/LO25krGFk1UYtT9XwkBfl
+	 a4yLfHPhArHtl91ZuzQDHQK2ZT5pa3AxDEFnJFmk=
+Received: from lxu-ped-host.. ([114.244.57.24])
+	by newxmesmtplogicsvrszc50-0.qq.com (NewEsmtp) with SMTP
+	id 9E539CC6; Wed, 07 Jan 2026 17:39:37 +0800
+X-QQ-mid: xmsmtpt1767778777t5wze93sj
+Message-ID: <tencent_8D33CB9E2A1B8D4B511BB0250FBAA8BB8708@qq.com>
+X-QQ-XMAILINFO: MlsYLnHA0UVj0lNvl/JwsaMpgzWBFFEbb9PqA1DSUfdUMRO+mX8BI1sVvoCLZ8
+	 B/AkqJTIS1FwBUM4uFLcbLY9Vhou9IHvpbZf4BGuSxEDTtFyf+5JYCO6ZwZ2hVdUvwAKMDJ7lMAj
+	 LGNiVPcZDopwd9Dmh8ZE4EniLvU6X93X2FHQ+EQn2wdV7FwN0XCBocv/bRMHhPZjfu4FxC1tIFDC
+	 YiyA7gDGVAsSxEl3pgZnzDQ8PB+HFmP2Yk63bdqxX3AaGKC93Q0447TBjhzXw/APwzBiXuKwACX+
+	 g1nHPsBknAjpgtkOaxhl2bwzcTVQwulMSpyRq8fG4Z/3euiH1sLOXxqvAXQni5NfcD+GfaD8CTt3
+	 r5iDUt3v54tZLtuMVXaSuFRMzSTUAfxnmsUQ/9rGhth5yuTP27ItlYnFBbpXgGiIwlf/7dRZLFPH
+	 roB4aRkhEZqrsM/EEkmq0yxoFtUgtJoGyarezj/h1e36JEy+ni6MQyX3rawniKAOCeA/whRL0uA5
+	 vHEMLax/Gd75o/kBaA7Ll5L4Xn3dCAXFZuvfoN+SRdXo4hygL94ZVsxh7FxxPWo19oYr9ArEVVuO
+	 1E2+S04PSGw66cTSdDpYO6DjgvpcV67o0IxHCdP55XuDuUbdKEL9jggWudJckDDSiL/k9hUB5DOE
+	 N1rwzhpngZnfVCUPq53Tn7cfQRIpPhP8Xnbalyi7yX0WgKj9WiwiLcMtwcrjq5IB1YGxM/ULk5UM
+	 9bZM28LHy1LUulF9834o/G4EVKFFs/kyUSmCTrZMmYMmbGYLP4wlHiL1dh2KWfeDNlJC0xtehZPa
+	 WiE4WeYe32Deas73fCihDfexJZYRvVZZFCjgAxlIeFJ39ViqwSsImutRLDGAsyWOYjflI6NcgYcJ
+	 oAXW8RdcIISCMkAtIgcV29tgA+MkqGHaAcKVm3+42pkTmktGVud8jDyk1DhYFXhPqoMSntbCoGdw
+	 EkHUVZg/7Z2LEVE1q09/qQtKt4oPg/6IS0wrQ4JIL1+FT7L0menymD4/5I7xvMEJF58/W51Z4=
+X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+2c29addf92581b410079@syzkaller.appspotmail.com
+Cc: andrii@kernel.org,
+	ast@kernel.org,
+	bpf@vger.kernel.org,
+	daniel@iogearbox.net,
+	eddyz87@gmail.com,
+	haoluo@google.com,
+	john.fastabend@gmail.com,
+	jolsa@kernel.org,
+	kpsingh@kernel.org,
+	linux-kernel@vger.kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	sdf@fomichev.me,
+	song@kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	yonghong.song@linux.dev
+Subject: [PATCH] bpf: Format string can't be empty
+Date: Wed,  7 Jan 2026 17:39:36 +0800
+X-OQ-MSGID: <20260107093935.474079-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <695bc686.050a0220.1c677c.032f.GAE@google.com>
+References: <695bc686.050a0220.1c677c.032f.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1765791463.git.u.kleine-koenig@baylibre.com>
- <CAHUa44FrDZbvRvfN8obf80_k=Eqxe9YxHpjaE5jU7nkxPUwfag@mail.gmail.com>
- <20251218135332f323fa91@mail.local> <CAHUa44GpW5aO26GDyL9RZub9vVYvVcJ7etwO0yXBN_mUi0W4AA@mail.gmail.com>
- <CAHUa44HqRbCJTXsrTCm0G5iwtkQtq+Si=yOspCjpAn-N2uVSVg@mail.gmail.com> <aV0Qx5BOso5co3tm@bogus>
-In-Reply-To: <aV0Qx5BOso5co3tm@bogus>
-From: Jens Wiklander <jens.wiklander@linaro.org>
-Date: Wed, 7 Jan 2026 10:38:19 +0100
-X-Gm-Features: AQt7F2rcNsjXN7djR70fxjzIrnv1VtdzPp10juTq1vFrm5vuVSwDuqGbqR3kJLk
-Message-ID: <CAHUa44FhRO0AO3nDXSoZ7O_9T3EFB47D34zRooCTd6fhXFzxXw@mail.gmail.com>
-Subject: Re: [PATCH v2 00/17] tee: Use bus callbacks instead of driver callbacks
-To: Sudeep Holla <sudeep.holla@arm.com>
-Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>, 
-	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@baylibre.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Sumit Garg <sumit.garg@kernel.org>, 
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	=?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Ard Biesheuvel <ardb@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Sumit Garg <sumit.garg@oss.qualcomm.com>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, 
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>, =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>, 
-	Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
-	James Bottomley <James.Bottomley@hansenpartnership.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Mimi Zohar <zohar@linux.ibm.com>, David Howells <dhowells@redhat.com>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Peter Huewe <peterhuewe@gmx.de>, op-tee@lists.trustedfirmware.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-rtc@vger.kernel.org, 
-	linux-efi@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, 
-	Cristian Marussi <cristian.marussi@arm.com>, arm-scmi@vger.kernel.org, 
-	linux-mips@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-integrity@vger.kernel.org, keyrings@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 6, 2026 at 2:40=E2=80=AFPM Sudeep Holla <sudeep.holla@arm.com> =
-wrote:
->
-> On Mon, Jan 05, 2026 at 10:16:09AM +0100, Jens Wiklander wrote:
-> > Hi,
-> >
-> > On Thu, Dec 18, 2025 at 5:29=E2=80=AFPM Jens Wiklander
-> > <jens.wiklander@linaro.org> wrote:
-> > >
-> > > On Thu, Dec 18, 2025 at 2:53=E2=80=AFPM Alexandre Belloni
-> > > <alexandre.belloni@bootlin.com> wrote:
-> > > >
-> > > > On 18/12/2025 08:21:27+0100, Jens Wiklander wrote:
-> > > > > Hi,
-> > > > >
-> > > > > On Mon, Dec 15, 2025 at 3:17=E2=80=AFPM Uwe Kleine-K=C3=B6nig
-> > > > > <u.kleine-koenig@baylibre.com> wrote:
-> > > > > >
-> > > > > > Hello,
-> > > > > >
-> > > > > > the objective of this series is to make tee driver stop using c=
-allbacks
-> > > > > > in struct device_driver. These were superseded by bus methods i=
-n 2006
-> > > > > > (commit 594c8281f905 ("[PATCH] Add bus_type probe, remove, shut=
-down
-> > > > > > methods.")) but nobody cared to convert all subsystems accordin=
-gly.
-> > > > > >
-> > > > > > Here the tee drivers are converted. The first commit is somewha=
-t
-> > > > > > unrelated, but simplifies the conversion (and the drivers). It
-> > > > > > introduces driver registration helpers that care about setting =
-the bus
-> > > > > > and owner. (The latter is missing in all drivers, so by using t=
-hese
-> > > > > > helpers the drivers become more correct.)
-> > > > > >
-> > > > > > v1 of this series is available at
-> > > > > > https://lore.kernel.org/all/cover.1765472125.git.u.kleine-koeni=
-g@baylibre.com
-> > > > > >
-> > > > > > Changes since v1:
-> > > > > >
-> > > > > >  - rebase to v6.19-rc1 (no conflicts)
-> > > > > >  - add tags received so far
-> > > > > >  - fix whitespace issues pointed out by Sumit Garg
-> > > > > >  - fix shutdown callback to shutdown and not remove
-> > > > > >
-> > > > > > As already noted in v1's cover letter, this series should go in=
- during a
-> > > > > > single merge window as there are runtime warnings when the seri=
-es is
-> > > > > > only applied partially. Sumit Garg suggested to apply the whole=
- series
-> > > > > > via Jens Wiklander's tree.
-> > > > > > If this is done the dependencies in this series are honored, in=
- case the
-> > > > > > plan changes: Patches #4 - #17 depend on the first two.
-> > > > > >
-> > > > > > Note this series is only build tested.
-> > > > > >
-> > > > > > Uwe Kleine-K=C3=B6nig (17):
-> > > > > >   tee: Add some helpers to reduce boilerplate for tee client dr=
-ivers
-> > > > > >   tee: Add probe, remove and shutdown bus callbacks to tee_clie=
-nt_driver
-> > > > > >   tee: Adapt documentation to cover recent additions
-> > > > > >   hwrng: optee - Make use of module_tee_client_driver()
-> > > > > >   hwrng: optee - Make use of tee bus methods
-> > > > > >   rtc: optee: Migrate to use tee specific driver registration f=
-unction
-> > > > > >   rtc: optee: Make use of tee bus methods
-> > > > > >   efi: stmm: Make use of module_tee_client_driver()
-> > > > > >   efi: stmm: Make use of tee bus methods
-> > > > > >   firmware: arm_scmi: optee: Make use of module_tee_client_driv=
-er()
-> > > > > >   firmware: arm_scmi: Make use of tee bus methods
-> > > > > >   firmware: tee_bnxt: Make use of module_tee_client_driver()
-> > > > > >   firmware: tee_bnxt: Make use of tee bus methods
-> > > > > >   KEYS: trusted: Migrate to use tee specific driver registratio=
-n
-> > > > > >     function
-> > > > > >   KEYS: trusted: Make use of tee bus methods
-> > > > > >   tpm/tpm_ftpm_tee: Make use of tee specific driver registratio=
-n
-> > > > > >   tpm/tpm_ftpm_tee: Make use of tee bus methods
-> > > > > >
-> > > > > >  Documentation/driver-api/tee.rst             | 18 +----
-> > > > > >  drivers/char/hw_random/optee-rng.c           | 26 ++----
-> > > > > >  drivers/char/tpm/tpm_ftpm_tee.c              | 31 +++++---
-> > > > > >  drivers/firmware/arm_scmi/transports/optee.c | 32 +++-----
-> > > > > >  drivers/firmware/broadcom/tee_bnxt_fw.c      | 30 ++-----
-> > > > > >  drivers/firmware/efi/stmm/tee_stmm_efi.c     | 25 ++----
-> > > > > >  drivers/rtc/rtc-optee.c                      | 27 ++-----
-> > > > > >  drivers/tee/tee_core.c                       | 84 ++++++++++++=
-++++++++
-> > > > > >  include/linux/tee_drv.h                      | 12 +++
-> > > > > >  security/keys/trusted-keys/trusted_tee.c     | 17 ++--
-> > > > > >  10 files changed, 164 insertions(+), 138 deletions(-)
-> > > > > >
-> > > > > > base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
-> > > > > > --
-> > > > > > 2.47.3
-> > > > > >
-> > > > >
-> > > > > Thank you for the nice cleanup, Uwe.
-> > > > >
-> > > > > I've applied patch 1-3 to the branch tee_bus_callback_for_6.20 in=
- my
-> > > > > tree at https://git.kernel.org/pub/scm/linux/kernel/git/jenswi/li=
-nux-tee.git/
-> > > > >
-> > > > > The branch is based on v6.19-rc1, and I'll try to keep it stable =
-for
-> > > > > others to depend on, if needed. Let's see if we can agree on taki=
-ng
-> > > > > the remaining patches via that branch.
-> > > >
-> > > > 6 and 7 can go through your branch.
-> > >
-> > > Good, I've added them to my branch now.
-> >
-> > This entire patch set should go in during a single merge window. I
-> > will not send any pull request until I'm sure all patches will be
-> > merged.
-> >
-> > So far (if I'm not mistaken), only the patches I've already added to
-> > next have appeared next. I can take the rest of the patches, too, but
-> > I need OK for the following:
-> >
->
-> [...]
->
-> >
-> > Sudeep, you seem happy with the following patches
-> > - firmware: arm_scmi: optee: Make use of module_tee_client_driver()
-> > - firmware: arm_scmi: Make use of tee bus methods
-> > OK if I take them via my tree, or would you rather take them yourself?
-> >
->
-> I am happy if you want to take all of them in one go. I think I have
-> already acked it. Please shout if you need anything else from me, happy t=
-o
-> help in anyway to make it easier to handle this change set.
+The user constructed a BPF program containing a bpf_snprintf() call.
+The fmt parameter passed to bpf_snprintf() was not assigned a value;
+it only executed the BPF_MAP_FREEZE command to freeze the fmt string.
+Furthermore, when bpf_check() executed check_reg_const_str() and
+check_bpf_snprintf_call() to check the fmt input parameter of the
+user-constructed BPF program's bpf_snprintf() call, strnchr() only
+checked if fmt was a null-terminated string. This led the BPF verifier
+to incorrectly assume the constant format string was valid.
+When the BPF program was actually executed, the out-of-bounds (OOB)
+issue reported by syzbot occurred [1].
 
-Thanks, I've applied all the patches in the series now, since it
-otherwise causes warnings during boot.
+This issue is strongly related to bpf_snprintf(), therefore adding a
+check for an empty format string in check_bpf_snprintf_call() would
+be beneficial. Since it calls bpf_bprintf_prepare(), only adding a
+check on the result of strnchr() is needed to prevent the case where
+the format string is empty.
 
-/Jens
+[1]
+BUG: KASAN: slab-out-of-bounds in strnchr+0x5e/0x80 lib/string.c:405
+Read of size 1 at addr ffff888029e093b0 by task ksoftirqd/1/23
+Call Trace:
+ strnchr+0x5e/0x80 lib/string.c:405
+ bpf_bprintf_prepare+0x167/0x13d0 kernel/bpf/helpers.c:829
+ ____bpf_snprintf kernel/bpf/helpers.c:1065 [inline]
+ bpf_snprintf+0xd3/0x1b0 kernel/bpf/helpers.c:1049
+
+Allocated by task 6022:
+ __bpf_map_area_alloc kernel/bpf/syscall.c:395 [inline]
+ bpf_map_area_alloc+0x64/0x180 kernel/bpf/syscall.c:408
+ insn_array_alloc+0x52/0x140 kernel/bpf/bpf_insn_array.c:49
+ map_create+0xafd/0x16a0 kernel/bpf/syscall.c:1514
+
+The buggy address is located 0 bytes to the right of
+ allocated 944-byte region [ffff888029e09000, ffff888029e093b0)
+
+Fixes: d9c9e4db186a ("bpf: Factorize bpf_trace_printk and bpf_seq_printf")
+Reported-by: syzbot+2c29addf92581b410079@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=2c29addf92581b410079
+Tested-by: syzbot+2c29addf92581b410079@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ kernel/bpf/helpers.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
+index db72b96f9c8c..88da2d0e634c 100644
+--- a/kernel/bpf/helpers.c
++++ b/kernel/bpf/helpers.c
+@@ -827,7 +827,7 @@ int bpf_bprintf_prepare(const char *fmt, u32 fmt_size, const u64 *raw_args,
+ 	char fmt_ptype, cur_ip[16], ip_spec[] = "%pXX";
+ 
+ 	fmt_end = strnchr(fmt, fmt_size, 0);
+-	if (!fmt_end)
++	if (!fmt_end || fmt_end == fmt)
+ 		return -EINVAL;
+ 	fmt_size = fmt_end - fmt;
+ 
+-- 
+2.43.0
+
 
