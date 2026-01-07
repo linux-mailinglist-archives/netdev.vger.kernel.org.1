@@ -1,88 +1,80 @@
-Return-Path: <netdev+bounces-247542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B51DCCFB8F8
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 02:16:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5915FCFB932
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 02:20:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A8B9930549B3
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 01:13:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EE57430DB4BD
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 01:16:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 155A6287263;
-	Wed,  7 Jan 2026 01:13:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C2C24293C;
+	Wed,  7 Jan 2026 01:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RMSQGL83"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ouq+1QpP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E45C5280CE0
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 01:13:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6456823E342
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 01:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767748421; cv=none; b=HPhozopnjI8QTFKyWQnb8b8YaKR3Rf6E3L9f3/9cgbgz2mh0a8eDsbt8UDJNacXLoG/tNQWzo3a+aWcydt568Pwnls2CumVNhUkWOlklKLd7cq8qA0jtR6TKj1xUn6+VC1G0DONZyLOox7/KoSODFFgLBsdw1xxGrZVRKOkBnBQ=
+	t=1767748229; cv=none; b=lgX0ph5AENmgCVPO3T01tXngf/na9rY3Kg5kyLWeQY2e68eM7Vvw/3qwWpeMnqlWEj/jlzevHA0BG3tGcspaTSlK4uHSQFo/Ktb1NiTKgnKRWFqy9I5k5ZBq5j9j166IrXs3Y3K54ylCOiYXLq91ZNkJN/i5IfsW0d4zRubmr2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767748421; c=relaxed/simple;
-	bh=F8TRBdEX0IKoosO6AWlc9pFWMhHrf5riuSD9UCdfoxM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WQzcoVWVjdfXC6oJX9j/98sKntAVH+/P3YRaKpKy45RXpgccVfdXo42Uy+jtGMpAMCqYCjBuq7qBXrS8AMOdeENzH+9Jbt7fjSF/5Z5AJgTxO+QCNQpmiXVnAdzXkrWbXgIU2wJZvAGhcRF5cS6RttgZlSZl4GJQE9B/EjQJqbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RMSQGL83; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BBA7C19422;
-	Wed,  7 Jan 2026 01:13:40 +0000 (UTC)
+	s=arc-20240116; t=1767748229; c=relaxed/simple;
+	bh=OoZH+fpqJ0cgwkA5l9s/Sp64c83kpzyoBJgWGj34zUo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HtDDUsIC9v+o9bFleOmxFXWXPBYDsSknkd5a1SpMmPHG6AhqmeSGSUBIf3Bg3MtKuXzkbo6kCQEJZYJiZvlu1AoND7ui6HFturhXrcJUzzQQY99t9QpvHz9Em0QwSwXdeMzTkLQy2nIcwkvSYbFvG8pqu59f3gg2tiP1tGQEWDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ouq+1QpP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C40DC116C6;
+	Wed,  7 Jan 2026 01:10:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767748420;
-	bh=F8TRBdEX0IKoosO6AWlc9pFWMhHrf5riuSD9UCdfoxM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RMSQGL83BaOtl7R/cKZl2xOqO/EfeCuO/EC/4LLu2y64ALQttL8YDHWs95Le+HpSo
-	 IrvXkNFF5uVLJHfiZDkH53C1qIlHr/rjs2SKiknra56c9fXOkp5lOdT6/eS7dD4666
-	 z/lxIMDdEen88BAyTj1qJIKx19qazVu3D97NOzRzBIbfh6YC3ufYc4zpg7i8izyHTg
-	 /nYPPz7sO2REVdPwHTGC3F3Gfi9VzPYHxtTDNofUOa0/TU2CUKsMWVBH8vu0X0Ll4a
-	 kK63cU9SuLzQajsi9GjUvPioTCiDOxoFRXLvc2lPoJ5DoFKw+K1pkEpr5FQPw/UcY1
-	 uyrob2oVIW3eg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B74B380CEF5;
-	Wed,  7 Jan 2026 01:10:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1767748228;
+	bh=OoZH+fpqJ0cgwkA5l9s/Sp64c83kpzyoBJgWGj34zUo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ouq+1QpPi7ktAt3k1KgclWjEMDUOJTW1MEfCkGU82iLEciCWEmmc0q0tXnU3g8JJc
+	 P5md9DSCoHJiELcNu6gjAkAkmNxVY3WghFsMBqDSwQmvB9FzHTjM6LEjUt8bkXba+j
+	 feK0K7+En/0uJKiO2OYePkMUB2VF+d2Vf8YpQfSfOPs4AtvYRtcV8mbJ9fA6V+ofZ1
+	 Ab9CliCoz60HiPTvFsJvxWPXBXchqF+UPRWD8EGq9V8GQR+Nj1E7YSyvVFuJOfwiPI
+	 Pd6puBLzeFbsvkYpv7niy7lD51Qy5co28jB+B17DvwMsOsBBq3vX8ImliYRKjQdWdT
+	 ttqVnoLI8zmHQ==
+Date: Tue, 6 Jan 2026 17:10:27 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: <netdev@vger.kernel.org>, Sabrina Dubroca <sd@queasysnail.net>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Dragos
+ Tatulea <dtatulea@nvidia.com>
+Subject: Re: [PATCH net-next] macsec: Support VLAN-filtering lower devices
+Message-ID: <20260106171027.57a7757f@kernel.org>
+In-Reply-To: <20260105101858.2627743-1-cratiu@nvidia.com>
+References: <20260105101858.2627743-1-cratiu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: libwx: remove unused rx_buffer_pgcnt
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176774821802.2186142.12690968741108457435.git-patchwork-notify@kernel.org>
-Date: Wed, 07 Jan 2026 01:10:18 +0000
-References: <F0907C8394B2D4A8+20260105071158.49929-1-jiawenwu@trustnetic.com>
-In-Reply-To: <F0907C8394B2D4A8+20260105071158.49929-1-jiawenwu@trustnetic.com>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- michal.kubiak@intel.com, mengyuanlou@net-swift.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon,  5 Jan 2026 15:11:58 +0800 you wrote:
-> The variable rx_buffer_pgcnt is redundant, just remove it.
+On Mon, 5 Jan 2026 12:18:58 +0200 Cosmin Ratiu wrote:
+> Before commit [1] this used to accidentally work because the macsec
+> device (and thus the lower device) was put in promiscuous mode and the
+> VLAN filter was not used. But after commit [1] correctly made the macsec
+> driver expose the IFF_UNICAST_FLT flag, promiscuous mode was no longer
+> used and VLAN filters on dev 1 kicked in. Without support in dev 2 for
+> propagating VLAN filters down, the register_vlan_dev -> vlan_vid_add ->
+> __vlan_vid_add -> vlan_add_rx_filter_info call from dev 3 is silently
+> eaten (because vlan_hw_filter_capable returns false and
+> vlan_add_rx_filter_info silently succeeds).
 > 
-> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-> ---
->  drivers/net/ethernet/wangxun/libwx/wx_lib.c | 17 ++++-------------
->  1 file changed, 4 insertions(+), 13 deletions(-)
+> [1] commit 0349659fd72f ("macsec: set IFF_UNICAST_FLT priv flag")
 
-Here is the summary with links:
-  - [net-next] net: libwx: remove unused rx_buffer_pgcnt
-    https://git.kernel.org/netdev/net-next/c/d362f446334c
-
-You are awesome, thank you!
+It used to work and now it doesn't sounds like a description of a fix.
+Whether the working state was by design or accidental doesn't really
+matter, I think? Please explain or resend for net with a Fixes..
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
