@@ -1,175 +1,175 @@
-Return-Path: <netdev+bounces-247710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B01B7CFDB12
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 13:34:06 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5914CCFD9EC
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 13:22:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 29F623089796
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 12:31:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0A9D6300A9B7
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 12:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75507315D23;
-	Wed,  7 Jan 2026 12:22:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D1773161BF;
+	Wed,  7 Jan 2026 12:22:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IPE49rnj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e3+G9jnD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057053168E4
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 12:22:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EDCD314B9A
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 12:22:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767788558; cv=none; b=cExNaUxurYt2h0LCVRVpp6Mwu2G+Z2ZBJXKvdXzEfqcvGPlYz2rF/7Zb4VuTGkAON890p9DpZyYrnhIp25iNtzqGzd4vcXYMJoSJLN8crYHYJXZMLFcLcc/a53zR/TsbN060PW083AebM0Q0qABXlXCWZvzZD7Z/9NeCfRrmPy4=
+	t=1767788538; cv=none; b=sqYOEGdIHcM52OL8Ce9QXKkog6L54nVQAqEuWAHiTe9xW29KBITruHhsNfLXBuWqMgJim8OfZryPg9rBf3YQLobrn8lVvByxO9IqAvEI1kClocwc60HCEmkY9Pr3NWrF6aDPwAGjG9cszdb0O407bBsV/ixloDyWmuKw4K7/1Jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767788558; c=relaxed/simple;
-	bh=unytFKZ8LCGZbWiIqqle1BjuJ9OKga7Krn0YjNtEcU4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DOp7dRIxumfbLxl7X+lNUr6je9BV+xNvYK7DmrV2LMPYIlUlaSBFb7u5JVF6RMzzQt5u4MVuYjT2wNdiycEZdkQMXhFJxjw4C48H15/exewcf5zG0LdwVCLXyPxgeSu3EOk8ANYvssLjLDh9H8Ld8xGT3NnCLzm0MDWXmcwGkyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IPE49rnj; arc=none smtp.client-ip=209.85.216.41
+	s=arc-20240116; t=1767788538; c=relaxed/simple;
+	bh=Q4ZqUeHdxj8w0kNEPzoysqUJgGoxPgA1XB5F+ofXapY=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hYuYUJzbUTDfUg812Fsby/SOjIDl2dcV+r4KrmRMW645jptKHjCXMjXb6uAkT1diRtVxuat23Nx3Z4cr5alnT50yE5WJCZ3MbINOWhc+7thA6lDuqtKdTzEFykjNwoLIqdbTcIIbwhrjdN6+otQlaJ27bgi4PCBrrlm2XvI4j3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e3+G9jnD; arc=none smtp.client-ip=209.85.221.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-34c84ec3b6eso2234999a91.3
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 04:22:36 -0800 (PST)
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-42b3d7c1321so1180084f8f.3
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 04:22:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767788556; x=1768393356; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20230601; t=1767788535; x=1768393335; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=htJmJ2nOl5HS2d4lrmu4G6awIswx3aqJ66sxEqxOU2k=;
-        b=IPE49rnjTjtHNOBtLnU3aEWDBjoZx5aoL7s059ET3UMOTiQ/nA6pVAcCTiwASBZDZz
-         dEPHicB+5eMr95lUShJLydiEOVzS/Pq0ts2IIL8m+lUMVjD0mJj1/JksKgGPqUj38+3Q
-         tlbPNWe6NBaxjmO7u4RWTO1+5oo4esLYzm8dMi4RrlApnNkpdXQwNt1dLyYvSKCybrTQ
-         sOaJTBT9RzwMbK1EuwKvmHMHkZxFF/QnLpIr/oaxJLVtQ6G2Y5fzKOjK4YAckBZyMn2m
-         98RJck2QDqsS1P1iaBBZ8j4enbxg0mUqyZDomxUbMb9/7+VQypljfgi4w07DMF3+Rmh4
-         E/pQ==
+        bh=+2Lat8SdX+02TbmLDhXK9YgQomayPj4Tjy+cMyjwyFk=;
+        b=e3+G9jnD6SyE+1ipEAjcougs9hqzvu9iQZ90we/e61pbNkHiwJuKugTViHBbEDuDOW
+         22obTnkjGzPHpWibpWHI5cWoihazSkJx7nF93Fc8xwzQZ7NlEVR7ht88XC1KVphfTgpP
+         R0HmbRgavlAHVOE3TKfbwgRzuPemeVbY9SikcRViLIRecgJXa1Ke5LhxPnSOqbjRzyMv
+         97BD36v+Qirqi21vhQSkEYMMVd6ohyEIP6CXr6g+/Cl1iC9J1eqBLxLi+7YE82HrNQCq
+         zTpakHWDBgYt1x7fW4tDoccF6fxGvKfZS89ka855GoDCRAtshEY8q5e5w84Kz3TQgAQ+
+         pjuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767788556; x=1768393356;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+        d=1e100.net; s=20230601; t=1767788535; x=1768393335;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=htJmJ2nOl5HS2d4lrmu4G6awIswx3aqJ66sxEqxOU2k=;
-        b=XMfgWnzxHwHsm/fQNl/lW/JXuAXpyYiZYXzM7eT6O81rFV+Q8AtYnS2WtWTAB1uFfY
-         FLGsks5T/NQOeBPXpDlqd4tC+548Zf4cqjE+l0Yaa+hQTQK5HHzPyMYdaPpiK6ymOwA8
-         9HbNsKwPlcz9+7mAz4AvU5oSKtU5TBZMXGe+FwfgW/xTEAfiU5O1uNEP5fyXge+yqTtQ
-         OeIr6E5aqG6nbg0x66AG46IaEDdXuBSuzXVltGxnToWxD6GutkXh/7PewFBY/TFiuUNI
-         xMDVdzIFG3mtTu1Tlr+ZeFpDL+p2ZA/lKfbtDEldzI0uUMe+AZ1ilI+URFG4Zt4tNnpD
-         7CeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW84EkGUUPc4UhQtZg9UVeYrEhUsiquHM+kaFGX86k+ybtheZRZs9bV1NNTCqy/YStf4aXs8wo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9emFNWeVRMcLT4QxOn+tcrup7BiUgxdAmgitDi5nnhSoJS30+
-	aVTywGELcQ7AysFNSkQv5zl3w9hHXi09mULEIWixp8ZtJLL279s3ZlZW
-X-Gm-Gg: AY/fxX5J4OUngdEW6CsQog4sd5Q1d8AV1wZPYIOpo8KpJhBmGW3hlTR6uCKiT0PFaSQ
-	EP7JCOUK9UocR635WsgT9YqllZJiJPEjWS0uEwMNY6QTcYsRRahcLS4p0MVHygUAQTINtKqJ9UI
-	NLCygrBmgJ3r22rl2i3LmIU3k0ozp2SKECFjP2m7LWP6dchMMA2gbXLFJGAE8FUlaAhBOKPkspW
-	j0xTesLzEDpxLOM5luagRhjtU+m9IbTR9RoP3BZaru6qP8HzdfPYXR/0YxaAXZvfkK++8QkqZLh
-	SzOdy038pssS4+N9SW5HXy1JarSktQm17q/9foTB9UVMSQolB2xzuRv1Bkr1wdvfPK411QScMOV
-	sy1oY1eXuztEc3D6qm3H7SLXtUA3gSlKOT2vQbP/N7waLAC/Vp6iM4Eh+zFMCFMoBGL5w7OpB6D
-	0D688ZpJFFKBI=
-X-Google-Smtp-Source: AGHT+IF4vumQ3UxDP/AczQhAuKSLCFCXdWDt3+3Ac3DseSrY7lK07U9RAIhVR1+386lDOWSI3dLtWg==
-X-Received: by 2002:a17:90b:540e:b0:343:5f43:933e with SMTP id 98e67ed59e1d1-34f68cbe0b5mr2124192a91.19.1767788555990;
-        Wed, 07 Jan 2026 04:22:35 -0800 (PST)
-Received: from [127.0.0.1] ([188.253.121.153])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34f5f8b1526sm5025946a91.14.2026.01.07.04.22.28
+        bh=+2Lat8SdX+02TbmLDhXK9YgQomayPj4Tjy+cMyjwyFk=;
+        b=w3bzRyxa7tYyJDsl4K+qHuxRid5UZDUT++MT+Upysn8Ek3mxPEyN+GYXxrXhF8s6UD
+         s4Xs9KHTlz3xBN0ddDZRQmGm+DRmKdP9f8GRMRbgucjo0K4DEkh8twt0plbf6bsi3m7i
+         Dxhcftk5vcUXjmVnzTRz8XnHv4U2FM+YKrlBREhVA+po4Jmu99+Yo4ShDd2QNP+jczrh
+         JzBjRWf7Xfx0Q3Q6NAHfTW9lvgo65QEuSHp0jGdUI46KLfgk05+lOjDxBHS86nVl/xzb
+         VDYQuGqt1k1P4zySgxEuzBAsTIgJJ+M0KlJ4fnjW3S1HX0saCA9WkB8Q2ObGdH60ADMU
+         r77Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXDSrkp0uCSObRaxswmHZmqvIL/GXGWKtI7vv2E+BFGas6MmXo8l3OQst1FPdHJ+MDVbbALiL0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxaAk8wwxzpMCoJnaoYCFLuTAG6jg89HdpAkhiWkfae8mFxt1w
+	FAGA4WG63Xs4CMvuXebOT78xINyMcldX1ICI00KsA7i3I20O1ClfaD5i
+X-Gm-Gg: AY/fxX6F7IrmL5nH2znjCWnx3djq6X98TasCKRd9/4EozugYOLmWnW/ofEKpQHRZ1Ee
+	fa2DXdAEHTfWc9swX8ZYe05ogtbcafLzzGu1nxClXZBYsjYGXRBM2OZmE+yc6BzuMAwvFO9sNmk
+	PGFN/SWUGNkQGjyDubeMu21KfiFafNC4DFSHA+rQt+x8a6zKjRPt5AcYVgk36YMIGP0XpdEsfKY
+	iaIFbcfLXAHtk1DSkryI1VL4toc+pYMe6wd8GFSJoqUL3VMrHn1MsPZIZAHuoyNT2SThFhWg/SW
+	azuv2tu3piqBKnTZOKAvG7aqI/IBN9kPKOE0zj0N65z3OqIIboE0XFNz0GjM02uc72a+W799/Cl
+	9u9Y5D5Bt4bOoRkjnXXds5adqhqw/tn1COm5b9+VxFNzwMavcVVVhnQtb0LHpFZM5bpLW7CnI1j
+	cbDOzc9Jox6OThwWfKFEzzRtO6dr1x
+X-Google-Smtp-Source: AGHT+IEAEEOMloGtBWAWlq//SXxp8JdbjV1Xe8Xns3g8sq+4RlTi3G3ATBwUL+bMJLZKOmriMZD/VQ==
+X-Received: by 2002:a5d:584c:0:b0:42f:9f4d:a4b2 with SMTP id ffacd0b85a97d-432c3775a07mr2858945f8f.19.1767788534546;
+        Wed, 07 Jan 2026 04:22:14 -0800 (PST)
+Received: from imac.lan ([2a02:8010:60a0:0:bc70:fb0c:12b6:3a41])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0e16f4sm10417107f8f.11.2026.01.07.04.22.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 04:22:35 -0800 (PST)
-From: Zesen Liu <ftyghome@gmail.com>
-Date: Wed, 07 Jan 2026 20:21:39 +0800
-Subject: [PATCH bpf 2/2] bpf: Require ARG_PTR_TO_MEM with memory flag
+        Wed, 07 Jan 2026 04:22:14 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	"Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
+	Gal Pressman <gal@nvidia.com>,
+	Jan Stancek <jstancek@redhat.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Nimrod Oren <noren@nvidia.com>,
+	netdev@vger.kernel.org,
+	Jonathan Corbet <corbet@lwn.net>,
+	=?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
+	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Ruben Wauters <rubenru09@aol.com>,
+	linux-doc@vger.kernel.org
+Subject: [PATCH net-next v1 10/13] tools: ynl-gen-c: suppress unhelpful pylint messages
+Date: Wed,  7 Jan 2026 12:21:40 +0000
+Message-ID: <20260107122143.93810-11-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260107122143.93810-1-donald.hunter@gmail.com>
+References: <20260107122143.93810-1-donald.hunter@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260107-helper_proto-v1-2-e387e08271cc@gmail.com>
-References: <20260107-helper_proto-v1-0-e387e08271cc@gmail.com>
-In-Reply-To: <20260107-helper_proto-v1-0-e387e08271cc@gmail.com>
-To: Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski <mattbobrowski@google.com>, 
- Steven Rostedt <rostedt@goodmis.org>, 
- Masami Hiramatsu <mhiramat@kernel.org>, 
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>
-Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Shuran Liu <electronlsr@gmail.com>, Peili Gao <gplhust955@gmail.com>, 
- Haoran Ni <haoran.ni.cs@gmail.com>, Zesen Liu <ftyghome@gmail.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1786; i=ftyghome@gmail.com;
- h=from:subject:message-id; bh=unytFKZ8LCGZbWiIqqle1BjuJ9OKga7Krn0YjNtEcU4=;
- b=owGbwMvMwCXWI1/u+8bXqJ3xtFoSQ2ac/xdV2YfeZ4wuCJmHK+jVqLv8r746++XhqI33HeIWb
- 12tuTauo5SFQYyLQVZMkaX3h+HdlZnmxttsFhyEmcPKBDKEgYtTACYSPZ3hn9Xf5xONrlr+X8xp
- w3u4MqBS/ZX9+cne2x/Yf3gYWmhZ9YLhf4YZZ/bqW6kPMp8LaE/j6LdmUPfcu6VwpXSdpc3x3sx
- nvAA=
-X-Developer-Key: i=ftyghome@gmail.com; a=openpgp;
- fpr=8DF831DDA9693733B63CA0C18C1F774DEC4D3287
+Content-Transfer-Encoding: 8bit
 
-Add check to ensure that ARG_PTR_TO_MEM is used with either MEM_WRITE or
-MEM_RDONLY.
+Disable pylint messages for too-many-*, too-few-*, docstrings,
+broad-exception-* and messages for specific code that won't get changed.
 
-Using ARG_PTR_TO_MEM alone without tags does not make sense because:
-
-- If the helper does not change the argument, missing MEM_RDONLY causes the
-verifier to incorrectly reject a read-only buffer.
-- If the helper does change the argument, missing MEM_WRITE causes the
-verifier to incorrectly assume the memory is unchanged, leading to errors
-in code optimization.
-
-Co-developed-by: Shuran Liu <electronlsr@gmail.com>
-Signed-off-by: Shuran Liu <electronlsr@gmail.com>
-Co-developed-by: Peili Gao <gplhust955@gmail.com>
-Signed-off-by: Peili Gao <gplhust955@gmail.com>
-Co-developed-by: Haoran Ni <haoran.ni.cs@gmail.com>
-Signed-off-by: Haoran Ni <haoran.ni.cs@gmail.com>
-Signed-off-by: Zesen Liu <ftyghome@gmail.com>
+Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- kernel/bpf/verifier.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ tools/net/ynl/pyynl/ynl_gen_c.py | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index f0ca69f888fa..c7ebddb66385 100644
---- a/kernel/bpf/verifier.c
-+++ b/kernel/bpf/verifier.c
-@@ -10349,10 +10349,27 @@ static bool check_btf_id_ok(const struct bpf_func_proto *fn)
- 	return true;
- }
+diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
+index b517d0c605ad..14d16024fe11 100755
+--- a/tools/net/ynl/pyynl/ynl_gen_c.py
++++ b/tools/net/ynl/pyynl/ynl_gen_c.py
+@@ -1,5 +1,11 @@
+ #!/usr/bin/env python3
+ # SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
++#
++# pylint: disable=line-too-long, missing-class-docstring, missing-function-docstring
++# pylint: disable=too-many-positional-arguments, too-many-arguments, too-many-statements
++# pylint: disable=too-many-branches, too-many-locals, too-many-instance-attributes
++# pylint: disable=too-many-nested-blocks, too-many-lines, too-few-public-methods
++# pylint: disable=broad-exception-raised, broad-exception-caught, protected-access
  
-+static bool check_mem_arg_rw_flag_ok(const struct bpf_func_proto *fn)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(fn->arg_type); i++) {
-+		enum bpf_arg_type arg_type = fn->arg_type[i];
-+
-+		if (base_type(arg_type) != ARG_PTR_TO_MEM)
-+			continue;
-+		if (!(arg_type & (MEM_WRITE | MEM_RDONLY)))
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
- static int check_func_proto(const struct bpf_func_proto *fn, int func_id)
- {
- 	return check_raw_mode_ok(fn) &&
- 	       check_arg_pair_ok(fn) &&
-+		   check_mem_arg_rw_flag_ok(fn) &&
- 	       check_btf_id_ok(fn) ? 0 : -EINVAL;
- }
+ import argparse
+ import filecmp
+@@ -11,6 +17,7 @@ import sys
+ import tempfile
+ import yaml
  
-
++# pylint: disable=no-name-in-module,wrong-import-position
+ sys.path.append(pathlib.Path(__file__).resolve().parent.as_posix())
+ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, SpecEnumEntry
+ from lib import SpecSubMessage
+@@ -183,6 +190,7 @@ class Type(SpecAttr):
+         for line in lines:
+             ri.cw.p(line)
+ 
++    # pylint: disable=assignment-from-none
+     def arg_member(self, ri):
+         member = self._complex_member_type(ri)
+         if member:
+@@ -280,6 +288,7 @@ class Type(SpecAttr):
+ 
+         code = []
+         presence = ''
++        # pylint: disable=consider-using-enumerate
+         for i in range(0, len(ref)):
+             presence = f"{var}->{'.'.join(ref[:i] + [''])}_present.{ref[i]}"
+             # Every layer below last is a nest, so we know it uses bit presence
+@@ -414,6 +423,7 @@ class TypeScalar(Type):
+         if low < -32768 or high > 32767:
+             self.checks['full-range'] = True
+ 
++    # pylint: disable=too-many-return-statements
+     def _attr_policy(self, policy):
+         if 'flags-mask' in self.checks or self.is_bitfield:
+             if self.is_bitfield:
+@@ -1650,6 +1660,7 @@ class CodeWriter:
+         if out_file is None:
+             self._out = os.sys.stdout
+         else:
++            # pylint: disable=consider-using-with
+             self._out = tempfile.NamedTemporaryFile('w+')
+             self._out_file = out_file
+ 
 -- 
-2.43.0
+2.52.0
 
 
