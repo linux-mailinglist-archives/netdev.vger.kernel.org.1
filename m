@@ -1,171 +1,280 @@
-Return-Path: <netdev+bounces-247797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BA7ECFEBA8
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 16:57:50 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CC9CCFE8BA
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 16:22:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4D1DE30EFDB9
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 15:51:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id EBE793014D2E
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 15:21:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315AA3624B2;
-	Wed,  7 Jan 2026 15:10:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D67333F8DD;
+	Wed,  7 Jan 2026 15:13:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MpE5ehR5"
+	dkim=pass (1024-bit key) header.d=valinux.co.jp header.i=@valinux.co.jp header.b="f5OUX8BE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from OS0P286CU011.outbound.protection.outlook.com (mail-japanwestazon11020143.outbound.protection.outlook.com [52.101.228.143])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE67636215D
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 15:09:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767798601; cv=none; b=fw2SKVZ13rZ5ar3CcNhbu1yuLO4iI/nlvnJU8D9n6LSqYdZITQupC+1u6j0V5BZnnn24MdyDChI5S7Q5GBIDjzoQZ76ymx2qLFhgs/vxEj83f/LxM4cJ5qyFLIocOjj1PDgSykdiWLXRw/5c6uPlvHAwP4geZZTk4IyxMHaTJFA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767798601; c=relaxed/simple;
-	bh=lYP9pWBjKgKjRO/PBe9DsZJ/kbBLmbapyPBWE4fiIQM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=nxKGCvQFe2SAgs7XXQ/DpqaDmdz5PaHny9/JTgfGuqeBIirY/yczVoKLFhDetT1NmRzXDso49VI6d0L1H7ctTTWEH/H9lTnNSTCn7ZG+9X1SDRPnPXUSpCZvOYKTdHEji3NL1OSaPHB9vsVnIPe68eEkRYDGaOWp64oG8EFwsz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MpE5ehR5; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-790b7b3e581so11623307b3.0
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 07:09:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767798599; x=1768403399; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g300JhXwNF6eU1q44sZuHW+zAs/cHhM+cAlOuqW2yJU=;
-        b=MpE5ehR5jNpVyRiZ6DzwAwPQkiVMjZ6ppDH/GwX4gYuvPzwJ/gGxtY6yIwVTAGHLK0
-         oN3gVLwgD0qhyZDaIrJgPCROoe7TDxw/qbFaWzNatLTexlSc6EtnmecmBKyRdt3RgYJs
-         q3XVQ3bdJ3/+lZldpoCsKmrbICU9T7xMceUWc+dNfufOpM7jlHzFB4v+RBwgbVe17jtr
-         MytIehsdWIC6JUX86D5AaaOfWl0vLuvcexYgY8ozgWGi1SGmzXHn4+WfRv6NFz3fUd5e
-         +/YHD617rvQ3yth+q7kuzKw/ubkn3+Qnii22aNYQ2zkujMov8uYunxCR0b7HcVthNuhb
-         itkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767798599; x=1768403399;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=g300JhXwNF6eU1q44sZuHW+zAs/cHhM+cAlOuqW2yJU=;
-        b=VULgC8Jg6kArQtDaXqxGPsO2Mk23A/pH4OX0yIDeXCyCdDwirRokvrOLMoPlBobNaR
-         RxXFxZjX6Nm0QHQVHDk50uKE1dELX7NLLAwrHLSdU8bELClXcJdLVGEGrdqpKD5tUFhO
-         rxvoKSo58gKkG0zvQpfecTNS5Od0WilBy5WGlAK4F01kGhjU6/xg4JB3VKsZiHE/89Rq
-         +fsyFbyo33lockOKpEXuNp3d6IV/py0jnyRb15LYbZcPY/DdJVTGPuMDHfcbT1di1aiQ
-         SiljgyxqIdQ3sqDIEA7DTh7994cpMdsuU+4CoMkRBWa2j0AzltEtY2hx47QRlL8pL1B0
-         cWCw==
-X-Forwarded-Encrypted: i=1; AJvYcCWMn2Kz0ps6Vb15WMazHS9IbOzVf/LoXiW8IpCeSRRQp7jCbd0usZEhzJ1ahqtLd7Bx9vDymbA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXb5Y6Why5R8mmQ2XLhr5kGPm6dfVDn0RSoDhrzzYUn4hTW+js
-	Om/MGY/G8SQ6nKRYVpYjsgctsPyQi+vf3q23c7g50T3uBD1V5xPJhiwl
-X-Gm-Gg: AY/fxX5/jcdrpYbGhvjwK+fENCULlmluxO9qqNQ0LUgh2JRkORA8CIIFa1oWXI6AYKw
-	hFi2UmOm1XN+XjsrDBMQdaWlOGDJew+m/BUArUZJIiazoYWU/f5Fvx7iL7zivStk6a3iH8TxIka
-	OgE3+4H55pCoMEa9LjcoXAKuGtvN1NVByODpT/Wjrak9ZXJCm9qtLBSM/jDinSwTE3WwXJIEy/x
-	wtD5awRgdXXuGOIX2XvCRcN3r/RdnEYMKH6B2XBM4p7gTkqMb4bxv3otInkV5Wk+bTOFB8REiCP
-	9GCdhtq8Z7R73C9SAmhBAj87QIgmG+WDaEmf9LJDXuij2hIYFLFz8PTXbC0mdMfiR4QiF5ngS1t
-	Azvkmyhsay7nL1HgTKPd6rSgwCUyUMPxHWQ67dFThwTD8IAcI20EI5+eGtCHJrKegKQ2kbaE80R
-	YIW5HjGXycWwHwdXOrgjoDuaVycEOAOTNb0v/CzYhVPTHH7BZKX7COha4I7rRXY3Wnc9m4WQ==
-X-Google-Smtp-Source: AGHT+IGq8b5RPG6dybV52fvuoZgWw0/+xdPYqRh0ReKPr8wVUOhqY8MAT8YoteZOdcT8AyQ4phmwJQ==
-X-Received: by 2002:a05:690c:19:b0:78f:86cd:5626 with SMTP id 00721157ae682-790a96e76f8mr55204137b3.26.1767798598537;
-        Wed, 07 Jan 2026 07:09:58 -0800 (PST)
-Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-790aa58f9f5sm19262057b3.24.2026.01.07.07.09.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 07:09:58 -0800 (PST)
-Date: Wed, 07 Jan 2026 10:09:57 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Mahdi Faramarzpour <mahdifrmx@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
- netdev@vger.kernel.org, 
- davem@davemloft.net, 
- dsahern@kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- horms@kernel.org
-Message-ID: <willemdebruijn.kernel.21c4d3b7b8f9d@gmail.com>
-In-Reply-To: <CA+KdSGOzzb=vMWh6UG-OFSQgEapS4Ckwf5K8hwYy8hz4N9RVMg@mail.gmail.com>
-References: <20260105114732.140719-1-mahdifrmx@gmail.com>
- <20260105175406.3bd4f862@kernel.org>
- <CA+KdSGN4uLo3kp1kN0TPCUt-Ak59k_Hr0w3tNtE106ybUFi2-Q@mail.gmail.com>
- <willemdebruijn.kernel.36ecbd32a1f0d@gmail.com>
- <CA+KdSGOzzb=vMWh6UG-OFSQgEapS4Ckwf5K8hwYy8hz4N9RVMg@mail.gmail.com>
-Subject: Re: [PATCH net-next] udp: add drop count for packets in
- udp_prod_queue
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F286533F8A8;
+	Wed,  7 Jan 2026 15:13:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.228.143
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767798805; cv=fail; b=MCiNo6f+8qT+GKVnUTU3pMuT+PcZaW0steMlW9E+hW9dozbKgtIGyIImvH3E6mlX4FJjDx8HJLpJH6uStVFDZDnqUzgT8ATdCWplFf40Zb/gFckMO+IhWrH6c8IEnuYQwC82IU6gz2XOyDVQzAAWYsuzwK9m1ojRjWgKGF/tQxA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767798805; c=relaxed/simple;
+	bh=RpY8/E5TsLiMruP9PDLBVKGGMnGZN6saIkXc32d+7FU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=uec4E1iXcowUBNUM5TZ5hRGKtOiPe8Nbhbcdaz9Ggt5ugd4wJwvTQsxHaTi0yza65JW6oLyoDwTcgUHxptRG8QZJMkCPW33pdu0jEwor4iIHBJlGektf3Lx3PsLwZaH8Yo4R1w6IZDdXkBYp6u2PgOCs6UqDiIU2iIrl1eRlTvM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valinux.co.jp; spf=pass smtp.mailfrom=valinux.co.jp; dkim=pass (1024-bit key) header.d=valinux.co.jp header.i=@valinux.co.jp header.b=f5OUX8BE; arc=fail smtp.client-ip=52.101.228.143
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=valinux.co.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=valinux.co.jp
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jBBFXSsfD1PoNJkbPstLriGwFCVCNx6jIKcyTgkMJB32mnoJqXO6/ZhvsSzLT3h1TS0bJxPyBNO1UCklDnnt1cwbys3IOHMn3ZubkpzOn8SuED1vnPZUXKyK0gDrFY3BmHk1sS9e7v3UxB1ViXhoGHnHC+fJaaQZg3rf/V5V6PMCsFlsJitCiybe60aZ2obrqDv5wZSbnK5WcMngLpvrjUXJVdXM5jLOVKPax2HmS2qeHb8+dtlEARbLZaUd0e/sfQ0B90Xc2bY8dc2z/0zdoDX3ogiAzG4DYAnQ9BMAxwV3q6dzKlpCQKWEkegbDKuJ4p+H+s392bcN7cJfSw3Mug==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Wl/YeUnhSCcKLEJxoTd5kxaEDSvUs5PMtEB1hvTrasA=;
+ b=T3CucvoAhJPin9sh6RDZgWn7QbN++koha+JDfcSYfqP01/BJLTbqQXqfXiQNO2yM4s/IU0RIqc0X7Vrx3ZyWyLW2BVudFFbmn62SVhBO88BRraMhstItsIN+BNCcuxzVcxxmuLlepJdSZnQwDSt31ywAJPE/aWq04zRTroRNMHRiiBq8pwKPPgT39n9LEBFh7jPnDgoWTGhljtl0MNybfGnzD6zP6osI3B6833RwKjoEzXl3KQtWgUKA/hxIwjpMVEwf1aLJCZmXtfrRai5HUdYGyrpXuNfpYfx5etb30TFQNJ28z5lxX65zm7p43HyAKNLeNZHUQ9aybId+QTnOcw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=valinux.co.jp; dmarc=pass action=none
+ header.from=valinux.co.jp; dkim=pass header.d=valinux.co.jp; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=valinux.co.jp;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Wl/YeUnhSCcKLEJxoTd5kxaEDSvUs5PMtEB1hvTrasA=;
+ b=f5OUX8BEhvJBO/umDbuJTlKruTFPuRhQVCnAHIONYzSwqaJYFwbpUiJg4ar9aRFcrzcXjY6LsDn+qpSsz1OTFUDO6JVgdYlNthR91VDS6+83KPuck3ktFiIAcIZQ1tsoHXVMbjKDO3twJBin1HTgpU0vc0rFrizrBFCxc/+FTDM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=valinux.co.jp;
+Received: from TY7P286MB7722.JPNP286.PROD.OUTLOOK.COM (2603:1096:405:38f::10)
+ by TYWP286MB2618.JPNP286.PROD.OUTLOOK.COM (2603:1096:400:249::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.2; Wed, 7 Jan
+ 2026 15:13:20 +0000
+Received: from TY7P286MB7722.JPNP286.PROD.OUTLOOK.COM
+ ([fe80::2305:327c:28ec:9b32]) by TY7P286MB7722.JPNP286.PROD.OUTLOOK.COM
+ ([fe80::2305:327c:28ec:9b32%5]) with mapi id 15.20.9499.002; Wed, 7 Jan 2026
+ 15:13:20 +0000
+Date: Thu, 8 Jan 2026 00:13:19 +0900
+From: Koichiro Den <den@valinux.co.jp>
+To: Dave Jiang <dave.jiang@intel.com>
+Cc: "Frank.Li@nxp.com" <Frank.Li@nxp.com>, 
+	"ntb@lists.linux.dev" <ntb@lists.linux.dev>, "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, 
+	"dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>, 
+	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "mani@kernel.org" <mani@kernel.org>, 
+	"kwilczynski@kernel.org" <kwilczynski@kernel.org>, "kishon@kernel.org" <kishon@kernel.org>, 
+	"bhelgaas@google.com" <bhelgaas@google.com>, "corbet@lwn.net" <corbet@lwn.net>, 
+	"geert+renesas@glider.be" <geert+renesas@glider.be>, "magnus.damm@gmail.com" <magnus.damm@gmail.com>, 
+	"robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org" <krzk+dt@kernel.org>, 
+	"conor+dt@kernel.org" <conor+dt@kernel.org>, "vkoul@kernel.org" <vkoul@kernel.org>, 
+	"joro@8bytes.org" <joro@8bytes.org>, "will@kernel.org" <will@kernel.org>, 
+	"robin.murphy@arm.com" <robin.murphy@arm.com>, "jdmason@kudzu.us" <jdmason@kudzu.us>, 
+	"allenbh@gmail.com" <allenbh@gmail.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, 
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>, 
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
+	"Basavaraj.Natikar@amd.com" <Basavaraj.Natikar@amd.com>, "Shyam-sundar.S-k@amd.com" <Shyam-sundar.S-k@amd.com>, 
+	"kurt.schwemmer@microsemi.com" <kurt.schwemmer@microsemi.com>, "logang@deltatee.com" <logang@deltatee.com>, 
+	"jingoohan1@gmail.com" <jingoohan1@gmail.com>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>, 
+	"utkarsh02t@gmail.com" <utkarsh02t@gmail.com>, "jbrunet@baylibre.com" <jbrunet@baylibre.com>, 
+	"dlemoal@kernel.org" <dlemoal@kernel.org>, "arnd@arndb.de" <arnd@arndb.de>, 
+	"elfring@users.sourceforge.net" <elfring@users.sourceforge.net>
+Subject: Re: [RFC PATCH v3 35/35] Documentation: driver-api: ntb: Document
+ remote eDMA transport backend
+Message-ID: <r4usafc6dmzdysypyycantypikzk2vqs2rvubbs7qnm7ad6k4t@qudeqfafzsjm>
+References: <20251217151609.3162665-1-den@valinux.co.jp>
+ <20251217151609.3162665-36-den@valinux.co.jp>
+ <77ae1b02-ff32-4694-9b34-bc49c85c6c82@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <77ae1b02-ff32-4694-9b34-bc49c85c6c82@intel.com>
+X-ClientProxiedBy: TYCP286CA0055.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:400:2b5::10) To TY7P286MB7722.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:405:38f::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: TY7P286MB7722:EE_|TYWP286MB2618:EE_
+X-MS-Office365-Filtering-Correlation-Id: 78bc39fe-9c73-4f24-61bc-08de4dff4b0d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|7416014|10070799003|376014|27256017;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?eEaayL2Zi76weANX73n0tTKsfzZ4oDQ+9ua9vXd/ne0jqcUjca6cX5TwcuHz?=
+ =?us-ascii?Q?Q9ksSTXq63mWOOWo+HMqett6PMZtR/HbD4ozRmVGkiQM8RsU+dIL8v25nPFC?=
+ =?us-ascii?Q?j1Ch1zi4R6NqCyPFE2gcYf+5GgNPQkXdvsYOfjVcVOcJ7LEGoaHNZid9aAu5?=
+ =?us-ascii?Q?5/P3Xoc+du3/rnMM/jWys6CGWAeAsmIEuasa7SdXI1n878cRFJiNGJxZ+osN?=
+ =?us-ascii?Q?IlkDMV5zrillIX7ivF1SshVbrhM/hIf1wCNiAzLIXhel0sa6VNAvpTfNvRdr?=
+ =?us-ascii?Q?kcvKUg0DxhOuAMbEv41J3PmD832YBX1a6RpuWAfJjOxJCjMTJUP0WAdhZYCg?=
+ =?us-ascii?Q?hEEDJneQzCIaCqGKV4p9b4QEcX6n+xNYPtL40Qzj2kbjHYgz9uR+r5pw6rZy?=
+ =?us-ascii?Q?fhGHjvcpHdgWpSCFjgD/RQ/XzlpT0y6+24lgZGesIxGxNDVyK8YKL3Zi9OU/?=
+ =?us-ascii?Q?q5lublotASgGIXChk2JIfM/MJ2KMaPBThEFWc+YK9J3yeNlBTuB9L34xzj28?=
+ =?us-ascii?Q?hL7EGBNZ/xC2+R0I/mk7UcvFsMM3lracKIe3+PcPMGx7GfWBMyMMZnqIfoJH?=
+ =?us-ascii?Q?JadC7pLJBKDaEmAg6RBw1nuv8GyfKAhIkuw+AfqWlPytoSdF/wyobk+ubjeR?=
+ =?us-ascii?Q?XNCT7wqYj76UdZ7J7QQUORkc8Yi83bMSDLr1um8SyMflAhimzZOXPkTP2vKq?=
+ =?us-ascii?Q?FQZPlpXv0XskT8inUlP6NMtiUrVL0o7LEHN7cH+EEcPl/YEdWqZ9x/M12UtC?=
+ =?us-ascii?Q?OQ0vbyAxJiQW9VSjSiyezepxO28jzIQ266WWdYbYdU/oRXUvk6pwO3mmfUxN?=
+ =?us-ascii?Q?+DaYFm2OjSuSFHNix62kliFlPqcpI9xKA0rJBIiKlMGgJboyv/RivzsI1Fld?=
+ =?us-ascii?Q?TRGVXYiiUpq8LmfCmxE83fy2xH+Vxx0Vh6m58t7Byq5I7alITD2OspisBrPe?=
+ =?us-ascii?Q?kqsOzrD/Sxuim+q/E+2Vx5cbJJqQTIshXgaoxwPv+ThVQniaCRwbWi+mEt9p?=
+ =?us-ascii?Q?AaqTKsrWIIadSmD2iXNZGiowawMnWF4W7JwABXWEx2slcFIZ/G9TUTAZ55A/?=
+ =?us-ascii?Q?eYWiiQNbjGz8uqq+FgsiRRpUCV4T8rX6jjKoAwbyn/pqgmVrXPdzzLIAxTIv?=
+ =?us-ascii?Q?q5L/qPagsjnGMf9LXQCUiEujl9oRl0Xxy5GzozDzHWs3xBfIV3E+SrWpdeey?=
+ =?us-ascii?Q?RECQoeE2bcaR9mU4AvVmXRQv1FhS9xraRdmL4I1o0bUkWMWlFXfHh9YHEDDX?=
+ =?us-ascii?Q?V30bAFXSAudlMGaz8pgIcp1qqREeGE+2gc6k6A7b2r7RMTBaPH+5Bdwlz1bU?=
+ =?us-ascii?Q?AR1BalBkpS6thruihmJn9Vj8bqnIirnT+3W5C0+FIsg3S10jPQZLY2Sm4eEt?=
+ =?us-ascii?Q?K07oKlFYfHfDBxRL/wYXZkofQ9p5tyDaoHQksA6C+arku37F5g2CDSny/I5M?=
+ =?us-ascii?Q?lOO89UWcjgJ866QK+B60PLWFzzJzAceeHUisVFBRApNc9+5Ayyx2AxU30dVm?=
+ =?us-ascii?Q?Hw2q3W7DoGMNWrxus8126ailfxt6EOHnmZn6?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY7P286MB7722.JPNP286.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(10070799003)(376014)(27256017);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?8kOUDN5PidPUvrtHN57GPWg86V0x553UjyE6SuFifGTSqWXTC2vsuMy9NfvC?=
+ =?us-ascii?Q?Gy69/ZbypR17on3eZQjJZcrrMbFjVfUPmnoS3JrFguSwXGx092tE6jHyagUA?=
+ =?us-ascii?Q?1TAQvTt00MUFAUwp5GYocEGraDYIG6eeSm1JrtK5F5DUoknb7KYavmyYv3Qa?=
+ =?us-ascii?Q?5Lf50p7E/P0gI8xQ3inJJoFme4muGnmZ8LjugdLCD9oRBMTURRY0LYmfsIx9?=
+ =?us-ascii?Q?3zChGR6WOdJjuR3L0R/02IJ4isWkosmPcDVIZvOyNdzqvLwvUSuiexHoCE8s?=
+ =?us-ascii?Q?N/rSacZkYHrPWNjFzh1j3eC119NEzzY1qlymVuUEvO5lieQcr+1GVy5spSRp?=
+ =?us-ascii?Q?me9xo9eTFWp7Njsd2sc65uiIq/PLqF/rFUI6ksOSArPEyOttnZ4bv3Tru5Gu?=
+ =?us-ascii?Q?wFNmgz0fh8fWx8NWJ5UlAp1koL31s/ADOLsKDNdD8z0C/kaErBvwvHhaKRDi?=
+ =?us-ascii?Q?g/YhDbTTAn2OQvMro1gwdz/nyquExvE3RUweoUxnMCZPqvwEIqxv6Ynwk+hS?=
+ =?us-ascii?Q?SCtHzHba+lUIrU20oJ1KGG3Rd4sFi5zTtGnWrjxTs/pye0sdh0bg7qGh4vrS?=
+ =?us-ascii?Q?HxcNYiIFMYaa5n4rtVM9/UXsPg83inwH894RVnPZoXDPVOc+w4/0piJB/byJ?=
+ =?us-ascii?Q?0oX1+6fgM5Btf1F02M3hMwuXlW9YQJkyZCVnO1u0ZODFEUtvealQLSJPK8Y+?=
+ =?us-ascii?Q?XvKJOdhqac6H2GpUKLOQ+3mrfkcUtqCnf6nCHRNlAzHs8DowXITC1ah3aF58?=
+ =?us-ascii?Q?Yx/H767Tz/gCSIT04kcKnMe8AP1COlOLwVQA3qOj0xRxggJnZgd6ioMTjy81?=
+ =?us-ascii?Q?pd0oB8EUXvJuVPRcS3sgtFhjikk+eE+O89elUlqCcF8BEK/Wb4nm2+jgVoh/?=
+ =?us-ascii?Q?SWDHDDVsU7kIsrfPj9TR9NUejP2ZjoSQiYk98w9mvMkEVfKdFdMJuwVNXGlL?=
+ =?us-ascii?Q?jDyoxZihiDJekmPsxMENJuVeMl4F12J+PwzzMeWMvzE8rq8lQkIE/7Qvqkvf?=
+ =?us-ascii?Q?+mBnf2PJHtCHpXKgFjNotovRSiNhJSNMJBSOhPtH87jJ0HuQ1T3D5rfm1LaA?=
+ =?us-ascii?Q?MXdU32pti5U5t/04AyNcUzzNE0jM4ARPrTaUlaK1XOP0tdbElSMMMfDg1qxw?=
+ =?us-ascii?Q?5F1xVXbchV2dL3ET/mHho8nKCPvu64UcqIDkco2BOMjI+D70Vk6pOffJsPus?=
+ =?us-ascii?Q?/wCm2tV+k5bjMs4wEx6KkDb8/Yn7JwkZVtNTI2Wq9e7rmndGCT+gxXXz6nJw?=
+ =?us-ascii?Q?mgknCoGM/vdy5a+EqA1qZG4th8bDruPgdntjsJ7lH2cSM10OTIgn7HhSXttl?=
+ =?us-ascii?Q?JLd9IBxtlhnF1WdyIYyMKdhQZ4c1XYF3jUjE1QRubhkfNhuZjwAQjtgdSdHO?=
+ =?us-ascii?Q?G4njN2mCIOmaG72XUD+ZlQTo9Ln+NmyS9hxTw23fxyvGPCCzFT1p2F+M9w9d?=
+ =?us-ascii?Q?wUrn6HVorQlEpEddD84rdDsMQ/YjPMobhyIg/IgvmAqYTDCQa9w32eaOI6MJ?=
+ =?us-ascii?Q?oIPCVi25YrE34KmhZq+bWQc7zWmmT71F6jCjIMOzTDbEDcvS3uSsOWlp/j8Y?=
+ =?us-ascii?Q?ZqsSZsQeh42S0xKdaNc1RKLQGpfuqLH4rMzG5gN+OgR2y9/JgRjEP4vu0XWW?=
+ =?us-ascii?Q?OfbCujTe1m4bGvIMQBF3bbizAdlV7U+AukDoQfMbhXam2jf4wmG6XmhLJXut?=
+ =?us-ascii?Q?1Yr0g9ScFJzGPEVXoiIw7Ef2YQ78TO96c8rct4qaXUz1bOaQruh1R0kb3np4?=
+ =?us-ascii?Q?mVY8sNLX8DhGssofc+xAvrnCy0j62NXzVyvHotlSdDfoHkyFuIRe?=
+X-OriginatorOrg: valinux.co.jp
+X-MS-Exchange-CrossTenant-Network-Message-Id: 78bc39fe-9c73-4f24-61bc-08de4dff4b0d
+X-MS-Exchange-CrossTenant-AuthSource: TY7P286MB7722.JPNP286.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2026 15:13:20.4816
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 7a57bee8-f73d-4c5f-a4f7-d72c91c8c111
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DCJgdi+E+L2Xpt9sWYrSZD2wSBhmGdDlo7F9jG2xMRKCX+coeKmXNAyV9N/WHwsJmVfrmMJPMbZ/VckB21Et7Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYWP286MB2618
 
-Mahdi Faramarzpour wrote:
-> On Tue, Jan 6, 2026 at 10:52=E2=80=AFPM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Mahdi Faramarzpour wrote:
-> > > On Tue, Jan 6, 2026 at 5:24=E2=80=AFAM Jakub Kicinski <kuba@kernel.=
-org> wrote:
-> > > >
-> > > > On Mon,  5 Jan 2026 15:17:32 +0330 Mahdi Faramarzpour wrote:
-> > > > > This commit adds SNMP drop count increment for the packets in
-> > > > > per NUMA queues which were introduced in commit b650bf0977d3
-> > > > > ("udp: remove busylock and add per NUMA queues").
-> >
-> > Can you give some rationale why the existing counters are insufficien=
-t
-> > and why you chose to change then number of counters you suggest
-> > between revisions of your patch?
-> >
-> The difference between revisions is due to me realizing that the only e=
-rror the
-> udp_rmem_schedule returns is ENOBUFS, which is mapped to UDP_MIB_MEMERR=
-ORS
-> (refer to function __udp_queue_rcv_skb), and thus UDP_MIB_RCVBUFERRORS
-> need not increase.
+On Wed, Jan 07, 2026 at 06:09:38AM +0900, Dave Jiang wrote:
+> 
+> 
+> On 12/17/25 8:16 AM, Koichiro Den wrote:
+> > Add a description of the ntb_transport backend architecture and the new
+> > remote eDMA backed mode introduced by CONFIG_NTB_TRANSPORT_EDMA and the
+> > use_remote_edma module parameter.
+> > 
+> > Signed-off-by: Koichiro Den <den@valinux.co.jp>
+> > ---
+> >  Documentation/driver-api/ntb.rst | 58 ++++++++++++++++++++++++++++++++
+> >  1 file changed, 58 insertions(+)
+> > 
+> > diff --git a/Documentation/driver-api/ntb.rst b/Documentation/driver-api/ntb.rst
+> > index a49c41383779..eb7b889d17c4 100644
+> > --- a/Documentation/driver-api/ntb.rst
+> > +++ b/Documentation/driver-api/ntb.rst
+> > @@ -132,6 +132,64 @@ Transport queue pair.  Network data is copied between socket buffers and the
+> >  Transport queue pair buffer.  The Transport client may be used for other things
+> >  besides Netdev, however no other applications have yet been written.
+> >  
+> > +Transport backends
+> > +~~~~~~~~~~~~~~~~~~
+> > +
+> > +The ``ntb_transport`` core driver implements a generic "queue pair"
+> > +abstraction on top of the memory windows exported by the NTB hardware. Each
+> > +queue pair has a TX and an RX ring and is used by client drivers such as
+> > +``ntb_netdev`` to exchange variable sized payloads with the peer.
+> > +
+> > +There are currently two ways for ``ntb_transport`` to move payload data
+> > +between the local system memory and the peer:
+> > +
+> > +* The default backend copies data between the caller buffers and the TX/RX
+> > +  rings in the memory windows using ``memcpy()`` on the local CPU or, when
+> > +  the ``use_dma`` module parameter is set, a local DMA engine via the
+> > +  standard dmaengine ``DMA_MEMCPY`` interface.
+> > +
+> > +* When ``CONFIG_NTB_TRANSPORT_EDMA`` is enabled in the kernel configuration
+> > +  and the ``use_remote_edma`` module parameter is set at run time, a second
+> > +  backend uses a DesignWare eDMA engine that resides on the endpoint side
+> 
+> I would say "embedded DMA device" instead of a specific DesignWare eDMA engine to keep the transport generic. But provide a reference or link to DesignWare eDMA engine as reference.
 
-I see. Please make such a note in the revision changelog. See also
+That makes sense. I will switch the wording.
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#cha=
-nges-requested
+> 
+> > +  of the NTB. In this mode the endpoint driver exposes a dedicated peer
+> > +  memory window that contains the eDMA register block together with a small
+> > +  control structure and per-channel linked-list rings only for read
+> > +  channels. The host ioremaps this window and configures a dmaengine
+> > +  device. The endpoint uses its local eDMA write channels for its TX
+> > +  transfer, while the host side uses the remote eDMA read channels for its
+> > +  TX transfer.
+> 
+> Can you provide some more text on the data flow from one host to the other for eDMA vs via host based DMA in the current transport? i.e. currently for a transmit, user data gets copied into an skbuff by the network stack, and then the local host copies it into the ring buffer on the remote host via DMA write (or CPU). And the remote host then copies out of the ring buffer entry to a kernel skbuff and back to user space on the receiver side. How does it now work with eDMA? Also can the mechanism used by eDMA be achieved with a host DMA setup or is the eDMA mechanism specifically tied to the DW hardware design? Would be nice to move the ASCII data flow diagram in the cover to documentation so we don't lose that.
 
-> > This code adds some cost to the hot path. The blamed commit added
-> > drop counters, most likely weighing the value of counters against
-> > their cost. I don't immediately see reason to revisit that.
-> >
-> AFAIU the drop_counter is per socket, while the counters added in this
-> patch correspond
-> to /proc/net/{snmp,snmp6} pseudofiles. This patch implements the todo
-> comment added in
-> the blamed commit.
+I'll add more text (and the ASCII data-flow diagram).
 
-Ah indeed.
+Thanks,
+Koichiro
 
-The entire logic can be inside the unlikely(to_drop) branch right?
-No need to initialize the counters in the hot path, or do the
-skb->protocol earlier?
-
-The previous busylock approach could also drop packets at this stage
-(goto uncharge_drop), and the skb is also dropped if exceeding rcvbuf.
-Neither of those conditions update SNMP stats. I'd like to understand
-what makes this case different.
-
-> > > >
-> > > > You must not submit more than one version of a patch within a 24h=
-
-> > > > period.
-> > > Hi Jakub and sorry for the noise, didn't know that. Is there any wa=
-y to check
-> > > my patch against all patchwork checks ,specially the AI-reviewer
-> > > before submitting it?
-> >
-> > See https://www.kernel.org/doc/html/latest/process/maintainer-netdev.=
-html
-> >
-> thanks.
-
-
+> 
+> DJ
+> 
+> > +
+> > +The ``ntb_transport`` core routes queue pair operations (enqueue,
+> > +completion polling, link bring-up/teardown etc.) through a small
+> > +backend-ops structure so that both implementations can coexist in the same
+> > +module without affecting the public queue pair API used by clients. From a
+> > +client driver's point of view (for example ``ntb_netdev``) the queue pair
+> > +interface is the same regardless of which backend is active.
+> > +
+> > +When ``use_remote_edma`` is not enabled, ``ntb_transport`` behaves as in
+> > +previous kernels before the optional ``use_remote_edma`` parameter was
+> > +introduced, and continues to use the shared-memory backend. Existing
+> > +configurations that do not select the eDMA backend therefore see no
+> > +behavioural change.
+> > +
+> > +In the remote eDMA mode host-to-endpoint notifications are delivered via a
+> > +dedicated DMA read channel located at the endpoint. In both the default
+> > +backend mode and the remote eDMA mode, endpoint-to-host notifications are
+> > +backed by native MSI support on DW EPC, even when ``use_msi=0``.  Because
+> > +of this, the ``use_msi`` module parameter has no effect when
+> > +``use_remote_edma=1`` on the host.
+> > +
+> > +At a high level, enabling the remote eDMA transport backend requires:
+> > +
+> > +* building the kernel with ``CONFIG_NTB_TRANSPORT`` and
+> > +  ``CONFIG_NTB_TRANSPORT_EDMA`` enabled,
+> > +* configuring the NTB endpoint so that it exposes a memory window containing
+> > +  the eDMA register block, descriptor rings and control structure expected by
+> > +  the helper driver, and
+> > +* loading ``ntb_transport`` on the host with ``use_remote_edma=1`` so that
+> > +  the eDMA-backed backend is selected instead of the default shared-memory
+> > +  backend.
+> > +
+> >  NTB Ping Pong Test Client (ntb\_pingpong)
+> >  -----------------------------------------
+> >  
+> 
 
