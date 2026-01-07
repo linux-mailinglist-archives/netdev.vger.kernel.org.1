@@ -1,163 +1,93 @@
-Return-Path: <netdev+bounces-247628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 655D7CFC8A1
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 09:13:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E22BCFC9A0
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 09:28:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 59A2630021D1
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 08:13:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AF28D3011A47
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 08:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 540C1284B3B;
-	Wed,  7 Jan 2026 08:13:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0977527FB3E;
+	Wed,  7 Jan 2026 08:24:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b="ankoLIDO"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fiTzTVNN"
 X-Original-To: netdev@vger.kernel.org
-Received: from dilbert.mork.no (dilbert.mork.no [65.108.154.246])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4F3275B15;
-	Wed,  7 Jan 2026 08:13:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.108.154.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6502E285CBC
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 08:24:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767773609; cv=none; b=hZr8sT6cSA0YmKMzX7B3fs6NXxoOLmZOjhwiqkvqOgGR54W29PYSSBdezRJpP9Zl8NpN2RbPYQKBqQlOSiqbXDWEWf4/lkLY2cW3ZUzLeqNFc/cdaqMa6O553DDlGhXAwAmLyGPr+dDn84+7lsyWToA44GobxaqaHuzglnfDHQ4=
+	t=1767774257; cv=none; b=DjIwyUXbyBfRocE3IBXJs/DkYDyar0iMuf3msmRQa0zF++mq+bWUE6gNibemywcDvsHqzBq6MHTUAg2DinuPOvqD/PvODCJJc88yGtWEUSJFURctmczf4EB0UHTHtnVcLs6Irhy9q2qYDU8P9GCA0PVdm8wPb2G2uOeB52Tpsjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767773609; c=relaxed/simple;
-	bh=fQ+XNO/PFxHDKCqaH5FA98OR+dK9zecdjBQiDuPaCes=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=r8EFRcDdTn20S1evroWK7RfUqXazdHUPmlM6sUuKoZ6J8QQCrQFJa0pxomzSZCXOYLgE8ep+m/dfXyta/QIN2lA4j9Ll6Oig1s9p2oK8yc8VDntruI95o0jWE9G6CfiYNOxc1STRAM7rrkyVWUDau6fxSyXgKe5GaGBKvO4/i70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no; spf=pass smtp.mailfrom=miraculix.mork.no; dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b=ankoLIDO; arc=none smtp.client-ip=65.108.154.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=miraculix.mork.no
-Authentication-Results: dilbert.mork.no;
-	dkim=pass (1024-bit key; secure) header.d=mork.no header.i=@mork.no header.a=rsa-sha256 header.s=b header.b=ankoLIDO;
-	dkim-atps=neutral
-Received: from canardo.dyn.mork.no ([IPv6:2a01:799:10e2:d900:0:0:0:1])
-	(authenticated bits=0)
-	by dilbert.mork.no (8.18.1/8.18.1) with ESMTPSA id 6078CTcF325307
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Wed, 7 Jan 2026 08:12:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mork.no; s=b;
-	t=1767773549; bh=GMHhwOjApnNmIM/IGLBoV1hrqPEAl7/n8Dd5Zu2tbRI=;
-	h=From:To:Cc:Subject:References:Date:Message-ID:From;
-	b=ankoLIDOlBbWRMEwsPRzbCSIiwL+79ngKEnXu1Sw/jG25R6BG0iCcr78w5FCqaLGe
-	 qL/S5kvI5XRfoQJA0iBOuWGsaC+rhmo2TMFDiqI9zl8XQfc9y9CM/Fniri9jDTFzTJ
-	 IVvvoNkkDHUzvcXmdsNBSxYtQTJfH5vU5ssD3dH4=
-Received: from miraculix.mork.no ([IPv6:2a01:799:10e2:d90a:6f50:7559:681d:630c])
-	(authenticated bits=0)
-	by canardo.dyn.mork.no (8.18.1/8.18.1) with ESMTPSA id 6078CTBl1975768
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Wed, 7 Jan 2026 09:12:29 +0100
-Received: (nullmailer pid 651874 invoked by uid 1000);
-	Wed, 07 Jan 2026 08:12:28 -0000
-From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-phy@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org,
-        Daniel Golle <daniel@makrotopia.org>,
-        Horatiu Vultur <horatiu.vultur@microchip.com>,
-        Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-        Russell King <linux@armlinux.org.uk>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-        Neil Armstrong <neil.armstrong@linaro.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-        Eric Woudstra <ericwouds@gmail.com>,
-        Marek =?utf-8?Q?Beh=C3=BAn?= <kabel@kernel.org>,
-        Lee Jones <lee@kernel.org>,
-        Patrice Chotard <patrice.chotard@foss.st.com>
-Subject: Re: [PATCH v2 net-next 05/10] phy: add phy_get_rx_polarity() and
- phy_get_tx_polarity()
-In-Reply-To: <20260103210403.438687-6-vladimir.oltean@nxp.com> (Vladimir
-	Oltean's message of "Sat, 3 Jan 2026 23:03:58 +0200")
-Organization: m
-References: <20260103210403.438687-1-vladimir.oltean@nxp.com>
-	<20260103210403.438687-6-vladimir.oltean@nxp.com>
-Date: Wed, 07 Jan 2026 09:12:28 +0100
-Message-ID: <87jyxtaljn.fsf@miraculix.mork.no>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1767774257; c=relaxed/simple;
+	bh=54aj3R0iIaS17+MZo0BMstHwz1AwMwxQ3C2BjShH57Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tmTmfgQO6u3IjXUp/sywHIT2T3Jq8K8tRqaWY3WhH/Th8rngjNz69J/x4LETO/6vjAKDzODvtCgBiAcbJPD8gY/4+fzDoaeChrVMTu3mjsJwcRlYN2ffplxla7TiwYT8bwt1uYVaxiOZZgedT7v1krAB+rm4EFfd9bU0JqppNXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fiTzTVNN; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 3EE2EC1EC8D;
+	Wed,  7 Jan 2026 08:23:44 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 45FAC606F8;
+	Wed,  7 Jan 2026 08:24:10 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 25FF0103C8597;
+	Wed,  7 Jan 2026 09:24:02 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1767774249; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=gR/y6Uc5IExI1wlxJ6ehnKNiWxH7FKN74OHl8YN3mA0=;
+	b=fiTzTVNNLJb0Uw8Jv0vWqooScqqTYklPwX2Dhw4LZBn3N80l/kHhwqLjkryGv/ra9alaiB
+	5hv+9pfn0gAF0m83ZMFWxvwjGo0458GDt5VYm4lzj/pgzWNe3M+Z7IuRety+tknX2BpJ6U
+	5Jz5fWyaN6UPog10egFN5FOUqYk2HxIoJI9Ugo7+kAr1h6HSlp5UTHazRvw6VKglEMzMNE
+	AyGlZZY6qGFqrlimOoFxFktvinoNbv/LuufrkCd+ODTwwLYasOj8MMmeA+JOvlAwZcW6hA
+	aj3E8kgxhy8EDcTrgSozdGroxAfS0I/iwML02iDoa+qLt9WD/kP9ZjoZqaLFmQ==
+Message-ID: <74c648d8-ab86-42b4-a20d-aa0e5ab6f57b@bootlin.com>
+Date: Wed, 7 Jan 2026 09:24:02 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Virus-Scanned: clamav-milter 1.4.3 at canardo.mork.no
-X-Virus-Status: Clean
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/9] net: stmmac: dwmac4: remove duplicated
+ definitions
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>
+References: <aV1w9yxPwL990yZJ@shell.armlinux.org.uk>
+ <E1vdDi0-00000002E1J-1SNG@rmk-PC.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <E1vdDi0-00000002E1J-1SNG@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-Vladimir Oltean <vladimir.oltean@nxp.com> writes:
+Hi Russell,
 
-> +static int fwnode_get_u32_prop_for_name(struct fwnode_handle *fwnode,
-> +					const char *name,
-> +					const char *props_title,
-> +					const char *names_title,
-> +					unsigned int default_val,
-> +					unsigned int *val)
-> +{
-> +	int err, n_props, n_names, idx =3D -1;
-> +	u32 *props;
-> +
-> +	if (!name) {
-> +		pr_err("Lookup key inside \"%s\" is mandatory\n", names_title);
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (!fwnode) {
-> +		*val =3D default_val;
-> +		return 0;
-> +	}
-> +
-> +	err =3D fwnode_property_count_u32(fwnode, props_title);
-> +	if (err < 0)
-> +		return err;
-> +	if (err =3D=3D 0) {
-> +		*val =3D default_val;
-> +		return 0;
-> +	}
-> +	n_props =3D err;
+On 06/01/2026 21:31, Russell King (Oracle) wrote:
+> dwmac4.h duplicates some of the debug register definitions. Remove
+> the second copy.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-I tried using this in the air_en8811h driver and started wondering if I
-have misunderstood something.
+Nice. I was able to confirm with 'grep define dwmac4.h | sort | uniq -d'
+that what you remove are all the duplicates, and only the duplicates :)
 
-The problem I have is that fwnode_property_count_u32() returns -EINVAL
-if props_title is missing.  So if you have a node with the legacy
-"airoha,pnswap-rx" property instead of "rx-polarity", or more common: no
-polariy property at all, then we see -EINVAL returned from
-phy_get_rx_polarity().  Which is propagated back to config_init() and
-the phy fails to attach.  That can't be the intention?
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-The behaviour I expected is described by this test:
+Maxime
 
-
-/* Test: tx-polarity property is missing */
-static void phy_test_tx_polarity_is_missing(struct kunit *test)
-{
-	static const struct property_entry entries[] =3D {
-		{}
-	};
-	struct fwnode_handle *node;
-	unsigned int val;
-	int ret;
-
-	node =3D fwnode_create_software_node(entries, NULL);
-	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, node);
-
-	ret =3D phy_get_manual_tx_polarity(node, "sgmi", &val);
-	KUNIT_EXPECT_EQ(test, ret, 0);
-	KUNIT_EXPECT_EQ(test, val, PHY_POL_NORMAL);
-
-	fwnode_remove_software_node(node);
-}
-
-
-
-Bj=C3=B8rn
 
