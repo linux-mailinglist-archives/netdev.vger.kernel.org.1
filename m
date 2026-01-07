@@ -1,111 +1,144 @@
-Return-Path: <netdev+bounces-247620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08B65CFC597
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 08:30:48 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13467CFC58B
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 08:29:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0CE613029C3E
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 07:30:47 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1F8C230010C4
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 07:29:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 741F2225A35;
-	Wed,  7 Jan 2026 07:30:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="lp0B3+kU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24F17287505;
+	Wed,  7 Jan 2026 07:29:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com [209.85.210.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2C91D6AA;
-	Wed,  7 Jan 2026 07:30:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51208286413
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 07:29:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767771045; cv=none; b=aImwR624wL/6ppM2lVQCfFBoNfkjOvkVeRMKHdel1OOqTtIxEwLKc50KfHApldNJWw2xMAqCvOQ5lSwG5Z96n+jjPkdtMofgfdXeZYTvighxlj1g58zLl62GFSJXuuLtYlFEhzImBxPBR316Yc4Qtzsbp5BzLBUJpc9LTXByE3I=
+	t=1767770984; cv=none; b=s6UUgp4/5bSVUVxBjyTZVhSoDkcH1lGKI+vxUVZIYp5UuNlt+T7KZI+L28cTh2UqXwyFJAqCqhO++gW6Uow7Sp2dglI9FAV9klSiGzoBWDO80Olo1ObRd0wXkx2yIHAfu/Q+Qk4UffRkbBaOozWRPc13bsvTaDakpS0/41RRmEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767771045; c=relaxed/simple;
-	bh=wLyagcN9auWDH0AMqrqEQdu5ZjLCXtjXEEOWvWCsyF0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=e8XNYLqNO+7um0Oj0cbFw8kJBRaXzhgq/LvpIcSa38IXRmIPoz8Xlx/fr7P/V78jBzDbbj6eYgmrC3F9gy4TT0xi4mfUSv07hdmjKXqOWI/g8jwqu84Jc7J1bxoVrSgQecDt/SbDnDm7e9714rkaswYrTly9fB78jGnzirrAh58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=lp0B3+kU; arc=none smtp.client-ip=117.135.210.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=wLyagcN9auWDH0AMqrqEQdu5ZjLCXtjXEEOWvWCsyF0=; b=l
-	p0B3+kUA2d8r0bOr2+CSMqDck9P4QA48NGynGxTeZi+k5efGCjiN2t1Q3LHTdPYc
-	UOq3YK5tBsMglV5NB6uyxMnnlC97pVFGYyJ1TrKLdenipIEZEJp1qbxIk0NqKHIr
-	wyB5Mg9LScSzNfipznbUYjQt2npyxRdAFQ4BKiq6to=
-Received: from slark_xiao$163.com (
- [2408:8459:3860:79dc:e48d:3bf1:6788:3ccb] ) by ajax-webmail-wmsvr-40-127
- (Coremail) ; Wed, 7 Jan 2026 15:29:24 +0800 (CST)
-Date: Wed, 7 Jan 2026 15:29:24 +0800 (CST)
-From: "Slark Xiao" <slark_xiao@163.com>
-To: "Sergey Ryazanov" <ryazanov.s.a@gmail.com>
-Cc: loic.poulain@oss.qualcomm.com, johannes@sipsolutions.net,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, mani@kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"Daniele Palmas" <dnlplm@gmail.com>
-Subject: Re:Re: [net-next v4 7/8] net: wwan: prevent premature device
- unregister when NMEA port is present
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
- 20250723(a044bf12) Copyright (c) 2002-2026 www.mailtech.cn 163com
-In-Reply-To: <83c51a99-038d-4283-9a39-97129966a500@gmail.com>
-References: <20260105102018.62731-1-slark_xiao@163.com>
- <20260105102018.62731-8-slark_xiao@163.com>
- <83c51a99-038d-4283-9a39-97129966a500@gmail.com>
-X-NTES-SC: AL_Qu2dBfucv0Et4iGRYekfmk8Sg+84W8K3v/0v1YVQOpF8jA/p8D8rXnZKEETb8uSdCjyerB63dQJQxMhbR6tAWYkJXRrvxDGQzXjOWRxKChVO9g==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1767770984; c=relaxed/simple;
+	bh=GJkxCE6w3KPklk8iFvgegRwUzCMBjTJPCQu7m3NHEeE=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=iKs+cWIVfAg5I/n5SGfeRFqT4Kn4R8YDf18o46VUxxxA56fTFfKkLxClFRP35eiHdG28srfD6ISyFLL/jzW5EWC5/A7vS8hRgYxhxUS5HsTCFjQ7Y03gjVgE+dKrgPOt4UAbAVoHro0WNGZUoF7+dfM/zn9CJ+KQvMceu3osL/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-7caf4cdfa28so3180233a34.0
+        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 23:29:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767770981; x=1768375781;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MoybaKXdj283M2AxUCCehLSLuVC7znL/PT0tESBuOEc=;
+        b=WQn8GhlPcs1SJpT7AD+XSNlt1ZNbnCzv24RjCabeaH2xyLHenvzWrw0gy2tAr7oIev
+         fX/lgGXAdRl5/dlYzeHKd37aJe4vMbTe178GjKV+lH57uRYhzrn1mWnmh59yh6CVfEJ+
+         9jd8R7WP/X81HVY0IhuTYS0i9H1peHpFif9Z+t03RzWajlcD9htL6jNeaJqiS2G6uvPB
+         U4VAFl/bXUwuikyeod3xUL0xv8J132gobbaQFIFA4eXR+rrf/+pmF7bPGeLLHJDiel3s
+         bhwCcbbb58qOofvCpy/J3pN60fZKnPw+K9dFJkAEqv53zeilZuVYLkWoRxc0a7yaY8cY
+         VEOA==
+X-Forwarded-Encrypted: i=1; AJvYcCWFAa8nbH8XrCUa2kR0ID75hNMeRArXRDsZx0ZvPqlzrTAniIP74TrkxQ+jR7816KgSCOzWpxw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyfy7oara2/QbdjUadE3CJfukbTmBTSx7tBBEMpc4cPbFyibk7/
+	vnjTevt9Xc6ggm/5PKYV/KncdE2nrbgB+IjdmlRlQEl9o9P/cAxtWAQrw8wXlN+hQLwWByrdRv8
+	mK40dvRWsyhf3o8pyjX5l7Qg9Y38GeEi4dby4rc954JHIsqcd4bS5h0IbCHM=
+X-Google-Smtp-Source: AGHT+IFqMQVuMCLxQnYmm3zrWq/rFPMsuGHkTW8gwAwJXGgXzD5v6VG/qOtR8daXJAoQp0CT0MXl/N8gwmCqLVVcKlod+u+L6H7J
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <63fddbfb.60e7.19b975c40ea.Coremail.slark_xiao@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:fygvCgBXlypUC15pNeJRAA--.17370W
-X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/xtbCvxTJLmleC1RQ-QAA3J
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+X-Received: by 2002:a4a:dd0b:0:b0:654:18f9:10f4 with SMTP id
+ 006d021491bc7-65f54e4e232mr512495eaf.0.1767770981262; Tue, 06 Jan 2026
+ 23:29:41 -0800 (PST)
+Date: Tue, 06 Jan 2026 23:29:41 -0800
+In-Reply-To: <20260106164338.1738035-1-edumazet@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <695e0b65.050a0220.1c677c.0359.GAE@google.com>
+Subject: [syzbot ci] Re: net: update netdev_lock_{type,name}
+From: syzbot ci <syzbot+ci84807814270b24b7@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, eric.dumazet@gmail.com, 
+	horms@kernel.org, kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-CgpBdCAyMDI2LTAxLTA3IDA5OjA2OjA1LCAiU2VyZ2V5IFJ5YXphbm92IiA8cnlhemFub3Yucy5h
-QGdtYWlsLmNvbT4gd3JvdGU6Cj5IaSBTbGFyaywgTG9pYywKPgo+c29ycnkgZm9yIGxhdGUgam9p
-bmluZyB0aGUgZGlzY3Vzc2lvbiwgcGxlYXNlIGZpbmQgYSBkZXNpZ24gcXVlc3Rpb24gYmVsb3cu
-Cj4KPk9uIDEvNS8yNiAxMjoyMCwgU2xhcmsgWGlhbyB3cm90ZToKPj4gRnJvbTogTG9pYyBQb3Vs
-YWluIDxsb2ljLnBvdWxhaW5Ab3NzLnF1YWxjb21tLmNvbT4KPj4gCj4+IFRoZSBXV0FOIGNvcmUg
-dW5yZWdpc3RlcnMgdGhlIGRldmljZSB3aGVuIGl0IGhhcyBubyByZW1haW5pbmcgV1dBTiBvcHMK
-Pj4gb3IgY2hpbGQgZGV2aWNlcy4gRm9yIE5NRUEgcG9ydCB0eXBlcywgdGhlIGNoaWxkIGlzIHJl
-Z2lzdGVyZWQgdW5kZXIKPj4gdGhlIEdOU1MgY2xhc3MgaW5zdGVhZCBvZiBXV0FOLCBzbyB0aGUg
-Y29yZSBpbmNvcnJlY3RseSBhc3N1bWVzIHRoZXJlCj4+IGFyZSBubyBjaGlsZHJlbiBhbmQgdW5y
-ZWdpc3RlcnMgdGhlIFdXQU4gZGV2aWNlIHRvbyBlYXJseS4gVGhpcyBsZWFkcwo+PiB0byBhIHNl
-Y29uZCB1bnJlZ2lzdGVyIGF0dGVtcHQgYWZ0ZXIgdGhlIE5NRUEgZGV2aWNlIGlzIHJlbW92ZWQu
-Cj4+IAo+PiBUbyBmaXggdGhpcyBpc3N1ZSwgd2UgcmVnaXN0ZXIgYSB2aXJ0dWFsIFdXQU4gcG9y
-dCBkZXZpY2UgYWxvbmcgdGhlCj4+IEdOU1MgZGV2aWNlLCB0aGlzIGVuc3VyZXMgdGhlIFdXQU4g
-ZGV2aWNlIHJlbWFpbnMgcmVnaXN0ZXJlZCB1bnRpbAo+PiBhbGwgYXNzb2NpYXRlZCBwb3J0cywg
-aW5jbHVkaW5nIE5NRUEsIGFyZSBwcm9wZXJseSByZW1vdmVkLgo+Cj53d2FuIGNvcmUgYXNzdW1l
-cyB3aG9sZSByZXNwb25zaWJpbGl0eSBmb3IgbWFuYWdpbmcgYSBXV0FOIGRldmljZS4gV2UgCj5h
-bHJlYWR5IHVzZSB3d2FuX2NyZWF0ZV9kZXYoKS93d2FuX3JlbW92ZV9kZXYoKSBldmVyeXdoZXJl
-LiBCdXQsIHdlIGFyZSAKPmNoZWNraW5nIHRoZSByZW1pbmRpbmcgcmVmZXJlbmNlcyBpbiBhbiBp
-bXBsaWNpdCB3YXkgdXNpbmcgCj5kZXZpY2VfZm9yX2VhY2hfY2hpbGQoKSBhbmQgcmVnaXN0ZXJl
-ZCBPUFMgZXhpc3RlbmNlLiBUaHVzLCB3ZSBuZWVkIHRoaXMgCj50cmljayB3aXRoIGEgdmlydHVh
-bCBjaGlsZCBwb3J0Lgo+Cj5Eb2VzIGl0IG1ha2Ugc2Vuc2UgdG8gc3dpdGNoIHRvIGFuIGV4cGxp
-Y2l0IHJlZmVyZW5jZSBjb3VudGluZz8gV2UgY2FuIAo+aW50cm9kdWNlIHN1Y2ggY291bnRlciB0
-byB0aGUgd3dhbl9kZXZpY2Ugc3RydWN0dXJlLCBhbmQgCj5pbmNyZW1lbnQvZGVjcmVtZW50IGl0
-IG9uIGV2ZXJ5IHd3YW5fY3JlYXRlX2RldigpL3d3YW5fcmVtb3ZlX2RldigpIAo+Y2FsbC4gU28s
-IHdlIHdpbGwgZG8gZGV2aWNlX3VucmVnaXN0ZXIoKSB1cG9uIHJlZmVyZW5jZSBudW1iZXIgYmVj
-b21pbmcgCj56ZXJvLgo+Cj5JZiBpdCBzb3VuZHMgcHJvbWlzaW5nLCBJIGNhbiBzZW5kIGEgUkZD
-LCBsZXQncyBzYXksIHRvbW9ycm93LgoKVGhlIFJGQyBvbmx5IGZvciB0aGlzIHBhdGNoIG9yIHRo
-ZSBleGlzdGluZyBkZXNpZ24/IFNpbmNlIHRoZXJlIGlzIHByb2JsZW0KcmVwb3J0ZWQgaW7CoGh0
-dHBzOi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcvcHJvamVjdC9uZXRkZXZicGYvcGF0Y2gvMjAyNjAx
-MDUxMDIwMTguNjI3MzEtMy1zbGFya194aWFvQDE2My5jb20vIzI2NzIwODI4LgoKQ3VycmVudGx5
-IGRlc2lnbjoKwqDCoMKgIG1pbm9yID0gaWRhX2FsbG9jX3JhbmdlKCZtaW5vcnMsIDAsIFdXQU5f
-TUFYX01JTk9SUyAtIDEsIEdGUF9LRVJORUwpOwrCoMKgwqAgaWYgKG1pbm9yIDwgMCkKwqDCoMKg
-wqDCoMKgwqAgcmV0dXJuIG1pbm9yOwoKwqDCoMKgIHBvcnQtPmRldi5jbGFzcyA9ICZ3d2FuX2Ns
-YXNzOwovLyB3aGVuIGNkZXYgaXMgZmFsc2UsIG5vIGRldnQgd2FzIGFzc2lnbmVkLiBCdXQgd3dh
-bl9wb3J0X2Rlc3Ryb3koKSB1c2UgZGV2dCB0byBmcmVlCsKgwqDCoCBpZiAoY2RldikKwqDCoMKg
-wqDCoMKgwqAgcG9ydC0+ZGV2LmRldnQgPSBNS0RFVih3d2FuX21ham9yLCBtaW5vcik7CgpXZSBu
-ZWVkIHRvIGhhdmUgYSB1cGRhdGUgYmFzZWQgb24gdGhpcyBwYXRjaCBpZiB3ZSB3YW50IHRvIHVz
-ZSB0aGlzIG9uZSBpbiB0aGlzIHNlcmlhbC4KwqAK
+syzbot ci has tested the following series
+
+[v1] net: update netdev_lock_{type,name}
+https://lore.kernel.org/all/20260106164338.1738035-1-edumazet@google.com
+* [PATCH net] net: update netdev_lock_{type,name}
+
+and found the following issue:
+WARNING in netdev_init_one_queue
+
+Full report is available here:
+https://ci.syzbot.org/series/68d4719e-5ae3-402a-a73d-99450d0774b4
+
+***
+
+WARNING in netdev_init_one_queue
+
+tree:      net
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
+base:      1806d210e5a8f431ad4711766ae4a333d407d972
+arch:      amd64
+compiler:  Debian clang version 21.1.8 (++20251202083448+f68f64eb8130-1~exp1~20251202083504.46), Debian LLD 21.1.8
+config:    https://ci.syzbot.org/builds/1c4d3398-ae52-417f-943e-84be818a07a6/config
+
+------------[ cut here ]------------
+netdev_lock_pos() could not find dev_type=824
+WARNING: net/core/dev.c:527 at netdev_init_one_queue+0x1c5/0x440, CPU#1: syz-executor/6079
+Modules linked in:
+CPU: 1 UID: 0 PID: 6079 Comm: syz-executor Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:netdev_init_one_queue+0x1c7/0x440
+Code: bf 3f 00 00 00 e8 b9 14 74 f8 66 41 83 ff 3e 0f 87 59 01 00 00 e8 09 11 74 f8 eb 19 e8 02 11 74 f8 48 8d 3d 3b 32 82 06 89 ee <67> 48 0f b9 3a 41 bf 3e 00 00 00 4e 8d 24 fd e0 1f 90 8c 4c 89 e0
+RSP: 0018:ffffc90005487020 EFLAGS: 00010293
+RAX: ffffffff894e61fe RBX: ffff88816c381000 RCX: ffff8881047257c0
+RDX: 0000000000000000 RSI: 0000000000000338 RDI: ffffffff8fd09440
+RBP: 0000000000000338 R08: 0000000000000003 R09: 0000000000000000
+R10: 0000000000000010 R11: ffffffff81ae36b0 R12: 000000000000fffe
+R13: dffffc0000000000 R14: 000000000000003e R15: ffffffff8c9022d8
+FS:  0000555586066500(0000) GS:ffff8882a9a0f000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000555586079888 CR3: 000000011929a000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ alloc_netdev_mqs+0x937/0x11b0
+ rtnl_create_link+0x31f/0xd70
+ rtnl_newlink_create+0x277/0xb70
+ rtnl_newlink+0x1666/0x1be0
+ rtnetlink_rcv_msg+0x7d5/0xbe0
+ netlink_rcv_skb+0x232/0x4b0
+ netlink_unicast+0x80f/0x9b0
+ netlink_sendmsg+0x813/0xb40
+ __sock_sendmsg+0x21c/0x270
+ __sys_sendto+0x3c0/0x550
+ __x64_sys_sendto+0xde/0x100
+ do_syscall_64+0xe2/0xf80
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fcc51555ed7
+Code: 48 89 fa 4c 89 df e8 a8 56 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
+RSP: 002b:00007ffe07b19fa0 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
+RAX: ffffffffffffffda RBX: 0000555586066500 RCX: 00007fcc51555ed7
+RDX: 000000000000004c RSI: 00007fcc52334670 RDI: 0000000000000003
+RBP: 0000000000000001 R08: 00007ffe07b1a004 R09: 000000000000000c
+R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000003
+R13: 0000000000000000 R14: 00007fcc52334670 R15: 0000000000000000
+ </TASK>
+
+
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
