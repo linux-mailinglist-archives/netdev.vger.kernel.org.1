@@ -1,168 +1,143 @@
-Return-Path: <netdev+bounces-247828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 825E3CFFB59
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 20:21:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D489DCFFE11
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 20:58:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B065D300B020
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 19:20:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B02A930DBBCE
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 19:26:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79B50350A25;
-	Wed,  7 Jan 2026 16:58:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B4539871A;
+	Wed,  7 Jan 2026 17:34:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+Received: from mail-oo1-f77.google.com (mail-oo1-f77.google.com [209.85.161.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E793451C6
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 16:58:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAED525F96D
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 17:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767805128; cv=none; b=Dy/r1TFaQvxpwidde4nDS0AYxWZ1pHg8Q69Hi6mmNW+3sm2QrnKvs7EYOvx7R1eMfSEBgKxo90RH+cLsII9lG+8QOR4Y/lfGdEEzdW8Ri1HU8PvoEXa7nTnqQZNjIsHUp6ScgJTxgSc6ycZbJio7kQHA1E0yPJNTg7Jz+4yqHYQ=
+	t=1767807270; cv=none; b=iua5+BovWhMvirqwWcRSEbDzE9UmddtDkOSa+VOdjB+/ICObV6000VP30vR3eu+VQcY355ccIh+Zxt5mobE8AgvwOHaqr7JRd82A9NZ4J63LZRaWCopDqfeMCZJwLwvsr8W5EQerLQGZxNugNrWyXx0+7dd2YcqNQdDOu5y3D2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767805128; c=relaxed/simple;
-	bh=m5WDIZIi3d768WXw2bEW3UP2IIBOeDrI8x3vS1dMkQQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aaGxMAhaNiSo5ZB3IWo6bK5fL9qIZ1xGgEer5w/52fdQVaO4MA3msPK9oAQxo7a8/dm5Q3GncMOqU/DYV7a39SaxZmEn8cgWGxc2P+nqwGxWUqTiXz5LRumeq/RLhDm6kqxyM0wN81llghwrE5HIJcJrzINmXqalXlz804mDPSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7c7503c73b4so1205286a34.3
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 08:58:44 -0800 (PST)
+	s=arc-20240116; t=1767807270; c=relaxed/simple;
+	bh=T8p9x7YcHH4RBi5k9EYCafGeHl5JeFf5qbbqC19P2CE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=u4RZJx9hfidOsnkghoohlg6uvrAHlB305JoyArMNYIAj0dlWpKajqQVnc8vhzcNI0rMKIjgEmQ8jTjgLBgjO1ENj1JXnMpajwaaGHlJqQMukFtJrE2eSz0ho4KTSMMx6jEYqTRqmoP8ouTe4kNXDZRUID1jEX9qc3p+AxHXb65E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f77.google.com with SMTP id 006d021491bc7-65b153371efso2074771eaf.1
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 09:34:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767805122; x=1768409922;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9ICq+3QhS1/QYa5EnJldE7FUJw5ckZTY5TKUvUBnPks=;
-        b=sZ6YDYc1fxXQu3qGR/OVphiaF/HBpYcTeRBoG0DW89PddQawfQodZS4m91H0wSsgWv
-         JzdpEZp3Lq7YTCGFE0NWCNIhvmttgexR+tDsG3WOUFFKL73PNsnXZXFd7V0E0KGjGXGM
-         JwsLZYljb6tIaM6BHVlVsj7jJpIEiD/6pe3FERK2X5oSpCLAcHakYWzAOQ4r8jlaJnBa
-         H5cN7vifDZSs/h3dj+KAv1E2UGYgQlZtLOATh25HXLeai3WZa3t7Dudj+koYLlHxmz1z
-         bfJqli6T6VrpElAkwuDiRjHkfo5+en/w9el2E0HI1G5G7vlYcHpwr+5iNB52HALvE4GN
-         ziAw==
-X-Forwarded-Encrypted: i=1; AJvYcCVzfZeOtFMpbhJIuo5ctnsUJUwZ1JT3KUBhDIQkRsVGw2+J/zkBj1wM0Shhs5RvEfSN/nvOnD8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGijV45rud4vtUigNA/PIAMfMZ8UvkhOhssozdWVnxZBKT5tSz
-	P4LliH07el0IyuveTVXAstH+iJHDKoWtFJCxNplpkLAzDyhdBjNIr6ec
-X-Gm-Gg: AY/fxX584AF1bTrvH/qn3syR6SB70Zt1aL9nKhbkFo/tfUEBb+4o3EHHKJwnCXDkbxo
-	IRoDs19UKzw83EKUYK4Vjs4jjkje5jNjFLMsASG/gWF5lZBrBO9iRcCNnUAQzqXBc6p6kvdJYQ6
-	XHg1/UZk7hvVVKTfnz0xeVk1qx4z+8XjkGdr/+l1UzaYMCvgv/6OMaKoiOyZ2fobgbdR++SD8bK
-	SZbpP5apMrK3T+utppFDW4sA0fdESOyKMNYPF0uoreGesThpDiwk+8HPK1MmkfoOw1yYI57sbGz
-	2NLcuFrIa13K43QVXsGZqRxYqT/ZAktWxBWq+aQ6KvDcB/CeAf9+xS5IPO/9DdUluLGbbvx+ufs
-	Hb9MktTiWIJfxvmE3OVeeVG9FnDntGKvPrxmPb4vwClnz4EeMv8COsdC5tnWubqVJ9zBOA4jB3j
-	9C32A/FcGyP5HZhQ==
-X-Google-Smtp-Source: AGHT+IFc13I3F2mIIe4Fwfz9kARgujMXq0dFx1fcCN8Gp8WazR5CBs3+RoMWkUBSEgtOxvi0tOnklw==
-X-Received: by 2002:a05:6830:25d0:b0:7c6:a62d:8663 with SMTP id 46e09a7af769-7ce508db6b5mr1908773a34.11.1767805122167;
-        Wed, 07 Jan 2026 08:58:42 -0800 (PST)
-Received: from gmail.com ([2a03:2880:10ff:56::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7ce478af813sm3717716a34.19.2026.01.07.08.58.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 08:58:41 -0800 (PST)
-Date: Wed, 7 Jan 2026 08:58:39 -0800
-From: Breno Leitao <leitao@debian.org>
-To: John Ogness <john.ogness@linutronix.de>
-Cc: pmladek@suse.com, mpdesouza@suse.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, gustavold@gmail.com, 
-	calvin@wbinvd.org, jv@jvosburgh.net, kernel-team@meta.com, 
-	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, rostedt@goodmis.org
-Subject: Re: [PATCH net-next 0/2] net: netconsole: convert to NBCON console
- infrastructure
-Message-ID: <4dwhhlnuv2n3f7d3hqoulcnsg6ljucd6v47kqcszcwcshfoqno@rzxvg456q4fi>
-References: <20251222-nbcon-v1-0-65b43c098708@debian.org>
- <5mpei32y7sl5jmi2ciim4crxbc55zztiucxxsdd633mvzxlk7n@fowtsefym5y6>
- <87zf6pfmlq.fsf@jogness.linutronix.de>
+        d=1e100.net; s=20230601; t=1767807268; x=1768412068;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YXJ9WC2NmU9YEErBDW4d1c4BSngY0akKh966eavx5Fk=;
+        b=slU2vZxsPlfZIRp0uImq33MRfMchyO/Btr9WmvnRHRej2mUeJVJkdME1tz9YH/85G5
+         TIM51rUh7gRtMNrQrHJTfenv2yNeSKElxLRqmM04R5aBgfuldXEeQjTXj0O6y4ZUztPe
+         VJG6zq+VkAd/DvUftwAOA6rUnYSbW93f2DwThDsO8mBYAUlLtocxtDwXdLzisqeLj2Tf
+         Ct0aztGL4Q2X/vAreGiy+y9EgSfu74OwfQvRvVhW/A+61ZvEWCaTsxkQGRfE2x9dZMHv
+         DzFECPgWOuxwgEz6D4kXq0asAjpDr/77J9RflLkVxG1cjSPN1+W+1aswZdjFDebyYOWS
+         Eusg==
+X-Forwarded-Encrypted: i=1; AJvYcCVJrwIbPtRpMPyyViR9vUwFd4nU4dDrbaENIcJRIRFvgErpy2ZpVBEJ5mjRnp+DgydRWAVsFwg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2gQrog4MsOBgZrX/SlrxQTpIeQcK9QVBiDvYyQ6AwGSED0Fq9
+	JPuNaMWoY5G0doxdT1gd2cpqXCrlfKEDhKih0D8vnD540qpxITh3aNQOa61xJOEgNLJni5LF9ES
+	Cjd0xYXU+dvtMBg5Zl0MacOcoTjt6OL+mbcRHWQVZ597wRja0mhOvuK590Yw=
+X-Google-Smtp-Source: AGHT+IH4AnecHwe1eU+seiZT8AASstncmzFKC7GVs7sp+BqLT+rUYXqD/TFtAndib/yxC1B/VhUmEO2OoS2WpKMEmKAy6Syz4FVi
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87zf6pfmlq.fsf@jogness.linutronix.de>
+X-Received: by 2002:a4a:e645:0:b0:65b:299f:8947 with SMTP id
+ 006d021491bc7-65f481e96e9mr3009818eaf.14.1767807267978; Wed, 07 Jan 2026
+ 09:34:27 -0800 (PST)
+Date: Wed, 07 Jan 2026 09:34:27 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <695e9923.050a0220.1c677c.0370.GAE@google.com>
+Subject: [syzbot] [batman?] [bluetooth?] memory leak in skb_clone (3)
+From: syzbot <syzbot+6e76aa21aaf2d8be6034@syzkaller.appspotmail.com>
+To: antonio@mandelbit.com, b.a.t.m.a.n@lists.open-mesh.org, 
+	johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	marek.lindner@mailbox.org, netdev@vger.kernel.org, sven@narfation.org, 
+	sw@simonwunderlich.de, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi John,
+Hello,
 
-On Wed, Jan 07, 2026 at 04:56:41PM +0106, John Ogness wrote:
-> On 2026-01-07, Breno Leitao <leitao@debian.org> wrote:
-> > Upon reviewing the printk subsystem, I noticed that struct
-> > printk_info->caller_id stores similar information, but not exactly the
-> > same. It contains either the CPU *or* the task, not both, and this data
-> > isn't easily accessible from within the ->write_thread() context. 
-> >
-> > One possible solution that comes to my mind is to pass both the CPU ID
-> > and the task_struct/vpid to struct printk_info, and then integrate this
-> > into struct nbcon_write_context *wctxt somehow.
-> >
-> > This way, netconsole could reliably query the original CPU and task that
-> > generated the message, regardless of where the netconsole code is
-> > executed.
-> 
-> But by the time the printer is active, that task may no longer exist,
-> may have migrated to a different CPU and/or may be sleeping.
-> 
-> IIUC, basically you want to attach console-specific additional
-> information to ringbuffer records, but only that specific console should
-> see/use the additional information. In this case it could be up to 4+16
-> additional bytes (depending on @sysdata_fields).
-> 
-> A while ago we had a discussion[0] about adding custom
+syzbot found the following issue on:
 
-Thanks for sharing that discussion link—very helpful context!
+HEAD commit:    4a26e7032d7d Merge tag 'core-bugs-2025-12-01' of git://git..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=116a9512580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=cbf343972ee89096
+dashboard link: https://syzkaller.appspot.com/bug?extid=6e76aa21aaf2d8be6034
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=179be192580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15cd92b4580000
 
-> information. There I even went so far as to suggest supporting things
-> like a new boot argument:
-> 
->     printk.format=ts,cpu,comm,pid,in_atomic
->
-> (which could also be console-specific)
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/3f4ff8b7d65f/disk-4a26e703.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/2fbb585ef1ac/vmlinux-4a26e703.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/dfdc58db78d3/bzImage-4a26e703.xz
 
-This is essentially what we ended up implementing in netconsole.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+6e76aa21aaf2d8be6034@syzkaller.appspotmail.com
 
-Netconsole makes this straightforward and efficient since I don't need to worry
-about ring buffer space. The approach is simple: receive the char *msg, copy it
-to a bounce buffer, append raw_smp_processor_id(), current->comm, etc., send
-the packet, and free the buffer. No impact on the ring buffer or other side
-effects.
+2025/12/03 00:25:54 executed programs: 5
+BUG: memory leak
+unreferenced object 0xffff88811a1e1100 (size 240):
+  comm "kworker/u9:0", pid 51, jiffies 4294944590
+  hex dump (first 32 bytes):
+    90 50 50 42 81 88 ff ff 90 50 50 42 81 88 ff ff  .PPB.....PPB....
+    00 00 00 00 00 00 00 00 00 50 50 42 81 88 ff ff  .........PPB....
+  backtrace (crc eed28d2d):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4983 [inline]
+    slab_alloc_node mm/slub.c:5288 [inline]
+    kmem_cache_alloc_noprof+0x397/0x5a0 mm/slub.c:5295
+    skb_clone+0xae/0x2b0 net/core/skbuff.c:2050
+    __skb_tstamp_tx+0x3a0/0x4c0 net/core/skbuff.c:5636
+    hci_conn_tx_queue+0x11c/0x1d0 net/bluetooth/hci_conn.c:3026
+    hci_send_conn_frame net/bluetooth/hci_core.c:3086 [inline]
+    hci_sched_acl_pkt net/bluetooth/hci_core.c:3701 [inline]
+    hci_sched_acl net/bluetooth/hci_core.c:3726 [inline]
+    hci_tx_work+0x437/0x570 net/bluetooth/hci_core.c:3820
+    process_one_work+0x26b/0x620 kernel/workqueue.c:3263
+    process_scheduled_works kernel/workqueue.c:3346 [inline]
+    worker_thread+0x2c4/0x4f0 kernel/workqueue.c:3427
+    kthread+0x15b/0x310 kernel/kthread.c:463
+    ret_from_fork+0x2af/0x2e0 arch/x86/kernel/process.c:158
+    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
 
-> The result of the discussion was killing off dictionaries (that allowed
-> variable length custom data) and replacing them with the dev_printk_info
-> struct.
-> 
-> I am just pointing out that this kind of discussion has existed in the
-> past and not suggesting that we should reintroduce dictionaries.
-> 
-> A simple fix could be to add an extra 36-byte struct to both
-> dev_printk_info and nbcon_write_context that exists conditionally on
-> CONFIG_NETCONSOLE_DYNAMIC.
+connection error: failed to recv *flatrpc.ExecutorMessageRawT: EOF
 
-I believe we can achieve this with less than 36 bytes per entry. Taking
-inspiration from printk_caller_id(), we could store both the PID and
-smp_processor_id() more compactly, 8 bytes total ?!
 
-Something like the following should address netconsole's needs:
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-	diff --git a/include/linux/dev_printk.h b/include/linux/dev_printk.h
-	index eb2094e43050..908cb891af0d 100644
-	--- a/include/linux/dev_printk.h
-	+++ b/include/linux/dev_printk.h
-	@@ -27,6 +27,10 @@ struct device;
-	struct dev_printk_info {
-		char subsystem[PRINTK_INFO_SUBSYSTEM_LEN];
-		char device[PRINTK_INFO_DEVICE_LEN];
-	+#ifdef CONFIG_DEV_PRINTK_ENRICHED_CTX 		/* Something that I can select when CONFIG_NETCONSOLE_DYNAMIC is selected */
-	+       pid_t pid;
-	+       int cpu;
-	+#endif
-	};
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-> vprintk_store() would set the extra data to dev_printk_info.
-> 
-> nbcon_emit_next_record() would copy the data to nbcon_write_context.
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-Thanks. Let me prototype this and see how it turns out.
---breno
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
