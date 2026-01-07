@@ -1,113 +1,212 @@
-Return-Path: <netdev+bounces-247868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BBC2CFFA65
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 20:07:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 15913CFFA9C
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 20:11:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7DBD8302E331
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 19:06:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3652330164F1
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 19:11:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D965309DC5;
-	Wed,  7 Jan 2026 19:05:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2895E318EDF;
+	Wed,  7 Jan 2026 19:11:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A4RHJTdV"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="Mm9zf2Iq";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="AX/mQRph"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8FCF1EB9E1;
-	Wed,  7 Jan 2026 19:05:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767812736; cv=none; b=oRKZozxZSSjwdTs+XF5CkwfYYHV0+IJmC5Yr9FleceiiYhmjFOnlWyJt1A6+9rGPhtpodPcTKZIK8MtsWCzBqqA1CnCDJ9zTOPVVFMm2zH2I+BfD5eGrkUb021Ywr57A4/xuiDhO163hZwgnEknaWLZ7ieTKiFJtl3Tp6CcrJds=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767812736; c=relaxed/simple;
-	bh=cXrxAzv98+rTuAo6AZR2IpL01l/GgbnBK6hzUkgo918=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=JgW3CwVayZkeEv8ASfTK2hgrZg9l9Ds+Vy1KmLG2IHtz2ENkZi7Na8ie8hFo8KwC0Kng3X7ijrci6B6lOfPlXSi/54Bbiap9dxphnsAok6SYZ+YcP39BtNQBwuJPOI69yaOFewP/u9UyqEX7R5fBszfNvOyARhrGQ0HgAZvnWaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A4RHJTdV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F10CC4CEF1;
-	Wed,  7 Jan 2026 19:05:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767812735;
-	bh=cXrxAzv98+rTuAo6AZR2IpL01l/GgbnBK6hzUkgo918=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=A4RHJTdVg2eo8w4IuucYp7SsRoCH3YT//hVw93Zkkrf5yuY7VdVHzXn5p17rzjL12
-	 qFhnYO1sBxAF8pzvUHMpneAhxajxGMSSn/P5eWKV8DgEr+V8cC0I0it/mxBoIwnpzA
-	 ZTG5e65Y87dMZvAKJQ5K5dt9Ppt1bkZCnEZg46y9U/FleUdZZwCi/IwOgRoSRZueGl
-	 wWU3xb2cH5R7JKWBRu+isqhIrXzOJQiW5H8Z0OLzuYO0YHMw3moiytq6UZetkvnrs/
-	 q+BCtxWtQqAd1Xg6v3hFI08liH2/hzx+9bPTHbu7bb9UT4hw/68aVlXtLjWeg5+mZk
-	 TljZ3k+3lL8bg==
-Date: Wed, 7 Jan 2026 13:05:34 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Frederic Weisbecker <frederic@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chen Ridong <chenridong@huawei.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org, Jinhui Guo <guojinhui.liam@bytedance.com>
-Subject: Re: [PATCH 01/33] PCI: Prepare to protect against concurrent
- isolated cpuset change
-Message-ID: <20260107190534.GA441483@bhelgaas>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A8AC31326C;
+	Wed,  7 Jan 2026 19:11:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767813070; cv=pass; b=UeGcBeQpuczZ2JZ2V6PS2ZuoNksHJwO1bFpr+7OBPnNdKIHX4xgsZ4We2sOjjts4zGLvvOgHqqyhwfinx/EMxUfBAI35GLB3cykrK9E0U6XNcseYyRbt+vGlk9DK5e8g0UMC/ocxDJ4pmQs27wpD8lA7giV82d8sKXvpJb2AtRg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767813070; c=relaxed/simple;
+	bh=7/6P5kqhrnH/hdP9OHNW7wYS0aD/dIDyDiQdzcLXx4A=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ZHSv4DhjgQX0vnhvNL0MDg/jY97H5DV7XhRg1gZX1XVWZ/dPSmsAjtHSmVpO384W1JgcCwxquKA/SWRbZveW8p63G0QvS/cwnzgR0jDyEM1prUkTgS6nI4ojzsbAS73+avKINwcLL8bjOo1NqJufM1JMljxMhIlMaOfIKvqUaxo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=Mm9zf2Iq; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=AX/mQRph; arc=pass smtp.client-ip=85.215.255.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1767813058; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=Wxyn/xnJAa3hLwfgwX8p7h1gmBR2SPKmeGXxhXYJBycPQv26VT3W4zfby7LsMbfhGD
+    SRcem+JppwGQdgp8hd4fK4Zh6C9NL4QxdDjR1AWHpgvi5x1B+SxMpqawz6y7/71DIgWU
+    dawspC7vRuepszVWA+AtkCidnNLoilmpPeMa2gbc0T1bbExjXQoduqSFDQZA3XkSDCxC
+    /AKge0cq7ywAnQErgj6GkATKRMa07pZ3+N4d8rYoXheJ+hKNuC+lFvL+8GjqWJAonAf5
+    +ZoJ3DyDhspeqNWlvk0dwkeMcafwELHC3HWYecG6Dig3tx+AALyT54VIvjY5rr+iiL00
+    VFWA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1767813058;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:References:Cc:To:From:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=cuuyyK8AJB1JvCg5cXPQk2zK10JVAUsDNfYmLT6RYIM=;
+    b=HuGcE/truZiA8gdvslQfjMU5Q6xBY1TNlskbxyub4dtqpjUiW7izsunRlH2M4BqoBm
+    vS1hRQT1C6GdmWYYPF5FNXE/HmlGA8IAR8fXGvRxZyCxa8hDbnu7gT1Ig03vzy5HpLWY
+    Ue8ogjhI7WTBI6WB6EvkP92dI8FiUI2Dc6pv2XbOUuqQt2XXnQUtCyhVqEyZCFWPP/0p
+    BiV4C+D2qNdHdPD7/MROQFCB8vbMIR6LCJ3ylCJq3p7YpPygDntIBAvag2BmWwh4hpXp
+    c1+jXWmYA3d+vywZvf1LOyAHlGlvHX753tnrDjm98ZwRFlFaP6NAGWMxMNKxQYa0oBRt
+    pPTQ==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1767813058;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:References:Cc:To:From:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=cuuyyK8AJB1JvCg5cXPQk2zK10JVAUsDNfYmLT6RYIM=;
+    b=Mm9zf2Iqz5r+k0zhYmLXQYxTQXWyDZ8hZWLD/ggpY87wSsWXKKMuHZCiX4p3wMQioy
+    NkRgD7QViPkQjdQqJpUCWMpv7vRkKbcyy81LJEH//vHTC3e9u8xsMnu6mh6Hc3071wXU
+    aj4V/5/6dUK3/glSyn9o5voTcdcQPwZBgA7dTKJZbxVlm/iVEDDqkxg6sixob1BF3YZ8
+    nL3QLP7YLlBBTU1t8zAo5D4G36C6KAADPuEGwoX8Bk8zJtJF8yjlsRgotP9DjfxmfF2o
+    6ERh4a9maRa584+L7uMgDb7Qu7qiahlD3MPW18vISFgTc6wh9CXgy9Di1NJqHSahgz/8
+    Ckcw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1767813058;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:References:Cc:To:From:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=cuuyyK8AJB1JvCg5cXPQk2zK10JVAUsDNfYmLT6RYIM=;
+    b=AX/mQRphzdB5pBq0iUsNYv9CyC7jVzb92JYqtx9J9Mlbx7jCv5HXnbnW9C0CuCQLdJ
+    NUShLJ72x+digueIiGCA==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeFQ7s8bGWj0Q=="
+Received: from [IPV6:2a00:6020:4a38:6800::9f3]
+    by smtp.strato.de (RZmta 54.1.0 AUTH)
+    with ESMTPSA id K0e68b207JAwEgV
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Wed, 7 Jan 2026 20:10:58 +0100 (CET)
+Message-ID: <2af792de-77a0-4f77-a6b8-f207089b94b6@hartkopp.net>
+Date: Wed, 7 Jan 2026 20:10:57 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260101221359.22298-2-frederic@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [bpf, xdp] headroom - was: Re: Question about to KMSAN:
+ uninit-value in can_receive
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: mkl@pengutronix.de, Prithvi <activprithvi@gmail.com>, andrii@kernel.org,
+ linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com, netdev@vger.kernel.org
+References: <20251117173012.230731-1-activprithvi@gmail.com>
+ <0c98b1c4-3975-4bf5-9049-9d7f10d22a6d@hartkopp.net>
+ <c2cead0a-06ed-4da4-a4e4-8498908aae3e@hartkopp.net>
+ <aSx++4VrGOm8zHDb@inspiron>
+ <d6077d36-93ed-4a6d-9eed-42b1b22cdffb@hartkopp.net>
+ <20251220173338.w7n3n4lkvxwaq6ae@inspiron>
+ <01190c40-d348-4521-a2ab-3e9139cc832e@hartkopp.net>
+ <20260102153611.63wipdy2meh3ovel@inspiron>
+ <20260102120405.34613b68@kernel.org>
+ <63c20aae-e014-44f9-a201-99e0e7abadcb@hartkopp.net>
+ <20260104074222.29e660ac@kernel.org>
+ <fac5da75-2fc0-464c-be90-34220313af64@hartkopp.net>
+ <20260105152638.74cfea6c@kernel.org>
+ <904fa297-b657-4f5b-9999-b8cfcc11bfa9@hartkopp.net>
+ <20260106162306.0649424c@kernel.org>
+ <8b55ae26-daba-4b2e-a10b-4be367fb42d0@hartkopp.net>
+Content-Language: en-US
+In-Reply-To: <8b55ae26-daba-4b2e-a10b-4be367fb42d0@hartkopp.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-[+cc Jinhui]
+Sorry for answering myself:
 
-On Thu, Jan 01, 2026 at 11:13:26PM +0100, Frederic Weisbecker wrote:
-> HK_TYPE_DOMAIN will soon integrate cpuset isolated partitions and
-> therefore be made modifiable at runtime. Synchronize against the cpumask
-> update using RCU.
+The below idea using skb->cb definitely does not work :-/
+
+But as we never use encapsulation in CAN skbs we can use the 
+inner_protocol and inner_xxx_header space when skb->encapsulation is false:
+
+	union {
+		/* encapsulation == true */
+		struct {
+			union {
+				__be16		inner_protocol;
+				__u8		inner_ipproto;
+			};
+
+			__u16			inner_transport_header;
+			__u16			inner_network_header;
+			__u16			inner_mac_header;
+		};
+		/* encapsulation == false */
+		struct {
+			int can_iif;
+			__u16 can_frame_len;
+		};
+	};
+
+
+Best regards,
+Oliver
+
+On 07.01.26 16:34, Oliver Hartkopp wrote:
+> Hello Jakub,
 > 
-> The RCU locked section includes both the housekeeping CPU target
-> election for the PCI probe work and the work enqueue.
+> On 07.01.26 01:23, Jakub Kicinski wrote:
+>> On Tue, 6 Jan 2026 13:04:41 +0100 Oliver Hartkopp wrote:
+>>> When such skb is echo'ed back after successful transmission via
+>>> netif_rx() this leads to skb->skb_iif = skb->dev->ifindex;
+>>>
+>>> To prevent a loopback the CAN frame must not be sent back to the
+>>> originating interface - even when it has been routed to different CAN
+>>> interfaces in the meantime (which always overwrites skb_iif).
+>>>
+>>> Therefore we need to maintain the "real original" incoming interface.
+>>
+>> Alternatively perhaps for this particular use case you could use
+>> something like metadata_dst to mark the frame as forwarded / annotate
+>> with the originating ifindex?
 > 
-> This way the housekeeping update side will simply need to flush the
-> pending related works after updating the housekeeping mask in order to
-> make sure that no PCI work ever executes on an isolated CPU. This part
-> will be handled in a subsequent patch.
+> I looked into it and the way how skb_dst is shared in the union behind 
+> cb[] does not look very promising for skbs that wander up and down in 
+> the network layer. And it is pretty complex to just store a single 
+> interface index integer value.
 > 
-> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> While looking into _sk_redir to see how the _skb_refdst union is used, 
+> I've seen that the _sk_redir function was removed from struct tcp_skb_cb 
+> (commit e3526bb92a208).
+> 
+> Today we use skb->cb only for passing (address) information from the 
+> network layer to the socket layer and user space. But the space in cb[] 
+> could also hold the content we currently store in the problematic skb 
+> headroom.
+> 
+> Would using skb->cb be a good approach for CAN skbs (that do not have 
+> any of the Ethernet/TCP/IP requirements/features) or will there still be 
+> networking code (besides CAN drivers and CAN network layer) that writes 
+> into cb[] when passing the CAN skb up and down in the stack?
+> 
+> /**
+>   * struct can_skb_cb - private data inside CAN skb->cb
+>   * cb[] is 64 bit aligned which is also recommended for struct 
+> sockaddr_can
+>   * @magic:    to check if someone wrote to our CAN skb->cb space
+>   * @flags:    extra flags for CAN_RAW and CAN_BCM sockets
+>   * @can_addr:    socket address information to userspace
+>   * @can_iif:    ifindex of the first interface the CAN frame appeared on
+>   * @skbcnt:    atomic counter to have an unique id together with skb 
+> pointer
+>   * @frame_len:    bql length cache of CAN frame in data link layer
+>   */
+> struct can_skb_cb {
+>      u32 magic;
+>      u32 flags;
+>      struct sockaddr_can can_addr;
+>      int can_iif;
+>      int skbcnt;
+>      unsigned int frame_len;
+> };
+> 
+> If not: We also don't have vlans nor inner[protocol|headers] in CAN 
+> where we might store the 4 byte can_iif integer ...
+> 
+> Many thanks and best regards,
+> Oliver
 
-Just FYI, Jinhui posted a series that touches this same code and might
-need some coordination:
-
-  https://lore.kernel.org/r/20260107175548.1792-1-guojinhui.liam@bytedance.com
-
-IIUC, Jinhui's series adds some more NUMA smarts in the driver core
-sync probing path and removes corresponding NUMA code from the PCI
-core probe path.
-
-Bjorn
 
