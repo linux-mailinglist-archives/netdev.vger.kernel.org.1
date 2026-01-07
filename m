@@ -1,175 +1,210 @@
-Return-Path: <netdev+bounces-247690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B377ACFD971
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 13:17:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 396DDCFDA58
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 13:25:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1DFC8300D666
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 12:17:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3B90830094A7
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 12:25:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0FBD308F3A;
-	Wed,  7 Jan 2026 12:17:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E872830B512;
+	Wed,  7 Jan 2026 12:18:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hxx0K4WJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b973SbL1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC613112B4
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 12:17:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65EDB1EC01B
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 12:18:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767788265; cv=none; b=VOjl7xxtmSr52X53lYvRGM+GSI79ccP+mTeXWGD+qYTJvfN7MkYUBwv6w02qno9V2PRDL7EI3BcSaYEPsqsS6dInK0rywKi9Ki+xeZazTqq3OKUr4Wifw6Csc/P92xmL62LEnW6vW+/IhDGRBtgXpVR2ZEhqr3KWUwna+7ZHBG8=
+	t=1767788311; cv=none; b=qYYzF3OSPYbKz9wQf6tMC4wYG2TBynHMFMIbvr8noEBjH8/7Z4MZhTNwzoYI97ktz0TfQR7ZzDSLgSJzhUgz0rFY31qI42ZjcO/WQguOGEYaJCeWEOH6P+YxL9xSVCZ3Tb65ymYWKzQrYcglSssaIe9RzPFWkJ1c4TNaTPVbE0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767788265; c=relaxed/simple;
-	bh=unytFKZ8LCGZbWiIqqle1BjuJ9OKga7Krn0YjNtEcU4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=edbgMy+TRF5pzRDpDVijT2vf6dZMcRBhIZQNuvH5VvgtH0KwERNfuwEYJvQXQazWCaMBJWwsXIZJ3xkG5jitML2LfEjYZW5ic1TjCCehqQeF8O24niRq1CEs0eJJ1PxuAhcW5L+25znGID4cI3Xz1Kn8Ww5APypmehMrsT99No0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hxx0K4WJ; arc=none smtp.client-ip=209.85.214.173
+	s=arc-20240116; t=1767788311; c=relaxed/simple;
+	bh=U6Y9FPJi6T3NvRGYldqxHltA4ZqTIEv+NP1KSmN9oho=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M24V6JHfdW1vfAUkrLnu+QRKR3cC1han5yMbaQG+6RsnvgMgZHrYYwMtqfn2xXf7lpRUjUuTF31DwDIBMiKMX7XQO30hyCD5SlEn9lolIbWrVqcfYpatA+mlm4VDWX0WShGMjB4HD5BlPtVfmkIae+m9I8+t1SN1MFE/u0M67Sc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b973SbL1; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2a0a33d0585so15389345ad.1
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 04:17:44 -0800 (PST)
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7b7828bf7bcso1744900b3a.2
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 04:18:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767788263; x=1768393063; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=htJmJ2nOl5HS2d4lrmu4G6awIswx3aqJ66sxEqxOU2k=;
-        b=Hxx0K4WJfNcevFrkkjD/ig/efMM0d/wmzS6HAN/9pMiWmFQdrKesCCXHHt6aTXvn8Q
-         CmLkaNFeeIwY6K2oLmIp2i2osextuFVp8syijGxqt2xKaPP4SblCCx1p3uTeS1ScpxrJ
-         lwdZtwUU/CHrE4b6GUpqqmwCbj4tqSLy7kDKVXAwbmcWGbmwTcq7rJSoOtE9hraeML/g
-         oYoHDbguPKmwHL/ELAA4+XLP0wOfGfBjiynViELp7Q8iqCnT39lcRBTOJ7fhVMzeTVLv
-         wG309TTuxDhULiUKLNhCDOG3gE/baj2uZklxhqI9mp9NUQt3Kvw8oIllAwy1rjDler2v
-         E9BA==
+        d=gmail.com; s=20230601; t=1767788310; x=1768393110; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wp1Xhf/12m+pUthcYvg3YicdMqsMY9ThbK3LGU2x3ss=;
+        b=b973SbL1Y+ZFhRuBlYdxm6D1qj1KtXp7oa82bqjHDN1JwbYY+rq+XHHAlNFHi2+gSK
+         eZnzi3z55KtImI0VTHhkJDqBuvjeixgwPM7vxs11sAEbDIh6fXfacCD47b6N3TzdMXP5
+         5J71XcyevQonXn8GqlcphqbrszJpA0nuSyVskywVXtPZzCkyNFDWUQ44gNubLi8U8MTJ
+         aJb3bXPWZiZmVooLhtdBHFxzprcUWt6VbcFRSQzNIDtquMozZjZEXo01GHmzGMxcXOvG
+         XWQS1+AvEn6mnVESnDb3alkXqujyStE6oUzXJTi5bPdsF0uMXFqPiFAptWe/157NfqEM
+         x2Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767788263; x=1768393063;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=htJmJ2nOl5HS2d4lrmu4G6awIswx3aqJ66sxEqxOU2k=;
-        b=hgj0UbYMX0TDHA3mV11zx93jFpVICOhhbO9nnDQBwPwl6RK9XSw4O1SUOo5vhYYFwq
-         xtOCzw4HDKQJPFOvxYtvXRaLCb/YuQ+A7VDMk3zfYG+VcP4r56qMw9GdJhmmEeFz8+GK
-         /WuzcQoeIyykgrgrSrD+7wdFMUXgB9fjXBWX+LN1ByCyH/Se2HMFtgCrs3+WRUIhpPgy
-         eJO0agSD8+9zwYJb30/bhvYntIPtjgpqUPSraRslpCmf1Kw326yFh/O8ic4lS83SaoC0
-         Q10Bci0Zsugzunj6tAWjh4WCtwCIphtpKoO3IScdeOlYKLqIc4zOuM96amg7WVBA5Nnt
-         0c4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUbZpRtWsK6hQlTAFFO2zRfithmXn8zV+sZT866FHECuEERImAwH54y/23HxQ9LolvlRAlcqlU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxg04PuSAVOMZIgYZrlGtR6oIHx29fyCKttq8ROli900i3P/1gZ
-	D7Bxigin1S8fP3d7iMM8viriikMH2wsmyNepDZLgnUtcfJukT0QCjp24
-X-Gm-Gg: AY/fxX5NDanLTWRN5AmetiRoFeA1Mh8ePiBsD1AO/QRPR+IXwxvd1jOnszV4V8J9zXb
-	4mY/M58mYAs+43NFtmWSQDBRNePhG5CmPTY4bC+gy5HLrCD8Xo5VsIy3jEDnHAcq+J0WhEqyfBN
-	IAhxlcHgALVUMaFKGNb933kvuQrJ7p9UNpFiJlmxhG7tlyXxT5GgTCaA67vN+k8+JCAPbGMAw9m
-	ss25L/dDK7EqWOzs58qNAp2hjMKXsRFHvv5J6zkFaveiuKQqa4VwI61iYchsvxSu0WHO30K+Umh
-	SY55y+z7t2czuJEX343MhfYT0mSXqk/AZdBlit4W5QcB7dgOpFFNnxR44JbA5GwXV5J6Vob7Dz2
-	aArLNy6PGJfJRqa0P56sWIHgXHMNtQyR2YyxjQANI3xIYzKZYv7X0uDRbd9l1igRYZNISgfey7S
-	XyHom3mTfbsuw=
-X-Google-Smtp-Source: AGHT+IHrxNRxtolUOD4KQenPLaGlanLAT6aJ2E8evm+7qxd+QPmMdAGse+vZ/5sK9FbuhMD3s/dxnw==
-X-Received: by 2002:a17:903:40ca:b0:2a0:bb11:9072 with SMTP id d9443c01a7336-2a3ee4bfe1dmr20912635ad.55.1767788263084;
-        Wed, 07 Jan 2026 04:17:43 -0800 (PST)
-Received: from [127.0.0.1] ([188.253.121.152])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a3e3cc7856sm51003525ad.68.2026.01.07.04.17.35
+        d=1e100.net; s=20230601; t=1767788310; x=1768393110;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wp1Xhf/12m+pUthcYvg3YicdMqsMY9ThbK3LGU2x3ss=;
+        b=U/6yY6AdsOS4qbthrHz6f8uqNk20zUR79hPACyfV4/z/KzgLAgwK9LpEGrAihwqSgo
+         3BhoqDa+oUkHtjZuZS7k8U+r0SlFikIRdrDhh7l2+5IhjJV4tJkUrUUbL6i9wzSvQp65
+         xP/sLTRu12yGD9fWGuY2IXSnJqWTgIrTz1p6OpDy5iYfZV8uho7lEBYxxR4mTIFWOYsq
+         pPVdxIov3nm71ODwfg/Nk/TUukgnegCH8fQUPiyhCull2myZBoajxK/defCqpYYT1aQS
+         882oFcgOfCqqdLXAfplg5cXl/YPGhLZ65hsQ4RMTTRKRDdQOtaMluVUryG9vuzmudfY/
+         jPfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX4y2AdT8YJWRjJpWiE0bJIdjN9H2ZWFq/8NY6ZFelIzg6EfpDiOqmyudKu1IBZKKVEgcjUHgI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxa0eX09+dBcrpUfIeYt8PsCu2vVE/j0t0Emmq4SGJbfe0SJnsB
+	f9mYmCBmhManNdORIy8zmqBEwj95AzW/JmELkt6XGFp90NH/5TOz0OzW
+X-Gm-Gg: AY/fxX4dnVsEXGLyo7stzcGANxeOTqsVrfM+l/sPaj5UMPj5iP3RV0ShV/riS1sZTIv
+	vSZ4cQdAXiY3QNTCT2h1QIZdqVgdkLpPrKGzMFYbDqZiW2PsLeseZDTTcESGgtoeNP54CUFakLC
+	YkXH457JpcTtDDZsdr1jpgqLFL66m0Cu534ZOin/7N/9iVGHrv2971ng07Y1BMUggZYSLQfrI+c
+	41fUSbdyCjrmVKNKUvQWhnzQNHKYk7BRXAfhWBRT04SLruEuBqntfeT3rfeo9jdHkeTqtfdd6Tl
+	Dq1rsQlFgnji6N1zcyB2ZUVrrMsZNiexpe+RMDrLSMr8Wa+m8RezcGQ13rjBdCU/wIZcZRdE8TY
+	xvh5depjynycWHgVQRfkdHe0PhAIavwa5w3Wbi6sjrZt/iU+m32AHCo9T5SOIVqFo0wSg9xWNED
+	k+2aiFXKKeeAw=
+X-Google-Smtp-Source: AGHT+IG73PZ9Ur2uNR7sdzaq1IpxrpP08mJnukVQMVVUubDxzaUVhM2WKX32T2Z8GT1tngWh2BcQcg==
+X-Received: by 2002:a05:6a20:2444:b0:366:14af:9bb9 with SMTP id adf61e73a8af0-3898fa09bd6mr2022199637.67.1767788309564;
+        Wed, 07 Jan 2026 04:18:29 -0800 (PST)
+Received: from fedora ([2401:4900:1f33:c0f:f9e4:5751:d29d:c2b9])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c4cbf28f6cdsm5063337a12.6.2026.01.07.04.18.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 04:17:42 -0800 (PST)
-From: Zesen Liu <ftyghome@gmail.com>
-Date: Wed, 07 Jan 2026 20:16:48 +0800
-Subject: [PATCH bpf 2/2] bpf: Require ARG_PTR_TO_MEM with memory flag
+        Wed, 07 Jan 2026 04:18:29 -0800 (PST)
+From: Shi Hao <i.shihao.999@gmail.com>
+To: horms@kernel.org
+Cc: i.shihao.999@gmail.com,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kuba@kernel.org,
+	edumazet@google.com,
+	dsahern@kernel.org,
+	davem@davemloft.net
+Subject: [PATCH net-next v3] net: ipv6: fix spelling typos in comments
+Date: Wed,  7 Jan 2026 17:48:12 +0530
+Message-ID: <20260107121812.40268-1-i.shihao.999@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260107-helper_proto-v1-2-21fa523fccfd@gmail.com>
-References: <20260107-helper_proto-v1-0-21fa523fccfd@gmail.com>
-In-Reply-To: <20260107-helper_proto-v1-0-21fa523fccfd@gmail.com>
-To: Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski <mattbobrowski@google.com>, 
- Steven Rostedt <rostedt@goodmis.org>, 
- Masami Hiramatsu <mhiramat@kernel.org>, 
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>
-Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Shuran Liu <electronlsr@gmail.com>, Peili Gao <gplhust955@gmail.com>, 
- Haoran Ni <haoran.ni.cs@gmail.com>, Zesen Liu <ftyghome@gmail.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1786; i=ftyghome@gmail.com;
- h=from:subject:message-id; bh=unytFKZ8LCGZbWiIqqle1BjuJ9OKga7Krn0YjNtEcU4=;
- b=owGbwMvMwCXWI1/u+8bXqJ3xtFoSQ2ac3zmnp5FLy4UX8R2LjTnQbvGNz5/VUua8a9321ZUfz
- N5U5h7qKGVhEONikBVTZOn9YXh3Zaa58TabBQdh5rAygQxh4OIUgImsU2ZkuHfrkQV/keSbs7yi
- rAmrH7ac7wjduNutbtPkV2d33jvtF8PI0M2xIH26qJnV886PrGvehIZc/LniQLPi6f4e1r3mV71
- jOQA=
-X-Developer-Key: i=ftyghome@gmail.com; a=openpgp;
- fpr=8DF831DDA9693733B63CA0C18C1F774DEC4D3287
+Content-Transfer-Encoding: 8bit
 
-Add check to ensure that ARG_PTR_TO_MEM is used with either MEM_WRITE or
-MEM_RDONLY.
+fix misspelled typos in comments
 
-Using ARG_PTR_TO_MEM alone without tags does not make sense because:
+- destionation ->  destination
+- wont -> won't
+- upto -> up to
+- informations -> information
 
-- If the helper does not change the argument, missing MEM_RDONLY causes the
-verifier to incorrectly reject a read-only buffer.
-- If the helper does change the argument, missing MEM_WRITE causes the
-verifier to incorrectly assume the memory is unchanged, leading to errors
-in code optimization.
-
-Co-developed-by: Shuran Liu <electronlsr@gmail.com>
-Signed-off-by: Shuran Liu <electronlsr@gmail.com>
-Co-developed-by: Peili Gao <gplhust955@gmail.com>
-Signed-off-by: Peili Gao <gplhust955@gmail.com>
-Co-developed-by: Haoran Ni <haoran.ni.cs@gmail.com>
-Signed-off-by: Haoran Ni <haoran.ni.cs@gmail.com>
-Signed-off-by: Zesen Liu <ftyghome@gmail.com>
+Signed-off-by: Shi Hao <i.shihao.999@gmail.com>
 ---
- kernel/bpf/verifier.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
 
-diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index f0ca69f888fa..c7ebddb66385 100644
---- a/kernel/bpf/verifier.c
-+++ b/kernel/bpf/verifier.c
-@@ -10349,10 +10349,27 @@ static bool check_btf_id_ok(const struct bpf_func_proto *fn)
- 	return true;
- }
- 
-+static bool check_mem_arg_rw_flag_ok(const struct bpf_func_proto *fn)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(fn->arg_type); i++) {
-+		enum bpf_arg_type arg_type = fn->arg_type[i];
-+
-+		if (base_type(arg_type) != ARG_PTR_TO_MEM)
-+			continue;
-+		if (!(arg_type & (MEM_WRITE | MEM_RDONLY)))
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
- static int check_func_proto(const struct bpf_func_proto *fn, int func_id)
+v3:
+- Fix corrupt patch
+
+v2: https://lore.kernel.org/all/aTZj_AFt6bR9_a2F@fedora/T/#m110f6623aeef100cdc6dad59f0851f6272e7371f
+- Rebased on net-next
+
+v1: https://lore.kernel.org/netdev/20251127103133.13877-1-i.shihao.999@gmail.com/T/#u
+---
+ net/ipv6/ah6.c                          | 2 +-
+ net/ipv6/calipso.c                      | 4 ++--
+ net/ipv6/ip6_fib.c                      | 2 +-
+ net/ipv6/ip6_vti.c                      | 2 +-
+ net/ipv6/netfilter/nf_conntrack_reasm.c | 2 +-
+ net/ipv6/reassembly.c                   | 2 +-
+ 6 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/net/ipv6/ah6.c b/net/ipv6/ah6.c
+index 95372e0f1d21..92e1cf90a6be 100644
+--- a/net/ipv6/ah6.c
++++ b/net/ipv6/ah6.c
+@@ -169,7 +169,7 @@ static bool zero_out_mutable_opts(struct ipv6_opt_hdr *opthdr)
+ /**
+  *	ipv6_rearrange_destopt - rearrange IPv6 destination options header
+  *	@iph: IPv6 header
+- *	@destopt: destionation options header
++ *	@destopt: destination options header
+  */
+ static void ipv6_rearrange_destopt(struct ipv6hdr *iph, struct ipv6_opt_hdr *destopt)
  {
- 	return check_raw_mode_ok(fn) &&
- 	       check_arg_pair_ok(fn) &&
-+		   check_mem_arg_rw_flag_ok(fn) &&
- 	       check_btf_id_ok(fn) ? 0 : -EINVAL;
- }
- 
+diff --git a/net/ipv6/calipso.c b/net/ipv6/calipso.c
+index 21f6ed126253..2510a610a350 100644
+--- a/net/ipv6/calipso.c
++++ b/net/ipv6/calipso.c
+@@ -43,7 +43,7 @@
+ #define CALIPSO_HDR_LEN (2 + 8)
 
--- 
-2.43.0
+ /* Maximum size of the calipso option including
+- * the two-byte TLV header and upto 3 bytes of
++ * the two-byte TLV header and up to 3 bytes of
+  * leading pad and 7 bytes of trailing pad.
+  */
+ #define CALIPSO_OPT_LEN_MAX_WITH_PAD (3 + CALIPSO_OPT_LEN_MAX + 7)
+@@ -713,7 +713,7 @@ static int calipso_pad_write(unsigned char *buf, unsigned int offset,
+  *
+  * Description:
+  * Generate a CALIPSO option using the DOI definition and security attributes
+- * passed to the function. This also generates upto three bytes of leading
++ * passed to the function. This also generates up to three bytes of leading
+  * padding that ensures that the option is 4n + 2 aligned.  It returns the
+  * number of bytes written (including any initial padding).
+  */
+diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+index 2111af022d94..bd1107eec89b 100644
+--- a/net/ipv6/ip6_fib.c
++++ b/net/ipv6/ip6_fib.c
+@@ -1010,7 +1010,7 @@ static int fib6_nh_drop_pcpu_from(struct fib6_nh *nh, void *_arg)
 
+ static void fib6_drop_pcpu_from(struct fib6_info *f6i)
+ {
+-	/* Make sure rt6_make_pcpu_route() wont add other percpu routes
++	/* Make sure rt6_make_pcpu_route() won't add other percpu routes
+	 * while we are cleaning them here.
+	 */
+	f6i->fib6_destroying = 1;
+diff --git a/net/ipv6/ip6_vti.c b/net/ipv6/ip6_vti.c
+index ad5290be4dd6..cc8d0b142224 100644
+--- a/net/ipv6/ip6_vti.c
++++ b/net/ipv6/ip6_vti.c
+@@ -435,7 +435,7 @@ static bool vti6_state_check(const struct xfrm_state *x,
+  * vti6_xmit - send a packet
+  *   @skb: the outgoing socket buffer
+  *   @dev: the outgoing tunnel device
+- *   @fl: the flow informations for the xfrm_lookup
++ *   @fl: the flow information for the xfrm_lookup
+  **/
+ static int
+ vti6_xmit(struct sk_buff *skb, struct net_device *dev, struct flowi *fl)
+diff --git a/net/ipv6/netfilter/nf_conntrack_reasm.c b/net/ipv6/netfilter/nf_conntrack_reasm.c
+index 64ab23ff559b..fcb17308c7e7 100644
+--- a/net/ipv6/netfilter/nf_conntrack_reasm.c
++++ b/net/ipv6/netfilter/nf_conntrack_reasm.c
+@@ -251,7 +251,7 @@ static int nf_ct_frag6_queue(struct frag_queue *fq, struct sk_buff *skb,
+
+	/* Note : skb->rbnode and skb->dev share the same location. */
+	dev = skb->dev;
+-	/* Makes sure compiler wont do silly aliasing games */
++	/* Makes sure compiler won't do silly aliasing games */
+	barrier();
+
+	prev = fq->q.fragments_tail;
+diff --git a/net/ipv6/reassembly.c b/net/ipv6/reassembly.c
+index 25ec8001898d..13540779a2c7 100644
+--- a/net/ipv6/reassembly.c
++++ b/net/ipv6/reassembly.c
+@@ -187,7 +187,7 @@ static int ip6_frag_queue(struct net *net,
+
+	/* Note : skb->rbnode and skb->dev share the same location. */
+	dev = skb->dev;
+-	/* Makes sure compiler wont do silly aliasing games */
++	/* Makes sure compiler won't do silly aliasing games */
+	barrier();
+
+	prev_tail = fq->q.fragments_tail;
+--
+2.51.0
 
