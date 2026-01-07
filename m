@@ -1,127 +1,140 @@
-Return-Path: <netdev+bounces-247670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E617CFD23D
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 11:21:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9F07CFD243
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 11:21:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7093930223E6
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 10:21:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EA9FE3047199
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 10:17:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CB66331A5D;
-	Wed,  7 Jan 2026 10:12:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 240172E8882;
+	Wed,  7 Jan 2026 10:17:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="hAXMnEZy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X1+qLOGb"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B530331A44;
-	Wed,  7 Jan 2026 10:12:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.224
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7844E2DEA67
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 10:17:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767780768; cv=none; b=D/bq5DpmKCMD6oT9yoRdMQGGUuLYcWHkb9Oh4nSWOBWItDHHQezg6k4vKgt58HOqm4rurz7PsaSRzMIujr9rujuCJVsjS9fzTQEwn7mOUP7dkUxqp3x2dawoRVSiAWYaq7DKsN2zyR3squC/wxNOSJevvnNdCKtPB4zpfgSG6OA=
+	t=1767781077; cv=none; b=I22v9GUgF8CK4g+KzxxmsdzTq/+1TxberQI8a6ErvWFMKmWwfoiRDP+N7mONUd/oYfNCSKcTLFYYVbY0v1qSS+Wo0zidPodxjtJ7g4525WwdW/N4qiRi+5hlafw2DhOqcdbh5+Luh0xwvonctdQ25DK4tKZuqwU20SzNowCVFb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767780768; c=relaxed/simple;
-	bh=vlS6qdRyqabvM+tHIJ06XpBFkDb6xR+kCvy8kuew0nU=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=fuQ5lxdSVGYo8buDEpudZfHonCgdQpEF6vuLI+d7cvwIyt3X75rPNrB3dsl8JIObMrWfJ0tG3XrdjHMiDWE748lXFp6RpVLDxuW+t12kevLXm16pJbL0LdMyK7FCEkbWbvlcr98ZE6zKaSN4aWjtGpdTHPqGwyaAzYOZzEfYlFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=hAXMnEZy; arc=none smtp.client-ip=113.46.200.224
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=xgGBDdPkyGi0NxdVfTA0d5ZgzYrifSbg+B1MClYQnJ8=;
-	b=hAXMnEZyt9rD6dS8UFGFn1fmmuXrXkAYjiAVmm2qzgjIWF4zIaaXfTOtLEQ0RBVS6QgXVCELK
-	oZvUQYSAvEQhbqJyKSB3BdAS9pcVdcQ1nO/0AJAh/IiP/xdSrSoDWzsxXax3oSZlorOCU57DF3E
-	ObYd96ZuXuRkU6nhMMd92dk=
-Received: from mail.maildlp.com (unknown [172.19.163.200])
-	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4dmP0811bbz1cyTV;
-	Wed,  7 Jan 2026 18:09:28 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0F8574055B;
-	Wed,  7 Jan 2026 18:12:43 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Wed, 7 Jan 2026 18:12:42 +0800
-Message-ID: <dd88ed18-d348-42ea-ab15-a0f34f3bea3d@huawei.com>
-Date: Wed, 7 Jan 2026 18:12:41 +0800
+	s=arc-20240116; t=1767781077; c=relaxed/simple;
+	bh=sZ3mYpTbv/XotPCF4CdZdQgefByrsCZvWPwwcFuFdu8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=BlNYTq4/NN/0X6IfFG2JPMoZSq3Pt8ZPNWAUZw1UdWpcgbQc8t1KNBCg65Mn/Q1R2pJz8XFY9zgyX82uk5Fejp1y8Ns3Ilo8gOQgbu1bbZtzY+pNqR2kOQeOw3Seo/ZU46MqECRPhho7xLzpHUFNytsNdhMbCF+q2BCTIbz0d/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X1+qLOGb; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-4327555464cso1046328f8f.1
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 02:17:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767781074; x=1768385874; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zz5VqpciYzlzrDKhkNf3p0wOlTe+spDWVku/imh0wW8=;
+        b=X1+qLOGbt8H+g5qDNZHBIy5tvYG6wB4JoYWcV87piCyg0xaFyFq5Cjp9HmMOzAcxr9
+         Vamw4onaXp0qIxWm65AHgC2wbfi9h+HRGuBZ4kmnTcwf4CF6ydHJ1Xsysd8zX34hxO4w
+         h5YFR6c/qoZEfwq55dHv4JM4GnztZIPPt8aszg4V1BmxsNOKVa+beYRDylNWv04pjTwJ
+         vRYxg/aBVaZnNfMkXqteBL0GzinOJuch267whNRTL3Da9EhjQdc+bUmLCvzQlnBD6x7D
+         38bspZlPuXqGcY0RDICLUfYLnztecMnbeoWPODWiyv3qb5vYN7RAX3e+kExTbYfQL9t9
+         Ub2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767781074; x=1768385874;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zz5VqpciYzlzrDKhkNf3p0wOlTe+spDWVku/imh0wW8=;
+        b=CcbMBhuQv2SyGCwTlwMTbEMdQjXzIzpvNmPUydCHR9m7ZsmTfw65W6Z7Hqb1Gry8+y
+         daVstXwty8Q/bz+3SYNwShvV6ilY2udGHaEINPSsBJ23+7UqtXURQK4UXu1nTfCBfU2U
+         pTDdOr86k6Xm5As+YNnzylD6JeGM93GE8nSnQ0WKo/d/2RZQGJaDNvcnjJ5wZd/M5TYS
+         UEIfmNplPJCOR6rW2bf202nluhz93vZG9xfs7Q2k3InqpNVBLOwGz9jRf/G3y2uf4Oyi
+         okfomkegdL4i7psdmeZN43rIXbljP/SwEHwHY5G0d1Q00lCAZYR6TOw9BFdVupij3H7F
+         hLwA==
+X-Gm-Message-State: AOJu0YxEr/0pIyz3jP5ITs5ybeeYBVByBaoi48E7tmUnUaGKko+KzgRu
+	jdH8vNw4Va4QaS6eVKWzr9nfjne+9Qy8jYzc9I+QGuM1U1/oMCZt6M/OkE6BFQ==
+X-Gm-Gg: AY/fxX6Xa0bMFKPFpYsa1GkpmWAWF8dlWztMm+t0al7mLikzWkdssEDmATYBS/z/lma
+	eB/ocOld5WaV7kXNYu6B1eelkdVEqF4/5ENVHCj9hStygxlZxJf2jzV3Qqzb8wNoTdv1kVNI2xu
+	6KM0j55vnD2061vBp1bffw8b6URnyrwkP5LL+Ydl1pYQPK5VDy6EXmFflN3yrKT2WZrjqLP0w+p
+	HoeHfLILpFWnv5z4YMcFkxO3a5hlW1LWYct+J4TTO4AdA8znboqFF3VZJyjcpFkAoMw59cfgyzn
+	xonSe2tCQqWe+707eap46r5oYN5cGj9ZYu00K3uV9WmuH5BwrM8wGIFbXRDniKkxnflojxsM2Nq
+	cwt++OYF9AdVS3f3L/wY1HCPVwieHVSHuR8ZplAtuAFsE5Ina6bh/8r3zYs7SX9S2JsJ5+J+NeJ
+	fdyFcl1+nf07mJJqoo3H8=
+X-Google-Smtp-Source: AGHT+IGVy0IzKXT0arvwyJMRyYIHdNRpHdjTMklcKCCT8hfx7RIZD2RcwFg53tOX3u+ah11y3aFn3w==
+X-Received: by 2002:a05:6000:40dc:b0:432:5bf9:cf2e with SMTP id ffacd0b85a97d-432c377298amr2547801f8f.13.1767781073405;
+        Wed, 07 Jan 2026 02:17:53 -0800 (PST)
+Received: from [192.168.1.187] ([161.230.67.253])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0e6784sm9281054f8f.19.2026.01.07.02.17.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Jan 2026 02:17:53 -0800 (PST)
+Message-ID: <019bcd38dadb138fda4cf8b113c13b77a4581168.camel@gmail.com>
+Subject: Re: [PATCH v2 1/2] net: phy: adin: enable configuration of the LP
+ Termination Register
+From: Nuno =?ISO-8859-1?Q?S=E1?= <noname.nuno@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>, Osose Itua
+ <osose.itua@savoirfairelinux.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, michael.hennerich@analog.com, 
+	jerome.oufella@savoirfairelinux.com
+Date: Wed, 07 Jan 2026 10:18:35 +0000
+In-Reply-To: <a587cedd-9450-4c58-bc39-ecbdd525ef65@lunn.ch>
+References: <20251222222210.3651577-1-osose.itua@savoirfairelinux.com>
+	 <20251222222210.3651577-2-osose.itua@savoirfairelinux.com>
+	 <a587cedd-9450-4c58-bc39-ecbdd525ef65@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, Andrew Lunn <andrew@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
-	<Frank.Sae@motor-comm.com>, <hkallweit1@gmail.com>, <shenjian15@huawei.com>,
-	<liuyonglong@huawei.com>, <chenhao418@huawei.com>,
-	<jonathan.cameron@huawei.com>, <salil.mehta@huawei.com>,
-	<shiyongbang@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH RFC net-next 2/6] net: phy: add support to set default
- rules
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-References: <20251215125705.1567527-1-shaojijie@huawei.com>
- <20251215125705.1567527-3-shaojijie@huawei.com>
- <fe22ae64-2a09-45ce-8dbf-a4683745e21c@lunn.ch>
- <647f91c7-72c2-4e9d-a26d-3f1b5ee42b21@huawei.com>
- <aVerWcPPteVKRHv1@shell.armlinux.org.uk>
- <2d94db98-9484-438f-8e25-6b836c63ff71@huawei.com>
- <aV4sSr79IBIQRj9x@shell.armlinux.org.uk>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <aV4sSr79IBIQRj9x@shell.armlinux.org.uk>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- kwepemk100013.china.huawei.com (7.202.194.61)
 
+On Tue, 2025-12-23 at 10:36 +0100, Andrew Lunn wrote:
+> > +static int adin_config_zptm100(struct phy_device *phydev)
+> > +{
+> > +	struct device *dev =3D &phydev->mdio.dev;
+> > +	int reg;
+> > +	int rc;
+> > +
+> > +	if (!(device_property_read_bool(dev, "adi,low-cmode-impedance")))
+> > +		return 0;
+> > +
+> > +	/* set to 0 to configure for lowest common-mode impedance */
+> > +	rc =3D phy_write_mmd(phydev, MDIO_MMD_VEND1, ADIN1300_B_100_ZPTM_DIMR=
+X, 0x0);
+> > +	if (rc < 0)
+> > +		return rc;
+> > +
+> > +	reg =3D phy_read_mmd(phydev, MDIO_MMD_VEND1, ADIN1300_B_100_ZPTM_DIMR=
+X);
+> > +	if (reg < 0)
+> > +		return reg;
+> > +
+> > +	if (!(reg & ADIN1300_B_100_ZPTM_EN_DIMRX)) {
+> > +		phydev_err(phydev, "Failed to set lowest common-mode impedance.\n");
+> > +		return -EINVAL;
+> > +	}
+>=20
+> Under what condition do you think this could happen? Do you think
+> there are variants of the hardware which do not have this register?
+>=20
+> 	Andrew
 
-on 2026/1/7 17:50, Russell King (Oracle) wrote:
-> On Wed, Jan 07, 2026 at 05:43:08PM +0800, Jijie Shao wrote:
->> on 2026/1/2 19:26, Russell King (Oracle) wrote:
->>> On Wed, Dec 17, 2025 at 08:54:59PM +0800, Jijie Shao wrote:
->>>> on 2025/12/16 15:09, Andrew Lunn wrote:
->>>>> On Mon, Dec 15, 2025 at 08:57:01PM +0800, Jijie Shao wrote:
->>>>>> The node of led need add new property: rules,
->>>>>> and rules can be set as:
->>>>>> BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_RX)
->>>>> Please could you expand this description. It is not clear to my why it
->>>>> is needed. OF systems have not needed it so far. What is special about
->>>>> your hardware?
->>>> I hope to configure the default rules.
->>>> Currently, the LED does not configure rules during initialization; it uses the default rules in the PHY registers.
->>>> I would like to change the default rules during initialization.
->>> One of the issues here is that there are boards out there where the boot
->>> loader has configured the PHY LED configuration - and doesn't supply it
->>> via DT (because PHY LED configuration in the kernel is a new thing.)
->>>
->>> Adding default rules for LEDs will break these platforms.
->>>
->>> Please find a way to provide the LED rules via firmware rather than
->>> introducing some kind of rule defaulting.
->>
->> Actually, in my code, `default_rules` is an optional configuration;
->> you can choose not to set default rules.
-> How is that achieved?
+I think he's just reading back the register to make sure the value was real=
+ly updated...
+If we were going to that for every write our lives would be miserable :).
 
-I use `fwnode_property_present()` to determine whether the rules exist,
-and if they do not exist, I skip the configuration.
+I looked at both adin1200 and adin1300 and they support this in the same wa=
+y so the above
+should just be:
 
-+static int fwnode_phy_led_set_rules(struct phy_device *phydev,
-+				    struct fwnode_handle *led, u32 index)
-+{
-+	u32 rules;
-+	int err;
-+
-+	if (!fwnode_property_present(led, "rules"))
-+		return 0;
+return phy_write_mmd()...
 
-Thanks,
-Jijie Shao
-
+- Nuno S=C3=A1
 
