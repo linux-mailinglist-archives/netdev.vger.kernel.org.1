@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-247532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0927CCFB8E3
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 02:12:03 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A764BCFB8B5
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 02:08:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8D0B8303C99C
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 01:06:48 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B578E3034E41
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 01:06:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 905B123BCF3;
-	Wed,  7 Jan 2026 01:05:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA8823D294;
+	Wed,  7 Jan 2026 01:05:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ngMkZEva"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wjzx3J1b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f74.google.com (mail-dl1-f74.google.com [74.125.82.74])
+Received: from mail-dy1-f202.google.com (mail-dy1-f202.google.com [74.125.82.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12C421CA03
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 01:05:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC472417F0
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 01:05:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767747916; cv=none; b=XYC5R46uICr0klAuOOkdCvDZoBtVDO0ZjHM0Qu/ZE6k/Xjo7CJzqTsF2x9nDXq3+k8Rbri9kf7e2Gf/ssUhC17Z4NsaehKgZ7YRb7VLB93BaKQyxXaWYl/6WXrH4teJ6B9b33gDjkXF2UmwgJDaXsL0jJoetsgPw3IAZjtOH9D4=
+	t=1767747921; cv=none; b=QAQN1PTx71H8tLQjf6Z1b+HV4gfLpJnaXPnTgoJ1xpiadz0KaY2BEWgwQ9hpGSsDEwrBuhgHO0LaifYhWI6a9jGnhGSsuz4D3L3I2TjWh+Bao8DlBrQCzzUvekNCK8NEJ+M1WsgVHsS89hoY86/BIBLc3eaOYKZkcmlZlA1yu7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767747916; c=relaxed/simple;
-	bh=tkLJE6mxW9kD6LFeLnXQRH+Qpbe3qoEP5gnI/ETjkYU=;
+	s=arc-20240116; t=1767747921; c=relaxed/simple;
+	bh=8+A7JJ35NzoQ5l9hGwxPyHD1LIdTAMGfemokebbJmOk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VhS3v0zZYjiPmvq2OwKWGQCJ3OX08NtZ0ZSOiQlMhWU+Orwywni0tEyAj8r8gRer/hDqyPSkx8NHV8NdSA+6XYQKEV10YJRuWCKr+N5ckjhDpu39wvGblZnsV3VTmQ2Kd9V+u/1e3YZh6XEimL0+E3qh8Dt7ADHGERoBASq4oDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--boolli.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ngMkZEva; arc=none smtp.client-ip=74.125.82.74
+	 To:Cc:Content-Type; b=H3sxBOVKqogON4UWNAzMa8ArI0fD7CSmWOANKCqrYz8sYOGYvvAhEfj4RoHr/lkh2BOKGIFjKWPrt53avtX9D/kOj3SONeLyKmO6GAaqrgR6l1wbS+wAO2EZFsiTeWHdTPcXKehqoQKlEhM8EuggoUbv0QqPLXB2I5rhR0YwQnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--boolli.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wjzx3J1b; arc=none smtp.client-ip=74.125.82.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--boolli.bounces.google.com
-Received: by mail-dl1-f74.google.com with SMTP id a92af1059eb24-11ddcc9f85eso296764c88.0
-        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 17:05:14 -0800 (PST)
+Received: by mail-dy1-f202.google.com with SMTP id 5a478bee46e88-2ae32686ed0so3085209eec.0
+        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 17:05:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767747914; x=1768352714; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1767747919; x=1768352719; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DVMU6yQcsBfSJN4wWGFbhK9cF/Gmku+mF1OJ5kiuDgE=;
-        b=ngMkZEvaoOJeqICN8hRXap/kBc1i4Bz/RtrQUWwJdzGQimL8qZkqbgldFklLrGbZOd
-         RrOT4NvbDjbqvH6Rz5J3GBKddRa34QnwvyyGeZC2Q/Hk4rTnr5WmGaLQj6mqZkxUHbrB
-         Bq6g1sCjixw0CP+5TgErbCF9HrC6bUoiYwa8xUTH27Dvywa8KBh+MXOeHRRcWxQZIEwD
-         qkWTjcUoe8mVEJ5XOf9K1STmMNJiUQ8wTkA57XBT8FncoQSFi3hwnefeo2RYQyylOqNC
-         SmLBb/HRW79dP25b27/yDUzCYpYGvb/ufceAc7N5z4v8rDLJL85nFq3w+x76+c1vL+Fw
-         oXHw==
+        bh=QgCM4PdeMwtaGAjDdJiUYbxQZ0vj4v9BcNHM8Ys9aos=;
+        b=wjzx3J1b3Qq2QEuS9s5I/d6402EtjNIbQgCyWcuOxnkQF9w+yW5nR2jYejP0l7Usfn
+         QnmgWDFL3xhZnTl+m3BW7YWQMBZNRpYw0pWjUV8PVmfRKYDRZW/lz9MANvoWY8M68l/z
+         jHzjf4u3LqjyXxOHmbJCZFVnHcii4WSDL7Azp5XHUsV0i0u2M8Pf/V+rqlynliMPMhC/
+         rMXoGjvvbChKK8Kyb9/rhclhoidFdVGB+ohJZwUXdo07Vx8BgJlHrO974eWIJw01zfp/
+         0D1ayuqKEzoiNofScMF4Yv0V5UIqZAPwWXSYphidi+VZLAscLJjaPknEw7PzXpaXujbd
+         mocQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767747914; x=1768352714;
+        d=1e100.net; s=20230601; t=1767747919; x=1768352719;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DVMU6yQcsBfSJN4wWGFbhK9cF/Gmku+mF1OJ5kiuDgE=;
-        b=Mwtandbh+KfqiA40McI/Zfbl8XFGrA6vnyvA1/FuK1gai7QGJISZoDz06ubQH7gvEV
-         LU6ahRmKNLMgRBvvyn3WtZtmysmic6rcSG9Z3ypwKUsFPiOoZSV5YCmhqsYAUahSCGOE
-         Z5Q5ZoGhDvs3aDNWMtAE9E9CHyJ+BNvm4ccyeE+8TMZSO9ij+9LjqWB82H/vBoSaYcPb
-         d58Hp956yt625SXnyjq9M6Bk3Yb8CrnL3IPYqJr0mCs9oKmLdrmxUwIsw9rd0T8fy7F9
-         L+kCbBqagYxJDwzwmP9/V/9/P8N2QgWWm+3EY6gNws+3sHPZbNK0GsdUm7ExKJMzGp7g
-         6+oQ==
-X-Gm-Message-State: AOJu0YwGNTeyVTqOyoKz9I6eA+D4BL7nDdgXhdqYX3fFKSgQbh2hPV5W
-	7MtxjyPW8wBGg7cxBd9Ojp9sd3oU7ZZg+MS/woaMfiSr9tm7jd4VbZynYf1tzyJ3BidZaIf5J8Z
-	KoV2FOg==
-X-Google-Smtp-Source: AGHT+IEimtIxB0kDVopi3uqHoc0Swa3Du9lb+RqD1lMp8iOBNaJDFMF2YObFUEkWmzhx8yWtOHWSy33uHcg=
-X-Received: from dlbcm23.prod.google.com ([2002:a05:7022:6897:b0:11b:1a9a:d2e8])
- (user=boolli job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7022:249f:b0:11e:3e9:3e90
- with SMTP id a92af1059eb24-121f866f776mr891858c88.25.1767747913845; Tue, 06
- Jan 2026 17:05:13 -0800 (PST)
-Date: Wed,  7 Jan 2026 01:05:00 +0000
+        bh=QgCM4PdeMwtaGAjDdJiUYbxQZ0vj4v9BcNHM8Ys9aos=;
+        b=ks5x1y5g3BZxGJD3FxHM0I1Ym4DiBR/BmG78AUB25iTuEEdZzPvJbUlLschjkkRKbs
+         MD7dctX0Y/GQcOFtu61xQqYrIGmZjY7MY+7m5Hefj7j1H/Ryjvsmvhv4kpDsmH3jXgey
+         zju7j7IIpGx7nxvq0WoyUEvMPlV7T1JBwoVLaQt8juwz6QERcrxj9Iy/tiexStSIOE1o
+         V1C2YI6K+dmXgR0LlEqVzUUQJlEgT3qH84Zbg7+O4dYNjGPsaGlKosRuGUdS6pMVisM5
+         hkYQTtHLbUG/CXcbW49JrMKWPyQudbgZE5djduw5Sr+9LFfnE0pXFhsz+LHtpEKMsSSW
+         3utg==
+X-Gm-Message-State: AOJu0YyPGNcH+H0x3lkwSQ5pn9p+L6v5zRwH5UpBP3DRSIEmUE7CH78Q
+	YtaX1CBxgeJ3i3TwpvGeBLOJQTg1NTTulYhfQTFt6I00FMfxcOvsfbEKcsE/gIuTlfAuMTfxzMc
+	H1eIWpQ==
+X-Google-Smtp-Source: AGHT+IFj+b4aF+K3rOjN8KEbm91uYV5xlFvkogdLWnfIxNCoV4dVQ9b0ZLkt2gOYISLMhV6VHkw1LvhmW/8=
+X-Received: from dybcp4.prod.google.com ([2002:a05:7300:a144:b0:2a2:4eb1:3771])
+ (user=boolli job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7300:e42b:b0:2ae:4fd7:ba56
+ with SMTP id 5a478bee46e88-2b17d2951e1mr608048eec.23.1767747918938; Tue, 06
+ Jan 2026 17:05:18 -0800 (PST)
+Date: Wed,  7 Jan 2026 01:05:01 +0000
 In-Reply-To: <20260107010503.2242163-1-boolli@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -71,8 +71,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260107010503.2242163-1-boolli@google.com>
 X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
-Message-ID: <20260107010503.2242163-2-boolli@google.com>
-Subject: [PATCH 2/5] idpf: skip changing MTU if vport is NULL during HW reset
+Message-ID: <20260107010503.2242163-3-boolli@google.com>
+Subject: [PATCH 3/5] idpf: skip getting RX flow rules if vport is NULL during
+ HW reset
 From: Li Li <boolli@google.com>
 To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
@@ -99,47 +100,50 @@ not clear the netdev held by vport:
     kfree(adapter->vports);
     adapter->vports = NULL;
 
-During an idpf HW reset, when userspace changes the MTU of the netdev,
-the vport associated with the netdev is NULL, and so a kernel panic
-would happen:
+During an idpf HW reset, when userspace gets RX flow classification
+rules of the netdev, the vport associated with the netdev is NULL,
+and so a kernel panic would happen:
 
-[ 2081.955742] BUG: kernel NULL pointer dereference, address: 0000000000000068
+[ 1466.308592] BUG: kernel NULL pointer dereference, address: 0000000000000032
 ...
-[ 2082.002739] RIP: 0010:idpf_initiate_soft_reset+0x19/0x190
+[ 1466.356222] RIP: 0010:idpf_get_rxnfc+0x3b/0x70
 
 This can be reproduced reliably by injecting a TX timeout to cause
 an idpf HW reset, and injecting a virtchnl error to cause the HW
-reset to fail and retry, while changing the MTU of the netdev in
-userspace.
+reset to fail and retry, while running "ethtool -n" in userspace.
 
 With this patch applied, we see the following error but no kernel
 panics anymore:
 
-[  304.291346] idpf 0000:05:00.0 eth1: mtu not changed due to no vport innetdev
-RTNETLINK answers: Bad address
+[  312.476576] idpf 0000:05:00.0 eth1: failed to get rules due to no vport in netdev
+Cannot get RX rings: Bad address
+rxclass: Cannot get RX class rule count: Bad address
+RX classification rule retrieval failed
 
 Signed-off-by: Li Li <boolli@google.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf_lib.c | 7 +++++++
+ drivers/net/ethernet/intel/idpf/idpf_ethtool.c | 7 +++++++
  1 file changed, 7 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index 57b8b3fd9124c..53b31989722a7 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -2328,11 +2327,17 @@ static int idpf_change_mtu(struct net_device *netdev, int new_mtu)
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
+index 6a4b630b786c2..c71af85408a29 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
+@@ -45,6 +44,11 @@ static int idpf_get_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd,
  
  	idpf_vport_ctrl_lock(netdev);
  	vport = idpf_netdev_to_vport(netdev);
 +	if (!vport) {
-+		netdev_err(netdev, "mtu not changed due to no vport in netdev\n");
++		netdev_err(netdev, "failed to get rules due to no vport in netdev\n");
 +		err = -EFAULT;
 +		goto unlock;
 +	}
+ 	vport_config = np->adapter->vport_config[np->vport_idx];
+ 	user_config = &vport_config->user_config;
  
- 	WRITE_ONCE(netdev->mtu, new_mtu);
- 
- 	err = idpf_initiate_soft_reset(vport, IDPF_SR_MTU_CHANGE);
+@@ -85,6 +90,7 @@ static int idpf_get_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd,
+ 		break;
+ 	}
  
 +unlock:
  	idpf_vport_ctrl_unlock(netdev);
