@@ -1,197 +1,251 @@
-Return-Path: <netdev+bounces-247707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82061CFDA7F
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 13:28:20 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66F8DCFDB00
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 13:33:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 94BCA30F891D
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 12:22:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 83E35304A8D5
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 12:31:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23B383161BA;
-	Wed,  7 Jan 2026 12:22:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90E6D328B7A;
+	Wed,  7 Jan 2026 12:24:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R4ud838R"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IQPBqY3d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B1A4315D24
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 12:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A60328B70;
+	Wed,  7 Jan 2026 12:24:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767788542; cv=none; b=nGU1VJRE2qt1KcLdG0zUS8v5XkT0PcHZDgWgfjE0kxpWUVpgXuF+CgxBczin1ae9bn8GCeK/PonKLy61KMp2RTkGmrUVUk+pIg3zOXhSJJLubAxjQ0R3ai6WSikXVnxN06bjzVrrrbaiM2HnGVG8o9eP2BhkHPClHcftMixUtsY=
+	t=1767788663; cv=none; b=aa28lq/ucz86TBi/d/GeicIYYm+xJPeUD1evYWmUZzIoMnRKpkypow4DZya0h7Vvw7SfzWTsIVsEJ5Rr6ki5tJlO6MxeZsFe9op2TzTBNFYmU0VX5xhDbt94gHU+d1YpAJ/FSFXbSa3+RNCOzJX7xKZS+N7As3nCBQpUn9VqPvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767788542; c=relaxed/simple;
-	bh=kdB+D8ooK5y+MGn4KMCXRzCE7BBpYAmF+6+mGhFmov0=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PVqRamgQa/52cG5ToEHrLQoSIdOwsWIBmdoXIW7IEx6QQbKlF6jJil9cyUrD3Kuo9XxBUi0g+ytDtHClp0QkVxaEnbnv2HRLe4aEQsPHchmKiETp/PcFQecv0CXLxtfGgdevZQFcxQAOKrRsRYObuw+C2SzcMKFr2u8fzWe7pjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R4ud838R; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-42e2e3c0dccso949912f8f.2
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 04:22:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767788538; x=1768393338; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FKLGw9RhzY5YOkkhmRmhvQTx9xsA1wJogmSE46HH268=;
-        b=R4ud838ReTtdL3jRI3wcuL8XKgEZ0M93KZcWiGkimDRBqSLq5nPwK8u/gHv/9FEc9i
-         Tzxc5WdUYmlpofesl8hb6oMc4+Xnw3mq3F4YNAtOXLaJOgchazsrooMNX8JKYyCxL4U6
-         hnAq99ns9ffa9C3sOSo7GRosJxyFKR11ctjMlK4LrvlQzynvpheonnoId5jfNY584KbL
-         cmNzOPsmGqHH7BAcn0BEWFdPLir5EWHu6wSEr+H7thUSA1SNqMqvE2om/k+dEumpQdWm
-         cjxjp4bOE3Xylwixbj6B+BTM3n8yVXxplOWdCkKVA4U+m4UhSsad9xOEfTVKojd8Y2fZ
-         Zqpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767788538; x=1768393338;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=FKLGw9RhzY5YOkkhmRmhvQTx9xsA1wJogmSE46HH268=;
-        b=qB7n4Qqz9OU9iKRi3h6M3uEMQDF+t3VWZUwhn7nSTeiV0D1Q+mYMQwka9ixY450vpw
-         jyxpaGwhEsLZJPIlMJfRzr0EJoxzllhU8EdDt63Jow0jn872IWxhhgecPY4ItPQGF3ya
-         TFfGbmPVFhnQ9JPCQ+hvFiRibfdEnMD1WwiBzKnhSpSo7H/4whtcOzA0Jkm8CifEUpdL
-         r4OG6F8PUMJZfHYENU7/8i3mVQzB1V8iEpkMvimADhv07ztUO0EhtZYd0vGmOkCWUy5X
-         Ni/P4u2IBH9iua/V/UzXqOj4cHNPJB0U1pzVK4Ms5UlqQnQQDEVRKxhB+7xenetDMxuu
-         lAjw==
-X-Forwarded-Encrypted: i=1; AJvYcCXTJZGPeKbjoWLpdF+YY3G1G/I8lh+aH8oRwrIlCp+5n0CMN6PR+lUKKI8A96EG6g4SdwoFs8w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwEO1ufovyn1c5YQtBLFnlvEXuVb2cHCGyrR+z6moYh9iKZETTm
-	UxtJUFZYF+PUU27xY3mdX0zvMZcDLnuDgbPIqKyY5iD1yWPo6FPRLxBRbgx6cg==
-X-Gm-Gg: AY/fxX7QzwF+gQoQ5z1KJq7KL1RTaym2nfhuISdA6RBQxYtB2EmtutKxtJYs0301lfk
-	iysipWCroue8Hn7FwX2eBeU+sDm1RWTwi9IR8fmWZiL/TDluZhXk9wEUHwwGBEdXko2DJrDPTKP
-	I6nj1OjrgkxOJjSi4Z1AVuKU37NNIzYD8X5IXjSo5oZua2NPLUPjihZpwBoYXSG1SxuuH8VmdVI
-	ijuGVq0Kw6+AUl/NcCk0gn2X014ks3+XGUvcZowvioAUbwBh13ySioLXWww2H1sXOCR38eCftxt
-	Vbm0f5wwqgBVYrv6//gSlET0iRR4Zc1f1eBvjzeHk0D9JETKsHQJiBC2G8WmwxCkfKuvX3HuMjP
-	GzyNIwJeRYBwADnhwjoQ8gTpnYkz0SABHK/a9xgAuoQvkGpMNrcYoxZUzyuIY018nHcTLBf1SdX
-	UDjn3jUs4BVIEWNhRda2VKOZSwkMcr
-X-Google-Smtp-Source: AGHT+IFDN//R8tPKMlA4XyPjKFG9gUgQwKQylfTdCf0jvQBBESf+sLesU0BxFAZFA45mSUh5AwD0QA==
-X-Received: by 2002:a05:6000:1449:b0:431:6ba:38ac with SMTP id ffacd0b85a97d-432c374f131mr3053927f8f.4.1767788538368;
-        Wed, 07 Jan 2026 04:22:18 -0800 (PST)
-Received: from imac.lan ([2a02:8010:60a0:0:bc70:fb0c:12b6:3a41])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0e16f4sm10417107f8f.11.2026.01.07.04.22.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 04:22:17 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	"Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
-	Gal Pressman <gal@nvidia.com>,
-	Jan Stancek <jstancek@redhat.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Nimrod Oren <noren@nvidia.com>,
-	netdev@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	=?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
-	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Ruben Wauters <rubenru09@aol.com>,
-	linux-doc@vger.kernel.org
-Subject: [PATCH net-next v1 13/13] tools: ynl-gen-c: Fix remaining pylint warnings
-Date: Wed,  7 Jan 2026 12:21:43 +0000
-Message-ID: <20260107122143.93810-14-donald.hunter@gmail.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260107122143.93810-1-donald.hunter@gmail.com>
-References: <20260107122143.93810-1-donald.hunter@gmail.com>
+	s=arc-20240116; t=1767788663; c=relaxed/simple;
+	bh=IsygWTMZdTG0Nq6crJvMpuu1naoy0zMIB4K4PhC/N+g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OQE/KZQoOnjsdN1BQIRFC1Y9PdnjGmbKLKzYRQeh8Y3aP8zNj0oHYL1f9fyFxnaB36nBc2i0R1g4qnUvrlD1/PNK5oTSNL+GCN4xNJw+TxK5ENTvYBv7pEownFX5lOzWSV+bDZlHO4LPpKNdP0KXooCpa0khHNSct9IAhZAQvNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IQPBqY3d; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F7A2C4CEF7;
+	Wed,  7 Jan 2026 12:24:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767788663;
+	bh=IsygWTMZdTG0Nq6crJvMpuu1naoy0zMIB4K4PhC/N+g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IQPBqY3d1wDsYM2p0cWdND2XmtPcU6sME/U61WJINvoK0+GWxk+WGZrcW5N1NQM1N
+	 73Sb6VNbTLeyVeVtSvcGuq01XdzERHaNnnCSIpllqmR85o83ujea5Gm5hz2MczeBy/
+	 JHWs91IWhHNoW7DLlmSc8UndW/pTYDFOLFNQ7GY00vA2nrOibnCos/9s1USnf0dGuD
+	 qEvBv22WKdjZnB8dCGLvYpmSR5Unp3anb0PsaOw6LL7fGw1RXS2LJG9DTpV/RznDhd
+	 0/H8+MMiRmpEnx0rGGoIo6HoQhpSHd0SRTD8/G338qS7bZt6Mel6qlFXr6gHiG7O2V
+	 h2Fospv+Dq25g==
+Date: Wed, 7 Jan 2026 12:24:18 +0000
+From: Simon Horman <horms@kernel.org>
+To: Cindy Lu <lulu@redhat.com>
+Cc: mst@redhat.com, jasowang@redhat.com, dtatulea@nvidia.com,
+	virtualization@lists.linux-foundation.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 2/3] vdpa/mlx5: reuse common function for MAC address
+ updates
+Message-ID: <20260107122418.GB196631@kernel.org>
+References: <20251229071614.779621-1-lulu@redhat.com>
+ <20251229071614.779621-2-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251229071614.779621-2-lulu@redhat.com>
 
-Fix the following pylint warning instances:
+On Mon, Dec 29, 2025 at 03:16:13PM +0800, Cindy Lu wrote:
+> Factor out MAC address update logic and reuse it from handle_ctrl_mac().
+> 
+> This ensures that old MAC entries are removed from the MPFS table
+> before adding a new one and that the forwarding rules are updated
+> accordingly. If updating the flow table fails, the original MAC and
+> rules are restored as much as possible to keep the software and
+> hardware state consistent.
+> 
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> ---
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c | 95 +++++++++++++++++--------------
+>  1 file changed, 53 insertions(+), 42 deletions(-)
+> 
+> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> index 6e42bae7c9a1..c87e6395b060 100644
+> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> @@ -2125,62 +2125,48 @@ static void teardown_steering(struct mlx5_vdpa_net *ndev)
+>  	mlx5_destroy_flow_table(ndev->rxft);
+>  }
+>  
+> -static virtio_net_ctrl_ack handle_ctrl_mac(struct mlx5_vdpa_dev *mvdev, u8 cmd)
+> +static int mlx5_vdpa_change_new_mac(struct mlx5_vdpa_net *ndev,
+> +				    struct mlx5_core_dev *pfmdev,
+> +				    const u8 *new_mac)
+>  {
+> -	struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
+> -	struct mlx5_control_vq *cvq = &mvdev->cvq;
+> -	virtio_net_ctrl_ack status = VIRTIO_NET_ERR;
+> -	struct mlx5_core_dev *pfmdev;
+> -	size_t read;
+> -	u8 mac[ETH_ALEN], mac_back[ETH_ALEN];
+> -
+> -	pfmdev = pci_get_drvdata(pci_physfn(mvdev->mdev->pdev));
+> -	switch (cmd) {
+> -	case VIRTIO_NET_CTRL_MAC_ADDR_SET:
+> -		read = vringh_iov_pull_iotlb(&cvq->vring, &cvq->riov, (void *)mac, ETH_ALEN);
+> -		if (read != ETH_ALEN)
+> -			break;
+> -
+> -		if (!memcmp(ndev->config.mac, mac, 6)) {
+> -			status = VIRTIO_NET_OK;
+> -			break;
+> -		}
+> +	struct mlx5_vdpa_dev *mvdev = &ndev->mvdev;
+> +	u8 old_mac[ETH_ALEN];
+>  
+> -		if (is_zero_ether_addr(mac))
+> -			break;
+> +	if (is_zero_ether_addr(new_mac))
+> +		return -EINVAL;
+>  
+> -		if (!is_zero_ether_addr(ndev->config.mac)) {
+> -			if (mlx5_mpfs_del_mac(pfmdev, ndev->config.mac)) {
+> -				mlx5_vdpa_warn(mvdev, "failed to delete old MAC %pM from MPFS table\n",
+> -					       ndev->config.mac);
+> -				break;
+> -			}
+> +	if (!is_zero_ether_addr(ndev->config.mac)) {
+> +		if (mlx5_mpfs_del_mac(pfmdev, ndev->config.mac)) {
+> +			mlx5_vdpa_warn(mvdev, "failed to delete old MAC %pM from MPFS table\n",
+> +				       ndev->config.mac);
+> +			return -EIO;
+>  		}
+> +	}
+>  
+> -		if (mlx5_mpfs_add_mac(pfmdev, mac)) {
+> -			mlx5_vdpa_warn(mvdev, "failed to insert new MAC %pM into MPFS table\n",
+> -				       mac);
+> -			break;
+> -		}
+> +	if (mlx5_mpfs_add_mac(pfmdev, (u8 *)new_mac)) {
+> +		mlx5_vdpa_warn(mvdev, "failed to insert new MAC %pM into MPFS table\n",
+> +			       new_mac);
+> +		return -EIO;
+> +	}
+>  
+>  		/* backup the original mac address so that if failed to add the forward rules
+>  		 * we could restore it
+>  		 */
+> -		memcpy(mac_back, ndev->config.mac, ETH_ALEN);
+> +		memcpy(old_mac, ndev->config.mac, ETH_ALEN);
+>  
+> -		memcpy(ndev->config.mac, mac, ETH_ALEN);
+> +		memcpy(ndev->config.mac, new_mac, ETH_ALEN);
 
-ynl_gen_c.py:575:15: E0606: Possibly using variable 'mem' before
-assignment (possibly-used-before-assignment)
+...
 
-ynl_gen_c.py:888:0: R1707: Disallow trailing comma tuple
-(trailing-comma-tuple)
+Hi Cindy,
 
-ynl_gen_c.py:944:21: C0209: Formatting a regular string which could be an
-f-string (consider-using-f-string)
+I realise that this makes the diffstat significantly more verbose.
+And hides material changes. So perhaps there is a nicer way to do this.
 
-ynl_gen_c.py:1450:14: C1802: Do not use `len(SEQUENCE)` without comparison
-to determine if a sequence is empty (use-implicit-booleaness-not-len)
+But with the current arrangement of this patch, I think that
+the indentation from just above, until the end of this function
+needs to be updated.
 
-ynl_gen_c.py:1688:13: W1514: Using open without explicitly specifying an
-encoding (unspecified-encoding)
+I.e. the following incremental patch on top of this one.
 
-ynl_gen_c.py:3446:0: C0325: Unnecessary parens after '=' keyword
-(superfluous-parens)
+This was flagged by Smatch.
 
-Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
----
- tools/net/ynl/pyynl/ynl_gen_c.py | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
-
-diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
-index 5f079a74c8d1..c823ccf2b75c 100755
---- a/tools/net/ynl/pyynl/ynl_gen_c.py
-+++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-@@ -571,6 +571,8 @@ class TypeBinary(Type):
-             mem = 'NLA_POLICY_MIN_LEN(' + self.get_limit_str('min-len') + ')'
-         elif 'max-len' in self.checks:
-             mem = 'NLA_POLICY_MAX_LEN(' + self.get_limit_str('max-len') + ')'
-+        else:
-+            raise Exception('Failed to process policy check for binary type')
+diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+index c87e6395b060..c796f502b604 100644
+--- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
++++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+@@ -2149,48 +2149,48 @@ static int mlx5_vdpa_change_new_mac(struct mlx5_vdpa_net *ndev,
+ 		return -EIO;
+ 	}
  
-         return mem
+-		/* backup the original mac address so that if failed to add the forward rules
+-		 * we could restore it
+-		 */
+-		memcpy(old_mac, ndev->config.mac, ETH_ALEN);
++	/* backup the original mac address so that if failed to add the forward rules
++	 * we could restore it
++	 */
++	memcpy(old_mac, ndev->config.mac, ETH_ALEN);
  
-@@ -885,7 +887,7 @@ class TypeIndexedArray(Type):
-                 f"for (i = 0; i < {var}->{ref}_count.{self.c_name}; i++)",
-                 f'{self.nested_render_name}_free(&{var}->{ref}{self.c_name}[i]);',
-             ]
--        lines += f"free({var}->{ref}{self.c_name});",
-+        lines += (f"free({var}->{ref}{self.c_name});",)
-         return lines
+-		memcpy(ndev->config.mac, new_mac, ETH_ALEN);
++	memcpy(ndev->config.mac, new_mac, ETH_ALEN);
  
- class TypeNestTypeValue(Type):
-@@ -941,9 +943,8 @@ class TypeSubMessage(TypeNest):
-         else:
-             sel_var = f"{var}->{sel}"
-         get_lines = [f'if (!{sel_var})',
--                     'return ynl_submsg_failed(yarg, "%s", "%s");' %
--                        (self.name, self['selector']),
--                    f"if ({self.nested_render_name}_parse(&parg, {sel_var}, attr))",
-+                     f'return ynl_submsg_failed(yarg, "{self.name}", "{self['selector']}");',
-+                     f"if ({self.nested_render_name}_parse(&parg, {sel_var}, attr))",
-                      "return YNL_PARSE_CB_ERROR;"]
-         init_lines = [f"parg.rsp_policy = &{self.nested_render_name}_nest;",
-                       f"parg.data = &{var}->{self.c_name};"]
-@@ -1447,7 +1448,7 @@ class Family(SpecFamily):
-         attr_set_queue = list(self.root_sets.keys())
-         attr_set_seen = set(self.root_sets.keys())
+-		/* Need recreate the flow table entry, so that the packet could forward back
+-		 */
+-		mac_vlan_del(ndev, old_mac, 0, false);
++	/* Need recreate the flow table entry, so that the packet could forward back
++	 */
++	mac_vlan_del(ndev, old_mac, 0, false);
  
--        while len(attr_set_queue):
-+        while attr_set_queue:
-             a_set = attr_set_queue.pop(0)
-             for attr, spec in self.attr_sets[a_set].items():
-                 if 'nested-attributes' in spec:
-@@ -1685,7 +1686,7 @@ class CodeWriter:
-         if not self._overwrite and os.path.isfile(self._out_file):
-             if filecmp.cmp(self._out.name, self._out_file, shallow=False):
-                 return
--        with open(self._out_file, 'w+') as out_file:
-+        with open(self._out_file, 'w+', encoding='utf-8') as out_file:
-             self._out.seek(0)
-             shutil.copyfileobj(self._out, out_file)
-             self._out.close()
-@@ -3443,7 +3444,7 @@ def main():
-         print(exc)
-         os.sys.exit(1)
+-		if (mac_vlan_add(ndev, ndev->config.mac, 0, false)) {
+-			mlx5_vdpa_warn(mvdev, "failed to insert forward rules, try to restore\n");
++	if (mac_vlan_add(ndev, ndev->config.mac, 0, false)) {
++		mlx5_vdpa_warn(mvdev, "failed to insert forward rules, try to restore\n");
  
--    cw = CodeWriter(BaseNlLib(), args.out_file, overwrite=(not args.cmp_out))
-+    cw = CodeWriter(BaseNlLib(), args.out_file, overwrite=not args.cmp_out)
+-			/* Although it hardly run here, we still need double check */
+-			if (is_zero_ether_addr(old_mac)) {
+-				mlx5_vdpa_warn(mvdev, "restore mac failed: Original MAC is zero\n");
+-				return -EIO;
+-			}
++		/* Although it hardly run here, we still need double check */
++		if (is_zero_ether_addr(old_mac)) {
++			mlx5_vdpa_warn(mvdev, "restore mac failed: Original MAC is zero\n");
++			return -EIO;
++		}
  
-     _, spec_kernel = find_kernel_root(args.spec)
-     if args.mode == 'uapi' or args.header:
--- 
-2.52.0
-
+-			/* Try to restore original mac address to MFPS table, and try to restore
+-			 * the forward rule entry.
+-			 */
+-			if (mlx5_mpfs_del_mac(pfmdev, ndev->config.mac)) {
+-				mlx5_vdpa_warn(mvdev, "restore mac failed: delete MAC %pM from MPFS table failed\n",
+-					       ndev->config.mac);
+-			}
++		/* Try to restore original mac address to MFPS table, and try to restore
++		 * the forward rule entry.
++		 */
++		if (mlx5_mpfs_del_mac(pfmdev, ndev->config.mac)) {
++			mlx5_vdpa_warn(mvdev, "restore mac failed: delete MAC %pM from MPFS table failed\n",
++				       ndev->config.mac);
++		}
+ 
+-			if (mlx5_mpfs_add_mac(pfmdev, old_mac)) {
+-				mlx5_vdpa_warn(mvdev, "restore mac failed: insert old MAC %pM into MPFS table failed\n",
+-					       old_mac);
+-			}
++		if (mlx5_mpfs_add_mac(pfmdev, old_mac)) {
++			mlx5_vdpa_warn(mvdev, "restore mac failed: insert old MAC %pM into MPFS table failed\n",
++				       old_mac);
++		}
+ 
+-			memcpy(ndev->config.mac, old_mac, ETH_ALEN);
++		memcpy(ndev->config.mac, old_mac, ETH_ALEN);
+ 
+-			if (mac_vlan_add(ndev, ndev->config.mac, 0, false))
+-				mlx5_vdpa_warn(mvdev, "restore forward rules failed: insert forward rules failed\n");
++		if (mac_vlan_add(ndev, ndev->config.mac, 0, false))
++			mlx5_vdpa_warn(mvdev, "restore forward rules failed: insert forward rules failed\n");
+ 
+-			return -EIO;
+-		}
++		return -EIO;
++	}
+ 
+-		return 0;
++	return 0;
+ }
+ 
+ static virtio_net_ctrl_ack handle_ctrl_mac(struct mlx5_vdpa_dev *mvdev, u8 cmd)
 
