@@ -1,165 +1,146 @@
-Return-Path: <netdev+bounces-247609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3320DCFC4A0
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 08:11:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E997ACFC4A6
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 08:11:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5A3E8303899D
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 07:10:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 82771301140D
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 07:11:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAE422765F8;
-	Wed,  7 Jan 2026 07:10:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 430D7257830;
+	Wed,  7 Jan 2026 07:11:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YyFE6yVC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JG7GdLiD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f193.google.com (mail-dy1-f193.google.com [74.125.82.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8EF1F63CD
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 07:10:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1468074BE1;
+	Wed,  7 Jan 2026 07:11:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767769837; cv=none; b=RBcG6NYDKMs4WVmwjyUUjI7vUeqvSEeot0poR9FVeLF3/Cg1ZDjKg1adXT+y20cezDAQwid9sxlObtFWooQHhIkK2S2GQmibAQRtOobn+OTEZLrZ6B6WagF3w++PHYvW1fQ9YQ3o1VUq/PO1di7fv+ipKejIkHOFpZjsWVgD11M=
+	t=1767769874; cv=none; b=pMsnRBBW93azSpNaNextEjVZJCYB4Upuxk9kPAphjhrgKCdmdxkF9B6uy/uOCykDps/EanImeq3WNdnSV5oPv0VZtJj22VUG8aJhVT7au/F5kp6spgWnzflqTvJcIrsBzhAYyVqr6BoTW7CN43muABgfZTts1Y9r2U1FF+od2jI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767769837; c=relaxed/simple;
-	bh=Tag4uW1gJKIbFMRBQGpgPZqok5VYlk0s010/2wTSRLo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iN7IepBJpwgkHFjFd2LQ5jz+VrmidSWueqQZhDPVSi2mghMxqx3Xxdfo+umCgVFaerfv96MY5+7/phtdbEeXCiy8ZIMu0WF6MRJqWkP2+ipdmaS6jc38VqMo0zLXSfyjQeNYqh2nWffx0kc4Zf+Im4TnLCWnBFhsSyWl9+8rY4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YyFE6yVC; arc=none smtp.client-ip=74.125.82.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f193.google.com with SMTP id 5a478bee46e88-2ae57f34e22so1623160eec.1
-        for <netdev@vger.kernel.org>; Tue, 06 Jan 2026 23:10:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767769835; x=1768374635; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8SmTNJ1Y/tJtwUpON+YJlGyMTfU5DwilWF+vv967P/M=;
-        b=YyFE6yVCoOias+Yo8Lwyf21Fmfj+GPdMp7IWqx7OhVx6GqwtoYwsHSUAwEa/zdPCHI
-         /7xzi/aqIrmjBitpJOa2OrAlSXcwg7OYiI/YsAcaprvhLHrgoXnj1BIiNhFlTut5CB0r
-         D/cXHDfxDEv47lbgDUlLeVbsh3Qon7QKqmcG9x621DDRbRVWS1/pXqr94ckGy1bDxLEf
-         TxLO32BswMHm0P85cL3JOo4DFey/kEUO45B494yv6g9yZ0CW8RmnDfMbn1EdDRgKCcwq
-         Bdv75RxDruQeXvdOPAq+S1/Yq4QIovAlHLaSf5ljrkwECB5M3Cv/0kso1J4if9J+2Sfs
-         kYIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767769835; x=1768374635;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=8SmTNJ1Y/tJtwUpON+YJlGyMTfU5DwilWF+vv967P/M=;
-        b=o7Uc/7RBhWl/nD7e2SgyXIw+l9US9VnAz+lEv1CbD6/CWw8bQdkIWtUZPe2A43qBVF
-         932jh8EsEH2RfZkigFu7ZNkfbw/NYp9o3fFWw7gc6UY01b7L1Xib2RRMyQH1LzV4kXZ0
-         5Gqupu3GdJT0hHzWdBOtuzyYrniGRDCmdGbHihmVYrsrmma+4rs+RVYvjjUJiuQ9qk9A
-         mPSkutCcoWJEg0XimWTNLqBIg7nzrgrH6Xh8RfONLGeA9/Ko009AtnvEQ0N3yFxN/hME
-         Fho4e/kYj3IM2lMlLMPZz7oau3EDahKKbqQaRKZ2QvqFGLaIblsEWDiITDsHlQJymzK0
-         saUg==
-X-Gm-Message-State: AOJu0YwD/f4WyTae6UYLTPWk/75t/kQrY6wW452QDlFkq6/406IXZIUj
-	9rtv1qVbIXUNO6wUPLtcVWnsuN3LRuaJUaISA5il4e53koEOBhU0c+xqWfmix+p/
-X-Gm-Gg: AY/fxX7Ip0y13LUKUc7Zvr2aMqlbnnExPVPoqQ6e70uSCpKapExNVtk7FDpS1swsQ89
-	bn1sCYjAbuH4uMcdG5qawG935sdbSWsg6hjN5d8vrJEShKWdAGc1+irijVrq0wWAU8hLkBIeysP
-	7TloRsrgPsv+7TJvfM9h43/CYgJ+46/6EvyLZGz8Q7najjBkdq0S59pME7CBuAzBi9DBNkNNcz1
-	83m8B1OMxIVwmIuIclVJvg5X+GstWHoiwXMXaoyUVGKiiRdUz6fIEA1xQi2YNtCtxsByrgv3eye
-	lMW0YaTMSZxRONWPabVst0GkpCh5wArT12c62ofXYojPiJVat8gV3QE1OuGciY9gPQuC1xImC39
-	CekOSWu4ZCdI5qIl1mnoc3qQbgyLyGMXnqlQn/kdMqAUkCggak2oA0BDWVQn8lNV+X9sT7j3eUg
-	R3fFKiA8cNK++sAEJJiKruLJcxwCIHHUxTXl8X5sqRklO6VQlntgih05u7F/V/zQirPd0XXl4p/
-	NKK1wwyW7talVJSNhRRvpDX1R2swc0239wLMsjxPuG0bEZRAztURmQcH+Kb9VqWoWTQi73xMB30
-	JBeA6K84n1uFEPQ=
-X-Google-Smtp-Source: AGHT+IEM0Djs13xBO1962zCB2rl5tFWUEiCWqXtNyAd+s50eRCqI66s8JdGHy/8PwEJkIPOEFCX/lQ==
-X-Received: by 2002:a05:7300:fb86:b0:2b0:4e86:814c with SMTP id 5a478bee46e88-2b17d207b17mr1359482eec.13.1767769835194;
-        Tue, 06 Jan 2026 23:10:35 -0800 (PST)
-Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b1706a53f0sm6091593eec.10.2026.01.06.23.10.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jan 2026 23:10:35 -0800 (PST)
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Subject: [PATCH net-next] sis900: remove module version and switch to module_pci_driver
-Date: Tue,  6 Jan 2026 23:10:15 -0800
-Message-ID: <20260107071015.29914-3-enelsonmoore@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260107071015.29914-1-enelsonmoore@gmail.com>
-References: <20260107071015.29914-1-enelsonmoore@gmail.com>
+	s=arc-20240116; t=1767769874; c=relaxed/simple;
+	bh=YEXSgOITxIN6mJF/xx/h3Pi2AK3vEPMqUsJYnrw5Cok=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=McGp0qehxZNhIYP/ivuhkqIDk0bCcIVqJvveWVoq4jS/T7tiHyeS6gazOp25n8/AWt67ZSvHMjvg2tDP92XLjmuKBoXBD9+aeb+vclQqYPQjNPu63Oa1PgilRn8JBEhBtEubcabX8AOMp5lFuzf1o40FPFv0o8rDsl1G8rm2Lcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JG7GdLiD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA788C4CEF7;
+	Wed,  7 Jan 2026 07:11:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767769873;
+	bh=YEXSgOITxIN6mJF/xx/h3Pi2AK3vEPMqUsJYnrw5Cok=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=JG7GdLiDYDOcUauN/qejiUdmZUAuJzFanrurRV7iIMIeMblIKMcWOF6me9O+EWGeq
+	 7kCiA6d7qiTQqYVAvn7hdLKZqhWUk1CGWYFJ8ELxmr/pGL/Uzj516M39ZH0IUqft3q
+	 DcGLH9djYxFM3eRUW5LHfoFHi2kMCTO3aDX5uw9fXeaRXCBxtJvEAVm4h948SpqLwX
+	 MB0jP8X5ZvIAgO0ZWDAGpmKF+OSUJbkC5wPD9KvTcf8Fq5hDv8ywYBZ6e3qF21Cw39
+	 SPf7DjIYNO5qsAE0vrdIP2saWUsKdOiaziciPH7wpwrXepiendj5DRaCSqECMwDic0
+	 iio60+S2dhxbg==
+Content-Type: multipart/mixed; boundary="===============5457345692534689078=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Message-Id: <7b965f06828236a16f0146550e01a581b1c202c427584a894d5a70a42ff06435@mail.kernel.org>
+In-Reply-To: <20260107064352.291069-5-dongml2@chinatelecom.cn>
+References: <20260107064352.291069-5-dongml2@chinatelecom.cn>
+Subject: Re: [PATCH bpf-next v7 04/11] bpf: support fsession for bpf_session_is_return
+From: bot+bpf-ci@kernel.org
+To: menglong8.dong@gmail.com,ast@kernel.org,andrii@kernel.org
+Cc: daniel@iogearbox.net,martin.lau@linux.dev,eddyz87@gmail.com,song@kernel.org,yonghong.song@linux.dev,john.fastabend@gmail.com,kpsingh@kernel.org,sdf@fomichev.me,haoluo@google.com,jolsa@kernel.org,davem@davemloft.net,dsahern@kernel.org,tglx@linutronix.de,mingo@redhat.com,jiang.biao@linux.dev,bp@alien8.de,dave.hansen@linux.intel.com,x86@kernel.org,hpa@zytor.com,bpf@vger.kernel.org,netdev@vger.kernel.org,linux-kernel@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Wed,  7 Jan 2026 07:11:12 +0000 (UTC)
 
-The module version is useless, and the only thing the
-sis900_init_module routine did besides pci_register_driver was to print
-the version.
+--===============5457345692534689078==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+> index 41228b0add52..95248b0d28ab 100644
+> --- a/include/linux/bpf.h
+> +++ b/include/linux/bpf.h
+> @@ -1229,6 +1229,9 @@ enum {
+>  #endif
+>  };
+>
+> +#define BPF_TRAMP_M_NR_ARGS	0
+> +#define BPF_TRAMP_M_IS_RETURN	8
+
+[ ... ]
+
+> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> index bfff3f84fd91..d3709edd0e51 100644
+
+[ ... ]
+
+> @@ -22558,6 +22564,13 @@ static int fixup_kfunc_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
+>  		   desc->func_id == special_kfunc_list[KF_bpf_rdonly_cast]) {
+>  		insn_buf[0] = BPF_MOV64_REG(BPF_REG_0, BPF_REG_1);
+>  		*cnt = 1;
+> +	} else if (desc->func_id == special_kfunc_list[KF_bpf_session_is_return] &&
+> +		   env->prog->expected_attach_type == BPF_TRACE_FSESSION) {
+> +		/* Load nr_args from ctx - 8 */
+> +		insn_buf[0] = BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_1, -8);
+> +		insn_buf[1] = BPF_ALU64_IMM(BPF_RSH, BPF_REG_0, BPF_TRAMP_M_IS_RETURN);
+> +		insn_buf[2] = BPF_ALU64_IMM(BPF_AND, BPF_REG_0, 1);
+> +		*cnt = 3;
+                ^^^^
+
+This inlined code reads the BPF_TRAMP_M_IS_RETURN bit (bit 8) from ctx[-1]
+to determine if the program is running at function exit. However, looking
+at arch/x86/net/bpf_jit_comp.c, the trampoline only stores nr_regs to
+ctx[-8] at this point in the series:
+
+    emit_mov_imm64(&prog, BPF_REG_0, 0, (u32) nr_regs);
+    emit_stx(&prog, BPF_DW, BPF_REG_FP, BPF_REG_0, -nregs_off);
+
+The BPF_TRAMP_M_IS_RETURN flag is not being set by the trampoline code.
+Is this intentional? The arch code that sets this bit appears to be added
+in a later commit in the series (93d4641b9513 "bpf,x86: add fsession
+support for x86_64").
+
+At this commit, bpf_session_is_return() for fsession programs will always
+return false, even during fexit execution, because bit 8 is never set.
+
+> +	}
+>
+>  	if (env->insn_aux_data[insn_idx].arg_prog) {
+
+[ ... ]
+
+> diff --git a/kernel/trace/bpf_trace.c b/kernel/trace/bpf_trace.c
+> index 736b32cf2195..9d3bf3bbe8f6 100644
+
+[ ... ]
+
+> @@ -3314,6 +3314,12 @@ static u64 bpf_uprobe_multi_entry_ip(struct bpf_run_ctx *ctx)
+>  }
+>  #endif /* CONFIG_UPROBES */
+>
+> +bool bpf_fsession_is_return(void *ctx)
+> +{
+> +	/* This helper call is inlined by verifier. */
+> +	return !!(((u64 *)ctx)[-1] & (1 << BPF_TRAMP_M_IS_RETURN));
+> +}
+
+The same issue exists here in bpf_fsession_is_return() - it reads bit 8
+which is not set by the trampoline at this point in the series. The
+comment indicates this is inlined by the verifier, but both code paths
+have the same problem.
+
+[ ... ]
+
+
 ---
- drivers/net/ethernet/sis/sis900.c | 31 +------------------------------
- 1 file changed, 1 insertion(+), 30 deletions(-)
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
-diff --git a/drivers/net/ethernet/sis/sis900.c b/drivers/net/ethernet/sis/sis900.c
-index b461918dc5f4..d85ac8cbeb00 100644
---- a/drivers/net/ethernet/sis/sis900.c
-+++ b/drivers/net/ethernet/sis/sis900.c
-@@ -79,10 +79,6 @@
- #include "sis900.h"
- 
- #define SIS900_MODULE_NAME "sis900"
--#define SIS900_DRV_VERSION "v1.08.10 Apr. 2 2006"
--
--static const char version[] =
--	KERN_INFO "sis900.c: " SIS900_DRV_VERSION "\n";
- 
- static int max_interrupt_work = 40;
- static int multicast_filter_limit = 128;
-@@ -442,13 +438,6 @@ static int sis900_probe(struct pci_dev *pci_dev,
- 	const char *card_name = card_names[pci_id->driver_data];
- 	const char *dev_name = pci_name(pci_dev);
- 
--/* when built into the kernel, we only print version if device is found */
--#ifndef MODULE
--	static int printed_version;
--	if (!printed_version++)
--		printk(version);
--#endif
--
- 	/* setup various bits in PCI command register */
- 	ret = pcim_enable_device(pci_dev);
- 	if(ret) return ret;
-@@ -2029,7 +2018,6 @@ static void sis900_get_drvinfo(struct net_device *net_dev,
- 	struct sis900_private *sis_priv = netdev_priv(net_dev);
- 
- 	strscpy(info->driver, SIS900_MODULE_NAME, sizeof(info->driver));
--	strscpy(info->version, SIS900_DRV_VERSION, sizeof(info->version));
- 	strscpy(info->bus_info, pci_name(sis_priv->pci_dev),
- 		sizeof(info->bus_info));
- }
-@@ -2567,21 +2555,4 @@ static struct pci_driver sis900_pci_driver = {
- 	.driver.pm	= &sis900_pm_ops,
- };
- 
--static int __init sis900_init_module(void)
--{
--/* when a module, this is printed whether or not devices are found in probe */
--#ifdef MODULE
--	printk(version);
--#endif
--
--	return pci_register_driver(&sis900_pci_driver);
--}
--
--static void __exit sis900_cleanup_module(void)
--{
--	pci_unregister_driver(&sis900_pci_driver);
--}
--
--module_init(sis900_init_module);
--module_exit(sis900_cleanup_module);
--
-+module_pci_driver(sis900_pci_driver);
--- 
-2.43.0
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/20773233136
 
+--===============5457345692534689078==--
 
