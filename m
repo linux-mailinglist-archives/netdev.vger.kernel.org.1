@@ -1,142 +1,167 @@
-Return-Path: <netdev+bounces-247802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A760CFED80
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 17:23:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9108CFECB0
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 17:11:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 77B7830012C5
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 16:21:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BD7403081E38
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 15:56:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F9F1395240;
-	Wed,  7 Jan 2026 15:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAA063A35D9;
+	Wed,  7 Jan 2026 15:39:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HffQtd3T";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="VbfctQdP";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HffQtd3T";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="VbfctQdP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA87394488
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 15:34:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE2B03A35BC
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 15:39:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767800063; cv=none; b=kRI0ewnt2znmB3pqcopK/F/+y/H4NVY88Gmb11Qt0dz9hxOL/A6tSetrZSmLEdfDHHbml5Ibhqe9AcG6QrncwdG1jsPyNpG1zcP4SQc4ee29tj1aBNQgKNTedry3L7gKf5K61X5VLZsaifpITbTYbzFgqjM2fipLjw5yQRy/bfw=
+	t=1767800346; cv=none; b=Dlc3IwpOR9GNHo4jhqqP5BHNLHUHO4GNsTRfmUCMwZaA8R1Mjn1PjU2Xkjl8fhKAYXTF37M9mpmBxbiNMiaENNZS1ZUmV7qPqCnZ2nEdGSlICT48qxveNvgfczWaft5fG9dCsUoYf/XSSpSGkshquHjamS/kv57hlleJQulwFII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767800063; c=relaxed/simple;
-	bh=+jcXT0Qd0MP/qXpaY/rIBJ8LHVp0WyD94cq6v1/lYNA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=FROOJ2fwvrvBCqeWibtQaZhlxUovQ1+kf0BnfGX7/JhLnXuy0okRGaeAix531ozx1iR1OFDjUwbyXKErTKCt1BXtS5EaGtcmfwfG81HoX+Q2l2oGbR3y7rIOWEIAeJDMZT9AEl1WjG2A05GZrIiqwZ1Z8zBKGwPi5wCn7IYzLD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-65746235dd4so547835eaf.3
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 07:34:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767800060; x=1768404860;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vFGKIQl/QbaqT2n6c9mJgM64BLFaT5MMFGibHivKdeQ=;
-        b=CpZHlcYlqPafT6ieDiqRH6pS2vVKw/tIV28z0qKw7xFJylUgimg7DiBpaIsWReVoWP
-         rwQlyMeIWFhOR0/yG4D01lYUwnDgPpnCRIOGD6pAWzQLUk3sY2l84h2F09O5/C9iCVpk
-         DIKvSEtjuT1Hc3ZXrQk8aTc41RvzJq2csHVfQ6/Vscz5HRv1wVGjAaPALNUrtaiABnUB
-         k9/bhwGY2O+p2Zm0sn43vfTrjBTR6SSaRnSZ83H3TFg5h+6oOHkx4Az2S7+br9t4kY5t
-         cWCxjO1S8DaLesoOT4gT/gduNUgItfHWaujWM1JHq9j9xd95LW+xU4tpFAh8l0AITjG4
-         8A4w==
-X-Forwarded-Encrypted: i=1; AJvYcCWNgbUNUYrLXBeRFEdJhxYtOQSRuuynMZz7nNzSaVmNd9ZbpiJSPmQxqzWXdeuvpr+0JRUcjpk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8MLO41/CeJuDW3ldywQAaIHbWEglCk2aKjp8uYT0D4GdB9Nqa
-	WxOFwEi2kn9QN8lyjM46WRwECeb7MOGV866sSUVpSy8dgTCaZ6WNgivqVpCoNohSkJcM/E5eswR
-	TrCdhQtBmqgshQGPMid3WTlYGwSGKK+7iaRaDZItW2gIA+zLTG/5O/bModVY=
-X-Google-Smtp-Source: AGHT+IGF2wQGBSRYfqIMGfsewhBc+zagOQzvOfUtyUbX89hNVPwEDqMoVzj0pFQ7GyGSefeBwC/Iqsq55wcl6bC4YMqkLBWgQBvM
+	s=arc-20240116; t=1767800346; c=relaxed/simple;
+	bh=50w+oXt2hScNdCwJcCVqTG2Afxm91zAvIhyTSnt4iuU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hKcZTF6RBilRjjSj5sh1M/tHUdAeJeVPzvCrYMGFok0Mbn6AFRLqqvKn8ISZ6d6mRzcjp6NPCGkNlajpgd6YOgJ+GGlUkGbiN+66ryMs7zRqvEGgmehB1f1QxF2LtlEVfkTpAChLU51eS+/WirVLchp/amDdfxAOvSDcY13aaNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HffQtd3T; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=VbfctQdP; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HffQtd3T; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=VbfctQdP; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id DCC185C1FD;
+	Wed,  7 Jan 2026 15:38:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1767800336; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=1vbLNYrfc5erOsYy/2jQXQL9OCtF2aZv1jUjz7lYxqY=;
+	b=HffQtd3TM1BjTsGQwefVftqZ3266RcD5AQK/4N04203quy+/o7pt5WZA0OKIcTsJlJy5Z8
+	6r55ogwrldeu7wCKXZxogH2VLcmrQDif6W9cbMVXllJpxMfHnvrQcM/AS4gYxJYp7emvik
+	F0qgge4sWcc/sUhCR/OCv10z2eHbeq4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1767800336;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=1vbLNYrfc5erOsYy/2jQXQL9OCtF2aZv1jUjz7lYxqY=;
+	b=VbfctQdPdf+mJe9RMGv9VbUn82Ba4/3Av9AMqrvN2bCZZC5EHOdX7+qFuDO2IsY1/wVRlq
+	4YyCXKKmztAIQFCQ==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1767800336; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=1vbLNYrfc5erOsYy/2jQXQL9OCtF2aZv1jUjz7lYxqY=;
+	b=HffQtd3TM1BjTsGQwefVftqZ3266RcD5AQK/4N04203quy+/o7pt5WZA0OKIcTsJlJy5Z8
+	6r55ogwrldeu7wCKXZxogH2VLcmrQDif6W9cbMVXllJpxMfHnvrQcM/AS4gYxJYp7emvik
+	F0qgge4sWcc/sUhCR/OCv10z2eHbeq4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1767800336;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=1vbLNYrfc5erOsYy/2jQXQL9OCtF2aZv1jUjz7lYxqY=;
+	b=VbfctQdPdf+mJe9RMGv9VbUn82Ba4/3Av9AMqrvN2bCZZC5EHOdX7+qFuDO2IsY1/wVRlq
+	4YyCXKKmztAIQFCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5396B3EA63;
+	Wed,  7 Jan 2026 15:38:56 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id FcJ2ERB+Xmn7CgAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Wed, 07 Jan 2026 15:38:56 +0000
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Fernando Fernandez Mancera <fmancera@suse.de>
+Subject: [PATCH 1/2 net-next v2] ipv6: use the right ifindex when replying to icmpv6 from localhost
+Date: Wed,  7 Jan 2026 16:38:40 +0100
+Message-ID: <20260107153841.5030-1-fmancera@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:1610:b0:65d:1636:5442 with SMTP id
- 006d021491bc7-65f54f6b90amr1254931eaf.56.1767800059693; Wed, 07 Jan 2026
- 07:34:19 -0800 (PST)
-Date: Wed, 07 Jan 2026 07:34:19 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <695e7cfb.050a0220.1c677c.036b.GAE@google.com>
-Subject: [syzbot] [afs?] [net?] KCSAN: data-race in rxrpc_peer_keepalive_worker
- / rxrpc_send_data_packet
-From: syzbot <syzbot+6182afad5045e6703b3d@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dhowells@redhat.com, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-afs@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, marc.dionne@auristor.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -2.80
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-0.987];
+	MIME_GOOD(-0.10)[text/plain];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:mid];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid];
+	RCVD_TLS_ALL(0.00)[]
 
-Hello,
+When replying to a ICMPv6 echo request that comes from localhost address
+the right output ifindex is 1 (lo) and not rt6i_idev dev index. Use the
+skb device ifindex instead. This fixes pinging to a local address from
+localhost source address.
 
-syzbot found the following issue on:
+$ ping6 -I ::1 2001:1:1::2 -c 3
+PING 2001:1:1::2 (2001:1:1::2) from ::1 : 56 data bytes
+64 bytes from 2001:1:1::2: icmp_seq=1 ttl=64 time=0.037 ms
+64 bytes from 2001:1:1::2: icmp_seq=2 ttl=64 time=0.069 ms
+64 bytes from 2001:1:1::2: icmp_seq=3 ttl=64 time=0.122 ms
 
-HEAD commit:    30f09200cc4a Merge tag 'arm64-fixes' of git://git.kernel.o..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=13446e12580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=655255e3ef31c19b
-dashboard link: https://syzkaller.appspot.com/bug?extid=6182afad5045e6703b3d
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+2001:1:1::2 ping statistics
+3 packets transmitted, 3 received, 0% packet loss, time 2032ms
+rtt min/avg/max/mdev = 0.037/0.076/0.122/0.035 ms
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/445be400b5e4/disk-30f09200.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/8be295d83690/vmlinux-30f09200.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/ae2ac2a81686/bzImage-30f09200.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6182afad5045e6703b3d@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KCSAN: data-race in rxrpc_peer_keepalive_worker / rxrpc_send_data_packet
-
-write to 0xffff8881044ab560 of 8 bytes by task 4063 on cpu 1:
- rxrpc_send_data_packet+0x1593/0x1df0 net/rxrpc/output.c:714
- rxrpc_transmit_fresh_data net/rxrpc/call_event.c:255 [inline]
- rxrpc_transmit_some_data+0x63c/0x8b0 net/rxrpc/call_event.c:277
- rxrpc_input_call_event+0x8bb/0xf30 net/rxrpc/call_event.c:401
- rxrpc_io_thread+0x1c1e/0x21c0 net/rxrpc/io_thread.c:550
- kthread+0x489/0x510 kernel/kthread.c:463
- ret_from_fork+0x122/0x1b0 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-read to 0xffff8881044ab560 of 8 bytes by task 3500 on cpu 0:
- rxrpc_peer_keepalive_dispatch net/rxrpc/peer_event.c:268 [inline]
- rxrpc_peer_keepalive_worker+0x44e/0x800 net/rxrpc/peer_event.c:341
- process_one_work kernel/workqueue.c:3263 [inline]
- process_scheduled_works+0x4ce/0x9d0 kernel/workqueue.c:3346
- worker_thread+0x582/0x770 kernel/workqueue.c:3427
- kthread+0x489/0x510 kernel/kthread.c:463
- ret_from_fork+0x122/0x1b0 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-value changed: 0x0000000000000000 -> 0x0000000000000029
-
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 0 UID: 0 PID: 3500 Comm: kworker/u9:1 Not tainted syzkaller #0 PREEMPT(voluntary) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
-Workqueue: krxrpcd rxrpc_peer_keepalive_worker
-==================================================================
-
-
+Fixes: 1b70d792cf67 ("ipv6: Use rt6i_idev index for echo replies to a local address")
+Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+v2: no changes
+---
+ net/ipv6/icmp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
+index 5d2f90babaa5..5de254043133 100644
+--- a/net/ipv6/icmp.c
++++ b/net/ipv6/icmp.c
+@@ -965,7 +965,9 @@ static enum skb_drop_reason icmpv6_echo_reply(struct sk_buff *skb)
+ 	fl6.daddr = ipv6_hdr(skb)->saddr;
+ 	if (saddr)
+ 		fl6.saddr = *saddr;
+-	fl6.flowi6_oif = icmp6_iif(skb);
++	fl6.flowi6_oif = ipv6_addr_type(&fl6.daddr) & IPV6_ADDR_LOOPBACK ?
++			 skb->dev->ifindex :
++			 icmp6_iif(skb);
+ 	fl6.fl6_icmp_type = type;
+ 	fl6.flowi6_mark = mark;
+ 	fl6.flowi6_uid = sock_net_uid(net, NULL);
+-- 
+2.52.0
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
