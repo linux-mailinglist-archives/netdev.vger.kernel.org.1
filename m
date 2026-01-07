@@ -1,144 +1,104 @@
-Return-Path: <netdev+bounces-247841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6009CFF1EF
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 18:33:22 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FC4CCFF2A3
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 18:43:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id F3E8230019C1
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 17:30:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AD4AD3011B38
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 17:41:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D3693644C0;
-	Wed,  7 Jan 2026 17:05:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E5B234DB6E;
+	Wed,  7 Jan 2026 17:31:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B9k8CT2B"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Rzf9wKZO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A203624C8
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 17:05:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3633E34A3C4;
+	Wed,  7 Jan 2026 17:31:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767805520; cv=none; b=RL4PBQmm/QsHqKBverb/mqYMOVTsr7i0PdEbUQi2LynfzDyQKeN5JNI4u2Ir0AZBvJs/dz8ZkQ/Ma16uVpRmmI0KFKvcG0DHotMztRMqLPwDrJqlCDEUi/Uzb06RXkHaXMADqkbxG6lj8h9dnVi2hxPmg2dSFSBqaEW/hEDFUaw=
+	t=1767807103; cv=none; b=dp1BLSrjWpLGTs+4UtKXJQB8Ha6lmbmbI1OrvsPZDSgKQU479oz02FyMRuxXKlutKvyCveDq5m77d3eg1qY/ft8YAA9IH5V0PobHjCSbJDED7NAosXCwo479WgRrX9/LiYzoH7kJQWyz9blRtytZHTOf0AQuWG6NFLS/oQOT5p4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767805520; c=relaxed/simple;
-	bh=GZVPnIihlbssrlAxnEReq4xRAteXUX7SCOOZGsQW5EI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TTv50EUNSBK6b0ssmY2qwI7oFWg4MbZfdsHMYZkafJwvXD9Gm4qmGruBcu36zKA23SOzIhR4IRQx6M5zgMDtqiUA8gdMKPqDhwUN/aGxSZaLLaMP7vuGl65AMZHPFdqvcv6AxyH4Sl7Qg+GZYCdo4cz9zbYVSVzikK+flJCKJh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B9k8CT2B; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8bb6a27d3edso209177985a.3
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 09:05:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767805517; x=1768410317; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dOc8XfG+0s04myYixo5Pf4CHGB1gH0OMOC9SxKCE8Xo=;
-        b=B9k8CT2BOs46lSMT9jF+qAMoMzBY8WRc4BUjN65S+IwiGDxy7GLhk7yKpCCbP8fuUO
-         ZoDEemxFxhsyQj2ERol15t6RwvT0Cbm0sddEgr1n+1lmaKajIDzZyq0kUO2glvNJ5d/k
-         AYzq/TSWh80u82SKfiijeFHP+CFiPAGnVz4xHmJRfOaSl3B4DbpszZU6g5KBVzdxeNWf
-         QOM7ZtfeRGMv6FZsvQsbYa7OD1wZ8G49jimFb5wCSQKvYovq8rgNCa1vTtHNQnta0ejt
-         HnDILz/cIbUBepJwiVIWkwvnJi2ZJQSRyKl6giGN1c3sl2EPDbs+ZYmVJzRjmYBSWb9L
-         bEBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767805517; x=1768410317;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dOc8XfG+0s04myYixo5Pf4CHGB1gH0OMOC9SxKCE8Xo=;
-        b=vuMR6AKHEa8UIBr4HW1kFVIzsFzg2zLyuflh2XmsXv00dNdZVwbRiLdWMc5fNHqFan
-         Pe55bp1Ap+TSavUTkQEvMc72Wqakapl0ZPOExd1PywyuQ9S2ZrnVFu/WVGy4wegWMqqZ
-         GYyNN48pK24pjZVJVjFt4OP+d97+q++m0nN73Dn8FJSCVZKQ0ZFMM15EJckgeNGaybXS
-         6m5SC1AdfqIdM9A29nk22b4j/TFx+IjZDgxrin2Ds/Wka+RcJRvLAdZv/FTNF9BbTEtV
-         5d83D0A+hVhJknfSkwZuX8qkBUV0rfd8XyjQfQDvWJgch7eSH6BAcMMTZOyAFnHVbm+0
-         LdSw==
-X-Forwarded-Encrypted: i=1; AJvYcCUDiQIDD3kawajvcq8ZQSVccDv1+dX8GyIHCz+uNYq85NcH7cq/uN5eBol4tC5txZdQQuw8AEI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKN3RF32ZGtB59bpvlj+qhzusGyX9R7LRYJEEeY2+MEJLGylbR
-	oj9IQ9gkyImZocpD42gCOuta+CbKhMA0CPMJe7bNjnnW+wLaZJiojz+u
-X-Gm-Gg: AY/fxX7yUf7EBfYI0kdMnTjwyBu4LIGGGElAKTh1FBxCbLMnZa1zlUjjSucdp3s1P4w
-	4sLdw6/cKivVdEkAJKbfluR3S9prtEqHQSalke/6PJzrS7lSQyZdof8jAiGOJSQQD7g5VatEWmE
-	ASuYI8TmNGnufisiuDf82kwZttrLqcBtm30dWA6QbXYKTYiLV+dGk9UFrehmpx+Z7N/aZ3YVDWo
-	OmfWghfpVBAmMx2P7dZAFFfnLv4qpxHZIQaYKxd574GTCpYZM0qFxMOyeIDMwjYdjx/ilTcKv0f
-	Ix1Ae9+3ljjI30rIfCFafyPQeH+4Y66RU3F8jXcDCsJgtvy85U7xnCOTKRadBKpKpo2Kl4mIEh3
-	Ltuug/f1xr9C0Rpnf42kpflLju47gEgEcqu5Xy8ESaOL0QNE8LrV0/3RPde7KGhQoTW5ChinDsM
-	q1UzP2f910b1wX74C5
-X-Google-Smtp-Source: AGHT+IHexZZHvIX4wJ9N9GsO9bANEN/avMjXKz+s9jn7FEl2rkDaHTwvV6tUPNS67dV+YcgpZH3t+Q==
-X-Received: by 2002:a05:620a:7087:b0:8be:64e5:52b9 with SMTP id af79cd13be357-8c389408be6mr323212485a.57.1767805517246;
-        Wed, 07 Jan 2026 09:05:17 -0800 (PST)
-Received: from ?IPV6:2601:18f:901:12c::100d? ([2601:18f:901:12c::100d])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c37f51cdcesm405934685a.26.2026.01.07.09.05.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Jan 2026 09:05:16 -0800 (PST)
-Message-ID: <099019ee-05f4-457b-a82b-0fac55d8dd48@gmail.com>
-Date: Wed, 7 Jan 2026 12:05:15 -0500
+	s=arc-20240116; t=1767807103; c=relaxed/simple;
+	bh=STJkh8Ybg0FTqQCs6HFtlRNhgJiwg7Qi5xrVh47nvhI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rjqcAiaNJDlmdeH0Sgl0Zuwkg6ohi8BPepV5Ixic4Mo50CUTRNDhBB8ZZVsor1OdzFAPQ+gM/hxCRm9ALLxyqSXJ7cuINr6/edQAe2gZV1bH/fzBKadCWB0aBq2GqSIvK/S22QmHvy3dpc8WwyqrwJ+00QDe63o5tVPGgEbtzwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Rzf9wKZO; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=8+5pL9ii5SD5d+0EKkLqda2QSulYIArq9zhWN7r2gxk=; b=Rzf9wKZOImcX0VlW5/RM8Fzxsy
+	453as1VrOz7SqoMKUJKY7KUxs4lmsF1WBd76AjfRWJwy9uUWARmkIbXuXBRd/rl9HSktwp3p6uzIp
+	3dE6TSlv+gXv2PtxuA0YlfYHw6APntUvhqw8L14uBAqVWpSQQWJG55Hk7St81QnM2ZI8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vdXNI-001puP-IS; Wed, 07 Jan 2026 18:31:12 +0100
+Date: Wed, 7 Jan 2026 18:31:12 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: Rob Herring <robh@kernel.org>, netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>, Petr Oros <poros@redhat.com>,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Stefan Wahren <wahrenst@gmx.net>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	linux-rdma@vger.kernel.org,
+	Horatiu Vultur <Horatiu.Vultur@microchip.com>
+Subject: Re: [PATCH RFC net-next 01/13] dt-bindings: net:
+ ethernet-controller: Add DPLL pin properties
+Message-ID: <0000750a-e08e-45c7-a039-5eb754f6e37c@lunn.ch>
+References: <20251211194756.234043-1-ivecera@redhat.com>
+ <20251211194756.234043-2-ivecera@redhat.com>
+ <2de556f0-d7db-47f1-a59e-197f92f93d46@lunn.ch>
+ <20251217004946.GA3445804-robh@kernel.org>
+ <5db81f5b-4f35-46e4-8fec-4298f1ac0c4e@redhat.com>
+ <CAL_JsqJoybgJTAbSjGbTBxo-v=dbYY68tT309CV98=ohWhnC=w@mail.gmail.com>
+ <66815c08-8408-4651-b039-d47925ae125e@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2 net-next v2] ipv6: use the right ifindex when replying
- to icmpv6 from localhost
-To: Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20260107153841.5030-1-fmancera@suse.de>
-Content-Language: en-US
-From: Brian Haley <haleyb.dev@gmail.com>
-In-Reply-To: <20260107153841.5030-1-fmancera@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <66815c08-8408-4651-b039-d47925ae125e@redhat.com>
 
-Hi Fernando,
+> > I have no idea what makes sense for ACPI and little interest in
+> > reviewing ACPI bindings. While I think the whole idea of shared
+> > bindings is questionable, really it's a question of review bandwidth
+> > and so far no one has stepped up to review ACPI bindings.
+> 
+> It depends... shared bindings allow drivers to read property values
+> without need to have separate OF and ACPI codepaths.
 
-On 1/7/26 10:38 AM, Fernando Fernandez Mancera wrote:
-> When replying to a ICMPv6 echo request that comes from localhost address
-> the right output ifindex is 1 (lo) and not rt6i_idev dev index. Use the
-> skb device ifindex instead. This fixes pinging to a local address from
-> localhost source address.
-> 
-> $ ping6 -I ::1 2001:1:1::2 -c 3
-> PING 2001:1:1::2 (2001:1:1::2) from ::1 : 56 data bytes
-> 64 bytes from 2001:1:1::2: icmp_seq=1 ttl=64 time=0.037 ms
-> 64 bytes from 2001:1:1::2: icmp_seq=2 ttl=64 time=0.069 ms
-> 64 bytes from 2001:1:1::2: icmp_seq=3 ttl=64 time=0.122 ms
-> 
-> 2001:1:1::2 ping statistics
-> 3 packets transmitted, 3 received, 0% packet loss, time 2032ms
-> rtt min/avg/max/mdev = 0.037/0.076/0.122/0.035 ms
-> 
-> Fixes: 1b70d792cf67 ("ipv6: Use rt6i_idev index for echo replies to a local address")
-> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
-> ---
-> v2: no changes
-> ---
->   net/ipv6/icmp.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
-> index 5d2f90babaa5..5de254043133 100644
-> --- a/net/ipv6/icmp.c
-> +++ b/net/ipv6/icmp.c
-> @@ -965,7 +965,9 @@ static enum skb_drop_reason icmpv6_echo_reply(struct sk_buff *skb)
->   	fl6.daddr = ipv6_hdr(skb)->saddr;
->   	if (saddr)
->   		fl6.saddr = *saddr;
-> -	fl6.flowi6_oif = icmp6_iif(skb);
-> +	fl6.flowi6_oif = ipv6_addr_type(&fl6.daddr) & IPV6_ADDR_LOOPBACK ?
-> +			 skb->dev->ifindex :
-> +			 icmp6_iif(skb);
->   	fl6.fl6_icmp_type = type;
->   	fl6.flowi6_mark = mark;
->   	fl6.flowi6_uid = sock_net_uid(net, NULL);
+Do you have real hardware in your hands using ACPI?
 
-Using ipv6_addr_loopback(&fl6.daddr) might be more efficient as it does 
-a direct comparison of the address.
-
--Brian
+   Andrew
 
