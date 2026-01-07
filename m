@@ -1,48 +1,47 @@
-Return-Path: <netdev+bounces-247726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1F6DCFDD1A
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 14:04:39 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0636CFDC8F
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 13:57:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E8977301029B
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 12:57:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id ECEB930060DB
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 12:57:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2F97315793;
-	Wed,  7 Jan 2026 12:57:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 091A2316196;
+	Wed,  7 Jan 2026 12:57:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HOlBu6qN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aO13gosd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E7A8199931
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 12:57:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8D1530AAD7
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 12:57:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767790643; cv=none; b=oOPBTjfYFDPnAER3nF1zy/rQ4rDa3GN+vTGXIbXu9Aw/15DViZHCN2Rshfj6SwDMtvqjkPvdr1/Iq6mQ/XrgXXHhE4357427M1qHVXjRRLN3TNXO0Yz9/ETFo1WX21yxE4wm5SIXeHzhQmCymAl1KksIyOLCg+PvPRr9d88K19E=
+	t=1767790645; cv=none; b=aSbF/khxT2lg/hRJ9BtAHPkK65MUUJNfHNyBOGvzapWjcb1Sbt+CAtTK5T9lqr4D0V8J4O3i3CWxnrvwr9p5dcQkbRg/DSpXGw0qKSEtU8u7zJsymAFnGlBneLaN06GgUBgQcdSMfO8dWlWlKzJvW2RPUWJarKHPqD4SRvNsx5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767790643; c=relaxed/simple;
-	bh=mEETJasBND2XPwCJNStXzFgWWFgtcQyIC+hE17BKzRg=;
+	s=arc-20240116; t=1767790645; c=relaxed/simple;
+	bh=LukkQPBp5SBixBLENpAhljrn+GhlOWzpEr6rtqc7ud0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=do6KMcyyFbXki/joniBAqa2kxjoHmt9Ola9V7Kj8wknyc1ks1bRMnJDaCiWKDfS5OV3D9XWKipdaWjAJmJ47Lvk1EngHLHTGDOjIUUKvi2Kfww0BNg0kVwFWRzlWoGFughakwUsHaUptIuR8Vj4I0OHTw/e5Ntvr4TBkV6e2+m8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HOlBu6qN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81382C19421;
-	Wed,  7 Jan 2026 12:57:21 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=hZVcD3+H5BAAyY9XMxM9LekSpLmlCFu3HrsAcQ/7ms5xzrddoLyU1/EHJ6x18mLxyPL0rve3lQxfQbhUg85MB9pqawTeQdJKtXMMOQKoh29bVjH6kP9hJW2wWwieo5YENG2+EhvnXQYA2+uAMTVnAZKAYT3Ybdst//2ZK98S1DQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aO13gosd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 996F5C16AAE;
+	Wed,  7 Jan 2026 12:57:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767790643;
-	bh=mEETJasBND2XPwCJNStXzFgWWFgtcQyIC+hE17BKzRg=;
+	s=k20201202; t=1767790645;
+	bh=LukkQPBp5SBixBLENpAhljrn+GhlOWzpEr6rtqc7ud0=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=HOlBu6qNquBfkJ2aT/LzBM061XuXQ9cqvkFvglYAbbVzrS18c6y+vzM8H224SMhsW
-	 f/pZlDwe2/Uj+p2gJEQdLvGRzMSa3SM6hnk+MverTKOSgQ/qAqntP4adWcVLH5KfTn
-	 VlcSFkGb9EQ/tmvZ2+squyE2HKIroI0sRk2RTOcUitM2wCKkuhzbdlGB0Lg5B8CK01
-	 bhE/L0BfbC+x5YwYM3tIxMTi6W0VJ1g648MRBfuJcHHKAApNwlkk1APfg523pVQfqp
-	 Ls9I5VdR/NCgWXLXHEgFDzhxmCj6ZVJ1et7W/qR1F33ApwBIeUBvXmL6BArFePlmM5
-	 GvCf3bsHHAcdw==
+	b=aO13gosdfG+LS618mjdTma5mqiYXjmVzaNcIuLG/cKwDI7YdVXdmUYl5f4NRIKOqJ
+	 YoE/loVt/RlEdF4LmE7uDdBbYLY4jKv3Z2vnATLukyUW9H9DbuBvu1xHUvRF32Z3mG
+	 M6CAUcuXiyFW/St6mqugQueSQSD+bH+OIoOAgRkMxmWr0HVVyIfPlYiWQKahLfW6/c
+	 av996UwXYfbLz1aYb4y0jwAof7F8EpjChht7ea2rfbeFtqnhSbGOcBpmpNYxOE1eGs
+	 urCaFAJOtx17DekvuGGwhzptwY1YFMm5POeV4a90wx/6/g7/mY7VFMZBtpPHLmaCBL
+	 93sMz+CHh7fSA==
 From: Linus Walleij <linusw@kernel.org>
-Date: Wed, 07 Jan 2026 13:57:14 +0100
-Subject: [PATCH net-next 1/2] net: dsa: tag_ks8995: Add the KS8995 tag
- handling
+Date: Wed, 07 Jan 2026 13:57:15 +0100
+Subject: [PATCH net-next 2/2] net: dsa: ks8995: Add DSA tagging to KS8995
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,7 +50,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260107-ks8995-dsa-tagging-v1-1-1a92832c1540@kernel.org>
+Message-Id: <20260107-ks8995-dsa-tagging-v1-2-1a92832c1540@kernel.org>
 References: <20260107-ks8995-dsa-tagging-v1-0-1a92832c1540@kernel.org>
 In-Reply-To: <20260107-ks8995-dsa-tagging-v1-0-1a92832c1540@kernel.org>
 To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
@@ -61,190 +60,178 @@ To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
 Cc: netdev@vger.kernel.org, Linus Walleij <linusw@kernel.org>
 X-Mailer: b4 0.14.3
 
-The KS8995 100Mbit switch can do proper DSA per-port tagging
-with the proper set-up. This adds the code to handle ingress
-and egress KS8995 tags.
+This makes the KS8995 DSA switch use the special tags to direct
+traffic to a specific port and identify traffic coming in on a
+specific port.
 
-The tag is a modified 0x8100 ethertype tag where a bit in the
-last byte is set for each target port.
+These tags are not available on the sibling devices KSZ8895
+or KSZ8795.
+
+To do this the switch require us to enable "special tags" in a
+register, then enable tag insertion on the CPU port, meaning the
+CPU port will deliver packets with a special tag indicating which
+port the traffic is coming from, and then we need to enable
+tag removal on all outgoing (LAN) ports, this means that the
+special egress tag is stripped off by the switch before exiting
+the PHY-backed ports.
+
+Add a MAINTAINERS entry while we're at it.
 
 Signed-off-by: Linus Walleij <linusw@kernel.org>
 ---
- include/net/dsa.h    |   2 +
- net/dsa/Kconfig      |   6 +++
- net/dsa/Makefile     |   1 +
- net/dsa/tag_ks8995.c | 114 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 123 insertions(+)
+ MAINTAINERS              |  8 +++++
+ drivers/net/dsa/Kconfig  |  1 +
+ drivers/net/dsa/ks8995.c | 87 ++++++++++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 94 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/dsa.h b/include/net/dsa.h
-index cced1a866757..b4c1ac14d051 100644
---- a/include/net/dsa.h
-+++ b/include/net/dsa.h
-@@ -57,6 +57,7 @@ struct tc_action;
- #define DSA_TAG_PROTO_BRCM_LEGACY_FCS_VALUE	29
- #define DSA_TAG_PROTO_YT921X_VALUE		30
- #define DSA_TAG_PROTO_MXL_GSW1XX_VALUE		31
-+#define DSA_TAG_PROTO_KS8995_VALUE		32
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 5b11839cba9d..310accf05153 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -16942,6 +16942,14 @@ F:	drivers/bus/mhi/
+ F:	drivers/pci/endpoint/functions/pci-epf-mhi.c
+ F:	include/linux/mhi.h
  
- enum dsa_tag_protocol {
- 	DSA_TAG_PROTO_NONE		= DSA_TAG_PROTO_NONE_VALUE,
-@@ -91,6 +92,7 @@ enum dsa_tag_protocol {
- 	DSA_TAG_PROTO_VSC73XX_8021Q	= DSA_TAG_PROTO_VSC73XX_8021Q_VALUE,
- 	DSA_TAG_PROTO_YT921X		= DSA_TAG_PROTO_YT921X_VALUE,
- 	DSA_TAG_PROTO_MXL_GSW1XX	= DSA_TAG_PROTO_MXL_GSW1XX_VALUE,
-+	DSA_TAG_PROTO_KS8995		= DSA_TAG_PROTO_KS8995_VALUE,
- };
- 
- struct dsa_switch;
-diff --git a/net/dsa/Kconfig b/net/dsa/Kconfig
-index f86b30742122..c5272dc7af88 100644
---- a/net/dsa/Kconfig
-+++ b/net/dsa/Kconfig
-@@ -112,6 +112,12 @@ config NET_DSA_TAG_MXL_GSW1XX
- 	  Say Y or M if you want to enable support for tagging frames for
- 	  MaxLinear GSW1xx switches.
- 
-+config NET_DSA_TAG_KS8995
-+	tristate "Tag driver for Micrel KS8995 switch"
-+	help
-+	  Say Y if you want to enable support for tagging frames for the
-+	  Micrel KS8995 switch.
++MICREL KS8995 DSA SWITCH
++M:	Linus Walleij <linusw@kernel.org>
++S:	Supported
++S:	Maintained
++F:	Documentation/devicetree/bindings/net/dsa/micrel,ks8995.yaml
++F:	drivers/net/dsa/ks8995.c
++F:	net/dsa/tag_ks8995.c
 +
- config NET_DSA_TAG_KSZ
- 	tristate "Tag driver for Microchip 8795/937x/9477/9893 families of switches"
+ MICROBLAZE ARCHITECTURE
+ M:	Michal Simek <monstr@monstr.eu>
+ S:	Supported
+diff --git a/drivers/net/dsa/Kconfig b/drivers/net/dsa/Kconfig
+index 7eb301fd987d..8925308cc7d7 100644
+--- a/drivers/net/dsa/Kconfig
++++ b/drivers/net/dsa/Kconfig
+@@ -97,6 +97,7 @@ config NET_DSA_KS8995
+ 	tristate "Micrel KS8995 family 5-ports 10/100 Ethernet switches"
+ 	depends on SPI
+ 	select NET_DSA_TAG_NONE
++	select NET_DSA_TAG_KS8995
  	help
-diff --git a/net/dsa/Makefile b/net/dsa/Makefile
-index 42d173f5a701..03eed7653a34 100644
---- a/net/dsa/Makefile
-+++ b/net/dsa/Makefile
-@@ -25,6 +25,7 @@ obj-$(CONFIG_NET_DSA_TAG_BRCM_COMMON) += tag_brcm.o
- obj-$(CONFIG_NET_DSA_TAG_DSA_COMMON) += tag_dsa.o
- obj-$(CONFIG_NET_DSA_TAG_GSWIP) += tag_gswip.o
- obj-$(CONFIG_NET_DSA_TAG_HELLCREEK) += tag_hellcreek.o
-+obj-$(CONFIG_NET_DSA_TAG_KS8995) += tag_ks8995.o
- obj-$(CONFIG_NET_DSA_TAG_KSZ) += tag_ksz.o
- obj-$(CONFIG_NET_DSA_TAG_LAN9303) += tag_lan9303.o
- obj-$(CONFIG_NET_DSA_TAG_MTK) += tag_mtk.o
-diff --git a/net/dsa/tag_ks8995.c b/net/dsa/tag_ks8995.c
-new file mode 100644
-index 000000000000..a5adda4767a3
---- /dev/null
-+++ b/net/dsa/tag_ks8995.c
-@@ -0,0 +1,114 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2025 Linus Walleij <linusw@kernel.org>
-+ */
-+#include <linux/etherdevice.h>
-+#include <linux/log2.h>
-+#include <linux/list.h>
-+#include <linux/slab.h>
-+
-+#include "tag.h"
-+
-+/* The KS8995 Special Tag Packet ID (STPID)
-+ * pushes its tag in a way similar to a VLAN tag
-+ * -----------------------------------------------------------
-+ * | MAC DA | MAC SA | 2 bytes tag | 2 bytes TCI | EtherType |
-+ * -----------------------------------------------------------
-+ * The tag is: 0x8100 |= BIT(port), ports 0,1,2,3
-+ */
-+
-+#define KS8995_NAME "ks8995"
-+
-+#define KS8995_TAG_LEN 4
-+
-+static struct sk_buff *ks8995_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	  This driver supports the Micrel KS8995 family of 10/100 Mbit ethernet
+ 	  switches, managed over SPI.
+diff --git a/drivers/net/dsa/ks8995.c b/drivers/net/dsa/ks8995.c
+index 77d8b842693c..00c8c7853c61 100644
+--- a/drivers/net/dsa/ks8995.c
++++ b/drivers/net/dsa/ks8995.c
+@@ -3,7 +3,7 @@
+  * SPI driver for Micrel/Kendin KS8995M and KSZ8864RMN ethernet switches
+  *
+  * Copyright (C) 2008 Gabor Juhos <juhosg at openwrt.org>
+- * Copyright (C) 2025 Linus Walleij <linus.walleij@linaro.org>
++ * Copyright (C) 2025-2026 Linus Walleij <linusw@kernel.org>
+  *
+  * This file was based on: drivers/spi/at25.c
+  *     Copyright (C) 2006 David Brownell
+@@ -338,6 +338,12 @@ static int ks8995_reset(struct ks8995_switch *ks)
+ 	return ks8995_start(ks);
+ }
+ 
++static bool ks8995_is_ks8995(struct ks8995_switch *ks)
 +{
-+	struct dsa_port *dp = dsa_user_to_port(dev);
-+	u16 ks8995_tag;
-+	__be16 *p;
-+	u16 port;
-+	u16 tci;
-+
-+	/* Prepare the special KS8995 tags */
-+	port = dsa_xmit_port_mask(skb, dev);
-+	/* The manual says to set this to the CPU port if no port is indicated */
-+	if (!port)
-+		port = BIT(5);
-+
-+	ks8995_tag = ETH_P_8021Q | port;
-+	tci = port & VLAN_VID_MASK;
-+
-+	/* Push in a tag between MAC and ethertype */
-+	netdev_dbg(dev, "egress packet tag: add tag %04x %04x to port %d\n",
-+		   ks8995_tag, tci, dp->index);
-+
-+	skb_push(skb, KS8995_TAG_LEN);
-+	dsa_alloc_etype_header(skb, KS8995_TAG_LEN);
-+
-+	p = dsa_etype_header_pos_tx(skb);
-+	p[0] = htons(ks8995_tag);
-+	p[1] = htons(tci);
-+
-+	return skb;
++	return ((ks->chip->family_id == FAMILY_KS8995) &&
++		(ks->chip->chip_id == KS8995_CHIP_ID));
 +}
 +
-+static struct sk_buff *ks8995_rcv(struct sk_buff *skb, struct net_device *dev)
+ /* ks8995_get_revision - get chip revision
+  * @ks: pointer to switch instance
+  *
+@@ -532,12 +538,89 @@ dsa_tag_protocol ks8995_get_tag_protocol(struct dsa_switch *ds,
+ 					 int port,
+ 					 enum dsa_tag_protocol mp)
+ {
+-	/* This switch actually uses the 6 byte KS8995 protocol */
++	struct ks8995_switch *ks = ds->priv;
++
++	if (ks8995_is_ks8995(ks))
++		/* This switch uses the KS8995 protocol */
++		return DSA_TAG_PROTO_KS8995;
++
+ 	return DSA_TAG_PROTO_NONE;
+ }
+ 
++/* Only the KS8995 supports special (DSA) tagging with special bits
++ * set for the ingress and egress ports. The "special tag" register bit
++ * in the other versions is used for clock edge setting so make sure
++ * to only enable this on the KS8995.
++ */
++static int ks8995_special_tags_setup(struct ks8995_switch *ks)
 +{
-+	unsigned int port;
-+	__be16 *p;
-+	u16 etype;
-+	u16 tci;
++	int ret;
++	u8 val;
++	int i;
 +
-+	if (unlikely(!pskb_may_pull(skb, KS8995_TAG_LEN))) {
-+		netdev_err(dev, "dropping packet, cannot pull\n");
-+		return NULL;
++	ret = ks8995_read_reg(ks, KS8995_REG_GC9, &val);
++	if (ret) {
++		dev_err(ks->dev, "failed to read KS8995_REG_GC9\n");
++		return ret;
 +	}
 +
-+	p = dsa_etype_header_pos_rx(skb);
-+	etype = ntohs(p[0]);
++	/* Enable the "special tag" (the DSA port tagging) */
++	val |= KS8995_GC9_SPECIAL;
 +
-+	if (etype == ETH_P_8021Q) {
-+		/* That's just an ordinary VLAN tag, pass through */
-+		return skb;
++	ret = ks8995_write_reg(ks, KS8995_REG_GC9, val);
++	if (ret)
++		dev_err(ks->dev, "failed to set KS8995_REG_GC11\n");
++
++	ret = ks8995_read_reg(ks, KS8995_REG_PC(KS8995_CPU_PORT, KS8995_REG_PC0), &val);
++	if (ret) {
++		dev_err(ks->dev, "failed to read KS8995_REG_PC0 on CPU port\n");
++		return ret;
 +	}
 +
-+	if ((etype & 0xFFF0U) != ETH_P_8021Q) {
-+		/* Not custom, just pass through */
-+		netdev_dbg(dev, "non-KS8995 ethertype 0x%04x\n", etype);
-+		return skb;
++	/* Enable tag INSERTION on the CPU port, this will add the special KS8995 DSA tag
++	 * to packets entering from the chip, indicating the source port.
++	 */
++	val &= ~KS8995_PC0_TAG_REM;
++	val |= KS8995_PC0_TAG_INS;
++
++	ret = ks8995_write_reg(ks, KS8995_REG_PC(KS8995_CPU_PORT, KS8995_REG_PC0), val);
++	if (ret) {
++		dev_err(ks->dev, "failed to write KS8995_REG_PC0 on CPU port\n");
++		return ret;
 +	}
 +
-+	port = ilog2(etype & 0xF);
-+	tci = ntohs(p[1]);
-+	netdev_dbg(dev, "ingress packet tag: %04x %04x, port %d\n",
-+		   etype, tci, port);
++	/* Enable tag REMOVAL on all the LAN-facing ports: this will strip the special
++	 * DSA tag that we add during transmission of the egress packets before they exit
++	 * the router chip.
++	 */
++	for (i = 0; i < KS8995_CPU_PORT; i++) {
++		ret = ks8995_read_reg(ks, KS8995_REG_PC(i, KS8995_REG_PC0), &val);
++		if (ret) {
++			dev_err(ks->dev, "failed to read KS8995_REG_PC0 on port %d\n", i);
++			return ret;
++		}
 +
-+	skb->dev = dsa_conduit_find_user(dev, 0, port);
-+	if (!skb->dev) {
-+		netdev_err(dev, "could not find user for port %d\n", port);
-+		return NULL;
++		val |= KS8995_PC0_TAG_REM;
++		val &= ~KS8995_PC0_TAG_INS;
++
++		ret = ks8995_write_reg(ks, KS8995_REG_PC(i, KS8995_REG_PC0), val);
++		if (ret) {
++			dev_err(ks->dev, "failed to write KS8995_REG_PC0 on port %d\n", i);
++			return ret;
++		}
 +	}
 +
-+	/* Remove KS8995 tag and recalculate checksum */
-+	skb_pull_rcsum(skb, KS8995_TAG_LEN);
-+
-+	dsa_strip_etype_header(skb, KS8995_TAG_LEN);
-+
-+	dsa_default_offload_fwd_mark(skb);
-+
-+	return skb;
++	return 0;
 +}
 +
-+static const struct dsa_device_ops ks8995_netdev_ops = {
-+	.name = KS8995_NAME,
-+	.proto	= DSA_TAG_PROTO_KS8995,
-+	.xmit = ks8995_xmit,
-+	.rcv = ks8995_rcv,
-+	.needed_headroom = KS8995_TAG_LEN,
-+};
+ static int ks8995_setup(struct dsa_switch *ds)
+ {
++	struct ks8995_switch *ks = ds->priv;
 +
-+MODULE_DESCRIPTION("DSA tag driver for Micrel KS8995 family of switches");
-+MODULE_LICENSE("GPL");
-+MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_KS8995, KS8995_NAME);
++	if (ks8995_is_ks8995(ks))
++		/* This switch uses the KS8995 protocol */
++		return ks8995_special_tags_setup(ks);
 +
-+module_dsa_tag_driver(ks8995_netdev_ops);
+ 	return 0;
+ }
+ 
 
 -- 
 2.52.0
