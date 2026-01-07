@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-247778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74DAACFE532
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 15:35:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 152F9CFE5E0
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 15:45:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8992F300E80C
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 14:35:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8A0D130B8CF4
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 14:37:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B86C234DB6D;
-	Wed,  7 Jan 2026 14:28:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2448434DCC9;
+	Wed,  7 Jan 2026 14:28:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="PeVMmie8"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="a43gj3jN"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E67034DB48
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 14:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C10A34DB60
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 14:28:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767796109; cv=none; b=hKgxfI75xpAQwj3b7P42ibE40yvhYVRf4VTmHSlw/W3y0HvSZNSvJd8Qdc0tAMHDRB576HW4qGCK93PR0peId4/HHRZIMHJcVAP76cg3dYc8Wv2g3EsI+hKiTjzxirMcLrT+SiCrS0N61HLWONAAZ5WXPbcO/tWGSkQZdEZcBiY=
+	t=1767796112; cv=none; b=muVVH/RDCMLLk5qbBns26eEr/konlPSWyIh6tNZimney2WJ3EoLn2UTGC+pY79RXbNXz3q7gZyzyKJkfg4w+lZkZc3rgBTOPHy8a3DcO3YwZxx2jWh4Hv4c25MUK5gIFzBl7Grlb9x9Z0YGPjyKzdLpjEYbtiJuHmzh3IXA2AZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767796109; c=relaxed/simple;
-	bh=xwrB/b5QrEV/rUuOB8P9BAxfua4cQLk+rP/xgLLeUkk=;
+	s=arc-20240116; t=1767796112; c=relaxed/simple;
+	bh=9Nkg5+9yHPlpPwp9nF6PKpTxzXwCWPm/mZB+YcWF76s=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=qbRSidzCObbN9MXDRYDb0Fz1AebAKOh0uuVK+QE2fgDIRUTiM0haY3SLeTDvdDcfIyDPrtk2IEUOqD3sN6Mr0D5+EqlJ6CuDZLg84zNOal+VABDV6EX/W9HfVestBMJHG5ozjGlzp7XuldZnhOBmHfcv5LvLmRycizQxMV5ofnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=PeVMmie8; arc=none smtp.client-ip=209.85.218.44
+	 In-Reply-To:To:Cc; b=j3VpwDDmiLmTC+AGHaQ5Jj90G2gGpqJ9NVHuyzS4VbKwAzGlJ/q+N0t8dY3x/hASUXEM9VWc6++GwgWtfIymvtrIM2gWAFJneGDGe9bMZQc963r7aNR5I+R7lWPqbGaTxpo31ngdHMhL/35biBoxs3Fk6mmqLhh52D1b/Wo4nTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=a43gj3jN; arc=none smtp.client-ip=209.85.218.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b7eff205947so291102466b.1
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 06:28:27 -0800 (PST)
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b79ea617f55so440777566b.3
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 06:28:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1767796106; x=1768400906; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1767796107; x=1768400907; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=40lIxFU/M7AeqLeGFjm5F7DuV67hMWTgLEj6ZEsO05s=;
-        b=PeVMmie84aOR18+VVCpJPkosOBKP7SFjROVPvT+WjQwdPKDTnlp4rSgVZiu6WmrRou
-         mAoaz2kLwMjFYA0nH5uUCqZ6iG3xfwW+pSKjhIe6uY8anxHaf8jwNbp8SJvVOO7K3LXc
-         uw6QZ7wgqAI8DRcLC3mkFh7oXIB06PZDUPfkFb2BLMNQQOdl8uajsxMknzk1iwuFO+QT
-         f2SE+a02arDugVE7z+TYRMg/sXQeoS2kMLemRQ+zJ0CyUpdO3v0SiSVXu6rjjzSRHOGn
-         JkbHU6xQ7mEzjC6FwQqH0gUWb9VjYQOt1wrhETUutzn4uNnPaU5SxSeyDj263m8S7yFw
-         sHWQ==
+        bh=4/14zXsBs003XOvy4U1i82NqonKMu3HQa+ln0OAs3us=;
+        b=a43gj3jNdfdYSv4gSSQS1oeN9NV32Ra8DtqbY0X7Vsy4hETHQOptKzlRPAzSfW5C5J
+         rqYsS0BxJUHewgw26mvVzXNfgt3thkrIKFG31h+4UcHp0Ls1o87201G4kq+71TWrRSCj
+         Wza6WJePRH9B+7gbHGbP4RBHBxPJygffji6TbH3E+aCLGdSvmDw3pEjvPqstcFSVqY6h
+         D74V3Nl52qyvee6ZS6NLG+eCYDQcevBW/Hexfq9k/4eAaSZ9Zb0ghbqGctCwyDpimU5t
+         CdowmE8eB2zONDsAMfJNV0jtR/VcUcYa/eSBLfFdmGqd0GO3WPfm/MrxPXXnt/17q8M1
+         Bt5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767796106; x=1768400906;
+        d=1e100.net; s=20230601; t=1767796107; x=1768400907;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=40lIxFU/M7AeqLeGFjm5F7DuV67hMWTgLEj6ZEsO05s=;
-        b=mp1VjYT2kRzmvb/XmuJtvNInZD3VrOGIMjr7C8Lvzu2ZB5WnmthZlCE7LQQZsxIl1Q
-         mhdblM0DSoOBLhSd/vnOCIPdS4+RSkccJG+l+vQWncILJP646jesb2ybGdnA24j9RI/S
-         gS+iqYu8R1peKHOVZAOFW4zU9A4XQwU1BDBwpxVQlSzwVhquSN0VW8I7477AUc+Wtq7r
-         USg6QANJLkUteRob87ZGQQdGJHsEuZrsB1y0QlkmUICFkX3zkXmx5wDrUvwN616Stdwe
-         AGHpUMZFdXippVGd5ixCjdlHJmyI5vXQgaNnCkmkAg3Bm1PRCqV1n9u0rh/Y9IGi7Mnx
-         y30w==
-X-Gm-Message-State: AOJu0YwM2kvW8P6oBUNAWXD64EbtCQBQoMn9tDgbYHFNcCR87UpibfPU
-	iO6hg4MdYfQebaPkUmegXcQGN7UU4myJal+sYMJsGNZeNgD5+g0T/kqKajw+vk1IAXY=
-X-Gm-Gg: AY/fxX47j9bmYrHbUjNtQPeyfceOfKgIQHWh4g0HCm0jMsKRawLfajkkpKMW57X5bSx
-	jj+HlxMYa2mwpE9BrQOH3ql8nPMUh9kAc7PTE3802qdLVeX07VqhveXFtTiakxwiTt6NQVpLt3V
-	6q+xM37/PY4fWwD99LqlZA4MwUEo1RAXPxuKf/E66CRCqp1Au2M7YXrqFSTMkYEFGZs/ogZMOW4
-	ZsAphfR6mqA3yjuTKccfe3nGTS6exdWkrOLWPYA6MFwSvnpVofyqDv806UEXUL7Wwd0Tz6mDiGw
-	W+D1F2MsRUbkosMZ1i7xuE1YycqoHMXmWd+6WMCcTdT7MsbFf7rwNT9H4jBtAjj1AyRcC7w8ERD
-	lyBSOy6VVHIpzrqWZVZw+g04AKcKWiKtaz3VtTIImZzGH7MFjnDr5UQcg3DL0WIrJ4xxbwVPyqj
-	VeRh4HjTYlG8idzPw0vaB2AnC4GHlDPmSItezjvQq+6E/kyCSyHF4rNFJi9dc=
-X-Google-Smtp-Source: AGHT+IFSbEh4/xMkvAihmgqWgevCSBRqmh1v3qkJfxrR3Zd6+maDQXuvOA7HtiqZ0/K3ds8lXmfMeQ==
-X-Received: by 2002:a17:907:9704:b0:b6d:7288:973d with SMTP id a640c23a62f3a-b844503a6f6mr301552566b.56.1767796106307;
-        Wed, 07 Jan 2026 06:28:26 -0800 (PST)
+        bh=4/14zXsBs003XOvy4U1i82NqonKMu3HQa+ln0OAs3us=;
+        b=I+Fd7LTCf4OXmPd9vfGwU825sKwSwZy/VXKwjw1cGI3FtTPqlQpSEuuT+u+uJoLxy1
+         Oq+vkR4qZ+b/Ba23tPxNBe17jFRy9272tN6cjK37X3GHRDR/ITRvEL/GUsNQNiFGdx1h
+         gRVHuyQQ1mVkqjDM4Qhe/+1nTuc2GvHhHRJYCPlxdcheDEOnEkSrUk0jzGVD0Rn+1TWC
+         gpgNpdedMZ9sNDy5jFNSCh6t+FYIzIEVg9qAjeNLBdbUHp9FvSxqDAnjwkGgUi6K1uYl
+         ZVM6BG2nJWQ2wSbf5awTDeYMKbGXo1pVAhNfPhnrA71Eg1WTUPK45spemwvt+6Eugik5
+         1gGw==
+X-Gm-Message-State: AOJu0YxIBy9m90O0r3BoTkSUsgKIrV0FL8dbYiX2PTnoo0Ed38DVxiFy
+	ZYTlXa12VaEcm8cmTlmnmFfrrN1VV0D6CKj1GN4SHn00gd+dzmKSwFraR4PJ9NoHpF0=
+X-Gm-Gg: AY/fxX7+1wutiKgu7rQvDizJqCaOMWl2z3X0mhUear1p67uTfjLXz0XhVZ9blslWSLO
+	7epNipsY+z/uV8kA/SjzTnFMzaLt9rRyrzsZ0TBT1SpRor1D/6gPIWWq7hhDddFLYsBbqcWIfPO
+	knyffqQ5QE/xZrbijeC+DUiP08KQvrrUnhlagAtWEFoO+vJIyxuyHUXVsfhrrP85Fu3X4Dtst8a
+	XiLOMQB80g6pZ+EiEVFoavliCv/ebvuMoLM+bdB1HfVTt01ZoQ6sAgAgjQEsn8wAecBd7fs6VHI
+	Pt044nik4FzuPxZMYaMHm4KOGVe8C1mBsxv5LFqI1b6a2r0w+35sTIb4dv/KSyPReP7Rx2yNfni
+	w01QRM53d3XNYrDSFGwfT5LTpCaiAUlQWAsLOeDt1nHwg3DTtw6t0f+6w0BLWfn5DL2Opm5859s
+	cHyv883E0yBgDl1yfb4nga2T3Xpfi8qfhPXpCgD/iOHqTok/6vHYs6jSX5EI8=
+X-Google-Smtp-Source: AGHT+IFuKBW87SwWKv45NowNyF6gDSC4dEqUaQmH0tDRwaae0GNWQln5Te3nVrJsyyGSAJHCYyWCOw==
+X-Received: by 2002:a17:906:fe05:b0:b75:7b39:847a with SMTP id a640c23a62f3a-b8445216dccmr283429566b.60.1767796107483;
+        Wed, 07 Jan 2026 06:28:27 -0800 (PST)
 Received: from cloudflare.com (79.184.207.118.ipv4.supernova.orange.pl. [79.184.207.118])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8429fdf4e7sm545959766b.0.2026.01.07.06.28.25
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a235c0fsm527881766b.9.2026.01.07.06.28.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 06:28:25 -0800 (PST)
+        Wed, 07 Jan 2026 06:28:27 -0800 (PST)
 From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Wed, 07 Jan 2026 15:28:14 +0100
-Subject: [PATCH bpf-next v3 14/17] bpf, verifier: Track when data_meta
- pointer is loaded
+Date: Wed, 07 Jan 2026 15:28:15 +0100
+Subject: [PATCH bpf-next v3 15/17] bpf, verifier: Support direct kernel
+ calls in gen_prologue
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,7 +83,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260107-skb-meta-safeproof-netdevs-rx-only-v3-14-0d461c5e4764@cloudflare.com>
+Message-Id: <20260107-skb-meta-safeproof-netdevs-rx-only-v3-15-0d461c5e4764@cloudflare.com>
 References: <20260107-skb-meta-safeproof-netdevs-rx-only-v3-0-0d461c5e4764@cloudflare.com>
 In-Reply-To: <20260107-skb-meta-safeproof-netdevs-rx-only-v3-0-0d461c5e4764@cloudflare.com>
 To: bpf@vger.kernel.org
@@ -102,47 +102,97 @@ Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
  kernel-team@cloudflare.com
 X-Mailer: b4 0.15-dev-07fe9
 
-Introduce PA_F_DATA_META_LOAD flag to track when a BPF program loads the
-skb->data_meta pointer.
+Prepare ground for the next patch to emit a call to a regular kernel
+function, not a kfunc or a BPF helper, from the prologue generator using
+BPF_EMIT_CALL.
 
-This information will be used by gen_prologue() to handle cases where there
-is a gap between metadata end and skb->data, requiring metadata to be
-realigned.
+These calls use offsets relative to __bpf_call_base and must bypass the
+verifier's patch_call_imm fixup, which expects BPF helper IDs rather than
+pre-resolved offsets.
 
-Reviewed-by: Eduard Zingerman <eddyz87@gmail.com>
+Add a finalized_call flag to bpf_insn_aux_data to mark call instructions
+with finalized offsets so the verifier can skip patch_call_imm fixup for
+these calls.
+
+As a follow-up, existing gen_prologue and gen_epilogue callbacks using
+kfuncs can be converted to BPF_EMIT_CALL, removing the need for kfunc
+resolution during prologue/epilogue generation.
+
+Suggested-by: Alexei Starovoitov <ast@kernel.org>
 Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 ---
- include/linux/bpf_verifier.h | 1 +
- kernel/bpf/verifier.c        | 4 ++++
- 2 files changed, 5 insertions(+)
+ include/linux/bpf_verifier.h |  1 +
+ kernel/bpf/verifier.c        | 12 ++++++++++++
+ net/core/filter.c            |  5 +++--
+ 3 files changed, 16 insertions(+), 2 deletions(-)
 
 diff --git a/include/linux/bpf_verifier.h b/include/linux/bpf_verifier.h
-index c8397ae51880..b32ddf0f0ab3 100644
+index b32ddf0f0ab3..9ccd56c04a45 100644
 --- a/include/linux/bpf_verifier.h
 +++ b/include/linux/bpf_verifier.h
-@@ -649,6 +649,7 @@ enum priv_stack_mode {
- 
- enum packet_access_flags {
- 	PA_F_DIRECT_WRITE = BIT(0),
-+	PA_F_DATA_META_LOAD = BIT(1),
- };
- 
- struct bpf_subprog_info {
+@@ -561,6 +561,7 @@ struct bpf_insn_aux_data {
+ 	bool non_sleepable; /* helper/kfunc may be called from non-sleepable context */
+ 	bool is_iter_next; /* bpf_iter_<type>_next() kfunc call */
+ 	bool call_with_percpu_alloc_ptr; /* {this,per}_cpu_ptr() with prog percpu alloc */
++	bool finalized_call; /* call holds function offset relative to __bpf_base_call */
+ 	u8 alu_state; /* used in combination with alu_limit */
+ 	/* true if STX or LDX instruction is a part of a spill/fill
+ 	 * pattern for a bpf_fastcall call.
 diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index daa90c81d802..76f2befc8159 100644
+index 76f2befc8159..219e233cc4c6 100644
 --- a/kernel/bpf/verifier.c
 +++ b/kernel/bpf/verifier.c
-@@ -6226,6 +6226,10 @@ static int check_ctx_access(struct bpf_verifier_env *env, int insn_idx, int off,
- 		} else {
- 			env->insn_aux_data[insn_idx].ctx_field_size = info->ctx_field_size;
+@@ -21816,6 +21816,14 @@ static int convert_ctx_accesses(struct bpf_verifier_env *env)
+ 			env->prog = new_prog;
+ 			delta += cnt - 1;
+ 
++			/* gen_prologue emits function calls with target address
++			 * relative to __bpf_call_base. Skip patch_call_imm fixup.
++			 */
++			for (i = 0; i < cnt - 1; i++) {
++				if (bpf_helper_call(&env->prog->insnsi[i]))
++					env->insn_aux_data[i].finalized_call = true;
++			}
++
+ 			ret = add_kfunc_in_insns(env, insn_buf, cnt - 1);
+ 			if (ret < 0)
+ 				return ret;
+@@ -23422,6 +23430,9 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
+ 			goto next_insn;
  		}
+ patch_call_imm:
++		if (env->insn_aux_data[i + delta].finalized_call)
++			goto next_insn;
 +
-+		if (base_type(info->reg_type) == PTR_TO_PACKET_META)
-+			env->seen_packet_access |= PA_F_DATA_META_LOAD;
-+
- 		/* remember the offset of last byte accessed in ctx */
- 		if (env->prog->aux->max_ctx_offset < off + size)
- 			env->prog->aux->max_ctx_offset = off + size;
+ 		fn = env->ops->get_func_proto(insn->imm, env->prog);
+ 		/* all functions that have prototype and verifier allowed
+ 		 * programs to call them, must be real in-kernel functions
+@@ -23433,6 +23444,7 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
+ 			return -EFAULT;
+ 		}
+ 		insn->imm = fn->func - __bpf_call_base;
++		env->insn_aux_data[i + delta].finalized_call = true;
+ next_insn:
+ 		if (subprogs[cur_subprog + 1].start == i + delta + 1) {
+ 			subprogs[cur_subprog].stack_depth += stack_depth_extra;
+diff --git a/net/core/filter.c b/net/core/filter.c
+index 07af2a94cc9a..e91d5a39e0a7 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -9080,10 +9080,11 @@ static int bpf_unclone_prologue(struct bpf_insn *insn_buf, u32 pkt_access_flags,
+ 	*insn++ = BPF_JMP_IMM(BPF_JEQ, BPF_REG_6, 0, 7);
+ 
+ 	/* ret = bpf_skb_pull_data(skb, 0); */
++	BUILD_BUG_ON(!__same_type(btf_bpf_skb_pull_data,
++				  (u64 (*)(struct sk_buff *, u32))NULL));
+ 	*insn++ = BPF_MOV64_REG(BPF_REG_6, BPF_REG_1);
+ 	*insn++ = BPF_ALU64_REG(BPF_XOR, BPF_REG_2, BPF_REG_2);
+-	*insn++ = BPF_RAW_INSN(BPF_JMP | BPF_CALL, 0, 0, 0,
+-			       BPF_FUNC_skb_pull_data);
++	*insn++ = BPF_EMIT_CALL(bpf_skb_pull_data);
+ 	/* if (!ret)
+ 	 *      goto restore;
+ 	 * return TC_ACT_SHOT;
 
 -- 
 2.43.0
