@@ -1,175 +1,229 @@
-Return-Path: <netdev+bounces-247740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45E87CFDFB8
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 14:37:20 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D4DDCFDF8F
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 14:36:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1D0923097977
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 13:33:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EA81A301936B
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 13:33:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1D6E3321B0;
-	Wed,  7 Jan 2026 13:22:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A91334C05;
+	Wed,  7 Jan 2026 13:24:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SOnitJg+"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="lXN1hqlW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D672C331A6F
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 13:22:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06FA43346B9;
+	Wed,  7 Jan 2026 13:24:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767792165; cv=none; b=h2cfZCdLwTQ9UcPi47luY7823oYc8sVDUXZRrGCRTBg/cSAiNNa96XasVKuRAGh4VM90ROcNRJOxDMGfLhY0L5HNj6MzGzhWZSVbpEO/zvafpk0Dy1bkiXZLwELQcAHN4OjkXTehSyVVC3R9Uqg2sVIoyuATuA2WjCIzSiLym0g=
+	t=1767792266; cv=none; b=Mcxs34TNhtsZCuY9mjh6Ng9t3JAZozu0ZdyeVFeXTmUNAJapoacWcu0HHSnpeHfaYfC2jLCMUiqQbRhhhD+Ui+THotR6K3qfVuJ7D6lbnIHCthyM5H22pZLWsaO+wjYyFdDSP9C5TIFtDe+mfGXuc/dYEfcaExm4VIzM5INAMLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767792165; c=relaxed/simple;
-	bh=unytFKZ8LCGZbWiIqqle1BjuJ9OKga7Krn0YjNtEcU4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ZFd5TcvrmPhx9oIgT2Wqwtm04VEz7H60Y87kc0OwEbZxzSEqVCy8puq4TaN5QcYfZ/AB8HE2vxjMb0XPZAYVd/63ebv++3abOmlnE7P03FxVt48wQHRz4aSQiNppoWL18yBzy6owgGBp028dOQLW/qp7S/qum1POIX+NmXDNaKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SOnitJg+; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2a099233e8dso16871295ad.3
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 05:22:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767792163; x=1768396963; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=htJmJ2nOl5HS2d4lrmu4G6awIswx3aqJ66sxEqxOU2k=;
-        b=SOnitJg+hVNmVJlkwgk6o2H6/EhOte0DlJvlj8MJEn0dEWu0JMlQzYioj0qc3CIS1k
-         H1ooZnU2xiniV7uT2rzxd2ZIa4Mx0SwC5yS3A0Covjgq5DzIslb14tDyddB/o55gYEaK
-         Vp4Sw6tbLDxVZ6SXZDdKlQ4sJuiR0sfMbDzycke8XaMV9ujj0rh8S2F1dSUZBXjD+OBL
-         gR1HN9GgQB5/GAZ3tNwHin6NSHdCnGj7UxjineA1dJuvAHI5Rxsgq+sQP7Quk3zSWnvS
-         mUeb9TsipgTtm2aR2TMufCulDuurhfjCt6LCQ+WVoVyNsZCa1rSkK67jbZ4q0wUFBELL
-         GguQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767792163; x=1768396963;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=htJmJ2nOl5HS2d4lrmu4G6awIswx3aqJ66sxEqxOU2k=;
-        b=T8aixHsGk5qx2c6FTQ7D///xeG8WZIWrR/PGwqRAfK3r49GRSEio9vu6x+3YhtNpAn
-         FWBY7epgyaxJ55YnukhAIdcNsM3axJQ1ahqqpY6mTSzVII5Um0+Y7vwc6tQShZ6eutuY
-         m4hqY3SWHggqPR0Q2FSuHwkDYCteRHvrNbSSeTW1f+Qkdmfg345K8+6qlNzJhLON2LR/
-         l2IUXmrHosMR/CBzk+mHZadO34oCBYdtTq0feToH1llpQWRQHmG3A2Ab8whFa8lQ7OB0
-         dgLVz7/lyxZzhA3hhgbJuCl8NZpi1lSQOhsmaNZCDWJ6GwAko4tdXGk2Kwzcz6ReQU61
-         aSbg==
-X-Forwarded-Encrypted: i=1; AJvYcCVmNhvj7gW8pOxldUrNlxEGN7+3XPxGz7lWec/yl9Cb3hCiiGiZ6yz0O/syzMYdcAS2cfG9O+w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwEefo//BszuI8KSSMf4ibIE7G48+9YfzHWNB0mcKcPg0AXIJBk
-	s7SU8R4mVZ7dCrct+54b/YoHvnYiI4lFx0Dn0pOngxr1jSoUZmluaPf2
-X-Gm-Gg: AY/fxX51pyFgjJ174stId3MhFJ4H75CJh7eaJ3MZ2oWYQSCURGJR3b85XxdqooA0U2f
-	iWNafYBfEumo2rbOF/9qJk/mO774K0TaYuu0Oh+t6i9yuR4v3s9L3PMBI97ztK/f7JUPMMeUvXD
-	f7ql6hCv5NZtY7XnTnVgTKvXqWhOkk2YG3hXlZLJXqk6KzfSq+ah8HL1zWTqRQ53rY45+Q4x3cq
-	H6oehWogCQRQiGnc1MGuN6HdsATw/zaEHqFvo6Q2h+9jGBjY44207yiIW0unWgu4Hgjv2U3eKYO
-	YZiUEJEnA+NLG8q2ITbbq32MHZMLSohkJR52iGKuLCkIWB72JcqdPPyvTTmtztcp7Pf8H1TQGYe
-	THlyTxoIlPRdOcWgdbgDPwpexrmbgAi3vCqBGuQHb8pCie5h+hl2jNKHrlQzbSihomeJoX6eIpl
-	4Aw4FfBk0/iOq3DcVCDeFSNQ==
-X-Google-Smtp-Source: AGHT+IEvtZa3zLpS6a5Y/+nmtOmpeeuGMbTxkqCETXk3Efe8UmRkWBRknzvf6eczc+NkOyxjXeazrg==
-X-Received: by 2002:a17:902:daca:b0:2a0:da38:96d8 with SMTP id d9443c01a7336-2a3ee443bf0mr20830455ad.25.1767792162588;
-        Wed, 07 Jan 2026 05:22:42 -0800 (PST)
-Received: from [127.0.0.1] ([188.253.121.152])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a3e3cc7912sm52511685ad.67.2026.01.07.05.22.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 05:22:42 -0800 (PST)
-From: Zesen Liu <ftyghome@gmail.com>
-Date: Wed, 07 Jan 2026 21:21:43 +0800
-Subject: [PATCH bpf v2 2/2] bpf: Require ARG_PTR_TO_MEM with memory flag
+	s=arc-20240116; t=1767792266; c=relaxed/simple;
+	bh=F9RrKDoP89ksDR30EK1rrk2PGiB8ie+HEZ1iF2jUPeE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cueXq3lXLF44lsN3lHwu0BxS+8WxdujIip9PbL7JiAG5ZdKTfYjqpCMPye5DgYWMVNi56LQDYLr0dNtUB6plRvWVPFgTHTGfGk4XhhFSfyds2LvIyZau4fUNvntZowX/oCKR8aMjhlnom57RuMF4L5ctiG1PiGdJobn+EIVjpDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=lXN1hqlW; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6071DbME2795403;
+	Wed, 7 Jan 2026 05:24:17 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=lp3ipfX6smHR4mmwoTsnFb+
+	75o6rQsxaBkPodIDUj9Y=; b=lXN1hqlW0za/fhXCafSlS+TJAajw5rL9mMI4UJW
+	1CIonKWZ+BCajkXQISvwdoNRtWsLi9rZTGHoBAZee5f90yDIE0m8rEamnjMRzbpY
+	Arq6qDWnTaquZBBZCdTZMTuFdAlCdqPdNtU4GTVMnGHDnOyqfK7F1pAvhSRMdJBc
+	zR9rRFAiWzpJFdMh7of4kQoKc8o7juwYAS9jIL3ilO9PnoEswV+NOalaY4NxYduV
+	y0DCjQflBzrnLfVtDcoFIc3cYaIYFMTgyB6upjKDsnGjSCrTm4Uktln6YMMWd4Jc
+	WCODAGSvSux+JJiQLxJs5xBuMjy3FsfXxZKl4UuiorBRmNQ==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bgf3fw1ux-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 07 Jan 2026 05:24:17 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 7 Jan 2026 05:24:31 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Wed, 7 Jan 2026 05:24:31 -0800
+Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id AD7D03F70B2;
+	Wed,  7 Jan 2026 05:24:13 -0800 (PST)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <andrew+netdev@lunn.ch>
+CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>,
+        Ratheesh Kannoth
+	<rkannoth@marvell.com>
+Subject: [PATCH net-next v2 00/10] Switch support
+Date: Wed, 7 Jan 2026 18:53:58 +0530
+Message-ID: <20260107132408.3904352-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260107-helper_proto-v2-2-4c562bcca5a8@gmail.com>
-References: <20260107-helper_proto-v2-0-4c562bcca5a8@gmail.com>
-In-Reply-To: <20260107-helper_proto-v2-0-4c562bcca5a8@gmail.com>
-To: Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski <mattbobrowski@google.com>, 
- Steven Rostedt <rostedt@goodmis.org>, 
- Masami Hiramatsu <mhiramat@kernel.org>, 
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>
-Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Shuran Liu <electronlsr@gmail.com>, Peili Gao <gplhust955@gmail.com>, 
- Haoran Ni <haoran.ni.cs@gmail.com>, Zesen Liu <ftyghome@gmail.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1786; i=ftyghome@gmail.com;
- h=from:subject:message-id; bh=unytFKZ8LCGZbWiIqqle1BjuJ9OKga7Krn0YjNtEcU4=;
- b=owGbwMvMwCXWI1/u+8bXqJ3xtFoSQ2ZcHKfXnRfM7Bz8sbOPtxaeKuSre5UuvjNs77NkU+Od5
- 73+er3tKGVhEONikBVTZOn9YXh3Zaa58TabBQdh5rAygQxh4OIUgIkcimX47yj3//irmXOKCkSf
- py4VeqYl3l5yOXj/g2anJTI2DKcUvjEydH6csH5bW6CMziyV3XniFTfVHzjWFVxWcK590+SR4Di
- LCQA=
-X-Developer-Key: i=ftyghome@gmail.com; a=openpgp;
- fpr=8DF831DDA9693733B63CA0C18C1F774DEC4D3287
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=PLgCOPqC c=1 sm=1 tr=0 ts=695e5e81 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=4rCbcO1rH8UwRTBQTsMA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA3MDEwMiBTYWx0ZWRfX8ZMf81LORnp2
+ bK7zTGYW5EXlJbovyZrDb1AiHDaxTtPYVe0oG+7qWwswKArogQZweFUtX89EjIHEDQLbtNCDJTn
+ jnnPDK40kHC6FD1aXkqoAdMpriXICMSkEwXph2FZvlM9oRPDrOfuFI0pc/6eDMgjeGpEnlaNL4K
+ UZDjXubK2uQKjCzWYnhnDlaITD9aUY9GnNsnOkBbLiBnGTsRHI98j0ura51mhWi4DiwHK04KjNx
+ qtvgyXrVA3zU34SRGF46iBNKxjXWB6zeZqoCSTkVuys3RqclpNRvW885uJEaSz0X7BMGhyHNPbu
+ hVLpAQcyte4eObyYlzARhQd6IjDLky+G1qXV5u4N2wb8f3y6P8yGKKai8qFUDwQfTVnpQREk2G+
+ vxbJ1YHNwC2wh6+mZw/llvSq4xlHS1+M4PdQxi9yqAqRqe0a7aovTTEq58RC0alcfwh6nxJP2vP
+ +wSALJPXK3Tyta5HlmA==
+X-Proofpoint-GUID: _PtcE0-NN43kQ6hA_X3qWaGWJ6Hx9n57
+X-Proofpoint-ORIG-GUID: _PtcE0-NN43kQ6hA_X3qWaGWJ6Hx9n57
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-07_01,2026-01-06_01,2025-10-01_01
 
-Add check to ensure that ARG_PTR_TO_MEM is used with either MEM_WRITE or
-MEM_RDONLY.
+Marvell CN10K switch hardware is capable of accelerating L2, L3,
+and flow. The switch hardware runs an application that
+creates a logical port for each representor device when representors
+are enabled through devlink.
 
-Using ARG_PTR_TO_MEM alone without tags does not make sense because:
+This patch series implements communication from Host OS to switch
+HW and vice versa.
 
-- If the helper does not change the argument, missing MEM_RDONLY causes the
-verifier to incorrectly reject a read-only buffer.
-- If the helper does change the argument, missing MEM_WRITE causes the
-verifier to incorrectly assume the memory is unchanged, leading to errors
-in code optimization.
+   |--------------------------------|
+   |            HOST OS             |
+   |                                |
+   | eth0(rep-eth0)  eth1(rep-eth1) |
+   |  |                 |           |
+   |  |                 |           |
+   ---------------------------------|
+      |                 |
+      |                 |
+  ---------------------------------|
+  |  lport0             lport1     |
+  |                                |
+  |            switch              |
+  |                                |
+  ---------------------------------|
 
-Co-developed-by: Shuran Liu <electronlsr@gmail.com>
-Signed-off-by: Shuran Liu <electronlsr@gmail.com>
-Co-developed-by: Peili Gao <gplhust955@gmail.com>
-Signed-off-by: Peili Gao <gplhust955@gmail.com>
-Co-developed-by: Haoran Ni <haoran.ni.cs@gmail.com>
-Signed-off-by: Haoran Ni <haoran.ni.cs@gmail.com>
-Signed-off-by: Zesen Liu <ftyghome@gmail.com>
----
- kernel/bpf/verifier.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+When representors are created, corresponding "logical ports" are
+created in switchdev. The switch hardware allocates a NIX PF and
+configures its send queues. These send queues should be able to
+transmit packets to any channel, as send queues as from same NIX PF.
+Switch is capable of forwarding packets between these logical ports.
 
-diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index f0ca69f888fa..c7ebddb66385 100644
---- a/kernel/bpf/verifier.c
-+++ b/kernel/bpf/verifier.c
-@@ -10349,10 +10349,27 @@ static bool check_btf_id_ok(const struct bpf_func_proto *fn)
- 	return true;
- }
- 
-+static bool check_mem_arg_rw_flag_ok(const struct bpf_func_proto *fn)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(fn->arg_type); i++) {
-+		enum bpf_arg_type arg_type = fn->arg_type[i];
-+
-+		if (base_type(arg_type) != ARG_PTR_TO_MEM)
-+			continue;
-+		if (!(arg_type & (MEM_WRITE | MEM_RDONLY)))
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
- static int check_func_proto(const struct bpf_func_proto *fn, int func_id)
- {
- 	return check_raw_mode_ok(fn) &&
- 	       check_arg_pair_ok(fn) &&
-+		   check_mem_arg_rw_flag_ok(fn) &&
- 	       check_btf_id_ok(fn) ? 0 : -EINVAL;
- }
- 
+Notifier callbacks are registered to receive system events such as
+FDB add/delete and FIB add/delete. Flow add/delete operations are
+handled through the .ndo_setup_tc() interface. These events are
+captured and processed by the NIC driver and forwarded to the switch
+device through the AF driver. All message exchanges use the mailbox
+interface.
 
--- 
+Bridge acceleration:
+FDB add/delete notifications are processed, and learned SMAC
+information is sent to the switch hardware. The switch inserts a
+hardware rule to accelerate packets destined to the MAC address.
+
+Flow acceleration:
+NFT and OVS applications call .ndo_setup_tc() to push rules to
+hardware for acceleration. This interface is used to forward
+rules to the switch hardware through the mailbox interface.
+
+Ratheesh Kannoth (10):
+  octeontx2-af: switch: Add AF to switch mbox and skeleton files
+  Mbox message for AF to switch
+
+  octeontx2-af: switch: Add switch dev to AF mboxes
+  Switch to AF driver mbox messages
+
+  octeontx2-pf: switch: Add pf files hierarchy
+  PF skeleton files for bridge, fib and flow
+
+  octeontx2-af: switch: Representor for switch port
+  Switch ID is copied and sent to switch when Representors are
+  enabled thru devlink. Upon receipt of the message, switch queries
+  AF driver to get info on rep interfaces.
+
+  octeontx2-af: switch: Enable Switch hw port for all channels
+  Switch ports should be configured to TX packets on any channel.
+
+  octeontx2-pf: switch: Register for notifier chains.
+  Notifier callback for various system events.
+
+  octeontx2: switch: L2 offload support
+  Bridge (L2) offload support
+
+  octeontx2: switch: L3 offload support
+  FIB (L3) offload support.
+
+  octeontx2: switch: Flow offload support
+  Flow (5/7 tuple) offload support.
+
+  octeontx2: switch: trace support
+  Trace logs for flow and action
+
+ .../net/ethernet/marvell/octeontx2/Kconfig    |  12 +
+ .../ethernet/marvell/octeontx2/af/Makefile    |   2 +
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  | 219 ++++++
+ .../net/ethernet/marvell/octeontx2/af/rvu.c   | 111 +++-
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |   6 +
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  54 +-
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   |  77 ++-
+ .../marvell/octeontx2/af/rvu_npc_fs.c         |  13 +-
+ .../ethernet/marvell/octeontx2/af/rvu_rep.c   |   3 +-
+ .../marvell/octeontx2/af/switch/rvu_sw.c      |  47 ++
+ .../marvell/octeontx2/af/switch/rvu_sw.h      |  14 +
+ .../marvell/octeontx2/af/switch/rvu_sw_fl.c   | 294 ++++++++
+ .../marvell/octeontx2/af/switch/rvu_sw_fl.h   |  13 +
+ .../marvell/octeontx2/af/switch/rvu_sw_l2.c   | 284 ++++++++
+ .../marvell/octeontx2/af/switch/rvu_sw_l2.h   |  13 +
+ .../marvell/octeontx2/af/switch/rvu_sw_l3.c   | 215 ++++++
+ .../marvell/octeontx2/af/switch/rvu_sw_l3.h   |  11 +
+ .../ethernet/marvell/octeontx2/nic/Makefile   |   8 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_tc.c  |  17 +-
+ .../marvell/octeontx2/nic/otx2_txrx.h         |   2 +
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |   8 +
+ .../net/ethernet/marvell/octeontx2/nic/rep.c  |  10 +
+ .../marvell/octeontx2/nic/switch/sw_fdb.c     | 143 ++++
+ .../marvell/octeontx2/nic/switch/sw_fdb.h     |  18 +
+ .../marvell/octeontx2/nic/switch/sw_fib.c     | 133 ++++
+ .../marvell/octeontx2/nic/switch/sw_fib.h     |  16 +
+ .../marvell/octeontx2/nic/switch/sw_fl.c      | 544 +++++++++++++++
+ .../marvell/octeontx2/nic/switch/sw_fl.h      |  15 +
+ .../marvell/octeontx2/nic/switch/sw_nb.c      | 629 ++++++++++++++++++
+ .../marvell/octeontx2/nic/switch/sw_nb.h      |  31 +
+ .../marvell/octeontx2/nic/switch/sw_trace.c   |  11 +
+ .../marvell/octeontx2/nic/switch/sw_trace.h   |  82 +++
+ 32 files changed, 3040 insertions(+), 15 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_fl.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_fl.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l3.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l3.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fib.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fib.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fl.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fl.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_trace.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_trace.h
+
+--
+ChangeLog:
+v1 -> v2: Fixed build errors
 2.43.0
-
 
