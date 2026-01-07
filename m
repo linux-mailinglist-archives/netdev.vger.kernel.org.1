@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-247840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03069CFF1A4
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 18:30:36 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C194BCFF201
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 18:34:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7127630019EB
+	by sin.lore.kernel.org (Postfix) with ESMTP id 28F7430265AF
 	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 17:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9968036213D;
-	Wed,  7 Jan 2026 17:05:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D4EA365A07;
+	Wed,  7 Jan 2026 17:05:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="K0ccQIHh"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qYWdUSEY"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012015.outbound.protection.outlook.com [40.107.200.15])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010038.outbound.protection.outlook.com [52.101.85.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C879735FF5D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ACE9350281
 	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 17:05:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.15
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.38
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767805517; cv=fail; b=hIi7onqTtxWze6DQRhP0OWV7bEpq47UO2CuF0XQPGhMLW2wjAuWV5g6Da+/tFEg8OWIGdFFoh4nEMzBoZCt+Kg/QxG3/zlZHZB1M9Ed3LJ3REmDnCjFn8GyFTP/YW9l2dxwG53R04l/QRHFByC3GgNxXoHOAzqDY+/HZvKFtwL4=
+	t=1767805522; cv=fail; b=XmSk1SPzzJKFrrwKiy3xp3d6/vaUYHLN03DT4puzSpdoaxgQm2nstZ1EC99IOnMHnwQD+lQNoqrTVBfBuqcRHqoeZsmJ5Q4MIySjBdosnDcDEIPcxHi/DpOJQLfm9bRUX2jZjliIA9XUE5ESq3/6jTuTHag6mzXWw2zsfts0mos=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767805517; c=relaxed/simple;
-	bh=PLCa7VpY9dQDzr0gH7LWrBhhaSycmJtrL61poww2lLc=;
+	s=arc-20240116; t=1767805522; c=relaxed/simple;
+	bh=Si5VL71x1xY6Q6Gqi/Bdl3OrUhdp3KEeQnuWJisHdXk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NZKLRLPpNk0Bcjo2TlS8aF4vbQFWNfz/icxDjt6ifv8Y8fIzR4ZxKPuKlssrZUN7Zmcz77KJxbYlolV0/OGWz6qQjqnFK8dHq+XZbEE/ul6I6Nne/I/qkDUtQ/ITNoTe6DVChu7liabqn5+l3kUtH4sC96EBRWEI93pdQoHq6k4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=K0ccQIHh; arc=fail smtp.client-ip=40.107.200.15
+	 MIME-Version:Content-Type; b=lZ8in9khq7AXxDVY4BVGoL43+AmL/kS85CHYgFYMrnOq8u2m7sihQCuC1JYSx+q2Br3hzH7EQmRkN0IjdhqpVgsNwR4ZtDMm7YVN/RBGKVeSFEY9ADT73g1l5u7JUx3lv1E9BGXGNB8/nb4Prel1ONqQN3WTef/bdTIikEdFpOo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qYWdUSEY; arc=fail smtp.client-ip=52.101.85.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ehwtMKQT0ctsz9utDD16mSs4Abx83g4ii1sns/Sgli6DZw5drVAfSodLRz8TqqP44O6PPDuzd4YSIzB+brE7L8mXM8RUYh1p/m0EQQ5X8dhZa1afqCTOmYpqWKwCh8JSb61ku1Uw3v2mw1wIOUEMe9alj+CIgbF7wGdpKMrrFi3ZFYawlXtxi57VYiHw8VfJxi4FUANcNki5z4Z2D6IZudPugMS34Q0dgD9u/S04c4futwcsqe3fOCVE0pk4M679EYRFi3wTwNtAQzFunrAXMCCj8c63ket7dHDOLKsyNwHLM0A3HEnOvu9EpBhpSIhmXlY6SZm7x92PwDApZOxVaQ==
+ b=KthHaWjXXMsRRHCp2Jr8AqtiOWL7/AAFONtCm8K8wB2tVthHVWeNIkNXWFLG8qYvTQpkA08QVplN9BdzhQQns5dKLUtQn+rq3Oj2zpoaMHMK7miJY05ZgrmcdEjqrmuzrvYxh4jwsYTzwO6UNtufRIjmYJOyBdOO2pazC8J3I17tmQkLdiXgpkdGmWQ1W0zQ0LaY6WUxHYKu2a1tfzVXoEverLtzcwFAviu6bhc51RHc5aSt1tyd7VPtXlwY5VsUcqOaayM/FnjJ5Kv1IxsCyFLswWvJF5o2DdmC6yCUu9YQP7Sk7c6TQd8+RS2/ywS07Q1MgrgvbEj9HMw83iXKVw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CXlV7puzQbBdC3qP1YugRjCV3C/lQLjWlAzpcwcd9F4=;
- b=O2DP9Fwk2Ew8wpEQ5W5D2JFGLQO/t2ReYBcU9sZ48EJGNibDJ/CAfaXVJRPDynz1VWCARmMIkA5VjSu7O9zIMeCUARSSRw+ih+yGJyY7aVGa0qUgV5nO3LlNWIM6DBpfYXKLhgfjn31W9L/n6U8/EFXfssR4h7ox4FLIuPcuAK3fcHHITit+f/7h95LZzApR+OSCTYy2PaC/ixGm8J5y6GKILJtL2mCrZGRhzc2dFsvn0/dN3xF+BIqiDpv8aHQT/kxQN4xsceG+fdrXl5NXwq61mtRk4aJc0gvluaLoD82fkphJCRbSBlO+dLSw+ITCHIGYWh1Xb7OsmK6m39so9g==
+ bh=6RYRmYIG4OJW+2YjyZuE43m7DexIxuN+UUS7q4ak3Ds=;
+ b=U9JBA+FYeXJQMUelgUCpjkO7TNoeosbSfaJh0U/qS1T4z4Qcq5SwE397dz8GhZPTW9dXaJyrctDksNC08wg66+2k+Z/WyqfGEDlThBguRZXqZwqzFDxamMdRidXW6wwKUzDMyh1oIJmMOSeAgUe7qBebbj7ocVM3vm19pTm1nJgBpPuifT8zgQERG78aDHvbCFAwsW5BPl/WqVZyHKsHXM6xGm9UuPJcBlvVwVi279gwLIziS+lHqBiGv/XQjgm4io1buSWvlPYNZcXf8w2PRsSkBH5DTJ0jAMjCQlyynryZKUHGxX4CQVRTlRRdEwNgLbf/deHFuA6P/5VVs/YH1w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.118.232) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CXlV7puzQbBdC3qP1YugRjCV3C/lQLjWlAzpcwcd9F4=;
- b=K0ccQIHhyDQTT2iLeucm83aauT1OjDcvngb2XwVN2Kkx9I4cosxz6rf/+KnKa12WMdTMcj6JtI261XxLjKPRae6CLggo1EVviz3L43/i0N0JkLLFOJFU9avREqWn2fZZlib7RAW18XDIhv4Xwsm48cPKhhZcYE0lVVycsSOVLx0B7XfJSrAeVwAub2VZmuXXWE6QHSHnoUlDzg3yhukpR3iHdLWAzxzn5pUQl7wACh7dDSwyhWz+oU7phUwgegmwfc0AY0Vu6rT06FpAvCG48Ovu7O9HlSCmgNHNLXP26GiXtwkhpNJebbN+iW7Nw9Ng7fITsEjhRFaoSCGdcAkrGg==
-Received: from PH7P222CA0001.NAMP222.PROD.OUTLOOK.COM (2603:10b6:510:33a::14)
- by CY8PR12MB7585.namprd12.prod.outlook.com (2603:10b6:930:98::7) with
+ bh=6RYRmYIG4OJW+2YjyZuE43m7DexIxuN+UUS7q4ak3Ds=;
+ b=qYWdUSEYfMI9nugSqSv5rx2wUcWqz7F8UyJwEZSdRUd7sAaJY0rWcCRj0KOtQCBtekN2EzF/tHzh6DNZ+Qk9/lEzem0QM6DdiCqRlUkipkpNWeMIPlPumMY8lRY8jpE2u0AI1TfWuK/B4anegNZzhiAQIH+XcBjhqS1hsnkVsn7phEoL5vlEumuo4WrTqKEx2TOANpQGj7DiKhsznMnIMR81Wesgd8Nlcf9btR824LN5p+FigEXn6EgqrPte0y5TOGL9FOAfOUux5iGxBhs7JYIDuUp8ZRiY+K7hn7maC97bk7Mym/TgEtaYfOaGzHiFp+858smbcAYpJf398JFo2w==
+Received: from MN2PR16CA0054.namprd16.prod.outlook.com (2603:10b6:208:234::23)
+ by BL3PR12MB6572.namprd12.prod.outlook.com (2603:10b6:208:38f::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.2; Wed, 7 Jan
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9456.14; Wed, 7 Jan
  2026 17:05:07 +0000
-Received: from CO1PEPF000044F8.namprd21.prod.outlook.com
- (2603:10b6:510:33a:cafe::b1) by PH7P222CA0001.outlook.office365.com
- (2603:10b6:510:33a::14) with Microsoft SMTP Server (version=TLS1_3,
+Received: from BL02EPF0001A104.namprd05.prod.outlook.com
+ (2603:10b6:208:234:cafe::97) by MN2PR16CA0054.outlook.office365.com
+ (2603:10b6:208:234::23) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9499.2 via Frontend Transport; Wed, 7
- Jan 2026 17:05:05 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ Jan 2026 17:05:03 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- CO1PEPF000044F8.mail.protection.outlook.com (10.167.241.198) with Microsoft
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ BL02EPF0001A104.mail.protection.outlook.com (10.167.241.135) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9520.0 via Frontend Transport; Wed, 7 Jan 2026 17:05:06 +0000
-Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.9499.1 via Frontend Transport; Wed, 7 Jan 2026 17:05:07 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 7 Jan
- 2026 09:04:44 -0800
+ 2026 09:04:46 -0800
 Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Wed, 7 Jan 2026 09:04:43 -0800
+ 15.2.2562.20; Wed, 7 Jan 2026 09:04:45 -0800
 Received: from vdi.nvidia.com (10.127.8.14) by mail.nvidia.com
  (10.126.190.181) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
- Transport; Wed, 7 Jan 2026 09:04:42 -0800
+ Transport; Wed, 7 Jan 2026 09:04:44 -0800
 From: Daniel Jurgens <danielj@nvidia.com>
 To: <netdev@vger.kernel.org>, <mst@redhat.com>, <jasowang@redhat.com>,
 	<pabeni@redhat.com>
@@ -84,9 +84,9 @@ CC: <virtualization@lists.linux.dev>, <parav@nvidia.com>,
 	<eperezma@redhat.com>, <jgg@ziepe.ca>, <kevin.tian@intel.com>,
 	<kuba@kernel.org>, <andrew+netdev@lunn.ch>, <edumazet@google.com>, "Daniel
  Jurgens" <danielj@nvidia.com>
-Subject: [PATCH net-next v15 10/12] virtio_net: Add support for IPv6 ethtool steering
-Date: Wed, 7 Jan 2026 11:04:20 -0600
-Message-ID: <20260107170422.407591-11-danielj@nvidia.com>
+Subject: [PATCH net-next v15 11/12] virtio_net: Add support for TCP and UDP ethtool rules
+Date: Wed, 7 Jan 2026 11:04:21 -0600
+Message-ID: <20260107170422.407591-12-danielj@nvidia.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20260107170422.407591-1-danielj@nvidia.com>
 References: <20260107170422.407591-1-danielj@nvidia.com>
@@ -101,118 +101,151 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044F8:EE_|CY8PR12MB7585:EE_
-X-MS-Office365-Filtering-Correlation-Id: e319c19a-f3c1-4bb0-8463-08de4e0ee82b
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A104:EE_|BL3PR12MB6572:EE_
+X-MS-Office365-Filtering-Correlation-Id: 652b5c48-8cc7-4b07-bec3-08de4e0ee8dd
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|36860700013|82310400026|1800799024;
+	BCL:0;ARA:13230040|376014|1800799024|7416014|82310400026|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?WI46CAn7ns9eH3srqIQ0OJrmxlG6745SjhGx+aFEIUCqY48/X+T1Odwho8b4?=
- =?us-ascii?Q?f4Wg8yHU3VaevASxUDEZEF3t1nEtUeidEvA0aa4LKXqZTLs17bBRN5yUY/EP?=
- =?us-ascii?Q?a+z2scqEx2dAWH+j93MBUDEAXGQ0ownOv2vr4p9hFqUR5PAQ+Tspvpj4t4uA?=
- =?us-ascii?Q?uJBKjSEdpFFArmtq1W0k1Rg4zV0Ku6vTLleYLBuGw0TJEpGiTPotsC4ZVdRE?=
- =?us-ascii?Q?u8AaICr2P/oYKCNPBlRW63aHqWNNKbb7V85R+sUT8EmxDHW6LJ4BHt0pmgZH?=
- =?us-ascii?Q?btcpgxJVEzLYj+/lKUUrl9pzQdtLBDFBJHRNVjKxetYNsAGLxfVdN+o09TFk?=
- =?us-ascii?Q?O9YCg5oUdimwRrR7hA6flt+Hs88BdX3AaM5CgE62Yny9A0o3TSN84neWECJc?=
- =?us-ascii?Q?AeLa3GQBzqThAwilLQyLRAq0UCH0BMUABlFvy+9Y2QU72FPVb+GNgHHtTP0f?=
- =?us-ascii?Q?JDcGdjI4ONHE40hhVzO/oJZPnXBg6KES/RjTAGcRkRAHhYpVIsXT5qNS1WwL?=
- =?us-ascii?Q?fA0sLT9IdsH8nrJNUBlaQ968BN3ona5M/mSSQv1wqX4ehecNpNjdSA0Zu7gt?=
- =?us-ascii?Q?SOcoB5kRsUjWjL1K3cWsg8RWt7MRyImTkYPrd28v808pL4F7h5ZDI8s4bhnX?=
- =?us-ascii?Q?UkGP8215C2l9DFNME0OoP775y80TDUS3oVKcRhgd/RTF6LLjd3vH5N7LHZZL?=
- =?us-ascii?Q?RDxYVmUj61bpeAeJkfxM741saXWn/PhtyUQ3OXezXT3jWtf7LD6O+UtU8kQq?=
- =?us-ascii?Q?cXrJj+mAb9Ya59KdUFmULLIXp+TvCpWZYOl2oQ/4spLifzhdJTt2mEFOaRsf?=
- =?us-ascii?Q?2ABKzDbe6CJFBvuE5McBmTESdjiywxMYxvjyMeJCEQbAeN8KwHujlwMRCoBf?=
- =?us-ascii?Q?vmzZ+8ixAXQllJnqHUTH0j47iZBWsLwxY3ovWypf9q+bwABeQngGQas859+C?=
- =?us-ascii?Q?lJXT7CJ0UpzqXtnNgi6VwE6xmlySiQiw8dAbd0VrWhhML5UWy03a2RB8oUUL?=
- =?us-ascii?Q?OhZu0tnx77MrjliUhEs990rZNR1TYpjR+u0b6deeMGOXRdSEHr3IuNvkHUzp?=
- =?us-ascii?Q?PF+XBAj74n+Q5iQ9Ri4V+4n8eJu3GX6j+mDuRXIIyRciDVaUo48NvjEyTLRd?=
- =?us-ascii?Q?rcLBbJZiXujzdq9/2ecRTrKf1j7I6wdH/8BvGa9X6hETVAqgn8so1tcOX8VJ?=
- =?us-ascii?Q?8tOW/eKc1P5ro6fr42C2wSsBuqfDzWN8g8aphzfsb80sjBkSL6S9WqlO5MKe?=
- =?us-ascii?Q?vE84Zoj27OhzNE87E/FVo3H9fg60jVd7cdGsqNSlJxkF11jxi06ZxEAoOHam?=
- =?us-ascii?Q?xmfwFt+EWmIr8nmA9UNQSP1ZrfUxlmF9rT+wlzfAPn3TJ/HeoZ/6kZko+0EA?=
- =?us-ascii?Q?P+2jMd4iZAdtHHohSpi+63itR7065ys4fMMwwcgbZgXzfWc+kjiuNqVGobXm?=
- =?us-ascii?Q?SVuZOmzj+PrMWhKL6o+/6zHjPxPjmn8xq3ZjXdN4og4f5zvfbwc5pNkhA70o?=
- =?us-ascii?Q?8MogX1w6hnOKz3sxYw/R6ZweyoRrBviB/xlnkrXZn1wMtXW9MnJys1qZQXFz?=
- =?us-ascii?Q?ytT0iCSuW2eDvE1Fm8U=3D?=
+	=?us-ascii?Q?X1wkZ65U1Ej/ucJxkTl1xIkVXNW+U8zMlohCa9WnKPasp2tzaOjQMlwvOt9H?=
+ =?us-ascii?Q?2s87qvooavLM5JdKlOSSuc6EBv1mFJRX7Ja03qKpBYrSGgVHvr3O9/dXrBth?=
+ =?us-ascii?Q?/cXPFZNszLlJViEgB/EZyCkPdwcga+dMrer/4v4TVE2G2jcjptpCk5rDC7jA?=
+ =?us-ascii?Q?w98oECbrBlLDKTbTt7ptc6gzIlM6WWFVz0/0dp/wkf4oWXxJQpnFpnIZKwXI?=
+ =?us-ascii?Q?u3WzTNGvMrNTu5th1lyb2VH3yVT2o3aDdDp4R8h7/6VdY7j7+FVaOsIFGnck?=
+ =?us-ascii?Q?Q/pR0KczpShLwB8Q1YO4LZKD69v0w8VJ0b4GVOaFRUs2IEkA62Dnv3OgQiOu?=
+ =?us-ascii?Q?fxvW1oBM6AOG7oF9zS4ZG57c4dRSIbp58vf2adgOaIKwlCPnCMcgiiFQnzSh?=
+ =?us-ascii?Q?JmLEJTE197WoIrjRkbiPm0Q41ioQcLwQDqbIhncret4JKCLhvZ+U6GzRuws7?=
+ =?us-ascii?Q?JzVUELQb8/l6Us9eqQ4tUvN0NDgkMYC/h7X73uqLcn+zJ7fZAu/U6p/skMl3?=
+ =?us-ascii?Q?htEuNV3TQC4rbfvk1pmGa1gTTlTdFTZb3KG6dBWblL5jHNoml6laGCy3xF4D?=
+ =?us-ascii?Q?dvBNymY7ftmJ4e8aS1GVieBzQ1nc6dd+09oTIUr1olYx91OpWmBp5nMbkvQn?=
+ =?us-ascii?Q?JQ+nEVi4nIbBfgQ6aJ4g2bBaMR5txEhE0rErNddzXgokGL/LNFeUCA/SVlxm?=
+ =?us-ascii?Q?89HeXMLK8BwjRXi7VIQOwhG0BLIJxp33449L4umVFEa/aw/k4yJyrXdzfVZZ?=
+ =?us-ascii?Q?j7r8JSpug22TpAMiVI/fM4Il6Vik+U3Vdy5AzmvkhYBIxkHblpMNEeKSIBxz?=
+ =?us-ascii?Q?ptx+H2DZl2kyW0iQEv3UsbaUNQxmiUrI8UBbgsbsG3YLWB8ivnN603WKU5lE?=
+ =?us-ascii?Q?GaAbbtvWlk7n+KLrPrTJAflGeRkzVELXRL2WM7M+s/T4iqB/cETlllx9c/5A?=
+ =?us-ascii?Q?FA1OxvX2poBjKES5ZqSGS+rRGFzXfiq09B4vVca9+ZCpdYqhZHrBjEydllk6?=
+ =?us-ascii?Q?Pw6/ewqMWKS+i4q/98A/0cCbIc4rYEdZX2/7kQK/VDqbA3g9g7YYUUk9l6NM?=
+ =?us-ascii?Q?F5v1loCKT6F6pC8VmPWxYHrs+cfrIp18FqT1kc/Hwcfq0KCLEykwS9RqJ0gY?=
+ =?us-ascii?Q?wfM7BgQlF+68fkzPZc/vV1gWChlBUZyN620hWqsftlWtlaWHzoBoG1gR7j4t?=
+ =?us-ascii?Q?tjQIRSBJ/PXdlZolzVj/z5/PvkfwFc+nwEDYSIsMpgsXCWvijJE0PMhxQwgT?=
+ =?us-ascii?Q?m7AwmZG9zsGIaCF9LoZC/BSYxhk0UK6IQByIkUhe8hiL5s3lrJXOLD5FG1k9?=
+ =?us-ascii?Q?T2ZiMSlIu/z1CmDNV+vUsGOKNE6g5P9QqaCS9I5vuPTdLeSrHwRh8T5s6V58?=
+ =?us-ascii?Q?A26+DCCx0X0dMkNoVOXqGcAc8jBOmJ95fmqA/7caXrwMhcdJqjuyuxr3292a?=
+ =?us-ascii?Q?c9MHRoCp424/f8SziSlOsCrMcqsJ9RmKk0rZWUL+A8xubB+O9akLZeiR5HiT?=
+ =?us-ascii?Q?FZSDRHHbeNffU6pDAtxefQyGyprWHfsKueQ4gXPSTxNC35Q3qB+e/HbmHUaI?=
+ =?us-ascii?Q?TsZMmiCTGNwxG+Mi9UE=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(36860700013)(82310400026)(1800799024);DIR:OUT;SFP:1101;
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(82310400026)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2026 17:05:06.3876
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2026 17:05:07.4749
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e319c19a-f3c1-4bb0-8463-08de4e0ee82b
+X-MS-Exchange-CrossTenant-Network-Message-Id: 652b5c48-8cc7-4b07-bec3-08de4e0ee8dd
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000044F8.namprd21.prod.outlook.com
+	BL02EPF0001A104.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7585
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6572
 
-Implement support for IPV6_USER_FLOW type rules.
+Implement TCP and UDP V4/V6 ethtool flow types.
 
-Example:
-$ ethtool -U ens9 flow-type ip6 src-ip fe80::2 dst-ip fe80::4 action 3
-Added rule with ID 0
+Examples:
+$ ethtool -U ens9 flow-type udp4 dst-ip 192.168.5.2 dst-port\
+4321 action 20
+Added rule with ID 4
 
-The example rule will forward packets with the specified source and
-destination IP addresses to RX ring 3.
+This example directs IPv4 UDP traffic with the specified address and
+port to queue 20.
+
+$ ethtool -U ens9 flow-type tcp6 src-ip 2001:db8::1 src-port 1234 dst-ip\
+2001:db8::2 dst-port 4321 action 12
+Added rule with ID 5
+
+This example directs IPv6 TCP traffic with the specified address and
+port to queue 12.
 
 Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
 Reviewed-by: Parav Pandit <parav@nvidia.com>
 Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
 Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 ---
-v4: commit message typo
+v4: (*num_hdrs)++ to ++(*num_hdrs)
 
 v12:
-  - refactor calculate_flow_sizes. MST
-  - Move parse_ip6 l3_mask check to TCP/UDP patch. MST
-  - Set eth proto to ipv6 as needed. MST
-  - Also check l4_4_bytes mask is 0 in setup_ip_key_mask. MST
-  - Remove tclass check in setup_ip_key_mask. If it's not suppored it
-    will be caught in validate_classifier_selectors.  MST
-  - Changed error return in setup_ip_key_mask to -EINVAL
+  - Refactor calculate_flow_sizes. MST
+  - Refactor build_and_insert to remove goto validate. MST
+  - Move parse_ip4/6 l3_mask check here. MST
 
-v13:
-  - Verify nexthdr unset for ip6. MST
-  - Return -EINVAL if tclass is set. It's available in the struct.
+v14:
+  - Add tcp and udp includes. MST
+  - Don't set l3_mask in parse_ipv?. The field isn't in the tcpip?_spec
+    structures. It's fine to remove since it is set explicitly in
+    setup_ip_key_mask.  Simon Hormon/Claude Code
 ---
 ---
- drivers/net/virtio_net.c | 99 +++++++++++++++++++++++++++++++++++-----
- 1 file changed, 88 insertions(+), 11 deletions(-)
+ drivers/net/virtio_net.c | 221 ++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 207 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 93be689e0ecb..6dbbdc1422c5 100644
+index 6dbbdc1422c5..6ac3ac421728 100644
 --- a/drivers/net/virtio_net.c
 +++ b/drivers/net/virtio_net.c
-@@ -5937,6 +5937,34 @@ static bool validate_ip4_mask(const struct virtnet_ff *ff,
+@@ -31,6 +31,8 @@
+ #include <net/ip.h>
+ #include <uapi/linux/virtio_pci.h>
+ #include <uapi/linux/virtio_net_ff.h>
++#include <uapi/linux/tcp.h>
++#include <uapi/linux/udp.h>
+ #include <linux/xarray.h>
+ #include <linux/refcount.h>
+ 
+@@ -5965,6 +5967,52 @@ static bool validate_ip6_mask(const struct virtnet_ff *ff,
  	return true;
  }
  
-+static bool validate_ip6_mask(const struct virtnet_ff *ff,
++static bool validate_tcp_mask(const struct virtnet_ff *ff,
 +			      const struct virtio_net_ff_selector *sel,
 +			      const struct virtio_net_ff_selector *sel_cap)
 +{
 +	bool partial_mask = !!(sel_cap->flags & VIRTIO_NET_FF_MASK_F_PARTIAL_MASK);
-+	struct ipv6hdr *cap, *mask;
++	struct tcphdr *cap, *mask;
 +
-+	cap = (struct ipv6hdr *)&sel_cap->mask;
-+	mask = (struct ipv6hdr *)&sel->mask;
++	cap = (struct tcphdr *)&sel_cap->mask;
++	mask = (struct tcphdr *)&sel->mask;
 +
-+	if (!ipv6_addr_any(&mask->saddr) &&
-+	    !check_mask_vs_cap(&mask->saddr, &cap->saddr,
-+			       sizeof(cap->saddr), partial_mask))
++	if (mask->source &&
++	    !check_mask_vs_cap(&mask->source, &cap->source,
++	    sizeof(cap->source), partial_mask))
 +		return false;
 +
-+	if (!ipv6_addr_any(&mask->daddr) &&
-+	    !check_mask_vs_cap(&mask->daddr, &cap->daddr,
-+			       sizeof(cap->daddr), partial_mask))
++	if (mask->dest &&
++	    !check_mask_vs_cap(&mask->dest, &cap->dest,
++	    sizeof(cap->dest), partial_mask))
 +		return false;
 +
-+	if (mask->nexthdr &&
-+	    !check_mask_vs_cap(&mask->nexthdr, &cap->nexthdr,
-+			       sizeof(cap->nexthdr), partial_mask))
++	return true;
++}
++
++static bool validate_udp_mask(const struct virtnet_ff *ff,
++			      const struct virtio_net_ff_selector *sel,
++			      const struct virtio_net_ff_selector *sel_cap)
++{
++	bool partial_mask = !!(sel_cap->flags & VIRTIO_NET_FF_MASK_F_PARTIAL_MASK);
++	struct udphdr *cap, *mask;
++
++	cap = (struct udphdr *)&sel_cap->mask;
++	mask = (struct udphdr *)&sel->mask;
++
++	if (mask->source &&
++	    !check_mask_vs_cap(&mask->source, &cap->source,
++	    sizeof(cap->source), partial_mask))
++		return false;
++
++	if (mask->dest &&
++	    !check_mask_vs_cap(&mask->dest, &cap->dest,
++	    sizeof(cap->dest), partial_mask))
 +		return false;
 +
 +	return true;
@@ -221,136 +254,259 @@ index 93be689e0ecb..6dbbdc1422c5 100644
  static bool validate_mask(const struct virtnet_ff *ff,
  			  const struct virtio_net_ff_selector *sel)
  {
-@@ -5951,6 +5979,9 @@ static bool validate_mask(const struct virtnet_ff *ff,
+@@ -5982,11 +6030,45 @@ static bool validate_mask(const struct virtnet_ff *ff,
  
- 	case VIRTIO_NET_FF_MASK_TYPE_IPV4:
- 		return validate_ip4_mask(ff, sel, sel_cap);
+ 	case VIRTIO_NET_FF_MASK_TYPE_IPV6:
+ 		return validate_ip6_mask(ff, sel, sel_cap);
 +
-+	case VIRTIO_NET_FF_MASK_TYPE_IPV6:
-+		return validate_ip6_mask(ff, sel, sel_cap);
++	case VIRTIO_NET_FF_MASK_TYPE_TCP:
++		return validate_tcp_mask(ff, sel, sel_cap);
++
++	case VIRTIO_NET_FF_MASK_TYPE_UDP:
++		return validate_udp_mask(ff, sel, sel_cap);
  	}
  
  	return false;
-@@ -5978,11 +6009,33 @@ static void parse_ip4(struct iphdr *mask, struct iphdr *key,
- 	}
  }
  
-+static void parse_ip6(struct ipv6hdr *mask, struct ipv6hdr *key,
-+		      const struct ethtool_rx_flow_spec *fs)
++static void set_tcp(struct tcphdr *mask, struct tcphdr *key,
++		    __be16 psrc_m, __be16 psrc_k,
++		    __be16 pdst_m, __be16 pdst_k)
 +{
-+	const struct ethtool_usrip6_spec *l3_mask = &fs->m_u.usr_ip6_spec;
-+	const struct ethtool_usrip6_spec *l3_val  = &fs->h_u.usr_ip6_spec;
-+
-+	if (!ipv6_addr_any((struct in6_addr *)l3_mask->ip6src)) {
-+		memcpy(&mask->saddr, l3_mask->ip6src, sizeof(mask->saddr));
-+		memcpy(&key->saddr, l3_val->ip6src, sizeof(key->saddr));
++	if (psrc_m) {
++		mask->source = psrc_m;
++		key->source = psrc_k;
 +	}
-+
-+	if (!ipv6_addr_any((struct in6_addr *)l3_mask->ip6dst)) {
-+		memcpy(&mask->daddr, l3_mask->ip6dst, sizeof(mask->daddr));
-+		memcpy(&key->daddr, l3_val->ip6dst, sizeof(key->daddr));
++	if (pdst_m) {
++		mask->dest = pdst_m;
++		key->dest = pdst_k;
 +	}
 +}
 +
++static void set_udp(struct udphdr *mask, struct udphdr *key,
++		    __be16 psrc_m, __be16 psrc_k,
++		    __be16 pdst_m, __be16 pdst_k)
++{
++	if (psrc_m) {
++		mask->source = psrc_m;
++		key->source = psrc_k;
++	}
++	if (pdst_m) {
++		mask->dest = pdst_m;
++		key->dest = pdst_k;
++	}
++}
++
+ static void parse_ip4(struct iphdr *mask, struct iphdr *key,
+ 		      const struct ethtool_rx_flow_spec *fs)
+ {
+@@ -6028,12 +6110,26 @@ static void parse_ip6(struct ipv6hdr *mask, struct ipv6hdr *key,
+ 
  static bool has_ipv4(u32 flow_type)
  {
- 	return flow_type == IP_USER_FLOW;
+-	return flow_type == IP_USER_FLOW;
++	return flow_type == TCP_V4_FLOW ||
++	       flow_type == UDP_V4_FLOW ||
++	       flow_type == IP_USER_FLOW;
  }
  
-+static bool has_ipv6(u32 flow_type)
-+{
-+	return flow_type == IPV6_USER_FLOW;
+ static bool has_ipv6(u32 flow_type)
+ {
+-	return flow_type == IPV6_USER_FLOW;
++	return flow_type == TCP_V6_FLOW ||
++	       flow_type == UDP_V6_FLOW ||
++	       flow_type == IPV6_USER_FLOW;
 +}
 +
++static bool has_tcp(u32 flow_type)
++{
++	return flow_type == TCP_V4_FLOW || flow_type == TCP_V6_FLOW;
++}
++
++static bool has_udp(u32 flow_type)
++{
++	return flow_type == UDP_V4_FLOW || flow_type == UDP_V6_FLOW;
+ }
+ 
  static int setup_classifier(struct virtnet_ff *ff,
- 			    struct virtnet_classifier **c)
- {
-@@ -6119,6 +6172,7 @@ static bool supported_flow_type(const struct ethtool_rx_flow_spec *fs)
- 	switch (fs->flow_type) {
+@@ -6173,6 +6269,10 @@ static bool supported_flow_type(const struct ethtool_rx_flow_spec *fs)
  	case ETHER_FLOW:
  	case IP_USER_FLOW:
-+	case IPV6_USER_FLOW:
+ 	case IPV6_USER_FLOW:
++	case TCP_V4_FLOW:
++	case TCP_V6_FLOW:
++	case UDP_V4_FLOW:
++	case UDP_V6_FLOW:
  		return true;
  	}
  
-@@ -6158,6 +6212,8 @@ static void calculate_flow_sizes(struct ethtool_rx_flow_spec *fs,
- 		++(*num_hdrs);
- 		if (has_ipv4(fs->flow_type))
+@@ -6214,6 +6314,12 @@ static void calculate_flow_sizes(struct ethtool_rx_flow_spec *fs,
  			size += sizeof(struct iphdr);
-+		else if (has_ipv6(fs->flow_type))
-+			size += sizeof(struct ipv6hdr);
+ 		else if (has_ipv6(fs->flow_type))
+ 			size += sizeof(struct ipv6hdr);
++
++		if (has_tcp(fs->flow_type) || has_udp(fs->flow_type)) {
++			++(*num_hdrs);
++			size += has_tcp(fs->flow_type) ? sizeof(struct tcphdr) :
++							 sizeof(struct udphdr);
++		}
  	}
  
  	BUG_ON(size > 0xff);
-@@ -6185,7 +6241,10 @@ static void setup_eth_hdr_key_mask(struct virtio_net_ff_selector *selector,
+@@ -6253,7 +6359,8 @@ static void setup_eth_hdr_key_mask(struct virtio_net_ff_selector *selector,
  
- 	if (num_hdrs > 1) {
- 		eth_m->h_proto = cpu_to_be16(0xffff);
--		eth_k->h_proto = cpu_to_be16(ETH_P_IP);
-+		if (has_ipv4(fs->flow_type))
-+			eth_k->h_proto = cpu_to_be16(ETH_P_IP);
-+		else
-+			eth_k->h_proto = cpu_to_be16(ETH_P_IPV6);
- 	} else {
- 		memcpy(eth_m, &fs->m_u.ether_spec, sizeof(*eth_m));
- 		memcpy(eth_k, &fs->h_u.ether_spec, sizeof(*eth_k));
-@@ -6196,20 +6255,38 @@ static int setup_ip_key_mask(struct virtio_net_ff_selector *selector,
+ static int setup_ip_key_mask(struct virtio_net_ff_selector *selector,
  			     u8 *key,
- 			     const struct ethtool_rx_flow_spec *fs)
+-			     const struct ethtool_rx_flow_spec *fs)
++			     const struct ethtool_rx_flow_spec *fs,
++			     int num_hdrs)
  {
-+	struct ipv6hdr *v6_m = (struct ipv6hdr *)&selector->mask;
+ 	struct ipv6hdr *v6_m = (struct ipv6hdr *)&selector->mask;
  	struct iphdr *v4_m = (struct iphdr *)&selector->mask;
-+	struct ipv6hdr *v6_k = (struct ipv6hdr *)key;
- 	struct iphdr *v4_k = (struct iphdr *)key;
+@@ -6265,27 +6372,99 @@ static int setup_ip_key_mask(struct virtio_net_ff_selector *selector,
+ 		selector->length = sizeof(struct ipv6hdr);
  
--	selector->type = VIRTIO_NET_FF_MASK_TYPE_IPV4;
--	selector->length = sizeof(struct iphdr);
-+	if (has_ipv6(fs->flow_type)) {
-+		selector->type = VIRTIO_NET_FF_MASK_TYPE_IPV6;
-+		selector->length = sizeof(struct ipv6hdr);
+ 		/* exclude tclass, it's not exposed properly struct ip6hdr */
+-		if (fs->h_u.usr_ip6_spec.l4_4_bytes ||
+-		    fs->m_u.usr_ip6_spec.l4_4_bytes ||
+-		    fs->h_u.usr_ip6_spec.tclass ||
++		if (fs->h_u.usr_ip6_spec.tclass ||
+ 		    fs->m_u.usr_ip6_spec.tclass ||
+-		    fs->h_u.usr_ip6_spec.l4_proto ||
+-		    fs->m_u.usr_ip6_spec.l4_proto)
++		    (num_hdrs == 2 && (fs->h_u.usr_ip6_spec.l4_4_bytes ||
++				      fs->m_u.usr_ip6_spec.l4_4_bytes ||
++				      fs->h_u.usr_ip6_spec.l4_proto ||
++				      fs->m_u.usr_ip6_spec.l4_proto)))
+ 			return -EINVAL;
+ 
+ 		parse_ip6(v6_m, v6_k, fs);
 +
-+		/* exclude tclass, it's not exposed properly struct ip6hdr */
-+		if (fs->h_u.usr_ip6_spec.l4_4_bytes ||
-+		    fs->m_u.usr_ip6_spec.l4_4_bytes ||
-+		    fs->h_u.usr_ip6_spec.tclass ||
-+		    fs->m_u.usr_ip6_spec.tclass ||
-+		    fs->h_u.usr_ip6_spec.l4_proto ||
-+		    fs->m_u.usr_ip6_spec.l4_proto)
-+			return -EINVAL;
++		if (num_hdrs > 2) {
++			v6_m->nexthdr = 0xff;
++			if (has_tcp(fs->flow_type))
++				v6_k->nexthdr = IPPROTO_TCP;
++			else
++				v6_k->nexthdr = IPPROTO_UDP;
++		}
+ 	} else {
+ 		selector->type = VIRTIO_NET_FF_MASK_TYPE_IPV4;
+ 		selector->length = sizeof(struct iphdr);
  
--	if (fs->h_u.usr_ip4_spec.l4_4_bytes ||
--	    fs->h_u.usr_ip4_spec.ip_ver != ETH_RX_NFC_IP4 ||
--	    fs->m_u.usr_ip4_spec.l4_4_bytes ||
--	    fs->m_u.usr_ip4_spec.ip_ver ||
--	    fs->m_u.usr_ip4_spec.proto)
--		return -EINVAL;
-+		parse_ip6(v6_m, v6_k, fs);
-+	} else {
-+		selector->type = VIRTIO_NET_FF_MASK_TYPE_IPV4;
-+		selector->length = sizeof(struct iphdr);
+-		if (fs->h_u.usr_ip4_spec.l4_4_bytes ||
+-		    fs->h_u.usr_ip4_spec.ip_ver != ETH_RX_NFC_IP4 ||
+-		    fs->m_u.usr_ip4_spec.l4_4_bytes ||
+-		    fs->m_u.usr_ip4_spec.ip_ver ||
+-		    fs->m_u.usr_ip4_spec.proto)
++		if (num_hdrs == 2 &&
++		    (fs->h_u.usr_ip4_spec.l4_4_bytes ||
++		     fs->h_u.usr_ip4_spec.ip_ver != ETH_RX_NFC_IP4 ||
++		     fs->m_u.usr_ip4_spec.l4_4_bytes ||
++		     fs->m_u.usr_ip4_spec.ip_ver ||
++		     fs->m_u.usr_ip4_spec.proto))
+ 			return -EINVAL;
+ 
+ 		parse_ip4(v4_m, v4_k, fs);
 +
-+		if (fs->h_u.usr_ip4_spec.l4_4_bytes ||
-+		    fs->h_u.usr_ip4_spec.ip_ver != ETH_RX_NFC_IP4 ||
-+		    fs->m_u.usr_ip4_spec.l4_4_bytes ||
-+		    fs->m_u.usr_ip4_spec.ip_ver ||
-+		    fs->m_u.usr_ip4_spec.proto)
-+			return -EINVAL;
- 
--	parse_ip4(v4_m, v4_k, fs);
-+		parse_ip4(v4_m, v4_k, fs);
++		if (num_hdrs > 2) {
++			v4_m->protocol = 0xff;
++			if (has_tcp(fs->flow_type))
++				v4_k->protocol = IPPROTO_TCP;
++			else
++				v4_k->protocol = IPPROTO_UDP;
++		}
 +	}
++
++	return 0;
++}
++
++static int setup_transport_key_mask(struct virtio_net_ff_selector *selector,
++				    u8 *key,
++				    struct ethtool_rx_flow_spec *fs)
++{
++	struct tcphdr *tcp_m = (struct tcphdr *)&selector->mask;
++	struct udphdr *udp_m = (struct udphdr *)&selector->mask;
++	const struct ethtool_tcpip6_spec *v6_l4_mask;
++	const struct ethtool_tcpip4_spec *v4_l4_mask;
++	const struct ethtool_tcpip6_spec *v6_l4_key;
++	const struct ethtool_tcpip4_spec *v4_l4_key;
++	struct tcphdr *tcp_k = (struct tcphdr *)key;
++	struct udphdr *udp_k = (struct udphdr *)key;
++
++	if (has_tcp(fs->flow_type)) {
++		selector->type = VIRTIO_NET_FF_MASK_TYPE_TCP;
++		selector->length = sizeof(struct tcphdr);
++
++		if (has_ipv6(fs->flow_type)) {
++			v6_l4_mask = &fs->m_u.tcp_ip6_spec;
++			v6_l4_key = &fs->h_u.tcp_ip6_spec;
++
++			set_tcp(tcp_m, tcp_k, v6_l4_mask->psrc, v6_l4_key->psrc,
++				v6_l4_mask->pdst, v6_l4_key->pdst);
++		} else {
++			v4_l4_mask = &fs->m_u.tcp_ip4_spec;
++			v4_l4_key = &fs->h_u.tcp_ip4_spec;
++
++			set_tcp(tcp_m, tcp_k, v4_l4_mask->psrc, v4_l4_key->psrc,
++				v4_l4_mask->pdst, v4_l4_key->pdst);
++		}
++
++	} else if (has_udp(fs->flow_type)) {
++		selector->type = VIRTIO_NET_FF_MASK_TYPE_UDP;
++		selector->length = sizeof(struct udphdr);
++
++		if (has_ipv6(fs->flow_type)) {
++			v6_l4_mask = &fs->m_u.udp_ip6_spec;
++			v6_l4_key = &fs->h_u.udp_ip6_spec;
++
++			set_udp(udp_m, udp_k, v6_l4_mask->psrc, v6_l4_key->psrc,
++				v6_l4_mask->pdst, v6_l4_key->pdst);
++		} else {
++			v4_l4_mask = &fs->m_u.udp_ip4_spec;
++			v4_l4_key = &fs->h_u.udp_ip4_spec;
++
++			set_udp(udp_m, udp_k, v4_l4_mask->psrc, v4_l4_key->psrc,
++				v4_l4_mask->pdst, v4_l4_key->pdst);
++		}
++	} else {
++		return -EOPNOTSUPP;
+ 	}
  
  	return 0;
- }
-@@ -6279,7 +6356,7 @@ static int build_and_insert(struct virtnet_ff *ff,
- 
+@@ -6325,6 +6504,7 @@ static int build_and_insert(struct virtnet_ff *ff,
+ 	struct virtio_net_ff_selector *selector;
+ 	struct virtnet_classifier *c;
+ 	size_t classifier_size;
++	size_t key_offset;
+ 	int num_hdrs;
+ 	u8 key_size;
+ 	u8 *key;
+@@ -6357,11 +6537,24 @@ static int build_and_insert(struct virtnet_ff *ff,
  	setup_eth_hdr_key_mask(selector, key, fs, num_hdrs);
  
--	if (has_ipv4(fs->flow_type)) {
-+	if (has_ipv4(fs->flow_type) || has_ipv6(fs->flow_type)) {
+ 	if (has_ipv4(fs->flow_type) || has_ipv6(fs->flow_type)) {
++		key_offset = selector->length;
  		selector = next_selector(selector);
  
- 		err = setup_ip_key_mask(selector, key + sizeof(struct ethhdr), fs);
+-		err = setup_ip_key_mask(selector, key + sizeof(struct ethhdr), fs);
++		err = setup_ip_key_mask(selector, key + key_offset,
++					fs, num_hdrs);
+ 		if (err)
+ 			goto err_classifier;
++
++		if (has_udp(fs->flow_type) || has_tcp(fs->flow_type)) {
++			key_offset += selector->length;
++			selector = next_selector(selector);
++
++			err = setup_transport_key_mask(selector,
++						       key + key_offset,
++						       fs);
++			if (err)
++				goto err_classifier;
++		}
+ 	}
+ 
+ 	err = validate_classifier_selectors(ff, classifier, num_hdrs);
 -- 
 2.50.1
 
