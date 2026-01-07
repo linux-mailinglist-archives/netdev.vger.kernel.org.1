@@ -1,68 +1,58 @@
-Return-Path: <netdev+bounces-247515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 348E0CFB75E
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 01:25:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0654CFB76A
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 01:27:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EA2ED3028F53
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 00:23:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 54710309670F
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 00:24:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28EE417C21C;
-	Wed,  7 Jan 2026 00:23:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 280441C8626;
+	Wed,  7 Jan 2026 00:24:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ksHrNXCU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QLnpJWkv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E97FD1684A4;
-	Wed,  7 Jan 2026 00:23:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0287317C21C
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 00:24:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767745391; cv=none; b=YGg94VlFBZGyl05RfQqbUr/bYPeyvJVki9Z0vVQCvhgvclzXk8KRA8+f9SOdvozES/LmXOF1/jMLB7Z2OdFNYWxgsQV99dLfWJQwOo41K+WpfEboKyi9iZMoEfFIzZGWgxHHFLweo/TGdiFaQq8LWEoR3m4HXe/SNmFIxodZT1A=
+	t=1767745499; cv=none; b=T5DcJJ1KOQjCNlVGMMsIjyaw14/WeeMOFwa7JVYFVVD32DrFiKIg0wG/V/MTWwd9dFitBTHca6tugNjcFqrpLZ59gjz8yPf9Tf0VfzdukyqjBxbVnGHU0bYP82u7zmqVTltDb/EaJeW5MimeUhhf6HJND++qi00YMvYfp9dzfy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767745391; c=relaxed/simple;
-	bh=wY4FRjNX3BB8mXL+6r1lxCBoL1PogAM00UMTBb3+13Y=;
+	s=arc-20240116; t=1767745499; c=relaxed/simple;
+	bh=4yz7SAZrElr31jPuxI5ovVwFRh6NpkT8Na1DC4XZbAk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kvh7wFdC7qtirp/Wpaup+PqUQEZAtiZ/LesbVE9UO3N406K/3ZXZzWS2Ysw60sj2C8aNjEtqniEC/sVHCM51vWr8n0tXeZ9b2l7HPefmnoxtm5zgzdx2s01QOGqDJKHqw4/eEjWMBsCgLrf/JZO7cWzaabkfVXAHQbp+NJmgp74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ksHrNXCU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00E7DC116C6;
-	Wed,  7 Jan 2026 00:23:06 +0000 (UTC)
+	 MIME-Version:Content-Type; b=RWjQxbaonBLfeL2E3BbfB+hW/tDlKvtCPnugS/6feZC6HHRuKEh3En+NnjmHEqAZ4/XhiXZUPhqu655UegRaY/E8M/sTPy7/yTH9rFItSUkbUJN9XYegUrYrDt5JbDJiJGNX3+SINhQwFxCN/CTzrBc+a9Nb5iCceUV2mFlOmog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QLnpJWkv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1212FC116C6;
+	Wed,  7 Jan 2026 00:24:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767745387;
-	bh=wY4FRjNX3BB8mXL+6r1lxCBoL1PogAM00UMTBb3+13Y=;
+	s=k20201202; t=1767745498;
+	bh=4yz7SAZrElr31jPuxI5ovVwFRh6NpkT8Na1DC4XZbAk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ksHrNXCUkbJnUfD3/20A8m7nvyRRA70BY3IfWnP1qPnGaRsEMJUdFfGJ9JZsyerPT
-	 HFtHW5eKfGc/EYff3tfyqAEXIEaQ6+y/biYzV3QdfhUV0T4bQ5c+EfQNe6PW7h/9jG
-	 MOlxsB87MUCXsJil+HSkaCMQUM3a5cRxWQwmAimIvoXueN6zPdzSr26qoZMyw7BHDV
-	 ga446ZdysuFNvZSWe4ofIXJJwNdjpFrwt111LbfvWwVv9mgJQRCJCjzqB2WOiy9Iv1
-	 u3/H61qeuk2BA8r093A9BTraLOzx0BW+LNwvdJDc3doqSJfWhLpT/hJ9JkR0OKV6qd
-	 cA23ELIe/0ZGA==
-Date: Tue, 6 Jan 2026 16:23:06 -0800
+	b=QLnpJWkvCGS3gNuPVIHaeBUXAL9gAl9YwgDNvg5h2EieseWFiVImnICybM70+Vmvu
+	 kecxKALB8LmDva4uFcnJOwprm0fNhuB5iWUye59HarJj0rjc8Xe5WrLZGuoH7Dbcw9
+	 A1hNztroM6IsAL797E240F7tk/0i6sA6mCLe+v24vk3X+yc+Uu/UdTpbA0GBgWgVVm
+	 fQI9HBJpAu1gCk6tJjcZYloA0iMiNSFNgDwr2+DSY3y6BSGipsF/NB8MSPzCOrYhu2
+	 lmH+me/mNhQaWr1/lENtW7dOcePs6hN9A6+rRuP0YWa2lGCRaa5sEb6lFMzpJJmtNo
+	 kjZIm1P9Yfzbg==
+Date: Tue, 6 Jan 2026 16:24:56 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Oliver Hartkopp <socketcan@hartkopp.net>
-Cc: mkl@pengutronix.de, Prithvi <activprithvi@gmail.com>, andrii@kernel.org,
- linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzkaller-bugs@googlegroups.com, netdev@vger.kernel.org
-Subject: Re: [bpf, xdp] headroom - was: Re: Question about to KMSAN:
- uninit-value in can_receive
-Message-ID: <20260106162306.0649424c@kernel.org>
-In-Reply-To: <904fa297-b657-4f5b-9999-b8cfcc11bfa9@hartkopp.net>
-References: <20251117173012.230731-1-activprithvi@gmail.com>
-	<0c98b1c4-3975-4bf5-9049-9d7f10d22a6d@hartkopp.net>
-	<c2cead0a-06ed-4da4-a4e4-8498908aae3e@hartkopp.net>
-	<aSx++4VrGOm8zHDb@inspiron>
-	<d6077d36-93ed-4a6d-9eed-42b1b22cdffb@hartkopp.net>
-	<20251220173338.w7n3n4lkvxwaq6ae@inspiron>
-	<01190c40-d348-4521-a2ab-3e9139cc832e@hartkopp.net>
-	<20260102153611.63wipdy2meh3ovel@inspiron>
-	<20260102120405.34613b68@kernel.org>
-	<63c20aae-e014-44f9-a201-99e0e7abadcb@hartkopp.net>
-	<20260104074222.29e660ac@kernel.org>
-	<fac5da75-2fc0-464c-be90-34220313af64@hartkopp.net>
-	<20260105152638.74cfea6c@kernel.org>
-	<904fa297-b657-4f5b-9999-b8cfcc11bfa9@hartkopp.net>
+To: Tonghao Zhang <tonghao@bamaicloud.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, Nikolay Aleksandrov
+ <razor@blackwall.org>, Hangbin Liu <liuhangbin@gmail.com>, Jason Xing
+ <kerneljasonxing@gmail.com>
+Subject: Re: [PATCH RESEND net-next v4 0/4] A series of minor optimizations
+ of the bonding module
+Message-ID: <20260106162456.6158d8be@kernel.org>
+In-Reply-To: <cover.1767000122.git.tonghao@bamaicloud.com>
+References: <cover.1767000122.git.tonghao@bamaicloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,17 +62,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 6 Jan 2026 13:04:41 +0100 Oliver Hartkopp wrote:
-> When such skb is echo'ed back after successful transmission via 
-> netif_rx() this leads to skb->skb_iif = skb->dev->ifindex;
-> 
-> To prevent a loopback the CAN frame must not be sent back to the 
-> originating interface - even when it has been routed to different CAN 
-> interfaces in the meantime (which always overwrites skb_iif).
-> 
-> Therefore we need to maintain the "real original" incoming interface.
+On Sat,  3 Jan 2026 17:49:42 +0800 Tonghao Zhang wrote:
+> These patches mainly target the peer notify mechanism of the bonding module.
+> Including updates of peer notify, lock races, etc. For more information, please
+> refer to the patch.
 
-Alternatively perhaps for this particular use case you could use
-something like metadata_dst to mark the frame as forwarded / annotate
-with the originating ifindex?
+FTR this patch series was marked as Deferred by someone, not clear 
+to me who and why. Please wait a day to see if anyone speaks up
+and repost.
 
