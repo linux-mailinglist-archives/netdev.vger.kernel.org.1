@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-247527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C539FCFB8D4
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 02:09:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 69A5BCFB8DA
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 02:10:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EAA1F30DCC6D
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 01:05:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 211CD30F4107
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 01:05:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA5923D7FF;
-	Wed,  7 Jan 2026 01:04:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEFAC247DE1;
+	Wed,  7 Jan 2026 01:04:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="WgOnwKC+"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="DI2QB3B9"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F6220ED;
-	Wed,  7 Jan 2026 01:04:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97EFD23A9B0;
+	Wed,  7 Jan 2026 01:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767747888; cv=none; b=dri+oxtCmth854hfHSDbsoDZTItSdiD5THFRxt1kwWMASryiepB7HU8iaLe4sKFCopvUwVbNVFT5+67E+ltMjjc24UxaZJyYuxTpZ3+YTgn5TQqpUP5ewafZVcHTOsZDkWsk5wuomvo+M3OWD/oC4jjkezcC3aX3EZmvI27wMu4=
+	t=1767747889; cv=none; b=ntg2EREg2iUTb7phK/XMS17jrRG4QOB5qXuCyZdtn1cuGRNxqVqBnjgdUG1vaUV2cpDX3yLFLRv11rVZ9/ylzztRkWkXkA9YVURMQSFIf0WN6Y5bt9O77jZ8PSo1WO/DHOyI8xrThnjx4GkVUd6wePSWNlsK1XaoT9Z5cBBKYcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767747888; c=relaxed/simple;
-	bh=UNIPutTRhEk/21npihuYrL47NPWvcGs8KZXsgyUoxKw=;
+	s=arc-20240116; t=1767747889; c=relaxed/simple;
+	bh=0IMjmLMCnOU2fPiCxC2EJwL+HLJAu1/CLuV/JBTAdww=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W0N1Lzc3Dbzffj4LU1y2uHXZkSsqPTPaasedvZqXi8NpUKBE0paScwB70pEb1qtYKhe1/GuLHxVDBBlNgEwqQvDIkiSf2M9H8/wozyO3VOeBKrPydduvYfHsfuCGDFPfNI4aUnrfw/RTbUCtSzxVW8qricfKr4iyt17cSgVrlSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=WgOnwKC+; arc=none smtp.client-ip=113.46.200.220
+	 MIME-Version:Content-Type; b=nG7IsHNqU6laMIrg+jinGeYb5cfDGQ+1gb1r75/sXue+sHaPhTim6kxtt87oA9X46UaHk3tulNVdrJmuyzWWulOMRPCdyN008IEQJyAH3b3Qsi0H0qtg1rNyKIXiRgSRRC2wQnheQkFoo4Log14R0BkFWPk92jrakU07SP3iwjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=DI2QB3B9; arc=none smtp.client-ip=113.46.200.223
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=RGrca02i1pajsgh8t78wIav6cnqeq9exHZDXfvq2K5k=;
-	b=WgOnwKC+vp+SEOLcTYOQKcoIPtqZzSx67acArBquL2sQQ3rbgB+r8Gc64lHYvUu/8e1sr8lOs
-	IMPF2f+j0SMy3eUpvQpq5kG3zgqj8DjU5in4A7mW+0MKCGyXRCfcmjFb82dF5zHHmLI/dRlVFVk
-	I74fdeWA8tL6FbkG6fJndBQ=
-Received: from mail.maildlp.com (unknown [172.19.162.140])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4dm8qx2WdZz12LHX;
-	Wed,  7 Jan 2026 09:01:33 +0800 (CST)
+	bh=QqcxYPu+etYkHC38X3eMef7Z5wzu6DRmSex9D5brSSg=;
+	b=DI2QB3B9ErQ6ezQfm53+MCa3YElnM3FwGhqU3N2jQeZ0Bz3jcdjwquN40qNakifWW6zTxeYF4
+	OpFhcCYWnWeudra04DxN/W6HJE84nFi9yNe26uRZNzXtIg9J7ARRMIzhbPzDdFiJzxge2V4fR8I
+	HJEVcxlgK7pcNIEAT3ek4+w=
+Received: from mail.maildlp.com (unknown [172.19.162.92])
+	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4dm8ql69fNzmV88;
+	Wed,  7 Jan 2026 09:01:23 +0800 (CST)
 Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
-	by mail.maildlp.com (Postfix) with ESMTPS id CE0B42016A;
-	Wed,  7 Jan 2026 09:04:37 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id A942140565;
+	Wed,  7 Jan 2026 09:04:39 +0800 (CST)
 Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.188.120) by
  kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Wed, 7 Jan 2026 09:04:36 +0800
+ 15.2.1544.36; Wed, 7 Jan 2026 09:04:38 +0800
 From: Fan Gong <gongfan1@huawei.com>
 To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
 	<netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
@@ -57,9 +57,9 @@ CC: <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>, luosifu
 	<luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>, Zhou Shuai
 	<zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
 	<shijing34@huawei.com>, Luo Yang <luoyang82@h-partners.com>
-Subject: [PATCH net-next v09 4/9] hinic3: Add .ndo_set_features and .ndo_fix_features
-Date: Wed, 7 Jan 2026 09:04:19 +0800
-Message-ID: <369acf8fa82d553104ae78bcb73375b224100ced.1767707500.git.zhuyikai1@h-partners.com>
+Subject: [PATCH net-next v09 5/9] hinic3: Add .ndo_features_check
+Date: Wed, 7 Jan 2026 09:04:20 +0800
+Message-ID: <26eb3da38e06ba184b3b5ad9eb2bcd49e101ae67.1767707500.git.zhuyikai1@h-partners.com>
 X-Mailer: git-send-email 2.51.0.windows.1
 In-Reply-To: <cover.1767707500.git.zhuyikai1@h-partners.com>
 References: <cover.1767707500.git.zhuyikai1@h-partners.com>
@@ -74,517 +74,65 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
  kwepemf100013.china.huawei.com (7.202.181.12)
 
-Implement following callback function:
-.ndo_set_features
-.ndo_fix_features
-
-The .ndo_set_features function includes five features: rx_csum,
-tso, lro, rx_cvlan and vlan_filter.
-Add these new features in netdev_feature_init.
+As we cannot solve packets with multiple stacked vlan, so we use
+.ndo_features_check to check for these packets and return a smaller
+feature without offload features.
 
 Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
 Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
 Signed-off-by: Fan Gong <gongfan1@huawei.com>
 ---
- .../net/ethernet/huawei/hinic3/hinic3_main.c  |  33 +++-
- .../huawei/hinic3/hinic3_mgmt_interface.h     |  40 +++++
- .../huawei/hinic3/hinic3_netdev_ops.c         | 161 ++++++++++++++++++
- .../ethernet/huawei/hinic3/hinic3_nic_cfg.c   | 130 ++++++++++++++
- .../ethernet/huawei/hinic3/hinic3_nic_cfg.h   |   5 +
- .../ethernet/huawei/hinic3/hinic3_nic_dev.h   |   2 +
- 6 files changed, 370 insertions(+), 1 deletion(-)
+ .../ethernet/huawei/hinic3/hinic3_netdev_ops.c   | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_main.c b/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-index 2bd306f09cd5..6071d2023a5d 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
-@@ -227,6 +227,8 @@ static void hinic3_assign_netdev_ops(struct net_device *netdev)
- static void netdev_feature_init(struct net_device *netdev)
- {
- 	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	netdev_features_t hw_features = 0;
-+	netdev_features_t vlan_fts = 0;
- 	netdev_features_t cso_fts = 0;
- 	netdev_features_t tso_fts = 0;
- 	netdev_features_t dft_fts;
-@@ -239,7 +241,29 @@ static void netdev_feature_init(struct net_device *netdev)
- 	if (hinic3_test_support(nic_dev, HINIC3_NIC_F_TSO))
- 		tso_fts |= NETIF_F_TSO | NETIF_F_TSO6;
- 
--	netdev->features |= dft_fts | cso_fts | tso_fts;
-+	if (hinic3_test_support(nic_dev, HINIC3_NIC_F_RX_VLAN_STRIP |
-+				HINIC3_NIC_F_TX_VLAN_INSERT))
-+		vlan_fts |= NETIF_F_HW_VLAN_CTAG_TX | NETIF_F_HW_VLAN_CTAG_RX;
-+
-+	if (hinic3_test_support(nic_dev, HINIC3_NIC_F_RX_VLAN_FILTER))
-+		vlan_fts |= NETIF_F_HW_VLAN_CTAG_FILTER;
-+
-+	if (hinic3_test_support(nic_dev, HINIC3_NIC_F_VXLAN_OFFLOAD))
-+		tso_fts |= NETIF_F_GSO_UDP_TUNNEL | NETIF_F_GSO_UDP_TUNNEL_CSUM;
-+
-+	/* LRO is disabled by default, only set hw features */
-+	if (hinic3_test_support(nic_dev, HINIC3_NIC_F_LRO))
-+		hw_features |= NETIF_F_LRO;
-+
-+	netdev->features |= dft_fts | cso_fts | tso_fts | vlan_fts;
-+	netdev->vlan_features |= dft_fts | cso_fts | tso_fts;
-+	hw_features |= netdev->hw_features | netdev->features;
-+	netdev->hw_features = hw_features;
-+	netdev->priv_flags |= IFF_UNICAST_FLT;
-+
-+	netdev->hw_enc_features |= dft_fts;
-+	if (hinic3_test_support(nic_dev, HINIC3_NIC_F_VXLAN_OFFLOAD))
-+		netdev->hw_enc_features |= cso_fts | tso_fts | NETIF_F_TSO_ECN;
- }
- 
- static int hinic3_set_default_hw_feature(struct net_device *netdev)
-@@ -254,6 +278,13 @@ static int hinic3_set_default_hw_feature(struct net_device *netdev)
- 		return err;
- 	}
- 
-+	err = hinic3_set_hw_features(netdev);
-+	if (err) {
-+		hinic3_update_nic_feature(nic_dev, 0);
-+		hinic3_set_nic_feature_to_hw(nic_dev);
-+		return err;
-+	}
-+
- 	return 0;
- }
- 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h b/drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h
-index 3a6d3ee534d0..69405715e734 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h
-@@ -56,6 +56,22 @@ struct l2nic_cmd_update_mac {
- 	u8                   new_mac[ETH_ALEN];
- };
- 
-+struct l2nic_cmd_vlan_offload {
-+	struct mgmt_msg_head msg_head;
-+	u16                  func_id;
-+	u8                   vlan_offload;
-+	u8                   rsvd1[5];
-+};
-+
-+/* set vlan filter */
-+struct l2nic_cmd_set_vlan_filter {
-+	struct mgmt_msg_head msg_head;
-+	u16                  func_id;
-+	u8                   rsvd[2];
-+	/* bit0:vlan filter en; bit1:broadcast_filter_en */
-+	u32                  vlan_filter_ctrl;
-+};
-+
- struct l2nic_cmd_set_ci_attr {
- 	struct mgmt_msg_head msg_head;
- 	u16                  func_idx;
-@@ -102,6 +118,26 @@ struct l2nic_cmd_set_dcb_state {
- 	u8                   rsvd[7];
- };
- 
-+struct l2nic_cmd_lro_config {
-+	struct mgmt_msg_head msg_head;
-+	u16                  func_id;
-+	u8                   opcode;
-+	u8                   rsvd1;
-+	u8                   lro_ipv4_en;
-+	u8                   lro_ipv6_en;
-+	/* unit is 1K */
-+	u8                   lro_max_pkt_len;
-+	u8                   resv2[13];
-+};
-+
-+struct l2nic_cmd_lro_timer {
-+	struct mgmt_msg_head msg_head;
-+	/* 1: set timer value, 0: get timer value */
-+	u8                   opcode;
-+	u8                   rsvd[3];
-+	u32                  timer;
-+};
-+
- #define L2NIC_RSS_TYPE_VALID_MASK         BIT(23)
- #define L2NIC_RSS_TYPE_TCP_IPV6_EXT_MASK  BIT(24)
- #define L2NIC_RSS_TYPE_IPV6_EXT_MASK      BIT(25)
-@@ -162,11 +198,15 @@ enum l2nic_cmd {
- 	L2NIC_CMD_SET_VPORT_ENABLE    = 6,
- 	L2NIC_CMD_SET_SQ_CI_ATTR      = 8,
- 	L2NIC_CMD_CLEAR_QP_RESOURCE   = 11,
-+	L2NIC_CMD_CFG_RX_LRO          = 13,
-+	L2NIC_CMD_CFG_LRO_TIMER       = 14,
- 	L2NIC_CMD_FEATURE_NEGO        = 15,
- 	L2NIC_CMD_GET_MAC             = 20,
- 	L2NIC_CMD_SET_MAC             = 21,
- 	L2NIC_CMD_DEL_MAC             = 22,
- 	L2NIC_CMD_UPDATE_MAC          = 23,
-+	L2NIC_CMD_SET_VLAN_FILTER_EN  = 26,
-+	L2NIC_CMD_SET_RX_VLAN_OFFLOAD = 27,
- 	L2NIC_CMD_CFG_RSS             = 60,
- 	L2NIC_CMD_CFG_RSS_HASH_KEY    = 63,
- 	L2NIC_CMD_CFG_RSS_HASH_ENGINE = 64,
 diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c b/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
-index 7361a4821cb8..526487bf57f4 100644
+index 526487bf57f4..c1e4edfb69a9 100644
 --- a/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
 +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
-@@ -12,6 +12,9 @@
- #include "hinic3_rx.h"
- #include "hinic3_tx.h"
+@@ -2,6 +2,7 @@
+ // Copyright (c) Huawei Technologies Co., Ltd. 2025. All rights reserved.
  
-+#define HINIC3_LRO_DEFAULT_COAL_PKT_SIZE  32
-+#define HINIC3_LRO_DEFAULT_TIME_LIMIT     16
+ #include <linux/etherdevice.h>
++#include <linux/if_vlan.h>
+ #include <linux/netdevice.h>
+ 
+ #include "hinic3_hwif.h"
+@@ -15,6 +16,10 @@
+ #define HINIC3_LRO_DEFAULT_COAL_PKT_SIZE  32
+ #define HINIC3_LRO_DEFAULT_TIME_LIMIT     16
+ 
++#define HINIC3_VLAN_CLEAR_OFFLOAD \
++	(NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM | \
++	 NETIF_F_SCTP_CRC | NETIF_F_RXCSUM | NETIF_F_ALL_TSO)
 +
  /* try to modify the number of irq to the target number,
   * and return the actual number of irq.
   */
-@@ -476,6 +479,162 @@ static int hinic3_close(struct net_device *netdev)
- 	return 0;
+@@ -624,6 +629,16 @@ static netdev_features_t hinic3_fix_features(struct net_device *netdev,
+ 	return features_tmp;
  }
  
-+#define SET_FEATURES_OP_STR(op)  ((op) ? "Enable" : "Disable")
-+
-+static int hinic3_set_feature_rx_csum(struct net_device *netdev,
-+				      netdev_features_t wanted_features,
-+				      netdev_features_t features,
-+				      netdev_features_t *failed_features)
++static netdev_features_t hinic3_features_check(struct sk_buff *skb,
++					       struct net_device *dev,
++					       netdev_features_t features)
 +{
-+	netdev_features_t changed = wanted_features ^ features;
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
++	if (unlikely(skb_vlan_tagged_multi(skb)))
++		features &= ~HINIC3_VLAN_CLEAR_OFFLOAD;
 +
-+	if (changed & NETIF_F_RXCSUM)
-+		dev_dbg(hwdev->dev, "%s rx csum success\n",
-+			SET_FEATURES_OP_STR(wanted_features & NETIF_F_RXCSUM));
-+
-+	return 0;
++	return features;
 +}
 +
-+static int hinic3_set_feature_tso(struct net_device *netdev,
-+				  netdev_features_t wanted_features,
-+				  netdev_features_t features,
-+				  netdev_features_t *failed_features)
-+{
-+	netdev_features_t changed = wanted_features ^ features;
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
-+
-+	if (changed & NETIF_F_TSO)
-+		dev_dbg(hwdev->dev, "%s tso success\n",
-+			SET_FEATURES_OP_STR(wanted_features & NETIF_F_TSO));
-+
-+	return 0;
-+}
-+
-+static int hinic3_set_feature_lro(struct net_device *netdev,
-+				  netdev_features_t wanted_features,
-+				  netdev_features_t features,
-+				  netdev_features_t *failed_features)
-+{
-+	netdev_features_t changed = wanted_features ^ features;
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
-+	bool en = !!(wanted_features & NETIF_F_LRO);
-+	int err;
-+
-+	if (!(changed & NETIF_F_LRO))
-+		return 0;
-+
-+	err = hinic3_set_rx_lro_state(hwdev, en,
-+				      HINIC3_LRO_DEFAULT_TIME_LIMIT,
-+				      HINIC3_LRO_DEFAULT_COAL_PKT_SIZE);
-+	if (err) {
-+		dev_err(hwdev->dev, "%s lro failed\n", SET_FEATURES_OP_STR(en));
-+		*failed_features |= NETIF_F_LRO;
-+	}
-+
-+	return err;
-+}
-+
-+static int hinic3_set_feature_rx_cvlan(struct net_device *netdev,
-+				       netdev_features_t wanted_features,
-+				       netdev_features_t features,
-+				       netdev_features_t *failed_features)
-+{
-+	bool en = !!(wanted_features & NETIF_F_HW_VLAN_CTAG_RX);
-+	netdev_features_t changed = wanted_features ^ features;
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
-+	int err;
-+
-+	if (!(changed & NETIF_F_HW_VLAN_CTAG_RX))
-+		return 0;
-+
-+	err = hinic3_set_rx_vlan_offload(hwdev, en);
-+	if (err) {
-+		dev_err(hwdev->dev, "%s rx vlan offload failed\n",
-+			SET_FEATURES_OP_STR(en));
-+		*failed_features |= NETIF_F_HW_VLAN_CTAG_RX;
-+	}
-+
-+	return err;
-+}
-+
-+static int hinic3_set_feature_vlan_filter(struct net_device *netdev,
-+					  netdev_features_t wanted_features,
-+					  netdev_features_t features,
-+					  netdev_features_t *failed_features)
-+{
-+	bool en = !!(wanted_features & NETIF_F_HW_VLAN_CTAG_FILTER);
-+	netdev_features_t changed = wanted_features ^ features;
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
-+	int err;
-+
-+	if (!(changed & NETIF_F_HW_VLAN_CTAG_FILTER))
-+		return 0;
-+
-+	err = hinic3_set_vlan_filter(hwdev, en);
-+	if (err) {
-+		dev_err(hwdev->dev, "%s rx vlan filter failed\n",
-+			SET_FEATURES_OP_STR(en));
-+		*failed_features |= NETIF_F_HW_VLAN_CTAG_FILTER;
-+	}
-+
-+	return err;
-+}
-+
-+static int hinic3_set_features(struct net_device *netdev,
-+			       netdev_features_t curr,
-+			       netdev_features_t wanted)
-+{
-+	netdev_features_t failed = 0;
-+	int err;
-+
-+	err = hinic3_set_feature_rx_csum(netdev, wanted, curr, &failed) |
-+	      hinic3_set_feature_tso(netdev, wanted, curr, &failed) |
-+	      hinic3_set_feature_lro(netdev, wanted, curr, &failed) |
-+	      hinic3_set_feature_rx_cvlan(netdev, wanted, curr, &failed) |
-+	      hinic3_set_feature_vlan_filter(netdev, wanted, curr, &failed);
-+	if (err) {
-+		netdev->features = wanted ^ failed;
-+		return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static int hinic3_ndo_set_features(struct net_device *netdev,
-+				   netdev_features_t features)
-+{
-+	return hinic3_set_features(netdev, netdev->features, features);
-+}
-+
-+static netdev_features_t hinic3_fix_features(struct net_device *netdev,
-+					     netdev_features_t features)
-+{
-+	netdev_features_t features_tmp = features;
-+
-+	/* If Rx checksum is disabled, then LRO should also be disabled */
-+	if (!(features_tmp & NETIF_F_RXCSUM))
-+		features_tmp &= ~NETIF_F_LRO;
-+
-+	return features_tmp;
-+}
-+
-+int hinic3_set_hw_features(struct net_device *netdev)
-+{
-+	netdev_features_t wanted, curr;
-+
-+	wanted = netdev->features;
-+	/* fake current features so all wanted are enabled */
-+	curr = ~wanted;
-+
-+	return hinic3_set_features(netdev, curr, wanted);
-+}
-+
- static int hinic3_change_mtu(struct net_device *netdev, int new_mtu)
+ int hinic3_set_hw_features(struct net_device *netdev)
  {
- 	int err;
-@@ -595,6 +754,8 @@ static void hinic3_get_stats64(struct net_device *netdev,
- static const struct net_device_ops hinic3_netdev_ops = {
- 	.ndo_open             = hinic3_open,
+ 	netdev_features_t wanted, curr;
+@@ -756,6 +771,7 @@ static const struct net_device_ops hinic3_netdev_ops = {
  	.ndo_stop             = hinic3_close,
-+	.ndo_set_features     = hinic3_ndo_set_features,
-+	.ndo_fix_features     = hinic3_fix_features,
+ 	.ndo_set_features     = hinic3_ndo_set_features,
+ 	.ndo_fix_features     = hinic3_fix_features,
++	.ndo_features_check   = hinic3_features_check,
  	.ndo_change_mtu       = hinic3_change_mtu,
  	.ndo_set_mac_address  = hinic3_set_mac_addr,
  	.ndo_tx_timeout       = hinic3_tx_timeout,
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
-index 7fec13bbe60e..79494ac8f395 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
-@@ -57,6 +57,136 @@ bool hinic3_test_support(struct hinic3_nic_dev *nic_dev,
- 	return (nic_dev->nic_io->feature_cap & feature_bits) == feature_bits;
- }
- 
-+static int hinic3_set_rx_lro(struct hinic3_hwdev *hwdev, u8 ipv4_en, u8 ipv6_en,
-+			     u8 lro_max_pkt_len)
-+{
-+	struct l2nic_cmd_lro_config lro_cfg = {};
-+	struct mgmt_msg_params msg_params = {};
-+	int err;
-+
-+	lro_cfg.func_id = hinic3_global_func_id(hwdev);
-+	lro_cfg.opcode = MGMT_MSG_CMD_OP_SET;
-+	lro_cfg.lro_ipv4_en = ipv4_en;
-+	lro_cfg.lro_ipv6_en = ipv6_en;
-+	lro_cfg.lro_max_pkt_len = lro_max_pkt_len;
-+
-+	mgmt_msg_params_init_default(&msg_params, &lro_cfg,
-+				     sizeof(lro_cfg));
-+
-+	err = hinic3_send_mbox_to_mgmt(hwdev, MGMT_MOD_L2NIC,
-+				       L2NIC_CMD_CFG_RX_LRO,
-+				       &msg_params);
-+
-+	if (err || lro_cfg.msg_head.status) {
-+		dev_err(hwdev->dev, "Failed to set lro offload, err: %d, status: 0x%x\n",
-+			err, lro_cfg.msg_head.status);
-+		return -EFAULT;
-+	}
-+
-+	return 0;
-+}
-+
-+static int hinic3_set_rx_lro_timer(struct hinic3_hwdev *hwdev, u32 timer_value)
-+{
-+	struct l2nic_cmd_lro_timer lro_timer = {};
-+	struct mgmt_msg_params msg_params = {};
-+	int err;
-+
-+	lro_timer.opcode = MGMT_MSG_CMD_OP_SET;
-+	lro_timer.timer = timer_value;
-+
-+	mgmt_msg_params_init_default(&msg_params, &lro_timer,
-+				     sizeof(lro_timer));
-+
-+	err = hinic3_send_mbox_to_mgmt(hwdev, MGMT_MOD_L2NIC,
-+				       L2NIC_CMD_CFG_LRO_TIMER,
-+				       &msg_params);
-+
-+	if (err || lro_timer.msg_head.status) {
-+		dev_err(hwdev->dev, "Failed to set lro timer, err: %d, status: 0x%x\n",
-+			err, lro_timer.msg_head.status);
-+
-+		return -EFAULT;
-+	}
-+
-+	return 0;
-+}
-+
-+int hinic3_set_rx_lro_state(struct hinic3_hwdev *hwdev, u8 lro_en,
-+			    u32 lro_timer, u8 lro_max_pkt_len)
-+{
-+	u8 ipv4_en, ipv6_en;
-+	int err;
-+
-+	ipv4_en = lro_en ? 1 : 0;
-+	ipv6_en = lro_en ? 1 : 0;
-+
-+	dev_dbg(hwdev->dev, "Set LRO max coalesce packet size to %uK\n",
-+		lro_max_pkt_len);
-+
-+	err = hinic3_set_rx_lro(hwdev, ipv4_en, ipv6_en, lro_max_pkt_len);
-+	if (err)
-+		return err;
-+
-+	/* we don't set LRO timer for VF */
-+	if (HINIC3_IS_VF(hwdev))
-+		return 0;
-+
-+	dev_dbg(hwdev->dev, "Set LRO timer to %u\n", lro_timer);
-+
-+	return hinic3_set_rx_lro_timer(hwdev, lro_timer);
-+}
-+
-+int hinic3_set_rx_vlan_offload(struct hinic3_hwdev *hwdev, u8 en)
-+{
-+	struct l2nic_cmd_vlan_offload vlan_cfg = {};
-+	struct mgmt_msg_params msg_params = {};
-+	int err;
-+
-+	vlan_cfg.func_id = hinic3_global_func_id(hwdev);
-+	vlan_cfg.vlan_offload = en;
-+
-+	mgmt_msg_params_init_default(&msg_params, &vlan_cfg,
-+				     sizeof(vlan_cfg));
-+
-+	err = hinic3_send_mbox_to_mgmt(hwdev, MGMT_MOD_L2NIC,
-+				       L2NIC_CMD_SET_RX_VLAN_OFFLOAD,
-+				       &msg_params);
-+
-+	if (err || vlan_cfg.msg_head.status) {
-+		dev_err(hwdev->dev, "Failed to set rx vlan offload, err: %d, status: 0x%x\n",
-+			err, vlan_cfg.msg_head.status);
-+		return -EFAULT;
-+	}
-+
-+	return 0;
-+}
-+
-+int hinic3_set_vlan_filter(struct hinic3_hwdev *hwdev, u32 vlan_filter_ctrl)
-+{
-+	struct l2nic_cmd_set_vlan_filter vlan_filter = {};
-+	struct mgmt_msg_params msg_params = {};
-+	int err;
-+
-+	vlan_filter.func_id = hinic3_global_func_id(hwdev);
-+	vlan_filter.vlan_filter_ctrl = vlan_filter_ctrl;
-+
-+	mgmt_msg_params_init_default(&msg_params, &vlan_filter,
-+				     sizeof(vlan_filter));
-+
-+	err = hinic3_send_mbox_to_mgmt(hwdev, MGMT_MOD_L2NIC,
-+				       L2NIC_CMD_SET_VLAN_FILTER_EN,
-+				       &msg_params);
-+
-+	if (err || vlan_filter.msg_head.status) {
-+		dev_err(hwdev->dev, "Failed to set vlan filter, err: %d, status: 0x%x\n",
-+			err, vlan_filter.msg_head.status);
-+		return -EFAULT;
-+	}
-+
-+	return 0;
-+}
-+
- void hinic3_update_nic_feature(struct hinic3_nic_dev *nic_dev, u64 feature_cap)
- {
- 	nic_dev->nic_io->feature_cap = feature_cap;
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
-index d4326937db48..a17cd56bce71 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
-@@ -57,6 +57,11 @@ bool hinic3_test_support(struct hinic3_nic_dev *nic_dev,
- 			 enum hinic3_nic_feature_cap feature_bits);
- void hinic3_update_nic_feature(struct hinic3_nic_dev *nic_dev, u64 feature_cap);
- 
-+int hinic3_set_rx_lro_state(struct hinic3_hwdev *hwdev, u8 lro_en,
-+			    u32 lro_timer, u8 lro_max_pkt_len);
-+int hinic3_set_rx_vlan_offload(struct hinic3_hwdev *hwdev, u8 en);
-+int hinic3_set_vlan_filter(struct hinic3_hwdev *hwdev, u32 vlan_filter_ctrl);
-+
- int hinic3_init_function_table(struct hinic3_nic_dev *nic_dev);
- int hinic3_set_port_mtu(struct net_device *netdev, u16 new_mtu);
- 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
-index b8c9c325a45a..a8e92e070d9e 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
-@@ -7,6 +7,7 @@
- #include <linux/netdevice.h>
- 
- #include "hinic3_hw_cfg.h"
-+#include "hinic3_hwdev.h"
- #include "hinic3_mgmt_interface.h"
- 
- enum hinic3_flags {
-@@ -98,6 +99,7 @@ struct hinic3_nic_dev {
- };
- 
- void hinic3_set_netdev_ops(struct net_device *netdev);
-+int hinic3_set_hw_features(struct net_device *netdev);
- int hinic3_qps_irq_init(struct net_device *netdev);
- void hinic3_qps_irq_uninit(struct net_device *netdev);
- 
 -- 
 2.43.0
 
