@@ -1,80 +1,97 @@
-Return-Path: <netdev+bounces-247537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5915FCFB932
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 02:20:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4182CFB96B
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 02:26:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EE57430DB4BD
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 01:16:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8191E301584D
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 01:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C2C24293C;
-	Wed,  7 Jan 2026 01:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3FDE8405C;
+	Wed,  7 Jan 2026 01:23:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ouq+1QpP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fs+PjrIa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6456823E342
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 01:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA02C3C2F;
+	Wed,  7 Jan 2026 01:23:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767748229; cv=none; b=lgX0ph5AENmgCVPO3T01tXngf/na9rY3Kg5kyLWeQY2e68eM7Vvw/3qwWpeMnqlWEj/jlzevHA0BG3tGcspaTSlK4uHSQFo/Ktb1NiTKgnKRWFqy9I5k5ZBq5j9j166IrXs3Y3K54ylCOiYXLq91ZNkJN/i5IfsW0d4zRubmr2Y=
+	t=1767749009; cv=none; b=NM8lkdUi9XjTZ9k/kmRCTc7Gau9I6azhT8JQib9DUnudZ2g9WelishnWjdZHJtVz7nQHEqaYHDQue1YYP48nZQgWkcGnWXJL67kcC5JNug0LjihCVUBO6+HCEQOLidh00CTK4PTXxVqmA8G9UDLrlX7pvNPo8+ByoXgX2YdJ5tw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767748229; c=relaxed/simple;
-	bh=OoZH+fpqJ0cgwkA5l9s/Sp64c83kpzyoBJgWGj34zUo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HtDDUsIC9v+o9bFleOmxFXWXPBYDsSknkd5a1SpMmPHG6AhqmeSGSUBIf3Bg3MtKuXzkbo6kCQEJZYJiZvlu1AoND7ui6HFturhXrcJUzzQQY99t9QpvHz9Em0QwSwXdeMzTkLQy2nIcwkvSYbFvG8pqu59f3gg2tiP1tGQEWDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ouq+1QpP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C40DC116C6;
-	Wed,  7 Jan 2026 01:10:28 +0000 (UTC)
+	s=arc-20240116; t=1767749009; c=relaxed/simple;
+	bh=WekDqgZtqkKfkrvVCpmmKae/JFgoUDTJyK2zOeI8kjU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Bf6WFsQSYYxFDZTBOJdGBllNi489A94Rg8t79uEILhJ8NWLp6enCrFGrHdXBtJKQT4izZn50G5qsgGRhJLs/5A7qzbMCzRE0ZlxaPg4AlfojpscnvQpacbVY2yIYrdRrUPpUlC7npfiE6KBoYf9lKYsqbuD1AGrc3vnnA9fGRK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fs+PjrIa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47678C116C6;
+	Wed,  7 Jan 2026 01:23:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767748228;
-	bh=OoZH+fpqJ0cgwkA5l9s/Sp64c83kpzyoBJgWGj34zUo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ouq+1QpPi7ktAt3k1KgclWjEMDUOJTW1MEfCkGU82iLEciCWEmmc0q0tXnU3g8JJc
-	 P5md9DSCoHJiELcNu6gjAkAkmNxVY3WghFsMBqDSwQmvB9FzHTjM6LEjUt8bkXba+j
-	 feK0K7+En/0uJKiO2OYePkMUB2VF+d2Vf8YpQfSfOPs4AtvYRtcV8mbJ9fA6V+ofZ1
-	 Ab9CliCoz60HiPTvFsJvxWPXBXchqF+UPRWD8EGq9V8GQR+Nj1E7YSyvVFuJOfwiPI
-	 Pd6puBLzeFbsvkYpv7niy7lD51Qy5co28jB+B17DvwMsOsBBq3vX8ImliYRKjQdWdT
-	 ttqVnoLI8zmHQ==
-Date: Tue, 6 Jan 2026 17:10:27 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: <netdev@vger.kernel.org>, Sabrina Dubroca <sd@queasysnail.net>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Dragos
- Tatulea <dtatulea@nvidia.com>
-Subject: Re: [PATCH net-next] macsec: Support VLAN-filtering lower devices
-Message-ID: <20260106171027.57a7757f@kernel.org>
-In-Reply-To: <20260105101858.2627743-1-cratiu@nvidia.com>
-References: <20260105101858.2627743-1-cratiu@nvidia.com>
+	s=k20201202; t=1767749009;
+	bh=WekDqgZtqkKfkrvVCpmmKae/JFgoUDTJyK2zOeI8kjU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=fs+PjrIapaAgvbXjrQgw1dUanyFaJ74KFVptyUGD26MWqoGQ3zVxGMfOBNYVE+7n2
+	 DTaY5/cOO3qlcQuu6qRSiR5SZhzbK6rBhPl802iYna5UyniLByZugjKgdGZR5FrQB1
+	 oziJwkhMDE06XmGEXAOTXf0DZLs+dx1OeFAsHf5/3Y4TroQB1r/or6f+n39tT3x+kf
+	 2Ba/OWGY0J+be5LjMd5hrZ/9FB9kxhG7HEy/Ab3XIPfl2aOff5YhoDotcUrPx8WSg5
+	 jv7ruSTAAuIXA2ngAYmnrARflWLdJy3EecD6cP/ikorDH/VlTNWFG72RcEqHRzhqRA
+	 sHio3Ov08JyCQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2BB0380CEF5;
+	Wed,  7 Jan 2026 01:20:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: sfp: return the number of written bytes for
+ smbus
+ single byte access
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176774880679.2188953.327787991480765340.git-patchwork-notify@kernel.org>
+Date: Wed, 07 Jan 2026 01:20:06 +0000
+References: <20260105151840.144552-1-maxime.chevallier@bootlin.com>
+In-Reply-To: <20260105151840.144552-1-maxime.chevallier@bootlin.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, andrew@lunn.ch, kuba@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, linux@armlinux.org.uk, jelonek.jonas@gmail.com,
+ hkallweit1@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, f.fainelli@gmail.com,
+ kory.maincent@bootlin.com, horms@kernel.org, romain.gantois@bootlin.com,
+ kabel@kernel.org
 
-On Mon, 5 Jan 2026 12:18:58 +0200 Cosmin Ratiu wrote:
-> Before commit [1] this used to accidentally work because the macsec
-> device (and thus the lower device) was put in promiscuous mode and the
-> VLAN filter was not used. But after commit [1] correctly made the macsec
-> driver expose the IFF_UNICAST_FLT flag, promiscuous mode was no longer
-> used and VLAN filters on dev 1 kicked in. Without support in dev 2 for
-> propagating VLAN filters down, the register_vlan_dev -> vlan_vid_add ->
-> __vlan_vid_add -> vlan_add_rx_filter_info call from dev 3 is silently
-> eaten (because vlan_hw_filter_capable returns false and
-> vlan_add_rx_filter_info silently succeeds).
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon,  5 Jan 2026 16:18:39 +0100 you wrote:
+> We expect the SFP write accessors to return the number of written bytes.
+> We fail to do so for single-byte smbus accesses, which may cause errors
+> when setting a module's high-power state and for some cotsworks modules.
 > 
-> [1] commit 0349659fd72f ("macsec: set IFF_UNICAST_FLT priv flag")
+> Let's return the amount of written bytes, as expected.
+> 
+> Fixes: 7662abf4db94 ("net: phy: sfp: Add support for SMBus module access")
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> 
+> [...]
 
-It used to work and now it doesn't sounds like a description of a fix.
-Whether the working state was by design or accidental doesn't really
-matter, I think? Please explain or resend for net with a Fixes..
+Here is the summary with links:
+  - [net] net: sfp: return the number of written bytes for smbus single byte access
+    https://git.kernel.org/netdev/net/c/13ff3e724207
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
