@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-247849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32FB2CFF839
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 19:41:41 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E674CFF2D0
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 18:45:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8B36A324DA4D
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 17:54:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6175E300EDD6
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 17:44:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D90B34A3AC;
-	Wed,  7 Jan 2026 17:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20EDC3502BE;
+	Wed,  7 Jan 2026 17:44:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="utRdtkD7"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Is4g6+8N"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC3093A0B21
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 17:43:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0838A344026
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 17:44:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767807808; cv=none; b=ZAfpJSNgK68rZDhFyQMtaQEdzT4n0xIulDejWgVX9sy6zfuh1Jgicm/2UzDiBt/tkjS9wxwRPjhch4FQlilM1LLqEm9RzefjPC7Y7P+brPToz3bwSZS8a8sAOB/J+MnjVlEPwjgreYMSdswTXQx6w7wExiGj02WwUc7VWEY1/Pw=
+	t=1767807888; cv=none; b=T3g4i2kIs4c8++G46QRDYSxj9rPcOnipnLv7+3rrf+KCr5jvyhev/OxDqe70qDGYJ2u/OuhQpTedRDUWVZpkKwLmtHgrXGdqk8BoxAyu6G/2St14LLAKQNY+//CZw+TE7yK9wcjK7wUuaCQj9auSsjTs2yladNLyrqbpt4r6jcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767807808; c=relaxed/simple;
-	bh=V95J9fNee3+Dx8FXgV4XIKi03wV1Wd5CaNJUONYkaNo=;
+	s=arc-20240116; t=1767807888; c=relaxed/simple;
+	bh=00mbrnvH2ExbEnCuy+wJWyUAVG1hBUwXZj+iMTp5RNs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g+GOrBjVv0+J9wVbn2uN568BlGaI2jDX+MXRPT2CvQMl7+mgE4FpZ+y6SxcJD+Z9XvQsBYY4OF0ybQuTZXnZUXxC1L4A2g0TGauE4OPnjimCALkRsgRcLP2+BP6SO9g9wm/dhwzzo5UFMdxfKRHRoA7G+RvhyFTvnI6FyYETEqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=utRdtkD7; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=B1P0Q7e3zOOMJaf8AqJ3AcRNns41ezeZFI3xlF9krNr7jVRAutWSUZvrasILOxRYMDtQMSAMJNvJ+vFSQp8vQgOYmtS+vNoOULKj+PeU4UUjDAdqUNT80vws5ojXeaF9Z823PQ1YSJ7aLY3osszs8n+Z6AJsLvjrolxhoJfFByA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Is4g6+8N; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -34,19 +34,19 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xnpEUpxzZmn7Lue4zFPJYF4CnKz+QaMHPZS6tOsK1S4=; b=utRdtkD7CFkn728PEefjQGuPpz
-	ivK3seEjARHWdKkAUyE7Lbcfolvp5Glc/bdy1Kt5r8Y9Ye/jSvyU/zX6rLw586gxWqlChKG717p7I
-	zF6LZBDNQ36agD3GK2LWKtICAZRmOQtfxtunim1+LHxTJrmMk7L6gAkcUSrO2zvO9PPA=;
+	bh=fFnNhSVaySYikeApYkBhR9vweG6WA4VVlXBy8tMX2qY=; b=Is4g6+8NTLbgZOks0b8aR9vbUw
+	sexIwZfSw1BXQypL2bBtssslfQZo97EtRziY1ZDENla/UFpkvmDOeUe07IaECB81nkILTX1k4PAzV
+	ZK8N03xxkrmQmlNmawrADWaJSJEQAwRbBPCEPH/YTo3xDSOmMQEMMxj8QXMGacy4EXiA=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vdXZ0-001py9-Se; Wed, 07 Jan 2026 18:43:18 +0100
-Date: Wed, 7 Jan 2026 18:43:18 +0100
+	id 1vdXaI-001pz7-35; Wed, 07 Jan 2026 18:44:38 +0100
+Date: Wed, 7 Jan 2026 18:44:38 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 Cc: netdev@vger.kernel.org
 Subject: Re: [PATCH net-next] epic100: remove module version and switch to
  module_pci_driver
-Message-ID: <5e0d2d79-e3ee-4d1e-90b0-d83249354abe@lunn.ch>
+Message-ID: <5f20621f-3b91-4782-a4d1-4031cc7ecbf5@lunn.ch>
 References: <20260107071015.29914-1-enelsonmoore@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,11 +62,11 @@ On Tue, Jan 06, 2026 at 11:10:13PM -0800, Ethan Nelson-Moore wrote:
 > The module version is useless, and the only thing the epic_init routine
 > did besides pci_register_driver was to print the version.
 
-Hi Ethan
+You also failed to run ./scripts/get_maintainers.py, so you have lots
+of missing Cc:.
 
-The threading is a bit odd in these series. Generally, for a patch
-series, each patch is numbered, 1/3, 2/3, 3/3 etc. And it is a good
-idea to have a 0/3 explaining the big picture of what the series does.
+    Andrew
 
-     Andrew
+---
+pw-bot: cr
 
