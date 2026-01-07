@@ -1,166 +1,141 @@
-Return-Path: <netdev+bounces-247672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8CD1CFD270
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 11:25:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5455CCFD328
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 11:35:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CF7EF300E7FC
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 10:25:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6107D30C9B1B
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 10:25:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B816315D39;
-	Wed,  7 Jan 2026 10:24:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5653191A9;
+	Wed,  7 Jan 2026 10:25:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q+QJsvCF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mpbbNCJC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com [209.85.128.66])
+Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com [209.85.221.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBD03128CB
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 10:24:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B7631690E
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 10:25:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767781497; cv=none; b=ST8TNf4SHSpC/HpCo+M8ONKJLC24e7NqjJsaocXR0sflzUKz/YW1abjliOKaq4FzEdx/FPbTRcATjY+Xkk8KlxSqe4Wk2Uu/92xIP/YECuKuQO4hezmeRneudxhz0zQ6yePKSPPlZSYG7V9OOEuI3XbYP0tHU2MVoaDneIY3xFM=
+	t=1767781505; cv=none; b=tIbcbciUOn7HLazQKx0ulfzlkVrALFGl/d26hkaCVPZdwvPoleuwU0WLnEDfkNOEMd6GiFn+6fxfvMQBrhnN1yJeNyrnQMGUec5AXmZbqXyLFW83jIST/50THT74QNXI/qA+ykOpf/UWhePw1j3xBL95UVomzHhN8JcA7i3cox4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767781497; c=relaxed/simple;
-	bh=GSdzZu4nWA2E5aaBkTTxSMPmgEeiZszj8OmyKcEtTdI=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=CAP+5moEUQqOec2YSKhdPOJZtt5VcDZkGH+TYgidAHZTPfoeEIabV6Igc2sUaTwjlKPMmrRnwyLptPXL9PpNRG9KtJbZ0D30OQFIwXVXmu14id0DLkqw9kEGuAFZzDdrGyXIN0V59L/rAZcHuO0NKclrNEs85nXM5BVPCGOT+Sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q+QJsvCF; arc=none smtp.client-ip=209.85.128.66
+	s=arc-20240116; t=1767781505; c=relaxed/simple;
+	bh=cTvGRbomyBZQnV+yZJHifvwVeWf6GxW9l/M7+SaVQ2o=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=emjuEe+YwE+bbM1yXvPMEG22tfjjbYhGVR5HwRQloB5+G0yWq2SWFgj3JT3snKqpR9NXYsjkNdF0RDM0Xxq/KowYY/xrs4MvhLssMCw9YJWZu24IgbsXDf+RRkXMJCSrc3hrOSXvWrNdwf+sbdHdfxPk6hphdVVGenwiQcbYTgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mpbbNCJC; arc=none smtp.client-ip=209.85.221.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f66.google.com with SMTP id 5b1f17b1804b1-4779ce2a624so15549065e9.2
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 02:24:55 -0800 (PST)
+Received: by mail-wr1-f65.google.com with SMTP id ffacd0b85a97d-430fbb6012bso1440496f8f.1
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 02:25:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767781494; x=1768386294; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:cc:to:from:date:from:to:cc:subject
+        d=gmail.com; s=20230601; t=1767781502; x=1768386302; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=GSdzZu4nWA2E5aaBkTTxSMPmgEeiZszj8OmyKcEtTdI=;
-        b=Q+QJsvCFFKYjOmyHvprV+s3qcNANMDKoDIgd0gQ1jt9irrE5uBaScveZiFdghk1xHH
-         dpugPoXSj5s58KodbbU8mLfHVXVQxo71kTmx72KnKc7J/N5eYRe6koozpWNRcc08NAHT
-         f2HR7E0fhFRRtXN8T8w7b2NpmcqkPSEB0FDTTwBoyNpeUNsPa6RKAirdVZnSo5AaFp8N
-         WIMLyW0NecLIagpjvjd37mOWjoXLA9Iso8lfl9S4qA3Av9UNhBdtevrs3tFAnZwBcsHs
-         KVfttxkZBetZScgdRVudIW2u+swXXUmUoz0QSOnKkrSeg31PkUHzHDua2GBpl2WnUGEY
-         p6SQ==
+        bh=cTvGRbomyBZQnV+yZJHifvwVeWf6GxW9l/M7+SaVQ2o=;
+        b=mpbbNCJCym1xp3J55yz6aR3xDa6yBTQlmdzgymRat9v7XDiycm87DpKC40ci5BCu9g
+         ag19P4JcJw1rNVmgTc9o3rQ/ibEf11kcuo6Mm6kZ3o/sdqAWhZoIYLZg8LqeEErF9OKD
+         D7YoqWl+LXz8KqCislrZo/b96GooiJOT8HMMUtXFgQ7JdtOZgT7jM9ZWmurhjrdF43WR
+         +1QD5wedOPq+k/+L3IQOKJoUanJGnQNjG8Pi+3AIe6v3rV1s3URBNGYy4momShxcnt3D
+         O/GCw9lJBMSPwtROFFS97VX7eHO3lAjGwJE4KQpBRDMT/zNVJlYv8/v8aZmeqnJ/KqNV
+         TwAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767781494; x=1768386294;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:cc:to:from:date:x-gm-gg
+        d=1e100.net; s=20230601; t=1767781502; x=1768386302;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GSdzZu4nWA2E5aaBkTTxSMPmgEeiZszj8OmyKcEtTdI=;
-        b=FN/CeAbS1lpPOa9a4ZZRYvG74S7r/xwNLFS1aqkCCZmYl28At4/Uc335jkCksBqcQ9
-         6e0/6KgqTZRVWi1YP0K2GvqgCYm+o/sRrhWEHYtESk1J74b8SUgOwY38jP4x1fIf6U3w
-         RNAPrVo7QDd0Eq4hTY3qmhyDlitmzvlqUhXR99LdPp9JyC8xxHepEsiFgatOlwRDDgAt
-         FF3JrHwKXuGEXg92iLDw7Ji3jqt1N4kWHmkpcMWPHqfAzZ/dp3wjtT0G1GwF0Lq1pKwa
-         pSBD82CA/D/G7+xdPgW8OL8rC3onKopoN0+xWHT/t+SdIVcIcbxKcqNWuVn3/RAMJMDK
-         gODw==
-X-Forwarded-Encrypted: i=1; AJvYcCXuoBZnfMN8JcQhprUFiNiuahcHTrA4JY91u6fg7mx9I2L/LwX6h74/ZI0uWW9kd8dvyokAybw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQx5ydjK92RkWDAl1pnKaLJZRN8Hn8RHd+mmrW+yGS/vhqWbRS
-	1H6q1Mlz+3nf2cNRVx7LtW+NRwYvkRYHgV4rxChbP8Cg64EHnfQtUhdq
-X-Gm-Gg: AY/fxX56rK5m0i8G+ivxNFJJ06DNgf1K/PAtDih2DUOqMdWMmXXCwU8WeiRya6COuK2
-	5krKnwA49mdUZu/RYNnoBTOgJ3uRPpf/weFlA9FBWU+qGMSgV4NeNTbeK3Y0UpKVrNUjYpS9baK
-	rwPjRFu+mzNvWnxZ3WGZxnZxW5L1Bti4nwQKOIiqaJQfvPX9yn7ayX1lPCdc1YhJ6tOve9Fs41h
-	5BsJhzdRglBTv5jRhqGlzMSIAkm5PyXuoj9sO7Qr3HBpeyHMONPwVJIB1s632swlpbBtAFTwy1b
-	7IvMo6xM1NqEsstBjrjO0yT0zGQKFk+Qut/L7LlqYEHMjqWd6uofQ6SVqL4LhCAo1Pqu3Z0c3dv
-	zdBXz++uJ6lQKNUEXRVzX9z3lDVc3CveiPlr2ViaTrOZCyb+S5B2z2TpJCBQsVQrEIHntFpq3q9
-	i6N5RsBElNtqy41vUMffaHAnDiHtLGMdDNDQ==
-X-Google-Smtp-Source: AGHT+IFTQENpnm9YH+tI5EH1YalvRvb869aMnLb2Ju6B0Q5s25SG8IKpq9uMtw1ecZIiHlnmbwAhLA==
-X-Received: by 2002:a05:600c:4692:b0:47d:3ead:7439 with SMTP id 5b1f17b1804b1-47d84b5403dmr20736785e9.37.1767781493707;
-        Wed, 07 Jan 2026 02:24:53 -0800 (PST)
-Received: from ehlo.thunderbird.net ([80.244.29.171])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5ff1e9sm9971768f8f.41.2026.01.07.02.24.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Jan 2026 02:24:53 -0800 (PST)
-Date: Wed, 07 Jan 2026 12:24:50 +0200
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-To: Slark Xiao <slark_xiao@163.com>
-CC: loic.poulain@oss.qualcomm.com, johannes@sipsolutions.net,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, mani@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Daniele Palmas <dnlplm@gmail.com>
-Subject: =?US-ASCII?Q?Re=3ARe=3A_=5Bnet-next_v4_7/8=5D_net=3A_wwan=3A_prevent_prem?=
- =?US-ASCII?Q?ature_device_unregister_when_NMEA_port_is_present?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <63fddbfb.60e7.19b975c40ea.Coremail.slark_xiao@163.com>
-References: <20260105102018.62731-1-slark_xiao@163.com> <20260105102018.62731-8-slark_xiao@163.com> <83c51a99-038d-4283-9a39-97129966a500@gmail.com> <63fddbfb.60e7.19b975c40ea.Coremail.slark_xiao@163.com>
-Message-ID: <3E02ACE7-C86F-4FE0-A930-464F8E7D27E9@gmail.com>
+        bh=cTvGRbomyBZQnV+yZJHifvwVeWf6GxW9l/M7+SaVQ2o=;
+        b=Nbwj3kZqJS4nUZj/8FyueHV1kDtRhA6Cb3fk/G6RT0HfuSnpBjceX4sdfo0okvFCUz
+         vmlWFYU/vDh/UWRo5s3fD/fNroFHeBK9eDjDtU0h4FaLEJY90PqzfRumma7b9p19vr9g
+         8Bk/M7Orc8Ag+XmtWzNxqGIR0bloHnxwdvpnw1aJmKSc1p6KXkOAn4yHAIUlmClhBz8L
+         Q9GIlZDHds2U2q69OjByoCyAzcGRW+hgYz6pUhhmZlN1yu9ZZQgqpM5Ph584y0VxpLUn
+         G+QGkTOGV3IMfwuwiYNVOOadrRho1JRRYCaDYWAgNf18UDWOMeNje5rxp5fNSKVBCZUI
+         YwhA==
+X-Gm-Message-State: AOJu0YzZd/rVenLs3v7cKHafUYmhgi3QLTm/Nx1Uit6UAJ99f70sXpHI
+	u9ZAeadum+QRWecV3zk3ygT8B6HLxGxdGY48YavKsMIe6ySbyY7EzIQs
+X-Gm-Gg: AY/fxX4Jznc5d+NLm+QkmT9nJvU0X19/C61ROSjjXf2U+ZzS2glhOQmP1flziIYmJ0O
+	ZFM3fLj+mTSnni8KqoBP91m9fjobWyIivEG6FX8XbA0qSDP2NFDq0uajZn1Yweq0KFtcQS8/Y2B
+	wFUuHGS1tROi3csSE0IhRDQ3X5Bxp3sjRvM+WP2nB39HRi+558KmtxxoILx83xefVT6Ox6OJcpl
+	hYH2uG/yGcEizlbOZzLcbiArsI56TT0XVIv58EnX+bsxObm6c7fSVQ45OdamyfwFBK+vdg3djwp
+	bavxyt85wPvx4GdFiXBUwxQitZKoRvO82yDWvyoZGjMAFo8Swrkhn0qC6/S1AIWjEkhKd38VFEp
+	A//VnakJeV4tkv3aWjTq8jylIiB0acGR+3cmqiQV0kT3D5qnsR09KrbUkVVAEzfp+ToAM/eWOPx
+	s/60YUiDFMhoJtM7NZFlg=
+X-Google-Smtp-Source: AGHT+IHjhtmQPgtjUxH7G5aqK4V2+BWaRftwiGSeqgLK0QdYBuHzVzzSrn7JqQF0ls+ysYMxHM47Dw==
+X-Received: by 2002:a05:6000:40c9:b0:431:48f:f79e with SMTP id ffacd0b85a97d-432c3775b58mr2421958f8f.25.1767781501603;
+        Wed, 07 Jan 2026 02:25:01 -0800 (PST)
+Received: from [192.168.1.187] ([161.230.67.253])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5feaf8sm9351598f8f.39.2026.01.07.02.25.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Jan 2026 02:25:01 -0800 (PST)
+Message-ID: <0ef03e2e1eb383eb0501d000704333f850652a4d.camel@gmail.com>
+Subject: Re: [PATCH v2 2/2] dt-bindings: net: adi,adin: document LP
+ Termination property
+From: Nuno =?ISO-8859-1?Q?S=E1?= <noname.nuno@gmail.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>, Osose Itua
+	 <osose.itua@savoirfairelinux.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, michael.hennerich@analog.com, 
+	jerome.oufella@savoirfairelinux.com
+Date: Wed, 07 Jan 2026 10:25:43 +0000
+In-Reply-To: <20251227-perfect-accomplished-wildcat-4fcc75@quoll>
+References: <20251222222210.3651577-1-osose.itua@savoirfairelinux.com>
+	 <20251222222210.3651577-3-osose.itua@savoirfairelinux.com>
+	 <20251227-perfect-accomplished-wildcat-4fcc75@quoll>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On January 7, 2026 9:29:24 AM, Slark Xiao <slark_xiao@163=2Ecom> wrote:
->At 2026-01-07 09:06:05, "Sergey Ryazanov" <ryazanov=2Es=2Ea@gmail=2Ecom> =
-wrote:
->>Hi Slark, Loic,
->>
->>sorry for late joining the discussion, please find a design question bel=
-ow=2E
->>
->>On 1/5/26 12:20, Slark Xiao wrote:
->>> From: Loic Poulain <loic=2Epoulain@oss=2Equalcomm=2Ecom>
->>>=20
->>> The WWAN core unregisters the device when it has no remaining WWAN ops
->>> or child devices=2E For NMEA port types, the child is registered under
->>> the GNSS class instead of WWAN, so the core incorrectly assumes there
->>> are no children and unregisters the WWAN device too early=2E This lead=
-s
->>> to a second unregister attempt after the NMEA device is removed=2E
->>>=20
->>> To fix this issue, we register a virtual WWAN port device along the
->>> GNSS device, this ensures the WWAN device remains registered until
->>> all associated ports, including NMEA, are properly removed=2E
->>
->>wwan core assumes whole responsibility for managing a WWAN device=2E We=
-=20
->>already use wwan_create_dev()/wwan_remove_dev() everywhere=2E But, we ar=
-e=20
->>checking the reminding references in an implicit way using=20
->>device_for_each_child() and registered OPS existence=2E Thus, we need th=
-is=20
->>trick with a virtual child port=2E
->>
->>Does it make sense to switch to an explicit reference counting? We can=
-=20
->>introduce such counter to the wwan_device structure, and=20
->>increment/decrement it on every wwan_create_dev()/wwan_remove_dev()=20
->>call=2E So, we will do device_unregister() upon reference number becomin=
-g=20
->>zero=2E
->>
->>If it sounds promising, I can send a RFC, let's say, tomorrow=2E
->
->The RFC only for this patch or the existing design? Since there is proble=
-m
->reported in=C2=A0https://patchwork=2Ekernel=2Eorg/project/netdevbpf/patch=
-/20260105102018=2E62731-3-slark_xiao@163=2Ecom/#26720828=2E
->
->Currently design:
->=C2=A0=C2=A0=C2=A0 minor =3D ida_alloc_range(&minors, 0, WWAN_MAX_MINORS =
-- 1, GFP_KERNEL);
->=C2=A0=C2=A0=C2=A0 if (minor < 0)
->=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return minor;
->
->=C2=A0=C2=A0=C2=A0 port->dev=2Eclass =3D &wwan_class;
->// when cdev is false, no devt was assigned=2E But wwan_port_destroy() us=
-e devt to free
->=C2=A0=C2=A0=C2=A0 if (cdev)
->=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 port->dev=2Edevt =3D MKDEV(wwa=
-n_major, minor);
->
->We need to have a update based on this patch if we want to use this one i=
-n this serial=2E
+On Sat, 2025-12-27 at 13:29 +0100, Krzysztof Kozlowski wrote:
+> On Mon, Dec 22, 2025 at 05:21:05PM -0500, Osose Itua wrote:
+> > Add "adi,low-cmode-impedance" boolean property which, when present,
+> > configures the PHY for the lowest common-mode impedance on the receive
+> > pair for 100BASE-TX operation.
+> >=20
+> > Signed-off-by: Osose Itua <osose.itua@savoirfairelinux.com>
+> > ---
+> > =C2=A0Documentation/devicetree/bindings/net/adi,adin.yaml | 6 ++++++
+> > =C2=A01 file changed, 6 insertions(+)
+> >=20
+> > diff --git a/Documentation/devicetree/bindings/net/adi,adin.yaml
+> > b/Documentation/devicetree/bindings/net/adi,adin.yaml
+> > index c425a9f1886d..d3c8c5cc4bb1 100644
+> > --- a/Documentation/devicetree/bindings/net/adi,adin.yaml
+> > +++ b/Documentation/devicetree/bindings/net/adi,adin.yaml
+> > @@ -52,6 +52,12 @@ properties:
+> > =C2=A0=C2=A0=C2=A0=C2=A0 description: Enable 25MHz reference clock outp=
+ut on CLK25_REF pin.
+> > =C2=A0=C2=A0=C2=A0=C2=A0 type: boolean
+> > =C2=A0
+> > +=C2=A0 adi,low-cmode-impedance:
+> > +=C2=A0=C2=A0=C2=A0 description: |
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Ability to configure for the lowest com=
+mon-mode impedance on the
+>=20
+> Either this is ability or you configure the PHY, as written in commit
+> msg. The latter suggests that's a SW property, not hardware, thus not
+> for bindings.
+>=20
 
-The proposed idea for the WWAN device release will entirely substitute thi=
-s patch=2E So, all these issues with the virtual stub port creation should =
-gone as well=2E
+Looking at the datasheet this looks like a system level decision. With the =
+above
+it seems we'll actually use more power and it is suited for designs where t=
+here is
+common-mode noise reaching the phy. So it feels like something we would put=
+ in DT...=C2=A0
 
---
-Sergey
+But I agree the commit message (and maybe the property description) should
+be better in reflecting why this is used rather than just saying what are w=
+e enabling.
+
+- Nuno S=C3=A1
 
