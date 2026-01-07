@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-247562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 592C1CFBB26
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 03:20:55 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9C09CFBB20
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 03:19:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E86F9303E674
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 02:15:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C1281303A3D5
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 02:19:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DA34284665;
-	Wed,  7 Jan 2026 02:15:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D42B2239562;
+	Wed,  7 Jan 2026 02:19:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HpMEZrXV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KBkkaUiU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27FEF283C82
-	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 02:15:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B027B190473
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 02:19:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767752116; cv=none; b=VNVvJbmEKI3tblxS6ICbf9IUPcRqc/upqH3jPSDmoH/Bh/nQDFIzJOBTjZa65PhcC6ku8w3a2IzEPGkRP8kHFQMaKb3bmleaScxszcV+kWXUSFMIqlgOfffgxAAxkaHIMEiVSxLlDXUQTk6i2C+7i92agJSMQUkCD8VIjGwguKs=
+	t=1767752368; cv=none; b=QYE+lnt+vYYZfEaFUvUZ5Kj6H7T/GyAOPmQSEuhQUB+h/h4LGs1EhZFZCPJ7gPoetSs783Yl9ZUEcDNjTCNlrsI60LBnxqSb4assnNvy/VBJVvtcGDnSNeIAO+0m8JwYxVrBzs/hkM8YB+tfcxkL8f2uZc+QJzQg03yefl8cumM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767752116; c=relaxed/simple;
-	bh=iEdfXCVIDG2db/BN5yptdxGxwWUtHuKA0Ok1eRnLKtA=;
+	s=arc-20240116; t=1767752368; c=relaxed/simple;
+	bh=IaTD99UxI1gvP3iqLsGRM4oC4hvzuQXUQkvfDmzxJ+M=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WOobtTSIKGFTNfL9WPUavf5ya1A395qIUVrxxeZUcdo/ZmDw+FkOzLbBpwHcMeYQI3XwyqdMx8ZoBGqjUWR+wlqCmZE9OS110uwiI9f/TV07S5mz5JlXZf+dwzA4FZRQ2c60CKRRu9NVLmMHJn8lCiixpU85bXy72/Nu2NKwEms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HpMEZrXV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05923C116C6;
-	Wed,  7 Jan 2026 02:15:13 +0000 (UTC)
+	 MIME-Version:Content-Type; b=SlZYUHGms2UTSWb1VroaI20FPAUlY6pUnPyh1vbuf6GWfK/j9LYOydI4nxm5nZ5d84dAaU0xJmxi3qOfMRo2h1thcNu7cppZtE0hkkP6fT7O7GZInc8mT+IwDo/Bpg8FIlVnTg1zJ4eLAk0RuHMy0AmeruW3srjJjONrWg5yhjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KBkkaUiU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0856C116C6;
+	Wed,  7 Jan 2026 02:19:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767752114;
-	bh=iEdfXCVIDG2db/BN5yptdxGxwWUtHuKA0Ok1eRnLKtA=;
+	s=k20201202; t=1767752368;
+	bh=IaTD99UxI1gvP3iqLsGRM4oC4hvzuQXUQkvfDmzxJ+M=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HpMEZrXVjL6DiDuYYFVc6r4iccHmX7LI78K9PfG9I+qiDPIQadH8g2zuEoZSSCrDF
-	 He0wTuG/qKlHmMeDk1BP/sFqLh61JSaM8FyZhdCCfWpl+kF6icLP4p/yYQtCg4dzpx
-	 fDQe1SR4dl0dD3hadX/biWO9dSgPztpQ9Hh1u4TTugdPp4hjJM5oYQ0Swgi5vmNCDy
-	 ccC/awhGqkhNFZpnFi5ryqVEBoy4QVV+fHX/IctDX5JRfpXKlSRDTaebMRTmgl1iRH
-	 pyskWEfjpsRS+mI6+ky1qg2gmgrufIO+VC14DTFK4+Dai3sMtl9ePp26nOD37wXPC0
-	 A1rHTpxp3hlqw==
-Date: Tue, 6 Jan 2026 18:15:13 -0800
+	b=KBkkaUiU7gXFg0kYPFdGdFzSdb5ixHPFZkPgEEuYYJDeUTOkPtRXX0fmWGgxLZntG
+	 zLTUKpkMlJ9aJWwtCqrRrlo6EkOpCoO+OkTS4wX+HhofIksOYhTOzWV2S+m5jGs5ct
+	 gIRFfvvJaCkGe5Dp5X7+7ifO+vIK9x+iYsOZCBRSIk0VXUVutd44Ej3oLQVuXBNHEy
+	 4R7QgnoLdEK37C3gu/DlBWbZnpG6PqNy/NOV3WeMVXnLPNKfrL6Ht390JdEehhvQbc
+	 ADsbLe53ZPtd4MPAHa8XKZ+gxilVZ7emwpoSXyFQjFhAyuRYNnCYtbapC7plVnBR15
+	 n+mYZqpBOZ4dw==
+Date: Tue, 6 Jan 2026 18:19:26 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Michael Chan <michael.chan@broadcom.com>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
  pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com,
- andrew.gospodarek@broadcom.com, Kalesh AP
- <kalesh-anakkur.purayil@broadcom.com>
-Subject: Re: [PATCH net-next 6/6] bnxt_en: Implement ethtool_ops ->
- get_link_ext_state()
-Message-ID: <20260106181513.48e8f218@kernel.org>
-In-Reply-To: <20260105215833.46125-7-michael.chan@broadcom.com>
+ andrew.gospodarek@broadcom.com, Somnath Kotur <somnath.kotur@broadcom.com>,
+ Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Subject: Re: [PATCH net-next 4/6] bnxt_en: Defrag the NVRAM region when
+ resizing UPDATE region fails
+Message-ID: <20260106181926.4d561295@kernel.org>
+In-Reply-To: <20260105215833.46125-5-michael.chan@broadcom.com>
 References: <20260105215833.46125-1-michael.chan@broadcom.com>
-	<20260105215833.46125-7-michael.chan@broadcom.com>
+	<20260105215833.46125-5-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,49 +61,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon,  5 Jan 2026 13:58:33 -0800 Michael Chan wrote:
-> +static char *bnxt_link_down_reason(struct bnxt_link_info *link_info)
-> +{
-> +	u8 reason = link_info->link_down_reason;
-> +
-> +	/* Multiple bits can be set, we report 1 bit only in order of
-> +	 * priority.
-> +	 */
-> +	if (reason & PORT_PHY_QCFG_RESP_LINK_DOWN_REASON_RF)
-> +		return "(Remote fault)";
-> +	if (reason & PORT_PHY_QCFG_RESP_LINK_DOWN_REASON_OTP_SPEED_VIOLATION)
-> +		return "(OTP Speed limit violation)";
-> +	if (reason & PORT_PHY_QCFG_RESP_LINK_DOWN_REASON_CABLE_REMOVED)
-> +		return "(Cable removed)";
-> +	if (reason & PORT_PHY_QCFG_RESP_LINK_DOWN_REASON_MODULE_FAULT)
-> +		return "(Module fault)";
-> +	if (reason & PORT_PHY_QCFG_RESP_LINK_DOWN_REASON_BMC_REQUEST)
-> +		return "(BMC request down)";
-> +	if (reason & PORT_PHY_QCFG_RESP_LINK_DOWN_REASON_TX_LASER_DISABLED)
-> +		return "(TX laser disabled)";
-> +	return "";
-> +};
+On Mon,  5 Jan 2026 13:58:31 -0800 Michael Chan wrote:
+> +			if (rc == -ENOSPC) {
+> +				if (retry || bnxt_hwrm_nvm_defrag(bp))
+> +					break;
+> +				retry = true;
+> +			}
+> +		} while (rc == -ENOSPC && retry);
 
-spurious ;
-
-> +static int bnxt_get_link_ext_state(struct net_device *dev,
-> +				   struct ethtool_link_ext_state_info *info)
-> +{
-> +	struct bnxt *bp = netdev_priv(dev);
-> +	u8 reason;
-> +
-> +	if (BNXT_LINK_IS_UP(bp))
-> +		return -ENODATA;
-> +
-> +	reason = bp->link_info.link_down_reason;
-> +	if (reason & PORT_PHY_QCFG_RESP_LINK_DOWN_REASON_CABLE_REMOVED) {
-> +		info->link_ext_state = ETHTOOL_LINK_EXT_STATE_NO_CABLE;
-> +		return 0;
-> +	} else if (reason & PORT_PHY_QCFG_RESP_LINK_DOWN_REASON_MODULE_FAULT) {
-> +		info->link_ext_state = ETHTOOL_LINK_EXT_STATE_MODULE;
-> +		return 0;
-
-Please extend the uAPI to add the missing codes. None of the strings
-you're adding look very Broadcom specific to me. And there's a code 
-for Remote Fault already.
+Since there's an explicit break under rc == ENOSPC + retry
+the while loop doesn't need to check retry.
+Something needs to be cleaned up here
 
