@@ -1,77 +1,95 @@
-Return-Path: <netdev+bounces-247564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C001CFBB74
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 03:27:39 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23ED6CFBBD4
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 03:33:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 18A1B3030584
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 02:22:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 03074304435A
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 02:33:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3696522541B;
-	Wed,  7 Jan 2026 02:22:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D18F1224AFA;
+	Wed,  7 Jan 2026 02:33:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lt2hRUAX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kkr0cuF3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09F95207A32;
-	Wed,  7 Jan 2026 02:22:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42E83B2AA;
+	Wed,  7 Jan 2026 02:33:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767752567; cv=none; b=l0sJKBkNET4YBPmi0la7e4jI6D1nww5w6BAeQTs4GaPKpFm5VdBndexo3x6wEePX1Qirmh4wwSv+26YL1WRKR6B0A/PRa+w5jL2OGOyIlj5peTgl6l3oYtRXjuAusa7646x8NSXTS2c+R5e6jX+0PC0jIvcBRx8mpF83B04Pu2I=
+	t=1767753213; cv=none; b=Sdah9G8kT2doNpiwQk1lmEErbBrjucAYc2Vwja93u3Yj6H7a2d7Ypcqcxy8MvzfPe6z180n46HxqKSX+OW2m90dBE7ybw1h/8QcZJmV3gUQ0b8VbZtEOdGbNy9Qu+Qp4UYS1/yPhfVWRttj2Xw4U4/VF8PtbA/OzyBwvu0xg9M4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767752567; c=relaxed/simple;
-	bh=PNW4HVVxZ8G3oxjVQkL+mo9ujZl8FvRW/0AILaRzqCE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=S3/m02KsPRcPLr2CIGs1kzxTXnCVa3oG7c0T8D8frzNjTIs7+Rn0OT6CL9PTzcDUIShr5Mm+BTcoUsL6BgIOmOLSTrPAQ0pm8PxD2b0XsdtqxlIZ8Sgf2JXFPS70JcaA04eKl71h78BfVZfFRzgv44o8Xk6IaqHix++HubV160w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lt2hRUAX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2203DC116C6;
-	Wed,  7 Jan 2026 02:22:45 +0000 (UTC)
+	s=arc-20240116; t=1767753213; c=relaxed/simple;
+	bh=MCUUIdXCDhCt4LmsTYV2Uss60dFo7CxTbWBVPSNDhdo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=KxpGqu3eVcAfzzk7/I6/GjorQfSjSBaPDPN1jyU5Cdfb7gq++0OHMw9CtidGfwu/iaiy/lCGzSKlz+ErX1G1QiXDHDXnfYva4clUxVl2cpPCzBj9WKQ5vLH5HMId9g+QmCc0ZAwswrpMPlOCX9yRl7xQzpYsgPQbdY1oTpF2Qb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kkr0cuF3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F957C116C6;
+	Wed,  7 Jan 2026 02:33:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767752565;
-	bh=PNW4HVVxZ8G3oxjVQkL+mo9ujZl8FvRW/0AILaRzqCE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Lt2hRUAXcMoRQ01j7oO9zAtSwb4KyRih5epLEMLZuvgElDzFj6hvnFLm1vzUizbL8
-	 MoXshNzec5Fn+dBocb5dcalWORKg1JMipCWcdSpZnUsY7phvWMm44t5IaH1EyIgles
-	 RhohDfnPYrRg8oOwQ6uruEY9yUX0/W/qchElRQFVSZu8IZ1sJ/SBG7KxBo/YAfIW2L
-	 Z2A/uMQrDel92WcVe19KTsmtVaTIYpqu5MMnhzT8YJTJfhb9GCtnnTFNqzvkJko61Y
-	 zprNKcZaz6sRYApBezD/hKx5y3Cj8ZhSdHVSZAuX3/fne1QOoJbSKbYgzo5I4PWyXW
-	 3IDM7Bk6Zz2Tg==
-Date: Tue, 6 Jan 2026 18:22:44 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joshua Washington <joshwash@google.com>
-Cc: netdev@vger.kernel.org, Harshitha Ramamurthy <hramamurthy@google.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, Ankit Garg
- <nktgrg@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
- Catherine Sullivan <csully@google.com>, Luigi Rizzo <lrizzo@google.com>,
- Jon Olson <jonolson@google.com>, Sagi Shahar <sagis@google.com>, Bailey
- Forrest <bcf@google.com>, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-Subject: Re: [PATCH net 0/2] gve: fix crashes on invalid TX queue indices
-Message-ID: <20260106182244.7188a8f6@kernel.org>
-In-Reply-To: <20260105232504.3791806-1-joshwash@google.com>
-References: <20260105232504.3791806-1-joshwash@google.com>
+	s=k20201202; t=1767753212;
+	bh=MCUUIdXCDhCt4LmsTYV2Uss60dFo7CxTbWBVPSNDhdo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Kkr0cuF31PJ4cqyvx1vPoHO0yf0hlMsG8CInERPQeSx37v1uQoTLLlBG3kL6/d7wp
+	 8J0PTsQpekCQ5iUMBvnX3Zz/CIFsc2qXz/LfWCgiYCmkTxuYSLdpvIIvL7pFgpQAH3
+	 V/xxhlOT2wBRYwkRuOUXCt+q5MbBui0q9vonaBW7Mk1LM8ztSAx4muIxEvF/6zEWmf
+	 IY5d49UnlzYvvkrsN76Olr5RfLYhWV4Gyerh7Ly6qDl5Cl5rU/eUZOc4t0MoV8CisW
+	 Nc3PSaDC2lkzXqfxTpScE/ZuwjEAhe4P2t6PiLQWPv8MAFs3EKT1IVzoX4xWdVQqkx
+	 NwSYQbZBzdlVQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B5AB3380CEF5;
+	Wed,  7 Jan 2026 02:30:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3 0/2] net: netdevsim: fix inconsistent carrier state
+ after link/unlink
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176775300954.2206594.1826844025995318778.git-patchwork-notify@kernel.org>
+Date: Wed, 07 Jan 2026 02:30:09 +0000
+References: <cover.1767624906.git.yk@y-koj.net>
+In-Reply-To: <cover.1767624906.git.yk@y-koj.net>
+To: Yohei Kojima <yk@y-koj.net>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, shuah@kernel.org, leitao@debian.org,
+ andrew+netdev@lunn.ch, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
 
-On Mon,  5 Jan 2026 15:25:02 -0800 Joshua Washington wrote:
-> This series fixes a kernel panic in the GVE driver caused by
-> out-of-bounds array access when the network stack provides an invalid
-> TX queue index.
+Hello:
 
-Do you know how? I seem to recall we had such issues due to bugs
-in the qdisc layer, most of which were fixed.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Fixing this at the source, if possible, would be far preferable
-to sprinkling this condition to all the drivers.
+On Tue,  6 Jan 2026 00:17:31 +0900 you wrote:
+> This series fixes netdevsim's inconsistent behavior between carrier
+> and link/unlink state.
+> 
+> More specifically, this fixes a bug that the carrier goes DOWN although
+> two netdevsim were peered, depending on the order of peering and ifup.
+> Especially in a NetworkManager-enabled environment, netdevsim test fails
+> because of this.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v3,1/2] net: netdevsim: fix inconsistent carrier state after link/unlink
+    https://git.kernel.org/netdev/net/c/d83dddffe190
+  - [net,v3,2/2] selftests: netdevsim: add carrier state consistency test
+    https://git.kernel.org/netdev/net/c/75df712cddfd
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
