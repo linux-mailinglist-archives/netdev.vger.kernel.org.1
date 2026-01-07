@@ -1,242 +1,201 @@
-Return-Path: <netdev+bounces-247810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86623CFFA69
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 20:07:22 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33AC7CFFB50
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 20:21:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5366733E4E1F
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 18:23:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C88323019365
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 19:20:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99B1037BE74;
-	Wed,  7 Jan 2026 15:53:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94878357704;
+	Wed,  7 Jan 2026 16:57:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iqrn1+Zh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WNb+a3iI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A140737996C;
-	Wed,  7 Jan 2026 15:53:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B8B3A0B05
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 16:57:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767801236; cv=none; b=ak+Bb3T8kWHuC+B26CIa1C2S8YJA/b/J/4vOLczJwrtx37vQ/xpbRQKNaAcP3VBb5lfyJsNlNaosgJO7JB+IWSkdQEUzxZBjSdkWgbREPP2kmmzQ8yf3bK7do3D+ie1wqWFOxDEc/fQLfzavuo5GuuTN6lVxJib+B03iDMjPoew=
+	t=1767805078; cv=none; b=CYNRvj4CwSKKJNjPTNBqWcaWuW9JoFu3Kr3lQ4oejI2/mByao6owUWOjMzSnr9z26aGuPonKS14I1s1VP1SgTXzGh98gYHdS8PyTFMxLkfICvHWX5N5Rv3QIz7I06WJi09T51ZmSf71xte0A82gSt14uwZ4wMZL04lrAOKoIv/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767801236; c=relaxed/simple;
-	bh=iAxVfRTXVTe2JGeObQQ/jNjHNR45g20PNAJM33yX/U0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JFCIe6nvfmFdJhOFIzayKa43ogNdb0ZGMn100UReNbtJFPLmtAVn8J6U9fORbjEnwmmco1jl0s4CIffUUCVGEY+SbT8UYNOOIkAa4Un6eBS3TOBT8imGLVHCMs9us67hkSoGLrkf84GbhAKWh7aunjjXn9CFkZXeGUBgYNArQFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iqrn1+Zh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43B8BC4CEF7;
-	Wed,  7 Jan 2026 15:53:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767801235;
-	bh=iAxVfRTXVTe2JGeObQQ/jNjHNR45g20PNAJM33yX/U0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iqrn1+Zh4aApERyJQL/YFZ3K1bOgZ0DuwbsxkDJqSDDLXtlX7jSWFteWjVCa3Po0W
-	 5DzKo2udCgmQ0NTdvc+MPrRbX2QlaBbcqEQ6oA/0sQScJYGL+mAqumTiflUdraPfaI
-	 5gvPWmRuzybKRIXLtxPcKxRV91/hJQ09Mf2LXFdiHuxX4jUnDtMoNX4KOY+qqBC8li
-	 v1f3aUAEj2b3AiOVQMBoh8/RealKE+dYC1hHf71yUeSHbEwDRIj1dXtzkJ5aaSxbVD
-	 pRvLiCI8KSy2rCBEQ3HZTkGNHuboGdcZG7azQPYIqiYv3wE6U7ZPYAhT+h6bS7sdGZ
-	 vGqjXg2FKHAUA==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Yao Zi <ziyao@disroot.org>,
-	Nathan Chancellor <nathan@kernel.org>,
+	s=arc-20240116; t=1767805078; c=relaxed/simple;
+	bh=oTh/Bm7Bvc5pQDGtio2WHmCSYQcQfl+HLeQb6+ZuPa4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jCdqDpflgH8vz1SJbvcMAxH/OsF/RNw7ktcsj7j094jsRc4tjpd/dtqPCvIdwHNk8PMwnU9uaqYmOfmAOFhQaqTPcWKGoamDtAT0ZVd2BAw8aFqehz21JQHcSVHu92KiZuYVxTwPyHMyHcnMmO/d5J4nm55bVkAneh8zUqNfQPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WNb+a3iI; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-477ba2c1ca2so24469645e9.2
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 08:57:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767805070; x=1768409870; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=9cVSMIV0M1vHEkGoca4IYHePZY2mIben9Mxd1bnOl0g=;
+        b=WNb+a3iI069+UVfkyi0mdxhz3UHcXoR2Dks6g/Zr5duayBmAFceV4VkycZSQSpNejh
+         HLZlFMYjlGHuAd5pKPpyck8hVhyA2qdSQS6CJ0AFLDAqOnmDIgtA5UrRPi6TgeY3OBXb
+         M7jL5UtGiyEB5/LAvkngUsdz8mpiVg5rAWbvbWb69JZ3mBVLfT4SVX43b32nfuvyPxDS
+         oVaOjdXCtPvHyFZkhXo97/vde6t2f3pdnBRP4enQVaZtjMSYvHnmG3e3qQ/L9D7r8sEL
+         vxr5lm3h5pey/t84dNgdBxUxJDBVt3m5XkrlodFszwtaV2LuITUgssDn6gLTPFbCNLb7
+         sLsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767805070; x=1768409870;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9cVSMIV0M1vHEkGoca4IYHePZY2mIben9Mxd1bnOl0g=;
+        b=wKIp60E2Bhl9LXrl/aHPoIuG+r4G5ncxhbF6hMHuxY1s3J2NGc1HvccpOt11crG+cb
+         aOT40grPuBkQtTlXz6XaWg+5m4kgMB+Ju6LYphL4QPFYKwSeS3WKQZ2BVJXFyWm2gsuc
+         H3OA8BVVLViooX51UmwBgLGZxx+Ot/IrV2hvvCShskZhrKu6G9eDOELcUKD3qGJyZOkN
+         SNnNa0NUOG9S9r9dJGhSmdNgvNvzkkUftYVsl/6Z7uytSFScHQ9nIn5sDYgshyY+pnX5
+         5fGP9T9kQmp87Alyux7dmhwSiV/IZ32hdqjHDeuvC2duv/i8RyEC5zp55z6YwMiqbpHF
+         /Ezw==
+X-Forwarded-Encrypted: i=1; AJvYcCW4WEZh2AySPNzrJLaA2g2dTGPzfWDwVqFFbLBmRIZzyWyG1qOrmQcI5LEaNamOn1FQ9V/XuVg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKe7mNBry/OBHO/nDSo7ePIHhf+kblb1qd68P9gH/lkU13dad2
+	t1XzB5EV5gV9NWj7TYzlDZpZWqzRQZp8r7O2vktfTUkAWsqT0SYK7tC5nHwbHN2wCg==
+X-Gm-Gg: AY/fxX4gWqZuY9dOboIbqrA5dDVVC7j27rx93QPKM8g/z3wAUVqUDpnsuEBB5vvH7zx
+	wpXlqO+bvtWS7YSuV6bSlUyWCcWipwdQi26pN92TnaFOpfmXJvOK63D3TdRUqFyxpDHDqiS0mzZ
+	+WkblnDEEYUOQpuP9vhl2elOm8FUt8fgv/v11vDglZuTldNkyusceYHfOcAA3LvgnTsccwAiIvr
+	zpQxLWTfHm2iSjRiZWaaw+QG6BHZ1b7lLC+VWV/06Bp6xViV856lDv/5ND3rGykhOfnQZ7epDbl
+	6RCdQacvikHezUXsiLroSEP6veOLAoJliUZMGIoGdg8Hjj3RvuMhNL19ABQqLocZcA3QYXa2UtC
+	uce5wpCgGnHJLyz0EigeIpPXwyNZiNmaTFy5ZffLOvkTppe5RGJJ/0kdnYX6hwcONnIvu3IHbYc
+	kwzZNcMRXtkuyLT3wSRRa/vr0xEEDTKWU47wzUJ1nsCw==
+X-Google-Smtp-Source: AGHT+IFNWlJitUC1NSOuwXl+nF0iGIoib1vo+UR+IFwK8+8wYGCEbPSdCgCOi3fSLDFCBKtQyHctnQ==
+X-Received: by 2002:a05:600c:8b2c:b0:477:7f4a:44b0 with SMTP id 5b1f17b1804b1-47d84b3ea06mr36754095e9.33.1767805069507;
+        Wed, 07 Jan 2026 08:57:49 -0800 (PST)
+Received: from google.com ([2a00:79e0:288a:8:aaba:e2c1:29df:3e24])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f41f5e0sm104518655e9.8.2026.01.07.08.57.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Jan 2026 08:57:48 -0800 (PST)
+Date: Wed, 7 Jan 2026 17:57:43 +0100
+From: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>
+To: Justin Suess <utilityemal77@gmail.com>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>, Paul Moore <paul@paul-moore.com>,
+	James Morris <jmorris@namei.org>,
+	"Serge E . Hallyn" <serge@hallyn.com>,
 	Simon Horman <horms@kernel.org>,
-	Oliver Hartkopp <socketcan@hartkopp.net>,
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Sasha Levin <sashal@kernel.org>,
-	richardcochran@gmail.com,
-	pjw@kernel.org,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu,
-	shaul.triebitz@intel.com,
-	emmanuel.grumbach@intel.com,
-	netdev@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: [PATCH AUTOSEL 6.18] wifi: iwlwifi: Implement settime64 as stub for MVM/MLD PTP
-Date: Wed,  7 Jan 2026 10:53:13 -0500
-Message-ID: <20260107155329.4063936-11-sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260107155329.4063936-1-sashal@kernel.org>
-References: <20260107155329.4063936-1-sashal@kernel.org>
+	=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
+	linux-security-module@vger.kernel.org, Tingmao Wang <m@maowtm.org>,
+	netdev@vger.kernel.org, Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>
+Subject: Re: [RFC PATCH 0/1] lsm: Add hook unix_path_connect
+Message-ID: <aV6Qh39jVg8trMlg@google.com>
+References: <20251231213314.2979118-1-utilityemal77@gmail.com>
+ <CAAVpQUCF3uES6j22P1TYzgKByw+E4EqpM=+OFyqtRGStGWxH+Q@mail.gmail.com>
+ <aVuaqij9nXhLfAvN@google.com>
+ <CAAVpQUB6gnfovRZAg_BfVKPuS868dFj7HxthbxRL-nZvcsOzCg@mail.gmail.com>
+ <2da3f1ae-1fe1-40c4-8748-9fb371e696f0@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.18.3
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <2da3f1ae-1fe1-40c4-8748-9fb371e696f0@gmail.com>
 
-From: Yao Zi <ziyao@disroot.org>
+On Wed, Jan 07, 2026 at 07:19:02AM -0500, Justin Suess wrote:
+> On 1/7/26 02:33, Kuniyuki Iwashima wrote:
+> > +VFS maintainers
+> >
+> > On Mon, Jan 5, 2026 at 3:04 AM Günther Noack <gnoack@google.com> wrote:
+> >> Hello!
+> >>
+> >> On Sun, Jan 04, 2026 at 11:46:46PM -0800, Kuniyuki Iwashima wrote:
+> >>> On Wed, Dec 31, 2025 at 1:33 PM Justin Suess <utilityemal77@gmail.com> wrote:
+> >>>> Motivation
+> >>>> ---
+> >>>>
+> >>>> For AF_UNIX sockets bound to a filesystem path (aka named sockets), one
+> >>>> identifying object from a policy perspective is the path passed to
+> >>>> connect(2). However, this operation currently restricts LSMs that rely
+> >>>> on VFS-based mediation, because the pathname resolved during connect()
+> >>>> is not preserved in a form visible to existing hooks before connection
+> >>>> establishment.
+> >>> Why can't LSM use unix_sk(other)->path in security_unix_stream_connect()
+> >>> and security_unix_may_send() ?
+> >> Thanks for bringing it up!
+> >>
+> >> That path is set by the process that acts as the listening side for
+> >> the socket.  The listening and the connecting process might not live
+> >> in the same mount namespace, and in that case, it would not match the
+> >> path which is passed by the client in the struct sockaddr_un.
+> > Thanks for the explanation !
+> >
+> > So basically what you need is resolving unix_sk(sk)->addr.name
+> > by kern_path() and comparing its d_backing_inode(path.dentry)
+> > with d_backing_inode (unix_sk(sk)->path.dendtry).
+> >
+> > If the new hook is only used by Landlock, I'd prefer doing that on
+> > the existing connect() hooks.
+> I see. Did you have a particular hook in mind to extend?
+> 
+> One complication I see is whatever hook this gets added to
+> would also need CONFIG_SECURITY_PATH, since logically this restriction
+> would fall under it:
+> 
+> From security/Kconfig:
+> 
+> config SECURITY_PATH
+>     bool "Security hooks for pathname based access control"
+>     depends on SECURITY
+>     help
+>       This enables the security hooks for pathname based access control.
+>       If enabled, a security module can use these hooks to
+>       implement pathname based access controls.
+>       If you are unsure how to answer this question, answer N.
+> 
+> config SECURITY_NETWORK
+>     bool "Socket and Networking Security Hooks"
+>     depends on SECURITY
+>     help
+>       This enables the socket and networking security hooks.
+>       If enabled, a security module can use these hooks to
+>       implement socket and networking access controls.
+>       If you are unsure how to answer this question, answer N.
+> 
+> Logically, this type of access control falls under both categories, so must be
+> gated by both features. No existing LSM hooks are gated by both afaik, so
+> there is not really an existing logical place to extend an existing hook without
+> changing what features are required to be enabled for existing users.
+> 
+> I do see more uses for this hook that just landlock, bpf lsm hooks
+> or other non-labeling LSMs like apparmor or TOMOYO could take advantage
+> of this as well.
 
-[ Upstream commit 81d90d93d22ca4f61833cba921dce9a0bd82218f ]
+Apologies, I overlooked your reply earlier today.
 
-Since commit dfb073d32cac ("ptp: Return -EINVAL on ptp_clock_register if
-required ops are NULL"), PTP clock registered through ptp_clock_register
-is required to have ptp_clock_info.settime64 set, however, neither MVM
-nor MLD's PTP clock implementation sets it, resulting in warnings when
-the interface starts up, like
+The existing hooks that are called from af_unix.c are:
 
-WARNING: drivers/ptp/ptp_clock.c:325 at ptp_clock_register+0x2c8/0x6b8, CPU#1: wpa_supplicant/469
-CPU: 1 UID: 0 PID: 469 Comm: wpa_supplicant Not tainted 6.18.0+ #101 PREEMPT(full)
-ra: ffff800002732cd4 iwl_mvm_ptp_init+0x114/0x188 [iwlmvm]
-ERA: 9000000002fdc468 ptp_clock_register+0x2c8/0x6b8
-iwlwifi 0000:01:00.0: Failed to register PHC clock (-22)
+- security_unix_stream_connect() for SOCK_STREAM unix(7) sockets
+- security_unix_may_send() for SOCK_DGRAM unix(7) sockets
 
-I don't find an appropriate firmware interface to implement settime64()
-for iwlwifi MLD/MVM, thus instead create a stub that returns
--EOPTNOTSUPP only, suppressing the warning and allowing the PTP clock to
-be registered.
+Apart from that, at a higher level, there are also
 
-Reported-by: Nathan Chancellor <nathan@kernel.org>
-Closes: https://lore.kernel.org/all/20251108044822.GA3262936@ax162/
-Signed-off-by: Yao Zi <ziyao@disroot.org>
-Tested-by: Nathan Chancellor <nathan@kernel.org>
-Reviewed-by: Simon Horman <horms@kernel.org>
-tested-by: damian Tometzki damian@riscv-rocks.de
-Tested-by: Oliver Hartkopp <socketcan@hartkopp.net>
-Acked-by: Miri Korenblit <miriam.rachel.korenblit@intel.com>
-Link: https://patch.msgid.link/20251204123204.9316-1-ziyao@disroot.org
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
+- security_socket_connect()
+- security_socket_sendmsg() and security_socket_recvmsg()
 
-LLM Generated explanations, may be completely bogus:
+These are used from net/socket.c.
 
-## Summary Analysis
+For the connectionless dgram Unix sockets, we would need to tell apart the cases
+where sendmsg()/recvmsg() are used with and without a sockaddr.  (Dgram sockets
+can be either connected with connect() and then have a fixed sockaddr, or they
+can be passed a remote sockaddr with each message send and receive operation.)
+This can told apart in security_socket_sendmsg() from the msg argument, but it
+doesn't look like we could tell it apart from security_unix_may_send().
 
-### Problem Being Fixed
-This commit fixes a **regression** caused by commit dfb073d32cac ("ptp:
-Return -EINVAL on ptp_clock_register if required ops are NULL"), which
-made `settime64` mandatory for PTP clock registration. Without this fix:
+Landlock already depends on CONFIG_SECURITY_NETWORK and CONFIG_SECURITY_PATH,
+so we would not need to have further #ifdefs to use one of these hooks.
 
-1. **Immediate symptom**: PTP clock registration fails with -EINVAL
-   (error -22), producing a kernel WARNING
-2. **Underlying issue**: Prevents a potential NULL pointer dereference
-   in `ptp_clock_settime()` (line 107 of `drivers/ptp/ptp_clock.c`)
-   which unconditionally calls `ptp->info->settime64()` when userspace
-   calls `clock_settime()` on the PTP device
+There are other difficulties I found which worry me and which I listed in the
+other mail at https://lore.kernel.org/all/aV5WTGvQB0XI8Q_N@google.com/.
 
-### Code Change Analysis
-The fix is extremely simple and surgical:
-- Adds two trivial 5-line stub functions (`iwl_mld_ptp_settime` and
-  `iwl_mvm_ptp_settime`) that simply return `-EOPNOTSUPP`
-- Registers these stubs in the respective `ptp_clock_info` structures
-- Total change: ~14 lines of obvious, trivial code
-
-### Stable Tree Criteria Evaluation
-| Criterion | Assessment |
-|-----------|------------|
-| Obviously correct | ✅ Stub returns standard "not supported" error |
-| Fixes real bug | ✅ Fixes PTP registration failure and potential NULL
-deref |
-| Important issue | ✅ Prevents kernel WARNING and failed functionality |
-| Small and contained | ✅ ~14 lines, 2 files, same driver |
-| No new features | ✅ Just adds required stub, no new functionality |
-
-### Evidence of Similar Fixes Being Backported
-The similar commits `329d050bbe63` (gve) and `6d080f810ffd` (iavf) that
-add identical `settime64` stubs have been backported to stable
-(confirmed in `stable/linux-6.18.y`). This establishes precedent.
-
-### Testing and Review Quality
-Excellent:
-- 4 different Tested-by tags (Nathan Chancellor, damian Tometzki, Oliver
-  Hartkopp, and implicit by Johannes Berg who merged it)
-- Reviewed-by from Simon Horman
-- Acked-by from Intel iwlwifi maintainer (Miri Korenblit)
-- Bug was reported with a lore.kernel.org link
-
-### Risk Assessment
-**Risk: Essentially zero.** The stub function just returns
-`-EOPNOTSUPP`. It cannot cause any regressions because:
-- It only gets called if userspace explicitly tries to set the PTP clock
-  time
-- Returning -EOPNOTSUPP is the correct response for unsupported
-  functionality
-- The alternative (no stub) causes immediate registration failure
-
-### Dependency Considerations
-- The MVM part (`mvm/ptp.c`) applies to kernels with iwlwifi MVM PTP
-  support (v6.3+)
-- The MLD part (`mld/ptp.c`) is only relevant for very recent kernels
-  (v6.11+)
-- Stable maintainers can easily drop the MLD hunk for older kernels that
-  don't have it
-
-### Conclusion
-This is a textbook stable backport candidate: a small, obvious fix for a
-real regression affecting production users of Intel WiFi hardware. The
-fix pattern has already been applied and backported for other drivers
-(gve, iavf). The risk is essentially zero, and the benefit is clear
-(functional PTP clock registration and prevention of potential NULL
-dereference).
-
-**YES**
-
- drivers/net/wireless/intel/iwlwifi/mld/ptp.c | 7 +++++++
- drivers/net/wireless/intel/iwlwifi/mvm/ptp.c | 7 +++++++
- 2 files changed, 14 insertions(+)
-
-diff --git a/drivers/net/wireless/intel/iwlwifi/mld/ptp.c b/drivers/net/wireless/intel/iwlwifi/mld/ptp.c
-index ffeb37a7f830..231920425c06 100644
---- a/drivers/net/wireless/intel/iwlwifi/mld/ptp.c
-+++ b/drivers/net/wireless/intel/iwlwifi/mld/ptp.c
-@@ -121,6 +121,12 @@ static int iwl_mld_ptp_gettime(struct ptp_clock_info *ptp,
- 	return 0;
- }
- 
-+static int iwl_mld_ptp_settime(struct ptp_clock_info *ptp,
-+			       const struct timespec64 *ts)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static int iwl_mld_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
- {
- 	struct iwl_mld *mld = container_of(ptp, struct iwl_mld,
-@@ -279,6 +285,7 @@ void iwl_mld_ptp_init(struct iwl_mld *mld)
- 
- 	mld->ptp_data.ptp_clock_info.owner = THIS_MODULE;
- 	mld->ptp_data.ptp_clock_info.gettime64 = iwl_mld_ptp_gettime;
-+	mld->ptp_data.ptp_clock_info.settime64 = iwl_mld_ptp_settime;
- 	mld->ptp_data.ptp_clock_info.max_adj = 0x7fffffff;
- 	mld->ptp_data.ptp_clock_info.adjtime = iwl_mld_ptp_adjtime;
- 	mld->ptp_data.ptp_clock_info.adjfine = iwl_mld_ptp_adjfine;
-diff --git a/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c b/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c
-index 06a4c9f74797..ad156b82eaa9 100644
---- a/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c
-+++ b/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c
-@@ -220,6 +220,12 @@ static int iwl_mvm_ptp_gettime(struct ptp_clock_info *ptp,
- 	return 0;
- }
- 
-+static int iwl_mvm_ptp_settime(struct ptp_clock_info *ptp,
-+			       const struct timespec64 *ts)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static int iwl_mvm_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
- {
- 	struct iwl_mvm *mvm = container_of(ptp, struct iwl_mvm,
-@@ -281,6 +287,7 @@ void iwl_mvm_ptp_init(struct iwl_mvm *mvm)
- 	mvm->ptp_data.ptp_clock_info.adjfine = iwl_mvm_ptp_adjfine;
- 	mvm->ptp_data.ptp_clock_info.adjtime = iwl_mvm_ptp_adjtime;
- 	mvm->ptp_data.ptp_clock_info.gettime64 = iwl_mvm_ptp_gettime;
-+	mvm->ptp_data.ptp_clock_info.settime64 = iwl_mvm_ptp_settime;
- 	mvm->ptp_data.scaled_freq = SCALE_FACTOR;
- 
- 	/* Give a short 'friendly name' to identify the PHC clock */
--- 
-2.51.0
-
+—Günther
 
