@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-247543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4182CFB96B
-	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 02:26:04 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6B28CFB94D
+	for <lists+netdev@lfdr.de>; Wed, 07 Jan 2026 02:23:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8191E301584D
-	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 01:23:31 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 46534300AC8A
+	for <lists+netdev@lfdr.de>; Wed,  7 Jan 2026 01:23:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3FDE8405C;
-	Wed,  7 Jan 2026 01:23:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA72F13B7A3;
+	Wed,  7 Jan 2026 01:23:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fs+PjrIa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m2sIklyE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA02C3C2F;
-	Wed,  7 Jan 2026 01:23:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861E93FCC
+	for <netdev@vger.kernel.org>; Wed,  7 Jan 2026 01:23:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767749009; cv=none; b=NM8lkdUi9XjTZ9k/kmRCTc7Gau9I6azhT8JQib9DUnudZ2g9WelishnWjdZHJtVz7nQHEqaYHDQue1YYP48nZQgWkcGnWXJL67kcC5JNug0LjihCVUBO6+HCEQOLidh00CTK4PTXxVqmA8G9UDLrlX7pvNPo8+ByoXgX2YdJ5tw=
+	t=1767749017; cv=none; b=C6g3bLpUUqW33jnT/VrxLrTqquKX6Un6AdlZ7fMLuMTgNH8V+vd/atk2k2HvfVYzWyjlXv3WNr1rbNwEhEdgEmMQGRKEO1jB4O6FKMWhXH6w2iCGNYVZlUtSotOYNyQbTolsJRAWc7CDwWX+weMT3hOzTRMn5CpjhRqFjxGH+y0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767749009; c=relaxed/simple;
-	bh=WekDqgZtqkKfkrvVCpmmKae/JFgoUDTJyK2zOeI8kjU=;
+	s=arc-20240116; t=1767749017; c=relaxed/simple;
+	bh=5cFJO5s3wQK+4Ifp8ZJthLIPbVJ6jfkCvYSf0lyofR4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Bf6WFsQSYYxFDZTBOJdGBllNi489A94Rg8t79uEILhJ8NWLp6enCrFGrHdXBtJKQT4izZn50G5qsgGRhJLs/5A7qzbMCzRE0ZlxaPg4AlfojpscnvQpacbVY2yIYrdRrUPpUlC7npfiE6KBoYf9lKYsqbuD1AGrc3vnnA9fGRK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fs+PjrIa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47678C116C6;
-	Wed,  7 Jan 2026 01:23:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=GAKHCUDJ5jcrQuo0kKhm06cUtNdSerOi/jECf2ZH/W9x0Cktax8EZZH0J/Y+OJ3C48eMnwfJQxtoYw3e11SS2MX6zhzke0Dv22day96m+S1THpB8EYuUTo1bxey7yEavBWbAcJd7sIO6roNXhZXg32OPu+WfJZpc3S+FkicZKA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m2sIklyE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16701C116C6;
+	Wed,  7 Jan 2026 01:23:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767749009;
-	bh=WekDqgZtqkKfkrvVCpmmKae/JFgoUDTJyK2zOeI8kjU=;
+	s=k20201202; t=1767749017;
+	bh=5cFJO5s3wQK+4Ifp8ZJthLIPbVJ6jfkCvYSf0lyofR4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fs+PjrIapaAgvbXjrQgw1dUanyFaJ74KFVptyUGD26MWqoGQ3zVxGMfOBNYVE+7n2
-	 DTaY5/cOO3qlcQuu6qRSiR5SZhzbK6rBhPl802iYna5UyniLByZugjKgdGZR5FrQB1
-	 oziJwkhMDE06XmGEXAOTXf0DZLs+dx1OeFAsHf5/3Y4TroQB1r/or6f+n39tT3x+kf
-	 2Ba/OWGY0J+be5LjMd5hrZ/9FB9kxhG7HEy/Ab3XIPfl2aOff5YhoDotcUrPx8WSg5
-	 jv7ruSTAAuIXA2ngAYmnrARflWLdJy3EecD6cP/ikorDH/VlTNWFG72RcEqHRzhqRA
-	 sHio3Ov08JyCQ==
+	b=m2sIklyEBO/CYs87pAiZmQ0zUYGPZraIpqStPxRNwuP0iqIouTC1ySo5YrGMhJBwM
+	 sKoxSIjDrplOvYKegAUM6rD1Q+kGMb9Dc/b6+qi/TnSSJLOBQB19RtFVTOLiXQknGM
+	 BnPNgh2BRkqKoq3wzFlJS0QQi13oA7LLt3WJRP5rZL2Ws4b466LEmpfxsRZSLF0RM7
+	 s/yRLd985tmyAXW2s2hsp8kVC2/L9liGveDwtEy3+JgvLTUhs/cDWpOmJle/3RK48+
+	 Puqp/4173YlxUf6JynVZ9/Caj0l0mEURC2b+FIxoNQFSk1EXIxdYwkJB1+yBp5sTvu
+	 /kRc4Yv2cNbhQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2BB0380CEF5;
-	Wed,  7 Jan 2026 01:20:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B5A58380CEF5;
+	Wed,  7 Jan 2026 01:20:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,43 +50,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: sfp: return the number of written bytes for
- smbus
- single byte access
+Subject: Re: [PATCH net-next] net: airoha: Use gdm port enum value whenever
+ possible
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176774880679.2188953.327787991480765340.git-patchwork-notify@kernel.org>
-Date: Wed, 07 Jan 2026 01:20:06 +0000
-References: <20260105151840.144552-1-maxime.chevallier@bootlin.com>
-In-Reply-To: <20260105151840.144552-1-maxime.chevallier@bootlin.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, andrew@lunn.ch, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com, linux@armlinux.org.uk, jelonek.jonas@gmail.com,
- hkallweit1@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, f.fainelli@gmail.com,
- kory.maincent@bootlin.com, horms@kernel.org, romain.gantois@bootlin.com,
- kabel@kernel.org
+ <176774881426.2188953.14906966324669227872.git-patchwork-notify@kernel.org>
+Date: Wed, 07 Jan 2026 01:20:14 +0000
+References: <20260105-airoha-use-port-idx-enum-v1-1-503ca5763858@kernel.org>
+In-Reply-To: <20260105-airoha-use-port-idx-enum-v1-1-503ca5763858@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  5 Jan 2026 16:18:39 +0100 you wrote:
-> We expect the SFP write accessors to return the number of written bytes.
-> We fail to do so for single-byte smbus accesses, which may cause errors
-> when setting a module's high-power state and for some cotsworks modules.
+On Mon, 05 Jan 2026 10:40:47 +0100 you wrote:
+> Use AIROHA_GDMx_IDX enum value whenever possible.
+> This patch is just cosmetic changes and does not introduce any logic one.
 > 
-> Let's return the amount of written bytes, as expected.
-> 
-> Fixes: 7662abf4db94 ("net: phy: sfp: Add support for SMBus module access")
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+>  drivers/net/ethernet/airoha/airoha_eth.c | 40 +++++++++++++++++---------------
+>  1 file changed, 21 insertions(+), 19 deletions(-)
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: sfp: return the number of written bytes for smbus single byte access
-    https://git.kernel.org/netdev/net/c/13ff3e724207
+  - [net-next] net: airoha: Use gdm port enum value whenever possible
+    https://git.kernel.org/netdev/net-next/c/4d513329b87c
 
 You are awesome, thank you!
 -- 
