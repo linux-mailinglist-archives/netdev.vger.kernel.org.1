@@ -1,107 +1,131 @@
-Return-Path: <netdev+bounces-248135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E15B0D040F0
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 16:54:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 259C9D0497B
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:57:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C5833303D5E7
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:48:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D263E31BBCA3
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:49:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EC92230D1E;
-	Thu,  8 Jan 2026 15:47:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4431B135A53;
+	Thu,  8 Jan 2026 15:49:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GZsCXQ+q"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hEchSgcR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 371DE226D1E;
-	Thu,  8 Jan 2026 15:47:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A522613FEE
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 15:49:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767887264; cv=none; b=f3oaqmO14f6M24h4cwVjbxY5VHStJLrjKcel94qA1YpE261UC7n4AxHxp2ExrbmV8icgckhj9LxJ10mh4EUMpYrphHS/xdalcev5VU/W6GpZQGaevOwxBsvuhSwRGkTmeVFyt52rbIfH9HisHFYYAq7xHP4x7LgXNDyBb56/I7I=
+	t=1767887393; cv=none; b=qBPz1VEz2Oo7PHwkd6w1kKS7JxNAgZxzle94fRw/Mf4glIO4pDaGPXIGgWO480/vHw3xpKBJ8vh//EGkGtmBMUlADy9euNBsTbpSitybHMmEdmPFSPo+K2IclS4H4n/Zi4nPc7/RB0gawz9ah53AwVZ4cP09MzLDn4lecLZbtmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767887264; c=relaxed/simple;
-	bh=rRafGtka+Zehe/QV1cX6sSl/+Pxyy/fwaUZk3pYs55Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Du/cmT6JqNpMjE8JSosoYUrHqyY2NMx5NZqOQLVj3+jIcBFHqPZ+rEFn7vpHAKIe4+/iIewJyc/Bx3Rf8X9vBbOUZvEie1/JZJrLB3CTlbdRPuBnq/Ifu3hAAX8wkSFiMf/MkKPQgaYOf7QMMVXJAUgONQ4TGi4O9Lnr/KbAuKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GZsCXQ+q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB20DC116C6;
-	Thu,  8 Jan 2026 15:47:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767887263;
-	bh=rRafGtka+Zehe/QV1cX6sSl/+Pxyy/fwaUZk3pYs55Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GZsCXQ+qr4G1mL9qEBvyZjVtrMbkDrUDLNLc+WyF5b0Es1yI189MtmWSzSSZQoguW
-	 UqvcF4BSDnEqZDdfDdcBGVDrYM3TI538kbyQTNLQHGRG918U8GBPPHeNs1+xdDFbos
-	 vc9SjEraU0d9IHkY1sbo8Vl92b3yyGo9gsEopcSTjNS6wxmGPC6QVaYXyTbcrbtjEW
-	 0MDNk2S4PvLVn/rL2wHH/SGTjqtdbqvaXlKqVkBPgvMTsY2zmIGR9bVznzhnTEQMAC
-	 d1K34JgHKgbPCXRNG97lJ/qSHdZz16k3UgJ6PdfD79sqk8LXA8HTXqv4qjM3M0J9uQ
-	 rQn/5WvQjbCYg==
-Date: Thu, 8 Jan 2026 07:47:41 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
- Simon Horman <horms@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
- <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- kernel-team@cloudflare.com
-Subject: Re: [PATCH bpf-next v3 00/17] Decouple skb metadata tracking from
- MAC header offset
-Message-ID: <20260108074741.00bd532f@kernel.org>
-In-Reply-To: <20260107-skb-meta-safeproof-netdevs-rx-only-v3-0-0d461c5e4764@cloudflare.com>
-References: <20260107-skb-meta-safeproof-netdevs-rx-only-v3-0-0d461c5e4764@cloudflare.com>
+	s=arc-20240116; t=1767887393; c=relaxed/simple;
+	bh=baH0+S5FRCy2ZjSOmeskCbxjbyD4X718iYtRCXvFed0=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:Subject:Cc:To:
+	 References:In-Reply-To; b=jb8LPil4QHwgeNyrbTHn97+sAU4DHAWH1gpqzYIq+n2KUEUYhew++ljyWfTYHEfXb5mJ+1/A/jcy3SDMsowZbBf9962TIWEAG+Frl3hamxlJFzqH0Y+98LS2M/SIgLhWeSinzA6ExNRP1p+tzSYag0qyvayDZySFs9MEwuA42ME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hEchSgcR; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 93BD8C1ECB4;
+	Thu,  8 Jan 2026 15:49:22 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id BCE9A6072B;
+	Thu,  8 Jan 2026 15:49:48 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5A433103C88A5;
+	Thu,  8 Jan 2026 16:49:45 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1767887387; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=+Na8EeoJpHVy9GL8yL3E3EnYoVxE4qmKVaywnb9ABQs=;
+	b=hEchSgcRyev5Wdv7QuNPL4hDhDVVQqmHs6DGmRdYNhGE1rsK+bih4eAx2nLriIM3GtKlrl
+	grarWnOY9jkcNKnzN9Jn3kXb8GMnxIiV+Yfl7Q7Hbg5ycjuuFh0YifyuN1A3hqJWTBWIv3
+	uscHlrOARgD/LDOy2nfPKYICSXFrCslqHp5ERsMhUqqdwY1WnS/rcvdVECyI/uESLOfK7b
+	ev4LteAdSbNy4ink12DzY2UacUYJxsXiF7Zc0r756qh6KTrRH1uifdbgjU9aXnGhMy8GgV
+	TMmigQhXhWT7h+XhTerOUpHwQ6Gif2cHYpAjpepMniHS2dXcdSgz9lKD19faiw==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 08 Jan 2026 16:49:45 +0100
+Message-Id: <DFJBRX0BOZ94.1YAHY6PVCGA0L@bootlin.com>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: Re: [PATCH RFC net-next v2 5/8] cadence: macb: add XDP support for
+ gem
+Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
+ <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Lorenzo Bianconi" <lorenzo@kernel.org>, =?utf-8?q?Th=C3=A9o_Lebrun?=
+ <theo.lebrun@bootlin.com>
+To: "Paolo Valerio" <pvalerio@redhat.com>, <netdev@vger.kernel.org>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20251220235135.1078587-1-pvalerio@redhat.com>
+ <20251220235135.1078587-6-pvalerio@redhat.com>
+In-Reply-To: <20251220235135.1078587-6-pvalerio@redhat.com>
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Wed, 07 Jan 2026 15:28:00 +0100 Jakub Sitnicki wrote:
-> This series continues the effort to provide reliable access to xdp/skb
-> metadata from BPF context on the receive path. We have recently talked
-> about it at Plumbers [1].
-> 
-> Currently skb metadata location is tied to the MAC header offset:
-> 
->   [headroom][metadata][MAC hdr][L3 pkt]
->                       ^
->                       skb_metadata_end = head + mac_header
-> 
-> This design breaks on L2 decapsulation (VLAN, GRE, etc.) when the MAC
-> offset is reset. The naive fix is to memmove metadata on every decap path,
-> but we can avoid this cost by tracking metadata position independently.
-> 
-> Introduce a dedicated meta_end field in skb_shared_info that records where
-> metadata ends relative to skb->head:
-> 
->   [headroom][metadata][gap][MAC hdr][L3 pkt]
->                      ^
->                      skb_metadata_end = head + meta_end
->                      
-> This allows BPF dynptr access (bpf_dynptr_from_skb_meta()) to work without
-> memmove. For skb->data_meta pointer access, which expects metadata
-> immediately before skb->data, make the verifier inject realignment code in
-> TC BPF prologue.
+Hello Paolo, netdev,
 
-I don't understand what semantics for the buffer layout you're trying
-to establish, we now have "headroom" and "gap"?
+On Sun Dec 21, 2025 at 12:51 AM CET, Paolo Valerio wrote:
+> Introduce basic XDP support for macb/gem with the XDP_PASS,
+> XDP_DROP, XDP_REDIRECT verdict support.
+>
+> Signed-off-by: Paolo Valerio <pvalerio@redhat.com>
+> ---
+>  drivers/net/ethernet/cadence/macb.h      |   3 +
+>  drivers/net/ethernet/cadence/macb_main.c | 184 ++++++++++++++++++++---
+>  2 files changed, 169 insertions(+), 18 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/c=
+adence/macb.h
+> index 45c04157f153..815d50574267 100644
+> --- a/drivers/net/ethernet/cadence/macb.h
+> +++ b/drivers/net/ethernet/cadence/macb.h
+> @@ -16,6 +16,7 @@
+>  #include <linux/workqueue.h>
+>  #include <net/page_pool/helpers.h>
+>  #include <net/xdp.h>
+> +#include <linux/bpf_trace.h>
 
-	[headroom][metadata][gap][packet]
+Shouldn't that land in macb_main.c? Required by trace_xdp_exception().
 
-You're not solving the encap side either, skb_push() will still happily
-encroach on the metadata. Feel like duct tape, we can't fundamentally
-update the layout of the skb without updating all the helpers.
-metadata works perfectly fine for its intended use case - passing info
-about the frame from XDP offload to XDP and then to TC.
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ether=
+net/cadence/macb_main.c
+> index 582ceb728124..f767eb2e272e 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -5,6 +5,7 @@
+>   * Copyright (C) 2004-2006 Atmel Corporation
+>   */
+> =20
+> +#include <asm-generic/errno.h>
+
+This is a mistake. For example compiling for a MIPS target I get all
+errno constants redefined. Seeing where it was added it might have been
+added by auto-import tooling.
+
+If needed, to be replaced by
+   #include <linux/errno.h>
+
+=E2=9F=A9 git grep -h 'include.*errno' drivers/ | sort | uniq -c | sort -nr=
+ | head -n3
+   1645 #include <linux/errno.h>
+     19 #include <asm/errno.h>
+      5 #include <linux/errno.h> /* For the -ENODEV/... values */
+
+Thanks,
+
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
 
