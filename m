@@ -1,256 +1,266 @@
-Return-Path: <netdev+bounces-248006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96EAAD02B58
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 13:44:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32258D0255B
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 12:16:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 349E43013561
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 12:38:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 29E5E31CA2A6
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 11:07:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 396B1346A12;
-	Thu,  8 Jan 2026 08:47:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 885DC3876DE;
+	Thu,  8 Jan 2026 08:59:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="C9Sy5rUK"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Q5ew7+gP";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="TpiR/AZj"
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010058.outbound.protection.outlook.com [52.101.69.58])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58BAE3314D9;
-	Thu,  8 Jan 2026 08:47:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.58
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767862069; cv=fail; b=JEud6okT1eo8B6DPDQKKhpB5vC618IdTvtgL82VrqZjM+3JD7+hHj2MSGVL1i2twHuExjXGlCz17csQqFDNPJmNU3GVdHWFo5EaPLWEBBp11H9bOU6zue2miKdXM9PKXOYNpsHHM6afRipArwj6PttWN8xV/lYLhZ4379adrxTE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767862069; c=relaxed/simple;
-	bh=2DOgcCdDDPZEkWtRps+8FdFmYgrbHoh0lxeIWKWEQ/Y=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=RjAO1hqRHgjFEMBymjNLV+ihc8p6ORKGKVUi33k9AFsgRMOqHCNcQUyamWBOdf3HQ0mDLq3Ggi/0H56IEGdifjEzj8Rf/6FUMRnidH7Spwv1CqbL6yKXjS5Y30u+JmX39t00F2IKq7FFQDEoIKg5tHwfjhRywTQH1LdbyNKs+qs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=C9Sy5rUK; arc=fail smtp.client-ip=52.101.69.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YiXZH0K8a1pWmvFRP7vqgACnM2e/SMAyE0Exw1g+rsIntrEqxYh0ajRJJlrgMGTSfEWIljSfQDyRM7QiKAtyKZrrNyVCXEy29Ne65TvGMJ+Ic3omysCTKlL5whBpQ1aXY18dG0fbzYSj3AL1bHjwYqbHsswn8b5HcKGQjERssjqIJO9FzRwMSXPmP3qPSoBW5AUzIdZkoavkGURw9URjZDtmwTtLaLHh2X8gazjqQO8TphJQzb4jGaMxHtXqY/7aOJ9DCNBkTEbaAt9Nh6EcUc15fJJpI4PZce2pKdjn0PhW7wRYEYyQOC/v3vnuatNBvrQ1nK6fk0wZSUw1o3dGyw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2DOgcCdDDPZEkWtRps+8FdFmYgrbHoh0lxeIWKWEQ/Y=;
- b=aVV3eDMPJdnCR2dr4xpMF1YAiRY4hkPka7KaRMuTNDKX6VpBVNPO6co+X4UN+Xif2hH2/hQwzVPibrO4bmAiaoI1iH9BUez3gJuRpHtlvk6aloY5ZPkDkevmAE+R6a3HZpaya/q4/pUl6gtGxoovnTMb09dlBPP5U0by7j372A6qicSFsQHm+97tMolvYI43K0exw7k1WUyFbsrVhzMOTLPvAyJuAdjV7OUgSahVMQ6A/HIg2f8ls0dRSjCuJ1eR00UoowXUZsKSudM3nl1sOK8Ihvg3s+lMnSkfoPapiC5cXujmHojgenJg3eABzHHqwCe16yt206vSWMnS6G8Zow==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nokia-bell-labs.com; dmarc=pass action=none
- header.from=nokia-bell-labs.com; dkim=pass header.d=nokia-bell-labs.com;
- arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2DOgcCdDDPZEkWtRps+8FdFmYgrbHoh0lxeIWKWEQ/Y=;
- b=C9Sy5rUK5IAZgxoLSuq05Kr/muIP+TazUxrjaksnus7MPPZICITBeO3KxDHLG0YMdr0pQA/mgeh/vrbvW6MrQyaElQr0UDNrR6pyGECu9ASxnOqb8ou7bWSrIMuQUclJpaszK/YgsQqfXW/vyo5o5LB1IAhA8l6HkTpY5ZuQCAuW3+yzTS8P77Xb01aRqBu/EYFcqdSSmnSVqdG29zFNRjgZ1cdaBmzBySfvjqVEHKXLrGO6LT4az8Cy03kpmxfPA6Qv7TK8JRjWdEP9CJtTs5bLPDmClzrSu7lvv0xGorBMNImtkJqtfUciMvUaFhGuHlFqJT+w4fCSTTn2cbgPSw==
-Received: from PAXPR07MB7984.eurprd07.prod.outlook.com (2603:10a6:102:133::12)
- by GV2PR07MB8963.eurprd07.prod.outlook.com (2603:10a6:150:b8::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.2; Thu, 8 Jan
- 2026 08:47:34 +0000
-Received: from PAXPR07MB7984.eurprd07.prod.outlook.com
- ([fe80::b7f8:dc0a:7e8d:56]) by PAXPR07MB7984.eurprd07.prod.outlook.com
- ([fe80::b7f8:dc0a:7e8d:56%2]) with mapi id 15.20.9499.003; Thu, 8 Jan 2026
- 08:47:34 +0000
-From: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
-To: Paolo Abeni <pabeni@redhat.com>, "edumazet@google.com"
-	<edumazet@google.com>, "parav@nvidia.com" <parav@nvidia.com>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "corbet@lwn.net"
-	<corbet@lwn.net>, "horms@kernel.org" <horms@kernel.org>, "dsahern@kernel.org"
-	<dsahern@kernel.org>, "kuniyu@google.com" <kuniyu@google.com>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "dave.taht@gmail.com" <dave.taht@gmail.com>,
-	"jhs@mojatatu.com" <jhs@mojatatu.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"stephen@networkplumber.org" <stephen@networkplumber.org>,
-	"xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>, "jiri@resnulli.us"
-	<jiri@resnulli.us>, "davem@davemloft.net" <davem@davemloft.net>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "donald.hunter@gmail.com"
-	<donald.hunter@gmail.com>, "ast@fiberby.net" <ast@fiberby.net>,
-	"liuhangbin@gmail.com" <liuhangbin@gmail.com>, "shuah@kernel.org"
-	<shuah@kernel.org>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>, "ij@kernel.org" <ij@kernel.org>,
-	"ncardwell@google.com" <ncardwell@google.com>, "Koen De Schepper (Nokia)"
-	<koen.de_schepper@nokia-bell-labs.com>, "g.white@cablelabs.com"
-	<g.white@cablelabs.com>, "ingemar.s.johansson@ericsson.com"
-	<ingemar.s.johansson@ericsson.com>, "mirja.kuehlewind@ericsson.com"
-	<mirja.kuehlewind@ericsson.com>, cheshire <cheshire@apple.com>,
-	"rs.ietf@gmx.at" <rs.ietf@gmx.at>, "Jason_Livingood@comcast.com"
-	<Jason_Livingood@comcast.com>, Vidhi Goel <vidhi_goel@apple.com>
-Subject: RE: [PATCH v7 net-next 00/13] AccECN protocol case handling series
-Thread-Topic: [PATCH v7 net-next 00/13] AccECN protocol case handling series
-Thread-Index: AQHcfLJYfp0P5qIzmUSdgLUUXjW7nLVH+8+AgAABAQA=
-Date: Thu, 8 Jan 2026 08:47:34 +0000
-Message-ID:
- <PAXPR07MB798456B62DBAC92A9F5915DAA385A@PAXPR07MB7984.eurprd07.prod.outlook.com>
-References: <20260103131028.10708-1-chia-yu.chang@nokia-bell-labs.com>
- <56f6f3dd-14a8-44e9-a13d-eeb0a27d81d2@redhat.com>
-In-Reply-To: <56f6f3dd-14a8-44e9-a13d-eeb0a27d81d2@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nokia-bell-labs.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR07MB7984:EE_|GV2PR07MB8963:EE_
-x-ms-office365-filtering-correlation-id: 8efb8b75-2ba7-4141-b074-08de4e92914a
-x-ld-processed: 5d471751-9675-428d-917b-70f44f9630b0,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|376014|366016|1800799024|38070700021|921020;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?KWoZHGr5+2NrpejZ4mA3rlVmS0D8xUEM36T0GRVD+KfMr+bujFr/tRb1AKsm?=
- =?us-ascii?Q?4A+oWyXDStbEXbrimzknO2IrDQKAtWerQcv9zbbxz377r1oNf/e1emou1Uwe?=
- =?us-ascii?Q?aYSLtpK5sDRGRATaVNJaZy5lKey1NmlbqOUSRN6OYeh4NoDLGKix4TXjnKAt?=
- =?us-ascii?Q?4fyisAuQ24EbdoD5++/OeamT9gKMUu0AJZ8348xwA3e2ax/k9TGSRq/URwmR?=
- =?us-ascii?Q?pjubwtq8n80GQYNh/is9vSYijMUPhzpSfQbidwqYkJzStLUwVRvN2byv2ViX?=
- =?us-ascii?Q?fej4tjPa+CJjYH3aa4ZhsZGuxiYZ+eZ2kc2Z1EzWrKV7K9AOwDdxP1BL9lkm?=
- =?us-ascii?Q?IvqQ9S/JO6RAaw7MjmedH7xv8pVFCX8+AV2gxWJxeC2aaa/buigJv7pVY46P?=
- =?us-ascii?Q?VJricCe+oIs36Fa7RFWiKJD+usF/b11BVkyr8xCZhICL0m7Vh2lu1es3733a?=
- =?us-ascii?Q?07Gp+zJfeY89KZ2f4v4gP16DFGB//20HaNUDWE329iqkUmcSdHjjF7qV+HOu?=
- =?us-ascii?Q?lC+qWooIIs3QXUmqdYISPNdHz2gwvrinnq6ZEPdAuznHikZnbi8TwbhetRu1?=
- =?us-ascii?Q?8c0iS7M4CDIqbqVV6Ea1aajKNyHV537OSRT6P7Z1sa7ZarW+ThuSr1KmcJ2v?=
- =?us-ascii?Q?yULTewFNZKD4moKkHUaChmJZSA2OseYDbIJx0pVqegm5wM2fkszXoPq18KaR?=
- =?us-ascii?Q?EFN6M+6Z+IA1IzTVli7fgG+ax9xJk6aDjCIfCH6JYxd/iOijdDOfM68AYgo0?=
- =?us-ascii?Q?yDSA18eek5TZVtGsapGwyJuHr2902x4o+lhvMARi6LdS9tbevhukWDDuEttH?=
- =?us-ascii?Q?bSPcyJ9z/x01yWnGb9oQuHxkcgREQZDr/n5Rf4gY1FcpGGU86xpCwOn0p23D?=
- =?us-ascii?Q?Lzkz2TuNj7ue6YoFIcf2Pua+s1YBqExFo9pdKgEcf7sAKcQrOpAZyfJGJzAE?=
- =?us-ascii?Q?dDFB34cDoNGK5sGfm9+7pU5NB1vY/RGptjE7kj+pm12DB1sIEzdo3xTFdd7i?=
- =?us-ascii?Q?i4wuwvzGhQI6wAysS0p950pNENwmAXdbkFgXiazgvWDozKqZoXssDKW9NjzI?=
- =?us-ascii?Q?jQiDrw2d2Johg3d3n/J+mRJji5yJmLlgVOC1tdwsKMHEZVB0DivcyNORaK1h?=
- =?us-ascii?Q?G1GPOReHTcCGf3i7cospcCsGAT8p2cCGlragdUHocZlx8SYDb7VpEtaMvK+T?=
- =?us-ascii?Q?GPmDWtDYP8P7ABPCOgB9G9KSMUvrraiXQ+QqA95jCqwJfwjLUlKl6OBygOC3?=
- =?us-ascii?Q?XTKmMBHRYXBxmGxsz3SMvxKACVgSL/Pvv9dr23QluGEpxT16q0tWs/lNwsF0?=
- =?us-ascii?Q?7dghnUyWBIgDaxD2L1QhjjL7LbWLkHj21TL/QRmmrN01QLsiOhPBalr4xFhb?=
- =?us-ascii?Q?Z4dbRJBcK4GeKcVieeQf1IWWBQyLoO/HKoTAuk8O54ZSvxQgIZKix1pYW8r7?=
- =?us-ascii?Q?LKTWuy6GIEe9zoEBXWcBgyAO0TiOOBXArBGaz7SsR3kViGbm7OJYoPatCRQ+?=
- =?us-ascii?Q?IwSxMSNSAtQpnyjO/AHm4b/XGI2d3X/B+LEYt4sDz8eM4rrY4VF+DLY3wA?=
- =?us-ascii?Q?=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR07MB7984.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(38070700021)(921020);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?gWrsZUY/2fDZsLeq2AdCRCM7+LTgxijQ1G77moPTPICkaEq7bHqTwQTMObvu?=
- =?us-ascii?Q?tmEsQrPkFqTfPiRjwheuZhZsm5FhrlcwNhlx9JdQPedX/LwSSu+w8Ctf8fJv?=
- =?us-ascii?Q?ZqFpPY0FUgFsAUCTFdIoiLjPaikfP15J2XrU9uHhCl8AY7kuafI30rzz7pTe?=
- =?us-ascii?Q?RcANhzpYutdSmMUMjh9m+TgcKh5Ye6IpW7G6m3s9Hjti0UbjtInXPKsME54a?=
- =?us-ascii?Q?YWI3lA/mK3vRgk6bUgNVlP9nd2L0OCr2oGSm0xuFp7XTxLTFCOk8LF/73iB6?=
- =?us-ascii?Q?FyxxyqlypafumdLR4wepkp2nuWj7esYQAGoPWpV6rId0oSBZUW8oNaBbZOaK?=
- =?us-ascii?Q?cvTQMa3TQWY4zMjfZvi+jm9UsEByNejr3uZdVdvCib121cmOeUO2QaXS023F?=
- =?us-ascii?Q?MvxfPGeSgEVkNLwvfntXty/ZOlqonHblCOi3MLvIj/I0tbBjU3JhogRKMl9k?=
- =?us-ascii?Q?jrF0kXBxA7Ju1tHRFeNXxADjiaLdcadyTHhMU4mAmt6HXuCcbDtO3YoZQnyp?=
- =?us-ascii?Q?omc3YzQ/6rOFIEdsyHMnf/zzH/Z05htOI5HWf+Mi9eiznoINt6McFnt6yDDO?=
- =?us-ascii?Q?p05EwVWRZ3oxog/BLuExR5b3VvSrJkMme7GIOWMfg6aXtX3wkuY7o09oaUJq?=
- =?us-ascii?Q?7uN6z7QaZhhHgKFSKIlEsuHFER0S9Y2NXvHtirBGae6zBWLimqRQyBBuc/7B?=
- =?us-ascii?Q?JgxMEgburq3bOR5hnpegCxUmxnFmZQUWXWPrvGk2kt/cmcEpPMvSPKcH2NsW?=
- =?us-ascii?Q?2zGQnAK2GZb96du4AU/6Iz/ZWd4iN1gx2//hR30PnzDoMev8Y+sEcGeSBOPh?=
- =?us-ascii?Q?2jVJ8F6dGKMR6wQMtlHZWyfZt+gxbpzzlNfZnuc5ACDOfS1FKoefXQr27LfF?=
- =?us-ascii?Q?5HOxUS7+UYnq5oUnUhYYQEkNq7QmlZJxkxHbB2FqP/hQMu6Lv3TvVRNQ8C9S?=
- =?us-ascii?Q?FhjR/zQAOwDLgtOnoPdjANLDDll/lGLgBpaHuRMy5WbtvYD8q+JDrXsY4oZ2?=
- =?us-ascii?Q?mjJAkOIWRW5jUtVfjtjakzkkj1Lo0jlJ/p69vaFJEr4ivEDzd+5DuGKWizXb?=
- =?us-ascii?Q?a8Fszsqvxxbjb4hz4rliTgTyRHBpw8shSsckyzFYwZYSid6tddzDtH9acHvU?=
- =?us-ascii?Q?tQ8GR5hHKJpNeMTz+JjvhqZCulyqFGR+z7hVCLNVSp3PgwHlIbnuLRdwzm0x?=
- =?us-ascii?Q?PWcYegYvMkLbUx6yEqnR8sIXRkCJjLeaLGTjxsiGRAzAxRcdPWoX1EaRZUE3?=
- =?us-ascii?Q?DXppt622an13cn9igMe/aLR1obyNS2cAXFiYWkXpyzBFEdPLMh7LZ1moSzfP?=
- =?us-ascii?Q?G67Cq/HLYLJZ9rcKcnHOtgbsgtzr8xRkI55TG12eyo232jhroJh4Y98W1AyD?=
- =?us-ascii?Q?xX/5zQ9bwCY9dfFfLgdlYKtmNxj5S6rwbY/ORgkyIFniSG35O7IKsEW3gXnA?=
- =?us-ascii?Q?xDAqosg9lrsdLoWQMLSEzCnkGFUe/CH0ttfjmRByz3urBDCcM9JwW//FQJcN?=
- =?us-ascii?Q?qbZPmsMn0PE4pxSpWMuMGF7k7QkJMxNeswdo9FxSwwhx1C5rDyEqpMTZGDHc?=
- =?us-ascii?Q?mOLrw3vEgV0HUHDczMQdps9ElCjj80cxudIMlqy0alujP18Q3b4obv7p0siU?=
- =?us-ascii?Q?tG8PZ3Erc8DhAIr8nAdl8Ej1EIiNDVwVrmnR+OzGwZONEBL//aCfXw110AKW?=
- =?us-ascii?Q?8CUvIZD824CgV9QCr7F2O1IaGgmbmJF+UExVhY2BqfjThNQWxkJHUhg78del?=
- =?us-ascii?Q?I4ek5f3DrohdiNLLaY1eq4yi0ATKuh8=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F64D3816E9
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 08:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767862771; cv=none; b=OQC9DeFJ80YxsTo4L/M7N8ddhYZvUnuGPmji8C8SNY31T+L3NQoN6xE2LqgqYNZ2oZnL8aq8tCMcOaaNsm0dVhJdw7WmL5pD0IqJczjSXzLwbnebLI9Iy6dvgWhODt7iMGbsY+0el38wN+HguJ5aFaYLfmBKfDModzEXH0K+pt4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767862771; c=relaxed/simple;
+	bh=YHlE0d4Zdg3zGpi7vnXaRyEcbTQU0hyKWGZwGGtXrSQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rc3Qe9ewCrcJvP6Wr1gGuOGO4OVOZjlKvUMMtXaaXDnRGNXdM/TTHk5+ZwSlL5ScS35Rl0xTUgIFjaYwpm0drmrtH+jj51TEZPri088RrBta4/QD+Ky8jgJl56Nfpgz6yozl0zcNnEE/uPRUNkOUln9Fe70sqovV6s8fbu1XaTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Q5ew7+gP; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=TpiR/AZj; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6087QBlR1258526
+	for <netdev@vger.kernel.org>; Thu, 8 Jan 2026 08:59:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	W2zJ4MmBHNV6iOH+dkgfjuEvhOikcvGRf00d0zwDe6E=; b=Q5ew7+gPvSW9mncm
+	F8RfLr5tQRPOkbtavnM7YN/f8Bt9awTCBEUDwhtPzQ+K4XMyje09PSOqA11FXX/T
+	m3UUAZnJVRyvRNHEG8Qorff0g3b8XIopMpFUUMwB5jKHJYSFd7SSsEQvnAAaKI4w
+	r4kK4klhGFa1Me4X3JuzKqc0pucPdIuIaWfYxKiNitoevdZ0DjefJGyBMfYl/qXt
+	8hSFaQPHt6mStl2DpkKU6yo/UFYO8O6/VUaZWV9Oip1EfSys83N5+Mw1wL0KsNjA
+	z6hWf7LCqKqetACoxnBYoe4Q5eR+D0TnJjuDV1dl58ZZZrwC/d8BBCUUmYQwXQaE
+	gJmNuQ==
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com [209.85.219.71])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bj86gr8ss-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 08:59:23 +0000 (GMT)
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-88a360b8096so77759836d6.0
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 00:59:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1767862762; x=1768467562; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W2zJ4MmBHNV6iOH+dkgfjuEvhOikcvGRf00d0zwDe6E=;
+        b=TpiR/AZjAEbPz1ufTkh1t3QlzWStNyaDUcXq7iXPQB21AdRICkcRMQ5+xInVIkUPWV
+         4kXBsmiGNvFFc3BaZbx6rJmxZWpT0Bd8fM85tK+9wNOnr5sC/gXOxzGowOh/EmW20FLk
+         EHDcamOJZKZNRpGriTorai761SzwcFeznidBmYml29DcWlBM/A+iRSqG6D8Z/pxs4DKT
+         CHUNonDLZVXMoDKVLZhY65hkZHbw9fCdvU8n0wMFi/hclrb7Ks1Xs4w4H57yE3/t8PDy
+         s+gwOyYSh1GljWsXuSJgSRUOkxwOl+UdEGumGKFUWSY0AIYJ3DD9ZSCxx7z/Q82GSJpl
+         qz4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767862762; x=1768467562;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=W2zJ4MmBHNV6iOH+dkgfjuEvhOikcvGRf00d0zwDe6E=;
+        b=EEVlP57Z3PBhPGj+7KggZq5eOg/mqzzj6LGq1qX49QO2cvn8YRxjXhGAGzsdQPLvXW
+         SX4wQI6AEAuF8/3I/Td6LiAGLBJHu5V8efJra0xxSHG/tK5frXmihnwe5qBkMEn3Fya+
+         Ip2htnQl+AzuKn1Rhcp4nEi1hJgyQlTOdMpRTwMIh2d8xzcJNwRTvgWoxUOMaiwm4PMH
+         p6gkXP3bsU4kK/kGGsuQV14zEImQYAPYN/H4MEdpOefQ3+E3XxOypMnaZ6+HC0kRZkl4
+         w9w41fheTbkcx7DDNoXfDZiTPbPOoAwmcjHmhKED9eMId5njP1V02OiDyAfWXcRZMujw
+         Jt5w==
+X-Forwarded-Encrypted: i=1; AJvYcCVzdRij5yAN+TA9VrSLBhE6ZZkqazONDIFzDlOT7HIINQ1IkJHQWuGQ4/kHRO3UVj0ZFPQOwr8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9T/1ivCIonEOCOYzsJW/WCVNSGk7cG20Rkmeurd3DCAg78NbX
+	HPhwoOClYwb9Us1FkmYQLdClZqHo3KrnUcCt2KaQRVklppOCEe7zwpnF2y9rd1Gp/1A6E5IvhTG
+	UAdvpLDGom+lLD4UR7DiHlED3IXMTMKNfiwF0s9tahfD+4hixXJ5gRCZR89HZWi6QVPYPMxcTDr
+	omSvsgm9bp5TbkTBs64wK+PvPxGM9ZhPAXlA==
+X-Gm-Gg: AY/fxX6ofaV5PfSM3k0gebio2t2ZIystzYcmqQgWsiJMX5cSeDqAfh9bG1RyAfcvqkY
+	WEOonRymAnJfsDUlX44jS1zglMvyOihXLNfBkhL8wF1OuVa/9uoFO4THwqUm5hv7/wY6nyMEMgR
+	XjKtJw857s+lX0UhkAQvFW0DeG2cRjMZy2/gAiA3cJSp5Ejh7NIxPMb7gRop0y6otRA4hgyB2ME
+	g8tDu8BiAa4EZd5uPer6lzuJDg=
+X-Received: by 2002:a05:6214:5a13:b0:88a:2fb5:a085 with SMTP id 6a1803df08f44-8908429d1bdmr68994446d6.63.1767862762414;
+        Thu, 08 Jan 2026 00:59:22 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHD08pztITad85dXLvvLj/zaVI7S1hQWKy76WyLIAObgQ5gJ5PNnIvzvVBmR/unLMMKb1PuoQDxIPtYho/Irg8=
+X-Received: by 2002:a05:6214:5a13:b0:88a:2fb5:a085 with SMTP id
+ 6a1803df08f44-8908429d1bdmr68994246d6.63.1767862761950; Thu, 08 Jan 2026
+ 00:59:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nokia-bell-labs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR07MB7984.eurprd07.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8efb8b75-2ba7-4141-b074-08de4e92914a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jan 2026 08:47:34.2736
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: yCgm/v+w4c/2G1A0YB5EcSCnU8t4YJxh19W9YT+r+3per+ClzTFfSC+Eya8/SOtyceDdCVGK11Cs+vwVmLuq5wYwLeznr9b6W46r7FaU/Sqxk2/dt2fEJuEOKg1lFej6
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR07MB8963
+References: <63fddbfb.60e7.19b975c40ea.Coremail.slark_xiao@163.com>
+ <20260108020518.27086-1-ryazanov.s.a@gmail.com> <20260108020518.27086-2-ryazanov.s.a@gmail.com>
+In-Reply-To: <20260108020518.27086-2-ryazanov.s.a@gmail.com>
+From: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Date: Thu, 8 Jan 2026 09:59:10 +0100
+X-Gm-Features: AQt7F2qaLtMgbw-nlldBcRtYDWUYk02042kppIpDTdXRJEkqAipSIXtzn8PNruc
+Message-ID: <CAFEp6-17zHKA+88FfTqUKV44O18sg7Ow2HAt05ucucaXjXbSKA@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/1] net: wwan: core: explicit WWAN device reference counting
+To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        netdev@vger.kernel.org, Daniele Palmas <dnlplm@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Authority-Analysis: v=2.4 cv=ZNjaWH7b c=1 sm=1 tr=0 ts=695f71eb cx=c_pps
+ a=UgVkIMxJMSkC9lv97toC5g==:117 a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10
+ a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8
+ a=EUspDBNiAAAA:8 a=ariseCS8t_dG9Y59fBMA:9 a=QEXdDO2ut3YA:10
+ a=1HOtulTD9v-eNWfpl4qZ:22
+X-Proofpoint-ORIG-GUID: fXD9YJn_P5059xqhCUhElmgugctubgzY
+X-Proofpoint-GUID: fXD9YJn_P5059xqhCUhElmgugctubgzY
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA4MDA1OSBTYWx0ZWRfX9E7jUEwrxiIc
+ /i0ehP+UdkFTca8Y8lK2mAMNaRwstR4mdeeLsmRCjSUHpB2vVmHhgXwJnHI6TBK5VOgudhpcMeS
+ 9fM/dxq9OPMkQiYlZ8T08FztNEV8+erw5bFrx2zk42vbJLca6v+Z5Rq0c35uUdy5W2FL42yJBxd
+ 8JlXm+zP2v9mCa+4GImWKtPxrcNSH5EBRe9O5fT36Pxk3WIKSWxaaibtyjJ7Emd5nKD+jbwwEsW
+ 3Y3g9y0PVizDBb8Q7sGljts2CL1FmbXL1ptTQeoRy0PQbRyaLR/XyE2fC7uhgon0X2WALEjFTO/
+ LOpdqi1OKzfBanLqA2TfKRGR2WHWAZ7EYiAwQSK9gsRKdKg0KqyyRi6Zygt94cv70Zzt65YUgty
+ sFDnOPw7R+B5L60lkNKZrAkr/9qTnuF0WfcFrekQomRipZxDpKr66VGLpxCqFZkkCY9qTRtpzCr
+ tur8Vn/tMNEz/YzAfCw==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-08_01,2026-01-07_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 impostorscore=0 priorityscore=1501 malwarescore=0 suspectscore=0
+ adultscore=0 clxscore=1015 phishscore=0 spamscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2512120000 definitions=main-2601080059
 
-> -----Original Message-----
-> From: Paolo Abeni <pabeni@redhat.com>=20
-> Sent: Thursday, January 8, 2026 9:42 AM
-> To: Chia-Yu Chang (Nokia) <chia-yu.chang@nokia-bell-labs.com>; edumazet@g=
-oogle.com; parav@nvidia.com; linux-doc@vger.kernel.org; corbet@lwn.net; hor=
-ms@kernel.org; dsahern@kernel.org; kuniyu@google.com; bpf@vger.kernel.org; =
-netdev@vger.kernel.org; dave.taht@gmail.com; jhs@mojatatu.com; kuba@kernel.=
-org; stephen@networkplumber.org; xiyou.wangcong@gmail.com; jiri@resnulli.us=
-; davem@davemloft.net; andrew+netdev@lunn.ch; donald.hunter@gmail.com; ast@=
-fiberby.net; liuhangbin@gmail.com; shuah@kernel.org; linux-kselftest@vger.k=
-ernel.org; ij@kernel.org; ncardwell@google.com; Koen De Schepper (Nokia) <k=
-oen.de_schepper@nokia-bell-labs.com>; g.white@cablelabs.com; ingemar.s.joha=
-nsson@ericsson.com; mirja.kuehlewind@ericsson.com; cheshire <cheshire@apple=
-.com>; rs.ietf@gmx.at; Jason_Livingood@comcast.com; Vidhi Goel <vidhi_goel@=
-apple.com>
-> Subject: Re: [PATCH v7 net-next 00/13] AccECN protocol case handling seri=
-es
->=20
->=20
-> CAUTION: This is an external email. Please be very careful when clicking =
-links or opening attachments. See the URL nok.it/ext for additional informa=
-tion.
->=20
->=20
->=20
-> On 1/3/26 2:10 PM, chia-yu.chang@nokia-bell-labs.com wrote:
-> > From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> >
-> > Hello,
-> >
-> > Plesae find the v7 AccECN case handling patch series, which covers=20
-> > several excpetional case handling of Accurate ECN spec (RFC9768), adds=
-=20
-> > new identifiers to be used by CC modules, adds ecn_delta into=20
-> > rate_sample, and keeps the ACE counter for computation, etc.
-> >
-> > This patch series is part of the full AccECN patch series, which is=20
-> > available at
-> > https://eur03.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fgit=
-h
-> > ub.com%2FL4STeam%2Flinux-net-next%2Fcommits%2Fupstream_l4steam%2F&data
-> > =3D05%7C02%7Cchia-yu.chang%40nokia-bell-labs.com%7C4954fd4327e54369383b=
-0
-> > 8de4e91c0e7%7C5d4717519675428d917b70f44f9630b0%7C0%7C0%7C6390345850669
-> > 63900%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAw
-> > MCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdat
-> > a=3Dx1PbPUTrvjl2KIoU%2F53WgSDw4desZzP0TJL3tIm5QuI%3D&reserved=3D0
-> >
-> > Best regards,
-> > Chia-Yu
->=20
-> I had just a minor comment on patch 11/13. I think this deserves explicit=
- ack from Eric, Neal or Kuniyuki; please wait a little longer for them befo=
-re resend.
->=20
-> Side note: it would be great to pair the AccECN behaviours with some pktd=
-rill tests, do you have plan for it?
->=20
-> Thanks,
->=20
-> Paolo
+On Thu, Jan 8, 2026 at 3:05=E2=80=AFAM Sergey Ryazanov <ryazanov.s.a@gmail.=
+com> wrote:
+>
+> We need information about existing WWAN device children since we remove
+> the device after removing the last child. Previously, we tracked users
+> implicitly by checking whether ops was registered and existence of a
+> child device of the wwan_class class. Upcoming GNSS (NMEA) port type
+> support breaks this approach by introducing a child device of the
+> gnss_class class.
+>
+> And a modem driver can easily trigger a kernel Oops by removing regular
+> (e.g., MBIM, AT) ports first and then removing a GNSS port. The WWAN
+> device will be unregistered on removal of a last regular WWAN port. And
+> subsequent GNSS port removal will cause NULL pointer dereference in
+> simple_recursive_removal().
+>
+> In order to support ports of classes other than wwan_class, switch to
+> explicit references counting. Introduce a dedicated counter to the WWAN
+> device struct, increment it on every wwan_create_dev() call, decrement
+> on wwan_remove_dev(), and actually unregister the WWAN device when there
+> are no more references.
+>
+> Run tested with wwan_hwsim with NMEA support patches applied and
+> different port removing sequences.
+>
+> Reported-by: Daniele Palmas <dnlplm@gmail.com>
+> Closes: https://lore.kernel.org/netdev/CAGRyCJE28yf-rrfkFbzu44ygLEvoUM7fe=
+cK1vnrghjG_e9UaRA@mail.gmail.com/
+> Suggested-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+> Signed-off-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+> ---
+>  drivers/net/wwan/wwan_core.c | 29 +++++++++--------------------
+>  1 file changed, 9 insertions(+), 20 deletions(-)
+>
+> diff --git a/drivers/net/wwan/wwan_core.c b/drivers/net/wwan/wwan_core.c
+> index ade8bbffc93e..d24f7b2b435b 100644
+> --- a/drivers/net/wwan/wwan_core.c
+> +++ b/drivers/net/wwan/wwan_core.c
+> @@ -42,6 +42,9 @@ static struct dentry *wwan_debugfs_dir;
+>   * struct wwan_device - The structure that defines a WWAN device
+>   *
+>   * @id: WWAN device unique ID.
+> + * @refcount: Reference count of this WWAN device. When this refcount re=
+aches
+> + * zero, the device is deleted. NB: access is protected by global
+> + * wwan_register_lock mutex.
+>   * @dev: Underlying device.
+>   * @ops: wwan device ops
+>   * @ops_ctxt: context to pass to ops
+> @@ -49,6 +52,7 @@ static struct dentry *wwan_debugfs_dir;
+>   */
+>  struct wwan_device {
+>         unsigned int id;
+> +       unsigned int refcount;
+>         struct device dev;
+>         const struct wwan_ops *ops;
+>         void *ops_ctxt;
+> @@ -222,8 +226,10 @@ static struct wwan_device *wwan_create_dev(struct de=
+vice *parent)
+>
+>         /* If wwandev already exists, return it */
+>         wwandev =3D wwan_dev_get_by_parent(parent);
+> -       if (!IS_ERR(wwandev))
+> +       if (!IS_ERR(wwandev)) {
+> +               wwandev->refcount++;
+>                 goto done_unlock;
+> +       }
+>
+>         id =3D ida_alloc(&wwan_dev_ids, GFP_KERNEL);
+>         if (id < 0) {
+> @@ -242,6 +248,7 @@ static struct wwan_device *wwan_create_dev(struct dev=
+ice *parent)
+>         wwandev->dev.class =3D &wwan_class;
+>         wwandev->dev.type =3D &wwan_dev_type;
+>         wwandev->id =3D id;
+> +       wwandev->refcount =3D 1;
+>         dev_set_name(&wwandev->dev, "wwan%d", wwandev->id);
+>
+>         err =3D device_register(&wwandev->dev);
+> @@ -263,30 +270,12 @@ static struct wwan_device *wwan_create_dev(struct d=
+evice *parent)
+>         return wwandev;
+>  }
+>
+> -static int is_wwan_child(struct device *dev, void *data)
+> -{
+> -       return dev->class =3D=3D &wwan_class;
+> -}
+> -
+>  static void wwan_remove_dev(struct wwan_device *wwandev)
+>  {
+> -       int ret;
+> -
+>         /* Prevent concurrent picking from wwan_create_dev */
+>         mutex_lock(&wwan_register_lock);
+>
+> -       /* WWAN device is created and registered (get+add) along with its=
+ first
+> -        * child port, and subsequent port registrations only grab a refe=
+rence
+> -        * (get). The WWAN device must then be unregistered (del+put) alo=
+ng with
+> -        * its last port, and reference simply dropped (put) otherwise. I=
+n the
+> -        * same fashion, we must not unregister it when the ops are still=
+ there.
+> -        */
+> -       if (wwandev->ops)
+> -               ret =3D 1;
+> -       else
+> -               ret =3D device_for_each_child(&wwandev->dev, NULL, is_wwa=
+n_child);
+> -
+> -       if (!ret) {
+> +       if (--wwandev->refcount =3D=3D 0) {
 
-Hi Paolo,
+Looks good to me, though I=E2=80=99m not sure why this wasn=E2=80=99t the i=
+nitial
+solution. I=E2=80=99d suggest adding a paranoid WARN here, just in the
+unlikely case there are still ops or wwan children attached.
 
-Thanks for the feedback.
 
-Regarding the packetdrill cases for AccECN, shall I can include in this pat=
-ch series (v8) or is it suggested to submit them in a standalone series?
-
-Chia-Yu
+>  #ifdef CONFIG_WWAN_DEBUGFS
+>                 debugfs_remove_recursive(wwandev->debugfs_dir);
+>  #endif
+> --
+> 2.52.0
+>
 
