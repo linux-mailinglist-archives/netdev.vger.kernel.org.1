@@ -1,124 +1,158 @@
-Return-Path: <netdev+bounces-248289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65A6BD06874
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 00:20:30 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C51AFD06877
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 00:21:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 41DE5301AE07
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 23:20:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B6D1D301A636
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 23:21:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 084AD2EBDEB;
-	Thu,  8 Jan 2026 23:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBC6433CEBC;
+	Thu,  8 Jan 2026 23:21:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L4Lbe7Hp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PoYU/nyR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FBF233987
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 23:20:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767914426; cv=none; b=i0NbHFqgdSVQYR3fmGHfatB7j3rrn6wQidnS7QTo6tNGCHQiKwoxbicD1Rbi595Kkyb8hl4Cst4Iw6rxop9ysdw+JVxKfTUynGC3a5AlP3zUd4uItHZnD+WfDOiyW2Cc7IjL1yP/HxmOnqx6m6+QGABSS7AHr8r0q7uxhCOtngA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767914426; c=relaxed/simple;
-	bh=7bwQ+XZ+abLywU7PoTafW4uAbblLEvi0WeRRKdGZLhA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KypPWC+xv4DAMb/CcPZx8vtTRDkC01cf94ktEwi9YKgvAu5F6F+Gc6B0cKn09YG3njdHl/7mZ4o9qMkKmuF94anR2tTvhxbAG+yA8AKO0UZgJzOuf3MlLoRtOq/CklP+Zk5BYubOlyruz8mkVDzEvnR+Osw5FFeGEAP9e3xfWYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L4Lbe7Hp; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-47d182a8c6cso24313005e9.1
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 15:20:25 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 604F42EFDBB
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 23:20:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767914460; cv=pass; b=kkLAu9KyZ9ibZax0yFSU7J5n9Fk7EXadplSITnZq7YgKkDFWgpcT5ZFMA/qwzKAXW7dWQKgMwip0Ddycrp0h8BA2FmD/wwuBnu0U3hKCnURPq0IkYZlF5v2YtDTZbQ4+qLe/3ARj+NVk4Djxh297osvSX1z9D2vy6sB5MvAU/QY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767914460; c=relaxed/simple;
+	bh=rhCQWH/yPA2hIsQ82SImjkWBzo10eMRYT8Mz8RFa9JE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n4uu0dwdVYwFwqxJp/PXQbR65zqU/mVtnEHakIb5qD1O/ySPi1XdKdsoxkX7unQj9MYzZrPlsTkXOTnJcF09xRc13Pb3zRBxVQSFjshpsj5A0+J/NJKWLlya2aq7xtrTH9n8pzWBJYbgHOWu7QVJdplBctiS49+IMsCNs5wKsbU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PoYU/nyR; arc=pass smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4ee243b98caso79601cf.1
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 15:20:59 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1767914458; cv=none;
+        d=google.com; s=arc-20240605;
+        b=P/huK9Z1yB7IvYgwYRQqnxlU8g59brrZfrmm45J+9M2zYK/0dIoffKByl8x3zMfvHy
+         8OqIrNzp+ldzQwoSOpWQ5JliTmH9oJYZWzBN0XyZyVovym0EX80vV+eTfM+ZoRVAI7+a
+         SzI7Y8wfv4zEqgqpoC6valEmcih8TJur3aBkkl9CP8Y/TQRwDa0r40fYqGYzWQQyuqH1
+         /O6jBLrVRYNCt9OjR4+IBSLECep3vbix7uTbi5rLf2XbH0bo53/YVpMviWWtolio7U9B
+         sqUp5LU/Eq50gdR4MndjfqlXlNG2ltpGQ9JI9HePfUtJCGoNRkEloqTmY2Zdo1L2JQIy
+         SGPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=wj+2ERqBcujhHCH9Aw3uOT+r18qxiQCPwhg6TrYRXaA=;
+        fh=8CDcCm5NHD1KT4l2TBOX0zbMqFM/Vexs2xQD0DnJGJA=;
+        b=Zfr0EnNzWcE5HdbmunwhtOkcFuns5j9wDgpT+0ldecIApO9lpG9ddnSIi6p6V6AIXM
+         9lxnV1Zcvn2kKjctRfQPRzIU25ReYdC4K4ToJKdes6ykgCAxO+6CqNJbm5JFUtuucgOE
+         nkq9llQdkmw+d0gozjIVTXSuk2vJCzTh13loWixrkaQuJ8CjJbshPLZVCSS1jIel/CA3
+         9BlqlVZxyzu5XDVI30ZYsCY8w0ZOA+S6O19swzHb3nbipMILnVkbIEFyMJpXh6Hip3sq
+         ggUP5L9TM33PZoaecUdme9EUWQB90y0UesVRao2LQ1nZdqPh4baViVfaHwphjrt49qec
+         ca7Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767914424; x=1768519224; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GAPZAV/DI69pvvmVAjFT6poIAMoV1R1xs7ZH4qHwqr4=;
-        b=L4Lbe7HpUf556KQA33EsuUaZtXIpv63I9O6VknZmiq+vAyhNKfIOaB3UMUKZI7Jf/3
-         IB7/tBjEYva+5I4xe0+DZMi4mcg0Cm3Q8diK5w0adZBsN8R7v8/zQn3QIRfg21NSyXz/
-         5S1FHBonEsf9QvXGBZZI8CyN268eIVd4IbaiUPLNegnxJyBX/V3YBve/d4muV5AGR7SB
-         ygycuRPJ7Sk74e+YymObgE4LjjGqZd2TogRxwQJIXZ17uXBfKAJEQb5//C150GSNug+x
-         ph5LA0hXFCFErQeM3uvdv9KlCDCDS86kXssNKcCNc9oGTYUqiwGNT7yeIn4yawIDSDf7
-         DvkQ==
+        d=google.com; s=20230601; t=1767914458; x=1768519258; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wj+2ERqBcujhHCH9Aw3uOT+r18qxiQCPwhg6TrYRXaA=;
+        b=PoYU/nyRL6U8AMm+w6+xHu6Rp4iz1e1Zjwndtf1P91rPFzimAMia/xk5fhd449Yzxq
+         wOals5bwl/YzYefe3/yTZAjAWkISnRAZn8K1QbpSXs2ccRYiBBAN7hFiMcvfG2xwNXC1
+         K57zh+rov+V7kAdpWShLKBCoQ9SSw7P9vZDUIf9q4Q8vTWZJ0QcuRBaPhvGnNIkmk64d
+         tEo937ako0z2KeIh2dBrKuWwBp5257PoYUZg7RYNYYdqCoTlndR5zq6h3fwcT3bizaPf
+         M86h+FD6RdajgFP379GAaSe+QJc4JG99+Zv5ieYjS26cJc7oZwDse17dx9FHSYA2SaM6
+         5gIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767914424; x=1768519224;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GAPZAV/DI69pvvmVAjFT6poIAMoV1R1xs7ZH4qHwqr4=;
-        b=Tv155i7w8GQOyDbrZYYxSiWJe0waST11HA7PSYL43lmPDwyic2nirOTZNHjC5yZAJQ
-         9rhXs8f5c5kRvQ60KsFEICxZJyG7C57hbONWJ0xPZR7S86ecmgc3MOFkHQ10WsO5Tl5D
-         WXNOqSfdLE1SYsisXDJjDcvLyEHs0r6VVvUYY6JUAKuch/RygmMJpzXC8P9WR09xopTZ
-         xd8sMuOLeiJFx3E24SUfCfLiyNcZ98/ondnznPHLiNgw2v+veVyMoWYqUWKltajKqz0m
-         BRLSSFraNcA64EyzwW53elJ3/bNTSsLduFHtP8Dfa4M6yMdPKJHnF9es2gI3bjNxQEEs
-         5XUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV0t/BX5++sYCvMQ6iNUdrpiiAwYZTnRGSigNorSwuGzSzgJB+zSnsrz6KZn/mS86EfB0lsv2Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEll0yV4MWWyfhwX2Ncbvqqw91ds2lkXTnKwTEKELwQL9kIAOk
-	CPure/CTmn15o5c9rA9W07g/QRZHJ2BNbyS6yjGLEzzz7fUuq3hKzxhM
-X-Gm-Gg: AY/fxX4oov0VJMn6aEGNuqs3EQRM/ezSPPWbJuBw8EyEYercVmsJAM28FvZPrTiNxn7
-	kc51FTKEiGGrSg5Fk53GwEO6zl/27y0yc5VA29VFGYm4lKMXjTtGrtubybxkOpHvfvgqpsNBKTO
-	ws7IUVteoknWMvFLUZUQ6HPIRbmGGtg3fIazKS7ca/OtEcY5ejXz9DxpD5DvmbaFsVntRWa2FT2
-	5zq9eT5Xu+opi7nO5yWWRUquQAz5OO68H1wQYmCQO3b+5UPaI1fot+YRmE2HR8H0OlcaGrhE4aW
-	oziQ7KamYRpCW0UY91vX4jH08rppFxP7q6tfhYblEysrzrW5Lg7mauz6ZZ/emlnhIYGJ2vL8K4A
-	BwPCeqhpzKsrmNHiz+hx9bjYKtPLSjJ7uLEvai4SeF51n1wqXeDKPWjNySmmq6FVk5BsdnnjW8u
-	AGQ43PzIgvEEOju10=
-X-Google-Smtp-Source: AGHT+IH0wkNf0HJBh0WfU29N6zAqcqxpV4tj2ho3jeagdAn2EOdOlSEs8Bt3XH76R+EuTmqAwz/kqA==
-X-Received: by 2002:a05:600c:46cc:b0:45d:e28c:875a with SMTP id 5b1f17b1804b1-47d84b41034mr94045105e9.31.1767914423528;
-        Thu, 08 Jan 2026 15:20:23 -0800 (PST)
-Received: from google.com ([37.228.206.31])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d8678cad8sm51826055e9.3.2026.01.08.15.20.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 15:20:23 -0800 (PST)
-Date: Thu, 8 Jan 2026 23:20:21 +0000
-From: Fabio Baltieri <fabio.baltieri@gmail.com>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Russell King - ARM Linux <linux@armlinux.org.uk>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Michael Klein <michael@fossekall.de>,
-	Realtek linux nic maintainers <nic_swsd@realtek.com>,
-	Aleksander Jan Bajkowski <olek2@wp.pl>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next 1/2] net: phy: realtek: add PHY driver for
- RTL8127ATF
-Message-ID: <aWA7tSjnH7Kr1GCk@google.com>
-References: <52011433-79d3-4097-a2d3-d1cca1f66acb@gmail.com>
- <492763d9-9ece-41a1-a542-d09d9b77ab4a@gmail.com>
- <aWA2DswjBcFWi8eA@makrotopia.org>
+        d=1e100.net; s=20230601; t=1767914458; x=1768519258;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=wj+2ERqBcujhHCH9Aw3uOT+r18qxiQCPwhg6TrYRXaA=;
+        b=GTS0fUafOOBIKig9XuiE0mvvZl78j93nX8bZszmohBDPCOz/nbUn1yWEuwIgNasgGG
+         /NJrQqeDX7gADtO16C2hMKMuvzOQUL/D6ifBpyvxntB/m0gF7TKuLcTg4H4WeyHvHAn5
+         zcwA/lrFMgzK2+CboczVsIJ3xvl1b8BWyBly1mxmSJGrMLxkmiuJCZrO3RAWNuw6k5lw
+         wqT/eO4veASTfjXe+3VNxS3T+QP/5nu9B6U9XBWg6e6wMEOMSyf3N8jb9uE8o3GLJ/Nd
+         op0RcWvtAfAovw9CgTWhIeVsmzz9ZSMtBKUSoWHKiIv6HjJv46RS6KUYoBoIxXvZEhZl
+         +Xpw==
+X-Forwarded-Encrypted: i=1; AJvYcCVc+3Nk9LY8KmnahUazN5nSNDtqyb3y9jeqSNlzzF5OP0KZilrDxB5+5JoyJ00xTR/ZBakzihk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxP0dCMdcb1y9kAidZAQCuWDNHgjtFYoVDG9x7LxcibkzyQZTZ+
+	fJSpLtccR8w4r5+hBy0ojaZYA4wv0l8vz+LeTWO3Da9Ng6RGib2VOg+NvoSfb86uOPBsDMZLPy3
+	Yvy/935SoIgUemOUtpTV5DxNUeB5/bMdArCd2R2VL
+X-Gm-Gg: AY/fxX74uiq/qYTL9h9G3nxv/XfmP7XAMsk1K12TjtsEQx1Xwg07iwvD0auJgdzkcoZ
+	ZvPvx1E7u84yVR2tsoqvmFFhuB7hRgeEAjgTu8/eTDEyGW/QyIQXoJsE/Oqx2jkJ8rpR3wrwJLT
+	6HwmF2/KeolfL2Qk5m1jwUsY4/pcDxljjXaPpIE3zGcJzUSszUCzdFYvGsoVzR7S83/ruC4YSQV
+	YNLcgRBqqo8jnA4E3nSHes115/p9M4aQFELRXMAIx4edRGwg5nob27Ek5YJxKRjNEbCdFvGCXWd
+	Zl9RS/nckNIvS6Z03P2Jw4h2/wMCkjd/T+lu8Mcm0blfBSPH2nc0pUkXrCPpXZ1EzE06BA==
+X-Received: by 2002:a05:622a:451:b0:4ff:bffa:d9e4 with SMTP id
+ d75a77b69052e-4ffcb20efa3mr2340841cf.13.1767914457681; Thu, 08 Jan 2026
+ 15:20:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aWA2DswjBcFWi8eA@makrotopia.org>
+References: <20260108155816.36001-1-chia-yu.chang@nokia-bell-labs.com>
+ <20260108155816.36001-2-chia-yu.chang@nokia-bell-labs.com> <CADVnQykTJWJf7kjxWrdYMYaeamo20JDbd_SijTejLj1ES37j7Q@mail.gmail.com>
+In-Reply-To: <CADVnQykTJWJf7kjxWrdYMYaeamo20JDbd_SijTejLj1ES37j7Q@mail.gmail.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Thu, 8 Jan 2026 18:20:40 -0500
+X-Gm-Features: AQt7F2pqVzz9M7qiJp7DfsnUleYfVSMGUfqYVX43z4keU7aZSTGIZ7pkvS8mv_0
+Message-ID: <CADVnQynohH4UyvyKm9rUNcCMbnepJKMwhOCPRFzM5wTvpDR1ZA@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/1] selftests/net: Add packetdrill packetdrill cases
+To: chia-yu.chang@nokia-bell-labs.com
+Cc: pabeni@redhat.com, edumazet@google.com, parav@nvidia.com, 
+	linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org, 
+	dsahern@kernel.org, kuniyu@google.com, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com, 
+	kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com, 
+	jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch, 
+	donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com, 
+	shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org, 
+	koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com, 
+	ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com, 
+	cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com, 
+	vidhi_goel@apple.com, Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 08, 2026 at 10:56:14PM +0000, Daniel Golle wrote:
-> > +static int rtlgen_sfp_read_status(struct phy_device *phydev)
-> > +{
-> > +	int val, err;
-> > +
-> > +	err = genphy_update_link(phydev);
-> > +	if (err)
-> > +		return err;
-> > +
-> > +	if (!phydev->link)
-> > +		return 0;
-> > +
-> > +	val = rtlgen_read_vend2(phydev, RTL_VND2_PHYSR);
-> 
-> This should be the same as
-> phy_read(phydev, MII_RESV2); /* on page 0 */
-> Please try.
+On Thu, Jan 8, 2026 at 5:46=E2=80=AFPM Neal Cardwell <ncardwell@google.com>=
+ wrote:
+>
+> On Thu, Jan 8, 2026 at 10:58=E2=80=AFAM <chia-yu.chang@nokia-bell-labs.co=
+m> wrote:
+> >
+> > From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> >
+> > Linux Accurate ECN test sets using ACE counters and AccECN options to
+> > cover several scenarios: Connection teardown, different ACK conditions,
+> > counter wrapping, SACK space grabbing, fallback schemes, negotiation
+> > retransmission/reorder/loss, AccECN option drop/loss, different
+> > handshake reflectors, data with marking, and different sysctl values.
+> >
+> > Co-developed-by: Ilpo J=C3=A4rvinen <ij@kernel.org>
+> > Signed-off-by: Ilpo J=C3=A4rvinen <ij@kernel.org>
+> > Co-developed-by: Neal Cardwell <ncardwell@google.com>
+> > Signed-off-by: Neal Cardwell <ncardwell@google.com>
+> > ---
+>
+> Chia-Yu, thank you for posting the packetdrill tests.
+>
+> A couple thoughts:
+>
+> (1) These tests are using the experimental AccECN packetdrill support
+> that is not in mainline packetdrill yet. Can you please share the
+> github URL for the version of packetdrill you used? I will work on
+> merging the appropriate experimental AccECN packetdrill support into
+> the Google packetdrill mainline branch.
 
-Tried it on my setup, the two calls do indeed seem to return the same
-value.
+Oh, for that part I see you mentioned this already in the cover letter:
+
+  The used packetdrill is commit 6f2116af6b7e1936a53e80ab31b77f74abda1aaa
+  of the branch: https://github.com/minuscat/packetdrill_accecn
+
+Thanks!
+neal
 
