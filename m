@@ -1,949 +1,1312 @@
-Return-Path: <netdev+bounces-248216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A36ED05430
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 18:58:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84FBFD05A33
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 19:46:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C1917309E9C3
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 17:54:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9595E3156135
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 17:55:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84A692EC0B3;
-	Thu,  8 Jan 2026 17:54:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64C7F2E8B9F;
+	Thu,  8 Jan 2026 17:55:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S8A9KR1/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MNEpuExC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E472E8DFD;
-	Thu,  8 Jan 2026 17:54:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB2522E7F0A;
+	Thu,  8 Jan 2026 17:55:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767894842; cv=none; b=eRw2S/CrSR/Z+OVm6ornHa86JmveHkKTj8gkr0R3Y8hngbjZCrXz98bGvu0vlQq4sPzwtBAudMhKFyB5sm7Q+o1yEehTVdepXuQn2x9g37SCTivS6dI5LJR5mdo/lE6YSPzL/GJksNzyOnVebRfboj0xBGVx/iK4lrqaRDLAuVw=
+	t=1767894954; cv=none; b=H/s7DP4fSAfCQnrShCT0W1uzFkd4P9vyNQTYbfc8CmElnLfTKZmiDv2QwYIaE6y2scQAd/v21f7LJWCKyGYgKNJhlxpYtyjB9Y53OJBBlS7qgSkGIeybSU2jYaMidVNAdoT23SCrefX7ad+Mu+cBoVXw6iXfK2m1cEbdeag35x8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767894842; c=relaxed/simple;
-	bh=XhMdckBQEozroMmVJtq6WzdPWV2xeheplbnmN6AiSLI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mTEKIFteEXXMcX3s+xvxYhI3muCQiqZwC72+eViscXjFUnnGZ/tbbqCtzyuE9AO3Zc8phxqipsrlIa7hbz7geEOrO0ZT13JQlOqzke2aZuF+cS/zR0KqIXlzVJ48sonNccEGB2Jf0vr7q6l8q+FFgV/X+BQLSuhpBmuJMzPtCbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S8A9KR1/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8AABC116C6;
-	Thu,  8 Jan 2026 17:53:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767894842;
-	bh=XhMdckBQEozroMmVJtq6WzdPWV2xeheplbnmN6AiSLI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=S8A9KR1/mZlIqe5BDLemIsKiTwDtLHt3W494ck1q2cDHqd4eUrwBvuLv3qVW8TbsJ
-	 GlazU43AR2yvdojM7nRekffxkBg2sS10TLARYogYB1MsxNyRntMBc5R++auRNTt6B4
-	 mpLPJwnQgorcldDft2WDVrezeLWUT5gNZb+ECAsX43c3hE17XQK6d5JrzkCrYJppOS
-	 KjgPLE88/Lu1ysoCCXh656434bz9FqLjha0CGuTA72BdPnJjxcAyvsNw2xWfYHfR7z
-	 9Ua7yWhT5AEMRp+tSeW+LByMkHAIfnG3FzqF/uMsals7youdPr/voJnUHV+C8Yw6Lp
-	 sz6S6mrssWdjQ==
-Date: Thu, 8 Jan 2026 17:53:57 +0000
-From: Simon Horman <horms@kernel.org>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	sgoutham@marvell.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
-	sumang@marvell.com
-Subject: Re: [PATCH net-next 01/13] octeontx2-af: npc: cn20k: Index management
-Message-ID: <20260108175357.GJ345651@kernel.org>
-References: <20260105023254.1426488-1-rkannoth@marvell.com>
- <20260105023254.1426488-2-rkannoth@marvell.com>
+	s=arc-20240116; t=1767894954; c=relaxed/simple;
+	bh=+Fa0hifhGlchTYdpqcrqARHHey22di9gkd6hroHz9s4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EJKyd/GhRk2FpxcHR3Ecsi7MbWxNO+4RSxiviMtOEAcmW35vpr/GHxn+M1+THFGH6smqg3UNb0x60l2pXtGBFUhYJZjpJOgPCAxi5kjGW332ArAArN7RBEVA6g3Ias4J9cMyRUetEYPQ0LR5f8FuTUj+5OVcVW+9C4xlx+t60lo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MNEpuExC; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1767894952; x=1799430952;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=+Fa0hifhGlchTYdpqcrqARHHey22di9gkd6hroHz9s4=;
+  b=MNEpuExCP9zn66+ovokut0hFeDAzf/Yfrnm/n8rcmXalbmmf3jx+Q+PG
+   EuepHJe0+oqWh1Dj++nPi7ipsho3FTGlLGxc9I5v/SamAmmEu/NkeEL9A
+   dQ5Af5ol7Zid4ihM99YicmDrvg9F0SBu4CDmdxpzLALEYp2Eoh4CEtesU
+   zTyF9qCNfXaVsF8D3aWgMuXAwZ5qStnOWJMFBnAW0imfF5g2+K5PqrFAR
+   iefOYW5CpICCavbdYLb7T4HUZuew3vRnkkfzN/e2g8HTNdnPJihouiwMT
+   YBXI3hZEJPdbIT7s3fsJTC1Zv7uGNnhS5hRXo47ZF9LJcuUhoMb+0cw6J
+   w==;
+X-CSE-ConnectionGUID: wMFx4p9URyWFrwfc/JwXQg==
+X-CSE-MsgGUID: imuriOjhTUiPL0CeIVc0xQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11665"; a="94751425"
+X-IronPort-AV: E=Sophos;i="6.21,211,1763452800"; 
+   d="scan'208";a="94751425"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2026 09:55:50 -0800
+X-CSE-ConnectionGUID: OPCGqI7wQ7iJfsgWzylGAw==
+X-CSE-MsgGUID: 57IvlF7ZSfeOUtYg8Wjfvw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,211,1763452800"; 
+   d="scan'208";a="207802923"
+Received: from rchatre-mobl4.amr.corp.intel.com (HELO [10.125.109.207]) ([10.125.109.207])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2026 09:55:48 -0800
+Message-ID: <71fd5c95-3734-479f-b1dd-9a2b48fdeb74@intel.com>
+Date: Thu, 8 Jan 2026 10:55:46 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260105023254.1426488-2-rkannoth@marvell.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 26/35] NTB: ntb_transport: Introduce DW eDMA backed
+ transport mode
+To: Koichiro Den <den@valinux.co.jp>
+Cc: Frank.Li@nxp.com, ntb@lists.linux.dev, linux-pci@vger.kernel.org,
+ dmaengine@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, mani@kernel.org,
+ kwilczynski@kernel.org, kishon@kernel.org, bhelgaas@google.com,
+ corbet@lwn.net, geert+renesas@glider.be, magnus.damm@gmail.com,
+ robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, vkoul@kernel.org,
+ joro@8bytes.org, will@kernel.org, robin.murphy@arm.com, jdmason@kudzu.us,
+ allenbh@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ Basavaraj.Natikar@amd.com, Shyam-sundar.S-k@amd.com,
+ kurt.schwemmer@microsemi.com, logang@deltatee.com, jingoohan1@gmail.com,
+ lpieralisi@kernel.org, utkarsh02t@gmail.com, jbrunet@baylibre.com,
+ dlemoal@kernel.org, arnd@arndb.de, elfring@users.sourceforge.net
+References: <20251217151609.3162665-1-den@valinux.co.jp>
+ <20251217151609.3162665-27-den@valinux.co.jp>
+ <e3229f31-e781-4680-aed1-05ad5174a793@intel.com>
+ <gvwki3y5bec5lr4eukzreuojw4t55og72bnuoh74gmbgrdbtiq@c5qgmt5cdygd>
+ <cb83f12f-14f9-4df1-bd43-c127a06bb7dc@intel.com>
+ <rlqffb3dnvalfjj4vcbmqkraqxmqdv5vd4tpqq2cssyuwrydc3@ujkesovxdgfy>
+Content-Language: en-US
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <rlqffb3dnvalfjj4vcbmqkraqxmqdv5vd4tpqq2cssyuwrydc3@ujkesovxdgfy>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 05, 2026 at 08:02:42AM +0530, Ratheesh Kannoth wrote:
 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.c
-> index 498968bf4cf5..c7c59a98d969 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/debugfs.c
-> @@ -11,7 +11,189 @@
->  #include <linux/pci.h>
->  
->  #include "struct.h"
-> +#include "rvu.h"
->  #include "debugfs.h"
-> +#include "cn20k/npc.h"
-> +
-> +static void npc_subbank_srch_order_dbgfs_usage(void)
-> +{
-> +	pr_err("Usage: echo \"[0]=[8],[1]=7,[2]=30,...[31]=0\" > <debugfs>/subbank_srch_order\n");
-> +}
-> +
-> +static int
-> +npc_subbank_srch_order_parse_n_fill(struct rvu *rvu, char *options,
-> +				    int num_subbanks)
-> +{
-> +	unsigned long w1 = 0, w2 = 0;
-> +	char *p, *t1, *t2;
-> +	int (*arr)[2];
-> +	int idx, val;
-> +	int cnt, ret;
-> +
-> +	cnt = 0;
-> +
-> +	options[strcspn(options, "\r\n")] = 0;
-> +
-> +	arr = kcalloc(num_subbanks, sizeof(*arr), GFP_KERNEL);
-> +	if (!arr)
-> +		return -ENOMEM;
-> +
-> +	while ((p = strsep(&options, " ,")) != NULL) {
-> +		if (!*p)
-> +			continue;
-> +
-> +		t1 = strsep(&p, "=");
-> +		t2 = strsep(&p, "");
-> +
-> +		if (strlen(t1) < 3) {
-> +			pr_err("%s:%d Bad Token %s=%s\n",
-> +			       __func__, __LINE__, t1, t2);
-> +			goto err;
-> +		}
-> +
-> +		if (t1[0] != '[' || t1[strlen(t1) - 1] != ']') {
-> +			pr_err("%s:%d Bad Token %s=%s\n",
-> +			       __func__, __LINE__, t1, t2);
 
-Hi Ratheesh,
+On 1/7/26 6:25 PM, Koichiro Den wrote:
+> On Wed, Jan 07, 2026 at 12:02:15PM -0700, Dave Jiang wrote:
+>>
+>>
+>> On 1/7/26 7:54 AM, Koichiro Den wrote:
+>>> On Tue, Jan 06, 2026 at 11:51:03AM -0700, Dave Jiang wrote:
+>>>>
+>>>>
+>>>> On 12/17/25 8:16 AM, Koichiro Den wrote:
+>>>>> Add a new ntb_transport backend that uses a DesignWare eDMA engine
+>>>>> located on the endpoint, to be driven by both host and endpoint.
+>>>>>
+>>>>> The endpoint exposes a dedicated memory window which contains the eDMA
+>>>>> register block, a small control structure (struct ntb_edma_info) and
+>>>>> per-channel linked-list (LL) rings for read channels. Endpoint drives
+>>>>> its local eDMA write channels for its transmission, while host side
+>>>>> uses the remote eDMA read channels for its transmission.
+>>>>>
+>>>>> A key benefit of this backend is that the memory window no longer needs
+>>>>> to carry data-plane payload. This makes the design less sensitive to
+>>>>> limited memory window space and allows scaling to multiple queue pairs.
+>>>>> The memory window layout is specific to the eDMA-backed backend, so
+>>>>> there is no automatic fallback to the memcpy-based default transport
+>>>>> that requires the different layout.
+>>>>>
+>>>>> Signed-off-by: Koichiro Den <den@valinux.co.jp>
+>>>>> ---
+>>>>>  drivers/ntb/Kconfig                  |  12 +
+>>>>>  drivers/ntb/Makefile                 |   2 +
+>>>>>  drivers/ntb/ntb_transport_core.c     |  15 +-
+>>>>>  drivers/ntb/ntb_transport_edma.c     | 987 +++++++++++++++++++++++++++
+>>>>>  drivers/ntb/ntb_transport_internal.h |  15 +
+>>>>>  5 files changed, 1029 insertions(+), 2 deletions(-)
+>>>>>  create mode 100644 drivers/ntb/ntb_transport_edma.c
+>>>>>
+>>>>> diff --git a/drivers/ntb/Kconfig b/drivers/ntb/Kconfig
+>>>>> index df16c755b4da..5ba6d0b7f5ba 100644
+>>>>> --- a/drivers/ntb/Kconfig
+>>>>> +++ b/drivers/ntb/Kconfig
+>>>>> @@ -37,4 +37,16 @@ config NTB_TRANSPORT
+>>>>>  
+>>>>>  	 If unsure, say N.
+>>>>>  
+>>>>> +config NTB_TRANSPORT_EDMA
+>>>>> +	bool "NTB Transport backed by remote eDMA"
+>>>>> +	depends on NTB_TRANSPORT
+>>>>> +	depends on PCI
+>>>>> +	select DMA_ENGINE
+>>>>> +	select NTB_EDMA
+>>>>> +	help
+>>>>> +	  Enable a transport backend that uses a remote DesignWare eDMA engine
+>>>>> +	  exposed through a dedicated NTB memory window. The host uses the
+>>>>> +	  endpoint's eDMA engine to move data in both directions.
+>>>>> +	  Say Y here if you intend to use the 'use_remote_edma' module parameter.
+>>>>> +
+>>>>>  endif # NTB
+>>>>> diff --git a/drivers/ntb/Makefile b/drivers/ntb/Makefile
+>>>>> index 9b66e5fafbc0..b9086b32ecde 100644
+>>>>> --- a/drivers/ntb/Makefile
+>>>>> +++ b/drivers/ntb/Makefile
+>>>>> @@ -6,3 +6,5 @@ ntb-y			:= core.o
+>>>>>  ntb-$(CONFIG_NTB_MSI)	+= msi.o
+>>>>>  
+>>>>>  ntb_transport-y		:= ntb_transport_core.o
+>>>>> +ntb_transport-$(CONFIG_NTB_TRANSPORT_EDMA)	+= ntb_transport_edma.o
+>>>>> +ntb_transport-$(CONFIG_NTB_TRANSPORT_EDMA)	+= hw/edma/ntb_hw_edma.o
+>>>>> diff --git a/drivers/ntb/ntb_transport_core.c b/drivers/ntb/ntb_transport_core.c
+>>>>> index 40c2548f5930..bd21232f26fe 100644
+>>>>> --- a/drivers/ntb/ntb_transport_core.c
+>>>>> +++ b/drivers/ntb/ntb_transport_core.c
+>>>>> @@ -104,6 +104,12 @@ module_param(use_msi, bool, 0644);
+>>>>>  MODULE_PARM_DESC(use_msi, "Use MSI interrupts instead of doorbells");
+>>>>>  #endif
+>>>>>  
+>>>>> +bool use_remote_edma;
+>>>>> +#ifdef CONFIG_NTB_TRANSPORT_EDMA
+>>>>> +module_param(use_remote_edma, bool, 0644);
+>>>>> +MODULE_PARM_DESC(use_remote_edma, "Use remote eDMA mode (when enabled, use_msi is ignored)");
+>>>>> +#endif
+>>>>
+>>>> This seems clunky. Can the ntb_transport_core determine this when the things are called through ntb_transport_edma? Or maybe a set_transport_type can be introduced by the transport itself during allocation?
+>>>
+>>> Agreed. I plan to drop 'use_remote_edma' and instead,
+>>> - add a module parameter: transport_type={"default","edma"} (defaulting to "default"),
+>>> - introduce ntb_transport_backend_register() for transports to self-register via
+>>>   struct ntb_transport_backend { .name, .ops }, and
+>>> - have the core select the backend whose .name matches transport_type.
+>>>
+>>> I think this should keep any non-default transport-specific logic out of
+>>> ntb_transport_core, or at least keep it to a minimum, while still allowing
+>>> non-defualt transports (*ntb_transport_edma is the only choice for now
+>>> though) to plug in cleanly.
+>>>
+>>> If you see a cleaner approach, I would appreciate it if you could elaborate
+>>> a bit more on your idea.
+>>
+> 
+> Thank you for the comment, let me respond inline below.
+> 
+>> Do you think it's flexible enough that we can determine a transport type per 'ntb_transport_mw' or is this an all or nothing type of thing?
+> 
+> At least in the current implementation, the remote eDMA use is an
+> all-or-nothing type rather than something that can be selected per
+> ntb_transport_mw.
+> 
+> The way remote eDMA consumes MW is quite similar to how ntb_msi uses them
+> today. Assuming multiple MWs are available, the last MW is reserved to
+> expose the remote eDMA info/register/LL regions to the host by packing all
+> of them into a single MW. In that sense, it does not map naturally to a
+> per-MW selection model.
+> 
+>> I'm trying to see if we can do away with the module param.
+> 
+> I think it is useful to keep an explicit way for an administrator to choose
+> the transport type (default vs edma). Even on platforms where dw-edma is
+> available, there can potentially be platform-specific or hard-to-reproduce
+> issues (e.g. problems that only show up with certain transfer patterns),
+> and having a way to fall back the long-existing traditional transport can
+> be valuable.
+> 
+> That said, I am not opposed to making the default behavior an automatic
+> selection, where edma is chosen when it's available and the parameter is
+> left unset.
+> 
+>> Or I guess when you probe ntb_netdev, the selection would happen there and thus transport_type would be in ntb_netdev module?
+> 
+> I'm not sure how selecting the transport type at ntb_netdev probe time
+> would work in practice, and what additional benefit that would provide.
 
-FWIIW, I would advocate slightly more descriptive and thus unique
-error messages and dropping __func__ and __LINE__ from logs,
-here and elsewhere.
+So currently ntb_netdev or ntb_transport are not auto-loaded right? They are manually probed by the user. So with the new transport, the user would modprobe ntb_transport_edma.ko. And that would trigger the eDMA transport setup right? With the ntb_transport_core library existing, we should be able to load both the ntb_transport_host and ntb_transport_edma at the same time theoretically. And ntb_netdev should be able to select one or the other transport. This is the most versatile scenario. An alternative is there can be only 1 transport ever loaded, and when ntb_transport_edma is loaded, it just looks like the default transport and netdev functions as it always has without knowing what the underneath transport is. On the platform if there are multiple NTB ports, it would be nice to have the flexibility of allowing each port choose the usage of the current transport and the edma transport if the user desires.
 
-The __func__, and in particular __LINE__ information will only
-tend to change as the file is up dated, and so any debugging will
-need to know the source that the kernel was compiled from.
+DJ
 
-And I'd say that given the state of debugging functionality in the kernel -
-e..g dynamic tracepoints - this is not as useful as it may seem at first.
+> 
+> Kind regards,
+> Koichiro
+> 
+>>
+>>>
+>>> Thanks,
+>>> Koichiro
+>>>
+>>>>
+>>>> DJ
+>>>>
+>>>>> +
+>>>>>  static struct dentry *nt_debugfs_dir;
+>>>>>  
+>>>>>  /* Only two-ports NTB devices are supported */
+>>>>> @@ -156,7 +162,7 @@ enum {
+>>>>>  #define drv_client(__drv) \
+>>>>>  	container_of((__drv), struct ntb_transport_client, driver)
+>>>>>  
+>>>>> -#define NTB_QP_DEF_NUM_ENTRIES	100
+>>>>> +#define NTB_QP_DEF_NUM_ENTRIES	128
+>>>>>  #define NTB_LINK_DOWN_TIMEOUT	10
+>>>>>  
+>>>>>  static void ntb_transport_rxc_db(unsigned long data);
+>>>>> @@ -1189,7 +1195,11 @@ static int ntb_transport_probe(struct ntb_client *self, struct ntb_dev *ndev)
+>>>>>  
+>>>>>  	nt->ndev = ndev;
+>>>>>  
+>>>>> -	rc = ntb_transport_default_init(nt);
+>>>>> +	if (use_remote_edma)
+>>>>> +		rc = ntb_transport_edma_init(nt);
+>>>>> +	else
+>>>>> +		rc = ntb_transport_default_init(nt);
+>>>>> +
+>>>>>  	if (rc)
+>>>>>  		return rc;
+>>>>>  
+>>>>> @@ -1950,6 +1960,7 @@ ntb_transport_create_queue(void *data, struct device *client_dev,
+>>>>>  
+>>>>>  	nt->qp_bitmap_free &= ~qp_bit;
+>>>>>  
+>>>>> +	qp->qp_bit = qp_bit;
+>>>>>  	qp->cb_data = data;
+>>>>>  	qp->rx_handler = handlers->rx_handler;
+>>>>>  	qp->tx_handler = handlers->tx_handler;
+>>>>> diff --git a/drivers/ntb/ntb_transport_edma.c b/drivers/ntb/ntb_transport_edma.c
+>>>>> new file mode 100644
+>>>>> index 000000000000..6ae5da0a1367
+>>>>> --- /dev/null
+>>>>> +++ b/drivers/ntb/ntb_transport_edma.c
+>>>>> @@ -0,0 +1,987 @@
+>>>>> +// SPDX-License-Identifier: GPL-2.0-only
+>>>>> +/*
+>>>>> + * NTB transport backend for remote DesignWare eDMA.
+>>>>> + *
+>>>>> + * This implements the backend_ops used when use_remote_edma=1 and
+>>>>> + * relies on drivers/ntb/hw/edma/ for low-level eDMA/MW programming.
+>>>>> + */
+>>>>> +
+>>>>> +#include <linux/bug.h>
+>>>>> +#include <linux/compiler.h>
+>>>>> +#include <linux/debugfs.h>
+>>>>> +#include <linux/dmaengine.h>
+>>>>> +#include <linux/dma-mapping.h>
+>>>>> +#include <linux/errno.h>
+>>>>> +#include <linux/io-64-nonatomic-lo-hi.h>
+>>>>> +#include <linux/ntb.h>
+>>>>> +#include <linux/pci.h>
+>>>>> +#include <linux/pci-epc.h>
+>>>>> +#include <linux/seq_file.h>
+>>>>> +#include <linux/slab.h>
+>>>>> +
+>>>>> +#include "hw/edma/ntb_hw_edma.h"
+>>>>> +#include "ntb_transport_internal.h"
+>>>>> +
+>>>>> +#define NTB_EDMA_RING_ORDER	7
+>>>>> +#define NTB_EDMA_RING_ENTRIES	(1U << NTB_EDMA_RING_ORDER)
+>>>>> +#define NTB_EDMA_RING_MASK	(NTB_EDMA_RING_ENTRIES - 1)
+>>>>> +
+>>>>> +#define NTB_EDMA_MAX_POLL	32
+>>>>> +
+>>>>> +/*
+>>>>> + * Remote eDMA mode implementation
+>>>>> + */
+>>>>> +struct ntb_transport_ctx_edma {
+>>>>> +	remote_edma_mode_t remote_edma_mode;
+>>>>> +	struct device *dma_dev;
+>>>>> +	struct workqueue_struct *wq;
+>>>>> +	struct ntb_edma_chans chans;
+>>>>> +};
+>>>>> +
+>>>>> +struct ntb_transport_qp_edma {
+>>>>> +	struct ntb_transport_qp *qp;
+>>>>> +
+>>>>> +	/*
+>>>>> +	 * For ensuring peer notification in non-atomic context.
+>>>>> +	 * ntb_peer_db_set might sleep or schedule.
+>>>>> +	 */
+>>>>> +	struct work_struct db_work;
+>>>>> +
+>>>>> +	u32 rx_prod;
+>>>>> +	u32 rx_cons;
+>>>>> +	u32 tx_cons;
+>>>>> +	u32 tx_issue;
+>>>>> +
+>>>>> +	spinlock_t rx_lock;
+>>>>> +	spinlock_t tx_lock;
+>>>>> +
+>>>>> +	struct work_struct rx_work;
+>>>>> +	struct work_struct tx_work;
+>>>>> +};
+>>>>> +
+>>>>> +struct ntb_edma_desc {
+>>>>> +	u32 len;
+>>>>> +	u32 flags;
+>>>>> +	u64 addr; /* DMA address */
+>>>>> +	u64 data;
+>>>>> +};
+>>>>> +
+>>>>> +struct ntb_edma_ring {
+>>>>> +	struct ntb_edma_desc desc[NTB_EDMA_RING_ENTRIES];
+>>>>> +	u32 head;
+>>>>> +	u32 tail;
+>>>>> +};
+>>>>> +
+>>>>> +static inline bool ntb_qp_edma_is_rc(struct ntb_transport_qp *qp)
+>>>>> +{
+>>>>> +	struct ntb_transport_ctx_edma *ctx = qp->transport->priv;
+>>>>> +
+>>>>> +	return ctx->remote_edma_mode == REMOTE_EDMA_RC;
+>>>>> +}
+>>>>> +
+>>>>> +static inline bool ntb_qp_edma_is_ep(struct ntb_transport_qp *qp)
+>>>>> +{
+>>>>> +	struct ntb_transport_ctx_edma *ctx = qp->transport->priv;
+>>>>> +
+>>>>> +	return ctx->remote_edma_mode == REMOTE_EDMA_EP;
+>>>>> +}
+>>>>> +
+>>>>> +static inline bool ntb_qp_edma_enabled(struct ntb_transport_qp *qp)
+>>>>> +{
+>>>>> +	return ntb_qp_edma_is_rc(qp) || ntb_qp_edma_is_ep(qp);
+>>>>> +}
+>>>>> +
+>>>>> +static inline unsigned int ntb_edma_ring_sel(struct ntb_transport_qp *qp,
+>>>>> +					     unsigned int n)
+>>>>> +{
+>>>>> +	return n ^ !!ntb_qp_edma_is_ep(qp);
+>>>>> +}
+>>>>> +
+>>>>> +static inline struct ntb_edma_ring *
+>>>>> +ntb_edma_ring_local(struct ntb_transport_qp *qp, unsigned int n)
+>>>>> +{
+>>>>> +	unsigned int r = ntb_edma_ring_sel(qp, n);
+>>>>> +
+>>>>> +	return &((struct ntb_edma_ring *)qp->rx_buff)[r];
+>>>>> +}
+>>>>> +
+>>>>> +static inline struct ntb_edma_ring __iomem *
+>>>>> +ntb_edma_ring_remote(struct ntb_transport_qp *qp, unsigned int n)
+>>>>> +{
+>>>>> +	unsigned int r = ntb_edma_ring_sel(qp, n);
+>>>>> +
+>>>>> +	return &((struct ntb_edma_ring __iomem *)qp->tx_mw)[r];
+>>>>> +}
+>>>>> +
+>>>>> +static inline struct ntb_edma_desc *
+>>>>> +ntb_edma_desc_local(struct ntb_transport_qp *qp, unsigned int n, unsigned int i)
+>>>>> +{
+>>>>> +	return &ntb_edma_ring_local(qp, n)->desc[i];
+>>>>> +}
+>>>>> +
+>>>>> +static inline struct ntb_edma_desc __iomem *
+>>>>> +ntb_edma_desc_remote(struct ntb_transport_qp *qp, unsigned int n,
+>>>>> +		     unsigned int i)
+>>>>> +{
+>>>>> +	return &ntb_edma_ring_remote(qp, n)->desc[i];
+>>>>> +}
+>>>>> +
+>>>>> +static inline u32 *ntb_edma_head_local(struct ntb_transport_qp *qp,
+>>>>> +				       unsigned int n)
+>>>>> +{
+>>>>> +	return &ntb_edma_ring_local(qp, n)->head;
+>>>>> +}
+>>>>> +
+>>>>> +static inline u32 __iomem *ntb_edma_head_remote(struct ntb_transport_qp *qp,
+>>>>> +						unsigned int n)
+>>>>> +{
+>>>>> +	return &ntb_edma_ring_remote(qp, n)->head;
+>>>>> +}
+>>>>> +
+>>>>> +static inline u32 *ntb_edma_tail_local(struct ntb_transport_qp *qp,
+>>>>> +				       unsigned int n)
+>>>>> +{
+>>>>> +	return &ntb_edma_ring_local(qp, n)->tail;
+>>>>> +}
+>>>>> +
+>>>>> +static inline u32 __iomem *ntb_edma_tail_remote(struct ntb_transport_qp *qp,
+>>>>> +						unsigned int n)
+>>>>> +{
+>>>>> +	return &ntb_edma_ring_remote(qp, n)->tail;
+>>>>> +}
+>>>>> +
+>>>>> +/* The 'i' must be generated by ntb_edma_ring_idx() */
+>>>>> +#define NTB_DESC_TX_O(qp, i)	ntb_edma_desc_remote(qp, 0, i)
+>>>>> +#define NTB_DESC_TX_I(qp, i)	ntb_edma_desc_local(qp, 0, i)
+>>>>> +#define NTB_DESC_RX_O(qp, i)	ntb_edma_desc_remote(qp, 1, i)
+>>>>> +#define NTB_DESC_RX_I(qp, i)	ntb_edma_desc_local(qp, 1, i)
+>>>>> +
+>>>>> +#define NTB_HEAD_TX_I(qp)	ntb_edma_head_local(qp, 0)
+>>>>> +#define NTB_HEAD_RX_O(qp)	ntb_edma_head_remote(qp, 1)
+>>>>> +
+>>>>> +#define NTB_TAIL_TX_O(qp)	ntb_edma_tail_remote(qp, 0)
+>>>>> +#define NTB_TAIL_RX_I(qp)	ntb_edma_tail_local(qp, 1)
+>>>>> +
+>>>>> +/* ntb_edma_ring helpers */
+>>>>> +static __always_inline u32 ntb_edma_ring_idx(u32 v)
+>>>>> +{
+>>>>> +	return v & NTB_EDMA_RING_MASK;
+>>>>> +}
+>>>>> +
+>>>>> +static __always_inline u32 ntb_edma_ring_used_entry(u32 head, u32 tail)
+>>>>> +{
+>>>>> +	if (head >= tail) {
+>>>>> +		WARN_ON_ONCE((head - tail) > (NTB_EDMA_RING_ENTRIES - 1));
+>>>>> +		return head - tail;
+>>>>> +	}
+>>>>> +
+>>>>> +	WARN_ON_ONCE((U32_MAX - tail + head + 1) > (NTB_EDMA_RING_ENTRIES - 1));
+>>>>> +	return U32_MAX - tail + head + 1;
+>>>>> +}
+>>>>> +
+>>>>> +static __always_inline u32 ntb_edma_ring_free_entry(u32 head, u32 tail)
+>>>>> +{
+>>>>> +	return NTB_EDMA_RING_ENTRIES - ntb_edma_ring_used_entry(head, tail) - 1;
+>>>>> +}
+>>>>> +
+>>>>> +static __always_inline bool ntb_edma_ring_full(u32 head, u32 tail)
+>>>>> +{
+>>>>> +	return ntb_edma_ring_free_entry(head, tail) == 0;
+>>>>> +}
+>>>>> +
+>>>>> +static unsigned int ntb_transport_edma_tx_free_entry(struct ntb_transport_qp *qp)
+>>>>> +{
+>>>>> +	struct ntb_transport_qp_edma *edma = qp->priv;
+>>>>> +	unsigned int head, tail;
+>>>>> +
+>>>>> +	scoped_guard(spinlock_irqsave, &edma->tx_lock) {
+>>>>> +		/* In this scope, only 'head' might proceed */
+>>>>> +		tail = READ_ONCE(edma->tx_issue);
+>>>>> +		head = READ_ONCE(*NTB_HEAD_TX_I(qp));
+>>>>> +	}
+>>>>> +	/*
+>>>>> +	 * 'used' amount indicates how much the other end has refilled,
+>>>>> +	 * which are available for us to use for TX.
+>>>>> +	 */
+>>>>> +	return ntb_edma_ring_used_entry(head, tail);
+>>>>> +}
+>>>>> +
+>>>>> +static void ntb_transport_edma_debugfs_stats_show(struct seq_file *s,
+>>>>> +						  struct ntb_transport_qp *qp)
+>>>>> +{
+>>>>> +	seq_printf(s, "rx_bytes - \t%llu\n", qp->rx_bytes);
+>>>>> +	seq_printf(s, "rx_pkts - \t%llu\n", qp->rx_pkts);
+>>>>> +	seq_printf(s, "rx_err_no_buf - %llu\n", qp->rx_err_no_buf);
+>>>>> +	seq_printf(s, "rx_buff - \t0x%p\n", qp->rx_buff);
+>>>>> +	seq_printf(s, "rx_max_entry - \t%u\n", qp->rx_max_entry);
+>>>>> +	seq_printf(s, "rx_alloc_entry - \t%u\n\n", qp->rx_alloc_entry);
+>>>>> +
+>>>>> +	seq_printf(s, "tx_bytes - \t%llu\n", qp->tx_bytes);
+>>>>> +	seq_printf(s, "tx_pkts - \t%llu\n", qp->tx_pkts);
+>>>>> +	seq_printf(s, "tx_ring_full - \t%llu\n", qp->tx_ring_full);
+>>>>> +	seq_printf(s, "tx_err_no_buf - %llu\n", qp->tx_err_no_buf);
+>>>>> +	seq_printf(s, "tx_mw - \t0x%p\n", qp->tx_mw);
+>>>>> +	seq_printf(s, "tx_max_entry - \t%u\n", qp->tx_max_entry);
+>>>>> +	seq_printf(s, "free tx - \t%u\n", ntb_transport_tx_free_entry(qp));
+>>>>> +	seq_putc(s, '\n');
+>>>>> +
+>>>>> +	seq_puts(s, "Using Remote eDMA - Yes\n");
+>>>>> +	seq_printf(s, "QP Link - \t%s\n", qp->link_is_up ? "Up" : "Down");
+>>>>> +}
+>>>>> +
+>>>>> +static void ntb_transport_edma_uninit(struct ntb_transport_ctx *nt)
+>>>>> +{
+>>>>> +	struct ntb_transport_ctx_edma *ctx = nt->priv;
+>>>>> +
+>>>>> +	if (ctx->wq)
+>>>>> +		destroy_workqueue(ctx->wq);
+>>>>> +	ctx->wq = NULL;
+>>>>> +
+>>>>> +	ntb_edma_teardown_chans(&ctx->chans);
+>>>>> +
+>>>>> +	switch (ctx->remote_edma_mode) {
+>>>>> +	case REMOTE_EDMA_EP:
+>>>>> +		ntb_edma_teardown_mws(nt->ndev);
+>>>>> +		break;
+>>>>> +	case REMOTE_EDMA_RC:
+>>>>> +		ntb_edma_teardown_peer(nt->ndev);
+>>>>> +		break;
+>>>>> +	case REMOTE_EDMA_UNKNOWN:
+>>>>> +	default:
+>>>>> +		break;
+>>>>> +	}
+>>>>> +
+>>>>> +	ctx->remote_edma_mode = REMOTE_EDMA_UNKNOWN;
+>>>>> +}
+>>>>> +
+>>>>> +static void ntb_transport_edma_db_work(struct work_struct *work)
+>>>>> +{
+>>>>> +	struct ntb_transport_qp_edma *edma =
+>>>>> +			container_of(work, struct ntb_transport_qp_edma, db_work);
+>>>>> +	struct ntb_transport_qp *qp = edma->qp;
+>>>>> +
+>>>>> +	ntb_peer_db_set(qp->ndev, qp->qp_bit);
+>>>>> +}
+>>>>> +
+>>>>> +static void ntb_transport_edma_notify_peer(struct ntb_transport_qp_edma *edma)
+>>>>> +{
+>>>>> +	struct ntb_transport_qp *qp = edma->qp;
+>>>>> +	struct ntb_transport_ctx_edma *ctx = qp->transport->priv;
+>>>>> +
+>>>>> +	if (!ntb_edma_notify_peer(&ctx->chans, qp->qp_num))
+>>>>> +		return;
+>>>>> +
+>>>>> +	/*
+>>>>> +	 * Called from contexts that may be atomic. Since ntb_peer_db_set()
+>>>>> +	 * may sleep, delegate the actual doorbell write to a workqueue.
+>>>>> +	 */
+>>>>> +	queue_work(system_highpri_wq, &edma->db_work);
+>>>>> +}
+>>>>> +
+>>>>> +static void ntb_transport_edma_isr(void *data, int qp_num)
+>>>>> +{
+>>>>> +	struct ntb_transport_ctx *nt = data;
+>>>>> +	struct ntb_transport_qp_edma *edma;
+>>>>> +	struct ntb_transport_ctx_edma *ctx;
+>>>>> +	struct ntb_transport_qp *qp;
+>>>>> +
+>>>>> +	if (qp_num < 0 || qp_num >= nt->qp_count)
+>>>>> +		return;
+>>>>> +
+>>>>> +	qp = &nt->qp_vec[qp_num];
+>>>>> +	if (WARN_ON(!qp))
+>>>>> +		return;
+>>>>> +
+>>>>> +	ctx = (struct ntb_transport_ctx_edma *)qp->transport->priv;
+>>>>> +	edma = qp->priv;
+>>>>> +
+>>>>> +	queue_work(ctx->wq, &edma->rx_work);
+>>>>> +	queue_work(ctx->wq, &edma->tx_work);
+>>>>> +}
+>>>>> +
+>>>>> +static int ntb_transport_edma_rc_init(struct ntb_transport_ctx *nt)
+>>>>> +{
+>>>>> +	struct ntb_transport_ctx_edma *ctx = nt->priv;
+>>>>> +	struct ntb_dev *ndev = nt->ndev;
+>>>>> +	struct pci_dev *pdev = ndev->pdev;
+>>>>> +	int peer_mw;
+>>>>> +	int rc;
+>>>>> +
+>>>>> +	if (!use_remote_edma || ctx->remote_edma_mode != REMOTE_EDMA_UNKNOWN)
+>>>>> +		return 0;
+>>>>> +
+>>>>> +	peer_mw = ntb_peer_mw_count(ndev);
+>>>>> +	if (peer_mw <= 0)
+>>>>> +		return -ENODEV;
+>>>>> +
+>>>>> +	rc = ntb_edma_setup_peer(ndev, peer_mw - 1, nt->qp_count);
+>>>>> +	if (rc) {
+>>>>> +		dev_err(&pdev->dev, "Failed to enable remote eDMA: %d\n", rc);
+>>>>> +		return rc;
+>>>>> +	}
+>>>>> +
+>>>>> +	rc = ntb_edma_setup_chans(get_dma_dev(ndev), &ctx->chans, true);
+>>>>> +	if (rc) {
+>>>>> +		dev_err(&pdev->dev, "Failed to setup eDMA channels: %d\n", rc);
+>>>>> +		goto err_teardown_peer;
+>>>>> +	}
+>>>>> +
+>>>>> +	rc = ntb_edma_setup_intr_chan(get_dma_dev(ndev), &ctx->chans);
+>>>>> +	if (rc) {
+>>>>> +		dev_err(&pdev->dev, "Failed to setup eDMA notify channel: %d\n",
+>>>>> +			rc);
+>>>>> +		goto err_teardown_chans;
+>>>>> +	}
+>>>>> +
+>>>>> +	ctx->remote_edma_mode = REMOTE_EDMA_RC;
+>>>>> +	return 0;
+>>>>> +
+>>>>> +err_teardown_chans:
+>>>>> +	ntb_edma_teardown_chans(&ctx->chans);
+>>>>> +err_teardown_peer:
+>>>>> +	ntb_edma_teardown_peer(ndev);
+>>>>> +	return rc;
+>>>>> +}
+>>>>> +
+>>>>> +
+>>>>> +static int ntb_transport_edma_ep_init(struct ntb_transport_ctx *nt)
+>>>>> +{
+>>>>> +	struct ntb_transport_ctx_edma *ctx = nt->priv;
+>>>>> +	struct ntb_dev *ndev = nt->ndev;
+>>>>> +	struct pci_dev *pdev = ndev->pdev;
+>>>>> +	int peer_mw;
+>>>>> +	int rc;
+>>>>> +
+>>>>> +	if (!use_remote_edma || ctx->remote_edma_mode == REMOTE_EDMA_EP)
+>>>>> +		return 0;
+>>>>> +
+>>>>> +	/**
+>>>>> +	 * This check assumes that the endpoint (pci-epf-vntb.c)
+>>>>> +	 * ntb_dev_ops implements .get_private_data() while the host side
+>>>>> +	 * (ntb_hw_epf.c) does not.
+>>>>> +	 */
+>>>>> +	if (!ntb_get_private_data(ndev))
+>>>>> +		return 0;
+>>>>> +
+>>>>> +	peer_mw = ntb_peer_mw_count(ndev);
+>>>>> +	if (peer_mw <= 0)
+>>>>> +		return -ENODEV;
+>>>>> +
+>>>>> +	rc = ntb_edma_setup_mws(ndev, peer_mw - 1, nt->qp_count,
+>>>>> +				ntb_transport_edma_isr, nt);
+>>>>> +	if (rc) {
+>>>>> +		dev_err(&pdev->dev,
+>>>>> +			"Failed to set up memory window for eDMA: %d\n", rc);
+>>>>> +		return rc;
+>>>>> +	}
+>>>>> +
+>>>>> +	rc = ntb_edma_setup_chans(get_dma_dev(ndev), &ctx->chans, false);
+>>>>> +	if (rc) {
+>>>>> +		dev_err(&pdev->dev, "Failed to setup eDMA channels: %d\n", rc);
+>>>>> +		ntb_edma_teardown_mws(ndev);
+>>>>> +		return rc;
+>>>>> +	}
+>>>>> +
+>>>>> +	ctx->remote_edma_mode = REMOTE_EDMA_EP;
+>>>>> +	return 0;
+>>>>> +}
+>>>>> +
+>>>>> +
+>>>>> +static int ntb_transport_edma_setup_qp_mw(struct ntb_transport_ctx *nt,
+>>>>> +					  unsigned int qp_num)
+>>>>> +{
+>>>>> +	struct ntb_transport_qp *qp = &nt->qp_vec[qp_num];
+>>>>> +	struct ntb_dev *ndev = nt->ndev;
+>>>>> +	struct ntb_queue_entry *entry;
+>>>>> +	struct ntb_transport_mw *mw;
+>>>>> +	unsigned int mw_num, mw_count, qp_count;
+>>>>> +	unsigned int qp_offset, rx_info_offset;
+>>>>> +	unsigned int mw_size, mw_size_per_qp;
+>>>>> +	unsigned int num_qps_mw;
+>>>>> +	size_t edma_total;
+>>>>> +	unsigned int i;
+>>>>> +	int node;
+>>>>> +
+>>>>> +	mw_count = nt->mw_count;
+>>>>> +	qp_count = nt->qp_count;
+>>>>> +
+>>>>> +	mw_num = QP_TO_MW(nt, qp_num);
+>>>>> +	mw = &nt->mw_vec[mw_num];
+>>>>> +
+>>>>> +	if (!mw->virt_addr)
+>>>>> +		return -ENOMEM;
+>>>>> +
+>>>>> +	if (mw_num < qp_count % mw_count)
+>>>>> +		num_qps_mw = qp_count / mw_count + 1;
+>>>>> +	else
+>>>>> +		num_qps_mw = qp_count / mw_count;
+>>>>> +
+>>>>> +	mw_size = min(nt->mw_vec[mw_num].phys_size, mw->xlat_size);
+>>>>> +	if (max_mw_size && mw_size > max_mw_size)
+>>>>> +		mw_size = max_mw_size;
+>>>>> +
+>>>>> +	mw_size_per_qp = round_down((unsigned int)mw_size / num_qps_mw, SZ_64);
+>>>>> +	qp_offset = mw_size_per_qp * (qp_num / mw_count);
+>>>>> +	rx_info_offset = mw_size_per_qp - sizeof(struct ntb_rx_info);
+>>>>> +
+>>>>> +	qp->tx_mw_size = mw_size_per_qp;
+>>>>> +	qp->tx_mw = nt->mw_vec[mw_num].vbase + qp_offset;
+>>>>> +	if (!qp->tx_mw)
+>>>>> +		return -EINVAL;
+>>>>> +	qp->tx_mw_phys = nt->mw_vec[mw_num].phys_addr + qp_offset;
+>>>>> +	if (!qp->tx_mw_phys)
+>>>>> +		return -EINVAL;
+>>>>> +	qp->rx_info = qp->tx_mw + rx_info_offset;
+>>>>> +	qp->rx_buff = mw->virt_addr + qp_offset;
+>>>>> +	qp->remote_rx_info = qp->rx_buff + rx_info_offset;
+>>>>> +
+>>>>> +	/* Due to housekeeping, there must be at least 2 buffs */
+>>>>> +	qp->tx_max_frame = min(transport_mtu, mw_size_per_qp / 2);
+>>>>> +	qp->rx_max_frame = min(transport_mtu, mw_size_per_qp / 2);
+>>>>> +
+>>>>> +	/* In eDMA mode, decouple from MW sizing and force ring-sized entries */
+>>>>> +	edma_total = 2 * sizeof(struct ntb_edma_ring);
+>>>>> +	if (rx_info_offset < edma_total) {
+>>>>> +		dev_err(&ndev->dev, "Ring space requires %zuB (>=%uB)\n",
+>>>>> +			edma_total, rx_info_offset);
+>>>>> +		return -EINVAL;
+>>>>> +	}
+>>>>> +	qp->tx_max_entry = NTB_EDMA_RING_ENTRIES;
+>>>>> +	qp->rx_max_entry = NTB_EDMA_RING_ENTRIES;
+>>>>> +
+>>>>> +	/*
+>>>>> +	 * Checking to see if we have more entries than the default.
+>>>>> +	 * We should add additional entries if that is the case so we
+>>>>> +	 * can be in sync with the transport frames.
+>>>>> +	 */
+>>>>> +	node = dev_to_node(&ndev->dev);
+>>>>> +	for (i = qp->rx_alloc_entry; i < qp->rx_max_entry; i++) {
+>>>>> +		entry = kzalloc_node(sizeof(*entry), GFP_KERNEL, node);
+>>>>> +		if (!entry)
+>>>>> +			return -ENOMEM;
+>>>>> +
+>>>>> +		entry->qp = qp;
+>>>>> +		ntb_list_add(&qp->ntb_rx_q_lock, &entry->entry,
+>>>>> +			     &qp->rx_free_q);
+>>>>> +		qp->rx_alloc_entry++;
+>>>>> +	}
+>>>>> +
+>>>>> +	memset(qp->rx_buff, 0, edma_total);
+>>>>> +
+>>>>> +	qp->rx_pkts = 0;
+>>>>> +	qp->tx_pkts = 0;
+>>>>> +
+>>>>> +	return 0;
+>>>>> +}
+>>>>> +
+>>>>> +static int ntb_transport_edma_rx_complete(struct ntb_transport_qp *qp)
+>>>>> +{
+>>>>> +	struct device *dma_dev = get_dma_dev(qp->ndev);
+>>>>> +	struct ntb_transport_qp_edma *edma = qp->priv;
+>>>>> +	struct ntb_queue_entry *entry;
+>>>>> +	struct ntb_edma_desc *in;
+>>>>> +	unsigned int len;
+>>>>> +	bool link_down;
+>>>>> +	u32 idx;
+>>>>> +
+>>>>> +	if (ntb_edma_ring_used_entry(READ_ONCE(*NTB_TAIL_RX_I(qp)),
+>>>>> +				     edma->rx_cons) == 0)
+>>>>> +		return 0;
+>>>>> +
+>>>>> +	idx = ntb_edma_ring_idx(edma->rx_cons);
+>>>>> +	in = NTB_DESC_RX_I(qp, idx);
+>>>>> +	if (!(in->flags & DESC_DONE_FLAG))
+>>>>> +		return 0;
+>>>>> +
+>>>>> +	link_down = in->flags & LINK_DOWN_FLAG;
+>>>>> +	in->flags = 0;
+>>>>> +	len = in->len; /* might be smaller than entry->len */
+>>>>> +
+>>>>> +	entry = (struct ntb_queue_entry *)(uintptr_t)in->data;
+>>>>> +	if (WARN_ON(!entry))
+>>>>> +		return 0;
+>>>>> +
+>>>>> +	if (link_down) {
+>>>>> +		ntb_qp_link_down(qp);
+>>>>> +		edma->rx_cons++;
+>>>>> +		ntb_list_add(&qp->ntb_rx_q_lock, &entry->entry, &qp->rx_free_q);
+>>>>> +		return 1;
+>>>>> +	}
+>>>>> +
+>>>>> +	dma_unmap_single(dma_dev, entry->addr, entry->len, DMA_FROM_DEVICE);
+>>>>> +
+>>>>> +	qp->rx_bytes += len;
+>>>>> +	qp->rx_pkts++;
+>>>>> +	edma->rx_cons++;
+>>>>> +
+>>>>> +	if (qp->rx_handler && qp->client_ready)
+>>>>> +		qp->rx_handler(qp, qp->cb_data, entry->cb_data, len);
+>>>>> +
+>>>>> +	ntb_list_add(&qp->ntb_rx_q_lock, &entry->entry, &qp->rx_free_q);
+>>>>> +	return 1;
+>>>>> +}
+>>>>> +
+>>>>> +static void ntb_transport_edma_rx_work(struct work_struct *work)
+>>>>> +{
+>>>>> +	struct ntb_transport_qp_edma *edma = container_of(
+>>>>> +				work, struct ntb_transport_qp_edma, rx_work);
+>>>>> +	struct ntb_transport_qp *qp = edma->qp;
+>>>>> +	struct ntb_transport_ctx_edma *ctx = qp->transport->priv;
+>>>>> +	unsigned int i;
+>>>>> +
+>>>>> +	for (i = 0; i < NTB_EDMA_MAX_POLL; i++) {
+>>>>> +		if (!ntb_transport_edma_rx_complete(qp))
+>>>>> +			break;
+>>>>> +	}
+>>>>> +
+>>>>> +	if (ntb_transport_edma_rx_complete(qp))
+>>>>> +		queue_work(ctx->wq, &edma->rx_work);
+>>>>> +}
+>>>>> +
+>>>>> +static void ntb_transport_edma_tx_work(struct work_struct *work)
+>>>>> +{
+>>>>> +	struct ntb_transport_qp_edma *edma = container_of(
+>>>>> +				work, struct ntb_transport_qp_edma, tx_work);
+>>>>> +	struct ntb_transport_qp *qp = edma->qp;
+>>>>> +	struct ntb_edma_desc *in, __iomem *out;
+>>>>> +	struct ntb_queue_entry *entry;
+>>>>> +	unsigned int len;
+>>>>> +	void *cb_data;
+>>>>> +	u32 idx;
+>>>>> +
+>>>>> +	while (ntb_edma_ring_used_entry(READ_ONCE(edma->tx_issue),
+>>>>> +					edma->tx_cons) != 0) {
+>>>>> +		/* Paired with smp_wmb() in ntb_transport_edma_tx_enqueue_inner() */
+>>>>> +		smp_rmb();
+>>>>> +
+>>>>> +		idx = ntb_edma_ring_idx(edma->tx_cons);
+>>>>> +		in = NTB_DESC_TX_I(qp, idx);
+>>>>> +		entry = (struct ntb_queue_entry *)(uintptr_t)in->data;
+>>>>> +		if (!entry || !(entry->flags & DESC_DONE_FLAG))
+>>>>> +			break;
+>>>>> +
+>>>>> +		in->data = 0;
+>>>>> +
+>>>>> +		cb_data = entry->cb_data;
+>>>>> +		len = entry->len;
+>>>>> +
+>>>>> +		out = NTB_DESC_TX_O(qp, idx);
+>>>>> +
+>>>>> +		WRITE_ONCE(edma->tx_cons, edma->tx_cons + 1);
+>>>>> +
+>>>>> +		/*
+>>>>> +		 * No need to add barrier in-between to enforce ordering here.
+>>>>> +		 * The other side proceeds only after both flags and tail are
+>>>>> +		 * updated.
+>>>>> +		 */
+>>>>> +		iowrite32(entry->flags, &out->flags);
+>>>>> +		iowrite32(edma->tx_cons, NTB_TAIL_TX_O(qp));
+>>>>> +
+>>>>> +		ntb_transport_edma_notify_peer(edma);
+>>>>> +
+>>>>> +		ntb_list_add(&qp->ntb_tx_free_q_lock, &entry->entry,
+>>>>> +			     &qp->tx_free_q);
+>>>>> +
+>>>>> +		if (qp->tx_handler)
+>>>>> +			qp->tx_handler(qp, qp->cb_data, cb_data, len);
+>>>>> +
+>>>>> +		/* stat updates */
+>>>>> +		qp->tx_bytes += len;
+>>>>> +		qp->tx_pkts++;
+>>>>> +	}
+>>>>> +}
+>>>>> +
+>>>>> +static void ntb_transport_edma_tx_cb(void *data,
+>>>>> +				     const struct dmaengine_result *res)
+>>>>> +{
+>>>>> +	struct ntb_queue_entry *entry = data;
+>>>>> +	struct ntb_transport_qp *qp = entry->qp;
+>>>>> +	struct ntb_transport_ctx *nt = qp->transport;
+>>>>> +	struct device *dma_dev = get_dma_dev(qp->ndev);
+>>>>> +	enum dmaengine_tx_result dma_err = res->result;
+>>>>> +	struct ntb_transport_ctx_edma *ctx = nt->priv;
+>>>>> +	struct ntb_transport_qp_edma *edma = qp->priv;
+>>>>> +
+>>>>> +	switch (dma_err) {
+>>>>> +	case DMA_TRANS_READ_FAILED:
+>>>>> +	case DMA_TRANS_WRITE_FAILED:
+>>>>> +	case DMA_TRANS_ABORTED:
+>>>>> +		entry->errors++;
+>>>>> +		entry->len = -EIO;
+>>>>> +		break;
+>>>>> +	case DMA_TRANS_NOERROR:
+>>>>> +	default:
+>>>>> +		break;
+>>>>> +	}
+>>>>> +	dma_unmap_sg(dma_dev, &entry->sgl, 1, DMA_TO_DEVICE);
+>>>>> +	sg_dma_address(&entry->sgl) = 0;
+>>>>> +
+>>>>> +	entry->flags |= DESC_DONE_FLAG;
+>>>>> +
+>>>>> +	queue_work(ctx->wq, &edma->tx_work);
+>>>>> +}
+>>>>> +
+>>>>> +static int ntb_transport_edma_submit(struct device *d, struct dma_chan *chan,
+>>>>> +				     size_t len, void *rc_src, dma_addr_t dst,
+>>>>> +				     struct ntb_queue_entry *entry)
+>>>>> +{
+>>>>> +	struct scatterlist *sgl = &entry->sgl;
+>>>>> +	struct dma_async_tx_descriptor *txd;
+>>>>> +	struct dma_slave_config cfg;
+>>>>> +	dma_cookie_t cookie;
+>>>>> +	int nents, rc;
+>>>>> +
+>>>>> +	if (!d)
+>>>>> +		return -ENODEV;
+>>>>> +
+>>>>> +	if (!chan)
+>>>>> +		return -ENXIO;
+>>>>> +
+>>>>> +	if (WARN_ON(!rc_src || !dst))
+>>>>> +		return -EINVAL;
+>>>>> +
+>>>>> +	if (WARN_ON(sg_dma_address(sgl)))
+>>>>> +		return -EINVAL;
+>>>>> +
+>>>>> +	sg_init_one(sgl, rc_src, len);
+>>>>> +	nents = dma_map_sg(d, sgl, 1, DMA_TO_DEVICE);
+>>>>> +	if (nents <= 0)
+>>>>> +		return -EIO;
+>>>>> +
+>>>>> +	memset(&cfg, 0, sizeof(cfg));
+>>>>> +	cfg.dst_addr       = dst;
+>>>>> +	cfg.src_addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
+>>>>> +	cfg.dst_addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES;
+>>>>> +	cfg.direction      = DMA_MEM_TO_DEV;
+>>>>> +
+>>>>> +	txd = dmaengine_prep_slave_sg_config(chan, sgl, 1, DMA_MEM_TO_DEV,
+>>>>> +				      DMA_CTRL_ACK | DMA_PREP_INTERRUPT, &cfg);
+>>>>> +	if (!txd) {
+>>>>> +		rc = -EIO;
+>>>>> +		goto out_unmap;
+>>>>> +	}
+>>>>> +
+>>>>> +	txd->callback_result = ntb_transport_edma_tx_cb;
+>>>>> +	txd->callback_param = entry;
+>>>>> +
+>>>>> +	cookie = dmaengine_submit(txd);
+>>>>> +	if (dma_submit_error(cookie)) {
+>>>>> +		rc = -EIO;
+>>>>> +		goto out_unmap;
+>>>>> +	}
+>>>>> +	dma_async_issue_pending(chan);
+>>>>> +	return 0;
+>>>>> +out_unmap:
+>>>>> +	dma_unmap_sg(d, sgl, 1, DMA_TO_DEVICE);
+>>>>> +	return rc;
+>>>>> +}
+>>>>> +
+>>>>> +static int ntb_transport_edma_tx_enqueue_inner(struct ntb_transport_qp *qp,
+>>>>> +					       struct ntb_queue_entry *entry)
+>>>>> +{
+>>>>> +	struct device *dma_dev = get_dma_dev(qp->ndev);
+>>>>> +	struct ntb_transport_qp_edma *edma = qp->priv;
+>>>>> +	struct ntb_transport_ctx *nt = qp->transport;
+>>>>> +	struct ntb_edma_desc *in, __iomem *out;
+>>>>> +	struct ntb_transport_ctx_edma *ctx = nt->priv;
+>>>>> +	unsigned int len = entry->len;
+>>>>> +	struct dma_chan *chan;
+>>>>> +	u32 issue, idx, head;
+>>>>> +	dma_addr_t dst;
+>>>>> +	int rc;
+>>>>> +
+>>>>> +	WARN_ON_ONCE(entry->flags & DESC_DONE_FLAG);
+>>>>> +
+>>>>> +	scoped_guard(spinlock_irqsave, &edma->tx_lock) {
+>>>>> +		head = READ_ONCE(*NTB_HEAD_TX_I(qp));
+>>>>> +		issue = edma->tx_issue;
+>>>>> +		if (ntb_edma_ring_used_entry(head, issue) == 0) {
+>>>>> +			qp->tx_ring_full++;
+>>>>> +			return -ENOSPC;
+>>>>> +		}
+>>>>> +
+>>>>> +		/*
+>>>>> +		 * ntb_transport_edma_tx_work() checks entry->flags
+>>>>> +		 * so it needs to be set before tx_issue++.
+>>>>> +		 */
+>>>>> +		idx = ntb_edma_ring_idx(issue);
+>>>>> +		in = NTB_DESC_TX_I(qp, idx);
+>>>>> +		in->data = (uintptr_t)entry;
+>>>>> +
+>>>>> +		/* Make in->data visible before tx_issue++ */
+>>>>> +		smp_wmb();
+>>>>> +
+>>>>> +		WRITE_ONCE(edma->tx_issue, edma->tx_issue + 1);
+>>>>> +	}
+>>>>> +
+>>>>> +	/* Publish the final transfer length to the other end */
+>>>>> +	out = NTB_DESC_TX_O(qp, idx);
+>>>>> +	iowrite32(len, &out->len);
+>>>>> +	ioread32(&out->len);
+>>>>> +
+>>>>> +	if (unlikely(!len)) {
+>>>>> +		entry->flags |= DESC_DONE_FLAG;
+>>>>> +		queue_work(ctx->wq, &edma->tx_work);
+>>>>> +		return 0;
+>>>>> +	}
+>>>>> +
+>>>>> +	/* Paired with dma_wmb() in ntb_transport_edma_rx_enqueue_inner() */
+>>>>> +	dma_rmb();
+>>>>> +
+>>>>> +	/* kick remote eDMA read transfer */
+>>>>> +	dst = (dma_addr_t)in->addr;
+>>>>> +	chan = ntb_edma_pick_chan(&ctx->chans, qp->qp_num);
+>>>>> +	rc = ntb_transport_edma_submit(dma_dev, chan, len,
+>>>>> +					      entry->buf, dst, entry);
+>>>>> +	if (rc) {
+>>>>> +		entry->errors++;
+>>>>> +		entry->len = -EIO;
+>>>>> +		entry->flags |= DESC_DONE_FLAG;
+>>>>> +		queue_work(ctx->wq, &edma->tx_work);
+>>>>> +	}
+>>>>> +	return 0;
+>>>>> +}
+>>>>> +
+>>>>> +static int ntb_transport_edma_tx_enqueue(struct ntb_transport_qp *qp,
+>>>>> +					 struct ntb_queue_entry *entry,
+>>>>> +					 void *cb, void *data, unsigned int len,
+>>>>> +					 unsigned int flags)
+>>>>> +{
+>>>>> +	struct device *dma_dev;
+>>>>> +
+>>>>> +	if (entry->addr) {
+>>>>> +		/* Deferred unmap */
+>>>>> +		dma_dev = get_dma_dev(qp->ndev);
+>>>>> +		dma_unmap_single(dma_dev, entry->addr, entry->len,
+>>>>> +				 DMA_TO_DEVICE);
+>>>>> +	}
+>>>>> +
+>>>>> +	entry->cb_data = cb;
+>>>>> +	entry->buf = data;
+>>>>> +	entry->len = len;
+>>>>> +	entry->flags = flags;
+>>>>> +	entry->errors = 0;
+>>>>> +	entry->addr = 0;
+>>>>> +
+>>>>> +	WARN_ON_ONCE(!ntb_qp_edma_enabled(qp));
+>>>>> +
+>>>>> +	return ntb_transport_edma_tx_enqueue_inner(qp, entry);
+>>>>> +}
+>>>>> +
+>>>>> +static int ntb_transport_edma_rx_enqueue_inner(struct ntb_transport_qp *qp,
+>>>>> +					       struct ntb_queue_entry *entry)
+>>>>> +{
+>>>>> +	struct device *dma_dev = get_dma_dev(qp->ndev);
+>>>>> +	struct ntb_transport_qp_edma *edma = qp->priv;
+>>>>> +	struct ntb_edma_desc *in, __iomem *out;
+>>>>> +	unsigned int len = entry->len;
+>>>>> +	void *data = entry->buf;
+>>>>> +	dma_addr_t dst;
+>>>>> +	u32 idx;
+>>>>> +	int rc;
+>>>>> +
+>>>>> +	dst = dma_map_single(dma_dev, data, len, DMA_FROM_DEVICE);
+>>>>> +	rc = dma_mapping_error(dma_dev, dst);
+>>>>> +	if (rc)
+>>>>> +		return rc;
+>>>>> +
+>>>>> +	guard(spinlock_bh)(&edma->rx_lock);
+>>>>> +
+>>>>> +	if (ntb_edma_ring_full(READ_ONCE(edma->rx_prod),
+>>>>> +			       READ_ONCE(edma->rx_cons))) {
+>>>>> +		rc = -ENOSPC;
+>>>>> +		goto out_unmap;
+>>>>> +	}
+>>>>> +
+>>>>> +	idx = ntb_edma_ring_idx(edma->rx_prod);
+>>>>> +	in = NTB_DESC_RX_I(qp, idx);
+>>>>> +	out = NTB_DESC_RX_O(qp, idx);
+>>>>> +
+>>>>> +	iowrite32(len, &out->len);
+>>>>> +	iowrite64(dst, &out->addr);
+>>>>> +
+>>>>> +	WARN_ON(in->flags & DESC_DONE_FLAG);
+>>>>> +	in->data = (uintptr_t)entry;
+>>>>> +	entry->addr = dst;
+>>>>> +
+>>>>> +	/* Ensure len/addr are visible before the head update */
+>>>>> +	dma_wmb();
+>>>>> +
+>>>>> +	WRITE_ONCE(edma->rx_prod, edma->rx_prod + 1);
+>>>>> +	iowrite32(edma->rx_prod, NTB_HEAD_RX_O(qp));
+>>>>> +
+>>>>> +	return 0;
+>>>>> +out_unmap:
+>>>>> +	dma_unmap_single(dma_dev, dst, len, DMA_FROM_DEVICE);
+>>>>> +	return rc;
+>>>>> +}
+>>>>> +
+>>>>> +static int ntb_transport_edma_rx_enqueue(struct ntb_transport_qp *qp,
+>>>>> +					 struct ntb_queue_entry *entry)
+>>>>> +{
+>>>>> +	int rc;
+>>>>> +
+>>>>> +	rc = ntb_transport_edma_rx_enqueue_inner(qp, entry);
+>>>>> +	if (rc) {
+>>>>> +		ntb_list_add(&qp->ntb_rx_q_lock, &entry->entry,
+>>>>> +			     &qp->rx_free_q);
+>>>>> +		return rc;
+>>>>> +	}
+>>>>> +
+>>>>> +	ntb_list_add(&qp->ntb_rx_q_lock, &entry->entry, &qp->rx_pend_q);
+>>>>> +
+>>>>> +	if (qp->active)
+>>>>> +		tasklet_schedule(&qp->rxc_db_work);
+>>>>> +
+>>>>> +	return 0;
+>>>>> +}
+>>>>> +
+>>>>> +static void ntb_transport_edma_rx_poll(struct ntb_transport_qp *qp)
+>>>>> +{
+>>>>> +	struct ntb_transport_ctx *nt = qp->transport;
+>>>>> +	struct ntb_transport_ctx_edma *ctx = nt->priv;
+>>>>> +	struct ntb_transport_qp_edma *edma = qp->priv;
+>>>>> +
+>>>>> +	queue_work(ctx->wq, &edma->rx_work);
+>>>>> +	queue_work(ctx->wq, &edma->tx_work);
+>>>>> +}
+>>>>> +
+>>>>> +static int ntb_transport_edma_qp_init(struct ntb_transport_ctx *nt,
+>>>>> +				      unsigned int qp_num)
+>>>>> +{
+>>>>> +	struct ntb_transport_qp *qp = &nt->qp_vec[qp_num];
+>>>>> +	struct ntb_transport_qp_edma *edma;
+>>>>> +	struct ntb_dev *ndev = nt->ndev;
+>>>>> +	int node;
+>>>>> +
+>>>>> +	node = dev_to_node(&ndev->dev);
+>>>>> +
+>>>>> +	qp->priv = kzalloc_node(sizeof(*edma), GFP_KERNEL, node);
+>>>>> +	if (!qp->priv)
+>>>>> +		return -ENOMEM;
+>>>>> +
+>>>>> +	edma = (struct ntb_transport_qp_edma *)qp->priv;
+>>>>> +	edma->qp = qp;
+>>>>> +	edma->rx_prod = 0;
+>>>>> +	edma->rx_cons = 0;
+>>>>> +	edma->tx_cons = 0;
+>>>>> +	edma->tx_issue = 0;
+>>>>> +
+>>>>> +	spin_lock_init(&edma->rx_lock);
+>>>>> +	spin_lock_init(&edma->tx_lock);
+>>>>> +
+>>>>> +	INIT_WORK(&edma->db_work, ntb_transport_edma_db_work);
+>>>>> +	INIT_WORK(&edma->rx_work, ntb_transport_edma_rx_work);
+>>>>> +	INIT_WORK(&edma->tx_work, ntb_transport_edma_tx_work);
+>>>>> +
+>>>>> +	return 0;
+>>>>> +}
+>>>>> +
+>>>>> +static void ntb_transport_edma_qp_free(struct ntb_transport_qp *qp)
+>>>>> +{
+>>>>> +	struct ntb_transport_qp_edma *edma = qp->priv;
+>>>>> +
+>>>>> +	cancel_work_sync(&edma->db_work);
+>>>>> +	cancel_work_sync(&edma->rx_work);
+>>>>> +	cancel_work_sync(&edma->tx_work);
+>>>>> +
+>>>>> +	kfree(qp->priv);
+>>>>> +}
+>>>>> +
+>>>>> +static int ntb_transport_edma_pre_link_up(struct ntb_transport_ctx *nt)
+>>>>> +{
+>>>>> +	struct ntb_dev *ndev = nt->ndev;
+>>>>> +	struct pci_dev *pdev = ndev->pdev;
+>>>>> +	int rc;
+>>>>> +
+>>>>> +	rc = ntb_transport_edma_ep_init(nt);
+>>>>> +	if (rc)
+>>>>> +		dev_err(&pdev->dev, "Failed to init EP: %d\n", rc);
+>>>>> +
+>>>>> +	return rc;
+>>>>> +}
+>>>>> +
+>>>>> +static int ntb_transport_edma_post_link_up(struct ntb_transport_ctx *nt)
+>>>>> +{
+>>>>> +	struct ntb_dev *ndev = nt->ndev;
+>>>>> +	struct pci_dev *pdev = ndev->pdev;
+>>>>> +	int rc;
+>>>>> +
+>>>>> +	rc = ntb_transport_edma_rc_init(nt);
+>>>>> +	if (rc)
+>>>>> +		dev_err(&pdev->dev, "Failed to init RC: %d\n", rc);
+>>>>> +
+>>>>> +	return rc;
+>>>>> +}
+>>>>> +
+>>>>> +static int ntb_transport_edma_enable(struct ntb_transport_ctx *nt,
+>>>>> +				     unsigned int *mw_count)
+>>>>> +{
+>>>>> +	struct ntb_dev *ndev = nt->ndev;
+>>>>> +	struct ntb_transport_ctx_edma *ctx = nt->priv;
+>>>>> +
+>>>>> +	if (!use_remote_edma)
+>>>>> +		return 0;
+>>>>> +
+>>>>> +	/*
+>>>>> +	 * We need at least one MW for the transport plus one MW reserved
+>>>>> +	 * for the remote eDMA window (see ntb_edma_setup_mws/peer).
+>>>>> +	 */
+>>>>> +	if (*mw_count <= 1) {
+>>>>> +		dev_err(&ndev->dev,
+>>>>> +			"remote eDMA requires at least two MWS (have %u)\n",
+>>>>> +			*mw_count);
+>>>>> +		return -ENODEV;
+>>>>> +	}
+>>>>> +
+>>>>> +	ctx->wq = alloc_workqueue("ntb-edma-wq", WQ_UNBOUND | WQ_SYSFS, 0);
+>>>>> +	if (!ctx->wq) {
+>>>>> +		ntb_transport_edma_uninit(nt);
+>>>>> +		return -ENOMEM;
+>>>>> +	}
+>>>>> +
+>>>>> +	/* Reserve the last peer MW exclusively for the eDMA window. */
+>>>>> +	*mw_count -= 1;
+>>>>> +
+>>>>> +	return 0;
+>>>>> +}
+>>>>> +
+>>>>> +static void ntb_transport_edma_disable(struct ntb_transport_ctx *nt)
+>>>>> +{
+>>>>> +	ntb_transport_edma_uninit(nt);
+>>>>> +}
+>>>>> +
+>>>>> +static const struct ntb_transport_backend_ops edma_backend_ops = {
+>>>>> +	.enable = ntb_transport_edma_enable,
+>>>>> +	.disable = ntb_transport_edma_disable,
+>>>>> +	.qp_init = ntb_transport_edma_qp_init,
+>>>>> +	.qp_free = ntb_transport_edma_qp_free,
+>>>>> +	.pre_link_up = ntb_transport_edma_pre_link_up,
+>>>>> +	.post_link_up = ntb_transport_edma_post_link_up,
+>>>>> +	.setup_qp_mw = ntb_transport_edma_setup_qp_mw,
+>>>>> +	.tx_free_entry = ntb_transport_edma_tx_free_entry,
+>>>>> +	.tx_enqueue = ntb_transport_edma_tx_enqueue,
+>>>>> +	.rx_enqueue = ntb_transport_edma_rx_enqueue,
+>>>>> +	.rx_poll = ntb_transport_edma_rx_poll,
+>>>>> +	.debugfs_stats_show = ntb_transport_edma_debugfs_stats_show,
+>>>>> +};
+>>>>> +
+>>>>> +int ntb_transport_edma_init(struct ntb_transport_ctx *nt)
+>>>>> +{
+>>>>> +	struct ntb_dev *ndev = nt->ndev;
+>>>>> +	int node;
+>>>>> +
+>>>>> +	node = dev_to_node(&ndev->dev);
+>>>>> +	nt->priv = kzalloc_node(sizeof(struct ntb_transport_ctx_edma), GFP_KERNEL,
+>>>>> +				node);
+>>>>> +	if (!nt->priv)
+>>>>> +		return -ENOMEM;
+>>>>> +
+>>>>> +	nt->backend_ops = edma_backend_ops;
+>>>>> +	/*
+>>>>> +	 * On remote eDMA mode, one DMA read channel is used for Host side
+>>>>> +	 * to interrupt EP.
+>>>>> +	 */
+>>>>> +	use_msi = false;
+>>>>> +	return 0;
+>>>>> +}
+>>>>> diff --git a/drivers/ntb/ntb_transport_internal.h b/drivers/ntb/ntb_transport_internal.h
+>>>>> index 51ff08062d73..9fff65980d3d 100644
+>>>>> --- a/drivers/ntb/ntb_transport_internal.h
+>>>>> +++ b/drivers/ntb/ntb_transport_internal.h
+>>>>> @@ -8,6 +8,7 @@
+>>>>>  extern unsigned long max_mw_size;
+>>>>>  extern unsigned int transport_mtu;
+>>>>>  extern bool use_msi;
+>>>>> +extern bool use_remote_edma;
+>>>>>  
+>>>>>  #define QP_TO_MW(nt, qp)	((qp) % nt->mw_count)
+>>>>>  
+>>>>> @@ -29,6 +30,11 @@ struct ntb_queue_entry {
+>>>>>  		struct ntb_payload_header __iomem *tx_hdr;
+>>>>>  		struct ntb_payload_header *rx_hdr;
+>>>>>  	};
+>>>>> +
+>>>>> +#ifdef CONFIG_NTB_TRANSPORT_EDMA
+>>>>> +	dma_addr_t addr;
+>>>>> +	struct scatterlist sgl;
+>>>>> +#endif
+>>>>>  };
+>>>>>  
+>>>>>  struct ntb_rx_info {
+>>>>> @@ -202,4 +208,13 @@ int ntb_transport_init_queue(struct ntb_transport_ctx *nt,
+>>>>>  			     unsigned int qp_num);
+>>>>>  struct device *get_dma_dev(struct ntb_dev *ndev);
+>>>>>  
+>>>>> +#ifdef CONFIG_NTB_TRANSPORT_EDMA
+>>>>> +int ntb_transport_edma_init(struct ntb_transport_ctx *nt);
+>>>>> +#else
+>>>>> +static inline int ntb_transport_edma_init(struct ntb_transport_ctx *nt)
+>>>>> +{
+>>>>> +	return -EOPNOTSUPP;
+>>>>> +}
+>>>>> +#endif /* CONFIG_NTB_TRANSPORT_EDMA */
+>>>>> +
+>>>>>  #endif /* _NTB_TRANSPORT_INTERNAL_H_ */
+>>>>
+>>
+> 
 
-...
-
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-
-...
-
-> +static int npc_multi_subbank_ref_alloc(struct rvu *rvu, int key_type,
-> +				       int ref, int limit, int prio,
-> +				       bool contig, int count,
-> +				       u16 *mcam_idx)
-> +{
-> +	struct npc_subbank *sb;
-> +	unsigned long *bmap;
-> +	int sb_off, off, rc;
-> +	int cnt = 0;
-> +	bool bitset;
-> +
-> +	if (prio != NPC_MCAM_HIGHER_PRIO) {
-> +		while (ref <= limit) {
-> +			/* Calculate subbank and subbank index */
-> +			rc =  npc_mcam_idx_2_subbank_idx(rvu, ref,
-> +							 &sb, &sb_off);
-> +			if (rc)
-> +				goto err;
-> +
-> +			/* If subbank is not suitable for requested key type
-> +			 * restart search from next subbank
-> +			 */
-> +			if (!npc_subbank_suits(sb, key_type)) {
-> +				ref = SB_ALIGN_UP(ref);
-> +				if (contig) {
-> +					rc = npc_idx_free(rvu, mcam_idx,
-> +							  cnt, false);
-> +					if (rc)
-> +						return rc;
-> +					cnt = 0;
-> +				}
-> +				continue;
-> +			}
-> +
-> +			mutex_lock(&sb->lock);
-> +
-> +			/* If subbank is free; mark it as used */
-> +			if (sb->flags & NPC_SUBBANK_FLAG_FREE) {
-> +				rc =  __npc_subbank_mark_used(rvu, sb,
-> +							      key_type);
-> +				if (rc) {
-> +					mutex_unlock(&sb->lock);
-> +					dev_err(rvu->dev,
-> +						"%s:%d Error to add to use array\n",
-> +						__func__, __LINE__);
-> +					goto err;
-> +				}
-> +			}
-> +
-> +			/* Find correct bmap */
-> +			__npc_subbank_sboff_2_off(rvu, sb, sb_off, &bmap, &off);
-> +
-> +			/* if bit is already set, reset 'cnt' */
-> +			bitset = test_bit(off, bmap);
-> +			if (bitset) {
-> +				mutex_unlock(&sb->lock);
-> +				if (contig) {
-> +					rc = npc_idx_free(rvu, mcam_idx,
-> +							  cnt, false);
-> +					if (rc)
-> +						return rc;
-> +					cnt = 0;
-> +				}
-> +
-> +				ref++;
-> +				continue;
-> +			}
-> +
-> +			set_bit(off, bmap);
-> +			sb->free_cnt--;
-> +			mcam_idx[cnt++] = ref;
-> +			mutex_unlock(&sb->lock);
-> +
-> +			if (cnt == count)
-> +				return 0;
-> +			ref++;
-> +		}
-> +
-> +		/* Could not allocate request count slots */
-> +		goto err;
-> +	}
-> +	while (ref >= limit) {
-> +		rc =  npc_mcam_idx_2_subbank_idx(rvu, ref,
-> +						 &sb, &sb_off);
-> +		if (rc)
-> +			goto err;
-> +
-> +		if (!npc_subbank_suits(sb, key_type)) {
-> +			ref = SB_ALIGN_DOWN(ref) - 1;
-> +			if (contig) {
-> +				rc = npc_idx_free(rvu, mcam_idx, cnt, false);
-> +				if (rc)
-> +					return rc;
-> +
-> +				cnt = 0;
-> +			}
-> +			continue;
-> +		}
-> +
-> +		mutex_lock(&sb->lock);
-> +
-> +		if (sb->flags & NPC_SUBBANK_FLAG_FREE) {
-> +			rc =  __npc_subbank_mark_used(rvu, sb, key_type);
-> +			if (rc) {
-> +				mutex_unlock(&sb->lock);
-> +				dev_err(rvu->dev,
-> +					"%s:%d Error to add to use array\n",
-> +					__func__, __LINE__);
-> +				goto err;
-> +			}
-> +		}
-> +
-> +		__npc_subbank_sboff_2_off(rvu, sb, sb_off, &bmap, &off);
-> +		bitset = test_bit(off, bmap);
-> +		if (bitset) {
-> +			mutex_unlock(&sb->lock);
-> +			if (contig) {
-> +				cnt = 0;
-> +				rc = npc_idx_free(rvu, mcam_idx, cnt, false);
-> +				if (rc)
-> +					return rc;
-
-Claude Code with Review Prompts [1] flags that the call to npc_idx_free()
-is a noop because count is reset to 0 before (rather than after) it is
-called.
-
-> +			}
-> +			ref--;
-> +			continue;
-> +		}
-> +
-> +		mcam_idx[cnt++] = ref;
-> +		sb->free_cnt--;
-> +		set_bit(off, bmap);
-> +		mutex_unlock(&sb->lock);
-> +
-> +		if (cnt == count)
-> +			return 0;
-> +		ref--;
-> +	}
-> +
-> +err:
-> +	rc = npc_idx_free(rvu, mcam_idx, cnt, false);
-> +	if (rc)
-> +		dev_err(rvu->dev,
-> +			"%s:%d Error happened while freeing cnt=%u indexes\n",
-> +			__func__, __LINE__, cnt);
-> +
-> +	return -ENOSPC;
-> +}
-> +
-> +static int npc_subbank_free_cnt(struct rvu *rvu, struct npc_subbank *sb,
-> +				int key_type)
-> +{
-> +	int cnt, spd;
-> +
-> +	spd = npc_priv.subbank_depth;
-> +	mutex_lock(&sb->lock);
-> +
-> +	if (sb->flags & NPC_SUBBANK_FLAG_FREE)
-> +		cnt = key_type == NPC_MCAM_KEY_X4 ? spd : 2 * spd;
-> +	else
-> +		cnt = sb->free_cnt;
-> +
-> +	mutex_unlock(&sb->lock);
-> +	return cnt;
-> +}
-> +
-> +static int npc_subbank_ref_alloc(struct rvu *rvu, int key_type,
-> +				 int ref, int limit, int prio,
-> +				 bool contig, int count,
-> +				 u16 *mcam_idx)
-> +{
-> +	struct npc_subbank *sb1, *sb2;
-> +	bool max_alloc, start, stop;
-> +	int r, l, sb_idx1, sb_idx2;
-> +	int tot = 0, rc;
-> +	int alloc_cnt;
-> +
-> +	max_alloc = !contig;
-> +
-> +	start = true;
-> +	stop = false;
-> +
-> +	/* Loop until we cross the ref/limit boundary */
-> +	while (!stop) {
-> +		rc = npc_subbank_iter(rvu, key_type, ref, limit, prio,
-> +				      &r, &l, &start, &stop);
-> +
-> +		dev_dbg(rvu->dev,
-> +			"%s:%d ref=%d limit=%d r=%d l=%d start=%d stop=%d tot=%d count=%d rc=%d\n",
-> +			__func__, __LINE__, ref, limit, r, l,
-> +			start, stop, tot, count, rc);
-> +
-> +		if (rc)
-> +			goto err;
-> +
-> +		/* Find subbank and subbank index for ref */
-> +		rc = npc_mcam_idx_2_subbank_idx(rvu, r, &sb1,
-> +						&sb_idx1);
-> +		if (rc)
-> +			goto err;
-> +
-> +		dev_dbg(rvu->dev,
-> +			"%s:%d ref subbank=%d off=%d\n",
-> +			__func__, __LINE__, sb1->idx, sb_idx1);
-> +
-> +		/* Skip subbank if it is not available for the keytype */
-> +		if (!npc_subbank_suits(sb1, key_type)) {
-> +			dev_dbg(rvu->dev,
-> +				"%s:%d not suitable sb=%d key_type=%d\n",
-> +				__func__, __LINE__, sb1->idx, key_type);
-> +			continue;
-> +		}
-> +
-> +		/* Find subbank and subbank index for limit */
-> +		rc = npc_mcam_idx_2_subbank_idx(rvu, l, &sb2,
-> +						&sb_idx2);
-> +		if (rc)
-> +			goto err;
-> +
-> +		dev_dbg(rvu->dev,
-> +			"%s:%d limit subbank=%d off=%d\n",
-> +			__func__, __LINE__, sb_idx1, sb_idx2);
-> +
-> +		/* subbank of ref and limit should be same */
-> +		if (sb1 != sb2) {
-> +			dev_err(rvu->dev,
-> +				"%s:%d l(%d) and r(%d) are not in same subbank\n",
-> +				__func__, __LINE__, r, l);
-> +			goto err;
-> +		}
-> +
-> +		if (contig &&
-> +		    npc_subbank_free_cnt(rvu, sb1, key_type) < count) {
-> +			dev_dbg(rvu->dev, "%s:%d less count =%d\n",
-> +				__func__, __LINE__,
-> +				npc_subbank_free_cnt(rvu, sb1, key_type));
-> +			continue;
-> +		}
-> +
-> +		/* Try in one bank of a subbank */
-> +		alloc_cnt = 0;
-> +		rc =  npc_subbank_alloc(rvu, sb1, key_type,
-> +					r, l, prio, contig,
-> +					count - tot, mcam_idx + tot,
-> +					count - tot, max_alloc,
-> +					&alloc_cnt);
-> +
-> +		tot += alloc_cnt;
-> +
-> +		dev_dbg(rvu->dev, "%s:%d Allocated tot=%d alloc_cnt=%d\n",
-> +			__func__, __LINE__, tot, alloc_cnt);
-> +
-> +		if (!rc && count == tot)
-> +			return 0;
-> +	}
-> +err:
-> +	dev_dbg(rvu->dev, "%s:%d Error to allocate\n",
-> +		__func__, __LINE__);
-> +
-> +	/* non contiguous allocation fails. We need to do clean up */
-> +	if (max_alloc) {
-> +		rc = npc_idx_free(rvu, mcam_idx, tot, false);
-> +		if (rc)
-> +			dev_err(rvu->dev,
-> +				"%s:%d failed to free %u indexes\n",
-> +				__func__, __LINE__, tot);
-> +	}
-> +
-> +	return -EFAULT;
-> +}
-> +
-> +/* Minimize allocation from bottom and top subbanks for noref allocations.
-> + * Default allocations are ref based, and will be allocated from top
-> + * subbanks (least priority subbanks). Since default allocation is at very
-> + * early stage of kernel netdev probes, this subbanks will be moved to
-> + * used subbanks list. This will pave a way for noref allocation from these
-> + * used subbanks. Skip allocation for these top and bottom, and try free
-> + * bank next. If none slot is available, come back and search in these
-> + * subbanks.
-> + */
-> +
-> +static int npc_subbank_restricted_idxs[2];
-> +static bool restrict_valid = true;
-> +
-> +static bool npc_subbank_restrict_usage(struct rvu *rvu, int index)
-> +{
-> +	int i;
-> +
-> +	if (!restrict_valid)
-> +		return false;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(npc_subbank_restricted_idxs); i++) {
-> +		if (index == npc_subbank_restricted_idxs[i])
-> +			return true;
-> +	}
-> +
-> +	return false;
-> +}
-> +
-> +static int npc_subbank_noref_alloc(struct rvu *rvu, int key_type, bool contig,
-> +				   int count, u16 *mcam_idx)
-> +{
-> +	struct npc_subbank *sb;
-> +	unsigned long index;
-> +	int tot = 0, rc;
-> +	bool max_alloc;
-> +	int alloc_cnt;
-> +	int idx, i;
-> +	void *val;
-> +
-> +	max_alloc = !contig;
-> +
-> +	/* Check used subbanks for free slots */
-> +	xa_for_each(&npc_priv.xa_sb_used, index, val) {
-> +		idx = xa_to_value(val);
-> +
-> +		/* Minimize allocation from restricted subbanks
-> +		 * in noref allocations.
-> +		 */
-> +		if (npc_subbank_restrict_usage(rvu, idx))
-> +			continue;
-> +
-> +		sb = &npc_priv.sb[idx];
-> +
-> +		/* Skip if not suitable subbank */
-> +		if (!npc_subbank_suits(sb, key_type))
-> +			continue;
-> +
-> +		if (contig && npc_subbank_free_cnt(rvu, sb, key_type) < count)
-> +			continue;
-> +
-> +		/* try in bank 0. Try passing ref and limit equal to
-> +		 * subbank boundaries
-> +		 */
-> +		alloc_cnt = 0;
-> +		rc =  npc_subbank_alloc(rvu, sb, key_type,
-> +					sb->b0b, sb->b0t, 0,
-> +					contig, count - tot,
-> +					mcam_idx + tot,
-> +					count - tot,
-> +					max_alloc, &alloc_cnt);
-> +
-> +		/* Non contiguous allocation may allocate less than
-> +		 * requested 'count'.
-> +		 */
-> +		tot += alloc_cnt;
-> +
-> +		dev_dbg(rvu->dev,
-> +			"%s:%d Allocated %d from subbank %d, tot=%d count=%d\n",
-> +			__func__, __LINE__, alloc_cnt, sb->idx, tot, count);
-> +
-> +		/* Successfully allocated */
-> +		if (!rc && count == tot)
-> +			return 0;
-> +
-> +		/* x4 entries can be allocated from bank 0 only */
-> +		if (key_type == NPC_MCAM_KEY_X4)
-> +			continue;
-> +
-> +		/* try in bank 1 for x2 */
-> +		alloc_cnt = 0;
-> +		rc =  npc_subbank_alloc(rvu, sb, key_type,
-> +					sb->b1b, sb->b1t, 0,
-> +					contig, count - tot,
-> +					mcam_idx + tot,
-> +					count - tot, max_alloc,
-> +					&alloc_cnt);
-> +
-> +		tot += alloc_cnt;
-> +
-> +		dev_dbg(rvu->dev,
-> +			"%s:%d Allocated %d from subbank %d, tot=%d count=%d\n",
-> +			__func__, __LINE__, alloc_cnt, sb->idx, tot, count);
-> +
-> +		if (!rc && count == tot)
-> +			return 0;
-> +	}
-> +
-> +	/* Allocate in free subbanks */
-> +	xa_for_each(&npc_priv.xa_sb_free, index, val) {
-> +		idx = xa_to_value(val);
-> +		sb = &npc_priv.sb[idx];
-> +
-> +		/* Minimize allocation from restricted subbanks
-> +		 * in noref allocations.
-> +		 */
-> +		if (npc_subbank_restrict_usage(rvu, idx))
-> +			continue;
-> +
-> +		if (!npc_subbank_suits(sb, key_type))
-> +			continue;
-> +
-> +		/* try in bank 0 */
-> +		alloc_cnt = 0;
-> +		rc =  npc_subbank_alloc(rvu, sb, key_type,
-> +					sb->b0b, sb->b0t, 0,
-> +					contig, count - tot,
-> +					mcam_idx + tot,
-> +					count - tot,
-> +					max_alloc, &alloc_cnt);
-> +
-> +		tot += alloc_cnt;
-> +
-> +		dev_dbg(rvu->dev,
-> +			"%s:%d Allocated %d from subbank %d, tot=%d count=%d\n",
-> +			__func__, __LINE__, alloc_cnt, sb->idx, tot, count);
-> +
-> +		/* Successfully allocated */
-> +		if (!rc && count == tot)
-> +			return 0;
-> +
-> +		/* x4 entries can be allocated from bank 0 only */
-> +		if (key_type == NPC_MCAM_KEY_X4)
-> +			continue;
-> +
-> +		/* try in bank 1 for x2 */
-> +		alloc_cnt = 0;
-> +		rc =  npc_subbank_alloc(rvu, sb,
-> +					key_type, sb->b1b, sb->b1t, 0,
-> +					contig, count - tot,
-> +					mcam_idx + tot, count - tot,
-> +					max_alloc, &alloc_cnt);
-> +
-> +		tot += alloc_cnt;
-> +
-> +		dev_dbg(rvu->dev,
-> +			"%s:%d Allocated %d from subbank %d, tot=%d count=%d\n",
-> +			__func__, __LINE__, alloc_cnt, sb->idx, tot, count);
-> +
-> +		if (!rc && count == tot)
-> +			return 0;
-> +	}
-> +
-> +	/* Allocate from restricted subbanks */
-> +	for (i = 0; restrict_valid &&
-> +	     (i < ARRAY_SIZE(npc_subbank_restricted_idxs)); i++) {
-> +		idx = npc_subbank_restricted_idxs[i];
-> +		sb = &npc_priv.sb[idx];
-> +
-> +		/* Skip if not suitable subbank */
-> +		if (!npc_subbank_suits(sb, key_type))
-> +			continue;
-> +
-> +		if (contig && npc_subbank_free_cnt(rvu, sb, key_type) < count)
-> +			continue;
-> +
-> +		/* try in bank 0. Try passing ref and limit equal to
-> +		 * subbank boundaries
-> +		 */
-> +		alloc_cnt = 0;
-> +		rc =  npc_subbank_alloc(rvu, sb, key_type,
-> +					sb->b0b, sb->b0t, 0,
-> +					contig, count - tot,
-> +					mcam_idx + tot,
-> +					count - tot,
-> +					max_alloc, &alloc_cnt);
-> +
-> +		/* Non contiguous allocation may allocate less than
-> +		 * requested 'count'.
-> +		 */
-> +		tot += alloc_cnt;
-> +
-> +		dev_dbg(rvu->dev,
-> +			"%s:%d Allocated %d from subbank %d, tot=%d count=%d\n",
-> +			__func__, __LINE__, alloc_cnt, sb->idx, tot, count);
-> +
-> +		/* Successfully allocated */
-> +		if (!rc && count == tot)
-> +			return 0;
-> +
-> +		/* x4 entries can be allocated from bank 0 only */
-> +		if (key_type == NPC_MCAM_KEY_X4)
-> +			continue;
-> +
-> +		/* try in bank 1 for x2 */
-> +		alloc_cnt = 0;
-> +		rc =  npc_subbank_alloc(rvu, sb, key_type,
-> +					sb->b1b, sb->b1t, 0,
-> +					contig, count - tot,
-> +					mcam_idx + tot,
-> +					count - tot, max_alloc,
-> +					&alloc_cnt);
-> +
-> +		tot += alloc_cnt;
-> +
-> +		dev_dbg(rvu->dev,
-> +			"%s:%d Allocated %d from subbank %d, tot=%d count=%d\n",
-> +			__func__, __LINE__, alloc_cnt, sb->idx, tot, count);
-> +
-> +		if (!rc && count == tot)
-> +			return 0;
-> +	}
-> +
-> +	/* non contiguous allocation fails. We need to do clean up */
-> +	if (max_alloc)
-> +		npc_idx_free(rvu, mcam_idx, tot, false);
-> +
-> +	dev_dbg(rvu->dev, "%s:%d non-contig allocation fails\n",
-> +		__func__, __LINE__);
-> +
-> +	return -EFAULT;
-> +}
-> +
-> +int npc_cn20k_idx_free(struct rvu *rvu, u16 *mcam_idx, int count)
-> +{
-> +	return npc_idx_free(rvu, mcam_idx, count, true);
-> +}
-> +
-> +int npc_cn20k_ref_idx_alloc(struct rvu *rvu, int pcifunc, int key_type,
-> +			    int prio, u16 *mcam_idx, int ref, int limit,
-> +			    bool contig, int count)
-> +{
-> +	int i, eidx, rc, bd;
-> +	bool ref_valid;
-> +
-> +	bd = npc_priv.bank_depth;
-> +
-> +	/* Special case: ref == 0 && limit= 0 && prio == HIGH && count == 1
-> +	 * Here user wants to allocate 0th entry
-> +	 */
-> +	if (!ref && !limit && prio == NPC_MCAM_HIGHER_PRIO &&
-> +	    count == 1) {
-> +		rc = npc_subbank_ref_alloc(rvu, key_type, ref, limit,
-> +					   prio, contig, count, mcam_idx);
-> +
-> +		if (rc)
-> +			return rc;
-> +		goto add2map;
-> +	}
-> +
-> +	ref_valid = !!(limit || ref);
-> +	if (!ref_valid) {
-> +		if (contig && count > npc_priv.subbank_depth)
-> +			goto try_noref_multi_subbank;
-> +
-> +		rc = npc_subbank_noref_alloc(rvu, key_type, contig,
-> +					     count, mcam_idx);
-> +		if (!rc)
-> +			goto add2map;
-> +
-> +try_noref_multi_subbank:
-> +		eidx = (key_type == NPC_MCAM_KEY_X4) ? bd - 1 : 2 * bd - 1;
-> +
-> +		if (prio == NPC_MCAM_HIGHER_PRIO)
-> +			rc = npc_multi_subbank_ref_alloc(rvu, key_type,
-> +							 eidx, 0,
-> +							 NPC_MCAM_HIGHER_PRIO,
-> +							 contig, count,
-> +							 mcam_idx);
-> +		else
-> +			rc = npc_multi_subbank_ref_alloc(rvu, key_type,
-> +							 0, eidx,
-> +							 NPC_MCAM_LOWER_PRIO,
-> +							 contig, count,
-> +							 mcam_idx);
-> +
-> +		if (!rc)
-> +			goto add2map;
-> +
-> +		return rc;
-> +	}
-> +
-> +	if ((prio == NPC_MCAM_LOWER_PRIO && ref > limit) ||
-> +	    (prio == NPC_MCAM_HIGHER_PRIO && ref < limit)) {
-> +		dev_err(rvu->dev, "%s:%d Wrong ref_enty(%d) or limit(%d)\n",
-> +			__func__, __LINE__, ref, limit);
-> +		return -EINVAL;
-> +	}
-> +
-> +	if ((key_type == NPC_MCAM_KEY_X4 && (ref >= bd || limit >= bd)) ||
-> +	    (key_type == NPC_MCAM_KEY_X2 &&
-> +	     (ref >= 2 * bd || limit >= 2 * bd))) {
-> +		dev_err(rvu->dev, "%s:%d Wrong ref_enty(%d) or limit(%d)\n",
-> +			__func__, __LINE__, ref, limit);
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (contig && count > npc_priv.subbank_depth)
-> +		goto try_ref_multi_subbank;
-> +
-> +	rc = npc_subbank_ref_alloc(rvu, key_type, ref, limit,
-> +				   prio, contig, count, mcam_idx);
-> +	if (!rc)
-> +		goto add2map;
-> +
-> +try_ref_multi_subbank:
-> +	rc = npc_multi_subbank_ref_alloc(rvu, key_type,
-> +					 ref, limit, prio,
-> +					 contig, count, mcam_idx);
-> +	if (!rc)
-> +		goto add2map;
-> +
-> +	return rc;
-> +
-> +add2map:
-> +	for (i = 0; i < count; i++) {
-> +		rc = npc_add_to_pf_maps(rvu, mcam_idx[i], pcifunc);
-> +		if (rc)
-> +			return rc;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +void npc_cn20k_subbank_calc_free(struct rvu *rvu, int *x2_free,
-> +				 int *x4_free, int *sb_free)
-> +{
-> +	struct npc_subbank *sb;
-> +	int i;
-> +
-> +	/* Reset all stats to zero */
-> +	*x2_free = 0;
-> +	*x4_free = 0;
-> +	*sb_free = 0;
-> +
-> +	for (i = 0; i < npc_priv.num_subbanks; i++) {
-> +		sb = &npc_priv.sb[i];
-> +		mutex_lock(&sb->lock);
-> +
-> +		/* Count number of free subbanks */
-> +		if (sb->flags & NPC_SUBBANK_FLAG_FREE) {
-> +			(*sb_free)++;
-> +			goto next;
-> +		}
-> +
-> +		/* Sumup x4 free count */
-> +		if (sb->key_type == NPC_MCAM_KEY_X4) {
-> +			(*x4_free) += sb->free_cnt;
-> +			goto next;
-> +		}
-> +
-> +		/* Sumup x2 free counts */
-> +		(*x2_free) += sb->free_cnt;
-> +next:
-> +		mutex_unlock(&sb->lock);
-> +	}
-> +}
-> +
-> +int
-> +rvu_mbox_handler_npc_cn20k_get_free_count(struct rvu *rvu,
-> +					  struct msg_req *req,
-> +					  struct npc_cn20k_get_free_count_rsp *rsp)
-> +{
-> +	npc_cn20k_subbank_calc_free(rvu, &rsp->free_x2,
-> +				    &rsp->free_x4, &rsp->free_subbanks);
-> +	return 0;
-> +}
-> +
-> +static void npc_lock_all_subbank(void)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < npc_priv.num_subbanks; i++)
-> +		mutex_lock(&npc_priv.sb[i].lock);
-> +}
-> +
-> +static void npc_unlock_all_subbank(void)
-> +{
-> +	int i;
-> +
-> +	for (i = npc_priv.num_subbanks - 1; i >= 0; i--)
-> +		mutex_unlock(&npc_priv.sb[i].lock);
-> +}
-> +
-> +static int *subbank_srch_order;
-> +
-
-> +int npc_cn20k_search_order_set(struct rvu *rvu, int (*arr)[2], int cnt)
-> +{
-> +	struct npc_mcam *mcam = &rvu->hw->mcam;
-> +	u8 (*fslots)[2], (*uslots)[2];
-> +	int fcnt = 0, ucnt = 0;
-> +	struct npc_subbank *sb;
-> +	unsigned long index;
-> +	int idx, val;
-> +	void *v;
-> +
-> +	if (cnt != npc_priv.num_subbanks)
-> +		return -EINVAL;
-> +
-> +	fslots = kcalloc(cnt, sizeof(*fslots), GFP_KERNEL);
-> +	if (!fslots)
-> +		return -ENOMEM;
-> +
-> +	uslots = kcalloc(cnt, sizeof(*uslots), GFP_KERNEL);
-> +	if (!uslots)
-> +		return -ENOMEM;
-> +
-> +	for (int i = 0; i < cnt; i++, arr++) {
-> +		idx = (*arr)[0];
-> +		val = (*arr)[1];
-
-FWIIW, I think this would be slightly more clearly expressed as:
-
-		idx = arr[i][0];
-		val = arr[i][0];
-
-Likewise for uslots and fslots below.
-
-> +
-> +		subbank_srch_order[idx] = val;
-> +	}
-> +
-> +	/* Lock mcam */
-> +	mutex_lock(&mcam->lock);
-> +	npc_lock_all_subbank();
-> +
-> +	restrict_valid = false;
-> +
-> +	xa_for_each(&npc_priv.xa_sb_used, index, v) {
-> +		val = xa_to_value(v);
-> +		(*(uslots + ucnt))[0] = index;
-> +		(*(uslots + ucnt))[1] = val;
-> +		xa_erase(&npc_priv.xa_sb_used, index);
-> +		ucnt++;
-> +	}
-> +
-> +	xa_for_each(&npc_priv.xa_sb_free, index, v) {
-> +		val = xa_to_value(v);
-> +		(*(fslots + fcnt))[0] = index;
-> +		(*(fslots + fcnt))[1] = val;
-> +		xa_erase(&npc_priv.xa_sb_free, index);
-> +		fcnt++;
-> +	}
-> +
-> +	for (int i = 0; i < ucnt; i++) {
-> +		idx  = (*(uslots + i))[1];
-> +		sb = &npc_priv.sb[idx];
-> +		sb->arr_idx = subbank_srch_order[sb->idx];
-> +		xa_store(&npc_priv.xa_sb_used, sb->arr_idx,
-> +			 xa_mk_value(sb->idx), GFP_KERNEL);
-> +	}
-> +
-> +	for (int i = 0; i < fcnt; i++) {
-> +		idx  = (*(fslots + i))[1];
-> +		sb = &npc_priv.sb[idx];
-> +		sb->arr_idx = subbank_srch_order[sb->idx];
-> +		xa_store(&npc_priv.xa_sb_free, sb->arr_idx,
-> +			 xa_mk_value(sb->idx), GFP_KERNEL);
-> +	}
-> +
-> +	npc_unlock_all_subbank();
-> +	mutex_unlock(&mcam->lock);
-> +
-> +	kfree(fslots);
-> +	kfree(uslots);
-> +
-> +	return 0;
-> +}
-
-...
-
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
-> new file mode 100644
-> index 000000000000..e1191d3d03cb
-> --- /dev/null
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
-> @@ -0,0 +1,65 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/* Marvell RVU Admin Function driver
-> + *
-> + * Copyright (C) 2026 Marvell.
-> + *
-> + */
-> +
-> +#ifndef NPC_CN20K_H
-> +#define NPC_CN20K_H
-> +
-> +#define MAX_NUM_BANKS 2
-> +#define MAX_NUM_SUB_BANKS 32
-> +#define MAX_SUBBANK_DEPTH 256
-> +
-> +enum npc_subbank_flag {
-> +	NPC_SUBBANK_FLAG_UNINIT,	// npc_subbank is not initialized yet.
-> +	NPC_SUBBANK_FLAG_FREE = BIT(0),	// No slot allocated
-> +	NPC_SUBBANK_FLAG_USED = BIT(1), // At least one slot allocated
-> +};
-
-I would suggest using Kernel doc formatting for the documentation
-the enum above and two structs below.
-
-> +
-> +struct npc_subbank {
-> +	u16 b0t, b0b, b1t, b1b;		// mcam indexes of this subbank
-> +	enum npc_subbank_flag flags;
-> +	struct mutex lock;		// for flags & rsrc modification
-> +	DECLARE_BITMAP(b0map, MAX_SUBBANK_DEPTH);	// for x4 and x2
-> +	DECLARE_BITMAP(b1map, MAX_SUBBANK_DEPTH);	// for x2 only
-> +	u16 idx;	// subbank index, 0 to npc_priv.subbank - 1
-> +	u16 arr_idx;	// Index to the free array or used array
-> +	u16 free_cnt;	// number of free slots;
-> +	u8 key_type;	//NPC_MCAM_KEY_X4 or NPC_MCAM_KEY_X2
-> +};
-> +
-> +struct npc_priv_t {
-> +	int bank_depth;
-> +	const int num_banks;
-> +	int num_subbanks;
-> +	int subbank_depth;
-> +	u8 kw;				// Kex configure Keywidth.
-> +	struct npc_subbank *sb;		// Array of subbanks
-> +	struct xarray xa_sb_used;	// xarray of used subbanks
-> +	struct xarray xa_sb_free;	// xarray of free subbanks
-> +	struct xarray *xa_pf2idx_map;	// Each PF to map its mcam idxes
-> +	struct xarray xa_idx2pf_map;	// Mcam idxes to pf map.
-> +	struct xarray xa_pf_map;	// pcifunc to index map.
-> +	int pf_cnt;
-> +	bool init_done;
-> +};
-
-...
 
