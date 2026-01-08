@@ -1,128 +1,96 @@
-Return-Path: <netdev+bounces-248082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB057D03058
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 14:28:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 026A7D03512
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 15:23:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2BD12302949A
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 13:25:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E5075317E441
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 13:56:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D620C33BBA8;
-	Thu,  8 Jan 2026 13:23:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0FCA318EFD;
+	Thu,  8 Jan 2026 13:32:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NlLnLvAA"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0116B18859B
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 13:23:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3048E3BFE3D;
+	Thu,  8 Jan 2026 13:32:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767878591; cv=none; b=hnEebbGXqv+7k5HDsVHiW8dgYRBCMRPq83cGB8/xqGDO5ComNS1YUA8GTUyLHJySj7W9OCxTqnkEi9i99+pK+zjiRZ3Ih34GdsOzlHabOJpR6HaHkrC8zrYcUMq8ntIo0VAEM8Rt5UYGXE7TCVgiH6rTqf+cHBj78T98oFv1RG0=
+	t=1767879127; cv=none; b=dhAi9XVhxQByS6sL3Gbj3k4v8Y377/Ib19wmGo82KkuOfzaM0xVRuVFfEzvwDvA2C7jHRg0PYezZQZ3/3RcpDC1TzldSoRVtRHlKGjhBc/rONSsJllgHXdP5VMa3AshrEP7s1lmBea3MbFd0w+eRe2f8ydwuueRe9tL+mRUVNs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767878591; c=relaxed/simple;
-	bh=sushfq5GAYWdCXpDJKKEKFHV3Afei3pz/MnRjM3PDt4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=aJpElVsI5CCGx3rz/c6vkxnRemIL+laxPFpaUyTHfDUmECWBVCyQRGX2AcCyTNoH8gTdugTRpaKCMms2M6nvdxT+4Ck57PQATP4ZvaznIUjy0pXnKvRhoaueWfPA0WvWH6oEG65VvZUeokXwpi/8zoCkr4Hr1MNectEm1crCiZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1vdpyU-0005cJ-PR; Thu, 08 Jan 2026 14:22:50 +0100
-Received: from lupine.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::4e] helo=lupine)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1vdpyS-009gXW-2F;
-	Thu, 08 Jan 2026 14:22:48 +0100
-Received: from pza by lupine with local (Exim 4.98.2)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1vdpyS-000000007uP-1b8C;
-	Thu, 08 Jan 2026 14:22:48 +0100
-Message-ID: <1fe08251f091bd695f630b7b46ae8c8d85d664a3.camel@pengutronix.de>
-Subject: Re: [PATCH v3 1/3] net: stmmac: socfpga: add call to
- assert/deassert ahb reset line
-From: Philipp Zabel <p.zabel@pengutronix.de>
-To: Dinh Nguyen <dinguyen@kernel.org>, Maxime Chevallier	
- <maxime.chevallier@bootlin.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre
- Torgue	 <alexandre.torgue@foss.st.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Mamta Shukla	 <mamta.shukla@leica-geosystems.com>,
- Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc: bsp-development.geo@leica-geosystems.com, Pengutronix Kernel Team	
- <kernel@pengutronix.de>, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, 	linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org
-Date: Thu, 08 Jan 2026 14:22:48 +0100
-In-Reply-To: <20260108-remove_ocp-v3-1-ea0190244b4c@kernel.org>
-References: <20260108-remove_ocp-v3-0-ea0190244b4c@kernel.org>
-	 <20260108-remove_ocp-v3-1-ea0190244b4c@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2-0+deb13u1 
+	s=arc-20240116; t=1767879127; c=relaxed/simple;
+	bh=GUwF1Yg/W4LjgNFNJ59UKOdN4qBNr5ji6szGlMiVl8k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UmBCHvwAFJuBG5LBfisG8aCyArg3gIzzfpEpe4alh1cl4zYIpAb9RZViM2urLG+3z+62wc6of/uA4Bxmvtka4jhpgwfFlGTa6ZHOq/WCt8sBdSTWtRbjdNr/gqbhCjtl/jBmS7LPB0PoVoyPBXzJ0wYhh4EviF0e9hEdZ/vgm3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NlLnLvAA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9D9DC116C6;
+	Thu,  8 Jan 2026 13:32:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767879125;
+	bh=GUwF1Yg/W4LjgNFNJ59UKOdN4qBNr5ji6szGlMiVl8k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NlLnLvAAm26tW7Ctjnm5MqUtY9rPp2aVYNTbNQuurD4bq9pBxfY00Bj/GAkOFhp51
+	 yczSV7P+ZVBnrkELUpujSrlPFab4mPu6U2ItYEx/UMLQ4+AY4ZixCoPH4UQ0HZlOdd
+	 RVW0OzHhFsBAaEvhbbMKicN1d906C+t3jd5Wrwo92EJqdZuiGkwmmedYufoIbfwSSS
+	 fq2hN7WZI7TRSOCl7miC/LH7kx5Wt1k722f/J9ug4g42elVQRKtH/J/o5eyiuleF5L
+	 TPiI7kOFppldobk/V88cMgg9bgi1ohXDzRSApU8mARNZ1YC4NjTlhOQwzFGouyXqlH
+	 h89oV/6RvmY3w==
+Date: Thu, 8 Jan 2026 13:31:59 +0000
+From: Simon Horman <horms@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org, YiFei Zhu <zhuyifei@google.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	intel-wired-lan@lists.osuosl.org,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: Re: [PATCH iwl-next v4] idpf: export RX hardware timestamping
+ information to XDP
+Message-ID: <20260108133159.GH345651@kernel.org>
+References: <20251223194649.3050648-1-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: p.zabel@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251223194649.3050648-1-almasrymina@google.com>
 
-On Do, 2026-01-08 at 07:08 -0600, Dinh Nguyen wrote:
-> The "stmmaceth-ocp" reset line of stmmac controller on the SoCFPGA
-> platform is essentially the "ahb" reset on the standard stmmac
-> controller. But since stmmaceth-ocp has already been introduced into
-> the wild, we cannot just remove support for it. But what we can do is
-> to support both "stmmaceth-ocp" and "ahb" reset names. Going forward we
-> will be using "ahb", but in order to not break ABI, we will be call reset
-> assert/de-assert both ahb and stmmaceth-ocp.
->=20
-> The ethernet hardware on SoCFPGA requires either the stmmaceth-ocp or
-> ahb reset to be asserted every time before changing the phy mode, then
-> de-asserted when the phy mode has been set.
->=20
-> With this change, we should be able to revert patch:
-> commit 62a40a0d5634 ("arm: dts: socfpga: use reset-name "stmmaceth-ocp"
-> instead of "ahb"")
->=20
-> Signed-off-by: Dinh Nguyen <dinguyen@kernel.org>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 4 ++++
->  1 file changed, 4 insertions(+)
->=20
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/driver=
-s/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-> index a2b52d2c4eb6f..79df55515c718 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-> @@ -407,6 +407,7 @@ static int socfpga_gen5_set_phy_mode(struct socfpga_d=
-wmac *dwmac)
-> =20
->  	/* Assert reset to the enet controller before changing the phy mode */
->  	reset_control_assert(dwmac->stmmac_ocp_rst);
-> +	reset_control_assert(dwmac->plat_dat->stmmac_ahb_rst);
+On Tue, Dec 23, 2025 at 07:46:46PM +0000, Mina Almasry wrote:
+> From: YiFei Zhu <zhuyifei@google.com>
+> 
+> The logic is similar to idpf_rx_hwtstamp, but the data is exported
+> as a BPF kfunc instead of appended to an skb to support grabbing
+> timestamps in xsk packets.
+> 
+> A idpf_queue_has(PTP, rxq) condition is added to check the queue
+> supports PTP similar to idpf_rx_process_skb_fields.
+> 
+> Tested using an xsk connection and checking xdp timestamps are
+> retreivable in received packets.
+> 
+> Cc: intel-wired-lan@lists.osuosl.org
+> Signed-off-by: YiFei Zhu <zhuyifei@google.com>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
-Since these two are just different names for the same reset,
-I think it would be cleaner to rename dwmac->stmmac_ocp_rst to
-dwmac->stmmac_ahb_rst and assign this either to
-dwmac->plat_dat->stmmac_ahb_rst or to the stmmac-ocp reset during
-probe.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Also, a comment explaining that the dem_reset_control_get_optional(dev,
-"stmmaceth-ocp") is for backwards compatibility with legacy device
-trees could be helpful to future readers.
-
-
-regards
-Philipp
 
