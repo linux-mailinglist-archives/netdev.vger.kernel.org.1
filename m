@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-248272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1972D06528
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 22:30:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E9DCD0652E
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 22:30:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 505CD3073789
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 21:27:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0D53E3075F7D
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 21:27:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1811B3385A6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA280331218;
 	Thu,  8 Jan 2026 21:27:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hm2gl/p3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AC8dOesR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9753338598
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 21:27:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A41338918
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 21:27:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767907629; cv=none; b=RYetBPodEY/tye/LIeKtHj4Ui9DmUhTCzn4suvCPYxMWUDQkKlMlskTsvBN6389OuXO21SynBSjr9MJGrh0XgARelaKzHPPKnd6fH7lQyAwpjvxiyOV8cjlm467wfiSXQ+I8qiC376siA6s8hqKm8vVtUztpIIJ9c7OMJ5Q0NPs=
+	t=1767907629; cv=none; b=KZ0/7nD2tbskLdQo9vJE41XvnzQ+mIwX+Bu1ZWpgFp0XYXsYbH8ugyO5+7hTe4ZO7LjbR9QbWGIC7KjN0ZyC3vWNm0lldwE+eJi0OF5PMSkPwKFuM7S4ZXsP56lf9e4qBBM9R5HXbYWA+93DAoZQtmh9uIKPR6+7eXsg1Dkm+0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1767907629; c=relaxed/simple;
-	bh=ZYkiL7oh5oOKHYsQ0T8OqBJ7F7EiYH6SKhKX4yq536Q=;
+	bh=L1kdY1zZ21jJE8Lu631sAvQXOmIPIXlDqAjuHLa/Ysk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c717mwjZ6p8cUTKMhNUotBKB0D1LPdOrrzea9MhsAMAT9Ne/PeeglDpksZZHlPf4A1HRnKFYrGu5OseTQCDWfbJNBIi+RxntltsnIAcGizFEB4yMu+lAO+jLLEOjBxYJ1ou04CdqesUDV7NB6EvvF3FUQ2UdN+v0DMnM6VKZO2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hm2gl/p3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EF0DC116C6;
-	Thu,  8 Jan 2026 21:27:08 +0000 (UTC)
+	 MIME-Version; b=qqL7GSddd2+1HfL7e1cBix/Qa3k2F8N0jLcWrIuNPbkoxnc0AMvoOpmNk55V/jBExEMf3OAWF9YiwE+vJv3f0yBIT2z4MXeujEesMPWtPFv0uhNmI6dgg16aVDkZ3gOItX0mPBn5XaSb0mObVmJ5HX1L/5bsZRJVKrF8SzUulb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AC8dOesR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5039EC116C6;
+	Thu,  8 Jan 2026 21:27:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767907628;
-	bh=ZYkiL7oh5oOKHYsQ0T8OqBJ7F7EiYH6SKhKX4yq536Q=;
+	s=k20201202; t=1767907629;
+	bh=L1kdY1zZ21jJE8Lu631sAvQXOmIPIXlDqAjuHLa/Ysk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hm2gl/p3hREqB56MW+Krb8CXCdp/SY8PWxBp2o6VW/RHpXTSwc54krFuMBsmi7o/0
-	 tbjEVPEGnJdjbkPHGLDb7wS3LldZvnOPoUcL57wCFAEEpzGEU6WffuoHobiYXmDjZ1
-	 BfgnoS2MacnqxekiYN69lJVvLtRubCtnUu6gIAnVcrQtOZErgnLjaYqTpsK0r+ccWc
-	 yO8FKu+E/7MDBlIrABxwg0g+6K9BuGl4owA2JX3kfbI5NjVnLd+WAnX6FgujB4M5x+
-	 senemMWhxd7vwPx4yc1dlHmHcnONsl+hYouqwW6ff0cdKy4mKjKxRjm8NqPofSWeSg
-	 eHxcpt+FePA/g==
+	b=AC8dOesRtT79/P9Dk6jTJWcT3TUaylEPOkU1aqmfeM67bA2AxVeIUh/3AKTLBh9Kj
+	 xU7aj/OceZ5hiNSBdTlKWqAeFEYX2OAvJBiykJ0hOa9HeZH15EBdbr8Uhgb2P/LRoc
+	 wWaPn/91JDxwv+99ipSp3R7MRcKh88YEBAf/583fXR1CV4IBO64qKBdgu2dLDwPVFL
+	 Qff9jYaKtNHwNqqIx3ABueEwfFxI+cYwI07oWbT7jUwkuBzF9nlLoD9DBCwOhPzQWt
+	 coc+mm34QO6lpHE4NqA7d1Pj2Su0V2aBPB3ZTsfi+nwQfuwcy8ZQJvDT4lYtd5ETEl
+	 etLEBE8jm9ypA==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -48,10 +48,11 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: [PATCH net 2/4] net/mlx5e: Don't store mlx5e_priv in mlx5e_dev devlink priv
-Date: Thu,  8 Jan 2026 13:26:55 -0800
-Message-ID: <20260108212657.25090-3-saeed@kernel.org>
+	Leon Romanovsky <leonro@nvidia.com>,
+	Shay Drori <shayd@nvidia.com>
+Subject: [PATCH net 3/4] net/mlx5e: Pass netdev to mlx5e_destroy_netdev instead of priv
+Date: Thu,  8 Jan 2026 13:26:56 -0800
+Message-ID: <20260108212657.25090-4-saeed@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260108212657.25090-1-saeed@kernel.org>
 References: <20260108212657.25090-1-saeed@kernel.org>
@@ -66,10 +67,13 @@ Content-Transfer-Encoding: 8bit
 From: Saeed Mahameed <saeedm@nvidia.com>
 
 mlx5e_priv is an unstable structure that can be memset(0) if profile
-attaching fails, mlx5e_priv in mlx5e_dev devlink private is used to
-reference the netdev and mdev associated with that struct. Instead,
-store netdev directly into mlx5e_dev and get mdev from the containing
-mlx5_adev aux device structure.
+attaching fails.
+
+Pass netdev to mlx5e_destroy_netdev() to guarantee it will work on a
+valid netdev.
+
+On mlx5e_remove: Check validity of priv->profile, before attempting
+to cleanup any resources that might be not there.
 
 This fixes a kernel oops in mlx5e_remove when switchdev mode fails due
 to change profile failure.
@@ -86,25 +90,24 @@ mlx5_core 0012:03:00.1 gpu3rdma1: mlx5e_netdev_change_profile: failed to rollbac
 
 $ devlink dev reload pci/0000:00:03.0 ==> oops
 
-BUG: kernel NULL pointer dereference, address: 0000000000000520
- #PF: supervisor read access in kernel mode
- #PF: error_code(0x0000) - not-present page
+BUG: kernel NULL pointer dereference, address: 0000000000000370
 PGD 0 P4D 0
 Oops: Oops: 0000 [#1] SMP NOPTI
-CPU: 3 UID: 0 PID: 521 Comm: devlink Not tainted 6.18.0-rc5+ #117 PREEMPT(voluntary)
+CPU: 15 UID: 0 PID: 520 Comm: devlink Not tainted 6.18.0-rc5+ #115 PREEMPT(voluntary)
 Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-2.fc40 04/01/2014
-RIP: 0010:mlx5e_remove+0x68/0x130
-RSP: 0018:ffffc900034838f0 EFLAGS: 00010246
-RAX: ffff88810283c380 RBX: ffff888101874400 RCX: ffffffff826ffc45
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: ffff888102d789c0 R08: ffff8881007137f0 R09: ffff888100264e10
-R10: ffffc90003483898 R11: ffffc900034838a0 R12: ffff888100d261a0
-R13: ffff888100d261a0 R14: ffff8881018749a0 R15: ffff888101874400
-FS:  00007f8565fea740(0000) GS:ffff88856a759000(0000) knlGS:0000000000000000
+RIP: 0010:mlx5e_dcbnl_dscp_app+0x23/0x100
+RSP: 0018:ffffc9000083f8b8 EFLAGS: 00010286
+RAX: ffff8881126fc380 RBX: ffff8881015ac400 RCX: ffffffff826ffc45
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: ffff8881035109c0
+RBP: ffff8881035109c0 R08: ffff888101e3e838 R09: ffff888100264e10
+R10: ffffc9000083f898 R11: ffffc9000083f8a0 R12: ffff888101b921a0
+R13: ffff888101b921a0 R14: ffff8881015ac9a0 R15: ffff8881015ac400
+FS:  00007f789a3c8740(0000) GS:ffff88856aa59000(0000) knlGS:0000000000000000
 CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000520 CR3: 000000010b11a004 CR4: 0000000000370ef0
+CR2: 0000000000000370 CR3: 000000010b6c0001 CR4: 0000000000370ef0
 Call Trace:
  <TASK>
+ mlx5e_remove+0x57/0x110
  device_release_driver_internal+0x19c/0x200
  bus_remove_device+0xc6/0x130
  device_del+0x160/0x3d0
@@ -116,91 +119,100 @@ Call Trace:
  devlink_nl_reload_doit+0x45b/0x5a0
  genl_family_rcv_msg_doit+0xe8/0x140
 
-Fixes: ee75f1fc44dd ("net/mlx5e: Create separate devlink instance for ethernet auxiliary device")
 Fixes: c4d7eb57687f ("net/mxl5e: Add change profile method")
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+Reviewed-by: Shay Drori <shayd@nvidia.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en.h  |  2 +-
- .../net/ethernet/mellanox/mlx5/core/en_main.c | 20 ++++++++++---------
- 2 files changed, 12 insertions(+), 10 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en.h      |  2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 15 +++++++++------
+ drivers/net/ethernet/mellanox/mlx5/core/en_rep.c  |  4 ++--
+ 3 files changed, 12 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-index f42256768700..be52c30c2ad6 100644
+index be52c30c2ad6..ff4ab4691baf 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-@@ -962,7 +962,7 @@ struct mlx5e_priv {
- };
- 
- struct mlx5e_dev {
--	struct mlx5e_priv *priv;
-+	struct net_device *netdev;
- 	struct devlink_port dl_port;
- };
- 
+@@ -1242,7 +1242,7 @@ struct net_device *
+ mlx5e_create_netdev(struct mlx5_core_dev *mdev, const struct mlx5e_profile *profile);
+ int mlx5e_attach_netdev(struct mlx5e_priv *priv);
+ void mlx5e_detach_netdev(struct mlx5e_priv *priv);
+-void mlx5e_destroy_netdev(struct mlx5e_priv *priv);
++void mlx5e_destroy_netdev(struct net_device *netdev);
+ int mlx5e_netdev_change_profile(struct net_device *netdev,
+ 				struct mlx5_core_dev *mdev,
+ 				const struct mlx5e_profile *new_profile,
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index e50525b771bc..9f8d95f8915e 100644
+index 9f8d95f8915e..2c06a4abea04 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -6655,8 +6655,8 @@ static int _mlx5e_resume(struct auxiliary_device *adev)
+@@ -6643,11 +6643,12 @@ void mlx5e_netdev_attach_nic_profile(struct net_device *netdev,
+ 	mlx5e_netdev_change_profile(netdev, mdev, &mlx5e_nic_profile, NULL);
+ }
+ 
+-void mlx5e_destroy_netdev(struct mlx5e_priv *priv)
++void mlx5e_destroy_netdev(struct net_device *netdev)
  {
- 	struct mlx5_adev *edev = container_of(adev, struct mlx5_adev, adev);
- 	struct mlx5e_dev *mlx5e_dev = auxiliary_get_drvdata(adev);
--	struct mlx5e_priv *priv = mlx5e_dev->priv;
 -	struct net_device *netdev = priv->netdev;
-+	struct mlx5e_priv *priv = netdev_priv(mlx5e_dev->netdev);
-+	struct net_device *netdev = mlx5e_dev->netdev;
- 	struct mlx5_core_dev *mdev = edev->mdev;
- 	struct mlx5_core_dev *pos, *to;
- 	int err, i;
-@@ -6702,10 +6702,11 @@ static int mlx5e_resume(struct auxiliary_device *adev)
- 
- static int _mlx5e_suspend(struct auxiliary_device *adev, bool pre_netdev_reg)
- {
-+	struct mlx5_adev *edev = container_of(adev, struct mlx5_adev, adev);
- 	struct mlx5e_dev *mlx5e_dev = auxiliary_get_drvdata(adev);
--	struct mlx5e_priv *priv = mlx5e_dev->priv;
--	struct net_device *netdev = priv->netdev;
--	struct mlx5_core_dev *mdev = priv->mdev;
-+	struct mlx5e_priv *priv = netdev_priv(mlx5e_dev->netdev);
-+	struct net_device *netdev = mlx5e_dev->netdev;
-+	struct mlx5_core_dev *mdev = edev->mdev;
- 	struct mlx5_core_dev *pos;
- 	int i;
- 
-@@ -6766,11 +6767,11 @@ static int _mlx5e_probe(struct auxiliary_device *adev)
- 		goto err_devlink_port_unregister;
- 	}
- 	SET_NETDEV_DEVLINK_PORT(netdev, &mlx5e_dev->dl_port);
-+	mlx5e_dev->netdev = netdev;
- 
- 	mlx5e_build_nic_netdev(netdev);
- 
- 	priv = netdev_priv(netdev);
--	mlx5e_dev->priv = priv;
- 
- 	priv->profile = profile;
- 	priv->ppriv = NULL;
-@@ -6833,7 +6834,8 @@ static void _mlx5e_remove(struct auxiliary_device *adev)
- {
- 	struct mlx5_adev *edev = container_of(adev, struct mlx5_adev, adev);
- 	struct mlx5e_dev *mlx5e_dev = auxiliary_get_drvdata(adev);
--	struct mlx5e_priv *priv = mlx5e_dev->priv;
-+	struct net_device *netdev = mlx5e_dev->netdev;
 +	struct mlx5e_priv *priv = netdev_priv(netdev);
+ 
+-	mlx5e_priv_cleanup(priv);
++	if (priv->profile)
++		mlx5e_priv_cleanup(priv);
+ 	free_netdev(netdev);
+ }
+ 
+@@ -6804,7 +6805,7 @@ static int _mlx5e_probe(struct auxiliary_device *adev)
+ err_profile_cleanup:
+ 	profile->cleanup(priv);
+ err_destroy_netdev:
+-	mlx5e_destroy_netdev(priv);
++	mlx5e_destroy_netdev(netdev);
+ err_devlink_port_unregister:
+ 	mlx5e_devlink_port_unregister(mlx5e_dev);
+ err_devlink_unregister:
+@@ -6839,7 +6840,9 @@ static void _mlx5e_remove(struct auxiliary_device *adev)
  	struct mlx5_core_dev *mdev = edev->mdev;
  
  	mlx5_core_uplink_netdev_set(mdev, NULL);
-@@ -6842,8 +6844,8 @@ static void _mlx5e_remove(struct auxiliary_device *adev)
+-	mlx5e_dcbnl_delete_app(priv);
++
++	if (priv->profile)
++		mlx5e_dcbnl_delete_app(priv);
+ 	/* When unload driver, the netdev is in registered state
  	 * if it's from legacy mode. If from switchdev mode, it
  	 * is already unregistered before changing to NIC profile.
- 	 */
--	if (priv->netdev->reg_state == NETREG_REGISTERED) {
--		unregister_netdev(priv->netdev);
-+	if (netdev->reg_state == NETREG_REGISTERED) {
-+		unregister_netdev(netdev);
- 		_mlx5e_suspend(adev, false);
- 	} else {
- 		struct mlx5_core_dev *pos;
+@@ -6860,7 +6863,7 @@ static void _mlx5e_remove(struct auxiliary_device *adev)
+ 	/* Avoid cleanup if profile rollback failed. */
+ 	if (priv->profile)
+ 		priv->profile->cleanup(priv);
+-	mlx5e_destroy_netdev(priv);
++	mlx5e_destroy_netdev(netdev);
+ 	mlx5e_devlink_port_unregister(mlx5e_dev);
+ 	mlx5e_destroy_devlink(mlx5e_dev);
+ }
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
+index 52d3ad0b9cd9..6eec88fa6d10 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
+@@ -1611,7 +1611,7 @@ mlx5e_vport_vf_rep_load(struct mlx5_core_dev *dev, struct mlx5_eswitch_rep *rep)
+ 	priv->profile->cleanup(priv);
+ 
+ err_destroy_netdev:
+-	mlx5e_destroy_netdev(netdev_priv(netdev));
++	mlx5e_destroy_netdev(netdev);
+ 	return err;
+ }
+ 
+@@ -1666,7 +1666,7 @@ mlx5e_vport_rep_unload(struct mlx5_eswitch_rep *rep)
+ 	mlx5e_rep_vnic_reporter_destroy(priv);
+ 	mlx5e_detach_netdev(priv);
+ 	priv->profile->cleanup(priv);
+-	mlx5e_destroy_netdev(priv);
++	mlx5e_destroy_netdev(netdev);
+ free_ppriv:
+ 	kvfree(ppriv); /* mlx5e_rep_priv */
+ }
 -- 
 2.52.0
 
