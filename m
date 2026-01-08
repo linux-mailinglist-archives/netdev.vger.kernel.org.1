@@ -1,212 +1,311 @@
-Return-Path: <netdev+bounces-248257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36F66D0605B
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 21:19:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B124DD0607F
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 21:22:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6B3003013EA4
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 20:18:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 36A9A3024D78
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 20:22:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA70532ED28;
-	Thu,  8 Jan 2026 20:18:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4E2332AAB0;
+	Thu,  8 Jan 2026 20:22:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SRihcpir"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dE30YEXF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76111328614
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 20:18:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8CB81A23A0;
+	Thu,  8 Jan 2026 20:22:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767903520; cv=none; b=Esy+C3vb6mm4/nl3sPAM1VAI8RB5lMhfJCrak9xgxbiFM4iIycoDJr2X7Ob5+/oFEtQIXQZB5ljEVD6jTHiZ10X8Mx7YVVr/4v70FH10DP2/C8kSuz9xcZm/5qh6mqXZ1KgA53Shmfu2kbFdTeRURPRy9NiiDTJuagmTXKj38kk=
+	t=1767903747; cv=none; b=lrizul+YAzEEBQp4jJZh4tH8HEK4IE6o5IbGJW/RS86iJgFJ+9HOZMzI90ARf6hqjhNrZudXmCVtiE4PMlaL5ILS41kd1OQi39CuLZmyEduK4sZwLT/xJaqD6nLsFDVKJn4/IENqvwIG9xLcyP7O5zeNhNH1X29U1NTn9vaaeg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767903520; c=relaxed/simple;
-	bh=eMZuMbnvTpupe3z4sL/3yulIjCVyOBiMl0XNVcweEro=;
+	s=arc-20240116; t=1767903747; c=relaxed/simple;
+	bh=GdQrN+ZQRYM/rEQoK2EVWRblOIHzv0OWm75G2cMva8I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=smkyNNdF2N9pI1cvPFEueF2+wj/uGFJBdQYDY8Cs4OJzISmRfmLzoO0CeDflTxOYJ7D6NX8BJsR70V9VXECN3YGJfeY2rntFpwyKJFsuxc8Q2op85vtoVGv1CHOMn2E7SvD5eCQLkSYOou8y54d6M6oja0aOZldsB60DgvkXFqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SRihcpir; arc=none smtp.client-ip=74.125.82.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-12056277571so3835751c88.1
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 12:18:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767903517; x=1768508317; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hEV94PZ/KmCPCiILrgkVyejWUU/HBZTW+bNvgP5cVxM=;
-        b=SRihcpirg88znFnf7ymmXQH95DVPkToNTrpohc+42U0u9c1wXwxKuurfBA3jhLcr9R
-         /DdXSCIWulqZceHZTUHNx8gECtW3nH6DJRGQquLLtOzWO2vVAocyz7Nv1pIEoMGT+qzZ
-         nB7O1ilPZ0OCiF5mXcOQ537tMy5+wtZWsG9oAnuMGXjSTpHH3IaHuW8sUxc2u6WCy7mr
-         r9rHhb0qtnArJ0jIqCrUXfbutSg0YNIs0qHsRI9qcprNxApjZx0b0tfPq96+gkizmw8B
-         FsGyeY50Ty4NdFvRGy1XI5xEvcs7zXL8guSo6ZPZIsk22nlc3FURHfLvmr78ToM0VuJR
-         GAbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767903517; x=1768508317;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hEV94PZ/KmCPCiILrgkVyejWUU/HBZTW+bNvgP5cVxM=;
-        b=A0JzWQiGswJkAA7jyh/kYAMnWEbn1GduU03bZ6wwQu2C+pRpfJ/TxjqgtGz2XWxgJ+
-         qNHhMWrKNKFxgC0xhTdHUriEaCkqsoguUdkk8JiEvrn4jDVyYUF0vMcg19PzrtVZCTcd
-         Iakuef3Fjw7Rms8V9RcmL2yXm9UwDITcNT3YG7W95KgstwvOofF0bi0VV55Tj6avB1iu
-         70IFjA6euRYk4k30jSBdi751puUZPqqRlXDBTkSRIw2Vm1UfYpC9g1gl3tCyf3y09UXy
-         gzV2yZUmdX5OZYNfVFxzdXtF127Tkvx/Rte2S87ADLkqz7utwv61eG7hBioOWMq5zMZR
-         Bcyg==
-X-Forwarded-Encrypted: i=1; AJvYcCXQBj1LUHHT05RnjA6FA1L3Uvt/JAxG/KF0GaMP1RPiwHg6lWgmzq6UEK3i5+j95hoRCsNw6+I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxkhX09mO1O5IZW24gAskRGG5Y/OCASdzR8cugLsJwfAbZqUjB
-	IYDKuuWd1h2N2dbEgINnDpKcviAONLCMGF+rvVvOrdMUbx3JGk3JlRM=
-X-Gm-Gg: AY/fxX7X7x3SqtEeqaW9T8QhUiPj429Kzh/l4k7IJH+H22Z+A2eX3kf6krUiGAuP9i1
-	VO/cOvZgpmbWd1jKp7dMOEp6+lvTHrWEI1KlY5pyPvOvBWzRnNJrEQ8lIRhPMl+GDcXuJsvMkHA
-	X9huBQSJQoVOPsidERT14/BCnO8FFqnJCWpD4eIyuM+fD8AFKh9M+BZ0456xNb6dCmL8wSWZQ7t
-	AvlXlQRzjyDj51lcuDSYJPwFdnjM+QfwufN0hbmr9EaYcEOWHqKlIk4qZpN4/48MlDOul8upLha
-	yoewqSJx1pkrHnbfUt9fhQHRsWendB6uWHLuytucvjv8mE31oPtItQOC2uP/W8Uh8XrHx9na7gL
-	jCxiIlE1X7XYhID4ivevAAC0qK5zJGAQTZsD3yhu33B14SaN6wsNhthrF3MQhroMvjFiHjZPm/B
-	5sklO2BiNRhSITrFjwDXnfQSgZD6BC2cSSH0XZ0//HTNwqdnPkC0wVQ+9hhlgkpkn4AfFyHtSa/
-	b1ynA==
-X-Google-Smtp-Source: AGHT+IFUQi0BrfT68h0C2uHqNHZmyyN+toZqSmeX8bW0JvZ5hvF4JdUCKUKVcLcElvTT5rqIfY6TvQ==
-X-Received: by 2002:a05:7022:43a1:b0:11e:3e9:3e9f with SMTP id a92af1059eb24-121f8b9aedamr5501314c88.50.1767903516937;
-        Thu, 08 Jan 2026 12:18:36 -0800 (PST)
-Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-121f243ed62sm15476361c88.5.2026.01.08.12.18.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 12:18:36 -0800 (PST)
-Date: Thu, 8 Jan 2026 12:18:35 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y2CTnUDap8OQLdJGhg0c8XnmA2aaMXacvyGcLjXmRJMavN746olJrENe3wo6+npup+h6nmWVNS0lOc0GatbV/DC1BUvCxKdCk6u11C6LGrqtL+/6C7n5v8XUYjGvzw0JPfMpFqEXEh08WrR8nR63afs+gaCATIEYHrZqw2gHa8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dE30YEXF; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1767903745; x=1799439745;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=GdQrN+ZQRYM/rEQoK2EVWRblOIHzv0OWm75G2cMva8I=;
+  b=dE30YEXFh3VEApy4TgVlRzkFD/nPBeEPmUVYU++6EcDdO/24Nze2pMTn
+   g5546nm5IBWeeUNnlYRIwXcr5GCv6yYt1u9i0j9UT78f4tWE0gQXD2+d6
+   dBy/fB22b0NJGhZo/EmU80m0KRM0jFxvLBMvzXwN1bqdYwqJ7heuZQ765
+   8QaUsuHBlpQv+oHngD+QFdvK6oJ20uwVXgbcjUcwuIGiGqq1aqiuBPFkp
+   R35IjPP8yrlPfv3G5TAAYxs7JQHElMkJiid5sL47Oz5fObJsAMJrz2fQ+
+   aEciOsxP/4UP0Fq4sOJIL1qhK2KGO+c2g308PnCaY+YMHGIvCrHNohioX
+   w==;
+X-CSE-ConnectionGUID: XCzTnsmwRr+biRUy5KXhgA==
+X-CSE-MsgGUID: 2iJ8O99CTOqdy7Z5RWYnVQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11665"; a="86706514"
+X-IronPort-AV: E=Sophos;i="6.21,211,1763452800"; 
+   d="scan'208";a="86706514"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2026 12:22:24 -0800
+X-CSE-ConnectionGUID: HKw0EADDT9S18G4SjpZ19Q==
+X-CSE-MsgGUID: SCDiEARCQYSm/ua3y5cAtg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,211,1763452800"; 
+   d="scan'208";a="207775745"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 08 Jan 2026 12:22:18 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vdwWO-0000000058K-1XXv;
+	Thu, 08 Jan 2026 20:22:16 +0000
+Date: Fri, 9 Jan 2026 04:21:38 +0800
+From: kernel test robot <lkp@intel.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Mina Almasry <almasrymina@google.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	David Ahern <dsahern@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Mina Almasry <almasrymina@google.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
 	Stanislav Fomichev <sdf@fomichev.me>, asml.silence@gmail.com,
+	matttbe@kernel.org, skhawaja@google.com,
 	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH RESEND net-next v2] net: devmem: convert binding refcount
- to percpu_ref
-Message-ID: <aWARGwnF3z-ix35V@mini-arch>
-References: <20260107-upstream-precpu-ref-v2-v2-1-a709f098b3dc@meta.com>
+Subject: Re: [PATCH net-next v8 3/5] net: devmem: implement autorelease token
+ management
+Message-ID: <202601090411.LCEg5Rem-lkp@intel.com>
+References: <20260107-scratch-bobbyeshleman-devmem-tcp-token-upstream-v8-3-92c968631496@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260107-upstream-precpu-ref-v2-v2-1-a709f098b3dc@meta.com>
+In-Reply-To: <20260107-scratch-bobbyeshleman-devmem-tcp-token-upstream-v8-3-92c968631496@meta.com>
 
-On 01/07, Bobby Eshleman wrote:
-> From: Bobby Eshleman <bobbyeshleman@meta.com>
-> 
-> Convert net_devmem_dmabuf_binding refcount from refcount_t to percpu_ref
-> to optimize common-case reference counting on the hot path.
-> 
-> The typical devmem workflow involves binding a dmabuf to a queue
-> (acquiring the initial reference on binding->ref), followed by
-> high-volume traffic where every skb fragment acquires a reference.
-> Eventually traffic stops and the unbind operation releases the initial
-> reference. Additionally, the high traffic hot path is often multi-core.
-> This access pattern is ideal for percpu_ref as the first and last
-> reference during bind/unbind normally book-ends activity in the hot
-> path.
-> 
-> __net_devmem_dmabuf_binding_free becomes the percpu_ref callback invoked
-> when the last reference is dropped.
-> 
-> kperf test:
-> - 4MB message sizes
-> - 60s of workload each run
-> - 5 runs
-> - 4 flows
-> 
-> Throughput:
-> 	Before: 45.31 GB/s (+/- 3.17 GB/s)
-> 	After: 48.67 GB/s (+/- 0.01 GB/s)
-> 
-> Picking throughput-matched kperf runs (both before and after matched at
-> ~48 GB/s) for apples-to-apples comparison:
-> 
-> Summary (averaged across 4 workers):
-> 
->   TX worker CPU idle %:
->     Before: 34.44%
->     After: 87.13%
-> 
->   RX worker CPU idle %:
->     Before: 5.38%
->     After: 9.73%
-> 
-> kperf before:
-> 
-> client: == Source
-> client:   Tx 98.100 Gbps (735764807680 bytes in 60001149 usec)
-> client:   Tx102.798 Gbps (770996961280 bytes in 60001149 usec)
-> client:   Tx101.534 Gbps (761517834240 bytes in 60001149 usec)
-> client:   Tx 82.794 Gbps (620966707200 bytes in 60001149 usec)
-> client:   net CPU 56: usr: 0.01% sys: 0.12% idle:17.06% iow: 0.00% irq: 9.89% sirq:72.91%
-> client:   app CPU 60: usr: 0.08% sys:63.30% idle:36.24% iow: 0.00% irq: 0.30% sirq: 0.06%
-> client:   net CPU 57: usr: 0.03% sys: 0.08% idle:75.68% iow: 0.00% irq: 2.96% sirq:21.23%
-> client:   app CPU 61: usr: 0.06% sys:67.67% idle:31.94% iow: 0.00% irq: 0.28% sirq: 0.03%
-> client:   net CPU 58: usr: 0.01% sys: 0.06% idle:76.87% iow: 0.00% irq: 2.84% sirq:20.19%
-> client:   app CPU 62: usr: 0.06% sys:69.78% idle:29.79% iow: 0.00% irq: 0.30% sirq: 0.05%
-> client:   net CPU 59: usr: 0.06% sys: 0.16% idle:74.97% iow: 0.00% irq: 3.76% sirq:21.03%
-> client:   app CPU 63: usr: 0.06% sys:59.82% idle:39.80% iow: 0.00% irq: 0.25% sirq: 0.05%
-> client: == Target
-> client:   Rx 98.092 Gbps (735764807680 bytes in 60006084 usec)
-> client:   Rx102.785 Gbps (770962161664 bytes in 60006084 usec)
-> client:   Rx101.523 Gbps (761499566080 bytes in 60006084 usec)
-> client:   Rx 82.783 Gbps (620933136384 bytes in 60006084 usec)
-> client:   net CPU  2: usr: 0.00% sys: 0.01% idle:24.51% iow: 0.00% irq: 1.67% sirq:73.79%
-> client:   app CPU  6: usr: 1.51% sys:96.43% idle: 1.13% iow: 0.00% irq: 0.36% sirq: 0.55%
-> client:   net CPU  1: usr: 0.00% sys: 0.01% idle:25.18% iow: 0.00% irq: 1.99% sirq:72.80%
-> client:   app CPU  5: usr: 2.21% sys:94.54% idle: 2.54% iow: 0.00% irq: 0.38% sirq: 0.30%
-> client:   net CPU  3: usr: 0.00% sys: 0.01% idle:26.34% iow: 0.00% irq: 2.12% sirq:71.51%
-> client:   app CPU  7: usr: 2.22% sys:94.28% idle: 2.52% iow: 0.00% irq: 0.59% sirq: 0.37%
-> client:   net CPU  0: usr: 0.00% sys: 0.03% idle: 0.00% iow: 0.00% irq:10.44% sirq:89.51%
-> client:   app CPU  4: usr: 2.39% sys:81.46% idle:15.33% iow: 0.00% irq: 0.50% sirq: 0.30%
-> 
-> kperf after:
-> 
-> client: == Source
-> client:   Tx 99.257 Gbps (744447016960 bytes in 60001303 usec)
-> client:   Tx101.013 Gbps (757617131520 bytes in 60001303 usec)
-> client:   Tx 88.179 Gbps (661357854720 bytes in 60001303 usec)
-> client:   Tx101.002 Gbps (757533245440 bytes in 60001303 usec)
-> client:   net CPU 56: usr: 0.00% sys: 0.01% idle: 6.22% iow: 0.00% irq: 8.68% sirq:85.06%
-> client:   app CPU 60: usr: 0.08% sys:12.56% idle:87.21% iow: 0.00% irq: 0.08% sirq: 0.05%
-> client:   net CPU 57: usr: 0.00% sys: 0.05% idle:69.53% iow: 0.00% irq: 2.02% sirq:28.38%
-> client:   app CPU 61: usr: 0.11% sys:13.40% idle:86.36% iow: 0.00% irq: 0.08% sirq: 0.03%
-> client:   net CPU 58: usr: 0.00% sys: 0.03% idle:70.04% iow: 0.00% irq: 3.38% sirq:26.53%
-> client:   app CPU 62: usr: 0.10% sys:11.46% idle:88.31% iow: 0.00% irq: 0.08% sirq: 0.03%
-> client:   net CPU 59: usr: 0.01% sys: 0.06% idle:71.18% iow: 0.00% irq: 1.97% sirq:26.75%
-> client:   app CPU 63: usr: 0.10% sys:13.10% idle:86.64% iow: 0.00% irq: 0.10% sirq: 0.05%
-> client: == Target
-> client:   Rx 99.250 Gbps (744415182848 bytes in 60003297 usec)
-> client:   Rx101.006 Gbps (757589737472 bytes in 60003297 usec)
-> client:   Rx 88.171 Gbps (661319475200 bytes in 60003297 usec)
-> client:   Rx100.996 Gbps (757514792960 bytes in 60003297 usec)
-> client:   net CPU  2: usr: 0.00% sys: 0.01% idle:28.02% iow: 0.00% irq: 1.95% sirq:70.00%
-> client:   app CPU  6: usr: 2.03% sys:87.20% idle:10.04% iow: 0.00% irq: 0.37% sirq: 0.33%
-> client:   net CPU  3: usr: 0.00% sys: 0.00% idle:27.63% iow: 0.00% irq: 1.90% sirq:70.45%
-> client:   app CPU  7: usr: 1.78% sys:89.70% idle: 7.79% iow: 0.00% irq: 0.37% sirq: 0.34%
-> client:   net CPU  0: usr: 0.00% sys: 0.01% idle: 0.00% iow: 0.00% irq: 9.96% sirq:90.01%
-> client:   app CPU  4: usr: 2.33% sys:83.51% idle:13.24% iow: 0.00% irq: 0.64% sirq: 0.26%
-> client:   net CPU  1: usr: 0.00% sys: 0.01% idle:27.60% iow: 0.00% irq: 1.94% sirq:70.43%
-> client:   app CPU  5: usr: 1.88% sys:89.61% idle: 7.86% iow: 0.00% irq: 0.35% sirq: 0.27%
-> 
-> Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
-> ---
-> I previously sent this out after the merge window closed. This is
-> unchanged from that rev, so I left it the same version and added
-> RESEND, though I'm not entirely sure if that was correct...
-> ---
-> Changes in v2:
-> - remove comments (Stan and Paolo)
-> - fix grammar error in commit msg
-> - avoid unnecessary name change of work_struct wq
-> - Link to v1:
->   https://lore.kernel.org/r/20251126-upstream-percpu-ref-v1-1-cea20a92b1dd@meta.com
+Hi Bobby,
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Bobby-Eshleman/net-devmem-refactor-sock_devmem_dontneed-for-autorelease-split/20260108-095740
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260107-scratch-bobbyeshleman-devmem-tcp-token-upstream-v8-3-92c968631496%40meta.com
+patch subject: [PATCH net-next v8 3/5] net: devmem: implement autorelease token management
+config: sparc64-defconfig (https://download.01.org/0day-ci/archive/20260109/202601090411.LCEg5Rem-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260109/202601090411.LCEg5Rem-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601090411.LCEg5Rem-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> net/ipv4/tcp.c:2600:6: error: call to undeclared function 'net_devmem_dmabuf_binding_get'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+    2600 |                                         net_devmem_dmabuf_binding_get(binding);
+         |                                         ^
+   net/ipv4/tcp.c:2600:6: note: did you mean 'net_devmem_dmabuf_binding_put'?
+   net/ipv4/../core/devmem.h:163:1: note: 'net_devmem_dmabuf_binding_put' declared here
+     163 | net_devmem_dmabuf_binding_put(struct net_devmem_dmabuf_binding *binding)
+         | ^
+   1 error generated.
+
+
+vim +/net_devmem_dmabuf_binding_get +2600 net/ipv4/tcp.c
+
+  2498	
+  2499	/* On error, returns the -errno. On success, returns number of bytes sent to the
+  2500	 * user. May not consume all of @remaining_len.
+  2501	 */
+  2502	static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
+  2503				      unsigned int offset, struct msghdr *msg,
+  2504				      int remaining_len)
+  2505	{
+  2506		struct dmabuf_cmsg dmabuf_cmsg = { 0 };
+  2507		struct tcp_xa_pool tcp_xa_pool;
+  2508		unsigned int start;
+  2509		int i, copy, n;
+  2510		int sent = 0;
+  2511		int err = 0;
+  2512	
+  2513		tcp_xa_pool.max = 0;
+  2514		tcp_xa_pool.idx = 0;
+  2515		do {
+  2516			start = skb_headlen(skb);
+  2517	
+  2518			if (skb_frags_readable(skb)) {
+  2519				err = -ENODEV;
+  2520				goto out;
+  2521			}
+  2522	
+  2523			/* Copy header. */
+  2524			copy = start - offset;
+  2525			if (copy > 0) {
+  2526				copy = min(copy, remaining_len);
+  2527	
+  2528				n = copy_to_iter(skb->data + offset, copy,
+  2529						 &msg->msg_iter);
+  2530				if (n != copy) {
+  2531					err = -EFAULT;
+  2532					goto out;
+  2533				}
+  2534	
+  2535				offset += copy;
+  2536				remaining_len -= copy;
+  2537	
+  2538				/* First a dmabuf_cmsg for # bytes copied to user
+  2539				 * buffer.
+  2540				 */
+  2541				memset(&dmabuf_cmsg, 0, sizeof(dmabuf_cmsg));
+  2542				dmabuf_cmsg.frag_size = copy;
+  2543				err = put_cmsg_notrunc(msg, SOL_SOCKET,
+  2544						       SO_DEVMEM_LINEAR,
+  2545						       sizeof(dmabuf_cmsg),
+  2546						       &dmabuf_cmsg);
+  2547				if (err)
+  2548					goto out;
+  2549	
+  2550				sent += copy;
+  2551	
+  2552				if (remaining_len == 0)
+  2553					goto out;
+  2554			}
+  2555	
+  2556			/* after that, send information of dmabuf pages through a
+  2557			 * sequence of cmsg
+  2558			 */
+  2559			for (i = 0; i < skb_shinfo(skb)->nr_frags; i++) {
+  2560				struct net_devmem_dmabuf_binding *binding = NULL;
+  2561				skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
+  2562				struct net_iov *niov;
+  2563				u64 frag_offset;
+  2564				int end;
+  2565	
+  2566				/* !skb_frags_readable() should indicate that ALL the
+  2567				 * frags in this skb are dmabuf net_iovs. We're checking
+  2568				 * for that flag above, but also check individual frags
+  2569				 * here. If the tcp stack is not setting
+  2570				 * skb_frags_readable() correctly, we still don't want
+  2571				 * to crash here.
+  2572				 */
+  2573				if (!skb_frag_net_iov(frag)) {
+  2574					net_err_ratelimited("Found non-dmabuf skb with net_iov");
+  2575					err = -ENODEV;
+  2576					goto out;
+  2577				}
+  2578	
+  2579				niov = skb_frag_net_iov(frag);
+  2580				if (!net_is_devmem_iov(niov)) {
+  2581					err = -ENODEV;
+  2582					goto out;
+  2583				}
+  2584	
+  2585				end = start + skb_frag_size(frag);
+  2586				copy = end - offset;
+  2587	
+  2588				if (copy > 0) {
+  2589					copy = min(copy, remaining_len);
+  2590	
+  2591					frag_offset = net_iov_virtual_addr(niov) +
+  2592						      skb_frag_off(frag) + offset -
+  2593						      start;
+  2594					dmabuf_cmsg.frag_offset = frag_offset;
+  2595					dmabuf_cmsg.frag_size = copy;
+  2596	
+  2597					binding = net_devmem_iov_binding(niov);
+  2598	
+  2599					if (!sk->sk_devmem_info.binding) {
+> 2600						net_devmem_dmabuf_binding_get(binding);
+  2601						sk->sk_devmem_info.binding = binding;
+  2602					}
+  2603	
+  2604					if (sk->sk_devmem_info.binding != binding) {
+  2605						err = -EFAULT;
+  2606						goto out;
+  2607					}
+  2608	
+  2609					if (static_branch_unlikely(&tcp_devmem_ar_key)) {
+  2610						err = tcp_xa_pool_refill(sk,
+  2611									 &tcp_xa_pool,
+  2612									 skb_shinfo(skb)->nr_frags - i);
+  2613						if (err)
+  2614							goto out;
+  2615	
+  2616						dmabuf_cmsg.frag_token =
+  2617							tcp_xa_pool.tokens[tcp_xa_pool.idx];
+  2618					} else {
+  2619						dmabuf_cmsg.frag_token =
+  2620							net_iov_virtual_addr(niov) >> PAGE_SHIFT;
+  2621					}
+  2622	
+  2623	
+  2624					/* Will perform the exchange later */
+  2625					dmabuf_cmsg.dmabuf_id = net_devmem_iov_binding_id(niov);
+  2626	
+  2627					offset += copy;
+  2628					remaining_len -= copy;
+  2629	
+  2630					err = put_cmsg_notrunc(msg, SOL_SOCKET,
+  2631							       SO_DEVMEM_DMABUF,
+  2632							       sizeof(dmabuf_cmsg),
+  2633							       &dmabuf_cmsg);
+  2634					if (err)
+  2635						goto out;
+  2636	
+  2637					tcp_xa_pool_inc_pp_ref_count(&tcp_xa_pool, frag);
+  2638	
+  2639					sent += copy;
+  2640	
+  2641					if (remaining_len == 0)
+  2642						goto out;
+  2643				}
+  2644				start = end;
+  2645			}
+  2646	
+  2647			tcp_xa_pool_commit(sk, &tcp_xa_pool);
+  2648			if (!remaining_len)
+  2649				goto out;
+  2650	
+  2651			/* if remaining_len is not satisfied yet, we need to go to the
+  2652			 * next frag in the frag_list to satisfy remaining_len.
+  2653			 */
+  2654			skb = skb_shinfo(skb)->frag_list ?: skb->next;
+  2655	
+  2656			offset = offset - start;
+  2657		} while (skb);
+  2658	
+  2659		if (remaining_len) {
+  2660			err = -EFAULT;
+  2661			goto out;
+  2662		}
+  2663	
+  2664	out:
+  2665		tcp_xa_pool_commit(sk, &tcp_xa_pool);
+  2666		if (!sent)
+  2667			sent = err;
+  2668	
+  2669		return sent;
+  2670	}
+  2671	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
