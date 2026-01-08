@@ -1,127 +1,117 @@
-Return-Path: <netdev+bounces-248022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4569ED02022
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 11:05:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D323CD022F0
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 11:45:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1114D3008751
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 10:05:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5B16C3053325
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 10:40:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2B253BB9EA;
-	Thu,  8 Jan 2026 09:39:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3EE043B80B;
+	Thu,  8 Jan 2026 09:55:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cv8B0xcm"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Q45wSUUn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00E53C1FFA
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 09:39:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857254383B6;
+	Thu,  8 Jan 2026 09:55:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767865153; cv=none; b=HfV4TpOWefdBOmm5Qj73g8hfTZIhkj8RA7H/ivMSdGjNSeR1Vv4+i/afzHglOqpyIKBLmDvjwhzeHbAzkJQhOhGcjEtmzSn570ei5iMXlXGbf+y2Pj0XBHNPZ4o4HFGC7mNhuWYtadGM5YaHcjAyURbFGILzChJXwCiXf594iaE=
+	t=1767866153; cv=none; b=LCGhtrRwOBNcLZohLwl1Y/ZnPbILinzg3f4Tp8Xz+53wecbq6aDJHsa8Z2pGiOgDwsjnCktAyYC44tgWs2aygBI+wLIB7gXEpguABtd2k+DaRcP/N8+PctbTMXX/w5JSsVG9TKLoBsZvbzG1VbJVbHLd3JcLI6uYQmb9U8dbxmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767865153; c=relaxed/simple;
-	bh=Bq9lo2Ohtvj3XIL6dpPA64B4eaxXyOVIuYLGEY645Q8=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=AyLOmlN3lbbCz/Kn97Apm1OgyGMGaIgTpPDEIVY5pW0xeNUS1lncibU5ME2YLSRotS974XLWBRYD0a3lAOG4V3jDvY8x3woTdb5LCUatycE1pplmICykYNN8BsvYw8b8bguJDn4v9o4YniFUlKoyoZo6MdtKDJReHYGsL8LXrgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cv8B0xcm; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-47d5e021a53so21901245e9.3
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 01:39:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767865142; x=1768469942; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :message-id:date:in-reply-to:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=91O35Wu5Tt42VZKwq2kPLdWW5NTRjmE00iaWWCPrcU0=;
-        b=Cv8B0xcmLl2j34XrZnNE4IF+xqk2mfBFKkgsqzKcJJRMcSNfbR3ZFA/HOg1e9nC5z0
-         3qO5L72saJeuTDPochuDP3wz2xZT3B/YzppFqT5zqtCpBLjigIeB327bs09GPAVtq+Pg
-         kMz5bZ3BLp8hypDIeokNKJJW3P1FN5EQ3hqGwBPnX6dYbzUCWH+UDeRn/mlhb+L2J/oP
-         B4N16eErEkznVxE2BiKNQ7ky6//0hIz4slCWwRRQDOlc7mMiY+SlyO/Q97mp765zyhA1
-         rQXSwcRdIRZLXAVUZPAB/xZ6H4HDud9r5X0RsxPPQ4V4B3eNs+KFHgZn8QznWC5IN3ak
-         yxpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767865142; x=1768469942;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :message-id:date:in-reply-to:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=91O35Wu5Tt42VZKwq2kPLdWW5NTRjmE00iaWWCPrcU0=;
-        b=m+430LwNYp60SRS8JPVQ1w/+WIgEbnVIEnXa55/Nb3SJyICnnCJOLkI1+8dgY0Do5M
-         FVNI3NRN40hgdOWxbQfucBk/ayqxnWwCYj2P2MOaxxf2b9/GRZfahFTBcIEV64rDYVwR
-         melaMBxy3ukKiIFXxDi1JKsZ4zTZyB0fuyGQlMulU/3v0kyx9YDCXjCsOPDTBQxV13gR
-         Y7J2qiXcu6fPVrW6lYXCFpbVxlZGRREEAG32LYHSzq2j0BVQc2KeRU56J+jB3kVnOhnn
-         JYeeexjgjRUNWC3IXACvosIR4s7ibuQ83Xli9iQYSXQfabr1V69DuGtIfz4Fw8o+sB9s
-         5GzA==
-X-Forwarded-Encrypted: i=1; AJvYcCU9nDtpxjR1svjWQa4XZYJtP4I0cY9b/xNKYf0PmuvGfYVp3EFM66vhohx7NdfU6JSkWzKq7Ds=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEkxkSpWKa3l2Y04l0vBDPCRDDfbJgucST4vVGFAufZ8sy8smo
-	nOHdTLdmYHykYPSq08yky30TjbCQCZJrxwV5YSG4zkgiVL8O1jgkSkSR
-X-Gm-Gg: AY/fxX5wk0NbOf11hp76q80j6ptxCTASjO9kzF882SCI1dVu8675+LoPQmMS/EYnNtT
-	dYOLvhv3BGV7/gQWgZME9+12sBYe3RXfZvptKYBin22F3Z/35RvKMbBsAifMRTAdqNR4jEbrQgQ
-	wFr7n2pNrTaA7WhexIfz/QdmHe/KtBEXK/eelaBjf09+fETerQ4FcZE5Y9iEkWVMUOkcDsn7oTQ
-	L7ughiG88TuXz8+ERQdQ1GjQeXkXf1X7R9KlrDdHRYS6Aq3LJsF8ZS/1+hsf1pBZDZ1wupn7kZE
-	2WH31bFr4Ymvk0feOfWr6vp8qoJ8TwXFHaYZsnpNQwH3cnoEDXc5zup5319VGNzTqro+o7X4Oo0
-	hSJ0Wh4dJpKr7vpUvx+WHltnGHvDo7P7u7F0lpZllYfBa90GE56Y4VmSMjeTCq2iqTcMCke873L
-	vfl38gaKQkwRKlaLxYP+WR2LM=
-X-Google-Smtp-Source: AGHT+IE0ivurfeyw4RGMPF7H3eHa1D98hrIj7ko+VBPF2UVbcwlddpeCKfgvEgdfZlhOZHZZlhrZMQ==
-X-Received: by 2002:a05:600c:3483:b0:47d:6c69:bf28 with SMTP id 5b1f17b1804b1-47d84b3476fmr69913435e9.24.1767865141446;
-        Thu, 08 Jan 2026 01:39:01 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:8115:84ef:f979:bd53])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d865e3dfasm33121615e9.2.2026.01.08.01.39.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 01:39:00 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Changwoo Min <changwoo@igalia.com>
-Cc: lukasz.luba@arm.com,  rafael@kernel.org,  kuba@kernel.org,
-  davem@davemloft.net,  edumazet@google.com,  pabeni@redhat.com,
-  horms@kernel.org,  lenb@kernel.org,  pavel@kernel.org,
-  kernel-dev@igalia.com,  linux-pm@vger.kernel.org,
-  netdev@vger.kernel.org,  sched-ext@lists.linux.dev,
-  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 for 6.19 0/4] Revise the EM YNL spec to be clearer
-In-Reply-To: <20260108053212.642478-1-changwoo@igalia.com>
-Date: Thu, 08 Jan 2026 09:38:56 +0000
-Message-ID: <m27btswij3.fsf@gmail.com>
-References: <20260108053212.642478-1-changwoo@igalia.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1767866153; c=relaxed/simple;
+	bh=iJfRlKeMUO7hZk716maG+9Rh9rC1sx9th/OS3Y5rewY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=q3KvweVr+wvaM4ARlE0wh8SEM5sRkhr8lqrIuQHlE2mXPWXTSI1nt63DkGYAZM1pPlDu9m2a2+g42HX1DwIcaLFCDB19tB5fFheleOBEAdEh/AQIs/b0Kr43mOsSaTf07OaUG/IqhMYcb0TkACDkCjxlCrcu0uPHKvxqCvo9nks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Q45wSUUn; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1vdmjp-0000fG-Bo; Thu, 08 Jan 2026 10:55:29 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Cc:To:In-Reply-To:References:Message-Id:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
+	bh=gzlvfrpy1K4hTAKMoW8f2yDrhOt+qjbv/u9I1nI7fRQ=; b=Q45wSUUnWNiVYCZbUUNhSTyRcY
+	mRH+IgOIKbTp1Ap6wKfOnOuvNUEW5qCalkNl5ctk77fCu2OhYW2Mp6PyO3fXPGkB9FcePhWfqw2S1
+	Bql2Z3+dFKRv+pMpmglg0dmf1+UO1RJRRZlsQftFG7Jk4Ho5apkLHxTzYfdmDSqd3gc2Ej8yeach/
+	1lRK1aRXJr9LwNTfIEw2CLyaGona4xXfWoD+R6IzlkqlpK/9u7OJhFcaasYpmqCdyQrZ6fyEdjpk9
+	9+/xjosh4NFC0TN96qc0CJx07Mdxmf7p3IalQLMZS0CrKdergnizPbfjWBU+lTeEYbEuGTYmw6H+5
+	ECtXQCqw==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1vdmjm-0000eJ-Sx; Thu, 08 Jan 2026 10:55:27 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1vdmjZ-00AchK-PX; Thu, 08 Jan 2026 10:55:13 +0100
+From: Michal Luczaj <mhal@rbox.co>
+Date: Thu, 08 Jan 2026 10:54:54 +0100
+Subject: [PATCH 1/2] vsock/virtio: Coalesce only linear skb
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260108-vsock-recv-coalescence-v1-1-26f97bb9a99b@rbox.co>
+References: <20260108-vsock-recv-coalescence-v1-0-26f97bb9a99b@rbox.co>
+In-Reply-To: <20260108-vsock-recv-coalescence-v1-0-26f97bb9a99b@rbox.co>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+ Stefan Hajnoczi <stefanha@redhat.com>, 
+ Stefano Garzarella <sgarzare@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Michal Luczaj <mhal@rbox.co>
+X-Mailer: b4 0.14.3
 
-Changwoo Min <changwoo@igalia.com> writes:
+Vsock/virtio common tries to coalesce buffers in rx queue: if a linear skb
+(with a spare tail room) is followed by a small skb (length limited by
+GOOD_COPY_LEN = 128), an attempt is made to join them.
 
-> This patch set addresses all the concerns raised at [1] to make the EM YN=
-L spec
-> clearer. It includes the following changes:
->
-> - Fix the lint errors (1/4).=20
-> - Rename em.yaml to dev-energymodel.yaml (2/4).  =E2=80=9Cdev-energymodel=
-=E2=80=9D was used
->   instead of =E2=80=9Cdevice-energy-model=E2=80=9D, which was originally =
-proposed [2], because
->   the netlink protocol name cannot exceed GENL_NAMSIZ(16). In addition, d=
-ocs
->   strings and flags attributes were added.
-> - Change cpus' type from string to u64 array of CPU ids (3/4).
-> - Add dump to get-perf-domains in the EM YNL spec (4/4). A user can fetch
->   either information about a specific performance domain with do or infor=
-mation
->   about all performance domains with dump.=20
->
-> ChangeLog v1 -> v2:
-> - Remove perf-domains in the YNL spec, as do and dump of get-perf-domains
->   share the reply format using perf-domain-attrs (4/4).
-> - Add example outputs of get-perf-domains and get-perf-table for ease of
->   understanding (cover letter).
+Since the introduction of MSG_ZEROCOPY support, assumption that a small skb
+will always be linear is incorrect (see loopback transport). In the
+zerocopy case, data is lost and the linear skb is appended with
+uninitialized kernel memory.
 
-v2 looks good, thanks!
+Ensure only linear skbs are coalesced. Note that skb_tailroom(last_skb) > 0
+guarantees last_skb is linear.
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+ net/vmw_vsock/virtio_transport_common.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index dcc8a1d5851e..cf35eb7190cc 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -1375,7 +1375,8 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
+ 		 * of a new message.
+ 		 */
+ 		if (skb->len < skb_tailroom(last_skb) &&
+-		    !(le32_to_cpu(last_hdr->flags) & VIRTIO_VSOCK_SEQ_EOM)) {
++		    !(le32_to_cpu(last_hdr->flags) & VIRTIO_VSOCK_SEQ_EOM) &&
++		    !skb_is_nonlinear(skb)) {
+ 			memcpy(skb_put(last_skb, skb->len), skb->data, skb->len);
+ 			free_pkt = true;
+ 			last_hdr->flags |= hdr->flags;
+
+-- 
+2.52.0
+
 
