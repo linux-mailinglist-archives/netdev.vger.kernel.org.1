@@ -1,187 +1,97 @@
-Return-Path: <netdev+bounces-248094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B5CFD03A8D
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 16:06:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4A2AD0480B
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:45:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 72F99308144D
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 14:59:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C58473118DDD
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:36:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E16F426682;
-	Thu,  8 Jan 2026 14:01:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6FDB338586;
+	Thu,  8 Jan 2026 14:07:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q5QoP85R";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="d3JbxpWe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="utJiWtVK"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A244C42189D
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 14:01:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A051F2C11F6
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 14:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767880909; cv=none; b=XKFjd6RIXaMtc/Wo0wtM3SmBJli+nqulgsmo4nSfotiY2x3lJykpt/lD9ZhJTtYBASbdUjeFkPUMpEk9sblJeTEdVn7to9C9AAaCkctkmRh2GGFzDrogKPKXOk/xpfjMyv7SwAeY+JisJf/CmNdVKbxnyen12vD6zWXfRKGTlr8=
+	t=1767881228; cv=none; b=GlxZR0aROpbcRg3y6JaIjiDESktw6ah0iGRP8lx73PZAkGVMsHSYePc/wz8Kay32wZ231SHEbHtgrIyVjwkTBzQ6V271I4/+xvnGbA739IxXAuBMfRWk3XCAeB54okrdLCglXEreWNPFu58C4xbCnoBiKFE5hoxadN3xZuuCxAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767880909; c=relaxed/simple;
-	bh=CtjrmsOB2mCj2lgwPdRfiuPc5BO/uYM9mUDMD9vab4c=;
-	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=WiRqbCjk01PVqboOq82GVyMCyeZdPvRDw6ZIVfUAAYF+JdknfeJoJg3UttwxR2E2vdvVqWp/HyYGdCTHfCGZRqiDqaOC9oTDNeEb9yxl0nxPfwLc2ZJrnxAfLiUZkEYVQ0AZn91wfzHszUSX1jRmZfPiVNrb6bpFAbACWHUBreM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q5QoP85R; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=d3JbxpWe; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767880906;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BQa7/1Zt+dnaRaD4ugLaeRuqXLaoL3JF8Ifb+lDa748=;
-	b=Q5QoP85RLWHfLIq/ugGxsnZKV+47mGwDS4+ZXdqgGj5QR1ypuwOaDHQfxrP+mt92bGYV5J
-	49S8BXGv46bffPCictgQz3+VoKEFh1kV1qMsV8RSDp3Zy41+vADOpmDHoElxilhgRM0XTe
-	Oe7g7ehRpCk0UHh5tCIRjFllojo9aeI=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-627-EslUXk3fMnGZtGk5r3L5KQ-1; Thu, 08 Jan 2026 09:01:45 -0500
-X-MC-Unique: EslUXk3fMnGZtGk5r3L5KQ-1
-X-Mimecast-MFC-AGG-ID: EslUXk3fMnGZtGk5r3L5KQ_1767880903
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b802d6ed5b0so579873366b.1
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 06:01:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767880903; x=1768485703; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:to:from
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BQa7/1Zt+dnaRaD4ugLaeRuqXLaoL3JF8Ifb+lDa748=;
-        b=d3JbxpWeuQO9rcdUUkNfkwp3+YV0q1CvsHwdSGiy0We+TTptoOAT8OMWYbxLSoZ+hO
-         yzUsC3Y/j4/rZi0PvaioKmacFmgz1X8iup3N2qkh6DktmVb23aYJMXRbxHAPNTTOJoa8
-         wmFkUTMxvia5axuSFE0V78Vi7a3HFPKZoUvJiUDx+UcY6hbVOKcWAT0FWJoI+ENpOSZj
-         4TBwy28BhEsZwB53ce+Cp5bUoCeyRT902S1aFPph4Ow1qdqvYXx2tPTqqFd5AJ0OZB6t
-         VgnnDHkiIHwzvG7yw/peAr+5LgKdSyy2Mp+2DJV75AWcq7nT7JVbavJKvATQk8SxcEB/
-         3c8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767880903; x=1768485703;
-        h=mime-version:message-id:date:references:in-reply-to:subject:to:from
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BQa7/1Zt+dnaRaD4ugLaeRuqXLaoL3JF8Ifb+lDa748=;
-        b=XVRud/bNYy4KxpMBOzLPjcuAmxHdoSF28INLpo52IFT9Yp077cQU+fCALKAOSbvl07
-         /Imyv2Bg99hf5snNDQvGUfbnYVW177pN1HIK1cbwMLjPEt2L5VFACwti8NUrwx0RSdlM
-         YgEwipKuLRtJi3Qil96F9LSM0D4HXafcargcg8MEUYvnbUyaDoT5L52PwRAl+/MVVE1+
-         vFhjE/zdxyhB0UHLTf53wJXsx628IwKCvK84fru2ABkkjcmULbSSF6qCcLjHZnOY0B5o
-         RcJtRUAfoMg8IFwS51nbN54IpcRS63dRrnMbvtZ02lTvmD/P78k7B2fMpXpBzF6BFELl
-         UBpA==
-X-Forwarded-Encrypted: i=1; AJvYcCUJe8galhCfFRwyf3gSyDOplIgyAfYRyX7nLg+hes5+puhlhOAjmxnkTRRJVjhTe+W0sv/WBzo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5a+YO1KNq9MkjIWDtbW3XujzofN7vw1/W0FWUcDvlgZ6ez+aP
-	ANK4TRW/CrDZLBvKaKUW4eSVNCr5C9ZQgMmuLbaaLxzjOrtdhKSj2jYZeGg9hDQTI7JXlRV72mg
-	bTlf1tmaqpkoaxGAdHjVG6r6RRnhxKbxAPyF8/IciBB+fzP2S1Ty1O0drjLxmL+qqpA==
-X-Gm-Gg: AY/fxX7plYeFaGQUeFtO2rWfGgwQGZBaGlUehiwKJXYa0RwfFPUHqqXrzclBzJaKTGE
-	qGi3rt3qCrI1vnLmy8PXgrFG+rCqmdahLwcvAeE0XdmLjq/6wE5sBrY+ePay2khgr8bR9KdhgIT
-	7Di9XKRaJfdfyu/45+B7I8Tbb4YR8gbtEP4mw9e+eUA57fJ7ffT6BxeqM998UJJh/JPbxyJVJ1p
-	e8ZK5puzwqd4U0SQFY/B3KhWhsaEfTrHcBdW3YLoULWcbnwjO/k6hVCBMBivIv1ocONV+ivzGJR
-	2suKja6LeE9WxCdyog9aiELbb+t+NQVibYSJOfqluJ02K3/kYnU7yT2osWJDIRXwy52EdwyMFGf
-	QN7qIHFKLc4l/7U5MmEAbd7khUoLdgMl8gkdz
-X-Received: by 2002:a17:907:6e93:b0:b72:b7cd:f59e with SMTP id a640c23a62f3a-b8444c8f7e1mr683440766b.8.1767880902584;
-        Thu, 08 Jan 2026 06:01:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFlhIIhaBb2McQwvoWk8N0JL7SSuE00CIJ5So+f8CTldzHzJorWqIOgybxuvnaqsIbBkpucBA==
-X-Received: by 2002:a17:907:6e93:b0:b72:b7cd:f59e with SMTP id a640c23a62f3a-b8444c8f7e1mr683436266b.8.1767880902102;
-        Thu, 08 Jan 2026 06:01:42 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a564284sm829495666b.62.2026.01.08.06.01.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 06:01:41 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id BF187408379; Thu, 08 Jan 2026 15:01:40 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, Alexei Starovoitov
- <ast@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Lorenzo
- Bianconi <lorenzo@kernel.org>, bpf <bpf@vger.kernel.org>, Network
- Development <netdev@vger.kernel.org>
-Subject: Re: [PATCH] bpf: fix reference count leak in bpf_prog_test_run_xdp()
-In-Reply-To: <af090e53-9d9b-4412-8acb-957733b3975c@I-love.SAKURA.ne.jp>
-References: <af090e53-9d9b-4412-8acb-957733b3975c@I-love.SAKURA.ne.jp>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Thu, 08 Jan 2026 15:01:40 +0100
-Message-ID: <87qzs02ofv.fsf@toke.dk>
+	s=arc-20240116; t=1767881228; c=relaxed/simple;
+	bh=rur/eFIPFwsjnt7rsZv39PcFC9AOyQANaNtWSJe8sXg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZMfK21dHNOxuzIb5jYVxCTTW2BgyQWYf6vLqozzfCBxX2naxfmfN7v4IIBEDH0w+cTszr4Sw5z31vzoLPRtQFmxpbQapIeHK/E3VD2OpeqXpWUiz5vDCVGQmwaK82s5og6OKstvX/knPpE4A+PsTlU8lsbC612ypYwDOZ08jGiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=utJiWtVK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1807BC116C6
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 14:07:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767881228;
+	bh=rur/eFIPFwsjnt7rsZv39PcFC9AOyQANaNtWSJe8sXg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=utJiWtVKt82v18WXPXSLXOyaxp1Eu3HKgBHdzASLKAEf6FGSSmAD05sAFe7ezApd1
+	 ygcsxrPwl8JEOKcW5Az25I7Ly4meqldaavx4K9PhgynTEwHhaxZVzY7W1tPwRV76ao
+	 w50APrGdUaVhLeFHoVbsJRAjBjW1RfEOCRxZ4rhYReVLuNjB6joenvGiq66KfBLXj+
+	 Byx5ZWW8+gvLUcpJcgDcaVQfSKLR581nIXBx9OIBxYkMo22EoN9ngHmTwRLVH0uz/3
+	 afgWWjgboY9Do0w1SwELSgZmko8gS2wWcGYWEo2kMIX6Q3pHby2nrBjBN8f8Tr1mIN
+	 gePmy5VsUVcfg==
+Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-459ac2f1dc2so1911430b6e.3
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 06:07:08 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXGvsJyuMA5KkS2bIjZEBSFwTjquSkxo25YD4yB15aAoYL1HnSASl2H3ZEU84t+EynXUz8NZzI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBrYjfVIkUBf1QYk+h3+U4bwcH11o550//4caPYJlrc3AzC4Fu
+	JlJr37InwkrEp1JgiVAX4YC/HB2f4Pa7VHGf0RkE5yBKAxCsET6x5XNvytn9eTteEKGiUT6JEgR
+	tLjivEvZRBOsMNtPtofYV9jhgwS3tgFU=
+X-Google-Smtp-Source: AGHT+IGiPG3we/G7gqGAVUfEGYc/MX4SFKJU91JLPhCIbBNtzaJzMd+r3u8tZWz0BzQhoH/VrpQ7/+HJdI7NM9Tt2lw=
+X-Received: by 2002:a05:6820:2283:b0:659:7c9a:942d with SMTP id
+ 006d021491bc7-65f54e717d0mr2586755eaf.0.1767881227241; Thu, 08 Jan 2026
+ 06:07:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <6245770.lOV4Wx5bFT@rafael.j.wysocki> <2816529.mvXUDI8C0e@rafael.j.wysocki>
+In-Reply-To: <2816529.mvXUDI8C0e@rafael.j.wysocki>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Thu, 8 Jan 2026 15:06:55 +0100
+X-Gmail-Original-Message-ID: <CAJZ5v0ifehCqCdC=rE9eUAe7p2jx=QOv8K=HXo3n9D0WefVMUw@mail.gmail.com>
+X-Gm-Features: AQt7F2ql4dsJ5nNrNXN_XQXzBdZ5i2rjEWr2rh7CMUz2vPUerTQkosZ3m3_QUgE
+Message-ID: <CAJZ5v0ifehCqCdC=rE9eUAe7p2jx=QOv8K=HXo3n9D0WefVMUw@mail.gmail.com>
+Subject: Re: [RESEND][PATCH v2 0/3] net: Discard pm_runtime_put() return value
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Linux PM <linux-pm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Ulf Hansson <ulf.hansson@linaro.org>, Brian Norris <briannorris@chromium.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Siddharth Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>, netdev@vger.kernel.org, 
+	Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+	Simon Horman <horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp> writes:
+On Wed, Jan 7, 2026 at 1:37=E2=80=AFPM Rafael J. Wysocki <rafael@kernel.org=
+> wrote:
+>
+> Hi All,
+>
+> This is a resend of
+>
+> https://lore.kernel.org/linux-pm/5973090.DvuYhMxLoT@rafael.j.wysocki/
+>
+> which mostly was a resend of patches [10-12/23] from:
+>
+> https://lore.kernel.org/linux-pm/6245770.lOV4Wx5bFT@rafael.j.wysocki/
+>
+> as requested by Jakub, except for the last patch that has been fixed
+> while at it and so the version has been bumped up.
+>
+> The patches are independent of each other and they are all requisite
+> for converting pm_runtime_put() into a void function.
 
-> syzbot is reporting
->
->   unregister_netdevice: waiting for sit0 to become free. Usage count = 2
->
-> problem. A debug printk() patch found that a refcount is obtained at
-> xdp_convert_md_to_buff() from bpf_prog_test_run_xdp().
->
-> According to commit ec94670fcb3b ("bpf: Support specifying ingress via
-> xdp_md context in BPF_PROG_TEST_RUN"), the refcount obtained by
-> xdp_convert_md_to_buff() will be released by xdp_convert_buff_to_md().
->
-> Therefore, we can consider that the error handling path introduced by
-> commit 1c1949982524 ("bpf: introduce frags support to
-> bpf_prog_test_run_xdp()") forgot to call xdp_convert_buff_to_md().
->
-> Reported-by: syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
-> Fixes: 1c1949982524 ("bpf: introduce frags support to bpf_prog_test_run_xdp()")
-> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-> ---
-> Since syzbot has no reproducer for this problem, I can't test this patch.
->
->  net/bpf/test_run.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
->
-> diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-> index 655efac6f133..9a16293ba14b 100644
-> --- a/net/bpf/test_run.c
-> +++ b/net/bpf/test_run.c
-> @@ -1355,13 +1355,13 @@ int bpf_prog_test_run_xdp(struct bpf_prog *prog, const union bpf_attr *kattr,
->  
->  			if (sinfo->nr_frags == MAX_SKB_FRAGS) {
->  				ret = -ENOMEM;
-> -				goto out;
-> +				goto out_put_dev;
->  			}
->  
->  			page = alloc_page(GFP_KERNEL);
->  			if (!page) {
->  				ret = -ENOMEM;
-> -				goto out;
-> +				goto out_put_dev;
->  			}
->  
->  			frag = &sinfo->frags[sinfo->nr_frags++];
-> @@ -1373,7 +1373,7 @@ int bpf_prog_test_run_xdp(struct bpf_prog *prog, const union bpf_attr *kattr,
->  			if (copy_from_user(page_address(page), data_in + size,
->  					   data_len)) {
->  				ret = -EFAULT;
-> -				goto out;
-> +				goto out_put_dev;
->  			}
->  			sinfo->xdp_frags_size += data_len;
->  			size += data_len;
-> @@ -1388,6 +1388,7 @@ int bpf_prog_test_run_xdp(struct bpf_prog *prog, const union bpf_attr *kattr,
->  		ret = bpf_test_run_xdp_live(prog, &xdp, repeat, batch_size, &duration);
->  	else
->  		ret = bpf_test_run(prog, &xdp, repeat, &retval, &duration, true);
-> +out_put_dev:
->  	/* We convert the xdp_buff back to an xdp_md before checking the return
->  	 * code so the reference count of any held netdevice will be decremented
->  	 * even if the test run failed.
-
-Hmm, this will end up call bpf_ctx_finish() in the error path, which I'm
-not sure we want?
-
-Could we just move the xdp_convert_md_to_buff() call to after the frags
-have been copied? Not sure there's technically any dependency there,
-even though it does look a little off?
-
--Toke
-
+Any news on this or do I need to resend it again?
 
