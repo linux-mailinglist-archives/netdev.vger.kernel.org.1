@@ -1,315 +1,252 @@
-Return-Path: <netdev+bounces-248140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BFB7D043FC
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:15:55 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CECFFD04609
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:29:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A9EC93435B49
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:00:32 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C2B6F30470E3
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:02:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ED95226D1E;
-	Thu,  8 Jan 2026 15:58:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B916B1F419F;
+	Thu,  8 Jan 2026 16:02:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="koA+r3n5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SimJEcJY"
 X-Original-To: netdev@vger.kernel.org
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011037.outbound.protection.outlook.com [40.107.130.37])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAFC51F0E25;
-	Thu,  8 Jan 2026 15:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7292013E02A;
+	Thu,  8 Jan 2026 16:02:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767887907; cv=fail; b=iQgIBSkZx4NhObA5XOUlwKUn56GHkizggYRvXqorZkdacqv5lBk0FjsYa7Jy8gP/0QMKY0qvrKoJZyIW087V1Aawj18pLeP8ZNY1xJ4GIJQ9SoReuUn47z7hhF0C6rCmJsj4Qd3ZCSPUwzSzFwp7b8FDzyUblPq9xAHjR3CnYGQ=
+	t=1767888151; cv=fail; b=XuVST2njXUPch8KuilEdE1VmX+xstqg3oVnODRHSoRsk3ZZhU+S2Nh+4+egou+/Y7vd6iB6WVsqV7YZ7eEN6yxvjv4XxmBOqLHnUH5Wkb20HMiXbflV2O/Y2PAAaWNaok8kaXHEcphcC5gnGldYwSexx8+x24ONJiwl3R2VfZF8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767887907; c=relaxed/simple;
-	bh=fIhIMwuEkxPlfKk6ebBaeYT3f841rOtv/vMHE+j8dHc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=jYPFTAVxd0xHOctGGzMHSSUOO70XNj2jeeNUD028KLsJyFw7ZctpvbvWIjqe5MqGTILUaQd0ev6F5DK+06gH+M7gwNgrDtRwwTsD0ACr1jK2U0reDcRHW2VFij3j7u8RXEp5R/7djCsLcwh4fWFuudWlZy7BlP2pyhbZqcajPLM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=koA+r3n5; arc=fail smtp.client-ip=40.107.130.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
+	s=arc-20240116; t=1767888151; c=relaxed/simple;
+	bh=Wr1tb9mP+KSMybuNV/PKdTcvermedxTVcz7XWCzyWYA=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=txojq9MtBu1w8U6vQgM/QQIu1uj0llOKDWg76pNtiaOs0CwpTMIrdrJ6EVrr5U0jItuHBrBugggpy7PPyV/cYO0vl/SF5Nqs1X1Kfm41jlZO9px3raO5dJZ0131zelsSG3ESB5UNVrckrN+4rb6eIfrLc8scQucv0Vq70GDj7fY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SimJEcJY; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1767888149; x=1799424149;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Wr1tb9mP+KSMybuNV/PKdTcvermedxTVcz7XWCzyWYA=;
+  b=SimJEcJYdk/uzGXGeMHkNaES49VCakc3429n1HubFBrNFjLE0IlfEvMz
+   g5x89LF+a6FBzEr5f5sogLrO3ZRj916nhu2FzXUu9tgsug9fezjXrZaiI
+   Q7QSzyqTtpA1lorNtm75Wuxtghs62AVJiVFf5J943iia0FxiDam3iijvK
+   vt2Hq2vBhOIsqF9rOaCLsymVqgZ0lOGHur6OofqwOonqejZNTmNLob5Gg
+   ntx6HP+CoF9hfrQsO0ZzYlbvUdSja3I4DaUWVZSghKPauj9sgXOCCHaiu
+   +ko4BvwZ25rJzD62BuTCgKt+RaWoZQIo8/jka3+mVdnjCqXIKu3/rwWFy
+   Q==;
+X-CSE-ConnectionGUID: TJdgVDfxQzKw4tORaCoWkA==
+X-CSE-MsgGUID: CM9JnSR5SSqqZ2RrXvZabw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11665"; a="73125945"
+X-IronPort-AV: E=Sophos;i="6.21,211,1763452800"; 
+   d="scan'208";a="73125945"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2026 08:02:21 -0800
+X-CSE-ConnectionGUID: OgXjvgdrRnmt4zehBTK5Zg==
+X-CSE-MsgGUID: GiLdqvH3QMeSe5ZeOwzYgw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,211,1763452800"; 
+   d="scan'208";a="202855256"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2026 08:02:21 -0800
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Thu, 8 Jan 2026 08:02:20 -0800
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29 via Frontend Transport; Thu, 8 Jan 2026 08:02:20 -0800
+Received: from CY7PR03CU001.outbound.protection.outlook.com (40.93.198.7) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Thu, 8 Jan 2026 08:02:19 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kIA/wKmT1qE1MFsAzEyKlzkR2hWuRZ5MURvDGSDb+Eiu9eqqKBIpuWnRjswGSwMuDA9TWN4SRf8mkao1Ox/8LKPEf/7ajCQPMEU1IJlLJ5k1kW3FHVqk0Z4VBvrBTzgUhf1gsilkrGFt8LXYZAQGz2Osmnk1Y+mOmVTyWprc5qmDiPZN2s+YS+Iphaz1Q/VO/tGQmTPPN0CBNbpFG/VFKaeByQ3G9g74UeFAx8S9G3uQIDmDIlmMZ4M5DK3Mj4FACMQX688lAzDAFOj56Gvg6xiaJCL/CUTYaLbcB7gh4uHDewa9jlApdKwxUUqatcfECDOa2VghfTfP9rb28/goDw==
+ b=H14v3B5XnNWs1RMrsHcJDmK+gl8WlpFyhjB7M3qHqVeqKZ2NOlSworY19rN8mHgdXu/EC53yfM5VbZf+sil0VGxlP6luoXbQTPXNZXheWFAw84cIRgRlW0aUS8+T7Hebz7L5osh0ILeApV4nBjMZ647AvJKVde2erVRasD3tDmCqwrhDY2jlmaKtRAph0jGwDJd0dGqHKtDdUNLCcQDM48kZODbwxwJzOimExbY/Ov7eROW795K0tvT65EXMtV6A2gyjJnkE+zfUH4iGUrW8fOSdgjxXekXxp4WFp/DOsUQVhraaIEXl7NbfBQD7Qk0xqM8hOmpmDAvMbhbYYegA6A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=olPwJX2H7K90aW33zds3ExEdFSGLobj2XO4MqlTul4E=;
- b=vb4i563o6XeYUarfAn2YGcrjS0PfVLxYW/hMu1G/A/kV24U6oaXH8Znmv5iRU1soiDAHq0qq/CTEuyoAaFvBmZSosFvOo1LBLk39VQOOm1ZcCNjMKbUMJ+kfPzIVML2UVpEo1q1mZ05pcpF2OIrNxWll8ZU79f/xd+fnw5ti6mg6pqB72Eu+1AEKe+xOiUW1oVD+uOE7Oq7DUi+coshPQsrafMUGf8Wxp3PFkmYRIdSubmowlEl28lqyPNsnYkCG9VvROhOOEBq+Ff3bDMCJpNAJnRvmAlsxaChIIL7c255cDFURD1XHYJbrP2ymw4mtkWRDkZgxxKx37dwytXweWw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 131.228.2.241) smtp.rcpttodomain=apple.com smtp.mailfrom=nokia-bell-labs.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none
- header.from=nokia-bell-labs.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=olPwJX2H7K90aW33zds3ExEdFSGLobj2XO4MqlTul4E=;
- b=koA+r3n5/LZPaXIUg4HzsrtqLp5KQP3JBKxicsjGDTjsNSydBbh1p66PZmfq1PP6dPnkpqWwj0N7zlSeurKVcpVEQtSKNQHtSCrGuMofM1kcjkE9t4fFWonf5T6mxURYgVSDrGUvmD/CHKmwdqyV+PAvxfekz8xDGYqAERS51AYFwdgQwBN34eY8nPTJzAqv8GEIRg2UIystELoYrEf8mi58Bjy+WMsOZfClw11BwVnX9C12C18f5se2iawrAHd5+ao18IHkzqNKEwdUlhFwO9y+ozp5wwVCbsMA/VYedgDaLNwK0ShqwcPUvevSg2JPs/c1+LIAX/Ib4FEwGYaTJA==
-Received: from DB9PR06CA0023.eurprd06.prod.outlook.com (2603:10a6:10:1db::28)
- by OSKPR07MB10519.eurprd07.prod.outlook.com (2603:10a6:e10:99::17) with
+ bh=qz4fBuO6GHWPgpM8P9UXBYDdHPShX018x5/fzQkZvBU=;
+ b=rqIiULLX+iIkN7aIt2z5ZDsKAECOSSlbV9RWmQoi4UTdN/Ml9Cue+ApHCBuwFt1kJ6Z09tbJbvdX3/8sPNLWp3fw0pXo4ECIrLRMgz2VYASmLkiZSkqVRz0vTHFOmQX1TmiI+yJw0fjn8XNHWWQP1AtJ3IbOVlcOwiO51xXLvVB9IREAnhIjCz3wNatuHAgD7PZYItu8J7IuPlBBr9wDqSgUsAq3eiNdW9/Vr8MPvjAIpsCCK5yEl7g5Z3F18+B+ApBUy9P0tu4U+gX7GJ1sG7D+vcYKNTjVUrmqy+nrDA6AuAF/Z4pHngmn2RVyD10r+WkUYCjFEzXrJNxqu+KrrA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by IA0PR11MB7403.namprd11.prod.outlook.com (2603:10b6:208:431::17) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.2; Thu, 8 Jan
- 2026 15:58:20 +0000
-Received: from DU2PEPF00028D04.eurprd03.prod.outlook.com
- (2603:10a6:10:1db:cafe::1f) by DB9PR06CA0023.outlook.office365.com
- (2603:10a6:10:1db::28) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9499.3 via Frontend Transport; Thu, 8
- Jan 2026 15:58:20 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 131.228.2.241)
- smtp.mailfrom=nokia-bell-labs.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nokia-bell-labs.com;
-Received-SPF: Pass (protection.outlook.com: domain of nokia-bell-labs.com
- designates 131.228.2.241 as permitted sender)
- receiver=protection.outlook.com; client-ip=131.228.2.241;
- helo=fihe3nok0734.emea.nsn-net.net; pr=C
-Received: from fihe3nok0734.emea.nsn-net.net (131.228.2.241) by
- DU2PEPF00028D04.mail.protection.outlook.com (10.167.242.164) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9520.1
- via Frontend Transport; Thu, 8 Jan 2026 15:58:19 +0000
-Received: from sarah.nbl.nsn-rdnet.net (sarah.nbl.nsn-rdnet.net [10.0.73.150])
-	by fihe3nok0734.emea.nsn-net.net (Postfix) with ESMTP id 67C4D20320;
-	Thu,  8 Jan 2026 17:58:18 +0200 (EET)
-From: chia-yu.chang@nokia-bell-labs.com
-To: pabeni@redhat.com,
-	edumazet@google.com,
-	parav@nvidia.com,
-	linux-doc@vger.kernel.org,
-	corbet@lwn.net,
-	horms@kernel.org,
-	dsahern@kernel.org,
-	kuniyu@google.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	dave.taht@gmail.com,
-	jhs@mojatatu.com,
-	kuba@kernel.org,
-	stephen@networkplumber.org,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	donald.hunter@gmail.com,
-	ast@fiberby.net,
-	liuhangbin@gmail.com,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	ij@kernel.org,
-	ncardwell@google.com,
-	koen.de_schepper@nokia-bell-labs.com,
-	g.white@cablelabs.com,
-	ingemar.s.johansson@ericsson.com,
-	mirja.kuehlewind@ericsson.com,
-	cheshire@apple.com,
-	rs.ietf@gmx.at,
-	Jason_Livingood@comcast.com,
-	vidhi_goel@apple.com
-Cc: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-Subject: [PATCH net-next 0/1] AccECN packetdrill selftest series
-Date: Thu,  8 Jan 2026 16:58:15 +0100
-Message-Id: <20260108155816.36001-1-chia-yu.chang@nokia-bell-labs.com>
-X-Mailer: git-send-email 2.34.1
+ 2026 16:02:15 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::6aa:411d:4bfa:619c]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::6aa:411d:4bfa:619c%4]) with mapi id 15.20.9499.002; Thu, 8 Jan 2026
+ 16:02:15 +0000
+Message-ID: <c65ca5b7-4121-41c4-a5cc-3df2644339a7@intel.com>
+Date: Thu, 8 Jan 2026 16:59:06 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net-next] ice: access @pp through
+ netmem_desc instead of page
+To: Pavel Begunkov <asml.silence@gmail.com>
+CC: Matthew Wilcox <willy@infradead.org>, Byungchul Park <byungchul@sk.com>,
+	<netdev@vger.kernel.org>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<kernel_team@skhynix.com>, <harry.yoo@oracle.com>, <david@redhat.com>,
+	<toke@redhat.com>, <almasrymina@google.com>, <anthony.l.nguyen@intel.com>,
+	<przemyslaw.kitszel@intel.com>, <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<intel-wired-lan@lists.osuosl.org>
+References: <20251216040723.10545-1-byungchul@sk.com>
+ <aUDd9lLy76sBejrP@casper.infradead.org>
+ <37b642bd-9f26-477e-9fca-1e3c931c0efb@gmail.com>
+Content-Language: en-US
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <37b642bd-9f26-477e-9fca-1e3c931c0efb@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: DU6P191CA0016.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:10:540::10) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU2PEPF00028D04:EE_|OSKPR07MB10519:EE_
-X-MS-Office365-Filtering-Correlation-Id: 692f31a4-fc8e-4cce-4719-08de4ecebe8f
-X-LD-Processed: 5d471751-9675-428d-917b-70f44f9630b0,ExtAddr
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|IA0PR11MB7403:EE_
+X-MS-Office365-Filtering-Correlation-Id: eff522b0-5f45-4d7b-6bb7-08de4ecf4a70
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
- BCL:0;ARA:13230040|7416014|376014|36860700013|82310400026|1800799024|13003099007|921020;
-X-Microsoft-Antispam-Message-Info:
- =?utf-8?B?WlVkcnB3NjJyZ0lpa1Q2NDhNMFhLZzVNZ2p5aTJHZVY2UHEyWDNFVUFENFdR?=
- =?utf-8?B?akJQUlhZNVRROWlGNXJSMGhKZ1kzZ3NjOXFGRFN3SUcwMTFHVGNYSE1lay9W?=
- =?utf-8?B?ZzlYc2s5N3FseURjMy9ZMmJKcXVGR0xLWkFEU2kwd3ZNeS9BTmhoS2dKbCs0?=
- =?utf-8?B?VGNYODJxckw5V001M3dMYjlJNjMvTG15R3pCbWlIclA0TWxmS3JSTENWVEJa?=
- =?utf-8?B?SHZkajZqZjJ4bVExOWNPa0VOY2IzR3daY2p5YlhFZVd2VHJNYUlVTE5teHdB?=
- =?utf-8?B?ak42bFIwUEx3Z2lleXV2dXJKMG9aL3FUTVBjYy93cUU4QnlXMkFnc3BRMWx6?=
- =?utf-8?B?WHpnYXdNYTNmdENWMGtMNFlkQnRHMnBtTUgyZlh5Uk5oQ2JKVVJ0dEdyZ2Q2?=
- =?utf-8?B?UmZLdG1YZ3ZxTFNBRDBPUUUzQXVmdmlOb08vdGZoY2JudFJ1b2wxYlFsYXhL?=
- =?utf-8?B?VHpYbkl6ZVdvQk9ia2FGQjQwNVBWdE1JOWVmMi9SaTlLWW5reGdRWUVDSUp0?=
- =?utf-8?B?VkNReFgwUWc5V3JYRVludVF1ZHhLTnJic0dKZE9ITmNocTlEdGh4cVljUjdL?=
- =?utf-8?B?U1lmMkFYWlZzVUNOTFdvWUlkY1dYcGtTeTNsbE1uNmk2aE10dTBXS1I1NWZr?=
- =?utf-8?B?Z05zTktkUGVVdHIxN2pPSUUyU0JURVJ5Vm9wai9BTEV6Z3NVS1hiTUt0M1B0?=
- =?utf-8?B?Z1VwbGVQU1lxblNxR1BjY0locVhDSjdzczVhcTVBUlAyTGFjU1pIWi9FMFZ1?=
- =?utf-8?B?SU1uMTJ5a1lwdExPKzg1OUdOMUM0WXQyeEJXRXJwUWVGT0hSL08rTDBKMUFM?=
- =?utf-8?B?Zk1ndXlyTXVaTmhuYzFXSzRGaHM3akU0blQybHFkUGVYVnFWbjQxbTZMY3dX?=
- =?utf-8?B?WUUxaDgzZjcxRkRGMTRlc3B5QWN6TGlIQXN0SU4yNTFlNm9pUWEyeWhvK1Zn?=
- =?utf-8?B?SFUvODVlOWozcmZjVmRsSjM1d1FnaDRHVG9JTmM2ZkJlUzA0QnQySzlYYWU1?=
- =?utf-8?B?OEZJQVNDdEtqalFnS09DQnl2Z2NROVdTaXB4aGZ6R3JXTHFQdGRwZG1takFv?=
- =?utf-8?B?OTFBZExiOVNVKzhVUU5pNjNyMlJIeklpZVpnRlJMTVBWS3BxbnpBK1k2RXlF?=
- =?utf-8?B?aitlUStnc0xtMlRLSnZwQkJnVEp5QWNYNUdEdVd2ZWJjRzhpTjJuRzFNaHI1?=
- =?utf-8?B?N0dOYTVnS1JIdHpYU3pKUWl0REF6LzBZSnBQMW1UWnZaYnZuRFdvYUplNi9y?=
- =?utf-8?B?aXBkeGt1QTk5VEJwc0x3ZHZ2WEZJTW5TUGNlYTJ5TXFJckZhNXl4QUNCY2dH?=
- =?utf-8?B?bmFzMTNOaVRwZGJVdjdLc1JkM043T2VjZlVkZ0ZoWTF1R2xZV1RRc0NiRGxJ?=
- =?utf-8?B?NWZadGw2dk00R1JtOUY2TzNjYTl0ZDZ0RDlBUDJLa2RCT0E5STV6S2ZZcjlF?=
- =?utf-8?B?U0R2OFMrUDZncTVDanFNT1c1ZkhEYkdwY1FEbnhueE56cVZySEt0QllGdXF1?=
- =?utf-8?B?RG54elgrUnROcW5LUVZtYjQ4WVplak5yWW1sV2FMOHduZ3M1bWJaZlVrdnU5?=
- =?utf-8?B?UzR3Q1dNNlQzU05jRzhneURYYW8vWGsyVGdYZ3UzZ3FQY0FrQlpBd1B6Zlkv?=
- =?utf-8?B?SVllenRsREwrdDU5OEFGb3haN0NnSlRJcWtLaFpHdTg5VmxRK1JGbEsyTUF3?=
- =?utf-8?B?NytlZ1NNVVJ2T0R3TC9kdUhGMlJTNkN1Q0RDVVQzZ1d6SmYzMGZ1NHpxQWdw?=
- =?utf-8?B?NjdvaFBUY1pHMTh6bEJSVFpLRVIxREp0NGhtWlFqME1Kb1E0M09jSGw2MXBh?=
- =?utf-8?B?UUx3bjhJQk1vZHN0ckJxUnh6ZVFrZFFXVUNrVkRNdUF2akhYelNPK2pSemlR?=
- =?utf-8?B?cEhoTkJVMk5VUUYrYkZKbjg3akNoOWNJMERVOWlVMi80T21LYnM4bm9RNmN4?=
- =?utf-8?B?L1U0L29jdXROOWtlN0d5TEJIRERkaEFvNCtRbTU1RFY3QWlyVFJjbUtYUENX?=
- =?utf-8?B?QzF3U0tHWHBXbnlpdHM3dUg2VmNrcnB0WnlNS3krZldnVHZMc3VHaHByN3di?=
- =?utf-8?B?RVEzL0VsRnpiTnB2dXBOaXEvaGtJTEFIMXYzSVVSdXNKZmdkR1QyYWdMU1B3?=
- =?utf-8?Q?DewMHgT/sG2vjsnQiTTDHIhrQ?=
-X-Forefront-Antispam-Report:
- CIP:131.228.2.241;CTRY:FI;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:fihe3nok0734.emea.nsn-net.net;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(36860700013)(82310400026)(1800799024)(13003099007)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: nokia-bell-labs.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2026 15:58:19.9636
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 692f31a4-fc8e-4cce-4719-08de4ecebe8f
-X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5d471751-9675-428d-917b-70f44f9630b0;Ip=[131.228.2.241];Helo=[fihe3nok0734.emea.nsn-net.net]
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?ajhSZ2tEU0F1L0RGQkpFV2orTEt3SndIZFhrRlgweXlwdTl4UDRzVVBxLzJU?=
+ =?utf-8?B?cHZnT2FxK1dlbXN2bThGaGhNWGxXbWhQWmgzbVMzVjdHUGdnVmRSSG95L3B1?=
+ =?utf-8?B?SU85M2pJWmZ4VThxTkJwMDEwLzc2YVVVL2JiZTNka1VoNUZIN2ZETDllT3Jq?=
+ =?utf-8?B?bmJlalZmVm5xb3FUV0plNzN4b1RDN2dMU0R2M0RhOGVOdy9lS3AxcXlyZ2hp?=
+ =?utf-8?B?UjBWbW5qcWtvb1NvcnpsYVliNkg2NWRoRjMvSzlEczI3cVR5ZnVBU3FSMVBr?=
+ =?utf-8?B?TWRQcGh6N01mUWpkcWFlaTdFK2hEeGJhYWtuWHNsMmV6TGN6TDg4aFZ2K3dZ?=
+ =?utf-8?B?Wkl1ZnplREZOakVpb0lhZ3VvNHRxOFAzb1VqNTBRK0gzSWMvRjFpRERuY2Ex?=
+ =?utf-8?B?OW1GVVJSbk0ya1E1cm5meFhaTFNycnQzRjAzcFVlbUpvMElRS21DOWZDdjlZ?=
+ =?utf-8?B?M1BmZHBuTm9RZlhUeFJiYzZPOXJ0dS9yS1pJb3R6dDd6UTF1Wk4zWGxmMVFN?=
+ =?utf-8?B?d1ovWGNTR3I3NG4wQ2JQRjdwbWhybktqMERHL3B1L1BSS0xwZ2dSWU1EbDhi?=
+ =?utf-8?B?Y2JxcTZVYlVrZ08rdFZlazI0VXJYd1FWQWZLSDV5VW5ZSTQ5S2t1OExHbXBI?=
+ =?utf-8?B?YjR5endkTVdYTWlRWVNtUGY5d2ZVaDM2anhVdVlNVjlnZUszcGpMSW1rWXJj?=
+ =?utf-8?B?dXZXeExubDdqSUdDVjlXVkZXNHRyTkt5bFZ2ZHRFRzZIUHBjK0RRMnovYStH?=
+ =?utf-8?B?OU1ldTNUSndYVjhydzZFRk5FeHlCWGFiUXR6Yk9ZcEdmZzFER2pNdUlTa09G?=
+ =?utf-8?B?Yk8xbnJmVlBNV2x2bXJiT1BZU1pCZ29nZkUwaFdjUlZDb1hOQ3ZTbTJPUnBO?=
+ =?utf-8?B?SjJGMWRKOU1LN0k1dFM4UXgvREIybFh0NERVUmdrTUtIQnRlSStLazNXemtv?=
+ =?utf-8?B?aVZDR1FVcHZmMEhSRHQ1S1VWUnllYksva1hmMXRMKzZLb3I2U1VacHlmUHlO?=
+ =?utf-8?B?bG1mRmtqeFlxYzNNRnVCWm1Jcko2T25aOE1qWllJSVVueERyMGhKUkw2bTVS?=
+ =?utf-8?B?dEhEYlk1WURjOHdKOEpFR0NmcU1ESUdLdWpaNmpVZS9IdHQ2TzFBZ3IvbGhy?=
+ =?utf-8?B?a2crZWhqNWVRZENKWjRMdDIxT0FHb0NuckU3L2VLRncxUVdOQzZZaFhQeENL?=
+ =?utf-8?B?NjRCNy9ITlp2bGY2K3h6a3dDUE9oanpsV1NvOFYyZEkwR2xhOFJheWFwNlVr?=
+ =?utf-8?B?ODlBeWpIa0NXZjduR1BmRTdTa29SRTFtbFhhTHhVRXFDSEtnbGhaUWxMdXVy?=
+ =?utf-8?B?OXY0WGE2aDIzLzBGNFZGd3VtQnNKem1oYzFFTVFBVmpWK0h6RkdzbTJlL284?=
+ =?utf-8?B?RUhtOXJDVG5aQ1M4ZzdxOGVNK0pmaFg0MmVQWlkyNHFmbGQzRit1Y3Y2VEh5?=
+ =?utf-8?B?d1M0T1lTU0V0dng4b2JJbHFHOERWR0VaVzFNbk9sVFRwYmpMdEVFbGd1aVZT?=
+ =?utf-8?B?UnEyb1ZvV1hFZkNmcC84blFjUWJlSzJmeGtOVUdFSlUzM05SdzErUlVkTUkr?=
+ =?utf-8?B?TWtqbWNzMWJJZy9kWFMrVTcrWkpYYWpHeUl0ckpBQ2o0djdtSmdUNnlwUjA0?=
+ =?utf-8?B?WnZPR2Z6OHZKaWswSjd6ZHNOVDlCYzZkVE5lWU1Ra3dnbitMOW5MMWlBYjV2?=
+ =?utf-8?B?K2g2NWEvSjhTdFltTnN1bHlmUzNvMm1VdUlESEl3N1h0L2hpSDM1SjlNMGd6?=
+ =?utf-8?B?d1ZsbWtBZVFQUGp6WitML2FWaS8vUzgzc3krRXZuOURsNXNyMk1hTTQrd1Z1?=
+ =?utf-8?B?QUxKOVFJNlk0clNWWHE2LytmNEpucnpZcEljS282MnFSZkhWQkJVOWZsTmlY?=
+ =?utf-8?B?OUtYeVFOUXFqeEt4aUJ6OUFsRDhDRU1jVFhOTGRlOWxEYlZaN0N0ejBORjQv?=
+ =?utf-8?Q?/AlhrHrb+f5Com18DJnSH0bMh0zl0MYb?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UEFMWk9zNklTYTl3YzVjNHcxN3NybGl4eXV1ZDhKQ1dOZlUyUlhyMFBPdGgw?=
+ =?utf-8?B?ZGVKeUdNclZ1anpnQVI5WDg3Sk9Fek9oSzhydXczeFJiR2l3TUVCZlNsUU03?=
+ =?utf-8?B?OXpsWENjaEJtTnlid2NicTNvSHJFRTRrMGFjRmJXMHBVUWNRZWRjK2Y4OCtD?=
+ =?utf-8?B?MFhhV0o2RXA1ZnFUZGhYakpsQm9pMHY0c2dwbkZYTXl5OGY4KzhIU0JzTjBN?=
+ =?utf-8?B?NzBueUhlZG5JaE9Yd0pwc0lKdVpsaE5JNWZuYnpTQ0lCb1Z2UU0rd1ZKd0Zh?=
+ =?utf-8?B?U29CaVhhZnBqL3RkUUdLaVhiQm92dFVTbnJ4L3JhVmoyRUNlY1NrZ2VtZEo0?=
+ =?utf-8?B?M3FKbW1tWkFSTllXNlluRnViYy9nZ1JNVndQVmxiR1FJT241Sy95SHJTbFNt?=
+ =?utf-8?B?ZkUwVytaSmh2N3J0MnBjdDQyWXdEb09EVEw4SmpZOXUzNTFUTW5hU2NaeVdZ?=
+ =?utf-8?B?enVrbGZjTnFZL3pORHovdjcvYURUajY0R0FjdnZFWjR2S054NmtvTVZFNlVm?=
+ =?utf-8?B?TGtrenBuM1ZudXVWVm9KMzFoVEIrK3hWTExJQ0FOc3pNczNMcGpHUTIvcXFa?=
+ =?utf-8?B?M2lNRTQyeSt0VTZZUGNDckpDd0VCdWYwUDduSlBxYytGdGhhek1IRlJKSWhT?=
+ =?utf-8?B?V3BJY0p1ZWFjbkNyMCtsMDkzcVl2dThaT0RjYXJyZ05Dd05kM0NRRWJ3ZTh0?=
+ =?utf-8?B?R00rQWhablo2YlRKUlFHYUphdlhVMStOSExMQWZTY0ZWQWUxVmJnMVF4N3VS?=
+ =?utf-8?B?RnJuZ2E1QlFGNkNEc1ZtV21XZnV0eTMvUnNVeXhvS3pkZE9TMjB0YlBUN0hr?=
+ =?utf-8?B?RUVhUVRlZmZMQkV5NTgvWjNlZG5SeGJFaDNUWnExb0ZBMDFJV3lrVnorV3Jk?=
+ =?utf-8?B?V294cFBhU0JhaENjajdNczVLSEhDN2tBK2t4dGNBWlN2ZHk1U1NpdTMwMWM0?=
+ =?utf-8?B?NU13TjdUcHlSWmVsZXArT1dMZFpIb3pxLzlKbndwMjUxTXZHaFhJREVBenI0?=
+ =?utf-8?B?VE9sT0F1YjNSaHlOVy9Lei9YYW8zNWpMaTdlMUczQmFGQk5OZ3FMZ2gyS0hJ?=
+ =?utf-8?B?Z01xNWJEY2NoejBRWjY5L1llMFlKMUZIRXZlWk1WMDRiWW9SUXZtTnNmdHY2?=
+ =?utf-8?B?cUQ0UkFEbzlYVGR4LytPaFltcXBaVE1xMVVrU1J5MkVVc2toOGJCTVRsWllw?=
+ =?utf-8?B?K3FCcjJPRzk4enBOTDlPZjBVYnVkcmI0NDU2WnlYNk5MeUEwREtiZ0EvMnd1?=
+ =?utf-8?B?OTVKZVNpSnh2RHQwR2FSTmh2cVRlMktJeTg3ellDU3JmWmF1dmRJYTlyTTB5?=
+ =?utf-8?B?Y0dZa1dSUEp2MnNtdGRQNnRraWhhVGFudENFd0IwMjg2UFp4N0lJaHJYSXVw?=
+ =?utf-8?B?bVR4dVVGTzM0b2xNb2s1ZE9WcXRyWURGT1Q2TEJtQjF0cVhLYTlTOFJGcUo3?=
+ =?utf-8?B?dGJqOWc0MGV1RW82SHV5RTRjV1JoL3VWdm1NVk84MGwvQ2h0RllhWG9mWmpn?=
+ =?utf-8?B?VHIvbHZOM21GYXJNT0FsbXpJUWVMdm1aOTRnNXFzRDZWSUcyZXMwYUpJOEQw?=
+ =?utf-8?B?WjRtUWRCdStrNk40QTFib2Ric0U1TEF5UWxhMy9lZkkvTWo5SzVkWXF6QVhl?=
+ =?utf-8?B?bllDSHprL0IvOVppV2twWGRJZ2RNNlREa1VJV0JrNDQrU0Zoak13N0U2UU9G?=
+ =?utf-8?B?a0EyQ2xGZU5Da1BqUXFEQUJEeVBodFV1amVlL3JmMndQZ0hwdUpSSGJHUlQ4?=
+ =?utf-8?B?ay9FK0dhdkVmaExWeXBCbS9RRUM0S0JMQmVGaWZqOENCWjBQZTFzSjBOVDhH?=
+ =?utf-8?B?N1RrRHJsWG1qeVpOMmxOSm9salg5TTFubWhrWFpmZlVqQXFHY1l5Z2lhSDFj?=
+ =?utf-8?B?N2hSUzZYd0lZWFBwa0FLVkZvYUFPdGN0alJhOFg5NXlkWFQvZUN0VXFKMGtT?=
+ =?utf-8?B?d0VoY3cwd2hvS2NTVnAzNTVodDIvR2xKai9ERnFMMjMrc0F1MURueEpYYm1N?=
+ =?utf-8?B?M3JsQXQwOTQrbVkrK3NXcjNKRG1PcTJXWEdEd2J1aUNiUTJ3VndxbGdaOTly?=
+ =?utf-8?B?RnZOZGhjWjFubndKdld4eVgyMVhEY2lMcTVPQ0QzYlkwZ25rdzF0K0IvenZJ?=
+ =?utf-8?B?cEYxa2hOSWViWWZYT0Q4cHo5Ri93c1gxcks2aFFuV0ZrUU5MTG9FNlhRU2VS?=
+ =?utf-8?B?MGRsSlQrZjVkYXhsc1Nkd0tUdm1CNXhjOTVMUU9TWmRtNWJ5clhSK2ZRaGdR?=
+ =?utf-8?B?eTVMVm8yRnczdTBJd0ZZRnhmUmYxRTA5MHVoa01ieUZNK3loTE9hZXpyWnAx?=
+ =?utf-8?B?NXVLeU5Nd29sOE9SMGtFUjVGd2hDNVNleTE1dTFDU3d5NEhzaXZYWnRvdkZU?=
+ =?utf-8?Q?ly+TswiyPwFpWht8=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: eff522b0-5f45-4d7b-6bb7-08de4ecf4a70
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TreatMessagesAsInternal-DU2PEPF00028D04.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSKPR07MB10519
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2026 16:02:15.1750
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: w6Z7ooZhjhKOBFWgo1raqEfGaPZZJCVFxvcLC56+nsfzSZZ6ADTD2jFPhZcg1r97P63Xy6ZmOgIkI/+e3/R/2PFoDKMYd7UmaaynQKfrjnY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7403
+X-OriginatorOrg: intel.com
 
-From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+From: Pavel Begunkov <asml.silence@gmail.com>
+Date: Wed, 17 Dec 2025 13:11:28 +0000
 
-Hello,
+> On 12/16/25 04:20, Matthew Wilcox wrote:
+>> On Tue, Dec 16, 2025 at 01:07:23PM +0900, Byungchul Park wrote:
+>>> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+>>> @@ -1251,7 +1251,7 @@ static int ice_lbtest_receive_frames(struct
+>>> ice_rx_ring *rx_ring)
+>>>           rx_buf = &rx_ring->rx_fqes[i];
+>>>           page = __netmem_to_page(rx_buf->netmem);
+>>>           received_buf = page_address(page) + rx_buf->offset +
+>>> -                   page->pp->p.offset;
+>>> +                   pp_page_to_nmdesc(page)->pp->p.offset;
+>>
+>> Shouldn't we rather use:
+>>
+>>         nmdesc = __netmem_to_nmdesc(rx_buf->netmem);
+>>         received_buf = nmdesc_address(nmdesc) + rx_buf->offset +
+>>                 nmdesc->pp->p_offset;
+>>
+>> (also. i think we're missing a nmdesc_address() function in our API).
+> 
+> It wouldn't make sense as net_iov backed nmdescs don't have/expose
+> host addresses (only dma addresses). nmdesc_address() would still
+> need to rely on the caller knowing that it's a page. An explicit
+> cast with *netmem_to_page() should be better.
 
-Please find the v1 AccECN packetdrill selftest patch series, which
-includes several test cases used to verify the functionality of
-Accurate ECN spec (RFC9768) under a variety of conditions.
+Sorry for the late reply. Holidays... Happy New Year everyone.
 
-The used packetdrill is commit 6f2116af6b7e1936a53e80ab31b77f74abda1aaa
-of the branch: https://github.com/minuscat/packetdrill_accecn
+I agree with Pavel. This loopback test always operates with
+kernel/page-backed memory. I believe it's fully valid to explicitly cast
+to a page in such cases and work with it. This is also more clear to the
+readers after all (IIRC I suggested this piece of code when Michał was
+working on the ice conversion).
 
-Best regards,
-Chia-Yu
-
-Chia-Yu Chang (1):
-  selftests/net: Add packetdrill packetdrill cases
-
- .../close-local-close-then-remote-fin.pkt     | 25 +++++++
- .../accecn/counters/3rd-ack-lost-data-ce.pkt  | 22 ++++++
- .../accecn/counters/delivered-2ndlargeack.pkt | 25 +++++++
- .../delivered-falseoverflow-detect.pkt        | 31 ++++++++
- .../accecn/counters/delivered-largeack.pkt    | 24 +++++++
- .../accecn/counters/delivered-largeack2.pkt   | 25 +++++++
- .../accecn/counters/delivered-maxack.pkt      | 25 +++++++
- .../accecn/counters/delivered-updates.pkt     | 70 +++++++++++++++++++
- .../accecn/counters/ecn-field-updates-opt.pkt | 35 ++++++++++
- .../accecn/counters/noprogress.pkt            | 27 +++++++
- .../counters/sack-space-grab-with-ts.pkt      | 39 +++++++++++
- .../accecn/counters/sack-space-grab.pkt       | 28 ++++++++
- .../accecn/counters/tsnoprogress.pkt          | 26 +++++++
- .../accecn/counters/tsprogress.pkt            | 25 +++++++
- .../accecn/fallback/acc_ecn_disabled.pkt      | 14 ++++
- .../accecn/fallback/accecn-to-rfc3168.pkt     | 18 +++++
- .../fallback/client_accecn_options_drop.pkt   | 34 +++++++++
- .../fallback/client_accecn_options_lost.pkt   | 38 ++++++++++
- .../net/packetdrill/accecn/fallback/ecn3.pkt  | 12 ++++
- .../accecn/fallback/ipflags-drop.pkt          | 14 ++++
- .../accecn/fallback/listen-opt-drop.pkt       | 16 +++++
- .../accecn/fallback/multiple_syn_ack_drop.pkt | 28 ++++++++
- .../accecn/fallback/multiple_syn_drop.pkt     | 18 +++++
- .../accecn/fallback/negotiation-bleach.pkt    | 23 ++++++
- .../accecn/fallback/rfc3168-to-fallback.pkt   | 18 +++++
- .../accecn/fallback/rfc3168-to-rfc3168.pkt    | 18 +++++
- .../syn_ace_flags_acked_after_retransmit.pkt  | 18 +++++
- .../accecn/fallback/syn_ace_flags_drop.pkt    | 16 +++++
- ...n_ack_ace_flags_acked_after_retransmit.pkt | 27 +++++++
- .../fallback/syn_ack_ace_flags_drop.pkt       | 27 +++++++
- .../negotiation/3rd-ack-after-synack-rxmt.pkt | 19 +++++
- .../accecn/negotiation/3rd-dups.pkt           | 26 +++++++
- .../negotiation/accecn_then_notecn_syn.pkt    | 28 ++++++++
- .../negotiation/clientside-disabled.pkt       | 12 ++++
- .../negotiation/negotiation-connect.pkt       | 23 ++++++
- .../accecn/negotiation/negotiation-listen.pkt | 26 +++++++
- .../negotiation/negotiation-noopt-connect.pkt | 23 ++++++
- .../negotiation/negotiation-optenable.pkt     | 23 ++++++
- .../negotiation/no-ecn-after-acc-ecn.pkt      | 20 ++++++
- .../packetdrill/accecn/negotiation/noopt.pkt  | 27 +++++++
- .../negotiation/notecn_then_accecn_syn.pkt    | 28 ++++++++
- .../serverside-accecn-disabled1.pkt           | 20 ++++++
- .../serverside-accecn-disabled2.pkt           | 20 ++++++
- .../accecn/negotiation/serverside-broken.pkt  | 19 +++++
- .../negotiation/serverside-ecn-disabled.pkt   | 19 +++++
- .../accecn/negotiation/serverside-only.pkt    | 18 +++++
- .../accecn/negotiation/synack-rexmit.pkt      | 15 ++++
- .../accecn/negotiation/synack-rxmt.pkt        | 25 +++++++
- .../reflector/2nd-data-as-first-connect.pkt   | 30 ++++++++
- .../accecn/reflector/2nd-data-as-first.pkt    | 24 +++++++
- .../3rd-ack-ce-updates-received_ce.pkt        | 18 +++++
- .../packetdrill/accecn/reflector/syn-ce.pkt   | 13 ++++
- .../packetdrill/accecn/reflector/syn-ect0.pkt | 13 ++++
- .../packetdrill/accecn/reflector/syn-ect1.pkt | 13 ++++
- .../synack-ce-updates-delivered-ce.pkt        | 22 ++++++
- .../accecn/reflector/synack-ce.pkt            | 28 ++++++++
- .../accecn/reflector/synack-ect0.pkt          | 24 +++++++
- .../accecn/reflector/synack-ect1.pkt          | 24 +++++++
- 58 files changed, 1366 insertions(+)
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/close/close-local-close-then-remote-fin.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/counters/3rd-ack-lost-data-ce.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/counters/delivered-2ndlargeack.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/counters/delivered-falseoverflow-detect.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/counters/delivered-largeack.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/counters/delivered-largeack2.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/counters/delivered-maxack.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/counters/delivered-updates.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/counters/ecn-field-updates-opt.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/counters/noprogress.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/counters/sack-space-grab-with-ts.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/counters/sack-space-grab.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/counters/tsnoprogress.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/counters/tsprogress.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/fallback/acc_ecn_disabled.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/fallback/accecn-to-rfc3168.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/fallback/client_accecn_options_drop.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/fallback/client_accecn_options_lost.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/fallback/ecn3.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/fallback/ipflags-drop.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/fallback/listen-opt-drop.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/fallback/multiple_syn_ack_drop.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/fallback/multiple_syn_drop.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/fallback/negotiation-bleach.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/fallback/rfc3168-to-fallback.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/fallback/rfc3168-to-rfc3168.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/fallback/syn_ace_flags_acked_after_retransmit.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/fallback/syn_ace_flags_drop.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/fallback/syn_ack_ace_flags_acked_after_retransmit.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/fallback/syn_ack_ace_flags_drop.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/negotiation/3rd-ack-after-synack-rxmt.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/negotiation/3rd-dups.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/negotiation/accecn_then_notecn_syn.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/negotiation/clientside-disabled.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/negotiation/negotiation-connect.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/negotiation/negotiation-listen.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/negotiation/negotiation-noopt-connect.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/negotiation/negotiation-optenable.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/negotiation/no-ecn-after-acc-ecn.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/negotiation/noopt.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/negotiation/notecn_then_accecn_syn.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/negotiation/serverside-accecn-disabled1.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/negotiation/serverside-accecn-disabled2.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/negotiation/serverside-broken.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/negotiation/serverside-ecn-disabled.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/negotiation/serverside-only.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/negotiation/synack-rexmit.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/negotiation/synack-rxmt.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/reflector/2nd-data-as-first-connect.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/reflector/2nd-data-as-first.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/reflector/3rd-ack-ce-updates-received_ce.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/reflector/syn-ce.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/reflector/syn-ect0.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/reflector/syn-ect1.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/reflector/synack-ce-updates-delivered-ce.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/reflector/synack-ce.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/reflector/synack-ect0.pkt
- create mode 100644 tools/testing/selftests/net/packetdrill/accecn/reflector/synack-ect1.pkt
-
--- 
-2.34.1
-
+Thanks,
+Olek
 
