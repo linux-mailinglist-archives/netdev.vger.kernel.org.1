@@ -1,115 +1,141 @@
-Return-Path: <netdev+bounces-248127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4291D041B9
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:00:08 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id E36C2D04219
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:02:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2577D30C5179
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:41:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 27C93301F0F8
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:43:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFBF9328B6E;
-	Thu,  8 Jan 2026 15:24:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF68346FBD;
+	Thu,  8 Jan 2026 15:30:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="EJkuhDM8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="STXWlS2E"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66D222424E
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 15:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4D8343D90;
+	Thu,  8 Jan 2026 15:30:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767885882; cv=none; b=hXBOxDMrHKmFwsliJI5f6sMhdwywiJ+Yja4yUsAUXc+JreuDkzc2BwZ2tiT9FJe6ssD++eSamQaDUSPoTWh2OmF0OVu1T6S9ykSY9FTolXEGn82wIfXlsbMQlRLAyyONjjz6dEuCFFNythUzsDAHXwyFFhLEgQMSsbCuM63fNLU=
+	t=1767886206; cv=none; b=oYj0j48dv5EPdG2T1eXmkqwS9MiTzp8yuGYaXwrFlm5fNH92HrKBTxU1PasE3kaYxZJ/bBN+AeVRstqoe79wt35VImw5+/kf7s39RUAcAu9pYJG3NTBrqeAjUlFa4LAxTCICJysbjKi0d9lfBDmbqN+AxpSBQNhINe0Ei/z+gcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767885882; c=relaxed/simple;
-	bh=se7mjTrEljDa5+xJptV2C6dIFdLvtjzl3IzTbjxdV2Y=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Subject:Cc:To:
-	 References:In-Reply-To; b=igdju1whIzHR2DyVznVpDMsKme6WS2f7OH0zP7dlnLo33G8lj00UrtfRBaMuOWxqjCljUSBzrOWjCkX852IBZV38BfTSYlGrFMXBzfLH0jv62uBYWxPSzZgFl1IXsIs2a9/PtnrmIqVfeJVzaezAqdf2ellsWRi3cQKxqZ2O8lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=EJkuhDM8; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id AB792C1ECB4;
-	Thu,  8 Jan 2026 15:24:10 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id DA767606B6;
-	Thu,  8 Jan 2026 15:24:36 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 6EC3D103C889B;
-	Thu,  8 Jan 2026 16:24:33 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1767885876; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=Q2L7agkPWdUdZsOD1rRtCCHaHCmFCKB7oA88Pha1Tb0=;
-	b=EJkuhDM8l2x72dF88nadNboT+6Vb4TJTVyCSS+birec3IHH+uO2j/yCCS8xIV0L7S/WKui
-	+Xe8tlDxozuKSJPwwJEGvYxQ7cmas9t1ipdMljT6C9g9sKmLJspi1jZekY4zCKwcVC4Eur
-	+NMgRKx8UwHkAUNRChBfowmrTq/XlLvBJEyVpjUbE+1cFrdUixGo23f5Xpe6q2ivoHQCxj
-	7ivO6fbveoZrL5dMaVd9crG1VDRKtTZr14lVMSFR8lEZF643kbAafPN2TwK7rKZtrHG/R3
-	2Lb6CgwJtbo+ZdBOK5keYgY2zugLMFitHMCORs7NJC5ttTLymwXVxW/kysyMMA==
+	s=arc-20240116; t=1767886206; c=relaxed/simple;
+	bh=O5nTqfKGed4/ouIvuXWoveXxb7DulUnX59ws2pakbe8=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=q87CYdSQzclsclK2I2mBh9BzL3jqILJ4k2ARbSzYPf9DlNHA/GTS3V6NCvi611/0fLntQfqrb/uUFypcAWO3tHvDLe4g38TZMwIpTZoktT0SWgMrVMqxFsD1ukVfPgvWPrvSkR56+bjcn3xBrfmBMC9xUwRdWU0k4acRoERFgZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=STXWlS2E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 144F2C116C6;
+	Thu,  8 Jan 2026 15:30:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767886205;
+	bh=O5nTqfKGed4/ouIvuXWoveXxb7DulUnX59ws2pakbe8=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=STXWlS2EA/1fun9Zp78AAlIfZxHVkCS6HlUCJuDmnCIq1174bQIx/3D8HB4GzBoaS
+	 LmUUNu+Oefzf+aQlC28T+bimIQ3JnYQX/hHUdXRHI5eOkAfVpuEIWGyWxtAWLjW0ez
+	 ptkCGcyAXAll9cZ+mLCwMt6suCYukZlG/fHlO+hIcrxDvZRPtSW/MPoHuH/sR0nPu5
+	 e4UYuFOLmMEGMZlA9729C0TTM5YtO10GVt4C4pu3SzZqli5GnpCzRNFPO1YIyuP/ya
+	 +S6dWMy9WMARnWjyGdQGPEcjIlyCY6yV1VX1ljNPKunftMUmzciAXsXnYrB8TSEQiS
+	 /IFLZAQm/KrzA==
+Content-Type: multipart/mixed; boundary="===============8409071063143057427=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 08 Jan 2026 16:24:32 +0100
-Message-Id: <DFJB8LYO40ZD.394UQ8NLOQ9WP@bootlin.com>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Subject: Re: [PATCH RFC net-next v2 1/8] net: macb: move Rx buffers alloc
- from link up to open
-Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
- <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Lorenzo Bianconi" <lorenzo@kernel.org>, =?utf-8?q?Th=C3=A9o_Lebrun?=
- <theo.lebrun@bootlin.com>
-To: "Paolo Valerio" <pvalerio@redhat.com>, <netdev@vger.kernel.org>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20251220235135.1078587-1-pvalerio@redhat.com>
- <20251220235135.1078587-2-pvalerio@redhat.com>
-In-Reply-To: <20251220235135.1078587-2-pvalerio@redhat.com>
-X-Last-TLS-Session-Version: TLSv1.3
+MIME-Version: 1.0
+Message-Id: <00f31a205b2c447d9b8c1bbb15acb3b137f49a24c7f96e65ffce41ca541c2a90@mail.kernel.org>
+In-Reply-To: <20260108150102.12563-3-jiayuan.chen@linux.dev>
+References: <20260108150102.12563-3-jiayuan.chen@linux.dev>
+Subject: Re: [PATCH bpf-next v6 2/3] bpf, sockmap: Fix FIONREAD for sockmap
+From: bot+bpf-ci@kernel.org
+To: jiayuan.chen@linux.dev,bpf@vger.kernel.org
+Cc: jiayuan.chen@linux.dev,john.fastabend@gmail.com,jakub@cloudflare.com,davem@davemloft.net,edumazet@google.com,kuba@kernel.org,pabeni@redhat.com,horms@kernel.org,ncardwell@google.com,kuniyu@google.com,dsahern@kernel.org,andrii@kernel.org,eddyz87@gmail.com,ast@kernel.org,daniel@iogearbox.net,martin.lau@linux.dev,song@kernel.org,yonghong.song@linux.dev,kpsingh@kernel.org,sdf@fomichev.me,haoluo@google.com,jolsa@kernel.org,shuah@kernel.org,mhal@rbox.co,cong.wang@bytedance.com,netdev@vger.kernel.org,linux-kernel@vger.kernel.org,linux-kselftest@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Thu,  8 Jan 2026 15:30:05 +0000 (UTC)
 
-Hello Paolo,
+--===============8409071063143057427==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Nothing major in this review. Mostly nits.
+> diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
 
-On Sun Dec 21, 2025 at 12:51 AM CET, Paolo Valerio wrote:
-> From: Th=C3=A9o Lebrun <theo.lebrun@bootlin.com>
->
-> mog_alloc_rx_buffers(), getting called at open, does not do rx buffer
-> alloc on GEM. The bulk of the work is done by gem_rx_refill() filling
-> up all slots with valid buffers.
->
-> gem_rx_refill() is called at link up by
-> gem_init_rings() =3D=3D bp->macbgem_ops.mog_init_rings().
->
-> Move operation to macb_open(), mostly to allow it to fail early and
-> loudly rather than init the device with Rx mostly broken.
->
-> About `bool fail_early`:
->  - When called from macb_open(), ring init fails as soon as a queue
->    cannot be refilled.
->  - When called from macb_hresp_error_task(), we do our best to reinit
->    the device: we still iterate over all queues and try refilling all
->    even if a previous queue failed.
+[ ... ]
 
-About [PATCH 1/8], it conflicts with a patch that landed on v6.19-rc4:
-99537d5c476c ("net: macb: Relocate mog_init_rings() callback from
-macb_mac_link_up() to macb_open()").
+> +static int tcp_bpf_ioctl(struct sock *sk, int cmd, int *karg)
+> +{
+> +	bool slow;
+> +
+> +	/* we only care about FIONREAD */
+> +	if (cmd != SIOCINQ)
+> +		return tcp_ioctl(sk, cmd, karg);
+> +
+> +	/* works similar as tcp_ioctl */
+> +	if (sk->sk_state == TCP_LISTEN)
+> +		return -EINVAL;
+> +
+> +	slow = lock_sock_fast(sk);
+> +	*karg = sk_psock_msg_inq(sk);
+> +	unlock_sock_fast(sk, slow);
+> +
+> +	return 0;
+> +}
 
-I don't get a merge conflict but the
-   bp->macbgem_ops.mog_init_rings(bp);
-call must be dropped from macb_open() in [1/8]. It doesn't build anyway
-because that call passes a single argument.
+Can FIONREAD underreport available data here? The tcp_bpf_recvmsg()
+function can read from both the BPF ingress_msg queue and the native TCP
+receive queue:
 
-Thanks,
+    if (!skb_queue_empty(&sk->sk_receive_queue) &&
+        sk_psock_queue_empty(psock)) {
+        sk_psock_put(sk, psock);
+        return tcp_recvmsg(sk, msg, len, flags, addr_len);
+    }
 
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+But tcp_bpf_ioctl() only returns the BPF queue size via sk_psock_msg_inq(),
+ignoring any data in sk_receive_queue. For TCP_BPF_BASE sockets (sockmap
+without verdict program), incoming data stays in the native receive queue.
+If such a socket has data in sk_receive_queue but an empty ingress_msg,
+FIONREAD would return 0 even though tcp_bpf_recvmsg() would successfully
+read data.
 
+Should this return the sum of both queues, similar to how the original
+tcp_ioctl() uses tcp_inq()?
+
+> diff --git a/net/ipv4/udp_bpf.c b/net/ipv4/udp_bpf.c
+
+[ ... ]
+
+> +static int udp_bpf_ioctl(struct sock *sk, int cmd, int *karg)
+> +{
+> +	if (cmd != SIOCINQ)
+> +		return udp_ioctl(sk, cmd, karg);
+> +
+> +	/* works similar as udp_ioctl. */
+> +	*karg = sk_msg_first_len(sk);
+> +	return 0;
+> +}
+
+Similar question for UDP: udp_bpf_recvmsg() checks psock_has_data() and
+falls through to native udp recvmsg when the BPF queue is empty:
+
+    if (!psock_has_data(psock)) {
+        ret = sk_udp_recvmsg(sk, msg, len, flags, addr_len);
+        goto out;
+    }
+
+If the BPF ingress_msg queue is empty but the native UDP receive queue has
+a datagram, sk_msg_first_len() returns 0 while udp_bpf_recvmsg() would
+successfully receive data. Should udp_bpf_ioctl() fall through to
+udp_ioctl() when sk_msg_first_len() returns 0?
+
+
+---
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/20821477139
+
+--===============8409071063143057427==--
 
