@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-248273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E9DCD0652E
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 22:30:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E9D6D06534
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 22:30:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0D53E3075F7D
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 21:27:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C6BD33078EE5
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 21:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA280331218;
-	Thu,  8 Jan 2026 21:27:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43CDA3382D4;
+	Thu,  8 Jan 2026 21:27:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AC8dOesR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jkRw1P5S"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A41338918
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 21:27:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6BB53321A5
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 21:27:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767907629; cv=none; b=KZ0/7nD2tbskLdQo9vJE41XvnzQ+mIwX+Bu1ZWpgFp0XYXsYbH8ugyO5+7hTe4ZO7LjbR9QbWGIC7KjN0ZyC3vWNm0lldwE+eJi0OF5PMSkPwKFuM7S4ZXsP56lf9e4qBBM9R5HXbYWA+93DAoZQtmh9uIKPR6+7eXsg1Dkm+0c=
+	t=1767907630; cv=none; b=TI4kzNdeKgctEGgNNOAaF8JTfDFBMuKIt2qH6tpq1hLFOEUrOkd/JzgqE4N/qa1tJ/Iu/0BAiVDmL9YHEWfmaEVespwFFWPX+uL1ITKBbNVZ6RUkGGsZd1RGvb8c0s2tMcR8GzzQWgmLxrcSZvFVffcT7P2mbQM7PkGbw2syPFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767907629; c=relaxed/simple;
-	bh=L1kdY1zZ21jJE8Lu631sAvQXOmIPIXlDqAjuHLa/Ysk=;
+	s=arc-20240116; t=1767907630; c=relaxed/simple;
+	bh=tE5JoeY5dorpvYM0BilOd6py7iFh0xJfYhCxLMoE0II=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qqL7GSddd2+1HfL7e1cBix/Qa3k2F8N0jLcWrIuNPbkoxnc0AMvoOpmNk55V/jBExEMf3OAWF9YiwE+vJv3f0yBIT2z4MXeujEesMPWtPFv0uhNmI6dgg16aVDkZ3gOItX0mPBn5XaSb0mObVmJ5HX1L/5bsZRJVKrF8SzUulb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AC8dOesR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5039EC116C6;
-	Thu,  8 Jan 2026 21:27:09 +0000 (UTC)
+	 MIME-Version; b=Q2uszX5N4HG0Xp0iExtS0QPAlKtfAFzIAeyd9rnBAD8OdJDPYw5d5dxD4pCKS2j0BDFj80HlxBJY8ymWMCernlIDtR5ECucuU9Qfsg7LsPIiHu1rj9C1PmcXtTGJx2Wjkn1RULkqVjV2JLpVFCYfxUtkNhhZCnWMkWvUaGACqTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jkRw1P5S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23DABC2BC87;
+	Thu,  8 Jan 2026 21:27:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767907629;
-	bh=L1kdY1zZ21jJE8Lu631sAvQXOmIPIXlDqAjuHLa/Ysk=;
+	s=k20201202; t=1767907630;
+	bh=tE5JoeY5dorpvYM0BilOd6py7iFh0xJfYhCxLMoE0II=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AC8dOesRtT79/P9Dk6jTJWcT3TUaylEPOkU1aqmfeM67bA2AxVeIUh/3AKTLBh9Kj
-	 xU7aj/OceZ5hiNSBdTlKWqAeFEYX2OAvJBiykJ0hOa9HeZH15EBdbr8Uhgb2P/LRoc
-	 wWaPn/91JDxwv+99ipSp3R7MRcKh88YEBAf/583fXR1CV4IBO64qKBdgu2dLDwPVFL
-	 Qff9jYaKtNHwNqqIx3ABueEwfFxI+cYwI07oWbT7jUwkuBzF9nlLoD9DBCwOhPzQWt
-	 coc+mm34QO6lpHE4NqA7d1Pj2Su0V2aBPB3ZTsfi+nwQfuwcy8ZQJvDT4lYtd5ETEl
-	 etLEBE8jm9ypA==
+	b=jkRw1P5SkF5Ea/Z9NER0FsYNe5SzOpkjh5wzvHfVLsYzOLIDEgclNZe5uNwhwuwEC
+	 n5lpNCmH2R75y1xErqA/ejx/BVVJHpvCtTx2eO6oLaYfa/MxgaFknlYx5mamKJVjWA
+	 0Rlys7JmmXHfpc5LcOgBgekUkHYOR3xCOIDBqxSbtY9k7Uc5Zdu6bhjZTZFIxzhmpi
+	 2BtheBFnw4kAbnCOpSue7YlatnoJl55QzEuAYn2TeVLrvA9BlZZUIxEnsp+jhCBQJK
+	 jsb+8YHW3AWaHM3Mf7M55HO9YfeS27GF37lxyT5+jWote2FNMjnFz1CWVqXu7oVwLV
+	 9NF8R3oSPfHyg==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -48,11 +48,10 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Shay Drori <shayd@nvidia.com>
-Subject: [PATCH net 3/4] net/mlx5e: Pass netdev to mlx5e_destroy_netdev instead of priv
-Date: Thu,  8 Jan 2026 13:26:56 -0800
-Message-ID: <20260108212657.25090-4-saeed@kernel.org>
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: [PATCH net 4/4] net/mlx5e: Restore destroying state bit after profile cleanup
+Date: Thu,  8 Jan 2026 13:26:57 -0800
+Message-ID: <20260108212657.25090-5-saeed@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260108212657.25090-1-saeed@kernel.org>
 References: <20260108212657.25090-1-saeed@kernel.org>
@@ -66,153 +65,60 @@ Content-Transfer-Encoding: 8bit
 
 From: Saeed Mahameed <saeedm@nvidia.com>
 
-mlx5e_priv is an unstable structure that can be memset(0) if profile
-attaching fails.
+Profile rollback can fail in mlx5e_netdev_change_profile() and we will
+end up with invalid mlx5e_priv memset to 0, we must maintain the
+'destroying' bit in order to gracefully shutdown even if the
+profile/priv are not valid.
 
-Pass netdev to mlx5e_destroy_netdev() to guarantee it will work on a
-valid netdev.
-
-On mlx5e_remove: Check validity of priv->profile, before attempting
-to cleanup any resources that might be not there.
-
-This fixes a kernel oops in mlx5e_remove when switchdev mode fails due
-to change profile failure.
+This patch maintains the previous state of the 'destroying' state of
+mlx5e_priv after priv cleanup, to allow the remove flow to cleanup
+common resources from mlx5_core to avoid FW fatal errors as seen below:
 
 $ devlink dev eswitch set pci/0000:00:03.0 mode switchdev
-Error: mlx5_core: Failed setting eswitch to offloads.
-dmesg:
-workqueue: Failed to create a rescuer kthread for wq "mlx5e": -EINTR
-mlx5_core 0012:03:00.1: mlx5e_netdev_init_profile:6214:(pid 37199): mlx5e_priv_init failed, err=-12
-mlx5_core 0012:03:00.1 gpu3rdma1: mlx5e_netdev_change_profile: new profile init failed, -12
-workqueue: Failed to create a rescuer kthread for wq "mlx5e": -EINTR
-mlx5_core 0012:03:00.1: mlx5e_netdev_init_profile:6214:(pid 37199): mlx5e_priv_init failed, err=-12
-mlx5_core 0012:03:00.1 gpu3rdma1: mlx5e_netdev_change_profile: failed to rollback to orig profile, -12
+    Error: mlx5_core: Failed setting eswitch to offloads.
+dmesg: mlx5_core 0000:00:03.0 enp0s3np0: failed to rollback to orig profile, ...
 
-$ devlink dev reload pci/0000:00:03.0 ==> oops
+$ devlink dev reload pci/0000:00:03.0
 
-BUG: kernel NULL pointer dereference, address: 0000000000000370
-PGD 0 P4D 0
-Oops: Oops: 0000 [#1] SMP NOPTI
-CPU: 15 UID: 0 PID: 520 Comm: devlink Not tainted 6.18.0-rc5+ #115 PREEMPT(voluntary)
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-2.fc40 04/01/2014
-RIP: 0010:mlx5e_dcbnl_dscp_app+0x23/0x100
-RSP: 0018:ffffc9000083f8b8 EFLAGS: 00010286
-RAX: ffff8881126fc380 RBX: ffff8881015ac400 RCX: ffffffff826ffc45
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: ffff8881035109c0
-RBP: ffff8881035109c0 R08: ffff888101e3e838 R09: ffff888100264e10
-R10: ffffc9000083f898 R11: ffffc9000083f8a0 R12: ffff888101b921a0
-R13: ffff888101b921a0 R14: ffff8881015ac9a0 R15: ffff8881015ac400
-FS:  00007f789a3c8740(0000) GS:ffff88856aa59000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000370 CR3: 000000010b6c0001 CR4: 0000000000370ef0
-Call Trace:
- <TASK>
- mlx5e_remove+0x57/0x110
- device_release_driver_internal+0x19c/0x200
- bus_remove_device+0xc6/0x130
- device_del+0x160/0x3d0
- ? devl_param_driverinit_value_get+0x2d/0x90
- mlx5_detach_device+0x89/0xe0
- mlx5_unload_one_devl_locked+0x3a/0x70
- mlx5_devlink_reload_down+0xc8/0x220
- devlink_reload+0x7d/0x260
- devlink_nl_reload_doit+0x45b/0x5a0
- genl_family_rcv_msg_doit+0xe8/0x140
+mlx5_core 0000:00:03.0: E-Switch: Disable: mode(LEGACY), nvfs(0), necvfs(0), active vports(0)
+mlx5_core 0000:00:03.0: poll_health:803:(pid 519): Fatal error 3 detected
+mlx5_core 0000:00:03.0: firmware version: 28.41.1000
+mlx5_core 0000:00:03.0: 0.000 Gb/s available PCIe bandwidth (Unknown x255 link)
+mlx5_core 0000:00:03.0: mlx5_function_enable:1200:(pid 519): enable hca failed
+mlx5_core 0000:00:03.0: mlx5_function_enable:1200:(pid 519): enable hca failed
+mlx5_core 0000:00:03.0: mlx5_health_try_recover:340:(pid 141): handling bad device here
+mlx5_core 0000:00:03.0: mlx5_handle_bad_state:285:(pid 141): Expected to see disabled NIC but it is full driver
+mlx5_core 0000:00:03.0: mlx5_error_sw_reset:236:(pid 141): start
+mlx5_core 0000:00:03.0: NIC IFC still 0 after 4000ms.
 
 Fixes: c4d7eb57687f ("net/mxl5e: Add change profile method")
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-Reviewed-by: Shay Drori <shayd@nvidia.com>
 Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en.h      |  2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 15 +++++++++------
- drivers/net/ethernet/mellanox/mlx5/core/en_rep.c  |  4 ++--
- 3 files changed, 12 insertions(+), 9 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-index be52c30c2ad6..ff4ab4691baf 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-@@ -1242,7 +1242,7 @@ struct net_device *
- mlx5e_create_netdev(struct mlx5_core_dev *mdev, const struct mlx5e_profile *profile);
- int mlx5e_attach_netdev(struct mlx5e_priv *priv);
- void mlx5e_detach_netdev(struct mlx5e_priv *priv);
--void mlx5e_destroy_netdev(struct mlx5e_priv *priv);
-+void mlx5e_destroy_netdev(struct net_device *netdev);
- int mlx5e_netdev_change_profile(struct net_device *netdev,
- 				struct mlx5_core_dev *mdev,
- 				const struct mlx5e_profile *new_profile,
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index 9f8d95f8915e..2c06a4abea04 100644
+index 2c06a4abea04..9042c8a388e4 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -6643,11 +6643,12 @@ void mlx5e_netdev_attach_nic_profile(struct net_device *netdev,
- 	mlx5e_netdev_change_profile(netdev, mdev, &mlx5e_nic_profile, NULL);
- }
+@@ -6325,6 +6325,7 @@ int mlx5e_priv_init(struct mlx5e_priv *priv,
  
--void mlx5e_destroy_netdev(struct mlx5e_priv *priv)
-+void mlx5e_destroy_netdev(struct net_device *netdev)
+ void mlx5e_priv_cleanup(struct mlx5e_priv *priv)
  {
--	struct net_device *netdev = priv->netdev;
-+	struct mlx5e_priv *priv = netdev_priv(netdev);
++	bool destroying = test_bit(MLX5E_STATE_DESTROYING, &priv->state);
+ 	int i;
  
--	mlx5e_priv_cleanup(priv);
-+	if (priv->profile)
-+		mlx5e_priv_cleanup(priv);
- 	free_netdev(netdev);
+ 	/* bail if change profile failed and also rollback failed */
+@@ -6352,6 +6353,8 @@ void mlx5e_priv_cleanup(struct mlx5e_priv *priv)
+ 	}
+ 
+ 	memset(priv, 0, sizeof(*priv));
++	if (destroying) /* restore destroying bit, to allow unload */
++		set_bit(MLX5E_STATE_DESTROYING, &priv->state);
  }
  
-@@ -6804,7 +6805,7 @@ static int _mlx5e_probe(struct auxiliary_device *adev)
- err_profile_cleanup:
- 	profile->cleanup(priv);
- err_destroy_netdev:
--	mlx5e_destroy_netdev(priv);
-+	mlx5e_destroy_netdev(netdev);
- err_devlink_port_unregister:
- 	mlx5e_devlink_port_unregister(mlx5e_dev);
- err_devlink_unregister:
-@@ -6839,7 +6840,9 @@ static void _mlx5e_remove(struct auxiliary_device *adev)
- 	struct mlx5_core_dev *mdev = edev->mdev;
- 
- 	mlx5_core_uplink_netdev_set(mdev, NULL);
--	mlx5e_dcbnl_delete_app(priv);
-+
-+	if (priv->profile)
-+		mlx5e_dcbnl_delete_app(priv);
- 	/* When unload driver, the netdev is in registered state
- 	 * if it's from legacy mode. If from switchdev mode, it
- 	 * is already unregistered before changing to NIC profile.
-@@ -6860,7 +6863,7 @@ static void _mlx5e_remove(struct auxiliary_device *adev)
- 	/* Avoid cleanup if profile rollback failed. */
- 	if (priv->profile)
- 		priv->profile->cleanup(priv);
--	mlx5e_destroy_netdev(priv);
-+	mlx5e_destroy_netdev(netdev);
- 	mlx5e_devlink_port_unregister(mlx5e_dev);
- 	mlx5e_destroy_devlink(mlx5e_dev);
- }
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-index 52d3ad0b9cd9..6eec88fa6d10 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-@@ -1611,7 +1611,7 @@ mlx5e_vport_vf_rep_load(struct mlx5_core_dev *dev, struct mlx5_eswitch_rep *rep)
- 	priv->profile->cleanup(priv);
- 
- err_destroy_netdev:
--	mlx5e_destroy_netdev(netdev_priv(netdev));
-+	mlx5e_destroy_netdev(netdev);
- 	return err;
- }
- 
-@@ -1666,7 +1666,7 @@ mlx5e_vport_rep_unload(struct mlx5_eswitch_rep *rep)
- 	mlx5e_rep_vnic_reporter_destroy(priv);
- 	mlx5e_detach_netdev(priv);
- 	priv->profile->cleanup(priv);
--	mlx5e_destroy_netdev(priv);
-+	mlx5e_destroy_netdev(netdev);
- free_ppriv:
- 	kvfree(ppriv); /* mlx5e_rep_priv */
- }
+ static unsigned int mlx5e_get_max_num_txqs(struct mlx5_core_dev *mdev,
 -- 
 2.52.0
 
