@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-248153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DAEFD046EE
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:36:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62C90D046F1
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:36:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ECA1931C7579
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:15:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9CBF131011D9
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:15:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2CBF2D1F44;
-	Thu,  8 Jan 2026 16:14:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A4DD264A74;
+	Thu,  8 Jan 2026 16:14:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fFG85hcM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fx9H/Kqn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CF8623645D
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 16:14:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CED1261B70
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 16:14:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767888845; cv=none; b=eSiaizTPwpti591ti7Lgp7/kLT1SCGZ96Kamu+MKvdWlqGydzP/KPxDmvkfAHb/lvBmgt3Bts1y5cquKXx+M4+pUFJovTctuNeLyAcQqm6I0huvR5JN6Dup0U2XQVPaqpSfVvrrrjYq3iJxmF/noxV7AGcapXG/OL8zPI7LJI4U=
+	t=1767888852; cv=none; b=Gg24FkGwfyp4kk5T3dfhFQl0ad0CEacs85XBB8+9JJP0nihxvq30LieU3akJGbClP3XbOmrCIgIwrE1R21f7wqWFbkDTrL3aLg7tZJLNcXzGhsq58y+4WjvwsSv56Tj0ldLzCwGVZyILStzpxxDT2O1bjuPAnBUXXv8DZPy/E9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767888845; c=relaxed/simple;
-	bh=MXYNv6GPQptH7ep7PcaH1dwnT3kfqeJgECIDbMJzJlk=;
+	s=arc-20240116; t=1767888852; c=relaxed/simple;
+	bh=XZ9nObiYim8NkjfW0RpWV/3nVT4rOuVITGvYWC+qhx0=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=H43GyVVDEXmBrvja/JyLs/nsqpAV/Vp2o6GA7e0YrktRAxDeMRtiehPZv0G09kuppELKAvwf5PK0vA06Bvor24b9MMnuTVsr2gAZpcrXKfuQgrZmm6TrhI6daYKqWQGDaoDXFU3aNg/SXZV2hnrpY1Fw30xBVWExhfNyqak9I0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fFG85hcM; arc=none smtp.client-ip=209.85.221.48
+	 MIME-Version; b=o14rUqT1YL579KrpGV8Bcu7BJoCdK6OW5ilh1jecK/He0qnyUAo/ZNmIl4Vxm3kUg/ylvZbyWxgxKGlngB1wv+OfdtWypUFw2QCAods/Rd9LEDNHDqwpKSj0YOTXs6TsgirH7+scTXn5bxjbIe5N/uOOo3CVvkg8TYYgRQ7FEKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fx9H/Kqn; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-42fb4eeb482so1853551f8f.0
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 08:14:03 -0800 (PST)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-477bf34f5f5so26661005e9.0
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 08:14:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767888842; x=1768493642; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1767888848; x=1768493648; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=CLL5UIxh5PUk40HwyUo69Fp+sMd2y28+0jBjp5B54vc=;
-        b=fFG85hcMIXeRxak/NFVga78PpI136jpAhbd0O8aB0c2611wP4ugGnZNzBBUuiTW7JO
-         fIThs9ZlHTmNJpOnTiKJCFKlBCYCF++Gp1YJ8WPp4mm9WNTJFbfJKz5nMGylF63e5esi
-         dGE9bkKq8o+8Is5dw/J4a6gCWh3la39WHqr+pnGKmgXf2JV2EgSaVm4UOG7H+PlC1TT6
-         BPU3Pzk/AHRvrEs0BDHob0I8Hmy53furPm1yOwYlGQugtlhDco7TfVp4q6aGdX/6yykz
-         GIw/HS64IyzUFg5AynwT4FJaNvmJTBU7Kip8lHn7is0EMiluIfBwVtZcdZFKi5UMooW1
-         sd7A==
+        bh=mLiBhMdM0ed6GuReeIXjh6JbFnl9TSN9hbzoSUALHj8=;
+        b=fx9H/Kqn8QL+yMybVQR5BPTREXjcg4CzHtrVHEMDvfoeksId5OcttKajEcnXY5ksWq
+         YMXfC30jIEjdK06epdQma8xH+VbOvD/Dlgq8slU4FQanZR/tv+jGcowpN6Tlqh5VPkAf
+         rKSpAbLDWJimfZhdin38vrdYUVBSM4nL61Vhglk35OE7w95OgpHFaUKxsaaWL6J2EmsI
+         UtCnz4W0jVOOL3OQFJhhKRq0CS3VzZoqfulGuA09baULMRmvdaz/LIrnz2T5GhVk27su
+         aZGbQ0H3F5qMPAVm5W70VqUTK7LxBwEKWJsqdWpxlmv85nJhL0OU5xhb0WW0lGo5ANkg
+         VKbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767888842; x=1768493642;
+        d=1e100.net; s=20230601; t=1767888848; x=1768493648;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=CLL5UIxh5PUk40HwyUo69Fp+sMd2y28+0jBjp5B54vc=;
-        b=j0sgIHbfn9nrqyOCXcx2RVDLpBERQmz4fbbVrT/wZxOTP5XHdVh5PBjhYbfhrqsySQ
-         7+dFFIv5NSwRJ7GcZ+4T8xVTeQw3euoaPopt2KcgPwclAtvd9z60W/mM6vgTG6q5P5/T
-         SImPu36Lfx0lIpZc86OThrpRHp76dwPyHRHQCVHH+JLrhDmBu41iGDCEkosxwiv+1Qge
-         F0LcF88f4+F6DJQji+Ojs93futlW16+vbqJXDspEohZZRJ3BDXpZTaRlxYF7fZ0yfv2G
-         ZMaeC2rRJ5SbPIWmVa20itJeodzfp9oqaVhevBVXp6kmNHud50A9eKKLHt3LByv+C55+
-         2yBg==
-X-Forwarded-Encrypted: i=1; AJvYcCUZvSqNm3tXEE4BBxEpxtRfT1RD7xpUwwJIuVm9sCW74TFsarv2opNb/sNm/CMZZ8cWm5eZLss=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJ//lM/Bgu7Cj0aixqHFgAyUYZZ1zPYrAeFPDXCa9qmM0wa8ZF
-	M5i0GKvWgc5Y8FvtwEa5cP1clIwFRCebu4nkNo5VUVGLjyGaWbDbhSvc
-X-Gm-Gg: AY/fxX4gaamBji3anh9xVIcFNsltUVGgfrSYahLI7XqIQ5TXiMofAuqYRZtzzDF9mIz
-	MQcuTp8ZlyUh5NXEWVuVRi6gK2FCzDFsXQyxrwQT7BDmvIpNVWRsFhB6UMg2FgBvH6UewjSHhUf
-	F9HEVgSXzTUVa9sn7CO6dikPruTIle0m3ydQTEKHWRFTQOUsw++MVLtzLwaAX76Ysu0MqeiV+ng
-	QA2K/H5cb0kEFMpxdeti5jlE8wnHY1gtkphGVrgqSjYs7BH/0Iw/UoqTmM4Qrs8emouUjtA6FSl
-	CnLV+i+V0v1yg40vNSJZ1Elm833EZ7Q0F8+JZ6nrqkalStJhlniGPBU/7fJUgkUWb7yQrux+GKx
-	G4SCrgE8xtaTlH3CnDvTI562cB5keCzajWFN/rWSSjD4FZHmNfM0yJV77vrrQP8IFeg/MeMbslC
-	iAXObq/fba3Tg/epWfbAzhRXQ5SJ7g
-X-Google-Smtp-Source: AGHT+IFSR7OrZGmAkbuK3KTFbwypOtsBS5UWM2Z8CLQAaFKU04q9Y3Yb9pryEJYGXxFcRkgvtLImQw==
-X-Received: by 2002:a05:6000:401f:b0:42f:8816:a509 with SMTP id ffacd0b85a97d-432c3779246mr8266484f8f.62.1767888841499;
-        Thu, 08 Jan 2026 08:14:01 -0800 (PST)
+        bh=mLiBhMdM0ed6GuReeIXjh6JbFnl9TSN9hbzoSUALHj8=;
+        b=suf+6wQaZQzf5yFCdVg1jGzIWQADj6/QTPr+iAErFsRK+AnOXu3Exyw+rWn3eVJe2L
+         RJ5o4+hi/vAUFA2ElBfTFe7KnDfOkBqLEaSWaHc764j00P5je4ppTfhW/slTaUYyo2Sd
+         JroPBD0S/bOIBb0dbuHIddo3JN5rkkcAdmbDDMOHV2dsv1qx3MdH04ca0U6D8q1DK0Ze
+         L005xyRZHlD4zQZWcvEd0au27xUGXaXb9WED9C6fmqGYA7U64mbwLtQJPsn13Cl9/5zd
+         eycceMJn9vMdi8OW9tKJAsBie2s5CDnBJ7N3VG5/8ZvmyCsR0D/Ia/i0uLYzVkZT90/e
+         2fvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVfjhTMhBjpmGrxKeSIHudpO2gGJK/lVwkZo4M5icXdpD0OUI/nfyP6swu4qpRWU6wnbd8ISMA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVFiy31lDXAMHujzvOpDj83AsJbO7GRRFnZFTMFpkEEm/kp3E0
+	hStClWf8ZL7drIdkpVbamNeZEhZc3mpShN/oQSS/zV/ruzBFQkPw9wXO
+X-Gm-Gg: AY/fxX4sNkN2VlDUx/C/JpZiu3OaKYS1q9tCppnVknq9WGxTIrchVNEfHwZ0Ck8Kitt
+	FqMQaWsEGLS136aa6lVT7EiBNkezaLL2ncIN/0Sl31ut5oC1TEUE46NBHMXC9fGuexcnkNClCuX
+	EFxlcAYswSNCx03L1jpRaH1Puh1vxth3tDKgjZJHI57Hv/nYSofXimCZBB0R+3SYAL5eQ6xqSfM
+	LqnwXwo2aKE0/p63YtcgK0Zxnf/eLZod/YFCsy7rY6lVv1D7KHEOgKTRb+kuG9pCOj0rUGJ8dsv
+	Q/pgJaQTujsSmmEoEzKif0yz9ddlhDz9DPBt3Au9Q7Y6ZuCcHY353Lmz5QQs9u+l1YUVkub7+ub
+	VstaDmnj5WW2Tt57E+gkmaGnBTNwQw2m6mYfrkiimvwZsV3GjZyk9oc/iHlfQIXUMVGEJzuBdh5
+	/mxjORxDZqgLEhq1ain8o7uYRtYJwy
+X-Google-Smtp-Source: AGHT+IHnf3v+9SyV7jhJjfxqD6XCzmZdJNUZq3pH6pXfY6PTxBlKmL6Vxe3zq/joa7VEsKOblePhBA==
+X-Received: by 2002:a05:600c:3484:b0:46e:7e22:ff6a with SMTP id 5b1f17b1804b1-47d84b1fd4bmr85581285e9.15.1767888847563;
+        Thu, 08 Jan 2026 08:14:07 -0800 (PST)
 Received: from imac.lan ([2a02:8010:60a0:0:8115:84ef:f979:bd53])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5edd51sm17140039f8f.29.2026.01.08.08.13.58
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5edd51sm17140039f8f.29.2026.01.08.08.14.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 08:13:59 -0800 (PST)
+        Thu, 08 Jan 2026 08:14:03 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: Donald Hunter <donald.hunter@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -91,9 +91,9 @@ To: Donald Hunter <donald.hunter@gmail.com>,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Ruben Wauters <rubenru09@aol.com>,
 	linux-doc@vger.kernel.org
-Subject: [PATCH net-next v2 04/13] tools: ynl: fix pylint dict, indentation, long lines, uninitialised
-Date: Thu,  8 Jan 2026 16:13:30 +0000
-Message-ID: <20260108161339.29166-5-donald.hunter@gmail.com>
+Subject: [PATCH net-next v2 05/13] tools: ynl: fix pylint misc warnings
+Date: Thu,  8 Jan 2026 16:13:31 +0000
+Message-ID: <20260108161339.29166-6-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260108161339.29166-1-donald.hunter@gmail.com>
 References: <20260108161339.29166-1-donald.hunter@gmail.com>
@@ -107,196 +107,142 @@ Content-Transfer-Encoding: 8bit
 
 Fix pylint warnings for:
 
-- use-dict-literal
-- bad-indentation
-- line-too-long
-- possibly-used-before-assignment
+- unused-argument
+- consider-using-in
+- consider-using-get
+- consider-using-f-string
+- protected-access
+- unidiomatic-typecheck
+- no-else-return
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- tools/net/ynl/pyynl/lib/nlspec.py | 19 ++++++++--------
- tools/net/ynl/pyynl/lib/ynl.py    | 37 ++++++++++++++++---------------
- 2 files changed, 29 insertions(+), 27 deletions(-)
+ tools/net/ynl/pyynl/lib/doc_generator.py |  3 +--
+ tools/net/ynl/pyynl/lib/nlspec.py        |  5 ++---
+ tools/net/ynl/pyynl/lib/ynl.py           | 18 +++++++++---------
+ 3 files changed, 12 insertions(+), 14 deletions(-)
 
+diff --git a/tools/net/ynl/pyynl/lib/doc_generator.py b/tools/net/ynl/pyynl/lib/doc_generator.py
+index 3a16b8eb01ca..d1afff9d9956 100644
+--- a/tools/net/ynl/pyynl/lib/doc_generator.py
++++ b/tools/net/ynl/pyynl/lib/doc_generator.py
+@@ -109,8 +109,7 @@ class RstFormatters:
+                     'fixed-header': 'definition',
+                     'nested-attributes': 'attribute-set',
+                     'struct': 'definition'}
+-        if prefix in mappings:
+-            prefix = mappings[prefix]
++        prefix = mappings.get(prefix, prefix)
+         return f":ref:`{namespace}-{prefix}-{name}`"
+ 
+     def rst_header(self) -> str:
 diff --git a/tools/net/ynl/pyynl/lib/nlspec.py b/tools/net/ynl/pyynl/lib/nlspec.py
-index a35f827f09e3..fcd4106d0cfa 100644
+index fcd4106d0cfa..f3173146b64b 100644
 --- a/tools/net/ynl/pyynl/lib/nlspec.py
 +++ b/tools/net/ynl/pyynl/lib/nlspec.py
-@@ -129,8 +129,8 @@ class SpecEnumSet(SpecElement):
+@@ -105,8 +105,7 @@ class SpecEnumEntry(SpecElement):
+     def user_value(self, as_flags=None):
+         if self.enum_set['type'] == 'flags' or as_flags:
+             return 1 << self.value
+-        else:
+-            return self.value
++        return self.value
  
-         prev_entry = None
-         value_start = self.yaml.get('value-start', 0)
--        self.entries = dict()
--        self.entries_by_val = dict()
-+        self.entries = {}
-+        self.entries_by_val = {}
-         for entry in self.yaml['entries']:
-             e = self.new_entry(entry, prev_entry, value_start)
-             self.entries[e.name] = e
-@@ -451,6 +451,7 @@ class SpecFamily(SpecElement):
-             stream.seek(0)
-             spec = pyyaml.safe_load(stream)
  
-+        self.fixed_header = None
-         self._resolution_list = []
+ class SpecEnumSet(SpecElement):
+@@ -194,7 +193,7 @@ class SpecAttr(SpecElement):
+         self.sub_message = yaml.get('sub-message')
+         self.selector = yaml.get('selector')
  
-         super().__init__(self, spec)
-@@ -579,13 +580,13 @@ class SpecFamily(SpecElement):
-             self.msgs[op.name] = op
+-        self.is_auto_scalar = self.type == "sint" or self.type == "uint"
++        self.is_auto_scalar = self.type in ("sint", "uint")
  
-     def find_operation(self, name):
--      """
--      For a given operation name, find and return operation spec.
--      """
--      for op in self.yaml['operations']['list']:
--        if name == op['name']:
--          return op
--      return None
-+        """
-+        For a given operation name, find and return operation spec.
-+        """
-+        for op in self.yaml['operations']['list']:
-+            if name == op['name']:
-+                return op
-+        return None
  
-     def resolve(self):
-         self.resolve_up(super())
+ class SpecAttrSet(SpecElement):
 diff --git a/tools/net/ynl/pyynl/lib/ynl.py b/tools/net/ynl/pyynl/lib/ynl.py
-index 6e39618e5598..040ff3b87c17 100644
+index 040ff3b87c17..4bc8e58cb621 100644
 --- a/tools/net/ynl/pyynl/lib/ynl.py
 +++ b/tools/net/ynl/pyynl/lib/ynl.py
-@@ -235,7 +235,7 @@ class NlMsg:
+@@ -415,7 +415,7 @@ class NetlinkProtocol:
+         nlmsg = struct.pack("HHII", nl_type, nl_flags, seq, 0)
+         return nlmsg
  
-         self.extack = None
-         if self.nl_flags & Netlink.NLM_F_ACK_TLVS and extack_off:
--            self.extack = dict()
-+            self.extack = {}
-             extack_attrs = NlAttrs(self.raw[extack_off:])
-             for extack in extack_attrs:
-                 if extack.type == Netlink.NLMSGERR_ATTR_MSG:
-@@ -296,7 +296,8 @@ class NlMsg:
-         return self.nl_type
+-    def message(self, flags, command, version, seq=None):
++    def message(self, flags, command, _version, seq=None):
+         return self._message(command, flags, seq)
  
-     def __repr__(self):
--        msg = f"nl_len = {self.nl_len} ({len(self.raw)}) nl_flags = 0x{self.nl_flags:x} nl_type = {self.nl_type}"
-+        msg = (f"nl_len = {self.nl_len} ({len(self.raw)}) "
-+               f"nl_flags = 0x{self.nl_flags:x} nl_type = {self.nl_type}")
-         if self.error:
-             msg += '\n\terror: ' + str(self.error)
-         if self.extack:
-@@ -361,7 +362,7 @@ def _genl_load_families():
-                     return
+     def _decode(self, nl_msg):
+@@ -425,7 +425,7 @@ class NetlinkProtocol:
+         msg = self._decode(nl_msg)
+         if op is None:
+             op = ynl.rsp_by_value[msg.cmd()]
+-        fixed_header_size = ynl._struct_size(op.fixed_header)
++        fixed_header_size = ynl.struct_size(op.fixed_header)
+         msg.raw_attrs = NlAttrs(msg.raw, fixed_header_size)
+         return msg
  
-                 gm = GenlMsg(nl_msg)
--                fam = dict()
-+                fam = {}
-                 for attr in NlAttrs(gm.raw):
-                     if attr.type == Netlink.CTRL_ATTR_FAMILY_ID:
-                         fam['id'] = attr.as_scalar('u16')
-@@ -370,7 +371,7 @@ def _genl_load_families():
-                     elif attr.type == Netlink.CTRL_ATTR_MAXATTR:
-                         fam['maxattr'] = attr.as_scalar('u32')
-                     elif attr.type == Netlink.CTRL_ATTR_MCAST_GROUPS:
--                        fam['mcast'] = dict()
-+                        fam['mcast'] = {}
-                         for entry in NlAttrs(attr.raw):
-                             mcast_name = None
-                             mcast_id = None
-@@ -390,6 +391,7 @@ class GenlMsg:
-         self.nl = nl_msg
-         self.genl_cmd, self.genl_version, _ = struct.unpack_from("BBH", nl_msg.raw, 0)
-         self.raw = nl_msg.raw[4:]
-+        self.raw_attrs = []
- 
-     def cmd(self):
-         return self.genl_cmd
-@@ -560,8 +562,7 @@ class YnlFamily(SpecFamily):
-             for single_value in value:
-                 scalar += enum.entries[single_value].user_value(as_flags = True)
-             return scalar
--        else:
--            return enum.entries[value].user_value()
-+        return enum.entries[value].user_value()
- 
-     def _get_scalar(self, attr_spec, value):
-         try:
-@@ -750,8 +751,7 @@ class YnlFamily(SpecFamily):
-     def _decode_unknown(self, attr):
-         if attr.is_nest:
-             return self._decode(NlAttrs(attr.raw), None)
--        else:
--            return attr.as_bin()
-+        return attr.as_bin()
+@@ -755,7 +755,7 @@ class YnlFamily(SpecFamily):
  
      def _rsp_add(self, rsp, name, is_multi, decoded):
          if is_multi is None:
-@@ -800,7 +800,8 @@ class YnlFamily(SpecFamily):
- 
-     # pylint: disable=too-many-statements
-     def _decode(self, attrs, space, outer_attrs = None):
--        rsp = dict()
-+        rsp = {}
-+        search_attrs = {}
-         if space:
-             attr_space = self.attr_sets[space]
-             search_attrs = SpaceAttrs(attr_space, rsp, outer_attrs)
-@@ -818,7 +819,9 @@ class YnlFamily(SpecFamily):
- 
-             try:
-                 if attr_spec["type"] == 'nest':
--                    subdict = self._decode(NlAttrs(attr.raw), attr_spec['nested-attributes'], search_attrs)
-+                    subdict = self._decode(NlAttrs(attr.raw),
-+                                           attr_spec['nested-attributes'],
-+                                           search_attrs)
-                     decoded = subdict
-                 elif attr_spec["type"] == 'string':
-                     decoded = attr.as_strz()
-@@ -927,12 +930,11 @@ class YnlFamily(SpecFamily):
-                     format_ = NlAttr.get_format(m.type, m.byte_order)
-                     size += format_.size
-             return size
--        else:
--            return 0
-+        return 0
- 
-     def _decode_struct(self, data, name):
-         members = self.consts[name].members
--        attrs = dict()
-+        attrs = {}
+-            if name in rsp and type(rsp[name]) is not list:
++            if name in rsp and not isinstance(rsp[name], list):
+                 rsp[name] = [rsp[name]]
+                 is_multi = True
+             else:
+@@ -788,7 +788,7 @@ class YnlFamily(SpecFamily):
          offset = 0
-         for m in members:
-             value = None
-@@ -969,7 +971,7 @@ class YnlFamily(SpecFamily):
+         if msg_format.fixed_header:
+             decoded.update(self._decode_struct(attr.raw, msg_format.fixed_header))
+-            offset = self._struct_size(msg_format.fixed_header)
++            offset = self.struct_size(msg_format.fixed_header)
+         if msg_format.attr_set:
+             if msg_format.attr_set in self.attr_sets:
+                 subdict = self._decode(NlAttrs(attr.raw, offset), msg_format.attr_set)
+@@ -908,7 +908,7 @@ class YnlFamily(SpecFamily):
+             return
+ 
+         msg = self.nlproto.decode(self, NlMsg(request, 0, op.attr_set), op)
+-        offset = self.nlproto.msghdr_size() + self._struct_size(op.fixed_header)
++        offset = self.nlproto.msghdr_size() + self.struct_size(op.fixed_header)
+         search_attrs = SpaceAttrs(op.attr_set, vals)
+         path = self._decode_extack_path(msg.raw_attrs, op.attr_set, offset,
+                                         extack['bad-attr-offs'], search_attrs)
+@@ -916,14 +916,14 @@ class YnlFamily(SpecFamily):
+             del extack['bad-attr-offs']
+             extack['bad-attr'] = path
+ 
+-    def _struct_size(self, name):
++    def struct_size(self, name):
+         if name:
+             members = self.consts[name].members
+             size = 0
+             for m in members:
+                 if m.type in ['pad', 'binary']:
+                     if m.struct:
+-                        size += self._struct_size(m.struct)
++                        size += self.struct_size(m.struct)
+                     else:
+                         size += m.len
+                 else:
+@@ -942,7 +942,7 @@ class YnlFamily(SpecFamily):
+                 offset += m.len
              elif m.type == 'binary':
                  if m.struct:
-                     if value is None:
--                        value = dict()
-+                        value = {}
-                     attr_payload += self._encode_struct(m.struct, value)
-                 else:
-                     if value is None:
-@@ -1026,7 +1028,7 @@ class YnlFamily(SpecFamily):
-         return raw
+-                    len_ = self._struct_size(m.struct)
++                    len_ = self.struct_size(m.struct)
+                     value = self._decode_struct(data[offset : offset + len_],
+                                                 m.struct)
+                     offset += len_
+@@ -987,7 +987,7 @@ class YnlFamily(SpecFamily):
  
-     def handle_ntf(self, decoded):
--        msg = dict()
-+        msg = {}
-         if self.include_raw:
-             msg['raw'] = decoded
-         op = self.rsp_by_value[decoded.cmd()]
-@@ -1166,9 +1168,8 @@ class YnlFamily(SpecFamily):
-                     if decoded.cmd() in self.async_msg_ids:
-                         self.handle_ntf(decoded)
-                         continue
--                    else:
--                        print('Unexpected message: ' + repr(decoded))
--                        continue
-+                    print('Unexpected message: ' + repr(decoded))
-+                    continue
- 
-                 rsp_msg = self._decode(decoded.raw_attrs, op.attr_set.name)
-                 if op.fixed_header:
+     def _formatted_string(self, raw, display_hint):
+         if display_hint == 'mac':
+-            formatted = ':'.join('%02x' % b for b in raw)
++            formatted = ':'.join(f'{b:02x}' for b in raw)
+         elif display_hint == 'hex':
+             if isinstance(raw, int):
+                 formatted = hex(raw)
 -- 
 2.52.0
 
