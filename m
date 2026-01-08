@@ -1,83 +1,96 @@
-Return-Path: <netdev+bounces-248119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8068AD03B1A
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 16:13:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EC43D03D42
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 16:27:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D4B913064A83
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:06:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C4004336093D
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:07:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E9222DECB1;
-	Thu,  8 Jan 2026 15:05:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84974333445;
+	Thu,  8 Jan 2026 15:05:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dPdY47mD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aU0hxsE9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34E022DB795
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 15:05:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C2B530B536;
+	Thu,  8 Jan 2026 15:05:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767884703; cv=none; b=efMH8K7ycyPhv4uC3siLIXRLYRNgiL2N+cqVsvVcL2ZLeadlOETNl7NBXvV8B9AWWkbtz6qN8mtgRplC63C/9t5f7mMXY5DcOd8jD+4dHLMDn+idOBwQCUYy2FZEtrIMgc46npVLk5G1q25LVssv7uPaf/84jhLt6Ad8sBH5OK8=
+	t=1767884736; cv=none; b=CeCftNI9+YH4SllruqtzrGlQmMiRoTW8ymRqMM1zfpbBxUo6X0AZFo5qBmH1GoSt5ypxPr7D2RVmWGfpic4ERi5RlxcItTZ1y9B6airFI2DvuldsFdncNh63KzArxsJBA2HrpKsYFtDfhtA9mOGNQVXZJFuOfHLg8HcAqByHrLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767884703; c=relaxed/simple;
-	bh=RGmmRSOekZ9dSwMwSZLBkzhaCG4B3yB6Z3uObL3WdfE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WPNskkf9RNB8yx/cqO0CfbYysclPV0s2ikIKLqGYl1+YmOScM2ZJsZBNUzXplApy7i927fr2/q7QLBNpZAyN4pbqufvg5iEQabEHcFHtne6qrZ0wO86vxJRy14Xoxr9c3yd+5t1EztETYXN99hAq6uQFTqHCqEl7CHvd3yXohhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dPdY47mD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C44BDC116C6;
-	Thu,  8 Jan 2026 15:05:00 +0000 (UTC)
+	s=arc-20240116; t=1767884736; c=relaxed/simple;
+	bh=OhlOQ7KmGY1tCliVjuLQ3JOxdM6RT+MpKjYTQNq49QU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=oCHlluJY6OCM8Dju0+9ihMVWV5I/E9MUMZA48QMny7ULz8YVaiLpdihc51D9qPyTGUEiRz1spV60cEch+aGoDfv5FEJtF7rNHJ6YDX3dso50ytq9nsw5lJE24UVrGK09HbVs3GCSZybBsWn1pq0/uKS6dtYu5w72/ImUNCwACXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aU0hxsE9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 826B3C116D0;
+	Thu,  8 Jan 2026 15:05:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767884702;
-	bh=RGmmRSOekZ9dSwMwSZLBkzhaCG4B3yB6Z3uObL3WdfE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dPdY47mDYM/ZOdRmussvL0jQ5nswO4clI6ZQN71mcBr7JXT85xT+fBbNdwlIyPfIq
-	 QbP43ELD7V+B/rrU5jWxBY5L88B9PQJQDUnPpWMuYBoIsCWSgqvlB64aTxf/nq4mei
-	 F7t4YOeZ6mlPdNAExetVUXi6Ejf9hqIDL4Kmf2d5HEPqqrtY4C8gYPe6eKgmUEpKkG
-	 v+fOcbdIXu0e2IOWQ7IL/RNjsucZtVENMLU6hsG4xnRpyGvgBUimnNItvD3PbDFBTy
-	 HaYLS0geSops+1PXgaLCzoYmocS20i9eiXT2kHrHfidhqQF2gQEATrlxzwFP5XvlxP
-	 qhpE2cNl6LVTg==
-Date: Thu, 8 Jan 2026 15:04:57 +0000
-From: Simon Horman <horms@kernel.org>
-To: Joris Vaisvila <joey@tinyisr.com>
-Cc: netdev@vger.kernel.org, nbd@nbd.name, sean.wang@mediatek.com,
-	lorenzo@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH v2] net: ethernet: mtk_eth_soc: avoid writing to ESW
- registers on MT7628
-Message-ID: <20260108150457.GI345651@kernel.org>
-References: <20260106052845.1945352-1-joey@tinyisr.com>
+	s=k20201202; t=1767884735;
+	bh=OhlOQ7KmGY1tCliVjuLQ3JOxdM6RT+MpKjYTQNq49QU=;
+	h=From:Subject:Date:To:Cc:From;
+	b=aU0hxsE9w6KFlaqb5qfNSIS0DUG+I8lveyFHswoGwf3mTYDYF4JGhjA8Xo4I0ekOE
+	 8kTopEsog54rnEv1qIrHiBt0vuUvHR2dG+8Gk83Bh18EKcUMykBLaQz1osIyfDLngi
+	 p38i/YgRtfg+jLmOf7ND6ngyruPdVyx5pD2/wcek2KRZpVZGsd5DG4V740o32nXJAN
+	 HdInwQJlDhBAkx8NfvXocMYrbSPowlJMVmG5WWIWYyuJ2xvawU4W5EOYSj4SdBEvm2
+	 GjM+zSv5WGoIGARX9mctvsvCThR0cBtOovBQpzk4GB2YZ0ijRv/uTdtgmnjp5t+s4i
+	 d2hTYJy7un6wA==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Subject: [PATCH net-next v3 0/2] net: airoha: Init Block Ack memory region
+ for MT7996 NPU offloading
+Date: Thu, 08 Jan 2026 16:05:06 +0100
+Message-Id: <20260108-airoha-ba-memory-region-v3-0-bf1814e5dcc4@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260106052845.1945352-1-joey@tinyisr.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3XNzw6CMAwG8FchO1uzP46BJ9/DeBhQYFGYKWbRE
+ N7dQmKiBy9Nvqbfr7OYkAJO4pjNgjCFKcSRg9llou792CGEhrPQUudSSQ0+UOw9VB4GHCK9gLD
+ jDtiiKfXBOGUKLbh9J2zDc5PPF859mB58vj1Kat1+TPvXTAok2Eo674yreZ6uSCPe9pE6saJJf
+ 0PuP6QZagpV2rbOc2fUD7Qsyxv+n74tCAEAAA==
+X-Change-ID: 20260102-airoha-ba-memory-region-58d924371382
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+X-Mailer: b4 0.14.2
 
-On Tue, Jan 06, 2026 at 07:18:28AM +0200, Joris Vaisvila wrote:
-> The MT7628 does not expose MAC control registers. Writes to these
-> registers corrupt the ESW VLAN configuration. Existing drivers
-> never use the affected features, so this went unnoticed.
-> 
-> This patch skips MCR register reads and writes on MT7628, preventing
-> invalid register access.
-> 
-> Fixes: 296c9120752b ("net: ethernet: mediatek: Add MT7628/88 SoC support")
-> Signed-off-by: Joris Vaisvila <joey@tinyisr.com>
-> ---
-> v2:
-> - Add missing Fixes tag
+This is a preliminary series in order to enable NPU offloading for
+MT7996 (Eagle) chipset.
 
-Hi Joris,
+---
+Changes in v3:
+- Add missing minItems for memory-region-names in airoha,en7581-npu.yaml
+- Link to v2: https://lore.kernel.org/r/20260107-airoha-ba-memory-region-v2-0-d8195fc66731@kernel.org
 
-While I think a minimal patch along these lines is appropriate as a bug
-fix. I am wondering if, as a follow-up, consideration could be given to
-registering alternate phy ops for MT7628. This would push the conditional
-handling to probe rather than calback execution time. And I suspect it
-would lead to a cleaner implementation.
+Changes in v2:
+- Remork memory-region entry in airoha,en7581-npu.yaml
+- Link to v1: https://lore.kernel.org/r/20260105-airoha-ba-memory-region-v1-0-5b07a737c7a7@kernel.org
+
+---
+Lorenzo Bianconi (2):
+      dt-bindings: net: airoha: npu: Add BA memory region
+      net: airoha: npu: Init BA memory region if provided via DTS
+
+ .../devicetree/bindings/net/airoha,en7581-npu.yaml  | 21 +++++++++++----------
+ drivers/net/ethernet/airoha/airoha_npu.c            |  8 ++++++++
+ 2 files changed, 19 insertions(+), 10 deletions(-)
+---
+base-commit: fd1de45ad24f24cf0aedee0f64e668674a9bd6c9
+change-id: 20260102-airoha-ba-memory-region-58d924371382
+
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
