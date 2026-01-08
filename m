@@ -1,130 +1,218 @@
-Return-Path: <netdev+bounces-248020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49A1BD02B43
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 13:44:00 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9883D02A68
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 13:34:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B1F2033F2CDC
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 11:52:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BBEA431D4FFD
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 12:12:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9D5242A110;
-	Thu,  8 Jan 2026 09:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 047553B52F6;
+	Thu,  8 Jan 2026 09:38:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Ygda1Zl3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Zrc/Ddkf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5CE73EEFD0;
-	Thu,  8 Jan 2026 09:35:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3219D451072
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 09:38:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767864953; cv=none; b=O54cRBbIDySgDEVs/ba4Yk4tjlyIIgtSmEWBcB9MADOOi9iFlo0MGkbR34lQQ3+FtWWVqhLOGfoaXRs6kGcaweCWduxrlm3cqXwnVSS8SARbh/yJFAL2nGMtx//adMhxsg41wc1fi0ZNdFbv+VC5dYiUNAistMUjuUTCfGplrmg=
+	t=1767865097; cv=none; b=r6qPTaGYwdafcqoX2+oV+kBZaFnMGIDTZ3qPFVAHh0DDSeUHX5RqYzp3IOorUieaXrGRfd1CDFICfkk5OatBas0ZD+tg4NKJY73urp1ed1HOsW+WiEyJbpuMgfrDQxzRoe3CpuAQ5A6vGNUNODKbWoHr0xmNHNFrfvalrmfoqNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767864953; c=relaxed/simple;
-	bh=u4VNoQ4LhdNMfgJfjaPrZHW/RqtvVeuzsobcsLRKZ6c=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c2tBsCIoGl/btuf5ojSFDhwX8FBVRbHIX2SV2J8etd7sQ895dpKAPloECs9T+a0RAoP2ubR4o4mwcr1F7BsSi+LataP0/gUlQb+X5btH4GKbQA5TqXp2/Tr09oBpi02HwZEfhd8fJeUkqHKqFFKwgNBf0bH6PGXvBiO8czoEcZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Ygda1Zl3; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 607NW88a2095193;
-	Thu, 8 Jan 2026 01:35:17 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=R9m/7bu28KfSpruc1SVA0v9xT
-	u6mKd3dyd3y4F5hcGo=; b=Ygda1Zl3zD8t5iZhIbaZYyr762Brj+MVaF9aO7ke3
-	vVxYrC7A9fDN/7ictd/cQj/VUD7VeeWkQf++BjHUq5mWTo32C0lXDxvzGTtkCx+2
-	145Qd56LVN/DHiBL47lz1vOHclMg6p2fn9NT78CrTj+gA8JoX/8qTDJyoY3ovHxK
-	rjZikIx2Y+iwAowZ9Wy1D8CjIbyvHJDzhec1gfBwDqo+z/xBaV9KrNWofRmfvpal
-	+ZTU6IgBqCNcZBdrQmlJo4R4GZLLBjUEZlwon1KnqmtIFnpBZ0Ok+NyGwly+y7OS
-	ju3BqPDPJVDyt5WJmOp8K7HT+sQok9B7tqITk9j6e03Zw==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bj18193t2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 08 Jan 2026 01:35:17 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Thu, 8 Jan 2026 01:35:30 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Thu, 8 Jan 2026 01:35:30 -0800
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id C8CAB3F70AC;
-	Thu,  8 Jan 2026 01:35:13 -0800 (PST)
-Date: Thu, 8 Jan 2026 15:05:12 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: ALOK TIWARI <alok.a.tiwari@oracle.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <andrew+netdev@lunn.ch>, <sgoutham@marvell.com>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2 07/10] octeontx2: switch: L2 offload support
-Message-ID: <aV96UNXRN9tzuWxI@rkannoth-OptiPlex-7090>
-References: <20260107132408.3904352-1-rkannoth@marvell.com>
- <20260107132408.3904352-8-rkannoth@marvell.com>
- <99647efb-537c-462e-bbef-a3c01ef1bd8c@oracle.com>
+	s=arc-20240116; t=1767865097; c=relaxed/simple;
+	bh=xYoAkbZ+fQsm7/D0zib+nPKAF9nQcA50254Lm+cn9eA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=d5uzItpdT1ohyWqrGbmh8CjkBTFFfw6lVEsL98iK8N9gNMWa+t0WlSOxLimAEUnliwp+boFUaGHL7rxBejn31+WTiKe61r/9lL2X/IevGHW+SqcMdPZ7yE2ZEcAqbd4Bm+kzmx1QyYNMQ6isTrapiPIxgecgld3jCry49sPcVW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Zrc/Ddkf; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8b51396f3efso571775185a.1
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 01:38:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767865088; x=1768469888; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=DP33MR8ykYImNY+QQTZqBr/areFVGQgn5Ta0nTtQjLI=;
+        b=Zrc/Ddkfnile/V/KFpftfZ1/9YfmZby1keYevEAL1UfCibm3HfL1Heva/2hLfJZLUO
+         hMNKJZr64h4r10XGpMQ7fCIHdaP2lERk/KIW/iWQTq4iT8xYbxK/E9jq8exn6VfVMy4E
+         DUQ7hCTRivGfKc1kB5YeCWRYBcpgX+jCBIWKOpgF+DUuHzHH7i7o3mBdH4JpkfNLCmiv
+         vu0pnrDF0ZcH0lMy4fjND7RobGZcUn6D97S7qU00cf3iVvTeig63R10QUR1nrNa68sYg
+         BVukPVzPybNZPAPVmpTYo54K71DBFfgJyfMDyxAD/Dejp1sJ4lw2lzdxGYOZGDE5ysmT
+         qHoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767865088; x=1768469888;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DP33MR8ykYImNY+QQTZqBr/areFVGQgn5Ta0nTtQjLI=;
+        b=A1Kikm8UfqAyOcgdR4Q+wXlyijVKQaYgd3GdAhQSN2UP8jOVrclduEhMSAxARsahb+
+         D7XcP6LWmeGTAHY/P/gTxv6HbN/HEXt9dQM6BLASeQU2ej1EO/v4cZpgGBehbYoISW+Y
+         ssJyyBBiO7nti0OkB7Dwoz76NM6eQqhPf/rcYP07ziT2KRO+X2DNB4UgL/dmm7D1rnIi
+         2c/k6hY/5JFiuFXRRyVi1kBckBuxNy4mUmtpMgoLavcR0C/JSUMxriqIxI32meF8VdeH
+         mvkeMoE5m7HpnV/I8nkhMGsjk7+nnLuGEgTJ6tvO1glYc1npZfuADw1z0lgQv5pnK2fb
+         vQoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUvbuu9tYIXzvgeJ6cmJMGOY1KWiMFBE61ZhzppyEQXWHW6fx0gMv4erSD93R93UYyiFQtvJTM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7KSQ0iYdCwEwVR89Qo/eyZ5DYUkVroMoNFGsKOJt1vOo9z1bV
+	nm2toOfuoGX8obdskUuk8bSxDUBRCtHBwcSY45iaSQiWMowWN7xFGJ0ogMl/MpYYocrnYwu5vxn
+	vYGrUzogrF8kxcQ==
+X-Google-Smtp-Source: AGHT+IE6yqWp7GSyUajLZIN5gixNAv+Fje7d2eJSulPCqveMoS6vMQMHGvwtfp+VkuS17RuyzJRyj9VcQlgicg==
+X-Received: from qkd26.prod.google.com ([2002:a05:620a:a01a:b0:8c3:8900:223])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:4143:b0:8b5:8ba0:b312 with SMTP id af79cd13be357-8c3893dca40mr749343585a.48.1767865088162;
+ Thu, 08 Jan 2026 01:38:08 -0800 (PST)
+Date: Thu,  8 Jan 2026 09:38:06 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <99647efb-537c-462e-bbef-a3c01ef1bd8c@oracle.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA4MDA2MyBTYWx0ZWRfX6sqMdsaALcgG
- 5RiGO+VRxKvP48y0Gks261d8p6/Rbde6lDs/VBEzgbikiqr1IgUDTkqSaEOB7oAhuV7K4/DicwU
- upgosAugncX34WGZNDpnnkiBxoXPg1ZX5VDuLquufq06L8XTB3ktFYWLrmNmwmaFBgN44VTc1ji
- Y9N8rgAglCJdIcSR+CGeEG+nVUV4xchZ5IpxnCfPjCrXhiGzO8dbfdjhKPcIfNmhHNUdMCmQ7Na
- W2L8mSAHq5dFy19fiRQztYzjk8Xp9yUdFx1psJZ85kgZY+HjJnHLQaXE1+T4g5gYYhcMNTXlULY
- X6EIETbyhhOGq5roZ/Xpb3vOpriEqrLHpZ5ijVFjzOclsD4ssDM/b2t5OxCWB/76x2yC/VosXHN
- svENQxeqCQo39Xfq+AX7f7MvEUjydvgm9Zox1T0Gi1ACldSRK1+i0crIETWDFe4MSmeRUe40WYL
- A305a2dc31zCVEA46zw==
-X-Authority-Analysis: v=2.4 cv=Vdf6/Vp9 c=1 sm=1 tr=0 ts=695f7a55 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=yPCof4ZbAAAA:8 a=fx7Rj7giRjSIOVbTE-wA:9 a=CjuIK1q_8ugA:10
- a=8_z660xuARpGUQqPBE_n:22
-X-Proofpoint-GUID: fHjv5R4HGN7EkCuiYfnHLqQf03CfdFbx
-X-Proofpoint-ORIG-GUID: fHjv5R4HGN7EkCuiYfnHLqQf03CfdFbx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-08_02,2026-01-07_03,2025-10-01_01
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
+Message-ID: <20260108093806.834459-1-edumazet@google.com>
+Subject: [PATCH v3 net] net: bridge: annotate data-races around fdb->{updated,used}
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot+bfab43087ad57222ce96@syzkaller.appspotmail.com, 
+	Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 2026-01-08 at 14:37:38, ALOK TIWARI (alok.a.tiwari@oracle.com) wrote:
->
->
-> On 1/7/2026 6:54 PM, Ratheesh Kannoth wrote:
-> > +		fdb_refresh_wq = alloc_workqueue("swdev_fdb_refresg_wq", 0, 0);
->
-> consider, "swdev_fdb_refresg_wq" -> "swdev_fdb_refresh_wq"
-ACK.
->
-> > +		if (!rvu_sw_l2_offl_wq) {
->
-> Checks rvu_sw_l2_offl_wq instead of fdb_refresh_wq
->
-> > +			dev_err(rvu->dev, "L2 offl workqueue allocation failed\n");
->
-> offl -> fbd
-ACK.
->
-> > +			return -ENOMEM;
-> > +		}
-> > +
-> > +		return 0;
-> > +	}
-> > +
-> > +	rswitch->flags &= ~RVU_SWITCH_FLAG_FW_READY;
-> > +	rswitch->pcifunc = -1;
-> > +	flush_work(&l2_offl_work.work);
-> > +	return 0;
-> > +}
->
->
-> Thanks,
-> Alok
+fdb->updated and fdb->used are read and written locklessly.
+
+Add READ_ONCE()/WRITE_ONCE() annotations.
+
+Fixes: 31cbc39b6344 ("net: bridge: add option to allow activity notifications for any fdb entries")
+Reported-by: syzbot+bfab43087ad57222ce96@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/695e3d74.050a0220.1c677c.035f.GAE@google.com/
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: Ido Schimmel <idosch@nvidia.com>
+---
+v3: annotate br_handle_frame_finish() as well (Nikolay)
+v2: annotate all problematic fdb->updated and fdb->used reads/writes.
+    https://lore.kernel.org/netdev/CANn89iLaMpL1Kz=t13b0eGZ+m5dBxUpXx8oPKD1V-VwBAkzbJA@mail.gmail.com/T/#m19446ad4b132da817bda52a98a77a815034ed020
+v1: https://lore.kernel.org/netdev/CANn89iL8-e_jphcg49eX=zdWrOeuA-AJDL0qhsTrApA4YnOFEg@mail.gmail.com/T/#mf99b76469697813939abe745f42ace3e201ef6f4
+
+ net/bridge/br_fdb.c   | 28 ++++++++++++++++------------
+ net/bridge/br_input.c |  4 ++--
+ 2 files changed, 18 insertions(+), 14 deletions(-)
+
+diff --git a/net/bridge/br_fdb.c b/net/bridge/br_fdb.c
+index 58d22e2b85fc3551bd5aec9c20296ddfcecaa040..0501ffcb8a3ddb21a19254915564b4000b6b6911 100644
+--- a/net/bridge/br_fdb.c
++++ b/net/bridge/br_fdb.c
+@@ -70,7 +70,7 @@ static inline int has_expired(const struct net_bridge *br,
+ {
+ 	return !test_bit(BR_FDB_STATIC, &fdb->flags) &&
+ 	       !test_bit(BR_FDB_ADDED_BY_EXT_LEARN, &fdb->flags) &&
+-	       time_before_eq(fdb->updated + hold_time(br), jiffies);
++	       time_before_eq(READ_ONCE(fdb->updated) + hold_time(br), jiffies);
+ }
+ 
+ static int fdb_to_nud(const struct net_bridge *br,
+@@ -126,9 +126,9 @@ static int fdb_fill_info(struct sk_buff *skb, const struct net_bridge *br,
+ 	if (nla_put_u32(skb, NDA_FLAGS_EXT, ext_flags))
+ 		goto nla_put_failure;
+ 
+-	ci.ndm_used	 = jiffies_to_clock_t(now - fdb->used);
++	ci.ndm_used	 = jiffies_to_clock_t(now - READ_ONCE(fdb->used));
+ 	ci.ndm_confirmed = 0;
+-	ci.ndm_updated	 = jiffies_to_clock_t(now - fdb->updated);
++	ci.ndm_updated	 = jiffies_to_clock_t(now - READ_ONCE(fdb->updated));
+ 	ci.ndm_refcnt	 = 0;
+ 	if (nla_put(skb, NDA_CACHEINFO, sizeof(ci), &ci))
+ 		goto nla_put_failure;
+@@ -551,7 +551,7 @@ void br_fdb_cleanup(struct work_struct *work)
+ 	 */
+ 	rcu_read_lock();
+ 	hlist_for_each_entry_rcu(f, &br->fdb_list, fdb_node) {
+-		unsigned long this_timer = f->updated + delay;
++		unsigned long this_timer = READ_ONCE(f->updated) + delay;
+ 
+ 		if (test_bit(BR_FDB_STATIC, &f->flags) ||
+ 		    test_bit(BR_FDB_ADDED_BY_EXT_LEARN, &f->flags)) {
+@@ -924,6 +924,7 @@ int br_fdb_fillbuf(struct net_bridge *br, void *buf,
+ {
+ 	struct net_bridge_fdb_entry *f;
+ 	struct __fdb_entry *fe = buf;
++	unsigned long delta;
+ 	int num = 0;
+ 
+ 	memset(buf, 0, maxnum*sizeof(struct __fdb_entry));
+@@ -953,8 +954,11 @@ int br_fdb_fillbuf(struct net_bridge *br, void *buf,
+ 		fe->port_hi = f->dst->port_no >> 8;
+ 
+ 		fe->is_local = test_bit(BR_FDB_LOCAL, &f->flags);
+-		if (!test_bit(BR_FDB_STATIC, &f->flags))
+-			fe->ageing_timer_value = jiffies_delta_to_clock_t(jiffies - f->updated);
++		if (!test_bit(BR_FDB_STATIC, &f->flags)) {
++			delta = jiffies - READ_ONCE(f->updated);
++			fe->ageing_timer_value =
++				jiffies_delta_to_clock_t(delta);
++		}
+ 		++fe;
+ 		++num;
+ 	}
+@@ -1002,8 +1006,8 @@ void br_fdb_update(struct net_bridge *br, struct net_bridge_port *source,
+ 			unsigned long now = jiffies;
+ 			bool fdb_modified = false;
+ 
+-			if (now != fdb->updated) {
+-				fdb->updated = now;
++			if (now != READ_ONCE(fdb->updated)) {
++				WRITE_ONCE(fdb->updated, now);
+ 				fdb_modified = __fdb_mark_active(fdb);
+ 			}
+ 
+@@ -1242,10 +1246,10 @@ static int fdb_add_entry(struct net_bridge *br, struct net_bridge_port *source,
+ 	if (fdb_handle_notify(fdb, notify))
+ 		modified = true;
+ 
+-	fdb->used = jiffies;
++	WRITE_ONCE(fdb->used, jiffies);
+ 	if (modified) {
+ 		if (refresh)
+-			fdb->updated = jiffies;
++			WRITE_ONCE(fdb->updated, jiffies);
+ 		fdb_notify(br, fdb, RTM_NEWNEIGH, true);
+ 	}
+ 
+@@ -1556,7 +1560,7 @@ int br_fdb_external_learn_add(struct net_bridge *br, struct net_bridge_port *p,
+ 			goto err_unlock;
+ 		}
+ 
+-		fdb->updated = jiffies;
++		WRITE_ONCE(fdb->updated, jiffies);
+ 
+ 		if (READ_ONCE(fdb->dst) != p) {
+ 			WRITE_ONCE(fdb->dst, p);
+@@ -1565,7 +1569,7 @@ int br_fdb_external_learn_add(struct net_bridge *br, struct net_bridge_port *p,
+ 
+ 		if (test_and_set_bit(BR_FDB_ADDED_BY_EXT_LEARN, &fdb->flags)) {
+ 			/* Refresh entry */
+-			fdb->used = jiffies;
++			WRITE_ONCE(fdb->used, jiffies);
+ 		} else {
+ 			modified = true;
+ 		}
+diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
+index 777fa869c1a14453bd1827d545527607fbf95a60..e355a15bf5ab13e603ceed2b99e56ddeffdecbb2 100644
+--- a/net/bridge/br_input.c
++++ b/net/bridge/br_input.c
+@@ -221,8 +221,8 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
+ 		if (test_bit(BR_FDB_LOCAL, &dst->flags))
+ 			return br_pass_frame_up(skb, false);
+ 
+-		if (now != dst->used)
+-			dst->used = now;
++		if (now != READ_ONCE(dst->used))
++			WRITE_ONCE(dst->used, now);
+ 		br_forward(dst->dst, skb, local_rcv, false);
+ 	} else {
+ 		if (!mcast_hit)
+-- 
+2.52.0.351.gbe84eed79e-goog
+
 
