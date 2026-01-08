@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-248160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3357AD04868
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:47:19 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B6F5D0486B
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:47:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4F1D130299DD
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:15:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 546293114E12
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:15:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC7982DB78F;
-	Thu,  8 Jan 2026 16:14:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3CDC2673B7;
+	Thu,  8 Jan 2026 16:14:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AN09Yimk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="THiuHZQn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 394C92D9EC2
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 16:14:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 631F42DAFA5
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 16:14:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767888859; cv=none; b=sLhyrBOsk18qXUMizSInEIxb+Sp8t5X+klsuWByPCQGezcmHw4exa7lAZ0c7kKXU5CLPl+pl7QZo3gYtHgRmPf8ISw+9l5E7euXByW5s4tiFHL6cKLjD64HBXuA0uNmBldo2hHriSnBpR4EemmFPH0KSXJ53XPJvZ5giQ4xyuLo=
+	t=1767888861; cv=none; b=IylyeKaVe9XgDqMFVjNOYEeRpjQyZmPiYt0aXFVxcQJ0NPDNTZV9IDS5IzCdPgHPo1GpenbfBkWJqURTNj4uPBwXJTVhpL1lwiBz5MwFBdjImzX779IhJwI0FGdcjodNPTKY4mq/Fm1UWk/+V1pgXLWMEc70Hd0zbahZNDBiHY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767888859; c=relaxed/simple;
-	bh=nO2bn1/X6Q1HJ59mIC36zIsLozrVj5jDEowErPA8Pys=;
+	s=arc-20240116; t=1767888861; c=relaxed/simple;
+	bh=gZtQXWYl86QcRVxJrWdGNxS17N7jTxg6qD9PlenxVkc=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gJkmLM7eeOPxGn1BDdaOLTnKb9feVXtRolhUAFRpg6ZF2TyKyElUT4XIQnGO8sdSKV8twXCebW3wANLJHKPdrMmOVchmM6pTB5smp9Pmf7VN20gguw2Y8s/W3jDnW3nzVVLyRKpSYQbUhjZMfkhHUvM5njwTNCT+I1QXuJwFWzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AN09Yimk; arc=none smtp.client-ip=209.85.128.44
+	 MIME-Version; b=YzVS73NToIxHglKw8sdvuEpACd4S9ziOAtul3pVCkIIlq0WVkaJ0MQUHk5kPpw384edpxdcp7AUX/eMJvjenxOBuHnh7QWSX+1W+n/FCnwGl9Rxl+Yc9FWBEA/0umdvWkL9V9C3rd4ptnDZ92mFomXMC/Amvwonp5GmqNaXMYHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=THiuHZQn; arc=none smtp.client-ip=209.85.221.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-47d182a8c6cso22324715e9.1
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 08:14:17 -0800 (PST)
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-4308d81fdf6so1725450f8f.2
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 08:14:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767888855; x=1768493655; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1767888857; x=1768493657; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=XH/5sZqKOpUiqB0g18ozl06rqkBZr1JF05p9ctKLLoM=;
-        b=AN09YimkufjrRFSEzOBVm+bAeMKFSJ2zIAY2AsKgAofBvc3s9cumShxAClaw1SY6AG
-         58nx179oRAF2DoukRc3bQgjpcdFJ4wRPrl5WgHWS6YdDg7VsfzKrqfIq9Cq1EWnIeFhQ
-         Kpi1cDtYYzQUB1GcVcr22uUJCBYbDuHrN3Ze4DjUPUudTRy2t2W+Q8Neof9PZ8zU5OBS
-         auX26DJHIR8c19qg3+3yVusz3Z31y+zUSHbl/DZYQi2HyQ7xJTHPx9OPY3iBD0ZVPgtA
-         yw/06U4HqxmVxyQ4zx0gKlxSrDT5vu4gI+GXtDCj9+PVhXPqoIT6TO93ufLcPdU/eh7z
-         YIdQ==
+        bh=dXJRDY1LT2kYrctjUr0o0V8a6dmySfNZXgbe2pBlHk4=;
+        b=THiuHZQnzFU03UZHVRqCTMArgjLulgOA+Sq2vwQeoLSJES6Ecc8rBzUoFtgzHNtgQS
+         kd7RcvDjKkvnDCfiqo9Ptj5PfS22/QlibGTNQ3cfzx8fRL4b93rwbgXwMLV3/0MHCJ1p
+         6IOCqUO/JU3EikBtFkhgrfEI4OBY0kVMhZS3LzLBedKo8q3lBQMVCMbvmzmPiEbq4UO1
+         fo9WqkDKrsxuRGL13kxt8MdfWecO9yntIix+7KLPRQKbfkwpGruK/Wda35I0qA0U5bo6
+         VAEWfUzpwiR1AQhrk3e/A9GBAnDZWn/T4s7ZidHXrfB8slhojNGYiSukvQNy5oxQJxfs
+         D6/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767888855; x=1768493655;
+        d=1e100.net; s=20230601; t=1767888857; x=1768493657;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=XH/5sZqKOpUiqB0g18ozl06rqkBZr1JF05p9ctKLLoM=;
-        b=cXoi1i2xTTNSTefVG7K9JUKQHgMxslmc833fR8YrpTt8mTBc/uyqur9MzRtJcpNtIO
-         6DAZ/4ABSRETCBmTXcPcY33A0DsFgFlhYnra2ddXra6SdDRr7k1MAp7IVBBb+t7ca1J0
-         6fT1XsHHBunBIt4Dy/uhpjs+MlRwjGrveFmpT+N35HY4C3PGA+dPwaB4btVohEDoUROJ
-         3SaA9YxjrO0t6YiAIfkWInqYXOqOHe8lYbuJMTc1zev9HuRmKqpff9MDg4gcPAtWHIiE
-         myPsZoCaj8Pg+bo3LGbrewgpnl7POURj5BHFkI58GhbU6t7c+gXaD3UEeeI3HZOKX9hM
-         qHCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV3nSMdljCKZmpJuHnFQNokC2LE12zHIvCXGmH2ucKuroePMma0pTx3Aj2csWFINPRsqg96bzM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7gZMcm2N1DNHAEpJk7SKBxH8A3welyX9v/dIByBLJK3wiTpZL
-	ozvGcW0C5bpHWkP6upqzZP+ACaUl8AOa/WbaBPU2jXImocn9l0gyE/4T
-X-Gm-Gg: AY/fxX7GemeOMhZbPW4sMpqlKwWU787fFBLCiiXrEDa//6vNslM8ugjya2r/G5CUbA1
-	ClhjBLugaMhxjPK36K/dyQxtLneI1TBGqM+D5HVyvwvZ62M8b8l+fQIACDO0AF1O89pVCGlKU/Y
-	H+f29Y7tzfPOu4lAONBxZLCGf9ZrrHaPGD8VrmbOKxvH+c+ZEqSVwGCT06RdCWLxkUEdmDx9XZK
-	5mCELNctFps8ckSG48TyH1ninP+Xde2fooIZVy+Ld7eQ0hoW5zY4FmcDt04gzcEi4LSm8mAXHkA
-	CStK+8qFwKrhOuxDde+dZHwT9f92CZLZhTN22BzWODmmH5qQwxtZ4izDz0hXspcWJlMnX9E1u7n
-	VgA5TvMYEA11Yu4cmK716cH9KB8lWhckDsnPXA0aGQSTuIEAunZzlp0LOh+li0vvU+oRrotUF8a
-	WfIbDzucT30qOR2HTX2LD3ANY2Z7Uw
-X-Google-Smtp-Source: AGHT+IFJta3hUD2BZpF49bHegsnyUi9l4d3KWAVmb45nhunjuyAqdtGJ+OzDsAk51ueYrDlYEqfLWA==
-X-Received: by 2002:a05:600c:8b52:b0:477:abea:9028 with SMTP id 5b1f17b1804b1-47d84b1a348mr72188125e9.6.1767888855322;
-        Thu, 08 Jan 2026 08:14:15 -0800 (PST)
+        bh=dXJRDY1LT2kYrctjUr0o0V8a6dmySfNZXgbe2pBlHk4=;
+        b=e0Ob6UNj+QPpLHTlwMqE3J+8cmPX3jOivt0tGGCShSB1RDiTvuPx5X+s+cERy9u1Bh
+         gBlSYKkwmz8yXasS5f46kfung+ca0pJeqU2DNrX+ytNXaGXFfY9iYYeKRkn4o9gcFpmn
+         ps/ei95ELJCAj4EplAffpwfz/enwycXG/psZNPEJ3XvKtpJzbb944xlixFp0aRK1STYi
+         pqOjm2NGEh/fUWezLifgf3w47VrdYJEqB+ncRxXoWMwKJt6HsC/KhC6A9XKhcuBpwy2S
+         XuX+J76LwT3apfTxL1EFvelWULZsVuTbPo1Ya5ist9HepwGoxZPcvARMpChBuofkFiF0
+         hQIw==
+X-Forwarded-Encrypted: i=1; AJvYcCX3V3+0k8LrYMPBHvYUQ8A8GjFUqXTGR1dmXD30WpgHv3lf4ntBkgbQnLjC/kEGND9trg8mPsU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBFel9f7ulziXrIjNMOtv1aLRyN+OPW/D6cLAhiOc2bWsLv2Al
+	z44AhjwoiTH/BseWpUOALhJNVT7FNSjLdXa1Ek3NeHaLt1gSAoElz2m9
+X-Gm-Gg: AY/fxX7cknakN+qGWV7qzg7bpKYIHv2c/mrtFQoWlCZEpsqBFICaPiq+jIN7vQ1wPV/
+	l9DrsG1zhY51vK8FXRHpDqm1P2eyEOWAKhN30RY1Ud7KXUt3BK8izxoREpEBkEYjorLdQAK6i1p
+	8v80tydQvCU0DR/lTQbaY2hy7AAkUPWL7NG9ElHLC+7rgbuxp0DADcCypFfPG6axEB7Ip/cO3nq
+	zC0g/oBkrTvwtIuFe1bDV9ia9tro6ahRi8hu5WtT8ZGL5hG0E5neJoqRwl87AHm5LRTqJXCmlzv
+	X5H6tlXRGfLYblBC5VUt+vpYRgvyM5NlNQdrbT2n5vFIB/+DZIYfAODvaKh7iIsx6shVGPm6/Ft
+	x56yDCpg8L7EBdqDNBkHp/1Y3WYDYe5LvnBBWVhxpdRBnuJCJP7/s9XwZCJ/SkzP7MPGX6DdzrK
+	JJOmX7kX6nNrVIHapmEP1ZJsZ9PK5K
+X-Google-Smtp-Source: AGHT+IFzD2YrZMaxn03RDd8mf46Abm3BOfvlGWLP7d9ODcOHgKo723CEnN5qLA/9X4Oy0FSzJysERQ==
+X-Received: by 2002:adf:ec06:0:b0:431:656:c726 with SMTP id ffacd0b85a97d-432c3628249mr6319949f8f.3.1767888856574;
+        Thu, 08 Jan 2026 08:14:16 -0800 (PST)
 Received: from imac.lan ([2a02:8010:60a0:0:8115:84ef:f979:bd53])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5edd51sm17140039f8f.29.2026.01.08.08.14.14
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5edd51sm17140039f8f.29.2026.01.08.08.14.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 08:14:14 -0800 (PST)
+        Thu, 08 Jan 2026 08:14:16 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: Donald Hunter <donald.hunter@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -91,9 +91,9 @@ To: Donald Hunter <donald.hunter@gmail.com>,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Ruben Wauters <rubenru09@aol.com>,
 	linux-doc@vger.kernel.org
-Subject: [PATCH net-next v2 11/13] tools: ynl-gen-c: fix pylint warnings for returns, unused, redefined
-Date: Thu,  8 Jan 2026 16:13:37 +0000
-Message-ID: <20260108161339.29166-12-donald.hunter@gmail.com>
+Subject: [PATCH net-next v2 12/13] tools: ynl-gen-c: fix pylint None, type, dict, generators, init
+Date: Thu,  8 Jan 2026 16:13:38 +0000
+Message-ID: <20260108161339.29166-13-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260108161339.29166-1-donald.hunter@gmail.com>
 References: <20260108161339.29166-1-donald.hunter@gmail.com>
@@ -105,371 +105,181 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fix the following pylint warnings:
+Fix the following pylint warnings that are trivial one-liners:
 
-- unused-argument
-- unused-variable
-- no-else-return
-- inconsistent-return-statements
-- redefined-outer-name
-- unreachable
+- unsubscriptable-object
+- unidiomatic-typecheck
+- use-dict-literal
+- attribute-defined-outside-init
+- consider-using-in
+- consider-using-generator
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- tools/net/ynl/pyynl/ynl_gen_c.py | 100 ++++++++++++++++---------------
- 1 file changed, 52 insertions(+), 48 deletions(-)
+ tools/net/ynl/pyynl/ynl_gen_c.py | 49 ++++++++++++++++++--------------
+ 1 file changed, 27 insertions(+), 22 deletions(-)
 
 diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
-index 14d16024fe11..900896779e61 100755
+index 900896779e61..5f079a74c8d1 100755
 --- a/tools/net/ynl/pyynl/ynl_gen_c.py
 +++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-@@ -7,6 +7,12 @@
- # pylint: disable=too-many-nested-blocks, too-many-lines, too-few-public-methods
- # pylint: disable=broad-exception-raised, broad-exception-caught, protected-access
- 
-+"""
-+ynl_gen_c
-+
-+A YNL to C code generator for both kernel and userspace protocol stubs.
-+"""
-+
- import argparse
- import filecmp
- import pathlib
-@@ -15,7 +21,7 @@ import re
- import shutil
- import sys
- import tempfile
--import yaml
-+import yaml as pyyaml
- 
- # pylint: disable=no-name-in-module,wrong-import-position
- sys.path.append(pathlib.Path(__file__).resolve().parent.as_posix())
-@@ -164,7 +170,7 @@ class Type(SpecAttr):
- 
-     def presence_member(self, space, type_filter):
-         if self.presence_type() != type_filter:
--            return
-+            return ''
- 
-         if self.presence_type() == 'present':
-             pfx = '__' if space == 'user' else ''
-@@ -173,14 +179,15 @@ class Type(SpecAttr):
-         if self.presence_type() in {'len', 'count'}:
-             pfx = '__' if space == 'user' else ''
-             return f"{pfx}u32 {self.c_name};"
-+        return ''
- 
--    def _complex_member_type(self, ri):
-+    def _complex_member_type(self, _ri):
-         return None
- 
-     def free_needs_iter(self):
-         return False
- 
--    def _free_lines(self, ri, var, ref):
-+    def _free_lines(self, _ri, var, ref):
-         if self.is_multi_val() or self.presence_type() in {'count', 'len'}:
-             return [f'free({var}->{ref}{self.c_name});']
-         return []
-@@ -278,7 +285,7 @@ class Type(SpecAttr):
-     def _setter_lines(self, ri, member, presence):
-         raise Exception(f"Setter not implemented for class type {self.type}")
- 
--    def setter(self, ri, space, direction, deref=False, ref=None, var="req"):
-+    def setter(self, ri, _space, direction, deref=False, ref=None, var="req"):
-         ref = (ref if ref else []) + [self.c_name]
-         member = f"{var}->{'.'.join(ref)}"
- 
-@@ -434,15 +441,15 @@ class TypeScalar(Type):
-                 flag_cnt = len(flags['entries'])
-                 mask = (1 << flag_cnt) - 1
-             return f"NLA_POLICY_MASK({policy}, 0x{mask:x})"
--        elif 'full-range' in self.checks:
-+        if 'full-range' in self.checks:
-             return f"NLA_POLICY_FULL_RANGE({policy}, &{c_lower(self.enum_name)}_range)"
--        elif 'range' in self.checks:
-+        if 'range' in self.checks:
-             return f"NLA_POLICY_RANGE({policy}, {self.get_limit_str('min')}, {self.get_limit_str('max')})"
--        elif 'min' in self.checks:
-+        if 'min' in self.checks:
-             return f"NLA_POLICY_MIN({policy}, {self.get_limit_str('min')})"
--        elif 'max' in self.checks:
-+        if 'max' in self.checks:
-             return f"NLA_POLICY_MAX({policy}, {self.get_limit_str('max')})"
--        elif 'sparse' in self.checks:
-+        if 'sparse' in self.checks:
-             return f"NLA_POLICY_VALIDATE_FN({policy}, &{c_lower(self.enum_name)}_validate)"
-         return super()._attr_policy(policy)
- 
-@@ -637,7 +644,7 @@ class TypeBinaryScalarArray(TypeBinary):
- 
- 
- class TypeBitfield32(Type):
--    def _complex_member_type(self, ri):
-+    def _complex_member_type(self, _ri):
-         return "struct nla_bitfield32"
- 
-     def _attr_typol(self):
-@@ -665,7 +672,7 @@ class TypeNest(Type):
-     def is_recursive(self):
-         return self.family.pure_nested_structs[self.nested_attrs].recursive
- 
--    def _complex_member_type(self, ri):
-+    def _complex_member_type(self, _ri):
-         return self.nested_struct_type
- 
-     def _free_lines(self, ri, var, ref):
-@@ -699,7 +706,7 @@ class TypeNest(Type):
-                       f"parg.data = &{var}->{self.c_name};"]
-         return get_lines, init_lines, None
- 
--    def setter(self, ri, space, direction, deref=False, ref=None, var="req"):
-+    def setter(self, ri, _space, direction, deref=False, ref=None, var="req"):
-         ref = (ref if ref else []) + [self.c_name]
- 
-         for _, attr in ri.family.pure_nested_structs[self.nested_attrs].member_list():
-@@ -724,19 +731,18 @@ class TypeMultiAttr(Type):
-     def _complex_member_type(self, ri):
-         if 'type' not in self.attr or self.attr['type'] == 'nest':
-             return self.nested_struct_type
--        elif self.attr['type'] == 'binary' and 'struct' in self.attr:
-+        if self.attr['type'] == 'binary' and 'struct' in self.attr:
-             return None  # use arg_member()
--        elif self.attr['type'] == 'string':
-+        if self.attr['type'] == 'string':
-             return 'struct ynl_string *'
--        elif self.attr['type'] in scalars:
-+        if self.attr['type'] in scalars:
-             scalar_pfx = '__' if ri.ku_space == 'user' else ''
-             if self.is_auto_scalar:
-                 name = self.type[0] + '64'
-             else:
-                 name = self.attr['type']
-             return scalar_pfx + name
--        else:
--            raise Exception(f"Sub-type {self.attr['type']} not supported yet")
-+        raise Exception(f"Sub-type {self.attr['type']} not supported yet")
- 
+@@ -200,7 +200,7 @@ class Type(SpecAttr):
+     # pylint: disable=assignment-from-none
      def arg_member(self, ri):
-         if self.type == 'binary' and 'struct' in self.attr:
-@@ -747,7 +753,7 @@ class TypeMultiAttr(Type):
-     def free_needs_iter(self):
-         return self.attr['type'] in {'nest', 'string'}
+         member = self._complex_member_type(ri)
+-        if member:
++        if member is not None:
+             spc = ' ' if member[-1] != '*' else ''
+             arg = [member + spc + '*' + self.c_name]
+             if self.presence_type() == 'count':
+@@ -210,7 +210,7 @@ class Type(SpecAttr):
  
--    def _free_lines(self, ri, var, ref):
-+    def _free_lines(self, _ri, var, ref):
-         lines = []
-         if self.attr['type'] in scalars:
-             lines += [f"free({var}->{ref}{self.c_name});"]
-@@ -811,13 +817,12 @@ class TypeIndexedArray(Type):
-     def _complex_member_type(self, ri):
-         if 'sub-type' not in self.attr or self.attr['sub-type'] == 'nest':
-             return self.nested_struct_type
--        elif self.attr['sub-type'] in scalars:
-+        if self.attr['sub-type'] in scalars:
-             scalar_pfx = '__' if ri.ku_space == 'user' else ''
-             return scalar_pfx + self.attr['sub-type']
--        elif self.attr['sub-type'] == 'binary' and 'exact-len' in self.checks:
-+        if self.attr['sub-type'] == 'binary' and 'exact-len' in self.checks:
-             return None  # use arg_member()
--        else:
--            raise Exception(f"Sub-type {self.attr['sub-type']} not supported yet")
-+        raise Exception(f"Sub-type {self.attr['sub-type']} not supported yet")
+     def struct_member(self, ri):
+         member = self._complex_member_type(ri)
+-        if member:
++        if member is not None:
+             ptr = '*' if self.is_multi_val() else ''
+             if self.is_recursive_for_op(ri):
+                 ptr = '*'
+@@ -258,9 +258,9 @@ class Type(SpecAttr):
  
-     def arg_member(self, ri):
-         if self.sub_type == 'binary' and 'exact-len' in self.checks:
-@@ -833,12 +838,11 @@ class TypeIndexedArray(Type):
-     def _attr_typol(self):
-         if self.attr['sub-type'] in scalars:
-             return f'.type = YNL_PT_U{c_upper(self.sub_type[1:])}, '
--        elif self.attr['sub-type'] == 'binary' and 'exact-len' in self.checks:
-+        if self.attr['sub-type'] == 'binary' and 'exact-len' in self.checks:
-             return f'.type = YNL_PT_BINARY, .len = {self.checks["exact-len"]}, '
--        elif self.attr['sub-type'] == 'nest':
-+        if self.attr['sub-type'] == 'nest':
-             return f'.type = YNL_PT_NEST, .nest = &{self.nested_render_name}_nest, '
--        else:
--            raise Exception(f"Typol for IndexedArray sub-type {self.attr['sub-type']} not supported, yet")
-+        raise Exception(f"Typol for IndexedArray sub-type {self.attr['sub-type']} not supported, yet")
+     def attr_get(self, ri, var, first):
+         lines, init_lines, _ = self._attr_get(ri, var)
+-        if type(lines) is str:
++        if isinstance(lines, str):
+             lines = [lines]
+-        if type(init_lines) is str:
++        if isinstance(init_lines, str):
+             init_lines = [init_lines]
  
-     def _attr_get(self, ri, var):
-         local_vars = ['const struct nlattr *attr2;']
-@@ -874,7 +878,7 @@ class TypeIndexedArray(Type):
-     def free_needs_iter(self):
-         return self.sub_type == 'nest'
+         kw = 'if' if first else 'else if'
+@@ -1002,7 +1002,7 @@ class Struct:
+         self.in_multi_val = False  # used by a MultiAttr or and legacy arrays
  
--    def _free_lines(self, ri, var, ref):
-+    def _free_lines(self, _ri, var, ref):
-         lines = []
-         if self.sub_type == 'nest':
-             lines += [
-@@ -885,7 +889,7 @@ class TypeIndexedArray(Type):
-         return lines
+         self.attr_list = []
+-        self.attrs = dict()
++        self.attrs = {}
+         if type_list is not None:
+             for t in type_list:
+                 self.attr_list.append((t, self.attr_set[t]),)
+@@ -1094,8 +1094,8 @@ class EnumSet(SpecEnumSet):
+         return EnumEntry(self, entry, prev_entry, value_start)
  
- class TypeNestTypeValue(Type):
--    def _complex_member_type(self, ri):
-+    def _complex_member_type(self, _ri):
-         return self.nested_struct_type
+     def value_range(self):
+-        low = min([x.value for x in self.entries.values()])
+-        high = max([x.value for x in self.entries.values()])
++        low = min(x.value for x in self.entries.values())
++        high = max(x.value for x in self.entries.values())
  
-     def _attr_typol(self):
-@@ -1030,7 +1034,7 @@ class Struct:
+         if high - low + 1 != len(self.entries):
+             return None, None
+@@ -1234,6 +1234,12 @@ class Family(SpecFamily):
+         self.hooks = None
+         delattr(self, "hooks")
  
-     def external_selectors(self):
-         sels = []
--        for name, attr in self.attr_list:
-+        for _name, attr in self.attr_list:
-             if isinstance(attr, TypeSubMessage) and attr.selector.is_external():
-                 sels.append(attr.selector)
-         return sels
-@@ -1047,9 +1051,9 @@ class EnumEntry(SpecEnumEntry):
-         super().__init__(enum_set, yaml, prev, value_start)
++        self.root_sets = {}
++        self.pure_nested_structs = {}
++        self.kernel_policy = None
++        self.global_policy = None
++        self.global_policy_set = None
++
+         super().__init__(file_name, exclude_ops=exclude_ops)
  
-         if prev:
--            self.value_change = (self.value != prev.value + 1)
-+            self.value_change = self.value != prev.value + 1
-         else:
--            self.value_change = (self.value != 0)
-+            self.value_change = self.value != 0
-         self.value_change = self.value_change or self.enum_set['type'] == 'flags'
+         self.fam_key = c_upper(self.yaml.get('c-family-name', self.yaml["name"] + '_FAMILY_NAME'))
+@@ -1268,18 +1274,18 @@ class Family(SpecFamily):
  
-         # Added by resolve:
-@@ -1321,7 +1325,7 @@ class Family(SpecFamily):
-                 }
+         self.mcgrps = self.yaml.get('mcast-groups', {'list': []})
  
-     def _load_root_sets(self):
--        for op_name, op in self.msgs.items():
-+        for _op_name, op in self.msgs.items():
-             if 'attribute-set' not in op:
+-        self.hooks = dict()
++        self.hooks = {}
+         for when in ['pre', 'post']:
+-            self.hooks[when] = dict()
++            self.hooks[when] = {}
+             for op_mode in ['do', 'dump']:
+-                self.hooks[when][op_mode] = dict()
++                self.hooks[when][op_mode] = {}
+                 self.hooks[when][op_mode]['set'] = set()
+                 self.hooks[when][op_mode]['list'] = []
+ 
+         # dict space-name -> 'request': set(attrs), 'reply': set(attrs)
+-        self.root_sets = dict()
++        self.root_sets = {}
+         # dict space-name -> Struct
+-        self.pure_nested_structs = dict()
++        self.pure_nested_structs = {}
+ 
+         self._mark_notify()
+         self._mock_up_events()
+@@ -1627,7 +1633,7 @@ class RenderInfo:
+ 
+         self.cw = cw
+ 
+-        self.struct = dict()
++        self.struct = {}
+         if op_mode == 'notify':
+             op_mode = 'do' if 'do' in op else 'dump'
+         for op_dir in ['request', 'reply']:
+@@ -1794,7 +1800,7 @@ class CodeWriter:
+         if not local_vars:
+             return
+ 
+-        if type(local_vars) is str:
++        if isinstance(local_vars, str):
+             local_vars = [local_vars]
+ 
+         local_vars.sort(key=len, reverse=True)
+@@ -1814,20 +1820,19 @@ class CodeWriter:
+     def writes_defines(self, defines):
+         longest = 0
+         for define in defines:
+-            if len(define[0]) > longest:
+-                longest = len(define[0])
++            longest = max(len(define[0]), longest)
+         longest = ((longest + 8) // 8) * 8
+         for define in defines:
+             line = '#define ' + define[0]
+             line += '\t' * ((longest - len(define[0]) + 7) // 8)
+-            if type(define[1]) is int:
++            if isinstance(define[1], int):
+                 line += str(define[1])
+-            elif type(define[1]) is str:
++            elif isinstance(define[1], str):
+                 line += '"' + define[1] + '"'
+             self.p(line)
+ 
+     def write_struct_init(self, members):
+-        longest = max([len(x[0]) for x in members])
++        longest = max(len(x[0]) for x in members)
+         longest += 1  # because we prepend a .
+         longest = ((longest + 8) // 8) * 8
+         for one in members:
+@@ -2670,7 +2675,7 @@ def print_req_free(ri):
+ 
+ 
+ def print_rsp_type(ri):
+-    if (ri.op_mode == 'do' or ri.op_mode == 'dump') and 'reply' in ri.op[ri.op_mode]:
++    if ri.op_mode in ('do', 'dump') and 'reply' in ri.op[ri.op_mode]:
+         direction = 'reply'
+     elif ri.op_mode == 'event':
+         direction = 'reply'
+@@ -2683,7 +2688,7 @@ def print_wrapped_type(ri):
+     ri.cw.block_start(line=f"{type_name(ri, 'reply')}")
+     if ri.op_mode == 'dump':
+         ri.cw.p(f"{type_name(ri, 'reply')} *next;")
+-    elif ri.op_mode == 'notify' or ri.op_mode == 'event':
++    elif ri.op_mode in ('notify', 'event'):
+         ri.cw.p('__u16 family;')
+         ri.cw.p('__u8 cmd;')
+         ri.cw.p('struct ynl_ntf_base_type *next;')
+@@ -2946,7 +2951,7 @@ def print_kernel_op_table_hdr(family, cw):
+ 
+ def print_kernel_op_table(family, cw):
+     print_kernel_op_table_fwd(family, cw, terminate=False)
+-    if family.kernel_policy == 'global' or family.kernel_policy == 'per-op':
++    if family.kernel_policy in ('global', 'per-op'):
+         for op_name, op in family.ops.items():
+             if op.is_async:
                  continue
- 
-@@ -1520,7 +1524,7 @@ class Family(SpecFamily):
-             for k, _ in self.root_sets.items():
-                 yield k, None  # we don't have a struct, but it must be terminal
- 
--        for attr_set, struct in all_structs():
-+        for attr_set, _struct in all_structs():
-             for _, spec in self.attr_sets[attr_set].items():
-                 if 'nested-attributes' in spec:
-                     child_name = spec['nested-attributes']
-@@ -1540,7 +1544,7 @@ class Family(SpecFamily):
-     def _load_global_policy(self):
-         global_set = set()
-         attr_set_name = None
--        for op_name, op in self.ops.items():
-+        for _op_name, op in self.ops.items():
-             if not op:
-                 continue
-             if 'attribute-set' not in op:
-@@ -2049,12 +2053,12 @@ def put_op_name(family, cw):
-     _put_enum_to_str_helper(cw, family.c_name + '_op', map_name, 'op')
- 
- 
--def put_enum_to_str_fwd(family, cw, enum):
-+def put_enum_to_str_fwd(_family, cw, enum):
-     args = [enum.user_type + ' value']
-     cw.write_func_prot('const char *', f'{enum.render_name}_str', args, suffix=';')
- 
- 
--def put_enum_to_str(family, cw, enum):
-+def put_enum_to_str(_family, cw, enum):
-     map_name = f'{enum.render_name}_strmap'
-     cw.block_start(line=f"static const char * const {map_name}[] =")
-     for entry in enum.entries.values():
-@@ -2335,7 +2339,8 @@ def parse_rsp_nested_prototype(ri, struct, suffix=';'):
- 
- def parse_rsp_nested(ri, struct):
-     if struct.submsg:
--        return parse_rsp_submsg(ri, struct)
-+        parse_rsp_submsg(ri, struct)
-+        return
- 
-     parse_rsp_nested_prototype(ri, struct, suffix='')
- 
-@@ -2715,7 +2720,7 @@ def _free_type(ri, direction, struct):
- 
- 
- def free_rsp_nested_prototype(ri):
--        print_free_prototype(ri, "")
-+    print_free_prototype(ri, "")
- 
- 
- def free_rsp_nested(ri, struct):
-@@ -3357,7 +3362,7 @@ def render_user_family(family, cw, prototype):
-             else:
-                 raise Exception('Invalid notification ' + ntf_op_name)
-             _render_user_ntf_entry(ri, ntf_op)
--        for op_name, op in family.ops.items():
-+        for _op_name, op in family.ops.items():
-             if 'event' not in op:
-                 continue
-             ri = RenderInfo(cw, family, "user", op, "event")
-@@ -3429,10 +3434,9 @@ def main():
-             print('Spec license:', parsed.license)
-             print('License must be: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)')
-             os.sys.exit(1)
--    except yaml.YAMLError as exc:
-+    except pyyaml.YAMLError as exc:
-         print(exc)
-         os.sys.exit(1)
--        return
- 
-     cw = CodeWriter(BaseNlLib(), args.out_file, overwrite=(not args.cmp_out))
- 
-@@ -3535,7 +3539,7 @@ def main():
-                 cw.nl()
- 
-             if parsed.kernel_policy in {'per-op', 'split'}:
--                for op_name, op in parsed.ops.items():
-+                for _op_name, op in parsed.ops.items():
-                     if 'do' in op and 'event' not in op:
-                         ri = RenderInfo(cw, parsed, args.mode, op, "do")
-                         print_req_policy_fwd(cw, ri.struct['request'], ri=ri)
-@@ -3564,7 +3568,7 @@ def main():
-                 print_req_policy(cw, struct)
-                 cw.nl()
- 
--            for op_name, op in parsed.ops.items():
-+            for _op_name, op in parsed.ops.items():
-                 if parsed.kernel_policy in {'per-op', 'split'}:
-                     for op_mode in ['do', 'dump']:
-                         if op_mode in op and 'request' in op[op_mode]:
-@@ -3592,7 +3596,7 @@ def main():
-                 ri = RenderInfo(cw, parsed, args.mode, "", "", attr_set)
-                 print_type_full(ri, struct)
- 
--            for op_name, op in parsed.ops.items():
-+            for _op_name, op in parsed.ops.items():
-                 cw.p(f"/* ============== {op.enum_name} ============== */")
- 
-                 if 'do' in op and 'event' not in op:
-@@ -3625,7 +3629,7 @@ def main():
-                         raise Exception(f'Only notifications with consistent types supported ({op.name})')
-                     print_wrapped_type(ri)
- 
--            for op_name, op in parsed.ntfs.items():
-+            for _op_name, op in parsed.ntfs.items():
-                 if 'event' in op:
-                     ri = RenderInfo(cw, parsed, args.mode, op, 'event')
-                     cw.p(f"/* {op.enum_name} - event */")
-@@ -3675,7 +3679,7 @@ def main():
-                 if struct.reply:
-                     parse_rsp_nested(ri, struct)
- 
--            for op_name, op in parsed.ops.items():
-+            for _op_name, op in parsed.ops.items():
-                 cw.p(f"/* ============== {op.enum_name} ============== */")
-                 if 'do' in op and 'event' not in op:
-                     cw.p(f"/* {op.enum_name} - do */")
-@@ -3703,7 +3707,7 @@ def main():
-                         raise Exception(f'Only notifications with consistent types supported ({op.name})')
-                     print_ntf_type_free(ri)
- 
--            for op_name, op in parsed.ntfs.items():
-+            for _op_name, op in parsed.ntfs.items():
-                 if 'event' in op:
-                     cw.p(f"/* {op.enum_name} - event */")
- 
 -- 
 2.52.0
 
