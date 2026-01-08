@@ -1,196 +1,156 @@
-Return-Path: <netdev+bounces-248279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80D6BD06739
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 23:43:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEB7FD0674C
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 23:47:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A17523019B58
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 22:43:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 700CE3020490
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 22:47:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27E5F32B990;
-	Thu,  8 Jan 2026 22:43:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E721A328613;
+	Thu,  8 Jan 2026 22:47:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NGQejxtf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f79.google.com (mail-ot1-f79.google.com [209.85.210.79])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75262326931
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 22:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.79
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767912206; cv=none; b=ceEpY2oPcbTJ+NzwPGG3H3enVvhOCG8LYQEP6l6dPcv1MkcSbH+Q8K1d/YPYXXDGQCXb4qEqLiP23jWaIJ7Mrc+1hvnJWIc3LOki8svP0nzruJwuIYiTB+BRtp0V9xK33eHAmhC4qCN/vgj75sHrXubNGuGcJ9ds04D90HbzjS0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767912206; c=relaxed/simple;
-	bh=D4SiCcZnagi1n5ujXKNODjmWJFDN8mwFcgYlm5guZjk=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=pLKZ5rjLSGHgNPJZxy72KgxldG4nK1xVhX1+18btANHg5OdmQsJ+99Zhpl1QS+DQkYZnkIAl/2fWAE5k4P3h3r1YfMPWdOlMbGsVqrt7jKTjB+M7wn9joqNUlyDrqDenVHkFn0dABlsfIs0EHBVT9aKqilxi0eKqNHuSIuqrMcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f79.google.com with SMTP id 46e09a7af769-7c70930bdf4so812627a34.2
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 14:43:24 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D7D2D0615
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 22:47:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767912429; cv=pass; b=tO/fv+JWNKnVPXVl0cM7WOPlb0uavI6+yu1WXbFJxffUZSiVmjkHTtuishOj4Y5OC054xK/3aioxJGYkbo9POauboz/NUE6la5tNhbg63jTHODrUtmzZOU5Kalz7whAdOIqonLqpOGYI2US2sMV8AsyzYV/bSS4IXv3HBini7rU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767912429; c=relaxed/simple;
+	bh=05M7G+yD5bg2zpxfBRZSfkHw88GfIvX7aX3Dn7f4FHo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sIZxmHfdLnhEuvAsu3nMEdum0S8vCEa5irU/vcGRsxVsyOEopx3yT69NdMMTAlbYgqpXzPiwdZ/4KO5buzwpFMDZ9fQqph4fzUflz782/uu887ey/J2BsEGb+iychBW+BKMxmpdByjHNJ5Oek8yT13PDwNhoDgN2TkwhjaplA0A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NGQejxtf; arc=pass smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4edb8d6e98aso180241cf.0
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 14:47:08 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1767912427; cv=none;
+        d=google.com; s=arc-20240605;
+        b=NYhG19lSbmvV5YnWqUrUcvRcIJ/WXDUG/f3td+hFPAmBItsO+rME4DanjrleVJVvcR
+         xwTCD7StbGeplH4iU0KzwyFzhXbuAXbAHJfmI59EGYCf+HxQF6qamE+E8TaZbge4QqXG
+         7yUl3UyvsD8kStu3dvcveAF4qMFNyo1n3oULs2Cwn+M6vGI9Nx70LCa+Mm0GCmMFRiPB
+         W/zh2r+B+kLIBqsWQAcPJnAVRmxkfKwaS0CJUFdwCxLeGWMQ69NhDQkzUZk3YNLT+NH8
+         zeDBHUw/00EOZ5nKPiEFG7KZp4Bz/gfnABnvRwi6b34aeNIHyJjvqz9r1pzVZS2Ld/uz
+         FdUQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=05M7G+yD5bg2zpxfBRZSfkHw88GfIvX7aX3Dn7f4FHo=;
+        fh=XDylHoCimzop9AAgTRuj0QeXQqbe/kd7huiScx40AF0=;
+        b=eySXZMygE8GRwffuk3klhBd//Rke3ehMnxMOujBe7de1kcqh+zOqdRKH+mC+XUI1t+
+         3amNVtHGUE6Atdi5ncJNJeqZ1DCqcLbQ5uQ23nVaL+uyxrcv0Cjibws6tuZp1rIRQBHw
+         9vIjPGsHhJcGLXWvXET92+928ln/dBRmXgWWRhSxFw20BnPJr3tAtuUsqcv3CWs8jlvC
+         tv50xthNIvIak/e28FSXMcxWkvpGVlhmmv60O/o6Zr+BK6IVk8RNvUCX/L8CFncZMFhe
+         KaQD90FHPldZrxjIuT14K7pNLPlt7vWXzRlR6Mrs1uVJZUZluX8PNEqXY1egFSMW9Zf5
+         Xpqw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767912427; x=1768517227; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=05M7G+yD5bg2zpxfBRZSfkHw88GfIvX7aX3Dn7f4FHo=;
+        b=NGQejxtf2Jaa+RGslgJRJN+JXurmKYzqnYxfVp8GPq3Zay9NOOR7eoF3Zscb/0kT6J
+         BRXM3Koq5aNwJG6Xs9rIRhTbWIS1/1hmL4glbb95HoB6mT9RiMEOHNw6wIc1rTBTILlQ
+         HwEosyqJ9ExuavMPnseG6vxblXkOSut6IYTp95WMS6rKmy+V0pF3ZDuR6+RlfSJf+XRg
+         hUmJu81DWN5mH9KtOy99zamcPFbKZf+e4BVQIa3fw50k7Kazafz5+mfgGrzwZ+uMJwdU
+         rsi1333NfXMsMETzrVe+4gUN7q86gY2CLx3o3Yzo5e/opPEzxJi1AQzEnFwZNeYNTgcs
+         yE1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767912203; x=1768517003;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9TiEK9HPqCMHBDhTZnOlClVfYIrH5v0N+vhwn/LE/jA=;
-        b=uzjDroQG1sIGKQ+aJAX0ZeXNR9o2LfWCTININqups1+FrAtfg8WcdhvhH7d003ApP9
-         m0bmZSEPMjtfvHROWNf0YE+zz72lRNSatZYGoYxKPIEfTkENOmrt4hMvHMdL9B9dNPlw
-         TjpQAVr83uRMbcx7kMB6XOmUIbvIoRS4eQNwpd/WSBZO25CgtTxld/MMpZuZ+vi1oaDQ
-         BOf6UjEY7GC5uHCHA3SMkLcr51m8lF2o516+ODAAwFE0embQ3VaAU5KMpLx16PAUrOXa
-         y7SgRbaT6rEJ9GGi/jjiS/J6910JwNi1Cz5qUdgPtJUSTAPh4JxhBqKnn0moLHBs9uZl
-         fnxw==
-X-Forwarded-Encrypted: i=1; AJvYcCWwXvg4nDgqU2nArlMottw8ptnvcmCYEXY+u/rp1fDjK5P6qWrgXQiB48AT84rlheh4Q8Q5Ug4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz45KVGv4mYHr0It469PT5PQo1Y1C5WbP/h1FuIa8Y7lgdimR6N
-	kaNKcvqLP5oepUVjA3i1e4fM3TKcFXGP3wMTlRgF8zzRr7nyjNXJ3aOx1or3Mwzgs3nDU3FlW/X
-	BU9aRHZ9OsMkiqxTfIicPdQE5fYLQkSDsSH5Zis3E0Izzk8uxNsl3j8Xj+jg=
-X-Google-Smtp-Source: AGHT+IE8xjXTGeRVle2y1n9kyRhHQ27tNqGnF+vOObwYB1W2n6IDOLJRU7eiCCGS9BqZQrPHgusDY97H9CLlxWdaDI/Zw6baX5hM
+        d=1e100.net; s=20230601; t=1767912427; x=1768517227;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=05M7G+yD5bg2zpxfBRZSfkHw88GfIvX7aX3Dn7f4FHo=;
+        b=U18XBGMErRkH28AQ5KK6V7nzoJt6vdpQMFekwuVk5Wxd1zM67iLBZSdvId+vHuX9th
+         T3BMDccXlI/bA0BEj4V4Wq4C0P1lMypyQfW6eAreOLqPjjN0QJa7ICrizq0B+TrO+FBB
+         MW8+bJ2Ieq+rVzR4NFWY7ep5WjFAXyN8IoSw8gPSsc+x92iu2QFlcxdn1GXmwr9MutCX
+         2jWZ8TQYaK0GfHZb7+KhCeLYtQSEX40lTE52rB+IPu9dXUuqCpNuHQrVpyYkzH+iAvqi
+         VEDHFco6jw7uqiL6S29+2z74IzmajZVyjUpPWGTAMt+pl4jWPAF49Sm2RPR2s7+v9fEL
+         2FLg==
+X-Forwarded-Encrypted: i=1; AJvYcCUV8vYc3bWpIK46v7ALTsoCqOpo7sh5A5UwP5eE8xKEjg8KiuGVTTghnTlqNLNqknS9VjbJpCE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYmSr5Z+uDgh0QLzdRbfWwzgThtshXJP9O59bpBJZjLFYVwADM
+	3Usfa2Yp8BgiUWg0udvULI4C2GdQFDDuRydlww5sDBmbbHyrrQFKNkGNQX+jnFWu99WIEvzXIaP
+	GY5j6srxSSClNosl2LBvtz2uI3GCxo3h5oSCy4VGy
+X-Gm-Gg: AY/fxX73KXsVlFcgn+LFKQ2++8W5hnegqB88OE1aanHKLVAXDiaj37VmaaEtiznOEOU
+	sFaxrNmUiBtVTCrTpyd5tMJE3Z0AuUx2r1wrptY7Mbxz5b0cqFF/ru5U/ssZH8ROlgysRpI0Y8T
+	a4S60IW6tOjU4xgOnZHxS0DZ7nKyKcnR7PxrB1RZyiph+wGc1OV/g36m0xjDCp7rL/K2RrJp3jB
+	HE6cj6kuO+eg1bn58w0CkB9QVnqkT9PK3jY25cIeOX3GFiUo/ZrkIGkCaaKTyLsmsw5sjiCrvEK
+	ruwNv8CQ5EhbtReXzvCUkxEh1Rz7CxDvw8KC6IBUurWNK4Y879jLp9TeBwBqIXTE7NMvQA==
+X-Received: by 2002:ac8:5782:0:b0:4f3:7b37:81b with SMTP id
+ d75a77b69052e-4ffca3ad29bmr3817721cf.18.1767912426910; Thu, 08 Jan 2026
+ 14:47:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:60b:b0:65f:bad:789c with SMTP id
- 006d021491bc7-65f54f670d5mr3384227eaf.58.1767912203538; Thu, 08 Jan 2026
- 14:43:23 -0800 (PST)
-Date: Thu, 08 Jan 2026 14:43:23 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6960330b.050a0220.1c677c.03a9.GAE@google.com>
-Subject: [syzbot] [wireguard?] WARNING in stub_timer
-From: syzbot <syzbot+19e796f043fe3be7b76a@syzkaller.appspotmail.com>
-To: Jason@zx2c4.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	wireguard@lists.zx2c4.com
+References: <20260108155816.36001-1-chia-yu.chang@nokia-bell-labs.com> <20260108155816.36001-2-chia-yu.chang@nokia-bell-labs.com>
+In-Reply-To: <20260108155816.36001-2-chia-yu.chang@nokia-bell-labs.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Thu, 8 Jan 2026 17:46:47 -0500
+X-Gm-Features: AQt7F2ovG-v9G1YvqpyTasF2O1QIEJ_BUtc_E8UKj2kCrrVV8U2__Yy5KoIU4r0
+Message-ID: <CADVnQykTJWJf7kjxWrdYMYaeamo20JDbd_SijTejLj1ES37j7Q@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/1] selftests/net: Add packetdrill packetdrill cases
+To: chia-yu.chang@nokia-bell-labs.com
+Cc: pabeni@redhat.com, edumazet@google.com, parav@nvidia.com, 
+	linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org, 
+	dsahern@kernel.org, kuniyu@google.com, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com, 
+	kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com, 
+	jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch, 
+	donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com, 
+	shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org, 
+	koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com, 
+	ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com, 
+	cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com, 
+	vidhi_goel@apple.com, Willem de Bruijn <willemb@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Thu, Jan 8, 2026 at 10:58=E2=80=AFAM <chia-yu.chang@nokia-bell-labs.com>=
+ wrote:
+>
+> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+>
+> Linux Accurate ECN test sets using ACE counters and AccECN options to
+> cover several scenarios: Connection teardown, different ACK conditions,
+> counter wrapping, SACK space grabbing, fallback schemes, negotiation
+> retransmission/reorder/loss, AccECN option drop/loss, different
+> handshake reflectors, data with marking, and different sysctl values.
+>
+> Co-developed-by: Ilpo J=C3=A4rvinen <ij@kernel.org>
+> Signed-off-by: Ilpo J=C3=A4rvinen <ij@kernel.org>
+> Co-developed-by: Neal Cardwell <ncardwell@google.com>
+> Signed-off-by: Neal Cardwell <ncardwell@google.com>
+> ---
 
-syzbot found the following issue on:
+Chia-Yu, thank you for posting the packetdrill tests.
 
-HEAD commit:    54e82e93ca93 Merge tag 'core_urgent_for_v6.19_rc4' of git:..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1022ee22580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=513255d80ab78f2b
-dashboard link: https://syzkaller.appspot.com/bug?extid=19e796f043fe3be7b76a
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+A couple thoughts:
 
-Unfortunately, I don't have any reproducer for this issue yet.
+(1) These tests are using the experimental AccECN packetdrill support
+that is not in mainline packetdrill yet. Can you please share the
+github URL for the version of packetdrill you used? I will work on
+merging the appropriate experimental AccECN packetdrill support into
+the Google packetdrill mainline branch.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-54e82e93.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f3befb5f53a4/vmlinux-54e82e93.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/92820ca1dbd8/bzImage-54e82e93.xz
+(2) The last I heard, the tools/testing/selftests/net/packetdrill/
+infrastructure does not run tests in subdirectories of that
+packetdrill/ directory, and that is why all the tests in
+tools/testing/selftests/net/packetdrill/ are in a single directory.
+When you run these tests, do all the tests actually get run? Just
+wanted to check this. :-)
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+19e796f043fe3be7b76a@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: kernel/time/timer.c:716 at stub_timer+0xa/0x20 kernel/time/timer.c:716, CPU#0: kworker/0:1/10
-Modules linked in:
-CPU: 0 UID: 0 PID: 10 Comm: kworker/0:1 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: events_power_efficient wg_ratelimiter_gc_entries
-RIP: 0010:stub_timer+0xa/0x20 kernel/time/timer.c:716
-Code: 0f 94 c0 5b 41 5e e9 05 73 b0 09 cc 0f 1f 40 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa e8 27 fa 12 00 90 <0f> 0b 90 c3 cc cc cc cc cc 66 66 66 66 2e 0f 1f 84 00 00 00 00 00
-RSP: 0018:ffffc90000007c98 EFLAGS: 00010246
-RAX: ffffffff81ae0d39 RBX: 0000000000000101 RCX: ffff88801bef0000
-RDX: 0000000000000100 RSI: ffffffff8bc095c0 RDI: ffffc9000db0f1c0
-RBP: ffffc90000007d90 R08: ffffffff8f824677 R09: 1ffffffff1f048ce
-R10: dffffc0000000000 R11: ffffffff81ae0d30 R12: 0000000000000000
-R13: ffffc9000db0f1c0 R14: 1ffff92000000f98 R15: 0000000000000001
-FS:  0000000000000000(0000) GS:ffff88808d414000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f2cc5528910 CR3: 00000000377e7000 CR4: 0000000000352ef0
-Call Trace:
- <IRQ>
- call_timer_fn+0x16e/0x590 kernel/time/timer.c:1748
- expire_timers kernel/time/timer.c:1799 [inline]
- __run_timers kernel/time/timer.c:2373 [inline]
- __run_timer_base+0x61a/0x860 kernel/time/timer.c:2385
- run_timer_base kernel/time/timer.c:2394 [inline]
- run_timer_softirq+0xb7/0x180 kernel/time/timer.c:2404
- handle_softirqs+0x22b/0x7c0 kernel/softirq.c:622
- __do_softirq kernel/softirq.c:656 [inline]
- invoke_softirq kernel/softirq.c:496 [inline]
- __irq_exit_rcu+0x60/0x150 kernel/softirq.c:723
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:739
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1056 [inline]
- sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1056
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
-RIP: 0010:lock_release+0x2d8/0x3b0 kernel/locking/lockdep.c:5893
-Code: e4 e2 10 00 00 00 00 eb b5 e8 84 7f bd 09 f7 c3 00 02 00 00 74 b9 65 48 8b 05 74 9e e2 10 48 3b 44 24 28 75 44 fb 48 83 c4 30 <5b> 41 5c 41 5d 41 5e 41 5f 5d e9 59 5e c0 09 cc 48 8d 3d 11 6d e7
-RSP: 0018:ffffc900001c79e0 EFLAGS: 00000282
-RAX: f62d7e25cf48d100 RBX: 0000000000000283 RCX: 0000000080000001
-RDX: 0000000000000002 RSI: ffffffff8d97c93e RDI: ffffffff8bc095e0
-RBP: ffff88801bef0b80 R08: 0000000000000003 R09: 0000000000000004
-R10: dffffc0000000000 R11: fffff52000038f34 R12: 0000000000000002
-R13: 0000000000000002 R14: ffffffff8ea6eef8 R15: ffff88801bef0000
- __raw_spin_unlock include/linux/spinlock_api_smp.h:141 [inline]
- _raw_spin_unlock+0x16/0x50 kernel/locking/spinlock.c:186
- spin_unlock include/linux/spinlock.h:391 [inline]
- wg_ratelimiter_gc_entries+0x384/0x450 drivers/net/wireguard/ratelimiter.c:76
- process_one_work kernel/workqueue.c:3257 [inline]
- process_scheduled_works+0xad1/0x1770 kernel/workqueue.c:3340
- worker_thread+0x8a0/0xda0 kernel/workqueue.c:3421
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x510/0xa50 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	e4 e2                	in     $0xe2,%al
-   2:	10 00                	adc    %al,(%rax)
-   4:	00 00                	add    %al,(%rax)
-   6:	00 eb                	add    %ch,%bl
-   8:	b5 e8                	mov    $0xe8,%ch
-   a:	84 7f bd             	test   %bh,-0x43(%rdi)
-   d:	09 f7                	or     %esi,%edi
-   f:	c3                   	ret
-  10:	00 02                	add    %al,(%rdx)
-  12:	00 00                	add    %al,(%rax)
-  14:	74 b9                	je     0xffffffcf
-  16:	65 48 8b 05 74 9e e2 	mov    %gs:0x10e29e74(%rip),%rax        # 0x10e29e92
-  1d:	10
-  1e:	48 3b 44 24 28       	cmp    0x28(%rsp),%rax
-  23:	75 44                	jne    0x69
-  25:	fb                   	sti
-  26:	48 83 c4 30          	add    $0x30,%rsp
-* 2a:	5b                   	pop    %rbx <-- trapping instruction
-  2b:	41 5c                	pop    %r12
-  2d:	41 5d                	pop    %r13
-  2f:	41 5e                	pop    %r14
-  31:	41 5f                	pop    %r15
-  33:	5d                   	pop    %rbp
-  34:	e9 59 5e c0 09       	jmp    0x9c05e92
-  39:	cc                   	int3
-  3a:	48                   	rex.W
-  3b:	8d                   	.byte 0x8d
-  3c:	3d                   	.byte 0x3d
-  3d:	11 6d e7             	adc    %ebp,-0x19(%rbp)
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Thanks!
+neal
 
