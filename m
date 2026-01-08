@@ -1,125 +1,129 @@
-Return-Path: <netdev+bounces-248037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37190D0262B
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 12:29:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27F1DD02552
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 12:15:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8C12131F33FA
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 11:08:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2E87F31C2F9F
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 11:06:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A04F73A961B;
-	Thu,  8 Jan 2026 10:32:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FB533D3D0B;
+	Thu,  8 Jan 2026 10:33:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WYI109jR"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="lPvKeEbS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outbound.ms.icloud.com (p-west3-cluster2-host7-snip4-5.eps.apple.com [57.103.74.28])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B03739E6D7
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 10:32:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA023D5D8F
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 10:33:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.74.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767868347; cv=none; b=oOWvvM+1Lk0G2WxMuYb280+1epSugZVKrzXsmA5FxsszFT8Ur8hwKefXXg9j6J4wIlKtqSSUp9hi6gzqGRYd8gzPJPLt11n3lj1W2mSGbf8XNdTB9cQZ5pfhAZQaoy8vtKcNNsGVsJ7PTRh+0VH9wjvMf8DS/zwFoGuFWPIL4UM=
+	t=1767868386; cv=none; b=tfaZkEeZ5a0j7ILxqzQ0jHCAkvAx0s8duAkr4b3HGeZbk0ebMLA8/rLK7gletwi/SZrqf1iMdUB7Pt13bH1pTQXSKAhOrbt2xqes1KoJifASQGEZw0hz6gOCMizjALG0FldK53UeyUcnMMplPYXP6l1lx0n0WGJUZxzGRUhKT+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767868347; c=relaxed/simple;
-	bh=R2K+i1sRQKmSf8yyiZ0axORAp9DYHsv+qjGYYzdkAi0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cYWZ0Elf66htcgOZpTCUN6DIahCoRrptMaG4Q6LpvnGhElqW+Wj5Oe1HygQQiKRJYIWTtMoABR7zQYGl7Bxw4jZpT0yrPAz83Ppe/PDRa+GIiFzNRmhis+2nUJ7swiu6TNZCWOmy+gXWjHBrshtJFLzWKDNwIP/Be1iMgp97g9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WYI109jR; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4fb68720518so30644311cf.2
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 02:32:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767868337; x=1768473137; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ok3n6452CCn2akqoUJ4qnpNLPbUKwpWUXAR9kiMAF0c=;
-        b=WYI109jRM4F/eCVbKIWmEp7Ozmw8Qmb+0LULE++Sn16pPCOjjoE3k+59AXapKEsYiZ
-         2wPf4Mlaipiodl3TjRwi8Ti+Etwooye5O6Yq0VucV1mZw9QLpJUbcQKVV/gEflWSv71U
-         9aKEVt0N4jf1tRfcMjQjY4tnVj5PYzrx3vh+hIr9K3kqRqvJDjjBru8T0GgffVtEFmvx
-         hPFOcxT4m4DnYD66aqP+mIZaiFjH8HVF0684vvFuZU9iWgjkc9FzuUUi5XQT165yKu4G
-         KJ//tuwWIGV4hp4AMeiit73tXFIxfHZ82m4XgYYclPdetGuXbSsylP+zmo1dQ5kF4Aik
-         bpGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767868337; x=1768473137;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Ok3n6452CCn2akqoUJ4qnpNLPbUKwpWUXAR9kiMAF0c=;
-        b=TwnMEaWuOhPGWIs6/KEbjyvKFGs7qUuMqP+O+JEP0pLLpCeH9N3qb31IkfTEQYDcrf
-         rJyCZv5uJq7aXhaOdHkoxPbMRqATWm9iQjHxoJ/arpKanh7y3FdewCkCvJdbLNOI1kCb
-         KARElYjSNUWBxuK0m+KoDE+uxrlhBr5M9+ZUg+WbZriY25Tyrfa3BY0w925bTmp5C4a2
-         sce+fRcWWIP4661uQzsAYJ3J81Smm46OIotQoQX+NhcR/nLqhjxlDCPj50Q4ZBEwrctB
-         9+9zK32aNtyoUBAnYyVBvvnPdsn4V02ukqaCCRv/OBJWqwt1pz8IIRU4WxSy/rOpuIl7
-         ZF8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVAx/bUcTj06B1vbxZaS/T39NE3TMBb+uE6xpgJsT2e5A36UFxJBQELDN2Qt8iLY4wtMQkPqfA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKRAQRTdQzE7SruMGRiQIr+E14IqM4DjQ+t9cOlFpTX0wvNHpr
-	/TbC2l1vnLU8zTr19Ap32FQs1DqkBDDjAynbBASF13WKsEfvG5bVga5zCc6/PNaqE2ZRRyD48mz
-	Gh8+HO9QUxMRIbMmeBZ+ig8wxY2ObRBLpkGEGw/gx
-X-Gm-Gg: AY/fxX69jJZsBiGMzynAyWfv7Jbwi+60ADfBKc6QSe4yKZdJgaFcAN1DtgDZk3JjFfW
-	+ydgYk8nfrfXjkT604l48iDy+R6sKUJTeJW0VBXWho44Y3R5NjvD9hR9Zd60DlVoz8r70JdelEH
-	tFws388Vhi6/tyOMq8drUp0czCAxgQe2ILeRckmjnSd6lMIoDrtEJIsK4Rhz4Vm5tfz35eY4uqr
-	/l8CSgouZpJTzFxwwtHat07ZOxM8Nqy/zYLi58sUPc4MkNl7cjF1tPphg5P8z8bBiINWA==
-X-Google-Smtp-Source: AGHT+IFY03QOD+rpaee6JMJz5V1Q+LtZHzyW9QYCkUaj/PQGgBqN8ctNNUwKRAG43fFXIBU1U0KMnEepQ85YQps45bM=
-X-Received: by 2002:a05:622a:248d:b0:4f1:b1f5:277b with SMTP id
- d75a77b69052e-4ffb48a8654mr78118021cf.23.1767868336738; Thu, 08 Jan 2026
- 02:32:16 -0800 (PST)
+	s=arc-20240116; t=1767868386; c=relaxed/simple;
+	bh=3VvZc5Pxqa2DYWHioCPMHDe+wkeZBiz42WkZ8pZYGKo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nshn3KrEtqnAmh+zqQgsYFIfsNgnvnMSAlzdFvt/ub5UELhyubSX+gqD/PRayE1mdzfcLIycoo4rkz7mNNuIB+z6WsxCx0MnFbZhRc3V1Qsq0oVtBID2lnGBY2LgOQ2Xrt4xEwDmW1ZuQGLTNGFWmNP9ZNz0lvwsY274mYvnsd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=lPvKeEbS reason="key not found in DNS"; arc=none smtp.client-ip=57.103.74.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=y-koj.net
+Received: from outbound.ms.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-west-3a-100-percent-7 (Postfix) with ESMTPS id F0F4718001A0;
+	Thu,  8 Jan 2026 10:32:57 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; bh=LUPYqb/Z3vOvooaWSeMwubFxJknkvN/Ii7q3nM4iWGk=; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=lPvKeEbSaYiwAJreUhoH7n0SbBz6UjbzJJQ4dHgB/I870dUntaME2dbfU1GfSOjy08nMiy2V1rnTWxFjSVaKa/GE4FF9Hnmfz5zc4zvs1c+FS+fUqhMgwpc9hAbSCsXY9wimIbzlZ3NY9BS3jAJhOE70kLQVJXFXeus9DJB/aOrJcwLbkLSsx5dKsBfxlP4kqcL/BK9xwYOvD1+ou/tf+2UJS4odvhJS15T0aCEgfHG878nm54fGW2TlFIBYnaqLtl7MrFCTaIG2YkcrIio7eomuYgP/CUaqUQ2w2v05PpK3JJtjx0Qg7XQ84HTjJiSpI+pzkhpGxQJRiGYAuBu9oQ==
+mail-alias-created-date: 1719758601013
+Received: from desktop.y-koj.net (unknown [17.57.154.37])
+	by p00-icloudmta-asmtp-us-west-3a-100-percent-7 (Postfix) with ESMTPSA id 3401718001EA;
+	Thu,  8 Jan 2026 10:32:53 +0000 (UTC)
+Date: Thu, 8 Jan 2026 19:32:51 +0900
+From: Yohei Kojima <yk@y-koj.net>
+To: Stefan Metzmacher <metze@samba.org>
+Cc: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
+	quic@lists.linux.dev, davem@davemloft.net, kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Moritz Buhl <mbuhl@openbsd.org>,
+	Tyler Fanelli <tfanelli@redhat.com>,
+	Pengtao He <hepengtao@xiaomi.com>,
+	Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org,
+	Steve French <smfrench@gmail.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
+	kernel-tls-handshake@lists.linux.dev,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>, Steve Dickson <steved@redhat.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Alexander Aring <aahringo@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	John Ericson <mail@johnericson.me>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	"D . Wythe" <alibuda@linux.alibaba.com>,
+	Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Daniel Stenberg <daniel@haxx.se>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Subject: Re: [PATCH net-next v6 05/16] quic: provide quic.h header files for
+ kernel and userspace
+Message-ID: <aV-HgBCqGx0pc-pL@desktop.y-koj.net>
+References: <cover.1767621882.git.lucien.xin@gmail.com>
+ <127ed26fc7689a580c52316a2a82d8f418228b23.1767621882.git.lucien.xin@gmail.com>
+ <aV9AwNITeyL71INz@desktop.y-koj.net>
+ <a0453a42-ee41-466a-b8aa-8eaaa38d7905@samba.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260108101927.857582-1-edumazet@google.com> <851802c967b92b5ea2ce93e8577107acd43d2034.camel@sipsolutions.net>
-In-Reply-To: <851802c967b92b5ea2ce93e8577107acd43d2034.camel@sipsolutions.net>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 8 Jan 2026 11:32:04 +0100
-X-Gm-Features: AQt7F2p-y5UbYRv-TWHGNGwam1_iRtt3bbPJlg6n-RcD7sW7wTP_mSOnZxUlj-8
-Message-ID: <CANn89iLxDc9viP0Pmj3uC01s46eUR2xu4XAUEo=he-M84aCf9A@mail.gmail.com>
-Subject: Re: [PATCH net] wifi: avoid kernel-infoleak from struct iw_point
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, syzbot+bfc7323743ca6dbcc3d3@syzkaller.appspotmail.com, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a0453a42-ee41-466a-b8aa-8eaaa38d7905@samba.org>
+X-Proofpoint-GUID: JLj43OVRav7MR6VFNVjRS8okeeDqPRLl
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA4MDA3MSBTYWx0ZWRfX5hmb4oSR963s
+ Iog93epKphb/mOgoQFR2UR0U/5XfwAfFsTfEQ4nQMrcr+FPjIqramaOeSCwRvmj8rf9iSDSgsIv
+ W6/W7tjhh7SqHpJjM4r55aaEV2IqF+y2575cy7C9MJLxlf7koDWNka+jMlFuf5F2Z2xBSCfCQ2S
+ XrsKjRJM/RgmECGh39aCoQN3gkkVMqbQJjobWeUpqlWYMJ1lseR8PyqGljS6GfZtw2+526+Z+vo
+ PgLY8NoybtybcIuy2WRVcpj4lUZK6hISKEa1LYm+swQHyl+fGA0w425eCRKg7fzXo2PldzD4BsX
+ 1guYZzAOZjXBxXxcSvw
+X-Authority-Info: v=2.4 cv=b/G/I9Gx c=1 sm=1 tr=0 ts=695f87db
+ cx=c_apl:c_apl_out:c_pps a=qkKslKyYc0ctBTeLUVfTFg==:117 a=kj9zAlcOel0A:10
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=_cr4Ci8WIZHmLF2k5DQA:9
+ a=CjuIK1q_8ugA:10
+X-Proofpoint-ORIG-GUID: JLj43OVRav7MR6VFNVjRS8okeeDqPRLl
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-08_02,2026-01-07_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=576
+ phishscore=0 clxscore=1030 spamscore=0 mlxscore=0 suspectscore=0 bulkscore=0
+ malwarescore=0 adultscore=0 classifier=spam authscore=0 adjust=0 reason=mlx
+ scancount=1 engine=8.22.0-2510240001 definitions=main-2601080071
+X-JNJ: AAAAAAAB7HiKDXe6q/z6mwBqEPBcxpgq2SZdZu0d1zTRUl+8Mh95RVMlNCbhqB+hmtxz+g4tD+gGurL6TBbAhgIQuBly6NiLQN798UYk7PSEJhiwZmbWLPn6vMJK8bYsUSKAd+ij8lEBEUtB9ktehSVNt4cQN1VeuOSh5H7scQ2P7D54iIbo1B8XBDcH0AR1k49dlRWuEddjBy1m/Zl3LHTa8Rm+r+4UzyEgEGJVC80zc4ZZwg/ApYc6CI/ITLTRMiyQFTBMOrxT7V1dt+ViZb0hoD011JDkDSrQCDJAuqagF1ZJgMoST0qzZVculNtwA1NmfULwZ8mrGgHF1Z0vBNQWfPmQukAWW6jDjAxX9r533dhqURLZTggPlXjSAInYjfPT/XlW/HRn2Osw3P3FOt+Ffb+zWG5qjBM4WYw1Bvsit+ffzTzt4LOQAHntvs6qTVqNQHhrdFGWSr+X/wnJCPZW225TGNkuc0qxr4LwubF7vA37Hcgm772/rargMeyJ//XVCe5vIToXNDQUvWkxNKizKjLQ64CxuV9Tr/tUah7MGYOtOQuRfgbklcqXjqWDBEC5P6M41qPR7KeRQt9TJwKwta0IL8OOdSjcRcXfNrNr+qQZ19h2+MR27/Let2ltPgqRsQb1wz4Dx12YQBc+LFiG5ac++Pgyd5m3pNKOoYDlFV0IAw86GHwl6scWEpdSKiuamL7Cws8g6/NTcsA2XGNfMrZwkQzuUm7vX+DadEBhjWBYLnZbFqqhCvyAFi/sOq0lpnL+dC1KMOtpId0s/e/Y/Q03njmQjYfxet4jvsZwYPyxhAt3sUCxlvBNim/V0y54AUHbUltGFSkhmlubiEs/Mux+SDUuK5EyjgNjL/ZVGseFCnxuSjc280tnz7X6pqpgKm5t+U7bXnKRck3JwrqriSv3EVdzzwh5AX+DqUo25uV7/FdfgWKKNWW6takhr+NbB2SJCe1eUXYcvsdZsZUA1i83wnN
+ ktib/Dr/kuVOMgFo+6wJLHt+wiQuS/JE04xvE87fdV1qj9GqXt8Ghl8cQWu+pMDazHVlfiHhU7mCAav8Ow/xcWcSplmOQlc3AWZWpL6E=
 
-On Thu, Jan 8, 2026 at 11:29=E2=80=AFAM Johannes Berg <johannes@sipsolution=
-s.net> wrote:
->
-> On Thu, 2026-01-08 at 10:19 +0000, Eric Dumazet wrote:
-> > struct iw_point has a 32bit hole on 64bit arches.
-> >
-> > struct iw_point {
-> >   void __user   *pointer;       /* Pointer to the data  (in user space)=
- */
-> >   __u16         length;         /* number of fields or size in bytes */
-> >   __u16         flags;          /* Optional params */
-> > };
-> >
-> > Make sure to zero the structure to avoid dislosing 32bits of kernel dat=
-a
-> > to user space.
->
-> Heh, wow. Talk about old code.
->
-> > Reported-by: syzbot+bfc7323743ca6dbcc3d3@syzkaller.appspotmail.com
-> > https://lore.kernel.org/netdev/695f83f3.050a0220.1c677c.0392.GAE@google=
-.com/T/#u
->
-> Was that intentionally without Link: or some other tag?
+On Thu, Jan 08, 2026 at 10:15:13AM +0100, Stefan Metzmacher wrote:
+> >> +
+> >> +/* Socket Options APIs */
+> >> +#define QUIC_SOCKOPT_EVENT				0
+> >> +#define QUIC_SOCKOPT_STREAM_OPEN			1
+> >> +#define QUIC_SOCKOPT_STREAM_RESET			2
+> >> +#define QUIC_SOCKOPT_STREAM_STOP_SENDING		3
+> >> +#define QUIC_SOCKOPT_CONNECTION_ID			4
+> >> +#define QUIC_SOCKOPT_CONNECTION_CLOSE			5
+> >> +#define QUIC_SOCKOPT_CONNECTION_MIGRATION		6
+> >> +#define QUIC_SOCKOPT_KEY_UPDATE				7
+> > 
+> > This is a trivial point, but it would be better to align the indentation
+> > of the line above.
+> 
+> This is just the diff output in mail, now in my reply
+> the value 5 is also moved one tab to much.
+> 
+> It's all aligned correctly in the actual file.
 
-Somehow the Closes: prefix has been lost when I cooked the patch.
+That's embarrassing! I'm very sorry for the noise.
 
-Closes: https://lore.kernel.org/netdev/695f83f3.050a0220.1c677c.0392.GAE@go=
-ogle.com/T/#u
-
-Let me know if you want a V2, thanks.
-
->
-> johannes
+Yohei
 
