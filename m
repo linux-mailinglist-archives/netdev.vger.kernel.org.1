@@ -1,234 +1,193 @@
-Return-Path: <netdev+bounces-247996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09E7FD01968
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 09:32:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5654AD0198F
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 09:36:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 17D1431BE040
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 08:25:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9ADC833208FB
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 08:28:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CB4739282D;
-	Thu,  8 Jan 2026 08:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE28036C0C6;
+	Thu,  8 Jan 2026 08:02:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="aBWtHZkA"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="UMp9Of1z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C7E369974;
-	Thu,  8 Jan 2026 08:01:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0649366DAE;
+	Thu,  8 Jan 2026 08:01:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767859318; cv=none; b=qTLf1WiAUvQO5vaG/zttxyDh+NjcvW2TQ2eTxPLItvCobDhzt8Fsir2+fqAVY9SnWYTCixPqsIu7ardgacpCKTRJGeBnQ+zK04pQN8lJmG9/C161hyuHSjBx13y/gjtvYnZ17hCMQKSObBNdUEj/HmEj3P0Mc5pfJcYh0MtV5QE=
+	t=1767859347; cv=none; b=BPGA1UJ7/Nh/r3u9/+vGkXwf51RhC4f1umGVnePymQMpSLah0hS7jceye4FP+pFd+oO3ehLxe+ZFAgPP3UANNMEAD9DIfoooRTtTxrnh5t9IvOXJn/Z/Lm5PbRCK2IClVDFhTPdUVsfovxohfYTs7yyw2++Ut2dFGLAdpR0JmQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767859318; c=relaxed/simple;
-	bh=FPOPOiaHiMS1DGiB15UET9ZTvHI8/dOj06ra13vuyiE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DUUlpyzi+pnDxVXe4EbVGRkXXuvJYgrAW7fHqmr4h5jKyv97VnKb9OH3synrddvRqRQ8pEqJqfRGUHXVzwemF8J6UmYN+KtFmZxBClXncitdor3B3UCg5kGT2vKVhXdaLA10dNVM4K01Jnqxk8LIaxpBetjH91ggsGjiCynxybQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=aBWtHZkA; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id D758AC1ECB4;
-	Thu,  8 Jan 2026 08:01:10 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 10D5B606B6;
-	Thu,  8 Jan 2026 08:01:37 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C0FB2103C8674;
-	Thu,  8 Jan 2026 09:01:31 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1767859295; h=from:subject:date:message-id:to:cc:mime-version:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=246FoifQioiJlJKgK0l+PteqgHVK9qea+qwvqnjBY1s=;
-	b=aBWtHZkAKBfoJKrCVBeIgCH0DizWz1dLnxNjTB0j4LnxHtt27Ev8L1zJVUaJQHYNm+Jrqz
-	Qh3m8lbH5SE2Fpo52vWhHsuCYadvIn1t+MpLeyQUC4wYtxV52+sOc+07uThw2L973O29tS
-	Wz4uO85ab5PYGoqy6s72Drrb1WRWgIyz0xHhUUVpQlb1QXopxm4gf8JdhvnLiHIepkkqEN
-	tV13yGLgCj4aRHK6ViS/czZlhOtbprzgmbdrrexR787Mg3yUlG0UiEzPXvb2Dh0grkGAY5
-	T+IoJJYtODUiobXxdW54VhztXCb6Jmtpq/Yj5UOeFcTGf2UPajFmDDoJ13+Ryw==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	mwojtas@chromium.org,
-	Antoine Tenart <atenart@kernel.org>,
-	devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: [PATCH net-next v22 11/14] net: phy: at803x: Support SFP through phy_port interface
-Date: Thu,  8 Jan 2026 09:00:36 +0100
-Message-ID: <20260108080041.553250-12-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20260108080041.553250-1-maxime.chevallier@bootlin.com>
-References: <20260108080041.553250-1-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1767859347; c=relaxed/simple;
+	bh=IFeuOjD8hRs56JH5OH6esmLiSoXTdFIyx1pB3qoK6bk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TGG3H/7AxgY7Okn0ZP4ROAXfY2kTUKmOfig9Aw4mnYgR6j+QGDx3IeNs7Io8EIXWF8SMfo3oay9PpljRHzgVpENz/NCa5Oz5sw8o0Ej/mTcdq1o3Y+eE+Vha8C1pcdJZa9rKY7zmHBeiTYXDDvaLSKfx1D1NGDHnsGMk2RVbpJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=UMp9Of1z; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [192.168.178.121] (p5dc880d2.dip0.t-ipconnect.de [93.200.128.210])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 60881WCM021689
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Thu, 8 Jan 2026 09:01:32 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1767859294;
+	bh=IFeuOjD8hRs56JH5OH6esmLiSoXTdFIyx1pB3qoK6bk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=UMp9Of1z8yVW4cY2rEJpK3EGpW1/RoUxI0k4i9OCigiMcwa/J25XxWuqi8v1om9we
+	 j2sInzMtZ8Qdfmajlhej7l3o3RcuV0OGG+0D8ArEX64f2pc5T2FXX6A0vYEN+wsvjC
+	 CNCZYwfZ6A6nbKV2nATUZH0efC7h7+31qUw5VFdg=
+Message-ID: <bd41afae-cf1e-46ab-8948-4c7fa280b20f@tu-dortmund.de>
+Date: Thu, 8 Jan 2026 09:01:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH net-next v7 9/9] tun/tap & vhost-net: avoid ptr_ring tail-drop
+ when qdisc is present
+To: Jason Wang <jasowang@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com,
+        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
+ <20260107210448.37851-10-simon.schippers@tu-dortmund.de>
+ <CACGkMEuQikCsHn9cdhVxxHbjKAyW288SPNxAyXQ7FWNxd7Qenw@mail.gmail.com>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <CACGkMEuQikCsHn9cdhVxxHbjKAyW288SPNxAyXQ7FWNxd7Qenw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
 
-Convert the at803x driver to use the generic phylib SFP handling, via a
-dedicated .attach_port() callback, populating the supported interfaces.
+On 1/8/26 05:37, Jason Wang wrote:
+> On Thu, Jan 8, 2026 at 5:06 AM Simon Schippers
+> <simon.schippers@tu-dortmund.de> wrote:
+>>
+>> This commit prevents tail-drop when a qdisc is present and the ptr_ring
+>> becomes full. Once an entry is successfully produced and the ptr_ring
+>> reaches capacity, the netdev queue is stopped instead of dropping
+>> subsequent packets.
+>>
+>> If producing an entry fails anyways, the tun_net_xmit returns
+>> NETDEV_TX_BUSY, again avoiding a drop. Such failures are expected because
+>> LLTX is enabled and the transmit path operates without the usual locking.
+>> As a result, concurrent calls to tun_net_xmit() are not prevented.
+>>
+>> The existing __{tun,tap}_ring_consume functions free space in the
+>> ptr_ring and wake the netdev queue. Races between this wakeup and the
+>> queue-stop logic could leave the queue stopped indefinitely. To prevent
+>> this, a memory barrier is enforced (as discussed in a similar
+>> implementation in [1]), followed by a recheck that wakes the queue if
+>> space is already available.
+>>
+>> If no qdisc is present, the previous tail-drop behavior is preserved.
+>>
+>> +-------------------------+-----------+---------------+----------------+
+>> | pktgen benchmarks to    | Stock     | Patched with  | Patched with   |
+>> | Debian VM, i5 6300HQ,   |           | noqueue qdisc | fq_codel qdisc |
+>> | 10M packets             |           |               |                |
+>> +-----------+-------------+-----------+---------------+----------------+
+>> | TAP       | Transmitted | 196 Kpps  | 195 Kpps      | 185 Kpps       |
+>> |           +-------------+-----------+---------------+----------------+
+>> |           | Lost        | 1618 Kpps | 1556 Kpps     | 0              |
+>> +-----------+-------------+-----------+---------------+----------------+
+>> | TAP       | Transmitted | 577 Kpps  | 582 Kpps      | 578 Kpps       |
+>> |  +        +-------------+-----------+---------------+----------------+
+>> | vhost-net | Lost        | 1170 Kpps | 1109 Kpps     | 0              |
+>> +-----------+-------------+-----------+---------------+----------------+
+>>
+>> [1] Link: https://lore.kernel.org/all/20250424085358.75d817ae@kernel.org/
+>>
+>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>> ---
+>>  drivers/net/tun.c | 31 +++++++++++++++++++++++++++++--
+>>  1 file changed, 29 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>> index 71b6981d07d7..74d7fd09e9ba 100644
+>> --- a/drivers/net/tun.c
+>> +++ b/drivers/net/tun.c
+>> @@ -1008,6 +1008,8 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+>>         struct netdev_queue *queue;
+>>         struct tun_file *tfile;
+>>         int len = skb->len;
+>> +       bool qdisc_present;
+>> +       int ret;
+>>
+>>         rcu_read_lock();
+>>         tfile = rcu_dereference(tun->tfiles[txq]);
+>> @@ -1060,13 +1062,38 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+>>
+>>         nf_reset_ct(skb);
+>>
+>> -       if (ptr_ring_produce(&tfile->tx_ring, skb)) {
+>> +       queue = netdev_get_tx_queue(dev, txq);
+>> +       qdisc_present = !qdisc_txq_has_no_queue(queue);
+>> +
+>> +       spin_lock(&tfile->tx_ring.producer_lock);
+>> +       ret = __ptr_ring_produce(&tfile->tx_ring, skb);
+>> +       if (__ptr_ring_produce_peek(&tfile->tx_ring) && qdisc_present) {
+>> +               netif_tx_stop_queue(queue);
+>> +               /* Avoid races with queue wake-up in
+>> +                * __{tun,tap}_ring_consume by waking if space is
+>> +                * available in a re-check.
+>> +                * The barrier makes sure that the stop is visible before
+>> +                * we re-check.
+>> +                */
+>> +               smp_mb__after_atomic();
+>> +               if (!__ptr_ring_produce_peek(&tfile->tx_ring))
+>> +                       netif_tx_wake_queue(queue);
+> 
+> I'm not sure I will get here, but I think those should be moved to the
+> following if(ret) check. If __ptr_ring_produce() succeed, there's no
+> need to bother with those queue stop/wake logic?
 
-As these devices are limited to 1000BaseX, a workaround is used to also
-support, in a very limited way, copper modules. This is done by
-supporting SGMII but limiting it to 1G full duplex (in which case it's
-somewhat compatible with 1000BaseX).
+There is a need for that. If __ptr_ring_produce_peek() returns -ENOSPC,
+we stop the queue proactively.
 
-Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Tested-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- drivers/net/phy/qcom/at803x.c | 77 +++++++++++++++--------------------
- 1 file changed, 32 insertions(+), 45 deletions(-)
+I believe what you are aiming for is to always stop the queue if(ret),
+which I can agree with. In that case, I would simply change the condition
+to:
 
-diff --git a/drivers/net/phy/qcom/at803x.c b/drivers/net/phy/qcom/at803x.c
-index 338acd11a9b6..2995b08bac96 100644
---- a/drivers/net/phy/qcom/at803x.c
-+++ b/drivers/net/phy/qcom/at803x.c
-@@ -20,7 +20,7 @@
- #include <linux/of.h>
- #include <linux/phylink.h>
- #include <linux/reset.h>
--#include <linux/sfp.h>
-+#include <linux/phy_port.h>
- #include <dt-bindings/net/qca-ar803x.h>
- 
- #include "qcom.h"
-@@ -769,57 +769,44 @@ static int at8031_register_regulators(struct phy_device *phydev)
- 	return 0;
- }
- 
--static int at8031_sfp_insert(void *upstream, const struct sfp_eeprom_id *id)
-+static int at803x_configure_mii(struct phy_port *port, bool enable,
-+				phy_interface_t interface)
- {
--	__ETHTOOL_DECLARE_LINK_MODE_MASK(phy_support);
--	__ETHTOOL_DECLARE_LINK_MODE_MASK(sfp_support);
--	struct phy_device *phydev = upstream;
--	const struct sfp_module_caps *caps;
--	phy_interface_t iface;
--
--	linkmode_zero(phy_support);
--	phylink_set(phy_support, 1000baseX_Full);
--	phylink_set(phy_support, 1000baseT_Full);
--	phylink_set(phy_support, Autoneg);
--	phylink_set(phy_support, Pause);
--	phylink_set(phy_support, Asym_Pause);
--
--	caps = sfp_get_module_caps(phydev->sfp_bus);
--	/* Some modules support 10G modes as well as others we support.
--	 * Mask out non-supported modes so the correct interface is picked.
--	 */
--	linkmode_and(sfp_support, phy_support, caps->link_modes);
-+	struct phy_device *phydev = port_phydev(port);
- 
--	if (linkmode_empty(sfp_support)) {
--		dev_err(&phydev->mdio.dev, "incompatible SFP module inserted\n");
--		return -EINVAL;
--	}
-+	if (interface == PHY_INTERFACE_MODE_SGMII)
-+		dev_warn(&phydev->mdio.dev,
-+			 "module may not function if 1000Base-X not supported\n");
-+
-+	return 0;
-+}
- 
--	iface = sfp_select_interface(phydev->sfp_bus, sfp_support);
-+static const struct phy_port_ops at803x_port_ops = {
-+	.configure_mii = at803x_configure_mii,
-+};
- 
--	/* Only 1000Base-X is supported by AR8031/8033 as the downstream SerDes
--	 * interface for use with SFP modules.
--	 * However, some copper modules detected as having a preferred SGMII
--	 * interface do default to and function in 1000Base-X mode, so just
--	 * print a warning and allow such modules, as they may have some chance
--	 * of working.
-+static int at8031_attach_mii_port(struct phy_device *phydev,
-+				  struct phy_port *port)
-+{
-+	linkmode_zero(port->supported);
-+	phylink_set(port->supported, 1000baseX_Full);
-+	phylink_set(port->supported, 1000baseT_Full);
-+	phylink_set(port->supported, Autoneg);
-+	phylink_set(port->supported, Pause);
-+	phylink_set(port->supported, Asym_Pause);
-+
-+	/* This device doesn't really support SGMII. However, do our best
-+	 * to be compatible with copper modules (that usually require SGMII),
-+	 * in a degraded mode as we only allow 1000BaseT Full
- 	 */
--	if (iface == PHY_INTERFACE_MODE_SGMII)
--		dev_warn(&phydev->mdio.dev, "module may not function if 1000Base-X not supported\n");
--	else if (iface != PHY_INTERFACE_MODE_1000BASEX)
--		return -EINVAL;
-+	__set_bit(PHY_INTERFACE_MODE_SGMII, port->interfaces);
-+	__set_bit(PHY_INTERFACE_MODE_1000BASEX, port->interfaces);
-+
-+	port->ops = &at803x_port_ops;
- 
- 	return 0;
- }
- 
--static const struct sfp_upstream_ops at8031_sfp_ops = {
--	.attach = phy_sfp_attach,
--	.detach = phy_sfp_detach,
--	.module_insert = at8031_sfp_insert,
--	.connect_phy = phy_sfp_connect_phy,
--	.disconnect_phy = phy_sfp_disconnect_phy,
--};
--
- static int at8031_parse_dt(struct phy_device *phydev)
- {
- 	struct device_node *node = phydev->mdio.dev.of_node;
-@@ -840,8 +827,7 @@ static int at8031_parse_dt(struct phy_device *phydev)
- 		return ret;
- 	}
- 
--	/* Only AR8031/8033 support 1000Base-X for SFP modules */
--	return phy_sfp_probe(phydev, &at8031_sfp_ops);
-+	return 0;
- }
- 
- static int at8031_probe(struct phy_device *phydev)
-@@ -1172,6 +1158,7 @@ static struct phy_driver at803x_driver[] = {
- 	.set_tunable		= at803x_set_tunable,
- 	.cable_test_start	= at8031_cable_test_start,
- 	.cable_test_get_status	= at8031_cable_test_get_status,
-+	.attach_mii_port	= at8031_attach_mii_port,
- }, {
- 	/* Qualcomm Atheros AR8032 */
- 	PHY_ID_MATCH_EXACT(ATH8032_PHY_ID),
--- 
-2.49.0
+if (qdisc_present && (ret || __ptr_ring_produce_peek(&tfile->tx_ring)))
 
+> 
+>> +       }
+>> +       spin_unlock(&tfile->tx_ring.producer_lock);
+>> +
+>> +       if (ret) {
+>> +               /* If a qdisc is attached to our virtual device,
+>> +                * returning NETDEV_TX_BUSY is allowed.
+>> +                */
+>> +               if (qdisc_present) {
+>> +                       rcu_read_unlock();
+>> +                       return NETDEV_TX_BUSY;
+>> +               }
+>>                 drop_reason = SKB_DROP_REASON_FULL_RING;
+>>                 goto drop;
+>>         }
+>>
+>>         /* dev->lltx requires to do our own update of trans_start */
+>> -       queue = netdev_get_tx_queue(dev, txq);
+>>         txq_trans_cond_update(queue);
+>>
+>>         /* Notify and wake up reader process */
+>> --
+>> 2.43.0
+>>
+> 
+> Thanks
+> 
 
