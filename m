@@ -1,120 +1,132 @@
-Return-Path: <netdev+bounces-248078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61A6ED02FDF
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 14:24:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C56F6D03017
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 14:26:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 29ED73016448
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 13:23:31 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 768A7302EF22
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 13:24:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A6A3EE4D5;
-	Thu,  8 Jan 2026 13:08:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF5D4ADDBF;
+	Thu,  8 Jan 2026 13:12:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XRMBic0G"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dn04lUtm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com [209.85.221.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E053D7271;
-	Thu,  8 Jan 2026 13:08:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEF5E4B2DE7
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 13:12:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767877710; cv=none; b=r3NOtscsckW+lD5UTJEzr9pGId18NALjs6Ts+p3R1rmD0TlDlIj0zHvuJ/0fvSs4aPw8ncCGWZ8fL/sOZejuF30XAWAhj5hx2oIx7DtjxgDZLAwWm7Ebj7DhjYkQaiKV2n4Fhz7QWiQIlVDYYnKxmrOAA+RHefTmO3jwZeqrCbU=
+	t=1767877958; cv=none; b=WZfSE2Bxt91+meNtO5DneY2ecL0nngbFEn1Jt+1DoLlbb6iIql7yJi02RZrClpNklXloZ4ay1r/ygsSZSnP/uK0QZhLPwCYKqT2TSwKlqYg2T8SkJ0cujRwshWGl/CO6iqPxeinhLk3eILU14aYDrE2ZfjDQI8R3NJxKVnUxEmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767877710; c=relaxed/simple;
-	bh=BEFqASubnMhLuZshwv8XM1o9a6Rbhxs2caSt9SThpyQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=QTOLmYLVGlIZEwdfXLzIIeJiTXBgCJNHD/X4jL9r+DCTLBM8+U7bMYbPk09zCTLJPEGWIWe6C6oW4WRTmNDUSpu5OjvxMGErVDjtL+3UlsLdjAtISJfgHHrJasE6n+b22EnLAIQSgDDtEaucwJrKJPWcC+kHFDQqtkE/Kh+Gv04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XRMBic0G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C8F6C19422;
-	Thu,  8 Jan 2026 13:08:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767877710;
-	bh=BEFqASubnMhLuZshwv8XM1o9a6Rbhxs2caSt9SThpyQ=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=XRMBic0G5unXBBKtPVKjxLP9Y21Uw1rOGHGXAdcJY+W+/4GY/AZXl7TsdSOv37RbZ
-	 61xlZT8ixVHx4g0L7GbF8oKbMcBXdHa1+IeoRUWXbiPWkRSz0ps/8caEufs/g/hbCK
-	 e8Vai3kIOSHV5bLEhiY2zY2bOZ/DBYQ/+HufR7NfR7BmbGxuvhwjPgVZl/hEw6WRIA
-	 sRmxBoImpSjAgoDKZr9nnHFIcrk26Nl614qIhniVpDlqNKzx6YcIengo4fXZfhtcnn
-	 9tSX4XKE1fv2yFOpANCggDXjuem8gpXLQRZDD95/UN6ftHrv8eq49KkKXgV7oqEgjp
-	 7PYEnxduZarrQ==
-From: Dinh Nguyen <dinguyen@kernel.org>
-Date: Thu, 08 Jan 2026 07:08:11 -0600
-Subject: [PATCH v3 3/3] dt-bindings: net: altr,socfpga-stmmac: remove TODO
- note
+	s=arc-20240116; t=1767877958; c=relaxed/simple;
+	bh=ntcSTOGdH0CKjeTZNLnC8v8dbPtkb/IHzwCftDO6npA=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=UnI6KlEB5Y67Kux/oT8fDS3U9hMJ/y/OBWNIxuT/4voPCXTVieOpHZbs2vKqLBVOPKoDiyRG9bOSGIL2KlKabuSrj+cxyBDGU+DYVH8OSiDO3C/6RVpYPbLrSAGuYwbgK+jv5G6eMaqofv9Ve0AIHZ+mkF+haXUsSgy5MTvVkcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dn04lUtm; arc=none smtp.client-ip=209.85.221.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f66.google.com with SMTP id ffacd0b85a97d-43260a5a096so2208427f8f.0
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 05:12:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767877955; x=1768482755; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:references
+         :in-reply-to:user-agent:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ntcSTOGdH0CKjeTZNLnC8v8dbPtkb/IHzwCftDO6npA=;
+        b=Dn04lUtmjxRnw732foM/u7Pcx0nfs93aaXSqvQRiMlOLkOV7bn99NEx2H8Sx76C5BA
+         3We8ibiB5zeA0D8d9dJKzuu4Uw1+9eyvl/QBJ+ivBPgW6sZxl4+Rp4PUYiEaCn84yWJZ
+         oZ7TCKk7sWhuEzF8goUxQoY+yN6H+OE2dGFIySEbrIssMCUvO6dUUP4DgPHuyB7IumCe
+         PdqXVRazRY5nPrb5qNdFt4IoRMDF2x7H+P+DibjNumrdj65XrHylus2gSroxt0MP1Sn/
+         7uIDXKrpccFlmnhg3JnTrk140KyecTkqFSS8nMBbiapPUpQSnqlRRc6JfrtICQ23NGaP
+         lDJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767877955; x=1768482755;
+        h=content-transfer-encoding:mime-version:message-id:references
+         :in-reply-to:user-agent:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ntcSTOGdH0CKjeTZNLnC8v8dbPtkb/IHzwCftDO6npA=;
+        b=N9eoWdgZIZmTKp7QEPWPajsBPzNWao/xJO33RiqI+dG3B05jYsaWE2rgjdamsm9JYr
+         luNaX2KPzl7evVSCdjDhN/EyfvlWbaGgbgXy4tqSyP//tQ6w7KWHh9Vlho2Gb45gKPWM
+         bDj45h2RU7E5pAVdlesBHdNtsF8GmuhcvjvIxLR1N4YY3F5gyKpFpQP9xEg1TEF6hQhe
+         s/fH5Ty6BzSg4mIB9U9fYGW5G2Kjs/W1FrK4y/XZwyeyOs9XGr+4QEeBs2Gaq5RGqugv
+         KD5k+cfENIsU91sQiGT9C+wMnN/jPqLOJ8RCJ4u+cliDJAkokiS8qPfBHrEwGUawGiXI
+         Ch3g==
+X-Forwarded-Encrypted: i=1; AJvYcCXjCP+FfONWWcvCPEt6ECG0jkgt9PiNb12Msu5qhGK0ZvSWKxOa6ObYt8xbMlDxFSvWpqqTNgQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxglfEVTCyPo6mkOSOqgy0hsxtzHZH0SjzGClQTy85Zp3AVAZtT
+	Vdh6jKwsSb5VfoOcY7Sd4iIMRN3kLAgAnlnO7vaQp+M+1mm8A1qhBpUg
+X-Gm-Gg: AY/fxX5zn8ih1gQOgvBSblzVPKIe7Z/qlpr7SR6EWi41SlqxoTNMfyJ8QXAmA63MyjJ
+	T69Q4sON+GiF67gBUZVQIrNG0Z2o5BfyMz0T6Gb8vr9+F9zBJvu97kL/JlAchqVT8aYAvgdgqlf
+	N/1c8Hq+Gh5SivwN2SpUmCZ8NvNwbroOoOit2t3L9C1IQEPqvvWStOvKvDfyEK33omYof0IMjNx
+	EGziaKWsFAVRvCNfHJEj1PH8kt4wk1QBrZGx/2aRlK9qmomsIfSME5j8gfRyJqyuTIF/Iqy8czC
+	Wepa/uJ3GeWdtxNoHwUFH8zJU/8rHGuuvuE3MLkrTSuJEEP6BV1DaXFGPvy/MvXVrosw3uQ+6gT
+	AkTt1nhZ3XA8RGe3Qf5dmxichxV6cGr1TqKc+8sPMJG172Hv86j91NG4Yw0LNzLz5W4RxOj6c6H
+	MdCC672e/k9mMm22qZmBmvjB6ysq+sJdgC9Q==
+X-Google-Smtp-Source: AGHT+IHJNndQhZwnGqgQG0c42iHvCrFP+LdbnfPpq29bFyRYl+i21rvWLnajXl63MsRsEx5c6KXbYg==
+X-Received: by 2002:a05:6000:2881:b0:430:fdfc:7ddf with SMTP id ffacd0b85a97d-432c37d2db0mr7902239f8f.42.1767877954882;
+        Thu, 08 Jan 2026 05:12:34 -0800 (PST)
+Received: from ehlo.thunderbird.net ([80.244.29.150])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0e175csm16273042f8f.14.2026.01.08.05.12.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 Jan 2026 05:12:34 -0800 (PST)
+Date: Thu, 08 Jan 2026 15:12:31 +0200
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+To: Slark Xiao <slark_xiao@163.com>
+CC: Loic Poulain <loic.poulain@oss.qualcomm.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Daniele Palmas <dnlplm@gmail.com>
+Subject: Re:[RFC PATCH 0/1] prevent premature device unregister via
+User-Agent: K-9 Mail for Android
+In-Reply-To: <a4d09fa.9614.19b9d445a3c.Coremail.slark_xiao@163.com>
+References: <63fddbfb.60e7.19b975c40ea.Coremail.slark_xiao@163.com> <20260108020518.27086-1-ryazanov.s.a@gmail.com> <a4d09fa.9614.19b9d445a3c.Coremail.slark_xiao@163.com>
+Message-ID: <A8D63D10-7BE1-4EA9-8020-03D69A81C750@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260108-remove_ocp-v3-3-ea0190244b4c@kernel.org>
-References: <20260108-remove_ocp-v3-0-ea0190244b4c@kernel.org>
-In-Reply-To: <20260108-remove_ocp-v3-0-ea0190244b4c@kernel.org>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Philipp Zabel <p.zabel@pengutronix.de>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Mamta Shukla <mamta.shukla@leica-geosystems.com>, 
- Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc: bsp-development.geo@leica-geosystems.com, 
- Pengutronix Kernel Team <kernel@pengutronix.de>, netdev@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- devicetree@vger.kernel.org, Dinh Nguyen <dinguyen@kernel.org>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1088; i=dinguyen@kernel.org;
- h=from:subject:message-id; bh=BEFqASubnMhLuZshwv8XM1o9a6Rbhxs2caSt9SThpyQ=;
- b=owEBbQKS/ZANAwAKARmUBAuBoyj0AcsmYgBpX6xGixoksxcAk+BFIhc7a5PDFAUf6fYBGoSrA
- QcXF26GOf6JAjMEAAEKAB0WIQSgeEx6LKTlWbBUzA0ZlAQLgaMo9AUCaV+sRgAKCRAZlAQLgaMo
- 9HqGEACCdtcSvnQAfq+6jLL6yfY2+XXhl5DnzWzojSs6HegHQ0ZbpDwfCGPrifVoSJXFmkD7nr0
- CltAAh4vut2VGb3rI9/x+5N01I14VcqhnKhiABEFf3YYyHYOi824DJ2sVosKuYycm3GRvHPqw7l
- wkxNNjK1DLhriPS0GSjbmBllVOwdtIYAi/MUFrybzDAT1eVKd0Nt6WUifwwx4GOR48aXPzXOImT
- iSGrytZczmKbxCRNR91MYOQPNpaupejVUiv+qk49e1Wvo5/zw1j2c8P+x4kbgIQ5hsI7I95CtY1
- Om6E9OJDZeEBg+fH+EYZAhwfRIueYWLKPi/LkJENvBkJxPWODdxTipNv5+tjfO3iV6PjjivYz2w
- 2sj8/XjplvBsA2a7A30BB9KLxqqcLFubf24+DoFqOmNh3pBTAoezTfZoU6NfTk+uKKTGoh5uYZ8
- D7D+HbKQ3qJ+rSbt9PX/m+uzA4FaYZsJjR9plqPHYuXRPQfW3PfkrlZzH89f9PcSNPH3OD0k6dO
- AxxEjPE/Ky/2CCNxN+NF6DStkntbtUTJkVuCZbRwZM333eIaZWMKZmgNfizBOd4w5mUhg7Qw63D
- Zm6KHOdH9e1jh8H+4ABegP6ar0SPeJbLGeIPvccBNiypKQZGMgBtF/g0tpvcKWyBXt6ccVLmyPo
- UDCLYSxQxcxiDTA==
-X-Developer-Key: i=dinguyen@kernel.org; a=openpgp;
- fpr=A0784C7A2CA4E559B054CC0D1994040B81A328F4
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The 'stmmaceth-ocp' will no longer be used as a reset-name, going forward
-and 'ahb' shall be used.
+On January 8, 2026 1:01:01 PM, Slark Xiao <slark_xiao@163=2Ecom> wrote:
+>
+>
+>At 2026-01-08 10:05:17, "Sergey Ryazanov" <ryazanov=2Es=2Ea@gmail=2Ecom> =
+wrote:
+>>Initially I was unable to hit or reproduce the issue with hwsim since it
+>>unregister the WWAN device ops as a last step effectively holding the
+>>WWAN device when all the regular WWAN ports are already removed=2E Thank=
+s
+>>to the detiled report of Daniele and the fix proposed by Loic, it became
+>>obvious what a releasing sequence leads to the crash=2E
+>>
+>>With WWAN device ops unregistration done first in hwsim, I was able to
+>>easily reproduce the WWAN device premature unregister, and develop
+>>another fix avoiding a dummy port allocation and relying on a reference
+>>counting=2E See details in the RFC patch=2E
+>>
+>>Loic, what do you think about this way of the users tracking?
+>>
+>>Slark, if you would like to go with the proposed patch, just remove the
+>>patch #7 from the series and insert the proposed patch between between
+>>#1 and #2=2E Of if you prefer, I can reassemble the whole series and sen=
+d
+>>it as RFC v5=2E
+>>
+>
+>Please help reassemble them and send it as RFC v5=2E
 
-Signed-off-by: Dinh Nguyen <dinguyen@kernel.org>
----
-v3: Addressed Rob Herring's comments and updated commit header/message
-v2: Introduced
-v1: n/a
----
- Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml | 2 --
- 1 file changed, 2 deletions(-)
+Will do it tonight=2E
 
-diff --git a/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml b/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml
-index fc445ad5a1f1a..8e7077d4319eb 100644
---- a/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml
-+++ b/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml
-@@ -13,8 +13,6 @@ description:
-   This binding describes the Altera SOCFPGA SoC implementation of the
-   Synopsys DWMAC for the Cyclone5, Arria5, Stratix10, Agilex5 and Agilex7
-   families of chips.
--  # TODO: Determine how to handle the Arria10 reset-name, stmmaceth-ocp, that
--  # does not validate against net/snps,dwmac.yaml.
- 
- select:
-   properties:
-
--- 
-2.42.0.411.g813d9a9188
-
+--
+Sergey
+Hi Slark,
 
