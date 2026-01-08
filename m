@@ -1,89 +1,89 @@
-Return-Path: <netdev+bounces-248241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 026D2D0597A
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 19:36:32 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CC3DD059AA
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 19:37:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 63BD1301EF26
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 18:36:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2519E30617C8
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 18:36:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D35A31A044;
-	Thu,  8 Jan 2026 18:36:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0579131B107;
+	Thu,  8 Jan 2026 18:36:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ddtu73kT"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hAgWGe0a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f98.google.com (mail-ot1-f98.google.com [209.85.210.98])
+Received: from mail-pf1-f225.google.com (mail-pf1-f225.google.com [209.85.210.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2FD931D362
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 18:36:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 931F531D366
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 18:36:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767897372; cv=none; b=Wm8tHRlvEHE/iuRZHG53o/o6tsLK1FI0USmNoTQxiLr980TMyXgPN9x7LL2Y+zoPmWYn1U+ngtYkrTXrkgBBpO0dn6w08SdT2qWUKLF/7Y1o2Lb8AomDy5D4ycBX3KQAArKB21WufAMxmvgrOlxCd8Rq8l/+EF8IPyuAUQo5Pmw=
+	t=1767897372; cv=none; b=j8RBlWESJdWUMzP/lQFaZvdaTgtwma32u+9ileDnR0KU9v7BijRPd+w3KyHOxxo9XTfsTDmY2YxxgGUD9NLT6oCAgkQS4fstvSv0AJu9znor4DrV7LRLy8DqL25lvZD5GmotokrHJBdSkZMfUEkZTntIkzh3Ylb/kEfvfqSvri0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1767897372; c=relaxed/simple;
-	bh=J3zCQT9KRfR6Phew64Xd6TkllgZgHPeNbAmKrWxCo1o=;
+	bh=d8EMOf8Fk1Tup6le9fvotjNBnKBtzAXIIIVRTf40mno=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DJxwYkRUGmV00gPwB1u+YXH02r6l/L1ESJ+xmEpQw9rjVsmRrLf3ztokGRIHlEjIX5qNchzRR1meC4BEOm0jM861IniP258AenY0rbhBsYKzEULMVplPP3AigjJ3kH411KuQsMtK3V6j+GWMm1W87yGmcGQ5IJIZNBXSDMxB9qQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ddtu73kT; arc=none smtp.client-ip=209.85.210.98
+	 MIME-Version; b=RxjlEk26iUu2IAErU9TC7M/A3VJrvkJugbamPrZkOC7R3Qmw7KMKcInfG1unSAu/lDDfCoL4DCyLSIrFlkR4ySST8JuhegEGhmFGl4qQUE1bIrIwX+cCwRbDZltgKAfaEzuPaOuJjKhvBqUirKWaRJQlutHExbPXxh7VY1FBv8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hAgWGe0a; arc=none smtp.client-ip=209.85.210.225
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ot1-f98.google.com with SMTP id 46e09a7af769-7c701097a75so2014187a34.3
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 10:36:10 -0800 (PST)
+Received: by mail-pf1-f225.google.com with SMTP id d2e1a72fcca58-7bab7c997eeso2681001b3a.0
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 10:36:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767897369; x=1768502169;
+        d=1e100.net; s=20230601; t=1767897371; x=1768502171;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DwzT9JMMB7mK6wX1rUx4UrG4jivBz1ByRguCNkGrzbw=;
-        b=jfRqQdrKJ4kkrzkyWGNkxT7GgbGTTY0ww1+PfHdVZKgROynFiBziLBOuzYr5E2mXrl
-         jFDDeWiYA8WEDgZS+VLjSd0eZXBmJxya/r9kMeIu/88uCwT5Ph97Ao1ynB/wB/7Y93ZQ
-         FS1NAU+jJKPMFIKtw+BJeWaxtvgUTffAWp2OPHn/IDakRKdncGNKoH2txAgeEGjyPycC
-         UfbUp2tQ9A0vJlVM2UcvZRX9XPR7D6VIWok77/h9t7gPjhDrPeXbewbatEXsi9HjYh0S
-         l1XWi+HbewspCptbIKWPnoseasmS3giPTTPrQ6ssrjSNECJOJHKLF8uUEmehGlSRhNst
-         oKnQ==
-X-Gm-Message-State: AOJu0YxuITR/JNRaZRswdAY9EphYR+zygoig0iJ8hvLKaRF/xZ0UXeyN
-	3zk5NuQ86PwNQplJGFsVdQOdzYmweL1DM/BBshvRNoWyR4D16+N6NoQcvgHfHEW4TlFcyU8+/0M
-	/Z0Tf/Ct3EpYTKsihw7mdZFSlQkhKmnENaOkBIQ3Tpyz7F5qoTE1Y8R/IRWiQHyFc8jWyXzfGtD
-	zVyRwqQQBYj9b4i1nAizlUnhJXA0GK3M/IiQ+J5wVuGJLEMVrXFVzcVL/LtCENuYPU0iRZm2K2z
-	kibt73CBIA=
-X-Gm-Gg: AY/fxX4GMeRmbSgZ0TS6ehoi/006XwVmKI+g2rTYXQ4hsPyt64lVT21eJ9QjcZnmh1i
-	FZF2j3AXMsaZ8kPCtMWNlnBGiI7hVCE7mT1EA3tnlIvK+Q4MzFCkpkpWOrAsJbDWhvuUujVkqJv
-	PYzY99WR8me4sl1Pd8z+tbbxPhzIRJP3jLEAMK1V/X88ub3M34GWo475528pbptp4Rlfxu+ZyZi
-	/SFf136VOufsPhKsnV3bMQIPIUNAYHabsKK4eXzRhUtCH/GJ/neVTUANRDu/qP7f++tBoDE7Y0U
-	lADjlBX3JDTTxx1Mg0jnA/XOZjtDmXaysPzYaH9ItNjY2nAgL5/OANjW67Iz588DZ8uUlbkgi33
-	etro5sw084i7Ir97/IiMHurjy9dRuSN7ERwuORgqls5cS9vMFpRP6OaYkErtAHeGfcZ57yZN2tU
-	zTLN+d9rclRybKZi2bKqhEcU7HmoNSxonjxrHXM+gV/nj8KYI=
-X-Google-Smtp-Source: AGHT+IGbAhY6RD0rCH8zNwN/7an4RnJ2a2OPegyxLqse6js/YkJoloDtDPlzLSvDEXs8XBOrOwQDqcO3aW9a
-X-Received: by 2002:a05:6830:3c1:b0:7b2:aba7:f4e with SMTP id 46e09a7af769-7ce508cea6emr3614875a34.10.1767897369442;
-        Thu, 08 Jan 2026 10:36:09 -0800 (PST)
+        bh=jBQ9TacjFBzOWlhuKZ/poG0odYuVvSSj8qpZjEFXk6g=;
+        b=Dm5Tsl11FZH5v0V6/HNppslWM66xUgcsYzOtJok5poNj6qPF/Yyn1i4maawA2qN8oo
+         DoJZmmNBp1tgLQ43fFiwrxmCgcmxWBqQRFlgYUATE0wVKiHjdZHF6yoE++OhOy1DMPWk
+         OzrNZc1jtOj91ZsR8w35nrmjt+l3fz52CzSXkCj1sGMIEHU66p4DTBfdVC3kaZIQhT2t
+         1iFYTdO6X6tHAxFfPFt1N8QWzlCk6ellIWf9wtmWCd3YCQq0AomaIUcf+faLY80tC186
+         MDtk4/WPdUw5v5UmUc/ogMEL3nZ7VW7re37yy7nnn81xxt+GSVa7C67TmxtRPUjuTsc9
+         SGtQ==
+X-Gm-Message-State: AOJu0YxBGZFeTW9PYHfot36JYBeeJzoHYVeuCv1MC/2YBKe9H7ibEtso
+	hIxsgUlyMRPnri+BEXIKVALTwKCS8TDWPCIBPm5zRddNfi2lT3ENsYWIZCKohNSudhiw07CitWB
+	8fw716WRVYZIJiMA8g0JQDqW6K1XUK9kRBzS+MN2MkqvGA8dihFzyKQQeZot3MhXYNyWp21D6oh
+	WB7USw9SOm55uCZYqP/zrjANoFYHOt8MuAGUoA0chRLPulDshqtOYW0hMCk3iK1XRHqJJHWMqrv
+	S2GojpcYZQ=
+X-Gm-Gg: AY/fxX5Huuyo3SZw1LnnJltS409HwMz2gkyf+tRhG/uiBtdKqIJGBeG3xG20nEJe/rA
+	tKuVPWCA4itAXNHmOL6Z5KnH74Iv+p9SYLPgKxVH4S3KEPoIV5HvoR0chN8vX8zpk3Rk7EJiTmA
+	4jexUjcfZdGowQ3nOcv+eTMGuUZVG+JRfVXmw+e+1LWv7FkZBjoP6EcZVAp9Max3DJVE8q7Lx0F
+	yMLIycrIaPNmZpngaaRnoMIwCHyyW2XUyAiR0Khu1nXM543BZZKDRDvKgpU3GvdfEJFwv78v6s9
+	YZ5SsB0ZqZUSnXUyYNgQjzqQj86w/r6l1EQHm4HN7hVSS9BN5ejNYcs86302Ixg704RcnjhhwxU
+	ebYKm1RgC8Wz1DPjElG30kSydrktcW2JJLAJsA7Mabyt0BzmsGPaTsnPlatwYE1IBtFENVnpP2p
+	tPxaRp56YDSHgd8uV3d47LRNGVEyBYXzSA2lsHVEj7Ytl5f+I=
+X-Google-Smtp-Source: AGHT+IFQgER4pADO3YOOrjY24jQCq9n7ipmRkzSgaZ0vroAahSs8AbjTVvAeWY1V4K140lEr3v2AFl0yJ5+b
+X-Received: by 2002:a17:90a:d40d:b0:340:bfcd:6af8 with SMTP id 98e67ed59e1d1-34f68b4c624mr6905740a91.4.1767897370850;
+        Thu, 08 Jan 2026 10:36:10 -0800 (PST)
 Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-116.dlp.protect.broadcom.com. [144.49.247.116])
-        by smtp-relay.gmail.com with ESMTPS id 46e09a7af769-7ce47802f1bsm1139467a34.2.2026.01.08.10.36.09
+        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-34f6367c7c5sm928497a91.3.2026.01.08.10.36.10
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 08 Jan 2026 10:36:09 -0800 (PST)
+        Thu, 08 Jan 2026 10:36:10 -0800 (PST)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-4ed7591799eso80503161cf.0
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 10:36:08 -0800 (PST)
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-88a2cff375bso81611816d6.1
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 10:36:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1767897368; x=1768502168; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1767897369; x=1768502169; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DwzT9JMMB7mK6wX1rUx4UrG4jivBz1ByRguCNkGrzbw=;
-        b=ddtu73kTu2Nx6zYSSULObx3meb3HVqykcKcBan8RIExU1Oex8nZfN+fIgURgXQtVSc
-         Ni6h47se/FDgByZjwsyi9tsRF+Aji+tIEA8DV4Z0jhCyELQR9UQUsprCiLE+FkoY5Dsr
-         WJZKa6N7ari+QE6/T5GTCZuTyf+ILeZzSZmwM=
-X-Received: by 2002:a05:622a:40cc:b0:4ee:4709:4c38 with SMTP id d75a77b69052e-4ffb4b5b232mr94464171cf.80.1767897367706;
-        Thu, 08 Jan 2026 10:36:07 -0800 (PST)
-X-Received: by 2002:a05:622a:40cc:b0:4ee:4709:4c38 with SMTP id d75a77b69052e-4ffb4b5b232mr94463721cf.80.1767897367164;
-        Thu, 08 Jan 2026 10:36:07 -0800 (PST)
+        bh=jBQ9TacjFBzOWlhuKZ/poG0odYuVvSSj8qpZjEFXk6g=;
+        b=hAgWGe0a1NMEXXW4kGqyg+KHbOoXvWSessdmWgWbulxawLDrYULLsEp7NGb29RfTcp
+         smg3uJwt+hAq+nGJ/C19ia81Xxituf3zNYC9gyk3ZTgb+51DObC2Z2xvi/46qssSkNh1
+         QcKj2nkZT1lcw97252wXdzNe38bQ0zWsO2o84=
+X-Received: by 2002:ad4:5fcf:0:b0:888:4939:c29 with SMTP id 6a1803df08f44-89084337fa3mr90203076d6.71.1767897369438;
+        Thu, 08 Jan 2026 10:36:09 -0800 (PST)
+X-Received: by 2002:ad4:5fcf:0:b0:888:4939:c29 with SMTP id 6a1803df08f44-89084337fa3mr90202746d6.71.1767897369005;
+        Thu, 08 Jan 2026 10:36:09 -0800 (PST)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ffc17c2897sm15973721cf.32.2026.01.08.10.36.05
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ffc17c2897sm15973721cf.32.2026.01.08.10.36.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 10:36:06 -0800 (PST)
+        Thu, 08 Jan 2026 10:36:08 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -93,12 +93,11 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com,
-	Hongguang Gao <hongguang.gao@broadcom.com>,
-	Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: [PATCH net-next v2 3/6] bnxt_en: Add support for FEC bin histograms
-Date: Thu,  8 Jan 2026 10:35:18 -0800
-Message-ID: <20260108183521.215610-4-michael.chan@broadcom.com>
+	Somnath Kotur <somnath.kotur@broadcom.com>,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Subject: [PATCH net-next v2 4/6] bnxt_en: Defrag the NVRAM region when resizing UPDATE region fails
+Date: Thu,  8 Jan 2026 10:35:19 -0800
+Message-ID: <20260108183521.215610-5-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.45.4
 In-Reply-To: <20260108183521.215610-1-michael.chan@broadcom.com>
 References: <20260108183521.215610-1-michael.chan@broadcom.com>
@@ -111,100 +110,82 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-Fill in the struct ethtool_fec_hist passed to the bnxt_get_fec_stats()
-callback if the FW supports the feature.  Bins 0 to 15 inclusive are
-available when the feature is supported.
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
 
-Reviewed-by: Hongguang Gao <hongguang.gao@broadcom.com>
-Reviewed-by: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+When updating to a new firmware pkg, the driver checks if the UPDATE
+region is big enough for the pkg and if it's not big enough, it
+issues an NVM_WRITE cmd to update with the requested size.
+
+This NVM_WRITE cmd can fail indicating fragmented region. Currently
+the driver fails the fw update when this happens. We can improve the
+situation by defragmenting the region and try the NVM_WRITE cmd
+again. This will make firmware update more reliable.
+
+Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  1 +
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 51 +++++++++++++++++++
- 2 files changed, 52 insertions(+)
+v2: Simplify the do-while loop.
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 08d9adf52ec6..2a2d172fa6ed 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -2704,6 +2704,7 @@ struct bnxt {
- #define BNXT_PHY_FL_NO_PFC		(PORT_PHY_QCAPS_RESP_FLAGS2_PFC_UNSUPPORTED << 8)
- #define BNXT_PHY_FL_BANK_SEL		(PORT_PHY_QCAPS_RESP_FLAGS2_BANK_ADDR_SUPPORTED << 8)
- #define BNXT_PHY_FL_SPEEDS2		(PORT_PHY_QCAPS_RESP_FLAGS2_SPEEDS2_SUPPORTED << 8)
-+#define BNXT_PHY_FL_FDRSTATS		(PORT_PHY_QCAPS_RESP_FLAGS2_FDRSTAT_CMD_SUPPORTED << 8)
- 
- 	/* copied from flags in hwrm_port_mac_qcaps_output */
- 	u8			mac_flags;
+v1: https://lore.kernel.org/netdev/20260105215833.46125-5-michael.chan@broadcom.com/
+---
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 32 +++++++++++++++++--
+ 1 file changed, 29 insertions(+), 3 deletions(-)
+
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 068e191ede19..af4ceb6d2158 100644
+index af4ceb6d2158..4dfae7b61c76 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -3216,6 +3216,56 @@ static int bnxt_get_fecparam(struct net_device *dev,
- 	return 0;
- }
+@@ -3848,9 +3848,25 @@ static int nvm_update_err_to_stderr(struct net_device *dev, u8 result,
+ #define BNXT_NVM_MORE_FLAG	(cpu_to_le16(NVM_MODIFY_REQ_FLAGS_BATCH_MODE))
+ #define BNXT_NVM_LAST_FLAG	(cpu_to_le16(NVM_MODIFY_REQ_FLAGS_BATCH_LAST))
  
-+static const struct ethtool_fec_hist_range bnxt_fec_ranges[] = {
-+	{ 0, 0},
-+	{ 1, 1},
-+	{ 2, 2},
-+	{ 3, 3},
-+	{ 4, 4},
-+	{ 5, 5},
-+	{ 6, 6},
-+	{ 7, 7},
-+	{ 8, 8},
-+	{ 9, 9},
-+	{ 10, 10},
-+	{ 11, 11},
-+	{ 12, 12},
-+	{ 13, 13},
-+	{ 14, 14},
-+	{ 15, 15},
-+	{ 0, 0},
-+};
-+
-+static void bnxt_hwrm_port_phy_fdrstat(struct bnxt *bp,
-+				       struct ethtool_fec_hist *hist)
++static int bnxt_hwrm_nvm_defrag(struct bnxt *bp)
 +{
-+	struct ethtool_fec_hist_value *values = hist->values;
-+	struct hwrm_port_phy_fdrstat_output *resp;
-+	struct hwrm_port_phy_fdrstat_input *req;
-+	int rc, i;
++	struct hwrm_nvm_defrag_input *req;
++	int rc;
 +
-+	if (!(bp->phy_flags & BNXT_PHY_FL_FDRSTATS))
-+		return;
-+
-+	rc = hwrm_req_init(bp, req, HWRM_PORT_PHY_FDRSTAT);
++	rc = hwrm_req_init(bp, req, HWRM_NVM_DEFRAG);
 +	if (rc)
-+		return;
++		return rc;
++	req->flags = cpu_to_le32(NVM_DEFRAG_REQ_FLAGS_DEFRAG);
++	hwrm_req_timeout(bp, req, bp->hwrm_cmd_max_timeout);
 +
-+	req->port_id = cpu_to_le16(bp->pf.port_id);
-+	req->ops = cpu_to_le16(PORT_PHY_FDRSTAT_REQ_OPS_COUNTER);
-+	resp = hwrm_req_hold(bp, req);
-+	rc = hwrm_req_send(bp, req);
-+	if (!rc) {
-+		hist->ranges = bnxt_fec_ranges;
-+		for (i = 0; i <= 15; i++) {
-+			__le64 sum = resp->accumulated_codewords_err_s[i];
-+
-+			values[i].sum = le64_to_cpu(sum);
-+		}
-+	}
-+	hwrm_req_drop(bp, req);
++	return hwrm_req_send(bp, req);
 +}
 +
- static void bnxt_get_fec_stats(struct net_device *dev,
- 			       struct ethtool_fec_stats *fec_stats,
- 			       struct ethtool_fec_hist *hist)
-@@ -3237,6 +3287,7 @@ static void bnxt_get_fec_stats(struct net_device *dev,
- 		*(rx + BNXT_RX_STATS_EXT_OFFSET(rx_fec_corrected_blocks));
- 	fec_stats->uncorrectable_blocks.total =
- 		*(rx + BNXT_RX_STATS_EXT_OFFSET(rx_fec_uncorrectable_blocks));
-+	bnxt_hwrm_port_phy_fdrstat(bp, hist);
- }
+ static int bnxt_resize_update_entry(struct net_device *dev, size_t fw_size,
+ 				    struct netlink_ext_ack *extack)
+ {
++	struct bnxt *bp = netdev_priv(dev);
++	bool retry = false;
+ 	u32 item_len;
+ 	int rc;
  
- static u32 bnxt_ethtool_forced_fec_to_fw(struct bnxt_link_info *link_info,
+@@ -3863,9 +3879,19 @@ static int bnxt_resize_update_entry(struct net_device *dev, size_t fw_size,
+ 	}
+ 
+ 	if (fw_size > item_len) {
+-		rc = bnxt_flash_nvram(dev, BNX_DIR_TYPE_UPDATE,
+-				      BNX_DIR_ORDINAL_FIRST, 0, 1,
+-				      round_up(fw_size, 4096), NULL, 0);
++		do {
++			rc = bnxt_flash_nvram(dev, BNX_DIR_TYPE_UPDATE,
++					      BNX_DIR_ORDINAL_FIRST, 0, 1,
++					      round_up(fw_size, 4096), NULL,
++					      0);
++
++			if (rc == -ENOSPC) {
++				if (retry || bnxt_hwrm_nvm_defrag(bp))
++					break;
++				retry = true;
++			}
++		} while (rc == -ENOSPC);
++
+ 		if (rc) {
+ 			BNXT_NVM_ERR_MSG(dev, extack, MSG_RESIZE_UPDATE_ERR);
+ 			return rc;
 -- 
 2.51.0
 
