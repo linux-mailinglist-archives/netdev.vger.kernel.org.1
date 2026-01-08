@@ -1,344 +1,171 @@
-Return-Path: <netdev+bounces-248267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89F32D062C5
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 21:54:26 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76D20D064A4
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 22:25:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ABD173014BFD
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 20:53:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5C8DA30C4467
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 21:20:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFCA233120E;
-	Thu,  8 Jan 2026 20:53:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6907337B8E;
+	Thu,  8 Jan 2026 21:19:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lxe8eozA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K5/ZjS4w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D79330D27
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 20:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBF6833AD9D
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 21:19:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767905631; cv=none; b=bcea0+A+/Otg8qwTf1A104ibJCsUSdhrdV6tii3BcWGH1hv2OBAMW2Xj8ChlmSWIqVLe4NxHVODR4Nb90FMNbyqClNgqDq78Uoa9la3crN9tO9fK2g7D9gmMhgSAQKx02nbY5BxIcvh4fxjny5Fv17Bd7sUQgVW/49jHiQsA9Zo=
+	t=1767907157; cv=none; b=aZ0k6MPvPpwZAidoLtG5yo76stB+WiJgkCMOFKVTA8FzX/temlu9su/UfxSFFimqSm0ZO67W2tBtnrud/LUl29fkBps3qW8y07WKfoZM7T7K0mbGkySTYMZ+hNKvBNW8YpABRl1zImG2HfturwVBuX0TwvNCUkHUhZlMMy9qoSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767905631; c=relaxed/simple;
-	bh=afGOrrG253csa3uqEgPmIydOfBGWfK5KtcXw5MNo1rs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HSx9pgCIq8Q4qIk8efPJX4Yl+RfMMHnYReYxCDQmC61g9e05Kz678R6dfJBCBSXUlTM7sZKlIPR8JYI5IOcGlloY49/6JuiLS0KoKZnPnI7WZ9tMNNjgBtnMMkEHW0skDD1gf0sScidqbNAz86qOOF0pP6omn288sK5s3QtHXIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lxe8eozA; arc=none smtp.client-ip=209.85.214.180
+	s=arc-20240116; t=1767907157; c=relaxed/simple;
+	bh=k6NcCumQIYmHLhnier8TovJJC9eePQklBhANrhDv5hc=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=pNvQnCZByOIWRjSPm1rbTbOZ5nfHEOoKXydCI06d9T4NuyOfWfZB74C5y5p5R23wzc6eqKHZEozrk1qV5Gj0mzEtG/LDchjdV+OanldgCwIvcM72JADnpy2qrftrPL91FvLeCY/aG0GDuFSFGZ3192eaj7MHTDSNiZR6RFiBDcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K5/ZjS4w; arc=none smtp.client-ip=74.125.224.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2a0c20ee83dso34087905ad.2
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 12:53:50 -0800 (PST)
+Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-6446d7a8eadso3252415d50.0
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 13:19:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767905630; x=1768510430; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1767907147; x=1768511947; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hgesYXUyjhKCm1S8hcZ/z6okb8iz6ntq+8D27jGAgrg=;
-        b=lxe8eozAGyl5Rq42+5MONGZZ14Z4t6MESExnzFKwxJIOPvc/+V2Af0Dg8Yfi4I0VSJ
-         xPxHs2hVJa8gUNMxdptGKFlidgcouWPq27uehwOPCGAxbrb7bvnM7fKNjWYI1vCNdcq+
-         PLsWeSoQqYClZnOPBFRu4WUpTH4jkw0mfSU9CXx8nCuc9HR/0IM8e5cIELeJO/YJn68j
-         Sy660zIWbziZIIUz7IaGyAm06dpO5c/MH7NDV/0A4tN31LmBstX/81qF5b5eE175t9E3
-         070c/dLqw3mbXhxWmtRcBlpCA5zyCxVxjSpwCWe7kCAU8O7IiHqXOrR5UsplUxiY2Gwp
-         qOqg==
+        bh=qI1VhtNrnA7RTvn7H2k3tlOEJnVIKIkj9Gp5W7JbRSY=;
+        b=K5/ZjS4w57wo3sF4MAwUxMLPaXKrPcpXMwm2GERmutKYYSoSnPbr3ByDpB8auQvzd8
+         WbhSG5jcQmD7dkruk0HqNs/iILDTGV8SWjilf7+kjSr7A2LdVrEq2FXVn5roERipKeG6
+         sNytiZS3PAz0Djfs/aSRG022AU9Y4i9W1VajL3ikkVp8tHO2/ZLlcw+UnXwWGCEx3QHM
+         hIerBjVfxYa73cNCqqi2fTAJyBijySW8roCWuUDvgdrS75qX8pKJUaLgmt/NQVfp7CyC
+         bMustaFQe8FphZDMcmHlT+fOjYcillShO1Ls4r7F3+/j5wxoOdQSF3UgkActz1/E6Ior
+         sRFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767905630; x=1768510430;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=hgesYXUyjhKCm1S8hcZ/z6okb8iz6ntq+8D27jGAgrg=;
-        b=A2ROiNtbKJD18u0yE3MKYnFVkdwalfqq2e1JmZftqra479zzO8g66ICFEKy4DkJTwE
-         hLAZQlM0ZKRBrDLf8WpqdbLmwMA+ilJp0y1JVbexhcbjsemlDumy8TlxkL3FW/Y6R++X
-         sdJvisDHlBvXsUMS6vYYU4aQItql5TMWJzCMtdd3/lcCwmgpoiVFHK7Yzl1dqoz2t32b
-         DYezKZmNvAMuE5GJaVKq1pwXvYxF5kwrAz+8AOHkq3QlMRj/j7khKbHsB/kCf2MXvCMX
-         OiIS9rJ9LlVKzZUrSDH+ItLgXLNlSPoIdmhUX9hP2UIDJm9fQpCVG5ZyPOJo6zQdv4Cd
-         Js7Q==
-X-Gm-Message-State: AOJu0YxHA+QUTq7Ok/9y/5LAf7VrAgpYixpvwWRD3j3Gd1nbxgIYYt2B
-	y2QSuv7X/rLIhnq2VwhrmWDwdobbDcZZLW+8RuuqosopEiEydF3gGK8reiHzIo+yibdV32XLtvD
-	/PBvXAIngGAufV+O+Vhr4r49abdVThz49Tl/zd7k=
-X-Gm-Gg: AY/fxX6Ct3QesgKTN4H4iWMHfFc/wNAxl+lPnFpMVHOo0uH2ByXVtprkMhOofkGtAq4
-	WWV1TqNFdn1BYUeWOlDenoLM1jEg787X6r5mWA49hKfvsLyBtTCfnpWGmgvLzOMo6MmgnVO2xYn
-	CWYwWRuX7tzdtAhvPeXZwMKKZ+//o1wKTx9L3gaqSnxrE7wLroFGID8BaDtb7f5QzooCOe5ZS++
-	PCOOY8FV/jzI5XS7qOHbkFmQ1nypDYeHnjgsuvz3cZmE65VCC1IOX6z+3Ruqn84L+oHEiw=
-X-Google-Smtp-Source: AGHT+IFk1ypv6jabTKOGj053mvHy6pQjoeZ8W93H4EnhnTN6KTWCb6KqVmNC2vLwYthuOLwNH1ShsE8Bh1+hydXD/2Y=
-X-Received: by 2002:a17:903:2f4e:b0:2a1:388c:ca63 with SMTP id
- d9443c01a7336-2a3ee48ab8bmr70727175ad.31.1767905629684; Thu, 08 Jan 2026
- 12:53:49 -0800 (PST)
+        d=1e100.net; s=20230601; t=1767907147; x=1768511947;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qI1VhtNrnA7RTvn7H2k3tlOEJnVIKIkj9Gp5W7JbRSY=;
+        b=rF5UEx6OsMuDffCDFMY1GJ8cE/XYJC9zRfOOr5wLlj+bW5/czF/zBnyXLkor5aeQlg
+         2Wo0wQHBSoE9WIkro8XG+Lglkdu8Wg/Vdu8D6CifkosbInJ7QQ2hTywDzzXXrzLadBok
+         xeWAomdeWiOK7z2xW4+czcpmB7aqn8JuM/Qkt8enRB1VHVtuWpqpPPcE+T5PmFZT9C5t
+         cwhAKzYCpZC1bnLkpBT+yIqJ7FsEwO73dASHalbyoiCLgE1IOVt+UDtUE1v0eMSE7z1q
+         q9c0JhwJWKt2Euq4hNiGmc1nuAhW4+6lLtREGP0Jm8ZlpGcIvCpnxLI75Dw4G1ZJmIuE
+         cX9w==
+X-Forwarded-Encrypted: i=1; AJvYcCXANZBqb3mbxeJqhF4tcyXVj9HEDTNYVxlR+pKKHvMWHgkm/WDT0VGjm1mNq44bm8/aqVe0SPI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHQmw1+jmAgWLHzuwrdFK4JVLG1vEWroplT9FlhPaGAjCLwj6e
+	I5/r/zX6J2LWLbCSBUWYk2DIhAPDLlP4eX+GZqv7O2cyoio01sDTFOw1
+X-Gm-Gg: AY/fxX6kGrKh4QW5PxcIHeau7kpnN2LxAzTdCyFgkcyC2K6S1DxlES2pJ8ciJ7b9goX
+	lh29EnrIE+l6ZKw9PzFXsRYRgOLo3CBLIivvRLHUdINC49Hsrc5qgfmyNFVHbnf6Dq/dM7al080
+	bLTaZkYyiNFoCxuNbV7S6mMW5JS38yozNR28LZphTSlfNZyTkaCPoaqRgvZWspD+zGzl8+f1xRA
+	HLjzPJiLng3pNwo7iLW/lyZBt5Jb1ZJ4iHvxXlkr37rmk6CX65WatroVio8Lzo6t4fXf4f6RP0o
+	TBuxuTZd6KkuFI0Ule8ODACXcT4sHoFnObpE9rofnG4GsmG05bo7iRgBoNtRI3Qhidi5H5JPgUH
+	qwHbmdog+Sfrdjea/3bEbT81ry+Fdpdf85d50t3JAzN9ydIR4u6+DQBs0qgKe7ntm31v9HEtn5G
+	ISnCQW/ps2DUqeHhh61WPQm5K15im9b5kGpuhAziYSq8cBorkLCc5rwLEZeak=
+X-Google-Smtp-Source: AGHT+IH7UD35QW4lgUsFaITiEyiFxguR5hhMhmv/pY1+GMMAQREUogRSqcZeWJ8s6M/OjEGc8Af7Xw==
+X-Received: by 2002:a05:690e:1286:b0:644:1c42:37a3 with SMTP id 956f58d0204a3-64716c4ff8emr6294238d50.65.1767907147355;
+        Thu, 08 Jan 2026 13:19:07 -0800 (PST)
+Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-790aa670b16sm33617767b3.35.2026.01.08.13.19.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jan 2026 13:19:06 -0800 (PST)
+Date: Thu, 08 Jan 2026 16:19:06 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Willem de Bruijn <willemb@google.com>, 
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Message-ID: <willemdebruijn.kernel.13946c10e0d90@gmail.com>
+In-Reply-To: <20260108123845.7868cec4@kernel.org>
+References: <20260107110521.1aab55e9@kernel.org>
+ <willemdebruijn.kernel.276cd2b2b0063@gmail.com>
+ <20260107192511.23d8e404@kernel.org>
+ <20260108080646.14fb7d95@kernel.org>
+ <willemdebruijn.kernel.58a32e438c@gmail.com>
+ <20260108123845.7868cec4@kernel.org>
+Subject: Re: [TEST] txtimestamp.sh pains after netdev foundation migration
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <cover.1767621882.git.lucien.xin@gmail.com> <1e642f7c65ec53934bb05f95c5cf206648c7de9f.1767621882.git.lucien.xin@gmail.com>
- <5cb27e9f-ec01-4b50-b22c-dc8b027827bc@redhat.com> <CADvbK_eXRpT8n1B7p2-1T6eAZZ=4p7gQgJtMGBBQrHa036nyxw@mail.gmail.com>
-In-Reply-To: <CADvbK_eXRpT8n1B7p2-1T6eAZZ=4p7gQgJtMGBBQrHa036nyxw@mail.gmail.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 8 Jan 2026 15:53:38 -0500
-X-Gm-Features: AQt7F2prUwiesd57XIG5R5Kpud_5P3QAJ44UiznNwVa7X7NXC1X7eS6-WB_wefg
-Message-ID: <CADvbK_dEbOvdaMB4jGkaQMO7j0CnnpYUYJXmS-eKxmURybG09w@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 06/16] quic: add stream management
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
-	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
-	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
-	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 8, 2026 at 3:29=E2=80=AFPM Xin Long <lucien.xin@gmail.com> wrot=
-e:
->
-> On Thu, Jan 8, 2026 at 10:36=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> w=
-rote:
-> >
-> > On 1/5/26 3:04 PM, Xin Long wrote:
-> > > +/* Create and register new streams for sending or receiving. */
-> > > +static struct quic_stream *quic_stream_create(struct quic_stream_tab=
-le *streams,
-> > > +                                           s64 max_stream_id, bool s=
-end, bool is_serv)
-> > > +{
-> > > +     struct quic_stream_limits *limits =3D &streams->send;
-> > > +     struct quic_stream *stream =3D NULL;
-> > > +     gfp_t gfp =3D GFP_KERNEL_ACCOUNT;
-> > > +     s64 stream_id;
-> > > +
-> > > +     if (!send) {
-> > > +             limits =3D &streams->recv;
-> > > +             gfp =3D GFP_ATOMIC | __GFP_ACCOUNT;
-> > > +     }
-> > > +     stream_id =3D limits->next_bidi_stream_id;
-> > > +     if (quic_stream_id_uni(max_stream_id))
-> > > +             stream_id =3D limits->next_uni_stream_id;
-> > > +
-> > > +     /* rfc9000#section-2.1: A stream ID that is used out of order r=
-esults in all streams
-> > > +      * of that type with lower-numbered stream IDs also being opene=
-d.
-> > > +      */
-> > > +     while (stream_id <=3D max_stream_id) {
-> > > +             stream =3D kzalloc(sizeof(*stream), gfp);
-> > > +             if (!stream)
-> > > +                     return NULL;
-> >
-> > Do you need to release the allocated ids in case of failure? It would b=
-e
-> > sourprising to find some ids allocated when this call fails/returns NUL=
-L.
-> I was aware of this, but didn't change it. As the streams are always open=
-ed
-> sequentially, I think it's fine just to leave them without causing proble=
-ms
-> when users assume these streams are not yet open.
->
-> >
-> > > +
-> > > +             stream->id =3D stream_id;
-> > > +             if (quic_stream_id_uni(stream_id)) {
-> > > +                     if (send) {
-> > > +                             stream->send.max_bytes =3D limits->max_=
-stream_data_uni;
-> > > +                     } else {
-> > > +                             stream->recv.max_bytes =3D limits->max_=
-stream_data_uni;
-> > > +                             stream->recv.window =3D stream->recv.ma=
-x_bytes;
-> > > +                     }
-> > > +                     /* Streams must be opened sequentially. Update =
-the next stream ID so the
-> > > +                      * correct starting point is known if an out-of=
--order open is requested.
-> > > +                      */
-> > > +                     limits->next_uni_stream_id =3D stream_id + QUIC=
-_STREAM_ID_STEP;
-> > > +                     limits->streams_uni++;
-> > > +
-> > > +                     quic_stream_add(streams, stream);
-> > > +                     stream_id +=3D QUIC_STREAM_ID_STEP;
-> > > +                     continue;
-> > > +             }
-> > > +
-> > > +             if (quic_stream_id_local(stream_id, is_serv)) {
-> > > +                     stream->send.max_bytes =3D streams->send.max_st=
-ream_data_bidi_remote;
-> > > +                     stream->recv.max_bytes =3D streams->recv.max_st=
-ream_data_bidi_local;
-> > > +             } else {
-> > > +                     stream->send.max_bytes =3D streams->send.max_st=
-ream_data_bidi_local;
-> > > +                     stream->recv.max_bytes =3D streams->recv.max_st=
-ream_data_bidi_remote;
-> > > +             }
-> > > +             stream->recv.window =3D stream->recv.max_bytes;
-> > > +
-> > > +             limits->next_bidi_stream_id =3D stream_id + QUIC_STREAM=
-_ID_STEP;
-> > > +             limits->streams_bidi++;
-> > > +
-> > > +             quic_stream_add(streams, stream);
-> > > +             stream_id +=3D QUIC_STREAM_ID_STEP;
-> > > +     }
-> > > +     return stream;
-> > > +}
-> > > +
-> > > +/* Check if a send or receive stream ID is already closed. */
-> > > +static bool quic_stream_id_closed(struct quic_stream_table *streams,=
- s64 stream_id, bool send)
-> > > +{
-> > > +     struct quic_stream_limits *limits =3D send ? &streams->send : &=
-streams->recv;
-> > > +
-> > > +     if (quic_stream_id_uni(stream_id))
-> > > +             return stream_id < limits->next_uni_stream_id;
-> > > +     return stream_id < limits->next_bidi_stream_id;
-> >
-> > I can't recall if I mentioned the following in a past review... it look=
-s
-> > like the above assumes wrap around are not possible, which is realistic
-> > given the u64 counters - it would require > 100y on a server allocating
-> > 4G ids per second.
-> >
-> > But it would be nice to explcitly document such assumption somewhere.
-> >
-> How about I add a simple comment in quic_stream_create() right above
-> the next_uni_stream_id/streams_uni increases, like
->
-> "Note overflow of next_uni_stream_id/streams_uni is impossible with u64."
->
-> > > +}
-> > > +
-> > > +/* Check if a stream ID would exceed local (recv) or peer (send) lim=
-its. */
-> > > +bool quic_stream_id_exceeds(struct quic_stream_table *streams, s64 s=
-tream_id, bool send)
-> > > +{
-> > > +     u64 nstreams;
-> > > +
-> > > +     if (!send) {
-> > > +             if (quic_stream_id_uni(stream_id))
-> > > +                     return stream_id > streams->recv.max_uni_stream=
-_id;
-> > > +             return stream_id > streams->recv.max_bidi_stream_id;
-> > > +     }
-> > > +
-> > > +     if (quic_stream_id_uni(stream_id)) {
-> > > +             if (stream_id > streams->send.max_uni_stream_id)
-> > > +                     return true;
-> > > +             stream_id -=3D streams->send.next_uni_stream_id;
-> > > +             nstreams =3D quic_stream_id_to_streams(stream_id);
-> >
-> > It's not clear to me why send streams only have this additional check.
-> This is a good question.
->
-> For recv.max_uni_stream_id, it changes based on next_uni/bidi_stream_id,
-> max_streams_uni/bidi and streams_uni/bidi in quic_stream_max_streams_upda=
-te(),
-> there's no need to check them again. (maybe I should leave a comment here=
-)
->
-> But for send.max_uni_stream_id, it was updated simply from the peer's upd=
-ated
-> recv.max_uni_stream_id announcement, it must check its local counts and
-> limits as well.
->
-> >
-> > > +             return nstreams + streams->send.streams_uni > streams->=
-send./;
-> >
-> > Possibly it would be more consistent
-> >
-> > max_uni_stream_id -> max_stream_ids_uni
-> >
-> > (no strong preferences)
-> I actually got the variable name from
-> https://datatracker.ietf.org/doc/html/rfc9000.
->
-Sorry, I may misunderstand here. from the variable names:
-- max_uni_stream_id: is a stream_id
-- max_stream_ids_uni: should be a stream_id counter.
+Jakub Kicinski wrote:
+> On Thu, 08 Jan 2026 14:02:15 -0500 Willem de Bruijn wrote:
+> > Increasing tolerance should work.
+> > 
+> > The current values are pragmatic choices to be so low as to minimize
+> > total test runtime, but high enough to avoid flakes. Well..
+> > 
+> > If increasing tolerance, we also need to increase the time the test
+> > waits for all notifications to arrive, cfg_sleep_usec.
+> 
+> To be clear the theory is that we got scheduled out between taking the
+> USR timestamp and sending the packet. But once the packet is in the
+> kernel it seems to flow, so AFAIU cfg_sleep_usec can remain untouched.
+> 
+> Thinking about it more - maybe what blocks us is the print? Maybe under
+> vng there's a non-trivial chance that a print to stderr ends up
+> blocking on serial and schedules us out? I mean maybe we should:
+> 
+> diff --git a/tools/testing/selftests/net/txtimestamp.c b/tools/testing/selftests/net/txtimestamp.c
+> index abcec47ec2e6..e2273fdff495 100644
+> --- a/tools/testing/selftests/net/txtimestamp.c
+> +++ b/tools/testing/selftests/net/txtimestamp.c
+> @@ -207,12 +207,10 @@ static void __print_timestamp(const char *name, struct timespec *cur,
+>         fprintf(stderr, "\n");
+>  }
+>  
+> -static void print_timestamp_usr(void)
+> +static void record_timestamp_usr(void)
+>  {
+>         if (clock_gettime(CLOCK_REALTIME, &ts_usr))
+>                 error(1, errno, "clock_gettime");
+> -
+> -       __print_timestamp("  USR", &ts_usr, 0, 0);
+>  }
+>  
+>  static void check_timestamp_usr(void)
+> @@ -636,8 +634,6 @@ static void do_test(int family, unsigned int report_opt)
+>                         fill_header_udp(buf + off, family == PF_INET);
+>                 }
+>  
+> -               print_timestamp_usr();
+> -
+>                 iov.iov_base = buf;
+>                 iov.iov_len = total_len;
+>  
+> @@ -692,10 +688,14 @@ static void do_test(int family, unsigned int report_opt)
+>  
+>                 }
+>  
+> +               record_timestamp_usr();
+>                 val = sendmsg(fd, &msg, 0);
+>                 if (val != total_len)
+>                         error(1, errno, "send");
+>  
+> +               /* Avoid I/O between taking ts_usr and sendmsg() */
+> +               __print_timestamp("  USR", &ts_usr, 0, 0);
+> +
+>                 check_timestamp_usr();
+>  
+>                 /* wait for all errors to be queued, else ACKs arrive OOO */
 
-max_uni_stream_id =3D quic_stream_id_to_streams(max_stream_ids_uni);
-max_stream_ids_uni =3D quic_stream_streams_to_id(max_uni_stream_id)
+Definitely worth including.
 
-I used max_uni_stream_id, as in most places it's used to check against
-stream_id.
+Could it be helpful to schedule at RR or FIFO prio. Depends on the
+reason for descheduling. And it only affects priority within the VM.
 
-Thanks.
+I'm having trouble reproducing it in vng both locally and on 
+netdev-virt.
 
-> >
-> > > +     }
-> > > +
-> > > +     if (stream_id > streams->send.max_bidi_stream_id)
-> > > +             return true;
-> > > +     stream_id -=3D streams->send.next_bidi_stream_id;
-> > > +     nstreams =3D quic_stream_id_to_streams(stream_id);
-> > > +     return nstreams + streams->send.streams_bidi > streams->send.ma=
-x_streams_bidi;
-> > > +}
-> >
-> > [...]
-> > > +/* Get or create a receive stream by ID. Requires sock lock held. */
-> > > +struct quic_stream *quic_stream_recv_get(struct quic_stream_table *s=
-treams, s64 stream_id,
-> > > +                                      bool is_serv)
-> > > +{
-> > > +     struct quic_stream *stream;
-> > > +
-> > > +     if (!quic_stream_id_valid(stream_id, is_serv, false))
-> > > +             return ERR_PTR(-EINVAL);
-> > > +
-> > > +     stream =3D quic_stream_find(streams, stream_id);
-> > > +     if (stream)
-> > > +             return stream;
-> > > +
-> > > +     if (quic_stream_id_local(stream_id, is_serv)) {
-> > > +             if (quic_stream_id_closed(streams, stream_id, true))
-> > > +                     return ERR_PTR(-ENOSTR);
-> > > +             return ERR_PTR(-EINVAL);
-> > > +     }
-> > > +
-> > > +     if (quic_stream_id_closed(streams, stream_id, false))
-> > > +             return ERR_PTR(-ENOSTR);
-> > > +
-> > > +     if (quic_stream_id_exceeds(streams, stream_id, false))
-> > > +             return ERR_PTR(-EAGAIN);
-> > > +
-> > > +     stream =3D quic_stream_create(streams, stream_id, false, is_ser=
-v);
-> > > +     if (!stream)
-> > > +             return ERR_PTR(-ENOSTR);
-> > > +     if (quic_stream_id_valid(stream_id, is_serv, true))
-> > > +             streams->send.active_stream_id =3D stream_id;
-> >
-> > This function is really similar to quic_stream_send_get(), I think it
-> > should be easy factor out a common helper (and possibly use directly
-> > such helper with no send/recv wrapper).
-> >
-> I will factor out a common helper quic_stream_get() but keep
-> quic_stream_send_get/put() as:
->
-> struct quic_stream *quic_stream_send_get(...)
-> {
->         return quic_stream_get(streams, stream_id, is_serv, true);
-> }
->
-> struct quic_stream *quic_stream_recv_get(...)
-> {
->         return quic_stream_get(streams, stream_id, is_serv, false);
-> }
->
-> Thanks.
+At this point, an initial obviously correct patch and observe how
+much that mitigates the issue is likely the fastest way forward.
 
