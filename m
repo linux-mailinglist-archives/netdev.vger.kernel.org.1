@@ -1,122 +1,133 @@
-Return-Path: <netdev+bounces-248172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FB04D047F6
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:44:34 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85029D04A06
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 18:01:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 24767300FEE7
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:43:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0EC7D30712E7
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:54:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 474122DB7B0;
-	Thu,  8 Jan 2026 16:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9749E2F6900;
+	Thu,  8 Jan 2026 16:53:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="loIgkrCC"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="o6ybf19F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2611F0E25
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 16:43:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DDF62DC792;
+	Thu,  8 Jan 2026 16:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767890613; cv=none; b=sMHLLdQiFK7DM9L07HnOFB9V2Ep3LY0Jixf9Aqcx1fX8ybLmPoojmQFZrppC88iU9LAlBRBtNn7zJBb1tbmXBL3gRGm9KqrIFvkqMPmWtfGgTjLYGoCIzRNx4Wgr7DuO2x80DYA3/oU07RLUayv1xBXEMZ8a7Fr2Rs9k+pfaTQE=
+	t=1767891228; cv=none; b=HQnDexXtm5vBZY+HC/Ot2vxjFNEImcWuuT/aIThMnKXpMwGjzi6cqqnw2t25upHXSZ9drUpbOnWiEqAqEOSPM10zvFU1bIHl3ZArNvwDx0E/k0G2oS6joItCmbUD6mIwFXDiXaBR9z7Kyfn4IV38rjKiVwgPRHvDMk9MTe1ueLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767890613; c=relaxed/simple;
-	bh=xQACEz7s6jNsl7Ho1erfv2YqZYDG7xydPJ65zVcRSrE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l+kiG96sbg3DqJt4RXkDhU0F1pJsrnirYbHLdP0K8Cgv56KFTQe5Cd4vGJtXyjdCfPJOy9fWnEOHUqsLJiUVf67L9DhJYYdzL/nAMX/Erbd6AOwVELbfry2Lc6rN2HloW9Q/2cc37RcdRV5f1n57v+KSzPglaFvNDLhll+vad/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=loIgkrCC; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-59b6d5bd575so2609217e87.1
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 08:43:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767890609; x=1768495409; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JdAeBL88xoS7UgCWkb4s+7iYieB6s8NwPA6lyDMFM6g=;
-        b=loIgkrCCHM4cplJSOxW06yHVMAVUVmHBv/KVeehTXs4MKHhSzHyrEbMit4wUuXD3MJ
-         U+QBy+4sFLo4m8YUtj8gFIObI0hRCMxgE0xnfZTR27enRq2D7ODub2eSkjjOUV+4Du55
-         R3SAGTs6VpiqATKjQ6vbx25M6m2hruVgwSRVPgC2Mmoo1LKSoDAAtcg62ACPN4KnqvMM
-         M+eKkY+oaBrNBgB1h5UrEQQi95FKfmnhZPYED/mCb6jqhEFe2CqnfmCRXsTe7eZ4Bjf3
-         30tchWOzzRCOzTcI9/Dll7zZoWaNgnidIgZrVIf8D1W2qde1sQ64Ohx8bTzb1Ejk9P1a
-         BbfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767890609; x=1768495409;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JdAeBL88xoS7UgCWkb4s+7iYieB6s8NwPA6lyDMFM6g=;
-        b=Rx7pEi2gRJ3/LlIdBkBohKr5H6SgghsdDtP7n9jPMQFkbZ6yIl+z1O0BeNm2KC5ynJ
-         SCH9jVjBFZPfU7pWk9e7iJoaediubDVqs9to2vzrroiQxiBLgVqGdsU2Q+VDTPTqtCEg
-         elIdE+X0KtmukdHM2wz6817KVRyXuc+CihsmnwXKDv8K5gpTGnHT876B0TH0HnV3JU2D
-         vwHMtAXhz9+v6zjwR5hhT+yC/yJ2VI83yG8eSXsspOfLT0UrP9lg8dAMv1T2/RPzvXCa
-         xKzLNTyDkObBvaRxYyoafKaggFVyhEQulKS3HZKqzdl35Q6tqkZWLPX6ZHLif9JE2/LB
-         WziA==
-X-Gm-Message-State: AOJu0YyFMWQjj0bKIXxOXjXKiFA2tYFZGbkwYWn/YgKgQmTA+WVPXrxL
-	t16J+29VmeXC83dUdP2vtZIPwDpVKimgnOpzPwuWMRIEN+swc3oQGCM=
-X-Gm-Gg: AY/fxX7OUIDxjnJc5qPANOw0soJI/tDRavG6lydWLXRjRV4ZTvKTgr68fRoyqBjSpHx
-	CqtnrPz7VLd1Ebe4mdf1Q9YzVGFc9v8owEJk1yPYnm/iMu2YeTz5hjH6m/6y8STF0Nu2ZbQAv6p
-	aKelEzF6bzAFU8s+RBaOsE9YrVpfi75dI8QIyqekgECPSHlj+XVSvyG1YsEdEpQ05SEibzfKQmK
-	k0r/Zz94XvGdYlZlz2bNxT2l71C3+FjHc/9Dv1jdBRHLf9L0BRUyITR8DQeWquDYuEifvUme2Cz
-	a+LkEX8OUnKYw0pEC/s1uBfoXUUnVFMmDdDKQgRO9K0Xz2aZAX7ClUroElGQLite08qg0PSMjKt
-	OjlovNylGmlHv/JPHiRLBIkzarUeVl3dBh6GtRyNuavfOPepsBR0hTy/2eRmqe+H8mva7MzRPiP
-	QlCHH4aKrzP1QJ
-X-Google-Smtp-Source: AGHT+IFjvtk15WSd3WCRk/DAvZL8axgifBdzNQmKitYRNxaQKrvtp3LD/hQAfVAGOKVG8WSIPTTbEw==
-X-Received: by 2002:a05:6512:15a4:b0:59b:7942:227a with SMTP id 2adb3069b0e04-59b79422343mr714210e87.24.1767890608259;
-        Thu, 08 Jan 2026 08:43:28 -0800 (PST)
-Received: from DESKTOP-BKIPFGN ([45.43.86.16])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59b792cf330sm470942e87.102.2026.01.08.08.43.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 08:43:27 -0800 (PST)
-From: Kery Qi <qikeyu2017@gmail.com>
-To: vburru@marvell.com
-Cc: netdev@vger.kernel.org,
-	Kery Qi <qikeyu2017@gmail.com>
-Subject: [PATCH] net: octeon_ep_vf: fix free_irq dev_id mismatch in IRQ rollback
-Date: Fri,  9 Jan 2026 00:42:57 +0800
-Message-ID: <20260108164256.1749-2-qikeyu2017@gmail.com>
-X-Mailer: git-send-email 2.50.1.windows.1
+	s=arc-20240116; t=1767891228; c=relaxed/simple;
+	bh=H6ZzK5qb8nWtFLSe4fdBJd3Sr6s7l07yqSi7M31fQTU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ewQnuSUfY7sWw/fd/aj+F93tCqDIhQfmm56/A4R2i97eCdPB491G0wFmQrLyCEXg+JTA240kTYDlroM+81sxRxUNgXDebTmVUCI/dvGHhhs4G3FQbuAj3DN7S6dYtsGkc4dZXhSxuifcd0mPcGtdUIU5lBy7WTDrDKaynmpCFks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=o6ybf19F; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=3siOpUNTPvOetSwU3kkXTXaIQvHOmBaMe0L2dosaTxU=; b=o6ybf19FQhA2/H0eXyYAWhtYCg
+	E8J7QNNibSepM+CpqXDcjTCEXSDmnR7+vAORpbZk4kTZVsegRNEgFkFKinfF9y0Z2M4cnpsdnuDzL
+	I2rpUSBEqhBNs9pXdH3OOo7nj6AT4CkgeTF8RlYKVLskcyCD3aEgYDT3wNANa9m+a3ws=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vdtGL-001zEW-Ds; Thu, 08 Jan 2026 17:53:29 +0100
+Date: Thu, 8 Jan 2026 17:53:29 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH net-next v22 02/14] net: ethtool: Introduce
+ ETHTOOL_LINK_MEDIUM_* values
+Message-ID: <b8da3ec2-0775-4d81-8867-4993325a1e6c@lunn.ch>
+References: <20260108080041.553250-1-maxime.chevallier@bootlin.com>
+ <20260108080041.553250-3-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260108080041.553250-3-maxime.chevallier@bootlin.com>
 
-octep_vf_request_irqs() requests MSI-X queue IRQs with dev_id set to
-ioq_vector. If request_irq() fails part-way, the rollback loop calls
-free_irq() with dev_id set to 'oct', which does not match the original
-dev_id and may leave the irqaction registered.
+On Thu, Jan 08, 2026 at 09:00:27AM +0100, Maxime Chevallier wrote:
+> In an effort to have a better representation of Ethernet ports,
+> introduce enumeration values representing the various ethernet Mediums.
+> 
+> This is part of the 802.3 naming convention, for example :
+> 
+> 1000 Base T 4
+>  |    |   | |
+>  |    |   | \_ pairs (4)
+>  |    |   \___ Medium (T == Twisted Copper Pairs)
+>  |    \_______ Baseband transmission
+>  \____________ Speed
+> 
+>  Other example :
+> 
+> 10000 Base K X 4
+>            | | \_ lanes (4)
+>            | \___ encoding (BaseX is 8b/10b while BaseR is 66b/64b)
+>            \_____ Medium (K is backplane ethernet)
+> 
+> In the case of representing a physical port, only the medium and number
+> of pairs should be relevant. One exception would be 1000BaseX, which is
+> currently also used as a medium in what appears to be any of 1000BaseSX,
+> 1000BaseCX, 1000BaseLX, 1000BaseEX, 1000BaseBX10 and some other.
+> 
+> This was reflected in the mediums associated with the 1000BaseX linkmode.
+> 
+> These mediums are set in the net/ethtool/common.c lookup table that
+> maintains a list of all linkmodes with their number of pairs, medium,
+> encoding, speed and duplex.
+> 
+> One notable exception to this is 100BaseT Ethernet. It emcompasses 100BaseTX,
+> which is a 2-pairs protocol but also 100BaseT4, that will also work on 4-pairs
+> cables. As we don't make a disctinction between these,  the lookup table
+> contains 2 sets of pair numbers, indicating the min number of pairs for a
+> protocol to work and the "nominal" number of pairs as well.
+> 
+> Another set of exceptions are linkmodes such 100000baseLR4_ER4, where
+> the same link mode seems to represent 100GBaseLR4 and 100GBaseER4. The
+> macro __DEFINE_LINK_MODE_PARAMS_MEDIUMS is here used to populate the
+> .mediums bitfield with all appropriate mediums.
+> 
+> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-This can keep IRQ handlers alive while ioq_vector is later freed during
-unwind/teardown, leading to a use-after-free or crash when an interrupt
-fires.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Fix the error path to free IRQs with the same ioq_vector dev_id used
-during request_irq().
-
-Fixes: 1cd3b407977c ("octeon_ep_vf: add Tx/Rx processing and interrupt support")
-Signed-off-by: Kery Qi <qikeyu2017@gmail.com>
----
- drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
-index 420c3f4cf741..1d9760b4b8f4 100644
---- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
-@@ -218,7 +218,7 @@ static int octep_vf_request_irqs(struct octep_vf_device *oct)
- ioq_irq_err:
- 	while (i) {
- 		--i;
--		free_irq(oct->msix_entries[i].vector, oct);
-+		free_irq(oct->msix_entries[i].vector, oct->ioq_vector[i]);
- 	}
- 	return -1;
- }
--- 
-2.34.1
-
+    Andrew
 
