@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-248171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64E45D0513F
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 18:39:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BF9AD052C8
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 18:49:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6ED583219E69
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:43:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6323A3148992
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:53:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD8372DB781;
-	Thu,  8 Jan 2026 16:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59F6E2DFA25;
+	Thu,  8 Jan 2026 16:53:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VWUC7Dqo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oC2ZuIzD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C652DA75B;
-	Thu,  8 Jan 2026 16:43:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34ECD2DE715;
+	Thu,  8 Jan 2026 16:53:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767890610; cv=none; b=F/TW5CuJ+mhJUDhzUgXHaDbUIy5uNtqyVafZKyafl7dcoF3LyndGH3pFA7KY1tIt8eK5JhoxQYofGlXYphcpeZQWKJOn2gedsCGBNWH7yGNr6GR7P0AJvlmZ9HZFc6tq6KVz4cYpszJsRjL2JjqEYJdLCW8fdixJ9Wuya+dFknU=
+	t=1767891221; cv=none; b=bH/fLz30oESprmtRWkDwHGh6hT+geGa4njomE0FZS9uYCaP2xFhogMGcR49MJBIXyaK95TkPVg3E8czcOB5O3E0loQh6uyN2Vp8witAdE1dpp6cxGDr+fUQoIU8JXt8/7ZPckhNmm66CeFv59NhXW7UaL8TI96Ki3kRigHMoIw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767890610; c=relaxed/simple;
-	bh=5epKMpOb+l/EFgcm7Vcn5gz1FO+42Bit832PgR6kcHw=;
+	s=arc-20240116; t=1767891221; c=relaxed/simple;
+	bh=Ts1muOavFyR+CMHHmy7O619iAFPJ2dNHocafgCAzdyU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RxmfPs3RHhI7H2SqQA0Vly0DzHvl0DO3xwEzRFevfdOHeoVHwySPaOPraHTO1kD7VIPj8wcpatdlcpBy1Ot9GT31+qTOKHwfU5NsNP/4vK5Eo7NHsVO3M9ft7z4M3y8i3czkD0xWhK8b/4nnFEBsylvkiTCj3pCfmraLwj7GV3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VWUC7Dqo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C308C116C6;
-	Thu,  8 Jan 2026 16:43:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=UtCdWqSfmNIBRsYZvAB7gvGDj4531y21nUuagwERl+YqdYeeU9X3ett0VS7Y7Gi+wlLNtTdqnvB+prGkyB3YyFUHy7mKabQdAE4EGrBlA+geGkqj2DmJlCavzWNBVirGkIE9GE+sTopR9XLnNb2JKDefwmOT7bJB0r9JH3RHkbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oC2ZuIzD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7F73C16AAE;
+	Thu,  8 Jan 2026 16:53:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767890609;
-	bh=5epKMpOb+l/EFgcm7Vcn5gz1FO+42Bit832PgR6kcHw=;
+	s=k20201202; t=1767891220;
+	bh=Ts1muOavFyR+CMHHmy7O619iAFPJ2dNHocafgCAzdyU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VWUC7DqozPvifhhNrDZ2gcqXFvjjjhkQdFAuT9onLmonDcLNNU6+4G0SE/4XCB2oV
-	 v/j2R8frVYPuC4dKZRmpTDlnLjufYcSENIKgErjdC6fnpbsLW8vlbtTOpiN8dRNFHo
-	 i0JoIUW81jE63PRzC5l8cA55v0i81KI8S9L/a0AJcvJZgltmgWvbnTForZKdB7Xdlv
-	 wuCCT0j0odn1uJ+CVqfS2VAB4IJnoK7F6cemnGHuKEyhsmQi1NfwTkrqE3QmvCQG2j
-	 Cs14OQq+1D5Kj7hF89os27vnPw/LDvIvZImmq8uhZ1lsHxnxKz6yUrKVlDGtTNtBjt
-	 TS4FHQWkQypOg==
+	b=oC2ZuIzDea1axb/98d94uctnpbSOk115fA3s62Gr60yxUBsc7Idz6oQnTsO1/VTZB
+	 CstsA7v8ty5ZZ0g1AC9/+SADz5llHU03y1AGhAlxIB5V0PFnZbi35aSubydsn5YnS7
+	 tPq+bIl3d42XtoYM3UOXlwitEFvgShONOrmOZcciwWh02K2CmVJGUjfB9dAMZdC4/m
+	 DoM7jq6Hqx+57hOIt7VhNKujpKmCGqVcXsyJ5fSyHNYub1upHsOBZlFKMvzC5l1JKX
+	 VMuA4iuEG96Q27faxEb+9vzw4MVVnqv/zC/aGy2gDs33RlkibulocFcbPPILuF12vm
+	 cPmSwaDIYJP+Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3BA7F3A54A35;
-	Thu,  8 Jan 2026 16:40:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 78C783A54A3D;
+	Thu,  8 Jan 2026 16:50:18 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,38 +50,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: 3com: 3c59x: fix possible null dereference in
- vortex_probe1()
+Subject: Re: [GIT PULL] wireless-2026-01-08
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176789040604.3712290.6082999624158344701.git-patchwork-notify@kernel.org>
-Date: Thu, 08 Jan 2026 16:40:06 +0000
-References: <20260106094731.25819-2-fourier.thomas@gmail.com>
-In-Reply-To: <20260106094731.25819-2-fourier.thomas@gmail.com>
-To: Thomas Fourier <fourier.thomas@gmail.com>
-Cc: stable@vger.kernel.org, klassert@kernel.org, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mingo@kernel.org, tglx@linutronix.de, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <176789101729.3716059.6759131308217908715.git-patchwork-notify@kernel.org>
+Date: Thu, 08 Jan 2026 16:50:17 +0000
+References: <20260108140141.139687-3-johannes@sipsolutions.net>
+In-Reply-To: <20260108140141.139687-3-johannes@sipsolutions.net>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This pull request was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  6 Jan 2026 10:47:21 +0100 you wrote:
-> pdev can be null and free_ring: can be called in 1297 with a null
-> pdev.
+On Thu,  8 Jan 2026 15:01:23 +0100 you wrote:
+> Hi,
 > 
-> Fixes: 55c82617c3e8 ("3c59x: convert to generic DMA API")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
+> After the holidays and all we don't seem to have that
+> much yet, but I've collected what we have for now.
+> 
+> Please pull and let us know if there's any problem.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: 3com: 3c59x: fix possible null dereference in vortex_probe1()
-    https://git.kernel.org/netdev/net/c/a4e305ed60f7
+  - [GIT,PULL] wireless-2026-01-08
+    https://git.kernel.org/netdev/net/c/804809ae4085
 
 You are awesome, thank you!
 -- 
