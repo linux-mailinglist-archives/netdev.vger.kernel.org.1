@@ -1,146 +1,133 @@
-Return-Path: <netdev+bounces-248189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B97F7D04FBF
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 18:32:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA6D8D04EFD
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 18:26:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 36DA833A813F
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:58:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DC3EE33E5278
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 17:01:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEC642E7F3A;
-	Thu,  8 Jan 2026 16:58:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B68A2328B65;
+	Thu,  8 Jan 2026 16:59:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DRW1BX6J"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="glfExQLs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF5E92DC792
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 16:58:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E83F9328247;
+	Thu,  8 Jan 2026 16:59:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767891514; cv=none; b=BRnGL4CnVBZo0h/e/Z3fcJip9ijG5HP4XlyBVJCirRTKuETgAwGht9unlvIlVJZeSpCrQTS0VUx67LD/0dh8XBCCWg2ZKDEmeT+m+yyYA7YeaS+froeTqe54jK3UoZNgxqaJClJ767d2Jqfx1w3J4mlmjkJAr2m3jKNVQ1rlvh0=
+	t=1767891564; cv=none; b=LR1UZG/CBf6bPFTkJwS9cn4gK7gzwl5kOm3uRd5FG17oRTdZ982FdCOhedTdUCAucjPXH7eEI8PVuswB9w1SS2cRo8L/dcqs/xcovEgyOrWURpg9uzd08/1bLGOZYpLsk2iFo57HSapySIv/qF+3Ulrvmcw0VvlXN3HDAhRKdZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767891514; c=relaxed/simple;
-	bh=MVTzGXbScex35TzesGDsimq24WTvc4nqhQnvv4OBy3M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BxT0SmRRLCUxxSQiJwEvCY2zqvgfaOyOIb2cfEIayzjAndf5Va7H0pVKxA+RkzJTa6Hb48h2qwFKU/SJA/1RWQnysKO6pSm61uu31mOQxtttS6DN0NiaBrxquIy5olFwi+T8sxZN++NB/vGc9l4o8FAXz46xOKCh7pxq6K7TggU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DRW1BX6J; arc=none smtp.client-ip=209.85.215.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-bc0d7255434so1632716a12.0
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 08:58:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767891511; x=1768496311; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fIpmw3TbxuFac2rr3Ral/5NrCqmxWN0HTMSbOEZp4Sw=;
-        b=DRW1BX6JIl5KubVDEoi/bLzYViOSOuIQB0Vqt8HDE5tY6ut+XRnck3d83XoYziHEWu
-         vsnFlKF8tnjlsR4iMiiQ5Yly3nkCI4NmBeDGHtVL7JEqU6WPBrkV8t1uPK64vvsQB38V
-         +D4Jon6ClRLavjf9AUDqo2bC1/BkRljIVizM16sKo7IG53+6kGsSZ7v7bjLfr7wimtTO
-         d/gnZfOU0cY+RYznJS7mMDVJuecDDyTZkRMoSQLzCMC9D+LF3xHIz8NQNfD8o6CebUif
-         tG1LvV5GlCHid6lIoWV5Rkz2oJs4XDQ87n+NWzwl0nOCFha1gtWniaV0MT/uhZDGvrA8
-         BhmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767891511; x=1768496311;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=fIpmw3TbxuFac2rr3Ral/5NrCqmxWN0HTMSbOEZp4Sw=;
-        b=OcLvhjMYZRGpBObOsCDXlldafUgI/NJGq0jNuqr9Wy/FcRlv8b8zugJHyC8e+CDMuc
-         lw37obuhmn6lo+QPx2CyA3SDwrhfalPne+AzlZyx255uE10IkmZqfi0+Yv7EHyB+gQKF
-         eTTgEOGpW5Ga4qS0cbrhxeT6hHOZptbmce0PAYsZvnXsqutcPsQPs5g3YhjnWKQtPv7t
-         Ao9uB4a7MkkLi3zEJdJGlIhPEOgsBaLL3sPrze0DzlaQKpk/Yj9S1YdA7D+zk6pCagKr
-         j7GkarH4rODtgDqxdtgk8aJhrepPy4xsYE8jWajnsiSnhp/lQIz2ha4KgtPzdcKhI4Fa
-         wfjg==
-X-Gm-Message-State: AOJu0YxJb6hhuGw53HynZgCtGMHIHdHNdlzWHSlLt5RwIZSnRQte7hXu
-	0VbVtBe+HRqXtXHvdxgjR7rqIqmqRWKqwhXDBM3P6qTpvp5DOpaa5HXtlcfTDiFCc/JRwEy5i3P
-	r/h/UjrLnyksuTNUIxL/B7LQomLQipvg=
-X-Gm-Gg: AY/fxX58Q7Eq/fNAqEWQ343/nJyYJ3lxNPEhc8OFQWyZttBw5KbmOPG06TiLezj1uMH
-	lzYcZwI8C2xx8kICsxPq3ykxfKZ6yfa8hvL+3fFv3lNjpCo0XlvKRB5DxOk716CiRl2030sSsS/
-	uQusmlHuGIEz8MfjQYuDeGVl1dEK6cU6Sv21+nczsF0KbmK+UmpK5pBPYyOcPjZNnATGUyg+r4d
-	9VPSgD/PspY6+i9QJB/RiuYAuLm2aEZSZ+jnozWzgiqqzo16vGu3G2nCIiAeiSlzLr4le0FY+gH
-	pzCob2Tf4OtUYI7f3/lfIzuvCEAY
-X-Google-Smtp-Source: AGHT+IHULotT7XFOA4hDBTUJBhfsHPefC4PlHzU1kuHvxYpkrgCp4pB0H1Sx2VpJWUGOCosSRzEF1Th10/Eb/PAqOAk=
-X-Received: by 2002:a17:903:1a6f:b0:2a3:ee53:d201 with SMTP id
- d9443c01a7336-2a3ee53d218mr72769795ad.12.1767891510843; Thu, 08 Jan 2026
- 08:58:30 -0800 (PST)
+	s=arc-20240116; t=1767891564; c=relaxed/simple;
+	bh=XzZZXjdtvOICb4xYlhqyG/RZmZePmoROzaSn75hfqto=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A6oDxSW4dgoHL1Cvm11Rbi8Zn9MJj65sYOjbKWzNTkcy757wLknMEXstgCDTo8okiOPdqfvRZIVwXnQJHTi/bF9Uf8o7BavEZQZA+hw5XCBdqv3VjkultgEXWxGVc8pw62R8ESX6Qba89JjhPb35UBQuXIDcQME6rh1+uhKg5a4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=glfExQLs; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=uQf5+PqsoN/BZz1kHM8KDEKsf5OhkvBgMB2wQzEFpJI=; b=glfExQLsR0hZ4sRZ6CiLG573SM
+	wBfOXMbUFFxOZY0aGirZkoLAPPLhb7Uy2OCOlhjO8QuWzJy2/NrAYmRaGRLcpQzTNpMwGI/O8zgCS
+	s6c7DAwdGU1XdQgDQPPuzKaT5+tzcufSpp6+sW1oJzTinQtTqpaGtsvYsKtnqCJ886RA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vdtLq-001zJe-M6; Thu, 08 Jan 2026 17:59:10 +0100
+Date: Thu, 8 Jan 2026 17:59:10 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH net-next v22 03/14] net: phy: Introduce PHY ports
+ representation
+Message-ID: <aa13419e-2e4e-4e26-ba35-54d640a49815@lunn.ch>
+References: <20260108080041.553250-1-maxime.chevallier@bootlin.com>
+ <20260108080041.553250-4-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1767621882.git.lucien.xin@gmail.com> <f891d87f585b028c2994b4f57712504e6c39b1b5.1767621882.git.lucien.xin@gmail.com>
- <6c8a1f56-16ed-482f-a9a8-ac840a7aebd3@redhat.com>
-In-Reply-To: <6c8a1f56-16ed-482f-a9a8-ac840a7aebd3@redhat.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 8 Jan 2026 11:58:18 -0500
-X-Gm-Features: AQt7F2r2eahRmpC-isaCgnTPZ3EtB5uQT5Ead8hHYSoe5kUDYAgbUFOe0Uminug
-Message-ID: <CADvbK_d_3cF63zM6cJv0Oc5XB7ntaZozzbu4K+xmM2jaS7Jshg@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 03/16] quic: provide common utilities and data structures
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
-	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
-	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
-	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260108080041.553250-4-maxime.chevallier@bootlin.com>
 
-On Thu, Jan 8, 2026 at 9:45=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> On 1/5/26 3:04 PM, Xin Long wrote:
-> > +/* Check whether 'd2' is equal to any element inside the list 'd1'.
-> > + *
-> > + * 'd1' is assumed to be a sequence of length-prefixed elements. Each =
-element
-> > + * is compared to 'd2' using 'quic_data_cmp()'.
-> > + *
-> > + * Returns 1 if a match is found, 0 otherwise.
-> > + */
-> > +int quic_data_has(struct quic_data *d1, struct quic_data *d2)
-> > +{
-> > +     struct quic_data d;
-> > +     u64 length;
-> > +     u32 len;
-> > +     u8 *p;
-> > +
-> > +     for (p =3D d1->data, len =3D d1->len; len; len -=3D length, p +=
-=3D length) {
-> > +             quic_get_int(&p, &len, &length, 1);
-> > +             quic_data(&d, p, length);
-> > +             if (!quic_data_cmp(&d, d2))
-> > +                     return 1;
->
-> AI review found something likely relevant here:
->
-> """
-> Can this cause an integer underflow?  When 'length' (read from the data)
-> is greater than the remaining 'len', the subtraction 'len -=3D length' wi=
-ll
-> wrap the u32 to a very large value, causing out-of-bounds memory access.
->
-> Compare with quic_data_to_string() which validates: 'len < length'.
->
-> The same issue exists in quic_data_match() below.
-> """
-AI seems right. I will change it to:
+On Thu, Jan 08, 2026 at 09:00:28AM +0100, Maxime Chevallier wrote:
+> Ethernet provides a wide variety of layer 1 protocols and standards for
+> data transmission. The front-facing ports of an interface have their own
+> complexity and configurability.
+> 
+> Introduce a representation of these front-facing ports. The current code
+> is minimalistic and only support ports controlled by PHY devices, but
+> the plan is to extend that to SFP as well as raw Ethernet MACs that
+> don't use PHY devices.
+> 
+> This minimal port representation allows describing the media and number
+> of pairs of a BaseT port. From that information, we can derive the
+> linkmodes usable on the port, which can be used to limit the
+> capabilities of an interface.
+> 
+> For now, the port pairs and medium is derived from devicetree, defined
+> by the PHY driver, or populated with default values (as we assume that
+> all PHYs expose at least one port).
+> 
+> The typical example is 100M ethernet. 100BaseTX works using only 2
+> pairs on a Cat 5 cables. However, in the situation where a 10/100/1000
+> capable PHY is wired to its RJ45 port through 2 pairs only, we have no
+> way of detecting that. The "max-speed" DT property can be used, but a
+> more accurate representation can be used :
+> 
+> mdi {
+> 	connector-0 {
+> 		media = "BaseT";
+> 		pairs = <2>;
+> 	};
+> };
+> 
+> >From that information, we can derive the max speed reachable on the
+> port.
+> 
+> Another benefit of having that is to avoid vendor-specific DT properties
+> (micrel,fiber-mode or ti,fiber-mode).
+> 
+> This basic representation is meant to be expanded, by the introduction
+> of port ops, userspace listing of ports, and support for multi-port
+> devices.
+> 
+> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-                if (!quic_get_int(&p, &len, &length, 1) || len < length)
-                        return 0;
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Thanks.
+    Andrew
 
