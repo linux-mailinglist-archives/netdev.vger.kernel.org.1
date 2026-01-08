@@ -1,57 +1,70 @@
-Return-Path: <netdev+bounces-248124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33DE8D03AB1
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 16:08:54 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30AEAD04174
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 16:57:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8B29F301053B
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:08:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1D0E431621FD
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:39:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B34AF248861;
-	Thu,  8 Jan 2026 15:07:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FE363033D2;
+	Thu,  8 Jan 2026 15:17:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kiih61/M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q/pe9NNM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ECE4242935
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 15:07:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FFB9212FB9;
+	Thu,  8 Jan 2026 15:17:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767884851; cv=none; b=IW7c5ZP6mBC4a408AOaVc17FSYp0JXjVPnErbEGC0+KZLNFCjomtOjrDLjh8C8unuXWsO15ei+JQTzMYiW7EJGpkLiZouAoQ7Oj0luFrlLZNCa8/NSedbw1CnAFkAvZMD2aMfqXixlzYH4x0wQrqxksUOcqw43R8wyeaI1zES0U=
+	t=1767885425; cv=none; b=txrYIR2SmieGqZSzCSELfxkbC6bhdm49Oz/TSvWm9Rkl0Ko5zhTIQua5yvpDzz/2bxbmm9iwCQMddVU1WQt+4r63Pf7X+z4BUUdN7lXGxNjNREXHxzGXNpvDDqWJwSFWkFwWpbObeyJAmqixFPByiAnTnzsOPVMPNU+Qw/bcOyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767884851; c=relaxed/simple;
-	bh=rVjW+7g08CsaF8/U5C2AIau2HipugOJgIASXicUAEIg=;
+	s=arc-20240116; t=1767885425; c=relaxed/simple;
+	bh=f0CvU2tIQVYrHZLwRGFpAIZTZzQEZlmsLyp505OcoT8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ao3dKIUbrysNW47oj27sE/fkKehJ5jezA2o0J83W+1JPOXt/diO8+fjjSkamc6ogxNJKrDgROxMDGDzU+qHdP37WvwfodkAtIaMmD7lnU6jZKQvvp0EmkB0dCJByWvn68ytadQhV/IT6WHSLV6tWo1ZjFVyhEoC1goAYGirQsCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kiih61/M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A09CEC116C6;
-	Thu,  8 Jan 2026 15:07:30 +0000 (UTC)
+	 MIME-Version:Content-Type; b=u7p5E5iY3fBt3Oxo04+ELXVDWW4yc6be9OuPLAlSbleQILJ0zdKTZZgVFpqD/CgskbAp+yHoqfryBTudsVN2I6RHNphTPIQro5ksgGByKH0DkttnI9vi9+leTsBEILq8r344AXujUclffMW8+a97wAFTQL9VTS7TvUPQC/bB0TQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q/pe9NNM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D9FDC116C6;
+	Thu,  8 Jan 2026 15:17:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767884851;
-	bh=rVjW+7g08CsaF8/U5C2AIau2HipugOJgIASXicUAEIg=;
+	s=k20201202; t=1767885424;
+	bh=f0CvU2tIQVYrHZLwRGFpAIZTZzQEZlmsLyp505OcoT8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kiih61/M5L1y+N813dg8NelXTuCXe6o9V2dm4tynnomud2ULI9buOkfQBLIOW6yyb
-	 U8C9dPSxKS8UbtJDvC0mzCpWxoHklbjg6m5W2MixJdXi9rl3tFQsQJDlZXOMuSo33k
-	 PWLwKfMwQlFmM179JxIw/aGXLeZaitKMwA48fhCtyoE9HKj9iHMqFweyTEBXw504bq
-	 lnwYxYrpjeM6cEHsdvDZvwGXcaOSz69o9Sknt6tGJiDzCqAU4mrtWTC0BorfuhtSbG
-	 r2QfnJ4qKhSdtBFlf3oSw/NACFGU05pst3Am5jHQfPNUITnIt8zg/M3S52gw+v5cPA
-	 0fKNyrbGRrcMg==
-Date: Thu, 8 Jan 2026 07:07:29 -0800
+	b=Q/pe9NNMiNxz34hUsWNmWKU2WKqFubbla3Wr7oWeH8vOiu/jI6KQbvAGDiyqebpee
+	 zueXbvVoEBUbdilVPWFJqRuNuBAGfpQY2nYSH9LvfR+BEfmKbAmTaTk3QHLESwLWxL
+	 c135xytcgj5cRVkPduRTaYTXtd8dD4ewUE3Z//Eazp9mW0O7lbVosamcHzpVBpSAh4
+	 obT6D1ou2uLjkRk25+UQt+57hKnWBZQhox46TD8U12AduKkVvhG7W33xnvNXXjjSLx
+	 lR+Mn0/snAZwvs+38w+8/rWcw4jdjKomYHqwq+hCNYv4L7gB3mBokXbb7PQnPcYV5H
+	 MZ5zw230QRGUw==
+Date: Thu, 8 Jan 2026 07:17:03 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Takashi Kozu <takkozu@amazon.com>
-Cc: <anthony.l.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>,
- <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
- <pabeni@redhat.com>, <intel-wired-lan@lists.osuosl.org>,
- <netdev@vger.kernel.org>, Kohei Enju <enjuk@amazon.com>
-Subject: Re: [PATCH iwl-next v2 3/3] igb: allow configuring RSS key via
- ethtool set_rxfh
-Message-ID: <20260108070729.79575f9c@kernel.org>
-In-Reply-To: <20260108052020.84218-8-takkozu@amazon.com>
-References: <20260108052020.84218-5-takkozu@amazon.com>
-	<20260108052020.84218-8-takkozu@amazon.com>
+To: Oliver Hartkopp <socketcan@hartkopp.net>
+Cc: mkl@pengutronix.de, Prithvi <activprithvi@gmail.com>, andrii@kernel.org,
+ linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com, netdev@vger.kernel.org
+Subject: Re: [bpf, xdp] headroom - was: Re: Question about to KMSAN:
+ uninit-value in can_receive
+Message-ID: <20260108071703.788c67ed@kernel.org>
+In-Reply-To: <8b55ae26-daba-4b2e-a10b-4be367fb42d0@hartkopp.net>
+References: <20251117173012.230731-1-activprithvi@gmail.com>
+	<0c98b1c4-3975-4bf5-9049-9d7f10d22a6d@hartkopp.net>
+	<c2cead0a-06ed-4da4-a4e4-8498908aae3e@hartkopp.net>
+	<aSx++4VrGOm8zHDb@inspiron>
+	<d6077d36-93ed-4a6d-9eed-42b1b22cdffb@hartkopp.net>
+	<20251220173338.w7n3n4lkvxwaq6ae@inspiron>
+	<01190c40-d348-4521-a2ab-3e9139cc832e@hartkopp.net>
+	<20260102153611.63wipdy2meh3ovel@inspiron>
+	<20260102120405.34613b68@kernel.org>
+	<63c20aae-e014-44f9-a201-99e0e7abadcb@hartkopp.net>
+	<20260104074222.29e660ac@kernel.org>
+	<fac5da75-2fc0-464c-be90-34220313af64@hartkopp.net>
+	<20260105152638.74cfea6c@kernel.org>
+	<904fa297-b657-4f5b-9999-b8cfcc11bfa9@hartkopp.net>
+	<20260106162306.0649424c@kernel.org>
+	<8b55ae26-daba-4b2e-a10b-4be367fb42d0@hartkopp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,34 +74,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 8 Jan 2026 14:20:15 +0900 Takashi Kozu wrote:
-> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-> index da0f550de605..d42b3750f0b1 100644
-> --- a/drivers/net/ethernet/intel/igb/igb_main.c
-> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
-> @@ -4526,7 +4526,8 @@ static void igb_setup_mrqc(struct igb_adapter *adapter)
->  	u32 mrqc, rxcsum;
->  	u32 j, num_rx_queues;
->  
-> -	netdev_rss_key_fill(adapter->rss_key, sizeof(adapter->rss_key));
-> +	if (!adapter->has_user_rss_key)
-> +		netdev_rss_key_fill(adapter->rss_key, sizeof(adapter->rss_key));
->  	igb_write_rss_key(adapter);
+On Wed, 7 Jan 2026 16:34:13 +0100 Oliver Hartkopp wrote:
+> > Alternatively perhaps for this particular use case you could use
+> > something like metadata_dst to mark the frame as forwarded / annotate
+> > with the originating ifindex?  
+> 
+> I looked into it and the way how skb_dst is shared in the union behind 
+> cb[] does not look very promising for skbs that wander up and down in 
+> the network layer.
 
-This is an unusual construct. adapter->rss_key is driver state, does
-something wipe it? It's normal to have to write the key into the device
-after reset but initializing the driver state is usually done at probe,
-just once. Then you don't have to worry whether the state is coming from
-random or user.
-
-Note that netdev_rss_key_fill() initializes its state once per boot so
-it will not change its 'return' value without reboot.
-
-Last but not least - would you be able to run:
-
-tools/testing/selftests/drivers/net/hw/toeplitz.py
-tools/testing/selftests/drivers/net/hw/rss_api.py
-
-against this device? Some more help:
-https://github.com/linux-netdev/nipa/wiki/Running-driver-tests
+Maybe I'm misunderstanding, but skb_dst is only unioned with some
+socket layer (TCP and sockmsg) fields, not with cb[]. It'd be
+problematic if CAN gw frames had to traverse routing but I don't 
+think they do?
 
