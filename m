@@ -1,106 +1,91 @@
-Return-Path: <netdev+bounces-248138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9098D042F2
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:08:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E7BFD042F7
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:08:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2AC47305A2CA
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:58:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 33725306078B
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:58:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 130C8261B80;
-	Thu,  8 Jan 2026 15:54:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2289B26B75B;
+	Thu,  8 Jan 2026 15:54:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ePrbtzKi"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="anmTV0HF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6F9A2620D2
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 15:54:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE83B264A86;
+	Thu,  8 Jan 2026 15:54:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767887662; cv=none; b=t//+/DhBORaCt/z1fjS3/UhzLw2PGvzF/3QLXkz2NCFOScGtjQGGefgV55XF1IdHW7+JVIbqyw8TGnFYcYcyCxak7/L1l0mlExb1mzt7rFnwdyyEHkcTBM6vmmd0ujQZQ0gX5T3TBd5DnWQR1me7Ye8svdTGbemnxJ0b4VSAe8A=
+	t=1767887667; cv=none; b=M7cvIqbWLJAYpTvrViT8YR0E/jjWm58vTjjg4NIZSCHn3ySSsfW6/v84KSnuB8sMmElubUMWvIwARWc5jsS4gC571Tb/AINBvfWunYkTT5r2ooe5nOjrP2KD00yI5kkGuQbwlZDosV5TTdOAc2ycFgD38a1Dy9RGDOeEqusr4Qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767887662; c=relaxed/simple;
-	bh=Ebf9ED4E2DrYDUeb5/Z3l+FqEQuAjHWRa1ZEjzvJbro=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=dJr7AR8TEktjx+SDnZx5b/39AnLLSdfNU5h3xdXQrS12b2RDvYfW53Xca/maUlZ1VDxlddQ+QaOkjV/nysf8MsMS+vDKV/GIcJnwVeUez4baNZowHKlCk5lA6Z112MKMd+6/dd/DQEgOWgz9/9jDzt/7UNmgufVIqw//ftbIMm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ePrbtzKi; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 7AA601A2715;
-	Thu,  8 Jan 2026 15:54:17 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 4D6FB6072B;
-	Thu,  8 Jan 2026 15:54:17 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 26423103C88AD;
-	Thu,  8 Jan 2026 16:54:14 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1767887656; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=oNfdH53kQuTuXNIKre/qRSoBoNj+epfNl5b+1DiEuPI=;
-	b=ePrbtzKiiZ/g2cIR7eGmilTYBEtczpPaW7zs4DbwGItBcJfrI7nHVlQDcRjIiNYVJOOuLr
-	oNL1+3M2AiTYN/OxZ3UnKQ1nFVJKb8yPR50wvd/iaSA93B56LpW1I7SXoGlr3PHwr6CDx8
-	WKxU76bug5mPPPc0kzFZaNXK6YDnbKXbZvKEf5ueip9KjgJjuoAbok6shzeYbvfvV3H5ph
-	256MBTzcIhqEdIltFHSbV81PVZse2ZVzk+aaE3/64rjhJp0SQ1Ktb6xN3p/tgbqEXLuitV
-	HpaNFEYp1MVwH3rLmtz57EHRAP97o8m44JzPaBYa0tKOz06Aoiwl0BkNIHnodQ==
+	s=arc-20240116; t=1767887667; c=relaxed/simple;
+	bh=D7mFMv1M/e+pJMtAzOs2WcvquDi6G1yfA7fqyx8qQAc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ro6XQCBY2o+plSTqWi9cJv14tjkgpMQm8saJp0dSPRYArwa0Pd6CjATpdns9+JFixMw/Q4JdeShNp7X6dAUOdEm7NTyexRGk1qhY5pd9n0XQzNPYTC7laQKPilHoPKhwc38Ii2IyMT6APDYdcUYTGvffX/GDC7x9JmP6xbDWhIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=anmTV0HF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCCDFC116C6;
+	Thu,  8 Jan 2026 15:54:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1767887666;
+	bh=D7mFMv1M/e+pJMtAzOs2WcvquDi6G1yfA7fqyx8qQAc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=anmTV0HFmn5QQsF+PGyK0sxpR71b+VQYn95yley/jmx7xSc2D+J2/LfZN+pv2xppz
+	 Juou0wOhbO2Ns0uZJNIhO8+6kXiQy/XJN/urquVjzd5GAGvSlL5y2ykTQKI1L+bwld
+	 BIw9GXlbMSMduRu+KeIJg7cF4v75ANEcje9+Ox98=
+Date: Thu, 8 Jan 2026 16:54:22 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: HarinadhD <harinadh.dommaraju@broadcom.com>
+Cc: stable@vger.kernel.org, john.fastabend@gmail.com, daniel@iogearbox.net,
+	jakub@cloudflare.com, lmb@cloudflare.com, davem@davemloft.net,
+	kuba@kernel.org, ast@kernel.org, andrii@kernel.org, kafai@fb.com,
+	songliubraving@fb.com, yhs@fb.com, kpsingh@kernel.org,
+	netdev@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org, ajay.kaher@broadcom.com,
+	alexey.makhalov@broadcom.com,
+	vamsi-krishna.brahmajosyula@broadcom.com, yin.ding@broadcom.com,
+	tapas.kundu@broadcom.com, Eric Dumazet <edumazet@google.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: Re: [PATCH v5.10.y] bpf, sockmap: Don't let
+ sock_map_{close,destroy,unhash} call itself
+Message-ID: <2026010808-nearby-endurable-8e19@gregkh>
+References: <20251212035458.1794979-1-harinadh.dommaraju@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 08 Jan 2026 16:54:14 +0100
-Message-Id: <DFJBVCNFR0ZE.2ZIJ3RYVOMQP1@bootlin.com>
-Subject: Re: [PATCH RFC net-next v2 8/8] cadence: macb: introduce xmit
- support
-Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
- <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Lorenzo Bianconi" <lorenzo@kernel.org>, =?utf-8?q?Th=C3=A9o_Lebrun?=
- <theo.lebrun@bootlin.com>
-To: "Paolo Valerio" <pvalerio@redhat.com>, <netdev@vger.kernel.org>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20251220235135.1078587-1-pvalerio@redhat.com>
- <20251220235135.1078587-9-pvalerio@redhat.com>
-In-Reply-To: <20251220235135.1078587-9-pvalerio@redhat.com>
-X-Last-TLS-Session-Version: TLSv1.3
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251212035458.1794979-1-harinadh.dommaraju@broadcom.com>
 
-On Sun Dec 21, 2025 at 12:51 AM CET, Paolo Valerio wrote:
-> Add XDP_TX verdict support, also introduce ndo_xdp_xmit function for
-> redirection, and update macb_tx_unmap() to handle both skbs and xdp
-> frames advertising NETDEV_XDP_ACT_NDO_XMIT capability and the ability
-> to process XDP_TX verdicts.
->
-> Signed-off-by: Paolo Valerio <pvalerio@redhat.com>
-> ---
->  drivers/net/ethernet/cadence/macb_main.c | 166 +++++++++++++++++++++--
->  1 file changed, 158 insertions(+), 8 deletions(-)
->
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ether=
-net/cadence/macb_main.c
-> index cd29a80d1dbb..d8abfa45e22d 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
-> +static int
-> +gem_xdp_xmit(struct net_device *dev, int num_frame,
-> +	     struct xdp_frame **frames, u32 flags)
-> +{
+On Fri, Dec 12, 2025 at 03:54:58AM +0000, HarinadhD wrote:
+> From: Jakub Sitnicki <jakub@cloudflare.com>
+> 
+> [ Upstream commit 5b4a79ba65a1ab479903fff2e604865d229b70a9 ]
+> 
+> sock_map proto callbacks should never call themselves by design. Protect
+> against bugs like [1] and break out of the recursive loop to avoid a stack
+> overflow in favor of a resource leak.
+> 
+> [1] https://lore.kernel.org/all/00000000000073b14905ef2e7401@google.com/
+> 
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+> Acked-by: John Fastabend <john.fastabend@gmail.com>
+> Link: https://lore.kernel.org/r/20230113-sockmap-fix-v2-1-1e0ee7ac2f90@cloudflare.com
+> Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
+> [ Harinadh: Modified to apply on v5.10.y ]
+> Signed-off-by: HarinadhD <Harinadh.Dommaraju@broadcom.com>
 
-nit: a bit surprised by the first line break in the function header.
-Especially as it doesn't prevent splitting arguments across two lines.
+Please use your name for your signed-off-by.
 
-Thanks,
+thanks,
 
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+greg k-h
 
