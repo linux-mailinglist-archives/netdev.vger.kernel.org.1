@@ -1,153 +1,123 @@
-Return-Path: <netdev+bounces-248089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DEC5D03A84
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 16:06:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 13C19D047D8
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:43:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3257F3355771
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 14:35:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0331631D18D0
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:35:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD2B4AB668;
-	Thu,  8 Jan 2026 13:57:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A988F4247C7;
+	Thu,  8 Jan 2026 14:01:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="N46t9Kk/"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="dFB5skw8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDEB140FD9C;
-	Thu,  8 Jan 2026 13:57:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0837640FD89;
+	Thu,  8 Jan 2026 14:01:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767880678; cv=none; b=l+Nq+mj3q6wiVjio0C70wCgKlvYAcBRsd1ix1ztV4sq8pjZhlarFjSV1nzMskQYOcgMG1izRqm5prg3Cx9xMOSdsXwhB12hj7/oJEND0sxrqNNoNIQFIv/qJR0o4JsUJWlt+9E87hkx5oD6C902+Ps6g5egRaYdPxsgGbWQ2wdI=
+	t=1767880908; cv=none; b=Vng8Lb+8bqtkLRHiyxEC/BVw0zXUAcOwNYuYAK4/0qgaHBMhGpmBceRd/6ew04kHRNA6TPfrjFpp4xOkkVGGYXiTLV898XYZGlZLicSnGOyAKxBb+tcucWrghheELc97kC+MHCS3IiTzEuqWxrawXHiMEmjbaaS9UNNoHkZH3MI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767880678; c=relaxed/simple;
-	bh=oo49FY2ULfaQzovc7U0e+DMcGIZIxCNslx48Vot+DTc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=UY6T4wChp9koqnkMWFImtB9doyHIgRiMN15jxPZdd9DV0igKbGT7i1I5rT8mJCNuCnV4A7VlUYE+TgNAbofJ5S3dF1LfDtyk0jSOr/EXfYDY5nz6eFy7YDGZikawsKzsl1+hs3gVoL/IfzDTIb4XDz7tJ4JWHnRYOb8hxHxEr0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=N46t9Kk/; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20260108135752euoutp01739b42acd5b37a2cf575cc6620e75601~Ixhr3Z5IZ0573705737euoutp01M;
-	Thu,  8 Jan 2026 13:57:52 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20260108135752euoutp01739b42acd5b37a2cf575cc6620e75601~Ixhr3Z5IZ0573705737euoutp01M
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1767880672;
-	bh=yH2rPLThWUM1dKN4UcJR1XVOYszcMfuT+BMdjTT6Aeg=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=N46t9Kk/hKhFT/cK/fnFzzobH1ZHxDEKrH7vDer+rIyqkzq2N3DjZtamOag7s+48z
-	 i2stGQ72tRjS8NBhnxaWsqtYROJQY5AGOSLNwsEn/ggNNLJc1AOnGbHRIXur7qHK0Z
-	 QXh9oqt5sxoI2nKXY+ibzdMZ6i2j5jvnKS/9Zbog=
-Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20260108135752eucas1p13f59f8e3f41236b8ee98e7a0596869e7~Ixhrlgbp73057130571eucas1p1m;
-	Thu,  8 Jan 2026 13:57:52 +0000 (GMT)
-Received: from [106.210.134.192] (unknown [106.210.134.192]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20260108135749eusmtip2c78af2cbbbecbe57163d255ece269da0~IxholZqkN2020220202eusmtip2V;
-	Thu,  8 Jan 2026 13:57:49 +0000 (GMT)
-Message-ID: <c43c630e-cd3c-43bf-b390-659c23f7c711@samsung.com>
-Date: Thu, 8 Jan 2026 14:57:48 +0100
+	s=arc-20240116; t=1767880908; c=relaxed/simple;
+	bh=/a6tor3t3BHXPf6cV1FkvZgBVzI83Fmb2fWyG8E85nc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nzdM75hZ006gjkAnS76/zlfNO3wTpycige3UKFW4rMSBXheVQVmZrplPCuarKA0u1vwH91E0oKcLyiuY1go7DCErrmfhnxqRjwozh5m5tXKAum+vzNL20Gf6lmdINUfZd1c4GAGeNrr5OWefogr1jE4Y+t60HEs1s6WfmvaOUi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=dFB5skw8; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=CHsYpmrl3ptgn/SH1+1dZo3E9tUPIlXIh6WzL+1xlrU=; t=1767880907; x=1769090507; 
+	b=dFB5skw8p+/z8w6j6pkGCnsYOXuVlI8+anoooXH/nJSHa8Zhu8CGHKEjAUVWQpmmgG55qfCqyBn
+	Eji3C3Y71mShBlo7zHfiSbMi1FcaZ+Y4kSxH3RQU+RYIjXeSYSUMhCGzLZwlFPezI1LB0azR/VkXP
+	xh56ZZWgHCm6xHao1kh//DBBnTGkp5YPlmHuoGAu9WU0PUBjHPMbjRYvpaNgGhbW+sLFzbHzdPE5+
+	38YGjcXcK3+w3mqqj8HyDx48H59XHCi/pqhznP4Yu0NHE15TvBgPKw1lG+7Z/l1jeO3I6iK6e8B4a
+	pwOFXgBmiq2tVJnXpfzNECYALUpWNPt6s+XA==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1vdqa8-00000006XK8-3ShP;
+	Thu, 08 Jan 2026 15:01:45 +0100
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Subject: [GIT PULL] wireless-2026-01-08
+Date: Thu,  8 Jan 2026 15:01:23 +0100
+Message-ID: <20260108140141.139687-3-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Betterbird (Windows)
-Subject: Re: [PATCH v2 03/15] dma-mapping: add DMA_ATTR_CPU_CACHE_CLEAN
-To: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
-Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>, Paolo
-	Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, "James E.J. Bottomley"
-	<James.Bottomley@hansenpartnership.com>, "Martin K. Petersen"
-	<martin.petersen@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, Xuan Zhuo
-	<xuanzhuo@linux.alibaba.com>, Robin Murphy <robin.murphy@arm.com>, Stefano
-	Garzarella <sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
-	Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Petr Tesarik
-	<ptesarik@suse.com>, Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe
-	<jgg@ziepe.ca>, Bartosz Golaszewski <brgl@kernel.org>,
-	linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
-	iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
-Content-Language: en-US
-From: Marek Szyprowski <m.szyprowski@samsung.com>
-In-Reply-To: <2d5d091f9d84b68ea96abd545b365dd1d00bbf48.1767601130.git.mst@redhat.com>
 Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20260108135752eucas1p13f59f8e3f41236b8ee98e7a0596869e7
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20260105082314eucas1p2dd6ff42b1a8f9c60e9c813dffef7f4fb
-X-EPHeader: CA
-X-CMS-RootMailID: 20260105082314eucas1p2dd6ff42b1a8f9c60e9c813dffef7f4fb
-References: <cover.1767601130.git.mst@redhat.com>
-	<CGME20260105082314eucas1p2dd6ff42b1a8f9c60e9c813dffef7f4fb@eucas1p2.samsung.com>
-	<2d5d091f9d84b68ea96abd545b365dd1d00bbf48.1767601130.git.mst@redhat.com>
 
-On 05.01.2026 09:23, Michael S. Tsirkin wrote:
-> When multiple small DMA_FROM_DEVICE or DMA_BIDIRECTIONAL buffers share a
-> cacheline, and DMA_API_DEBUG is enabled, we get this warning:
-> 	cacheline tracking EEXIST, overlapping mappings aren't supported.
->
-> This is because when one of the mappings is removed, while another one
-> is active, CPU might write into the buffer.
->
-> Add an attribute for the driver to promise not to do this, making the
-> overlapping safe, and suppressing the warning.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Hi,
 
-It is somehow similar to DMA_ATTR_SKIP_CPU_SYNC in its concept, so I see 
-no reason not to accept it.
+After the holidays and all we don't seem to have that
+much yet, but I've collected what we have for now.
 
-Acked-by: Marek Szyprowski <m.szyprowski@samsung.com>
+Please pull and let us know if there's any problem.
 
-> ---
->   include/linux/dma-mapping.h | 7 +++++++
->   kernel/dma/debug.c          | 3 ++-
->   2 files changed, 9 insertions(+), 1 deletion(-)
->
-> diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
-> index 29ad2ce700f0..29973baa0581 100644
-> --- a/include/linux/dma-mapping.h
-> +++ b/include/linux/dma-mapping.h
-> @@ -79,6 +79,13 @@
->    */
->   #define DMA_ATTR_MMIO		(1UL << 10)
->   
-> +/*
-> + * DMA_ATTR_CPU_CACHE_CLEAN: Indicates the CPU will not dirty any cacheline
-> + * overlapping this buffer while it is mapped for DMA. All mappings sharing
-> + * a cacheline must have this attribute for this to be considered safe.
-> + */
-> +#define DMA_ATTR_CPU_CACHE_CLEAN	(1UL << 11)
-> +
->   /*
->    * A dma_addr_t can hold any valid DMA or bus address for the platform.  It can
->    * be given to a device to use as a DMA source or target.  It is specific to a
-> diff --git a/kernel/dma/debug.c b/kernel/dma/debug.c
-> index 138ede653de4..7e66d863d573 100644
-> --- a/kernel/dma/debug.c
-> +++ b/kernel/dma/debug.c
-> @@ -595,7 +595,8 @@ static void add_dma_entry(struct dma_debug_entry *entry, unsigned long attrs)
->   	if (rc == -ENOMEM) {
->   		pr_err_once("cacheline tracking ENOMEM, dma-debug disabled\n");
->   		global_disable = true;
-> -	} else if (rc == -EEXIST && !(attrs & DMA_ATTR_SKIP_CPU_SYNC) &&
-> +	} else if (rc == -EEXIST &&
-> +		   !(attrs & (DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_CPU_CACHE_CLEAN)) &&
->   		   !(IS_ENABLED(CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC) &&
->   		     is_swiotlb_active(entry->dev))) {
->   		err_printk(entry->dev, entry,
+Thanks,
+johannes
 
-Best regards
--- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
 
+
+The following changes since commit dbf8fe85a16a33d6b6bd01f2bc606fc017771465:
+
+  Merge tag 'net-6.19-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-12-30 08:45:58 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2026-01-08
+
+for you to fetch changes up to a203dbeeca15a9b924f0d51f510921f4bae96801:
+
+  wifi: mac80211: collect station statistics earlier when disconnect (2026-01-08 13:33:11 +0100)
+
+----------------------------------------------------------------
+Couple of fixes:
+ - mac80211:
+   - long-standing injection bug due to chanctx rework
+   - more recent interface iteration issue
+   - collect statistics before removing stations
+ - hwsim:
+   - fix NAN frequency typo (potential NULL ptr deref)
+   - fix locking of radio lock (needs softirqs disabled)
+ - wext:
+   - ancient issue with compat and events copying some
+     uninitialized stack data to userspace
+
+----------------------------------------------------------------
+Baochen Qiang (1):
+      wifi: mac80211: collect station statistics earlier when disconnect
+
+Benjamin Berg (2):
+      wifi: mac80211_hwsim: fix typo in frequency notification
+      wifi: mac80211_hwsim: disable BHs for hwsim_radio_lock
+
+Eric Dumazet (1):
+      wifi: avoid kernel-infoleak from struct iw_point
+
+Johannes Berg (1):
+      wifi: mac80211: restore non-chanctx injection behaviour
+
+Miri Korenblit (1):
+      wifi: mac80211: don't iterate not running interfaces
+
+ drivers/net/wireless/virtual/mac80211_hwsim.c | 6 +++---
+ net/mac80211/chan.c                           | 3 +++
+ net/mac80211/sta_info.c                       | 7 ++++---
+ net/mac80211/tx.c                             | 2 ++
+ net/wireless/wext-core.c                      | 4 ++++
+ net/wireless/wext-priv.c                      | 4 ++++
+ 6 files changed, 20 insertions(+), 6 deletions(-)
 
