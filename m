@@ -1,341 +1,238 @@
-Return-Path: <netdev+bounces-248173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E070D04BD9
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 18:10:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 185F1D0535B
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 18:53:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 601343044DB2
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:50:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 348933258F35
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:58:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948902DC32D;
-	Thu,  8 Jan 2026 16:50:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E8352DF3EA;
+	Thu,  8 Jan 2026 16:58:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="cd7wCeCz";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="FNRJcD03"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gvb9MbgX";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZnmUW5JS"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B09211A9F94;
-	Thu,  8 Jan 2026 16:50:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D998D2E0901
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 16:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767891055; cv=none; b=nkG8fkTe46pzznGV/4qVoXh2MLVwjrpCMx2dg0YMV2HcDcS0FVvx84fCNPQL7b4Cy2wKb+ghgEFRqP6hqmXDDlydxD1ssLlFcoMePFhTLarxovqofQxJV6t9gNOljgjnM0jupCHVBUsGtANy5XQv/tAF5hyo7AuAVyHVcfNpBgA=
+	t=1767891484; cv=none; b=sbZAfVlvFH5Rv9SyxILEC9C6HRuDEDFCk3LpqYr5BvqCpFUUO71G5ZZawgCvjcfbEa9JwfD+k/3IAFpyOi3bIoBTdDmlmfalqPHUkppe1/Iyk68DTvL/0E3/yBvi9lm2FqBidTA3j1bNbusC1cIuy7K9fYzsRz+IRUXzqzyaNqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767891055; c=relaxed/simple;
-	bh=Iqoq1m/RT2bttxazyQgEEHP5Rc3/GttfjIFSvdipBfQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=s16iNqMZvr9pGxdnit1tkvx1Dgd8X6ZdhMebG2JG21BVOhDi+FJ9b60EjXh1sqBawOKK70Xqj4B7R86rF6h2NYr7AZ637A/FcyPjltzTgd4hFW3Ibu1cpuqyV9SEKoRHBsKnFKy7LNB6HBqMQCxPw7NOMikRN6s/cuUZvt6foWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=cd7wCeCz; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=FNRJcD03; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: John Ogness <john.ogness@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1767891045;
+	s=arc-20240116; t=1767891484; c=relaxed/simple;
+	bh=2kkh1HTmGOanA54h30MjycXWgO8nn18K7F0xkeq1RXU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=sNYVItQYMB+r6CCq12U4/+Ti0Dl1gHZHEYmBYCmhyW7AljXz19qLWS10F0PEByCqypG77EzwzSshhn8OinuvjAhA7NW1ire2BsDzqfujirvdHULjvHp4r7kiq0PPJn8J4DL9sUqfD6mOD0vweHYBoSctsZ6pYJlTj328oNExg2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gvb9MbgX; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZnmUW5JS; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767891477;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Yh3Bt5uWwYvi0HCGizakfaiy4BqE4GYy3HS/MV/Gc90=;
-	b=cd7wCeCzwSNsFCLFwmla4Miij+Cuv8/eVpVtNiYS3dhT5pXbVwNVfWqz5ApCSJ5YUtsVXw
-	kbv7CK2tohfGpBt/XbY9sqFkB3fNFgHPVvYUxmUVv4lOUtU4lOgq3mUvF9wujgtgfsQ2Zt
-	lHRSm2b5+Z1fCpW9Y88vGD55NEB+MRDUEmJIoaJOr8P1EgOhtTO+LnvpHsMt7ZRngingm2
-	tTs4VXmeDNkRX0Izv4RPcb5LuakaM2TnxWYl2+p4nMnC3Mm1TNoZkjlPZCXdc/u8S0j8Mx
-	bBqBqEDw1Z2UlCiUtIVvDzcYlJdxrTLoGGB73aCRw5MeL0OarNlapbwKGXTuYg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1767891045;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Yh3Bt5uWwYvi0HCGizakfaiy4BqE4GYy3HS/MV/Gc90=;
-	b=FNRJcD03Qk8U9BX7Q6PzCRHt+k1nwjYhSZ12ZdtFdJt65C4BBbW7i8pzBISApxSGqh+wmn
-	zT8IWJqUgko+LPBg==
-To: Breno Leitao <leitao@debian.org>, pmladek@suse.com, mpdesouza@suse.com
-Cc: pmladek@suse.com, mpdesouza@suse.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de,
- gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net,
- kernel-team@meta.com, Simon Horman <horms@kernel.org>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, rostedt@goodmis.org
-Subject: Re: [PATCH net-next 0/2] net: netconsole: convert to NBCON console
- infrastructure
-In-Reply-To: <j764nuipx4nvemd3wlqfyx77lkdf7wgs5z452hlacwglvc2e7n@vsko4bq5xb2f>
-References: <20251222-nbcon-v1-0-65b43c098708@debian.org>
- <5mpei32y7sl5jmi2ciim4crxbc55zztiucxxsdd633mvzxlk7n@fowtsefym5y6>
- <87zf6pfmlq.fsf@jogness.linutronix.de>
- <4dwhhlnuv2n3f7d3hqoulcnsg6ljucd6v47kqcszcwcshfoqno@rzxvg456q4fi>
- <j764nuipx4nvemd3wlqfyx77lkdf7wgs5z452hlacwglvc2e7n@vsko4bq5xb2f>
-Date: Thu, 08 Jan 2026 17:56:44 +0106
-Message-ID: <87eco09hgb.fsf@jogness.linutronix.de>
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FjS4feJSaN6kOmYKqAI8LPvPwfc7zrDjsTbRox8HRnQ=;
+	b=gvb9MbgX5lqd24OOwyRz8OPeIb6Tut3FcqAk2f2vZhhjxyz8ucdEq8ZEI88kuvH6ZSE8nL
+	hX0Q9qdnSxT7BpqRiA7D4dUXxqdw3b1agWmsdduTEncY5i3wkremO+yuCcU/y52PQnzRQg
+	y8WFAbBFINX5di1PPVvaKGOraHFL7n4=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-193-uovK53Y-N0q7m2IpvjxGZg-1; Thu, 08 Jan 2026 11:57:56 -0500
+X-MC-Unique: uovK53Y-N0q7m2IpvjxGZg-1
+X-Mimecast-MFC-AGG-ID: uovK53Y-N0q7m2IpvjxGZg_1767891475
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b801784f406so424048666b.0
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 08:57:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1767891474; x=1768496274; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=FjS4feJSaN6kOmYKqAI8LPvPwfc7zrDjsTbRox8HRnQ=;
+        b=ZnmUW5JSIa8Zu6Y6dfgtuusJQ7qOKrcGeMOIQ7RTM3i129VNUAOubiLnmuYkfHv7y4
+         sfxTy0Xg8CZOD03hBHTxfK+mL/9PbiMj2dBtO2nU5P3Yop8NtSWQZ2cbIJq9li3G4LR5
+         DvWpP/8eN+FNhZjoaWJNg1XLbmCiDzqal+WM7cxPcR2cbovECq3W1BCBnLwqOixWmj9A
+         itvIEtcQXAGhkxpYBxSAZOzFhzcDHLpFHYRI8q/NXguMMEqI0XYguUPQH9SXk06qgOj/
+         Lm9W8kZrOnnD7OK6XtkBl+bYJYHmmF3kkaNfcrHAHK6nJB9wPVTPtIyVIG+vH+ecR8Dv
+         kCsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767891474; x=1768496274;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FjS4feJSaN6kOmYKqAI8LPvPwfc7zrDjsTbRox8HRnQ=;
+        b=Yuv0EmAvJMBPjiQMS0qAOBN92w757/h3cxCw2qcdVWQ/0bPIbXfkgUgnZce38HjPUb
+         bLLVk7cFPBgwlECAEPF7f1NhkKdOggRLE3fcSzFhLttUfRWCt1Gbpm20ZKC0zK62dPFZ
+         lV1IsFOOG0P0TinhjE4EJy9+X1xRfgVdbkLaxKrxpxxn3faDYgTA/HriPe4a59xeWIkY
+         vq5o4t8dXMK/OE1SqyVYcilwBe3lQpUrZ9u9cXGPkA1GA1zFcF2o4p5F1wSF0BHoflSD
+         8qn2/4hhrtWNM47ll05vF4towO3NevVVL9gvE6rqLKJ5sCYG9hNfFw2kE9k27UFg1Rcn
+         gVqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUTYFLkInWVhvzoDJfNZFNaO6nPZIxHzKico7t9GVqUyMQLAXQ+Ga8tyAaf6immW9hJVvkBIq8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXDbKrSTHYiOc29CBFwatZCrg1OVXpmtGzV1mc/7S9Xjo4O/V0
+	xiefP641KSNmRn6f/1EkQIXN6rPaOHOLMWZcnKdSom9D0m4m/9FADD4Gt6iQ6m/eSGn8K7AM6rp
+	avq99pu/7eX+qBgE5ocNlWgTOkxyOKyYVd9CsufdmVLhr3bKhAarlgp8GvkfUvrhM0w==
+X-Gm-Gg: AY/fxX7u8PVCGgFNy0Ucv3tP2LKAB6jhLmq2q9TwdlnP5qvWQSxy9QC/tewzkrLCOwt
+	0Hiqhf2vWkhFHF8fARYzDbEvNk932KQopZ4F8cwMmha88BWfXhKBsdWyWfKfom7QiSDmzUxFn5C
+	C2xD49OhwsSSf/eyCU6NVTfdlKHBPxcyVHY7l6CYmE5LBES1dQyZIuUP/WkEdVHHxmY2V3Oi/DC
+	Yz5rmL1Eox/yBvJQiZfPdQ16Noy41AeirXrqNe/XMbJXEnjBk6PabRqLPU8pKPyRic6crU12H6G
+	HJVHKzhxcjEP9AZfgXBM/Ba5PhUzuyAoT5M+Uh7ZXe+i5Xb+NPBfkfdy3YvytQICvwgAg2HXXW6
+	cS0M3c5yFpCbRznANKaeKzI4doKOYIqaDHA==
+X-Received: by 2002:a17:907:2d88:b0:b7a:1be1:984 with SMTP id a640c23a62f3a-b84453f2266mr608595666b.64.1767891474324;
+        Thu, 08 Jan 2026 08:57:54 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFFWJVAHTUWbZTy1KF6VR+6h/Us1UzmfRaGVZweCOKnOEbb1/ZVYwDxcy96zyzkUcNJkGt4QQ==
+X-Received: by 2002:a17:907:2d88:b0:b7a:1be1:984 with SMTP id a640c23a62f3a-b84453f2266mr608593666b.64.1767891473839;
+        Thu, 08 Jan 2026 08:57:53 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a4d029bsm869145066b.41.2026.01.08.08.57.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jan 2026 08:57:53 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id C38E64083B9; Thu, 08 Jan 2026 17:57:52 +0100 (CET)
+From: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Subject: [PATCH net-next v7 0/6] Multi-queue aware sch_cake
+Date: Thu, 08 Jan 2026 17:56:02 +0100
+Message-Id: <20260108-mq-cake-sub-qdisc-v7-0-4eb645f0419c@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAKLhX2kC/3XRwU7DMAwG4FeZcibIdpOs4YSExANwRRyS2GERW
+ sfaMg1Ne3dCETDUcvz1258PPqlB+iKDulmdVC+HMpRdV8P6aqXSJnTPogvXrAjIggfS271O4UX
+ 08Bb1nsuQdOIM0XqmLFbVvddecjlO5qPqZNSdHEf1VJtNGcZd/z4de7i/mwa+YDIL8AE1aNMEc
+ MCISOG2F96E8TrttpN3wB+i1v8SgXJGDtG0bZ4RdEmslwiqBBn2EhjMOvoZ0VwQDSwRTSVsdi5
+ Z00riNCPML0GAS4T5JIC5IcSAyc0I+004QLBLhK1EG7yPniNYmRPuknBLhKuECAm4iBLx70fO5
+ /MHcmeJO1ACAAA=
+X-Change-ID: 20250902-mq-cake-sub-qdisc-cdf0b59d2fe5
+To: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>, 
+ Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+ Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: =?utf-8?q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>, 
+ cake@lists.bufferbloat.net, netdev@vger.kernel.org, 
+ Willem de Bruijn <willemb@google.com>, 
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>, 
+ Victor Nogueira <victor@mojatatu.com>
+X-Mailer: b4 0.14.3
 
-On 2026-01-08, Breno Leitao <leitao@debian.org> wrote:
-> On Wed, Jan 07, 2026 at 08:58:39AM -0800, Breno Leitao wrote:
-> This is what I am thinking about. How bad is it?
->
-> (I've also implemented the netconsole part as well, so, if you want to
-> have a tree, you can find it in
-> https://github.com/leitao/linux/tree/execution_context)
+This series adds a multi-queue aware variant of the sch_cake scheduler,
+called 'cake_mq'. Using this makes it possible to scale the rate shaper
+of sch_cake across multiple CPUs, while still enforcing a single global
+rate on the interface.
 
-Thanks. It is very helpful to see how you intend to use it.
+The approach taken in this patch series is to implement a separate qdisc
+called 'cake_mq', which is based on the existing 'mq' qdisc, but differs
+in a couple of aspects:
 
-> commit fe79961da6cabe42343185cf1a7308162bf6bad3
-> Author: Breno Leitao <leitao@debian.org>
-> Date:   Thu Jan 8 03:00:46 2026 -0800
->
->     printk: Add execution context (PID/CPU) to dev_printk_info
->     
->     Extend struct dev_printk_info to include the task PID and CPU number
->     where printk messages originate. This information is captured at
->     vprintk_store() time and propagated through printk_message to
->     nbcon_write_context, making it available to nbcon console drivers.
->     
->     This is useful for consoles like netconsole that want to include
->     execution context in their output, allowing correlation of messages
->     with specific tasks and CPUs regardless of where the console driver
->     actually runs.
->     
->     The feature is controlled by CONFIG_PRINTK_EXECUTION_CTX, which is
->     automatically selected by CONFIG_NETCONSOLE_DYNAMIC. When disabled,
->     the helper functions compile to no-ops with no overhead.
->     
->     Suggested-by: John Ogness <john.ogness@linutronix.de>
->     Signed-off-by: Breno Leitao <leitao@debian.org>
->
-> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-> index ac12eaf11755..e6a9369be202 100644
-> --- a/drivers/net/Kconfig
-> +++ b/drivers/net/Kconfig
-> @@ -341,6 +341,7 @@ config NETCONSOLE_DYNAMIC
->  	bool "Dynamic reconfiguration of logging targets"
->  	depends on NETCONSOLE && SYSFS && CONFIGFS_FS && \
->  			!(NETCONSOLE=y && CONFIGFS_FS=m)
-> +	select PRINTK_EXECUTION_CTX
->  	help
->  	  This option enables the ability to dynamically reconfigure target
->  	  parameters (interface, IP addresses, port numbers, MAC addresses)
-> diff --git a/include/linux/console.h b/include/linux/console.h
-> index fc9f5c5c1b04..c724f59f96e6 100644
-> --- a/include/linux/console.h
-> +++ b/include/linux/console.h
-> @@ -298,12 +298,18 @@ struct nbcon_context {
->   * @outbuf:		Pointer to the text buffer for output
->   * @len:		Length to write
->   * @unsafe_takeover:	If a hostile takeover in an unsafe state has occurred
-> + * @pid:		PID of the task that generated the message
-> + * @cpu:		CPU on which the message was generated
->   */
->  struct nbcon_write_context {
->  	struct nbcon_context	__private ctxt;
->  	char			*outbuf;
->  	unsigned int		len;
->  	bool			unsafe_takeover;
-> +#ifdef CONFIG_PRINTK_EXECUTION_CTX
-> +	pid_t			pid;
-> +	int			cpu;
-> +#endif
+- It will always install a cake instance on each hardware queue (instead
+  of using the default qdisc for each queue like 'mq' does).
 
-Something like msg_pid/msg_cpu or printk_pid/printk_cpu might be better
-to make it clear we are not talking about _this_ context. This struct is
-used by code outside of the printk subsystem, which is why I think it
-needs to be more obvious what these represent.
+- The cake instances on the queues will share their configuration, which
+  can only be modified through the parent cake_mq instance.
 
-@Petr: Any suggestions for names (assuming this is even acceptable)?
+Doing things this way simplifies user configuration by centralising
+all configuration through the cake_mq qdisc (which also serves as an
+obvious way of opting into the multi-queue aware behaviour). The cake_mq
+qdisc takes all the same configuration parameters as the cake qdisc.
 
->  };
->  
->  /**
-> diff --git a/include/linux/dev_printk.h b/include/linux/dev_printk.h
-> index eb2094e43050..42ee778b29dd 100644
-> --- a/include/linux/dev_printk.h
-> +++ b/include/linux/dev_printk.h
-> @@ -27,6 +27,10 @@ struct device;
->  struct dev_printk_info {
->  	char subsystem[PRINTK_INFO_SUBSYSTEM_LEN];
->  	char device[PRINTK_INFO_DEVICE_LEN];
-> +#ifdef CONFIG_PRINTK_EXECUTION_CTX
-> +	pid_t pid;
+An earlier version of this work was presented at this year's Netdevconf:
+https://netdevconf.info/0x19/sessions/talk/mq-cake-scaling-software-rate-limiting-across-cpu-cores.html
 
-I am not happy about this being resolved by the netconsole printer to
-get the task name. A lot can happen between now and then. But I also
-shudder at the thought of making dev_printk_info much larger. This is
-already a horrible waste of memory (which I talked about here[0]).
+The patch series is structured as follows:
 
-I also do not think dev_printk_info is the appropriate place to store
-this information. These new fields are not related to the dev_printk
-API. They belong in printk_info.
+- Patch 1 exports the mq qdisc functions for reuse.
 
-> +	int cpu;
-> +#endif
->  };
->  
->  #ifdef CONFIG_PRINTK
-> diff --git a/kernel/printk/internal.h b/kernel/printk/internal.h
-> index 5f5f626f4279..81e5cd336677 100644
-> --- a/kernel/printk/internal.h
-> +++ b/kernel/printk/internal.h
-> @@ -287,6 +287,10 @@ struct printk_message {
->  	unsigned int		outbuf_len;
->  	u64			seq;
->  	unsigned long		dropped;
-> +#ifdef CONFIG_PRINTK_EXECUTION_CTX
-> +	pid_t			pid;
-> +	int			cpu;
-> +#endif
->  };
->  
->  bool printk_get_next_message(struct printk_message *pmsg, u64 seq,
-> diff --git a/kernel/printk/nbcon.c b/kernel/printk/nbcon.c
-> index 3fa403f9831f..2465fafd7727 100644
-> --- a/kernel/printk/nbcon.c
-> +++ b/kernel/printk/nbcon.c
-> @@ -946,6 +946,18 @@ void nbcon_reacquire_nobuf(struct nbcon_write_context *wctxt)
->  }
->  EXPORT_SYMBOL_GPL(nbcon_reacquire_nobuf);
->  
-> +#ifdef CONFIG_PRINTK_EXECUTION_CTX
-> +static inline void wctxt_load_execution_ctx(struct nbcon_write_context *wctxt,
-> +					    struct printk_message *pmsg)
-> +{
-> +	wctxt->pid = pmsg->pid;
-> +	wctxt->cpu = pmsg->cpu;
-> +}
-> +#else
-> +static inline void wctxt_load_execution_ctx(struct nbcon_write_context *wctxt,
-> +					    struct printk_message *pmsg) {}
-> +#endif
-> +
->  /**
->   * nbcon_emit_next_record - Emit a record in the acquired context
->   * @wctxt:	The write context that will be handed to the write function
-> @@ -1048,6 +1060,8 @@ static bool nbcon_emit_next_record(struct nbcon_write_context *wctxt, bool use_a
->  	/* Initialize the write context for driver callbacks. */
->  	nbcon_write_context_set_buf(wctxt, &pmsg.pbufs->outbuf[0], pmsg.outbuf_len);
->  
-> +	wctxt_load_execution_ctx(wctxt, &pmsg);
-> +
->  	if (use_atomic)
->  		con->write_atomic(con, wctxt);
->  	else
-> diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-> index 1d765ad242b8..ff47b5384f20 100644
-> --- a/kernel/printk/printk.c
-> +++ b/kernel/printk/printk.c
-> @@ -2213,6 +2213,26 @@ static u16 printk_sprint(char *text, u16 size, int facility,
->  	return text_len;
->  }
->  
-> +#ifdef CONFIG_PRINTK_EXECUTION_CTX
-> +static inline void printk_save_execution_ctx(struct dev_printk_info *dev_info)
-> +{
-> +	dev_info->pid = task_pid_nr(current);
-> +	dev_info->cpu = smp_processor_id();
-> +}
-> +
-> +static inline void pmsg_load_execution_ctx(struct printk_message *pmsg,
-> +					   const struct dev_printk_info *dev_info)
-> +{
-> +	pmsg->pid = dev_info->pid;
-> +	pmsg->cpu = dev_info->cpu;
-> +}
-> +#else
-> +static inline void printk_save_execution_ctx(struct dev_printk_info *dev_info) {}
-> +
-> +static inline void pmsg_load_execution_ctx(struct printk_message *pmsg,
-> +					   const struct dev_printk_info *dev_info) {}
-> +#endif
-> +
->  __printf(4, 0)
->  int vprintk_store(int facility, int level,
->  		  const struct dev_printk_info *dev_info,
-> @@ -2320,6 +2340,7 @@ int vprintk_store(int facility, int level,
->  	r.info->caller_id = caller_id;
->  	if (dev_info)
->  		memcpy(&r.info->dev_info, dev_info, sizeof(r.info->dev_info));
-> +	printk_save_execution_ctx(&r.info->dev_info);
->  
->  	/* A message without a trailing newline can be continued. */
->  	if (!(flags & LOG_NEWLINE))
-> @@ -3002,6 +3023,7 @@ bool printk_get_next_message(struct printk_message *pmsg, u64 seq,
->  	pmsg->seq = r.info->seq;
->  	pmsg->dropped = r.info->seq - seq;
->  	force_con = r.info->flags & LOG_FORCE_CON;
-> +	pmsg_load_execution_ctx(pmsg, &r.info->dev_info);
->  
->  	/*
->  	 * Skip records that are not forced to be printed on consoles and that
-> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-> index ba36939fda79..197022099dd8 100644
-> --- a/lib/Kconfig.debug
-> +++ b/lib/Kconfig.debug
-> @@ -35,6 +35,17 @@ config PRINTK_CALLER
->  	  no option to enable/disable at the kernel command line parameter or
->  	  sysfs interface.
->  
-> +config PRINTK_EXECUTION_CTX
-> +	bool
-> +	depends on PRINTK
-> +	help
-> +	  This option extends struct dev_printk_info to include extra execution
+- Patch 2 factors out the sch_cake configuration variables into a
+  separate struct that can be shared between instances.
 
-It should extend printk_info instead.
+- Patch 3 adds the basic cake_mq qdisc, reusing the exported mq code
 
-> +	  context in pritnk, such as task PID and CPU number from where the
+- Patch 4 adds configuration sharing across the cake instances installed
+  under cake_mq
 
-                     printk
+- Patch 5 adds the shared shaper state that enables the multi-core rate
+  shaping
 
-> +	  message originated. This is useful for correlating device messages
+- Patch 6 adds selftests for cake_mq
 
-Rather than "device messages" I suggest "printk messages".
+A patch to iproute2 to make it aware of the cake_mq qdisc were submitted
+separately with a previous patch version:
 
-> +	  with specific execution contexts.
-> +
-> +	  One of the main user for this config is netconsole.
+https://lore.kernel.org/r/20260105162902.1432940-1-toke@redhat.com
 
-Rather than saying which drivers might support this, it would probably
-be better to make it explicit. For example introducing a new config
-like:
+---
+Changes in v7:
+- Use kzalloc() instead of kvcalloc(1, ...)
+- Add missing SoB to last patch
+- Add new include/linux/sch_priv.h header file to MAINTAINERS entry for TC
+- Link to v6: https://lore.kernel.org/r/20260106-mq-cake-sub-qdisc-v6-0-ee2e06b1eb1a@redhat.com
 
-CONFIG_CONSOLE_HAS_EXECUTION_CTX
+Changes in v6:
+- Add missing teardown command in last selftest
+- Link to v5: https://lore.kernel.org/r/20260105-mq-cake-sub-qdisc-v5-0-8a99b9db05e6@redhat.com
 
-that can only be selected by the console driver (or in your case, the
-console driver option NETCONSOLE_DYNAMIC). Then make
-PRINTK_EXECUTION_CTX depend only on CONSOLE_HAS_EXECUTION_CTX. That way
-it is only available if the console driver supports it.
+Changes in v5:
+- Disallow using autorate-ingress with cake_mq
+- Lock each child in cake_mq_change() instead of the parent
+- Move mq exports into its own header file and export them with EXPORT_SYMBOL_NS_GPL
+- Add selftests
+- Link to v4: https://lore.kernel.org/r/20251201-mq-cake-sub-qdisc-v4-0-50dd3211a1c6@redhat.com
 
-> +
->  config STACKTRACE_BUILD_ID
->  	bool "Show build ID information in stacktraces"
->  	depends on PRINTK
+Changes in v4:
+- A bunch of bot nits:
+ - Fix null pointer deref in cake_destroy()
+ - Unwind qdisc registration on failure
+ - Use rcu_dereference() instead of rtnl_dereference() in data path
+ - Use WRITE_ONCE() for q->last_active
+ - Store num_active_qs to stats value after computing it
+- Link to v3: https://lore.kernel.org/r/20251130-mq-cake-sub-qdisc-v3-0-5f66c548ecdc@redhat.com
 
-While this patch might be "good enough" to preserve the current
-CONFIG_NETCONSOLE_DYNAMIC features for NBCON, I am not happy about it:
+Changes in v3:
+- Export the functions from sch_mq and reuse them instead of copy-pasting
+- Dropped Jamal's reviewed-by on the patches that changed due to the above
+- Fixed a crash if cake_mq_init is called with a NULL opt parameter
+- Link to v2: https://lore.kernel.org/r/20251127-mq-cake-sub-qdisc-v2-0-24d9ead047b9@redhat.com
 
-1. It relies on the printer context being able to determine context
-information about the printk() caller. I would prefer adding the task
-name directly to printk_info instead.
+Changes in v2:
+- Rebase on top of net-next, incorporating Eric's changes
+- Link to v1: https://lore.kernel.org/r/20251124-mq-cake-sub-qdisc-v1-0-a2ff1dab488f@redhat.com
 
-2. It adds information to printk records that only netconsole can
-use. If we want other consoles to support this, we would need to modify
-all the console code. I would prefer it is dynamically added to the
-generic printing text. We could do this by extending
-msg_print_ext_body() based on some user configuration. But it would
-conflict with the current netconsole format.
+Changes in v1 (since RFC):
+- Drop the sync_time parameter for now and always use the 200 us value.
+  We are planning to explore auto-configuration of the sync time, so
+  this is to avoid committing to a UAPI. If needed, a parameter can be
+  added back later.
+- Keep the tc yaml spec in sync with the new stats member
+- Rebase on net-next
+- Link to RFC: https://lore.kernel.org/r/20250924-mq-cake-sub-qdisc-v1-0-43a060d1112a@redhat.com
 
-Despite my concerns, adding the PID and CPU information is generally
-useful. So I am not against expanding printk_info. My concerns are more
-about how this information is being used by netconsole.
+---
+Jonas Köppeler (2):
+      net/sched: sch_cake: share shaper state across sub-instances of cake_mq
+      selftests/tc-testing: add selftests for cake_mq qdisc
 
-@Petr: I am really curious to hear your thoughts on this.
+Toke Høiland-Jørgensen (4):
+      net/sched: Export mq functions for reuse
+      net/sched: sch_cake: Factor out config variables into separate struct
+      net/sched: sch_cake: Add cake_mq qdisc for using cake on mq devices
+      net/sched: sch_cake: Share config across cake_mq sub-qdiscs
 
-John Ogness
+ Documentation/netlink/specs/tc.yaml                |   3 +
+ MAINTAINERS                                        |   1 +
+ include/net/sch_priv.h                             |  27 +
+ include/uapi/linux/pkt_sched.h                     |   1 +
+ net/sched/sch_cake.c                               | 514 ++++++++++++++-----
+ net/sched/sch_mq.c                                 |  71 ++-
+ .../tc-testing/tc-tests/qdiscs/cake_mq.json        | 559 +++++++++++++++++++++
+ 7 files changed, 1018 insertions(+), 158 deletions(-)
+---
+base-commit: 76de4e1594b7dfacba549e9db60585811f45dbe5
+change-id: 20250902-mq-cake-sub-qdisc-cdf0b59d2fe5
 
-[0] https://lore.kernel.org/lkml/84y10vz7ty.fsf@jogness.linutronix.de
 
