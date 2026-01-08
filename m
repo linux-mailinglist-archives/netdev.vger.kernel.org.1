@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-248178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 798FDD04C28
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 18:13:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9A56D052E3
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 18:49:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 13BBC30666AF
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:54:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0E1363328E2A
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:54:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B56C92EBBB2;
-	Thu,  8 Jan 2026 16:53:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5BEB2F28FC;
+	Thu,  8 Jan 2026 16:53:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l0hTXkKg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Grpgfaio"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AFE92DCF46;
-	Thu,  8 Jan 2026 16:53:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A10D52E9EAE
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 16:53:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767891226; cv=none; b=M4i9D1iCHb+KBzjuCAqLL8+oNHKVx8CZDGpAfoLBq5J7oFpn9pWbr8q3yJK9IKpuJhYYy9NJhcRtqOuVE09zHPyrmujvGpOhHPV+gA5+rDZA9GwCDBFNgAr0w52qglBHjCw64n8vTKSgk9Cont+ORneugvvPcPmGt6CmZ/J1alA=
+	t=1767891227; cv=none; b=ES3GzWpR9R6oC7hXmjabVR4upEBuArJBJCCRALJYFKL+rXISSqZZWMMlKx5hF597TXECeSa4j+t80WkxWMxjiBxRsUbQ18UU9i2BdZl6dKiY9qgONy/vC6QH41io2jsC0uPLRPwYH7ND1sx6hd2ZA8+td/s4wXYkFVPa+WfOEIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767891226; c=relaxed/simple;
-	bh=m4uIYf7XRXQ4HudqrctBnnMhYPZl+6Vzv/7NAPsBjHk=;
+	s=arc-20240116; t=1767891227; c=relaxed/simple;
+	bh=Jzf8zaj/18RluhRNfs3E+iGvbGzsUJq52CgdDRVw5SA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cCsyZJPxFZBbrYMOtfzKJPWzid+fQunTMi26/pziBxvpOTE3RJ14uMCTmFmlkc8ZOc+dfkKGRA2xnyCd6HUF3suNDfY9BsHFj3r5J43IjBLfplEkcYDHxGIbZixXzPi0VKF7yIzOFCf+V6qX8u1C7klAhD43AzDDNROlswaj8Rk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l0hTXkKg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4700BC4AF0B;
-	Thu,  8 Jan 2026 16:53:46 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ewMDGQOtyMwG+OBJ9piIVdS9+t8VF0p+GoxwKfoJhy07191vuyZekg2igh1PrwOnommCNKa6u46hV2MVqBJjOKiyLGuDDgnzagq+AaJp0GVfQemYXRPXVQEohhzFaeOxfI0Nzijmm7n9pxk6jbv0vgx4Z7t4ULgEkgDuDigNBqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Grpgfaio; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CA6FC16AAE;
+	Thu,  8 Jan 2026 16:53:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767891226;
-	bh=m4uIYf7XRXQ4HudqrctBnnMhYPZl+6Vzv/7NAPsBjHk=;
+	s=k20201202; t=1767891227;
+	bh=Jzf8zaj/18RluhRNfs3E+iGvbGzsUJq52CgdDRVw5SA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=l0hTXkKgc3KwpLWgIVq7oGmjDHOZr4MG+7HMUv4DfkcYra9NqnqwXw0MSKvU08aJ0
-	 dikv8LqWrsxtqImw7MwVyDBx13DnT0VznwHhpzJrAdd3ivhtaPOCqzrRa/fwQGUTFU
-	 rF2M9tB32+VvHOytIBZp80uGHSXDAl9BphphbE6Ii27xfQvo+VDfvCt0DU5e8OmOEZ
-	 Gm46OUjYNsTZWg5vmFjqWskXX6M9YEXGIkC0Us5KxIclJvFX0ikjzoQYPZBCNDHEP3
-	 bFdXnvSdCObY3rPChJQz9E7NdWzbzftl+CeBSLJvjeoQlJ1r8dLLjsfGFgpQaAO6ZE
-	 jXKUJSxN8L42g==
+	b=Grpgfaio2k77LqpVwEjw0kjvqOC+dtKvSs1XHfohOt0/jvI6R2wi+rTGlHQk80poO
+	 b4yct/g0Sgt3bvHA/4jiVyt7+pPfGso+khUceCrVtciwK6yt1aON+UfVJvy/XpZ0DM
+	 Lr2hkzcnVu6Mye5N8MnfzO5eQL8UVmBCkPVGR4ww/IX3vGmHu60StGjRfiOZV7XVug
+	 iRoBzJ8qgbmyv2QEpa638gc935LPmyIAWDlwybf10Izqod/kjiv5vk91sphOOPK76E
+	 rWvgsqPwPRj/ehJ65wP6kbZGH8sG+AjTZ7Jc0FtoTaIZTWItpYFHKKbKCAv/t17OeB
+	 8kbsHLn6NEXqA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2AC23A54A3D;
-	Thu,  8 Jan 2026 16:50:23 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3C2D03A54A3D;
+	Thu,  8 Jan 2026 16:50:25 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,37 +50,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH NET v2 1/1] net: usb: pegasus: fix memory leak in
- update_eth_regs_async()
+Subject: Re: [PATCH net] tools: ynl: don't install tests
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176789102277.3716059.3717751225941024809.git-patchwork-notify@kernel.org>
-Date: Thu, 08 Jan 2026 16:50:22 +0000
-References: <20260106084821.3746677-1-petko.manolov@konsulko.com>
-In-Reply-To: <20260106084821.3746677-1-petko.manolov@konsulko.com>
-To: Petko Manolov <petko.manolov@konsulko.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, stable@vger.kernel.org,
- pabeni@redhat.com, andrew@lunn.ch, petkan@nucleusys.com
+ <176789102402.3716059.16341235372896443735.git-patchwork-notify@kernel.org>
+Date: Thu, 08 Jan 2026 16:50:24 +0000
+References: <20260106163426.1468943-1-kuba@kernel.org>
+In-Reply-To: <20260106163426.1468943-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ donald.hunter@gmail.com, jstancek@redhat.com, liuhangbin@gmail.com,
+ matttbe@kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  6 Jan 2026 10:48:21 +0200 you wrote:
-> From: Petko Manolov <petkan@nucleusys.com>
+On Tue,  6 Jan 2026 08:34:26 -0800 you wrote:
+> make's install target is meant for installing the production
+> artifacts, AFAIU. Don't install test_ynl_cli and test_ynl_ethtool
+> from under the main YNL install target. The install target
+> under tests/ is retained in case someone wants the tests
+> to be installed.
 > 
-> When asynchronously writing to the device registers and if usb_submit_urb()
-> fail, the code fail to release allocated to this point resources.
-> 
-> Fixes: 323b34963d11 ("drivers: net: usb: pegasus: fix control urb submission")
-> Signed-off-by: Petko Manolov <petkan@nucleusys.com>
+> Fixes: 308b7dee3e5c ("tools: ynl: add YNL test framework")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - [NET,v2,1/1] net: usb: pegasus: fix memory leak in update_eth_regs_async()
-    https://git.kernel.org/netdev/net/c/afa27621a28a
+  - [net] tools: ynl: don't install tests
+    https://git.kernel.org/netdev/net/c/790792ebc960
 
 You are awesome, thank you!
 -- 
