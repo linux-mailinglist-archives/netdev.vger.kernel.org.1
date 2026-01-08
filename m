@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-248179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9A56D052E3
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 18:49:49 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6B63D04B4E
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 18:07:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0E1363328E2A
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:54:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 23C0A30AFC30
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:54:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5BEB2F28FC;
-	Thu,  8 Jan 2026 16:53:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A7FD2FD1BF;
+	Thu,  8 Jan 2026 16:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Grpgfaio"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I7TAsFjp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A10D52E9EAE
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 16:53:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357762FB616;
+	Thu,  8 Jan 2026 16:53:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767891227; cv=none; b=ES3GzWpR9R6oC7hXmjabVR4upEBuArJBJCCRALJYFKL+rXISSqZZWMMlKx5hF597TXECeSa4j+t80WkxWMxjiBxRsUbQ18UU9i2BdZl6dKiY9qgONy/vC6QH41io2jsC0uPLRPwYH7ND1sx6hd2ZA8+td/s4wXYkFVPa+WfOEIY=
+	t=1767891229; cv=none; b=MJUEZE1eJeHS1+dmRjxNDdz73aCI3nkxXYQMofsk1DLkWo0P78FEGQzuSQV7Rq7Qq0Mzx9G0cXVfLXxV+oo1ToMdqCtJYOkpfy5ccYsxkNM+c/DhQTHgkCatDQjWjWtE25hX4r+Y/MCe6S+OM3/hakh07xzYlTfImoHhK2cGsow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767891227; c=relaxed/simple;
-	bh=Jzf8zaj/18RluhRNfs3E+iGvbGzsUJq52CgdDRVw5SA=;
+	s=arc-20240116; t=1767891229; c=relaxed/simple;
+	bh=FvVFkhq3ih/7Pr5tX1hi0ZB/aEynWF5iQIiO6C5sTes=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ewMDGQOtyMwG+OBJ9piIVdS9+t8VF0p+GoxwKfoJhy07191vuyZekg2igh1PrwOnommCNKa6u46hV2MVqBJjOKiyLGuDDgnzagq+AaJp0GVfQemYXRPXVQEohhzFaeOxfI0Nzijmm7n9pxk6jbv0vgx4Z7t4ULgEkgDuDigNBqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Grpgfaio; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CA6FC16AAE;
-	Thu,  8 Jan 2026 16:53:47 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=DR+qcuanxWiuzIVODyCGxMDe5+pkGqbr0dev885hSm+elJA9tOwC97UrDbQCc9aYao2zpwZRTxxHR2xL1klIouWgrTU0WaVCMGDm5ikLH3SqLjZiam/yBGnkFKZu/T9DoKJlzikgGaJ2COC+906dxK1ucAw6ILfg8cKp1Zq2hyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I7TAsFjp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB259C116D0;
+	Thu,  8 Jan 2026 16:53:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767891227;
-	bh=Jzf8zaj/18RluhRNfs3E+iGvbGzsUJq52CgdDRVw5SA=;
+	s=k20201202; t=1767891228;
+	bh=FvVFkhq3ih/7Pr5tX1hi0ZB/aEynWF5iQIiO6C5sTes=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Grpgfaio2k77LqpVwEjw0kjvqOC+dtKvSs1XHfohOt0/jvI6R2wi+rTGlHQk80poO
-	 b4yct/g0Sgt3bvHA/4jiVyt7+pPfGso+khUceCrVtciwK6yt1aON+UfVJvy/XpZ0DM
-	 Lr2hkzcnVu6Mye5N8MnfzO5eQL8UVmBCkPVGR4ww/IX3vGmHu60StGjRfiOZV7XVug
-	 iRoBzJ8qgbmyv2QEpa638gc935LPmyIAWDlwybf10Izqod/kjiv5vk91sphOOPK76E
-	 rWvgsqPwPRj/ehJ65wP6kbZGH8sG+AjTZ7Jc0FtoTaIZTWItpYFHKKbKCAv/t17OeB
-	 8kbsHLn6NEXqA==
+	b=I7TAsFjpCZ8ixhLH8eLruCaFKaf3RDtHdYJ5YZpjqtMJjXzAI9agXVWUucZWg2mtI
+	 yEZsq0fESmmtj9c/oh9eCoQu122ZDqT0Oe+jfMRQucdik3iVkRZbjN9oy9lDVnYHHj
+	 /O0c9Ev7BZN+UECrtL5qcDE3YNhR2jaW6QOY9jW2/Gx5HICXH+XRAwj/sjRj0ettFC
+	 mZ1yZiMt+OjyRJqsumJpyOJmOoPUROI+uaHs3hxpfqa/BU8U+UVexDGU/LXqhkfFCN
+	 JxBNlOAQSV7RM0dyNhty7rnKJHNVcfwFSwySEefWHpqu29PSyQ4kIxAWq5sncy3Uac
+	 xVkEXdP3kMMfg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3C2D03A54A3D;
-	Thu,  8 Jan 2026 16:50:25 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 789033A54A3D;
+	Thu,  8 Jan 2026 16:50:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,39 +50,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] tools: ynl: don't install tests
+Subject: Re: [PATCH v2] atm: Fix dma_free_coherent() size
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176789102402.3716059.16341235372896443735.git-patchwork-notify@kernel.org>
-Date: Thu, 08 Jan 2026 16:50:24 +0000
-References: <20260106163426.1468943-1-kuba@kernel.org>
-In-Reply-To: <20260106163426.1468943-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- donald.hunter@gmail.com, jstancek@redhat.com, liuhangbin@gmail.com,
- matttbe@kernel.org
+ <176789102528.3716059.7973685974047061916.git-patchwork-notify@kernel.org>
+Date: Thu, 08 Jan 2026 16:50:25 +0000
+References: <20260107090141.80900-2-fourier.thomas@gmail.com>
+In-Reply-To: <20260107090141.80900-2-fourier.thomas@gmail.com>
+To: Thomas Fourier <fourier.thomas@gmail.com>
+Cc: stable@vger.kernel.org, 3chas3@gmail.com,
+ linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  6 Jan 2026 08:34:26 -0800 you wrote:
-> make's install target is meant for installing the production
-> artifacts, AFAIU. Don't install test_ynl_cli and test_ynl_ethtool
-> from under the main YNL install target. The install target
-> under tests/ is retained in case someone wants the tests
-> to be installed.
+On Wed,  7 Jan 2026 10:01:36 +0100 you wrote:
+> The size of the buffer is not the same when alloc'd with
+> dma_alloc_coherent() in he_init_tpdrq() and freed.
 > 
-> Fixes: 308b7dee3e5c ("tools: ynl: add YNL test framework")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] tools: ynl: don't install tests
-    https://git.kernel.org/netdev/net/c/790792ebc960
+  - [v2] atm: Fix dma_free_coherent() size
+    https://git.kernel.org/netdev/net/c/4d984b0574ff
 
 You are awesome, thank you!
 -- 
