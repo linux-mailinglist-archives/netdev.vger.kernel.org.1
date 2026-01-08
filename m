@@ -1,311 +1,289 @@
-Return-Path: <netdev+bounces-248011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 644C3D03242
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 14:48:33 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 348ABD036EA
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 15:42:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 156373071BAE
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 13:40:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 12E2C303BA92
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 14:41:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 686963DA7F9;
-	Thu,  8 Jan 2026 09:08:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="VuZiaUHX";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="esCVtQDV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B1DC461DA7;
+	Thu,  8 Jan 2026 11:08:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EE183EDD45;
-	Thu,  8 Jan 2026 09:08:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767863287; cv=fail; b=LyXlvcMEIIFAfjuiQFPPCPYIEL0Kk2KSeiwHFUK7aVOGvmRn+r4itu3/njSHk9BMpYF5Dwwpih1jlc138zE498EMQcFL3QgyX4zo0m86evCetV27RIT9ua4HLx3CwVfpqX3Cl9eEqq53eby0MOG8dxW7RCU9Ja875IQCVI+IkBs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767863287; c=relaxed/simple;
-	bh=HQJ/q+hxG457tlvbpQWQhesGddZHhV23H0ruLkZ0Rcs=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Mu7zHzhTbTysYutsfDeon6m8KVH2QDLW5w92/sZmJLJYQTiIj1RyXs82emkO0HngxB5lNMYptPrkragf1ltmayNAgNbB0R32r1evumoBc4gfXivpR0WNbJicyXDBujoK80rkwHygRnHLNBUC3WS/bREBKxL95oaOSRWb8DSiKs8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=VuZiaUHX; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=esCVtQDV; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60871PFl3780187;
-	Thu, 8 Jan 2026 09:07:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=nNX0AONehQsubIUtjW4E2qsMB1RZKgpPY1UrSDI87fg=; b=
-	VuZiaUHXkU/hnyOH7YyB5ESqPF6BtjkMEoCbAhwpeScyLi+1hsyWc96I7b3tDfyl
-	JIwnT/vzZoiFqwKxNCaEkuMOu9oCMkR55RlpXETXxpbGqL2vV2zPTQlwhzzARwYz
-	qoa64n85q0VzpjEn9Xe6Q/Us0hiOBf2c39fsYokm28N/TkeFDfxkxEDxhnR/nI1M
-	aibRhh/zv08/pEYlzJkc7UBi5/YqZSFEBx6wZyqwUAwh6l6Nd0LWD4+4BeivILNe
-	3p1WtvdSwo2A3m1+9n/IdTrfuHkXJRjKFOpqdlOh0mJJApAhQ3FprZlKvmaKMZYS
-	1TFaXEsC3NjGJGpjtAFzuw==
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4bj7tr03mx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 08 Jan 2026 09:07:49 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 6087npVk030838;
-	Thu, 8 Jan 2026 09:07:48 GMT
-Received: from mw6pr02cu001.outbound.protection.outlook.com (mail-westus2azon11012045.outbound.protection.outlook.com [52.101.48.45])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4besjew0cx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 08 Jan 2026 09:07:48 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=swdWnUNL1Ewtnm3wSPnYxhRqXr5sLK2zLLQfsT2oZC68fdZ7NwrUgl/OtX9OixjhAmbQXo9CGjxOqCM/ZybFdjPZLWn4HJ6JZIO0ZmdvDMzzzB/Y3KJdPOdYhbZ04SUk2CkwGvJh/xDrRGR8DDyzckdZHDPqo/3lGnn9Lfp4MEO+VsnuAavC+KHhqrmEYvxonNaBuJN52moKU+MbCXZ0unFAy/B8U9t/fehgrBW3QrNBEFfBilygeuSD5z7hongc9uh70kXjRiH/nkM8HPRyCLB7IKPIBBDRe1LDvTKsONAe/s08WLrWGx+mwKOlrxEf4n/m6/bQIgo+0E8iqrJw8Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nNX0AONehQsubIUtjW4E2qsMB1RZKgpPY1UrSDI87fg=;
- b=pXokYs1Kvh6Fj+QQDuPhmmDqnsh7QpxUan/6E79zlfxjjO/Zg8Cc0GRowFUzQGuOzqMLtQ1BFLh8IUCUsEd40fpT4DidsAZkLkrLdltgc4JdEdsYc/uaa6KtqD+1O9UgJPD7D+QcjpUnkTeg1PqSsmCjY+1cMRh15jCXFlo423CXXt6i9JWK+WM9zG22vFRMMX6zBwwtrKnWrpgJi9yb9TLmajo0kj1enXjwboYP5XgcJUFoLGBJp6ef2+1qHxIgdJZ53Pl61QKYPiaL6ONpaO5T2w6BOF/PBuBvUmCSgG9YVHJ7QS2MBwxGW5JtFgTSwspt+OU0Hh/f/Ci8Wu3UHg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nNX0AONehQsubIUtjW4E2qsMB1RZKgpPY1UrSDI87fg=;
- b=esCVtQDVGzrsgxxMrfEcdAL2Pe7UuXHiZCPdhPyw4My0ziaXitGn7xkuKCz6C0QzXny6G7t87bpuXqlD9h8ZErb07cPrs+x35oXAvae3H9CYuC1ToMKNXXTPdkROyNtS6p8XzgzOR3jk4OBcyWjbIQ4Y1YtwR2c3FjVFf1BH0Hs=
-Received: from DS7PR10MB5328.namprd10.prod.outlook.com (2603:10b6:5:3a6::12)
- by BY5PR10MB4291.namprd10.prod.outlook.com (2603:10b6:a03:207::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.2; Thu, 8 Jan
- 2026 09:07:45 +0000
-Received: from DS7PR10MB5328.namprd10.prod.outlook.com
- ([fe80::ea13:c6c1:9956:b29c]) by DS7PR10MB5328.namprd10.prod.outlook.com
- ([fe80::ea13:c6c1:9956:b29c%6]) with mapi id 15.20.9499.003; Thu, 8 Jan 2026
- 09:07:45 +0000
-Message-ID: <99647efb-537c-462e-bbef-a3c01ef1bd8c@oracle.com>
-Date: Thu, 8 Jan 2026 14:37:38 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 07/10] octeontx2: switch: L2 offload support
-To: Ratheesh Kannoth <rkannoth@marvell.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, andrew+netdev@lunn.ch
-Cc: sgoutham@marvell.com, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com
-References: <20260107132408.3904352-1-rkannoth@marvell.com>
- <20260107132408.3904352-8-rkannoth@marvell.com>
-Content-Language: en-US
-From: ALOK TIWARI <alok.a.tiwari@oracle.com>
-In-Reply-To: <20260107132408.3904352-8-rkannoth@marvell.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO2P123CA0060.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:1::24) To DS7PR10MB5328.namprd10.prod.outlook.com
- (2603:10b6:5:3a6::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 593B6461DB0
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 11:08:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767870511; cv=none; b=AGAX8AaasjjFNl8U7h/LiCwInUHb/5aUjipLdei0sA4Tq1YmpuA3QPCMr5A+wWEF2UXexGgNXssS4aYRi7fDEuZnl9G9uaHCHQK077RAlMFC4JvxcBdofnMekHGotCTCXkN1SETzKIit4m7eH2m9u1G+3clLxNtsMEJYLy/188c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767870511; c=relaxed/simple;
+	bh=wcGRWM+RnRdB3POnfupDCWelJbx+Hr39/IrIZi1Sq3k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mck8Gx7hP3jAMZzkYQSXg0rg/oMTZMMP5MUl55INU1Mxz5epJKkxn3yH3rAd0wV9UvJzbuVsf8ajbYPZR4JpBHdAH2jbNx07bE7njaiqs0UXkAP/XfNHiBsn1DsBhdXH3ldJpCqGTwf3eONyym/YGzqJYbbT93DopJ7H+Ty13FE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.161.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-65cff0c342eso2151070eaf.3
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 03:08:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767870499; x=1768475299;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PlbXXe8ivVlM+DeeY84GE+OAIs3+4LxqS0gyqDVJQ5A=;
+        b=OPBk/t93AHCtJaNnYZsugxKdntkchFvTLqYkEjawacnyMrFsq2qp45jqJ09+bvs+j8
+         zqoVHuvRWu999Ky8MyzoFGbAwYJPkfwEqPAu2a2q+YgqZFYGtIXa0REDYLycGbX777M4
+         bALXJTWiWqtwfiuDRYWX9nNt2/rw2nH9ZnbUgWPGfIzR+FIpcHmGqOt6VQHHpKf64QXH
+         uOPf09JlVHPtZVabPxArw/YNUZUKTTejZPNkh5sh707bXtCJ0yDJxpJeGhwKw6Po+xk7
+         CFpFp5EbtQRsKkZH6b9dRRbhMidg+BmdUe3xkN3tJJbunO36TIvJmOu4UFP+s8NEASrG
+         eBLg==
+X-Forwarded-Encrypted: i=1; AJvYcCVJML0HLyczW4EX0OYBwncuA1F/lXwPkuecWQYSFezIzvg0jxhFoBG0dfm9Ts4xpQPQK/s19vw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhzZ+c9OCUiBmgkzstnqiLuAiPCPKgBDkCm/PIQKh93IJPFC1H
+	HlHABAF+4EiTLqhjqLzp3QNdMBsxog1b4UOMzJdJhK1cPWh2p1y1oGaX
+X-Gm-Gg: AY/fxX5jaNk9TJWwGR+I6/rucNJ8uwQLU6G0ZM3SV9Qp+FUa86NsPIg4PPEQmx1rQ6o
+	9V+FHBhh9kafb+Buo43/EaEWwtdfPFkCPklE1eHGdpKa24Oc7jB0UpTa5CRrT1axl8YVPc8y+B7
+	L5l3nM7DbABz1SlsPicJh90wGHywXBaHdj7qh9XqUidaMp2WSjNZsTT6iaHWgqTsmzLwsxKQjHC
+	5gCnKUH9WY0BhBdJxiAmbCpUw24oWds8I3TPLdwokNnSMsHl/tzklhxbBFBWbrb/LnXg13f6Xi1
+	xFKdehn3VmbpLIlYCSXSibElrRs6ECH8ENMKVhzgHWhSPFmmsl9fZ91he+sRDD1Yjo/ELtDS8x9
+	BNqvZwoDqt/vr5t1I/iv+rxDp7btbT2SyqnQgzXIS2p7KSJRZKyQZdRZlEIVtuuwpNY97VveCuy
+	ml91jTszXMH0wP
+X-Google-Smtp-Source: AGHT+IFcPD+ED5vq4PSH9sGAATnX//FOjx5ZkRYp2X6L9Gh1I9FJuyRqd7zLWOVuXVwlMFRnhpKBNQ==
+X-Received: by 2002:a05:6820:f002:b0:65d:a79:568b with SMTP id 006d021491bc7-65f54eebcccmr2237188eaf.34.1767870499469;
+        Thu, 08 Jan 2026 03:08:19 -0800 (PST)
+Received: from gmail.com ([2a03:2880:10ff:73::])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-65f48cb03d4sm3297830eaf.12.2026.01.08.03.08.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jan 2026 03:08:18 -0800 (PST)
+Date: Thu, 8 Jan 2026 03:08:16 -0800
+From: Breno Leitao <leitao@debian.org>
+To: John Ogness <john.ogness@linutronix.de>, pmladek@suse.com, 
+	mpdesouza@suse.com
+Cc: pmladek@suse.com, mpdesouza@suse.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, gustavold@gmail.com, 
+	calvin@wbinvd.org, jv@jvosburgh.net, kernel-team@meta.com, 
+	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, rostedt@goodmis.org
+Subject: Re: [PATCH net-next 0/2] net: netconsole: convert to NBCON console
+ infrastructure
+Message-ID: <j764nuipx4nvemd3wlqfyx77lkdf7wgs5z452hlacwglvc2e7n@vsko4bq5xb2f>
+References: <20251222-nbcon-v1-0-65b43c098708@debian.org>
+ <5mpei32y7sl5jmi2ciim4crxbc55zztiucxxsdd633mvzxlk7n@fowtsefym5y6>
+ <87zf6pfmlq.fsf@jogness.linutronix.de>
+ <4dwhhlnuv2n3f7d3hqoulcnsg6ljucd6v47kqcszcwcshfoqno@rzxvg456q4fi>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR10MB5328:EE_|BY5PR10MB4291:EE_
-X-MS-Office365-Filtering-Correlation-Id: ce6b4f9a-6ce8-488e-9876-08de4e956312
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?U0NDRUYzS3hvb0lub0hsRmdRSEVrZVFTN24xWktVemdiQmRmVWQ3b0wrWDI2?=
- =?utf-8?B?SUtudXQrUU54RldEelA1RTVYSTE5Tk9waDR5a0ZFblBhM0JSWXhaaVVSSExu?=
- =?utf-8?B?cU9qNFhpZW5tcmFPbzI5aE8wZk1jR294ckZkOFI2K3FBSnBibXhJK2tBa0Rn?=
- =?utf-8?B?YkVReXAxeEV1ejA3RGYwbHMzV0haZ1BSMU8vK3o1N3hTbUhTbWZ6K2lLeCth?=
- =?utf-8?B?NUNuaHdPS2ROZExIOWJ5cFJwMFFCUXMrZFlMMlBxV0JzVi8xMEd0aVRrTXJH?=
- =?utf-8?B?ZisxZ2EzV1dvK3JEYTg5ZHdvYnQ3QmcwYjd4cTN2SitQQmxIVzVMSUp6dlFS?=
- =?utf-8?B?UDZVemlqK01MdHpMUlZRbktGZTVwYmpDMDJ1OEIrZnROSEMvejMzUHV6SmVN?=
- =?utf-8?B?ellwQzVzL0p5YUVaNXRnd1ZWMk5ka1hwcWE3ampNbzgyM0hUbjVRVFV5Zlk3?=
- =?utf-8?B?QzdRVENtcHVkNkVIazhrQkhQLzZaNHZFaTNXQXpaMU9HWmpac1FoeE0wdDEr?=
- =?utf-8?B?TnpoZm1wd09tWFBQb3p1M1Q1R3NoTStwVG93NkN4NmVvSksxd2tjQVVQRlZ4?=
- =?utf-8?B?Tk1IS3h0Z1JySUg5ODV5MWFaNmJHTHNESzl0bmE4RndpbElVZ1QyVy81bUpw?=
- =?utf-8?B?MUo5ckhJZzRQU2hLczhMVE42YVJwWm41c2NaN1h2UG5wNzRkamZ5TmwycE4y?=
- =?utf-8?B?SzRXNUNRQ1lyam5zZ3JNWnYvNWQwYS9PM3M5NC90YXpyZ2txTGxyM05pZGFQ?=
- =?utf-8?B?ZEx0VmFFUVZ0cnc3VnhWVEUzNDVKN2RwZitBRWxNWGtqd1g2WkRvYXNJWTJw?=
- =?utf-8?B?WUZSQTR0MWkyNjdmK0c5eVZMN2JxcHNHVmd1VmxQZm8yUDh0UGhHOWFGYUpO?=
- =?utf-8?B?WHJLNzdXUVd0aktEYWlLdVpIaUlmOUZjUEhSTkcycm96amRqcm5zL3RFdlZq?=
- =?utf-8?B?blJlUEIxR3hVZDc2d0VtUHJDdFYrNWVDQzAvMW1JQkxXVmdkZWZYdC9SN1Fy?=
- =?utf-8?B?RjZudFp3TXc4L2N3Vi9MSkxSZW9ZUG5KdUJMVVplMkN1OUNJSTRWeVNJQnVm?=
- =?utf-8?B?bER2dHFXUnpMRG9FdlBuYXcwNEtDSVRRTkpkQksxRHBUN1pqT0N3OGhDdndZ?=
- =?utf-8?B?TU9DVFgraDJxK05JYjczeTVLaE5oWDF2dndJVEk4aGpRU2dPRldYanQ2WXg2?=
- =?utf-8?B?NGFBUmh1SDdjbEg4QlRQbDVJZjU3VEhwZ29GNFZBaCtpVVovZWw1aXBSbWh3?=
- =?utf-8?B?cUVUSGsvKzdtMWhpc0hTMFhhUU9jaXhkVTRZbkVTT0gyZVFyUWFWeC9qWlNP?=
- =?utf-8?B?UlpSbkg0VSsxdVB2WTF6ZUlQVWVyd0dwOGZPdkp4QnJvSmEwVkJOOUNBdzRn?=
- =?utf-8?B?R3lvbGZyUUN1R0U1NFZCMXl5bytUeVhOVmxkdk5nbk15SVNUSVZySFJOOUg2?=
- =?utf-8?B?QzdLZGljTldKb2pBei9KQlhBaURjdU9rZks2UTRWWUpnblpEZ1VNTDVjY2g2?=
- =?utf-8?B?ZVY5bU5OUnRCdVh5cUd3T1JIekFxb3czT3pTM055U1lCb25UK1ozNlVoQWJI?=
- =?utf-8?B?TXIxc0IrcTNuV1dPTG9WRDVGTm5KN09aSHFKdWtjdktLVzRiTlZzbGQzSE9S?=
- =?utf-8?B?bFhOc2NQMkxSbW1uQ1o4TDFZVmNZOFlOZ2kwNjBDYW81L0UzNWFTNWsxaFll?=
- =?utf-8?B?WmE0MVJ3MXpJL0tUM0oxWkZ5QVF3ODlNQ1JaUWZvN3ArdlJYOTRzSE8wTUxo?=
- =?utf-8?B?d1pjQ1pNaWIyU21EYnZYdXdKMUE1Sk1HanZhTEw5TCsvWDhqazNzM0FnVlZs?=
- =?utf-8?B?Mkw5bVUzdmdhY0NNUlppVjJsa2hLYzVWdERyd1VLZmVuQnA0L3NIdmpDMEVx?=
- =?utf-8?B?dGs3OC8xSXo3eTdLc1hvejVzcURtUGF4SVNXZ01ZMGUrd2xrY2RKL3ppbDNa?=
- =?utf-8?Q?t30wzyRKNfQBNVuytvzy30caOLkZoWSJ?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR10MB5328.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?THE3WktFby8zTktrNlVwMHUrOWZqOFVIR293ckZ1MWxJWWV5dVB6bzJsZmhK?=
- =?utf-8?B?WXRtek1OSEtmVGxWMEsxaW1aNStjcndvak82bzRLallWWDJSMXlXcHlFQTN4?=
- =?utf-8?B?V3UxV0h2MTJNc2xZeU9zSCtTaXJhUGV3NktjanpaUThxaUJoS3grL3hHQmJp?=
- =?utf-8?B?ZFhlbUdOOE9PNm1Jc2xiVjR1Y3VrSXhpeDllMDBrSjlZeGYzVkdlWWxubXZS?=
- =?utf-8?B?VE1YTjNYbkRmbVdxemZ0aWg5N1BnWE1LYU9ueWhwU2VJcE1TQ2M2SG10bGI1?=
- =?utf-8?B?L3pzTFhjYVI4SThwY0ZMTDkyQ3Qwck9nMzVRU3BOT1lVL1ZjT1hmU25zYjZ2?=
- =?utf-8?B?MjhvWHpMZXdJTnRDSWhFTmU2N2w1YSszeVpIOHppV1R4YkZXbS9UcVNKdlN4?=
- =?utf-8?B?Q1Y2OTRTVnVTNEpobmhseWpCamRQS1RJc0hSRlZQdmR5RExzUGhHSGtKZ1hZ?=
- =?utf-8?B?Ri9Bd3pxZVAwWlZKc1Nkak9DNmNIVjhTWldGOHdhbEJkazIvMGJYenFLTGV1?=
- =?utf-8?B?NTFHeHQwMVdpdlJFUENHQUF2eWlTYzRkTHJHdkU3MVpvN1NDT3FPOU1STDBi?=
- =?utf-8?B?K3B1T3dGR29hdGdYT2cweXVhNjRYL3hESUNxaWRYRGhDTU9GWXVldEw4cjhB?=
- =?utf-8?B?a0JxZ2cybWhwU0M3WFIyUm1XeGRCejhIYi8razZMWGxrWmRsajZLdWN5MUxS?=
- =?utf-8?B?UE53TG8wVmdqaUI5Z1BXblo0Z3FPek1odk9vSFpOKzJFZ09CbUdrUXQwNFZP?=
- =?utf-8?B?aGZHbDA0Z1lsUlM5QTNJTmVES0ZVeFYzUVh1b3ByYVFBQWJSVjZuL2Z5aXV2?=
- =?utf-8?B?Vk0yNDJ2SXAwNlRHajB4LzJRajZjUkVWYlBkZFlFR25ubXlTMVFNdEFjTjM2?=
- =?utf-8?B?Q1poR3phL2hsMHhIS05BRVhjKzhNWWkyRzZ1a2kzdjRPU1pNWDdFc1dDREZh?=
- =?utf-8?B?alVHV1NVTWhjMmdBSWFVc3E2ZmI4d3FMeUZpdmpzTm9rd1kvaHZuRHRvTUNi?=
- =?utf-8?B?elhkN291T2ZTdS9QSnVBeEFwbVgwdVVEelZPdE1HZ0FDdlgrUjUwYmhoZTJu?=
- =?utf-8?B?ZUZzVjFRcVQraHlmTTB5L1JjK0swb05zVHoyRnBIOTNjTVpHZFZocGdkQTk4?=
- =?utf-8?B?MFB6YStkZ2JoNmkzYitZZjNzaUV5T3c2ZTBERnpHMUNzUEY0bFZLUWFwQmF3?=
- =?utf-8?B?RENzTlZPWU93M3I0d0lzT0ZUd0IwSW1SbTcyZjRWVmpyRkJRRjB5bUE2UGpC?=
- =?utf-8?B?WVI0K09ZRGdJV1orYWRNOUxDTWxlaDNkcDBIU091S2V0OEZLK2JqSDQ0blFi?=
- =?utf-8?B?eE1ZYmZnQnk4RzFJcHB0TUN5VWc1bHZzR3Zmb3JNWVc4NGxFMExtaFRKZXk1?=
- =?utf-8?B?SVlBa1AvMU80d2x4RFBxY25MU2g5YnVRLzU2eVk2WjVzTzdlVVNWdVNDbWJ1?=
- =?utf-8?B?RnFxMEtHZ1lKTGsxRzZ5bEJ5TSttaUNlU0pZZTVDeFVPS1BNQmFKVXZiSktC?=
- =?utf-8?B?OWNMT1N0RjVvWjVEZGV0NUNiL1BDTHM4SEJsUzJzdDZkdVdxTkdSZjlnYmlU?=
- =?utf-8?B?YmsrS2o3NVhJcHV1a2JBenhvVU42VFp2d05CUHIzdm9uNUluQlRteXJyT3Ax?=
- =?utf-8?B?dk8wdFdSclF2N2J2b1FmTkdvOEVnc2UvbVFhYThBQmZnQmpaWFRzVjNIWHpY?=
- =?utf-8?B?eTdFYWRxeFRydnRKQTJ6RjlDcFhtRHc0WUZPdGhkRDNOU2lwdXU4alZMRUN6?=
- =?utf-8?B?RVFrYmhJS0tGd3UwS3FHZzExZEZIQVZ4dExya2RhK2FYOEFvWUtUSmUrVjdv?=
- =?utf-8?B?VGpGYytlSTNHTzFTNnNlMHJRSjNMTVF1MHk5cUN1VkRYTTByYnVabHpTZDhi?=
- =?utf-8?B?MUViUUpBV1h0UEFCa3hUVTh0U0tEN0pMWDY1VkNqREJSL2RiWFlNZk1Ndkl5?=
- =?utf-8?B?Z05STUxYZ2Y5bjFVWm43QWZIb2JCV0QxNVFNRStWMERBd2VuZk5xUWRjWWg0?=
- =?utf-8?B?TE1GQmYvWnBjWGFjRFJMR01xNmU5MjJEOFYweUVLUjJtY3FGcGZtUTdsS1A4?=
- =?utf-8?B?aWd0UDJUWVdJN3ZqOWtCOVcyQW5DdThLYjJ6YXVuNnMrMkhrQ21kaHJXUU1O?=
- =?utf-8?B?b3ZKbGhoSHdud0lHYXRpR3ZCRlhZWUxaY3ZjdkRTcHQxUGpIR2JiNXY1MGpJ?=
- =?utf-8?B?RUxmdG5nU2x5YVRtTHpHTFpCelE0WWk3aUVMWUVJbHdWOGVuUlh0VHp6bU5W?=
- =?utf-8?B?TVd2SVRsQ1FkZmhMaFVpaHhkUWhsY25SNXlJN0lEMm5HN0RQN3plV0ppaSt3?=
- =?utf-8?B?Um83S0NLRzkrZ1A5QlhyZFdqbHZCMkNaUVdORFFFZWExYVUraERSSXZpNUMz?=
- =?utf-8?Q?y58AhosCAtkG96JA=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	kG3tx8RMWHOQFuMHy7mcysSQayAT9N8SseJw+jrpvUFatxF/8nxiO4YIEbWOK4TF4DIQfw74qpVHT29y4tMzU7p9wenKumrQMjUKpTE243keXMRtzXvj6V54+//wSJmJXR7disWKzc35hgGJvql9jAtt7Uyj9XjNmlhlnD+aCHBNFkQTiNvna4bYFNyCLo2NFztDe4KJkVbk2khoRbKxXTjYvbcWRoOQqnPrwNoFZ4gKFSg+X5DMNA9mgglWyJVmJ93K3Y6GUa9iWJa6O6n84rENroxu4yGC7GbnUNR4XDlaOx1ftryCzovS/oRWNZaJFPmId1bXe1TkgOVa/gZPXpNDYu9jcGTMkpU3tPT/XkLxnq34AkvQ5p0PkXYKNZzjlD4jtwnQ8giK6hwmB//zSTJ2D/o5F/eXL/ddUc/3Xfa4oxuKUEBJ6M9GfR30x5c2qEJTLYSSBV0uqwHKG8QOlRjaL5g3+g6pTqdamhdl3YvZbi2U5vinJ/v0K4OMjqIb9QlRx3yHvjfiOhSFC1FRcq43f7TsFDEzgATUvJ4JFEEowvxyBMKyZ7AoGiumjp1Ypi2yG0jcyO6qXtT+0XgUn0bdLNh1nA2OtegHBnfTZrY=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ce6b4f9a-6ce8-488e-9876-08de4e956312
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR10MB5328.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2026 09:07:45.5463
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RsKdso60sukIgerrGEZx/dSkySxdx7hNkigxn5NhSd4BePnQeoeVOx4B9sERj5ajxB5DaI5qqKaVsO4iJ3O86wEFSRpU171vvzxQ5ZZ45ok=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR10MB4291
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-08_02,2026-01-07_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0 adultscore=0
- malwarescore=0 suspectscore=0 mlxscore=0 spamscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2512120000
- definitions=main-2601080061
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA4MDA2MSBTYWx0ZWRfX/Zl0OCNc7sFG
- S3Ym6pBYbU0EilA1TbeEZgVDa5mF8Jpmapj7u8+ZWXZDybWqT1cCsRSbS2Jn8DuSGKDS3m9AkB7
- PhMHLn497wVpvBOIMkK1702g3O2ooOyJ6wPiczptHOkxlWjO3gmmOY7LizFBUlyTuvstJ7teqmx
- wKa0wxT5CpzGxiqKfBVUFhIBIPk5ZRyqcQJ8i/Qy0kuaKT6RyxBFEZNbIdxulS7CEpONKDACxg5
- z+5nqIcY46iB39NSyM68r8cvB0T3CO15BR97LNXKXn6npLOiLwqEfndtakbmhD+vzS/43O8f5E6
- iM5qyDBx3vU9kIeoGsu9zxPsoUzbVPwFDnFVw7UNWxsDi+OSSPfnD+IBkF2GDUZYqlhFwWfGitr
- 7IZxEE4jfKcfPCgeZS+9yIovXk7YgQmfN/fpe6uwWVgEKgTi9q7T2q5f2BWl/cochakMoaPayyv
- 9Wr9g4ZmIhmZLuN4VAWHe4u9a9sGPDrOOPsz77Xk=
-X-Proofpoint-GUID: nEl8lMfGDH1xOEx60wEw7ODP1RHJxWnS
-X-Authority-Analysis: v=2.4 cv=LN1rgZW9 c=1 sm=1 tr=0 ts=695f73e5 b=1 cx=c_pps
- a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=vUbySO9Y5rIA:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=Fq99xjXByLZgPzlzTk8A:9 a=QEXdDO2ut3YA:10 cc=ntf awl=host:13654
-X-Proofpoint-ORIG-GUID: nEl8lMfGDH1xOEx60wEw7ODP1RHJxWnS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4dwhhlnuv2n3f7d3hqoulcnsg6ljucd6v47kqcszcwcshfoqno@rzxvg456q4fi>
+
+On Wed, Jan 07, 2026 at 08:58:39AM -0800, Breno Leitao wrote:
+> On Wed, Jan 07, 2026 at 04:56:41PM +0106, John Ogness wrote:
+> 
+> Thanks. Let me prototype this and see how it turns out.
+
+This is what I am thinking about. How bad is it?
+
+(I've also implemented the netconsole part as well, so, if you want to
+have a tree, you can find it in
+https://github.com/leitao/linux/tree/execution_context)
 
 
+commit fe79961da6cabe42343185cf1a7308162bf6bad3
+Author: Breno Leitao <leitao@debian.org>
+Date:   Thu Jan 8 03:00:46 2026 -0800
 
-On 1/7/2026 6:54 PM, Ratheesh Kannoth wrote:
-> +
-> +static void rvu_sw_l2_offl_rule_wq_handler(struct work_struct *work)
-> +{
-> +	struct rvu_sw_l2_work *offl_work;
-> +	struct l2_entry *l2_entry;
-> +	int budget = 16;
-> +	bool add_fdb;
-> +
-> +	offl_work = container_of(work, struct rvu_sw_l2_work, work);
-> +
-> +	while (budget--) {
-> +		mutex_lock(&l2_offl_list_lock);
-> +		l2_entry = list_first_entry_or_null(&l2_offl_lh, struct l2_entry, list);
-> +		if (!l2_entry) {
-> +			mutex_unlock(&l2_offl_list_lock);
-> +			return;
-> +		}
-> +
-> +		list_del_init(&l2_entry->list);
-> +		mutex_unlock(&l2_offl_list_lock);
-> +
-> +		add_fdb = !!(l2_entry->flags & FDB_ADD);
-> +
-> +		if (add_fdb)
-> +			rvu_sw_l2_offl_cancel_add_if_del_reqs_exist(l2_entry->mac);
-> +
-> +		rvu_sw_l2_offl_rule_push(offl_work->rvu, l2_entry);
-> +		kfree(l2_entry);
-> +	}
-> +
-> +	if (!list_empty(&l2_offl_lh))
-> +		queue_work(rvu_sw_l2_offl_wq, &l2_offl_work.work);
-> +}
-> +
-> +int rvu_sw_l2_init_offl_wq(struct rvu *rvu, u16 pcifunc, bool fw_up)
-> +{
-> +	struct rvu_switch *rswitch;
-> +
-> +	rswitch = &rvu->rswitch;
-> +
-> +	if (fw_up) {
-> +		rswitch->flags |= RVU_SWITCH_FLAG_FW_READY;
-> +		rswitch->pcifunc = pcifunc;
-> +
-> +		l2_offl_work.rvu = rvu;
-> +		INIT_WORK(&l2_offl_work.work, rvu_sw_l2_offl_rule_wq_handler);
-> +		rvu_sw_l2_offl_wq = alloc_workqueue("swdev_rvu_sw_l2_offl_wq", 0, 0);
-> +		if (!rvu_sw_l2_offl_wq) {
-> +			dev_err(rvu->dev, "L2 offl workqueue allocation failed\n");
-> +			return -ENOMEM;
-> +		}
-> +
-> +		fdb_refresh_work.rvu = rvu;
-> +		INIT_WORK(&fdb_refresh_work.work, rvu_sw_l2_fdb_refresh_wq_handler);
-> +		fdb_refresh_wq = alloc_workqueue("swdev_fdb_refresg_wq", 0, 0);
+    printk: Add execution context (PID/CPU) to dev_printk_info
+    
+    Extend struct dev_printk_info to include the task PID and CPU number
+    where printk messages originate. This information is captured at
+    vprintk_store() time and propagated through printk_message to
+    nbcon_write_context, making it available to nbcon console drivers.
+    
+    This is useful for consoles like netconsole that want to include
+    execution context in their output, allowing correlation of messages
+    with specific tasks and CPUs regardless of where the console driver
+    actually runs.
+    
+    The feature is controlled by CONFIG_PRINTK_EXECUTION_CTX, which is
+    automatically selected by CONFIG_NETCONSOLE_DYNAMIC. When disabled,
+    the helper functions compile to no-ops with no overhead.
+    
+    Suggested-by: John Ogness <john.ogness@linutronix.de>
+    Signed-off-by: Breno Leitao <leitao@debian.org>
 
-consider, "swdev_fdb_refresg_wq" -> "swdev_fdb_refresh_wq"
-
-> +		if (!rvu_sw_l2_offl_wq) {
-
-Checks rvu_sw_l2_offl_wq instead of fdb_refresh_wq
-
-> +			dev_err(rvu->dev, "L2 offl workqueue allocation failed\n");
-
-offl -> fbd
-
-> +			return -ENOMEM;
-> +		}
-> +
-> +		return 0;
-> +	}
-> +
-> +	rswitch->flags &= ~RVU_SWITCH_FLAG_FW_READY;
-> +	rswitch->pcifunc = -1;
-> +	flush_work(&l2_offl_work.work);
-> +	return 0;
-> +}
-
-
-Thanks,
-Alok
+diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+index ac12eaf11755..e6a9369be202 100644
+--- a/drivers/net/Kconfig
++++ b/drivers/net/Kconfig
+@@ -341,6 +341,7 @@ config NETCONSOLE_DYNAMIC
+ 	bool "Dynamic reconfiguration of logging targets"
+ 	depends on NETCONSOLE && SYSFS && CONFIGFS_FS && \
+ 			!(NETCONSOLE=y && CONFIGFS_FS=m)
++	select PRINTK_EXECUTION_CTX
+ 	help
+ 	  This option enables the ability to dynamically reconfigure target
+ 	  parameters (interface, IP addresses, port numbers, MAC addresses)
+diff --git a/include/linux/console.h b/include/linux/console.h
+index fc9f5c5c1b04..c724f59f96e6 100644
+--- a/include/linux/console.h
++++ b/include/linux/console.h
+@@ -298,12 +298,18 @@ struct nbcon_context {
+  * @outbuf:		Pointer to the text buffer for output
+  * @len:		Length to write
+  * @unsafe_takeover:	If a hostile takeover in an unsafe state has occurred
++ * @pid:		PID of the task that generated the message
++ * @cpu:		CPU on which the message was generated
+  */
+ struct nbcon_write_context {
+ 	struct nbcon_context	__private ctxt;
+ 	char			*outbuf;
+ 	unsigned int		len;
+ 	bool			unsafe_takeover;
++#ifdef CONFIG_PRINTK_EXECUTION_CTX
++	pid_t			pid;
++	int			cpu;
++#endif
+ };
+ 
+ /**
+diff --git a/include/linux/dev_printk.h b/include/linux/dev_printk.h
+index eb2094e43050..42ee778b29dd 100644
+--- a/include/linux/dev_printk.h
++++ b/include/linux/dev_printk.h
+@@ -27,6 +27,10 @@ struct device;
+ struct dev_printk_info {
+ 	char subsystem[PRINTK_INFO_SUBSYSTEM_LEN];
+ 	char device[PRINTK_INFO_DEVICE_LEN];
++#ifdef CONFIG_PRINTK_EXECUTION_CTX
++	pid_t pid;
++	int cpu;
++#endif
+ };
+ 
+ #ifdef CONFIG_PRINTK
+diff --git a/kernel/printk/internal.h b/kernel/printk/internal.h
+index 5f5f626f4279..81e5cd336677 100644
+--- a/kernel/printk/internal.h
++++ b/kernel/printk/internal.h
+@@ -287,6 +287,10 @@ struct printk_message {
+ 	unsigned int		outbuf_len;
+ 	u64			seq;
+ 	unsigned long		dropped;
++#ifdef CONFIG_PRINTK_EXECUTION_CTX
++	pid_t			pid;
++	int			cpu;
++#endif
+ };
+ 
+ bool printk_get_next_message(struct printk_message *pmsg, u64 seq,
+diff --git a/kernel/printk/nbcon.c b/kernel/printk/nbcon.c
+index 3fa403f9831f..2465fafd7727 100644
+--- a/kernel/printk/nbcon.c
++++ b/kernel/printk/nbcon.c
+@@ -946,6 +946,18 @@ void nbcon_reacquire_nobuf(struct nbcon_write_context *wctxt)
+ }
+ EXPORT_SYMBOL_GPL(nbcon_reacquire_nobuf);
+ 
++#ifdef CONFIG_PRINTK_EXECUTION_CTX
++static inline void wctxt_load_execution_ctx(struct nbcon_write_context *wctxt,
++					    struct printk_message *pmsg)
++{
++	wctxt->pid = pmsg->pid;
++	wctxt->cpu = pmsg->cpu;
++}
++#else
++static inline void wctxt_load_execution_ctx(struct nbcon_write_context *wctxt,
++					    struct printk_message *pmsg) {}
++#endif
++
+ /**
+  * nbcon_emit_next_record - Emit a record in the acquired context
+  * @wctxt:	The write context that will be handed to the write function
+@@ -1048,6 +1060,8 @@ static bool nbcon_emit_next_record(struct nbcon_write_context *wctxt, bool use_a
+ 	/* Initialize the write context for driver callbacks. */
+ 	nbcon_write_context_set_buf(wctxt, &pmsg.pbufs->outbuf[0], pmsg.outbuf_len);
+ 
++	wctxt_load_execution_ctx(wctxt, &pmsg);
++
+ 	if (use_atomic)
+ 		con->write_atomic(con, wctxt);
+ 	else
+diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
+index 1d765ad242b8..ff47b5384f20 100644
+--- a/kernel/printk/printk.c
++++ b/kernel/printk/printk.c
+@@ -2213,6 +2213,26 @@ static u16 printk_sprint(char *text, u16 size, int facility,
+ 	return text_len;
+ }
+ 
++#ifdef CONFIG_PRINTK_EXECUTION_CTX
++static inline void printk_save_execution_ctx(struct dev_printk_info *dev_info)
++{
++	dev_info->pid = task_pid_nr(current);
++	dev_info->cpu = smp_processor_id();
++}
++
++static inline void pmsg_load_execution_ctx(struct printk_message *pmsg,
++					   const struct dev_printk_info *dev_info)
++{
++	pmsg->pid = dev_info->pid;
++	pmsg->cpu = dev_info->cpu;
++}
++#else
++static inline void printk_save_execution_ctx(struct dev_printk_info *dev_info) {}
++
++static inline void pmsg_load_execution_ctx(struct printk_message *pmsg,
++					   const struct dev_printk_info *dev_info) {}
++#endif
++
+ __printf(4, 0)
+ int vprintk_store(int facility, int level,
+ 		  const struct dev_printk_info *dev_info,
+@@ -2320,6 +2340,7 @@ int vprintk_store(int facility, int level,
+ 	r.info->caller_id = caller_id;
+ 	if (dev_info)
+ 		memcpy(&r.info->dev_info, dev_info, sizeof(r.info->dev_info));
++	printk_save_execution_ctx(&r.info->dev_info);
+ 
+ 	/* A message without a trailing newline can be continued. */
+ 	if (!(flags & LOG_NEWLINE))
+@@ -3002,6 +3023,7 @@ bool printk_get_next_message(struct printk_message *pmsg, u64 seq,
+ 	pmsg->seq = r.info->seq;
+ 	pmsg->dropped = r.info->seq - seq;
+ 	force_con = r.info->flags & LOG_FORCE_CON;
++	pmsg_load_execution_ctx(pmsg, &r.info->dev_info);
+ 
+ 	/*
+ 	 * Skip records that are not forced to be printed on consoles and that
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index ba36939fda79..197022099dd8 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -35,6 +35,17 @@ config PRINTK_CALLER
+ 	  no option to enable/disable at the kernel command line parameter or
+ 	  sysfs interface.
+ 
++config PRINTK_EXECUTION_CTX
++	bool
++	depends on PRINTK
++	help
++	  This option extends struct dev_printk_info to include extra execution
++	  context in pritnk, such as task PID and CPU number from where the
++	  message originated. This is useful for correlating device messages
++	  with specific execution contexts.
++
++	  One of the main user for this config is netconsole.
++
+ config STACKTRACE_BUILD_ID
+ 	bool "Show build ID information in stacktraces"
+ 	depends on PRINTK
 
