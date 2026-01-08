@@ -1,136 +1,118 @@
-Return-Path: <netdev+bounces-248287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CBF9D067FE
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 00:00:44 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20445D0686E
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 00:19:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E2CE93032E8A
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 23:00:39 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 65E14300AC82
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 23:19:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BCF532B98A;
-	Thu,  8 Jan 2026 23:00:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 646E028D8E8;
+	Thu,  8 Jan 2026 23:19:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dIDEuas0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dCury5uW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D209532ED42
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 23:00:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA4181D9663
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 23:19:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767913239; cv=none; b=jiznPUNnlcN9SOj5qIO3dU+e5WRkCfny2mkpD5kjhXe+9W5ePGmaMJaQR6keC72UWbfx/ZhIm2ZrY264+5+xR+tPKnbg084YDJc1UfuNnYWxWZ0Wm8ySI5mqn1/QzX7KYC4tG2wWgppX9fmVbxD2tZRaa3nhWBnF8TWvtA6IajY=
+	t=1767914357; cv=none; b=Ak7fFBsc+VYotrQlrCeLP+5I98yQ5/g9EJffR/lbC93pZrHfa3h/IlZRMhPKj4Xc35wtVTZR4QsHxqh5fEz0agUAkwgBxsCtVGGIXteOUcoBC7xBvZoYKT8xftzGxlSYp/siAgX3qulWx/AIEuF5ECcQlzSykypPbokXklgqPjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767913239; c=relaxed/simple;
-	bh=7uTjsH5gjDU9zpsTpDuUn7p7VXGiNcg2iXBbtGllmF8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H7mlnJ8vuohGMzBmS66RQ7x2CNQ8AEDhratVbVcLyKIquEQWujqckysYNkx2wyZY9PhiCsgbj9ewFhkTzmt8tOujfa+bRcl+qezPmIHeiqmdbPeb1N4MU4XJMubd7CbtC6jg+mQ/Kxu1pGOkT8WVOrtu1bYYLu0jdDx6NVHgY08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dIDEuas0; arc=none smtp.client-ip=209.85.128.54
+	s=arc-20240116; t=1767914357; c=relaxed/simple;
+	bh=hWYmWXFxnKku1jo28+4Sq4UXesm9R2PiIxdlKbhYrXk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jCiHOUPYCC14NnS1HquyZ3qBHcZbISKSrkybc8QV74aTIiQq0xxcBqXee8PTl1zEyn/iSCcYMIEmpxGLlnaECOHxewWjuhr82LE/Zkt44tNFVzqiy86ihtLZA8s+b+VffV4SbqabQ1nU/IubNut90QVbY1cpZ89J6FBN/I6j0cA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dCury5uW; arc=none smtp.client-ip=209.85.221.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-47d5e021a53so27781185e9.3
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 15:00:37 -0800 (PST)
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-432755545fcso2128501f8f.1
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 15:19:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767913236; x=1768518036; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kTs5F2JHv0vLkSOoY06Hetp6FjpguwAewpS9fSwegYA=;
-        b=dIDEuas0L3HEj2dlhjFS2r1c70QMFzWhFP3avr3tpHyeWTtIqfU+d/IgWGovOQJWJl
-         rsM2Ltq1bQhFt5iDo2MmyC9RScGJm6kW70qZOZTOdou0yAhC/+azdm70I00/DxbuNo8q
-         F4gTaebqcLToDekIGj3YGt7OubuPFnswGh5oeqPSFeRAqqT9Te3PTZnWVdXK/iwG0tnA
-         b8RfOJ5biAiweftGsIxRZTCHBov7fFv7+MHT2Q23qO6WcGGnziZT8CaDQZftO8i2pmtA
-         a07puAsXFbHVXxIugt4oJJyxAlCsKGmA1eb+TA1MXqF/QbMr5aXNYvfhjKCijKJT9WgH
-         utVw==
+        d=gmail.com; s=20230601; t=1767914354; x=1768519154; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BWbIabO0t2kJEwN10dkXtzynFH1qHhFIB6cJcEXchTE=;
+        b=dCury5uWabux0LywhoSmGTi007hIU4jy5E9NErlTKCDJ8QsRzDm8izqUTAVJpwV0KN
+         hHGX+VHUxrs/Fb59NzT0HRqHxEAUwVitAA3qtwmT+V9Bmomt0b79a97s2nSWnuS80nl5
+         J21Maid3Y0AzttNM04lRaidW6Y7bjwGcBELjjiuFSBzO1umv8gEJ3LnHq8nYRgm0FqJH
+         2qV9qptHUkkbCEAb4Czg6VBEfZf1qAsoyqfNkyRHpM3o1sREBM8MsQXbGssbXm8rk6NL
+         HUQpWDuH+T26Le4DjIQqMtjufhGcr9lf/6MQJbC/AuaaCgYHTZH1ImIXER46NH6Nf3O5
+         WB2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767913236; x=1768518036;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kTs5F2JHv0vLkSOoY06Hetp6FjpguwAewpS9fSwegYA=;
-        b=X4V2zN9EoQ2TIr+xj/V+bCzKUtm71UHFdmfHq150dXKgbuL2+dmM0RWn5TCrzf758q
-         eA28EfwYbFYWN4SoafxZSV9LF6feA8fJn128kOQJT42r6vNeZez8XE46yFT/Yblhhadd
-         LuzJSPtJqmkFwH63iweMaM1vn7JS4d4qmSzakE31uLd57GngkqERQzt6KM0XLbK4mZBX
-         3IiqTFPJ6nvYuJue9NRdAApjOwYJth+s8IpLH3ZkttASYPeeorHsPHLliFj7zym9NCoh
-         GBaw3yX8WnbSuf09bhes5SAkDH34Xjy0a2CMgzmZ8G9Z2pmxBTo6KjXYEzXirEt7NjDK
-         h6cw==
-X-Gm-Message-State: AOJu0YwluCfemPF9Bj6IbIUPZnRiZjAhgTMl1kpP3596YYTE5zg/sUcf
-	SpCSncxc74bAPbZhjaUQw8mQJGoLbJfw2pGtvNckyiYB7H8lAEWb30Ju
-X-Gm-Gg: AY/fxX7gO5t8JxKnluZXEpaVXoE97AAup3UfeqxAUigbN974IMWkl6PG3o4hAN0253q
-	ssuvHnIZ4iKGCsVOzxt1lV78j2yGQGVrZRX0mVDlkhid45fP7TlDOAci6aLJjPxzhknK2t4fIg0
-	eyPK9ve0hI7tWYk5IPyzg/CFzf5MTXstUucJaq2eKZHdK51bHQOgiO7fCpOD3I+88EmqAaVYdXH
-	LDm+qlpjQpT+ULt8ot23u8lQUopVkh7KOZVrGwR7R9tJc+X/Y2zTeYKxVaGrx6XgDQNEejjFCQz
-	IGTFIenpNn1Brg7kLOroEbwNClGBcDEY9cjcgeS0EpMicr2kiWZr+WD+ZP6onVlFjcIB/04O6Nn
-	UTsI2e7E/JdAr7IyZGbNGFdbej5iC+C25AN8B7A3ZnoKu93qU9sC3BgOTsO0Poh03DN7uBWwPBL
-	EUrlP0OLdaH5Lo6yqtCYSrWGFk
-X-Google-Smtp-Source: AGHT+IEuU7ujUQDT65TdTzOKfQ2Ae2kq/1YVQ03DSFVdErxbkmkwOz8rJiBGKnYVtJPy0CDZ/hc5lw==
-X-Received: by 2002:a05:600c:4e8a:b0:479:2a09:9262 with SMTP id 5b1f17b1804b1-47d84b18037mr97353125e9.9.1767913236018;
-        Thu, 08 Jan 2026 15:00:36 -0800 (PST)
-Received: from [192.168.0.2] ([212.50.121.5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d8715b5f7sm50302885e9.4.2026.01.08.15.00.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Jan 2026 15:00:33 -0800 (PST)
-Message-ID: <599905d9-19ac-4027-85d1-9b185603051c@gmail.com>
-Date: Fri, 9 Jan 2026 01:00:48 +0200
+        d=1e100.net; s=20230601; t=1767914354; x=1768519154;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BWbIabO0t2kJEwN10dkXtzynFH1qHhFIB6cJcEXchTE=;
+        b=jW2tycLMOtqNDqYHK7YjEt+LhPydfBQZbizk5ICuSFngHNq/4E1WqFwtcwVcThSBg6
+         ua4uB69x0kjyp70msHoUy/Qls4HHPo59b2kHiHkERtBs/8llmrvYGnt0mf60Ay5tES8P
+         Jj8PdZ46CiTzX4zOmMhVhm07ObvI2rEGE+zFww5A2Nal9N5bgR2cduSAiqp9zDbQ2ZMx
+         I3MCGwKLBgHBSzds4o9yswn6xnt2stWu938Dh2GMw+VIOnpe8wBuSRQQsy4vI5qJXUCS
+         JVGKskv0cYavhvw0q1vJaJ+LxUkfzBOtNyVzhRpiK22Y/L7L4pC/pu5pcK1zBkrc2Hf6
+         b8hw==
+X-Forwarded-Encrypted: i=1; AJvYcCWLTQ/dZkYefR2XjBF6w43TvczmSOagkA6oq/UIs2YyanBbE6iK4qYI08l2x1MsMVvwjtaBvVM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxoh5maGUhc+NlqyOoCquDsj7NJRgqcomwcwNRAFNK4UHCUYudk
+	wpjkRV52+sfsDWwBTaQal4jB1q3BT/JTbGiXyVQQ/OUBQY213YNPLQNU
+X-Gm-Gg: AY/fxX6YcWMPcjVqVtlYzDGq0CEvJThMNwIYkG2rEhPG6oBvirEtltEUf3CmkUm7pAi
+	3Spp261TTQd9Jk11xpb+TilmgWEWwQoaTBVI3xtEGudhTpdfrCoUlPUQ2cKYJjJbG9UTq48PaN9
+	I+T7A2FeW9St7/CTtu5XYqul0tmoGxqKI2Wp4zfCT+ft6mQvtO7afMCqeAO2sN2O2Kc59Tb/tr+
+	NHvACe3usdOcFjbq96gIUSk/8VL/yW2QZlIpaKJKEL3xm7KjrEWrkTn13Io9iZLjbKMYfXCMbal
+	91KQb+A7J6a6LBlM61cYH04Ld79vUr+h8TAnqqaltf7uwIkoUsOiauLRmXwq2ffadT1zDeUKcz3
+	nFGylKx3aB88VvJOXU82jsiVmB7yfAoswx1g5qQo+09HmotgSUzhBXVrXg+7g+buP5YBD/VYWMM
+	iICPCZGO9Zy8vq0AU=
+X-Google-Smtp-Source: AGHT+IEzdhKALltABm5XBS2La8kTprLHVWdnQ5WNEGE6t0W+pFNLVRN/o9iPJ1XeQZrKs1u5edJ7PQ==
+X-Received: by 2002:a05:6000:4305:b0:429:c14f:5f7d with SMTP id ffacd0b85a97d-432c374f13cmr9768336f8f.29.1767914353881;
+        Thu, 08 Jan 2026 15:19:13 -0800 (PST)
+Received: from google.com ([37.228.206.31])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0dacd1sm18693102f8f.4.2026.01.08.15.19.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jan 2026 15:19:13 -0800 (PST)
+Date: Thu, 8 Jan 2026 23:19:11 +0000
+From: Fabio Baltieri <fabio.baltieri@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Russell King - ARM Linux <linux@armlinux.org.uk>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Michael Klein <michael@fossekall.de>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Realtek linux nic maintainers <nic_swsd@realtek.com>,
+	Aleksander Jan Bajkowski <olek2@wp.pl>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next 2/2] r8169: add support for RTL8127ATF (Fiber
+ SFP)
+Message-ID: <aWA7b-8ouKIm7HFU@google.com>
+References: <52011433-79d3-4097-a2d3-d1cca1f66acb@gmail.com>
+ <d2bab188-96de-407d-84b3-34584494aa30@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] wwan: t7xx: Add CONFIG_WWAN_DEBUG_PORTS to control ADB
- debug port
-To: "wanquan.zhong" <zwq2226404116@163.com>,
- chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com,
- haijun.liu@mediatek.com, ricardo.martinez@linux.intel.com
-Cc: netdev@vger.kernel.org, loic.poulain@oss.qualcomm.com,
- johannes@sipsolutions.net, davem@davemloft.net, andrew+netdev@lunn.ch,
- kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
- "wanquan.zhong" <wanquan.zhong@fibocom.com>
-References: <20260108125207.690657-1-zwq2226404116@163.com>
-Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <20260108125207.690657-1-zwq2226404116@163.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d2bab188-96de-407d-84b3-34584494aa30@gmail.com>
 
-Hi Wanquan,
-
-On 1/8/26 14:52, wanquan.zhong wrote:
-> From: "wanquan.zhong" <wanquan.zhong@fibocom.com>
+On Thu, Jan 08, 2026 at 09:28:20PM +0100, Heiner Kallweit wrote:
+> RTL8127ATF supports a SFP+ port for fiber modules (10GBASE-SR/LR/ER/ZR and
+> DAC). The list of supported modes was provided by Realtek. According to the
+> r8127 vendor driver also 1G modules are supported, but this needs some more
+> complexity in the driver, and only 10G mode has been tested so far.
+> Therefore mainline support will be limited to 10G for now.
+> The SFP port signals are hidden in the chip IP and driven by firmware.
+> Therefore mainline SFP support can't be used here.
 > 
-> Add a new Kconfig option CONFIG_WWAN_DEBUG_PORTS for WWAN devices,
-> to conditionally enable the ADB debug port functionality. This option:
-> - Depends on DEBUG_FS (aligning with existing debug-related WWAN configs)
-> - Defaults to 'y',If default to n, it may cause difficulties for t7xx
-> debugging
-> - Requires EXPERT to be visible (to avoid accidental enablement)
-> 
-> In t7xx_port_proxy.c, wrap the ADB port configuration struct with
-> CONFIG_WWAN_DEBUG_PORTS, so the port is only exposed when
-> the config is explicitly enabled (e.g. for lab debugging scenarios).
-> 
-> This aligns with security best practices of restricting debug interfaces
-> on production user devices, while retaining access for development.
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
-This security argument sounds a bit weak. Debugfs can be enabled easily, 
-and devlink allowing a firmware replacement is enabled by every 2nd 
-driver. Proper privilege management contributes to the security better. 
-ADB is hidden by default, and a user have to write a file in sysfs. What 
-does effectively mean that he already has the root privileges.
+Tested-by: Fabio Baltieri <fabio.baltieri@gmail.com>
 
-BTW, why does the patch disable only ADB? MIPC is not so dangerous?
-
-On the other hand, I agree that ADB is not a port for daily usage, and 
-it might be beneficial to save some resources on excluding it. Proposed 
-patch eliminates one array element, what does not worth burden of the 
-new configuration option maintenance.
-
-Considering the above. The patch is NACKed by me.
-
---
-Sergey
+Thanks!
+Fabio
 
