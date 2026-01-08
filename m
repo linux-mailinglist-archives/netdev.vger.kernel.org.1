@@ -1,128 +1,113 @@
-Return-Path: <netdev+bounces-248090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E13FD0356F
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 15:28:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C670D034C5
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 15:22:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C788131DECAB
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 13:59:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5F6D53148957
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 14:00:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADB6F4DA550;
-	Thu,  8 Jan 2026 13:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865E84C6F1C;
+	Thu,  8 Jan 2026 13:59:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="L2FTBc97"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="llD/m/JG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B98C34DA537;
-	Thu,  8 Jan 2026 13:59:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B21E84DBD6B
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 13:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767880754; cv=none; b=juuazNKZHgxwJN3VuVh81o1HPWhZ9zS4YrAsy3jpDjzBWGqnqWm7p9TQvsSiylndbemioVj0eMj4GH2Rq6Nju4Q6FzM14khdEABc35T6HZfemjmvPLDPd3lHTBuPD63x91uJt6Y3AdpQI3KiGykjEfh7XtOnUsjuiTDQSfKORf0=
+	t=1767880766; cv=none; b=dKDjfWHxdnexEQEY2jx6n64lBodVVFgPrEHxS7nNkCzpVKX5GYRZd+j/b1TLVAzG6yhQMipkvsp4RLlRJ64pwMtTvEOIqDS3zTAlV574GU/hKlzW+Y1SkCRVPhrfJxmsJB2UY+bLrdTMfQyhfu3XtaBaxtfc0jeGrYwW5Dobpnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767880754; c=relaxed/simple;
-	bh=i+S0t+cvTYJQZdDDAO2WBUwfYWcrj53i531N1BKDWtw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=el1jFhUEB8t4vcfZRo3OOdUjh8N6+8PgMiu1Gk4nO2ojb5giqBOIsy1r7SLEkbyfqen2b6uvw2WokGVdV955l8xPxHvQhTeP0UEU8osyaKhlYp/jU10giTUgWtEUaRVANEMbzr4vPDx7Z1b77wkAJeYq49o82csdBoz0tU11fXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=L2FTBc97; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20260108135910euoutp01ccbfd9c84e69621c7e3b92a2b5deec4f~Ixi0etxix0597605976euoutp01a;
-	Thu,  8 Jan 2026 13:59:10 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20260108135910euoutp01ccbfd9c84e69621c7e3b92a2b5deec4f~Ixi0etxix0597605976euoutp01a
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1767880750;
-	bh=HBLoWucuNoa4iyIqpGPENUJPEqe5py10aQ1+typoc88=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=L2FTBc97UDye/KFyXU5zA6qnW86ftuorQ2GangcpFFaA4Z/PMV/6yRn1S8sl1dSwS
-	 exmaxsLC/S8/bl80Gu6pAC0Zmfc9N4LXZlfPgeh8CT5RoOz9PQbJhYlqMC3Mxd93Ps
-	 wJrG8j45kuOs7szKO1kH8Zg6/dW3sly4RuykzNNc=
-Received: from eusmtip2.samsung.com (unknown [203.254.199.222]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20260108135910eucas1p2c3a9b2f7e2c019e56996f0760278662f~Ixiz4YTfm2123121231eucas1p23;
-	Thu,  8 Jan 2026 13:59:10 +0000 (GMT)
-Received: from [106.210.134.192] (unknown [106.210.134.192]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20260108135905eusmtip2913ea5be854e60c0e9a456912a96a941~Ixiv5DNn82338323383eusmtip2D;
-	Thu,  8 Jan 2026 13:59:05 +0000 (GMT)
-Message-ID: <b19d87c3-e783-44d1-ae7c-5911ba42d487@samsung.com>
-Date: Thu, 8 Jan 2026 14:59:05 +0100
+	s=arc-20240116; t=1767880766; c=relaxed/simple;
+	bh=2pKAnlEn6hRYqap+nvJVoSIseniKes/Ivmr+dkuPPFM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SXXosa6/QMcPA2LjxEKpBZGR9BTVhNnGueVoWQwvmeWZ4P/OZPw0mkqgCc+R1MrUEmuSw8q9z7JRow75UCV+39LfKUxBTCvF7H1j3hHJu1RiKkS4+IV4/074IIa1jsxWUI1Qz9HNVbhVCVtl6pUpGdzbvGbmNWx+ixlJBnFT51g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=llD/m/JG; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4ee14ba3d9cso33129801cf.1
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 05:59:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767880764; x=1768485564; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uDy71JxhuxNQvQEZmT+0GWb6fjggpBo0WVDg9NnAn2A=;
+        b=llD/m/JGeenMEEb7shRsC4OaET6KkdY4KZtRUfGe9E1sIAJ2r0vK+71P3o8ex2somg
+         qx0Y1wRqCDc+A/goGBz8Gu9TkrZjB+ntQCbBF7ASTudSPd5c30GQ6uMbg6AuodO3D9xr
+         qgs60wJYzk0f/UccpghYzLprBxKnLpgq/tr0n2mvAQbKvJumV8VSwC8lc7l/L3eKyIaa
+         IhuBY48ya2XBri5NhsWSFkoUKP8qLzAXTy5x3p8iRMyczkChRobcZG4bYlS6eGu7QOjJ
+         ZyWTWyE7rOoVi0JBGR6u3SBzCrgQcNp70JPUwc2LX9uYdgJzLW3D265dQLZDWz8bBehT
+         Z8mA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767880764; x=1768485564;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=uDy71JxhuxNQvQEZmT+0GWb6fjggpBo0WVDg9NnAn2A=;
+        b=xVRDf2BThCJofj1rzTx88cfRTekQgUQpeeAK1DgeP2xIOSw4dKVbAN7vKIQnlz1J/Y
+         +JAQAf9aK3rmq3RCDurPRiX5LDXi29j9UbWzNsgjfxo/UOQgvWW1VJCc0gn7f+K1fRnc
+         o2AOw4sEwCdYZCAMvQUB9kur3cZhdL6oZiOB1m/IfakpIdleS/Vy2jJXPauMW+4MBTnY
+         rCWiHTio4Yevz1IsNJN0mW08KYLlkNkbGZQnTR9zFk/feOCN4j1oVbH0Nh+i0v4OaLdJ
+         HJj4m1lukTI9KjbxVbSnBjyZqFBR0vcXe5XeLR3tlERHzsjZW2tLM/K7r7ufkwNf/jpR
+         IyVA==
+X-Forwarded-Encrypted: i=1; AJvYcCUlLh/RRNhUKusBp3REIU4sf98nZHjuYoYYvJPB+yLREZ1xZ3NadDk2ecULUEBUZt7ZauOKsvg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/g5l9QgmIAZLi53G1pZpLwVPF+feaJkKTV9VBV+5I/ny75BE5
+	wo7EQQOK/OUf2CyEPuYUBUIZCXXLhsPT9QWYLaXi5p6//AVVXFmDof97XVxy1Bkf7iDeX30VZgO
+	CqiCVTQmSbouCndV22I1IMytkQlcBjnGxUJ4kHt5G
+X-Gm-Gg: AY/fxX5VNw9SM3Nb76V4Bmy0QTFUNyOEgT5UeGHzQL0qs05uIZo1UocWOnLI3m9BT5K
+	ZXdY63I788psvfbe03SnrCbs3qeIdsG0Bcxm1E8lokPHaIo8x1vRCu1VoJ3LMg7HSFtDuNQqVmb
+	bffBPueNDbG3Qr+gq9mVhPIMLPs1IAqYPpfPrqctAKD5tlHgQ/6MCnmaylVZx375n7trBHyduEt
+	jwMb/4HvB/RIJfUCfzJtd1Mf6KfCLR38y7Feui4cZRelBLgkwjc3sFLROadyyswLixQ0A==
+X-Google-Smtp-Source: AGHT+IFsds6ZAUmMQT/8XUII+uJ/L0chWB0gSjHaZOF/WPuPs/LHIXOtHv6L1aOWMgUlYiGaenOj0af9Eh+7ppZuT4M=
+X-Received: by 2002:ac8:580f:0:b0:4ee:1db1:a60f with SMTP id
+ d75a77b69052e-4ffb47d6537mr89817661cf.16.1767880763322; Thu, 08 Jan 2026
+ 05:59:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Betterbird (Windows)
-Subject: Re: [PATCH v2 04/15] docs: dma-api: document
- DMA_ATTR_CPU_CACHE_CLEAN
-To: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
-Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, Jason Wang <jasowang@redhat.com>, Paolo
-	Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, "James E.J. Bottomley"
-	<James.Bottomley@hansenpartnership.com>, "Martin K. Petersen"
-	<martin.petersen@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>, Xuan Zhuo
-	<xuanzhuo@linux.alibaba.com>, Robin Murphy <robin.murphy@arm.com>, Stefano
-	Garzarella <sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
-	Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Petr Tesarik
-	<ptesarik@suse.com>, Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe
-	<jgg@ziepe.ca>, Bartosz Golaszewski <brgl@kernel.org>,
-	linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-scsi@vger.kernel.org,
-	iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
-Content-Language: en-US
-From: Marek Szyprowski <m.szyprowski@samsung.com>
-In-Reply-To: <0720b4be31c1b7a38edca67fd0c97983d2a56936.1767601130.git.mst@redhat.com>
-Content-Transfer-Encoding: 7bit
-X-CMS-MailID: 20260108135910eucas1p2c3a9b2f7e2c019e56996f0760278662f
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20260105082317eucas1p2259400fc064a45dfe6147964fcb6e73e
-X-EPHeader: CA
-X-CMS-RootMailID: 20260105082317eucas1p2259400fc064a45dfe6147964fcb6e73e
-References: <cover.1767601130.git.mst@redhat.com>
-	<CGME20260105082317eucas1p2259400fc064a45dfe6147964fcb6e73e@eucas1p2.samsung.com>
-	<0720b4be31c1b7a38edca67fd0c97983d2a56936.1767601130.git.mst@redhat.com>
+References: <695e7cfb.050a0220.1c677c.036b.GAE@google.com> <2744142.1767879733@warthog.procyon.org.uk>
+In-Reply-To: <2744142.1767879733@warthog.procyon.org.uk>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 8 Jan 2026 14:59:12 +0100
+X-Gm-Features: AQt7F2ohXWhRfOT_iVfpSN35Cg00-2WqmDTRpQnRPNtu5XMbSkKBhR2D11ff_3Y
+Message-ID: <CANn89i+z6XzGGJRJFuL-1_FDeRXQUULZwZNnXU9RLkcptpw7jA@mail.gmail.com>
+Subject: Re: [syzbot] [afs?] [net?] KCSAN: data-race in rxrpc_peer_keepalive_worker
+ / rxrpc_send_data_packet
+To: David Howells <dhowells@redhat.com>
+Cc: syzbot <syzbot+6182afad5045e6703b3d@syzkaller.appspotmail.com>, 
+	davem@davemloft.net, horms@kernel.org, kuba@kernel.org, 
+	linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	marc.dionne@auristor.com, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 05.01.2026 09:23, Michael S. Tsirkin wrote:
-> Document DMA_ATTR_CPU_CACHE_CLEAN as implemented in the
-> previous patch.
+On Thu, Jan 8, 2026 at 2:42=E2=80=AFPM David Howells <dhowells@redhat.com> =
+wrote:
 >
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-Acked-by: Marek Szyprowski <m.szyprowski@samsung.com>
-
-> ---
->   Documentation/core-api/dma-attributes.rst | 9 +++++++++
->   1 file changed, 9 insertions(+)
+> I think that this shouldn't be a problem.  The write is:
 >
-> diff --git a/Documentation/core-api/dma-attributes.rst b/Documentation/core-api/dma-attributes.rst
-> index 0bdc2be65e57..1d7bfad73b1c 100644
-> --- a/Documentation/core-api/dma-attributes.rst
-> +++ b/Documentation/core-api/dma-attributes.rst
-> @@ -148,3 +148,12 @@ DMA_ATTR_MMIO is appropriate.
->   For architectures that require cache flushing for DMA coherence
->   DMA_ATTR_MMIO will not perform any cache flushing. The address
->   provided must never be mapped cacheable into the CPU.
-> +
-> +DMA_ATTR_CPU_CACHE_CLEAN
-> +------------------------
-> +
-> +This attribute indicates the CPU will not dirty any cacheline overlapping this
-> +DMA_FROM_DEVICE/DMA_BIDIRECTIONAL buffer while it is mapped. This allows
-> +multiple small buffers to safely share a cacheline without risk of data
-> +corruption, suppressing DMA debug warnings about overlapping mappings.
-> +All mappings sharing a cacheline should have this attribute.
+>         conn->peer->last_tx_at =3D ktime_get_seconds();
+>
+> and the read is:
+>
+>         keepalive_at =3D peer->last_tx_at + RXRPC_KEEPALIVE_TIME;
+>
+> an approximate time is fine as we're estimating when to send a keepalive
+> packet if we haven't transmitted a packet in a while.
 
-Best regards
--- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
+LGTM, but potential load and store tearing should be avoided, using
+READ_ONCE() and WRITE_ONCE().
 
+last_tx_at being time64_t, this would still be racy on 32bit arches.
+
+last_tx_at could probably be an "unsigned long" (in jiffies units)...
 
