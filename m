@@ -1,160 +1,151 @@
-Return-Path: <netdev+bounces-248036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DBB1D023A1
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 11:56:25 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0612D026A6
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 12:34:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A897B300A99C
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 10:56:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4246530B726A
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 11:32:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 435ED4A65FB;
-	Thu,  8 Jan 2026 10:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5ABE345CDA;
+	Thu,  8 Jan 2026 08:41:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XW3W4SQb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VBurWId2";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="H0ZaHClA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7458E4A65C5
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 10:30:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F22B333EAF9
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 08:41:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767868226; cv=none; b=OQLZzEBH4SJOyCmClqO+x2qUaOft2tw+ulxnktkKHatJCFYZvcvwXO+8lbWiLgImAzrM/LwVIV3wtgRq2DE80mf2GYhpItQlWlmpl8LYYUBvsp9clgJERm7KcovtZ5whsl95VvwitwK7J1VpznJr213VCfiCn9MwO3cxcMrOhVA=
+	t=1767861709; cv=none; b=gEcL9aExQsOKcd8oIr7noLIUp36fj/B/iwvIeI8TrVfVitZYvOKpGNVL0vTudW/S1pLfKwRTkJNxU/IxlCd4zZM6eKWgFU0VaAerhyhAjR+Ic+/1F4xsrwxrNiCYMgotx35Wg29apQ4G6mvONLI2gutoi2ep66miH6b1Dw+ppYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767868226; c=relaxed/simple;
-	bh=0uipFis8wkUJAtInCuFtvgsW07eWYLoNh0PbJv7jezw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dptBTxrU1bhFexZgHXoFckOQ8Wug3Q48jTFXGxQIoJR2b1TbKYX9+mkvaVE/o210IvWerGMOlI4KmxErSdnSYCX4UtTcKXOgURO/3rtLAIvpCRsv5NcWf/9lSxSElDadBFGwtpf7cljXJ66+6RqRthAtM3mAoUaAO0dj6H3+K58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XW3W4SQb; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-4327790c4e9so1466219f8f.2
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 02:30:24 -0800 (PST)
+	s=arc-20240116; t=1767861709; c=relaxed/simple;
+	bh=T3g1hkv59Wof+KEXGfr6rRK1rS6rPS46Y5/WRoZTizA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=YRg+ahvO+qVhVL/DJGd09fR9FVqJ6iHG9giQUvWfMk8uJvGGDI968pPz4TNw9CsOww6k3DxiTTY7rWPwoGjvgaHSo3e3bRgh2CgusXtxx6bLnVndhfNR5f57JAvZtMw7E4bLU22dmoga6jOqxUebNkut4gQjWkRx4Xa+wQ1+aN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VBurWId2; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=H0ZaHClA; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767861703;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5RGxvIn5fQFYR3/ngtCtv4UC6h+IZmTY0D3VzGMTF2k=;
+	b=VBurWId2HqDrerkVnZFpzr+u2oijSKw/y5AwinLgSSqHcGcgpuwRuA5rqmcZWF2crUSpTe
+	RgcDPzslfnlUj/2Hr/2KycWtH0/2yuS2lGUT6xY69D3DF84Za6K3U2G1Z4229diie6+XUQ
+	c2Y1jJGUlznxQPsD4sy68uJajZBycuA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-187-Id_QrRnuMkm6-5rgHwY9eg-1; Thu, 08 Jan 2026 03:41:42 -0500
+X-MC-Unique: Id_QrRnuMkm6-5rgHwY9eg-1
+X-Mimecast-MFC-AGG-ID: Id_QrRnuMkm6-5rgHwY9eg_1767861701
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-47d5c7a2f54so11181565e9.1
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 00:41:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767868222; x=1768473022; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JkBZ6sa3GSnCHPRd79ivj9LmwMul58d/usPL6qSpnTU=;
-        b=XW3W4SQb5iVJqtnLTg9pXfdIivFVT7sNZolZK0g1e8wR8DXTB7lH/+u/jyTuw4Da2A
-         6Un1M1RMzi3TjWkCqXtSiU1MRhTr83UKssbwGNU2y1X5U1mkUeqKZiVuN8Tn8cdbIcOi
-         VnPsV85ecwvZGoCdO9zAwhuUrIiwsbHF/yfeixp/UTvV4PZRBpeTNhNkSq0DHAij4CL4
-         IsNu5sgJW4XN2S/RJKjTxk+TU1HuVG1E6VKESxmeD9T+Qb+5MrxGlb2MmtrniLtcQG0j
-         i9WxJFKVAN+T+b2CgcpqSw4+EKMjVrssUUF1ADCm9Oy3YbzS3kHkQTWbS212qW548kmy
-         1q2Q==
+        d=redhat.com; s=google; t=1767861701; x=1768466501; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=5RGxvIn5fQFYR3/ngtCtv4UC6h+IZmTY0D3VzGMTF2k=;
+        b=H0ZaHClA6c3KoNXD+3tXrJmCoOMCR4qT4eAFmnf2dOeabJW5fsJqAWfno/Hnr6IrJF
+         PZsl7U0+3YU3OI4CFlEzjkH45/HO0+BSrGX9ycowVi6hz+rbrBz7lDIeSMLATjJQ8fpj
+         4bcunlq7X/5aKBSUWaT5w7dl3OVtHYcGXCexzwle5no4JMZ2LS/+MjdiFTy4ANdhEH/D
+         EyZTVPMJdL1rs56ukgozYGLyIfpVz8OLhjT6Pu9aHsf61+U5LHYQAbpy+Mb13jGJg28V
+         njkHf0BGhtJDYMe/xcmy1utfrDHkmj/67hrPfw1S16/xnMmMbWsfk3Xjx2at6abqluqP
+         Y8cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767868222; x=1768473022;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JkBZ6sa3GSnCHPRd79ivj9LmwMul58d/usPL6qSpnTU=;
-        b=OQ2KyYoaSCoCUhk5gMGjm5gKbEp06D19dE1zP0ChOVVNYyX0fRIxJvBIS/nqn8y7Ua
-         egz9xK4Mznu6jm3xv3extQCKZt2XGqnXAcdByNxE08LjFz9VvpH46QGH2MCrmtWqYrNw
-         dWaqqiTExrLXnIYjp1t67QCZ/70YQAQyKKTtcvxNATyYi2vpoOXCxNEmqOUJF7CppC5p
-         DndKAiaVS1ssbh2zdnocOewahDxh2sgO1/zHdDIBopUEPUzYaBaWxoX/wi5jds29PYcq
-         ekTVotmuaNl32HLqVJWAgYNU5l4Vk60s/45snRbJ4h6at+BfBVvKmYqn8Jeyi/qbr3EL
-         xRpg==
-X-Gm-Message-State: AOJu0YyH8q81iYGDsaoLTfkshqJ3Cqt5dZYSCDBB9c4ogYWEB+jGQziI
-	HKER9/VPPvKNhAkD6oflMcm98MUWP12UMjngBBA3PRge4wzvf2hwGoubRRGUHB3ogEk=
-X-Gm-Gg: AY/fxX5dbx5Ld0cT57pn1WmLGf6Xq7C9+L3tspNvohuZbCyqLfr80SZVe08cyLSOHOk
-	C64II/1MmGY2vI6ls6PxwDRhYGuPWXyV/AXW+/PQubV+gyEhbbodZ8x2h6QsYXWhx8VinOiEZ6W
-	quZRXFRxaK+w2J+NAvSEHpkGg/FXAa1prP3JOab2m8WOuYXsx1q0upv1obgTXa8E4MgS3DNXfeH
-	PATR/XmvPA10Rr8gxrOHpoFWJZvuwdfuMjjTMOn5A7+p3FUlJNIpl0ps33OvzXwQlbeRdVAcG5z
-	ooy0QVSBEny/DD1djDpTDtZlfF8gZtTjRyl+Aqks6pDQs3GsR+8uu+AL1umCjtT6avpTjqQkQaf
-	Ri/7IMJkUpwcEU+8XGc75BPshsWDPD0zfE8NinQ5Q7ZRdtGxSkSbrPfjYac+qNtzDXAkE9U4gSM
-	ZWhQ==
-X-Google-Smtp-Source: AGHT+IFPr6YhwcvospboRe0wf35zEEkDtRS84WRGH9vdKWubsTOEW/0L5BU1GpLdroBE0MFBeH2OJg==
-X-Received: by 2002:a05:6000:2509:b0:431:907:f307 with SMTP id ffacd0b85a97d-432c3760e1fmr6815671f8f.48.1767868221924;
-        Thu, 08 Jan 2026 02:30:21 -0800 (PST)
-Received: from wdesk. ([37.218.240.70])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5fe67csm15258490f8f.40.2026.01.08.02.30.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 02:30:21 -0800 (PST)
-From: Mahdi Faramarzpour <mahdifrmx@gmail.com>
-To: netdev@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	kshitiz.bartariya@zohomail.in,
-	Mahdi Faramarzpour <mahdifrmx@gmail.com>
-Subject: [PATCH net-next] udp: add drop count for packets in udp_prod_queue
-Date: Thu,  8 Jan 2026 13:59:50 +0330
-Message-Id: <20260108102950.49417-1-mahdifrmx@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1767861701; x=1768466501;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5RGxvIn5fQFYR3/ngtCtv4UC6h+IZmTY0D3VzGMTF2k=;
+        b=CBn5NJcUdRq+IG7eYJ7ffz5QjgOqB/WrelrcQhHkLpQ3bsejfTCY0kdt7RzVSkMbVS
+         lDk6h7kw97KO4Wjy73J7IKNvPVJq2gfDKg8FwTTo0FjpZUiku2pLCSOyKMt/fmOztUDk
+         XYYojlLj20UFu1HsfIcZVvJAuByHELJFagr1qDJAbVmfZid6su5vQQVhEW4fUfVLmuPc
+         Gp2LviT3l15SoU3GIhTLDa+1G8vn6krG0QXwbRK3MMPjc2h8R5AAf0LrZIncYvVaPNSE
+         6pgHt8/QoQmFR3sspFg9811jyCVA6veN7K1CosmcofQ8ea1hMbVd5rgwSQ3nfJiEhX5A
+         Np0g==
+X-Forwarded-Encrypted: i=1; AJvYcCW+YKezPpLFH7GlCJTOYcE1hW8hmNPlIrFGbLvpdpQQoGLMhdabw2VLdOJdc4JaMlsuGHCMaYA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDfBpRYO5pOrDtjsJhn/xxczEddW8tgbetELKwoornBGnIEL+A
+	bT6WQdThvjfEkMiPs0/Oxc+xp+ChxHrI+IvwA7feD7zYRF+QrrwW4r/D2dXDh3aSa5iZ6a901Td
+	LyEV6JyFMdUbuJ1t1HkMqQaBhble74ks2uLEXOgXiCgB3Gb0QzoXctfy4Lw==
+X-Gm-Gg: AY/fxX5yKLUfBXAQowJM9Ze7owJ5gy8BHOkXcDA86ZUEnjPRStB/x6gncRTaUhWKnkF
+	iZiMTCl39WhnHrJlDdVNYTVBuy0Wc2UjXTT8mZscwGYQLdfgzHmhoWEZvkZOA4s4OMEiwbtF5KE
+	gVcvZPn+lq04GL1Yl5XR+r+oQm3/EXNZZZ4PUIyOAh3QKXYp4oMHnnr0DwpCrXVynLTFHtfF0YO
+	Olqdg1VTZZBwGWI/6rG+2t7lWhYdkKHjWGwFZlwiruqm/d2+riye8RM40A/ro2FRff7ghtcnEK0
+	eHCpEPnI6E6aAnmVkRnn6jpro76XQ8ljLb3cuvmedBF5cP4mGDOf7Wtgdjxz0GhoYFFvXW87Bh2
+	qKWv5jL+09oA9Ug==
+X-Received: by 2002:a05:600c:6749:b0:471:5c0:94fc with SMTP id 5b1f17b1804b1-47d84849fb2mr69624025e9.6.1767861700977;
+        Thu, 08 Jan 2026 00:41:40 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHMRmXfUT8h/fx23p3HVnSIevvQ/xZpWdXJvjJswXBBTxuR8fZK2hfXFsrWgfe2gcekBcZ2PQ==
+X-Received: by 2002:a05:600c:6749:b0:471:5c0:94fc with SMTP id 5b1f17b1804b1-47d84849fb2mr69623615e9.6.1767861700621;
+        Thu, 08 Jan 2026 00:41:40 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.149.145])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f703a8csm139970835e9.13.2026.01.08.00.41.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 Jan 2026 00:41:40 -0800 (PST)
+Message-ID: <56f6f3dd-14a8-44e9-a13d-eeb0a27d81d2@redhat.com>
+Date: Thu, 8 Jan 2026 09:41:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 net-next 00/13] AccECN protocol case handling series
+To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com, parav@nvidia.com,
+ linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
+ dsahern@kernel.org, kuniyu@google.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
+ kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch,
+ donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
+ ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+ g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
+ mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+ Jason_Livingood@comcast.com, vidhi_goel@apple.com
+References: <20260103131028.10708-1-chia-yu.chang@nokia-bell-labs.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260103131028.10708-1-chia-yu.chang@nokia-bell-labs.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-This commit adds SNMP drop count increment for the packets in
-per NUMA queues which were introduced in commit b650bf0977d3
-("udp: remove busylock and add per NUMA queues").
+On 1/3/26 2:10 PM, chia-yu.chang@nokia-bell-labs.com wrote:
+> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> 
+> Hello,
+> 
+> Plesae find the v7 AccECN case handling patch series, which covers
+> several excpetional case handling of Accurate ECN spec (RFC9768),
+> adds new identifiers to be used by CC modules, adds ecn_delta into
+> rate_sample, and keeps the ACE counter for computation, etc.
+> 
+> This patch series is part of the full AccECN patch series, which is available at
+> https://github.com/L4STeam/linux-net-next/commits/upstream_l4steam/
+> 
+> Best regards,
+> Chia-Yu
 
-Signed-off-by: Mahdi Faramarzpour <mahdifrmx@gmail.com>
----
-v4:
-  - move all changes to unlikely(to_drop) branch
-v3: https://lore.kernel.org/netdev/20260105114732.140719-1-mahdifrmx@gmail.com/
-  - remove the unreachable UDP_MIB_RCVBUFERRORS code
-v2: https://lore.kernel.org/netdev/20260105071218.10785-1-mahdifrmx@gmail.com/
-  - change ENOMEM to ENOBUFS
-v1: https://lore.kernel.org/netdev/20260104105732.427691-1-mahdifrmx@gmail.com/
----
- net/ipv4/udp.c | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+I had just a minor comment on patch 11/13. I think this deserves
+explicit ack from Eric, Neal or Kuniyuki; please wait a little longer
+for them before resend.
 
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index ffe074cb5..399d1a357 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -1705,6 +1705,10 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
- 	unsigned int rmem, rcvbuf;
- 	int size, err = -ENOMEM;
- 	int total_size = 0;
-+	struct {
-+		int ipv4;
-+		int ipv6;
-+	} mem_err_count;
- 	int q_size = 0;
- 	int dropcount;
- 	int nb = 0;
-@@ -1793,14 +1797,28 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
- 	}
- 
- 	if (unlikely(to_drop)) {
-+		mem_err_count.ipv4 = 0;
-+		mem_err_count.ipv6 = 0;
- 		for (nb = 0; to_drop != NULL; nb++) {
- 			skb = to_drop;
-+			if (skb->protocol == htons(ETH_P_IP))
-+				mem_err_count.ipv4++;
-+			else
-+				mem_err_count.ipv6++;
- 			to_drop = skb->next;
- 			skb_mark_not_on_list(skb);
--			/* TODO: update SNMP values. */
- 			sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_PROTO_MEM);
- 		}
- 		numa_drop_add(&udp_sk(sk)->drop_counters, nb);
-+
-+		SNMP_ADD_STATS(__UDPX_MIB(sk, true), UDP_MIB_MEMERRORS,
-+			       mem_err_count.ipv4);
-+		SNMP_ADD_STATS(__UDPX_MIB(sk, true), UDP_MIB_INERRORS,
-+			       mem_err_count.ipv4);
-+		SNMP_ADD_STATS(__UDPX_MIB(sk, false), UDP_MIB_MEMERRORS,
-+			       mem_err_count.ipv6);
-+		SNMP_ADD_STATS(__UDPX_MIB(sk, false), UDP_MIB_INERRORS,
-+			       mem_err_count.ipv6);
- 	}
- 
- 	atomic_sub(total_size, &udp_prod_queue->rmem_alloc);
--- 
-2.34.1
+Side note: it would be great to pair the AccECN behaviours with some
+pktdrill tests, do you have plan for it?
+
+Thanks,
+
+Paolo
 
 
