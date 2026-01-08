@@ -1,437 +1,115 @@
-Return-Path: <netdev+bounces-248056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB661D03AC9
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 16:10:03 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 733DCD03E77
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 16:36:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DF0D330158CA
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:09:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id F1136300899B
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:36:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3BA93EF0B2;
-	Thu,  8 Jan 2026 11:47:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 489384984B4;
+	Thu,  8 Jan 2026 12:04:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZpPt0D+M"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="CsU3Bc/m"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from iad-out-012.esa.us-east-1.outbound.mail-perimeter.amazon.com (iad-out-012.esa.us-east-1.outbound.mail-perimeter.amazon.com [34.197.10.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EAC62FD7A7
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 11:47:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3205149848F
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 12:04:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.197.10.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767872832; cv=none; b=k79T6Zjcd/WSvNh0c8hke6unae6fD4NVShteOOVNrj6THJf99/Y1pnDVuAfS/C30Xw+5GCh0T4EoRG+IyjMZucDNlwesrJrUIDsjGxTDsKZGLHpoAT1y5VWCwweSTQ+0b7pA3I3HbDtYXA2h1Qh2Bghf09y2Qgc2R2wX97p6FKU=
+	t=1767873867; cv=none; b=XDcewd/Ww3hRY68+fkR3wespuEPtnQllxZSLa8obK50N9xMvlfKs2Ar5H3VczqFp6D7tY9wEZUPj1+bi3+4B6CIWiRfC0YBR2JJGIkk6yFv4w2SWz2K7nQ1r58ZIzyxn4BBDVXoIi3cE76/nzCYq3qJjK5oetE4UKIqpbc6LHkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767872832; c=relaxed/simple;
-	bh=ae1ahcMQ6W4KZC2gE/1OZAOU9eLsdS4SuPOqdQF4o7o=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=Jcm2xEVsiHnaY/uCqeWSAddQjdSOqffHM8bAfH+yg4QR5aXixhaozOnl9n0Y4uL1FkQDJ7Znn8T1AeEQSSp4NA1u7xcZOgJloozTSme2w4og0oAH+shUPEW4qMArDy4rGD8C5jWX6YebHakIzBenmTNwUoozHMaya2UPqIZnQAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZpPt0D+M; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1767873867; c=relaxed/simple;
+	bh=i0xcOAhzDQaCuhh/+O/fpHFZNrkQuiTWto0UGqAXzfw=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UX4LEO50SKyJ6Z51GasKgOFb/yDdY0iFktyP9shhx+teTKt6oqCoWDm4LVr9fmkOkZje0dDugy33r1Emq5+sb5kOW1Wp6Fn8hLPnfrizWARmBJBD7m6wJwwMeLXbAqCGwgnfUqDBBB7hXTpXd5T3kGLI5Wv+2lx/RuVjACJymz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=CsU3Bc/m; arc=none smtp.client-ip=34.197.10.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1767873863; x=1799409863;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=JYW49MvEg/hKYNjcSEtm/n9oUxDHwTAeo5+QHLIEc/8=;
+  b=CsU3Bc/mVC+IrT+PANaxQckROSkSOWShpM05z52Tw6LLHeZAVjH2A8m2
+   Y4u1Qer+ypdaS9g1Ho3E7OGaEiKeS+hOnmkIsE67nGIFECGCm4Iaftgk/
+   5O1tWR9PEKKy+Rl25RimnuG+uw+RRfi+MEzbp4CgWpbTmlFLV2bHbIzkn
+   g+lyLOjOv0ileL+qvFYMyUwKpvL4G+hvRzK/Zxv5A72er7HIBYBG+wM40
+   RHGIe0lIwJaUP9B/SJqvkHC3erLPnkj9AbHrIrm7/ZkjbKfju6/uhjd5A
+   DYWtQPLAaNmwgWYQoJJd74A6EepvfvXfDIWOtmufBjS5WdbB0xGgTT2c3
+   g==;
+X-CSE-ConnectionGUID: nI6yRKgjS/SlP4nD3NJ6XQ==
+X-CSE-MsgGUID: wy8+cW/gS1eKV6Nn3jDSvg==
+X-IronPort-AV: E=Sophos;i="6.21,210,1763424000"; 
+   d="scan'208";a="9372761"
+Received: from ip-10-4-7-229.ec2.internal (HELO smtpout.naws.us-east-1.prod.farcaster.email.amazon.dev) ([10.4.7.229])
+  by internal-iad-out-012.esa.us-east-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2026 12:04:18 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [205.251.233.104:16936]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.44.170:2525] with esmtp (Farcaster)
+ id e9329683-61cc-461e-9b20-53594e5e9dee; Thu, 8 Jan 2026 12:04:18 +0000 (UTC)
+X-Farcaster-Flow-ID: e9329683-61cc-461e-9b20-53594e5e9dee
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
+ Thu, 8 Jan 2026 12:04:18 +0000
+Received: from b0be8375a521 (10.37.244.11) by EX19D001UWA001.ant.amazon.com
+ (10.13.138.214) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35; Thu, 8 Jan 2026
+ 12:04:16 +0000
+From: Kohei Enju <enjuk@amazon.com>
+To: <aleksandr.loktionov@intel.com>
+CC: <andrew+netdev@lunn.ch>, <anthony.l.nguyen@intel.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <enjuk@amazon.com>,
+	<intel-wired-lan@lists.osuosl.org>, <kuba@kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<przemyslaw.kitszel@intel.com>, <takkozu@amazon.com>
+Subject: Re: RE: [Intel-wired-lan] [PATCH iwl-next v2 3/3] igb: allow configuring RSS key via ethtool set_rxfh
+Date: Thu, 8 Jan 2026 21:03:58 +0900
+Message-ID: <20260108120400.75859-1-enjuk@amazon.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <IA3PR11MB8986D6E9C30B7FFBCEF64394E585A@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <IA3PR11MB8986D6E9C30B7FFBCEF64394E585A@IA3PR11MB8986.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767872815;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UtoPCHhrlUD7ktISh+mpZ5JLYC/bBj6xbi4IbIb21ao=;
-	b=ZpPt0D+MZiWgXOEGPQGunqR/Xuf0FYuGpBUcvkesYci2sc/FfSTQewLlSjWyi3fonfP6be
-	GWS+OwdoWkiLHyr4kWdf+RbaHiZ1g7RcTr4KE+MhVXAsifWFX+XY906l34+ulH/mWRWHWj
-	NN3Sw1c79mus4XV8NYrOitHrVf+cPQE=
-Date: Thu, 08 Jan 2026 11:46:46 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <66843c358b71a0dc3e57cc6ac6c0e8b1bb018e38@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH bpf-next v5 2/3] bpf, sockmap: Fix FIONREAD for sockmap
-To: "Jakub Sitnicki" <jakub@cloudflare.com>
-Cc: bpf@vger.kernel.org, "John Fastabend" <john.fastabend@gmail.com>, "David 
- S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Simon Horman" <horms@kernel.org>, "Neal Cardwell"
- <ncardwell@google.com>, "Kuniyuki Iwashima" <kuniyu@google.com>, "David
- Ahern" <dsahern@kernel.org>, "Alexei Starovoitov" <ast@kernel.org>,
- "Daniel Borkmann" <daniel@iogearbox.net>, "Andrii Nakryiko"
- <andrii@kernel.org>, "Martin  KaFai Lau" <martin.lau@linux.dev>, "Eduard
- Zingerman" <eddyz87@gmail.com>, "Song Liu" <song@kernel.org>, "Yonghong
- Song" <yonghong.song@linux.dev>, "KP  Singh" <kpsingh@kernel.org>,
- "Stanislav Fomichev" <sdf@fomichev.me>, "Hao  Luo" <haoluo@google.com>,
- "Jiri Olsa" <jolsa@kernel.org>, "Shuah Khan" <shuah@kernel.org>, "Stefano
- Garzarella" <sgarzare@redhat.com>, "Michal  Luczaj" <mhal@rbox.co>, "Cong
- Wang" <cong.wang@bytedance.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-In-Reply-To: <87ikddijrd.fsf@cloudflare.com>
-References: <20260106051458.279151-1-jiayuan.chen@linux.dev>
- <20260106051458.279151-3-jiayuan.chen@linux.dev>
- <87ikddijrd.fsf@cloudflare.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWA001.ant.amazon.com (10.13.139.124) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-January 7, 2026 at 22:23, "Jakub Sitnicki" <jakub@cloudflare.com mailto:j=
-akub@cloudflare.com?to=3D%22Jakub%20Sitnicki%22%20%3Cjakub%40cloudflare.c=
-om%3E > wrote:
+On Thu, 8 Jan 2026 07:29:19 +0000, Loktionov, Aleksandr wrote:
 
+>> 
+>> -	igb_write_rss_indir_tbl(adapter);
+>> +	if (rxfh->key) {
+>> +		adapter->has_user_rss_key = true;
+>> +		memcpy(adapter->rss_key, rxfh->key, sizeof(adapter-
+>> >rss_key));
+>> +		igb_write_rss_key(adapter);
+>It leads to race between ethtool RSS update and concurrent resets.
+>Because igb_setup_mrqc() (called during resets) also calls igb_write_rss_key(adapter).
+>Non-fatal but breaks RSS configuration guarantees.
 
->=20
->=20On Tue, Jan 06, 2026 at 01:14 PM +08, Jiayuan Chen wrote:
->=20
->=20>=20
->=20> A socket using sockmap has its own independent receive queue: ingre=
-ss_msg.
-> >  This queue may contain data from its own protocol stack or from othe=
-r
-> >  sockets.
-> >=20
->=20>  Therefore, for sockmap, relying solely on copied_seq and rcv_nxt t=
-o
-> >  calculate FIONREAD is not enough.
-> >=20
->=20>  This patch adds a new ingress_size field in the psock structure to=
- record
-> >  the data length in ingress_msg. Additionally, we implement new ioctl
-> >  interfaces for TCP and UDP to intercept FIONREAD operations. While U=
-nix
-> >  and VSOCK also support sockmap and have similar FIONREAD calculation
-> >  issues, fixing them would require more extensive changes
-> >  (please let me know if modifications are needed). I believe it's not
-> >  appropriate to include those changes under this fix patch.
-> >=20
->=20Nit: These last two lines don't really belong in the commit message.
-> Side notes for reviewers can be added after the "---" marker.
->=20
->=20>=20
->=20> Previous work by John Fastabend made some efforts towards FIONREAD =
-support:
-> >  commit e5c6de5fa025 ("bpf, sockmap: Incorrectly handling copied_seq"=
-)
-> >  Although the current patch is based on the previous work by John Fas=
-tabend,
-> >  it is acceptable for our Fixes tag to point to the same commit.
-> >=20
->=20>  FD1:read()
-> >  -- FD1->copied_seq++
-> >  | [read data]
-> >  |
-> >  [enqueue data] v
-> >  [sockmap] -> ingress to self -> ingress_msg queue
-> >  FD1 native stack ------> ^
-> >  -- FD1->rcv_nxt++ -> redirect to other | [enqueue data]
-> >  | |
-> >  | ingress to FD1
-> >  v ^
-> >  ... | [sockmap]
-> >  FD2 native stack
-> >=20
->=20>  Fixes: 04919bed948dc ("tcp: Introduce tcp_read_skb()")
-> >  Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-> >  ---
-> >  include/linux/skmsg.h | 67 +++++++++++++++++++++++++++++++++++++++++=
---
-> >  net/core/skmsg.c | 3 ++
-> >  net/ipv4/tcp_bpf.c | 21 ++++++++++++++
-> >  net/ipv4/udp_bpf.c | 25 +++++++++++++---
-> >  4 files changed, 110 insertions(+), 6 deletions(-)
-> >=20
->=20>  diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-> >  index 0323a2b6cf5e..1fa03953043f 100644
-> >  --- a/include/linux/skmsg.h
-> >  +++ b/include/linux/skmsg.h
-> >  @@ -97,6 +97,7 @@ struct sk_psock {
-> >  struct sk_buff_head ingress_skb;
-> >  struct list_head ingress_msg;
-> >  spinlock_t ingress_lock;
-> >  + ssize_t ingress_size;
-> >=20
->=20The name is not great because we also already have `ingress_bytes`.
-> I suggest to rename and add a doc string. Also we don't expect the coun=
-t
-> to ever be negative. Why ssize_t when we store all other byte counts
-> there as u32?
->=20
->=20 /** @msg_tot_len: Total bytes queued in ingress_msg list. */
->  u32 msg_tot_len;
->=20
->=20>=20
->=20> unsigned long state;
-> >  struct list_head link;
-> >  spinlock_t link_lock;
-> >  @@ -321,6 +322,27 @@ static inline void sock_drop(struct sock *sk, s=
-truct sk_buff *skb)
-> >  kfree_skb(skb);
-> >  }
-> >=20=20
->=20>  +static inline ssize_t sk_psock_get_msg_size_nolock(struct sk_psoc=
-k *psock)
-> >  +{
-> >  + /* Used by ioctl to read ingress_size only; lock-free for performa=
-nce */
-> >  + return READ_ONCE(psock->ingress_size);
-> >  +}
-> >  +
-> >  +static inline void sk_psock_inc_msg_size_locked(struct sk_psock *ps=
-ock, ssize_t diff)
-> >  +{
-> >  + /* Use WRITE_ONCE to ensure correct read in sk_psock_get_msg_size_=
-nolock().
-> >  + * ingress_lock should be held to prevent concurrent updates to ing=
-ress_size
-> >  + */
-> >  + WRITE_ONCE(psock->ingress_size, psock->ingress_size + diff);
-> >  +}
-> >  +
-> >  +static inline void sk_psock_inc_msg_size(struct sk_psock *psock, ss=
-ize_t diff)
-> >=20
->=20Not sure about this function name. "inc" usually means increment by o=
-ne.
-> Was that modeled after some existing interface?
->=20
->=20If not, I'd switch rename to sk_psock_msg_len_add(..., int delta)
->=20
->=20Following the naming convention from sk_forward_alloc_add(),
-> skb_frag_size_add(), skb_len_add(), etc.
->=20
->=20>=20
->=20> +{
-> >  + spin_lock_bh(&psock->ingress_lock);
-> >  + sk_psock_inc_msg_size_locked(psock, diff);
-> >  + spin_unlock_bh(&psock->ingress_lock);
-> >  +}
-> >  +
-> >  static inline bool sk_psock_queue_msg(struct sk_psock *psock,
-> >  struct sk_msg *msg)
-> >  {
-> >  @@ -329,6 +351,7 @@ static inline bool sk_psock_queue_msg(struct sk_=
-psock *psock,
-> >  spin_lock_bh(&psock->ingress_lock);
-> >  if (sk_psock_test_state(psock, SK_PSOCK_TX_ENABLED)) {
-> >  list_add_tail(&msg->list, &psock->ingress_msg);
-> >  + sk_psock_inc_msg_size_locked(psock, msg->sg.size);
-> >  ret =3D true;
-> >  } else {
-> >  sk_msg_free(psock->sk, msg);
-> >  @@ -345,18 +368,25 @@ static inline struct sk_msg *sk_psock_dequeue_=
-msg(struct sk_psock *psock)
-> >=20=20
->=20>  spin_lock_bh(&psock->ingress_lock);
-> >  msg =3D list_first_entry_or_null(&psock->ingress_msg, struct sk_msg,=
- list);
-> >  - if (msg)
-> >  + if (msg) {
-> >  list_del(&msg->list);
-> >  + sk_psock_inc_msg_size_locked(psock, -msg->sg.size);
-> >  + }
-> >  spin_unlock_bh(&psock->ingress_lock);
-> >  return msg;
-> >  }
-> >=20=20
->=20>  +static inline struct sk_msg *sk_psock_peek_msg_locked(struct sk_p=
-sock *psock)
-> >  +{
-> >  + return list_first_entry_or_null(&psock->ingress_msg, struct sk_msg=
-, list);
-> >  +}
-> >  +
-> >  static inline struct sk_msg *sk_psock_peek_msg(struct sk_psock *psoc=
-k)
-> >  {
-> >  struct sk_msg *msg;
-> >=20=20
->=20>  spin_lock_bh(&psock->ingress_lock);
-> >  - msg =3D list_first_entry_or_null(&psock->ingress_msg, struct sk_ms=
-g, list);
-> >  + msg =3D sk_psock_peek_msg_locked(psock);
-> >  spin_unlock_bh(&psock->ingress_lock);
-> >  return msg;
-> >  }
-> >  @@ -523,6 +553,39 @@ static inline bool sk_psock_strp_enabled(struct=
- sk_psock *psock)
-> >  return !!psock->saved_data_ready;
-> >  }
-> >=20=20
->=20>  +/* for tcp only, sk is locked */
-> >  +static inline ssize_t sk_psock_msg_inq(struct sock *sk)
-> >  +{
-> >  + struct sk_psock *psock;
-> >  + ssize_t inq =3D 0;
-> >  +
-> >  + psock =3D sk_psock_get(sk);
-> >  + if (likely(psock)) {
-> >  + inq =3D sk_psock_get_msg_size_nolock(psock);
-> >  + sk_psock_put(sk, psock);
-> >  + }
-> >  + return inq;
-> >  +}
-> >  +
-> >  +/* for udp only, sk is not locked */
-> >  +static inline ssize_t sk_msg_first_length(struct sock *sk)
-> >=20
->=20s/_length/_len/
->=20
->=20>=20
->=20> +{
-> >  + struct sk_psock *psock;
-> >  + struct sk_msg *msg;
-> >  + ssize_t inq =3D 0;
-> >  +
-> >  + psock =3D sk_psock_get(sk);
-> >  + if (likely(psock)) {
-> >  + spin_lock_bh(&psock->ingress_lock);
-> >  + msg =3D sk_psock_peek_msg_locked(psock);
-> >  + if (msg)
-> >  + inq =3D msg->sg.size;
-> >  + spin_unlock_bh(&psock->ingress_lock);
-> >  + sk_psock_put(sk, psock);
-> >  + }
-> >  + return inq;
-> >  +}
-> >  +
-> >  #if IS_ENABLED(CONFIG_NET_SOCK_MSG)
-> >=20=20
->=20>  #define BPF_F_STRPARSER (1UL << 1)
-> >  diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-> >  index d73e03f7713a..c959d52a62b2 100644
-> >  --- a/net/core/skmsg.c
-> >  +++ b/net/core/skmsg.c
-> >  @@ -455,6 +455,7 @@ int __sk_msg_recvmsg(struct sock *sk, struct sk_=
-psock *psock, struct msghdr *msg
-> >  atomic_sub(copy, &sk->sk_rmem_alloc);
-> >  }
-> >  msg_rx->sg.size -=3D copy;
-> >  + sk_psock_inc_msg_size(psock, -copy);
-> >=20=20
->=20>  if (!sge->length) {
-> >  sk_msg_iter_var_next(i);
-> >  @@ -819,9 +820,11 @@ static void __sk_psock_purge_ingress_msg(struct=
- sk_psock *psock)
-> >  list_del(&msg->list);
-> >  if (!msg->skb)
-> >  atomic_sub(msg->sg.size, &psock->sk->sk_rmem_alloc);
-> >  + sk_psock_inc_msg_size(psock, -((ssize_t)msg->sg.size));
-> >=20
->=20Cast won't be needed after you switch param type to `int`.
->=20
->=20>=20
->=20> sk_msg_free(psock->sk, msg);
-> >  kfree(msg);
-> >  }
-> >  + WARN_ON_ONCE(psock->ingress_size);
-> >  }
-> >=20=20
->=20>  static void __sk_psock_zap_ingress(struct sk_psock *psock)
-> >  diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
-> >  index 6332fc36ffe6..a9c758868f13 100644
-> >  --- a/net/ipv4/tcp_bpf.c
-> >  +++ b/net/ipv4/tcp_bpf.c
-> >  @@ -10,6 +10,7 @@
-> >=20=20
->=20>  #include <net/inet_common.h>
-> >  #include <net/tls.h>
-> >  +#include <asm/ioctls.h>
-> >=20=20
->=20>  void tcp_eat_skb(struct sock *sk, struct sk_buff *skb)
-> >  {
-> >  @@ -332,6 +333,25 @@ static int tcp_bpf_recvmsg_parser(struct sock *=
-sk,
-> >  return copied;
-> >  }
-> >=20=20
->=20>  +static int tcp_bpf_ioctl(struct sock *sk, int cmd, int *karg)
-> >  +{
-> >  + bool slow;
-> >  +
-> >  + /* we only care about FIONREAD */
-> >=20
->=20Nit: This comment seems redundant. The expression is obvious.
->=20
->=20>=20
->=20> + if (cmd !=3D SIOCINQ)
-> >  + return tcp_ioctl(sk, cmd, karg);
-> >  +
-> >  + /* works similar as tcp_ioctl */
-> >  + if (sk->sk_state =3D=3D TCP_LISTEN)
-> >  + return -EINVAL;
-> >  +
-> >  + slow =3D lock_sock_fast(sk);
-> >  + *karg =3D sk_psock_msg_inq(sk);
-> >  + unlock_sock_fast(sk, slow);
-> >  +
-> >  + return 0;
-> >  +}
-> >  +
-> >  static int tcp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size=
-_t len,
-> >  int flags, int *addr_len)
-> >  {
-> >  @@ -610,6 +630,7 @@ static void tcp_bpf_rebuild_protos(struct proto =
-prot[TCP_BPF_NUM_CFGS],
-> >  prot[TCP_BPF_BASE].close =3D sock_map_close;
-> >  prot[TCP_BPF_BASE].recvmsg =3D tcp_bpf_recvmsg;
-> >  prot[TCP_BPF_BASE].sock_is_readable =3D sk_msg_is_readable;
-> >  + prot[TCP_BPF_BASE].ioctl =3D tcp_bpf_ioctl;
-> >=20=20
->=20>  prot[TCP_BPF_TX] =3D prot[TCP_BPF_BASE];
-> >  prot[TCP_BPF_TX].sendmsg =3D tcp_bpf_sendmsg;
-> >  diff --git a/net/ipv4/udp_bpf.c b/net/ipv4/udp_bpf.c
-> >  index 0735d820e413..cc1156aef14d 100644
-> >  --- a/net/ipv4/udp_bpf.c
-> >  +++ b/net/ipv4/udp_bpf.c
-> >  @@ -5,6 +5,7 @@
-> >  #include <net/sock.h>
-> >  #include <net/udp.h>
-> >  #include <net/inet_common.h>
-> >  +#include <asm/ioctls.h>
-> >=20=20
->=20>  #include "udp_impl.h"
-> >=20=20
->=20>  @@ -111,12 +112,28 @@ enum {
-> >  static DEFINE_SPINLOCK(udpv6_prot_lock);
-> >  static struct proto udp_bpf_prots[UDP_BPF_NUM_PROTS];
-> >=20=20
->=20>  +static int udp_bpf_ioctl(struct sock *sk, int cmd, int *karg)
-> >  +{
-> >  + /* we only care about FIONREAD */
-> >  + if (cmd !=3D SIOCINQ)
-> >  + return udp_ioctl(sk, cmd, karg);
-> >  +
-> >  + /* works similar as udp_ioctl.
-> >  + * man udp(7): "FIONREAD (SIOCINQ): Returns the size of the next
-> >  + * pending datagram in the integer in bytes, or 0 when no datagram
-> >  + * is pending."
-> >  + */
-> >=20
->=20Not sure we need to quote man pages here.
->=20
->=20>=20
->=20> + *karg =3D sk_msg_first_length(sk);
-> >  + return 0;
-> >  +}
-> >  +
-> >  static void udp_bpf_rebuild_protos(struct proto *prot, const struct =
-proto *base)
-> >  {
-> >  - *prot =3D *base;
-> >  - prot->close =3D sock_map_close;
-> >  - prot->recvmsg =3D udp_bpf_recvmsg;
-> >  - prot->sock_is_readable =3D sk_msg_is_readable;
-> >  + *prot =3D *base;
-> >  + prot->close =3D sock_map_close;
-> >  + prot->recvmsg =3D udp_bpf_recvmsg;
-> >  + prot->sock_is_readable =3D sk_msg_is_readable;
-> >  + prot->ioctl =3D udp_bpf_ioctl;
-> >  }
-> >=20=20
->=20>  static void udp_bpf_check_v6_needs_rebuild(struct proto *ops)
-> >
+At my first glance, rtnl lock serializes those operation, so it
+doesn't seem to be racy as long as they are under the rtnl lock.
+
+As far as I skimmed the codes, functions such as igb_open()/
+igb_up()/igb_reset_task(), which finally call igb_write_rss_key() are
+serialized by rtnl lock or serializes igb_write_rss_key() call by
+locking rtnl.
+
+Please let me know if I'm missing something and it's truly racy.
+
 >
-
-Thanks Jakub. All good suggestions. I've applied them in v6.
+>I think ethtool can/should wait of reset/watchdog task to finish. 
+>I'm against adding locks, and just my personal opinion, it's better to implement igb_rss_key_update_task() in addition to reset and watchdog tasks to be used both in reset and ethtool path.
+>
+>What do you think?
 
