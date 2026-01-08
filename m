@@ -1,121 +1,161 @@
-Return-Path: <netdev+bounces-248218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFCB5D05809
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 19:26:28 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49CB0D05869
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 19:28:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0996330B8911
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 18:01:58 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 929F2302A7FC
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 18:07:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECE002ECD2A;
-	Thu,  8 Jan 2026 17:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B3712EC561;
+	Thu,  8 Jan 2026 18:07:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LAhz5yjL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d3Ie1A6C"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67872EC0B5;
-	Thu,  8 Jan 2026 17:59:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071D92EA172
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 18:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767895195; cv=none; b=hegPA06oYvTmtk5u/lbDl4qmJZ08vnHj7ftQnH/SbtF+ZByxOgS7qjhBEIJZI8JHc+XTdfwnoSG7EydZKkoy+cAbiBzIBr3FuL85vqdeUapjjEp1RrNXV8ECqTVDzd8Ri08ycQi+DL5+mOgF98O0J0RKHBocciTnYB3AbsFDBcw=
+	t=1767895676; cv=none; b=Cpag/Zhm1nVFdymCGvNdsZJQnaSLR3dlMU6N5Cc1y26ZWu0aqjeMZoVOkOUGOXmuwBQuugeTxChMvZxYjrmMduDaxmoZ6AdXAqEYrAd2XFTN9AjEksR7jJEnTz5gTwz605TmTvyo11Q8IO7znXoZLtH8iTHXFtjPuumzPUh1hD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767895195; c=relaxed/simple;
-	bh=VS56+iHIwd0KOuIb+PXgF9rBDOZqhRNZV1FUYSuWDpw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IWot6GouRu8VL4OL4m/PdcuFuNiNth9IWkEWarxFAaslesQqAOYoCq2CBirhSQYHftMBqrzHSZwtSshN7Pyo1IDhfYOq+mCe+F/xx4xDQvJc1p6jF5WUd0jP9Yju5LrXBua/wT/D2J04CRH3poLXhDqSAvI5GAGMxVDetXFQ6pY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LAhz5yjL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DE5DC116C6;
-	Thu,  8 Jan 2026 17:59:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767895195;
-	bh=VS56+iHIwd0KOuIb+PXgF9rBDOZqhRNZV1FUYSuWDpw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LAhz5yjL6nQDZ8HKQZuDJVGQHvPKYqPunLwgEMdzrMbcKJrsb656s5iADUgqG3/5O
-	 lejfjZ247pUxqt6Szg/mmf6t8sjN6qLnps+LjzEkf9ax2jfUEzMGbxbH5KRbEB4JNU
-	 CkpZ+seRXVTg4OBAU1I3Xz8SQVfqiIyKfoKTjZtMdGMPNyoo8uwThvYuO+Z7jmG3IN
-	 LvUij3Y9MD7fJekpZDgk8Lgj2TrV8scbrlysPayU6FG8E9fZ0iQl0ohPYYr2GHmJuO
-	 +XItFOjC6xdx5o45xZcEZFlxDC9GRZsYu7VJUCZioerife92TPAjV3+fQp6cijT9Kb
-	 ayUoRJBbst5YA==
-Date: Thu, 8 Jan 2026 17:59:50 +0000
-From: Simon Horman <horms@kernel.org>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	andrew+netdev@lunn.ch, sgoutham@marvell.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	Suman Ghosh <sumang@marvell.com>
-Subject: Re: [PATCH net-next v2 03/13] octeontx2-af: npc: cn20k: Add default
- profile
-Message-ID: <20260108175950.GK345651@kernel.org>
-References: <20260107033844.437026-1-rkannoth@marvell.com>
- <20260107033844.437026-4-rkannoth@marvell.com>
+	s=arc-20240116; t=1767895676; c=relaxed/simple;
+	bh=eFlE0EEPfk3rewZOji/LmMkHrW23JLC2qQUHwRdkLWA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=vEFsYPdO0uFBb0ECwpv0pj/828eZMgqicwTNTcwHFoEGySY6gzZ40Onb9jmBx7EPXIlgyojh3J6RUepRiIv+bWwXA4IcPsKuREudWRrlcFdW3C/2x4my2YgNkP0MCMrrkbY//pJBcylflAC7gqaW+sCy2s+ox73OFEnW9zGeS8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d3Ie1A6C; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2a07f8dd9cdso26268815ad.1
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 10:07:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767895674; x=1768500474; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kG0qxlR7DkmzCTUi0X2cIVFJ3HHiLT6S36Wu9RwdLVQ=;
+        b=d3Ie1A6CGa28Ttr1TTaKTI0CqL8UfzfbBVnc3kQpnc9smokQ52Tb6Sp86W9+fGob7l
+         xIvuagbJfFwoNaZXsYlpRW3bYpwdKwAF+0qd1j6q5UhCxY6q1lNO4vKVELrn+Tj5WUnB
+         z7MZdkwG8Pkr8/j1CD6mISZKVUni+Tggx+69xD5bQsPICnuUOWP5V+ggww6NdGSYb3/w
+         xewNz/iW+grwID73F9Tk47golQ1MtyjboFtmgauJwiV/hxs0tlU0siMozBg3nwZmKkFi
+         FBOkK6bQFCQKQY4BGQVX/dUKN7zEhzDy2q06POFbW70+wwqMPxEnOgH0H9/uaY8jk1bX
+         4e3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767895674; x=1768500474;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=kG0qxlR7DkmzCTUi0X2cIVFJ3HHiLT6S36Wu9RwdLVQ=;
+        b=Y26vE73RUSjN+UsV9f80bVeXf3yNOUab8zE4fwIo/FbSvjjhTvljMJcCSIDBAzbbkz
+         6sVHTb60JBFgXRArMUveG14L8dS7TyhIiDF278rtt5Efk2gSg0gqwMKp+fhVV+ddllSc
+         AVwb6gmsHjNGsTUgEVwxRA+oGOjq4OqwnbhLkTn7tdnezCcvbJ+PgN4ATFaJsO8tqUf9
+         v21LJRIJKEbSWanEsUcoGA6jVnWFHlfYufD/9+qgxvyS4eqXR/gdEQKzCnK7YZvKM9dQ
+         hFv0+63ae+UsuxWEJsAKg+s5hNVd6pQ8SF3cgnxLqDfOIte9xJmFiWdWMT6JnFDfHeyb
+         5duA==
+X-Gm-Message-State: AOJu0YzlxX07tk5sYJ5IiNdkct/dGgd/3o8TTeggt9BJQxKn51ENhsCE
+	cEV3eMoRDKxIdojTnQmXwm6G34nbe72qJ6+R16+MA7d8k4PaT/OAr4RtYJbaBVzGw1sk3YKYR0H
+	iXEhjh05hGxR+hcRYmHQgMCTH5PEELQitHl6Fae8=
+X-Gm-Gg: AY/fxX6yjKdcDuT1KnmH3X3H2uOXJKR25X5aa3GxU5erKKNKlcDd7j3g4Hj+VxICfTS
+	nE6Twy5hTSDVtxGXnWFJKZdXjVadhKGFHuviBVobWL1MmY8OjQJMxXv8lZiEBpUCDIOVJQW4XZ4
+	gtt+RQU0w+pEqrIwOygs0R/kvbLIF82E8SNnGjf9jOzNy8L/7AYaN39asZnKVH5IkUJPwlorPVS
+	4Y6LbtpV1bxlAJTFo2kBiwRV6aBq5j80Q7sI6pFaTC/yEzxPbOvfhEIqbOvgTUmxWIVQh6f8T/D
+	m3UrBeko4OMlEQ9b2dL9ONcv44aY
+X-Google-Smtp-Source: AGHT+IE9Y4d720NUxx7X6c0Vop4TSZunxU0aBEXsPFaXcnftPaEKDqjIyJPqDzTbJ8MhAvkZSc7J6WYOjD4cMrQ1F1Y=
+X-Received: by 2002:a17:903:124e:b0:2a1:3cd8:d2dc with SMTP id
+ d9443c01a7336-2a3ee4b74a9mr74559005ad.57.1767895674105; Thu, 08 Jan 2026
+ 10:07:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260107033844.437026-4-rkannoth@marvell.com>
+References: <cover.1767621882.git.lucien.xin@gmail.com> <79bf90a6e105c6e6ac692de21a90ec621af47cc5.1767621882.git.lucien.xin@gmail.com>
+ <ec28c852-e80a-41c9-94ce-a0fce8ee07e7@redhat.com>
+In-Reply-To: <ec28c852-e80a-41c9-94ce-a0fce8ee07e7@redhat.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Thu, 8 Jan 2026 13:07:42 -0500
+X-Gm-Features: AQt7F2q4UBD6cchiuW4fIBTslqGz6vf73cyh9XXwWjTaKPFND-PFSs14ShxZDj8
+Message-ID: <CADvbK_dKYZ6_NyxcsweKRPkFEq046+1RENA7vH9hBhG-6xNxxw@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 07/16] quic: add connection id management
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
+	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
+	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
+	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 07, 2026 at 09:08:34AM +0530, Ratheesh Kannoth wrote:
-> From: Suman Ghosh <sumang@marvell.com>
-> 
-> Default mkex profile for cn20k silicon. This commit
-> changes attribute of objects to may_be_unused to
-> avoid compiler warning
-> 
-> Signed-off-by: Suman Ghosh <sumang@marvell.com>
-> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
-> ---
->  .../ethernet/marvell/octeontx2/af/cn20k/npc.c | 170 +++++++++++++++++-
->  .../ethernet/marvell/octeontx2/af/cn20k/npc.h |  18 ++
->  .../marvell/octeontx2/af/npc_profile.h        |  72 ++++----
->  3 files changed, 223 insertions(+), 37 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-> index bc52aafeb6a4..8f3f9cb37333 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-> @@ -7,9 +7,13 @@
->  #include <linux/xarray.h>
->  #include <linux/bitfield.h>
->  
-> +#include "rvu.h"
-> +#include "npc.h"
-> +#include "npc_profile.h"
-> +#include "rvu_npc_hash.h"
-> +#include "rvu_npc.h"
->  #include "cn20k/npc.h"
->  #include "cn20k/reg.h"
-> -#include "rvu_npc.h"
->  
->  static struct npc_priv_t npc_priv = {
->  	.num_banks = MAX_NUM_BANKS,
-> @@ -21,6 +25,170 @@ static const char *npc_kw_name[NPC_MCAM_KEY_MAX] = {
->  	[NPC_MCAM_KEY_X4] = "X4",
->  };
->  
-> +#define KEX_EXTR_CFG(bytesm1, hdr_ofs, ena, key_ofs)		\
-> +		     (((bytesm1) << 16) | ((hdr_ofs) << 8) | ((ena) << 7) | \
-> +		     ((key_ofs) & 0x3F))
-> +
-> +static struct npc_mcam_kex_extr npc_mkex_extr_default = {
-> +	.mkex_sign = MKEX_SIGN,
-> +	.name = "default",
-> +	.kpu_version = NPC_KPU_PROFILE_VER,
-> +	.keyx_cfg = {
-> +		/* nibble: LA..LE (ltype only) + Error code + Channel */
-> +		[NIX_INTF_RX] = ((u64)NPC_MCAM_KEY_DYN << 32) | NPC_CN20K_PARSE_NIBBLE_INTF_RX |
-> +				 NPC_CN20K_PARSE_NIBBLE_ERRCODE,
+On Thu, Jan 8, 2026 at 10:52=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> On 1/5/26 3:04 PM, Xin Long wrote:
+> > +/* Remove connection IDs from the set with sequence numbers less than =
+or equal to a number. */
+> > +void quic_conn_id_remove(struct quic_conn_id_set *id_set, u32 number)
+> > +{
+> > +     struct quic_common_conn_id *common, *tmp;
+> > +     struct list_head *list;
+> > +
+> > +     list =3D &id_set->head;
+> > +     list_for_each_entry_safe(common, tmp, list, list) {
+> > +             if (common->number <=3D number) {
+> > +                     if (id_set->active =3D=3D common)
+> > +                             id_set->active =3D tmp;
+> > +                     quic_conn_id_del(common);
+> > +                     id_set->count--;
+> > +             }
+>
+> Since the list is sorted by number you could break the loop as soon as
+> common->number > number.
+>
+> > +     }
+> > +}
+> > +
+> > +struct quic_conn_id *quic_conn_id_find(struct quic_conn_id_set *id_set=
+, u32 number)
+> > +{
+> > +     struct quic_common_conn_id *common;
+> > +
+> > +     list_for_each_entry(common, &id_set->head, list)
+> > +             if (common->number =3D=3D number)
+> > +                     return &common->id;
+>
+> Same here, you can break the loop when common->number > number
+>
+Yup, this will save some rounds.
 
-Hi Suman and Ratheesh,
+>
+> > +static inline u32 quic_conn_id_first_number(struct quic_conn_id_set *i=
+d_set)
+> > +{
+> > +     struct quic_common_conn_id *common;
+> > +
+> > +     common =3D list_first_entry(&id_set->head, struct quic_common_con=
+n_id, list);
+>
+> id_set can be empty at creation time. The above assumes it contains at
+> least an element. Does the caller need to check for such condition?
+> Possibly moving the check here would simplify the code?
+>
+quic_conn_id_first_number() is always called in the socket that is not
+in CLOSE state,
+and there must be at least one ID in the id_set in such states. I will
+leave a comment
+in this function if you're okay with it.
 
-NPC_CN20K_PARSE_NIBBLE_ERRCODE isn't defined until the following patch,
-so this results in a build failure.
-
-...
+Thanks.
 
