@@ -1,90 +1,137 @@
-Return-Path: <netdev+bounces-248125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30AEAD04174
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 16:57:49 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F033BD04192
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 16:58:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1D0E431621FD
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:39:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1B92131C1E04
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FE363033D2;
-	Thu,  8 Jan 2026 15:17:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4BBD341AD8;
+	Thu,  8 Jan 2026 15:20:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q/pe9NNM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aRhkLWGi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FFB9212FB9;
-	Thu,  8 Jan 2026 15:17:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4750B331A5D;
+	Thu,  8 Jan 2026 15:20:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767885425; cv=none; b=txrYIR2SmieGqZSzCSELfxkbC6bhdm49Oz/TSvWm9Rkl0Ko5zhTIQua5yvpDzz/2bxbmm9iwCQMddVU1WQt+4r63Pf7X+z4BUUdN7lXGxNjNREXHxzGXNpvDDqWJwSFWkFwWpbObeyJAmqixFPByiAnTnzsOPVMPNU+Qw/bcOyU=
+	t=1767885652; cv=none; b=i5Eu9d++2cQ41N19FOHxg9XDhtx8+hhOaM9XKWzg+5HQmv+/KNnYP9qEVWErtmnuFQaB8DMxMmsfJfiwJ/5/qIUlBMYztkR8hZM1cQ/0OxiSZDctor9xVG2KE0zijf4nx467kfPdqYVBQrknJ2NeU35xXio1HQ3WwxWtZZvfPVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767885425; c=relaxed/simple;
-	bh=f0CvU2tIQVYrHZLwRGFpAIZTZzQEZlmsLyp505OcoT8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u7p5E5iY3fBt3Oxo04+ELXVDWW4yc6be9OuPLAlSbleQILJ0zdKTZZgVFpqD/CgskbAp+yHoqfryBTudsVN2I6RHNphTPIQro5ksgGByKH0DkttnI9vi9+leTsBEILq8r344AXujUclffMW8+a97wAFTQL9VTS7TvUPQC/bB0TQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q/pe9NNM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D9FDC116C6;
-	Thu,  8 Jan 2026 15:17:04 +0000 (UTC)
+	s=arc-20240116; t=1767885652; c=relaxed/simple;
+	bh=kj9/L1h9QFZS6wMHhPgh4NTq4aVPlZfDQzmk8AYQgVU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JWLeOdpxYRzBEkY0fTSeK3xCsnsYNvV/Xxco2Zwh4nizKt15iMeSNqkuxpxpLNyZ8GgdcmhUKWXXG7fw01WTIPyCMYJGXR1ZuTEMZh+D66nwnoTaMTxivrdhMuX033/6UQofawY7lBSz1xf1kD5C/FbaKtpvn6UQjA6T+v8fx18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aRhkLWGi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B8BEC116C6;
+	Thu,  8 Jan 2026 15:20:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767885424;
-	bh=f0CvU2tIQVYrHZLwRGFpAIZTZzQEZlmsLyp505OcoT8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Q/pe9NNMiNxz34hUsWNmWKU2WKqFubbla3Wr7oWeH8vOiu/jI6KQbvAGDiyqebpee
-	 zueXbvVoEBUbdilVPWFJqRuNuBAGfpQY2nYSH9LvfR+BEfmKbAmTaTk3QHLESwLWxL
-	 c135xytcgj5cRVkPduRTaYTXtd8dD4ewUE3Z//Eazp9mW0O7lbVosamcHzpVBpSAh4
-	 obT6D1ou2uLjkRk25+UQt+57hKnWBZQhox46TD8U12AduKkVvhG7W33xnvNXXjjSLx
-	 lR+Mn0/snAZwvs+38w+8/rWcw4jdjKomYHqwq+hCNYv4L7gB3mBokXbb7PQnPcYV5H
-	 MZ5zw230QRGUw==
-Date: Thu, 8 Jan 2026 07:17:03 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Oliver Hartkopp <socketcan@hartkopp.net>
-Cc: mkl@pengutronix.de, Prithvi <activprithvi@gmail.com>, andrii@kernel.org,
- linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzkaller-bugs@googlegroups.com, netdev@vger.kernel.org
-Subject: Re: [bpf, xdp] headroom - was: Re: Question about to KMSAN:
- uninit-value in can_receive
-Message-ID: <20260108071703.788c67ed@kernel.org>
-In-Reply-To: <8b55ae26-daba-4b2e-a10b-4be367fb42d0@hartkopp.net>
-References: <20251117173012.230731-1-activprithvi@gmail.com>
-	<0c98b1c4-3975-4bf5-9049-9d7f10d22a6d@hartkopp.net>
-	<c2cead0a-06ed-4da4-a4e4-8498908aae3e@hartkopp.net>
-	<aSx++4VrGOm8zHDb@inspiron>
-	<d6077d36-93ed-4a6d-9eed-42b1b22cdffb@hartkopp.net>
-	<20251220173338.w7n3n4lkvxwaq6ae@inspiron>
-	<01190c40-d348-4521-a2ab-3e9139cc832e@hartkopp.net>
-	<20260102153611.63wipdy2meh3ovel@inspiron>
-	<20260102120405.34613b68@kernel.org>
-	<63c20aae-e014-44f9-a201-99e0e7abadcb@hartkopp.net>
-	<20260104074222.29e660ac@kernel.org>
-	<fac5da75-2fc0-464c-be90-34220313af64@hartkopp.net>
-	<20260105152638.74cfea6c@kernel.org>
-	<904fa297-b657-4f5b-9999-b8cfcc11bfa9@hartkopp.net>
-	<20260106162306.0649424c@kernel.org>
-	<8b55ae26-daba-4b2e-a10b-4be367fb42d0@hartkopp.net>
+	s=k20201202; t=1767885650;
+	bh=kj9/L1h9QFZS6wMHhPgh4NTq4aVPlZfDQzmk8AYQgVU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=aRhkLWGiPKtpyO6PuD4gE7esDHAwgPu0Ne8Ork+0d/SVkDOV7tcU2iy14cG+5LFs/
+	 dVeVJq5SQcpsE46hTLhIOvT1gu42nmVyS2fpeKE8ZzipfI0GAxYV2eq4AmgG0ds9T7
+	 +cVhwNYuYaSW2ptAy/ZiwL4RWPkLGGWDzB8bCj5ENKEgsd2dQ6egn0eVf6shLnv82m
+	 XLXN3so119rbtHrcqAB2hwPiS9258GSk8rABWGGCPGXjExADK35Attf/+wHJRQAA8R
+	 6vycGveZdz9oF46zK0hgQCV6BKjEHEzC9zAEkuXkvT/O/uRRAz74apze2AFtl5qkXV
+	 2lriJkzOZyVRA==
+Message-ID: <604c7b1d-f366-4faa-9abd-bae8ae73b561@kernel.org>
+Date: Thu, 8 Jan 2026 08:20:48 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2 net-next v2] selftests: ipv6_icmp: add tests for
+ ICMPv6 handling
+Content-Language: en-US
+To: Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, shuah@kernel.org, linux-kselftest@vger.kernel.org
+References: <20260107153841.5030-1-fmancera@suse.de>
+ <20260107153841.5030-2-fmancera@suse.de>
+ <72d45fe9-c058-4944-b7a2-260b7259096f@kernel.org>
+ <1660abed-e6ad-4657-8736-599ab9114f68@suse.de>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <1660abed-e6ad-4657-8736-599ab9114f68@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, 7 Jan 2026 16:34:13 +0100 Oliver Hartkopp wrote:
-> > Alternatively perhaps for this particular use case you could use
-> > something like metadata_dst to mark the frame as forwarded / annotate
-> > with the originating ifindex?  
+On 1/8/26 4:24 AM, Fernando Fernandez Mancera wrote:
+> On 1/7/26 5:41 PM, David Ahern wrote:
+>> On 1/7/26 8:38 AM, Fernando Fernandez Mancera wrote:
+>>> +icmpv6_to_vrf_based_local_address()
+>>> +{
+>>> +    local rc
+>>> +    local lldummy
+>>> +
+>>> +    echo
+>>> +    echo "ICMPv6 to VRF based local address"
+>>> +
+>>> +    setup
+>>> +
+>>> +    lldummy=$(get_linklocal dummy0)
+>>> +
+>>> +    if [ -z "$lldummy" ]; then
+>>> +        echo "Failed to get link local address for dummy0"
+>>> +        return 1
+>>> +    fi
+>>> +
+>>> +    run_cmd "$NS_EXEC sysctl -w net.ipv6.conf.all.keep_addr_on_down=1"
+>>> +
+>>> +    # create VRF and setup
+>>> +    run_cmd "$IP link add vrf0 type vrf table 10"
+>>> +    run_cmd "$IP link set vrf0 up"
+>>> +    run_cmd "$IP link set dummy0 master vrf0"
+>>
+>> run_cmd "$IP -6 addr add ::1 dev vrf0 nodad"
+>>
+>> makes the VRF device the loopback.
+>>
+>>> +
+>>> +    # route to reach 2001:db8::1/128 on VRF device and back to ::1
+>>> +    run_cmd "$IP -6 route add 2001:db8:1::1/64 dev vrf0"
+>>> +    run_cmd "$IP -6 route add ::1/128 dev vrf0 table 10"
+>>
+>> and then this route add should not be needed. This is how fcnal-test.sh
+>> works.
+>>
 > 
-> I looked into it and the way how skb_dst is shared in the union behind 
-> cb[] does not look very promising for skbs that wander up and down in 
-> the network layer.
+> Oh neat! Thanks.
+> 
+>>> +
+>>> +    # ping6 to link local address
+>>> +    run_cmd "$NS_EXEC ${ping6} -c 3 $lldummy%dummy0"
+>>> +    log_test $? 0 "Ping to link local address on VRF context"
+>>> +
+>>> +    # ping6 to link local address from localhost (::1)
+>>> +    run_cmd "$NS_EXEC ${ping6} -c 3 -I ::1 $lldummy%dummy0"
+>>
+>> -I vrf0 should be needed for all VRF tests. I suspect your current
+>> passing tests are because you have a single setup step and then run
+>> non-VRF test followed by VRF test. Really you need to do the setup,
+>> run_test, cleanup for each test.
+>>
+> 
+> You are right here about the cleanup, although the tests are passing
+> even if the cleanup is properly done or if `-t
+> icmpv6_to_vrf_based_local_address`. I don't see why they should not pass.
 
-Maybe I'm misunderstanding, but skb_dst is only unioned with some
-socket layer (TCP and sockmsg) fields, not with cb[]. It'd be
-problematic if CAN gw frames had to traverse routing but I don't 
-think they do?
+Without ::1 on the vrf device there is no valid address. ie., ::1 is in
+the default vrf and dummy0 is in the VRF so it should not be allowed.
+Something is off.
+> 
+> I am changing them to use `-I vrf0` because it makes more sense.
+
+I should have asked yesterday: how do these tests differ from what is
+done in fcnal-test.sh - ipv4_ping and ipv6_ping? Those tests cover
+loopback, linklocal address and global address combined with vrf and no vrf.
+
+
 
