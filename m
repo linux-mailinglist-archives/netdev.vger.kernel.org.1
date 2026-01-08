@@ -1,132 +1,110 @@
-Return-Path: <netdev+bounces-248079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C56F6D03017
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 14:26:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EED09D0324B
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 14:49:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 768A7302EF22
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 13:24:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C8F8E3097D4D
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 13:40:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF5D4ADDBF;
-	Thu,  8 Jan 2026 13:12:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13D854E2A2D;
+	Thu,  8 Jan 2026 13:14:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dn04lUtm"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="a2tE4Xjh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com [209.85.221.66])
+Received: from sg-1-105.ptr.blmpb.com (sg-1-105.ptr.blmpb.com [118.26.132.105])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEF5E4B2DE7
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 13:12:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC65F4DBD9E
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 13:14:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.105
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767877958; cv=none; b=WZfSE2Bxt91+meNtO5DneY2ecL0nngbFEn1Jt+1DoLlbb6iIql7yJi02RZrClpNklXloZ4ay1r/ygsSZSnP/uK0QZhLPwCYKqT2TSwKlqYg2T8SkJ0cujRwshWGl/CO6iqPxeinhLk3eILU14aYDrE2ZfjDQI8R3NJxKVnUxEmw=
+	t=1767878048; cv=none; b=KRsr9Ajbz7FncqDG0GlkXrNRL5CsQb/+WY3lfsP4p5Nod+8QYKwYv1GNuTHj6OObb/i+diw+XZi1nqkP9FNWFFNdEltT74ZmuM7WV97xzExlhiNe2HN09oUESYqQ3MPptIF262rbcMqzeA0n6vIdeBuh3c0NtYAgf/FhJUDdxb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767877958; c=relaxed/simple;
-	bh=ntcSTOGdH0CKjeTZNLnC8v8dbPtkb/IHzwCftDO6npA=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=UnI6KlEB5Y67Kux/oT8fDS3U9hMJ/y/OBWNIxuT/4voPCXTVieOpHZbs2vKqLBVOPKoDiyRG9bOSGIL2KlKabuSrj+cxyBDGU+DYVH8OSiDO3C/6RVpYPbLrSAGuYwbgK+jv5G6eMaqofv9Ve0AIHZ+mkF+haXUsSgy5MTvVkcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dn04lUtm; arc=none smtp.client-ip=209.85.221.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f66.google.com with SMTP id ffacd0b85a97d-43260a5a096so2208427f8f.0
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 05:12:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767877955; x=1768482755; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ntcSTOGdH0CKjeTZNLnC8v8dbPtkb/IHzwCftDO6npA=;
-        b=Dn04lUtmjxRnw732foM/u7Pcx0nfs93aaXSqvQRiMlOLkOV7bn99NEx2H8Sx76C5BA
-         3We8ibiB5zeA0D8d9dJKzuu4Uw1+9eyvl/QBJ+ivBPgW6sZxl4+Rp4PUYiEaCn84yWJZ
-         oZ7TCKk7sWhuEzF8goUxQoY+yN6H+OE2dGFIySEbrIssMCUvO6dUUP4DgPHuyB7IumCe
-         PdqXVRazRY5nPrb5qNdFt4IoRMDF2x7H+P+DibjNumrdj65XrHylus2gSroxt0MP1Sn/
-         7uIDXKrpccFlmnhg3JnTrk140KyecTkqFSS8nMBbiapPUpQSnqlRRc6JfrtICQ23NGaP
-         lDJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767877955; x=1768482755;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ntcSTOGdH0CKjeTZNLnC8v8dbPtkb/IHzwCftDO6npA=;
-        b=N9eoWdgZIZmTKp7QEPWPajsBPzNWao/xJO33RiqI+dG3B05jYsaWE2rgjdamsm9JYr
-         luNaX2KPzl7evVSCdjDhN/EyfvlWbaGgbgXy4tqSyP//tQ6w7KWHh9Vlho2Gb45gKPWM
-         bDj45h2RU7E5pAVdlesBHdNtsF8GmuhcvjvIxLR1N4YY3F5gyKpFpQP9xEg1TEF6hQhe
-         s/fH5Ty6BzSg4mIB9U9fYGW5G2Kjs/W1FrK4y/XZwyeyOs9XGr+4QEeBs2Gaq5RGqugv
-         KD5k+cfENIsU91sQiGT9C+wMnN/jPqLOJ8RCJ4u+cliDJAkokiS8qPfBHrEwGUawGiXI
-         Ch3g==
-X-Forwarded-Encrypted: i=1; AJvYcCXjCP+FfONWWcvCPEt6ECG0jkgt9PiNb12Msu5qhGK0ZvSWKxOa6ObYt8xbMlDxFSvWpqqTNgQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxglfEVTCyPo6mkOSOqgy0hsxtzHZH0SjzGClQTy85Zp3AVAZtT
-	Vdh6jKwsSb5VfoOcY7Sd4iIMRN3kLAgAnlnO7vaQp+M+1mm8A1qhBpUg
-X-Gm-Gg: AY/fxX5zn8ih1gQOgvBSblzVPKIe7Z/qlpr7SR6EWi41SlqxoTNMfyJ8QXAmA63MyjJ
-	T69Q4sON+GiF67gBUZVQIrNG0Z2o5BfyMz0T6Gb8vr9+F9zBJvu97kL/JlAchqVT8aYAvgdgqlf
-	N/1c8Hq+Gh5SivwN2SpUmCZ8NvNwbroOoOit2t3L9C1IQEPqvvWStOvKvDfyEK33omYof0IMjNx
-	EGziaKWsFAVRvCNfHJEj1PH8kt4wk1QBrZGx/2aRlK9qmomsIfSME5j8gfRyJqyuTIF/Iqy8czC
-	Wepa/uJ3GeWdtxNoHwUFH8zJU/8rHGuuvuE3MLkrTSuJEEP6BV1DaXFGPvy/MvXVrosw3uQ+6gT
-	AkTt1nhZ3XA8RGe3Qf5dmxichxV6cGr1TqKc+8sPMJG172Hv86j91NG4Yw0LNzLz5W4RxOj6c6H
-	MdCC672e/k9mMm22qZmBmvjB6ysq+sJdgC9Q==
-X-Google-Smtp-Source: AGHT+IHJNndQhZwnGqgQG0c42iHvCrFP+LdbnfPpq29bFyRYl+i21rvWLnajXl63MsRsEx5c6KXbYg==
-X-Received: by 2002:a05:6000:2881:b0:430:fdfc:7ddf with SMTP id ffacd0b85a97d-432c37d2db0mr7902239f8f.42.1767877954882;
-        Thu, 08 Jan 2026 05:12:34 -0800 (PST)
-Received: from ehlo.thunderbird.net ([80.244.29.150])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0e175csm16273042f8f.14.2026.01.08.05.12.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Jan 2026 05:12:34 -0800 (PST)
-Date: Thu, 08 Jan 2026 15:12:31 +0200
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-To: Slark Xiao <slark_xiao@163.com>
-CC: Loic Poulain <loic.poulain@oss.qualcomm.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- Daniele Palmas <dnlplm@gmail.com>
-Subject: Re:[RFC PATCH 0/1] prevent premature device unregister via
-User-Agent: K-9 Mail for Android
-In-Reply-To: <a4d09fa.9614.19b9d445a3c.Coremail.slark_xiao@163.com>
-References: <63fddbfb.60e7.19b975c40ea.Coremail.slark_xiao@163.com> <20260108020518.27086-1-ryazanov.s.a@gmail.com> <a4d09fa.9614.19b9d445a3c.Coremail.slark_xiao@163.com>
-Message-ID: <A8D63D10-7BE1-4EA9-8020-03D69A81C750@gmail.com>
+	s=arc-20240116; t=1767878048; c=relaxed/simple;
+	bh=SFmiJaN3ONjkE9h4CmYC+F0bzaOxK/UW37PXwRAcUnw=;
+	h=To:Subject:Cc:Message-Id:Mime-Version:Content-Type:From:Date; b=UwOmmIt0upYFCmjQaCMNxhHzWRx2MV2muHt2hj0WfQtmKIepy/r731MQvJX2VVV0dJfKYcqF2teYzNrdf0b32OVJIMH7Is30DlTt7dhhd5CC7kANFHokSfo/5kbL9vxPOWtezDvDRJRhxH1dtgIwlAsI8X9Xh1dQmEZzy0NFBqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=a2tE4Xjh; arc=none smtp.client-ip=118.26.132.105
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=2212171451; d=bytedance.com; t=1767878036; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=kybuBjhJ8ENNqYO08HJbTeAe8vlxFKiTuQ7Y009ja4c=;
+ b=a2tE4Xjh4cWfs3RUpllW7etRrObMpNkj16bh07jRH6vCW3iJ3eZEC9+h/p45xyuCNxbXHw
+ Zg/iCIki1d39obFTDxnUhvoPGUbw+kjPWqMjShoWisRjNFj9Ft6omnQTV84Y2mtbRk2PO4
+ sSJi1OLLkUNmOAha3cQr0pxuJReko8v9MjsMnX4Rf/GrZ7znZs9z4Fqixzfv9llk4o8/0p
+ 1r4kXBSXfQHwNBTTT10c4VqJdkgLvRTWC82hpydYe9jOXZ94xR4Qn1wFKlRb/EtGEghslh
+ 70rb52jhTXoPdt+26V0JLo/eblIMWZXL/GjRaEDjMlhJYgCIBVjaIdPgBvGvgw==
+To: <netdev@vger.kernel.org>
+Subject: Question about RPS hash collisions with IPv6 flow labels
+Content-Transfer-Encoding: 7bit
+X-Original-From: Zigit Zo <zuozhijie@bytedance.com>
+Cc: <linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
+Message-Id: <b7aa237d-e35e-4af7-a4c3-f8315c2f7310@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Type: text/plain; charset=UTF-8
+From: "Zigit Zo" <zuozhijie@bytedance.com>
+Date: Thu, 8 Jan 2026 21:13:01 +0800
+Content-Language: en-US
+X-Lms-Return-Path: <lba+2695fad92+c1662e+vger.kernel.org+zuozhijie@bytedance.com>
 
-On January 8, 2026 1:01:01 PM, Slark Xiao <slark_xiao@163=2Ecom> wrote:
->
->
->At 2026-01-08 10:05:17, "Sergey Ryazanov" <ryazanov=2Es=2Ea@gmail=2Ecom> =
-wrote:
->>Initially I was unable to hit or reproduce the issue with hwsim since it
->>unregister the WWAN device ops as a last step effectively holding the
->>WWAN device when all the regular WWAN ports are already removed=2E Thank=
-s
->>to the detiled report of Daniele and the fix proposed by Loic, it became
->>obvious what a releasing sequence leads to the crash=2E
->>
->>With WWAN device ops unregistration done first in hwsim, I was able to
->>easily reproduce the WWAN device premature unregister, and develop
->>another fix avoiding a dummy port allocation and relying on a reference
->>counting=2E See details in the RFC patch=2E
->>
->>Loic, what do you think about this way of the users tracking?
->>
->>Slark, if you would like to go with the proposed patch, just remove the
->>patch #7 from the series and insert the proposed patch between between
->>#1 and #2=2E Of if you prefer, I can reassemble the whole series and sen=
-d
->>it as RFC v5=2E
->>
->
->Please help reassemble them and send it as RFC v5=2E
+Hello netdev,
 
-Will do it tonight=2E
+We have observed unexpected RPS behavior related to IPv6 flow labels on
+5.10/5.15 and would like to ask for advice, on our 5.10 and 5.15 kernels
+under the following conditions:
 
---
-Sergey
-Hi Slark,
+a. virtio-net (no hash offload)
+b. RPS enabled, skb_get_hash calculates the hash here
+c. IPv6 with default auto_flowlabels enabled
+
+This causes RPS to keep selecting the same CPU with very similar hashes.
+This might be a coincidence, but it keeps happening on these machines,
+affecting around 10 RX machines. We have selected one RX machine:
+
+xxxx:71b::50 -> yyyy, [flowlabel 0xeaf27] [skb->hash 3568038043] [cpu 79]
+xxxx:71d::36 -> yyyy, [flowlabel 0xbf206] [skb->hash 3544518926] [cpu 79]
+xxxx:71a::34 -> yyyy, [flowlabel 0x7b6a8] [skb->hash 3538231196] [cpu 79]
+xxxx:71d::40 -> yyyy, [flowlabel 0xbd4a4] [skb->hash 3572956790] [cpu 79]
+xxxx:71a::37 -> yyyy, [flowlabel 0x5dbe5] [skb->hash 3573425965] [cpu 79]
+xxxx:71f::41 -> yyyy, [flowlabel 0x6acdf] [skb->hash 3571406812] [cpu 79]
+xxxx:706::22 -> yyyy, [flowlabel 0x124ae] [skb->hash 3541372961] [cpu 79]
+xxxx:718::28 -> yyyy, [flowlabel 0x5ca00] [skb->hash 3551598012] [cpu 79]
+xxxx:708::29 -> yyyy, [flowlabel 0x1dfa9] [skb->hash 3559424332] [cpu 79]
+xxxx:71c::40 -> yyyy, [flowlabel 0xfeb81] [skb->hash 3545152152] [cpu 79]
+
+Most of the connections are long-lived, but even when the flow label is
+changed on retransmission, RPS still keeps selecting the same CPU. We are
+wondering why this happens. One possibility is that the TX side is running
+a rather old kernel which still uses prandom to generate sk_txhash (flow
+label), leading to a higher chance of hash collisions. However, we are not
+sure about this, so we would like to ask for help:
+
+- Does anyone know how to explain these hash collisions if they are
+  generated by prandom? Is this very likely to occur, or is it really a
+  corner case that we hit?
+
+- Linux has limited ability to ignore or override the flow label in RPS
+  (for performance or security reasons). Are there any ideas or plans to
+  improve this?
+
+- The flow dissector BPF attach point is somewhat hard to use, especially
+  for IPv6 with extension headers. We want to remove the flow label from
+  the keys rather than recomputing the rest of the keys that we are not
+  interested in. It also affects many other places (we are using the host
+  network without network namespaces), such as the fib, which we do not
+  want to touch. A tc BPF program can modify packets to clear the IPv6 flow
+  label, but this still has a wide impact.
+
+-- 
+Regards,
 
