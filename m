@@ -1,128 +1,114 @@
-Return-Path: <netdev+bounces-247956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D2EED00E49
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 04:41:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10647D00F1B
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 04:54:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 721C43002846
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 03:41:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B89E6300EE71
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 03:52:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DE9E27B4E8;
-	Thu,  8 Jan 2026 03:41:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEB56284669;
+	Thu,  8 Jan 2026 03:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b5SR+E4q";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="O1JdmZxF"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="ApOsPKZi"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B98CA253B42
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 03:41:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 721DA1E1C02;
+	Thu,  8 Jan 2026 03:52:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767843662; cv=none; b=N4Te4+W0PJ5lL4bwv4bPrZjQwbFTdQ8pHLc7sv2Teo41gCdbaVK1If10gwwcaTez+VTo/MMc7CW6YsKnHa+QfQwEwlVsrNhY3fEKxI1vdM63d5fCc979SIaBmgVytaPxNFPa4L0oRPp/SDRuj0q74PzLIIuZzkQ3sB9bkm0rFWE=
+	t=1767844336; cv=none; b=lmMKaR6F+BmV00zIInAZ1x8G879MZ8AJ2DP+UcJrqQPDtzGn/n0gxado9vbKIenG2+a2DHUyHY1PKgHFQSvRyD0zWgzRMwK+cMa0Hwnizayw4o2t/86Ki1enbw+z8jEuJc5iIN3jN1Ap9N1edY9QPr2MEYeswprg6aexcliQBHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767843662; c=relaxed/simple;
-	bh=VkCSubSt5xnjldSC7X3KoWYDh+xOvzCSf5/mkTI/WA8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FhQ87tlheM1BlBu0g7Xt2XaCCF4JI50xLWCrkPBPmelbRXLcHLDCS5tWulo6doPiazFXu7Pwpx6BAVKOOOQCOnssIX0T5mqZd8Ztp8iT+phNRjfB+k+JLC6c5CahsWhqW3PQ55gbYOhyPuRaqBGH7ort/rmVIaj0YUR4yIOwlAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b5SR+E4q; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=O1JdmZxF; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767843659;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VkCSubSt5xnjldSC7X3KoWYDh+xOvzCSf5/mkTI/WA8=;
-	b=b5SR+E4qoIqNlInac/aFtFgkKJdvZNj1CB+pPGaDW4w8GwhDhgG5OMF5A+F7+BuHu3frPT
-	FzIBChne2YhmZeznPnpZw4WQ4AvsDpLcXRUFYFwb9APaNznciNQNMNZ12JSrFU3tTt4ywM
-	VJl/e6/oSCpzokmJVLdHnrP81DH3IlE=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-645-XiRduofGPYuHj4BbBBKubw-1; Wed, 07 Jan 2026 22:40:58 -0500
-X-MC-Unique: XiRduofGPYuHj4BbBBKubw-1
-X-Mimecast-MFC-AGG-ID: XiRduofGPYuHj4BbBBKubw_1767843657
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-34c7d0c5ed2so2784109a91.0
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 19:40:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767843657; x=1768448457; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VkCSubSt5xnjldSC7X3KoWYDh+xOvzCSf5/mkTI/WA8=;
-        b=O1JdmZxFjfPWZC7Sfnct3aXbX93cFKVvFIlJssZ8OPiiMevYNJ114HTSuKsY2qQPwb
-         Ft2TogvqzgiEfMR6nfzkYKcm19aDmA3eFiH0h4GmJk61HAmk2w7N5fLB9W0cv1OENIAd
-         oke1B6DRLS4PHnLzUbSgicmJ6EghpiTrk/hrE+iVlyuj6h3+OmT87gWmvtqSN6JATKuJ
-         6zRifLasX0rYwVttWVRYfOzXRLNbjaIS1EwPN8U1OBUBQNYox1PSNcWwKbITfu30y7NM
-         zAswt8PqskjfwnIoPvXDn+7TL8JV6WTxGX4Emslh9II4dumhcqFf4inG0mLxgmQ17CyD
-         dxMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767843657; x=1768448457;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=VkCSubSt5xnjldSC7X3KoWYDh+xOvzCSf5/mkTI/WA8=;
-        b=m7OmjYBzRIoBZumf4Z4Dc4CUSEEiUlxpFqJmDI8JLCf4sSCep4OM7T13dYh2SO3rXv
-         39HkH44GRdBT6tl/AumwbVP3OpSFBJqb4SkgI8y1o1zdflemAJ8na1I1tUXF/Lk+rrSE
-         MiJcc654TfraFnrwEViuyjFApWZhgHDYhsdR6RjlGN2WYv8pVI5IlKG/z3uvQHoLe4l/
-         Im8xwR9Z3Db8p+mmlkExmE8b/Ym9fR2FmfhY8oTBo2EXjELtsCmD/eCEdrSsmwgVU60X
-         EsWOpzuDq9RGxZezFAi44E0jr/cp50bTngqlDbpryO1BNj6nLnZfa1TyTDqKjtap+fnP
-         TYWA==
-X-Forwarded-Encrypted: i=1; AJvYcCWY0JWxCwzmpEh8ImC5HnnLaGIcUgjGCWSfLphnT+kapIhz7cfHDZ4yg7ROCJ5sKlHEXeYWids=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRY3P9ZefVMtx80Flw7i+HRjyX3fKwpYOcdilRkUJMeJuU1bSo
-	VWHW+MLoNOLLxV72fULD0hBs/wfETBY6uAsVgS5e09NQyTRmSD4d6zVFnzWZy2/eu9VqeNt16fK
-	f7J2V75zF3yVkPnoUB8+xh43J2rJa+nYlCvdu9KiMG+cv1Q/FMU85sMQ3PkCgX6pjY/9E7eZer8
-	RYZTSg+ykn1LNeyCCadfrBdxLqtEzFWg8X
-X-Gm-Gg: AY/fxX6RcRLZjora7KJXcBuZ/Z6Ad2F8U53P7k29tyBl4omb4MwWNlUU3MK9mmjeiCv
-	QHjIQR4tkaaNIuI8Su11dDs1y3wuuw3yd3W0gVUz5cNyGRCeYlJvTI5FAvYfpWLTHWTGk2Uaer/
-	XydUHyLWsQHohT1XvcyzAt7yhLjqzF2LuPdXUQEM+6v52XcIvmMvTZUiW3rSOXlkA=
-X-Received: by 2002:a17:90a:ec8b:b0:34a:a1dd:1f2a with SMTP id 98e67ed59e1d1-34f68c020c8mr4599009a91.20.1767843657571;
-        Wed, 07 Jan 2026 19:40:57 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGRT/gHviVKg3BmAeVmqnf6QovlGyDQiLOP3X7YJzYa/y5gFMdrkkTDAfiNZ+bZ74TXfET7NZIrA4LL/VqNrJg=
-X-Received: by 2002:a17:90a:ec8b:b0:34a:a1dd:1f2a with SMTP id
- 98e67ed59e1d1-34f68c020c8mr4598982a91.20.1767843657139; Wed, 07 Jan 2026
- 19:40:57 -0800 (PST)
+	s=arc-20240116; t=1767844336; c=relaxed/simple;
+	bh=N11ud/29/xb3iZMmXpKrXBXTa9bni9MiyylUgTmbtYM=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=XUnN5E1nMGIhuiCx1QLr8kbrgzUWDDjRL9qFSsYUCexw2WQORLYlUo+02yTcSWJV6G+K9O5ky8tvzJZ/CDUSD2SZmfOs1YR10lZngrxi8r/l65hTCu78NCnI7lVwhjU8/aYnuSexWX8jQkJxObU1YLhpStxhOSkk7WFb0cydTZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=ApOsPKZi; arc=none smtp.client-ip=162.62.58.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1767844323; bh=vmPXkqU9yLiH93gm3VWlfOFiLqBtoUVm3HoDD1IKX60=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=ApOsPKZirq3t+vkYzL6/lvYqmxCgD99/dRdUEn+cnVYMBBxn6IHRF2EiW5mY/kPnH
+	 4BJxNSh4JosqAzs03ss4ABUhtS4LvFKMy7cdKyXSHGS8ScWqnxhDRgos5hYu/U2hnD
+	 P62kGvzypHN6MGMkw+RZekmbPEuXBHePUf5Nbg/w=
+Received: from lxu-ped-host.. ([114.244.57.24])
+	by newxmesmtplogicsvrszb51-1.qq.com (NewEsmtp) with SMTP
+	id CFB99C1E; Thu, 08 Jan 2026 11:51:59 +0800
+X-QQ-mid: xmsmtpt1767844319trs1jpa36
+Message-ID: <tencent_1F9A6FB02D856F9C9550E80AEC3ECD30790A@qq.com>
+X-QQ-XMAILINFO: Od8VqZhFMB3NLUra3EypMbPafKfoZi5h+aLWwHliwL/oL/OhOxcWvPKurQDQIC
+	 g+p8obuBjkNWvvIYqS4zbfiHpFSpGBlJooYkH14P2fwpaC9IxLI7GQp0Dv2sDHvc3ro+zo4D8+/b
+	 He02rn0CuGtAS76odeb/eoEExlFYssZgAffeXjB2pV4qHsRIdo/O0N6RljkZr36ZHo1JnKY1gF3p
+	 8VlojG5HCgCBSVuRjXH+7MxhTgwtho9FmvwRXZusEHmK5mYWnFi88CZvyQBML6nXw0HrPzoeALf/
+	 h6Jf29NV+SyD/pyllLhPCCG1tCHFyT+oFq+Cm4gxfOyNRpvNA+Hr7dsb2wkHNLmRcQb7uNRBL3qL
+	 pcTTi9hI1kgYLaG0khXY9i2p/QOE4s4Yy2gBNsXS3MmMWdxdoZ0wZQ50YjnoQ/Fw1HV1CsRdRXuw
+	 Gy3o4MP2/qK8bnA1Zya623JQB0c38wU1v9N9rQEfS0sC7PkYDzTPgne2B27ChWGc0dCT6m5iBWcP
+	 5XeLyUVqbQTRpUSBNrAm7JTzM/70LBU0JFAv4G+PR7Mvn2IoTcisa9vg+yvBt4K02Vmer/2HjKCa
+	 P966D+Ql2VwV3HzxXtifr4+KCIh915idUYczdEWIPUl6fSqRaiVS4zzeacKEmAW41gx/ZEyfQTDk
+	 jowSs1bSgZFdmhsCE/YZoZyB+EIIeZyhenD5eCDNjNIpdg6x/y7YbZFhRLeZfT8VafZhcpxyBtsH
+	 7K160SJEYQmH/l++y3/PAAFVrd7RCYzIcOpe+/RyHICczkil+2ahksQjeoClonEW9ccvu5HG5f3L
+	 HCoL0NO18ph8aJo7rOJ6U46m3Zcc755DHXEIZZzqYEFNlm82y4P5dqSA6k83fXB43FWSdf3W4lmq
+	 6c3kQ1GKImlmNyyays/CwjfzdjZTMZYSgx93eFMPDD3W6sIx7BDqVhiBp/vh+ZdD/MsXyN9VcLG0
+	 4sKwLhN/Wz438JaMMszVJVsoQufZ1K77FOvlmPlPFoioeiD6N2IdIqLiMW+jgj/HYf9Q84SCw=
+X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
+From: Edward Adam Davis <eadavis@qq.com>
+To: alexei.starovoitov@gmail.com
+Cc: andrii@kernel.org,
+	ast@kernel.org,
+	bpf@vger.kernel.org,
+	daniel@iogearbox.net,
+	eadavis@qq.com,
+	eddyz87@gmail.com,
+	haoluo@google.com,
+	john.fastabend@gmail.com,
+	jolsa@kernel.org,
+	kpsingh@kernel.org,
+	linux-kernel@vger.kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	sdf@fomichev.me,
+	song@kernel.org,
+	syzbot+2c29addf92581b410079@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com,
+	yonghong.song@linux.dev
+Subject: Re: [PATCH] bpf: Format string can't be empty
+Date: Thu,  8 Jan 2026 11:52:00 +0800
+X-OQ-MSGID: <20260108035159.496633-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <CAADnVQ+oMVuUjZi0MtGf52P3Xg9p4RBFarwZ_PiLWMAu+hU=rg@mail.gmail.com>
+References: <CAADnVQ+oMVuUjZi0MtGf52P3Xg9p4RBFarwZ_PiLWMAu+hU=rg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de> <20260107210448.37851-6-simon.schippers@tu-dortmund.de>
-In-Reply-To: <20260107210448.37851-6-simon.schippers@tu-dortmund.de>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 8 Jan 2026 11:40:43 +0800
-X-Gm-Features: AQt7F2oQUWxfwmKfkPMH58sXdUHRR1BABNg8c-gOhAXPWs9rnLQwCP9cTooUbiA
-Message-ID: <CACGkMEs-V7g6fP418K3SmD-oayT0mGOnzPt-ynkNAjiSVfHppw@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 5/9] tun/tap: add unconsume function for
- returning entries to ptr_ring
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	mst@redhat.com, eperezma@redhat.com, leiyang@redhat.com, 
-	stephen@networkplumber.org, jon@nutanix.com, tim.gebauer@tu-dortmund.de, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 8, 2026 at 5:06=E2=80=AFAM Simon Schippers
-<simon.schippers@tu-dortmund.de> wrote:
->
-> Add {tun,tap}_ring_unconsume() wrappers to allow external modules
-> (e.g. vhost-net) to return previously consumed entries back to the
-> ptr_ring.
-
-It would be better to explain why we need such a return.
-
-> The functions delegate to ptr_ring_unconsume() and take a
-> destroy callback for entries that cannot be returned to the ring.
->
-
-Thanks
+On Wed, 7 Jan 2026 19:02:37 -0800, Alexei Starovoitov <alexei.starovoitov@gmail.com> wrote:
+> > diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
+> > index db72b96f9c8c..88da2d0e634c 100644
+> > --- a/kernel/bpf/helpers.c
+> > +++ b/kernel/bpf/helpers.c
+> > @@ -827,7 +827,7 @@ int bpf_bprintf_prepare(const char *fmt, u32 fmt_size, const u64 *raw_args,
+> >         char fmt_ptype, cur_ip[16], ip_spec[] = "%pXX";
+> >
+> >         fmt_end = strnchr(fmt, fmt_size, 0);
+> > -       if (!fmt_end)
+> > +       if (!fmt_end || fmt_end == fmt)
+> >                 return -EINVAL;
+> 
+> I don't think you root caused it correctly.
+> The better fix and analysis:
+I am keeping my analysis and patch.
+The root cause of the problem is that the format string does not contain
+a null terminator ('\0').
+Filtering out map type 0x22 to solve the problem is too hasty, as it
+would prevent all instructions from calling functions with constant
+string arguments.
 
 
