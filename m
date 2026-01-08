@@ -1,211 +1,140 @@
-Return-Path: <netdev+bounces-248047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DF0FD03FF7
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 16:47:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 09643D03D3F
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 16:27:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0D15A365933D
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:25:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F34F43149AEA
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 14:59:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BDBF46922D;
-	Thu,  8 Jan 2026 11:25:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D717F389470;
+	Thu,  8 Jan 2026 11:27:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="zzeuYK4J";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="a4BjqOjY";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="zzeuYK4J";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="a4BjqOjY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VXNJAOji";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gKablw+A"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2747A469216
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 11:25:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B2E469230
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 11:27:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767871507; cv=none; b=sDVKFfV3xfVOBtZ8U4LoaPFEH480WUhpcE4nvnlqFRW8QtbC7Y6X2qhh4t2lgSpItwfJlELGhT7HYFvMrmIDuMZAePSh4EzPbfZXCrLxzn1vtlD/0tBMg3TdoL3eHOt49g3k0lepFP7tJb9FF4NU6kiZgX9gQ+VhXqVYoWdeUpQ=
+	t=1767871679; cv=none; b=gSnbv9mxTHroOYTlTQ18uQJVYqiyaX2ZUjCJtXaqMfc80KPDON7OUOUS+fzPYxdvq4CxrEI8EpOmYlPuWqNvr/PdyEP+oUrd61y+Rc5Hx2qb+3wuvcjMZRUnRcXD/FPTMF/pVNE8Pqp5qAaZTsOFQsYFvtHEr1HqvpjDzkwj1dw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767871507; c=relaxed/simple;
-	bh=E+cxBL6iGJEaBuPkTGtHu82oHyV+Kg/WQo1e48kL0Q4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oX9Cs1ASXwUijhFygMA7nJcrrIA9+KrRIqMBxd7VNt6MtPlRaGcVyfDX0j18X5IHvQzrmbbDm4P1BPmGQiuUacuURMRRew6DpEtCAE3kF7tUaiT+OXks+xifpUdVJzM4OFr7cr2bz3+y1oRGrx13Is0iGmS9Aa+PGNz4Co/ARPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=zzeuYK4J; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=a4BjqOjY; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=zzeuYK4J; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=a4BjqOjY; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 5F82733E0F;
-	Thu,  8 Jan 2026 11:25:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1767871500; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
+	s=arc-20240116; t=1767871679; c=relaxed/simple;
+	bh=DXVRxgEjQyIFhLiJRSIIYHf6s0Xh3efyK6PB23H68Xk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JHnTupoaaGKVaLEonk1XB0bFXjw+CXtZIxpE0DIqemubi2avO12X6ROVc87rlkFnQFWMjb/uYjWHNSyGAimV0e/yU/Upbf0tG8BjP0PFQOZmZEUEeEogOGhCIvmO91shqQO+8gw2B8T86mNYltpudr273s0lW1jAL/Eh2wQwmQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VXNJAOji; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gKablw+A; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767871674;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7c1/UMRLgd6OVjPFN55tLol9ENyLQiqdlzxLSOhEahA=;
-	b=zzeuYK4JmvqpKb6T9z/uuaHIJr1np63drmqVzOReBPn1iF4ZFokHRksat8z5osSfr62d2a
-	CkF3uPWlvoemv1K9g+lPmz4QIYD5SYPLDp4UVVS2y/AVB/kH5g+URSM85QmC/9RyelISos
-	NorcAo2aqMKj3YLmEmYM/EH2PleO9us=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1767871500;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7c1/UMRLgd6OVjPFN55tLol9ENyLQiqdlzxLSOhEahA=;
-	b=a4BjqOjY+rFIopZW9V2d0M7Et7r4PNvOLeijKtzJ3Vr7SQUSsSbmYlfzyBq5CcnC0H4pwy
-	LDFGJnPi3dAZoMCw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1767871500; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7c1/UMRLgd6OVjPFN55tLol9ENyLQiqdlzxLSOhEahA=;
-	b=zzeuYK4JmvqpKb6T9z/uuaHIJr1np63drmqVzOReBPn1iF4ZFokHRksat8z5osSfr62d2a
-	CkF3uPWlvoemv1K9g+lPmz4QIYD5SYPLDp4UVVS2y/AVB/kH5g+URSM85QmC/9RyelISos
-	NorcAo2aqMKj3YLmEmYM/EH2PleO9us=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1767871500;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7c1/UMRLgd6OVjPFN55tLol9ENyLQiqdlzxLSOhEahA=;
-	b=a4BjqOjY+rFIopZW9V2d0M7Et7r4PNvOLeijKtzJ3Vr7SQUSsSbmYlfzyBq5CcnC0H4pwy
-	LDFGJnPi3dAZoMCw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E21783EA63;
-	Thu,  8 Jan 2026 11:24:59 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id BAJKNAuUX2m4DgAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Thu, 08 Jan 2026 11:24:59 +0000
-Message-ID: <1660abed-e6ad-4657-8736-599ab9114f68@suse.de>
-Date: Thu, 8 Jan 2026 12:24:47 +0100
+	bh=7OLB5of9LH4Xgr0g/cKdpkyNCBxF+ZVgPMqVenfELd8=;
+	b=VXNJAOji900LbBB3YipqIIEnHHd09fRytx1wSbSkMJjgNoMIFWPi808TFBWER22JZAyo3h
+	zuaOogzChP+mHw5JgkDog7P2ZscdXwkHq4LLU67BT1HHYCDa9jDe6od92w6ofxx/P0be1q
+	dxcq+YoQRy6psmsKyiyE0qy5PoN0DDI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-662-PQXX-ZqPMUaRAA7blS_05A-1; Thu, 08 Jan 2026 06:27:53 -0500
+X-MC-Unique: PQXX-ZqPMUaRAA7blS_05A-1
+X-Mimecast-MFC-AGG-ID: PQXX-ZqPMUaRAA7blS_05A_1767871672
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-47d4029340aso29936105e9.3
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 03:27:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1767871672; x=1768476472; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7OLB5of9LH4Xgr0g/cKdpkyNCBxF+ZVgPMqVenfELd8=;
+        b=gKablw+ACVcLJ6DvTE9rQO7V6DTsNNxQw+BMfHf4bN/t/62m81D3wxPKm9zWG/vzUA
+         ta7xgfNwl4K+FPLXCwswbzUa+553v+xo1cz9ojeRZBE1E0PGJ1oZkh9GGEuHQgywGjHQ
+         PuQ79p8T+X6WR5VOlHIleeMDyPRWjLIcZJ/imT/YOqX2pZSie4wLKS3rlBtLNw1vZ8lh
+         rFnumjKGmfjyjL+1N7A6TbyRexqpAugySIJRzpRnl8IKPMqxZtZylmkzxpfa8LoaS7Fw
+         bSZrDoQdvLDYaZhp5siaDq7alwWrJat30sSc02G3aTYISGE3YjJrBZbgBsnAUEd2YAAM
+         nEnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767871672; x=1768476472;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7OLB5of9LH4Xgr0g/cKdpkyNCBxF+ZVgPMqVenfELd8=;
+        b=pFWM32aqi8g5N1RY0ricyWiO3EpwbSItNo1X/RDYC0T/yOARbmBV5Am1eZpHSLMSdE
+         I4gKfM11iuQAaCWA1elmIm2TD3RqZsL0BA8Zqe9VYVjkaVSzK4EgBn3S4IpHMPTy6+oH
+         QUm1AEEKS0p/aIrEe5b5A1sCiuecenlllMbnI+TpCSnIyztyy+kO51F0BitC1s5hc4Zm
+         B+HqR3nZAqKTh6tX53paPr3wSOZvi88pCFXJBKnXAYCjXXzzq+XdMeoYTfm/3yTmNEJs
+         yl0mDnZ1iZ0u7KCbAOzLrDPzX4ljKgOM6lvRmwKfdNsdOZ1JUViQHORCSv1cwYeyx0q0
+         CmGg==
+X-Forwarded-Encrypted: i=1; AJvYcCU/qqu6ANomv5M/Oznx6beRG71n2PWHnFgTFonmKeuPWyv9hNjIY++X89vRPk0yLr9GaH2RoOk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yybu7tRL1n6RrNIHIkTOiv5tOfkayLKfdtnfSqpkkAGUjxIPaRu
+	N9p5WKIYy3iALVz2V/rVbfArPlPzLWSxOtKdxcSI42aMoa4v2IwSoKwJ3vjbmWWUwhsvQUcOI3g
+	zML6OXWl76lVIRosfE9E3TCEKCOKyl5Yb7j4fAbflD4UM1TcoUIHl7Dx+Eg==
+X-Gm-Gg: AY/fxX45ATPtFm9hTgZ2gpX79kDK7FnJINphTIZbKAtc2VWSlmvst6rmFk3Lr/Szq7u
+	24h16ozO6MFziFudOjHSn1t/p/8yNLirGz+CLvK4uttZlec0lbhNgS1d05SeySW/sZad8ujWWQO
+	gRzPsLj0jFRDG/SPn4O6qLi8pjRSfUhDtR9gUv2U0X4/HEQ5VwUsJibbWsjL3sB4W/fWSNthNrQ
+	DmOFAx9jqZbD0JgRpYydtb6XLE7EhxFY4Qlan0LvTZDM6o6LsC9SCH/wZzPyyL/Hp3IPeMFNBvT
+	GwS1TeOEtu9suFw8akjxfHK7mOO3qldU3ErSWStvtuxfJAD8n7N1s61eYExTOCVaFYiWOiOKMA0
+	v8sOhW0Q5I/7n0smi
+X-Received: by 2002:a05:600c:648a:b0:47a:9560:ec22 with SMTP id 5b1f17b1804b1-47d84b17ae4mr64276195e9.14.1767871672375;
+        Thu, 08 Jan 2026 03:27:52 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHCrhVJUOXGI01OCCuWHNzKXAge7t6WHbeU8FiHMv65fBH2sXqaXVpMSUa0Er0tnD1FeKLcmw==
+X-Received: by 2002:a05:600c:648a:b0:47a:9560:ec22 with SMTP id 5b1f17b1804b1-47d84b17ae4mr64275905e9.14.1767871671965;
+        Thu, 08 Jan 2026 03:27:51 -0800 (PST)
+Received: from sgarzare-redhat ([193.207.178.182])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f668e03sm154398805e9.14.2026.01.08.03.27.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jan 2026 03:27:51 -0800 (PST)
+Date: Thu, 8 Jan 2026 12:27:41 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Melbin K Mathew <mlbnkm1@gmail.com>
+Cc: stefanha@redhat.com, kvm@vger.kernel.org, netdev@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, mst@redhat.com, 
+	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org
+Subject: Re: [PATCH net v4 0/4] vsock/virtio: fix TX credit handling
+Message-ID: <aV-UZ9IhrXW2hsOn@sgarzare-redhat>
+References: <20251217181206.3681159-1-mlbnkm1@gmail.com>
+ <xwnhhms5divyalikrekxxfkz7xaeqwuyfzvro72v5b4davo6hc@kii7js242jbc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2 net-next v2] selftests: ipv6_icmp: add tests for
- ICMPv6 handling
-To: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, shuah@kernel.org, linux-kselftest@vger.kernel.org
-References: <20260107153841.5030-1-fmancera@suse.de>
- <20260107153841.5030-2-fmancera@suse.de>
- <72d45fe9-c058-4944-b7a2-260b7259096f@kernel.org>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <72d45fe9-c058-4944-b7a2-260b7259096f@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
-X-Spam-Level: 
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <xwnhhms5divyalikrekxxfkz7xaeqwuyfzvro72v5b4davo6hc@kii7js242jbc>
 
-On 1/7/26 5:41 PM, David Ahern wrote:
-> On 1/7/26 8:38 AM, Fernando Fernandez Mancera wrote:
->> +icmpv6_to_vrf_based_local_address()
->> +{
->> +	local rc
->> +	local lldummy
->> +
->> +	echo
->> +	echo "ICMPv6 to VRF based local address"
->> +
->> +	setup
->> +
->> +	lldummy=$(get_linklocal dummy0)
->> +
->> +	if [ -z "$lldummy" ]; then
->> +		echo "Failed to get link local address for dummy0"
->> +		return 1
->> +	fi
->> +
->> +	run_cmd "$NS_EXEC sysctl -w net.ipv6.conf.all.keep_addr_on_down=1"
->> +
->> +	# create VRF and setup
->> +	run_cmd "$IP link add vrf0 type vrf table 10"
->> +	run_cmd "$IP link set vrf0 up"
->> +	run_cmd "$IP link set dummy0 master vrf0"
-> 
-> run_cmd "$IP -6 addr add ::1 dev vrf0 nodad"
-> 
-> makes the VRF device the loopback.
-> 
->> +
->> +	# route to reach 2001:db8::1/128 on VRF device and back to ::1
->> +	run_cmd "$IP -6 route add 2001:db8:1::1/64 dev vrf0"
->> +	run_cmd "$IP -6 route add ::1/128 dev vrf0 table 10"
-> 
-> and then this route add should not be needed. This is how fcnal-test.sh
-> works.
-> 
+Hi Melbin and happy new year!
 
-Oh neat! Thanks.
+On Thu, Dec 18, 2025 at 10:18:03AM +0100, Stefano Garzarella wrote:
+>On Wed, Dec 17, 2025 at 07:12:02PM +0100, Melbin K Mathew wrote:
+>>This series fixes TX credit handling in virtio-vsock:
+>>
+>>Patch 1: Fix potential underflow in get_credit() using s64 arithmetic
+>>Patch 2: Cap TX credit to local buffer size (security hardening)
+>>Patch 3: Fix vsock_test seqpacket bounds test
+>>Patch 4: Add stream TX credit bounds regression test
+>
+>Again, this series doesn't apply both on my local env but also on 
+>patchwork:
+>https://patchwork.kernel.org/project/netdevbpf/list/?series=1034314
+>
+>Please, can you fix your env?
+>
+>Let me know if you need any help.
 
->> +
->> +	# ping6 to link local address
->> +	run_cmd "$NS_EXEC ${ping6} -c 3 $lldummy%dummy0"
->> +	log_test $? 0 "Ping to link local address on VRF context"
->> +
->> +	# ping6 to link local address from localhost (::1)
->> +	run_cmd "$NS_EXEC ${ping6} -c 3 -I ::1 $lldummy%dummy0"
-> 
-> -I vrf0 should be needed for all VRF tests. I suspect your current
-> passing tests are because you have a single setup step and then run
-> non-VRF test followed by VRF test. Really you need to do the setup,
-> run_test, cleanup for each test.
-> 
+Any update on this?
+If you have trouble, please let me know.
+I can repost fixing the latest stuff.
 
-You are right here about the cleanup, although the tests are passing 
-even if the cleanup is properly done or if `-t 
-icmpv6_to_vrf_based_local_address`. I don't see why they should not pass.
-
-I am changing them to use `-I vrf0` because it makes more sense.
-
-Thanks for the feedback!
-Fernando.
-
->> +	log_test $? 0 "Ping to link local address from ::1 on VRF context"
->> +
->> +	# ping6 to local address
->> +	run_cmd "$NS_EXEC ${ping6} -c 3 2001:db8:1::1"
->> +	log_test $? 0 "Ping to local address on VRF context"
->> +
->> +	# ping6 to local address from localhost (::1)
->> +	run_cmd "$NS_EXEC ${ping6} -c 3 -I ::1 2001:db8:1::1"
->> +	log_test $? 0 "Ping to local address from ::1 on VRF context"
->> +}
->> +
-> 
+Thanks,
+Stefano
 
 
