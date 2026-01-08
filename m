@@ -1,110 +1,91 @@
-Return-Path: <netdev+bounces-248080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EED09D0324B
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 14:49:00 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 402BBD03110
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 14:37:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C8F8E3097D4D
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 13:40:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3083730B32C1
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 13:25:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13D854E2A2D;
-	Thu,  8 Jan 2026 13:14:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E52D2DB7B4;
+	Thu,  8 Jan 2026 13:22:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="a2tE4Xjh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IKy9C0iP"
 X-Original-To: netdev@vger.kernel.org
-Received: from sg-1-105.ptr.blmpb.com (sg-1-105.ptr.blmpb.com [118.26.132.105])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC65F4DBD9E
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 13:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.105
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3457C18859B
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 13:22:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767878048; cv=none; b=KRsr9Ajbz7FncqDG0GlkXrNRL5CsQb/+WY3lfsP4p5Nod+8QYKwYv1GNuTHj6OObb/i+diw+XZi1nqkP9FNWFFNdEltT74ZmuM7WV97xzExlhiNe2HN09oUESYqQ3MPptIF262rbcMqzeA0n6vIdeBuh3c0NtYAgf/FhJUDdxb8=
+	t=1767878544; cv=none; b=kWhVjimKnGC3Am6GMC4+OSGodPRjK4XochkPu3iTXicfUxN9A0ED+HYr+u/Z7kMYoguwXHnj6cExj0Xb/oFVdbg/AntvcKyDHVMm18fmo1MT0ixDyroWNspU07Ze1obD0aQt0J+a28PxPlCoXp/x/JDGrDW2paXduVP/nwBgOvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767878048; c=relaxed/simple;
-	bh=SFmiJaN3ONjkE9h4CmYC+F0bzaOxK/UW37PXwRAcUnw=;
-	h=To:Subject:Cc:Message-Id:Mime-Version:Content-Type:From:Date; b=UwOmmIt0upYFCmjQaCMNxhHzWRx2MV2muHt2hj0WfQtmKIepy/r731MQvJX2VVV0dJfKYcqF2teYzNrdf0b32OVJIMH7Is30DlTt7dhhd5CC7kANFHokSfo/5kbL9vxPOWtezDvDRJRhxH1dtgIwlAsI8X9Xh1dQmEZzy0NFBqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=a2tE4Xjh; arc=none smtp.client-ip=118.26.132.105
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=2212171451; d=bytedance.com; t=1767878036; h=from:subject:
- mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
- mime-version:in-reply-to:message-id;
- bh=kybuBjhJ8ENNqYO08HJbTeAe8vlxFKiTuQ7Y009ja4c=;
- b=a2tE4Xjh4cWfs3RUpllW7etRrObMpNkj16bh07jRH6vCW3iJ3eZEC9+h/p45xyuCNxbXHw
- Zg/iCIki1d39obFTDxnUhvoPGUbw+kjPWqMjShoWisRjNFj9Ft6omnQTV84Y2mtbRk2PO4
- sSJi1OLLkUNmOAha3cQr0pxuJReko8v9MjsMnX4Rf/GrZ7znZs9z4Fqixzfv9llk4o8/0p
- 1r4kXBSXfQHwNBTTT10c4VqJdkgLvRTWC82hpydYe9jOXZ94xR4Qn1wFKlRb/EtGEghslh
- 70rb52jhTXoPdt+26V0JLo/eblIMWZXL/GjRaEDjMlhJYgCIBVjaIdPgBvGvgw==
-To: <netdev@vger.kernel.org>
-Subject: Question about RPS hash collisions with IPv6 flow labels
-Content-Transfer-Encoding: 7bit
-X-Original-From: Zigit Zo <zuozhijie@bytedance.com>
-Cc: <linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
-Message-Id: <b7aa237d-e35e-4af7-a4c3-f8315c2f7310@bytedance.com>
+	s=arc-20240116; t=1767878544; c=relaxed/simple;
+	bh=5VC3XO65xa/3k4GCT3RsZy0cYcsebKOEvEis61s4nuM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kMcGuMaqk/LLTdJmT7U5FkqG8AyRxlgA3am73ZtMUTrypHKEVNKBev0APpI+xRaIOr/i4dtCtTiEczw1GbR7ZMD+nraflU+REWOKPbLB/hHbUN3an6YUUfvvr9N75M5tHQTFomDd/oqaHmU3O7w1bXmZTq5jtKJYkMk8dh9OqpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IKy9C0iP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44AE2C116C6;
+	Thu,  8 Jan 2026 13:22:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767878543;
+	bh=5VC3XO65xa/3k4GCT3RsZy0cYcsebKOEvEis61s4nuM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IKy9C0iPwki/PsgSXscFwuR5IKQkfr5AS7wnEqKjQf6oatQuNj/YzvQ0DogAa2h5v
+	 SSL+uPUvxH7vidtqGhZoMeCOgXJVBanC6xnwcQQX1u1O12zrX2AVoH5NYqiGeiyhYr
+	 ZX0PQo+Zqou4UJxVo29C+wirnYgOIHMw6tzGBKokOZYwlNEgY/+unc7ULCkyEjdY1G
+	 f4W2VEDrB12LLx3AlcUCestFCmQJ3VEnDPHsChd5VjFzLLqhrMWDKxS8YeBNnQ2pXw
+	 meMHqTl807NSIB2iNousQNqLG5fDi81KdOP9swRmeAmG1LU+GTBWKNmqzsu4yHgBvC
+	 h594bYUdX5ZBA==
+Date: Thu, 8 Jan 2026 13:22:18 +0000
+From: Simon Horman <horms@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net v2] net: airoha: Fix schedule while atomic in
+ airoha_ppe_deinit()
+Message-ID: <20260108132218.GG345651@kernel.org>
+References: <20260105-airoha-fw-ethtool-v2-1-3b32b158cc31@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Type: text/plain; charset=UTF-8
-From: "Zigit Zo" <zuozhijie@bytedance.com>
-Date: Thu, 8 Jan 2026 21:13:01 +0800
-Content-Language: en-US
-X-Lms-Return-Path: <lba+2695fad92+c1662e+vger.kernel.org+zuozhijie@bytedance.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260105-airoha-fw-ethtool-v2-1-3b32b158cc31@kernel.org>
 
-Hello netdev,
+On Mon, Jan 05, 2026 at 09:43:31AM +0100, Lorenzo Bianconi wrote:
+> airoha_ppe_deinit() runs airoha_npu_ppe_deinit() in atomic context.
+> airoha_npu_ppe_deinit routine allocates ppe_data buffer with GFP_KERNEL
+> flag. Rely on rcu_replace_pointer in airoha_ppe_deinit routine in order
+> to fix schedule while atomic issue in airoha_npu_ppe_deinit() since we
+> do not need atomic context there.
 
-We have observed unexpected RPS behavior related to IPv6 flow labels on
-5.10/5.15 and would like to ask for advice, on our 5.10 and 5.15 kernels
-under the following conditions:
+Hi Lorenzo,
 
-a. virtio-net (no hash offload)
-b. RPS enabled, skb_get_hash calculates the hash here
-c. IPv6 with default auto_flowlabels enabled
+If I understand things correctly the key problem here is that
+an allocation with GFP_KERNEL implies GFP_RECLAIM and thus may sleep.
+But RCU read-side critical sections are not allowed to sleep in non-RT
+kernels.
 
-This causes RPS to keep selecting the same CPU with very similar hashes.
-This might be a coincidence, but it keeps happening on these machines,
-affecting around 10 RX machines. We have selected one RX machine:
+If so, I think it would be clearer to describe the problem along those
+lines. But maybe it is just me.
 
-xxxx:71b::50 -> yyyy, [flowlabel 0xeaf27] [skb->hash 3568038043] [cpu 79]
-xxxx:71d::36 -> yyyy, [flowlabel 0xbf206] [skb->hash 3544518926] [cpu 79]
-xxxx:71a::34 -> yyyy, [flowlabel 0x7b6a8] [skb->hash 3538231196] [cpu 79]
-xxxx:71d::40 -> yyyy, [flowlabel 0xbd4a4] [skb->hash 3572956790] [cpu 79]
-xxxx:71a::37 -> yyyy, [flowlabel 0x5dbe5] [skb->hash 3573425965] [cpu 79]
-xxxx:71f::41 -> yyyy, [flowlabel 0x6acdf] [skb->hash 3571406812] [cpu 79]
-xxxx:706::22 -> yyyy, [flowlabel 0x124ae] [skb->hash 3541372961] [cpu 79]
-xxxx:718::28 -> yyyy, [flowlabel 0x5ca00] [skb->hash 3551598012] [cpu 79]
-xxxx:708::29 -> yyyy, [flowlabel 0x1dfa9] [skb->hash 3559424332] [cpu 79]
-xxxx:71c::40 -> yyyy, [flowlabel 0xfeb81] [skb->hash 3545152152] [cpu 79]
+> 
+> Fixes: 00a7678310fe3 ("net: airoha: Introduce flowtable offload support")
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+> Changes in v2:
+> - Update commit log.
+> - Link to v1: https://lore.kernel.org/r/20251223-airoha-fw-ethtool-v1-1-1dbd1568c585@kernel.org
 
-Most of the connections are long-lived, but even when the flow label is
-changed on retransmission, RPS still keeps selecting the same CPU. We are
-wondering why this happens. One possibility is that the TX side is running
-a rather old kernel which still uses prandom to generate sk_txhash (flow
-label), leading to a higher chance of hash collisions. However, we are not
-sure about this, so we would like to ask for help:
-
-- Does anyone know how to explain these hash collisions if they are
-  generated by prandom? Is this very likely to occur, or is it really a
-  corner case that we hit?
-
-- Linux has limited ability to ignore or override the flow label in RPS
-  (for performance or security reasons). Are there any ideas or plans to
-  improve this?
-
-- The flow dissector BPF attach point is somewhat hard to use, especially
-  for IPv6 with extension headers. We want to remove the flow label from
-  the keys rather than recomputing the rest of the keys that we are not
-  interested in. It also affects many other places (we are using the host
-  network without network namespaces), such as the fib, which we do not
-  want to touch. A tc BPF program can modify packets to clear the IPv6 flow
-  label, but this still has a wide impact.
-
--- 
-Regards,
+...
 
