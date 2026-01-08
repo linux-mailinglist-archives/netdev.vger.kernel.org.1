@@ -1,94 +1,110 @@
-Return-Path: <netdev+bounces-248044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60189D02736
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 12:40:36 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40C2BD025BF
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 12:22:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 64A8231C70F7
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 11:22:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D49863095BD6
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 11:22:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14B5038E5C4;
-	Thu,  8 Jan 2026 11:02:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AA602D7DC1;
+	Thu,  8 Jan 2026 11:01:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="GZL0RK/0"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="usZprcgd"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057382D97BA
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 11:02:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE8042846D;
+	Thu,  8 Jan 2026 11:01:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767870129; cv=none; b=PYIUGJg/UWSkUlWkGde100bl+TMKAQhwWuP2WqxDVaj6Ph0BXKEKCz/LApPanwa0c0rHVZj/CwXwLGkO2/JCH1KMTz5DmEiHVHyEVxM2H19fBvo/QVQitb+wcqhdW8nYtClEsNL0X7wSuZToJtQPt2CdVLfo/ccFFi+aQObQ8Pg=
+	t=1767870095; cv=none; b=qKHw5uykK67S24zhYt6LupTIpAzz7zrXNOOw+RyRN/zOUh4ghhdPCbCbTADUlHiCPTYS7Yf8r8wXwCJvHJLKfYIPDlXEx1zCSZ8JqA0VILC8Z2sM9d/7zF7XTKsrhffiGA0Kw9NOP77ty/tTmkpH4JuqjAj7dF56Y37HHT6A4ao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767870129; c=relaxed/simple;
-	bh=VeQbDWPYOYhZa7ttdL1emC86pVJCV25qdkde4RPb35M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=KjQlsuPdmC3q6YGO/7IGXUmpy9FG9dkCvth82OJDFgmx9J5F4KNklj0/vxuOKMUlSX/CfRC372nBJ18KTyt4ssWTwd16CaMa3J9ArgcXr0K6Lhc7+2noJzxTCTwjjAwDdvFVQYj+2wNuJgj33rH0C49SuMoZtqwONO4QIBHPBfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=GZL0RK/0; arc=none smtp.client-ip=117.135.210.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=VeQbDWPYOYhZa7ttdL1emC86pVJCV25qdkde4RPb35M=; b=G
-	ZL0RK/02XnKQ6gY/XL3MWWOLpWqdo4TrL0k30/mko/PWRhU8Zo6DCn62evlg5t7d
-	LUX/pwHsx/oRLSLOiVYTZPO0yj7t64EkHDYec074yYqeD6xCT9Jny+WCwR48nPyU
-	kzU15H2TdwHRZsnseYX2hn/fUpXqWpqZ0I4NVH7ie8=
-Received: from slark_xiao$163.com (
- [2409:895b:3920:8117:f3e8:3169:1a11:160b] ) by ajax-webmail-wmsvr-40-118
- (Coremail) ; Thu, 8 Jan 2026 19:01:01 +0800 (CST)
-Date: Thu, 8 Jan 2026 19:01:01 +0800 (CST)
-From: "Slark Xiao" <slark_xiao@163.com>
-To: "Sergey Ryazanov" <ryazanov.s.a@gmail.com>
-Cc: "Loic Poulain" <loic.poulain@oss.qualcomm.com>,
-	"Johannes Berg" <johannes@sipsolutions.net>,
-	"Andrew Lunn" <andrew+netdev@lunn.ch>,
-	"Eric Dumazet" <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	"Jakub Kicinski" <kuba@kernel.org>,
-	"Paolo Abeni" <pabeni@redhat.com>, netdev@vger.kernel.org,
-	"Daniele Palmas" <dnlplm@gmail.com>
-Subject: Re:[RFC PATCH 0/1] prevent premature device unregister via
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
- 20251222(83accb85) Copyright (c) 2002-2026 www.mailtech.cn 163com
-In-Reply-To: <20260108020518.27086-1-ryazanov.s.a@gmail.com>
-References: <63fddbfb.60e7.19b975c40ea.Coremail.slark_xiao@163.com>
- <20260108020518.27086-1-ryazanov.s.a@gmail.com>
-X-NTES-SC: AL_Qu2dBfScv0gt5yGYbOkWnUwUgu46UMG3vf8u2IMbV+Uhig/d1RsNW2NiFmny6sieDR+DvAK6dj9i48B6Y61IqIfSuPfEniWsElWo8iE7
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	s=arc-20240116; t=1767870095; c=relaxed/simple;
+	bh=kifWMDUcjyoNqnma7UqgQlLZbT3dPAVcD7eeu3dSDNg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=XB7Kb5fTFw4RcgahAbUwHy6E9C+nKXez6rvRXH2FjwZY1Q9jK5XGvsYqg6ekf5IYWUZP1Xh7H1jPyZbaC+E7808UBy6LQoFAMWprByvq1zCqOFuoL5ko0YjksKkLMnSaZ2+Fl7QKXdOD980kZ2qlqmHrb+vWriwFAqXk26xKQBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=usZprcgd; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=QXBd9eAoJBUhCI7owVszPAap9fsVDbLgy/vELqg02I8=;
+	t=1767870087; x=1769079687; b=usZprcgdYHAmiySm1ZuQiBSLSJM24eEwZSnb7cxWW35EIKC
+	eAWWfArgoGD12FBx9IBlkMAY6F7eyqUxrFjbugYdi7dSHguyUSn6cgHL35KrqVrtIokFsVhnVP5Vn
+	FuCwuMCvRBLbRVhHDLRRK9BYxBgwN3iItbU0y+rVw83q69Rrg8nz6arZSbi/ymK0PJHykIP+AdPDw
+	1yao9jvGZ9O98Uxd7BovHh075h+UktgXwvdKnUT3su+y0CH3pllQZVR/Nny2C+PyOsjHg4MXZWIL0
+	bZN6/nkefjSZvN5DIYfpWepcxF/aOe/jFVznPgeg8XEUBmKJ0RzxW0fWAJ/9Lraw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1vdnlU-00000006SZl-25oB;
+	Thu, 08 Jan 2026 12:01:16 +0100
+Message-ID: <0e3af232f15f62f2540a307ccb967c1ae5fdadbf.camel@sipsolutions.net>
+Subject: Re: [PATCH net] wifi: avoid kernel-infoleak from struct iw_point
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>,  Jakub Kicinski	 <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com,
+ syzbot+bfc7323743ca6dbcc3d3@syzkaller.appspotmail.com, 
+	stable@vger.kernel.org
+Date: Thu, 08 Jan 2026 12:01:15 +0100
+In-Reply-To: <20260108101927.857582-1-edumazet@google.com> (sfid-20260108_112630_391137_9C1D2E9D)
+References: <20260108101927.857582-1-edumazet@google.com>
+	 (sfid-20260108_112630_391137_9C1D2E9D)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <a4d09fa.9614.19b9d445a3c.Coremail.slark_xiao@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:digvCgD3Pzptjl9pB_lTAA--.24392W
-X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/xtbC6A3wVWlfjm1I4wAA3+
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+X-malware-bazaar: not-scanned
 
-CgpBdCAyMDI2LTAxLTA4IDEwOjA1OjE3LCAiU2VyZ2V5IFJ5YXphbm92IiA8cnlhemFub3Yucy5h
-QGdtYWlsLmNvbT4gd3JvdGU6Cj5Jbml0aWFsbHkgSSB3YXMgdW5hYmxlIHRvIGhpdCBvciByZXBy
-b2R1Y2UgdGhlIGlzc3VlIHdpdGggaHdzaW0gc2luY2UgaXQKPnVucmVnaXN0ZXIgdGhlIFdXQU4g
-ZGV2aWNlIG9wcyBhcyBhIGxhc3Qgc3RlcCBlZmZlY3RpdmVseSBob2xkaW5nIHRoZQo+V1dBTiBk
-ZXZpY2Ugd2hlbiBhbGwgdGhlIHJlZ3VsYXIgV1dBTiBwb3J0cyBhcmUgYWxyZWFkeSByZW1vdmVk
-LiBUaGFua3MKPnRvIHRoZSBkZXRpbGVkIHJlcG9ydCBvZiBEYW5pZWxlIGFuZCB0aGUgZml4IHBy
-b3Bvc2VkIGJ5IExvaWMsIGl0IGJlY2FtZQo+b2J2aW91cyB3aGF0IGEgcmVsZWFzaW5nIHNlcXVl
-bmNlIGxlYWRzIHRvIHRoZSBjcmFzaC4KPgo+V2l0aCBXV0FOIGRldmljZSBvcHMgdW5yZWdpc3Ry
-YXRpb24gZG9uZSBmaXJzdCBpbiBod3NpbSwgSSB3YXMgYWJsZSB0bwo+ZWFzaWx5IHJlcHJvZHVj
-ZSB0aGUgV1dBTiBkZXZpY2UgcHJlbWF0dXJlIHVucmVnaXN0ZXIsIGFuZCBkZXZlbG9wCj5hbm90
-aGVyIGZpeCBhdm9pZGluZyBhIGR1bW15IHBvcnQgYWxsb2NhdGlvbiBhbmQgcmVseWluZyBvbiBh
-IHJlZmVyZW5jZQo+Y291bnRpbmcuIFNlZSBkZXRhaWxzIGluIHRoZSBSRkMgcGF0Y2guCj4KPkxv
-aWMsIHdoYXQgZG8geW91IHRoaW5rIGFib3V0IHRoaXMgd2F5IG9mIHRoZSB1c2VycyB0cmFja2lu
-Zz8KPgo+U2xhcmssIGlmIHlvdSB3b3VsZCBsaWtlIHRvIGdvIHdpdGggdGhlIHByb3Bvc2VkIHBh
-dGNoLCBqdXN0IHJlbW92ZSB0aGUKPnBhdGNoICM3IGZyb20gdGhlIHNlcmllcyBhbmQgaW5zZXJ0
-IHRoZSBwcm9wb3NlZCBwYXRjaCBiZXR3ZWVuIGJldHdlZW4KPiMxIGFuZCAjMi4gT2YgaWYgeW91
-IHByZWZlciwgSSBjYW4gcmVhc3NlbWJsZSB0aGUgd2hvbGUgc2VyaWVzIGFuZCBzZW5kCj5pdCBh
-cyBSRkMgdjUuCj4KClBsZWFzZSBoZWxwIHJlYXNzZW1ibGUgdGhlbSBhbmQgc2VuZCBpdCBhcyBS
-RkMgdjUuCgo+Q0M6IFNsYXJrIFhpYW8gPHNsYXJrX3hpYW9AMTYzLmNvbT4KPkNDOiBEYW5pZWxl
-IFBhbG1hcyA8ZG5scGxtQGdtYWlsLmNvbT4KPgo+LS0gCj4yLjUyLjAK
+On Thu, 2026-01-08 at 10:19 +0000, Eric Dumazet wrote:
+>=20
+> https://lore.kernel.org/netdev/695f83f3.050a0220.1c677c.0392.GAE@google.c=
+om/T/#u
+
+That wasn't the easiest bit to follow (for me anyway), so for anyone
+else wanting to follow along, here's my interpretation of what happens:
+
+> +++ b/net/wireless/wext-core.c
+> @@ -1101,6 +1101,10 @@ static int compat_standard_call(struct net_device	=
+*dev,
+>  		return ioctl_standard_call(dev, iwr, cmd, info, handler);
+> =20
+>  	iwp_compat =3D (struct compat_iw_point *) &iwr->u.data;
+> +
+> +	/* struct iw_point has a 32bit hole on 64bit arches. */
+> +	memset(&iwp, 0, sizeof(iwp));
+> +
+>  	iwp.pointer =3D compat_ptr(iwp_compat->pointer);
+>  	iwp.length =3D iwp_compat->length;
+>  	iwp.flags =3D iwp_compat->flags;
+
+This all looks mostly fine locally, even for the compat code, i.e. for a
+32-bit task on the 64-bit machine. The iwp is created here and is given
+to ioctl_standard_iw_point(), which crucially then for some requests
+(according to IW_DESCR_FLAG_EVENT) passes it to wireless_send_event().
+
+This then can creates _two_ events, one for 32-bit tasks and one for 64-
+bit tasks, and the 64-bit one will have the "struct iw_point" starting
+from "length", excluding "pointer" but including the padding at the
+end... The layout is further described in the "The problem for 64/32
+bit." comment in wext-core.c
+
+I don't think this can happen for the compat_private_call() part since
+no events are generated there, but fixing it there as well is definitely
+better (and who knows what random drivers might do in priv ioctls.)
+
+johannes
 
