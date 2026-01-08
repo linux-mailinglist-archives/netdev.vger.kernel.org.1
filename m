@@ -1,165 +1,279 @@
-Return-Path: <netdev+bounces-248200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B90AFD04F70
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 18:29:30 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 907D8D04EA3
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 18:24:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C16743058A76
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 17:22:08 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3814C3025C5A
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 17:18:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 530633254B2;
-	Thu,  8 Jan 2026 17:16:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A83233B6EA;
+	Thu,  8 Jan 2026 17:15:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="TRb3mIOD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OXaSVbwP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f66.google.com (mail-dl1-f66.google.com [74.125.82.66])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90AC2DB7BC
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 17:16:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A192D8367
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 17:15:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767892565; cv=none; b=KkV1tigyVVnSQkqQo9tiJYfJHM/m5vzeuh9Fy6by5H3aM0E0uN30k8JAvi55qNtr/jyp1rQjYUm+9xoW6yVCjKRIs3bl0eejY02fMO9HSyVTGUM/3eYSPO074/QEtSPf5XFuk5eCghbSOeW45LQwfkMfNLAPKtXRu/mupfXNsm0=
+	t=1767892517; cv=none; b=XheZ7S/gwX9yC+NPZ7Mx7qw1LXkdU9+1vT6FjqCp90+RVnzTOixu56DudtZ2dB9ug2TDiLVbZf2iT02WZUvDprAVg692yDl1soZmvEK7OpPFrIsle3NjdKYyzdnrQD8wCp7ztpkqvoFxSccDbFLNt1JUulY9iRUhFBMvklWhcaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767892565; c=relaxed/simple;
-	bh=iVn7YA8nn01ehzj/XTgcwn2kQO76KBY0zuM655UBDEQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=s5ujIpP1mScJ2gV7ZY4EQSK2fjadxQCEfN/mGbI7h1Am4iCV6zZd1wzbGpRRM3krt4t4+C0ac2MmWC+00B1HO2OIqgso3Nb06fWYIZGNQjbZl17nAdibUMnDimQAkoLqf3LP195R52D2tGs67Kw99a5qowlKudoplrr7mQd1idk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=TRb3mIOD; arc=none smtp.client-ip=74.125.82.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-dl1-f66.google.com with SMTP id a92af1059eb24-11b992954d4so3201914c88.1
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 09:16:03 -0800 (PST)
+	s=arc-20240116; t=1767892517; c=relaxed/simple;
+	bh=AuDE9ebKxrkOdSB7ljmI0tbKZlH425IN5gpjPydiKnw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GhWuiUKYkZcheMot+t9rW2VvKgmoaMSahfpsJCDO4WLtceKUZaY5dws1gJUe5mhYQJlsa144atGnTd/c6HgnykoY44P8BymoiuKoOSiT2simXvDVblT37Q3KzpzsPTTOvdGpIVATZmQezDqfa/mi52qzvpUm66xONn5HCG/dw8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OXaSVbwP; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4775ae5684fso16539035e9.1
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 09:15:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1767892563; x=1768497363; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ymnZ12ZVg5d56UvSdMCpk88bIArGImL4sE/PnHSiNIQ=;
-        b=TRb3mIOD02aXwh683WoTy8T7VvvxXeqOawpzQQen9Czcw1a3m/NFVuON4oAR6wlpL6
-         NXFk4bu5ipX2kk90NVraMyL5wYDYTxmacAM3xDr5XlcbKzzqG8QSP7K/mRl01lGyyxYE
-         Iu84WSyx4n41oVMr1DajtbuLxtHIXIBAyepSIP4/yzjdX60RYLOQQpcKGXXeUUVE1iFJ
-         Ai+EQ6iaEReBdYjpNo5hvfjBkbivRa+OxNNTFunr1HUeGdEMeylx9Ts+dm8HlBdutfyI
-         sYsH/ldFt7XmEbRpz4oKHpx3DcDB9JbnuMplc3iklpE9LhdrkVVRYLRcNl041ET698bL
-         Zhnw==
+        d=gmail.com; s=20230601; t=1767892514; x=1768497314; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6D1o9jEKajQa0GbPakJfCRGl0DmafU0V8KV51S4R/vU=;
+        b=OXaSVbwP4zMzzr7HUJKACWS6H7qgK8onO/qxvKG7TjNKGOFoiqrbXdow9hsP1MM1hn
+         rUnFEPVXt48jix8NmFmZ6qbYAzeb67uOHuTIslCXXt+pW83eDtnHQxuStwt1DOhkQYeB
+         oW7axzyu696H5jrHkfceSIq1o6JmsPQGTUwDCGHxJP9KOqRAdvtaab/GnJGcKM8/Ou4+
+         vDk+QQl8KEEeZtKvedPuCYUscNxjmQl5ASF1eHTQRelYS59cjEMExUdSQnoKpoJPkxk9
+         B9fkonuKCbkHHLAcWsy5hPpTVbv08nTMH0ZX29k27gfwbH6smEWA51HzRvj4R9HH6gEE
+         si5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767892563; x=1768497363;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ymnZ12ZVg5d56UvSdMCpk88bIArGImL4sE/PnHSiNIQ=;
-        b=RORHTv6xYll6m/S/0u2/EBqjbHsYFe9NV8HmflcJxK8Jy74Xn6coJwWHmZLANksgiz
-         xStDujFXfH5kSxWkAh50VKov6ICfHI/sADcUmGy9Qz3SCUHHQYLT1UIKBq4gcXwxgLC7
-         LHO1rcWWR990PAUu4+6ZfaV8kHtcykzAwH/1qcLFu+6nGfWziow7vhtZrngjSgD3LrdV
-         dU3VnJRrVvd/vD8JaQZbLOuZak0JRTo9PCjEMlIPTQT+Loi7RyhVOcOq8kFgTL8C3BJo
-         BeptVPOss5QWZcIAmvOidVm6uXR3hFXsgqwL/Uq8qPdvGwOC0bSelwgoDWZP7xrcjfAa
-         Mxag==
-X-Forwarded-Encrypted: i=1; AJvYcCXLf5t0IyCWBnvU1kDzuyJLtOk4yg+b/ozu8yjNYaLqZDfxycsSqTC1ZJqtvYNEq01Y7lnDFUY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzM4YD+X259RnI5O/ikt3gHmpsyukpg/UsdfN/wT93nxG95pRfc
-	8DbvPPHlTrF8lWci9SW0fYH5bWTH+9vFhJueZSRWD8d52bwJkA1o6jthjatbUklJxRkAmc5+DlG
-	0+ZJ8pw==
-X-Gm-Gg: AY/fxX6LOPfSv4km5qSHYlJG9PCq1dMQxvUzhPrGrqdxKniz2/WLOZ/QDbqeqYVkQ3C
-	gJKYUsTiAxmQGt24j5eQVL4EtRNBelfPTZYdfVUdTYa1tHlXsjsff3xBlASxgGK+WH+rFgT/Vsc
-	ZFO3h1Vs6LmYgVqzx2xG6qSBdKULjV+HKyDtR3vKDt7RfLIWt++7ndBKSo9c15KDx1daDHmkop9
-	qKfeFqAxYfjkGWeG3mpH67aedPDBcabq0nnH48UhAq6ImIpT6J5WgKcyDy9sbtcJB0j6nRSKBhg
-	nKFfUIiAwnFxkArbI89ezxwuaYrgalXPwxhhXkIJybYGFds3W65pcWTlFMU+W81Z83EHE8lLGE6
-	lLIuj6ppIJTT2HVMWUxu4Khcsn9tCnHVbMHtaqe/ozclboPVApErhxHu4blVSxjTVZgI/3ljsiC
-	Hh5FP7X6FCSHXhhBdISGzoYkfv9IcGw97TPwOoJp7MaO1rQYnINuyyqnOm
-X-Google-Smtp-Source: AGHT+IH/P63oPD2Zjgbk6vQ5uk1IV5bufCRAoon/NN+MlFYjFEMytYxxH8BoZy1vBED78EauWwhmdQ==
-X-Received: by 2002:a05:7022:387:b0:119:e56c:189d with SMTP id a92af1059eb24-121f8afbcdfmr6181418c88.5.1767892562923;
-        Thu, 08 Jan 2026 09:16:02 -0800 (PST)
-Received: from pong.herbertland.com ([2601:646:8980:b330:812d:d4cb:feac:3d09])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-121f248bb6esm14029259c88.12.2026.01.08.09.16.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 09:16:02 -0800 (PST)
-From: Tom Herbert <tom@herbertland.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	netdev@vger.kernel.org
-Cc: Tom Herbert <tom@herbertland.com>
-Subject: [PATCH net-next v2 4/4] ipv6: Document defaults for max_{dst|hbh}_opts_number sysctls
-Date: Thu,  8 Jan 2026 09:14:56 -0800
-Message-ID: <20260108171456.47519-5-tom@herbertland.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260108171456.47519-1-tom@herbertland.com>
-References: <20260108171456.47519-1-tom@herbertland.com>
+        d=1e100.net; s=20230601; t=1767892514; x=1768497314;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6D1o9jEKajQa0GbPakJfCRGl0DmafU0V8KV51S4R/vU=;
+        b=TpbybQw3WPJ6TOztujdB0pJs6PhnJmIgU0rfCU0b4ELu4pM464IEKQsetfVvqiOWgb
+         fXaisXAt+jYO6sXWNxNsneMH2/dKtnf7Zh1nREZTvhjzVmgp6Pn4bLWDZ+SqaIUp7aDm
+         quQ6ZFHJSM3RVxBMaNG5mq/t3tlh/9+KyfFfA9eEqLD3/hOZ7joLyytfznNkHlBxhaLA
+         8tDFZrHyZlSaZyNTd8YRQiONtIB3swz1d9h2fRdC8DFtD4tmmCNuy0XRShN38TsEi3ZO
+         9knOctnT+abfjGJkL1Nog4svHTQ+pzl8Wfu/F4Zz3rxKpHbcZSh7zcH4526DagOhQDX2
+         bDHg==
+X-Gm-Message-State: AOJu0YyNivPLob9drPp7dAYNcZgOBeMiyFmkm3cLtnn2BXWmJA7sJU1/
+	eUqPs1+hIyX6Q5QEPD6C6T2DU8y40hjvJoalv5WQm/KMjWudgeLF1125
+X-Gm-Gg: AY/fxX7tWa6WscfqiG2V5NReYUFRZou9KHkxgeP3IDqzQ2WrLZRCHThLVjhW11uBRgQ
+	/Do98QfwwzZrvvOJy4p3KvgtVQOvVgbRK2tBCSjGiRQ54yvnPTBx8USDAAp8FuwDEMu2UxL4E6X
+	NWJMv0Z4+1TISf8l0B4ZqjnpdIqdv0fB99jbioPIGIkMYwp7pwYd4fQQaEWXrYIGclh8hXvHrzE
+	Dl+CZaz0sdlYB3e04m94+EnGJ4pC/8fmOTkFJZsYdvb9jIoAfXCistfnJASAmGc3QlgQZYq3Kuf
+	nRnbZowpWzJTG3ij80i6C9eZx9QtYdq/r8wN1fuWlI36iC1hg9KDrpKlcjhi8FOxRhu93AYVcAN
+	wkSelAEuKqV6rgUw5r+c+PTe26RoBvPUgg+gDlYB/67XhV5begvDrMxLhLIpbK9VlQPLV9xcNyn
+	Ivvh8JecI8EgDSrQsdjXRI8jRAf2DSKZF0XwI+thW5sqEKs69M+WckuncxBWw17IBnGFjQ6GHgf
+	b6vCsLbpndsHYgnoM+zZycvXYGe4p4OFx0STNxSLnkuKA0fnXbQqa7cgi57AyV+
+X-Google-Smtp-Source: AGHT+IFcCGgMU+hS+RTRrNzIAjwIWMe0mOqLZMiGxQZB6qJ1qYyPKCs8tNXAEosP7J/qcndq2yiglw==
+X-Received: by 2002:a05:600c:3e0d:b0:477:63a4:88fe with SMTP id 5b1f17b1804b1-47d84b0a279mr77807385e9.2.1767892513604;
+        Thu, 08 Jan 2026 09:15:13 -0800 (PST)
+Received: from ?IPV6:2003:ea:8f14:a400:1d60:60fb:9b76:bf18? (p200300ea8f14a4001d6060fb9b76bf18.dip0.t-ipconnect.de. [2003:ea:8f14:a400:1d60:60fb:9b76:bf18])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f653cd6sm171439465e9.9.2026.01.08.09.15.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 Jan 2026 09:15:13 -0800 (PST)
+Message-ID: <4294bfc4-ca9c-4a37-9079-bcd13dcfa3ac@gmail.com>
+Date: Thu, 8 Jan 2026 18:15:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 2/2] r8169: enable LTR support
+To: javen <javen_xu@realsil.com.cn>, nic_swsd@realtek.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260108023523.1019-1-javen_xu@realsil.com.cn>
+ <20260108023523.1019-3-javen_xu@realsil.com.cn>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+In-Reply-To: <20260108023523.1019-3-javen_xu@realsil.com.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-In the descriptions of max_dst_opts_number and max_hbh_opts_number
-sysctls add text about how a zero setting means that a packet with
-any Destination or Hop-by-Hop options is dropped.
+On 1/8/2026 3:35 AM, javen wrote:
+> From: Javen Xu <javen_xu@realsil.com.cn>
+> 
+> This patch will enable
+> RTL8168FP/RTL8168EP/RTL8168H/RTL8125/RTL8126/RTL8127 LTR support.
+> 
+> Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
+> 
+> ---
+> v2: Replace some register numbers with names according to datasheet.
+> ---
+>  drivers/net/ethernet/realtek/r8169_main.c | 112 ++++++++++++++++++++++
+>  1 file changed, 112 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+> index f9df6aadacce..1ee5a0b5a6a0 100644
+> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> @@ -312,6 +312,15 @@ enum rtl_registers {
+>  	IBIMR0          = 0xfa,
+>  	IBISR0          = 0xfb,
+>  	FuncForceEvent	= 0xfc,
+> +
+> +	ALDPS_LTR	= 0xe0a2,
+> +	LTR_OBFF_LOCK	= 0xe032,
+> +	LTR_SNOOP	= 0xe034,
+> +
+> +#define ALDPS_LTR_EN			BIT(0)
+> +#define LTR_OBFF_LOCK_EN		BIT(0)
+> +#define LINK_SPEED_CHANGE_EN		BIT(14)
+> +#define LTR_SNOOP_EN			GENMASK(15, 14)
+>  };
+>  
+>  enum rtl8168_8101_registers {
+> @@ -397,6 +406,8 @@ enum rtl8168_registers {
+>  #define PWM_EN				(1 << 22)
+>  #define RXDV_GATED_EN			(1 << 19)
+>  #define EARLY_TALLY_EN			(1 << 16)
+> +	COMBO_LTR_EXTEND = 0xb6,
+> +#define COMBO_LTR_EXTEND_EN 	BIT(0)
+>  };
+>  
+>  enum rtl8125_registers {
+> @@ -2919,6 +2930,104 @@ static void rtl_disable_exit_l1(struct rtl8169_private *tp)
+>  	}
+>  }
+>  
+> +static void rtl_enable_ltr(struct rtl8169_private *tp)
+> +{
+> +	switch (tp->mac_version) {
+> +	case RTL_GIGA_MAC_VER_80:
+> +		r8168_mac_ocp_write(tp, 0xcdd0, 0x9003);
+> +		r8168_mac_ocp_modify(tp, LTR_SNOOP, 0x0000, LTR_SNOOP_EN);
+> +		r8168_mac_ocp_modify(tp, ALDPS_LTR, 0x0000, ALDPS_LTR_EN);
+> +		r8168_mac_ocp_write(tp, 0xcdd2, 0x8c09);
+> +		r8168_mac_ocp_write(tp, 0xcdd8, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcdd4, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcdda, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcdd6, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcddc, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcde8, 0x887a);
+> +		r8168_mac_ocp_write(tp, 0xcdea, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcdec, 0x8c09);
+> +		r8168_mac_ocp_write(tp, 0xcdee, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcdf0, 0x8a62);
+> +		r8168_mac_ocp_write(tp, 0xcdf2, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcdf4, 0x883e);
+> +		r8168_mac_ocp_write(tp, 0xcdf6, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcdf8, 0x8849);
+> +		r8168_mac_ocp_write(tp, 0xcdfa, 0x9003);
+> +		r8168_mac_ocp_modify(tp, LTR_OBFF_LOCK, 0x0000, LINK_SPEED_CHANGE_EN);
+> +		break;
+> +	case RTL_GIGA_MAC_VER_70:
+> +		r8168_mac_ocp_write(tp, 0xcdd0, 0x9003);
+> +		r8168_mac_ocp_modify(tp, LTR_SNOOP, 0x0000, LTR_SNOOP_EN);
+> +		r8168_mac_ocp_modify(tp, ALDPS_LTR, 0x0000, ALDPS_LTR_EN);
+> +		r8168_mac_ocp_write(tp, 0xcdd2, 0x8c09);
+> +		r8168_mac_ocp_write(tp, 0xcdd8, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcdd4, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcdda, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcdd6, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcddc, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcde8, 0x887a);
+> +		r8168_mac_ocp_write(tp, 0xcdea, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcdec, 0x8c09);
+> +		r8168_mac_ocp_write(tp, 0xcdee, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcdf0, 0x8a62);
+> +		r8168_mac_ocp_write(tp, 0xcdf2, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcdf4, 0x883e);
+> +		r8168_mac_ocp_write(tp, 0xcdf6, 0x9003);
+> +		r8168_mac_ocp_modify(tp, LTR_OBFF_LOCK, 0x0000, LINK_SPEED_CHANGE_EN);
+> +		break;
+> +	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_66:
+> +		r8168_mac_ocp_write(tp, 0xcdd0, 0x9003);
+> +		r8168_mac_ocp_modify(tp, LTR_SNOOP, 0x0000, LTR_SNOOP_EN);
+> +		r8168_mac_ocp_modify(tp, ALDPS_LTR, 0x0000, ALDPS_LTR_EN);
+> +		r8168_mac_ocp_write(tp, 0xcdd2, 0x889c);
+> +		r8168_mac_ocp_write(tp, 0xcdd8, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcdd4, 0x8c30);
+> +		r8168_mac_ocp_write(tp, 0xcdda, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcdd6, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcddc, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcde8, 0x883e);
+> +		r8168_mac_ocp_write(tp, 0xcdea, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcdec, 0x889c);
+> +		r8168_mac_ocp_write(tp, 0xcdee, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcdf0, 0x8C09);
+> +		r8168_mac_ocp_write(tp, 0xcdf2, 0x9003);
+> +		r8168_mac_ocp_modify(tp, LTR_OBFF_LOCK, 0x0000, LINK_SPEED_CHANGE_EN);
+> +		break;
+> +	case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_48:
+> +	case RTL_GIGA_MAC_VER_52:
+> +		r8168_mac_ocp_modify(tp, ALDPS_LTR, 0x0000, ALDPS_LTR_EN);
+> +		RTL_W8(tp, COMBO_LTR_EXTEND, RTL_R8(tp, COMBO_LTR_EXTEND) | COMBO_LTR_EXTEND_EN);
+> +		fallthrough;
+> +	case RTL_GIGA_MAC_VER_51:
+> +		r8168_mac_ocp_modify(tp, LTR_SNOOP, 0x0000, LTR_SNOOP_EN);
+> +		r8168_mac_ocp_write(tp, 0xe02c, 0x1880);
+> +		r8168_mac_ocp_write(tp, 0xe02e, 0x4880);
+> +		r8168_mac_ocp_write(tp, 0xcdd8, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcdda, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcddc, 0x9003);
+> +		r8168_mac_ocp_write(tp, 0xcdd2, 0x883c);
+> +		r8168_mac_ocp_write(tp, 0xcdd4, 0x8c12);
+> +		r8168_mac_ocp_write(tp, 0xcdd6, 0x9003);
+> +		break;
+> +	default:
+> +		return;
+> +	}
+> +	/* chip can trigger LTR */
+> +	r8168_mac_ocp_modify(tp, LTR_OBFF_LOCK, 0x0003, LTR_OBFF_LOCK_EN);
+> +}
+> +
+> +static void rtl_disable_ltr(struct rtl8169_private *tp)
+> +{
 
-Report the default for max_dst_opts_number to be zero (i.e. packets
-with Destination options are dropped by default), and add a
-justification.
+You wrote in response to my question on v1: "We generally do not recommend disabling LTR."
+Then, can't this function be removed? Or what would be the impact of leaving LTR enabled?
 
-Report the default for max_hbh_opts_number to be one.
+Please also address the checkpatch warnings, as reported by CI:
+https://patchwork.kernel.org/project/netdevbpf/patch/20260108023523.1019-3-javen_xu@realsil.com.cn/
 
-Signed-off-by: Tom Herbert <tom@herbertland.com>
----
- Documentation/networking/ip-sysctl.rst | 38 ++++++++++++++++++--------
- 1 file changed, 27 insertions(+), 11 deletions(-)
 
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index bc9a01606daf..de078f7f6a17 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -2474,20 +2474,36 @@ mld_qrv - INTEGER
- 	Minimum: 1 (as specified by RFC6636 4.5)
- 
- max_dst_opts_number - INTEGER
--	Maximum number of non-padding TLVs allowed in a Destination
--	options extension header. If this value is less than zero
--	then unknown options are disallowed and the number of known
--	TLVs allowed is the absolute value of this number.
--
--	Default: 8
-+        Maximum number of non-padding TLVs allowed in a Destination
-+        options extension header. If this value is zero then receive
-+        Destination Options processing is disabled in which case packets
-+        with the Destination Options extension header are dropped. If
-+        this value is less than zero then unknown options are disallowed
-+        and the number of known TLVs allowed is the absolute value of
-+        this number.
-+
-+        The default is zero which means the all received packets with
-+        Destination Options extension header are dropped. The rationale is that
-+        for the vast majority of hosts, Destination Options serve no purpose.
-+        In the thirty years of IPv6 no broadly useful IPv6 Destination options
-+        have been defined, they have no security or even checksum protection,
-+        latest data shows the Destination have drop rates on the Internet
-+        from ten percent to more than thirty percent (depending on the size of
-+        the extension header). They also have the potential to be used as a
-+        Denial of Service attack.
-+
-+        Default: 0
- 
- max_hbh_opts_number - INTEGER
- 	Maximum number of non-padding TLVs allowed in a Hop-by-Hop
--	options extension header. If this value is less than zero
--	then unknown options are disallowed and the number of known
--	TLVs allowed is the absolute value of this number.
--
--	Default: 8
-+	options extension header. If this value is zero then receive
-+        Hop-by-Hop Options processing is disabled in which case packets
-+        with the Hop-by-Hop Options extension header are dropped.
-+        If this value is less than zero then unknown options are disallowed
-+        and the number of known TLVs allowed is the absolute value of this
-+        number.
-+
-+        Default: 1
- 
- max_dst_opts_length - INTEGER
- 	Maximum length allowed for a Destination options extension
--- 
-2.43.0
+> +	switch (tp->mac_version) {
+> +	case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_80:
+> +		r8168_mac_ocp_modify(tp, 0xe032, 0x0003, 0);
+> +		break;
+> +	default:
+> +		break;
+> +	}
+> +}
+> +
+> +
+>  static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
+>  {
+>  	u8 val8;
+> @@ -2947,6 +3056,7 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
+>  			break;
+>  		}
+>  
+> +		rtl_enable_ltr(tp);
+>  		switch (tp->mac_version) {
+>  		case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_48:
+>  		case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_LAST:
+> @@ -2968,6 +3078,7 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
+>  			break;
+>  		}
+>  
+> +		rtl_disable_ltr(tp);
+>  		switch (tp->mac_version) {
+>  		case RTL_GIGA_MAC_VER_70:
+>  		case RTL_GIGA_MAC_VER_80:
+> @@ -4811,6 +4922,7 @@ static void rtl8169_down(struct rtl8169_private *tp)
+>  
+>  	rtl8169_cleanup(tp);
+>  	rtl_disable_exit_l1(tp);
+> +	rtl_disable_ltr(tp);
+>  	rtl_prepare_power_down(tp);
+>  
+>  	if (tp->dash_type != RTL_DASH_NONE && !tp->saved_wolopts)
 
 
