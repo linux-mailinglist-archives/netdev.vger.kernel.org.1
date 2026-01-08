@@ -1,128 +1,88 @@
-Return-Path: <netdev+bounces-247974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A6BFD01434
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 07:42:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D5353D014A0
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 07:47:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4CACA300A36A
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 06:42:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 11C77302D397
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 06:47:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1B7C33C192;
-	Thu,  8 Jan 2026 06:42:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68EDF27F171;
+	Thu,  8 Jan 2026 06:47:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2702133BBC6;
-	Thu,  8 Jan 2026 06:42:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+Received: from mx.socionext.com (mx.socionext.com [202.248.49.38])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21F7A26FD9A;
+	Thu,  8 Jan 2026 06:47:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.248.49.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767854534; cv=none; b=q5vGpdiCODDfcWbuMzSIpjoLQJNAIchV+/78Aa+6mhmz9WS/2IMDGhtEVJpwZQ6XMW5zsiW6py5LGARdTHKItjZYFBAYMvrWdh+YwQOCgKQCNRTspF2KiW+4BRmmiNIlb4eIKhu3aOXCB0DW30uI5hUkInrVr6iOjw/EIzFLAyc=
+	t=1767854834; cv=none; b=sWy0UeIb4CbhUtMXkvzRlfsW5MPecawVy+ZGQmb5gPHDymW7JqKL9cM4PndQtOFzkUsPsXjP0DRpq5NbXUAkIfPs5f50MzKTrvDWUiR1UyWxNfkxoW4BWKHn7AyuTVnIrzI6JAzhSeVu4jTSsKPqRKLBiYysutie7TfOyJUSGRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767854534; c=relaxed/simple;
-	bh=ivIqnI2zEUjC4OJwj+vb1q+Ivmz424hYR9nY7UVpNWQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=moTGtnRtqjDR8kN6WtR4ZXGrTC5MJSIk82nlSaPlUM3i1x1ArqWEdbcf3q7i3Vp1+6PbT6XemJLYosZd5X214bwom6VJwFir9LfAHgG7tl33h+Mhiam1GXnd3/jk2CVJl8WA0dczTl0lthqZcM1GYv3RRpKf9OeNkCH4i+lVf0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [192.168.0.105] (unknown [114.241.82.145])
-	by APP-03 (Coremail) with SMTP id rQCowACXtt2SUV9pJAwYBA--.18933S2;
-	Thu, 08 Jan 2026 14:41:23 +0800 (CST)
-Message-ID: <8c16931b-8637-43c3-a2db-5c66d8865124@iscas.ac.cn>
-Date: Thu, 8 Jan 2026 14:41:22 +0800
+	s=arc-20240116; t=1767854834; c=relaxed/simple;
+	bh=5FmDmQiqF35UR7MxgCzvyisBOZ2UU9X9Bu4ye1Eaejk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TEqLVNaiSTTtzfeV3vbVo/CZ2c+Efu2ZWZ0cA+UVGMSF0F1fntmRVcOvzo0NnCm2AAyqFatF4rn2ZOsJYiuNKjteVnvcwramRDWlavI5rcX0VqeR2rNGVRNfS6FKWCN8rYvEcawE3OQbyPZIzzonxVRRYJftAU7G7b6ljEEi+ZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com; spf=pass smtp.mailfrom=socionext.com; arc=none smtp.client-ip=202.248.49.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=socionext.com
+Received: from unknown (HELO kinkan3-ex.css.socionext.com) ([172.31.9.52])
+  by mx.socionext.com with ESMTP; 08 Jan 2026 15:47:00 +0900
+Received: from mail.mfilter.local (mail-arc02.css.socionext.com [10.213.46.40])
+	by kinkan3-ex.css.socionext.com (Postfix) with ESMTP id 068AD20695EB;
+	Thu,  8 Jan 2026 15:47:00 +0900 (JST)
+Received: from kinkan3.css.socionext.com ([172.31.9.51]) by m-FILTER with ESMTP; Thu, 8 Jan 2026 15:46:59 +0900
+Received: from plum.e01.socionext.com (unknown [10.212.245.39])
+	by kinkan3.css.socionext.com (Postfix) with ESMTP id 979181757;
+	Thu,  8 Jan 2026 15:46:59 +0900 (JST)
+From: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+Subject: [PATCH net 1/2] net: ethernet: ave: Remove unnecessary 'out of memory' message
+Date: Thu,  8 Jan 2026 15:46:40 +0900
+Message-Id: <20260108064641.2593749-1-hayashi.kunihiko@socionext.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/5] drm/radeon: Raise msi_addr_mask to 40 bits for
- pre-Bonaire
-To: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Madhavan Srinivasan <maddy@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
- Alex Deucher <alexander.deucher@amd.com>, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>, Brett Creeley <brett.creeley@amd.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Bjorn Helgaas <bhelgaas@google.com>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>
-Cc: Han Gao <gaohan@iscas.ac.cn>, linuxppc-dev@lists.ozlabs.org,
- linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
- dri-devel@lists.freedesktop.org, netdev@vger.kernel.org,
- linux-pci@vger.kernel.org, linux-sound@vger.kernel.org
-References: <20251224-pci-msi-addr-mask-v1-0-05a6fcb4b4c0@iscas.ac.cn>
- <20251224-pci-msi-addr-mask-v1-3-05a6fcb4b4c0@iscas.ac.cn>
- <15ec03f3-f0cf-45f7-b7f6-98b075533d3e@amd.com>
-Content-Language: en-US
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-In-Reply-To: <15ec03f3-f0cf-45f7-b7f6-98b075533d3e@amd.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowACXtt2SUV9pJAwYBA--.18933S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7uFy5KrWUGFyUtw18Jr1rCrg_yoW8Cw4Upa
-	y8Ga98KrZIy34jkay7u39rZF1Yya10kayrWrZrK343u34Yvry2gFZIv3WUJa4kXr1ktw4j
-	vFyUG3W8ZFn5CaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvE14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-	0xkIwI1lc7CjxVAaw2AFwI0_GFv_Wryl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
-	v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
-	1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
-	AIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
-	42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWI
-	evJa73UjIFyTuYvjTRNJ5oDUUUU
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
-On 1/7/26 23:20, Christian König wrote:
-> On 12/24/25 04:10, Vivian Wang wrote:
->> The code was originally written using no_64bit_msi, which restricts the
->> device to 32-bit MSI addresses.
->>
->> Since msi_addr_mask is introduced, use DMA_BIT_MASK(40) instead of
->> DMA_BIT_MASK(32) here for msi_addr_mask, describing the restriction more
->> precisely and allowing these devices to work on platforms with MSI
->> doorbell address above 32-bit space, as long as it is within the
->> hardware restriction of 40-bit space.
->>
->> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
->> ---
->>  drivers/gpu/drm/radeon/radeon_irq_kms.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/gpu/drm/radeon/radeon_irq_kms.c b/drivers/gpu/drm/radeon/radeon_irq_kms.c
->> index d550554a6f3f..ea519d43348b 100644
->> --- a/drivers/gpu/drm/radeon/radeon_irq_kms.c
->> +++ b/drivers/gpu/drm/radeon/radeon_irq_kms.c
->> @@ -251,8 +251,8 @@ static bool radeon_msi_ok(struct radeon_device *rdev)
->>  	 * IBM POWER servers, so we limit them
->>  	 */
->>  	if (rdev->family < CHIP_BONAIRE) {
->> -		dev_info(rdev->dev, "radeon: MSI limited to 32-bit\n");
->> -		rdev->pdev->msi_addr_mask = DMA_BIT_MASK(32);
->> +		dev_info(rdev->dev, "radeon: MSI limited to 40-bit\n");
->> +		rdev->pdev->msi_addr_mask = DMA_BIT_MASK(40);
-> Well, that is not even remotely correct.
->
-> Please move that close to the dma_set_mask_and_coherent() call in radeon_device_init() (file radeon_device.c).
->
-> The check there is most likely already what you need. Should be pretty straight forward.
+Follow the warning from checkpatch.pl and remove 'out of memory' message.
 
-Thanks. In that case, maybe this msi_addr_mask thing was overcomplicated
-after all. Maybe coherent_dma_mask is just the right thing to check anyway.
+    WARNING: Possible unnecessary 'out of memory' message
+    #590: FILE: drivers/net/ethernet/socionext/sni_ave.c:590:
+    +               if (!skb) {
+    +                       netdev_err(ndev, "can't allocate skb for Rx\n");
 
-I'll see if I can figure something out. Of course I need to keep the
-logic for Power still working...
+Signed-off-by: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+---
+ drivers/net/ethernet/socionext/sni_ave.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-Vivian "dramforever" Wang
+diff --git a/drivers/net/ethernet/socionext/sni_ave.c b/drivers/net/ethernet/socionext/sni_ave.c
+index 66b3549636f8..4700998c4837 100644
+--- a/drivers/net/ethernet/socionext/sni_ave.c
++++ b/drivers/net/ethernet/socionext/sni_ave.c
+@@ -586,10 +586,8 @@ static int ave_rxdesc_prepare(struct net_device *ndev, int entry)
+ 	skb = priv->rx.desc[entry].skbs;
+ 	if (!skb) {
+ 		skb = netdev_alloc_skb(ndev, AVE_MAX_ETHFRAME);
+-		if (!skb) {
+-			netdev_err(ndev, "can't allocate skb for Rx\n");
++		if (!skb)
+ 			return -ENOMEM;
+-		}
+ 		skb->data += AVE_FRAME_HEADROOM;
+ 		skb->tail += AVE_FRAME_HEADROOM;
+ 	}
+-- 
+2.34.1
 
 
