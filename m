@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-248077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE014D033F4
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 15:13:23 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61A6ED02FDF
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 14:24:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4C8EE30DBA0E
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 13:51:41 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 29ED73016448
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 13:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 161633A7DF0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A6A3EE4D5;
 	Thu,  8 Jan 2026 13:08:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EFqj2r7h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XRMBic0G"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C813D4138;
-	Thu,  8 Jan 2026 13:08:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E053D7271;
+	Thu,  8 Jan 2026 13:08:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767877709; cv=none; b=WtqS8y60bSYk1iC+Zm+pdVCIywiAHWeJlx0XIKPP0ajbPX9cBzd/5+CdXeU7gCSI+49TOZ5DN0j5hWxSTlih/HbLFJA3n3eeP9vYFdS/cmpV+nLbfAwwpI4CiEblBMJ7dUCIlDsKllLUcjC9N1DEuEtSK1f+2035K4dnaVO6WPk=
+	t=1767877710; cv=none; b=r3NOtscsckW+lD5UTJEzr9pGId18NALjs6Ts+p3R1rmD0TlDlIj0zHvuJ/0fvSs4aPw8ncCGWZ8fL/sOZejuF30XAWAhj5hx2oIx7DtjxgDZLAwWm7Ebj7DhjYkQaiKV2n4Fhz7QWiQIlVDYYnKxmrOAA+RHefTmO3jwZeqrCbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767877709; c=relaxed/simple;
-	bh=zzfKZcs3JKUANgBbQm5V67WGSuiqbzhNyOZ+JkUeHv0=;
+	s=arc-20240116; t=1767877710; c=relaxed/simple;
+	bh=BEFqASubnMhLuZshwv8XM1o9a6Rbhxs2caSt9SThpyQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=JOwtqcCIItsXe99iBsZBfwaeU4WLwWinsHqqBz9y1vvGo/dcTLXFWxpRDSOQUHkvEYHIeUA/gVhhGgSxzmkaml4qYNdm/4i5MH3PFJ6r+Jgr5rWVWnZ/E2rt31EN5YI/ef4waOad76ulmR0bJR8y/gZ7WPnAP8czZ6Z9aM8Czos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EFqj2r7h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07276C116C6;
-	Thu,  8 Jan 2026 13:08:26 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=QTOLmYLVGlIZEwdfXLzIIeJiTXBgCJNHD/X4jL9r+DCTLBM8+U7bMYbPk09zCTLJPEGWIWe6C6oW4WRTmNDUSpu5OjvxMGErVDjtL+3UlsLdjAtISJfgHHrJasE6n+b22EnLAIQSgDDtEaucwJrKJPWcC+kHFDQqtkE/Kh+Gv04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XRMBic0G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C8F6C19422;
+	Thu,  8 Jan 2026 13:08:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767877708;
-	bh=zzfKZcs3JKUANgBbQm5V67WGSuiqbzhNyOZ+JkUeHv0=;
+	s=k20201202; t=1767877710;
+	bh=BEFqASubnMhLuZshwv8XM1o9a6Rbhxs2caSt9SThpyQ=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=EFqj2r7h+3BQhj13CjsMQez9jQX02SF95uG1X5t7ID2LqMEwrzqJB1aZrx4fqu061
-	 W458UVJC1WDgkijW+H4/sMqKwZ2ic9TWZa3IWxrgftf3JQlGct+oHtK42buxuq/7ZR
-	 V19pJqvXovETaDE5T21+oSC9RAIDMIec5UPMQLo3ZN90fT534LY5xsIcGz8K24hObn
-	 iBGjyJCgMqATD6kSsD1Q15FWTQMnBQZEyJs6eVrY8Rr8eg4CbqZCOpsWPQ+vSBcLpg
-	 +1mF6GdGPxbf0dOjCFC3X427fXbzXX+Qzkx1GSKMDSnL50friBb/IhNCFLi0YNCIFp
-	 ARVUuDhfV3lIQ==
+	b=XRMBic0G5unXBBKtPVKjxLP9Y21Uw1rOGHGXAdcJY+W+/4GY/AZXl7TsdSOv37RbZ
+	 61xlZT8ixVHx4g0L7GbF8oKbMcBXdHa1+IeoRUWXbiPWkRSz0ps/8caEufs/g/hbCK
+	 e8Vai3kIOSHV5bLEhiY2zY2bOZ/DBYQ/+HufR7NfR7BmbGxuvhwjPgVZl/hEw6WRIA
+	 sRmxBoImpSjAgoDKZr9nnHFIcrk26Nl614qIhniVpDlqNKzx6YcIengo4fXZfhtcnn
+	 9tSX4XKE1fv2yFOpANCggDXjuem8gpXLQRZDD95/UN6ftHrv8eq49KkKXgV7oqEgjp
+	 7PYEnxduZarrQ==
 From: Dinh Nguyen <dinguyen@kernel.org>
-Date: Thu, 08 Jan 2026 07:08:10 -0600
-Subject: [PATCH v3 2/3] Revert "arm: dts: socfpga: use reset-name
- "stmmaceth-ocp" instead of "ahb""
+Date: Thu, 08 Jan 2026 07:08:11 -0600
+Subject: [PATCH v3 3/3] dt-bindings: net: altr,socfpga-stmmac: remove TODO
+ note
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,7 +51,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260108-remove_ocp-v3-2-ea0190244b4c@kernel.org>
+Message-Id: <20260108-remove_ocp-v3-3-ea0190244b4c@kernel.org>
 References: <20260108-remove_ocp-v3-0-ea0190244b4c@kernel.org>
 In-Reply-To: <20260108-remove_ocp-v3-0-ea0190244b4c@kernel.org>
 To: Maxime Chevallier <maxime.chevallier@bootlin.com>, 
@@ -71,65 +71,48 @@ Cc: bsp-development.geo@leica-geosystems.com,
  linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
  devicetree@vger.kernel.org, Dinh Nguyen <dinguyen@kernel.org>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1820; i=dinguyen@kernel.org;
- h=from:subject:message-id; bh=zzfKZcs3JKUANgBbQm5V67WGSuiqbzhNyOZ+JkUeHv0=;
- b=owEBbQKS/ZANAwAKARmUBAuBoyj0AcsmYgBpX6xGGWdQPpVq8qYm9OlaaTePBrJYKVLBxsdwv
- 083GmzhNlyJAjMEAAEKAB0WIQSgeEx6LKTlWbBUzA0ZlAQLgaMo9AUCaV+sRgAKCRAZlAQLgaMo
- 9OuZD/0cEohrZMBiJ9+Hr8v+FNP4SWi2PDnbdjjrrH1XtMNbDYBr4nQRJXrlqGCvRsbj3HI+jBp
- WP2HQkHGaHYmsHXnVt16KNOgqxFsxWKcT6oQt81RvsCDmQ+NUl9iHEqYAWDSaPsKY5fFxqy3gFc
- s1oXUvptc8oac7b1x1nevpzFMpdt/zV/pnJSwiKaDeRvhF219Kh5oihYBOO7xYYCaAmkRbL2FG1
- 2KWGHhNSPJ9rxCk+MUVDFMaJX2ILjyfmKoM/suoLKzh4/jo+Om/9H2irhbLXQXekurU7S1FFzkP
- fZ+86SFc7wkSJ8NrpHVBs7PWqzIH0TBkMvqqNv8L2z7y5oIYM4QmNQhnyhoIwrI1uhPK7bQHdx7
- 0fokdMs7SGRpAPBwLOsdavcWN+1ndBWfU+P2LzkTWaqYFLr/EL+JQO12K9qqytngujojC2dBbd6
- xVVsaA7vmfu5yjAF7Crn+hVVWFUqajOKqZttrbk+8s3ZgRT7SGXivTP5CsaPGXVwvxtVRxxXlEY
- WJi/ykJYVOFqE5EfkG6GMyBG3vNIK0/noa7g3phua5fzvCfeFsWIkGsbFhLsPr+7tg5wq4PcrV4
- 6KCIVkhrFzWpnMZhUOMZ7kTPm4OxyJYNUAJHTvklgfPbPX0eiNtzKNZRim2aGgbzTMNW22j4SUy
- 2NFHASTH1iB1sdw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1088; i=dinguyen@kernel.org;
+ h=from:subject:message-id; bh=BEFqASubnMhLuZshwv8XM1o9a6Rbhxs2caSt9SThpyQ=;
+ b=owEBbQKS/ZANAwAKARmUBAuBoyj0AcsmYgBpX6xGixoksxcAk+BFIhc7a5PDFAUf6fYBGoSrA
+ QcXF26GOf6JAjMEAAEKAB0WIQSgeEx6LKTlWbBUzA0ZlAQLgaMo9AUCaV+sRgAKCRAZlAQLgaMo
+ 9HqGEACCdtcSvnQAfq+6jLL6yfY2+XXhl5DnzWzojSs6HegHQ0ZbpDwfCGPrifVoSJXFmkD7nr0
+ CltAAh4vut2VGb3rI9/x+5N01I14VcqhnKhiABEFf3YYyHYOi824DJ2sVosKuYycm3GRvHPqw7l
+ wkxNNjK1DLhriPS0GSjbmBllVOwdtIYAi/MUFrybzDAT1eVKd0Nt6WUifwwx4GOR48aXPzXOImT
+ iSGrytZczmKbxCRNR91MYOQPNpaupejVUiv+qk49e1Wvo5/zw1j2c8P+x4kbgIQ5hsI7I95CtY1
+ Om6E9OJDZeEBg+fH+EYZAhwfRIueYWLKPi/LkJENvBkJxPWODdxTipNv5+tjfO3iV6PjjivYz2w
+ 2sj8/XjplvBsA2a7A30BB9KLxqqcLFubf24+DoFqOmNh3pBTAoezTfZoU6NfTk+uKKTGoh5uYZ8
+ D7D+HbKQ3qJ+rSbt9PX/m+uzA4FaYZsJjR9plqPHYuXRPQfW3PfkrlZzH89f9PcSNPH3OD0k6dO
+ AxxEjPE/Ky/2CCNxN+NF6DStkntbtUTJkVuCZbRwZM333eIaZWMKZmgNfizBOd4w5mUhg7Qw63D
+ Zm6KHOdH9e1jh8H+4ABegP6ar0SPeJbLGeIPvccBNiypKQZGMgBtF/g0tpvcKWyBXt6ccVLmyPo
+ UDCLYSxQxcxiDTA==
 X-Developer-Key: i=dinguyen@kernel.org; a=openpgp;
  fpr=A0784C7A2CA4E559B054CC0D1994040B81A328F4
 
-This reverts commit 62a40a0d5634834790f7166ab592be247390d857.
-
-With the patch "add call to assert/deassert ahb reset line" in place, we can
-safely remove the "stmmaceth-ocp" reset name and just use the standard
-"ahb" reset name.
+The 'stmmaceth-ocp' will no longer be used as a reset-name, going forward
+and 'ahb' shall be used.
 
 Signed-off-by: Dinh Nguyen <dinguyen@kernel.org>
 ---
- arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+v3: Addressed Rob Herring's comments and updated commit header/message
+v2: Introduced
+v1: n/a
+---
+ Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
-index b108265e9bde4..6b6e77596ffa8 100644
---- a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
-+++ b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
-@@ -440,7 +440,7 @@ gmac0: ethernet@ff800000 {
- 			clocks = <&l4_mp_clk>, <&peri_emac_ptp_clk>;
- 			clock-names = "stmmaceth", "ptp_ref";
- 			resets = <&rst EMAC0_RESET>, <&rst EMAC0_OCP_RESET>;
--			reset-names = "stmmaceth", "stmmaceth-ocp";
-+			reset-names = "stmmaceth", "ahb";
- 			snps,axi-config = <&socfpga_axi_setup>;
- 			status = "disabled";
- 		};
-@@ -460,7 +460,7 @@ gmac1: ethernet@ff802000 {
- 			clocks = <&l4_mp_clk>, <&peri_emac_ptp_clk>;
- 			clock-names = "stmmaceth", "ptp_ref";
- 			resets = <&rst EMAC1_RESET>, <&rst EMAC1_OCP_RESET>;
--			reset-names = "stmmaceth", "stmmaceth-ocp";
-+			reset-names = "stmmaceth", "ahb";
- 			snps,axi-config = <&socfpga_axi_setup>;
- 			status = "disabled";
- 		};
-@@ -480,7 +480,7 @@ gmac2: ethernet@ff804000 {
- 			clocks = <&l4_mp_clk>, <&peri_emac_ptp_clk>;
- 			clock-names = "stmmaceth", "ptp_ref";
- 			resets = <&rst EMAC2_RESET>, <&rst EMAC2_OCP_RESET>;
--			reset-names = "stmmaceth", "stmmaceth-ocp";
-+			reset-names = "stmmaceth", "ahb";
- 			snps,axi-config = <&socfpga_axi_setup>;
- 			status = "disabled";
- 		};
+diff --git a/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml b/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml
+index fc445ad5a1f1a..8e7077d4319eb 100644
+--- a/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml
++++ b/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml
+@@ -13,8 +13,6 @@ description:
+   This binding describes the Altera SOCFPGA SoC implementation of the
+   Synopsys DWMAC for the Cyclone5, Arria5, Stratix10, Agilex5 and Agilex7
+   families of chips.
+-  # TODO: Determine how to handle the Arria10 reset-name, stmmaceth-ocp, that
+-  # does not validate against net/snps,dwmac.yaml.
+ 
+ select:
+   properties:
 
 -- 
 2.42.0.411.g813d9a9188
