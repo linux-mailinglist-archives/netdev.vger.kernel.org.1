@@ -1,138 +1,290 @@
-Return-Path: <netdev+bounces-248246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19998D05AF7
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 19:56:21 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CFB6D05A79
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 19:48:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 97A213007699
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 18:48:35 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CBDDB301711F
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 18:48:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E34E27F00A;
-	Thu,  8 Jan 2026 18:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE2F82FFDEC;
+	Thu,  8 Jan 2026 18:48:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LH/vr4KI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o5CiaR/K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3DBB230BCB
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 18:48:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 884D8230BCB;
+	Thu,  8 Jan 2026 18:48:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767898115; cv=none; b=eAGcJcKJnMO6bu79V5BvNS5XzqgDnMHfr7S/lM02HqNExNVrt0S+iPpUzUhFKm7TIqzNZiy4kJmFrS/IqMYl19ry4EQeDl+nG18HC/PcUmiaGkxp/nfwH33XfwspqJ/zZl66R9LuQfH2VawlrSbqy5svY4uw8ULJ1boxjnbuiP4=
+	t=1767898126; cv=none; b=MXhjVNjekNss9LraoNxp5E5JeULOJ2Ue1r3/68WpXBEP/VP3ngOmOgXqGRFOpamZvdpcI83s3RL9IwtpE1JOxfEmFIGudz8t5o59AgoyAlPk+Yk+w9fQV6DSUstUk0AfGRoeKGchOxMYyhpD3/BOLDUKUdY4rs7dRk5Qre4sX5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767898115; c=relaxed/simple;
-	bh=cwp1Mrwqv0eoxdv01wEfOpLvzIf0ijJYV3HVq0Vl6hs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GTfkvEHS1d+6qgP/gTew1goQlXSqv+81FZ3Xq5seeE6Opmp6v4w/R4RxGGJz7dTaymKi68fRtqggtXh0J8sxgYnweUCZ6df9MB1/jYLjZCxNv8YabzTBVVgtGFBkij39Q1OqAbfEueNe4pGzqcy+uCl87K5s9sUcI974H/7G51I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LH/vr4KI; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-47d493a9b96so21236645e9.1
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 10:48:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767898112; x=1768502912; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=S6byj3l499CYP6Jvy37bW5MCtNkOsDXtvYU9D7/Vhs8=;
-        b=LH/vr4KIUVbrnKvOkg/oQMVIWFixyiUQzkJbXodW1nrR7VkiqOp2dHUdihksTUnsso
-         trwt3yhbvHyMT7n1UkrwDEYGsg5gBHJlkcn8gLtaiUQRozAxIyYjFH1JAkGtB8LeXexs
-         srNe0vy8qDuCalmfki8J4cRK1dQ+gae7L53DVgWV/HOjX22yf/QLCUTTRqcPJh4NSHCi
-         gfn8HNTHU6pCH0AaGB4k+8Lqz68+k4K2AVwlQXXEdwkbSIJH5a1befIN9rkIIfQXNujh
-         ZvVLsvnEIIIBvrA1vXnWwrMFmtZA26gYqzKF5MHBPY6AcKrY5ekwsUY2fzggV9upcHDf
-         kICw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767898112; x=1768502912;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S6byj3l499CYP6Jvy37bW5MCtNkOsDXtvYU9D7/Vhs8=;
-        b=iTyQKuoOAmMQxPabk7LZGTOuC0FBGlD0Hg/ZT7FyrpNpOvOn1V2EW766eqNSBEELJK
-         iD3xDHyL5UT/8ssyI/DXns5LBnUX/ryAbSc/yv5leWzlGu/DMACxG7ZNMnx6wEDiqQqn
-         5U7Q1xV2KBDxK5xDRGQ9rshvMJrhnxq4aqsaWYiVyJM+KjEMHZrfOV7Drh40at8kfRvh
-         lZowaKgKamRlvtBxANIx1UXwMhIAE+CVT4PWewZWQ88fK+oXDpwOus3ejt+T+YjvkKhF
-         JMMq8TAxQtahBhFZHECSLBeMgMoXnKh97v1MXdGeYExfp9KxRY5uRUbYwYfGr+g5ZidZ
-         LtgA==
-X-Gm-Message-State: AOJu0YyCLIHTuEhUd+7PiEZ5pdeOsY2DbhdYhjeue60R/35tdy8MlA34
-	TGtc5lBaGfKpGb/rfFE9kPkkb/T30ZH2ifaFY8PB5p6VsrjmoXJXhtc=
-X-Gm-Gg: AY/fxX7X4EAiRhlhUPX1AeAYuAY1jhmCrdyXufE8KPv6fDRxtJWtDc5JdgUg0hiRwNd
-	NDJHI8niLcQ0UvNamTZSh4g4rFnGlbMuBf5TU4hLUPApxZwUvnnvt8QheDiezicTOlTWrX2Ghsp
-	TvryVa0SdzFhH2BqV/tPe9Axd5lOb/GD61Knl8eGjDx7jCdxNwiSaOE0nsbpw3ks3VtXWwx93/p
-	W63M4l+VrwOn82KmStNHupAiEsXnVLjTjeKvbDOm9WNLlCW85cNfZAxSHijN089eSWKJg6kcTiz
-	dchprlxKrFRAOxYvgClV5u7EuaFun4clSBQKKgQbJI6jHNcKncPYKwlQKRTxzbyWzzgXHKOQvQy
-	JK+kv7OAe3KW7bY5CCylXLoucEUTSRjv+ix/O2kBikiklARRghbps5CqxU1BfBYDzfHlP0+E81i
-	jrWFtCb1rQGUe2
-X-Google-Smtp-Source: AGHT+IHK+F1RmoP+kpgDGVhzwngbhxjIUsHyn7D7h8MljBg/QOnpBdj2zXVwzk87U6dp2EJtUxklXQ==
-X-Received: by 2002:a05:600c:4fc6:b0:477:b734:8c41 with SMTP id 5b1f17b1804b1-47d84b0b320mr83819425e9.1.1767898111702;
-        Thu, 08 Jan 2026 10:48:31 -0800 (PST)
-Received: from DESKTOP-BKIPFGN ([45.43.86.16])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d8661caffsm43013065e9.5.2026.01.08.10.48.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 10:48:31 -0800 (PST)
-From: Kery Qi <qikeyu2017@gmail.com>
-To: christian.koenig@amd.com
-Cc: netdev@vger.kernel.org,
-	Kery Qi <qikeyu2017@gmail.com>
-Subject: [PATCH] drm/radeon/sumo: Avoid UAF/double-free on power table parse errors
-Date: Fri,  9 Jan 2026 02:48:23 +0800
-Message-ID: <20260108184823.1795-1-qikeyu2017@gmail.com>
-X-Mailer: git-send-email 2.50.1.windows.1
+	s=arc-20240116; t=1767898126; c=relaxed/simple;
+	bh=iaKLxH1eWMLIWQCBMyurZPxJrCh6SelDIBA5lqfVKFY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HLZaPjq1q7QuYvJYWHvu5y6vXV/jr2dgkZl2bS+hizLnPd5OHE/oT9CUVkT5yCGyu15pvTUOH46KhxJ7SdKFbMiYpFlR3AwK0axn7zGtOxda/maXMZWkCm1O6VI5Dyv2PtJ8glxKeLwcZ2xfjkF22SQtyUzI7ieX9Q/8RyCy9rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o5CiaR/K; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01E19C116C6;
+	Thu,  8 Jan 2026 18:48:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767898126;
+	bh=iaKLxH1eWMLIWQCBMyurZPxJrCh6SelDIBA5lqfVKFY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=o5CiaR/KOo4BuHLVpDduKTti7k2pTbaFx5PSfaIKJqs+uz11Zzm+yg2Qsau2sQow8
+	 EmSheYn6EX3jMXhx3kPigpazRhAvChWG5uEdBO4XDm1ziQpLnomt2mQSKaf5UBlKjz
+	 3a+2q9vuc4HsXwQ8VEOrss93VYyGvwkWoJcjq04Ebaz3OFLXm14I/idUb/35gu1fm/
+	 e85kQrMRgf/kh4z9Wshu6AwIQhcYKW5EM08EURrKCK2+0A5pY9mNU2quZnzN+rfhMX
+	 CBVO9yQaasThvN1frLxLaMIfwj9Hz9Z1CC0/mFGkJR6xdQvtSQXXEMhUXgBWvXnzeY
+	 JGAQUUE2rYgsQ==
+Date: Thu, 8 Jan 2026 12:48:45 -0600
+From: Rob Herring <robh@kernel.org>
+To: Stefan Eichenberger <eichest@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, krzk+dt@kernel.org,
+	conor+dt@kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Stefan Eichenberger <stefan.eichenberger@toradex.com>
+Subject: Re: [PATCH v2 1/2] dt-bindings: net: micrel: Convert to DT schema
+Message-ID: <20260108184845.GA758009-robh@kernel.org>
+References: <20260108125208.29940-1-eichest@gmail.com>
+ <20260108125208.29940-2-eichest@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260108125208.29940-2-eichest@gmail.com>
 
-sumo_parse_power_table() allocates rdev->pm.dpm.ps and then allocates a
-per-state sumo_ps (ps_priv) for each entry. On error, it currently frees
-rdev->pm.dpm.ps in two places:
+On Thu, Jan 08, 2026 at 01:51:27PM +0100, Stefan Eichenberger wrote:
+> From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+> 
+> Convert the devicetree bindings for the Micrel PHYs and switches to DT
+> schema.
+> 
+> Signed-off-by: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+> ---
+>  .../devicetree/bindings/net/micrel.txt        |  57 --------
+>  .../devicetree/bindings/net/micrel.yaml       | 133 ++++++++++++++++++
+>  2 files changed, 133 insertions(+), 57 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/net/micrel.txt
+>  create mode 100644 Documentation/devicetree/bindings/net/micrel.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/micrel.txt b/Documentation/devicetree/bindings/net/micrel.txt
+> deleted file mode 100644
+> index 01622ce58112..000000000000
+> --- a/Documentation/devicetree/bindings/net/micrel.txt
+> +++ /dev/null
+> @@ -1,57 +0,0 @@
+> -Micrel PHY properties.
+> -
+> -These properties cover the base properties Micrel PHYs.
+> -
+> -Optional properties:
+> -
+> - - micrel,led-mode : LED mode value to set for PHYs with configurable LEDs.
+> -
+> -	Configure the LED mode with single value. The list of PHYs and the
+> -	bits that are currently supported:
+> -
+> -	KSZ8001: register 0x1e, bits 15..14
+> -	KSZ8041: register 0x1e, bits 15..14
+> -	KSZ8021: register 0x1f, bits 5..4
+> -	KSZ8031: register 0x1f, bits 5..4
+> -	KSZ8051: register 0x1f, bits 5..4
+> -	KSZ8081: register 0x1f, bits 5..4
+> -	KSZ8091: register 0x1f, bits 5..4
+> -	LAN8814: register EP5.0, bit 6
+> -
+> -	See the respective PHY datasheet for the mode values.
+> -
+> - - micrel,rmii-reference-clock-select-25-mhz: RMII Reference Clock Select
+> -						bit selects 25 MHz mode
+> -
+> -	Setting the RMII Reference Clock Select bit enables 25 MHz rather
+> -	than 50 MHz clock mode.
+> -
+> -	Note that this option is only needed for certain PHY revisions with a
+> -	non-standard, inverted function of this configuration bit.
+> -	Specifically, a clock reference ("rmii-ref" below) is always needed to
+> -	actually select a mode.
+> -
+> - - clocks, clock-names: contains clocks according to the common clock bindings.
+> -
+> -	supported clocks:
+> -	- KSZ8021, KSZ8031, KSZ8081, KSZ8091: "rmii-ref": The RMII reference
+> -	  input clock. Used to determine the XI input clock.
+> -
+> - - micrel,fiber-mode: If present the PHY is configured to operate in fiber mode
+> -
+> -	Some PHYs, such as the KSZ8041FTL variant, support fiber mode, enabled
+> -	by the FXEN boot strapping pin. It can't be determined from the PHY
+> -	registers whether the PHY is in fiber mode, so this boolean device tree
+> -	property can be used to describe it.
+> -
+> -	In fiber mode, auto-negotiation is disabled and the PHY can only work in
+> -	100base-fx (full and half duplex) modes.
+> -
+> - - coma-mode-gpios: If present the given gpio will be deasserted when the
+> -		    PHY is probed.
+> -
+> -	Some PHYs have a COMA mode input pin which puts the PHY into
+> -	isolate and power-down mode. On some boards this input is connected
+> -	to a GPIO of the SoC.
+> -
+> -	Supported on the LAN8814.
+> diff --git a/Documentation/devicetree/bindings/net/micrel.yaml b/Documentation/devicetree/bindings/net/micrel.yaml
+> new file mode 100644
+> index 000000000000..52d1b187e1d3
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/micrel.yaml
+> @@ -0,0 +1,133 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/micrel.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Micrel KSZ series PHYs and switches
+> +
+> +maintainers:
+> +  - Andrew Lunn <andrew@lunn.ch>
+> +  - Stefan Eichenberger <eichest@gmail.com>
+> +
+> +description:
+> +  The Micrel KSZ series contains different network phys and switches.
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - ethernet-phy-id000e.7237  # KSZ8873MLL
+> +      - ethernet-phy-id0022.1430  # KSZ886X
+> +      - ethernet-phy-id0022.1435  # KSZ8863
+> +      - ethernet-phy-id0022.1510  # KSZ8041
+> +      - ethernet-phy-id0022.1537  # KSZ8041RNLI
+> +      - ethernet-phy-id0022.1550  # KSZ8051
+> +      - ethernet-phy-id0022.1555  # KSZ8021
+> +      - ethernet-phy-id0022.1556  # KSZ8031
+> +      - ethernet-phy-id0022.1560  # KSZ8081, KSZ8091
+> +      - ethernet-phy-id0022.1570  # KSZ8061
+> +      - ethernet-phy-id0022.161a  # KSZ8001
+> +      - ethernet-phy-id0022.1720  # KS8737
+> +
+> +  micrel,fiber-mode:
+> +    type: boolean
+> +    description: |
+> +      If present the PHY is configured to operate in fiber mode.
+> +
+> +      The KSZ8041FTL variant supports fiber mode, enabled by the FXEN
+> +      boot strapping pin. It can't be determined from the PHY registers
+> +      whether the PHY is in fiber mode, so this boolean device tree
+> +      property can be used to describe it.
+> +
+> +      In fiber mode, auto-negotiation is disabled and the PHY can only
+> +      work in 100base-fx (full and half duplex) modes.
+> +
+> +  micrel,led-mode:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    description: |
+> +      LED mode value to set for PHYs with configurable LEDs.
+> +
+> +      Configure the LED mode with single value. The list of PHYs and the
+> +      bits that are currently supported:
+> +
+> +      KSZ8001: register 0x1e, bits 15..14
+> +      KSZ8041: register 0x1e, bits 15..14
+> +      KSZ8021: register 0x1f, bits 5..4
+> +      KSZ8031: register 0x1f, bits 5..4
+> +      KSZ8051: register 0x1f, bits 5..4
+> +      KSZ8081: register 0x1f, bits 5..4
+> +      KSZ8091: register 0x1f, bits 5..4
+> +
+> +      See the respective PHY datasheet for the mode values.
+> +    minimum: 0
+> +    maximum: 3
+> +
+> +allOf:
+> +  - $ref: ethernet-phy.yaml#
+> +  - if:
+> +      not:
+> +        properties:
+> +          compatible:
+> +            contains:
+> +              const: ethernet-phy-id0022.1510
+> +    then:
+> +      properties:
+> +        micrel,fiber-mode: false
+> +  - if:
+> +      not:
+> +        properties:
+> +          compatible:
+> +            contains:
+> +              enum:
+> +                - ethernet-phy-id0022.1510
+> +                - ethernet-phy-id0022.1555
+> +                - ethernet-phy-id0022.1556
+> +                - ethernet-phy-id0022.1550
+> +                - ethernet-phy-id0022.1560
+> +                - ethernet-phy-id0022.161a
+> +    then:
+> +      properties:
+> +        micrel,led-mode: false
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            enum:
+> +              - ethernet-phy-id0022.1555
+> +              - ethernet-phy-id0022.1556
+> +              - ethernet-phy-id0022.1560
+> +    then:
+> +      properties:
+> +        clocks:
+> +          maxItems: 1
 
-- if (!rdev->pm.power_state[i].clock_info) { kfree(rdev->pm.dpm.ps); ... }
-- if (ps == NULL) { kfree(rdev->pm.dpm.ps); ... }
+This has no effect because ethernet-phy.yaml already defines this.
 
-However, when sumo_parse_power_table() fails during the load/init path,
-the driver later unwinds and calls the corresponding fini path, which
-dereferences rdev->pm.dpm.ps[i].ps_priv and then frees rdev->pm.dpm.ps.
+> +        clock-names:
+> +          const: rmii-ref
+> +          description:
+> +            The RMII reference input clock. Used to determine the XI input
+> +            clock.
+> +        micrel,rmii-reference-clock-select-25-mhz:
+> +          type: boolean
+> +          description: |
+> +            RMII Reference Clock Select bit selects 25 MHz mode
+> +
+> +            Setting the RMII Reference Clock Select bit enables 25 MHz rather
+> +            than 50 MHz clock mode.
 
-Freeing rdev->pm.dpm.ps inside sumo_parse_power_table() leaves a dangling
-pointer that the unwind/fini path will both dereference and free again,
-resulting in a use-after-free and a double-free.
+These should be defined at the top-level. Then use the if/then schema to 
+disallow the properties.
 
-Fix this by removing the local kfree(rdev->pm.dpm.ps) from the error
-returns in sumo_parse_power_table() and letting the common unwind/fini
-path perform the cleanup.
-Fixes: 80ea2c129c76 ("drm/radeon/kms: add dpm support for sumo asics (v2)")
-
-Signed-off-by: Kery Qi <qikeyu2017@gmail.com>
----
- drivers/gpu/drm/radeon/sumo_dpm.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/gpu/drm/radeon/sumo_dpm.c b/drivers/gpu/drm/radeon/sumo_dpm.c
-index b11f7c5bbcbe..af649b7b2e1a 100644
---- a/drivers/gpu/drm/radeon/sumo_dpm.c
-+++ b/drivers/gpu/drm/radeon/sumo_dpm.c
-@@ -1491,15 +1491,11 @@ static int sumo_parse_power_table(struct radeon_device *rdev)
- 		non_clock_array_index = power_state->v2.nonClockInfoIndex;
- 		non_clock_info = (struct _ATOM_PPLIB_NONCLOCK_INFO *)
- 			&non_clock_info_array->nonClockInfo[non_clock_array_index];
--		if (!rdev->pm.power_state[i].clock_info) {
--			kfree(rdev->pm.dpm.ps);
-+		if (!rdev->pm.power_state[i].clock_info)
- 			return -EINVAL;
--		}
- 		ps = kzalloc(sizeof(struct sumo_ps), GFP_KERNEL);
--		if (ps == NULL) {
--			kfree(rdev->pm.dpm.ps);
-+		if (ps == NULL)
- 			return -ENOMEM;
--		}
- 		rdev->pm.dpm.ps[i].ps_priv = ps;
- 		k = 0;
- 		idx = (u8 *)&power_state->v2.clockInfoIndex[0];
--- 
-2.34.1
-
+> +
+> +dependentRequired:
+> +  micrel,rmii-reference-clock-select-25-mhz: [ clock-names ]
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    mdio {
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+> +
+> +        ethernet-phy@5 {
+> +            compatible = "ethernet-phy-id0022.1510";
+> +            reg = <5>;
+> +            micrel,led-mode = <2>;
+> +            micrel,fiber-mode;
+> +        };
+> +    };
+> -- 
+> 2.51.0
+> 
 
