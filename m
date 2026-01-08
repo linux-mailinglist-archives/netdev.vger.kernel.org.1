@@ -1,49 +1,50 @@
-Return-Path: <netdev+bounces-247943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68188D00B4D
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 03:41:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4EE5D00B4A
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 03:41:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 60FF8308BA28
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1CFE53089CC1
 	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 02:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70EF11E1A33;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE9219D081;
 	Thu,  8 Jan 2026 02:35:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="EALqSZ4F"
+	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="YQFRf0uX"
 X-Original-To: netdev@vger.kernel.org
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 638DF19F135;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1512C3A0B36;
 	Thu,  8 Jan 2026 02:35:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767839754; cv=none; b=PSxiPDRPCOGWyuPcRRE9r0XsM9JAJbFLWIzEicxHmfHdc0wreNF3y4ZvAq8Kg/xpgRXrRE9NsJiPm2c2cYykc1yNMFUNlPJnbt1xRsg3xZot8yEUKaTsLXHsEwYkIEaCn3oMqnbasXRa1+DAqBAf++lzadSr1qny6JjwsyO3XPI=
+	t=1767839754; cv=none; b=Sr/sTTW7wzfUZYay+BSej4VjN8dtgcysg+UhwVqnImtVo+QAfMY7oJP2GrPS8JjiUr87HsyadVbhdyk2YxbOa3DIBZJteWlRs+u61DsxitaHXKZFMgZwA4xVAvGMKk3sDqGkXIWT0wIS0IZMj52jBSfzobvcPw62LvqlS058x7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1767839754; c=relaxed/simple;
-	bh=8w0zUQot0Td8MJc64KNRrRzNN1FGkWnaIgcl+PhOHrU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Bi8ZF/gILy6g60sB3Rzv2PUPYvy9QuWjsUhnjL6wFCqwBtC+YHMrUo1vHKwhTMVb2akmIt18uZ4tKUl9YFBj/UJq/CaawRUFr2UN+UBW0yFDw6CPiFbIFxq8w5TYqvDVAio3NCTEcU3iQck88eeZdZcrh4jV9SOCdwSpCd/Sgok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=EALqSZ4F; arc=none smtp.client-ip=211.75.126.72
+	bh=7bGxxODUayhFpFH7ufFTYiYf88UtsbWD3WqeYGG1Ask=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LxLWIv2PyFXbfhhqF/9+8kc7zYiz+2kc0POU/bG4xzetYk/NCbljquecnekaqNLa3CYo6p/XbrRVP6X2un4iNtWxTxYJprDBUq0W+NkUOS2Gy8VFg/QAuI58eQYZK98pVfoPn+cznua9a7BcdzKHhM78WcWDy3WeKh42VxTlyK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=YQFRf0uX; arc=none smtp.client-ip=211.75.126.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6082ZQgJ4109080, This message is accepted by code: ctloc85258
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 6082ZRgJ4109080, This message is accepted by code: ctloc85258
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
 	s=dkim; t=1767839727;
-	bh=FifvSYiNNb4Ew6CTBLmhWhGdlOu/GARV3FDormX0taQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type;
-	b=EALqSZ4Farr1/SfSfYTLYkj4k7J2YiU3L6mkAkSwdU9+Dac0Y6INWlxYW+t3+Ktrq
-	 tR7RAXH4Y72owBuk469/LLkewwmQ9jEPWPIWb+3vBe9O5x0ZoUHRdExaiTrydpjuor
-	 tzvXfZFct9JXKWRElDtwcBQbbRVigkxkaHm3yC2WG2xFv6W14bdSgL9v0PdRRla5Wy
-	 OH8M67Inhvf5Z1mkAalsyVzoTEo06I3dmm5utlchiQnkRztBDUMOZgo0xM4aQRYlGY
-	 j/2SEnXqfiHE4UTlxQiC98KK9kVMWphCUnMSFpjcOZ+njCU5gFgsYsARZHYtcJ130r
-	 LLHj+vl598grw==
+	bh=7g87re8t4MshgafsWCmjGFNSoUEW5ANnTwm1h447a7Q=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding:Content-Type;
+	b=YQFRf0uXhJPTOGh3AyKI7+nwHx479j510w069fKsiHoFer418jaVO46F13LUEZjHu
+	 v16Qe6etB/KojPU7Ye8QyasT0iaKMOEGtNYmmhv0ForjIFTpnlRP0p03GCPCtt+fLS
+	 HhcLN7ECV8fBddqZKf5oLQ6FWQ82WSk94AP0qwqvmEjQ5JV540xsTRf9sdeZH6ubRM
+	 0qKZ4Hgxb0c+JaJgJKCwPzh4a6ohV6QUaA6AJPUK4kRsI/ud5ghFIXs4pbCUb9KzMd
+	 rO/Og/qKrK+kIoc3gU0KSTiW85/Nrxhx9iJsf2D68/xZIGR6azltspkqUr4iI1c9dO
+	 uQTmH7PnkGWYA==
 Received: from RS-EX-MBS2.realsil.com.cn ([172.29.17.102])
-	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 6082ZQgJ4109080
+	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 6082ZRgJ4109080
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 8 Jan 2026 10:35:26 +0800
+	Thu, 8 Jan 2026 10:35:27 +0800
 Received: from RS-EX-MBS2.realsil.com.cn (172.29.17.102) by
  RS-EX-MBS2.realsil.com.cn (172.29.17.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -58,40 +59,48 @@ To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         Javen Xu
 	<javen_xu@realsil.com.cn>
-Subject: [PATCH net-next v2 0/2] r8169: add dash and LTR support
-Date: Thu, 8 Jan 2026 10:35:21 +0800
-Message-ID: <20260108023523.1019-1-javen_xu@realsil.com.cn>
+Subject: [PATCH net-next v2 1/2] r8169: add DASH support for RTL8127AP
+Date: Thu, 8 Jan 2026 10:35:22 +0800
+Message-ID: <20260108023523.1019-2-javen_xu@realsil.com.cn>
 X-Mailer: git-send-email 2.50.1.windows.1
+In-Reply-To: <20260108023523.1019-1-javen_xu@realsil.com.cn>
+References: <20260108023523.1019-1-javen_xu@realsil.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
 From: Javen Xu <javen_xu@realsil.com.cn>
 
-This series patch adds dash support for RTL8127AP and LTR support for=0D
-RTL8168FP/RTL8168EP/RTL8168H/RTL8125/RTL8126/RTL8127.
-=0D
----=0D
-Changes in v2:=0D
-- Replace some register numbers with names according to the datasheet.=0D
-- Link to v1: https://lore.kernel.org/netdev/20260106083012.164-1-javen_xu@=
-realsil.com.cn/=0D
-=0D
----=0D
+This adds DASH support for chip RTL8127AP. Its mac version is
+RTL_GIGA_MAC_VER_80 and revision id is 0x04. DASH is a standard for
+remote management of network device, allowing out-of-band control.
 
-Javen Xu (2):
-  r8169: add DASH support for RTL8127AP
-  r8169: enable LTR support
+Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>
+---
+ drivers/net/ethernet/realtek/r8169_main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
- drivers/net/ethernet/realtek/r8169_main.c | 116 ++++++++++++++++++++++
- 1 file changed, 116 insertions(+)
-
---=20
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 755083852eef..f9df6aadacce 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -1513,6 +1513,10 @@ static enum rtl_dash_type rtl_get_dash_type(struct rtl8169_private *tp)
+ 		return RTL_DASH_EP;
+ 	case RTL_GIGA_MAC_VER_66:
+ 		return RTL_DASH_25_BP;
++	case RTL_GIGA_MAC_VER_80:
++		return (tp->pci_dev->revision == 0x04)
++			? RTL_DASH_25_BP
++			: RTL_DASH_NONE;
+ 	default:
+ 		return RTL_DASH_NONE;
+ 	}
+-- 
 2.43.0
 
 
