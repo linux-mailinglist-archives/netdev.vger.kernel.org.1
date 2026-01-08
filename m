@@ -1,190 +1,286 @@
-Return-Path: <netdev+bounces-248031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9DD0D026E2
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 12:36:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 977D3D0286A
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 13:05:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 60F14302DC9E
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 11:20:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F2B4B313082A
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 11:46:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CA1F45C3AD;
-	Thu,  8 Jan 2026 10:16:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174B535580D;
+	Thu,  8 Jan 2026 10:17:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WW/z2JSe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f207.google.com (mail-oi1-f207.google.com [209.85.167.207])
+Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 402E344D685
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 10:16:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8266F39E6C7
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 10:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767867384; cv=none; b=uCRysUUy+ljfXkj6ndBcEDaqBxY4mukTD6YTq3kU2WBfjFHF2EofGLoMaJY4WpnFvQdnzaYEmID6ddPMXzBkmVwT5cI61C1q0WiIjbnJT3bAKqjwf5R3B2yIfNJFxW9Ae0C52qedfnXpybaYHzkvgAp1eutqXpfMJdFU5hiZb2E=
+	t=1767867449; cv=none; b=B55DJSYMN//uvw8JdCCqw+lSzFpgCn0J4drsyQT2zApSPHTKWJyjxlU2NS3iWiwxPFbUvSd58dY35d7XvuY43+PENWHpKOjktunyk+7ykezlmILScjrwDOAD+Qt8ypbDLy8X57bSSl6AN3F87451+at+pvv/kraskpBKnl43AYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767867384; c=relaxed/simple;
-	bh=r46TeTAsvXLyudt9PQ5TJmUtz6XZj6rTn/Rg5C2jtIw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=cgWZdPOfpwAP1DlslTWSVPjhit5XLe0WZgkJVHvc2ZDno/gd0mWTj2uOq7wWF9PShqTcTfW1uxdPLuBBzFp7/T2c3faGV+WUo81DU/sCyI5vMtvzLERYKyWwEZ76vm1txTtVsg4T2sWBNzkF2RPTcCmHqI5a/N8XpbLgzNJ56Kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f207.google.com with SMTP id 5614622812f47-4512e9f2f82so5613245b6e.3
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 02:16:20 -0800 (PST)
+	s=arc-20240116; t=1767867449; c=relaxed/simple;
+	bh=Ogh8tAOoOjINkJI4yg6EZF9WR+UCZs8B5H9QpYxebYA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pbkT2mhBfqj/dQ1b+s0C7m5donOpJ1WglpoKIBJxQ+Yx8KzdJMDfWAq0188412bFBaNDJcp/C2i3ASB7aNWA6d2mqtwsq23xFScrIU2Nt4pc/EyP40SFRdGhqLO9aEAbqzmse2XmylsTOpva1X+LQlUXlaDDQn0o/Lg2JR/rB7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WW/z2JSe; arc=none smtp.client-ip=74.125.82.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-121bf277922so3120975c88.0
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 02:17:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767867437; x=1768472237; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yZ1fs3Ohphla2JOGra+RJtxs+PcO1u7EwjOa/BB89TI=;
+        b=WW/z2JSejySQzKm0tAXNzhnxRVch7X7N50GYxAXZbi5y5dCU/RvVSYI97dMly4SWS0
+         vRHLhdojmEfx2ZSN/TsEbgGMikmjXx9YlYHLohotcQ3P7LVcH83sIiNyf7mXGTXAxTIu
+         fy+6JMK5DXstvnlJfgofzMVU2iEJTtRwmcyYpv30hzNtyGZwiemTlUnV19Fwa3p/LYgY
+         RzFJoHW9F8Im6ZL5RVn4g+EHaait+6HDVkVA0xiQoMmK/DATD0eaIr/uLJt+3ZL1duTD
+         3Hsj9LRPANhjxy3+TmW+uYMgl/xA4v9yAWmGz/SY0KVuC9tdVAIgedTW/HrCocGBipIg
+         H5rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767867379; x=1768472179;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HfzHvGppm2YPB7GFJv3lvZRdv00vKd6q9SmsqIhkZt4=;
-        b=dFi+SV4W0BRTgIPsxIXLTZUUbEEDTmVAABTbUTRWV/nWyEUD5iJyrSnyOsXmNH+TwE
-         jXmDXqb0MZKlZq+RwEDBvnVD8GiO3b/eebsFoWX3D0NQAlJzxb6uHKVjRC7p5vagg4th
-         uIWFskTYfuoDpQmtkF1FOsGZKEh2SQnAQb1Fzepu7+fTsvXmsiD/ND5ten29GIXJ4/ib
-         ZhRqngbBc9vg1mmVKoI3S4TJRpqMXl4+THGhhXap8x6QcHrrqHFL8hQZHadcxrUUDoOf
-         0QcSzpGYgfVxUVm1I7pPG8OKyqDV3c4J9klgu4aucDD4gWcJTdXV+MIDt/5jM5z2Fat4
-         68XA==
-X-Forwarded-Encrypted: i=1; AJvYcCWwcgQhPyQtkkyq39skHQCpB4zyt1gu71mcNeXSSdFe8KiBSjEK7wkFn8V3wlB/ne7eR5vtxNQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxK2KIo88ieJzBnIFdpK2YgZqzqVPx+ICcKLzhuE3RLmPEvG29Z
-	/pVvf7NT6svzpur8oJMa0aQucwrU5FjqOvA53zqGKhvOvdqdQ8hMjRjx/fPOOuE1n9tT2P/9LN9
-	lA48kQdU9Xc+rjdVQsWzot2c8tPTKEs7we3GTn7ZEBHNnihqoxRcZWy1EzmE=
-X-Google-Smtp-Source: AGHT+IGlG9xMD/Xg43vd6VzYzy/bP8Xcm+nWbQlnZVG1oqAohaZtzbuXMPHk7W4Hw07khUgFjwxb+gmfZ2h9K/mOj5AnkwCpX6vv
+        d=1e100.net; s=20230601; t=1767867437; x=1768472237;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=yZ1fs3Ohphla2JOGra+RJtxs+PcO1u7EwjOa/BB89TI=;
+        b=TvqrmLWgmk8pO08rSjvIfFYr+/y29G+VJL0qIRrIZLW6W9sBdYJsZHT/JuFB8pPzNL
+         2rt3s8yl/994ZOVk8LUb9tBU/ABk4OF/4xIVaIdvIHjjCy8q17o5Y6HAKlGTj3I+NsXO
+         6bj1vvxRnL+mFYNfykVVETCI1ALmR1Gy3ShSbWetzNCRKbFAhN4wAQkF2HRku3cab351
+         j4+TMv09ZrI27KhEokN961agi1LCADnz4vJzY4R67nS795FcHoJ9jY9a1orb2YzE43uN
+         AyZszXbc8byTc+ShFn0SP8yR/oZ8SRdQ/Vv2YotYx3vKIksXHB/2CnL4mDXZEYutaMoh
+         AGhA==
+X-Forwarded-Encrypted: i=1; AJvYcCU8Hb6d/TM4VpVYtun7G6GTFb7+GCOVRGQZWoqimTbGSPg5sqWnxLpaC6nfX2u0vC0G1q9SyG4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxc8uZdh0Rce9NFHLy3jN/nb9YaIcFjkL/zB///sQQFBUbot3Gh
+	itlPcLQu4aGuH1EwiKQLNdkr7xJEqf3ezq8o62PINj56UQlTyb9j4P1IqfeXSQ+lI+11fM1T/Bv
+	oNWweK5vByNcmez/CFQHkXOnqdK1VYB1TIVo9oI48
+X-Gm-Gg: AY/fxX6XmFT/t0r1IAKKRsz5ctdnNW+VGud+AXdbLdxHMEZBqf38tnFYecv+48UqJsf
+	xqIdJZZQV6N7V8fjMfZe3xx9Ve8a9qOSgEfgTlwpyb1HrIgOgI4357fysPaSU4hZV8j9wiccRO4
+	uZ2MYlcbrxfNhHB+v19ou2FTGnUkUko3095UGW8Ind0DCbieI3zw/EMU76rGojmVyofYH6yc9SO
+	aXYvz90t5QwJ6b62E/LXwXkOAURuId5xENRTcWJmjDcK6f8pvO6CjedJtxkG5fjb3qyIgcc1jTt
+	jwob+LcldapZ09ieo5c9O8hlj4lFXw==
+X-Google-Smtp-Source: AGHT+IEMMbaQfZ7lBCEbNvFvi7mbfGcSl9hnMwuZ0q+ABdPgHEIYL9VhTGNA99HN668kF16xmTxfRs7XrSrMkqOwvT8=
+X-Received: by 2002:a05:7022:23a5:b0:11a:c8f4:3216 with SMTP id
+ a92af1059eb24-121f8b14c84mr4064588c88.15.1767867436254; Thu, 08 Jan 2026
+ 02:17:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:a1a1:b0:65b:29af:b562 with SMTP id
- 006d021491bc7-65f5508542emr1552625eaf.77.1767867379436; Thu, 08 Jan 2026
- 02:16:19 -0800 (PST)
-Date: Thu, 08 Jan 2026 02:16:19 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <695f83f3.050a0220.1c677c.0392.GAE@google.com>
-Subject: [syzbot] [net?] KMSAN: kernel-infoleak in __skb_datagram_iter (5)
-From: syzbot <syzbot+bfc7323743ca6dbcc3d3@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+References: <20251231213314.2979118-1-utilityemal77@gmail.com>
+ <CAAVpQUCF3uES6j22P1TYzgKByw+E4EqpM=+OFyqtRGStGWxH+Q@mail.gmail.com>
+ <aVuaqij9nXhLfAvN@google.com> <CAAVpQUB6gnfovRZAg_BfVKPuS868dFj7HxthbxRL-nZvcsOzCg@mail.gmail.com>
+ <aV5WTGvQB0XI8Q_N@google.com>
+In-Reply-To: <aV5WTGvQB0XI8Q_N@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Thu, 8 Jan 2026 02:17:05 -0800
+X-Gm-Features: AQt7F2rdIe6CkrQHtb0o9QvKbxRtFU-yNoPsYBohXhvgwop6uzgiOI8WxkEiNf4
+Message-ID: <CAAVpQUAd==+Pw02+E6UC-qwaDNm7aFg+Q9YDbWzyniShAkAhFQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/1] lsm: Add hook unix_path_connect
+To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
+Cc: Justin Suess <utilityemal77@gmail.com>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E . Hallyn" <serge@hallyn.com>, Simon Horman <horms@kernel.org>, 
+	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	linux-security-module@vger.kernel.org, Tingmao Wang <m@maowtm.org>, 
+	netdev@vger.kernel.org, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Wed, Jan 7, 2026 at 4:49=E2=80=AFAM G=C3=BCnther Noack <gnoack@google.co=
+m> wrote:
+>
+> On Tue, Jan 06, 2026 at 11:33:32PM -0800, Kuniyuki Iwashima wrote:
+> > +VFS maintainers
+> >
+> > On Mon, Jan 5, 2026 at 3:04=E2=80=AFAM G=C3=BCnther Noack <gnoack@googl=
+e.com> wrote:
+> > >
+> > > Hello!
+> > >
+> > > On Sun, Jan 04, 2026 at 11:46:46PM -0800, Kuniyuki Iwashima wrote:
+> > > > On Wed, Dec 31, 2025 at 1:33=E2=80=AFPM Justin Suess <utilityemal77=
+@gmail.com> wrote:
+> > > > > Motivation
+> > > > > ---
+> > > > >
+> > > > > For AF_UNIX sockets bound to a filesystem path (aka named sockets=
+), one
+> > > > > identifying object from a policy perspective is the path passed t=
+o
+> > > > > connect(2). However, this operation currently restricts LSMs that=
+ rely
+> > > > > on VFS-based mediation, because the pathname resolved during conn=
+ect()
+> > > > > is not preserved in a form visible to existing hooks before conne=
+ction
+> > > > > establishment.
+> > > >
+> > > > Why can't LSM use unix_sk(other)->path in security_unix_stream_conn=
+ect()
+> > > > and security_unix_may_send() ?
+> > >
+> > > Thanks for bringing it up!
+> > >
+> > > That path is set by the process that acts as the listening side for
+> > > the socket.  The listening and the connecting process might not live
+> > > in the same mount namespace, and in that case, it would not match the
+> > > path which is passed by the client in the struct sockaddr_un.
+> >
+> > Thanks for the explanation !
+> >
+> > So basically what you need is resolving unix_sk(sk)->addr.name
+> > by kern_path() and comparing its d_backing_inode(path.dentry)
+> > with d_backing_inode (unix_sk(sk)->path.dendtry).
+> >
+> > If the new hook is only used by Landlock, I'd prefer doing that on
+> > the existing connect() hooks.
+>
+> I've talked about that in the "Alternative: Use existing LSM hooks" secti=
+on in
+> https://lore.kernel.org/all/20260101134102.25938-1-gnoack3000@gmail.com/
+>
+> If we resolve unix_sk(sk)->addr.name ourselves in the Landlock hook
+> again, we would resolve the path twice: Once in unix_find_bsd() in
+> net/unix/af_unix.c (the Time-Of-Use), and once in the Landlock
+> security hook for the connect() operation (the Time-Of-Check).
+>
+> If I understand you correctly, you are suggesting that we check that
+> the inode resolved by af_unix
+> (d_backing_inode(unix_sk(sk)->path.dentry)) is the same as the one
+> that we resolve in Landlock ourselves, and therefore we can detect the
+> TOCTOU race and pretend that this is equivalent to the case where
+> af_unix resolved to the same inode with the path that Landlock
+> observed?
+>
+> If the walked file system hierarchy changes in between these two
+> accesses, Landlock enforces the policy based on path elements that
+> have changed in between.
+>
+> * We start with a Landlock policy where Unix connect() is restricted
+>   by default, but is permitted on "foo/bar2" and everything underneath
+>   it.  The hierarchy is:
+>
+>   foo/
+>       bar/
+>           baz.sock
+>       bar2/        <--- Landlock rule: socket connect() allowed here and =
+below
+>
+> * We connect() to the path "foo/bar/baz.sock"
+> * af_unix.c path lookup resolves "foo/bar/baz.sock" (TOU)
+>   This works because Landlock is not checked at this point yet.
+> * In between the two lookups:
+>   * the directory foo/bar gets renamed to foo/bar.old
+>   * foo/bar2 gets moved to foo/bar
+>   * baz.sock gets moved into the (new) foo/bar directory
+> * Landlock check: path lookup of "foo/bar/baz.sock" (TOC)
+>   and subsequent policy check using the resolved path.
+>
+>   This succeeds because connect() is permitted on foo/bar2 and
+>   beneath.  We also check that the resolved inode is the same as the
+>   one resolved by af_unix.c.
+>
+> And now the reasoning is basically that this is fine because the
+> (inode) result of the two lookups was the same and we pretend that the
+> Landlock path lookup was the one where the actual permission check was
+> done?
 
-syzbot found the following issue on:
+Right.  IIUC, even in your patch, the file could be renamed
+while LSM is checking the path, no ?  I think holding the
+path ref does not lock concurrent rename operations.
 
-HEAD commit:    f0b9d8eb98df Merge tag 'nfsd-6.19-3' of git://git.kernel.o..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=13f9be9a580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b3903bdf68407a14
-dashboard link: https://syzkaller.appspot.com/bug?extid=bfc7323743ca6dbcc3d3
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-userspace arch: i386
+To me, it's not a small race and basically it's the same with
+the ops below,
 
-Unfortunately, I don't have any reproducer for this issue yet.
+sk1.bind('test')
+sk1.listen()
+os.rename('test', 'test2')
+sk2.connect('test2')
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/d9ff9c5037b8/disk-f0b9d8eb.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/b3c97cb6b38c/vmlinux-f0b9d8eb.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d523f5e33ff5/bzImage-f0b9d8eb.xz
+sk1.bind('test')
+sk1.listen()
+sk2.connect('test1')
+os.rename('test', 'test2')
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+bfc7323743ca6dbcc3d3@syzkaller.appspotmail.com
+and the important part is whether the path _was_ the
+allowed one when LSM checked the path.
 
-=====================================================
-BUG: KMSAN: kernel-infoleak in instrument_copy_to_user include/linux/instrumented.h:114 [inline]
-BUG: KMSAN: kernel-infoleak in copy_to_user_iter lib/iov_iter.c:24 [inline]
-BUG: KMSAN: kernel-infoleak in iterate_ubuf include/linux/iov_iter.h:30 [inline]
-BUG: KMSAN: kernel-infoleak in iterate_and_advance2 include/linux/iov_iter.h:302 [inline]
-BUG: KMSAN: kernel-infoleak in iterate_and_advance include/linux/iov_iter.h:330 [inline]
-BUG: KMSAN: kernel-infoleak in _copy_to_iter+0xef3/0x33f0 lib/iov_iter.c:197
- instrument_copy_to_user include/linux/instrumented.h:114 [inline]
- copy_to_user_iter lib/iov_iter.c:24 [inline]
- iterate_ubuf include/linux/iov_iter.h:30 [inline]
- iterate_and_advance2 include/linux/iov_iter.h:302 [inline]
- iterate_and_advance include/linux/iov_iter.h:330 [inline]
- _copy_to_iter+0xef3/0x33f0 lib/iov_iter.c:197
- copy_to_iter include/linux/uio.h:220 [inline]
- simple_copy_to_iter net/core/datagram.c:521 [inline]
- __skb_datagram_iter+0x196/0x12c0 net/core/datagram.c:402
- skb_copy_datagram_iter+0x5b/0x1e0 net/core/datagram.c:535
- skb_copy_datagram_msg include/linux/skbuff.h:4217 [inline]
- netlink_recvmsg+0x4bb/0xfe0 net/netlink/af_netlink.c:1951
- sock_recvmsg_nosec net/socket.c:1078 [inline]
- sock_recvmsg+0x2df/0x390 net/socket.c:1100
- ____sys_recvmsg+0x193/0x610 net/socket.c:2812
- ___sys_recvmsg+0x20b/0x850 net/socket.c:2854
- __sys_recvmsg net/socket.c:2887 [inline]
- __do_sys_recvmsg net/socket.c:2893 [inline]
- __se_sys_recvmsg net/socket.c:2890 [inline]
- __x64_sys_recvmsg+0x20e/0x3d0 net/socket.c:2890
- x64_sys_call+0x38b7/0x3e70 arch/x86/include/generated/asm/syscalls_64.h:48
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd3/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>
+> Some pieces of this which I am still unsure about:
+>
+> * What we are supposed to do when the two resolved inodes are not the
+>   same, because we detected the race?  We can not allow the connection
+>   in that case, but it would be wrong to deny it as well.  I'm not
+>   sure whether returning one of the -ERESTART* variants is feasible in
+>   this place and bubbles up correctly to the system call / io_uring
+>   layer.
 
-Uninit was stored to memory at:
- pskb_expand_head+0x310/0x15d0 net/core/skbuff.c:2290
- netlink_trim+0x3a3/0x450 net/netlink/af_netlink.c:1299
- netlink_broadcast_filtered+0x80/0x28f0 net/netlink/af_netlink.c:1512
- nlmsg_multicast_filtered include/net/netlink.h:1165 [inline]
- nlmsg_multicast include/net/netlink.h:1184 [inline]
- nlmsg_notify+0x15b/0x2f0 net/netlink/af_netlink.c:2593
- rtnl_notify+0xba/0x100 net/core/rtnetlink.c:958
- wireless_nlevent_flush net/wireless/wext-core.c:354 [inline]
- wireless_nlevent_process+0xfe/0x290 net/wireless/wext-core.c:414
- process_one_work kernel/workqueue.c:3257 [inline]
- process_scheduled_works+0xb91/0x1d80 kernel/workqueue.c:3340
- worker_thread+0xedf/0x1590 kernel/workqueue.c:3421
- kthread+0xd5c/0xf00 kernel/kthread.c:463
- ret_from_fork+0x208/0x710 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
-
-Uninit was stored to memory at:
- wireless_send_event+0x652/0x1540 net/wireless/wext-core.c:580
- ioctl_standard_iw_point+0x12b0/0x13f0 net/wireless/wext-core.c:896
- compat_standard_call+0x188/0x4c0 net/wireless/wext-core.c:1108
- wireless_process_ioctl net/wireless/wext-core.c:-1 [inline]
- wext_ioctl_dispatch+0x192/0x7a0 net/wireless/wext-core.c:1014
- compat_wext_handle_ioctl+0x1a1/0x300 net/wireless/wext-core.c:1137
- compat_sock_ioctl+0x20c/0xff0 net/socket.c:3530
- __do_compat_sys_ioctl fs/ioctl.c:695 [inline]
- __se_compat_sys_ioctl fs/ioctl.c:638 [inline]
- __ia32_compat_sys_ioctl+0x7f9/0x1270 fs/ioctl.c:638
- ia32_sys_call+0x25d9/0x4340 arch/x86/include/generated/asm/syscalls_32.h:55
- do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
- __do_fast_syscall_32+0x154/0x320 arch/x86/entry/syscall_32.c:307
- do_fast_syscall_32+0x38/0x80 arch/x86/entry/syscall_32.c:332
- do_SYSENTER_32+0x1f/0x30 arch/x86/entry/syscall_32.c:370
- entry_SYSENTER_compat_after_hwframe+0x84/0x8e
-
-Local variable iwp created at:
- compat_standard_call+0x4a/0x4c0 net/wireless/wext-core.c:1095
- wireless_process_ioctl net/wireless/wext-core.c:-1 [inline]
- wext_ioctl_dispatch+0x192/0x7a0 net/wireless/wext-core.c:1014
-
-Bytes 60-63 of 64 are uninitialized
-Memory access of size 64 starts at ffff8881183ec000
-Data copied to user address 00007ffe7d4a8260
-
-CPU: 1 UID: 101 PID: 5458 Comm: dhcpcd Not tainted syzkaller #0 PREEMPT(none) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-=====================================================
+Imagine that the rename ops was done a bit earlier, which is
+before the first lookup in unix_find_bsd().  Then, the socket
+will not be found, and -ECONNREFUSED is returned.
+LSM pcan pretend as such.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+>
+> * What if other kinds of permission checks happen on a different
+>   lookup code path?  (If another stacked LSM had a similar
+>   implementation with yet another path lookup based on a different
+>   kind of policy, and if a race happened in between, it could at least
+>   be possible that for one variant of the path, it would be OK for
+>   Landlock but not the other LSM, and for the other variant of the
+>   path it would be OK for the other LSM but not Landlock, and then the
+>   connection could get accepted even if that would not have been
+>   allowed on one of the two paths alone.)  I find this a somewhat
+>   brittle implementation approach.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Do you mean that the evaluation of the stacked LSMs could
+return 0 if one of them allows it even though other LSMs deny ?
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+>
+> * Would have to double check the unix_dgram_connect code paths in
+>   af_unix to see whether this is feasible for DGRAM sockets:
+>
+>   There is a way to connect() a connectionless DGRAM socket, and in
+>   that case, the path lookup in af_unix happens normally only during
+>   connect(),
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+Note that connected DGRAM socket can send() data to other sockets
+by specifying the peer name in each send(), and even they can
+disconnect by connect(AF_UNSPEC).
 
-If you want to undo deduplication, reply with:
-#syz undup
+
+> very far apart from the initial security_unix_may_send()
+>   LSM hook which is used for DGRAM sockets - It would be weird if we
+>   were able to connect() a DGRAM socket, thinking that now all path
+>   lookups are done, but then when you try to send a message through
+>   it, Landlock surprisingly does the path lookup again based on a very
+>   old and possibly outdated path.  If Landlock's path lookup fails
+>   (e.g. because the path has disappeared, or because the inode now
+>   differs), retries won't be able to recover this any more.  Normally,
+>   the path does not need to get resolved any more once the DGRAM
+>   socket is connected.
+>
+>   Noteworthy: When Unix servers restart, they commonly unlink the old
+>   socket inode in the same place and create a new one with bind().  So
+>   as the time window for the race increases, it is actually a common
+>   scenario that a different inode with appear under the same path.
+>
+> I have to digest this idea a bit.  I find it less intuitive than using
+> the exact same struct path with a newly introduced hook, but it does
+> admittedly mitigate the problem somewhat.  I'm just not feeling very
+> comfortable with security policy code that requires difficult
+> reasoning. =F0=9F=A4=94 Or maybe I interpreted too much into your suggest=
+ion. :)
+> I'd be interested to hear what you think.
+>
+> =E2=80=94G=C3=BCnther
 
