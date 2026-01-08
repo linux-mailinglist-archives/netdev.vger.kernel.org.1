@@ -1,127 +1,112 @@
-Return-Path: <netdev+bounces-248015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0F11D02031
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 11:06:17 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1F1FD02475
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 12:03:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CB965310ABA1
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 09:28:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3BCAE3001636
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 11:03:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22CB542C3F7;
-	Thu,  8 Jan 2026 09:23:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 425AE43530C;
+	Thu,  8 Jan 2026 09:23:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gh5nmJmh"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="R+vNtJUu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E07E94366FC
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 09:23:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E204366ED;
+	Thu,  8 Jan 2026 09:23:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767864195; cv=none; b=fKj2PmL0npsY/CpzjNPXJiNm+stVFPX6FVue5aoHWi92FnHCT1sWxb1bi4nK8pP860oKXR/8F4NprgYP4Z8R+LaZJLaw40at0lzII/UGN0D4DpmQqQTQkiAeGQiiA852ptI3b1zNAnGzxzyHCEjriDA2O/hwRJmC8SeDUM1wbPk=
+	t=1767864204; cv=none; b=N4P5HTdLealui4fFlZKBbuhhbAkg7QTLAPyu/0KU2cU6Y050RrvnEqlTRkSKO6K9cHreAk15pEg7yl69S2V9CYt6g6dDsF6n6zOLIEjMdtZWA4RsOJ6Qw3ww/txFTX8JsDuir2qpqiuvt2tJNkCSnLNyNL+1wsO7LFF6f5ofuGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767864195; c=relaxed/simple;
-	bh=pfSA6BFLcq+T+Czfs8ZmyisuGlZDzt+vthInVmHVXG0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oNqBYos8VXWq6XMExFTDGV1Eskv8+JpWBdZoZZlUUbXJQ5Dtd4p6UHETyNY/QcrDohP+HHYAPGHJnxXYp5RrIAGAb4gviLpP9//V2dex4/iCFygxNFQ8kyNk9a7SvkjZrkR/PZKI0Tb0rRb5TxxBKMAcPMM4d6LHJRoIla1XUdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gh5nmJmh; arc=none smtp.client-ip=209.85.219.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-88a2d21427dso30291696d6.3
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 01:23:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767864186; x=1768468986; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gioCXq6nTAkg2YLHxtZAgY/YHH9fRIxqTnJ/8upycr8=;
-        b=Gh5nmJmhz9M6odxQa5EpD7iq6Pshq0xVvhaYZzNcTXCRz5ld/LYhTlFcRb5fugetAT
-         b47ogarod6tTyPCJPFwwjNOqvbv65BWLDMGwCMxV7+wHTMIYrhqLm6J7Vvh2aFPxmZu2
-         Wp7YPV2BP9+HkAQw4iGdZzbJGvJ8R2TSJac30UXhaRWmYmpEpOzoQJXN1chp3wxA8fXa
-         oJ1JTbrH8ENWs4Y430xRbG376D91fZeT+s+mLJ+XdK3QtMFkJ65JZTRfJJxnH5zXGpzY
-         alM6y8P5EiD9u5hJJNDVsZ0AC50JaHgntmtkFuSzddQKTKMB9ENZhx80oxcJWvBgl8ie
-         MB5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767864186; x=1768468986;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=gioCXq6nTAkg2YLHxtZAgY/YHH9fRIxqTnJ/8upycr8=;
-        b=k5MqjDceNOwKZY2/IdKCj5TtrQj6t3nD2ZYxFnVoPsNCH4jJGbdpWDoih1jhK7LTiw
-         LaaPJSYzWaKnedn4o3W4igOn44czEfGJwPZcgpa5uPj+p6INiCxGi7h6I8YIJ8XV1tW5
-         jV/iXSWZwali1u8KlEQ5yenWRDBh/R5TePqphV32Ewo8AGd6Ne6Geu7uzDRDEvKD2Db3
-         5rzBHQ3MFnlpJ9GstmfcUT6zk3YZn6CMq1aF/w3JWowsyvhy2KYlDZhzXTc5CJzPyMvq
-         7siqEJK6UI1v+psQn34Yjr8iU+EkwBsxFqK6mrSnrb3FZDSf1Z3PAWQ+V0Uszt4Ah2tn
-         beDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUpEWgu4IrLVGu1MCHULJViOrS6bqhd0yWuv8hGR2u9BF7IFMyI+VGVv75jQ48cpCRsoSgM31Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvQU9vKt83unB+yrY5VKGQJ9cYFMDAMdL9OxUVnPXRV7uGlGh2
-	TrGDe7b3dFX4JOxmz0exj+Bqqi7kwuHkGaHw9G/oIzGnsG7gLN/HJLF+jbITx6H0+7YrMswGp7t
-	1qowNkGEoUQ7YeiJm6gixvB0ZV7NIS354mbhu1OUU
-X-Gm-Gg: AY/fxX7ePnfrpZ9pK1C++HSXEXKdYAhTkGYPRMjq8kl/R33vFzChuL7HKYf0Sgxl9AF
-	by2HR14dgX8nsbaXlvA1qdtOZtOKpUxvt0UNSIC6u64ySv8z2DxxHhfO0hjYRw3UPYSfuKFd5cg
-	GDdBCL3bmjz3nDzaWbsnADWsm33HnW7GLUqcA6MO0GbDpWFQ/yScchIR7/AnGrN27B+DI/Yvm4Y
-	uqJtgZBccEQP7zJ1qBQEv4Z8PDnWs++gwgRUaXANAx2T7gKY3PW9xyr5WmX0ejqqhBaOA==
-X-Google-Smtp-Source: AGHT+IGZX/gylyILRvYSQ0dm8ryNutv8QBrmfiAv3BMoc3OEcbsbCfeav9AV9q+DZxg3mXV6vgEHhKixrPWBHdVB6ao=
-X-Received: by 2002:ad4:5cab:0:b0:88a:4391:59cc with SMTP id
- 6a1803df08f44-890842710a6mr71766116d6.50.1767864186233; Thu, 08 Jan 2026
- 01:23:06 -0800 (PST)
+	s=arc-20240116; t=1767864204; c=relaxed/simple;
+	bh=T6ODENUXXRk+WwiW0UQcfJyWXcsELYis0y45Qs/7hMk=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WS4g27KqWJRzuOgYZHWsal9hvzxpAFnNzYnrx++8dnFBSbnNwnGuD/icn/Nw6WhED/rXwiVnV5JLrSCZ6RGp+OuWmH0AhA+mNWPJUTigLXHpgJ75l7Ytmd/oqUuDydPsWQN4WWTLjvnCnhoJoydGeWdyhcm0hHIb0TtQK0cy7gE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=R+vNtJUu; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 607MKSKI1059551;
+	Thu, 8 Jan 2026 01:23:04 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=bWwu8cfUEeAT1XNq1HbUAkafD
+	ALxf8PrG5YcA2bFXMc=; b=R+vNtJUuJgWbVLfmosN6iOf5tcRHHwcYz82dyO6zr
+	K94zRQuBsg83M0G7dNJWp+egbq9uuvQZq5A9EjbhcD5F+Vt5agDrl+C0bC3rWHPa
+	/PnEkECrQEnxJSo4f+lmO7lbAIdKBS3m+MlZ8JAIbz1HKBP2oRhZWk1ynEM+ZaWC
+	KwapWMMdftXKKdJGPF6q74wrL6Mo2oK55f6IkuLGPuN92xYICgjDwfViaEa8cclY
+	ZvPcQFawctIU7r5ASktKIwarVlal8oLdOUizi5cEPFuO7/0yLeNn0Rs8/WE0O+mz
+	iFCeIx5bNIugz8de5vqAdxEyI6KY2Azyghz0uH9raHVuw==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bgf3fyhfw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 08 Jan 2026 01:23:04 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Thu, 8 Jan 2026 01:23:18 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Thu, 8 Jan 2026 01:23:18 -0800
+Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 0252A3F70B3;
+	Thu,  8 Jan 2026 01:23:00 -0800 (PST)
+Date: Thu, 8 Jan 2026 14:52:59 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: ALOK TIWARI <alok.a.tiwari@oracle.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <andrew+netdev@lunn.ch>, <sgoutham@marvell.com>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2 01/10] octeontx2-af: switch: Add AF to switch
+ mbox and skeleton files
+Message-ID: <aV93c1PNk_t3Qsni@rkannoth-OptiPlex-7090>
+References: <20260107132408.3904352-1-rkannoth@marvell.com>
+ <20260107132408.3904352-2-rkannoth@marvell.com>
+ <ea4fc014-251c-4d5f-adc6-0e3aa562862a@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260107125423.4031241-1-edumazet@google.com> <695f50c2.050a0220.1c677c.038a.GAE@google.com>
-In-Reply-To: <695f50c2.050a0220.1c677c.038a.GAE@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 8 Jan 2026 10:22:55 +0100
-X-Gm-Features: AQt7F2oZg3GBnUBPbwDdGZXDIWMS1CdfEALaFbRmvnvamEMsnCsdn0bQH2w6kC8
-Message-ID: <CANn89i+Z3ELnxMJdRqsUy-afppMot7Otezu3BiheH+wtOvgscg@mail.gmail.com>
-Subject: Re: [syzbot ci] Re: net: update netdev_lock_{type,name}
-To: syzbot ci <syzbot+ci131adae482253910@syzkaller.appspotmail.com>
-Cc: davem@davemloft.net, eric.dumazet@gmail.com, horms@kernel.org, 
-	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ea4fc014-251c-4d5f-adc6-0e3aa562862a@oracle.com>
+X-Authority-Analysis: v=2.4 cv=PLgCOPqC c=1 sm=1 tr=0 ts=695f7778 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=yPCof4ZbAAAA:8 a=nZhaFKFgNW1-scjISb8A:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA4MDA2MiBTYWx0ZWRfX4yJvDHzUdIf/
+ 2dlpqyAJyVSiSn6PaKcbdhTd0ix5nL4BupVmeiQlDh0IWySCCHFXri/iMp7rJKEFO7NfTsYy/kj
+ bC8C+fQY5BWJ3I2TbwAG5zg4NPm2l0/BffIMhNXMQ80lGsIA66hmhTyrPD+7vyAydiMikyq/ttX
+ 6pv+h0CWDXA053D4tI9NMLjW6vo+mbY4FYTpbrLwK5RRr2fb/lWelE+e7JcO3xSR669yyyAiC57
+ 72IDSP0/rU5IabqP8woy73VIu/rhWL90kIS37MC15kf2M5PJrsBzwgATkP00INOWz1i8JObPvSv
+ k8uAw6DtCA0plMnPt3FYDBma0JJArbwOZOXjYOYyRQZI7Xrt0+Mu2jHXTzN/zSCI0yeCUHUXGzZ
+ 8zIWdqaPVQ1McgAEcHDdIRL2QwC3619NvluBRQsx1BaLbQj9tckDiFs7LilSrX3Q4OXrDivx6ft
+ bD6ThYjtE1v0Sx2lCzg==
+X-Proofpoint-GUID: FQAS55kLHLMw62wZC7T0EPUcM-iNV3XA
+X-Proofpoint-ORIG-GUID: FQAS55kLHLMw62wZC7T0EPUcM-iNV3XA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-08_02,2026-01-07_03,2025-10-01_01
 
-On Thu, Jan 8, 2026 at 7:37=E2=80=AFAM syzbot ci
-<syzbot+ci131adae482253910@syzkaller.appspotmail.com> wrote:
+On 2026-01-08 at 14:32:33, ALOK TIWARI (alok.a.tiwari@oracle.com) wrote:
 >
-> syzbot ci has tested the following series
 >
-> [v2] net: update netdev_lock_{type,name}
-> https://lore.kernel.org/all/20260107125423.4031241-1-edumazet@google.com
-> * [PATCH v2 net] net: update netdev_lock_{type,name}
+> On 1/7/2026 6:53 PM, Ratheesh Kannoth wrote:
+> > +++ b/drivers/net/ethernet/marvell/octeontx2/af/Makefile
+> > @@ -4,6 +4,7 @@
+> >   #
+> >   ccflags-y += -I$(src)
 >
-> and found the following issue:
-> WARNING in register_netdevice
+> redundant include path
 >
-> Full report is available here:
-> https://ci.syzbot.org/series/07a2abd3-8dbc-43d0-a5d9-cdbb1a35d769
->
-> ***
->
-> WARNING in register_netdevice
->
-> tree:      net
-> URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netde=
-v/net.git
-> base:      1806d210e5a8f431ad4711766ae4a333d407d972
-> arch:      amd64
-> compiler:  Debian clang version 21.1.8 (++20251202083448+f68f64eb8130-1~e=
-xp1~20251202083504.46), Debian LLD 21.1.8
-> config:    https://ci.syzbot.org/builds/f4fb7576-ea1f-485d-9ef1-c3270f156=
-0d9/config
-> C repro:   https://ci.syzbot.org/findings/e4767ea9-6be5-4bce-9523-40ab12d=
-29b67/c_repro
-> syz repro: https://ci.syzbot.org/findings/e4767ea9-6be5-4bce-9523-40ab12d=
-29b67/syz_repro
->
-> ------------[ cut here ]------------
-> netdev_lock_pos() could not find dev_type=3D805
-
-OK, 805 is ARPHRD_IEEE802154_MONITOR, I am adding it to V3
+> > +ccflags-y += -I$(src) -I$(src)/switch/
+> >   obj-$(CONFIG_OCTEONTX2_MBOX) += rvu_mbox.o
+> >   obj-$(CONFIG_OCTEONTX2_AF) += rvu_af.o
+ACK.
 
