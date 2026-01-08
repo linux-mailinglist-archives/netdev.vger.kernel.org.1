@@ -1,107 +1,127 @@
-Return-Path: <netdev+bounces-248024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78C69D0232F
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 11:50:28 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0F11D02031
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 11:06:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C1B2C30E7765
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 10:40:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CB965310ABA1
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 09:28:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB847438389;
-	Thu,  8 Jan 2026 09:55:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22CB542C3F7;
+	Thu,  8 Jan 2026 09:23:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="1lgx+Ttr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gh5nmJmh"
 X-Original-To: netdev@vger.kernel.org
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B931437881;
-	Thu,  8 Jan 2026 09:55:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E07E94366FC
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 09:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767866137; cv=none; b=XTM/B89jJEaC2bePYJQmpGWoRtocvd5rae6Wc9nFD0MDv0FvbTguxSMTk4rlkIRtEVXg3+31y4YGfdSLfEiruQ4EeUP5jVIhTvTW/r2tB9CmR/BlDiYpB/IDqXSfspvOyK+++HZ7kQO9osKctAemcFlrqEbDYS/WMp2ghP3PGZk=
+	t=1767864195; cv=none; b=fKj2PmL0npsY/CpzjNPXJiNm+stVFPX6FVue5aoHWi92FnHCT1sWxb1bi4nK8pP860oKXR/8F4NprgYP4Z8R+LaZJLaw40at0lzII/UGN0D4DpmQqQTQkiAeGQiiA852ptI3b1zNAnGzxzyHCEjriDA2O/hwRJmC8SeDUM1wbPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767866137; c=relaxed/simple;
-	bh=B6S8TBSEiyZ4YvS8fr2U3VKqbBmcKmxGs9b0vsWOMtE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tIWbNG3CoB92SvA5iK4rj7jla/JuZ8RvGi4GWoGKMUX6lePWcq5dHYjRNXMgPApUcLqbbqbjtKkPUT3Ala5pyxaCLy5C/G+eQzPW6J/bzRvUk64ADuEoRsqARlTSkBz2bQe8Kbq64SYWE1dK46G+gvZALojFHwItlaKjCuW/6gw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=1lgx+Ttr; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=V322NNHDb3UZVoqZIix2wB9FULXm13D1D7TjShLxhms=; b=1lgx+TtrnOTcAWNaHwOJeJJVHn
-	DyPjOfISZ4Kg/UeId70CNJkWdYZL/7CyDc0hGhjp5dOzsF4RdiVapAEoNCy0ub06Efqc2ul//Ytgg
-	9iGRubksPBx36SZADmZcTH/atant2NAwafFCklQmAws4ZaSpEIPHjyx+iEU7+jRTTdBIobpdCBxq2
-	Ov3/I3120b6hGm6/07ct1YEOTxQx1pEm0b3zaz2vLH3dlGfLtPYVLRglb+JIWT3IQlQIDgIV9bOsy
-	V3PDm49bgH3If+PQjrOSiKjhfvZgR3n4o3mbMhYsX863RlE77jdGj7Y2POsUQ5Twr+Q4iGOMTugA4
-	+/cTyhpuEehxGFkwoY9a1UEtidB0a0zk7U2bKjfrJHhwctV8WZTc011KVTpG0T7+D+RFZdfRL8YzC
-	kW4e2dO9Z1+4uk7YorinwXnfFsNK3v/3o324J699DM3d3/rOY5teeMg3osG179RtWb8bFIgoN20l5
-	f1rPWJJUBq+R+l4Zu3QFl334;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1vdm6s-003RwX-1B;
-	Thu, 08 Jan 2026 09:15:14 +0000
-Message-ID: <a0453a42-ee41-466a-b8aa-8eaaa38d7905@samba.org>
-Date: Thu, 8 Jan 2026 10:15:13 +0100
+	s=arc-20240116; t=1767864195; c=relaxed/simple;
+	bh=pfSA6BFLcq+T+Czfs8ZmyisuGlZDzt+vthInVmHVXG0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oNqBYos8VXWq6XMExFTDGV1Eskv8+JpWBdZoZZlUUbXJQ5Dtd4p6UHETyNY/QcrDohP+HHYAPGHJnxXYp5RrIAGAb4gviLpP9//V2dex4/iCFygxNFQ8kyNk9a7SvkjZrkR/PZKI0Tb0rRb5TxxBKMAcPMM4d6LHJRoIla1XUdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gh5nmJmh; arc=none smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-88a2d21427dso30291696d6.3
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 01:23:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767864186; x=1768468986; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gioCXq6nTAkg2YLHxtZAgY/YHH9fRIxqTnJ/8upycr8=;
+        b=Gh5nmJmhz9M6odxQa5EpD7iq6Pshq0xVvhaYZzNcTXCRz5ld/LYhTlFcRb5fugetAT
+         b47ogarod6tTyPCJPFwwjNOqvbv65BWLDMGwCMxV7+wHTMIYrhqLm6J7Vvh2aFPxmZu2
+         Wp7YPV2BP9+HkAQw4iGdZzbJGvJ8R2TSJac30UXhaRWmYmpEpOzoQJXN1chp3wxA8fXa
+         oJ1JTbrH8ENWs4Y430xRbG376D91fZeT+s+mLJ+XdK3QtMFkJ65JZTRfJJxnH5zXGpzY
+         alM6y8P5EiD9u5hJJNDVsZ0AC50JaHgntmtkFuSzddQKTKMB9ENZhx80oxcJWvBgl8ie
+         MB5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767864186; x=1768468986;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=gioCXq6nTAkg2YLHxtZAgY/YHH9fRIxqTnJ/8upycr8=;
+        b=k5MqjDceNOwKZY2/IdKCj5TtrQj6t3nD2ZYxFnVoPsNCH4jJGbdpWDoih1jhK7LTiw
+         LaaPJSYzWaKnedn4o3W4igOn44czEfGJwPZcgpa5uPj+p6INiCxGi7h6I8YIJ8XV1tW5
+         jV/iXSWZwali1u8KlEQ5yenWRDBh/R5TePqphV32Ewo8AGd6Ne6Geu7uzDRDEvKD2Db3
+         5rzBHQ3MFnlpJ9GstmfcUT6zk3YZn6CMq1aF/w3JWowsyvhy2KYlDZhzXTc5CJzPyMvq
+         7siqEJK6UI1v+psQn34Yjr8iU+EkwBsxFqK6mrSnrb3FZDSf1Z3PAWQ+V0Uszt4Ah2tn
+         beDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUpEWgu4IrLVGu1MCHULJViOrS6bqhd0yWuv8hGR2u9BF7IFMyI+VGVv75jQ48cpCRsoSgM31Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvQU9vKt83unB+yrY5VKGQJ9cYFMDAMdL9OxUVnPXRV7uGlGh2
+	TrGDe7b3dFX4JOxmz0exj+Bqqi7kwuHkGaHw9G/oIzGnsG7gLN/HJLF+jbITx6H0+7YrMswGp7t
+	1qowNkGEoUQ7YeiJm6gixvB0ZV7NIS354mbhu1OUU
+X-Gm-Gg: AY/fxX7ePnfrpZ9pK1C++HSXEXKdYAhTkGYPRMjq8kl/R33vFzChuL7HKYf0Sgxl9AF
+	by2HR14dgX8nsbaXlvA1qdtOZtOKpUxvt0UNSIC6u64ySv8z2DxxHhfO0hjYRw3UPYSfuKFd5cg
+	GDdBCL3bmjz3nDzaWbsnADWsm33HnW7GLUqcA6MO0GbDpWFQ/yScchIR7/AnGrN27B+DI/Yvm4Y
+	uqJtgZBccEQP7zJ1qBQEv4Z8PDnWs++gwgRUaXANAx2T7gKY3PW9xyr5WmX0ejqqhBaOA==
+X-Google-Smtp-Source: AGHT+IGZX/gylyILRvYSQ0dm8ryNutv8QBrmfiAv3BMoc3OEcbsbCfeav9AV9q+DZxg3mXV6vgEHhKixrPWBHdVB6ao=
+X-Received: by 2002:ad4:5cab:0:b0:88a:4391:59cc with SMTP id
+ 6a1803df08f44-890842710a6mr71766116d6.50.1767864186233; Thu, 08 Jan 2026
+ 01:23:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 05/16] quic: provide quic.h header files for
- kernel and userspace
-To: Yohei Kojima <yk@y-koj.net>, Xin Long <lucien.xin@gmail.com>
-Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev,
- davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
- Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>,
- linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>,
- Namjae Jeon <linkinjeon@kernel.org>, Paulo Alcantara <pc@manguebit.com>,
- Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev,
- Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
- Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
- Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
- Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
- Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
- <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
- illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Daniel Stenberg <daniel@haxx.se>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>
-References: <cover.1767621882.git.lucien.xin@gmail.com>
- <127ed26fc7689a580c52316a2a82d8f418228b23.1767621882.git.lucien.xin@gmail.com>
- <aV9AwNITeyL71INz@desktop.y-koj.net>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <aV9AwNITeyL71INz@desktop.y-koj.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20260107125423.4031241-1-edumazet@google.com> <695f50c2.050a0220.1c677c.038a.GAE@google.com>
+In-Reply-To: <695f50c2.050a0220.1c677c.038a.GAE@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 8 Jan 2026 10:22:55 +0100
+X-Gm-Features: AQt7F2oZg3GBnUBPbwDdGZXDIWMS1CdfEALaFbRmvnvamEMsnCsdn0bQH2w6kC8
+Message-ID: <CANn89i+Z3ELnxMJdRqsUy-afppMot7Otezu3BiheH+wtOvgscg@mail.gmail.com>
+Subject: Re: [syzbot ci] Re: net: update netdev_lock_{type,name}
+To: syzbot ci <syzbot+ci131adae482253910@syzkaller.appspotmail.com>
+Cc: davem@davemloft.net, eric.dumazet@gmail.com, horms@kernel.org, 
+	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Am 08.01.26 um 06:29 schrieb Yohei Kojima:
->> +
->> +/* Socket Options APIs */
->> +#define QUIC_SOCKOPT_EVENT				0
->> +#define QUIC_SOCKOPT_STREAM_OPEN			1
->> +#define QUIC_SOCKOPT_STREAM_RESET			2
->> +#define QUIC_SOCKOPT_STREAM_STOP_SENDING		3
->> +#define QUIC_SOCKOPT_CONNECTION_ID			4
->> +#define QUIC_SOCKOPT_CONNECTION_CLOSE			5
->> +#define QUIC_SOCKOPT_CONNECTION_MIGRATION		6
->> +#define QUIC_SOCKOPT_KEY_UPDATE				7
-> 
-> This is a trivial point, but it would be better to align the indentation
-> of the line above.
+On Thu, Jan 8, 2026 at 7:37=E2=80=AFAM syzbot ci
+<syzbot+ci131adae482253910@syzkaller.appspotmail.com> wrote:
+>
+> syzbot ci has tested the following series
+>
+> [v2] net: update netdev_lock_{type,name}
+> https://lore.kernel.org/all/20260107125423.4031241-1-edumazet@google.com
+> * [PATCH v2 net] net: update netdev_lock_{type,name}
+>
+> and found the following issue:
+> WARNING in register_netdevice
+>
+> Full report is available here:
+> https://ci.syzbot.org/series/07a2abd3-8dbc-43d0-a5d9-cdbb1a35d769
+>
+> ***
+>
+> WARNING in register_netdevice
+>
+> tree:      net
+> URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netde=
+v/net.git
+> base:      1806d210e5a8f431ad4711766ae4a333d407d972
+> arch:      amd64
+> compiler:  Debian clang version 21.1.8 (++20251202083448+f68f64eb8130-1~e=
+xp1~20251202083504.46), Debian LLD 21.1.8
+> config:    https://ci.syzbot.org/builds/f4fb7576-ea1f-485d-9ef1-c3270f156=
+0d9/config
+> C repro:   https://ci.syzbot.org/findings/e4767ea9-6be5-4bce-9523-40ab12d=
+29b67/c_repro
+> syz repro: https://ci.syzbot.org/findings/e4767ea9-6be5-4bce-9523-40ab12d=
+29b67/syz_repro
+>
+> ------------[ cut here ]------------
+> netdev_lock_pos() could not find dev_type=3D805
 
-This is just the diff output in mail, now in my reply
-the value 5 is also moved one tab to much.
-
-It's all aligned correctly in the actual file.
-
-metze
+OK, 805 is ARPHRD_IEEE802154_MONITOR, I am adding it to V3
 
