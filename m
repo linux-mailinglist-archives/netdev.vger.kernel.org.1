@@ -1,124 +1,125 @@
-Return-Path: <netdev+bounces-248130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E4D4D03FD0
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 16:46:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5466AD04282
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:06:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B261330260CE
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:45:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7DB453174DEB
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:46:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D84DD336EE8;
-	Thu,  8 Jan 2026 15:36:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46691C2324;
+	Thu,  8 Jan 2026 15:42:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D4fNL9M1"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="SWsPUE9I";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Pdk+3aEB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5340B2DB7BC
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 15:36:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5AA2500967
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 15:41:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767886573; cv=none; b=M/6uc1Jj6Q2d73u1aLWYlCnzJfnvief3svap2yd0yAvl+upoLqyZCQ4uGAqf0c55HwFPPTsjSJvEYXnngD4bw30UYjU2WluYYEzBsLqjGEpX4TsXN19grycm8E9kPrNii9OVYPrgMvbk+dPfGI0NA82K+y+qUJQYDBiewgolNmM=
+	t=1767886922; cv=none; b=UO3vBWRtopnoHbPhEkosOK0UaUouFZxQXmfjRTiWJrKktQpdAuzddcHvCTzTlLfUyR210ja0F2545bhZot8mFNoVPjcVKfp+1BduiesaB4ZJyUIFdumBmURuFo49qa5QgIlo0flm5PS08ahA8maNlnguEDV7Ae/fkEbo3Q9Szuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767886573; c=relaxed/simple;
-	bh=ucRGlmDd3/r8nfrOQe5jirZFyZr6Y1yZ1K5F6n5ysSE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A1J2zCO3c5jRkAcWMdQXTjz7JETpZi0HrybVcbYf2SiuEBVrx4nbXTDpfE2bwkQ8MwZ+fzQE+LN8YCUAzf/gGNtD3FG7+rGh6GfHLM2KCvfGn7h0SPGwmLH3XJ2PXArQBhRIk3Ee2rOgNJs6Kcw8AWcJOhBkPpttaGNgH5Bo0bA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D4fNL9M1; arc=none smtp.client-ip=74.125.224.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-6420c08f886so4539504d50.3
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 07:36:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767886571; x=1768491371; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gnFJkRhaV66zgMXaJc/JY4M/OQDHlfL0DxhciZSYrK0=;
-        b=D4fNL9M1ZvUpk4B/6viWYNf0lLXJYQ+WYrDvruCxddqE0WVLrDmOnDSNenP9dOlGAe
-         LvmUxZspuwx//V7Aa1PorMkuW5tYajtwAzxzBCons7VBkz7x4qX6/li1MiTWLW7o7M4q
-         7XNaoK75rwXAhJfJb+UwPPpF/E/L15XMPOE5qUmnN6YVzQIhgF3eGiBwsfvRwmE6pU3m
-         M/7ytqugYrhAtpNaQk0FFqdxvA/YVvzGqYt0mJgDOI8O3IyIzcVkFJrmAOxeUWMh9Bj6
-         zOcbtMcHHxmpnv2lSdpXFBLAUM9UxCr/ArGZeIpDLINbft0Y5HiRGfG/j6j6fCdTghp7
-         j+Ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767886571; x=1768491371;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=gnFJkRhaV66zgMXaJc/JY4M/OQDHlfL0DxhciZSYrK0=;
-        b=MHiKjNWA8kYt2zLvTsMkOPCVVwLOMy4enlSUyWp76v0onPjG3ydB4D6uHMOtHGmwWt
-         0WEnXJ/ThBurBM1KCRBcBgTHjCG+HoX7FIqTMvSmIn8zRu45X9l4XOYBT8+8S1OXmk3u
-         MEe4v/Ar2W93NY8IZe0mPcZQ6ZntBy9hqFTwtOcQoPNomJrIRSCLISPObSOaYr7zC4Na
-         QjIWloCCHB8fJWOFcJ4Nv/HJ23NTC1Q/O/xu0OXTGcBsV6oGcPF9iQpV/YBxRQiYOUqW
-         zVvWtvbZ2syffOaJINWIfKlxg1TGLx0Gb5v6IGeNepVC/6w5fADCT98ZOEo/R1h8Gl1D
-         FQ3g==
-X-Forwarded-Encrypted: i=1; AJvYcCXE/2f5PoPw/1/Rloz69y9oNb67Pnd/I4CNCYlyKjcS+vFcKA0GJcrjHRnXKZAXFj132E2terc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyixk2/xuBCgUNLhto6yA84Tdinm3rIqXlUHgBQJOv18GZhlTYQ
-	Px0fJWL9ZbsdsZ8IF9YT1VLmt/LndCcy9m+0jAQHz4gaDzE5KVKHfJqXKq+4IPInhP3NCccJVB7
-	lHWvf412JxVUAJ4o6XIOUdMBKIj3yNfameHfCnuFr
-X-Gm-Gg: AY/fxX7W6wIwEgCd66LyMLE9CLl/GZXoPTSTlICPJ2qTHV3cMO1jctTJ5OEQHkmBybg
-	ci+PREXlHqs6upKmxHGE2Awq5Wd9kEVKG/OKwF+NeiDxf6BzY2hZ3lH0HN0fpNbDopVjOBi76W0
-	5kMzY8xjDhCnw7Mw3cdpsL7u/IFmXPESh8wdz4ndJzqGohY9SH/9B1jTgb/h0mlLrQlNwWe5WkV
-	9kj37VlYdvPBXcX2Ab9Q8B4ECxsroKp1P3DKFiJ0XCLIcJ2X1PoGjrlZG3PUqwzO8wGKJSSToxJ
-	j4peCt3T0MAtTqa1
-X-Google-Smtp-Source: AGHT+IEhutCa+d1fecklGrAulTr6368iVhdJVg2l+MKe+nQdWtxJwrbTRLVCZBCBVbsC0Ui7pART8ZAUov35MeYOE/U=
-X-Received: by 2002:a05:690e:c49:b0:645:5b1f:4cbf with SMTP id
- 956f58d0204a3-64716c97e5dmr5547871d50.82.1767886570937; Thu, 08 Jan 2026
- 07:36:10 -0800 (PST)
+	s=arc-20240116; t=1767886922; c=relaxed/simple;
+	bh=YNfhz7J/JCOKs9MdHhsbHE5FDZz0yzGVxx+/D4ERjJE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NUQq0W98O0yBmN4YzBuXQjRko370dz9rzFLis+3xFScvHLdZyMF/Cp+8YgM3N4jo4fBzjCEyGJlkhp2NP0MZxv5T+QaXZd+pu7by1oWQDB+F4lL2HALZiuc4cIuGhJYtq2dk143izGLpMVI5fX5weqDed5wcM0v5EGGvWMWAF5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=SWsPUE9I; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Pdk+3aEB; arc=none smtp.client-ip=103.168.172.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 9A943140005B;
+	Thu,  8 Jan 2026 10:41:58 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Thu, 08 Jan 2026 10:41:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1767886918; x=
+	1767973318; bh=2yxKiX7AZg3x23P2C7kVl6/Va64tTlWpce229PC12C4=; b=S
+	WsPUE9IcsZkkf5Mw6bJYsfMycLn1MAC1fMZv/2ozsFPbFvw5iw83xvofOjU79gW4
+	1MyEFCRPkDmvuEL8rkWRAk6x2dD9U/ewLeS42BtlNBQjYCefD06P6ByPK0W6mZ68
+	R7G4p+bZiHDp9uYvXn0doE9DZVJAGRQ45hH6pLG8lf3hzYLFBGjfEYOe2NtF1HZI
+	nz2jGm411AiOWMneSCk7UGG05q+F3W/3yg9PeulrZ2H05fVgeTQ5IraGFy2tpPxQ
+	fkTvbIrGQpUy/lnsWv04w4EdQ86XJ8DvW3PQ1WSwKF4W/QTy9V+UOpiQpzslIDc3
+	PT0bkKOQbFZc8kwevPbSA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1767886918; x=1767973318; bh=2yxKiX7AZg3x23P2C7kVl6/Va64tTlWpce2
+	29PC12C4=; b=Pdk+3aEBohsGS/sgE7lLQU4qjx5WTP2mW7dAAIDoY/nnzqyieRu
+	8cPD+LoZz4+V06QBHlNXtY0aM7nj1JlmGuXCmd+lIlasj5oOiWfqLl+9i7+EJmBZ
+	ZW5vmNyeAK2JQj5alc3Hv0howPwXOaWDcrZDpn1Z0Ayw2siS/QVD4a2HeyOTSfb4
+	vzu/KQYZKzud+p+cHQ+xTr1jgMR5vUBRJJQlhFZAsnHNmzKJWT1mig0kxy1yX7CU
+	czTK6YoHOJNZdHUKBnRsip0F5HxqiteGHycYYxfOO+jjLENjXvKGkoCDqYb9A7ut
+	EV576/t0ch6O7Y4QWd7h2lVwMoaYlY47MGA==
+X-ME-Sender: <xms:RtBfacxgFSI0kak6fT3BTPdRP4umYVzPipAUTFXs67nd4y9N55IPdA>
+    <xme:RtBfafV5imoUlRUU17lCmAZPlrpYN_2IOqODwDNHxVnyl7qKHV6F3xKZgjaan_hAQ
+    572724cB2ER3YONXP4Hm9x5x197DzIlUIpkEy6ae8iUuMZGADm5icUZ>
+X-ME-Received: <xmr:RtBfaUjJ8D0BUZOHiUJnEdmFM_EajBuEv6fLCttOY_-VyutQuGqlnVEDj9DT>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddutdeifeegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfhfgggtuggjsehttdertd
+    dttdejnecuhfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghs
+    hihsnhgrihhlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuieduge
+    dtfefhkeegteehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedt
+    necurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvth
+    dpnhgspghrtghpthhtohepkedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepkhhu
+    sggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofh
+    htrdhnvghtpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+    pdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhope
+    hprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvght
+    uggvvheslhhunhhnrdgthhdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrgh
+    dprhgtphhtthhopehjohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomh
+X-ME-Proxy: <xmx:RtBfaXCBpSdeE5-Ke-q0YQ18olYro3UTXIx53Ii9EIZkOOslJSZPXQ>
+    <xmx:RtBfaStLQS9Uygf--f0A86n9R39N1STRfWV_BMVCrDMeA3cFv3EUJQ>
+    <xmx:RtBfaTehsT7V1K7x2jV0B6ay0YIPbQFNC7m8b4qXKId910tpWXNzSA>
+    <xmx:RtBfaf9e8Bvr2TRqWVD_f6qK89_ApKrMA9rXd7RD8jFqnrHaRrncPg>
+    <xmx:RtBfaZLLHSMbzxGaZUO2XGjC6aFmkGY1pu-B9JWDiSEfgaOpV-j22Phw>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 8 Jan 2026 10:41:57 -0500 (EST)
+Date: Thu, 8 Jan 2026 16:41:55 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	john.fastabend@gmail.com
+Subject: Re: [PATCH net] MAINTAINERS: add docs and selftest to the TLS file
+ list
+Message-ID: <aV_QQ959hkQS4IAV@krikkit>
+References: <20260106200706.1596250-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260105232504.3791806-1-joshwash@google.com> <20260106182244.7188a8f6@kernel.org>
-In-Reply-To: <20260106182244.7188a8f6@kernel.org>
-From: Ankit Garg <nktgrg@google.com>
-Date: Thu, 8 Jan 2026 07:35:59 -0800
-X-Gm-Features: AQt7F2qghmcnZCTDqBJHYPPZ0nhfFsgTlE5hVuZJf6OdRubD9agLAdLg-fjfDGs
-Message-ID: <CAJcM6BGWGLrS=7b5Hq6RVZTD9ZHn7HyFssU6FDW4=-U8HD0+bw@mail.gmail.com>
-Subject: Re: [PATCH net 0/2] gve: fix crashes on invalid TX queue indices
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Joshua Washington <joshwash@google.com>, netdev@vger.kernel.org, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Catherine Sullivan <csully@google.com>, 
-	Luigi Rizzo <lrizzo@google.com>, Jon Olson <jonolson@google.com>, Sagi Shahar <sagis@google.com>, 
-	Bailey Forrest <bcf@google.com>, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260106200706.1596250-1-kuba@kernel.org>
 
-On Tue, Jan 6, 2026 at 6:22=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Mon,  5 Jan 2026 15:25:02 -0800 Joshua Washington wrote:
-> > This series fixes a kernel panic in the GVE driver caused by
-> > out-of-bounds array access when the network stack provides an invalid
-> > TX queue index.
->
-> Do you know how? I seem to recall we had such issues due to bugs
-> in the qdisc layer, most of which were fixed.
->
-> Fixing this at the source, if possible, would be far preferable
-> to sprinkling this condition to all the drivers.
-That matches our observation=E2=80=94we have encountered this panic on olde=
-r
-kernels (specifically Rocky Linux 8) but have not been able to
-reproduce it on recent upstream kernels.
+2026-01-06, 12:07:06 -0800, Jakub Kicinski wrote:
+> The TLS MAINTAINERS entry does not seem to cover the selftest
+> or docs. Add those. While at it remove the unnecessary wildcard
+> from net/tls/, there are no subdirectories anyway so this change
+> has no impact today.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: john.fastabend@gmail.com
+> CC: sd@queasysnail.net
+> ---
+>  MAINTAINERS | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
-Could you point us to the specific qdisc fixes you recall? We'd like
-to verify if the issue we are seeing on the older kernel is indeed one
-of those known/fixed bugs.
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
-If it turns out this is fully resolved in the core network stack
-upstream, we can drop this patch for the mainline driver. However, if
-there is ambiguity, do you think there is value in keeping this check
-to prevent the driver from crashing on invalid input?
-
-Thanks,
-Ankit Garg
+-- 
+Sabrina
 
