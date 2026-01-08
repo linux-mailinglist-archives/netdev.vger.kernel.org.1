@@ -1,297 +1,138 @@
-Return-Path: <netdev+bounces-248245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BC64D059DA
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 19:42:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19998D05AF7
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 19:56:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A7FDF30146F0
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 18:42:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 97A213007699
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 18:48:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 946702FD1BF;
-	Thu,  8 Jan 2026 18:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E34E27F00A;
+	Thu,  8 Jan 2026 18:48:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="tXDlQCeV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LH/vr4KI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-bc09.mail.infomaniak.ch (smtp-bc09.mail.infomaniak.ch [45.157.188.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E8C4286D70
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 18:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3DBB230BCB
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 18:48:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767897734; cv=none; b=EN7LlL2QRyrNzd89C9TFic/CoYwwDRxeAqagwWI1cdUZqA1eykKmgNSLnSkAtywWJMeLPeHPW7GZepXqs3GajrL1n/Osp+A0otvZng4eZedaNUe939T+zxXXSfvjIVjXaEiyVg/VY211OROf5kmBKtViol2oxn2Wby9pnjemkQo=
+	t=1767898115; cv=none; b=eAGcJcKJnMO6bu79V5BvNS5XzqgDnMHfr7S/lM02HqNExNVrt0S+iPpUzUhFKm7TIqzNZiy4kJmFrS/IqMYl19ry4EQeDl+nG18HC/PcUmiaGkxp/nfwH33XfwspqJ/zZl66R9LuQfH2VawlrSbqy5svY4uw8ULJ1boxjnbuiP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767897734; c=relaxed/simple;
-	bh=5AhcDwpfR+YII5+gCn87seKs+lCY2e2+wFBN2fIYU4M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eE9CBlUzj+xV340t5YA9tLjqkLSe1aJsLL751O7QTyzUxwIqfLkH+d3UO5F2ouTq4DLCHNY2T1iTvMJOVQknM6awiTNKYNkxP7ElSM0z3okSZp6Hg3KxBMAXtUoEpJFOnRu+QYXzs/GyUl7FCz7npDGFrVDsKiJucji/5ooBxjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=tXDlQCeV; arc=none smtp.client-ip=45.157.188.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4dnDKB5mwyzhyb;
-	Thu,  8 Jan 2026 19:42:06 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1767897726;
-	bh=y3jrhHg5FUx7kF7ivKJ7o2ZPDRDDiYTDDrcyS1yBIpA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tXDlQCeVQGf2kBOcNAdDXCUJtXZwsibr5Bn6v/MRWbBIxKa4oMgobVLIg4AH97ZHV
-	 CRLjv9hCH8cvUcvZ2vVJpY1c+6Wxt2yVkx9psmDA21Ci4CRmB4MQmTwG6+3dYujbjW
-	 E+ebe8PmGnPEDyFHe1+h4b5r3+KwhHkSU59uHuxo=
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4dnDK94t2VzXJF;
-	Thu,  8 Jan 2026 19:42:05 +0100 (CET)
-Date: Thu, 8 Jan 2026 19:42:00 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
-	Justin Suess <utilityemal77@gmail.com>, Paul Moore <paul@paul-moore.com>, 
-	James Morris <jmorris@namei.org>, "Serge E . Hallyn" <serge@hallyn.com>, 
-	Simon Horman <horms@kernel.org>, linux-security-module@vger.kernel.org, 
-	Tingmao Wang <m@maowtm.org>, netdev@vger.kernel.org, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>
-Subject: Re: [RFC PATCH 0/1] lsm: Add hook unix_path_connect
-Message-ID: <20260108.gaiDoe7Faghi@digikod.net>
-References: <20251231213314.2979118-1-utilityemal77@gmail.com>
- <CAAVpQUCF3uES6j22P1TYzgKByw+E4EqpM=+OFyqtRGStGWxH+Q@mail.gmail.com>
- <aVuaqij9nXhLfAvN@google.com>
- <CAAVpQUB6gnfovRZAg_BfVKPuS868dFj7HxthbxRL-nZvcsOzCg@mail.gmail.com>
- <aV5WTGvQB0XI8Q_N@google.com>
- <CAAVpQUAd==+Pw02+E6UC-qwaDNm7aFg+Q9YDbWzyniShAkAhFQ@mail.gmail.com>
+	s=arc-20240116; t=1767898115; c=relaxed/simple;
+	bh=cwp1Mrwqv0eoxdv01wEfOpLvzIf0ijJYV3HVq0Vl6hs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GTfkvEHS1d+6qgP/gTew1goQlXSqv+81FZ3Xq5seeE6Opmp6v4w/R4RxGGJz7dTaymKi68fRtqggtXh0J8sxgYnweUCZ6df9MB1/jYLjZCxNv8YabzTBVVgtGFBkij39Q1OqAbfEueNe4pGzqcy+uCl87K5s9sUcI974H/7G51I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LH/vr4KI; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-47d493a9b96so21236645e9.1
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 10:48:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767898112; x=1768502912; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=S6byj3l499CYP6Jvy37bW5MCtNkOsDXtvYU9D7/Vhs8=;
+        b=LH/vr4KIUVbrnKvOkg/oQMVIWFixyiUQzkJbXodW1nrR7VkiqOp2dHUdihksTUnsso
+         trwt3yhbvHyMT7n1UkrwDEYGsg5gBHJlkcn8gLtaiUQRozAxIyYjFH1JAkGtB8LeXexs
+         srNe0vy8qDuCalmfki8J4cRK1dQ+gae7L53DVgWV/HOjX22yf/QLCUTTRqcPJh4NSHCi
+         gfn8HNTHU6pCH0AaGB4k+8Lqz68+k4K2AVwlQXXEdwkbSIJH5a1befIN9rkIIfQXNujh
+         ZvVLsvnEIIIBvrA1vXnWwrMFmtZA26gYqzKF5MHBPY6AcKrY5ekwsUY2fzggV9upcHDf
+         kICw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767898112; x=1768502912;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S6byj3l499CYP6Jvy37bW5MCtNkOsDXtvYU9D7/Vhs8=;
+        b=iTyQKuoOAmMQxPabk7LZGTOuC0FBGlD0Hg/ZT7FyrpNpOvOn1V2EW766eqNSBEELJK
+         iD3xDHyL5UT/8ssyI/DXns5LBnUX/ryAbSc/yv5leWzlGu/DMACxG7ZNMnx6wEDiqQqn
+         5U7Q1xV2KBDxK5xDRGQ9rshvMJrhnxq4aqsaWYiVyJM+KjEMHZrfOV7Drh40at8kfRvh
+         lZowaKgKamRlvtBxANIx1UXwMhIAE+CVT4PWewZWQ88fK+oXDpwOus3ejt+T+YjvkKhF
+         JMMq8TAxQtahBhFZHECSLBeMgMoXnKh97v1MXdGeYExfp9KxRY5uRUbYwYfGr+g5ZidZ
+         LtgA==
+X-Gm-Message-State: AOJu0YyCLIHTuEhUd+7PiEZ5pdeOsY2DbhdYhjeue60R/35tdy8MlA34
+	TGtc5lBaGfKpGb/rfFE9kPkkb/T30ZH2ifaFY8PB5p6VsrjmoXJXhtc=
+X-Gm-Gg: AY/fxX7X4EAiRhlhUPX1AeAYuAY1jhmCrdyXufE8KPv6fDRxtJWtDc5JdgUg0hiRwNd
+	NDJHI8niLcQ0UvNamTZSh4g4rFnGlbMuBf5TU4hLUPApxZwUvnnvt8QheDiezicTOlTWrX2Ghsp
+	TvryVa0SdzFhH2BqV/tPe9Axd5lOb/GD61Knl8eGjDx7jCdxNwiSaOE0nsbpw3ks3VtXWwx93/p
+	W63M4l+VrwOn82KmStNHupAiEsXnVLjTjeKvbDOm9WNLlCW85cNfZAxSHijN089eSWKJg6kcTiz
+	dchprlxKrFRAOxYvgClV5u7EuaFun4clSBQKKgQbJI6jHNcKncPYKwlQKRTxzbyWzzgXHKOQvQy
+	JK+kv7OAe3KW7bY5CCylXLoucEUTSRjv+ix/O2kBikiklARRghbps5CqxU1BfBYDzfHlP0+E81i
+	jrWFtCb1rQGUe2
+X-Google-Smtp-Source: AGHT+IHK+F1RmoP+kpgDGVhzwngbhxjIUsHyn7D7h8MljBg/QOnpBdj2zXVwzk87U6dp2EJtUxklXQ==
+X-Received: by 2002:a05:600c:4fc6:b0:477:b734:8c41 with SMTP id 5b1f17b1804b1-47d84b0b320mr83819425e9.1.1767898111702;
+        Thu, 08 Jan 2026 10:48:31 -0800 (PST)
+Received: from DESKTOP-BKIPFGN ([45.43.86.16])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d8661caffsm43013065e9.5.2026.01.08.10.48.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jan 2026 10:48:31 -0800 (PST)
+From: Kery Qi <qikeyu2017@gmail.com>
+To: christian.koenig@amd.com
+Cc: netdev@vger.kernel.org,
+	Kery Qi <qikeyu2017@gmail.com>
+Subject: [PATCH] drm/radeon/sumo: Avoid UAF/double-free on power table parse errors
+Date: Fri,  9 Jan 2026 02:48:23 +0800
+Message-ID: <20260108184823.1795-1-qikeyu2017@gmail.com>
+X-Mailer: git-send-email 2.50.1.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAVpQUAd==+Pw02+E6UC-qwaDNm7aFg+Q9YDbWzyniShAkAhFQ@mail.gmail.com>
-X-Infomaniak-Routing: alpha
 
-On Thu, Jan 08, 2026 at 02:17:05AM -0800, Kuniyuki Iwashima wrote:
-> On Wed, Jan 7, 2026 at 4:49 AM Günther Noack <gnoack@google.com> wrote:
-> >
-> > On Tue, Jan 06, 2026 at 11:33:32PM -0800, Kuniyuki Iwashima wrote:
-> > > +VFS maintainers
-> > >
-> > > On Mon, Jan 5, 2026 at 3:04 AM Günther Noack <gnoack@google.com> wrote:
-> > > >
-> > > > Hello!
-> > > >
-> > > > On Sun, Jan 04, 2026 at 11:46:46PM -0800, Kuniyuki Iwashima wrote:
-> > > > > On Wed, Dec 31, 2025 at 1:33 PM Justin Suess <utilityemal77@gmail.com> wrote:
-> > > > > > Motivation
-> > > > > > ---
-> > > > > >
-> > > > > > For AF_UNIX sockets bound to a filesystem path (aka named sockets), one
-> > > > > > identifying object from a policy perspective is the path passed to
-> > > > > > connect(2). However, this operation currently restricts LSMs that rely
-> > > > > > on VFS-based mediation, because the pathname resolved during connect()
-> > > > > > is not preserved in a form visible to existing hooks before connection
-> > > > > > establishment.
-> > > > >
-> > > > > Why can't LSM use unix_sk(other)->path in security_unix_stream_connect()
-> > > > > and security_unix_may_send() ?
-> > > >
-> > > > Thanks for bringing it up!
-> > > >
-> > > > That path is set by the process that acts as the listening side for
-> > > > the socket.  The listening and the connecting process might not live
-> > > > in the same mount namespace, and in that case, it would not match the
-> > > > path which is passed by the client in the struct sockaddr_un.
-> > >
-> > > Thanks for the explanation !
-> > >
-> > > So basically what you need is resolving unix_sk(sk)->addr.name
-> > > by kern_path() and comparing its d_backing_inode(path.dentry)
-> > > with d_backing_inode (unix_sk(sk)->path.dendtry).
+sumo_parse_power_table() allocates rdev->pm.dpm.ps and then allocates a
+per-state sumo_ps (ps_priv) for each entry. On error, it currently frees
+rdev->pm.dpm.ps in two places:
 
-I would definitely prefer to avoid any kind of hack to try to detect
-potential race conditions. :)  I think it would also be more difficult
-to maintain.
+- if (!rdev->pm.power_state[i].clock_info) { kfree(rdev->pm.dpm.ps); ... }
+- if (ps == NULL) { kfree(rdev->pm.dpm.ps); ... }
 
-A well-defined hook would avoid race conditions by design, simplify
-kernel code, and document the security check.
+However, when sumo_parse_power_table() fails during the load/init path,
+the driver later unwinds and calls the corresponding fini path, which
+dereferences rdev->pm.dpm.ps[i].ps_priv and then frees rdev->pm.dpm.ps.
 
-> > >
-> > > If the new hook is only used by Landlock, I'd prefer doing that on
-> > > the existing connect() hooks.
+Freeing rdev->pm.dpm.ps inside sumo_parse_power_table() leaves a dangling
+pointer that the unwind/fini path will both dereference and free again,
+resulting in a use-after-free and a double-free.
 
-I guess other security modules would like to rely on that too.
+Fix this by removing the local kfree(rdev->pm.dpm.ps) from the error
+returns in sumo_parse_power_table() and letting the common unwind/fini
+path perform the cleanup.
+Fixes: 80ea2c129c76 ("drm/radeon/kms: add dpm support for sumo asics (v2)")
 
-> >
-> > I've talked about that in the "Alternative: Use existing LSM hooks" section in
-> > https://lore.kernel.org/all/20260101134102.25938-1-gnoack3000@gmail.com/
-> >
-> > If we resolve unix_sk(sk)->addr.name ourselves in the Landlock hook
-> > again, we would resolve the path twice: Once in unix_find_bsd() in
-> > net/unix/af_unix.c (the Time-Of-Use), and once in the Landlock
-> > security hook for the connect() operation (the Time-Of-Check).
-> >
-> > If I understand you correctly, you are suggesting that we check that
-> > the inode resolved by af_unix
-> > (d_backing_inode(unix_sk(sk)->path.dentry)) is the same as the one
-> > that we resolve in Landlock ourselves, and therefore we can detect the
-> > TOCTOU race and pretend that this is equivalent to the case where
-> > af_unix resolved to the same inode with the path that Landlock
-> > observed?
-> >
-> > If the walked file system hierarchy changes in between these two
-> > accesses, Landlock enforces the policy based on path elements that
-> > have changed in between.
-> >
-> > * We start with a Landlock policy where Unix connect() is restricted
-> >   by default, but is permitted on "foo/bar2" and everything underneath
-> >   it.  The hierarchy is:
-> >
-> >   foo/
-> >       bar/
-> >           baz.sock
-> >       bar2/        <--- Landlock rule: socket connect() allowed here and below
-> >
-> > * We connect() to the path "foo/bar/baz.sock"
-> > * af_unix.c path lookup resolves "foo/bar/baz.sock" (TOU)
-> >   This works because Landlock is not checked at this point yet.
-> > * In between the two lookups:
-> >   * the directory foo/bar gets renamed to foo/bar.old
-> >   * foo/bar2 gets moved to foo/bar
-> >   * baz.sock gets moved into the (new) foo/bar directory
-> > * Landlock check: path lookup of "foo/bar/baz.sock" (TOC)
-> >   and subsequent policy check using the resolved path.
-> >
-> >   This succeeds because connect() is permitted on foo/bar2 and
-> >   beneath.  We also check that the resolved inode is the same as the
-> >   one resolved by af_unix.c.
-> >
-> > And now the reasoning is basically that this is fine because the
-> > (inode) result of the two lookups was the same and we pretend that the
-> > Landlock path lookup was the one where the actual permission check was
-> > done?
-> 
-> Right.  IIUC, even in your patch, the file could be renamed
-> while LSM is checking the path, no ?
+Signed-off-by: Kery Qi <qikeyu2017@gmail.com>
+---
+ drivers/gpu/drm/radeon/sumo_dpm.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-Yes but that should not be an issue wrt to the security policy.  The
-check should atomic and consistent with the unix socket path resolution
-used by the network stack.  In fact, comparing paths would potentially
-forbid such rename, whereas this might be legitimate.
+diff --git a/drivers/gpu/drm/radeon/sumo_dpm.c b/drivers/gpu/drm/radeon/sumo_dpm.c
+index b11f7c5bbcbe..af649b7b2e1a 100644
+--- a/drivers/gpu/drm/radeon/sumo_dpm.c
++++ b/drivers/gpu/drm/radeon/sumo_dpm.c
+@@ -1491,15 +1491,11 @@ static int sumo_parse_power_table(struct radeon_device *rdev)
+ 		non_clock_array_index = power_state->v2.nonClockInfoIndex;
+ 		non_clock_info = (struct _ATOM_PPLIB_NONCLOCK_INFO *)
+ 			&non_clock_info_array->nonClockInfo[non_clock_array_index];
+-		if (!rdev->pm.power_state[i].clock_info) {
+-			kfree(rdev->pm.dpm.ps);
++		if (!rdev->pm.power_state[i].clock_info)
+ 			return -EINVAL;
+-		}
+ 		ps = kzalloc(sizeof(struct sumo_ps), GFP_KERNEL);
+-		if (ps == NULL) {
+-			kfree(rdev->pm.dpm.ps);
++		if (ps == NULL)
+ 			return -ENOMEM;
+-		}
+ 		rdev->pm.dpm.ps[i].ps_priv = ps;
+ 		k = 0;
+ 		idx = (u8 *)&power_state->v2.clockInfoIndex[0];
+-- 
+2.34.1
 
-> I think holding the
-> path ref does not lock concurrent rename operations.
-
-We cannot hold a path ref without potential VFS issues.
-
-> 
-> To me, it's not a small race and basically it's the same with
-> the ops below,
-> 
-> sk1.bind('test')
-> sk1.listen()
-> os.rename('test', 'test2')
-> sk2.connect('test2')
-> 
-> sk1.bind('test')
-> sk1.listen()
-> sk2.connect('test1')
-> os.rename('test', 'test2')
-> 
-> and the important part is whether the path _was_ the
-> allowed one when LSM checked the path.
-
-In the case of Landlock's sandboxing, we want to check the path at
-connect time because that's when it makes sense for the client wrt to
-its request (and its security policy).
-
-FYI, Landlock identifies paths with a set of inodes, so if the unix
-socket is explicitly allowed, then a rename may still be allowed by the
-security policy.
-
-> 
-> >
-> > Some pieces of this which I am still unsure about:
-> >
-> > * What we are supposed to do when the two resolved inodes are not the
-> >   same, because we detected the race?  We can not allow the connection
-> >   in that case, but it would be wrong to deny it as well.  I'm not
-> >   sure whether returning one of the -ERESTART* variants is feasible in
-> >   this place and bubbles up correctly to the system call / io_uring
-> >   layer.
-> 
-> Imagine that the rename ops was done a bit earlier, which is
-> before the first lookup in unix_find_bsd().  Then, the socket
-> will not be found, and -ECONNREFUSED is returned.
-> LSM pcan pretend as such.
-
-Yes but this would be inconsistent with the network stack.  It would
-introduce a race condition where unix socket cannot be used for
-potentially no legitimate reason.
-
-> 
-> 
-> >
-> > * What if other kinds of permission checks happen on a different
-> >   lookup code path?  (If another stacked LSM had a similar
-> >   implementation with yet another path lookup based on a different
-> >   kind of policy, and if a race happened in between, it could at least
-> >   be possible that for one variant of the path, it would be OK for
-> >   Landlock but not the other LSM, and for the other variant of the
-> >   path it would be OK for the other LSM but not Landlock, and then the
-> >   connection could get accepted even if that would not have been
-> >   allowed on one of the two paths alone.)  I find this a somewhat
-> >   brittle implementation approach.
-> 
-> Do you mean that the evaluation of the stacked LSMs could
-> return 0 if one of them allows it even though other LSMs deny ?
-
-If any LSM returns a non-zero value, then the call stops.
-
-I think what Günther wanted to highlight is that a hook call may lead to
-different hook implementation calls, and all these implementations should
-be able to return consistent results wrt to other calls.
-
-> 
-> 
-> >
-> > * Would have to double check the unix_dgram_connect code paths in
-> >   af_unix to see whether this is feasible for DGRAM sockets:
-> >
-> >   There is a way to connect() a connectionless DGRAM socket, and in
-> >   that case, the path lookup in af_unix happens normally only during
-> >   connect(),
-> 
-> Note that connected DGRAM socket can send() data to other sockets
-> by specifying the peer name in each send(), and even they can
-> disconnect by connect(AF_UNSPEC).
-
-Yes, thanks for pointing this out.  It's the duty of LSMs to correctly
-handle this case.  It is handled by Landlock for abstract unix sockets.
-
-> 
-> 
-> > very far apart from the initial security_unix_may_send()
-> >   LSM hook which is used for DGRAM sockets - It would be weird if we
-> >   were able to connect() a DGRAM socket, thinking that now all path
-> >   lookups are done, but then when you try to send a message through
-> >   it, Landlock surprisingly does the path lookup again based on a very
-> >   old and possibly outdated path.  If Landlock's path lookup fails
-> >   (e.g. because the path has disappeared, or because the inode now
-> >   differs), retries won't be able to recover this any more.  Normally,
-> >   the path does not need to get resolved any more once the DGRAM
-> >   socket is connected.
-> >
-> >   Noteworthy: When Unix servers restart, they commonly unlink the old
-> >   socket inode in the same place and create a new one with bind().  So
-> >   as the time window for the race increases, it is actually a common
-> >   scenario that a different inode with appear under the same path.
-> >
-> > I have to digest this idea a bit.  I find it less intuitive than using
-> > the exact same struct path with a newly introduced hook, but it does
-> > admittedly mitigate the problem somewhat.  I'm just not feeling very
-> > comfortable with security policy code that requires difficult
-> > reasoning. 🤔 Or maybe I interpreted too much into your suggestion. :)
-> > I'd be interested to hear what you think.
-> >
-> > —Günther
 
