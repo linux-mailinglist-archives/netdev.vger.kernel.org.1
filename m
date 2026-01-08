@@ -1,43 +1,44 @@
-Return-Path: <netdev+bounces-248270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78DD4D064EC
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 22:27:32 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E76DD064E4
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 22:27:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6B6D5300E8C3
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 21:27:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A601E3019BCE
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 21:27:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61E2933769F;
-	Thu,  8 Jan 2026 21:27:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 044B7337BAC;
+	Thu,  8 Jan 2026 21:27:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e8jpVjYJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vCH84qG7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F939337680
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5D67337B8E
 	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 21:27:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767907627; cv=none; b=bgMu9vJNOszjhj2+ErGzQydLB40iK2PruAu4r5tYOIJ6aC1Jya5oAQiezAn79IaLJr/FK1D4jDvJR4HisSnab9ZMgVmsLsY5kP5hkeaLgbDcIT9rmvph2r/a0dRPhNVuNGcNENacQBv2zwpDJaqnb2gsehXSpohKQWF1Y8Mn/UU=
+	t=1767907627; cv=none; b=c51pQqrG/+ATi+JNah0mTAgkalNW408TGx+xHl1SOPJlezTXhagEnY+qlY1jos4VaTZ+sZe6/PN6KpabrzyoxCF1Xhj1ta906TjIur6+nfcOPBGhmugZXHdivJXsRacc6WVSCuCcfnZ8E3zovuvzLdAexoUyTtZpf6l4XH5CGlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1767907627; c=relaxed/simple;
-	bh=VcY8TTTh7bZZ3T6K5FSlYOtni9mNEfq7mBNqRAtO9u0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GQM+JVXQYv4cbdin0BRkXD0LS7B3R14PKeQJoJtiVkTDUuPx4Gi/PAFJh3qRORdrb2JP/PtGe87ZnDNVb7lDJLATkg4aPc6jw6T7V+FBrlvQxUuchwhZV2WlOR+B+xfB1D92NkJ5MQLRnXDx1nPtaZ3XcKWvoZuD8u856ujZFyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e8jpVjYJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9C99C116C6;
-	Thu,  8 Jan 2026 21:27:06 +0000 (UTC)
+	bh=iBKR5lv/ZjTE/HBJASyRX413z0iwq/42SQxRnPNqTIk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Fna5j0LHbs9NQH6COOqdHQD+1btpT8L7259ofDVX78cV2IvQ2AEahDiEygLvF6iaPtkfV66NiCsck1JEcOIglsVArn8a6rUiWiPBM7OyZdFVZr+cvXx0NWGqInEpuGfwhva/dCKnkhz/wQWJImh9776NbAmdM9CqPi17Y0KXzgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vCH84qG7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3B09C116C6;
+	Thu,  8 Jan 2026 21:27:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767907626;
-	bh=VcY8TTTh7bZZ3T6K5FSlYOtni9mNEfq7mBNqRAtO9u0=;
-	h=From:To:Cc:Subject:Date:From;
-	b=e8jpVjYJEL5vg99msNpzDGBXPeu+cZ54VG4H/kIPm9rjASOMZfndGbw9o4l0tecRT
-	 wfL37F5ofMOOJzZ2TAVAWbC6eF8aackncTHkfeWiD4FenixqV/wdEs0wn0krCg+U1R
-	 wWKMJG3sux7zd5eAWZShX7h2awVIDZaglDU4ItoABvOLoydk2Mzra0CkcGMEhdY/Ww
-	 OepFQ8hXvp3Sj66aNDWPfwkEGGyD8+DNacVjdfEGqxISfPoDE3Dxhuloymw8wI/UZU
-	 KmXfFm55IEc4uozb9BXcu9P8PrIxfoasozj26NrR1kb5I8O7A5YGw+bFpoNvhF2JMB
-	 NLVzWk/vN/img==
+	s=k20201202; t=1767907627;
+	bh=iBKR5lv/ZjTE/HBJASyRX413z0iwq/42SQxRnPNqTIk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=vCH84qG7zixOVN9t32Y68Fu7h5Lj8ymswS9oZ0CGtyb80JP/7P6EB4eNUHuXiQ2rw
+	 gX2vsZ28EdcZbhliuL7iqwftRCTKVV3ybm5iFyXQqUnSCfRQpaOI/yz/MBpW0sykAk
+	 GYck/0L9w0NbkwKufw1qTOkRpPU7LhjA3xjsQeEqRQz1PBi/IV2D1EoCTz5HP2/MmC
+	 pujAHlAgOFe1iaBtQzN1Phgw6234weazqmbJViymAU19chlO5Mi7C77lo4r/Z499u9
+	 C9XEUVqtxtD6V0QmtT3UMhwqOH4aZgT7eoGozj4qUoBhaDpPP3UUQmQ5KHOA4LvMaR
+	 wUFCP8Zpf+mRg==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -48,10 +49,12 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>
-Subject: [PATCH net 0/4] mlx5e profile change fix
-Date: Thu,  8 Jan 2026 13:26:53 -0800
-Message-ID: <20260108212657.25090-1-saeed@kernel.org>
+Subject: [PATCH net 1/4] net/mlx5e: Fix crash on profile change rollback failure
+Date: Thu,  8 Jan 2026 13:26:54 -0800
+Message-ID: <20260108212657.25090-2-saeed@kernel.org>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260108212657.25090-1-saeed@kernel.org>
+References: <20260108212657.25090-1-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,19 +65,223 @@ Content-Transfer-Encoding: 8bit
 
 From: Saeed Mahameed <saeedm@nvidia.com>
 
-This series fixes a crash in mlx5e due to profile change error flow.
+mlx5e_netdev_change_profile can fail to attach a new profile and can
+fail to rollback to old profile, in such case, we could end up with a
+dangling netdev with a fully reset netdev_priv. A retry to change
+profile, e.g. another attempt to call mlx5e_netdev_change_profile via
+switchdev mode change, will crash trying to access the now NULL
+priv->mdev.
 
-Saeed Mahameed (4):
-  net/mlx5e: Fix crash on profile change rollback failure
-  net/mlx5e: Don't store mlx5e_priv in mlx5e_dev devlink priv
-  net/mlx5e: Pass netdev to mlx5e_destroy_netdev instead of priv
-  net/mlx5e: Restore destroying state bit after profile cleanup
+This fix allows mlx5e_netdev_change_profile() to handle previous
+failures and an empty priv, by not assuming priv is valid.
 
- drivers/net/ethernet/mellanox/mlx5/core/en.h  | 13 +--
- .../net/ethernet/mellanox/mlx5/core/en_main.c | 86 ++++++++++++-------
- .../net/ethernet/mellanox/mlx5/core/en_rep.c  | 15 ++--
- 3 files changed, 71 insertions(+), 43 deletions(-)
+Pass netdev and mdev to all flows requiring
+mlx5e_netdev_change_profile() and avoid passing priv.
+In mlx5e_netdev_change_profile() check if current priv is valid, and if
+not, just attach the new profile without trying to access the old one.
 
+This fixes the following oops, when enabling switchdev mode for the 2nd
+time after first time failure:
+
+ ## Enabling switchdev mode first time:
+
+mlx5_core 0012:03:00.1: E-Switch: Supported tc chains and prios offload
+workqueue: Failed to create a rescuer kthread for wq "mlx5e": -EINTR
+mlx5_core 0012:03:00.1: mlx5e_netdev_init_profile:6214:(pid 37199): mlx5e_priv_init failed, err=-12
+mlx5_core 0012:03:00.1 gpu3rdma1: mlx5e_netdev_change_profile: new profile init failed, -12
+workqueue: Failed to create a rescuer kthread for wq "mlx5e": -EINTR
+mlx5_core 0012:03:00.1: mlx5e_netdev_init_profile:6214:(pid 37199): mlx5e_priv_init failed, err=-12
+mlx5_core 0012:03:00.1 gpu3rdma1: mlx5e_netdev_change_profile: failed to rollback to orig profile, -12
+                                                                         ^^^^^^^^
+mlx5_core 0000:00:03.0: E-Switch: Disable: mode(LEGACY), nvfs(0), necvfs(0), active vports(0)
+
+ ## retry: Enabling switchdev mode 2nd time:
+
+mlx5_core 0000:00:03.0: E-Switch: Supported tc chains and prios offload
+BUG: kernel NULL pointer dereference, address: 0000000000000038
+ #PF: supervisor read access in kernel mode
+ #PF: error_code(0x0000) - not-present page
+PGD 0 P4D 0
+Oops: Oops: 0000 [#1] SMP NOPTI
+CPU: 13 UID: 0 PID: 520 Comm: devlink Not tainted 6.18.0-rc4+ #91 PREEMPT(voluntary)
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-2.fc40 04/01/2014
+RIP: 0010:mlx5e_detach_netdev+0x3c/0x90
+Code: 50 00 00 f0 80 4f 78 02 48 8b bf e8 07 00 00 48 85 ff 74 16 48 8b 73 78 48 d1 ee 83 e6 01 83 f6 01 40 0f b6 f6 e8 c4 42 00 00 <48> 8b 45 38 48 85 c0 74 08 48 89 df e8 cc 47 40 1e 48 8b bb f0 07
+RSP: 0018:ffffc90000673890 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: ffff8881036a89c0 RCX: 0000000000000000
+RDX: ffff888113f63800 RSI: ffffffff822fe720 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 0000000000002dcd R09: 0000000000000000
+R10: ffffc900006738e8 R11: 00000000ffffffff R12: 0000000000000000
+R13: 0000000000000000 R14: ffff8881036a89c0 R15: 0000000000000000
+FS:  00007fdfb8384740(0000) GS:ffff88856a9d6000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000038 CR3: 0000000112ae0005 CR4: 0000000000370ef0
+Call Trace:
+ <TASK>
+ mlx5e_netdev_change_profile+0x45/0xb0
+ mlx5e_vport_rep_load+0x27b/0x2d0
+ mlx5_esw_offloads_rep_load+0x72/0xf0
+ esw_offloads_enable+0x5d0/0x970
+ mlx5_eswitch_enable_locked+0x349/0x430
+ ? is_mp_supported+0x57/0xb0
+ mlx5_devlink_eswitch_mode_set+0x26b/0x430
+ devlink_nl_eswitch_set_doit+0x6f/0xf0
+ genl_family_rcv_msg_doit+0xe8/0x140
+ genl_rcv_msg+0x18b/0x290
+ ? __pfx_devlink_nl_pre_doit+0x10/0x10
+ ? __pfx_devlink_nl_eswitch_set_doit+0x10/0x10
+ ? __pfx_devlink_nl_post_doit+0x10/0x10
+ ? __pfx_genl_rcv_msg+0x10/0x10
+ netlink_rcv_skb+0x52/0x100
+ genl_rcv+0x28/0x40
+ netlink_unicast+0x282/0x3e0
+ ? __alloc_skb+0xd6/0x190
+ netlink_sendmsg+0x1f7/0x430
+ __sys_sendto+0x213/0x220
+ ? __sys_recvmsg+0x6a/0xd0
+ __x64_sys_sendto+0x24/0x30
+ do_syscall_64+0x50/0x1f0
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+RIP: 0033:0x7fdfb8495047
+
+Fixes: c4d7eb57687f ("net/mxl5e: Add change profile method")
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/en.h  |  9 ++--
+ .../net/ethernet/mellanox/mlx5/core/en_main.c | 48 +++++++++++++------
+ .../net/ethernet/mellanox/mlx5/core/en_rep.c  | 11 ++---
+ 3 files changed, 44 insertions(+), 24 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+index 262dc032e276..f42256768700 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+@@ -1243,9 +1243,12 @@ mlx5e_create_netdev(struct mlx5_core_dev *mdev, const struct mlx5e_profile *prof
+ int mlx5e_attach_netdev(struct mlx5e_priv *priv);
+ void mlx5e_detach_netdev(struct mlx5e_priv *priv);
+ void mlx5e_destroy_netdev(struct mlx5e_priv *priv);
+-int mlx5e_netdev_change_profile(struct mlx5e_priv *priv,
+-				const struct mlx5e_profile *new_profile, void *new_ppriv);
+-void mlx5e_netdev_attach_nic_profile(struct mlx5e_priv *priv);
++int mlx5e_netdev_change_profile(struct net_device *netdev,
++				struct mlx5_core_dev *mdev,
++				const struct mlx5e_profile *new_profile,
++				void *new_ppriv);
++void mlx5e_netdev_attach_nic_profile(struct net_device *netdev,
++				     struct mlx5_core_dev *mdev);
+ void mlx5e_set_netdev_mtu_boundaries(struct mlx5e_priv *priv);
+ void mlx5e_build_nic_params(struct mlx5e_priv *priv, struct mlx5e_xsk *xsk, u16 mtu);
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index 07fc4d2c8fad..e50525b771bc 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -6584,19 +6584,28 @@ mlx5e_netdev_attach_profile(struct net_device *netdev, struct mlx5_core_dev *mde
+ 	return err;
+ }
+ 
+-int mlx5e_netdev_change_profile(struct mlx5e_priv *priv,
+-				const struct mlx5e_profile *new_profile, void *new_ppriv)
++int mlx5e_netdev_change_profile(struct net_device *netdev,
++				struct mlx5_core_dev *mdev,
++				const struct mlx5e_profile *new_profile,
++				void *new_ppriv)
+ {
+-	const struct mlx5e_profile *orig_profile = priv->profile;
+-	struct net_device *netdev = priv->netdev;
+-	struct mlx5_core_dev *mdev = priv->mdev;
+-	void *orig_ppriv = priv->ppriv;
++	struct mlx5e_priv *priv = netdev_priv(netdev);
++	const struct mlx5e_profile *orig_profile;
+ 	int err, rollback_err;
++	void *orig_ppriv;
+ 
+-	/* cleanup old profile */
+-	mlx5e_detach_netdev(priv);
+-	priv->profile->cleanup(priv);
+-	mlx5e_priv_cleanup(priv);
++	orig_profile = priv->profile;
++	orig_ppriv = priv->ppriv;
++
++	/* NULL could happen if previous change_profile failed to rollback */
++	if (priv->profile) {
++		WARN_ON_ONCE(priv->mdev != mdev);
++		/* cleanup old profile */
++		mlx5e_detach_netdev(priv);
++		priv->profile->cleanup(priv);
++		mlx5e_priv_cleanup(priv);
++	}
++	/* priv members are not valid from this point ... */
+ 
+ 	if (mdev->state == MLX5_DEVICE_STATE_INTERNAL_ERROR) {
+ 		mlx5e_netdev_init_profile(netdev, mdev, new_profile, new_ppriv);
+@@ -6613,16 +6622,25 @@ int mlx5e_netdev_change_profile(struct mlx5e_priv *priv,
+ 	return 0;
+ 
+ rollback:
++	if (!orig_profile) {
++		netdev_warn(netdev, "no original profile to rollback to\n");
++		priv->profile = NULL;
++		return err;
++	}
++
+ 	rollback_err = mlx5e_netdev_attach_profile(netdev, mdev, orig_profile, orig_ppriv);
+-	if (rollback_err)
+-		netdev_err(netdev, "%s: failed to rollback to orig profile, %d\n",
+-			   __func__, rollback_err);
++	if (rollback_err) {
++		netdev_err(netdev, "failed to rollback to orig profile, %d\n",
++			   rollback_err);
++		priv->profile = NULL;
++	}
+ 	return err;
+ }
+ 
+-void mlx5e_netdev_attach_nic_profile(struct mlx5e_priv *priv)
++void mlx5e_netdev_attach_nic_profile(struct net_device *netdev,
++				     struct mlx5_core_dev *mdev)
+ {
+-	mlx5e_netdev_change_profile(priv, &mlx5e_nic_profile, NULL);
++	mlx5e_netdev_change_profile(netdev, mdev, &mlx5e_nic_profile, NULL);
+ }
+ 
+ void mlx5e_destroy_netdev(struct mlx5e_priv *priv)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
+index ee9595109649..52d3ad0b9cd9 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
+@@ -1508,17 +1508,16 @@ mlx5e_vport_uplink_rep_load(struct mlx5_core_dev *dev, struct mlx5_eswitch_rep *
+ {
+ 	struct mlx5e_rep_priv *rpriv = mlx5e_rep_to_rep_priv(rep);
+ 	struct net_device *netdev;
+-	struct mlx5e_priv *priv;
+ 	int err;
+ 
+ 	netdev = mlx5_uplink_netdev_get(dev);
+ 	if (!netdev)
+ 		return 0;
+ 
+-	priv = netdev_priv(netdev);
+-	rpriv->netdev = priv->netdev;
+-	err = mlx5e_netdev_change_profile(priv, &mlx5e_uplink_rep_profile,
+-					  rpriv);
++	/* must not use netdev_priv(netdev), it might not be initialized yet */
++	rpriv->netdev = netdev;
++	err = mlx5e_netdev_change_profile(netdev, dev,
++					  &mlx5e_uplink_rep_profile, rpriv);
+ 	mlx5_uplink_netdev_put(dev, netdev);
+ 	return err;
+ }
+@@ -1546,7 +1545,7 @@ mlx5e_vport_uplink_rep_unload(struct mlx5e_rep_priv *rpriv)
+ 	if (!(priv->mdev->priv.flags & MLX5_PRIV_FLAGS_SWITCH_LEGACY))
+ 		unregister_netdev(netdev);
+ 
+-	mlx5e_netdev_attach_nic_profile(priv);
++	mlx5e_netdev_attach_nic_profile(netdev, priv->mdev);
+ }
+ 
+ static int
 -- 
 2.52.0
 
