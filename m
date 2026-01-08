@@ -1,180 +1,156 @@
-Return-Path: <netdev+bounces-248249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AF11D05B55
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 20:02:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73DEDD05BFD
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 20:08:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 79F63301CA00
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 19:02:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9CAB0306F8CC
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 19:02:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2792B314A6C;
-	Thu,  8 Jan 2026 19:02:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C12B2FFF8E;
+	Thu,  8 Jan 2026 19:02:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hnV4XboG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RHCDhwtm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+Received: from mail-ua1-f74.google.com (mail-ua1-f74.google.com [209.85.222.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5CFE2882B7
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 19:02:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7926E17C77
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 19:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767898940; cv=none; b=V4j79sKcF7Tzfp0QndVkYXpCyGXifWzUsBm7UuqUSijBl+SJ+SVDuXWkLhtVc1heaWQyS61KSbN68/cDGxPuhrA5sL+hkHKHiaWEz/xHz28nTvh3SkJFX5m9JucO1ZgFvfNuj1I76AjuttuhgAEutvabDw4VEOmCoBgoqRJgKRE=
+	t=1767898938; cv=none; b=Bc0YBJQIHH142KrGzMu5aQfGtk4n3FHWSXjIm9BXC9iHrxW0kQXTZNnZTQ+w+uGhxyzyuIUw10Wfh4GToDGpl5k77nAjymHTxrlAya5erjdR5a2GVSuaSU6irv2JoU8gmxeAkealecySWLulhXrITIibznc3ux2DYY+JMHHSf8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767898940; c=relaxed/simple;
-	bh=K2LW6sotoVOT7QIZVrqOf906H98OP4kg4/+B/vAo/IM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=nTnhtogGwxoDaX1rfdKkYW3Ad5vCvLUSFuF9g0aNfEW1+ExmJzVg2aytyF+iD4lqlK0ePocLLobsBOqjPQhTo+D6XafsSoeyabJj05MVlVl0qmcbnPzFZXFGxPffdyLi56kxm6mkrbrDdOAeTkLh+tmw85y5OG9TlZA76yDxteQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hnV4XboG; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-78fc7892214so41716517b3.0
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 11:02:18 -0800 (PST)
+	s=arc-20240116; t=1767898938; c=relaxed/simple;
+	bh=bmsgJQjLk29OJNvpvfRINdDYgS5i02EpAdv8qvo87Tw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Q2kpvrpwPl3OMtiLI04PXkQ2mw2qBexo3DshTU0u4ai/EPd7oakJw+S7WbpZcpYMheHAwWTfUMBCMaDeMqt/7GREjhhXfffcS/Fy6eMqCuGNbtLSeF9wG+qtWsYIkqUzAu3IkxC5wz10nOpFnvQP93GvzGJEMDlwnzAxaWByQtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RHCDhwtm; arc=none smtp.client-ip=209.85.222.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-ua1-f74.google.com with SMTP id a1e0cc1a2514c-93f5fe52b10so8013742241.1
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 11:02:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767898937; x=1768503737; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nmyELOaSZADXI222ZY+oX6FK9Sc9qHdBAIkmig6ymHE=;
-        b=hnV4XboG/4j2lFt5VZkbucBezm4cUKFcj+punkbFiHpzG5GKKHzybREq5of2FSLDTm
-         1IN2IS3wVW7B9vQ48Uq81iHZMrfjpJxLCxcnkdamW1Rpsz9FnLtDa3WJlUFYAmb6RmqW
-         lRGRGPaCA5o07ji2qEZM8uhJdFbp8FxAJoHMlfJ+cuRjvLqGZ1uMQM5sNOCUMCWnsLYP
-         wjM+Jl0c9Q1Q0c75s0iq1QWQJtePn4tfFFn2vFQBwyy1EryCilpKZngx92arvLhy+3Kt
-         05RUaQdo7q0DiembdTDY74BUX0KQweo4OXW3GJb8B1grp2zA73JuQNlyoPKwuWlxLqcB
-         D/Fg==
+        d=google.com; s=20230601; t=1767898936; x=1768503736; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=EDj2Vvsei5534FITWHXTg4wgHwlaEiMeQ4aPR0lt8yc=;
+        b=RHCDhwtmOqicAg4CLfIlTDSZ8/msTZx0sECgx391anqQIVBx++1SvLKUhDBR4icjFl
+         xdEqCcy6JiwuO0T1BrvndJj6btg30SsQ85+Tn39Z4MWEbtd1y3VdHNJFH0ivlnqxShAX
+         9J25KOby1Q/GM0/Nx1yZfNOfURjEH6lxOhQRnXwpwbasSrrNbid653TDXB++utYh0TrU
+         elVeP0ej1YvgxldT43ppnv/+dfpGLFkiIB9VtoiqCRvBV+4egE93koKTVRFYlSBwuskg
+         NAM5c6EZ64+ESJoRFR88cknnQvYXtzny+kk60+uAv6nq18lwCLC2ftTqbDls7hLm/oMH
+         OfXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767898937; x=1768503737;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+        d=1e100.net; s=20230601; t=1767898936; x=1768503736;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=nmyELOaSZADXI222ZY+oX6FK9Sc9qHdBAIkmig6ymHE=;
-        b=Dqu9285uGa37iLtQaXrBGbE6Pz/venWLufv4golIYT2iK/Hf3NiO8nOLogpo3N3roM
-         yvJlI4mXSlXVCY7B5KnyC7sEIjGxK/nSQ5NX4tkLgdHF4dpYUIA2B135am3zeeU84tx8
-         v9VEn0te1pq55AyMOoTLSDKrh8k0n/15RQgT+UvgJDPu2z3pDriv+Pwq8N6UGiqDkdFd
-         PbYAZJMqgLRfzC8uhigeRDRQ0Ui7tlHe/3O0bJu/4NKlVDlIuhthBHpkzsDmwZu/B3IV
-         40D3roxpAG/2WmOCNta1bcnR0cARYU9w+AR7bgm8b7ip8OPw/vobN0VuudohR0pByGaZ
-         Jx7A==
-X-Forwarded-Encrypted: i=1; AJvYcCVwC+xkVU3gvaCN3lgUsDa2Fy3odZMh1QRTaxSKPVzXwFudpU2n2eoJWKwQ5KrVoiUjVR4HZfo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysmNAGKZZdhvVpK1x0g965eQkt/uV67Z7FuIV53TRum0sw8q8G
-	m+f8yGYDa+bQdIlGDj9HSrrAG/NBzmkwnv2hMhygjiHPljQL01SGsAdl
-X-Gm-Gg: AY/fxX5TRmIZlu+R3fEpPV+o2nfUpiTpC1ecTdV4eHE9htOMuqWxxg0Cqfmjo8aJUhh
-	WW9EjrqILHSO68FHRLEPPkMDeMNVwvMoWrdQQBCTyGBgiOuy9GNFjGmYm3pmOR+cGsgusG0JVSG
-	UbFQ0WCffQKHT2Uxsdu+nro9R7+3vsjgsSqtV60RNv/4Cp7r4SXQwCI/Ta0ifX82EiIdPebo7D9
-	k0zPapVWjIX4OoYw/iZz4NujlJo6ZmiK5Rln01W/9JMjIyv4KhExkv2XADs0aXgJORTdGI4/lco
-	BDQx7LUoCrD9CZJ7eE1iwIUX2yGTG7B6FfPhgaQhdffurh4+7qa313pHLljtC1JeZqI38AZgUOU
-	vzyAi5X1Pw6c1ZOKqfF1ovG88uKB9i/zOd8+9VhA5CVrIk9UK4YhEIHYIoHA8Rjrr5sJXbhJXAS
-	KsHeyMODqdz4/vt2XakrtKf1au61zbiDgbIVwgQ6g/wBAcFYO19qvkrqbd90o=
-X-Google-Smtp-Source: AGHT+IH5TaDYP6X1kkJaAPJeZNhAuOn1s7Vher4mhni2y+Zy4W9mvbfIbaAIpbkb8246LikCcU/sVg==
-X-Received: by 2002:a05:690e:1289:b0:641:f5bc:69a0 with SMTP id 956f58d0204a3-64716c9392amr6445805d50.78.1767898936103;
-        Thu, 08 Jan 2026 11:02:16 -0800 (PST)
-Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-6470d80d2c2sm3673670d50.8.2026.01.08.11.02.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 11:02:15 -0800 (PST)
-Date: Thu, 08 Jan 2026 14:02:15 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Willem de Bruijn <willemb@google.com>, 
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Message-ID: <willemdebruijn.kernel.58a32e438c@gmail.com>
-In-Reply-To: <20260108080646.14fb7d95@kernel.org>
-References: <20260107110521.1aab55e9@kernel.org>
- <willemdebruijn.kernel.276cd2b2b0063@gmail.com>
- <20260107192511.23d8e404@kernel.org>
- <20260108080646.14fb7d95@kernel.org>
-Subject: Re: [TEST] txtimestamp.sh pains after netdev foundation migration
+        bh=EDj2Vvsei5534FITWHXTg4wgHwlaEiMeQ4aPR0lt8yc=;
+        b=DeCtOGMh2CY62Rn2930/7PNmHDjbbUEdYd/Z6Vcyp7W/AiFwWqbCYEk95xxLtOQrwB
+         sYwCRbxhiI7NYAkqkhEBd46bZO7pBmC6N31yjs/38OGI/ij1llK3NfXbf/H9DMCZA3Wt
+         YZniCToUHCPUXSN00LfzvCqDZHWQUzm7s6T79KIdF93v3qG55wQ8wPKi4VtL7TZWlUoS
+         x6rUO0FLMqmS8CbeFw9KMkeZeCyZkihLK4XRvIvZzXxJMSSZpQtomWnefX02vzC46fmp
+         y5SHa5Ic8VQqyhZ3fHGeJUaM7kW3LP/ZxaUVTQoFKYiEoZxBOf8VThj9MCYaEuVLkKkq
+         P7Gw==
+X-Forwarded-Encrypted: i=1; AJvYcCXqZBvGHzbzX7VfagoEjQAINKzTEcuRKnMykY6OoIDlOPAGBB/8PeWCaReivJnA8KUgzUFdyTs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6s/IiIp9VSwpCNvCJ4O+hDkYQrIxL5nWqihB7qgU5PJT+msQs
+	XEbFGKi+5LcObf8SJb8mM4lszbgyAoV8sR6U1zl1WdutDflI9MW4DodZY5xdKuNwCR+Za7Rl16S
+	OPwIB4Vh4MzzPXg==
+X-Google-Smtp-Source: AGHT+IGjC8bFQ9AcUYDDWAL6x3CrQ/3mMjNLHg/HzJ3BeRqfNzWWSQYax9ZrU8zE3tM17cQ0oE0szEbJNCZNqg==
+X-Received: from qvbkr16.prod.google.com ([2002:a05:6214:2b90:b0:88a:27b1:923a])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6102:548b:b0:5d7:debc:ae81 with SMTP id ada2fe7eead31-5ecb1e8dba8mr2758918137.4.1767898936044;
+ Thu, 08 Jan 2026 11:02:16 -0800 (PST)
+Date: Thu,  8 Jan 2026 19:02:14 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
+Message-ID: <20260108190214.1667040-1-edumazet@google.com>
+Subject: [PATCH net] ipv4: ip_gre: make ipgre_header() robust
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot+7c134e1c3aa3283790b9@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-Jakub Kicinski wrote:
-> On Wed, 7 Jan 2026 19:25:11 -0800 Jakub Kicinski wrote:
-> > On Wed, 07 Jan 2026 19:19:53 -0500 Willem de Bruijn wrote:
-> > > 17 out of 20 happen in the first SND-USR calculation.
-> > > One representative example:
-> > > 
-> > >     # 7.11 [+0.00] test SND
-> > >     # 7.11 [+0.00]     USR: 1767443466 s 155019 us (seq=0, len=0)
-> > >     # 7.19 [+0.08] ERROR: 18600 us expected between 10000 and 18000
-> > >     # 7.19 [+0.00]     SND: 1767443466 s 173619 us (seq=0, len=10)  (USR +18599 us)
-> > >     # 7.20 [+0.00]     USR: 1767443466 s 243683 us (seq=0, len=0)
-> > >     # 7.27 [+0.07]     SND: 1767443466 s 253690 us (seq=1, len=10)  (USR +10006 us)
-> > >     # 7.27 [+0.00]     USR: 1767443466 s 323746 us (seq=0, len=0)
-> > >     # 7.35 [+0.08]     SND: 1767443466 s 333752 us (seq=2, len=10)  (USR +10006 us)
-> > >     # 7.35 [+0.00]     USR: 1767443466 s 403811 us (seq=0, len=0)
-> > >     # 7.43 [+0.08]     SND: 1767443466 s 413817 us (seq=3, len=10)  (USR +10006 us)
-> > >     # 7.43 [+0.00]     USR-SND: count=4, avg=12154 us, min=10006 us, max=18599 us  
-> > 
-> > Hm, that's the first kernel timestamp vs the timestamp in user space?
-> > I wonder if we could catch this by re-taking the user stamp after
-> > sendmsg() returns, if >1msec elapsed something is probably wrong 
-> > (we got scheduled out before having a chance to complete the send?)
-> 
-> How about:
-> 
-> diff --git a/tools/testing/selftests/net/txtimestamp.c b/tools/testing/selftests/net/txtimestamp.c
-> index 4b4bbc2ce5c9..abcec47ec2e6 100644
-> --- a/tools/testing/selftests/net/txtimestamp.c
-> +++ b/tools/testing/selftests/net/txtimestamp.c
-> @@ -215,6 +215,24 @@ static void print_timestamp_usr(void)
->  	__print_timestamp("  USR", &ts_usr, 0, 0);
->  }
->  
-> +static void check_timestamp_usr(void)
-> +{
-> +	long long unsigned ts_delta_usec;
-> +	struct timespec now;
-> +
-> +	if (clock_gettime(CLOCK_REALTIME, &now))
-> +		error(1, errno, "clock_gettime");
-> +
-> +	ts_delta_usec = timespec_to_ns64(&now) - timespec_to_ns64(&ts_usr);
-> +	ts_delta_usec /= 1000;
-> +	if (ts_delta_usec > cfg_delay_tolerance_usec / 2) {
-> +		cfg_delay_tolerance_usec =
-> +			ts_delta_usec + cfg_delay_tolerance_usec / 2;
-> +		fprintf(stderr, "WARN: sendmsg() took %llu us, increasing delay tolerance to %d us\n",
-> +			ts_delta_usec, cfg_delay_tolerance_usec);
-> +	}
-> +}
-> +
->  static void print_timestamp(struct scm_timestamping *tss, int tstype,
->  			    int tskey, int payload_len)
->  {
-> @@ -678,6 +696,8 @@ static void do_test(int family, unsigned int report_opt)
->  		if (val != total_len)
->  			error(1, errno, "send");
->  
-> +		check_timestamp_usr();
-> +
->  		/* wait for all errors to be queued, else ACKs arrive OOO */
->  		if (cfg_sleep_usec)
->  			usleep(cfg_sleep_usec);
-> -- 
-> 2.52.0
+Analog to commit db5b4e39c4e6 ("ip6_gre: make ip6gre_header() robust")
 
-Increasing tolerance should work.
+Over the years, syzbot found many ways to crash the kernel
+in ipgre_header() [1].
 
-The current values are pragmatic choices to be so low as to minimize
-total test runtime, but high enough to avoid flakes. Well..
+This involves team or bonding drivers ability to dynamically
+change their dev->needed_headroom and/or dev->hard_header_len
 
-If increasing tolerance, we also need to increase the time the test
-waits for all notifications to arrive, cfg_sleep_usec.
+In this particular crash mld_newpack() allocated an skb
+with a too small reserve/headroom, and by the time mld_sendpack()
+was called, syzbot managed to attach an ipgre device.
 
-Since the majority of errors happen on the first measurement, I was
-thinking of a different approach of just taking that as a warm up
-measurement.
+[1]
+skbuff: skb_under_panic: text:ffffffff89ea3cb7 len:2030915468 put:2030915372 head:ffff888058b43000 data:ffff887fdfa6e194 tail:0x120 end:0x6c0 dev:team0
+ kernel BUG at net/core/skbuff.c:213 !
+Oops: invalid opcode: 0000 [#1] SMP KASAN PTI
+CPU: 1 UID: 0 PID: 1322 Comm: kworker/1:9 Not tainted syzkaller #0 PREEMPT(full)
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+Workqueue: mld mld_ifc_work
+ RIP: 0010:skb_panic+0x157/0x160 net/core/skbuff.c:213
+Call Trace:
+ <TASK>
+  skb_under_panic net/core/skbuff.c:223 [inline]
+  skb_push+0xc3/0xe0 net/core/skbuff.c:2641
+  ipgre_header+0x67/0x290 net/ipv4/ip_gre.c:897
+  dev_hard_header include/linux/netdevice.h:3436 [inline]
+  neigh_connected_output+0x286/0x460 net/core/neighbour.c:1618
+  NF_HOOK_COND include/linux/netfilter.h:307 [inline]
+  ip6_output+0x340/0x550 net/ipv6/ip6_output.c:247
+  NF_HOOK+0x9e/0x380 include/linux/netfilter.h:318
+  mld_sendpack+0x8d4/0xe60 net/ipv6/mcast.c:1855
+  mld_send_cr net/ipv6/mcast.c:2154 [inline]
+  mld_ifc_work+0x83e/0xd60 net/ipv6/mcast.c:2693
+  process_one_work kernel/workqueue.c:3257 [inline]
+  process_scheduled_works+0xad1/0x1770 kernel/workqueue.c:3340
+  worker_thread+0x8a0/0xda0 kernel/workqueue.c:3421
+  kthread+0x711/0x8a0 kernel/kthread.c:463
+  ret_from_fork+0x510/0xa50 arch/x86/kernel/process.c:158
+  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
 
-But I'd also like to poke some more to understand what makes that
-run stand out.
+Fixes: c54419321455 ("GRE: Refactor GRE tunneling code.")
+Reported-by: syzbot+7c134e1c3aa3283790b9@syzkaller.appspotmail.com
+Closes: https://www.spinics.net/lists/netdev/msg1147302.html
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/ipv4/ip_gre.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
+diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
+index 8178c44a3cdd48c5a737e9f4e5696ad8f9fbd4cc..e13244729ad8d5b1c2b9c483d25bff0e438134b5 100644
+--- a/net/ipv4/ip_gre.c
++++ b/net/ipv4/ip_gre.c
+@@ -891,10 +891,17 @@ static int ipgre_header(struct sk_buff *skb, struct net_device *dev,
+ 			const void *daddr, const void *saddr, unsigned int len)
+ {
+ 	struct ip_tunnel *t = netdev_priv(dev);
+-	struct iphdr *iph;
+ 	struct gre_base_hdr *greh;
++	struct iphdr *iph;
++	int needed;
++
++	needed = t->hlen + sizeof(*iph);
++	if (skb_headroom(skb) < needed &&
++	    pskb_expand_head(skb, HH_DATA_ALIGN(needed - skb_headroom(skb)),
++			     0, GFP_ATOMIC))
++		return -needed;
+ 
+-	iph = skb_push(skb, t->hlen + sizeof(*iph));
++	iph = skb_push(skb, needed);
+ 	greh = (struct gre_base_hdr *)(iph+1);
+ 	greh->flags = gre_tnl_flags_to_gre_flags(t->parms.o_flags);
+ 	greh->protocol = htons(type);
+-- 
+2.52.0.457.g6b5491de43-goog
 
 
