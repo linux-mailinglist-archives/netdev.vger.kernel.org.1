@@ -1,38 +1,39 @@
-Return-Path: <netdev+bounces-247975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5353D014A0
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 07:47:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8443DD014D1
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 07:52:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 11C77302D397
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 06:47:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DBA5130CF7DE
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 06:47:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68EDF27F171;
-	Thu,  8 Jan 2026 06:47:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4552A341AC0;
+	Thu,  8 Jan 2026 06:47:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mx.socionext.com (mx.socionext.com [202.248.49.38])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21F7A26FD9A;
-	Thu,  8 Jan 2026 06:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB279330B07;
+	Thu,  8 Jan 2026 06:47:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.248.49.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767854834; cv=none; b=sWy0UeIb4CbhUtMXkvzRlfsW5MPecawVy+ZGQmb5gPHDymW7JqKL9cM4PndQtOFzkUsPsXjP0DRpq5NbXUAkIfPs5f50MzKTrvDWUiR1UyWxNfkxoW4BWKHn7AyuTVnIrzI6JAzhSeVu4jTSsKPqRKLBiYysutie7TfOyJUSGRI=
+	t=1767854838; cv=none; b=A7+H6Qw2hUh/8QByyg/Uz55WMCEetRAYVeaZEwoVNT7aybrVLZOra5ABzyyf0/yIhQ6+Ff5ntOEoNPThn6od0avMyB3mnqTgGYlatS/fb7XZDytbAStfeaAcfsrck9GsFap+zA5ogO9oJAja0bXmaN8RChmfOQ2Pp8ZaNPs8k9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767854834; c=relaxed/simple;
-	bh=5FmDmQiqF35UR7MxgCzvyisBOZ2UU9X9Bu4ye1Eaejk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TEqLVNaiSTTtzfeV3vbVo/CZ2c+Efu2ZWZ0cA+UVGMSF0F1fntmRVcOvzo0NnCm2AAyqFatF4rn2ZOsJYiuNKjteVnvcwramRDWlavI5rcX0VqeR2rNGVRNfS6FKWCN8rYvEcawE3OQbyPZIzzonxVRRYJftAU7G7b6ljEEi+ZE=
+	s=arc-20240116; t=1767854838; c=relaxed/simple;
+	bh=WeOCucExIjQlrwVpPEHnUCV9xwI7ryLMMNZFlVl4+24=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=b0UGg2WKlL4uWtMABs9H2yHba3zNmsCcHBMnE9fC14dBwt3NPg598A7ZAk7uJEJ53PzfzOR93qsAdEMV4QiaQoUYQDDJYIt7o5Cl3W593Em9xQxGHNrrJBzayTE19wCgar9daxNE4aaCqEVZDwdJgGm+SOoKAXUpGu8qDeBm0yk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com; spf=pass smtp.mailfrom=socionext.com; arc=none smtp.client-ip=202.248.49.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=socionext.com
 Received: from unknown (HELO kinkan3-ex.css.socionext.com) ([172.31.9.52])
-  by mx.socionext.com with ESMTP; 08 Jan 2026 15:47:00 +0900
+  by mx.socionext.com with ESMTP; 08 Jan 2026 15:47:01 +0900
 Received: from mail.mfilter.local (mail-arc02.css.socionext.com [10.213.46.40])
-	by kinkan3-ex.css.socionext.com (Postfix) with ESMTP id 068AD20695EB;
-	Thu,  8 Jan 2026 15:47:00 +0900 (JST)
-Received: from kinkan3.css.socionext.com ([172.31.9.51]) by m-FILTER with ESMTP; Thu, 8 Jan 2026 15:46:59 +0900
+	by kinkan3-ex.css.socionext.com (Postfix) with ESMTP id 7552C20695EB;
+	Thu,  8 Jan 2026 15:47:01 +0900 (JST)
+Received: from kinkan3.css.socionext.com ([172.31.9.51]) by m-FILTER with ESMTP; Thu, 8 Jan 2026 15:47:01 +0900
 Received: from plum.e01.socionext.com (unknown [10.212.245.39])
-	by kinkan3.css.socionext.com (Postfix) with ESMTP id 979181757;
-	Thu,  8 Jan 2026 15:46:59 +0900 (JST)
+	by kinkan3.css.socionext.com (Postfix) with ESMTP id 10D811757;
+	Thu,  8 Jan 2026 15:47:01 +0900 (JST)
 From: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -42,10 +43,12 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
-Subject: [PATCH net 1/2] net: ethernet: ave: Remove unnecessary 'out of memory' message
-Date: Thu,  8 Jan 2026 15:46:40 +0900
-Message-Id: <20260108064641.2593749-1-hayashi.kunihiko@socionext.com>
+Subject: [PATCH net 2/2] net: ethernet: ave: Replace udelay with usleep_range
+Date: Thu,  8 Jan 2026 15:46:41 +0900
+Message-Id: <20260108064641.2593749-2-hayashi.kunihiko@socionext.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260108064641.2593749-1-hayashi.kunihiko@socionext.com>
+References: <20260108064641.2593749-1-hayashi.kunihiko@socionext.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,34 +57,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Follow the warning from checkpatch.pl and remove 'out of memory' message.
+Replace udelay() with usleep_range() as notified by checkpatch.pl.
 
-    WARNING: Possible unnecessary 'out of memory' message
-    #590: FILE: drivers/net/ethernet/socionext/sni_ave.c:590:
-    +               if (!skb) {
-    +                       netdev_err(ndev, "can't allocate skb for Rx\n");
+    CHECK: usleep_range is preferred over udelay; see function description
+    of usleep_range() and udelay().
+    #906: FILE: drivers/net/ethernet/socionext/sni_ave.c:906:
+    +       udelay(50);
 
 Signed-off-by: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
 ---
- drivers/net/ethernet/socionext/sni_ave.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ drivers/net/ethernet/socionext/sni_ave.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/socionext/sni_ave.c b/drivers/net/ethernet/socionext/sni_ave.c
-index 66b3549636f8..4700998c4837 100644
+index 4700998c4837..a3735d81a862 100644
 --- a/drivers/net/ethernet/socionext/sni_ave.c
 +++ b/drivers/net/ethernet/socionext/sni_ave.c
-@@ -586,10 +586,8 @@ static int ave_rxdesc_prepare(struct net_device *ndev, int entry)
- 	skb = priv->rx.desc[entry].skbs;
- 	if (!skb) {
- 		skb = netdev_alloc_skb(ndev, AVE_MAX_ETHFRAME);
--		if (!skb) {
--			netdev_err(ndev, "can't allocate skb for Rx\n");
-+		if (!skb)
- 			return -ENOMEM;
--		}
- 		skb->data += AVE_FRAME_HEADROOM;
- 		skb->tail += AVE_FRAME_HEADROOM;
- 	}
+@@ -903,11 +903,11 @@ static void ave_rxfifo_reset(struct net_device *ndev)
+ 
+ 	/* assert reset */
+ 	writel(AVE_GRR_RXFFR, priv->base + AVE_GRR);
+-	udelay(50);
++	usleep_range(50, 100);
+ 
+ 	/* negate reset */
+ 	writel(0, priv->base + AVE_GRR);
+-	udelay(20);
++	usleep_range(20, 40);
+ 
+ 	/* negate interrupt status */
+ 	writel(AVE_GI_RXOVF, priv->base + AVE_GISR);
 -- 
 2.34.1
 
