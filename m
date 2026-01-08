@@ -1,100 +1,105 @@
-Return-Path: <netdev+bounces-248102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAD17D04024
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 16:48:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63F14D04582
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:26:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9106030FDBF1
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:28:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1E52232F7318
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:15:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B5C843FD00;
-	Thu,  8 Jan 2026 14:19:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE7755078FB;
+	Thu,  8 Jan 2026 14:25:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YH4XZg4h"
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CFE040F8F3;
-	Thu,  8 Jan 2026 14:19:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88C65078DE;
+	Thu,  8 Jan 2026 14:25:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767881949; cv=none; b=mC03oytCuq9ldHHzwefLQ+GnyBIVtre3qX1hw6me+VmgbtqQlHpVgT4Z6UNZ3tFU9lve+/fE3It3Udo3RyQiI16kNz0XqfapDFijxjsW5R+l7oB3M3a+vuDXzv0WrkpzM0rML8HfMfmRwAVNg3X4e1+W+CAp77PMBqTa8OmN20k=
+	t=1767882348; cv=none; b=U7sVoGfbR7cbhyFaYhxNe+q4kjAfz2Ui6Wu+ztecJeZHXg00HybfTvaLqW0ivNRAV+1go+lU4vwsD92l6dAEFDIOmSU7oPj2A1/kH038c80ifCe7PRWmmXBTlDkVPPLz8P5B5hxliWV83AF7hc6SJ7Kp4kzw6AFl9sokcQwIGpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767881949; c=relaxed/simple;
-	bh=BepAi8AeO4+ixlelyuqSBWK9uM4+csWfw4z51yePc58=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=a4bpf2E5NQTWuY5Jc2tGMII8o+cuhHxUEHjpVq61H7Re2ACwop+ohbHu9Fvh2TKSD/8deURnLmGynb2CGWVixNvbcQDrrFTKSpYNPY6FZHl4RJsKNslca9F3/woPH9MI1BHXRDCHCV/YR3vNm3N2sNmG9EWBuFqJ2vcKZaFTy9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 608EIsPZ043558;
-	Thu, 8 Jan 2026 23:18:54 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 608EIs3R043554
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Thu, 8 Jan 2026 23:18:54 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <1db0fa14-af3b-47e6-93dc-0adffaa3d934@I-love.SAKURA.ne.jp>
-Date: Thu, 8 Jan 2026 23:18:54 +0900
+	s=arc-20240116; t=1767882348; c=relaxed/simple;
+	bh=F13uKkukZXofZUBYaNqrE+dWSP1fqQkxZdlgcTwh0ko=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=m7WNVn+SuNy8LAWWBLrn79ucwt0/1till3ZJIGBy8U5FKyrln6CWGuuLP+NkRGyXRGKvNL+A3ZDvl3WoxA/4pA/MkZ/ICJVEl8JdoGaYXCTJq7MZIgxoyQR6xkvdPEDblAiWgBoRG0x/Wvnz/TVBIUcghZGBAO1XJWpBEnk2Z68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YH4XZg4h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A58AC116C6;
+	Thu,  8 Jan 2026 14:25:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767882348;
+	bh=F13uKkukZXofZUBYaNqrE+dWSP1fqQkxZdlgcTwh0ko=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=YH4XZg4hu7qDLTlUAWnnk+IScfeVKZniaLj09ytWaARbv75UD8nZvEtaTe80xOejN
+	 g6zpoHBVuIM882dgo8CzYhvculGHyddTrWsHbWJ+dMD4GKLhoAZ46mtj/IXX7FFBln
+	 udJXKcPZ5RQaSoUfkwI3ZCeDwyBIOcpUrLsHRt9u91BZzig+3iQ7JI904U5Z/UlxF0
+	 txfUv/fmIxGcjZTvRrxvjCBcfd7xiajaOUz5c7IoB2KJMlyOh8aKsf6OqdFgUooC+m
+	 Qrg+3kaLcIfzQB155wUwZo6dLeb8mnMvaF7msq0MFbjb2Fmi3Cbqsfwl7AQvbbgGxi
+	 vXDjvxb0nv8AA==
+Date: Thu, 08 Jan 2026 08:25:47 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] bpf: fix reference count leak in bpf_prog_test_run_xdp()
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Lorenzo Bianconi <lorenzo@kernel.org>, bpf <bpf@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>
-References: <af090e53-9d9b-4412-8acb-957733b3975c@I-love.SAKURA.ne.jp>
- <87qzs02ofv.fsf@toke.dk>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <87qzs02ofv.fsf@toke.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Anti-Virus-Server: fsav303.rs.sakura.ne.jp
-X-Virus-Status: clean
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: krzk+dt@kernel.org, 
+ Stefan Eichenberger <stefan.eichenberger@toradex.com>, pabeni@redhat.com, 
+ davem@davemloft.net, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ conor+dt@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+ andrew+netdev@lunn.ch, edumazet@google.com
+To: Stefan Eichenberger <eichest@gmail.com>
+In-Reply-To: <20260108125208.29940-2-eichest@gmail.com>
+References: <20260108125208.29940-1-eichest@gmail.com>
+ <20260108125208.29940-2-eichest@gmail.com>
+Message-Id: <176788234726.4064937.7806181035120642054.robh@kernel.org>
+Subject: Re: [PATCH v2 1/2] dt-bindings: net: micrel: Convert to DT schema
 
-On 2026/01/08 23:01, Toke Høiland-Jørgensen wrote:
-> Hmm, this will end up call bpf_ctx_finish() in the error path, which I'm
-> not sure we want?
 
-Excuse me, but I don't think bpf_ctx_finish() will be called, for
-
-+out_put_dev:
- 	/* We convert the xdp_buff back to an xdp_md before checking the return
- 	 * code so the reference count of any held netdevice will be decremented
- 	 * even if the test run failed.
- 	 */
- 	xdp_convert_buff_to_md(&xdp, ctx);
- 	if (ret) // <== ret was set to non-0 value immediately before the "goto out_put_dev;" line.
- 		goto out;
- 
- 	size = xdp.data_end - xdp.data_meta + sinfo->xdp_frags_size;
- 	ret = bpf_test_finish(kattr, uattr, xdp.data_meta, sinfo, size, sinfo->xdp_frags_size,
- 			      retval, duration);
- 	if (!ret)
- 		ret = bpf_ctx_finish(kattr, uattr, ctx,
- 				     sizeof(struct xdp_md));
-
+On Thu, 08 Jan 2026 13:51:27 +0100, Stefan Eichenberger wrote:
+> From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
 > 
-> Could we just move the xdp_convert_md_to_buff() call to after the frags
-> have been copied? Not sure there's technically any dependency there,
-> even though it does look a little off?
+> Convert the devicetree bindings for the Micrel PHYs and switches to DT
+> schema.
+> 
+> Signed-off-by: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+> ---
+>  .../devicetree/bindings/net/micrel.txt        |  57 --------
+>  .../devicetree/bindings/net/micrel.yaml       | 133 ++++++++++++++++++
+>  2 files changed, 133 insertions(+), 57 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/net/micrel.txt
+>  create mode 100644 Documentation/devicetree/bindings/net/micrel.yaml
+> 
 
-Unless
+My bot found errors running 'make dt_binding_check' on your patch:
 
-	xdp_md->data = xdp->data - xdp->data_meta;
-	xdp_md->data_end = xdp->data_end - xdp->data_meta;
+yamllint warnings/errors:
 
-in xdp_convert_buff_to_md() lines do something bad for the error path,
-I think this change will be safe.
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/renesas,ether.example.dtb: ethernet-phy@1 (ethernet-phy-id0022.1537): compatible: ['ethernet-phy-id0022.1537', 'ethernet-phy-ieee802.3-c22'] is too long
+	from schema $id: http://devicetree.org/schemas/net/micrel.yaml
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.kernel.org/project/devicetree/patch/20260108125208.29940-2-eichest@gmail.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
 
 
