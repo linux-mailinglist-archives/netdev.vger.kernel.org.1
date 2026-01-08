@@ -1,172 +1,182 @@
-Return-Path: <netdev+bounces-247909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7717BD007C1
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 01:42:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DD5ED007D0
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 01:43:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 766D730222E0
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 00:41:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 21FC73014AF5
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 00:42:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F9D1D86DC;
-	Thu,  8 Jan 2026 00:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12BCE1D514E;
+	Thu,  8 Jan 2026 00:42:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lh9AaWzp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NRPfGZK0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FFF51A23B6
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 00:41:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7571A23B6
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 00:42:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767832897; cv=none; b=uXiHh57FM0GKzpbWBEY1e8bVMmkbE9jWeLrZinkfnPW30RD3r0crEf5bOW/WnZQ3d8FEPRpETLdKa8xrgwnD9Vwc+wyiE71UVhwgpsSiMxvLnn3qxJh+M0Y1GGqOr54HR3RbpBJNptl1ga7KJfUnpzY/2DCXyCpgr200ffP32eA=
+	t=1767832965; cv=none; b=Xs8iEJvtY2UAHkONY5Rj9FjyO9EgBbq4M9OUD4UPrgdX0rlRmeAxqQSdbxLwuQwVmfuQSwg0U6N8G4abi5PNpwYNPLwbk7o/9chEhOR26mxJirJWG+Jn8UyDA5IB3eZOBs2ZPS+WJ35SCHjmo5XlddYcOE5YSElmzorFkpcVoq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767832897; c=relaxed/simple;
-	bh=9g0zStzKQeS3+N9tmIKzZx3owOLSnCnzmMh7XbFrzQk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LltaebGkNIrdQWW4+xfZp8YZ6siST89ze2MqnVHm+FzBj8K+5ILtMr/zXB4o6hj1R7dAEOAy81Y6Tpmyw0eu1HmQ5/Ed07z9Za30by9Prp5vy+z34YQ32GX8WODdtE1htz7CgwKRma4B4rY32ePJBNhLl0QMtq4vK8uNX8SKYw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lh9AaWzp; arc=none smtp.client-ip=209.85.128.179
+	s=arc-20240116; t=1767832965; c=relaxed/simple;
+	bh=9r88JtSZ6xGnZCA8BUjHISgxh3ySwofk73N/9vkt6PQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ojMrrVFam54aVEnmYcM9rWedcrlQBVHYUHTQqlncTy23opiDCeixAYB7sDYICUVRsN5dgFxrLb82fvkLWgoBG1d2id7gs4fVtcmfIT+cEoCC63nWaxJI4ec+yakJgea0pRyKeNCv75zervYJkVGJ2+JaJdq3eCL3WrktoSILjeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NRPfGZK0; arc=none smtp.client-ip=209.85.221.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-78fb6c7874cso31165587b3.0
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 16:41:35 -0800 (PST)
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-42e2ba54a6fso1039509f8f.3
+        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 16:42:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767832894; x=1768437694; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jrenqTp8E4tDkOgXs7eMnB0GiU20rX+sxdLI3fByfBk=;
-        b=lh9AaWzpXnlVl9nZXhJnRo0Y8K1o7eo2v3zX9HTdB/EjYm4atY/VsyMe8GBBfbdxL1
-         MH0hMkuVOfYpgXKVnTBj6/tNewFC5wUaq7Y+9Z7k53yeBjrUkRjtqnV/qY11zl5ug2O7
-         wksu4fd3gdNwP2DyBS+s0qtIz23y537d3e48wcy0dIkAHfs1mWrl71c2BdRIOTnhlBM0
-         3LUvbvAQeGxsSW5jzPmATnyHTDyZ7308bcJtphsqX/8whzHOmvCwqK5YrxPR0t56ZApx
-         TNA2JYT8nFglk8yG3BOIo9fYFE+zk7fZdx1PBltKZpeEN8iCcJbzVO5VNZPmLfds9L97
-         uxnw==
+        d=gmail.com; s=20230601; t=1767832961; x=1768437761; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=P/9BEHPko6/406fwIeYINmqT5OrYPin1DACgb6PeivA=;
+        b=NRPfGZK0K7QuvYHnmcGT/v1cOr8XWLfMZ8BDcUhIuPWOez5LW9C3727+u3bWKJSuAM
+         x0xFEUmLEQHpe9VssMLVNzpDJaIReiZHYBoCCYP0eDsXT3oCedokbXezLK6+A0S1cA0T
+         W4pJiCaZXH6P8pHX5SdEd4RGc3lf02f4wXsGPgMEu8lUKP2U8Y1yYwqmmaGx5QJfjl1O
+         dG3zY8Z4p01ip2x5qMxxTwSV4DwMlWaQCd9ceg4mYTFPA+gXx9DdXMdNfc+ia1mA6hVk
+         eW3UydxdEpRtAFaf+1g0HbqYGQ0gKMDMin8+HZkaBBQAonm51DBPGlN0QkmKn82gwirj
+         ncWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767832894; x=1768437694;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jrenqTp8E4tDkOgXs7eMnB0GiU20rX+sxdLI3fByfBk=;
-        b=CSmRjVeiF3af+JG5Pw5ptVkQg4EZsjoD9vwUWBESGmswz9ltmQC5q5YYteCZVSGB2S
-         +dd7CHjbhBQ+uiCd582LsTpaXMGKFJDqgTrwJSDaItJpepgAPNk3iQLeacME2zZEhzYK
-         rTjqm2z1+fUwiGUttbxF9dQnQD91P7gnsyNZPxaEo8/+YD553Q92Ur7VMzkNifRNQmox
-         8ZK8mKwSR1oUwCsTPHIP6Z83csRH+vwI1pKPfOq1rsB47D9ewwzjFSfLI27OCLzKUtug
-         ZuJmeUnVI9YU/nt0GLVyp48t0FsyXMNxjQ2ZfJP2NcuGtrEtbQAqg4m89mFXBhp3/9Vc
-         YoTA==
-X-Forwarded-Encrypted: i=1; AJvYcCUGcb6i9PcH8LhaebLbEvTq4K0qtEjGNODZtq+xvCuUl3gqtMxEtYVV1zUvPlmURci04kdyoWs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5vsLN7GbGM7LLG02Sxo5fjjWjR8wtppAWDMKpRZuNQ+BmV+ix
-	aD+JOueImowmxrERVaZ3YOB6+usLPfNXkJ88kRkgsrav6/nJiHwGX19N
-X-Gm-Gg: AY/fxX7mLtARcSj4/Jzy48gdZLgJcw5TyZGpEV32Q8Idjw3nXDNfQHJwNRN+If5WD1K
-	NCybv2bqCOwgsuvunG3/fmrLx3Q7FWSftj5pQkLfBiwevH8zvU1YMqmQvye9IqAg1gUmXAqbe2N
-	yvfXXHpVD5u++hEZhGA1vGvm6wEYMZzef1JXv1zNY+4t78ncGncWzZsJhNTUFLY7m5T7zWU2NOD
-	Sk6wzXIqT2PzUr/Upwm3YCvIqt8n43tTbXiIcfDtwGJwswxKtldj0+6gajssL0Bmt9NOa2asvaD
-	unrlC+d2Qy+ugrfJM4VSujHhZWz3MtEWSK7dAzjVM+zwd7SqzlmPh0Juus90vwJ8jPv6Xv7ynoa
-	qqWITZzgeHLjX31ggCusFmBD9QX0DDFzMaO8G9cXWl/9F16CFqsOZ6bMS3CEHAtsAC8ILl2eDIF
-	HTFD5aCGLVvfEhHTgE92pHM2rY/qsdtpSDZss476cnh2gjog==
-X-Google-Smtp-Source: AGHT+IEnrEIlaG9p2xZXsCNaxYstFtQuumuk05m95Q+1JCx1iT0A6+p+K9E6BdjxZvhkaj4OdW4EFA==
-X-Received: by 2002:a05:690e:1686:b0:644:60d9:8675 with SMTP id 956f58d0204a3-64716cbfa9fmr3525112d50.90.1767832894483;
-        Wed, 07 Jan 2026 16:41:34 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:42::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6470d89d607sm2690822d50.12.2026.01.07.16.41.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 16:41:33 -0800 (PST)
-Date: Wed, 7 Jan 2026 16:41:32 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, berrange@redhat.com,
-	Sargun Dhillon <sargun@sargun.me>,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v12 04/12] vsock: add netns support to virtio
- transports
-Message-ID: <aV79PDVBDEqxHlhK@devvm11784.nha0.facebook.com>
-References: <20251126-vsock-vmtest-v12-0-257ee21cd5de@meta.com>
- <20251126-vsock-vmtest-v12-4-257ee21cd5de@meta.com>
- <6cef5a68-375a-4bb6-84f8-fccc00cf7162@redhat.com>
- <aS8oMqafpJxkRKW5@devvm11784.nha0.facebook.com>
- <06b7cfea-d366-44f7-943e-087ead2f25c2@redhat.com>
- <aS9hoOKb7yA5Qgod@devvm11784.nha0.facebook.com>
- <99b6f3f7-4130-436a-bfef-3ef35832e02c@redhat.com>
+        d=1e100.net; s=20230601; t=1767832961; x=1768437761;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=P/9BEHPko6/406fwIeYINmqT5OrYPin1DACgb6PeivA=;
+        b=pl76F3En+wA3ie3lS/1pk7HuszgdImnnypzEmhiSH1+p4fYvcj31cckykyf77STDqA
+         f6h2w0boI8yvuqYmJUvosrPnUmMr+Retad/9elxulyxaais31wc0vjSc+fid6aq6AT27
+         WpGJGH0CYyudrKy6zac2WKKlV6vPSavqlM0Twqmr0gW+9B4DVptF5LXM1UkhJvT4AP7g
+         9z+uvxBpD1AlTZfyfbu0B9WpFfSMFGREe/AnpJMJCPMnhIOtueOlqlCw1nK8JkFtbXl/
+         ys2QKmMAXAqIE+qWdWDGC/Q+1sG9/C2sCMVsQ37TOiNHdufcLriP0ZeCTvf3bHf6TzwX
+         JVkA==
+X-Forwarded-Encrypted: i=1; AJvYcCX78yk5s0TwTiBjbH+79MiIeIikQbdjh3YxJVFBzmuRpza1VZH+9JSOAtoK3euzAZlFLW93hnc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKZNE3f5g295wlVJn/1ksxBZboXQFb0eROs/vTqsaZRjEfuRfA
+	KkOFZGRMHf/c1W2W8YWLyvOJXP69JKUWg6TtivZbGa17MFfu0viG7667
+X-Gm-Gg: AY/fxX4cFTwUKrifRVm7kEZyFZvzdEVrMRXTw/5NdzzbSGiOJVCFhQAvLivEoDkXgDP
+	2+BLC9/AjtIQ1l7bZm9gPefISCljFCGp4Z1GnaAXyoGCFAJhM/MkGeemdmMsxqvZ3ksK74V229g
+	Rp4f71K3ldUiuAXNGIpMZlZQGwDfVgK9am+u9GG0QnykGDiZ20fuefmU3aa1IqoAHW1m1ON93p3
+	M9yC80o53hnCi5ea0JabCge2jEptxKdfAgY0w9EkBbR8OlrOltPHnmnLqFNJydCbIveCu4OHhdN
+	OhgYSx4UOEr0fV/00nJrZLtuHRgjwGpj/qi+ptD0Xi/hjG2C3kvCZs8nQoqj13LYIklg2sMHQkA
+	hx7SoYhWl2jFJWRn23Yxxg/Ympb6u7MBmUN7LDNVyEzZLTuJxyqgqPTmxIpnNQNoJG3wgZqn4h3
+	KBxsUnzXfeZctJ9w==
+X-Google-Smtp-Source: AGHT+IFTfQWgJn/mwY43/DpenxZMUgLIDYN3NOa3kiGMyzLgOoMz9GLFCupyFA0R0Z3yX3Mz7Ira5A==
+X-Received: by 2002:a05:6000:1843:b0:432:b951:e9ff with SMTP id ffacd0b85a97d-432c376158amr6238838f8f.53.1767832961411;
+        Wed, 07 Jan 2026 16:42:41 -0800 (PST)
+Received: from [192.168.0.2] ([212.50.121.5])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5ee5eesm13342959f8f.34.2026.01.07.16.42.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 07 Jan 2026 16:42:40 -0800 (PST)
+Message-ID: <af3aba1d-984b-46e1-824f-8cdbd774f89f@gmail.com>
+Date: Thu, 8 Jan 2026 02:42:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <99b6f3f7-4130-436a-bfef-3ef35832e02c@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next v4 2/8] net: wwan: core: split port creation and
+ registration
+To: Slark Xiao <slark_xiao@163.com>,
+ Sai Krishna Gajula <saikrishnag@marvell.com>
+Cc: "loic.poulain@oss.qualcomm.com" <loic.poulain@oss.qualcomm.com>,
+ "johannes@sipsolutions.net" <johannes@sipsolutions.net>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "mani@kernel.org" <mani@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20260105102018.62731-1-slark_xiao@163.com>
+ <20260105102018.62731-3-slark_xiao@163.com>
+ <BYAPR18MB37352E69CB7B685926A574B9A087A@BYAPR18MB3735.namprd18.prod.outlook.com>
+ <65a926ef.5e4a.19b97551cdb.Coremail.slark_xiao@163.com>
+Content-Language: en-US
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <65a926ef.5e4a.19b97551cdb.Coremail.slark_xiao@163.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jan 07, 2026 at 10:47:56AM +0100, Paolo Abeni wrote:
-> Hi,
-> 
-> On 12/2/25 11:01 PM, Bobby Eshleman wrote:
-> > On Tue, Dec 02, 2025 at 09:47:19PM +0100, Paolo Abeni wrote:
-> >> I still have some concern WRT the dynamic mode change after netns
-> >> creation. I fear some 'unsolvable' (or very hard to solve) race I can't
-> >> see now. A tcp_child_ehash_entries-like model will avoid completely the
-> >> issue, but I understand it would be a significant change over the
-> >> current status.
-> >>
-> >> "Luckily" the merge window is on us and we have some time to discuss. Do
-> >> you have a specific use-case for the ability to change the netns mode
-> >> after creation?
-> >>
-> >> /P
-> > 
-> > I don't think there is a hard requirement that the mode be change-able
-> > after creation. Though I'd love to avoid such a big change... or at
-> > least leave unchanged as much of what we've already reviewed as
-> > possible.
-> > 
-> > In the scheme of defining the mode at creation and following the
-> > tcp_child_ehash_entries-ish model, what I'm imagining is:
-> > - /proc/sys/net/vsock/child_ns_mode can be set to "local" or "global"
-> > - /proc/sys/net/vsock/child_ns_mode is not immutable, can change any
-> >   number of times
-> > 
-> > - when a netns is created, the new netns mode is inherited from
-> >   child_ns_mode, being assigned using something like:
-> > 
-> > 	  net->vsock.ns_mode =
-> > 		get_net_ns_by_pid(current->pid)->child_ns_mode
-> > 
-> > - /proc/sys/net/vsock/ns_mode queries the current mode, returning
-> >   "local" or "global", returning value of net->vsock.ns_mode
-> > - /proc/sys/net/vsock/ns_mode and net->vsock.ns_mode are immutable and
-> >   reject writes
-> > 
-> > Does that align with what you have in mind?
-> Sorry for the latency. This fell of my radar while I still processed PW
-> before EoY and afterwards I had some break.
-> 
-> Yes, the above aligns with what I suggested, and I think it should solve
-> possible race-related concerns (but I haven't looked at the RFC).
-> 
-> /P
-> 
-> 
+On 1/7/26 09:21, Slark Xiao wrote:
+> At 2026-01-07 00:49:50, "Sai Krishna Gajula" <saikrishnag@marvell.com> wrote:
+>>> -----Original Message-----
+>>> From: Slark Xiao <slark_xiao@163.com>
+>>> Sent: Monday, January 5, 2026 3:50 PM
+>>> To: loic.poulain@oss.qualcomm.com; ryazanov.s.a@gmail.com;
+>>> johannes@sipsolutions.net; andrew+netdev@lunn.ch;
+>>> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+>>> pabeni@redhat.com; mani@kernel.org
+>>> Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org
+>>> Subject: [net-next v4 2/8] net: wwan: core: split port creation and
+>>> registration
+>>>
+>>> From: Sergey Ryazanov <ryazanov. s. a@ gmail. com> Upcoming GNSS (NMEA)
+>>> port type support requires exporting it via the GNSS subsystem. On another
+>>> hand, we still need to do basic WWAN core work: find or allocate the WWAN
+>>> device, make it the
+>>> From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+>>>
+>>> Upcoming GNSS (NMEA) port type support requires exporting it via the GNSS
+>>> subsystem. On another hand, we still need to do basic WWAN core
+>>> work: find or allocate the WWAN device, make it the port parent, etc. To reuse
+>>> as much code as possible, split the port creation function into the registration
+>>> of a regular WWAN port device, and basic port struct initialization.
+>>>
+>>> To be able to use put_device() uniformly, break the device_register() call into
+>>> device_initialize() and device_add() and call device initialization earlier.
 
-No worries, understandable! Thanks for the confirmation.
+[skipped]
 
-Best,
-Bobby
+>>> +	struct wwan_device *wwandev = to_wwan_dev(port->dev.parent);
+>>> +	char namefmt[0x20];
+>>> +	int minor, err;
+>>> +
+>>> +	/* A port is exposed as character device, get a minor */
+>>> +	minor = ida_alloc_range(&minors, 0, WWAN_MAX_MINORS - 1,
+>>> GFP_KERNEL);
+>>> +	if (minor < 0)
+>>> +		return minor;
+>>> +
+>>> +	port->dev.class = &wwan_class;
+>>> +	port->dev.devt = MKDEV(wwan_major, minor);
+>>> +
+>>> +	/* allocate unique name based on wwan device id, port type and
+>>> number */
+>>> +	snprintf(namefmt, sizeof(namefmt), "wwan%u%s%%d", wwandev-
+>>>> id,
+>>> +		 wwan_port_types[port->type].devsuf);
+>>> +
+>>> +	/* Serialize ports registration */
+>>> +	mutex_lock(&wwan_register_lock);
+>>> +
+>>> +	__wwan_port_dev_assign_name(port, namefmt);
+>>> +	err = device_add(&port->dev);
+>>> +
+>>> +	mutex_unlock(&wwan_register_lock);
+>>> +
+>>> +	if (err)
+>>> +		return err;
+>> Please check, if freeing with ida_free is required before returning err.
+>> if (err) {
+>>     ida_free(&minors, minor);
+>>     return err;
+>> }
+> Yes, you are right.
+> And patch 7/8 modifies this file as well. We need to align with that changes
+> since there are some issues(we still allocates the minor even the cdev is
+> false). This would lead to the release function can't release the correct
+> devt.
+
+Sai, nice catch! It should free the minor number on error exactly like this.
+
+--
+Sergey
 
