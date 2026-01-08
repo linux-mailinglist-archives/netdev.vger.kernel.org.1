@@ -1,101 +1,84 @@
-Return-Path: <netdev+bounces-248105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28095D0429A
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:07:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 04B10D03DBC
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 16:30:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3D35A30508B3
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:57:26 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 962FA302B914
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 15:23:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F28EE40FD83;
-	Thu,  8 Jan 2026 14:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 606E0342507;
+	Thu,  8 Jan 2026 14:32:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UCOREY3r"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MDY9Ne0g"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F8A40FD82
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 14:28:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 904332D641C;
+	Thu,  8 Jan 2026 14:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767882507; cv=none; b=RwrYpbyXU1cb63D24Bm8x1WXBIbAiXkg/0MGAHFAG13pt1gs5aF/V3ci8z/1AkfpY8HuZ2mC7sKHIEXgJ+qyS8Y/v1XQxgCFyRz5QxvTMqSzMmIEexMzXQEc5oeC7AzHQg71p3yLTblWIGcFM5+yhIUHXV4LzoCAoKAy1E5ifns=
+	t=1767882736; cv=none; b=g1M9J84yz666I+IpuJtapJ1za3vk7LcFeP05t6OYYWo6FDv30Okf1rAgGKDjH89dRQXjW35SMRu6mEXnrgTZQGFLxP3GuCZOdWiuMkJUkRloc9sVwtFzxC2HW9PUoTmRW5bYUTQLQXayEfAOrC9GIVNSzYZxsx7WuGIkKm+kK5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767882507; c=relaxed/simple;
-	bh=D+97G85jkwq44zug9GC2GyAfPD9MnT1LhuZ3x05qiXQ=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=LKoUtuO0BoPdKzoVAKdmSVmA3BUGiJS1fMu0p1xty/l8nZEy3ZteKlM+TuWbMg4DwtbqDoFPCi2AWUmUxEHaYGztWz0qCCCidOlwObklwdzHE9vvL94C6ke5gCToS1kwf0VGzfqxd+3TLcE8S9uk3d+SVUHVdpbyRANtEQqabVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UCOREY3r; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767882505;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xNexTqCHVDcVwW22lygltlD6uavxVUzC/ZSbgJIKvGg=;
-	b=UCOREY3rVlHilGJzJUauOzsiaZljnhYpiYtElICeq8NvPb9xrxup31nO9V5IWBjsMsnPxH
-	8RwbmUsFdfXAqphUIHV20QNKau+rlwR6T1pT5JIeyc65yYJBrlSL87mw9ZyOlAFcaT24rh
-	Q+pWKoNB54fMpxCRmqO7XPOEzokkH9w=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-408-vgsnEQTqPQS65cOOZ6Xy9w-1; Thu,
- 08 Jan 2026 09:28:22 -0500
-X-MC-Unique: vgsnEQTqPQS65cOOZ6Xy9w-1
-X-Mimecast-MFC-AGG-ID: vgsnEQTqPQS65cOOZ6Xy9w_1767882500
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7EE3718005B6;
-	Thu,  8 Jan 2026 14:28:20 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F2FC930002D2;
-	Thu,  8 Jan 2026 14:28:14 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <CANn89i+z6XzGGJRJFuL-1_FDeRXQUULZwZNnXU9RLkcptpw7jA@mail.gmail.com>
-References: <CANn89i+z6XzGGJRJFuL-1_FDeRXQUULZwZNnXU9RLkcptpw7jA@mail.gmail.com> <695e7cfb.050a0220.1c677c.036b.GAE@google.com> <2744142.1767879733@warthog.procyon.org.uk>
-To: Eric Dumazet <edumazet@google.com>
-Cc: dhowells@redhat.com,
-    syzbot <syzbot+6182afad5045e6703b3d@syzkaller.appspotmail.com>,
-    davem@davemloft.net, horms@kernel.org, kuba@kernel.org,
-    linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
-    marc.dionne@auristor.com, netdev@vger.kernel.org, pabeni@redhat.com,
-    syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [afs?] [net?] KCSAN: data-race in rxrpc_peer_keepalive_worker / rxrpc_send_data_packet
+	s=arc-20240116; t=1767882736; c=relaxed/simple;
+	bh=75sU1pnzkYdOyK+Xa922WehXLcn+nA8/e8ViucVg6bQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rIfrE8rogSlhrmjqQZeEIghJMcgM0a7tPK69vjdncELmwMtVjy7M4mDIrTgB0805yQpYalN8uvfs0Ha0lSwIUCk1rBTLAVAKDS4CCJ+hYQi3WXVx4r96plBCE4TQRZCnvurlOMU3nVQACy4fzS5SoDPwotyAsUtq4hLI7dXGE0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MDY9Ne0g; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Re7M6LdtvhdNqEYL+EBdoJ128eL4bJjgUYnGGAfRk9I=; b=MDY9Ne0gm8qsafCUwSHfeCT6mn
+	BG628dCjMo3ScozAmmZg6U0JDPLREFDMSE3J+ODlcSF44BFx+7i3If85AhiKuBJOqieycF+89YCrP
+	8UJ9y78kl4sAySZxSZu4tKP29g8EBGHqYCeCcUQMVVZRu3TvyB8a4iG53LGIt9C8ZKLE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vdr3P-001xdV-TC; Thu, 08 Jan 2026 15:31:59 +0100
+Date: Thu, 8 Jan 2026 15:31:59 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	Frank.Sae@motor-comm.com, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, shenjian15@huawei.com,
+	liuyonglong@huawei.com, chenhao418@huawei.com,
+	jonathan.cameron@huawei.com, salil.mehta@huawei.com,
+	shiyongbang@huawei.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 2/6] net: phy: add support to set default
+ rules
+Message-ID: <b2cc74c0-d63f-418b-9c28-f7a143f61bd3@lunn.ch>
+References: <20251215125705.1567527-1-shaojijie@huawei.com>
+ <20251215125705.1567527-3-shaojijie@huawei.com>
+ <fe22ae64-2a09-45ce-8dbf-a4683745e21c@lunn.ch>
+ <647f91c7-72c2-4e9d-a26d-3f1b5ee42b21@huawei.com>
+ <4e884fc2-9f64-48dd-b0be-e9bb6ec0582d@lunn.ch>
+ <3c82f4e1-0702-4617-b40c-d7f1cbd5a1de@huawei.com>
+ <970a1e2d-c1b1-4b96-9e8e-71aea6b6dc44@lunn.ch>
+ <178a0dc6-438b-4f6f-9cf3-0fb36f7953b3@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2744875.1767882492.1@warthog.procyon.org.uk>
-Date: Thu, 08 Jan 2026 14:28:12 +0000
-Message-ID: <2744876.1767882492@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <178a0dc6-438b-4f6f-9cf3-0fb36f7953b3@huawei.com>
 
-Eric Dumazet <edumazet@google.com> wrote:
+> However, there is no way to handle the issue with another patch;
+> I cannot directly modify the ACPI table (a risky operation).
 
-> LGTM, but potential load and store tearing should be avoided, using
-> READ_ONCE() and WRITE_ONCE().
+It should not be risky. ACPI tables have as many bugs as any other
+software. You have to assume they are buggy and will get updated
+during their lifetime, so you have processes in place to allow them to
+be safely upgraded.
 
-Fair point.
-
-> last_tx_at being time64_t, this would still be racy on 32bit arches.
-> 
-> last_tx_at could probably be an "unsigned long" (in jiffies units)...
-
-I've tried avoiding jiffies where possible.  We have way too many different
-clocks with different granularities and uses in the kernel, but you might be
-right.
-
-David
-
+   Andrew
 
