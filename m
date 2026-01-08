@@ -1,174 +1,198 @@
-Return-Path: <netdev+bounces-248002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FE76D019C6
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 09:43:37 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2F0DD01D8F
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 10:32:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C0B8F30006DC
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 08:43:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 732EB316BEC2
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 08:24:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED223876A9;
-	Thu,  8 Jan 2026 08:17:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67F0437C0E4;
+	Thu,  8 Jan 2026 08:01:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pi3npI/j"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="2ixSlMYf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774AA35772C
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 08:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1556392814
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 08:01:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767860275; cv=none; b=cnhTCpi93XOEutyBtUzhBosiPGu65uRUL8Qe6i7WWg7Hr9apNs7NvUSeVizfJoJJO6DaXgbl9LczWq43sNW6W75BndiRp8wk51+hYGMBN0iQVuEnWkwYxkuNj6sF+/9Wwpvf7qEdCmhg2BsQEz8VNU5k7fzTqOCYRdZjvsIGijc=
+	t=1767859310; cv=none; b=tsjBCbBGAPyWXSkhHB1V6KMWTBMX+zAnY4Q0HGAx2BBlLW+0l9TmuvCIICJtBFLE/xnH1Ko97eFltUu8F5LSjM7savU1XOZ+PpZiuwKl9yendimlfu4zAvLMqzl1IUKmzFIAFYxSN0F+/Q3j4K1hbbyvcTce+xLOVs+WJWs6Mhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767860275; c=relaxed/simple;
-	bh=o4MsYELLIRdpMavb58oxxcTrWEElqeifzs3r0QwK8Io=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rOBePugw6W83LouDLr2W/jFVqjNC9JsAJ0jKMdXSSQ3riINafGPoGfSuAfApzbjuXuxDdACVZmcdKeQYRy0mS9df4VFRM1gyBq6K5/2QqCgzurBsv9kX3a6+OyVelHbfR6ZfmmQmvytAHqvjbkdG0irtrDn11t8Qz/ZW0t9oGnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pi3npI/j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5824DC116D0;
-	Thu,  8 Jan 2026 08:17:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767860274;
-	bh=o4MsYELLIRdpMavb58oxxcTrWEElqeifzs3r0QwK8Io=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pi3npI/j5aOGRk56+t6y+yOqn70I0DXEEM7RsohpkeLi7GZeqLkgWzgrjwSOni6X8
-	 0jzRiIToeBB/rsSuUEtqSfQIi9FTEP/2j+YF4BZLryhk+FT7hRMXKeJKE7kApoExTN
-	 8BaNvAESbwgIV4HE10KvxeEo4CgmzK43FvT4Q2Jg4FA0a9WkCeA1L3h7XWrXONZfzb
-	 RROrtNHeydyGhSn3VQo6SQFCO2kfnsWJ9q22auBS6om38sEmgo+qozwnW1KFEeX+QQ
-	 NMs7Z2pOFZe42evcBO6W0koelQRwewGzIav/FSb26FCozTYqKvY9fv/DkvWWGne72U
-	 0h07gNlkGSkGQ==
-Date: Thu, 8 Jan 2026 08:17:48 +0000
-From: Simon Horman <horms@kernel.org>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1767859310; c=relaxed/simple;
+	bh=pwUBSGQIpveH1nhSTDnvLrm9OvdoCcbTaQeMjwcxGgA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=MgvdHsarcAEfKfsdfMA8XM1SCOgvSu4X7FT3hhAGowvR+GB3/vEqaBWIroO4qlzqpFQssRZyfIy3qtgdZo8uoOw8rvtSwgCTbbtbwBwpzLWPwsBFmyrkZTtbozOTDjYVjNdOrCN+iaq6Uzmpz8d7v0sCEHf059xpavckQgi9UAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=2ixSlMYf; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 494F4C1ECB0;
+	Thu,  8 Jan 2026 08:00:51 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 745A6606B6;
+	Thu,  8 Jan 2026 08:01:17 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 54D5A103C87CD;
+	Thu,  8 Jan 2026 09:01:12 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1767859275; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=fqpvZ3gIw60FSm2tn2zmZaYb3WkC7IjwX7NYx16RT5E=;
+	b=2ixSlMYfzk5LN7W3ITgSN0PFZSsQcH2ulEVdu8kdrANewAaLQvmZGEWxaoWBvw4/1lC2SX
+	bkOJTJCMALLJ8UzxqU81/KKr+sat8oSIYJ2TV4yyUYqR7SeRNxXg+ETLCxVTzH8MRfD/La
+	sLmubIa1JjwoSr14MXCDBUqvWsJnu5GhPSuWY36tnQgGROhKOKGVC81Gql9+cWzz8MmzN2
+	3omfTc3BTINrWskq0lbsG7bND9UaQaJ82IEDug7mdWNBxLFn/1C/9OAlkwALqPDPmoD+Uz
+	/ES6JafVQr70UooTnRbDugAm60pftbt1PmRU2R74sd6Vq7JKwmvMJk35y4u4tg==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Philo Lu <lulie@linux.alibaba.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
-	Dong Yibo <dong100@mucse.com>,
-	Vivian Wang <wangruikang@iscas.ac.cn>,
-	MD Danish Anwar <danishanwar@ti.com>,
-	Dust Li <dust.li@linux.alibaba.com>
-Subject: Re: [PATCH net-next v18 4/6] eea: create/destroy rx,tx queues for
- netdevice open and stop
-Message-ID: <20260108081748.GF345651@kernel.org>
-References: <20260105110712.22674-1-xuanzhuo@linux.alibaba.com>
- <20260105110712.22674-5-xuanzhuo@linux.alibaba.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	mwojtas@chromium.org,
+	Antoine Tenart <atenart@kernel.org>,
+	devicetree@vger.kernel.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: [PATCH net-next v22 06/14] net: phy: Create a phy_port for PHY-driven SFPs
+Date: Thu,  8 Jan 2026 09:00:31 +0100
+Message-ID: <20260108080041.553250-7-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20260108080041.553250-1-maxime.chevallier@bootlin.com>
+References: <20260108080041.553250-1-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260105110712.22674-5-xuanzhuo@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Rspamd-Fuzzy: f0a28691f7ec4acdd6a2650b9611bd90b8db1865e04a7f31d08e08ed4978660bd74e6f9d7b79f45cf671da8c3c71ec37e6f3c48ea0acdb78a09d500b02d2c7fd
 
-On Mon, Jan 05, 2026 at 07:07:10PM +0800, Xuan Zhuo wrote:
-> Add basic driver framework for the Alibaba Elastic Ethernet Adapter(EEA).
-> 
-> This commit introduces the implementation for the netdevice open and
-> stop.
-> 
-> Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-> Reviewed-by: Philo Lu <lulie@linux.alibaba.com>
-> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Some PHY devices may be used as media-converters to drive SFP ports (for
+example, to allow using SFP when the SoC can only output RGMII). This is
+already supported to some extend by allowing PHY drivers to registers
+themselves as being SFP upstream.
 
-...
+However, the logic to drive the SFP can actually be split to a per-port
+control logic, allowing support for multi-port PHYs, or PHYs that can
+either drive SFPs or Copper.
 
-> diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.c b/drivers/net/ethernet/alibaba/eea/eea_net.c
+To that extent, create a phy_port when registering an SFP bus onto a
+PHY. This port is considered a "serdes" port, in that it can feed data
+to another entity on the link. The PHY driver needs to specify the
+various PHY_INTERFACE_MODE_XXX that this port supports.
 
-...
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+Tested-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+ drivers/net/phy/phy_device.c | 30 ++++++++++++++++++++++++++++++
+ drivers/net/phy/phy_port.c   | 15 +++++++++++++++
+ 2 files changed, 45 insertions(+)
 
-> +/* resources: ring, buffers, irq */
-> +int eea_reset_hw_resources(struct eea_net *enet, struct eea_net_init_ctx *ctx)
-> +{
-> +	int err;
-> +
-> +	if (!netif_running(enet->netdev)) {
-> +		enet->cfg = ctx->cfg;
-> +		return 0;
-> +	}
-> +
-> +	err = eea_alloc_rxtx_q_mem(ctx);
-> +	if (err) {
-> +		netdev_warn(enet->netdev,
-> +			    "eea reset: alloc q failed. stop reset. err %d\n",
-> +			    err);
-> +		return err;
-> +	}
-> +
-> +	eea_netdev_stop(enet->netdev);
-> +
-> +	enet_bind_new_q_and_cfg(enet, ctx);
-> +
-> +	err = eea_active_ring_and_irq(enet);
-> +	if (err) {
-> +		netdev_warn(enet->netdev,
-> +			    "eea reset: active new ring and irq failed. err %d\n",
-> +			    err);
-> +		return err;
-> +	}
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index f9cacdfb516e..3fc3a30fe7ed 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -1643,6 +1643,32 @@ static void phy_del_port(struct phy_device *phydev, struct phy_port *port)
+ 	phydev->n_ports--;
+ }
+ 
++static int phy_setup_sfp_port(struct phy_device *phydev)
++{
++	struct phy_port *port = phy_port_alloc();
++	int ret;
++
++	if (!port)
++		return -ENOMEM;
++
++	port->parent_type = PHY_PORT_PHY;
++	port->phy = phydev;
++
++	/* The PHY is a media converter, the port connected to the SFP cage
++	 * is a MII port.
++	 */
++	port->is_mii = true;
++
++	/* The port->supported and port->interfaces list will be populated
++	 * when attaching the port to the phydev.
++	 */
++	ret = phy_add_port(phydev, port);
++	if (ret)
++		phy_port_destroy(port);
++
++	return ret;
++}
++
+ /**
+  * phy_sfp_probe - probe for a SFP cage attached to this PHY device
+  * @phydev: Pointer to phy_device
+@@ -1664,6 +1690,10 @@ int phy_sfp_probe(struct phy_device *phydev,
+ 		ret = sfp_bus_add_upstream(bus, phydev, ops);
+ 		sfp_bus_put(bus);
+ 	}
++
++	if (!ret && phydev->sfp_bus)
++		ret = phy_setup_sfp_port(phydev);
++
+ 	return ret;
+ }
+ EXPORT_SYMBOL(phy_sfp_probe);
+diff --git a/drivers/net/phy/phy_port.c b/drivers/net/phy/phy_port.c
+index 70b3ecb8fb09..81e557aae0d6 100644
+--- a/drivers/net/phy/phy_port.c
++++ b/drivers/net/phy/phy_port.c
+@@ -131,6 +131,21 @@ void phy_port_update_supported(struct phy_port *port)
+ 				 __ETHTOOL_LINK_MODE_MASK_NBITS)
+ 			port->pairs = max_t(int, port->pairs,
+ 					    ethtool_linkmode_n_pairs(mode));
++
++	/* Serdes ports supported through SFP may not have any medium set,
++	 * as they will output PHY_INTERFACE_MODE_XXX modes. In that case, derive
++	 * the supported list based on these interfaces
++	 */
++	if (port->is_mii && !port->mediums) {
++		unsigned long interface, link_caps = 0;
++
++		/* Get each interface's caps */
++		for_each_set_bit(interface, port->interfaces,
++				 PHY_INTERFACE_MODE_MAX)
++			link_caps |= phy_caps_from_interface(interface);
++
++		phy_caps_linkmodes(link_caps, port->supported);
++	}
+ }
+ EXPORT_SYMBOL_GPL(phy_port_update_supported);
+ 
+-- 
+2.49.0
 
-I think that some unwinding of resources is needed if
-eea_active_ring_and_irq() or eea_start_rxtx() fail.
-Similar to what appears in eea_netdev_open().
-
-Also flagged by Claude Code with Review Prompts.
-
-> +
-> +	err = eea_start_rxtx(enet->netdev);
-> +	if (err)
-> +		netdev_warn(enet->netdev,
-> +			    "eea reset: start queue failed. err %d\n", err);
-> +
-> +	return err;
-> +}
-
-...
-
-> diff --git a/drivers/net/ethernet/alibaba/eea/eea_tx.c b/drivers/net/ethernet/alibaba/eea/eea_tx.c
-
-...
-
-> +static void eea_free_meta(struct eea_net_tx *tx, struct eea_net_cfg *cfg)
-> +{
-> +	struct eea_sq_free_stats stats;
-> +	struct eea_tx_meta *meta;
-> +	int i;
-> +
-> +	while ((meta = eea_tx_meta_get(tx)))
-> +		meta->skb = NULL;
-> +
-> +	for (i = 0; i < cfg->tx_ring_num; i++) {
-> +		meta = &tx->meta[i];
-> +
-> +		if (!meta->skb)
-> +			continue;
-> +
-> +		eea_meta_free_xmit(tx, meta, false, NULL, &stats);
-> +
-> +		meta->skb = NULL;
-> +	}
-
-Claude Code running with Review Prompts [1] flags that
-in the loop above cfg->tx_ring_num is used as the bounds
-for access to tx->meta. But elsewhere, including in the
-allocation of tx->meta, ctx->cfg.tx_ring_depth is used.
-
-[1] https://github.com/masoncl/review-prompts/
-
-> +
-> +	kvfree(tx->meta);
-> +	tx->meta = NULL;
-> +}
-
-...
 
