@@ -1,176 +1,128 @@
-Return-Path: <netdev+bounces-247973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-247974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3D6BD01419
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 07:38:09 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A6BFD01434
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 07:42:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 515173019BBB
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 06:38:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4CACA300A36A
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 06:42:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 581BF302742;
-	Thu,  8 Jan 2026 06:38:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1B7C33C192;
+	Thu,  8 Jan 2026 06:42:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8349B329C69
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 06:37:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2702133BBC6;
+	Thu,  8 Jan 2026 06:42:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767854285; cv=none; b=MVGLCqMzJihQ22RlW06P7m3kBlP26dprYTbom+0gq1mtet3dGPR2w2rUmrClqFFYDYN2XCZrqZYRkWYCskTl+JaYIARDjkvT/yML0dzpHSZQC7zT7bnr6SMVX1sAczX2kpK9TyYAF7DeMtKisdTps34Rs/7Rpo5UoShPlW9ytss=
+	t=1767854534; cv=none; b=q5vGpdiCODDfcWbuMzSIpjoLQJNAIchV+/78Aa+6mhmz9WS/2IMDGhtEVJpwZQ6XMW5zsiW6py5LGARdTHKItjZYFBAYMvrWdh+YwQOCgKQCNRTspF2KiW+4BRmmiNIlb4eIKhu3aOXCB0DW30uI5hUkInrVr6iOjw/EIzFLAyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767854285; c=relaxed/simple;
-	bh=ILvKRSqrZfBY8R9Sv0medJtSP+HX16ReDfjszaeLukE=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=C/FddC3tz93HU1YVwyLKiC4aWjt2SuVR0yq1MV0vtcMMaUa6jr7S4T6lsv4hV+L2ULu6G4zRc2bAY1mIm3/y9iq0p6OE81c0ikOofUFPa9Zolc7mY0VIg6aDintybhzPzWdHSGWeScKWfZYgRLdUAgGOyYjllimGAT2+DxrvVPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-65744e10b91so3858825eaf.0
-        for <netdev@vger.kernel.org>; Wed, 07 Jan 2026 22:37:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767854274; x=1768459074;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gqIBuhKVe2+1cy9MVOoRMx3f9L33YTIZn4K3zXXwQSg=;
-        b=MeJ3sVc6eeox/k8W9uqQBG5bj2tN2Q1kuW+2DHl+s7vByzIzshHea4cxwl6/ETJ9xu
-         /qaPBuJ474x1yWMoN9uRvCbJxgse/m/nBtmGRpWoA9S5mlcrnvW30MjloCj15iqYLQFZ
-         bIccILCUF1+F+TTaoqJU2NO0RuvOrndDSNuq4STLcRs9virvGeH32Y30tVE2JIfcQi96
-         pe1pTgt75qGokFb2MOlM2caGqzr4QtSxTyQ+RAGK1sGUDt1WeS0itivcvIfLc2AFaou/
-         hd6flchcrXdOS2hGkitZw/DqZMIl3khkX010nDl2BG09y08UD4kTRn/lBijYzQOnLxCw
-         YZow==
-X-Forwarded-Encrypted: i=1; AJvYcCWhi7Z3iIkXuVlOolGiEc4IROe7CR36haejR9NjN1LvcwpRCaO3yEqNWU1VD0ftDXqvdQjm2pY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRkkSSyPR7MlbRvjnJug0VflcPokuLZO4UhHhIR5wQXJJn+Nzl
-	VAKFTcDH1dG2rB+W/K5V9Lmy9nZMxcjhWI439CUzHLWx4T6qNz9EicNF5I7xGh38cymTSc9RUcq
-	6fgumyu+pNBTpvb2q4djctX70WUej7dx+J1BhSYBJZ17HtP3VJ/dKklDrsZg=
-X-Google-Smtp-Source: AGHT+IHIfg3MfaIcvzzEKAjuxvTtaZyQdIckRHbJK0+t50UYjzoeOX8AdyZuFdPHRxMGZUOI8oplaw/SIT3W0Dkym7+Zfte1G2MU
+	s=arc-20240116; t=1767854534; c=relaxed/simple;
+	bh=ivIqnI2zEUjC4OJwj+vb1q+Ivmz424hYR9nY7UVpNWQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=moTGtnRtqjDR8kN6WtR4ZXGrTC5MJSIk82nlSaPlUM3i1x1ArqWEdbcf3q7i3Vp1+6PbT6XemJLYosZd5X214bwom6VJwFir9LfAHgG7tl33h+Mhiam1GXnd3/jk2CVJl8WA0dczTl0lthqZcM1GYv3RRpKf9OeNkCH4i+lVf0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [192.168.0.105] (unknown [114.241.82.145])
+	by APP-03 (Coremail) with SMTP id rQCowACXtt2SUV9pJAwYBA--.18933S2;
+	Thu, 08 Jan 2026 14:41:23 +0800 (CST)
+Message-ID: <8c16931b-8637-43c3-a2db-5c66d8865124@iscas.ac.cn>
+Date: Thu, 8 Jan 2026 14:41:22 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:1624:b0:659:9a49:90ac with SMTP id
- 006d021491bc7-65f54f7a4f7mr1813923eaf.43.1767854274203; Wed, 07 Jan 2026
- 22:37:54 -0800 (PST)
-Date: Wed, 07 Jan 2026 22:37:54 -0800
-In-Reply-To: <20260107125423.4031241-1-edumazet@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <695f50c2.050a0220.1c677c.038a.GAE@google.com>
-Subject: [syzbot ci] Re: net: update netdev_lock_{type,name}
-From: syzbot ci <syzbot+ci131adae482253910@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, eric.dumazet@gmail.com, 
-	horms@kernel.org, kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/5] drm/radeon: Raise msi_addr_mask to 40 bits for
+ pre-Bonaire
+To: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+ Alex Deucher <alexander.deucher@amd.com>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Brett Creeley <brett.creeley@amd.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Bjorn Helgaas <bhelgaas@google.com>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>
+Cc: Han Gao <gaohan@iscas.ac.cn>, linuxppc-dev@lists.ozlabs.org,
+ linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+ dri-devel@lists.freedesktop.org, netdev@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-sound@vger.kernel.org
+References: <20251224-pci-msi-addr-mask-v1-0-05a6fcb4b4c0@iscas.ac.cn>
+ <20251224-pci-msi-addr-mask-v1-3-05a6fcb4b4c0@iscas.ac.cn>
+ <15ec03f3-f0cf-45f7-b7f6-98b075533d3e@amd.com>
+Content-Language: en-US
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+In-Reply-To: <15ec03f3-f0cf-45f7-b7f6-98b075533d3e@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowACXtt2SUV9pJAwYBA--.18933S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7uFy5KrWUGFyUtw18Jr1rCrg_yoW8Cw4Upa
+	y8Ga98KrZIy34jkay7u39rZF1Yya10kayrWrZrK343u34Yvry2gFZIv3WUJa4kXr1ktw4j
+	vFyUG3W8ZFn5CaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvE14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc7CjxVAaw2AFwI0_GFv_Wryl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
+	v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
+	1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
+	AIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
+	42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWI
+	evJa73UjIFyTuYvjTRNJ5oDUUUU
+X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
-syzbot ci has tested the following series
+On 1/7/26 23:20, Christian König wrote:
+> On 12/24/25 04:10, Vivian Wang wrote:
+>> The code was originally written using no_64bit_msi, which restricts the
+>> device to 32-bit MSI addresses.
+>>
+>> Since msi_addr_mask is introduced, use DMA_BIT_MASK(40) instead of
+>> DMA_BIT_MASK(32) here for msi_addr_mask, describing the restriction more
+>> precisely and allowing these devices to work on platforms with MSI
+>> doorbell address above 32-bit space, as long as it is within the
+>> hardware restriction of 40-bit space.
+>>
+>> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+>> ---
+>>  drivers/gpu/drm/radeon/radeon_irq_kms.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/gpu/drm/radeon/radeon_irq_kms.c b/drivers/gpu/drm/radeon/radeon_irq_kms.c
+>> index d550554a6f3f..ea519d43348b 100644
+>> --- a/drivers/gpu/drm/radeon/radeon_irq_kms.c
+>> +++ b/drivers/gpu/drm/radeon/radeon_irq_kms.c
+>> @@ -251,8 +251,8 @@ static bool radeon_msi_ok(struct radeon_device *rdev)
+>>  	 * IBM POWER servers, so we limit them
+>>  	 */
+>>  	if (rdev->family < CHIP_BONAIRE) {
+>> -		dev_info(rdev->dev, "radeon: MSI limited to 32-bit\n");
+>> -		rdev->pdev->msi_addr_mask = DMA_BIT_MASK(32);
+>> +		dev_info(rdev->dev, "radeon: MSI limited to 40-bit\n");
+>> +		rdev->pdev->msi_addr_mask = DMA_BIT_MASK(40);
+> Well, that is not even remotely correct.
+>
+> Please move that close to the dma_set_mask_and_coherent() call in radeon_device_init() (file radeon_device.c).
+>
+> The check there is most likely already what you need. Should be pretty straight forward.
 
-[v2] net: update netdev_lock_{type,name}
-https://lore.kernel.org/all/20260107125423.4031241-1-edumazet@google.com
-* [PATCH v2 net] net: update netdev_lock_{type,name}
+Thanks. In that case, maybe this msi_addr_mask thing was overcomplicated
+after all. Maybe coherent_dma_mask is just the right thing to check anyway.
 
-and found the following issue:
-WARNING in register_netdevice
+I'll see if I can figure something out. Of course I need to keep the
+logic for Power still working...
 
-Full report is available here:
-https://ci.syzbot.org/series/07a2abd3-8dbc-43d0-a5d9-cdbb1a35d769
+Vivian "dramforever" Wang
 
-***
-
-WARNING in register_netdevice
-
-tree:      net
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
-base:      1806d210e5a8f431ad4711766ae4a333d407d972
-arch:      amd64
-compiler:  Debian clang version 21.1.8 (++20251202083448+f68f64eb8130-1~exp1~20251202083504.46), Debian LLD 21.1.8
-config:    https://ci.syzbot.org/builds/f4fb7576-ea1f-485d-9ef1-c3270f1560d9/config
-C repro:   https://ci.syzbot.org/findings/e4767ea9-6be5-4bce-9523-40ab12d29b67/c_repro
-syz repro: https://ci.syzbot.org/findings/e4767ea9-6be5-4bce-9523-40ab12d29b67/syz_repro
-
-------------[ cut here ]------------
-netdev_lock_pos() could not find dev_type=805
-WARNING: net/core/dev.c:529 at netdev_lock_pos net/core/dev.c:529 [inline], CPU#0: syz.0.17/5972
-WARNING: net/core/dev.c:529 at netdev_set_addr_lockdep_class net/core/dev.c:547 [inline], CPU#0: syz.0.17/5972
-WARNING: net/core/dev.c:529 at register_netdevice+0x7f9/0x1ba0 net/core/dev.c:11318, CPU#0: syz.0.17/5972
-Modules linked in:
-CPU: 0 UID: 0 PID: 5972 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:netdev_lock_pos net/core/dev.c:529 [inline]
-RIP: 0010:netdev_set_addr_lockdep_class net/core/dev.c:547 [inline]
-RIP: 0010:register_netdevice+0x7fc/0x1ba0 net/core/dev.c:11318
-Code: ca 56 db f8 48 c7 03 00 00 00 00 41 bd f4 ff ff ff 4c 8b 64 24 28 e9 8f f9 ff ff e8 4e 59 74 f8 48 8d 3d 27 79 82 06 44 89 e6 <67> 48 0f b9 3a 41 bc 40 00 00 00 49 bf 00 00 00 00 00 fc ff df 4c
-RSP: 0018:ffffc9000768ef20 EFLAGS: 00010293
-RAX: ffffffff894e19b2 RBX: fffffffffffffff8 RCX: ffff8881063c57c0
-RDX: 0000000000000000 RSI: 0000000000000325 RDI: ffffffff8fd092e0
-RBP: ffffc9000768f090 R08: 0000000000000003 R09: 0000000000000000
-R10: dffffc0000000000 R11: ffffed10218fd9d4 R12: 0000000000000325
-R13: ffffffff8c902318 R14: 000000000000fffe R15: 0000000000000040
-FS:  000055556284f500(0000) GS:ffff88818e40f000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f4739c706c0 CR3: 00000001bdb86000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- ieee802154_if_add+0xb39/0x1050 net/mac802154/iface.c:667
- ieee802154_add_iface_deprecated+0x43/0x70 net/mac802154/cfg.c:26
- rdev_add_virtual_intf_deprecated net/ieee802154/rdev-ops.h:16 [inline]
- ieee802154_add_iface+0x472/0x860 net/ieee802154/nl-phy.c:218
- genl_family_rcv_msg_doit+0x22a/0x330 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x61c/0x7a0 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x232/0x4b0 net/netlink/af_netlink.c:2550
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
- netlink_unicast+0x80f/0x9b0 net/netlink/af_netlink.c:1344
- netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1894
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:742
- ____sys_sendmsg+0x4d7/0x810 net/socket.c:2592
- ___sys_sendmsg+0x2a5/0x360 net/socket.c:2646
- __sys_sendmsg net/socket.c:2678 [inline]
- __do_sys_sendmsg net/socket.c:2683 [inline]
- __se_sys_sendmsg net/socket.c:2681 [inline]
- __x64_sys_sendmsg+0x1bd/0x2a0 net/socket.c:2681
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xe2/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f4739d9acb9
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffd43a0e968 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f473a005fa0 RCX: 00007f4739d9acb9
-RDX: 0000000020048000 RSI: 00002000000009c0 RDI: 0000000000000004
-RBP: 00007f4739e08bf7 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f473a005fac R14: 00007f473a005fa0 R15: 00007f473a005fa0
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	ca 56 db             	lret   $0xdb56
-   3:	f8                   	clc
-   4:	48 c7 03 00 00 00 00 	movq   $0x0,(%rbx)
-   b:	41 bd f4 ff ff ff    	mov    $0xfffffff4,%r13d
-  11:	4c 8b 64 24 28       	mov    0x28(%rsp),%r12
-  16:	e9 8f f9 ff ff       	jmp    0xfffff9aa
-  1b:	e8 4e 59 74 f8       	call   0xf874596e
-  20:	48 8d 3d 27 79 82 06 	lea    0x6827927(%rip),%rdi        # 0x682794e
-  27:	44 89 e6             	mov    %r12d,%esi
-* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
-  2f:	41 bc 40 00 00 00    	mov    $0x40,%r12d
-  35:	49 bf 00 00 00 00 00 	movabs $0xdffffc0000000000,%r15
-  3c:	fc ff df
-  3f:	4c                   	rex.WR
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
