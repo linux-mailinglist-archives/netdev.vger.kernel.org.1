@@ -1,111 +1,145 @@
-Return-Path: <netdev+bounces-248040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB172D0256E
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 12:17:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E7005D026DC
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 12:35:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D296D31F47F4
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 11:08:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0F3CB32A0027
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 11:15:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E3B421A18;
-	Thu,  8 Jan 2026 10:33:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1CE74A3A50;
+	Thu,  8 Jan 2026 10:55:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="HI1Xe/Wm"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="LSNy5RUW"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BB9B3D5D91;
-	Thu,  8 Jan 2026 10:33:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034C64A340E;
+	Thu,  8 Jan 2026 10:55:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767868416; cv=none; b=d9+oXsAfHiKsB5Dom5g/Qg+HTt/uXeH8gZMG4BFV0jbVEnNG+VIjQIaFp8TFOUUxpqx87AjTisgihI3r4pAJEMd5GQsduiRRWjahPUcdUvAbqFkoZklwO4j9VcmM4wTza8/cFqTdXHhAyb746xIkPiVWLHlRJW+56TqDdTAQE4E=
+	t=1767869746; cv=none; b=kAjvzjaHknSqnxHtGzU/m7JHh7MkNl+8+tM6JhKPuiAijzMr/BhiYQcbuMuWKRzlApR/vluR3Xid1C14RDAC+CR0Zm1dQBZih0R9H93T6/NeuzZXf6j0lmvJD18BeBKsP0/wGGe05pmmj9tQuzok4J+uMrhaswvlBuie2Jqiup4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767868416; c=relaxed/simple;
-	bh=wcJxSvhQuR8Ohtvh9c8ZrmAnoBDfeKQhMCSJH0GDces=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dxmfEy4Ej8HsS93WthGDtqbf+ZELfVl45J8asQ6gfVfABzDOt5koAmUt8RSx8P+Bd2M9BRjiH0r53ciL+i7pcR8GMUsFMkrEGOMtwEiRopByzJ1oDp3qfxY9mMg7ElpZ3g+zUfwSpgZh0WMtm4vFlkvM6b64lqiPBQ2Vp1NEwIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=HI1Xe/Wm; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=P/iMwaQ/GUCProAJTtvt0w5p4KCQ9LrMsr1jgcnLhRQ=;
-	t=1767868413; x=1769078013; b=HI1Xe/WmohPmRibmjFsTHuoUMiB6sHpATNjTlrRjAz9xItU
-	DvBaI8KyL/Rs5Lvql+Eu7DEJyaKO37AWsvaU9rTVKdFfdf6v41y3E5ezJE9stvJlHTScDQvwJlH7o
-	sHhsvxQcA8qrrj+8f/lwWeCYpqW+HpK/imzD3dWzwYLTrkcHtIorVMzk03A1KJHJkBqu49OD7KDNi
-	JSESbsSxftzUkyhosoutM77jwJzMNZ65n1uWwgsp9s56ZqAVcqlAVhDOR1n0cQeDzBFblFRKr+p6t
-	gQ1Klxnx0V7HurHl+XEWLDNmM/DAov3QIYURCxh1pvEuWTYyviOp+33VJrd2NTUA==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1vdnKX-00000006Rk6-1AJv;
-	Thu, 08 Jan 2026 11:33:25 +0100
-Message-ID: <a48aad932c2c70148b273e1d32909a99977b3316.camel@sipsolutions.net>
-Subject: Re: [PATCH net] wifi: avoid kernel-infoleak from struct iw_point
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com,
- syzbot+bfc7323743ca6dbcc3d3@syzkaller.appspotmail.com, 
-	stable@vger.kernel.org
-Date: Thu, 08 Jan 2026 11:33:24 +0100
-In-Reply-To: <CANn89iLxDc9viP0Pmj3uC01s46eUR2xu4XAUEo=he-M84aCf9A@mail.gmail.com> (sfid-20260108_113219_216071_25574978)
-References: <20260108101927.857582-1-edumazet@google.com>
-	 <851802c967b92b5ea2ce93e8577107acd43d2034.camel@sipsolutions.net>
-	 <CANn89iLxDc9viP0Pmj3uC01s46eUR2xu4XAUEo=he-M84aCf9A@mail.gmail.com>
-	 (sfid-20260108_113219_216071_25574978)
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
+	s=arc-20240116; t=1767869746; c=relaxed/simple;
+	bh=CMHw5DVfJXuTHlKA1vYZRXcYoK6WVCIZRW+YpFHJDKo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oh0qmdcl+AvjeVQcyGH8ElVZ27RJRcb1lj6G+VuKprzHTABq/yuwCdRfQPD4ZU2kY9gMuZAar1bPRySMNcKiE4pa7thC0SSpqxvKwrEDPg+Z8wfaXqL9xiDrVX3gdilX/Jn+GxFCDp4nusC74oQPcThzH25nWzCmiSpGY2+Lb8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=LSNy5RUW; arc=none smtp.client-ip=220.197.31.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=6B
+	x/uBoRw2LaNn4oI17UqZrmd/+0o1xj0zRiwIVURNk=; b=LSNy5RUWIF5JMTqzzU
+	H7aEcuFI6pUxe17aBdf06ze43FCCxKPOEcfYO+PqRf6qFANEy+Evl/YLP2SQPu4S
+	2M1/eCM3EFUqS5siVuyjhtcsTw0yCB/cKpDJxXpW6b82lulMcJR741mhM+yQd+uG
+	G06UbvG2RMeFu34oAyd8S1md4=
+Received: from GHT-5854251031.localdomain (unknown [])
+	by gzsmtp4 (Coremail) with SMTP id PygvCgBnDLTojF9pnbalKQ--.33395S2;
+	Thu, 08 Jan 2026 18:54:36 +0800 (CST)
+From: "wanquan.zhong" <zwq2226404116@163.com>
+To: chandrashekar.devegowda@intel.com,
+	chiranjeevi.rapolu@linux.intel.com,
+	haijun.liu@mediatek.com,
+	ricardo.martinez@linux.intel.com
+Cc: netdev@vger.kernel.org,
+	loic.poulain@oss.qualcomm.com,
+	ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
+	andrew+netdev@lunn.ch,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	"wanquan.zhong" <wanquan.zhong@fibocom.com>
+Subject: [PATCH] wwan: t7xx: Add CONFIG_WWAN_DEBUG_PORTS to control ADB debug port
+Date: Thu,  8 Jan 2026 18:54:25 +0800
+Message-ID: <20260108105425.601842-1-zwq2226404116@163.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:PygvCgBnDLTojF9pnbalKQ--.33395S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxArW3tFWxuF18AF43Cw4kJFb_yoW5Xr1kpa
+	1DGa4Ykr1DJ3ZxAa18AayI9ry5AFnruFW2gry2q34Y9ryUAFy5Cr4v9FyayF15J3W7ZFyx
+	A3yjgFnFgF1q9w7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07Uvg4DUUUUU=
+X-CM-SenderInfo: h2ztjjaswuikqrrwqiywtou0bp/xtbC0g2Q52lfjO0NlAAA3m
 
-On Thu, 2026-01-08 at 11:32 +0100, Eric Dumazet wrote:
-> On Thu, Jan 8, 2026 at 11:29=E2=80=AFAM Johannes Berg <johannes@sipsoluti=
-ons.net> wrote:
-> >=20
-> > On Thu, 2026-01-08 at 10:19 +0000, Eric Dumazet wrote:
-> > > struct iw_point has a 32bit hole on 64bit arches.
-> > >=20
-> > > struct iw_point {
-> > >   void __user   *pointer;       /* Pointer to the data  (in user spac=
-e) */
-> > >   __u16         length;         /* number of fields or size in bytes =
-*/
-> > >   __u16         flags;          /* Optional params */
-> > > };
-> > >=20
-> > > Make sure to zero the structure to avoid dislosing 32bits of kernel d=
-ata
-> > > to user space.
-> >=20
-> > Heh, wow. Talk about old code.
-> >=20
-> > > Reported-by: syzbot+bfc7323743ca6dbcc3d3@syzkaller.appspotmail.com
-> > > https://lore.kernel.org/netdev/695f83f3.050a0220.1c677c.0392.GAE@goog=
-le.com/T/#u
-> >=20
-> > Was that intentionally without Link: or some other tag?
->=20
-> Somehow the Closes: prefix has been lost when I cooked the patch.
->=20
-> Closes: https://lore.kernel.org/netdev/695f83f3.050a0220.1c677c.0392.GAE@=
-google.com/T/#u
->=20
-> Let me know if you want a V2, thanks.
+From: "wanquan.zhong" <wanquan.zhong@fibocom.com>
 
-I'll add it, no worries.
+Add a new Kconfig option CONFIG_WWAN_DEBUG_PORTS for WWAN devices,
+to conditionally enable the ADB debug port functionality. This option:
+- Depends on DEBUG_FS (aligning with existing debug-related WWAN configs)
+- Defaults to 'n' (disabled by default for user devices)
+- Requires EXPERT to be visible (to avoid accidental enablement)
 
-johannes
+In t7xx_port_proxy.c, wrap the ADB port configuration struct with
+CONFIG_WWAN_DEBUG_PORTS, so the port is only exposed when
+the config is explicitly enabled (e.g. for lab debugging scenarios).
+
+This aligns with security best practices of restricting debug interfaces
+on production user devices, while retaining access for development.
+
+Signed-off-by: wanquan.zhong <wanquan.zhong@fibocom.com>
+---
+ drivers/net/wwan/Kconfig                | 11 +++++++++++
+ drivers/net/wwan/t7xx/t7xx_port_proxy.c |  2 ++
+ 2 files changed, 13 insertions(+)
+ mode change 100644 => 100755 drivers/net/wwan/Kconfig
+ mode change 100644 => 100755 drivers/net/wwan/t7xx/t7xx_port_proxy.c
+
+diff --git a/drivers/net/wwan/Kconfig b/drivers/net/wwan/Kconfig
+old mode 100644
+new mode 100755
+index 410b0245114e..70edfd0c03bb
+--- a/drivers/net/wwan/Kconfig
++++ b/drivers/net/wwan/Kconfig
+@@ -27,6 +27,17 @@ config WWAN_DEBUGFS
+ 	  elements for each WWAN device in a directory that is corresponding to
+ 	  the device name: debugfs/wwan/wwanX.
+ 
++config WWAN_DEBUG_PORTS
++	bool "WWAN devices ADB debug port" if EXPERT
++	depends on DEBUG_FS
++	default n
++	help
++	  Enables ADB (Android Debug Bridge) debug port support for WWAN devices.
++
++	  If this option is selected, then the ADB debug port functionality in
++	  WWAN device drivers is enabled, allowing for Android Debug Bridge
++	  connections through WWAN modems that support this feature.
++
+ config WWAN_HWSIM
+ 	tristate "Simulated WWAN device"
+ 	help
+diff --git a/drivers/net/wwan/t7xx/t7xx_port_proxy.c b/drivers/net/wwan/t7xx/t7xx_port_proxy.c
+old mode 100644
+new mode 100755
+index 4fc131f9632f..23b331780f07
+--- a/drivers/net/wwan/t7xx/t7xx_port_proxy.c
++++ b/drivers/net/wwan/t7xx/t7xx_port_proxy.c
+@@ -102,6 +102,7 @@ static const struct t7xx_port_conf t7xx_port_conf[] = {
+ 		.ops = &ctl_port_ops,
+ 		.name = "t7xx_ap_ctrl",
+ 	}, {
++#ifdef CONFIG_WWAN_DEBUG_PORTS
+ 		.tx_ch = PORT_CH_AP_ADB_TX,
+ 		.rx_ch = PORT_CH_AP_ADB_RX,
+ 		.txq_index = Q_IDX_ADB,
+@@ -112,6 +113,7 @@ static const struct t7xx_port_conf t7xx_port_conf[] = {
+ 		.port_type = WWAN_PORT_ADB,
+ 		.debug = true,
+ 	}, {
++#endif
+ 		.tx_ch = PORT_CH_MIPC_TX,
+ 		.rx_ch = PORT_CH_MIPC_RX,
+ 		.txq_index = Q_IDX_MBIM_MIPC,
+-- 
+2.43.0
+
 
