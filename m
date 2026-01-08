@@ -1,139 +1,122 @@
-Return-Path: <netdev+bounces-248170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF704D04817
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:45:40 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FB04D047F6
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:44:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8FA3030445C5
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:37:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 24767300FEE7
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:43:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E9D52D7DCE;
-	Thu,  8 Jan 2026 16:37:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 474122DB7B0;
+	Thu,  8 Jan 2026 16:43:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D6mP/TCd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="loIgkrCC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DAA028688C
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 16:37:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2611F0E25
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 16:43:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767890247; cv=none; b=SIIjiLVdxgJ1b1VQjzBP5DbQhhOQKhF8m/Cc9r3vDQk93U9EJJdf8Bhh6QuNNBZ95VwWMEXxaKmqUzJ8D70jEVOT9YF3eij6wEEczvg8AXv7SOs06gsFel7KSTogGksIJl/eQ0xOgl0lYupZqq065780HYRdblrjKFco8gLYQmY=
+	t=1767890613; cv=none; b=sMHLLdQiFK7DM9L07HnOFB9V2Ep3LY0Jixf9Aqcx1fX8ybLmPoojmQFZrppC88iU9LAlBRBtNn7zJBb1tbmXBL3gRGm9KqrIFvkqMPmWtfGgTjLYGoCIzRNx4Wgr7DuO2x80DYA3/oU07RLUayv1xBXEMZ8a7Fr2Rs9k+pfaTQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767890247; c=relaxed/simple;
-	bh=oiUJOqy4+7szk5Y7VIQU5zTbc+NUVFVNGpKBy1cwMy4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qoynY14k1haLWiFUoxwsXWlILUJ8CCBK22+s14xNjhMr/GqKTlKfYWjHooQnI07Wv2WuUwZ2t7rJBuveIos3uAJxbJ1banABkPxgFq/rB67q9lmgVPhEMvBKQ5ZNGw2hkLEdUQJ3SqGpFauuBMvpHUQ7bYz88Ras5DDjaxw2Wbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D6mP/TCd; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4f1aecac2c9so25114211cf.1
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 08:37:26 -0800 (PST)
+	s=arc-20240116; t=1767890613; c=relaxed/simple;
+	bh=xQACEz7s6jNsl7Ho1erfv2YqZYDG7xydPJ65zVcRSrE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l+kiG96sbg3DqJt4RXkDhU0F1pJsrnirYbHLdP0K8Cgv56KFTQe5Cd4vGJtXyjdCfPJOy9fWnEOHUqsLJiUVf67L9DhJYYdzL/nAMX/Erbd6AOwVELbfry2Lc6rN2HloW9Q/2cc37RcdRV5f1n57v+KSzPglaFvNDLhll+vad/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=loIgkrCC; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-59b6d5bd575so2609217e87.1
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 08:43:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767890245; x=1768495045; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KTBWtsdOdEJC2lJNr/ZVJNmgBqrVXGpeJsYz8CSdWns=;
-        b=D6mP/TCdn3jVffNeeuPjAgnCx+SB1iPZBGU1oy6+8SyL0WX/5Pp1tNdkfmxhqiUjsb
-         O0s6DAoF41DPkBZ4pJOc9V8Honapajjzbj7qjAEmlpxGeKTbpmrlfA2RTgd6YM3NwQL1
-         3FbQtX0rOzpp7r9LBfPGWMscdRRopH5A19CcL5DW8FtUQvFf4fZ95Iihyuobop3hFRot
-         CeGntQJOsByxWeFCZ6hQ8Kou1KoiX6s+h7K3E3y2Xjka/HYrRPb8eWoBQzNmN4ovhrv2
-         o59EUzt4hasHN87sHDKlfkITF/Ow32xIMN1yybh+EPC0WTsWmr6Su+JnJDIYMqylkfO5
-         Mbmw==
+        d=gmail.com; s=20230601; t=1767890609; x=1768495409; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JdAeBL88xoS7UgCWkb4s+7iYieB6s8NwPA6lyDMFM6g=;
+        b=loIgkrCCHM4cplJSOxW06yHVMAVUVmHBv/KVeehTXs4MKHhSzHyrEbMit4wUuXD3MJ
+         U+QBy+4sFLo4m8YUtj8gFIObI0hRCMxgE0xnfZTR27enRq2D7ODub2eSkjjOUV+4Du55
+         R3SAGTs6VpiqATKjQ6vbx25M6m2hruVgwSRVPgC2Mmoo1LKSoDAAtcg62ACPN4KnqvMM
+         M+eKkY+oaBrNBgB1h5UrEQQi95FKfmnhZPYED/mCb6jqhEFe2CqnfmCRXsTe7eZ4Bjf3
+         30tchWOzzRCOzTcI9/Dll7zZoWaNgnidIgZrVIf8D1W2qde1sQ64Ohx8bTzb1Ejk9P1a
+         BbfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767890245; x=1768495045;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=KTBWtsdOdEJC2lJNr/ZVJNmgBqrVXGpeJsYz8CSdWns=;
-        b=V01hH5XsyC7UhqCPCaCxZfhdnmLbjbD7E17SG2gF/4AaYwWcl2ZFM7smiOtLpauvrH
-         Snonopg5XDPHEwwlqmp/H71rtlb9uTjugC1eLlmJz/N75xBXQGKMdqw4NQsRQwAgmfxA
-         2zs7P5ZAWO7v7lS3+uLOR8C787qH9zSnpAw3kq7u9TRs1J942j57pKRqsMAIX/TY1Mh4
-         DxZXtAUdQZhpgs/AEkkQ3lqAb8CyHUKe++rpvhZj46BhO/OTqmrzv/Faq1nbj58r78zc
-         m5zaWD/Ma4u/JANEesRnbmMf9yZjFNJ05zwm/fEslTLG55EnepbtsaDCFSOe4DVGDJMX
-         mppA==
-X-Forwarded-Encrypted: i=1; AJvYcCVO+577z3kESFlfAQ3ZVKZimrgND5aazS1RIpV+jwvelr3BlkV6ehQz6XfK1blTcMX3Q6cB4q0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8oojSSrjaRF1AjEyUIFzvswSpFS0elk0UlNbMibkGncZX3nAf
-	/rTJVgvsL1epY0ZTW3/QVDnDImCaZadDTv/0J2unrBkk8Mh2ClIreE967zwVSCSPStm9lhjP8ox
-	lClh8MwkSYIXho7BCGhHvf/17dQeLlV1HJ4RYSP4a
-X-Gm-Gg: AY/fxX6bcsR5ZDoeEXPTDiU6mMYW2R24ZrPadT77pl/a0JBEecHxVdeaEMu/Mmkblx5
-	A6UNb0ow+XP7g+V06T5KOgO3tAr0g6AiwMyAePJvkH5udOaF/kzpkXEF0Z1xtJaS7Gf5/6L9aDA
-	1In0YBDfba8F6gOmm2b3ALnqjTjTfLTplbILh99+9A979Br/xOsW3tnksCd+UmoNO3us0PWj2AU
-	J+wSyX/aJeu0XcE0cV0v7U7rloIcDE4NHsr4sH1gSJC1CeeQr/hmXP5URuxDhen6AjzzQ==
-X-Google-Smtp-Source: AGHT+IE2f3jpfVr0DitkgQW0hgUpjNRprB0PR+qzZgf0vZaVTjpsGhCNA+19FxT3hPHaBT/ttMh7PhhiKWRsFSyPKyE=
-X-Received: by 2002:a05:622a:7291:b0:4ff:a8c1:b00e with SMTP id
- d75a77b69052e-4ffa8c1bf36mr109817591cf.2.1767890245238; Thu, 08 Jan 2026
- 08:37:25 -0800 (PST)
+        d=1e100.net; s=20230601; t=1767890609; x=1768495409;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JdAeBL88xoS7UgCWkb4s+7iYieB6s8NwPA6lyDMFM6g=;
+        b=Rx7pEi2gRJ3/LlIdBkBohKr5H6SgghsdDtP7n9jPMQFkbZ6yIl+z1O0BeNm2KC5ynJ
+         SCH9jVjBFZPfU7pWk9e7iJoaediubDVqs9to2vzrroiQxiBLgVqGdsU2Q+VDTPTqtCEg
+         elIdE+X0KtmukdHM2wz6817KVRyXuc+CihsmnwXKDv8K5gpTGnHT876B0TH0HnV3JU2D
+         vwHMtAXhz9+v6zjwR5hhT+yC/yJ2VI83yG8eSXsspOfLT0UrP9lg8dAMv1T2/RPzvXCa
+         xKzLNTyDkObBvaRxYyoafKaggFVyhEQulKS3HZKqzdl35Q6tqkZWLPX6ZHLif9JE2/LB
+         WziA==
+X-Gm-Message-State: AOJu0YyFMWQjj0bKIXxOXjXKiFA2tYFZGbkwYWn/YgKgQmTA+WVPXrxL
+	t16J+29VmeXC83dUdP2vtZIPwDpVKimgnOpzPwuWMRIEN+swc3oQGCM=
+X-Gm-Gg: AY/fxX7OUIDxjnJc5qPANOw0soJI/tDRavG6lydWLXRjRV4ZTvKTgr68fRoyqBjSpHx
+	CqtnrPz7VLd1Ebe4mdf1Q9YzVGFc9v8owEJk1yPYnm/iMu2YeTz5hjH6m/6y8STF0Nu2ZbQAv6p
+	aKelEzF6bzAFU8s+RBaOsE9YrVpfi75dI8QIyqekgECPSHlj+XVSvyG1YsEdEpQ05SEibzfKQmK
+	k0r/Zz94XvGdYlZlz2bNxT2l71C3+FjHc/9Dv1jdBRHLf9L0BRUyITR8DQeWquDYuEifvUme2Cz
+	a+LkEX8OUnKYw0pEC/s1uBfoXUUnVFMmDdDKQgRO9K0Xz2aZAX7ClUroElGQLite08qg0PSMjKt
+	OjlovNylGmlHv/JPHiRLBIkzarUeVl3dBh6GtRyNuavfOPepsBR0hTy/2eRmqe+H8mva7MzRPiP
+	QlCHH4aKrzP1QJ
+X-Google-Smtp-Source: AGHT+IFjvtk15WSd3WCRk/DAvZL8axgifBdzNQmKitYRNxaQKrvtp3LD/hQAfVAGOKVG8WSIPTTbEw==
+X-Received: by 2002:a05:6512:15a4:b0:59b:7942:227a with SMTP id 2adb3069b0e04-59b79422343mr714210e87.24.1767890608259;
+        Thu, 08 Jan 2026 08:43:28 -0800 (PST)
+Received: from DESKTOP-BKIPFGN ([45.43.86.16])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59b792cf330sm470942e87.102.2026.01.08.08.43.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jan 2026 08:43:27 -0800 (PST)
+From: Kery Qi <qikeyu2017@gmail.com>
+To: vburru@marvell.com
+Cc: netdev@vger.kernel.org,
+	Kery Qi <qikeyu2017@gmail.com>
+Subject: [PATCH] net: octeon_ep_vf: fix free_irq dev_id mismatch in IRQ rollback
+Date: Fri,  9 Jan 2026 00:42:57 +0800
+Message-ID: <20260108164256.1749-2-qikeyu2017@gmail.com>
+X-Mailer: git-send-email 2.50.1.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260105232504.3791806-1-joshwash@google.com> <20260106182244.7188a8f6@kernel.org>
- <CAJcM6BGWGLrS=7b5Hq6RVZTD9ZHn7HyFssU6FDW4=-U8HD0+bw@mail.gmail.com>
-In-Reply-To: <CAJcM6BGWGLrS=7b5Hq6RVZTD9ZHn7HyFssU6FDW4=-U8HD0+bw@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 8 Jan 2026 17:37:14 +0100
-X-Gm-Features: AQt7F2pZbYuFwcYb8xyVXNJG4r7Uvb6KoQWlgEB11-noITK7mtV2kImy1DvF0ZQ
-Message-ID: <CANn89iK_=W8JT6WGb17ARnqqSgKkt5=GUaTMB6CbPfYuPNS7vA@mail.gmail.com>
-Subject: Re: [PATCH net 0/2] gve: fix crashes on invalid TX queue indices
-To: Ankit Garg <nktgrg@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Joshua Washington <joshwash@google.com>, netdev@vger.kernel.org, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Catherine Sullivan <csully@google.com>, Luigi Rizzo <lrizzo@google.com>, Jon Olson <jonolson@google.com>, 
-	Sagi Shahar <sagis@google.com>, Bailey Forrest <bcf@google.com>, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 8, 2026 at 4:36=E2=80=AFPM Ankit Garg <nktgrg@google.com> wrote=
-:
->
-> On Tue, Jan 6, 2026 at 6:22=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
-> >
-> > On Mon,  5 Jan 2026 15:25:02 -0800 Joshua Washington wrote:
-> > > This series fixes a kernel panic in the GVE driver caused by
-> > > out-of-bounds array access when the network stack provides an invalid
-> > > TX queue index.
-> >
-> > Do you know how? I seem to recall we had such issues due to bugs
-> > in the qdisc layer, most of which were fixed.
-> >
-> > Fixing this at the source, if possible, would be far preferable
-> > to sprinkling this condition to all the drivers.
-> That matches our observation=E2=80=94we have encountered this panic on ol=
-der
-> kernels (specifically Rocky Linux 8) but have not been able to
-> reproduce it on recent upstream kernels.
+octep_vf_request_irqs() requests MSI-X queue IRQs with dev_id set to
+ioq_vector. If request_irq() fails part-way, the rollback loop calls
+free_irq() with dev_id set to 'oct', which does not match the original
+dev_id and may leave the irqaction registered.
 
-What is the kernel version used in Rocky Linux 8 ?
+This can keep IRQ handlers alive while ioq_vector is later freed during
+unwind/teardown, leading to a use-after-free or crash when an interrupt
+fires.
 
-Note that the test against real_num_tx_queues is done before reaching
-the Qdisc layer.
+Fix the error path to free IRQs with the same ioq_vector dev_id used
+during request_irq().
 
-It might help to give a stack trace of a panic.
+Fixes: 1cd3b407977c ("octeon_ep_vf: add Tx/Rx processing and interrupt support")
+Signed-off-by: Kery Qi <qikeyu2017@gmail.com>
+---
+ drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->
-> Could you point us to the specific qdisc fixes you recall? We'd like
-> to verify if the issue we are seeing on the older kernel is indeed one
-> of those known/fixed bugs.
->
-> If it turns out this is fully resolved in the core network stack
-> upstream, we can drop this patch for the mainline driver. However, if
-> there is ambiguity, do you think there is value in keeping this check
-> to prevent the driver from crashing on invalid input?
+diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
+index 420c3f4cf741..1d9760b4b8f4 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
++++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
+@@ -218,7 +218,7 @@ static int octep_vf_request_irqs(struct octep_vf_device *oct)
+ ioq_irq_err:
+ 	while (i) {
+ 		--i;
+-		free_irq(oct->msix_entries[i].vector, oct);
++		free_irq(oct->msix_entries[i].vector, oct->ioq_vector[i]);
+ 	}
+ 	return -1;
+ }
+-- 
+2.34.1
 
-We already have many costly checks, and netdev_core_pick_tx() should
-already prevent such panic.
-
->
-> Thanks,
-> Ankit Garg
 
