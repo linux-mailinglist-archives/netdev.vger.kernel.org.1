@@ -1,241 +1,323 @@
-Return-Path: <netdev+bounces-248262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43862D060E5
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 21:29:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C001D06193
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 21:31:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AB34C300F680
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 20:29:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1F70F3043F1D
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 20:30:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4871B32BF26;
-	Thu,  8 Jan 2026 20:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88DE032FA14;
+	Thu,  8 Jan 2026 20:30:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GpC4Nncb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZQ6p8mun"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF2C32F75B
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 20:29:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90A232F76D
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 20:30:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767904155; cv=none; b=mvgngdU80g1Nw109UBi4DCEzdcPIn/T/f/vuT1vr0u8vb0Vt4xhZ53Vn1kADBJFLjpJmDxY8WTA8dWl0OeRipY0w4oswcrzUAD1TGwPX4W1M7C/xDrm/SqzAEbokP5P53xA4jWOukGloqiVhbWrYsUNkhOG+QB5vYHPouFZq+fY=
+	t=1767904213; cv=none; b=GKenblSP0UBk87SK8+UwfdI980psTXQz0X2qLAqMJk06mf+DPXvsgUZSFicyUymGVugf2fIB9TVKB6MKgJY+nq9UEJZD16E4Z8DDwc9PTcSp9HQ+29TA6iGZmkb4KsuAuY7tG93tC1tArl2LCfUN/Y5l3bO2DUc1cmGUQBcJ+0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767904155; c=relaxed/simple;
-	bh=Elmxtu0EpGvZb0ppPt5OQP1jBQXvA3X4ZEr/mOQ1PQ8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E56muBakeBFr35yJjMuT/uMupuswEu319E/Ejqxow/yKmVjeQAR0fboEqK5yf1bSylUiR3rnNQ+dTb+ZEzMfEoLhcq+c0wnJ8LJ5RJzvJu0czpkU3Pu6Q89QbZPmvV0qffMM7kXfjuRd73lhObMwsjmGUVreYRdn8Og4zz98JNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GpC4Nncb; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <74fa8337-b0cb-42fb-af8a-fdf6877e558d@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767904148;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=81ZhWDVOVX04uUXOb7d5nmsY+iDMPwWWhkP9liTg+sw=;
-	b=GpC4NncbNx8VKMsk+Kt5cEnFjafDrw38At4R7SPNvhiIfmn0whRFB14TsW+nzuwel6hY95
-	YOTlQf45vDDSUw8xCLQXx6/dhFrB8RB4k/zGpS/2BawZYH7N3BE/mSqqONjdyG5VNM6Y8M
-	DMkYkh6RD2zYMWP0/J2/9pv/2Dd1B5A=
-Date: Thu, 8 Jan 2026 12:29:00 -0800
+	s=arc-20240116; t=1767904213; c=relaxed/simple;
+	bh=+Qeg4iwRnJhGshuLoQ0hip2kddvArBWryH2l+yXMfDo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mZjjl262BAuUWSKnxB2LRjBWUqwZXmArXiXqnYV0r8UOMeRBc0LiKmVzdK6/F48auov+42W3qXuKP7+B8u/GG+d6ZYrEOWa7NkWO78j9yCzYCy/lUtl5rmzLDzjNneSpe5YznyqU7SmPqNMN9t9BbsxwG2uRcdQD2zxLe7VxDIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZQ6p8mun; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-34c21417781so2595183a91.3
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 12:30:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767904211; x=1768509011; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7f5sQo5jTkvuwoFmDFJSpZOLtNbc84M3KHSphocTY2A=;
+        b=ZQ6p8munNAJLrdHOuz04f1+J9PfbhWzBLy9W+0hVOVuuYKMITuvmzAkgSacavOsijV
+         khpShi8InuFLduTI7gf8QYVxYwAzaSSPnuhvuwdOTyXyTAFNf/dzTVxPSuxYNjvxeEa1
+         Bv1O1rl6lTGXUG0wpf/73Y8VqQx5KAvlp/UFkyP1SsCfoQ82VIKSJuJrKaLaiDOpxpCD
+         EiyhuzTvCWlFCLHd1QRlZaVkeapbUtxXsuRDNSZkyGnxSF9whN6fgvj+wLjr7J6CU/On
+         953wdFfjFdSb0oWBDRGwXduzooLkUr+wJoDVKzLIdAz4it1YoHLwuaeHZfWf1GMG2Vg1
+         jlBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767904211; x=1768509011;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=7f5sQo5jTkvuwoFmDFJSpZOLtNbc84M3KHSphocTY2A=;
+        b=W+pUJ0DOxMRdY1DhEEhFdP8ft2tnJZLw0/FNW8SUxIwCMTYRNJBevoINiaTNw4peKb
+         YQiS/IbnPn8NR0Y1Ig/mkD+/z7CWeHRZ2c7tCSavQHVZE6yBoTVt6HpckhagZM4OyMxx
+         P2YNnWZGuWTKz+WjBw6f3M91DPk4CyMbD9dTTAZn7gSoqvj9BaFNZfSdcKRqpEDPhwNa
+         GFnJ7V5NwRIIEmwXMnbqR7UI15v6Kd1s0CYjlim1B9r20rQHDYxIuQtIujxwz6tWieaK
+         8bnSiKpoDA/Ye1sssL1YybuFyVug0GzSbUotD9Gqz0tqap9F21POBWisWWvCxPV26aGW
+         om5g==
+X-Gm-Message-State: AOJu0YyUbgUDmgh0XEQfw7NGMJ/deHGJkmjYk7Vt9NI2HcvX5mvBamMJ
+	GVv1Wky8JThYELW2dWnrEvFemfCACcaHNgrjnrGDwH2kWANBTtL6IW64bVMc/Nusqy9/tM7cunF
+	CYEvwW5EXEfXseFAvERLFhvMnutftNQ4=
+X-Gm-Gg: AY/fxX7jfDPiydegQKRiDSx/FMjnNsnJHGuvj1bQP5WVazHvomdPXsWMa+5AzUdn9lY
+	1lpk1SDTmDNCqjvvJn1I6J9v5b/Dj391Dhu6YwDbWEWAi+TLAjm9odPT/GrnSPC4qMdWifJ1Mgt
+	+ajk62gKWXYyETrtkeu1IEIDLjtmUZEpPNlDlu999DoEsn5EBdCaO7rpTickUV2aLIJw8H9b6FG
+	MGTmwaPRA7+24bROhXohb5F1UoYf1GynWP2EtEEABu6ZkTKGCymiPW98w/FzymDBKweFPVfRh1y
+	kyw7gdm3FUJ46IUy6xBeIqVOox7J
+X-Google-Smtp-Source: AGHT+IGbLC6cx1ApwiDReFzbSLNdOW7A6lCncS1m6eFQ/DG8qnCS8rcADr1cTXrjHejrOMh422vV1hu2v3pKca8FjV0=
+X-Received: by 2002:a17:90b:2783:b0:340:c179:3666 with SMTP id
+ 98e67ed59e1d1-34f68c023dfmr6806900a91.8.1767904211135; Thu, 08 Jan 2026
+ 12:30:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 01/16] bpf: Convert bpf_selem_unlink_map to
- failable
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net,
- memxor@gmail.com, martin.lau@kernel.org, kpsingh@kernel.org,
- yonghong.song@linux.dev, song@kernel.org, haoluo@google.com,
- kernel-team@meta.com
-References: <20251218175628.1460321-1-ameryhung@gmail.com>
- <20251218175628.1460321-2-ameryhung@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20251218175628.1460321-2-ameryhung@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <cover.1767621882.git.lucien.xin@gmail.com> <1e642f7c65ec53934bb05f95c5cf206648c7de9f.1767621882.git.lucien.xin@gmail.com>
+ <5cb27e9f-ec01-4b50-b22c-dc8b027827bc@redhat.com>
+In-Reply-To: <5cb27e9f-ec01-4b50-b22c-dc8b027827bc@redhat.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Thu, 8 Jan 2026 15:29:58 -0500
+X-Gm-Features: AQt7F2piM-am5p0y4zg8EECj2AGre5rp6pGr0YwXe5OEXXnGdYkID72_rNecvvk
+Message-ID: <CADvbK_eXRpT8n1B7p2-1T6eAZZ=4p7gQgJtMGBBQrHa036nyxw@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 06/16] quic: add stream management
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
+	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
+	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
+	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/18/25 9:56 AM, Amery Hung wrote:
-> To prepare for changing bpf_local_storage_map_bucket::lock to rqspinlock,
-> convert bpf_selem_unlink_map() to failable. It still always succeeds and
-> returns 0 for now.
-> 
-> Since some operations updating local storage cannot fail in the middle,
-> open-code bpf_selem_unlink_map() to take the b->lock before the
-> operation. There are two such locations:
-> 
-> - bpf_local_storage_alloc()
-> 
->    The first selem will be unlinked from smap if cmpxchg owner_storage_ptr
->    fails, which should not fail. Therefore, hold b->lock when linking
->    until allocation complete. Helpers that assume b->lock is held by
->    callers are introduced: bpf_selem_link_map_nolock() and
->    bpf_selem_unlink_map_nolock().
-> 
-> - bpf_local_storage_update()
-> 
->    The three step update process: link_map(new_selem),
->    link_storage(new_selem), and unlink_map(old_selem) should not fail in
->    the middle.
-> 
-> In bpf_selem_unlink(), bpf_selem_unlink_map() and
-> bpf_selem_unlink_storage() should either all succeed or fail as a whole
-> instead of failing in the middle. So, return if unlink_map() failed.
-> 
-> In bpf_local_storage_destroy(), since it cannot deadlock with itself or
-> bpf_local_storage_map_free() who the function might be racing with,
-> retry if bpf_selem_unlink_map() fails due to rqspinlock returning
-> errors.
-> 
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> ---
->   kernel/bpf/bpf_local_storage.c | 64 +++++++++++++++++++++++++++++-----
->   1 file changed, 55 insertions(+), 9 deletions(-)
-> 
-> diff --git a/kernel/bpf/bpf_local_storage.c b/kernel/bpf/bpf_local_storage.c
-> index e2fe6c32822b..4e3f227fd634 100644
-> --- a/kernel/bpf/bpf_local_storage.c
-> +++ b/kernel/bpf/bpf_local_storage.c
-> @@ -347,7 +347,7 @@ void bpf_selem_link_storage_nolock(struct bpf_local_storage *local_storage,
->   	hlist_add_head_rcu(&selem->snode, &local_storage->list);
->   }
->   
-> -static void bpf_selem_unlink_map(struct bpf_local_storage_elem *selem)
-> +static int bpf_selem_unlink_map(struct bpf_local_storage_elem *selem)
+On Thu, Jan 8, 2026 at 10:36=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> On 1/5/26 3:04 PM, Xin Long wrote:
+> > +/* Create and register new streams for sending or receiving. */
+> > +static struct quic_stream *quic_stream_create(struct quic_stream_table=
+ *streams,
+> > +                                           s64 max_stream_id, bool sen=
+d, bool is_serv)
+> > +{
+> > +     struct quic_stream_limits *limits =3D &streams->send;
+> > +     struct quic_stream *stream =3D NULL;
+> > +     gfp_t gfp =3D GFP_KERNEL_ACCOUNT;
+> > +     s64 stream_id;
+> > +
+> > +     if (!send) {
+> > +             limits =3D &streams->recv;
+> > +             gfp =3D GFP_ATOMIC | __GFP_ACCOUNT;
+> > +     }
+> > +     stream_id =3D limits->next_bidi_stream_id;
+> > +     if (quic_stream_id_uni(max_stream_id))
+> > +             stream_id =3D limits->next_uni_stream_id;
+> > +
+> > +     /* rfc9000#section-2.1: A stream ID that is used out of order res=
+ults in all streams
+> > +      * of that type with lower-numbered stream IDs also being opened.
+> > +      */
+> > +     while (stream_id <=3D max_stream_id) {
+> > +             stream =3D kzalloc(sizeof(*stream), gfp);
+> > +             if (!stream)
+> > +                     return NULL;
+>
+> Do you need to release the allocated ids in case of failure? It would be
+> sourprising to find some ids allocated when this call fails/returns NULL.
+I was aware of this, but didn't change it. As the streams are always opened
+sequentially, I think it's fine just to leave them without causing problems
+when users assume these streams are not yet open.
 
-This will end up only be used by bpf_selem_unlink(). It may as well 
-remove this function and open code in the bpf_selem_unlink(). I think it 
-may depend on how patch 10 goes and also if it makes sense to remove 
-bpf_selem_"link"_map and bpf_selem_unlink_map_nolock also, so treat it 
-as a nit note for now.
+>
+> > +
+> > +             stream->id =3D stream_id;
+> > +             if (quic_stream_id_uni(stream_id)) {
+> > +                     if (send) {
+> > +                             stream->send.max_bytes =3D limits->max_st=
+ream_data_uni;
+> > +                     } else {
+> > +                             stream->recv.max_bytes =3D limits->max_st=
+ream_data_uni;
+> > +                             stream->recv.window =3D stream->recv.max_=
+bytes;
+> > +                     }
+> > +                     /* Streams must be opened sequentially. Update th=
+e next stream ID so the
+> > +                      * correct starting point is known if an out-of-o=
+rder open is requested.
+> > +                      */
+> > +                     limits->next_uni_stream_id =3D stream_id + QUIC_S=
+TREAM_ID_STEP;
+> > +                     limits->streams_uni++;
+> > +
+> > +                     quic_stream_add(streams, stream);
+> > +                     stream_id +=3D QUIC_STREAM_ID_STEP;
+> > +                     continue;
+> > +             }
+> > +
+> > +             if (quic_stream_id_local(stream_id, is_serv)) {
+> > +                     stream->send.max_bytes =3D streams->send.max_stre=
+am_data_bidi_remote;
+> > +                     stream->recv.max_bytes =3D streams->recv.max_stre=
+am_data_bidi_local;
+> > +             } else {
+> > +                     stream->send.max_bytes =3D streams->send.max_stre=
+am_data_bidi_local;
+> > +                     stream->recv.max_bytes =3D streams->recv.max_stre=
+am_data_bidi_remote;
+> > +             }
+> > +             stream->recv.window =3D stream->recv.max_bytes;
+> > +
+> > +             limits->next_bidi_stream_id =3D stream_id + QUIC_STREAM_I=
+D_STEP;
+> > +             limits->streams_bidi++;
+> > +
+> > +             quic_stream_add(streams, stream);
+> > +             stream_id +=3D QUIC_STREAM_ID_STEP;
+> > +     }
+> > +     return stream;
+> > +}
+> > +
+> > +/* Check if a send or receive stream ID is already closed. */
+> > +static bool quic_stream_id_closed(struct quic_stream_table *streams, s=
+64 stream_id, bool send)
+> > +{
+> > +     struct quic_stream_limits *limits =3D send ? &streams->send : &st=
+reams->recv;
+> > +
+> > +     if (quic_stream_id_uni(stream_id))
+> > +             return stream_id < limits->next_uni_stream_id;
+> > +     return stream_id < limits->next_bidi_stream_id;
+>
+> I can't recall if I mentioned the following in a past review... it looks
+> like the above assumes wrap around are not possible, which is realistic
+> given the u64 counters - it would require > 100y on a server allocating
+> 4G ids per second.
+>
+> But it would be nice to explcitly document such assumption somewhere.
+>
+How about I add a simple comment in quic_stream_create() right above
+the next_uni_stream_id/streams_uni increases, like
 
->   {
->   	struct bpf_local_storage_map *smap;
->   	struct bpf_local_storage_map_bucket *b;
-> @@ -355,7 +355,7 @@ static void bpf_selem_unlink_map(struct bpf_local_storage_elem *selem)
->   
->   	if (unlikely(!selem_linked_to_map_lockless(selem)))
+"Note overflow of next_uni_stream_id/streams_uni is impossible with u64."
 
-In the later patch where both local_storage's and map-bucket's locks 
-must be acquired, will this check still be needed if there is an earlier 
-check that ensures the selem is still linked to the local_storage? It 
-does not matter in terms of perf, but I think it will help code reading 
-in the future for the common code path (i.e. the code paths other than 
-bpf_local_storage_destroy and bpf_local_storage_map_free).
+> > +}
+> > +
+> > +/* Check if a stream ID would exceed local (recv) or peer (send) limit=
+s. */
+> > +bool quic_stream_id_exceeds(struct quic_stream_table *streams, s64 str=
+eam_id, bool send)
+> > +{
+> > +     u64 nstreams;
+> > +
+> > +     if (!send) {
+> > +             if (quic_stream_id_uni(stream_id))
+> > +                     return stream_id > streams->recv.max_uni_stream_i=
+d;
+> > +             return stream_id > streams->recv.max_bidi_stream_id;
+> > +     }
+> > +
+> > +     if (quic_stream_id_uni(stream_id)) {
+> > +             if (stream_id > streams->send.max_uni_stream_id)
+> > +                     return true;
+> > +             stream_id -=3D streams->send.next_uni_stream_id;
+> > +             nstreams =3D quic_stream_id_to_streams(stream_id);
+>
+> It's not clear to me why send streams only have this additional check.
+This is a good question.
 
->   		/* selem has already be unlinked from smap */
-> -		return;
-> +		return 0;
->   
->   	smap = rcu_dereference_check(SDATA(selem)->smap, bpf_rcu_lock_held());
->   	b = select_bucket(smap, selem);
-> @@ -363,6 +363,14 @@ static void bpf_selem_unlink_map(struct bpf_local_storage_elem *selem)
->   	if (likely(selem_linked_to_map(selem)))
->   		hlist_del_init_rcu(&selem->map_node);
->   	raw_spin_unlock_irqrestore(&b->lock, flags);
-> +
-> +	return 0;
-> +}
-> +
-> +static void bpf_selem_unlink_map_nolock(struct bpf_local_storage_elem *selem)
-> +{
-> +	if (likely(selem_linked_to_map(selem)))
+For recv.max_uni_stream_id, it changes based on next_uni/bidi_stream_id,
+max_streams_uni/bidi and streams_uni/bidi in quic_stream_max_streams_update=
+(),
+there's no need to check them again. (maybe I should leave a comment here)
 
-Take this chance to remove the selem_linked_to_map() check. 
-hlist_del_init_rcu has the same check.
+But for send.max_uni_stream_id, it was updated simply from the peer's updat=
+ed
+recv.max_uni_stream_id announcement, it must check its local counts and
+limits as well.
 
-> +		hlist_del_init_rcu(&selem->map_node);
->   }
->   
->   void bpf_selem_link_map(struct bpf_local_storage_map *smap,
-> @@ -376,13 +384,26 @@ void bpf_selem_link_map(struct bpf_local_storage_map *smap,
->   	raw_spin_unlock_irqrestore(&b->lock, flags);
->   }
->   
-> +static void bpf_selem_link_map_nolock(struct bpf_local_storage_map *smap,
-> +				      struct bpf_local_storage_elem *selem,
-> +				      struct bpf_local_storage_map_bucket *b)
-> +{
-> +	RCU_INIT_POINTER(SDATA(selem)->smap, smap);
+>
+> > +             return nstreams + streams->send.streams_uni > streams->se=
+nd./;
+>
+> Possibly it would be more consistent
+>
+> max_uni_stream_id -> max_stream_ids_uni
+>
+> (no strong preferences)
+I actually got the variable name from
+https://datatracker.ietf.org/doc/html/rfc9000.
 
-Is it needed? bpf_selem_alloc should have init the SDATA(selem)->smap.
+>
+> > +     }
+> > +
+> > +     if (stream_id > streams->send.max_bidi_stream_id)
+> > +             return true;
+> > +     stream_id -=3D streams->send.next_bidi_stream_id;
+> > +     nstreams =3D quic_stream_id_to_streams(stream_id);
+> > +     return nstreams + streams->send.streams_bidi > streams->send.max_=
+streams_bidi;
+> > +}
+>
+> [...]
+> > +/* Get or create a receive stream by ID. Requires sock lock held. */
+> > +struct quic_stream *quic_stream_recv_get(struct quic_stream_table *str=
+eams, s64 stream_id,
+> > +                                      bool is_serv)
+> > +{
+> > +     struct quic_stream *stream;
+> > +
+> > +     if (!quic_stream_id_valid(stream_id, is_serv, false))
+> > +             return ERR_PTR(-EINVAL);
+> > +
+> > +     stream =3D quic_stream_find(streams, stream_id);
+> > +     if (stream)
+> > +             return stream;
+> > +
+> > +     if (quic_stream_id_local(stream_id, is_serv)) {
+> > +             if (quic_stream_id_closed(streams, stream_id, true))
+> > +                     return ERR_PTR(-ENOSTR);
+> > +             return ERR_PTR(-EINVAL);
+> > +     }
+> > +
+> > +     if (quic_stream_id_closed(streams, stream_id, false))
+> > +             return ERR_PTR(-ENOSTR);
+> > +
+> > +     if (quic_stream_id_exceeds(streams, stream_id, false))
+> > +             return ERR_PTR(-EAGAIN);
+> > +
+> > +     stream =3D quic_stream_create(streams, stream_id, false, is_serv)=
+;
+> > +     if (!stream)
+> > +             return ERR_PTR(-ENOSTR);
+> > +     if (quic_stream_id_valid(stream_id, is_serv, true))
+> > +             streams->send.active_stream_id =3D stream_id;
+>
+> This function is really similar to quic_stream_send_get(), I think it
+> should be easy factor out a common helper (and possibly use directly
+> such helper with no send/recv wrapper).
+>
+I will factor out a common helper quic_stream_get() but keep
+quic_stream_send_get/put() as:
 
-> +	hlist_add_head_rcu(&selem->map_node, &b->list);
-> +}
-> +
+struct quic_stream *quic_stream_send_get(...)
+{
+        return quic_stream_get(streams, stream_id, is_serv, true);
+}
 
-[ ... ]
+struct quic_stream *quic_stream_recv_get(...)
+{
+        return quic_stream_get(streams, stream_id, is_serv, false);
+}
 
-> @@ -574,20 +603,37 @@ bpf_local_storage_update(void *owner, struct bpf_local_storage_map *smap,
->   		goto unlock;
->   	}
->   
-> +	b = select_bucket(smap, selem);
-> +
-> +	if (old_sdata) {
-> +		old_b = select_bucket(smap, SELEM(old_sdata));
-> +		old_b = old_b == b ? NULL : old_b;
-> +	}
-> +
-> +	raw_spin_lock_irqsave(&b->lock, b_flags);
-> +
-> +	if (old_b)
-> +		raw_spin_lock_irqsave(&old_b->lock, old_b_flags);
-
-This will deadlock because of the lock ordering of b and old_b. 
-Replacing it with res_spin_lock in the later patch can detect it and 
-break it more gracefully. imo, we should not introduce a known deadlock 
-logic in the kernel code in the syscall code path and ask the current 
-user to retry the map_update_elem syscall.
-
-What happened to the patch in the earlier revision that uses the 
-local_storage (or owner) for select_bucket?
-
-[ will continue with the rest of the patches a bit later ]
-
-> +
->   	alloc_selem = NULL;
->   	/* First, link the new selem to the map */
-> -	bpf_selem_link_map(smap, selem);
-> +	bpf_selem_link_map_nolock(smap, selem, b);
->   
->   	/* Second, link (and publish) the new selem to local_storage */
->   	bpf_selem_link_storage_nolock(local_storage, selem);
->   
->   	/* Third, remove old selem, SELEM(old_sdata) */
->   	if (old_sdata) {
-> -		bpf_selem_unlink_map(SELEM(old_sdata));
-> +		bpf_selem_unlink_map_nolock(SELEM(old_sdata));
->   		bpf_selem_unlink_storage_nolock(local_storage, SELEM(old_sdata),
->   						&old_selem_free_list);
->   	}
->   
-> +	if (old_b)
-> +		raw_spin_unlock_irqrestore(&old_b->lock, old_b_flags);
-> +
-> +	raw_spin_unlock_irqrestore(&b->lock, b_flags);
-> +
->   unlock:
->   	raw_spin_unlock_irqrestore(&local_storage->lock, flags);
->   	bpf_selem_free_list(&old_selem_free_list, false);
-> @@ -679,7 +725,7 @@ void bpf_local_storage_destroy(struct bpf_local_storage *local_storage)
->   		/* Always unlink from map before unlinking from
->   		 * local_storage.
->   		 */
-> -		bpf_selem_unlink_map(selem);
-> +		WARN_ON(bpf_selem_unlink_map(selem));
->   		/* If local_storage list has only one element, the
->   		 * bpf_selem_unlink_storage_nolock() will return true.
->   		 * Otherwise, it will return false. The current loop iteration
-
+Thanks.
 
