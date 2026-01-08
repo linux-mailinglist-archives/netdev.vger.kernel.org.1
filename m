@@ -1,252 +1,127 @@
-Return-Path: <netdev+bounces-248143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B306ED0442E
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:17:06 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78E7AD0472D
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 17:39:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9A4C2317925B
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:02:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 39B393034301
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 16:06:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DE8018859B;
-	Thu,  8 Jan 2026 16:02:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 187AC1F09A8;
+	Thu,  8 Jan 2026 16:06:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kFf7+K7d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R1gFAGZg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BFF2BB1D;
-	Thu,  8 Jan 2026 16:02:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767888147; cv=fail; b=ZRV47OeDJ5MBubYoFv1YTHnaPc9cHaAaKmfeowCbqEyVLMxuZEf6VC0SZsCTfC/Z7nOwT9ZW3dMCclj/oFI2qlVhA2ZZ/ANmGJWW1tbmpW/ZanPhHT2IBdB6qV/nAUR8kqigDrv/4K9xcSa8QyInFhpoZAFhO3/VP7a6Zxv/zXo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767888147; c=relaxed/simple;
-	bh=Wr1tb9mP+KSMybuNV/PKdTcvermedxTVcz7XWCzyWYA=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Hby4ax1932JEXIY36FAvMiWu7OhmEinaICazLEYvrLCJ9aJE2moHgdUOrut/na7vrUfD4GcsUpukygiaLL3VaaMiiTQvNfGHO3xXQQgnlRKfNWEvQ+agJUKain8VBCsonTWHau4RrhHQsUNCfmv5iJT0t1efZ89raY5vW3muE4s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kFf7+K7d; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767888146; x=1799424146;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Wr1tb9mP+KSMybuNV/PKdTcvermedxTVcz7XWCzyWYA=;
-  b=kFf7+K7dxpVGPMBLRxCkJU02+LTPrVA2VNhsTeiPSZK53lDt3rfLKsw0
-   UB5E49tKoS7uLfNHY9r9oz5jU0wCR5DNsd/bhh/q1/t/Vv10CtrWHBOXJ
-   vnn7ql/tijw1gQVQTbL7nqmn8AAwqCXdH0YxVkzQ3vgXo6alGdYFDd/P9
-   LFHZsIYkQOAzyiiXnBF2ob3XtEx1dWyQN+s63qR560x2omn2O0r44uVzw
-   tBW2BA2t1TRYZz5RN5u6xAzmaQj9r5d7oHrLGTnPfd3LOO7amQ6UTk0WW
-   HEBim0G/FklO1Dsy+vZPnG29D1o0PEeSTpHh6TOw9ltQKPGQ/66Q8v46T
-   A==;
-X-CSE-ConnectionGUID: rHfFGm6yTV+0X1wazHS/fg==
-X-CSE-MsgGUID: 2AmtdGbqQuK9XiTXLw4cYA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11665"; a="86683778"
-X-IronPort-AV: E=Sophos;i="6.21,211,1763452800"; 
-   d="scan'208";a="86683778"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2026 08:02:26 -0800
-X-CSE-ConnectionGUID: 108q21N7ShW5whbpPcJN6w==
-X-CSE-MsgGUID: vW8ge8BeS0yRXuT1tKedug==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,211,1763452800"; 
-   d="scan'208";a="233944833"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2026 08:02:26 -0800
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Thu, 8 Jan 2026 08:02:25 -0800
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Thu, 8 Jan 2026 08:02:25 -0800
-Received: from PH0PR06CU001.outbound.protection.outlook.com (40.107.208.66) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Thu, 8 Jan 2026 08:02:24 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qHEAzcIfndPnw73UV9GQCRBPZHMC11YIWEvUoivezXET51mc12sIwiUlE475GuWHfvVd8FN62F9GZEhj2wNFiRrEh7lIVIwmxfeYYPf1yrF9vcq4/MMRWRzJZWK5uAZL3/z2vtcrI/6LFowLU18Y1hqdoZ0iYE6+vsCEYhaWyv0N45OnFKKivxM5VA0Y4L8wmBUpqnj94e+gPPGetVmeSiWcef9SLPVILhlKMaS4QJFnJw2rBATu/MkuNefMaei0jHr3GjPbE11XC4TrmEeETwTah4InA2PRDv7lS1RiwQDQgcyloI1kPCA9Lk555rJKejR2EaR8kuTGxLhxjHbnuQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qz4fBuO6GHWPgpM8P9UXBYDdHPShX018x5/fzQkZvBU=;
- b=Vzc/kd9B6C6jQ/u4rNEmr52Kmd1QoEd9MTzwTvsFEofCN1+bMAJU6BefwN1U/bnXNp7gvcQVi/sKJFdo5VPv0rrhOoM+4X7Vw0AxZ6bCw5agd0ijp6+l9AQVDFKVV99E6xH6E8WDjKuf6nep+pqeJgd01q/npPXVjfuX+JST2du+yTKPbDpXYo+w10w1qd2FHy4JChghYfZQmdr0F8irC0bQCFwjIwDZnbT/6HefZeOYmaNneJRgIjowjqNp5cule6FszuUZsWoEW76919wHqK3O+B7tiMDg0WZFZllyRAcXLHZKR35xhPnwp3wNI+OH77faOIILjKarSReiuXQHVQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by SA2PR11MB4988.namprd11.prod.outlook.com (2603:10b6:806:f8::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.4; Thu, 8 Jan
- 2026 16:02:18 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::6aa:411d:4bfa:619c]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::6aa:411d:4bfa:619c%4]) with mapi id 15.20.9499.002; Thu, 8 Jan 2026
- 16:02:17 +0000
-Message-ID: <c65ca5b7-4121-41c4-a5cc-3df2644339a7@intel.com>
-Date: Thu, 8 Jan 2026 16:59:06 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net-next] ice: access @pp through
- netmem_desc instead of page
-To: Pavel Begunkov <asml.silence@gmail.com>
-CC: Matthew Wilcox <willy@infradead.org>, Byungchul Park <byungchul@sk.com>,
-	<netdev@vger.kernel.org>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel_team@skhynix.com>, <harry.yoo@oracle.com>, <david@redhat.com>,
-	<toke@redhat.com>, <almasrymina@google.com>, <anthony.l.nguyen@intel.com>,
-	<przemyslaw.kitszel@intel.com>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<intel-wired-lan@lists.osuosl.org>
-References: <20251216040723.10545-1-byungchul@sk.com>
- <aUDd9lLy76sBejrP@casper.infradead.org>
- <37b642bd-9f26-477e-9fca-1e3c931c0efb@gmail.com>
-Content-Language: en-US
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <37b642bd-9f26-477e-9fca-1e3c931c0efb@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: DU2PR04CA0177.eurprd04.prod.outlook.com
- (2603:10a6:10:2b0::32) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15151A9F94
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 16:06:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767888407; cv=none; b=kg/1jEAUpEip17LLVsyNDQOBXwWU51XAIt1pn2hS/zIOQ1HcshgJMq5lUnzikLzicNxSHYYM3QTOQzJFSNkvGNpLFdbjW7VYfbGYUKshC6mPAIHBWY3BXLXriBQZZPDkoSesFw8wKdZBaKU8I0l2KnEUrQMig2eDzVGIcyE8ptY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767888407; c=relaxed/simple;
+	bh=UegVCAwQ78YZhR1Wz6KfLUbuIxrTsfzJgNqJKWnP9uw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UCMMUlJfv7Px2I6S6+DOHkXn3rV20f3dlnaeQJKNSTSJAmQvrY0mBizMwJrdWc5CtbK6VmHj+o5AX/q4OoKZWlKNDBaRrf7gomTECbIF6a8JAuel1bRvbP1iHwQATgappfpubypEw7oZ1ycP8bEm/A6cQ1sJ6yhgB03RJXyk14M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R1gFAGZg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0680FC116D0;
+	Thu,  8 Jan 2026 16:06:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767888407;
+	bh=UegVCAwQ78YZhR1Wz6KfLUbuIxrTsfzJgNqJKWnP9uw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=R1gFAGZg8yRnN6ZmzH/jh5NecSqz7ZNHclabTB23bv6uw+m3zvT3Sz5v+uqEQuJ6Y
+	 ZwuWRDkV3IKcwFZU28WtTENJ0+sqAuZUXjfKJgNQdXLuxhS6lK8YbXxjSNlnxtGMZw
+	 ksbywVGyGn5hg3+JbrUn/reQZaNjmv2WjLjrABd9U0RY6daeLAOpufR4923R63V/S9
+	 2fKQpSQ8FIVxtaDIys3r+mpT6YNJ9P2HDvl5vLT5BoCwSyTrNRDfjgW3UGUVs2niEY
+	 LNHirU/FS3uqJ3fVvQfeeC7c6Eq5B/KNqOiFMQ3v6H2iHTwrYAltb33WQx57NVhYFi
+	 wUvI1NdLXuAAw==
+Date: Thu, 8 Jan 2026 08:06:46 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Willem de Bruijn <willemb@google.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>
+Subject: Re: [TEST] txtimestamp.sh pains after netdev foundation migration
+Message-ID: <20260108080646.14fb7d95@kernel.org>
+In-Reply-To: <20260107192511.23d8e404@kernel.org>
+References: <20260107110521.1aab55e9@kernel.org>
+	<willemdebruijn.kernel.276cd2b2b0063@gmail.com>
+	<20260107192511.23d8e404@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|SA2PR11MB4988:EE_
-X-MS-Office365-Filtering-Correlation-Id: b9c264ae-b939-4b3f-cf10-08de4ecf4c20
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?K2hmdmRIT3FtSVJGUkxLelZtdTEzSlVwbDd3NEFyaXR3S2pOdi96UTJxM2Y3?=
- =?utf-8?B?Sk85K1NUSXhOVnBIcGZtRENqVGE1WXgwRk4wa0RsV1JaMTV6MTJIWXNhdVRU?=
- =?utf-8?B?eDk5SEVpeTdCQ0c2ZUlSMmozL285UFBMRUdZRzlhSzd2TjV0RHJVNUp1U3Nt?=
- =?utf-8?B?M0JUYXE4bkpVaUR1c0Z4dE1FdGptQVd3NCsyd1UzRWluVVc5Z0JlZHdYeCtN?=
- =?utf-8?B?QmNaNEJTTHBSeWtvZ3FsSWl4Yld0MGlEd2V0U3RvTjY2emdzSlZ2M2dWNGpH?=
- =?utf-8?B?bkpnckN6T3BVOUJoS3A5cHJlK0lzVWdzQ095VmJhbi9wYjM4TkxHVnBkTWRI?=
- =?utf-8?B?cDFGL2wvdlk1NENsYXFsVDdwOVBmbWFndDluaktPOWdIYzk3RUxjSmQvZjNE?=
- =?utf-8?B?cU50Q2pFUlhQMTRodjc0SUhiSHYwKytQVXBSTHRqa1ZpSXFVOTlPRVBVNnVw?=
- =?utf-8?B?ZG0wN09hSnd3ODkyUy9jenQ3QWVrclBRZGwvVzNxTGp2ZUVOUUpNRzRmYndr?=
- =?utf-8?B?aWRzaGtSWU9HdWhRbXR0dDh0Q2lTa3NSWEJ1VFo4M2JDQmZHdGs1WDRVZHhM?=
- =?utf-8?B?Vnl2NGZTdUpNbStjTGU2ZFZyMGJqOTdKelhCMnN4NkhITzYxRWpCMGh6dHFj?=
- =?utf-8?B?R0NJR3Z3ZDRWRFdKdFBxbFZCVFozOWc3OWtxRmRZblhZVHpLcGtHeS9GVExM?=
- =?utf-8?B?MFhSSmVGYjQ3ZkNqMFFKT21yOFBobHVOZnBPWGtraktQaEV6WWZGZloremhI?=
- =?utf-8?B?QmRnaWpZSHIvcEwwckpoTk5UcE94T21kZEtod0dnU3hsKytZMGlaRWRKM05R?=
- =?utf-8?B?V2JvVG9RMm1vTkU4N3VpSkxzMFAvQTNEOFRSeERKSTJOby83MEZGY0JXdVFx?=
- =?utf-8?B?bTV5dmpBU1RLYkVLOEJkajUyM3hzdWt0dVVUOEgzZ2ZYTVFhZUNCZkxpckx2?=
- =?utf-8?B?M2h4WUR1Q2RwWU9YdmxCSkttQzBJemRJZU94MGpkb0lLbEtXRk1haGtBNVlP?=
- =?utf-8?B?UnlBQ0pxWG9GeVcxNFNDSkVBYmhPd3JKaU5VS3MweE16S1B2aXp6bUEzR1ZR?=
- =?utf-8?B?M0htQjhLK0J2MHBpajRUQ0RhNWttL0kyVVAxbi9EMnlhbVlBbEpBMThMM01j?=
- =?utf-8?B?RkQ1YnBTSy91NmFsbVM1UnYrdTVzR3EzRThZaUJhOHN5VUJKNnJrbU1SUDIx?=
- =?utf-8?B?Z1lUYm41QklmYUlHV3N3SW1VbGZ0T1kxMVVPczJlMVFqMkx0d3Y2ZUZHdWVE?=
- =?utf-8?B?VDNFOTVwSzNsNG1YWERRTHgrRUg1SXVaWHZ2eE11SzB4K21KYnE5R1dZZXRX?=
- =?utf-8?B?R04ycVo4UlVzU1p2QlBWdFBSc0dpM2xPZUV5NUQ4bnlhWHlLTHl4RStzNG5Z?=
- =?utf-8?B?SlcvcGdDWHJYRG05UTZyREVhWXZ3Q1AxUkp0eEcwVnZMQTZFUEVvUVFQZnFG?=
- =?utf-8?B?NHRxbktWUEh6SGZwNkh3eG5YSnlVcTVvakJUS3RGNUw2NjBBN01zVG80N09q?=
- =?utf-8?B?Wm5RcVM3S0ZmNGNDNWZsMUlvdGF6NFlmZFRoOGFERjlybzZTNHREa29vQWt6?=
- =?utf-8?B?RTVjYWF6VCtUdW45QnFPT1dyM2tXeU5uUWNkWEx4NTZma3ppL2hYQ2U0Q2dS?=
- =?utf-8?B?YnFtc1hWTWphZXRuTTE2ZUxlbVZTR21KZ0lndTVJQThZOHRHZVNLTVZQVTR5?=
- =?utf-8?B?YW5rRDdLdm5NWEhFOXRRTk4yQ1VIY2RkOG1OdU9UN21uZ1hEQ1c1MGRxaXFU?=
- =?utf-8?B?Y1VGa3JoQkdzUTAvZWdyelM5VjJ3bTNQVktVQkRkeDVQZkl6bENSVFJwNmFN?=
- =?utf-8?B?ZHFYNHhoRWt6QzVseitobHBGcVEvZHhuSkZJbGFQQ3hNR01sKzRWb3c1Y2Yy?=
- =?utf-8?B?TFNTUWxraWpaQUhna2oxY0tpTk1LOURkTXRBcVRjWVkyeVN2dXFRTVhJNU9B?=
- =?utf-8?Q?EiUQhU63qKNQe9BzhMuzRLdmX2Le4z+y?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WGpHM1FpUjd3ZnNCamhpS1RVdWNSd29BLzIxTVAxeVNWK2NCYnl4WGEzZEJq?=
- =?utf-8?B?c3RpSlVZTTVZaVFiQTh3enhoQWJSSkJmSnpNTkN5WFM5K1p0QzlnSmFKZ2Qr?=
- =?utf-8?B?cjB3bThsMnFQakpBem5TQ1RKWWpqWEFyWlJobGxFUXdjdDRwcHE1Z3hMNlov?=
- =?utf-8?B?NHVzWk1tTE5meFR2YTVLNlE4Y3Q5ZjlQajJaOWQveURDZVZmbzJBQ2FSQUt6?=
- =?utf-8?B?WVJ2SXlicVVOcXFnbU9zUmg5WWt6VFRtSkp5WittOFhQQlBRSlE2dnJwZk9k?=
- =?utf-8?B?K3JrOUpXRGZHNzVwQldyT1hqd1YzaFUzalhReEZMMXpOUW5BV2dSc0UwdStt?=
- =?utf-8?B?SkZQbnoyUGpPTW9STFFreXFDUkd5bmNkM2gxa2VJUC9sT3RjbGMzeHhsaW9K?=
- =?utf-8?B?RnRZS2xCTlRuZ2Zod3p5NjFOSVg2Z0hDOXA2L0plSEFVSVdmamNkTzF2dzhP?=
- =?utf-8?B?d1Judk03S0x1NTA5dFZPRWwvRWtDaEVhTFFNUjEyVXJpSk8wQ3VCRzdicExQ?=
- =?utf-8?B?OG00b2tuU3JzSE5NOVZyLzlFWnBQaU1OQ3VYQmxjcUwyanAzMFZDeDZSTjhK?=
- =?utf-8?B?N1lhSHh3cmx0cmZyKzdLVzFhZEg1Sy8xZ0R0TGp6WHlhdFRGeitBTWxXYWV6?=
- =?utf-8?B?ZlpaaXNIZzVhU0ZlWXIvY3lpVGFQQzhzWWxTVy90aVNVTDBIVDdNMTlYS3gy?=
- =?utf-8?B?RUdIVDdNSzYrTVFnYkxodktLaVBmMVJOL3RBZ0RLaUpsNnI3dzJUdHBIUlZ3?=
- =?utf-8?B?dGNublJ5OUwvOVFKcnRZNTcxNDZpZXFRVmFMMmR5ZVo4TXovRllpMnRCMkFm?=
- =?utf-8?B?YnhkK1l2VGt1Rm9palFQdUo3UzkyM09XWjdUVVpWOUJRekVGRXA3QzVYRTk4?=
- =?utf-8?B?Y0k2dk9DVXpiWmpka0d1VVlHNTBxRGpGd1MzM1gxR0NQcTZ2RnUwWXNaMGRi?=
- =?utf-8?B?L0NhY1ZvTGEvNmhxc3BJTDF0Um9EZ3JCbXdWVDM1QmRSV3dTc1hHbTNtTGlo?=
- =?utf-8?B?ZU1INGhSNnRtYTh5b2RQUkhpSXNIQkZJdnRiY3k2NGY2eXMxV0F6aHhLNTJm?=
- =?utf-8?B?R2x6MUpBeTN6amJobkMwQWs4bzFhdmpUVGVnajdMNktEVEpoYW8vSjBDU0s0?=
- =?utf-8?B?eWlta1k4QTFmd3Rwby91dUxRSm15SzBNcURoZWd2TmZ0OTUzNnVWQnFNdjln?=
- =?utf-8?B?bjE2MFBWdS9XbDR2b0hpdnhxU2pZUEdDVmhHVklnM0dHakhhQldVV0RIbnZu?=
- =?utf-8?B?bEZGdVlOWDFxYS8rcVFHNnpaS0FLZEI0OWNyT0xWLzNKdlpzR0ExcjZPKzdJ?=
- =?utf-8?B?Y2hBS2xqeUROWDc2dElJNWJmNVNSRmJlbjZzUnpGeVB4akVTV0dCSk16cGw0?=
- =?utf-8?B?RGRJZlFzdUgzMlVtWVhqaHBUTG96bC9Ma3lCN3FrNkIzQWUzMzUvRTRVc1Fz?=
- =?utf-8?B?cWpDVVVCb203QVdLS0dOSENiYUZBQzRFZ2dJb3J5WStzQUM3RTk3bTZNdjdj?=
- =?utf-8?B?V0xTc2szaENKV2d6V01pYy90QmVreVp4NTBJbjQ3ZStlOVRSRjhEbmJwcy9q?=
- =?utf-8?B?cmJ4VEJWTGRVVGYrUjNSK2kvTW96QkI0N214S0hGWURwZzJLd1V5OFVERGVa?=
- =?utf-8?B?eVpkY0NhZ0dxNUUzeHpmSHFHc3k5SDh5ZkdKWHU2b0orRGpvZVBGdEwyRHc4?=
- =?utf-8?B?R3lKd3p5ZmJHYmNFSG9veUZXdnJYNC9XUktVLzFGdEpWQnFjdHBPL0QrTEQ2?=
- =?utf-8?B?ZWJoUUNvSDVBeXRHa3BVWHQreFViOUdJTmg2TUlnMEdQQXBvK2ZPNXRET1p0?=
- =?utf-8?B?QlAxOTFQM1c1RFBjZTJkQzBxeEcwVi9ZZGErd045enRJMHVES2FnMlJYSS9E?=
- =?utf-8?B?alF3ZXhGRis1UVM0cjZqVDNEOWxvalZoMXRJQVVMZlVQQ0Y5YkxLaHhKRXpU?=
- =?utf-8?B?eEJsVjlBaHJtUklzbFhtaSt5cXNQdXM1ajJ1K3RIZ1FHSnVTYmc2TkUyYk91?=
- =?utf-8?B?ZXNldHFzWFZxenhKb1dVQytrajRLU2crekZOOXJxMkRzaFVSUGhEdGhuTnUr?=
- =?utf-8?B?UUFSMlNJTTFaNm12NjEycjN5ci9TQ29COHg1QXFPT0lWYThMcUxrQlhpbXlE?=
- =?utf-8?B?eWVJaFhMUEw1Y0V1YitZN0Nub1VlRFk5OWlvamlGZEIyWWNXRExZa2VCc2F1?=
- =?utf-8?B?VllGbnVJOUhDVDcrQ09Kc1krQUNFSnFiTHRhZkVNeFVESDAzNEFpT2FaM2kv?=
- =?utf-8?B?MWdGNm95QlE0UVAvakl1VUJrZzlNYWduTEQyeElIUk95N1o2TFp4M1d2aFNT?=
- =?utf-8?B?bGR6aUlIVVRnMFlVWk9ORzd5cTg5K3JJUlNQRzlmLzBVaTRDcXlGV2NRM0NU?=
- =?utf-8?Q?T/xPPFK9ZPaGbaVQ=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b9c264ae-b939-4b3f-cf10-08de4ecf4c20
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2026 16:02:17.9140
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: irSKHUWGUinLsgbd2VbRJWe/oBmj7Tr42ui3E+PU1klkxV4Zjt8Jw2PdQ19cBIUo6MKalsi2JIYM+I5/MFfRXEfRZkRW2z+4CzeDhsRuDQk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4988
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Pavel Begunkov <asml.silence@gmail.com>
-Date: Wed, 17 Dec 2025 13:11:28 +0000
-
-> On 12/16/25 04:20, Matthew Wilcox wrote:
->> On Tue, Dec 16, 2025 at 01:07:23PM +0900, Byungchul Park wrote:
->>> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
->>> @@ -1251,7 +1251,7 @@ static int ice_lbtest_receive_frames(struct
->>> ice_rx_ring *rx_ring)
->>>           rx_buf = &rx_ring->rx_fqes[i];
->>>           page = __netmem_to_page(rx_buf->netmem);
->>>           received_buf = page_address(page) + rx_buf->offset +
->>> -                   page->pp->p.offset;
->>> +                   pp_page_to_nmdesc(page)->pp->p.offset;
->>
->> Shouldn't we rather use:
->>
->>         nmdesc = __netmem_to_nmdesc(rx_buf->netmem);
->>         received_buf = nmdesc_address(nmdesc) + rx_buf->offset +
->>                 nmdesc->pp->p_offset;
->>
->> (also. i think we're missing a nmdesc_address() function in our API).
+On Wed, 7 Jan 2026 19:25:11 -0800 Jakub Kicinski wrote:
+> On Wed, 07 Jan 2026 19:19:53 -0500 Willem de Bruijn wrote:
+> > 17 out of 20 happen in the first SND-USR calculation.
+> > One representative example:
+> > 
+> >     # 7.11 [+0.00] test SND
+> >     # 7.11 [+0.00]     USR: 1767443466 s 155019 us (seq=0, len=0)
+> >     # 7.19 [+0.08] ERROR: 18600 us expected between 10000 and 18000
+> >     # 7.19 [+0.00]     SND: 1767443466 s 173619 us (seq=0, len=10)  (USR +18599 us)
+> >     # 7.20 [+0.00]     USR: 1767443466 s 243683 us (seq=0, len=0)
+> >     # 7.27 [+0.07]     SND: 1767443466 s 253690 us (seq=1, len=10)  (USR +10006 us)
+> >     # 7.27 [+0.00]     USR: 1767443466 s 323746 us (seq=0, len=0)
+> >     # 7.35 [+0.08]     SND: 1767443466 s 333752 us (seq=2, len=10)  (USR +10006 us)
+> >     # 7.35 [+0.00]     USR: 1767443466 s 403811 us (seq=0, len=0)
+> >     # 7.43 [+0.08]     SND: 1767443466 s 413817 us (seq=3, len=10)  (USR +10006 us)
+> >     # 7.43 [+0.00]     USR-SND: count=4, avg=12154 us, min=10006 us, max=18599 us  
 > 
-> It wouldn't make sense as net_iov backed nmdescs don't have/expose
-> host addresses (only dma addresses). nmdesc_address() would still
-> need to rely on the caller knowing that it's a page. An explicit
-> cast with *netmem_to_page() should be better.
+> Hm, that's the first kernel timestamp vs the timestamp in user space?
+> I wonder if we could catch this by re-taking the user stamp after
+> sendmsg() returns, if >1msec elapsed something is probably wrong 
+> (we got scheduled out before having a chance to complete the send?)
 
-Sorry for the late reply. Holidays... Happy New Year everyone.
+How about:
 
-I agree with Pavel. This loopback test always operates with
-kernel/page-backed memory. I believe it's fully valid to explicitly cast
-to a page in such cases and work with it. This is also more clear to the
-readers after all (IIRC I suggested this piece of code when Michał was
-working on the ice conversion).
+diff --git a/tools/testing/selftests/net/txtimestamp.c b/tools/testing/selftests/net/txtimestamp.c
+index 4b4bbc2ce5c9..abcec47ec2e6 100644
+--- a/tools/testing/selftests/net/txtimestamp.c
++++ b/tools/testing/selftests/net/txtimestamp.c
+@@ -215,6 +215,24 @@ static void print_timestamp_usr(void)
+ 	__print_timestamp("  USR", &ts_usr, 0, 0);
+ }
+ 
++static void check_timestamp_usr(void)
++{
++	long long unsigned ts_delta_usec;
++	struct timespec now;
++
++	if (clock_gettime(CLOCK_REALTIME, &now))
++		error(1, errno, "clock_gettime");
++
++	ts_delta_usec = timespec_to_ns64(&now) - timespec_to_ns64(&ts_usr);
++	ts_delta_usec /= 1000;
++	if (ts_delta_usec > cfg_delay_tolerance_usec / 2) {
++		cfg_delay_tolerance_usec =
++			ts_delta_usec + cfg_delay_tolerance_usec / 2;
++		fprintf(stderr, "WARN: sendmsg() took %llu us, increasing delay tolerance to %d us\n",
++			ts_delta_usec, cfg_delay_tolerance_usec);
++	}
++}
++
+ static void print_timestamp(struct scm_timestamping *tss, int tstype,
+ 			    int tskey, int payload_len)
+ {
+@@ -678,6 +696,8 @@ static void do_test(int family, unsigned int report_opt)
+ 		if (val != total_len)
+ 			error(1, errno, "send");
+ 
++		check_timestamp_usr();
++
+ 		/* wait for all errors to be queued, else ACKs arrive OOO */
+ 		if (cfg_sleep_usec)
+ 			usleep(cfg_sleep_usec);
+-- 
+2.52.0
 
-Thanks,
-Olek
 
