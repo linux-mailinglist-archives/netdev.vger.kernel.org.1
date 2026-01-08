@@ -1,82 +1,91 @@
-Return-Path: <netdev+bounces-248221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30067D05A5B
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 19:47:47 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68BF4D05788
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 19:23:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C87AE300D497
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 18:14:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 40B97300E44B
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 18:23:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 589E32FD7D5;
-	Thu,  8 Jan 2026 18:14:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 794E4311C15;
+	Thu,  8 Jan 2026 18:23:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eVc14Opc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eLGCbYxu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8E75238D54
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 18:14:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC4D2310784
+	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 18:23:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767896098; cv=none; b=FUyQQRv3qSe7itIIpTYVdzAIuc4eRv1ylKUrV/T018gi/fGt4Y50ixvyz28qOvNZH9ovCJacaUEt6IqkM6fCYN9I+KCOyigywXDcBq7amsjrJuD1CPrHfx8Ta2KYGSY9rG5gpvbvUHfdjL8E0jnMt2y1uedQjCEVCMHconddZo8=
+	t=1767896619; cv=none; b=llAo2r15G0Ub3/vrAIfu4CsQw7ZXXABTshvoKYFjJjg47FLFnG9c9vKm/3DC8h+CU7pd9ZenJn0y64tZTU888OsiooRwUkM8cVppHH5xrYPEs7DLkVX18HiJrZ2fVvLKcPSljQ1PQwq+7oI3M0N7cIx1XpyMAB+e5NM8PEqU2WY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767896098; c=relaxed/simple;
-	bh=P+VNpoWXn5StTNI90Gk2MmeCjVvVQPCMwGG15E3L0fw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Z+JCYhhysJQPw2rSj9KhC/b0NNmk3gbD1ZTxrjy1QXt78F4iNVhs4Y3gjoyvvzSRXFT3X0YUHeeZrc2TY0hIvGiD8dLaQpevImheAdOMulow7LiKjyRTUfByTVohlbhYVH6ybsOZg2FVK5UqgAWMuaA3T4cjmhw3I4OapE/mDmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eVc14Opc; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-432d2c7a8b9so628755f8f.2
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 10:14:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767896092; x=1768500892; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=x9nrVXytCUOxRtBOG/U2u1E3dN/2Yf8ykIJFaTP4VqQ=;
-        b=eVc14OpcQkAOM7ZqvWsd3+gzi6leZSgSSks64YTmFgu8Sgtl+nblM63eoH9NDh0AcS
-         WBZKtwJbCzSmV+gUiFIKYaPVQ+mfHBCmO/h174JNQaXLZXrHGemyUc19cmmV9WW4kBLu
-         6KklH9YHTncsPj/JirAEFBbaahQO1xmHD9/2szwnx2XM6XaDZR/NPVABWvHPfmePLlB9
-         4JzWf85dqnX45wCdOLaOz5QNqc8AflmuUQwH9BzIXp1pWsq93GAtNjtH20g+tHzBQVKy
-         NHNsmlmqPh2LEFwc+hYaeS/uHWywkM8u6QBFcscpulffTSu+BgopDCVQXPqcicLSjhno
-         N1jA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767896092; x=1768500892;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x9nrVXytCUOxRtBOG/U2u1E3dN/2Yf8ykIJFaTP4VqQ=;
-        b=pDWBuyT1g63pLl7zdtmMbKz8RZvXYcUzPwWA6fJiucpRlqNck99UDQjlV00UZuRaQ/
-         7/67pkgylrDuvWrE3F1Cyp8Q98Rm3atcR4+5aVE2qPM4urYch3Tnlu4oufw9brKGAz+a
-         EIpiiEuJlyFrTvoNorKOgtCv/9XpL3FCoODJN1KDw52zZ2zhjKwwUDZ3isttxX0UfICR
-         fyOKiN+pU1r862Np39bzuNmtsfTjin5Cb1PU+AIIP7Dk68jMx0yCdOeXdUVbtw9Iis6x
-         D1q5zEt3Mnp9hyXdDQtLM4Bn1sep69JKRCILuOQ401NyAbjODOPNMLtbyYUw0mWL2DjC
-         fKRQ==
-X-Gm-Message-State: AOJu0YwxL34EgQgTKJSQSzaEfY0MI8xLwvhIJ1VVnd9w2023pg30YRxi
-	9DPWj5CALf+YNPfBjWiVJ93P8Gb0QQ2dT0KN/rTGWn7QkGZHvYADJJMoRCW3uTTCmKYgn/Y=
-X-Gm-Gg: AY/fxX7icD7w3nPblvr95OX81Z+NkyjlD+CDgs4WRkMG9A5FiTreS/IuQUze2lAask/
-	uugRD0jWSPRpLdfxs2mj0YXGuKMIkJVhi33f2iVxG8LhvrX3zk/FKtTaCDzSPs6hB+CTE1MVVht
-	hSsQxmDdE8DnMGLiwiuqoz0VV/dBnGdNRP8Pmsg9sE1s6FPjJUNDn/lXCslH4fwJ02cWfw462R1
-	vA1O3YvdjTjms/sx1xJ12gunoirkACpLpbFJmi7nn2Tq+dbCbCxa52TNogEQAUeB0iVecLMu/6n
-	BMQjomCpOEtxjNz5dd9t0QGfWhq7CWVDHnaphmstbeaEbxbcFDsWjbDCqa/Dcujo/KNzrIwpJFg
-	mnqfvcQEXGqGDaBaZ+C30iMnL/WybJgo1OSFMZ0SgCq7FgB/lp5RtWNH3h1hD4Dc4PwruSZF9OH
-	qiQNZGVM5pcHOk
-X-Google-Smtp-Source: AGHT+IFQHa6wezPcsYFb/lxvIinMaM7P0t4SusqiKYdrMW6g1X57dF6NFL0Jh+psOWvCodWYLcZeQw==
-X-Received: by 2002:a05:6000:400f:b0:42f:edb6:3625 with SMTP id ffacd0b85a97d-432c379ba9cmr9280547f8f.53.1767896092363;
-        Thu, 08 Jan 2026 10:14:52 -0800 (PST)
-Received: from DESKTOP-BKIPFGN ([45.43.86.16])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5ee5eesm17833645f8f.34.2026.01.08.10.14.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 10:14:52 -0800 (PST)
-From: Kery Qi <qikeyu2017@gmail.com>
-To: alexander.deucher@amd.com
-Cc: netdev@vger.kernel.org,
-	Kery Qi <qikeyu2017@gmail.com>
-Subject: [PATCH] drm/radeon/kv: Avoid UAF/double-free on power table parse error
-Date: Fri,  9 Jan 2026 02:14:24 +0800
-Message-ID: <20260108181423.1772-2-qikeyu2017@gmail.com>
-X-Mailer: git-send-email 2.50.1.windows.1
+	s=arc-20240116; t=1767896619; c=relaxed/simple;
+	bh=byjnH73p+Jzsz7pjUDHFcwFHOJJHuGtBOHNwd7Y2sgI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g3T/8/16esO6YqOwc+A76UM/P0H+ySE1PAPq20VMCVsI8uwJMNt65CZai1pGpvDVMWtUM9I+5Z8UpVQNpzfhP+0zTldmd6d2wPmm7cDzbDaZ5rNl2sF+06Os5DhtQSvnUy5mwvuU2Ctt3KDWbn7Vrq1m+58otU0Us1GIZLIcGpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eLGCbYxu; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767896616;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=EltKARJ+Nuab9bXI1zOrXiqWGrxnQkfq54M5thLshDQ=;
+	b=eLGCbYxuEufh6i80JON6kMcWjUy92ZgBiFcGVfoiqD26roZZipMPTiZtb39DeQhUzqeAO/
+	E8mGbTQ+Ebrd750ieJ/JwzCZW2s7J3JclvuO8j30xlMKwiI4UTdq9GnB2l15H/oiKPKmrT
+	l8UW90WQoZWVbhtI3YQh9clwzOACCSE=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-370-6V4tQ_yYO2CbwPIdoXc16w-1; Thu,
+ 08 Jan 2026 13:23:32 -0500
+X-MC-Unique: 6V4tQ_yYO2CbwPIdoXc16w-1
+X-Mimecast-MFC-AGG-ID: 6V4tQ_yYO2CbwPIdoXc16w_1767896609
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 98D1B180045C;
+	Thu,  8 Jan 2026 18:23:28 +0000 (UTC)
+Received: from p16v.luc.cera.cz (unknown [10.44.32.20])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4F6131800285;
+	Thu,  8 Jan 2026 18:23:20 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-rdma@vger.kernel.org,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Petr Oros <poros@redhat.com>,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>
+Subject: [PATCH net-next 00/12] dpll: Core improvements and ice E825-C SyncE support
+Date: Thu,  8 Jan 2026 19:23:06 +0100
+Message-ID: <20260108182318.20935-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,56 +93,108 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-kv_parse_power_table() allocates rdev->pm.dpm.ps and then allocates a
-per-state kv_ps (ps_priv) for each entry. If the kv_ps kzalloc() fails,
-the current code kfree()s rdev->pm.dpm.ps and returns -ENOMEM without
-clearing the pointer.
+This series introduces Synchronous Ethernet (SyncE) support for
+the Intel E825-C Ethernet controller. Unlike previous generations where
+DPLL connections were implicitly assumed, the E825-C architecture relies
+on the platform firmware to describe the physical connections between
+the network controller and external DPLLs (such as the ZL3073x).
 
-The load error-unwind path will later call kv_dpm_fini(), which
-dereferences rdev->pm.dpm.ps[i].ps_priv and then kfree()s rdev->pm.dpm.ps.
-With rdev->pm.dpm.ps already freed in kv_parse_power_table(), this turns
-into a use-after-free followed by a double-free.
+To accommodate this, the series extends the DPLL subsystem to support
+firmware node (fwnode) associations, asynchronous discovery via notifiers,
+and dynamic pin management. Additionally, a significant refactor of
+the DPLL reference counting logic is included to ensure robustness and
+debuggability.
 
-Call flow:
+DPLL Core Extensions:
+* Firmware Node Support: Pins can now be registered with an associated
+  struct fwnode_handle. This allows consumer drivers to lookup pins based
+  on device properties (dpll-pins).
+* Asynchronous Notifiers: A raw notifier chain is added to the DPLL core.
+  This allows the network driver (ice driver in this series) to subscribe
+  to events and react when the platform DPLL driver registers the parent
+  pins, resolving probe ordering dependencies.
+* Dynamic Indexing: Drivers can now request DPLL_PIN_IDX_UNSPEC to have
+  the core automatically allocate a unique pin index, simplifying driver
+  implementation for virtual or non-indexed pins.
 
-radeon_driver_load_kms
-|-> radeon_device_init
-    |-> radeon_init
-        |-> kv_dpm_init
-            |-> kv_parse_power_table   (fails)
+Reference Counting & Debugging:
+* Refactor: The reference counting logic in the core is consolidated.
+  Internal list management helpers now automatically handle hold/put
+  operations, removing fragile open-coded logic in the registration paths.
+* Duplicate Checks: The core now strictly rejects duplicate registration
+  attempts for the same pin/device context.
+* Reference Tracking: A new Kconfig option DPLL_REFCNT_TRACKER is added
+  (using the kernel's REF_TRACKER infrastructure). This allows developers
+  to instrument and debug reference leaks by recording stack traces for
+  every get/put operation.
 
-radeon_driver_unload_kms
-|-> radeon_device_fini
-    |-> radeon_fini
-        |-> kv_dpm_fini                (deref/free rdev->pm.dpm.ps)
+Driver Updates:
+* zl3073x: Updated to register pins with their firmware nodes and support
+  the 'mux' pin type.
+* ice: Implements the E825-C specific hardware configuration for SyncE
+  (CGU registers). It utilizes the new notifier and fwnode APIs to
+  dynamically discover and attach to the platform DPLLs.
 
-Fix this by not freeing rdev->pm.dpm.ps in the kv_ps allocation failure
-path and letting the common unwind/fini path perform the cleanup.
-Fixes: 41a524abff26 ("drm/radeon/kms: add dpm support for KB/KV")
+Patch Summary:
+* Patch 1-3:
+  DT pin consumer schema and helper functions for finding DPLL pins via fwnode.
+* Patch 4:
+  Updates zl3073x to register pins with fwnode.
+* Patch 5-6:
+  Adds notifiers and dynamic pin index allocation to DPLL core.
+* Patch 7:
+  Adds 'mux' pin type support to zl3073x.
+* Patch 8-9:
+  Refactors DPLL core refcounting and adds duplicate registration checks.
+* Patch 10-11:
+  Adds REF_TRACKER infrastructure and updates existing drivers to support it.
+* Patch 12:
+  Implements the E825-C SyncE logic in the ice driver using the new
+  infrastructure.
 
-Signed-off-by: Kery Qi <qikeyu2017@gmail.com>
----
- drivers/gpu/drm/radeon/kv_dpm.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Arkadiusz Kubalewski (1):
+  ice: dpll: Support E825-C SyncE and dynamic pin discovery
 
-diff --git a/drivers/gpu/drm/radeon/kv_dpm.c b/drivers/gpu/drm/radeon/kv_dpm.c
-index 4aa050385284..ee1889ecbd97 100644
---- a/drivers/gpu/drm/radeon/kv_dpm.c
-+++ b/drivers/gpu/drm/radeon/kv_dpm.c
-@@ -2472,10 +2472,8 @@ static int kv_parse_power_table(struct radeon_device *rdev)
- 		if (!rdev->pm.power_state[i].clock_info)
- 			return -EINVAL;
- 		ps = kzalloc(sizeof(struct kv_ps), GFP_KERNEL);
--		if (ps == NULL) {
--			kfree(rdev->pm.dpm.ps);
-+		if (ps == NULL)
- 			return -ENOMEM;
--		}
- 		rdev->pm.dpm.ps[i].ps_priv = ps;
- 		k = 0;
- 		idx = (u8 *)&power_state->v2.clockInfoIndex[0];
+Ivan Vecera (10):
+  dt-bindings: dpll: add common dpll-pin-consumer schema
+  dpll: Allow associating dpll pin with a firmware node
+  dpll: Add helpers to find DPLL pin fwnode
+  dpll: zl3073x: Associate pin with fwnode handle
+  dpll: Support dynamic pin index allocation
+  dpll: zl3073x: Add support for mux pin type
+  dpll: Enhance and consolidate reference counting logic
+  dpll: Prevent duplicate registrations
+  dpll: Add reference count tracking support
+  drivers: Add support for DPLL reference count tracking
+
+Petr Oros (1):
+  dpll: Add notifier chain for dpll events
+
+ .../bindings/dpll/dpll-pin-consumer.yaml      |  30 +
+ drivers/dpll/Kconfig                          |  15 +
+ drivers/dpll/dpll_core.c                      | 320 +++++++-
+ drivers/dpll/dpll_core.h                      |  11 +
+ drivers/dpll/dpll_netlink.c                   |   6 +
+ drivers/dpll/zl3073x/dpll.c                   |  15 +-
+ drivers/dpll/zl3073x/dpll.h                   |   2 +
+ drivers/dpll/zl3073x/prop.c                   |   2 +
+ drivers/net/ethernet/intel/ice/ice_dpll.c     | 728 +++++++++++++++---
+ drivers/net/ethernet/intel/ice/ice_dpll.h     |  29 +
+ drivers/net/ethernet/intel/ice/ice_lib.c      |   3 +
+ drivers/net/ethernet/intel/ice/ice_ptp.c      |  29 +
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   |   9 +-
+ drivers/net/ethernet/intel/ice/ice_tspll.c    | 217 ++++++
+ drivers/net/ethernet/intel/ice/ice_tspll.h    |  13 +-
+ drivers/net/ethernet/intel/ice/ice_type.h     |   6 +
+ .../net/ethernet/mellanox/mlx5/core/dpll.c    |  16 +-
+ drivers/ptp/ptp_ocp.c                         |  18 +-
+ include/linux/dpll.h                          |  74 +-
+ 19 files changed, 1385 insertions(+), 158 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/dpll/dpll-pin-consumer.yaml
+
 -- 
-2.34.1
+2.52.0
 
 
