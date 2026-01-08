@@ -1,164 +1,130 @@
-Return-Path: <netdev+bounces-248019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC8DAD02950
-	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 13:21:09 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49A1BD02B43
+	for <lists+netdev@lfdr.de>; Thu, 08 Jan 2026 13:44:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D360035D7E15
-	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 11:59:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B1F2033F2CDC
+	for <lists+netdev@lfdr.de>; Thu,  8 Jan 2026 11:52:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35BDC3793D7;
-	Thu,  8 Jan 2026 09:32:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9D5242A110;
+	Thu,  8 Jan 2026 09:35:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zV8Id+ir"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Ygda1Zl3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF31B3659FB
-	for <netdev@vger.kernel.org>; Thu,  8 Jan 2026 09:32:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5CE73EEFD0;
+	Thu,  8 Jan 2026 09:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767864776; cv=none; b=Fz9608cH+2Er6Fz4RXnx10tD2SBEh7cAMLsUUyCblS5Q4GPoqd4dusFfN8cbPkxf8n+XUFTutaML3vsmxMPgnwlm2wvlXKhk+8a049ltdgm6hVV0JvAJNxhf9xFnbv6voOMp9FstrvebNBTRoa3DXyr/A6Q1feIXfIW04XpaMlo=
+	t=1767864953; cv=none; b=O54cRBbIDySgDEVs/ba4Yk4tjlyIIgtSmEWBcB9MADOOi9iFlo0MGkbR34lQQ3+FtWWVqhLOGfoaXRs6kGcaweCWduxrlm3cqXwnVSS8SARbh/yJFAL2nGMtx//adMhxsg41wc1fi0ZNdFbv+VC5dYiUNAistMUjuUTCfGplrmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767864776; c=relaxed/simple;
-	bh=HB1aYQ38Ehr6jAsxsm7H/sf7+3UcedO4CKZuNa5mLKg=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=a6pkTicSqkHCxb1jobpYgtggQyERFyPyh23G20B5nXl9rpIBLj6muwtbq4zWHtZUH0NqEdggUSGxNpLKeHoKGxi2W3sY6yLliMOE6Ku5ep2bzsvsSna0kJ/WcRF3xW1Nv4cNkMoAqwmzRMRato747D1Ctc00/FN/0ePlCisXhwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zV8Id+ir; arc=none smtp.client-ip=209.85.219.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-88a366fa140so53928986d6.1
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 01:32:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767864768; x=1768469568; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=vDzdUm/TFOcZ1qORmw+T2FqCgEjXNFwcS7Hs4V7eonY=;
-        b=zV8Id+irabKsB7KtYKLpH+VefQUb9PpGNyiUtaLHkEwq4XxsILG0NIMuyly13OTQ2z
-         9V312vYAG/fljhyWqpEZsX+dI3RACCMCNl6hljf9EX5yH9oROqCoAp6VXX2kFBDxH73Z
-         zGJws4Tt1GKD6UVnJ6xnMWxW2vHxP6uC0zoZHfLBPaAJuGWFTa+RtLFs6+Ucmd58M29G
-         mZbBBwTtW66Yum/KugPIvdfEKhM1QyAGn+MnCbmIjNvNCzu7eP/essmzgZIGXBvkvulR
-         67zaUWf7gaazv+1UDUMKBg40R0gD0dAqXM5Ain/AMLVdhY39an3lsxSzRTMt5oPLOyt0
-         +dgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767864768; x=1768469568;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vDzdUm/TFOcZ1qORmw+T2FqCgEjXNFwcS7Hs4V7eonY=;
-        b=Z2B7Cs9sQM3EqD6s0XFY9f5L111Ln6dpLSWL/+G+0Co8Y9k9TeyzRNiuHG3M1yBLif
-         EFWNrf9JmqJgk9p5Olr7BCV/z9L3UQhzoHSK76f+Wq41RKQcYq9uHM+CmXXnwySS+9PA
-         cvXHrO7mnCZ2EJ7cVsRcDwdQT5m9zvsm+XEESOEf5MacAepYXyNQqN+nZCEVIhO9VFGG
-         Ek9GvJ54WhMk2o1ePPXgzOCZvqgOmE7SrYJOcRnh7MU4lDLGOyGFsdcgH02E3ZlKgigc
-         mZfnD11i/kftEOmDNXT5cZNLtjfYNGsgzgyjQ13i1z7Cmhr8vTESD1lp1rRAd5xypO4c
-         L2Fw==
-X-Forwarded-Encrypted: i=1; AJvYcCXqkBA/7P2S79HfT1ACLAWPk0akRnbQY3fSTQ4PBpvGFjffztjogiXA1scsJf/OMQZU3fp6ncM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlsCw1MSQqAKYAnchC3hIJRdDplrP3CdtYGDVq5lzjRO7NzGMg
-	RgE0F8hJDOrCH71tz7aFzO3tPgOJJMU6ivbNnOHjU4umTQOQS2AtYLlkrEGnKxbPL8bTAGRwbEO
-	MtHkgRErTRbOfQw==
-X-Google-Smtp-Source: AGHT+IGIMWF0bH2p5rn9Xs57lmJylJd/H3dy/M2vGjOQ+rcuwA3UKhoIMkJw+WQE7KSO7XhUrBBoGpo3xw13/w==
-X-Received: from qvbld26.prod.google.com ([2002:a05:6214:419a:b0:888:3b63:e0cd])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:4b0d:b0:880:264b:7c5c with SMTP id 6a1803df08f44-890842b4931mr73044466d6.61.1767864768300;
- Thu, 08 Jan 2026 01:32:48 -0800 (PST)
-Date: Thu,  8 Jan 2026 09:32:44 +0000
+	s=arc-20240116; t=1767864953; c=relaxed/simple;
+	bh=u4VNoQ4LhdNMfgJfjaPrZHW/RqtvVeuzsobcsLRKZ6c=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c2tBsCIoGl/btuf5ojSFDhwX8FBVRbHIX2SV2J8etd7sQ895dpKAPloECs9T+a0RAoP2ubR4o4mwcr1F7BsSi+LataP0/gUlQb+X5btH4GKbQA5TqXp2/Tr09oBpi02HwZEfhd8fJeUkqHKqFFKwgNBf0bH6PGXvBiO8czoEcZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Ygda1Zl3; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 607NW88a2095193;
+	Thu, 8 Jan 2026 01:35:17 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=R9m/7bu28KfSpruc1SVA0v9xT
+	u6mKd3dyd3y4F5hcGo=; b=Ygda1Zl3zD8t5iZhIbaZYyr762Brj+MVaF9aO7ke3
+	vVxYrC7A9fDN/7ictd/cQj/VUD7VeeWkQf++BjHUq5mWTo32C0lXDxvzGTtkCx+2
+	145Qd56LVN/DHiBL47lz1vOHclMg6p2fn9NT78CrTj+gA8JoX/8qTDJyoY3ovHxK
+	rjZikIx2Y+iwAowZ9Wy1D8CjIbyvHJDzhec1gfBwDqo+z/xBaV9KrNWofRmfvpal
+	+ZTU6IgBqCNcZBdrQmlJo4R4GZLLBjUEZlwon1KnqmtIFnpBZ0Ok+NyGwly+y7OS
+	ju3BqPDPJVDyt5WJmOp8K7HT+sQok9B7tqITk9j6e03Zw==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bj18193t2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 08 Jan 2026 01:35:17 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Thu, 8 Jan 2026 01:35:30 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Thu, 8 Jan 2026 01:35:30 -0800
+Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id C8CAB3F70AC;
+	Thu,  8 Jan 2026 01:35:13 -0800 (PST)
+Date: Thu, 8 Jan 2026 15:05:12 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: ALOK TIWARI <alok.a.tiwari@oracle.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <andrew+netdev@lunn.ch>, <sgoutham@marvell.com>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2 07/10] octeontx2: switch: L2 offload support
+Message-ID: <aV96UNXRN9tzuWxI@rkannoth-OptiPlex-7090>
+References: <20260107132408.3904352-1-rkannoth@marvell.com>
+ <20260107132408.3904352-8-rkannoth@marvell.com>
+ <99647efb-537c-462e-bbef-a3c01ef1bd8c@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
-Message-ID: <20260108093244.830280-1-edumazet@google.com>
-Subject: [PATCH v3 net] net: update netdev_lock_{type,name}
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <99647efb-537c-462e-bbef-a3c01ef1bd8c@oracle.com>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA4MDA2MyBTYWx0ZWRfX6sqMdsaALcgG
+ 5RiGO+VRxKvP48y0Gks261d8p6/Rbde6lDs/VBEzgbikiqr1IgUDTkqSaEOB7oAhuV7K4/DicwU
+ upgosAugncX34WGZNDpnnkiBxoXPg1ZX5VDuLquufq06L8XTB3ktFYWLrmNmwmaFBgN44VTc1ji
+ Y9N8rgAglCJdIcSR+CGeEG+nVUV4xchZ5IpxnCfPjCrXhiGzO8dbfdjhKPcIfNmhHNUdMCmQ7Na
+ W2L8mSAHq5dFy19fiRQztYzjk8Xp9yUdFx1psJZ85kgZY+HjJnHLQaXE1+T4g5gYYhcMNTXlULY
+ X6EIETbyhhOGq5roZ/Xpb3vOpriEqrLHpZ5ijVFjzOclsD4ssDM/b2t5OxCWB/76x2yC/VosXHN
+ svENQxeqCQo39Xfq+AX7f7MvEUjydvgm9Zox1T0Gi1ACldSRK1+i0crIETWDFe4MSmeRUe40WYL
+ A305a2dc31zCVEA46zw==
+X-Authority-Analysis: v=2.4 cv=Vdf6/Vp9 c=1 sm=1 tr=0 ts=695f7a55 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=yPCof4ZbAAAA:8 a=fx7Rj7giRjSIOVbTE-wA:9 a=CjuIK1q_8ugA:10
+ a=8_z660xuARpGUQqPBE_n:22
+X-Proofpoint-GUID: fHjv5R4HGN7EkCuiYfnHLqQf03CfdFbx
+X-Proofpoint-ORIG-GUID: fHjv5R4HGN7EkCuiYfnHLqQf03CfdFbx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-08_02,2026-01-07_03,2025-10-01_01
 
-Add missing entries in netdev_lock_type[] and netdev_lock_name[] :
-
-CAN, MCTP, RAWIP, CAIF, IP6GRE, 6LOWPAN, NETLINK, VSOCKMON,
-IEEE802154_MONITOR.
-
-Also add a WARN_ONCE() in netdev_lock_pos() to help future bug hunting
-next time a protocol is added without updating these arrays.
-
-Fixes: 1a33e10e4a95 ("net: partially revert dynamic lockdep key changes")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
-v3: add IEEE802154_MONITOR.
-v2: add NETLINK (Jakub), VSOCKMON.
-v1: add CAN, MCTP, RAWIP, CAIF, IP6GRE, 6LOWPAN.
-
- net/core/dev.c | 25 +++++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
-
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 36dc5199037edb1506e67f6ab5e977ff41efef59..9af9c3df452f7f736430c2e39d16ef004aeaae4b 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -478,15 +478,21 @@ static const unsigned short netdev_lock_type[] = {
- 	 ARPHRD_IEEE1394, ARPHRD_EUI64, ARPHRD_INFINIBAND, ARPHRD_SLIP,
- 	 ARPHRD_CSLIP, ARPHRD_SLIP6, ARPHRD_CSLIP6, ARPHRD_RSRVD,
- 	 ARPHRD_ADAPT, ARPHRD_ROSE, ARPHRD_X25, ARPHRD_HWX25,
-+	 ARPHRD_CAN, ARPHRD_MCTP,
- 	 ARPHRD_PPP, ARPHRD_CISCO, ARPHRD_LAPB, ARPHRD_DDCMP,
--	 ARPHRD_RAWHDLC, ARPHRD_TUNNEL, ARPHRD_TUNNEL6, ARPHRD_FRAD,
-+	 ARPHRD_RAWHDLC, ARPHRD_RAWIP,
-+	 ARPHRD_TUNNEL, ARPHRD_TUNNEL6, ARPHRD_FRAD,
- 	 ARPHRD_SKIP, ARPHRD_LOOPBACK, ARPHRD_LOCALTLK, ARPHRD_FDDI,
- 	 ARPHRD_BIF, ARPHRD_SIT, ARPHRD_IPDDP, ARPHRD_IPGRE,
- 	 ARPHRD_PIMREG, ARPHRD_HIPPI, ARPHRD_ASH, ARPHRD_ECONET,
- 	 ARPHRD_IRDA, ARPHRD_FCPP, ARPHRD_FCAL, ARPHRD_FCPL,
- 	 ARPHRD_FCFABRIC, ARPHRD_IEEE80211, ARPHRD_IEEE80211_PRISM,
--	 ARPHRD_IEEE80211_RADIOTAP, ARPHRD_PHONET, ARPHRD_PHONET_PIPE,
--	 ARPHRD_IEEE802154, ARPHRD_VOID, ARPHRD_NONE};
-+	 ARPHRD_IEEE80211_RADIOTAP,
-+	 ARPHRD_IEEE802154, ARPHRD_IEEE802154_MONITOR,
-+	 ARPHRD_PHONET, ARPHRD_PHONET_PIPE,
-+	 ARPHRD_CAIF, ARPHRD_IP6GRE, ARPHRD_NETLINK, ARPHRD_6LOWPAN,
-+	 ARPHRD_VSOCKMON,
-+	 ARPHRD_VOID, ARPHRD_NONE};
- 
- static const char *const netdev_lock_name[] = {
- 	"_xmit_NETROM", "_xmit_ETHER", "_xmit_EETHER", "_xmit_AX25",
-@@ -495,15 +501,21 @@ static const char *const netdev_lock_name[] = {
- 	"_xmit_IEEE1394", "_xmit_EUI64", "_xmit_INFINIBAND", "_xmit_SLIP",
- 	"_xmit_CSLIP", "_xmit_SLIP6", "_xmit_CSLIP6", "_xmit_RSRVD",
- 	"_xmit_ADAPT", "_xmit_ROSE", "_xmit_X25", "_xmit_HWX25",
-+	"_xmit_CAN", "_xmit_MCTP",
- 	"_xmit_PPP", "_xmit_CISCO", "_xmit_LAPB", "_xmit_DDCMP",
--	"_xmit_RAWHDLC", "_xmit_TUNNEL", "_xmit_TUNNEL6", "_xmit_FRAD",
-+	"_xmit_RAWHDLC", "_xmit_RAWIP",
-+	"_xmit_TUNNEL", "_xmit_TUNNEL6", "_xmit_FRAD",
- 	"_xmit_SKIP", "_xmit_LOOPBACK", "_xmit_LOCALTLK", "_xmit_FDDI",
- 	"_xmit_BIF", "_xmit_SIT", "_xmit_IPDDP", "_xmit_IPGRE",
- 	"_xmit_PIMREG", "_xmit_HIPPI", "_xmit_ASH", "_xmit_ECONET",
- 	"_xmit_IRDA", "_xmit_FCPP", "_xmit_FCAL", "_xmit_FCPL",
- 	"_xmit_FCFABRIC", "_xmit_IEEE80211", "_xmit_IEEE80211_PRISM",
--	"_xmit_IEEE80211_RADIOTAP", "_xmit_PHONET", "_xmit_PHONET_PIPE",
--	"_xmit_IEEE802154", "_xmit_VOID", "_xmit_NONE"};
-+	"_xmit_IEEE80211_RADIOTAP",
-+	"_xmit_IEEE802154", "_xmit_IEEE802154_MONITOR",
-+	"_xmit_PHONET", "_xmit_PHONET_PIPE",
-+	"_xmit_CAIF", "_xmit_IP6GRE", "_xmit_NETLINK", "_xmit_6LOWPAN",
-+	"_xmit_VSOCKMON",
-+	"_xmit_VOID", "_xmit_NONE"};
- 
- static struct lock_class_key netdev_xmit_lock_key[ARRAY_SIZE(netdev_lock_type)];
- static struct lock_class_key netdev_addr_lock_key[ARRAY_SIZE(netdev_lock_type)];
-@@ -516,6 +528,7 @@ static inline unsigned short netdev_lock_pos(unsigned short dev_type)
- 		if (netdev_lock_type[i] == dev_type)
- 			return i;
- 	/* the last key is used by default */
-+	WARN_ONCE(1, "netdev_lock_pos() could not find dev_type=%u\n", dev_type);
- 	return ARRAY_SIZE(netdev_lock_type) - 1;
- }
- 
--- 
-2.52.0.351.gbe84eed79e-goog
-
+On 2026-01-08 at 14:37:38, ALOK TIWARI (alok.a.tiwari@oracle.com) wrote:
+>
+>
+> On 1/7/2026 6:54 PM, Ratheesh Kannoth wrote:
+> > +		fdb_refresh_wq = alloc_workqueue("swdev_fdb_refresg_wq", 0, 0);
+>
+> consider, "swdev_fdb_refresg_wq" -> "swdev_fdb_refresh_wq"
+ACK.
+>
+> > +		if (!rvu_sw_l2_offl_wq) {
+>
+> Checks rvu_sw_l2_offl_wq instead of fdb_refresh_wq
+>
+> > +			dev_err(rvu->dev, "L2 offl workqueue allocation failed\n");
+>
+> offl -> fbd
+ACK.
+>
+> > +			return -ENOMEM;
+> > +		}
+> > +
+> > +		return 0;
+> > +	}
+> > +
+> > +	rswitch->flags &= ~RVU_SWITCH_FLAG_FW_READY;
+> > +	rswitch->pcifunc = -1;
+> > +	flush_work(&l2_offl_work.work);
+> > +	return 0;
+> > +}
+>
+>
+> Thanks,
+> Alok
 
