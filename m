@@ -1,201 +1,160 @@
-Return-Path: <netdev+bounces-248382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3323DD078B3
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 08:23:00 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BB21D078F7
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 08:27:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id AC4843012C79
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 07:22:56 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6C8A73003B2D
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 07:27:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78BA42EC08C;
-	Fri,  9 Jan 2026 07:22:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC1682EB5CD;
+	Fri,  9 Jan 2026 07:27:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bHmOEDk4";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="R+PxUuWI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U20X6Fco"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D47072EBBB3
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 07:22:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5955129CEB
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 07:27:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767943373; cv=none; b=NaHf2tcjcsSqTWhyYLlwC8Ar3kWUyU2MUzVJXfASMKz7gZW5Eyuajj3Fn+hxWClWrbNuvGG/fE+7Je21v4CGzzE+YZjdmXdvP49rRAomPJ+DfE5QWC+d83lHiMeW6Dm1hUVcLcofv6tdXUTQ151OcqjIoY2Ah+pDwHmpJ5Kq82g=
+	t=1767943664; cv=none; b=nZiHUXxLbuN/2IvOw4Lp22OL/4zCjmZdEoZL27xZWqIY4PLLGo31avPDzpYDBVkd2LSq3LTjhP5ksuHCW7g1j3tH6eNLse6J1aW2TLiHvkjXIP0toYP12VY+78811cm2HySDtnyQ8vHJtX7ULAh6dgCpE2Se9lFPEcktHv6Qi9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767943373; c=relaxed/simple;
-	bh=j1W235feRg0KN6FKcAZabBql8JsWIHtShwbmzD/a/pk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o8HRNjtgHmx7dv7FBnyWH2e4CXmsbTkPfOraiAIAHyWofoYC/dCQVF8WJx2kazBUZf97Xj0W8cl4Bt7si5Ylntb/v/xtdyBawFg9ecSRGeLEF8S4UbefttptxxVarIhwR57GVJuBJ4fltEGfo/HxJQZqnyO1vuET7A6GnHdZ9e8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bHmOEDk4; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=R+PxUuWI; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767943370;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qCNBeC55dwFkYuH90UgwaJbtMoG2cmT0emKakpEw6rI=;
-	b=bHmOEDk4WTx99tib5hmS58Yz3DXmAH+o5LNZBDCMIKk+k6ciaDyr7IXFVQJx+UQQiSHpHG
-	OQKiX+Q3r56Y4XUdvfxiZU5hyMtgtLdcmxyy7AIC5AwxqtCz1LjBeRIiSTK+Sj5eFwrEve
-	qUfxAIzFN7fyuwfNKl25Jv11ngdomro=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-434-pvrKkQtBNZGwNZvanrGKKw-1; Fri, 09 Jan 2026 02:22:49 -0500
-X-MC-Unique: pvrKkQtBNZGwNZvanrGKKw-1
-X-Mimecast-MFC-AGG-ID: pvrKkQtBNZGwNZvanrGKKw_1767943368
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-47d4029340aso39413935e9.3
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 23:22:49 -0800 (PST)
+	s=arc-20240116; t=1767943664; c=relaxed/simple;
+	bh=QNuVbPeI2qVEw72vq3YmkyXsF4v4LnSYiVYCItYTB0I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=AKfeUNKPDAZr+nikPoNLMlcvXQypCl8gGKEXXJ09hCAha5KtPoyp8S3jdkVSp5Jn60ng0xf7oPu23tDTTs6XbaKtGIVOx8PNvDUfQ4g0Z1z2J7bBG02KrPtXO8F+Dlia6OeT+re5uQ44Hh2JzTYuQdHr0YVBTdyqy6CqFCZ0XAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U20X6Fco; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4775ae77516so43663555e9.1
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 23:27:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767943368; x=1768548168; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qCNBeC55dwFkYuH90UgwaJbtMoG2cmT0emKakpEw6rI=;
-        b=R+PxUuWIRXIrRgrq1h3TXojF5Qdslf4k8kqVo1et1koqF8PkFGflgODSx6j2GPoEs4
-         z+5gYKngwhNgbZjGBTkdwqs2iBOJUMqhOB5SJ56ZdfWfZFOGyQw2w81Et+uXoFZei9RK
-         5Jsf2uHqjr9s40DhGBdo10pvkPbYvI+WdI3iJTefWTwZo6mIdOyPJXDoMQ56ESGvhPWb
-         5Cv44qQkv6QZV/GQlCMFNl1uCACh2+5RwdSr6wYMNzZzxM9U2BQgx5jKWM15BPJ2/hEs
-         cDCwWQrfmxpRvwyljqijri/2OWLJV8rzsZU+uBXJT7NrkIBPdR3WaciZoiXckSHKb29s
-         bn0w==
+        d=gmail.com; s=20230601; t=1767943662; x=1768548462; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=mUlwKfPXko5L4cw7hWpnjkjddCTSDp0J/M9heFeeYPY=;
+        b=U20X6Fco8NqTRMD/XyTBCjyZllK0A7hUQ4rrdM1+bNQvUlw9IZwst41TMTgCpwhe9h
+         Ssh57W4ZZ9g/Epf8mNAZJwhPT0Gc2k28r8jtB/eI6VChMWykjwnbYWEiKxFmOixWWMvI
+         KUNchkeDPMWxDNsp94+TZGGMuJGKpqz9JlNGKows7d+LnoXfKSwVZsZV87Lr9nREx/DC
+         FsV9O8CFXOVRg6c8Jt7fahmWvnTOok0zDjEWoB6y1V7VDJ+rK5yIa6HX3Q9+HN8yZvyg
+         Qc27fP6u2sv3hHLoAuBymA+v/91VPUyQCJR+tdGEbXVXAKtRKEAaaVP2vFNpOZQjTksJ
+         80hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767943368; x=1768548168;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qCNBeC55dwFkYuH90UgwaJbtMoG2cmT0emKakpEw6rI=;
-        b=TbhaiG98mom2SbzK/zHZhKIPtF2M6MOM6R5oM6mRHsf9MKxniud/GehjDHVSK1lgsp
-         SCM3RfYKN4Ta6hl8euHVSKsb7yr/ljyf5T7erGeW0jJsYj2Tysl61bdgfBEWPhzp5Qjd
-         4FhZ9a0xTy4pltt+kn+mVzX8aLDI4VeBJAdBBjZpA943gY4RjO5h85It6HhX/homdZMS
-         utAmgWPfHAQcnot3dSxzH4VCQXHOhJmvVZ5qNwOSb4vaRXl8YYnRRWYqY5X3jQVWEB9d
-         AFvUtVhisIJOioarwHSo/OdKXAM8U9XIxM7DTlUyQ8esaI1/VdqEQTsoxPKxqS3pOdqP
-         azgA==
-X-Forwarded-Encrypted: i=1; AJvYcCVWvAwWMEG1rV6HdkkEiiZtxDkC/oSqIat66UasbvpYjSy0QMfoqLjQxXHt+OKJgjTrsYHADc8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVwDZ4yVdLMBWbYLHgAcZpHh69U0iVuQm2MFVtaMjA79+EHt+t
-	f1qaqPzbo6rK+oEe3QJNd/gfXjtcEbn135JHGQIVzmcrTjzohTLQE52aZhErH1HTvtT1xo0lLNE
-	7mivUrlthSrDVkZMam+yryw7MHOZkN3O9n5MRnSezVReMdESTx4hqWZIJkA==
-X-Gm-Gg: AY/fxX7W5LVB3Jhl4CJmcizPyMzPII0l+AN8wZOnDI6eV178XnpL6owrZMJ+PAvrm74
-	PO90POdpp4PsJCwe6+EMqB5WBU5Fp8fNYy9/CNQiHwbsdWDTdd6KDNmIAhnO2rerrp9rL8hSNW4
-	lFkFD2nf89TxILJ9PmKaF6SZfEDsP9+3lc9jeRYHJD2u7Lk6g2tzIHAHUIECNP6nPAFnYB0wEil
-	eO/MMOs3H1o9k/iQv8Fl8mPBXbLS0cP/ZafhDp9mnccUYP8S19dKrZKQooYr8m3PMfCoJK+Z1vK
-	IFwL5SEnry5kumwrmxDoUN0NviwhDs2hiC4NfmuaQSrZxe4A+H1wOukUpvtcSbj8QF1f5ntZKIy
-	7sM4ASQSt1RBcYT7kyaCw9P5mmiadpZrPdA==
-X-Received: by 2002:a05:6000:4201:b0:430:f40f:61ba with SMTP id ffacd0b85a97d-432c3798349mr11114924f8f.41.1767943368380;
-        Thu, 08 Jan 2026 23:22:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFHdWMIJxf4esvBI4hULstTggLuOtGp39Tkn3cxYuG9NjEAkGwtcZDffJ90hcLBXgcBNIrf8w==
-X-Received: by 2002:a05:6000:4201:b0:430:f40f:61ba with SMTP id ffacd0b85a97d-432c3798349mr11114886f8f.41.1767943367815;
-        Thu, 08 Jan 2026 23:22:47 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0daa84sm20705982f8f.2.2026.01.08.23.22.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 23:22:47 -0800 (PST)
-Date: Fri, 9 Jan 2026 02:22:44 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
-	leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
-	tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH net-next v7 2/9] ptr_ring: add helper to detect newly
- freed space on consume
-Message-ID: <20260109021023-mutt-send-email-mst@kernel.org>
-References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
- <20260107210448.37851-3-simon.schippers@tu-dortmund.de>
+        d=1e100.net; s=20230601; t=1767943662; x=1768548462;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mUlwKfPXko5L4cw7hWpnjkjddCTSDp0J/M9heFeeYPY=;
+        b=tZ6Y65T3flPZbOGXTdfPO6t39PVWXvGJyO2phNkb6X1WG8a5hZ0k/kTNlMwbRVaJ5d
+         GB+VoLyJjS8aEiBHJ7N7boCP99rb5E22qTrXhfUP+V6LyNlSdPwmyOWs7mW3bBDHr+BU
+         E/VhdqXpTHph4LoBEy0TI+7HBNl9/Q7SCCDkpZQ6NlwpLWQqFu8AwI1+2EUs1NTmk/7C
+         q9XknPsW3/iRFCfgrClUMciTsKlyGUxQh2kyISnUkFbsdIHKAVYLqQ6uwJpjoB/tcY0l
+         XkCMCovKi8U2oYLc1ymY5tZRgmq0RotIPVEnyt8Sp8DWdOnxeuQ/inoKzqOIx1HLiGCm
+         CxSw==
+X-Forwarded-Encrypted: i=1; AJvYcCVEIX+UL2Pi0zYWj8Qhe/HvK3pyJPkwSSFrbaEUQlGfxomQSAV+jniZjC5jqI49bC7WAW9419c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxuVbQ0O87J0CpT+1yf2OSpA1LKy3jofpyKCFqcee8CUjDLOxUx
+	SKSL+u2F9JYLhaDmyUBbu8OnoRRjPytkuADk1oBYCmcgtk4/E9vHH4Q+
+X-Gm-Gg: AY/fxX5k9TVBetB59sv08bG8+B3nK5d7SKbl7avUP1BrCbMrMZAW3rxV3YexEtMZKCB
+	2nSrNyaQQ+3YyAdQA6aEhAJ0WXiXlIu5pw9M4UYfdJ7A1T/Vff+TeC6HoLM2sr2z6w/8K+CJ4/k
+	VQtGcLKoDsbjukEtoxUpKAlW+p7cdgRXDzjc1nPB/QgdvCgPYvgtJsfzjYwK7SaA+rJsZ4QMOqw
+	A1+tLqEsdIPv8IOShMcqDfDvcXrvEvNC2uMsjORjjeY6FMnCcetSUKYdnTb/mzAR09+LYYhPfG6
+	TEAGznVFvK+Gm/tJxiYpwvqfxHDxwgP1WZnEX0DTHxYvCCBpF5nfs5qIj2OBXo4LjYQcyt+T2WP
+	b+vorog/rKw+zr8rUhxeUK2Yi8fePpdxZ2wTTkNZY2op6AwbvimiW/LKv5NbY78UZEoonqL0X4O
+	+jzjtxOCd8T3wwwcmV3UkkcmdBQT189Jz7lZmMlYIdxqCWycQ/v/c9VTpZa2TvHwLxJ1UXDYxpy
+	tiygAAxYnFb7QLUIyQI3dU7ty+tkFmF2DELgou/RCVi7kGnJl4NuQ==
+X-Google-Smtp-Source: AGHT+IF6uMw1r7waLkv7KoCFAlGPIuQzERBLeCEdwblU6RPsq9aQl2/481f7Eu8tg0BSK5rXC766hA==
+X-Received: by 2002:a05:600c:83c9:b0:45d:5c71:769a with SMTP id 5b1f17b1804b1-47d84b3b650mr98273025e9.26.1767943661494;
+        Thu, 08 Jan 2026 23:27:41 -0800 (PST)
+Received: from ?IPV6:2003:ea:8f34:b700:1da4:ce1d:3d7c:283d? (p200300ea8f34b7001da4ce1d3d7c283d.dip0.t-ipconnect.de. [2003:ea:8f34:b700:1da4:ce1d:3d7c:283d])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f653c61sm193670815e9.10.2026.01.08.23.27.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 Jan 2026 23:27:41 -0800 (PST)
+Message-ID: <65f60d6f-d6f9-4c36-a344-ffc713633dfd@gmail.com>
+Date: Fri, 9 Jan 2026 08:27:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260107210448.37851-3-simon.schippers@tu-dortmund.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/5] net: phy: realtek: simplify C22 reg access
+ via MDIO_MMD_VEND2
+To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Michael Klein <michael@fossekall.de>, Aleksander Jan Bajkowski
+ <olek2@wp.pl>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <cover.1767926665.git.daniel@makrotopia.org>
+ <938aff8b65ea84eccdf1a2705684298ec33cc5b0.1767926665.git.daniel@makrotopia.org>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+In-Reply-To: <938aff8b65ea84eccdf1a2705684298ec33cc5b0.1767926665.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 07, 2026 at 10:04:41PM +0100, Simon Schippers wrote:
-> This proposed function checks whether __ptr_ring_zero_tail() was invoked
-> within the last n calls to __ptr_ring_consume(), which indicates that new
-> free space was created. Since __ptr_ring_zero_tail() moves the tail to
-> the head - and no other function modifies either the head or the tail,
-> aside from the wrap-around case described below - detecting such a
-> movement is sufficient to detect the invocation of
-> __ptr_ring_zero_tail().
+On 1/9/2026 4:03 AM, Daniel Golle wrote:
+> RealTek 2.5GE PHYs have all standard Clause-22 registers mapped also
+> inside MDIO_MMD_VEND2 at offset 0xa400. This is used mainly in case the
+> PHY is inside a copper SFP module which uses the RollBall MDIO-over-I2C
+> method which *only* supports Clause-45. In order to support such
+> modules, the PHY driver has previously been split into a C22-only and
+> C45-only instances, creating quite a bit of redundancy and confusion.
 > 
-> The implementation detects this movement by checking whether the tail is
-> at most n positions behind the head. If this condition holds, the shift
-> of the tail to its current position must have occurred within the last n
-> calls to __ptr_ring_consume(), indicating that __ptr_ring_zero_tail() was
-> invoked and that new free space was created.
+To complement: RTL812x MAC/PHY chips allow access to MDIO_MMD_VEND2 of the
+integrated PHY only. There is no native C22 MDIO access.
+
+> In preparation of reunifying the two driver instances, add support for
+> translating MDIO_MMD_VEND2 registers 0xa400 to 0xa438 back to standard
+> Clause-22 access in case the PHY is accessed on a Clause-22 bus.
 > 
-> This logic also correctly handles the wrap-around case in which
-> __ptr_ring_zero_tail() is invoked and the head and the tail are reset
-> to 0. Since this reset likewise moves the tail to the head, the same
-> detection logic applies.
-> 
-> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 > ---
->  include/linux/ptr_ring.h | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
+>  drivers/net/phy/realtek/realtek_main.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 > 
-> diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
-> index a5a3fa4916d3..7cdae6d1d400 100644
-> --- a/include/linux/ptr_ring.h
-> +++ b/include/linux/ptr_ring.h
-> @@ -438,6 +438,19 @@ static inline int ptr_ring_consume_batched_bh(struct ptr_ring *r,
->  	return ret;
->  }
+> diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
+> index 7302b25b8908b..886694ff995f6 100644
+> --- a/drivers/net/phy/realtek/realtek_main.c
+> +++ b/drivers/net/phy/realtek/realtek_main.c
+> @@ -143,6 +143,7 @@
 >  
-> +/* Returns true if the consume of the last n elements has created space
-> + * in the ring buffer (i.e., a new element can be produced).
-> + *
-> + * Note: Because of batching, a successful call to __ptr_ring_consume() /
-> + * __ptr_ring_consume_batched() does not guarantee that the next call to
-> + * __ptr_ring_produce() will succeed.
-
-
-I think the issue is it does not say what is the actual guarantee.
-
-Another issue is that the "Note" really should be more prominent,
-it really is part of explaining what the functions does.
-
-Hmm. Maybe we should tell it how many entries have been consumed and
-get back an indication of how much space this created?
-
-fundamentally
-	 n - (r->consumer_head - r->consumer_tail)?
-
-
-does the below sound good maybe?
-
-/* Returns the amound of space (number of new elements that can be
- * produced) that calls to ptr_ring_consume created.
- *
- * Getting n entries from calls to ptr_ring_consume() /
- * ptr_ring_consume_batched() does *not* guarantee that the next n calls to
- * ptr_ring_produce() will succeed.
- *
- * Use this function after consuming n entries to get a hint about
- * how much space was actually created.
-
-
-
-
-
-> + */
-> +static inline bool __ptr_ring_consume_created_space(struct ptr_ring *r,
-> +						    int n)
-> +{
-> +	return r->consumer_head - r->consumer_tail < n;
-> +}
+>  #define RTL822X_VND2_TO_PAGE(reg)		((reg) >> 4)
+>  #define RTL822X_VND2_TO_PAGE_REG(reg)		(16 + (((reg) & GENMASK(3, 0)) >> 1))
+> +#define RTL822X_VND2_TO_C22_REG(reg)		(((reg) - 0xa400) / 2)
+>  #define RTL822X_VND2_C22_REG(reg)		(0xa400 + 2 * (reg))
+>  
+>  #define RTL8221B_VND2_INER			0xa4d2
+> @@ -1264,6 +1265,11 @@ static int rtl822xb_read_mmd(struct phy_device *phydev, int devnum, u16 reg)
+>  		return mmd_phy_read(phydev->mdio.bus, phydev->mdio.addr,
+>  				    phydev->is_c45, devnum, reg);
+>  
+> +	/* Simplify access to C22-registers addressed inside MDIO_MMD_VEND2 */
+> +	if (reg >= RTL822X_VND2_C22_REG(0) &&
+> +	    reg <= RTL822X_VND2_C22_REG(30))
+> +		return __phy_read(phydev, RTL822X_VND2_TO_C22_REG(reg));
 > +
->  /* Cast to structure type and call a function without discarding from FIFO.
->   * Function must return a value.
->   * Callers must take consumer_lock.
-> -- 
-> 2.43.0
+>  	/* Use paged access for MDIO_MMD_VEND2 over Clause-22 */
+>  	page = RTL822X_VND2_TO_PAGE(reg);
+>  	oldpage = __phy_read(phydev, RTL821x_PAGE_SELECT);
+> @@ -1299,6 +1305,11 @@ static int rtl822xb_write_mmd(struct phy_device *phydev, int devnum, u16 reg,
+>  		return mmd_phy_write(phydev->mdio.bus, phydev->mdio.addr,
+>  				     phydev->is_c45, devnum, reg, val);
+>  
+> +	/* Simplify access to C22-registers addressed inside MDIO_MMD_VEND2 */
+> +	if (reg >= RTL822X_VND2_C22_REG(0) &&
+> +	    reg <= RTL822X_VND2_C22_REG(30))
+> +		return __phy_write(phydev, RTL822X_VND2_TO_C22_REG(reg), val);
+> +
+>  	/* Use paged access for MDIO_MMD_VEND2 over Clause-22 */
+>  	page = RTL822X_VND2_TO_PAGE(reg);
+>  	oldpage = __phy_read(phydev, RTL821x_PAGE_SELECT);
 
 
