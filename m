@@ -1,90 +1,148 @@
-Return-Path: <netdev+bounces-248418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B3DAD085DD
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 10:57:15 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DED1D085E7
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 10:57:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E996530118E5
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 09:57:13 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 86F243019B4F
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 09:57:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5158B33508A;
-	Fri,  9 Jan 2026 09:57:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C023358D6;
+	Fri,  9 Jan 2026 09:57:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="hxFCMl+I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E22335562
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 09:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A563358BA;
+	Fri,  9 Jan 2026 09:57:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767952632; cv=none; b=gUbHSKESBeDvsukmLtBUhBUkDV6BKU1hwwNJpnRm0RwpDFDftbDo8i+gwnY90Vkf7Fqqb3dFFD2CYiLOpPz49EN1oDtrsrupBeDlP2+CxVYfrjFSbMN5hrcc0XrUizlMMs+MlBQfXMUmQ2ytQNtIuYjGB8KTvqwyB1eo26ailjc=
+	t=1767952649; cv=none; b=Yu7jGWW1wqd6j8VnOfBnQu3cdQ/Vjmut/Nhci517/yp5mDD9lJvM6EqjsJxzbXeEgm9V+90jsHynL89n5pg5VATK+1JHCu6QX3OdelY8fm1y4pufXnRT757Nt7NfjJknToJr25WJOW99qRagZd7kAbPtEIGp+Hjv8CgUjakzJgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767952632; c=relaxed/simple;
-	bh=ZIv2ks0v+I5xUjrsxuPT5slTgULmlLe7AeTQkxhYLdI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c2EeMm1mMIr/+corqPVC0iRXr7t9l6ssjEoDmdebfiPf25NouyR+C3ic71vC3xJQsN0MHtwpVcNHrwup7snJcOFB2Q2F1zB8PHCEsW7/l538PNde8Hlh2vzDXE5zULHdcjt+rXqkpnNceovbXWQ0HX/xw8sOT0XcB2l3DIMcvoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-7c78d30649aso2854101a34.2
-        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 01:57:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767952630; x=1768557430;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kflOjGXSHLopFrMVAwp7IfrEEKDXiVUp2sZg3tRSfEY=;
-        b=kxOkj3TwtsfVk42vQ7ZTgWGW9Xa2uMtpJenqqAf/P1+lM9IeTcGmYa5L4pqlR9cFcf
-         PDf5OlB9IcnJKGwdLQ6q6BEex5bW7lYvRUgEg/L7FvXOYgbKNaPfwSld7Z3bQQDz0val
-         uKjXNiP5pcDJWr8lJMNZflKNbRTqxNT7O6jfxnvZWmp0+RCDhyaUVCBLtduQTV3RhdVJ
-         K6DIMnyBIBiIqsFQjMZnuLgI39kpfCssdnd59ZiIvkZYk6+ymxuJ/PUYT3tfYJfhNfMq
-         TIyZUerbD5FMljdz2cHWaL3b1hGsVVAGrezC2/kAkVkQk3nyAXfy2HdfMfGu/VfmXupy
-         7ctA==
-X-Forwarded-Encrypted: i=1; AJvYcCXiH0HW/ItFS3W51zu4smJ5ZtRAiAM/u+W3yxffwj4+X8AB4iDgIpUQlfECfO8+szOdTWMgvr4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdISDZBm44zMZ2W64PWGZ81/WUcr4qvPFzzVAD1GDb/VnysJjc
-	kbX+9iQN4Zps2NVdTqKjl8P5Z21TmCe34stHkdUu1N+NQurjbO5k8Sqt
-X-Gm-Gg: AY/fxX7/YD7s8GqxEgSMqLstJVWhIzPyaVgllVOONy3qm5x81XfHGEcXcQzUGlTFFRC
-	+Lq5r1t2aeBdym8/c10g6bRuniMlck2JK6u8PJgL9Sqxtnp4/MnPgKx2G5KctHhOPvgKWXUhK/H
-	7fsr5qgPZ+h7CkOPnVD9Q/AYjLjiDiX8b4qJl2s5RiPsad8Affb1/fti68El8eZc7q++9qoUUuo
-	r5V9LJFlMCLGqjvk9msFyvQj3a8lyMfAyhvEv0N8apjWeE8OCXdNBXaBKD9HLXXi2BvoT8+N4KM
-	c7mJFf5Y6Urnt5lVIXEmia0s+3OhEpGAdMtjWKr9p8bdwsunbyNF4D72Hue48GcYLK6KnkzYmMf
-	5y6NC/A6ZLkCyTWefmvSf/tBSSSGk63aT45a/4GSV4E7eLohoa2/8dmR6vznaiSHxuaZlBhG5Qu
-	Cf3A==
-X-Google-Smtp-Source: AGHT+IGbTqhczWhIwv57lJTTKxd6slxfMkmNFicxm0SXSHnh6M/fl49RZ59Em0oW1pjz3+D20eebBg==
-X-Received: by 2002:a05:6830:3c1:b0:7b4:f1e6:4957 with SMTP id 46e09a7af769-7ce50a02094mr6090839a34.20.1767952629685;
-        Fri, 09 Jan 2026 01:57:09 -0800 (PST)
-Received: from gmail.com ([2a03:2880:10ff:74::])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3ffa4de40bfsm6552444fac.5.2026.01.09.01.57.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jan 2026 01:57:09 -0800 (PST)
-Date: Fri, 9 Jan 2026 01:57:07 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, petrm@nvidia.com, 
-	jdamato@fastly.com
-Subject: Re: [PATCH net-next 1/2] selftests: net: py: capitalize defer queue
- and improve import
-Message-ID: <jajmjcfg7ga76ueewfosv2mwd6ndbxzzeugtdesmk2l55frfx2@miahmmhzs3ra>
-References: <20260108225257.2684238-1-kuba@kernel.org>
+	s=arc-20240116; t=1767952649; c=relaxed/simple;
+	bh=M1qmy86SHZvWLo4r8+7G1n+HTnEPqHQke1+1swI55bA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qCQusGPimo1sEf1VE7EKBVZLXrbJWxhpNxfKLIQLG5aG0pnCYrzB4nKrrgRIRehqrM8qSADVWFPgQbyA603hAbsr34JefbqnwmJC9sixcqqlzqKvrxXxcATXy/aHzeGRVDyVkb+rjnFeW2zHxXsnEy0w6yX180QSPjPUOnnYlgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=hxFCMl+I; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [129.217.186.165] ([129.217.186.165])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 6099vHq4004261
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Fri, 9 Jan 2026 10:57:18 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1767952639;
+	bh=M1qmy86SHZvWLo4r8+7G1n+HTnEPqHQke1+1swI55bA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=hxFCMl+IlmnD5oQ1CQu1M4EaVYRTK+qhszYZagf+xK+38mY4iJQ0P0OkWJ81GZ1dV
+	 yjKcWyle3X1gtoOEdG22WTNAR3o9C1gfYJqH5QeaGI1sNqCI7DNsdlc/kemMw6flBX
+	 RdUqsKUJJEcwUAj3H1sOzr7yKRxgq7gB9h2pxnAQ=
+Message-ID: <0ae9071b-6d76-4336-8aee-d0338eecc6f5@tu-dortmund.de>
+Date: Fri, 9 Jan 2026 10:57:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260108225257.2684238-1-kuba@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH net-next v7 7/9] vhost-net: vhost-net: replace rx_ring with
+ tun/tap ring wrappers
+To: Jason Wang <jasowang@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com,
+        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
+ <20260107210448.37851-8-simon.schippers@tu-dortmund.de>
+ <CACGkMEtndGm+GX+3Kn5AWTkEc+PK0Fo1=VSZzhgBQoYRQbicQw@mail.gmail.com>
+ <5961e982-9c52-4e7a-b1ca-caaf4c4d0291@tu-dortmund.de>
+ <CACGkMEsKFcsumyNU6vVgBE4LjYWNb2XQNaThwd9H5eZ+RjSwfQ@mail.gmail.com>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <CACGkMEsKFcsumyNU6vVgBE4LjYWNb2XQNaThwd9H5eZ+RjSwfQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 08, 2026 at 02:52:56PM -0800, Jakub Kicinski wrote:
-> Import utils and refer to the global defer queue that way instead
-> of importing the queue. This will make it possible to assign value
-> to the global variable. While at it capitalize the name, to comply
-> with the Python coding style.
+On 1/9/26 07:04, Jason Wang wrote:
+> On Thu, Jan 8, 2026 at 3:48 PM Simon Schippers
+> <simon.schippers@tu-dortmund.de> wrote:
+>>
+>> On 1/8/26 05:38, Jason Wang wrote:
+>>> On Thu, Jan 8, 2026 at 5:06 AM Simon Schippers
+>>> <simon.schippers@tu-dortmund.de> wrote:
+>>>>
+>>>> Replace the direct use of ptr_ring in the vhost-net virtqueue with
+>>>> tun/tap ring wrapper helpers. Instead of storing an rx_ring pointer,
+>>>> the virtqueue now stores the interface type (IF_TUN, IF_TAP, or IF_NONE)
+>>>> and dispatches to the corresponding tun/tap helpers for ring
+>>>> produce, consume, and unconsume operations.
+>>>>
+>>>> Routing ring operations through the tun/tap helpers enables netdev
+>>>> queue wakeups, which are required for upcoming netdev queue flow
+>>>> control support shared by tun/tap and vhost-net.
+>>>>
+>>>> No functional change is intended beyond switching to the wrapper
+>>>> helpers.
+>>>>
+>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>> Co-developed by: Jon Kohler <jon@nutanix.com>
+>>>> Signed-off-by: Jon Kohler <jon@nutanix.com>
+>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>> ---
+>>>>  drivers/vhost/net.c | 92 +++++++++++++++++++++++++++++----------------
+>>>>  1 file changed, 60 insertions(+), 32 deletions(-)
+>>>>
+>>>> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+>>>> index 7f886d3dba7d..215556f7cd40 100644
+>>>> --- a/drivers/vhost/net.c
+>>>> +++ b/drivers/vhost/net.c
+>>>> @@ -90,6 +90,12 @@ enum {
+>>>>         VHOST_NET_VQ_MAX = 2,
+>>>>  };
+>>>>
+>>>> +enum if_type {
+>>>> +       IF_NONE = 0,
+>>>> +       IF_TUN = 1,
+>>>> +       IF_TAP = 2,
+>>>> +};
+>>>
+>>> This looks not elegant, can we simply export objects we want to use to
+>>> vhost like get_tap_socket()?
+>>
+>> No, we cannot do that. We would need access to both the ptr_ring and the
+>> net_device. However, the net_device is protected by an RCU lock.
+>>
+>> That is why {tun,tap}_ring_consume_batched() are used:
+>> they take the appropriate locks and handle waking the queue.
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> How about introducing a callback in the ptr_ring itself, so vhost_net
+> only need to know about the ptr_ring?
 
-Reviwed-by: Breno Leitao <leitao@debian.org>
+That would be great, but I'm not sure whether this should be the
+responsibility of the ptr_ring.
+
+If the ptr_ring were to keep track of the netdev queue, it could handle
+all the management itself - stopping the queue when full and waking it
+again once space becomes available.
+
+What would be your idea for implementing this?
+
+> 
+> Thanks
+> 
+>>
+>>>
+>>> Thanks
+>>>
+>>
+> 
 
