@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-248298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AEE5D06B10
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 02:10:34 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED3B5D06AF9
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 02:09:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E808930365A9
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 01:09:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 311D0302FBFB
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 01:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5DAE1F2BAD;
-	Fri,  9 Jan 2026 01:09:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A47621DE885;
+	Fri,  9 Jan 2026 01:09:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mk4KkMYc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dw3zlYK3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 293621632E7
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 01:09:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03AC619DF62
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 01:09:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767920953; cv=none; b=P3hcyVjZfOH2D5A1b8iU+XSCuInbZGCs/XrvWsGvPHNZHIU8KPMLtE7DQmoNgNupg5m58tVDcU6QFvTg0r4/jIKZtvcZ+EcCf6ksAAkL6y2ov9MnC7WCa3mKDgZ+U/0BLvUBsdeLa/PPhDEiOECrmIRhcE88ZuyU68yOWvDFlXo=
+	t=1767920958; cv=none; b=G5z2aO1aGnXBj69TgI5R2TTBXASQSEMdca0Up/ZujuiHPhbxXEs2ugSZAgF+DjbpKQqG2TUcPp2c3G9VBUL3+nGd0y1xtBPMyR3NdCFWsznCzoUKBYdhptC6ewHRACsuGkiUG6viEi+JFxIpHJe5sXSQ1ilT66TdHvRZgcF21n4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767920953; c=relaxed/simple;
-	bh=Op1D4JGBOw6dW1leE2O1zi7Myotx/Tp5RPzy4tsAm/0=;
+	s=arc-20240116; t=1767920958; c=relaxed/simple;
+	bh=qvZwfaPu5uCnTFXPKEZcwVmhpe79e1kDhuHev9xryz0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=skcFqJYlkkTEp8UaTM/Ifo1OdnHSG1aiTrn3dunrMs7z5BX2IorESio3IolK3XSXytCJ+aHrWHkcv0udkkbc8Zsa+tymAclOL7+4UWUIDEcYRs5t9i/t2xYel2JWCgs+9c/sDP4kIxtglQ+z6q17lnf7hUKKd3Oo+AjowwDUR+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mk4KkMYc; arc=none smtp.client-ip=209.85.221.48
+	 MIME-Version; b=W8bHaZarCGA6hDUka1qfgsjEYK+VHNHck7+rXlL3m2Xywu5tpsefV3DgxBPWjkE4HWXykPt9Ki/MttZ0aOpMnwqChy4VymZ9DOl8/rqGGPesa0Hd5UirqiJoUzrLl1BpCVj8/B1m4jvM6yJcX77O8djSIv24+fpVjpVojxdlsXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dw3zlYK3; arc=none smtp.client-ip=209.85.221.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-4308d81fdf6so1891785f8f.2
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 17:09:11 -0800 (PST)
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-43277900fb4so1146206f8f.1
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 17:09:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767920950; x=1768525750; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1767920953; x=1768525753; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZRf1S/pKhh92G5gtxmiVStxeCyhZJoINvG7rPfwHfBQ=;
-        b=Mk4KkMYc6uINMLuaKXHNw+gsuoKGMfrVyxJmx4kCGRX7uO2+yEyY3rgBjqap2d0BQp
-         rU5L7x19G+iqm9mjt+2bi/7NoYHmQwe+jpUCvZS+Lw2ohKP0CnWqgYaUd+YiKFbVLBww
-         EjefexfVhGcM6wRYwagQ8p+9GHo+7UnnUTkAihzP8SFSC3FCzMewqMnsUJecRESBvKUU
-         hAiK3Q7fI4VTCffyneYfk59mZjncqO2U6Zr6Dgv1Hv/KE65Z+nvIGDpJYhuIyRvFuzIH
-         8QrtqDZupyItRr0qxv/VOjsqxpiRX81vcJ/HnGzHmmtNpMqk3Yp1eH9cC8bXFDbXeQFa
-         E+xw==
+        bh=fAturvmtQMGHtwjZ7axIFXlswJwZwqsgBCrBhkrK37g=;
+        b=Dw3zlYK3rFzGCIgIicTeNT2IPIrR8MIDOaV0Q1jGE6dhCGZ1VViZhA4PQsunUjHuB+
+         kpB+eprhPsKPwcPgmWMXWs+6eMwnw9zxtr4ZfvMm1/9Mv0hX+PgfEuhe1aa8DhRhXTPG
+         b2A6OvS1d9PynPLThrw3EG4seZJmopVIVCbZ0sQ64Axbw61w11Y0TixhUHgNkj/kQh0p
+         Z56fteAbAhYATu8ru4aXI/M+Xf5qphFTL0bnEXA2GXHHnaIxTs1pOqzU7g655oiNgagC
+         vxMIR/NePlSYaGUCZ8RVK0WFM/d7lp2GrABCgW0GQ7rHN00lsWd9XE+XhHM5czZ38W2g
+         jihQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767920950; x=1768525750;
+        d=1e100.net; s=20230601; t=1767920953; x=1768525753;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ZRf1S/pKhh92G5gtxmiVStxeCyhZJoINvG7rPfwHfBQ=;
-        b=M7dbj2EtnAalp+WW7RdNDcyJqi6qHG3ISbFMiF5A2/l5ADk2eZkZCjlQGlD93KD8hW
-         DZjj77smrQukKNPlUjEzNn/uaFdlMvxf4b8lBbgQk+dNQ5bipTe+ieSax+oUhkZ1Y4CO
-         aF+Voeq5S9eWcdb3XoZLDdpx4+njMtd34cgztpcv9IAuYYyYAcfQMCnNEpHwKkFXWRm2
-         VqwgvVvSD3Z9KKSdkPjTfHSj6c4SFFuZJb6/acICu4v4UdnvZUc5eQe+/5RoTdaD8euM
-         PbzhJs93hL9WLZXCKB/8dLCNZLaBt5VWO9XsJ4/Z9HHIgAPqu2GBN1i0Eh1QRI79GmYq
-         c5+g==
-X-Forwarded-Encrypted: i=1; AJvYcCWv0CWd5wFPmOBUSRKGi6eLsIGsJawXCYqFfWkmrZ5gOVy8CdKGcOzk+SyIzBviEdGNzn2FSPY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPxoKgFAoIEpEL6n5NzNFCND0N+kmj91SZPeaXGInQXZ1lW7zB
-	K9kcmx8Evpm2SgkLCdNayiuSZJ5C0FSCdU0QNT8ZamNTFYCqhUQclVwx
-X-Gm-Gg: AY/fxX4FxsdI9PLfhC2p8HmoB+sOIGjkU3Cr0OFWAbP5WzzCf0jUd6jkzZE31lib7OM
-	fXmY+VqsdEioaNtOYQbx4zgWs79KRQ7HPq0JxZsn6cNe5bpMmWtdUua96R4NLAF5IINgQAFtZcy
-	qKV5MhH96PCX22pI73cGyRbnFHD6Z1E9ykVpesKuTeAxqLkl2YKwS9jO7GH5g4lw76ioIVSYQVl
-	JXKDtB3oY9HXYrioS7VmihpxX8swfenUafK3PH9AI69TEOXniCRDCc+6pQUY7RDvMR/ilH1gTwN
-	dih7CDF1AOoHshrR29JOeHG0vCALjHiaIfuPs11VNnrUffMSqlcebeogDIjwCY1naoCDzEMB3r7
-	hxnUwqNqJttvt+NFlVcGoWrZ8dci9BDBzF50+ll5t7Ftk6Vh8fsmbx+3FewRqeWv86EZ3JdNe/x
-	KEitEVHJlUCg==
-X-Google-Smtp-Source: AGHT+IE221jfHoMWtPiR1bdRK+Bmhk9UZXI/X3lOz7oVpdDUb0Ux6I8od5an69R4QgV6ZJxvmTnqdA==
-X-Received: by 2002:a5d:5f51:0:b0:430:ff81:295d with SMTP id ffacd0b85a97d-432c374fc38mr10771526f8f.41.1767920950433;
-        Thu, 08 Jan 2026 17:09:10 -0800 (PST)
+        bh=fAturvmtQMGHtwjZ7axIFXlswJwZwqsgBCrBhkrK37g=;
+        b=QtZQsCuLUOojr2dRCQgRJMb0vhMdQuNGjYOaPr9bWr6QF0TVkVCSXZz+OKP94STARG
+         Ax9S8C24dz1FMkNU8xRPY+qFcFjBv2KefdkNKJFvc0m9eQ3h9DCiKXnQ24wSZTNTrYcc
+         MG0YlQ/ZLrkKTBofZ0VciARtB+gZHAbnJdmuEGKDtZN41W4gkjgv1vxtMGTShu5g55ND
+         e4W/H0gK6xcodNMC0IEoQrytP0L9rYQzuNS1XI1Ufy0edsJHqVwIS+d0NuHAnZinCtXx
+         Tt5U4ycga6rbizPketaaOLwBBF7mfwOv307dqOXYQ1j2tVt27TyE6nTY/Mh/XZHpPfuj
+         n1aQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV2/6JKx58urj/mvpMqSH23sBZH7n88NpdD/BH45WGSNKmBtricnzhVXFNlKT5J6bSE+TSni5Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxfuy8Y/Lf4n2sopp0zpoeA1vdRd9TM31C+mlTxhr1N7cavHcoX
+	i5/mtJ16KI0jSQfGY3dEpyO8muo9MgFkkviG5z/YMlDPYrJz4AUDlL3j
+X-Gm-Gg: AY/fxX5H6vttgwVl7aI6Ihl/YKt2MRGEQpH6ChtpblTAnqUVOVbq3qWawZDNxwFjS2z
+	2HBPrlWoZQVlWewX03uszUo+vTj/Ujg1QaiibMJP5Z3Awgb0ed+CgZ+m+aRk/5hh95n7jwzfjzp
+	uAcNy1aqXHtKi51pBQTPdVudkvYa77KCvihsT1vfdNCGv7/Oq7Xky87KPMQIqhxcJkdlLDCFtPS
+	1S921Yd3IIlaIrBGC2DJ3A34ZkZh/x7G0/utSkdIUtKl6l8nOa89cOTyEQHXSlRLzQk3bbN1fZu
+	fVJq+ZoDK4QNkUVD1NBRaT/vfT9ZKVaR6lMI3SDnUrKzVtTZeDhzKRW2PPH30Ou4SnYqpwC7XvM
+	cOH7AYbcADlBkGIwKRlf8P5XL1c6w1hUiC3/vzpvNkcpO8/rG/eOSzKUTzLUKOh9cxL1m2R5stM
+	L7u1rtgVz5og==
+X-Google-Smtp-Source: AGHT+IFzbqFh/f/vwHhrdMejROOldIso+1k/br/9NHK8zplFr2sEMkH2Q4RnxGZ2YNxpAA3A/WO07g==
+X-Received: by 2002:a5d:64c7:0:b0:431:327:5dd6 with SMTP id ffacd0b85a97d-432c3634312mr9195979f8f.8.1767920953021;
+        Thu, 08 Jan 2026 17:09:13 -0800 (PST)
 Received: from rsa-laptop ([212.50.121.5])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0e17aasm19698214f8f.15.2026.01.08.17.09.09
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0e17aasm19698214f8f.15.2026.01.08.17.09.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 17:09:09 -0800 (PST)
+        Thu, 08 Jan 2026 17:09:12 -0800 (PST)
 From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
 To: Loic Poulain <loic.poulain@oss.qualcomm.com>,
 	Johannes Berg <johannes@sipsolutions.net>
@@ -80,10 +80,11 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: [RFC PATCH v5 1/7] net: wwan: core: remove unused port_id field
-Date: Fri,  9 Jan 2026 03:09:03 +0200
-Message-ID: <20260109010909.4216-2-ryazanov.s.a@gmail.com>
+	netdev@vger.kernel.org,
+	Daniele Palmas <dnlplm@gmail.com>
+Subject: [RFC PATCH v5 2/7] net: wwan: core: explicit WWAN device reference counting
+Date: Fri,  9 Jan 2026 03:09:04 +0200
+Message-ID: <20260109010909.4216-3-ryazanov.s.a@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260109010909.4216-1-ryazanov.s.a@gmail.com>
 References: <20260109010909.4216-1-ryazanov.s.a@gmail.com>
@@ -95,36 +96,130 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-It was used initially for a port id allocation, then removed, and then
-accidently introduced again, but it is still unused. Drop it again to
-keep code clean.
+We need information about existing WWAN device children since we remove
+the device after removing the last child. Previously, we tracked users
+implicitly by checking whether ops was registered and existence of a
+child device of the wwan_class class. Upcoming GNSS (NMEA) port type
+support breaks this approach by introducing a child device of the
+gnss_class class.
 
+And a modem driver can easily trigger a kernel Oops by removing regular
+(e.g., MBIM, AT) ports first and then removing a GNSS port. The WWAN
+device will be unregistered on removal of a last regular WWAN port. And
+subsequent GNSS port removal will cause NULL pointer dereference in
+simple_recursive_removal().
+
+In order to support ports of classes other than wwan_class, switch to
+explicit references counting. Introduce a dedicated counter to the WWAN
+device struct, increment it on every wwan_create_dev() call, decrement
+on wwan_remove_dev(), and actually unregister the WWAN device when there
+are no more references.
+
+Run tested with wwan_hwsim with NMEA support patches applied and
+different port removing sequences.
+
+Reported-by: Daniele Palmas <dnlplm@gmail.com>
+Closes: https://lore.kernel.org/netdev/CAGRyCJE28yf-rrfkFbzu44ygLEvoUM7fecK1vnrghjG_e9UaRA@mail.gmail.com/
+Suggested-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
 Signed-off-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Reviewed-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
 ---
- drivers/net/wwan/wwan_core.c | 2 --
- 1 file changed, 2 deletions(-)
+Changes:
+* RFCv2->RFCv5: new patch to address modem disconnection / system
+  shutdown issues
+---
+ drivers/net/wwan/wwan_core.c | 37 ++++++++++++++++++------------------
+ 1 file changed, 18 insertions(+), 19 deletions(-)
 
 diff --git a/drivers/net/wwan/wwan_core.c b/drivers/net/wwan/wwan_core.c
-index 63a47d420bc5..ade8bbffc93e 100644
+index ade8bbffc93e..33f7a140fba9 100644
 --- a/drivers/net/wwan/wwan_core.c
 +++ b/drivers/net/wwan/wwan_core.c
-@@ -43,7 +43,6 @@ static struct dentry *wwan_debugfs_dir;
+@@ -42,6 +42,9 @@ static struct dentry *wwan_debugfs_dir;
+  * struct wwan_device - The structure that defines a WWAN device
   *
   * @id: WWAN device unique ID.
++ * @refcount: Reference count of this WWAN device. When this refcount reaches
++ * zero, the device is deleted. NB: access is protected by global
++ * wwan_register_lock mutex.
   * @dev: Underlying device.
-- * @port_id: Current available port ID to pick.
   * @ops: wwan device ops
   * @ops_ctxt: context to pass to ops
-  * @debugfs_dir:  WWAN device debugfs dir
-@@ -51,7 +50,6 @@ static struct dentry *wwan_debugfs_dir;
+@@ -49,6 +52,7 @@ static struct dentry *wwan_debugfs_dir;
+  */
  struct wwan_device {
  	unsigned int id;
++	int refcount;
  	struct device dev;
--	atomic_t port_id;
  	const struct wwan_ops *ops;
  	void *ops_ctxt;
+@@ -222,8 +226,10 @@ static struct wwan_device *wwan_create_dev(struct device *parent)
+ 
+ 	/* If wwandev already exists, return it */
+ 	wwandev = wwan_dev_get_by_parent(parent);
+-	if (!IS_ERR(wwandev))
++	if (!IS_ERR(wwandev)) {
++		wwandev->refcount++;
+ 		goto done_unlock;
++	}
+ 
+ 	id = ida_alloc(&wwan_dev_ids, GFP_KERNEL);
+ 	if (id < 0) {
+@@ -242,6 +248,7 @@ static struct wwan_device *wwan_create_dev(struct device *parent)
+ 	wwandev->dev.class = &wwan_class;
+ 	wwandev->dev.type = &wwan_dev_type;
+ 	wwandev->id = id;
++	wwandev->refcount = 1;
+ 	dev_set_name(&wwandev->dev, "wwan%d", wwandev->id);
+ 
+ 	err = device_register(&wwandev->dev);
+@@ -263,30 +270,21 @@ static struct wwan_device *wwan_create_dev(struct device *parent)
+ 	return wwandev;
+ }
+ 
+-static int is_wwan_child(struct device *dev, void *data)
+-{
+-	return dev->class == &wwan_class;
+-}
+-
+ static void wwan_remove_dev(struct wwan_device *wwandev)
+ {
+-	int ret;
+-
+ 	/* Prevent concurrent picking from wwan_create_dev */
+ 	mutex_lock(&wwan_register_lock);
+ 
+-	/* WWAN device is created and registered (get+add) along with its first
+-	 * child port, and subsequent port registrations only grab a reference
+-	 * (get). The WWAN device must then be unregistered (del+put) along with
+-	 * its last port, and reference simply dropped (put) otherwise. In the
+-	 * same fashion, we must not unregister it when the ops are still there.
+-	 */
+-	if (wwandev->ops)
+-		ret = 1;
+-	else
+-		ret = device_for_each_child(&wwandev->dev, NULL, is_wwan_child);
++	if (--wwandev->refcount <= 0) {
++		struct device *child = device_find_any_child(&wwandev->dev);
++
++		if (WARN_ON(wwandev->ops))	/* Paranoid */
++			goto out_unlock;
++		if (WARN_ON(child)) {		/* Paranoid */
++			put_device(child);
++			goto out_unlock;
++		}
+ 
+-	if (!ret) {
  #ifdef CONFIG_WWAN_DEBUGFS
+ 		debugfs_remove_recursive(wwandev->debugfs_dir);
+ #endif
+@@ -295,6 +293,7 @@ static void wwan_remove_dev(struct wwan_device *wwandev)
+ 		put_device(&wwandev->dev);
+ 	}
+ 
++out_unlock:
+ 	mutex_unlock(&wwan_register_lock);
+ }
+ 
 -- 
 2.52.0
 
