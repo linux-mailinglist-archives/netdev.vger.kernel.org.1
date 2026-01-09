@@ -1,209 +1,104 @@
-Return-Path: <netdev+bounces-248628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FB3ED0C53E
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 22:32:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 242C0D0C54D
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 22:35:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3973730E8625
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 21:27:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 12F7530D4D1D
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 21:32:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 696D033D6DA;
-	Fri,  9 Jan 2026 21:27:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93FB4221FBD;
+	Fri,  9 Jan 2026 21:32:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="WMpA2VPT"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Da9RZUY0"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D013A340263;
-	Fri,  9 Jan 2026 21:27:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E926500942;
+	Fri,  9 Jan 2026 21:32:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767994038; cv=none; b=kUcG9f+bqTz7lFz8QQHoiq2s0SSpJIqsiKzWQ66xsuG65suyvV/XAjjdZxljJ2BMeHfrNQ5MgTcBSQvpuJUFQHlBeSfPGfw7rTvGXD/l80NI5Xv9jiQtRMElP7Kn3LVZOtuFd76jUfW7BbW/Z03Lo0qmtKj3TEuK0KfzydxZF74=
+	t=1767994356; cv=none; b=Mtj92UvDE1usf3jrsDQIVwWdisRAJL7dRTauCVQCbZyEzDEuJ2EH98jFXdQWFVibOQjHKsBmc+OUyQ4JPOrXG9Bjc8DBWYpd8olE1vuCJk8WplrkjkURI0wYCd0PJbJmILpG2fc4A9YK7dAAY7AzKHr3L3SYBzse0tikVhkezxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767994038; c=relaxed/simple;
-	bh=ds3vmtRO482oJ4L9zl1gi+HwQInYAfVxpdU9illDGlw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZzHAZVY/eXlb7uv6758d/fIC4kDykrrRSIOk40kzk6TNpxhFw8hh1/b4xxAFWn9iI+s2gQXf01tcJ3sSF4lL7S818ygs0JRvnrxYjVrXjFQBixYvWlSeX1+kcd8/4gkHUEteMdpiYh4nbxVBIkyCRDlQ+Voto8UtkUNumcXX87c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=WMpA2VPT; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+	s=arc-20240116; t=1767994356; c=relaxed/simple;
+	bh=fat2CoC7ZD57Pu0XLNkO1+A5yeIHqj50mpWtl2XZLtI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IFA6pBuHygOpTEvnn5dOo7SNHVXvjfLk0DrOKwbIzHFQfzjfWerdUgYNzGYpAKkauOKbzZtVsBcvUaRs9zp8pMTz2heSynXvylsZJVBdnFy7esaqNvHnsIdKQ7QYMxXTRolvm7XrL2UbufkMt9u9l147QNYwQzIq9w+TmTVyqiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Da9RZUY0; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=A3JhZ4YZgwR/rLOGJb+FXJJbVesXMoF+77HTdLn+a1E=; b=WMpA2VPTK6beS1GaMaGAkR9fVL
-	ybbQBmnTMvs/WcjEAsmm197H8s6OAu2hXIP3eWUsEXt3B8MnTPVEy4ho0SymARNJO7Ail/m/rcSSk
-	EHje5LVcJe46BrSzDETZQMkxc+H5E7Q33RNik4wR1xtODMlZlbp+cjyLnTc3o7XzEaBh6TGYRLR3Y
-	DVoVrp62UBEAlxpX7BHbymA0rZNUVbYYL+ko18o494lqqM6oxO4kr6E1W546x7ReMJIq1RQuAJE69
-	mKUl9EkoEsetMYHT3PBlO/4nMpKyI+2smrONHdN+0Ng+kKbqmS8J/YHuyc4BxZNxi7duieQAX1VEu
-	2yubTsoQ==;
-Received: from localhost ([127.0.0.1])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1veK0S-00056W-02;
-	Fri, 09 Jan 2026 22:26:52 +0100
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	razor@blackwall.org,
-	pabeni@redhat.com,
-	willemb@google.com,
-	sdf@fomichev.me,
-	john.fastabend@gmail.com,
-	martin.lau@kernel.org,
-	jordan@jrife.io,
-	maciej.fijalkowski@intel.com,
-	magnus.karlsson@intel.com,
-	dw@davidwei.uk,
-	toke@redhat.com,
-	yangzhenze@bytedance.com,
-	wangdongdong.6@bytedance.com
-Subject: [PATCH net-next v5 16/16] selftests/net: Add netkit container tests
-Date: Fri,  9 Jan 2026 22:26:32 +0100
-Message-ID: <20260109212632.146920-17-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260109212632.146920-1-daniel@iogearbox.net>
-References: <20260109212632.146920-1-daniel@iogearbox.net>
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=/nDQg9bpXjHmVcghjS2F7GZEWZqr2lL6ZJYKc/GvqCA=; b=Da9RZUY0CnXx47/5MElY2eW2+8
+	fLTGpcDUgoxlZ5CiTDYeUwsc98LU3MUIu7PtL54otK/eEPnnTEmP/Fh6yq2Ln1qpuT5u7UKyx3GYK
+	F9vfpHm5J45d6ymZGNdI5wnAo7xcha7rHyRfpjOWjYQQCTBqcEmejV7P9SnH+ZcS4wDLNwr/lAB5N
+	abVpU3UkNqPnDM4Nq3woPGY78DzlTMxmbaZlulk3fLzZXlFvfhy+IKfx2Ym+M2Bn6GeK2xwB061st
+	PUeibgU5OoqszN/Q7TBnGoPhsrDrz2gqeWIVDOcWhJhMOblJ+J5xoUTO92CRWQgJdM/Urmc0xkKST
+	ZOUDm5ug==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56288)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1veK5m-000000004M5-3hoR;
+	Fri, 09 Jan 2026 21:32:23 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1veK5i-000000003e9-0k86;
+	Fri, 09 Jan 2026 21:32:18 +0000
+Date: Fri, 9 Jan 2026 21:32:18 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Michael Klein <michael@fossekall.de>,
+	Aleksander Jan Bajkowski <olek2@wp.pl>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/5] net: phy: realtek: simplify C22 reg access
+ via MDIO_MMD_VEND2
+Message-ID: <aWFz4TWNGEs7rGPF@shell.armlinux.org.uk>
+References: <cover.1767926665.git.daniel@makrotopia.org>
+ <938aff8b65ea84eccdf1a2705684298ec33cc5b0.1767926665.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.0.9/27875/Fri Jan  9 08:26:02 2026)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <938aff8b65ea84eccdf1a2705684298ec33cc5b0.1767926665.git.daniel@makrotopia.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: David Wei <dw@davidwei.uk>
+On Fri, Jan 09, 2026 at 03:03:22AM +0000, Daniel Golle wrote:
+> RealTek 2.5GE PHYs have all standard Clause-22 registers mapped also
+> inside MDIO_MMD_VEND2 at offset 0xa400. This is used mainly in case the
+> PHY is inside a copper SFP module which uses the RollBall MDIO-over-I2C
+> method which *only* supports Clause-45.
 
-Add two tests using NetDrvContEnv. One basic test that sets up a netkit
-pair, with one end in a netns. Use LOCAL_PREFIX_V6 and nk_forward BPF
-program to ping from a remote host to the netkit in netns.
+It isn't just Rollball. There are SoCs out there which have separate
+MDIO buses, one bus signals at 3.3V and can generate only clause 22
+frames. The other operates at 1.2V and can only generate clause 45
+frames.
 
-Second is a selftest for netkit queue leasing, using io_uring zero copy
-test binary inside of a netns with netkit. This checks that memory
-providers can be bound against virtual queues in a netkit within a
-netns that are leasing from a physical netdev in the default netns.
+While hardware may elect to generate and recognise either frame types
+at either voltage, this goes some way to explain why there are
+implementations that only support one or the other on a particular
+pair of MDC/MDIO wires.
 
-Signed-off-by: David Wei <dw@davidwei.uk>
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
----
- .../testing/selftests/drivers/net/hw/Makefile |  2 +
- .../selftests/drivers/net/hw/nk_netns.py      | 23 ++++++++
- .../selftests/drivers/net/hw/nk_qlease.py     | 55 +++++++++++++++++++
- 3 files changed, 80 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/hw/nk_netns.py
- create mode 100755 tools/testing/selftests/drivers/net/hw/nk_qlease.py
+Armada 8040 has this setup - there is one MDIO bus that only supports
+clause 22 frames, and there is a separate MDIO bus that only supports
+clause 45 frames.
 
-diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-index 9c163ba6feee..39ad86d693b3 100644
---- a/tools/testing/selftests/drivers/net/hw/Makefile
-+++ b/tools/testing/selftests/drivers/net/hw/Makefile
-@@ -32,6 +32,8 @@ TEST_PROGS = \
- 	irq.py \
- 	loopback.sh \
- 	nic_timestamp.py \
-+	nk_netns.py \
-+	nk_qlease.py \
- 	pp_alloc_fail.py \
- 	rss_api.py \
- 	rss_ctx.py \
-diff --git a/tools/testing/selftests/drivers/net/hw/nk_netns.py b/tools/testing/selftests/drivers/net/hw/nk_netns.py
-new file mode 100755
-index 000000000000..afa8638195d8
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/nk_netns.py
-@@ -0,0 +1,23 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+from lib.py import ksft_run, ksft_exit
-+from lib.py import NetDrvContEnv
-+from lib.py import cmd
-+
-+
-+def test_ping(cfg) -> None:
-+    cfg.require_ipver("6")
-+
-+    cmd(f"ping -c 1 -W5 {cfg.nk_guest_ipv6}", host=cfg.remote)
-+    cmd(f"ping -c 1 -W5 {cfg.remote_addr_v['6']}", ns=cfg.netns)
-+
-+
-+def main() -> None:
-+    with NetDrvContEnv(__file__) as cfg:
-+        ksft_run([test_ping], args=(cfg,))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
-diff --git a/tools/testing/selftests/drivers/net/hw/nk_qlease.py b/tools/testing/selftests/drivers/net/hw/nk_qlease.py
-new file mode 100755
-index 000000000000..738a46d2d20c
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/nk_qlease.py
-@@ -0,0 +1,55 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+import re
-+from os import path
-+from lib.py import ksft_run, ksft_exit
-+from lib.py import NetDrvContEnv
-+from lib.py import bkg, cmd, defer, ethtool, rand_port, wait_port_listen
-+
-+
-+def create_rss_ctx(cfg):
-+    output = ethtool(f"-X {cfg.ifname} context new start {cfg.src_queue} equal 1").stdout
-+    values = re.search(r'New RSS context is (\d+)', output).group(1)
-+    return int(values)
-+
-+
-+def set_flow_rule(cfg):
-+    output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port {cfg.port} action {cfg.src_queue}").stdout
-+    values = re.search(r'ID (\d+)', output).group(1)
-+    return int(values)
-+
-+
-+def set_flow_rule_rss(cfg, rss_ctx_id):
-+    output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port {cfg.port} context {rss_ctx_id}").stdout
-+    values = re.search(r'ID (\d+)', output).group(1)
-+    return int(values)
-+
-+
-+def test_iou_zcrx(cfg) -> None:
-+    cfg.require_ipver('6')
-+
-+    ethtool(f"-X {cfg.ifname} equal {cfg.src_queue}")
-+    defer(ethtool, f"-X {cfg.ifname} default")
-+
-+    flow_rule_id = set_flow_rule(cfg)
-+    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}")
-+
-+    rx_cmd = f"ip netns exec {cfg.netns.name} {cfg.bin_local} -s -p {cfg.port} -i {cfg._nk_guest_ifname} -q {cfg.nk_queue}"
-+    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.nk_guest_ipv6} -p {cfg.port} -l 12840"
-+    with bkg(rx_cmd, exit_wait=True):
-+        wait_port_listen(cfg.port, proto="tcp", ns=cfg.netns)
-+        cmd(tx_cmd, host=cfg.remote)
-+
-+
-+def main() -> None:
-+    with NetDrvContEnv(__file__, lease=True) as cfg:
-+        cfg.bin_local = path.abspath(path.dirname(__file__) + "/../../../drivers/net/hw/iou-zcrx")
-+        cfg.bin_remote = cfg.remote.deploy(cfg.bin_local)
-+        cfg.port = rand_port()
-+        ksft_run([test_iou_zcrx], args=(cfg,))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
 -- 
-2.43.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
