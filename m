@@ -1,70 +1,71 @@
-Return-Path: <netdev+bounces-248348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27F7BD073D4
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 06:49:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 72EB3D073E9
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 06:51:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3F55E305480D
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 05:49:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4597A30631A0
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 05:49:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AC0D29B764;
-	Fri,  9 Jan 2026 05:49:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E59F62D46CE;
+	Fri,  9 Jan 2026 05:49:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="lCjtIROw"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Yrj/mHI4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F297328DF2D;
-	Fri,  9 Jan 2026 05:49:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E24500960;
+	Fri,  9 Jan 2026 05:49:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767937747; cv=none; b=llvh5JA274K+93PcllNoudS6Mes0+2wcnxGg9Oay4me6sPH+VM2DDkmdwKpjKS1Q6b5VChSq1Mh378OO+0pyUa4E775zYWyO5ZQKJXd+seXhWplkICT/cgFciljW9Jy/4F+2U8z+YmYV3LrgRNWBJX6zazyHaWwUKo0ANkJYL6I=
+	t=1767937750; cv=none; b=rS+7t8JqmTWkPrlu+6ig3EMqTVwJir379xznG3/YJV89kM0OITGdeRyz8YjY9Xv2VupjHmpVeIk1De9m9jTePXhASqgSasjbxX7betTw1z1Aq3MId59dMn8WAZ/0CVWlZMuvVov8yCZ8nYzQBTT1foQlluJQkSUEIp5y/DraHPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767937747; c=relaxed/simple;
-	bh=TQMKqp1zGAK3/9q4h5lhNncCtcqO1V88DYOXK6/Bi/g=;
+	s=arc-20240116; t=1767937750; c=relaxed/simple;
+	bh=5Txp3W1CUHHZ8FJzRrLMo/lwP8vZDJPeKLDgnb6drVY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QWuLwqkxqd66z9Fc+cxqlH3Dna/VT3V0nSCtxBlyxKQmEgSW/SbCArYDtYM7nIDnJzrIW+xnF741Pu3MIwyQbpybY1o0XiJ+vJZwGxnIDp1pNhOO0u8uOY0Z/03kffxImdXFBYoLYeGA4VWjIvbrwITNubcdlzkpqSoEKDLcqgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=lCjtIROw; arc=none smtp.client-ip=67.231.156.173
+	 MIME-Version:Content-Type; b=ppkTCt7pOOqZEavUZTdvhOYVRm6qWMR3cYb2RkBzGVb6CYi4BMmZ9CB0iXfEy/nXD6XkPcU8/Zf+/gWREfJMCYNR+qdWb2gXGgAogXEw2YLhiCUwVM4ZvUbnOTJVPb1hxhsf80lI/hSBtZJsEnv/71ElOZ2dv874vVkALSOHqgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Yrj/mHI4; arc=none smtp.client-ip=67.231.148.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 608Etkpt2094216;
-	Thu, 8 Jan 2026 21:48:55 -0800
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60939hXa2939755;
+	Thu, 8 Jan 2026 21:48:58 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=m
-	7+wDbHv1fmXdG6NzcLkIrPId7/0/+jDIyc9Ax6A9bY=; b=lCjtIROwqUM7p7a1n
-	aCgTBejp0T87UWz60JbYkRqat4BmOpoXZQlINIXHCGChTjnPwMLAy6I9D0DdcMDb
-	wY/8IFO9c72veA2I+3VZEq/qqOpo+GlazXNzjYit8eaTfAf30PNH3ujKxqDm95gZ
-	RdhKR7hE+QPCJMV+BbEbBKFZeJlhD4evCc1zmndw7ssppNexFDQ/ju8MJNnqBqhj
-	kczFkmJMxoVGeTFQIyeerIhdvGhnXqcwh4QhXJ0zx+IATMyFJ1WiAcFozwstJSP8
-	sse7MekJADj3RcUcKe1ar8rUJbfnz9doOPz+5OLyjI/5frH4rKP0c1HRH8ch4hYm
-	TMU9A==
+	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=B
+	44AY6qf9E3+d6yd4FXEdBQjvfZ1v0Zb0zyITpFRoDc=; b=Yrj/mHI4lfZqC/S+f
+	d1nw/6bvPShFjnWOxzJSYU3kJxyUnAylc2V8fn+T16CgUrV8kHM+PZo5iYLzOK4/
+	ysnvS9f8RbHAnxMMo7sV+kQGc+FYuLAxjCvYERZtYvtdKyR/7HayUX8XUrxK9ioR
+	SiLuvXlQc8n2flddm3pjHYQPxs8IYihW9Enf/H8V3D4f940dTFRn+sP8F9NzldWX
+	8ZHYM+c23lRxMVbgUvAwe02AgmA8Eo4wBNEG3gZ5wtECbxCLIZo0rqfhGO1meOjE
+	SK7NaorjDQiF11otONWr2ePBP54Mk89gSjRTYGncamYfYJaNPRiUYa7ciEG4Vqjv
+	m+8gw==
 Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bj181bgda-1
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4bhwh2v0cy-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 08 Jan 2026 21:48:54 -0800 (PST)
+	Thu, 08 Jan 2026 21:48:57 -0800 (PST)
 Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
  DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Thu, 8 Jan 2026 21:49:09 -0800
+ 15.2.1544.25; Thu, 8 Jan 2026 21:49:12 -0800
 Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
  (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Thu, 8 Jan 2026 21:49:09 -0800
+ Transport; Thu, 8 Jan 2026 21:49:12 -0800
 Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id 3B7D35B692B;
-	Thu,  8 Jan 2026 21:48:50 -0800 (PST)
+	by maili.marvell.com (Postfix) with ESMTP id 697EF3F7060;
+	Thu,  8 Jan 2026 21:48:54 -0800 (PST)
 From: Ratheesh Kannoth <rkannoth@marvell.com>
 To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
 CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
         <kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-        "Ratheesh
- Kannoth" <rkannoth@marvell.com>
-Subject: [PATCH net-next v3 05/13] octeontx2-af: npc: cn20k: Allocate default MCAM indexes
-Date: Fri, 9 Jan 2026 11:18:20 +0530
-Message-ID: <20260109054828.1822307-6-rkannoth@marvell.com>
+        Suman Ghosh
+	<sumang@marvell.com>,
+        Ratheesh Kannoth <rkannoth@marvell.com>
+Subject: [PATCH net-next v3 06/13] octeontx2-af: npc: cn20k: Use common APIs
+Date: Fri, 9 Jan 2026 11:18:21 +0530
+Message-ID: <20260109054828.1822307-7-rkannoth@marvell.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260109054828.1822307-1-rkannoth@marvell.com>
 References: <20260109054828.1822307-1-rkannoth@marvell.com>
@@ -76,742 +77,1206 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA5MDAzNyBTYWx0ZWRfX6GfwyKfAsTbR
- xDipK/dyf5RYFtZhsxx0Wd60041Aj938tmv36RKk65LVMluxfxyEDFZ+q8rexBLFY7F2hZaFqpk
- chc82UJetzxVZ1Tg7WyFTd50eOFaXIu8LF2RPZtZZ31iBBvqGNNl7EEiBQobzR+79LC+PSLre8j
- WJYfxEf90aURYEvpDhXfvfy8W4p1GPekFehwcNvW0u/TRXjWC2obvJ7SjFdWKjVG4ghYmmgoJHL
- 06eqi2aCrG/eHnk10+/YyiLEJbQXQGqFozPN/B5KQMFUcwQ9bdX39S30aTsZsB3rL1vnRwix4fj
- 9+lsbLX7tXCaHD/D3eQgoSbmTmuwrdi7RNIYo+5Tb3/Ls4PDqBxZLvG76LTsGKHRCPHmYb3zFol
- QfhnLIZi5VqULBW2v9+cMsJYHfyQ31ZwqV2XMSK4pZRdFlFGIqsxbFDyWoBRYLJ36tGpMA9xw0M
- eefUjD5Bl1RdqEE6R7g==
-X-Authority-Analysis: v=2.4 cv=Vdf6/Vp9 c=1 sm=1 tr=0 ts=696096c7 cx=c_pps
+X-Proofpoint-GUID: E73H0qawJ2VZ_f7dPQ1vra2AfjXcsQVp
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA5MDAzNyBTYWx0ZWRfX9My35oUtDnJU
+ bNxsk4vqC9ImbkEkiTPYULFp83Dcuh/Prx1zoZQr28ljTAyFrLEl5p/odqfN/CucG9QtTjDegAD
+ +/+x9bW+fiTWezp2l8k4araiq5yvO1HQtX7Q+iIzhDPmLO3CocvN29W+Lnbhe3ZcZGcztbXKEBT
+ UH90O+IUrWZ6U8nZQ9wv8bZtCc+9fMk/wL1ix8XwSG9EKTaL06Nh5NOyx8JmxwNBmBnj5vGSd3x
+ 0IqPy5CM45XeLMrjTOTZhpjSFKlGyj9FaXvlmMZoNDxZ8e1joy0+m8Cc3qI3HmUzQb/2/KeGjVr
+ k5NGUz2HRjSNvLS+pZFtKeh/Yr0bNdCM/2eLUh3TRffCWpdDJDzvGXniUSqAXaLzkRSxwADrNPt
+ G8u/gKxCTWJd2zG6tivbsBODBfN3fmORMtNKPGJQ1thj/ys8JcLMmqKBPvFUXhX8oz6cJhiJM/N
+ X7+UmVxJrFmPPmEVWQg==
+X-Authority-Analysis: v=2.4 cv=ROO+3oi+ c=1 sm=1 tr=0 ts=696096c9 cx=c_pps
  a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
  a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
- a=njG_chu-v0deECxusFoA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: gEfFk2AJm52TieiuQAZf02B6vCmv-M9c
-X-Proofpoint-ORIG-GUID: gEfFk2AJm52TieiuQAZf02B6vCmv-M9c
+ a=YiITfu5hDICovFRBzmQA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: E73H0qawJ2VZ_f7dPQ1vra2AfjXcsQVp
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2026-01-09_01,2026-01-08_02,2025-10-01_01
 
-Reserving MCAM entries in the AF driver for installing default MCAM
-entries is not an efficient allocation method, as it results in
-significant wastage of entries. This patch allocates MCAM indexes for
-promiscuous, multicast, broadcast, and unicast traffic in descending
-order of indexes (from lower to higher priority) when the NIX LF is
-attached to the PF/VF.
+From: Suman Ghosh <sumang@marvell.com>
 
+In cn20k silicon, the register definitions and the algorithms used to
+read, write, copy, and enable MCAM entries have changed. This patch
+updates the common APIs to support both cn20k and previous silicon
+variants.
+
+Additionally, cn20k introduces a new algorithm for MCAM index management.
+The common APIs are updated to invoke the cn20k-specific index management
+routines for allocating, freeing, and retrieving default MCAM entries.
+
+Signed-off-by: Suman Ghosh <sumang@marvell.com>
 Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 ---
- .../ethernet/marvell/octeontx2/af/cn20k/npc.c | 361 +++++++++++++++++-
- .../ethernet/marvell/octeontx2/af/cn20k/npc.h |  28 ++
- .../net/ethernet/marvell/octeontx2/af/mbox.h  |   8 +-
- .../net/ethernet/marvell/octeontx2/af/rvu.c   |  17 +-
- .../net/ethernet/marvell/octeontx2/af/rvu.h   |   1 +
- .../ethernet/marvell/octeontx2/af/rvu_npc.c   |  36 +-
- .../marvell/octeontx2/nic/otx2_flows.c        |   2 +-
- 7 files changed, 433 insertions(+), 20 deletions(-)
+ .../ethernet/marvell/octeontx2/af/cn20k/npc.c | 473 +++++++++++++++++-
+ .../ethernet/marvell/octeontx2/af/cn20k/npc.h |  15 +
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |   3 +
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |   4 +-
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |   1 -
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 290 ++++++++---
+ .../marvell/octeontx2/af/rvu_npc_fs.c         |  11 +-
+ 7 files changed, 725 insertions(+), 72 deletions(-)
 
 diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-index 88d7f65d246c..cc5a2fde02b9 100644
+index cc5a2fde02b9..252e86d85f69 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
 +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-@@ -25,10 +25,28 @@ static const char *npc_kw_name[NPC_MCAM_KEY_MAX] = {
- 	[NPC_MCAM_KEY_X4] = "X4",
- };
+@@ -447,7 +447,8 @@ static void npc_program_mkex_rx(struct rvu *rvu, int blkaddr,
  
-+static const char *npc_dft_rule_name[NPC_DFT_RULE_MAX_ID] = {
-+	[NPC_DFT_RULE_PROMISC_ID] = "Promisc",
-+	[NPC_DFT_RULE_MCAST_ID] = "Mcast",
-+	[NPC_DFT_RULE_BCAST_ID] = "Bcast",
-+	[NPC_DFT_RULE_UCAST_ID] = "Ucast",
-+};
-+
- #define KEX_EXTR_CFG(bytesm1, hdr_ofs, ena, key_ofs)		\
- 		     (((bytesm1) << 16) | ((hdr_ofs) << 8) | ((ena) << 7) | \
- 		     ((key_ofs) & 0x3F))
+ 	/* Program EXTRACTOR */
+ 	for (extr = 0; extr < num_extr; extr++)
+-		rvu_write64(rvu, blkaddr, NPC_AF_INTFX_EXTRACTORX_CFG(intf, extr),
++		rvu_write64(rvu, blkaddr,
++			    NPC_AF_INTFX_EXTRACTORX_CFG(intf, extr),
+ 			    mkex_extr->intf_extr_lid[intf][extr]);
  
-+#define NPC_DFT_RULE_ID_MK(pcifunc, id) \
-+	((pcifunc) | FIELD_PREP(GENMASK_ULL(31, 16), id))
-+
-+#define NPC_DFT_RULE_ID_2_PCIFUNC(rid) \
-+	FIELD_GET(GENMASK_ULL(15, 0), rid)
-+
-+#define NPC_DFT_RULE_ID_2_ID(rid) \
-+	FIELD_GET(GENMASK_ULL(31, 16), rid)
-+
-+#define NPC_DFT_RULE_PRIO 127
-+
- static const char cn20k_def_pfl_name[] = "default";
+ 	/* Program EXTRACTOR_LTYPE */
+@@ -518,10 +519,12 @@ void npc_cn20k_load_mkex_profile(struct rvu *rvu, int blkaddr,
  
- static struct npc_mcam_kex_extr npc_mkex_extr_default = {
-@@ -2176,9 +2194,10 @@ rvu_mbox_handler_npc_cn20k_get_free_count(struct rvu *rvu,
+ 	mcam_kex_extr = (struct npc_mcam_kex_extr __force *)mkex_prfl_addr;
+ 
+-	while (((s64)prfl_sz > 0) && (mcam_kex_extr->mkex_sign != MKEX_END_SIGN)) {
++	while (((s64)prfl_sz > 0) && (mcam_kex_extr->mkex_sign !=
++				      MKEX_END_SIGN)) {
+ 		/* Compare with mkex mod_param name string */
+ 		if (mcam_kex_extr->mkex_sign == MKEX_CN20K_SIGN &&
+-		    !strncmp(mcam_kex_extr->name, mkex_profile, MKEX_NAME_LEN)) {
++		    !strncmp(mcam_kex_extr->name, mkex_profile,
++			     MKEX_NAME_LEN)) {
+ 			rvu->kpu.mcam_kex_prfl.mkex_extr = mcam_kex_extr;
+ 			goto program_mkex_extr;
+ 		}
+@@ -532,13 +535,433 @@ void npc_cn20k_load_mkex_profile(struct rvu *rvu, int blkaddr,
+ 	dev_warn(dev, "Failed to load requested profile: %s\n", mkex_profile);
+ 
+ program_mkex_extr:
+-	dev_info(rvu->dev, "Using %s mkex profile\n", rvu->kpu.mcam_kex_prfl.mkex_extr->name);
++	dev_info(rvu->dev, "Using %s mkex profile\n",
++		 rvu->kpu.mcam_kex_prfl.mkex_extr->name);
+ 	/* Program selected mkex profile */
+-	npc_program_mkex_profile(rvu, blkaddr, rvu->kpu.mcam_kex_prfl.mkex_extr);
++	npc_program_mkex_profile(rvu, blkaddr,
++				 rvu->kpu.mcam_kex_prfl.mkex_extr);
+ 	if (mkex_prfl_addr)
+ 		iounmap(mkex_prfl_addr);
+ }
+ 
++void
++npc_cn20k_enable_mcam_entry(struct rvu *rvu, int blkaddr,
++			    int index, bool enable)
++{
++	struct npc_mcam *mcam = &rvu->hw->mcam;
++	int mcam_idx = index % mcam->banksize;
++	int bank = index / mcam->banksize;
++	u64 cfg, hw_prio;
++	u8 kw_type;
++
++	npc_mcam_idx_2_key_type(rvu, index, &kw_type);
++	if (kw_type == NPC_MCAM_KEY_X2) {
++		cfg = rvu_read64(rvu, blkaddr,
++				 NPC_AF_CN20K_MCAMEX_BANKX_CFG_EXT(mcam_idx, bank));
++		hw_prio = cfg & GENMASK_ULL(14, 8);
++		cfg = enable ? 1 : 0;
++		cfg |= hw_prio;
++		rvu_write64(rvu, blkaddr,
++			    NPC_AF_CN20K_MCAMEX_BANKX_CFG_EXT(mcam_idx, bank),
++			    cfg);
++		return;
++	}
++
++	/* For NPC_CN20K_MCAM_KEY_X4 keys, both the banks
++	 * need to be programmed with the same value.
++	 */
++	for (bank = 0; bank < mcam->banks_per_entry; bank++) {
++		cfg = rvu_read64(rvu, blkaddr,
++				 NPC_AF_CN20K_MCAMEX_BANKX_CFG_EXT(mcam_idx, bank));
++		hw_prio = cfg & GENMASK_ULL(14, 8);
++		cfg = enable ? 1 : 0;
++		cfg |= hw_prio;
++		rvu_write64(rvu, blkaddr,
++			    NPC_AF_CN20K_MCAMEX_BANKX_CFG_EXT(mcam_idx, bank),
++			    cfg);
++	}
++}
++
++void
++npc_cn20k_clear_mcam_entry(struct rvu *rvu, int blkaddr, int bank, int index)
++{
++	rvu_write64(rvu, blkaddr,
++		    NPC_AF_CN20K_MCAMEX_BANKX_CAMX_INTF_EXT(index, bank, 1),
++		    0);
++	rvu_write64(rvu, blkaddr,
++		    NPC_AF_CN20K_MCAMEX_BANKX_CAMX_INTF_EXT(index, bank, 0),
++		    0);
++
++	rvu_write64(rvu, blkaddr,
++		    NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W0_EXT(index, bank, 1), 0);
++	rvu_write64(rvu, blkaddr,
++		    NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W0_EXT(index, bank, 0), 0);
++
++	rvu_write64(rvu, blkaddr,
++		    NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W1_EXT(index, bank, 1), 0);
++	rvu_write64(rvu, blkaddr,
++		    NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W1_EXT(index, bank, 0), 0);
++
++	rvu_write64(rvu, blkaddr,
++		    NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W2_EXT(index, bank, 1), 0);
++	rvu_write64(rvu, blkaddr,
++		    NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W2_EXT(index, bank, 0), 0);
++
++	rvu_write64(rvu, blkaddr,
++		    NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W3_EXT(index, bank, 1), 0);
++	rvu_write64(rvu, blkaddr,
++		    NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W3_EXT(index, bank, 0), 0);
++}
++
++static void npc_cn20k_get_keyword(struct mcam_entry *entry, int idx,
++				  u64 *cam0, u64 *cam1)
++{
++	u64 kw_mask;
++
++	/* The two banks of every MCAM entry are used as a single double-wide entry that
++	 * is compared with the search key as follows:
++	 *
++	 * NPC_AF_MCAME()_BANK(0)_CAM(0..1)_W0_EXT[MD] corresponds to NPC_MCAM_KEY_X4_S[KW0]
++	 * NPC_AF_MCAME()_BANK(0)_CAM(0..1)_W1_EXT[MD] corresponds to NPC_MCAM_KEY_X4_S[KW1]
++	 * NPC_AF_MCAME()_BANK(0)_CAM(0..1)_W2_EXT[MD] corresponds to NPC_MCAM_KEY_X4_S[KW2]
++	 * NPC_AF_MCAME()_BANK(0)_CAM(0..1)_W3_EXT[MD] corresponds to NPC_MCAM_KEY_X4_S[KW3]
++	 * NPC_AF_MCAME()_BANK(1)_CAM(0..1)_W0_EXT[MD] corresponds to NPC_MCAM_KEY_X4_S[KW4]
++	 * NPC_AF_MCAME()_BANK(1)_CAM(0..1)_W1_EXT[MD] corresponds to NPC_MCAM_KEY_X4_S[KW5]
++	 * NPC_AF_MCAME()_BANK(1)_CAM(0..1)_W2_EXT[MD] corresponds to NPC_MCAM_KEY_X4_S[KW6]
++	 * NPC_AF_MCAME()_BANK(1)_CAM(0..1)_W3_EXT[MD] corresponds to NPC_MCAM_KEY_X4_S[KW7]
++	 */
++	*cam1 = entry->kw[idx];
++	kw_mask = entry->kw_mask[idx];
++	*cam1 &= kw_mask;
++	*cam0 = ~*cam1 & kw_mask;
++}
++
++static void npc_cn20k_config_kw_x2(struct rvu *rvu, struct npc_mcam *mcam,
++				   int blkaddr, int index, u8 intf,
++				   struct mcam_entry *entry,
++				   int bank, u8 kw_type, int kw)
++{
++	u64 intf_ext = 0, intf_ext_mask = 0;
++	u8 tx_intf_mask = ~intf & 0x3;
++	u8 tx_intf = intf, kex_type;
++	u8 kw_type_mask = ~kw_type;
++	u64 cam0, cam1, kex_cfg;
++
++	if (is_npc_intf_tx(intf)) {
++		/* Last bit must be set and rest don't care
++		 * for TX interfaces
++		 */
++		tx_intf_mask = 0x1;
++		tx_intf = intf & tx_intf_mask;
++		tx_intf_mask = ~tx_intf & tx_intf_mask;
++	}
++
++	kex_cfg = rvu_read64(rvu, blkaddr, NPC_AF_INTFX_KEX_CFG(intf));
++	kex_type = (kex_cfg & GENMASK_ULL(34, 32)) >> 32;
++	/*-------------------------------------------------------------------------------------|
++	 *	Kex type    |  mcam entry   |  cam1	   |	cam 0	|| <----- output ----> |
++	 *	in profile  |  len	    | (key type)   | (key type)	|| len	  |   type     |
++	 *-------------------------------------------------------------------------------------|
++	 *	X2	    |  256 (X2)	    |  001b	   |	110b	|| X2	  |    X2      |
++	 *-------------------------------------------------------------------------------------|
++	 *	X4	    |  256 (X2)	    |  000b	   |	000b	|| X2	  |  DYNAMIC   |
++	 *-------------------------------------------------------------------------------------|
++	 *	X4	    |  512 (X4)	    |  010b	   |	101b	|| X4	  |    X4      |
++	 *-------------------------------------------------------------------------------------|
++	 *    DYNAMIC	    |  256 (X2)	    |  000b	   |	000b	|| X2	  |  DYNAMIC   |
++	 *-------------------------------------------------------------------------------------|
++	 *    DYNAMIC	    |  512 (X4)	    |  010b	   |	101b	|| X4	  |    X4      |
++	 *-------------------------------------------------------------------------------------|
++	 */
++	if ((kex_type == NPC_MCAM_KEY_DYN || kex_type == NPC_MCAM_KEY_X4) &&
++	    kw_type == NPC_MCAM_KEY_X2) {
++		kw_type = 0;
++		kw_type_mask = 0;
++	}
++
++	intf_ext = ((u64)kw_type << 16) | tx_intf;
++	intf_ext_mask = (((u64)kw_type_mask  << 16) & GENMASK_ULL(18, 16)) |
++		tx_intf_mask;
++	rvu_write64(rvu, blkaddr,
++		    NPC_AF_CN20K_MCAMEX_BANKX_CAMX_INTF_EXT(index, bank, 1),
++		    intf_ext);
++	rvu_write64(rvu, blkaddr,
++		    NPC_AF_CN20K_MCAMEX_BANKX_CAMX_INTF_EXT(index, bank, 0),
++		    intf_ext_mask);
++
++	/* Set the match key */
++	npc_cn20k_get_keyword(entry, kw, &cam0, &cam1);
++	rvu_write64(rvu, blkaddr,
++		    NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W0_EXT(index, bank, 1),
++		    cam1);
++	rvu_write64(rvu, blkaddr,
++		    NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W0_EXT(index, bank, 0),
++		    cam0);
++
++	npc_cn20k_get_keyword(entry, kw + 1, &cam0, &cam1);
++	rvu_write64(rvu, blkaddr,
++		    NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W1_EXT(index, bank, 1),
++		    cam1);
++	rvu_write64(rvu, blkaddr,
++		    NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W1_EXT(index, bank, 0),
++		    cam0);
++
++	npc_cn20k_get_keyword(entry, kw + 2, &cam0, &cam1);
++	rvu_write64(rvu, blkaddr,
++		    NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W2_EXT(index, bank, 1),
++		    cam1);
++	rvu_write64(rvu, blkaddr,
++		    NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W2_EXT(index, bank, 0),
++		    cam0);
++
++	npc_cn20k_get_keyword(entry, kw + 3, &cam0, &cam1);
++	rvu_write64(rvu, blkaddr,
++		    NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W3_EXT(index, bank, 1),
++		    cam1);
++	rvu_write64(rvu, blkaddr,
++		    NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W3_EXT(index, bank, 0),
++		    cam0);
++}
++
++static void npc_cn20k_config_kw_x4(struct rvu *rvu, struct npc_mcam *mcam,
++				   int blkaddr, int index, u8 intf,
++				   struct mcam_entry *entry, u8 kw_type)
++{
++	int kw = 0, bank;
++
++	for (bank = 0; bank < mcam->banks_per_entry; bank++, kw = kw + 4)
++		npc_cn20k_config_kw_x2(rvu, mcam, blkaddr,
++				       index, intf,
++				       entry, bank, kw_type, kw);
++}
++
++static void
++npc_cn20k_set_mcam_bank_cfg(struct rvu *rvu, int blkaddr, int mcam_idx,
++			    int bank, u8 kw_type, bool enable, u8 hw_prio)
++{
++	struct npc_mcam *mcam = &rvu->hw->mcam;
++	u64 bank_cfg;
++
++	bank_cfg = (u64)hw_prio << 8;
++	if (enable)
++		bank_cfg |= 0x1;
++
++	if (kw_type == NPC_MCAM_KEY_X2) {
++		rvu_write64(rvu, blkaddr,
++			    NPC_AF_CN20K_MCAMEX_BANKX_CFG_EXT(mcam_idx, bank),
++			    bank_cfg);
++		return;
++	}
++
++	/* For NPC_MCAM_KEY_X4 keys, both the banks
++	 * need to be programmed with the same value.
++	 */
++	for (bank = 0; bank < mcam->banks_per_entry; bank++) {
++		rvu_write64(rvu, blkaddr,
++			    NPC_AF_CN20K_MCAMEX_BANKX_CFG_EXT(mcam_idx, bank),
++			    bank_cfg);
++	}
++}
++
++void
++npc_cn20k_config_mcam_entry(struct rvu *rvu, int blkaddr, int index, u8 intf,
++			    struct mcam_entry *entry, bool enable, u8 hw_prio)
++{
++	struct npc_mcam *mcam = &rvu->hw->mcam;
++	int mcam_idx = index % mcam->banksize;
++	int bank = index / mcam->banksize;
++	int kw = 0;
++	u8 kw_type;
++
++	/* Disable before mcam entry update */
++	npc_cn20k_enable_mcam_entry(rvu, blkaddr, index, false);
++
++	npc_mcam_idx_2_key_type(rvu, index, &kw_type);
++	/* CAM1 takes the comparison value and
++	 * CAM0 specifies match for a bit in key being '0' or '1' or 'dontcare'.
++	 * CAM1<n> = 0 & CAM0<n> = 1 => match if key<n> = 0
++	 * CAM1<n> = 1 & CAM0<n> = 0 => match if key<n> = 1
++	 * CAM1<n> = 0 & CAM0<n> = 0 => always match i.e dontcare.
++	 */
++	if (kw_type == NPC_MCAM_KEY_X2) {
++		/* Clear mcam entry to avoid writes being suppressed by NPC */
++		npc_cn20k_clear_mcam_entry(rvu, blkaddr, bank, mcam_idx);
++		npc_cn20k_config_kw_x2(rvu, mcam, blkaddr,
++				       mcam_idx, intf, entry,
++				       bank, kw_type, kw);
++		/* Set 'action' */
++		rvu_write64(rvu, blkaddr,
++			    NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(mcam_idx, bank, 0),
++			    entry->action);
++
++		/* Set TAG 'action' */
++		rvu_write64(rvu, blkaddr,
++			    NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(mcam_idx, bank, 1),
++			    entry->vtag_action);
++	} else {
++		/* Clear mcam entry to avoid writes being suppressed by NPC */
++		npc_cn20k_clear_mcam_entry(rvu, blkaddr, 0, mcam_idx);
++		npc_cn20k_clear_mcam_entry(rvu, blkaddr, 1, mcam_idx);
++
++		npc_cn20k_config_kw_x4(rvu, mcam, blkaddr,
++				       mcam_idx, intf, entry, kw_type);
++		for (bank = 0; bank < mcam->banks_per_entry; bank++) {
++			/* Set 'action' */
++			rvu_write64(rvu, blkaddr,
++				    NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(mcam_idx, bank, 0),
++				    entry->action);
++
++			/* Set TAG 'action' */
++			rvu_write64(rvu, blkaddr,
++				    NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(mcam_idx, bank, 1),
++				    entry->vtag_action);
++		}
++	}
++
++	/* TODO: */
++	/* PF installing VF rule */
++	npc_cn20k_set_mcam_bank_cfg(rvu, blkaddr, mcam_idx, bank,
++				    kw_type, enable, hw_prio);
++}
++
++void npc_cn20k_copy_mcam_entry(struct rvu *rvu, int blkaddr, u16 src, u16 dest)
++{
++	struct npc_mcam *mcam = &rvu->hw->mcam;
++	u8 src_kwtype, dest_kwtype;
++	u64 cfg, sreg, dreg;
++	int dbank, sbank;
++	int bank, i;
++
++	dbank = npc_get_bank(mcam, dest);
++	sbank = npc_get_bank(mcam, src);
++	npc_mcam_idx_2_key_type(rvu, src, &src_kwtype);
++	npc_mcam_idx_2_key_type(rvu, dest, &dest_kwtype);
++	if (src_kwtype != dest_kwtype)
++		return;
++
++	src &= (mcam->banksize - 1);
++	dest &= (mcam->banksize - 1);
++
++	/* Copy INTF's, W0's, W1's, W2's, W3s CAM0 and CAM1 configuration */
++	for (bank = 0; bank < mcam->banks_per_entry; bank++) {
++		sreg = NPC_AF_CN20K_MCAMEX_BANKX_CAMX_INTF_EXT(src, sbank + bank, 0);
++		dreg = NPC_AF_CN20K_MCAMEX_BANKX_CAMX_INTF_EXT(dest, dbank + bank, 0);
++		for (i = 0; i < 10; i++) {
++			cfg = rvu_read64(rvu, blkaddr, sreg + (i * 8));
++			rvu_write64(rvu, blkaddr, dreg + (i * 8), cfg);
++		}
++
++		/* Copy action */
++		for (i = 0; i < 3; i++) {
++			cfg = rvu_read64(rvu, blkaddr,
++					 NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(src,
++									       sbank + bank,
++									       i));
++			rvu_write64(rvu, blkaddr,
++				    NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(dest,
++									  dbank + bank,
++									  i), cfg);
++		}
++
++		/* Copy bank configuration */
++		cfg = rvu_read64(rvu, blkaddr,
++				 NPC_AF_CN20K_MCAMEX_BANKX_CFG_EXT(src, sbank + bank));
++		rvu_write64(rvu, blkaddr,
++			    NPC_AF_CN20K_MCAMEX_BANKX_CFG_EXT(dest, dbank + bank), cfg);
++		if (src_kwtype == NPC_MCAM_KEY_X2)
++			break;
++	}
++}
++
++static void npc_cn20k_fill_entryword(struct mcam_entry *entry, int idx,
++				     u64 cam0, u64 cam1)
++{
++	entry->kw[idx] = cam1;
++	entry->kw_mask[idx] = cam1 ^ cam0;
++}
++
++void npc_cn20k_read_mcam_entry(struct rvu *rvu, int blkaddr, u16 index,
++			       struct mcam_entry *entry, u8 *intf, u8 *ena,
++			       u8 *hw_prio)
++{
++	struct npc_mcam *mcam = &rvu->hw->mcam;
++	int kw = 0, bank;
++	u64 cam0, cam1, bank_cfg;
++	u8 kw_type;
++
++	npc_mcam_idx_2_key_type(rvu, index, &kw_type);
++
++	bank = npc_get_bank(mcam, index);
++	index &= (mcam->banksize - 1);
++	*intf = rvu_read64(rvu, blkaddr,
++			   NPC_AF_CN20K_MCAMEX_BANKX_CAMX_INTF_EXT(index, bank, 1)) & 3;
++	bank_cfg = rvu_read64(rvu, blkaddr,
++			      NPC_AF_CN20K_MCAMEX_BANKX_CFG_EXT(index, bank));
++	*ena = bank_cfg & 0x1;
++	*hw_prio = (bank_cfg & GENMASK_ULL(14, 8)) >> 8;
++	if (kw_type == NPC_MCAM_KEY_X2) {
++		cam1 = rvu_read64(rvu, blkaddr,
++				  NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W0_EXT(index, bank, 1));
++		cam0 = rvu_read64(rvu, blkaddr,
++				  NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W0_EXT(index, bank, 0));
++		npc_cn20k_fill_entryword(entry, kw, cam0, cam1);
++
++		cam1 = rvu_read64(rvu, blkaddr,
++				  NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W1_EXT(index, bank, 1));
++		cam0 = rvu_read64(rvu, blkaddr,
++				  NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W1_EXT(index, bank, 0));
++		npc_cn20k_fill_entryword(entry, kw + 1, cam0, cam1);
++
++		cam1 = rvu_read64(rvu, blkaddr,
++				  NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W2_EXT(index, bank, 1));
++		cam0 = rvu_read64(rvu, blkaddr,
++				  NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W2_EXT(index, bank, 0));
++		npc_cn20k_fill_entryword(entry, kw + 2, cam0, cam1);
++
++		cam1 = rvu_read64(rvu, blkaddr,
++				  NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W3_EXT(index, bank, 1));
++		cam0 = rvu_read64(rvu, blkaddr,
++				  NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W3_EXT(index, bank, 0));
++		npc_cn20k_fill_entryword(entry, kw + 3, cam0, cam1);
++		goto read_action;
++	}
++
++	for (bank = 0; bank < mcam->banks_per_entry; bank++, kw = kw + 4) {
++		cam1 = rvu_read64(rvu, blkaddr,
++				  NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W0_EXT(index, bank, 1));
++		cam0 = rvu_read64(rvu, blkaddr,
++				  NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W0_EXT(index, bank, 0));
++		npc_cn20k_fill_entryword(entry, kw, cam0, cam1);
++
++		cam1 = rvu_read64(rvu, blkaddr,
++				  NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W1_EXT(index, bank, 1));
++		cam0 = rvu_read64(rvu, blkaddr,
++				  NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W1_EXT(index, bank, 0));
++		npc_cn20k_fill_entryword(entry, kw + 1, cam0, cam1);
++
++		cam1 = rvu_read64(rvu, blkaddr,
++				  NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W2_EXT(index, bank, 1));
++		cam0 = rvu_read64(rvu, blkaddr,
++				  NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W2_EXT(index, bank, 0));
++		npc_cn20k_fill_entryword(entry, kw + 2, cam0, cam1);
++
++		cam1 = rvu_read64(rvu, blkaddr,
++				  NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W3_EXT(index, bank, 1));
++		cam0 = rvu_read64(rvu, blkaddr,
++				  NPC_AF_CN20K_MCAMEX_BANKX_CAMX_W3_EXT(index, bank, 0));
++		npc_cn20k_fill_entryword(entry, kw + 3, cam0, cam1);
++	}
++
++read_action:
++	/* 'action' is set to same value for both bank '0' and '1'.
++	 * Hence, reading bank '0' should be enough.
++	 */
++	entry->action = rvu_read64(rvu, blkaddr,
++				   NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(index, 0, 0));
++	entry->vtag_action = rvu_read64(rvu, blkaddr,
++					NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(index, 0, 1));
++}
++
+ static u8 npc_map2cn20k_flag(u8 flag)
+ {
+ 	switch (flag) {
+@@ -609,13 +1032,15 @@ npc_cn20k_update_action_entries_n_flags(struct rvu *rvu,
+ 	}
+ }
+ 
+-int npc_cn20k_apply_custom_kpu(struct rvu *rvu, struct npc_kpu_profile_adapter *profile)
++int npc_cn20k_apply_custom_kpu(struct rvu *rvu,
++			       struct npc_kpu_profile_adapter *profile)
+ {
+-	size_t hdr_sz = sizeof(struct npc_cn20k_kpu_profile_fwdata), offset = 0;
++	size_t hdr_sz = sizeof(struct npc_cn20k_kpu_profile_fwdata);
+ 	struct npc_cn20k_kpu_profile_fwdata *fw = rvu->kpu_fwdata;
+ 	struct npc_kpu_profile_action *action;
+ 	struct npc_kpu_profile_cam *cam;
+ 	struct npc_kpu_fwdata *fw_kpu;
++	size_t offset = 0;
+ 	u16 kpu, entry;
+ 	int entries;
+ 
+@@ -701,6 +1126,40 @@ int npc_cn20k_apply_custom_kpu(struct rvu *rvu, struct npc_kpu_profile_adapter *
  	return 0;
  }
  
--int rvu_mbox_handler_npc_cn20k_get_kex_cfg(struct rvu *rvu,
--					   struct msg_req *req,
--					   struct npc_cn20k_get_kex_cfg_rsp *rsp)
-+int
-+rvu_mbox_handler_npc_cn20k_get_kex_cfg(struct rvu *rvu,
-+				       struct msg_req *req,
-+				       struct npc_cn20k_get_kex_cfg_rsp *rsp)
- {
- 	int extr, lt;
- 
-@@ -2396,6 +2415,340 @@ static int npc_pcifunc_map_create(struct rvu *rvu)
- 	return cnt;
- }
- 
-+int npc_cn20k_dft_rules_idx_get(struct rvu *rvu, u16 pcifunc, u16 *bcast,
-+				u16 *mcast, u16 *promisc, u16 *ucast)
++int npc_mcam_idx_2_key_type(struct rvu *rvu, u16 mcam_idx, u8 *key_type)
 +{
-+	u16 *ptr[4] = {promisc, mcast, bcast, ucast};
-+	unsigned long idx;
-+	bool set = false;
-+	void *val;
-+	int i, j;
++	struct npc_subbank *sb;
++	int bank_off, sb_id;
 +
-+	if (!npc_priv.init_done)
-+		return 0;
-+
-+	if (is_lbk_vf(rvu, pcifunc)) {
-+		if (!ptr[0])
-+			return -ENOMEM;
-+
-+		idx = NPC_DFT_RULE_ID_MK(pcifunc, NPC_DFT_RULE_PROMISC_ID);
-+		val = xa_load(&npc_priv.xa_pf2dfl_rmap, idx);
-+		if (!val) {
-+			pr_debug("%s:%d Failed to find %s index for pcifunc=%#x\n",
-+				 __func__, __LINE__,
-+				 npc_dft_rule_name[NPC_DFT_RULE_PROMISC_ID],
-+				 pcifunc);
-+
-+			*ptr[0] = USHRT_MAX;
-+			return -ESRCH;
-+		}
-+
-+		*ptr[0] = xa_to_value(val);
-+		return 0;
++	/* mcam_idx should be less than (2 * bank depth) */
++	if (mcam_idx >= npc_priv.bank_depth * 2) {
++		dev_err(rvu->dev, "%s:%d bad params\n",
++			__func__, __LINE__);
++		return -EINVAL;
 +	}
 +
-+	if (is_vf(pcifunc)) {
-+		if (!ptr[3])
-+			return -ENOMEM;
++	/* find mcam offset per bank */
++	bank_off = mcam_idx & (npc_priv.bank_depth - 1);
 +
-+		idx = NPC_DFT_RULE_ID_MK(pcifunc, NPC_DFT_RULE_UCAST_ID);
-+		val = xa_load(&npc_priv.xa_pf2dfl_rmap, idx);
-+		if (!val) {
-+			pr_debug("%s:%d Failed to find %s index for pcifunc=%#x\n",
-+				 __func__, __LINE__,
-+				 npc_dft_rule_name[NPC_DFT_RULE_UCAST_ID],
-+				 pcifunc);
++	/* Find subbank id */
++	sb_id = bank_off / npc_priv.subbank_depth;
 +
-+			*ptr[3] = USHRT_MAX;
-+			return -ESRCH;
-+		}
-+
-+		*ptr[3] = xa_to_value(val);
-+		return 0;
-+	}
-+
-+	for (i = NPC_DFT_RULE_START_ID, j = 0; i < NPC_DFT_RULE_MAX_ID; i++,
-+	     j++) {
-+		if (!ptr[j])
-+			continue;
-+
-+		idx = NPC_DFT_RULE_ID_MK(pcifunc, i);
-+		val = xa_load(&npc_priv.xa_pf2dfl_rmap, idx);
-+		if (!val) {
-+			pr_debug("%s:%d Failed to find %s index for pcifunc=%#x\n",
-+				 __func__, __LINE__,
-+				 npc_dft_rule_name[i], pcifunc);
-+
-+			*ptr[j] = USHRT_MAX;
-+			continue;
-+		}
-+
-+		*ptr[j] = xa_to_value(val);
-+		set = true;
-+	}
-+
-+	return  set ? 0 : -ESRCH;
-+}
-+
-+static bool npc_is_cgx_or_lbk(struct rvu *rvu, u16 pcifunc)
-+{
-+	return is_pf_cgxmapped(rvu, rvu_get_pf(rvu->pdev, pcifunc)) ||
-+		is_lbk_vf(rvu, pcifunc);
-+}
-+
-+void npc_cn20k_dft_rules_free(struct rvu *rvu, u16 pcifunc)
-+{
-+	struct npc_mcam_free_entry_req free_req = { 0 };
-+	unsigned long index;
-+	struct msg_rsp rsp;
-+	u16 ptr[4];
-+	int rc, i;
-+	void *map;
-+
-+	if (!npc_priv.init_done)
-+		return;
-+
-+	if (!npc_is_cgx_or_lbk(rvu, pcifunc)) {
-+		dev_dbg(rvu->dev,
-+			"%s:%d dft rule allocation is only for cgx mapped device, pcifunc=%#x\n",
-+			__func__, __LINE__, pcifunc);
-+		return;
-+	}
-+
-+	rc = npc_cn20k_dft_rules_idx_get(rvu, pcifunc, &ptr[0], &ptr[1],
-+					 &ptr[2], &ptr[3]);
-+	if (rc)
-+		return;
-+
-+	/* LBK */
-+	if (is_lbk_vf(rvu, pcifunc)) {
-+		index = NPC_DFT_RULE_ID_MK(pcifunc, NPC_DFT_RULE_PROMISC_ID);
-+		map = xa_erase(&npc_priv.xa_pf2dfl_rmap, index);
-+		if (!map)
-+			dev_dbg(rvu->dev,
-+				"%s:%d Err from delete %s mcam idx from xarray (pcifunc=%#x\n",
-+				__func__, __LINE__,
-+				npc_dft_rule_name[NPC_DFT_RULE_PROMISC_ID],
-+				pcifunc);
-+
-+		goto free_rules;
-+	}
-+
-+	/* VF */
-+	if (is_vf(pcifunc)) {
-+		index = NPC_DFT_RULE_ID_MK(pcifunc, NPC_DFT_RULE_UCAST_ID);
-+		map = xa_erase(&npc_priv.xa_pf2dfl_rmap, index);
-+		if (!map)
-+			dev_dbg(rvu->dev,
-+				"%s:%d Err from delete %s mcam idx from xarray (pcifunc=%#x\n",
-+				__func__, __LINE__,
-+				npc_dft_rule_name[NPC_DFT_RULE_UCAST_ID],
-+				pcifunc);
-+
-+		goto free_rules;
-+	}
-+
-+	/* PF */
-+	for (i = NPC_DFT_RULE_START_ID; i < NPC_DFT_RULE_MAX_ID; i++)  {
-+		index = NPC_DFT_RULE_ID_MK(pcifunc, i);
-+		map = xa_erase(&npc_priv.xa_pf2dfl_rmap, index);
-+		if (!map)
-+			dev_dbg(rvu->dev,
-+				"%s:%d Err from delete %s mcam idx from xarray (pcifunc=%#x\n",
-+				__func__, __LINE__, npc_dft_rule_name[i],
-+				pcifunc);
-+	}
-+
-+free_rules:
-+
-+	free_req.hdr.pcifunc = pcifunc;
-+	free_req.all = 1;
-+	rc = rvu_mbox_handler_npc_mcam_free_entry(rvu, &free_req, &rsp);
-+	if (rc)
-+		dev_err(rvu->dev,
-+			"%s:%d Error deleting default entries (pcifunc=%#x\n",
-+			__func__, __LINE__, pcifunc);
-+}
-+
-+int npc_cn20k_dft_rules_alloc(struct rvu *rvu, u16 pcifunc)
-+{
-+	u16 mcam_idx[4] = { 0 }, pf_ucast, pf_pcifunc;
-+	struct npc_mcam_alloc_entry_req req = { 0 };
-+	struct npc_mcam_alloc_entry_rsp rsp = { 0 };
-+	int ret, eidx, i, k, pf, cnt;
-+	struct rvu_pfvf *pfvf;
-+	unsigned long index;
-+	u16 b, m, p, u;
-+
-+	if (!npc_priv.init_done)
-+		return 0;
-+
-+	if (!npc_is_cgx_or_lbk(rvu, pcifunc)) {
-+		dev_dbg(rvu->dev,
-+			"%s:%d dft rule allocation is only for cgx mapped device, pcifunc=%#x\n",
-+			__func__, __LINE__, pcifunc);
-+		return 0;
-+	}
-+
-+	/* Check if default rules are already alloced for this pcifunc */
-+	ret =  npc_cn20k_dft_rules_idx_get(rvu, pcifunc, &b, &m, &p, &u);
-+	if (!ret) {
-+		dev_err(rvu->dev,
-+			"%s:%d default rules are already installed (pcifunc=%#x)\n",
-+			__func__, __LINE__, pcifunc);
-+		dev_err(rvu->dev,
-+			"%s:%d bcast(%u) mcast(%u) promisc(%u) ucast(%u)\n",
-+			__func__, __LINE__, b, m, p, u);
-+		return 0;
-+	}
-+
-+	/* Set ref index as lowest priority index */
-+	eidx = 2 * npc_priv.bank_depth - 1;
-+
-+	/* Install only UCAST for VF */
-+	cnt = is_vf(pcifunc) ? 1 : ARRAY_SIZE(mcam_idx);
-+
-+	/* For VF pcifunc, allocate default mcam indexes by taking
-+	 * ref as PF's ucast index.
++	/* Check if subbank id is more than maximum
++	 * number of subbanks available
 +	 */
-+	if (is_vf(pcifunc)) {
-+		pf = rvu_get_pf(rvu->pdev, pcifunc);
-+		pf_pcifunc = pf << RVU_CN20K_PFVF_PF_SHIFT;
-+
-+		/* Get PF's ucast entry index */
-+		ret = npc_cn20k_dft_rules_idx_get(rvu, pf_pcifunc, NULL,
-+						  NULL, NULL, &pf_ucast);
-+
-+		/* There is no PF rules installed; and VF installation comes
-+		 * first. PF may come later.
-+		 * TODO: Install PF rules before installing VF rules.
-+		 */
-+
-+		/* Set PF's ucast as ref entry */
-+		if (!ret)
-+			eidx = pf_ucast;
++	if (sb_id >= npc_priv.num_subbanks) {
++		dev_err(rvu->dev, "%s:%d invalid subbank %d\n",
++			__func__, __LINE__, sb_id);
++		return -EINVAL;
 +	}
 +
-+	pfvf = rvu_get_pfvf(rvu, pcifunc);
-+	pfvf->hw_prio = NPC_DFT_RULE_PRIO;
++	sb = &npc_priv.sb[sb_id];
 +
-+	req.contig = false;
-+	req.ref_prio = NPC_MCAM_HIGHER_PRIO;
-+	req.ref_entry = eidx;
-+	req.kw_type = NPC_MCAM_KEY_X2;
-+	req.count = cnt;
-+	req.hdr.pcifunc = pcifunc;
++	*key_type = sb->key_type;
 +
-+	ret = rvu_mbox_handler_npc_mcam_alloc_entry(rvu, &req, &rsp);
-+
-+	/* successfully allocated index */
-+	if (!ret) {
-+		/* Copy indexes to local array */
-+		for (i = 0; i < cnt; i++)
-+			mcam_idx[i] = rsp.entry_list[i];
-+
-+		goto chk_sanity;
-+	}
-+
-+	/* If there is no slots available and request is for PF,
-+	 * return error.
-+	 */
-+	if (!is_vf(pcifunc)) {
-+		dev_err(rvu->dev,
-+			"%s:%d Default index allocation failed for pcifunc=%#x\n",
-+			__func__, __LINE__, pcifunc);
-+		return ret;
-+	}
-+
-+	/* We could not find an index with higher priority index for VF.
-+	 * Find rule with lower priority index and set hardware priority
-+	 * as NPC_DFT_RULE_PRIO - 1 (higher hw priority)
-+	 */
-+	req.contig = false;
-+	req.kw_type = NPC_MCAM_KEY_X2;
-+	req.count = cnt;
-+	req.hdr.pcifunc = pcifunc;
-+	req.ref_prio = NPC_MCAM_LOWER_PRIO;
-+	req.ref_entry = eidx + 1;
-+	ret = rvu_mbox_handler_npc_mcam_alloc_entry(rvu, &req, &rsp);
-+	if (ret) {
-+		dev_err(rvu->dev,
-+			"%s:%d Default index allocation failed for pcifunc=%#x\n",
-+			__func__, __LINE__, pcifunc);
-+		return ret;
-+	}
-+
-+	/* Copy indexes to local array */
-+	for (i = 0; i < cnt; i++)
-+		mcam_idx[i] = rsp.entry_list[i];
-+
-+	pfvf->hw_prio = NPC_DFT_RULE_PRIO - 1;
-+
-+chk_sanity:
-+	dev_dbg(rvu->dev,
-+		"%s:%d Default index for pcifunc=%#x, bcast=%u mcast=%u promise=%u ucast=%u cnt=%u\n",
-+		__func__, __LINE__, pcifunc, mcam_idx[0], mcam_idx[1],
-+		mcam_idx[2], mcam_idx[3], cnt);
-+
-+	/* LBK */
-+	if (is_lbk_vf(rvu, pcifunc)) {
-+		index = NPC_DFT_RULE_ID_MK(pcifunc, NPC_DFT_RULE_PROMISC_ID);
-+		ret = xa_insert(&npc_priv.xa_pf2dfl_rmap, index,
-+				xa_mk_value(mcam_idx[0]), GFP_KERNEL);
-+		if (ret) {
-+			dev_err(rvu->dev,
-+				"%s:%d Err to insert %s mcam idx to xarray pcifunc=%#x\n",
-+				__func__, __LINE__,
-+				npc_dft_rule_name[NPC_DFT_RULE_PROMISC_ID],
-+				pcifunc);
-+			ret = -EFAULT;
-+			goto err;
-+		}
-+
-+		goto done;
-+	}
-+
-+	/* VF */
-+	if (is_vf(pcifunc)) {
-+		index = NPC_DFT_RULE_ID_MK(pcifunc, NPC_DFT_RULE_UCAST_ID);
-+		ret = xa_insert(&npc_priv.xa_pf2dfl_rmap, index,
-+				xa_mk_value(mcam_idx[0]), GFP_KERNEL);
-+		if (ret) {
-+			dev_err(rvu->dev,
-+				"%s:%d Err to insert %s mcam idx to xarray pcifunc=%#x\n",
-+				__func__, __LINE__,
-+				npc_dft_rule_name[NPC_DFT_RULE_UCAST_ID],
-+				pcifunc);
-+			ret = -EFAULT;
-+			goto err;
-+		}
-+
-+		goto done;
-+	}
-+
-+	/* PF */
-+	for (i = NPC_DFT_RULE_START_ID, k = 0; i < NPC_DFT_RULE_MAX_ID &&
-+	     k < cnt; i++, k++) {
-+		index = NPC_DFT_RULE_ID_MK(pcifunc, i);
-+		ret = xa_insert(&npc_priv.xa_pf2dfl_rmap, index,
-+				xa_mk_value(mcam_idx[k]), GFP_KERNEL);
-+		if (ret) {
-+			dev_err(rvu->dev,
-+				"%s:%d Err to insert %s mcam idx to xarray pcifunc=%#x\n",
-+				__func__, __LINE__, npc_dft_rule_name[i],
-+				pcifunc);
-+			ret = -EFAULT;
-+			goto err;
-+		}
-+	}
-+
-+done:
 +	return 0;
-+err:
-+	/* TODO: handle errors */
-+	return ret;
 +}
 +
- static int npc_priv_init(struct rvu *rvu)
+ static int npc_subbank_idx_2_mcam_idx(struct rvu *rvu, struct npc_subbank *sb,
+ 				      u16 sub_off, u16 *mcam_idx)
  {
- 	struct npc_mcam *mcam = &rvu->hw->mcam;
-@@ -2446,6 +2799,7 @@ static int npc_priv_init(struct rvu *rvu)
- 	xa_init_flags(&npc_priv.xa_sb_free, XA_FLAGS_ALLOC);
- 	xa_init_flags(&npc_priv.xa_idx2pf_map, XA_FLAGS_ALLOC);
- 	xa_init_flags(&npc_priv.xa_pf_map, XA_FLAGS_ALLOC);
-+	xa_init_flags(&npc_priv.xa_pf2dfl_rmap, XA_FLAGS_ALLOC);
- 
- 	if (npc_create_srch_order(num_subbanks)) {
- 		kfree(npc_priv.sb);
-@@ -2483,6 +2837,7 @@ void npc_cn20k_deinit(struct rvu *rvu)
- 	xa_destroy(&npc_priv.xa_sb_free);
- 	xa_destroy(&npc_priv.xa_idx2pf_map);
- 	xa_destroy(&npc_priv.xa_pf_map);
-+	xa_destroy(&npc_priv.xa_pf2dfl_rmap);
- 
- 	for (i = 0; i < npc_priv.pf_cnt; i++)
- 		xa_destroy(&npc_priv.xa_pf2idx_map[i]);
 diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
-index 461fb10e25a6..f3fca233ef57 100644
+index f3fca233ef57..061827df04ea 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
 +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h
-@@ -95,6 +95,26 @@ enum npc_subbank_flag {
- 	NPC_SUBBANK_FLAG_USED = BIT(1), /* At least one slot allocated */
- };
+@@ -290,4 +290,19 @@ void npc_cn20k_dft_rules_free(struct rvu *rvu, u16 pcifunc);
  
-+/**
-+ * enum npc_dft_rule_id - Default rule type
-+ *
-+ * Mcam default rule type.
-+ *
-+ * @NPC_DFT_RULE_START_ID: Not used
-+ * @NPC_DFT_RULE_PROMISC_ID:  promiscuous rule
-+ * @NPC_DFT_RULE_MCAST_ID:  promiscuous rule
-+ * @NPC_DFT_RULE_BCAST_ID:  broadcast rule
-+ * @NPC_DFT_RULE_UCAST_ID:  unicast rule
-+ */
-+enum npc_dft_rule_id {
-+	NPC_DFT_RULE_START_ID = 1,
-+	NPC_DFT_RULE_PROMISC_ID = NPC_DFT_RULE_START_ID,
-+	NPC_DFT_RULE_MCAST_ID,
-+	NPC_DFT_RULE_BCAST_ID,
-+	NPC_DFT_RULE_UCAST_ID,
-+	NPC_DFT_RULE_MAX_ID,
-+};
+ int npc_cn20k_dft_rules_idx_get(struct rvu *rvu, u16 pcifunc, u16 *bcast,
+ 				u16 *mcast, u16 *promisc, u16 *ucast);
 +
- /**
-  * struct npc_subbank - Subbank fields.
-  * @b0b:	Subbanks bottom index for bank0
-@@ -140,6 +160,7 @@ struct npc_subbank {
-  * @xa_pf_map:		Pcifunc to index map.
-  * @pf_cnt:		Number of PFs.A
-  * @init_don:		Indicates MCAM initialization is done.
-+ * @xa_pf2dfl_rmap:	PF to default rule index map.
-  *
-  * This structure is populated during probing time by reading
-  * HW csr registers.
-@@ -156,6 +177,7 @@ struct npc_priv_t {
- 	struct xarray *xa_pf2idx_map;	/* Each PF to map its mcam idxes */
- 	struct xarray xa_idx2pf_map;	/* Mcam idxes to pf map. */
- 	struct xarray xa_pf_map;	/* pcifunc to index map. */
-+	struct xarray xa_pf2dfl_rmap;	/* pcifunc to default rule index */
- 	int pf_cnt;
- 	bool init_done;
- };
-@@ -262,4 +284,10 @@ int npc_cn20k_apply_custom_kpu(struct rvu *rvu, struct npc_kpu_profile_adapter *
- void
- npc_cn20k_update_action_entries_n_flags(struct rvu *rvu,
- 					struct npc_kpu_profile_adapter *profile);
++void npc_cn20k_config_mcam_entry(struct rvu *rvu, int blkaddr, int index,
++				 u8 intf, struct mcam_entry *entry,
++				 bool enable, u8 hw_prio);
++void npc_cn20k_enable_mcam_entry(struct rvu *rvu, int blkaddr,
++				 int index, bool enable);
++void npc_cn20k_copy_mcam_entry(struct rvu *rvu, int blkaddr,
++			       u16 src, u16 dest);
++void npc_cn20k_read_mcam_entry(struct rvu *rvu, int blkaddr, u16 index,
++			       struct mcam_entry *entry, u8 *intf, u8 *ena,
++			       u8 *hw_prio);
++void npc_cn20k_clear_mcam_entry(struct rvu *rvu, int blkaddr,
++				int bank, int index);
++int npc_mcam_idx_2_key_type(struct rvu *rvu, u16 mcam_idx, u8 *key_type);
 +
-+int npc_cn20k_dft_rules_alloc(struct rvu *rvu, u16 pcifunc);
-+void npc_cn20k_dft_rules_free(struct rvu *rvu, u16 pcifunc);
-+
-+int npc_cn20k_dft_rules_idx_get(struct rvu *rvu, u16 pcifunc, u16 *bcast,
-+				u16 *mcast, u16 *promisc, u16 *ucast);
  #endif /* NPC_CN20K_H */
 diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-index 2b413c99a841..49c9ee15c74f 100644
+index 49c9ee15c74f..24df1b67bde3 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
 +++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-@@ -1539,9 +1539,10 @@ struct npc_mcam_alloc_entry_req {
- #define NPC_MCAM_ANY_PRIO		0
- #define NPC_MCAM_LOWER_PRIO		1
- #define NPC_MCAM_HIGHER_PRIO		2
--	u8  priority; /* Lower or higher w.r.t ref_entry */
-+	u8  ref_prio; /* Lower or higher w.r.t ref_entry */
- 	u16 ref_entry;
- 	u16 count;    /* Number of entries requested */
-+	u8 kw_type; /* entry key type, valid for cn20k */
- };
- 
- struct npc_mcam_alloc_entry_rsp {
-@@ -1634,10 +1635,12 @@ struct npc_mcam_alloc_and_write_entry_req {
- 	struct mbox_msghdr hdr;
- 	struct mcam_entry entry_data;
- 	u16 ref_entry;
--	u8  priority;    /* Lower or higher w.r.t ref_entry */
-+	u8  ref_prio;    /* Lower or higher w.r.t ref_entry */
+@@ -1577,6 +1577,8 @@ struct npc_mcam_write_entry_req {
  	u8  intf;	 /* Rx or Tx interface */
  	u8  enable_entry;/* Enable this MCAM entry ? */
- 	u8  alloc_cntr;  /* Allocate counter and map ? */
-+	/* hardware priority, supported for cn20k */
-+	u8 hw_prio;
+ 	u8  set_cntr;    /* Set counter for this entry ? */
++	u8  hw_prio;	 /* hardware priority, valid for cn20k */
++	u64 reserved;	 /* reserved for future use */
  };
  
- struct npc_mcam_alloc_and_write_entry_rsp {
-@@ -1790,6 +1793,7 @@ struct npc_install_flow_req {
- 	u8  vtag1_op;
- 	/* old counter value */
- 	u16 cntr_val;
-+	u8 hw_prio;
+ /* Enable/Disable a given entry */
+@@ -1824,6 +1826,7 @@ struct npc_mcam_read_entry_rsp {
+ 	struct mcam_entry entry_data;
+ 	u8 intf;
+ 	u8 enable;
++	u8 hw_prio; /* valid for cn20k */
  };
  
- struct npc_install_flow_rsp {
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-index 2d78e08f985f..df02caedc020 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-@@ -22,6 +22,7 @@
- #include "rvu_npc_hash.h"
- #include "cn20k/reg.h"
- #include "cn20k/api.h"
-+#include "cn20k/npc.h"
- 
- #define DRV_NAME	"rvu_af"
- #define DRV_STRING      "Marvell OcteonTX2 RVU Admin Function Driver"
-@@ -1396,7 +1397,6 @@ static void rvu_detach_block(struct rvu *rvu, int pcifunc, int blktype)
- 	if (blkaddr < 0)
- 		return;
+ /* Available entries to use */
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+index d2a0f6821cf9..a53bb5c924ef 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+@@ -1124,8 +1124,8 @@ int rvu_cgx_cfg_pause_frm(struct rvu *rvu, u16 pcifunc, u8 tx_pause, u8 rx_pause
+ void rvu_mac_reset(struct rvu *rvu, u16 pcifunc);
+ u32 rvu_cgx_get_lmac_fifolen(struct rvu *rvu, int cgx, int lmac);
+ void cgx_start_linkup(struct rvu *rvu);
+-int npc_get_nixlf_mcam_index(struct npc_mcam *mcam, u16 pcifunc, int nixlf,
+-			     int type);
++int npc_get_nixlf_mcam_index(struct npc_mcam *mcam,
++			     u16 pcifunc, int nixlf, int type);
+ bool is_mcam_entry_enabled(struct rvu *rvu, struct npc_mcam *mcam, int blkaddr,
+ 			   int index);
+ int rvu_npc_init(struct rvu *rvu);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+index 2f485a930edd..810707d0e1f2 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+@@ -5283,7 +5283,6 @@ int rvu_mbox_handler_nix_lf_stop_rx(struct rvu *rvu, struct msg_req *req,
+ 	/* Disable the interface if it is in any multicast list */
+ 	nix_mcast_update_mce_entry(rvu, pcifunc, 0);
  
 -
- 	block = &hw->block[blkaddr];
+ 	pfvf = rvu_get_pfvf(rvu, pcifunc);
+ 	clear_bit(NIXLF_INITIALIZED, &pfvf->flags);
  
- 	num_lfs = rvu_get_rsrc_mapcount(pfvf, block->addr);
-@@ -1467,6 +1467,13 @@ static int rvu_detach_rsrcs(struct rvu *rvu, struct rsrc_detach *detach,
- 			else if ((blkid == BLKADDR_CPT1) && !detach->cptlfs)
- 				continue;
- 		}
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+index 246f3568a795..ea0368b32b01 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+@@ -18,6 +18,7 @@
+ #include "rvu_npc_hash.h"
+ #include "cn20k/npc.h"
+ #include "rvu_npc.h"
++#include "cn20k/reg.h"
+ 
+ #define RSVD_MCAM_ENTRIES_PER_PF	3 /* Broadcast, Promisc and AllMulticast */
+ #define RSVD_MCAM_ENTRIES_PER_NIXLF	1 /* Ucast for LFs */
+@@ -151,10 +152,33 @@ int npc_get_nixlf_mcam_index(struct npc_mcam *mcam,
+ {
+ 	struct rvu_hwinfo *hw = container_of(mcam, struct rvu_hwinfo, mcam);
+ 	struct rvu *rvu = hw->rvu;
+-	int pf = rvu_get_pf(rvu->pdev, pcifunc);
++	u16 bcast, mcast, promisc, ucast;
+ 	int index;
++	int rc;
++	int pf;
 +
-+		if (detach_all ||
-+		    (detach && (blkid == BLKADDR_NIX0 ||
-+				blkid == BLKADDR_NIX1) &&
-+		     detach->nixlf))
-+			npc_cn20k_dft_rules_free(rvu, pcifunc);
++	if (is_cn20k(rvu->pdev)) {
++		rc = npc_cn20k_dft_rules_idx_get(rvu, pcifunc, &bcast, &mcast,
++						 &promisc, &ucast);
++		if (rc)
++			return -EFAULT;
 +
- 		rvu_detach_block(rvu, pcifunc, block->type);
- 	}
- 
-@@ -1738,8 +1745,14 @@ int rvu_mbox_handler_attach_resources(struct rvu *rvu,
- 	if (attach->npalf)
- 		rvu_attach_block(rvu, pcifunc, BLKTYPE_NPA, 1, attach);
- 
--	if (attach->nixlf)
-+	if (attach->nixlf) {
- 		rvu_attach_block(rvu, pcifunc, BLKTYPE_NIX, 1, attach);
-+		if (is_cn20k(rvu->pdev)) {
-+			err = npc_cn20k_dft_rules_alloc(rvu, pcifunc);
-+			if (err)
-+				goto exit;
++		switch (type) {
++		case NIXLF_BCAST_ENTRY:
++			return bcast;
++		case NIXLF_ALLMULTI_ENTRY:
++			return mcast;
++		case NIXLF_PROMISC_ENTRY:
++			return promisc;
++		case NIXLF_UCAST_ENTRY:
++			return ucast;
++		default:
++			return -EINVAL;
 +		}
 +	}
  
- 	if (attach->sso) {
- 		/* RVU func doesn't know which exact LF or slot is attached
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-index dd930aa05582..d2a0f6821cf9 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-@@ -308,6 +308,7 @@ struct rvu_pfvf {
- 	u64     lmt_map_ent_w1; /* Preseving the word1 of lmtst map table entry*/
- 	unsigned long flags;
- 	struct  sdp_node_info *sdp_info;
-+	u8	hw_prio;   /* Hw priority of default rules */
- };
+ 	/* Check if this is for a PF */
++	pf = rvu_get_pf(rvu->pdev, pcifunc);
+ 	if (pf && !(pcifunc & RVU_PFVF_FUNC_MASK)) {
+ 		/* Reserved entries exclude PF0 */
+ 		pf--;
+@@ -175,7 +199,12 @@ int npc_get_nixlf_mcam_index(struct npc_mcam *mcam,
  
- enum rvu_pfvf_flags {
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-index 8361d0aa4b6f..246f3568a795 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-@@ -653,6 +653,9 @@ void rvu_npc_install_ucast_entry(struct rvu *rvu, u16 pcifunc,
- 	req.match_id = action.match_id;
- 	req.flow_key_alg = action.flow_key_alg;
- 
-+	if (is_cn20k(rvu->pdev))
-+		req.hw_prio = pfvf->hw_prio;
-+
- 	rvu_mbox_handler_npc_install_flow(rvu, &req, &rsp);
- }
- 
-@@ -741,6 +744,9 @@ void rvu_npc_install_promisc_entry(struct rvu *rvu, u16 pcifunc,
- 	req.match_id = action.match_id;
- 	req.flow_key_alg = flow_key_alg;
- 
-+	if (is_cn20k(rvu->pdev))
-+		req.hw_prio = pfvf->hw_prio;
-+
- 	rvu_mbox_handler_npc_install_flow(rvu, &req, &rsp);
- }
- 
-@@ -821,6 +827,9 @@ void rvu_npc_install_bcast_match_entry(struct rvu *rvu, u16 pcifunc,
- 	req.hdr.pcifunc = 0; /* AF is requester */
- 	req.vf = pcifunc;
- 
-+	if (is_cn20k(rvu->pdev))
-+		req.hw_prio = pfvf->hw_prio;
-+
- 	rvu_mbox_handler_npc_install_flow(rvu, &req, &rsp);
- }
- 
-@@ -909,6 +918,9 @@ void rvu_npc_install_allmulti_entry(struct rvu *rvu, u16 pcifunc, int nixlf,
- 	req.match_id = action.match_id;
- 	req.flow_key_alg = flow_key_alg;
- 
-+	if (is_cn20k(rvu->pdev))
-+		req.hw_prio = pfvf->hw_prio;
-+
- 	rvu_mbox_handler_npc_install_flow(rvu, &req, &rsp);
- }
- 
-@@ -2484,7 +2496,7 @@ npc_get_mcam_search_range_priority(struct npc_mcam *mcam,
+ int npc_get_bank(struct npc_mcam *mcam, int index)
  {
- 	u16 fcnt;
++	struct rvu_hwinfo *hw = container_of(mcam, struct rvu_hwinfo, mcam);
+ 	int bank = index / mcam->banksize;
++	struct rvu *rvu = hw->rvu;
++
++	if (is_cn20k(rvu->pdev))
++		return bank;
  
--	if (req->priority == NPC_MCAM_HIGHER_PRIO)
-+	if (req->ref_prio == NPC_MCAM_HIGHER_PRIO)
- 		goto hprio;
+ 	/* 0,1 & 2,3 banks are combined for this keysize */
+ 	if (mcam->keysize == NPC_MCAM_KEY_X2)
+@@ -191,7 +220,13 @@ bool is_mcam_entry_enabled(struct rvu *rvu, struct npc_mcam *mcam,
+ 	u64 cfg;
  
- 	/* For a low priority entry allocation
-@@ -2584,7 +2596,7 @@ static int npc_mcam_alloc_entries(struct npc_mcam *mcam, u16 pcifunc,
- 		goto lprio_alloc;
+ 	index &= (mcam->banksize - 1);
+-	cfg = rvu_read64(rvu, blkaddr, NPC_AF_MCAMEX_BANKX_CFG(index, bank));
++	if (is_cn20k(rvu->pdev))
++		cfg = rvu_read64(rvu, blkaddr,
++				 NPC_AF_CN20K_MCAMEX_BANKX_CFG_EXT(index, bank));
++	else
++		cfg = rvu_read64(rvu, blkaddr,
++				 NPC_AF_MCAMEX_BANKX_CFG(index, bank));
++
+ 	return (cfg & 1);
+ }
  
- 	/* Get the search range for priority allocation request */
--	if (req->priority) {
-+	if (req->ref_prio) {
- 		npc_get_mcam_search_range_priority(mcam, req,
- 						   &start, &end, &reverse);
- 		goto alloc;
-@@ -2625,11 +2637,11 @@ static int npc_mcam_alloc_entries(struct npc_mcam *mcam, u16 pcifunc,
- 		 * and not in mid zone.
- 		 */
- 		if (!(pcifunc & RVU_PFVF_FUNC_MASK) &&
--		    req->priority == NPC_MCAM_HIGHER_PRIO)
-+		    req->ref_prio == NPC_MCAM_HIGHER_PRIO)
- 			end = req->ref_entry;
+@@ -201,6 +236,13 @@ void npc_enable_mcam_entry(struct rvu *rvu, struct npc_mcam *mcam,
+ 	int bank = npc_get_bank(mcam, index);
+ 	int actbank = bank;
  
- 		if (!(pcifunc & RVU_PFVF_FUNC_MASK) &&
--		    req->priority == NPC_MCAM_LOWER_PRIO)
-+		    req->ref_prio == NPC_MCAM_LOWER_PRIO)
- 			start = req->ref_entry;
++	if (is_cn20k(rvu->pdev)) {
++		if (index < 0 || index >= mcam->banksize * mcam->banks)
++			return;
++
++		return npc_cn20k_enable_mcam_entry(rvu, blkaddr, index, enable);
++	}
++
+ 	index &= (mcam->banksize - 1);
+ 	for (; bank < (actbank + mcam->banks_per_entry); bank++) {
+ 		rvu_write64(rvu, blkaddr,
+@@ -369,6 +411,7 @@ static u64 npc_get_default_entry_action(struct rvu *rvu, struct npc_mcam *mcam,
+ 					int blkaddr, u16 pf_func)
+ {
+ 	int bank, nixlf, index;
++	u64 reg;
+ 
+ 	/* get ucast entry rule entry index */
+ 	if (nix_get_nixlf(rvu, pf_func, &nixlf, NULL)) {
+@@ -383,8 +426,12 @@ static u64 npc_get_default_entry_action(struct rvu *rvu, struct npc_mcam *mcam,
+ 	bank = npc_get_bank(mcam, index);
+ 	index &= (mcam->banksize - 1);
+ 
+-	return rvu_read64(rvu, blkaddr,
+-			  NPC_AF_MCAMEX_BANKX_ACTION(index, bank));
++	if (is_cn20k(rvu->pdev))
++		reg = NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(index, bank, 0);
++	else
++		reg = NPC_AF_MCAMEX_BANKX_ACTION(index, bank);
++
++	return rvu_read64(rvu, blkaddr, reg);
+ }
+ 
+ static void npc_fixup_vf_rule(struct rvu *rvu, struct npc_mcam *mcam,
+@@ -549,6 +596,9 @@ static void npc_copy_mcam_entry(struct rvu *rvu, struct npc_mcam *mcam,
+ 	u64 cfg, sreg, dreg;
+ 	int bank, i;
+ 
++	if (is_cn20k(rvu->pdev))
++		return npc_cn20k_copy_mcam_entry(rvu, blkaddr, src, dest);
++
+ 	src &= (mcam->banksize - 1);
+ 	dest &= (mcam->banksize - 1);
+ 
+@@ -585,20 +635,31 @@ u64 npc_get_mcam_action(struct rvu *rvu, struct npc_mcam *mcam,
+ 			int blkaddr, int index)
+ {
+ 	int bank = npc_get_bank(mcam, index);
++	u64 reg;
+ 
+ 	index &= (mcam->banksize - 1);
+-	return rvu_read64(rvu, blkaddr,
+-			  NPC_AF_MCAMEX_BANKX_ACTION(index, bank));
++
++	if (is_cn20k(rvu->pdev))
++		reg = NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(index, bank, 0);
++	else
++		reg = NPC_AF_MCAMEX_BANKX_ACTION(index, bank);
++	return rvu_read64(rvu, blkaddr, reg);
+ }
+ 
+ void npc_set_mcam_action(struct rvu *rvu, struct npc_mcam *mcam,
+ 			 int blkaddr, int index, u64 cfg)
+ {
+ 	int bank = npc_get_bank(mcam, index);
++	u64 reg;
+ 
+ 	index &= (mcam->banksize - 1);
+-	return rvu_write64(rvu, blkaddr,
+-			   NPC_AF_MCAMEX_BANKX_ACTION(index, bank), cfg);
++
++	if (is_cn20k(rvu->pdev))
++		reg = NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(index, bank, 0);
++	else
++		reg = NPC_AF_MCAMEX_BANKX_ACTION(index, bank);
++
++	return rvu_write64(rvu, blkaddr, reg, cfg);
+ }
+ 
+ void rvu_npc_install_ucast_entry(struct rvu *rvu, u16 pcifunc,
+@@ -973,10 +1034,17 @@ static void npc_update_vf_flow_entry(struct rvu *rvu, struct npc_mcam *mcam,
+ 			/* disable before mcam entry update */
+ 			npc_enable_mcam_entry(rvu, mcam, blkaddr, actindex,
+ 					      false);
++
+ 			/* update 'action' */
+-			rvu_write64(rvu, blkaddr,
+-				    NPC_AF_MCAMEX_BANKX_ACTION(entry, bank),
+-				    rx_action);
++			if (is_cn20k(rvu->pdev))
++				rvu_write64(rvu, blkaddr,
++					    NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(entry, bank, 0),
++					    rx_action);
++			else
++				rvu_write64(rvu, blkaddr,
++					    NPC_AF_MCAMEX_BANKX_ACTION(entry, bank),
++					    rx_action);
++
+ 			if (enable)
+ 				npc_enable_mcam_entry(rvu, mcam, blkaddr,
+ 						      actindex, true);
+@@ -993,6 +1061,7 @@ static void npc_update_rx_action_with_alg_idx(struct rvu *rvu, struct nix_rx_act
+ 	struct npc_mcam *mcam = &rvu->hw->mcam;
+ 	struct rvu_hwinfo *hw = rvu->hw;
+ 	int bank, op_rss;
++	u64 reg;
+ 
+ 	if (!is_mcam_entry_enabled(rvu, mcam, blkaddr, mcam_index))
+ 		return;
+@@ -1002,15 +1071,19 @@ static void npc_update_rx_action_with_alg_idx(struct rvu *rvu, struct nix_rx_act
+ 	bank = npc_get_bank(mcam, mcam_index);
+ 	mcam_index &= (mcam->banksize - 1);
+ 
++	if (is_cn20k(rvu->pdev))
++		reg = NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(mcam_index,
++							    bank, 0);
++	else
++		reg = NPC_AF_MCAMEX_BANKX_ACTION(mcam_index, bank);
++
+ 	/* If Rx action is MCAST update only RSS algorithm index */
+ 	if (!op_rss) {
+-		*(u64 *)&action = rvu_read64(rvu, blkaddr,
+-				NPC_AF_MCAMEX_BANKX_ACTION(mcam_index, bank));
++		*(u64 *)&action = rvu_read64(rvu, blkaddr, reg);
+ 
+ 		action.flow_key_alg = alg_idx;
+ 	}
+-	rvu_write64(rvu, blkaddr,
+-		    NPC_AF_MCAMEX_BANKX_ACTION(mcam_index, bank), *(u64 *)&action);
++	rvu_write64(rvu, blkaddr, reg, *(u64 *)&action);
+ }
+ 
+ void rvu_npc_update_flowkey_alg_idx(struct rvu *rvu, u16 pcifunc, int nixlf,
+@@ -1020,6 +1093,7 @@ void rvu_npc_update_flowkey_alg_idx(struct rvu *rvu, u16 pcifunc, int nixlf,
+ 	struct nix_rx_action action;
+ 	int blkaddr, index, bank;
+ 	struct rvu_pfvf *pfvf;
++	u64 reg;
+ 
+ 	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
+ 	if (blkaddr < 0)
+@@ -1042,8 +1116,12 @@ void rvu_npc_update_flowkey_alg_idx(struct rvu *rvu, u16 pcifunc, int nixlf,
+ 	bank = npc_get_bank(mcam, index);
+ 	index &= (mcam->banksize - 1);
+ 
+-	*(u64 *)&action = rvu_read64(rvu, blkaddr,
+-				     NPC_AF_MCAMEX_BANKX_ACTION(index, bank));
++	if (is_cn20k(rvu->pdev))
++		reg = NPC_AF_CN20K_MCAMEX_BANKX_ACTIONX_EXT(index, bank, 0);
++	else
++		reg = NPC_AF_MCAMEX_BANKX_ACTION(index, bank);
++
++	*(u64 *)&action = rvu_read64(rvu, blkaddr, reg);
+ 	/* Ignore if no action was set earlier */
+ 	if (!*(u64 *)&action)
+ 		return;
+@@ -1053,9 +1131,7 @@ void rvu_npc_update_flowkey_alg_idx(struct rvu *rvu, u16 pcifunc, int nixlf,
+ 	action.index = group;
+ 	action.flow_key_alg = alg_idx;
+ 
+-	rvu_write64(rvu, blkaddr,
+-		    NPC_AF_MCAMEX_BANKX_ACTION(index, bank), *(u64 *)&action);
+-
++	rvu_write64(rvu, blkaddr, reg, *(u64 *)&action);
+ 	/* update the VF flow rule action with the VF default entry action */
+ 	if (mcam_index < 0)
+ 		npc_update_vf_flow_entry(rvu, mcam, blkaddr, pcifunc,
+@@ -1870,46 +1946,56 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
+ 	int cntr;
+ 	u64 cfg;
+ 
+-	/* Actual number of MCAM entries vary by entry size */
+ 	cfg = (rvu_read64(rvu, blkaddr,
+ 			  NPC_AF_INTFX_KEX_CFG(0)) >> 32) & 0x07;
+-	mcam->total_entries = (mcam->banks / BIT_ULL(cfg)) * mcam->banksize;
+ 	mcam->keysize = cfg;
+ 
+ 	/* Number of banks combined per MCAM entry */
+ 	if (is_cn20k(rvu->pdev)) {
++		/* In cn20k, x2 entries is allowed for x4 profile.
++		 * set total_entries as 8192 * 2 and key size as x2.
++		 */
++		mcam->total_entries = mcam->banks * mcam->banksize;
+ 		if (cfg == NPC_MCAM_KEY_X2)
+ 			mcam->banks_per_entry = 1;
+ 		else
+ 			mcam->banks_per_entry = 2;
++
++		rsvd = 0;
+ 	} else {
++		mcam->total_entries = (mcam->banks / BIT_ULL(cfg)) *
++						mcam->banksize;
++
+ 		if (cfg == NPC_MCAM_KEY_X4)
+ 			mcam->banks_per_entry = 4;
+ 		else if (cfg == NPC_MCAM_KEY_X2)
+ 			mcam->banks_per_entry = 2;
+ 		else
+ 			mcam->banks_per_entry = 1;
+-	}
+ 
+-	/* Reserve one MCAM entry for each of the NIX LF to
+-	 * guarantee space to install default matching DMAC rule.
+-	 * Also reserve 2 MCAM entries for each PF for default
+-	 * channel based matching or 'bcast & promisc' matching to
+-	 * support BCAST and PROMISC modes of operation for PFs.
+-	 * PF0 is excluded.
+-	 */
+-	rsvd = (nixlf_count * RSVD_MCAM_ENTRIES_PER_NIXLF) +
+-		((rvu->hw->total_pfs - 1) * RSVD_MCAM_ENTRIES_PER_PF);
+-	if (mcam->total_entries <= rsvd) {
+-		dev_warn(rvu->dev,
+-			 "Insufficient NPC MCAM size %d for pkt I/O, exiting\n",
+-			 mcam->total_entries);
+-		return -ENOMEM;
++		/* Reserve one MCAM entry for each of the NIX LF to
++		 * guarantee space to install default matching DMAC rule.
++		 * Also reserve 2 MCAM entries for each PF for default
++		 * channel based matching or 'bcast & promisc' matching to
++		 * support BCAST and PROMISC modes of operation for PFs.
++		 * PF0 is excluded.
++		 */
++		rsvd = (nixlf_count * RSVD_MCAM_ENTRIES_PER_NIXLF) +
++			((rvu->hw->total_pfs - 1) * RSVD_MCAM_ENTRIES_PER_PF);
++		if (mcam->total_entries <= rsvd) {
++			dev_warn(rvu->dev,
++				 "Insufficient NPC MCAM size %d for pkt I/O, exiting\n",
++				 mcam->total_entries);
++			return -ENOMEM;
++		}
  	}
  
-@@ -2678,7 +2690,7 @@ static int npc_mcam_alloc_entries(struct npc_mcam *mcam, u16 pcifunc,
- 	/* If allocating requested no of entries is unsucessful,
- 	 * expand the search range to full bitmap length and retry.
- 	 */
--	if (!req->priority && (rsp->count < req->count) &&
-+	if (!req->ref_prio && rsp->count < req->count &&
- 	    ((end - start) != mcam->bmap_entries)) {
- 		reverse = true;
- 		start = 0;
-@@ -2689,14 +2701,14 @@ static int npc_mcam_alloc_entries(struct npc_mcam *mcam, u16 pcifunc,
- 	/* For priority entry allocation requests, if allocation is
- 	 * failed then expand search to max possible range and retry.
- 	 */
--	if (req->priority && rsp->count < req->count) {
--		if (req->priority == NPC_MCAM_LOWER_PRIO &&
-+	if (req->ref_prio && rsp->count < req->count) {
-+		if (req->ref_prio == NPC_MCAM_LOWER_PRIO &&
- 		    (start != (req->ref_entry + 1))) {
- 			start = req->ref_entry + 1;
- 			end = mcam->bmap_entries;
- 			reverse = false;
- 			goto alloc;
--		} else if ((req->priority == NPC_MCAM_HIGHER_PRIO) &&
-+		} else if ((req->ref_prio == NPC_MCAM_HIGHER_PRIO) &&
- 			   ((end - start) != req->ref_entry)) {
- 			start = 0;
- 			end = req->ref_entry;
-@@ -2810,9 +2822,9 @@ int rvu_mbox_handler_npc_mcam_alloc_entry(struct rvu *rvu,
- 	/* ref_entry can't be '0' if requested priority is high.
- 	 * Can't be last entry if requested priority is low.
- 	 */
--	if ((!req->ref_entry && req->priority == NPC_MCAM_HIGHER_PRIO) ||
--	    ((req->ref_entry == mcam->bmap_entries) &&
--	     req->priority == NPC_MCAM_LOWER_PRIO))
-+	if ((!req->ref_entry && req->ref_prio == NPC_MCAM_HIGHER_PRIO) ||
-+	    (req->ref_entry == mcam->bmap_entries &&
-+	     req->ref_prio == NPC_MCAM_LOWER_PRIO))
- 		return NPC_MCAM_INVALID_REQ;
+ 	mcam->bmap_entries = mcam->total_entries - rsvd;
+-	mcam->nixlf_offset = mcam->bmap_entries;
+-	mcam->pf_offset = mcam->nixlf_offset + nixlf_count;
++	/* cn20k does not need offsets to alloc mcam entries */
++	if (!is_cn20k(rvu->pdev)) {
++		mcam->nixlf_offset = mcam->bmap_entries;
++		mcam->pf_offset = mcam->nixlf_offset + nixlf_count;
++	}
  
- 	/* Since list of allocated indices needs to be sent to requester,
-@@ -3358,7 +3370,7 @@ int rvu_mbox_handler_npc_mcam_alloc_and_write_entry(struct rvu *rvu,
- 	/* Try to allocate a MCAM entry */
- 	entry_req.hdr.pcifunc = req->hdr.pcifunc;
- 	entry_req.contig = true;
--	entry_req.priority = req->priority;
-+	entry_req.ref_prio = req->ref_prio;
- 	entry_req.ref_entry = req->ref_entry;
- 	entry_req.count = 1;
+ 	/* Allocate bitmaps for managing MCAM entries */
+ 	mcam->bmap = bitmap_zalloc(mcam->bmap_entries, GFP_KERNEL);
+@@ -1933,13 +2019,15 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
+ 	 * allocations and another 1/8th at the top for high priority
+ 	 * allocations.
+ 	 */
+-	mcam->lprio_count = mcam->bmap_entries / 8;
+-	if (mcam->lprio_count > BITS_PER_LONG)
+-		mcam->lprio_count = round_down(mcam->lprio_count,
+-					       BITS_PER_LONG);
+-	mcam->lprio_start = mcam->bmap_entries - mcam->lprio_count;
+-	mcam->hprio_count = mcam->lprio_count;
+-	mcam->hprio_end = mcam->hprio_count;
++	if (!is_cn20k(rvu->pdev)) {
++		mcam->lprio_count = mcam->bmap_entries / 8;
++		if (mcam->lprio_count > BITS_PER_LONG)
++			mcam->lprio_count = round_down(mcam->lprio_count,
++						       BITS_PER_LONG);
++		mcam->lprio_start = mcam->bmap_entries - mcam->lprio_count;
++		mcam->hprio_count = mcam->lprio_count;
++		mcam->hprio_end = mcam->hprio_count;
++	}
  
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-index 64c6d9162ef6..052d989f2d9a 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-@@ -104,7 +104,7 @@ int otx2_alloc_mcam_entries(struct otx2_nic *pfvf, u16 count)
- 		 * will be on top of PF.
+ 	/* Allocate bitmap for managing MCAM counters and memory
+ 	 * for saving counter to RVU PFFUNC allocation mapping.
+@@ -2063,15 +2151,13 @@ static void rvu_npc_setup_interfaces(struct rvu *rvu, int blkaddr)
+ 	struct npc_mcam *mcam = &rvu->hw->mcam;
+ 	struct rvu_hwinfo *hw = rvu->hw;
+ 	u64 nibble_ena, rx_kex, tx_kex;
+-	u64 *keyx_cfg;
++	u64 *keyx_cfg, reg;
+ 	u8 intf;
+ 
+-	if (is_cn20k(rvu->pdev)) {
++	if (is_cn20k(rvu->pdev))
+ 		keyx_cfg = mkex_extr->keyx_cfg;
+-		goto skip_miss_cntr;
+-	}
+-
+-	keyx_cfg = mkex->keyx_cfg;
++	else
++		keyx_cfg = mkex->keyx_cfg;
+ 
+ 	/* Reserve last counter for MCAM RX miss action which is set to
+ 	 * drop packet. This way we will know how many pkts didn't match
+@@ -2080,7 +2166,6 @@ static void rvu_npc_setup_interfaces(struct rvu *rvu, int blkaddr)
+ 	mcam->counters.max--;
+ 	mcam->rx_miss_act_cntr = mcam->counters.max;
+ 
+-skip_miss_cntr:
+ 	rx_kex = keyx_cfg[NIX_INTF_RX];
+ 	tx_kex = keyx_cfg[NIX_INTF_TX];
+ 
+@@ -2103,14 +2188,18 @@ static void rvu_npc_setup_interfaces(struct rvu *rvu, int blkaddr)
+ 			    rx_kex);
+ 
+ 		if (is_cn20k(rvu->pdev))
+-			continue;
++			reg = NPC_AF_INTFX_MISS_ACTX(intf, 0);
++		else
++			reg = NPC_AF_INTFX_MISS_ACT(intf);
+ 
+ 		/* If MCAM lookup doesn't result in a match, drop the received
+ 		 * packet. And map this action to a counter to count dropped
+ 		 * packets.
  		 */
- 		if (!is_otx2_vf(pfvf->pcifunc)) {
--			req->priority = NPC_MCAM_HIGHER_PRIO;
-+			req->ref_prio = NPC_MCAM_HIGHER_PRIO;
- 			req->ref_entry = flow_cfg->def_ent[0];
- 		}
+-		rvu_write64(rvu, blkaddr,
+-			    NPC_AF_INTFX_MISS_ACT(intf), NIX_RX_ACTIONOP_DROP);
++		rvu_write64(rvu, blkaddr, reg, NIX_RX_ACTIONOP_DROP);
++
++		if (is_cn20k(rvu->pdev))
++			continue;
  
+ 		/* NPC_AF_INTFX_MISS_STAT_ACT[14:12] - counter[11:9]
+ 		 * NPC_AF_INTFX_MISS_STAT_ACT[8:0] - counter[8:0]
+@@ -2130,12 +2219,15 @@ static void rvu_npc_setup_interfaces(struct rvu *rvu, int blkaddr)
+ 		rvu_write64(rvu, blkaddr, NPC_AF_INTFX_KEX_CFG(intf),
+ 			    tx_kex);
+ 
++		if (is_cn20k(rvu->pdev))
++			reg = NPC_AF_INTFX_MISS_ACTX(intf, 0);
++		else
++			reg = NPC_AF_INTFX_MISS_ACT(intf);
++
+ 		/* Set TX miss action to UCAST_DEFAULT i.e
+ 		 * transmit the packet on NIX LF SQ's default channel.
+ 		 */
+-		rvu_write64(rvu, blkaddr,
+-			    NPC_AF_INTFX_MISS_ACT(intf),
+-			    NIX_TX_ACTIONOP_UCAST_DEFAULT);
++		rvu_write64(rvu, blkaddr, reg, NIX_TX_ACTIONOP_UCAST_DEFAULT);
+ 	}
+ }
+ 
+@@ -2333,6 +2425,10 @@ static void npc_map_mcam_entry_and_cntr(struct rvu *rvu, struct npc_mcam *mcam,
+ 	/* Set mapping and increment counter's refcnt */
+ 	mcam->entry2cntr_map[entry] = cntr;
+ 	mcam->cntr_refcnt[cntr]++;
++
++	if (is_cn20k(rvu->pdev))
++		return;
++
+ 	/* Enable stats */
+ 	rvu_write64(rvu, blkaddr,
+ 		    NPC_AF_MCAMEX_BANKX_STAT_ACT(index, bank),
+@@ -2390,6 +2486,7 @@ static void npc_mcam_free_all_entries(struct rvu *rvu, struct npc_mcam *mcam,
+ 				      int blkaddr, u16 pcifunc)
+ {
+ 	u16 index, cntr;
++	int rc;
+ 
+ 	/* Scan all MCAM entries and free the ones mapped to 'pcifunc' */
+ 	for (index = 0; index < mcam->bmap_entries; index++) {
+@@ -2407,6 +2504,13 @@ static void npc_mcam_free_all_entries(struct rvu *rvu, struct npc_mcam *mcam,
+ 							      blkaddr, index,
+ 							      cntr);
+ 			mcam->entry2target_pffunc[index] = 0x0;
++			if (is_cn20k(rvu->pdev)) {
++				rc = npc_cn20k_idx_free(rvu, &index, 1);
++				if (rc)
++					dev_err(rvu->dev,
++						"Failed to free mcam idx=%u pcifunc=%#x\n",
++						index, pcifunc);
++			}
+ 		}
+ 	}
+ }
+@@ -2553,14 +2657,74 @@ static int npc_mcam_alloc_entries(struct npc_mcam *mcam, u16 pcifunc,
+ 				  struct npc_mcam_alloc_entry_req *req,
+ 				  struct npc_mcam_alloc_entry_rsp *rsp)
+ {
++	struct rvu_hwinfo *hw = container_of(mcam, struct rvu_hwinfo, mcam);
+ 	u16 entry_list[NPC_MAX_NONCONTIG_ENTRIES];
+ 	u16 fcnt, hp_fcnt, lp_fcnt;
++	struct rvu *rvu = hw->rvu;
+ 	u16 start, end, index;
+ 	int entry, next_start;
+ 	bool reverse = false;
+ 	unsigned long *bmap;
++	int ret, limit = 0;
+ 	u16 max_contig;
+ 
++	if (!is_cn20k(rvu->pdev))
++		goto not_cn20k;
++
++	/* The below table is being followed during allocation,
++	 *
++	 * 1. ref_entry == 0 && prio == HIGH && count == 1  ==> user wants to allocate 0th index
++	 * 2. ref_entry == 0 && prio == HIGH && count > 1   ==> Invalid request
++	 * 3. ref_entry == 0 && prio == LOW && count >= 1   ==> limit = 0
++	 * 4. ref_entry != 0 && prio == HIGH && count >= 1  ==> limit = 0
++	 * 5. ref_entry != 0 && prio == LOW && count >=1    ==> limit = Max (X2: 2*8192, X4: 8192)
++	 */
++	if (req->ref_entry && req->ref_prio == NPC_MCAM_LOWER_PRIO) {
++		if (req->kw_type == NPC_MCAM_KEY_X2)
++			limit = 2 * mcam->bmap_entries;
++		else
++			limit = mcam->bmap_entries;
++	}
++
++	ret = npc_cn20k_ref_idx_alloc(rvu, pcifunc, req->kw_type,
++				      req->ref_prio, rsp->entry_list,
++				      req->ref_entry, limit,
++				      req->contig, req->count);
++
++	if (ret) {
++		rsp->count = 0;
++		return NPC_MCAM_ALLOC_FAILED;
++	}
++
++	rsp->count = req->count;
++	if (req->contig)
++		rsp->entry = rsp->entry_list[0];
++
++	/* cn20k, entries allocation algorithm is different.
++	 * This common API updates some bitmap on usage etc, which
++	 * will be used by other functions. So update those for
++	 * cn20k as well.
++	 */
++
++	mutex_lock(&mcam->lock);
++	/* Mark the allocated entries as used and set nixlf mapping */
++	for (entry = 0; entry < rsp->count; entry++) {
++		index = rsp->entry_list[entry];
++		npc_mcam_set_bit(mcam, index);
++		mcam->entry2pfvf_map[index] = pcifunc;
++		mcam->entry2cntr_map[index] = NPC_MCAM_INVALID_MAP;
++	}
++
++	/* cn20k, free count is provided thru different mbox message.
++	 * one counter to indicate free x2 slots and free x4 slots
++	 * does not provide any useful information to the user.
++	 */
++	rsp->free_count = -1;
++	mutex_unlock(&mcam->lock);
++
++	return 0;
++
++not_cn20k:
+ 	mutex_lock(&mcam->lock);
+ 
+ 	/* Check if there are any free entries */
+@@ -2881,6 +3045,14 @@ int rvu_mbox_handler_npc_mcam_free_entry(struct rvu *rvu,
+ 		npc_unmap_mcam_entry_and_cntr(rvu, mcam, blkaddr,
+ 					      req->entry, cntr);
+ 
++	if (is_cn20k(rvu->pdev)) {
++		rc = npc_cn20k_idx_free(rvu, &req->entry, 1);
++		if (rc)
++			dev_err(rvu->dev,
++				"Failed to free index=%u\n",
++				req->entry);
++	}
++
+ 	goto exit;
+ 
+ free_all:
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+index fef6be2de284..a0c294203eee 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+@@ -1757,14 +1757,19 @@ static int npc_update_dmac_value(struct rvu *rvu, int npcblkaddr,
+ 	struct npc_mcam_write_entry_req write_req = { 0 };
+ 	struct mcam_entry *entry = &write_req.entry_data;
+ 	struct npc_mcam *mcam = &rvu->hw->mcam;
++	u8 intf, enable, hw_prio;
+ 	struct msg_rsp rsp;
+-	u8 intf, enable;
+ 	int err;
+ 
+ 	ether_addr_copy(rule->packet.dmac, pfvf->mac_addr);
+ 
+-	npc_read_mcam_entry(rvu, mcam, npcblkaddr, rule->entry,
+-			    entry, &intf,  &enable);
++	if (is_cn20k(rvu->pdev))
++		npc_cn20k_read_mcam_entry(rvu, npcblkaddr, rule->entry,
++					  entry, &intf,
++					  &enable, &hw_prio);
++	else
++		npc_read_mcam_entry(rvu, mcam, npcblkaddr, rule->entry,
++				    entry, &intf, &enable);
+ 
+ 	npc_update_entry(rvu, NPC_DMAC, entry,
+ 			 ether_addr_to_u64(pfvf->mac_addr), 0,
 -- 
 2.43.0
 
