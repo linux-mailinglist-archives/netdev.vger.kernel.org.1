@@ -1,306 +1,384 @@
-Return-Path: <netdev+bounces-248454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BA2ED089A5
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 11:35:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CDA9D08917
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 11:31:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5DC44309B899
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 10:32:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 881BB304393C
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 10:31:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7307B33BBAF;
-	Fri,  9 Jan 2026 10:32:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B109338F5E;
+	Fri,  9 Jan 2026 10:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Mv5PWSAA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uG1s8IsA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832D233A6E0;
-	Fri,  9 Jan 2026 10:31:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16934338F45;
+	Fri,  9 Jan 2026 10:31:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767954721; cv=none; b=pClDhMI4twpg4kOambgzN0AdYi/liPzbzbCRvavWRNsw119I5qx4RmrqFi2B3+AkIVdMpRffJgSEe/D7hIf61CogF97libMwPp7XPQPbvOHbFyHTVzvjUwfdia9YHuGqx6kbG8YOQY2k3A6JQAnH7fmjzVIHavhAQZRPj++HcmY=
+	t=1767954672; cv=none; b=UTKX7eOvZb+iyNWAEKg15bCPILOothp5du/pnwlGT8YfFmOqAaPDX58J3oTDvkiHUt3h94j+3lYKs9Ykhmd+fy0ZIRAGpbLiS0Z89Gq+uxTKOpXF/5SxzfWvhc4t9/Cs28ktpQvBTUO9dfZFuF6IKP2bPRgh17tQgPVmnkk6HoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767954721; c=relaxed/simple;
-	bh=7LdXTT/4uMU1KEnQ2Nm+9GOgr+S0ppAn+sVry4w4/mY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EfB4QT5NTiSnOU8orRNP6eOY1pYliQmNNT+MyR4AE2qc838rlWTZbltL25rhQT7ymmE2IfxEQS8Ob/gEaWF+dNQGbyoymDAusysegqCiHQha6tMgV7ik1eDvvpnkMLM3Q47JjztVEB2P9RfPAFcYgvm6PRXAPFVV0KileJZOGps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Mv5PWSAA; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60934aZ0027531;
-	Fri, 9 Jan 2026 02:31:52 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=e
-	Na560f65DxhyZfQm4oATo3PUgV4in3z9qiFk2KCJNo=; b=Mv5PWSAAOOr+fzAsw
-	cNZ9Tj3fD1W/aHdC59mnkpsMM0MnrPzQTMu/5PvmtxSh8ESKK02l4LCDBv88E61a
-	boY7eViwsEWojOu8cYzw72Urr3ojsHHoWSiY9hgKydGKgYls7l3o50rQEnA9qMwd
-	2vuq1kFy+2ItjsKiYhCgDvW4ZxQKMIEjXid5hS5DDIzoMFqs/M8Rnk775iRKcMeQ
-	/QlKADRUUjTn9wHGkQjvCAtOzj5diTk92XWWDJfWNGVbm1BbUCgqOI+fDGdsIuwe
-	GdWgF3DFowwEj5E1yewkC9M2JrSzuzBIKZLjdpZV4UMKwoDdZJ0cy58Ls2OpfBeP
-	YC+BQ==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bjset0x36-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 09 Jan 2026 02:31:51 -0800 (PST)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Fri, 9 Jan 2026 02:31:51 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Fri, 9 Jan 2026 02:31:51 -0800
-Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id 68A3F3F708A;
-	Fri,  9 Jan 2026 02:31:48 -0800 (PST)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-        "Ratheesh
- Kannoth" <rkannoth@marvell.com>
-Subject: [PATCH net-next v3 10/10] octeontx2: switch: trace support
-Date: Fri, 9 Jan 2026 16:00:35 +0530
-Message-ID: <20260109103035.2972893-11-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260109103035.2972893-1-rkannoth@marvell.com>
-References: <20260109103035.2972893-1-rkannoth@marvell.com>
+	s=arc-20240116; t=1767954672; c=relaxed/simple;
+	bh=bXk+G60lniWNXI+WPcRooYsJNDc63eLTT1Qx87AHdQQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DKLzpAUoE/lm9cEWnH54Vi7Jeh21fYNI4wU0cacbAFn071E8BAlhSOWjtClkRD37QbJBUK9i153ehyFauKDYL3Ky1P4YH9oLiENE++G6aVMj9J/sgJcmJBaJkvk7iyYbgKL1sugNJ7ZlhcC4vad5CCq/vx3WXtD2VyJ3AN1ILRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uG1s8IsA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3956BC19422;
+	Fri,  9 Jan 2026 10:31:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767954671;
+	bh=bXk+G60lniWNXI+WPcRooYsJNDc63eLTT1Qx87AHdQQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uG1s8IsAtdCGzLQasnSeDvTCUURIjrhUPWEyR0VmDGVvUPbf/y2FUCPHDofwuUsNS
+	 g3w6/MwNQljAF0jDBNWU4D5vW0P1YSR20m56TsKPhoxON1Td1EFayq3du1JyiwRvDg
+	 lAXd6cvRy1kGuDbkID1/XjX/cKRNqsqYMXoVoQqQnLHRTqyg/zv6cXB/VdhVu8rQ09
+	 Oi9+472QT7EKgc+i5LCl3G4Jw7Y9HoNm/Oz1Cb2MVOb/3pgWQauwHKPIenYQR4WmHJ
+	 RwdTRKOcpg/0Zy2FpCxRdhr7U8C+cEUyeiwWm2wNOr4zYPWpyOBBCsJuAD9lABT9wx
+	 8njef9yjMsCFg==
+Date: Fri, 9 Jan 2026 10:31:05 +0000
+From: Lee Jones <lee@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 07/15] mfd: core: add ability for cells to probe
+ on a custom parent OF node
+Message-ID: <20260109103105.GE1118061@google.com>
+References: <20251118190530.580267-1-vladimir.oltean@nxp.com>
+ <20251118190530.580267-8-vladimir.oltean@nxp.com>
+ <20251120144136.GF661940@google.com>
+ <20251120153622.p6sy77coa3de6srw@skbuf>
+ <20251121120646.GB1117685@google.com>
+ <20251121170308.tntvl2mcp2qwx6qz@skbuf>
+ <20251215155028.GF9275@google.com>
+ <20251216002955.bgjy52s4stn2eo4r@skbuf>
+ <20251216091831.GG9275@google.com>
+ <20251216162447.erl5cuxlj7yd3ktv@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=W581lBWk c=1 sm=1 tr=0 ts=6960d917 cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
- a=gFDZAJeugxnc_ztJiqIA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: Ox0XJNy9nPamQWsCAD5XqAKjMPA9er4l
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA5MDA3NiBTYWx0ZWRfX8OVLlCo92mbJ
- FOi0Men1gHZMCxgOFXCzuzNB2ZSdtrZSAcJH81LY7u3/WgLI0f4Cyk0QptmVsqXKKUps0plqYsi
- tm8KeXAcw378fT1RRVtbb+DwBMvqiI1aj3JnjH9l6ejQcPvgve39mhEhFAV1Z2ECwO4xVS3zutc
- ck/GCgLmTYvyEg85kyiSq9Rm2V0mo8VPt9zRTCR4Yze7z7RnTkyQ8Am6LyXBDQFdSyBeJAgu+cf
- JQfQbDR2paduCytIZwn7E/DYbV5sC2A24Y7zczGQN6Hj7jYjmGTeju4iZkXDA8taSD0PFzsW+Si
- Rj7EEqbJOcAEOZfFbe1J9Pu3WOBc4YDN5ZdXsF1FPKZnij6NUeLnts4XQ+zghlofV9qajluF1RD
- tWIENPiUjlrxOgPfsF94y7wg/H/ax2sq66+vAUquc2uLPIXu8VwDXP28oZFw3g5qjtxd0kV1/R2
- 4xzFnaKqOHUYNxAa2EA==
-X-Proofpoint-ORIG-GUID: Ox0XJNy9nPamQWsCAD5XqAKjMPA9er4l
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-09_03,2026-01-08_02,2025-10-01_01
+In-Reply-To: <20251216162447.erl5cuxlj7yd3ktv@skbuf>
 
-Traces are added to flow parsing to ease debugging.
+On Tue, 16 Dec 2025, Vladimir Oltean wrote:
 
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
----
- .../ethernet/marvell/octeontx2/nic/Makefile   |  2 +-
- .../marvell/octeontx2/nic/switch/sw_fl.c      | 18 +++-
- .../marvell/octeontx2/nic/switch/sw_trace.c   | 11 +++
- .../marvell/octeontx2/nic/switch/sw_trace.h   | 82 +++++++++++++++++++
- 4 files changed, 109 insertions(+), 4 deletions(-)
- create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_trace.c
- create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_trace.h
+> On Tue, Dec 16, 2025 at 09:18:31AM +0000, Lee Jones wrote:
+> > Unless you add/convert more child devices that are outside of net/ and
+> > drivers/net AND move the core MFD usage to drivers/mfd/, then we can't
+> > conclude that [ this device is suitable for MFD ].
+> 
+> To me, the argument that child devices can't all be under drivers/net/
+> is superficial. An mii_bus is very different in purpose from a phylink_pcs
+> and from a net_device, yet all 3 live in drivers/net/.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/Makefile b/drivers/net/ethernet/marvell/octeontx2/nic/Makefile
-index da87e952c187..5f722d0cfac2 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/Makefile
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/Makefile
-@@ -13,7 +13,7 @@ rvu_nicpf-y := otx2_pf.o otx2_common.o otx2_txrx.o otx2_ethtool.o \
- 	       switch/sw_fdb.o switch/sw_fl.o
- 
- ifdef CONFIG_OCTEONTX_SWITCH
--rvu_nicpf-y += switch/sw_nb.o switch/sw_fib.o
-+rvu_nicpf-y += switch/sw_nb.o switch/sw_fib.o switch/sw_trace.o
- endif
- 
- rvu_nicvf-y := otx2_vf.o
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fl.c b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fl.c
-index c9aa0043cc4c..3ddae5d08578 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fl.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fl.c
-@@ -18,6 +18,7 @@
- #include "../otx2_struct.h"
- #include "../cn10k.h"
- #include "sw_nb.h"
-+#include "sw_trace.h"
- #include "sw_fl.h"
- 
- #if !IS_ENABLED(CONFIG_OCTEONTX_SWITCH)
-@@ -140,6 +141,7 @@ static int sw_fl_parse_actions(struct otx2_nic *nic,
- 
- 		switch (act->id) {
- 		case FLOW_ACTION_REDIRECT:
-+			trace_sw_act_dump(__func__, __LINE__, act->id);
- 			tuple->in_pf = nic->pcifunc;
- 			out_nic = netdev_priv(act->dev);
- 			tuple->xmit_pf = out_nic->pcifunc;
-@@ -147,6 +149,7 @@ static int sw_fl_parse_actions(struct otx2_nic *nic,
- 			break;
- 
- 		case FLOW_ACTION_CT:
-+			trace_sw_act_dump(__func__, __LINE__, act->id);
- 			err = nf_flow_table_offload_add_cb(act->ct.flow_table,
- 							   sw_fl_setup_ft_block_ingress_cb,
- 							   nic);
-@@ -161,6 +164,7 @@ static int sw_fl_parse_actions(struct otx2_nic *nic,
- 			break;
- 
- 		case FLOW_ACTION_MANGLE:
-+			trace_sw_act_dump(__func__, __LINE__, act->id);
- 			tuple->mangle[used].type = act->mangle.htype;
- 			tuple->mangle[used].val = act->mangle.val;
- 			tuple->mangle[used].mask = act->mangle.mask;
-@@ -170,6 +174,7 @@ static int sw_fl_parse_actions(struct otx2_nic *nic,
- 			break;
- 
- 		default:
-+			trace_sw_act_dump(__func__, __LINE__, act->id);
- 			break;
- 		}
- 	}
-@@ -445,21 +450,28 @@ static int sw_fl_add(struct otx2_nic *nic, struct flow_cls_offload *f)
- 		return 0;
- 
- 	rc  = sw_fl_parse_flow(nic, f, &tuple, &features);
--	if (rc)
-+	if (rc) {
-+		trace_sw_fl_dump(__func__, __LINE__, &tuple);
- 		return -EFAULT;
-+	}
- 
- 	if (!netif_is_ovs_port(nic->netdev)) {
- 		rc = sw_fl_get_pcifunc(nic, tuple.ip4src, &tuple.in_pf,
- 				       &tuple, true);
--		if (rc)
-+		if (rc) {
-+			trace_sw_fl_dump(__func__, __LINE__, &tuple);
- 			return rc;
-+		}
- 
- 		rc = sw_fl_get_pcifunc(nic, tuple.ip4dst, &tuple.xmit_pf,
- 				       &tuple, false);
--		if (rc)
-+		if (rc) {
-+			trace_sw_fl_dump(__func__, __LINE__, &tuple);
- 			return rc;
-+		}
- 	}
- 
-+	trace_sw_fl_dump(__func__, __LINE__, &tuple);
- 	sw_fl_add_to_list(nic, &tuple, f->cookie, true);
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_trace.c b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_trace.c
-new file mode 100644
-index 000000000000..260fd2bb3606
---- /dev/null
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_trace.c
-@@ -0,0 +1,11 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Marvell RVU Admin Function driver
-+ *
-+ * Copyright (C) 2026 Marvell.
-+ *
-+ */
-+
-+#define CREATE_TRACE_POINTS
-+#include "sw_trace.h"
-+EXPORT_TRACEPOINT_SYMBOL(sw_fl_dump);
-+EXPORT_TRACEPOINT_SYMBOL(sw_act_dump);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_trace.h b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_trace.h
-new file mode 100644
-index 000000000000..e23deca0309a
---- /dev/null
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_trace.h
-@@ -0,0 +1,82 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Marvell RVU Admin Function driver
-+ *
-+ * Copyright (C) 2026 Marvell.
-+ *
-+ */
-+
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM rvu
-+
-+#if !defined(SW_TRACE_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define SW_TRACE_H
-+
-+#include <linux/types.h>
-+#include <linux/tracepoint.h>
-+
-+#include "mbox.h"
-+
-+TRACE_EVENT(sw_fl_dump,
-+	    TP_PROTO(const char *fname, int line, struct fl_tuple *ftuple),
-+	    TP_ARGS(fname, line, ftuple),
-+	    TP_STRUCT__entry(__string(f, fname)
-+			     __field(int, l)
-+			     __array(u8, smac, ETH_ALEN)
-+			     __array(u8, dmac, ETH_ALEN)
-+			     __field(u16, eth_type)
-+			     __field(u32, sip)
-+			     __field(u32, dip)
-+			     __field(u8, ip_proto)
-+			     __field(u16, sport)
-+			     __field(u16, dport)
-+			     __field(u8, uni_di)
-+			     __field(u16, in_pf)
-+			     __field(u16, out_pf)
-+	    ),
-+	    TP_fast_assign(__assign_str(f);
-+			   __entry->l = line;
-+			   memcpy(__entry->smac, ftuple->smac, ETH_ALEN);
-+			   memcpy(__entry->dmac, ftuple->dmac, ETH_ALEN);
-+			   __entry->sip = (__force u32)(ftuple->ip4src);
-+			   __entry->dip = (__force u32)(ftuple->ip4dst);
-+			   __entry->eth_type = (__force u16)ftuple->eth_type;
-+			   __entry->ip_proto = ftuple->proto;
-+			   __entry->sport = (__force u16)(ftuple->sport);
-+			   __entry->dport = (__force u16)(ftuple->dport);
-+			   __entry->uni_di = ftuple->uni_di;
-+			   __entry->in_pf = ftuple->in_pf;
-+			   __entry->out_pf = ftuple->xmit_pf;
-+	    ),
-+	    TP_printk("[%s:%d] %pM %pI4:%u to %pM %pI4:%u eth_type=%#x proto=%u uni=%u in=%#x out=%#x",
-+		      __get_str(f), __entry->l, __entry->smac, &__entry->sip, __entry->sport,
-+		      __entry->dmac, &__entry->dip, __entry->dport,
-+		      ntohs((__force __be16)__entry->eth_type), __entry->ip_proto, __entry->uni_di,
-+		      __entry->in_pf, __entry->out_pf)
-+);
-+
-+TRACE_EVENT(sw_act_dump,
-+	    TP_PROTO(const char *fname, int line, u32 act),
-+	    TP_ARGS(fname, line, act),
-+	    TP_STRUCT__entry(__string(fname, fname)
-+			     __field(int, line)
-+			     __field(u32, act)
-+	    ),
-+
-+	    TP_fast_assign(__assign_str(fname);
-+			   __entry->line = line;
-+			   __entry->act = act;
-+	    ),
-+
-+	    TP_printk("[%s:%d] %u",
-+		       __get_str(fname), __entry->line, __entry->act)
-+);
-+
-+#endif
-+
-+#undef TRACE_INCLUDE_PATH
-+#define TRACE_INCLUDE_PATH ../../drivers/net/ethernet/marvell/octeontx2/nic/switch/
-+
-+#undef TRACE_INCLUDE_FILE
-+#define TRACE_INCLUDE_FILE sw_trace
-+
-+#include <trace/define_trace.h>
+Understood.
+
+> Furthermore, I am looking at schemas such as /devicetree/bindings/mfd/adi,max77541.yaml:
+> "MAX77540 is a Power Management IC with 2 buck regulators."
+> and I don't understand how it possibly passed this criterion. It is one
+> chip with two devices of the same kind, and nothing else.
+
+The MAX77541 has Regulators and an Analog to Digital Converter.
+
+2 makes it Multi and passes criterion.
+
+The ADC is 'hidden' from DT by MFD.
+
+> If moving the core MFD usage to drivers/mfd/ is another hard requirement,
+> this is also attacking form rather than substance. You as the MFD
+> maintainer can make an appeal to authority and NACK aesthetics you don't
+> like, but I just want everyone to be on the same page about this.
+
+My plan, when and if I manage to find a few spare cycles, is to remove
+MFD use from outside drivers/mfd.  That's been my rule since forever.
+Having this in place ensures that the other rules are kept and (mild)
+chaos doesn't ensue.  The MFD API is trivial to abuse.  You wouldn't
+believe some of things I've seen over the years.  Each value I have is
+there for a historical reason.
+
+> > > > There does appear to be at least some level of misunderstanding
+> > > > between us.  I'm not for one moment suggesting that a switch
+> > > > can't be an MFD. If it contains probe-able components that need
+> > > > to be split-up across multiple different subsystems, then by all
+> > > > means, move the core driver into drivers/mfd/ and register child
+> > > > devices 'till your heart's content.
+> > > 
+> > > Are you still speaking generically here, or have you actually
+> > > looked at any "nxp,sja1105q" or "nxp,sja1110a" device trees to see
+> > > what it would mean for these compatible strings to be probed by a
+> > > driver in drivers/mfd?
+> > 
+> > It's not my role to go digging into existing implementations and
+> > previous submissions to prove whether a particular submission is
+> > suitable for inclusion into MFD.
+> > 
+> > Please put in front of me, in a concise way (please), why you think
+> > this is fit for inclusion.
+> 
+> No new information, I think the devices are fit for MFD because of
+> their memory map which was shown in the previous reply.
+
+And Andrew's opinion reflects that, so I'm inclined to agree in general
+terms.
+
+> > I've explained what is usually required, but I'll (over-)simplify
+> > again for clarity:
+> > 
+> >  - The mfd_* API call-sites must only exist in drivers/mfd/ -
+> >  Consumers usually spit out non-system specific logic into a 'core'
+> >  - MFDs need to have more than one child - This is where the 'Multi'
+> >  comes in - Children should straddle different sub-systems -
+> >  drivers/net is not enough [0] - If all of your sub-devices are in
+> >  'net' use the platform_* API - <other stipulations less relevant to
+> >  this stipulation> ...
+> > 
+> > There will always be exceptions, but previous mistakes are not good
+> > justifications for future ones.
+> > 
+> > [0]
+> > 
+> >   .../bindings/net/dsa/nxp,sja1105.yaml         |  28 +
+> >   .../bindings/net/pcs/snps,dw-xpcs.yaml        |   8 + MAINTAINERS
+> >   |   2 + drivers/mfd/mfd-core.c                        |  11 +-
+> >   drivers/net/dsa/sja1105/Kconfig               |   2 +
+> >   drivers/net/dsa/sja1105/Makefile              |   2 +-
+> >   drivers/net/dsa/sja1105/sja1105.h             |  42 +-
+> >   drivers/net/dsa/sja1105/sja1105_main.c        | 169 +++---
+> >   drivers/net/dsa/sja1105/sja1105_mdio.c        | 507
+> >   ------------------ drivers/net/dsa/sja1105/sja1105_mfd.c         |
+> >   293 ++++++++++ drivers/net/dsa/sja1105/sja1105_mfd.h         |  11
+> >   + drivers/net/dsa/sja1105/sja1105_spi.c         | 113 +++-
+> >   drivers/net/mdio/Kconfig                      |  21 +-
+> >   drivers/net/mdio/Makefile                     |   2 +
+> >   drivers/net/mdio/mdio-regmap-simple.c         |  77 +++
+> >   drivers/net/mdio/mdio-regmap.c                |   7 +-
+> >   drivers/net/mdio/mdio-sja1110-cbt1.c          | 173 ++++++
+> >   drivers/net/pcs/pcs-xpcs-plat.c               | 146 +++--
+> >   drivers/net/pcs/pcs-xpcs.c                    |  12 +
+> >   drivers/net/phy/phylink.c                     |  75 ++-
+> >   include/linux/mdio/mdio-regmap.h              |   2 +
+> >   include/linux/mfd/core.h                      |   7 +
+> >   include/linux/pcs/pcs-xpcs.h                  |   1 +
+> >   include/linux/phylink.h                       |   5 + 24 files
+> >   changed, 1033 insertions(+), 683 deletions(-) delete mode 100644
+> >   drivers/net/dsa/sja1105/sja1105_mdio.c create mode 100644
+> >   drivers/net/dsa/sja1105/sja1105_mfd.c create mode 100644
+> >   drivers/net/dsa/sja1105/sja1105_mfd.h create mode 100644
+> >   drivers/net/mdio/mdio-regmap-simple.c create mode 100644
+> >   drivers/net/mdio/mdio-sja1110-cbt1.c
+> > 
+> > > What OF node would remain for the DSA switch (child) device
+> > > driver? The same? Or are you suggesting that the entire
+> > > drivers/net/dsa/sja1105/ would move to drivers/mfd/? Or?
+> > 
+> > See bullet 1.1 above.
+> > 
+> > [...]
+> > 
+> > > > I don't recall those discussions from 3 years ago, but the
+> > > > Ocelot platform, whatever it may be, seems to have quite a lot
+> > > > more cross-subsystem device support requirements going on than I
+> > > > see here:
+> > > > 
+> > > > drivers/i2c/busses/i2c-designware-platdrv.c
+> > > > drivers/irqchip/irq-mscc-ocelot.c drivers/mfd/ocelot-*
+> > > > drivers/net/dsa/ocelot/* drivers/net/ethernet/mscc/ocelot*
+> > > > drivers/net/mdio/mdio-mscc-miim.c
+> > > > drivers/phy/mscc/phy-ocelot-serdes.c
+> > > > drivers/pinctrl/pinctrl-microchip-sgpio.c
+> > > > drivers/pinctrl/pinctrl-ocelot.c
+> > > > drivers/power/reset/ocelot-reset.c drivers/spi/spi-dw-mmio.c
+> > > > net/dsa/tag_ocelot_8021q.c
+> > > 
+> > > This is a natural effect of Ocelot being "whatever it may be". It
+> > > is a family of networking SoCs, of which VSC7514 has a MIPS CPU
+> > > and Linux port, where the above drivers are used. The VSC7512 is
+> > > then a simplified variant with the MIPS CPU removed, and the
+> > > internal components controlled externally over SPI. Hence MFD to
+> > > reuse the same drivers as Linux on MIPS (using MMIO) did. This is
+> > > all that matters, not the quantity.
+> > 
+> > From what I can see, Ocelot ticks all of the boxes for MFD API
+> > usage, whereas this submission does not.  The fact that the
+> > overarching device provides a similar function is neither here nor
+> > there.
+> > 
+> > These are the results from my searches of your device:
+> > 
+> >   git grep -i SJA1110 | grep -v 'net\|arch\|include' <no results>
+> > 
+> > [...]
+> > 
+> > > > My point is, you don't seem to have have any of that here.
+> > > 
+> > > What do you want to see exactly which is not here?
+> > > 
+> > > I have converted three classes of sub-devices on the NXP SJA1110
+> > > to MFD children in this patch set. Two MDIO buses and an Ethernet
+> > > PCS for SGMII.
+> > > 
+> > > In the SJA1110 memory map, the important resources look something
+> > > like this:
+> > > 
+> > > Name         Description
+> > > Start      End SWITCH       Ethernet Switch Subsystem
+> > > 0x000000   0x3ffffc 100BASE-T1   Internal MDIO bus for 100BASE-T1
+> > > PHY (port 5 - 10)  0x704000   0x704ffc SGMII1       SGMII Port 1
+> > > 0x705000   0x705ffc SGMII2       SGMII Port 2
+> > > 0x706000   0x706ffc SGMII3       SGMII Port 3
+> > > 0x707000   0x707ffc SGMII4       SGMII Port 4
+> > > 0x708000   0x708ffc 100BASE-TX   Internal MDIO bus for 100BASE-TX
+> > > PHY                0x709000   0x709ffc
+> > 
+> > All in drivers/net.
+> > 
+> > > ACU          Auxiliary Control Unit
+> > > 0x711000   0x711ffc GPIO         General Purpose Input/Output
+> > > 0x712000   0x712ffc
+> > 
+> > Where are these drivers?
+> 
+> For the GPIO I have no driver yet.
+> 
+> For the ACU, there is a reusable group of 4 registers for which I
+> wrote a cascaded interrupt controller driver in 2022. This register
+> group is instantiated multiple times in the SJA1110, which justified a
+> reusable driver.
+> 
+> Upstreaming it was blocked by the inability to instantiate it from the
+> main DSA driver using backwards-compatible DT bindings.
+> 
+> In any case, on the older generation SJA1105 (common driver with
+> SJA1110), the GPIO and interrupt controller blocks are missing. There
+> is an ACU block, but it handles just pinmux and pad configuration, and
+> the DSA driver programs it directly rather than going through the
+> pinmux subsystem.
+> 
+> This highlights a key requirement I have from the API for
+> instantiating sub-devices: that it is sufficiently flexible to split
+> them out of the main device when that starts making sense (we identify
+> a reusable block, or we need to configure it in the device tree, etc).
+> Otherwise, chopping up the switch address space upfront is a huge
+> overhead that may have no practical gains.
+
+I certainly understand the challenges.
+
+However, from my PoV, if you are instantiating one driver, even if it
+does a bunch of different things which _could_ be split-up into all
+sorts of far reaching subsystems, it's still one driver and therefore
+does not meet the criteria for inclusion into MFD.
+
+I had to go and remind myself of your DT:
+
+        ethernet-switch@0 {
+                compatible = "nxp,sja1110a";
+
+                mdios {
+                        mdio@0 {
+                                compatible = "nxp,sja1110-base-t1-mdio";
+                        };
+
+                        mdio@1 {
+                                compatible = "nxp,sja1110-base-tx-mdio";
+                        };
+                };
+        };
+
+To my untrained eye, this looks like two instances of a MDIO device.
+
+Are they truly different enough to be classified for "Multi"?
+
+> > > I need to remind you that my purpose here is not to add drivers in
+> > > breadth for all SJA1110 sub-devices now.
+> > 
+> > You'll see from my discussions with Colin, sub-drivers (if they are
+> > to be used for MFD justification (point 3 above), then they must be
+> > added as part of the first submission.  Perhaps this isn't an MFD,
+> > "yet"?
+> > 
+> > [...]
+> 
+> IMHO, the concept of being or not being MFD "yet" is silly. Based on
+> the register map, you are, or are not.
+
+Perhaps I didn't explain this very well.  What I'm alluding to here is
+that perhaps this a collection of different devices that may well fit
+comfortably with the remit of MFD.  However, I haven't seen any
+compelling evidence of that in this current submission.
+
+As an example, when contributors submit an MFD core driver with only one
+device, let's say a few Regulators but promise that the device is
+actually capable of operating as a Watchdog, a Real-Time Clock and a
+Power-on Key, only they haven't authored the drivers for those yet.  The
+driver get NACKed until at least one other piece of functionality is
+available.  Else the "Multi" box isn't ticked and therefore does not
+qualify for inclusion.
+
+The "yet" part was alluding to the fact that this may be the case here.
+
+> > > The SGMII blocks are highly reusable IPs licensed from Synopsys,
+> > > and Linux already has DT bindings and a corresponding platform
+> > > driver for the case where their registers are viewed using MMIO.
+> > 
+> > This is a good reason for dividing them up into subordinate platform
+> > devices.  However, it is not a good use-case of MFD.  In it's
+> > current guise, your best bet is to use the platform_* API directly.
+> > 
+> > This is a well trodden path and it not challenging:
+> > 
+> >   % git grep platform_device_add -- arch drivers sound | wc -l 398
+> > 
+> > [...]
+> > 
+> > > In my opinion I do not need to add handling for any other
+> > > sub-device, for the support to be more "cross-system" like for
+> > > Ocelot. What is here is enough for you to decide if this is
+> > > adequate for MFD or not.
+> > 
+> > Currently ... it's not.
+> > 
+> > [...]
+> > 
+> > Hopefully that helps to clarify my expectations a little.
+> > 
+> > TL;DR, this looks like a good candidate for direct platform_* usage.
+> 
+> I do have a local branch with platform devices created manually, and
+> yet, I considered the mfd_add_devices() form looked cleaner when
+> submitting.
+> 
+> I expect the desire to split up reusable register regions into
+> platform sub-devices to pop up again, so the logic should be available
+> as library code at some level (possibly DSA).
+> 
+> Unless you have something against the idea, I'm thinking a good name
+> for this library code would be "nmfd", for "Not MFD". It is like MFD,
+> except: - the parent can simultaneously handle the main function of
+> the device while delegating other regions to sub-devices - the
+> sub-devices can all have drivers in the same subsystem (debatable
+> whether MFD follows this - just to avoid discussions) - their OF nodes
+> don't have to be direct children of the parent.
+
+Well, we already have Simple MFD which works for some basic use-cases.
+
+When I've thought about replacing the existing occurrences of the MFD
+API being used outside of drivers/mfd, I have often thought of a
+platform_add_device_simple() call which I believe would do what most
+people of these use-cases actually want.
+
 -- 
-2.43.0
-
+Lee Jones [李琼斯]
 
