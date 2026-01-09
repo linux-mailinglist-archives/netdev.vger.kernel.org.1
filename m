@@ -1,140 +1,232 @@
-Return-Path: <netdev+bounces-248461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F071D08CC2
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 12:05:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BEE8D08D0D
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 12:09:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E7930309402A
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 11:00:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1B8553004F6D
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 11:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2C9633B973;
-	Fri,  9 Jan 2026 11:00:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FE79334C06;
+	Fri,  9 Jan 2026 11:07:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kDOZ1wFL"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="e6u/lY3j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+Received: from mail-pl1-f227.google.com (mail-pl1-f227.google.com [209.85.214.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED8033B972
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 11:00:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A541F339705
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 11:07:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767956447; cv=none; b=mSZvXDnGWyilJV4DR9JFCh1gwxmDvfI3XPQKXsBX6g2IlM0UOzqTxFHwf/WCmGh4bTt0rq8Dn138emxKiTY0gZHW8/xVkFjwh6xAdPNAcANKRJujbriAJfecq/cxzRLpW3dvsspAJv37DnEk1HUEhDOlTuhNSbq7yYRXDk4PMLU=
+	t=1767956860; cv=none; b=sWtoL5HCSfHO7nN2eScfgTFFtT2FrqcnsJTe7LhC8qDfdTjmhyS2AJAh2OJXpT6Ra46uH7pe25wpCrdFq0UZIzpI3QFf88KPrUgSFG1MTaTTuHM+j6YOzZqMWYlAIxRmqOWt8zftOlwTpM3J1AbG5dMFHR2p36IwEU0/8xbCKYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767956447; c=relaxed/simple;
-	bh=E7Kw2qWiUnhrhOA9x+kUneMFMH2UGTN9uFe1m7zolm0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ICCn41J6JoPfUDN94nZqdDCdHl0g8fBK5OXafwHctBKgAqiBnezNAOxG7ardNhdOfKr+gqnc6NZYurbxYh0lGTuQKeFcM9kI4+PaIuB3v0QQBMH+bYAXLeSpz+mp/LLeLwgg4b8jVCAxzl1mdpbsfVk8PvrycXspnl2w0zQdT+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kDOZ1wFL; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-59b679cff1fso3088029e87.0
-        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 03:00:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767956444; x=1768561244; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YqoBuqGPYO3MBBZam2ND97FvS4ahEqNDCPSZA0/NAZU=;
-        b=kDOZ1wFL+boHapIMVtaWcjmsfpHDuxcFoTrsP/Rdwv2GWc0s5vVyQ50H7UZ8uXUXCU
-         svq+b3MtNfyN85wKZjA8CwU5xGSi2q5iNtyOAPja1oRzbwmyzsg7etNkpKal59/p0OIw
-         8jH9Ppd670grHK5ae89/KO4MIEuakiMdSD+N6Kk/8/DKP6486Fmw9QU+vLOmGSFPcdHx
-         UXAdIzE8gzQham5ogb9T7b6T2TKoZcHIwc4kN9wAxTFhVCutj7FbLfbxZUrpOCyVIsLz
-         QupeUmwN/tgVzDGRbjLFVZKAcSeMfgjlNfur9M+ziOFBzfrnJPrM4s3sd0ffs9ng/1H6
-         EzYg==
+	s=arc-20240116; t=1767956860; c=relaxed/simple;
+	bh=bClo26dKQKfmtH6wmORSjwie/4l4DK0i8SN38XFShIg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RbPhx7VPQoV9AuAg9f2iZ5TFnLuKSD5Yh7uC4wGG3XJBeMdNy1O6wbAgAeFObzrWrRgRNpK9H86y4Sogo6Urv82W/MSwJzKqNbYcGfOhFqxT3EXd6FYESbkV8uqqkO/hcyeNz/tngFrkPq8LHnK4OME+hN4rCat694tze1FZLEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=e6u/lY3j; arc=none smtp.client-ip=209.85.214.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f227.google.com with SMTP id d9443c01a7336-2a3e89aa5d0so30603055ad.1
+        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 03:07:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767956444; x=1768561244;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YqoBuqGPYO3MBBZam2ND97FvS4ahEqNDCPSZA0/NAZU=;
-        b=T1hMTQgIcD0Uz3i/bkZKPUPw3ukL+XAhe8Pu5ECMrJc7diayqpqfstvkVJ61lSiFvQ
-         Ib/H1jDlVjMWSNlhYlGI+7eUTTcll3fRS+faZBIuIgP6B4cPSFut2OsLIl6K+mGIsIHz
-         +Em5uQpx+lw4we5HERsXEmXyIThRr8bQ+ld+4mza8v4sb896FuR6IFVvFuy2fJqe8yFa
-         DRlY0EshVq/WGVq54ajQaqFrFeEMMQTgKl2Xx/ECg4GbO3qxQOBvgDwoQuFSHzlBQ0XO
-         6KlZE8UkXf/+IM7KcUOkBQYh2KiuhsodPoeoZknlfLekJvac/E/S23juyKfGDrHFqR6Z
-         EUuw==
-X-Forwarded-Encrypted: i=1; AJvYcCXWbiFHNNCRzBOgWORG0i5EzsJCdcKHDdlOvvhReWoGru8lW7tdTMmLM5AVEeJfP1IY/qEb6y0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzytMI8jK5TwmEqh21PmN6gHHqvpDOzw7V5QBQ6rby7YXHcSv1S
-	yuuanORt3F52a+Z+4BXfG48bvQ4Ytdwo03Z+NeUFIMBZFr2pH6WsZN7XJUb+jg==
-X-Gm-Gg: AY/fxX7uD3OeXv2dfJbvHSogsUj4xdv4OIr6efvYqi3nIS2eeISVxY1sKB6vK83w42u
-	FLHXuGbF9RFi2nqWyCgbfMp4avPiHCU9/wYyOq6UIOJQKQ664Mv34fqvWemc7DDq8nLGACUuNc+
-	4FIhQ8ZFHhiNuV43Y6RXl/AfHDXYZT1ZZtFVqHmaxhQ6ynCkA/J9+MzaeLCgszdTPq/OgVst2i7
-	jMUG+syM6YKE500OKysk7bf7KZAytCLBZI0a1v0MX5waCxlDWVrwxXyjatrqqabYZZ5DGKWqy8M
-	bJP2McgvgBkZLedYrr9TW8bTWLa0Vu5SzMNk7SdhI4iTYy566QsRWWY9xUawzouwoXwvHlcC8fa
-	KxtIaAWUxB76t0hOsEWW8hSftKbG+he7g+1ItpqEyVF2vt3mVjFWiJGFHSrlvYIEAVsClrGOibR
-	7thLUBG0P4NoLoL6Bp/MGliQcjFrn4tJbdElDOP1JKuo5I2sOqAc+1LfAZvUYfZU/BrssCqZpBh
-	DvlnHCHww+hW/FKDOdBtGj2DIMZBvc8rV8JQm0wHR+BV2/OT6zO2w==
-X-Google-Smtp-Source: AGHT+IFMWrhn/zD8S7L7QefRHqtE+srOvan7Oqu7FDcQ1yfstaZdkM+oGVRAUleuY9Bwvy1rVkrYVQ==
-X-Received: by 2002:a05:6512:3da9:b0:59a:1a4e:c098 with SMTP id 2adb3069b0e04-59b6ed134b7mr2674313e87.8.1767956443812;
-        Fri, 09 Jan 2026 03:00:43 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f34:b700:c079:f905:5470:9a28? (p200300ea8f34b700c079f90554709a28.dip0.t-ipconnect.de. [2003:ea:8f34:b700:c079:f905:5470:9a28])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59b6a2b8330sm2512662e87.10.2026.01.09.03.00.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Jan 2026 03:00:43 -0800 (PST)
-Message-ID: <1263a26d-a622-45d7-8043-262f2b92ed3b@gmail.com>
-Date: Fri, 9 Jan 2026 12:00:41 +0100
+        d=1e100.net; s=20230601; t=1767956858; x=1768561658;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eD5pHYGilsMyb5v5eXOJGZgBHsDewfP3AwzPbcKcT5s=;
+        b=NW0OvWQnKgSNt3GDNscUaw21veyoSaud18cK9TKVxzqjdg7BD0hyzTzg7PycBR4+eB
+         9Viin9oDWPx5imINFpbnwdLZ/p+2N1Yb++Z+ipzWWrQ2TWZ2cTjUD8FZOaLyIWcUp7HD
+         Itjt0mvn7mR58do8n89St0BzNIYQk1cXvExcW1E+kdORye7EGaqNCOaKAlEfdDYH9Kxt
+         rjSaaM4wV+tItAGXQ0ohanyZpL2/7dATEIwQJrgD2cQwn4yZGf/zTMoJGCShdEcnDSlt
+         +Q+0dM9/91QY1+h86fnxAU8HZl1xBGBPegG8r00uIvEZHY5yB+4Z3Sdv2+FzMVYyoXRX
+         lsDg==
+X-Forwarded-Encrypted: i=1; AJvYcCVtWHGta7bq39+24uB5qDLtF6POnaYktOnhyo9opGHsfwljfMBHjt4/eeZaxoA06TU3VrYDfXA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzILx7qOWnK4OFM8MCaT5HwN/qMsySUYjc1PaZ5MKhqR2/PBKcs
+	da0oJUk/7s3vexh1yXt6FujNftY/qfEbZrPDjwdblVz/FGIzUKeLm2afjSMUEAK5QchDU9ZM8ej
+	EP59AX0cql1co6k4owkD5llOihCovch9AFoTykMXDLJU5HJJ8LLwyUKacbziKkzsftkmwdJbNvR
+	VVA5oSbKjVlEGyefHu8DE/iY2vzEIgjKajdTL7EX6uRi8ejy/PEsXkCGQDW6vneNtkETEqF3nk6
+	oJnuR/3aCtr69VXjd0bjA==
+X-Gm-Gg: AY/fxX4iaEYlxN/4bh5lVliFoyvhthWmXAZn/v2RROr52aedTqTVMNeEIbpO2cb8+dU
+	eJkvkchqvxV7BPLVoLc1LxywWLeKE8w6ae9l72wdM+fR/3K6ZNeGtjOhfdJta2J0S960BctS4fZ
+	2Hwr385a+S1VSa12wC6AJh8hxOuzV9lazsu94+Os9l8g77wiiV7tfVKQgDBVXyRLt1vITAHG5Xq
+	u40BnNC1utepbcweWtsrLb+XuA6pF0Vz1/P+b0QWRLlyIEywgrsDAVr1KOl8WhFBwtorN+z+Ke0
+	dn2BNfQ5A13rxhiwSRJCZuSFwtn3OzabwvZBSjpLYldxNatlfnuMBdXvepJPIFcZ8h5bgYq3RZB
+	VxDb/yJAjqFH5RWTG79/5RiWaQh/ZQVvKvQ4AgKjqEB0wtL2rQOHijn1g+1vki/L8ro/KGShRm5
+	SZf5I8eFIyvPoqLnh4tN1vGpi3BYAyJ4QAwpoWuplZTrC/5QYMNA==
+X-Google-Smtp-Source: AGHT+IGY/5Y5dTzx1kvnNyi29umrZ6aaGyMKZx5qKVmx8nXK9wE1ALA5MmDe4+KqPZEWruxNPoC2G+ENdu35
+X-Received: by 2002:a17:902:f546:b0:290:ac36:2ed6 with SMTP id d9443c01a7336-2a3ee42a386mr86359555ad.14.1767956857957;
+        Fri, 09 Jan 2026 03:07:37 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-2.dlp.protect.broadcom.com. [144.49.247.2])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2a3e3cc4b54sm11932235ad.49.2026.01.09.03.07.37
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 09 Jan 2026 03:07:37 -0800 (PST)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-dy1-f197.google.com with SMTP id 5a478bee46e88-2ac363a9465so3245991eec.0
+        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 03:07:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1767956856; x=1768561656; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eD5pHYGilsMyb5v5eXOJGZgBHsDewfP3AwzPbcKcT5s=;
+        b=e6u/lY3jiyHaefD2gMMsIPSsetyln1ny1Vsbu96XaS/t3uXU5mJx/Y3BE/Iky4nuAY
+         UtQyGqLngUqAUmrqwPviYJrWPfxzG2YA5XCDj7DdZu9T+ws1CXYSjs5NA7spnr+eOXYY
+         09Q2GES7lXRiWZPf8YNJLcQqaE1fWiXgsVRbc=
+X-Forwarded-Encrypted: i=1; AJvYcCV7v5sffD/eWgaNJ2+cnga+LnqcYwakb2pc+FGFgOzV1Z6msqNGABP847LciRGnpv/uH20McSw=@vger.kernel.org
+X-Received: by 2002:a05:7301:7214:b0:2ae:5d7d:4f1d with SMTP id 5a478bee46e88-2b17d238b33mr8081319eec.1.1767956856154;
+        Fri, 09 Jan 2026 03:07:36 -0800 (PST)
+X-Received: by 2002:a05:7301:7214:b0:2ae:5d7d:4f1d with SMTP id 5a478bee46e88-2b17d238b33mr8081297eec.1.1767956855605;
+        Fri, 09 Jan 2026 03:07:35 -0800 (PST)
+Received: from photon-big-dev.. ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b1775fe27dsm8783818eec.29.2026.01.09.03.07.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Jan 2026 03:07:35 -0800 (PST)
+From: HarinadhD <harinadh.dommaraju@broadcom.com>
+To: stable@vger.kernel.org,
+	gregkh@linuxfoundation.org
+Cc: john.fastabend@gmail.com,
+	daniel@iogearbox.net,
+	jakub@cloudflare.com,
+	lmb@cloudflare.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	ast@kernel.org,
+	andrii@kernel.org,
+	kafai@fb.com,
+	songliubraving@fb.com,
+	yhs@fb.com,
+	kpsingh@kernel.org,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ajay.kaher@broadcom.com,
+	alexey.makhalov@broadcom.com,
+	vamsi-krishna.brahmajosyula@broadcom.com,
+	yin.ding@broadcom.com,
+	tapas.kundu@broadcom.com,
+	Eric Dumazet <edumazet@google.com>,
+	Sasha Levin <sashal@kernel.org>,
+	Harinadh Dommaraju <Harinadh.Dommaraju@broadcom.com>
+Subject: [PATCH v2 v5.10.y] bpf, sockmap: Don't let sock_map_{close,destroy,unhash} call itself
+Date: Fri,  9 Jan 2026 10:20:11 +0000
+Message-ID: <20260109102011.3904861-1-harinadh.dommaraju@broadcom.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: phy: fixed_phy: replace list of fixed PHYs
- with static array
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- David Miller <davem@davemloft.net>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <e14f6119-9bf9-4e9d-8e14-a8cb884cbd5c@gmail.com>
- <20260108181102.4553d618@kernel.org>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <20260108181102.4553d618@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-On 1/9/2026 3:11 AM, Jakub Kicinski wrote:
-> On Tue, 6 Jan 2026 17:56:26 +0100 Heiner Kallweit wrote:
->> +/* The DSA loop driver may allocate 4 fixed PHY's, and 4 additional
->> + * fixed PHY's for a system should be sufficient.
->> + */
->> +#define NUM_FP	8
->> +
->>  struct fixed_phy {
->> -	int addr;
->>  	struct phy_device *phydev;
->>  	struct fixed_phy_status status;
->>  	int (*link_update)(struct net_device *, struct fixed_phy_status *);
->> -	struct list_head node;
->>  };
->>  
->> +static struct fixed_phy fmb_fixed_phys[NUM_FP];
->>  static struct mii_bus *fmb_mii_bus;
->> -static LIST_HEAD(fmb_phys);
->> +static DEFINE_IDA(phy_fixed_ida);
-> 
-> Isn't IDA an overkill for a range this tiny?
-> IDA is useful if the ID range is large and may be sparse.
-> Here a bitmap would suffice.
-> 
+From: Jakub Sitnicki <jakub@cloudflare.com>
 
-Thanks for the suggestion! The IDA has been there forever, just the definition
-has been moved now. I think switching to a bitmap is a good option.
-Can we handle this as a follow-up?
+[ Upstream commit 5b4a79ba65a1ab479903fff2e604865d229b70a9 ]
 
-> DECLARE_BITMAP(phy_fixed_ids, NUM_FP); 
-> 
-> id = find_first_zero_bit(phy_fixed_ids, NUM_FP);
-> if (id >= NUM_FP)
-> 	return -ENOSPC;
-> 
-> set_bit(id, phy_fixed_ids);
-> ...
+sock_map proto callbacks should never call themselves by design. Protect
+against bugs like [1] and break out of the recursive loop to avoid a stack
+overflow in favor of a resource leak.
+
+[1] https://lore.kernel.org/all/00000000000073b14905ef2e7401@google.com/
+
+Suggested-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+Acked-by: John Fastabend <john.fastabend@gmail.com>
+Link: https://lore.kernel.org/r/20230113-sockmap-fix-v2-1-1e0ee7ac2f90@cloudflare.com
+Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+[Harinadh: Modified to apply on v5.10.y ]
+Signed-off-by: Harinadh Dommaraju <Harinadh.Dommaraju@broadcom.com>
+---
+ net/core/sock_map.c | 53 +++++++++++++++++++++++++--------------------
+ 1 file changed, 30 insertions(+), 23 deletions(-)
+
+diff --git a/net/core/sock_map.c b/net/core/sock_map.c
+index 3a9e0046a780..438bbef5ff75 100644
+--- a/net/core/sock_map.c
++++ b/net/core/sock_map.c
+@@ -1558,15 +1558,16 @@ void sock_map_unhash(struct sock *sk)
+ 	psock = sk_psock(sk);
+ 	if (unlikely(!psock)) {
+ 		rcu_read_unlock();
+-		if (sk->sk_prot->unhash)
+-			sk->sk_prot->unhash(sk);
+-		return;
++		saved_unhash = READ_ONCE(sk->sk_prot)->unhash;
++	} else {
++		saved_unhash = psock->saved_unhash;
++		sock_map_remove_links(sk, psock);
++		rcu_read_unlock();
+ 	}
+-
+-	saved_unhash = psock->saved_unhash;
+-	sock_map_remove_links(sk, psock);
+-	rcu_read_unlock();
+-	saved_unhash(sk);
++	if (WARN_ON_ONCE(saved_unhash == sock_map_unhash))
++		return;
++	if (saved_unhash)
++		saved_unhash(sk);
+ }
+ 
+ void sock_map_destroy(struct sock *sk)
+@@ -1578,16 +1579,17 @@ void sock_map_destroy(struct sock *sk)
+ 	psock = sk_psock_get(sk);
+ 	if (unlikely(!psock)) {
+ 		rcu_read_unlock();
+-		if (sk->sk_prot->destroy)
+-			sk->sk_prot->destroy(sk);
+-		return;
++		saved_destroy = READ_ONCE(sk->sk_prot)->destroy;
++	} else {
++		saved_destroy = psock->saved_destroy;
++		sock_map_remove_links(sk, psock);
++		rcu_read_unlock();
++		sk_psock_put(sk, psock);
+ 	}
+-
+-	saved_destroy = psock->saved_destroy;
+-	sock_map_remove_links(sk, psock);
+-	rcu_read_unlock();
+-	sk_psock_put(sk, psock);
+-	saved_destroy(sk);
++	if (WARN_ON_ONCE(saved_destroy == sock_map_destroy))
++		return;
++	if (saved_destroy)
++		saved_destroy(sk);
+ }
+ EXPORT_SYMBOL_GPL(sock_map_destroy);
+ 
+@@ -1602,13 +1604,18 @@ void sock_map_close(struct sock *sk, long timeout)
+ 	if (unlikely(!psock)) {
+ 		rcu_read_unlock();
+ 		release_sock(sk);
+-		return sk->sk_prot->close(sk, timeout);
++		saved_close = READ_ONCE(sk->sk_prot)->close;
++	} else {
++		saved_close = psock->saved_close;
++		sock_map_remove_links(sk, psock);
++		rcu_read_unlock();
++		release_sock(sk);
+ 	}
+-
+-	saved_close = psock->saved_close;
+-	sock_map_remove_links(sk, psock);
+-	rcu_read_unlock();
+-	release_sock(sk);
++	/* Make sure we do not recurse. This is a bug.
++	 * Leak the socket instead of crashing on a stack overflow.
++	 */
++	if (WARN_ON_ONCE(saved_close == sock_map_close))
++		return;
+ 	saved_close(sk, timeout);
+ }
+ 
+-- 
+2.43.7
 
 
