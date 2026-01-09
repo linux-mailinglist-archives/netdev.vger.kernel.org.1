@@ -1,81 +1,79 @@
-Return-Path: <netdev+bounces-248491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C9DED0A012
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 13:50:20 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 119ACD0A147
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 13:57:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B972E30C85B1
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 12:38:03 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B57A430D4E6B
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 12:41:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9778B35971B;
-	Fri,  9 Jan 2026 12:38:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD9A535B137;
+	Fri,  9 Jan 2026 12:40:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="N5mDZd3Q"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="hqAwRBW1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94E033372B
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 12:38:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D841DF72C
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 12:40:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767962283; cv=none; b=Bm5mArS/+eQ7JNWaSP34Liygi0xPgiUIGCepNumvDT2xkM/v7uF0FOgdUzBdBSq1cwyIAxcQsg59z37by5XEt0D5fAc02z67SMfTv3cZOGatkU9boUPcGY16qNBXsuwT9QBh+niV4lDgdIDceL9Q9iNyZLesMM1io2ErZnRTcFI=
+	t=1767962444; cv=none; b=afW7vMrs8vVItVQXWoxxG8aSmsUmtUuy0FPOhJJ8A8JPE7KzVQSleJbpWYGNwQQh1i+vXABzxld6ncUJDBCBnvelDqqOfYfs0il4XXAJCCrJOaP6dHTDGUPWeoMq2R7MB78GPqd6nZfoqBxdxr3hX37w0WP8svQLyfX4rvyU0nk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767962283; c=relaxed/simple;
-	bh=pCePNRJ/Geejast6eOyH3mTBkPFdK4IanixiX5nAZ5g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Silqi45aiOSQgH92rz/6/0RQYkTGML1L+qx6LxSCXm3jDUbW7bzIUhNXCF81LQOU4+95P0pIxJcgD93JC5JvCtCgylHDyxHy2MJxCIAW2x60/BpFiK3mnCDslxgpaZ+mbNOiOr87brrg424A/gBMcjZY8Acm7iXq5xXfkSm2ZmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=N5mDZd3Q; arc=none smtp.client-ip=209.85.218.47
+	s=arc-20240116; t=1767962444; c=relaxed/simple;
+	bh=nfqPrA3vvRkG6Tmb3LIiS7KgpHc+6H/TE8anC3X9D5A=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=PmSinsSOfJIFwhp9sM9erP9XEkUi77P+EbS2/E+GmMDfBF/oRkVOI8CS7jPGMxcm/WgKO2fIwF1RNYpN9iZVO+9sHSVT74uJPxq1Ge8di39KKBvyxBAeFg9lpxicf9uXeAlnYc/oNQvgPCzN2nepJgR3DCoI7LI9mpHCRBl/hTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=hqAwRBW1; arc=none smtp.client-ip=209.85.218.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b73161849e1so812978366b.2
-        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 04:38:01 -0800 (PST)
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b8427c74ef3so640033266b.2
+        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 04:40:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1767962280; x=1768567080; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NmgtpSCyUdGCs6k4As/mmm3rTuvH18R6z3Rt3Vmk304=;
-        b=N5mDZd3QRQgvD43sruTN0c8C6CT7Z4wvyV/ZAK1P1InsK/+gkTP4L76QtdEXyMsCRK
-         MYPIzksFeMATckY0tibFlpDCOSIpIh5WZ1YNpU72TMYbpJg07paRlblbHPRUGGOBwE95
-         De8q3MRXK+li1zON2We64DlaayQEGqCqk5iGhVP+h9wD1JbeWbztcRGlFAj2bw7ttCGz
-         V9eo3U2wsnu/aN7KI+TpOljh5E0MKJW1abOLXNBYqmhN1hplTJ/se7bZgZE+0FB7HYI9
-         2Pl+W0WYz12b6UeY5eL29Yn1Arj/wMtcBe9MWRx7lrQ+cFvW0vLS6zdAmhW8zshqlcIj
-         RyqA==
+        d=blackwall.org; s=google; t=1767962441; x=1768567241; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=XmbzNcIB7zmVJRvzuFkngXTnhqTy/rGzx/z/GUGBVgA=;
+        b=hqAwRBW1M6kOoxm4WcrZycmTbOfa6KKz6R1+D/NIE7kJDohPlAcuLItLnihO+RG76R
+         3AVV6bBv19AxSvMrhwXfRx2k3/PjVitApb6OKg8htmX05qfEiPShLInQbghtsGNn8LWo
+         NKacD4rWK0753o/MMgu0yLiaY0padX//tcirglBJx3ofjhCHq8tc3WwZ1AvSGNaxzfwy
+         Ke0ZRahtgIW+h0dvx8KfUDO6Aoq67fibTTg1+QqTmMubZ134I+1W3+9ZNbEYRMzheMjC
+         cnV+UltbqcgBZR6CYH2SqwtGAno184+dk5s/NVzYGIl+EVoDNZmcOkO9H2NMHslH8Fac
+         Xmjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767962280; x=1768567080;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NmgtpSCyUdGCs6k4As/mmm3rTuvH18R6z3Rt3Vmk304=;
-        b=TszZ5mAJ9GgRL4wxuTtDMvmBP1vXKBA/1un4buGW2rhPxnQzftwtvYsK+B1MP8qxcZ
-         Me4yemm5EixOez9OA/A3pWSx2Kug60l45XMOZiYvn+AhuKlrnqCjKifjgZDKKJS9Tg5x
-         8Zr3gjnozvWNqV45wb1miXGVYzPX0H6QQo/q1s7iZ3R+6yFpLzgUjyu1sxBi+FuzHhBn
-         y511rUlRW3qh5uG2JF8Iz+i76FXZauW9HMmsgTS9FxuT3QCX6iQMDCBU4L82K6hsKq5I
-         YTGxcbewMjS2fEw1W0J2r13EDWbOIM6XOz2v9Csi+bsD0l0O2HRrpKsEkOPCVgO26VRk
-         vuFw==
-X-Forwarded-Encrypted: i=1; AJvYcCVZ7w/5jKcI2LxR1G3AMJKuuheqESqC0AtkKfgkew1T/8dQgdusvhN3y6ZAYZYS/wwCoLysTQc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzkGwlrUtIoWnu4T9t3rZyU7+ZHTB1DRJp1CiGrbADKwfAeZpoi
-	WzQkIEomFSTSBbyxcJLbVcKs6dZWgD9ETmnKQba2xvAqziJWCnhI631403/B+H1rzlSesmg21XO
-	pv3XQ
-X-Gm-Gg: AY/fxX5kAbPBJh8du9c5dvHP7D3CZC4zgPUP6eX8oHaSmQAUIW2KKFfhIypwMtmD69+
-	Otl/BoKpVsVpvzBuyNFdClsCwZRZ3p2yv04fTcaI5i4NR60m1h+mPwA7sJcnukE/miW1XTqS4xw
-	JlrW9Bn6Tam7PWhGJwIO6AxUqnOCCQIc/PYJxZDLfoR5Am0xpgXvF+Bxy2tgSlti8srxn+o2BeK
-	54xtHsgGSmU7BOe9X/v6rOnaBIckoLjW8l3v49ZlUgTlrk7pwrkSF1uM7Xq20UGxsr82W9hySsJ
-	dtyF1oPnAx8xXspPEQnciMmcVt405kJEQN1BQoa2pzMNigr9fnIJCZ7fy2+l7GK5vrBztZfzXBY
-	PZHfCpcrL/pFT8wWTcrA8sQPgeTG1N0xQIzswm+A/JDHGAZldp9f3uN6j9x0bVgkFuneCimoAuw
-	Q/K5vt5vOMQPmpqScCniIa4NYjlg84hdBCpzTg7oEMUvxXwj4LxwvlyLrDW9/v8I8JmKPuwA==
-X-Google-Smtp-Source: AGHT+IHsPgR40X+wpRAxVOPhgYu8DNrZZqYCCRvBUPPDWd4i/4gQVDgk51cykP0uAeUN5jiSR6miNg==
-X-Received: by 2002:a17:907:3d02:b0:b83:3716:ca6b with SMTP id a640c23a62f3a-b84451c7c7bmr942769466b.17.1767962279632;
-        Fri, 09 Jan 2026 04:37:59 -0800 (PST)
+        d=1e100.net; s=20230601; t=1767962441; x=1768567241;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XmbzNcIB7zmVJRvzuFkngXTnhqTy/rGzx/z/GUGBVgA=;
+        b=IzaeR66x+Er5R5ECPHUY+enT/BKb6ug6lAWyqumeaYegIebPpOJCbNbXvX9h2+QiQ7
+         p4TaMLkLgiL9bbXhfmYrPVzySgKibztfYg6yNGk76c3Xv6n2wRx449R7RWMvrx8Dmr4X
+         TEgdFV4JfDsMMiKp7zEJK60oPkVhexJDXJKPqVgAfNBUCf0qkPVvkUmvS+CSyM7VmwsQ
+         72v+BLAM57Zox1AHLZTHLrvjnj9ERDZS/6sOMcPyLL3GyVgCkMSlRj4L8Su5lrfKBuS6
+         uON4BwzpF/Gkes95FDKVhBMlPpMxo5tBxfah3HatsZdnk/DKnW6RHmXZPA6xylENVOiz
+         sTqA==
+X-Forwarded-Encrypted: i=1; AJvYcCWFEZhnQ5OVE9XVpwyNhp+60iS2BBTMLCMzBwcWv2ogsec/2706X4mumo20S2t7t7PAlYV3rME=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/CQrFp+xTT0TTGsdMOLvO20jDz/WL8UbhgFimE5RKm3Fz+mVq
+	VYY7i2X4NaxfoMG0Ndj7WaXj1dLBWK5AQjvp+pzvA3/GZveb/tSg6EhnOf8ubkjk7do=
+X-Gm-Gg: AY/fxX4eHXEKO8RjENAe9rlTGpPGfNoQrLCpl7VeaYgJCl9yMc2lXwRbs7bQmRMIhbs
+	foFw3NN3NjoPX+3R6FYh5cwyl+VMw41dPXO1dQJcYoZFye+Sh0y4GYWpf47s/RG8TdXLkQ6Rt/k
+	btLSkbuYUVIPsYXURuiP1TsKmOgXw8Q99mIolZFp6h3ugr9HdqY3XZPKurPQ6d7tv2nErmEWam/
+	qpHgmOsFPTZpnWvI4CU5n9FDA6JxehMok7ZsFYTmqrXkMCvtb8ViWIjKAqFz/zmDA6X9DG/lhIH
+	rNF+ri/miUKdf4I80ZBNZ4Hs4fq02AL49NNg5VqznnwNpaKOmgPKKHcYTkUkEL5eckbXQt4jVzY
+	mn+y23LfmN2Wzn+3IXpIC0UjO8shFNq/SlyUjcp/ESKkO+0YPPoShvCv5ornrjLeKvG7knryIro
+	9fDwxRHkQzaqwzHKIDCZdArYmp7WC2y5Z7NF36rZxwj3guWBawC0vyi9ekJQLu6rRmBHEJbA==
+X-Google-Smtp-Source: AGHT+IHVhyzPTaDfm/HfRVhOtp5M0BEzqsLqNW+VhIRiyeoVJC8KY5ryR4B7ChzWKucvVAe+aHW94w==
+X-Received: by 2002:a17:907:841:b0:b84:40d3:43e7 with SMTP id a640c23a62f3a-b844502c5abmr788464466b.6.1767962441235;
+        Fri, 09 Jan 2026 04:40:41 -0800 (PST)
 Received: from [192.168.0.161] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a5118eesm1089541366b.52.2026.01.09.04.37.58
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a2340a2sm1121332166b.5.2026.01.09.04.40.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Jan 2026 04:37:59 -0800 (PST)
-Message-ID: <fd629b2e-79ee-4edb-9c5a-23aa803db6b4@blackwall.org>
-Date: Fri, 9 Jan 2026 14:37:57 +0200
+        Fri, 09 Jan 2026 04:40:40 -0800 (PST)
+Message-ID: <0b999b82-e39e-43d8-b224-d660de1c21d9@blackwall.org>
+Date: Fri, 9 Jan 2026 14:40:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,8 +81,9 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESEND net-next v2 4/5] bonding: 3ad: Add support for
- SPEED_80000
+Subject: Re: [PATCH RESEND net-next v2 2/5] net: thunderbolt: Allow changing
+ MTU of the device
+From: Nikolay Aleksandrov <razor@blackwall.org>
 To: Mika Westerberg <mika.westerberg@linux.intel.com>, netdev@vger.kernel.org
 Cc: Yehezkel Bernat <YehezkelShB@gmail.com>, Ian MacDonald
  <ian@netstatz.com>, Salvatore Bonaccorso <carnil@debian.org>,
@@ -93,58 +92,62 @@ Cc: Yehezkel Bernat <YehezkelShB@gmail.com>, Ian MacDonald
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
  Jay Vosburgh <jv@jvosburgh.net>, Simon Horman <horms@kernel.org>
 References: <20260109122606.3586895-1-mika.westerberg@linux.intel.com>
- <20260109122606.3586895-5-mika.westerberg@linux.intel.com>
+ <20260109122606.3586895-3-mika.westerberg@linux.intel.com>
+ <b070f4f6-e81b-4674-954b-609ad17f1cda@blackwall.org>
 Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20260109122606.3586895-5-mika.westerberg@linux.intel.com>
+In-Reply-To: <b070f4f6-e81b-4674-954b-609ad17f1cda@blackwall.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 09/01/2026 14:26, Mika Westerberg wrote:
-> Add support for ethtool SPEED_80000. This is needed to allow
-> Thunderbolt/USB4 networking driver to be used with the bonding driver.
+On 09/01/2026 14:35, Nikolay Aleksandrov wrote:
+> On 09/01/2026 14:26, Mika Westerberg wrote:
+>> In some cases it is useful to be able to use different MTU than the
+>> default one. Especially when dealing against non-Linux networking stack.
+>> For this reason add possibility to change the MTU of the device.
+>>
+>> Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+>> ---
+>>   drivers/net/thunderbolt/main.c | 11 +++++++++++
+>>   1 file changed, 11 insertions(+)
+>>
+>> diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/ 
+>> main.c
+>> index 57b226afeb84..20bac55a3e20 100644
+>> --- a/drivers/net/thunderbolt/main.c
+>> +++ b/drivers/net/thunderbolt/main.c
+>> @@ -1257,12 +1257,23 @@ static void tbnet_get_stats64(struct 
+>> net_device *dev,
+>>       stats->rx_missed_errors = net->stats.rx_missed_errors;
+>>   }
+>> +static int tbnet_change_mtu(struct net_device *dev, int new_mtu)
+>> +{
+>> +    /* Keep the MTU within supported range */
+>> +    if (new_mtu < 68 || new_mtu > (TBNET_MAX_MTU - ETH_HLEN))
+>> +        return -EINVAL;
+>> +
+>> +    dev->mtu = new_mtu;
+>> +    return 0;
+>> +}
+>> +
+>>   static const struct net_device_ops tbnet_netdev_ops = {
+>>       .ndo_open = tbnet_open,
+>>       .ndo_stop = tbnet_stop,
+>>       .ndo_start_xmit = tbnet_start_xmit,
+>>       .ndo_set_mac_address = eth_mac_addr,
+>>       .ndo_get_stats64 = tbnet_get_stats64,
+>> +    .ndo_change_mtu    = tbnet_change_mtu,
+>>   };
+>>   static void tbnet_generate_mac(struct net_device *dev)
 > 
-> Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
-> ---
->   drivers/net/bonding/bond_3ad.c | 6 ++++++
->   1 file changed, 6 insertions(+)
+> You can use struct net_device's min/max_mtu instead of a custom 
+> ndo_change_mtu.
+> They will be validated by dev_validate_mtu().
 > 
-> diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
-> index 1a8de2bf8655..e5e9c7207309 100644
-> --- a/drivers/net/bonding/bond_3ad.c
-> +++ b/drivers/net/bonding/bond_3ad.c
-> @@ -72,6 +72,7 @@ enum ad_link_speed_type {
->   	AD_LINK_SPEED_40000MBPS,
->   	AD_LINK_SPEED_50000MBPS,
->   	AD_LINK_SPEED_56000MBPS,
-> +	AD_LINK_SPEED_80000MBPS,
->   	AD_LINK_SPEED_100000MBPS,
->   	AD_LINK_SPEED_200000MBPS,
->   	AD_LINK_SPEED_400000MBPS,
-> @@ -297,6 +298,7 @@ static inline int __check_agg_selection_timer(struct port *port)
->    *     %AD_LINK_SPEED_40000MBPS
->    *     %AD_LINK_SPEED_50000MBPS
->    *     %AD_LINK_SPEED_56000MBPS
-> + *     %AD_LINK_SPEED_80000MBPS
->    *     %AD_LINK_SPEED_100000MBPS
->    *     %AD_LINK_SPEED_200000MBPS
->    *     %AD_LINK_SPEED_400000MBPS
-> @@ -365,6 +367,10 @@ static u16 __get_link_speed(struct port *port)
->   			speed = AD_LINK_SPEED_56000MBPS;
->   			break;
->   
-> +		case SPEED_80000:
-> +			speed = AD_LINK_SPEED_80000MBPS;
-> +			break;
-> +
->   		case SPEED_100000:
->   			speed = AD_LINK_SPEED_100000MBPS;
->   			break;
+> Cheers,
+>   Nik
+> 
+> 
 
-You should also update __get_agg_bandwidth(), otherwise the
-aggregated bandwidth will be reported as 0.
-
-Cheers,
-  Nik
-
+In fact it seems they're already set in tbnet_probe(), so you can drop
+this patch altogether.
 
