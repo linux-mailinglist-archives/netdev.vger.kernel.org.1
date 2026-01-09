@@ -1,188 +1,165 @@
-Return-Path: <netdev+bounces-248481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AFF5D09726
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 13:18:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64A3FD0971D
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 13:18:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0E2683034F3A
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 12:13:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7593630361E4
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 12:13:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4929A35A952;
-	Fri,  9 Jan 2026 12:13:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7333F3590C6;
+	Fri,  9 Jan 2026 12:13:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gIHmK+AR"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="k8u0G43g"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB55032F748
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 12:13:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A1E320CB6;
+	Fri,  9 Jan 2026 12:13:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767960800; cv=none; b=LQDcU4/2aYSZHFvzpMJheO8pqTzB1EkNODNgGVSnHPXRh48MC4r/GyfOqSuq+ZVAPxzUT4FIkz3yvmhavdvryD+hjidDskpwkjiteHj+HzGt0m9QXb9Hy9/+hVcxNV8A2HEij43RXq9vdiU/YkvHRcPPK1Z3TrB0DLhP4Ju2vHI=
+	t=1767960799; cv=none; b=CQD8JnZel6OzsQwpFaubEcVydGlsYskisSpm+8x/odm9M/Y9qoxF86Qi0t49Snm28Ll/6O4PDlrBdiABn+oRiCf8itvGs0Ova7pM/R81ZBVmHOTVAzfL9WlQlUiN6EKzo6ESgskKyqBCvNht9jr9CS7+LQfn/r1i7bss+aSSFxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767960800; c=relaxed/simple;
-	bh=0yIboiZ8laNJ/CNq79lvdYNX16Y4FwxBgDWahMAFWsI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uvRzMDoZOopTCkTBSoBZuj8z2q6Qm6bBsb9eADIAtoM9jLbJ91pUR3NnsuZQPx1mmgzCJnykvs6rHqiVWZ/RxweB0QrK1aC9MLdzqq2KHZakXkKrRw3ueBtxnOrCcp/jknPW+zArfgX+Gu1lni/jnlIae7BY5GPhHO5nf4TqTLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gIHmK+AR; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767960787;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=EETQ3C2Ap/oA0jEy2/KTMPkQ1GCOoyHzuFkFxZNtMb8=;
-	b=gIHmK+AR693tXzNTKjXokpseT5ImWVGflJPzyf7iM6EvDZ0XU4K6aItdnleZuNziD3t5HK
-	hptCgc1ZaE9xz6vyuiqerswDansfn3niL4ajhMmpyBg6rKGBpwwMF3rSavh3mWcZWki6Yl
-	R6d6b1JsaaqVwMfczgZNExdV7WIzmg4=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
+	s=arc-20240116; t=1767960799; c=relaxed/simple;
+	bh=ESDkvH3Fn8HOZZe7JX1x2euDTTEb5v9YrKxw7SyT/1c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lo2+VuV257nzTYozq4UW13rkd+yHCWpAh3BM933lPFGb5ylFLACrzFXI7a2BR+Uvs7L4D8MwdXbk98uXqbPOjOxhpQiINkzpk1hmnZZjdPCMUi8vKdcMgdgYex7TZqjSHjPe6+o3lSUVX79miJaNOLP/E+ke2W4wsnnB1B1OGww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=k8u0G43g; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=fxxZLvuiImILHyrS856L3kgRb21V4nyjPtMH9ZzQ8Pk=; b=k8u0G43gdIatNdaYc4bz4t0F30
+	UNBGB1508TTMbAGDwl9UlzPmkFgxY7vpWgGN75A/8+ZuIgk4fmqK5hxNksrHVZ5heG0GW7KIvhlmj
+	TeN1vi06/vlzysucjjpGpmZl9q9Wxjr92Gdprn0HLd4ZPNftEokJz6J24Q5OBmtVlA1IZriEShg++
+	X+41MHlzVU9RtiPt7BElhaNI8d8vLEBTmR5me6L1jIU/gQ8r1JbyfRaviA2fpME/1dKl4xmiHC9Pv
+	2pT3DEkyo5OgH7ArDSZyQaWcf3Yt1sr40QkKNkNgW5Bo3Ri+STuzC6Txf2GwFmTC9y1xt7BVyWFVI
+	MzyTX6jA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60774)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1veBMb-000000003px-2Rtl;
+	Fri, 09 Jan 2026 12:13:09 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1veBMY-000000003Iu-2hvl;
+	Fri, 09 Jan 2026 12:13:06 +0000
+Date: Fri, 9 Jan 2026 12:13:06 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jonas Jelonek <jelonek.jonas@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2] net: ipconfig: Remove outdated comment and indent code block
-Date: Fri,  9 Jan 2026 13:11:29 +0100
-Message-ID: <20260109121128.170020-2-thorsten.blum@linux.dev>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v4] net: sfp: add SMBus I2C block support
+Message-ID: <aWDw0nbcZUaJnCQX@shell.armlinux.org.uk>
+References: <20260109101321.2804-1-jelonek.jonas@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260109101321.2804-1-jelonek.jonas@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-The comment has been around ever since commit 1da177e4c3f4
-("Linux-2.6.12-rc2") and can be removed. Remove it and indent the code
-block accordingly.
+On Fri, Jan 09, 2026 at 10:13:21AM +0000, Jonas Jelonek wrote:
+> Commit 7662abf4db94 ("net: phy: sfp: Add support for SMBus module access")
+> added support for SMBus-only controllers for module access. However,
+> this is restricted to single-byte accesses and has the implication that
+> hwmon is disabled (due to missing atomicity of 16-bit accesses) and
+> warnings are printed.
+> 
+> There are probably a lot of SMBus-only I2C controllers out in the wild
+> which support block reads. Right now, they don't work with SFP modules.
+> This applies - amongst others - to I2C/SMBus-only controllers in Realtek
+> longan and mango SoCs.
+> 
+> Downstream in OpenWrt, a patch similar to the abovementioned patch is
+> used for current LTS kernel 6.12. However, this uses byte-access for all
+> kinds of access and thus disregards the atomicity for wider access.
+> 
+> Introduce read/write SMBus I2C block operations to support SMBus-only
+> controllers with appropriate support for block read/write. Those
+> operations are used for all accesses if supported, otherwise the
+> single-byte operations will be used. With block reads, atomicity for
+> 16-bit reads as required by hwmon is preserved and thus, hwmon can be
+> used.
+> 
+> The implementation requires the I2C_FUNC_SMBUS_I2C_BLOCK to be
+> supported as it relies on reading a pre-defined amount of bytes.
+> This isn't intended by the official SMBus Block Read but supported by
+> several I2C controllers/drivers.
+> 
+> Support for word access is not implemented due to issues regarding
+> endianness.
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
-Changes in v2:
-- Move const definition to the top (Paolo)
-- Format ternary expression
-- Link to v1: https://lore.kernel.org/lkml/20251220130335.77220-1-thorsten.blum@linux.dev/
----
- net/ipv4/ipconfig.c | 89 +++++++++++++++++++++------------------------
- 1 file changed, 42 insertions(+), 47 deletions(-)
+I'm wondering whether we should go further with this - we implement
+byte mode SMBus support, but there is also word mode, too, which
+would solve the HWMON issues. It looks like more SMBus devices support
+word mode than I2C block mode.
 
-diff --git a/net/ipv4/ipconfig.c b/net/ipv4/ipconfig.c
-index 019408d3ca2c..b1e1be00ff8b 100644
---- a/net/ipv4/ipconfig.c
-+++ b/net/ipv4/ipconfig.c
-@@ -679,8 +679,18 @@ static const u8 ic_bootp_cookie[4] = { 99, 130, 83, 99 };
- static void __init
- ic_dhcp_init_options(u8 *options, struct ic_device *d)
- {
--	u8 mt = ((ic_servaddr == NONE)
--		 ? DHCPDISCOVER : DHCPREQUEST);
-+	static const u8 ic_req_params[] = {
-+		1,	/* Subnet mask */
-+		3,	/* Default gateway */
-+		6,	/* DNS server */
-+		12,	/* Host name */
-+		15,	/* Domain name */
-+		17,	/* Boot path */
-+		26,	/* MTU */
-+		40,	/* NIS domain name */
-+		42,	/* NTP servers */
-+	};
-+	u8 mt = (ic_servaddr == NONE) ? DHCPDISCOVER : DHCPREQUEST;
- 	u8 *e = options;
- 	int len;
- 
-@@ -705,51 +715,36 @@ ic_dhcp_init_options(u8 *options, struct ic_device *d)
- 		e += 4;
- 	}
- 
--	/* always? */
--	{
--		static const u8 ic_req_params[] = {
--			1,	/* Subnet mask */
--			3,	/* Default gateway */
--			6,	/* DNS server */
--			12,	/* Host name */
--			15,	/* Domain name */
--			17,	/* Boot path */
--			26,	/* MTU */
--			40,	/* NIS domain name */
--			42,	/* NTP servers */
--		};
--
--		*e++ = 55;	/* Parameter request list */
--		*e++ = sizeof(ic_req_params);
--		memcpy(e, ic_req_params, sizeof(ic_req_params));
--		e += sizeof(ic_req_params);
--
--		if (ic_host_name_set) {
--			*e++ = 12;	/* host-name */
--			len = strlen(utsname()->nodename);
--			*e++ = len;
--			memcpy(e, utsname()->nodename, len);
--			e += len;
--		}
--		if (*vendor_class_identifier) {
--			pr_info("DHCP: sending class identifier \"%s\"\n",
--				vendor_class_identifier);
--			*e++ = 60;	/* Class-identifier */
--			len = strlen(vendor_class_identifier);
--			*e++ = len;
--			memcpy(e, vendor_class_identifier, len);
--			e += len;
--		}
--		len = strlen(dhcp_client_identifier + 1);
--		/* the minimum length of identifier is 2, include 1 byte type,
--		 * and can not be larger than the length of options
--		 */
--		if (len >= 1 && len < 312 - (e - options) - 1) {
--			*e++ = 61;
--			*e++ = len + 1;
--			memcpy(e, dhcp_client_identifier, len + 1);
--			e += len + 1;
--		}
-+	*e++ = 55;	/* Parameter request list */
-+	*e++ = sizeof(ic_req_params);
-+	memcpy(e, ic_req_params, sizeof(ic_req_params));
-+	e += sizeof(ic_req_params);
-+
-+	if (ic_host_name_set) {
-+		*e++ = 12;	/* host-name */
-+		len = strlen(utsname()->nodename);
-+		*e++ = len;
-+		memcpy(e, utsname()->nodename, len);
-+		e += len;
-+	}
-+	if (*vendor_class_identifier) {
-+		pr_info("DHCP: sending class identifier \"%s\"\n",
-+			vendor_class_identifier);
-+		*e++ = 60;	/* Class-identifier */
-+		len = strlen(vendor_class_identifier);
-+		*e++ = len;
-+		memcpy(e, vendor_class_identifier, len);
-+		e += len;
-+	}
-+	len = strlen(dhcp_client_identifier + 1);
-+	/* the minimum length of identifier is 2, include 1 byte type,
-+	 * and can not be larger than the length of options
-+	 */
-+	if (len >= 1 && len < 312 - (e - options) - 1) {
-+		*e++ = 61;
-+		*e++ = len + 1;
-+		memcpy(e, dhcp_client_identifier, len + 1);
-+		e += len + 1;
- 	}
- 
- 	*e++ = 255;	/* End of the list */
+So, if we're seeing more SMBus adapters being used with SFPs, maybe
+we should be thinking about a more adaptive approach to SMBus, where
+we try to do the best with the features that the SMBus adapter
+provides us.
+
+Maybe something like:
+
+static int sfp_smbus_write(struct sfp *sfp, bool a2, u8 dev_addr, void *buf,
+                           size_t len)
+{
+	size_t this_len, transferred, total;
+	union i2c_smbus_data smbus_data;
+	u8 bus_addr = a2 ? 0x51 : 0x50;
+	u32 functionality;
+	int ret;
+
+	functioality = i2c_get_functionality(sfp->i2c);
+	total = len;
+
+	while (len) {
+		if (len > sfp->i2c_max_block_size)
+			this_len = sfp->i2c_max_block_size;
+		else
+			this_len = len;
+
+		if (this_len > 2 &&
+		    functionality & I2C_FUNC_SMBUS_READ_I2C_BLOCK) {
+			.. use smbus i2c block mode ..
+			transferred = this_len;
+		} else if (this_len >= 2 &&
+		           functionality & I2C_FUNC_SMBUS_READ_WORD_DATA) {
+			.. use smbus word mode ..
+			transferred = 2;
+		} else {
+			.. use smbus byte mode ..
+			transferred = 1;
+		}
+
+		buf += transferred;
+		len -= transferred;
+	}
+
+	return ret < 0 : ret : total - len;
+}
+
+sfp_hwmon_probe() will do the right thing based upon i2c_block_size, so
+where only byte mode is supported, we don't get hwmon support.
+
 -- 
-Thorsten Blum <thorsten.blum@linux.dev>
-GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
