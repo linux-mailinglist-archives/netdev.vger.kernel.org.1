@@ -1,144 +1,211 @@
-Return-Path: <netdev+bounces-248534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DEFCD0ABAC
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 15:48:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90014D0ABDC
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 15:51:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 642343038398
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 14:46:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5FE6B300E3D4
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 14:47:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1552231078B;
-	Fri,  9 Jan 2026 14:46:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0243930BF6D;
+	Fri,  9 Jan 2026 14:47:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HjQC29jO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TwOkJAqM"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC93E3101B9;
-	Fri,  9 Jan 2026 14:46:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F64420459A
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 14:47:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767969999; cv=none; b=JA3RvItmlaaGvVtP555CS579Pn9ZUVpaTZh4WX1gS2mlUg77Wazhy6Dkg6mKCaJ0Q8Ng5LA81/p3sqEK8MuzokI8oIWMjtKwhYu8+z4i0O8XYHiCIvjzIHRBM2Mq/2/bLVZOwErfkpFLVIoPjetVGWENFtnDRRyHSctqU8dkjc4=
+	t=1767970074; cv=none; b=EPB5rJAa9+d4/WWPFrRCaWyidi+iy7aO2WkgX2Wv+lK8eLbuJuPdHOsAt3uU+oSQ6v905AsBlKjAqX0bzJ9zFvPF4VxTjWvlsxW/c5HoRNI+62Od8oUJrecneZfpWNDjM+IIh7RjGZrgNnyVneEZa913CqZW4zzfh4jMTsBPYRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767969999; c=relaxed/simple;
-	bh=B6sznWUxpO5Ih9NiRDT77oADP2VoqUFi3ScgXNcmFu0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IWCA8iHYv0Sc3o0IILHIT1No+w6bXfU+WKu+h9CssRA9ZYDq+6Rv3Hsg68CEAhh2zA0hFqIQEm/RvrnqLgoUjxkdEhmh+pbYd/66HcHsFuR6quYQ1eIlsSdZBUAaCgwOjjWUqVC67juPPXsWlsETLB4LYDxy/W0ZIRMVVC8dsRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=HjQC29jO; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=zDHHj7CfQYDxXShv+s7OPmgXz2bEdCrtei4bkY9twy0=; b=HjQC29jO/FmWHhPhNnPey2YJL0
-	ygfO0IYKggY+V3iLs+V40lCeeP/iH7a8h0vHNioSdcCCxFF48xY3EqqHS73J/O0QVPb0Ds4ioa5BK
-	lYWBmtRUDPYZko6VOGRTGsdaJxqesu6gT4/e4NSbTX+UOTwq9qu7n2uMCmu31Ns6tX90L2Bo2dtDK
-	Ie6TDVnNxiT7ZZu5xcBw6h+9MGWwGV3TbKj1Ep4gas21y4WVhhrXO5EQFBe7Epws3FY3hSxzzuQOD
-	lZ6hbGfzCpvCqMzJ6nkvSdFIVmZM6GwejlnnP9QS3WxIjm77JXWepU8SMKAmPF6aFAsEii1e63f91
-	50ZXJ6mA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43020)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1veDkv-000000003w5-1B1y;
-	Fri, 09 Jan 2026 14:46:25 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1veDkr-000000003OZ-2ksH;
-	Fri, 09 Jan 2026 14:46:21 +0000
-Date: Fri, 9 Jan 2026 14:46:21 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH net-next v2 2/2] net: pcs: rzn1-miic: Add support for PHY
- link active-level configuration
-Message-ID: <aWEUvef4eDlmuOic@shell.armlinux.org.uk>
-References: <20260109142250.3313448-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20260109142250.3313448-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	s=arc-20240116; t=1767970074; c=relaxed/simple;
+	bh=tMyA0jgWZUY05/4RNiG0ugxFC1DgjIcO68pVnGKa2J4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mZFTxttxCx3NykbbDOS9567Zw81S9rlmX1X3sU4Fmjt/Td6C0FT1CYRg5A5e6kVNJVUfWEKK6nIIOwQHI7N/iEWC8Sp740hKjhAtPeLMqvlTT9g0eDm2IMXmnr+GfvOc28W/z+n8rA0X7os25IHoj+/wMM1GU4WibVCBPQTqCYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TwOkJAqM; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767970072;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nBvA9+9FowTNDc9kk7N2zTDw3Fsb1HWru+YFGxNPkjM=;
+	b=TwOkJAqMbC5D48r1kgV9qUH/tqGiiOLZo72eB0yFL4Kk3YXxv/SzsK2fbcFtiUKn6VxHCe
+	ayKXoD1aln9pCKK6SMHYfNV0scB/8T7mN4kZZcDmA0ZsC3cTHAX2nFtSWByl3C/Ak6dh+W
+	UhkoBp13AM2ReLFFw2WTgZht6KNMQB4=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-384-EL9hj0GqOFSDltbe3aIfHw-1; Fri,
+ 09 Jan 2026 09:47:49 -0500
+X-MC-Unique: EL9hj0GqOFSDltbe3aIfHw-1
+X-Mimecast-MFC-AGG-ID: EL9hj0GqOFSDltbe3aIfHw_1767970064
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 282091955F34;
+	Fri,  9 Jan 2026 14:47:44 +0000 (UTC)
+Received: from [10.44.33.222] (unknown [10.44.33.222])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 65C3A19560B4;
+	Fri,  9 Jan 2026 14:47:37 +0000 (UTC)
+Message-ID: <dba89495-3963-4ce4-a3dc-6187f22dbd9e@redhat.com>
+Date: Fri, 9 Jan 2026 15:47:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260109142250.3313448-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net-next 12/12] ice: dpll: Support
+ E825-C SyncE and dynamic pin discovery
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>,
+ "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+ Rob Herring <robh@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+ "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, Mark Bloch <mbloch@nvidia.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>,
+ "Lobakin, Aleksander" <aleksander.lobakin@intel.com>,
+ Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Saeed Mahameed
+ <saeedm@nvidia.com>, "David S. Miller" <davem@davemloft.net>
+References: <20260108182318.20935-1-ivecera@redhat.com>
+ <20260108182318.20935-13-ivecera@redhat.com>
+ <IA3PR11MB8986036A2826A4EE758A456EE582A@IA3PR11MB8986.namprd11.prod.outlook.com>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <IA3PR11MB8986036A2826A4EE758A456EE582A@IA3PR11MB8986.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Fri, Jan 09, 2026 at 02:22:50PM +0000, Prabhakar wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+On 1/9/26 7:15 AM, Loktionov, Aleksandr wrote:
 > 
-> Add support to configure the PHY link signal active level per converter
-> using the DT property "renesas,miic-phylink-active-low".
 > 
-> Introduce the MIIC_PHYLINK register definition and extend the MIIC driver
-> with a new `phylink` structure to store the mask and value for PHY link
-> configuration. Implement `miic_configure_phylink()` to determine the bit
-> position and polarity for each port based on the SoC type, such as RZ/N1
-> or RZ/T2H/N2H.
+>> -----Original Message-----
+>> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+>> Of Ivan Vecera
+>> Sent: Thursday, January 8, 2026 7:23 PM
+>> To: netdev@vger.kernel.org
+>> Cc: Eric Dumazet <edumazet@google.com>; Nguyen, Anthony L
+>> <anthony.l.nguyen@intel.com>; Rob Herring <robh@kernel.org>; Leon
+>> Romanovsky <leon@kernel.org>; Andrew Lunn <andrew+netdev@lunn.ch>;
+>> linux-rdma@vger.kernel.org; Kitszel, Przemyslaw
+>> <przemyslaw.kitszel@intel.com>; Kubalewski, Arkadiusz
+>> <arkadiusz.kubalewski@intel.com>; intel-wired-lan@lists.osuosl.org;
+>> Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>;
+>> devicetree@vger.kernel.org; Conor Dooley <conor+dt@kernel.org>; Jiri
+>> Pirko <jiri@resnulli.us>; Richard Cochran <richardcochran@gmail.com>;
+>> Prathosh Satish <Prathosh.Satish@microchip.com>; Vadim Fedorenko
+>> <vadim.fedorenko@linux.dev>; Mark Bloch <mbloch@nvidia.com>; linux-
+>> kernel@vger.kernel.org; Tariq Toukan <tariqt@nvidia.com>; Lobakin,
+>> Aleksander <aleksander.lobakin@intel.com>; Jonathan Lemon
+>> <jonathan.lemon@gmail.com>; Krzysztof Kozlowski <krzk+dt@kernel.org>;
+>> Saeed Mahameed <saeedm@nvidia.com>; David S. Miller
+>> <davem@davemloft.net>
+>> Subject: [Intel-wired-lan] [PATCH net-next 12/12] ice: dpll: Support
+>> E825-C SyncE and dynamic pin discovery
+>>
+>> From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>>
+>> Add DPLL support for the Intel E825-C Ethernet controller. Unlike
+>> previous generations (E810), the E825-C connects to the platform's
+>> DPLL subsystem via MUX pins defined in the system firmware (Device
+>> Tree/ACPI).
+>>
+>> Implement the following mechanisms to support this architecture:
+>>
+>> 1. Dynamic Pin Discovery: Use the fwnode_dpll_pin_find() helper to
+>>     locate the parent MUX pins defined in the firmware.
+>>
+>> 2. Asynchronous Registration: Since the platform DPLL driver may probe
+>>     independently of the network driver, utilize the DPLL notifier
+>> chain
+>>     (register_dpll_notifier). The driver listens for DPLL_PIN_CREATED
+>>     events to detect when the parent MUX pins become available, then
+>>     registers its own Recovered Clock (RCLK) pins as children of those
+>>     parents.
+>>
+>> 3. Hardware Configuration: Implement the specific register access
+>> logic
+>>     for E825-C CGU (Clock Generation Unit) registers (R10, R11). This
+>>     includes configuring the bypass MUXes and clock dividers required
+>> to
+>>     drive SyncE signals.
+>>
+>> 4. Split Initialization: Refactor `ice_dpll_init()` to separate the
+>>     static initialization path of E810 from the dynamic, firmware-
+>> driven
+>>     path required for E825-C.
+>>
+>> Co-developed-by: Ivan Vecera <ivecera@redhat.com>
+>> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+>> Co-developed-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+>> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+>> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>> ---
+>>   drivers/net/ethernet/intel/ice/ice_dpll.c   | 715 +++++++++++++++++--
+>> -
+>>   drivers/net/ethernet/intel/ice/ice_dpll.h   |  25 +
+>>   drivers/net/ethernet/intel/ice/ice_lib.c    |   3 +
+>>   drivers/net/ethernet/intel/ice/ice_ptp.c    |  29 +
+>>   drivers/net/ethernet/intel/ice/ice_ptp_hw.c |   9 +-
+>>   drivers/net/ethernet/intel/ice/ice_tspll.c  | 217 ++++++
+>> drivers/net/ethernet/intel/ice/ice_tspll.h  |  13 +-
+>>   drivers/net/ethernet/intel/ice/ice_type.h   |   6 +
+>>   8 files changed, 925 insertions(+), 92 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c
+>> b/drivers/net/ethernet/intel/ice/ice_dpll.c
+>> index 4eca62688d834..06575d42de6e9 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_dpll.c
+>> +++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
+>> @@ -5,6 +5,7 @@
 > 
-> The accumulated configuration is stored during DT parsing and applied
-> later in `miic_probe()` after hardware initialization, since the MIIC
-> registers can only be modified safely once the hardware setup is complete.
+> ...
+> 
+>> +/**
+>> + * ice_dpll_init_fwnode_pins - initialize pins from device tree
+>> + * @pf: board private structure
+>> + * @pins: pointer to pins array
+>> + * @start_idx: starting index for pins
+>> + * @count: number of pins to initialize
+>> + *
+>> + * Initialize input pins for E825 RCLK support. The parent pins
+>> (rclk0,
+>> +rclk1)
+>> + * are expected to be defined in the device tree (ACPI). This
+>> function
+>> +allocates
+> Device Tree and ACPI are different firmware interfaces, aren't they?
+> Writing "device tree (ACPI)" can mislead readers about where the
+> fwnode-backed discovery is expected to come from.
 
-Please do not re-use "phylink", we have a subsystem in the kernel named
-as such, and, for example, it too defines "struct phylink".
+Will fix.
 
-> +/**
-> + * struct phylink - Phylink configuration
-> + * @mask: Mask of phylink bits
-> + * @val: Value of phylink bits
-> + */
-> +struct phylink {
-> +	u32 mask;
-> +	u32 val;
-> +};
-> +
+> The code looks good for me.
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
-You don't get a warning for this, because, although you have:
+Thank you, Alex.
+Ivan
 
-#include <linux/phylink.h>
-
-which delares "struct phylink" as:
-
-struct phylink;
-
-The definition of this structure is entirely private to
-drivers/net/phy/phylink.c and is intentionally not exposed.
-
-By redefining "struct phylink" here, it means that anyone using gdb
-is going to run into problems - which version of this struct is the
-right one for any particular pointer.
-
-You describe this feature as "PHY-link" and "PHY link" in your commit
-and cover messages. Please use "phy_link" and "PHY_LINK" as identifies
-for this so that grep can distinguish between your PHY link feature
-and the phylink infrastructure.
-
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
