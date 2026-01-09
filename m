@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-248302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 618CDD06B1C
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 02:11:56 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45038D06AFD
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 02:09:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D1D3C304A594
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 01:09:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A1175300D81B
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 01:09:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A64B11F91E3;
-	Fri,  9 Jan 2026 01:09:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47D921A9B24;
+	Fri,  9 Jan 2026 01:09:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CeYgFHML"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="USf3qNTu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112EF1F099C
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 01:09:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EED61C3C08
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 01:09:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767920962; cv=none; b=Lec3+4cH8SI5MWKl2ofKv0bEZc83m1qu7HMCTqfCLgAOZ8zq2ohZlcyPFxh3/MJkETcIDFbEyeXg/qMWbH5upkekw9ic8iQCrbC4kQCI9oZaYrIsS2OdKlg7Rv4PQXE/ekVvaFeBnDS0UCB13XJbNf4/AwMTI5zjlAFXs2v2nUY=
+	t=1767920965; cv=none; b=Z7wZSU2Wgh73W1Pv92CnANyFvADEuIWiBKVy19O8/J2sVLnDMQSLmaJlj+X7H6ONFcEgnuS35Sz9PtCZtyxtnAyv03B7mvqNllxpRzSYbiBbra5mUes50UeJI40JwNnkiw7WteR8dPfncUEfh9JGsEwVTB8NA1k/wtV14E+xPw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767920962; c=relaxed/simple;
-	bh=iinJshec64GKg/TN9rII8jst+csOkvFipCTScE05pN4=;
+	s=arc-20240116; t=1767920965; c=relaxed/simple;
+	bh=usyBlb+b/TEj0pW6zQBAZ4j6OzObyz0EBAXKM2c0Vss=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Rnq4IDQfL+ZT1Uwdb1jGEra8HpRO0fnV/pTFmXcWWBdvw9MkCcyhkkBElwdBBpGEl5/uh5naeIAVHSu+s/WTEVUGYILVome8KVjXk//nG888kG3utbECCEgMSOQupmJl8TSOlZ+ayC+1jlpTo7EoAbcUgaiRYIfTK6SWfgDaMZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CeYgFHML; arc=none smtp.client-ip=209.85.221.43
+	 MIME-Version; b=RlktRyFmoOsZrBCcapVVvzNSMFBKgyvpKY6LMcV914asiEY/GrV74W5sr1CEXSnSvoOR1NoHFsnFAbWJE9/Z8YEQM3gnAM7raAeCH7tk4fMT1puHdYQfXqGktChSeIp2qfOpQY7HQkSo1qHHRIGWvUKEZfw6BafiGxLbbYVQlKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=USf3qNTu; arc=none smtp.client-ip=209.85.221.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-430f3ef2d37so3210297f8f.3
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 17:09:20 -0800 (PST)
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-43260a5a096so2589643f8f.0
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 17:09:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767920959; x=1768525759; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1767920962; x=1768525762; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JY8A3nsH5MtpPAQRzjCOTgxx0rWSatWQPCAX40Np41o=;
-        b=CeYgFHMLJi2Bx+mVUM4ZwQNGsKbXNw1xrRldpFnOMwVIUcbd4Sal9SimKUt0ketaYp
-         UzyXM1xi1FaSHeT4rc37IKufNDkLh1wD7gd2BwiUrs8cjfC0X19eBbYdDP0swhYe4Bzt
-         xeL6N5qKwTf1+rIgVbNL6UyWn9NSwVF2nJdp55gGigOdY8Kn36UAGHfnpCSQ3n2gGhVJ
-         KzA9mpG9t+DaPKYT0DLYDc8c7wIdBzqWd6ysMSeAldteqKa3+Tl5r7Y75YbEsQ5fqXvV
-         T8zhaNytIf2xv7dYWsoVtCc38QBq0EqhjB90KDzjh9ddxWP5Dsm0bcXUs09FLi/XnBhu
-         c68w==
+        bh=qbZ8+rlZ2XM6qoOuKVKOlDkNcCRWWQmyXjdZtMNax68=;
+        b=USf3qNTubic8ii1FdPzi15NTtS1aYazwi86JtMiRJaLn/+7nOipKhHRmZrYI59fvkh
+         T6NtrU3Zf8EWZ3GINfQiP6m0AQWrM5gBPJxKDH+DtSoufHoO8yYN0XF7HPHRnTP5GsQ3
+         ID2Do4tTslUK6tenpOsXwVyxY0qR3O/4I3WzHCcZQpEoL29S7yhdhs9itFB8R9xwIX1C
+         Xrynen6xFGeIgj1kc1ja3pHRU7Yaa0QKon3+niJuCYSJATaaSO87XrxXxHlvdg3ClBju
+         MSdOsIIF+XjpMYHBXjaHjMrnTNNKEy34USoDuLRO78IzU4X1LeNgPL3OdRFfOXDsHW7T
+         12sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767920959; x=1768525759;
+        d=1e100.net; s=20230601; t=1767920962; x=1768525762;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=JY8A3nsH5MtpPAQRzjCOTgxx0rWSatWQPCAX40Np41o=;
-        b=kaMhzxIi+T2ZawAin8gHU8epLOGsqtHkDRM6+8tSXjAnihvfD3PTKv3ETn6CC41r5u
-         ObZaa8Hy9CYd1xvClU8c0QXM8bqm5yjoMR76DBiY8Yw5JjGuN+dKvYBMJcVpZmFd4kXz
-         4XsWdUCp37jXlawKLq7YJDFigrIgTG26Sfj70ymEk7VvCUlJQ9R+F78BRARQLrpyA6C1
-         3zbQQFKWoRM1CNzqBvCzMj/GZ+QtsghU8SGqAXR0Gx0qlJkNfU7chNsdiLr1LxuBS6ma
-         7/nPhDuCpgMBDwzjFRnuMSj9wGCMVw+USHFYbEqB4vhqCnGdjXpOZ01UxeoN3NJvsTA5
-         dikQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVjW4X+1V8TjVgT8JlKwHsZoxed0CGPDrN0hR2gllDYkXxKLlxukGhjU/BCWKkcOYJbQozrvVE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAnWsvQB2olC9UVW4ls09OfGOPNmYNVqQdmHOzRC257SBvVCLX
-	+j8c8g+75zrm8xgLa9ymVmESwg1F7/qIPStKsXWMwPb0wQD0ZBp6zsaO
-X-Gm-Gg: AY/fxX6XOqsnRXU0sM9wDXJQcweUjqXuD+vJ+5Fu98QHDQkHXILRet9gQCoDxwS9UDr
-	4XfpknakBwUFD275gEG4xX+KJLEpPkf6Mtu9PAAgIIpsJYQ1TxrZ+tEr2k8/VXN5ZUHx2BRZ5cO
-	Up1YCbGWDD3RhNVYURbgYlYfOtqjPYSl1DdL6Pd8H3/3mIhwxsKzpB2U2JVkC+slHjapdlWDmQK
-	dhpO2GuLuUxbcvd4nmUsJJXhWpQL7ptQH8KF0cwnQmZbgjBDEpME7JoQBOUauT5XiloqMxeU5QH
-	VvAfHk4oLce/9PYt4IhgzXcw4AZUMZy+wCUi1BpGB7Zc1d5n5Ey/fnTbm0Fa2sPlsLW2rsxYbIA
-	V7Cu0KoTIC+0PfUd4lTjzSFxj4PW/dTPgF9pC06fdyX4baXycmOi0IdN7hxJR36FqPMMpB71+95
-	/cYzpG8NsV4Q==
-X-Google-Smtp-Source: AGHT+IEqHlDkH0UxjoAAfYg301owqmBxoZDQeS9f8Y1jOv2GiJHpvEgq4q59IDjHJ8z1+wpXSVlCRg==
-X-Received: by 2002:a05:6000:400a:b0:430:f1e8:ed98 with SMTP id ffacd0b85a97d-432c3790b90mr9112198f8f.17.1767920959373;
-        Thu, 08 Jan 2026 17:09:19 -0800 (PST)
+        bh=qbZ8+rlZ2XM6qoOuKVKOlDkNcCRWWQmyXjdZtMNax68=;
+        b=qp33oKtLmOhJ45LfndIWzuvFFgsgjPcbpBy5M5k1VdOV72gAItYJVAZfV85131tQfl
+         EbYDzwTf/ILNIkYMd0KMyioaDX8sMxkz53+UJ1zMOnYPrY2d3ico7im/EMbdJeZx3VN2
+         V8AjEB3gpSleXkzv94zjgSYpMrH+QMMIfxiueEADs0RjZaL2jWd1vUNvS5pkWPDV9zjo
+         vhTujqfAHS+w9FaSrlet/ctbbTY3ToAlRs4zJ9Oj82rV+O790RNyMaUZ9XJ2OqoCzpGe
+         ld1MW/QD8K6Wz8SIx57Wd1+65eOr2C1fDni6csZZ/XNHomtvvIv2u3WaRzsN/xiv9pFz
+         x3gg==
+X-Forwarded-Encrypted: i=1; AJvYcCX3DcmrP5a8Ky5BHG/yps/l1YoTQhEXDzBrx+n9Y/yldOIy0PqBvRoEHW+7OToN5PzM38QN6XM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvuqB/uxI8W4dTDEXyOEkNcvweKNcrtHCZZpVonQ3xd19Wo2Bj
+	j3JvolWmsKAxqTpXnOkdjxwjQkbJQ2ZC1RRACyleS9OL+cm98qJofpO/
+X-Gm-Gg: AY/fxX6QlvKZtS91zbecb2HJNEJo9QaaMCBkfHRncuzxH5rPK85Rd2TtXcol0gwpEhv
+	4enaFoXEP3wf59nED8MkozoZb1sSb8Gp4Q5K1nehc/iLaObVep5DPZqp3UJq8FRK840/UIJMnRs
+	a6oDqM9tE6t3k4x9oZimZsEEPEUHS+S5jQ0R+FU1I26j5O5UNBw4WXXdanuBqd5M9KWPHWKTIk0
+	84FaUICRt43UKGn7KH3rYWS7AJ/EC0yEr7SDX/m/vdE1HBGyZ5tbluyYpqzM/3ZJhKMI5VdBvb/
+	rADh2NLj1/5jjUbC5HZR5vp4oD/4BjCl1hXmKk3qV1hpmVbfWzvhCz9KfuFaa/cTTjDcrESInP6
+	3nYe/oIn9ufeTWNk0lE46+zyMHPw/ZOVGuzD24jm6MrQw5kU+ovWNTqFytA5aEJDiKSc/Wkojnt
+	2udL8MSvfRIQ==
+X-Google-Smtp-Source: AGHT+IFZQmpSIFx2Il32vLa/mwl+HOWcs6sUb2tqUxeGLLhMadkql0ja2OjK+pzs3xrh5XNomPf7/g==
+X-Received: by 2002:a5d:5850:0:b0:430:fcda:452d with SMTP id ffacd0b85a97d-432c3790c68mr9834411f8f.22.1767920961819;
+        Thu, 08 Jan 2026 17:09:21 -0800 (PST)
 Received: from rsa-laptop ([212.50.121.5])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0e17aasm19698214f8f.15.2026.01.08.17.09.18
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0e17aasm19698214f8f.15.2026.01.08.17.09.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Jan 2026 17:09:18 -0800 (PST)
+        Thu, 08 Jan 2026 17:09:20 -0800 (PST)
 From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
 To: Loic Poulain <loic.poulain@oss.qualcomm.com>,
 	Johannes Berg <johannes@sipsolutions.net>
@@ -81,9 +81,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org
-Subject: [RFC PATCH v5 6/7] net: wwan: hwsim: refactor to support more port types
-Date: Fri,  9 Jan 2026 03:09:08 +0200
-Message-ID: <20260109010909.4216-7-ryazanov.s.a@gmail.com>
+Subject: [RFC PATCH v5 7/7] net: wwan: hwsim: support NMEA port emulation
+Date: Fri,  9 Jan 2026 03:09:09 +0200
+Message-ID: <20260109010909.4216-8-ryazanov.s.a@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260109010909.4216-1-ryazanov.s.a@gmail.com>
 References: <20260109010909.4216-1-ryazanov.s.a@gmail.com>
@@ -95,190 +95,209 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Just introduced WWAN NMEA port type needs a testing option. The WWAN HW
-simulator was developed with the AT port type in mind and cannot be
-easily extended. Refactor it now to make it capable to support more port
-types.
+Support NMEA port emulation for the WWAN core GNSS port testing purpose.
+Emulator produces pair of GGA + RMC sentences every second what should
+be enough to fool gpsd into believing it is working with a NMEA GNSS
+receiver.
 
-No big functional changes, mostly renaming with a little code
-rearrangement.
+If the GNSS system is enabled then one NMEA port will be created
+automatically for the simulated WWAN device. Manual NMEA port creation
+is not supported at the moment.
 
 Signed-off-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
 Reviewed-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
 ---
 Changes:
-* RFCv2->RFCv5: became 6/7 (was 5/6)
+* RFCv2->RFCv5: became 7/7 (was 6/6)
 ---
- drivers/net/wwan/wwan_hwsim.c | 73 ++++++++++++++++++++---------------
- 1 file changed, 41 insertions(+), 32 deletions(-)
+ drivers/net/wwan/wwan_hwsim.c | 128 +++++++++++++++++++++++++++++++++-
+ 1 file changed, 126 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/wwan/wwan_hwsim.c b/drivers/net/wwan/wwan_hwsim.c
-index b02befd1b6fb..20277ba88433 100644
+index 20277ba88433..5b5af2c9a63d 100644
 --- a/drivers/net/wwan/wwan_hwsim.c
 +++ b/drivers/net/wwan/wwan_hwsim.c
-@@ -56,12 +56,16 @@ struct wwan_hwsim_port {
- 	struct wwan_port *wwan;
- 	struct work_struct del_work;
- 	struct dentry *debugfs_topdir;
--	enum {			/* AT command parser state */
--		AT_PARSER_WAIT_A,
--		AT_PARSER_WAIT_T,
--		AT_PARSER_WAIT_TERM,
--		AT_PARSER_SKIP_LINE,
--	} pstate;
-+	union {
-+		struct {
-+			enum {	/* AT command parser state */
-+				AT_PARSER_WAIT_A,
-+				AT_PARSER_WAIT_T,
-+				AT_PARSER_WAIT_TERM,
-+				AT_PARSER_SKIP_LINE,
-+			} pstate;
-+		} at_emul;
-+	};
- };
- 
- static const struct file_operations wwan_hwsim_debugfs_portdestroy_fops;
-@@ -101,16 +105,16 @@ static const struct wwan_ops wwan_hwsim_wwan_rtnl_ops = {
- 	.setup = wwan_hwsim_netdev_setup,
- };
- 
--static int wwan_hwsim_port_start(struct wwan_port *wport)
-+static int wwan_hwsim_at_emul_start(struct wwan_port *wport)
- {
- 	struct wwan_hwsim_port *port = wwan_port_get_drvdata(wport);
- 
--	port->pstate = AT_PARSER_WAIT_A;
-+	port->at_emul.pstate = AT_PARSER_WAIT_A;
- 
- 	return 0;
- }
- 
--static void wwan_hwsim_port_stop(struct wwan_port *wport)
-+static void wwan_hwsim_at_emul_stop(struct wwan_port *wport)
- {
- }
- 
-@@ -120,7 +124,7 @@ static void wwan_hwsim_port_stop(struct wwan_port *wport)
+@@ -2,7 +2,7 @@
+ /*
+  * WWAN device simulator for WWAN framework testing.
   *
-  * Be aware that this processor is not fully V.250 compliant.
+- * Copyright (c) 2021, Sergey Ryazanov <ryazanov.s.a@gmail.com>
++ * Copyright (c) 2021, 2025, Sergey Ryazanov <ryazanov.s.a@gmail.com>
   */
--static int wwan_hwsim_port_tx(struct wwan_port *wport, struct sk_buff *in)
-+static int wwan_hwsim_at_emul_tx(struct wwan_port *wport, struct sk_buff *in)
- {
- 	struct wwan_hwsim_port *port = wwan_port_get_drvdata(wport);
- 	struct sk_buff *out;
-@@ -142,17 +146,17 @@ static int wwan_hwsim_port_tx(struct wwan_port *wport, struct sk_buff *in)
- 	for (i = 0, s = 0; i < in->len; ++i) {
- 		char c = in->data[i];
  
--		if (port->pstate == AT_PARSER_WAIT_A) {
-+		if (port->at_emul.pstate == AT_PARSER_WAIT_A) {
- 			if (c == 'A' || c == 'a')
--				port->pstate = AT_PARSER_WAIT_T;
-+				port->at_emul.pstate = AT_PARSER_WAIT_T;
- 			else if (c != '\n')	/* Ignore formating char */
--				port->pstate = AT_PARSER_SKIP_LINE;
--		} else if (port->pstate == AT_PARSER_WAIT_T) {
-+				port->at_emul.pstate = AT_PARSER_SKIP_LINE;
-+		} else if (port->at_emul.pstate == AT_PARSER_WAIT_T) {
- 			if (c == 'T' || c == 't')
--				port->pstate = AT_PARSER_WAIT_TERM;
-+				port->at_emul.pstate = AT_PARSER_WAIT_TERM;
- 			else
--				port->pstate = AT_PARSER_SKIP_LINE;
--		} else if (port->pstate == AT_PARSER_WAIT_TERM) {
-+				port->at_emul.pstate = AT_PARSER_SKIP_LINE;
-+		} else if (port->at_emul.pstate == AT_PARSER_WAIT_TERM) {
- 			if (c != '\r')
- 				continue;
- 			/* Consume the trailing formatting char as well */
-@@ -162,11 +166,11 @@ static int wwan_hwsim_port_tx(struct wwan_port *wport, struct sk_buff *in)
- 			skb_put_data(out, &in->data[s], n);/* Echo */
- 			skb_put_data(out, "\r\nOK\r\n", 6);
- 			s = i + 1;
--			port->pstate = AT_PARSER_WAIT_A;
--		} else if (port->pstate == AT_PARSER_SKIP_LINE) {
-+			port->at_emul.pstate = AT_PARSER_WAIT_A;
-+		} else if (port->at_emul.pstate == AT_PARSER_SKIP_LINE) {
- 			if (c != '\r')
- 				continue;
--			port->pstate = AT_PARSER_WAIT_A;
-+			port->at_emul.pstate = AT_PARSER_WAIT_A;
- 		}
- 	}
- 
-@@ -183,18 +187,25 @@ static int wwan_hwsim_port_tx(struct wwan_port *wport, struct sk_buff *in)
- 	return 0;
- }
- 
--static const struct wwan_port_ops wwan_hwsim_port_ops = {
--	.start = wwan_hwsim_port_start,
--	.stop = wwan_hwsim_port_stop,
--	.tx = wwan_hwsim_port_tx,
-+static const struct wwan_port_ops wwan_hwsim_at_emul_port_ops = {
-+	.start = wwan_hwsim_at_emul_start,
-+	.stop = wwan_hwsim_at_emul_stop,
-+	.tx = wwan_hwsim_at_emul_tx,
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+@@ -12,8 +12,10 @@
+ #include <linux/slab.h>
+ #include <linux/device.h>
+ #include <linux/spinlock.h>
++#include <linux/time.h>
+ #include <linux/list.h>
+ #include <linux/skbuff.h>
++#include <linux/timer.h>
+ #include <linux/netdevice.h>
+ #include <linux/wwan.h>
+ #include <linux/debugfs.h>
+@@ -65,6 +67,9 @@ struct wwan_hwsim_port {
+ 				AT_PARSER_SKIP_LINE,
+ 			} pstate;
+ 		} at_emul;
++		struct {
++			struct timer_list timer;
++		} nmea_emul;
+ 	};
  };
  
--static struct wwan_hwsim_port *wwan_hwsim_port_new(struct wwan_hwsim_dev *dev)
-+static struct wwan_hwsim_port *wwan_hwsim_port_new(struct wwan_hwsim_dev *dev,
-+						   enum wwan_port_type type)
+@@ -193,6 +198,108 @@ static const struct wwan_port_ops wwan_hwsim_at_emul_port_ops = {
+ 	.tx = wwan_hwsim_at_emul_tx,
+ };
+ 
++#if IS_ENABLED(CONFIG_GNSS)
++#define NMEA_MAX_LEN		82	/* Max sentence length */
++#define NMEA_TRAIL_LEN		5	/* '*' + Checksum + <CR><LF> */
++#define NMEA_MAX_DATA_LEN	(NMEA_MAX_LEN - NMEA_TRAIL_LEN)
++
++static __printf(2, 3)
++void wwan_hwsim_nmea_skb_push_sentence(struct sk_buff *skb,
++				       const char *fmt, ...)
++{
++	unsigned char *s, *p;
++	va_list ap;
++	u8 cs = 0;
++	int len;
++
++	s = skb_put(skb, NMEA_MAX_LEN + 1);	/* +'\0' */
++	if (!s)
++		return;
++
++	va_start(ap, fmt);
++	len = vsnprintf(s, NMEA_MAX_DATA_LEN + 1, fmt, ap);
++	va_end(ap);
++	if (WARN_ON_ONCE(len > NMEA_MAX_DATA_LEN))/* No space for trailer */
++		return;
++
++	for (p = s + 1; *p != '\0'; ++p)/* Skip leading '$' or '!' */
++		cs ^= *p;
++	p += snprintf(p, 5 + 1, "*%02X\r\n", cs);
++
++	len = (p - s) - (NMEA_MAX_LEN + 1);	/* exp. vs real length diff */
++	skb->tail += len;			/* Adjust tail to real length */
++	skb->len += len;
++}
++
++static void wwan_hwsim_nmea_emul_timer(struct timer_list *t)
++{
++	/* 43.74754722298909 N 11.25759835922875 E in DMM format */
++	static const unsigned int coord[4 * 2] = { 43, 44, 8528, 0,
++						   11, 15, 4559, 0 };
++	struct wwan_hwsim_port *port = from_timer(port, t, nmea_emul.timer);
++	struct sk_buff *skb;
++	struct tm tm;
++
++	time64_to_tm(ktime_get_real_seconds(), 0, &tm);
++
++	mod_timer(&port->nmea_emul.timer, jiffies + HZ);	/* 1 second */
++
++	skb = alloc_skb(NMEA_MAX_LEN * 2, GFP_KERNEL);	/* GGA + RMC */
++	if (!skb)
++		return;
++
++	wwan_hwsim_nmea_skb_push_sentence(skb,
++					  "$GPGGA,%02u%02u%02u.000,%02u%02u.%04u,%c,%03u%02u.%04u,%c,1,7,1.03,176.2,M,55.2,M,,",
++					  tm.tm_hour, tm.tm_min, tm.tm_sec,
++					  coord[0], coord[1], coord[2],
++					  coord[3] ? 'S' : 'N',
++					  coord[4], coord[5], coord[6],
++					  coord[7] ? 'W' : 'E');
++
++	wwan_hwsim_nmea_skb_push_sentence(skb,
++					  "$GPRMC,%02u%02u%02u.000,A,%02u%02u.%04u,%c,%03u%02u.%04u,%c,0.02,31.66,%02u%02u%02u,,,A",
++					  tm.tm_hour, tm.tm_min, tm.tm_sec,
++					  coord[0], coord[1], coord[2],
++					  coord[3] ? 'S' : 'N',
++					  coord[4], coord[5], coord[6],
++					  coord[7] ? 'W' : 'E',
++					  tm.tm_mday, tm.tm_mon + 1,
++					  (unsigned int)tm.tm_year - 100);
++
++	wwan_port_rx(port->wwan, skb);
++}
++
++static int wwan_hwsim_nmea_emul_start(struct wwan_port *wport)
++{
++	struct wwan_hwsim_port *port = wwan_port_get_drvdata(wport);
++
++	timer_setup(&port->nmea_emul.timer, wwan_hwsim_nmea_emul_timer, 0);
++	wwan_hwsim_nmea_emul_timer(&port->nmea_emul.timer);
++
++	return 0;
++}
++
++static void wwan_hwsim_nmea_emul_stop(struct wwan_port *wport)
++{
++	struct wwan_hwsim_port *port = wwan_port_get_drvdata(wport);
++
++	timer_delete_sync(&port->nmea_emul.timer);
++}
++
++static int wwan_hwsim_nmea_emul_tx(struct wwan_port *wport, struct sk_buff *in)
++{
++	consume_skb(in);
++
++	return 0;
++}
++
++static const struct wwan_port_ops wwan_hwsim_nmea_emul_port_ops = {
++	.start = wwan_hwsim_nmea_emul_start,
++	.stop = wwan_hwsim_nmea_emul_stop,
++	.tx = wwan_hwsim_nmea_emul_tx,
++};
++#endif
++
+ static struct wwan_hwsim_port *wwan_hwsim_port_new(struct wwan_hwsim_dev *dev,
+ 						   enum wwan_port_type type)
  {
-+	const struct wwan_port_ops *ops;
- 	struct wwan_hwsim_port *port;
- 	char name[0x10];
- 	int err;
+@@ -203,6 +310,10 @@ static struct wwan_hwsim_port *wwan_hwsim_port_new(struct wwan_hwsim_dev *dev,
  
-+	if (type == WWAN_PORT_AT)
-+		ops = &wwan_hwsim_at_emul_port_ops;
-+	else
-+		return ERR_PTR(-EINVAL);
-+
- 	port = kzalloc(sizeof(*port), GFP_KERNEL);
- 	if (!port)
- 		return ERR_PTR(-ENOMEM);
-@@ -205,9 +216,7 @@ static struct wwan_hwsim_port *wwan_hwsim_port_new(struct wwan_hwsim_dev *dev)
- 	port->id = dev->port_idx++;
- 	spin_unlock(&dev->ports_lock);
+ 	if (type == WWAN_PORT_AT)
+ 		ops = &wwan_hwsim_at_emul_port_ops;
++#if IS_ENABLED(CONFIG_GNSS)
++	else if (type == WWAN_PORT_NMEA)
++		ops = &wwan_hwsim_nmea_emul_port_ops;
++#endif
+ 	else
+ 		return ERR_PTR(-EINVAL);
  
--	port->wwan = wwan_create_port(&dev->dev, WWAN_PORT_AT,
--				      &wwan_hwsim_port_ops,
--				      NULL, port);
-+	port->wwan = wwan_create_port(&dev->dev, type, ops, NULL, port);
- 	if (IS_ERR(port->wwan)) {
- 		err = PTR_ERR(port->wwan);
- 		goto err_free_port;
-@@ -392,7 +401,7 @@ static ssize_t wwan_hwsim_debugfs_portcreate_write(struct file *file,
- 	struct wwan_hwsim_dev *dev = file->private_data;
- 	struct wwan_hwsim_port *port;
+@@ -478,9 +589,10 @@ static int __init wwan_hwsim_init_devs(void)
+ 		list_add_tail(&dev->list, &wwan_hwsim_devs);
+ 		spin_unlock(&wwan_hwsim_devs_lock);
  
--	port = wwan_hwsim_port_new(dev);
-+	port = wwan_hwsim_port_new(dev, WWAN_PORT_AT);
- 	if (IS_ERR(port))
- 		return PTR_ERR(port);
- 
-@@ -459,6 +468,8 @@ static int __init wwan_hwsim_init_devs(void)
- 	int i, j;
- 
- 	for (i = 0; i < wwan_hwsim_devsnum; ++i) {
-+		struct wwan_hwsim_port *port;
-+
- 		dev = wwan_hwsim_dev_new();
- 		if (IS_ERR(dev))
- 			return PTR_ERR(dev);
-@@ -471,9 +482,7 @@ static int __init wwan_hwsim_init_devs(void)
+-		/* Create a couple of ports per each device to accelerate
++		/* Create a few various ports per each device to accelerate
  		 * the simulator readiness time.
  		 */
++
  		for (j = 0; j < 2; ++j) {
--			struct wwan_hwsim_port *port;
--
--			port = wwan_hwsim_port_new(dev);
-+			port = wwan_hwsim_port_new(dev, WWAN_PORT_AT);
+ 			port = wwan_hwsim_port_new(dev, WWAN_PORT_AT);
  			if (IS_ERR(port))
- 				return PTR_ERR(port);
+@@ -490,6 +602,18 @@ static int __init wwan_hwsim_init_devs(void)
+ 			list_add_tail(&port->list, &dev->ports);
+ 			spin_unlock(&dev->ports_lock);
+ 		}
++
++#if IS_ENABLED(CONFIG_GNSS)
++		port = wwan_hwsim_port_new(dev, WWAN_PORT_NMEA);
++		if (IS_ERR(port)) {
++			dev_warn(&dev->dev, "failed to create initial NMEA port: %d\n",
++				 (int)PTR_ERR(port));
++		} else {
++			spin_lock(&dev->ports_lock);
++			list_add_tail(&port->list, &dev->ports);
++			spin_unlock(&dev->ports_lock);
++		}
++#endif
+ 	}
  
+ 	return 0;
 -- 
 2.52.0
 
