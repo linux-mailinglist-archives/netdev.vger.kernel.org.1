@@ -1,197 +1,201 @@
-Return-Path: <netdev+bounces-248381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F3ADD07860
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 08:13:10 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3323DD078B3
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 08:23:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5FCB73004789
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 07:12:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AC4843012C79
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 07:22:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B01862EB85E;
-	Fri,  9 Jan 2026 07:12:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78BA42EC08C;
+	Fri,  9 Jan 2026 07:22:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iFurzW9l"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bHmOEDk4";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="R+PxUuWI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CB202E22AA
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 07:12:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D47072EBBB3
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 07:22:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767942731; cv=none; b=I7+BEMgq1d1y7rU9wBOOCbZRTOsPLRcYq7ZUy/TEWFd4V4xC+NOMpun34URTwuycvwmYkoOBLHTKJtr73HkQ4LtcEUwU9K5tH0JzVHmR8b1+oVVHdpGaFjCaQs5fVp8KFDlx7o60cRpWuVAVUfqoDoSyORfq54pYtzqx/aGYTyU=
+	t=1767943373; cv=none; b=NaHf2tcjcsSqTWhyYLlwC8Ar3kWUyU2MUzVJXfASMKz7gZW5Eyuajj3Fn+hxWClWrbNuvGG/fE+7Je21v4CGzzE+YZjdmXdvP49rRAomPJ+DfE5QWC+d83lHiMeW6Dm1hUVcLcofv6tdXUTQ151OcqjIoY2Ah+pDwHmpJ5Kq82g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767942731; c=relaxed/simple;
-	bh=V1rQXE+eUN7DNfjhzRLAFHimoakueJkcAJTWHiBBUA0=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=bEnahawsXaGDnZCvYTIrHNDb5gynEipzN+VhkqlitCT+0/jfYA6fvCxwR2eJkhonoWVg+8ePnDIbOKc9NQi88o3vmia58JwHIS1/sS9QzrG/dduZ0M11aOtjQdae5F3GlGr1/VbCwvByZkd3FEeITXhw+dW6sXKSrc4n8U1ttXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iFurzW9l; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-47775fb6cb4so21996675e9.0
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 23:12:09 -0800 (PST)
+	s=arc-20240116; t=1767943373; c=relaxed/simple;
+	bh=j1W235feRg0KN6FKcAZabBql8JsWIHtShwbmzD/a/pk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o8HRNjtgHmx7dv7FBnyWH2e4CXmsbTkPfOraiAIAHyWofoYC/dCQVF8WJx2kazBUZf97Xj0W8cl4Bt7si5Ylntb/v/xtdyBawFg9ecSRGeLEF8S4UbefttptxxVarIhwR57GVJuBJ4fltEGfo/HxJQZqnyO1vuET7A6GnHdZ9e8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bHmOEDk4; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=R+PxUuWI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767943370;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qCNBeC55dwFkYuH90UgwaJbtMoG2cmT0emKakpEw6rI=;
+	b=bHmOEDk4WTx99tib5hmS58Yz3DXmAH+o5LNZBDCMIKk+k6ciaDyr7IXFVQJx+UQQiSHpHG
+	OQKiX+Q3r56Y4XUdvfxiZU5hyMtgtLdcmxyy7AIC5AwxqtCz1LjBeRIiSTK+Sj5eFwrEve
+	qUfxAIzFN7fyuwfNKl25Jv11ngdomro=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-434-pvrKkQtBNZGwNZvanrGKKw-1; Fri, 09 Jan 2026 02:22:49 -0500
+X-MC-Unique: pvrKkQtBNZGwNZvanrGKKw-1
+X-Mimecast-MFC-AGG-ID: pvrKkQtBNZGwNZvanrGKKw_1767943368
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-47d4029340aso39413935e9.3
+        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 23:22:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767942728; x=1768547528; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=WxGn5/OE39MpZemngI+D3oZNq6iEFjmHB6+jYLQ2MgA=;
-        b=iFurzW9lf8vHiocHVlXzIedL77thvEJjhVfks9n1OByQ0nZkRuBJRZV+CDBap11hpr
-         BYfYZ63EfhyghaQ/0zLcuq1uqRY42hwaDJ/IfT0AQODEnDYKACXxrtU+5sEPmlHo7lTO
-         PQBVls6fnUeTrYWD+1Tg1P3v8D1y2CfZXukpohx5ghfa098HwwFpIMT8mU0Vp/VCU/cX
-         ZHocCKRH6/wfMZUjgv7ZnOeAnc9UlgZ3YtUoPnUlbVM0OWyShshzTYwEhc7sLavuTxNf
-         v7HFVEE34Lhf7CDx+n0RO8aKuBbhMPgl8+YFlTZmGk1X+92nzb1YzaQDxaIBawvZXSp6
-         10Cw==
+        d=redhat.com; s=google; t=1767943368; x=1768548168; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qCNBeC55dwFkYuH90UgwaJbtMoG2cmT0emKakpEw6rI=;
+        b=R+PxUuWIRXIrRgrq1h3TXojF5Qdslf4k8kqVo1et1koqF8PkFGflgODSx6j2GPoEs4
+         z+5gYKngwhNgbZjGBTkdwqs2iBOJUMqhOB5SJ56ZdfWfZFOGyQw2w81Et+uXoFZei9RK
+         5Jsf2uHqjr9s40DhGBdo10pvkPbYvI+WdI3iJTefWTwZo6mIdOyPJXDoMQ56ESGvhPWb
+         5Cv44qQkv6QZV/GQlCMFNl1uCACh2+5RwdSr6wYMNzZzxM9U2BQgx5jKWM15BPJ2/hEs
+         cDCwWQrfmxpRvwyljqijri/2OWLJV8rzsZU+uBXJT7NrkIBPdR3WaciZoiXckSHKb29s
+         bn0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767942728; x=1768547528;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WxGn5/OE39MpZemngI+D3oZNq6iEFjmHB6+jYLQ2MgA=;
-        b=jf9Y3h6YOxI3MR6yThuQafQvrmbPIWXXNh3i8OYqFPb4X6QqHZ3c0GBAepTUbESul1
-         /UbdcrjUoOBGsuWg6WB1R5zodkvDwQ67QcMbLMLJqCi1AFwOlc84N6MkbclqpKBwWd28
-         IQX5k0jf3b/OLzdGC8N/afobBXsnes7nMAD3JMaayjVt/VzgnDJc5btl0pOnWNSA80/e
-         1URBycaeZuzvrVuJ8aHEcK7vOh6Izx+6iG4vwONbajFp0jyyCBjgReXLmmorm98NOGIi
-         RgEJWh1KzUdSdcrMRfcthTmNhPgfmwNxRUbaZNCnfAh9LZepl4LdHgAf2X3PXHdm10jn
-         8+Eg==
-X-Forwarded-Encrypted: i=1; AJvYcCVO4NkZeV4/oQtpegMMyTuQYUiL4IlzFP4LTajevfL0OXdOdNJ0jl/piXnXfDdOY1ug/wL2L7U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywz1io574yakS9SCx2HHbQ2t9SauDiD1W9bnQCMLBlFzUSt40/s
-	nSazwdlgvBj/tdig7lZ6+YEs+APmcG6QGNlBJaLsfvOXFj4EXj+gzYL4
-X-Gm-Gg: AY/fxX7GSaVS5LiR3cQm4tCMtGrNQowL6SIwoCnCzpFHadFsN2oi3s6hKOyuWASCgK4
-	DMXizDUO4Vxd6Iuy74I/jQOYuBD9Qd5kF6a9qx2VGPSNfky8c8XzCnIwkcEODOORqjXTWr1RkaU
-	8JBaUTV0u+mL4PdQFkvm42bpmcIV+Qz+01AT/kGlmpgMS+cV1NArieye1hliaGBWpMsWCwAwTfj
-	gWlVpj2tCTTV4ehNNvtsEMmOnQvxke4ZV6WFyv6hZvl96KTXhIsjPh3mHf3py85yx6k++XefluC
-	5V+VDLoi1QcSMEsSIitNKBAlrJ+DEE5leoKGOFQLADCqtSBSCslWrE42S3aFoXxn3RkIcBKSYYq
-	OJYdNs2Dh86IBSmAN6J0dy4b12zWaNiJv1gdtUO50uw6Hsv7wCf+OaKG1L7sfwJfvPZx6JgQQeP
-	uTrHuE2BOOnc4lG0c4gjlGtTJ0ChFkiBUBjg==
-X-Google-Smtp-Source: AGHT+IEXchnztikZ6TBC5dh/zTMNJS+2BRCBmoom+2odvuMesN69tQriWc0PXoqqOi/s946zAImISQ==
-X-Received: by 2002:a05:600c:458e:b0:47b:e29f:e067 with SMTP id 5b1f17b1804b1-47d84b0b21dmr91582815e9.6.1767942728137;
-        Thu, 08 Jan 2026 23:12:08 -0800 (PST)
-Received: from ehlo.thunderbird.net ([80.244.29.172])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0dacd1sm20360905f8f.4.2026.01.08.23.12.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Jan 2026 23:12:07 -0800 (PST)
-Date: Fri, 09 Jan 2026 09:11:58 +0200
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-To: Slark Xiao <slark_xiao@163.com>
-CC: Loic Poulain <loic.poulain@oss.qualcomm.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- Muhammad Nuzaihan <zaihan@unrealasia.net>, Daniele Palmas <dnlplm@gmail.com>,
- Qiang Yu <quic_qianyu@quicinc.com>, Manivannan Sadhasivam <mani@kernel.org>,
- Johan Hovold <johan@kernel.org>
-Subject: Re:[RFC PATCH v5 0/7] net: wwan: add NMEA port type support
-User-Agent: K-9 Mail for Android
-In-Reply-To: <1b1a21b2.31c6.19ba0c6143b.Coremail.slark_xiao@163.com>
-References: <20260109010909.4216-1-ryazanov.s.a@gmail.com> <1b1a21b2.31c6.19ba0c6143b.Coremail.slark_xiao@163.com>
-Message-ID: <DF8AF3F7-9A3F-4DCB-963C-DCAE46309F7B@gmail.com>
+        d=1e100.net; s=20230601; t=1767943368; x=1768548168;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qCNBeC55dwFkYuH90UgwaJbtMoG2cmT0emKakpEw6rI=;
+        b=TbhaiG98mom2SbzK/zHZhKIPtF2M6MOM6R5oM6mRHsf9MKxniud/GehjDHVSK1lgsp
+         SCM3RfYKN4Ta6hl8euHVSKsb7yr/ljyf5T7erGeW0jJsYj2Tysl61bdgfBEWPhzp5Qjd
+         4FhZ9a0xTy4pltt+kn+mVzX8aLDI4VeBJAdBBjZpA943gY4RjO5h85It6HhX/homdZMS
+         utAmgWPfHAQcnot3dSxzH4VCQXHOhJmvVZ5qNwOSb4vaRXl8YYnRRWYqY5X3jQVWEB9d
+         AFvUtVhisIJOioarwHSo/OdKXAM8U9XIxM7DTlUyQ8esaI1/VdqEQTsoxPKxqS3pOdqP
+         azgA==
+X-Forwarded-Encrypted: i=1; AJvYcCVWvAwWMEG1rV6HdkkEiiZtxDkC/oSqIat66UasbvpYjSy0QMfoqLjQxXHt+OKJgjTrsYHADc8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVwDZ4yVdLMBWbYLHgAcZpHh69U0iVuQm2MFVtaMjA79+EHt+t
+	f1qaqPzbo6rK+oEe3QJNd/gfXjtcEbn135JHGQIVzmcrTjzohTLQE52aZhErH1HTvtT1xo0lLNE
+	7mivUrlthSrDVkZMam+yryw7MHOZkN3O9n5MRnSezVReMdESTx4hqWZIJkA==
+X-Gm-Gg: AY/fxX7W5LVB3Jhl4CJmcizPyMzPII0l+AN8wZOnDI6eV178XnpL6owrZMJ+PAvrm74
+	PO90POdpp4PsJCwe6+EMqB5WBU5Fp8fNYy9/CNQiHwbsdWDTdd6KDNmIAhnO2rerrp9rL8hSNW4
+	lFkFD2nf89TxILJ9PmKaF6SZfEDsP9+3lc9jeRYHJD2u7Lk6g2tzIHAHUIECNP6nPAFnYB0wEil
+	eO/MMOs3H1o9k/iQv8Fl8mPBXbLS0cP/ZafhDp9mnccUYP8S19dKrZKQooYr8m3PMfCoJK+Z1vK
+	IFwL5SEnry5kumwrmxDoUN0NviwhDs2hiC4NfmuaQSrZxe4A+H1wOukUpvtcSbj8QF1f5ntZKIy
+	7sM4ASQSt1RBcYT7kyaCw9P5mmiadpZrPdA==
+X-Received: by 2002:a05:6000:4201:b0:430:f40f:61ba with SMTP id ffacd0b85a97d-432c3798349mr11114924f8f.41.1767943368380;
+        Thu, 08 Jan 2026 23:22:48 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFHdWMIJxf4esvBI4hULstTggLuOtGp39Tkn3cxYuG9NjEAkGwtcZDffJ90hcLBXgcBNIrf8w==
+X-Received: by 2002:a05:6000:4201:b0:430:f40f:61ba with SMTP id ffacd0b85a97d-432c3798349mr11114886f8f.41.1767943367815;
+        Thu, 08 Jan 2026 23:22:47 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0daa84sm20705982f8f.2.2026.01.08.23.22.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jan 2026 23:22:47 -0800 (PST)
+Date: Fri, 9 Jan 2026 02:22:44 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+	leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+	tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next v7 2/9] ptr_ring: add helper to detect newly
+ freed space on consume
+Message-ID: <20260109021023-mutt-send-email-mst@kernel.org>
+References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
+ <20260107210448.37851-3-simon.schippers@tu-dortmund.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260107210448.37851-3-simon.schippers@tu-dortmund.de>
 
-On January 9, 2026 5:21:34 AM, Slark Xiao <slark_xiao@163=2Ecom> wrote:
->At 2026-01-09 09:09:02, "Sergey Ryazanov" <ryazanov=2Es=2Ea@gmail=2Ecom> =
-wrote:
->>The series introduces a long discussed NMEA port type support for the
->>WWAN subsystem=2E There are two goals=2E From the WWAN driver perspectiv=
-e,
->>NMEA exported as any other port type (e=2Eg=2E AT, MBIM, QMI, etc=2E)=2E=
- From
->>user space software perspective, the exported chardev belongs to the
->>GNSS class what makes it easy to distinguish desired port and the WWAN
->>device common to both NMEA and control (AT, MBIM, etc=2E) ports makes it
->>easy to locate a control port for the GNSS receiver activation=2E
->>
->>Done by exporting the NMEA port via the GNSS subsystem with the WWAN
->>core acting as proxy between the WWAN modem driver and the GNSS
->>subsystem=2E
->>
->>The series starts from a cleanup patch=2E Then three patches prepares th=
-e
->>WWAN core for the proxy style operation=2E Followed by a patch introding=
- a
->>new WWNA port type, integration with the GNSS subsystem and demux=2E The
->>series ends with a couple of patches that introduce emulated EMEA port
->>to the WWAN HW simulator=2E
->>
->>The series is the product of the discussion with Loic about the pros and
->>cons of possible models and implementation=2E Also Muhammad and Slark di=
-d
->>a great job defining the problem, sharing the code and pushing me to
->>finish the implementation=2E Daniele has caught an issue on driver
->>unloading and suggested an investigation direction=2E What was concluded
->>by Loic=2E Many thanks=2E
->>
->>Slark, if this series with the unregister fix suits you, please bundle
->>it with your MHI patch, and (re-)send for final inclusion=2E
->>
->>Changes RFCv1->RFCv2:
->>* Uniformly use put_device() to release port memory=2E This made code le=
-ss
->>  weird and way more clear=2E Thank you, Loic, for noticing and the fix
->>  discussion!
->>Changes RFCv2->RFCv5:
->>* Fix premature WWAN device unregister; new patch 2/7, thus, all
->>  subsequent patches have been renumbered
->>* Minor adjustments here and there
->>
->Shall I keep these RFC changes info in my next commit?
->Also these RFC changes info in these single patch=2E
+On Wed, Jan 07, 2026 at 10:04:41PM +0100, Simon Schippers wrote:
+> This proposed function checks whether __ptr_ring_zero_tail() was invoked
+> within the last n calls to __ptr_ring_consume(), which indicates that new
+> free space was created. Since __ptr_ring_zero_tail() moves the tail to
+> the head - and no other function modifies either the head or the tail,
+> aside from the wrap-around case described below - detecting such a
+> movement is sufficient to detect the invocation of
+> __ptr_ring_zero_tail().
+> 
+> The implementation detects this movement by checking whether the tail is
+> at most n positions behind the head. If this condition holds, the shift
+> of the tail to its current position must have occurred within the last n
+> calls to __ptr_ring_consume(), indicating that __ptr_ring_zero_tail() was
+> invoked and that new free space was created.
+> 
+> This logic also correctly handles the wrap-around case in which
+> __ptr_ring_zero_tail() is invoked and the head and the tail are reset
+> to 0. Since this reset likewise moves the tail to the head, the same
+> detection logic applies.
+> 
+> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+> ---
+>  include/linux/ptr_ring.h | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
+> index a5a3fa4916d3..7cdae6d1d400 100644
+> --- a/include/linux/ptr_ring.h
+> +++ b/include/linux/ptr_ring.h
+> @@ -438,6 +438,19 @@ static inline int ptr_ring_consume_batched_bh(struct ptr_ring *r,
+>  	return ret;
+>  }
+>  
+> +/* Returns true if the consume of the last n elements has created space
+> + * in the ring buffer (i.e., a new element can be produced).
+> + *
+> + * Note: Because of batching, a successful call to __ptr_ring_consume() /
+> + * __ptr_ring_consume_batched() does not guarantee that the next call to
+> + * __ptr_ring_produce() will succeed.
 
-Generally, yeah, it's a good idea to keep information about changes, espec=
-ially per item patch=2E Keeping the cover latter changelog is up to you=2E
 
->And I want to know whether  v5 or v6 shall be used for my next serial?
+I think the issue is it does not say what is the actual guarantee.
 
-Any of them will work=2E If you asking me, then I would suggest to send it=
- as v6 to continue numbering=2E
+Another issue is that the "Note" really should be more prominent,
+it really is part of explaining what the functions does.
 
->Is there a review progress for these RFC patches ( for patch 2/7 and=20
->3/7 especially)=2E If yes, I will hold my commit until these review progr=
-ess
->finished=2E If not, I will combine these changes with my MHI patch and se=
-nd
->them out asap=2E
+Hmm. Maybe we should tell it how many entries have been consumed and
+get back an indication of how much space this created?
 
-I have collected all the feedback=2E E=2Eg=2E, minor number leak was fixed=
-=2E Fixed one long noticed mistype=2E And collected two new review tags giv=
-en by Loic=2E So, my advice is to use these patches as base and put your MH=
-I patch on top of them=2E
+fundamentally
+	 n - (r->consumer_head - r->consumer_tail)?
 
->>CC: Slark Xiao <slark_xiao@163=2Ecom>
->>CC: Muhammad Nuzaihan <zaihan@unrealasia=2Enet>
->>CC: Daniele Palmas <dnlplm@gmail=2Ecom>
->>CC: Qiang Yu <quic_qianyu@quicinc=2Ecom>
->>CC: Manivannan Sadhasivam <mani@kernel=2Eorg>
->>CC: Johan Hovold <johan@kernel=2Eorg>
->>
->>Sergey Ryazanov (7):
->>  net: wwan: core: remove unused port_id field
->>  net: wwan: core: explicit WWAN device reference counting
->>  net: wwan: core: split port creation and registration
->>  net: wwan: core: split port unregister and stop
->>  net: wwan: add NMEA port support
->>  net: wwan: hwsim: refactor to support more port types
->>  net: wwan: hwsim: support NMEA port emulation
->>
->> drivers/net/wwan/Kconfig      |   1 +
->> drivers/net/wwan/wwan_core=2Ec  | 280 +++++++++++++++++++++++++++------=
--
->> drivers/net/wwan/wwan_hwsim=2Ec | 201 +++++++++++++++++++-----
->> include/linux/wwan=2Eh          |   2 +
->> 4 files changed, 396 insertions(+), 88 deletions(-)
->>
->>--=20
->>2=2E52=2E0
 
-Hi Slark
+does the below sound good maybe?
+
+/* Returns the amound of space (number of new elements that can be
+ * produced) that calls to ptr_ring_consume created.
+ *
+ * Getting n entries from calls to ptr_ring_consume() /
+ * ptr_ring_consume_batched() does *not* guarantee that the next n calls to
+ * ptr_ring_produce() will succeed.
+ *
+ * Use this function after consuming n entries to get a hint about
+ * how much space was actually created.
+
+
+
+
+
+> + */
+> +static inline bool __ptr_ring_consume_created_space(struct ptr_ring *r,
+> +						    int n)
+> +{
+> +	return r->consumer_head - r->consumer_tail < n;
+> +}
+> +
+>  /* Cast to structure type and call a function without discarding from FIFO.
+>   * Function must return a value.
+>   * Callers must take consumer_lock.
+> -- 
+> 2.43.0
+
 
