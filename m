@@ -1,76 +1,77 @@
-Return-Path: <netdev+bounces-248475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87A59D08F06
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 12:35:00 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40A55D08EC7
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 12:33:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2DFA6305B5A5
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 11:29:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9C13A308BE55
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 11:29:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18FE535C181;
-	Fri,  9 Jan 2026 11:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D5B335CB63;
+	Fri,  9 Jan 2026 11:29:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h+0hgalO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QwZdNikX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com [209.85.128.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 574B6227EA8
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 11:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E1B135BDC6
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 11:29:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767958160; cv=none; b=iR80Tc79IRU3lGOvIhXp5/GI6VjFMwxBWC4j8p3u8J/xtrJJuhLME6ddaPROHjHeYvkvynJbxEldiLLpekRrK4faDRBqeNPko19f4M4C0tszpS5cLktYZRd4LpOxXkXSopO5bspJEgcdwSpr+yR3U1+dGX0FkRxuIpHozHYZFOk=
+	t=1767958162; cv=none; b=OzUyyWD20bF9/gtB72JICoih3ZncHWFTQwhAKCyuvz6ga8mJ0tyfUpmXersk6sGsNKs6Eyoywgp3q70AO6YA1NI4TdpYPlVhnw82GYqpyZizRAw9qPoBCOV4JVyqBfn9pYfLufvb89nHf+Pi3Wm0MVtgMOsToBs4Vtzl8uCwdXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767958160; c=relaxed/simple;
-	bh=/jxCrpK8l6glGcqt49LNeHrXzbo3WZk9EY0AmmIwENo=;
+	s=arc-20240116; t=1767958162; c=relaxed/simple;
+	bh=axdc3q5KY7YeHULab/TvgzOYs0oof9ugiogriyYfhIs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Tqu+cgRBYlbwk/IIoy2LfOrDKa0HptiR+9tvYhHQCBAxO30ofbDv/7GaaXhEPQNxs5Lgw8NC9IUm3dIvDrhy04Yuy2XedR720qJPYnnhI77Y95E+Mx1y3XpJu5dzeSU+eJWTDPIOfmK9yg3gvOfha4llU5alOQnt52V1RmhvWNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h+0hgalO; arc=none smtp.client-ip=209.85.128.52
+	 MIME-Version; b=NwVWztOAVfPlxWIWFHWZDQTx511QfYU+A3SafhLU7/kaBEULUWa0PoDiIG+hpYLARbmTd9Sn7j5sCuotJZk9+60sZnfGj9HdNrU1UA3eJkirHrcMe9cWXAsDSEiwYa6X0OciqkNLQKaHq6g3y3N8YPqLWWy3eL4iso6T5axdUFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QwZdNikX; arc=none smtp.client-ip=209.85.128.66
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-47775fb6cb4so23335345e9.0
-        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 03:29:16 -0800 (PST)
+Received: by mail-wm1-f66.google.com with SMTP id 5b1f17b1804b1-47775fb6c56so39239275e9.1
+        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 03:29:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767958155; x=1768562955; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1767958157; x=1768562957; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WJRC4dPidxMIa9vqar4Y3LK2OFHt6WzESXNCWKhLD0s=;
-        b=h+0hgalOLvkaiVreIVlWnFsD7FLxMGxgYjcECpRiFlLppOrRDuSOin4WdyW83RlYK4
-         4SeCVO9+TvbdniM3n7n0RV0JHTKrPFphJJC/dXsDoV5NsL898yYMH8Q0r/E2fJxAgbjy
-         qxA2+cAt2tmQfgW5WfGwgmoSZyd5R6tpVnqkwEEee3MTFFUKoBHdtId+pxPW0w4F2J+q
-         RGjZIyzmTENj1Qa1QkhlDr6Z25G7VOwQvrtv94NFpD80LN0YYXp0HUBO8PFU9YA5kGDG
-         y45NLgx/HYPMjNarPZ3hyLahLByhGvYD1964kMaDn/T56iD0aOJURD1NMaeNn+UzI3tg
-         6tQg==
+        bh=kiBEtLY6CE0u/w5HMF7IyfpDPmY7qzN3np9POU+8r/k=;
+        b=QwZdNikXMmUiWaP6LrA6Ss+L4IlbzqbF8LAkHZkrSJYHJAwJQzeZm6Hovf0wIRcqhB
+         PexztlOhMNAPcHnKno9bvafz3SBPHuPe1N7aTJkWq4qn5RX2N0DAbGl8jfVmU8Pzq1o6
+         FvOIooIaqyNuWlJfMg1Rv0KcZ2IBryt5yp4e8HRITnG2mhY5v8pSnqUDdS0cR8H5jQmV
+         TdNAm/O3qnO5a4/RMRYI/H+6j9zwcW+NQ/Kr2oZnB1oA3WbpZqAi6YFG9a4nhi9r1ekM
+         3d/nerDRq2lYdG8wL7uo6OszlN/QB0A6zKiLWKvDRusPD82tpNIL64qInLSG2s2XojGf
+         jOuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767958155; x=1768562955;
+        d=1e100.net; s=20230601; t=1767958157; x=1768562957;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=WJRC4dPidxMIa9vqar4Y3LK2OFHt6WzESXNCWKhLD0s=;
-        b=gd6HwjYOGFRTnyA8N505X+KppJ25PdHpmpAaKbRys4JNS0ZhY4f/dhsdRb9JGO3eI7
-         lxm0BVshhlrNxAL7XJyYhlwDSsdkm9QsuDvyrc34eX6tYRNF21+7TGwe98tZHUytzYQT
-         c858AoOM+V+05ds7yAQ9PTMywRCdOdTpkLV/kJq3CcnfCI1/64+iwlQoC9boUzsHADsR
-         mJEQOorNH40Ka3ziAg4qemm1bE1U6yBmM9AWwPDmCT87QfSBlUo3Tet6SklKrayfYgRd
-         uKlspcqkB2uLl84TZpd8yiygFpcxusX18ovVSjpaC8ZdUITxO4w4/nyNSufaKpiLC6rv
-         WZ+w==
-X-Gm-Message-State: AOJu0Yw7mfAbtlbHkb4vptLIgdbzbXy338etG0t+SOD9MGHY5wzGJAvP
-	aL05zN9PTElBvMkXJAGDbxelxnknvK/wrFvuJx2C4gwykFdEy5239bycRs8lsg==
-X-Gm-Gg: AY/fxX6OFjD11bF49bxLBiXRyO6l5Xrh4QfWhQk72LhCtFd3msfwFnFU8FgoU/1ay9v
-	4uvCIcK3YEZyyd6/U5A81DtGka/ayFs+jQMPFCmBlOtU0hLz1X00abfwBEiEWvnPE0XXCLnoAal
-	oVH2yzyudPBF3x9k+akNjjrTSdLz2UwvauRbPJkWB4vZ5XmfUYH5bxnCigOE9CtsW1ElwQFiI/a
-	2y3AksJkgVC9OIcOL+Lca4D0juNKZq2UnTM5e7pwjwDRJqpbyuiE5WrP8PJFjW2Z8+fNgNFFUGa
-	oQBaWsOF8LzY8sYuu9lRZaNpti0i3DLT/j1kuv9rkOq/EE9khLCwxHqSSJ2DN2H95oFeqnviqEx
-	IafAuDt6aunAcZEhCr6mPSGJqpeFb2cVX0OuHhSf2Zu9KCjCQJHllaruLGItWDNO3c6kBh0xmhe
-	r3uVIr2/y1AfhS3WffSq4v2+HEpnXwiZSPT+3uAYZvb+0hDFCfThOXhu6Wg2KcROhl1tdhBA==
-X-Google-Smtp-Source: AGHT+IFP8GKWdVbTR4kP2eSXOtP3B21YVVOqcaO/WazPjd6IKdKiRPGp9LwPNLHkHaCIs9RrvfXe8w==
-X-Received: by 2002:a05:600c:8b57:b0:477:54f9:6ac2 with SMTP id 5b1f17b1804b1-47d849bdfa7mr100045195e9.0.1767958154803;
-        Fri, 09 Jan 2026 03:29:14 -0800 (PST)
+        bh=kiBEtLY6CE0u/w5HMF7IyfpDPmY7qzN3np9POU+8r/k=;
+        b=IOlLzkOGqSsF8CctIhE99W5oy9DVFePVRBaX+vbBDy5HJtyiD0QVYgyGLPVi5XX3Ig
+         Fs8qmYgrXXZr10zFaPQF/ijvoMg5RjDwISeMsNaPFCEVgEHjQu8eV3jRg8UX06ZGd1U9
+         N7hRC9/dOu0+2+vxm9HnVFvgpVVq6WgTFp4ZwQ87DJhAm26g/cGQack3uIvMHFPtJ012
+         ob+UR1tx5jUXdXPWvDiK3+p1zwhZje+x27pPpjAQA/DMqZ/KZSfRE6dj1NuW6av+I9KN
+         PMq83iq0o79Md/He3q5JE6muXlcY8vhbSATrwW1j0zrgwp62no45GMbAf5kS7rq8Sh3s
+         mN9w==
+X-Gm-Message-State: AOJu0Yx4gJt7aGaKA6CHmyiTvPgBLyumjyt57D/ciz0WtkD7/eQSc3P0
+	ob6zuDHJ1QRuHPJubFO0jub9qeIAk5fRmcesRT3QG/nKmvsis+pvAsCdsVesWWrl
+X-Gm-Gg: AY/fxX661neWrk8jHpk9A67jbi5QbsmwaJCf6WtI7s0rct/evb7qchVobsuLR0Vw4rQ
+	Bk/gbwMDVP+GGXnzyXUYJfWXof4ArlcfdWNFn4/iY7yz8Cm3cX7on3PQ9ULLqmRZTSiuMNFgmZx
+	+4ywm0N7CAoWARwhZapuJNyABDb9kMBzmBmhnFwPATMrX/NG6b+zOCJV0n3rVZ1/BEPdBLssl32
+	rAOGiHgFMcvhjvuFUi/Fe1XbNG0I5Z4u9aay/jy/ohf9UltGokoCYppVzIR/oHMCg/n8WIcquZH
+	8+MCNH608VbDbdnoZICWhlP96DM6ciy181i0gY0HWW8fjaf4EvCsUcnqf4KrooO9NTnvSl+HZQz
+	OgaBSjKdjn0zZBCMxvRrY3J7t7sgheH7biJvL09H2rTI54PwlKsR3/yEvT369oIBuRSLKKnM/oq
+	vXxZU+3ETIVuqmK/d54AyC4FhXBq2EtE5l6UgG7CIQTh0TX1zY3QU41mzmEyHHSUg4E76FyMIWx
+	yxdVLmW
+X-Google-Smtp-Source: AGHT+IF6sUa9JMjq/7LpBs2cdH8SCduGosXSIcxXOG6syAloBrtUa/I4hJziDJatmkaPD68dJ1oitQ==
+X-Received: by 2002:a05:600c:1d0c:b0:471:14b1:da13 with SMTP id 5b1f17b1804b1-47d84b1fcf9mr101969345e9.14.1767958156631;
+        Fri, 09 Jan 2026 03:29:16 -0800 (PST)
 Received: from 127.com ([2620:10d:c092:600::1:69b5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d8636c610sm60056985e9.0.2026.01.09.03.29.13
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d8636c610sm60056985e9.0.2026.01.09.03.29.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jan 2026 03:29:14 -0800 (PST)
+        Fri, 09 Jan 2026 03:29:15 -0800 (PST)
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S . Miller" <davem@davemloft.net>,
@@ -124,9 +125,9 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	linux-kselftest@vger.kernel.org,
 	dtatulea@nvidia.com,
 	io-uring@vger.kernel.org
-Subject: [PATCH net-next v8 8/9] selftests: iou-zcrx: test large chunk sizes
-Date: Fri,  9 Jan 2026 11:28:47 +0000
-Message-ID: <bb51fe4e6f30b0bd2335bfc665dc3e30b8de7acb.1767819709.git.asml.silence@gmail.com>
+Subject: [PATCH net-next v8 9/9] io_uring/zcrx: document area chunking parameter
+Date: Fri,  9 Jan 2026 11:28:48 +0000
+Message-ID: <65585c411f066a0565880ef0a9843e244d511bcf.1767819709.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <cover.1767819709.git.asml.silence@gmail.com>
 References: <cover.1767819709.git.asml.silence@gmail.com>
@@ -138,209 +139,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a test using large chunks for zcrx memory area.
+struct io_uring_zcrx_ifq_reg::rx_buf_len is used as a hint specifying
+the kernel what buffer size it should use. Document the API and
+limitations.
 
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- .../selftests/drivers/net/hw/iou-zcrx.c       | 72 +++++++++++++++----
- .../selftests/drivers/net/hw/iou-zcrx.py      | 37 ++++++++++
- 2 files changed, 97 insertions(+), 12 deletions(-)
+ Documentation/networking/iou-zcrx.rst | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.c b/tools/testing/selftests/drivers/net/hw/iou-zcrx.c
-index 62456df947bc..0a19b573f4f5 100644
---- a/tools/testing/selftests/drivers/net/hw/iou-zcrx.c
-+++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.c
-@@ -12,6 +12,7 @@
- #include <unistd.h>
+diff --git a/Documentation/networking/iou-zcrx.rst b/Documentation/networking/iou-zcrx.rst
+index 54a72e172bdc..7f3f4b2e6cf2 100644
+--- a/Documentation/networking/iou-zcrx.rst
++++ b/Documentation/networking/iou-zcrx.rst
+@@ -196,6 +196,26 @@ Return buffers back to the kernel to be used again::
+   rqe->len = cqe->res;
+   IO_URING_WRITE_ONCE(*refill_ring.ktail, ++refill_ring.rq_tail);
  
- #include <arpa/inet.h>
-+#include <linux/mman.h>
- #include <linux/errqueue.h>
- #include <linux/if_packet.h>
- #include <linux/ipv6.h>
-@@ -37,6 +38,23 @@
- 
- #include <liburing.h>
- 
-+#define SKIP_CODE	42
++Area chunking
++-------------
 +
-+struct t_io_uring_zcrx_ifq_reg {
-+	__u32	if_idx;
-+	__u32	if_rxq;
-+	__u32	rq_entries;
-+	__u32	flags;
++zcrx splits the memory area into fixed-length physically contiguous chunks.
++This limits the maximum buffer size returned in a single io_uring CQE. Users
++can provide a hint to the kernel to use larger chunks by setting the
++``rx_buf_len`` field of ``struct io_uring_zcrx_ifq_reg`` to the desired length
++during registration. If this field is set to zero, the kernel defaults to
++the system page size.
 +
-+	__u64	area_ptr; /* pointer to struct io_uring_zcrx_area_reg */
-+	__u64	region_ptr; /* struct io_uring_region_desc * */
++To use larger sizes, the memory area must be backed by physically contiguous
++ranges whose sizes are multiples of ``rx_buf_len``. It also requires kernel
++and hardware support. If registration fails, users are generally expected to
++fall back to defaults by setting ``rx_buf_len`` to zero.
 +
-+	struct io_uring_zcrx_offsets offsets;
-+	__u32	zcrx_id;
-+	__u32	rx_buf_len;
-+	__u64	__resv[3];
-+};
++Larger chunks don't give any additional guarantees about buffer sizes returned
++in CQEs, and they can vary depending on many factors like traffic pattern,
++hardware offload, etc. It doesn't require any application changes beyond zcrx
++registration.
 +
- static long page_size;
- #define AREA_SIZE (8192 * page_size)
- #define SEND_SIZE (512 * 4096)
-@@ -65,6 +83,8 @@ static bool cfg_oneshot;
- static int cfg_oneshot_recvs;
- static int cfg_send_size = SEND_SIZE;
- static struct sockaddr_in6 cfg_addr;
-+static unsigned cfg_rx_buf_len;
-+static bool cfg_dry_run;
+ Testing
+ =======
  
- static char *payload;
- static void *area_ptr;
-@@ -128,14 +148,28 @@ static void setup_zcrx(struct io_uring *ring)
- 	if (!ifindex)
- 		error(1, 0, "bad interface name: %s", cfg_ifname);
- 
--	area_ptr = mmap(NULL,
--			AREA_SIZE,
--			PROT_READ | PROT_WRITE,
--			MAP_ANONYMOUS | MAP_PRIVATE,
--			0,
--			0);
--	if (area_ptr == MAP_FAILED)
--		error(1, 0, "mmap(): zero copy area");
-+	if (cfg_rx_buf_len && cfg_rx_buf_len != page_size) {
-+		area_ptr = mmap(NULL,
-+				AREA_SIZE,
-+				PROT_READ | PROT_WRITE,
-+				MAP_ANONYMOUS | MAP_PRIVATE |
-+				MAP_HUGETLB | MAP_HUGE_2MB,
-+				-1,
-+				0);
-+		if (area_ptr == MAP_FAILED) {
-+			printf("Can't allocate huge pages\n");
-+			exit(SKIP_CODE);
-+		}
-+	} else {
-+		area_ptr = mmap(NULL,
-+				AREA_SIZE,
-+				PROT_READ | PROT_WRITE,
-+				MAP_ANONYMOUS | MAP_PRIVATE,
-+				0,
-+				0);
-+		if (area_ptr == MAP_FAILED)
-+			error(1, 0, "mmap(): zero copy area");
-+	}
- 
- 	ring_size = get_refill_ring_size(rq_entries);
- 	ring_ptr = mmap(NULL,
-@@ -157,17 +191,23 @@ static void setup_zcrx(struct io_uring *ring)
- 		.flags = 0,
- 	};
- 
--	struct io_uring_zcrx_ifq_reg reg = {
-+	struct t_io_uring_zcrx_ifq_reg reg = {
- 		.if_idx = ifindex,
- 		.if_rxq = cfg_queue_id,
- 		.rq_entries = rq_entries,
- 		.area_ptr = (__u64)(unsigned long)&area_reg,
- 		.region_ptr = (__u64)(unsigned long)&region_reg,
-+		.rx_buf_len = cfg_rx_buf_len,
- 	};
- 
--	ret = io_uring_register_ifq(ring, &reg);
--	if (ret)
-+	ret = io_uring_register_ifq(ring, (void *)&reg);
-+	if (cfg_rx_buf_len && (ret == -EINVAL || ret == -EOPNOTSUPP ||
-+			       ret == -ERANGE)) {
-+		printf("Large chunks are not supported %i\n", ret);
-+		exit(SKIP_CODE);
-+	} else if (ret) {
- 		error(1, 0, "io_uring_register_ifq(): %d", ret);
-+	}
- 
- 	rq_ring.khead = (unsigned int *)((char *)ring_ptr + reg.offsets.head);
- 	rq_ring.ktail = (unsigned int *)((char *)ring_ptr + reg.offsets.tail);
-@@ -323,6 +363,8 @@ static void run_server(void)
- 	io_uring_queue_init(512, &ring, flags);
- 
- 	setup_zcrx(&ring);
-+	if (cfg_dry_run)
-+		return;
- 
- 	add_accept(&ring, fd);
- 
-@@ -383,7 +425,7 @@ static void parse_opts(int argc, char **argv)
- 		usage(argv[0]);
- 	cfg_payload_len = max_payload_len;
- 
--	while ((c = getopt(argc, argv, "sch:p:l:i:q:o:z:")) != -1) {
-+	while ((c = getopt(argc, argv, "sch:p:l:i:q:o:z:x:d")) != -1) {
- 		switch (c) {
- 		case 's':
- 			if (cfg_client)
-@@ -418,6 +460,12 @@ static void parse_opts(int argc, char **argv)
- 		case 'z':
- 			cfg_send_size = strtoul(optarg, NULL, 0);
- 			break;
-+		case 'x':
-+			cfg_rx_buf_len = page_size * strtoul(optarg, NULL, 0);
-+			break;
-+		case 'd':
-+			cfg_dry_run = true;
-+			break;
- 		}
- 	}
- 
-diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-index 712c806508b5..83061b27f2f2 100755
---- a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-+++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-@@ -7,6 +7,7 @@ from lib.py import ksft_run, ksft_exit, KsftSkipEx
- from lib.py import NetDrvEpEnv
- from lib.py import bkg, cmd, defer, ethtool, rand_port, wait_port_listen
- 
-+SKIP_CODE = 42
- 
- def _get_current_settings(cfg):
-     output = ethtool(f"-g {cfg.ifname}", json=True)[0]
-@@ -132,6 +133,42 @@ def test_zcrx_rss(cfg) -> None:
-         cmd(tx_cmd, host=cfg.remote)
- 
- 
-+def test_zcrx_large_chunks(cfg) -> None:
-+    cfg.require_ipver('6')
-+
-+    combined_chans = _get_combined_channels(cfg)
-+    if combined_chans < 2:
-+        raise KsftSkipEx('at least 2 combined channels required')
-+    (rx_ring, hds_thresh) = _get_current_settings(cfg)
-+    port = rand_port()
-+
-+    ethtool(f"-G {cfg.ifname} tcp-data-split on")
-+    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto")
-+
-+    ethtool(f"-G {cfg.ifname} hds-thresh 0")
-+    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}")
-+
-+    ethtool(f"-G {cfg.ifname} rx 64")
-+    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}")
-+
-+    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}")
-+    defer(ethtool, f"-X {cfg.ifname} default")
-+
-+    flow_rule_id = _set_flow_rule(cfg, port, combined_chans - 1)
-+    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}")
-+
-+    rx_cmd = f"{cfg.bin_local} -s -p {port} -i {cfg.ifname} -q {combined_chans - 1} -x 2"
-+    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.addr_v['6']} -p {port} -l 12840"
-+
-+    probe = cmd(rx_cmd + " -d", fail=False)
-+    if probe.ret == SKIP_CODE:
-+        raise KsftSkipEx(probe.stdout)
-+
-+    with bkg(rx_cmd, exit_wait=True):
-+        wait_port_listen(port, proto="tcp")
-+        cmd(tx_cmd, host=cfg.remote)
-+
-+
- def main() -> None:
-     with NetDrvEpEnv(__file__) as cfg:
-         cfg.bin_local = path.abspath(path.dirname(__file__) + "/../../../drivers/net/hw/iou-zcrx")
 -- 
 2.52.0
 
