@@ -1,119 +1,88 @@
-Return-Path: <netdev+bounces-248462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BEE8D08D0D
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 12:09:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B0AABD08D4F
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 12:12:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1B8553004F6D
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 11:07:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7F4743051EB3
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 11:09:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FE79334C06;
-	Fri,  9 Jan 2026 11:07:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5373338931;
+	Fri,  9 Jan 2026 11:09:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="e6u/lY3j"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="dBmot0JA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f227.google.com (mail-pl1-f227.google.com [209.85.214.227])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013041.outbound.protection.outlook.com [40.93.196.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A541F339705
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 11:07:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.227
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767956860; cv=none; b=sWtoL5HCSfHO7nN2eScfgTFFtT2FrqcnsJTe7LhC8qDfdTjmhyS2AJAh2OJXpT6Ra46uH7pe25wpCrdFq0UZIzpI3QFf88KPrUgSFG1MTaTTuHM+j6YOzZqMWYlAIxRmqOWt8zftOlwTpM3J1AbG5dMFHR2p36IwEU0/8xbCKYw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767956860; c=relaxed/simple;
-	bh=bClo26dKQKfmtH6wmORSjwie/4l4DK0i8SN38XFShIg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RbPhx7VPQoV9AuAg9f2iZ5TFnLuKSD5Yh7uC4wGG3XJBeMdNy1O6wbAgAeFObzrWrRgRNpK9H86y4Sogo6Urv82W/MSwJzKqNbYcGfOhFqxT3EXd6FYESbkV8uqqkO/hcyeNz/tngFrkPq8LHnK4OME+hN4rCat694tze1FZLEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=e6u/lY3j; arc=none smtp.client-ip=209.85.214.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f227.google.com with SMTP id d9443c01a7336-2a3e89aa5d0so30603055ad.1
-        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 03:07:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767956858; x=1768561658;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eD5pHYGilsMyb5v5eXOJGZgBHsDewfP3AwzPbcKcT5s=;
-        b=NW0OvWQnKgSNt3GDNscUaw21veyoSaud18cK9TKVxzqjdg7BD0hyzTzg7PycBR4+eB
-         9Viin9oDWPx5imINFpbnwdLZ/p+2N1Yb++Z+ipzWWrQ2TWZ2cTjUD8FZOaLyIWcUp7HD
-         Itjt0mvn7mR58do8n89St0BzNIYQk1cXvExcW1E+kdORye7EGaqNCOaKAlEfdDYH9Kxt
-         rjSaaM4wV+tItAGXQ0ohanyZpL2/7dATEIwQJrgD2cQwn4yZGf/zTMoJGCShdEcnDSlt
-         +Q+0dM9/91QY1+h86fnxAU8HZl1xBGBPegG8r00uIvEZHY5yB+4Z3Sdv2+FzMVYyoXRX
-         lsDg==
-X-Forwarded-Encrypted: i=1; AJvYcCVtWHGta7bq39+24uB5qDLtF6POnaYktOnhyo9opGHsfwljfMBHjt4/eeZaxoA06TU3VrYDfXA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzILx7qOWnK4OFM8MCaT5HwN/qMsySUYjc1PaZ5MKhqR2/PBKcs
-	da0oJUk/7s3vexh1yXt6FujNftY/qfEbZrPDjwdblVz/FGIzUKeLm2afjSMUEAK5QchDU9ZM8ej
-	EP59AX0cql1co6k4owkD5llOihCovch9AFoTykMXDLJU5HJJ8LLwyUKacbziKkzsftkmwdJbNvR
-	VVA5oSbKjVlEGyefHu8DE/iY2vzEIgjKajdTL7EX6uRi8ejy/PEsXkCGQDW6vneNtkETEqF3nk6
-	oJnuR/3aCtr69VXjd0bjA==
-X-Gm-Gg: AY/fxX4iaEYlxN/4bh5lVliFoyvhthWmXAZn/v2RROr52aedTqTVMNeEIbpO2cb8+dU
-	eJkvkchqvxV7BPLVoLc1LxywWLeKE8w6ae9l72wdM+fR/3K6ZNeGtjOhfdJta2J0S960BctS4fZ
-	2Hwr385a+S1VSa12wC6AJh8hxOuzV9lazsu94+Os9l8g77wiiV7tfVKQgDBVXyRLt1vITAHG5Xq
-	u40BnNC1utepbcweWtsrLb+XuA6pF0Vz1/P+b0QWRLlyIEywgrsDAVr1KOl8WhFBwtorN+z+Ke0
-	dn2BNfQ5A13rxhiwSRJCZuSFwtn3OzabwvZBSjpLYldxNatlfnuMBdXvepJPIFcZ8h5bgYq3RZB
-	VxDb/yJAjqFH5RWTG79/5RiWaQh/ZQVvKvQ4AgKjqEB0wtL2rQOHijn1g+1vki/L8ro/KGShRm5
-	SZf5I8eFIyvPoqLnh4tN1vGpi3BYAyJ4QAwpoWuplZTrC/5QYMNA==
-X-Google-Smtp-Source: AGHT+IGY/5Y5dTzx1kvnNyi29umrZ6aaGyMKZx5qKVmx8nXK9wE1ALA5MmDe4+KqPZEWruxNPoC2G+ENdu35
-X-Received: by 2002:a17:902:f546:b0:290:ac36:2ed6 with SMTP id d9443c01a7336-2a3ee42a386mr86359555ad.14.1767956857957;
-        Fri, 09 Jan 2026 03:07:37 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-2.dlp.protect.broadcom.com. [144.49.247.2])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2a3e3cc4b54sm11932235ad.49.2026.01.09.03.07.37
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 09 Jan 2026 03:07:37 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dy1-f197.google.com with SMTP id 5a478bee46e88-2ac363a9465so3245991eec.0
-        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 03:07:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1767956856; x=1768561656; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=eD5pHYGilsMyb5v5eXOJGZgBHsDewfP3AwzPbcKcT5s=;
-        b=e6u/lY3jiyHaefD2gMMsIPSsetyln1ny1Vsbu96XaS/t3uXU5mJx/Y3BE/Iky4nuAY
-         UtQyGqLngUqAUmrqwPviYJrWPfxzG2YA5XCDj7DdZu9T+ws1CXYSjs5NA7spnr+eOXYY
-         09Q2GES7lXRiWZPf8YNJLcQqaE1fWiXgsVRbc=
-X-Forwarded-Encrypted: i=1; AJvYcCV7v5sffD/eWgaNJ2+cnga+LnqcYwakb2pc+FGFgOzV1Z6msqNGABP847LciRGnpv/uH20McSw=@vger.kernel.org
-X-Received: by 2002:a05:7301:7214:b0:2ae:5d7d:4f1d with SMTP id 5a478bee46e88-2b17d238b33mr8081319eec.1.1767956856154;
-        Fri, 09 Jan 2026 03:07:36 -0800 (PST)
-X-Received: by 2002:a05:7301:7214:b0:2ae:5d7d:4f1d with SMTP id 5a478bee46e88-2b17d238b33mr8081297eec.1.1767956855605;
-        Fri, 09 Jan 2026 03:07:35 -0800 (PST)
-Received: from photon-big-dev.. ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b1775fe27dsm8783818eec.29.2026.01.09.03.07.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jan 2026 03:07:35 -0800 (PST)
-From: HarinadhD <harinadh.dommaraju@broadcom.com>
-To: stable@vger.kernel.org,
-	gregkh@linuxfoundation.org
-Cc: john.fastabend@gmail.com,
-	daniel@iogearbox.net,
-	jakub@cloudflare.com,
-	lmb@cloudflare.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	ast@kernel.org,
-	andrii@kernel.org,
-	kafai@fb.com,
-	songliubraving@fb.com,
-	yhs@fb.com,
-	kpsingh@kernel.org,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ajay.kaher@broadcom.com,
-	alexey.makhalov@broadcom.com,
-	vamsi-krishna.brahmajosyula@broadcom.com,
-	yin.ding@broadcom.com,
-	tapas.kundu@broadcom.com,
-	Eric Dumazet <edumazet@google.com>,
-	Sasha Levin <sashal@kernel.org>,
-	Harinadh Dommaraju <Harinadh.Dommaraju@broadcom.com>
-Subject: [PATCH v2 v5.10.y] bpf, sockmap: Don't let sock_map_{close,destroy,unhash} call itself
-Date: Fri,  9 Jan 2026 10:20:11 +0000
-Message-ID: <20260109102011.3904861-1-harinadh.dommaraju@broadcom.com>
-X-Mailer: git-send-email 2.43.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA52433B962;
+	Fri,  9 Jan 2026 11:09:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767956982; cv=fail; b=ks0D9TqvNbNITZgsN+dw0x7wwnzDp05aic2bHcFkHREnRwDFkgb45BT/2aIg7PwnVm/CPXGw6dlNPxl0/AB1gltnE/f4QJubQ0/rlQBtBnZhGiwHozIgtGyzJrnKhvdkt5oomaLVbdfuEfHllJ62kwY7sqieK9sGcJGAceVzCeA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767956982; c=relaxed/simple;
+	bh=aziUNcS8vmchlSthCKBFb0wqc81jeiJs+1/qvXtF91I=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Dms9bzGP+rIqFjV4ff7BC0Q1d3EiYez36qTKxVXLXnQLSVagueABFQe33Ao6Ifa6aNBjUpfVaNm7YY5b0AA9rkCxtg9xNf5FBQsxRalJUdBAElImL8QcAqXczPy2mVQ+60aYsfUuf9xCvVYiKvmiEdtsIsxtCI+cyHA44K9C0SI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=dBmot0JA; arc=fail smtp.client-ip=40.93.196.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=KayQ23orOGWzBuo3PymzQ71xe8IvuyikSryuriYgiFzUHNzy5jlWZinhBfSYQAsfOdO+x4lPjU0zpCnVrIe0rKCrNf/G0DGXGFiZV+R65Z2nWZ7QtW1x8ufQ2DggvGhPp37fR1fl8iwKQE08XJ/CkNJJRc/l3zoeJX3/d8eLo7oTmYt67NLmHbzjKcGvv3HIl890SsLpg8YZjQoOfgZDWho6TlUg+AeAC0dJGGAyeJeRPY+8GW5pab8RRhLIo71gwUpuzPZGOmFaiQFmvUXziH+7LSOQjjQxkc+dPo3azmBSB/ADIsYLD41TctVi80nLC/sRVOw3sJFfLHwuudorGQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RcbBLFckhoJ7RTSa3xK4n1qSwLCZ2HniZr8cLT/4wxA=;
+ b=QBPZixEyL2stkXYQdeRc60h+2fD8NVic3LADc8DuyzuLL8TUS1aRAlpz4tqSyaezTUE3d06+GUao/Xyic5YGKXQuRUzr0U3f81gmX97fL6UWVraT2hJDA2CFkRql5R/2z2m1ZL0tp6U1Qe9EpYuCHcFKC9MRdU5mTaGEG/IVWkImVqeWVJPoVCPTGCqMYf6WIkhkA50Nnq4P27nhlA6xdtSuDWfAwBDSUisNmhriqhgABtaPu+/fRpCRoYbvSbe1pb428/SZJU8D2BTCHTRtZTEqAUQgTunZEJ+X9NlsqAJG05FV5mQ0Th4mdMBRgroqvPpM/l2OhGGNRprrlNFdpA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RcbBLFckhoJ7RTSa3xK4n1qSwLCZ2HniZr8cLT/4wxA=;
+ b=dBmot0JAnX/KVWU6/ASJWSM2zvM0WRTCvugRR7W8/RXT999/O7VxUY+zR2W5FKC6WJe724KEInEKGaMOtyLXJ/654f+xpHJOZnALk9EsTCRScanGhTyTh/6DoJn60+KbFLRsnWsMjJiHwxTs+uXQSv6RkHooOXaJJexKwuKwia5vkmlaay8fNN57NnCO3lMpXncS0yTgYsC3cEs34BjaQBy80ReluDICuZDqfEKWNQlTIcxBab8N0IkJ3Pwf5YsSdEPW8lcO8YyfWarjLUiEMWLCsJN69nJAjT2Gjctt5mLxpYrwChUdQT3TDXUr2kyxLbBulXwZ3Lm9zjQIb7QSJw==
+Received: from SJ0PR05CA0166.namprd05.prod.outlook.com (2603:10b6:a03:339::21)
+ by CYXPR12MB9443.namprd12.prod.outlook.com (2603:10b6:930:db::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.5; Fri, 9 Jan
+ 2026 11:09:29 +0000
+Received: from SJ5PEPF000001F1.namprd05.prod.outlook.com
+ (2603:10b6:a03:339:cafe::a6) by SJ0PR05CA0166.outlook.office365.com
+ (2603:10b6:a03:339::21) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9520.0 via Frontend Transport; Fri, 9
+ Jan 2026 11:09:26 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SJ5PEPF000001F1.mail.protection.outlook.com (10.167.242.69) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9520.1 via Frontend Transport; Fri, 9 Jan 2026 11:09:28 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 9 Jan
+ 2026 03:09:17 -0800
+Received: from c-237-113-240-247.mtl.labs.mlnx (10.126.231.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Fri, 9 Jan 2026 03:09:13 -0800
+From: Cosmin Ratiu <cratiu@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+	<shuah@kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>, Carolina Jubran
+	<cjubran@nvidia.com>, <linux-kselftest@vger.kernel.org>
+Subject: [PATCH net-next v2 0/1] PSP self test improvements
+Date: Fri, 9 Jan 2026 13:08:50 +0200
+Message-ID: <20260109110851.2952906-1-cratiu@nvidia.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -121,112 +90,72 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001F1:EE_|CYXPR12MB9443:EE_
+X-MS-Office365-Filtering-Correlation-Id: 91e2055d-b098-4249-e1b4-08de4f6f8ee1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|376014|82310400026|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?du9Z/+6ZI8e7WWdGcprwFK2VJ99LgL/jC9CUxGr1Y74+CVBBRc+LuYkU2+2k?=
+ =?us-ascii?Q?gBuz+F5b7uigckZgQNli3ZU2DfEaYesShDqUnhQv6IO8BCm6VAxSrDUkgjSI?=
+ =?us-ascii?Q?UHo+kbHucxXmK7AhL+VKuKs8j9ibXipND8lRCPpBYey1Of9rbqxZ28pgg0sj?=
+ =?us-ascii?Q?8FR+WxbtYYK7mzC0635rcBaU0QVKogDytc3Iaa6yRcbX7+qqKAwPJGm6spem?=
+ =?us-ascii?Q?rqZSLf5zHErSYW+K1z8hIexw1ZhKkxmX7v6wTF6Zs0EZGVan7BT1yVCE2r11?=
+ =?us-ascii?Q?0EPbYsX8i5JlaKas69WbB4z/Dcny9eYb9YiQQqRd0/QJ38ycie6TwOmjXLj0?=
+ =?us-ascii?Q?HRlJNqLgPn/g8G9yW4dGPY3WjRvFtMxhrqohSEZTnKDZM/Z/O5USVF0z5GAX?=
+ =?us-ascii?Q?tPGrlSxvZv5lhgg0UIeJr7N+4DC9Om6DET6Vz43t6UxU1PpLy0P4i70CeUOr?=
+ =?us-ascii?Q?NmjFipgLiU2BmCoHAgEiF+PsGPYeAravBlPIOBSv+0QSPdKobjqsCMyFZy5v?=
+ =?us-ascii?Q?uKTl37SV/aJm2/eL5fLc0747CgaB+tvrscrr0l6R6NqcTvLVj9P12R6WVNZ3?=
+ =?us-ascii?Q?+ZwzW0Il5v83kZdU/y6SbZY+wyjYr3DUVubneXkcriouMfaaWOtKZILCM0Xp?=
+ =?us-ascii?Q?3p+fgyIkkhotyow1zt/Zmmck2a+cxh30U/hSi/3NMZZVeyRCnZA5aDxEqbEA?=
+ =?us-ascii?Q?LEaoTPp3VaFl7R1qxiTLRZ84nAxwGgFjSwq3Krvq9hLET9xaSWsbjasS+YAp?=
+ =?us-ascii?Q?57Q85xY4Opmw2zhUUxh3i1l1sQuN8YXWzT2XcdUA7LJPR/PrfkdHpMu4Chii?=
+ =?us-ascii?Q?KA8qtGxWTJYmo9095WqvnuHkixgLTSpADHQvLXyIC1DX1e36JpZXppvBt0P8?=
+ =?us-ascii?Q?FGcBFixpcLfd5Q1V3FFPG45nfr/XnyNwjdPWIsLIf5QozQarGJl7VDmz8kDn?=
+ =?us-ascii?Q?xVZKQXu0kRFr8IUD3OxJ2MUzVeYQzYAkdYRz1ei5eTx0X6tzk4Oi1TQCRtC5?=
+ =?us-ascii?Q?aFY2oEzO289UurBzo+p74/TA+Ks8jW+z5pfkqf+gmXS64sqbW6keTCYh5vid?=
+ =?us-ascii?Q?UuXm0yxMRXH/s94J4Lht1s/sVfH1bNkpSUXjHBLF/6LB/6yNTu00nU5uj904?=
+ =?us-ascii?Q?gD7LGklDLfAoCC6p1HRWtKI4eK4Gq5Epgvqe8ulIPfmWYHBL3SsofXKX9uV5?=
+ =?us-ascii?Q?OLG7cQ62PVURefUKMdk5I9oFMBbGAvPoRVghsqmGYelXatVhGejUnxZsnjPs?=
+ =?us-ascii?Q?S5uCoEs+AU1D+r7iIX96EbikaB77ivm8T8q6O2OJ5hB7WFMX0C6C2hoaPJHU?=
+ =?us-ascii?Q?mdEQ3P31+sra7ywkND6hS1fD/mI1ACCLSTBl4PMIHt9X93kakr8YE2Z0pV5I?=
+ =?us-ascii?Q?fV+seaBw8OnEzLQWEo4Pae1UI5yzzqv3z6WnlgLpm5x6WBuQNpwLqHdPoPLt?=
+ =?us-ascii?Q?OUjcoIwANkk3w4w+77OqmwHnxCjgn0E3R1Zj31wwmsNLpcggXdYdkLlFfzAh?=
+ =?us-ascii?Q?FPJPRdlp2Zvr/DNE8/LGihqkRPsCM7NjBiFdxx+nBzocVwTcEpNSsxnMXVY5?=
+ =?us-ascii?Q?bCCc+tHvvxAYv9cHF8I=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jan 2026 11:09:28.9964
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 91e2055d-b098-4249-e1b4-08de4f6f8ee1
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF000001F1.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR12MB9443
 
-From: Jakub Sitnicki <jakub@cloudflare.com>
+Changes since v1:
+- Used ifindex in psp_responder to select the PSP device
+- Merged the two patches since they started overlapping too much.
 
-[ Upstream commit 5b4a79ba65a1ab479903fff2e604865d229b70a9 ]
+Cosmin Ratiu (1):
+  selftests: drv-net: psp: Better control the used PSP dev
 
-sock_map proto callbacks should never call themselves by design. Protect
-against bugs like [1] and break out of the recursive loop to avoid a stack
-overflow in favor of a resource leak.
+ .../selftests/drivers/net/lib/py/env.py       |  1 +
+ tools/testing/selftests/drivers/net/psp.py    |  4 +-
+ .../selftests/drivers/net/psp_responder.c     | 50 +++++++++----------
+ 3 files changed, 26 insertions(+), 29 deletions(-)
 
-[1] https://lore.kernel.org/all/00000000000073b14905ef2e7401@google.com/
-
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
-Acked-by: John Fastabend <john.fastabend@gmail.com>
-Link: https://lore.kernel.org/r/20230113-sockmap-fix-v2-1-1e0ee7ac2f90@cloudflare.com
-Signed-off-by: Alexei Starovoitov <ast@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-[Harinadh: Modified to apply on v5.10.y ]
-Signed-off-by: Harinadh Dommaraju <Harinadh.Dommaraju@broadcom.com>
----
- net/core/sock_map.c | 53 +++++++++++++++++++++++++--------------------
- 1 file changed, 30 insertions(+), 23 deletions(-)
-
-diff --git a/net/core/sock_map.c b/net/core/sock_map.c
-index 3a9e0046a780..438bbef5ff75 100644
---- a/net/core/sock_map.c
-+++ b/net/core/sock_map.c
-@@ -1558,15 +1558,16 @@ void sock_map_unhash(struct sock *sk)
- 	psock = sk_psock(sk);
- 	if (unlikely(!psock)) {
- 		rcu_read_unlock();
--		if (sk->sk_prot->unhash)
--			sk->sk_prot->unhash(sk);
--		return;
-+		saved_unhash = READ_ONCE(sk->sk_prot)->unhash;
-+	} else {
-+		saved_unhash = psock->saved_unhash;
-+		sock_map_remove_links(sk, psock);
-+		rcu_read_unlock();
- 	}
--
--	saved_unhash = psock->saved_unhash;
--	sock_map_remove_links(sk, psock);
--	rcu_read_unlock();
--	saved_unhash(sk);
-+	if (WARN_ON_ONCE(saved_unhash == sock_map_unhash))
-+		return;
-+	if (saved_unhash)
-+		saved_unhash(sk);
- }
- 
- void sock_map_destroy(struct sock *sk)
-@@ -1578,16 +1579,17 @@ void sock_map_destroy(struct sock *sk)
- 	psock = sk_psock_get(sk);
- 	if (unlikely(!psock)) {
- 		rcu_read_unlock();
--		if (sk->sk_prot->destroy)
--			sk->sk_prot->destroy(sk);
--		return;
-+		saved_destroy = READ_ONCE(sk->sk_prot)->destroy;
-+	} else {
-+		saved_destroy = psock->saved_destroy;
-+		sock_map_remove_links(sk, psock);
-+		rcu_read_unlock();
-+		sk_psock_put(sk, psock);
- 	}
--
--	saved_destroy = psock->saved_destroy;
--	sock_map_remove_links(sk, psock);
--	rcu_read_unlock();
--	sk_psock_put(sk, psock);
--	saved_destroy(sk);
-+	if (WARN_ON_ONCE(saved_destroy == sock_map_destroy))
-+		return;
-+	if (saved_destroy)
-+		saved_destroy(sk);
- }
- EXPORT_SYMBOL_GPL(sock_map_destroy);
- 
-@@ -1602,13 +1604,18 @@ void sock_map_close(struct sock *sk, long timeout)
- 	if (unlikely(!psock)) {
- 		rcu_read_unlock();
- 		release_sock(sk);
--		return sk->sk_prot->close(sk, timeout);
-+		saved_close = READ_ONCE(sk->sk_prot)->close;
-+	} else {
-+		saved_close = psock->saved_close;
-+		sock_map_remove_links(sk, psock);
-+		rcu_read_unlock();
-+		release_sock(sk);
- 	}
--
--	saved_close = psock->saved_close;
--	sock_map_remove_links(sk, psock);
--	rcu_read_unlock();
--	release_sock(sk);
-+	/* Make sure we do not recurse. This is a bug.
-+	 * Leak the socket instead of crashing on a stack overflow.
-+	 */
-+	if (WARN_ON_ONCE(saved_close == sock_map_close))
-+		return;
- 	saved_close(sk, timeout);
- }
- 
 -- 
-2.43.7
+2.45.0
 
 
