@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-248470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7AEFD08EAC
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 12:32:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A7012D08EB2
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 12:32:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 181E130CA959
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8997130CDC8F
 	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 11:29:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAE8B359707;
-	Fri,  9 Jan 2026 11:29:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 096D235A933;
+	Fri,  9 Jan 2026 11:29:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IMeMYpaZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HHHhRw72"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com [209.85.128.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910F1359705
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 11:29:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35313590DD
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 11:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767958150; cv=none; b=DJQVtI9mJlP1Asi+CPemxPKtLy7F/KOrIiEugGS98RYTP7ryMw3lSLXI81tyuNa7IPoClo7UkpdXpBH15IA7ftXOff/itltcJDaDBFLJBdI+v67Bv1lH7ROhRHrZagA8SKP9Cu4taIUllp7E/4qUAdS9nhosdXO3IFmPpDrMHSY=
+	t=1767958151; cv=none; b=t7XSiHhQOEEaV+U3mnLMH3vWk5M3kOKBd6t7O90nwZpG+7Zpx1n5O7raadZNWpSgcSW4NKiIsq9zPyYBursbgGyb0o7CBS8PNpZSJwOTQSrg6eFPtR6FBhvObRpzEEn2c9ELeUnGBy+tqDTmaxyl98y7qa6aNChHHK+QxP5rvmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767958150; c=relaxed/simple;
-	bh=8v+hHUhF1CMhZOc8CLqelBf0LDjedL88Pj/OWXk4VqE=;
+	s=arc-20240116; t=1767958151; c=relaxed/simple;
+	bh=hKOxjq4fxJ+iQfib8Cm75gZgmDPHfB9Dr0qLWGLYXFA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qU0H0hw/hmkWHQxk51fYn0HWFbMPTxU+B10wqSwnvjq7MgKQZTOMhxNIk9PHTIQdIxbEYEz5SHO/uVfaDM1lcIf7GHtaHMf+TfalZR6XNjNG69j69o6GQBBBkHvU6QznB9SF999UczELB7MAaU8NzeWYe3jOUZ7NLC74lS7blM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IMeMYpaZ; arc=none smtp.client-ip=209.85.128.46
+	 MIME-Version; b=cY7E+agIxxL3NRFpl6veH9ELJislivtUth08RxC6mL00r1vkhly5RwiPCJBnlByBusb+w2tBqfzU8I25rkwgbH+BLZ8irtBsg9apbxXzJQ85fFYf28Ib6LWiRW2UEy3dEsDZDnXp/XDT3pjnwOr11t5uP28X3ee7TXo3mQ3ZhAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HHHhRw72; arc=none smtp.client-ip=209.85.128.68
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-47d59da3d81so14007655e9.0
-        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 03:29:05 -0800 (PST)
+Received: by mail-wm1-f68.google.com with SMTP id 5b1f17b1804b1-47d1d8a49f5so27625315e9.3
+        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 03:29:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767958143; x=1768562943; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1767958146; x=1768562946; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kdd1BJ8GnEBdSFCIL/A/+d2iA6KRo+nUubv323kPE0Y=;
-        b=IMeMYpaZNNU//ZfeRXmfaPZKwfgILGS6vxfT1MrsWE4HPuqM4AGELGoVPU+RT/STJz
-         kvBBJaO490+u8Q+GtHLj6l9ag08jxEwJuQa4YDMNgHyRUdAQTq2vZz9qlBLtXyXGSUCX
-         ZyDCqJ2Izfmw7i2A9nAIh5TTtC5PmaOKEH6tYLWqKIA4VmKvyw7wWdGMkfL6L0KpParE
-         5dA/J7ZKX64Vxv/OAQjIAt0l5MCn2ErlH+CrCDVryj0XkSmSLoJR7hd6drvo5rCTXa8c
-         Jth8tYGj6smsuyWQINEIQ4M6dg7ZZhCXgzxN++ud2LRIZ0+ZW15Sojto3FpQah7Pl/6n
-         as+w==
+        bh=TWL7hbAkNRsIM9hHu4g4BkFlYyqPgZDU68a7iQIhzDo=;
+        b=HHHhRw72TWPZCJ341hwOHL6/05wsgcs23mXP7RxJGEyIoqolIVbOMIqTOfpQt19zRM
+         05n786aOs0DWt84e8XLXAC5urr/+RJonEsXhgsyEH819l3O5KdywIuIfw0WnfhAmedEg
+         uElfdPLyHABR9T9kn2/wImSEOSjFbFraxvGE4IWOrY27GvqYIpRjZdw0Tasra0/Bjn9X
+         T2ihfDVlOFFSlA0l5EaD/n4v4vOGSjXZHeH81b4UhXAztYFI/Pix/7Hn/20PAtoPvrO0
+         5dG/AjptJRhve38dtYwUa/tU1t2/T36wZ7vM52kc4sQM6AhFBe28pqD+JAL4a8l7eHnk
+         rDPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767958143; x=1768562943;
+        d=1e100.net; s=20230601; t=1767958146; x=1768562946;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=kdd1BJ8GnEBdSFCIL/A/+d2iA6KRo+nUubv323kPE0Y=;
-        b=gvVLBsleUpq5JEQaOW+ST+yW25KWLp8pSsNMLDlLJ6y+fthKS+f9sVUWKUT31oZBJt
-         1JZL+dim74Ox5DYpsP1dIi4OK9LS5b5j+ZuhAzOGxrD6GK9IO/8BnKTk6UrdMdiet1he
-         nNNMr+0bRrvghBdTj/scgdv43+4r/soPkpVC2NcHNX4f4b/KBZZkN7uR6CcIgQy+fhRO
-         38auR6YNXfa7KdKnzOcQOPNdRh0GXbNpZJPyd5YblGah9p+5dyMBBFUIWPDjrzVpFe+A
-         c3nil8XelelAsIHD0LhYIzHezR1WkprCq4W4Wz58zckmIm8Rv8OVCQzJGx+J9ENXqn7h
-         jR0g==
-X-Gm-Message-State: AOJu0Yy8i9K8INNHaDpkYqYrZ5qaeWNGf9b7b6bzyOiNMbAD8diFHxEX
-	fGjOJHDh9DP3bRaFDpE4IqclBrzgNV4+as4tSkIyoDiDly/SHEUJHVryEuQzsg==
-X-Gm-Gg: AY/fxX5mGCWtZSgcetrPyn1j8UO77y6G5F5IKc2Ejv+SH/ZzUlk6yiGPIRjyZTG7mxr
-	GRb830hV4cA39YZI/z3dnPnKaR0lCdm62rdak8JwF9rpS+VApM7y1bbLio4MZwQjoTDx6fP6wUJ
-	DvZ1AAXeSt0d1reN4+t/iaWPmYKAqTRd+XsUpP5VBHjP/b2DiTdsr+GajjTPUVecpd87Wf6Vvqj
-	iFVKAgmvZ1sw/8pwCgxYDOd5e3gTHSl7nFMm/qy5229Etf1sI7nb+9ARIi33DT9E3cRTFWHkV6+
-	8Ym3hbtVAoLt8EIxh29mlfSUIN9LyvEK5NJMi8Cm7/fo7jVUMV/ebIygH1rBI6wAmw9RTlzU3Kw
-	RGThQ0rjQ8/SoCalqROejrlqUEfGwOfdB844vvqHLQPmQVA0t7T/RloXPbMxIniwGYEVy5FK719
-	K7DapGYUOo4tmM86zUsT46Osk05rs3jYRpXE2mYoLWGo5OkuyRYFAR2dBIU64JSqBXJ+9OzA==
-X-Google-Smtp-Source: AGHT+IHKuRS0IT/bpC+UJc4vXXX6jRdQbUKXx2O2o/AL3e7ieD8njEmbDbJnzHUsvm+xrORjKVPuZQ==
-X-Received: by 2002:a05:600c:8215:b0:46e:2815:8568 with SMTP id 5b1f17b1804b1-47d8486cd41mr104264645e9.10.1767958142195;
-        Fri, 09 Jan 2026 03:29:02 -0800 (PST)
+        bh=TWL7hbAkNRsIM9hHu4g4BkFlYyqPgZDU68a7iQIhzDo=;
+        b=K9CMHiY6rVYFvsoNyjF+hn9qIsa68jdXwoQNHtnUMsuphaW7dXBEAFejrH5MG1iyFq
+         +Xd9ja6lk1KdHc0jvPE+rDq0+BnRa1pruoDeQZjT5QqnXC0M/dB7CR4iWAJ40nEcTbJt
+         XX9biG+cqU5AnMhU8Iiy+P3cz3K7KO7TW8z5uioqRlasd82tg5+AdrYQG25NVp+g4+hC
+         kMr7L8zyw19NTdr1PU5Dp7gt8+a5ZEujF+zYzeWKh+SWnPcErkHvOKnxdNz4ROZaevLZ
+         aECXskOE+8EKk/RVReLX30+KSMyDaql6ysdsJoAZee+zkBWVPxzC1jBCuUQkw/GAGMak
+         SwRA==
+X-Gm-Message-State: AOJu0Yx+G7jQrGCLivc36cxWu3zdnEUbG8cYRq5bh8k3yox2UlxGhcLL
+	2L0+6CLHKEGozrRsYllw3U8WbnGiFgJoQkhUR230ylqAlHE9QOsiUbLzbMJhDx/q
+X-Gm-Gg: AY/fxX55PFRXY5hcRCiKE0tGhh66bWElHHdJY5V4Nd6AqO1NZ3UGApfDdChQWdIUujx
+	BtULZUjIoHAKTKml/4umFh2u+t/OCKhYiKHaPoZ3CyU5o14+XOjSUTToQfClpF4dRqlNioytqZN
+	rv2Uuhv2u4CS9+6OTnfrdMg2idh/kG3gSbo+lAKedMHx4uKO/HoPaJQgaIAAVAYwzGL9Q9Zei2O
+	ue0v96ux2dWltu9iyHtwQSy8t0vNpMaxQfzbYbjgtonyc/dWLn0YHpnc7EkZ1WnmFbHsIaOhu7I
+	R5Zw/ftMYznOXVea4kdrKea+1eVqCxHCSyZy913185EsKX9ZFth9KwNwm0xIMZA3icwWY5xvMyC
+	Oy7yUAbNavjbRw24gm4frcOX7koigSu7VWHEboGrd0899SbFZexR1K4o3Uz+Bfa1VEGyBAmy0rR
+	9pAOxPu7OW0IMUK9HnJDBaweXeRasIM1kPiAhpjsnwoqqIBlfYrcj0RFeGsFLo2sioMbUZvg==
+X-Google-Smtp-Source: AGHT+IEtu//eEPFSMQCQc0x4+ohl+/zP3PbtVY9Fq75VCKqTNmy1GQDGxEUmS6COuOk11FJ2AmC1hg==
+X-Received: by 2002:a05:600c:1f8c:b0:477:7d94:5d0e with SMTP id 5b1f17b1804b1-47d84b40955mr99606675e9.27.1767958145751;
+        Fri, 09 Jan 2026 03:29:05 -0800 (PST)
 Received: from 127.com ([2620:10d:c092:600::1:69b5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d8636c610sm60056985e9.0.2026.01.09.03.28.59
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d8636c610sm60056985e9.0.2026.01.09.03.29.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jan 2026 03:29:00 -0800 (PST)
+        Fri, 09 Jan 2026 03:29:05 -0800 (PST)
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S . Miller" <davem@davemloft.net>,
@@ -124,9 +124,9 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	linux-kselftest@vger.kernel.org,
 	dtatulea@nvidia.com,
 	io-uring@vger.kernel.org
-Subject: [PATCH net-next v8 3/9] net: add bare bone queue configs
-Date: Fri,  9 Jan 2026 11:28:42 +0000
-Message-ID: <6280519f4d4dcd9500f04fc1a79677a2df9b2fca.1767819709.git.asml.silence@gmail.com>
+Subject: [PATCH net-next v8 4/9] net: pass queue rx page size from memory provider
+Date: Fri,  9 Jan 2026 11:28:43 +0000
+Message-ID: <da8aa10eaa0e4dce52a0b39ed7e3829eb70e22f5.1767819709.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <cover.1767819709.git.asml.silence@gmail.com>
 References: <cover.1767819709.git.asml.silence@gmail.com>
@@ -138,320 +138,103 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We'll need to pass extra parameters when allocating a queue for memory
-providers. Define a new structure for queue configurations, and pass it
-to qapi callbacks. It's empty for now, actual parameters will be added
-in following patches.
+Allow memory providers to configure rx queues with a custom receive
+page size. It's passed in struct pp_memory_provider_params, which is
+copied into the queue, so it's preserved across queue restarts. Then,
+it's propagated to the driver in a new queue config parameter.
 
-Configurations should persist across resets, and for that they're
-default-initialised on device registration and stored in struct
-netdev_rx_queue. We also add a new qapi callback for defaulting a given
-config. It must be implemented if a driver wants to use queue configs
-and is optional otherwise.
+Drivers should explicitly opt into using it by setting
+QCFG_RX_PAGE_SIZE, in which case they should implement ndo_default_qcfg,
+validate the size on queue restart and honour the current config in case
+of a reset.
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c       |  8 ++++++--
- drivers/net/ethernet/google/gve/gve_main.c      |  9 ++++++---
- .../net/ethernet/mellanox/mlx5/core/en_main.c   | 10 ++++++----
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.c    |  8 ++++++--
- drivers/net/netdevsim/netdev.c                  |  7 +++++--
- include/net/netdev_queues.h                     |  9 +++++++++
- include/net/netdev_rx_queue.h                   |  2 ++
- net/core/dev.c                                  | 17 +++++++++++++++++
- net/core/netdev_rx_queue.c                      | 12 +++++++++---
- 9 files changed, 66 insertions(+), 16 deletions(-)
+ include/net/netdev_queues.h   | 10 ++++++++++
+ include/net/page_pool/types.h |  1 +
+ net/core/netdev_rx_queue.c    |  9 +++++++++
+ 3 files changed, 20 insertions(+)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index d17d0ea89c36..73f954da39b9 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -15902,7 +15902,9 @@ static const struct netdev_stat_ops bnxt_stat_ops = {
- 	.get_base_stats		= bnxt_get_base_stats,
- };
- 
--static int bnxt_queue_mem_alloc(struct net_device *dev, void *qmem, int idx)
-+static int bnxt_queue_mem_alloc(struct net_device *dev,
-+				struct netdev_queue_config *qcfg,
-+				void *qmem, int idx)
- {
- 	struct bnxt_rx_ring_info *rxr, *clone;
- 	struct bnxt *bp = netdev_priv(dev);
-@@ -16068,7 +16070,9 @@ static void bnxt_copy_rx_ring(struct bnxt *bp,
- 	dst->rx_agg_bmap = src->rx_agg_bmap;
- }
- 
--static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
-+static int bnxt_queue_start(struct net_device *dev,
-+			    struct netdev_queue_config *qcfg,
-+			    void *qmem, int idx)
- {
- 	struct bnxt *bp = netdev_priv(dev);
- 	struct bnxt_rx_ring_info *rxr, *clone;
-diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index 7eb64e1e4d85..c42640da15a5 100644
---- a/drivers/net/ethernet/google/gve/gve_main.c
-+++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -2616,8 +2616,9 @@ static void gve_rx_queue_mem_free(struct net_device *dev, void *per_q_mem)
- 		gve_rx_free_ring_dqo(priv, gve_per_q_mem, &cfg);
- }
- 
--static int gve_rx_queue_mem_alloc(struct net_device *dev, void *per_q_mem,
--				  int idx)
-+static int gve_rx_queue_mem_alloc(struct net_device *dev,
-+				  struct netdev_queue_config *qcfg,
-+				  void *per_q_mem, int idx)
- {
- 	struct gve_priv *priv = netdev_priv(dev);
- 	struct gve_rx_alloc_rings_cfg cfg = {0};
-@@ -2638,7 +2639,9 @@ static int gve_rx_queue_mem_alloc(struct net_device *dev, void *per_q_mem,
- 	return err;
- }
- 
--static int gve_rx_queue_start(struct net_device *dev, void *per_q_mem, int idx)
-+static int gve_rx_queue_start(struct net_device *dev,
-+			      struct netdev_queue_config *qcfg,
-+			      void *per_q_mem, int idx)
- {
- 	struct gve_priv *priv = netdev_priv(dev);
- 	struct gve_rx_ring *gve_per_q_mem;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index 07fc4d2c8fad..0e2132b58257 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -5596,8 +5596,9 @@ struct mlx5_qmgmt_data {
- 	struct mlx5e_channel_param cparam;
- };
- 
--static int mlx5e_queue_mem_alloc(struct net_device *dev, void *newq,
--				 int queue_index)
-+static int mlx5e_queue_mem_alloc(struct net_device *dev,
-+				 struct netdev_queue_config *qcfg,
-+				 void *newq, int queue_index)
- {
- 	struct mlx5_qmgmt_data *new = (struct mlx5_qmgmt_data *)newq;
- 	struct mlx5e_priv *priv = netdev_priv(dev);
-@@ -5658,8 +5659,9 @@ static int mlx5e_queue_stop(struct net_device *dev, void *oldq, int queue_index)
- 	return 0;
- }
- 
--static int mlx5e_queue_start(struct net_device *dev, void *newq,
--			     int queue_index)
-+static int mlx5e_queue_start(struct net_device *dev,
-+			     struct netdev_queue_config *qcfg,
-+			     void *newq, int queue_index)
- {
- 	struct mlx5_qmgmt_data *new = (struct mlx5_qmgmt_data *)newq;
- 	struct mlx5e_priv *priv = netdev_priv(dev);
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-index 13d508ce637f..e36ed25462b4 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-@@ -2809,7 +2809,9 @@ void fbnic_napi_depletion_check(struct net_device *netdev)
- 	fbnic_wrfl(fbd);
- }
- 
--static int fbnic_queue_mem_alloc(struct net_device *dev, void *qmem, int idx)
-+static int fbnic_queue_mem_alloc(struct net_device *dev,
-+				 struct netdev_queue_config *qcfg,
-+				 void *qmem, int idx)
- {
- 	struct fbnic_net *fbn = netdev_priv(dev);
- 	const struct fbnic_q_triad *real;
-@@ -2861,7 +2863,9 @@ static void __fbnic_nv_restart(struct fbnic_net *fbn,
- 		netif_wake_subqueue(fbn->netdev, nv->qt[i].sub0.q_idx);
- }
- 
--static int fbnic_queue_start(struct net_device *dev, void *qmem, int idx)
-+static int fbnic_queue_start(struct net_device *dev,
-+			     struct netdev_queue_config *qcfg,
-+			     void *qmem, int idx)
- {
- 	struct fbnic_net *fbn = netdev_priv(dev);
- 	struct fbnic_napi_vector *nv;
-diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-index 6927c1962277..6285fbefe38a 100644
---- a/drivers/net/netdevsim/netdev.c
-+++ b/drivers/net/netdevsim/netdev.c
-@@ -758,7 +758,9 @@ struct nsim_queue_mem {
- };
- 
- static int
--nsim_queue_mem_alloc(struct net_device *dev, void *per_queue_mem, int idx)
-+nsim_queue_mem_alloc(struct net_device *dev,
-+		     struct netdev_queue_config *qcfg,
-+		     void *per_queue_mem, int idx)
- {
- 	struct nsim_queue_mem *qmem = per_queue_mem;
- 	struct netdevsim *ns = netdev_priv(dev);
-@@ -807,7 +809,8 @@ static void nsim_queue_mem_free(struct net_device *dev, void *per_queue_mem)
- }
- 
- static int
--nsim_queue_start(struct net_device *dev, void *per_queue_mem, int idx)
-+nsim_queue_start(struct net_device *dev, struct netdev_queue_config *qcfg,
-+		 void *per_queue_mem, int idx)
- {
- 	struct nsim_queue_mem *qmem = per_queue_mem;
- 	struct netdevsim *ns = netdev_priv(dev);
 diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
-index 541e7d9853b1..f6f1f71a24e1 100644
+index f6f1f71a24e1..feca25131930 100644
 --- a/include/net/netdev_queues.h
 +++ b/include/net/netdev_queues.h
-@@ -14,6 +14,9 @@ struct netdev_config {
- 	u8	hds_config;
+@@ -15,6 +15,7 @@ struct netdev_config {
  };
  
-+struct netdev_queue_config {
+ struct netdev_queue_config {
++	u32	rx_page_size;
+ };
+ 
+ /* See the netdev.yaml spec for definition of each statistic */
+@@ -114,6 +115,11 @@ void netdev_stat_queue_sum(struct net_device *netdev,
+ 			   int tx_start, int tx_end,
+ 			   struct netdev_queue_stats_tx *tx_sum);
+ 
++enum {
++	/* The queue checks and honours the page size qcfg parameter */
++	QCFG_RX_PAGE_SIZE	= 0x1,
 +};
 +
- /* See the netdev.yaml spec for definition of each statistic */
- struct netdev_queue_stats_rx {
- 	u64 bytes;
-@@ -130,6 +133,8 @@ void netdev_stat_queue_sum(struct net_device *netdev,
-  * @ndo_queue_get_dma_dev: Get dma device for zero-copy operations to be used
-  *			   for this queue. Return NULL on error.
+ /**
+  * struct netdev_queue_mgmt_ops - netdev ops for queue management
   *
-+ * @ndo_default_qcfg:	Populate queue config struct with defaults. Optional.
+@@ -135,6 +141,8 @@ void netdev_stat_queue_sum(struct net_device *netdev,
+  *
+  * @ndo_default_qcfg:	Populate queue config struct with defaults. Optional.
+  *
++ * @supported_params:	Bitmask of supported parameters, see QCFG_*.
 + *
   * Note that @ndo_queue_mem_alloc and @ndo_queue_mem_free may be called while
   * the interface is closed. @ndo_queue_start and @ndo_queue_stop will only
   * be called for an interface which is open.
-@@ -137,16 +142,20 @@ void netdev_stat_queue_sum(struct net_device *netdev,
- struct netdev_queue_mgmt_ops {
- 	size_t	ndo_queue_mem_size;
- 	int	(*ndo_queue_mem_alloc)(struct net_device *dev,
-+				       struct netdev_queue_config *qcfg,
- 				       void *per_queue_mem,
- 				       int idx);
- 	void	(*ndo_queue_mem_free)(struct net_device *dev,
- 				      void *per_queue_mem);
- 	int	(*ndo_queue_start)(struct net_device *dev,
-+				   struct netdev_queue_config *qcfg,
- 				   void *per_queue_mem,
- 				   int idx);
- 	int	(*ndo_queue_stop)(struct net_device *dev,
- 				  void *per_queue_mem,
- 				  int idx);
-+	void	(*ndo_default_qcfg)(struct net_device *dev,
-+				    struct netdev_queue_config *qcfg);
+@@ -158,6 +166,8 @@ struct netdev_queue_mgmt_ops {
+ 				    struct netdev_queue_config *qcfg);
  	struct device *	(*ndo_queue_get_dma_dev)(struct net_device *dev,
  						 int idx);
++
++	unsigned int supported_params;
  };
-diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queue.h
-index 8cdcd138b33f..cfa72c485387 100644
---- a/include/net/netdev_rx_queue.h
-+++ b/include/net/netdev_rx_queue.h
-@@ -7,6 +7,7 @@
- #include <linux/sysfs.h>
- #include <net/xdp.h>
- #include <net/page_pool/types.h>
-+#include <net/netdev_queues.h>
  
- /* This structure contains an instance of an RX queue. */
- struct netdev_rx_queue {
-@@ -27,6 +28,7 @@ struct netdev_rx_queue {
- 	struct xsk_buff_pool            *pool;
- #endif
- 	struct napi_struct		*napi;
-+	struct netdev_queue_config	qcfg;
- 	struct pp_memory_provider_params mp_params;
- } ____cacheline_aligned_in_smp;
+ bool netif_rxq_has_unreadable_mp(struct net_device *dev, int idx);
+diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
+index 1509a536cb85..0d453484a585 100644
+--- a/include/net/page_pool/types.h
++++ b/include/net/page_pool/types.h
+@@ -161,6 +161,7 @@ struct memory_provider_ops;
+ struct pp_memory_provider_params {
+ 	void *mp_priv;
+ 	const struct memory_provider_ops *mp_ops;
++	u32 rx_page_size;
+ };
  
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 36dc5199037e..a1d394addaef 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11270,6 +11270,21 @@ static void netdev_free_phy_link_topology(struct net_device *dev)
- 	}
- }
- 
-+static void init_rx_queue_cfgs(struct net_device *dev)
-+{
-+	const struct netdev_queue_mgmt_ops *qops = dev->queue_mgmt_ops;
-+	struct netdev_rx_queue *rxq;
-+	int i;
-+
-+	if (!qops || !qops->ndo_default_qcfg)
-+		return;
-+
-+	for (i = 0; i < dev->num_rx_queues; i++) {
-+		rxq = __netif_get_rx_queue(dev, i);
-+		qops->ndo_default_qcfg(dev, &rxq->qcfg);
-+	}
-+}
-+
- /**
-  * register_netdevice() - register a network device
-  * @dev: device to register
-@@ -11315,6 +11330,8 @@ int register_netdevice(struct net_device *dev)
- 	if (!dev->name_node)
- 		goto out;
- 
-+	init_rx_queue_cfgs(dev);
-+
- 	/* Init, if this function is available */
- 	if (dev->netdev_ops->ndo_init) {
- 		ret = dev->netdev_ops->ndo_init(dev);
+ struct page_pool {
 diff --git a/net/core/netdev_rx_queue.c b/net/core/netdev_rx_queue.c
-index a0083f176a9c..86d1c0a925e3 100644
+index 86d1c0a925e3..b81cad90ba2f 100644
 --- a/net/core/netdev_rx_queue.c
 +++ b/net/core/netdev_rx_queue.c
-@@ -22,6 +22,7 @@ int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq_idx)
- {
- 	struct netdev_rx_queue *rxq = __netif_get_rx_queue(dev, rxq_idx);
- 	const struct netdev_queue_mgmt_ops *qops = dev->queue_mgmt_ops;
-+	struct netdev_queue_config qcfg;
- 	void *new_mem, *old_mem;
- 	int err;
+@@ -30,12 +30,21 @@ int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq_idx)
+ 	    !qops->ndo_queue_mem_alloc || !qops->ndo_queue_start)
+ 		return -EOPNOTSUPP;
  
-@@ -31,6 +32,10 @@ int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq_idx)
- 
++	if (WARN_ON_ONCE(qops->supported_params && !qops->ndo_default_qcfg))
++		return -EINVAL;
++
  	netdev_assert_locked(dev);
  
-+	memset(&qcfg, 0, sizeof(qcfg));
-+	if (qops->ndo_default_qcfg)
-+		qops->ndo_default_qcfg(dev, &qcfg);
+ 	memset(&qcfg, 0, sizeof(qcfg));
+ 	if (qops->ndo_default_qcfg)
+ 		qops->ndo_default_qcfg(dev, &qcfg);
+ 
++	if (rxq->mp_params.rx_page_size) {
++		if (!(qops->supported_params & QCFG_RX_PAGE_SIZE))
++			return -EOPNOTSUPP;
++		qcfg.rx_page_size = rxq->mp_params.rx_page_size;
++	}
 +
  	new_mem = kvzalloc(qops->ndo_queue_mem_size, GFP_KERNEL);
  	if (!new_mem)
  		return -ENOMEM;
-@@ -41,7 +46,7 @@ int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq_idx)
- 		goto err_free_new_mem;
- 	}
- 
--	err = qops->ndo_queue_mem_alloc(dev, new_mem, rxq_idx);
-+	err = qops->ndo_queue_mem_alloc(dev, &qcfg, new_mem, rxq_idx);
- 	if (err)
- 		goto err_free_old_mem;
- 
-@@ -54,7 +59,7 @@ int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq_idx)
- 		if (err)
- 			goto err_free_new_queue_mem;
- 
--		err = qops->ndo_queue_start(dev, new_mem, rxq_idx);
-+		err = qops->ndo_queue_start(dev, &qcfg, new_mem, rxq_idx);
- 		if (err)
- 			goto err_start_queue;
- 	} else {
-@@ -66,6 +71,7 @@ int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq_idx)
- 	kvfree(old_mem);
- 	kvfree(new_mem);
- 
-+	rxq->qcfg = qcfg;
- 	return 0;
- 
- err_start_queue:
-@@ -76,7 +82,7 @@ int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq_idx)
- 	 * WARN if we fail to recover the old rx queue, and at least free
- 	 * old_mem so we don't also leak that.
- 	 */
--	if (qops->ndo_queue_start(dev, old_mem, rxq_idx)) {
-+	if (qops->ndo_queue_start(dev, &rxq->qcfg, old_mem, rxq_idx)) {
- 		WARN(1,
- 		     "Failed to restart old queue in error path. RX queue %d may be unhealthy.",
- 		     rxq_idx);
 -- 
 2.52.0
 
