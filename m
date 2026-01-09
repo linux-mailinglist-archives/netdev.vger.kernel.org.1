@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-248579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C0A9D0BD46
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 19:28:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E18DD0BD8A
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 19:32:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BAC77301AD30
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 18:28:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0D5F5301D5BA
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 18:31:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A728366557;
-	Fri,  9 Jan 2026 18:28:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CFDB21D00A;
+	Fri,  9 Jan 2026 18:31:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="r9CsqDao"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="COcIW6ip"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C08C365A1A;
-	Fri,  9 Jan 2026 18:28:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69EB1F5842;
+	Fri,  9 Jan 2026 18:31:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767983301; cv=none; b=KttA4Z3TtlP9pfvq97ZmfVpcq5lOvFnaBqQpvODJWgFKPNN1XDsm2KW5c/jzxhN8YHEP8GliSWfjf6kdUqB283/wRc8W6A5XeWf/ntzSd7dmGNisIkKivrTmD1tagDZ+s4SBVs9EPVj+ezyyBS1nBBESpjwn0q3CsBb3MDqC5lA=
+	t=1767983482; cv=none; b=utF9SVrq0g2Xg+GMefEOFh1UflrE09+x1QpblVoTcNyM3yJBFUWDdiLi9nQQAxe2uqcJ72f6CY637Dg+JRLgUg+AvFUXqHpX+3ujUWJFC5v18A7/yeUZGXtr1OAmHrvxu9uFAP6WyVnRDDCn/bxglTQiUdqfJJ7+qRoINmDPl4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767983301; c=relaxed/simple;
-	bh=RnYQ3jKO2W4FwB6NaVCWDHAv/WgbVuSK5HvRF1E6bs4=;
+	s=arc-20240116; t=1767983482; c=relaxed/simple;
+	bh=XAAGKCd5MnY6NfG+WnqQP/TWOdF5dooFnJtvLTdRyO0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sabpYRmls95g4bl8UIbIOvIFi0ZmaWKL6JBAYPs/fiuFlWHFMle1R4zZxw+42Y5InNF7lI1lvB6tAYrzk3Xk6UR9D8sWB3N+Apwa7qv7dU0mh+Gk8QyZ5dxw9YWbOR8j5EhcsDjibVo9kLUTIcRcSwv8yLnoNHYTGfJAYTbM+90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=r9CsqDao; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=VUjOAn70ZtLo0SPkUiC1+ZdcarhXGTffzQ5+22jbWYnrMPO5NIKX3GKxZJbF0cDG/ZANjYayEsEgwUL5Xt6SnnObcJoKrMX9n6dULSSgQc69LVUIGK2uSmp1J0v2ZYvwNzNf97T9WO8y3snclpfwY9RuNxHPercositpE9WYI8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=COcIW6ip; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -34,13 +34,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=AoU/pYR/8Cjf2D5K13/a9aFfWsyhDLaSPlVF5yOnY/g=; b=r9CsqDaoUY730tg3SWrg8c7dpA
-	n/bCi+XeY9OOvMvpx3OVeAcCe8afkdzHtULOeScAtoUSD3v716IwgcQOxmljCavQStYwlAW5P/Zmb
-	b1LO4V8xOGVNaOG8FjizxFDVdOHs+fQ0wkwrNdwfVaAvHFSPjsfLLPxJLPZzT+ZfIOME=;
+	bh=EwGYOeRaxC8r7KLQ5MPQHRQIWLWbUCt3JTk1jKiuCXI=; b=COcIW6ipe3pNW3FLUndl9lxole
+	p8kA6IAipiGel0bGPkZFc3iT9DHRMCYDVlPe/BHwmOlsOZHjg3xxIW3w7TXTZou1tIeT2KcsH3x0V
+	FnOnenbGbAWs4NA4n7Dq5nWHLvTRDKIjGvMGZRm65GhmpmKvcfr4F2WOsA+Eq5U6LJts=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1veHDG-0029Zc-9h; Fri, 09 Jan 2026 19:27:54 +0100
-Date: Fri, 9 Jan 2026 19:27:54 +0100
+	id 1veHGP-0029bk-2U; Fri, 09 Jan 2026 19:31:09 +0100
+Date: Fri, 9 Jan 2026 19:31:09 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: lizhi2@eswincomputing.com
 Cc: devicetree@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
@@ -52,11 +52,11 @@ Cc: devicetree@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	ningyu@eswincomputing.com, linmin@eswincomputing.com,
 	pinkesh.vaghela@einfochips.com, weishangjuan@eswincomputing.com
-Subject: Re: [PATCH v1 1/2] dt-bindings: ethernet: eswin: add clock sampling
- control
-Message-ID: <00b7b42f-2f9d-402a-82f0-21641ea894a1@lunn.ch>
+Subject: Re: [PATCH v1 2/2] net: stmmac: eic7700: enable clocks before syscon
+ access and correct RX sampling timing
+Message-ID: <1f553a6e-ca95-45e2-be14-96557a35e618@lunn.ch>
 References: <20260109080601.1262-1-lizhi2@eswincomputing.com>
- <20260109080859.1285-1-lizhi2@eswincomputing.com>
+ <20260109080929.1308-1-lizhi2@eswincomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,33 +65,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260109080859.1285-1-lizhi2@eswincomputing.com>
+In-Reply-To: <20260109080929.1308-1-lizhi2@eswincomputing.com>
 
->    rx-internal-delay-ps:
-> -    enum: [0, 200, 600, 1200, 1600, 1800, 2000, 2200, 2400]
-> +    enum: [0, 20, 60, 100, 200, 400, 800, 1600, 2400]
->  
->    tx-internal-delay-ps:
-> -    enum: [0, 200, 600, 1200, 1600, 1800, 2000, 2200, 2400]
-> +    enum: [0, 20, 60, 100, 200, 400, 800, 1600, 2400]
+> +	dwc_priv->eic7700_hsp_regmap =
+> +			syscon_regmap_lookup_by_phandle(pdev->dev.of_node,
+> +							"eswin,hsp-sp-csr");
+> +	if (IS_ERR(dwc_priv->eic7700_hsp_regmap))
+>  		return dev_err_probe(&pdev->dev,
+> -				PTR_ERR(eic7700_hsp_regmap),
+> +				PTR_ERR(dwc_priv->eic7700_hsp_regmap),
+>  				"Failed to get hsp-sp-csr regmap\n");
 
-You need to add some text to the Changelog to indicate why this is
-safe to do, and will not cause any regressions for DT blobs already in
-use. Backwards compatibility is very important and needs to be
-addressed.
-
-> +  eswin,rx-clk-invert:
-> +    description:
-> +      Invert the receive clock sampling polarity at the MAC input.
-> +      This property may be used to compensate for SoC-specific
-> +      receive clock to data skew and help ensure correct RX data
-> +      sampling at high speed.
-> +    type: boolean
-
-This does not make too much sense to me. The RGMII standard indicates
-sampling happens on both edges of the clock. The rising edge is for
-the lower 4 bits, the falling edge for the upper 4 bits. Flipping the
-polarity would only swap the nibbles around.
+In order to be backwards compatible, you cannot error out here,
+because old DT blobs won't have this property.
 
 	Andrew
 
