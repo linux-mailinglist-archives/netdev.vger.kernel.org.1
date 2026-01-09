@@ -1,251 +1,115 @@
-Return-Path: <netdev+bounces-248591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F8BBD0C2A0
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 21:18:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C643D0C2D2
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 21:20:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3873B306215E
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 20:16:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 958BC3043A40
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 20:19:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6C436827D;
-	Fri,  9 Jan 2026 20:16:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SAQS/33b"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFAC2368276;
+	Fri,  9 Jan 2026 20:19:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FB6B2D7801
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 20:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19E8F1A5B84;
+	Fri,  9 Jan 2026 20:19:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767989776; cv=none; b=j+WE77BUe1AZgu50tPBpRjf9W4eH5+cLJUIgXG39VJvntoFLkr3oMRG8ghmwCOHRyWusyauNSARm4bHjhA0PTwtnY/w95K0fAY6/KcddZzM8vzMsTTaENTjU3toeLVlwKSMTS+ESNRfMKB3KNYWevoI5S05+rlK8xjmmslLwGj8=
+	t=1767989974; cv=none; b=WqdVWN/9kq12K1h99oShFvidw28MOwsNQJd0kAZdj8FUdSv3IjZju6FWpOrUz1CVLTI3YfKGwXCEbSXR7F554snW5erraASM+UvZNtSleOrRFt4a0wIwsnf73h3cSUEAKyyyWzw/SuXqWkMz0WJkoe5vmisl78ox4CuE3xYjys0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767989776; c=relaxed/simple;
-	bh=mFbhpeXCqNd/7Rte3a2k/13x5b9j0MOVD9gaYRgKXEI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=twOrhRBM9BcS2o0zTJh/yZQLeORXKjBfJ/7vfCS0a7J+8zlqMI8xVYZI5nOzfSNwI9kSfYS01tOR/rFRZuKfsmuXbQGU7VqPLmLBT1UpoyoIZYXdRWT1JhMktqHd1LdIr9fyCkiL4uq8ABQPfmm93xivGyvQ9kVM7U2+U9zl7KU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SAQS/33b; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <337d8ebe-d3d4-4818-92d8-4937da835843@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767989771;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O6YyP1nqBpHVcVr324fZG2Y+jC5tzmVdlHE7NOeXw1I=;
-	b=SAQS/33bsg5LZVI0OIdAniGRmzXPqsXF3ITBvej/2CQpemk14820UzwFPqUz18+1Qa3XGb
-	bBm9YP/B43unyKF1oQ92odjj8sMGRPAtc8orXDMxXM/LeUuNMkfpF8/5CNPJFR1AIztbEE
-	0+kW5+FeRm2DpGonUE+PfLhHhrzNDRk=
-Date: Fri, 9 Jan 2026 12:16:02 -0800
+	s=arc-20240116; t=1767989974; c=relaxed/simple;
+	bh=I2nnjmwaNfXgjLJ8SmnxPwl6ImxChekcUju5ImCnXuU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vg6mQnTkROEFclRVDiA+lZOUu81iOaWPntHcxj5tEpOBSAWNEJlgk+vwrCRR8YyAwB9AamSi3cjV7YSpcPcDCel2c8IpaTntvWfnCYGcmX5Dpqca5r1K9NfZBdKy440AtcdWG9lYNC8AXCupxwsSTruQlLfjuj+57X9gOSs/QDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1veIx9-000000002ES-2XNt;
+	Fri, 09 Jan 2026 20:19:23 +0000
+Date: Fri, 9 Jan 2026 20:19:20 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Michael Klein <michael@fossekall.de>,
+	Aleksander Jan Bajkowski <olek2@wp.pl>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 4/5] net: phy: realtek: demystify PHYSR register
+ location
+Message-ID: <aWFiyMJTYcCBnoWJ@makrotopia.org>
+References: <cover.1767926665.git.daniel@makrotopia.org>
+ <bad322c8d939b5ba564ba353af9fb5f07b821752.1767926665.git.daniel@makrotopia.org>
+ <1261b3d5-3e09-4dd6-8645-fd546cbdce62@gmail.com>
+ <aWD0AuYGO9ZJm9wa@makrotopia.org>
+ <aWE7fPY64ew-MY6Q@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 10/16] bpf: Support lockless unlink when
- freeing map or local storage
-To: Amery Hung <ameryhung@gmail.com>
-Cc: netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org,
- daniel@iogearbox.net, memxor@gmail.com, martin.lau@kernel.org,
- kpsingh@kernel.org, yonghong.song@linux.dev, song@kernel.org,
- haoluo@google.com, kernel-team@meta.com, bpf@vger.kernel.org
-References: <20251218175628.1460321-1-ameryhung@gmail.com>
- <20251218175628.1460321-11-ameryhung@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20251218175628.1460321-11-ameryhung@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aWE7fPY64ew-MY6Q@makrotopia.org>
 
-
-
-On 12/18/25 9:56 AM, Amery Hung wrote:
-> Introduce bpf_selem_unlink_lockless() to properly handle errors returned
-> from rqspinlock in bpf_local_storage_map_free() and
-> bpf_local_storage_destroy() where the operation must succeeds.
+On Fri, Jan 09, 2026 at 05:31:40PM +0000, Daniel Golle wrote:
+> On Fri, Jan 09, 2026 at 12:26:42PM +0000, Daniel Golle wrote:
+> > On Fri, Jan 09, 2026 at 08:32:33AM +0100, Heiner Kallweit wrote:
+> > > On 1/9/2026 4:03 AM, Daniel Golle wrote:
+> > > > Turns out that register address RTL_VND2_PHYSR (0xa434) maps to
+> > > > Clause-22 register MII_RESV2. Use that to get rid of yet another magic
+> > > > number, and rename access macros accordingly.
+> > > > 
+> > > 
+> > > RTL_VND2_PHYSR is documented in the datasheet, at least for RTL8221B(I)-VB-CG.
+> > > (this datasheet is publicly available, I don't have access to other datasheets)
+> > > MII_RESV2 isn't documented there. Is MII_RESV2 documented in any other datasheet?
+> > 
+> > No datasheet mentions the nature of paging only affecting registers
+> > 0x10~0x17, I've figured that out by code analysis and testing (ie.
+> > dumping all registers for all known/used pages using mdio-tools in
+> > userspace, and writing to PHYCR1 toggling BIT(13) and confirming that it
+> > affects the PHY in the expected way). Don't ask me why they ommit this
+> > in the datasheets, I suspect the people writing the datasheets are given
+> > some auto-generated code and also don't have unterstanding of the actual
+> > internals (maybe to "protect" their precious IP?).
+> > 
+> > Anyway, as RTL_VND2_PHYSR is 0xa434 on MDIO_MMD_VEND2, and we know that
+> > 0xa400~0xa43c maps to the standard C22 registers, I concluded that
+> > 0xa434 on MDIO_MMD_VEND2 is identical to C22 register 0x1a, ie.
+> > MII_RESV2. I've also noticed that the mechanism to translate registers
+> > on MDIO_MMD_VEND2 to paged C22 registers only makes use of registers
+> > 0x10~0x17, so it became apparent that other registers are not affected
+> > by paging.
+> > 
+> > I've confirmed all that by testing on RTL8211F and RTL8221B. As pointed
+> > out this also holds true for internal PHYs on r8169 which emulate C22
+> > registers in the exact same way. Hence the PHY driver can be simplified,
+> > as there is no need to set and restore the page around the reading of
+> > PHYSR.
 > 
-> The idea of bpf_selem_unlink_lockless() is to allow an selem to be
-> partially linked and use refcount to determine when and who can free the
-> selem. An selem initially is fully linked to a map and a local storage
-> and therefore selem->link_cnt is set to 2. Under normal circumstances,
-> bpf_selem_unlink_lockless() will be able to grab locks and unlink
-> an selem from map and local storage in sequeunce, just like
-> bpf_selem_unlink(), and then add it to a local tofree list provide by
-> the caller. However, if any of the lock attempts fails, it will
-> only clear SDATA(selem)->smap or selem->local_storage depending on the
-> caller and decrement link_cnt to signal that the corresponding data
-> structure holding a reference to the selem is gone. Then, only when both
-> map and local storage are gone, an selem can be free by the last caller
-> that turns link_cnt to 0.
+> Just did some additional testing also with r8169 (with internal 2.5G PHY
+> 0x001cc840), and PHYSR reads fine as MII_RESV2, letting the Ethernet
+> driver handle the mapping to MDIO_MMD_VEND2 instead of using a paged
+> read in the PHY driver.
 > 
-> To make sure bpf_obj_free_fields() is done only once and when map is
-> still present, it is called when unlinking an selem from b->list under
-> b->lock.
-> 
-> To make sure uncharging memory is only done once and when owner is still
-> present, only unlink selem from local_storage->list in
-> bpf_local_storage_destroy() and return the amount of memory to uncharge
-> to the caller (i.e., owner) since the map associated with an selem may
-> already be gone and map->ops->map_local_storage_uncharge can no longer
-> be referenced.
-> 
-> Finally, access of selem, SDATA(selem)->smap and selem->local_storage
-> are racy. Callers will protect these fields with RCU.
-> 
-> Co-developed-by: Martin KaFai Lau <martin.lau@kernel.org>
-> Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> ---
->   include/linux/bpf_local_storage.h |  2 +-
->   kernel/bpf/bpf_local_storage.c    | 77 +++++++++++++++++++++++++++++--
->   2 files changed, 74 insertions(+), 5 deletions(-)
-> 
-> diff --git a/include/linux/bpf_local_storage.h b/include/linux/bpf_local_storage.h
-> index 20918c31b7e5..1fd908c44fb6 100644
-> --- a/include/linux/bpf_local_storage.h
-> +++ b/include/linux/bpf_local_storage.h
-> @@ -80,9 +80,9 @@ struct bpf_local_storage_elem {
->   						 * after raw_spin_unlock
->   						 */
->   	};
-> +	atomic_t link_cnt;
->   	u16 size;
->   	bool use_kmalloc_nolock;
-> -	/* 4 bytes hole */
->   	/* The data is stored in another cacheline to minimize
->   	 * the number of cachelines access during a cache hit.
->   	 */
-> diff --git a/kernel/bpf/bpf_local_storage.c b/kernel/bpf/bpf_local_storage.c
-> index 62201552dca6..4c682d5aef7f 100644
-> --- a/kernel/bpf/bpf_local_storage.c
-> +++ b/kernel/bpf/bpf_local_storage.c
-> @@ -97,6 +97,7 @@ bpf_selem_alloc(struct bpf_local_storage_map *smap, void *owner,
->   			if (swap_uptrs)
->   				bpf_obj_swap_uptrs(smap->map.record, SDATA(selem)->data, value);
->   		}
-> +		atomic_set(&selem->link_cnt, 2);
->   		selem->size = smap->elem_size;
->   		selem->use_kmalloc_nolock = smap->use_kmalloc_nolock;
->   		return selem;
-> @@ -200,9 +201,11 @@ static void bpf_selem_free_rcu(struct rcu_head *rcu)
->   	/* The bpf_local_storage_map_free will wait for rcu_barrier */
->   	smap = rcu_dereference_check(SDATA(selem)->smap, 1);
->   
-> -	migrate_disable();
-> -	bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
-> -	migrate_enable();
-> +	if (smap) {
-> +		migrate_disable();
-> +		bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
-> +		migrate_enable();
-> +	}
->   	kfree_nolock(selem);
->   }
->   
-> @@ -227,7 +230,8 @@ void bpf_selem_free(struct bpf_local_storage_elem *selem,
->   		 * is only supported in task local storage, where
->   		 * smap->use_kmalloc_nolock == true.
->   		 */
-> -		bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
-> +		if (smap)
-> +			bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
->   		__bpf_selem_free(selem, reuse_now);
->   		return;
->   	}
-> @@ -419,6 +423,71 @@ int bpf_selem_unlink(struct bpf_local_storage_elem *selem, bool reuse_now)
->   	return err;
->   }
->   
-> +/* Callers of bpf_selem_unlink_lockless() */
-> +#define BPF_LOCAL_STORAGE_MAP_FREE	0
-> +#define BPF_LOCAL_STORAGE_DESTROY	1
-> +
-> +/*
-> + * Unlink an selem from map and local storage with lockless fallback if callers
-> + * are racing or rqspinlock returns error. It should only be called by
-> + * bpf_local_storage_destroy() or bpf_local_storage_map_free().
-> + */
-> +static void bpf_selem_unlink_lockless(struct bpf_local_storage_elem *selem,
-> +				      struct hlist_head *to_free, int caller)
-> +{
-> +	struct bpf_local_storage *local_storage;
-> +	struct bpf_local_storage_map_bucket *b;
-> +	struct bpf_local_storage_map *smap;
-> +	unsigned long flags;
-> +	int err, unlink = 0;
-> +
-> +	local_storage = rcu_dereference_check(selem->local_storage, bpf_rcu_lock_held());
-> +	smap = rcu_dereference_check(SDATA(selem)->smap, bpf_rcu_lock_held());
-> +
-> +	/*
-> +	 * Free special fields immediately as SDATA(selem)->smap will be cleared.
-> +	 * No BPF program should be reading the selem.
-> +	 */
-> +	if (smap) {
-> +		b = select_bucket(smap, selem);
-> +		err = raw_res_spin_lock_irqsave(&b->lock, flags);
-> +		if (!err) {
-> +			if (likely(selem_linked_to_map(selem))) {
-> +				hlist_del_init_rcu(&selem->map_node);
-> +				bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
-> +				RCU_INIT_POINTER(SDATA(selem)->smap, NULL);
-> +				unlink++;
-> +			}
-> +			raw_res_spin_unlock_irqrestore(&b->lock, flags);
-> +		} else if (caller == BPF_LOCAL_STORAGE_MAP_FREE) {
-> +			RCU_INIT_POINTER(SDATA(selem)->smap, NULL);
 
-I suspect I am missing something obvious, so it will be faster to ask here.
+Same for 10ec:8168
+("Realtek Semiconductor Co., Ltd. RTL8111/8168/8211/8411 PCI Express Gigabit Ethernet Controller (rev 15)")
+with PHY ID 0x001cc800 ("Generic FE-GE Realtek PHY"), works all fine
+with this series applied.
 
-I could see why init NULL can work if it could assume the map_free 
-caller always succeeds in the b->lock, the "if (!err)" path above.
-
-If the b->lock did fail here for the map_free caller, it reset 
-SDATA(selem)->smap to NULL here. Who can do the bpf_obj_free_fields() in 
-the future?
-
-> +		}
-> +	}
-> +
-> +	/*
-> +	 * Only let destroy() unlink from local_storage->list and do mem_uncharge
-> +	 * as owner is guaranteed to be valid in destroy().
-> +	 */
-> +	if (local_storage && caller == BPF_LOCAL_STORAGE_DESTROY) {
-
-If I read here correctly, only bpf_local_storage_destroy() can do the 
-bpf_selem_free(). For example, if a bpf_sk_storage_map is going away, 
-the selem (which is memcg charged) will stay in the sk until the sk is 
-closed?
-
-> +		err = raw_res_spin_lock_irqsave(&local_storage->lock, flags);
-> +		if (!err) {
-> +			hlist_del_init_rcu(&selem->snode);
-> +			unlink++;
-> +			raw_res_spin_unlock_irqrestore(&local_storage->lock, flags);
-> +		}
-> +		RCU_INIT_POINTER(selem->local_storage, NULL);
-> +	}
-> +
-> +	/*
-> +	 * Normally, an selem can be unlink under local_storage->lock and b->lock, and
-> +	 * then added to a local to_free list. However, if destroy() and map_free() are
-> +	 * racing or rqspinlock returns errors in unlikely situations (unlink != 2), free
-> +	 * the selem only after both map_free() and destroy() drop the refcnt.
-> +	 */
-> +	if (unlink == 2 || atomic_dec_and_test(&selem->link_cnt))
-> +		hlist_add_head(&selem->free_node, to_free);
-> +}
-> +
->   void __bpf_local_storage_insert_cache(struct bpf_local_storage *local_storage,
->   				      struct bpf_local_storage_map *smap,
->   				      struct bpf_local_storage_elem *selem)
-
+So I agree that for r8169 this change doesn't make a difference, but
+for standalone PHYs it does make things more simple and also means
+less MDIO operations (1 instead of 3) to do the same thing.
 
