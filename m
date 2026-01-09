@@ -1,337 +1,323 @@
-Return-Path: <netdev+bounces-248390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEDB1D07BA0
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 09:10:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BA61D07C4F
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 09:22:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EA6D43005090
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 08:10:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C2DE1305EE77
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 08:21:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC722FC876;
-	Fri,  9 Jan 2026 08:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96ED030B520;
+	Fri,  9 Jan 2026 08:21:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lYR91u1t"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.76.78.106])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E12B02E22AA;
-	Fri,  9 Jan 2026 08:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.76.78.106
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A66303CAF
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 08:21:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767946199; cv=none; b=irEUyskE7TKZRPW3IwZbhECbpCoYwMbbCmKUapRX8OC0tFmqHDszANP4JXpiXXTllU6jZMkpIJhmaDrtheS8U9HPpvwIhF7eOV63zq1XfwvN7Yc0j9J+prhQvDiA/m+FdxeT830gzgirnYqlYRgAKPYZuD6/WHaWhd2/GcfGOwE=
+	t=1767946905; cv=none; b=pTup4dvBIbKbYA55lVhc1bFQt0nItyIXnaKuv36N5jmOyGknQCZh01nqX8srX/qctWXDthwMgaQgeAOtVtCU+QNFTJD7XSQ23JxdOenmWrc9yte/z/M5Ny/uYSMnJHhQWCcsTRMEa0JOuu4L/89wCfzuqBv+zR2gROTBf4rWlPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767946199; c=relaxed/simple;
-	bh=vMd0fjHx08FFrjZifFKAG+Ky6J9KcXzgr1/KAXKrlSs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IWYbRZg1f9Yz6LEf7pJEL95KnX5iDFSNJWVAXo7A++Ah2ZEP0QSmCdu/OaKoIYgeDp9Eh63mBZDlWTj0gNH7+IF1XzxT7Ur1b0G46uRvxxjC1RGDA7HYCL+oZXr96jHBAzwtN6QD1hizEJiNA2ifmTYsRwtu3vjnfz3uEguFKwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=13.76.78.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
-Received: from E0004057DT.eswin.cn (unknown [10.11.96.26])
-	by app2 (Coremail) with SMTP id TQJkCgB3uay7t2BpiWySAA--.23182S2;
-	Fri, 09 Jan 2026 16:09:32 +0800 (CST)
-From: lizhi2@eswincomputing.com
-To: devicetree@vger.kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	rmk+kernel@armlinux.org.uk,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: ningyu@eswincomputing.com,
-	linmin@eswincomputing.com,
-	pinkesh.vaghela@einfochips.com,
-	weishangjuan@eswincomputing.com,
-	Zhi Li <lizhi2@eswincomputing.com>
-Subject: [PATCH v1 2/2] net: stmmac: eic7700: enable clocks before syscon access and correct RX sampling timing
-Date: Fri,  9 Jan 2026 16:09:26 +0800
-Message-ID: <20260109080929.1308-1-lizhi2@eswincomputing.com>
-X-Mailer: git-send-email 2.52.0.windows.1
-In-Reply-To: <20260109080601.1262-1-lizhi2@eswincomputing.com>
-References: <20260109080601.1262-1-lizhi2@eswincomputing.com>
+	s=arc-20240116; t=1767946905; c=relaxed/simple;
+	bh=4+/JZMqsrTLvC6BTE/UnUz/uSOHAYm++AXfPzhoMcRo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=necBgocHrlcaWoJN8YhWBdxdzpnbezb9+M8sGouxeZpbzZHJhYP1s38K332qYE0ICFqx1C0wfkI1KumTFF4NUMhnyC+bOuUVrRMKNy7PZEOk8xP595uOVsx3cYRu2KRDMnL/lOdXmGnxVzbuVbnBSZeWb88fV7wOok75Kk+lBoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lYR91u1t; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-432d2670932so963839f8f.2
+        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 00:21:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767946878; x=1768551678; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bAaqO1edMEpG8D22KcxmchMJQR+sscKFymxMmmUQ79s=;
+        b=lYR91u1tgFImxRaA57eDTiiDuLpo2OhULig6AU8/ccw+G9EWuxlJkkcJPjcbeYLaOa
+         M5ubmACC1zPfHq3FeXWQX/G/TrxRCmOwFV1HyBILLdUDrnjHsctOwqVE7+T9f4ZGdKKq
+         UEUy4WcducJGnvLMHcHPXOBiWNXCCTnAQ8tSZErCkyRBTjlEe7fWQ3YtWm4Uj5PtypPJ
+         xTfOesO8CqRZsydws9jxDEIUw4nvSJPZsHmRfouR15Szu49JxQl/4bmUCaRPH/D4koal
+         j/9wZ1LofQjOByxTUjYkTWIdzb8TWgXTuYc4D3bgVKeCusOM8v7fH2JbFoDCfwTczpje
+         YBQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767946878; x=1768551678;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bAaqO1edMEpG8D22KcxmchMJQR+sscKFymxMmmUQ79s=;
+        b=SeN5YbVvf1Rzfm3pZ5IAcpmU6syMF5h3jt/FxmYpPqLK4L8mPFmYxv3pc+KHLHclTG
+         LXXyrxjjDepZUPnCkoOFmUWnkyuZ92ClIAGFujty/06EIox45YkMTi0hnQ43FMWKBA64
+         AyrP+Sb3FeJ4sIqfjyUWEHxd+vhM311lthowMyWKvI9L9F/B0K1mtw90X1Hb4GCjmIvU
+         CE3ORxLTp2fQhlU/LuIQthS7FgufvvKg6K6oJ5OHwBoT5+K1O96EB28PKBsOThbUfAWa
+         +E396K8cKsXIjD3a98OXwwyUtshAr0BW9figCwMVDJYwrEKpdZSmeAl1/hhUYpwD9hFX
+         NmXg==
+X-Forwarded-Encrypted: i=1; AJvYcCX4GWel1EjMH4sgZKq4xIADCak8GyuJrAPdWy2Ll8zs65GucoG3REe1r+ZcdzebAJ/ntas20VE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZy3MPqAV7WF/PSGmEu5x/pw8hM2Yg+W2UYDHonpW0Ibt+X/tu
+	paVJi/Fv2sVy/EFHZlAstcD0D58pEJPgH3WoZRu/4nZIhggU4pMrFYgt
+X-Gm-Gg: AY/fxX7lIrq0uFkQkZ5bK87bH7dybSY/rbChfnHYPcBAj8Z68/74fhOOPi6iDUvbb1Y
+	GCGnBDkgx/Zb6Tozy0ICOalLaBnSD0FLPdpNYZoq72UR5kwpkq6gn+X4nvmRkSVltcCYS+QsVvR
+	HLvgpOwIVrjkTOTgvp83BVHX7g7ofACT0rczzb4cFxP/QfFC9yaGVN6W5DIwefHbXmvve61HKRK
+	woi3IBveExUDB/9I9Xgb3Wh74GYG6wd3KERlSgeOz83zUKh3An1M/oozEgWDtvwUd5XW+uRYywv
+	0Tnk4VEpa1lLIKu1HGoaMya5/Q0HmXZui6irkWl9oRzdl5ruIUcueNc5APTGDqiAuLkWgVMFETO
+	Gi8ZQ0QZsCaXiuHPbkKOC4TNMfT+xZEqfOg1Vxth/eDGZqXDsIeasH85yyYgYBeqC2xoYot63dA
+	B0QpXbxThe9Ec=
+X-Google-Smtp-Source: AGHT+IG9ya1IwVVkPrvQpXEW25miZ+F+tc85mHm67h5wQbXXz3z9xmfaPgBjvwnR9GqSZrgo1n09wg==
+X-Received: by 2002:a5d:5d0e:0:b0:431:66a:cbc3 with SMTP id ffacd0b85a97d-432c378a081mr8988878f8f.6.1767946878227;
+        Fri, 09 Jan 2026 00:21:18 -0800 (PST)
+Received: from eichest-laptop ([2a02:168:af72:0:66a2:be50:e0d3:29f9])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5fe83bsm21421414f8f.38.2026.01.09.00.21.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Jan 2026 00:21:17 -0800 (PST)
+Date: Fri, 9 Jan 2026 09:21:15 +0100
+From: Stefan Eichenberger <eichest@gmail.com>
+To: Rob Herring <robh@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, krzk+dt@kernel.org,
+	conor+dt@kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Stefan Eichenberger <stefan.eichenberger@toradex.com>
+Subject: Re: [PATCH v2 1/2] dt-bindings: net: micrel: Convert to DT schema
+Message-ID: <aWC6e9N0rJt1JHsw@eichest-laptop>
+References: <20260108125208.29940-1-eichest@gmail.com>
+ <20260108125208.29940-2-eichest@gmail.com>
+ <20260108184845.GA758009-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:TQJkCgB3uay7t2BpiWySAA--.23182S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxKw4kKr45AF47XF15tFy7ZFb_yoWfWF17pF
-	WkCFyYqr1jqF1fG3yvyF40q34Fkw47WF1fCryftFn2yF9xtrs8Xayqya4akFy5Gry7Za13
-	J3yUJFyxu3W29rJanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBm14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxkF7I0En4kS14v26r4a6rW5MxkIecxEwVCm-wCF04
-	k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18
-	MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr4
-	1lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1U
-	MIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I
-	8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRNSdgDUUUU
-X-CM-SenderInfo: xol2xx2s6h245lqf0zpsxwx03jof0z/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260108184845.GA758009-robh@kernel.org>
 
-From: Zhi Li <lizhi2@eswincomputing.com>
+On Thu, Jan 08, 2026 at 12:48:45PM -0600, Rob Herring wrote:
+> On Thu, Jan 08, 2026 at 01:51:27PM +0100, Stefan Eichenberger wrote:
+> > From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+> > 
+> > Convert the devicetree bindings for the Micrel PHYs and switches to DT
+> > schema.
+> > 
+> > Signed-off-by: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+> > ---
+> >  .../devicetree/bindings/net/micrel.txt        |  57 --------
+> >  .../devicetree/bindings/net/micrel.yaml       | 133 ++++++++++++++++++
+> >  2 files changed, 133 insertions(+), 57 deletions(-)
+> >  delete mode 100644 Documentation/devicetree/bindings/net/micrel.txt
+> >  create mode 100644 Documentation/devicetree/bindings/net/micrel.yaml
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/micrel.txt b/Documentation/devicetree/bindings/net/micrel.txt
+> > deleted file mode 100644
+> > index 01622ce58112..000000000000
+> > --- a/Documentation/devicetree/bindings/net/micrel.txt
+> > +++ /dev/null
+> > @@ -1,57 +0,0 @@
+> > -Micrel PHY properties.
+> > -
+> > -These properties cover the base properties Micrel PHYs.
+> > -
+> > -Optional properties:
+> > -
+> > - - micrel,led-mode : LED mode value to set for PHYs with configurable LEDs.
+> > -
+> > -	Configure the LED mode with single value. The list of PHYs and the
+> > -	bits that are currently supported:
+> > -
+> > -	KSZ8001: register 0x1e, bits 15..14
+> > -	KSZ8041: register 0x1e, bits 15..14
+> > -	KSZ8021: register 0x1f, bits 5..4
+> > -	KSZ8031: register 0x1f, bits 5..4
+> > -	KSZ8051: register 0x1f, bits 5..4
+> > -	KSZ8081: register 0x1f, bits 5..4
+> > -	KSZ8091: register 0x1f, bits 5..4
+> > -	LAN8814: register EP5.0, bit 6
+> > -
+> > -	See the respective PHY datasheet for the mode values.
+> > -
+> > - - micrel,rmii-reference-clock-select-25-mhz: RMII Reference Clock Select
+> > -						bit selects 25 MHz mode
+> > -
+> > -	Setting the RMII Reference Clock Select bit enables 25 MHz rather
+> > -	than 50 MHz clock mode.
+> > -
+> > -	Note that this option is only needed for certain PHY revisions with a
+> > -	non-standard, inverted function of this configuration bit.
+> > -	Specifically, a clock reference ("rmii-ref" below) is always needed to
+> > -	actually select a mode.
+> > -
+> > - - clocks, clock-names: contains clocks according to the common clock bindings.
+> > -
+> > -	supported clocks:
+> > -	- KSZ8021, KSZ8031, KSZ8081, KSZ8091: "rmii-ref": The RMII reference
+> > -	  input clock. Used to determine the XI input clock.
+> > -
+> > - - micrel,fiber-mode: If present the PHY is configured to operate in fiber mode
+> > -
+> > -	Some PHYs, such as the KSZ8041FTL variant, support fiber mode, enabled
+> > -	by the FXEN boot strapping pin. It can't be determined from the PHY
+> > -	registers whether the PHY is in fiber mode, so this boolean device tree
+> > -	property can be used to describe it.
+> > -
+> > -	In fiber mode, auto-negotiation is disabled and the PHY can only work in
+> > -	100base-fx (full and half duplex) modes.
+> > -
+> > - - coma-mode-gpios: If present the given gpio will be deasserted when the
+> > -		    PHY is probed.
+> > -
+> > -	Some PHYs have a COMA mode input pin which puts the PHY into
+> > -	isolate and power-down mode. On some boards this input is connected
+> > -	to a GPIO of the SoC.
+> > -
+> > -	Supported on the LAN8814.
+> > diff --git a/Documentation/devicetree/bindings/net/micrel.yaml b/Documentation/devicetree/bindings/net/micrel.yaml
+> > new file mode 100644
+> > index 000000000000..52d1b187e1d3
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/micrel.yaml
+> > @@ -0,0 +1,133 @@
+> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/micrel.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: Micrel KSZ series PHYs and switches
+> > +
+> > +maintainers:
+> > +  - Andrew Lunn <andrew@lunn.ch>
+> > +  - Stefan Eichenberger <eichest@gmail.com>
+> > +
+> > +description:
+> > +  The Micrel KSZ series contains different network phys and switches.
+> > +
+> > +properties:
+> > +  compatible:
+> > +    enum:
+> > +      - ethernet-phy-id000e.7237  # KSZ8873MLL
+> > +      - ethernet-phy-id0022.1430  # KSZ886X
+> > +      - ethernet-phy-id0022.1435  # KSZ8863
+> > +      - ethernet-phy-id0022.1510  # KSZ8041
+> > +      - ethernet-phy-id0022.1537  # KSZ8041RNLI
+> > +      - ethernet-phy-id0022.1550  # KSZ8051
+> > +      - ethernet-phy-id0022.1555  # KSZ8021
+> > +      - ethernet-phy-id0022.1556  # KSZ8031
+> > +      - ethernet-phy-id0022.1560  # KSZ8081, KSZ8091
+> > +      - ethernet-phy-id0022.1570  # KSZ8061
+> > +      - ethernet-phy-id0022.161a  # KSZ8001
+> > +      - ethernet-phy-id0022.1720  # KS8737
+> > +
+> > +  micrel,fiber-mode:
+> > +    type: boolean
+> > +    description: |
+> > +      If present the PHY is configured to operate in fiber mode.
+> > +
+> > +      The KSZ8041FTL variant supports fiber mode, enabled by the FXEN
+> > +      boot strapping pin. It can't be determined from the PHY registers
+> > +      whether the PHY is in fiber mode, so this boolean device tree
+> > +      property can be used to describe it.
+> > +
+> > +      In fiber mode, auto-negotiation is disabled and the PHY can only
+> > +      work in 100base-fx (full and half duplex) modes.
+> > +
+> > +  micrel,led-mode:
+> > +    $ref: /schemas/types.yaml#/definitions/uint32
+> > +    description: |
+> > +      LED mode value to set for PHYs with configurable LEDs.
+> > +
+> > +      Configure the LED mode with single value. The list of PHYs and the
+> > +      bits that are currently supported:
+> > +
+> > +      KSZ8001: register 0x1e, bits 15..14
+> > +      KSZ8041: register 0x1e, bits 15..14
+> > +      KSZ8021: register 0x1f, bits 5..4
+> > +      KSZ8031: register 0x1f, bits 5..4
+> > +      KSZ8051: register 0x1f, bits 5..4
+> > +      KSZ8081: register 0x1f, bits 5..4
+> > +      KSZ8091: register 0x1f, bits 5..4
+> > +
+> > +      See the respective PHY datasheet for the mode values.
+> > +    minimum: 0
+> > +    maximum: 3
+> > +
+> > +allOf:
+> > +  - $ref: ethernet-phy.yaml#
+> > +  - if:
+> > +      not:
+> > +        properties:
+> > +          compatible:
+> > +            contains:
+> > +              const: ethernet-phy-id0022.1510
+> > +    then:
+> > +      properties:
+> > +        micrel,fiber-mode: false
+> > +  - if:
+> > +      not:
+> > +        properties:
+> > +          compatible:
+> > +            contains:
+> > +              enum:
+> > +                - ethernet-phy-id0022.1510
+> > +                - ethernet-phy-id0022.1555
+> > +                - ethernet-phy-id0022.1556
+> > +                - ethernet-phy-id0022.1550
+> > +                - ethernet-phy-id0022.1560
+> > +                - ethernet-phy-id0022.161a
+> > +    then:
+> > +      properties:
+> > +        micrel,led-mode: false
+> > +  - if:
+> > +      properties:
+> > +        compatible:
+> > +          contains:
+> > +            enum:
+> > +              - ethernet-phy-id0022.1555
+> > +              - ethernet-phy-id0022.1556
+> > +              - ethernet-phy-id0022.1560
+> > +    then:
+> > +      properties:
+> > +        clocks:
+> > +          maxItems: 1
+> 
+> This has no effect because ethernet-phy.yaml already defines this.
 
-The second Ethernet controller (eth1) on the Eswin EIC7700 SoC may fail
-to sample RX data correctly at Gigabit speed due to EIC7700-specific
-receive clock to data skew at the MAC input.
+Thanks for the info. That means I would only set the clock-names and
+remove maxItems. I will fix that in the next version.
 
-The existing internal delay configuration does not provide sufficient
-adjustment range to compensate for this condition. Update the EIC7700
-DWMAC glue driver to optionally apply EIC7700-specific clock sampling
-inversion for Gigabit operation.
+> > +        clock-names:
+> > +          const: rmii-ref
+> > +          description:
+> > +            The RMII reference input clock. Used to determine the XI input
+> > +            clock.
+> > +        micrel,rmii-reference-clock-select-25-mhz:
+> > +          type: boolean
+> > +          description: |
+> > +            RMII Reference Clock Select bit selects 25 MHz mode
+> > +
+> > +            Setting the RMII Reference Clock Select bit enables 25 MHz rather
+> > +            than 50 MHz clock mode.
+> 
+> These should be defined at the top-level. Then use the if/then schema to 
+> disallow the properties.
 
-TXD and RXD delay registers are explicitly cleared during initialization
-to override any residual configuration left by the bootloader. All HSP
-CSR register accesses are performed only after the required clocks are
-enabled.
+The problem with this approach is, that because it has clock in its
+name, the DT schema valdiator will complain:
+devicetree/bindings/net/micrel.yaml: properties:micrel,rmii-reference-clock-select-25-mhz: 'anyOf' conditional failed, one must be fixed:
+        'maxItems' is a required property
+                hint: Only "maxItems" is required for a single entry if there are no constraints defined for the values.
+        'type' is not one of ['maxItems', 'description', 'deprecated']
+                hint: Only "maxItems" is required for a single entry if there are no constraints defined for the values.
+        Additional properties are not allowed ('type' was unexpected)
+                hint: Arrays must be described with a combination of minItems/maxItems/items
+        'type' is not one of ['description', 'deprecated', 'const', 'enum', 'minimum', 'maximum', 'multipleOf', 'default', '$ref', 'oneOf']
+        hint: cell array properties must define how many entries and what the entries are when there is more than one entry.
+        from schema $id: http://devicetree.org/meta-schemas/cell.yaml
 
-Fixes: ea77dbbdbc4e ("net: stmmac: add Eswin EIC7700 glue driver")
-Signed-off-by: Zhi Li <lizhi2@eswincomputing.com>
----
- .../ethernet/stmicro/stmmac/dwmac-eic7700.c   | 132 +++++++++++++-----
- 1 file changed, 97 insertions(+), 35 deletions(-)
+I couldn't find another way to define that Boolean type at top level. Is
+there an option to make the validator happy?
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c
-index bcb8e000e720..68c476612af9 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c
-@@ -28,20 +28,34 @@
- 
- /*
-  * TX/RX Clock Delay Bit Masks:
-- * - TX Delay: bits [14:8] — TX_CLK delay (unit: 0.1ns per bit)
-- * - RX Delay: bits [30:24] — RX_CLK delay (unit: 0.1ns per bit)
-+ * - TX Delay: bits [14:8] — TX_CLK delay (unit: 0.02ns per bit)
-+ * - TX Invert : bit  [15]
-+ * - RX Delay: bits [30:24] — RX_CLK delay (unit: 0.02ns per bit)
-+ * - RX Invert : bit  [31]
-  */
- #define EIC7700_ETH_TX_ADJ_DELAY	GENMASK(14, 8)
- #define EIC7700_ETH_RX_ADJ_DELAY	GENMASK(30, 24)
-+#define EIC7700_ETH_TX_INV_DELAY	BIT(15)
-+#define EIC7700_ETH_RX_INV_DELAY	BIT(31)
- 
--#define EIC7700_MAX_DELAY_UNIT 0x7F
-+#define EIC7700_MAX_DELAY_STEPS 0x7F
- 
- static const char * const eic7700_clk_names[] = {
- 	"tx", "axi", "cfg",
- };
- 
- struct eic7700_qos_priv {
-+	struct device *dev;
- 	struct plat_stmmacenet_data *plat_dat;
-+	struct regmap *eic7700_hsp_regmap;
-+	u32 eth_axi_lp_ctrl_offset;
-+	u32 eth_phy_ctrl_offset;
-+	u32 eth_txd_offset;
-+	u32 eth_clk_offset;
-+	u32 eth_rxd_offset;
-+	u32 eth_clk_dly_param;
-+	bool eth_tx_clk_inv;
-+	bool eth_rx_clk_inv;
- };
- 
- static int eic7700_clks_config(void *priv, bool enabled)
-@@ -61,8 +75,27 @@ static int eic7700_clks_config(void *priv, bool enabled)
- static int eic7700_dwmac_init(struct device *dev, void *priv)
- {
- 	struct eic7700_qos_priv *dwc = priv;
-+	u32 eth_phy_ctrl_regset;
-+	int ret = 0;
- 
--	return eic7700_clks_config(dwc, true);
-+	ret = eic7700_clks_config(dwc, true);
-+	if (ret)
-+		return ret;
-+
-+	regmap_read(dwc->eic7700_hsp_regmap, dwc->eth_phy_ctrl_offset,
-+		    &eth_phy_ctrl_regset);
-+	eth_phy_ctrl_regset |=
-+		(EIC7700_ETH_TX_CLK_SEL | EIC7700_ETH_PHY_INTF_SELI);
-+	regmap_write(dwc->eic7700_hsp_regmap, dwc->eth_phy_ctrl_offset,
-+		     eth_phy_ctrl_regset);
-+
-+	regmap_write(dwc->eic7700_hsp_regmap, dwc->eth_axi_lp_ctrl_offset,
-+		     EIC7700_ETH_CSYSREQ_VAL);
-+
-+	regmap_write(dwc->eic7700_hsp_regmap, dwc->eth_txd_offset, 0);
-+	regmap_write(dwc->eic7700_hsp_regmap, dwc->eth_rxd_offset, 0);
-+
-+	return ret;
- }
- 
- static void eic7700_dwmac_exit(struct device *dev, void *priv)
-@@ -88,17 +121,34 @@ static int eic7700_dwmac_resume(struct device *dev, void *priv)
- 	return ret;
- }
- 
-+static void eic7700_dwmac_fix_speed(void *priv, int speed, unsigned int mode)
-+{
-+	struct eic7700_qos_priv *dwc = (struct eic7700_qos_priv *)priv;
-+	u32 dly_param = dwc->eth_clk_dly_param;
-+
-+	switch (speed) {
-+	case SPEED_1000:
-+		if (dwc->eth_tx_clk_inv)
-+			dly_param |= EIC7700_ETH_TX_INV_DELAY;
-+		if (dwc->eth_rx_clk_inv)
-+			dly_param |= EIC7700_ETH_RX_INV_DELAY;
-+		break;
-+	case SPEED_100:
-+	case SPEED_10:
-+		break;
-+	default:
-+		dev_err(dwc->dev, "invalid speed %u\n", speed);
-+		break;
-+	}
-+
-+	regmap_write(dwc->eic7700_hsp_regmap, dwc->eth_clk_offset, dly_param);
-+}
-+
- static int eic7700_dwmac_probe(struct platform_device *pdev)
- {
- 	struct plat_stmmacenet_data *plat_dat;
- 	struct stmmac_resources stmmac_res;
- 	struct eic7700_qos_priv *dwc_priv;
--	struct regmap *eic7700_hsp_regmap;
--	u32 eth_axi_lp_ctrl_offset;
--	u32 eth_phy_ctrl_offset;
--	u32 eth_phy_ctrl_regset;
--	u32 eth_rxd_dly_offset;
--	u32 eth_dly_param = 0;
- 	u32 delay_ps;
- 	int i, ret;
- 
-@@ -116,13 +166,16 @@ static int eic7700_dwmac_probe(struct platform_device *pdev)
- 	if (!dwc_priv)
- 		return -ENOMEM;
- 
-+	dwc_priv->dev = &pdev->dev;
-+
- 	/* Read rx-internal-delay-ps and update rx_clk delay */
- 	if (!of_property_read_u32(pdev->dev.of_node,
- 				  "rx-internal-delay-ps", &delay_ps)) {
--		u32 val = min(delay_ps / 100, EIC7700_MAX_DELAY_UNIT);
-+		u32 val = min(delay_ps / 20, EIC7700_MAX_DELAY_STEPS);
- 
--		eth_dly_param &= ~EIC7700_ETH_RX_ADJ_DELAY;
--		eth_dly_param |= FIELD_PREP(EIC7700_ETH_RX_ADJ_DELAY, val);
-+		dwc_priv->eth_clk_dly_param &= ~EIC7700_ETH_RX_ADJ_DELAY;
-+		dwc_priv->eth_clk_dly_param |=
-+				 FIELD_PREP(EIC7700_ETH_RX_ADJ_DELAY, val);
- 	} else {
- 		return dev_err_probe(&pdev->dev, -EINVAL,
- 			"missing required property rx-internal-delay-ps\n");
-@@ -131,55 +184,63 @@ static int eic7700_dwmac_probe(struct platform_device *pdev)
- 	/* Read tx-internal-delay-ps and update tx_clk delay */
- 	if (!of_property_read_u32(pdev->dev.of_node,
- 				  "tx-internal-delay-ps", &delay_ps)) {
--		u32 val = min(delay_ps / 100, EIC7700_MAX_DELAY_UNIT);
-+		u32 val = min(delay_ps / 20, EIC7700_MAX_DELAY_STEPS);
- 
--		eth_dly_param &= ~EIC7700_ETH_TX_ADJ_DELAY;
--		eth_dly_param |= FIELD_PREP(EIC7700_ETH_TX_ADJ_DELAY, val);
-+		dwc_priv->eth_clk_dly_param &= ~EIC7700_ETH_TX_ADJ_DELAY;
-+		dwc_priv->eth_clk_dly_param |=
-+				 FIELD_PREP(EIC7700_ETH_TX_ADJ_DELAY, val);
- 	} else {
- 		return dev_err_probe(&pdev->dev, -EINVAL,
- 			"missing required property tx-internal-delay-ps\n");
- 	}
- 
--	eic7700_hsp_regmap = syscon_regmap_lookup_by_phandle(pdev->dev.of_node,
--							     "eswin,hsp-sp-csr");
--	if (IS_ERR(eic7700_hsp_regmap))
-+	dwc_priv->eth_tx_clk_inv =
-+	    of_property_read_bool(pdev->dev.of_node, "eswin,tx-clk-invert");
-+	dwc_priv->eth_rx_clk_inv =
-+	    of_property_read_bool(pdev->dev.of_node, "eswin,rx-clk-invert");
-+
-+	dwc_priv->eic7700_hsp_regmap =
-+			syscon_regmap_lookup_by_phandle(pdev->dev.of_node,
-+							"eswin,hsp-sp-csr");
-+	if (IS_ERR(dwc_priv->eic7700_hsp_regmap))
- 		return dev_err_probe(&pdev->dev,
--				PTR_ERR(eic7700_hsp_regmap),
-+				PTR_ERR(dwc_priv->eic7700_hsp_regmap),
- 				"Failed to get hsp-sp-csr regmap\n");
- 
- 	ret = of_property_read_u32_index(pdev->dev.of_node,
- 					 "eswin,hsp-sp-csr",
--					 1, &eth_phy_ctrl_offset);
-+					 1, &dwc_priv->eth_phy_ctrl_offset);
- 	if (ret)
- 		return dev_err_probe(&pdev->dev, ret,
- 				     "can't get eth_phy_ctrl_offset\n");
- 
--	regmap_read(eic7700_hsp_regmap, eth_phy_ctrl_offset,
--		    &eth_phy_ctrl_regset);
--	eth_phy_ctrl_regset |=
--		(EIC7700_ETH_TX_CLK_SEL | EIC7700_ETH_PHY_INTF_SELI);
--	regmap_write(eic7700_hsp_regmap, eth_phy_ctrl_offset,
--		     eth_phy_ctrl_regset);
--
- 	ret = of_property_read_u32_index(pdev->dev.of_node,
- 					 "eswin,hsp-sp-csr",
--					 2, &eth_axi_lp_ctrl_offset);
-+					 2, &dwc_priv->eth_axi_lp_ctrl_offset);
- 	if (ret)
- 		return dev_err_probe(&pdev->dev, ret,
- 				     "can't get eth_axi_lp_ctrl_offset\n");
- 
--	regmap_write(eic7700_hsp_regmap, eth_axi_lp_ctrl_offset,
--		     EIC7700_ETH_CSYSREQ_VAL);
-+	ret = of_property_read_u32_index(pdev->dev.of_node,
-+					 "eswin,hsp-sp-csr",
-+					 3, &dwc_priv->eth_txd_offset);
-+	if (ret)
-+		return dev_err_probe(&pdev->dev, ret,
-+				     "can't get eth_txd_offset\n");
- 
- 	ret = of_property_read_u32_index(pdev->dev.of_node,
- 					 "eswin,hsp-sp-csr",
--					 3, &eth_rxd_dly_offset);
-+					 4, &dwc_priv->eth_clk_offset);
- 	if (ret)
- 		return dev_err_probe(&pdev->dev, ret,
--				     "can't get eth_rxd_dly_offset\n");
-+				     "can't get eth_clk_offset\n");
- 
--	regmap_write(eic7700_hsp_regmap, eth_rxd_dly_offset,
--		     eth_dly_param);
-+	ret = of_property_read_u32_index(pdev->dev.of_node,
-+					 "eswin,hsp-sp-csr",
-+					 5, &dwc_priv->eth_rxd_offset);
-+	if (ret)
-+		return dev_err_probe(&pdev->dev, ret,
-+				     "can't get eth_rxd_offset\n");
- 
- 	plat_dat->num_clks = ARRAY_SIZE(eic7700_clk_names);
- 	plat_dat->clks = devm_kcalloc(&pdev->dev,
-@@ -208,6 +269,7 @@ static int eic7700_dwmac_probe(struct platform_device *pdev)
- 	plat_dat->exit = eic7700_dwmac_exit;
- 	plat_dat->suspend = eic7700_dwmac_suspend;
- 	plat_dat->resume = eic7700_dwmac_resume;
-+	plat_dat->fix_mac_speed = eic7700_dwmac_fix_speed;
- 
- 	return devm_stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
- }
--- 
-2.25.1
-
+Regards,
+Stefan
 
