@@ -1,103 +1,191 @@
-Return-Path: <netdev+bounces-248400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F30BD081B1
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 10:09:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB9E8D08175
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 10:07:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C500A3078D99
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 09:07:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7AD1C30453B2
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 09:07:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC03358D15;
-	Fri,  9 Jan 2026 09:07:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E971358D1F;
+	Fri,  9 Jan 2026 09:07:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="NEz8xk+a"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="QIZUXLlF"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D062D358D3C;
-	Fri,  9 Jan 2026 09:07:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F279358D11;
+	Fri,  9 Jan 2026 09:07:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767949666; cv=none; b=k29LKCB7cb2cz43wAksL9sA/905zdzkTHfBedklliPnwJrguPt0AEPwTY/Bs1aso/Fu3x+kJSRQ6cuNMIC8jSQ0LUQzb/CWcXYyLVFkeeNCiEvi/rOLAucpwt5Rm8JuR/foMQeRiZVAIyuu14ZGPHX5/aXkaAtI5kjgs+C2JLeU=
+	t=1767949629; cv=none; b=CEPqD0Xh/4o67liXrxG+Qw7xuWGalEdEmFrnlPClOFFIjcDMkoXpeenbkhX+4rDexx0IaX9Y9zyAoUFDljbD57hp16e2OtHT9EzxWM5oygv72m5LEO2fLampUgjF5J+66XS1o0Vg9bJhUoiW87PVJLJcYykq0sF0Mlt0uJ2UlAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767949666; c=relaxed/simple;
-	bh=3hwaGAcFcggIgpihes8MMjjJIldk8j4e67WpwcS7sYE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OA0+wKBbtWLOGVS5S/KxIqn3pN+aVGH+/lGyM0K0WIzycF8OwkHSWuaO4i4GWcrAFdu2GwJ+dnQn36FEj6AKRnmXsx4gXLDJywLWa6rIulBDLAzGdy1SmzG2F3J40Jg0Ynd5tRH4KuYm9gVn+LdJ9xs0a+BbUb7MEQCg4ZgXzao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=NEz8xk+a; arc=none smtp.client-ip=117.135.210.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=9U
-	mGaF8kB2z7vJpTD1/CORh1KAvWfraUhIxE9qUDlWM=; b=NEz8xk+aRn+bkboOMJ
-	iR7EfXiHiymGwlGqL3PeAvYnBls2I2g9bDqGYNhTKq10Ab4PxDAtowZjUCRBz9Kl
-	hPRXdoalvsBT1Pio4dPZ11l0j6q7BkLmh7HT1HbI94Wr5SRz4uE7Fr8rzIf0vxyo
-	qOep4QLK1sJiEbwACi+a5sG4w=
-Received: from zengchi (unknown [])
-	by gzsmtp3 (Coremail) with SMTP id PigvCgBXuCMsxWBpFG8wKw--.19983S2;
-	Fri, 09 Jan 2026 17:06:54 +0800 (CST)
-From: Zeng Chi <zeng_chi911@163.com>
-To: saeedm@nvidia.com,
-	leon@kernel.org,
-	tariqt@nvidia.com,
-	mbloch@nvidia.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	zengchi@kylinos.cn
-Subject: [PATCH] net/mlx5: Fix return type mismatch in mlx5_esw_vport_vhca_id()
-Date: Fri,  9 Jan 2026 17:06:50 +0800
-Message-Id: <20260109090650.1734268-1-zeng_chi911@163.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1767949629; c=relaxed/simple;
+	bh=+d+JzCPTL+yT/foEQIOsgqyGqHJgsF8/00FBfsVMSbE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dwTzuHnwTrTRHcW1Owoe500CXv0V4IjkIQMHyKOZWKU/VGz1w9dPPim+YEVAwXBpu4e0i3T2R5b/2GdoZ2Y/8Ck9TzlBE4lo3XwnWoRCSTimENrSdTUQH79ZGq3wK/rx+WXTx7CyXBRmOMFbdGktmJKWvohVBcgCGnVeoZa/w8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=QIZUXLlF; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [129.217.186.165] ([129.217.186.165])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 60996sV7009699
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Fri, 9 Jan 2026 10:06:55 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1767949615;
+	bh=+d+JzCPTL+yT/foEQIOsgqyGqHJgsF8/00FBfsVMSbE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=QIZUXLlFucBUvTJJQ78DRiaUWaCN7F9MkOwAZoKgqfR6mEn68zThiMqmkzm0vOiyW
+	 Gf5jsepAAY9jC0Jl6ulYPzgCacMfKHcxh4YKZJLjuDgumSPirzXKauwN0fJhHLiVTL
+	 Tap3upcOe3XZAHoLQKyqVqCN57sgPIDWKY6sMCBI=
+Message-ID: <7a093d8f-4822-49b4-bd0e-6b9885fc87a0@tu-dortmund.de>
+Date: Fri, 9 Jan 2026 10:06:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PigvCgBXuCMsxWBpFG8wKw--.19983S2
-X-Coremail-Antispam: 1Uf129KBjvdXoWrtr1xAw48CFWDZrWUCr1fCrg_yoWkCrbEg3
-	WUXF43Xw4q9Fn8Kr1rWrWYgrWI9r1DWFZ3CFZ2vFZ8Jw4q9w1DJ3y8Z3WfAryxWr18XFyD
-	Ga12vayav34jvjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU8jsj5UUUUU==
-X-CM-SenderInfo: 52hqws5fklmiqr6rljoofrz/xtbCwA7uqmlgxS4z4AAA37
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH net-next v7 2/9] ptr_ring: add helper to detect newly freed
+ space on consume
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
+ <20260107210448.37851-3-simon.schippers@tu-dortmund.de>
+ <20260109021023-mutt-send-email-mst@kernel.org>
+ <a0d5d875-9a9c-4bfe-8943-c7b28185c083@tu-dortmund.de>
+ <20260109033028-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <20260109033028-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Zeng Chi <zengchi@kylinos.cn>
+On 1/9/26 09:31, Michael S. Tsirkin wrote:
+> On Fri, Jan 09, 2026 at 08:35:31AM +0100, Simon Schippers wrote:
+>> On 1/9/26 08:22, Michael S. Tsirkin wrote:
+>>> On Wed, Jan 07, 2026 at 10:04:41PM +0100, Simon Schippers wrote:
+>>>> This proposed function checks whether __ptr_ring_zero_tail() was invoked
+>>>> within the last n calls to __ptr_ring_consume(), which indicates that new
+>>>> free space was created. Since __ptr_ring_zero_tail() moves the tail to
+>>>> the head - and no other function modifies either the head or the tail,
+>>>> aside from the wrap-around case described below - detecting such a
+>>>> movement is sufficient to detect the invocation of
+>>>> __ptr_ring_zero_tail().
+>>>>
+>>>> The implementation detects this movement by checking whether the tail is
+>>>> at most n positions behind the head. If this condition holds, the shift
+>>>> of the tail to its current position must have occurred within the last n
+>>>> calls to __ptr_ring_consume(), indicating that __ptr_ring_zero_tail() was
+>>>> invoked and that new free space was created.
+>>>>
+>>>> This logic also correctly handles the wrap-around case in which
+>>>> __ptr_ring_zero_tail() is invoked and the head and the tail are reset
+>>>> to 0. Since this reset likewise moves the tail to the head, the same
+>>>> detection logic applies.
+>>>>
+>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>> ---
+>>>>  include/linux/ptr_ring.h | 13 +++++++++++++
+>>>>  1 file changed, 13 insertions(+)
+>>>>
+>>>> diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
+>>>> index a5a3fa4916d3..7cdae6d1d400 100644
+>>>> --- a/include/linux/ptr_ring.h
+>>>> +++ b/include/linux/ptr_ring.h
+>>>> @@ -438,6 +438,19 @@ static inline int ptr_ring_consume_batched_bh(struct ptr_ring *r,
+>>>>  	return ret;
+>>>>  }
+>>>>  
+>>>> +/* Returns true if the consume of the last n elements has created space
+>>>> + * in the ring buffer (i.e., a new element can be produced).
+>>>> + *
+>>>> + * Note: Because of batching, a successful call to __ptr_ring_consume() /
+>>>> + * __ptr_ring_consume_batched() does not guarantee that the next call to
+>>>> + * __ptr_ring_produce() will succeed.
+>>>
+>>>
+>>> I think the issue is it does not say what is the actual guarantee.
+>>>
+>>> Another issue is that the "Note" really should be more prominent,
+>>> it really is part of explaining what the functions does.
+>>>
+>>> Hmm. Maybe we should tell it how many entries have been consumed and
+>>> get back an indication of how much space this created?
+>>>
+>>> fundamentally
+>>> 	 n - (r->consumer_head - r->consumer_tail)?
+>>
+>> No, that is wrong from my POV.
+>>
+>> It always creates the same amount of space which is the batch size or
+>> multiple batch sizes (or something less in the wrap-around case). That is
+>> of course only if __ptr_ring_zero_tail() was executed at least once,
+>> else it creates zero space.
+> 
+> exactly, and caller does not know, and now he wants to know so
+> we add an API for him to find out?
+> 
+> I feel the fact it's a binary (batch or 0) is an implementation
+> detail better hidden from user.
 
-The function mlx5_esw_vport_vhca_id() is declared to return bool,
-but returns -EOPNOTSUPP (-45), which is an int error code. This
-causes a signedness bug as reported by smatch.
+I agree, and I now understood your logic :)
 
-This patch fixes this smatch report:
-drivers/net/ethernet/mellanox/mlx5/core/eswitch.h:981 mlx5_esw_vport_vhca_id()
-warn: signedness bug returning '(-45)'
+So it should be:
 
-Signed-off-by: Zeng Chi <zengchi@kylinos.cn>
----
- drivers/net/ethernet/mellanox/mlx5/core/eswitch.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+static inline int __ptr_ring_consume_created_space(struct ptr_ring *r,
+						   int n)
+{
+	return max(n - (r->consumer_head - r->consumer_tail), 0);
+}
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-index ad1073f7b79f..e7fe43799b23 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-@@ -1009,7 +1009,7 @@ mlx5_esw_host_functions_enabled(const struct mlx5_core_dev *dev)
- static inline bool
- mlx5_esw_vport_vhca_id(struct mlx5_eswitch *esw, u16 vportn, u16 *vhca_id)
- {
--	return -EOPNOTSUPP;
-+	return false;
- }
- 
- #endif /* CONFIG_MLX5_ESWITCH */
--- 
-2.25.1
+Right?
 
+> 
+> 
+> 
+>>>
+>>>
+>>> does the below sound good maybe?
+>>>
+>>> /* Returns the amound of space (number of new elements that can be
+>>>  * produced) that calls to ptr_ring_consume created.
+>>>  *
+>>>  * Getting n entries from calls to ptr_ring_consume() /
+>>>  * ptr_ring_consume_batched() does *not* guarantee that the next n calls to
+>>>  * ptr_ring_produce() will succeed.
+>>>  *
+>>>  * Use this function after consuming n entries to get a hint about
+>>>  * how much space was actually created.
+>>>
+>>>
+>>>
+>>>
+>>>
+>>>> + */
+>>>> +static inline bool __ptr_ring_consume_created_space(struct ptr_ring *r,
+>>>> +						    int n)
+>>>> +{
+>>>> +	return r->consumer_head - r->consumer_tail < n;
+>>>> +}
+>>>> +
+>>>>  /* Cast to structure type and call a function without discarding from FIFO.
+>>>>   * Function must return a value.
+>>>>   * Callers must take consumer_lock.
+>>>> -- 
+>>>> 2.43.0
+>>>
+> 
 
