@@ -1,252 +1,467 @@
-Return-Path: <netdev+bounces-248516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E56D0D0A825
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 14:53:49 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F34ED0A896
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 15:03:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9C31E304A90B
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 13:50:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0C5483011B26
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 14:03:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A0B35A952;
-	Fri,  9 Jan 2026 13:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1196306486;
+	Fri,  9 Jan 2026 14:03:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="oDGf1b7X"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Dsm0cS1I"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012006.outbound.protection.outlook.com [40.107.200.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6341935A95A
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 13:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.6
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767966629; cv=fail; b=p1Gt25sgxTDZ/3SQuWr+1pl6iIGg+AYyV9BfbId8Y8AwUz4pbGzgSYZUoNE71V/PGgiY/XQ+nkSB3kwtx0jpMGeCboDiaEPvpUQRGQxkI+k9lkdP9U5m6gEkgpCmRc6Xydefl0LwpHan2iKKGgWyoBe0ExjQEqUnhhz7vS8rmeY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767966629; c=relaxed/simple;
-	bh=a9X3W0OlBTIeAGxs8ZbEh/OgGxfe5beJAQVrYKDOrjQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=bFEV/e7uMYP6Cj9AhxDwtTpO/CjDOrYyEoUEqFv1j+LXJU2olOvzzm+06jF4pioR4DBg36ebc1DICE5mpXYgc6Y8a6ouLOGGC3IzTYWIISmmNLejVsPRzwn1qgStltj4bDyxF15F7VLIVxiEJrg0EXY6SfRcVh5T24ZIBECXn2g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=oDGf1b7X; arc=fail smtp.client-ip=40.107.200.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sZGFdpCo3h5Py6ypj5UbE44TGJQ8en0QnDGl63pRK9YBbu01SH7jI1NnMbb1oAg1rZJFbhBGjdpeu21mwFg61XH5N3cTlI+YSKvIpXMLKnUiez1E/DcFr8rfhy5AaZEexVxD/DzTJEGuQgyo+HFblsfLGIlom81B0vTrLFHwSxLyL2JqgpyfArDBLvmP00GMTHw5mxA2vjxRRWNNZeVJoF1k7vchyocdWDvv/OAoMFNELkmRQf77i/EYKNuW+Vthovo24rc8kygcaskmzuOa2dGfZKQwfbX7U4PyaiJLHitKI8JGGX6q3YFu//JH2UggutvjOkXr3kva5vXMQV/lQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=a9X3W0OlBTIeAGxs8ZbEh/OgGxfe5beJAQVrYKDOrjQ=;
- b=DX2uQkZ7NyIVCugqc+lfVQ4JDBeHyDOBEd8G4uDkPocs88PKB9eRZBZs0hDXM2MTsFfs5qkL5b4Y/W739clr9HB1loTNikAkX1Can4KJVxQD+AxApi7WFEnddey2dnH47OzZoKa2qSpsnbs9p6dCa3zkDbH170BQW+psc/W0iEk0Hpa5t9Vq8SXba9I/f3sn4nW/TLRHfhB+g4RyztEgQzBC9e4yP/Z89N20oPI+GM9B3AM9KLx9+ypXu02nf0nxmWU9el5RDR1OKM7XeZHk1vAekGgQsX3M7MtB1dp4HF/OLwHdDrOUnDw5ohVaSjY8IzqYQIZS2M+HCj2dH/ZITQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=a9X3W0OlBTIeAGxs8ZbEh/OgGxfe5beJAQVrYKDOrjQ=;
- b=oDGf1b7X/y3lL7ETLYzjCfY9txXAK7aoSHUBhs1CYUkHlVe13fzv+mt5OWueDsdMPviu58Ps+46TNmXsR+PnaAL81c/hj66KtzyGfbe9FyOhI4Q1K3FgBaHqlpskiDbErl97oXTBj9lhRAnoKrxAYWidIMZH4medkEVygmdzk9DCEipyYTqTD69CIVgBJUPb5tAAjG6Ffk3hMZ7jftwKRmth6Jg+kkT8KVMaoD2lEMqpt0pAqZJBHm4jKZSIrNNJFErDAj3MiYzl26AOYR7UWERmfoXy+iEXFKoQxeuzUWfOgGyRAwhoNA8vIWI4Sb20yzb6jIA1JcvqlbBzdhXe+g==
-Received: from DS5PPF266051432.namprd12.prod.outlook.com
- (2603:10b6:f:fc00::648) by SJ1PR12MB6171.namprd12.prod.outlook.com
- (2603:10b6:a03:45a::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.4; Fri, 9 Jan
- 2026 13:50:24 +0000
-Received: from DS5PPF266051432.namprd12.prod.outlook.com
- ([fe80::3753:5cf7:1798:aa83]) by DS5PPF266051432.namprd12.prod.outlook.com
- ([fe80::3753:5cf7:1798:aa83%6]) with mapi id 15.20.9499.003; Fri, 9 Jan 2026
- 13:50:24 +0000
-From: Cosmin Ratiu <cratiu@nvidia.com>
-To: "sd@queasysnail.net" <sd@queasysnail.net>
-CC: "pabeni@redhat.com" <pabeni@redhat.com>, "davem@davemloft.net"
-	<davem@davemloft.net>, Dragos Tatulea <dtatulea@nvidia.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "edumazet@google.com" <edumazet@google.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>
-Subject: Re: [PATCH net] macsec: Support VLAN-filtering lower devices
-Thread-Topic: [PATCH net] macsec: Support VLAN-filtering lower devices
-Thread-Index: AQHcf8MYq0aPKotsqky8aDx5Wvpp8LVJpWmAgAAUJACAAAe+gIAAHPgA
-Date: Fri, 9 Jan 2026 13:50:24 +0000
-Message-ID: <611d927472c46839ebe643bc05daa2321bd183b9.camel@nvidia.com>
-References: <20260107104723.2750725-1-cratiu@nvidia.com>
-	 <aWDX64mYvwI3EVo4@krikkit>
-	 <5bbb83c9964515526b3d14a43bea492f20f3a0fa.camel@nvidia.com>
-	 <aWDvTx9JUHzUKEGm@krikkit>
-In-Reply-To: <aWDvTx9JUHzUKEGm@krikkit>
-Reply-To: Cosmin Ratiu <cratiu@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS5PPF266051432:EE_|SJ1PR12MB6171:EE_
-x-ms-office365-filtering-correlation-id: 81406f8a-a6b6-402f-4c91-08de4f860a36
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700021;
-x-microsoft-antispam-message-info:
- =?utf-8?B?Tzl3M2czNlhnZTVlY0czOXdXNmM2YmJnOC9WOXlVTlgzc1dnb3R2TVdXb3Ro?=
- =?utf-8?B?WUJhZ2R5MWIvNUoxUUtyZEhmbEdoQU1uaGROR3RRYm1FeE80R2xFVW12N2Uw?=
- =?utf-8?B?dTFGQXZNMWpKUVVXa2FvenRYUFVUbEZ4Y2RDMVk5dGIwYnl0L3dadnNQckg5?=
- =?utf-8?B?R29vWkxESEI0ZnBKeGQ2Z0ZuY1BjVDJJYkNkaDFLZkp1aXU1VDJyYmdSRndx?=
- =?utf-8?B?aGtmMmw0UW8zZjJIclNFcTg0ZWpQK205aDBlWTRZQ2FMam9Ub0lZR3ZoV1pj?=
- =?utf-8?B?QmRDWkh3OXFLR0VlcGRzL2VodHJNQmUrdGdDMEhOUWxrUy9FZnRpK01vZU9a?=
- =?utf-8?B?OXl0ZHI5enhIQUZNWSt0eGYvY0VuZkJvaEwwQnhSbXZYUXVidHkwaDZpQVor?=
- =?utf-8?B?dEtQZVEvTzdEYko5dHJtZlo1NCtTYkxkekZQK2FHN1RuRklsTVIvZ1g5NUlR?=
- =?utf-8?B?dGt1dGVOdFlwbGlGMk1ySzZkQnV3NmhlYW9hWE1wUkpTTWZsTnRWUXkyUDFP?=
- =?utf-8?B?aUYvL3RTbnJJNU85VUpXM3VTQStYV0ZaTDhBWTZBVjdGQ1cwT25hVmcxSkRB?=
- =?utf-8?B?cmdqVTB6RFFrTnl2VzlNcTBmbk5yKzBPR3Z1b0lkeFVFa2xhY3RNWE5tUmFj?=
- =?utf-8?B?N2JhNkVYVVdYRks0WldvNlBXUmM4NmszT0kxWnVXREsxWWNNd2lGVWZXU0hJ?=
- =?utf-8?B?RmU3b2FFTWZQbFh6djJiR2EwNnpnckJpOVRGbndWNUFCclRwcXREdmx4dEJv?=
- =?utf-8?B?OTZjZGpudERsR2htbVlYc1RxeGI1UjlseHRXWHNHUStiV2phMFhibnh6enV4?=
- =?utf-8?B?M1o0ZmFXUzF2d0o0SlgweGhuWWVwclM1ZjFGRzg0MUE0Q28xYkhYYTNLZzlS?=
- =?utf-8?B?UDQ5NnJ5c3V5UjVRV3BlMzF3VjhjWENMdTU2RmdseEo2TG80bG5xaDNQdUVj?=
- =?utf-8?B?N0hoZU5GRHAzYXlPSG1rZUpVTjlLYlNydWlLOExmNkJpK0kzUlB4MFgwR2Zp?=
- =?utf-8?B?bXFHcTlMa040L0xuZ3ZpQ1ZPZHdaM0UyMlRVSnBtbHpndENUbVdDaWJyOWhk?=
- =?utf-8?B?TUlvU1Q5Q29KaFllQnpBZnFwa2VWK0NNdlZSQlFFVWU2Vy84RWxROE12SFNp?=
- =?utf-8?B?QlBTV0xrL0dRcjNvS1NkNEI2UFF6QzBXSStlSkJITXpneDJXeloxWlQ0MnV5?=
- =?utf-8?B?QWlzektEa0FBRlF4eThpaGRRaHU1MENzRSswSEN5TzlMdzRCUHlTdHB4UUhm?=
- =?utf-8?B?TTRUejJHNVdqS1hIOVlGR0tQdzBoSnpYNi9sbktuMUNWSFNkYzNZUFNoYUln?=
- =?utf-8?B?WEl1RW5IOW1WN0gxWWw0K0F3UXJJUU9RNDVzMHBNTWptSlI1OGhkdDl3Q1oz?=
- =?utf-8?B?cjNrUjBwZXZHV0JjZXNVTFFUc2hQTjcrRkVlS0ltNHpTMWhoQjZyYk11SEg1?=
- =?utf-8?B?Uk1YNDg2WkkvdkJMbGpHMHVTNHJGSkNoK0VIN0FFU3NIOUZ2N3BWZ0VkN0lV?=
- =?utf-8?B?RSsvQTFUcVQrZXZ1NmM0YXBkTUJzdnpuNEFScWZrMXFPRWQwUzJiOTFwK0VG?=
- =?utf-8?B?d0pNRHVGZ0tzQjNVeVNsQnNLRFpwaHU0VTFLdnh6TzlreVA3c2VHWjFaejM1?=
- =?utf-8?B?Q1ZjaHR0WndyWnpzakJhMlFZR0ZJRzUyZloxdFNxM0RhQnFqaVdvdkNJU1I4?=
- =?utf-8?B?cTRIUVpwbHhqMldqU3UxZ0xCSkhoZlNDSzVhbFFjQVZMN3ZwUDY2WDFNMWEr?=
- =?utf-8?B?NFhvRVFiMWFSWTFvWVN4R1l4WnRLaUtrRHNZQTlPbDV3MWxqRGxlMi9uVGFk?=
- =?utf-8?B?eEZMenoreXNPeWp2ZmJuSFRDSEFtaVpWZ0UyOVhyZVNqYXZMb0wyb25RNlpS?=
- =?utf-8?B?MmxzRk53aFhVODFjSW9IeTRneEUvZHZ6NjJEQ200TTgzT0lxbGUvNUZGdHA5?=
- =?utf-8?B?MFJyZThZOFJ5dGdNcjE2T243M2JpaXVlU3pXVkFDeVVOVXFGbGQ3czhmVW1v?=
- =?utf-8?B?dnRXdGY0NWplMVNPRmFwcWVVbzRNdEsrenBqblhabSttN1FJTmRSdE5UVG1O?=
- =?utf-8?Q?mk+AP5?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS5PPF266051432.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?Y3lnQkVERkxMem1GSGZzSktVS2VXT2JDZmhJYjAzNStQWnUwOG5RQ005RVRz?=
- =?utf-8?B?WVR4M2RTeitQd0FOc0huTWpCNm5GMjFlQ3lPYm5mYXkycWwrMUxHMVN6L3Ra?=
- =?utf-8?B?U0JyeWpNZVgyYUlRWUpuMGtIWE9GZ3FmbEk4MnRIbzBQVXdjdUJ2a0Q2UnR2?=
- =?utf-8?B?cHpsWlorekdVa2d2dWdqNlU3ZXEwNXI1UnFqVmVVUXYxTzM3dHpseitTZUtC?=
- =?utf-8?B?bzJDa3pMcUpDRUx3eEdaNHlHV3lOYnRoaXYvWllXVEZUMlMyU3gwOGx6THNW?=
- =?utf-8?B?NDhyeWxDdnpPMk1QVmFjalJsdXFLcWliRlJNV1M2VzFwSGhsQkJFWHBhSmlQ?=
- =?utf-8?B?ZWJkZnQ3eU9DQ2poeDhKK01MVHkxdHJvNUQxSEJhc0xTZm5kK1FLdTdCZjM1?=
- =?utf-8?B?ekJTM3B5V21QSUtOdDUySytOMnR6cDJ0eW9udzAvOTlsSTN2N0hPZVNPejNM?=
- =?utf-8?B?TUhXYXUvU1VqbnFpS2l6bzRNaWJKSXJIVmh2WHV1OGlXeGpRZEt3VmNNdXdC?=
- =?utf-8?B?TGhRSGEzbHJoeU4wUUYwanlYeUNtZ0dWcndjZEp2R1VCbjQ1NmVpQlR1VVRX?=
- =?utf-8?B?eTdMMStiTXJ5UjJXK3V1OXBnaHdKQy8vY0lUL0pSZlNINTFFaDhMeDY4NVVm?=
- =?utf-8?B?amZ0ZzI3WVVJU0R4Y3VFQlhLa0NpeVJUYVdKVTU2SFN5ZGxRckF2eFBFRnFU?=
- =?utf-8?B?bEIyci9yUWxqWmdScVM2Y2FSNzR2S09wQ0tJT1hlK3FaNlk3azg2YkNIajlv?=
- =?utf-8?B?U205T1JiVEliY2tET2drTkNqQXhuRDdsQ2RTT0VyRE8raVFub296cHQwN2pV?=
- =?utf-8?B?QnBxaTQvcGMvOHpoTU1oMGlSUXB4czRzVXFER3hzeTVPVEdGelFkYWxhZWRk?=
- =?utf-8?B?OC9nc0U5Z2ZuWVRtTkFJM0V0U2V1dStsWXdFNWVtTGgxL1QvVkNRQUJXUzEr?=
- =?utf-8?B?Q2I4VmpiUDdpcTBJdUhhRGhrNHllcC9VaFVhYU1vaWdTalphOTVHNE5jWGt5?=
- =?utf-8?B?U3BZVlJVZnUranFudkpuVFdYVEhGZE5qVHFSOXpTYk1KRks5K1BtUVhaUFZi?=
- =?utf-8?B?YzNUaHJ5L2Rld1A5K3UvWkZrR0xCbXl4UXhHWkpUcUErWGlEMXlUNFdGYlRC?=
- =?utf-8?B?bzBsLytJOXhYa25mOHQ2K0txbTgzMEJ0Mzl6b28rY0VDdUhFdFA5QnBta29k?=
- =?utf-8?B?YS9rcWVGbWpJWjBMbXljYXhJSEZqVExMTlNPcEQ2SzJtemdZdGFSUk1kZ1kw?=
- =?utf-8?B?NlJTbjFiRENmZzRZSUI1NkZwaVI3R3BmTWtHc09HeDFyQVBzZlpYQndINWZC?=
- =?utf-8?B?OHYzY25yN0FrRFRHeXJuaTcyOXRQdWI0SThzRTAzbCsvK0xRK0FnMFBuZ3dF?=
- =?utf-8?B?R1lqVStlNWwwbm5INXdGNE1kTGtGWUdtZElGNHBrVEdnRGZNQVFPYnJJdnVL?=
- =?utf-8?B?UjIvZU1UcFF0dkozSWVEa21tZnhkcXdWUys5YWNLU1p6aTZsL2tZWGwyb0E5?=
- =?utf-8?B?ckx4VUxyTFB0Z2JZYWl3TFBhUGpiY0VWcVdON3l1VDh2S2NNKytERVdSVWV0?=
- =?utf-8?B?aUlZWFdITnZGWGFSNkpSV3RYd081VzFsRjJVcVFpcFFvL3ZOM1dpbjgzalR3?=
- =?utf-8?B?RGUxdlBFMURGNi9vSTBGMm05ZGswU1ZiNDJkbkllL1NpeExBVURndlN5UUFm?=
- =?utf-8?B?YXNOZW56cmtvdzBmL0V3dzFZeVdHNUMvb0s0QlN1WnppYmd6OGMzVXpVdEF3?=
- =?utf-8?B?V0R6TzE2bndud1E0b1N5TENCVmFucEZ1Z0k3WXQ3bXYwcmppVEUyNTVONHo1?=
- =?utf-8?B?cUJwSld5VUFhTkkzdDY4bmx1UDdiK2g0ZytGdm1nVkt4c28vbDRLcmNOQUFN?=
- =?utf-8?B?YmJjWUxmZmorNGtwaEtkUW5Kb0RIaWRISyt2VTRHdDB4UTRoVitBM0c3Z05Y?=
- =?utf-8?B?NUtnSE1KeTJrb0hHV1Myb3FSUWxtRmhkUHVmbzByeHRHb0x3V1JXNkJ3aWJC?=
- =?utf-8?B?VldQdGg5TVBRaHhxZnpTOW9aOUZnOUZhL3hNTi81OXZFdnBZOEt5VFE5V3lp?=
- =?utf-8?B?VEppeU1IQWd6N0VKb0FoUmV3clZZbEhUbWsrMTRtamtzZEFoWGNQYTBaYW9i?=
- =?utf-8?B?WElZM3gweEtGRUdrVkFwSm5sc1oreU1Ud3RHMURLZ0t3VWhPdVdtRlNUZ3hR?=
- =?utf-8?B?V1VydXhRSU1taUlldjNMWGJwOFg2LzdrUHVGWnZvb1pwNTI5ZjRDM2x2d0Q1?=
- =?utf-8?B?akpjY1Nwb1NTN2tjTTVGZXdKOWRUU0s4Z3dJY3ZGSWZsS215cmdSK2h0RmJn?=
- =?utf-8?B?a0x6RnZlQVNVR0twZ28yV20zMUtjZE5JTmcwUzl1dzFUQTFlaUFEUT09?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B32C814FEA19454DA59E65C989810927@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4AB321CC5B
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 14:03:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767967403; cv=none; b=SXdA97lzXboeV3VnXlsj/m1tLgmvZnlU0FjhIWlGB0J+JMLqDg7cub7j/UNJkLa0xOZZWyx+NvZgIs4NzawtHB8D1f3ejzcFdSDSGoHeUFgplB23SQImtq6o4/VdzB8Gaa7Ft1TchqZLzJlU13nuu2ebF8pH8FyPjGV1H8u3XpM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767967403; c=relaxed/simple;
+	bh=saybQ1ChBsAWJpWaR+Q8eVjb8I9L+BBvpkj6cJ/yvdU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HCEbRn7Ko7NcYsSI1qanLGhCBKlyZqwDo9vjjmt+bugmm2WubvRUBXLxd3PL1lSMtOXBtA8U6kltcpLxVPfKsmJn9R+n/7hbjKKdGvFh9bXwSXG85YheEJMAm/yCxF1HwEWo7Gwgowq5d1/piIJzoyh0zb5KBFAIh7kev3T4lvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Dsm0cS1I; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-47d63594f7eso26317235e9.0
+        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 06:03:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1767967399; x=1768572199; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ja5eTcAFAlRMIt4BiTLzCkciQiwxL9ad2vxqBFxtYGw=;
+        b=Dsm0cS1IWSwRDumUfq3zHrkMLdaymRMf4SIGyxgwHADWTeu4F+b3pQIvCVKNvqbDUA
+         jxc/FK4uGSq3YqDHy/X4ygWr70znVTA5MgJhxJB1p3ZGoqoHVLaOLiFjXF4uz07MCv1C
+         SzTU4MhCYo8xmqtKVCdRsKDWCVQ9TpKoc+kODpbZXNeU+c/kMWphlWtOdaPz/7s4hasw
+         fStY2q8P3wn47XAriupIjnoh7qZgWHfOm7wH+hzPv4I7CjUnAYT3CEQJmwAAButXCSX4
+         MMOtuOuRgSpFAsutFj2B8RTaBt2kifYtMNdTI1WOVhF1MKSI1aTKN1QJxH3TEJezd4S8
+         +rOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767967399; x=1768572199;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ja5eTcAFAlRMIt4BiTLzCkciQiwxL9ad2vxqBFxtYGw=;
+        b=W+pTMq8LJnYZoOgt9+4SUlwgaR9nqnuGw9PjgUU70mpsgpZ8YZsC9C4lahFdJEXXbq
+         ub9vskw2gQaGCoRR7dX3ELsW44ULApahn5+Ch7mbARXBDgqO4VTAk6JiWqgusXNfLfg2
+         uymMt39HdahENsGWHLeooy7aKXxkp73EZGPUBeffDhQ0DMnwR82J9APYVVNcHSXDJ1pc
+         NfNgfUN2RB2oPCOBRalHoW757sJqWDx9Qs828u77Lz4qfVtbSb5dUvGTNv65OU1/aunq
+         URFd2EVm4aeExkKCNTjeoR2+a2wn83dV5dvCmmDi5DAUotMymNfiadYt53QAbaaiHLD0
+         MupQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVVfLdSC0BDo2tZ37lOcspRxzNPBN6GwehGrDqpdGlKuBNDAGWXNi6ouI58wJL5q+SMy+SWS2o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqKnpc1fFAHHxW9/NdjnrjrdqFKDd+0n9tfBwUFa76We0rI7ZO
+	s609hJ5TtoN6v0RlhcDwaiU+5O93HC4LWLxS/v1qcvRXYhfi4mUuMxd07Vom2AUfZvM=
+X-Gm-Gg: AY/fxX76JO/bCwiSbNioXtBYoXt1mbBNp7mgu5W/tIEuxPkbsTf1DUudF+V1mbuZABz
+	HFjnyGZD4z3AQmjUEYjDAiuzkn8L63+B4DG+ms2ZVUZmcN6WQksyo2CrGByjQcV1tJhk5Wsn25E
+	aMesotjeAFUPcg6sceuD+FwYeIfLy8C6r9d2LJfpoKjHCxPDo6VAqRs0WSoJFe+xSDJ672kkn9s
+	oTWwkvOLiE865R4ZjgAqXeVcI12PmrdgoDgYbRt+9tUxXLxhGp0UfZepSOJ/hwBl/R/6tfMBWUC
+	LJ+bkGDbvL2edMX/qGi1vTzU4957qDJU827dOZpM84ioK9oh+tRVf70Ro4VSJ5BmN5Lu6G13Y23
+	2FtzLlLkC+XDOLYQIBv6wrhmvYbbj38c2f4hDjGKJqv6ay7if1BY7/21G3kFMYh5RYl2LjRrLNj
+	15PyfRZwG1EiUU1w==
+X-Google-Smtp-Source: AGHT+IGGi1Fzn+5kNYjsNQVAMrHmX7y47AEIs8n139tPRwpgtol/4YqgMx4hzut4vgSUGgaDR6ie5A==
+X-Received: by 2002:a05:600c:468e:b0:477:a1a2:d829 with SMTP id 5b1f17b1804b1-47d84b1862cmr123352185e9.13.1767967398957;
+        Fri, 09 Jan 2026 06:03:18 -0800 (PST)
+Received: from pathway.suse.cz ([176.114.240.130])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5edb7esm22251741f8f.30.2026.01.09.06.03.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Jan 2026 06:03:18 -0800 (PST)
+Date: Fri, 9 Jan 2026 15:03:16 +0100
+From: Petr Mladek <pmladek@suse.com>
+To: John Ogness <john.ogness@linutronix.de>
+Cc: Breno Leitao <leitao@debian.org>, mpdesouza@suse.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	asantostc@gmail.com, efault@gmx.de, gustavold@gmail.com,
+	calvin@wbinvd.org, jv@jvosburgh.net, kernel-team@meta.com,
+	Simon Horman <horms@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	rostedt@goodmis.org
+Subject: Re: [PATCH net-next 0/2] net: netconsole: convert to NBCON console
+ infrastructure
+Message-ID: <aWEKpH9JxYtyInvG@pathway.suse.cz>
+References: <20251222-nbcon-v1-0-65b43c098708@debian.org>
+ <5mpei32y7sl5jmi2ciim4crxbc55zztiucxxsdd633mvzxlk7n@fowtsefym5y6>
+ <87zf6pfmlq.fsf@jogness.linutronix.de>
+ <4dwhhlnuv2n3f7d3hqoulcnsg6ljucd6v47kqcszcwcshfoqno@rzxvg456q4fi>
+ <j764nuipx4nvemd3wlqfyx77lkdf7wgs5z452hlacwglvc2e7n@vsko4bq5xb2f>
+ <87eco09hgb.fsf@jogness.linutronix.de>
+ <aWECzkapsFFPFKNP@pathway.suse.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS5PPF266051432.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 81406f8a-a6b6-402f-4c91-08de4f860a36
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jan 2026 13:50:24.8406
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: n64TxrD6OX8aMLw8oM36xxMBH6nOp+jTqblRKSunY30VkX+iqLAB5fNhh35e/H0iAb6EDsLRAlhNQqfCBL1l/A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6171
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aWECzkapsFFPFKNP@pathway.suse.cz>
 
-T24gRnJpLCAyMDI2LTAxLTA5IGF0IDEzOjA2ICswMTAwLCBTYWJyaW5hIER1YnJvY2Egd3JvdGU6
-DQo+IDIwMjYtMDEtMDksIDExOjM4OjU5ICswMDAwLCBDb3NtaW4gUmF0aXUgd3JvdGU6DQo+ID4g
-T24gRnJpLCAyMDI2LTAxLTA5IGF0IDExOjI2ICswMTAwLCBTYWJyaW5hIER1YnJvY2Egd3JvdGU6
-DQo+ID4gPiAyMDI2LTAxLTA3LCAxMjo0NzoyMyArMDIwMCwgQ29zbWluIFJhdGl1IHdyb3RlOg0K
-PiA+ID4gPiBWTEFOLWZpbHRlcmluZyBpcyBkb25lIHRocm91Z2ggdHdvIG5ldGRldiBmZWF0dXJl
-cw0KPiA+ID4gPiAoTkVUSUZfRl9IV19WTEFOX0NUQUdfRklMVEVSIGFuZCBORVRJRl9GX0hXX1ZM
-QU5fU1RBR19GSUxURVIpDQo+ID4gPiA+IGFuZA0KPiA+ID4gPiB0d28NCj4gPiA+ID4gbmV0ZGV2
-IG9wcyAobmRvX3ZsYW5fcnhfYWRkX3ZpZCBhbmQgbmRvX3ZsYW5fcnhfa2lsbF92aWQpLg0KPiA+
-ID4gPiANCj4gPiA+ID4gSW1wbGVtZW50IHRoZXNlIGFuZCBhZHZlcnRpc2UgdGhlIGZlYXR1cmVz
-IGlmIHRoZSBsb3dlciBkZXZpY2UNCj4gPiA+ID4gc3VwcG9ydHMNCj4gPiA+ID4gdGhlbS4gVGhp
-cyBhbGxvd3MgcHJvcGVyIFZMQU4gZmlsdGVyaW5nIHRvIHdvcmsgb24gdG9wIG9mDQo+ID4gPiA+
-IG1hY3NlYw0KPiA+ID4gPiBkZXZpY2VzLCB3aGVuIHRoZSBsb3dlciBkZXZpY2UgaXMgY2FwYWJs
-ZSBvZiBWTEFOIGZpbHRlcmluZy4NCj4gPiA+ID4gQXMgYSBjb25jcmV0ZSBleGFtcGxlLCBoYXZp
-bmcgdGhpcyBjaGFpbiBvZiBpbnRlcmZhY2VzIG5vdw0KPiA+ID4gPiB3b3JrczoNCj4gPiA+ID4g
-dmxhbl9maWx0ZXJpbmdfY2FwYWJsZV9kZXYoMSkgLT4gbWFjc2VjX2RldigyKSAtPg0KPiA+ID4g
-PiBtYWNzZWNfdmxhbl9kZXYoMykNCj4gPiA+ID4gDQo+ID4gPiA+IEJlZm9yZSB0aGUgIkZpeGVz
-IiBjb21taXQgdGhpcyB1c2VkIHRvIGFjY2lkZW50YWxseSB3b3JrDQo+ID4gPiA+IGJlY2F1c2UN
-Cj4gPiA+ID4gdGhlDQo+ID4gPiA+IG1hY3NlYyBkZXZpY2UgKGFuZCB0aHVzIHRoZSBsb3dlciBk
-ZXZpY2UpIHdhcyBwdXQgaW4NCj4gPiA+ID4gcHJvbWlzY3VvdXMNCj4gPiA+ID4gbW9kZQ0KPiA+
-ID4gPiBhbmQgdGhlIFZMQU4gZmlsdGVyIHdhcyBub3QgdXNlZC4gQnV0IGFmdGVyIHRoYXQgY29t
-bWl0DQo+ID4gPiA+IGNvcnJlY3RseQ0KPiA+ID4gPiBtYWRlDQo+ID4gPiA+IHRoZSBtYWNzZWMg
-ZHJpdmVyIGV4cG9zZSB0aGUgSUZGX1VOSUNBU1RfRkxUIGZsYWcsIHByb21pc2N1b3VzDQo+ID4g
-PiA+IG1vZGUNCj4gPiA+ID4gd2FzDQo+ID4gPiA+IG5vIGxvbmdlciB1c2VkIGFuZCBWTEFOIGZp
-bHRlcnMgb24gZGV2IDEga2lja2VkIGluLiBXaXRob3V0DQo+ID4gPiA+IHN1cHBvcnQNCj4gPiA+
-ID4gaW4NCj4gPiA+ID4gZGV2IDIgZm9yIHByb3BhZ2F0aW5nIFZMQU4gZmlsdGVycyBkb3duLCB0
-aGUgcmVnaXN0ZXJfdmxhbl9kZXYNCj4gPiA+ID4gLT4NCj4gPiA+ID4gdmxhbl92aWRfYWRkIC0+
-IF9fdmxhbl92aWRfYWRkIC0+IHZsYW5fYWRkX3J4X2ZpbHRlcl9pbmZvIGNhbGwNCj4gPiA+ID4g
-ZnJvbQ0KPiA+ID4gPiBkZXYNCj4gPiA+ID4gMyBpcyBzaWxlbnRseSBlYXRlbiAoYmVjYXVzZSB2
-bGFuX2h3X2ZpbHRlcl9jYXBhYmxlIHJldHVybnMNCj4gPiA+ID4gZmFsc2UNCj4gPiA+ID4gYW5k
-DQo+ID4gPiA+IHZsYW5fYWRkX3J4X2ZpbHRlcl9pbmZvIHNpbGVudGx5IHN1Y2NlZWRzKS4NCj4g
-PiA+IA0KPiA+ID4gV2Ugb25seSB3YW50IHRvIHByb3BhZ2F0ZSBWTEFOIGZpbHRlcnMgd2hlbiBt
-YWNzZWMgb2ZmbG9hZCBpcw0KPiA+ID4gdXNlZCwNCj4gPiA+IG5vPyBJZiBvZmZsb2FkIGlzbid0
-IHVzZWQsIHRoZSBsb3dlciBkZXZpY2Ugc2hvdWxkIGJlIHVuYXdhcmUgb2YNCj4gPiA+IHdoYXRl
-dmVyIGlzIGhhcHBlbmluZyBvbiB0b3Agb2YgbWFjc2VjLCBzbyBJIGRvbid0IHRoaW5rIG5vbi0N
-Cj4gPiA+IG9mZmxvYWRlZA0KPiA+ID4gc2V0dXBzIGFyZSBhZmZlY3RlZCBieSB0aGlzPw0KPiA+
-IA0KPiA+IFZMQU4gZmlsdGVycyBhcmUgbm90IHJlbGF0ZWQgdG8gbWFjc2VjIG9mZmxvYWQsIHJp
-Z2h0PyBJdCdzIGFib3V0DQo+ID4gaW5mb3JtaW5nIHRoZSBsb3dlciBuZXRkZXZpY2Ugd2hpY2gg
-VkxBTnMgc2hvdWxkIGJlIGFsbG93ZWQuDQo+ID4gV2l0aG91dA0KPiA+IHRoaXMgcGF0Y2gsIHRo
-ZSBWTEFOLXRhZ2dlZCBwYWNrZXRzIGludGVuZGVkIGZvciB0aGUgbWFjc2VjIHZsYW4NCj4gPiBk
-ZXZpY2UNCj4gPiBhcmUgZGlzY2FyZGVkIGJ5IHRoZSBsb3dlciBkZXZpY2UgVkxBTiBmaWx0ZXIu
-DQo+IA0KPiBXaHkgZG9lcyB0aGUgbG93ZXIgZGV2aWNlIG5lZWQgdG8ga25vdyBpbiB0aGUgbm9u
-LW9mZmxvYWQgY2FzZT8gSXQNCj4gaGFzDQo+IG5vIGlkZWEgd2hldGhlciBpdCdzIFZMQU4gdHJh
-ZmZpYyBvciBhbnl0aGluZyBlbHNlIG9uY2UgaXQncyBzdHVmZmVkDQo+IGludG8gbWFjc2VjLg0K
-PiANCj4gVGhlIHBhY2tldCB3aWxsIGxvb2sgbGlrZQ0KPiANCj4gRVRIIHwgTUFDU0VDIHwgW3Nv
-bWUgb3BhcXVlIGRhdGEgdGhhdCBtYXkgb3IgbWF5IG5vdCBzdGFydCB3aXRoIGENCj4gVkxBTiBo
-ZWFkZXIgXQ0KDQpZb3UncmUgcmlnaHQsIEkgY2hlY2tlZCB0aGUgZmFpbHVyZSBhbmQgaXQgaGFw
-cGVucyBvbmx5IHdoZW4gb2ZmbG9hZHMNCmFyZSBlbmFibGVkLg0KDQo+ID4gPiBFdmVuIHdoZW4g
-b2ZmbG9hZCBpcyB1c2VkLCB0aGUgbG93ZXIgZGV2aWNlIHNob3VsZCBwcm9iYWJseQ0KPiA+ID4g
-aGFuZGxlDQo+ID4gPiAiRVRIICsgVkxBTiA1IiBkaWZmZXJlbnRseSBmcm9tICJFVEggKyBNQUNT
-RUMgKyBWTEFOIDUiLCBidXQgdGhhdA0KPiA+ID4gbWF5DQo+ID4gPiBub3QgYmUgcG9zc2libGUg
-d2l0aCBqdXN0IHRoZSBleGlzdGluZyBkZXZpY2Ugb3BzLg0KPiA+IA0KPiA+IEkgZG9uJ3Qgc2Vl
-IGhvdyBtYWNzZWMgcGxheXMgYSByb2xlIGludG8gaG93IHRoZSBsb3dlciBkZXZpY2UNCj4gPiBo
-YW5kbGVzDQo+ID4gVkxBTnMuIEZyb20gdGhlIHByb3RvY29sIGRpYWdyYW1zLCBJIHNlZSB0aGF0
-IGl0J3MgRVRIICsgVkxBTiA1ICsNCj4gPiBNQUNTRUMsIHRoZSBWTEFOIGlzbid0IGVuY3J5cHRl
-ZCBpZiBwcmVzZW50Lg0KPiANCj4gV2FpdCwgaWYgd2UncmUgdGFsa2luZyBhYm91dCBFVEggKyBW
-TEFOIDUgKyBNQUNTRUMsIG1hY3NlYyBzaG91bGRuJ3QNCj4gZXZlbiBiZSBpbnZvbHZlZCBpbiBW
-TEFOIGlkIDUuDQo+IA0KPiBpcCBsaW5rIGFkZCBsaW5rIGV0aDAgdHlwZSB2bGFuIGlkIDUNCj4g
-DQo+IHNob3VsZCBuZXZlciBnbyB0aHJvdWdoIGFueSBtYWNzZWMgY29kZSBhdCBhbGwuDQo+IA0K
-DQpUaGVzZSBhcmUgdGhlIGludGVyZmFjZXM6DQppcCBsaW5rIGFkZCBsaW5rICRMT1dFUl9ERVYg
-bWFjc2VjMCB0eXBlIG1hY3NlYyBzY2kgLi4uDQppcCBtYWNzZWMgb2ZmbG9hZCBtYWNzZWMwIG1h
-Yw0KaXAgbGluayBhZGQgbGluayBtYWNzZWMwIG5hbWUgbWFjc2VjX3ZsYW4gdHlwZSB2bGFuIGlk
-IDUNCg0KV2hhdCBoYXBwZW5zIGlzIHRoYXQgd2l0aG91dCB0aGUgVkxBTiBmaWx0ZXIgY29uZmln
-dXJlZCBjb3JyZWN0bHksIHRoZQ0KaHcgb24gdGhlIHJ4IHNpZGUgZGVjcnlwdHMgYW5kIGRlY2Fw
-c3VsYXRlcyBtYWNzZWMgcGFja2V0cyBidXQgZHJvcHMNCnRoZW0gc2hvcnR5IGFmdGVyLg0KDQpX
-b3VsZCB5b3UgbGlrZSB0byBzZWUgYW55IHR3ZWFrcyB0byB0aGUgcHJvcG9zZWQgcGF0Y2g/DQoN
-CkNvc21pbi4NCg==
+On Fri 2026-01-09 14:29:54, Petr Mladek wrote:
+> On Thu 2026-01-08 17:56:44, John Ogness wrote:
+> > On 2026-01-08, Breno Leitao <leitao@debian.org> wrote:
+> > > On Wed, Jan 07, 2026 at 08:58:39AM -0800, Breno Leitao wrote:
+> > > This is what I am thinking about. How bad is it?
+> > >
+> > > (I've also implemented the netconsole part as well, so, if you want to
+> > > have a tree, you can find it in
+> > > https://github.com/leitao/linux/tree/execution_context)
+> > 
+> > Thanks. It is very helpful to see how you intend to use it.
+> > 
+> > > commit fe79961da6cabe42343185cf1a7308162bf6bad3
+> > > Author: Breno Leitao <leitao@debian.org>
+> > > Date:   Thu Jan 8 03:00:46 2026 -0800
+> > >
+> > >     printk: Add execution context (PID/CPU) to dev_printk_info
+> > >     
+> > >     Extend struct dev_printk_info to include the task PID and CPU number
+> > >     where printk messages originate. This information is captured at
+> > >     vprintk_store() time and propagated through printk_message to
+> > >     nbcon_write_context, making it available to nbcon console drivers.
+> > >     
+> > >     This is useful for consoles like netconsole that want to include
+> > >     execution context in their output, allowing correlation of messages
+> > >     with specific tasks and CPUs regardless of where the console driver
+> > >     actually runs.
+> > >     
+> > >     The feature is controlled by CONFIG_PRINTK_EXECUTION_CTX, which is
+> > >     automatically selected by CONFIG_NETCONSOLE_DYNAMIC. When disabled,
+> > >     the helper functions compile to no-ops with no overhead.
+> > >     
+> > >     Suggested-by: John Ogness <john.ogness@linutronix.de>
+> > >     Signed-off-by: Breno Leitao <leitao@debian.org>
+> > >
+> > > diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+> > > index ac12eaf11755..e6a9369be202 100644
+> > > --- a/drivers/net/Kconfig
+> > > +++ b/drivers/net/Kconfig
+> > > @@ -341,6 +341,7 @@ config NETCONSOLE_DYNAMIC
+> > >  	bool "Dynamic reconfiguration of logging targets"
+> > >  	depends on NETCONSOLE && SYSFS && CONFIGFS_FS && \
+> > >  			!(NETCONSOLE=y && CONFIGFS_FS=m)
+> > > +	select PRINTK_EXECUTION_CTX
+> > >  	help
+> > >  	  This option enables the ability to dynamically reconfigure target
+> > >  	  parameters (interface, IP addresses, port numbers, MAC addresses)
+> > > diff --git a/include/linux/console.h b/include/linux/console.h
+> > > index fc9f5c5c1b04..c724f59f96e6 100644
+> > > --- a/include/linux/console.h
+> > > +++ b/include/linux/console.h
+> > > @@ -298,12 +298,18 @@ struct nbcon_context {
+> > >   * @outbuf:		Pointer to the text buffer for output
+> > >   * @len:		Length to write
+> > >   * @unsafe_takeover:	If a hostile takeover in an unsafe state has occurred
+> > > + * @pid:		PID of the task that generated the message
+> > > + * @cpu:		CPU on which the message was generated
+> > >   */
+> > >  struct nbcon_write_context {
+> > >  	struct nbcon_context	__private ctxt;
+> > >  	char			*outbuf;
+> > >  	unsigned int		len;
+> > >  	bool			unsafe_takeover;
+> > > +#ifdef CONFIG_PRINTK_EXECUTION_CTX
+> > > +	pid_t			pid;
+> > > +	int			cpu;
+> > > +#endif
+> > 
+> > Something like msg_pid/msg_cpu or printk_pid/printk_cpu might be better
+> > to make it clear we are not talking about _this_ context. This struct is
+> > used by code outside of the printk subsystem, which is why I think it
+> > needs to be more obvious what these represent.
+> > 
+> > @Petr: Any suggestions for names (assuming this is even acceptable)?
+> > 
+> > >  };
+> > >  
+> > >  /**
+> > > diff --git a/include/linux/dev_printk.h b/include/linux/dev_printk.h
+> > > index eb2094e43050..42ee778b29dd 100644
+> > > --- a/include/linux/dev_printk.h
+> > > +++ b/include/linux/dev_printk.h
+> > > @@ -27,6 +27,10 @@ struct device;
+> > >  struct dev_printk_info {
+> > >  	char subsystem[PRINTK_INFO_SUBSYSTEM_LEN];
+> > >  	char device[PRINTK_INFO_DEVICE_LEN];
+> > > +#ifdef CONFIG_PRINTK_EXECUTION_CTX
+> > > +	pid_t pid;
+> > 
+> > I am not happy about this being resolved by the netconsole printer to
+> > get the task name. A lot can happen between now and then. But I also
+> > shudder at the thought of making dev_printk_info much larger. This is
+> > already a horrible waste of memory (which I talked about here[0]).
+> > 
+> > I also do not think dev_printk_info is the appropriate place to store
+> > this information. These new fields are not related to the dev_printk
+> > API. They belong in printk_info.
+> > 
+> > > +	int cpu;
+> > > +#endif
+> > >  };
+> > >  
+> > >  #ifdef CONFIG_PRINTK
+> > > diff --git a/kernel/printk/internal.h b/kernel/printk/internal.h
+> > > index 5f5f626f4279..81e5cd336677 100644
+> > > --- a/kernel/printk/internal.h
+> > > +++ b/kernel/printk/internal.h
+> > > @@ -287,6 +287,10 @@ struct printk_message {
+> > >  	unsigned int		outbuf_len;
+> > >  	u64			seq;
+> > >  	unsigned long		dropped;
+> > > +#ifdef CONFIG_PRINTK_EXECUTION_CTX
+> > > +	pid_t			pid;
+> > > +	int			cpu;
+> > > +#endif
+> > >  };
+> > >  
+> > >  bool printk_get_next_message(struct printk_message *pmsg, u64 seq,
+> > > diff --git a/kernel/printk/nbcon.c b/kernel/printk/nbcon.c
+> > > index 3fa403f9831f..2465fafd7727 100644
+> > > --- a/kernel/printk/nbcon.c
+> > > +++ b/kernel/printk/nbcon.c
+> > > @@ -946,6 +946,18 @@ void nbcon_reacquire_nobuf(struct nbcon_write_context *wctxt)
+> > >  }
+> > >  EXPORT_SYMBOL_GPL(nbcon_reacquire_nobuf);
+> > >  
+> > > +#ifdef CONFIG_PRINTK_EXECUTION_CTX
+> > > +static inline void wctxt_load_execution_ctx(struct nbcon_write_context *wctxt,
+> > > +					    struct printk_message *pmsg)
+> > > +{
+> > > +	wctxt->pid = pmsg->pid;
+> > > +	wctxt->cpu = pmsg->cpu;
+> > > +}
+> > > +#else
+> > > +static inline void wctxt_load_execution_ctx(struct nbcon_write_context *wctxt,
+> > > +					    struct printk_message *pmsg) {}
+> > > +#endif
+> > > +
+> > >  /**
+> > >   * nbcon_emit_next_record - Emit a record in the acquired context
+> > >   * @wctxt:	The write context that will be handed to the write function
+> > > @@ -1048,6 +1060,8 @@ static bool nbcon_emit_next_record(struct nbcon_write_context *wctxt, bool use_a
+> > >  	/* Initialize the write context for driver callbacks. */
+> > >  	nbcon_write_context_set_buf(wctxt, &pmsg.pbufs->outbuf[0], pmsg.outbuf_len);
+> > >  
+> > > +	wctxt_load_execution_ctx(wctxt, &pmsg);
+> > > +
+> > >  	if (use_atomic)
+> > >  		con->write_atomic(con, wctxt);
+> > >  	else
+> > > diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
+> > > index 1d765ad242b8..ff47b5384f20 100644
+> > > --- a/kernel/printk/printk.c
+> > > +++ b/kernel/printk/printk.c
+> > > @@ -2213,6 +2213,26 @@ static u16 printk_sprint(char *text, u16 size, int facility,
+> > >  	return text_len;
+> > >  }
+> > >  
+> > > +#ifdef CONFIG_PRINTK_EXECUTION_CTX
+> > > +static inline void printk_save_execution_ctx(struct dev_printk_info *dev_info)
+> > > +{
+> > > +	dev_info->pid = task_pid_nr(current);
+> > > +	dev_info->cpu = smp_processor_id();
+> > > +}
+> > > +
+> > > +static inline void pmsg_load_execution_ctx(struct printk_message *pmsg,
+> > > +					   const struct dev_printk_info *dev_info)
+> > > +{
+> > > +	pmsg->pid = dev_info->pid;
+> > > +	pmsg->cpu = dev_info->cpu;
+> > > +}
+> > > +#else
+> > > +static inline void printk_save_execution_ctx(struct dev_printk_info *dev_info) {}
+> > > +
+> > > +static inline void pmsg_load_execution_ctx(struct printk_message *pmsg,
+> > > +					   const struct dev_printk_info *dev_info) {}
+> > > +#endif
+> > > +
+> > >  __printf(4, 0)
+> > >  int vprintk_store(int facility, int level,
+> > >  		  const struct dev_printk_info *dev_info,
+> > > @@ -2320,6 +2340,7 @@ int vprintk_store(int facility, int level,
+> > >  	r.info->caller_id = caller_id;
+> > >  	if (dev_info)
+> > >  		memcpy(&r.info->dev_info, dev_info, sizeof(r.info->dev_info));
+> > > +	printk_save_execution_ctx(&r.info->dev_info);
+> > >  
+> > >  	/* A message without a trailing newline can be continued. */
+> > >  	if (!(flags & LOG_NEWLINE))
+> > > @@ -3002,6 +3023,7 @@ bool printk_get_next_message(struct printk_message *pmsg, u64 seq,
+> > >  	pmsg->seq = r.info->seq;
+> > >  	pmsg->dropped = r.info->seq - seq;
+> > >  	force_con = r.info->flags & LOG_FORCE_CON;
+> > > +	pmsg_load_execution_ctx(pmsg, &r.info->dev_info);
+> > >  
+> > >  	/*
+> > >  	 * Skip records that are not forced to be printed on consoles and that
+> > > diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+> > > index ba36939fda79..197022099dd8 100644
+> > > --- a/lib/Kconfig.debug
+> > > +++ b/lib/Kconfig.debug
+> > > @@ -35,6 +35,17 @@ config PRINTK_CALLER
+> > >  	  no option to enable/disable at the kernel command line parameter or
+> > >  	  sysfs interface.
+> > >  
+> > > +config PRINTK_EXECUTION_CTX
+> > > +	bool
+> > > +	depends on PRINTK
+> > > +	help
+> > > +	  This option extends struct dev_printk_info to include extra execution
+> > 
+> > It should extend printk_info instead.
+> > 
+> > > +	  context in pritnk, such as task PID and CPU number from where the
+> > 
+> >                      printk
+> > 
+> > > +	  message originated. This is useful for correlating device messages
+> > 
+> > Rather than "device messages" I suggest "printk messages".
+> > 
+> > > +	  with specific execution contexts.
+> > > +
+> > > +	  One of the main user for this config is netconsole.
+> > 
+> > Rather than saying which drivers might support this, it would probably
+> > be better to make it explicit. For example introducing a new config
+> > like:
+> > 
+> > CONFIG_CONSOLE_HAS_EXECUTION_CTX
+> > 
+> > that can only be selected by the console driver (or in your case, the
+> > console driver option NETCONSOLE_DYNAMIC). Then make
+> > PRINTK_EXECUTION_CTX depend only on CONSOLE_HAS_EXECUTION_CTX. That way
+> > it is only available if the console driver supports it.
+> > 
+> > > +
+> > >  config STACKTRACE_BUILD_ID
+> > >  	bool "Show build ID information in stacktraces"
+> > >  	depends on PRINTK
+> > 
+> > While this patch might be "good enough" to preserve the current
+> > CONFIG_NETCONSOLE_DYNAMIC features for NBCON, I am not happy about it:
+> > 
+> > 1. It relies on the printer context being able to determine context
+> > information about the printk() caller. I would prefer adding the task
+> > name directly to printk_info instead.
+> 
+> Good question. I think that both appraches might have users.
+> I see the machines on the opposite sides of a spectrum.
+> 
+> a) Huge machines, with hunderds of CPUs and TBs of RAM, might afford
+>    allocation of more space for kernel messages. And it might be even
+>    useful when they run containers which are quickly comming and
+>    going.
+> 
+> b) Small embeded systems want to keep kernel message buffer as small
+>    as possible. I guess that they mostly run just few processes all
+>    the time. So the mapping PID <-> COMM is stable.
+> 
+> Let's see how complicated it would be to make this configurable.
+> 
+> > 2. It adds information to printk records that only netconsole can
+> > use. If we want other consoles to support this, we would need to modify
+> > all the console code. I would prefer it is dynamically added to the
+> > generic printing text. We could do this by extending
+> > msg_print_ext_body() based on some user configuration. But it would
+> > conflict with the current netconsole format.
+> > 
+> > Despite my concerns, adding the PID and CPU information is generally
+> > useful. So I am not against expanding printk_info. My concerns are more
+> > about how this information is being used by netconsole.
+> 
+> I agree. I see how useful is even the current print_caller() which
+> shows either PID or CPU number depending on the context. And it does
+> not make sense to store this info twice.
+> 
+> If we were adding this info, I would add it for all users, definitely.
+> We are going to touch the internal printk ringbuffer format anyway.
+> Now, the main question is how far we want to go.
+> 
+> I see the following possibilities:
+> 
+> A) caller_id -> pid + cpu + atomic/task context bit
+> ===================================================
+> 
+> A) caller_id -> pid + cpu + contex
+  ^
+  Should have been B /o\
+> ==================================
+> 
+> Same as above but the caller context info is stored separately and
+> might allow to distinguish more types. Something like:
+> 
+> diff --git a/kernel/printk/printk_ringbuffer.h b/kernel/printk/printk_ringbuffer.h
+> index 4ef81349d9fb..44aa60a3f84c 100644
+> --- a/kernel/printk/printk_ringbuffer.h
+> +++ b/kernel/printk/printk_ringbuffer.h
+> @@ -9,6 +9,19 @@
+>  #include <linux/stddef.h>
+>  #include <linux/types.h>
+>  
+> +#define PRINTK_CALLER_CTXT_PREEMPT_BIT		1
+> +#define PRINTK_CALLER_CTXT_SOFTIRQ_BIT		2
+> +#define PRINTK_CALLER_CTXT_HARDIRQ_BIT		3
+> +#define PRINTK_CALLER_CTXT_NMI			4
+> +/* This is not supported on all platforms, see irqs_disabled() */
+> +#define PRINTK_CALLER_CTXT_IRQS_DISABLED	5
+> +
+> +struct printk_caller {
+> +	u8	ctxt;	/* caller context: task, irq, ... */
+> +	pid_t	pid;	/* caller pid */
+> +	int	cpu;	/* caller CPU number */
+> +};
+> +
+>  /*
+>   * Meta information about each stored message.
+>   *
+> @@ -22,8 +35,8 @@ struct printk_info {
+>  	u8	facility;	/* syslog facility */
+>  	u8	flags:5;	/* internal record flags */
+>  	u8	level:3;	/* syslog level */
+> -	u32	caller_id;	/* thread id or processor id */
+>  
+> +	struct printk_caller caller;
+>  	struct dev_printk_info	dev_info;
+>  };
+>  
+> 
+> C) caller_id -> pid + cpu + comm + atomic/task context bit
+> ==========================================================
+> 
+> Similar to A and B but add also
+> 
+> 	char comm[TASK_COMM_LEN];
+> 
+> into struct printk_caller.
+> 
+> 
+> D) caller_id -> pid + cpu + comm + atomic/task context bit
+>    and move printk_caller + printk_dev_info into text buffer
+>    as suggested as mentioned at
+>    https://lore.kernel.org/lkml/84y10vz7ty.fsf@jogness.linutronix.de
+> ====================================================================
+> 
+> My opinion:
+> ===========
+> 
+> I personally think that the approach B) is the best compromise for now
+> because:
+
+Note that my proposed code shown only how to store the information
+so that it was available for the netconsole.
+
+Once we decide how to store it then we could talk about how to show
+it on other consoles and via /dev/kmsg. All the proposals allowed
+to keep the output backward compatible for now.
+
+Best Regards,
+Petr
 
