@@ -1,65 +1,55 @@
-Return-Path: <netdev+bounces-248308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05D8DD06C48
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 02:49:10 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E2AED06C69
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 02:54:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ABE773039AC3
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 01:49:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 22B0930399B9
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 01:54:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71F8E205E26;
-	Fri,  9 Jan 2026 01:49:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69C4F23A99F;
+	Fri,  9 Jan 2026 01:53:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pfgr/RA4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B4NxBbCe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49657184524;
-	Fri,  9 Jan 2026 01:49:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46FA11B4223;
+	Fri,  9 Jan 2026 01:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767923345; cv=none; b=LuO7pqitpoQU0Pu+zPzZ432Bqz1hwluoBRh0KYQ2BwVAb7kign2XgYsPzzXUPHN+/9Qg2iEzcc3sgx/2raAYi5hhB+te+/kVQtLMBpfvsHu8SxubITof4b0Inj5OIolf1fhaQk7O6rozCmtT00I/0gvTrzpN8GeulDFgotXUSyk=
+	t=1767923639; cv=none; b=OIMj0nKZBB6+8fgwSCaPc7n6W/i5rMc67v0g30LM/jMQfq48ZvmwCEaabp2UDhuvat/NCQPNK/ptrYJzLJ2v1KQP7YrU/2D1NlPj5drxmwrUWrde1ujc8JTS3tFYfShwvIE6/8vTRVZBxl1LyG8DIhl4CU35IgUfPjhBTvW3+MQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767923345; c=relaxed/simple;
-	bh=TKAtAkkRkG3fIlVVD7i881OYAVyJfLwxsk9rNKjwkKQ=;
+	s=arc-20240116; t=1767923639; c=relaxed/simple;
+	bh=9js/tucdgd1QhyQtfDMt6pyRupJeeRIaYQbve9E1rK4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JzMh0Rvc52mKRt30oyEqqNvMkxdOvdaI5KvCIYcemEDOgEd1aNkp5X0y3uUnnO4fdsbvjbSg1Oi38rZ5ux7D2YO4q8lKvTX1f/j4XmT2KQOS/g0hOgOHC9z3ORdcw3omhZSwL8xRX2SM65TvSZnqM10HC5L8/GDDwBv7TJyE3mU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pfgr/RA4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3DE1C116C6;
-	Fri,  9 Jan 2026 01:49:03 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Dob1F1alP77DyctiR3HhryPj1HkojE72IWQc57gwOVnkNgRBzW/TFDd9Xo0GOYS6JZ7gRUx3Wr6lOb4nH1ual+Er01rBgx+3CX1j1WdxDCM1+s4KsuIQTcRzgXDyGmlPlPGITIvtEPU9JeM8r1fmYQziOsQmJEHzqlNRFBZwNdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B4NxBbCe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69D9CC116C6;
+	Fri,  9 Jan 2026 01:53:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767923344;
-	bh=TKAtAkkRkG3fIlVVD7i881OYAVyJfLwxsk9rNKjwkKQ=;
+	s=k20201202; t=1767923638;
+	bh=9js/tucdgd1QhyQtfDMt6pyRupJeeRIaYQbve9E1rK4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pfgr/RA4t57U139lrC8Rf6eTR9TslDzmFV+X989mU+i4FTTfrc1mnVFv48A+gViZJ
-	 TnXGsf3Qpbvz/NDi/gHa1ky+4kKzL5F6W6W/bHx1KklWp8vLuakM119lB1u5LDqGgB
-	 9mtuvrFMQQNy5EeFD7wPbj3Jv28lGL36AG3tFIEDhuhUn8/IttJIx1Te45ycuusypV
-	 htlT2m4LmgY5hHHzPAURiCahSqsNqmRCN+pxp5qGNjQXBD3hoKAQo1l96usEYi2ipK
-	 CZwfDheE9koL+0ta44SRCdjYTOYO3HgAhZoIHIaomumWoJuwOWVF6wXWffhSr2CWl1
-	 5PWhbgZ8s2gdA==
-Date: Thu, 8 Jan 2026 17:49:03 -0800
+	b=B4NxBbCeGivUGwuqv5urifCLCWsgGmlkdHuCuTb5xbFr6xI4/dsAh49VAo38wPx61
+	 nhcD+KYCaob3IpQNSHyuvCmax7J26Ym6IgF/wZZ0H8NY8JG/ykSsgU7vUmlfsXNJuM
+	 Q5+NL0F5mCG/dnE4SmHUhVvAfVFhKpsju/vJvuS9GxWdOh+XZhDGSqDkJWnrrwnclb
+	 TXpaeT/eP18AvcUHeQfF3kg8/i1hErpqC088Gg1KKhTi2leyKf96mlr1CTJdBciNkr
+	 d88Ld4k5HNM+du2M5u8v1MNL1+TxqMPaXGkb01+F+CW1Hv4V1iZPJIu36MFxl9shVs
+	 8En2SunPPKufQ==
+Date: Thu, 8 Jan 2026 17:53:57 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
- Simon Horman <horms@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
- <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- kernel-team@cloudflare.com
-Subject: Re: [PATCH bpf-next v3 00/17] Decouple skb metadata tracking from
- MAC header offset
-Message-ID: <20260108174903.59323f72@kernel.org>
-In-Reply-To: <87ecnzj49h.fsf@cloudflare.com>
-References: <20260107-skb-meta-safeproof-netdevs-rx-only-v3-0-0d461c5e4764@cloudflare.com>
-	<20260108074741.00bd532f@kernel.org>
-	<87ecnzj49h.fsf@cloudflare.com>
+To: Tuo Li <islituo@gmail.com>
+Cc: ayush.sawal@chelsio.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, kernelxing@tencent.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] chcr_ktls: add a defensive NULL check to prevent a
+ possible null-pointer dereference in chcr_ktls_dev_del()
+Message-ID: <20260108175357.52ad56c1@kernel.org>
+In-Reply-To: <20260106123302.166220-1-islituo@gmail.com>
+References: <20260106123302.166220-1-islituo@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,20 +59,27 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 08 Jan 2026 20:25:30 +0100 Jakub Sitnicki wrote:
-> Man, that makes me think I'm a terrible speaker.
-> Or you just missed my talk :-)
+On Tue,  6 Jan 2026 20:33:02 +0800 Tuo Li wrote:
+> In this function, u_ctx is guarded by an if statement, which indicates that
+> it may be NULL:
+> 
+>   u_ctx = tx_info->adap->uld[CXGB4_ULD_KTLS].handle;
+>   if (u_ctx && u_ctx->detach)
+>     return;
+> 
+> Consequently, a potential null-pointer dereference may occur when
+> tx_info->tid != -1, as shown below:
+> 
+>   if (tx_info->tid != -1) {
+>     ...
+>     xa_erase(&u_ctx->tid_list, tx_info->tid);
+>   }
+> 
+> Therefore, add a defensive NULL check to prevent this issue.
 
-You're a great speaker, but not necessarily listener ;)
-IIRC there was no time for discussion
-
-> </joke>
-
-> If it is the overall approach that feels wrong, I'm definitely open to
-> discussing alternatives.
-
-To reduce the one-off feeling of the mechanism it'd be great to shove
-this state into an skb extension for example. Then if we optimize it
-and possibly make it live inline in the frame all the other skb
-extensions will benefit too.
+There seems to be no locking here.
+It'd take much more to make this code safe, sprinking random ifs
+here and there seem like a waste of time.
+-- 
+pw-bot: reject
 
