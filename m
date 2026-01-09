@@ -1,130 +1,141 @@
-Return-Path: <netdev+bounces-248442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC22FD08852
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 11:23:05 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FE42D088E1
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 11:28:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 700B9301670F
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 10:23:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1B67A3007E47
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 10:26:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14DCF33508A;
-	Fri,  9 Jan 2026 10:23:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FA213370EF;
+	Fri,  9 Jan 2026 10:26:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MmL0xntQ"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="kF+7bg0L";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Zw0Cnk6b"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from fout-b5-smtp.messagingengine.com (fout-b5-smtp.messagingengine.com [202.12.124.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9233019BA
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 10:23:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68BC53382E4
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 10:26:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767954184; cv=none; b=loz2+eGPNT1izvoIx8NoJYEvouQUuXx/7GpU5gktefkrR0HCzzHhnMf9JM1TBh9CecVCkbAY2EeQmn6C7nVcWyJDv+HQ2adntAXo1phmTWmgdWImresslMcKOckEEdC1Wy6r4u7TO9KTw1qcmwq2NOZyW1iYAhsQv62Pu8KgkrA=
+	t=1767954418; cv=none; b=iQ1oiSieYLUgqhGgDbmQvcCgDxa3TaqMAEwhYx/1rUZgVy+cz/NTVu4j5h4iPyZX6YHlCHkl9DVYN8iLjiXP6J75nbBIZPvpOILlA90r+Ia9Am3xyey9XubxPepsJAR4T++Lq2uA9xbUyu0HHj7cThhSW3ZEgECLoRc/jl1muqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767954184; c=relaxed/simple;
-	bh=EEGmoGqBV9GfkkOjO9oHg2qhXiEtLKEgQ9u8EJUQbKE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n/X1zhz95WAW8NEa/Pfh6iMf5hrir/w0+MfWG0EF0xNpJ+iPBGqfvcmL9f3jU4vGoVMqzewdOcUEI2DOS+P7Q93pfF63EbfVvnyRp3N3Y7vGPUKqy6J/pKBt1OmL2Ay7u1mhcyULEknwUc+wGttwA5yLRUfmS9rSsAcD7HXqlew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MmL0xntQ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767954181;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PgTuGSJqZ1fMkiPNSGvIy/EFwwr4d2ZCO17UacaOjNc=;
-	b=MmL0xntQxP+yVUCOeILo5d1fS8Nish7I988+/Ve+QJrUaM1L9+V6Jsy7TbZhklaI29qMip
-	7LhokfXdaevgKCIx6yZjm+sLFVcgbc4qUS6dG5pcqiRObpGMYFRd5GcHayerzcjyufswG0
-	PoPN7gEF2IdLBuw4Tpq91xHEOsgj3Js=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-519-DfkO9NcCMtSPK9fQ5b93Rg-1; Fri,
- 09 Jan 2026 05:23:00 -0500
-X-MC-Unique: DfkO9NcCMtSPK9fQ5b93Rg-1
-X-Mimecast-MFC-AGG-ID: DfkO9NcCMtSPK9fQ5b93Rg_1767954177
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 51BC01956096;
-	Fri,  9 Jan 2026 10:22:56 +0000 (UTC)
-Received: from [10.44.32.135] (unknown [10.44.32.135])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 793241956048;
-	Fri,  9 Jan 2026 10:22:48 +0000 (UTC)
-Message-ID: <25f49485-2228-4aa5-9023-0b00cc10a4da@redhat.com>
-Date: Fri, 9 Jan 2026 11:22:47 +0100
+	s=arc-20240116; t=1767954418; c=relaxed/simple;
+	bh=Snq+umPomX9fyavkvRRyaT2n0isrX93YrXdSoU9OwMM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e0TbJVsP6iOEfFC0p1Pgut06wNP+Yk0DnkunZLXF0loEQCRgkesG0F9qz/8ZY2y81Vxz97WcrCgBU4qaTbX5ZVJiijITbuNJQX9h8xBxs1evalm1X9DtfAFxkW1O5Ymjs0oU6rYY0rdQTZd+X9/JHwcUJywBobXKURjVXUI3xro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=kF+7bg0L; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Zw0Cnk6b; arc=none smtp.client-ip=202.12.124.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfout.stl.internal (Postfix) with ESMTP id 75FD21D00130;
+	Fri,  9 Jan 2026 05:26:54 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-05.internal (MEProxy); Fri, 09 Jan 2026 05:26:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1767954414; x=
+	1768040814; bh=aZINNoLVZ+Mwd+rayagnxMm/756a0J8Sm4oNGlDsEoc=; b=k
+	F+7bg0LXPxzC7Lnh8MuTVqkHmLjDw+2yaL0JTAE/i9xUUOwoXv9Bm+2f/WNu8zRY
+	f2AwSuPi7qXUCXj2PRtfpYl5uPI8twUMnI9dthJL3bWIzKcGnQ4L589R2YjuXEF0
+	uJsu3WOQ6VPaTDckIWY+RIshT9IGEird7lGy/mUezziKjqf/35MDWRCtdXk1FcSs
+	oFqkwQpBRxqDRNZ9aAT8kJerQ0mmDo73WJvDqFcjuCyrlTHT6jXAct+c28rp67qZ
+	ewkzuxLSkqPMvBIarotQKjF2U7eze5pU2DpimBm7eZjLra3k9UTAZyZC828fZ0e9
+	87Dg4jshJGMJ6NZo0yCYg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1767954414; x=1768040814; bh=aZINNoLVZ+Mwd+rayagnxMm/756a0J8Sm4o
+	NGlDsEoc=; b=Zw0Cnk6bk2+O6Mc0ZgmXzE7Asbb4JoFmQRBD1mK0guoaeKyFXCm
+	qOLm7rl+fAKMGJYFHX4I1z+qWeFPkJC6pr8gNxM/je65GlXDjppZQVYRA8Vsxz8O
+	JNaBOAcVQXqHPWTHUG6mhUxUjC+3tVpoKkGDacyrsq6iv39AcuxP5V/lCGjaAGL2
+	5Hv4rWVOzPQcV9YIgr69CioAv8O1w9yDorHMKj9oaKYSlQZSNqf9Tvx8LlrKAA0E
+	00PasjCJYNdHrPcRwYfLLPjh7tE9XRbro3mDNCGc3o3u5zyZjRLsiYBCjPA3M1da
+	ZuTXN8g8/OcrulDPejgpdJOCmwPZ6g4nDZw==
+X-ME-Sender: <xms:7ddgaR6kGfiPgkuc2fHOtxqwZ3NcelLG7f_s0jnUc_yrBGknEIKVWg>
+    <xme:7ddgad_Pbop4B16lnPE2eFYhVCVXZRqFBacrgbOxhdFDXbQB4GGVwzWZxoN5Fx3lY
+    -pEf4s1VkzTrr5O0tIlHl4rvWn1lkasigh1RmoXfPpCx3nRY-PcAydV>
+X-ME-Received: <xmr:7ddgaeqZERfcEr9x_fS-UVwUmDaf_4jPGewyjbgcht7Tvf_79xJBkUjKQALL>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddutdekheejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeekpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopegtrhgrthhiuhesnhhvihguihgrrdgtohhmpd
+    hrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
+    oheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvg
+    hmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohho
+    ghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpth
+    htohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguthgrthhulhgv
+    rgesnhhvihguihgrrdgtohhm
+X-ME-Proxy: <xmx:7ddgaWriZ-d-7f2LgDItkwWiBduOvdVG8Wyl6TZeHjNKuba4BPJR4g>
+    <xmx:7ddgaZ0xnaqkKJ6TXytz2Uj30sZRWwShCGzNuJM-XXGts2ZZ1TLeig>
+    <xmx:7ddgacEr9aKPSixVv0i1TzOqRIO8e2olPAIp9-EgRbtg8DIYDn_Lgw>
+    <xmx:7ddgacFXYt59tvro7qoLgsLn2JBFlTW5bDF3aKR678_mNiUbWX42_g>
+    <xmx:7tdgaSGpKVIecU3opd5VJ31Sg-QHqorzk0E9Tls0IXJmh1yEkp8jMq22>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 9 Jan 2026 05:26:53 -0500 (EST)
+Date: Fri, 9 Jan 2026 11:26:51 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [PATCH net] macsec: Support VLAN-filtering lower devices
+Message-ID: <aWDX64mYvwI3EVo4@krikkit>
+References: <20260107104723.2750725-1-cratiu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 03/12] dpll: Add helpers to find DPLL pin fwnode
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
- Jonathan Lemon <jonathan.lemon@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org,
- Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>,
- Grzegorz Nitka <grzegorz.nitka@intel.com>
-References: <20260108182318.20935-1-ivecera@redhat.com>
- <20260108182318.20935-4-ivecera@redhat.com>
- <20260109-cooperative-chinchilla-of-swiftness-aebbc8@quoll>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <20260109-cooperative-chinchilla-of-swiftness-aebbc8@quoll>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260107104723.2750725-1-cratiu@nvidia.com>
 
-
-
-On 1/9/26 10:55 AM, Krzysztof Kozlowski wrote:
-> On Thu, Jan 08, 2026 at 07:23:09PM +0100, Ivan Vecera wrote:
->> Add helper functions to the DPLL core to retrieve a DPLL pin's firmware
->> node handle based on the "dpll-pins" and "dpll-pin-names" properties.
->>
->> * `fwnode_dpll_pin_node_get()`: matches the given name against the
->>    "dpll-pin-names" property to find the correct index, then retrieves
->>    the reference from "dpll-pins".
->> * `device_dpll_pin_node_get()`: a wrapper around the fwnode helper for
->>    convenience when using a `struct device`.
->>
->> These helpers simplify the process for consumer drivers (such as Ethernet
->> controllers or PHYs) to look up their associated DPLL pins defined in
->> the DT or ACPI, which can then be passed to the DPLL subsystem to acquire
->> the pin object.
->>
->> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
->> ---
->>   drivers/dpll/dpll_core.c | 20 ++++++++++++++++++++
->>   include/linux/dpll.h     | 15 +++++++++++++++
->>   2 files changed, 35 insertions(+)
->>
+2026-01-07, 12:47:23 +0200, Cosmin Ratiu wrote:
+> VLAN-filtering is done through two netdev features
+> (NETIF_F_HW_VLAN_CTAG_FILTER and NETIF_F_HW_VLAN_STAG_FILTER) and two
+> netdev ops (ndo_vlan_rx_add_vid and ndo_vlan_rx_kill_vid).
 > 
-> I don't see cells defined in your binding. Neither updated property.c.
+> Implement these and advertise the features if the lower device supports
+> them. This allows proper VLAN filtering to work on top of macsec
+> devices, when the lower device is capable of VLAN filtering.
+> As a concrete example, having this chain of interfaces now works:
+> vlan_filtering_capable_dev(1) -> macsec_dev(2) -> macsec_vlan_dev(3)
 > 
-WDYM by property.c ?
+> Before the "Fixes" commit this used to accidentally work because the
+> macsec device (and thus the lower device) was put in promiscuous mode
+> and the VLAN filter was not used. But after that commit correctly made
+> the macsec driver expose the IFF_UNICAST_FLT flag, promiscuous mode was
+> no longer used and VLAN filters on dev 1 kicked in. Without support in
+> dev 2 for propagating VLAN filters down, the register_vlan_dev ->
+> vlan_vid_add -> __vlan_vid_add -> vlan_add_rx_filter_info call from dev
+> 3 is silently eaten (because vlan_hw_filter_capable returns false and
+> vlan_add_rx_filter_info silently succeeds).
 
-Thanks,
-Ivan
+We only want to propagate VLAN filters when macsec offload is used,
+no? If offload isn't used, the lower device should be unaware of
+whatever is happening on top of macsec, so I don't think non-offloaded
+setups are affected by this?
 
+Even when offload is used, the lower device should probably handle
+"ETH + VLAN 5" differently from "ETH + MACSEC + VLAN 5", but that may
+not be possible with just the existing device ops.
+
+-- 
+Sabrina
 
