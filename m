@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-248451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ED84D0897F
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 11:34:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 156F7D0898D
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 11:35:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 114A13008540
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 10:32:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 53034308AF26
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 10:32:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DD7433AD9D;
-	Fri,  9 Jan 2026 10:31:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA71733B96F;
+	Fri,  9 Jan 2026 10:31:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="YOVuLBep"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="ZZg8WXYe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6031333B6F6;
-	Fri,  9 Jan 2026 10:31:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF53933B940;
+	Fri,  9 Jan 2026 10:31:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767954710; cv=none; b=EhspIvzI2f8ZA74FwifwnfQGVu/0fnOpf+NhUVRJR0+TxOf5t42J6uFPm3kb90+O6r5Y1/gx8XVtrl9+TlSepPDYRXSLkmyWz3mkzN1faTojaazMfzZKp4WkJXvCcXDBo4UlFLqQ6SilFadHnGRc7mywk2sPB/mVZsbO2uToJKI=
+	t=1767954712; cv=none; b=k3nteNyJcR90r0yWMWMcl6inU/TLpgJ/PMfJpNvLM507oEm+v6NYVl7QdpLtRJD68h4EczTqzduQn2bSw+uO0SYwXWh2cHYb2ej5RuyVYNCBs467kB0ySUlzUZLy6wnAz4iSIRIY/0iuyaokBr+RFZ6tYR4fOBs8B9NwucUmNHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767954710; c=relaxed/simple;
-	bh=4XAmYoZ21y8NKb53o49wIwTc30wepgv/ny3+RJxWAOg=;
+	s=arc-20240116; t=1767954712; c=relaxed/simple;
+	bh=ONpyeSJ4R/S9DX4kJSbgbvCffb7gEjo1nsjoXd8RHOw=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tWsVt58sea1nvjMp6GDrzvcV3amyoMEK1fdeX5ud3p0nK0RtvdtAMICCqAU/lfsyvYbyHnY1HsuaiHbbLluFYs5WHn9pYJGrTxXH5EboQRFFuwOzG8t9wO0TZ/5bGnnixFhj0uoyg+fbf6P7FRKX7xU8iEizowTp8LrG83PCj1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=YOVuLBep; arc=none smtp.client-ip=67.231.148.174
+	 MIME-Version:Content-Type; b=VavqOI6HHqt2zZWKMpVViA09KNqc2ssnJtIfCx3yZVL1wTKSVDVQ6FiAjuce2/gIHjTp4JSgL4pTbrkVMyXvlt4lIYH5KdwKZ90dx3Q3LQ25zDqbhJnEjoL+GLAk+ekrva4AkXuWstyjZudX27SfbbBZY21NDXM9DMZB2N1xlIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=ZZg8WXYe; arc=none smtp.client-ip=67.231.148.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 608NSs3T832412;
-	Fri, 9 Jan 2026 02:31:39 -0800
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6093EZqg2938365;
+	Fri, 9 Jan 2026 02:31:42 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=+
-	/y/wrfklGhqQt+x0d5xBO45MM5I/V5bNVjuIISuyGQ=; b=YOVuLBepi5iprj/vw
-	sKKN5j/sj4aTYCRHRK5I8BbxNZy6hgVznjsPacStL6TiivXDNOyHFDpi6MMmxqJi
-	tHKXKzsPwvgTm8xhB6JzvngO4R8ahS2e1whN2N89WWV5GFKGdVU6MzggzDzsSyI5
-	OkEpFJi61iTDrgRZNvtrs7VBMfPkHhtTzoIl4OjZc5J4GygubioI6YQUirS1o/F0
-	FOaObd9uqL8b525o0iiCbZ7FBEXrDRgmJN/hEualm9kh+4Bdee0rGPY9pqGb9YHU
-	aUIzspA8GfkSCczAJto4+egKj0Hc1auAEzEXCoss8nlN/rcAuiRM+3K4w71Nau+2
-	J35Cg==
+	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=n
+	L/FaaAb7LBDAKquHGbF3eSw7/ajs7IfOmO2Hl8/l3k=; b=ZZg8WXYe4Yi4gTR5n
+	0m8Nxhl2KodLZuWEjj8kCHvtZcFmlwmXt2xnZ2+6NgQ3opKZNTxh8ijowlWvQhtw
+	wBnGsqdWYSag8VhcmisyNLhOsviVeRq337WZ20kgZZw3e07itlMYCy8WLSw0FyPi
+	7mKmJk1FEXMBcjSd+w9BzBHJ1MXxjwB/3kNgb0hi1bAiMgXU08BUdt0kv785SoDM
+	6XElljwv9bqS32chinepffD8NuengGQkVsS5oPohKXmHEDQINp6zojBJfmUasdwK
+	8GITovESASvtcQmohpwRaNPHF0f4gyeYVHZWLuIuVfJz1HeKYlR9DOV2In7Pw7+0
+	p4T/A==
 Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4bjp9r970d-1
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4bhwh2vmvw-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 09 Jan 2026 02:31:39 -0800 (PST)
+	Fri, 09 Jan 2026 02:31:42 -0800 (PST)
 Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
  DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Fri, 9 Jan 2026 02:31:53 -0800
+ 15.2.1544.25; Fri, 9 Jan 2026 02:31:56 -0800
 Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
  (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Fri, 9 Jan 2026 02:31:53 -0800
+ Transport; Fri, 9 Jan 2026 02:31:56 -0800
 Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id A00083F7089;
-	Fri,  9 Jan 2026 02:31:35 -0800 (PST)
+	by maili.marvell.com (Postfix) with ESMTP id EDA9B5B692B;
+	Fri,  9 Jan 2026 02:31:38 -0800 (PST)
 From: Ratheesh Kannoth <rkannoth@marvell.com>
 To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
 CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
         <kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
         "Ratheesh
  Kannoth" <rkannoth@marvell.com>
-Subject: [PATCH net-next v3 06/10] octeontx2-pf: switch: Register for notifier chains.
-Date: Fri, 9 Jan 2026 16:00:31 +0530
-Message-ID: <20260109103035.2972893-7-rkannoth@marvell.com>
+Subject: [PATCH net-next v3 07/10] octeontx2: switch: L2 offload support
+Date: Fri, 9 Jan 2026 16:00:32 +0530
+Message-ID: <20260109103035.2972893-8-rkannoth@marvell.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260109103035.2972893-1-rkannoth@marvell.com>
 References: <20260109103035.2972893-1-rkannoth@marvell.com>
@@ -76,73 +76,430 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=e58LiKp/ c=1 sm=1 tr=0 ts=6960d90b cx=c_pps
+X-Proofpoint-GUID: O1o5PlQPgeXXWR8hof97moDsUunYDK5S
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA5MDA3NiBTYWx0ZWRfXyLIHaQYWSG+h
+ IGS6I5/W3gQFCBsNHQCbxKZQPwt7C5N2B2NGFhXNalVSeE63e6q3Ioyd8Udu/azj8R7vj1KnCZ5
+ b5ehi3HgHIn6O3kSH3TtCmzBjrt5RcXcUGVnKGt0QzqBsFsMbk+oAa4PhjzsEds7KP+B6j7wagt
+ 30CLPPU6HcFdxfg/LduW9yrXAt+DTsjb1nMOocflBD29DDx7SfKI/YKy9xg86AiIbNdvwXcz55m
+ GA8+k9U6BTiPow49Ld44utnSmjSfKbwtWKfFgOc6/+bR86kmZhoeZ0MVcyGwFu+r5Tx9c0T+0jq
+ vcvwI+c0DbYsHxU0RSHCWwm1AM8Vzzvr1MS3k3mxETpkIA7Oxcno4R22EFcRid76yR/2nrbP9ZL
+ 7IYZr4TwxfKaafhTh/0AC20jV9NZ5XSvdYatHGlbTNfEOuUNDcyGDSvJAtW4zobXzqRNGIAIgTp
+ qgIaGqOk/gxUzW4N/Zg==
+X-Authority-Analysis: v=2.4 cv=ROO+3oi+ c=1 sm=1 tr=0 ts=6960d90e cx=c_pps
  a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
- a=8MKmJXxhQqrjLFTQZSMA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: ytZGaxibuNec32VDTC23_JQsoPgQqTn-
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA5MDA3NiBTYWx0ZWRfXy54kagMOR0wG
- ZNPnUu7IP3wDhaT17c5rA5riHhv3492aJWn/0ICcK3UOw7XwrtztqPtj9hn7xjQ95iRJY5UE3PJ
- uPkIiuLo/WHkst6URvo466ZHSHFFVMDq5lqrmb7L2Ul3mJX99DlY/EJRGlVGezsNIJ/TIaTDDqT
- YlBl6r9lrgeNMY5PP7aNaIaPi3fgVV+NfriUgr68pmE5YoqGFs8Wr33vbk5SwdsqmIKbc8xLq9l
- 71zZg4qx/cptDg5a2SWc9iqAoUHu6YRW3g0/lqlod81PvlfbVuetE+OC0/f/uTua8QFCma/CPy1
- gXaKdld5ytuQeBeveQpwkSFRYvlMZgHVGYzeyaSEtUmKJgNF6fpz7sztjudc4eWJCSZRiNilcL/
- WDN9/ZxfH8AL7xtLeK/Qwpeu8m8uz5/IdzedHiSw5u4mSu6rw9bVOKgZzzcmhLwoQeht5vAwWBw
- JFlLUzEYDyX3sKBGM7A==
-X-Proofpoint-GUID: ytZGaxibuNec32VDTC23_JQsoPgQqTn-
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8 a=zjSZ3cS-AAAA:8
+ a=cAmSjuAziB4ZO2rpmfEA:9 a=OBjm3rFKGHvpk9ecZwUJ:22 a=ZdzWmiyDu4ucoLeQK2uw:22
+X-Proofpoint-ORIG-GUID: O1o5PlQPgeXXWR8hof97moDsUunYDK5S
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2026-01-09_03,2026-01-08_02,2025-10-01_01
 
-Switchdev flow table needs information on 5tuple information
-to mangle/to find egress ports etc. PF driver registers for fdb/fib/netdev
-notifier chains to listen to events. These events are parsed and sent
-to switchdev HW through mbox events.
+Linux bridge fdb events are parsed to decide on DMAC to fwd
+packets. Switchdev HW flow table is filled with this information.
+Once populated, all packet with DMAC will be accelerated.
 
 Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 ---
- .../net/ethernet/marvell/octeontx2/nic/rep.c  |   7 +
- .../marvell/octeontx2/nic/switch/sw_nb.c      | 622 +++++++++++++++++-
- .../marvell/octeontx2/nic/switch/sw_nb.h      |  23 +-
- 3 files changed, 648 insertions(+), 4 deletions(-)
+ .../net/ethernet/marvell/octeontx2/af/rvu.c   |   1 +
+ .../marvell/octeontx2/af/switch/rvu_sw.c      |  18 +-
+ .../marvell/octeontx2/af/switch/rvu_sw_l2.c   | 270 ++++++++++++++++++
+ .../marvell/octeontx2/af/switch/rvu_sw_l2.h   |   2 +
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |  17 ++
+ .../marvell/octeontx2/nic/switch/sw_fdb.c     | 127 ++++++++
+ .../marvell/octeontx2/nic/switch/sw_fdb.h     |   5 +
+ .../marvell/octeontx2/nic/switch/sw_nb.c      |   5 +-
+ 8 files changed, 441 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-index 9200198be71f..0edbc56ae693 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-@@ -15,6 +15,7 @@
- #include "cn10k.h"
- #include "otx2_reg.h"
- #include "rep.h"
-+#include "switch/sw_nb.h"
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+index 6b61742a61b1..95decbc5fc0d 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+@@ -2460,6 +2460,7 @@ static void __rvu_mbox_up_handler(struct rvu_work *mwork, int type)
  
- #define DRV_NAME	"rvu_rep"
- #define DRV_STRING	"Marvell RVU Representor Driver"
-@@ -399,6 +400,7 @@ static void rvu_rep_get_stats64(struct net_device *dev,
+ 		switch (msg->id) {
+ 		case MBOX_MSG_CGX_LINK_EVENT:
++		case MBOX_MSG_AF2PF_FDB_REFRESH:
+ 			break;
+ 		default:
+ 			if (msg->rc)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.c b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.c
+index 533ee8725e38..b66f9c2eb981 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.c
+@@ -7,6 +7,8 @@
  
- static int rvu_eswitch_config(struct otx2_nic *priv, u8 ena)
+ #include "rvu.h"
+ #include "rvu_sw.h"
++#include "rvu_sw_l2.h"
++#include "rvu_sw_fl.h"
+ 
+ u32 rvu_sw_port_id(struct rvu *rvu, u16 pcifunc)
  {
-+	struct net_device *netdev = priv->netdev;
- 	struct devlink_port_attrs attrs = {};
- 	struct esw_cfg_req *req;
+@@ -16,7 +18,7 @@ u32 rvu_sw_port_id(struct rvu *rvu, u16 pcifunc)
+ 	rep_id  = rvu_rep_get_vlan_id(rvu, pcifunc);
  
-@@ -414,6 +416,11 @@ static int rvu_eswitch_config(struct otx2_nic *priv, u8 ena)
- 	memcpy(req->switch_id, attrs.switch_id.id, attrs.switch_id.id_len);
- 	otx2_sync_mbox_msg(&priv->mbox);
- 	mutex_unlock(&priv->mbox.lock);
+ 	port_id = FIELD_PREP(GENMASK_ULL(31, 16), rep_id) |
+-		  FIELD_PREP(GENMASK_ULL(15, 0), pcifunc);
++		FIELD_PREP(GENMASK_ULL(15, 0), pcifunc);
+ 
+ 	return port_id;
+ }
+@@ -25,5 +27,17 @@ int rvu_mbox_handler_swdev2af_notify(struct rvu *rvu,
+ 				     struct swdev2af_notify_req *req,
+ 				     struct msg_rsp *rsp)
+ {
+-	return 0;
++	int rc = 0;
 +
-+#if IS_ENABLED(CONFIG_OCTEONTX_SWITCH)
-+	ena ? sw_nb_register(netdev) : sw_nb_unregister(netdev);
-+#endif
++	switch (req->msg_type) {
++	case SWDEV2AF_MSG_TYPE_FW_STATUS:
++		rc = rvu_sw_l2_init_offl_wq(rvu, req->pcifunc, req->fw_up);
++		break;
++
++	case SWDEV2AF_MSG_TYPE_REFRESH_FDB:
++		rc = rvu_sw_l2_fdb_list_entry_add(rvu, req->pcifunc, req->mac);
++		break;
++	}
++
++	return rc;
+ }
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.c b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.c
+index 5f805bfa81ed..f99c9e86a25c 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.c
+@@ -4,11 +4,281 @@
+  * Copyright (C) 2026 Marvell.
+  *
+  */
++
++#include <linux/bitfield.h>
+ #include "rvu.h"
++#include "rvu_sw.h"
++#include "rvu_sw_l2.h"
++
++#define M(_name, _id, _fn_name, _req_type, _rsp_type)			\
++static struct _req_type __maybe_unused					\
++*otx2_mbox_alloc_msg_ ## _fn_name(struct rvu *rvu, int devid)		\
++{									\
++	struct _req_type *req;						\
++									\
++	req = (struct _req_type *)otx2_mbox_alloc_msg_rsp(		\
++		&rvu->afpf_wq_info.mbox_up, devid, sizeof(struct _req_type), \
++		sizeof(struct _rsp_type));				\
++	if (!req)							\
++		return NULL;						\
++	req->hdr.sig = OTX2_MBOX_REQ_SIG;				\
++	req->hdr.id = _id;						\
++	return req;							\
++}
++
++MBOX_UP_AF2SWDEV_MESSAGES
++MBOX_UP_AF2PF_FDB_REFRESH_MESSAGES
++#undef M
++
++struct l2_entry {
++	struct list_head list;
++	u64 flags;
++	u32 port_id;
++	u8  mac[ETH_ALEN];
++};
++
++static DEFINE_MUTEX(l2_offl_list_lock);
++static LIST_HEAD(l2_offl_lh);
++
++static DEFINE_MUTEX(fdb_refresh_list_lock);
++static LIST_HEAD(fdb_refresh_lh);
++
++struct rvu_sw_l2_work {
++	struct rvu *rvu;
++	struct work_struct work;
++};
++
++static struct rvu_sw_l2_work l2_offl_work;
++static struct workqueue_struct *rvu_sw_l2_offl_wq;
++
++static struct rvu_sw_l2_work fdb_refresh_work;
++static struct workqueue_struct *fdb_refresh_wq;
++
++static void rvu_sw_l2_offl_cancel_add_if_del_reqs_exist(u8 *mac)
++{
++	struct l2_entry *entry, *tmp;
++
++	mutex_lock(&l2_offl_list_lock);
++	list_for_each_entry_safe(entry, tmp, &l2_offl_lh, list) {
++		if (!ether_addr_equal(mac, entry->mac))
++			continue;
++
++		if (!(entry->flags & FDB_DEL))
++			continue;
++
++		list_del_init(&entry->list);
++		kfree(entry);
++		break;
++	}
++	mutex_unlock(&l2_offl_list_lock);
++}
++
++static int rvu_sw_l2_offl_rule_push(struct rvu *rvu, struct l2_entry *l2_entry)
++{
++	struct af2swdev_notify_req *req;
++	int swdev_pf;
++
++	swdev_pf = rvu_get_pf(rvu->pdev, rvu->rswitch.pcifunc);
++
++	mutex_lock(&rvu->mbox_lock);
++	req = otx2_mbox_alloc_msg_af2swdev_notify(rvu, swdev_pf);
++	if (!req) {
++		mutex_unlock(&rvu->mbox_lock);
++		return -ENOMEM;
++	}
++
++	ether_addr_copy(req->mac, l2_entry->mac);
++	req->flags = l2_entry->flags;
++	req->port_id = l2_entry->port_id;
++
++	otx2_mbox_wait_for_zero(&rvu->afpf_wq_info.mbox_up, swdev_pf);
++	otx2_mbox_msg_send_up(&rvu->afpf_wq_info.mbox_up, swdev_pf);
++
++	mutex_unlock(&rvu->mbox_lock);
++	return 0;
++}
++
++static int rvu_sw_l2_fdb_refresh(struct rvu *rvu, u16 pcifunc, u8 *mac)
++{
++	struct af2pf_fdb_refresh_req *req;
++	int pf, vidx;
++
++	pf = rvu_get_pf(rvu->pdev, pcifunc);
++
++	mutex_lock(&rvu->mbox_lock);
++
++	if (pf) {
++		req = otx2_mbox_alloc_msg_af2pf_fdb_refresh(rvu, pf);
++		if (!req) {
++			mutex_unlock(&rvu->mbox_lock);
++			return -ENOMEM;
++		}
++
++		req->hdr.pcifunc = pcifunc;
++		ether_addr_copy(req->mac, mac);
++		req->pcifunc = pcifunc;
++
++		otx2_mbox_wait_for_zero(&rvu->afpf_wq_info.mbox_up, pf);
++		otx2_mbox_msg_send_up(&rvu->afpf_wq_info.mbox_up, pf);
++	} else {
++		vidx = pcifunc - 1;
++
++		req = (struct af2pf_fdb_refresh_req *)
++			otx2_mbox_alloc_msg_rsp(&rvu->afvf_wq_info.mbox_up, vidx,
++						sizeof(*req), sizeof(struct msg_rsp));
++		if (!req) {
++			mutex_unlock(&rvu->mbox_lock);
++			return -ENOMEM;
++		}
++		req->hdr.sig = OTX2_MBOX_REQ_SIG;
++		req->hdr.id = MBOX_MSG_AF2PF_FDB_REFRESH;
++
++		req->hdr.pcifunc = pcifunc;
++		ether_addr_copy(req->mac, mac);
++		req->pcifunc = pcifunc;
++
++		otx2_mbox_wait_for_zero(&rvu->afvf_wq_info.mbox_up, vidx);
++		otx2_mbox_msg_send_up(&rvu->afvf_wq_info.mbox_up, vidx);
++	}
++
++	mutex_unlock(&rvu->mbox_lock);
++
++	return 0;
++}
++
++static void rvu_sw_l2_fdb_refresh_wq_handler(struct work_struct *work)
++{
++	struct rvu_sw_l2_work *fdb_work;
++	struct l2_entry *l2_entry;
++
++	fdb_work = container_of(work, struct rvu_sw_l2_work, work);
++
++	while (1) {
++		mutex_lock(&fdb_refresh_list_lock);
++		l2_entry = list_first_entry_or_null(&fdb_refresh_lh,
++						    struct l2_entry, list);
++		if (!l2_entry) {
++			mutex_unlock(&fdb_refresh_list_lock);
++			return;
++		}
++
++		list_del_init(&l2_entry->list);
++		mutex_unlock(&fdb_refresh_list_lock);
++
++		rvu_sw_l2_fdb_refresh(fdb_work->rvu, l2_entry->port_id, l2_entry->mac);
++		kfree(l2_entry);
++	}
++}
++
++static void rvu_sw_l2_offl_rule_wq_handler(struct work_struct *work)
++{
++	struct rvu_sw_l2_work *offl_work;
++	struct l2_entry *l2_entry;
++	int budget = 16;
++	bool add_fdb;
++
++	offl_work = container_of(work, struct rvu_sw_l2_work, work);
++
++	while (budget--) {
++		mutex_lock(&l2_offl_list_lock);
++		l2_entry = list_first_entry_or_null(&l2_offl_lh, struct l2_entry, list);
++		if (!l2_entry) {
++			mutex_unlock(&l2_offl_list_lock);
++			return;
++		}
++
++		list_del_init(&l2_entry->list);
++		mutex_unlock(&l2_offl_list_lock);
++
++		add_fdb = !!(l2_entry->flags & FDB_ADD);
++
++		if (add_fdb)
++			rvu_sw_l2_offl_cancel_add_if_del_reqs_exist(l2_entry->mac);
++
++		rvu_sw_l2_offl_rule_push(offl_work->rvu, l2_entry);
++		kfree(l2_entry);
++	}
++
++	if (!list_empty(&l2_offl_lh))
++		queue_work(rvu_sw_l2_offl_wq, &l2_offl_work.work);
++}
++
++int rvu_sw_l2_init_offl_wq(struct rvu *rvu, u16 pcifunc, bool fw_up)
++{
++	struct rvu_switch *rswitch;
++
++	rswitch = &rvu->rswitch;
++
++	if (fw_up) {
++		rswitch->flags |= RVU_SWITCH_FLAG_FW_READY;
++		rswitch->pcifunc = pcifunc;
++
++		l2_offl_work.rvu = rvu;
++		INIT_WORK(&l2_offl_work.work, rvu_sw_l2_offl_rule_wq_handler);
++		rvu_sw_l2_offl_wq = alloc_workqueue("swdev_rvu_sw_l2_offl_wq", 0, 0);
++		if (!rvu_sw_l2_offl_wq) {
++			dev_err(rvu->dev, "L2 offl workqueue allocation failed\n");
++			return -ENOMEM;
++		}
++
++		fdb_refresh_work.rvu = rvu;
++		INIT_WORK(&fdb_refresh_work.work, rvu_sw_l2_fdb_refresh_wq_handler);
++		fdb_refresh_wq = alloc_workqueue("swdev_fdb_refresh_wq", 0, 0);
++		if (!fdb_refresh_wq) {
++			dev_err(rvu->dev, "Fdb refresh workqueue allocation failed\n");
++			return -ENOMEM;
++		}
++
++		return 0;
++	}
++
++	rswitch->flags &= ~RVU_SWITCH_FLAG_FW_READY;
++	rswitch->pcifunc = -1;
++	flush_work(&l2_offl_work.work);
++	return 0;
++}
++
++int rvu_sw_l2_fdb_list_entry_add(struct rvu *rvu, u16 pcifunc, u8 *mac)
++{
++	struct l2_entry *l2_entry;
++
++	l2_entry = kcalloc(1, sizeof(*l2_entry), GFP_KERNEL);
++	if (!l2_entry)
++		return -ENOMEM;
++
++	l2_entry->port_id = pcifunc;
++	ether_addr_copy(l2_entry->mac, mac);
++
++	mutex_lock(&fdb_refresh_list_lock);
++	list_add_tail(&l2_entry->list, &fdb_refresh_lh);
++	mutex_unlock(&fdb_refresh_list_lock);
++
++	queue_work(fdb_refresh_wq, &fdb_refresh_work.work);
++	return 0;
++}
+ 
+ int rvu_mbox_handler_fdb_notify(struct rvu *rvu,
+ 				struct fdb_notify_req *req,
+ 				struct msg_rsp *rsp)
+ {
++	struct l2_entry *l2_entry;
++
++	if (!(rvu->rswitch.flags & RVU_SWITCH_FLAG_FW_READY))
++		return 0;
++
++	l2_entry = kcalloc(1, sizeof(*l2_entry), GFP_KERNEL);
++	if (!l2_entry)
++		return -ENOMEM;
++
++	ether_addr_copy(l2_entry->mac, req->mac);
++	l2_entry->flags = req->flags;
++	l2_entry->port_id = rvu_sw_port_id(rvu, req->hdr.pcifunc);
++
++	mutex_lock(&l2_offl_list_lock);
++	list_add_tail(&l2_entry->list, &l2_offl_lh);
++	mutex_unlock(&l2_offl_list_lock);
++
++	queue_work(rvu_sw_l2_offl_wq, &l2_offl_work.work);
 +
  	return 0;
  }
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.h b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.h
+index ff28612150c9..56786768880e 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.h
+@@ -8,4 +8,6 @@
+ #ifndef RVU_SW_L2_H
+ #define RVU_SW_L2_H
  
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c
-index 2d14a0590c5d..ce565fe7035c 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c
-@@ -4,14 +4,632 @@
++int rvu_sw_l2_init_offl_wq(struct rvu *rvu, u16 pcifunc, bool fw_up);
++int rvu_sw_l2_fdb_list_entry_add(struct rvu *rvu, u16 pcifunc, u8 *mac);
+ #endif
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
+index f4fdbfba8667..4642a1dd7ccb 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
+@@ -15,6 +15,7 @@
+ #include "otx2_ptp.h"
+ #include "cn10k.h"
+ #include "cn10k_ipsec.h"
++#include "switch/sw_nb.h"
+ 
+ #define DRV_NAME	"rvu_nicvf"
+ #define DRV_STRING	"Marvell RVU NIC Virtual Function Driver"
+@@ -141,6 +142,22 @@ static int otx2vf_process_mbox_msg_up(struct otx2_nic *vf,
+ 		err = otx2_mbox_up_handler_cgx_link_event(
+ 				vf, (struct cgx_link_info_msg *)req, rsp);
+ 		return err;
++
++	case MBOX_MSG_AF2PF_FDB_REFRESH:
++		rsp = (struct msg_rsp *)otx2_mbox_alloc_msg(&vf->mbox.mbox_up, 0,
++							    sizeof(struct msg_rsp));
++		if (!rsp)
++			return -ENOMEM;
++
++		rsp->hdr.id = MBOX_MSG_AF2PF_FDB_REFRESH;
++		rsp->hdr.sig = OTX2_MBOX_RSP_SIG;
++		rsp->hdr.pcifunc = req->pcifunc;
++		rsp->hdr.rc = 0;
++		err = otx2_mbox_up_handler_af2pf_fdb_refresh(vf,
++							     (struct af2pf_fdb_refresh_req *)req,
++							     rsp);
++		return err;
++
+ 	default:
+ 		otx2_reply_invalid_msg(&vf->mbox.mbox_up, 0, 0, req->id);
+ 		return -ENODEV;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.c b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.c
+index 6842c8d91ffc..71aec9628eb2 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.c
+@@ -4,13 +4,140 @@
   * Copyright (C) 2026 Marvell.
   *
   */
@@ -152,664 +509,196 @@ index 2d14a0590c5d..ce565fe7035c 100644
 +#include <net/switchdev.h>
 +#include <net/netevent.h>
 +#include <net/arp.h>
-+#include <net/route.h>
-+#include <linux/inetdevice.h>
 +
 +#include "../otx2_reg.h"
 +#include "../otx2_common.h"
 +#include "../otx2_struct.h"
 +#include "../cn10k.h"
- #include "sw_nb.h"
-+#include "sw_fdb.h"
-+#include "sw_fib.h"
-+#include "sw_fl.h"
+ #include "sw_fdb.h"
+ 
++#if !IS_ENABLED(CONFIG_OCTEONTX_SWITCH)
 +
-+static const char *sw_nb_cmd2str[OTX2_CMD_MAX] = {
-+	[OTX2_DEV_UP]  = "OTX2_DEV_UP",
-+	[OTX2_DEV_DOWN] = "OTX2_DEV_DOWN",
-+	[OTX2_DEV_CHANGE] = "OTX2_DEV_CHANGE",
-+	[OTX2_NEIGH_UPDATE] = "OTX2_NEIGH_UPDATE",
-+	[OTX2_FIB_ENTRY_REPLACE] = "OTX2_FIB_ENTRY_REPLACE",
-+	[OTX2_FIB_ENTRY_ADD] = "OTX2_FIB_ENTRY_ADD",
-+	[OTX2_FIB_ENTRY_DEL] = "OTX2_FIB_ENTRY_DEL",
-+	[OTX2_FIB_ENTRY_APPEND] = "OTX2_FIB_ENTRY_APPEND",
++int otx2_mbox_up_handler_af2pf_fdb_refresh(struct otx2_nic *pf,
++					   struct af2pf_fdb_refresh_req *req,
++					   struct msg_rsp *rsp)
++{
++	return 0;
++}
++
++#else
++
++static DEFINE_SPINLOCK(sw_fdb_llock);
++static LIST_HEAD(sw_fdb_lh);
++
++struct sw_fdb_list_entry {
++	struct list_head list;
++	u64 flags;
++	struct otx2_nic *pf;
++	u8  mac[ETH_ALEN];
++	bool add_fdb;
 +};
 +
-+const char *sw_nb_get_cmd2str(int cmd)
++static struct workqueue_struct *sw_fdb_wq;
++static struct work_struct sw_fdb_work;
++
++static int sw_fdb_add_or_del(struct otx2_nic *pf,
++			     const unsigned char *addr,
++			     bool add_fdb)
 +{
-+	return sw_nb_cmd2str[cmd];
-+}
-+EXPORT_SYMBOL(sw_nb_get_cmd2str);
++	struct fdb_notify_req *req;
++	int rc;
 +
-+static bool sw_nb_is_cavium_dev(struct net_device *netdev)
-+{
-+	struct pci_dev *pdev;
-+	struct device *dev;
-+
-+	dev = netdev->dev.parent;
-+	if (!dev)
-+		return false;
-+
-+	pdev = container_of(dev, struct pci_dev, dev);
-+	if (pdev->vendor != PCI_VENDOR_ID_CAVIUM)
-+		return false;
-+
-+	return true;
-+}
-+
-+static int sw_nb_check_slaves(struct net_device *dev,
-+			      struct netdev_nested_priv *priv)
-+{
-+	int *cnt;
-+
-+	if (!priv->flags)
-+		return 0;
-+
-+	priv->flags &= sw_nb_is_cavium_dev(dev);
-+	if (priv->flags) {
-+		cnt = priv->data;
-+		(*cnt)++;
++	mutex_lock(&pf->mbox.lock);
++	req = otx2_mbox_alloc_msg_fdb_notify(&pf->mbox);
++	if (!req) {
++		rc = -ENOMEM;
++		goto out;
 +	}
++
++	ether_addr_copy(req->mac, addr);
++	req->flags = add_fdb ? FDB_ADD : FDB_DEL;
++
++	rc = otx2_sync_mbox_msg(&pf->mbox);
++out:
++	mutex_unlock(&pf->mbox.lock);
++	return rc;
++}
++
++static void sw_fdb_wq_handler(struct work_struct *work)
++{
++	struct sw_fdb_list_entry *entry;
++	LIST_HEAD(tlist);
++
++	spin_lock(&sw_fdb_llock);
++	list_splice_init(&sw_fdb_lh, &tlist);
++	spin_unlock(&sw_fdb_llock);
++
++	while ((entry =
++		list_first_entry_or_null(&tlist,
++					 struct sw_fdb_list_entry,
++					 list)) != NULL) {
++		list_del_init(&entry->list);
++		sw_fdb_add_or_del(entry->pf, entry->mac, entry->add_fdb);
++		kfree(entry);
++	}
++
++	spin_lock(&sw_fdb_llock);
++	if (!list_empty(&sw_fdb_lh))
++		queue_work(sw_fdb_wq, &sw_fdb_work);
++	spin_unlock(&sw_fdb_llock);
++}
++
++int sw_fdb_add_to_list(struct net_device *dev, u8 *mac, bool add_fdb)
++{
++	struct otx2_nic *pf = netdev_priv(dev);
++	struct sw_fdb_list_entry *entry;
++
++	entry = kcalloc(1, sizeof(*entry), GFP_ATOMIC);
++	if (!entry)
++		return -ENOMEM;
++
++	ether_addr_copy(entry->mac, mac);
++	entry->add_fdb = add_fdb;
++	entry->pf = pf;
++
++	spin_lock(&sw_fdb_llock);
++	list_add_tail(&entry->list, &sw_fdb_lh);
++	queue_work(sw_fdb_wq, &sw_fdb_work);
++	spin_unlock(&sw_fdb_llock);
 +
 +	return 0;
 +}
 +
-+bool sw_nb_is_valid_dev(struct net_device *netdev)
-+{
-+	struct netdev_nested_priv priv;
-+	struct net_device *br;
-+	int cnt = 0;
-+
-+	priv.flags = true;
-+	priv.data = &cnt;
-+
-+	if (netif_is_bridge_master(netdev) || is_vlan_dev(netdev)) {
-+		netdev_walk_all_lower_dev(netdev, sw_nb_check_slaves, &priv);
-+		return priv.flags && !!*(int *)priv.data;
-+	}
-+
-+	if (netif_is_bridge_port(netdev)) {
-+		rcu_read_lock();
-+		br = netdev_master_upper_dev_get_rcu(netdev);
-+		if (!br) {
-+			rcu_read_unlock();
-+			return false;
-+		}
-+
-+		netdev_walk_all_lower_dev(br, sw_nb_check_slaves, &priv);
-+		rcu_read_unlock();
-+		return priv.flags && !!*(int *)priv.data;
-+	}
-+
-+	return sw_nb_is_cavium_dev(netdev);
-+}
-+
-+static int sw_nb_fdb_event(struct notifier_block *unused,
-+			   unsigned long event, void *ptr)
-+{
-+	struct net_device *dev = switchdev_notifier_info_to_dev(ptr);
-+	struct switchdev_notifier_fdb_info *fdb_info = ptr;
-+
-+	if (!sw_nb_is_valid_dev(dev))
-+		return NOTIFY_DONE;
-+
-+	switch (event) {
-+	case SWITCHDEV_FDB_ADD_TO_DEVICE:
-+		if (fdb_info->is_local)
-+			break;
-+		break;
-+
-+	case SWITCHDEV_FDB_DEL_TO_DEVICE:
-+		if (fdb_info->is_local)
-+			break;
-+		break;
-+
-+	default:
-+		return NOTIFY_DONE;
-+	}
-+
-+	return NOTIFY_DONE;
-+}
-+
-+static struct notifier_block sw_nb_fdb = {
-+	.notifier_call = sw_nb_fdb_event,
-+};
-+
-+static void __maybe_unused
-+sw_nb_fib_event_dump(struct net_device *dev, unsigned long event, void *ptr)
-+{
-+	struct fib_entry_notifier_info *fen_info = ptr;
-+	struct fib_nh *fib_nh;
-+	struct fib_info *fi;
-+	int i;
-+
-+	netdev_info(dev,
-+		    "%s:%d FIB event=%lu dst=%#x dstlen=%u type=%u\n",
-+		    __func__, __LINE__,
-+		    event, fen_info->dst, fen_info->dst_len,
-+		    fen_info->type);
-+
-+	fi = fen_info->fi;
-+	if (!fi)
-+		return;
-+
-+	fib_nh = fi->fib_nh;
-+	for (i = 0; i < fi->fib_nhs; i++, fib_nh++)
-+		netdev_info(dev, "%s:%d dev=%s saddr=%#x gw=%#x\n",
-+			    __func__, __LINE__,
-+			    fib_nh->fib_nh_dev->name,
-+			    fib_nh->nh_saddr, fib_nh->fib_nh_gw4);
-+}
-+
-+#define SWITCH_NB_FIB_EVENT_DUMP(...) \
-+	sw_nb_fib_event_dump(__VA_ARGS__)
-+
-+static int sw_nb_fib_event_to_otx2_event(int event)
-+{
-+	switch (event) {
-+	case FIB_EVENT_ENTRY_REPLACE:
-+		return OTX2_FIB_ENTRY_REPLACE;
-+	case FIB_EVENT_ENTRY_ADD:
-+		return OTX2_FIB_ENTRY_ADD;
-+	case FIB_EVENT_ENTRY_DEL:
-+		return OTX2_FIB_ENTRY_DEL;
-+	default:
-+		break;
-+	}
-+
-+	return -1;
-+}
-+
-+static int sw_nb_fib_event(struct notifier_block *nb,
-+			   unsigned long event, void *ptr)
-+{
-+	struct fib_entry_notifier_info *fen_info = ptr;
-+	struct net_device *dev, *pf_dev = NULL;
-+	struct fib_notifier_info *info = ptr;
-+	struct fib_entry *entries, *iter;
-+	struct netdev_hw_addr *dev_addr;
-+	struct net_device *lower;
-+	struct list_head *lh;
-+	struct neighbour *neigh;
-+	struct fib_nh *fib_nh;
-+	struct fib_info *fi;
-+	struct otx2_nic *pf;
-+	__be32 *haddr;
-+	int hcnt = 0;
-+	int cnt, i;
-+
-+	if (info->family != AF_INET)
-+		return NOTIFY_DONE;
-+
-+	switch (event) {
-+	case FIB_EVENT_ENTRY_REPLACE:
-+	case FIB_EVENT_ENTRY_ADD:
-+	case FIB_EVENT_ENTRY_DEL:
-+		break;
-+	default:
-+		return NOTIFY_DONE;
-+	}
-+
-+	/* Process only UNICAST routes add or del */
-+	if (fen_info->type != RTN_UNICAST)
-+		return NOTIFY_DONE;
-+
-+	fi = fen_info->fi;
-+
-+	if (!fi)
-+		return NOTIFY_DONE;
-+
-+	if (fi->fib_nh_is_v6)
-+		return NOTIFY_DONE;
-+
-+	entries = kcalloc(fi->fib_nhs, sizeof(*entries), GFP_ATOMIC);
-+	if (!entries)
-+		return NOTIFY_DONE;
-+
-+	haddr = kcalloc(fi->fib_nhs, sizeof(__be32), GFP_ATOMIC);
-+	if (!haddr) {
-+		kfree(entries);
-+		return NOTIFY_DONE;
-+	}
-+
-+	iter = entries;
-+	fib_nh = fi->fib_nh;
-+	for (i = 0; i < fi->fib_nhs; i++, fib_nh++) {
-+		dev = fib_nh->fib_nh_dev;
-+
-+		if (!dev)
-+			continue;
-+
-+		if (dev->type != ARPHRD_ETHER)
-+			continue;
-+
-+		if (!sw_nb_is_valid_dev(dev))
-+			continue;
-+
-+		iter->cmd = sw_nb_fib_event_to_otx2_event(event);
-+		iter->dst = fen_info->dst;
-+		iter->dst_len = fen_info->dst_len;
-+		iter->gw = be32_to_cpu(fib_nh->fib_nh_gw4);
-+
-+		netdev_dbg(dev,
-+			   "%s:%d FIB route Rule cmd=%lld dst=%#x dst_len=%d gw=%#x\n",
-+			   __func__, __LINE__,
-+			   iter->cmd, iter->dst, iter->dst_len, iter->gw);
-+
-+		pf_dev = dev;
-+		if (netif_is_bridge_master(dev))  {
-+			iter->bridge = 1;
-+			netdev_for_each_lower_dev(dev, lower, lh) {
-+				pf_dev = lower;
-+				break;
-+			}
-+		} else if (is_vlan_dev(dev)) {
-+			iter->vlan_valid = 1;
-+			pf_dev = vlan_dev_real_dev(dev);
-+			iter->vlan_tag = vlan_dev_vlan_id(dev);
-+		}
-+
-+		pf = netdev_priv(pf_dev);
-+		iter->port_id = pf->pcifunc;
-+
-+		if (!fib_nh->fib_nh_gw4) {
-+			if (iter->dst || iter->dst_len)
-+				iter++;
-+
-+			continue;
-+		}
-+		iter->gw_valid = 1;
-+
-+		if (fib_nh->nh_saddr)
-+			haddr[hcnt++] = fib_nh->nh_saddr;
-+
-+		rcu_read_lock();
-+		neigh = ip_neigh_gw4(fib_nh->fib_nh_dev, fib_nh->fib_nh_gw4);
-+		if (!neigh) {
-+			rcu_read_unlock();
-+			iter++;
-+			continue;
-+		}
-+
-+		if (is_valid_ether_addr(neigh->ha)) {
-+			iter->mac_valid = 1;
-+			ether_addr_copy(iter->mac, neigh->ha);
-+		}
-+
-+		iter++;
-+		rcu_read_unlock();
-+	}
-+
-+	cnt = iter - entries;
-+	if (!cnt) {
-+		kfree(entries);
-+		kfree(haddr);
-+		return NOTIFY_DONE;
-+	}
- 
--int sw_nb_unregister(void)
-+	if (!hcnt) {
-+		kfree(haddr);
-+		return NOTIFY_DONE;
-+	}
-+
-+	entries = kcalloc(hcnt, sizeof(*entries), GFP_ATOMIC);
-+	if (!entries)
-+		return NOTIFY_DONE;
-+
-+	iter = entries;
-+
-+	for (i = 0; i < hcnt; i++, iter++) {
-+		iter->cmd = sw_nb_fib_event_to_otx2_event(event);
-+		iter->dst = be32_to_cpu(haddr[i]);
-+		iter->dst_len = 32;
-+		iter->mac_valid = 1;
-+		iter->host = 1;
-+		iter->port_id = pf->pcifunc;
-+
-+		for_each_dev_addr(pf_dev, dev_addr) {
-+			ether_addr_copy(iter->mac, dev_addr->addr);
-+			break;
-+		}
-+
-+		netdev_dbg(dev,
-+			   "%s:%d FIB host  Rule cmd=%lld dst=%#x dst_len=%d gw=%#x %s\n",
-+			   __func__, __LINE__,
-+			   iter->cmd, iter->dst, iter->dst_len, iter->gw, dev->name);
-+	}
-+
-+	kfree(haddr);
-+	return NOTIFY_DONE;
-+}
-+
-+static struct notifier_block sw_nb_fib = {
-+	.notifier_call = sw_nb_fib_event,
-+};
-+
-+static int sw_nb_net_event(struct notifier_block *nb,
-+			   unsigned long event, void *ptr)
-+{
-+	struct net_device *lower, *pf_dev;
-+	struct neighbour *n = ptr;
-+	struct fib_entry *entry;
-+	struct list_head *iter;
-+	struct otx2_nic *pf;
-+
-+	switch (event) {
-+	case NETEVENT_NEIGH_UPDATE:
-+		if (n->tbl->family != AF_INET)
-+			break;
-+
-+		if (n->tbl != &arp_tbl)
-+			break;
-+
-+		if (!sw_nb_is_valid_dev(n->dev))
-+			break;
-+
-+		entry = kcalloc(1, sizeof(*entry), GFP_ATOMIC);
-+		if (!entry)
-+			break;
-+
-+		entry->cmd = OTX2_NEIGH_UPDATE;
-+		entry->dst = be32_to_cpu(*(__be32 *)n->primary_key);
-+		entry->dst_len = n->tbl->key_len * 8;
-+		entry->mac_valid = 1;
-+		entry->nud_state = n->nud_state;
-+		ether_addr_copy(entry->mac, n->ha);
-+
-+		pf_dev = n->dev;
-+		if (netif_is_bridge_master(n->dev))  {
-+			entry->bridge = 1;
-+			netdev_for_each_lower_dev(n->dev, lower, iter) {
-+				pf_dev = lower;
-+				break;
-+			}
-+		} else if (is_vlan_dev(n->dev)) {
-+			entry->vlan_valid = 1;
-+			pf_dev = vlan_dev_real_dev(n->dev);
-+			entry->vlan_tag = vlan_dev_vlan_id(n->dev);
-+		}
-+
-+		pf = netdev_priv(pf_dev);
-+		entry->port_id = pf->pcifunc;
-+		break;
-+	}
-+
-+	return NOTIFY_DONE;
-+}
-+
-+static struct notifier_block sw_nb_netevent = {
-+	.notifier_call = sw_nb_net_event,
-+
-+};
-+
-+static int sw_nb_inetaddr_event_to_otx2_event(int event)
+ int sw_fdb_init(void)
  {
-+	switch (event) {
-+	case NETDEV_CHANGE:
-+		return OTX2_DEV_CHANGE;
-+	case NETDEV_UP:
-+		return OTX2_DEV_UP;
-+	case NETDEV_DOWN:
-+		return OTX2_DEV_DOWN;
-+	default:
-+		break;
-+	}
-+	return -1;
-+}
-+
-+static int sw_nb_inetaddr_event(struct notifier_block *nb,
-+				unsigned long event, void *ptr)
-+{
-+	struct in_ifaddr *ifa = (struct in_ifaddr *)ptr;
-+	struct net_device *dev = ifa->ifa_dev->dev;
-+	struct net_device *lower, *pf_dev;
-+	struct netdev_hw_addr *dev_addr;
-+	struct fib_entry *entry;
-+	struct in_device *idev;
-+	struct list_head *iter;
-+	struct otx2_nic *pf;
-+
-+	if (event != NETDEV_CHANGE &&
-+	    event != NETDEV_UP &&
-+	    event != NETDEV_DOWN) {
-+		return NOTIFY_DONE;
-+	}
-+
-+	if (!sw_nb_is_valid_dev(dev))
-+		return NOTIFY_DONE;
-+
-+	idev = __in_dev_get_rtnl(dev);
-+	if (!idev || !idev->ifa_list)
-+		return NOTIFY_DONE;
-+
-+	entry = kcalloc(1, sizeof(*entry), GFP_ATOMIC);
-+	entry->cmd = sw_nb_inetaddr_event_to_otx2_event(event);
-+	entry->dst = be32_to_cpu(ifa->ifa_address);
-+	entry->dst_len = 32;
-+	entry->mac_valid = 1;
-+	entry->host = 1;
-+
-+	pf_dev = dev;
-+	if (netif_is_bridge_master(dev))  {
-+		entry->bridge = 1;
-+		netdev_for_each_lower_dev(dev, lower, iter) {
-+			pf_dev = lower;
-+			break;
-+		}
-+	} else if (is_vlan_dev(dev)) {
-+		entry->vlan_valid = 1;
-+		pf_dev = vlan_dev_real_dev(dev);
-+		entry->vlan_tag = vlan_dev_vlan_id(dev);
-+	}
-+
-+	pf = netdev_priv(pf_dev);
-+	entry->port_id = pf->pcifunc;
-+
-+	for_each_dev_addr(dev, dev_addr) {
-+		ether_addr_copy(entry->mac, dev_addr->addr);
-+		break;
-+	}
-+
-+	netdev_dbg(dev,
-+		   "%s:%d pushing inetaddr event from HOST interface address %#x, %pM, %s\n",
-+		   __func__, __LINE__,  entry->dst, entry->mac, dev->name);
-+
-+	return NOTIFY_DONE;
-+}
-+
-+static struct notifier_block sw_nb_inetaddr = {
-+	.notifier_call = sw_nb_inetaddr_event,
-+};
-+
-+static int sw_nb_netdev_event(struct notifier_block *unused,
-+			      unsigned long event, void *ptr)
-+{
-+	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
-+	struct netdev_hw_addr *dev_addr;
-+	struct net_device *pf_dev;
-+	struct in_ifaddr *ifa;
-+	struct fib_entry *entry;
-+	struct in_device *idev;
-+	struct otx2_nic *pf;
-+	struct list_head *iter;
-+	struct net_device *lower;
-+
-+	if (event != NETDEV_CHANGE &&
-+	    event != NETDEV_UP &&
-+	    event != NETDEV_DOWN) {
-+		return NOTIFY_DONE;
-+	}
-+
-+	if (!sw_nb_is_valid_dev(dev))
-+		return NOTIFY_DONE;
-+
-+	idev = __in_dev_get_rtnl(dev);
-+	if (!idev || !idev->ifa_list)
-+		return NOTIFY_DONE;
-+
-+	ifa = rtnl_dereference(idev->ifa_list);
-+
-+	entry = kcalloc(1, sizeof(*entry), GFP_KERNEL);
-+	entry->cmd = sw_nb_inetaddr_event_to_otx2_event(event);
-+	entry->dst = be32_to_cpu(ifa->ifa_address);
-+	entry->dst_len = 32;
-+	entry->mac_valid = 1;
-+	entry->host = 1;
-+
-+	pf_dev = dev;
-+	if (netif_is_bridge_master(dev))  {
-+		entry->bridge = 1;
-+		netdev_for_each_lower_dev(dev, lower, iter) {
-+			pf_dev = lower;
-+			break;
-+		}
-+	} else if (is_vlan_dev(dev)) {
-+		entry->vlan_valid = 1;
-+		pf_dev = vlan_dev_real_dev(dev);
-+		entry->vlan_tag = vlan_dev_vlan_id(dev);
-+	}
-+
-+	pf = netdev_priv(pf_dev);
-+	entry->port_id = pf->pcifunc;
-+
-+	for_each_dev_addr(dev, dev_addr) {
-+		ether_addr_copy(entry->mac, dev_addr->addr);
-+		break;
-+	}
-+
-+	netdev_dbg(dev,
-+		   "%s:%d pushing netdev event from HOST interface address %#x, %pM, dev=%s\n",
-+		   __func__, __LINE__,  entry->dst, entry->mac, dev->name);
-+
-+	return NOTIFY_DONE;
-+}
-+
-+static struct notifier_block sw_nb_netdev = {
-+	.notifier_call = sw_nb_netdev_event,
-+};
-+
-+int sw_nb_unregister(struct net_device *netdev)
-+{
-+	int err;
-+
-+	err = unregister_switchdev_notifier(&sw_nb_fdb);
-+
-+	if (err)
-+		netdev_err(netdev, "Failed to unregister switchdev nb\n");
-+
-+	err = unregister_fib_notifier(&init_net, &sw_nb_fib);
-+	if (err)
-+		netdev_err(netdev, "Failed to unregister fib nb\n");
-+
-+	err = unregister_netevent_notifier(&sw_nb_netevent);
-+	if (err)
-+		netdev_err(netdev, "Failed to unregister netevent\n");
-+
-+	err = unregister_inetaddr_notifier(&sw_nb_inetaddr);
-+	if (err)
-+		netdev_err(netdev, "Failed to unregister addr event\n");
-+
-+	err = unregister_netdevice_notifier(&sw_nb_netdev);
-+	if (err)
-+		netdev_err(netdev, "Failed to unregister netdev notifier\n");
-+
-+	sw_fl_deinit();
-+	sw_fib_deinit();
-+	sw_fdb_deinit();
++	INIT_WORK(&sw_fdb_work, sw_fdb_wq_handler);
++	sw_fdb_wq = alloc_workqueue("sw_fdb_wq", 0, 0);
++	if (!sw_fdb_wq)
++		return -ENOMEM;
 +
  	return 0;
  }
-+EXPORT_SYMBOL(sw_nb_unregister);
  
--int sw_nb_register(void)
-+int sw_nb_register(struct net_device *netdev)
+ void sw_fdb_deinit(void)
  {
-+	int err;
++	cancel_work_sync(&sw_fdb_work);
++	destroy_workqueue(sw_fdb_wq);
++}
 +
-+	sw_fdb_init();
-+	sw_fib_init();
-+	sw_fl_init();
++int otx2_mbox_up_handler_af2pf_fdb_refresh(struct otx2_nic *pf,
++					   struct af2pf_fdb_refresh_req *req,
++					   struct msg_rsp *rsp)
++{
++	struct switchdev_notifier_fdb_info item = {0};
 +
-+	err = register_switchdev_notifier(&sw_nb_fdb);
-+	if (err) {
-+		netdev_err(netdev, "Failed to register switchdev nb\n");
-+		return err;
-+	}
++	item.addr = req->mac;
++	item.info.dev = pf->netdev;
++	call_switchdev_notifiers(SWITCHDEV_FDB_ADD_TO_BRIDGE,
++				 item.info.dev, &item.info, NULL);
 +
-+	err = register_fib_notifier(&init_net, &sw_nb_fib, NULL, NULL);
-+	if (err) {
-+		netdev_err(netdev, "Failed to register fb notifier block");
-+		goto err1;
-+	}
-+
-+	err = register_netevent_notifier(&sw_nb_netevent);
-+	if (err) {
-+		netdev_err(netdev, "Failed to register netevent\n");
-+		goto err2;
-+	}
-+
-+	err = register_inetaddr_notifier(&sw_nb_inetaddr);
-+	if (err) {
-+		netdev_err(netdev, "Failed to register addr event\n");
-+		goto err3;
-+	}
-+
-+	err = register_netdevice_notifier(&sw_nb_netdev);
-+	if (err) {
-+		netdev_err(netdev, "Failed to register netdevice nb\n");
-+		goto err4;
-+	}
-+
- 	return 0;
-+
-+err4:
-+	unregister_inetaddr_notifier(&sw_nb_inetaddr);
-+
-+err3:
-+	unregister_netevent_notifier(&sw_nb_netevent);
-+
-+err2:
-+	unregister_fib_notifier(&init_net, &sw_nb_fib);
-+
-+err1:
-+	unregister_switchdev_notifier(&sw_nb_fdb);
-+	return err;
++	return 0;
  }
-+EXPORT_SYMBOL(sw_nb_register);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.h b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.h
-index 5f744cc3ecbb..81a54cb28ce2 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.h
-@@ -7,7 +7,26 @@
- #ifndef SW_NB_H_
- #define SW_NB_H_
++#endif
++EXPORT_SYMBOL(otx2_mbox_up_handler_af2pf_fdb_refresh);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.h b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.h
+index d4314d6d3ee4..f8705083418c 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.h
+@@ -7,7 +7,12 @@
+ #ifndef SW_FDB_H_
+ #define SW_FDB_H_
  
--int sw_nb_register(void);
--int sw_nb_unregister(void);
-+enum {
-+	OTX2_DEV_UP = 1,
-+	OTX2_DEV_DOWN,
-+	OTX2_DEV_CHANGE,
-+	OTX2_NEIGH_UPDATE,
-+	OTX2_FIB_ENTRY_REPLACE,
-+	OTX2_FIB_ENTRY_ADD,
-+	OTX2_FIB_ENTRY_DEL,
-+	OTX2_FIB_ENTRY_APPEND,
-+	OTX2_CMD_MAX,
-+};
-+
-+int sw_nb_register(struct net_device *netdev);
-+int sw_nb_unregister(struct net_device *netdev);
-+bool sw_nb_is_valid_dev(struct net_device *netdev);
-+
++int sw_fdb_add_to_list(struct net_device *dev, u8 *mac, bool add_fdb);
+ void sw_fdb_deinit(void);
+ int sw_fdb_init(void);
+ 
 +int otx2_mbox_up_handler_af2pf_fdb_refresh(struct otx2_nic *pf,
 +					   struct af2pf_fdb_refresh_req *req,
 +					   struct msg_rsp *rsp);
 +
-+const char *sw_nb_get_cmd2str(int cmd);
+ #endif // SW_FDB_H
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c
+index ce565fe7035c..f5e00807c0fa 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c
+@@ -21,6 +21,7 @@
+ #include "sw_fdb.h"
+ #include "sw_fib.h"
+ #include "sw_fl.h"
++#include "sw_nb.h"
  
- #endif // SW_NB_H_
+ static const char *sw_nb_cmd2str[OTX2_CMD_MAX] = {
+ 	[OTX2_DEV_UP]  = "OTX2_DEV_UP",
+@@ -59,7 +60,6 @@ static int sw_nb_check_slaves(struct net_device *dev,
+ 			      struct netdev_nested_priv *priv)
+ {
+ 	int *cnt;
+-
+ 	if (!priv->flags)
+ 		return 0;
+ 
+@@ -115,11 +115,13 @@ static int sw_nb_fdb_event(struct notifier_block *unused,
+ 	case SWITCHDEV_FDB_ADD_TO_DEVICE:
+ 		if (fdb_info->is_local)
+ 			break;
++		sw_fdb_add_to_list(dev, (u8 *)fdb_info->addr, true);
+ 		break;
+ 
+ 	case SWITCHDEV_FDB_DEL_TO_DEVICE:
+ 		if (fdb_info->is_local)
+ 			break;
++		sw_fdb_add_to_list(dev, (u8 *)fdb_info->addr, false);
+ 		break;
+ 
+ 	default:
+@@ -313,7 +315,6 @@ static int sw_nb_fib_event(struct notifier_block *nb,
+ 	entries = kcalloc(hcnt, sizeof(*entries), GFP_ATOMIC);
+ 	if (!entries)
+ 		return NOTIFY_DONE;
+-
+ 	iter = entries;
+ 
+ 	for (i = 0; i < hcnt; i++, iter++) {
 -- 
 2.43.0
 
