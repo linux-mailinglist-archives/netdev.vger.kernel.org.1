@@ -1,93 +1,79 @@
-Return-Path: <netdev+bounces-248539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAB67D0AE23
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 16:26:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1745D0AFE8
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 16:43:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B905B30F2B8C
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 15:22:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9E05E302922F
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 15:37:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA2135E53F;
-	Fri,  9 Jan 2026 15:22:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6A552C21E6;
+	Fri,  9 Jan 2026 15:37:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KOcCxIYH"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="d2KYLebv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7678B3385AC
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 15:22:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CC7931A051
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 15:37:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767972141; cv=none; b=SXeBIhy5Tu8jecfC3W7yGKnUQ7lPkEklgH8f+P1KfHz6qDbiDT5SUHpBYEaQdzyJ7MR0tZ85iH2w72XbM1k+P6j9iVd7AhG5JK0XArWhnpxoAgZaO5759lyBeh+TCfNCFG1BZJDQZ4XySq1ChDNulH/4OeSdhRIhEi4+m0HL8z4=
+	t=1767973031; cv=none; b=XGKDiytxrzrapBwdMSYDtKfGcX14wn/+/faYNzq6YiptUjTNpvs/IUy8fSo9wVDx4CIj0SlhaDN+IF/0Y+Zg+e0qP3zOTFhokfzDEecLX5mvGGqE4ViMG80npQ24aYD6F2HNWHKKWapSMl7sDX3FFBsUw31aHuyNKAVMyCt42fo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767972141; c=relaxed/simple;
-	bh=/0dRPRjqg3IHIqgYOrn2vyyviwdlxxFzHDkKNcZEB7U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hGmm54UCGyDnzkq0knRsSSGReRV4CbLF31QSjD40nkBEsV/kNia3/eQ2aV7tvuld9dXkaIyBH/uV5siK22XTj7SqYPPihTNQ56wdsqoncexen5Kak+E1Zcju2C2zjLST/Tr9fK+RZtsoPoT8bLEJ5u2hsR8cB+ww0+15JPhrW5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KOcCxIYH; arc=none smtp.client-ip=209.85.214.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-2a0d52768ccso31339905ad.1
-        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 07:22:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767972137; x=1768576937; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=l02srCpqwS/PPVAYoAwmWqO0txf7t8pnFoogY5rh/QA=;
-        b=KOcCxIYH7ZfzPZW1EgMeCaHB8qzTB4V8M6dVzLqboXwd/Hov8grmVhhBnWFEZruIAI
-         PMH0+w7EJVtTiszm0ibb3c6A+OO7Fbgdc6nvKgbjcB/ADx8G31SitVtH4IoVhgsx4gvb
-         sXkIFHmq2xukww/+00iDj7O+MzukW+exdkkWyyC64XiVGnGYNfn3cvvHzInhciOS9u7m
-         lSCrsIQ4YHxdDejbHnoGFTEbDhuoPsCCCRQ1KbvSzb+cS9Yc91uEZeq2K22cxB9sA84Y
-         4MUtGye4XgcRrX8rQ/8/62/jgNMMSPOVG4ORPFgv9S9137O29rxrOFAkUd3PXIWZlr4r
-         9Tcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767972137; x=1768576937;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l02srCpqwS/PPVAYoAwmWqO0txf7t8pnFoogY5rh/QA=;
-        b=WLnlHJSH5Usm9rJdj4wx1ee1QyxwrHjfRlvhzli2hCWJ13rojEPfbjwNthCsvbBcQG
-         MtyVz7r/b4dZ5eaLpbM8W/ww1d03ohK8dp59emirYKy5zjCiIpn3B11439KOjg5LsRf8
-         7yscQZhEekaCwr/w4vFS87RGzyIHQdB/cxXeCtlJg0aAenabJBCopyEskpldA81XQakK
-         bQJjuZ0gFFcK01DvJqq22pa2I+YHxyomlqAbHRzvZfVxy2VGmeQAWCbEfqmHG2zmhzBJ
-         XuY5iPEApkcc/l4aLGT/xx8WzFbWJ/gKzGxp+6YkyOR0aMsW+W7YFsShDeVBG9B6Rslu
-         5AqQ==
-X-Gm-Message-State: AOJu0YwIZh7yHzCKbyd5Lkhqoa4HibxL/UThL+PX0B9+7bh2WL1phwhk
-	gi6z7tqtogbTo4SrOabtOm8pDU3bJst4dvN7WCbE+h4wHivMIIYf6EYRwR4bwyl0
-X-Gm-Gg: AY/fxX60VmRF9i7x+a0zU47JXmDmGY14VMo6c9yZrzvdr/DcNi6IG487EXlNrncBbw1
-	uIBJV1caIvtoUPTOUpaklEGIYnmdz88z52Osv40lsIF4dCzsOxElyEQqMlfivVXzAvrS6c9K5RR
-	zQgASaKMdVd1Xck3DEKaeGzaiHxa7f60TMhjGEsvJfBEx5GojiYgbf58BWRRcdY0weUiJ0pJSWr
-	Qb8IdhUKMrYUYvJyZvscfgTram/8n8leIr1oz8/Ru4DEBKD8KyvrvhMmS4gmDl7jSrpAXVP7J+6
-	mMyYw1aZsL5X4PZYTjTus2ryWv0RuBAcnmgJyQC0AWX7e1wIpXaSmzyU2+6zaaxUb/hrxcyDkE0
-	uGR8xf1399QsUXV78C+090IpGNcuwkRTZ048MWa4Va8Z4mKFhshBjf8gQ+BA2az8L1kfRvF6me+
-	KLYmp7xR/W/CVBK4EpXQHjh2Ecn83PbAlOIz/uUmjC
-X-Google-Smtp-Source: AGHT+IFjwhs5i9G743dkgLzBhWBTZ55yy5yc6JsaoH2/JUYyPH+SQo8zbecqIuA/7HClY6kISME1yw==
-X-Received: by 2002:a17:903:478d:b0:2a0:b438:fc15 with SMTP id d9443c01a7336-2a3ee468407mr97193875ad.11.1767972136629;
-        Fri, 09 Jan 2026 07:22:16 -0800 (PST)
-Received: from fedora ([103.120.31.122])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a3e3cc87f8sm108021895ad.77.2026.01.09.07.22.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jan 2026 07:22:16 -0800 (PST)
-From: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
+	s=arc-20240116; t=1767973031; c=relaxed/simple;
+	bh=UiHnQOX8n8z/sEk6RLsE9km58+/qOu0e4tMQxCdsk0Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tSWnqn9MSnFz+An6/0QQq0rqsSR2P6w5wU8dRWFo9IekBaIdikUPMJViz87/f4eQAW4goCeSm5IFvXSjeQPEwxbOH1F9ciAS8Vd1wDiooZqdIjfZXMIod67vWq5YkeY+UdjbCk9o2IoMbvOD5wRoOWQQpn0Qeq5I2g09pYoB2rk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=d2KYLebv; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1767973017;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=btTxvIehuKA9Wli51TouY54utCzePLidNshQnisty/w=;
+	b=d2KYLebv5utowYBuU4UqGGjExr3k+VQQAPDSDqlkAB7UCGlwTIrKVpqy7qFQjN4h26lif3
+	fXSC8aR0TAx0SKsSHha3wwPKEkuvvhG2M6M5DYjYowe1rkvm6MAcHqmV00KzHjkOg/qPqh
+	/iDBW7Semt8/oACj8RYRGJtfiB+8HHs=
+From: Leon Hwang <leon.hwang@linux.dev>
+To: bpf@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Matt Bobrowski <mattbobrowski@google.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
 	Shuah Khan <shuah@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-Subject: [PATCH RESEND net-next] selftests/net/ipsec: Fix variable size type not at the end of struct
-Date: Fri,  9 Jan 2026 20:52:01 +0530
-Message-ID: <20260109152201.15668-1-ankitkhushwaha.linux@gmail.com>
-X-Mailer: git-send-email 2.52.0
+	Leon Hwang <leon.hwang@linux.dev>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	kernel-patches-bot@fb.com
+Subject: [PATCH bpf-next 0/3] bpf: Introduce BPF_BRANCH_SNAPSHOT_F_COPY flag for bpf_get_branch_snapshot helper
+Date: Fri,  9 Jan 2026 23:34:17 +0800
+Message-ID: <20260109153420.32181-1-leon.hwang@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,83 +81,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-The "struct alg" object contains a union of 3 xfrm structures:
+When the PMU LBR is running in branch-sensitive mode,
+'perf_snapshot_branch_stack()' may capture branch entries from the
+trampoline entry up to the call site inside a BPF program. These branch
+entries are not useful for analyzing the control flow of the tracee.
 
-	union {
-		struct xfrm_algo;
-		struct xfrm_algo_aead;
-		struct xfrm_algo_auth;
-	}
+To eliminate such noise for tracing programs, the branch snapshot should
+be taken as early as possible:
 
-All of them end with a flexible array member used to store key material,
-but the flexible array appears at *different offsets* in each struct.
-bcz of this, union itself is of variable-sized & Placing it above
-char buf[...] triggers:
+* Call 'perf_snapshot_branch_stack()' at the very beginning of the
+  trampoline for fentry programs.
+* Call 'perf_snapshot_branch_stack()' immediately after invoking the
+  tracee for fexit programs.
 
-ipsec.c:835:5: warning: field 'u' with variable sized type 'union
-(unnamed union at ipsec.c:831:3)' not at the end of a struct or class
-is a GNU extension [-Wgnu-variable-sized-type-not-at-end]
-  835 |                 } u;
-      |                   ^
+With this change, LBR snapshots remain meaningful even when multiple BPF
+programs execute before the one requesting LBR data.
 
-one fix is to use "TRAILING_OVERLAP()" which works with one flexible
-array member only.
+In addition, more relevant branch entries can be captured on AMD CPUs,
+which provide a 16-entry-deep LBR stack.
 
-But In "struct alg" flexible array member exists in all union members,
-but not at the same offset, so TRAILING_OVERLAP cannot be applied.
+Testing
 
-so the fix is to explicitly overlay the key buffer at the correct offset
-for the largest union member (xfrm_algo_auth). This ensures that the
-flexible-array region and the fixed buffer line up.
+The series was tested in a VM configured with LBR enabled:
 
-No functional change.
+vmtest --kvm-cpu-args 'host,pmu=on,lbr-fmt=0x5' -k $(make -s image_name) -
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
----
-CCed Gustavo and linux-hardening as suggested by Simon.
+Branch records were verified using bpfsnoop [1]:
 
-Previous patch: https://lore.kernel.org/all/aSiXmp4mh7M3RaRv@horms.kernel.org/t/#u
----
- tools/testing/selftests/net/ipsec.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+/path/to/bpfsnoop -k '(l)icmp_rcv' -E 1 -v \
+  --kernel-vmlinux /path/to/kernel/vmlinux
 
-diff --git a/tools/testing/selftests/net/ipsec.c b/tools/testing/selftests/net/ipsec.c
-index 0ccf484b1d9d..f4afef51b930 100644
---- a/tools/testing/selftests/net/ipsec.c
-+++ b/tools/testing/selftests/net/ipsec.c
-@@ -43,6 +43,10 @@
+For comparison, the following command was used without
+BPF_BRANCH_SNAPSHOT_F_COPY:
 
- #define BUILD_BUG_ON(condition) ((void)sizeof(char[1 - 2*!!(condition)]))
+/path/to/bpfsnoop -k '(l)icmp_rcv' -E 1 -v \
+  --force-get-branch-snapshot --kernel-vmlinux /path/to/kernel/vmlinux
 
-+#ifndef offsetof
-+#define offsetof(TYPE, MEMBER)	__builtin_offsetof(TYPE, MEMBER)
-+#endif
-+
- #define IPV4_STR_SZ	16	/* xxx.xxx.xxx.xxx is longest + \0 */
- #define MAX_PAYLOAD	2048
- #define XFRM_ALGO_KEY_BUF_SIZE	512
-@@ -827,13 +831,16 @@ static int xfrm_fill_key(char *name, char *buf,
- static int xfrm_state_pack_algo(struct nlmsghdr *nh, size_t req_sz,
- 		struct xfrm_desc *desc)
- {
--	struct {
-+	union {
- 		union {
- 			struct xfrm_algo	alg;
- 			struct xfrm_algo_aead	aead;
- 			struct xfrm_algo_auth	auth;
- 		} u;
--		char buf[XFRM_ALGO_KEY_BUF_SIZE];
-+		struct {
-+			unsigned char __offset_to_FAM[offsetof(struct xfrm_algo_auth, alg_key)];
-+			char buf[XFRM_ALGO_KEY_BUF_SIZE];
-+		};
- 	} alg = {};
- 	size_t alen, elen, clen, aelen;
- 	unsigned short type;
+Without BPF_BRANCH_SNAPSHOT_F_COPY, no branch records related to the
+tracee are captured. With it enabled, 17 branch records from the tracee
+are observed.
+
+Detailed verification results are available in the gist [2].
+
+With this series applied, retsnoop [3] can benefit from improved LBR
+support when using the '--lbr --fentries' options.
+
+Links:
+[1] https://github.com/bpfsnoop/bpfsnoop
+[2] https://gist.github.com/Asphaltt/cffdeb4b2f2db4c3c42f91a59109f9e7
+[3] https://github.com/anakryiko/retsnoop
+
+Leon Hwang (3):
+  bpf, x64: Call perf_snapshot_branch_stack in trampoline
+  bpf: Introduce BPF_BRANCH_SNAPSHOT_F_COPY flag for
+    bpf_get_branch_snapshot helper
+  selftests/bpf: Add BPF_BRANCH_SNAPSHOT_F_COPY test
+
+ arch/x86/net/bpf_jit_comp.c                   | 66 +++++++++++++++++++
+ include/linux/bpf.h                           | 18 ++++-
+ include/linux/bpf_verifier.h                  |  1 +
+ kernel/bpf/verifier.c                         | 30 +++++++++
+ kernel/trace/bpf_trace.c                      | 17 ++++-
+ .../bpf/prog_tests/get_branch_snapshot.c      | 26 +++++++-
+ .../selftests/bpf/progs/get_branch_snapshot.c |  3 +-
+ 7 files changed, 153 insertions(+), 8 deletions(-)
+
 --
 2.52.0
-
 
