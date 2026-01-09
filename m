@@ -1,99 +1,101 @@
-Return-Path: <netdev+bounces-248498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AE59D0A666
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 14:26:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E85ADD0A64B
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 14:25:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5C11E304EF4F
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 13:15:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DA6BA30322F7
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 13:15:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CEA135C1A7;
-	Fri,  9 Jan 2026 13:15:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3598B35BDDC;
+	Fri,  9 Jan 2026 13:15:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ggpgnk+q";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="nGwC/org"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fhJKb0Jk";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="XiuWr0Hg"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B9CB35BDBF
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 13:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8839E2E8B78
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 13:15:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767964546; cv=none; b=VQt5mLonqnAUOq/OO3IHm94XsmwTuyvB7/f2OhGRY+g/WgkqD3MmuQiAl8m/OkXhl5p5kx8BOnkJIptYkP08vZ/3R24Ikw4IdNZ1AJSp/WlJxy+FznhgFE8e1XfbTsaXbjZKXumEXIkX83n+/nHRjiOJPUxatX6od/XZJBJpo50=
+	t=1767964545; cv=none; b=UVM0/ZeAlvWijjyn96HCiemrKdm/15D/mLj4gO1BcMjaFGl+mBGrvFsALNsw0XjhWgW4dUwXhjXS4XqSdyQOl+Of6jCxL/Z0wUDWXqoxiahbNVHfksjoyu1i2u+Zf1jrTn1ZUbd1+e3Y4tpRS53+Ynf0iZK9T+S+SiTTbnlUEE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767964546; c=relaxed/simple;
-	bh=SaDOvD86LLv7c/iSJyHwBOYgTk0Ktp2/QVNS1nuUjKk=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=dDLzImQv7NkZ/dk8GHYgm8/u8gt64o4ZXThg6DLCSKru/6OBooVuizyqCnpP4z7uh8wtrcBF+XXBSH4ZDi45lfBlSPYnQlcBwfnpjNjkmdQ/zAjGAjIUxNj/QAE++c3kvwJN+9eh7b7vuJKOEdR8N1Fm1djMjaqZAbbM/PBY7MU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ggpgnk+q; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=nGwC/org; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1767964545; c=relaxed/simple;
+	bh=JmuDeJxLItLOh/bZtOxtFm1LStfkTnXSGkMQRcDG4Fw=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=nvYAs8El51J0q3uKo4O/gjopkyl37lvhO11M/oplyWUu7lX861G/bprAX2oR9tJmeA60m/4LYhHebd/pRX6QVdpv2Xt/d3oSr2/b8zMG8MYDd2UtGfylK04HRU3IuNO+YVremdNTFEAAkQG4bZmQmZMCimpeqiyP0gGgCMPvyec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fhJKb0Jk; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=XiuWr0Hg; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767964543;
+	s=mimecast20190719; t=1767964542;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=15JyQ+VnqINRMwrw8AIegPn8BzaxzgODQQRF2S98B5Y=;
-	b=ggpgnk+q2DDf81K/CUrCccRN52YY7U8YqTElLhCW8r1WNxL+XKaHZbDjftmmJT7+ZGNRlI
-	bZWXddKREB3DtuGAfN25LIAj/Txer1kjmjmxNYkveDyqfznUfYakswJu93qJ5aS1Mn45Uu
-	nII8HjNa2uVB82wGXieuMCAADZJGMq0=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w0VRQtyWtlpjzCobkhPA/bxrDXQwuOX3Zf3Yncleem0=;
+	b=fhJKb0JkiLgxTDq6YHCV69pHjZz3mYzvPrvW7+fKyANw6GbajlQHT8bXXo9rqLlEXHApOq
+	f1uEuKVto8Z5r9KFMvdQicUI2d4IZKlsf3MIOcKj+T+qgsOeynHKLKPJcUuPYV5vp4QUXq
+	vVv6tnRAvbNOMfVxqXipnGSD6mNS7Js=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-617-SsZAqdv5PrG1FFcNwJZiww-1; Fri, 09 Jan 2026 08:15:42 -0500
-X-MC-Unique: SsZAqdv5PrG1FFcNwJZiww-1
-X-Mimecast-MFC-AGG-ID: SsZAqdv5PrG1FFcNwJZiww_1767964541
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-b802d6ed5b0so901616366b.1
-        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 05:15:42 -0800 (PST)
+ us-mta-437-mivcOCjpNLi2lWM7LIpTHQ-1; Fri, 09 Jan 2026 08:15:41 -0500
+X-MC-Unique: mivcOCjpNLi2lWM7LIpTHQ-1
+X-Mimecast-MFC-AGG-ID: mivcOCjpNLi2lWM7LIpTHQ_1767964540
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b844098867cso575857566b.3
+        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 05:15:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767964541; x=1768569341; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=15JyQ+VnqINRMwrw8AIegPn8BzaxzgODQQRF2S98B5Y=;
-        b=nGwC/orgqNt9zs7LKPPMUtRbLfx5hJsmty0nGr84XUyw07cwB+eSKZCl4LhfIkw7sr
-         VLd6XXKRUZevI6yAUOyd3MwH64t7R5Y3l/AbQH1n2zpv+l7F2iwFx2arAPdQgddMp4nf
-         ASxAGcJZUTom7VEhr/PgpIv7lS5vJo9AEQmtGCMVfZ6wUsJZO6Pb8jWaOQh9I7eQYOXT
-         51eY/y7NafBmEatRFAocDVFApMHibAY0RZa2CtNCgwWZBxUs5WZuPrpWqUA5AC0Pzu8Z
-         5Qpv02e/5sUtBGiZm5/bJe4Z0uVdZBqcDJIZG2G8rllamlP/D8cdMCW4uEvDaR2KT+4a
-         qwLg==
+        d=redhat.com; s=google; t=1767964540; x=1768569340; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=w0VRQtyWtlpjzCobkhPA/bxrDXQwuOX3Zf3Yncleem0=;
+        b=XiuWr0HgDK1fGMD0vcFpyab+l9gUmBg99Z2CtxObABphnHlMoD+Kzk5mKE3avO5a77
+         pvD7qqS+bE9YNvwvURODsRvQb0g/t3LZdjBXNzXRYVR+s1JxlF+v+/plsMYnUfxBF477
+         CdofTPqJ3VSMOXbP+VZHhChSGgqwuMnKXSC4bCTsnkYLVqZIX03zlh1n7i9S9DHHJScZ
+         VUGYdlugJDHz3nC+yxZkBdk6RhURaZUhyiqu4H3fR20Ss+pPPMScuV39sUkN51v4G9oI
+         T+G+E70QKZZHn/ekSVJwsVf0/HXny+9QsSzG3kx8ynkdSBEJ+hPCYt0xv2hYAMm9bDEO
+         +csg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767964541; x=1768569341;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=15JyQ+VnqINRMwrw8AIegPn8BzaxzgODQQRF2S98B5Y=;
-        b=JMN0lfTlUEGcHl18VNaLg0xWUdZIi4NX8B29XJ7jK0MbkFBK22sVdnxUlVQZcNwp+Z
-         hxn/jgWr73eIzZAiT8ZCVu2hNhoc68DtlEcYRACem2rAj3eLN1tMxc04IwPPUNBW+1Iy
-         fdX/4RDM/IUENUictp2bSbeQoCyyB4KPLAY6OpruSwovLzC8aTFWBFYEwDNyO0VHHXUC
-         2/6r/PIJ/MjjbRDnLpkglem0aLgO2O8qlexX7I3tTKCx6MTQSjlvfK5nUP+LapozEKQy
-         C82bY/+cuusvLZD7jDn7mlnfRy0LJDJUcnv/pwf3Ux4+2XM4o0lt4YzinfccUshe6lz/
-         hyfA==
-X-Forwarded-Encrypted: i=1; AJvYcCUf8miDeShUeb2EL+JdVjxIXRTmkDlYPmrYOirGgcXWdIJab8P+4q0/X/ij4G6o9Rs0z6qPH64=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUFu3fc9pFf3AT6z9nq6DoeBSu9/tpoWVEMWegVhWRr1JJ/Tr4
-	6B17tIXXt063jFYa8DCTI33vqmq8ebkmUdYq2lhUhMkIig1N1hDoh9BVX30Jc6rxmRdMGOrr+DS
-	gzviiJirBAxpOL5kogVNtvblPdVT2fN8HDsWPil3FdsNktgYg2qbWdPAg/Q==
-X-Gm-Gg: AY/fxX7TxvP/yAUvNUW+nDSX7hWrydt836678j9ri03dnfx5NDlG8QslP1jifqEBppU
-	O7eyzb6gYzs9/+gq23o0hYPq4Zby+744crAPKP65xa1mKCnSbFfKtyCqnpYSdJDmwcWXsCUx4yb
-	pRcDBiS+L4UfKp/CSOFa/HqZN5Bm81Y3gCkIFX8UWOqPczJaVN6BxT/icu2ct92ggyGXlaxGwNa
-	6kOYGPLwfVJXjrW2iqn+a89i3thdiVukp4I58YcuVb1KS/GpmYBaS3X50Or0XZc91R586am+WEj
-	f+v+RxEC4rK5V0EXE8Cn/3JF7Nzk5inB1ul1ZxPhTPQ5HoU593Q6BxMFboJiLRXg8FDhyRCl/f+
-	l+i7GowBwCSyDAOBtrgrU/b5zbvkGG278e2/u
-X-Received: by 2002:a17:907:7801:b0:b73:1b97:5ddd with SMTP id a640c23a62f3a-b84298aaaf7mr977871666b.8.1767964540825;
-        Fri, 09 Jan 2026 05:15:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHXfD6hIS3yvZXrfPZ431q2UaPCz5Fvv5DwOUzo2N/PV5cXgjJXOX9oac+kNdKm+4+4JtHfjA==
-X-Received: by 2002:a17:907:7801:b0:b73:1b97:5ddd with SMTP id a640c23a62f3a-b84298aaaf7mr977868166b.8.1767964540306;
-        Fri, 09 Jan 2026 05:15:40 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a563f73sm1162052666b.61.2026.01.09.05.15.38
+        d=1e100.net; s=20230601; t=1767964540; x=1768569340;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=w0VRQtyWtlpjzCobkhPA/bxrDXQwuOX3Zf3Yncleem0=;
+        b=buosVmhIPtBqlE3Iom86xymcdGMmiubXbR0JWt+Q5KPWtgcpfaSQjinGcz7cPvSuqp
+         g8e5038+78SVSs3yIGUn94ROXmBathFUNSNah3f9hbY7REG154TUgpkYt//0lnDEh4+P
+         f21GPxGugyxWxvx3a/SmLFoysAUNA48o7ZRTn+3VZIrB3tl+CCAQ1CCYqsHKD+qadSkA
+         fKi2W+BUFzhNUuH3gtw3errlobyHBD59UECnabnHYOxCaeWuUsRqI+MsaIi2GA7er76g
+         78J429nJPAZHdj5GetegtIEQW1ZDE0lo/3NXdT7sh+klNl41TR0pgtqDSLpHFqRzz4fN
+         tMYA==
+X-Forwarded-Encrypted: i=1; AJvYcCXBtJqAh9wctApSt93kzI+/btqqJB4JJ4zPWX9mP9igYL44kUPmYVYk4fkTXCBBjeuedVQAqQ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw77/1bN9eKI71frzD0laC+aQV7qkQjZmYtr1E9gQAb9xUgQYo6
+	IX6S835K0fwohw5Q1sYLO78R1+bnNhkrZNK9B3n04Xp3DlEHgBGAbWvELN6h4mTS8eBh9B143Jw
+	VssswYYvPQBW+c5fcQuvRwHhfda+5kR9jvPHZ72zQafgg6iVU/wgHG4NpvCkABVnANg==
+X-Gm-Gg: AY/fxX4C9fcKGWPYNxECCuKgIZBoEVDZT03ef3hWTjxO2PQQI8yQ0Vsm0FEP3kfyMeY
+	5uC+HoU3YCvXHASvVtrZbZgURrSiYKvLmYVtp/A7c8nCGrzLJpEYBtnH4RyT+R2fSibMdrVW+zw
+	OaFZ3pDZzxQ6fvRKdMp2808C6V0CdNkmN8okAqVCsi+5HzdQ00I8o4fjGnQPqoUcFgJMIlcMVMC
+	UEbttHYaGNDN4Y/w8/xIE+AfJKrnyH45Cri8ymX7RfRHDajw22Cio+/DPinp+xpIVu+4oMwnwv7
+	v5P1PzMECbLTa8ACRiwoVxnSZdjV0vKXNqtNlRuhWoxyfiBECgqluWZxFZGH0G6VCy//8lmTd01
+	Ym+XxrbYju/Hstw1lvLTq+TNQSmxeEBR+zw==
+X-Received: by 2002:a17:906:308b:b0:b84:5818:6130 with SMTP id a640c23a62f3a-b8458186688mr560322066b.43.1767964539816;
+        Fri, 09 Jan 2026 05:15:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH45xvXr+lcQGLbKnMK5yBtPFXk/FS9cYJ0UFOTrHw+lBHOvqC3FjXhRg4jcYDezUMT+23iCQ==
+X-Received: by 2002:a17:906:308b:b0:b84:5818:6130 with SMTP id a640c23a62f3a-b8458186688mr560319366b.43.1767964539334;
+        Fri, 09 Jan 2026 05:15:39 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a5118eesm1098642466b.52.2026.01.09.05.15.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Fri, 09 Jan 2026 05:15:38 -0800 (PST)
 Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 1FAFE40862B; Fri, 09 Jan 2026 14:15:38 +0100 (CET)
+	id 2253240862D; Fri, 09 Jan 2026 14:15:38 +0100 (CET)
 From: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Subject: [PATCH net-next v8 0/6] Multi-queue aware sch_cake
-Date: Fri, 09 Jan 2026 14:15:29 +0100
-Message-Id: <20260109-mq-cake-sub-qdisc-v8-0-8d613fece5d8@redhat.com>
+Date: Fri, 09 Jan 2026 14:15:30 +0100
+Subject: [PATCH net-next v8 1/6] net/sched: Export mq functions for reuse
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,13 +104,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-B4-Tracking: v=1; b=H4sIAHH/YGkC/3XRwU7DMAwG4FdBORNkp0nacEJC4gG4Ig5J7LAIr
- WNtmYamvTtZEVDUcLR++7Nkn8TIQ+ZR3F6dxMCHPOZdX4ru+krEje9fWGYqtVCgDDhQcruX0b+
- yHN+D3FMeo4yUIBhHKrERZe5t4JSPs/kkep5kz8dJPJdkk8dpN3zMyx4f7ueGL1jpCnxACVI3H
- iwQIip/NzBt/HQTd9vZO+APUeJ/Ca9SQvJBd11aEWpJtDVCFUJpcuwJdBvcimgWRAM1oimESdZ
- GozuOFFeE/iUUYI3QFwKIGoXoMdoVYb4JCwimRphCdN654CiA4TVhl4StEbYQzIrBBuSA64+0S
- 6KrEe3lqRysNgk0ur+3OJ/Pn0cBkXeTAgAA
-X-Change-ID: 20250902-mq-cake-sub-qdisc-cdf0b59d2fe5
+Message-Id: <20260109-mq-cake-sub-qdisc-v8-1-8d613fece5d8@redhat.com>
+References: <20260109-mq-cake-sub-qdisc-v8-0-8d613fece5d8@redhat.com>
+In-Reply-To: <20260109-mq-cake-sub-qdisc-v8-0-8d613fece5d8@redhat.com>
 To: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>, 
  Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
  Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
@@ -117,127 +115,262 @@ To: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
 Cc: =?utf-8?q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>, 
  cake@lists.bufferbloat.net, netdev@vger.kernel.org, 
  Willem de Bruijn <willemb@google.com>, 
- =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>, 
- Victor Nogueira <victor@mojatatu.com>
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
 X-Mailer: b4 0.14.3
 
-This series adds a multi-queue aware variant of the sch_cake scheduler,
-called 'cake_mq'. Using this makes it possible to scale the rate shaper
-of sch_cake across multiple CPUs, while still enforcing a single global
-rate on the interface.
+To enable the cake_mq qdisc to reuse code from the mq qdisc, export a
+bunch of functions from sch_mq. Split common functionality out from some
+functions so it can be composed with other code, and export other
+functions wholesale. To discourage wanton reuse, put the symbols into a
+new NET_SCHED_INTERNAL namespace, and a sch_priv.h header file.
 
-The approach taken in this patch series is to implement a separate qdisc
-called 'cake_mq', which is based on the existing 'mq' qdisc, but differs
-in a couple of aspects:
+No functional change intended.
 
-- It will always install a cake instance on each hardware queue (instead
-  of using the default qdisc for each queue like 'mq' does).
-
-- The cake instances on the queues will share their configuration, which
-  can only be modified through the parent cake_mq instance.
-
-Doing things this way simplifies user configuration by centralising
-all configuration through the cake_mq qdisc (which also serves as an
-obvious way of opting into the multi-queue aware behaviour). The cake_mq
-qdisc takes all the same configuration parameters as the cake qdisc.
-
-An earlier version of this work was presented at this year's Netdevconf:
-https://netdevconf.info/0x19/sessions/talk/mq-cake-scaling-software-rate-limiting-across-cpu-cores.html
-
-The patch series is structured as follows:
-
-- Patch 1 exports the mq qdisc functions for reuse.
-
-- Patch 2 factors out the sch_cake configuration variables into a
-  separate struct that can be shared between instances.
-
-- Patch 3 adds the basic cake_mq qdisc, reusing the exported mq code
-
-- Patch 4 adds configuration sharing across the cake instances installed
-  under cake_mq
-
-- Patch 5 adds the shared shaper state that enables the multi-core rate
-  shaping
-
-- Patch 6 adds selftests for cake_mq
-
-A patch to iproute2 to make it aware of the cake_mq qdisc were submitted
-separately with a previous patch version:
-
-https://lore.kernel.org/r/20260105162902.1432940-1-toke@redhat.com
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
 ---
-Changes in v8:
-- Use right attribute in netlink extact error
-- Use kzalloc(sizeof(*q)) instead of kzalloc(sizeof(struct cake_sched_config))
-- Link to v7: https://lore.kernel.org/r/20260108-mq-cake-sub-qdisc-v7-0-4eb645f0419c@redhat.com
+ MAINTAINERS            |  1 +
+ include/net/sch_priv.h | 27 +++++++++++++++++++
+ net/sched/sch_mq.c     | 71 ++++++++++++++++++++++++++++++++++----------------
+ 3 files changed, 77 insertions(+), 22 deletions(-)
 
-Changes in v7:
-- Use kzalloc() instead of kvcalloc(1, ...)
-- Add missing SoB to last patch
-- Add new include/linux/sch_priv.h header file to MAINTAINERS entry for TC
-- Link to v6: https://lore.kernel.org/r/20260106-mq-cake-sub-qdisc-v6-0-ee2e06b1eb1a@redhat.com
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 765ad2daa218..01b691cb00d7 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -25446,6 +25446,7 @@ L:	netdev@vger.kernel.org
+ S:	Maintained
+ F:	include/net/pkt_cls.h
+ F:	include/net/pkt_sched.h
++F:	include/net/sch_priv.h
+ F:	include/net/tc_act/
+ F:	include/uapi/linux/pkt_cls.h
+ F:	include/uapi/linux/pkt_sched.h
+diff --git a/include/net/sch_priv.h b/include/net/sch_priv.h
+new file mode 100644
+index 000000000000..4789f668ae87
+--- /dev/null
++++ b/include/net/sch_priv.h
+@@ -0,0 +1,27 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __NET_SCHED_PRIV_H
++#define __NET_SCHED_PRIV_H
++
++#include <net/sch_generic.h>
++
++struct mq_sched {
++	struct Qdisc		**qdiscs;
++};
++
++int mq_init_common(struct Qdisc *sch, struct nlattr *opt,
++		   struct netlink_ext_ack *extack,
++		   const struct Qdisc_ops *qdisc_ops);
++void mq_destroy_common(struct Qdisc *sch);
++void mq_attach(struct Qdisc *sch);
++void mq_dump_common(struct Qdisc *sch, struct sk_buff *skb);
++struct netdev_queue *mq_select_queue(struct Qdisc *sch,
++				     struct tcmsg *tcm);
++struct Qdisc *mq_leaf(struct Qdisc *sch, unsigned long cl);
++unsigned long mq_find(struct Qdisc *sch, u32 classid);
++int mq_dump_class(struct Qdisc *sch, unsigned long cl,
++		  struct sk_buff *skb, struct tcmsg *tcm);
++int mq_dump_class_stats(struct Qdisc *sch, unsigned long cl,
++			struct gnet_dump *d);
++void mq_walk(struct Qdisc *sch, struct qdisc_walker *arg);
++
++#endif
+diff --git a/net/sched/sch_mq.c b/net/sched/sch_mq.c
+index c860119a8f09..bb94cd577943 100644
+--- a/net/sched/sch_mq.c
++++ b/net/sched/sch_mq.c
+@@ -15,11 +15,7 @@
+ #include <net/netlink.h>
+ #include <net/pkt_cls.h>
+ #include <net/pkt_sched.h>
+-#include <net/sch_generic.h>
+-
+-struct mq_sched {
+-	struct Qdisc		**qdiscs;
+-};
++#include <net/sch_priv.h>
+ 
+ static int mq_offload(struct Qdisc *sch, enum tc_mq_command cmd)
+ {
+@@ -49,23 +45,29 @@ static int mq_offload_stats(struct Qdisc *sch)
+ 	return qdisc_offload_dump_helper(sch, TC_SETUP_QDISC_MQ, &opt);
+ }
+ 
+-static void mq_destroy(struct Qdisc *sch)
++void mq_destroy_common(struct Qdisc *sch)
+ {
+ 	struct net_device *dev = qdisc_dev(sch);
+ 	struct mq_sched *priv = qdisc_priv(sch);
+ 	unsigned int ntx;
+ 
+-	mq_offload(sch, TC_MQ_DESTROY);
+-
+ 	if (!priv->qdiscs)
+ 		return;
+ 	for (ntx = 0; ntx < dev->num_tx_queues && priv->qdiscs[ntx]; ntx++)
+ 		qdisc_put(priv->qdiscs[ntx]);
+ 	kfree(priv->qdiscs);
+ }
++EXPORT_SYMBOL_NS_GPL(mq_destroy_common, "NET_SCHED_INTERNAL");
+ 
+-static int mq_init(struct Qdisc *sch, struct nlattr *opt,
+-		   struct netlink_ext_ack *extack)
++static void mq_destroy(struct Qdisc *sch)
++{
++	mq_offload(sch, TC_MQ_DESTROY);
++	mq_destroy_common(sch);
++}
++
++int mq_init_common(struct Qdisc *sch, struct nlattr *opt,
++		   struct netlink_ext_ack *extack,
++		   const struct Qdisc_ops *qdisc_ops)
+ {
+ 	struct net_device *dev = qdisc_dev(sch);
+ 	struct mq_sched *priv = qdisc_priv(sch);
+@@ -87,7 +89,8 @@ static int mq_init(struct Qdisc *sch, struct nlattr *opt,
+ 
+ 	for (ntx = 0; ntx < dev->num_tx_queues; ntx++) {
+ 		dev_queue = netdev_get_tx_queue(dev, ntx);
+-		qdisc = qdisc_create_dflt(dev_queue, get_default_qdisc_ops(dev, ntx),
++		qdisc = qdisc_create_dflt(dev_queue,
++					  qdisc_ops ?: get_default_qdisc_ops(dev, ntx),
+ 					  TC_H_MAKE(TC_H_MAJ(sch->handle),
+ 						    TC_H_MIN(ntx + 1)),
+ 					  extack);
+@@ -98,12 +101,24 @@ static int mq_init(struct Qdisc *sch, struct nlattr *opt,
+ 	}
+ 
+ 	sch->flags |= TCQ_F_MQROOT;
++	return 0;
++}
++EXPORT_SYMBOL_NS_GPL(mq_init_common, "NET_SCHED_INTERNAL");
++
++static int mq_init(struct Qdisc *sch, struct nlattr *opt,
++		   struct netlink_ext_ack *extack)
++{
++	int ret;
++
++	ret = mq_init_common(sch, opt, extack, NULL);
++	if (ret)
++		return ret;
+ 
+ 	mq_offload(sch, TC_MQ_CREATE);
+ 	return 0;
+ }
+ 
+-static void mq_attach(struct Qdisc *sch)
++void mq_attach(struct Qdisc *sch)
+ {
+ 	struct net_device *dev = qdisc_dev(sch);
+ 	struct mq_sched *priv = qdisc_priv(sch);
+@@ -124,8 +139,9 @@ static void mq_attach(struct Qdisc *sch)
+ 	kfree(priv->qdiscs);
+ 	priv->qdiscs = NULL;
+ }
++EXPORT_SYMBOL_NS_GPL(mq_attach, "NET_SCHED_INTERNAL");
+ 
+-static int mq_dump(struct Qdisc *sch, struct sk_buff *skb)
++void mq_dump_common(struct Qdisc *sch, struct sk_buff *skb)
+ {
+ 	struct net_device *dev = qdisc_dev(sch);
+ 	struct Qdisc *qdisc;
+@@ -152,7 +168,12 @@ static int mq_dump(struct Qdisc *sch, struct sk_buff *skb)
+ 
+ 		spin_unlock_bh(qdisc_lock(qdisc));
+ 	}
++}
++EXPORT_SYMBOL_NS_GPL(mq_dump_common, "NET_SCHED_INTERNAL");
+ 
++static int mq_dump(struct Qdisc *sch, struct sk_buff *skb)
++{
++	mq_dump_common(sch, skb);
+ 	return mq_offload_stats(sch);
+ }
+ 
+@@ -166,11 +187,12 @@ static struct netdev_queue *mq_queue_get(struct Qdisc *sch, unsigned long cl)
+ 	return netdev_get_tx_queue(dev, ntx);
+ }
+ 
+-static struct netdev_queue *mq_select_queue(struct Qdisc *sch,
+-					    struct tcmsg *tcm)
++struct netdev_queue *mq_select_queue(struct Qdisc *sch,
++				     struct tcmsg *tcm)
+ {
+ 	return mq_queue_get(sch, TC_H_MIN(tcm->tcm_parent));
+ }
++EXPORT_SYMBOL_NS_GPL(mq_select_queue, "NET_SCHED_INTERNAL");
+ 
+ static int mq_graft(struct Qdisc *sch, unsigned long cl, struct Qdisc *new,
+ 		    struct Qdisc **old, struct netlink_ext_ack *extack)
+@@ -198,14 +220,15 @@ static int mq_graft(struct Qdisc *sch, unsigned long cl, struct Qdisc *new,
+ 	return 0;
+ }
+ 
+-static struct Qdisc *mq_leaf(struct Qdisc *sch, unsigned long cl)
++struct Qdisc *mq_leaf(struct Qdisc *sch, unsigned long cl)
+ {
+ 	struct netdev_queue *dev_queue = mq_queue_get(sch, cl);
+ 
+ 	return rtnl_dereference(dev_queue->qdisc_sleeping);
+ }
++EXPORT_SYMBOL_NS_GPL(mq_leaf, "NET_SCHED_INTERNAL");
+ 
+-static unsigned long mq_find(struct Qdisc *sch, u32 classid)
++unsigned long mq_find(struct Qdisc *sch, u32 classid)
+ {
+ 	unsigned int ntx = TC_H_MIN(classid);
+ 
+@@ -213,9 +236,10 @@ static unsigned long mq_find(struct Qdisc *sch, u32 classid)
+ 		return 0;
+ 	return ntx;
+ }
++EXPORT_SYMBOL_NS_GPL(mq_find, "NET_SCHED_INTERNAL");
+ 
+-static int mq_dump_class(struct Qdisc *sch, unsigned long cl,
+-			 struct sk_buff *skb, struct tcmsg *tcm)
++int mq_dump_class(struct Qdisc *sch, unsigned long cl,
++		  struct sk_buff *skb, struct tcmsg *tcm)
+ {
+ 	struct netdev_queue *dev_queue = mq_queue_get(sch, cl);
+ 
+@@ -224,9 +248,10 @@ static int mq_dump_class(struct Qdisc *sch, unsigned long cl,
+ 	tcm->tcm_info = rtnl_dereference(dev_queue->qdisc_sleeping)->handle;
+ 	return 0;
+ }
++EXPORT_SYMBOL_NS_GPL(mq_dump_class, "NET_SCHED_INTERNAL");
+ 
+-static int mq_dump_class_stats(struct Qdisc *sch, unsigned long cl,
+-			       struct gnet_dump *d)
++int mq_dump_class_stats(struct Qdisc *sch, unsigned long cl,
++			struct gnet_dump *d)
+ {
+ 	struct netdev_queue *dev_queue = mq_queue_get(sch, cl);
+ 
+@@ -236,8 +261,9 @@ static int mq_dump_class_stats(struct Qdisc *sch, unsigned long cl,
+ 		return -1;
+ 	return 0;
+ }
++EXPORT_SYMBOL_NS_GPL(mq_dump_class_stats, "NET_SCHED_INTERNAL");
+ 
+-static void mq_walk(struct Qdisc *sch, struct qdisc_walker *arg)
++void mq_walk(struct Qdisc *sch, struct qdisc_walker *arg)
+ {
+ 	struct net_device *dev = qdisc_dev(sch);
+ 	unsigned int ntx;
+@@ -251,6 +277,7 @@ static void mq_walk(struct Qdisc *sch, struct qdisc_walker *arg)
+ 			break;
+ 	}
+ }
++EXPORT_SYMBOL_NS_GPL(mq_walk, "NET_SCHED_INTERNAL");
+ 
+ static const struct Qdisc_class_ops mq_class_ops = {
+ 	.select_queue	= mq_select_queue,
 
-Changes in v6:
-- Add missing teardown command in last selftest
-- Link to v5: https://lore.kernel.org/r/20260105-mq-cake-sub-qdisc-v5-0-8a99b9db05e6@redhat.com
-
-Changes in v5:
-- Disallow using autorate-ingress with cake_mq
-- Lock each child in cake_mq_change() instead of the parent
-- Move mq exports into its own header file and export them with EXPORT_SYMBOL_NS_GPL
-- Add selftests
-- Link to v4: https://lore.kernel.org/r/20251201-mq-cake-sub-qdisc-v4-0-50dd3211a1c6@redhat.com
-
-Changes in v4:
-- A bunch of bot nits:
- - Fix null pointer deref in cake_destroy()
- - Unwind qdisc registration on failure
- - Use rcu_dereference() instead of rtnl_dereference() in data path
- - Use WRITE_ONCE() for q->last_active
- - Store num_active_qs to stats value after computing it
-- Link to v3: https://lore.kernel.org/r/20251130-mq-cake-sub-qdisc-v3-0-5f66c548ecdc@redhat.com
-
-Changes in v3:
-- Export the functions from sch_mq and reuse them instead of copy-pasting
-- Dropped Jamal's reviewed-by on the patches that changed due to the above
-- Fixed a crash if cake_mq_init is called with a NULL opt parameter
-- Link to v2: https://lore.kernel.org/r/20251127-mq-cake-sub-qdisc-v2-0-24d9ead047b9@redhat.com
-
-Changes in v2:
-- Rebase on top of net-next, incorporating Eric's changes
-- Link to v1: https://lore.kernel.org/r/20251124-mq-cake-sub-qdisc-v1-0-a2ff1dab488f@redhat.com
-
-Changes in v1 (since RFC):
-- Drop the sync_time parameter for now and always use the 200 us value.
-  We are planning to explore auto-configuration of the sync time, so
-  this is to avoid committing to a UAPI. If needed, a parameter can be
-  added back later.
-- Keep the tc yaml spec in sync with the new stats member
-- Rebase on net-next
-- Link to RFC: https://lore.kernel.org/r/20250924-mq-cake-sub-qdisc-v1-0-43a060d1112a@redhat.com
-
----
-Jonas Köppeler (2):
-      net/sched: sch_cake: share shaper state across sub-instances of cake_mq
-      selftests/tc-testing: add selftests for cake_mq qdisc
-
-Toke Høiland-Jørgensen (4):
-      net/sched: Export mq functions for reuse
-      net/sched: sch_cake: Factor out config variables into separate struct
-      net/sched: sch_cake: Add cake_mq qdisc for using cake on mq devices
-      net/sched: sch_cake: Share config across cake_mq sub-qdiscs
-
- Documentation/netlink/specs/tc.yaml                |   3 +
- MAINTAINERS                                        |   1 +
- include/net/sch_priv.h                             |  27 +
- include/uapi/linux/pkt_sched.h                     |   1 +
- net/sched/sch_cake.c                               | 514 ++++++++++++++-----
- net/sched/sch_mq.c                                 |  71 ++-
- .../tc-testing/tc-tests/qdiscs/cake_mq.json        | 559 +++++++++++++++++++++
- 7 files changed, 1018 insertions(+), 158 deletions(-)
----
-base-commit: 76de4e1594b7dfacba549e9db60585811f45dbe5
-change-id: 20250902-mq-cake-sub-qdisc-cdf0b59d2fe5
+-- 
+2.52.0
 
 
