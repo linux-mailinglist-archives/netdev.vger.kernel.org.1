@@ -1,79 +1,183 @@
-Return-Path: <netdev+bounces-248577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16BAAD0BCCF
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 19:12:13 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1097D0BCF3
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 19:16:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EFF86300F899
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 18:12:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B6D523013158
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 18:16:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B5973644A5;
-	Fri,  9 Jan 2026 18:12:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A79453321BD;
+	Fri,  9 Jan 2026 18:16:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iKlHJ6t2"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="E41qEvWx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489C450096B
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 18:12:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF9AB22AE65
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 18:16:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767982329; cv=none; b=tb3LobrxKWp9Hp/+P2zoXEBxYYihUYjmnq/J/itz78zEkgo79aA3CT7Y7VRk3532A7rGywHDinqGf4SXADdr/skHCYwpFKX7w24g2qoRmjpUnFbClFmKDPDaYE13xCsujC3ny8Cgn54xfiBqSAws2n33xxNPIGE/VDgw9HujnyQ=
+	t=1767982572; cv=none; b=jTb/FQW/VAV8WLgyQORLhlg3GwSc04g4gxR+PuYp6cjc+gUwdGLQBpucrIj44HdT7Z4tSQN1s58jq4l1K8Xn/i5FFHRHacGShlUJusYBPyEq5IGDH3Z/dfIoAEjw5O9zOkMPMZ/OyEvDgsc8dAtxdRft/jBvG24zes9HSZkLRPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767982329; c=relaxed/simple;
-	bh=j3ewnioB6wnLvCgdro4quI1Q2RZxDcHLtkSCwS0mtic=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SvnUO0of0KHXEAs0Rnu6eYejEZaRnILnIAjE+d6PdJpQ/dA3qW6ezBqIra1Lm3Y3BhPFHutIcSXFXkj3lUSSv4gCjQM+1jCzeDf15QOydEBOjLJXWIRrRrpdbL/Q27lubpou+JbHPZuOzOxbncaJCyfC3jPF9y5hNaJNbc0ymf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iKlHJ6t2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C450C4CEF1;
-	Fri,  9 Jan 2026 18:12:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767982328;
-	bh=j3ewnioB6wnLvCgdro4quI1Q2RZxDcHLtkSCwS0mtic=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iKlHJ6t2d8pHS+X2q7qfKZqGiZE+z98W6+DMqPctPehZeyODtcn7l4tBya6MAs0iN
-	 BxTFWOJn83bBV5fIAQMIEjIHXP0l7EzNIGDiE18sJofS7dcsg/bC6Nlzts50jR6FXZ
-	 1smrLAtixpNK4yCy/OYDmyNWm5GXT5eXnzQi8uz3zO+AeHIuAsO+00k4GJVtJXdy7m
-	 F7zBbbSPaRT0h7TsNlYs6byVUyOniATXp7uZFiGFJrGp5T+pa54i382wOrBDCeIGPe
-	 4bdgQCnfvHZwDUl1Jq9hri58J4Fxy9A5gZ+BS2Z7IH4PH0VhVDZlf80RF4Op50TdJx
-	 nnzgLaHaLZIPA==
-Date: Fri, 9 Jan 2026 18:12:05 +0000
-From: Simon Horman <horms@kernel.org>
-To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH RFC net-next] net: remove HIPPI support and RoadRunner
- HIPPI driver
-Message-ID: <20260109181205.GQ345651@kernel.org>
-References: <20260107072623.36727-1-enelsonmoore@gmail.com>
+	s=arc-20240116; t=1767982572; c=relaxed/simple;
+	bh=ML7xH8bdEeUUQLjoAoECBAy95ypOvkyEbD46iVVfPVc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ibw9BiWqpgAGWh8h5fbY9I0furB7vLDKvfitwPU72PRt3YxcsaPV/30L/jROYey4CkryFjmiIxIWWGPDzv3EkLNHq3akoUa0IXkvTe3aig30amglHVJPtfAywZ9ATf0kHa25fHFzuCGfLMVvthttkz3N6D7gPeelEFVvuztLPhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=E41qEvWx; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <71c80294-9602-4302-a823-00a0fe7ed7c7@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1767982567;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GbJmJnSbNyL5FE7DeAV7iny/pYwmAwxYW049CqQZNOg=;
+	b=E41qEvWxNQ9SI+HO9X93b+aYH/WnZMukkTwx7iGpKJEC9i+2AzATFlT39LvdMN1P2Rhosg
+	Ed952cp2rpLADfaSO0Kz4Wy0IOpVdW/g1div2QCGPCPQMCcDMHCnEcRg2hjYmfPoSYia+x
+	x12zvGsiKedK4WWzbHFH9Z6jxSdFTTw=
+Date: Fri, 9 Jan 2026 10:16:02 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260107072623.36727-1-enelsonmoore@gmail.com>
+Subject: Re: [PATCH bpf-next v3 04/16] bpf: Convert bpf_selem_unlink to
+ failable
+To: Amery Hung <ameryhung@gmail.com>
+Cc: netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org,
+ daniel@iogearbox.net, memxor@gmail.com, martin.lau@kernel.org,
+ kpsingh@kernel.org, yonghong.song@linux.dev, song@kernel.org,
+ haoluo@google.com, kernel-team@meta.com, bpf@vger.kernel.org
+References: <20251218175628.1460321-1-ameryhung@gmail.com>
+ <20251218175628.1460321-5-ameryhung@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20251218175628.1460321-5-ameryhung@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jan 06, 2026 at 11:26:23PM -0800, Ethan Nelson-Moore wrote:
-> HIPPI has not been relevant for over two decades. It was rapidly
-> eclipsed by Fibre Channel, and even when it was new, it was
-> confined to very high-end hardware. The HIPPI code has only
-> received tree-wide changes and fixes by inspection in the entire
-> Git history. Remove HIPPI support and the rrunner HIPPI driver,
-> and move the former maintainer to the CREDITS file. Keep the
-> include/uapi/linux/if_hippi.h header because it is used by the TUN
-> code, and to avoid breaking userspace, however unlikely that may be.
+
+
+On 12/18/25 9:56 AM, Amery Hung wrote:
+> To prepare changing both bpf_local_storage_map_bucket::lock and
+> bpf_local_storage::lock to rqspinlock, convert bpf_selem_unlink() to
+> failable. It still always succeeds and returns 0 until the change
+> happens. No functional change.
 > 
-> Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+> For bpf_local_storage_map_free(), WARN_ON() for now as no real error
+> will happen until we switch to rqspinlock.
+> 
+> __must_check is added to the function declaration locally to make sure
+> all callers are accounted for during the conversion.
 
-I like the idea of removing unused code, so +1 from my side.
+I don't see __must_check. The same for patch 2.
 
-But, as noted for another of your recent patches,
-please use ./scripts/get_maintainer.pl this.patch to
-fill out the CC list.
+> 
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> ---
+>   include/linux/bpf_local_storage.h | 2 +-
+>   kernel/bpf/bpf_cgrp_storage.c     | 3 +--
+>   kernel/bpf/bpf_inode_storage.c    | 4 +---
+>   kernel/bpf/bpf_local_storage.c    | 8 +++++---
+>   kernel/bpf/bpf_task_storage.c     | 4 +---
+>   net/core/bpf_sk_storage.c         | 4 +---
+>   6 files changed, 10 insertions(+), 15 deletions(-)
+> 
+> diff --git a/include/linux/bpf_local_storage.h b/include/linux/bpf_local_storage.h
+> index 6cabf5154cf6..a94e12ddd83d 100644
+> --- a/include/linux/bpf_local_storage.h
+> +++ b/include/linux/bpf_local_storage.h
+> @@ -176,7 +176,7 @@ int bpf_local_storage_map_check_btf(const struct bpf_map *map,
+>   void bpf_selem_link_storage_nolock(struct bpf_local_storage *local_storage,
+>   				   struct bpf_local_storage_elem *selem);
+>   
+> -void bpf_selem_unlink(struct bpf_local_storage_elem *selem, bool reuse_now);
+> +int bpf_selem_unlink(struct bpf_local_storage_elem *selem, bool reuse_now);
+>   
+>   int bpf_selem_link_map(struct bpf_local_storage_map *smap,
+>   		       struct bpf_local_storage_elem *selem);
+> diff --git a/kernel/bpf/bpf_cgrp_storage.c b/kernel/bpf/bpf_cgrp_storage.c
+> index 0687a760974a..8fef24fcac68 100644
+> --- a/kernel/bpf/bpf_cgrp_storage.c
+> +++ b/kernel/bpf/bpf_cgrp_storage.c
+> @@ -118,8 +118,7 @@ static int cgroup_storage_delete(struct cgroup *cgroup, struct bpf_map *map)
+>   	if (!sdata)
+>   		return -ENOENT;
+>   
+> -	bpf_selem_unlink(SELEM(sdata), false);
+> -	return 0;
+> +	return bpf_selem_unlink(SELEM(sdata), false);
+>   }
+>   
+>   static long bpf_cgrp_storage_delete_elem(struct bpf_map *map, void *key)
+> diff --git a/kernel/bpf/bpf_inode_storage.c b/kernel/bpf/bpf_inode_storage.c
+> index e54cce2b9175..cedc99184dad 100644
+> --- a/kernel/bpf/bpf_inode_storage.c
+> +++ b/kernel/bpf/bpf_inode_storage.c
+> @@ -110,9 +110,7 @@ static int inode_storage_delete(struct inode *inode, struct bpf_map *map)
+>   	if (!sdata)
+>   		return -ENOENT;
+>   
+> -	bpf_selem_unlink(SELEM(sdata), false);
+> -
+> -	return 0;
+> +	return bpf_selem_unlink(SELEM(sdata), false);
+>   }
+>   
+>   static long bpf_fd_inode_storage_delete_elem(struct bpf_map *map, void *key)
+> diff --git a/kernel/bpf/bpf_local_storage.c b/kernel/bpf/bpf_local_storage.c
+> index 0e3fa5fbaaf3..fa629a180e9e 100644
+> --- a/kernel/bpf/bpf_local_storage.c
+> +++ b/kernel/bpf/bpf_local_storage.c
+> @@ -367,7 +367,7 @@ static void bpf_selem_link_map_nolock(struct bpf_local_storage_map *smap,
+>   	hlist_add_head_rcu(&selem->map_node, &b->list);
+>   }
+>   
+> -void bpf_selem_unlink(struct bpf_local_storage_elem *selem, bool reuse_now)
+> +int bpf_selem_unlink(struct bpf_local_storage_elem *selem, bool reuse_now)
+>   {
+>   	struct bpf_local_storage *local_storage;
+>   	bool free_local_storage = false;
+> @@ -377,7 +377,7 @@ void bpf_selem_unlink(struct bpf_local_storage_elem *selem, bool reuse_now)
+>   
+>   	if (unlikely(!selem_linked_to_storage_lockless(selem)))
+>   		/* selem has already been unlinked from sk */
+> -		return;
+> +		return 0;
+>   
+>   	local_storage = rcu_dereference_check(selem->local_storage,
+>   					      bpf_rcu_lock_held());
+> @@ -402,6 +402,8 @@ void bpf_selem_unlink(struct bpf_local_storage_elem *selem, bool reuse_now)
+>   
+>   	if (free_local_storage)
+>   		bpf_local_storage_free(local_storage, reuse_now);
+> +
+> +	return err;
 
-...
+err is not used in patch 3 and then becomes useful in patch 4. The 
+ai-review discovered issue on err also. Squash patch 4 into patch 3. It 
+will be easier to read.
+
+>   }
+>   
+>   void __bpf_local_storage_insert_cache(struct bpf_local_storage *local_storage,
+> @@ -837,7 +839,7 @@ void bpf_local_storage_map_free(struct bpf_map *map,
+>   				struct bpf_local_storage_elem, map_node))) {
+>   			if (busy_counter)
+>   				this_cpu_inc(*busy_counter);
+> -			bpf_selem_unlink(selem, true);
+> +			WARN_ON(bpf_selem_unlink(selem, true));
+
+nit. I would add __must_check to the needed functions in a single patch 
+when everything is ready instead of having an intermediate WARN_ON here 
+and then removed it later.
+
 
