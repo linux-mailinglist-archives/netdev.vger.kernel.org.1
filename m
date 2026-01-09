@@ -1,132 +1,170 @@
-Return-Path: <netdev+bounces-248440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E02BD08820
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 11:20:28 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6212D088D6
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 11:28:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C9540301E902
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 10:20:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6AB643015160
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 10:22:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03359336EC8;
-	Fri,  9 Jan 2026 10:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22DE933436A;
+	Fri,  9 Jan 2026 10:22:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="e6Ziy3SV";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="NSJEd+Cw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gqZLqamQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C24E332EC1;
-	Fri,  9 Jan 2026 10:20:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6BB223BF9F
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 10:22:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767954024; cv=none; b=RS/wIXC1Fw4AEilVPTp8TvnG5dHhh2NKc/yxt7tvfPcCJyjyQNZouVhrRnGB6IsFpT3m/GIAW9d/58AmDMmHmwhOroTcLmkoItSw+7fK00zbSdMZkn+70lswBEfCwJF8Akt5aLfkIzMZ5VScnRQhEGj22+oAmdCxtnc2NouXa8Q=
+	t=1767954140; cv=none; b=tYi4wvcF78TDz6WvrHog7g4lO1iATaMTI2kU1YM7KIXs+g7mQ9ZZ2kw97jODz9xo0Tb3KeyQNZFbHaKP4QfHXqPKsXhq/gHoIgSXLlVaMxlxaD87jheXBot+kUVKqFSd289AFvD9LX9iOepqzcnRmG8rB+WoY1LGWIGkevk01KA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767954024; c=relaxed/simple;
-	bh=Vk4OZ/PEc1O7ibxUtTzycjNMCMNgkop2WVagX7RPjaM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Srv+QvgQiemD8ADkaFHqlqL+WDzlS/T74K3pe8/H3Fd+H1wPh5btw/CSzyY8P1q7PqjMEGQkeIrWg/AGFLcDQwK89blwVbJnTKpUhJDE/wckP98+jplJ6hKxCCMrDWd9cUUmtW0FFZNZbbF5a8mRYnTk4MMMrwWnNsNThtY3DjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=e6Ziy3SV; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=NSJEd+Cw; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Fri, 9 Jan 2026 11:20:21 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1767954022;
+	s=arc-20240116; t=1767954140; c=relaxed/simple;
+	bh=P+Qapu7PTQqd6vj/HqMKsi+M3yYPpVMrQovpFpc59xM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HayBXTBVPDT4oHI+4svglNEPWp40YNZArDJimLRIH2sZN7aVEidm6bj+lf1rFhf15Wh2qCZobjqe1jXtIwOfJS8AKJHco5sMq/WRWRFA8TcAzT+fcm2o2PFtaO8WnsAtEs0fwyvOU7WuFv2tYc4+UXo39+fDwYmPeQR3U6ad1kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gqZLqamQ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767954137;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uFQeCjkrXgiJngG+qWy9Fm2wUdJK/cbETOpn2vAazqE=;
-	b=e6Ziy3SV0yxTWH+S+STwEca9J9UluhcfHljAWwcsjhMu0hxuC9onAD47PzRMoAmbERl9ZS
-	9nQKZRwsV/kONWbUsvD4TdNSLXWygn7caC/8pNLihdMCfFpgP89fcZZ4Gz4SHNC4NhZE1E
-	9dlrzret2TK89ETwqmpagWIJE6PdljC/iXJV5hzWmTrpoM7wbRf01ivmdXM827lAHt1WPU
-	jmraEpSdr/bEXPVU+Zm/s9Evr130CvN1iswY+65C7APDP8cebAXEoaYYpZYchxXGDbSKw5
-	fy9NItmZ8xnA54KJey9jCXRetO86IdTIZCayoStaCMIK+2OEJABgeB3wduyTcg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1767954022;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uFQeCjkrXgiJngG+qWy9Fm2wUdJK/cbETOpn2vAazqE=;
-	b=NSJEd+CwdGdhWdVp0gmpgP3M8CymxGdbMXgcIJ1BfUwR/2Im2OAA6IBOin6psBUaTzgMq8
-	roPWlGTECikhRyDg==
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
-	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, linux-kernel@vger.kernel.org, 
-	Netdev <netdev@vger.kernel.org>, netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH RFC net-next 3/3] netfilter: uapi: Use UAPI definition of
- INT_MAX and INT_MIN
-Message-ID: <20260109111310-4b387d2e-1459-4701-9e58-dc02ad74c499@linutronix.de>
-References: <20260105-uapi-limits-v1-0-023bc7a13037@linutronix.de>
- <20260105-uapi-limits-v1-3-023bc7a13037@linutronix.de>
- <d3554d2d-1344-45f3-a976-188d45415419@app.fastmail.com>
+	bh=1X6VjjSDBSXJE0ymL3SGMh0l4uxNAcGGXw1ekS2+I5g=;
+	b=gqZLqamQKtyDr9qhDKTE/XZfT6w37JhUM6sNppcGT6HQNGVKEw421uoOAj4oltzDfkkFYW
+	jSj35vQjyxf8d8/OglKyKWk+PoIY/Sqj/1zibLPPK5nRryUxTNdXCdVVMBBruvl3nucxGi
+	sgCNyd7h+q+0m1DS3R1qI9YUAf6t4Dg=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-204-ChZLRiv_Nwe1xlCYcTvuzw-1; Fri,
+ 09 Jan 2026 05:22:16 -0500
+X-MC-Unique: ChZLRiv_Nwe1xlCYcTvuzw-1
+X-Mimecast-MFC-AGG-ID: ChZLRiv_Nwe1xlCYcTvuzw_1767954133
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 94F33180035D;
+	Fri,  9 Jan 2026 10:22:12 +0000 (UTC)
+Received: from [10.44.32.135] (unknown [10.44.32.135])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 13FC61800994;
+	Fri,  9 Jan 2026 10:22:04 +0000 (UTC)
+Message-ID: <a581a86d-d49c-4761-bd68-989a7a12cb56@redhat.com>
+Date: Fri, 9 Jan 2026 11:22:03 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d3554d2d-1344-45f3-a976-188d45415419@app.fastmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net-next 01/12] dt-bindings: dpll: add
+ common dpll-pin-consumer schema
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>, Rob Herring <robh@kernel.org>,
+ Leon Romanovsky <leon@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ linux-rdma@vger.kernel.org, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ intel-wired-lan@lists.osuosl.org, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, devicetree@vger.kernel.org,
+ Conor Dooley <conor+dt@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
+ Mark Bloch <mbloch@nvidia.com>, linux-kernel@vger.kernel.org,
+ Tariq Toukan <tariqt@nvidia.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Saeed Mahameed
+ <saeedm@nvidia.com>, "David S. Miller" <davem@davemloft.net>
+References: <20260108182318.20935-1-ivecera@redhat.com>
+ <20260108182318.20935-2-ivecera@redhat.com>
+ <20260109-wonderful-acoustic-civet-e030da@quoll>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <20260109-wonderful-acoustic-civet-e030da@quoll>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Mon, Jan 05, 2026 at 02:02:17PM +0100, Arnd Bergmann wrote:
-> On Mon, Jan 5, 2026, at 09:26, Thomas Weiﬂschuh wrote:
-> > Using <limits.h> to gain access to INT_MAX and INT_MIN introduces a
-> > dependency on a libc, which UAPI headers should not do.
-> >
-> > Use the equivalent UAPI constants.
-> >
-> > Signed-off-by: Thomas Weiﬂschuh <thomas.weissschuh@linutronix.de>
+
+
+On 1/9/26 10:48 AM, Krzysztof Kozlowski wrote:
+> On Thu, Jan 08, 2026 at 07:23:07PM +0100, Ivan Vecera wrote:
+>> Introduce a common schema for DPLL pin consumers. Devices such as Ethernet
+>> controllers and PHYs may require connections to DPLL pins for Synchronous
+>> Ethernet (SyncE) or other frequency synchronization tasks.
+>>
+>> Defining these properties in a shared schema ensures consistency across
+>> different device types that consume DPLL resources.
+>>
+>> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+>> ---
+>>   .../bindings/dpll/dpll-pin-consumer.yaml      | 30 +++++++++++++++++++
+>>   MAINTAINERS                                   |  1 +
+>>   2 files changed, 31 insertions(+)
+>>   create mode 100644 Documentation/devicetree/bindings/dpll/dpll-pin-consumer.yaml
+>>
+>> diff --git a/Documentation/devicetree/bindings/dpll/dpll-pin-consumer.yaml b/Documentation/devicetree/bindings/dpll/dpll-pin-consumer.yaml
+>> new file mode 100644
+>> index 0000000000000..60c184c18318a
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/dpll/dpll-pin-consumer.yaml
+>> @@ -0,0 +1,30 @@
+>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>> +%YAML 1.2
+>> +---
+>> +$id: http://devicetree.org/schemas/dpll/dpll-pin-consumer.yaml#
+>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>> +
+>> +title: DPLL Pin Consumer
+>> +
+>> +maintainers:
+>> +  - Ivan Vecera <ivecera@redhat.com>
+>> +
 > 
-> I agree with the idea of the patch series, but I think this
-> introduces a different problem:
+> You miss select. Without it this binding is no-op.
+
+Will fix.
+
+>> +description: |
 > 
-> >  #include <linux/in.h>
-> > +#include <linux/limits.h>
+> Drop |
+
+Will do.
+
+>> +  Common properties for devices that require connection to DPLL (Digital Phase
+>> +  Locked Loop) pins for frequency synchronization (e.g. SyncE).
+>> +
+>> +properties:
+>> +  dpll-pins:
+>> +    $ref: /schemas/types.yaml#/definitions/phandle-array
+>> +    description:
+>> +      List of phandles to the DPLL pin nodes connected to this device.
+>> +
+>> +  dpll-pin-names:
+>> +    $ref: /schemas/types.yaml#/definitions/string-array
+>> +    description:
+>> +      Names for the DPLL pins defined in 'dpll-pins', in the same order.
+>> +
+>> +dependencies:
+>> +  dpll-pin-names: [ dpll-pins ]
 > 
-> linux/limits.h is not always clean against limits.h. In glibc,
-> you can include both in any order, but in musl, you cannot:
-> 
-> gcc -xc /dev/null -nostdinc -I /usr/include/aarch64-linux-musl -include limits.h -include linux/limits.h  -o - -Wall  -c 
-> In file included from <command-line>:
-> /usr/include/aarch64-linux-musl/linux/limits.h:7: warning: "NGROUPS_MAX" redefined
->     7 | #define NGROUPS_MAX    65536    /* supplemental group IDs are available */
->       | 
-> In file included from <command-line>:
-> /usr/include/aarch64-linux-musl/limits.h:48: note: this is the location of the previous definition
->    48 | #define NGROUPS_MAX 32
+> Binding should go to dtschema. See also commit
+> 3282a891060aace02e3eed4789739768060cea32 in dtschema or other examples
+> how to add new provider/consumer properties.
 
-Ack.
+Will do.
 
-> I can think of two alternative approaches here:
-> 
-> - put the __KERNEL_INT_MIN into a different header -- either a new one
->   or maybe uapi/linux/types.h
+Thanks for advice...
 
-> - use the compiler's built-in __INT_MIN__ instead of INT_MIN in
->   UAPI headers.
+Ivan
 
-If we can rely on compiler built-ins I would prefer this option.
-
-> On the other hand, there are a few other uapi headers
-> that already include linux/limits.h:
-> 
-> include/uapi/linux/auto_fs.h:#include <linux/limits.h>
-> include/uapi/linux/fs.h:#include <linux/limits.h>
-> include/uapi/linux/netfilter/xt_bpf.h:#include <linux/limits.h>
-> include/uapi/linux/netfilter/xt_cgroup.h:#include <linux/limits.h>
-> include/uapi/linux/netfilter/xt_hashlimit.h:#include <linux/limits.h>
-
-...
-
-
-Thomas
 
