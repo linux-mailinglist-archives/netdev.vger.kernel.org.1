@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-248321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F9C5D06E7F
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 04:03:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E345D06E94
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 04:04:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 886203014DBB
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 03:03:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A1816301D0CF
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 03:03:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3FA023B604;
-	Fri,  9 Jan 2026 03:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 123C823EAB7;
+	Fri,  9 Jan 2026 03:03:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1385319A288;
-	Fri,  9 Jan 2026 03:03:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96EFD1E8329;
+	Fri,  9 Jan 2026 03:03:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767927797; cv=none; b=dGJV6zmBN/vBVlWX41By+qzexQlrY1Ips2yV7QfXAKlx3H7sRVPaM+StPBX7cR3n88GmiPxJ8uOYgY3oOGSOknWiQEQcrp6esrpbGXQJdYEO7U++698opO9PB5EbztrfCDTsYi7UFXJvqUCaawqt3XW38GDQmAmXbhBGUR2FVs0=
+	t=1767927811; cv=none; b=ixSP+vwq2qcNJ9fQnRq1cgAK4MxsRhAONSjiKRB1lNSrbwCY+asg2lShIf8kCDlkV/f4CEQfZdiO71gQxiNxiKYYH1TmUuTIsUZF66awbxM/7PdaynTSMqBd1Ra9vE/2i/s/V6/md7CtfeAukUKxk+pVAV3vLJasg1o1/CZ2gQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767927797; c=relaxed/simple;
-	bh=kO1mpmyAP2DRh5/wDZxZoieVtP2B/Fq/8rWBoXAej2A=;
+	s=arc-20240116; t=1767927811; c=relaxed/simple;
+	bh=BFTSDRGmQm6Sxux2IEKd6bs1hUut7PYVzFZXa4mECW4=;
 	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kvz3/l+pU3c2Klw3YkoahlMXftEKNGdzDMOgv/+Gj6oyvxjsg3swzaXrYP8q2tOK2Nc/UO75ut9uWpqd8Tgzo+oJwi7EKzqtVZQmteoU7A2GkJIHYN2qR+IVNwZvDatdF9NEWKFRn8CPJOjCMowhVkCYfbWXGRskEF3HMzG9ZxY=
+	 Content-Type:Content-Disposition:In-Reply-To; b=nOqj/4UnV7p9s2mi26DQvr3VKAWkutpbw9WwJYreGGOMqRsFTG1E7zxrXdNJGz9s7ff/10s50s80JTFH8RA3VOYlLXmC29JlFh7Y5gX6Lsy5lBIRIYs+P5IRB3S5dSL5uNqrSniiKMZlMX8KeaTr44Np+e5awoDgFIobM7JvZiI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -31,9 +31,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.99)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1ve2mN-000000005k0-0la4;
-	Fri, 09 Jan 2026 03:03:11 +0000
-Date: Fri, 9 Jan 2026 03:03:08 +0000
+	id 1ve2mb-000000005kQ-1vBF;
+	Fri, 09 Jan 2026 03:03:25 +0000
+Date: Fri, 9 Jan 2026 03:03:22 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>,
@@ -45,9 +45,9 @@ To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	Michael Klein <michael@fossekall.de>,
 	Aleksander Jan Bajkowski <olek2@wp.pl>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 1/5] net: phy: realtek: support interrupt also for
- C22 variants
-Message-ID: <1b01a903484f441c0fc2e61f7277910b2fac7855.1767926665.git.daniel@makrotopia.org>
+Subject: [PATCH net-next 2/5] net: phy: realtek: simplify C22 reg access via
+ MDIO_MMD_VEND2
+Message-ID: <938aff8b65ea84eccdf1a2705684298ec33cc5b0.1767926665.git.daniel@makrotopia.org>
 References: <cover.1767926665.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -59,38 +59,58 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1767926665.git.daniel@makrotopia.org>
 
-Now that access to MDIO_MMD_VEND2 works transparently also in Clause-22
-mode, add interrupt support also for the C22 variants of the
-RTL8221B-VB-CG and RTL8221B-VM-CG. This results in the C22 and C45
-driver instances now having all the same features implemented.
+RealTek 2.5GE PHYs have all standard Clause-22 registers mapped also
+inside MDIO_MMD_VEND2 at offset 0xa400. This is used mainly in case the
+PHY is inside a copper SFP module which uses the RollBall MDIO-over-I2C
+method which *only* supports Clause-45. In order to support such
+modules, the PHY driver has previously been split into a C22-only and
+C45-only instances, creating quite a bit of redundancy and confusion.
+
+In preparation of reunifying the two driver instances, add support for
+translating MDIO_MMD_VEND2 registers 0xa400 to 0xa438 back to standard
+Clause-22 access in case the PHY is accessed on a Clause-22 bus.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- drivers/net/phy/realtek/realtek_main.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/net/phy/realtek/realtek_main.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index eb5b540ada0e5..7302b25b8908b 100644
+index 7302b25b8908b..886694ff995f6 100644
 --- a/drivers/net/phy/realtek/realtek_main.c
 +++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -2275,6 +2275,8 @@ static struct phy_driver realtek_drvs[] = {
- 	}, {
- 		.match_phy_device = rtl8221b_vb_cg_c22_match_phy_device,
- 		.name		= "RTL8221B-VB-CG 2.5Gbps PHY (C22)",
-+		.config_intr	= rtl8221b_config_intr,
-+		.handle_interrupt = rtl8221b_handle_interrupt,
- 		.probe		= rtl822x_probe,
- 		.get_features	= rtl822x_get_features,
- 		.config_aneg	= rtl822x_config_aneg,
-@@ -2307,6 +2309,8 @@ static struct phy_driver realtek_drvs[] = {
- 	}, {
- 		.match_phy_device = rtl8221b_vm_cg_c22_match_phy_device,
- 		.name		= "RTL8221B-VM-CG 2.5Gbps PHY (C22)",
-+		.config_intr	= rtl8221b_config_intr,
-+		.handle_interrupt = rtl8221b_handle_interrupt,
- 		.probe		= rtl822x_probe,
- 		.get_features	= rtl822x_get_features,
- 		.config_aneg	= rtl822x_config_aneg,
+@@ -143,6 +143,7 @@
+ 
+ #define RTL822X_VND2_TO_PAGE(reg)		((reg) >> 4)
+ #define RTL822X_VND2_TO_PAGE_REG(reg)		(16 + (((reg) & GENMASK(3, 0)) >> 1))
++#define RTL822X_VND2_TO_C22_REG(reg)		(((reg) - 0xa400) / 2)
+ #define RTL822X_VND2_C22_REG(reg)		(0xa400 + 2 * (reg))
+ 
+ #define RTL8221B_VND2_INER			0xa4d2
+@@ -1264,6 +1265,11 @@ static int rtl822xb_read_mmd(struct phy_device *phydev, int devnum, u16 reg)
+ 		return mmd_phy_read(phydev->mdio.bus, phydev->mdio.addr,
+ 				    phydev->is_c45, devnum, reg);
+ 
++	/* Simplify access to C22-registers addressed inside MDIO_MMD_VEND2 */
++	if (reg >= RTL822X_VND2_C22_REG(0) &&
++	    reg <= RTL822X_VND2_C22_REG(30))
++		return __phy_read(phydev, RTL822X_VND2_TO_C22_REG(reg));
++
+ 	/* Use paged access for MDIO_MMD_VEND2 over Clause-22 */
+ 	page = RTL822X_VND2_TO_PAGE(reg);
+ 	oldpage = __phy_read(phydev, RTL821x_PAGE_SELECT);
+@@ -1299,6 +1305,11 @@ static int rtl822xb_write_mmd(struct phy_device *phydev, int devnum, u16 reg,
+ 		return mmd_phy_write(phydev->mdio.bus, phydev->mdio.addr,
+ 				     phydev->is_c45, devnum, reg, val);
+ 
++	/* Simplify access to C22-registers addressed inside MDIO_MMD_VEND2 */
++	if (reg >= RTL822X_VND2_C22_REG(0) &&
++	    reg <= RTL822X_VND2_C22_REG(30))
++		return __phy_write(phydev, RTL822X_VND2_TO_C22_REG(reg), val);
++
+ 	/* Use paged access for MDIO_MMD_VEND2 over Clause-22 */
+ 	page = RTL822X_VND2_TO_PAGE(reg);
+ 	oldpage = __phy_read(phydev, RTL821x_PAGE_SELECT);
 -- 
 2.52.0
 
