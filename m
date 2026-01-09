@@ -1,78 +1,89 @@
-Return-Path: <netdev+bounces-248572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32E0AD0BBC4
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 18:45:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11CB2D0BC39
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 18:57:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 24FC6303F4DB
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 17:43:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D38A13007EFB
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 17:52:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5068A366DD7;
-	Fri,  9 Jan 2026 17:42:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A2273101A7;
+	Fri,  9 Jan 2026 17:52:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HzxOPOtS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RtxLUXRV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A987133BBC6
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 17:42:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E3628134C;
+	Fri,  9 Jan 2026 17:52:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767980550; cv=none; b=CIkMjFbgkh+/8sXDD48qeDcCDOr6lyiegleSouMWWIJcevEr7zyfyEr7f3HczKJMFTt4dlD6thznS2zKdV+IBRcSvGdVe91DEKLV/oSIeE84tQrD7ZhlPujdDEwFwPAu1jf8yOLV+7ZCUem8Z3QcMXd7rsluGq7oyued5ls3X9g=
+	t=1767981145; cv=none; b=aGhsIqcL+qnqZL7SjatNPY2KKIDVjlGytDUlp0FpUqQpXArAXrnBCOzbL5nj7HK5JGuQomBwg0qKxKVZzSfzRvXCZd4O/1R81V3C9wlY/Zq8ZnhY09nQKqDAjSjqhGEwoUPETyyBKcqTDzqrFy17uGWNQccObXpPIJ5i+MhAmvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767980550; c=relaxed/simple;
-	bh=jDaE/4G9sH62rAQhGnpFwOhs1DBKjM2F+Y2i75/gnro=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LoQXw9vtrbbMoEi7J/Pg9Wmozsgv/wjTmYV9EBT5CzcSIZJGSBGgaq5ii5sN+yLAUSzJ9RKMgCV4r8bvKRJWkp0knGs5+a2wCor5lFcKzQUzv0TA2T+ZEokLDEIXxTjBwvhUhDlpG5ajG01TjHIj0K6PLC/IB7YdUaNcuWjbvAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HzxOPOtS; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <429e4120-b973-4b26-9c50-2e03c104253a@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767980536;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lj5W6kqh7lX+37IEEa43roJ1s1YmsxJY/0Lu06gUPJ4=;
-	b=HzxOPOtSH8uzHCJC7tgY0UY+bxOxuL+YBklu2aqFT2Rr5h1KEhn1pFcZVCFso9gwlYshBt
-	zh25HdWCiqm+IoxSgcMN5ZhzYvoszX2F5Gin3upo1L1eQGG4pYUW7QrnMOXj2fJOFZiEVk
-	Vu4eOYrwy7puoxx+UlEkwj/ZERSxhWQ=
-Date: Fri, 9 Jan 2026 09:42:04 -0800
+	s=arc-20240116; t=1767981145; c=relaxed/simple;
+	bh=/V2TszK+/q6htD1Z4tu5rO2qBmBu1NQ0VZJKwhNsTmM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a7lI+jcjWeMGcQAdVgl0Qg0IBxFvmvjv00rXX7Uk4S9dPY5oUmJ5V8EP8XJBIUwzTde9CqY2WetQseiRd5nsdmYvm0bwlZBXitBqzA8TYOPa6Cc45OLIsVHoA9mgx/Jfn5s2QyBM2s3LfS6QRGGCG0PIwQq3gKYTdYNw5u169OA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RtxLUXRV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB18AC4CEF1;
+	Fri,  9 Jan 2026 17:52:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767981144;
+	bh=/V2TszK+/q6htD1Z4tu5rO2qBmBu1NQ0VZJKwhNsTmM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RtxLUXRVPX2k0HIFYf1/GFory8oKActYaR2W1D0zdgZSlFpgG1WPiEOsMy0M0mu0b
+	 0KmOU/2k73QjKyggamZS4F7ynHeiTk73bVe3+pLwtUrxcFN9ieOEaB7jmYjyL+TnIo
+	 bvYCVViFY1r6oZjnjugZJRoOffF7xxZpzrv6em74xWMlqgG44psMn+AYww/i6GlXsS
+	 pPWkj4gDORnhkZ2Mh8Ag7b0ARzv1J3vAZuvXHZDKahw/CKY9JD1XEqHTseubuNOTbd
+	 rAfHtV/KoAFj60oy/svKWqDW5vD2EQkECkBII/1unN3teTu27Qgaz+esDKfowP87SE
+	 sxHK0SqhvNJvw==
+Date: Fri, 9 Jan 2026 17:52:20 +0000
+From: Simon Horman <horms@kernel.org>
+To: Chen Zhen <chenzhen126@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, huyizhen2@huawei.com,
+	gaoxingwang1@huawei.com
+Subject: Re: [PATCH v2 net 2/2] selftests: vlan: add test for turn on hw
+ offload with reorder_hdr off
+Message-ID: <20260109175220.GM345651@kernel.org>
+References: <20260107033423.1885071-1-chenzhen126@huawei.com>
+ <20260107033423.1885071-3-chenzhen126@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 03/16] bpf: Open code bpf_selem_unlink_storage
- in bpf_selem_unlink
-To: Amery Hung <ameryhung@gmail.com>
-Cc: netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org,
- daniel@iogearbox.net, memxor@gmail.com, martin.lau@kernel.org,
- kpsingh@kernel.org, yonghong.song@linux.dev, song@kernel.org,
- haoluo@google.com, bpf@vger.kernel.org, kernel-team@meta.com
-References: <20251218175628.1460321-1-ameryhung@gmail.com>
- <20251218175628.1460321-4-ameryhung@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20251218175628.1460321-4-ameryhung@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260107033423.1885071-3-chenzhen126@huawei.com>
 
-On 12/18/25 9:56 AM, Amery Hung wrote:
-> @@ -396,17 +369,39 @@ static void bpf_selem_link_map_nolock(struct bpf_local_storage_map *smap,
->   
->   void bpf_selem_unlink(struct bpf_local_storage_elem *selem, bool reuse_now)
+On Wed, Jan 07, 2026 at 11:34:23AM +0800, Chen Zhen wrote:
+> If vlan dev was created with reorder_hdr off and hw offload both
+> off but up with hw offload on, it will trigger a skb_panic bug in
+> vlan_dev_hard_header().
+> 
+> Add a test to automatically catch re-occurrence of the issue.
+> 
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Chen Zhen <chenzhen126@huawei.com>
 
-bpf_selem_unlink() will not be used by bpf_local_storage_map_free() in 
-the later patch, so the "bool reuse_now" arg is no longer needed and 
-should be cleaned up.
+Shellcheck warns that cleanup is never invoked.
 
+  SC2329 (info): This function is never invoked. Check usage (or ignored if invoked indirectly).
 
+But is only true if only direct invocations are taken into
+account (which I assume is what shellcheck does).
+cleanup is actually called on exit as it has been
+registered to do so by trap.
 
+In order to keep shellcheck quiet I'd recommend adding the following
+to vlan_hw_offload.sh.
+
+#shellcheck disable=SC2329
+
+...
 
