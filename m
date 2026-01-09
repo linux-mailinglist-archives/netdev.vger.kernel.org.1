@@ -1,85 +1,72 @@
-Return-Path: <netdev+bounces-248612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70B04D0C48D
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 22:20:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 043F1D0C50B
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 22:28:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 229BA3009D4F
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 21:20:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B4CE5307CD14
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 21:27:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 363FC2ED846;
-	Fri,  9 Jan 2026 21:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 894A233F360;
+	Fri,  9 Jan 2026 21:27:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gt0ELQxc"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Wx/5nKQR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C655F4315F
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 21:20:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AFF433D4F8;
+	Fri,  9 Jan 2026 21:27:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767993602; cv=none; b=VVY+u1cTzqF0Z3jOfoT8pZiqMj1/6c6VP56fOoMF5vYkN1P9i8IRFcTVT2CTjh9S+98OHsEFaYGdtSbr1zZOcz+cSYr/xLuwxFeEBEvvQe0a+zbQomC+MxrWcekI+bTsX0pqJ0lMms28M1pXT1IxIDOFsWpCP4cwALocIbJCzmI=
+	t=1767994024; cv=none; b=GJDSzScFit2YFTHQRShBPkSJqYtLX62mYHVYn/v9oecEHGIAnd0Ycx6muu70JQqZjKJa+Igk72zPsL/cVIX1SJmL/hxRJoaXMxReTvnaQAFfBjxY/d/YPlELKs0Q5sl1ROngv1JlIvkQNvcC/+UiBqdk+K/rYNTSMh7CidKu5z8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767993602; c=relaxed/simple;
-	bh=Keh8/wLkPjuIFsQpRgZCfp4ZJyx7wqjtW0Jo9H9Wq/E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dcynYI/eLM5r6iA1Wshj+hlROGIdWVWZ0nhD0Q6sxtlWs5k1IZY36ghEhrAVlgvfL3tNAVLHdVFsuwmeLR0h+FWKakmGoy/nc/fBys76b+FrHMuPh4AK8cpMyOoRotuGBAQ6aKg8sxUiU5m1Rns+a8BESs54zB+nwE9Jr3n805E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gt0ELQxc; arc=none smtp.client-ip=209.85.221.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-5636f0cf5c3so441519e0c.1
-        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 13:20:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767993600; x=1768598400; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UHTvqu+YkutNQHzeS1Yr8MBlQu521tKvbncrgZNFtME=;
-        b=gt0ELQxczY99lSnLJzE6z0RPgXojdioG3214w6U+DbbPbm9G1FGv935LVbv9gkNZlN
-         zxVP2ry/6V/wKzw6PRvIzudASHSOTec9VswmNPDgJwaU+gZJBnZBqMKiPXSIKIalznJ6
-         1ZSpQZD7v6VHY1n/M/aIhh6JeLq591WWMWu9LQkBs/di1QQjYhpvcYQYmem1uPxxhKWz
-         q3r4auCprCCUfO4J/GepWHhLa+AiXY0xDN5QKlJR+m4YTVZUTJbtW6zFJwNzqxwfRyyr
-         5Ae1to2NCVJ4tiRdylFNEzIFJMo1vVYcmthYKgoBUy3zqHuz0MLvsHNCeQCOaGXSYFrR
-         ZNiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767993600; x=1768598400;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UHTvqu+YkutNQHzeS1Yr8MBlQu521tKvbncrgZNFtME=;
-        b=hcyCet/n/LFAXAuSb4jRjfanrR974vXNrmTXO4Gm8iH/90YzEl9URpgkhWZEJVXdqg
-         KM4U2LhlpvEItag/iO8/F22F3Kmak8tVGJyCKXPwjrsM9TW4fsG6yBVVPYM7/HDdVy0i
-         qkGp14t7N+lPRNCC83Rz0o2Pm2qehdkNS82pkwZwx7UUYwwxzOx2xKsc2p4IDDlVi06o
-         f0BdJuRVNba8JssRdSJ1b3h49saJohHv3lG/ekjJNwWIbF5+3fZ/wfSxSBMF+wf2srPz
-         ndFQOvwdDOsTMF5gdRXIYBV4gCXBOaQ4OFdQ2ZFh0RxjYkHFAI6X0mOkJaeV8yWlIHkq
-         InpA==
-X-Forwarded-Encrypted: i=1; AJvYcCVzVmXbF7Lv0BHZBSf29ScfRvSqhc8swW/wsJVqqTAl9nk4ow9/K3iAhh/+x7d7BVzjXuX6E0w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtsLm2Jon6DRlQf8aKoNFYDT2j9qdq3B4vFLCzQgR74SRwo7NE
-	g0a+8CTVnlB6QtrMByK90BOPJmhRSSZwrh0FhijRaNFDfHdfJXHFMUgI
-X-Gm-Gg: AY/fxX7mjh4bEnO4ItN7f05Fw1+qYiyb7XjtFxpePsYh0Ysw/WGQsW2Ofjd64q/A/4R
-	bMZXROhXUTaP6MmVrV/N/UacP2avwEr7dWpOVjq7aGU02CfafnTuuT4xmAPwH4UPaQYXPpyWlha
-	5N4y19dfpI3l4y6lJzXWuFG6V/ZOBb5TsG2b2om7qK6jDotu8ZkEiEPq5y2r9yfKFJsVsjbENG9
-	O70g7Ur/OBtKCQm3wFjChf9TfGkJIJuAvRfbjyJvytUNy9SyMUTvxDgzsvERdOrQBLjTP8yKMaX
-	Kyhq2l62Acq2cSC39yjJCbuMYdoSY+t4+nvWlbOzYNCka3UDLmkaEiLdxoXBNvnI7yunkeP5uUz
-	+zxxo8RGf4lDM8T/WTyeJhdzbwEZizeib2LHz8StAeTViDxM5v4BGnu7AFRkk6KnXfoc44EXiTl
-	/X04dMcWh+3F6fHyP94P3nbRYtlgmLGpR6U5wwefkwqcHmPqrmbRixobsQRpgj6hDkqCFTOBSLs
-	os6YQ==
-X-Google-Smtp-Source: AGHT+IEvBK7U7IYllotOCwtJvH/1foan5XHxTgks2D780rhblSmxmqd7ZL0bY7xhJskhy2TuvTjkDQ==
-X-Received: by 2002:a05:6122:322b:b0:55b:305b:4e41 with SMTP id 71dfb90a1353d-5634800fd9dmr4637269e0c.18.1767993599713;
-        Fri, 09 Jan 2026 13:19:59 -0800 (PST)
-Received: from lvondent-mobl5 ([72.188.211.115])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5633a20a183sm10259956e0c.9.2026.01.09.13.19.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jan 2026 13:19:58 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth 2026-01-09
-Date: Fri,  9 Jan 2026 16:19:49 -0500
-Message-ID: <20260109211949.236218-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1767994024; c=relaxed/simple;
+	bh=wf8Qv3Aqk2/50qt9jVnPO+HR1uWctcxKqbSZGclZoMk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ts2K0gQuMZKuwtXaCUBe6PD+6OZO0TtzZ9j5dZboFDPi2pXS288n+2IncDKCKENINtB8XODS92CaVevvGCan9ooAa5ujGKNflt+DQe1GONxqmpYqoR73+3DTVsMqEoEapm6kiceexQNS9x1d1PyRGY8LyN9sqPVrXv0+WMA4K0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=Wx/5nKQR; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=bWHjQU9evYWwuvpGRiDvGNHHyBWTkj1lPTYr5Ys8kmE=; b=Wx/5nKQROfJwMKl5facEcXuPsx
+	lUG/8uoY5YDR9bdw+VSYe6KkhoTl6Qdy0rBUDVA3sV7XepmOIAa/ThJWCzsMV2vlYiMwP1aOHPwvK
+	YontfV32YQpKhNRcEvReJZtj0MFFVe9FV7Cys+QQD7WYFpFuAG/1wLgotbJtYzdhnMy1Uzfw8GApz
+	omdxSSYbHaSBO1t3BgumuhBszRgTZqdQiltbTYtNtRePSz5r6q/fzLBq78Z3i6jPbhLlFUCjzb1pU
+	vziGYoosq8gPDhDT4zwNIOTSV8T+LJYLp/M9ynIbQh/D+6yil6kYWChx2UCyL2YfzUCxznxYX7b80
+	2kvRCPkg==;
+Received: from localhost ([127.0.0.1])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1veK0A-000531-0C;
+	Fri, 09 Jan 2026 22:26:34 +0100
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	razor@blackwall.org,
+	pabeni@redhat.com,
+	willemb@google.com,
+	sdf@fomichev.me,
+	john.fastabend@gmail.com,
+	martin.lau@kernel.org,
+	jordan@jrife.io,
+	maciej.fijalkowski@intel.com,
+	magnus.karlsson@intel.com,
+	dw@davidwei.uk,
+	toke@redhat.com,
+	yangzhenze@bytedance.com,
+	wangdongdong.6@bytedance.com
+Subject: [PATCH net-next v5 00/16] netkit: Support for io_uring zero-copy and AF_XDP
+Date: Fri,  9 Jan 2026 22:26:16 +0100
+Message-ID: <20260109212632.146920-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,28 +74,134 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.0.9/27875/Fri Jan  9 08:26:02 2026)
 
-The following changes since commit 872ac785e7680dac9ec7f8c5ccd4f667f49d6997:
+Containers use virtual netdevs to route traffic from a physical netdev
+in the host namespace. They do not have access to the physical netdev
+in the host and thus can't use memory providers or AF_XDP that require
+reconfiguring/restarting queues in the physical netdev.
 
-  ipv4: ip_tunnel: spread netdev_lockdep_set_classes() (2026-01-08 18:02:35 -0800)
+This patchset adds the concept of queue leasing to virtual netdevs that
+allow containers to use memory providers and AF_XDP at native speed.
+Leased queues are bound to a real queue in a physical netdev and act
+as a proxy.
 
-are available in the Git repository at:
+Memory providers and AF_XDP operations take an ifindex and queue id,
+so containers would pass in an ifindex for a virtual netdev and a queue
+id of a leased queue, which then gets proxied to the underlying real
+queue.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-01-09
+We have implemented support for this concept in netkit and tested the
+latter against Nvidia ConnectX-6 (mlx5) as well as Broadcom BCM957504
+(bnxt_en) 100G NICs. For more details see the individual patches.
 
-for you to fetch changes up to ab749bfe6a1fc233213f2d00facea5233139d509:
+v4->v5:
+ - Rework of the core API into queue-create op (Jakub)
+ - Rename from queue peering to queue leasing (Jakub)
+ - Add net selftests for queue leasing (Stan, Jakub)
+ - Move netkit_queue_get_dma_dev into core (Jakub)
+ - Dropped netkit_get_channels (Jakub)
+ - Moved ndo_queue_create back to return index or error (Jakub)
+ - Inline __netdev_rx_queue_{peer,unpeer} helpers (Jakub)
+ - Adding helpers in patches where they are used (Jakub)
+ - Undo inline for netdev_put_lock (Jakub)
+ - Factoring out checks whether device can lease (Jakub)
+ - Fix up return codes in netdev_nl_bind_queue_doit (Jakub)
+ - Reject when AF_XDP or mp already bound (Jakub)
+ - Switch some error cases to NL_SET_BAD_ATTR() (Jakub)
+ - Rebase and retested everything with mlx5 + bnxt_en
+v3->v4:
+ - ndo_queue_create store dst queue via arg (Nikolay)
+ - Small nits like a spelling issue + rev xmas (Nikolay)
+ - admin-perm flag in bind-queue spec (Jakub)
+ - Fix potential ABBA deadlock situation in bind (Jakub, Paolo, Stan)
+ - Add a peer dev_tracker to not reuse the sysfs one (Jakub)
+ - New patch (12/14) to handle the underlying device going away (Jakub)
+ - Improve commit message on queue-get (Jakub)
+ - Do not expose phys dev info from container on queue-get (Jakub)
+ - Add netif_put_rx_queue_peer_locked to simplify code (Stan)
+ - Rework xsk handling to simplify the code and drop a few patches
+ - Rebase and retested everything with mlx5 + bnxt_en
+v2->v3:
+ - Use netdev_ops_assert_locked instead of netdev_assert_locked (syzbot)
+ - Add missing netdev_lockdep_set_classes in netkit
+v1->v2:
+ - Removed bind sample ynl code (Stan)
+ - Reworked netdev locking to have consistent order (Stan, Kuba)
+ - Return 'not supported' in API patch (Stan)
+ - Improved ynl documentation (Kuba)
+ - Added 'max: s32-max' in ynl spec for ifindex (Kuba)
+ - Added also queue type in ynl to have user specify rx to make
+   it obvious (Kuba)
+ - Use of netdev_hold (Kuba)
+ - Avoid static inlines from another header (Kuba)
+ - Squashed some commits (Kuba, Stan)
+ - Removed ndo_{peer,unpeer}_queues callback and simplified
+   code (Kuba)
+ - Improved commit messages (Toke, Kuba, Stan, zf)
+ - Got rid of locking genl_sk_priv_get (Stan)
+ - Removed af_xdp cleanup churn (Maciej)
+ - Added netdev locking asserts (Stan)
+ - Reject ethtool ioctl path queue resizing (Kuba)
+ - Added kdoc for ndo_queue_create (Stan)
+ - Uninvert logic in netkit single dev mode (Jordan)
+ - Added binding support for multiple queues
 
-  Bluetooth: hci_sync: enable PA Sync Lost event (2026-01-09 16:03:57 -0500)
+Daniel Borkmann (9):
+  net: Add queue-create operation
+  net: Implement netdev_nl_queue_create_doit
+  net: Add lease info to queue-get response
+  net, ethtool: Disallow leased real rxqs to be resized
+  xsk: Extend xsk_rcv_check validation
+  xsk: Proxy pool management for leased queues
+  netkit: Add single device mode for netkit
+  netkit: Add netkit notifier to check for unregistering devices
+  netkit: Add xsk support for af_xdp applications
 
-----------------------------------------------------------------
-bluetooth pull request for net:
+David Wei (7):
+  net: Proxy net_mp_{open,close}_rxq for leased queues
+  net: Proxy netdev_queue_get_dma_dev for leased queues
+  netkit: Implement rtnl_link_ops->alloc and ndo_queue_create
+  selftests/net: Add bpf skb forwarding program
+  selftests/net: Add env for container based tests
+  selftests/net: Make NetDrvContEnv support queue leasing
+  selftests/net: Add netkit container tests
 
- - hci_sync: enable PA Sync Lost event
+ Documentation/netlink/specs/netdev.yaml       |  44 +++
+ drivers/net/netkit.c                          | 359 +++++++++++++++---
+ include/linux/netdevice.h                     |   6 +
+ include/net/netdev_queues.h                   |  19 +-
+ include/net/netdev_rx_queue.h                 |  21 +-
+ include/net/page_pool/memory_provider.h       |   4 +-
+ include/net/xdp_sock_drv.h                    |   2 +-
+ include/uapi/linux/if_link.h                  |   6 +
+ include/uapi/linux/netdev.h                   |  11 +
+ net/core/dev.c                                |   7 +
+ net/core/dev.h                                |   2 +
+ net/core/netdev-genl-gen.c                    |  20 +
+ net/core/netdev-genl-gen.h                    |   2 +
+ net/core/netdev-genl.c                        | 185 +++++++++
+ net/core/netdev_queues.c                      |  74 +++-
+ net/core/netdev_rx_queue.c                    | 173 +++++++--
+ net/ethtool/channels.c                        |  12 +-
+ net/ethtool/ioctl.c                           |   9 +-
+ net/xdp/xsk.c                                 |  73 +++-
+ tools/include/uapi/linux/netdev.h             |  11 +
+ .../testing/selftests/drivers/net/README.rst  |   7 +
+ .../selftests/drivers/net/hw/.gitignore       |   2 +
+ .../testing/selftests/drivers/net/hw/Makefile |   2 +
+ .../drivers/net/hw/lib/py/__init__.py         |   7 +-
+ .../selftests/drivers/net/hw/nk_forward.bpf.c |  49 +++
+ .../selftests/drivers/net/hw/nk_netns.py      |  23 ++
+ .../selftests/drivers/net/hw/nk_qlease.py     |  55 +++
+ .../selftests/drivers/net/lib/py/__init__.py  |   7 +-
+ .../selftests/drivers/net/lib/py/env.py       | 148 +++++++-
+ 29 files changed, 1222 insertions(+), 118 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/hw/nk_forward.bpf.c
+ create mode 100755 tools/testing/selftests/drivers/net/hw/nk_netns.py
+ create mode 100755 tools/testing/selftests/drivers/net/hw/nk_qlease.py
 
-----------------------------------------------------------------
-Yang Li (1):
-      Bluetooth: hci_sync: enable PA Sync Lost event
+-- 
+2.43.0
 
- net/bluetooth/hci_sync.c | 1 +
- 1 file changed, 1 insertion(+)
 
