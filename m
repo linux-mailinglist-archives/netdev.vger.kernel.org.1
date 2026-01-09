@@ -1,46 +1,41 @@
-Return-Path: <netdev+bounces-248295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83670D06A99
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 01:56:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00910D06AB1
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 02:00:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 85971300D914
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 00:56:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6863E3019887
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 00:59:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC6721F09B3;
-	Fri,  9 Jan 2026 00:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="llUkBRG2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 107F91D798E;
+	Fri,  9 Jan 2026 00:59:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA0581EB5E1;
-	Fri,  9 Jan 2026 00:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mx.socionext.com (mx.socionext.com [202.248.49.38])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D9DB1C3C08;
+	Fri,  9 Jan 2026 00:59:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.248.49.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767920203; cv=none; b=XhoL4uB8oGBnQwJmS7t2v6w3s2QfrTW6IX3gvrfVoRrmKceZlAgxZ2tgyUzxfykwy0R5NKehxIoeHCuuZLONr3Y94+P7IrUwBV2pjfyWdotgvNccDAY0b3WuEwEifsXNW4zJwWUgbh3KgHV4kO0O5SBlQ25N7YY2OZHYfoxCyNg=
+	t=1767920387; cv=none; b=Yuv1D6xPembyfqyuremzzELc+on0fslss0NVrJzXSXzU4QBm+VVHCarVa1D1JbX7yJCKTYl5VvdcaFWCkCDGEGZqBKWYE4L+nEySWGxB1HOh2mx1DUCFcMgQdG8Ns7sCgqGvdVluTNMIB5LcWYxcy/CZhD1hsBoakO/M67pgOMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767920203; c=relaxed/simple;
-	bh=vqJZDHh2cmNS2nIPBQoeIp5cRhAVJY3HXNq5Hq1PjdY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=ILvrztNYOT/jXRMk8b3ptiQRnTqf3Ev9hF7dBNFIkVLj4adltLlX06OECXmp4qXPqXbHAouz2FwK+Q97Ko2ysaPb2jDk9aKqxPO2rUBJWCy1PXNXTathVDAlEBcODCJmID6S37VpmhvKQjuG+kwQlMzbqr9wbWoa+FHBn7POwV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=llUkBRG2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA65AC116C6;
-	Fri,  9 Jan 2026 00:56:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767920203;
-	bh=vqJZDHh2cmNS2nIPBQoeIp5cRhAVJY3HXNq5Hq1PjdY=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=llUkBRG2NSn6UsqwqLz/oHPISJ0M6tgohqLshJcRTUAaCvJPGssOSHxTeuzWXc5Vd
-	 7vbViCE1UOD0NvRSdIwZtYunQBuvbsvBio2HrLIo5ylu+N6zza+wrPhGVuJDTkh8co
-	 rtIyPYiuq88rrehyG4bV9cvW4eXAjMVLu8RR+NgsBy4c3vf5Q0Qh75WumGMeas+m/V
-	 pWqy4UPF5aF++ZHSLHX2FkunE7VBUF1VitKXBtn/PDB157uQIOCq5wRxlMegkyiFNs
-	 gPOM4AlfLcwtRKZj7sD6IwrNydeFcSPvodlHGvUYxwgTzmR1bNySj5AxEGPSyHMXlo
-	 nzrPJ2qVePSdw==
-Message-ID: <e3ff455b-1c02-4f3b-9b57-1a9c7d5bd5fb@kernel.org>
-Date: Thu, 8 Jan 2026 17:56:41 -0700
+	s=arc-20240116; t=1767920387; c=relaxed/simple;
+	bh=tJsci8ts5VBXOELaDP09IiliX6G1igTyzNglsc4sHV0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fdYEjTQjagwpXbsGpFs9pFMZguM0JvnC8IXNjkXwvtYD0NrNs29FM5waOKk3EY0I/57T2g1LPg2XMKR/pbdop+NSxl3WVKRFqXu8O7jVIY6Fn3Zt8sbtNS2OzdpV2FIrRKl8Lkev7xIG3T7cQG8xu3zNKZ15f/aXKX3x6KTtR60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com; spf=pass smtp.mailfrom=socionext.com; arc=none smtp.client-ip=202.248.49.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=socionext.com
+Received: from unknown (HELO kinkan3-ex.css.socionext.com) ([172.31.9.52])
+  by mx.socionext.com with ESMTP; 09 Jan 2026 09:59:44 +0900
+Received: from mail.mfilter.local (mail-arc01.css.socionext.com [10.213.46.36])
+	by kinkan3-ex.css.socionext.com (Postfix) with ESMTP id 2C5EF20695EB;
+	Fri,  9 Jan 2026 09:59:44 +0900 (JST)
+Received: from iyokan3.css.socionext.com ([172.31.9.53]) by m-FILTER with ESMTP; Fri, 9 Jan 2026 09:59:43 +0900
+Received: from [10.212.247.110] (unknown [10.212.247.110])
+	by iyokan3.css.socionext.com (Postfix) with ESMTP id 355F210A003;
+	Fri,  9 Jan 2026 09:59:43 +0900 (JST)
+Message-ID: <c9b009a8-7077-4c37-9ebf-33ac86720d7e@socionext.com>
+Date: Fri, 9 Jan 2026 09:59:45 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,42 +43,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [net?] kernel BUG in fib6_add_rt2node (2)
+Subject: Re: [PATCH net 2/2] net: ethernet: ave: Replace udelay with
+ usleep_range
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260108064641.2593749-1-hayashi.kunihiko@socionext.com>
+ <20260108064641.2593749-2-hayashi.kunihiko@socionext.com>
+ <20260108090514.375a23fb@pumpkin>
 Content-Language: en-US
-To: syzbot <syzbot+cb809def1baaac68ab92@syzkaller.appspotmail.com>,
- davem@davemloft.net, edumazet@google.com, horms@kernel.org, kuba@kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- syzkaller-bugs@googlegroups.com
-References: <695d4d3a.050a0220.1c677c.0349.GAE@google.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <695d4d3a.050a0220.1c677c.0349.GAE@google.com>
-Content-Type: text/plain; charset=UTF-8
+From: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+In-Reply-To: <20260108090514.375a23fb@pumpkin>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 1/6/26 10:58 AM, syzbot wrote:
-> Hello,
+Hi David,
+
+On 2026/01/08 18:05, David Laight wrote:
+> On Thu,  8 Jan 2026 15:46:41 +0900
+> Kunihiko Hayashi <hayashi.kunihiko@socionext.com> wrote:
 > 
-> syzbot found the following issue on:
+>> Replace udelay() with usleep_range() as notified by checkpatch.pl.
 > 
-> HEAD commit:    1d528e794f3d Merge branch 'bpf-fix-bpf_d_path-helper-proto..
-> git tree:       bpf
-> console output: https://syzkaller.appspot.com/x/log.txt?x=159c51c2580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=9e5198eaf003f1d1
+> Nak.
+> Look at the code...
 
-This config at
+Thank you for reviewing.
 
-commit 59ba823e689f832f389ea6af6e7ae5842b3c860a (HEAD -> net-next,
-net-next/main)
-Merge: 76de4e1594b7 f2a3b12b305c
-Author: Jakub Kicinski <kuba@kernel.org>
-Date:   Thu Jan 8 11:37:07 2026 -0800
+Indeed, since this function is called from an interrupt context,
+it was not allowed to use usleep_range().
 
-    Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
+I'll keep udelay() here and close this patch.
 
-> dashboard link: https://syzkaller.appspot.com/bug?extid=cb809def1baaac68ab92
-> compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=139c51c2580000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11b2961a580000
+Thank you,
 
-and this reproducer does not show a problem for me.
+---
+Best Regards
+Kunihiko Hayashi
 
