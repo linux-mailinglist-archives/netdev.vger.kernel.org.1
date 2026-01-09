@@ -1,148 +1,112 @@
-Return-Path: <netdev+bounces-248419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DED1D085E7
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 10:57:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42EECD085F5
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 10:58:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 86F243019B4F
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 09:57:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6681E300A86B
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 09:58:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C023358D6;
-	Fri,  9 Jan 2026 09:57:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D82BC33554B;
+	Fri,  9 Jan 2026 09:58:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="hxFCMl+I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B1zTS6r2"
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A563358BA;
-	Fri,  9 Jan 2026 09:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A13296BCB;
+	Fri,  9 Jan 2026 09:58:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767952649; cv=none; b=Yu7jGWW1wqd6j8VnOfBnQu3cdQ/Vjmut/Nhci517/yp5mDD9lJvM6EqjsJxzbXeEgm9V+90jsHynL89n5pg5VATK+1JHCu6QX3OdelY8fm1y4pufXnRT757Nt7NfjJknToJr25WJOW99qRagZd7kAbPtEIGp+Hjv8CgUjakzJgc=
+	t=1767952686; cv=none; b=P6Fq/TWa84/q+T8/O9rOApY+9rfkxYeqN0ySjk1lfyoEUM/Qln10cLiIR9toBJbt4zvHhA56kMeuyYj6X+5pjQQVVVwTdyiG2q92u2Vm7oEzyBbzmm6pQDRzG8ixMH4/vuCwLFL16jpy0zbYfxe7/z35iPxaGR8F35WJJjbNFmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767952649; c=relaxed/simple;
-	bh=M1qmy86SHZvWLo4r8+7G1n+HTnEPqHQke1+1swI55bA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qCQusGPimo1sEf1VE7EKBVZLXrbJWxhpNxfKLIQLG5aG0pnCYrzB4nKrrgRIRehqrM8qSADVWFPgQbyA603hAbsr34JefbqnwmJC9sixcqqlzqKvrxXxcATXy/aHzeGRVDyVkb+rjnFeW2zHxXsnEy0w6yX180QSPjPUOnnYlgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=hxFCMl+I; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from [129.217.186.165] ([129.217.186.165])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 6099vHq4004261
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Fri, 9 Jan 2026 10:57:18 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1767952639;
-	bh=M1qmy86SHZvWLo4r8+7G1n+HTnEPqHQke1+1swI55bA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=hxFCMl+IlmnD5oQ1CQu1M4EaVYRTK+qhszYZagf+xK+38mY4iJQ0P0OkWJ81GZ1dV
-	 yjKcWyle3X1gtoOEdG22WTNAR3o9C1gfYJqH5QeaGI1sNqCI7DNsdlc/kemMw6flBX
-	 RdUqsKUJJEcwUAj3H1sOzr7yKRxgq7gB9h2pxnAQ=
-Message-ID: <0ae9071b-6d76-4336-8aee-d0338eecc6f5@tu-dortmund.de>
-Date: Fri, 9 Jan 2026 10:57:17 +0100
+	s=arc-20240116; t=1767952686; c=relaxed/simple;
+	bh=AYkp6bsgzCEdxBv7Tjl5nsBSLP1aoFKshtzd33sSLOU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mnyN5TLOFIbswRsLr+p+K8iiu1qv0deDO2G3VGBvAy0kW4d4mX3Ayfb5e66QYpt0HL3VJPJudFDCW2BP49+laGVdeh8U70GZQyMIGahS868YUZMfmuZwwXsRb0rvf2wtMjOo6UtdblbQgZ2O6tZwGcvpxvkAn0t6O3BEyZKhLdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B1zTS6r2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E33B2C4CEF1;
+	Fri,  9 Jan 2026 09:58:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767952686;
+	bh=AYkp6bsgzCEdxBv7Tjl5nsBSLP1aoFKshtzd33sSLOU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=B1zTS6r2lwnpCdemdIHFTpC/Kz1++IL2BF/9fB36hBsbh4ckD87S5zT7EUswtdale
+	 9n8Ksztd1JNTtwbRtfJJH2t0XUH0SWL6PxuWFpJJt4OU3dTn5eWpdMl6QPS6+HzNlM
+	 gfCIR6n/zxt96M+APu6ZUOxmpW42gS6dozivTbFf2u3h1ltdJGVjpiNCmfJrIYSLF4
+	 b6dbvpLq2qN4mw7LDTJcrNtgwFjCrpuhjFFYurQM5+f3R/GF6nxiG2xuLc04Lm6Tdy
+	 KMdOTGnZrA07J0XuzywgLBXj9L7naoRHeTW0ODO9CSpMpGCLxae/9tKQHZtsI7KxnP
+	 XeUxN2p1JzpIw==
+Date: Fri, 9 Jan 2026 09:58:01 +0000
+From: Lee Jones <lee@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 07/15] mfd: core: add ability for cells to probe
+ on a custom parent OF node
+Message-ID: <20260109095801.GD1118061@google.com>
+References: <20251118190530.580267-1-vladimir.oltean@nxp.com>
+ <20251118190530.580267-8-vladimir.oltean@nxp.com>
+ <20251120144136.GF661940@google.com>
+ <20251120153622.p6sy77coa3de6srw@skbuf>
+ <20251121120646.GB1117685@google.com>
+ <20251121170308.tntvl2mcp2qwx6qz@skbuf>
+ <20251215155028.GF9275@google.com>
+ <20251216002955.bgjy52s4stn2eo4r@skbuf>
+ <20251216091831.GG9275@google.com>
+ <987743fa-5673-4067-9a53-f5155b8d9ad8@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v7 7/9] vhost-net: vhost-net: replace rx_ring with
- tun/tap ring wrappers
-To: Jason Wang <jasowang@redhat.com>
-Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com,
-        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
-        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux.dev
-References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
- <20260107210448.37851-8-simon.schippers@tu-dortmund.de>
- <CACGkMEtndGm+GX+3Kn5AWTkEc+PK0Fo1=VSZzhgBQoYRQbicQw@mail.gmail.com>
- <5961e982-9c52-4e7a-b1ca-caaf4c4d0291@tu-dortmund.de>
- <CACGkMEsKFcsumyNU6vVgBE4LjYWNb2XQNaThwd9H5eZ+RjSwfQ@mail.gmail.com>
-Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <CACGkMEsKFcsumyNU6vVgBE4LjYWNb2XQNaThwd9H5eZ+RjSwfQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <987743fa-5673-4067-9a53-f5155b8d9ad8@lunn.ch>
 
-On 1/9/26 07:04, Jason Wang wrote:
-> On Thu, Jan 8, 2026 at 3:48 PM Simon Schippers
-> <simon.schippers@tu-dortmund.de> wrote:
->>
->> On 1/8/26 05:38, Jason Wang wrote:
->>> On Thu, Jan 8, 2026 at 5:06 AM Simon Schippers
->>> <simon.schippers@tu-dortmund.de> wrote:
->>>>
->>>> Replace the direct use of ptr_ring in the vhost-net virtqueue with
->>>> tun/tap ring wrapper helpers. Instead of storing an rx_ring pointer,
->>>> the virtqueue now stores the interface type (IF_TUN, IF_TAP, or IF_NONE)
->>>> and dispatches to the corresponding tun/tap helpers for ring
->>>> produce, consume, and unconsume operations.
->>>>
->>>> Routing ring operations through the tun/tap helpers enables netdev
->>>> queue wakeups, which are required for upcoming netdev queue flow
->>>> control support shared by tun/tap and vhost-net.
->>>>
->>>> No functional change is intended beyond switching to the wrapper
->>>> helpers.
->>>>
->>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->>>> Co-developed by: Jon Kohler <jon@nutanix.com>
->>>> Signed-off-by: Jon Kohler <jon@nutanix.com>
->>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
->>>> ---
->>>>  drivers/vhost/net.c | 92 +++++++++++++++++++++++++++++----------------
->>>>  1 file changed, 60 insertions(+), 32 deletions(-)
->>>>
->>>> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
->>>> index 7f886d3dba7d..215556f7cd40 100644
->>>> --- a/drivers/vhost/net.c
->>>> +++ b/drivers/vhost/net.c
->>>> @@ -90,6 +90,12 @@ enum {
->>>>         VHOST_NET_VQ_MAX = 2,
->>>>  };
->>>>
->>>> +enum if_type {
->>>> +       IF_NONE = 0,
->>>> +       IF_TUN = 1,
->>>> +       IF_TAP = 2,
->>>> +};
->>>
->>> This looks not elegant, can we simply export objects we want to use to
->>> vhost like get_tap_socket()?
->>
->> No, we cannot do that. We would need access to both the ptr_ring and the
->> net_device. However, the net_device is protected by an RCU lock.
->>
->> That is why {tun,tap}_ring_consume_batched() are used:
->> they take the appropriate locks and handle waking the queue.
+On Wed, 17 Dec 2025, Andrew Lunn wrote:
+
+> > > Name         Description                                         Start      End
+> > > SWITCH       Ethernet Switch Subsystem                           0x000000   0x3ffffc
+> > > 100BASE-T1   Internal MDIO bus for 100BASE-T1 PHY (port 5 - 10)  0x704000   0x704ffc
+> > > SGMII1       SGMII Port 1                                        0x705000   0x705ffc
+> > > SGMII2       SGMII Port 2                                        0x706000   0x706ffc
+> > > SGMII3       SGMII Port 3                                        0x707000   0x707ffc
+> > > SGMII4       SGMII Port 4                                        0x708000   0x708ffc
+> > > 100BASE-TX   Internal MDIO bus for 100BASE-TX PHY                0x709000   0x709ffc
+> > 
+> > All in drivers/net.
 > 
-> How about introducing a callback in the ptr_ring itself, so vhost_net
-> only need to know about the ptr_ring?
-
-That would be great, but I'm not sure whether this should be the
-responsibility of the ptr_ring.
-
-If the ptr_ring were to keep track of the netdev queue, it could handle
-all the management itself - stopping the queue when full and waking it
-again once space becomes available.
-
-What would be your idea for implementing this?
-
+> I've not been following this conversation too much, but i would like
+> to point out that what you find in drivers/net is not a uniform set of
+> drivers, but a collection of different driver types.
 > 
-> Thanks
+> SWITCH might belong on drivers/net/dsa
+> 100BASE-T1 might belong on drivers/net/mdio
+> SGMIIX might belong in drivers/net/pcs
+> 100BASE-TX might belong in drivers/net/mdio
 > 
->>
->>>
->>> Thanks
->>>
->>
+> I also expect those T1 and TX PHYs have drivers in drivers/net/phy,
+> but they are not memory mapped, so not on your list.
 > 
+> Each driver can probe independently, registering with different parts
+> of the net core. And then the switch driver will link all the parts
+> together using phandles.
+> 
+> Saying that all the sub drivers are in drivers/net seems an odd
+> argument it is not an MFD.
+
+Okay, I'm convinced.  Thanks for the additional context.
+
+-- 
+Lee Jones [李琼斯]
 
