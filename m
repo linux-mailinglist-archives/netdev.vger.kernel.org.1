@@ -1,117 +1,95 @@
-Return-Path: <netdev+bounces-248632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41862D0C64C
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 22:53:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 14FE3D0C737
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 23:22:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 628CC301EC4E
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 21:53:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5A15830076AF
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 22:21:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCEB733E35F;
-	Fri,  9 Jan 2026 21:53:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="K0NhceFr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C54BF341072;
+	Fri,  9 Jan 2026 22:21:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD30533D6E1
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 21:53:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 389F4C2EA;
+	Fri,  9 Jan 2026 22:21:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767995620; cv=none; b=ENmt/8uzCKcIDHZCTC95nzjb6UBrYIazy3yFYxHUvMdtXU8zkhIRogcMTokqFY3nwxgi+beG/a0s82zVgCLBe+8WJ0w9oBMWBvG+P/uzltT/E6NvJZn3UXPaxL9xwFjb5dZrx425A2SOQZhuVT88AvsWwbUvUmAmAei9msRJi30=
+	t=1767997313; cv=none; b=EcxRLsWIFMaLMI4FQBoecPHAwGxjN0iWxo7+tQ7TIpnI+gwti4YgPJ0ATu5Ne1mhTtpMdsLRuXx2NpSb/x0mbYqv8HiXkpwiZPAunbgp8uF5C9P99+8r3k3zIB/K1tJddwkTYFNQHwBSJavJsq7IiKesCzsPKN/3yHHtew59xWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767995620; c=relaxed/simple;
-	bh=gkxei1XV+7jup5mq3CbS6/u/Lk1Gm3xGtyjrSAmN83U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jnp2n3W3xweVhtN3l7F4/aY4y3u3UnMHARGrElFSnjsTSdatn4PKoy+lyfIHnrki5zrliXareIErxJL4afPaGCvgQev9yvPd3VW6hZxrBinAiAvMQzEpsAgbMHmnvgW87inBLdE+ymOA/TugPJGKy6Aeu6mJ0oP4sIDTL9unbNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=K0NhceFr; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f3e041d4-c65a-4c16-99ff-37caceebb54a@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767995615;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=513Ls91pZJUmzplWGcunk0nQa90ZGydxvckD4eQkbpI=;
-	b=K0NhceFr24pkhGGDbk9t7ZAZzu8znxijquW618kMieD3a6l6LM5bExNk1DbCU9wsoEIRX2
-	TjFkLr/BQbdLI6ett5AHQRUEs/jw/Sy0m1Hv3J7I3oids0hDHMuZTfvE4x3vpl1YbScJas
-	2M03mGMFHehLTqaqvjmgqPXaL8zlkRQ=
-Date: Fri, 9 Jan 2026 13:53:28 -0800
+	s=arc-20240116; t=1767997313; c=relaxed/simple;
+	bh=OdU6CYBB1RxX8LM+xLtOHJYJqiSR573jb8+Ryj5sMuU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MKqNWAoJ8IHUcuLT5Oa3uETRKGqsEyQrVE2Yg++rVMf1W0aj3xNzmijPU2iQY6B0OfIrE4KrsInXjhkV1sJmdQtczW3thlyeQm82FCMwp5KYg+G0q70AlopYqU2k/4kMPcr6FcbjWdjYSBY1iCqqauLKhbbPvZPQtX9ofG/Zq10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1veKrW-000000002io-0hJy;
+	Fri, 09 Jan 2026 22:21:42 +0000
+Date: Fri, 9 Jan 2026 22:21:38 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Michael Klein <michael@fossekall.de>,
+	Aleksander Jan Bajkowski <olek2@wp.pl>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/5] net: phy: realtek: simplify C22 reg access
+ via MDIO_MMD_VEND2
+Message-ID: <aWF_cmmcT03Q03Nv@makrotopia.org>
+References: <cover.1767926665.git.daniel@makrotopia.org>
+ <938aff8b65ea84eccdf1a2705684298ec33cc5b0.1767926665.git.daniel@makrotopia.org>
+ <aWFz4TWNGEs7rGPF@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 01/16] bpf: Convert bpf_selem_unlink_map to
- failable
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net,
- memxor@gmail.com, martin.lau@kernel.org, kpsingh@kernel.org,
- yonghong.song@linux.dev, song@kernel.org, haoluo@google.com,
- kernel-team@meta.com
-References: <20251218175628.1460321-1-ameryhung@gmail.com>
- <20251218175628.1460321-2-ameryhung@gmail.com>
- <74fa8337-b0cb-42fb-af8a-fdf6877e558d@linux.dev>
- <CAMB2axP5OvZKhHDnW9UD95S+2nTYaR4xLRHdg+oeXtpRJOfKrA@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CAMB2axP5OvZKhHDnW9UD95S+2nTYaR4xLRHdg+oeXtpRJOfKrA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aWFz4TWNGEs7rGPF@shell.armlinux.org.uk>
 
-On 1/9/26 10:39 AM, Amery Hung wrote:
->>> @@ -574,20 +603,37 @@ bpf_local_storage_update(void *owner, struct bpf_local_storage_map *smap,
->>>                goto unlock;
->>>        }
->>>
->>> +     b = select_bucket(smap, selem);
->>> +
->>> +     if (old_sdata) {
->>> +             old_b = select_bucket(smap, SELEM(old_sdata));
->>> +             old_b = old_b == b ? NULL : old_b;
->>> +     }
->>> +
->>> +     raw_spin_lock_irqsave(&b->lock, b_flags);
->>> +
->>> +     if (old_b)
->>> +             raw_spin_lock_irqsave(&old_b->lock, old_b_flags);
->> This will deadlock because of the lock ordering of b and old_b.
->> Replacing it with res_spin_lock in the later patch can detect it and
->> break it more gracefully. imo, we should not introduce a known deadlock
->> logic in the kernel code in the syscall code path and ask the current
->> user to retry the map_update_elem syscall.
->>
->> What happened to the patch in the earlier revision that uses the
->> local_storage (or owner) for select_bucket?
-> Thanks for reviewing!
+On Fri, Jan 09, 2026 at 09:32:18PM +0000, Russell King (Oracle) wrote:
+> On Fri, Jan 09, 2026 at 03:03:22AM +0000, Daniel Golle wrote:
+> > RealTek 2.5GE PHYs have all standard Clause-22 registers mapped also
+> > inside MDIO_MMD_VEND2 at offset 0xa400. This is used mainly in case the
+> > PHY is inside a copper SFP module which uses the RollBall MDIO-over-I2C
+> > method which *only* supports Clause-45.
 > 
-> I decided to revert it because this introduces the dependency of selem
-> to local_storage when unlinking. bpf_selem_unlink_lockless() cannot
-> assume map or local_storage associated with a selem to be alive. In
-> the case where local_storage is already destroyed, we won't be able to
-> figure out the bucket if select_bucket() uses local_storage for
-> hashing.
+> It isn't just Rollball. There are SoCs out there which have separate
+> MDIO buses, one bus signals at 3.3V and can generate only clause 22
+> frames. The other operates at 1.2V and can only generate clause 45
+> frames.
 > 
-> A middle ground is to use local_storage for hashing, but save the
-> bucket index in selem so that local_storage pointer won't be needed
-> later. WDYT?
+> While hardware may elect to generate and recognise either frame types
+> at either voltage, this goes some way to explain why there are
+> implementations that only support one or the other on a particular
+> pair of MDC/MDIO wires.
+> 
+> Armada 8040 has this setup - there is one MDIO bus that only supports
+> clause 22 frames, and there is a separate MDIO bus that only supports
+> clause 45 frames.
 
-I would try not to add another "const"-like value to selem if it does 
-not have to. imo, it is quite wasteful considering the number of 
-selem(s) that can live in the system. Yes, there is one final 8-byte 
-hole in selem, but it still should not be used lightly unless nothing 
-else can be shared. The atomic/u16/bool added in this set can be 
-discussed later once patch 10 is concluded.
+Interesting. And a bit annoying. I wasn't aware of the electrical
+difference (signal voltage).
 
-For select_bucket in bpf_selem_unlink_lockless, map_free should know the 
-bucket. destroy() should have the local_storage, no?
+Never the less, even with this change applied you now get a driver which
+uses *only* Clause-45 access in case phydev->is_45 is true, and only
+Clause-22 in case phydev->is_45 is false.
 
+From what I understood this was the intended outcome of having two
+dedicated drivers, and you can have the very same results now with a
+single driver. If you would like me to broaden the commit message and
+clarify this, please let me know.
 
