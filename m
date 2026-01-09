@@ -1,79 +1,89 @@
-Return-Path: <netdev+bounces-248293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39BDBD06975
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 01:07:43 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05462D069BE
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 01:27:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C5E7C3004B8C
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 00:07:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DC433302FBE1
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 00:27:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC06F450FE;
-	Fri,  9 Jan 2026 00:07:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="N+wQbmHR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 939571C5D5E;
+	Fri,  9 Jan 2026 00:27:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6838C10A1E;
-	Fri,  9 Jan 2026 00:07:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+Received: from mx.socionext.com (mx.socionext.com [202.248.49.38])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A19C61C3C08;
+	Fri,  9 Jan 2026 00:27:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.248.49.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767917252; cv=none; b=HVi+9194ELiBq/1l4+1HI5rHc3W2Az2poa3HaLRTA/nIBZUQWIE2rsvofQRz2B5ONVIPJBoMOknaZp13uLBDCzfMbeWqnb+HBhNoe7WpeMeKVV97GMX579n85AsKFMbi2VRg47ENE0TKMVekQKG4537YZq+GtTa0s9A7Zb/PB28=
+	t=1767918426; cv=none; b=m30WVoB2G6tXrMwGn6s0pBJOGyzNyHdS3EiJqhDndrQturf1WdQfdc9qcJjVRVIWpu+kZSmRN4HxB3Zb3h+cgqSvmFfG6eY3sGZKR3jV3hUyC4dTO1FcLjNw4lyV4ZtrzPqLAJA9x94s+xnIxl7Xl8ZM4IWGmMxLYSI7TBSZNTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767917252; c=relaxed/simple;
-	bh=slaMzHuaaj5FePbxfjcaFwt2M1YRzPYQ5M2hknJhAVc=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=hkhwFpMbB/aGeLs32YfJMatwCsSUEirMxDgMSG3+JlXnb2u6A0cEPEIEfMYBps0kOIG6I3d9O3EGbh3wPg+Xa1QKWm+KuOPIyj64r+yagEJesr5U7PPFjStzaQBA47Ng0C/4ymWCJLymVngrrvbhyo0QtpuMSBJ9HyoPu7xZ4TE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=N+wQbmHR; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1767917242;
-	bh=slaMzHuaaj5FePbxfjcaFwt2M1YRzPYQ5M2hknJhAVc=;
-	h=Subject:From:To:Date:In-Reply-To:References;
-	b=N+wQbmHR5y48GEK6KFeiIzb0yna4jdsWZldpgaUYI0q+2pVMlUrzJcijbZPZQ5LmD
-	 9q/XcTRNh3vLNeO2WOzgJ9FcqqFPFCxHOnsxlEisdUqvhKx1S6b/hQ5U+aEAkzcbq1
-	 wb2j6xOu5pm9MHRU2Apt7Nr0cJQV0gJCLg5k5gCBwQf7yjsVPujJjYqRRxQ2IAP/1Q
-	 mY+NK4rzG6mR4txXDpaYV1NMmTutr+BCRETBYHS27lg4Z437I5jNY6DeVrV609EcCL
-	 iiIelv8aNd2O6ImSYPOuE00zBvDZr2HPPoYL4JJEW01RTSBZ+WzERR1DffoIlHWy1R
-	 n1m8flsqqx4dQ==
-Received: from pecola.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 3FF327E142;
-	Fri,  9 Jan 2026 08:07:20 +0800 (AWST)
-Message-ID: <ea3db627f1d7fb4afb1d7b36253ff369341fbad3.camel@codeconstruct.com.au>
-Subject: Re: [PATCH] net: mctp-i2c: fix duplicate reception of old data
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Jian Zhang <zhangjian.3032@bytedance.com>, Matt Johnston
- <matt@codeconstruct.com.au>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Fri, 09 Jan 2026 08:07:19 +0800
-In-Reply-To: <20260108101829.1140448-1-zhangjian.3032@bytedance.com>
-References: <20260108101829.1140448-1-zhangjian.3032@bytedance.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2+deb12u1 
+	s=arc-20240116; t=1767918426; c=relaxed/simple;
+	bh=4iiPCQDJVG61ZYiJ0w+mgpL0MH7y3Q/osONS0y+x33c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZXBiYwVNb+6xuAmpqTVnRpRQY/Bku75IPwlp0TdGO3iX1WBAOWsuvjq4zy7lTJ17yfQz8vZ+8OE0AHGo+QlNvrZKhQgA/NBuwDsSCWt95JNhie2ltCOSTuebwUxH2TkH4bZ9eYaTbDmx5234mnmjSlpr/oe7bWZki7CYnzgemFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com; spf=pass smtp.mailfrom=socionext.com; arc=none smtp.client-ip=202.248.49.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=socionext.com
+Received: from unknown (HELO kinkan3-ex.css.socionext.com) ([172.31.9.52])
+  by mx.socionext.com with ESMTP; 09 Jan 2026 09:27:02 +0900
+Received: from mail.mfilter.local (mail-arc01.css.socionext.com [10.213.46.36])
+	by kinkan3-ex.css.socionext.com (Postfix) with ESMTP id F064F20695EB;
+	Fri,  9 Jan 2026 09:27:01 +0900 (JST)
+Received: from iyokan3.css.socionext.com ([172.31.9.53]) by m-FILTER with ESMTP; Fri, 9 Jan 2026 09:27:01 +0900
+Received: from [10.212.247.110] (unknown [10.212.247.110])
+	by iyokan3.css.socionext.com (Postfix) with ESMTP id 951C610A00D;
+	Fri,  9 Jan 2026 09:27:01 +0900 (JST)
+Message-ID: <34aaa094-daff-4045-b830-1687488c3e8e@socionext.com>
+Date: Fri, 9 Jan 2026 09:27:03 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/2] net: ethernet: ave: Remove unnecessary 'out of
+ memory' message
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260108064641.2593749-1-hayashi.kunihiko@socionext.com>
+ <81841486-b0c2-4f12-b4d5-08fe214f18d9@lunn.ch>
+Content-Language: en-US
+From: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+In-Reply-To: <81841486-b0c2-4f12-b4d5-08fe214f18d9@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Jian,
+Hi Andrew,
 
-> The MCTP I2C slave callback did not handle I2C_SLAVE_READ_REQUESTED
-> events. As a result, i2c read event will trigger repeated reception
-> of old data, reset rx_pos when a read request is received.
+On 2026/01/09 3:32, Andrew Lunn wrote:
+> On Thu, Jan 08, 2026 at 03:46:40PM +0900, Kunihiko Hayashi wrote:
+>> Follow the warning from checkpatch.pl and remove 'out of memory'
+> message.
+>>
+>>      WARNING: Possible unnecessary 'out of memory' message
+>>      #590: FILE: drivers/net/ethernet/socionext/sni_ave.c:590:
+>>      +               if (!skb) {
+>>      +                       netdev_err(ndev, "can't allocate skb for
+> Rx\n");
+> 
+> Please take a read of
+> 
+> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+> 
+> You tagged this for net, not net-next. I would say this is not a fix.
 
-Makes sense. You're just invoking any i2c read from the peer controller
-to trigger this, is that right?
+Thank you for pointing out.
+I thought this was a "fix" for the warning, however, it's not a logical
+fix. So I'll repost it as net-next.
 
-Cheers,
+Thank you,
 
-
-Jeremy
+---
+Best Regards
+Kunihiko Hayashi
 
