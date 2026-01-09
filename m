@@ -1,41 +1,46 @@
-Return-Path: <netdev+bounces-248294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05462D069BE
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 01:27:10 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83670D06A99
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 01:56:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DC433302FBE1
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 00:27:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 85971300D914
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 00:56:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 939571C5D5E;
-	Fri,  9 Jan 2026 00:27:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC6721F09B3;
+	Fri,  9 Jan 2026 00:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="llUkBRG2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.socionext.com (mx.socionext.com [202.248.49.38])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A19C61C3C08;
-	Fri,  9 Jan 2026 00:27:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.248.49.38
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA0581EB5E1;
+	Fri,  9 Jan 2026 00:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767918426; cv=none; b=m30WVoB2G6tXrMwGn6s0pBJOGyzNyHdS3EiJqhDndrQturf1WdQfdc9qcJjVRVIWpu+kZSmRN4HxB3Zb3h+cgqSvmFfG6eY3sGZKR3jV3hUyC4dTO1FcLjNw4lyV4ZtrzPqLAJA9x94s+xnIxl7Xl8ZM4IWGmMxLYSI7TBSZNTA=
+	t=1767920203; cv=none; b=XhoL4uB8oGBnQwJmS7t2v6w3s2QfrTW6IX3gvrfVoRrmKceZlAgxZ2tgyUzxfykwy0R5NKehxIoeHCuuZLONr3Y94+P7IrUwBV2pjfyWdotgvNccDAY0b3WuEwEifsXNW4zJwWUgbh3KgHV4kO0O5SBlQ25N7YY2OZHYfoxCyNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767918426; c=relaxed/simple;
-	bh=4iiPCQDJVG61ZYiJ0w+mgpL0MH7y3Q/osONS0y+x33c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZXBiYwVNb+6xuAmpqTVnRpRQY/Bku75IPwlp0TdGO3iX1WBAOWsuvjq4zy7lTJ17yfQz8vZ+8OE0AHGo+QlNvrZKhQgA/NBuwDsSCWt95JNhie2ltCOSTuebwUxH2TkH4bZ9eYaTbDmx5234mnmjSlpr/oe7bWZki7CYnzgemFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com; spf=pass smtp.mailfrom=socionext.com; arc=none smtp.client-ip=202.248.49.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=socionext.com
-Received: from unknown (HELO kinkan3-ex.css.socionext.com) ([172.31.9.52])
-  by mx.socionext.com with ESMTP; 09 Jan 2026 09:27:02 +0900
-Received: from mail.mfilter.local (mail-arc01.css.socionext.com [10.213.46.36])
-	by kinkan3-ex.css.socionext.com (Postfix) with ESMTP id F064F20695EB;
-	Fri,  9 Jan 2026 09:27:01 +0900 (JST)
-Received: from iyokan3.css.socionext.com ([172.31.9.53]) by m-FILTER with ESMTP; Fri, 9 Jan 2026 09:27:01 +0900
-Received: from [10.212.247.110] (unknown [10.212.247.110])
-	by iyokan3.css.socionext.com (Postfix) with ESMTP id 951C610A00D;
-	Fri,  9 Jan 2026 09:27:01 +0900 (JST)
-Message-ID: <34aaa094-daff-4045-b830-1687488c3e8e@socionext.com>
-Date: Fri, 9 Jan 2026 09:27:03 +0900
+	s=arc-20240116; t=1767920203; c=relaxed/simple;
+	bh=vqJZDHh2cmNS2nIPBQoeIp5cRhAVJY3HXNq5Hq1PjdY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ILvrztNYOT/jXRMk8b3ptiQRnTqf3Ev9hF7dBNFIkVLj4adltLlX06OECXmp4qXPqXbHAouz2FwK+Q97Ko2ysaPb2jDk9aKqxPO2rUBJWCy1PXNXTathVDAlEBcODCJmID6S37VpmhvKQjuG+kwQlMzbqr9wbWoa+FHBn7POwV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=llUkBRG2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA65AC116C6;
+	Fri,  9 Jan 2026 00:56:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767920203;
+	bh=vqJZDHh2cmNS2nIPBQoeIp5cRhAVJY3HXNq5Hq1PjdY=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=llUkBRG2NSn6UsqwqLz/oHPISJ0M6tgohqLshJcRTUAaCvJPGssOSHxTeuzWXc5Vd
+	 7vbViCE1UOD0NvRSdIwZtYunQBuvbsvBio2HrLIo5ylu+N6zza+wrPhGVuJDTkh8co
+	 rtIyPYiuq88rrehyG4bV9cvW4eXAjMVLu8RR+NgsBy4c3vf5Q0Qh75WumGMeas+m/V
+	 pWqy4UPF5aF++ZHSLHX2FkunE7VBUF1VitKXBtn/PDB157uQIOCq5wRxlMegkyiFNs
+	 gPOM4AlfLcwtRKZj7sD6IwrNydeFcSPvodlHGvUYxwgTzmR1bNySj5AxEGPSyHMXlo
+	 nzrPJ2qVePSdw==
+Message-ID: <e3ff455b-1c02-4f3b-9b57-1a9c7d5bd5fb@kernel.org>
+Date: Thu, 8 Jan 2026 17:56:41 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,47 +48,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] net: ethernet: ave: Remove unnecessary 'out of
- memory' message
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260108064641.2593749-1-hayashi.kunihiko@socionext.com>
- <81841486-b0c2-4f12-b4d5-08fe214f18d9@lunn.ch>
+Subject: Re: [syzbot] [net?] kernel BUG in fib6_add_rt2node (2)
 Content-Language: en-US
-From: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
-In-Reply-To: <81841486-b0c2-4f12-b4d5-08fe214f18d9@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: syzbot <syzbot+cb809def1baaac68ab92@syzkaller.appspotmail.com>,
+ davem@davemloft.net, edumazet@google.com, horms@kernel.org, kuba@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ syzkaller-bugs@googlegroups.com
+References: <695d4d3a.050a0220.1c677c.0349.GAE@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <695d4d3a.050a0220.1c677c.0349.GAE@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Andrew,
-
-On 2026/01/09 3:32, Andrew Lunn wrote:
-> On Thu, Jan 08, 2026 at 03:46:40PM +0900, Kunihiko Hayashi wrote:
->> Follow the warning from checkpatch.pl and remove 'out of memory'
-> message.
->>
->>      WARNING: Possible unnecessary 'out of memory' message
->>      #590: FILE: drivers/net/ethernet/socionext/sni_ave.c:590:
->>      +               if (!skb) {
->>      +                       netdev_err(ndev, "can't allocate skb for
-> Rx\n");
+On 1/6/26 10:58 AM, syzbot wrote:
+> Hello,
 > 
-> Please take a read of
+> syzbot found the following issue on:
 > 
-> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-> 
-> You tagged this for net, not net-next. I would say this is not a fix.
+> HEAD commit:    1d528e794f3d Merge branch 'bpf-fix-bpf_d_path-helper-proto..
+> git tree:       bpf
+> console output: https://syzkaller.appspot.com/x/log.txt?x=159c51c2580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=9e5198eaf003f1d1
 
-Thank you for pointing out.
-I thought this was a "fix" for the warning, however, it's not a logical
-fix. So I'll repost it as net-next.
+This config at
 
-Thank you,
+commit 59ba823e689f832f389ea6af6e7ae5842b3c860a (HEAD -> net-next,
+net-next/main)
+Merge: 76de4e1594b7 f2a3b12b305c
+Author: Jakub Kicinski <kuba@kernel.org>
+Date:   Thu Jan 8 11:37:07 2026 -0800
 
----
-Best Regards
-Kunihiko Hayashi
+    Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
+
+> dashboard link: https://syzkaller.appspot.com/bug?extid=cb809def1baaac68ab92
+> compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=139c51c2580000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11b2961a580000
+
+and this reproducer does not show a problem for me.
 
