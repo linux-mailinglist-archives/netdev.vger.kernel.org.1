@@ -1,118 +1,82 @@
-Return-Path: <netdev+bounces-248553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EA5DD0B439
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 17:32:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2698CD0B4C3
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 17:39:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3F8F13022F1B
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 16:31:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F15F730ED015
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 16:31:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 553BC30FF23;
-	Fri,  9 Jan 2026 16:31:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CE9536402E;
+	Fri,  9 Jan 2026 16:31:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jbxnvxnF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oN3WH5Wj"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E0635FF70
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 16:31:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEEE03385BC
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 16:31:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767976310; cv=none; b=h6p+Ie4sOplFA51Ddcs2/h9qQ0q5Gs0gbX10SU8z1jW7lkvxAf7Lwd7Z4F77T3fm/FN2yP6w34Wza9VEA11sgWvN2E/Dfd5ZeLddigzKDIAa6r4u8wNP7IStGStuNg1qXe4N4aHtqy9xCcHkja2hIGJaih9a213d5vTnwVKVUmw=
+	t=1767976292; cv=none; b=T/J0XMRQtKKcnuxcettj0VER0mvZbRpTBRMUUt4nDmBCnGz0fO9sv/AplQu7UWYr1siOvOa/Rij7T9VyPSkDv5xhoJF1iWpfDQozjwv4TJ/Eeor3oX5cxqR4+bAc5w92yGHQtwe1taBrKpWl2KM34MbN5bTePB+vy+rv3OMJ4nQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767976310; c=relaxed/simple;
-	bh=BCRMP2eyuWt/cu6xQkRQpDmqsMIlGvgreC2eYv+qXgY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HWJyoM16CblGt+cQUIhrv0qB84O9c8wergzYvz42icczFMZC2amN0yfE2wuRJDXp53IoXXPfUvvsX7qXoBy8l3+3b/b7ias9mMH2XOm4VaBQh7/WosbSydLZ92z5jg4s/ypr3oImfvulhCeSSBIj704dUN3R8vVE9qaZSfn7tZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jbxnvxnF; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <216a9728-ae69-43af-8632-471b71c56607@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767976296;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m76scKJtcG0f+dGnY7fKIibaFnzEOHd/0jl+nbkZ6eY=;
-	b=jbxnvxnFjlfyjXnAnVY3GRMUKcPkHWm/nZvlrsuH8xBOhF7hR/8erFycp+tmsGUMpZVrSx
-	nt/p5Ggn+hboMbDHzGnJD55WkF0fJg1stkFeetLmsHjlOMYFOti9jshlSZMaOR+B3lioeS
-	H0HZCDx3JuVadET64fJNMuIdZ1Uvntk=
-Date: Sat, 10 Jan 2026 00:31:20 +0800
+	s=arc-20240116; t=1767976292; c=relaxed/simple;
+	bh=sfLQbq5PkJLzZsulbRARyE0eoV1AzANKpvLzQK+dvHw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QlR5MruytwEU3/5n8BPkqSpSR32hnlReK0nHacVgLyVlbkU2AjbZT1vtLSoZt7zpSe3DA6XOzlbQ2WBpZqLNNMWxfEJrZaODLrQi2/aUorE7u60GIJCJk/vbriDJMH0H5uI8FyZoe12/UOzyXN3sonUgek2KFuB7dQb+dx9lKew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oN3WH5Wj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30C46C4CEF1;
+	Fri,  9 Jan 2026 16:31:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767976291;
+	bh=sfLQbq5PkJLzZsulbRARyE0eoV1AzANKpvLzQK+dvHw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=oN3WH5WjSayl7g88OEmJzUcO0PIpL71MIM5DQVXgqSa7sKG26oHHpG0okAegMaLMo
+	 Km5DGFYJpeiikOx9uwlhoOIo2qWY7psMGO/D549CaPZv/HtQKiiqVWxeX73i1WfHbq
+	 RZs3A8kicwpOlIWhHeB0JdfhM190uHKsHEPGo2ZGXKIHsDajK2BoRXxlvNJ2BNzlT8
+	 cx8UD/OXcGjEsaTgGRKwhrqmCfCfTVUXCi/p2F5XStPxsqgauR6VZf9a+3zXDCI/nV
+	 MIzNixeDwy5E4dE0gqEiPPQE2qj8PUDYLEXg72Nmg+q0WU1Erg8iuw3G0R6ssOEsnN
+	 wjTUSuloO/NwQ==
+Date: Fri, 9 Jan 2026 08:31:30 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>, Eric
+ Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: phy: fixed_phy: replace list of fixed
+ PHYs with static array
+Message-ID: <20260109083130.50ae4ba9@kernel.org>
+In-Reply-To: <aWEaWvV_0SfylwW5@shell.armlinux.org.uk>
+References: <e14f6119-9bf9-4e9d-8e14-a8cb884cbd5c@gmail.com>
+	<20260108181102.4553d618@kernel.org>
+	<aWEaWvV_0SfylwW5@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next 1/3] bpf, x64: Call perf_snapshot_branch_stack in
- trampoline
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, "David S . Miller" <davem@davemloft.net>,
- David Ahern <dsahern@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>,
- "H . Peter Anvin" <hpa@zytor.com>, Matt Bobrowski
- <mattbobrowski@google.com>, Steven Rostedt <rostedt@goodmis.org>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Shuah Khan <shuah@kernel.org>, Network Development <netdev@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>,
- linux-trace-kernel <linux-trace-kernel@vger.kernel.org>,
- "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
- kernel-patches-bot@fb.com
-References: <20260109153420.32181-1-leon.hwang@linux.dev>
- <20260109153420.32181-2-leon.hwang@linux.dev>
- <CAADnVQK4O-igzuSvfgjG1ZqdUBXrjNL=4tJZuS1uy36GCD2mVg@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Leon Hwang <leon.hwang@linux.dev>
-In-Reply-To: <CAADnVQK4O-igzuSvfgjG1ZqdUBXrjNL=4tJZuS1uy36GCD2mVg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-
-
-On 2026/1/10 00:24, Alexei Starovoitov wrote:
-> On Fri, Jan 9, 2026 at 7:37 AM Leon Hwang <leon.hwang@linux.dev> wrote:
->>
-
-[...]
-
->> @@ -3366,6 +3416,14 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *rw_im
->>
->>         save_args(m, &prog, regs_off, false, flags);
->>
->> +       if (bpf_prog_copy_branch_snapshot(fentry)) {
->> +               /* Get branch snapshot asap. */
->> +               if (invoke_branch_snapshot(&prog, image, rw_image)) {
->> +                       ret = -EINVAL;
->> +                       goto cleanup;
->> +               }
->> +       }
+On Fri, 9 Jan 2026 15:10:18 +0000 Russell King (Oracle) wrote:
+> > Isn't IDA an overkill for a range this tiny?
+> > IDA is useful if the ID range is large and may be sparse.
+> > Here a bitmap would suffice.
+> > 
+> > DECLARE_BITMAP(phy_fixed_ids, NUM_FP); 
+> > 
+> > id = find_first_zero_bit(phy_fixed_ids, NUM_FP);
+> > if (id >= NUM_FP)
+> > 	return -ENOSPC;
+> > 
+> > set_bit(id, phy_fixed_ids);  
 > 
-> Andrii already tried to do it.
-> I hated it back then and still hate the idea.
-> We're not going to add custom logic for one specific use case
-> no matter how appealing it sounds to save very limited LBR entries.
-> The HW will get better, but we will be stuck with this optimization forever.
-> 
+> Racy without locking.
 
-Understood, thanks for the explanation.
-
-I won’t pursue this approach further.
-
-Thanks,
-Leon
-
+True, if there's no existing locking wrap it in a do {} while and use
+test_and_set_bit() as the condition for repeat.
 
