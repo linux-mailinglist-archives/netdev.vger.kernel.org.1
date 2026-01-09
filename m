@@ -1,177 +1,163 @@
-Return-Path: <netdev+bounces-248395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57366D07EE0
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 09:45:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C061D07FC1
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 09:52:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 381D93038051
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 08:42:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8C931302B767
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 08:52:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8FED344057;
-	Fri,  9 Jan 2026 08:42:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA1A5352FA8;
+	Fri,  9 Jan 2026 08:52:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QYNaQebR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dCC/f8gE";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="on/i7mri"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F32CA2FA0DF
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 08:42:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0F4352C3B
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 08:52:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767948138; cv=none; b=nxp2QfH8A+XjUHbX7MAJlIK+0PNeSbxPHqcDl7LT6Wkw94uhsqitdczBvaqv7mLbV4d8BdrU3ZNAXB361zKBpGb2bxv6eoFMpS06rtAXgG2QDTj1FYtwoH74eyF8yylt8QPs9SRq0CmAbToNZSHZ/FmD5jtQkISR/gUiWVcy8ys=
+	t=1767948744; cv=none; b=ZWea9Wcx8+nTWaB7q5D+Ba37hF4Md38CDyVnY9bEMuv0Mtj9ye23dHxHmDWJrLT+xvIJPyrTqt2OHUpmIX4+giBlcksCZsAdbph0XLuCu0E5AKj1Z0yl0uWpNZLwf2nCHAcq5PllduKaESYs+WPA0SP4cmKZ91xcpXNdM/Qa/BI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767948138; c=relaxed/simple;
-	bh=02A6x4UGa/2dbvl2Im6Qey6hXFFU0uIY+U1g300uWoc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e177EBLfZMTCJUvJcgYsvJ/BnnKQmnBHdGAy4twmlyT1e9wgIw4icH8GXTvBBF9YqNjYHsmHNLwWjwjC7luW8bagaTI7iFH2PiCCysw853C6Twff2xASw/+LXybRqT0Fp76DFEUZ/Fn5Pyrp/jSEyaxHINq4iF5ZvvSQ+TRjlas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QYNaQebR; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-42fbc305552so2708085f8f.0
-        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 00:42:16 -0800 (PST)
+	s=arc-20240116; t=1767948744; c=relaxed/simple;
+	bh=E3NMqM+A8CEVRBGBT/M+cmeErAmFmkV5CGQbz1hlnlY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dcRNhTDGBqylMb/f5bns6wwEuBuuokvnosjYxz7Gog9EUVPmg3D+/aayl5G6OwS9YQdixjKM5L21eSh9H0RM5J9Z7YsU6m/a6q/jk/w/BDQN3oYK5PlqYKgRSunvhfDu3ILO+vaqPAVeFdgy2R9vR/HH0msefyr18Sw+Pn4vHL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dCC/f8gE; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=on/i7mri; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767948737;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qd3TxPrGEwbS4GVg26E8iOv4W5rh/N/xdaEX+6CIF7k=;
+	b=dCC/f8gECPGM2sOhhiGDz73T1nuz5VfZ3TQDsYw2J8ddDPPQ3m01IbKuXfZwHZxVm9sxmr
+	mKQw1JFXJYcHwOtfzIC16HbxdFryv57k1FKG1S9ury0aoPykW/ER6J8OT9EmVGlNynNjDe
+	zUaB/TZHre0YA2Qh0b1Yx/5y7H6AqXQ=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-541-glTmMvvROKmq7QCRMtmRmQ-1; Fri, 09 Jan 2026 03:52:16 -0500
+X-MC-Unique: glTmMvvROKmq7QCRMtmRmQ-1
+X-Mimecast-MFC-AGG-ID: glTmMvvROKmq7QCRMtmRmQ_1767948735
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-47d28e7960fso43787545e9.0
+        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 00:52:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767948135; x=1768552935; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=N/+wP7VUxOoGGhH+GyCKQ5tv6/IVz0LS1NxGo+a69kI=;
-        b=QYNaQebRtfe/V//lsNZ8n5oNh3ZQMay44QJVODzZmspwFrOFxiN6yA5bQm19AC8TbK
-         NEcUnlPxHF0eOgSm22oZYQKdvtwIlRHFAPGiDCqNEY4FL/LLMsDTENCZgLpsNsY/JBCZ
-         fZum0RQqDBRPWjdJVhnspaB7Jc58uZ98VkqIHEUodsXn7BSW/icH8Fjkw0fQvvY9S/9N
-         9DqRg/4KJfe/F4DEoOoclafi0bHTXv19kZQ1kvYfFos3qOANvmSOk6r33eHQ34lkOvRy
-         Xcs/8tLC/Iz4HBAqaffSa7RZKep9mobym+IYmnBsJADzB8I7NOdPjgr+G3Gk1ZOJt8ow
-         0Qmw==
+        d=redhat.com; s=google; t=1767948735; x=1768553535; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qd3TxPrGEwbS4GVg26E8iOv4W5rh/N/xdaEX+6CIF7k=;
+        b=on/i7mriqFGTWZYVvAc0CbJ+AJCpYNvEpDYWPKqMHf6E+JfLX9Zn2X2Dv9xm+6ogoL
+         u2aRDzNbOVnnr2NvkAmwiCT547u1qgSdAmBo+3n6z8VsDyuh3LOdlW9TN2zHN0dp78FU
+         cK316FDu6EBtIDkiO+abtBB6ePZc2yCG+bdD78+V206MV5nkZFa7rhBK8GUat36aopxr
+         Jqi0huRQwX9XZ3Ylosl4CKjLpDwK1URIEap0RmtGMBU0iDEzWhg6E7YcNh8clE2j+l0Y
+         iSAUsatvaJS87FLez3LCS3C/vme+SfjOKL6IKa2c1W5mzKxJtvcebzpCYsy1gAbNoM44
+         +pLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767948135; x=1768552935;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N/+wP7VUxOoGGhH+GyCKQ5tv6/IVz0LS1NxGo+a69kI=;
-        b=CRAfLNzSNKu99WMi4M6Jviv0Q1kNVAoLdnKbXF79Vic7coJNKDMyiR7H/SlDUyvVDG
-         uKMy0u5+RuhdeahnMBkV8e2Fe+mc8dDdzsvAEUqTc6uki0WvBGsQo2xuwWuyM6Shz2R/
-         WAIF62GgcKOsvhYiVeJDXzhKydpY7J6YSrYDnGm5VPKMQ3epIEKpsrpiagiJkenT0z2+
-         IOGdJXtvwmPiCpGDlJSEkcmi5PARjnlLthDB6RxQlCV1IQ+lMxhnWcbufIlIdL57QhbV
-         oEXtNSwpIxfL+p0iNfhv9woTka6n8Pj/48D2dYXqm0aRx1EjbgNCP8Xuh0eujpC5CV2v
-         k2wg==
-X-Forwarded-Encrypted: i=1; AJvYcCWCwmHFRl+thhO74hM5jbrhz1M24LeLFOVwDU+qeEykJAz5XDPGjgb/o8vOnNhyi/vMbHIIiDE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsVjPzEB9EF+Eyw4IpaTYESK4FtkBfV6Hu09Vg2mywiGzh6SjG
-	O10SGVQ89PVMr72rlUhaPdDtVoRkr4t96AAHGsZMEfb8FzG6bXAyZySZ
-X-Gm-Gg: AY/fxX5N/IhnTe8LGVQOigc8XT0fjjpOJl5qGco3CdtUigrYXOs3TBt6+6/uGZvT3jS
-	JIqLAWkz9bC6NLsA/f75pi8khlUqtto0+5OYo/F+dOy4xbxBnke3XYg8EkC1SKCKkaMgA7QT9xY
-	hdfxcbL0QhUb7+X+HzIAXpp5k0OZus0Tlqp1QoGbhBWRUUhrO446m677A+vOY7/8l5BzVZ9reMA
-	WxMY3Gm9gk4GQGYgPZS1ZWiLeYa+nf+KYPi2a5d5Uo9QWhIg32SFUKVnZkO/prbOlNDpnp1JLph
-	a82xk6kmqbwZTDiiaN26A9HB9xUnwJgm6vNxSNrJEQCCHtxI/opQIWuZJ+ecZsK3UmJCr3cA+sD
-	wljSwkg9Pe+5Z64jtGfv5JxLB1p1Okks/cWEqRDuVDmCeGW9veDJjtannLOKxj9zvnLJmPLMK7C
-	3R8slJ9iiV0kM=
-X-Google-Smtp-Source: AGHT+IGYAk2S3Qdr9OmtCXbZaajNREwTznfK/Lnn5IG7bEwG+8LMc/qLBJq9BAHsaKGTT3hoN4rQcA==
-X-Received: by 2002:a5d:64e3:0:b0:430:f68f:ee7d with SMTP id ffacd0b85a97d-432c379b79cmr11104260f8f.47.1767948135127;
-        Fri, 09 Jan 2026 00:42:15 -0800 (PST)
-Received: from eichest-laptop ([2a02:168:af72:0:66a2:be50:e0d3:29f9])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0dacc5sm20839538f8f.5.2026.01.09.00.42.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jan 2026 00:42:14 -0800 (PST)
-Date: Fri, 9 Jan 2026 09:42:12 +0100
-From: Stefan Eichenberger <eichest@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, shawnguo@kernel.org,
-	s.hauer@pengutronix.de, kernel@pengutronix.de, festevam@gmail.com,
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, francesco.dolcini@toradex.com,
-	robh@kernel.org,
-	Stefan Eichenberger <stefan.eichenberger@toradex.com>
-Subject: Re: [PATCH RESEND net-next v2] net: stmmac: dwmac: Add a fixup for
- the Micrel KSZ9131 PHY
-Message-ID: <aWC_ZDu0HipuVhQS@eichest-laptop>
-References: <20260105100245.19317-1-eichest@gmail.com>
- <6ee0d55a-69de-4c28-8d9d-d7755d5c0808@bootlin.com>
- <aVuxv3Pox-y5Dzln@eichest-laptop>
- <a597b9d6-2b32-461f-ac90-2db5bb20cdb2@lunn.ch>
- <aVvp70S2Lr3o_jyB@eichest-laptop>
- <aVvwOYce1CFOLiBk@shell.armlinux.org.uk>
- <aVv7wD2JFikGkt3F@eichest-laptop>
+        d=1e100.net; s=20230601; t=1767948735; x=1768553535;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qd3TxPrGEwbS4GVg26E8iOv4W5rh/N/xdaEX+6CIF7k=;
+        b=Jx5fAYfi+Uk0GB8FO2s2caPUCDf/mHe5+fsGM9qqKGgfbjVco7zZknVyn0nvnJiMG4
+         zOrW36QZisky+C5x06pjjwOQkXbEtTLSlKIN1nZwJjzDz/ZtRI+HDZpgdONonhD8Xvk+
+         CCkWXB/mgveSWtxylieuDSkg0Yr4l4w3PMt6NMYEkrqyYHsxLuGQdix6yEa3A2EV/x2b
+         IDs4gUEGsLSGbvMROw0GQcGuMXNFyQFsKfW/7MmKCUPGHs36ge3h2XUjReewAqwj4eby
+         41oaV7WJelNXsYpjAAbZugEZINQZvmxhw1L7yuMfCgEnEviut9MYq4NTD89IC4v0xM5B
+         clJA==
+X-Forwarded-Encrypted: i=1; AJvYcCXkLdhIsV8L0mE/D001qJDTLMkoeQPcbsizP0T8TyWbOgmg49n5aynDVrPxonii+qpnsLb6Uik=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVvLjvfZ7ZrhfIy3yfZDHaEMsaq9XHBBoz4JWgyg1H7AluUye9
+	JiCzYk+JQRTBxNij+FyIR26zR4QXvuF7Qa2GYaZ6cIf4rS+p+34t2H716eSjCKLI6U6jj7xK9Rm
+	tB4/5mrobisTJQu/INNpD4W8PLPSECG4Ai+Us/AjCwMY25oQH89KEwUoO
+X-Gm-Gg: AY/fxX7HkiQl+j3GcxA/NRgtQRUHHWhx4DjmOcl8F249O42ja++AgqkGP0vrrD0EVmL
+	WyM2R985K8gFys09Mej27BlbtxANyle9wVvmpewxyYhrSgQq1rrrIZvgegfz/jMLavXnYy9pVio
+	zCTPhq2miXCwfydIwR/zH8B7t6etwrXOwi4wra7jqI5KCks6oaCw0ZzFijIgpZuNGupjml916i9
+	rLC9RlsT/niV4P9D0dP2bX+84ipIe0RsHKx2NK34mbTcGIrqX0q5gKgF+W6i9AuCLBZYOBr9FSJ
+	GHyghcFWCUq5WgiwQejQGgIr4I7LzEiS/l20qkjzDQ6pIWJackPX/afPWMjs0dJ7nRRSMS+uwYs
+	9TdGUPee7Y/tNeS+kczSRy/cpRh7M5M1QqKJqDKvATNQN
+X-Received: by 2002:a05:600c:4ed4:b0:471:d2f:7987 with SMTP id 5b1f17b1804b1-47d84b40ae5mr105450725e9.26.1767948734932;
+        Fri, 09 Jan 2026 00:52:14 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH+OFAHyxfPesOUruCB2DRAXrjgnW+eYi4VghBgkUB+GFBY8GQZwQg5dZXLwXvSMhkSZcxTww==
+X-Received: by 2002:a05:600c:4ed4:b0:471:d2f:7987 with SMTP id 5b1f17b1804b1-47d84b40ae5mr105448925e9.26.1767948734236;
+        Fri, 09 Jan 2026 00:52:14 -0800 (PST)
+Received: from [192.168.0.135] (185-219-167-205-static.vivo.cz. [185.219.167.205])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d871a1e11sm55516855e9.19.2026.01.09.00.52.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 09 Jan 2026 00:52:13 -0800 (PST)
+Message-ID: <1fd29f17-a0e9-4032-8349-a85c9659a5f2@redhat.com>
+Date: Fri, 9 Jan 2026 09:52:12 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v4 0/4] Use correct destructor kfunc types
+To: Sami Tolvanen <samitolvanen@google.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ Network Development <netdev@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
+ Alexei Starovoitov <alexei.starovoitov@gmail.com>
+References: <20251126221724.897221-6-samitolvanen@google.com>
+ <6482b711-4def-427a-a416-f59fe08e61d0@redhat.com>
+ <CAADnVQJVEEcRy9C99sPuo-LYPf_7Tu3AwF6gYx5nrk700Y1Eww@mail.gmail.com>
+From: Viktor Malik <vmalik@redhat.com>
+Content-Language: en-US
+In-Reply-To: <CAADnVQJVEEcRy9C99sPuo-LYPf_7Tu3AwF6gYx5nrk700Y1Eww@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <aVv7wD2JFikGkt3F@eichest-laptop>
 
-Hi everyone,
+On 1/5/26 17:16, Alexei Starovoitov wrote:
+> On Mon, Jan 5, 2026 at 5:56 AM Viktor Malik <vmalik@redhat.com> wrote:
+>>
+>> On 11/26/25 23:17, Sami Tolvanen wrote:
+>>> Hi folks,
+>>>
+>>> While running BPF self-tests with CONFIG_CFI (Control Flow
+>>> Integrity) enabled, I ran into a couple of failures in
+>>> bpf_obj_free_fields() caused by type mismatches between the
+>>> btf_dtor_kfunc_t function pointer type and the registered
+>>> destructor functions.
+>>>
+>>> It looks like we can't change the argument type for these
+>>> functions to match btf_dtor_kfunc_t because the verifier doesn't
+>>> like void pointer arguments for functions used in BPF programs,
+>>> so this series fixes the issue by adding stubs with correct types
+>>> to use as destructors for each instance of this I found in the
+>>> kernel tree.
+>>>
+>>> The last patch changes btf_check_dtor_kfuncs() to enforce the
+>>> function type when CFI is enabled, so we don't end up registering
+>>> destructors that panic the kernel.
+>>
+>> Hi,
+>>
+>> this seems to have slipped through the cracks so I'm bumping the thread.
+>> It would be nice if we could merge this.
+> 
+> It did. Please rebase, resend.
 
-On Mon, Jan 05, 2026 at 06:58:24PM +0100, Stefan Eichenberger wrote:
-> On Mon, Jan 05, 2026 at 05:09:13PM +0000, Russell King (Oracle) wrote:
-> > On Mon, Jan 05, 2026 at 05:42:23PM +0100, Stefan Eichenberger wrote:
-> > > Yes this is correct. ERR050694 from NXP states:
-> > > The IEEE 802.3 standard states that, in MII/GMII modes, the byte
-> > > preceding the SFD (0xD5), SMD-S (0xE6,0x4C, 0x7F, or 0xB3), or SMD-C
-> > > (0x61, 0x52, 0x9E, or 0x2A) byte can be a non-PREAMBLE byte or there can
-> > > be no preceding preamble byte. The MAC receiver must successfully
-> > > receive a packet without any preamble(0x55) byte preceding the SFD,
-> > > SMD-S, or SMD-C byte.
-> > > However due to the defect, in configurations where frame preemption is
-> > > enabled, when preamble byte does not precede the SFD, SMD-S, or SMD-C
-> > > byte, the received packet is discarded by the MAC receiver. This is
-> > > because, the start-of-packet detection logic of the MAC receiver
-> > > incorrectly checks for a preamble byte.
-> > > 
-> > > NXP refers to IEEE 802.3 where in clause 35.2.3.2.2 Receive case (GMII)
-> > > they show two tables one where the preamble is preceding the SFD and one
-> > > where it is not. The text says:
-> > > The operation of 1000 Mb/s PHYs can result in shrinkage of the preamble
-> > > between transmission at the source GMII and reception at the destination
-> > > GMII. Table 35–3 depicts the case where no preamble bytes are conveyed
-> > > across the GMII. This case may not be possible with a specific PHY, but
-> > > illustrates the minimum preamble with which MAC shall be able to
-> > > operate. Table 35–4 depicts the case where the entire preamble is
-> > > conveyed across the GMII.
-> > > 
-> > > We would change the behavior from "no preamble is preceding SFD" to "the
-> > > enitre preamble is preceding SFD". Both are listed in the standard and
-> > > shall be supported by the MAC.
-> > 
-> > Thanks for providing the full explanation, it would be good to have
-> > that in the commit message.
-> 
-> Okay thanks, I will provide the full explanation in the next commit
-> message.
-> 
-> > 
-> > The next question would be, is it just the NXP EQOS implementation
-> > that this breaks on, or are other EQOS implementations affected?
-> > 
-> > In other words, if we choose to conditionally enable the preable at
-> > the PHY, should the generic parts of stmmac handle this rather than
-> > ending up with multiple platform specific glue having to code this.
-> > (This is something I really want to avoid - it doesn't scale.)
-> 
-> From the errata from NXP it sounds to me like it is a configuration
-> issue by NXP. I checked the following ERRATAs from vendors where I have
-> access to:
-> - ST STM32MP1: not affected: https://www.st.com/resource/en/errata_sheet/es0438-stm32mp151x3x7x-device-errata-stmicroelectronics.pdf
-> - Renesas RZN1: not affected: https://www.renesas.com/en/document/tcu/ethernet-mac-gmac-function-issue-0?r=1054561
-> - Starvive JH7110: not affected: https://doc-en.rvspace.org/JH7110/PDF/JH7110_Errata.pdf
-> - NXP S32: affected: (ERR050706 under NDA)
-> 
-> So from that I would conclude that it is an NXP specific issue and it's
-> not the full EQOS implementation that is broken.
+@Sami, could you please rebase and resend?
 
-I just wanted to check whether I should continue with the current
-approach or if I should instead enable the preamble in the PHY for all
-MACs. While I prefer the current approach, as the issue lies with the
-MAC rather than the PHY, I can also see the advantage of always enabling
-the feature.
+Thanks!
 
-Regards,
-Stefan
+> 
+
 
