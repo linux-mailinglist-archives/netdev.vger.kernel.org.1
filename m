@@ -1,118 +1,116 @@
-Return-Path: <netdev+bounces-248515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EB8BD0A735
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 14:39:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07C54D0A83D
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 14:56:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 075633001BCF
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 13:39:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D4F28304BD2B
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 13:53:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE8D22E8DFE;
-	Fri,  9 Jan 2026 13:39:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="mn6w4Go4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 994E835CB75;
+	Fri,  9 Jan 2026 13:53:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C959350A37
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 13:39:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3644633A9D4
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 13:53:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767965943; cv=none; b=eUO90osQG77miWsgmxSLLKcyVhurQoI70fJ0WoXkSO0P/CX8zBbFlLQGqEZB8SbOd8Q5RHLQXOfc+8S22jrno0Msfh85Mt9WcAws5YitrKHrg2YHJRDdic+hjU7vFhU12hzXyHmyP6rbKdbelt+UxUJXdHYjfF7mS2ymdNXpjD0=
+	t=1767966802; cv=none; b=hhG3pNikfXbFE8xnD996mIQupVjXumDQqasrp9n2eO1IN9VVcXc43WYGRoHMdxK9hmEFnpsSwAUyU+njKilZ7sJPWi+uiNQCPlclz8ttcPQAXCLJd1d3i+FdbbC1hHpOUizNsSftW7pnfSW4JUXlxWJ/ITVoLwL39O2bIZisrFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767965943; c=relaxed/simple;
-	bh=X5pOr0HXH7690oZ+YMkpzs0sTwAwEvmHi5SArJOSCs0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TO8Dz6jle+SSOlb9tN4qhVtAFEeISKMq8W8I74nT+N855SuZfqL6U7UMGJugYx8PYbZCE8c/zPD5H+CX8mEI6CbazAnY/TsqMp1tioyQ24vqpJ/vO0dLyjCeRtSCtKStHtf426YWuUfbveV5a6JhAYJoIhyXzCe5/eMGqYium8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=mn6w4Go4; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id C312A20842;
-	Fri,  9 Jan 2026 14:39:00 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 783Ms9fccMpu; Fri,  9 Jan 2026 14:39:00 +0100 (CET)
-Received: from EXCH-02.secunet.de (rl2.secunet.de [10.32.0.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 43BB1206B0;
-	Fri,  9 Jan 2026 14:39:00 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 43BB1206B0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1767965940;
-	bh=erxwDC74Yd/cL/vhsKRxodetgPXwn5vEI/xF1u2umVk=;
-	h=Date:From:To:CC:Subject:Reply-To:References:In-Reply-To:From;
-	b=mn6w4Go4/TsJ9PYbFdgapHFlq9Rsjd7dyPrh1zFTSKkzsCX7ulzfgG0s34cWbxes2
-	 VBYl3o33eWh+crRu+g+52vALskDDd5KywsCspAwPq4r/zH+sTFDpa/F34/AYJJ/2P1
-	 iI8k6mqu5rxvQxAuvH9SIv9rgqkqhpptv2+EFYUfgMnGi6/b29tgNHpnHceOOuwFMD
-	 PilwsXFVnREOj3ZvP+WFGsUJUlYyaMxI/cYlNQSFOUs6Ex4ONlwP9R4ATLxxLXcqrP
-	 2TBdk3Qw3gcJpaDPUphYh8bkVQxuuI9hRLk4WosEyJbZ+uGIJvT+ukZIMmNELIPvDn
-	 F/3EE5eDvnP/w==
-Received: from moon.secunet.de (172.18.149.1) by EXCH-02.secunet.de
- (10.32.0.172) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 9 Jan
- 2026 14:38:59 +0100
-Date: Fri, 9 Jan 2026 14:38:51 +0100
-From: Antony Antony <antony.antony@secunet.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <devel@linux-ipsec.org>
-Subject: [PATCH ipsec-next 6/6] xfrm: check that SA is in VALID state before
- use
-Message-ID: <a405d5032309cc92f1e6b63a167f26e4de15f7a9.1767964254.git.antony@moon.secunet.de>
-Reply-To: <antony.antony@secunet.com>
-References: <cover.1767964254.git.antony@moon.secunet.de>
+	s=arc-20240116; t=1767966802; c=relaxed/simple;
+	bh=sGqrxt7zRG0LJG7mo5vOXYADyr1bptC07ZO4l+9SEgA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qRmllY99XKf3Foyt76HZsX2f3S3IfIMAwbgCDv1dpK3Euh0IvlKpblydN2CrZFZYGhSXxTukc5uZFSi4mOoJi5VKrdQTetLydHev8xpU6suVe9/NFsFmh/ZX9usw+l5M/8BHq8EdQbjeXZ2Z2le4RFJbTWgQ3KZMfmuSQvW23Zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1veCvU-0002dl-0x; Fri, 09 Jan 2026 14:53:16 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1veCvS-009r4J-2O;
+	Fri, 09 Jan 2026 14:53:14 +0100
+Received: from blackshift.org (unknown [IPv6:2a03:2260:2009::])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 2E96A4C9996;
+	Fri, 09 Jan 2026 13:53:14 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net 0/3] pull-request: can 2026-01-09
+Date: Fri,  9 Jan 2026 14:46:09 +0100
+Message-ID: <20260109135311.576033-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <cover.1767964254.git.antony@moon.secunet.de>
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: EXCH-04.secunet.de (10.32.0.184) To EXCH-02.secunet.de
- (10.32.0.172)
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-During migration, an SA may be deleted or become invalid while skb(s)
-still hold a reference to it. Using such an SA in the output path may
-result in IV reuse with AES-GCM.
+Hello netdev-team,
 
-Reject use of states that are not in XFRM_STATE_VALID.
-This applies to both output and input data paths.
+this is a pull request of 3 patches for net/main.
 
-The check is performed in xfrm_state_check_expire(), which is called
-from xfrm_output_one().
+The first patch is by Szymon Wilczek and fixes a potential memory leak
+in the etas_es58x driver.
 
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
+The 2nd patch is by me, targets the gs_usb driver and fixes an URB
+memory leak.
+
+Ondrej Ille's patch fixes the transceiver delay compensation in the
+ctucanfd driver, which is needed for bit rates higher than 1 Mbit/s.
+
+regards,
+Marc
+
 ---
- net/xfrm/xfrm_state.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 04c893e42bc1..ca628262087f 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -2278,6 +2278,9 @@ EXPORT_SYMBOL(xfrm_state_update);
- 
- int xfrm_state_check_expire(struct xfrm_state *x)
- {
-+	if (x->km.state != XFRM_STATE_VALID)
-+		return -EINVAL;
-+
- 	/* All counters which are needed to decide if state is expired
- 	 * are handled by SW for non-packet offload modes. Simply skip
- 	 * the following update and save extra boilerplate in drivers.
--- 
-2.39.5
+The following changes since commit 872ac785e7680dac9ec7f8c5ccd4f667f49d6997:
 
+  ipv4: ip_tunnel: spread netdev_lockdep_set_classes() (2026-01-08 18:02:35 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-6.19-20260109
+
+for you to fetch changes up to e707c591a139d1bfa4ddc83036fc820ca006a140:
+
+  can: ctucanfd: fix SSP_SRC in cases when bit-rate is higher than 1 MBit. (2026-01-09 14:26:29 +0100)
+
+----------------------------------------------------------------
+linux-can-fixes-for-6.19-20260109
+
+----------------------------------------------------------------
+Marc Kleine-Budde (1):
+      can: gs_usb: gs_usb_receive_bulk_callback(): fix URB memory leak
+
+Ondrej Ille (1):
+      can: ctucanfd: fix SSP_SRC in cases when bit-rate is higher than 1 MBit.
+
+Szymon Wilczek (1):
+      can: etas_es58x: allow partial RX URB allocation to succeed
+
+ drivers/net/can/ctucanfd/ctucanfd_base.c    | 2 +-
+ drivers/net/can/usb/etas_es58x/es58x_core.c | 2 +-
+ drivers/net/can/usb/gs_usb.c                | 2 ++
+ 3 files changed, 4 insertions(+), 2 deletions(-)
 
