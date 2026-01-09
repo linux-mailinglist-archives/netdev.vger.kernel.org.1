@@ -1,141 +1,229 @@
-Return-Path: <netdev+bounces-248443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FE42D088E1
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 11:28:48 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BEFED08913
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 11:31:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1B67A3007E47
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 10:26:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9DEA630056EF
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 10:31:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FA213370EF;
-	Fri,  9 Jan 2026 10:26:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70887337BB4;
+	Fri,  9 Jan 2026 10:31:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="kF+7bg0L";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Zw0Cnk6b"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="YMnybweT"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b5-smtp.messagingengine.com (fout-b5-smtp.messagingengine.com [202.12.124.148])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68BC53382E4
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 10:26:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F8D2D5A19;
+	Fri,  9 Jan 2026 10:31:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767954418; cv=none; b=iQ1oiSieYLUgqhGgDbmQvcCgDxa3TaqMAEwhYx/1rUZgVy+cz/NTVu4j5h4iPyZX6YHlCHkl9DVYN8iLjiXP6J75nbBIZPvpOILlA90r+Ia9Am3xyey9XubxPepsJAR4T++Lq2uA9xbUyu0HHj7cThhSW3ZEgECLoRc/jl1muqs=
+	t=1767954692; cv=none; b=FUfVoB2Q3qiAMBhdtwiDjTZzTFPQI3GF8X9/+m7H9q/1/fiT5aMHeP797741Bac2yVLgUSs14PUh3IfbPKRyQCCEimfWd+rZKIFpfnPAz9w2vMoGfb8+uqwgk5lWsZSgaR3zFLGVRcrgCOyJPiFSOfUQrHLfrUTy5h+uDb7n9I0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767954418; c=relaxed/simple;
-	bh=Snq+umPomX9fyavkvRRyaT2n0isrX93YrXdSoU9OwMM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e0TbJVsP6iOEfFC0p1Pgut06wNP+Yk0DnkunZLXF0loEQCRgkesG0F9qz/8ZY2y81Vxz97WcrCgBU4qaTbX5ZVJiijITbuNJQX9h8xBxs1evalm1X9DtfAFxkW1O5Ymjs0oU6rYY0rdQTZd+X9/JHwcUJywBobXKURjVXUI3xro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=kF+7bg0L; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Zw0Cnk6b; arc=none smtp.client-ip=202.12.124.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfout.stl.internal (Postfix) with ESMTP id 75FD21D00130;
-	Fri,  9 Jan 2026 05:26:54 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Fri, 09 Jan 2026 05:26:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1767954414; x=
-	1768040814; bh=aZINNoLVZ+Mwd+rayagnxMm/756a0J8Sm4oNGlDsEoc=; b=k
-	F+7bg0LXPxzC7Lnh8MuTVqkHmLjDw+2yaL0JTAE/i9xUUOwoXv9Bm+2f/WNu8zRY
-	f2AwSuPi7qXUCXj2PRtfpYl5uPI8twUMnI9dthJL3bWIzKcGnQ4L589R2YjuXEF0
-	uJsu3WOQ6VPaTDckIWY+RIshT9IGEird7lGy/mUezziKjqf/35MDWRCtdXk1FcSs
-	oFqkwQpBRxqDRNZ9aAT8kJerQ0mmDo73WJvDqFcjuCyrlTHT6jXAct+c28rp67qZ
-	ewkzuxLSkqPMvBIarotQKjF2U7eze5pU2DpimBm7eZjLra3k9UTAZyZC828fZ0e9
-	87Dg4jshJGMJ6NZo0yCYg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1767954414; x=1768040814; bh=aZINNoLVZ+Mwd+rayagnxMm/756a0J8Sm4o
-	NGlDsEoc=; b=Zw0Cnk6bk2+O6Mc0ZgmXzE7Asbb4JoFmQRBD1mK0guoaeKyFXCm
-	qOLm7rl+fAKMGJYFHX4I1z+qWeFPkJC6pr8gNxM/je65GlXDjppZQVYRA8Vsxz8O
-	JNaBOAcVQXqHPWTHUG6mhUxUjC+3tVpoKkGDacyrsq6iv39AcuxP5V/lCGjaAGL2
-	5Hv4rWVOzPQcV9YIgr69CioAv8O1w9yDorHMKj9oaKYSlQZSNqf9Tvx8LlrKAA0E
-	00PasjCJYNdHrPcRwYfLLPjh7tE9XRbro3mDNCGc3o3u5zyZjRLsiYBCjPA3M1da
-	ZuTXN8g8/OcrulDPejgpdJOCmwPZ6g4nDZw==
-X-ME-Sender: <xms:7ddgaR6kGfiPgkuc2fHOtxqwZ3NcelLG7f_s0jnUc_yrBGknEIKVWg>
-    <xme:7ddgad_Pbop4B16lnPE2eFYhVCVXZRqFBacrgbOxhdFDXbQB4GGVwzWZxoN5Fx3lY
-    -pEf4s1VkzTrr5O0tIlHl4rvWn1lkasigh1RmoXfPpCx3nRY-PcAydV>
-X-ME-Received: <xmr:7ddgaeqZERfcEr9x_fS-UVwUmDaf_4jPGewyjbgcht7Tvf_79xJBkUjKQALL>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddutdekheejucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeekpdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopegtrhgrthhiuhesnhhvihguihgrrdgtohhmpd
-    hrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
-    oheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvg
-    hmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohho
-    ghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpth
-    htohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguthgrthhulhgv
-    rgesnhhvihguihgrrdgtohhm
-X-ME-Proxy: <xmx:7ddgaWriZ-d-7f2LgDItkwWiBduOvdVG8Wyl6TZeHjNKuba4BPJR4g>
-    <xmx:7ddgaZ0xnaqkKJ6TXytz2Uj30sZRWwShCGzNuJM-XXGts2ZZ1TLeig>
-    <xmx:7ddgacEr9aKPSixVv0i1TzOqRIO8e2olPAIp9-EgRbtg8DIYDn_Lgw>
-    <xmx:7ddgacFXYt59tvro7qoLgsLn2JBFlTW5bDF3aKR678_mNiUbWX42_g>
-    <xmx:7tdgaSGpKVIecU3opd5VJ31Sg-QHqorzk0E9Tls0IXJmh1yEkp8jMq22>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 9 Jan 2026 05:26:53 -0500 (EST)
-Date: Fri, 9 Jan 2026 11:26:51 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>
-Subject: Re: [PATCH net] macsec: Support VLAN-filtering lower devices
-Message-ID: <aWDX64mYvwI3EVo4@krikkit>
-References: <20260107104723.2750725-1-cratiu@nvidia.com>
+	s=arc-20240116; t=1767954692; c=relaxed/simple;
+	bh=EfFw6MozRHj1qEFaG0+tPEHxBQwyyGpVCIJCA5Ltyyo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kVRXqqBNMXQUxsyxlkuy0V7b6oLkqEk1N6f5D8n/pDx+e2xMwVqhwWtp/gMP/yckes62K9OoZAfnP2paJRv8ZUwYxgNo2nNtERRu+yRmPAYRkdYTHKQGJ/uyKlUFZtxifMKF8ygVJxzUcwJdOthUhkJmeDkDi48YtBHp9NOcY2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=YMnybweT; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6093EZqd2938365;
+	Fri, 9 Jan 2026 02:31:21 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=PIUSnERMq5fvelkdbrtClP8
+	XhrG2FEcGHgk00Kw+0tI=; b=YMnybweT/w280JZYjg46tErj3OwL9mcIcQrzDDW
+	6q0+yUzJFs34FZsUG5ugHWMPq7AB4VmZ3MPAbl8TBs5I0wO+djyYfqp9pHlHmiTx
+	LZevvTjE7SQAwEcKPt46ODOrdwZPLX7OANOqLi9P1R2ZSUjSZIM+cnQd3sktqcaB
+	3m4OJILZkDUgzfSpNOopmKfhdSN6nTdX0PqU/NFFAfzSNH3iFscYd0Xgck1zf8yz
+	4i9atzrB0Ezko+LpQYrMg19d3GZImMld+C1hH3dET84zXvG4IauLKepvwMPIGnww
+	uXAtdF0OxsMaidt+PWPizVu7WiONktHXLWEpEGWaMIUFNzA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4bhwh2vmv2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 09 Jan 2026 02:31:21 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Fri, 9 Jan 2026 02:31:20 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Fri, 9 Jan 2026 02:31:20 -0800
+Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id C36A83F7089;
+	Fri,  9 Jan 2026 02:31:16 -0800 (PST)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+        "Ratheesh
+ Kannoth" <rkannoth@marvell.com>
+Subject: [PATCH net-next v3 00/10] Switch support
+Date: Fri, 9 Jan 2026 16:00:25 +0530
+Message-ID: <20260109103035.2972893-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260107104723.2750725-1-cratiu@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: lHrIpN_YkO9UkAfSF_9r-FsBhglW1ocx
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA5MDA3NiBTYWx0ZWRfX3hcRiZ8ZtHJ4
+ rcRlyNmVQeMHctKkRkdgWdinvPO0wVaexiDk4QScPEOJaCyyCQpo8JS+g0+C9ORFpBuH1rF3Lym
+ kPu8u9Bpv4hPQ57FR9086jq6HygwDlB5/alqVg5mMB6k1VBhi86BLTRxRfqBSDI2C7opvFrhEBi
+ lGTP7yr61TuKftOhSxrbRm6+828rVcsiWRShiOZTT+Ok5cLEkc2a5B2ClCWik6uTyVa1OB/usRb
+ sKjssjUShYD4E/NWs0UWtNwzdib4zMEwbWgItiNabTGRIW2PA4aETHFIBkuBpL7ZgIOz5AWBTpU
+ 3uYlw3VLbpgKbIaMCFg8mMozoGz4xFJwugFK78VkxWvWJZl1axdJ3o0xorFXbo7R6PPCOr3wU5M
+ KKZhkUGRsx5RP0IN8LkwdGNUpOK5LU4g1o2Yh9os6EyhcTyOKVi4D/xn7qH/5AZpWtznx6f4i9v
+ wg6QPYdITrm93PhpDrw==
+X-Authority-Analysis: v=2.4 cv=ROO+3oi+ c=1 sm=1 tr=0 ts=6960d8f9 cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=4rCbcO1rH8UwRTBQTsMA:9
+X-Proofpoint-ORIG-GUID: lHrIpN_YkO9UkAfSF_9r-FsBhglW1ocx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-09_03,2026-01-08_02,2025-10-01_01
 
-2026-01-07, 12:47:23 +0200, Cosmin Ratiu wrote:
-> VLAN-filtering is done through two netdev features
-> (NETIF_F_HW_VLAN_CTAG_FILTER and NETIF_F_HW_VLAN_STAG_FILTER) and two
-> netdev ops (ndo_vlan_rx_add_vid and ndo_vlan_rx_kill_vid).
-> 
-> Implement these and advertise the features if the lower device supports
-> them. This allows proper VLAN filtering to work on top of macsec
-> devices, when the lower device is capable of VLAN filtering.
-> As a concrete example, having this chain of interfaces now works:
-> vlan_filtering_capable_dev(1) -> macsec_dev(2) -> macsec_vlan_dev(3)
-> 
-> Before the "Fixes" commit this used to accidentally work because the
-> macsec device (and thus the lower device) was put in promiscuous mode
-> and the VLAN filter was not used. But after that commit correctly made
-> the macsec driver expose the IFF_UNICAST_FLT flag, promiscuous mode was
-> no longer used and VLAN filters on dev 1 kicked in. Without support in
-> dev 2 for propagating VLAN filters down, the register_vlan_dev ->
-> vlan_vid_add -> __vlan_vid_add -> vlan_add_rx_filter_info call from dev
-> 3 is silently eaten (because vlan_hw_filter_capable returns false and
-> vlan_add_rx_filter_info silently succeeds).
+Marvell CN10K switch hardware is capable of accelerating L2, L3,
+and flow. The switch hardware runs an application that
+creates a logical port for each representor device when representors
+are enabled through devlink.
 
-We only want to propagate VLAN filters when macsec offload is used,
-no? If offload isn't used, the lower device should be unaware of
-whatever is happening on top of macsec, so I don't think non-offloaded
-setups are affected by this?
+This patch series implements communication from Host OS to switch
+HW and vice versa.
 
-Even when offload is used, the lower device should probably handle
-"ETH + VLAN 5" differently from "ETH + MACSEC + VLAN 5", but that may
-not be possible with just the existing device ops.
+   |--------------------------------|
+   |            HOST OS             |
+   |                                |
+   | eth0(rep-eth0)  eth1(rep-eth1) |
+   |  |                 |           |
+   |  |                 |           |
+   ---------------------------------|
+      |                 |
+      |                 |
+  ---------------------------------|
+  |  lport0             lport1     |
+  |                                |
+  |            switch              |
+  |                                |
+  ---------------------------------|
 
--- 
-Sabrina
+When representors are created, corresponding "logical ports" are
+created in switchdev. The switch hardware allocates a NIX PF and
+configures its send queues. These send queues should be able to
+transmit packets to any channel, as send queues as from same NIX PF.
+Switch is capable of forwarding packets between these logical ports.
+
+Notifier callbacks are registered to receive system events such as
+FDB add/delete and FIB add/delete. Flow add/delete operations are
+handled through the .ndo_setup_tc() interface. These events are
+captured and processed by the NIC driver and forwarded to the switch
+device through the AF driver. All message exchanges use the mailbox
+interface.
+
+Bridge acceleration:
+FDB add/delete notifications are processed, and learned SMAC
+information is sent to the switch hardware. The switch inserts a
+hardware rule to accelerate packets destined to the MAC address.
+
+Flow acceleration:
+NFT and OVS applications call .ndo_setup_tc() to push rules to
+hardware for acceleration. This interface is used to forward
+rules to the switch hardware through the mailbox interface.
+
+Ratheesh Kannoth (10):
+  octeontx2-af: switch: Add AF to switch mbox and skeleton files
+  Mbox message for AF to switch
+
+  octeontx2-af: switch: Add switch dev to AF mboxes
+  Switch to AF driver mbox messages
+
+  octeontx2-pf: switch: Add pf files hierarchy
+  PF skeleton files for bridge, fib and flow
+
+  octeontx2-af: switch: Representor for switch port
+  Switch ID is copied and sent to switch when Representors are
+  enabled thru devlink. Upon receipt of the message, switch queries
+  AF driver to get info on rep interfaces.
+
+  octeontx2-af: switch: Enable Switch hw port for all channels
+  Switch ports should be configured to TX packets on any channel.
+
+  octeontx2-pf: switch: Register for notifier chains.
+  Notifier callback for various system events.
+
+  octeontx2: switch: L2 offload support
+  Bridge (L2) offload support
+
+  octeontx2: switch: L3 offload support
+  FIB (L3) offload support.
+
+  octeontx2: switch: Flow offload support
+  Flow (5/7 tuple) offload support.
+
+  octeontx2: switch: trace support
+  Trace logs for flow and action
+
+ .../net/ethernet/marvell/octeontx2/Kconfig    |  12 +
+ .../ethernet/marvell/octeontx2/af/Makefile    |   2 +
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  | 219 ++++++
+ .../net/ethernet/marvell/octeontx2/af/rvu.c   | 111 +++-
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |   6 +
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  54 +-
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   |  77 ++-
+ .../marvell/octeontx2/af/rvu_npc_fs.c         |  13 +-
+ .../ethernet/marvell/octeontx2/af/rvu_rep.c   |   3 +-
+ .../marvell/octeontx2/af/switch/rvu_sw.c      |  47 ++
+ .../marvell/octeontx2/af/switch/rvu_sw.h      |  14 +
+ .../marvell/octeontx2/af/switch/rvu_sw_fl.c   | 294 ++++++++
+ .../marvell/octeontx2/af/switch/rvu_sw_fl.h   |  13 +
+ .../marvell/octeontx2/af/switch/rvu_sw_l2.c   | 284 ++++++++
+ .../marvell/octeontx2/af/switch/rvu_sw_l2.h   |  13 +
+ .../marvell/octeontx2/af/switch/rvu_sw_l3.c   | 215 ++++++
+ .../marvell/octeontx2/af/switch/rvu_sw_l3.h   |  11 +
+ .../ethernet/marvell/octeontx2/nic/Makefile   |   8 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_tc.c  |  17 +-
+ .../marvell/octeontx2/nic/otx2_txrx.h         |   2 +
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |   8 +
+ .../net/ethernet/marvell/octeontx2/nic/rep.c  |  10 +
+ .../marvell/octeontx2/nic/switch/sw_fdb.c     | 143 ++++
+ .../marvell/octeontx2/nic/switch/sw_fdb.h     |  18 +
+ .../marvell/octeontx2/nic/switch/sw_fib.c     | 133 ++++
+ .../marvell/octeontx2/nic/switch/sw_fib.h     |  16 +
+ .../marvell/octeontx2/nic/switch/sw_fl.c      | 544 +++++++++++++++
+ .../marvell/octeontx2/nic/switch/sw_fl.h      |  15 +
+ .../marvell/octeontx2/nic/switch/sw_nb.c      | 629 ++++++++++++++++++
+ .../marvell/octeontx2/nic/switch/sw_nb.h      |  31 +
+ .../marvell/octeontx2/nic/switch/sw_trace.c   |  11 +
+ .../marvell/octeontx2/nic/switch/sw_trace.h   |  82 +++
+ 32 files changed, 3040 insertions(+), 15 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_fl.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_fl.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l2.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l3.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/switch/rvu_sw_l3.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fdb.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fib.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fib.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fl.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_fl.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_nb.h
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_trace.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/switch/sw_trace.h
+
+--
+ChangeLog:
+v1 -> v2: Fixed build errors
+v2 -> v3: Fixed sparse error, Addressed comments from Alok, Kalesh
+2.43.0
 
