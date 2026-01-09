@@ -1,76 +1,77 @@
-Return-Path: <netdev+bounces-248473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B65C1D08EFD
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 12:34:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D832D08EF4
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 12:34:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 284E630034B5
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 11:29:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A7BE53059E80
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 11:29:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C05E235B15D;
-	Fri,  9 Jan 2026 11:29:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E1E35BDDD;
+	Fri,  9 Jan 2026 11:29:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hwHKJmqx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hXe9VPz5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8209359704
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 11:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E08B35B142
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 11:29:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767958156; cv=none; b=cpnqBmFbB0cI+XjDTwgA6ilWQmnwRfrqSjP12kHcd3IRSl9jy6Yle3PerGCepi7z/DYNGJ2Kd4r7bkVUNXYVC9Vw68jTfoQ5HWGZUDdts98+7zazGaWoav1GBMW896kp4Vkws/D+yemhN7oPwTkc6Olf+C6saa2tT8NQ3GFmlsk=
+	t=1767958160; cv=none; b=GWSP5pOug6dWhbUY+R2wcUQCMo5SjO6aDVqwV7X0xWdG+aluiUEFBi/vKs1gUPEwXvac1Xy4UFPA8JPz6aV4GjV45bGzips9r5kTZE+NZR7x1abKCHiyTv245O19s46iFcG8U75vQU/c89cHJzxpKoS22gN/a/r51w6JHTRQp6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767958156; c=relaxed/simple;
-	bh=5qbU+cqkCY7Oy7htHErBAKE7+dTnE/mhpdnkukFkSXk=;
+	s=arc-20240116; t=1767958160; c=relaxed/simple;
+	bh=F6waAxUTN0XHkxjyQT+jUXiZnFRXTIpv+p7I9hYKiIU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XFNHpwQTWe9ZrhxH1HvvhfN9fgbL+yXXxColX/uUw62LhpFBs42g+LYN52VJ68YmGhLxSohtud+9GlJYqyOgUqUvbXlcvyZCQvX7J2toZVPVYl/vKnpnIW70wXlS4GGE8sT60bsi1CImq3j52rK9W8559/0VhyCJ839TJ2OkohE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hwHKJmqx; arc=none smtp.client-ip=209.85.128.53
+	 MIME-Version; b=aLYdBcxKiadKcezVUqzVErsiRHz2aA3Y6mivaftromaPZYmA9u7ka7EIx5+/ezXot2Tj4izPn9eFAi9tcRSlosS5NIN5akxTt1GVcGsQ0uHjqflv+TQ8bEmHrMFJGlKzf5Con67FjShJQ2yguKdNDg62kgBe9SwQbaMNRdGNSXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hXe9VPz5; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-47d5e021a53so31212005e9.3
-        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 03:29:12 -0800 (PST)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4779cc419b2so36786255e9.3
+        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 03:29:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767958150; x=1768562950; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1767958153; x=1768562953; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3VL6yChlTp3dYpMCzBhFC2VDB7at7kYV7rRkhbUdhFI=;
-        b=hwHKJmqxpH5w6iezA9snAeS/GLYfoExNv4gBKN9yxT/nDeYIHHuwMvAxdv6K15Pxit
-         niT4NRbLo01etqSDQfSgfq2DYE8e4mjoPxd4fMi4Wv8RibRAlH9MdhdKPjmqYgqgI0VR
-         JeL1VI0bSvL95e9j0035mOBpDqmXiruk/QjjTVAwFrXphkcYN+dzdzCdJGa3PRlPps5e
-         q7OO7AmlTU1MOTuVnrN38SG63erPKbLNLAfPextQL2H6K7If8PxYvkGCffnLvJNcGAGg
-         lJEIXfar3z9eui7C7ipzvK5iSpIHwzgY2p00ziAWbgkeJh7hYTA+mB2JBke/jH1FpXMw
-         0hZw==
+        bh=HkGYuXz+QxHGRROmceDvRDL3xnFuc5UQrONsfTFdwcU=;
+        b=hXe9VPz5zpwUdxHdQiNA7nI7D89AQSveggNCgVpkqkyCGsukQrI2unq7opkC9S70QQ
+         Ma3zfkPfDUchjPMEWupLTGaO52psc0mwkWd9sHH0rVDMpJ/s47PPp/C/qQYRoWs5cWOw
+         p0zwWsuRel4KPLiXU1oykrX0YVN3ZClfZLk69wJYfhTz2dgqJjX5InV/gzoij6MTQFzj
+         ZZcTi2drf7HmcEjpmvWNx1GOynGzLktFNmg/od6VyS2UB7nPosKJXOSHbHPMZufx9OxL
+         CuzbUvqb6Ugpd5rIAnXpo+GMO05CiFtWBfNlTCgqkedlFa8dFNmiVxO9h0hHzAqwFhRW
+         NJkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767958150; x=1768562950;
+        d=1e100.net; s=20230601; t=1767958153; x=1768562953;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=3VL6yChlTp3dYpMCzBhFC2VDB7at7kYV7rRkhbUdhFI=;
-        b=TPCNP14whjmGGqaDdCE8yUhhpB8Imrq4CPVmEG//YeXFG7MyFXUooEdkEa0e8zTUZa
-         GQlL7Mlbjvs39fjIInsCCXb0NzXO7mgRvHFIX4aTbMwkPbsaT3tf8REuoHJF9xQGKi62
-         GrkQsHXiKbMqgQ7X0AC2S9lyApDu8I912TygzBNvDdujqbyeOApHiJuFRtqIzjCU3tle
-         G9uF/+bnJPNm/VBtMF/yyOy/GCL94mH454ingMtqTtHuduOWRo8952WP3qBRjRBd+qYi
-         M8WDVQTT7KtGCNkMsKew4DHJaOxaMZX6Pi4WIhVN6/70c+BzRXa8wYoD48SkdYjF/LVl
-         h3wg==
-X-Gm-Message-State: AOJu0YxfELmGKBAdcIK7UkpTwWIu88LcrCFM+9QjU/FV5T1ybRCva8lf
-	FJ1YgvhtdSzh0bh4BgiCfhghmS+5Y9rtWq/+RAoniqI87ys8vlglxEgnH6dp8w==
-X-Gm-Gg: AY/fxX4WUOMPQ86lwGDJ+aqtzzTHP/PtHadrB2eYm5KE+pmPR0BVNkMDbW3XP6jBvux
-	Cg/RwylE/10bHjzwiJ8BoU6Gmeq1wMdAs6imh4F2+5JI3YaVBTj/rITEjw+uROwK0SAd/DfD8Qn
-	JLu/2vtZkeHkfYUAiATw7Tk2IbSVjI6lPDZjJ4x4EMRXPLvZIOnwdUPW9Hz3xXG26HlZPl5nYFo
-	zGCNFa+ZlWN6czQR8ixsb+aPXF2NPz5Uxo9BIqayrwc8Nae5XAjRU43N10Qji3SCcpisRdUkF+8
-	EG5Gs3gpSlXoOwTAnTvLa6tXwdjpd6NOdzP0UCctHaQjog2qF2Y3UCamz2/GX0dNQU3JZgQ57uk
-	gA1+xx3g4xFD5IHjxIihnTKtw+joDTD/hnB80BgsXFZPovxV6NN2RITFW2Q3TzS1Imza69aiktT
-	94i+y1LFx0O2QJkWNSzVAlxKv5mq4c5PzLEJLNVzIxnooPLAkw/Em3MjoA5sxD3dAohbKNQg==
-X-Google-Smtp-Source: AGHT+IHy01qrbGB2/3dvCGWwtdhHYeGIDdQ2qK319mi7ENth+laC+xngVDxYXJWlkGJRgxWOxr0qDg==
-X-Received: by 2002:a05:600c:1c28:b0:477:632c:5b91 with SMTP id 5b1f17b1804b1-47d84b1a2e7mr124151565e9.16.1767958149641;
-        Fri, 09 Jan 2026 03:29:09 -0800 (PST)
+        bh=HkGYuXz+QxHGRROmceDvRDL3xnFuc5UQrONsfTFdwcU=;
+        b=nshKpAISbaxDVeA6B2zAwxyzREN7YebprlJapuexAjc1Cp0N7f4x+pRWi08iYS2KJJ
+         oqQy6Y0iNRNEiegwrAR3ZBfefATJaq2znOE0DagpW2xvTVxH8UJNTSfmd6p03K/eXO6T
+         jJAx2SMY5/XmC01xyPwbvlPVkZ12UaBqiYJf/OUdAhspKtN6J29lMfm4FXZYdALaf7PP
+         EgyIgqVPrLVNZZ8IszvoI52XLQK5NK0eb9zYLpbxgo8sPJwAyt8RPc4fmT8QrdpmCGdR
+         P6zGZCnwrKAHLc4eD/33yLIdQ2IiKBPmYmoLCM39bzQoAYUKFcCHmKi/akw2+DYvB7t7
+         UCNA==
+X-Gm-Message-State: AOJu0Yy/uvousdMMzNT/jzP0O3ihFjqgUO/UphGYMdzx7y/XBP3Qk2Fr
+	i/1hQiXYlmySMGsjhZn2p1EySMpHTwfPLhLNxo0e+vZyPkk2nYpdmL1qAGiiHA==
+X-Gm-Gg: AY/fxX7/2V8CpLf/XqtUbtyVJ7V//cE65isYdcdyGm42ypFZUeJBomhVfrgW8kC/wnP
+	syd3VJoQZp2nhMRuopkWXkZuDPLF4zjDAhHvCwoimvyUmzzsZ8OUKo8YWDDlPdqQWyX04p8BBIy
+	mBoxBai1PSoGTXkVBL3cIqENYaSq13jW8Sb8ZzDX3KAhDRxA3KQdRxTgDBkexteuTqHI2PhWZOe
+	ZoXKc8dltIfUcWQRqrldIU8WUshDZRtR6zgI7Xru2jd9xthk4ionjlVu2zns5IqDCa5RnQ+ExLi
+	d5FN3RU7NcRIr+8YGnehX69xNNliI2aXkv+DzBrwolS1xDcLM2bv0m4mXEDN2py+UEkjnmeW4o0
+	EXL3LvuERLiY7sHSVN6hMqvlvX3eN38FQLGovSF6Ubj5sZfiYD6tUil2dkDCIV44ELbdd7xrR2l
+	uHHwnCpkvTcXxpgHzN9IRvRC/a6Fy8bmbhhKj7h/tFxCZifhZ5mbnjhV0OSkr0XQI8pV3KH5m4y
+	es5jUTi
+X-Google-Smtp-Source: AGHT+IFSy1+lFxUURQmqDSNKN0HOOFkFOx1ujyLXJg2nypF43Lq0YrQtt9+vrxTHS0Rrgmo+7XmdqQ==
+X-Received: by 2002:a05:600c:1d14:b0:477:97c7:9be7 with SMTP id 5b1f17b1804b1-47d84b0a7bdmr104836275e9.1.1767958152875;
+        Fri, 09 Jan 2026 03:29:12 -0800 (PST)
 Received: from 127.com ([2620:10d:c092:600::1:69b5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d8636c610sm60056985e9.0.2026.01.09.03.29.07
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d8636c610sm60056985e9.0.2026.01.09.03.29.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jan 2026 03:29:08 -0800 (PST)
+        Fri, 09 Jan 2026 03:29:12 -0800 (PST)
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S . Miller" <davem@davemloft.net>,
@@ -124,9 +125,9 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	linux-kselftest@vger.kernel.org,
 	dtatulea@nvidia.com,
 	io-uring@vger.kernel.org
-Subject: [PATCH net-next v8 6/9] eth: bnxt: adjust the fill level of agg queues with larger buffers
-Date: Fri,  9 Jan 2026 11:28:45 +0000
-Message-ID: <8b6486d8a498875c4157f28171b5b0d26593c3d8.1767819709.git.asml.silence@gmail.com>
+Subject: [PATCH net-next v8 7/9] eth: bnxt: support qcfg provided rx page size
+Date: Fri,  9 Jan 2026 11:28:46 +0000
+Message-ID: <28028611f572ded416b8ab653f1b9515b0337fba.1767819709.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <cover.1767819709.git.asml.silence@gmail.com>
 References: <cover.1767819709.git.asml.silence@gmail.com>
@@ -138,82 +139,118 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jakub Kicinski <kuba@kernel.org>
+Implement support for qcfg provided rx page sizes. For that, implement
+the ndo_default_qcfg callback and validate the config on restart. Also,
+use the current config's value in bnxt_init_ring_struct to retain the
+correct size across resets.
 
-The driver tries to provision more agg buffers than header buffers
-since multiple agg segments can reuse the same header. The calculation
-/ heuristic tries to provide enough pages for 65k of data for each header
-(or 4 frags per header if the result is too big). This calculation is
-currently global to the adapter. If we increase the buffer sizes 8x
-we don't want 8x the amount of memory sitting on the rings.
-Luckily we don't have to fill the rings completely, adjust
-the fill level dynamically in case particular queue has buffers
-larger than the global size.
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-[pavel: rebase on top of agg_size_fac, assert agg_size_fac]
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 28 +++++++++++++++++++----
- 1 file changed, 24 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 36 ++++++++++++++++++++++-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h |  1 +
+ 2 files changed, 36 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 8f42885a7c86..137e348d2b9c 100644
+index 137e348d2b9c..3ffe4fe159d3 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -3816,16 +3816,34 @@ static void bnxt_free_rx_rings(struct bnxt *bp)
- 	}
- }
+@@ -4325,6 +4325,7 @@ static void bnxt_init_ring_struct(struct bnxt *bp)
+ 		struct bnxt_rx_ring_info *rxr;
+ 		struct bnxt_tx_ring_info *txr;
+ 		struct bnxt_ring_struct *ring;
++		struct netdev_rx_queue *rxq;
  
-+static int bnxt_rx_agg_ring_fill_level(struct bnxt *bp,
-+				       struct bnxt_rx_ring_info *rxr)
+ 		if (!bnapi)
+ 			continue;
+@@ -4342,7 +4343,8 @@ static void bnxt_init_ring_struct(struct bnxt *bp)
+ 		if (!rxr)
+ 			goto skip_rx;
+ 
+-		rxr->rx_page_size = BNXT_RX_PAGE_SIZE;
++		rxq = __netif_get_rx_queue(bp->dev, i);
++		rxr->rx_page_size = rxq->qcfg.rx_page_size;
+ 
+ 		ring = &rxr->rx_ring_struct;
+ 		rmem = &ring->ring_mem;
+@@ -15932,6 +15934,29 @@ static const struct netdev_stat_ops bnxt_stat_ops = {
+ 	.get_base_stats		= bnxt_get_base_stats,
+ };
+ 
++static void bnxt_queue_default_qcfg(struct net_device *dev,
++				    struct netdev_queue_config *qcfg)
 +{
-+	/* User may have chosen larger than default rx_page_size,
-+	 * we keep the ring sizes uniform and also want uniform amount
-+	 * of bytes consumed per ring, so cap how much of the rings we fill.
-+	 */
-+	int fill_level = bp->rx_agg_ring_size;
-+
-+	if (rxr->rx_page_size > BNXT_RX_PAGE_SIZE)
-+		fill_level /= rxr->rx_page_size / BNXT_RX_PAGE_SIZE;
-+
-+	return fill_level;
++	qcfg->rx_page_size = BNXT_RX_PAGE_SIZE;
 +}
 +
- static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
- 				   struct bnxt_rx_ring_info *rxr,
- 				   int numa_node)
- {
--	const unsigned int agg_size_fac = PAGE_SIZE / BNXT_RX_PAGE_SIZE;
-+	unsigned int agg_size_fac = rxr->rx_page_size / BNXT_RX_PAGE_SIZE;
- 	const unsigned int rx_size_fac = PAGE_SIZE / SZ_4K;
- 	struct page_pool_params pp = { 0 };
- 	struct page_pool *pool;
- 
--	pp.pool_size = bp->rx_agg_ring_size / agg_size_fac;
-+	if (WARN_ON_ONCE(agg_size_fac == 0))
-+		agg_size_fac = 1;
++static int bnxt_validate_qcfg(struct bnxt *bp, struct netdev_queue_config *qcfg)
++{
++	/* Older chips need MSS calc so rx_page_size is not supported */
++	if (!(bp->flags & BNXT_FLAG_CHIP_P5_PLUS) &&
++	     qcfg->rx_page_size != BNXT_RX_PAGE_SIZE)
++		return -EINVAL;
 +
-+	pp.pool_size = bnxt_rx_agg_ring_fill_level(bp, rxr) / agg_size_fac;
- 	if (BNXT_RX_PAGE_MODE(bp))
- 		pp.pool_size += bp->rx_ring_size / rx_size_fac;
- 
-@@ -4403,11 +4421,13 @@ static void bnxt_alloc_one_rx_ring_netmem(struct bnxt *bp,
- 					  struct bnxt_rx_ring_info *rxr,
- 					  int ring_nr)
- {
-+	int fill_level, i;
- 	u32 prod;
--	int i;
++	if (!is_power_of_2(qcfg->rx_page_size))
++		return -ERANGE;
 +
-+	fill_level = bnxt_rx_agg_ring_fill_level(bp, rxr);
++	if (qcfg->rx_page_size < BNXT_RX_PAGE_SIZE ||
++	    qcfg->rx_page_size > BNXT_MAX_RX_PAGE_SIZE)
++		return -ERANGE;
++
++	return 0;
++}
++
+ static int bnxt_queue_mem_alloc(struct net_device *dev,
+ 				struct netdev_queue_config *qcfg,
+ 				void *qmem, int idx)
+@@ -15944,6 +15969,10 @@ static int bnxt_queue_mem_alloc(struct net_device *dev,
+ 	if (!bp->rx_ring)
+ 		return -ENETDOWN;
  
- 	prod = rxr->rx_agg_prod;
--	for (i = 0; i < bp->rx_agg_ring_size; i++) {
-+	for (i = 0; i < fill_level; i++) {
- 		if (bnxt_alloc_rx_netmem(bp, rxr, prod, GFP_KERNEL)) {
- 			netdev_warn(bp->dev, "init'ed rx ring %d with %d/%d pages only\n",
- 				    ring_nr, i, bp->rx_agg_ring_size);
++	rc = bnxt_validate_qcfg(bp, qcfg);
++	if (rc < 0)
++		return rc;
++
+ 	rxr = &bp->rx_ring[idx];
+ 	clone = qmem;
+ 	memcpy(clone, rxr, sizeof(*rxr));
+@@ -15955,6 +15984,7 @@ static int bnxt_queue_mem_alloc(struct net_device *dev,
+ 	clone->rx_sw_agg_prod = 0;
+ 	clone->rx_next_cons = 0;
+ 	clone->need_head_pool = false;
++	clone->rx_page_size = qcfg->rx_page_size;
+ 
+ 	rc = bnxt_alloc_rx_page_pool(bp, clone, rxr->page_pool->p.nid);
+ 	if (rc)
+@@ -16081,6 +16111,8 @@ static void bnxt_copy_rx_ring(struct bnxt *bp,
+ 	src_ring = &src->rx_agg_ring_struct;
+ 	src_rmem = &src_ring->ring_mem;
+ 
++	dst->rx_page_size = src->rx_page_size;
++
+ 	WARN_ON(dst_rmem->nr_pages != src_rmem->nr_pages);
+ 	WARN_ON(dst_rmem->page_size != src_rmem->page_size);
+ 	WARN_ON(dst_rmem->flags != src_rmem->flags);
+@@ -16235,6 +16267,8 @@ static const struct netdev_queue_mgmt_ops bnxt_queue_mgmt_ops = {
+ 	.ndo_queue_mem_free	= bnxt_queue_mem_free,
+ 	.ndo_queue_start	= bnxt_queue_start,
+ 	.ndo_queue_stop		= bnxt_queue_stop,
++	.ndo_default_qcfg	= bnxt_queue_default_qcfg,
++	.supported_params	= QCFG_RX_PAGE_SIZE,
+ };
+ 
+ static void bnxt_remove_one(struct pci_dev *pdev)
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index 4c880a9fba92..d245eefbbdda 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -760,6 +760,7 @@ struct nqe_cn {
+ #endif
+ 
+ #define BNXT_RX_PAGE_SIZE (1 << BNXT_RX_PAGE_SHIFT)
++#define BNXT_MAX_RX_PAGE_SIZE BIT(15)
+ 
+ #define BNXT_MAX_MTU		9500
+ 
 -- 
 2.52.0
 
