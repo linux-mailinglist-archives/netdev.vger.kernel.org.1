@@ -1,141 +1,140 @@
-Return-Path: <netdev+bounces-248460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 658DBD08BC2
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 11:56:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F071D08CC2
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 12:05:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D13FB3010531
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 10:56:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E7930309402A
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 11:00:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8190E33ADAB;
-	Fri,  9 Jan 2026 10:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2C9633B973;
+	Fri,  9 Jan 2026 11:00:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kDOZ1wFL"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC812286D70
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 10:56:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED8033B972
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 11:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767956204; cv=none; b=eHgijR/0rgdjcP6K5r1Vd2FpRh3o+oXaaXT6EDY9bg+UbdTTymqQ10e/z+RVFXo0iGKI12jEItS+QNTriw/TSRbebkzc5mHAYgaooQXKfcybdRV6Qt30UqgW+Zr1VGXR/7w2JR/M3ZgIRDn2P8EseqNhRULSmm6MUAiwLd31BUA=
+	t=1767956447; cv=none; b=mSZvXDnGWyilJV4DR9JFCh1gwxmDvfI3XPQKXsBX6g2IlM0UOzqTxFHwf/WCmGh4bTt0rq8Dn138emxKiTY0gZHW8/xVkFjwh6xAdPNAcANKRJujbriAJfecq/cxzRLpW3dvsspAJv37DnEk1HUEhDOlTuhNSbq7yYRXDk4PMLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767956204; c=relaxed/simple;
-	bh=J0Sxl4vU8l9+D53XccRv0UWJqsotLxwL/KtSOnsvyqg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qp+J7bewXCe4u1xidAGFRqKsc1kHYMRWIZ7ShCSq4vnrjwkVhLkkwt9niwkzztKT9Ssy8XKbpSYu6+PF8YoEQAf9M6RV3NQWfX5JDz0ilzSYH+1OPEQ7yMnFRW7ZxV1+vzY4Ynf+Lo0cCCOGqldtguASQnufK0NydmLSEGD2F3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1veAAU-0008BG-4J; Fri, 09 Jan 2026 11:56:34 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1veAAS-009pcJ-2B;
-	Fri, 09 Jan 2026 11:56:32 +0100
-Received: from pengutronix.de (unknown [IPv6:2a03:2260:2009::])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id D9ED84C97BD;
-	Fri, 09 Jan 2026 10:56:31 +0000 (UTC)
-Date: Fri, 9 Jan 2026 11:56:31 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Vincent Mailhol <mailhol@kernel.org>
-Cc: Pavel Pisa <pisa@fel.cvut.cz>, Ondrej Ille <ondrej.ille@gmail.com>, 
-	linux-can@vger.kernel.org, David Laight <david.laight.linux@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Andrea Daoud <andreadaoud6@gmail.com>, 
-	Wolfgang Grandegger <wg@grandegger.com>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Jiri Novak <jnovak@fel.cvut.cz>
-Subject: Re: [PATCH v2] can: ctucanfd: fix SSP_SRC in cases when bit-rate is
- higher than 1 MBit.
-Message-ID: <20260109-meek-dexterous-jaybird-20f9f9-mkl@pengutronix.de>
-References: <20260105111620.16580-1-pisa@fel.cvut.cz>
- <c5851986-837b-4ffb-9bf7-3131cf9c05d1@kernel.org>
- <202601060153.21682.pisa@fel.cvut.cz>
- <c3dd8234-3a7e-4277-89cf-1f4ccb2c0317@kernel.org>
- <20260109-robust-clay-falcon-2f3ecb-mkl@pengutronix.de>
- <25616e3d-9fd9-491e-9a93-fa48d3e7ba2c@kernel.org>
+	s=arc-20240116; t=1767956447; c=relaxed/simple;
+	bh=E7Kw2qWiUnhrhOA9x+kUneMFMH2UGTN9uFe1m7zolm0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ICCn41J6JoPfUDN94nZqdDCdHl0g8fBK5OXafwHctBKgAqiBnezNAOxG7ardNhdOfKr+gqnc6NZYurbxYh0lGTuQKeFcM9kI4+PaIuB3v0QQBMH+bYAXLeSpz+mp/LLeLwgg4b8jVCAxzl1mdpbsfVk8PvrycXspnl2w0zQdT+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kDOZ1wFL; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-59b679cff1fso3088029e87.0
+        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 03:00:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767956444; x=1768561244; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YqoBuqGPYO3MBBZam2ND97FvS4ahEqNDCPSZA0/NAZU=;
+        b=kDOZ1wFL+boHapIMVtaWcjmsfpHDuxcFoTrsP/Rdwv2GWc0s5vVyQ50H7UZ8uXUXCU
+         svq+b3MtNfyN85wKZjA8CwU5xGSi2q5iNtyOAPja1oRzbwmyzsg7etNkpKal59/p0OIw
+         8jH9Ppd670grHK5ae89/KO4MIEuakiMdSD+N6Kk/8/DKP6486Fmw9QU+vLOmGSFPcdHx
+         UXAdIzE8gzQham5ogb9T7b6T2TKoZcHIwc4kN9wAxTFhVCutj7FbLfbxZUrpOCyVIsLz
+         QupeUmwN/tgVzDGRbjLFVZKAcSeMfgjlNfur9M+ziOFBzfrnJPrM4s3sd0ffs9ng/1H6
+         EzYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767956444; x=1768561244;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YqoBuqGPYO3MBBZam2ND97FvS4ahEqNDCPSZA0/NAZU=;
+        b=T1hMTQgIcD0Uz3i/bkZKPUPw3ukL+XAhe8Pu5ECMrJc7diayqpqfstvkVJ61lSiFvQ
+         Ib/H1jDlVjMWSNlhYlGI+7eUTTcll3fRS+faZBIuIgP6B4cPSFut2OsLIl6K+mGIsIHz
+         +Em5uQpx+lw4we5HERsXEmXyIThRr8bQ+ld+4mza8v4sb896FuR6IFVvFuy2fJqe8yFa
+         DRlY0EshVq/WGVq54ajQaqFrFeEMMQTgKl2Xx/ECg4GbO3qxQOBvgDwoQuFSHzlBQ0XO
+         6KlZE8UkXf/+IM7KcUOkBQYh2KiuhsodPoeoZknlfLekJvac/E/S23juyKfGDrHFqR6Z
+         EUuw==
+X-Forwarded-Encrypted: i=1; AJvYcCXWbiFHNNCRzBOgWORG0i5EzsJCdcKHDdlOvvhReWoGru8lW7tdTMmLM5AVEeJfP1IY/qEb6y0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzytMI8jK5TwmEqh21PmN6gHHqvpDOzw7V5QBQ6rby7YXHcSv1S
+	yuuanORt3F52a+Z+4BXfG48bvQ4Ytdwo03Z+NeUFIMBZFr2pH6WsZN7XJUb+jg==
+X-Gm-Gg: AY/fxX7uD3OeXv2dfJbvHSogsUj4xdv4OIr6efvYqi3nIS2eeISVxY1sKB6vK83w42u
+	FLHXuGbF9RFi2nqWyCgbfMp4avPiHCU9/wYyOq6UIOJQKQ664Mv34fqvWemc7DDq8nLGACUuNc+
+	4FIhQ8ZFHhiNuV43Y6RXl/AfHDXYZT1ZZtFVqHmaxhQ6ynCkA/J9+MzaeLCgszdTPq/OgVst2i7
+	jMUG+syM6YKE500OKysk7bf7KZAytCLBZI0a1v0MX5waCxlDWVrwxXyjatrqqabYZZ5DGKWqy8M
+	bJP2McgvgBkZLedYrr9TW8bTWLa0Vu5SzMNk7SdhI4iTYy566QsRWWY9xUawzouwoXwvHlcC8fa
+	KxtIaAWUxB76t0hOsEWW8hSftKbG+he7g+1ItpqEyVF2vt3mVjFWiJGFHSrlvYIEAVsClrGOibR
+	7thLUBG0P4NoLoL6Bp/MGliQcjFrn4tJbdElDOP1JKuo5I2sOqAc+1LfAZvUYfZU/BrssCqZpBh
+	DvlnHCHww+hW/FKDOdBtGj2DIMZBvc8rV8JQm0wHR+BV2/OT6zO2w==
+X-Google-Smtp-Source: AGHT+IFMWrhn/zD8S7L7QefRHqtE+srOvan7Oqu7FDcQ1yfstaZdkM+oGVRAUleuY9Bwvy1rVkrYVQ==
+X-Received: by 2002:a05:6512:3da9:b0:59a:1a4e:c098 with SMTP id 2adb3069b0e04-59b6ed134b7mr2674313e87.8.1767956443812;
+        Fri, 09 Jan 2026 03:00:43 -0800 (PST)
+Received: from ?IPV6:2003:ea:8f34:b700:c079:f905:5470:9a28? (p200300ea8f34b700c079f90554709a28.dip0.t-ipconnect.de. [2003:ea:8f34:b700:c079:f905:5470:9a28])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59b6a2b8330sm2512662e87.10.2026.01.09.03.00.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 09 Jan 2026 03:00:43 -0800 (PST)
+Message-ID: <1263a26d-a622-45d7-8043-262f2b92ed3b@gmail.com>
+Date: Fri, 9 Jan 2026 12:00:41 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="msdgz4pwflqfzkg7"
-Content-Disposition: inline
-In-Reply-To: <25616e3d-9fd9-491e-9a93-fa48d3e7ba2c@kernel.org>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: phy: fixed_phy: replace list of fixed PHYs
+ with static array
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ David Miller <davem@davemloft.net>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <e14f6119-9bf9-4e9d-8e14-a8cb884cbd5c@gmail.com>
+ <20260108181102.4553d618@kernel.org>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+In-Reply-To: <20260108181102.4553d618@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 1/9/2026 3:11 AM, Jakub Kicinski wrote:
+> On Tue, 6 Jan 2026 17:56:26 +0100 Heiner Kallweit wrote:
+>> +/* The DSA loop driver may allocate 4 fixed PHY's, and 4 additional
+>> + * fixed PHY's for a system should be sufficient.
+>> + */
+>> +#define NUM_FP	8
+>> +
+>>  struct fixed_phy {
+>> -	int addr;
+>>  	struct phy_device *phydev;
+>>  	struct fixed_phy_status status;
+>>  	int (*link_update)(struct net_device *, struct fixed_phy_status *);
+>> -	struct list_head node;
+>>  };
+>>  
+>> +static struct fixed_phy fmb_fixed_phys[NUM_FP];
+>>  static struct mii_bus *fmb_mii_bus;
+>> -static LIST_HEAD(fmb_phys);
+>> +static DEFINE_IDA(phy_fixed_ida);
+> 
+> Isn't IDA an overkill for a range this tiny?
+> IDA is useful if the ID range is large and may be sparse.
+> Here a bitmap would suffice.
+> 
 
---msdgz4pwflqfzkg7
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v2] can: ctucanfd: fix SSP_SRC in cases when bit-rate is
- higher than 1 MBit.
-MIME-Version: 1.0
+Thanks for the suggestion! The IDA has been there forever, just the definition
+has been moved now. I think switching to a bitmap is a good option.
+Can we handle this as a follow-up?
 
-On 09.01.2026 11:50:42, Vincent Mailhol wrote:
-> On 09/01/2026 at 10:29, Marc Kleine-Budde wrote:
-> > On 06.01.2026 23:14:47, Vincent Mailhol wrote:
-> >>> thanks for pointing to Transmission Delay Compensation
-> >>> related code introduced in 5.16 kernel. I have noticed it
-> >>> in the past but not considered it yet and I think
-> >>> that we need minimal fixes to help users and
-> >>> allow change to propagate into stable series now.
-> >
-> > How to proceed. Take this fix now an (hopefully) port to the mainline
-> > TDC framework later?
->
-> While I would definitely prefer to see the TDC framework implementation
-> rather than this quick fix,
+> DECLARE_BITMAP(phy_fixed_ids, NUM_FP); 
+> 
+> id = find_first_zero_bit(phy_fixed_ids, NUM_FP);
+> if (id >= NUM_FP)
+> 	return -ENOSPC;
+> 
+> set_bit(id, phy_fixed_ids);
+> ...
 
-ACK
-
-> I will also not block it.
-
-thanks
-
-> If you feel confident to continue with that patch, go ahead.
-
-I think the patch has been tested and as far as I understood the patch
-was used internally for some time. So applied to linux-can, added stable
-on Cc and added a fixes tag.
-
-thanks,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---msdgz4pwflqfzkg7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmlg3twACgkQDHRl3/mQ
-kZxNrQgAlk4TzqvrRZWIZparxSLvYu2lqpNS7mlDtHR20ficHdnLG1YyAAbHFVLc
-B68drUCHzjv/QJiZFN2h5I/glUqtnSCzfI0jrEwm5/6staSiBIo7z2cKxiAJPEIo
-ne50o0adNjQ0TspBR7UqSLY8DFwk0OWb+IiZwpHrIC5BaN8Uk/xCVGQigfKX8Gmq
-6TU42TCh+a5eTziaSpq+9NGB5f6Mvnlwwa1jG+L/wnrO9rcnRr1s4GhUIge9LSfH
-9jCazYhhrcD8Uycbvgkci7rpn4RPfolfnANlQ1ZZGmN5Lbi4z6O5ziJ6AVVjyK51
-nCrvEzvNWnCtAHlJYxBgx+VEj3k7YA==
-=6V0j
------END PGP SIGNATURE-----
-
---msdgz4pwflqfzkg7--
 
