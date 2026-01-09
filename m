@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-248487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB0A1D09A90
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 13:31:17 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52CD6D09A84
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 13:31:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 680943055180
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 12:26:25 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 24CBF304FA19
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 12:26:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 256AC35B151;
-	Fri,  9 Jan 2026 12:26:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5337335B142;
+	Fri,  9 Jan 2026 12:26:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y2k5IXV+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P+vvwdEe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1A6B35B12E
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 12:26:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8764359FA1
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 12:26:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767961575; cv=none; b=IAQJNOGW1rKNVH9UM4Fal0doMU1raJsnOAtf+SlM0OpWe4umtL8y72OZi9nF2BypoWaGATYi9/fVkiSiJ++KpPniqjWA5HdZdD9Xus0bawZiNiKaJ7+1A+8SLRSkR2OrqGidEYbArMov4Sqa/bwXyHqDIvNjo0I5NLIrQqJkrDs=
+	t=1767961574; cv=none; b=FWzP7YarjVyi7MVN+uWIEzgxtSNsa8zY17SKhtfBthadAy9QNXR9kD8LRY94n5Gf9Ut2mm45SgihrAaIPfxVNYwGYx3Fs4LjP7pdwvjxqEVdK8fu7h9QxvkCtfYNMCJ5DzHL+dQ9948PI6RulbkechdA1pIZUOuPa1H/7pA+k4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767961575; c=relaxed/simple;
-	bh=4x3rxTdPKMdDQfKbJXC39mIXbE5u9GGrZhMysH1lItA=;
+	s=arc-20240116; t=1767961574; c=relaxed/simple;
+	bh=obuskN0VLM0RsO7b1MxxqOgZpp++YKGXBy4gGTPNifQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iUvWgcjKDgzxzIjeGtO5kJeSCnyVfYzIfKy0c/JUQlFxCLZ/2f+OlbGyXCRPTmqD1Z9cbvLhqTO9pmchIHZo6XL77siTSiKYnd9IiGd3Gw0Ez2Znh76Z6kLZ3WI3z/+1NUNhLmkjmsoqnlPeIVCC3NKtem5TP+AnihdArfIBoi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Y2k5IXV+; arc=none smtp.client-ip=192.198.163.11
+	 MIME-Version; b=ImtY/7/lCQ2kl72+j71D0/izCswtEoTeIysz8Y8kDRAzb5yKrV5nkmVIFBjfvTE3CK0ttY2QSaDHDzF7RD2NAIAYk7Fe+3trUKjxff0Mk0a0KPTCTzQH1vtEpPEbAx45EI4bDGjVFguDuR9iX+GeX5LxyPV+3Rpu0E1BX77SEPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P+vvwdEe; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1767961574; x=1799497574;
+  t=1767961573; x=1799497573;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=4x3rxTdPKMdDQfKbJXC39mIXbE5u9GGrZhMysH1lItA=;
-  b=Y2k5IXV+NZ1LCLP14enaUVenlg0k17cjRkchmrmySS/YWH4DlETileZ+
-   ve35OxEuLs4/uoxN0WcEficdMkLxy45t0qaES5Cyvz8yLPKn7uQ63f4nP
-   zaulMcm6tJPPNwSruwzCBOP2Hb7qmdUsNVwZiU+59B5LETnq0UvJHPqR4
-   Qr8h6F8x2MwLtRNWMI1yaHdRfH9zKcaaEfWoM+OxSzgB0l/zdBGQcGwgb
-   kAeGM8LVvMneqX9oLQZ42n+8/AA5mJILe6I29eMd0TOFb7FMc3FAY6B1H
-   U9ZNvTpAiuqc43yMDI4ySXERSX3Br17gozLCh8JzFCnrUtFHVDwo/XVGc
-   A==;
-X-CSE-ConnectionGUID: PKOhwMfARRWjyVdazylqEg==
-X-CSE-MsgGUID: vVupCppXTM2KEC/lS2oITQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11665"; a="79981315"
+  bh=obuskN0VLM0RsO7b1MxxqOgZpp++YKGXBy4gGTPNifQ=;
+  b=P+vvwdEeJY05whrNMH3//SpSCNiqn7DehbBOWOJO1waJ587WJFgIxqOl
+   izgPYcBN16sj/S/R7X4JbSB21aiy57JgqDVBqMW5KnTAq1gwtawJJOybS
+   bLq25qj9dY3BbibXyl+ZeSIJSWvwa+wyKyihFXYjEuONR6ktBJQQPU+uD
+   XuW0aYsNkFghQX8ewKC9Y/eQy5fU/CJ28euuGXoYvdMCxSKUoezxaf3qT
+   XMFDKbZbfN3GtEt20c5PjK/Ek2uVijlFlTyLJarioFZ/sS07YsD9Cp2aX
+   xrIUABPp+BwjTw1dfPsD2UAWLQYEhbAw03t6bB8EDMpO+3Q+4a0R1QaZ9
+   g==;
+X-CSE-ConnectionGUID: KDDn2lwcTEaHiwVLNWmY0g==
+X-CSE-MsgGUID: HSu6P+i+TwqmgFuDQfa8ww==
+X-IronPort-AV: E=McAfee;i="6800,10657,11665"; a="73188974"
 X-IronPort-AV: E=Sophos;i="6.21,212,1763452800"; 
-   d="scan'208";a="79981315"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2026 04:26:11 -0800
-X-CSE-ConnectionGUID: CeVquu6CRXC7fMAoEc1w4g==
-X-CSE-MsgGUID: KgallUqPSiigNQQPUrgcZQ==
+   d="scan'208";a="73188974"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2026 04:26:11 -0800
+X-CSE-ConnectionGUID: GolGeTdvT4eya8xGMa9krQ==
+X-CSE-MsgGUID: /J/IlHwcSoGGsUgbSdfdmw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,212,1763452800"; 
-   d="scan'208";a="208516492"
+   d="scan'208";a="234169175"
 Received: from black.igk.intel.com ([10.91.253.5])
-  by orviesa005.jf.intel.com with ESMTP; 09 Jan 2026 04:26:08 -0800
+  by orviesa002.jf.intel.com with ESMTP; 09 Jan 2026 04:26:08 -0800
 Received: by black.igk.intel.com (Postfix, from userid 1001)
-	id E38279D; Fri, 09 Jan 2026 13:26:06 +0100 (CET)
+	id E61B29E; Fri, 09 Jan 2026 13:26:06 +0100 (CET)
 From: Mika Westerberg <mika.westerberg@linux.intel.com>
 To: netdev@vger.kernel.org
 Cc: Yehezkel Bernat <YehezkelShB@gmail.com>,
@@ -71,9 +71,9 @@ Cc: Yehezkel Bernat <YehezkelShB@gmail.com>,
 	Jay Vosburgh <jv@jvosburgh.net>,
 	Simon Horman <horms@kernel.org>,
 	Mika Westerberg <mika.westerberg@linux.intel.com>
-Subject: [PATCH RESEND net-next v2 3/5] net: ethtool: Add define for SPEED_80000
-Date: Fri,  9 Jan 2026 13:26:04 +0100
-Message-ID: <20260109122606.3586895-4-mika.westerberg@linux.intel.com>
+Subject: [PATCH RESEND net-next v2 4/5] bonding: 3ad: Add support for SPEED_80000
+Date: Fri,  9 Jan 2026 13:26:05 +0100
+Message-ID: <20260109122606.3586895-5-mika.westerberg@linux.intel.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20260109122606.3586895-1-mika.westerberg@linux.intel.com>
 References: <20260109122606.3586895-1-mika.westerberg@linux.intel.com>
@@ -85,26 +85,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-USB4 v2 link used in peer-to-peer networking is symmetric 80 Gbps so in
-order to support reading this link speed, add it to ethtool.
+Add support for ethtool SPEED_80000. This is needed to allow
+Thunderbolt/USB4 networking driver to be used with the bonding driver.
 
 Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
 ---
- include/uapi/linux/ethtool.h | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/bonding/bond_3ad.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
-index eb7ff2602fbb..181243a2d700 100644
---- a/include/uapi/linux/ethtool.h
-+++ b/include/uapi/linux/ethtool.h
-@@ -2190,6 +2190,7 @@ enum ethtool_link_mode_bit_indices {
- #define SPEED_40000		40000
- #define SPEED_50000		50000
- #define SPEED_56000		56000
-+#define SPEED_80000		80000
- #define SPEED_100000		100000
- #define SPEED_200000		200000
- #define SPEED_400000		400000
+diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
+index 1a8de2bf8655..e5e9c7207309 100644
+--- a/drivers/net/bonding/bond_3ad.c
++++ b/drivers/net/bonding/bond_3ad.c
+@@ -72,6 +72,7 @@ enum ad_link_speed_type {
+ 	AD_LINK_SPEED_40000MBPS,
+ 	AD_LINK_SPEED_50000MBPS,
+ 	AD_LINK_SPEED_56000MBPS,
++	AD_LINK_SPEED_80000MBPS,
+ 	AD_LINK_SPEED_100000MBPS,
+ 	AD_LINK_SPEED_200000MBPS,
+ 	AD_LINK_SPEED_400000MBPS,
+@@ -297,6 +298,7 @@ static inline int __check_agg_selection_timer(struct port *port)
+  *     %AD_LINK_SPEED_40000MBPS
+  *     %AD_LINK_SPEED_50000MBPS
+  *     %AD_LINK_SPEED_56000MBPS
++ *     %AD_LINK_SPEED_80000MBPS
+  *     %AD_LINK_SPEED_100000MBPS
+  *     %AD_LINK_SPEED_200000MBPS
+  *     %AD_LINK_SPEED_400000MBPS
+@@ -365,6 +367,10 @@ static u16 __get_link_speed(struct port *port)
+ 			speed = AD_LINK_SPEED_56000MBPS;
+ 			break;
+ 
++		case SPEED_80000:
++			speed = AD_LINK_SPEED_80000MBPS;
++			break;
++
+ 		case SPEED_100000:
+ 			speed = AD_LINK_SPEED_100000MBPS;
+ 			break;
 -- 
 2.50.1
 
