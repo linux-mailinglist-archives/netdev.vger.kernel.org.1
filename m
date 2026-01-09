@@ -1,175 +1,236 @@
-Return-Path: <netdev+bounces-248550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3193D0B3EB
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 17:30:15 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35717D0B3FD
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 17:30:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 02E0430D32BD
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 16:21:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 951823015119
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 16:24:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1BA231A547;
-	Fri,  9 Jan 2026 16:21:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E19D31A547;
+	Fri,  9 Jan 2026 16:24:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="u+GwY04C"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TsSq+IG6"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C79093128C7;
-	Fri,  9 Jan 2026 16:21:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A79A337B92
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 16:24:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767975708; cv=none; b=Uwz4/yVxCXrJGRTZ3fzSjcoDMTxv3M86aB/HCzcoDEYz5MpwZSEaFhUt54ZPJKok4cF6fjEzURqhdnqil4LtvVKCNFL/I3aQT7faiCTi1g5J9ZEpNm8oiiPG7+ArdSe9DuRHzpuISLLiGXQW8iYpsYZ6y4mDt9+AIocZReYSilw=
+	t=1767975897; cv=none; b=dD8lUJHhTP+kT6DPZw+4GCS01/EodZf67tJbgKSLbWcB17u6CNefHNCPrZRUwZxAzODU1EzkxlsfvAoBRFx1OaDkSXPUNRWuyxq5tjr+NCj04FpB7+0r9hZZ8a351eBSKeVFCyiCMzIGqw6XVz/WK1+OOGiBq85XosoDqToZwCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767975708; c=relaxed/simple;
-	bh=JHf7XjqDxz+HBu4lmMwAulX2JgUiNemGA0gF/Q2GtGk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e8K4DrDus517E1ghfWSwalR/lrQ7y93Erg2JyuoFKgNBZX6gxeRLPVnur3jTex9b/oc3a2HLcGYuqkN7a/azewHEpCIATi5oJmxGwLpfEq8U3ve1uf0JbqtygJ64USq8ce7Ltenz/pjuMNI4572h1966BteAsst856eBX4apF1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=u+GwY04C; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=gEXWYjUfV4aieZNmTH6njmEjvqBEOJCTz/56ibrDc1g=; b=u+GwY04Czf5tiOJziF7EKbS4R5
-	TCbJ76RNFno0KKV6/G3lXXehrXvd+C2SgRjqPGfHUmiiO7Lkos7riH854W9h4OioY7DomhhKM5A/g
-	ptVWbDkFUIOltdSs+/k1Vi+Yw+VKoetasTkKrFq6zRV2ZG6iCVgjoSGzYN7pSm1V01iuZigqBvIHZ
-	nzLfpq5ULrC4hKQqfQyJ8tNKwpy0GMErWVCqpcxBiCLts1lVpakvywANbH8QOTe4MPwvzsCEr+EGk
-	tFfWC7iYyEzG/tH1Bjd6ZBHQW1SWHcCFQ9cBB+YnbW8vVqBFzZtn3qtyW0XubvqQp3r6lDrK+QAeX
-	vPaSgE7w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44010)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1veFF7-0000000043b-1Z0s;
-	Fri, 09 Jan 2026 16:21:41 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1veFF5-000000003Rv-0thW;
-	Fri, 09 Jan 2026 16:21:39 +0000
-Date: Fri, 9 Jan 2026 16:21:39 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jonas Jelonek <jelonek.jonas@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v4] net: sfp: add SMBus I2C block support
-Message-ID: <aWErEyV8UhemgiRy@shell.armlinux.org.uk>
-References: <20260109101321.2804-1-jelonek.jonas@gmail.com>
- <aWDw0nbcZUaJnCQX@shell.armlinux.org.uk>
+	s=arc-20240116; t=1767975897; c=relaxed/simple;
+	bh=DsoNiErAyhf3A90GHQfACdBGfpojvMzHJ+IZ5BcSxgc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YhmzZn++ytWVwrFIQISrJH3M5EuxZx4f4LpfjBgDAxAmdF9Qbltjb+v2Zee9o+4akky5ZjNl61CgEOgXmfYTcH4dg0WQU4oxn8cmTI3u2Gx3y40RCFe4QwANPj2K7Rm2eVo1IyLZRa07lqLnNzUr7Iqsb9jqqzsLpcv/hdWZAjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TsSq+IG6; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-477ba2c1ca2so48478335e9.2
+        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 08:24:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767975893; x=1768580693; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aHmfnqgDCEmK613FRrQHV+ATkk1Rai86bVueukmcvOY=;
+        b=TsSq+IG6ozA/zUfAyQkCipaHBAEicf6+Ng74O2wCD1FeL0qNNProlDRua6tcy9fiNR
+         JqzuXzC2g1OSOgPjDpueIaELTRS5X14TU9V7T+XflgzxaNVXlWHdO0rpUkGcPF6XIrAW
+         4VsjspW06kmKN3iYDduKFPzZYUDMzn/AfJTihRgeGSKCZw7RPKySM5kQB3Py+YY2/EBQ
+         EBYNUzoc+3Xy33QaB3Cm/PPNGv59DYFvbHkXpYxV+Izy0HnDjrkxNFH07fWgO9fUsQkM
+         rfzgWuggSjQTUSEHTEGOspr+ajiQI9gDDOE5gO8I8AX/ZsriLNFU56pS3nywr5QcmmdW
+         wTCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767975893; x=1768580693;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=aHmfnqgDCEmK613FRrQHV+ATkk1Rai86bVueukmcvOY=;
+        b=Z5WcMW/H31NT5cZamVYv7bT9GgjMc1rFwIlKjR8p8tpH2MFDcA7PDd2El+muIF3a+G
+         E2sqrYRbH+PbNRxUVBqt7bQT2noEfLmKAiSWmjnERnY2Id1mb4oJPukbBc7oG/RRNZk7
+         2wnkvgEh6yIbzCY0QdUaecQ+hsdGfmnZcTbwUiNjtpWe2PeZGv71Bnukp7U9tZrCk5lt
+         Ss6WBIXEFHIBrV7vkqaGlMBLtIOLCr6U3lkfgrQveF/us9+UhXaIWyWLIHgEGvapfFgR
+         fda76H/HD5mdjplZcnAvhgRkygfdU3N5jxHSIUhUnwwzTe7BE1Ou+PD7mPEBzyfSATyY
+         nlUA==
+X-Forwarded-Encrypted: i=1; AJvYcCWuqUkvxJ5msGIEDB2Qhb01PrBImHIZAEdZHge3VsKcaVzerBgwfC3xpcbN2INqt8QCUgea3Tg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynDjlHGD7iOIMf+DR61NxPvBs8zm5Z/2EF+uObi1qfqQf6B9nB
+	/VcKviRV1USSiVDQVwUCDcMcTnkwxXG9d+ADwS4zvTryul4RtEFBO+jECNxrI/rCW/tD+4xyrdb
+	cIuqFe0+NBPZJihtKn4+mGGSV7iiKWHQ=
+X-Gm-Gg: AY/fxX5Jrcp1Jpzr6xNZNkvFY//kUoG5OgdipT7Z0wf1+ERXSgmmkXkvpvDqbUV+HNx
+	w3y/7lUHbJWqHTxrLK3XIX4L/SPl5anLHthJQoJYQIFInn4C7Wko/yrlZbXorkdO6W7R8kU97IK
+	wS5MnY1HqOgtK7togxh9qiHP0N4wnkZGtBKnoRduuhE8OaLfQa6kFROniqlOKmUUfIug6ldvx4S
+	IKnE9nBg5LYYpFiTsN34dPB+6AaUkpsQ5mb5AYIKRBbcjVl14aWxG7Uuf1Iyim9kdpHrE1FGcqW
+	NOOxOEea1BUl8IYn2rEqyZ7osDvV
+X-Google-Smtp-Source: AGHT+IH8/QRjd++hMR8vlKQXLENn7AamAuc5FJZXDbW/uNvxUAJMk5qvZVioKDc46eg8K59Ls8JDHizJk5fuymSkcis=
+X-Received: by 2002:a05:600c:4694:b0:46e:3d41:6001 with SMTP id
+ 5b1f17b1804b1-47d84b3db20mr97255695e9.34.1767975893237; Fri, 09 Jan 2026
+ 08:24:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aWDw0nbcZUaJnCQX@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20260109153420.32181-1-leon.hwang@linux.dev> <20260109153420.32181-2-leon.hwang@linux.dev>
+In-Reply-To: <20260109153420.32181-2-leon.hwang@linux.dev>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Fri, 9 Jan 2026 08:24:41 -0800
+X-Gm-Features: AZwV_Qjs-h5Q6oTESWcQ85ioWJXfjnRIPt3WHmpg0AdmKGFJ63hMwzpPEGHOOQk
+Message-ID: <CAADnVQK4O-igzuSvfgjG1ZqdUBXrjNL=4tJZuS1uy36GCD2mVg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 1/3] bpf, x64: Call perf_snapshot_branch_stack in trampoline
+To: Leon Hwang <leon.hwang@linux.dev>
+Cc: bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
+	"H . Peter Anvin" <hpa@zytor.com>, Matt Bobrowski <mattbobrowski@google.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Shuah Khan <shuah@kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	linux-trace-kernel <linux-trace-kernel@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, kernel-patches-bot@fb.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 09, 2026 at 12:13:06PM +0000, Russell King (Oracle) wrote:
-> On Fri, Jan 09, 2026 at 10:13:21AM +0000, Jonas Jelonek wrote:
-> > Commit 7662abf4db94 ("net: phy: sfp: Add support for SMBus module access")
-> > added support for SMBus-only controllers for module access. However,
-> > this is restricted to single-byte accesses and has the implication that
-> > hwmon is disabled (due to missing atomicity of 16-bit accesses) and
-> > warnings are printed.
-> > 
-> > There are probably a lot of SMBus-only I2C controllers out in the wild
-> > which support block reads. Right now, they don't work with SFP modules.
-> > This applies - amongst others - to I2C/SMBus-only controllers in Realtek
-> > longan and mango SoCs.
-> > 
-> > Downstream in OpenWrt, a patch similar to the abovementioned patch is
-> > used for current LTS kernel 6.12. However, this uses byte-access for all
-> > kinds of access and thus disregards the atomicity for wider access.
-> > 
-> > Introduce read/write SMBus I2C block operations to support SMBus-only
-> > controllers with appropriate support for block read/write. Those
-> > operations are used for all accesses if supported, otherwise the
-> > single-byte operations will be used. With block reads, atomicity for
-> > 16-bit reads as required by hwmon is preserved and thus, hwmon can be
-> > used.
-> > 
-> > The implementation requires the I2C_FUNC_SMBUS_I2C_BLOCK to be
-> > supported as it relies on reading a pre-defined amount of bytes.
-> > This isn't intended by the official SMBus Block Read but supported by
-> > several I2C controllers/drivers.
-> > 
-> > Support for word access is not implemented due to issues regarding
-> > endianness.
-> 
-> I'm wondering whether we should go further with this - we implement
-> byte mode SMBus support, but there is also word mode, too, which
-> would solve the HWMON issues. It looks like more SMBus devices support
-> word mode than I2C block mode.
-> 
-> So, if we're seeing more SMBus adapters being used with SFPs, maybe
-> we should be thinking about a more adaptive approach to SMBus, where
-> we try to do the best with the features that the SMBus adapter
-> provides us.
-> 
-> Maybe something like:
-> 
-> static int sfp_smbus_write(struct sfp *sfp, bool a2, u8 dev_addr, void *buf,
->                            size_t len)
-> {
-> 	size_t this_len, transferred, total;
-> 	union i2c_smbus_data smbus_data;
-> 	u8 bus_addr = a2 ? 0x51 : 0x50;
-> 	u32 functionality;
-> 	int ret;
-> 
-> 	functioality = i2c_get_functionality(sfp->i2c);
-> 	total = len;
-> 
-> 	while (len) {
-> 		if (len > sfp->i2c_max_block_size)
-> 			this_len = sfp->i2c_max_block_size;
-> 		else
-> 			this_len = len;
-> 
-> 		if (this_len > 2 &&
-> 		    functionality & I2C_FUNC_SMBUS_READ_I2C_BLOCK) {
-> 			.. use smbus i2c block mode ..
-> 			transferred = this_len;
-> 		} else if (this_len >= 2 &&
-> 		           functionality & I2C_FUNC_SMBUS_READ_WORD_DATA) {
-> 			.. use smbus word mode ..
-> 			transferred = 2;
-> 		} else {
-> 			.. use smbus byte mode ..
-> 			transferred = 1;
-> 		}
-> 
-> 		buf += transferred;
-> 		len -= transferred;
-> 	}
-> 
-> 	return ret < 0 : ret : total - len;
-> }
-> 
-> sfp_hwmon_probe() will do the right thing based upon i2c_block_size, so
-> where only byte mode is supported, we don't get hwmon support.
+On Fri, Jan 9, 2026 at 7:37=E2=80=AFAM Leon Hwang <leon.hwang@linux.dev> wr=
+ote:
+>
+> When the PMU LBR is running in branch-sensitive mode,
+> 'perf_snapshot_branch_stack()' may capture branch entries from the
+> trampoline entry up to the call site inside a BPF program. These branch
+> entries are not useful for analyzing the control flow of the tracee.
+>
+> To eliminate such noise for tracing programs, the branch snapshot should
+> be taken as early as possible:
+>
+> * Call 'perf_snapshot_branch_stack()' at the very beginning of the
+>   trampoline for fentry programs.
+> * Call 'perf_snapshot_branch_stack()' immediately after invoking the
+>   tracee for fexit programs.
+>
+> With this change, LBR snapshots remain meaningful even when multiple BPF
+> programs execute before the one requesting LBR data.
+>
+> In addition, more relevant branch entries can be captured on AMD CPUs,
+> which provide a 16-entry-deep LBR stack.
+>
+> Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
+> ---
+>  arch/x86/net/bpf_jit_comp.c | 66 +++++++++++++++++++++++++++++++++++++
+>  include/linux/bpf.h         | 16 ++++++++-
+>  2 files changed, 81 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+> index e3b1c4b1d550..a71a6c675392 100644
+> --- a/arch/x86/net/bpf_jit_comp.c
+> +++ b/arch/x86/net/bpf_jit_comp.c
+> @@ -12,6 +12,7 @@
+>  #include <linux/bpf.h>
+>  #include <linux/memory.h>
+>  #include <linux/sort.h>
+> +#include <linux/perf_event.h>
+>  #include <asm/extable.h>
+>  #include <asm/ftrace.h>
+>  #include <asm/set_memory.h>
+> @@ -19,6 +20,7 @@
+>  #include <asm/text-patching.h>
+>  #include <asm/unwind.h>
+>  #include <asm/cfi.h>
+> +#include "../events/perf_event.h"
+>
+>  static bool all_callee_regs_used[4] =3D {true, true, true, true};
+>
+> @@ -3137,6 +3139,54 @@ static int invoke_bpf_mod_ret(const struct btf_fun=
+c_model *m, u8 **pprog,
+>         return 0;
+>  }
+>
+> +DEFINE_PER_CPU(struct bpf_tramp_branch_entries, bpf_branch_snapshot);
+> +
+> +static int invoke_branch_snapshot(u8 **pprog, void *image, void *rw_imag=
+e)
+> +{
+> +       struct bpf_tramp_branch_entries __percpu *pptr =3D &bpf_branch_sn=
+apshot;
+> +       u8 *prog =3D *pprog;
+> +
+> +       /*
+> +        * Emit:
+> +        *
+> +        * struct bpf_tramp_branch_entries *br =3D this_cpu_ptr(&bpf_bran=
+ch_snapshot);
+> +        * br->cnt =3D static_call(perf_snapshot_branch_stack)(br->entrie=
+s, x86_pmu.lbr_nr);
+> +        */
+> +
+> +       /* mov rbx, &bpf_branch_snapshot */
+> +       emit_mov_imm64(&prog, BPF_REG_6, (long) pptr >> 32, (u32)(long) p=
+ptr);
+> +#ifdef CONFIG_SMP
+> +       /* add rbx, gs:[<off>] */
+> +       EMIT2(0x65, 0x48);
+> +       EMIT3(0x03, 0x1C, 0x25);
+> +       EMIT((u32)(unsigned long)&this_cpu_off, 4);
+> +#endif
+> +       /* mov esi, x86_pmu.lbr_nr */
+> +       EMIT1_off32(0xBE, x86_pmu.lbr_nr);
+> +       /* lea rdi, [rbx + offsetof(struct bpf_tramp_branch_entries, entr=
+ies)] */
+> +       EMIT4(0x48, 0x8D, 0x7B, offsetof(struct bpf_tramp_branch_entries,=
+ entries));
+> +       /* call static_call_query(perf_snapshot_branch_stack) */
+> +       if (emit_rsb_call(&prog, static_call_query(perf_snapshot_branch_s=
+tack),
+> +                         image + (prog - (u8 *)rw_image)))
+> +               return -EINVAL;
+> +       /* mov dword ptr [rbx], eax */
+> +       EMIT2(0x89, 0x03);
+> +
+> +       *pprog =3D prog;
+> +       return 0;
+> +}
+> +
+> +static bool bpf_prog_copy_branch_snapshot(struct bpf_tramp_links *tl)
+> +{
+> +       bool copy =3D false;
+> +       int i;
+> +
+> +       for (i =3D 0; i < tl->nr_links; i++)
+> +               copy =3D copy || tl->links[i]->link.prog->copy_branch_sna=
+pshot;
+> +
+> +       return copy;
+> +}
+> +
+>  /* mov rax, qword ptr [rbp - rounded_stack_depth - 8] */
+>  #define LOAD_TRAMP_TAIL_CALL_CNT_PTR(stack)    \
+>         __LOAD_TCC_PTR(-round_up(stack, 8) - 8)
+> @@ -3366,6 +3416,14 @@ static int __arch_prepare_bpf_trampoline(struct bp=
+f_tramp_image *im, void *rw_im
+>
+>         save_args(m, &prog, regs_off, false, flags);
+>
+> +       if (bpf_prog_copy_branch_snapshot(fentry)) {
+> +               /* Get branch snapshot asap. */
+> +               if (invoke_branch_snapshot(&prog, image, rw_image)) {
+> +                       ret =3D -EINVAL;
+> +                       goto cleanup;
+> +               }
+> +       }
 
-I should also note that, when checking for the appropriate
-functionality in sfp_i2c_configure(), we need to be careful that
-we can read single bytes.
+Andrii already tried to do it.
+I hated it back then and still hate the idea.
+We're not going to add custom logic for one specific use case
+no matter how appealing it sounds to save very limited LBR entries.
+The HW will get better, but we will be stuck with this optimization forever=
+.
 
-In other words, if an adapter reports that it supports smbus word data
-access, we need it to also support smbus byte data access or smbus i2c
-block access.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+pw-bot: cr
 
