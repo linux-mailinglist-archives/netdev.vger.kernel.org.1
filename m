@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-248320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91F2FD06E7C
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 04:03:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F9C5D06E7F
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 04:03:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 05564300A848
+	by sea.lore.kernel.org (Postfix) with ESMTP id 886203014DBB
 	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 03:03:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DA931E8329;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3FA023B604;
 	Fri,  9 Jan 2026 03:03:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 138F21D416C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1385319A288;
 	Fri,  9 Jan 2026 03:03:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767927797; cv=none; b=H6Hpw7JC7McRleThNy/BZ6s8ZzpKnlKvzfM2jfL3AShkAwXvh3xTD+B/wI7TAGGLiaeQ3gMFxvXG7EzuleaEshRvAOim7lgSCdzvA2gab7owX0addPNMSVAouQbBeGuiu5ftv0KTS4+9xj0CdhRE3QAN3Mmz2dxeuv3vtthDdiQ=
+	t=1767927797; cv=none; b=dGJV6zmBN/vBVlWX41By+qzexQlrY1Ips2yV7QfXAKlx3H7sRVPaM+StPBX7cR3n88GmiPxJ8uOYgY3oOGSOknWiQEQcrp6esrpbGXQJdYEO7U++698opO9PB5EbztrfCDTsYi7UFXJvqUCaawqt3XW38GDQmAmXbhBGUR2FVs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1767927797; c=relaxed/simple;
-	bh=SCDtJJyS+8maBEin5Ojm56ncLIlU1W3CEQsEPHqoGHQ=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=TjxFCP9uDJl+OlmD36tDDiq4vHpM1ORoAVXgDPTZfYUyWdOzBSCHyr/rkG8YjEuse/a0byGKobZjqV+4Z/dGLWet0EuNKqo8APe4q7PoEkATQHe88UYCQDEGnmnksaD+SnTKHv/6dlgR33MK0nSs0xTuu92JFOWvhMdMX93vDM4=
+	bh=kO1mpmyAP2DRh5/wDZxZoieVtP2B/Fq/8rWBoXAej2A=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kvz3/l+pU3c2Klw3YkoahlMXftEKNGdzDMOgv/+Gj6oyvxjsg3swzaXrYP8q2tOK2Nc/UO75ut9uWpqd8Tgzo+oJwi7EKzqtVZQmteoU7A2GkJIHYN2qR+IVNwZvDatdF9NEWKFRn8CPJOjCMowhVkCYfbWXGRskEF3HMzG9ZxY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -31,9 +31,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.99)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1ve2mB-000000005jf-1ADM;
-	Fri, 09 Jan 2026 03:02:59 +0000
-Date: Fri, 9 Jan 2026 03:02:55 +0000
+	id 1ve2mN-000000005k0-0la4;
+	Fri, 09 Jan 2026 03:03:11 +0000
+Date: Fri, 9 Jan 2026 03:03:08 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>,
@@ -45,9 +45,10 @@ To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	Michael Klein <michael@fossekall.de>,
 	Aleksander Jan Bajkowski <olek2@wp.pl>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 0/5] net: phy: realtek: simplify and reunify C22/C45
- drivers
-Message-ID: <cover.1767926665.git.daniel@makrotopia.org>
+Subject: [PATCH net-next 1/5] net: phy: realtek: support interrupt also for
+ C22 variants
+Message-ID: <1b01a903484f441c0fc2e61f7277910b2fac7855.1767926665.git.daniel@makrotopia.org>
+References: <cover.1767926665.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,42 +57,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <cover.1767926665.git.daniel@makrotopia.org>
 
-The RTL8221B PHY variants (VB-CG and VM-CG) were previously split into
-separate C22 and C45 driver instances to support copper SFP modules
-using the RollBall MDIO-over-I2C protocol, which only supports Clause-45
-access. However, this split created significant code duplication and
-complexity.
+Now that access to MDIO_MMD_VEND2 works transparently also in Clause-22
+mode, add interrupt support also for the C22 variants of the
+RTL8221B-VB-CG and RTL8221B-VM-CG. This results in the C22 and C45
+driver instances now having all the same features implemented.
 
-Commit 8af2136e77989 ("net: phy: realtek: add helper
-RTL822X_VND2_C22_REG") exposed that RealTek PHYs map all standard
-Clause-22 registers into MDIO_MMD_VEND2 at offset 0xa400.
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+ drivers/net/phy/realtek/realtek_main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-With commit 1850ec20d6e71 ("net: phy: realtek: use paged access for
-MDIO_MMD_VEND2 in C22 mode") it is now possible to access all MMD
-registers transparently, regardless of whether the PHY is accessed via
-C22 or C45 MDIO.
-
-Further improve the translation logic for this register mapping, so a
-single unified driver works efficiently with both access methods,
-reducing code duplication.
-
-The series also includes cleanup to remove unnecessary paged operations
-on registers that aren't actually affected by page selection.
-
-Testing was done on RTL8211F and RTL8221B-VB-CG (the latter in both
-C22 and C45 modes).
-
-Daniel Golle (5):
-  net: phy: realtek: support interrupt also for C22 variants
-  net: phy: realtek: simplify C22 reg access via MDIO_MMD_VEND2
-  net: phy: realtek: reunify C22 and C45 drivers
-  net: phy: realtek: demystify PHYSR register location
-  net: phy: realtek: simplify bogus paged operations
-
- drivers/net/phy/realtek/realtek_main.c | 122 ++++++++++---------------
- 1 file changed, 47 insertions(+), 75 deletions(-)
-
+diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
+index eb5b540ada0e5..7302b25b8908b 100644
+--- a/drivers/net/phy/realtek/realtek_main.c
++++ b/drivers/net/phy/realtek/realtek_main.c
+@@ -2275,6 +2275,8 @@ static struct phy_driver realtek_drvs[] = {
+ 	}, {
+ 		.match_phy_device = rtl8221b_vb_cg_c22_match_phy_device,
+ 		.name		= "RTL8221B-VB-CG 2.5Gbps PHY (C22)",
++		.config_intr	= rtl8221b_config_intr,
++		.handle_interrupt = rtl8221b_handle_interrupt,
+ 		.probe		= rtl822x_probe,
+ 		.get_features	= rtl822x_get_features,
+ 		.config_aneg	= rtl822x_config_aneg,
+@@ -2307,6 +2309,8 @@ static struct phy_driver realtek_drvs[] = {
+ 	}, {
+ 		.match_phy_device = rtl8221b_vm_cg_c22_match_phy_device,
+ 		.name		= "RTL8221B-VM-CG 2.5Gbps PHY (C22)",
++		.config_intr	= rtl8221b_config_intr,
++		.handle_interrupt = rtl8221b_handle_interrupt,
+ 		.probe		= rtl822x_probe,
+ 		.get_features	= rtl822x_get_features,
+ 		.config_aneg	= rtl822x_config_aneg,
 -- 
 2.52.0
 
