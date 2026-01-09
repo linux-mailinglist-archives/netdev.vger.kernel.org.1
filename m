@@ -1,171 +1,150 @@
-Return-Path: <netdev+bounces-248489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2023AD09B5F
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 13:34:18 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9225D09FFD
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 13:50:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8C815312C915
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 12:27:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D2F1530E476F
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 12:35:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D92435B13F;
-	Fri,  9 Jan 2026 12:26:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9739933C53A;
+	Fri,  9 Jan 2026 12:35:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="ItA+EMb9"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4231F35A952;
-	Fri,  9 Jan 2026 12:26:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4EF2336EDA
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 12:35:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767961619; cv=none; b=mz2G6RNQDTcBEC+ZQI9vvjYWr3QLHO6MfzeP4aDhKrWN8L6Kao1gQ3Z5n1BWVn4IHYwE9UX9pRGOIChWAYYngoqIbKB+RqR3dUVfa3WemXKlvt1384tZLdClBv3e2E4vZCufm2O65zDthF2TPMddT2+sMgVP3zgNAtVYLOxgvS8=
+	t=1767962147; cv=none; b=tfVdkn+Vs9K/B/QMtSJuBhW+LOM2CIwz/J+I8rFgQxzUDzyWzSyqkqAteLjlQC8kJR4rhjTNrAMo7ElvABzy/KO70n1sFrsOMHc/EIILBjGQ9kyf1vKJQROpFq0UvNqPHCFuj8Xnv0LZ6yx0omuJ74zpiLcn07DZFtPYXbiPhpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767961619; c=relaxed/simple;
-	bh=Sx9BVkicVbRljBfcUt/bbKp14RBo3IRdaKJvZfMCX40=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pCWxCfyIpqeIjpqOs9/SrYB7TrQYGh9DYBie6fRKiUc2C3rCbg32KOLsDBKrUVwmVXDp4AU/qm15mG+7vM7A0GB6tauQtWdNQpM4Np3m1mv8sSzX0PNPrio1r4PMolGDzOLfWIMmhFT0N6ulMfmnfBmTQm4GJA5H7UgVE+WtNDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1veBZl-000000008QQ-1VDX;
-	Fri, 09 Jan 2026 12:26:45 +0000
-Date: Fri, 9 Jan 2026 12:26:42 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Michael Klein <michael@fossekall.de>,
-	Aleksander Jan Bajkowski <olek2@wp.pl>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 4/5] net: phy: realtek: demystify PHYSR register
- location
-Message-ID: <aWD0AuYGO9ZJm9wa@makrotopia.org>
-References: <cover.1767926665.git.daniel@makrotopia.org>
- <bad322c8d939b5ba564ba353af9fb5f07b821752.1767926665.git.daniel@makrotopia.org>
- <1261b3d5-3e09-4dd6-8645-fd546cbdce62@gmail.com>
+	s=arc-20240116; t=1767962147; c=relaxed/simple;
+	bh=DDzuXc3q1Tz0WvFP6x9HQpJ8rU+Z/fWcqzCh0muALuI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ENFLOGNVQ+wQs7ObgZrqFhFJkUPlcySFv9f3JqV+E8ZZ9rzu5RYZ/CKlklKknqtT07wmUvJzGRX+KurSJMCqRv3VRguwUFVEVeWVXPgFwmr6v1ysM25YK0KOoENqjytSYJBQ6kpKU9ikC6GSQ2HOlM0XltZEdEW8a8QgZbVWqpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=ItA+EMb9; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b7a72874af1so773082066b.3
+        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 04:35:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall.org; s=google; t=1767962144; x=1768566944; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OvOuPMMiAx1s7+V+l8xKqTUgjaDGQGTF5xyeJ50K4T4=;
+        b=ItA+EMb9Hl8kK8c0T8kOtl7yWTCpmnNOoLRpwU1F9axi8Qo2VHvurkz6Kr4ZSgFsbV
+         P+m3BLfb7ppOjGyQTXnlHUdrKupmmP6vZyVZejxrQcAIoZCSChswaG751uyfSOcpo7Hg
+         anVaawwNJpFBvbRepXMOpKBeds/gDA4ObWit0rAYCGRKfruosCuQzYU7+94rAv8NH8xU
+         HVDY9YXBAb22UHlE3WUdUJ17ah1oiQQqqY0kEBp1ktS5YavytBTAnRbXjr+1dAma9Qzl
+         89cg/Ya15C5eMoGm0l5djgoohkPdUqurQPz4wemPAmlmqIviOkypqsawivrPnb1FTTvG
+         BJaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767962144; x=1768566944;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OvOuPMMiAx1s7+V+l8xKqTUgjaDGQGTF5xyeJ50K4T4=;
+        b=kefBIKwwtFt7SVFTKWsEO9J8cHwsxGV7aAV3c+MNXlhCfVjrskyS11xuZTUBqzWwfk
+         QOryZlxNrA00huyyHsIDojog16t2EsLvrd/mDj8Tn/l/ALNzD//WRF5FUDPXd9YgRX0M
+         lh0HsivudFO+6VvcV1Xo7B57BHzJyDj+r6in5an/CUb6p1rCasK4wwmGaE1MiE+BZEwQ
+         ZNTSupR7FP0CaWcRHTSJAuoL5aBCpAJQnBOwsvyiyM2iFi2IkzcMy+ZQqPnrTDPzQIeN
+         6kIWoeqHp9dyJXPmhNcnVMkxOQb7XGdER0bYjYFzupowT6Xf/HwJiO55Jneo+Ybag+Ss
+         hW9A==
+X-Forwarded-Encrypted: i=1; AJvYcCUHi9u4lY1vEPCSWHuSzNG3GW3plDgJ9XZ/hbj4qH5Cj6wqfj8y/yX4DN0FFYj6t+jBcK2J+Ls=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGSfo6VggCV0FtsH8zcr+PlUMMQObfpza+d4wavQpO2rWXC5/R
+	uU+7hvkT6nIWCMaLxe436gEznZGtdraMz3TKmrq45+RKVlhOFkKGbRLriDdrhpxjHk52WL050V7
+	+Ja5w
+X-Gm-Gg: AY/fxX4DB8C9OUcpJZtWZTl/BfNhqJGYC2/FDnSsC+PoPM3+NyRWYY/3KGrarzWIn2X
+	XaUcVrQQzt9qPU42zOPrbfifi0SyEVuIovb8KaeAjLBMOyS0HtFzhOJDOUwPKuofzcgThNMQSXC
+	KAHwaF5sDNBZU+rveguA53+LZAPVzD5hUEeeR5kPmBByQjB680PGpfp/2wmXSXMAaaS5Q1em4xb
+	16Q9u1gASkmkp+9KrMlV1vRE1ZTS4ISrB5eXCg3WdBDsWUvu3p+DjVbixWMur5FBA6cLBc5usVL
+	iXY2pKqIsMZawwl83IuTlEjBlGPLAWNRWIzC8mYAszny6+ccU2TIZIZtAN9tIg+5OZvGjhIjqGx
+	tD95SaJ7qSTFHYJBF52hvVeI8auolBUlBzfBrIaFpWR791Kf5LYJmQWuXHJYmdEdzc8CHw4q866
+	xsm9LMZIx+EfrHS4TeR1PxPuxn1m3uGgpYX7leNtTyxkyUW/epGyHEm/eglrcCwV07oyEC1w==
+X-Google-Smtp-Source: AGHT+IG8TQGDznAg3o3Qxai11yd1QN0mIrhsIx0cgYi0t54RtVRUe0zv2z5wnMmm2ZiszHAs0SE4xw==
+X-Received: by 2002:a17:907:a06:b0:b83:32b7:21b0 with SMTP id a640c23a62f3a-b8444c98cf3mr872414766b.17.1767962143988;
+        Fri, 09 Jan 2026 04:35:43 -0800 (PST)
+Received: from [192.168.0.161] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a230db0sm1118762766b.2.2026.01.09.04.35.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 09 Jan 2026 04:35:43 -0800 (PST)
+Message-ID: <b070f4f6-e81b-4674-954b-609ad17f1cda@blackwall.org>
+Date: Fri, 9 Jan 2026 14:35:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1261b3d5-3e09-4dd6-8645-fd546cbdce62@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND net-next v2 2/5] net: thunderbolt: Allow changing
+ MTU of the device
+To: Mika Westerberg <mika.westerberg@linux.intel.com>, netdev@vger.kernel.org
+Cc: Yehezkel Bernat <YehezkelShB@gmail.com>, Ian MacDonald
+ <ian@netstatz.com>, Salvatore Bonaccorso <carnil@debian.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jay Vosburgh <jv@jvosburgh.net>, Simon Horman <horms@kernel.org>
+References: <20260109122606.3586895-1-mika.westerberg@linux.intel.com>
+ <20260109122606.3586895-3-mika.westerberg@linux.intel.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20260109122606.3586895-3-mika.westerberg@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jan 09, 2026 at 08:32:33AM +0100, Heiner Kallweit wrote:
-> On 1/9/2026 4:03 AM, Daniel Golle wrote:
-> > Turns out that register address RTL_VND2_PHYSR (0xa434) maps to
-> > Clause-22 register MII_RESV2. Use that to get rid of yet another magic
-> > number, and rename access macros accordingly.
-> > 
+On 09/01/2026 14:26, Mika Westerberg wrote:
+> In some cases it is useful to be able to use different MTU than the
+> default one. Especially when dealing against non-Linux networking stack.
+> For this reason add possibility to change the MTU of the device.
 > 
-> RTL_VND2_PHYSR is documented in the datasheet, at least for RTL8221B(I)-VB-CG.
-> (this datasheet is publicly available, I don't have access to other datasheets)
-> MII_RESV2 isn't documented there. Is MII_RESV2 documented in any other datasheet?
-
-No datasheet mentions the nature of paging only affecting registers
-0x10~0x17, I've figured that out by code analysis and testing (ie.
-dumping all registers for all known/used pages using mdio-tools in
-userspace, and writing to PHYCR1 toggling BIT(13) and confirming that it
-affects the PHY in the expected way). Don't ask me why they ommit this
-in the datasheets, I suspect the people writing the datasheets are given
-some auto-generated code and also don't have unterstanding of the actual
-internals (maybe to "protect" their precious IP?).
-
-Anyway, as RTL_VND2_PHYSR is 0xa434 on MDIO_MMD_VEND2, and we know that
-0xa400~0xa43c maps to the standard C22 registers, I concluded that
-0xa434 on MDIO_MMD_VEND2 is identical to C22 register 0x1a, ie.
-MII_RESV2. I've also noticed that the mechanism to translate registers
-on MDIO_MMD_VEND2 to paged C22 registers only makes use of registers
-0x10~0x17, so it became apparent that other registers are not affected
-by paging.
-
-I've confirmed all that by testing on RTL8211F and RTL8221B. As pointed
-out this also holds true for internal PHYs on r8169 which emulate C22
-registers in the exact same way. Hence the PHY driver can be simplified,
-as there is no need to set and restore the page around the reading of
-PHYSR.
-
+> Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+> ---
+>   drivers/net/thunderbolt/main.c | 11 +++++++++++
+>   1 file changed, 11 insertions(+)
 > 
-> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> > ---
-> >  drivers/net/phy/realtek/realtek_main.c | 24 ++++++++++++------------
-> >  1 file changed, 12 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-> > index d07d60bc1ce34..5712372c71f91 100644
-> > --- a/drivers/net/phy/realtek/realtek_main.c
-> > +++ b/drivers/net/phy/realtek/realtek_main.c
-> > @@ -178,12 +178,12 @@
-> >  #define RTL9000A_GINMR				0x14
-> >  #define RTL9000A_GINMR_LINK_STATUS		BIT(4)
-> >  
-> > -#define RTL_VND2_PHYSR				0xa434
-> > -#define RTL_VND2_PHYSR_DUPLEX			BIT(3)
-> > -#define RTL_VND2_PHYSR_SPEEDL			GENMASK(5, 4)
-> > -#define RTL_VND2_PHYSR_SPEEDH			GENMASK(10, 9)
-> > -#define RTL_VND2_PHYSR_MASTER			BIT(11)
-> > -#define RTL_VND2_PHYSR_SPEED_MASK		(RTL_VND2_PHYSR_SPEEDL | RTL_VND2_PHYSR_SPEEDH)
-> > +#define RTL_PHYSR				MII_RESV2
-> > +#define RTL_PHYSR_DUPLEX			BIT(3)
-> > +#define RTL_PHYSR_SPEEDL			GENMASK(5, 4)
-> > +#define RTL_PHYSR_SPEEDH			GENMASK(10, 9)
-> > +#define RTL_PHYSR_MASTER			BIT(11)
-> > +#define RTL_PHYSR_SPEED_MASK			(RTL_PHYSR_SPEEDL | RTL_PHYSR_SPEEDH)
-> >  
-> >  #define	RTL_MDIO_PCS_EEE_ABLE			0xa5c4
-> >  #define	RTL_MDIO_AN_EEE_ADV			0xa5d0
-> > @@ -1102,12 +1102,12 @@ static void rtlgen_decode_physr(struct phy_device *phydev, int val)
-> >  	 * 0: Half Duplex
-> >  	 * 1: Full Duplex
-> >  	 */
-> > -	if (val & RTL_VND2_PHYSR_DUPLEX)
-> > +	if (val & RTL_PHYSR_DUPLEX)
-> >  		phydev->duplex = DUPLEX_FULL;
-> >  	else
-> >  		phydev->duplex = DUPLEX_HALF;
-> >  
-> > -	switch (val & RTL_VND2_PHYSR_SPEED_MASK) {
-> > +	switch (val & RTL_PHYSR_SPEED_MASK) {
-> >  	case 0x0000:
-> >  		phydev->speed = SPEED_10;
-> >  		break;
-> > @@ -1135,7 +1135,7 @@ static void rtlgen_decode_physr(struct phy_device *phydev, int val)
-> >  	 * 1: Master Mode
-> >  	 */
-> >  	if (phydev->speed >= 1000) {
-> > -		if (val & RTL_VND2_PHYSR_MASTER)
-> > +		if (val & RTL_PHYSR_MASTER)
-> >  			phydev->master_slave_state = MASTER_SLAVE_STATE_MASTER;
-> >  		else
-> >  			phydev->master_slave_state = MASTER_SLAVE_STATE_SLAVE;
-> > @@ -1155,8 +1155,7 @@ static int rtlgen_read_status(struct phy_device *phydev)
-> >  	if (!phydev->link)
-> >  		return 0;
-> >  
-> > -	val = phy_read_paged(phydev, RTL822X_VND2_TO_PAGE(RTL_VND2_PHYSR),
-> > -			     RTL822X_VND2_TO_PAGE_REG(RTL_VND2_PHYSR));
-> > +	val = phy_read(phydev, RTL_PHYSR);
-> >  	if (val < 0)
-> >  		return val;
-> >  
-> > @@ -1622,7 +1621,8 @@ static int rtl822x_c45_read_status(struct phy_device *phydev)
-> >  	}
-> >  
-> >  	/* Read actual speed from vendor register. */
-> > -	val = phy_read_mmd(phydev, MDIO_MMD_VEND2, RTL_VND2_PHYSR);
-> > +	val = phy_read_mmd(phydev, MDIO_MMD_VEND2,
-> > +			   RTL822X_VND2_C22_REG(RTL_PHYSR));
-> >  	if (val < 0)
-> >  		return val;
-> >  
-> 
+> diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/main.c
+> index 57b226afeb84..20bac55a3e20 100644
+> --- a/drivers/net/thunderbolt/main.c
+> +++ b/drivers/net/thunderbolt/main.c
+> @@ -1257,12 +1257,23 @@ static void tbnet_get_stats64(struct net_device *dev,
+>   	stats->rx_missed_errors = net->stats.rx_missed_errors;
+>   }
+>   
+> +static int tbnet_change_mtu(struct net_device *dev, int new_mtu)
+> +{
+> +	/* Keep the MTU within supported range */
+> +	if (new_mtu < 68 || new_mtu > (TBNET_MAX_MTU - ETH_HLEN))
+> +		return -EINVAL;
+> +
+> +	dev->mtu = new_mtu;
+> +	return 0;
+> +}
+> +
+>   static const struct net_device_ops tbnet_netdev_ops = {
+>   	.ndo_open = tbnet_open,
+>   	.ndo_stop = tbnet_stop,
+>   	.ndo_start_xmit = tbnet_start_xmit,
+>   	.ndo_set_mac_address = eth_mac_addr,
+>   	.ndo_get_stats64 = tbnet_get_stats64,
+> +	.ndo_change_mtu	= tbnet_change_mtu,
+>   };
+>   
+>   static void tbnet_generate_mac(struct net_device *dev)
+
+You can use struct net_device's min/max_mtu instead of a custom 
+ndo_change_mtu.
+They will be validated by dev_validate_mtu().
+
+Cheers,
+  Nik
+
+
 
