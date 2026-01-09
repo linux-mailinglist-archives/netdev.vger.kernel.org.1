@@ -1,175 +1,175 @@
-Return-Path: <netdev+bounces-248549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A2E5D0B361
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 17:24:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3193D0B3EB
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 17:30:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6AA6F30CE21E
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 16:18:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 02E0430D32BD
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 16:21:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BC2A3009E4;
-	Fri,  9 Jan 2026 16:18:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1BA231A547;
+	Fri,  9 Jan 2026 16:21:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cKiAbeLy";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dd7pirNN"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="u+GwY04C"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F7EF22B5A3
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 16:18:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C79093128C7;
+	Fri,  9 Jan 2026 16:21:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767975512; cv=none; b=CKRrlOD5LYwTzMrz3XdTXgaG5Qem1Yg4ctLbsi24S7suIvw98W/vyA85wCSiFpfS7Jb/ZVJeeBf7XSXnleHmxcQmtbsHGUGDvu73/c95HxECswn1D9Ueqe+yDV7aePrb3GljbY/crAk9Ji3dVpoU+HwpGJkM71mFD4lwjYZNTY0=
+	t=1767975708; cv=none; b=Uwz4/yVxCXrJGRTZ3fzSjcoDMTxv3M86aB/HCzcoDEYz5MpwZSEaFhUt54ZPJKok4cF6fjEzURqhdnqil4LtvVKCNFL/I3aQT7faiCTi1g5J9ZEpNm8oiiPG7+ArdSe9DuRHzpuISLLiGXQW8iYpsYZ6y4mDt9+AIocZReYSilw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767975512; c=relaxed/simple;
-	bh=a1/DesK3SdmsYTBBaArmoKyDaDj/3FIZv0uZ3aW3q6E=;
+	s=arc-20240116; t=1767975708; c=relaxed/simple;
+	bh=JHf7XjqDxz+HBu4lmMwAulX2JgUiNemGA0gF/Q2GtGk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eDn40Pp50o6dn2x9zTUdS9eTmw1RHMx3MYAmS6gQn5tvnB8mebb2Rhq1HJuWIBBgmjo6sgpQlqA+XVf4J1PQw5XHPJCMPf2Gt/fI68zByUQrnv4C070Y/BpMIKM8KFCPg79hMkJDRyFAKk3YSUzihP4FzqIEQQt2T4/jEYziPa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cKiAbeLy; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Dd7pirNN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767975510;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/krVGPsvJddi7hg5z9iCRy/aoNIgxBgy+h5yAK6W1kg=;
-	b=cKiAbeLyx1v+pyYLplqORQGMeAGJNFSLGROg77KxFMO6OExlwKL+wVxk+A44NxURO+OnaD
-	G9Nv767X6VOHr7Dk79V9DHGeGg8yndM3HFCoVokb3PvEDdH84u46ygfRFm8aWabYuzf/SS
-	9BDdpAZsi3NDbloAm9DWgzrz7X44NDI=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-600-HPpJpSZbNdaKbXMpZNQmDQ-1; Fri, 09 Jan 2026 11:18:29 -0500
-X-MC-Unique: HPpJpSZbNdaKbXMpZNQmDQ-1
-X-Mimecast-MFC-AGG-ID: HPpJpSZbNdaKbXMpZNQmDQ_1767975508
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-b79ff60ed8eso329484366b.0
-        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 08:18:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1767975508; x=1768580308; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/krVGPsvJddi7hg5z9iCRy/aoNIgxBgy+h5yAK6W1kg=;
-        b=Dd7pirNNdfNA9usNhQzvyK262repY0KT12gqpaLcAlITZwDwQslvtRheuKP8T0pYt0
-         2lcxMiRg3r2c1quh9hFsgQF3McmBq0VAnCLBYUnR92+QulvQ0OQL3Y7c3F0HZogjfRA0
-         AXvvBTyNX/zaFN7A1LLfETA3KaBMRqvhWXTmWG8f5tCrb+Ka7bY7MSNsRWy/ggQ/1Odu
-         G2KL6fq1B3I2/3UzKggCNwBs2uw1xFMSCdD7Gi6cf4VDdPu1HUJWax+0GJLOEhEj4XfP
-         B0EyeNFje6mM9a0V811PgZC3PnauDeCuKb8qewUL1JAETr4kyo15EDeIsAlolbWVqaAA
-         oXOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767975508; x=1768580308;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/krVGPsvJddi7hg5z9iCRy/aoNIgxBgy+h5yAK6W1kg=;
-        b=Um11BHx5TwHHkrmBQkqwfMpuBtpqWIrhGCFFAwOAHUnNkuC+r0cFZFIyyuLwc1Kibe
-         T6tHixLNNpAwwSJaNWqpK7Lf8FBUTU37EIE/wi2CJM9Wa/fu3qXDVRxjbKprwfcX/k0s
-         1b0aWIanyuy4Y+Tk7taFsH91y1meXnI55FpRnBsuYsTomxPBO4tGccGajmHPx4GlDO8/
-         cb8jdnwTKuy2ZSvtWX5yJwvSpRTFiw9o+DyohetEI5Eh6DJTNqePgi68THJSYnWA/HRG
-         IqGzMW2mhkDxLv4A8bsxRwiMiXKaGVCm7bl73QaKd88tFQo2h3ApU5X8mUerbyAx46Go
-         kOzA==
-X-Forwarded-Encrypted: i=1; AJvYcCVJ0NBcbGRJIe3ChyGSBtLZZdLtnqlKEoTbNhXKTRuZt0bpavJCAvP6/VD1kYwrXuQ64EB3QSU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrMAkC8uoGK6Rlo1nNb3Khp9FMKvaQyqBl6mYOQ1vrQ/mvaK84
-	vrQQgpQGplJUaQLnoEfrmegK/PlIOcR12RLyRLPm2bTSXYKR7VqEHw8KaBuNK+OaqgmGTtj3PCc
-	hbkp0B+fRcjKHwhUWNIf1vQ+9Vt3dGSy91ZMDK/Y4Gg2YXgwleRND8H/6Cw==
-X-Gm-Gg: AY/fxX6q7q6RTOwGZj1vgzmTUAgGfXsFKzR+gb0cp0wCgpsNM35QrspQB/KDjI3asNk
-	RA1SaGPicQL0Y5wjuaGR4s0GZ5ohCPbsoyOhM/mBrLw4fF2/PMzdB2Or970fP7shFejoDLcTVNg
-	Zc8S4f3i+tGwNKE6cebOd5r+JBR4rLOqrQNXWXVZFtMeS4Y9Xlmzf8/ipXg5doQ1QWwAH4v9qC2
-	4IBfJZ9StfGFZFz0YDbBEI4iZL+vxJ4ygHKjzzl2hVJAwmQiR453nRFsfBPL7iVQTJfDBL94QCX
-	jc8of14lCt5/PjmB9S7FOBhCJMFwCA5YEQJT8gN7Ny3dWKTPdEu3thYiWrXAle/pBA5AwU2a3VY
-	OQed3feOZwAAXvdQ=
-X-Received: by 2002:a17:907:1b0f:b0:b6d:9bab:a7ba with SMTP id a640c23a62f3a-b8445179d97mr1040652966b.42.1767975507961;
-        Fri, 09 Jan 2026 08:18:27 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHr2olBdquSj4gJBneVi4T80pCx/5PM/5koZL1efVNkWaXxHFkv/Bw2psyCF7rUeZB6h9BHnw==
-X-Received: by 2002:a17:907:1b0f:b0:b6d:9bab:a7ba with SMTP id a640c23a62f3a-b8445179d97mr1040648366b.42.1767975507266;
-        Fri, 09 Jan 2026 08:18:27 -0800 (PST)
-Received: from sgarzare-redhat ([193.207.176.59])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a51183asm1175084666b.49.2026.01.09.08.18.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jan 2026 08:18:26 -0800 (PST)
-Date: Fri, 9 Jan 2026 17:18:19 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Arseniy Krasnov <avkrasnov@salutedevices.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] vsock/virtio: Coalesce only linear skb
-Message-ID: <aWEnYm6ePitdHPQe@sgarzare-redhat>
-References: <20260108-vsock-recv-coalescence-v1-0-26f97bb9a99b@rbox.co>
- <20260108-vsock-recv-coalescence-v1-1-26f97bb9a99b@rbox.co>
+	 Content-Type:Content-Disposition:In-Reply-To; b=e8K4DrDus517E1ghfWSwalR/lrQ7y93Erg2JyuoFKgNBZX6gxeRLPVnur3jTex9b/oc3a2HLcGYuqkN7a/azewHEpCIATi5oJmxGwLpfEq8U3ve1uf0JbqtygJ64USq8ce7Ltenz/pjuMNI4572h1966BteAsst856eBX4apF1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=u+GwY04C; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=gEXWYjUfV4aieZNmTH6njmEjvqBEOJCTz/56ibrDc1g=; b=u+GwY04Czf5tiOJziF7EKbS4R5
+	TCbJ76RNFno0KKV6/G3lXXehrXvd+C2SgRjqPGfHUmiiO7Lkos7riH854W9h4OioY7DomhhKM5A/g
+	ptVWbDkFUIOltdSs+/k1Vi+Yw+VKoetasTkKrFq6zRV2ZG6iCVgjoSGzYN7pSm1V01iuZigqBvIHZ
+	nzLfpq5ULrC4hKQqfQyJ8tNKwpy0GMErWVCqpcxBiCLts1lVpakvywANbH8QOTe4MPwvzsCEr+EGk
+	tFfWC7iYyEzG/tH1Bjd6ZBHQW1SWHcCFQ9cBB+YnbW8vVqBFzZtn3qtyW0XubvqQp3r6lDrK+QAeX
+	vPaSgE7w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44010)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1veFF7-0000000043b-1Z0s;
+	Fri, 09 Jan 2026 16:21:41 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1veFF5-000000003Rv-0thW;
+	Fri, 09 Jan 2026 16:21:39 +0000
+Date: Fri, 9 Jan 2026 16:21:39 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jonas Jelonek <jelonek.jonas@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v4] net: sfp: add SMBus I2C block support
+Message-ID: <aWErEyV8UhemgiRy@shell.armlinux.org.uk>
+References: <20260109101321.2804-1-jelonek.jonas@gmail.com>
+ <aWDw0nbcZUaJnCQX@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260108-vsock-recv-coalescence-v1-1-26f97bb9a99b@rbox.co>
+In-Reply-To: <aWDw0nbcZUaJnCQX@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Jan 08, 2026 at 10:54:54AM +0100, Michal Luczaj wrote:
->Vsock/virtio common tries to coalesce buffers in rx queue: if a linear skb
->(with a spare tail room) is followed by a small skb (length limited by
->GOOD_COPY_LEN = 128), an attempt is made to join them.
->
->Since the introduction of MSG_ZEROCOPY support, assumption that a small skb
->will always be linear is incorrect (see loopback transport). In the
->zerocopy case, data is lost and the linear skb is appended with
->uninitialized kernel memory.
->
->Ensure only linear skbs are coalesced. Note that skb_tailroom(last_skb) > 0
->guarantees last_skb is linear.
->
->Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
->Signed-off-by: Michal Luczaj <mhal@rbox.co>
->---
-> net/vmw_vsock/virtio_transport_common.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
->
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index dcc8a1d5851e..cf35eb7190cc 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -1375,7 +1375,8 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
-> 		 * of a new message.
-> 		 */
-> 		if (skb->len < skb_tailroom(last_skb) &&
->-		    !(le32_to_cpu(last_hdr->flags) & VIRTIO_VSOCK_SEQ_EOM)) {
->+		    !(le32_to_cpu(last_hdr->flags) & VIRTIO_VSOCK_SEQ_EOM) &&
->+		    !skb_is_nonlinear(skb)) {
+On Fri, Jan 09, 2026 at 12:13:06PM +0000, Russell King (Oracle) wrote:
+> On Fri, Jan 09, 2026 at 10:13:21AM +0000, Jonas Jelonek wrote:
+> > Commit 7662abf4db94 ("net: phy: sfp: Add support for SMBus module access")
+> > added support for SMBus-only controllers for module access. However,
+> > this is restricted to single-byte accesses and has the implication that
+> > hwmon is disabled (due to missing atomicity of 16-bit accesses) and
+> > warnings are printed.
+> > 
+> > There are probably a lot of SMBus-only I2C controllers out in the wild
+> > which support block reads. Right now, they don't work with SFP modules.
+> > This applies - amongst others - to I2C/SMBus-only controllers in Realtek
+> > longan and mango SoCs.
+> > 
+> > Downstream in OpenWrt, a patch similar to the abovementioned patch is
+> > used for current LTS kernel 6.12. However, this uses byte-access for all
+> > kinds of access and thus disregards the atomicity for wider access.
+> > 
+> > Introduce read/write SMBus I2C block operations to support SMBus-only
+> > controllers with appropriate support for block read/write. Those
+> > operations are used for all accesses if supported, otherwise the
+> > single-byte operations will be used. With block reads, atomicity for
+> > 16-bit reads as required by hwmon is preserved and thus, hwmon can be
+> > used.
+> > 
+> > The implementation requires the I2C_FUNC_SMBUS_I2C_BLOCK to be
+> > supported as it relies on reading a pre-defined amount of bytes.
+> > This isn't intended by the official SMBus Block Read but supported by
+> > several I2C controllers/drivers.
+> > 
+> > Support for word access is not implemented due to issues regarding
+> > endianness.
+> 
+> I'm wondering whether we should go further with this - we implement
+> byte mode SMBus support, but there is also word mode, too, which
+> would solve the HWMON issues. It looks like more SMBus devices support
+> word mode than I2C block mode.
+> 
+> So, if we're seeing more SMBus adapters being used with SFPs, maybe
+> we should be thinking about a more adaptive approach to SMBus, where
+> we try to do the best with the features that the SMBus adapter
+> provides us.
+> 
+> Maybe something like:
+> 
+> static int sfp_smbus_write(struct sfp *sfp, bool a2, u8 dev_addr, void *buf,
+>                            size_t len)
+> {
+> 	size_t this_len, transferred, total;
+> 	union i2c_smbus_data smbus_data;
+> 	u8 bus_addr = a2 ? 0x51 : 0x50;
+> 	u32 functionality;
+> 	int ret;
+> 
+> 	functioality = i2c_get_functionality(sfp->i2c);
+> 	total = len;
+> 
+> 	while (len) {
+> 		if (len > sfp->i2c_max_block_size)
+> 			this_len = sfp->i2c_max_block_size;
+> 		else
+> 			this_len = len;
+> 
+> 		if (this_len > 2 &&
+> 		    functionality & I2C_FUNC_SMBUS_READ_I2C_BLOCK) {
+> 			.. use smbus i2c block mode ..
+> 			transferred = this_len;
+> 		} else if (this_len >= 2 &&
+> 		           functionality & I2C_FUNC_SMBUS_READ_WORD_DATA) {
+> 			.. use smbus word mode ..
+> 			transferred = 2;
+> 		} else {
+> 			.. use smbus byte mode ..
+> 			transferred = 1;
+> 		}
+> 
+> 		buf += transferred;
+> 		len -= transferred;
+> 	}
+> 
+> 	return ret < 0 : ret : total - len;
+> }
+> 
+> sfp_hwmon_probe() will do the right thing based upon i2c_block_size, so
+> where only byte mode is supported, we don't get hwmon support.
 
-Why here? I mean we can do the check even early, something like this:
+I should also note that, when checking for the appropriate
+functionality in sfp_i2c_configure(), we need to be careful that
+we can read single bytes.
 
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -1361,7 +1361,8 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
-          * to avoid wasting memory queueing the entire buffer with a small
-          * payload.
-          */
--       if (len <= GOOD_COPY_LEN && !skb_queue_empty(&vvs->rx_queue)) {
-+       if (len <= GOOD_COPY_LEN && !skb_queue_empty(&vvs->rx_queue) &&
-+           !skb_is_nonlinear(skb)) {
-                 struct virtio_vsock_hdr *last_hdr;
-                 struct sk_buff *last_skb;
+In other words, if an adapter reports that it supports smbus word data
+access, we need it to also support smbus byte data access or smbus i2c
+block access.
 
-
-I would also add the reason in the comment before that to make it clear.
-
-Thanks for the fix!
-Stefano
-
-> 			memcpy(skb_put(last_skb, skb->len), skb->data, skb->len);
-> 			free_pkt = true;
-> 			last_hdr->flags |= hdr->flags;
->
->-- 
->2.52.0
->
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
