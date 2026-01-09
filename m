@@ -1,250 +1,253 @@
-Return-Path: <netdev+bounces-248386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id DABDFD079AE
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 08:36:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EED0BD07A5B
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 08:49:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2C08E300872F
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 07:36:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3F4973017652
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 07:49:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10EEF2EBDE9;
-	Fri,  9 Jan 2026 07:36:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D110E22CBF1;
+	Fri,  9 Jan 2026 07:49:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lvsxxWdC"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="QxAl6v0Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013069.outbound.protection.outlook.com [40.93.201.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5634328642D
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 07:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767944175; cv=none; b=KRByF6txP7/mQ9rVJdt25c89Um9F39xsb2Ky3dDOf0amwLe1J4Yl4sHvTyMzMhArrIQfW8aJAW0nYCUtSZ3JPBwnqD/Ty1tCLzzgJL9DykeLfW9oxoXXa5MJ3wXA5xYvEtMhr9C8rwfiMPWzh3wW4p/wB5kow4LUlwuEBzVSohY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767944175; c=relaxed/simple;
-	bh=iF2Ai9iWjqYzfUBaa0nhaGu7J8rPHYoV/GptRdJ/v/4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a1JemxGecOqbVa5ljnO3zhFRO5GnKxcjFRDoSDXjJegypHb0YzDCNMXYKoIs6F6uHCBzOMFEkZy+A8TalAEj4vDP6//xVl2UMbdkzgGaNjbD2UX7CVNB3ykx5fuk1/d7yAB11E5qegv4rynGSo5dy+jOzm079o0OKEcbS5L8WvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lvsxxWdC; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4779adb38d3so27430755e9.2
-        for <netdev@vger.kernel.org>; Thu, 08 Jan 2026 23:36:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767944172; x=1768548972; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=q+V0nQ1zu3RTVUNrIUa2Z41r/bkUed1LFLOFTgT6K1Y=;
-        b=lvsxxWdCxgbXnIUWHak830DS+eaWz/HIXbSiozxZolMx+SkAzOKeZXbQegBYcm8css
-         8bRaZapVeVFSiVlCa/yXlZ7LAymIfVEUqqLFHhMWQumMYI3CziDB+QUP6GL1/rA6wFIq
-         yoOOJ1AItiidMKlPzkKqy438I8hCc+UI4vgL7jbk414ucTz0MVtflZCNLbZgC8B4qbBE
-         u/sjQvF/yFv9u4x8PA9/xOT/pEUW7PUEw4bewzay7klxZxX0DZZ45x/V1c7JO3PPQrU8
-         A79dnsvt4D59O6TquUCxzaPUv0Ov66v113AlPupKMQwHYI3yCa2MagtMi0Rfpco5U/Wg
-         WIEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767944172; x=1768548972;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=q+V0nQ1zu3RTVUNrIUa2Z41r/bkUed1LFLOFTgT6K1Y=;
-        b=w1iI111lbra+5M8wqdV+vr31Jx9MWKKB4IME/WmNzCdTkHdtDEw3iLrBWPmAVQwNLr
-         Z2v5l018myL1XzgcJ6Y7g6+g3L8bP+CQyZtfWu7TNGIYl3FyhbXuwruvXUTygStsDwm0
-         0dwgrHsk1+tSAbysog3RxZSb6SGcvGQgNPk2j36Dg3wTpypSYoy2UxrHoyItUj/7uj5L
-         Vpo95kvXkB+ODz+nkRaO1eKjQtloUWphbRiRcmKFEmInhvdzDfLMUmKhvSgmU3o/9IRX
-         vkk7tdL+BAXMed49IuudZaWxXvg3tdurnxIAMEdFDu9Rr8iGMladCmNgPmwqTTJWCwoj
-         P3CQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWXzdOAi4DyuHk6QY0aGQ5x5BLV018TLopaSJ0q7EdVg/vzsWpOhy+K7mhDpUItEVGapyf9uow=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrcN3YYNB/3CbdgQQ5QKAe6THWfSMU+/pzX6otiUlbXgszo2LL
-	G8kU9jHEwJ3KFXLILlao8jDb64t+FroA4vh9ROfg7ttaW5FUquFa4wVJ
-X-Gm-Gg: AY/fxX49DPFEs2jA92LzqXkyJOIAaxGCHZa8puyf28d3obv914y7P9O4sKX9wHlHakC
-	ohZmw3nscfdpl51+9bI7ao6QRICcANdzGck0GWVCfTguXxdNilcrQiJZFkedWLhRts9ucd9BxtD
-	65axH2btwmGK44exmsDMtPMqEOwPjIsp1aZgdWbjhazKFj5huz42AMMiQTMTsunLf6gxftx57xo
-	IQXsZwO1I4f4P0JeNimHpw/j/PIpW5klhOOol8pCUF7/lNeafFSAW94pxrSF8PZP+mjmjaMH8hu
-	Jr8xRTEyjJ65NtPRV/a0IOBsDCY3DbEFn1VjfdeiAUuHRb+NPdA3GwoJ99I5Iz/Z88ZFSWeZyVT
-	NYJdnYwRMUR71xoARPRc2vfZNVZ4ZGrm7/OniV5OOhWAzvU2eKeJqmCX1Z/Kq4wehfXSPTddzSK
-	anysQezlIcIUSuR/qKWW+LvfSUL9FCoJhTKp8VWt1vBHttEDTgtcrbQM7g0RhG9SMbgrK8ekJXk
-	0yaOF7oEpg5jHEcwbrYyBEDdywijuIvkFm8+tnqsrcBUjBPDaLI2g==
-X-Google-Smtp-Source: AGHT+IEC4d1uh6X7cJVsCAVMVrTBEY0PhVsFQFOknCd116TWTjucj/E+QmE9iCVaFZtKYVNWBoV+zw==
-X-Received: by 2002:a05:600c:3556:b0:479:33be:b23e with SMTP id 5b1f17b1804b1-47d84b3b4eamr112428785e9.17.1767944171528;
-        Thu, 08 Jan 2026 23:36:11 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f34:b700:1da4:ce1d:3d7c:283d? (p200300ea8f34b7001da4ce1d3d7c283d.dip0.t-ipconnect.de. [2003:ea:8f34:b700:1da4:ce1d:3d7c:283d])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d865e3d22sm57198835e9.1.2026.01.08.23.36.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Jan 2026 23:36:11 -0800 (PST)
-Message-ID: <fa9657f8-ec42-4476-bf4c-37db7b58ecac@gmail.com>
-Date: Fri, 9 Jan 2026 08:36:10 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50954263F52
+	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 07:49:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.69
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767944968; cv=fail; b=X9GpwGTouDFCoS4w1W9Pwt7+DMG5SAjvAluHShNpbVSleOMHBhWE1g1H7z9KJj8XZ7wIKSPwmeMPutk/Z0U/4MBxYnB7M7RFS2UIWVCo2/Cbpw37X/+KV/nbhQH1GvWUvuAp2aaVM6+9TPz+8ggc1J4LBwfiGGUW2kwyPi7rJ3Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767944968; c=relaxed/simple;
+	bh=JMOtTecySrpW+E3VmlZ088CnxXcv4TrQosmEhEBh/Cg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dYJ8J++Xz4lgRQ+mAsctPycv5XlLj7OcFaFD92p+wCxAc979CTFRyl2IpGgvNuah2kpdSV9d3Ut4a4x446Cu5OmfuhQD2XfLyxoRDltIuH3p44qF63HxZjDrNeJzizJp30IOZksDs0sDFhmAh9gqCFF+F/6CIqaq3wvDTnhCEKA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=QxAl6v0Z; arc=fail smtp.client-ip=40.93.201.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=L9L7z5atLzYfELum4vtCQ3YBG3HIYw+g4X9dLMwbS8AocL3U/qt8oM+sun1icvLwYS7WbiuynNzFAH3upBuAzCxqVL29qHrtjwrnvIK7+VUpWJoJ3hPHITKjfmzso1EDJQHO3ey7HDN15DqDTWdOgT7cR7iQNqoWJ5nw8TyCpZFj0T1ZjNToqPVFjcioCAsdQlT42xNnPPrdK+wazNFZeU4Bo0gu6hIJFPjINKXS9TmGcqlAX+MN/1QNRCNvtrPZrVpXB8FpuY0+PRZ0tX0TQdSvbCl3wYGzD+ApizVJFzIScypnHQLtgNAFm9qEo071mhk8mgl1vBEkdVYPie1mdQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HRUAvhswlXTjxItOfaddbFWL+g8ZPzce2hyeQYqbcHg=;
+ b=WzLOwyjsQK7KBCWXfQwbXLwSscSKyYE83lJONVHkuW022ZVsbJ6FfQzVLnNQTLmpFXq96RiWxQOKEOP/DM+SQbB4dK1JIg++AF5hSgsNEb07/dA3WXQDj9kZ5gNK6nhFPtlIBGsyuS1vqC15l9e5azwg/8keXgVIJjMMxS3acEH/p5C1pXqrdIv2cGQ5Wwl9NaxLV8AM4U9cesnjpluatBMOL1QmhwxIMHppFxAjq6RkQjTFck/qv5NCf97BsXDQPoSJqaDphKyNZFb46sgBkiMGvCfp3ra+8Q2ROkqehy/Bl0ir56eAppongLG1GapTCUa4wzeFHMMCg+q+vsSrFQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HRUAvhswlXTjxItOfaddbFWL+g8ZPzce2hyeQYqbcHg=;
+ b=QxAl6v0Zk2IVqyripze72rmq1ZZ26xmF+Fa2A5IOpI2226/2M88lDgK0PWg50u1iR+pVSoYyLx4ynlN2P/X1k22jDOACSY6cMxTuPVOg/W5RnSMfaAsPzW0kz2AQ3347M3Pfxn1rV5kGDbJrTq8k6T9k0O0GuHCETU4o9t/oFzs=
+Received: from SA0PR11CA0038.namprd11.prod.outlook.com (2603:10b6:806:d0::13)
+ by CYXPR12MB9426.namprd12.prod.outlook.com (2603:10b6:930:e3::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.4; Fri, 9 Jan
+ 2026 07:48:11 +0000
+Received: from SN1PEPF000252A4.namprd05.prod.outlook.com
+ (2603:10b6:806:d0:cafe::2d) by SA0PR11CA0038.outlook.office365.com
+ (2603:10b6:806:d0::13) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9499.2 via Frontend Transport; Fri, 9
+ Jan 2026 07:48:05 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ SN1PEPF000252A4.mail.protection.outlook.com (10.167.242.11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9520.1 via Frontend Transport; Fri, 9 Jan 2026 07:48:11 +0000
+Received: from airavat.amd.com (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 9 Jan
+ 2026 01:48:05 -0600
+From: Raju Rangoju <Raju.Rangoju@amd.com>
+To: <netdev@vger.kernel.org>
+CC: <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
+	<davem@davemloft.net>, <andrew+netdev@lunn.ch>, <Shyam-sundar.S-k@amd.com>,
+	Vishal Badole <Vishal.Badole@amd.com>, Raju Rangoju <Raju.Rangoju@amd.com>
+Subject: [PATCH net-next] xgbe: Use netlink extack to report errors to ethtool
+Date: Fri, 9 Jan 2026 13:17:46 +0530
+Message-ID: <20260109074746.3350059-1-Raju.Rangoju@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] net: phy: realtek: add PHY driver for
- RTL8127ATF
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- Michael Klein <michael@fossekall.de>,
- Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Aleksander Jan Bajkowski <olek2@wp.pl>,
- Fabio Baltieri <fabio.baltieri@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <52011433-79d3-4097-a2d3-d1cca1f66acb@gmail.com>
- <492763d9-9ece-41a1-a542-d09d9b77ab4a@gmail.com>
- <aWA2DswjBcFWi8eA@makrotopia.org>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <aWA2DswjBcFWi8eA@makrotopia.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF000252A4:EE_|CYXPR12MB9426:EE_
+X-MS-Office365-Filtering-Correlation-Id: dc6507b0-ca78-4728-3399-08de4f53702a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024|7142099003;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?rpZfiKadHQ4OaAZ9oh69HeEoSqXByK+qyd5BAY0C3D9plD+sMCckq/A+ODKH?=
+ =?us-ascii?Q?hHTp3I5knw4HZWQwKT20tUF//2whQEOILRJL8HXGdNazom/EcATESeJjhk+S?=
+ =?us-ascii?Q?dblZMpNnnV9Kd+XPWCT0jqjLeT7JcEXPQmmw1PIPQkIz6JiuvEvZGLdAv2vw?=
+ =?us-ascii?Q?Z1PTgF2wXp0nrdEn8g9mLEuf+lb6AIs9A+Oi9rcWzFxqIBLPV5KMXJXKXp+X?=
+ =?us-ascii?Q?RG/g8H3n86ftzAuDTBQqOsCvf6+WxTVRTgvZIiQVStw/l5go+ZG5xMq5WIow?=
+ =?us-ascii?Q?MNK4Y53iH6XfViXtGwP9pE2/uMiLLHNsJniIocHMSB5NCBJrPUGOZWjnQ8NT?=
+ =?us-ascii?Q?xxQy0RQ19NKGz3rN3hpmA8eF+CkP3Ni0GvD9BIQ5e0b7xuHu0XhdV3CFK5TU?=
+ =?us-ascii?Q?SrWY6DZ7YSFbybufO5mvF/ZeuiGl+Vgt2Uxh5X72cnsJsDk2/2LNu1EVA2Kq?=
+ =?us-ascii?Q?Ta8rGbpy31+yQXD/Z9S9kH2ADyUGQg6Y7qLmVyBsZ3r/kVhd81k7DApjCUC9?=
+ =?us-ascii?Q?pKY/9JzntAZVdQtW1arb/YZy/zvE2EsLPv8Asi/P9QNaBL2s6i+zCLvLaKfW?=
+ =?us-ascii?Q?AG2NBlP09Fmu//1T0ncKYpRlfbVk2de1wEZW6YWT5e9XxEE4Iy6tfLwOUv+C?=
+ =?us-ascii?Q?HYzxXSvibij+14UfR5o4gsw/cv89J9IMHmjmycJ/gMm5BMlX4rRKngwQ4lcF?=
+ =?us-ascii?Q?mOL8YqEKkolCBqsPhm5AU1L01wn2eEbVHuuoDhnnjMMozghKj116GVQU8eP1?=
+ =?us-ascii?Q?H0jhZ1bhiTdiToN9h/1NciN5+pERZ4uq1J25xiyQd8b3fA9hXEw/eziLjqZP?=
+ =?us-ascii?Q?5FqWJbdwp5H6XO8OkRONR57juCvT6moZUkUiBAPNYiJJ6LW3z3ZKROXNVMHx?=
+ =?us-ascii?Q?qcVWcwjJiQJ5SNQRJEMPwOdGI0aZfzLafYSjSS5EJWG7UZZAPCDAyopgW4BD?=
+ =?us-ascii?Q?3OvSdkKYW11mHSrdPumGE6K8JAFWHrMCRnTbauqmYF1gA3j9Dwy/yJkynOD0?=
+ =?us-ascii?Q?A9ScbZcfHxHn1H4Dz9R+aJIRkEnZvE4EkZCTFvegCNFHHsuZ2TjGBswTnb9u?=
+ =?us-ascii?Q?tZKuRmv0S756o5ez8qNUHcgJw2JSYH5bi9RXe8ivVh2Bjv5iRWSwZS8zzHH6?=
+ =?us-ascii?Q?Z2l7bSge0tlnNsFDZe1yIMb3FeAgSI/W8s8HCTCgWQnorEj+yGj4VUA/Jo4/?=
+ =?us-ascii?Q?H2c36A+q6UNh0+tHuBMzOFmXlenE9216YEUo+vnRy0gb/p2whP7nkoPvaeVn?=
+ =?us-ascii?Q?2DUC8Qs+pptEUEEO1ClRVk1QJZxsJPpHcYgKSSeHGlVOaI7VDXItCDpqxtep?=
+ =?us-ascii?Q?b4pQLwHZWxZkZWp9LbwYr/FWwWoAK34ELgV0tl95sn8N1ey4mElLsJaux0dw?=
+ =?us-ascii?Q?btMde9MKoJo363l25YITjs4ngJQ4HLQOH0+f+nKjAdMCyPKu4Q5jMGa7vLG0?=
+ =?us-ascii?Q?mo4qNVtIng4UTjw8WqqPd7qMrPAv79+r48A/Zgw0YYVlQnMxqzBE5Nr2XFgg?=
+ =?us-ascii?Q?oRu5boPlkz8ESxco8l0fBZAzt+i2RLURZVFYYOSB5w1t+dxc/WnZmrTAI522?=
+ =?us-ascii?Q?q+tmp+NtqxLg+dM6G7Q=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024)(7142099003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jan 2026 07:48:11.5224
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: dc6507b0-ca78-4728-3399-08de4f53702a
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF000252A4.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR12MB9426
 
-On 1/8/2026 11:56 PM, Daniel Golle wrote:
-> On Thu, Jan 08, 2026 at 09:27:06PM +0100, Heiner Kallweit wrote:
->> RTL8127ATF supports a SFP+ port for fiber modules (10GBASE-SR/LR/ER/ZR and
->> DAC). The list of supported modes was provided by Realtek. According to the
->> r8127 vendor driver also 1G modules are supported, but this needs some more
->> complexity in the driver, and only 10G mode has been tested so far.
->> Therefore mainline support will be limited to 10G for now.
->> The SFP port signals are hidden in the chip IP and driven by firmware.
->> Therefore mainline SFP support can't be used here.
->> This PHY driver is used by the RTL8127ATF support in r8169.
->> RTL8127ATF reports the same PHY ID as the TP version. Therefore use a dummy
->> PHY ID.  This PHY driver is used by the RTL8127ATF support in r8169.
->>
->> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
->> ---
->>  MAINTAINERS                            |  1 +
->>  drivers/net/phy/realtek/realtek_main.c | 54 ++++++++++++++++++++++++++
->>  include/linux/realtek_phy.h            |  7 ++++
->>  3 files changed, 62 insertions(+)
->>  create mode 100644 include/linux/realtek_phy.h
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 765ad2daa21..6ede656b009 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -9416,6 +9416,7 @@ F:	include/linux/phy_link_topology.h
->>  F:	include/linux/phylib_stubs.h
->>  F:	include/linux/platform_data/mdio-bcm-unimac.h
->>  F:	include/linux/platform_data/mdio-gpio.h
->> +F:	include/linux/realtek_phy.h
->>  F:	include/trace/events/mdio.h
->>  F:	include/uapi/linux/mdio.h
->>  F:	include/uapi/linux/mii.h
->> diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
->> index eb5b540ada0..b57ef0ce15a 100644
->> --- a/drivers/net/phy/realtek/realtek_main.c
->> +++ b/drivers/net/phy/realtek/realtek_main.c
->> @@ -16,6 +16,7 @@
->>  #include <linux/module.h>
->>  #include <linux/delay.h>
->>  #include <linux/clk.h>
->> +#include <linux/realtek_phy.h>
->>  #include <linux/string_choices.h>
->>  
->>  #include "../phylib.h"
->> @@ -2100,6 +2101,45 @@ static irqreturn_t rtl8221b_handle_interrupt(struct phy_device *phydev)
->>  	return IRQ_HANDLED;
->>  }
->>  
->> +static int rtlgen_sfp_get_features(struct phy_device *phydev)
->> +{
->> +	linkmode_set_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
->> +			 phydev->supported);
->> +
->> +	/* set default mode */
->> +	phydev->speed = SPEED_10000;
->> +	phydev->duplex = DUPLEX_FULL;
->> +
->> +	phydev->port = PORT_FIBRE;
->> +
->> +	return 0;
->> +}
->> +
->> +static int rtlgen_sfp_read_status(struct phy_device *phydev)
->> +{
->> +	int val, err;
->> +
->> +	err = genphy_update_link(phydev);
->> +	if (err)
->> +		return err;
->> +
->> +	if (!phydev->link)
->> +		return 0;
->> +
->> +	val = rtlgen_read_vend2(phydev, RTL_VND2_PHYSR);
-> 
-> This should be the same as
-> phy_read(phydev, MII_RESV2); /* on page 0 */
-> Please try.
-> 
+From: Vishal Badole <Vishal.Badole@amd.com>
 
-In case of an integrated PHY a phy_read() effectively is translated
-into a rtlgen_read_vend2(). So technically there's no benefit.
+Upgrade XGBE driver to report errors via netlink extack instead
+of netdev_error so ethtool userspace can be aware of failures.
 
-I don't have hw with RTL8127ATF, but maybe Fabio can test.
+Signed-off-by: Vishal Badole <Vishal.Badole@amd.com>
+Reviewed-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
+---
+ drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c | 46 +++++++++++---------
+ 1 file changed, 26 insertions(+), 20 deletions(-)
 
-> 
->> +	if (val < 0)
->> +		return val;
->> +
->> +	rtlgen_decode_physr(phydev, val);
->> +
->> +	return 0;
->> +}
->> +
->> +static int rtlgen_sfp_config_aneg(struct phy_device *phydev)
->> +{
->> +	return 0;
->> +}
->> +
->>  static struct phy_driver realtek_drvs[] = {
->>  	{
->>  		PHY_ID_MATCH_EXACT(0x00008201),
->> @@ -2361,6 +2401,20 @@ static struct phy_driver realtek_drvs[] = {
->>  		.write_page	= rtl821x_write_page,
->>  		.read_mmd	= rtl822x_read_mmd,
->>  		.write_mmd	= rtl822x_write_mmd,
->> +	}, {
->> +		PHY_ID_MATCH_EXACT(PHY_ID_RTL_DUMMY_SFP),
->> +		.name		= "Realtek SFP PHY Mode",
->> +		.flags		= PHY_IS_INTERNAL,
->> +		.probe		= rtl822x_probe,
->> +		.get_features	= rtlgen_sfp_get_features,
->> +		.config_aneg	= rtlgen_sfp_config_aneg,
->> +		.read_status	= rtlgen_sfp_read_status,
->> +		.suspend	= genphy_suspend,
->> +		.resume		= rtlgen_resume,
->> +		.read_page	= rtl821x_read_page,
->> +		.write_page	= rtl821x_write_page,
->> +		.read_mmd	= rtl822x_read_mmd,
->> +		.write_mmd	= rtl822x_write_mmd,
->>  	}, {
->>  		PHY_ID_MATCH_EXACT(0x001ccad0),
->>  		.name		= "RTL8224 2.5Gbps PHY",
->> diff --git a/include/linux/realtek_phy.h b/include/linux/realtek_phy.h
->> new file mode 100644
->> index 00000000000..d683bc1b065
->> --- /dev/null
->> +++ b/include/linux/realtek_phy.h
->> @@ -0,0 +1,7 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +#ifndef _REALTEK_PHY_H
->> +#define _REALTEK_PHY_H
->> +
->> +#define	PHY_ID_RTL_DUMMY_SFP	0x001ccbff
->> +
->> +#endif /* _REALTEK_PHY_H */
->> -- 
->> 2.52.0
->>
->>
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
+index 0d19b09497a0..0d1e979c864e 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
+@@ -362,13 +362,16 @@ static int xgbe_set_coalesce(struct net_device *netdev,
+ 
+ 	/* Check the bounds of values for Rx */
+ 	if (rx_riwt > XGMAC_MAX_DMA_RIWT) {
+-		netdev_err(netdev, "rx-usec is limited to %d usecs\n",
+-			   hw_if->riwt_to_usec(pdata, XGMAC_MAX_DMA_RIWT));
++		NL_SET_ERR_MSG_FMT_MOD(extack,
++				       "rx-usec is limited to %d usecs\n",
++				       hw_if->riwt_to_usec(pdata,
++							   XGMAC_MAX_DMA_RIWT));
+ 		return -EINVAL;
+ 	}
+ 	if (rx_frames > pdata->rx_desc_count) {
+-		netdev_err(netdev, "rx-frames is limited to %d frames\n",
+-			   pdata->rx_desc_count);
++		NL_SET_ERR_MSG_FMT_MOD(extack,
++				       "rx-frames is limited to %d frames\n",
++				       pdata->rx_desc_count);
+ 		return -EINVAL;
+ 	}
+ 
+@@ -387,8 +390,9 @@ static int xgbe_set_coalesce(struct net_device *netdev,
+ 		return -EINVAL;
+ 	}
+ 	if (tx_frames > pdata->tx_desc_count) {
+-		netdev_err(netdev, "tx-frames is limited to %d frames\n",
+-			   pdata->tx_desc_count);
++		NL_SET_ERR_MSG_FMT_MOD(extack,
++				       "tx-frames is limited to %d frames\n",
++				       pdata->tx_desc_count);
+ 		return -EINVAL;
+ 	}
+ 
+@@ -474,7 +478,7 @@ static int xgbe_set_rxfh(struct net_device *netdev,
+ 
+ 	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
+ 	    rxfh->hfunc != ETH_RSS_HASH_TOP) {
+-		netdev_err(netdev, "unsupported hash function\n");
++		NL_SET_ERR_MSG_FMT_MOD(extack, "unsupported hash function\n");
+ 		return -EOPNOTSUPP;
+ 	}
+ 
+@@ -561,37 +565,39 @@ static int xgbe_set_ringparam(struct net_device *netdev,
+ 	unsigned int rx, tx;
+ 
+ 	if (ringparam->rx_mini_pending || ringparam->rx_jumbo_pending) {
+-		netdev_err(netdev, "unsupported ring parameter\n");
++		NL_SET_ERR_MSG_FMT_MOD(extack, "unsupported ring parameter\n");
+ 		return -EINVAL;
+ 	}
+ 
+ 	if ((ringparam->rx_pending < XGBE_RX_DESC_CNT_MIN) ||
+ 	    (ringparam->rx_pending > XGBE_RX_DESC_CNT_MAX)) {
+-		netdev_err(netdev,
+-			   "rx ring parameter must be between %u and %u\n",
+-			   XGBE_RX_DESC_CNT_MIN, XGBE_RX_DESC_CNT_MAX);
++		NL_SET_ERR_MSG_FMT_MOD(extack,
++				       "rx ring parameter must be between %u and %u\n",
++				       XGBE_RX_DESC_CNT_MIN,
++				       XGBE_RX_DESC_CNT_MAX);
+ 		return -EINVAL;
+ 	}
+ 
+ 	if ((ringparam->tx_pending < XGBE_TX_DESC_CNT_MIN) ||
+ 	    (ringparam->tx_pending > XGBE_TX_DESC_CNT_MAX)) {
+-		netdev_err(netdev,
+-			   "tx ring parameter must be between %u and %u\n",
+-			   XGBE_TX_DESC_CNT_MIN, XGBE_TX_DESC_CNT_MAX);
++		NL_SET_ERR_MSG_FMT_MOD(extack,
++				       "tx ring parameter must be between %u and %u\n",
++				       XGBE_TX_DESC_CNT_MIN,
++				       XGBE_TX_DESC_CNT_MAX);
+ 		return -EINVAL;
+ 	}
+ 
+ 	rx = __rounddown_pow_of_two(ringparam->rx_pending);
+ 	if (rx != ringparam->rx_pending)
+-		netdev_notice(netdev,
+-			      "rx ring parameter rounded to power of two: %u\n",
+-			      rx);
++		NL_SET_ERR_MSG_FMT_MOD(extack,
++				       "rx ring parameter rounded to power of two: %u\n",
++				       rx);
+ 
+ 	tx = __rounddown_pow_of_two(ringparam->tx_pending);
+ 	if (tx != ringparam->tx_pending)
+-		netdev_notice(netdev,
+-			      "tx ring parameter rounded to power of two: %u\n",
+-			      tx);
++		NL_SET_ERR_MSG_FMT_MOD(extack,
++				       "tx ring parameter rounded to power of two: %u\n",
++				       tx);
+ 
+ 	if ((rx == pdata->rx_desc_count) &&
+ 	    (tx == pdata->tx_desc_count))
+-- 
+2.34.1
 
 
