@@ -1,260 +1,211 @@
-Return-Path: <netdev+bounces-248437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79096D087AF
-	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 11:16:29 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85F47D087DF
+	for <lists+netdev@lfdr.de>; Fri, 09 Jan 2026 11:17:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6CD19303C67F
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 10:13:40 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8DDCF30011AA
+	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 10:15:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C07F3375AA;
-	Fri,  9 Jan 2026 10:13:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BB78337BA1;
+	Fri,  9 Jan 2026 10:15:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NBjU0aNp"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="GXP9kHST"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36CF8336EC5
-	for <netdev@vger.kernel.org>; Fri,  9 Jan 2026 10:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EA632E732;
+	Fri,  9 Jan 2026 10:15:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767953609; cv=none; b=fnqxJoX3rrEh8BH2qcQH85aXOds/Gg9+cMnKLDqTq2FjZ36yCwN//hvPbanKuyAK0NLB3QCfthNcQVqQo2zccLLw1LSG+wsp1nbVdUpIb0l4jlAtqC0x90Tbdg1rzhHT516ydB+EEIoGhuqlXFpqISoCyEGEko31aFjzMSpeYG8=
+	t=1767953706; cv=none; b=qCSTNUajhmk79XHYFc/YzB6S3yrj2U5nhyk2kqEirUqkKykJxVrsbB4FPobU8FhO4e/1dDPwjh0pEmGMac5FQWFCQMpXFSQ1FgBHGt8JYyTNBsePtEk1t+XpAZt1n7FLZIzzjdNbIGBgafn6zd9XIC7EdjrsXlx58Ntkh4oJGtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767953609; c=relaxed/simple;
-	bh=LZv7VbJVZNPCl/GQ3+7aKwn27qsXY6G1rJO/vD5EKeI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TGWCJMDTKFRW5l90GVaVkhmjoEH8/YHIgzI+G9LLTzRTU+Ef3XkdyPPBlol+eUNPB1f2v6z4M5qRBPCmplH6HIKp7enKlCUs5yawCztXlke4bx95k386I+0CYxSASyorsZnWmCB6ATsxFlbQ9hz/OoYS7C8FRbAiy7njAKm1OnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NBjU0aNp; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-64b608ffca7so6204955a12.3
-        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 02:13:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767953605; x=1768558405; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=T0HVCB8h37LjRdbYf+NBimR89qCOjk6XADJ4vCRu8yk=;
-        b=NBjU0aNpmbNHIQOm7TpGa+/AM3fOQs1WOoVaQVyTILoCzyWsmZcZfygTkCNfrrIkG5
-         2QFy0D31yIKIeTg5cLLWXGaPiPmpfRXT1no0xtO0906kh6bUuFe8g2woH8BOYeTLRh5w
-         k3mWSpJla5007ZYNH2v98MfDJ18iGyQvD+ypAVSYuXaoixuEuLgtXPZnFsT/HMVejuOn
-         X+eWZI4tNW+wtw8rQlOladLjZUD8kumNdFnqGQio6rOAw2cad5ZWYXJU9oyFnzrhsLAM
-         FsEiI9AaXvr8BTOcqrGNbufH2Q9na8nen3zVMep6Cz0srQm522Fulj2RMmaCBUlZNekM
-         q72g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767953605; x=1768558405;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T0HVCB8h37LjRdbYf+NBimR89qCOjk6XADJ4vCRu8yk=;
-        b=rTLHUSDKIHKAbiWP6/DsmE7dXvDOnbI3+44wx02kyPvCTMNe5Iv7NrJew1xCikQXaz
-         fd5RLS/L1fxe4VM9KXL94YbVnqTLONOiJdG0NhhS+VlnZ7kwlSAuu2FInSYeQY4C2esS
-         JkWtIPgd5i9IyO+rz7vBkPmaqRNBpb5vCx+hnfg6gWUTbUEYwOoBMgPLKTwUlUBpqU//
-         8qSU7ZngyEo0pHMoXc2KRBToyInVBHyD7bNh9v6wToQztIyxj1bBNByervEifNKf6qr4
-         b1ZommnamQ+2fRC+wwqGOfRaD9nLRwEZPKtApP1swOcF2qkk27cG4ft71twWMv30qjq1
-         TnrQ==
-X-Gm-Message-State: AOJu0YxD+wYi5h1eB42ebz9XqVVNgpn2gEc+JsP+5z7Oxi2DrerBTarW
-	gl3zTPCc1FLnKTuk+UPb+6YowsJPDvzWHoJFjHddHGIfYWiedmCVrOA2
-X-Gm-Gg: AY/fxX40+OQygnpO/SLM7iX/Twm9nZIgeGnnfUE6/ncK3EfURCd1h04zQ+tKITa45nq
-	xymc74OWCYNUC7ABCqjVNXjMmwve3uLOtRLWw9QAoc1M7021XyFKTlr4kqdqLfDkPTCY4yN+GS+
-	buHuJF1/cgyUV0jMOdfNO0GZwrLQnhj9QqqVsGpaof22g8U6PeBXUb+un8tN9DHW+qkurOfVAHs
-	/uCLm+mvAHWKb8fCAJIgINnaqyVrIr9onCRfD1RSiiNhGeK2DuBNOoZp6hMNR/v9xnnCsgCj+ZJ
-	5uElrTdDmQX10JRtZ8l89TB+ylDe5oSC8ZA2VP8c1+ouvRGSFlvxqEfYyFRanUwhZucfkzCwufU
-	Ck5tI0c53jT1dxagBxVRU4HEI7gcQNLLiH9CwCVTZo8pWb6cewbDm4ND9L8y0giOt8JlRoKzn3P
-	fnDqSmkecQN445nBw=
-X-Google-Smtp-Source: AGHT+IHAs6M6/6d6TDseCaw58asjnE8jcwm8lPKvdScGi5kyj3ItTa1ERPN4RKKTaHnv8Pk62CNf+Q==
-X-Received: by 2002:aa7:cf97:0:b0:64d:17af:81d4 with SMTP id 4fb4d7f45d1cf-65097e494a5mr6938930a12.20.1767953605213;
-        Fri, 09 Jan 2026 02:13:25 -0800 (PST)
-Received: from builder.. ([2001:9e8:f116:2816:be24:11ff:fe30:5d85])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6507bf661fesm10688575a12.25.2026.01.09.02.13.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jan 2026 02:13:24 -0800 (PST)
-From: Jonas Jelonek <jelonek.jonas@gmail.com>
-To: Russell King <linux@armlinux.org.uk>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Jonas Jelonek <jelonek.jonas@gmail.com>
-Subject: [PATCH net-next v4] net: sfp: add SMBus I2C block support
-Date: Fri,  9 Jan 2026 10:13:21 +0000
-Message-ID: <20260109101321.2804-1-jelonek.jonas@gmail.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1767953706; c=relaxed/simple;
+	bh=o7JZKnKjaE69MTIhA9EF55nlKQYXzW6zANd0/gTwhds=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Qde/nN9w/72DnEgL+K48A+d8i8GzuiC6BHYuFwXQYmJYZHsgPoHrU3NPH9RAbBd+HdrBwRV+EVcNZllMotgTrm9PhPUewb+gHrien31R/8pzCSeLWNOyjC6U5hKS4fZs6QJF4WdMePeRXQL2MbSfYAJoIdtug8kME2voMOGoLSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=GXP9kHST; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+Received: from [129.217.186.165] ([129.217.186.165])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 609AEsWt003313
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Fri, 9 Jan 2026 11:14:55 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1767953695;
+	bh=o7JZKnKjaE69MTIhA9EF55nlKQYXzW6zANd0/gTwhds=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=GXP9kHSTN96tyHIbLuG+YZD3/mt0iz1I0EFcEetx3SCrvbAGGmoA+xpesYfSArqss
+	 9Rtv1DtbTrhfUSQRhy3+zRbDYgaOpeaoG8FYzTwplvLFhAXTMAyavRGimTtYAfovAU
+	 qTAMhF85wHOtgLHFSDFyWj+cBM2+CT5bpXDYk1EI=
+Message-ID: <900c364b-f5ca-4458-a711-bf3e0433b537@tu-dortmund.de>
+Date: Fri, 9 Jan 2026 11:14:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH net-next v7 9/9] tun/tap & vhost-net: avoid ptr_ring tail-drop
+ when qdisc is present
+To: Jason Wang <jasowang@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com,
+        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
+ <20260107210448.37851-10-simon.schippers@tu-dortmund.de>
+ <CACGkMEuQikCsHn9cdhVxxHbjKAyW288SPNxAyXQ7FWNxd7Qenw@mail.gmail.com>
+ <bd41afae-cf1e-46ab-8948-4c7fa280b20f@tu-dortmund.de>
+ <CACGkMEs8VHGjiLqn=-Gt5=WPMzqAXNM2GcK73dLarP9CQw3+rw@mail.gmail.com>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <CACGkMEs8VHGjiLqn=-Gt5=WPMzqAXNM2GcK73dLarP9CQw3+rw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Commit 7662abf4db94 ("net: phy: sfp: Add support for SMBus module access")
-added support for SMBus-only controllers for module access. However,
-this is restricted to single-byte accesses and has the implication that
-hwmon is disabled (due to missing atomicity of 16-bit accesses) and
-warnings are printed.
+On 1/9/26 07:09, Jason Wang wrote:
+> On Thu, Jan 8, 2026 at 4:02 PM Simon Schippers
+> <simon.schippers@tu-dortmund.de> wrote:
+>>
+>> On 1/8/26 05:37, Jason Wang wrote:
+>>> On Thu, Jan 8, 2026 at 5:06 AM Simon Schippers
+>>> <simon.schippers@tu-dortmund.de> wrote:
+>>>>
+>>>> This commit prevents tail-drop when a qdisc is present and the ptr_ring
+>>>> becomes full. Once an entry is successfully produced and the ptr_ring
+>>>> reaches capacity, the netdev queue is stopped instead of dropping
+>>>> subsequent packets.
+>>>>
+>>>> If producing an entry fails anyways, the tun_net_xmit returns
+>>>> NETDEV_TX_BUSY, again avoiding a drop. Such failures are expected because
+>>>> LLTX is enabled and the transmit path operates without the usual locking.
+>>>> As a result, concurrent calls to tun_net_xmit() are not prevented.
+>>>>
+>>>> The existing __{tun,tap}_ring_consume functions free space in the
+>>>> ptr_ring and wake the netdev queue. Races between this wakeup and the
+>>>> queue-stop logic could leave the queue stopped indefinitely. To prevent
+>>>> this, a memory barrier is enforced (as discussed in a similar
+>>>> implementation in [1]), followed by a recheck that wakes the queue if
+>>>> space is already available.
+>>>>
+>>>> If no qdisc is present, the previous tail-drop behavior is preserved.
+>>>>
+>>>> +-------------------------+-----------+---------------+----------------+
+>>>> | pktgen benchmarks to    | Stock     | Patched with  | Patched with   |
+>>>> | Debian VM, i5 6300HQ,   |           | noqueue qdisc | fq_codel qdisc |
+>>>> | 10M packets             |           |               |                |
+>>>> +-----------+-------------+-----------+---------------+----------------+
+>>>> | TAP       | Transmitted | 196 Kpps  | 195 Kpps      | 185 Kpps       |
+>>>> |           +-------------+-----------+---------------+----------------+
+>>>> |           | Lost        | 1618 Kpps | 1556 Kpps     | 0              |
+>>>> +-----------+-------------+-----------+---------------+----------------+
+>>>> | TAP       | Transmitted | 577 Kpps  | 582 Kpps      | 578 Kpps       |
+>>>> |  +        +-------------+-----------+---------------+----------------+
+>>>> | vhost-net | Lost        | 1170 Kpps | 1109 Kpps     | 0              |
+>>>> +-----------+-------------+-----------+---------------+----------------+
+>>>>
+>>>> [1] Link: https://lore.kernel.org/all/20250424085358.75d817ae@kernel.org/
+>>>>
+>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>> ---
+>>>>  drivers/net/tun.c | 31 +++++++++++++++++++++++++++++--
+>>>>  1 file changed, 29 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>>>> index 71b6981d07d7..74d7fd09e9ba 100644
+>>>> --- a/drivers/net/tun.c
+>>>> +++ b/drivers/net/tun.c
+>>>> @@ -1008,6 +1008,8 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+>>>>         struct netdev_queue *queue;
+>>>>         struct tun_file *tfile;
+>>>>         int len = skb->len;
+>>>> +       bool qdisc_present;
+>>>> +       int ret;
+>>>>
+>>>>         rcu_read_lock();
+>>>>         tfile = rcu_dereference(tun->tfiles[txq]);
+>>>> @@ -1060,13 +1062,38 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+>>>>
+>>>>         nf_reset_ct(skb);
+>>>>
+>>>> -       if (ptr_ring_produce(&tfile->tx_ring, skb)) {
+>>>> +       queue = netdev_get_tx_queue(dev, txq);
+>>>> +       qdisc_present = !qdisc_txq_has_no_queue(queue);
+>>>> +
+>>>> +       spin_lock(&tfile->tx_ring.producer_lock);
+>>>> +       ret = __ptr_ring_produce(&tfile->tx_ring, skb);
+>>>> +       if (__ptr_ring_produce_peek(&tfile->tx_ring) && qdisc_present) {
+>>>> +               netif_tx_stop_queue(queue);
+>>>> +               /* Avoid races with queue wake-up in
+>>>> +                * __{tun,tap}_ring_consume by waking if space is
+>>>> +                * available in a re-check.
+>>>> +                * The barrier makes sure that the stop is visible before
+>>>> +                * we re-check.
+>>>> +                */
+>>>> +               smp_mb__after_atomic();
+>>>> +               if (!__ptr_ring_produce_peek(&tfile->tx_ring))
+>>>> +                       netif_tx_wake_queue(queue);
+>>>
+>>> I'm not sure I will get here, but I think those should be moved to the
+>>> following if(ret) check. If __ptr_ring_produce() succeed, there's no
+>>> need to bother with those queue stop/wake logic?
+>>
+>> There is a need for that. If __ptr_ring_produce_peek() returns -ENOSPC,
+>> we stop the queue proactively.
+> 
+> This seems to conflict with the following NETDEV_TX_BUSY. Or is
+> NETDEV_TX_BUSY prepared for the xdp_xmit?
 
-There are probably a lot of SMBus-only I2C controllers out in the wild
-which support block reads. Right now, they don't work with SFP modules.
-This applies - amongst others - to I2C/SMBus-only controllers in Realtek
-longan and mango SoCs.
+Am I not allowed to stop the queue and then return NETDEV_TX_BUSY?
+And I do not understand the connection with xdp_xmit.
 
-Downstream in OpenWrt, a patch similar to the abovementioned patch is
-used for current LTS kernel 6.12. However, this uses byte-access for all
-kinds of access and thus disregards the atomicity for wider access.
-
-Introduce read/write SMBus I2C block operations to support SMBus-only
-controllers with appropriate support for block read/write. Those
-operations are used for all accesses if supported, otherwise the
-single-byte operations will be used. With block reads, atomicity for
-16-bit reads as required by hwmon is preserved and thus, hwmon can be
-used.
-
-The implementation requires the I2C_FUNC_SMBUS_I2C_BLOCK to be
-supported as it relies on reading a pre-defined amount of bytes.
-This isn't intended by the official SMBus Block Read but supported by
-several I2C controllers/drivers.
-
-Support for word access is not implemented due to issues regarding
-endianness.
-
-Signed-off-by: Jonas Jelonek <jelonek.jonas@gmail.com>
-
----
-changes since v4:
-- fix formal issues
-v3: https://lore.kernel.org/netdev/20260105161242.578487-1-jelonek.jonas@gmail.com/
-
-changes since v2:
-- fix previous attempt of v2 to fix return value
-v2: https://lore.kernel.org/netdev/20260105154653.575397-1-jelonek.jonas@gmail.com/
-
-changes since v1:
-- return number of written bytes instead of zero
-v1: https://lore.kernel.org/netdev/20251228213331.472887-1-jelonek.jonas@gmail.com/
----
- drivers/net/phy/sfp.c | 77 +++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 75 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index 84bef5099dda..a1deb80f630a 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -744,6 +744,35 @@ static int sfp_smbus_byte_read(struct sfp *sfp, bool a2, u8 dev_addr,
- 	return data - (u8 *)buf;
- }
- 
-+static int sfp_smbus_block_read(struct sfp *sfp, bool a2, u8 dev_addr,
-+				void *buf, size_t len)
-+{
-+	size_t block_size = sfp->i2c_block_size;
-+	union i2c_smbus_data smbus_data;
-+	u8 bus_addr = a2 ? 0x51 : 0x50;
-+	u8 *data = buf;
-+	u8 this_len;
-+	int ret;
-+
-+	while (len) {
-+		this_len = min(len, block_size);
-+
-+		smbus_data.block[0] = this_len;
-+		ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-+				     I2C_SMBUS_READ, dev_addr,
-+				     I2C_SMBUS_I2C_BLOCK_DATA, &smbus_data);
-+		if (ret < 0)
-+			return ret;
-+
-+		memcpy(data, &smbus_data.block[1], this_len);
-+		len -= this_len;
-+		data += this_len;
-+		dev_addr += this_len;
-+	}
-+
-+	return data - (u8 *)buf;
-+}
-+
- static int sfp_smbus_byte_write(struct sfp *sfp, bool a2, u8 dev_addr,
- 				void *buf, size_t len)
- {
-@@ -768,23 +797,67 @@ static int sfp_smbus_byte_write(struct sfp *sfp, bool a2, u8 dev_addr,
- 	return data - (u8 *)buf;
- }
- 
-+static int sfp_smbus_block_write(struct sfp *sfp, bool a2, u8 dev_addr,
-+				 void *buf, size_t len)
-+{
-+	size_t block_size = sfp->i2c_block_size;
-+	union i2c_smbus_data smbus_data;
-+	u8 bus_addr = a2 ? 0x51 : 0x50;
-+	u8 *data = buf;
-+	u8 this_len;
-+	int ret;
-+
-+	while (len) {
-+		this_len = min(len, block_size);
-+
-+		smbus_data.block[0] = this_len;
-+		memcpy(&smbus_data.block[1], data, this_len);
-+		ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-+				     I2C_SMBUS_WRITE, dev_addr,
-+				     I2C_SMBUS_I2C_BLOCK_DATA, &smbus_data);
-+		if (ret)
-+			return ret;
-+
-+		len -= this_len;
-+		data += this_len;
-+		dev_addr += this_len;
-+	}
-+
-+	return data - (u8 *)buf;
-+}
-+
- static int sfp_i2c_configure(struct sfp *sfp, struct i2c_adapter *i2c)
- {
-+	size_t max_block_size;
-+
- 	sfp->i2c = i2c;
- 
- 	if (i2c_check_functionality(i2c, I2C_FUNC_I2C)) {
- 		sfp->read = sfp_i2c_read;
- 		sfp->write = sfp_i2c_write;
--		sfp->i2c_max_block_size = SFP_EEPROM_BLOCK_SIZE;
-+		max_block_size = SFP_EEPROM_BLOCK_SIZE;
-+	} else if (i2c_check_functionality(i2c, I2C_FUNC_SMBUS_I2C_BLOCK)) {
-+		sfp->read = sfp_smbus_block_read;
-+		sfp->write = sfp_smbus_block_write;
-+
-+		max_block_size = SFP_EEPROM_BLOCK_SIZE;
-+		if (i2c->quirks && i2c->quirks->max_read_len)
-+			max_block_size = min(max_block_size,
-+					     i2c->quirks->max_read_len);
-+		if (i2c->quirks && i2c->quirks->max_write_len)
-+			max_block_size = min(max_block_size,
-+					     i2c->quirks->max_write_len);
-+
- 	} else if (i2c_check_functionality(i2c, I2C_FUNC_SMBUS_BYTE_DATA)) {
- 		sfp->read = sfp_smbus_byte_read;
- 		sfp->write = sfp_smbus_byte_write;
--		sfp->i2c_max_block_size = 1;
-+		max_block_size = 1;
- 	} else {
- 		sfp->i2c = NULL;
- 		return -EINVAL;
- 	}
- 
-+	sfp->i2c_max_block_size = max_block_size;
- 	return 0;
- }
- 
-
-base-commit: fc65403d55c3be44d19e6290e641433201345a5e
--- 
-2.48.1
-
+> 
+>>
+>> I believe what you are aiming for is to always stop the queue if(ret),
+>> which I can agree with. In that case, I would simply change the condition
+>> to:
+>>
+>> if (qdisc_present && (ret || __ptr_ring_produce_peek(&tfile->tx_ring)))
+>>
+>>>
+>>>> +       }
+>>>> +       spin_unlock(&tfile->tx_ring.producer_lock);
+>>>> +
+>>>> +       if (ret) {
+>>>> +               /* If a qdisc is attached to our virtual device,
+>>>> +                * returning NETDEV_TX_BUSY is allowed.
+>>>> +                */
+>>>> +               if (qdisc_present) {
+>>>> +                       rcu_read_unlock();
+>>>> +                       return NETDEV_TX_BUSY;
+>>>> +               }
+>>>>                 drop_reason = SKB_DROP_REASON_FULL_RING;
+>>>>                 goto drop;
+>>>>         }
+>>>>
+>>>>         /* dev->lltx requires to do our own update of trans_start */
+>>>> -       queue = netdev_get_tx_queue(dev, txq);
+>>>>         txq_trans_cond_update(queue);
+>>>>
+>>>>         /* Notify and wake up reader process */
+>>>> --
+>>>> 2.43.0
+>>>>
+>>>
+>>> Thanks
+>>>
+>>
+> 
+> Thanks
+> 
 
