@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-248648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F33A0D0CBDF
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 02:43:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FEC4D0CBE5
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 02:43:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C081A300F30A
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 01:43:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 09C41302CB9B
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 01:43:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43D6F1DF273;
-	Sat, 10 Jan 2026 01:43:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 685FD22F388;
+	Sat, 10 Jan 2026 01:43:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gC6V55cW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XPEBx8pG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EF972A1CF
-	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 01:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445832A1CF;
+	Sat, 10 Jan 2026 01:43:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768009411; cv=none; b=dElOUCC+DYmpVHSOs+Bdy6VUZYhNAdo3CMA+KG4WmMs174N7Yhh2qu0XdfsvaBRiBodM/KZbhkfZdermg4Ng0oAFXmnc45iZDN+zAcerzTo6cydo4NRAHtqFYw7DrXIi+zmgEpKhwLmDCBeNUy4EXfmJbmIw90JYOqoY6J4GMoM=
+	t=1768009418; cv=none; b=dpubXM+/oHv6odjfcFw1YZ3ZQib0VOOwor1OXwjBLcKpsrMJtpzn7Asrit1CmIbklpq7Xbsw7h4zhqiepLdS8xKvGmLW5Bmit+ylOq3WopuVh4u0YEtmW9eZjSIE10y+Upl4ZoZxxgCt0/6LrKTRKHO2QuEzzl1z5Gul3hK0HW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768009411; c=relaxed/simple;
-	bh=zbTuvh60RYa+x7sVZLNV0CzP5Fl2z8l5uEUjbH2vLbg=;
+	s=arc-20240116; t=1768009418; c=relaxed/simple;
+	bh=SooGb7Rs/BrumFC1Ul13PYFGR0gg7pXpiEHHkzi8YFs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=B86re63OJC0dq9stRPG4pI5UG4UkrY9bJ92FcJTI8YBhDvRLxoH550cxr0jZ1WytTE+dJJwNBLsxxt02UglBXQIny0aiAYEWZEpXfA/VVQM78AEQgwEhpr/lqjJlSSBaHl3MubecasjMrazTwWYRjlgmV1YwKaYGsQERR1Lvr48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gC6V55cW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9726C4CEF1;
-	Sat, 10 Jan 2026 01:43:30 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Cg42ne6e7whbOpZ8O1/+xfRReQb/BPQsOTmvkzldfFR+aX0ZLTl8G142rEXtXPt8kzllNjhQ1peHalW2gb24A3PiN/9wIe0gBN2JQ/e3UTp77wfRys5m+5vNLK0FdSVcwViC0DwENvfazuKVmVkaZQEPI9FhBqOCSfIrpyOiotk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XPEBx8pG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22AA0C4CEF1;
+	Sat, 10 Jan 2026 01:43:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768009410;
-	bh=zbTuvh60RYa+x7sVZLNV0CzP5Fl2z8l5uEUjbH2vLbg=;
+	s=k20201202; t=1768009418;
+	bh=SooGb7Rs/BrumFC1Ul13PYFGR0gg7pXpiEHHkzi8YFs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gC6V55cWmZQuEuoTikDyUUSQ0HZJ//nDTpkd6tiboyOj/ipPVacPedwS9c/Fgo9cE
-	 znFnqDQJgl/aoNdTe2NnUUmIujRaNJbEVV39rAkXUpxzEujYyQ38lrf1hq4bcnJ8UT
-	 165o2TMcyrlMBT5GdXL2C0TMb06Xt7AKWbdqZ6G/jyUEZg+/qjDOSW/uMNTcr5UieQ
-	 xTXvhMp6ZYny72GX5DTSfuiWfD3rjSRkljiI0oHurWLMPGsresPtSVb2Pyi3tnu/J9
-	 qeH4JiaHxApBLZ7lJrI2b1ngfRwiqY8FoqZqkwnhhZmIBL/uXW1rtcGEcRBSRn9pXI
-	 z1OGBTpeYV2yA==
+	b=XPEBx8pGrfJHcMd57d4WYXNWfp521AdH6BZmM3JYHPGKTipiZN/dY3jB+A3XpSjd3
+	 QzswL2NYRgrpIegzA71IEdmT8foAzU3P8wGGtNeXelLds0B1Zwot40WzFlsRMqhcnk
+	 Ce9qMxmywpwAYE8oaEQ+wPZXjG2O7vq1uP7QE4IuPyvQ8+cBL7g1T75tK6pgJjq7UQ
+	 4Y0rDgRNO6KT4PiGFQX4lKATxjwIiBJrlRXtzX813nbeKch9exFe0BnNuNL0y5yQ5S
+	 YVEcMC/2A7x0/ywqlYh+DL1sugQEoDa7x6UaGVY0FuhHCc8TBAZ8jOKcH3yAlJyl3Z
+	 OvlOMh6ReuM7Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 78A943AA9F46;
-	Sat, 10 Jan 2026 01:40:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2B8D3AA9F46;
+	Sat, 10 Jan 2026 01:40:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,42 +50,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 net] net: bridge: annotate data-races around
- fdb->{updated,used}
+Subject: Re: [PATCH net-next] selftests: forwarding: update PTP tcpdump
+ patterns
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176800920629.446502.13134188823510819845.git-patchwork-notify@kernel.org>
-Date: Sat, 10 Jan 2026 01:40:06 +0000
-References: <20260108093806.834459-1-edumazet@google.com>
-In-Reply-To: <20260108093806.834459-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netdev@vger.kernel.org, eric.dumazet@gmail.com,
- syzbot+bfab43087ad57222ce96@syzkaller.appspotmail.com, razor@blackwall.org,
- idosch@nvidia.com
+ <176800921377.446502.1178944732050569872.git-patchwork-notify@kernel.org>
+Date: Sat, 10 Jan 2026 01:40:13 +0000
+References: <20260107145320.1837464-1-kuba@kernel.org>
+In-Reply-To: <20260107145320.1837464-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
+ vladimir.oltean@nxp.com, alexander.sverdlin@gmail.com,
+ linux-kselftest@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu,  8 Jan 2026 09:38:06 +0000 you wrote:
-> fdb->updated and fdb->used are read and written locklessly.
+On Wed,  7 Jan 2026 06:53:19 -0800 you wrote:
+> Recent version of tcpdump (tcpdump-4.99.6-1.fc43.x86_64) seems to have
+> removed the spurious space after msg type in PTP info, e.g.:
 > 
-> Add READ_ONCE()/WRITE_ONCE() annotations.
+>  before:  PTPv2, majorSdoId: 0x0, msg type : sync msg, length: 44
+>  after:   PTPv2, majorSdoId: 0x0, msg type: sync msg, length: 44
 > 
-> Fixes: 31cbc39b6344 ("net: bridge: add option to allow activity notifications for any fdb entries")
-> Reported-by: syzbot+bfab43087ad57222ce96@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/695e3d74.050a0220.1c677c.035f.GAE@google.com/
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
-> Cc: Ido Schimmel <idosch@nvidia.com>
+> Update our patterns to match both.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3,net] net: bridge: annotate data-races around fdb->{updated,used}
-    https://git.kernel.org/netdev/net/c/b25a0b4a2193
+  - [net-next] selftests: forwarding: update PTP tcpdump patterns
+    https://git.kernel.org/netdev/net-next/c/68ec2b9fc59e
 
 You are awesome, thank you!
 -- 
