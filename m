@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-248766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78A7CD0DF34
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 00:32:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83A72D0DF3D
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 00:32:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C3FE8300E8F5
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 23:31:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3B8CA304A59C
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 23:31:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971522C08A1;
-	Sat, 10 Jan 2026 23:31:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C7602C15A2;
+	Sat, 10 Jan 2026 23:31:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DkgO+kDa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TEZmOEvS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756462BEFFE
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC63E27586C
 	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 23:31:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768087912; cv=none; b=i4iugWqMjMIj2PLj7jIC1EN9xHKG0umI6GUrxATYtnhG7zQw6vrZ1G0aSGUKY84Y2G8n02JkMdY7v8HrXG/9pdbzvLILBJ8Bn3amQPjAcTfNDbc4kNPlEhvCSsJN0z+gn3kByfS5YAZ9aEn847JG4npFu/QStsbbmvGueMAINUQ=
+	t=1768087913; cv=none; b=QIn9dtu6Nk4LidGeUCKX9p8fg3V9dxsYh9fkYv52d2RGeURbhADR36WxWiivJP5OD0nC4XzaWZWugCwBpBCjuRtO7KrCtJvopT5/RRoFfqtjWJ08o8UFFmx8ZI4p6W2JMZsMOonxT+46Am30b7iwBkYKH1nbKu/ND2wkhAyaKDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768087912; c=relaxed/simple;
-	bh=7uZ07Jw3PjFg0UXtmqPwJDLAhovdmjVMQZDQD2TsEBY=;
+	s=arc-20240116; t=1768087913; c=relaxed/simple;
+	bh=TyJ/NmspwtPdW7nGwdJHsFtYjvpCowKmH/K3NoP0Yy4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AE1PDaYGr8MMrXEJOAgHebP8U5HMWhlnCkC2T3RIeH3pi4vBjL9BhNPanWOGsKbjh8vUNE98q0GprkD4KCE1DmeAXN3HyuxNkSN9qoBwJHRNMx2lLZT5bLO4Z2sRxeaX+Dfp8yy3YspF3W56XNkATCUKs2WPbAAnokLezidROuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DkgO+kDa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2685C19423;
-	Sat, 10 Jan 2026 23:31:51 +0000 (UTC)
+	 MIME-Version; b=FqVuzXAyDa47L3iSzlRSLHhBxQXlePYaO+Px36p+j+ENE9zOrddgYYbEK4sXERq+YEcA/I4TOQeIYFVNzm1Mk3V/ToCQ05BzgLXadtE26XFfeddIoSMVEap3snCfjLDgmbwPK5GwsBAkD4BRJOxHTidwrJ5EeqTi5wH+DtfERTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TEZmOEvS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DF06C116C6;
+	Sat, 10 Jan 2026 23:31:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1768087912;
-	bh=7uZ07Jw3PjFg0UXtmqPwJDLAhovdmjVMQZDQD2TsEBY=;
+	bh=TyJ/NmspwtPdW7nGwdJHsFtYjvpCowKmH/K3NoP0Yy4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DkgO+kDaWZmU53hXGGYit4kXVHhfD4vMvvfeuGMVWqs2i7GK3wBnWmYMUH4rWBv2P
-	 IllE+R2kxFu2HcWJv4mSYi87NPvR0opkbbq0qs8TKr+D+N3S2EuYJnzyDJY8xXhCbH
-	 PiAf9R1/2sjzJmoS9q14FENzLuJ0CoTNT/yWxyeO1DC4EF095O7DXJNH0a1Ic/nFRG
-	 vVedt6KaN23EXxZi3scjkqX5uAVRcuixaCiuWu7fTZ4NcSa7RI2vqk3wenFhp/TdjV
-	 8in3KIXk/7nH8b/OkLDHz6TDyK8JIH5fhK/00htENYpu+AbrPFpb90gq62YAXVxRgb
-	 HQ/uv6+Vb6yBw==
+	b=TEZmOEvSOTpbhIZUWAdjuX3eq85fUnWWAS3YDwapfJ3JCKqfMkq5Ed/r6qZ4K3Lgw
+	 F+oiwRNcliRivD8MLQ4YJp7zMANEnhhuouI59fRadBYXmRYPvPKYc7htsyClm8cPBe
+	 BHgr1RoVgnFxme92dp5PT8QQLcVPKNw1ZH2M8VEo0u63cNbw8mOIfjl0Yyqw+GfGfo
+	 kO+Hgjg3f5naqJftjjge5C7Lc/nBAvZAIpDE+wW7KE+3iP5kdTfiJS+/5Bnnj6q9bo
+	 Tk2lccnMbaVgKD+AIcP1UTvs2uc51bIJTs1q5xiuq2hC3neKsCm1M/q86TbvBG17CE
+	 ODUaudPh+b7ow==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -50,9 +50,9 @@ Cc: netdev@vger.kernel.org,
 	donald.hunter@gmail.com,
 	gal@nvidia.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 2/7] tools: ynl: cli: wrap the doc text if it's long
-Date: Sat, 10 Jan 2026 15:31:37 -0800
-Message-ID: <20260110233142.3921386-3-kuba@kernel.org>
+Subject: [PATCH net-next v2 3/7] tools: ynl: cli: improve --help
+Date: Sat, 10 Jan 2026 15:31:38 -0800
+Message-ID: <20260110233142.3921386-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260110233142.3921386-1-kuba@kernel.org>
 References: <20260110233142.3921386-1-kuba@kernel.org>
@@ -64,57 +64,137 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We already use textwrap when printing "doc" section about an attribute,
-but only to indent the text. Switch to using fill() to split and indent
-all the lines. While at it indent the text by 2 more spaces, so that it
-doesn't align with the name of the attribute.
+Improve the clarity of --help. Reorder, provide some grouping and
+add help messages to most of the options.
 
-Before (I'm drawing a "box" at ~60 cols here, in an attempt for clarity):
-
- |  - irq-suspend-timeout: uint                              |
- |    The timeout, in nanoseconds, of how long to suspend irq|
- |processing, if event polling finds events                  |
-
-After:
-
- |  - irq-suspend-timeout: uint                              |
- |      The timeout, in nanoseconds, of how long to suspend  |
- |      irq processing, if event polling finds events        |
+No functional changes intended.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-v2:
- - remove the explicit sys.stdout.isatty() check
-v1: https://lore.kernel.org/20260109211756.3342477-3-kuba@kernel.org
----
- tools/net/ynl/pyynl/cli.py | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ tools/net/ynl/pyynl/cli.py | 107 ++++++++++++++++++++++++-------------
+ 1 file changed, 69 insertions(+), 38 deletions(-)
 
 diff --git a/tools/net/ynl/pyynl/cli.py b/tools/net/ynl/pyynl/cli.py
-index aa50d42e35ac..dc84619e5518 100755
+index dc84619e5518..3aa1f1e816bf 100755
 --- a/tools/net/ynl/pyynl/cli.py
 +++ b/tools/net/ynl/pyynl/cli.py
-@@ -10,6 +10,7 @@ import json
- import os
- import pathlib
- import pprint
-+import shutil
- import sys
- import textwrap
+@@ -151,47 +151,78 @@ RELATIVE_SCHEMA_DIR='../../../../Documentation/netlink'
+     """
  
-@@ -101,7 +102,11 @@ RELATIVE_SCHEMA_DIR='../../../../Documentation/netlink'
-                 attr_info += f" -> {nested_set_name}"
+     parser = argparse.ArgumentParser(description=description,
+-                                     epilog=epilog)
+-    spec_group = parser.add_mutually_exclusive_group(required=True)
+-    spec_group.add_argument('--family', dest='family', type=str,
+-                            help='name of the netlink FAMILY')
+-    spec_group.add_argument('--list-families', action='store_true',
+-                            help='list all netlink families supported by YNL (has spec)')
+-    spec_group.add_argument('--spec', dest='spec', type=str,
+-                            help='choose the family by SPEC file path')
++                                     epilog=epilog, add_help=False)
  
-             if attr.yaml.get('doc'):
--                doc_text = textwrap.indent(attr.yaml['doc'], prefix + '  ')
-+                doc_prefix = prefix + ' ' * 4
-+                term_width = shutil.get_terminal_size().columns
-+                doc_text = textwrap.fill(attr.yaml['doc'], width=term_width,
-+                                         initial_indent=doc_prefix,
-+                                         subsequent_indent=doc_prefix)
-                 attr_info += f"\n{doc_text}"
-             print(attr_info)
+-    parser.add_argument('--schema', dest='schema', type=str)
+-    parser.add_argument('--no-schema', action='store_true')
+-    parser.add_argument('--json', dest='json_text', type=str)
++    gen_group = parser.add_argument_group('General options')
++    gen_group.add_argument('-h', '--help', action='help',
++                           help='show this help message and exit')
  
+-    group = parser.add_mutually_exclusive_group()
+-    group.add_argument('--do', dest='do', metavar='DO-OPERATION', type=str)
+-    group.add_argument('--multi', dest='multi', nargs=2, action='append',
+-                       metavar=('DO-OPERATION', 'JSON_TEXT'), type=str)
+-    group.add_argument('--dump', dest='dump', metavar='DUMP-OPERATION', type=str)
+-    group.add_argument('--list-ops', action='store_true')
+-    group.add_argument('--list-msgs', action='store_true')
+-    group.add_argument('--list-attrs', dest='list_attrs', metavar='OPERATION', type=str,
+-                       help='List attributes for an operation')
+-    group.add_argument('--validate', action='store_true')
++    spec_group = parser.add_argument_group('Netlink family selection')
++    spec_sel = spec_group.add_mutually_exclusive_group(required=True)
++    spec_sel.add_argument('--list-families', action='store_true',
++                          help=('list Netlink families supported by YNL '
++                                '(which have a spec available in the standard '
++                                'system path)'))
++    spec_sel.add_argument('--family', dest='family', type=str,
++                          help='name of the Netlink FAMILY to use')
++    spec_sel.add_argument('--spec', dest='spec', type=str,
++                          help='full file path to the YAML spec file')
++
++    ops_group = parser.add_argument_group('Operations')
++    ops = ops_group.add_mutually_exclusive_group()
++    ops.add_argument('--do', dest='do', metavar='DO-OPERATION', type=str)
++    ops.add_argument('--dump', dest='dump', metavar='DUMP-OPERATION', type=str)
++    ops.add_argument('--multi', dest='multi', nargs=2, action='append',
++                     metavar=('DO-OPERATION', 'JSON_TEXT'), type=str,
++                     help="Multi-message operation sequence (for nftables)")
++    ops.add_argument('--list-ops', action='store_true',
++                     help="List available --do and --dump operations")
++    ops.add_argument('--list-msgs', action='store_true',
++                     help="List all messages of the family (incl. notifications)")
++    ops.add_argument('--list-attrs', dest='list_attrs', metavar='MSG',
++                     type=str, help='List attributes for a message / operation')
++    ops.add_argument('--validate', action='store_true',
++                     help="Validate the spec against schema and exit")
++
++    io_group = parser.add_argument_group('Input / Output')
++    io_group.add_argument('--json', dest='json_text', type=str,
++                          help=('Specify attributes of the message to send '
++                                'to the kernel in JSON format. Can be left out '
++                                'if the message is expected to be empty.'))
++    io_group.add_argument('--output-json', action='store_true',
++                          help='Format output as JSON')
++
++    ntf_group = parser.add_argument_group('Notifications')
++    ntf_group.add_argument('--subscribe', dest='ntf', type=str)
++    ntf_group.add_argument('--duration', dest='duration', type=int,
++                           help='when subscribed, watch for DURATION seconds')
++    ntf_group.add_argument('--sleep', dest='duration', type=int,
++                           help='alias for duration')
++
++    nlflags = parser.add_argument_group('Netlink message flags (NLM_F_*)',
++                                        ('Extra flags to set in nlmsg_flags of '
++                                         'the request, used mostly by older '
++                                         'Classic Netlink families.'))
++    nlflags.add_argument('--replace', dest='flags', action='append_const',
++                         const=Netlink.NLM_F_REPLACE)
++    nlflags.add_argument('--excl', dest='flags', action='append_const',
++                         const=Netlink.NLM_F_EXCL)
++    nlflags.add_argument('--create', dest='flags', action='append_const',
++                         const=Netlink.NLM_F_CREATE)
++    nlflags.add_argument('--append', dest='flags', action='append_const',
++                         const=Netlink.NLM_F_APPEND)
++
++    schema_group = parser.add_argument_group('Development options')
++    schema_group.add_argument('--schema', dest='schema', type=str,
++                              help="JSON schema to validate the spec")
++    schema_group.add_argument('--no-schema', action='store_true')
++
++    dbg_group = parser.add_argument_group('Debug options')
++    dbg_group.add_argument('--dbg-small-recv', default=0, const=4000,
++                           action='store', nargs='?', type=int, metavar='INT',
++                           help="Length of buffers used for recv()")
++    dbg_group.add_argument('--process-unknown', action=argparse.BooleanOptionalAction)
+ 
+-    parser.add_argument('--duration', dest='duration', type=int,
+-                        help='when subscribed, watch for DURATION seconds')
+-    parser.add_argument('--sleep', dest='duration', type=int,
+-                        help='alias for duration')
+-    parser.add_argument('--subscribe', dest='ntf', type=str)
+-    parser.add_argument('--replace', dest='flags', action='append_const',
+-                        const=Netlink.NLM_F_REPLACE)
+-    parser.add_argument('--excl', dest='flags', action='append_const',
+-                        const=Netlink.NLM_F_EXCL)
+-    parser.add_argument('--create', dest='flags', action='append_const',
+-                        const=Netlink.NLM_F_CREATE)
+-    parser.add_argument('--append', dest='flags', action='append_const',
+-                        const=Netlink.NLM_F_APPEND)
+-    parser.add_argument('--process-unknown', action=argparse.BooleanOptionalAction)
+-    parser.add_argument('--output-json', action='store_true')
+-    parser.add_argument('--dbg-small-recv', default=0, const=4000,
+-                        action='store', nargs='?', type=int)
+     args = parser.parse_args()
+ 
+     def output(msg):
 -- 
 2.52.0
 
