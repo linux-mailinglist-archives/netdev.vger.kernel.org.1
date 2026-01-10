@@ -1,84 +1,86 @@
-Return-Path: <netdev+bounces-248702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 618A5D0D77E
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 15:34:30 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78743D0D787
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 15:34:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B31E73002841
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 14:34:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A79E9300AFF1
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 14:34:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB4D30F94B;
-	Sat, 10 Jan 2026 14:34:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71FD728751B;
+	Sat, 10 Jan 2026 14:34:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kFU1h9qe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UUqxzCJM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F75345722
-	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 14:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E60272046BA
+	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 14:34:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768055656; cv=none; b=X/EESC5b9WWBwQnVBhdT1my0hxAj2A4SCnrSHoyKEsr3ZNB8WsszBB8R54HnVjXCKBLO2ZznZcIWGCcpkhLT7/xCmdqARhJunEFDtqLAStV2wkv8b7MJBoJaIr3SXLp9zRZL9Hbpm5PdsOIK2Xki6qCSBE0U+Z/QW2s21Yl/sFM=
+	t=1768055674; cv=none; b=Sug69tit39gk6E48XxYAgXeb6urkyGoXi6AkCx/0PefEEXVY4yDi7Q82fquNCRn8Uv/gPMm+SECo+IfslZlTHbFt0Zm+TYfEeKCCpDz+be9rUcLM3wN9oyw3f359TmUhD6CznT6qEUfSjismJZGsRTrgQ5Q/2dLGAuiwHfu1Ll0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768055656; c=relaxed/simple;
-	bh=CsyF4FB38pVyEBnCDklwP7O8BfvnyqizAoK/kl0VTvw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lCrA7QFmAQPZxN5tOQqLikKhXpmcFHAGYRoUx0V2/RDjazv127kkqY5FKIwLXb7EgV18iJ/PRZ0TBAsPwRyaPdh2HBya/HBpicbaldLQFqjh20BDCq9+jfTq3/hs8pfCLopsFlg1ip4XAuo477XqQ6hKir70N2gd0hqwx/bliR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kFU1h9qe; arc=none smtp.client-ip=209.85.218.48
+	s=arc-20240116; t=1768055674; c=relaxed/simple;
+	bh=/p1VbN6nG07QPsZrCTJvZLzYmNZLIDOLoWsTzdzhHKI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gLY2k6B21n4BrrDYX+viMxUFq6Qcijjr17q+/Dv5sc5nlFj2+MfwokX23yuMZxzpoQhj+Q4EsV0kpB0D43AK3S1IG/rwmKQDk/oQyqEMdu1V+ST5HGtP8IfTnELrdEeYxL6fxmy/7/mmSLLrSlpwvJiLNXQw9gMkRq0e5fniogw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UUqxzCJM; arc=none smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b86ef1e864cso58383366b.1
-        for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 06:34:13 -0800 (PST)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-64fabaf9133so9128821a12.3
+        for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 06:34:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768055652; x=1768660452; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RZUjgiOqEigL5MXUthwgLhJPvwHjvJ0v2nHO9M0M09g=;
-        b=kFU1h9qes0yDfOqDV8jUt00z6+9rO2U5gwYwVuHm2JLl5CuNEuYLv/Eve7TSPrvGvy
-         V+l7yuMhUpB+RqdADL063gGDvxEXMaP1nA5MsUkshK//zPFEkIsFwEZJfcN1h9ksG4Fd
-         OZeC48BqHKQ/r5kpgZWMHpeTrIwVkwjmwbwA2GX5kC/80WdLOBUF+BBnbDMFuO45v1Wq
-         8DTqMxxdjNiYG/t+JtIlFqKM94hTCi3815Cazs5UU8KBpAfI8QQUORsnMdLY8sETYVAj
-         9//Ky5GEu7ZPWGcF9F7yqGT7qH2lErT/vRCvLVL4K8Qj7afngMd3p20qENH43bpMwv4k
-         LX8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768055652; x=1768660452;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1768055670; x=1768660470; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RZUjgiOqEigL5MXUthwgLhJPvwHjvJ0v2nHO9M0M09g=;
-        b=QkndWErAkikvHc9rQvICJpetoEqn/YvZXENLcZYoPOWrIOorCH4LnmQg+KyXFZrPqU
-         /jzuT1O1DoAUwGMIBgAWFzjp9qWe/YOC39Tfus6qxf484SYA6Ijx/PhLHtffaqzZru+6
-         TJa8aCQJkato35mEEN8eecXhWeFiW19NGJxDmN6/W0n2PYww7QAjmpfgjYnO9Wi3wvUk
-         vncKZDvwcF6DRt+bsfZMV6unj5HtAcmQ6Fi08PT7t+Abjgck3CvauG4huS/e2GJofIyh
-         j4E46D82wS5gk/Ev60BVdH5jlq6Xx8m+VHsjW4ixK0jXG6WPcgI5jd6B3mndDegkKV39
-         SyoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXNa9itraSVWnh4hjYw3ZY543dFSemwEr9eD9tGVh3TK4bjTX424WZrB0Vfq3VZftDzraVj9OM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz6ItRjpehgu116GQlJEjtBZO+4usAN1iRw005ISykM3X1hiTTk
-	zwiCFO0TTz+FMZLdhWZMpKnv86BTg0vg6PIlffr5gqLQeB8VOE1uNAco
-X-Gm-Gg: AY/fxX67gL2q3dNIz+XNuoTH6FwnBC9KXSp9u5VBx/0MJHaKfOqxEbDbhl00NMcnKGH
-	BBPjqbileXxGJPjVlBETzX4eJQl/N9vBz62Wr45k/V9Hc9rx+Uk+uHkQCE3XI6ydben4rlbHPDB
-	smB25Hq2wNklBUGHz2XcNQblhcR9EkkqMoTfxbYM1TjC9JK0TbpfDXHVthqpqsuI8RUZlumkB3X
-	891Tn4keDBZ+R9XWzZcuYm8wh8YkCax9x69/qWA0IMKZGLshiJF9B8wl4u2ZIu4FN1AofvaEWoW
-	rDpOxwmqNo+k97Oioz5boqFdS88ohlU4syN5vK3JJxUyDJk+w6J8L7LQu2im1BGNZelmcvUJ6IJ
-	jby+hHpFDYqTA+xT3Ltpq7SrgEhSaHBBgihZZMzFcMpPUYBIre2vnoUTTSPqu2FU2E1LDiDqo6g
-	CS/ucb/zCMr1hiLfkWo1YsPvBzVKHfgMLEish5
-X-Google-Smtp-Source: AGHT+IHgewxH0hd7d8rLHVR5PvtoMIDhT0rjrEm67OfRIalqqVb8d8eP3GeR+itug81YJmpY3YeEZQ==
-X-Received: by 2002:a17:907:25c4:b0:b73:78f3:15c1 with SMTP id a640c23a62f3a-b8445414ff6mr1173667566b.52.1768055651912;
-        Sat, 10 Jan 2026 06:34:11 -0800 (PST)
+        bh=2wo/YIkbelmV6FA4SKOGcNkJM9mvKN+FOz8CqB+Y22k=;
+        b=UUqxzCJMzfVe6pkRG5yGeos3/F7FUHM9OB9Ia1KBeuhY+LbtBy3cAFy+Es336gaa4H
+         bcSZ+qfISKnq49dsaRF1CeZ0QZuwyQhAycezhi04/CbvtIM6yq+nouM+9LUOZaS6p6kR
+         +fceBCXyMWBAaun8bfLQyB9u9mGdSxrjGtDwhT9AqXwhpRKrL2OGCkYwdedwhzgixpnE
+         wccM+ETUCKbO7XmhTSHkFBAt9WHSYuj3C+hmZqbBLpLg8Zq85QGWS5anYU2u9UHEm5MV
+         dw9desmNvOzuOglzBkiuzl8m5x37v7ib+hdxF3pYJcJK7WsiV0S58ePLi9hw+TWHwhe/
+         csoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768055670; x=1768660470;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=2wo/YIkbelmV6FA4SKOGcNkJM9mvKN+FOz8CqB+Y22k=;
+        b=ZXT3/qOyEp73+fZE2iQjAmQYaqX8f4LAAx1+DhKxUgVBRo8UKzdjZ3ZHpTGz8RAESC
+         vIAWImh9KK4PQ+Vo83ifQJzhnzZJws9EzEvP5Tkx7njsqAYyM0maeylEilIIbUTO7Wls
+         z9fpWPbTWzZhRlFiddUafREygC9bU5T89/1JgLCvMiDsZJcFH4AbLYRVrsqoZnJdVW4j
+         7YlVRQW+xUb16j0ge31PlQu8Tx7Wawat76bzBBrXlRdY2hndMiBAoWBFFdWALLfNVsu6
+         oLe/xMHT3qRu1l6i3o8zSDjxq2lp5QRrLuWgnRR9d/Pn5AWBax+elUzMS9dkz9miUPEf
+         BAsg==
+X-Forwarded-Encrypted: i=1; AJvYcCXalCbDcdOa3zGb63rhPp3WDBSIisatWuEA0KIy+x3i5Vg4QjuJ7fY1og0jk5Ctm2mGiNq7ORI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywu2rZTBxpcs9slXxu4F3SOUF2YmUb0wh0R0DVWZm5Go9fV58Qr
+	BWWIkHXh0U4/82v5EHJeDVf3v+u9hjrAkeJNZS9+TJjpM02QLCiZ606d
+X-Gm-Gg: AY/fxX6jCA/RLwBTN13raTdiMv4afe9W9pz+uZUpxBVPnJlniexPCfSpFc2br8O87cP
+	5LyDvKyV2sL4+eb/Thp5H7NMejA0DzqSYeQValRjaWHOyzsD2/uEEc69AMouIGPXEhedKeyHOKF
+	XCtGBlli9v39hGaRQuRtwjopYTdqMMEOSvvIoYx8/Zfx/NyQctXq7IAcpExqz9AMQOXKfxdwRna
+	oeNbt3bLW70UCsPCx/QNYUsJANvA2fP7FdaH0xOQ5gmBlQuoCdIMcQ/G80oaLPgWwB4/UMllkvz
+	kJJyc6upgA0ztq1/zuA5NfNZhS7wqBeZs+zJKuq4WjCAlAAZQIPpAC1rP3RETzsKI431x+0QdDW
+	TsGSJiLGX4dsX17OYq0OkfS66LDJaFZcZre3CkBpKYn4dHMR6xcrYcPBl+BJRDZu/xZO5M6n+IX
+	9T470iwQunw6bZUxNWVnUVy/wq1l+/p2ea2HtL
+X-Google-Smtp-Source: AGHT+IHO9Q/Df/iXU72DbJL9Ky3HfCfxGLLpzRBeBwC5mygtDa80lVRMhr065JbDYAexMcmrwnDYFg==
+X-Received: by 2002:a17:907:a49:b0:b7c:e4e9:b13f with SMTP id a640c23a62f3a-b8444f4e435mr1319406666b.39.1768055669949;
+        Sat, 10 Jan 2026 06:34:29 -0800 (PST)
 Received: from localhost (ip87-106-108-193.pbiaas.com. [87.106.108.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a56c547sm1418621766b.69.2026.01.10.06.34.11
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b86faa6be37sm124615066b.36.2026.01.10.06.34.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Jan 2026 06:34:11 -0800 (PST)
+        Sat, 10 Jan 2026 06:34:29 -0800 (PST)
 From: =?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack3000@gmail.com>
 To: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
 	"Paul Moore" <paul@paul-moore.com>,
 	James Morris <jmorris@namei.org>,
 	"Serge E . Hallyn" <serge@hallyn.com>
 Cc: =?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack3000@gmail.com>,
+	Justin Suess <utilityemal77@gmail.com>,
 	linux-security-module@vger.kernel.org,
 	"Tingmao Wang" <m@maowtm.org>,
-	"Justin Suess" <utilityemal77@gmail.com>,
 	"Samasth Norway Ananda" <samasth.norway.ananda@oracle.com>,
 	"Matthieu Buffet" <matthieu@buffet.re>,
 	"Mikhail Ivanov" <ivanov.mikhail1@huawei-partners.com>,
@@ -91,10 +93,12 @@ Cc: =?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack3000@gmail.com>,
 	netdev@vger.kernel.org,
 	Alexander Viro <viro@zeniv.linux.org.uk>,
 	Christian Brauner <brauner@kernel.org>
-Subject: [PATCH v2 0/5] landlock: Pathname-based UNIX connect() control
-Date: Sat, 10 Jan 2026 15:32:55 +0100
-Message-ID: <20260110143300.71048-2-gnoack3000@gmail.com>
+Subject: [PATCH v2 1/5] lsm: Add hook unix_path_connect
+Date: Sat, 10 Jan 2026 15:32:57 +0100
+Message-ID: <20260110143300.71048-4-gnoack3000@gmail.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260110143300.71048-2-gnoack3000@gmail.com>
+References: <20260110143300.71048-2-gnoack3000@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,161 +108,110 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hello!
+From: Justin Suess <utilityemal77@gmail.com>
 
-This patch set introduces a filesystem-based Landlock restriction
-mechanism for connecting to UNIX domain sockets (or addressing them
-with sendmsg(2)).  It introduces a file system access right for each
-type of UNIX domain socket:
+Adds an LSM hook unix_path_connect.
 
- * LANDLOCK_ACCESS_FS_RESOLVE_UNIX_STREAM
- * LANDLOCK_ACCESS_FS_RESOLVE_UNIX_DGRAM
- * LANDLOCK_ACCESS_FS_RESOLVE_UNIX_SEQPACKET
+This hook is called to check the path of a named unix socket before a
+connection is initiated.
 
-For the connection-oriented SOCK_STREAM and SOCK_SEQPACKET type
-sockets, the access right makes the connect(2) operation fail with
-EACCES, if denied.
-
-SOCK_DGRAM-type UNIX sockets can be used both with connect(2), or by
-passing an explicit recipient address with every sendmsg(2)
-invocation.  In the latter case, the Landlock check is done when an
-explicit recipient address is passed to sendmsg(2) and can make
-sendmsg(2) return EACCES.  When UNIX datagram sockets are connected
-with connect(2), a fixed recipient address is associated with the
-socket and the check happens during connect(2) and may return EACCES.
-
-## Motivation
-
-Currently, landlocked processes can connect() to named UNIX sockets
-through the BSD socket API described in unix(7), by invoking socket(2)
-followed by connect(2) with a suitable struct sockname_un holding the
-socket's filename.  This can come as a surprise for users (e.g. in
-[1]) and it can be used to escape a sandbox when a Unix service offers
-command execution (some scenarios were listed by Tingmao Wang in [2]).
-
-The original feature request is at [4].
-
-## Alternatives and Related Work
-
-### Alternative: Use existing LSM hooks
-
-The existing hooks security_unix_stream_connect(),
-security_unix_may_send() and security_socket_connect() do not give
-access to the resolved file system path.
-
-Resolving the file system path again within Landlock would in my
-understanding produce a TOCTOU race, so making the decision based on
-the struct sockaddr_un contents is not an option.
-
-It is tempting to use the struct path that the listening socket is
-bound to, which can be acquired through the existing hooks.
-Unfortunately, the listening socket may have been bound from within a
-different namespace, and it is therefore a path that can not actually
-be referenced by the sandboxed program at the time of constructing the
-Landlock policy.  (More details are on the Github issue at [6] and on
-the LKML at [9]).
-
-### Related work: Scope Control for Pathname Unix Sockets
-
-The motivation for this patch is the same as in Tingmao Wang's patch
-set for "scoped" control for pathname Unix sockets [2], originally
-proposed in the Github feature request [5].
-
-In my reply to this patch set [3], I have discussed the differences
-between these two approaches.  On the related discussions on Github
-[4] and [5], there was consensus that the scope-based control is
-complimentary to the file system based control, but does not replace
-it.  Mickael's opening remark on [5] says:
-
-> This scoping would be complementary to #36 which would mainly be
-> about allowing a sandboxed process to connect to a more privileged
-> service (identified with a path).
-
-## Open questions in V2
-
-Seeking feedback on:
-
-- Feedback on the LSM hook name would be appreciated. We realize that
-  not all invocations of the LSM hook are related to connect(2) as the
-  name suggests, but some also happen during sendmsg(2).
-- Feedback on the structuring of the Landlock access rights, splitting
-  them up by socket type.  (Also naming; they are now consistently
-  called "RESOLVE", but could be named "CONNECT" in the stream and
-  seqpacket cases?)
-
-## Credits
-
-The feature was originally suggested by Jann Horn in [7].
-
-Tingmao Wang and Demi Marie Obenour have taken the initiative to
-revive this discussion again in [1], [4] and [5] and Tingmao Wang has
-sent the patch set for the scoped access control for pathname Unix
-sockets [2].
-
-Justin Suess has sent the patch for the LSM hook in [8].
-
-Ryan Sullivan has started on an initial implementation and has brought
-up relevant discussion points on the Github issue at [4] that lead to
-the current approach.
-
-[1] https://lore.kernel.org/landlock/515ff0f4-2ab3-46de-8d1e-5c66a93c6ede@gmail.com/
-[2] Tingmao Wang's "Implemnet scope control for pathname Unix sockets"
-    https://lore.kernel.org/all/cover.1767115163.git.m@maowtm.org/
-[3] https://lore.kernel.org/all/20251230.bcae69888454@gnoack.org/
-[4] Github issue for FS-based control for named Unix sockets:
-    https://github.com/landlock-lsm/linux/issues/36
-[5] Github issue for scope-based restriction of named Unix sockets:
-    https://github.com/landlock-lsm/linux/issues/51
-[6] https://github.com/landlock-lsm/linux/issues/36#issuecomment-2950632277
-[7] https://lore.kernel.org/linux-security-module/CAG48ez3NvVnonOqKH4oRwRqbSOLO0p9djBqgvxVwn6gtGQBPcw@mail.gmail.com/
-[8] Patch for the LSM hook:
-    https://lore.kernel.org/all/20251231213314.2979118-1-utilityemal77@gmail.com/
-[9] https://lore.kernel.org/all/20260108.64bd7391e1ae@gnoack.org/
-
+Cc: Günther Noack <gnoack3000@gmail.com>
+Signed-off-by: Justin Suess <utilityemal77@gmail.com>
 ---
+ include/linux/lsm_hook_defs.h |  4 ++++
+ include/linux/security.h      | 11 +++++++++++
+ net/unix/af_unix.c            |  9 +++++++++
+ security/security.c           | 20 ++++++++++++++++++++
+ 4 files changed, 44 insertions(+)
 
-## Older versions of this patch set
-
-V1: https://lore.kernel.org/all/20260101134102.25938-1-gnoack3000@gmail.com/
-
-Changes in V2:
- * Send Justin Suess's LSM hook patch together with the Landlock
-   implementation
- * LSM hook: Pass type and flags parameters to the hook, to make the
-   access right more generally usable across LSMs, per suggestion from
-   Paul Moore (Implemented by Justin)
- * Split the access right into the three types of UNIX domain sockets:
-   SOCK_STREAM, SOCK_DGRAM and SOCK_SEQPACKET.
- * selftests: More exhaustive tests.
- * Removed a minor commit from V1 which adds a missing close(fd) to a
-   test (it is already in the mic-next branch)
-
-Günther Noack (4):
-  landlock: Control pathname UNIX domain socket resolution by path
-  samples/landlock: Add support for named UNIX domain socket
-    restrictions
-  landlock/selftests: Test named UNIX domain socket restrictions
-  landlock: Document FS access rights for pathname UNIX sockets
-
-Justin Suess (1):
-  lsm: Add hook unix_path_connect
-
- Documentation/userspace-api/landlock.rst     |  25 ++-
- include/linux/lsm_hook_defs.h                |   4 +
- include/linux/security.h                     |  11 +
- include/uapi/linux/landlock.h                |  10 +
- net/unix/af_unix.c                           |   9 +
- samples/landlock/sandboxer.c                 |  18 +-
- security/landlock/access.h                   |   2 +-
- security/landlock/audit.c                    |   6 +
- security/landlock/fs.c                       |  34 ++-
- security/landlock/limits.h                   |   2 +-
- security/landlock/syscalls.c                 |   2 +-
- security/security.c                          |  20 ++
- tools/testing/selftests/landlock/base_test.c |   2 +-
- tools/testing/selftests/landlock/fs_test.c   | 225 +++++++++++++++++--
- 14 files changed, 344 insertions(+), 26 deletions(-)
-
+diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
+index 8c42b4bde09c..1dee5d8d52d2 100644
+--- a/include/linux/lsm_hook_defs.h
++++ b/include/linux/lsm_hook_defs.h
+@@ -317,6 +317,10 @@ LSM_HOOK(int, 0, post_notification, const struct cred *w_cred,
+ LSM_HOOK(int, 0, watch_key, struct key *key)
+ #endif /* CONFIG_SECURITY && CONFIG_KEY_NOTIFICATIONS */
+ 
++#if defined(CONFIG_SECURITY_NETWORK) && defined(CONFIG_SECURITY_PATH)
++LSM_HOOK(int, 0, unix_path_connect, const struct path *path, int type, int flags)
++#endif /* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
++
+ #ifdef CONFIG_SECURITY_NETWORK
+ LSM_HOOK(int, 0, unix_stream_connect, struct sock *sock, struct sock *other,
+ 	 struct sock *newsk)
+diff --git a/include/linux/security.h b/include/linux/security.h
+index 83a646d72f6f..382612af27a6 100644
+--- a/include/linux/security.h
++++ b/include/linux/security.h
+@@ -1931,6 +1931,17 @@ static inline int security_mptcp_add_subflow(struct sock *sk, struct sock *ssk)
+ }
+ #endif	/* CONFIG_SECURITY_NETWORK */
+ 
++#if defined(CONFIG_SECURITY_NETWORK) && defined(CONFIG_SECURITY_PATH)
++
++int security_unix_path_connect(const struct path *path, int type, int flags);
++
++#else /* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
++static inline int security_unix_path_connect(const struct path *path, int type, int flags)
++{
++	return 0;
++}
++#endif /* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
++
+ #ifdef CONFIG_SECURITY_INFINIBAND
+ int security_ib_pkey_access(void *sec, u64 subnet_prefix, u16 pkey);
+ int security_ib_endport_manage_subnet(void *sec, const char *name, u8 port_num);
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 55cdebfa0da0..3aabe2d489ae 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -1226,6 +1226,15 @@ static struct sock *unix_find_bsd(struct sockaddr_un *sunaddr, int addr_len,
+ 	if (!S_ISSOCK(inode->i_mode))
+ 		goto path_put;
+ 
++	/*
++	 * We call the hook because we know that the inode is a socket
++	 * and we hold a valid reference to it via the path.
++	 */
++	err = security_unix_path_connect(&path, type, flags);
++	if (err)
++		goto path_put;
++
++	err = -ECONNREFUSED;
+ 	sk = unix_find_socket_byinode(inode);
+ 	if (!sk)
+ 		goto path_put;
+diff --git a/security/security.c b/security/security.c
+index 31a688650601..0cee3502db83 100644
+--- a/security/security.c
++++ b/security/security.c
+@@ -4731,6 +4731,26 @@ int security_mptcp_add_subflow(struct sock *sk, struct sock *ssk)
+ 
+ #endif	/* CONFIG_SECURITY_NETWORK */
+ 
++#if defined(CONFIG_SECURITY_NETWORK) && defined(CONFIG_SECURITY_PATH)
++/*
++ * security_unix_path_connect() - Check if a named AF_UNIX socket can connect
++ * @path: path of the socket being connected to
++ * @type: type of the socket
++ * @flags: flags associated with the socket
++ *
++ * This hook is called to check permissions before connecting to a named
++ * AF_UNIX socket.
++ *
++ * Return: Returns 0 if permission is granted.
++ */
++int security_unix_path_connect(const struct path *path, int type, int flags)
++{
++	return call_int_hook(unix_path_connect, path, type, flags);
++}
++EXPORT_SYMBOL(security_unix_path_connect);
++
++#endif	/* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
++
+ #ifdef CONFIG_SECURITY_INFINIBAND
+ /**
+  * security_ib_pkey_access() - Check if access to an IB pkey is allowed
 -- 
 2.52.0
 
