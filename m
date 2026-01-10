@@ -1,157 +1,265 @@
-Return-Path: <netdev+bounces-248701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 830FFD0D75D
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 15:28:52 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 618A5D0D77E
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 15:34:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A5C88301119F
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 14:28:40 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B31E73002841
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 14:34:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C213469FC;
-	Sat, 10 Jan 2026 14:28:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB4D30F94B;
+	Sat, 10 Jan 2026 14:34:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U1FqWbyi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kFU1h9qe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E9847FBA2
-	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 14:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F75345722
+	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 14:34:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768055319; cv=none; b=u9JIuQr53UUFy6/n6Hg0ONxyB791TRWb4yd2RtsQCE2eJrgjzu8erKCli65lJ3yCzSDyhOq5M8+hjcCXS/vRFTApPZxdBQ0HfS09j5FhUmoftYAsM0Cg9Rp5xK/pvcUUuuPyfX8+CR/s2qRTp1JTgE3lSc+ViKDGYizm/zUlYIs=
+	t=1768055656; cv=none; b=X/EESC5b9WWBwQnVBhdT1my0hxAj2A4SCnrSHoyKEsr3ZNB8WsszBB8R54HnVjXCKBLO2ZznZcIWGCcpkhLT7/xCmdqARhJunEFDtqLAStV2wkv8b7MJBoJaIr3SXLp9zRZL9Hbpm5PdsOIK2Xki6qCSBE0U+Z/QW2s21Yl/sFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768055319; c=relaxed/simple;
-	bh=d6lGCZeBAbHolp3KHSWXcTEuK21Cd7GvLg3LdHS0lfQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h5sUPneNkfQ+6fIDYxPGsmROLilv4Jv2DxKvKkWkHUsVG/mj6NX2SCuOAoBknztlV9duSPPIySzAwW9CQdtKka/wuo4HgunP16gzIizU50UBErCg25Vwbo7FrVmJ8ygsD1Bqyj/FpJOCTYceUMESD96YaV9451wa1prTMoX9c1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U1FqWbyi; arc=none smtp.client-ip=209.85.128.45
+	s=arc-20240116; t=1768055656; c=relaxed/simple;
+	bh=CsyF4FB38pVyEBnCDklwP7O8BfvnyqizAoK/kl0VTvw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lCrA7QFmAQPZxN5tOQqLikKhXpmcFHAGYRoUx0V2/RDjazv127kkqY5FKIwLXb7EgV18iJ/PRZ0TBAsPwRyaPdh2HBya/HBpicbaldLQFqjh20BDCq9+jfTq3/hs8pfCLopsFlg1ip4XAuo477XqQ6hKir70N2gd0hqwx/bliR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kFU1h9qe; arc=none smtp.client-ip=209.85.218.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-47d3ba3a4deso30325885e9.2
-        for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 06:28:38 -0800 (PST)
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b86ef1e864cso58383366b.1
+        for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 06:34:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768055317; x=1768660117; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2HKscEfLpjUsn821O8EhAoZL6ejgDYubcUtKXZVxPBU=;
-        b=U1FqWbyi9bzUZqqyrhfuG8TCcoS9XPoldx60S50d+R02vrE+1OPDXQimmBdSR5Et4I
-         u/mzP3Mf4s3TJEloyI0vEVez+G4208DSsLHNIdBUUJPLOPv+N2c0zRTltRtwJcVqpb6+
-         wvphEXLaJx2IgJo2YYNs4pu36SZzgQ+YJPK0i411F+T//HA+v4GqZqs1FPDiJ2AD72iN
-         Di8H43Wc4W16FZOCKVVfVMlkHKxhGemjlIY68VC5hwL6tnpTR3Z/m6YTXE1+r++8MLhW
-         tcsuf4rys92nGfDz0l9z0yMMmTdEIaXOO9npIkF2QiHoNkCHGp6cpkR7yg2N05w65wEQ
-         6dew==
+        d=gmail.com; s=20230601; t=1768055652; x=1768660452; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RZUjgiOqEigL5MXUthwgLhJPvwHjvJ0v2nHO9M0M09g=;
+        b=kFU1h9qes0yDfOqDV8jUt00z6+9rO2U5gwYwVuHm2JLl5CuNEuYLv/Eve7TSPrvGvy
+         V+l7yuMhUpB+RqdADL063gGDvxEXMaP1nA5MsUkshK//zPFEkIsFwEZJfcN1h9ksG4Fd
+         OZeC48BqHKQ/r5kpgZWMHpeTrIwVkwjmwbwA2GX5kC/80WdLOBUF+BBnbDMFuO45v1Wq
+         8DTqMxxdjNiYG/t+JtIlFqKM94hTCi3815Cazs5UU8KBpAfI8QQUORsnMdLY8sETYVAj
+         9//Ky5GEu7ZPWGcF9F7yqGT7qH2lErT/vRCvLVL4K8Qj7afngMd3p20qENH43bpMwv4k
+         LX8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768055317; x=1768660117;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2HKscEfLpjUsn821O8EhAoZL6ejgDYubcUtKXZVxPBU=;
-        b=llz/80M7Jh390qvLkqMz0spTc64EM/tw1e6CM2lDnlijRVn8WF8gVTybGPW7bmEZAs
-         ASbvCYgiy92gnvvXN1jlQOL7J7B1wELBpfpW2hCxb/ka/Ky/H84KI8MkfI1q3LGiRu8n
-         sWaLh/JJ8W3KHQN15InCDE0tqIo0f3HeLxDyzBvroo5kdlZkXTmAu8Yp6v3ZnX3Dw/tM
-         o4fqAtrz7QkQo3Dd3K1ZPrym/90MizcZTfsGYaOMGD1sQj0QJCNCsAV/VZLdIXxvZiUH
-         JhHnYxpBjsqUSkVhn8vbt7T8jJ9AUC5Lka6Slw9ilP+mdmoFAijGVmprcP6UWnZiQ7P/
-         myzw==
-X-Forwarded-Encrypted: i=1; AJvYcCWpHt3LyyxPcv+F0idt+FrtK/qco9d/9Y3pLglOgSN73/LrqgcbPFEvF9Zzq6yJdO381GraPF8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZcAMXEEHg5kIHK1mhTyj/BH95mB0BXDMU/E4m5PQe2b2zjnz5
-	W+mUQtbHoW+FNjqnZ8qpLKj1Nkm0eghBghcIFNtJ1oo2TCnePbxMmr4G
-X-Gm-Gg: AY/fxX7NTiIoVVB8NHc845CCcgJFSdOLfh86Z4aV/ayJFKRowkDdYucMWy1TyqekIBN
-	brz9z2K40XBgP/x4j4Ugq6PECZMNju2KF0yo7sgy9h9VEDbA6d1UkMlO+71WGSdWIhCI41tSMs5
-	dvHt5SIz5gU28QJbLlG33NH/RbSX2YAdNmw5e5lrfXsMuRor6yAd5j32iak/ZTgji/TXcHMOnEU
-	w+vSbUf9/D3ZavWYz8pOTVSqc+cMcpgtSR7v7BwSJqV519uYr7WIATgbPxB493KH8ReQd+T1/hI
-	J5Am2adaKvDRiwvPUGsKmoihrlzAbPg5HdUknSnUTOHKWMghAqkRdJyUWsa0HG1i8naJZEmLgHR
-	C/nVV7cTuxDEieMMJJa3933KhcLAoXh0t+iEr7QEqiY1igh3gQrTgwwYB/iCLnxkS8yX1+mPT1G
-	DOPeQR6fcdQN/MCmi0TjY/zUOMiNTd7rBBzMdUXrl7o6P9t7g8gtWzhoJ8TEUqWywX5b4FZdz32
-	T2Epll9U+aptIFSeztsZU71jWR6GyMKsGh9SIB4NIRvisvmfvym+jBeujxEglWl
-X-Google-Smtp-Source: AGHT+IFzwNi/gSQQu6QdAYoPp8vk6efFPsgASFrxFAQZeIDNhCk6TnxV/M0/o3ZVX7YAUo57ZuLKYw==
-X-Received: by 2002:a05:600c:c0ca:b0:47d:87ac:73b8 with SMTP id 5b1f17b1804b1-47d87ac7a94mr106652105e9.27.1768055316608;
-        Sat, 10 Jan 2026 06:28:36 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f1c:1800:8cc6:804e:b81b:aa56? (p200300ea8f1c18008cc6804eb81baa56.dip0.t-ipconnect.de. [2003:ea:8f1c:1800:8cc6:804e:b81b:aa56])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432d286cdecsm14348726f8f.7.2026.01.10.06.28.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 10 Jan 2026 06:28:36 -0800 (PST)
-Message-ID: <9111d6cd-0071-4964-aa7f-221077cd05b7@gmail.com>
-Date: Sat, 10 Jan 2026 15:28:34 +0100
+        d=1e100.net; s=20230601; t=1768055652; x=1768660452;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RZUjgiOqEigL5MXUthwgLhJPvwHjvJ0v2nHO9M0M09g=;
+        b=QkndWErAkikvHc9rQvICJpetoEqn/YvZXENLcZYoPOWrIOorCH4LnmQg+KyXFZrPqU
+         /jzuT1O1DoAUwGMIBgAWFzjp9qWe/YOC39Tfus6qxf484SYA6Ijx/PhLHtffaqzZru+6
+         TJa8aCQJkato35mEEN8eecXhWeFiW19NGJxDmN6/W0n2PYww7QAjmpfgjYnO9Wi3wvUk
+         vncKZDvwcF6DRt+bsfZMV6unj5HtAcmQ6Fi08PT7t+Abjgck3CvauG4huS/e2GJofIyh
+         j4E46D82wS5gk/Ev60BVdH5jlq6Xx8m+VHsjW4ixK0jXG6WPcgI5jd6B3mndDegkKV39
+         SyoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXNa9itraSVWnh4hjYw3ZY543dFSemwEr9eD9tGVh3TK4bjTX424WZrB0Vfq3VZftDzraVj9OM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6ItRjpehgu116GQlJEjtBZO+4usAN1iRw005ISykM3X1hiTTk
+	zwiCFO0TTz+FMZLdhWZMpKnv86BTg0vg6PIlffr5gqLQeB8VOE1uNAco
+X-Gm-Gg: AY/fxX67gL2q3dNIz+XNuoTH6FwnBC9KXSp9u5VBx/0MJHaKfOqxEbDbhl00NMcnKGH
+	BBPjqbileXxGJPjVlBETzX4eJQl/N9vBz62Wr45k/V9Hc9rx+Uk+uHkQCE3XI6ydben4rlbHPDB
+	smB25Hq2wNklBUGHz2XcNQblhcR9EkkqMoTfxbYM1TjC9JK0TbpfDXHVthqpqsuI8RUZlumkB3X
+	891Tn4keDBZ+R9XWzZcuYm8wh8YkCax9x69/qWA0IMKZGLshiJF9B8wl4u2ZIu4FN1AofvaEWoW
+	rDpOxwmqNo+k97Oioz5boqFdS88ohlU4syN5vK3JJxUyDJk+w6J8L7LQu2im1BGNZelmcvUJ6IJ
+	jby+hHpFDYqTA+xT3Ltpq7SrgEhSaHBBgihZZMzFcMpPUYBIre2vnoUTTSPqu2FU2E1LDiDqo6g
+	CS/ucb/zCMr1hiLfkWo1YsPvBzVKHfgMLEish5
+X-Google-Smtp-Source: AGHT+IHgewxH0hd7d8rLHVR5PvtoMIDhT0rjrEm67OfRIalqqVb8d8eP3GeR+itug81YJmpY3YeEZQ==
+X-Received: by 2002:a17:907:25c4:b0:b73:78f3:15c1 with SMTP id a640c23a62f3a-b8445414ff6mr1173667566b.52.1768055651912;
+        Sat, 10 Jan 2026 06:34:11 -0800 (PST)
+Received: from localhost (ip87-106-108-193.pbiaas.com. [87.106.108.193])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a56c547sm1418621766b.69.2026.01.10.06.34.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 10 Jan 2026 06:34:11 -0800 (PST)
+From: =?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack3000@gmail.com>
+To: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
+	"Paul Moore" <paul@paul-moore.com>,
+	James Morris <jmorris@namei.org>,
+	"Serge E . Hallyn" <serge@hallyn.com>
+Cc: =?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack3000@gmail.com>,
+	linux-security-module@vger.kernel.org,
+	"Tingmao Wang" <m@maowtm.org>,
+	"Justin Suess" <utilityemal77@gmail.com>,
+	"Samasth Norway Ananda" <samasth.norway.ananda@oracle.com>,
+	"Matthieu Buffet" <matthieu@buffet.re>,
+	"Mikhail Ivanov" <ivanov.mikhail1@huawei-partners.com>,
+	konstantin.meskhidze@huawei.com,
+	"Demi Marie Obenour" <demiobenour@gmail.com>,
+	"Alyssa Ross" <hi@alyssa.is>,
+	"Jann Horn" <jannh@google.com>,
+	"Tahera Fahimi" <fahimitahera@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>
+Subject: [PATCH v2 0/5] landlock: Pathname-based UNIX connect() control
+Date: Sat, 10 Jan 2026 15:32:55 +0100
+Message-ID: <20260110143300.71048-2-gnoack3000@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/5] net: phy: realtek: reunify C22 and C45
- drivers
-To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>
-Cc: Russell King <linux@armlinux.org.uk>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- Michael Klein <michael@fossekall.de>, Aleksander Jan Bajkowski
- <olek2@wp.pl>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <cover.1767926665.git.daniel@makrotopia.org>
- <d8d6265c1555ba2ce766a19a515511753ae208bd.1767926665.git.daniel@makrotopia.org>
- <131c6552-f487-4790-99c6-cd4776875de9@lunn.ch>
- <aWEBviG7gpq3TGUv@makrotopia.org>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <aWEBviG7gpq3TGUv@makrotopia.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 1/9/2026 2:25 PM, Daniel Golle wrote:
-> On Fri, Jan 09, 2026 at 02:18:14PM +0100, Andrew Lunn wrote:
->> On Fri, Jan 09, 2026 at 03:03:33AM +0000, Daniel Golle wrote:
->>> Reunify the split C22/C45 drivers for the RTL8221B-VB-CG 2.5Gbps and
->>> RTL8221B-VM-CG 2.5Gbps PHYs back into a single driver.
->>> This is possible now by using all the driver operations previously used
->>> by the C45 driver, as transparent access to all MMDs including
->>> MDIO_MMD_VEND2 is now possible also over Clause-22 MDIO.
->>>
->>> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
->>> ---
->>>  drivers/net/phy/realtek/realtek_main.c | 72 ++++++--------------------
->>>  1 file changed, 16 insertions(+), 56 deletions(-)
->>>
->>> diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
->>> index 886694ff995f6..d07d60bc1ce34 100644
->>> --- a/drivers/net/phy/realtek/realtek_main.c
->>> +++ b/drivers/net/phy/realtek/realtek_main.c
->>> @@ -1879,28 +1879,18 @@ static int rtl8221b_match_phy_device(struct phy_device *phydev,
->>>  	return phydev->phy_id == RTL_8221B && rtlgen_supports_mmd(phydev);
->>>  }
->>>  
->>> -static int rtl8221b_vb_cg_c22_match_phy_device(struct phy_device *phydev,
->>> -					       const struct phy_driver *phydrv)
->>> +static int rtl8221b_vb_cg_match_phy_device(struct phy_device *phydev,
->>> +					   const struct phy_driver *phydrv)
->>>  {
->>> -	return rtlgen_is_c45_match(phydev, RTL_8221B_VB_CG, false);
->>> +	return rtlgen_is_c45_match(phydev, RTL_8221B_VB_CG, true) ||
->>> +	       rtlgen_is_c45_match(phydev, RTL_8221B_VB_CG, false);
->>
->> Are there any calls left to rtlgen_is_c45_match() which don't || true
->> and false? If not, maybe add another patch which removes the bool
->> parameter?
-> 
-> At this point it is still used by
-> ---
-> static int rtl8251b_c45_match_phy_device(struct phy_device *phydev,
->                                          const struct phy_driver *phydrv)
-> {
->         return rtlgen_is_c45_match(phydev, RTL_8251B, true);
-> }
-> ---
-> 
-> This 5G PHY supposedly supports only C45 mode, I don't know if it
-> actually needs the .match_phy_device at all or could also simply use
-> PHY_ID_MATCH_EXACT(RTL_8251B) instead, I don't have any device using
-> it so I can't test that.
+Hello!
 
-Yes, match_phy_device is needed. This PHY ID also matches the internal PHY
-of RTL8126. And RTL8126 doesn't support speaking c45 to its internal PHY.
+This patch set introduces a filesystem-based Landlock restriction
+mechanism for connecting to UNIX domain sockets (or addressing them
+with sendmsg(2)).  It introduces a file system access right for each
+type of UNIX domain socket:
+
+ * LANDLOCK_ACCESS_FS_RESOLVE_UNIX_STREAM
+ * LANDLOCK_ACCESS_FS_RESOLVE_UNIX_DGRAM
+ * LANDLOCK_ACCESS_FS_RESOLVE_UNIX_SEQPACKET
+
+For the connection-oriented SOCK_STREAM and SOCK_SEQPACKET type
+sockets, the access right makes the connect(2) operation fail with
+EACCES, if denied.
+
+SOCK_DGRAM-type UNIX sockets can be used both with connect(2), or by
+passing an explicit recipient address with every sendmsg(2)
+invocation.  In the latter case, the Landlock check is done when an
+explicit recipient address is passed to sendmsg(2) and can make
+sendmsg(2) return EACCES.  When UNIX datagram sockets are connected
+with connect(2), a fixed recipient address is associated with the
+socket and the check happens during connect(2) and may return EACCES.
+
+## Motivation
+
+Currently, landlocked processes can connect() to named UNIX sockets
+through the BSD socket API described in unix(7), by invoking socket(2)
+followed by connect(2) with a suitable struct sockname_un holding the
+socket's filename.  This can come as a surprise for users (e.g. in
+[1]) and it can be used to escape a sandbox when a Unix service offers
+command execution (some scenarios were listed by Tingmao Wang in [2]).
+
+The original feature request is at [4].
+
+## Alternatives and Related Work
+
+### Alternative: Use existing LSM hooks
+
+The existing hooks security_unix_stream_connect(),
+security_unix_may_send() and security_socket_connect() do not give
+access to the resolved file system path.
+
+Resolving the file system path again within Landlock would in my
+understanding produce a TOCTOU race, so making the decision based on
+the struct sockaddr_un contents is not an option.
+
+It is tempting to use the struct path that the listening socket is
+bound to, which can be acquired through the existing hooks.
+Unfortunately, the listening socket may have been bound from within a
+different namespace, and it is therefore a path that can not actually
+be referenced by the sandboxed program at the time of constructing the
+Landlock policy.  (More details are on the Github issue at [6] and on
+the LKML at [9]).
+
+### Related work: Scope Control for Pathname Unix Sockets
+
+The motivation for this patch is the same as in Tingmao Wang's patch
+set for "scoped" control for pathname Unix sockets [2], originally
+proposed in the Github feature request [5].
+
+In my reply to this patch set [3], I have discussed the differences
+between these two approaches.  On the related discussions on Github
+[4] and [5], there was consensus that the scope-based control is
+complimentary to the file system based control, but does not replace
+it.  Mickael's opening remark on [5] says:
+
+> This scoping would be complementary to #36 which would mainly be
+> about allowing a sandboxed process to connect to a more privileged
+> service (identified with a path).
+
+## Open questions in V2
+
+Seeking feedback on:
+
+- Feedback on the LSM hook name would be appreciated. We realize that
+  not all invocations of the LSM hook are related to connect(2) as the
+  name suggests, but some also happen during sendmsg(2).
+- Feedback on the structuring of the Landlock access rights, splitting
+  them up by socket type.  (Also naming; they are now consistently
+  called "RESOLVE", but could be named "CONNECT" in the stream and
+  seqpacket cases?)
+
+## Credits
+
+The feature was originally suggested by Jann Horn in [7].
+
+Tingmao Wang and Demi Marie Obenour have taken the initiative to
+revive this discussion again in [1], [4] and [5] and Tingmao Wang has
+sent the patch set for the scoped access control for pathname Unix
+sockets [2].
+
+Justin Suess has sent the patch for the LSM hook in [8].
+
+Ryan Sullivan has started on an initial implementation and has brought
+up relevant discussion points on the Github issue at [4] that lead to
+the current approach.
+
+[1] https://lore.kernel.org/landlock/515ff0f4-2ab3-46de-8d1e-5c66a93c6ede@gmail.com/
+[2] Tingmao Wang's "Implemnet scope control for pathname Unix sockets"
+    https://lore.kernel.org/all/cover.1767115163.git.m@maowtm.org/
+[3] https://lore.kernel.org/all/20251230.bcae69888454@gnoack.org/
+[4] Github issue for FS-based control for named Unix sockets:
+    https://github.com/landlock-lsm/linux/issues/36
+[5] Github issue for scope-based restriction of named Unix sockets:
+    https://github.com/landlock-lsm/linux/issues/51
+[6] https://github.com/landlock-lsm/linux/issues/36#issuecomment-2950632277
+[7] https://lore.kernel.org/linux-security-module/CAG48ez3NvVnonOqKH4oRwRqbSOLO0p9djBqgvxVwn6gtGQBPcw@mail.gmail.com/
+[8] Patch for the LSM hook:
+    https://lore.kernel.org/all/20251231213314.2979118-1-utilityemal77@gmail.com/
+[9] https://lore.kernel.org/all/20260108.64bd7391e1ae@gnoack.org/
+
+---
+
+## Older versions of this patch set
+
+V1: https://lore.kernel.org/all/20260101134102.25938-1-gnoack3000@gmail.com/
+
+Changes in V2:
+ * Send Justin Suess's LSM hook patch together with the Landlock
+   implementation
+ * LSM hook: Pass type and flags parameters to the hook, to make the
+   access right more generally usable across LSMs, per suggestion from
+   Paul Moore (Implemented by Justin)
+ * Split the access right into the three types of UNIX domain sockets:
+   SOCK_STREAM, SOCK_DGRAM and SOCK_SEQPACKET.
+ * selftests: More exhaustive tests.
+ * Removed a minor commit from V1 which adds a missing close(fd) to a
+   test (it is already in the mic-next branch)
+
+Günther Noack (4):
+  landlock: Control pathname UNIX domain socket resolution by path
+  samples/landlock: Add support for named UNIX domain socket
+    restrictions
+  landlock/selftests: Test named UNIX domain socket restrictions
+  landlock: Document FS access rights for pathname UNIX sockets
+
+Justin Suess (1):
+  lsm: Add hook unix_path_connect
+
+ Documentation/userspace-api/landlock.rst     |  25 ++-
+ include/linux/lsm_hook_defs.h                |   4 +
+ include/linux/security.h                     |  11 +
+ include/uapi/linux/landlock.h                |  10 +
+ net/unix/af_unix.c                           |   9 +
+ samples/landlock/sandboxer.c                 |  18 +-
+ security/landlock/access.h                   |   2 +-
+ security/landlock/audit.c                    |   6 +
+ security/landlock/fs.c                       |  34 ++-
+ security/landlock/limits.h                   |   2 +-
+ security/landlock/syscalls.c                 |   2 +-
+ security/security.c                          |  20 ++
+ tools/testing/selftests/landlock/base_test.c |   2 +-
+ tools/testing/selftests/landlock/fs_test.c   | 225 +++++++++++++++++--
+ 14 files changed, 344 insertions(+), 26 deletions(-)
+
+-- 
+2.52.0
 
 
