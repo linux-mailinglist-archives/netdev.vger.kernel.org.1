@@ -1,90 +1,104 @@
-Return-Path: <netdev+bounces-248638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E15AD0C8E4
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 00:35:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C1B44D0C9A5
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 01:11:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 932FE301FC3A
-	for <lists+netdev@lfdr.de>; Fri,  9 Jan 2026 23:35:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 65ABA3026B1B
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 00:11:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CB3533CE9D;
-	Fri,  9 Jan 2026 23:35:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95042E40E;
+	Sat, 10 Jan 2026 00:11:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QYm+8HnE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WF5/fIAP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EE2B248861;
-	Fri,  9 Jan 2026 23:35:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A2AE54B
+	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 00:11:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768001737; cv=none; b=I3DQp9vavdpwYjqot/i6swbchb84VkYVFRwIADbyXi0mESmJ9zk9AEKXCGxnyLR4BamuH503mJ8mIHe5H++QI7t4GPsn7N93oN5DpuHek4iyjunBPxmg/pQQ3HmYIY+0iQSr+/2amCqw70k5q+BqOU3Nhgc4lLx4lYvcQIEriWQ=
+	t=1768003876; cv=none; b=L9RgW0TQR0nfhygEzRBIEEVVJRCEeh6elpR2cxMuCEYRm3z7Hqys91abCh/BXupSTJYt0YEcbu/1Nz9uKhXFBqiTNPUstVVZGW8eykHEUTMXOUQ1bmYkTUDlHFPS5RL/ozwRMy/QNy5hSVH+z8EAeNRILy/oLoq0k6ASzHdi//s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768001737; c=relaxed/simple;
-	bh=Q1c6SA9SoZegHQaoQsX+njuHjd1iEf1cuhLBY5bV4qc=;
+	s=arc-20240116; t=1768003876; c=relaxed/simple;
+	bh=XszBXPJ18HkMpycCWMX0Y8i3Aoh/kyFsduWJiX9qSIA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IRY187e8piMwxxLznaC6VdlrLUnM1HuvSVcJSWqupeSeygpTTOl8XFZ75HbJDtAfY3qwUVNSSgc/Dm6RRMwQvvGhOGURiZjhCAVL3/6qCwfw6xbzOuadwxnBRe9IFfgx0L4RA68ICb5W/ArXMpM+cmpW+VCpMDK7dmgf1FrdxaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QYm+8HnE; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768001734; x=1799537734;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Q1c6SA9SoZegHQaoQsX+njuHjd1iEf1cuhLBY5bV4qc=;
-  b=QYm+8HnE/GeU0Lj3kPM1b4mrGRdcO8UuvkLLbDsai/9j8JoJ32KvCUtv
-   7SnD7hVH/hp3H0f3Z1SuD2+xm4HJuvkI1NQrNWYpTjtIcrB9L+ShfrjA0
-   E+Az99zUbasWShN+T/prAaTC1PFYAvNXQlv/hHh/HMKCiowd9CsYA/dGF
-   T6zCM10OAzu0nu1HITGiqH2RLZLyAMj9xdaMaKaKxNbeHOxSrlYE3R9VW
-   IQoL1DWk3yU6lwMCl6kvMpU4nhbjtO29H+RLptqD76guspmOe9lukMmCO
-   4aJ0MF0d4wXpNh6+UaTZc0ACZo2Shk9aEbdQgaQQi7MGnJY1AcPPVZ1vr
-   w==;
-X-CSE-ConnectionGUID: 4xDe1tctQcibag/Hy1lbOg==
-X-CSE-MsgGUID: oY4fxBmFR9Kx/njJH4s2cQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11666"; a="79679452"
-X-IronPort-AV: E=Sophos;i="6.21,215,1763452800"; 
-   d="scan'208";a="79679452"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2026 15:35:33 -0800
-X-CSE-ConnectionGUID: DA3EGJ76THe/Sdvdi4NDSw==
-X-CSE-MsgGUID: e0/EJjYbTDuy6c6td88RCg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,215,1763452800"; 
-   d="scan'208";a="203662294"
-Received: from igk-lkp-server01.igk.intel.com (HELO 92b2e8bd97aa) ([10.211.93.152])
-  by orviesa008.jf.intel.com with ESMTP; 09 Jan 2026 15:35:27 -0800
-Received: from kbuild by 92b2e8bd97aa with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1veM0r-0000000029k-15Ib;
-	Fri, 09 Jan 2026 23:35:25 +0000
-Date: Sat, 10 Jan 2026 00:34:30 +0100
-From: kernel test robot <lkp@intel.com>
-To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Rob Herring <robh@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, linux-rdma@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	intel-wired-lan@lists.osuosl.org, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Mark Bloch <mbloch@nvidia.com>, linux-kernel@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Saeed Mahameed <saeedm@nvidia.com>
-Subject: Re: [Intel-wired-lan] [PATCH net-next 06/12] dpll: Support dynamic
- pin index allocation
-Message-ID: <202601100030.nDiAPf7k-lkp@intel.com>
-References: <20260108182318.20935-7-ivecera@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QTM0zD74ipdRKCtpsGsNLMXxuTdEE1wq5tBEf2lYYQCDw20M2Q5dkqVzIe2Y3cYRbLLmoEqljPTD8PC2qelk/IXEDHeSH3hMQqyZDLXNheV5GiBNSDssD2PhXAtW4x9qVNOnpXuK/E7wS7b90VSb2XlxEB73gbEbeSVUYe42jdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WF5/fIAP; arc=none smtp.client-ip=74.125.224.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-646fe7f70e2so3386024d50.0
+        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 16:11:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768003874; x=1768608674; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6N0A2c2LYMc0dJDgYzdUUiKfOdoal/WEyiilk+5HTkg=;
+        b=WF5/fIAP4AEyO4f6KWSJP2rwaSy/sViblkfSeeU8EGHt4W8zcGu8GdInztygNBG+SI
+         lFZMtf5mk92Bho0bl/kz0wrylefbq54djvfDKFetQZqFm4VltIFlMyuYZ3TYsee7EuPv
+         cuFATTU+AojUbvwayi9w7OyNstSzzzIWEbhQr08urKNmtzyFQEASvw8VCOBtpjn1hEZ7
+         /S6AXS4ADril+8pCuPrnQcp3DFjvjtLVBL9cCPyinaRd8F5C9kJqxbl7/LUxO4bKzb5y
+         2VTvsnHADEUfrU8ytID59HZXZVXxMG6DT+qvAAEn0faaDEgjA/ym8ZI4sdu6WxDKie2G
+         EoTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768003874; x=1768608674;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6N0A2c2LYMc0dJDgYzdUUiKfOdoal/WEyiilk+5HTkg=;
+        b=vLuvXDUhRLePqhTCxE0sXtlMNF1RhpwbKeqvSNIk2twJWhYbcp2zSJnr6CkGmzayt4
+         yIvEWFv3xx1Z9ME2tygn/ddDrl0fBnewzvID09RcXyQkExqzIRpk7dOqRXtADDdH9YZL
+         NRRgeDSwR+8BEtHzLuvw9MlLS3Y2dRyJdZUrhjlyhc0MDeXzqm/EVnXzDYKmx3lMVy2+
+         iemq2auQsmpozSt2Rh8xBy3Q0KF1egK2bLqJ8AbWCFrZjwfy+5mVsGd8mqkP8fHTK1fn
+         sAUvOKQEhUGKa6Zu7IlAVJ6rVCUbpHCG/z3Ihhsa8ig5C7bFVcZFWR+zZaegXGmblwTm
+         D1kw==
+X-Forwarded-Encrypted: i=1; AJvYcCVVnv7WW8LPCOMW8Vouc97maUJ8STltK6RrnZQ4ffpQGfPdBgiisJZW3uSJIDXpXNVNcX63tmU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbGQcFCOoOXho2fDvQDFpXru2H+P/lkFPdDfmSWdK4AUA3QTAe
+	6m+4Y4CreKF9uIReY+KyLU3FFhCH82Tx0eR9DzXBpMDb9uELjhbqvAOD
+X-Gm-Gg: AY/fxX67nvawYhLDsvz9/8QeIsh9A3jFk9m+ZvJ4v7OSlRmhoV6Sx+oPSBV7DebvSaM
+	FarEuGzC0JK9CgCAJ/evEro10k1sqRN3TTyG7tBP1UppRhWswyzV9m7pK+CqDYu5oS1W7+UwfdX
+	dk1ADqTGjmgabTUVnB0Bbe1woD0Awf1Ke1rMN5laWvgwPOkc2KoItRJ5qIOV0IicMTsAxQq/jME
+	GeBgllxQ+2Hvh7+6lP5rWcLZjAar65C6xIEu6A587c5i9oUKff5YiwcF5AhbuF6NaSo5F43pGIi
+	ObpqVw2dCWBg+mrDc/HmiuIFrs54IMFpoAn/HHteKs+HSWr4+EVgV4t8kZBd48ueLuu/jcEc7br
+	LbFRwEzkxmaX9ebI0daxKSG74DOnmyvawVGcmRWnUdCNaF7UU4C0zcuFUGfXQSBkHpWZVPiWNVe
+	5mQzxpo4PLtPo97iSvScULfMeNnXWyNUXaKw==
+X-Google-Smtp-Source: AGHT+IE5CW/VP1bFR/Dosae0XD0Rb9scRJI8ZCC2GQQ5cF/xpuuKEVGU70q9buii5G2BZNROzhlUqg==
+X-Received: by 2002:a05:690e:1611:b0:644:7712:ed72 with SMTP id 956f58d0204a3-64716bd7b38mr8182868d50.43.1768003873903;
+        Fri, 09 Jan 2026 16:11:13 -0800 (PST)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:a::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-790aa553ac3sm46524707b3.5.2026.01.09.16.11.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Jan 2026 16:11:13 -0800 (PST)
+Date: Fri, 9 Jan 2026 16:11:12 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Shuah Khan <shuah@kernel.org>, Long Li <longli@microsoft.com>
+Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, kvm@vger.kernel.org,
+	linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	berrange@redhat.com, Sargun Dhillon <sargun@sargun.me>,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH RFC net-next v13 00/13] vsock: add namespace support to
+ vhost-vsock and loopback
+Message-ID: <aWGZILlNWzIbRNuO@devvm11784.nha0.facebook.com>
+References: <20251223-vsock-vmtest-v13-0-9d6db8e7c80b@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,52 +107,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260108182318.20935-7-ivecera@redhat.com>
+In-Reply-To: <20251223-vsock-vmtest-v13-0-9d6db8e7c80b@meta.com>
 
-Hi Ivan,
+On Tue, Dec 23, 2025 at 04:28:34PM -0800, Bobby Eshleman wrote:
+> This series adds namespace support to vhost-vsock and loopback. It does
+> not add namespaces to any of the other guest transports (virtio-vsock,
+> hyperv, or vmci).
+> 
+> The current revision supports two modes: local and global. Local
+> mode is complete isolation of namespaces, while global mode is complete
+> sharing between namespaces of CIDs (the original behavior).
+> 
+> The mode is set using the parent namespace's
+> /proc/sys/net/vsock/child_ns_mode and inherited when a new namespace is
+> created. The mode of the current namespace can be queried by reading
+> /proc/sys/net/vsock/ns_mode. The mode can not change after the namespace
+> has been created.
+> 
+> Modes are per-netns. This allows a system to configure namespaces
+> independently (some may share CIDs, others are completely isolated).
+> This also supports future possible mixed use cases, where there may be
+> namespaces in global mode spinning up VMs while there are mixed mode
+> namespaces that provide services to the VMs, but are not allowed to
+> allocate from the global CID pool (this mode is not implemented in this
+> series).
 
-kernel test robot noticed the following build warnings:
+Stefano, would like me to resend this without the RFC tag, or should I
+just leave as is for review? I don't have any planned changes at the
+moment.
 
-[auto build test WARNING on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Ivan-Vecera/dt-bindings-dpll-add-common-dpll-pin-consumer-schema/20260109-022618
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260108182318.20935-7-ivecera%40redhat.com
-patch subject: [Intel-wired-lan] [PATCH net-next 06/12] dpll: Support dynamic pin index allocation
-config: x86_64-rhel-9.4 (https://download.01.org/0day-ci/archive/20260110/202601100030.nDiAPf7k-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260110/202601100030.nDiAPf7k-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601100030.nDiAPf7k-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   drivers/dpll/dpll_core.c: In function 'dpll_pin_idx_free':
->> drivers/dpll/dpll_core.c:499:28: warning: integer overflow in expression of type 'int' results in '-2147483648' [-Woverflow]
-     499 |         pin_idx -= INT_MAX + 1;
-         |                            ^
-
-
-vim +499 drivers/dpll/dpll_core.c
-
-   490	
-   491	static void dpll_pin_idx_free(u32 pin_idx)
-   492	{
-   493		if (pin_idx <= INT_MAX)
-   494			return; /* Not a dynamic pin index */
-   495	
-   496		/* Map the index value from dynamic pin index range to IDA range and
-   497		 * free it.
-   498		 */
- > 499		pin_idx -= INT_MAX + 1;
-   500		ida_free(&dpll_pin_idx_ida, pin_idx);
-   501	}
-   502	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Best,
+Bobby
 
