@@ -1,233 +1,151 @@
-Return-Path: <netdev+bounces-248713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FC34D0D96B
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 18:05:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B214D0D9BE
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 18:24:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5799330049C1
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 17:04:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 83546303294A
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 17:23:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2F432877D2;
-	Sat, 10 Jan 2026 17:04:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DA05299AB4;
+	Sat, 10 Jan 2026 17:23:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Ix4EAMUv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bSIrCJpN"
 X-Original-To: netdev@vger.kernel.org
-Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010027.outbound.protection.outlook.com [52.101.56.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA5F23C4F4
-	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 17:04:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.27
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768064696; cv=fail; b=KW7NxqvXdn7QyeH47DavqqDY/blOaqeh3yCCRk3dAu9YoLzze7lvT+G9/te/WmGDlfnsMQP5PhV+asuucT3CT8OjNY59lkIAR2BdGjG0HgmmwKopU8IjmMjOl1pEPaGhVXem2kkMg19a9cNnqnLqnXcw6um3ltmLGyIv24Vy4bU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768064696; c=relaxed/simple;
-	bh=leOxaDdU+os+s2iFOLFWKNP9qxAcgRZ8Da66capLTkQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hf/ULjTbpQgyUPuG3OMH/8NWxjEuRXMN4HmTZlG/GqmgJTwYknF59nZL/iJKHuWSubDQCUDDT789So76lPrqvZnjEuaE1FP7q4lJYMu66b9JrxFQK8TBkQ5NKGWFtG6dRitAw2oXEWgfwTKBvTJG75yU898jps3rrdYvmV6W+kQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Ix4EAMUv; arc=fail smtp.client-ip=52.101.56.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=f5UkbI0JJCGDnoe1WF9EwG50OYUcrALjZLFVDofcht7pFZcn46eL3Qj/trGh2XpWJfAAB86ZJmWdmhRPDHil7v2vxTS0C0NDsyju8ncXrx3slsjSaxMnjpjHKWHDwge0mjXdBxal8t9t4ho9psfgczvAFnS6VRWImQuyXTbHArK3ijcRusLY1vPRRKqAZETn7E16EQtMBrMYp5SliPQWP3wbPF8Jx57/RuqBrhRGOqeQCwadRL1z3hy3D7DY0KF9EYS2pSwKNqYJmzHky8pO09pukDqr6K1CEjs/FPkXzW8ucWGdA5u3PC9Z0R/gbZCkSqM+E8ofiph4/2BZSRvsdA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=x7EhNh2dUTgh5BienM8MBV52GiFnEOreuVVEqZTAcM4=;
- b=po6FexvcUAsRiEggcy38GluVgAy60MM0Z8YBFDcns86K11nteNRzYc3KLqtSKdBZcVsS8ZnyQ62anUIItTJx6d8enlIKxyEyq9JWdhGExB7PQv61j00ciz63U+cjF8vjvBdi/6bWGRvC3jpZAfnE5J9BCRO9I1ZHRBR4o5f8TlDwYwOTLL6I/JcLV6a9Q30cSlyHU4mvZciPGB0B/ZXyAB+5Y2D+Fr+Mjq3OJBLzqwLhh2bHGVgNnYaxInbs72qEUTyliNhFsT2e4mHZauV6Z+Njr2HTeL5jt0cPCiKg0pMdnpE7VepRo58LDCIkNkEtMUGxFsw0At2LCcvm2f/hHQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=x7EhNh2dUTgh5BienM8MBV52GiFnEOreuVVEqZTAcM4=;
- b=Ix4EAMUvsNic5rF42xhZmIsek1DTH3Oa0D8fc1wTT/WBVg61Q9Fyj5lTMHcq2joSGjyqs+SzifW2MLX6XbSb+lwOit8/9NuCQyq+GbU5pd1NhsUSlm+sWK+esm+SUNKfRl09bsDGG0QrY9pRq7wsaTFVBrmJ8oFWVLxJwBlF8zE=
-Received: from SA9P223CA0005.NAMP223.PROD.OUTLOOK.COM (2603:10b6:806:26::10)
- by SJ0PR12MB6734.namprd12.prod.outlook.com (2603:10b6:a03:478::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.6; Sat, 10 Jan
- 2026 17:04:50 +0000
-Received: from SN1PEPF000252A0.namprd05.prod.outlook.com
- (2603:10b6:806:26:cafe::4b) by SA9P223CA0005.outlook.office365.com
- (2603:10b6:806:26::10) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9499.3 via Frontend Transport; Sat,
- 10 Jan 2026 17:04:50 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- SN1PEPF000252A0.mail.protection.outlook.com (10.167.242.7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9520.1 via Frontend Transport; Sat, 10 Jan 2026 17:04:50 +0000
-Received: from airavat.amd.com (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Sat, 10 Jan
- 2026 11:04:46 -0600
-From: Raju Rangoju <Raju.Rangoju@amd.com>
-To: <netdev@vger.kernel.org>
-CC: <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
-	<davem@davemloft.net>, <andrew+netdev@lunn.ch>, <Thomas.Lendacky@amd.com>,
-	<Shyam-sundar.S-k@amd.com>, Raju Rangoju <Raju.Rangoju@amd.com>
-Subject: [PATCH net] amd-xgbe: avoid misleading per-packet error log
-Date: Sat, 10 Jan 2026 22:34:22 +0530
-Message-ID: <20260110170422.3996690-1-Raju.Rangoju@amd.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30BC123EABC
+	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 17:23:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768065804; cv=none; b=JAPGlQN7vZvDbLublAZmn3VRCJbz4HZwLRkT/tDTqkeQFvDbMw2oUzPgK+L+f1N+6d/CaDuhL1O7v69wuesws0yJtxFB+9CH/aw3gvc9NJqC5orVTIYUSq3b+yq00Mm6fWa1WCdyXnHpmjCWdRy6lcF22RvW1NeH6sYHH5l7a34=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768065804; c=relaxed/simple;
+	bh=pakMjl6j6GOv4b+iY4CNdvqw95U+lNMsuEAbPeAA9Tk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=R+vNVn3vdRRlioWWO4B/zFJRSIHfOuiicnRgQXtpxlMUWHdddPhrvA91Mzxp5kE74HdxDa6dhtFk59rfnmZW8T947cUmUrIYYLNsqMnM9G3eSkfaUxRTN/P7wdR9a4YJgKfTCS1Z0EZFvSY3SFSfxqL6jfgiu/x0CMydakXIjnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bSIrCJpN; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4775ae5684fso24062885e9.1
+        for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 09:23:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768065789; x=1768670589; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6i+l9OirRP2WP1mwsYu6cExZNaNS29ikPG+ILCNDCAw=;
+        b=bSIrCJpNpScrwcrjtYab0YZ7qeifRvVEtiP/9SdXMJb7ErWq4xr8/votC2e/ilSxMU
+         7M/ij9JdgNMNwpGyYXD3fAMVCphRGUdpVet9m7/MmpDagMUGCULIQxpwcPMP7pBAdyiH
+         GZTnDHMYbi2P0iaKuS6u0ae5vPpPNaC7W1ZK1baK6V3MnlyOQ4DsL5UJjxdvryjltScB
+         3XTs0k1aGbIsu0D85oc9bepVk9KidDGZ9/8WzB5mNhjOkT1hUaFpejSTrnNaXkTRsF7E
+         EdrAQ40x9G0aDO/mPrpFmX9Zg3p38Cg4pw3R+wP2jS6LFU6xML5r9OUjbUAx4F2wI9Hf
+         IMgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768065789; x=1768670589;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6i+l9OirRP2WP1mwsYu6cExZNaNS29ikPG+ILCNDCAw=;
+        b=MH8sKJ8Mx9TFOziYGQAU8arCwPBLqYQMuizwPfPUXwaOr9uOVWpRLUT+meNnbnCp5Y
+         S0GDsDVfeOE44FQri7gL1jGYuVF3ldSePksKMZpps/BecAeVH66903IzzBVpq0MDsrmM
+         B8QoTunmniVhkKyqFnLBT7u3vP99S9ndCMocvwkLJRMx+LZYwcppWJ0vBIjqR0Sps/Wm
+         Jdmomz9rPrvBgpAT7vsyoNPBhimisK6UTUVZES5V9wnBy9lJWddtvt4uQ2dQPTHXvhFU
+         zUJJSec4fyvNk/Lt3zF3wH3VLvu1VDiRRIj4gxYzDiVkAGpkyqXN4B1XWAC9wo6/p6OS
+         PCsg==
+X-Forwarded-Encrypted: i=1; AJvYcCXzrTtapwU7Xu/MQa5WerW1Nh0vyZBm7jQtqqjjy2WL4UAYCe29xk7o6G8TA0p/UuLdJo0RvxE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySFaLS4OPR1KoPIzeGf0FeFSWoSE3IKpwFoGYq/PiioQ9whEL+
+	IZQL6p2su6CjGjuBpySyoLGl4Z2a7OhIyK7YhrthJjwpr/2kvfEKxE5v
+X-Gm-Gg: AY/fxX6ypY1HcY3n871iv0eFlzRvrnkOZLxgWmxTboFZUrk5RJh5RgnPZAWXDtcI2QI
+	kHDvFSfQIE68mx0vL7sTuDnPNsSNqp8h28cEqkg3kffOAwwZcjHfP4MObMBmQPq1hecPkIQzhc9
+	CdpVT/Z5Zwgk+RBD/ZQpz56NO4Nothk5JqwAj0VI+l8VlgmHhILcIg4gkG9Sfy81cXfILEO/jzz
+	zys6laejqf2NQAEEKATXUsy2TJ05tP6DX6pBnrOvyJBDkSvMaLHavc+/9NKH9EDSbkHJ8fvj3u2
+	xyHh6fRex49roOlFaKSOBx2AH4xYFrKK+25ZAQUFi/6QTiyg6dxXiLVkOLFQHH0I+rYA4QvhHLX
+	q+wYkvU0xBLEnbIKNeQ1cFwWEfQtQRs3x8CW3UvExZsDJ2rZBZkSb3VsrnlEvMBYvPZ340P3Jqk
+	Yi9WBrLcDxAuBmO+giqeMsBVDuIerBYchsRNQdO7e8bxe2RHo8X0kwG6dVjA10mCKcQS2+rVlrw
+	9F7y2DvyXq5HzpWN1bnOK5JcjUaHGLDiTAXEkIVor4oA0V5JBujCQ==
+X-Google-Smtp-Source: AGHT+IH5SusDuyYd10wVOARF8vfhuJmkj2Gs3NQGqH2vk32kOtSeaadtC/gGNE4+vdYKyJWnsH8X+g==
+X-Received: by 2002:a05:600c:4e13:b0:47d:25ac:3a94 with SMTP id 5b1f17b1804b1-47d84b32f30mr167555215e9.17.1768065789262;
+        Sat, 10 Jan 2026 09:23:09 -0800 (PST)
+Received: from ?IPV6:2003:ea:8f1c:1800:8cc6:804e:b81b:aa56? (p200300ea8f1c18008cc6804eb81baa56.dip0.t-ipconnect.de. [2003:ea:8f1c:1800:8cc6:804e:b81b:aa56])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d86372c92sm99561775e9.0.2026.01.10.09.23.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 10 Jan 2026 09:23:08 -0800 (PST)
+Message-ID: <6b1377b6-9664-4ba7-8297-6c0d4ce3d521@gmail.com>
+Date: Sat, 10 Jan 2026 18:23:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF000252A0:EE_|SJ0PR12MB6734:EE_
-X-MS-Office365-Filtering-Correlation-Id: 97cb6cb9-bdf9-43d8-76e1-08de506a5dad
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700013|1800799024|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?kmSxQXjuYgOc0wEE8qKqQFb88NOizqk9BvZryPBM1Ch9DaS8bryX9cuGFxfP?=
- =?us-ascii?Q?1VUv4zWnpf9oL38U75rVxWkiom2iSV7gN9icCtkf4z/JZCLtyNrL3ACIZ1A9?=
- =?us-ascii?Q?oSb6jPG/O+CAyMNh6hbkRufN9P/2hWOsZBiUgYucRhZQVT859I9dL40sGptW?=
- =?us-ascii?Q?34FLroha2NTtTn+KH4Ktz+run4yOgdI7TWUqzzyELv+XDU9zhS+Oe91oYtZE?=
- =?us-ascii?Q?t/5Q0cSxZf/rxUXjGsLLei500UkAVwRn/oXlvzB2orU/6I94e34IyvZxw6Tm?=
- =?us-ascii?Q?Bol6mqu8OpJEfX4BjMdFOBEk/KaSUcL9/0fT71BfXe/sRsUnrK3gAGUqlZPq?=
- =?us-ascii?Q?WsrRYCEqeUhCCtOgVaLmn5Sh7tHCPfGci3gzK1P36j3ceGFY1PQOcBYWhhny?=
- =?us-ascii?Q?4ekeNeST2tR6OWu7lge7uKkiJw/cqC1/+DirAeiJzRPn0/OnO9UthH2j/jcQ?=
- =?us-ascii?Q?g3heKamUKXK15PJ/AVtScBDm0wj/CeA0Au2XVoCSpn9ZxD1zCWEw/PHgRTXU?=
- =?us-ascii?Q?LdhHV9PVBxvlzFHEno6TjFtKio9eWQoxYUPhEJeRMZgfL1hVVxhomSasM6NB?=
- =?us-ascii?Q?OyGMWf1YpVp/jlldF8KcOx7c1SHrMmBSlinVG+kyJ4wBR5ErbWrQoR9TMmvy?=
- =?us-ascii?Q?ONWx7oerTL0R1ajZ9EYjjSx3wigAGYmTvytuKvnY2JnoJEMzg39+PK52c/60?=
- =?us-ascii?Q?F4UcuFD8BDP9uEVbcnouQUlz9K96kzevUE/mPVW98mdlEVvZhOMTzorxCO7o?=
- =?us-ascii?Q?yU2QiWCHo3IMhhZGXioZO8Ri5dVAekfYfprsd7olPnbJJobcbHZGMBGUndIL?=
- =?us-ascii?Q?Khca53QwvvgwgqtULz+quPJNAgzoImrW9u8ld98wB+KocPh1syFJNfCjXDUi?=
- =?us-ascii?Q?zvF92hu9T3xvtKxmTacL6NjWCfoQV/JCHJCLbgHOyMAS6wjluSCnXSknqMmp?=
- =?us-ascii?Q?qBwQmdq0QGfupmBfl996v99QX3S5kAx2MaHHue6zxY2Cfj6jzWttfPwE4FOL?=
- =?us-ascii?Q?zpL2nAlReX8DSau3YbzZZsypcwEFK/3qVC66I/rwqDBaBl8pFgqR32sM7NR7?=
- =?us-ascii?Q?FOu1dOllJ40s1NltgtP879dk9L2jGW4At0xVaJrIemzA9bHRgooJBudZCoQE?=
- =?us-ascii?Q?kRfE17EUtWFb85XRYwaNPJjntivTR/IUlc3buyAEPcyPJ9/Ltt6I/Bu9rG3z?=
- =?us-ascii?Q?oeaKGmM+3Q4Tk2BmHPJH8o1zv2V2ejWr35F6iz6ZevpMYNqgh1uQTqimAgqr?=
- =?us-ascii?Q?Kysucr5+EmBHB6j7UdAml7F7dsxJj+lYm88YsW0fn02fKwZW+msB5Z95PdQH?=
- =?us-ascii?Q?JCBwo+s9iWbD9+v4ED5kfjbnmc/3iwWZbiO93Dq4VrkC/pazcGNSOJMzjN1x?=
- =?us-ascii?Q?PONVQ3P7szg5/WkkJGMJ/MVxiwjErPLpyXtyFqBFKUau1t0ca6KPynEXYUUT?=
- =?us-ascii?Q?pa0Il6iyZirFGjWYvzYj8pBqq9m2El92O9+z0iq3mce3Izu0ayIp0i5HpgQH?=
- =?us-ascii?Q?UiEcmUKY0FLLdLopgXMadD0fJz8JLVvegA7YX2LLRp886TUqqBTWxvRD5Lim?=
- =?us-ascii?Q?I4Xv3o3PuZF+abtt1hA=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700013)(1800799024)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2026 17:04:50.0938
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 97cb6cb9-bdf9-43d8-76e1-08de506a5dad
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF000252A0.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6734
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] net: phy: realtek: add PHY driver for
+ RTL8127ATF
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ David Miller <davem@davemloft.net>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, Michael Klein <michael@fossekall.de>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Aleksander Jan Bajkowski <olek2@wp.pl>,
+ Fabio Baltieri <fabio.baltieri@gmail.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <52011433-79d3-4097-a2d3-d1cca1f66acb@gmail.com>
+ <492763d9-9ece-41a1-a542-d09d9b77ab4a@gmail.com>
+ <20260108172814.5d98954f@kernel.org>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+In-Reply-To: <20260108172814.5d98954f@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On the receive path, packet can be damaged because of buffer
-overflow in Rx FIFO. Avoid misleading per-packet error log when
-packet->errors is set, which could spam logs and confuse users.
-Instead, rely on the stats.
+On 1/9/2026 2:28 AM, Jakub Kicinski wrote:
+> On Thu, 8 Jan 2026 21:27:06 +0100 Heiner Kallweit wrote:
+>> --- /dev/null
+>> +++ b/include/linux/realtek_phy.h
+> 
+> How would you feel about putting this in include/net ?
+> Easy to miss things in linux/, harder to grep, not to
+> mention that some of our automation (patchwork etc) has
+> its own delegation rules, not using MAINTAINERS.
 
-Fixes: c5aa9e3b8156 ("amd-xgbe: Initial AMD 10GbE platform driver")
-Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
----
- drivers/net/ethernet/amd/xgbe/xgbe-common.h  | 3 +++
- drivers/net/ethernet/amd/xgbe/xgbe-dev.c     | 5 +++++
- drivers/net/ethernet/amd/xgbe/xgbe-drv.c     | 6 +++---
- drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c | 2 ++
- drivers/net/ethernet/amd/xgbe/xgbe.h         | 2 ++
- 5 files changed, 15 insertions(+), 3 deletions(-)
+Just sent a v2 with the new header moved to new include/net/phy/.
+patchwork is showing a warning rgd a missing new MAINTAINERS entry.
+However this new entry is added with the patch:
 
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-common.h b/drivers/net/ethernet/amd/xgbe/xgbe-common.h
-index 62b01de93db4..4a0548e0cbaf 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-common.h
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-common.h
-@@ -1134,6 +1134,9 @@
- #define RX_NORMAL_DESC3_RSV_INDEX		26
- #define RX_NORMAL_DESC3_RSV_WIDTH		1
- 
-+/* RX normal DESC3 values */
-+#define RX_NORMAL_DESC3_ETLT_FIFO_OVERFLOW	0x7
-+
- #define RX_DESC3_L34T_IPV4_TCP			1
- #define RX_DESC3_L34T_IPV4_UDP			2
- #define RX_DESC3_L34T_IPV4_ICMP			3
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-index b646ae575e6a..9cb57e0b26bc 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-@@ -1968,9 +1968,14 @@ static int xgbe_dev_read(struct xgbe_channel *channel)
- 			XGMAC_SET_BITS(packet->attributes, RX_PACKET_ATTRIBUTES,
- 				       TNPCSUM_DONE, 0);
- 			pdata->ext_stats.rx_vxlan_csum_errors++;
-+		} else if (etlt == RX_NORMAL_DESC3_ETLT_FIFO_OVERFLOW) {
-+			XGMAC_SET_BITS(packet->errors, RX_PACKET_ERRORS,
-+				       OVERRUN, 1);
-+			pdata->ext_stats.rx_buffer_overflow++;
- 		} else {
- 			XGMAC_SET_BITS(packet->errors, RX_PACKET_ERRORS,
- 				       FRAME, 1);
-+			pdata->ext_stats.rx_pkt_errors++;
- 		}
- 	}
- 
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-index 3ddd896d6987..132a2e1368ed 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-@@ -2292,9 +2292,9 @@ static int xgbe_rx_poll(struct xgbe_channel *channel, int budget)
- 			goto read_again;
- 
- 		if (error || packet->errors) {
--			if (packet->errors)
--				netif_err(pdata, rx_err, netdev,
--					  "error in received packet\n");
-+			/* packet->errors may indicate RX FIFO overflow;
-+			 * drop without per-packet log
-+			 */
- 			dev_kfree_skb(skb);
- 			goto next_packet;
- 		}
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
-index 0d19b09497a0..c8797a338542 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
-@@ -75,6 +75,8 @@ static const struct xgbe_stats xgbe_gstring_stats[] = {
- 	XGMAC_MMC_STAT("rx_pause_frames", rxpauseframes),
- 	XGMAC_EXT_STAT("rx_split_header_packets", rx_split_header_packets),
- 	XGMAC_EXT_STAT("rx_buffer_unavailable", rx_buffer_unavailable),
-+	XGMAC_EXT_STAT("rx_buffer_overflow", rx_buffer_overflow),
-+	XGMAC_EXT_STAT("rx_pkt_errors", rx_pkt_errors),
- };
- 
- #define XGBE_STATS_COUNT	ARRAY_SIZE(xgbe_gstring_stats)
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe.h b/drivers/net/ethernet/amd/xgbe/xgbe.h
-index 03ef0f548483..735c757e1603 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe.h
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
-@@ -675,6 +675,8 @@ struct xgbe_ext_stats {
- 	u64 rx_vxlan_packets;
- 	u64 rx_csum_errors;
- 	u64 rx_vxlan_csum_errors;
-+	u64 rx_buffer_overflow;
-+	u64 rx_pkt_errors;
- };
- 
- struct xgbe_pps_config {
--- 
-2.34.1
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -9416,6 +9416,7 @@ F:	include/linux/phy_link_topology.h
+ F:	include/linux/phylib_stubs.h
+ F:	include/linux/platform_data/mdio-bcm-unimac.h
+ F:	include/linux/platform_data/mdio-gpio.h
++F:	include/net/phy/
+ F:	include/trace/events/mdio.h
+ F:	include/uapi/linux/mdio.h
+ F:	include/uapi/linux/mii.h
 
+Bug in the check?
+
+
+stdout from the check:
+
+New files:
+include/net/phy/realtek_phy.h
+
+Modified files:
+drivers/net/phy/realtek/realtek_main.c
+MAINTAINERS
+drivers/net/ethernet/realtek/r8169_main.c
+
+Checking coverage for a new file: include/net/phy/realtek_phy.h
+  Section ETHERNET PHY LIBRARY covers ~225 files
+  Section NETWORKING [GENERAL] covers ~3556 files
+  Section THE REST covers ~590073 files
+ MIN 225
 
