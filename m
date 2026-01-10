@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-248738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCDA3D0DDA3
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 22:06:04 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB17BD0DDB5
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 22:06:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DC8D8304155B
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 21:05:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 242F3304B04A
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 21:05:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B02614A0C;
-	Sat, 10 Jan 2026 21:05:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECFEF2C21C2;
+	Sat, 10 Jan 2026 21:05:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Z16p81V/"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="RnOo7/zl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f68.google.com (mail-ed1-f68.google.com [209.85.208.68])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B6B71E5B95
-	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 21:05:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 401F52C0296
+	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 21:05:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768079127; cv=none; b=JWlnpipbJoNmyMp4y5cvLZqMI+72svZm3IUEb6QD4j1M8a0tXai+O90NALxvnzyvvoGkiAVlF8akor4OZhyWW8Bm6w8OQjZlKSibFgMdHOY4ncnIpICJZXttHbTqso8337QnjhjGLhmEWUvcu8dPKE7qt9D9i+vEsF/4TUb3LSw=
+	t=1768079128; cv=none; b=uSCqtrGJfsVX3/fYHKUe99gJXefLEP7icDfJ7IIaF2XGMhIkKO0IJaX8AsoLW6/FPFqxb8OMBKTaeY7hjfr4uEvZh3yS2j80CCG5CxyWozuiHX7b3gw3RPDlM5MgSEe2uDWMAKYeri9Cx6RQdKDOjs5VHUiC69d53zTnSpWhBok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768079127; c=relaxed/simple;
-	bh=DMSsZ2zhnNcVEuEk+Z1c616os0TJB+bYQZ2XQZ+BLm0=;
+	s=arc-20240116; t=1768079128; c=relaxed/simple;
+	bh=3AKTSUfuvyxS8OlYAqMdvKeirQ3fw+RmiaPyE+M3PO8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=fUEbf8z/jYpBcjryEQ/48S1SsoR07RR/jpYAU3Yh8kLUJFHQhlS0yiNuf6HPtdKqgXhnPCcN0hrF8YGgOge62WmZhzgpU9jr2nMZeyN7yi/lRlZojn/hRZ3yxbkqD7gpABHblt0Hr1+50WrySpH5GDJ8pyTRIbM26uDOt7mWJNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Z16p81V/; arc=none smtp.client-ip=209.85.208.68
+	 In-Reply-To:To:Cc; b=Fzpfn2V29o/m2cnO6Lm23bhpp4rXdJflbRBEfpUZJyQqBHml5mRdeiAlfUq/zM9kMo9kTDuEZ+2+DDJ1t6D2OCu6lcxgxaCoXNm7cwIj8SE0KE7b0aRrlOSJEnqthXfSajsP3Cjlwa+rTAslwA7d4RfG2y+2tkb2QuckcPH9LFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=RnOo7/zl; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f68.google.com with SMTP id 4fb4d7f45d1cf-64baaa754c6so7273224a12.3
-        for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 13:05:25 -0800 (PST)
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b7633027cb2so1026563666b.1
+        for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 13:05:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1768079124; x=1768683924; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1768079126; x=1768683926; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=gFxPlhETqVxBcpvZwh1z12pLI/x9cH1wDoqM1WNT2G0=;
-        b=Z16p81V/uj0Hh2Cwh7awmK+Cb4fgbwW5lhDV5ZBT+luVP5sOLJQckrIK/3Znw6cK5C
-         Oe2aRtoqKGfLlsejajWhgOjXBL/ojWr0Yz8qw7UOeXPPUhzt3Ui94vrUJRmNLtNtjcn/
-         rEqM3qAzvCBhHEt9GblEQTSA2VctKqB5uBh/ii0+hNi60mH/TxIXhkFRWsyCTu8SSepj
-         C9eWjMhPQTEKDt3SbHk3vy+VjA4341if6qjeFXfpCEFAfVZwLXM3Qhz4c2CmNgixjUmt
-         0QI/P9LdgqD88jKXlEIY9U2/Ap63zA31ddVCZDCG4XDzPliJQ6GEg3lnx7HduStIWg3U
-         e9xg==
+        bh=boSDHCNRu6fyxjZsrDAsWl71xR0mK1vjeAbhKjI6fRc=;
+        b=RnOo7/zlYqSUUoFaZHZ97hcwh+8ZjrsjYIWDQ3zoawYpOA8jD8GIzs/kXMSqMQMDkM
+         7/IPMn4eLt5fOhL/h7G1FhJm4z380dVyrVTE73rmN1NtXC42VvJXDrBh0nWmLSL7mJGN
+         cfpRUWfSn1VZmDXKkHzK1+nKIGyBKuY1oyPa7vzd/zZx3hRyVoYFG4ahjqF4q+55XcCT
+         1Yz4EE7d31mEjC2m5eoEhc2UC5MdZ4P4dZJ3bOkQKB6620PUjWCgz+ZSYyS9bYBzom46
+         0C2opxshuuRt/EzEDFiRiRDIUZVbce+6cVpI3G3GUC3mDA2f1VXbjElVp2dMzoq9KCKG
+         S1nA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768079124; x=1768683924;
+        d=1e100.net; s=20230601; t=1768079126; x=1768683926;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=gFxPlhETqVxBcpvZwh1z12pLI/x9cH1wDoqM1WNT2G0=;
-        b=fXkwZxpU0nuImdrPO3RqNpClOUDKERTYKUxNoUJNuSkvSeCEm9GxcN67hDk0hsJ3JZ
-         thelDet+9KEsnTaR8aWalQScE0QbQH7pXDmT8y7esL8d1PIK5AWkKUvyNn9OLx9DcRIS
-         nZtHgkjcocv6fyRh6niO0ptYCI8/36LLIc4YYLAkOPT8xczABYkrff/wq5ktIa3aPUwl
-         hgBZIFzwt6F4JIZlghEshvmoTewjzD4xcPRp3YKR4K1DWGyIMOYKzAb+WGB6LMvfnffh
-         4PokSsUi2kQKzK1J2TgpYwZxQKFUOoyCVOPFMOqqOgaXn2rlm4p8qLjDM/PCAfFnDO3z
-         qJ9g==
-X-Gm-Message-State: AOJu0YxbcjHvNcr2fuW2LIuRc1TLZYt9Xt4iXr9eChicq1KVfIokXBjP
-	dat7j0J7EZPDP8EiEBkr4d72sWGt9TPXadvYfI86tQdPy5dJ8+6aoIubVIp8J1rPu2s=
-X-Gm-Gg: AY/fxX6eHBFcmuiyprTtHEBtv1gHt6btdClW9EZOzAWIh38iXd+eoGrvqUr51FPpxPy
-	ZJRgHlh8tXb0GZ+J49Kbe1y9ZQMHvrBED2qV2fsfECjQN+qcnyl74hNljzt5jEt8/eS9Lc/frNS
-	vknZnxQEmlrvukrnKnCMjWICK2Rx6jSjyNMMnpAfwZCVbjP8QsXxIKJL5SFjIPfjOk1PICIl7dA
-	Z6UGDvb8hkPhixi/MuL5xLnuU4VTqoQ1C6WluhMrHov/JsOLKO2uOeF4DSNid3LwwR546pFWqAb
-	YztcV7d1j6CsY3NEsbR53RLj6sBHXBP6nYg8Y/qNHDc6YwU3TFGc9/qO2CVMJpGQPVWHg6471LU
-	NBU10CBqGEcpu4SoQZbV6dPeyJ8H2sfjGNeoKv+jBDtLXvfq+0OlAOySUqWgoDsCZdz9HwBmGoD
-	WUCP8bqndXZZUaaTXhzDEOqUQ9Bk8YwLsb0nevAImr7AOe6ubbnuOgA/P20ng=
-X-Google-Smtp-Source: AGHT+IF5BxzWvfCoMccLbvoqPziS+aIevf0t2FWDvLU7znmlF7MWPVqlhN+PmXzLEX7ramlHVgZibw==
-X-Received: by 2002:a17:907:6d10:b0:b72:6728:5bb1 with SMTP id a640c23a62f3a-b84454361f3mr1533060966b.56.1768079124355;
-        Sat, 10 Jan 2026 13:05:24 -0800 (PST)
+        bh=boSDHCNRu6fyxjZsrDAsWl71xR0mK1vjeAbhKjI6fRc=;
+        b=BpuSb/9ip4USj8ImQue60F32lfwXBdynooZV9hSUJd5w1ZyzNlhT3lSjpKp8xmpK28
+         sfoepjybI1MIaaGOWKGdU2mgeAfBPVvxIy2JTE8yWKuNwtagYtzpMfih1ZJtXjlQHbje
+         XFY/b9/yfP8MCG7kGPGfLeczFgharEWppDSKxd4x+PG1jxy4hKPM9XKrPi0KwbWfNBiV
+         /R7LuTqtORFYjRJXvSMV7srg+R/njDGbTZaRfmabvl+OLPl3LMVxJUfM4gLYgjiZ+kX1
+         fOA0S7atKVMnF88DGZgVp3ZOEai3iOiSepFFGdYGoj9Vs4V2HMP7LDhPRFZrGoXExIGf
+         7VPQ==
+X-Gm-Message-State: AOJu0YwHwpwkktHW/go6LArVGaszSCeVpYHtqiSJSrfpP/Jo/x9Xp0HP
+	GaIrhcScwtTn5vhF+nknD0xAldoSyYEqjG4EXx1pGP+yTcwS6z7L2UwbcRECN9XDj2s=
+X-Gm-Gg: AY/fxX6IX9ShWgCwQmdHgmEWB1Mb4UOgsURnDFov/rWEx8OrNHoH0iK6SSVkBE/aZOD
+	rGWheoP1Hd6CbRWiY4gKo+PMJ3HAXYIjhTpJnmW7AwaHww30r2aFPitzCwQjsZlcGGWaDZNrVVY
+	r77UCA978fF/rfEA6fFhVBhYKQpNDUEh9EAUe+uhTOWHAQj/3jXFp6gXgFxPYzkjEBPzh6uAp7o
+	MUVch0vkJQx5CoTvts60o3bDqKJy/XFPZOiAjWC/uy+bY/n7tFjEN4oW/Ou2mohCnpcnhuKGLoR
+	XRgLXRGroNPBowUBhTq0Yochn6B2CSvqfgn0ULBoptJ5CFYYcJHrxU0JRwSWaNouEg1d6PMYbGO
+	DJwmFrof2EOAk9d9wJiA2/oczChgxdwNNBv0BXPwTTjVOeSXXDjXZp07vf2HOnJ2fIlfWEY4snA
+	s1MWuPRRu1uO202dG6rycEWXWKk+iDj69C7jGzfnKqm4yNtyR2txxD23CEG7k=
+X-Google-Smtp-Source: AGHT+IEshYDSYgCJqSefNVm4rMDKSWFaQVKh1B8mzv/nYNmn2TNWQjnoEFs5sQkugV6KrgohAKZImQ==
+X-Received: by 2002:a17:907:9812:b0:b7c:e758:a79d with SMTP id a640c23a62f3a-b8444f4f40emr1328381166b.37.1768079125661;
+        Sat, 10 Jan 2026 13:05:25 -0800 (PST)
 Received: from cloudflare.com (79.184.207.118.ipv4.supernova.orange.pl. [79.184.207.118])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a23432dsm1467459766b.11.2026.01.10.13.05.23
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8701e1d467sm130421566b.70.2026.01.10.13.05.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Jan 2026 13:05:24 -0800 (PST)
+        Sat, 10 Jan 2026 13:05:25 -0800 (PST)
 From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Sat, 10 Jan 2026 22:05:15 +0100
-Subject: [PATCH net-next 01/10] net: Document skb_metadata_set contract
- with the drivers
+Date: Sat, 10 Jan 2026 22:05:16 +0100
+Subject: [PATCH net-next 02/10] bnxt_en: Call skb_metadata_set when
+ skb->data points past metadata
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,7 +83,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260110-skb-meta-fixup-skb_metadata_set-calls-v1-1-1047878ed1b0@cloudflare.com>
+Message-Id: <20260110-skb-meta-fixup-skb_metadata_set-calls-v1-2-1047878ed1b0@cloudflare.com>
 References: <20260110-skb-meta-fixup-skb_metadata_set-calls-v1-0-1047878ed1b0@cloudflare.com>
 In-Reply-To: <20260110-skb-meta-fixup-skb_metadata_set-calls-v1-0-1047878ed1b0@cloudflare.com>
 To: netdev@vger.kernel.org
@@ -104,34 +104,29 @@ Cc: "David S. Miller" <davem@davemloft.net>,
  bpf@vger.kernel.org, kernel-team@cloudflare.com
 X-Mailer: b4 0.15-dev-07fe9
 
-Prepare to copy XDP metadata into an skb extension chunk. To access the
-metadata contents, we need to know where it is located. Document the
-expectation - skb->data must point right past the metadata when
-skb_metadata_set gets called.
+Prepare to copy the XDP metadata into an skb extension in skb_metadata_set.
+
+Adjust the driver to pull from skb->data before calling skb_metadata_set.
 
 Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 ---
- include/linux/skbuff.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 86737076101d..df001283076f 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -4554,6 +4554,13 @@ static inline bool skb_metadata_differs(const struct sk_buff *skb_a,
- 	       true : __skb_metadata_differs(skb_a, skb_b, len_a);
- }
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 8419d1eb4035..7d0d81d29167 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -1440,8 +1440,8 @@ static struct sk_buff *bnxt_copy_xdp(struct bnxt_napi *bnapi,
+ 		return skb;
  
-+/**
-+ * skb_metadata_set - Record packet metadata length.
-+ * @skb: packet carrying the metadata
-+ * @meta_len: number of bytes of metadata preceding skb->data
-+ *
-+ * Must be called when skb->data already points past the metadata area.
-+ */
- static inline void skb_metadata_set(struct sk_buff *skb, u8 meta_len)
- {
- 	skb_shinfo(skb)->meta_len = meta_len;
+ 	if (metasize) {
+-		skb_metadata_set(skb, metasize);
+ 		__skb_pull(skb, metasize);
++		skb_metadata_set(skb, metasize);
+ 	}
+ 
+ 	return skb;
 
 -- 
 2.43.0
