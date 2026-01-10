@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-248765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF994D0DF31
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 00:32:03 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78A7CD0DF34
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 00:32:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E7CE930090E6
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 23:31:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C3FE8300E8F5
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 23:31:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D100128B407;
-	Sat, 10 Jan 2026 23:31:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971522C08A1;
+	Sat, 10 Jan 2026 23:31:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BO3MzFVd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DkgO+kDa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE39227B34E
-	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 23:31:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756462BEFFE
+	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 23:31:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768087911; cv=none; b=BqbHmP3a6a9yVHj0dSCqY1MPIhGpdnaLOy5J/wV1MnMFHhSRgULwvyxwz4CEw0lLEY7DNKZjS9OQlGq9GXJi4w0ZwXsljsFbE2gIRXdyusjDpw+3ITGk0ObN2znzBc+lMN4b0iPOLi9OKyUrr0CDduJXzp+cjUacRUDXp8a7/mM=
+	t=1768087912; cv=none; b=i4iugWqMjMIj2PLj7jIC1EN9xHKG0umI6GUrxATYtnhG7zQw6vrZ1G0aSGUKY84Y2G8n02JkMdY7v8HrXG/9pdbzvLILBJ8Bn3amQPjAcTfNDbc4kNPlEhvCSsJN0z+gn3kByfS5YAZ9aEn847JG4npFu/QStsbbmvGueMAINUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768087911; c=relaxed/simple;
-	bh=rsK6a8zSqNQH5laJSHYa3ZotV3Rir34S3JRgXgqZjUo=;
+	s=arc-20240116; t=1768087912; c=relaxed/simple;
+	bh=7uZ07Jw3PjFg0UXtmqPwJDLAhovdmjVMQZDQD2TsEBY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mFcs57tXOTUjQ1NAQ7AiDQlgfsGIKQb6Y5idiEa7SxAs0SZPPHi286mrXrBP5fGvi5/+zlR6MX3TDL3VDMJgaFQ9CxaKyppXZa7MWRTB/KS+oW3JuYIQWltBJCx+q/Y/7PPb+Fnuyq9B13vzPNFUAaDJ4UDH1WpnP9XzXS+VC6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BO3MzFVd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE82AC116C6;
-	Sat, 10 Jan 2026 23:31:50 +0000 (UTC)
+	 MIME-Version; b=AE1PDaYGr8MMrXEJOAgHebP8U5HMWhlnCkC2T3RIeH3pi4vBjL9BhNPanWOGsKbjh8vUNE98q0GprkD4KCE1DmeAXN3HyuxNkSN9qoBwJHRNMx2lLZT5bLO4Z2sRxeaX+Dfp8yy3YspF3W56XNkATCUKs2WPbAAnokLezidROuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DkgO+kDa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2685C19423;
+	Sat, 10 Jan 2026 23:31:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768087911;
-	bh=rsK6a8zSqNQH5laJSHYa3ZotV3Rir34S3JRgXgqZjUo=;
+	s=k20201202; t=1768087912;
+	bh=7uZ07Jw3PjFg0UXtmqPwJDLAhovdmjVMQZDQD2TsEBY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BO3MzFVd0lrboqNg6koaDe4PF8LaIslPoeBGY/ZpyD+qa7BOMFEfBbLb3nXW2rSC4
-	 iPuVNKH7PfzMzSAH/9MztTqKxMcIcW6sp3LKryeSB4Jxua+4tyFV26SYgpdSqITaUK
-	 cCI+z/DfKO4hbpMG3IlUE1ELFq7mxoDEmyquR0PTgoAwmDLKi+56z8MveIHTZGW1xH
-	 K7tLQ/dEsPUwsVP/0UFgpLM/tXUvTeBjfqp8yZAfnKbl+XFvnKL5JJxoEtX1rhIFPj
-	 Hq7ttk7iN3248A9lRDwLhmV23HfTMaFq56Dh2Pg2Db4DzuUJopGTQJvaBpAXcdAVnD
-	 LoRaO9zhqunLQ==
+	b=DkgO+kDaWZmU53hXGGYit4kXVHhfD4vMvvfeuGMVWqs2i7GK3wBnWmYMUH4rWBv2P
+	 IllE+R2kxFu2HcWJv4mSYi87NPvR0opkbbq0qs8TKr+D+N3S2EuYJnzyDJY8xXhCbH
+	 PiAf9R1/2sjzJmoS9q14FENzLuJ0CoTNT/yWxyeO1DC4EF095O7DXJNH0a1Ic/nFRG
+	 vVedt6KaN23EXxZi3scjkqX5uAVRcuixaCiuWu7fTZ4NcSa7RI2vqk3wenFhp/TdjV
+	 8in3KIXk/7nH8b/OkLDHz6TDyK8JIH5fhK/00htENYpu+AbrPFpb90gq62YAXVxRgb
+	 HQ/uv6+Vb6yBw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -50,9 +50,9 @@ Cc: netdev@vger.kernel.org,
 	donald.hunter@gmail.com,
 	gal@nvidia.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 1/7] tools: ynl: cli: introduce formatting for attr names in --list-attrs
-Date: Sat, 10 Jan 2026 15:31:36 -0800
-Message-ID: <20260110233142.3921386-2-kuba@kernel.org>
+Subject: [PATCH net-next v2 2/7] tools: ynl: cli: wrap the doc text if it's long
+Date: Sat, 10 Jan 2026 15:31:37 -0800
+Message-ID: <20260110233142.3921386-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260110233142.3921386-1-kuba@kernel.org>
 References: <20260110233142.3921386-1-kuba@kernel.org>
@@ -64,77 +64,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-It's a little hard to make sense of the output of --list-attrs,
-it looks like a wall of text. Sprinkle a little bit of formatting -
-make op and attr names bold, and Enum: / Flags: keywords italics.
+We already use textwrap when printing "doc" section about an attribute,
+but only to indent the text. Switch to using fill() to split and indent
+all the lines. While at it indent the text by 2 more spaces, so that it
+doesn't align with the name of the attribute.
+
+Before (I'm drawing a "box" at ~60 cols here, in an attempt for clarity):
+
+ |  - irq-suspend-timeout: uint                              |
+ |    The timeout, in nanoseconds, of how long to suspend irq|
+ |processing, if event polling finds events                  |
+
+After:
+
+ |  - irq-suspend-timeout: uint                              |
+ |      The timeout, in nanoseconds, of how long to suspend  |
+ |      irq processing, if event polling finds events        |
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/net/ynl/pyynl/cli.py | 30 +++++++++++++++++++++++++++---
- 1 file changed, 27 insertions(+), 3 deletions(-)
+v2:
+ - remove the explicit sys.stdout.isatty() check
+v1: https://lore.kernel.org/20260109211756.3342477-3-kuba@kernel.org
+---
+ tools/net/ynl/pyynl/cli.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/tools/net/ynl/pyynl/cli.py b/tools/net/ynl/pyynl/cli.py
-index 5fee45e48bbf..aa50d42e35ac 100755
+index aa50d42e35ac..dc84619e5518 100755
 --- a/tools/net/ynl/pyynl/cli.py
 +++ b/tools/net/ynl/pyynl/cli.py
-@@ -20,6 +20,29 @@ from lib import YnlFamily, Netlink, NlError, SpecFamily, SpecException, YnlExcep
- SYS_SCHEMA_DIR='/usr/share/ynl'
- RELATIVE_SCHEMA_DIR='../../../../Documentation/netlink'
+@@ -10,6 +10,7 @@ import json
+ import os
+ import pathlib
+ import pprint
++import shutil
+ import sys
+ import textwrap
  
-+# pylint: disable=too-few-public-methods,too-many-locals
-+class Colors:
-+    """ANSI color and font modifier codes"""
-+    RESET = '\033[0m'
-+
-+    BOLD = '\033[1m'
-+    ITALICS = '\033[3m'
-+    UNDERLINE = '\033[4m'
-+    INVERT = '\033[7m'
-+
-+
-+def color(text, modifiers):
-+    """Add color to text if output is a TTY
-+
-+    Returns:
-+        Colored text if stdout is a TTY, otherwise plain text
-+    """
-+    if sys.stdout.isatty():
-+        # Join the colors if they are a list, if it's a string this a noop
-+        modifiers = "".join(modifiers)
-+        return f"{modifiers}{text}{Colors.RESET}"
-+    return text
-+
- def schema_dir():
-     """
-     Return the effective schema directory, preferring in-tree before
-@@ -60,7 +83,7 @@ RELATIVE_SCHEMA_DIR='../../../../Documentation/netlink'
-     for attr_name in attr_names:
-         if attr_name in attr_set.attrs:
-             attr = attr_set.attrs[attr_name]
--            attr_info = f'{prefix}- {attr_name}: {attr.type}'
-+            attr_info = f'{prefix}- {color(attr_name, Colors.BOLD)}: {attr.type}'
-             if 'enum' in attr.yaml:
-                 enum_name = attr.yaml['enum']
-                 attr_info += f" (enum: {enum_name})"
-@@ -68,7 +91,8 @@ RELATIVE_SCHEMA_DIR='../../../../Documentation/netlink'
-                 if enum_name in ynl.consts:
-                     const = ynl.consts[enum_name]
-                     enum_values = list(const.entries.keys())
--                    attr_info += f"\n{prefix}  {const.type.capitalize()}: {', '.join(enum_values)}"
-+                    type_fmted = color(const.type.capitalize(), Colors.ITALICS)
-+                    attr_info += f"\n{prefix}  {type_fmted}: {', '.join(enum_values)}"
+@@ -101,7 +102,11 @@ RELATIVE_SCHEMA_DIR='../../../../Documentation/netlink'
+                 attr_info += f" -> {nested_set_name}"
  
-             # Show nested attributes reference and recursively display them
-             nested_set_name = None
-@@ -226,7 +250,7 @@ RELATIVE_SCHEMA_DIR='../../../../Documentation/netlink'
-             print(f'Operation {args.list_attrs} not found')
-             sys.exit(1)
+             if attr.yaml.get('doc'):
+-                doc_text = textwrap.indent(attr.yaml['doc'], prefix + '  ')
++                doc_prefix = prefix + ' ' * 4
++                term_width = shutil.get_terminal_size().columns
++                doc_text = textwrap.fill(attr.yaml['doc'], width=term_width,
++                                         initial_indent=doc_prefix,
++                                         subsequent_indent=doc_prefix)
+                 attr_info += f"\n{doc_text}"
+             print(attr_info)
  
--        print(f'Operation: {op.name}')
-+        print(f'Operation: {color(op.name, Colors.BOLD)}')
-         print(op.yaml['doc'])
- 
-         for mode in ['do', 'dump', 'event']:
 -- 
 2.52.0
 
