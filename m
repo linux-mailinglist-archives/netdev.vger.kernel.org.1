@@ -1,86 +1,131 @@
-Return-Path: <netdev+bounces-248724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11411D0DA91
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 19:49:14 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 475AFD0DA94
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 19:50:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D90063010A9D
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 18:49:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A195B30194E1
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 18:50:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E614126C17;
-	Sat, 10 Jan 2026 18:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B442221C173;
+	Sat, 10 Jan 2026 18:50:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vKRIG0vC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HtaIAtAL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B58E25771
-	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 18:49:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02EF71A262D;
+	Sat, 10 Jan 2026 18:50:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768070941; cv=none; b=O6z8Wq7loK5r9spFJeaNsBX5tZnfXQFo2ztNsrJsOS/Ag/62LuJoRqnWYAzIIBe6qMeBAPF+YItT2b4slhNnR3ByPvNfzNyDUXRWJwnL+8OgAgEBHbL2kLh1zVhGBccbmo3LIt+4QAfE2E695en8mb4nzWZWcoSRBDD9thvC7zY=
+	t=1768071022; cv=none; b=TZYdqq9suGpxlOWlg0LQV8BFMdfjVIcZlUCi0owS0a1QMficD+4X/cClN63Tzt/v3/SXGsJ74RuL4CmtPkg0QDsJKPiNmUk1F8ibcxzYHyOxKEMxBfeirvp4NMj3xH9M+YwtoBZW2aM7sAzZYaIyO1jbTHD6GH3LGwYAcdz32uE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768070941; c=relaxed/simple;
-	bh=0dAWoUzTvHaiJce07sZHIzrrwXoEXwl02qU1vns7cfU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E6LjaxV/WFrN3gAEVJh5ee4tuxV3uEO5/vyNtfUXr+WaWZjU9XazrcDPu2oc1BfVaSomlEJfre9kWBjVTn3zh0KbQ7ntRqmJ0f9KBuphP1IQ178oza4er1WV43vEIS9F2zmgK2zdC1cu7y0g3GdSRbGEkbsH7KDumGIARMl0kIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vKRIG0vC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2257C4CEF1;
-	Sat, 10 Jan 2026 18:48:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768070940;
-	bh=0dAWoUzTvHaiJce07sZHIzrrwXoEXwl02qU1vns7cfU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=vKRIG0vCIzkXCUt0epxddZ+JeOM+oBsWcE5E+kjFeGe1v5/MPPfTippWcfL+lh/3Q
-	 jvPsTENESqQ0yo9xL2puZLbbwVIwMArrYU6vYa3WMjRI9aoZx8UfSImPEkJKhRLggm
-	 9tFTpDDmOMrpqkNQHIZiwGnJ2C8sUEF4OHwDQMOiis/aU1IXAnhzCJ4gSD+47gpH7/
-	 crxq/BN+1WX3hfFA36MepQW6V/1q7SvQRTsQqpJVt1wmndmqXDD1ixtfqqfM1sQNgG
-	 CAKXDBbM/cfP+tZG0GSUriN8C6cTSgA5OZwYy/Upei7UckGRFQIkKC+8BmSlldT58c
-	 z5ObKcaqPs79w==
-Date: Sat, 10 Jan 2026 10:48:59 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>, Paolo Abeni
- <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, David Miller
- <davem@davemloft.net>, Vladimir Oltean <vladimir.oltean@nxp.com>, Michael
- Klein <michael@fossekall.de>, Daniel Golle <daniel@makrotopia.org>, Realtek
- linux nic maintainers <nic_swsd@realtek.com>, Aleksander Jan Bajkowski
- <olek2@wp.pl>, Fabio Baltieri <fabio.baltieri@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 0/2] r8169: add support for RTL8127ATF (10G
- Fiber SFP)
-Message-ID: <20260110104859.1264adf3@kernel.org>
-In-Reply-To: <c2ad7819-85f5-4df8-8ecf-571dbee8931b@gmail.com>
-References: <c2ad7819-85f5-4df8-8ecf-571dbee8931b@gmail.com>
+	s=arc-20240116; t=1768071022; c=relaxed/simple;
+	bh=KP/JVl3r6x4FSvM+KLvDJWnpRJEv9h9Ro9E1qTkua1Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=enBV38ldLk7VSMr1oIZU9R1i40OPYdgYhy+s5SODC0HB1U0p6/bSB8rLs7VqLGqJxrjnkcL9sfsf03m4F5voeMrY8h+eEOdkqI085FFbR0VPjxE7YXBjxtlVV8KJuk90Fe57gVbcv/n/cRqpT1B5jn8fviWpsTLPyVQaBz8U8tU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HtaIAtAL; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768071020; x=1799607020;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=KP/JVl3r6x4FSvM+KLvDJWnpRJEv9h9Ro9E1qTkua1Y=;
+  b=HtaIAtALfdGqkAG8QSlitGFN1RAo5rsvmeA9yuYNZDTJobTgsKoreo/v
+   085EwYaUmrACAUH/7eFreTIMmbNC7gwKxy5jfNttVyO6v45sYhBpLOYLt
+   nayIYMhpioIbnxYy8/aSI5Xqdb/JpOndQGJ+1e5PuNEElPGS4PswxV6RI
+   JqYhDpufMkoo2x890j1xFQYrGqRh6FZ4vGcNYfvPbbw5PliC2sgn4yM05
+   N5ktCobSqPDHckuWX6xFHqN8n8lwZikV1w/e5FRl+L8KqNrcmcZIWV6iE
+   2qVmpPOOrp/g6CmP4tLdjsuFW9Pi+5nOQ5GvruunFKhFeDvaoR05XOhrR
+   w==;
+X-CSE-ConnectionGUID: Zo7oEdWgTBaEdXp9qtSkVg==
+X-CSE-MsgGUID: 6coV/XWnTjquwhu19HMs7A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11667"; a="80868136"
+X-IronPort-AV: E=Sophos;i="6.21,217,1763452800"; 
+   d="scan'208";a="80868136"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2026 10:50:19 -0800
+X-CSE-ConnectionGUID: 1rdwCJ5VRAy4L9/WBEmnXg==
+X-CSE-MsgGUID: RNOoCIBaTsSlgbSGdrgbpw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,217,1763452800"; 
+   d="scan'208";a="208216482"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 10 Jan 2026 10:50:14 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vee2O-0000000091g-3Iq1;
+	Sat, 10 Jan 2026 18:50:12 +0000
+Date: Sun, 11 Jan 2026 02:49:17 +0800
+From: kernel test robot <lkp@intel.com>
+To: Sami Tolvanen <samitolvanen@google.com>, bpf@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Viktor Malik <vmalik@redhat.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Sami Tolvanen <samitolvanen@google.com>
+Subject: Re: [PATCH bpf-next v5 1/4] bpf: crypto: Use the correct destructor
+ kfunc type
+Message-ID: <202601110205.4dwPV9eI-lkp@intel.com>
+References: <20260110082548.113748-7-samitolvanen@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260110082548.113748-7-samitolvanen@google.com>
 
-On Sat, 10 Jan 2026 16:12:30 +0100 Heiner Kallweit wrote:
-> RTL8127ATF supports a SFP+ port for fiber modules (10GBASE-SR/LR/ER/ZR and
-> DAC). The list of supported modes was provided by Realtek. According to the
-> r8127 vendor driver also 1G modules are supported, but this needs some more
-> complexity in the driver, and only 10G mode has been tested so far.
-> Therefore mainline support will be limited to 10G for now.
-> The SFP port signals are hidden in the chip IP and driven by firmware.
-> Therefore mainline SFP support can't be used here.
-> The PHY driver is used by the RTL8127ATF support in r8169.
-> RTL8127ATF reports the same PHY ID as the TP version. Therefore use a dummy
-> PHY ID.
+Hi Sami,
 
-Hi Heiner!
+kernel test robot noticed the following build warnings:
 
-This series silently conflicts with Daniel's changes. I wasn't clear
-whether the conclusion here:
-https://lore.kernel.org/all/1261b3d5-3e09-4dd6-8645-fd546cbdce62@gmail.com/
-is that we shouldn't remove the define or Daniel's changes are good 
-to go in.. Could y'all spell out for me what you expect?
+[auto build test WARNING on 5714ca8cba5ed736f3733663c446cbee63a10a64]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Sami-Tolvanen/bpf-crypto-Use-the-correct-destructor-kfunc-type/20260110-162850
+base:   5714ca8cba5ed736f3733663c446cbee63a10a64
+patch link:    https://lore.kernel.org/r/20260110082548.113748-7-samitolvanen%40google.com
+patch subject: [PATCH bpf-next v5 1/4] bpf: crypto: Use the correct destructor kfunc type
+config: sh-randconfig-r133-20260110 (https://download.01.org/0day-ci/archive/20260111/202601110205.4dwPV9eI-lkp@intel.com/config)
+compiler: sh4-linux-gcc (GCC) 13.4.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260111/202601110205.4dwPV9eI-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601110205.4dwPV9eI-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> kernel/bpf/crypto.c:264:18: sparse: sparse: symbol 'bpf_crypto_ctx_release_dtor' was not declared. Should it be static?
+
+vim +/bpf_crypto_ctx_release_dtor +264 kernel/bpf/crypto.c
+
+   263	
+ > 264	__bpf_kfunc void bpf_crypto_ctx_release_dtor(void *ctx)
+   265	{
+   266		bpf_crypto_ctx_release(ctx);
+   267	}
+   268	CFI_NOSEAL(bpf_crypto_ctx_release_dtor);
+   269	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
