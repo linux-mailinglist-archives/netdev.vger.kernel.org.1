@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-248761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 357C9D0DEE2
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 00:00:15 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90776D0DEDA
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 23:59:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BAC8330351C2
+	by sto.lore.kernel.org (Postfix) with ESMTP id EAE363006995
 	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 22:59:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287D72609E3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2622C25744D;
 	Sat, 10 Jan 2026 22:59:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i0gVpZ4u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aOqHMMxv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C16229B38;
-	Sat, 10 Jan 2026 22:59:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03BAE221DAE;
+	Sat, 10 Jan 2026 22:59:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768085977; cv=none; b=j5kfsyBTGE1BbMyjvdw3VdlhfaFaiokmjnJs9aX6NwgyvHYtYzHjHJOvnlc3bEbqDsxMKHbpCL89VgdzYqa0ToWOdJYGFuXu4WiRa8HpfFsp1/K2bz8EYOXgz2n2N+VmxTephFXNz7cUeQTgmQ5jN8Q/9VUO3kMZU3+0su5fr0k=
+	t=1768085977; cv=none; b=KYv2MjiHi7KWGLyjaZO752aHOU0FWnd1v5Hh8M1UNcZW7R52EYtXSPj33Jo8umXZ8xmspYyhxVO5HTzEYr4yx5qNE7Xvqnr5j5lmFIx9SbLFBBjVdI7nddq7qJLTyCF1491NYqnhiK2mySG1vR0PWznofkgGDZwCa6hnQxEX0RM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1768085977; c=relaxed/simple;
-	bh=8nJIJf4VR9k4k83MdY9jNcYfgph5NN8HRYtc95S7wOM=;
+	bh=bG/9bo5Wky0kCuC8gN4U922vGwG/EZPRCzruUYAydys=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZB7/CRDLHsI0hbtWHBKhLZhoZFCRLykFsu2aXOCZnPe0kAKJ04eGOvc0yamew4rrjXXJ44tywjCdATQ7Bme/BSUkrtOUUC6WLAG62EMqGD5oPuYdwA/OqrTjmGgYOjzhaCrnbO6ZP2iCoK6w0WYq1JiWtjdBV+7QEu+bjy+8NJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i0gVpZ4u; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 943CAC4CEF1;
-	Sat, 10 Jan 2026 22:59:34 +0000 (UTC)
+	 MIME-Version; b=HsqUDSiEVtsdHzqh8k+Je9sHAJmudUUN0F5M79QSKnI+vRRhFtx1f5r5DwGwn1wO8KQUvMAuDUokqookN9Q8WBMj/rNNXx3OkgGiXSF0GcSNewur1yX0ly9q/4QrP6dKnk1mltf+yKaVhUO1ZOedMk3h4RmBDtuYeWKqIybwPTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aOqHMMxv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 559FAC116C6;
+	Sat, 10 Jan 2026 22:59:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768085974;
-	bh=8nJIJf4VR9k4k83MdY9jNcYfgph5NN8HRYtc95S7wOM=;
+	s=k20201202; t=1768085976;
+	bh=bG/9bo5Wky0kCuC8gN4U922vGwG/EZPRCzruUYAydys=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=i0gVpZ4u8jyvGgkRI2gdFOCV6FWgCjfbJ2YZvIacvhh5ITf3o+Qo5K0TY41oVE4cq
-	 lnNk0lbRNUj74e+QHe4s8BJrpnOAeh6PZkCuWOfqfNlV0QqD8arr1DRDZ56dcqCna4
-	 AFi2qmuzTYEGgiicvDA2Hz6t+WJ7kh/0IT2v9pn+DkcuFUW/sGbUoZfpktj/sXx8DN
-	 g0/HjpBqQtfZdNomXcpbGYAWZVroY4V/exBANmzRRtUyFb2jLVCvlW2yjFuF1veSZp
-	 hGuVbe3XdeYNX0ozG5yA5ElsLwqTAJMsn8EsO/bGnUVZ7B0A/zuFtXl5iyJ2VIiqVL
-	 HPx6IguBnz2uQ==
+	b=aOqHMMxvoF3r3sgdcgqFuXeteTdpRYNmC09cPVtgDp/BB5hNtHCDAnZPTLJKSM5ON
+	 oujNSLjXCXxxw31FJT2ZM1Iju3ZLQs9A6ru+GYGPxUDANwyRXYJ0FfL2iY+2TBqIoH
+	 bqISV5bD+yQ6YQ8cHmVSFB2a5aufnI6emAdA2BDtnUhBXE01JNsJ3AS1G/MceW2wvE
+	 wVVRYQkKk+6Hd0w9DpooODs2s9oG2gZeGPVYZJbj6wfTPyM7F7x126JaUG+vrYqzwV
+	 MuxuBxdsA6/30gIh7S41jIwC5mvULIM7KCw3BLf4wtkw7RjnWKGRmVmkCXXaf15X93
+	 v9qGT95DypGHQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: rkannoth@marvell.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [net-next,v3,04/13] ocetontx2-af: npc: cn20k: MKEX profile support
-Date: Sat, 10 Jan 2026 14:59:32 -0800
-Message-ID: <20260110225932.3900827-1-kuba@kernel.org>
+Subject: Re: [net-next,v3,05/13] octeontx2-af: npc: cn20k: Allocate default MCAM indexes
+Date: Sat, 10 Jan 2026 14:59:35 -0800
+Message-ID: <20260110225935.3900857-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260109054828.1822307-5-rkannoth@marvell.com>
-References: <20260109054828.1822307-5-rkannoth@marvell.com>
+In-Reply-To: <20260109054828.1822307-6-rkannoth@marvell.com>
+References: <20260109054828.1822307-6-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,68 +63,104 @@ email has considered the AI review valid, or at least pausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-ocetontx2-af: npc: cn20k: MKEX profile support
+octeontx2-af: npc: cn20k: Allocate default MCAM indexes
 
-This patch adds MKEX profile support for the cn20k silicon variant,
-introducing a new key extractor concept with up to 24 extractors per
-packet parsing profile.
+This patch allocates MCAM indexes for promiscuous, multicast, broadcast,
+and unicast traffic when the NIX LF is attached to the PF/VF, rather than
+reserving entries upfront.
 
 > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-> index 316e6cd1436a..88d7f65d246c 100644
+> index 88d7f65d246c..cc5a2fde02b9 100644
 > --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
 > +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
 
 [ ... ]
 
-> +void npc_cn20k_load_mkex_profile(struct rvu *rvu, int blkaddr,
-> +				 const char *mkex_profile)
+> +int npc_cn20k_dft_rules_alloc(struct rvu *rvu, u16 pcifunc)
 > +{
-> +	struct npc_mcam_kex_extr *mcam_kex_extr;
-> +	struct device *dev = &rvu->pdev->dev;
-> +	void __iomem *mkex_prfl_addr = NULL;
-> +	u64 prfl_sz;
-> +	int ret;
-> +
-> +	/* If user not selected mkex profile */
-> +	if (rvu->kpu_fwdata_sz ||
-> +	    !strncmp(mkex_profile, cn20k_def_pfl_name, MKEX_NAME_LEN))
-> +		goto program_mkex_extr;
-> +
-> +	/* Setting up the mapping for mkex profile image */
-> +	ret = npc_fwdb_prfl_img_map(rvu, &mkex_prfl_addr, &prfl_sz);
-> +	if (ret < 0)
-> +		goto program_mkex_extr;
-> +
-> +	mcam_kex_extr = (struct npc_mcam_kex_extr __force *)mkex_prfl_addr;
-> +
-> +	while (((s64)prfl_sz > 0) && (mcam_kex_extr->mkex_sign != MKEX_END_SIGN)) {
-> +		/* Compare with mkex mod_param name string */
-> +		if (mcam_kex_extr->mkex_sign == MKEX_CN20K_SIGN &&
-> +		    !strncmp(mcam_kex_extr->name, mkex_profile, MKEX_NAME_LEN)) {
-> +			rvu->kpu.mcam_kex_prfl.mkex_extr = mcam_kex_extr;
-> +			goto program_mkex_extr;
-> +		}
-> +
-> +		mcam_kex_extr++;
-> +		prfl_sz -= sizeof(struct npc_mcam_kex);
-                                 ^^^^^^^^^^^^^^^^^^^^^
-
-The loop iterates over struct npc_mcam_kex_extr entries (the pointer
-mcam_kex_extr is advanced by sizeof(struct npc_mcam_kex_extr) via
-mcam_kex_extr++), but the size decrement uses sizeof(struct npc_mcam_kex).
-
-These structures have different sizes:
-- struct npc_mcam_kex_extr contains intf_extr_lid[2][24] and
-  intf_extr_lt[2][24][16] arrays
-- struct npc_mcam_kex contains intf_lid_lt_ld[2][8][16][2] and
-  intf_ld_flags[2][2][16] arrays
-
-Should this be sizeof(struct npc_mcam_kex_extr) to match the pointer
-increment? Otherwise the loop termination condition will be incorrect
-and could read beyond the profile buffer boundaries.
-
-> +	}
-> +	dev_warn(dev, "Failed to load requested profile: %s\n", mkex_profile);
+> +	u16 mcam_idx[4] = { 0 }, pf_ucast, pf_pcifunc;
+> +	struct npc_mcam_alloc_entry_req req = { 0 };
+> +	struct npc_mcam_alloc_entry_rsp rsp = { 0 };
 
 [ ... ]
+
+> +	ret = rvu_mbox_handler_npc_mcam_alloc_entry(rvu, &req, &rsp);
+> +
+> +	/* successfully allocated index */
+> +	if (!ret) {
+> +		/* Copy indexes to local array */
+> +		for (i = 0; i < cnt; i++)
+> +			mcam_idx[i] = rsp.entry_list[i];
+> +
+> +		goto chk_sanity;
+> +	}
+
+[ ... ]
+
+> +chk_sanity:
+
+[ ... ]
+
+> +	/* LBK */
+> +	if (is_lbk_vf(rvu, pcifunc)) {
+> +		index = NPC_DFT_RULE_ID_MK(pcifunc, NPC_DFT_RULE_PROMISC_ID);
+> +		ret = xa_insert(&npc_priv.xa_pf2dfl_rmap, index,
+> +				xa_mk_value(mcam_idx[0]), GFP_KERNEL);
+> +		if (ret) {
+
+[ ... ]
+
+> +			ret = -EFAULT;
+> +			goto err;
+> +		}
+> +
+> +		goto done;
+> +	}
+> +
+> +	/* VF */
+> +	if (is_vf(pcifunc)) {
+> +		index = NPC_DFT_RULE_ID_MK(pcifunc, NPC_DFT_RULE_UCAST_ID);
+> +		ret = xa_insert(&npc_priv.xa_pf2dfl_rmap, index,
+> +				xa_mk_value(mcam_idx[0]), GFP_KERNEL);
+> +		if (ret) {
+
+[ ... ]
+
+> +			ret = -EFAULT;
+> +			goto err;
+> +		}
+> +
+> +		goto done;
+> +	}
+> +
+> +	/* PF */
+> +	for (i = NPC_DFT_RULE_START_ID, k = 0; i < NPC_DFT_RULE_MAX_ID &&
+> +	     k < cnt; i++, k++) {
+> +		index = NPC_DFT_RULE_ID_MK(pcifunc, i);
+> +		ret = xa_insert(&npc_priv.xa_pf2dfl_rmap, index,
+> +				xa_mk_value(mcam_idx[k]), GFP_KERNEL);
+> +		if (ret) {
+
+[ ... ]
+
+> +			ret = -EFAULT;
+> +			goto err;
+> +		}
+> +	}
+> +
+> +done:
+> +	return 0;
+> +err:
+> +	/* TODO: handle errors */
+> +	return ret;
+> +}
+
+If xa_insert() fails here, the MCAM entries that were allocated earlier
+via rvu_mbox_handler_npc_mcam_alloc_entry() are not freed before
+returning the error. Could this leak the MCAM entries?
+
+The comment indicates this is known incomplete error handling. For the
+PF case, partial xa_insert failures in the loop could also leave some
+entries inserted in the xarray while others are not, leading to an
+inconsistent state.
 
