@@ -1,104 +1,78 @@
-Return-Path: <netdev+bounces-248734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CFDCD0DD42
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 21:08:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CDBCD0DD4C
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 21:14:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D6C87300C2A1
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 20:08:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1A5FC3012BD3
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 20:13:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74BB029AAFA;
-	Sat, 10 Jan 2026 20:08:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C206283FDD;
+	Sat, 10 Jan 2026 20:13:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BfeA71UC"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00FB28688D
-	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 20:08:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 191882139C9;
+	Sat, 10 Jan 2026 20:13:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768075718; cv=none; b=I95gwjjnsBFB9aWUL/v3qtXsR8/QcVg+xjXa1msx0Ytjw4VfwJPNX/FgnbTtSIpLCO07B8Kx2k5bv7gT00mQiTk98iB5GHknbQc/Xv007NqMOrRJcoqCo2JWhHLWCxMy1xbLQRvoWREYj+wOOAnyLhyh8Ydat985V92BDVxCea0=
+	t=1768076031; cv=none; b=ZOq95pTRamu6BxtYptnbYcsdtXB6Nku+/IR4ZgHxH6wQXZpN9JvCptGwtBM9HJ24DloZ1dXRvBBiZsj+hdIBBj4y9buAFS5H5Cp4CjSVk5g8GLdxAkzm8T158Xw6wMem5SGoNaSny1ID2VY0pzaFs06w0HbRucDd1I09/H1Q4u8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768075718; c=relaxed/simple;
-	bh=q2eKViv57JjL52XiwmQ/pah0/sGTPKfLqUBRMpU2UNI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lNQG463DcC8ot356o81e4CM1ZRumZRJ2aseF9q+w6li3plbFCXK90KJKB1ZOtRy9YdrgbmzF92CliuaM+Zr7FNh+2cEoDWLEaSZxCuRE/L46EMeTBUHELxYK16yMJbPFCFWlcCRG0Wsle+7iveSe8z2V+VUOVn/xY1gaZ/hyZdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vefFv-000000006Qq-3P1q;
-	Sat, 10 Jan 2026 20:08:15 +0000
-Date: Sat, 10 Jan 2026 20:08:12 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Russell King - ARM Linux <linux@armlinux.org.uk>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	David Miller <davem@davemloft.net>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Michael Klein <michael@fossekall.de>,
-	Realtek linux nic maintainers <nic_swsd@realtek.com>,
-	Aleksander Jan Bajkowski <olek2@wp.pl>,
-	Fabio Baltieri <fabio.baltieri@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 0/2] r8169: add support for RTL8127ATF (10G
- Fiber SFP)
-Message-ID: <aWKxrOfWncySwz69@makrotopia.org>
-References: <c2ad7819-85f5-4df8-8ecf-571dbee8931b@gmail.com>
- <20260110104859.1264adf3@kernel.org>
- <6df422fa-5d65-435f-896b-6495c63eaacf@gmail.com>
+	s=arc-20240116; t=1768076031; c=relaxed/simple;
+	bh=7CFcTUhdtne9HIB2JWSObovUr87Zty1hnAetY9B3OZQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NCuk4nHVtM2uFoshzsDCvqqcz79jun9j2N75Tblznxon5bHe90CsgrNjuk4atFbCzsYrTU+Y1YCNNq0GnApkpxSM3hWxxBUm8wvLvVeDQU9agewASwWjBdwVhY0WltIpop0qPeNo9JCCLj8c1zcuMGKGOw3X9DSqNE1Co5GiK1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BfeA71UC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D9C9C4CEF1;
+	Sat, 10 Jan 2026 20:13:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768076030;
+	bh=7CFcTUhdtne9HIB2JWSObovUr87Zty1hnAetY9B3OZQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BfeA71UCHLwr3/fWCrvhsBrxEiyhRQ3P9UmwXmx35jr6KCGK/DOHpbsJwhrWltJel
+	 68Wq863QGWHaohuaYUGKvx3ZKbka4ZTrQtyv8NkkpOu1Wd6OfxWcdch5NqAmITKpNQ
+	 0udplL0i/Hf6k4PgrNxidO62sRYAXujqyf3jqslEkKCM0zPT/Y/5fRe3rwwghRYyTR
+	 4Y5xoWAcuAW0wY4Gqmomp4MSrcRfkDSDQY+OsJS++D8xIGIpt72QGcY/KvEV4WqLIh
+	 Cl3O8Ym2hZwKVP4v5w/6WJU1dMZsIkFPwyA11yeAtPcaS8C/NqHOjmc2JO8VeXfYJk
+	 E6dH1YhZ0zpHg==
+Date: Sat, 10 Jan 2026 12:13:49 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vimlesh Kumar <vimleshk@marvell.com>
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <sedara@marvell.com>, <srasheed@marvell.com>, <hgani@marvell.com>,
+ Veerasenareddy Burru <vburru@marvell.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v3] octeon_ep: reset firmware ready status
+Message-ID: <20260110121349.25eb40ce@kernel.org>
+In-Reply-To: <20260107134503.3437226-1-vimleshk@marvell.com>
+References: <20260107134503.3437226-1-vimleshk@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6df422fa-5d65-435f-896b-6495c63eaacf@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sat, Jan 10, 2026 at 09:03:05PM +0100, Heiner Kallweit wrote:
-> On 1/10/2026 7:48 PM, Jakub Kicinski wrote:
-> > On Sat, 10 Jan 2026 16:12:30 +0100 Heiner Kallweit wrote:
-> >> RTL8127ATF supports a SFP+ port for fiber modules (10GBASE-SR/LR/ER/ZR and
-> >> DAC). The list of supported modes was provided by Realtek. According to the
-> >> r8127 vendor driver also 1G modules are supported, but this needs some more
-> >> complexity in the driver, and only 10G mode has been tested so far.
-> >> Therefore mainline support will be limited to 10G for now.
-> >> The SFP port signals are hidden in the chip IP and driven by firmware.
-> >> Therefore mainline SFP support can't be used here.
-> >> The PHY driver is used by the RTL8127ATF support in r8169.
-> >> RTL8127ATF reports the same PHY ID as the TP version. Therefore use a dummy
-> >> PHY ID.
-> > 
-> > Hi Heiner!
-> > 
-> > This series silently conflicts with Daniel's changes. I wasn't clear
-> > whether the conclusion here:
-> > https://lore.kernel.org/all/1261b3d5-3e09-4dd6-8645-fd546cbdce62@gmail.com/
-> > is that we shouldn't remove the define or Daniel's changes are good 
-> > to go in.. Could y'all spell out for me what you expect?
-> 
-> I'm fine with replacing RTL_VND2_PHYSR with RTL_PHYSR, as proposed by Daniel.
-> However, as this isn't a fully trivial change, I'd like to avoid this change
-> in my series, and leave it to Daniel's series. Means he would have to add
-> the conversion of the call I just add.
-> Which series to apply first depends on whether Daniel has to send a new version,
-> or whether it's fine as-is. There was a number of comments, therefore I'm not
-> 100% sure.
+On Wed, 7 Jan 2026 13:45:02 +0000 Vimlesh Kumar wrote:
+> +#define CN9K_PEMX_PFX_CSX_PFCFGX(pem, pf, offset)\
+> +				 ({ typeof(offset) _off = (offset);\
+> +				 ((CN9K_PFX_CSX_PFCFGX_BASE_ADDR\
+> +				 | (uint64_t)FIELD_PREP(CN9K_PEM_GENMASK, pem)\
+> +				 | FIELD_PREP(CN9K_PF_GENMASK, pf)\
+> +				 | (CN9K_PFX_CSX_PFCFGX_SHADOW_BIT & (_off))\
+> +				 | (rounddown((_off), 8)))\
+> +				 + (CN9K_4BYTE_ALIGNED_ADDRESS_OFFSET(_off)));\
+> +				 })
 
-Imho it makes sense to merge RTL8127ATF first and I'll resend my current
-series. There was a typo in one of the commit messages, but more than that
-I think it does make sense to merge the non-controveral hardware addition
-before applying any potentially disruptive stuff which affects practically
-all PHYs supported by the driver (doesn't mean that I expect any disruption
-what-so-ever, but as a matter of principle it just seems right to do it
-that way around).
-
+This macro is completely unreadable. Maybe add a static inline to
+perform the CN9K_PEMX_PFX_CSX_PFCFGX() writes.
+-- 
+pw-bot: cr
 
