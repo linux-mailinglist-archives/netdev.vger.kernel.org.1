@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-248757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A94DD0DEC2
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 23:53:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2825D0DED1
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 23:58:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5B8313024E51
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 22:52:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8633530142E8
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 22:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34D50221DAE;
-	Sat, 10 Jan 2026 22:52:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B9E422576E;
+	Sat, 10 Jan 2026 22:58:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Roo7Cxva"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kyxSnaNC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 122AE1DDC1D;
-	Sat, 10 Jan 2026 22:52:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF9A1B4224;
+	Sat, 10 Jan 2026 22:58:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768085574; cv=none; b=AI1STY/2bsIR4VBLjT6PZsqDpLpr7sZ5b/Pr1dq+yBeRpQFTcYf2TVlCRXIpA4UcCBF4m/dGkmqKPR3uiimVWts6UDUpbifPz4ekYpnh91hsNw3EHFkH/rmZ5C7BnCy17PyYzYh7xx7iszr15nvGJO2pwOoZvx803SpfmClcuA4=
+	t=1768085923; cv=none; b=rCZBe7ZzrWUVxU8pg2llaThHGvtcxqgPiIDXlgVhu+a5C94yj+62T2GTVbLzfWuZWcqvrkq5lIo40s5Bo5qO/FZJYM+9rsHvoiOVW+9pHDjCfyXO+ZrZeealvaaOcWs+wJLlyNwtP4p/WyAHb9w7GrcDeTB1SxuRvHgwW4AD3LQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768085574; c=relaxed/simple;
-	bh=kQIXup3eGpGEzFjx2TOrT1yxsfQHKMJt3eerhakTGXc=;
+	s=arc-20240116; t=1768085923; c=relaxed/simple;
+	bh=+324RabEwbA/VZH9PrYE1jKMEnbznYGBleMcMlkMXAQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NaidcNCZaHawXrSgVLN8DAl3/GuRKUSHf6poSozhD9sedVCMDtOuuCeCrl1EWluqlj4c83+WLcXgZvayYX5CV2nFrv0kZB3vm/FOmV504lBUSjC/ehZBVhjYSbTKAcK6Uoc4MfOv1o32v3VqnPzQ45OofntfwjtGwBQFHBp+q6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Roo7Cxva; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35285C4CEF1;
-	Sat, 10 Jan 2026 22:52:53 +0000 (UTC)
+	 MIME-Version:Content-Type; b=uPVfZdLVXUPdI2E8R2lRONIv3g6ydn3fIzZGWTYHTpkok9Z9nOJwjxFt1lvV7eHqmY0VwiSYf7YbHfdndbuobNHsEkXY9wB1qOH3U4N8I4AR2NlX+N4uhW8qhCV8VKwAO6T+ebzq3ipXgC9joaru+ECTxDmcTpxCgrtVlo+1MuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kyxSnaNC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B7F2C4CEF1;
+	Sat, 10 Jan 2026 22:58:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768085573;
-	bh=kQIXup3eGpGEzFjx2TOrT1yxsfQHKMJt3eerhakTGXc=;
+	s=k20201202; t=1768085923;
+	bh=+324RabEwbA/VZH9PrYE1jKMEnbznYGBleMcMlkMXAQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Roo7CxvamP7CoBIqa5n8qan8WqlKbrvwTh/prkWhXbZY8PIgtSoSCwHq8oKIr3U0P
-	 uevdOn2S6WQvaAYxDJ4ddf+PphsrRqeyFYK/vN77szMOSoXsnqN8ohJlJwABqM0133
-	 /0SSL1YgMl10f7JhrG9Mn29mm9O72H1H7VRHXbXU1Mamyo3jxDHXQyMle6QA9PJc/I
-	 qPhLTh/zf2nAv7q6bCJnVwWvA7HBurHgZuHekwQdJ2P0rpa+cKcWv2LX7Ey6rdy+ZH
-	 qOL5xnlUNbXIN56hyw5p9NXqe8pkpPrDI5GQkAvhmpSAS39whajtTpXRvzLasPyiXu
-	 yzgGliAC6Lcyw==
-Date: Sat, 10 Jan 2026 14:52:52 -0800
+	b=kyxSnaNC55QX8k8DmmaW+uH5d3lB/+sBNj1aoS0QXJFPZbUFQouafj2lyw+52HWpO
+	 jrK0kAjFdN/0f3+Lsi98P/PrLo4NGNx4C/Tsdsp7LonAaUklxiHd0eH/5lktUv+4my
+	 xGOftfIHkmwmUNnQhMAqKXPH8qSBXaN29vhlu6GqeJaZwoxgTkAGIMxkKJfcj9kyiA
+	 qvAIFHGuCMwF1i5aAenYmm0H6EchWtRjhDEmfOvkkBpreqO2UVBcfdXY7avkWEGv4o
+	 z/qv5zpwuFnfLT+jNwdqbFkHlVa4L1fb+bHX0KBDexcgspUT/cXklEjqOSLo/qo4ZE
+	 DyGviKE58DvhA==
+Date: Sat, 10 Jan 2026 14:58:42 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Ratheesh Kannoth <rkannoth@marvell.com>
 Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
  <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
  <pabeni@redhat.com>, <andrew+netdev@lunn.ch>
-Subject: Re: [PATCH net-next v3 09/13] octeontx2-af: npc: cn20k: virtual
- index support
-Message-ID: <20260110145252.3ecf939f@kernel.org>
-In-Reply-To: <20260109054828.1822307-10-rkannoth@marvell.com>
+Subject: Re: [PATCH net-next v3 01/13] octeontx2-af: npc: cn20k: Index
+ management
+Message-ID: <20260110145842.2f81ffdc@kernel.org>
+In-Reply-To: <20260109054828.1822307-2-rkannoth@marvell.com>
 References: <20260109054828.1822307-1-rkannoth@marvell.com>
-	<20260109054828.1822307-10-rkannoth@marvell.com>
+	<20260109054828.1822307-2-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,30 +60,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 9 Jan 2026 11:18:24 +0530 Ratheesh Kannoth wrote:
-> This patch adds support for virtual MCAM index allocation and
-> improves CN20K MCAM defragmentation handling. A new field is
-> introduced in the non-ref, non-contiguous MCAM allocation mailbox
-> request to indicate that virtual indexes should be returned instead
-> of physical ones. Virtual indexes allow the hardware to move mapped
-> MCAM entries internally, enabling defragmentation and preventing
-> scattered allocations across subbanks. The patch also enhances
-> defragmentation by treating non-ref, non-contiguous allocations as
-> ideal candidates for packing sparsely used regions, which can free
-> up subbanks for potential x2 or x4 configuration. All such
-> allocations are tracked and always returned as virtual indexes so
-> they remain stable even when entries are moved during defrag.
-> During defragmentation, MCAM entries may shift between subbanks,
-> but their virtual indexes remain unchanged. Additionally, this
-> update fixes an issue where entry statistics were not being
-> restored correctly after defragmentation.
+On Fri, 9 Jan 2026 11:18:16 +0530 Ratheesh Kannoth wrote:
+> +static int
+> +npc_subbank_srch_order_parse_n_fill(struct rvu *rvu, char *options,
+> +				    int num_subbanks)
 
-Warning: drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h:203 struct member 'xa_idx2vidx_map' not described in 'npc_priv_t'
-Warning: drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h:203 struct member 'xa_vidx2idx_map' not described in 'npc_priv_t'
-Warning: drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h:203 struct member 'defrag_lh' not described in 'npc_priv_t'
-Warning: drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h:203 struct member 'lock' not described in 'npc_priv_t'
-Warning: drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h:203 struct member 'xa_idx2vidx_map' not described in 'npc_priv_t'
-Warning: drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h:203 struct member 'xa_vidx2idx_map' not described in 'npc_priv_t'
-Warning: drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h:203 struct member 'defrag_lh' not described in 'npc_priv_t'
-Warning: drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.h:203 struct member 'lock' not described in 'npc_priv_t'
+Please avoid writable debugfs files, do you really need them?
+The string parsing looks buggy / missing some checks for boundary
+conditions...
 
