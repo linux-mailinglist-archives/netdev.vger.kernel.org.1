@@ -1,100 +1,80 @@
-Return-Path: <netdev+bounces-248730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB7DED0DAB6
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 20:11:08 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1EBAD0DCBE
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 20:53:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B9E8030069BE
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 19:10:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F31E430210DE
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 19:53:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E4482BD5AD;
-	Sat, 10 Jan 2026 19:10:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EEC5298CA3;
+	Sat, 10 Jan 2026 19:53:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n+DwUM4f"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JymwyqmP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398611487F6;
-	Sat, 10 Jan 2026 19:10:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47FBC223328;
+	Sat, 10 Jan 2026 19:53:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768072255; cv=none; b=Rilk1YZtOvjkzVqCv0KBZ+Gd0P2fd8O59ZQUBGJJD9rvuk+3k29NLOniQCKGNdPTcc5mwL9t7CC7NqyksI57Htub3hGRNJtYPxvDIWoMloXxJvr/YyNnm4VFsW918t1W0z3smUBK08IVvne7+VfnJCRzIfstQVZfs2GXp8Rnm5Q=
+	t=1768074788; cv=none; b=X03eQxUn4J7otlUCWVJ8+R1zsbInohBXCPWXNJCt+aFT+Bo3bDmCjjJmOI90GFRcooHgYRSH6ao+Xi5euSEpPgKvrd2OcA/PMa3NW3+nYMGkJ2ZasIenazbNDQN2962tHxZIlZBJ32xTeprrlKnDbs8dTuKjaJlrehLB/zJ99mg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768072255; c=relaxed/simple;
-	bh=jvMLd2+xDvBad73V5ovapoHgJnezT8Gg6P+92jsxlSQ=;
+	s=arc-20240116; t=1768074788; c=relaxed/simple;
+	bh=1pce/+hL+mT4ikoF0LMeY9bsocfA5If5JoWOMV1Ha+s=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o33kN2yKbGpeeJsmDZPxvoWZvm+NKAm9tm71Mb5/Q472cla/kehSmGHKdXgMp95ZBq2s6C5woFQfUKhfsAHsTcGQQLMGK3BCJ+O6Wqsxf0UxLPFID7FQ1AVgzRb4KyFupU+XNNtIMYzi76Ef2SaWpmH2vGl76bFLTSALe+cV/aA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n+DwUM4f; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02699C4CEF1;
-	Sat, 10 Jan 2026 19:10:53 +0000 (UTC)
+	 MIME-Version:Content-Type; b=A6HzBTr0LNv3Kd92KAyl4eXuGvCkijciyqCqUu+Hw0OS7+l2NHjRmfuR8cF4DmoDFbm/bVNQb5fXkzfmOUTuWZe0coUxv2HJHlMg4SSPqhB2t5HsNSLCpsP8/zTfyBIak67VT23tElSXIvIymoNpxArenEp3pSVkPmbHD6Go4Po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JymwyqmP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 147CFC4CEF1;
+	Sat, 10 Jan 2026 19:53:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768072254;
-	bh=jvMLd2+xDvBad73V5ovapoHgJnezT8Gg6P+92jsxlSQ=;
+	s=k20201202; t=1768074787;
+	bh=1pce/+hL+mT4ikoF0LMeY9bsocfA5If5JoWOMV1Ha+s=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=n+DwUM4f1AITcQurzF1cqOXPVv2NjjeVAX0Cw8QyFUWKb8JtZ7OVaBx3H59dpthk/
-	 sas4D1Yf0MNTQx76TWwfV2/e0sdufWOVJsvVycXF7vqQAv4KCaANmwma2gg0qaxik+
-	 NjUKodNrWgaPCC5MdMH8jS1ehkOjU0fiD3w6InIsRw0l2gKTbxTc4jMemDKN6PmKui
-	 YxUkUmsz+oaHwStBIdBCBOj7GTlJjyGEB4DdT/kYHIyH7b9/+0aihrsW2g9E+lEkPu
-	 u6iFdZZA8v0udq2FgOyO0CHewWmpWWyNC3XtA7TZeZUzk1CVviCO6tfTRJ8jLP1Hk2
-	 8/7jP96bX90uA==
-Date: Sat, 10 Jan 2026 11:10:53 -0800
+	b=JymwyqmPz+GxaedKcYJ6EC3ttFAS5FDePO0zeT7fWqdqt7dV/ssMsrJpEH087slQ/
+	 JYSwT7uOPDdBaWSiYF+vShftlrQiLGCj8M9zRKT6J3iAkiFPxB3tpzW+czsKweMrgm
+	 KKcaN2sOoMEKok8AJVORKtJNrcu/nEZrXHsP4kVaAOI8WUwBTVtk4FbO0O33aTDav7
+	 jqJY/ct3miD0F6lz1AZe4XtWtsrnxyaBzkiu5EZq//MKX75FbA4NefQDUX9StIxl8z
+	 wqKm2PAn5HwW3jg4Nla9XU8uX9Wv2DrO8A0YmwxPwevEIhwNp1dpIAWDrE1QIcp7zh
+	 dHoaeaPGYwfxg==
+Date: Sat, 10 Jan 2026 11:53:06 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason
- Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio
- =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
- virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net v3 1/3] virtio-net: don't schedule delayed refill
- worker
-Message-ID: <20260110111053.08107da2@kernel.org>
-In-Reply-To: <2542db74-0e72-421d-932a-b1667fb16e56@gmail.com>
-References: <20260106150438.7425-1-minhquangbui99@gmail.com>
-	<20260106150438.7425-2-minhquangbui99@gmail.com>
-	<20260109181239.1c272f88@kernel.org>
-	<2542db74-0e72-421d-932a-b1667fb16e56@gmail.com>
+To: Suraj Gupta <suraj.gupta2@amd.com>
+Cc: <mturquette@baylibre.com>, <sboyd@kernel.org>,
+ <radhey.shyam.pandey@amd.com>, <andrew+netdev@lunn.ch>,
+ <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <michal.simek@amd.com>, <sean.anderson@linux.dev>, <linux@armlinux.org.uk>,
+ <linux-clk@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <bmasney@redhat.com>
+Subject: Re: [PATCH 2/2] net: axienet: Fix resource release ordering
+Message-ID: <20260110115306.4049b2cb@kernel.org>
+In-Reply-To: <20260109071051.4101460-3-suraj.gupta2@amd.com>
+References: <20260109071051.4101460-1-suraj.gupta2@amd.com>
+	<20260109071051.4101460-3-suraj.gupta2@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sat, 10 Jan 2026 15:23:36 +0700 Bui Quang Minh wrote:
-> >> @@ -3230,9 +3230,10 @@ static int virtnet_open(struct net_device *dev)
-> >>  =20
-> >>   	for (i =3D 0; i < vi->max_queue_pairs; i++) {
-> >>   		if (i < vi->curr_queue_pairs)
-> >> -			/* Make sure we have some buffers: if oom use wq. */
-> >> -			if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
-> >> -				schedule_delayed_work(&vi->refill, 0);
-> >> +			/* Pre-fill rq agressively, to make sure we are ready to
-> >> +			 * get packets immediately.
-> >> +			 */
-> >> +			try_fill_recv(vi, &vi->rq[i], GFP_KERNEL); =20
-> > We should enforce _some_ minimal fill level at the time of open().
-> > If the ring is completely empty no traffic will ever flow, right?
-> > Perhaps I missed scheduling the NAPI somewhere.. =20
->=20
-> The NAPI is enabled and scheduled in virtnet_napi_enable(). The code=20
-> path is like this
->=20
-> virtnet_enable_queue_pair
-> -> virtnet_napi_enable =20
->  =C2=A0 -> virtnet_napi_do_enable
->  =C2=A0 =C2=A0 -> virtqueue_napi_schedule
->=20
-> The same happens in __virtnet_rx_resume().
+On Fri, 9 Jan 2026 12:40:51 +0530 Suraj Gupta wrote:
+> Device-managed resources are released after manually-managed resources.
+> Therefore, once any manually-managed resource is acquired, all further
+> resources must be manually-managed too.
 
-I see. Alright, let me fix the nits while applying, no need to respin.
-Kinda want this in the tree for a few days before shipping off to Linus.
+only for resources which have dependencies. Please include in the commit
+message what exactly is going wrong in this driver. The commit under
+Fixes seems to be running ioremap, I don't see how that matters vs
+netdev allocation for example..
+
+> Convert all resources before the MDIO bus is created into device-managed
+> resources. In all cases but one there are already devm variants available.
+-- 
+pw-bot: cr
 
