@@ -1,111 +1,146 @@
-Return-Path: <netdev+bounces-248727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C405D0DAA1
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 20:01:04 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE352D0DAA4
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 20:04:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CF59130090F4
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 19:00:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B36033011029
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 19:04:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3648850276;
-	Sat, 10 Jan 2026 19:00:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02F52224B05;
+	Sat, 10 Jan 2026 19:04:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K/5rCS30"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PTPZ26dL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f51.google.com (mail-dl1-f51.google.com [74.125.82.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136B1500955
-	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 19:00:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03C32AE78
+	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 19:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768071654; cv=none; b=IbhO0IsGBVZj34BDcmeAc8/RyTI1lPpsPRKclSlJWvzMGwlngLU6yo7kQvih+RukLOzcqjtYSkAN8EKu5NrjlznjOFZgEcniiIh7e9ZuE0gILG6fzF+KdC6HO1wefeo313ML1SNgAnDBsQVUS7BL14YAZzBaWW10Xt6UF6uzlkk=
+	t=1768071851; cv=none; b=opfrPozo5uBJPT6QF54h7Vvs1Os1rlmrp6zcDMfzHcuVqzEPcV/6k5feyT9UNLnQh0r3Jd+7Ctv5c1wwo9CpQY6xLAb4stROeusk8j//KyEQJzyeKgzJazhw8iABvrPRHzoyXXp27HRnnI+iDhcvhL8zsYI2wEEEO/Tz6zTKvq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768071654; c=relaxed/simple;
-	bh=VD3guD1KU+N6pRQuDUlT6DEsq+CnrW4ILj320ZBPmNo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k7QHQ/i/ooqWk33yC2ywKSD3SivmHRa9oKRGZIBu5KFBANTRgvb6hfKD5gv+O/XmQXEtj/SyfsKjVe4QiIm8t+W71y64q1t+b2puMSUyStiKzKJKaP9MNxe2NXrbZYGqojarPZr6Cj68T06Q7dSl3C+Keq9HA2L3+31rb5uxIdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K/5rCS30; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16E38C4CEF1;
-	Sat, 10 Jan 2026 19:00:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768071653;
-	bh=VD3guD1KU+N6pRQuDUlT6DEsq+CnrW4ILj320ZBPmNo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=K/5rCS30fzLrIvib+j1oN9w7TcNkmivJgXna3XockMICKnekw8MdeiaZqMsaF0qr1
-	 eWWzfmdvfqBFN16yTMkYblTdCCa9noOXB74q0x32LuM/sI84SiFwf3nQ6Mp0XEWVEe
-	 uiruJyalc4i3p/RkpkZD89kFQS9amQqtdbr6y8tlX3V2rULpW7MMAuHvZOp8f4LXrU
-	 w2zGkQd94cpdwghDFPNNrs0/H1/3mL+rYS+8TI6OpwiMqZ36GY+bCEB++4C2RZ84YY
-	 3GRlZbxF6HdPFb4WH1ptU30pyR7JeOSvxU005oE3cQmenN/mgzKe04NtOwciq1H3u4
-	 nxOCYtdxhMyAA==
-Date: Sat, 10 Jan 2026 11:00:52 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>, Paolo Abeni
- <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, David Miller
- <davem@davemloft.net>, Vladimir Oltean <vladimir.oltean@nxp.com>, Michael
- Klein <michael@fossekall.de>, Daniel Golle <daniel@makrotopia.org>, Realtek
- linux nic maintainers <nic_swsd@realtek.com>, Aleksander Jan Bajkowski
- <olek2@wp.pl>, Fabio Baltieri <fabio.baltieri@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next 1/2] net: phy: realtek: add PHY driver for
- RTL8127ATF
-Message-ID: <20260110110052.5d986893@kernel.org>
-In-Reply-To: <20260110105740.53bca2cb@kernel.org>
-References: <52011433-79d3-4097-a2d3-d1cca1f66acb@gmail.com>
-	<492763d9-9ece-41a1-a542-d09d9b77ab4a@gmail.com>
-	<20260108172814.5d98954f@kernel.org>
-	<6b1377b6-9664-4ba7-8297-6c0d4ce3d521@gmail.com>
-	<20260110105740.53bca2cb@kernel.org>
+	s=arc-20240116; t=1768071851; c=relaxed/simple;
+	bh=dskCpJd+YCujyIx7XR9oysY2xe4QopxRDplMgNdfrEE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z4NifPNIrVTvOXSZCsaBTV1Rge3JBK8zPThLcPy5v6xOCXFqGn7JmLkrC1baA801uDIBlYZpoqynBj6gqS59ORqi1tfIlnukTrhDwzDMGzY+xeX96J3gW7I1IUhicOLGZqvKF9vBdtfOLCRIpdmlk7zVvfTfn66GYytKT9zBsrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PTPZ26dL; arc=none smtp.client-ip=74.125.82.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-11f36012fb2so6758012c88.1
+        for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 11:04:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768071850; x=1768676650; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JlaKzcSrJRaLTx4G3ypkWP+DmBlFYtf0U4Y+cLGn/os=;
+        b=PTPZ26dLPUKTp8l4cXDO+wcww8GGsTCAeby1ZtRIjFR2vbnO993G7goKPB5ZHW5wGu
+         CN7hQlgx9qb2A/cVtO7lrytJk9E7Y6vrXws/ISO3eQkMnDH94ub3nTyYsZETcD6Y1909
+         XA3wUVefWU4rtxhI/nMD7mcTl4WA6/GPNIv88F32VwMZApLrNzWEYaK6vgaamToMUwIF
+         a88ivxergm80Bk4xzkFWmvKZy+RpAaS1XzTfu/HaSl1wMYcKc1fpT5uCAH2TMx/1SIBe
+         xVtaPM87J/FSndMpKRMveDRdmngvhF22SnXDQEx/thLcUMQBtVZHRH7BWAN38sd6O/M0
+         m9/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768071850; x=1768676650;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JlaKzcSrJRaLTx4G3ypkWP+DmBlFYtf0U4Y+cLGn/os=;
+        b=lYmkW+Nb0kAGPIHGiMRsGjYNkmtiGrETMtApcdITWP0hDL8aM3b+F2iNnC9d2+wcRl
+         lFsbyAK06zlgjgXGdDaQ4Yt6i0KVFft4pIJtrrRu05CL1jwIcwWLadSFiGHt4vt8BQ+6
+         35hGZkKONXiw+9PWMlm2P++NGBh7jLih0Y8dFGlQ/DTuj5MX0j9JBDPR4N2deJrt/XCT
+         6S4NNVwUTJQJM9uZ+u902k496UfSFFSvxgP1bRsW0sU4Cjk3WsHwheUvnK95XwUg3Jgi
+         Rulgo4B45TZpfnvb0y0d91dZvJHn83d19SAtC+LHceHhqFPQF5mnhZp2CqiOYQ7CUWGp
+         oiFg==
+X-Forwarded-Encrypted: i=1; AJvYcCU2ro/+C1he+vpXqbcw8aKBXC7QcNY4ijorLbJmlcmzhD75bMOPmn7DmSwlD0s3IIKfohkbaVA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCwuzqSGnfVK5jV+1RBAx06T6N6NgSqRDkg7ZGd6KkSKECXKMy
+	/cs7IcAlv/8hE5qG40thZLtXABaamA3J7XPDoPFG9KaGDX5PcVYC6JQ=
+X-Gm-Gg: AY/fxX7TaHgpE9g21k6SL/QC20JWoDrbjFrj5cjE44sOw9K7H9QDcEBZIh22e518AIG
+	u4jNPSuwbg3kG9ZT2bg/UY6GSMYEIuCWU7X8CfOjizW5D1JaHuD007qtthseNnioo0B4XFAAbtm
+	zQB02e8ijqfRG0XfzzV5V59hVHARCsLWO8nK9XljELYxnFbjqg7K6EMYMrMHFzEoioDmp/VidFV
+	AXQ7ZAFMu2kdN75p6h9iwoT70GZRpuvVwakkHmK8lHGTkzspBYCiuTESrjGmXSIETsFn1X/rmDr
+	h94hVJeFoI4RhfE41bRN5Nfthqm8kowr8in+5o4KiDKZIBLFWhJsN9RyycDQc2xWuuMr8OOOWJQ
+	JhS4ueCJ63eaThJ9nlBMzafvaVESXe5RPyAllZDBMVgNN6enUXh4DsvHYFPx1juAb6xTQvISVpZ
+	sOGguNLTXjO4R8xs2CCXZROwBjvlrIxnuWABg9225Dlktj6g2Dv1+vj12ktln0/dmNWhSYTx4Qv
+	Xe0eg==
+X-Google-Smtp-Source: AGHT+IG+GcY2ymFoaEhKDPrjsSUaDi3OJeOrtrZ6G87StYoPBMKwjqu22SqnvFYvMfDQetvm3ldMLg==
+X-Received: by 2002:a05:7022:41a7:b0:11b:9386:8254 with SMTP id a92af1059eb24-121f8b65e84mr13876132c88.41.1768071849335;
+        Sat, 10 Jan 2026 11:04:09 -0800 (PST)
+Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-121f248c239sm16559538c88.9.2026.01.10.11.04.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 10 Jan 2026 11:04:08 -0800 (PST)
+Date: Sat, 10 Jan 2026 11:04:08 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	donald.hunter@gmail.com, gal@nvidia.com
+Subject: Re: [PATCH net-next 2/7] tools: ynl: cli: wrap the doc text if it's
+ long
+Message-ID: <aWKiqKPYiAeeyhPq@mini-arch>
+References: <20260109211756.3342477-1-kuba@kernel.org>
+ <20260109211756.3342477-3-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260109211756.3342477-3-kuba@kernel.org>
 
-On Sat, 10 Jan 2026 10:57:40 -0800 Jakub Kicinski wrote:
-> On Sat, 10 Jan 2026 18:23:06 +0100 Heiner Kallweit wrote:
-> > On 1/9/2026 2:28 AM, Jakub Kicinski wrote:  
-> > > How would you feel about putting this in include/net ?
-> > > Easy to miss things in linux/, harder to grep, not to
-> > > mention that some of our automation (patchwork etc) has
-> > > its own delegation rules, not using MAINTAINERS.    
-> > 
-> > Just sent a v2 with the new header moved to new include/net/phy/.
-> > patchwork is showing a warning rgd a missing new MAINTAINERS entry.
-> > However this new entry is added with the patch:
-> > 
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -9416,6 +9416,7 @@ F:	include/linux/phy_link_topology.h
-> >  F:	include/linux/phylib_stubs.h
-> >  F:	include/linux/platform_data/mdio-bcm-unimac.h
-> >  F:	include/linux/platform_data/mdio-gpio.h
-> > +F:	include/net/phy/
-> >  F:	include/trace/events/mdio.h
-> >  F:	include/uapi/linux/mdio.h
-> >  F:	include/uapi/linux/mii.h
-> > 
-> > Bug in the check?  
+On 01/09, Jakub Kicinski wrote:
+> We already use textwrap when printing "doc" section about an attribute,
+> but only to indent the text. Switch to using fill() to split and indent
+> all the lines. While at it indent the text by 2 more spaces, so that it
+> doesn't align with the name of the attribute.
 > 
-> My reading of it was basically that it's upset that realtek PHYs don't
-> have a dedicated maintainer. The check considers the PHY subsystem as
-> too large for the same people to cover core and all the drivers.
-> If that's the case then the check is working as expected.
-> It's just flagging the sub-optimal situation to the maintainers.
+> Before (I'm drawing a "box" at ~60 cols here, in an attempt for clarity):
 > 
-> I wasn't sure if you'd be willing to create a dedicated MAINTAINERS
-> entry for Realtek PHYs. The check itself is safe to ignore in this case.
+>  |  - irq-suspend-timeout: uint                              |
+>  |    The timeout, in nanoseconds, of how long to suspend irq|
+>  |processing, if event polling finds events                  |
+> 
+> After:
+> 
+>  |  - irq-suspend-timeout: uint                              |
+>  |      The timeout, in nanoseconds, of how long to suspend  |
+>  |      irq processing, if event polling finds events        |
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  tools/net/ynl/pyynl/cli.py | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/net/ynl/pyynl/cli.py b/tools/net/ynl/pyynl/cli.py
+> index aa50d42e35ac..e5e71ee4e133 100755
+> --- a/tools/net/ynl/pyynl/cli.py
+> +++ b/tools/net/ynl/pyynl/cli.py
+> @@ -10,6 +10,7 @@ import json
+>  import os
+>  import pathlib
+>  import pprint
+> +import shutil
+>  import sys
+>  import textwrap
+>  
+> @@ -101,7 +102,14 @@ RELATIVE_SCHEMA_DIR='../../../../Documentation/netlink'
+>                  attr_info += f" -> {nested_set_name}"
+>  
+>              if attr.yaml.get('doc'):
+> -                doc_text = textwrap.indent(attr.yaml['doc'], prefix + '  ')
+> +                doc_prefix = prefix + ' ' * 4
+> +                if sys.stdout.isatty():
+> +                    term_width = shutil.get_terminal_size().columns
+> +                else:
+> +                    term_width = 80
+> +                doc_text = textwrap.fill(attr.yaml['doc'], width=term_width,
+> +                                         initial_indent=doc_prefix,
+> +                                         subsequent_indent=doc_prefix)
 
-PS FWIW the check is our replacement for the utterly useless checkpatch
-check that asks for a MAINTAINERS entry every time a new file is added.
-I wanted to mute that without feeling guilty for ignoring a potentially
-useful suggestion so I coded up a more intelligent check which asks for
-MAINTAINERS entry only if the file doesn't fall under any reasonably
-sized entry already.
+Any specific reason you wrap to 80 for !isatty?
 
