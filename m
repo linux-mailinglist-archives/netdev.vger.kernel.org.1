@@ -1,114 +1,131 @@
-Return-Path: <netdev+bounces-248676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBBD3D0D086
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 07:17:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C613D0D2EC
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 08:57:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B6A5D3026BFC
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 06:17:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7B6A0302532B
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 07:57:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6571824677D;
-	Sat, 10 Jan 2026 06:17:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="R8AMfDgq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C54D2DB79C;
+	Sat, 10 Jan 2026 07:57:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f80.google.com (mail-oo1-f80.google.com [209.85.161.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC967258CE7
-	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 06:17:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1877320E023
+	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 07:57:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768025835; cv=none; b=Qs84s2YhxwvudGQRQOtdbeKcR0VtrXeSqKP2q5lJ5J3hRPOc2kMv8z/FU7SyZ6Sxn9tG/t6aGP9eKrtOI/+7BPq4zEXdRRuJvZxJtszCdx5oEUX8GFK941UWh926j00jBsxvbGu8qMa+suerrUdiXv0hvBfQwW6tzIQuA80T798=
+	t=1768031845; cv=none; b=gYR6Qu+UcAuV/3XjjZrzlW/rEwOBWPfPfSr/hHwfWvzEZfm1oKiJeVZWWOC//DDLtvU0BPWciHmviTor4/r0hzP3HWfbZhKJEIuNLzcCclxI6N9VkWlvTZDvObhW2YjxK7NiifZyJkqm2QacqRqU0pI0H6y9Uq/h506Nn7j8V00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768025835; c=relaxed/simple;
-	bh=vOplLJEX9isv42WotdBVOkJgDNihHfjDD0O3L5H/tMY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jbKEBpHkAKkfJq3PgukdbbrCQroEEiQFWgTxedD8qf8zL4YGZkWCqhj1yWkjtrtBY1zIvJbOehjj4rP8bqER1uzeBluaaukm81/vJ9XrF0OTx40hvJ48iKd+1YanlvaLNO6sr9ys1A5tiWm02tIOgkHe8/l0fzvjaf32CVA4i6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=R8AMfDgq; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768025821;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UJEhCFHRTbkOHjEzYSkqsIGSyEYidG74DyThTLA/jbs=;
-	b=R8AMfDgqbes+l+8+nfCFf0uaorNU4r8p6SPeRm03Dinj8AewFOMkHKwj8ajbBFqNBtapoR
-	UoBXgDBCwoOB/2RO9mXh09X7quIcO4YPVHzDMxckib+ym3ULowBhA0UXXz4LQivPrnC80H
-	hQV2AVPm6A1h23I3WI7FQdRYSd2H69k=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Menglong Dong <menglong8.dong@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- David Ahern <dsahern@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, jiang.biao@linux.dev,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
- bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Subject:
- Re: [PATCH bpf-next v8 04/11] bpf: support fsession for bpf_session_is_return
-Date: Sat, 10 Jan 2026 14:16:35 +0800
-Message-ID: <2813099.mvXUDI8C0e@7950hx>
-In-Reply-To:
- <CAADnVQJTc3qegim-hyzaurnCX-8pRQWoj+r9+0jgBQ-WmpLHuw@mail.gmail.com>
-References:
- <20260108022450.88086-1-dongml2@chinatelecom.cn> <5075208.31r3eYUQgx@7950hx>
- <CAADnVQJTc3qegim-hyzaurnCX-8pRQWoj+r9+0jgBQ-WmpLHuw@mail.gmail.com>
+	s=arc-20240116; t=1768031845; c=relaxed/simple;
+	bh=qT0nlE9tP6XTFN3uMUBBISQotht1yGyI09whZj5T12c=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=sk6j8uu3Q/Oe1JCHsiJcuDymo2RtLcpt9CJdjZVGegPU00wnb2LLL6cuKfUatgvsVt1pATytOC7F0R2X6FtWh/Koqm0FvrnMyTCe7B+jLNCCni7voz9VlNugqXolH8eX2+ntibJqJrVWlVrP5yuecTPCLphxt27r3/kJtY02X1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f80.google.com with SMTP id 006d021491bc7-65f66b8be64so3880347eaf.3
+        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 23:57:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768031843; x=1768636643;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3CKtBPBJN1VTx68R0gwqmuLhPZDrkNKJvv91rwrlpCo=;
+        b=eT/AHdZYqBGau8HbERua+Xk9ebM4at7aDHf8//nlH0vG/oE/54H0dv4ZeROoWC832x
+         IXxalOUXpgm489/lULb+46DFCnw6+KFNp2CWEHM6Sjls0H7xW/zJU6yd12qY9uFhrd0R
+         4wc2HZpUCH+PQPBGD3fg0GbNvTLcRHUfAu71cUWDxNbGyEJEN7c/1SNnw1gb/mIPADkM
+         BYPDdQBhRwHWcpDCz88VG0d6aX1Xz/28AEVDdgIfuGY9O/isCUiLD9WYekg/7kBrgbBP
+         VmZVR0iTxScPgFe9RSNBkJ4cMaAI6Anf3XLkBltzg88YngsW16D9uFY24pImrlU1H9pr
+         BhZw==
+X-Forwarded-Encrypted: i=1; AJvYcCU3vc0R5M7547KWAcIgk9bUHF/IdZc9CAspWUqDdD9xkqJVq36qpx3BYQZPUtwDie8N0TDuR84=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxW1hva0qCK3gXDG46LNEadXZht8COWGAOm5q2PbVcuHHqMVU6s
+	BHSdcB3cn+ifS2+45b0+bkXcePZBKAa+zaGVEOKUlhh9sCZSN1WR8mAvHQJMRvUsiAmnRZFHi5J
+	H5qDzYIQqBagz80KQgEA9/IgYUwpmTpmBTyLVJ2m0PVAPtw1canORgE/kAZY=
+X-Google-Smtp-Source: AGHT+IFV6oKsA0A7FaYkdn6rV3ubNp1bX5cU2VXgLQFjSxzbv5Z6HCxOfk/kOVuBmtsmjglj1wTg9fXlG38rjl0dacUZT0U6Hlij
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Migadu-Flow: FLOW_OUT
+X-Received: by 2002:a05:6820:6388:b0:65f:69f7:d0ed with SMTP id
+ 006d021491bc7-65f69f7d735mr1654899eaf.83.1768031842995; Fri, 09 Jan 2026
+ 23:57:22 -0800 (PST)
+Date: Fri, 09 Jan 2026 23:57:22 -0800
+In-Reply-To: <685b0ae5.a00a0220.2e5631.009a.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69620662.050a0220.eaf7.0002.GAE@google.com>
+Subject: Re: [syzbot] [wpan?] WARNING in lowpan_xmit (2)
+From: syzbot <syzbot+5b74e0e96f12e3728ec8@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 2026/1/10 14:05, Alexei Starovoitov wrote:
-> On Fri, Jan 9, 2026 at 7:38=E2=80=AFPM Menglong Dong <menglong.dong@linux=
-=2Edev> wrote:
-> >
-> >
-> > >
-> > > Remove the first hunk and make the 2nd a comment instead of a real fu=
-nction?
-> >
-> > Agree. So it will be:
-> >
-> > +static bool bpf_fsession_is_return(void *ctx)
-> > +{
-> > +       /* This helper call is implemented and inlined by the verifier,=
- and the logic is:
-> > +         *   return !!(((u64 *)ctx)[-1] & (1 << BPF_TRAMP_M_IS_RETURN)=
-);
-> > +         */
-> > +        return false;
-> > +}
->=20
-> No need to define an empty function.
-> A comment next to 'inline-by-bpf-asm' part explaining what is going on
-> will be enough.
+syzbot has found a reproducer for the following issue on:
 
-Yeah, I see. I'll remove the whole part, and do some comment
-in the verifier where I inline this function instead.
+HEAD commit:    372800cb95a3 Merge tag 'for-6.19-rc4-tag' of git://git.ker..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=139e9922580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8bfa57a8c0ab3aa8
+dashboard link: https://syzkaller.appspot.com/bug?extid=5b74e0e96f12e3728ec8
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=140649fc580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15d4d19a580000
 
-Thanks!
-Menglong Dong
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/95aaef1a6aac/disk-372800cb.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/3b81de4f4247/vmlinux-372800cb.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/98061453c05e/bzImage-372800cb.xz
 
->=20
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5b74e0e96f12e3728ec8@syzkaller.appspotmail.com
+
+ieee802154 phy0 wpan0: encryption failed: -22
+ieee802154 phy1 wpan1: encryption failed: -22
+------------[ cut here ]------------
+WARNING: ./include/linux/skbuff.h:3227 at skb_network_header_len include/linux/skbuff.h:3227 [inline], CPU#1: aoe_tx0/1301
+WARNING: ./include/linux/skbuff.h:3227 at lowpan_header net/ieee802154/6lowpan/tx.c:236 [inline], CPU#1: aoe_tx0/1301
+WARNING: ./include/linux/skbuff.h:3227 at lowpan_xmit+0xea9/0x1210 net/ieee802154/6lowpan/tx.c:282, CPU#1: aoe_tx0/1301
+Modules linked in:
+CPU: 1 UID: 0 PID: 1301 Comm: aoe_tx0 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+RIP: 0010:skb_network_header_len include/linux/skbuff.h:3227 [inline]
+RIP: 0010:lowpan_header net/ieee802154/6lowpan/tx.c:236 [inline]
+RIP: 0010:lowpan_xmit+0xea9/0x1210 net/ieee802154/6lowpan/tx.c:282
+Code: ff ff 4c 89 ff 48 01 81 38 02 00 00 e8 30 d8 0f fe e9 e6 fb ff ff e8 46 a3 8f f6 90 0f 0b 90 e9 a3 f5 ff ff e8 38 a3 8f f6 90 <0f> 0b 90 e9 86 f6 ff ff e8 2a a3 8f f6 0f b7 8d e0 fe ff ff 44 8b
+RSP: 0018:ffffc9000476f860 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: ffffc9000476f8e0 RCX: ffffffff8b2ebe6c
+RDX: ffff888028a3bd00 RSI: ffffffff8b2ec7e8 RDI: 0000000000000003
+RBP: ffffc9000476f9f0 R08: 0000000000000003 R09: 000000000000ffff
+R10: 000000000000ffff R11: 0000000000000000 R12: ffff88801d79a476
+R13: 000000000000ffff R14: ffff888028234d90 R15: ffff88801d79a3c0
+FS:  0000000000000000(0000) GS:ffff8881249fa000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000c007868000 CR3: 0000000071880000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ __netdev_start_xmit include/linux/netdevice.h:5273 [inline]
+ netdev_start_xmit include/linux/netdevice.h:5282 [inline]
+ xmit_one net/core/dev.c:3853 [inline]
+ dev_hard_start_xmit+0x97/0x6e0 net/core/dev.c:3869
+ __dev_queue_xmit+0x6d7/0x46b0 net/core/dev.c:4819
+ dev_queue_xmit include/linux/netdevice.h:3381 [inline]
+ tx+0xcc/0x190 drivers/block/aoe/aoenet.c:62
+ kthread+0x1e4/0x3e0 drivers/block/aoe/aoecmd.c:1241
+ kthread+0x3c5/0x780 kernel/kthread.c:463
+ ret_from_fork+0x983/0xb10 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
+ </TASK>
 
 
-
-
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
