@@ -1,80 +1,83 @@
-Return-Path: <netdev+bounces-248715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36563D0DA0D
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 18:44:11 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85E55D0DA15
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 18:58:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CBB9E301119F
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 17:43:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 7436F3000915
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 17:58:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67CFF28D850;
-	Sat, 10 Jan 2026 17:43:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEDC0244660;
+	Sat, 10 Jan 2026 17:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u+IsfEXC"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="s0h9zmTR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4573519CD0A;
-	Sat, 10 Jan 2026 17:43:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85E21C3C08
+	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 17:57:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768067039; cv=none; b=mADiRV5ukzpMLnsUI7IM8lCMQKGv6XLoiSf2izG56HSjooQL2SnM0kxPzxYrBAhRJzSZldlqyQ9+147gQ+bbe7565FUSZc9JVbTdzCLHqGrrXoY/SWX+7TbEEsq0k+lDHVCU/nVOBhR4b4xrk7o0wv81k83Mx6h7U4A1TxDutHY=
+	t=1768067880; cv=none; b=oI8gxnKlKE9aWPqPtJDwt8udK5/1IIyew7rVNeKgEdRs+ZsIcqB+LPxxsaoPdbu4oIUTYNwDVn77cxz861MnFRToWLAX/rsgUePBTpz0qaX9uqJg9Po4SFuuHsyb/ZQRCNx8p6Aw6acAeiGep7EZjK92d+vmxz7T+s1k6KwRT/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768067039; c=relaxed/simple;
-	bh=RzdLGJUcpACTY1/qZNpg82Y72LMhnpb5PbODpP+dHlk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sXza/5C4KRaw5fi/g+ZRTLXYw6rjbadMbJFbh49CAa+9gNlJnVyMeFRH30uAHkDx/3he94EUYmlnCz4HFiR+dEiIpNxiLM1Yf7Dg87KCPyY5Tq0dMhozxH1d0AFiE4pZxJwYeXsHYvZuHf1lj9n2PPdrABdDxFAJSVvvqv16H04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u+IsfEXC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EF56C4CEF1;
-	Sat, 10 Jan 2026 17:43:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768067039;
-	bh=RzdLGJUcpACTY1/qZNpg82Y72LMhnpb5PbODpP+dHlk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=u+IsfEXCyOqdFL2v65MDuMnuOltSaY5C5GoL34HHbzOk7imEOZL6yKcfHMiDv7/9D
-	 fiwMYOLNIF+X/TynTpYqV8+YPm5xMV/QC1Odo6S40C6BDwHAQl7TCjhS5C5YCNXGmp
-	 mPZ6wA5dFVQHBXx2ygWHV6oGdbil0HHeSGbUoFwE6XZxNPs8pLJocVS9pyXszUlB8I
-	 6T6qwY9Yq7C30+1Ms6JijPJsrPtc6bIQLe4RSwTYaqPRY7+A5fWNeC3I6aEf7qmqaV
-	 HBh7I0gfmuUYEUzzIcRy9clbWL1/qfcsmwyH0M5eG1YwKcP3gRafWVlN0dzam0iQx3
-	 gxAPXEljsAcUA==
-Date: Sat, 10 Jan 2026 09:43:57 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
- linux-kselftest@vger.kernel.org, sdf@fomichev.me, willemb@google.com,
- petrm@nvidia.com, willemdebruijn.kernel@gmail.com
-Subject: Re: [PATCH net-next v2 4/6] selftests: drv-net: gro: improve
- feature config
-Message-ID: <20260110094357.28921354@kernel.org>
-In-Reply-To: <20260110005121.3561437-5-kuba@kernel.org>
-References: <20260110005121.3561437-1-kuba@kernel.org>
-	<20260110005121.3561437-5-kuba@kernel.org>
+	s=arc-20240116; t=1768067880; c=relaxed/simple;
+	bh=a1E/gShRFIxm3/Z+Fu6kE6VGp0w2AcVd1OzYG71aqq8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EWBlouHCxOcn4NrqS4BCD8VAGL66jp+4zIdGPSd60wbzf7TPyE4Q+wQHplwrWs3q+UPF7U87aFOc0GDB3XxwCDoZsQ/zdBmsGI3YNO3d3ZNsbMIl6p4CzqOqts95o3lielRxX0pU0gA0Y9oyTV84fMHyrBIBNEzvHOrXlF5lq8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=s0h9zmTR; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=puxfefFprNB3SQUbQpm6V3t5QUMMxdRvcQAt++54mWw=; b=s0h9zmTRwXb1EPr/RnNCKPcw21
+	Hqtw62BZkvb5O67+F/f2/DjHzHkgVom9px43Z9Y546J2sZhngPacB+ky4rDCjBikMm/ve58KOKdE6
+	VG3i0WfffFvWO3P4Q4O48xk+6+st6zXlU9QTwoyMu2IA0RP0w6BA5u78/swNmkodfoqU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vedDk-002EAY-3e; Sat, 10 Jan 2026 18:57:52 +0100
+Date: Sat, 10 Jan 2026 18:57:52 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Mika Westerberg <mika.westerberg@linux.intel.com>
+Cc: netdev@vger.kernel.org, Yehezkel Bernat <YehezkelShB@gmail.com>,
+	Ian MacDonald <ian@netstatz.com>,
+	Salvatore Bonaccorso <carnil@debian.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jay Vosburgh <jv@jvosburgh.net>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH RESEND net-next v2 1/5] net: thunderbolt: Allow changing
+ MAC address of the device
+Message-ID: <b41a629a-4e71-4f50-b7e5-fcbec88cc488@lunn.ch>
+References: <20260109122606.3586895-1-mika.westerberg@linux.intel.com>
+ <20260109122606.3586895-2-mika.westerberg@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260109122606.3586895-2-mika.westerberg@linux.intel.com>
 
-On Fri,  9 Jan 2026 16:51:19 -0800 Jakub Kicinski wrote:
->      try:
->          # Disable TSO for local tests
->          cfg.require_nsim()  # will raise KsftXfailEx if not running on nsim
->  
-> -        cmd(f"ethtool -K {cfg.ifname} gro on tso off")
-> -        cmd(f"ethtool -K {cfg.remote_ifname} gro on tso off", host=cfg.remote)
-> +        _set_ethtool_feat(cfg.remote_ifname, cfg.remote_feat, {"tso": False},
-> +                          host=cfg.remote)
->      except KsftXfailEx:
->          pass
+On Fri, Jan 09, 2026 at 01:26:02PM +0100, Mika Westerberg wrote:
+> The MAC address we use is based on a suggestion in the USB4 Inter-domain
+> spec but it is not really used in the USB4NET protocol. It is more
+> targeted for the upper layers of the network stack. There is no reason
+> why it should not be changed by the userspace for example if needed for
+> bonding.
+> 
+> Reported-by: Ian MacDonald <ian@netstatz.com>
+> Closes: https://lore.kernel.org/netdev/CAFJzfF9N4Hak23sc-zh0jMobbkjK7rg4odhic1DQ1cC+=MoQoA@mail.gmail.com/
+> Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
 
-Looks like I haven't re-tested on netdevsim, this needs to spell out
-tcp-segmentation-offload :S
--- 
-pw-bot: cr
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
