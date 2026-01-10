@@ -1,61 +1,63 @@
-Return-Path: <netdev+bounces-248656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49842D0CCA8
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 03:02:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90B1BD0CCB2
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 03:12:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8061C3032AC2
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 02:02:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BDA6E3032114
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 02:12:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C73D42222D1;
-	Sat, 10 Jan 2026 02:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C80D23D7C2;
+	Sat, 10 Jan 2026 02:12:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wd+3VEil"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mo/OnHH9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3E612B93;
-	Sat, 10 Jan 2026 02:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14D432A1CF;
+	Sat, 10 Jan 2026 02:12:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768010531; cv=none; b=KT/PXHkNGjz/uUSaJzmSYttDm8oDuyvXvgAyskrMfH0sp0AEkYsMV4zl7e6XPZ74e3HbaYgeSX0WB86sqLjlvjt1itsURegoa3MzsYpvB+adO5z/Sp5dUUh+Pk8/Xy62CX8sFHDA8lZ2sjj1oUKWccAZmfZhjnipGY0+w+gygFo=
+	t=1768011161; cv=none; b=dRaprGrqSeDztAqSGRZcJMNVYuREX8sQvGgNC1FhkeEYMGdHMXaRfvwMh2qIxuZ9w+cf9fq0u3/Mtu6bWfSNKZ1iimt0D45TnICFSrVvJ5UZ1fCpv7KWN3jPLivzADATQPKR051Sbnq0diqX7Eg4YpH0DyRyEdB3HmxBYbpxha0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768010531; c=relaxed/simple;
-	bh=1MOiVEexVGrwFEVsAZA/tszL4KabaceGog91OcJBTnE=;
+	s=arc-20240116; t=1768011161; c=relaxed/simple;
+	bh=D5bkcgNL5G1VYcSawL2KHr0EISsJ30WpEfjpKWoSQE0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rFamiTJN91fykmAvfsv4bOhmHCnXlSfQ3kmt3tGeyn1sbucYgtTTK9r9Ve0g6tIth8jiUAMgVS1538GR3SaBzlp6aryAVjVAG/6Yh76/XfJLJ/oDnDZ1INWXy/glYmU3NZNxRDUyHQ06dPOm+WcnmaIaJ4t7VxeaOMpRGAPSGxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wd+3VEil; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 473D7C4CEF1;
-	Sat, 10 Jan 2026 02:02:10 +0000 (UTC)
+	 MIME-Version:Content-Type; b=fK4BzQXVU/+dCwjwlubmh6SQ5NW/uCUE+qbCVyJZTtOqs6uhp5xK3EwjwC03eqHcwBuEO97TFRT3Eh3z/WIg5pTqMMoWq7MpnG+VXnI0CrlzFofnKmhPu/VKtB0T1nJK3mCyavqU8vdhicaB819FxxIMKVfZAecVgANL88Jgh2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mo/OnHH9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3BABC4CEF1;
+	Sat, 10 Jan 2026 02:12:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768010531;
-	bh=1MOiVEexVGrwFEVsAZA/tszL4KabaceGog91OcJBTnE=;
+	s=k20201202; t=1768011160;
+	bh=D5bkcgNL5G1VYcSawL2KHr0EISsJ30WpEfjpKWoSQE0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Wd+3VEilhx6c25iOV43CWBhiMYs6aEI1zKqAFF8/Y3YhE4igyDQLEViKqADeZF5HM
-	 94/Eh2dUrycT5muvCfr5C33/S33uo7tjQ90p0UHqYQUxHceu9qhEjyl7+/H5O1Pk55
-	 o6Ogq6ZBy7D2YdC54DKaditdUdTxkZntMSY6ZNMi0651hlKp4NPOU9/cTaZbt47tcp
-	 hHbHzEeAm8lUphQO1Yf6zeKrW5O+6JWaBkp3GMwHGDR/cgJqc619zmIDDWIyMd/dMa
-	 pUGI15Q/+z9wnX09byNq950AuIT6CQVo79FWt9lJXLwsO6r9vqJS2oFQfUCzH0JpH0
-	 R9XRWxDjYYJNA==
-Date: Fri, 9 Jan 2026 18:02:09 -0800
+	b=Mo/OnHH9evnQn6WCMUPGVnFmo3gC1O+BzB8N0PdXAcjjprjXUBamM9FVphhGRm6J7
+	 FgefALw29cEzdsOkt0nwoJxeyemxWvHSyRynpSZCD0F7tSD2EOsJyMVqIuFr7g/WlB
+	 GMVtmh01VcKx86t8p9Cf8xDGBFrnHkVfGMErTycOxI8x1TBlLf8gGy3rD5d+481Zhh
+	 G/4bbVz+cRuXLoKeAbv43uNPXkIjhFtvH0FAodBMY+b1R6ftMQ8muuvUK6Q5TUrhmm
+	 Ll5X/6nBIq4z+5LSySDj7JyyGDDngrdyPJrIQp335UQjGPigEWlhDRwXL9skF8xNRc
+	 qTqCq6izikjxw==
+Date: Fri, 9 Jan 2026 18:12:39 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
- kotaranov@microsoft.com, horms@kernel.org,
- shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
- ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
- linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- dipayanroy@microsoft.com
-Subject: Re: [PATCH net-next, v7] net: mana: Implement ndo_tx_timeout and
- serialize queue resets per port.
-Message-ID: <20260109180209.023c50cf@kernel.org>
-In-Reply-To: <20260106230438.GA13125@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20260106230438.GA13125@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+To: Bui Quang Minh <minhquangbui99@gmail.com>
+Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason
+ Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio
+ =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
+ virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net v3 1/3] virtio-net: don't schedule delayed refill
+ worker
+Message-ID: <20260109181239.1c272f88@kernel.org>
+In-Reply-To: <20260106150438.7425-2-minhquangbui99@gmail.com>
+References: <20260106150438.7425-1-minhquangbui99@gmail.com>
+	<20260106150438.7425-2-minhquangbui99@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,42 +67,95 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 6 Jan 2026 15:04:38 -0800 Dipayaan Roy wrote:
-> +static void mana_per_port_queue_reset_work_handler(struct work_struct *work)
-> +{
-> +	struct mana_queue_reset_work *reset_queue_work =
-> +			container_of(work, struct mana_queue_reset_work, work);
+On Tue,  6 Jan 2026 22:04:36 +0700 Bui Quang Minh wrote:
+> When we fail to refill the receive buffers, we schedule a delayed worker
+> to retry later. However, this worker creates some concurrency issues.
+> For example, when the worker runs concurrently with virtnet_xdp_set,
+> both need to temporarily disable queue's NAPI before enabling again.
+> Without proper synchronization, a deadlock can happen when
+> napi_disable() is called on an already disabled NAPI. That
+> napi_disable() call will be stuck and so will the subsequent
+> napi_enable() call.
+> 
+> To simplify the logic and avoid further problems, we will instead retry
+> refilling in the next NAPI poll.
+
+Happy to see this go FWIW. If it causes issues we should consider
+adding some retry logic in the core (NAPI) rather than locally in
+the driver..
+
+> Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
+> Reported-by: Paolo Abeni <pabeni@redhat.com>
+> Closes: https://netdev-ctrl.bots.linux.dev/logs/vmksft/drv-hw-dbg/results/400961/3-xdp-py/stderr
+
+The Closes should probably point to Paolo's report. We'll wipe these CI
+logs sooner or later but the lore archive will stick around.
+
+> @@ -3230,9 +3230,10 @@ static int virtnet_open(struct net_device *dev)
+>  
+>  	for (i = 0; i < vi->max_queue_pairs; i++) {
+>  		if (i < vi->curr_queue_pairs)
+> -			/* Make sure we have some buffers: if oom use wq. */
+> -			if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
+> -				schedule_delayed_work(&vi->refill, 0);
+> +			/* Pre-fill rq agressively, to make sure we are ready to
+> +			 * get packets immediately.
+> +			 */
+> +			try_fill_recv(vi, &vi->rq[i], GFP_KERNEL);
+
+We should enforce _some_ minimal fill level at the time of open().
+If the ring is completely empty no traffic will ever flow, right?
+Perhaps I missed scheduling the NAPI somewhere..
+
+>  		err = virtnet_enable_queue_pair(vi, i);
+>  		if (err < 0)
+> @@ -3472,16 +3473,15 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
+>  				struct receive_queue *rq,
+>  				bool refill)
+>  {
+> -	bool running = netif_running(vi->dev);
+> -	bool schedule_refill = false;
+> +	if (netif_running(vi->dev)) {
+> +		/* Pre-fill rq agressively, to make sure we are ready to get
+> +		 * packets immediately.
+> +		 */
+> +		if (refill)
+> +			try_fill_recv(vi, rq, GFP_KERNEL);
+
+Similar thing here? Tho not sure we can fail here..
+
+> -	if (refill && !try_fill_recv(vi, rq, GFP_KERNEL))
+> -		schedule_refill = true;
+> -	if (running)
+>  		virtnet_napi_enable(rq);
+> -
+> -	if (schedule_refill)
+> -		schedule_delayed_work(&vi->refill, 0);
+> +	}
+>  }
+>  
+>  static void virtnet_rx_resume_all(struct virtnet_info *vi)
+> @@ -3829,11 +3829,13 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
+>  	}
+>  succ:
+>  	vi->curr_queue_pairs = queue_pairs;
+> -	/* virtnet_open() will refill when device is going to up. */
+> -	spin_lock_bh(&vi->refill_lock);
+> -	if (dev->flags & IFF_UP && vi->refill_enabled)
+> -		schedule_delayed_work(&vi->refill, 0);
+> -	spin_unlock_bh(&vi->refill_lock);
+> +	if (dev->flags & IFF_UP) {
+> +		local_bh_disable();
+> +		for (int i = 0; i < vi->curr_queue_pairs; ++i)
+> +			virtqueue_napi_schedule(&vi->rq[i].napi, vi->rq[i].vq);
 > +
-> +	struct mana_port_context *apc = container_of(reset_queue_work,
-> +						     struct mana_port_context,
-> +						     queue_reset_work);
 
-> +struct mana_queue_reset_work {
-> +	/* Work structure */
+nit: spurious new line
 
-Not sure what value this comment adds. Looks like something AI
-generator would add.
+> +		local_bh_enable();
+> +	}
+>  
+>  	return 0;
+>  }
 
-> +	struct work_struct work;
-> +};
-> +
->  struct mana_port_context {
->  	struct mana_context *ac;
->  	struct net_device *ndev;
-> +	struct mana_queue_reset_work queue_reset_work;
-
-Why did you wrap the work in another struct with just one member?
-It forces you to work thru two layers of container of.
-
-Either way, container_of supports nested structs so I think something
-like:
-
-	struct mana_port_context *apc = container_of(work,
-						     struct mana_port_context,
-						     queue_reset_work.work);
-
-should work (untested). But really, better to just delete the pointless
-nesting.
--- 
-pw-bot: cr
 
