@@ -1,158 +1,144 @@
-Return-Path: <netdev+bounces-248736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98876D0DD6D
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 21:40:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C9CCD0DD85
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 22:05:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 486BD30161AF
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 20:40:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C5D943025FA3
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 21:05:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9837C1DF25F;
-	Sat, 10 Jan 2026 20:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5086027B4E8;
+	Sat, 10 Jan 2026 21:05:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="icN58/h9"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="FntSP08Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22712500966
-	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 20:40:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE2FA4A0C
+	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 21:05:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768077608; cv=none; b=A2qV0/FWEzIgRJqfrADN7mRN/rUVa5rHSgo58cZKL6WYDk30vLMOANZWkfItYpUz/XkBmMMDrxz3+959OABmiAgW3UWwQ86SACjLDgKCfk+ya01isL85xINKD3nkZL7b+u1W6g5DIz6wAuQ59tPg2TIu2qfbsBJJDutbfUcjWJU=
+	t=1768079126; cv=none; b=EOh/uVFzt8Se429rvnmXGwz/gqtEmLlt5FzW/5v3t0zGTv5WCdbmh3S4h3ZKwvWEWbSucbSPpt8BKPlanZlljwDRfRZBgVzxF5GJWzxqmkyaWsTGL1cG59ElhLhsd3gUMskR2OjfHh9EGNPRe3vrv5gnk+kL2XicLoDRULaa8Bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768077608; c=relaxed/simple;
-	bh=DzINUMiYE3qIW0sC8NX9E1jxc3z5bNpowmPgKQgJv3A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qeG6QLBydMs/H1dtOxj7cXDfccJvFWU5Lkq9bY9KtwIEBzaZ7+AQqUAu660ztegiP5+UAFy6/ztQgf3hLEhlvFV8iw162RSkUXg7/Ni23vYOh0CnD+KeMFtR0CQixCqKLGKcdDhvuN2mxwGf9BAeNh+S92cuTPKeEf2Ww5+YIII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=icN58/h9; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-477ba2c1ca2so57908945e9.2
-        for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 12:40:06 -0800 (PST)
+	s=arc-20240116; t=1768079126; c=relaxed/simple;
+	bh=YpbZsCPgUtK+YNOWaJpwHQw8D9O6JEbSkLrjqbbRMrE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=impYEsGJimNQTLkAW9BvDAgATReRvcg+SaX1uWZ++RXdzoWAm/qZK2khf66QAcoLx+FcQGWZTur4Q54+0DjBYEU0rjLo94512y7miiKpP5DLZG+E33QfcsHoAbUoQ/7LyNpnG1r5W3244JE/8lt7BRZrQ2Z/U7n3Otg/3bYbndY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=FntSP08Y; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b734fcbf1e3so1044442566b.3
+        for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 13:05:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768077605; x=1768682405; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=56/tEBNogSWLSQPrFFl8skKl1ibOcwubXMFCHZrFQDc=;
-        b=icN58/h9VgTsuLTJAlHOXe7DRIF202sj8cxdkh9WupNUIeLBlIUjNP5qdIJIIRPCP5
-         kNqBRSeM4/p1NB0Khr1z032eEsOXV6+TV4IxtsI7W9JzHMSWbYt5eOotMlp0w+HjpSuh
-         DMyxTeYv+Cgfp4E8lbSt9VLiUrt9Zuy/QEmABd6TmuMcGwpGiqsZpT7LEY66ifomkjia
-         lQJVx7HYwT56DYtSk0QUekqeu3kB1ZQjeB5wdkuukfr6aIHzjJkRNX2HqYZHeTWgWxuk
-         S8sN6loBsxwrVprUpnyvFQImpTsIizBsPu8bUVjds0t6tfLkl4r9qirM/zZuysD8+DAV
-         WLYw==
+        d=cloudflare.com; s=google09082023; t=1768079123; x=1768683923; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lC30p+B2g5PX/MfNZDYtTYpmlqLfqwjvQthF+EF4ADY=;
+        b=FntSP08YwvxcL0BuOnxibKPqK84pB7ihoMJzmQH0NfzP5OrFS4Vx827bKMY71PWFbE
+         D9zkL7vxopmNgz2CbWVlMs+s77A2Ft9SULIlpLI1Mpg3BXH5hk1WpozX5IAsTJfKAoX4
+         1G4BySACKv3GC0061mMdeLOKkALzcWCptp/d6BXD4nBBrMbD1k4VH4q5DXTUj0OANbTM
+         QOFbFcsBmHtunzhHuZg2G5F18GLya46OO9NpaOvkOlnuvDzbqSAtWmNpEDzAhB9oK4Zn
+         ROAwi/1NDc+0dqcREXrNIguwWiw3y6VE7RQr3C/NK6Tf13IHsfp80scRs1x/pKvdj4h/
+         vpAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768077605; x=1768682405;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=56/tEBNogSWLSQPrFFl8skKl1ibOcwubXMFCHZrFQDc=;
-        b=EGme23Q0J3WUkEwo41SNUi04MHk79c4ssezpnMcchyJBooivweCahp/QUTH1BiNe+H
-         h1D3LFHj26UbLLYMOAdUQDnLvyUxkx1aviWU98up+WltpJLwh3ChgCxpKQxQDx+roAOs
-         oX+sDTcSOLt/bvuE3Q6aPIfHb13hSwWqR15SaLzryNVdG+TJV0NAomYwD4/nLssHCoud
-         ZDMH/7TYBMba/fKVNwGuKTJV3nyQdwZLuQm86MFR0/CoEVBrYQ4tz3I9dAbcQBbJUrHe
-         YThO+WSVnEAf2VDiZ8kBG2roe0YqaAPQ/DsGJmFi0uXJi8C9/ik8ozXdKrg1Pj0umj6O
-         SHsg==
-X-Forwarded-Encrypted: i=1; AJvYcCUkECpV4b8jmWx7Zx6OA4vNqWEBhT74a6UGBnxigFj0ZB6WYNyNqRQhrsku6ewjAQY3B6ETySA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfSmwC1RMaZbE5XpvXQX7IYhI1Kzs/a1ogjLC10OhTMT/JzVz6
-	5oVS8Zzhgd1YoVEaaKSgrvY57x5UOOugOhcup44HEg4bh3BKQq85nY0c
-X-Gm-Gg: AY/fxX4Q6aFGQj146NB3TUxIvJIWHockVZOO5MDuKSlAU9oP23olccCYNawpz3ZyRF1
-	kLF9esmMfAsPcx7L3dvPhPmjoXZBv9/HsS+KeNaBrMT3EjIa/bNPkIVohw2bcze5nIK99pIRsyB
-	9hcR0/yGDHEVd++haPVDvtOqT1vWkP7A9kr6sKboC6mb2QjAA1gajwfMkzJ+NalVQ1uaiaocS4E
-	kF+yeATdM9yrCn59R12h1p9q+3244pe4pxocfMZiaLRLUFRjsh7zFxewnVVJGwUHXWa5QKDcGAV
-	zjS+nUncyAkBxpv7ofTIesh3TsUmKVYSgiFH9qOKpKrYHSLD1ow/tq183UHrK7lA2P6NTbrkJBA
-	MHvProv7dhKj6Pyy8LiQF42qwLUP16gWSNlAY408oIG/glFffBogPzKfFLQhfa3EZob6F1kr3rh
-	REOXgxvTUMiSQcLuPJzemTIStTlBZSJCBvLgpK71Es3N2Dep1Bk/RRaBzq/5aHmXNTUjiY9YPcy
-	YCtytZwN5dtcNzMtvm6OJXVK+rmsWRset5Q3uVT2EOaJXLLkfdkgg==
-X-Google-Smtp-Source: AGHT+IHEYM+VfgpGFoMRxYTgz9DPD9vxG4M2JnxL1vTypWEivxzslm/KP4wMr9wjnzV8MCs33QiTCQ==
-X-Received: by 2002:a05:600c:1392:b0:46e:4a30:2b0f with SMTP id 5b1f17b1804b1-47d84b3863fmr154331985e9.29.1768077605417;
-        Sat, 10 Jan 2026 12:40:05 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f1c:1800:8cc6:804e:b81b:aa56? (p200300ea8f1c18008cc6804eb81baa56.dip0.t-ipconnect.de. [2003:ea:8f1c:1800:8cc6:804e:b81b:aa56])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d8717d9e7sm89831495e9.8.2026.01.10.12.40.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 10 Jan 2026 12:40:04 -0800 (PST)
-Message-ID: <2fa7fd1c-6f4c-4988-ac15-e576c6326542@gmail.com>
-Date: Sat, 10 Jan 2026 21:40:03 +0100
+        d=1e100.net; s=20230601; t=1768079123; x=1768683923;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lC30p+B2g5PX/MfNZDYtTYpmlqLfqwjvQthF+EF4ADY=;
+        b=g33qtBUz0ca6ARV4F3ZmgoFsKvjVoOD3lt37wCb0ja+pcDZsGr0cvSIH5SfIVJR2fD
+         AQjWua2cMsTmkRwypyu1cen/eLy7Y2aTEMaKgJtgBDeJiSTrujeXmUS/KE088Op5jaSD
+         m+TzsO+uvymZYuQqG7r+b1RfZoOwJ12UlIc9E0Q7uMsmZLJWJFI6y9TIkp9VLncNBp8F
+         Wj68YZSQfVgPv1rMpQErYUHNc5YDgjv5CKxuWTM3XQygElwLIeNDT3qq5az5y+sAQgL9
+         9lEN8PIfom9mrsTW/57SllxFD0413QlSVX95e809PY1+jp2mjryda/Ip7yBTeojYPWG3
+         Sphg==
+X-Gm-Message-State: AOJu0YzEUFWAtYl8+4k+W1+98Zhx3PcHpWREhTYhKHSynzOv4bwFn2T3
+	IAri32eNplrda9o8q+kc2Kg27ZQSgi8QzJ9rKg0XMriDaErc5GQQ9uIsljCdmnxhG9I=
+X-Gm-Gg: AY/fxX7UD9J4+81yRFxPPyZMG5gmZ2+cxuUPFlzitp74AIC+TAvmepGmhalnIXNOJPP
+	DzNaHZRqe3qS3SF7PqvjUHAYi520UWNMgMPt57864kUaWngF1bin5plcS2jKO90kGanSUYUutGY
+	LjLuKdYx+ky1T7laj9OwAWwqQE1tv7iUbk52h2fue6KzCxH6eHRR+Rz19qJ4nThTuVm97fuU+62
+	LdNsG5MiG/j2mwNY0skI2/96gqA08ACbL0I28lz5UZfHFhx3crTtdi4/YdtfQuRq47zsbTIKRmi
+	0qO1KZcalK6z7bTSqSfk37JUo3c3vGQvI6n1+WexF2iX0KLZqKIAB/Z6W+WImtjTdNla1xC9Foz
+	1KfY6zYH3y9n6qZV22mvs0mdHSiDyPkvviUwxZXRPQXbG8jI2B+aKLCq+3L9wZfIZUgooNrx+yu
+	6iXKhVrDYrEkdc+xD7K2zApUBYEhudrkOw2kX+0jd6fmbyLVxh1UmuVtX1Zlw=
+X-Google-Smtp-Source: AGHT+IE4AcfstCcru9GHC8O+sbKkpLiZU/SVJ2RJZTUoj4FwyqUUl6TpJ4rXM8j6vltoVQ5e62sCOg==
+X-Received: by 2002:a17:907:9802:b0:b7c:e320:5232 with SMTP id a640c23a62f3a-b8444c4ce48mr1225722466b.5.1768079123136;
+        Sat, 10 Jan 2026 13:05:23 -0800 (PST)
+Received: from cloudflare.com (79.184.207.118.ipv4.supernova.orange.pl. [79.184.207.118])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b870bcd342bsm15151666b.56.2026.01.10.13.05.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 10 Jan 2026 13:05:22 -0800 (PST)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+Subject: [PATCH net-next 00/10] Call skb_metadata_set when skb->data points
+ past metadata
+Date: Sat, 10 Jan 2026 22:05:14 +0100
+Message-Id: <20260110-skb-meta-fixup-skb_metadata_set-calls-v1-0-1047878ed1b0@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] net: phy: realtek: add PHY driver for
- RTL8127ATF
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- David Miller <davem@davemloft.net>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, Michael Klein <michael@fossekall.de>,
- Daniel Golle <daniel@makrotopia.org>,
- Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Aleksander Jan Bajkowski <olek2@wp.pl>,
- Fabio Baltieri <fabio.baltieri@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <52011433-79d3-4097-a2d3-d1cca1f66acb@gmail.com>
- <492763d9-9ece-41a1-a542-d09d9b77ab4a@gmail.com>
- <20260108172814.5d98954f@kernel.org>
- <6b1377b6-9664-4ba7-8297-6c0d4ce3d521@gmail.com>
- <20260110105740.53bca2cb@kernel.org> <20260110110052.5d986893@kernel.org>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <20260110110052.5d986893@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAq/YmkC/x3N0QrCMAyF4VcZuTbQzDLFVxEZcY0anHU0VQZj7
+ 27m5Qc/5yxgUlQMTs0CRb5q+s4O2jUwPDjfBTW5oQ1tF4gC2vOKL6mMN50/08Z+Y+LKvUnFgcf
+ RMCY5HONeInUEvjUV8f7/c4bsWZa5wmVdf8VUy+aBAAAA
+X-Change-ID: 20260110-skb-meta-fixup-skb_metadata_set-calls-4de7843e4161
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Michael Chan <michael.chan@broadcom.com>, 
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+ Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Stanislav Fomichev <sdf@fomichev.me>, intel-wired-lan@lists.osuosl.org, 
+ bpf@vger.kernel.org, kernel-team@cloudflare.com
+X-Mailer: b4 0.15-dev-07fe9
 
-On 1/10/2026 8:00 PM, Jakub Kicinski wrote:
-> On Sat, 10 Jan 2026 10:57:40 -0800 Jakub Kicinski wrote:
->> On Sat, 10 Jan 2026 18:23:06 +0100 Heiner Kallweit wrote:
->>> On 1/9/2026 2:28 AM, Jakub Kicinski wrote:  
->>>> How would you feel about putting this in include/net ?
->>>> Easy to miss things in linux/, harder to grep, not to
->>>> mention that some of our automation (patchwork etc) has
->>>> its own delegation rules, not using MAINTAINERS.    
->>>
->>> Just sent a v2 with the new header moved to new include/net/phy/.
->>> patchwork is showing a warning rgd a missing new MAINTAINERS entry.
->>> However this new entry is added with the patch:
->>>
->>> --- a/MAINTAINERS
->>> +++ b/MAINTAINERS
->>> @@ -9416,6 +9416,7 @@ F:	include/linux/phy_link_topology.h
->>>  F:	include/linux/phylib_stubs.h
->>>  F:	include/linux/platform_data/mdio-bcm-unimac.h
->>>  F:	include/linux/platform_data/mdio-gpio.h
->>> +F:	include/net/phy/
->>>  F:	include/trace/events/mdio.h
->>>  F:	include/uapi/linux/mdio.h
->>>  F:	include/uapi/linux/mii.h
->>>
->>> Bug in the check?  
->>
->> My reading of it was basically that it's upset that realtek PHYs don't
->> have a dedicated maintainer. The check considers the PHY subsystem as
->> too large for the same people to cover core and all the drivers.
->> If that's the case then the check is working as expected.
->> It's just flagging the sub-optimal situation to the maintainers.
->>
->> I wasn't sure if you'd be willing to create a dedicated MAINTAINERS
->> entry for Realtek PHYs. The check itself is safe to ignore in this case.
-> 
-> PS FWIW the check is our replacement for the utterly useless checkpatch
-> check that asks for a MAINTAINERS entry every time a new file is added.
-> I wanted to mute that without feeling guilty for ignoring a potentially
-> useful suggestion so I coded up a more intelligent check which asks for
-> MAINTAINERS entry only if the file doesn't fall under any reasonably
-> sized entry already.
+This series is split out of [1] following discussion with Jakub.
 
-I see, thanks for the explanation. At the moment realtek_phy.h holds just
-a single PHY ID, so it's fine to give it a home with the phylib maintainers.
-You're right, it would be good to have dedicated maintainer(s) for the
-Realtek PHY drivers. Ideally persons with access to Realtek datasheets.
-Maybe based on this discussion somebody volunteers ..
+To copy XDP metadata into an skb extension when skb_metadata_set() is
+called, we need to locate the metadata contents.
+
+These patches establish a contract with the drivers: skb_metadata_set()
+must be called only after skb->data has been advanced past the metadata
+area.
+
+[1] https://lore.kernel.org/r/20260107-skb-meta-safeproof-netdevs-rx-only-v3-0-0d461c5e4764@cloudflare.com
+
+Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+---
+Jakub Sitnicki (10):
+      net: Document skb_metadata_set contract with the drivers
+      bnxt_en: Call skb_metadata_set when skb->data points past metadata
+      i40e: Call skb_metadata_set when skb->data points past metadata
+      igb: Call skb_metadata_set when skb->data points past metadata
+      igc: Call skb_metadata_set when skb->data points past metadata
+      ixgbe: Call skb_metadata_set when skb->data points past metadata
+      mlx5e: Call skb_metadata_set when skb->data points past metadata
+      veth: Call skb_metadata_set when skb->data points past metadata
+      xsk: Call skb_metadata_set when skb->data points past metadata
+      xdp: Call skb_metadata_set when skb->data points past metadata
+
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c           | 2 +-
+ drivers/net/ethernet/intel/i40e/i40e_xsk.c          | 2 +-
+ drivers/net/ethernet/intel/igb/igb_xsk.c            | 2 +-
+ drivers/net/ethernet/intel/igc/igc_main.c           | 4 ++--
+ drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c        | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/xsk/rx.c | 2 +-
+ drivers/net/veth.c                                  | 4 ++--
+ include/linux/skbuff.h                              | 7 +++++++
+ net/core/dev.c                                      | 5 ++++-
+ net/core/xdp.c                                      | 2 +-
+ 10 files changed, 21 insertions(+), 11 deletions(-)
 
 
