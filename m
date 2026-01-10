@@ -1,84 +1,100 @@
-Return-Path: <netdev+bounces-248729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A97ED0DAAD
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 20:08:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB7DED0DAB6
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 20:11:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A48FE3004E2E
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 19:08:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B9E8030069BE
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 19:10:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC0C1299AB4;
-	Sat, 10 Jan 2026 19:07:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E4482BD5AD;
+	Sat, 10 Jan 2026 19:10:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PUpf/5eh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n+DwUM4f"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96C3285068
-	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 19:07:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398611487F6;
+	Sat, 10 Jan 2026 19:10:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768072078; cv=none; b=NZ7hsaRN+eL/GqnLEtJGatNJljT+5ylkPqduf5xokfNFOpwS6Zf5PKvFBt8x0iedgw1BJ0jyVXuGN6XXUJFaPD5XVEfuXSGchABX2B1BzQ/EdpeFjjChZUQSjMlukDl0Awc+9Vwb+gFGO+d8Eh5gPXUmgxgi1Nf9nNCe98XV8WI=
+	t=1768072255; cv=none; b=Rilk1YZtOvjkzVqCv0KBZ+Gd0P2fd8O59ZQUBGJJD9rvuk+3k29NLOniQCKGNdPTcc5mwL9t7CC7NqyksI57Htub3hGRNJtYPxvDIWoMloXxJvr/YyNnm4VFsW918t1W0z3smUBK08IVvne7+VfnJCRzIfstQVZfs2GXp8Rnm5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768072078; c=relaxed/simple;
-	bh=ZXi1A4cxWg+/v5f+5t+ZCY/Fz6vJm8MDxTNo5+I/qq0=;
+	s=arc-20240116; t=1768072255; c=relaxed/simple;
+	bh=jvMLd2+xDvBad73V5ovapoHgJnezT8Gg6P+92jsxlSQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lA26XwURklQ3USNnAZxuNzc0EIVHTtPuIS7f2QCEjMg/UHWGezJAucSJR6t/6EiQOH/mTxMmiCZXHbo4AeRBFchNTi4Q8B1vMx0rq1NUyjaMz4d5RepCSXBLx+8z2m9rpZV0XW4tMpb4hO4NoAVWav3m3FbFeHS1d/fobcw/YzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PUpf/5eh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB864C4CEF1;
-	Sat, 10 Jan 2026 19:07:57 +0000 (UTC)
+	 MIME-Version:Content-Type; b=o33kN2yKbGpeeJsmDZPxvoWZvm+NKAm9tm71Mb5/Q472cla/kehSmGHKdXgMp95ZBq2s6C5woFQfUKhfsAHsTcGQQLMGK3BCJ+O6Wqsxf0UxLPFID7FQ1AVgzRb4KyFupU+XNNtIMYzi76Ef2SaWpmH2vGl76bFLTSALe+cV/aA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n+DwUM4f; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02699C4CEF1;
+	Sat, 10 Jan 2026 19:10:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768072078;
-	bh=ZXi1A4cxWg+/v5f+5t+ZCY/Fz6vJm8MDxTNo5+I/qq0=;
+	s=k20201202; t=1768072254;
+	bh=jvMLd2+xDvBad73V5ovapoHgJnezT8Gg6P+92jsxlSQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PUpf/5ehYGjmaEwO84uqv5ioQKYhvPqHKNUH+/TXZFATG0rzs/kOG5O7N/Mjx3YEL
-	 nT6ayg6tX7AGCx2Y9ZYJyP6B3suSNohWgcQIAV4r90OqfO3GF5gCOeOWxBHgq05zyK
-	 79kEI5rEim2nc9pwQTbtxEvbTFyoyPtBAaKeK9OzbTtRG26qgqTf2fsuhvbR2C1wwr
-	 ssEEN6kocthSoMa/HG4yDCyJlNVoHE+ajsdysBwBemBJOBjD+DKbsJbZSWCmzlb6e5
-	 29l3wiFo8mr7oxGGBmdFYwH4Ly9gnou9/ryi/f+smC3H7k/yVW/Yw17FdlnvKOruaJ
-	 I5mvY1V3Pk6Gg==
-Date: Sat, 10 Jan 2026 11:07:57 -0800
+	b=n+DwUM4f1AITcQurzF1cqOXPVv2NjjeVAX0Cw8QyFUWKb8JtZ7OVaBx3H59dpthk/
+	 sas4D1Yf0MNTQx76TWwfV2/e0sdufWOVJsvVycXF7vqQAv4KCaANmwma2gg0qaxik+
+	 NjUKodNrWgaPCC5MdMH8jS1ehkOjU0fiD3w6InIsRw0l2gKTbxTc4jMemDKN6PmKui
+	 YxUkUmsz+oaHwStBIdBCBOj7GTlJjyGEB4DdT/kYHIyH7b9/+0aihrsW2g9E+lEkPu
+	 u6iFdZZA8v0udq2FgOyO0CHewWmpWWyNC3XtA7TZeZUzk1CVviCO6tfTRJ8jLP1Hk2
+	 8/7jP96bX90uA==
+Date: Sat, 10 Jan 2026 11:10:53 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- donald.hunter@gmail.com, gal@nvidia.com
-Subject: Re: [PATCH net-next 2/7] tools: ynl: cli: wrap the doc text if it's
- long
-Message-ID: <20260110110757.6dde2d45@kernel.org>
-In-Reply-To: <aWKiqKPYiAeeyhPq@mini-arch>
-References: <20260109211756.3342477-1-kuba@kernel.org>
-	<20260109211756.3342477-3-kuba@kernel.org>
-	<aWKiqKPYiAeeyhPq@mini-arch>
+To: Bui Quang Minh <minhquangbui99@gmail.com>
+Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason
+ Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio
+ =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
+ virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net v3 1/3] virtio-net: don't schedule delayed refill
+ worker
+Message-ID: <20260110111053.08107da2@kernel.org>
+In-Reply-To: <2542db74-0e72-421d-932a-b1667fb16e56@gmail.com>
+References: <20260106150438.7425-1-minhquangbui99@gmail.com>
+	<20260106150438.7425-2-minhquangbui99@gmail.com>
+	<20260109181239.1c272f88@kernel.org>
+	<2542db74-0e72-421d-932a-b1667fb16e56@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, 10 Jan 2026 11:04:08 -0800 Stanislav Fomichev wrote:
-> > @@ -101,7 +102,14 @@ RELATIVE_SCHEMA_DIR='../../../../Documentation/netlink'
-> >                  attr_info += f" -> {nested_set_name}"
-> >  
-> >              if attr.yaml.get('doc'):
-> > -                doc_text = textwrap.indent(attr.yaml['doc'], prefix + '  ')
-> > +                doc_prefix = prefix + ' ' * 4
-> > +                if sys.stdout.isatty():
-> > +                    term_width = shutil.get_terminal_size().columns
-> > +                else:
-> > +                    term_width = 80
-> > +                doc_text = textwrap.fill(attr.yaml['doc'], width=term_width,
-> > +                                         initial_indent=doc_prefix,
-> > +                                         subsequent_indent=doc_prefix)  
-> 
-> Any specific reason you wrap to 80 for !isatty?
+On Sat, 10 Jan 2026 15:23:36 +0700 Bui Quang Minh wrote:
+> >> @@ -3230,9 +3230,10 @@ static int virtnet_open(struct net_device *dev)
+> >>  =20
+> >>   	for (i =3D 0; i < vi->max_queue_pairs; i++) {
+> >>   		if (i < vi->curr_queue_pairs)
+> >> -			/* Make sure we have some buffers: if oom use wq. */
+> >> -			if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
+> >> -				schedule_delayed_work(&vi->refill, 0);
+> >> +			/* Pre-fill rq agressively, to make sure we are ready to
+> >> +			 * get packets immediately.
+> >> +			 */
+> >> +			try_fill_recv(vi, &vi->rq[i], GFP_KERNEL); =20
+> > We should enforce _some_ minimal fill level at the time of open().
+> > If the ring is completely empty no traffic will ever flow, right?
+> > Perhaps I missed scheduling the NAPI somewhere.. =20
+>=20
+> The NAPI is enabled and scheduled in virtnet_napi_enable(). The code=20
+> path is like this
+>=20
+> virtnet_enable_queue_pair
+> -> virtnet_napi_enable =20
+>  =C2=A0 -> virtnet_napi_do_enable
+>  =C2=A0 =C2=A0 -> virtqueue_napi_schedule
+>=20
+> The same happens in __virtnet_rx_resume().
 
-not really, just the default width of a classic terminal
-the textwrap library defaults to 70 which is another option tho
-I doubt there's a strong reason behind that value either..
+I see. Alright, let me fix the nits while applying, no need to respin.
+Kinda want this in the tree for a few days before shipping off to Linus.
 
