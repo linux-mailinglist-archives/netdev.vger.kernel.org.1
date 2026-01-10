@@ -1,149 +1,157 @@
-Return-Path: <netdev+bounces-248700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA2BDD0D72F
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 15:16:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 830FFD0D75D
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 15:28:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D6ACB301CCD9
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 14:13:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A5C88301119F
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 14:28:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02F7C346A1A;
-	Sat, 10 Jan 2026 14:13:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C213469FC;
+	Sat, 10 Jan 2026 14:28:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KwTu+i8v"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U1FqWbyi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f195.google.com (mail-pf1-f195.google.com [209.85.210.195])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3B013451AE
-	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 14:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E9847FBA2
+	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 14:28:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768054408; cv=none; b=om5KjCavC23XXir5llaAVCB0EY/xhrRMmd3LshSTLklncS/eIcND626WmF/ZHtAYAjhfhCRj44/p2QKX6pA6K/VNmcfNymXSchGRTvj/uJqF16AUjnaTnFAWZeuRIqFCITYpKBNkc8pkzefoWVYl/HV3r2DqZhTVJxwJUoj14tg=
+	t=1768055319; cv=none; b=u9JIuQr53UUFy6/n6Hg0ONxyB791TRWb4yd2RtsQCE2eJrgjzu8erKCli65lJ3yCzSDyhOq5M8+hjcCXS/vRFTApPZxdBQ0HfS09j5FhUmoftYAsM0Cg9Rp5xK/pvcUUuuPyfX8+CR/s2qRTp1JTgE3lSc+ViKDGYizm/zUlYIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768054408; c=relaxed/simple;
-	bh=agW6uKNys5gOeoTrVORTjBOaAxozAsYVc4VUeEIRBqk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YvJpsGFaDxc3zUjlNlzDtt3C3QIKzUERc/mjlICp3iaWenx+OYYWAfqeunx2O5u1TGpJOAK/21POVzvNPzKyRm66nGWhBpcmm3LG3LH/OeQyNfyijLqtp/IFSpxF2ikKeH+K9VjEqPWFWUaPiHNSSMnb0wZGafwI5/NsxvQHkHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KwTu+i8v; arc=none smtp.client-ip=209.85.210.195
+	s=arc-20240116; t=1768055319; c=relaxed/simple;
+	bh=d6lGCZeBAbHolp3KHSWXcTEuK21Cd7GvLg3LdHS0lfQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h5sUPneNkfQ+6fIDYxPGsmROLilv4Jv2DxKvKkWkHUsVG/mj6NX2SCuOAoBknztlV9duSPPIySzAwW9CQdtKka/wuo4HgunP16gzIizU50UBErCg25Vwbo7FrVmJ8ygsD1Bqyj/FpJOCTYceUMESD96YaV9451wa1prTMoX9c1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U1FqWbyi; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f195.google.com with SMTP id d2e1a72fcca58-81df6a302b1so1540693b3a.2
-        for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 06:13:27 -0800 (PST)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-47d3ba3a4deso30325885e9.2
+        for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 06:28:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768054407; x=1768659207; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ft9yy1vLUwNJD7u+x5LfWhJWNGjlertbzF816wc1jaU=;
-        b=KwTu+i8vVe4PjPzD2MKoi/yFtVnu3zAxaXFSXwm7eO8SoL0aSTamAdrmPLoPOMQ4K6
-         0TEJ2F8hs0q9fvTBikL2RsWZwgrbr8ipb3hPfRZXeL7fzOZMMofCs9sswusdXD6d6pFk
-         RtB5MACqzQt+/ewRh62x7dy0HDBPp+BlkQqvdJU40VOi7rpnzCZx5cTK7mka90xPylJD
-         YDPxAIfoHElX6TUTETfYStS59e8VgRKW4QEveUhZFOv8DmFtoEOgtUKPf9oX0Z6jkRoh
-         70kLf3LHLzW9zc9MHEuSumoas0OmuJjdUHzl5rZMaSntJJsQcW+2DMQ7pTrXLrdX1I74
-         UjLQ==
+        d=gmail.com; s=20230601; t=1768055317; x=1768660117; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2HKscEfLpjUsn821O8EhAoZL6ejgDYubcUtKXZVxPBU=;
+        b=U1FqWbyi9bzUZqqyrhfuG8TCcoS9XPoldx60S50d+R02vrE+1OPDXQimmBdSR5Et4I
+         u/mzP3Mf4s3TJEloyI0vEVez+G4208DSsLHNIdBUUJPLOPv+N2c0zRTltRtwJcVqpb6+
+         wvphEXLaJx2IgJo2YYNs4pu36SZzgQ+YJPK0i411F+T//HA+v4GqZqs1FPDiJ2AD72iN
+         Di8H43Wc4W16FZOCKVVfVMlkHKxhGemjlIY68VC5hwL6tnpTR3Z/m6YTXE1+r++8MLhW
+         tcsuf4rys92nGfDz0l9z0yMMmTdEIaXOO9npIkF2QiHoNkCHGp6cpkR7yg2N05w65wEQ
+         6dew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768054407; x=1768659207;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ft9yy1vLUwNJD7u+x5LfWhJWNGjlertbzF816wc1jaU=;
-        b=Cx3rE1X5IDFPtZ7LyoODbbfcio5P/beRQrdqqejVpLQfMYZOfTgG22CRvzHqJnGUcP
-         IaozHZvU1xig4e8zCrQzHOcp4MW5xnf5T5kyNPrfZgF48F/Xp6LR580KczVDfVEVS9Y4
-         7IjYfTctgczJg5K7NauQOPb63GTdmIU+yHK8zzV/0AFaYl6eppQuyLrVzH2FNGEThJtl
-         fXzMjsJYMfr1dkP94uRSc+O5NjyTGBv/yjLVm/qS6SKqbmQ85P+DGvIQ1LKK52Kl9N/W
-         SPYJ6nG6s4PIvD3AapLpuxC0ga7RyDDKBq4GNC9SdFaIdfOgfi56w5Ye6bXIXXp0qgpk
-         fxqw==
-X-Forwarded-Encrypted: i=1; AJvYcCWKw1qQCUFyXdn5qwfyzQVmtGV0bOEaZRmm2oD02DnCLDl0GRP66WnU/0cDbsxOnuOgR1jUrlQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqV028J7IbjekzpD1IJScjfGc5FlJruDPbzHgIWGE4ps9pCz8Q
-	qa7lQLmSx/es0vR6fZBfZy0fjI+kHsO9LVQoUv3weW4hh8d53ZtcqBAO
-X-Gm-Gg: AY/fxX6NT5Ir9+CGifYPQPlCs5C3iSRx7wNkefYVZpLsGkccxxcqyi/s2ZZkGjMYYbK
-	NwUj7bFxpjm8BfLnD89xBBWrc4+88y/cbAYzvAG9yX+LltEBDCWZIvMcA3JPJU5VAQWAZt+JlHt
-	6wv1gvVhc4PaVwmnCDLt0mxMKtxr9JEwwgIXm3Zrx6mewsZmnGe9jEazLn5jdM+tIH/autl7G3I
-	LkkhZ7wobxPnw6ZMncY0Akx9zOSly/2brabd9Xn2+QcSrttulPGglsXySmBOT4m2wacxgyKz1o7
-	7bFtBVRdxOl4sK7hemp1Omfe/KipA0BVClzf+FEy2ZU0kf8L0DYmZw936khi6QkxP9d0Ao7smp8
-	onAEyRz9dbBRkFc105V2ecQpB64QEtrEPOgZzgbJ1CDWkkOt3KIqPLtCG6vphV1PyVYQIkNNk36
-	ZRB2vEq3E=
-X-Google-Smtp-Source: AGHT+IGlvr7nkz2s+OAg6Cq422OLetEIPAeEPAoKEzaZnt/qGoDTuQsWGmx5xIko0mpEb8nDogHi4w==
-X-Received: by 2002:a05:6a00:ab85:b0:81f:1a4b:bf55 with SMTP id d2e1a72fcca58-81f1a4bc2a9mr3208433b3a.39.1768054406977;
-        Sat, 10 Jan 2026 06:13:26 -0800 (PST)
-Received: from 7950hx ([160.187.0.149])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-81f42658f03sm1481079b3a.20.2026.01.10.06.13.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Jan 2026 06:13:26 -0800 (PST)
-From: Menglong Dong <menglong8.dong@gmail.com>
-X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
-To: ast@kernel.org,
-	andrii@kernel.org
-Cc: daniel@iogearbox.net,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	jiang.biao@linux.dev,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH bpf-next v9 11/11] selftests/bpf: test fsession mixed with fentry and fexit
-Date: Sat, 10 Jan 2026 22:11:15 +0800
-Message-ID: <20260110141115.537055-12-dongml2@chinatelecom.cn>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260110141115.537055-1-dongml2@chinatelecom.cn>
-References: <20260110141115.537055-1-dongml2@chinatelecom.cn>
+        d=1e100.net; s=20230601; t=1768055317; x=1768660117;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2HKscEfLpjUsn821O8EhAoZL6ejgDYubcUtKXZVxPBU=;
+        b=llz/80M7Jh390qvLkqMz0spTc64EM/tw1e6CM2lDnlijRVn8WF8gVTybGPW7bmEZAs
+         ASbvCYgiy92gnvvXN1jlQOL7J7B1wELBpfpW2hCxb/ka/Ky/H84KI8MkfI1q3LGiRu8n
+         sWaLh/JJ8W3KHQN15InCDE0tqIo0f3HeLxDyzBvroo5kdlZkXTmAu8Yp6v3ZnX3Dw/tM
+         o4fqAtrz7QkQo3Dd3K1ZPrym/90MizcZTfsGYaOMGD1sQj0QJCNCsAV/VZLdIXxvZiUH
+         JhHnYxpBjsqUSkVhn8vbt7T8jJ9AUC5Lka6Slw9ilP+mdmoFAijGVmprcP6UWnZiQ7P/
+         myzw==
+X-Forwarded-Encrypted: i=1; AJvYcCWpHt3LyyxPcv+F0idt+FrtK/qco9d/9Y3pLglOgSN73/LrqgcbPFEvF9Zzq6yJdO381GraPF8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZcAMXEEHg5kIHK1mhTyj/BH95mB0BXDMU/E4m5PQe2b2zjnz5
+	W+mUQtbHoW+FNjqnZ8qpLKj1Nkm0eghBghcIFNtJ1oo2TCnePbxMmr4G
+X-Gm-Gg: AY/fxX7NTiIoVVB8NHc845CCcgJFSdOLfh86Z4aV/ayJFKRowkDdYucMWy1TyqekIBN
+	brz9z2K40XBgP/x4j4Ugq6PECZMNju2KF0yo7sgy9h9VEDbA6d1UkMlO+71WGSdWIhCI41tSMs5
+	dvHt5SIz5gU28QJbLlG33NH/RbSX2YAdNmw5e5lrfXsMuRor6yAd5j32iak/ZTgji/TXcHMOnEU
+	w+vSbUf9/D3ZavWYz8pOTVSqc+cMcpgtSR7v7BwSJqV519uYr7WIATgbPxB493KH8ReQd+T1/hI
+	J5Am2adaKvDRiwvPUGsKmoihrlzAbPg5HdUknSnUTOHKWMghAqkRdJyUWsa0HG1i8naJZEmLgHR
+	C/nVV7cTuxDEieMMJJa3933KhcLAoXh0t+iEr7QEqiY1igh3gQrTgwwYB/iCLnxkS8yX1+mPT1G
+	DOPeQR6fcdQN/MCmi0TjY/zUOMiNTd7rBBzMdUXrl7o6P9t7g8gtWzhoJ8TEUqWywX5b4FZdz32
+	T2Epll9U+aptIFSeztsZU71jWR6GyMKsGh9SIB4NIRvisvmfvym+jBeujxEglWl
+X-Google-Smtp-Source: AGHT+IFzwNi/gSQQu6QdAYoPp8vk6efFPsgASFrxFAQZeIDNhCk6TnxV/M0/o3ZVX7YAUo57ZuLKYw==
+X-Received: by 2002:a05:600c:c0ca:b0:47d:87ac:73b8 with SMTP id 5b1f17b1804b1-47d87ac7a94mr106652105e9.27.1768055316608;
+        Sat, 10 Jan 2026 06:28:36 -0800 (PST)
+Received: from ?IPV6:2003:ea:8f1c:1800:8cc6:804e:b81b:aa56? (p200300ea8f1c18008cc6804eb81baa56.dip0.t-ipconnect.de. [2003:ea:8f1c:1800:8cc6:804e:b81b:aa56])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432d286cdecsm14348726f8f.7.2026.01.10.06.28.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 10 Jan 2026 06:28:36 -0800 (PST)
+Message-ID: <9111d6cd-0071-4964-aa7f-221077cd05b7@gmail.com>
+Date: Sat, 10 Jan 2026 15:28:34 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/5] net: phy: realtek: reunify C22 and C45
+ drivers
+To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>
+Cc: Russell King <linux@armlinux.org.uk>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Michael Klein <michael@fossekall.de>, Aleksander Jan Bajkowski
+ <olek2@wp.pl>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <cover.1767926665.git.daniel@makrotopia.org>
+ <d8d6265c1555ba2ce766a19a515511753ae208bd.1767926665.git.daniel@makrotopia.org>
+ <131c6552-f487-4790-99c6-cd4776875de9@lunn.ch>
+ <aWEBviG7gpq3TGUv@makrotopia.org>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+In-Reply-To: <aWEBviG7gpq3TGUv@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Test the fsession when it is used together with fentry, fexit.
+On 1/9/2026 2:25 PM, Daniel Golle wrote:
+> On Fri, Jan 09, 2026 at 02:18:14PM +0100, Andrew Lunn wrote:
+>> On Fri, Jan 09, 2026 at 03:03:33AM +0000, Daniel Golle wrote:
+>>> Reunify the split C22/C45 drivers for the RTL8221B-VB-CG 2.5Gbps and
+>>> RTL8221B-VM-CG 2.5Gbps PHYs back into a single driver.
+>>> This is possible now by using all the driver operations previously used
+>>> by the C45 driver, as transparent access to all MMDs including
+>>> MDIO_MMD_VEND2 is now possible also over Clause-22 MDIO.
+>>>
+>>> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+>>> ---
+>>>  drivers/net/phy/realtek/realtek_main.c | 72 ++++++--------------------
+>>>  1 file changed, 16 insertions(+), 56 deletions(-)
+>>>
+>>> diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
+>>> index 886694ff995f6..d07d60bc1ce34 100644
+>>> --- a/drivers/net/phy/realtek/realtek_main.c
+>>> +++ b/drivers/net/phy/realtek/realtek_main.c
+>>> @@ -1879,28 +1879,18 @@ static int rtl8221b_match_phy_device(struct phy_device *phydev,
+>>>  	return phydev->phy_id == RTL_8221B && rtlgen_supports_mmd(phydev);
+>>>  }
+>>>  
+>>> -static int rtl8221b_vb_cg_c22_match_phy_device(struct phy_device *phydev,
+>>> -					       const struct phy_driver *phydrv)
+>>> +static int rtl8221b_vb_cg_match_phy_device(struct phy_device *phydev,
+>>> +					   const struct phy_driver *phydrv)
+>>>  {
+>>> -	return rtlgen_is_c45_match(phydev, RTL_8221B_VB_CG, false);
+>>> +	return rtlgen_is_c45_match(phydev, RTL_8221B_VB_CG, true) ||
+>>> +	       rtlgen_is_c45_match(phydev, RTL_8221B_VB_CG, false);
+>>
+>> Are there any calls left to rtlgen_is_c45_match() which don't || true
+>> and false? If not, maybe add another patch which removes the bool
+>> parameter?
+> 
+> At this point it is still used by
+> ---
+> static int rtl8251b_c45_match_phy_device(struct phy_device *phydev,
+>                                          const struct phy_driver *phydrv)
+> {
+>         return rtlgen_is_c45_match(phydev, RTL_8251B, true);
+> }
+> ---
+> 
+> This 5G PHY supposedly supports only C45 mode, I don't know if it
+> actually needs the .match_phy_device at all or could also simply use
+> PHY_ID_MATCH_EXACT(RTL_8251B) instead, I don't have any device using
+> it so I can't test that.
 
-Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
----
- .../testing/selftests/bpf/progs/fsession_test.c  | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/tools/testing/selftests/bpf/progs/fsession_test.c b/tools/testing/selftests/bpf/progs/fsession_test.c
-index 85e89f7219a7..c14dc0ed28e9 100644
---- a/tools/testing/selftests/bpf/progs/fsession_test.c
-+++ b/tools/testing/selftests/bpf/progs/fsession_test.c
-@@ -180,3 +180,19 @@ int BPF_PROG(test11, int a, int ret)
- 	*cookie = 0;
- 	return 0;
- }
-+
-+__u64 test12_result = 0;
-+SEC("fexit/bpf_fentry_test1")
-+int BPF_PROG(test12, int a, int ret)
-+{
-+	test12_result = a == 1 && ret == 2;
-+	return 0;
-+}
-+
-+__u64 test13_result = 0;
-+SEC("fentry/bpf_fentry_test1")
-+int BPF_PROG(test13, int a)
-+{
-+	test13_result = a == 1;
-+	return 0;
-+}
--- 
-2.52.0
+Yes, match_phy_device is needed. This PHY ID also matches the internal PHY
+of RTL8126. And RTL8126 doesn't support speaking c45 to its internal PHY.
 
 
