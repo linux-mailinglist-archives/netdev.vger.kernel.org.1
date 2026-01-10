@@ -1,161 +1,213 @@
-Return-Path: <netdev+bounces-248657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90B1BD0CCB2
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 03:12:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 003D1D0CCFE
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 03:20:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BDA6E3032114
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 02:12:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0066E303C802
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 02:19:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C80D23D7C2;
-	Sat, 10 Jan 2026 02:12:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1543024E4A1;
+	Sat, 10 Jan 2026 02:19:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mo/OnHH9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aP3KPlyY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14D432A1CF;
-	Sat, 10 Jan 2026 02:12:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB2FB1A2545
+	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 02:19:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768011161; cv=none; b=dRaprGrqSeDztAqSGRZcJMNVYuREX8sQvGgNC1FhkeEYMGdHMXaRfvwMh2qIxuZ9w+cf9fq0u3/Mtu6bWfSNKZ1iimt0D45TnICFSrVvJ5UZ1fCpv7KWN3jPLivzADATQPKR051Sbnq0diqX7Eg4YpH0DyRyEdB3HmxBYbpxha0=
+	t=1768011544; cv=none; b=jlIooliCuXNr9ptfTRnV8bQEjOpK63jwwHomTR7QskU+QzsipzRgjX9fhbZG0fdOOvDvgG6N3zLXexWefaPtoYW5fMkO4jUaijHb9p7BJjrFnSZF8IwqZ/TfuFV/VQY69jLggNZkz4d/8IMWaL+UAUI7IYWe6I7w0fYEAhmJ1vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768011161; c=relaxed/simple;
-	bh=D5bkcgNL5G1VYcSawL2KHr0EISsJ30WpEfjpKWoSQE0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fK4BzQXVU/+dCwjwlubmh6SQ5NW/uCUE+qbCVyJZTtOqs6uhp5xK3EwjwC03eqHcwBuEO97TFRT3Eh3z/WIg5pTqMMoWq7MpnG+VXnI0CrlzFofnKmhPu/VKtB0T1nJK3mCyavqU8vdhicaB819FxxIMKVfZAecVgANL88Jgh2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mo/OnHH9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3BABC4CEF1;
-	Sat, 10 Jan 2026 02:12:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768011160;
-	bh=D5bkcgNL5G1VYcSawL2KHr0EISsJ30WpEfjpKWoSQE0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Mo/OnHH9evnQn6WCMUPGVnFmo3gC1O+BzB8N0PdXAcjjprjXUBamM9FVphhGRm6J7
-	 FgefALw29cEzdsOkt0nwoJxeyemxWvHSyRynpSZCD0F7tSD2EOsJyMVqIuFr7g/WlB
-	 GMVtmh01VcKx86t8p9Cf8xDGBFrnHkVfGMErTycOxI8x1TBlLf8gGy3rD5d+481Zhh
-	 G/4bbVz+cRuXLoKeAbv43uNPXkIjhFtvH0FAodBMY+b1R6ftMQ8muuvUK6Q5TUrhmm
-	 Ll5X/6nBIq4z+5LSySDj7JyyGDDngrdyPJrIQp335UQjGPigEWlhDRwXL9skF8xNRc
-	 qTqCq6izikjxw==
-Date: Fri, 9 Jan 2026 18:12:39 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason
- Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio
- =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
- virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net v3 1/3] virtio-net: don't schedule delayed refill
- worker
-Message-ID: <20260109181239.1c272f88@kernel.org>
-In-Reply-To: <20260106150438.7425-2-minhquangbui99@gmail.com>
-References: <20260106150438.7425-1-minhquangbui99@gmail.com>
-	<20260106150438.7425-2-minhquangbui99@gmail.com>
+	s=arc-20240116; t=1768011544; c=relaxed/simple;
+	bh=xiO09bVBGC8/K7L0bw2p16Wp9QD28tXsWfMmjzD/Ua4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=OU9oysDECfxgPhKAH2pp1znPmdShIaPuZAlyzKbddnbEwPvkeeEyBWU6DzPONYK3W+Q6BKwgbL5Lx1Nb+6LbVFHPaI5kWdaR6M8KHlzcYxd4/GBVIM58aJVdkO8lLfUgF9uvy4BhBx+q8qAiUMr1M2RA08OlcAOE8KCCI/Pry2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aP3KPlyY; arc=none smtp.client-ip=209.85.128.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-790948758c1so51460777b3.1
+        for <netdev@vger.kernel.org>; Fri, 09 Jan 2026 18:19:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768011541; x=1768616341; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=07Oq7s3cDlA8pW6W82CkM0efPRUiBJHxCtezHHHyhNs=;
+        b=aP3KPlyY6zoY7wXyxuDu2CZQUwNdvvHc35TJGW5jxMrfnSDqkZXyLPcBG/23GZsOku
+         +SzTOovsD4ZTn547tqu2cDRpKnMKEbIDBs9G+q1kBW30Ou0bCwPCBKToUtTe9K3DDMMC
+         Ohuzeq6Bh6zK3AFt4y965A0yZlfbmg7XvB/lzx30Qv2e8kOJRUB/6V2PmCPEWYisTc9a
+         ZIaCQRPoXgxxFE1wzWPANO6w1Yctt4oVjzagCSmI5wSSHgVhs/uT+h2mXpScaiKeOspL
+         lIbXHhSREReuTlNknT2UKD+aui96R3GSDLqTRd51j+I4REL5tMJhMYS7npzTAvWIZJtj
+         aSYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768011541; x=1768616341;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=07Oq7s3cDlA8pW6W82CkM0efPRUiBJHxCtezHHHyhNs=;
+        b=YQwMPVY/lBc0+ofxcuJqvD1P6CPXiCoF2HZvoc6PPcvnAGOf/SepBXMrfxXtG9XjUj
+         jKUirVTIyR7X6Lp5/MI/9mUG6IAXOjOI+bqYAOYbbZ7rkNTBbEkmaSp2/Zxlm2WUFH3f
+         NZw6jJtdvKnjfLT0wn7T+ffySOW+D25xmDoLj9khyRjG48PSzfUXp87Tdrs+SjDhAehe
+         i6P4ZYPWsZfvJn1+cFICa3gV6MCaY1q/ihKcDWOfkeJ7lJ+dzfO7yP1KrXlAkMcWeqPS
+         NX7/5IEZtlRNyhJ0XvJWA7PQY/XnpVD5s0brYkhO/PrBj85lTw5eqjLufAVvCUxzgwih
+         e1Iw==
+X-Forwarded-Encrypted: i=1; AJvYcCW9fkRawK3DujmjODXFwtnU47EvmxoC4ZaCOyeB2ewg+6mMNo43sIAzHABL4r02yD6FLXQqRQw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNXOK/vjRVRAmsb19lAqBCZnvWNhh7om4Jv9nxGAJ7MXVPDnsJ
+	RKuZMRVb88AJHluXxmB57ffDHTlMdXz5dPYa/ablcNGRVaiQXbWWG+QB
+X-Gm-Gg: AY/fxX6ENo8HvtBzOvuXUC1veDgSH+YE+aCXYgurHRtcBocsJyxw5vrfILMsvQme9aA
+	EUvPQZDeLMc/fg2ipyXIqods9SyP7W2Fy1aPL5w7uqtCzD0FciGoXhX3cgo/P6XRx+/4ArP7DBh
+	FQGCHgWCMTDXGBy4zImrBgmxotFG6gKNJhGp7TcjJ3FjSZbuwPjPAFDetgTCmHrVG66dZyUDYbh
+	4Lr+9IhcQ79o3uUwVpjRsGODmArGpqw2oMHgl5sSLr59c4+hZWtgQcQU0kVPpK4apiAfB+zsMGR
+	3o5VAt0kpfE7wcLKAujkCp6FETpzF1j0awgxPveXtkz5z5w+WHRcL05sLrXUh/9/Q14nmzT2kUu
+	fuef+PrV85KDfzT0juv5nz90gYesfAuU1YqJcpUCfa9VJpPPE37EHofSNzxF3DM+yDSpYGZUEGJ
+	4gt9fOzAHO
+X-Google-Smtp-Source: AGHT+IGfZcTckoYQm0PZ8TzEz8YmdS7X/s2FUArN0KlH5v6g1oChNJ7JGYZdwCItZFhkXd+klVUdmg==
+X-Received: by 2002:a05:690c:6704:b0:78c:5bb4:1d27 with SMTP id 00721157ae682-790b568d427mr107537007b3.38.1768011540680;
+        Fri, 09 Jan 2026 18:19:00 -0800 (PST)
+Received: from localhost ([2a03:2880:25ff:a::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-790aa6713e5sm46527227b3.29.2026.01.09.18.19.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Jan 2026 18:19:00 -0800 (PST)
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+Date: Fri, 09 Jan 2026 18:18:15 -0800
+Subject: [PATCH net-next v9 1/5] net: devmem: rename tx_vec to vec in
+ dmabuf binding
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20260109-scratch-bobbyeshleman-devmem-tcp-token-upstream-v9-1-8042930d00d7@meta.com>
+References: <20260109-scratch-bobbyeshleman-devmem-tcp-token-upstream-v9-0-8042930d00d7@meta.com>
+In-Reply-To: <20260109-scratch-bobbyeshleman-devmem-tcp-token-upstream-v9-0-8042930d00d7@meta.com>
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ Willem de Bruijn <willemb@google.com>, Neal Cardwell <ncardwell@google.com>, 
+ David Ahern <dsahern@kernel.org>, Mina Almasry <almasrymina@google.com>, 
+ Arnd Bergmann <arnd@arndb.de>, Jonathan Corbet <corbet@lwn.net>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>, 
+ Donald Hunter <donald.hunter@gmail.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
+ linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ asml.silence@gmail.com, matttbe@kernel.org, skhawaja@google.com, 
+ Bobby Eshleman <bobbyeshleman@meta.com>
+X-Mailer: b4 0.14.3
 
-On Tue,  6 Jan 2026 22:04:36 +0700 Bui Quang Minh wrote:
-> When we fail to refill the receive buffers, we schedule a delayed worker
-> to retry later. However, this worker creates some concurrency issues.
-> For example, when the worker runs concurrently with virtnet_xdp_set,
-> both need to temporarily disable queue's NAPI before enabling again.
-> Without proper synchronization, a deadlock can happen when
-> napi_disable() is called on an already disabled NAPI. That
-> napi_disable() call will be stuck and so will the subsequent
-> napi_enable() call.
-> 
-> To simplify the logic and avoid further problems, we will instead retry
-> refilling in the next NAPI poll.
+From: Bobby Eshleman <bobbyeshleman@meta.com>
 
-Happy to see this go FWIW. If it causes issues we should consider
-adding some retry logic in the core (NAPI) rather than locally in
-the driver..
+Rename the 'tx_vec' field in struct net_devmem_dmabuf_binding to 'vec'.
+This field holds pointers to net_iov structures. The rename prepares for
+reusing 'vec' for both TX and RX directions.
 
-> Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
-> Reported-by: Paolo Abeni <pabeni@redhat.com>
-> Closes: https://netdev-ctrl.bots.linux.dev/logs/vmksft/drv-hw-dbg/results/400961/3-xdp-py/stderr
+No functional change intended.
 
-The Closes should probably point to Paolo's report. We'll wipe these CI
-logs sooner or later but the lore archive will stick around.
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+---
+ net/core/devmem.c | 22 +++++++++++-----------
+ net/core/devmem.h |  2 +-
+ 2 files changed, 12 insertions(+), 12 deletions(-)
 
-> @@ -3230,9 +3230,10 @@ static int virtnet_open(struct net_device *dev)
->  
->  	for (i = 0; i < vi->max_queue_pairs; i++) {
->  		if (i < vi->curr_queue_pairs)
-> -			/* Make sure we have some buffers: if oom use wq. */
-> -			if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
-> -				schedule_delayed_work(&vi->refill, 0);
-> +			/* Pre-fill rq agressively, to make sure we are ready to
-> +			 * get packets immediately.
-> +			 */
-> +			try_fill_recv(vi, &vi->rq[i], GFP_KERNEL);
+diff --git a/net/core/devmem.c b/net/core/devmem.c
+index ec4217d6c0b4..05a9a9e7abb9 100644
+--- a/net/core/devmem.c
++++ b/net/core/devmem.c
+@@ -75,7 +75,7 @@ void __net_devmem_dmabuf_binding_free(struct work_struct *wq)
+ 	dma_buf_detach(binding->dmabuf, binding->attachment);
+ 	dma_buf_put(binding->dmabuf);
+ 	xa_destroy(&binding->bound_rxqs);
+-	kvfree(binding->tx_vec);
++	kvfree(binding->vec);
+ 	kfree(binding);
+ }
+ 
+@@ -232,10 +232,10 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+ 	}
+ 
+ 	if (direction == DMA_TO_DEVICE) {
+-		binding->tx_vec = kvmalloc_array(dmabuf->size / PAGE_SIZE,
+-						 sizeof(struct net_iov *),
+-						 GFP_KERNEL);
+-		if (!binding->tx_vec) {
++		binding->vec = kvmalloc_array(dmabuf->size / PAGE_SIZE,
++					      sizeof(struct net_iov *),
++					      GFP_KERNEL);
++		if (!binding->vec) {
+ 			err = -ENOMEM;
+ 			goto err_unmap;
+ 		}
+@@ -249,7 +249,7 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+ 					      dev_to_node(&dev->dev));
+ 	if (!binding->chunk_pool) {
+ 		err = -ENOMEM;
+-		goto err_tx_vec;
++		goto err_vec;
+ 	}
+ 
+ 	virtual = 0;
+@@ -295,7 +295,7 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+ 			page_pool_set_dma_addr_netmem(net_iov_to_netmem(niov),
+ 						      net_devmem_get_dma_addr(niov));
+ 			if (direction == DMA_TO_DEVICE)
+-				binding->tx_vec[owner->area.base_virtual / PAGE_SIZE + i] = niov;
++				binding->vec[owner->area.base_virtual / PAGE_SIZE + i] = niov;
+ 		}
+ 
+ 		virtual += len;
+@@ -315,8 +315,8 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+ 	gen_pool_for_each_chunk(binding->chunk_pool,
+ 				net_devmem_dmabuf_free_chunk_owner, NULL);
+ 	gen_pool_destroy(binding->chunk_pool);
+-err_tx_vec:
+-	kvfree(binding->tx_vec);
++err_vec:
++	kvfree(binding->vec);
+ err_unmap:
+ 	dma_buf_unmap_attachment_unlocked(binding->attachment, binding->sgt,
+ 					  direction);
+@@ -363,7 +363,7 @@ struct net_devmem_dmabuf_binding *net_devmem_get_binding(struct sock *sk,
+ 	int err = 0;
+ 
+ 	binding = net_devmem_lookup_dmabuf(dmabuf_id);
+-	if (!binding || !binding->tx_vec) {
++	if (!binding || !binding->vec) {
+ 		err = -EINVAL;
+ 		goto out_err;
+ 	}
+@@ -414,7 +414,7 @@ net_devmem_get_niov_at(struct net_devmem_dmabuf_binding *binding,
+ 	*off = virt_addr % PAGE_SIZE;
+ 	*size = PAGE_SIZE - *off;
+ 
+-	return binding->tx_vec[virt_addr / PAGE_SIZE];
++	return binding->vec[virt_addr / PAGE_SIZE];
+ }
+ 
+ /*** "Dmabuf devmem memory provider" ***/
+diff --git a/net/core/devmem.h b/net/core/devmem.h
+index 0b43a648cd2e..1ea6228e4f40 100644
+--- a/net/core/devmem.h
++++ b/net/core/devmem.h
+@@ -63,7 +63,7 @@ struct net_devmem_dmabuf_binding {
+ 	 * address. This array is convenient to map the virtual addresses to
+ 	 * net_iovs in the TX path.
+ 	 */
+-	struct net_iov **tx_vec;
++	struct net_iov **vec;
+ 
+ 	struct work_struct unbind_w;
+ };
 
-We should enforce _some_ minimal fill level at the time of open().
-If the ring is completely empty no traffic will ever flow, right?
-Perhaps I missed scheduling the NAPI somewhere..
-
->  		err = virtnet_enable_queue_pair(vi, i);
->  		if (err < 0)
-> @@ -3472,16 +3473,15 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
->  				struct receive_queue *rq,
->  				bool refill)
->  {
-> -	bool running = netif_running(vi->dev);
-> -	bool schedule_refill = false;
-> +	if (netif_running(vi->dev)) {
-> +		/* Pre-fill rq agressively, to make sure we are ready to get
-> +		 * packets immediately.
-> +		 */
-> +		if (refill)
-> +			try_fill_recv(vi, rq, GFP_KERNEL);
-
-Similar thing here? Tho not sure we can fail here..
-
-> -	if (refill && !try_fill_recv(vi, rq, GFP_KERNEL))
-> -		schedule_refill = true;
-> -	if (running)
->  		virtnet_napi_enable(rq);
-> -
-> -	if (schedule_refill)
-> -		schedule_delayed_work(&vi->refill, 0);
-> +	}
->  }
->  
->  static void virtnet_rx_resume_all(struct virtnet_info *vi)
-> @@ -3829,11 +3829,13 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
->  	}
->  succ:
->  	vi->curr_queue_pairs = queue_pairs;
-> -	/* virtnet_open() will refill when device is going to up. */
-> -	spin_lock_bh(&vi->refill_lock);
-> -	if (dev->flags & IFF_UP && vi->refill_enabled)
-> -		schedule_delayed_work(&vi->refill, 0);
-> -	spin_unlock_bh(&vi->refill_lock);
-> +	if (dev->flags & IFF_UP) {
-> +		local_bh_disable();
-> +		for (int i = 0; i < vi->curr_queue_pairs; ++i)
-> +			virtqueue_napi_schedule(&vi->rq[i].napi, vi->rq[i].vq);
-> +
-
-nit: spurious new line
-
-> +		local_bh_enable();
-> +	}
->  
->  	return 0;
->  }
+-- 
+2.47.3
 
 
