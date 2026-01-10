@@ -1,220 +1,209 @@
-Return-Path: <netdev+bounces-248686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FFD2D0D486
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 11:14:22 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F7C8D0D681
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 14:42:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 599ED3017EDE
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 10:14:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0416D3008D47
+	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 13:42:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9BDE3033D8;
-	Sat, 10 Jan 2026 10:14:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C809F343D6E;
+	Sat, 10 Jan 2026 13:42:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gL5xClzi";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="G71BZGu4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W/xKS7O+"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378C130171A
-	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 10:14:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A2AF1E3DDE
+	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 13:42:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768040059; cv=none; b=KesI2K05yYSlEPBEo18n3MZ1GaZPOblNfJshiqnUzEWFoqmivIOs3d9ys4IHcB0/xpujvvKqndeW2zjiOg8DjEqJ876R6l9GS4U8bAbME/f4c0OytYB2N49m6EOEyL4Y+7YkCholC3xnCzLRlgP6HjOLcK/IxmlHCAiflJw6YOc=
+	t=1768052539; cv=none; b=rNfkEatssTWLkvEA7u+yl1YH7angeCSAZRZVPZ22vEMzYe28Y/lV2ysqLR3gIPgWt3MyXkcoOX4VDSanNdmISy7X2JXZRSEbouyrrT/X2HhV7N2C5844L0pmBBrN1rZgLaBf3O5zhKNCc8a1xWF1KJgrzFxukxagD8HuoOYdZvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768040059; c=relaxed/simple;
-	bh=GR3k999HC/wBwuDdQiVyvY8an+sH4jRx08ZnxkTnhTw=;
+	s=arc-20240116; t=1768052539; c=relaxed/simple;
+	bh=QHBtpr+1g4aUJXrWVXx2b2WrXDmyNzy8zeDOP6GFxq8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G3l3B1YgWUx8uvdZNAmlVlNneub5cve22iPh7xm3jlUBPry2CycafuMVtihL8e7OYVaCgxiw72OLO0SZBC93GYvZFVXybGBhHw0Ca3EPYoKhZWE0ueU7va94IzNP0lSCH8gojOoPasR2PiRB9KqzW+F6NDRYGzOvUnYlDgE4Tyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gL5xClzi; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=G71BZGu4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768040057;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dA+ZbEhpNNEZeZ/tio972zkgtuSqnUftWgoWPgE0LNo=;
-	b=gL5xClziAG9lNksl1hWzHMS19QBdTivcmBH8YXIO4fxJCQgtm1GdvmGgBLNhYUuIlotsRQ
-	Xtw4RJqznksZoagfVCuyQEyJo5TlOeDUVXvmsBW16iGLRokdtSIJdBpA8ybiy4ojqtsz5t
-	5Kx2J6Ewd05Z6Wm+diuayROmXfTWuVM=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-489-rVzDKd6-PmSmmJ9NDJXo3g-1; Sat, 10 Jan 2026 05:14:15 -0500
-X-MC-Unique: rVzDKd6-PmSmmJ9NDJXo3g-1
-X-Mimecast-MFC-AGG-ID: rVzDKd6-PmSmmJ9NDJXo3g_1768040055
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-477771366cbso39204145e9.0
-        for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 02:14:15 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wz2KnCwRPJGxMSv6B7r3c8DfOfZeAuAmhJxnWJ1v1lQruM2lvrJcTA4HxbjU2R/9v+lHICZHr35AqbkgnSnwaQBHzTw8ty3O5dsa7RBK7Vn3mQJwupcOAA2/a+gvb6KzwnIB8kM9C3vrQXhLsypKxEyYz/4KwHKq1SSDRsHt5A8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W/xKS7O+; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-47a95efd2ceso45680765e9.2
+        for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 05:42:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768040054; x=1768644854; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dA+ZbEhpNNEZeZ/tio972zkgtuSqnUftWgoWPgE0LNo=;
-        b=G71BZGu4owZ3Ue6J31vWpDgumNOP3djauKUn4sOFFt47FTTdInHZB8oSTTS2a/VhW/
-         JQegkBxDST6sIF/8cvMKzxLUokmobVrmFWUqLM4UlQXuMlBVk/3q0eeC5A9AYtFN2ajo
-         CSp+oArnlytsCUJCXjLruENqkrkSHBtNCnac49u7USRHt2dW9OYFzET+PyX0iWLvjxq/
-         O2C2zHGsrYS60YGDGyKhEwyiob/u5qC8RDGuWQF2UgQ4f7WuOUPaKzJT6YhvQrW01gud
-         ZH1B7jFiLJZLovTlSYptCr3bM6jWkxUoj1jhnO+/G41uzaBkmmFObDDiVZ2slBXAK9Ko
-         basQ==
+        d=gmail.com; s=20230601; t=1768052536; x=1768657336; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=niKD7lwOtoha0TRVTxtTbBYIAZIgplZuxoTzqvKJ568=;
+        b=W/xKS7O+FR6ocu1/qYakVfkSQ9QPMfgo1cAkdpQb683AgAIzI+hPupbDx2OovcFNo3
+         suh/0l7wISQGh76UlJk/vjRB6oqYzg7zJdaQRA7llmz/h2v4uh9VPKfGdyxNsBllvTd+
+         0GyR/0jRrPb36qfWVGVXU2gdZyVauFflDg5sJHcvLm22djpeQRlchlvF5567Bb27dUVw
+         wekHqUe9NjRzsgS3v1tPv1EaBMvwjQ1mKXc0R7H6lh7w9NKUXyupXJ0/lhu4QFsAuC0y
+         jRK4ZyOXQW1rMHoyteITXcyS0EzkBsuFOxiqD9kQ9XtOuyH8ij6+jYXPbJ9SSpEIJxS+
+         Vz2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768040054; x=1768644854;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dA+ZbEhpNNEZeZ/tio972zkgtuSqnUftWgoWPgE0LNo=;
-        b=iNoCZFpTXDAFxEJ/Yt2Uxd0a+fI5S5T1mm61NmLNnyglYnR6tArwiqLY9LtLVMQYtS
-         TQWi6IAHcoiWsJwdgit5akbg1Q9PCcK7V1SiUJTpHfCO/ar1KZJzk4hdAPex4a0woQOX
-         zUtprd3+TtGLm0qaeD1IxdtIKckJkNAh4HPPKN2Azu7D7JOvgETONCJZNNXr+3ylLSmI
-         z8cKqeZht0PL+OJAB79uAshK2pX0u16xESYuuI7hJePtE7gIvoAc6pS+vkn0UjK+kiV+
-         QPdWubLEpn3vNt+wtnNIytCr5G3Ha7gM/Fof4htV31QNoidWaZ3b55NvfxIp+eeHC2aM
-         Ky4g==
-X-Forwarded-Encrypted: i=1; AJvYcCX7oeXYYZGjaPQGDYPsX3ORrY7Ic+G+GPRqc1tvkmP11Hv/21B2JK3u9SzsQAjTMwIpSVW+BZU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGVqnWnXy0XDYvDpN9lA2nVmFCC2PeG1NP8IMsJOA1ZqZ0y0U5
-	veo+xsDftGY1D+jn72taFva7xj/hVkPmQl1rJfb+xGF7aXbJVtET+pAcVGDvfXcnozqCtc0P+qa
-	ntoZD72iv5lUZ6muktaqqC9hmvcamd6sizrpQipINQ0q80qF3gv506SG9mQ==
-X-Gm-Gg: AY/fxX6sG8aXmNmiHSTmlnf+Zuqt9kdpE53SnGfvH+eTvzOmGcTlh5wH2XQR4gxPPr2
-	mQpbi+SxY4tmVydJ6vKgDMGb9FYgzvPf3Oue42krQUES327a+aouJxRamrO0q82RZhqFkim7nx6
-	sYMxOydr3I2+Me6uO4vkLOw8zZXggT17nMUj4IUOI8FXw4sbO+6XD6sQLOOyU6aDyssbPRP+NNi
-	abdVHiRPALqmcWxLynzu0qVUGeif6gxuwlGDDpnpTHSASAdjvyZWd6KiNgMCGQELvI6G4uKz4Id
-	qPmyu2DEJear1uVvpxv2BcJsmwO9VgdNBGEFDu3hk0F7EaDOiIfv0n58TEx5kwKI7sG1nK3knha
-	jmP5S
-X-Received: by 2002:a05:600c:4fd4:b0:479:35e7:a0e3 with SMTP id 5b1f17b1804b1-47d84b3b687mr144672825e9.30.1768040054564;
-        Sat, 10 Jan 2026 02:14:14 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGsvcWZT602v6D3Jk4OZpQRCrttnIFGdd1e0R1U9h/xIHk0Xd/hakt57g7VJk+sGDBWCw9vRw==
-X-Received: by 2002:a05:600c:4fd4:b0:479:35e7:a0e3 with SMTP id 5b1f17b1804b1-47d84b3b687mr144672455e9.30.1768040054093;
-        Sat, 10 Jan 2026 02:14:14 -0800 (PST)
-Received: from redhat.com ([2a06:c701:73f2:9400:32c:f78d:ab04:e7a0])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d87167832sm86921535e9.7.2026.01.10.02.14.12
+        d=1e100.net; s=20230601; t=1768052536; x=1768657336;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=niKD7lwOtoha0TRVTxtTbBYIAZIgplZuxoTzqvKJ568=;
+        b=TBq/aYL3sGNneUzgDBvgPuJNRW50t2A+ep34EoCjjDW0fChSPa5ngS+ABG2vmM+vKn
+         scSGafwhb0gwmsxKBnU0sxVzT1N0cj9K+HP0Lt/u3cLStqPHoYVV6sWcUEQtl+N8gnTO
+         YHuLzlTjffAtSaJQ+87TU5MBYwzWITxnHoivq7p9SD87Cte72fzoSyZPq2BAJ13byTBh
+         yPiWC9jA33c2Ei/jE9ov7VVcNsH1we5rLBL7QNSo2qlr6UM1ktCHRF/mslqvDgwlw60a
+         jnMuhFca2fUcXnCXfx31BoOM1t9egYcBaMGGRppXPS3bSHauktKfRBUSWQxHZ20/Filf
+         rPWw==
+X-Forwarded-Encrypted: i=1; AJvYcCWbwqu9ZCCXdJWiYUdQGY2Cyf1RML7szj2mRYpskDRCFqZ94WBr9nnhQwolaq8Dce9QdL/2Asc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTQPljuOZst0Vy5515rh0FSYu8j6fZSd5VK/rT9wtFEBJG4642
+	79Z7wiYVLK/xRDC9QzHydiWbXi5Uqb8A3a25MMLgvNCWwGxqZAjPKWeE
+X-Gm-Gg: AY/fxX4L/Js+Y71s4TjFbrKOwNDzzbVUozVxPdtaEarv3JbCpK4ymZGqZzQA2TkbikN
+	+YF0j4bAapJr4SOvB6bMkRxZJjiGxrfCVLvspH6zmb307ykDte4GW/Yr5V2FDz3f9sUYLV5ITXH
+	3FLUL2pPbmjjjIYuhBepHc6Sva90hlYcFa8AU4yd1ni/maN87CjikDC6+XkJac+n5bsvVei/8hk
+	HgIFk8Rq0+GnF3GEU2INDewOypasN6gWu1dvUtNyjvGImptuKJgdKAdMzAbaxGKcVBHEhvn39Ob
+	0ClqZUOR18vwR3KGeeqV9NiPPfP6OWYhMbTGDH62aEgu/8H2YX7ND5WiQHiOXjAQfx0gbJ90P7q
+	8YGdnTKe7HTV2flY6fqn4QrJQNvY/LqdAjrQl8TTWhOpMZxeUYXXtyAP66Yrs+cq4TJsiupqTND
+	hi0DlkSipLnkCn9EdAjBOvZw==
+X-Google-Smtp-Source: AGHT+IGNmY6EuRXQMgmECxnNtQwrRUp+VeCi3/b3F25cOPZ8t8M9RwpG6+Ph3Pg2FEMSimcUer23+w==
+X-Received: by 2002:a05:600c:4f53:b0:479:1a09:1c4a with SMTP id 5b1f17b1804b1-47d84b3b389mr154806905e9.31.1768052536352;
+        Sat, 10 Jan 2026 05:42:16 -0800 (PST)
+Received: from eichest-laptop ([2a02:168:af72:0:6968:58fa:e72d:87c0])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d871ac28bsm85184595e9.20.2026.01.10.05.42.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Jan 2026 02:14:13 -0800 (PST)
-Date: Sat, 10 Jan 2026 05:14:10 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Bui Quang Minh <minhquangbui99@gmail.com>, netdev@vger.kernel.org,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net v3 1/3] virtio-net: don't schedule delayed refill
- worker
-Message-ID: <20260110051335-mutt-send-email-mst@kernel.org>
-References: <20260106150438.7425-1-minhquangbui99@gmail.com>
- <20260106150438.7425-2-minhquangbui99@gmail.com>
- <20260109181239.1c272f88@kernel.org>
+        Sat, 10 Jan 2026 05:42:15 -0800 (PST)
+Date: Sat, 10 Jan 2026 14:42:13 +0100
+From: Stefan Eichenberger <eichest@gmail.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, shawnguo@kernel.org, s.hauer@pengutronix.de,
+	kernel@pengutronix.de, festevam@gmail.com,
+	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, francesco.dolcini@toradex.com,
+	robh@kernel.org,
+	Stefan Eichenberger <stefan.eichenberger@toradex.com>
+Subject: Re: [PATCH RESEND net-next v2] net: stmmac: dwmac: Add a fixup for
+ the Micrel KSZ9131 PHY
+Message-ID: <aWJXNSiDLHLFGV8F@eichest-laptop>
+References: <20260105100245.19317-1-eichest@gmail.com>
+ <6ee0d55a-69de-4c28-8d9d-d7755d5c0808@bootlin.com>
+ <aVuxv3Pox-y5Dzln@eichest-laptop>
+ <a597b9d6-2b32-461f-ac90-2db5bb20cdb2@lunn.ch>
+ <aVvp70S2Lr3o_jyB@eichest-laptop>
+ <aVvwOYce1CFOLiBk@shell.armlinux.org.uk>
+ <aVv7wD2JFikGkt3F@eichest-laptop>
+ <aWC_ZDu0HipuVhQS@eichest-laptop>
+ <8f70bd9d-747f-4ffa-b0f2-1020071b5adc@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260109181239.1c272f88@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8f70bd9d-747f-4ffa-b0f2-1020071b5adc@bootlin.com>
 
-On Fri, Jan 09, 2026 at 06:12:39PM -0800, Jakub Kicinski wrote:
-> On Tue,  6 Jan 2026 22:04:36 +0700 Bui Quang Minh wrote:
-> > When we fail to refill the receive buffers, we schedule a delayed worker
-> > to retry later. However, this worker creates some concurrency issues.
-> > For example, when the worker runs concurrently with virtnet_xdp_set,
-> > both need to temporarily disable queue's NAPI before enabling again.
-> > Without proper synchronization, a deadlock can happen when
-> > napi_disable() is called on an already disabled NAPI. That
-> > napi_disable() call will be stuck and so will the subsequent
-> > napi_enable() call.
+Hi Maxime,
+
+On Fri, Jan 09, 2026 at 10:38:30AM +0100, Maxime Chevallier wrote:
+> Hi Stefan,
+> 
+> On 09/01/2026 09:42, Stefan Eichenberger wrote:
+> > Hi everyone,
 > > 
-> > To simplify the logic and avoid further problems, we will instead retry
-> > refilling in the next NAPI poll.
+> > On Mon, Jan 05, 2026 at 06:58:24PM +0100, Stefan Eichenberger wrote:
+> >> On Mon, Jan 05, 2026 at 05:09:13PM +0000, Russell King (Oracle) wrote:
+> >>> On Mon, Jan 05, 2026 at 05:42:23PM +0100, Stefan Eichenberger wrote:
+> >>>> Yes this is correct. ERR050694 from NXP states:
+> >>>> The IEEE 802.3 standard states that, in MII/GMII modes, the byte
+> >>>> preceding the SFD (0xD5), SMD-S (0xE6,0x4C, 0x7F, or 0xB3), or SMD-C
+> >>>> (0x61, 0x52, 0x9E, or 0x2A) byte can be a non-PREAMBLE byte or there can
+> >>>> be no preceding preamble byte. The MAC receiver must successfully
+> >>>> receive a packet without any preamble(0x55) byte preceding the SFD,
+> >>>> SMD-S, or SMD-C byte.
+> >>>> However due to the defect, in configurations where frame preemption is
+> >>>> enabled, when preamble byte does not precede the SFD, SMD-S, or SMD-C
+> >>>> byte, the received packet is discarded by the MAC receiver. This is
+> >>>> because, the start-of-packet detection logic of the MAC receiver
+> >>>> incorrectly checks for a preamble byte.
+> >>>>
+> >>>> NXP refers to IEEE 802.3 where in clause 35.2.3.2.2 Receive case (GMII)
+> >>>> they show two tables one where the preamble is preceding the SFD and one
+> >>>> where it is not. The text says:
+> >>>> The operation of 1000 Mb/s PHYs can result in shrinkage of the preamble
+> >>>> between transmission at the source GMII and reception at the destination
+> >>>> GMII. Table 35–3 depicts the case where no preamble bytes are conveyed
+> >>>> across the GMII. This case may not be possible with a specific PHY, but
+> >>>> illustrates the minimum preamble with which MAC shall be able to
+> >>>> operate. Table 35–4 depicts the case where the entire preamble is
+> >>>> conveyed across the GMII.
+> >>>>
+> >>>> We would change the behavior from "no preamble is preceding SFD" to "the
+> >>>> enitre preamble is preceding SFD". Both are listed in the standard and
+> >>>> shall be supported by the MAC.
+> >>>
+> >>> Thanks for providing the full explanation, it would be good to have
+> >>> that in the commit message.
+> >>
+> >> Okay thanks, I will provide the full explanation in the next commit
+> >> message.
+> >>
+> >>>
+> >>> The next question would be, is it just the NXP EQOS implementation
+> >>> that this breaks on, or are other EQOS implementations affected?
+> >>>
+> >>> In other words, if we choose to conditionally enable the preable at
+> >>> the PHY, should the generic parts of stmmac handle this rather than
+> >>> ending up with multiple platform specific glue having to code this.
+> >>> (This is something I really want to avoid - it doesn't scale.)
+> >>
+> >> From the errata from NXP it sounds to me like it is a configuration
+> >> issue by NXP. I checked the following ERRATAs from vendors where I have
+> >> access to:
+> >> - ST STM32MP1: not affected: https://www.st.com/resource/en/errata_sheet/es0438-stm32mp151x3x7x-device-errata-stmicroelectronics.pdf
+> >> - Renesas RZN1: not affected: https://www.renesas.com/en/document/tcu/ethernet-mac-gmac-function-issue-0?r=1054561
+> >> - Starvive JH7110: not affected: https://doc-en.rvspace.org/JH7110/PDF/JH7110_Errata.pdf
+> >> - NXP S32: affected: (ERR050706 under NDA)
+> >>
+> >> So from that I would conclude that it is an NXP specific issue and it's
+> >> not the full EQOS implementation that is broken.
+> > 
+> > I just wanted to check whether I should continue with the current
+> > approach or if I should instead enable the preamble in the PHY for all
+> > MACs. While I prefer the current approach, as the issue lies with the
+> > MAC rather than the PHY, I can also see the advantage of always enabling
+> > the feature.
 > 
-> Happy to see this go FWIW. If it causes issues we should consider
-> adding some retry logic in the core (NAPI) rather than locally in
-> the driver..
+> My main concern was that we may end-up with a lot of different fixups
+> for the various KSZ-family PHY devices, especially since this feature is
+> sometimes undocumented.
 > 
-> > Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
-> > Reported-by: Paolo Abeni <pabeni@redhat.com>
-> > Closes: https://netdev-ctrl.bots.linux.dev/logs/vmksft/drv-hw-dbg/results/400961/3-xdp-py/stderr
+> I've gone through the micrel.c driver, and looked at the datasheet of
+> most PHYs in there, and so far I've found that to fix this issue, we
+> need to set :
 > 
-> The Closes should probably point to Paolo's report. We'll wipe these CI
-> logs sooner or later but the lore archive will stick around.
+> KSZ9131 / KSZ8041: Register 0x14 bit 6
+> KSZ8061 / KSZ8051 : Register 0x18 bit 6
 > 
-> > @@ -3230,9 +3230,10 @@ static int virtnet_open(struct net_device *dev)
-> >  
-> >  	for (i = 0; i < vi->max_queue_pairs; i++) {
-> >  		if (i < vi->curr_queue_pairs)
-> > -			/* Make sure we have some buffers: if oom use wq. */
-> > -			if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
-> > -				schedule_delayed_work(&vi->refill, 0);
-> > +			/* Pre-fill rq agressively, to make sure we are ready to
-> > +			 * get packets immediately.
-> > +			 */
-> > +			try_fill_recv(vi, &vi->rq[i], GFP_KERNEL);
+> So in the end, the complexity appears to be a bit less exponential than
+> I originally thought, we may end-up with only a few fixups in this driver.
 > 
-> We should enforce _some_ minimal fill level at the time of open().
-> If the ring is completely empty no traffic will ever flow, right?
-> Perhaps I missed scheduling the NAPI somewhere..
+> I'd say, I'm fine with you proceeding with this original approach as it
+> minimizes the impact and risk to break other setups.
+> 
+> I'm sorry for triggering this whole discussion only to get back to the
+> starting point :(
 
-Practically, single page allocations with GFP_KERNEL don't
-really fail. So I think it's fine.
+Not problem, thanks a lot for the feedback and the discussion. I will
+then proceed with the current approach and send a new version with an
+updated commit message.
 
-> >  		err = virtnet_enable_queue_pair(vi, i);
-> >  		if (err < 0)
-> > @@ -3472,16 +3473,15 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
-> >  				struct receive_queue *rq,
-> >  				bool refill)
-> >  {
-> > -	bool running = netif_running(vi->dev);
-> > -	bool schedule_refill = false;
-> > +	if (netif_running(vi->dev)) {
-> > +		/* Pre-fill rq agressively, to make sure we are ready to get
-> > +		 * packets immediately.
-> > +		 */
-> > +		if (refill)
-> > +			try_fill_recv(vi, rq, GFP_KERNEL);
-> 
-> Similar thing here? Tho not sure we can fail here..
-> 
-> > -	if (refill && !try_fill_recv(vi, rq, GFP_KERNEL))
-> > -		schedule_refill = true;
-> > -	if (running)
-> >  		virtnet_napi_enable(rq);
-> > -
-> > -	if (schedule_refill)
-> > -		schedule_delayed_work(&vi->refill, 0);
-> > +	}
-> >  }
-> >  
-> >  static void virtnet_rx_resume_all(struct virtnet_info *vi)
-> > @@ -3829,11 +3829,13 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
-> >  	}
-> >  succ:
-> >  	vi->curr_queue_pairs = queue_pairs;
-> > -	/* virtnet_open() will refill when device is going to up. */
-> > -	spin_lock_bh(&vi->refill_lock);
-> > -	if (dev->flags & IFF_UP && vi->refill_enabled)
-> > -		schedule_delayed_work(&vi->refill, 0);
-> > -	spin_unlock_bh(&vi->refill_lock);
-> > +	if (dev->flags & IFF_UP) {
-> > +		local_bh_disable();
-> > +		for (int i = 0; i < vi->curr_queue_pairs; ++i)
-> > +			virtqueue_napi_schedule(&vi->rq[i].napi, vi->rq[i].vq);
-> > +
-> 
-> nit: spurious new line
-> 
-> > +		local_bh_enable();
-> > +	}
-> >  
-> >  	return 0;
-> >  }
-
+Regards,
+Stefan
 
