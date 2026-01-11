@@ -1,218 +1,164 @@
-Return-Path: <netdev+bounces-248772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8026D0DFA9
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 00:57:50 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 767B4D0DFF4
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 01:12:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 24DA630275CF
-	for <lists+netdev@lfdr.de>; Sat, 10 Jan 2026 23:57:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 527F93020395
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 00:12:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C78C5288C3D;
-	Sat, 10 Jan 2026 23:57:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A29E29A2;
+	Sun, 11 Jan 2026 00:12:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="blh0PLkk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GWbu5R2O";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="mu3W6dAU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D8E290DBB
-	for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 23:57:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ABE14C9D
+	for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 00:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768089445; cv=none; b=o629pqMh22foAcrScGNLDuGTbjncqw1ax24RBNt5Hww/uHYUCDlFWZ/wQX+16R6h0XJeRDll1ir6ZLzcCjrnolgyRuJWnYDDRo7B1t6S8q7b0NjKP8A7tkzRfsmtiOiYiKVJekB6ulXnjGPC6GAbJhJt4VK8m88HdxB85eu4Tg4=
+	t=1768090337; cv=none; b=Zpbi+1GTaG53nC8S0cEouSdgtYTxmoAXHOLvKtq22LPNtJ6TNcPJql39PRdp64SHoJ1iKvvhrO/CHvMqpqnFdbLnK0A8VhgYQWyw0MFiwceGwyoaqzGT2Yml+2SFoQcR++CMdoZpASU69nqVRclh3OiVLk7PLDogQuOMMJ8tUHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768089445; c=relaxed/simple;
-	bh=6d0jbGJAU8YqJ1gNkbevY7vBxa94V26EUK+0BIqPUmo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lW6/8VpAZGOtivJ9VdkrHgIG6VLahFSqAema0IVvxICPbIXh/8HZE3NuNkK/hiVc6U/noS+m190V5Gq5wN964Qg+w3PwMtILfAlu+sIfd5QTXvv+oPF8bcKb269/P6U7ZZfUDDP3XcwanB3bu8T9O5uEekzkdyxoAVxkahkNUZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com; spf=pass smtp.mailfrom=googlemail.com; dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b=blh0PLkk; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=googlemail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-64b9dfc146fso4312257a12.0
-        for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 15:57:22 -0800 (PST)
+	s=arc-20240116; t=1768090337; c=relaxed/simple;
+	bh=mLWLZ8V/CeaK+tkNrj5VuZDldGSy5v1mTtg2DMNYb/M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HSmso1/wIJ0uA9nhGSneOQ9PV+DZRyDMkZJZXxlIW2gI77v2ziLdlajLXYtrG1Jin3x7wigaNZ7feVESQ4YKJ3Zp6LDnldTLEstxiZJ+6khU6L9HpoGmlIaoBx3y3N4a5TidiSNEjiEqrKVM3wxfZL4Zlj95ZXr+GcS1N0lm/c4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GWbu5R2O; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=mu3W6dAU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768090335;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rJ92NuxJ/FhkA7sHAwthrAyvDj9go5GB1uGyDHAuqv0=;
+	b=GWbu5R2OkHOW1Q6dRltZRMiANuPvs6IRjCQOxp4RvFkyYGj7UUa6g4XA9G3ls7impXskL1
+	T0TPI/6Gn6oDC4+SFNTQeJo0iaskfFol2zJP4lXEa2droYI0NKd9m2xHcvsSYyoX1XA4At
+	ZimHuwip6MvoYEBwR2MyNRz8FAIpTgQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-311-3_LHgSz1PbOTie2hNLT5Fw-1; Sat, 10 Jan 2026 19:12:13 -0500
+X-MC-Unique: 3_LHgSz1PbOTie2hNLT5Fw-1
+X-Mimecast-MFC-AGG-ID: 3_LHgSz1PbOTie2hNLT5Fw_1768090333
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-477b8a667bcso62452315e9.2
+        for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 16:12:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20230601; t=1768089441; x=1768694241; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gpJJOa9t1wBvlVJkNJ/5YNn0WHt1DhBf0e1N6PffLYI=;
-        b=blh0PLkkftE8QP6q7KVkkHSbROckTkfi+0yBPSqs1Pe714b9CW7w5bBUCe3+6xgbGj
-         wN8CPy3BXbIDPqTkATMXglD/iBKMebVZh7Z38p55SKk+a1HruxD71qYbYhQ2pBWpRcN9
-         plQZ+tAPyy3df9cWIYxwVRIEXv2N7EQyCBUT9hWThuttzVmiGxmC+TaH7Nt2KKQGYD5m
-         g8p0Wgz9wnEDKQVt3aeac0E+C6JBCDvv8IBg7kcT7K+DZL3c43c6qJjdbk3usWoEmJDc
-         3W8w/2Px8IljIlFE6mbvSsAIA5rVFKJ5sEHNux5TYuJNJ8EwvM+bwFDqTBV6rq1sYMsm
-         ORJQ==
+        d=redhat.com; s=google; t=1768090332; x=1768695132; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rJ92NuxJ/FhkA7sHAwthrAyvDj9go5GB1uGyDHAuqv0=;
+        b=mu3W6dAUGHim0Hn7QT5H2ljZEnUp5X0zmSP/8oJdN38ucQYE9KHA7KLn9IZsUmj3z7
+         gyqCy/qwhszVUTW7Ar5bhF5GUU/mQIU6URCfYm57MCuK3g4qAIwZx2LH7vW1alXDYAus
+         vmM2ctz7a7wawMY/Pt3dCNnlFrmO9tDda+ibYAl7htBeh050CfYfeP/GuRAdaSQJ5IFp
+         XTHc8LSqUJFtbSQrVV5dZNqx/9f+imMwIWsGnMmfrHQ2p383vyXu3VAaOc8JCNXPbr27
+         8hzBkjw2+Zi+DZSfrhxlpod48bj7F6l6tH/5y8nw3PHClaFHmp9+3ObJdUpF3TRwEgik
+         DmCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768089441; x=1768694241;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gpJJOa9t1wBvlVJkNJ/5YNn0WHt1DhBf0e1N6PffLYI=;
-        b=Yz71bD3+Sbuf35g42snVTocpThP2lqwuPtnp9wh1ClBOszn12nl6TNfJ3OrvZkFZ0T
-         U2lf9YQTH4m6p55puluRUkCJn2PLlnHttx0rmbQ4OnO0MS+wUInKd21CysnQ8F6dkWq4
-         d0jx+uQ08bF0jdgAblyEdbMWqKKSDgrh1cKGOxHudCoDGwP9NedV1KISTfJHbCQFnJRI
-         WXQbCLSpMXDo45UlFe3LDVfC/ElasakemE4BW2AwI0hqxNxNboz2Sm1pNdjuhdnYsQr6
-         UCRNyu5cBvfWDRsMyRyQ/FVyd2xEsIzIEjfa2sYf+UBwQJvaJj3IKVFPb7vQLBbD4NeU
-         rDhw==
-X-Gm-Message-State: AOJu0YzMTonO1lyYgNaSvGJYmpeNStWofrrbcyLCbVfcOPqdUm5cT2uw
-	0HfLKpQJJ+GPhCCkb2mvHTzMZiLJzSQdqb66vQEocwHcpfLFBObgaP/kzolTKQ==
-X-Gm-Gg: AY/fxX7tpRal1CXDkXxj6Ri3abWmtOeRlTbO+KNWSkcYDdJJTxudvxsxobwUdHaVhg4
-	u5EpYn3bKbsFlyr+gUv18+gTg6aZwp0CR2lOKXizofYXu3rY30Go0oxNvTR0bjSh6NfDPK9msqE
-	BI6WKAxlfwD1NuMqCP5koHuVVyoU6ye5/reizAUUGPhaVI1bkbHBeIw792FROmgBHxnj3jM0E/C
-	YlqtDfEWR2s7hvKVYdKIbf7qpxRWN5UjRPyg/U1FbOBD4dFsL+lrLDgQ1YRu6IixXhtaM0iX/+a
-	aeudIdS1MhSP1ZNNELOeQj8Jbjd48VjoeBTdZzvgf8pwKGbgjGCTTlwlN7P/1gehi2rziOvtm6g
-	yo1hJdoVkhDWnmo6zgQplvzgA1EYCMtjMoLIWwj5GaaJBStP5GyKqd0P5NhIIQ9oi9F5go3SbLy
-	qWcXVgteu4JvrynKT3bmTuqxZEeRMeWrFWJlnr7izh4xsorghXK/iUdEx7FDvAMX8nDrwejRGRv
-	n6GA0/foqHiogkIkBgAk0JoPNEPhTuOc8ZmUoH5DQ==
-X-Google-Smtp-Source: AGHT+IHgGIkPHOw9/av7xXAs6nVP8o+aqKdZVjmSF3d9NRRkl/SPH1wJAmtrOHvxDrSGi5Wp7GJd3A==
-X-Received: by 2002:a05:6402:3551:b0:647:94e1:800f with SMTP id 4fb4d7f45d1cf-65097b99f05mr14840498a12.8.1768089440875;
-        Sat, 10 Jan 2026 15:57:20 -0800 (PST)
-Received: from blackbox (dynamic-2a02-3100-af95-6f00-1e86-0bff-fe2f-57b7.310.pool.telefonica.de. [2a02:3100:af95:6f00:1e86:bff:fe2f:57b7])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-6507bf6d5absm13701228a12.33.2026.01.10.15.57.18
+        d=1e100.net; s=20230601; t=1768090332; x=1768695132;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rJ92NuxJ/FhkA7sHAwthrAyvDj9go5GB1uGyDHAuqv0=;
+        b=XNAm58/X05Bjta1m4Y82gTC7N1A5tJ0gmrU7vGhiMFXGFS3BAN6aB0W11gwx2rXrnd
+         z7/hQakwU0xxRBT+7DfVu122jnsNq7LwFC00fBGJgBi6h+NhT1LZEwG6pZLoto9r8Dyn
+         v9ylW7BIwZzuh3ai4P9gtyfMJRTRdWvSDGvRSBgYUsQBz078eNY0Hc6eEmwtW0Kw8m/M
+         MbSJZewyjGULSoCKcClWKJLEkO0Pw0SvRTRXy3PQ7q/TVXHXB5Q7W/9fyMbNR8lCHGBL
+         lNui1eTTsVGfgdtEKuKcZA+46s0s+PyqQd9im7z2KshRr0FUGOvMiioXW4gAYPLPFIbi
+         +Qsg==
+X-Forwarded-Encrypted: i=1; AJvYcCWYcOflENsDqfz4RM2lEZDvktYgJyM5gHhi0tr7tacycw0NoEB7VSYlrCJaebMyrGRy7mfary8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YztVCmQ1raU80AzQd0A1HAvZcFi8zaLAxZgewRUJ1ZEFCV0n1BF
+	jdgINxekZmlzWhdmAeNQ3UlC5D+f2m7WznoKfDjXDmW/3HW2Z5t9RK8deG6X7k8PYSWcR/iRe4F
+	IVEhTvEYcBv+2AEwRKxD526x+YO+esq6Vhx4xIgnRm8kB73NmPcxv1dvaAg==
+X-Gm-Gg: AY/fxX4WnT0tsus/Lbr5P0ep1TCOSp0fi18rpM6VEioJ9RCnBRLp24J5vmE2L0WdV2y
+	gKGBm7470iR8rsHOzYiftM5Pqxrjye8ta1bxLsdAwJYL+jnkPwTJaowvoub673oC4mVyoLk3am+
+	Cm+WuAW0gVeKUqpE4oBfq8ES4shvuRBenecfxihOkTvE0X3hpmV91QznchJ8Mqm5xLo7zuyxVW6
+	Utjk1xuBpyJyxzZ3GzPzm9dXGh+FZn+I9ZMSRoNvlM7W8zZwoSATJh+qyAYbUCm6LfebUJ8lWC7
+	s4t6gavTxujoeC25IDC0HPGRo9apVi9EEo+CUtV2lRj/ZHoG5QsKClAZ66xBHkZOYlz3fB9MH/3
+	4ImKe14x2kBa5NU3LulEeJBC81mIJQxY=
+X-Received: by 2002:a05:600c:4fd0:b0:477:5c58:3d42 with SMTP id 5b1f17b1804b1-47d84b1f7efmr165064545e9.10.1768090332614;
+        Sat, 10 Jan 2026 16:12:12 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEnuDsqC9m+l3yDfJUMvz3utaUAG5Ge2RfD+SugU7SA1yuuWtgjR7DEiLIEaKlXtpa9H3hyeA==
+X-Received: by 2002:a05:600c:4fd0:b0:477:5c58:3d42 with SMTP id 5b1f17b1804b1-47d84b1f7efmr165064445e9.10.1768090332218;
+        Sat, 10 Jan 2026 16:12:12 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-35-22.inter.net.il. [80.230.35.22])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f41f5e0sm272650555e9.8.2026.01.10.16.12.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Jan 2026 15:57:20 -0800 (PST)
-From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-To: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Cc: linux-amlogic@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	conor+dt@kernel.org,
-	krzk+dt@kernel.org,
-	robh@kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-Subject: [PATCH net-next v1] dt-bindings: net: Convert icplus-ip101ag to yaml format
-Date: Sun, 11 Jan 2026 00:55:44 +0100
-Message-ID: <20260110235544.1593197-1-martin.blumenstingl@googlemail.com>
-X-Mailer: git-send-email 2.52.0
+        Sat, 10 Jan 2026 16:12:11 -0800 (PST)
+Date: Sat, 10 Jan 2026 19:12:07 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Shuah Khan <shuah@kernel.org>, Long Li <longli@microsoft.com>,
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, kvm@vger.kernel.org,
+	linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	berrange@redhat.com, Sargun Dhillon <sargun@sargun.me>,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH RFC net-next v13 00/13] vsock: add namespace support to
+ vhost-vsock and loopback
+Message-ID: <20260110191107-mutt-send-email-mst@kernel.org>
+References: <20251223-vsock-vmtest-v13-0-9d6db8e7c80b@meta.com>
+ <aWGZILlNWzIbRNuO@devvm11784.nha0.facebook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aWGZILlNWzIbRNuO@devvm11784.nha0.facebook.com>
 
-This allows for better validation of .dts.
+On Fri, Jan 09, 2026 at 04:11:12PM -0800, Bobby Eshleman wrote:
+> On Tue, Dec 23, 2025 at 04:28:34PM -0800, Bobby Eshleman wrote:
+> > This series adds namespace support to vhost-vsock and loopback. It does
+> > not add namespaces to any of the other guest transports (virtio-vsock,
+> > hyperv, or vmci).
+> > 
+> > The current revision supports two modes: local and global. Local
+> > mode is complete isolation of namespaces, while global mode is complete
+> > sharing between namespaces of CIDs (the original behavior).
+> > 
+> > The mode is set using the parent namespace's
+> > /proc/sys/net/vsock/child_ns_mode and inherited when a new namespace is
+> > created. The mode of the current namespace can be queried by reading
+> > /proc/sys/net/vsock/ns_mode. The mode can not change after the namespace
+> > has been created.
+> > 
+> > Modes are per-netns. This allows a system to configure namespaces
+> > independently (some may share CIDs, others are completely isolated).
+> > This also supports future possible mixed use cases, where there may be
+> > namespaces in global mode spinning up VMs while there are mixed mode
+> > namespaces that provide services to the VMs, but are not allowed to
+> > allocate from the global CID pool (this mode is not implemented in this
+> > series).
+> 
+> Stefano, would like me to resend this without the RFC tag, or should I
+> just leave as is for review? I don't have any planned changes at the
+> moment.
+> 
+> Best,
+> Bobby
 
-Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
----
- .../bindings/net/icplus,ip101ag.yaml          | 75 +++++++++++++++++++
- .../bindings/net/icplus-ip101ag.txt           | 19 -----
- 2 files changed, 75 insertions(+), 19 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/icplus,ip101ag.yaml
- delete mode 100644 Documentation/devicetree/bindings/net/icplus-ip101ag.txt
-
-diff --git a/Documentation/devicetree/bindings/net/icplus,ip101ag.yaml b/Documentation/devicetree/bindings/net/icplus,ip101ag.yaml
-new file mode 100644
-index 000000000000..f245516103b3
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/icplus,ip101ag.yaml
-@@ -0,0 +1,75 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/icplus,ip101ag.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: IC Plus Corp. IP101A / IP101G Ethernet PHYs
-+
-+maintainers:
-+  - Andrew Lunn <andrew@lunn.ch>
-+  - Florian Fainelli <f.fainelli@gmail.com>
-+  - Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-+
-+description: |
-+  Bindings for IC Plus Corp. IP101A / IP101G Ethernet MII/RMII PHYs
-+
-+  There are different models of the IP101G Ethernet PHY:
-+  - IP101GR (32-pin QFN package)
-+  - IP101G (die only, no package)
-+  - IP101GA (48-pin LQFP package)
-+
-+  There are different models of the IP101A Ethernet PHY (which is the
-+  predecessor of the IP101G):
-+  - IP101A (48-pin LQFP package)
-+  - IP101AH (48-pin LQFP package)
-+
-+  All of them share the same PHY ID.
-+
-+allOf:
-+  - $ref: ethernet-phy.yaml#
-+
-+properties:
-+  compatible:
-+    contains:
-+      enum:
-+        - ethernet-phy-id0243.0c54
-+
-+  icplus,select-rx-error:
-+    type: boolean
-+    description: |
-+      Pin 21 ("RXER/INTR_32") will output the receive error status.
-+      Interrupts are not routed outside the PHY in this mode.
-+
-+      This is only supported for IP101GR (32-pin QFN package).
-+
-+  icplus,select-interrupt:
-+    type: boolean
-+    description: |
-+      Pin 21 ("RXER/INTR_32") will output the interrupt signal.
-+
-+      This is only supported for IP101GR (32-pin QFN package).
-+
-+# RXER and INTR_32 functions are mutually exclusive
-+dependentSchemas:
-+  icplus,select-rx-error:
-+    properties:
-+      icplus,select-interrupt: false
-+  icplus,select-interrupt:
-+    properties:
-+      icplus,select-rx-error: false
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    mdio {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        ethphy1: ethernet-phy@1 {
-+                compatible = "ethernet-phy-id0243.0c54";
-+                reg = <1>;
-+                icplus,select-interrupt;
-+        };
-+    };
-diff --git a/Documentation/devicetree/bindings/net/icplus-ip101ag.txt b/Documentation/devicetree/bindings/net/icplus-ip101ag.txt
-deleted file mode 100644
-index a784592bbb15..000000000000
---- a/Documentation/devicetree/bindings/net/icplus-ip101ag.txt
-+++ /dev/null
-@@ -1,19 +0,0 @@
--IC Plus Corp. IP101A / IP101G Ethernet PHYs
--
--There are different models of the IP101G Ethernet PHY:
--- IP101GR (32-pin QFN package)
--- IP101G (die only, no package)
--- IP101GA (48-pin LQFP package)
--
--There are different models of the IP101A Ethernet PHY (which is the
--predecessor of the IP101G):
--- IP101A (48-pin LQFP package)
--- IP101AH (48-pin LQFP package)
--
--Optional properties for the IP101GR (32-pin QFN package):
--
--- icplus,select-rx-error:
--  pin 21 ("RXER/INTR_32") will output the receive error status.
--  interrupts are not routed outside the PHY in this mode.
--- icplus,select-interrupt:
--  pin 21 ("RXER/INTR_32") will output the interrupt signal.
--- 
-2.52.0
+i couldn't apply it on top of net-next so pls do.
 
 
