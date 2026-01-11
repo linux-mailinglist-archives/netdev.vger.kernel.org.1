@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-248800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B13AED0ECFA
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 13:12:37 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36A65D0ED0B
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 13:13:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EEE8A30274FC
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 12:08:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 158F53010A90
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 12:09:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B68F318BAB;
-	Sun, 11 Jan 2026 12:08:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AD0F333451;
+	Sun, 11 Jan 2026 12:09:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="UmIQTE+2"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Q+kXMQwv"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013039.outbound.protection.outlook.com [40.107.201.39])
+Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011003.outbound.protection.outlook.com [40.107.208.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63272AD20
-	for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 12:08:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48B9B33290A
+	for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 12:09:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.3
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768133338; cv=fail; b=SpPK4Iz+A//IgBRg2GeUAJHINUv/hv+ypHMvEafRYrDwLXT7r3IDuoTo4+ZFBj7KyFhzNSmeTFG2/eSP7KY9eugCvnYbp3Os42ppBBjxchjoYAtTm9bgJjB13qVuZxrHrOKs2rxxoxcg6awDvRQhXaF/Os2IgBEuhJKJ2e3fkw0=
+	t=1768133348; cv=fail; b=eUlW3PvvdvfUrX5BXbnogmBEQZqOAsvEzhC2dBGBm5Pn2cXY4FxlmqeZWqhH7qZ1YB9vdK4LI4CR4VK+bPYnmLrpAGdiByHSJWHgIZTKWtesrYgMseNAmis3oN+I7I4QmCRCzK21MDQBxdmstjbnNLGa87QTzh/X92NBERmAXNo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768133338; c=relaxed/simple;
-	bh=36ClsgeQw6jcTOGj7/c0MiruXnpakmq+YImUgZVRSu0=;
+	s=arc-20240116; t=1768133348; c=relaxed/simple;
+	bh=EYhiuohj0kU+uPdf3NrZriATmtN83feRPybloFI72pQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=kVi2ik9AL9W+BVGeP3cBiVolKt3artwnj++JG6KG/PjbXMRYDolBGILSHtKpMHB7Rrf/ZcWu7agecFYo4r2u1Pu4RetlttpPO0YUZ0s9+S/7phEUg3cB9S1yFhEucCNg8JI14h+i2TWCvYyT/sBNds8S1ogk+M/CUe0UoQ9tQ9M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=UmIQTE+2; arc=fail smtp.client-ip=40.107.201.39
+	 Content-Type:MIME-Version; b=LVD6CIYZz9Dz41MBT4UcX8l8mG5FR6c3dfcCkaGfWWNSam1hyRh3dv4ohT7AiFiIOWxTyE9s2ZyGLicmXJhRDkPxTR/pXnka7ISvCMx+aTCTkWaA4Q3UIeRlz2YRtN8HHbTcObUvyrtPymRbwuWoSTp3D28RJFusRcRAkgPBCUM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Q+kXMQwv; arc=fail smtp.client-ip=40.107.208.3
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pNzznf2ST6vqPYlCf13vaD7qHgBeXSaBfyut1wLLqHOP3FiaKXTCtz9H/LDgMD576aJEEvAgL1IC1PXX8bUbvVjUhBFyZcZetIOHdOc4QFBgeeBq45i7+rWnqk2A9aLrdGFfRXpCYDpQNPsAfvfZs6TCAAVH7lzhlVZk7CHBrNUMTZq2t+DoDiW+/fKXYxvsl+5uX9y+6XL6iIvl3B0hMn2qIJRjW3cvXnhS8ivP4WF3ZFP7Plild3s/uK3jeu9uMY/YNq3l1PE8un2t920zLajSmEZGViCONjGtqeYJGsB4KfgdjNEdmHWHcE0PF+W6tk6LJGbmFPqkwoFUo71p/g==
+ b=lgh0wze9n29GA5Oddeo+JTOhH2OMTP6cGQtcW8t8HgC2rASNs8ofPdnatbMRMaeqFWLfyaH39F0N/t5k1wBzLlyUGltwszuNP9Focbv1Xf/tp9fOvFUbVA9G8zLcviej3i/krl19H3VKo6kZSvrdUXzw4SHLktKoL5UlIBeUXH0IGX5fJARipSF7p+bQYfzK32Zt9Rn2nye+KXH9Z/P1dRJQ0a44hgeCg6DIMG46CK4sA1iEcztuE1yMVGABAxPoD1NRyoYFOngKzRe8zXhYfU8y750VLTRLeuq84No5QuBBxoVtt9fYTkwaWuV2SObkaU43y4X33473bj7Vyhz4kQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7pvrAvZNv8Sg3+P6qGj3Qk8phtUsRoD4x9hGlpTmr+8=;
- b=UcKH8w+ejgja8uxwYcyRBdYD8w8WLR6IxjHCAo1KZ4UceD3E4X0cpZUkJl0/zeIMCsIAyO2zLYz0mPhxDxNxZkbEZTU6n7Q6q4qg6EvNzUfOxPrBq6USGiM40osn1oYLX5LLmQpw3d/b4CIKVie2Y0UtEq43ej+7L2eHMnLwOSI5NsLhfR8lc45EzboYEz7DtOBulkJqT9zP+qQZ0ZWsJjW9oXae5eq+Q5o0h6aLak5mlc2rXTkA19j1s5u+KYYTiNL+q26fwtGA+U4spyNcRGiPibKcQ9NvzG40vRXzdidO7yL4o56sybx/GwtBnoEFft8hMOE8g1djX67B3XeQEw==
+ bh=wirBtbXJ0REFTkG+23IGTNsVwb5gSUklprnTbAa1Etg=;
+ b=W9HP5kS6B01Z6JM2o8nqbESYOKpDWhOKQfPVKejuqYyQRiTUC/3i+Q6ryFjERFQltCShRm2B6L+98pwE7gAFgy2ozT0rmcRGj+UPMBmoEQP4RzDFtLWUaRIv5Z7OtY/7iQWlcXe1udZHClUMlUC9zP07hHeMkv3xImoDjTJQtDEwteL2VhYfFFoVRSllqPDV43T36oxmE0FtFFwAiY1lsI7jddMr9v3xCXJKH20GGgu9q6oTcEHq+vz294TDkmmbzQJMSxlHuk8jLp9eZWpEu9nR3LTIN94OYvTuY7g18XOZCrsI+S8Wx2hRKY9vdOwE24oto2KOn5ePLhN1Qu5aXw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7pvrAvZNv8Sg3+P6qGj3Qk8phtUsRoD4x9hGlpTmr+8=;
- b=UmIQTE+2heF1VXzKzWANn3aLrcCSG9n2KCrVk5ctE0Fs8oy6bWiGFr3BNdPm4wE0Udq9a2HEJOtI23CD1nm+K1/hdot6ZDK/PyGTt63ZqfPLOvWK/o22kseoEWp80IHpgnt1Iai0KkbeVjgCZhFK5o5R9BlbKgnL827H/u+yRONe+i33/lFxMCE0+X4gb50xP0p+lSR6vZt5Vs6y6H1hHoGSIpOkFd+fUQ+H4KDLzr0WNEKliVEjrwY2XD6hauhoM3pi06to0DHIJTDl0AMzEd2VgD/dSJOAXOytZSKCjQU0oVMIa9bUodxh75Lv1eIJi6i5+L3QeyFk8tIJ1PODrA==
+ bh=wirBtbXJ0REFTkG+23IGTNsVwb5gSUklprnTbAa1Etg=;
+ b=Q+kXMQwvv8jQjJihdD5uSu2TuVP03+wGRjTsoJHpuPPVGe8lpgUp25MYkN9F+c6aVwexz4a9L3xg7FmwjAa0dFfEnxwACOPlhIevRDLjojX2vz+neXv7uS0CgspwKvJBVmHFWiJoGXZwso82YyP9Oj6xE3ttJ8+IGpUDMaMq4axZmcE9JE4836vz59NSDq7rFME8kGjg4T/sDhwNWiTH990lWwM5GRmpwIssbtelUAGNWxtlnd0B5rHsRfCWLio0O+DRJYgIWdp7qA8GJSfzF9zggAY2zISKGusRsnRw8WaVlfc99LA3S+5RSMuW5kpf7FJGkFnp3mM9adfjwU6P8w==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
  by SA5PPF0EB7D076B.namprd12.prod.outlook.com (2603:10b6:80f:fc04::8c5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.6; Sun, 11 Jan
- 2026 12:08:54 +0000
+ 2026 12:09:04 +0000
 Received: from SA3PR12MB7901.namprd12.prod.outlook.com
  ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
  ([fe80::6f7f:5844:f0f7:acc2%2]) with mapi id 15.20.9499.005; Sun, 11 Jan 2026
- 12:08:54 +0000
+ 12:09:04 +0000
 From: Ido Schimmel <idosch@nvidia.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -65,16 +65,16 @@ Cc: davem@davemloft.net,
 	horms@kernel.org,
 	petrm@nvidia.com,
 	Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net-next 1/5] selftests: fib-onlink: Remove "wrong nexthop device" IPv4 tests
-Date: Sun, 11 Jan 2026 14:08:09 +0200
-Message-ID: <20260111120813.159799-2-idosch@nvidia.com>
+Subject: [PATCH net-next 2/5] selftests: fib-onlink: Remove "wrong nexthop device" IPv6 tests
+Date: Sun, 11 Jan 2026 14:08:10 +0200
+Message-ID: <20260111120813.159799-3-idosch@nvidia.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260111120813.159799-1-idosch@nvidia.com>
 References: <20260111120813.159799-1-idosch@nvidia.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: TL2P290CA0023.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:3::12) To SA3PR12MB7901.namprd12.prod.outlook.com
+X-ClientProxiedBy: TL0P290CA0004.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:5::17) To SA3PR12MB7901.namprd12.prod.outlook.com
  (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -84,151 +84,136 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|SA5PPF0EB7D076B:EE_
-X-MS-Office365-Filtering-Correlation-Id: eac0a830-cad5-4615-53ea-08de510a308e
+X-MS-Office365-Filtering-Correlation-Id: 1015de69-b01a-466b-0a97-08de510a36e8
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?zeni+oIJnxCwDZdjXhCgWfoazE66NqNTHutsp/OWLEkYVWygygYkjAHxMutI?=
- =?us-ascii?Q?xsXfdr30kc6P1Dx4mcV9yHd+GokEn7xLQxUHfo4NiIgjzKLNHxQ7q4OnmqOJ?=
- =?us-ascii?Q?W2TA0FF4Mw9xyMFT4C8Sk9TEz0F942OfmH3Ip9HZ4n4kUoVMP96txzoV3qjE?=
- =?us-ascii?Q?3VTdxG87sxGthQibwRTFOkYeOMqElFAcgNhGJCDfuRYFkCavCeissPZdkgC0?=
- =?us-ascii?Q?QHuKreiw1gFlB7zwa5Fzan5xopOkLQJYrFA9gZSyL+nUQ1QDkcIln2XertBl?=
- =?us-ascii?Q?+yByKgqLiqSvjVXBVO1g8rjjQav0DSt3VK+9Jz9IuZxeFi/xBzn2l4S1w2rc?=
- =?us-ascii?Q?pefM1PaHhfNT6yzQiVEP9nzfbrqMToreHhaYWBT8SH2Ps1+d2qpsACl3spT9?=
- =?us-ascii?Q?x7g5Snj1X9d8Z+gJLPRxsrkmM/V9qeua6ATXuqYIMb94ZSJpqpUzK2+PrH0O?=
- =?us-ascii?Q?mvEAW6B9f11H9uQcZttwUbfHmejdvsL+Y701FwospvRZlwwNwuTrsvhTF+yh?=
- =?us-ascii?Q?+NiNruvbyfuRVZ02OnPnwL9gyCMjkSdJJ/5VIdsd+96/R4fMz/K5uHhtjLsa?=
- =?us-ascii?Q?n0ZfA5gpFuNRE1vN8tVCMYmzqJVHTya08whQlqUeHycEAGoVLRIUZHIY+WZw?=
- =?us-ascii?Q?WP9TU9sB0na2aI5JSUDNpMupStexB6qbdeHaR7t1ZKU9GIaqHSsnJoYYLvhv?=
- =?us-ascii?Q?ftyCbCI2WSOG4R7d9ELJ7zB58GzYRKIw62gV3vrtoItncol+tJhvzL+xOFvz?=
- =?us-ascii?Q?mmBug59aoOeWsBmfwiFYxR3VkeV7mwDw2PWvjnFENg7k33GmGt5i+hE/KYzU?=
- =?us-ascii?Q?1XvgbJfUU5GXgXEqsE6MFryaMdVkyhe4rOxAcTS1IqyLH3PTjDV9Uihkclkn?=
- =?us-ascii?Q?TVhF/8LHUFc7aM8+npErwofkjc6va/qwuq1bZaSjwmFZfIRHQmGy58SLKGf3?=
- =?us-ascii?Q?GvCVVMgw9rIRmxa4D62lrIo7BL1k9oJPiBRFpA/Y27xhr64QzF+vkA+JpOfJ?=
- =?us-ascii?Q?iplxXnp2fWx2/a87jyrYxZTVuCLdE9XUtGdwft3S1PzW5cTrso1zI/0N3GN7?=
- =?us-ascii?Q?Coaw4GZXt7DLYvtHpYga0c7cud6a04FlFGqiTK5wWPR0oDCL/Y9bxGSNLMiU?=
- =?us-ascii?Q?R2m1i4chJQOuVvw5mk/Wai/UPG2u8ZpYDglV8xdTY9PQaJ/SIhPqRpRDLG6/?=
- =?us-ascii?Q?lDL0qytBofUU2Ny/ImJlgauyRm0l50RyVC68xcB053HUUsoZUsSWLAI4iATX?=
- =?us-ascii?Q?U0aRrEJ18R8VFV3SVjS4O14JRbYMrIxFBpZSdv2PkJvIDbQN0E9r2SQ2gVvS?=
- =?us-ascii?Q?a9IeVq6VGcRrkMGHEqpe8l/8ti0tpNry0eFRQntWiFvptxMaY92y0RExIPFK?=
- =?us-ascii?Q?BrBC9cOVZ7VfixYcxr+C2TXsoXJI5uXOiMqXyfpzkLCFuQ7B2k3HkfHwIzmp?=
- =?us-ascii?Q?9WLavGkG+8wtCJgi8O/UeYmMjOz25MTo?=
+	=?us-ascii?Q?115xRxOH+0BBN0Oq9lfHwNGr0lV9vBdWpKuidaFfYSfzTi8KSDAhlS+CsqQJ?=
+ =?us-ascii?Q?WlHHn0tDsbvSsMxMdpQq4vhhMIbmkNl/sHeutxoC+hheFEV2jrpvwKPyVROx?=
+ =?us-ascii?Q?uQyxFcgJEbzEJ5eQhxk9YbiGzVaIHM4SIiaF6EfJWw3XkhR7G4SnJ12kmcB0?=
+ =?us-ascii?Q?dyk/sbjmUH4wmrWZzPka6arUr8G7nbzAR9Oxga45B1U9Fq7jIK/M04uBJmIT?=
+ =?us-ascii?Q?yQW9D5k/CVfjo+HuKrBRpU4k8RMWRxLPyfk0PZXhCpc1JzX2FijEndCLMV0j?=
+ =?us-ascii?Q?N+pnAuRuiYUgeeWld5sbdEb3CCdC9I9gVP000oeoowr2/ayRhf9WrGHlWD88?=
+ =?us-ascii?Q?xezgd1Qrb6Giwlfth4o/Ka5dg5ACZer5Ckox6nbT1nMA71OUpM0eUyupPnvQ?=
+ =?us-ascii?Q?hD7fWgwbW/45xZ+aaq/QIJR4RJppjEdKuxeN+Np34rWRvE4XYzdXIMTgx51q?=
+ =?us-ascii?Q?Iy0wi+IIixxZlwU6KczRbFIAB8U8rO4kJd0zSJoblHJMbCgkljYzxj5URQaJ?=
+ =?us-ascii?Q?k64A3jh583qo24opifb/wZfZU8HVWa6ynpTQgI/ax/EdkTPlAI8s301+YFmg?=
+ =?us-ascii?Q?xNReqHTKyE1dLgpHJGqn9TZqJInuO/ZA0nWu2rpo52tWw67oI7vlYdNBs0Px?=
+ =?us-ascii?Q?oDezcLJcIjcxkeBpFWm5VhmwZWIkvGBsvOlOjQ2Qg8179/GZVAS3ZnqI6grx?=
+ =?us-ascii?Q?ls8Zqj3xEnC4O2EBuEy5RRpUdDR9CMPtqNeADCtIb6nPpgg8oKkUHLHnqOi3?=
+ =?us-ascii?Q?yYXTDCNWuC2/Y7YagdtV9lyEVgLrF2WPse4ZT485pNaclRFcGPWJy4Zr7SKC?=
+ =?us-ascii?Q?1197lYJ3Ru98DYIGHYq2NyfzI5ATBFkVOuKLbAtq4BlxvlZ1htmH77fSWgJb?=
+ =?us-ascii?Q?l5gXE+8GuCKIZ8O+gLHJ0eOs8t4i3oVXvmVqaJl854hkw5CSGD566uE8ehVy?=
+ =?us-ascii?Q?q5WYNLzwpTNzgUEsBeJhsZ2NRUBNiibEvBIYM9ZPhcyhsnzUQUxWo3/sqc5w?=
+ =?us-ascii?Q?+iqmzN0qi37Jsvv5yIuB90h05mKiPhFA9MsowXmhiVRyMZD5SWYSNnV2Q76P?=
+ =?us-ascii?Q?Z7wBHqpw0WqDe76PedE2kMzR7cilaHq7NiMc8unOS7E/DIQIQwPpYBbDsIXG?=
+ =?us-ascii?Q?sFFhvwgtMMNIxKiM4VMhNGM8VTbN7aTYnkjRnb5Cs8K0FUVKiYscyGTVCM71?=
+ =?us-ascii?Q?nQ4ovcPaqHGte8ze05zqgbocj6+U0EOwnOV4jq4AfW8rocVR4skUYON+QAEN?=
+ =?us-ascii?Q?F4wdCfOYiVpUFSK+/zZ276Zn0OQcXBuBLURFNZVVsBz6B7qehr/BZz5uHLVY?=
+ =?us-ascii?Q?Bbza3IXnkDv9LA+vmvdKDIEmaNidYomM5J5l6+N/ZG6ONWZMrh0L3+TX6ijs?=
+ =?us-ascii?Q?2mxMY2MfPa+R1uAmYENIM0OBiGXoCNH3K8uye2bqV5S5onI02SG29pBW1nWG?=
+ =?us-ascii?Q?OPiYCqLv6uUo4rKh4WE6rshiJsHJDk42?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?HmDxbQl6Ewj0Mkuf763R10ziRtXFcOB+qukGFOA0cNy+zzqJkageK9Gwg42x?=
- =?us-ascii?Q?qLm0ynYft0+9tBC3ZjKu4k0CNdjRrZWx72lnIFt26ePkudRQNb6QYHVNugmI?=
- =?us-ascii?Q?MG/AMfB5F2WpoK4kxgCOTX56FzAUMsT/iEfRriWgGOCpvo47i00z8ALVygym?=
- =?us-ascii?Q?p/DJbsgSxzqQn/w/QjF8jmseq1B1k48/hTIbAgDzAuxa+1JicvaCtkMsrvF+?=
- =?us-ascii?Q?81HHQ+MZBOpftgC6wqHVrDKSG434qEDJK/7angwbVnV1fzqV2slUl0aR5C//?=
- =?us-ascii?Q?84eWZzMFzE3yzi4SJ0wrxfXQJPXYFO84iFIuirl34kcQ7dZDqQwPsu5g6eJZ?=
- =?us-ascii?Q?1P9F24JljfanEuiDGYOTvY+rfNDbAru04oHy+zR2rdY0Ixqbfg7HtzQFfXVJ?=
- =?us-ascii?Q?CRZtHx2lbGRoDnQHcF2n0Kid8BTpwZgo5Ame6LdNnzOFRMWekjshzeAd131i?=
- =?us-ascii?Q?I+TPVRhFDk3gsnE9iBZEKsFXX17avIm/Hdlc+trqMkm7HtMcYAuI1r23I3OP?=
- =?us-ascii?Q?bNquu3HuJlz6AWis0rMl/ZYxlbRgo4qWK+mUhnayvPeZiHjriq0lUWEr1zkH?=
- =?us-ascii?Q?bkw4Arx3QvFw4U55lvXLudfiMxATWO1GLsV8zyP1dYO3DnITrrE3Zll4sUVW?=
- =?us-ascii?Q?IvbGcrHZ2A6/J+CGxsTvIRHtgaaxL/p21bOnFS89OQXMhKjPM9cCo0j9MjuK?=
- =?us-ascii?Q?gsDH9bCJKUjGBodZbiwSoeYfs9KYsSwbIE4LY+FSAcVsCfLqUX9W/VojSsOD?=
- =?us-ascii?Q?+SCfqWMR2zFamZY7QixMJdgdykj4f1HTp4pL8qWx3djlvADV5oz6OZY5m3S9?=
- =?us-ascii?Q?mvCZ4QWBpHJdUVYklpq3REFvHG72eNloTkhkYEnXOhzwgRsUZEhUMUQB+7Bi?=
- =?us-ascii?Q?nhK0BRuXiAS6goaDoFreIEi1Z1sL93JJBLYNdCznQooEpJepnj8sl8RY90nb?=
- =?us-ascii?Q?3Dh+metCixPcB6rzEcro+7e5QMTMVYmvWg+LvzPQL+XpawRm5COu+YdV2D/N?=
- =?us-ascii?Q?0rMl6VsQ32wP1d9R18mV/JK0l9KgCHkEtmRXMzFQtdtyYPaZYCG4C9zYS1VU?=
- =?us-ascii?Q?PpgvJADAb5xN2ek224sXdXMRFc7PIlMDiQ3OJqYDW4zsDeOXpTtjo0dD7qpC?=
- =?us-ascii?Q?vFRbaLlCznzViWPLw8dbBFdZG8NcxkwtPWVnkUc+oxjFOguuKQPMgYZ/bQhZ?=
- =?us-ascii?Q?dKZUaEsdj6uC34F3FwWleb9YapxS43rZy6dXuRt2UWjvHI0DqnlEX56gCcdH?=
- =?us-ascii?Q?OGcv7RcvL67N4Uf4zQKNTkH6n89AIjzk3CKDCjnV9ABb9xlBsGlYu06IlhND?=
- =?us-ascii?Q?LJXfU5rQug/oUl5uPKGScqbqpJM2d/uMjOhkuoDiametRW2vMQ6j5GOgWR/+?=
- =?us-ascii?Q?ZGJyVXL3vZrJK8E3f4WcyQEbeSNHVkTaEYhK0Z+tfWl1xR5u1FL/V3+PcAQs?=
- =?us-ascii?Q?g5ARD5HryIXujjNc1kKpZfKKMO2gnVHiMiGWYQOWqfp3foT0mU637DifgG+J?=
- =?us-ascii?Q?RHk79OLRoZrCP9Teg6zQhvGYCJRCoQXsv80XwQ3Z73nJm6MTMAffZFaG3Wb8?=
- =?us-ascii?Q?y8ZCZyf2Ct9siIzrB1VlVicyVQwn6gDilSE/r/ybBGTquk5ACFc2uf+m3DuL?=
- =?us-ascii?Q?9gOcQPiCgIbWSimRDR/6zdiCUyG2thgdAixi7yWiykGOEK3h5IfB0GnPXQYt?=
- =?us-ascii?Q?R4LdwMUGo5rXysuyXVq0HLcOSUz1SVEgX/JTPFpD0229MsX/?=
+	=?us-ascii?Q?2ryRaM/gF/KXoVFwMjve6+4+vZE6Fxf7ij8n1e+CLZsD0Wzmwvw2ns0j/Hm9?=
+ =?us-ascii?Q?aw8jUikeeF2Sp4PfePCECjiKFrgtPM0/Q0Vhdfjsz6hRZnbhJL56X3Ipb5tx?=
+ =?us-ascii?Q?Z+SwYHYqvQ+32U5SaeGB91/1btg9sh6NfQp3tCgta1QqHWF8MHYwnG8HyT0V?=
+ =?us-ascii?Q?D2qa5IvmhuETyLui4xr6UbXzlSUdy6ahF9M7xiBwNJalifoy7rfLDmP0N6bb?=
+ =?us-ascii?Q?YTpCtrelwdTWAkRUvD57nL0LX42/8uA4KrZZTRMytTiw82pbqJRzxXKQRjau?=
+ =?us-ascii?Q?sjzfvIZacSIl+wyVB4drcgXLsh8RPGd/wSzKXF7sdNj89xvBAW9hp6coejms?=
+ =?us-ascii?Q?eT4z9pfjyi+soEchRl/SGPr2cZI0mbI9z+NRfvRPo7q1ONYaSRCMKCxzTvt+?=
+ =?us-ascii?Q?kqfyTu5FFB/JchfJ1GpAbGkfsZBHSCJ2mG5/FCdT998942PputQu+U6idh2S?=
+ =?us-ascii?Q?2oFh9KkuyIJ7fYsbb8f1cGsE3Dg4G6w6pF2wKFhyKndqWyZCJVTOa9kcIujd?=
+ =?us-ascii?Q?18HksEg/Qa5CqeHBrpj7jwpKrQaA6zvQGihV1ombJuP/bPy0fks/04F/4cg2?=
+ =?us-ascii?Q?SFLnNoo5lm579yZrw2HpY/7icKyOffAmkmUgEMzQEvHHLoZP08NcTQWkR+bM?=
+ =?us-ascii?Q?tUYTJdTAWIt4CSiczzQk3xKNPRV9uiFWitneKpHb6E0S/GcHs0EMsy1UhFM8?=
+ =?us-ascii?Q?VKmUlBJiaussAqx/6zCf6wwkCTxIPlvwBoCbfMoE++vSMV2HshAkYq3bvTHC?=
+ =?us-ascii?Q?1OPj76fcjxtbU+PbLvRSh30dJJjkVIBqnCek5i7HAilYSsssD6jmBPsKw5T5?=
+ =?us-ascii?Q?8PBzRlBpZSqrLCi7mZL2npxKglplEZSk+pTbkIQGYZPn5VrDKr9ZAVNbwOJ8?=
+ =?us-ascii?Q?ALKG5+Kri7TyrJuXDVt8qK3FOjcB/kyxp6ukmLx7EUZY9Hx4G0fp/HdUffCc?=
+ =?us-ascii?Q?H3rzAH45vnch8MdBr/IupEMxHGZRNDixg3BqGPbdiv/8Kv4mlvg7a1Z+Q4g3?=
+ =?us-ascii?Q?29J5fXtgJ5qbKrUIYxcNPY4uRgaG3N1yLbG36SzQv86xaCK5qsvYKyqcSCzm?=
+ =?us-ascii?Q?MaX9fQ2ncHRPvY0aRXF0x5P5o3e4sy3DlkpYDZCx6TARQv9Ro2hzFtYRAfVN?=
+ =?us-ascii?Q?rIJTTGpQHbc2Vsvw+GyOURzQUt1jOvDQn3Iwr2UMx/FUJRhExVbTSRPFAL+x?=
+ =?us-ascii?Q?e1tqLbQVedB7d68v4cxju0U+Y2k19ukzQVf4qzEf19T8h2FogcjOWkTr6IZ0?=
+ =?us-ascii?Q?MZErgR03pS9TJwxc4WjFXnYU1OGVgPsfLmMmF9R/0KeiMcjDmdsHEM3cJptr?=
+ =?us-ascii?Q?wyfjz0u7yE9ofGBqa7yWY1wfAuDj9V5cCisgSwWMQSDWWtLvLExM2pF26mzW?=
+ =?us-ascii?Q?FPwI+NBaLWRyA6dKK5L+DtDPELp6QM1pdQf0yx8Ij5uuNmJIa47dzNtXnWxU?=
+ =?us-ascii?Q?0TxZuExIwu39Pa0ZvhOhkQlmIpb5M7IgvEetMYyf6MhDrBi74NBlgA3cITDc?=
+ =?us-ascii?Q?F3fNe9FUoVp323zmBL9YfDiTP1m2XKf+R94o0G16SRYag61KThA8AXbgN8hx?=
+ =?us-ascii?Q?s1qua20Nfk5Ykia5uy15/P/ww9+Nay+4SMqvxu7zgHEaKRmzZ7ZfYEjVaJCG?=
+ =?us-ascii?Q?xbrbVXRF2R9XiqcgoXwFxYz+odTrHVs8n+GlXfHkzn+Z20BQI4oB0XmtpqaG?=
+ =?us-ascii?Q?KYBtbJGm/CXbV8DJ1MY605zHO6cUZ7UcjdLJyUeZ/+x9eU22?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eac0a830-cad5-4615-53ea-08de510a308e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1015de69-b01a-466b-0a97-08de510a36e8
 X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2026 12:08:54.0487
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2026 12:09:04.7034
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YiQRWouayERxlVRs15YruVMYHPErPc7oG6KC53g88FsMbBO+x/++z7n9ZEBmbOrxRAUEK4X8P/Jp2I5BjzDxcw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: KpRqhJs9XzISYEPAOCfRUrrD0Q/FZwjJtOkIUE3/IUVVYnEbaWwKZWPRzAqIqng1eMRXplq47AfO4kIGflyiLg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA5PPF0EB7D076B
 
-According to the test description, these tests fail because of a wrong
-nexthop device:
+The command in the test fails as expected because IPv6 forbids a nexthop
+device mismatch:
 
  # ./fib-onlink-tests.sh -v
  [...]
- COMMAND: ip ro add table 254 169.254.101.102/32 via 169.254.3.1 dev veth1 onlink
- Error: Nexthop has invalid gateway.
-
- TEST: Gateway resolves to wrong nexthop device            [ OK ]
- COMMAND: ip ro add table 1101 169.254.102.103/32 via 169.254.7.1 dev veth5 onlink
- Error: Nexthop has invalid gateway.
+ COMMAND: ip -6 ro add table 1101 2001:db8:102::103/128 via 2001:db8:701::64 dev veth5 onlink
+ Error: Nexthop has invalid gateway or device mismatch.
 
  TEST: Gateway resolves to wrong nexthop device - VRF      [ OK ]
  [...]
 
-But this is incorrect. They fail because the gateway addresses are local
-addresses:
+Where:
 
- # ip -4 address show
- [...]
- 28: veth3@if27: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000 link-netns peer_ns-Urqh3o
-     inet 169.254.3.1/24 scope global veth3
- [...]
- 32: veth7@if31: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master lisa state UP group default qlen 1000 link-netns peer_ns-Urqh3o
-     inet 169.254.7.1/24 scope global veth7
+ # ip route get 2001:db8:701::64 vrf lisa
+ 2001:db8:701::64 dev veth7 table 1101 proto kernel src 2001:db8:701::1 metric 256 pref medium
 
-Therefore, using a local address that matches the nexthop device fails
-as well:
+This is in contrast to IPv4 where a nexthop device mismatch is allowed
+when "onlink" is specified:
 
- # ip ro add table 254 169.254.101.102/32 via 169.254.3.1 dev veth3 onlink
- Error: Nexthop has invalid gateway.
-
-Using a gateway address with a "wrong" nexthop device is actually valid
-and allowed:
-
- # ip route get 169.254.1.2
- 169.254.1.2 dev veth1 src 169.254.1.1 uid 0
- # ip ro add table 254 169.254.101.102/32 via 169.254.1.2 dev veth3 onlink
+ # ip route get 169.254.7.2 vrf lisa
+ 169.254.7.2 dev veth7 table 1101 src 169.254.7.1 uid 0
+ # ip ro add table 1101 169.254.102.103/32 via 169.254.7.2 dev veth5 onlink
  # echo $?
  0
 
-Remove these tests given that their output is confusing and that the
-scenario that they are testing is already covered by other tests.
+Remove these tests in preparation for aligning IPv6 with IPv4 and
+allowing nexthop device mismatch when "onlink" is specified.
 
-A subsequent patch will add tests for the nexthop device mismatch
-scenario.
+A subsequent patch will add tests that verify that both address families
+allow a nexthop device mismatch with "onlink".
 
 Reviewed-by: Petr Machata <petrm@nvidia.com>
 Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 ---
- tools/testing/selftests/net/fib-onlink-tests.sh | 6 ------
- 1 file changed, 6 deletions(-)
+ tools/testing/selftests/net/fib-onlink-tests.sh | 7 -------
+ 1 file changed, 7 deletions(-)
 
 diff --git a/tools/testing/selftests/net/fib-onlink-tests.sh b/tools/testing/selftests/net/fib-onlink-tests.sh
-index ec2d6ceb1f08..1bb1c2289650 100755
+index 1bb1c2289650..63477be859e3 100755
 --- a/tools/testing/selftests/net/fib-onlink-tests.sh
 +++ b/tools/testing/selftests/net/fib-onlink-tests.sh
-@@ -315,12 +315,6 @@ invalid_onlink_ipv4()
- 		"Invalid gw - local unicast address, VRF"
+@@ -432,13 +432,6 @@ invalid_onlink_ipv6()
  
- 	run_ip 254 ${TEST_NET4[1]}.101 ${V4ADDRS[p1]} "" 2 "No nexthop device given"
+ 	run_ip6 254 ${TEST_NET6[1]}::101 ${V6ADDRS[p1]} "" 2 \
+ 		"No nexthop device given"
 -
--	run_ip 254 ${TEST_NET4[1]}.102 ${V4ADDRS[p3]} ${NETIFS[p1]} 2 \
--		"Gateway resolves to wrong nexthop device"
+-	# default VRF validation is done against LOCAL table
+-	# run_ip6 254 ${TEST_NET6[1]}::102 ${V6ADDRS[p3]/::[0-9]/::64} ${NETIFS[p1]} 2 \
+-	#	"Gateway resolves to wrong nexthop device"
 -
--	run_ip ${VRF_TABLE} ${TEST_NET4[2]}.103 ${V4ADDRS[p7]} ${NETIFS[p5]} 2 \
+-	run_ip6 ${VRF_TABLE} ${TEST_NET6[2]}::103 ${V6ADDRS[p7]/::[0-9]/::64} ${NETIFS[p5]} 2 \
 -		"Gateway resolves to wrong nexthop device - VRF"
  }
  
- ################################################################################
+ run_onlink_tests()
 -- 
 2.52.0
 
