@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-248806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4978CD0EE58
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 13:41:58 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8255D0EE6D
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 13:43:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 967243007D91
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 12:41:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B85B03007292
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 12:43:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5873E33C19E;
-	Sun, 11 Jan 2026 12:41:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A02B233C19E;
+	Sun, 11 Jan 2026 12:43:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SvQR+HyS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="irqv1iYh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C45514F70
-	for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 12:41:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1070D14F70
+	for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 12:43:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768135305; cv=none; b=UXRQHoVOwPwtlzDDo2E+W0VVD0fe8v3v9+Y6FuobwLd4Eivw07oZa1z86yOzZ/gz+6Z3m60nbQNaAq5oJsYus1hBUtVzcr3XK3OJ51/UFfMLORTIq2wf6PfaKNHXPOQ3gpKPzpsOhH48U2EUbQ0cIlHO5V+nxHe4M7FIL5mwi+Q=
+	t=1768135407; cv=none; b=Ld9dz+20BYRjG3x0B/VSWJtO8SkZZ8i1sVexzRDK5QdOIdnFXMUTkeGrIQOHqNdLkwINHtzsZ/PcSPr6AZiQoomYpu1CMSMwZN1qikaamH1PnFglz+6ZjAOzyVzCFT3lZZPHfoLA4r1hOlrntJPnNmkzoRi3/OgKlaRRUXqDdY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768135305; c=relaxed/simple;
-	bh=yfORz574U/QdIY8zj986fSTrqwSzgTLkdI+7BLEd3Tw=;
+	s=arc-20240116; t=1768135407; c=relaxed/simple;
+	bh=64j5Olm86lV96Y7gxVwqnbVRE2FvmaOZy7fmXNZGxlY=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ociJNXc2QeD7WNsOgsWdvKk1V4PA/IeWj1INa3acAe96ffHgehm+PmNCsrK9uEninpp4CLognEhrujrwcMLpyeV9LG1PLMwzNZ0aw/+Sty0doM6hwc79jMvFzp3bRBjyM7gp3X0Mb3vdw04ly/T0TUwQyb4Bj2uRp/h5V4nt3CE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SvQR+HyS; arc=none smtp.client-ip=209.85.128.50
+	 In-Reply-To:Content-Type; b=QbgRaansw9lUpkiofmfIln41X1Sv42oNXLTMVpMje1ggtOJeEZ8S4QiQLq9x9tuw1HOQu0WIY85p7MialitzBmvjnNsMptGviCSpyZRAHggC013EwsBFdYQ65k7NgfDPE3PtNXKFj/KwLa06dh61BheA/9YnKwKKVvPSM+DJoYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=irqv1iYh; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-47774d3536dso38131625e9.0
-        for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 04:41:43 -0800 (PST)
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-47796a837c7so38939475e9.0
+        for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 04:43:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768135302; x=1768740102; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1768135404; x=1768740204; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=UmzAhmHenjrYT+JoOzv/QCUdsbgbHQ35PpsPjgj4X/E=;
-        b=SvQR+HySACwgoaApMFd2e2QTHuXDZQegClMba/WP5Csa6aVFsJe/pgKzCArp5avHoB
-         hGVt7EUIzpFgU23SZzAfB5GQZyZk3PBnYg24ryGGCKdBe+QzWZfv7jhPbNt73+D5Q+4y
-         NYFVlYRBncNwvipOOuQKxuU+TRjEx/sVsfXvs52GLkrNmzhT1uFj0g+5skOmbiJq/qzX
-         LhfK969EQxDyUJAo2QR9PbkC6oJrZQ/jelr/xv7oj1UdDRv7Bw7i54vPbnx2dDxziVgf
-         Yx7q+SB2x51qS5rXxWKAB+NNC4i9uze+BlxA56PZLTNUSlIOzntDEvC6wzL4Fri1WOby
-         W7BA==
+        bh=BnELWpid4bhMNse/rPG4Hd0x2+fk0Z04tyfcZf33H10=;
+        b=irqv1iYh41VCSWO38zc5quZY/LYYerCVkXjMSmbL228GT3tgHmJlZbkZ7JwWFHBGYX
+         F6W1BI/WBemZZ+hlPD8lpxjQ2g6p9YCqLD3bta+ejaHrmudYWo1N3SDCq8NGW4DHFQSv
+         /dchqdB7FCiv9KdFq1cqFF/jQ6bDgCkGeuGtjOEQsUSOYyPOhPTNLJCkaeey/70+5PBl
+         pnn0s9Ve9g0M13Vfw6fnpvxJREfwG5gFOksQT3QpGPLZ4w/HsJcauPWrg70WA7TTxliS
+         2T/nRDlgyJbZc5WObYn5dlbxnlzGdAVU/DY9X2WF+crBi1LJ/VlbbwpP4m0Z0EW0X5Ze
+         n2aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768135302; x=1768740102;
+        d=1e100.net; s=20230601; t=1768135404; x=1768740204;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UmzAhmHenjrYT+JoOzv/QCUdsbgbHQ35PpsPjgj4X/E=;
-        b=mGGUuXxriQ+T+kLFT1pnbvXOWjLZ1k6kjcwMpLUJRYq+eJIpewWNBwFVmNTBeH+JL9
-         ckXhcrdHf13f15u+cXmxdHD+5Nfii6ux1LZfGLcJzv9va+AkH347/Y0APgKOAmRsb+YG
-         WSLWuYTlfbhs1RmmB52pvO6qIuwYAFdX5hQ34B9W9rUc/vrN5AbeMQEz2eSJ1q0W9T+F
-         xmByp9FdnppU/SbnsMeq7gXn+JikbxSULl1wKrBne0NKWZsM2A233bgyU7X6U43OEaVa
-         r8N3PnMgHMzuBvYFyveU/mFU3YgtUKi68OhH+gMLnTot+9krrk3r6+0z1gSiDgofqTie
-         CBww==
-X-Gm-Message-State: AOJu0Yw+UMyV3ZLNLMJq6FsPLFhiB/67h0DGPS35hIrSBooK5di/LMt6
-	J/Uk5EtsnR93fv+SZCE/2kba1Ukx3VKPc+iNx0+XGPzg4nsWU2wtZOCR
-X-Gm-Gg: AY/fxX63rIelGrYdka1tZz295fhCjptaQaowmu8SmWSFhPSAMfYbpxpZEk3aluuvIza
-	D1Pthr+Sqr7zG0OUYAYNa4BoYdgSzrG4Qx9aNkVuN/YHbDvIY4djOCxst+23v6ONtxt+5JNGWED
-	AbNTMou8CEEOAnkzyi5+E5yy5dkNwcpDRWFSwXLTHBUcybkAhaeF8ENFqdVv+Xvdxv9QukT/vTl
-	zPTjCkvtxw7e7MKz515+kEQMGpTcUXYL06jx2FtDO29E7rKHd5e+gbPTLzk4cHGXU2acXrL02c0
-	BhTfb0W9f3lPp8SRjUETK0d3mh5MNDwddArlIuYxut0rVliKjl9CfdIfpTIU/gVCgPxy5Gze7zV
-	JR5SaeF1+05ZnbWeAHjJnQ2eC9dS9HAwlcV+zNl7iYgA2MzC8iX6FI6GpnbXRWZhFlo8pPIzujC
-	zXj5ENO8i4eUeLJEkp/wv0noY2zho/EEC5oNJOFeeF+jPiY/B5UXSVyiihbWG3cpR8WkU2WnZDg
-	JSuqD/o2OwYEG2Y4ppTEO4Yq5uIA+Y+11gYFC4b84x3nq8xXIUaobTT5eg1WKqu
-X-Google-Smtp-Source: AGHT+IEJnv3UqFROfzTdiGk+Yia+03GyTCwkQV27SNGxc+20v7PiTTKfDMNR/uM8sxXDAst37Ralmg==
-X-Received: by 2002:a05:600c:3ba9:b0:477:9d88:2da6 with SMTP id 5b1f17b1804b1-47d847d0f30mr197917505e9.0.1768135301644;
-        Sun, 11 Jan 2026 04:41:41 -0800 (PST)
+        bh=BnELWpid4bhMNse/rPG4Hd0x2+fk0Z04tyfcZf33H10=;
+        b=Q8pwAORRE7I5ch0tLqFh+pJY047Z+Pg9g9FK9wAezj+k5prsRwWP3Lw4A0hvNck5er
+         +6XqxGp9Q3lGd4dHAlwzAeCHmtlO0MAGpNU0pUe+CSVWpzHEVjQa6a6onenxwBcZ9NWM
+         EKVT9oQAf6E0UsYc+tR2JGW+a9OwIEOJ7hNVT391sRyQmn/z5M2ltWlYXkBj0SOs5T5h
+         xKYIjDjrxMTbGVhZ/E+GuWL2Ulv+ZlbApKGdWkwr+2jh6mKM9c+vpX5FCqzwCjTMbRgP
+         uFs7a1G7lPsiUhacKtZEFsTtTgTosuOyzdNIP2pKqqYaaPQ76+nbBsxdnG1EZc9H93Hk
+         pXlw==
+X-Gm-Message-State: AOJu0YxycZrAkCxNpYw+HmZjlZ/EyDymKuHuEoOlcS4Cym6oxctrvdFQ
+	Ak8d85jHakbMHDhswAO98y05scVi/yjJj+07dlEiX3i545Vli49xK5UD
+X-Gm-Gg: AY/fxX4o2L79ZSGG1KRC6rc2mhl9vdlomoXudocAhM38qhV821JbHd8Sw8aksh1uCqF
+	vw0r5nGxKa9M9Ht8aC04ejCkQDuX/GRA9WqatFkhcEczm7eqnGPx21vwafpG9Hu2QVpKLzsoDVz
+	Nw/bLNz93Frm9lg23QBDBqDYUNFHzsf+yR7hZpupR0RjnqAQwDUq/4iRsEmKzxVI2qz8buBjBpV
+	V7xD4Xuu+7vJi6hZ26c+GllQRjOWMdM7YpiaK9IubaPF/JfJuS6lDxOjPQZSI69kci0vT0uiQA+
+	X5rnJyi9njGhDVwtzLsttrST77X8sNKvqOx6iAWSBvNlUUDasQPNk2up74yWqEAfcTEzq2V12Ml
+	vD5qjtwnyDtDn7Bsls1lcPvPTyvfP9WmFqHRVGQzIVej5F4J8uljlAwSZDeGbiMz4yY9K8qqHlO
+	Oc1aaoCXYQvghDrLJqt/+sNQr4qH2H48UrU/COlnwuR/VH673kqzzyUD1+UqYkEq/utI6HgN37j
+	KnB9L70LsvD8+bxvV4aMj+hoWwOh1AEPD/jermZHyIrpZ8mMbrYLQ==
+X-Google-Smtp-Source: AGHT+IEAi2oJbnwY96D8SZhZKSAAJuYsFbeMrlMhQPeDY7sUMGEmaFU8UQZOFTUi8cB4neD86HJIow==
+X-Received: by 2002:a05:600c:a015:b0:479:1348:c61e with SMTP id 5b1f17b1804b1-47d84b54c82mr129491775e9.20.1768135404271;
+        Sun, 11 Jan 2026 04:43:24 -0800 (PST)
 Received: from ?IPV6:2003:ea:8f47:8300:6996:b28c:496c:1292? (p200300ea8f4783006996b28c496c1292.dip0.t-ipconnect.de. [2003:ea:8f47:8300:6996:b28c:496c:1292])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47ecf6a5466sm18242265e9.11.2026.01.11.04.41.40
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f7053f5sm297995795e9.14.2026.01.11.04.43.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 11 Jan 2026 04:41:41 -0800 (PST)
-Message-ID: <8610d30c-eac7-4100-9008-d3b6cee6a5cd@gmail.com>
-Date: Sun, 11 Jan 2026 13:41:39 +0100
+        Sun, 11 Jan 2026 04:43:23 -0800 (PST)
+Message-ID: <d4614463-d532-41fc-92e9-ef97107aceb5@gmail.com>
+Date: Sun, 11 Jan 2026 13:43:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,8 +81,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v2 1/2] net: phy: fixed_phy: replace list of fixed
- PHYs with static array
+Subject: [PATCH net-next v2 2/2] net: phy: fixed_phy: replace IDA with a
+ bitmap
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
  Russell King - ARM Linux <linux@armlinux.org.uk>,
@@ -95,151 +95,88 @@ In-Reply-To: <110f676d-727c-4575-abe4-e383f98fc38f@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Due to max 32 PHY addresses being available per mii bus, using a list
-can't support more fixed PHY's. And there's no known use case for as
-much as 32 fixed PHY's on a system. 8 should be plenty of fixed PHY's,
-so use an array of that size instead of a list. This allows to
-significantly reduce the code size and complexity.
+Size of array fmb_fixed_phys is small, so we can use a simple bitmap
+instead of an IDA to manage dynamic allocation of fixed PHY's.
+find_first_zero_bit() isn't atomic, so we need the loop to rule out
+double allocation of a PHY address.
 
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/phy/fixed_phy.c | 69 +++++++++----------------------------
- 1 file changed, 17 insertions(+), 52 deletions(-)
+v2:
+- patch added
+---
+ drivers/net/phy/fixed_phy.c | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/net/phy/fixed_phy.c b/drivers/net/phy/fixed_phy.c
-index 50684271f81..7d6078d1570 100644
+index 7d6078d1570..0b83fb30a54 100644
 --- a/drivers/net/phy/fixed_phy.c
 +++ b/drivers/net/phy/fixed_phy.c
-@@ -10,7 +10,6 @@
- 
- #include <linux/kernel.h>
- #include <linux/module.h>
--#include <linux/list.h>
- #include <linux/mii.h>
- #include <linux/phy.h>
- #include <linux/phy_fixed.h>
-@@ -22,27 +21,24 @@
+@@ -16,7 +16,6 @@
+ #include <linux/err.h>
+ #include <linux/slab.h>
+ #include <linux/of.h>
+-#include <linux/idr.h>
+ #include <linux/netdevice.h>
  
  #include "swphy.h"
- 
-+/* The DSA loop driver may allocate 4 fixed PHY's, and 4 additional
-+ * fixed PHY's for a system should be sufficient.
-+ */
-+#define NUM_FP	8
-+
- struct fixed_phy {
--	int addr;
- 	struct phy_device *phydev;
- 	struct fixed_phy_status status;
+@@ -32,13 +31,13 @@ struct fixed_phy {
  	int (*link_update)(struct net_device *, struct fixed_phy_status *);
--	struct list_head node;
  };
  
-+static struct fixed_phy fmb_fixed_phys[NUM_FP];
++static DECLARE_BITMAP(fixed_phy_ids, NUM_FP);
+ static struct fixed_phy fmb_fixed_phys[NUM_FP];
  static struct mii_bus *fmb_mii_bus;
--static LIST_HEAD(fmb_phys);
-+static DEFINE_IDA(phy_fixed_ida);
+-static DEFINE_IDA(phy_fixed_ida);
  
  static struct fixed_phy *fixed_phy_find(int addr)
  {
--	struct fixed_phy *fp;
--
--	list_for_each_entry(fp, &fmb_phys, node) {
--		if (fp->addr == addr)
--			return fp;
--	}
--
--	return NULL;
-+	return ida_exists(&phy_fixed_ida, addr) ? fmb_fixed_phys + addr : NULL;
+-	return ida_exists(&phy_fixed_ida, addr) ? fmb_fixed_phys + addr : NULL;
++	return test_bit(addr, fixed_phy_ids) ? fmb_fixed_phys + addr : NULL;
  }
  
  int fixed_phy_change_carrier(struct net_device *dev, bool new_carrier)
-@@ -108,31 +104,6 @@ int fixed_phy_set_link_update(struct phy_device *phydev,
- }
- EXPORT_SYMBOL_GPL(fixed_phy_set_link_update);
- 
--static int __fixed_phy_add(int phy_addr,
--			   const struct fixed_phy_status *status)
--{
--	struct fixed_phy *fp;
--	int ret;
--
--	ret = swphy_validate_state(status);
--	if (ret < 0)
--		return ret;
--
--	fp = kzalloc(sizeof(*fp), GFP_KERNEL);
--	if (!fp)
--		return -ENOMEM;
--
--	fp->addr = phy_addr;
--	fp->status = *status;
--	fp->status.link = true;
--
--	list_add_tail(&fp->node, &fmb_phys);
--
--	return 0;
--}
--
--static DEFINE_IDA(phy_fixed_ida);
--
- static void fixed_phy_del(int phy_addr)
- {
- 	struct fixed_phy *fp;
-@@ -141,8 +112,7 @@ static void fixed_phy_del(int phy_addr)
- 	if (!fp)
+@@ -113,7 +112,20 @@ static void fixed_phy_del(int phy_addr)
  		return;
  
--	list_del(&fp->node);
--	kfree(fp);
-+	memset(fp, 0, sizeof(*fp));
- 	ida_free(&phy_fixed_ida, phy_addr);
+ 	memset(fp, 0, sizeof(*fp));
+-	ida_free(&phy_fixed_ida, phy_addr);
++	clear_bit(phy_addr, fixed_phy_ids);
++}
++
++static int fixed_phy_get_free_addr(void)
++{
++	int addr;
++
++	do {
++		addr = find_first_zero_bit(fixed_phy_ids, NUM_FP);
++		if (addr == NUM_FP)
++			return -ENOSPC;
++	} while (test_and_set_bit(addr, fixed_phy_ids));
++
++	return addr;
  }
  
-@@ -153,19 +123,20 @@ struct phy_device *fixed_phy_register(const struct fixed_phy_status *status,
- 	int phy_addr;
- 	int ret;
- 
-+	ret = swphy_validate_state(status);
-+	if (ret < 0)
-+		return ERR_PTR(ret);
-+
- 	if (!fmb_mii_bus || fmb_mii_bus->state != MDIOBUS_REGISTERED)
+ struct phy_device *fixed_phy_register(const struct fixed_phy_status *status,
+@@ -131,7 +143,7 @@ struct phy_device *fixed_phy_register(const struct fixed_phy_status *status,
  		return ERR_PTR(-EPROBE_DEFER);
  
--	/* Get the next available PHY address, up to PHY_MAX_ADDR */
--	phy_addr = ida_alloc_max(&phy_fixed_ida, PHY_MAX_ADDR - 1, GFP_KERNEL);
-+	/* Get the next available PHY address, up to NUM_FP */
-+	phy_addr = ida_alloc_max(&phy_fixed_ida, NUM_FP - 1, GFP_KERNEL);
+ 	/* Get the next available PHY address, up to NUM_FP */
+-	phy_addr = ida_alloc_max(&phy_fixed_ida, NUM_FP - 1, GFP_KERNEL);
++	phy_addr = fixed_phy_get_free_addr();
  	if (phy_addr < 0)
  		return ERR_PTR(phy_addr);
  
--	ret = __fixed_phy_add(phy_addr, status);
--	if (ret < 0) {
--		ida_free(&phy_fixed_ida, phy_addr);
--		return ERR_PTR(ret);
--	}
-+	fmb_fixed_phys[phy_addr].status = *status;
-+	fmb_fixed_phys[phy_addr].status.link = true;
- 
- 	phy = get_phy_device(fmb_mii_bus, phy_addr, false);
- 	if (IS_ERR(phy)) {
-@@ -237,15 +208,9 @@ module_init(fixed_mdio_bus_init);
- 
- static void __exit fixed_mdio_bus_exit(void)
+@@ -210,8 +222,6 @@ static void __exit fixed_mdio_bus_exit(void)
  {
--	struct fixed_phy *fp, *tmp;
--
  	mdiobus_unregister(fmb_mii_bus);
  	mdiobus_free(fmb_mii_bus);
- 
--	list_for_each_entry_safe(fp, tmp, &fmb_phys, node) {
--		list_del(&fp->node);
--		kfree(fp);
--	}
- 	ida_destroy(&phy_fixed_ida);
+-
+-	ida_destroy(&phy_fixed_ida);
  }
  module_exit(fixed_mdio_bus_exit);
+ 
 -- 
 2.52.0
 
