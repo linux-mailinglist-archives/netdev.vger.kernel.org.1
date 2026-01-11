@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-248818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6304BD0F247
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 15:42:34 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B0C1D0F26B
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 15:42:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EFA3F300E7D5
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 14:42:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A0CE8301D94C
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 14:42:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAD40349AF0;
-	Sun, 11 Jan 2026 14:42:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CCE2349AF3;
+	Sun, 11 Jan 2026 14:42:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="c77L/krc"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="l107AcbN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 632A9348880
-	for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 14:42:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 399A8346AC8
+	for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 14:42:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768142549; cv=none; b=hDZ9phnMnVpUpv4IpoMOlxswGI67Urv4XMcwDnElCmVO3ErFq7SJkRTWSkTz6hge5yzNYzd090zEbtIKyypLSTJXuV5CM93YGnXXfM8W6XD5Pz+2NdurPvSvn9xv4OunSkbXCD2OibQ1yMh//zqJ7qZPDWaiE7JUJa8RP9IZ8aY=
+	t=1768142565; cv=none; b=Ft/DZu4dslyIfLowdxTMkMKQleRsY1JhqNCCu+4ocSjbaMOmYlZM5GVugC6OnL/NbUT6anGtD7m4sqV/ZwGn2s7E45iy+W+VQQw3l4KAxo5c6GhAcaiZmMPOqElF1Jg2n4/Szl22fDLa0ag68/d24Q9suUTgXg9xsMMpluCiIMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768142549; c=relaxed/simple;
-	bh=nwibogWEaRHQR0G0uXO7BApOaM+RxcF4pitpiLWDTZg=;
+	s=arc-20240116; t=1768142565; c=relaxed/simple;
+	bh=r3/sjCZcn12IuIXnTNYHXq/ljVnoUjX3EA+fjUfOI3Q=;
 	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=rhED17Pt3guCJ5Zx3o+/9n98KDksUtNPoKHmkWMEj2+3dVahQsMta2ton5MUc9oPcPQctl+K60fyY0bhfo+S9/tci90mE52Pye+RdQJy5BstbrXR9HEmmJ5Z/kpLIHqgE6W8Ki5x2rIBCUOrZ3OkEx6tQ2xJExFM/T+1arQaGoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=c77L/krc; arc=none smtp.client-ip=209.85.208.45
+	 In-Reply-To:Content-Type; b=LEE/IDZFuX69D7yTrmcY7mRpbnvQ4CNpwctwshEGaptjTecjKJS3mOaBXmwZAiPLVEfehjhFwpQ+hMGhz12kqx48Xut1rC7AZmUKhoBunEMNWMVnnwF8I9GNm6NRjikX0mZimlx71uN/445p/9VFwjc/vbTs2UBX3sp/dJGLiYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=l107AcbN; arc=none smtp.client-ip=209.85.208.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-64b4b35c812so9118731a12.0
-        for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 06:42:27 -0800 (PST)
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-64b9230f564so7978293a12.1
+        for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 06:42:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1768142546; x=1768747346; darn=vger.kernel.org;
+        d=tuxon.dev; s=google; t=1768142562; x=1768747362; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=MkabSAxRfLn0dHpHfPolIqVil9ZYQkOUo+uqCMKmtA0=;
-        b=c77L/krcX+Mfr24+FUl4++gD6P5i5AGxy0m+b1eI91GhsDm0sayjulKachXmaIlYnj
-         wCOILRVKwoNMqwNVxiWqRG/2EpusMOG+6mI5UGjqQhrvQX/0x8TiI6/sD/LxA6Hib49A
-         w1bH1nFUZyZHE7gn2ZaU+W23FBJAHpOkkENkXq3dyjTbNfVtcnT0ibchItmEiZ1Np1qd
-         rc0qk+dTF5Uvu980fQlLsCVoritMg6f6VP48BGlFIXsO11MCq0nYJAdrEc8pu+EFAWms
-         a9jgZUFbr9W0Mz4E+TgG2PBR7kf7gSyNi/WRoJKvSsndQ8k0T0kWq1Tnsly+JbkLGMdO
-         RD9A==
+        bh=G/KcOMY2Aiby4Ym2c9/9bLw/G2mVDeqsJ5KVEAaYuIM=;
+        b=l107AcbNznzRzuNtn2TbxkYQlhR6Da9D0PeoZ7sVNzp9wAV5yVHDFfgDXtNcse8JtP
+         1DmmAfeZqqOcYFTSenS6cILajX5b6RgXX6HIhmIY3UZg5aJbo1JdFeC80Cv5hvn3bc/j
+         KKvki4OvEDKaJ9Fj86eywK4bKJI3rT+mJc+W0fyaHWSjZlsmYrrYq/9nELRLzTNYMz8o
+         6P1n1ZpvhhJDtfSLkMqCU6tFwKyfICSvVpovW3EKjYdzLfS1yWeDeZCGMKox7umDzxa/
+         PmGX3iy4E8hkGBE0MJQGizSmXp2IAvi9VaWoFC5Y6NGSSlZKyu7zWYQjhjJS6J8/dfWu
+         Ev4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768142546; x=1768747346;
+        d=1e100.net; s=20230601; t=1768142562; x=1768747362;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MkabSAxRfLn0dHpHfPolIqVil9ZYQkOUo+uqCMKmtA0=;
-        b=i5YY8oZ5mXlwoGhsDKkV8yfmi7bBt23m9AXqGivJFR3yjT5kv99xQVIwcwgjZGZU3y
-         mnmqt1rWS/xDqpt8VE5XuuXe/PS2+J173PeT+tTdmP9NBDJkf3OalyQ+nx6xiP1siikS
-         fve2kmZruwcwDViN8a1Ov0qSfEQy/FHqmtk/tkPs4oMBPvljP5nE6uQIX3lw2XtF+LpU
-         dk+83g1RyXuENpRZ3cWbzMFuTcwhWIgTIl8j/4W2hRM2QXKR+RD2QAPUmzGv4HUlR68C
-         84mfmcJX8SjmQFnFU1qUFu9dZ9D22wD8hCaSvxrL/tCNnUvvyrKnnj8yXR8V0NR8TZLP
-         8PBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWD1RLfOkDdNWox++D3CcBWll+yhRBuOaD+hvtCsC7lyRXQcd6EGI/eC2yA2kcib3WiOHaufHc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFwsNUK7IYv6bFUPQKJLKhp5+URykjwn4GyLXaTNUkxO62473Z
-	OHIh7al6+ghGPxCa+IKDwUUJuza4nZZyie9433B6KDSigudkoJE1FWaZMfeMrxgg8IM=
-X-Gm-Gg: AY/fxX4TUHxGFQgtNCz+2MwOW5AC7Cam57bDSGQmP62icodToiYw1VLY4UPBOEzP74w
-	g5oXhrFVUay2ACrst67TCnu6p0z8y8XBBnWZs0OxFWDyhQPOJsxBhZW1l5KfrlJxeYNQaS1vsnG
-	NK2Ec3T46F1AWbRX53RRoEdoGQhVxVzsRmKv4xSqUYlp/jjqC2eNwCs1bgFJ1kXRve9fcYy0Rjx
-	W1IWX9j8nOyraubs8r5K4/Wk0+OpRbGDERimyKB909LBWnVpODCHeCYiRUn5m4dFDGsIt4TqIBH
-	Yynb584FFSqsqNS/Wkn7k0HWdZFiMTu3xN0tkmN0Hj4qtgYqyAKztfHSlYswuvwv/E/na8a5KFg
-	MPdbyrf615qzO8eZa9ggezQHNghCkrDmklPfIvFFcQ1d9HUqYkrzCrSikdHdzNJo0h78lYJ06LT
-	ban0WqMtDaBitIkdkzdM3rARyiY9yBL2Z6Mw==
-X-Google-Smtp-Source: AGHT+IFonU/ClDvId9huEtx8OVZbpqDSrZa3cVBTJbulbnKxAZxCbWxaUM02TgbsxBJ1Mah6guhUAA==
-X-Received: by 2002:a05:6402:1469:b0:641:8a92:9334 with SMTP id 4fb4d7f45d1cf-65097dceb25mr14589135a12.6.1768142545311;
-        Sun, 11 Jan 2026 06:42:25 -0800 (PST)
+        bh=G/KcOMY2Aiby4Ym2c9/9bLw/G2mVDeqsJ5KVEAaYuIM=;
+        b=LmHucsxC9K4Fqwn3mwjsefl4gc5Vv+VP2M7HA0PJj24poRAYjoVcXUVTkpCTXR12CU
+         IssHlK1MsB5LFvHPgofRdIppLRHzvTdwbaN7X80Y7ewjyTYZ1JocgvyF1KdzD0TCpCw1
+         tC7YuBROKfw2OuInuWUVyyF9SnuXkOctsDWXo6plnsdtIMx2heBnzA7gt3Gd0QwRSR94
+         veXXVtDHec23CCYsqPS/c0OGlqZgAkg+BGQc7eakqwajqpiLDqummiduk1QCBsT+RQc2
+         WoogPs7//LgzLV8lfsx7tv8M+epLjE1ymJeGDByxRwtHsh4BV+RTUTT2JQp4XdXuuFXz
+         XiVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX2bet1/4tJ/rrXs5usCqADsBzXtm17OtRVhR7nEsY6BACjnEThk9XBx9NBJYoG0bLo2ZqKLcs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxheJe602US61aoaArl3dE4PTal8WWgbKSME5tqwW9GqKXGwvFP
+	IRtWv1v+1NdHtZp407aeMVRvYbAXF95/DuhM1mK1+JKwtVdtQ5uzMfdaWMb93FTL7mQ=
+X-Gm-Gg: AY/fxX5iA0u8ZrODDJl4H9EtOQr0ivYbJ3qGg9734s+PNlkVTXzKSkZ3JzAa2i/d7GC
+	orHrXohef0+5Xd1uoW5jgsHTrlHZ1Nvom+w23rTJJhn95VSyFCs2dUf6gOyXGx9gZ9q6ufOt+55
+	79TsURuJguOCCRs/T7BaY6QBgqwdPw6TvcZr1xIO3yzjABQiBuLUlphg4T82pair2iAlGoclYRC
+	sVmOQyTj5Plv9XhfxsBYneWKdZ/wPwlmTuusx1LnzVKu8zbGzd0czHNgJTqAPfp3Yi4166xOnWE
+	f1SpwKy7Y4KFniBQKkYPFTCzsM6BlBKsUe3nakONfB6ZxuSC+yM8ONjFclrnmjqRV8jO8ljYxVx
+	9JRqSK7bXfVas2LzrQkIW1x/pTeDwQF0BPmkgmxc6Y/ycKyV6YT0hk/AoWDh1TLfns6atSH8CzS
+	9kJNtAqMZUbJywo01OCgig75U=
+X-Google-Smtp-Source: AGHT+IE39UCsqaKXvD3F+fxNGt3UWpgz3o9+Q+iDczrztF9S6FJS6cHaS0zXDwLhDt1npYxNq43EAw==
+X-Received: by 2002:a05:6402:26d1:b0:64b:5f4e:9e6d with SMTP id 4fb4d7f45d1cf-65097e50c56mr13973823a12.18.1768142561550;
+        Sun, 11 Jan 2026 06:42:41 -0800 (PST)
 Received: from [10.216.106.246] ([213.233.110.57])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6507be658b3sm14914417a12.18.2026.01.11.06.42.19
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6507be642f5sm14853659a12.20.2026.01.11.06.42.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 11 Jan 2026 06:42:24 -0800 (PST)
-Message-ID: <2cdac084-4924-4ca2-85d6-2e6d9bf284aa@tuxon.dev>
-Date: Sun, 11 Jan 2026 16:42:18 +0200
+        Sun, 11 Jan 2026 06:42:41 -0800 (PST)
+Message-ID: <858ca139-61c5-45e3-a2c9-d0af414e3592@tuxon.dev>
+Date: Sun, 11 Jan 2026 16:42:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,8 +82,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: claudiu beznea <claudiu.beznea@tuxon.dev>
-Subject: Re: [PATCH v4 12/15] arm64: dts: microchip: add LAN969x clock header
- file
+Subject: Re: [PATCH v4 15/15] arm64: dts: microchip: add EV23X71A board
 To: Robert Marko <robert.marko@sartura.hr>, robh@kernel.org,
  krzk+dt@kernel.org, conor+dt@kernel.org, nicolas.ferre@microchip.com,
  alexandre.belloni@bootlin.com, herbert@gondor.apana.org.au,
@@ -101,62 +100,148 @@ To: Robert Marko <robert.marko@sartura.hr>, robh@kernel.org,
  linux-serial@vger.kernel.org, linux-usb@vger.kernel.org
 Cc: luka.perkov@sartura.hr
 References: <20251229184004.571837-1-robert.marko@sartura.hr>
- <20251229184004.571837-13-robert.marko@sartura.hr>
+ <20251229184004.571837-16-robert.marko@sartura.hr>
 Content-Language: en-US
-In-Reply-To: <20251229184004.571837-13-robert.marko@sartura.hr>
+In-Reply-To: <20251229184004.571837-16-robert.marko@sartura.hr>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-
+Hi, Robert,
 
 On 12/29/25 20:37, Robert Marko wrote:
-> LAN969x uses hardware clock indexes, so document theses in a header to make
-> them humanly readable.
+> Microchip EV23X71A is an LAN9696 based evaluation board.
 > 
 > Signed-off-by: Robert Marko <robert.marko@sartura.hr>
 > ---
-> Changes in v4:
-> * Move clock indexes from dt-bindings to a DTS header
-> 
 > Changes in v2:
-> * Rename file to microchip,lan9691.h
+> * Split from SoC DTSI commit
+> * Apply DTS coding style
+> * Enclose array in i2c-mux
+> * Alphanumericaly sort nodes
+> * Change management port mode to RGMII-ID
 > 
->   arch/arm64/boot/dts/microchip/clk-lan9691.h | 24 +++++++++++++++++++++
->   1 file changed, 24 insertions(+)
->   create mode 100644 arch/arm64/boot/dts/microchip/clk-lan9691.h
+>   arch/arm64/boot/dts/microchip/Makefile        |   1 +
+>   .../boot/dts/microchip/lan9696-ev23x71a.dts   | 757 ++++++++++++++++++
+>   2 files changed, 758 insertions(+)
+>   create mode 100644 arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dts
 > 
-> diff --git a/arch/arm64/boot/dts/microchip/clk-lan9691.h b/arch/arm64/boot/dts/microchip/clk-lan9691.h
+> diff --git a/arch/arm64/boot/dts/microchip/Makefile b/arch/arm64/boot/dts/microchip/Makefile
+> index c6e0313eea0f..09d16fc1ce9a 100644
+> --- a/arch/arm64/boot/dts/microchip/Makefile
+> +++ b/arch/arm64/boot/dts/microchip/Makefile
+> @@ -1,4 +1,5 @@
+>   # SPDX-License-Identifier: GPL-2.0
+> +dtb-$(CONFIG_ARCH_LAN969X) += lan9696-ev23x71a.dtb
+>   dtb-$(CONFIG_ARCH_SPARX5) += sparx5_pcb125.dtb
+>   dtb-$(CONFIG_ARCH_SPARX5) += sparx5_pcb134.dtb sparx5_pcb134_emmc.dtb
+>   dtb-$(CONFIG_ARCH_SPARX5) += sparx5_pcb135.dtb sparx5_pcb135_emmc.dtb
+> diff --git a/arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dts b/arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dts
 > new file mode 100644
-> index 000000000000..f0006a603747
+> index 000000000000..435df455b078
 > --- /dev/null
-> +++ b/arch/arm64/boot/dts/microchip/clk-lan9691.h
-> @@ -0,0 +1,24 @@
-> +/* SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause) */
+> +++ b/arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dts
 
-Shouldn't this use the same license as the dtsi including it?
+[ ...]
+
+> +&gpio {
+> +	emmc_sd_pins: emmc-sd-pins {
+> +		/* eMMC_SD - CMD, CLK, D0, D1, D2, D3, D4, D5, D6, D7, RSTN */
+> +		pins = "GPIO_14", "GPIO_15", "GPIO_16", "GPIO_17",
+> +		       "GPIO_18", "GPIO_19", "GPIO_20", "GPIO_21",
+> +		       "GPIO_22", "GPIO_23", "GPIO_24";
+> +		function = "emmc_sd";
+> +	};
+> +
+> +	fan_pins: fan-pins {
+> +		pins = "GPIO_25", "GPIO_26";
+> +		function = "fan";
+> +	};
+> +
+> +	fc0_pins: fc0-pins {
+> +		pins = "GPIO_3", "GPIO_4";
+> +		function = "fc";
+> +	};
+> +
+> +	fc2_pins: fc2-pins {
+> +		pins = "GPIO_64", "GPIO_65", "GPIO_66";
+> +		function = "fc";
+> +	};
+> +
+> +	fc3_pins: fc3-pins {
+> +		pins = "GPIO_55", "GPIO_56";
+> +		function = "fc";
+> +	};
+> +
+> +	mdio_pins: mdio-pins {
+> +		pins = "GPIO_9", "GPIO_10";
+> +		function = "miim";
+> +	};
+> +
+> +	mdio_irq_pins: mdio-irq-pins {
+> +		pins = "GPIO_11";
+> +		function = "miim_irq";
+> +	};
+> +
+> +	sgpio_pins: sgpio-pins {
+> +		/* SCK, D0, D1, LD */
+> +		pins = "GPIO_5", "GPIO_6", "GPIO_7", "GPIO_8";
+> +		function = "sgpio_a";
+> +	};
+> +
+> +	usb_ulpi_pins: usb-ulpi-pins {
+> +		pins = "GPIO_30", "GPIO_31", "GPIO_32", "GPIO_33",
+> +		       "GPIO_34", "GPIO_35", "GPIO_36", "GPIO_37",
+> +		       "GPIO_38", "GPIO_39", "GPIO_40", "GPIO_41";
+> +		function = "usb_ulpi";
+> +	};
+> +
+> +	usb_rst_pins: usb-rst-pins {
+> +		pins = "GPIO_12";
+> +		function = "usb2phy_rst";
+> +	};
+> +
+> +	usb_over_pins: usb-over-pins {
+> +		pins = "GPIO_13";
+> +		function = "usb_over_detect";
+> +	};
+> +
+> +	usb_power_pins: usb-power-pins {
+> +		pins = "GPIO_1";
+> +		function = "usb_power";
+> +	};
+> +
+> +	ptp_out_pins: ptp-out-pins {
+> +		pins = "GPIO_58";
+> +		function = "ptpsync_4";
+> +	};
+
+Could you please move this one upper to have all the entries in the gpio 
+container alphanumerically sorted?
 
 > +
-> +#ifndef _DTS_CLK_LAN9691_H
-> +#define _DTS_CLK_LAN9691_H
-> +
-> +#define GCK_ID_QSPI0		0
-> +#define GCK_ID_QSPI2		1
-> +#define GCK_ID_SDMMC0		2
-> +#define GCK_ID_SDMMC1		3
-> +#define GCK_ID_MCAN0		4
-> +#define GCK_ID_MCAN1		5
-> +#define GCK_ID_FLEXCOM0		6
-> +#define GCK_ID_FLEXCOM1		7
-> +#define GCK_ID_FLEXCOM2		8
-> +#define GCK_ID_FLEXCOM3		9
-> +#define GCK_ID_TIMER		10
-> +#define GCK_ID_USB_REFCLK	11
-> +
-> +/* Gate clocks */
-> +#define GCK_GATE_USB_DRD	12
-> +#define GCK_GATE_MCRAMC		13
-> +#define GCK_GATE_HMATRIX	14
-> +
-> +#endif
+> +	ptp_ext_pins: ptp-ext-pins {
+> +		pins = "GPIO_59";
+> +		function = "ptpsync_5";
+> +	};
+
+Same here.
+
+[ ...]
+
+> +		port29: port@29 {
+> +			reg = <29>;
+> +			phys = <&serdes 11>;
+> +			phy-handle = <&phy3>;
+> +			phy-mode = "rgmii-id";
+> +			microchip,bandwidth = <1000>;
+
+There are some questions around this node from Andrew in v1 of this series, 
+which I don't see an answer for in any of the following versions. Could you 
+please clarify?
+
+The rest looks good to me.
+
+Thank you,
+Claudiu
 
 
