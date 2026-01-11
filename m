@@ -1,203 +1,157 @@
-Return-Path: <netdev+bounces-248795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 297BBD0EA56
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 12:00:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E882AD0EB7C
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 12:39:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4AF5F30263C8
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 11:00:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9EDF3300C5D5
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 11:39:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 231FF332EC9;
-	Sun, 11 Jan 2026 11:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6826323406;
+	Sun, 11 Jan 2026 11:39:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="e0RSaExe"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="LOsQb0YE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC2C0336EC6;
-	Sun, 11 Jan 2026 11:00:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F7B721FF48;
+	Sun, 11 Jan 2026 11:39:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768129222; cv=none; b=nSZf6TZhICNP8/VXL267rzKWZdpbwex598zojykIvAC18rTlMqNfpe0ZqfCqFKqy4dgo6Xx8DjzCFM3ab/iv/RHY1SXitCnw9Dtkfd85ISYvW9bqd2KLdlzzriWBdlLM5hKagzTqxZAcyAieu/FFn7FXeGPCcCrWFhg3I0d6Cz4=
+	t=1768131556; cv=none; b=P8wMEKKkwzFjtFbbQALXvatKDdN/WQ1ClEHi5Z9x+YwKXfXe/hE44vr+/IUUmhS56G0uYWrS/Z+p1amJhhIkZJEyY4+X5rGQUWdAoszCnZEH2iMm4hyBGNM8ucFFGZEt/gXkXKky97TE7Pr7ccSfNUgJ2lR+aHNNrpngr2tgZsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768129222; c=relaxed/simple;
-	bh=ELIZpjH4jshC+q126H2p3RkHz0HlUxEYfJcAfY+Z9YE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t8jaea0Q615Ns42nqGNUgr1gg55m4DQJkmLFdhNlImipKVnHWXYyW0B9RilENovhmsQmIA70HRDpxOrTg3LyAuYHi1v4yWKBzJjPR3TpX9WmNpbp6KduY7I8LKYRsbNG3hiS+zGnWmb85WOORBoWhnuO1MKpBuAJF+d7atCZrqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=e0RSaExe; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1vetB6-009gyI-Sj; Sun, 11 Jan 2026 12:00:12 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=5uZ3LZfOZWVMlL8l8PLhGgJ10/9cK55ZfyWwVPRLGsk=; b=e0RSaExegxUf16QCIIQ+dyZvdP
-	spQfbYMwB0zpJ/3wGvx1IXbHwIAnXj8hLsOaQWpGPowImVIjE+u4ydYvzhb2pL0srfVdEl/wWObl6
-	agWl8SPivrToaW3n4tdmhccjYG6bGl/LQyCwJ6D6/TBm2wq0f/8yQ8NTjQhMgdidJuXpm+kfuwXhB
-	Xkhqt6GfIErXBPAlL5cL0/ZlTUEqeQUZob1Hv8+9sEu8J/sAGCMTfDiGZmN0keywKZV5q/hSz53L6
-	15MydZzaL0EUGuLHJi8WqOShrn8hvvaI61IzWLr+l6Alv+g18GzcnfUkw5Z7dCY/Gayil2Qwl0Rxp
-	nrBqHsEw==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1vetB6-0006ng-Eu; Sun, 11 Jan 2026 12:00:12 +0100
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1vetAp-007ayA-Cb; Sun, 11 Jan 2026 11:59:55 +0100
-Message-ID: <76ca0c9f-dcda-4a53-ac1f-c5c28d1ecf44@rbox.co>
-Date: Sun, 11 Jan 2026 11:59:54 +0100
+	s=arc-20240116; t=1768131556; c=relaxed/simple;
+	bh=hQMJSfAe59dMl+rWf30r91qj/nVJn0m7vU484+9zGzY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=G+Vkpqp/gHjs6F3f6iiM28F05V26wMe2xL/yMywHUAK31tBtnnx752QmmrhnakC78XlJzFFvfNUBQI5klCwVZaR+SU73lmuveb9Acg7PtSheGRBF/feCGIZt2czQxR/y99nnQU9WWTUDrtvd2oQkI7cELCZERiD01pQHrBJQikM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=LOsQb0YE; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: 07813878eee011f0942a039f3f28ce95-20260111
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=vmJtVU6N0MouEySwEwBNcMPu8mtgmC4osbjka7kRxyE=;
+	b=LOsQb0YEu52eCBtnzdsFroT93MUYIDNW4kpJ/QIMlvGtoWse0YxRnRUCJAxPk3MO2pw3CrTfzbzwznJsHZk6/HTDHEql9Hs2Uv11H8724LunJSNGdIpT2G7gxQWyRgIgWs/9aQ2c9W7AmqgpHObxo3zx0n/zMPahxyvjkvMbZyY=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.9,REQID:31191062-7dad-4ff3-8dad-f802bd1abbf2,IP:0,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:0
+X-CID-META: VersionHash:5047765,CLOUDID:7dd85fe8-ef90-4382-9c6f-55f2a0689a6b,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102|836|888|898,TC:-5,Content:0|15|5
+	0,EDM:-3,IP:nil,URL:1,File:130,RT:0,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OS
+	A:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULS
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 07813878eee011f0942a039f3f28ce95-20260111
+Received: from mtkmbs14n1.mediatek.inc [(172.21.101.75)] by mailgw01.mediatek.com
+	(envelope-from <jibin.zhang@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1947646583; Sun, 11 Jan 2026 19:24:01 +0800
+Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
+ MTKMBS09N1.mediatek.inc (172.21.101.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Sun, 11 Jan 2026 19:24:00 +0800
+Received: from mbjsdccf07.mediatek.inc (10.15.20.246) by
+ mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.2562.29 via Frontend Transport; Sun, 11 Jan 2026 19:23:59 +0800
+From: Jibin Zhang <jibin.zhang@mediatek.com>
+To: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>, "David S . Miller"
+	<davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
+CC: <wsd_upstream@mediatek.com>, <jibin.zhang@mediatek.com>
+Subject: [PATCH v2] net: fix segmentation of forwarding fraglist GRO
+Date: Sun, 11 Jan 2026 19:23:46 +0800
+Message-ID: <20260111112355.21504-1-jibin.zhang@mediatek.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] vsock/test: Add test for a linear and non-linear skb
- getting coalesced
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Arseniy Krasnov <avkrasnov@salutedevices.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260108-vsock-recv-coalescence-v1-0-26f97bb9a99b@rbox.co>
- <20260108-vsock-recv-coalescence-v1-2-26f97bb9a99b@rbox.co>
- <aWEqjjE1vb_t35lQ@sgarzare-redhat>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <aWEqjjE1vb_t35lQ@sgarzare-redhat>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On 1/9/26 17:32, Stefano Garzarella wrote:
-> On Thu, Jan 08, 2026 at 10:54:55AM +0100, Michal Luczaj wrote:
->> Loopback transport can mangle data in rx queue when a linear skb is
->> followed by a small MSG_ZEROCOPY packet.
-> 
-> Can we describe a bit more what the test is doing?
+This patch enhances GSO segment checks by verifying the presence
+of frag_list and protocol consistency, addressing low throughput
+issues on IPv4 servers when used as hotspots
 
-I've expanded the commit message:
+Specifically, it fixes a bug in GSO segmentation when forwarding
+GRO packets with frag_list. The function skb_segment_list cannot
+correctly process GRO skbs converted by XLAT, because XLAT only
+converts the header of the head skb. As a result, skbs in the
+frag_list may remain unconverted, leading to protocol
+inconsistencies and reduced throughput.
 
-To exercise the logic, send out two packets: a weirdly sized one (to ensure
-some spare tail room in the skb) and a zerocopy one that's small enough to
-fit in the spare room of its predecessor. Then, wait for both to land in
-the rx queue, and check the data received. Faulty packets merger manifests
-itself by corrupting payload of the later packet.
+To resolve this, the patch uses skb_segment to handle forwarded
+packets converted by XLAT, ensuring that all fragments are
+properly converted and segmented.
 
->> Signed-off-by: Michal Luczaj <mhal@rbox.co>
->> ---
->> tools/testing/vsock/vsock_test.c          |  5 +++
->> tools/testing/vsock/vsock_test_zerocopy.c | 67 +++++++++++++++++++++++++++++++
->> tools/testing/vsock/vsock_test_zerocopy.h |  3 ++
->> 3 files changed, 75 insertions(+)
->>
->> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->> index bbe3723babdc..21c8616100f1 100644
->> --- a/tools/testing/vsock/vsock_test.c
->> +++ b/tools/testing/vsock/vsock_test.c
->> @@ -2403,6 +2403,11 @@ static struct test_case test_cases[] = {
->> 		.run_client = test_stream_accepted_setsockopt_client,
->> 		.run_server = test_stream_accepted_setsockopt_server,
->> 	},
->> +	{
->> +		.name = "SOCK_STREAM MSG_ZEROCOPY coalescence corruption",
-> 
-> This is essentially a regression test for virtio transport, so I'd add 
-> virtio in the test name.
+Signed-off-by: Jibin Zhang <jibin.zhang@mediatek.com>
+---
+v2: To apply the added condition to a narrower scop
 
-Isn't virtio transport unaffected? It's about loopback transport (that
-shares common code with virtio transport).
+  In this version, the condition (skb_has_frag_list(gso_skb) &&
+(gso_skb->protocol == skb_shinfo(gso_skb)->frag_list->protocol))
+is moved into inner 'if' statement to a narrower scope.
 
->> +		.run_client = test_stream_msgzcopy_mangle_client,
->> +		.run_server = test_stream_msgzcopy_mangle_server,
->> +	},
->> 	{},
->> };
->>
->> diff --git a/tools/testing/vsock/vsock_test_zerocopy.c b/tools/testing/vsock/vsock_test_zerocopy.c
->> index 9d9a6cb9614a..6735a9d7525d 100644
->> --- a/tools/testing/vsock/vsock_test_zerocopy.c
->> +++ b/tools/testing/vsock/vsock_test_zerocopy.c
->> @@ -9,11 +9,13 @@
->> #include <stdio.h>
->> #include <stdlib.h>
->> #include <string.h>
->> +#include <sys/ioctl.h>
->> #include <sys/mman.h>
->> #include <unistd.h>
->> #include <poll.h>
->> #include <linux/errqueue.h>
->> #include <linux/kernel.h>
->> +#include <linux/sockios.h>
->> #include <errno.h>
->>
->> #include "control.h"
->> @@ -356,3 +358,68 @@ void test_stream_msgzcopy_empty_errq_server(const struct test_opts *opts)
->> 	control_expectln("DONE");
->> 	close(fd);
->> }
->> +
->> +#define GOOD_COPY_LEN	128	/* net/vmw_vsock/virtio_transport_common.c */
-> 
-> I think we don't need this, I mean we can eventually just send a single 
-> byte, no?
+  Send out the patch again for further discussion because:
 
-For a single byte sent, you get a single byte of uninitialized kernel
-memory. Uninitialized memory can by anything, in particular it can be
-(coincidentally) what you happen to expect. Which would result in a false
-positive. So instead of estimating what length sufficiently reduces
-probability of such false positive, I just took the upper bound.
+1. This issue has a significant impact and has occurred in many
+countries and regions.
+2. Currently, modifying BPF is not a good option, because BPF code
+cannot access the header of skb on the fraglist, and the required
+changes would affect a wide range of code.
+3. Directly disabling GRO aggregation for XLAT flows is also not a
+good solution, as this change would disable GRO even when forwarding
+is not needed, and it would also require cooperation from all device
+drivers.
 
-BTW, I've realized recv_verify() is reinventing the wheel. How about
-dropping it in favour of what test_seqpacket_msg_bounds_client() does, i.e.
-calc the hash of payload and send it over the control channel for verification?
+[1]: https//patchwork.kernel.org/patch/14350844
 
->> +
->> +void test_stream_msgzcopy_mangle_client(const struct test_opts *opts)
->> +{
->> +	char sbuf1[PAGE_SIZE + 1], sbuf2[GOOD_COPY_LEN];
->> +	struct pollfd fds;
->> +	int fd;
->> +
->> +	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
->> +	if (fd < 0) {
->> +		perror("connect");
->> +		exit(EXIT_FAILURE);
->> +	}
->> +
->> +	enable_so_zerocopy_check(fd);
->> +
->> +	memset(sbuf1, '1', sizeof(sbuf1));
->> +	memset(sbuf2, '2', sizeof(sbuf2));
->> +
->> +	send_buf(fd, sbuf1, sizeof(sbuf1), 0, sizeof(sbuf1));
->> +	send_buf(fd, sbuf2, sizeof(sbuf2), MSG_ZEROCOPY, sizeof(sbuf2));
->> +
->> +	fds.fd = fd;
->> +	fds.events = 0;
->> +
->> +	if (poll(&fds, 1, -1) != 1 || !(fds.revents & POLLERR)) {
->> +		perror("poll");
->> +		exit(EXIT_FAILURE);
->> +	}
-> 
-> Should we also call vsock_recv_completion() or we don't care about the 
-> result?
-> 
-> If we need it, maybe we can factor our the poll + 
-> vsock_recv_completion().
+---
+ net/ipv4/tcp_offload.c | 4 +++-
+ net/ipv4/udp_offload.c | 4 +++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-Nope, we don't care about the result.
+diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+index fdda18b1abda..6c2c10f37f87 100644
+--- a/net/ipv4/tcp_offload.c
++++ b/net/ipv4/tcp_offload.c
+@@ -107,7 +107,9 @@ static struct sk_buff *tcp4_gso_segment(struct sk_buff *skb,
+ 	if (skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST) {
+ 		struct tcphdr *th = tcp_hdr(skb);
+ 
+-		if (skb_pagelen(skb) - th->doff * 4 == skb_shinfo(skb)->gso_size)
++		if ((skb_pagelen(skb) - th->doff * 4 == skb_shinfo(skb)->gso_size) &&
++		    skb_has_frag_list(skb) &&
++		    (skb->protocol == skb_shinfo(skb)->frag_list->protocol))
+ 			return __tcp4_gso_segment_list(skb, features);
+ 
+ 		skb->ip_summed = CHECKSUM_NONE;
+diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+index 19d0b5b09ffa..2a99f011793f 100644
+--- a/net/ipv4/udp_offload.c
++++ b/net/ipv4/udp_offload.c
+@@ -514,7 +514,9 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+ 
+ 	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST) {
+ 		 /* Detect modified geometry and pass those to skb_segment. */
+-		if (skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size)
++		if ((skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size) &&
++		    skb_has_frag_list(gso_skb) &&
++		    (gso_skb->protocol == skb_shinfo(gso_skb)->frag_list->protocol))
+ 			return __udp_gso_segment_list(gso_skb, features, is_ipv6);
+ 
+ 		ret = __skb_linearize(gso_skb);
+-- 
+2.45.2
 
 
