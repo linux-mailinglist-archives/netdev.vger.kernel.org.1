@@ -1,814 +1,123 @@
-Return-Path: <netdev+bounces-248834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40893D0F758
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 17:40:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C5F1D0F7DD
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 18:08:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8E7E9302412C
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 16:40:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CAB51300A53F
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 17:08:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EED9734A3A7;
-	Sun, 11 Jan 2026 16:40:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C099833F8AC;
+	Sun, 11 Jan 2026 17:08:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="mgv2wK97"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lm+3H9Nh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f194.google.com (mail-qk1-f194.google.com [209.85.222.194])
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D710E1EDA3C
-	for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 16:40:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC59500963
+	for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 17:08:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768149618; cv=none; b=tkQA65XBWVAoI+fmiWfeDvuyGAyFt8Pg6W5StOIFRQGcsF4sBtVKaxRRx6WHcW9pEtTm/s/KwkczVb0ncoJErnXc5C7dyBUyeUl5WppaKpEQlV+edym3YXmc8S2O80m/YrMisSe2N4w/aod9vowzZBtFMQW75GaBB/HTtjk/MT0=
+	t=1768151290; cv=none; b=uuXCtVf9bdkH1SuEFW33sTnj4yxX5SVeNOrkbRMNg1OtuMyW75dla2MhfltbXWbARG5511UWt81M/ahGGm2IYuXFc/p5oCoh3kVlQLMrhxkV5n3TYrdtQRBHXXvJwXrC4Mo2fqNBEkz1CmaO0b5U7vA1OvJUsMfOPAl33hi4UR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768149618; c=relaxed/simple;
-	bh=PfQuUtyBeAJe+pofE4Hha9Bv47Gpih/GI5MxsWmeONI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lH641FJVqAVe0ghcVrimuJy39Fsuz0NgDYawpzN8ktxQ9+FX/vqp3pho+SSq5kPNTRTIuAuNVWGxQQFtmJQlZrg6Yz8ZVTkGT1SdLeswq+3ZsimxW/ZtYpt3mem+t1x+dLun0/LEjyevXU4ihCRX1OZLH7azxb0yIQyw3+eVb2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=mgv2wK97; arc=none smtp.client-ip=209.85.222.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-qk1-f194.google.com with SMTP id af79cd13be357-8ba0d6c68a8so665028585a.1
-        for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 08:40:16 -0800 (PST)
+	s=arc-20240116; t=1768151290; c=relaxed/simple;
+	bh=vfB7wwQOv6IVE0ly9jv3QpWGznBV/7h+jvxKooUUs3g=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=RujR5a9CFaNiZlM8mywXQvftTeswrdKwcWMiY8UNXBvHwN6Bon3wRyrNMgDdluNtRE6ZGXUdrtP2yx1+gxt9VlwberxyA+u3N8IINQg0W5O58clmb9Jq5o6lqas3MHBNsBgB29G8eEjCt8EdbmpckvEhEh8XE578HBL3cSi46mc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lm+3H9Nh; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-78fb6c7874cso62739937b3.0
+        for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 09:08:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1768149616; x=1768754416; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1768151288; x=1768756088; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CJyehmBvW9DPuVDZsw3GruKuvCyFCwdzD3V1PqXRjY4=;
-        b=mgv2wK97iKFq1SkbMPdg2Gupkm8ErUYMeqEerKfR1NClzkIfbt2NP0qlZx+yaUaPGM
-         Noh/3Re0O7tfeRDLpJAGL1XvQBJsvESXP+37BkKJWDJYCONQcoJw2iE4KSG2QpvXwZzH
-         cx99NCBNpBQdQi651oEaeMWSsTBql1NobYx5nAZ8eO/WtMfxmyKVdFCe9mIYRzRZRGHq
-         iG/dBVmyBapZB8JrpM5wWKtMtbo/LsgQRtVyau3gu4GjmzB3T7fTsqqszh7MvWcAW3Z5
-         iHW/5ZcanfMvzIBhAaRSI6hnEzrAIewnDDacZZ059XdfVx/vZwFTE51WMcwlY1ssQc0R
-         P9Kg==
+        bh=14CUfSTshsPYBnbMn2scYI68w2LgxYFZBM4RNYY08ec=;
+        b=lm+3H9NhgRLrRqFi5x2oKa7VCrv8kdWmT5c5UU9MeehHnWU4sXcY9sqPT/lGcxh5xq
+         P6TsX7yxohHArEtaS0TvGGvor3F0NtVZMvikgz+o+NLbkj+yVfhC68jD50ahR5B0VaSE
+         NkevdvQKvRmL8WojBgNBktGahCKlXXVBVtFXRyxMwoi03pKQKHgt/IrK7AZTFnYafcJK
+         zxRvm3eOUetSNgQ1v7i+P3j9pcIvI7jmSNxM0zcxRfx0dfvynx+b9gDkYDts4tv1haQp
+         YdjaTxdTDcGbwuLvF5PqZTJp8r/uMO3kVg0CrRKqR0DFhjqwpNZTUmZWIW72KLODXA+e
+         SYXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768149616; x=1768754416;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=CJyehmBvW9DPuVDZsw3GruKuvCyFCwdzD3V1PqXRjY4=;
-        b=Re4mBCXtLvlbhA93VzmjgJgXtCaPCIHY3TkCNJeQNDq7W78tfREhFv+dZLzBEtFARc
-         hcKusLF+qWdD3/pz24TtU/y5huYIvJIPg+DH326EvPQuZdidRyBQGslDpPyParX1GRs4
-         YrFVwwZR2Z8B3zadE3Svq0MTlyqn/WslHCLgS9dyVebfntmxpAO7QFla2xHb0jwuTvEk
-         jWjQRhi0gl4O+6S6ZTqhb4zrF4HywhwfIFTnfj/1m61D42uItp/KITgR3IRUI0kXWEcB
-         YLeM+PzlCPcvpuwkMckwf/4KDnU8n4EuuvSZ6zDYNVcNCrLHtAFn8YbzUvIhqodlmD+t
-         QxhA==
-X-Gm-Message-State: AOJu0Yx3tqe0MI7zQYEmRdtcaW+OYZIxX+Ta7TBONlbihK6civah29H6
-	boTwZmlLFgUyVqtlYCplEFfdIhZxUTGRZ/A25G2gl3XePKpM7vyfX3mUov4tDuYx/A==
-X-Gm-Gg: AY/fxX5aa8Nae5v9uRfs95eYnKC48myfLbw8OGD2kufBHuXv+mSxs5OjeC68zDyylXK
-	xvjrhFMXGmVufET4H2RoCmBLvH07rlnVLV9pFtBQKGpaTs6Hn6eDdu8pCMuclyIiyIwTsSlXeO2
-	dlwnQL7VQ8Coa55Sq7fZx3yggWXqE0aYUtYCAnfpO7flSStLqXOzuDU1NG9j0oey0rWTtlUV2Ed
-	b+oYHof/mzb1Pm0kRaVZgux2+WlxN8mvVRUcNk3SoVAkPwc9nWN9vYX+JWAiA9yHAQ3rWgQh3jX
-	SZy/9s5sFVjxShLTgO1BjPKEH+EKqV5Hf8688arXOpQOu63mQ5aYNjRF3/NL50/0QXXqRGzWwE+
-	2/29+9kM8wZ0wXu09JL6CvjZzZGF0SvP1/eMxXKhIGRA2aKOKocnYaYvFTLbD8bUxVxtrv0X4sG
-	P+fiJjfX0O0Vc=
-X-Google-Smtp-Source: AGHT+IG4foGDloQniaon3MpLXUBpHI3UeS1RoEs1YQ9a28qLfYXVLJJzx5xeo2cWlNJqEujiYzbqjw==
-X-Received: by 2002:a05:620a:172b:b0:8a4:107a:6772 with SMTP id af79cd13be357-8c389432833mr2043006385a.76.1768149615663;
-        Sun, 11 Jan 2026 08:40:15 -0800 (PST)
-Received: from majuu.waya ([70.50.89.69])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8c37f4a8956sm1276589085a.10.2026.01.11.08.40.13
+        d=1e100.net; s=20230601; t=1768151288; x=1768756088;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=14CUfSTshsPYBnbMn2scYI68w2LgxYFZBM4RNYY08ec=;
+        b=QbpMqNlVLDhNDdUnMU/viH3tEIK1fdwFsnDBdJBNVpZTzbqvC1qtN7YkL9vogNFsa3
+         L4jrxDwmJKOG6VLCiMSIOZTJBg3MphJdsS4J7ERfA75kZcMwS4qfv+b7TqsiZSajmqN8
+         H69PngaOYXm/yUV33E/UMiXcvfMTSEWALr5E+0WneF0g6kR+WbyjUpkodVCVEvCusvlW
+         UNmODLA2ZYHgMWyrk4pGLlah7Q9Wt3c04T7FSVOzWs2/PmrpCODDet6xgRjMUG9p2eAp
+         /dI9JbqLV+RdpR9gLvVAwmKHJ3WGNa/PDySbZhWfnSrHGQKNzKsptHHUoCn3BVHIGQsq
+         QAnQ==
+X-Gm-Message-State: AOJu0YwEZmggn8F//t/jPlrWJ5tp2K6Ft9xh2Tc65IqLHDef6x0uAufB
+	yM0QgnBU9mIEcvE76fIOCfGgr3Hwkl5tvkIPqkcA1XHdXln/tFQuneaZH3xIhg==
+X-Gm-Gg: AY/fxX531je2olRzcHxYhyzXDPxfvVQHkoH12A9Xd3eY+Io3u4YUY1ea9h5b+nt02ZM
+	PfaiYJmhopYC7pk2Bg1goEhVFJdPKLujw6QIM5Y8Ljfr/xzmG4fXSGAKXUlOChH/TO7zbEip4kO
+	0i6mgIWTbMkUd0HnPGoYt/3bQqsJVq19sE5W/T8SeNKcZVMlmDpwQ6eYrb5qdVqfAXEG4AwtBRp
+	KLo6ZyO/H56BdnInUBgWhGoZQg7agb7y4qkelUzlbd4RL/14Okb8dwBFS7IiYHOdsIdW/fLLqp+
+	oNUdQO5S/IUDWV4YVS2v/c9fKagwr6bUrQMvzAzpwKvWk9yhyqiasUpHnyobD7D2+kN1JSan3AK
+	qrJUMFrCOQOaxkpruvDr7WstiuiD+F4v5/8/6rVb6LB2xAeap4WxqJRQrQYCkm2vzZ4QMFGF2vl
+	zFhcIj33LgLxvjU4I626phv2OFbKnzT9FmFZiqXBv7NXtyAu5n3yAmAdHbyNg=
+X-Google-Smtp-Source: AGHT+IGv5P2YMNezQssDg4306hlzj+3yVIXMSWoalTwJ8MWNhRun/Bs/YEi8ZMBC8Tv2gECQCDzvHA==
+X-Received: by 2002:a05:690e:4004:b0:643:1a5f:aaec with SMTP id 956f58d0204a3-64716c5fd63mr12458018d50.47.1768151288211;
+        Sun, 11 Jan 2026 09:08:08 -0800 (PST)
+Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-6470d80d2c2sm7093598d50.8.2026.01.11.09.08.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Jan 2026 08:40:14 -0800 (PST)
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	andrew+netdev@lunn.ch
-Cc: netdev@vger.kernel.org,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	victor@mojatatu.com,
-	dcaratti@redhat.com,
-	lariel@nvidia.com,
-	daniel@iogearbox.net,
-	pablo@netfilter.org,
-	kadlec@netfilter.org,
-	fw@strlen.de,
-	phil@nwl.cc,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	zyc199902@zohomail.cn,
-	lrGerlinde@mailfence.com,
-	jschung2@proton.me,
-	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: [PATCH net 6/6] selftests/tc-testing: Add netem/mirred test cases exercising loops
-Date: Sun, 11 Jan 2026 11:39:47 -0500
-Message-Id: <20260111163947.811248-7-jhs@mojatatu.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260111163947.811248-1-jhs@mojatatu.com>
-References: <20260111163947.811248-1-jhs@mojatatu.com>
+        Sun, 11 Jan 2026 09:08:06 -0800 (PST)
+Date: Sun, 11 Jan 2026 12:08:06 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ davem@davemloft.net
+Cc: netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ horms@kernel.org, 
+ shuah@kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ sdf@fomichev.me, 
+ willemb@google.com, 
+ petrm@nvidia.com, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ willemdebruijn.kernel@gmail.com
+Message-ID: <willemdebruijn.kernel.fb5103cf5a5d@gmail.com>
+In-Reply-To: <20260110005121.3561437-5-kuba@kernel.org>
+References: <20260110005121.3561437-1-kuba@kernel.org>
+ <20260110005121.3561437-5-kuba@kernel.org>
+Subject: Re: [PATCH net-next v2 4/6] selftests: drv-net: gro: improve feature
+ config
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-From: Victor Nogueira <victor@mojatatu.com>
+Jakub Kicinski wrote:
+> We'll need to do a lot more feature handling to test HW-GRO and LRO.
+> Clean up the feature handling for SW GRO a bit to let the next commit
+> focus on the new test cases, only.
+> 
+> Make sure HW GRO-like features are not enabled for the SW tests.
+> Be more careful about changing features as "nothing changed"
+> situations may result in non-zero error code from ethtool.
+> 
+> Don't disable TSO on the local interface (receiver) when running over
+> netdevsim, we just want GSO to break up the segments on the sender.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Add mirred loop test cases to validate that those will be caught and other
-test cases that were previously misinterpreted as loops by mirred.
-Also add a netem nested duplicate test case to validate that it won't
-cause an infinite loop
+With the s/tso/tcp-segmentation-offload change
 
-This commit adds 14 test cases:
-
-- Redirect multiport: dummy egress -> dev1 ingress -> dummy egress (Loop)
-- Redirect multiport: dev1 ingress -> dev1 egress -> dev1 ingress (Loop)
-- Redirect multiport: dev1 ingress -> dummy ingress -> dev1 egress (No Loop)
-- Redirect multiport: dev1 ingress -> dummy ingress -> dev1 ingress (Loop)
-- Redirect multiport: dev1 ingress -> dummy egress -> dev1 ingress (Loop)
-- Redirect multiport: dummy egress -> dev1 ingress -> dummy egress (Loop)
-- Redirect multiport: dev1 ingress -> dummy ingress -> dummy egress -> dev1 egress (No Loop)
-- Redirect multiport: dev1 ingress -> dummy egress -> dev1 egress (No Loop)
-- Redirect multiport: dev1 ingress -> dummy egress -> dev1 egress (No Loop)
-- Redirect multiport: dev1 ingress -> dummy egress -> dummy ingress (No Loop)
-- Redirect singleport: dev1 ingress -> dev1 ingress (Loop)
-- Redirect singleport: dummy egress -> dummy ingress (No Loop)
-- Redirect multiport: dev1 ingress -> dummy ingress -> dummy egress (No Loop)
-- Test netem's recursive duplicate
-
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Signed-off-by: Victor Nogueira <victor@mojatatu.com>
----
- .../tc-testing/tc-tests/actions/mirred.json   | 616 +++++++++++++++++-
- .../tc-testing/tc-tests/qdiscs/netem.json     |  33 +-
- 2 files changed, 647 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json b/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
-index b056eb966871..9eb32cdf1ed3 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
-@@ -1144,6 +1144,620 @@
-         "teardown": [
-             "$TC qdisc del dev $DUMMY clsact"
-         ]
-+    },
-+    {
-+        "id": "531c",
-+        "name": "Redirect multiport: dummy egress -> dev1 ingress -> dummy egress (Loop)",
-+        "category": [
-+            "filter",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": [
-+                "nsPlugin"
-+            ]
-+        },
-+        "setup": [
-+            "$IP link set dev $DUMMY up || true",
-+            "$IP addr add 10.10.10.10/24 dev $DUMMY || true",
-+            "$TC qdisc add dev $DUMMY clsact",
-+            "$TC filter add dev $DUMMY egress protocol ip prio 10 matchall action mirred ingress redirect dev $DEV1 index 1",
-+            "$TC qdisc add dev $DEV1 clsact",
-+            "$TC filter add dev $DEV1 ingress protocol ip prio 10 matchall action mirred egress redirect dev $DUMMY index 2"
-+        ],
-+        "cmdUnderTest": "ping -c1 -W0.01 -I $DUMMY 10.10.10.1",
-+        "expExitCode": "1",
-+        "verifyCmd": "$TC -j -s actions get action mirred index 1",
-+        "matchJSON": [
-+            {
-+                "total acts": 0
-+            },
-+            {
-+                "actions": [
-+                    {
-+                        "order": 1,
-+                        "kind": "mirred",
-+                        "mirred_action": "redirect",
-+                        "direction": "ingress",
-+                        "index": 1,
-+                        "stats": {
-+                            "packets": 3
-+                        },
-+                        "not_in_hw": true
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            "$TC qdisc del dev $DUMMY clsact",
-+            "$TC qdisc del dev $DEV1 clsact"
-+        ]
-+    },
-+    {
-+        "id": "b1d7",
-+        "name": "Redirect multiport: dev1 ingress -> dev1 egress -> dev1 ingress (Loop)",
-+        "category": [
-+            "filter",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": [
-+                "nsPlugin",
-+                "scapyPlugin"
-+            ]
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 clsact",
-+            "$TC filter add dev $DEV1 ingress protocol ip prio 10 matchall action mirred egress redirect dev $DEV1 index 1"
-+        ],
-+        "cmdUnderTest": "$TC filter add dev $DEV1 egress protocol ip prio 11 matchall action mirred ingress redirect dev $DEV1 index 2",
-+        "scapy": [
-+            {
-+                "iface": "$DEV0",
-+                "count": 1,
-+                "packet": "Ether()/IP(dst='10.10.10.1', src='10.10.10.10')/ICMP()"
-+            }
-+        ],
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j -s actions get action mirred index 1",
-+        "matchJSON": [
-+            {
-+                "total acts": 0
-+            },
-+            {
-+                "actions": [
-+                    {
-+                        "order": 1,
-+                        "kind": "mirred",
-+                        "mirred_action": "redirect",
-+                        "direction": "egress",
-+                        "index": 1,
-+                        "stats": {
-+                            "packets": 3
-+                        },
-+                        "not_in_hw": true
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 clsact"
-+        ]
-+    },
-+    {
-+        "id": "c66d",
-+        "name": "Redirect multiport: dev1 ingress -> dummy ingress -> dev1 egress (No Loop)",
-+        "category": [
-+            "filter",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": [
-+                "nsPlugin",
-+                "scapyPlugin"
-+            ]
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 clsact",
-+            "$TC filter add dev $DEV1 ingress protocol ip prio 10 matchall action mirred ingress redirect dev $DUMMY index 1",
-+            "$TC qdisc add dev $DUMMY clsact"
-+        ],
-+        "cmdUnderTest": "$TC filter add dev $DUMMY ingress protocol ip prio 11 matchall action mirred egress redirect dev $DEV1 index 2",
-+        "scapy": [
-+            {
-+                "iface": "$DEV0",
-+                "count": 1,
-+                "packet": "Ether()/IP(dst='10.10.10.1', src='10.10.10.10')/ICMP()"
-+            }
-+        ],
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j -s actions get action mirred index 1",
-+        "matchJSON": [
-+            {
-+                "total acts": 0
-+            },
-+            {
-+                "actions": [
-+                    {
-+                        "order": 1,
-+                        "kind": "mirred",
-+                        "mirred_action": "redirect",
-+                        "direction": "ingress",
-+                        "index": 1,
-+                        "stats": {
-+                            "packets": 1
-+                        },
-+                        "not_in_hw": true
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 clsact",
-+            "$TC qdisc del dev $DUMMY clsact"
-+        ]
-+    },
-+    {
-+        "id": "aa99",
-+        "name": "Redirect multiport: dev1 ingress -> dummy ingress -> dev1 ingress (Loop)",
-+        "category": [
-+            "filter",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": [
-+                "nsPlugin",
-+                "scapyPlugin"
-+            ]
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 clsact",
-+            "$TC filter add dev $DEV1 ingress protocol ip prio 10 matchall action mirred ingress redirect dev $DUMMY index 1",
-+            "$TC qdisc add dev $DUMMY clsact"
-+        ],
-+        "cmdUnderTest": "$TC filter add dev $DUMMY ingress protocol ip prio 11 matchall action mirred ingress redirect dev $DEV1 index 2",
-+        "scapy": [
-+            {
-+                "iface": "$DEV0",
-+                "count": 1,
-+                "packet": "Ether()/IP(dst='10.10.10.1', src='10.10.10.10')/ICMP()"
-+            }
-+        ],
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j -s actions get action mirred index 1",
-+        "matchJSON": [
-+            {
-+                "total acts": 0
-+            },
-+            {
-+                "actions": [
-+                    {
-+                        "order": 1,
-+                        "kind": "mirred",
-+                        "mirred_action": "redirect",
-+                        "direction": "ingress",
-+                        "index": 1,
-+                        "stats": {
-+                            "packets": 2,
-+                            "overlimits": 1
-+                        },
-+                        "not_in_hw": true
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 clsact",
-+            "$TC qdisc del dev $DUMMY clsact"
-+        ]
-+    },
-+    {
-+        "id": "37d7",
-+        "name": "Redirect multiport: dev1 ingress -> dummy egress -> dev1 ingress (Loop)",
-+        "category": [
-+            "filter",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": [
-+                "nsPlugin",
-+                "scapyPlugin"
-+            ]
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 clsact",
-+            "$TC filter add dev $DEV1 ingress protocol ip prio 10 matchall action mirred egress redirect dev $DUMMY index 1",
-+            "$TC qdisc add dev $DUMMY clsact"
-+        ],
-+        "cmdUnderTest": "$TC filter add dev $DUMMY egress protocol ip prio 11 matchall action mirred ingress redirect dev $DEV1 index 2",
-+        "scapy": [
-+            {
-+                "iface": "$DEV0",
-+                "count": 1,
-+                "packet": "Ether()/IP(dst='10.10.10.1', src='10.10.10.10')/ICMP()"
-+            }
-+        ],
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j -s actions get action mirred index 1",
-+        "matchJSON": [
-+            {
-+                "total acts": 0
-+            },
-+            {
-+                "actions": [
-+                    {
-+                        "order": 1,
-+                        "kind": "mirred",
-+                        "mirred_action": "redirect",
-+                        "direction": "egress",
-+                        "index": 1,
-+                        "stats": {
-+                            "packets": 3
-+                        },
-+                        "not_in_hw": true
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 clsact",
-+            "$TC qdisc del dev $DUMMY clsact"
-+        ]
-+    },
-+    {
-+        "id": "6d02",
-+        "name": "Redirect multiport: dummy egress -> dev1 ingress -> dummy egress (Loop)",
-+        "category": [
-+            "filter",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": [
-+                "nsPlugin"
-+            ]
-+        },
-+        "setup": [
-+            "$IP link set dev $DUMMY up || true",
-+            "$IP addr add 10.10.10.10/24 dev $DUMMY || true",
-+            "$TC qdisc add dev $DUMMY clsact",
-+            "$TC filter add dev $DUMMY egress protocol ip prio 10 matchall action mirred ingress redirect dev $DEV1 index 1",
-+            "$TC qdisc add dev $DEV1 clsact",
-+            "$TC filter add dev $DEV1 ingress protocol ip prio 11 matchall action mirred egress redirect dev $DUMMY index 2"
-+        ],
-+        "cmdUnderTest": "ping -c1 -W0.01 -I $DUMMY 10.10.10.1",
-+        "expExitCode": "1",
-+        "verifyCmd": "$TC -j -s actions get action mirred index 1",
-+        "matchJSON": [
-+            {
-+                "total acts": 0
-+            },
-+            {
-+                "actions": [
-+                    {
-+                        "order": 1,
-+                        "kind": "mirred",
-+                        "mirred_action": "redirect",
-+                        "direction": "ingress",
-+                        "index": 1,
-+                        "stats": {
-+                            "packets": 3
-+                        },
-+                        "not_in_hw": true
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            "$TC qdisc del dev $DUMMY clsact",
-+            "$TC qdisc del dev $DEV1 clsact"
-+        ]
-+    },
-+    {
-+        "id": "8115",
-+        "name": "Redirect multiport: dev1 ingress -> dummy ingress -> dummy egress -> dev1 egress (No Loop)",
-+        "category": [
-+            "filter",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": [
-+                "nsPlugin",
-+                "scapyPlugin"
-+            ]
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 clsact",
-+            "$TC filter add dev $DEV1 ingress protocol ip prio 10 matchall action mirred ingress redirect dev $DUMMY index 1",
-+            "$TC qdisc add dev $DUMMY clsact",
-+            "$TC filter add dev $DUMMY ingress protocol ip prio 11 matchall action mirred egress redirect dev $DUMMY index 2"
-+        ],
-+        "cmdUnderTest": "$TC filter add dev $DUMMY egress protocol ip prio 12 matchall action mirred egress redirect dev $DEV1 index 3",
-+        "scapy": [
-+            {
-+                "iface": "$DEV0",
-+                "count": 1,
-+                "packet": "Ether()/IP(dst='10.10.10.1', src='10.10.10.10')/ICMP()"
-+            }
-+        ],
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j -s actions get action mirred index 1",
-+        "matchJSON": [
-+            {
-+                "total acts": 0
-+            },
-+            {
-+                "actions": [
-+                    {
-+                        "order": 1,
-+                        "kind": "mirred",
-+                        "mirred_action": "redirect",
-+                        "direction": "ingress",
-+                        "index": 1,
-+                        "stats": {
-+                            "packets": 1
-+                        },
-+                        "not_in_hw": true
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 clsact",
-+            "$TC qdisc del dev $DUMMY clsact"
-+        ]
-+    },
-+    {
-+        "id": "9eb3",
-+        "name": "Redirect multiport: dev1 ingress -> dummy egress -> dev1 egress (No Loop)",
-+        "category": [
-+            "filter",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": [
-+                "nsPlugin",
-+                "scapyPlugin"
-+            ]
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 clsact",
-+            "$TC filter add dev $DEV1 ingress protocol ip prio 10 matchall action mirred egress redirect dev $DUMMY index 1",
-+            "$TC qdisc add dev $DUMMY clsact"
-+        ],
-+        "cmdUnderTest": "$TC filter add dev $DUMMY egress protocol ip prio 11 matchall action mirred egress redirect dev $DEV1 index 2",
-+        "scapy": [
-+            {
-+                "iface": "$DEV0",
-+                "count": 1,
-+                "packet": "Ether()/IP(dst='10.10.10.1', src='10.10.10.10')/ICMP()"
-+            }
-+        ],
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j -s actions get action mirred index 1",
-+        "matchJSON": [
-+            {
-+                "total acts": 0
-+            },
-+            {
-+                "actions": [
-+                    {
-+                        "order": 1,
-+                        "kind": "mirred",
-+                        "mirred_action": "redirect",
-+                        "direction": "egress",
-+                        "index": 1,
-+                        "stats": {
-+                            "packets": 1
-+                        },
-+                        "not_in_hw": true
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 clsact",
-+            "$TC qdisc del dev $DUMMY clsact"
-+        ]
-+    },
-+    {
-+        "id": "d837",
-+        "name": "Redirect multiport: dev1 ingress -> dummy egress -> dummy ingress (No Loop)",
-+        "category": [
-+            "filter",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": [
-+                "nsPlugin",
-+                "scapyPlugin"
-+            ]
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 clsact",
-+            "$TC filter add dev $DEV1 ingress protocol ip prio 10 matchall action mirred egress redirect dev $DUMMY index 1",
-+            "$TC qdisc add dev $DUMMY clsact"
-+        ],
-+        "cmdUnderTest": "$TC filter add dev $DUMMY egress protocol ip prio 11 matchall action mirred ingress redirect dev $DUMMY index 2",
-+        "scapy": [
-+            {
-+                "iface": "$DEV0",
-+                "count": 1,
-+                "packet": "Ether()/IP(dst='10.10.10.1', src='10.10.10.10')/ICMP()"
-+            }
-+        ],
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j -s actions get action mirred index 1",
-+        "matchJSON": [
-+            {
-+                "total acts": 0
-+            },
-+            {
-+                "actions": [
-+                    {
-+                        "order": 1,
-+                        "kind": "mirred",
-+                        "mirred_action": "redirect",
-+                        "direction": "egress",
-+                        "index": 1,
-+                        "stats": {
-+                            "packets": 1
-+                        },
-+                        "not_in_hw": true
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 clsact",
-+            "$TC qdisc del dev $DUMMY clsact"
-+        ]
-+    },
-+    {
-+        "id": "2071",
-+        "name": "Redirect multiport: dev1 ingress -> dev1 ingress (Loop)",
-+        "category": [
-+            "filter",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": [
-+                "nsPlugin",
-+                "scapyPlugin"
-+            ]
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 clsact"
-+        ],
-+        "cmdUnderTest": "$TC filter add dev $DEV1 ingress protocol ip prio 10 matchall action mirred ingress redirect dev $DEV1 index 1",
-+        "scapy": [
-+            {
-+                "iface": "$DEV0",
-+                "count": 1,
-+                "packet": "Ether()/IP(dst='10.10.10.1', src='10.10.10.10')/ICMP()"
-+            }
-+        ],
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j -s actions get action mirred index 1",
-+        "matchJSON": [
-+            {
-+                "total acts": 0
-+            },
-+            {
-+                "actions": [
-+                    {
-+                        "order": 1,
-+                        "kind": "mirred",
-+                        "mirred_action": "redirect",
-+                        "direction": "ingress",
-+                        "index": 1,
-+                        "stats": {
-+                            "packets": 1,
-+                            "overlimits": 1
-+                        },
-+                        "not_in_hw": true
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 clsact"
-+        ]
-+    },
-+    {
-+        "id": "0101",
-+        "name": "Redirect singleport: dummy egress -> dummy ingress (No Loop)",
-+        "category": [
-+            "filter",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": [
-+                "nsPlugin"
-+            ]
-+        },
-+        "setup": [
-+            "$IP addr add 10.10.10.10/24 dev $DUMMY || true",
-+            "$TC qdisc add dev $DUMMY clsact",
-+            "$TC filter add dev $DUMMY egress protocol ip prio 11 matchall action mirred ingress redirect dev $DUMMY index 1"
-+        ],
-+        "cmdUnderTest": "ping -c1 -W0.01 -I $DUMMY 10.10.10.1",
-+        "expExitCode": "1",
-+        "verifyCmd": "$TC -j -s actions get action mirred index 1",
-+        "matchJSON": [
-+            {
-+                "total acts": 0
-+            },
-+            {
-+                "actions": [
-+                    {
-+                        "order": 1,
-+                        "kind": "mirred",
-+                        "mirred_action": "redirect",
-+                        "direction": "ingress",
-+                        "index": 1,
-+                        "stats": {
-+                            "packets": 1
-+                        },
-+                        "not_in_hw": true
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            "$TC qdisc del dev $DUMMY clsact"
-+        ]
-+    },
-+    {
-+        "id": "cf97",
-+        "name": "Redirect multiport: dev1 ingress -> dummy ingress -> dummy egress (No Loop)",
-+        "category": [
-+            "filter",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": [
-+                "nsPlugin",
-+                "scapyPlugin"
-+            ]
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 clsact",
-+            "$TC filter add dev $DEV1 ingress protocol ip prio 10 matchall action mirred ingress redirect dev $DUMMY index 1",
-+            "$TC qdisc add dev $DUMMY clsact"
-+        ],
-+        "cmdUnderTest": "$TC filter add dev $DUMMY ingress protocol ip prio 11 matchall action mirred egress redirect dev $DUMMY index 2",
-+        "scapy": [
-+            {
-+                "iface": "$DEV0",
-+                "count": 1,
-+                "packet": "Ether()/IP(dst='10.10.10.1', src='10.10.10.10')/ICMP()"
-+            }
-+        ],
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j -s actions get action mirred index 1",
-+        "matchJSON": [
-+            {
-+                "total acts": 0
-+            },
-+            {
-+                "actions": [
-+                    {
-+                        "order": 1,
-+                        "kind": "mirred",
-+                        "mirred_action": "redirect",
-+                        "direction": "ingress",
-+                        "index": 1,
-+                        "stats": {
-+                            "packets": 1
-+                        },
-+                        "not_in_hw": true
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 clsact",
-+            "$TC qdisc del dev $DUMMY clsact"
-+        ]
-     }
--
- ]
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/netem.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/netem.json
-index 3c4444961488..7c954989069d 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/netem.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/netem.json
-@@ -336,5 +336,36 @@
-         "teardown": [
-             "$TC qdisc del dev $DUMMY handle 1: root"
-         ]
--    }
-+    },
-+    {
-+        "id": "8c17",
-+        "name": "Test netem's recursive duplicate",
-+        "category": [
-+            "qdisc",
-+            "netem"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            "$IP link set dev $DUMMY up || true",
-+            "$IP addr add 10.10.11.10/24 dev $DUMMY || true",
-+            "$TC qdisc add dev $DUMMY root handle 1: netem limit 1 duplicate 100%",
-+            "$TC qdisc add dev $DUMMY parent 1: handle 2: netem duplicate 100%"
-+        ],
-+        "cmdUnderTest": "ping -c 1 10.10.11.11 -W 0.01",
-+        "expExitCode": "1",
-+        "verifyCmd": "$TC -s -j qdisc ls dev $DUMMY root",
-+        "matchJSON": [
-+            {
-+                "kind": "netem",
-+                "handle": "1:",
-+                "bytes": 294,
-+                "packets": 3
-+            }
-+        ],
-+        "teardown": [
-+            "$TC qdisc del dev $DUMMY handle 1: root"
-+        ]
-+     }
- ]
--- 
-2.34.1
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
