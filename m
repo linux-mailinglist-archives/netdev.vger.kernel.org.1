@@ -1,120 +1,490 @@
-Return-Path: <netdev+bounces-248851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68E3ED0FD12
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 21:39:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F507D0FD7B
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 21:55:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1D825301584F
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 20:39:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1FA673043563
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 20:55:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F2C7248F73;
-	Sun, 11 Jan 2026 20:39:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C31223D7CD;
+	Sun, 11 Jan 2026 20:55:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vlfe6jaf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PN3AN4Dn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
+Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98EC622A813
-	for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 20:39:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3FEE1C3C08
+	for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 20:55:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768163974; cv=none; b=bEVKl3dPHS3MauFRnL9CEahvk0Sguzz108K5d9g+U/zdpmaYU2ZjX4fYPB6zg1IYp2Y2xZ5K033N1O+DaXVe3GgjzgIhdFPIEev/sO/IMoyBmxpFx+4swcFzO7ue2CToun6D5RiPZAtFGIukWa1I9s3kd6PojVPlDN9G0HPMbps=
+	t=1768164927; cv=none; b=H/9881E0dsHOSLXUQPTeU+WpRBYDq4I0QBkwbAH4dFHjdyf2g58ABE59jhaciKBqVCcK9NuUKDleqVQCamJN/l8LqHvj3Zr7gKEQUgvIj5PmfG7pzYyhBRYZaHo9Ihc+hKCmfhXlPSEBFQQqO7245WTowU7cqYryHFfgKmECRnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768163974; c=relaxed/simple;
-	bh=BW13uDTRClwd+ENxHZXrwcj7SqhkHZAYp+zJ9mxdIss=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NgQyxp6NNS1GCludnqz0zJpiSJijfvpzdHNzEyQyDFBGOKB2su0uvBj2i8e01z5pNS78ARkFv+5DhipvpFU3zk2HxuOvCBgHuGAIgIpnSoMxxXtv1mJLmsYMUg8CDKwV09SO7whyEK14QjZktyessJFTaK6Q3xuDAnPEqlh/+js=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vlfe6jaf; arc=none smtp.client-ip=209.85.222.53
+	s=arc-20240116; t=1768164927; c=relaxed/simple;
+	bh=raf5s2qz0YvrEUseW4I4R1/vKZB6hxJ3uKY1UDxpOZk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nN8y6jestbp1A2d2mg2NnOl3aXMWZHnqYEHRSjHqFndkWqLzJdFfqZ+Gen8DFtvrB73tcGQM3/5ynicylLqTJ3p+rm3Tnkkyk1leKFyzWwB2wTC2LksKNIUlTSlvq/irdQi2UWWE1FaKAk6DM8Be9kbaoaVCxdeKLUAaCVDJSz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PN3AN4Dn; arc=none smtp.client-ip=74.125.82.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-93f5910b06cso2860709241.0
-        for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 12:39:33 -0800 (PST)
+Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-2ae38f81be1so5896081eec.0
+        for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 12:55:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768163972; x=1768768772; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P/B6ir2X1iP6OIYfvHzrgy+6QEnGmGpOcZQdGo4rUmk=;
-        b=Vlfe6jafqpcv1447YgakVCS78OBd4NtiKJeKi9AmjA4LehYOexwfOhBTqE5PB1saYL
-         5BdpepXDRGLdCg9REInDLz0uHw90oUXpQ/MnGigt1JuuMnjTEbvTZlZ0tZqREJ4cLUi4
-         rirYJFFPdBhH0jQj9AVHBTuX13ak+pA2qdsLRkQ5SZXcamIEyzVLRO5tSuZucdTDDWNe
-         XofE7u7qQMOa+9ijIGmDvXLNLVsoxl5oqKFcLSgdQSl/s13L0o/Md2lL5vSvtz4ovU8c
-         15QlGRGnzZAy6tcLWxM/PFpTQojIAMN7oM0wKs1gNiEFiVawylPdCSdIqw4yO6x/OFgp
-         iYLw==
+        d=gmail.com; s=20230601; t=1768164925; x=1768769725; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=00CnYMvLSnYadKME2IJNAU7KIzGfoX2dKPWJIpBxCsY=;
+        b=PN3AN4DnZgAYA3TC1tWgZoQ/qyapruQyTxE9aEz6HXKPdZoQA2xHnHSGOjgwwh7x89
+         5rxMUydOiSXxN2ObN3Kwx5pFnVZdtxhMTrUyI1DPXLZ6gEDt4q6YhiMjY98N0qa2eyvZ
+         K/W/1lyeBQBrtMoS52hFDDY4xLflmniKeHtdRh5VP2TygRfke/qajo4pryIPXvsplf9X
+         aVwf977gE3xalYwPYl4nx/12ByvaXNMgIxXN4p+DW0KJYD0AkFaw/kHLkUibZv+N7FDG
+         ekFOTWdHWnL0ppzcF6nAM153KkeK0TtBJNdW9uhGdkFr86LPDEBO4yYG/74JAiw4+Wn0
+         O3Nw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768163972; x=1768768772;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=P/B6ir2X1iP6OIYfvHzrgy+6QEnGmGpOcZQdGo4rUmk=;
-        b=k2RXNoqWnCJH4i+24ckYZ+oxStfe74vzOT9T5VuncG8EMEVHW0RnzSvlkJk92UFhyA
-         pJ0VYTUBiagxiTHS+dkJHlwaXm/qz4x1yz5ipADh3cXVQuxiWiVSo/rhNPTCNTd13zZm
-         eyy/1g8Zf/E4/IQveWM5AHtGUq5hOQGmOYtD+gal26HPex45TswdL8QNY7J6Bm82KXwe
-         vyN+qhLMw9k80+Lw+1bQFkmi6AG/cgf1p69YNkvh5hPOWzdo8P7ZYwvSvMxSIr4lZrXn
-         yfrvcMODN6aILyUIlCBsn1L9GzsZi569FdI9ccddkUbbZADCTs1bSxoAB3zEJ/PCCOEC
-         OtNw==
-X-Forwarded-Encrypted: i=1; AJvYcCWlRR9mpE5+x6zNZ7/UqSPATfjKOtzDGVMk2VVGDPtvn0k78k2VWVHAKp/GRuYpfijctwVZFn8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAbEQrkj006B0L+wxvrIw+xRItJdxqHBGF2Z0LX4a+Q/2LXOBb
-	DHlZsihM+AEumAVP0R//nEc+zFm8JyXrloFaJOuZ2KoRGxeCcOBWdIf8uLNFY3h5n8RHlz1ZD4r
-	MNx5tLYiJMHkYnElR2JMtzTp7+kks2h0=
-X-Gm-Gg: AY/fxX5Veb5uv309mkGd5XPzVmSGvF1m0XQXOqUUmnOY+Vm1/P+wPvCWjRr46P50dfw
-	ZQTZhG30qKeUXhP+UqTEmmPqzZ985J5d1GQaICfETfP6N8HLY/XDnx+z8y8/SMO80wutuKOnz5I
-	x3zh9z1tZio3cr+2C+xUDuEZrLxVifZ/Rz5cSlthVysvSlirITzf36wTZJvE5OLYVYYoGgpcmRh
-	iB43qqeoJ2bRv8GxtbfxoaHXjOYF+VcUV+3A0A3bBTizte/Qa5V+acZTqqt+RSLDTB4y8MwjAkP
-	2eZaxSqKIQi+hSags1a9RNUyvug8
-X-Google-Smtp-Source: AGHT+IHgiVt0XZYHJifogGXKM5jKONG9TLKcspZkda6yt0LOWf6kO999+bQ8W8E6x1OgBeJWn9LEF0UE4NTlDMeG5Us=
-X-Received: by 2002:a05:6102:c8d:b0:5db:293c:c294 with SMTP id
- ada2fe7eead31-5ec8b94edbfmr6899220137.5.1768163972469; Sun, 11 Jan 2026
- 12:39:32 -0800 (PST)
+        d=1e100.net; s=20230601; t=1768164925; x=1768769725;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=00CnYMvLSnYadKME2IJNAU7KIzGfoX2dKPWJIpBxCsY=;
+        b=iWbxEdtHe4PtMGe9S/pTbf9OzZ6/nzcWa6D4nl88gWDkIyUlsn2iPAIPbKUge0tEeZ
+         rjrufADAIkX2JsG45GmA3/tMMJQsDZEdNUdKMYWEaccY/eI1vS2vwWRPDxvewZXcpRH9
+         Tj4YXwfgNeyhYxY22NeqL9ydXnGIriUTbOT7cRzZpWTPI/cd7t6gAgEhnEKJ2PsL7yl1
+         yy1wlUiF8maJ8KjwsbBUu4oIyyGNXILtBqgVQGAHiznXt8eFs/tl8G3/1fKmODAMtEOh
+         rEhcO0Qh7ca8pHLRU3EsjYu2/AZRo9cFBq9kYxYGcAjgSnTnuvctRiLbrVgGdLXiT6+s
+         KqBQ==
+X-Gm-Message-State: AOJu0YxPSFgiI6/mRxtQV4fn9gUc5MZCEsqmAC40siAoMZeH30As+uSN
+	twHXKdP0OS0iB/fMl99gxsim+HtEnFe3DIa2f/IpiOcTsmOgnkCI2d2TKMyk
+X-Gm-Gg: AY/fxX7XWwnW5fBdKZAgY9F8sv6Ki5elbqtjrirzTSiXFfyaRj2BxAIbren74/UypGg
+	GAjd/2siN3YWSTo+N1Wru+38LN17ZHJ0czRX9c3vr0Cz8OBL30z6GCdxH0Qo3evv1+e2aZvusLu
+	xxvHIeyt7FqUpNsuetwEjojNWRpYj/U4xtVrogelWEXfYoGytvBdss5Y/aso1sSntuFmu29+lAf
+	ZezgJ7kFuRG+qe5UJr7e8PIpsR1/KJpwItiRAf2yVKLxV1L5ltdumIoOeRYAGDE3U2FSO5JeloL
+	fH2QGPLQj3AuL7aE5VVmg2q8G/BzFbBCK7uXo3OpnvdeOtKQ9JyykPq3N4mzRuMRVUBhGgPSCa7
+	SLnNCKuBUQ2+F2asZ8488zMJ0ONRPV65yLOnQU1TKb8QRK+H8eLrr9ZAYQrCPisd2frOI1BROfh
+	M0s2VY5JiuOLtmAnRtPKudMon13pzh0sQRqH1djtSIMTcqhETTwxfE+gZXDtIRqfR5rIlu1G/BP
+	avH5w==
+X-Google-Smtp-Source: AGHT+IEVAz6IANnY+WRQe8rWMdQm3Yennsrw5Zaj5LUn3D23TNuTNGO5QRyd/d+0rUS7TFFSOwlb9g==
+X-Received: by 2002:a05:7022:113:b0:119:e569:f626 with SMTP id a92af1059eb24-121f8b7a9f2mr16276498c88.31.1768164924560;
+        Sun, 11 Jan 2026 12:55:24 -0800 (PST)
+Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-121f24984a3sm23813047c88.13.2026.01.11.12.55.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 11 Jan 2026 12:55:23 -0800 (PST)
+Date: Sun, 11 Jan 2026 12:55:23 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, kuba@kernel.org,
+	davem@davemloft.net, razor@blackwall.org, pabeni@redhat.com,
+	willemb@google.com, sdf@fomichev.me, john.fastabend@gmail.com,
+	martin.lau@kernel.org, jordan@jrife.io,
+	maciej.fijalkowski@intel.com, magnus.karlsson@intel.com,
+	dw@davidwei.uk, toke@redhat.com, yangzhenze@bytedance.com,
+	wangdongdong.6@bytedance.com
+Subject: Re: [PATCH net-next v5 02/16] net: Implement
+ netdev_nl_queue_create_doit
+Message-ID: <aWQOO0xhXxNebmXF@mini-arch>
+References: <20260109212632.146920-1-daniel@iogearbox.net>
+ <20260109212632.146920-3-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260111163947.811248-1-jhs@mojatatu.com> <20260111163947.811248-6-jhs@mojatatu.com>
-In-Reply-To: <20260111163947.811248-6-jhs@mojatatu.com>
-From: Cong Wang <xiyou.wangcong@gmail.com>
-Date: Sun, 11 Jan 2026 12:39:21 -0800
-X-Gm-Features: AZwV_QiHay8kyrsuwvPurpt476Csb0RIB49hzdeCN69NIk-5IDi1jZbzUDbC3ug
-Message-ID: <CAM_iQpVVJ=8dSj7pGo+68wG5zfMop_weUh_N9EX0kO5P11NQJw@mail.gmail.com>
-Subject: Re: [PATCH net 5/6] net/sched: fix packet loop on netem when
- duplicate is on
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, andrew+netdev@lunn.ch, 
-	netdev@vger.kernel.org, jiri@resnulli.us, victor@mojatatu.com, 
-	dcaratti@redhat.com, lariel@nvidia.com, daniel@iogearbox.net, 
-	pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de, phil@nwl.cc, 
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	zyc199902@zohomail.cn, lrGerlinde@mailfence.com, jschung2@proton.me, 
-	William Liu <will@willsroot.io>, Savino Dicanosa <savy@syst3mfailure.io>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260109212632.146920-3-daniel@iogearbox.net>
 
-On Sun, Jan 11, 2026 at 8:40=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com>=
- wrote:
-> -               q->duplicate =3D 0;
-> +               skb2->ttl++; /* prevent duplicating a dup... */
->                 rootq->enqueue(skb2, rootq, to_free);
-> -               q->duplicate =3D dupsave;
+On 01/09, Daniel Borkmann wrote:
+> Implement netdev_nl_queue_create_doit which creates a new rx queue in a
+> virtual netdev and then leases it to a rx queue in a physical netdev.
+> 
+> Example with ynl client:
+> 
+>   # ./pyynl/cli.py \
+>       --spec ~/netlink/specs/netdev.yaml \
+>       --do queue-create \
+>       --json '{"ifindex": 8, "type": "rx", "lease": {"ifindex": 4, "queue": {"type": "rx", "id": 15}}}'
+>   {'id': 1}
+> 
+> Note that the netdevice locking order is always from the virtual to
+> the physical device.
+> 
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> Co-developed-by: David Wei <dw@davidwei.uk>
+> Signed-off-by: David Wei <dw@davidwei.uk>
+> ---
+>  include/net/netdev_queues.h   |  19 ++++-
+>  include/net/netdev_rx_queue.h |   9 ++-
+>  include/net/xdp_sock_drv.h    |   2 +-
+>  net/core/dev.c                |   7 ++
+>  net/core/dev.h                |   2 +
+>  net/core/netdev-genl.c        | 146 +++++++++++++++++++++++++++++++++-
+>  net/core/netdev_queues.c      |  57 +++++++++++++
+>  net/core/netdev_rx_queue.c    |  50 +++++++++++-
+>  net/xdp/xsk.c                 |   2 +-
+>  9 files changed, 282 insertions(+), 12 deletions(-)
+> 
+> diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
+> index cd00e0406cf4..f65319a6fb87 100644
+> --- a/include/net/netdev_queues.h
+> +++ b/include/net/netdev_queues.h
+> @@ -130,6 +130,11 @@ void netdev_stat_queue_sum(struct net_device *netdev,
+>   * @ndo_queue_get_dma_dev: Get dma device for zero-copy operations to be used
+>   *			   for this queue. Return NULL on error.
+>   *
+> + * @ndo_queue_create: Create a new RX queue which can be leased to another queue.
+> + *		      Ops on this queue are redirected to the leased queue e.g.
+> + *		      when opening a memory provider. Return the new queue id on
+> + *		      success. Return negative error code on failure.
+> + *
+>   * Note that @ndo_queue_mem_alloc and @ndo_queue_mem_free may be called while
+>   * the interface is closed. @ndo_queue_start and @ndo_queue_stop will only
+>   * be called for an interface which is open.
+> @@ -149,9 +154,12 @@ struct netdev_queue_mgmt_ops {
+>  						  int idx);
+>  	struct device *		(*ndo_queue_get_dma_dev)(struct net_device *dev,
+>  							 int idx);
+> +	int			(*ndo_queue_create)(struct net_device *dev);
+>  };
+>  
+> -bool netif_rxq_has_unreadable_mp(struct net_device *dev, int idx);
+> +bool netif_rxq_has_unreadable_mp(struct net_device *dev, unsigned int rxq_idx);
+> +bool netif_rxq_has_mp(struct net_device *dev, unsigned int rxq_idx);
+> +bool netif_rxq_is_leased(struct net_device *dev, unsigned int rxq_idx);
+>  
+>  /**
+>   * DOC: Lockless queue stopping / waking helpers.
+> @@ -329,5 +337,10 @@ static inline void netif_subqueue_sent(const struct net_device *dev,
+>  	})
+>  
+>  struct device *netdev_queue_get_dma_dev(struct net_device *dev, int idx);
+> -
+> -#endif
+> +bool netdev_can_create_queue(const struct net_device *dev,
+> +			     struct netlink_ext_ack *extack);
+> +bool netdev_can_lease_queue(const struct net_device *dev,
+> +			    struct netlink_ext_ack *extack);
+> +bool netdev_queue_busy(struct net_device *dev, int idx,
+> +		       struct netlink_ext_ack *extack);
+> +#endif /* _LINUX_NET_QUEUES_H */
+> diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queue.h
+> index 8cdcd138b33f..1cacc2451516 100644
+> --- a/include/net/netdev_rx_queue.h
+> +++ b/include/net/netdev_rx_queue.h
+> @@ -28,6 +28,8 @@ struct netdev_rx_queue {
+>  #endif
+>  	struct napi_struct		*napi;
+>  	struct pp_memory_provider_params mp_params;
+> +	struct netdev_rx_queue		*lease;
+> +	netdevice_tracker		lease_tracker;
+>  } ____cacheline_aligned_in_smp;
+>  
+>  /*
+> @@ -57,5 +59,8 @@ get_netdev_rx_queue_index(struct netdev_rx_queue *queue)
+>  }
+>  
+>  int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq);
+> -
+> -#endif
+> +void netdev_rx_queue_lease(struct netdev_rx_queue *rxq_dst,
+> +			   struct netdev_rx_queue *rxq_src);
+> +void netdev_rx_queue_unlease(struct netdev_rx_queue *rxq_dst,
+> +			     struct netdev_rx_queue *rxq_src);
+> +#endif /* _LINUX_NETDEV_RX_QUEUE_H */
+> diff --git a/include/net/xdp_sock_drv.h b/include/net/xdp_sock_drv.h
+> index 242e34f771cc..c07cfb431eac 100644
+> --- a/include/net/xdp_sock_drv.h
+> +++ b/include/net/xdp_sock_drv.h
+> @@ -28,7 +28,7 @@ void xsk_tx_completed(struct xsk_buff_pool *pool, u32 nb_entries);
+>  bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, struct xdp_desc *desc);
+>  u32 xsk_tx_peek_release_desc_batch(struct xsk_buff_pool *pool, u32 max);
+>  void xsk_tx_release(struct xsk_buff_pool *pool);
+> -struct xsk_buff_pool *xsk_get_pool_from_qid(struct net_device *dev,
+> +struct xsk_buff_pool *xsk_get_pool_from_qid(const struct net_device *dev,
+>  					    u16 queue_id);
+>  void xsk_set_rx_need_wakeup(struct xsk_buff_pool *pool);
+>  void xsk_set_tx_need_wakeup(struct xsk_buff_pool *pool);
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 36dc5199037e..c2b64ffeb9e6 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -1102,6 +1102,13 @@ netdev_get_by_index_lock_ops_compat(struct net *net, int ifindex)
+>  	return __netdev_put_lock_ops_compat(dev, net);
+>  }
+>  
+> +struct net_device *
+> +netdev_put_lock(struct net_device *dev, netdevice_tracker *tracker)
+> +{
+> +	netdev_tracker_free(dev, tracker);
+> +	return __netdev_put_lock(dev, dev_net(dev));
+> +}
+> +
+>  struct net_device *
+>  netdev_xa_find_lock(struct net *net, struct net_device *dev,
+>  		    unsigned long *index)
+> diff --git a/net/core/dev.h b/net/core/dev.h
+> index da18536cbd35..9bcb76b325d0 100644
+> --- a/net/core/dev.h
+> +++ b/net/core/dev.h
+> @@ -30,6 +30,8 @@ netdev_napi_by_id_lock(struct net *net, unsigned int napi_id);
+>  struct net_device *dev_get_by_napi_id(unsigned int napi_id);
+>  
+>  struct net_device *__netdev_put_lock(struct net_device *dev, struct net *net);
+> +struct net_device *netdev_put_lock(struct net_device *dev,
+> +				   netdevice_tracker *tracker);
+>  struct net_device *
+>  netdev_xa_find_lock(struct net *net, struct net_device *dev,
+>  		    unsigned long *index);
+> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+> index aae75431858d..cd4dc4eef029 100644
+> --- a/net/core/netdev-genl.c
+> +++ b/net/core/netdev-genl.c
+> @@ -1122,7 +1122,151 @@ int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info)
+>  
+>  int netdev_nl_queue_create_doit(struct sk_buff *skb, struct genl_info *info)
+>  {
+> -	return -EOPNOTSUPP;
+> +	const int qmaxtype = ARRAY_SIZE(netdev_queue_id_nl_policy) - 1;
+> +	const int lmaxtype = ARRAY_SIZE(netdev_lease_nl_policy) - 1;
+> +	int err, ifindex, ifindex_lease, queue_id, queue_id_lease;
+> +	struct nlattr *qtb[ARRAY_SIZE(netdev_queue_id_nl_policy)];
+> +	struct nlattr *ltb[ARRAY_SIZE(netdev_lease_nl_policy)];
+> +	struct netdev_rx_queue *rxq, *rxq_lease;
+> +	struct net_device *dev, *dev_lease;
+> +	netdevice_tracker dev_tracker;
+> +	struct nlattr *nest;
+> +	struct sk_buff *rsp;
+> +	void *hdr;
+> +
+> +	if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_IFINDEX) ||
+> +	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_TYPE) ||
+> +	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_QUEUE_LEASE))
+> +		return -EINVAL;
+> +	if (nla_get_u32(info->attrs[NETDEV_A_QUEUE_TYPE]) !=
+> +	    NETDEV_QUEUE_TYPE_RX) {
+> +		NL_SET_BAD_ATTR(info->extack, info->attrs[NETDEV_A_QUEUE_TYPE]);
+> +		return -EINVAL;
+> +	}
+> +
+> +	ifindex = nla_get_u32(info->attrs[NETDEV_A_QUEUE_IFINDEX]);
+> +
+> +	nest = info->attrs[NETDEV_A_QUEUE_LEASE];
+> +	err = nla_parse_nested(ltb, lmaxtype, nest,
+> +			       netdev_lease_nl_policy, info->extack);
+> +	if (err < 0)
+> +		return err;
+> +	if (NL_REQ_ATTR_CHECK(info->extack, nest, ltb, NETDEV_A_LEASE_IFINDEX) ||
+> +	    NL_REQ_ATTR_CHECK(info->extack, nest, ltb, NETDEV_A_LEASE_QUEUE))
+> +		return -EINVAL;
+> +	if (ltb[NETDEV_A_LEASE_NETNS_ID]) {
+> +		NL_SET_BAD_ATTR(info->extack, ltb[NETDEV_A_LEASE_NETNS_ID]);
+> +		return -EINVAL;
+> +	}
+> +
+> +	ifindex_lease = nla_get_u32(ltb[NETDEV_A_LEASE_IFINDEX]);
+> +
+> +	nest = ltb[NETDEV_A_LEASE_QUEUE];
+> +	err = nla_parse_nested(qtb, qmaxtype, nest,
+> +			       netdev_queue_id_nl_policy, info->extack);
+> +	if (err < 0)
+> +		return err;
+> +	if (NL_REQ_ATTR_CHECK(info->extack, nest, qtb, NETDEV_A_QUEUE_ID) ||
+> +	    NL_REQ_ATTR_CHECK(info->extack, nest, qtb, NETDEV_A_QUEUE_TYPE))
+> +		return -EINVAL;
+> +	if (nla_get_u32(qtb[NETDEV_A_QUEUE_TYPE]) != NETDEV_QUEUE_TYPE_RX) {
+> +		NL_SET_BAD_ATTR(info->extack, qtb[NETDEV_A_QUEUE_TYPE]);
+> +		return -EINVAL;
+> +	}
+> +	if (ifindex == ifindex_lease) {
+> +		NL_SET_ERR_MSG(info->extack,
+> +			       "Lease ifindex cannot be the same as queue creation ifindex");
+> +		return -EINVAL;
+> +	}
+> +
+> +	queue_id_lease = nla_get_u32(qtb[NETDEV_A_QUEUE_ID]);
+> +
+> +	rsp = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
+> +	if (!rsp)
+> +		return -ENOMEM;
+> +
+> +	hdr = genlmsg_iput(rsp, info);
+> +	if (!hdr) {
+> +		err = -EMSGSIZE;
+> +		goto err_genlmsg_free;
+> +	}
+> +
+> +	/* Locking order is always from the virtual to the physical device
+> +	 * since this is also the same order when applications open the
+> +	 * memory provider later on.
+> +	 */
+> +	dev = netdev_get_by_index_lock(genl_info_net(info), ifindex);
+> +	if (!dev) {
+> +		err = -ENODEV;
+> +		goto err_genlmsg_free;
+> +	}
+> +	if (!netdev_can_create_queue(dev, info->extack)) {
+> +		err = -EINVAL;
+> +		goto err_unlock_dev;
+> +	}
+> +
+> +	dev_lease = netdev_get_by_index(genl_info_net(info), ifindex_lease,
+> +					&dev_tracker, GFP_KERNEL);
+> +	if (!dev_lease) {
+> +		err = -ENODEV;
+> +		goto err_unlock_dev;
+> +	}
+> +	if (!netdev_can_lease_queue(dev_lease, info->extack)) {
+> +		netdev_put(dev_lease, &dev_tracker);
+> +		err = -EINVAL;
+> +		goto err_unlock_dev;
+> +	}
+> +
+> +	dev_lease = netdev_put_lock(dev_lease, &dev_tracker);
+> +	if (!dev_lease) {
+> +		err = -ENODEV;
+> +		goto err_unlock_dev;
+> +	}
+> +	if (queue_id_lease >= dev_lease->real_num_rx_queues) {
+> +		err = -ERANGE;
+> +		NL_SET_BAD_ATTR(info->extack, qtb[NETDEV_A_QUEUE_ID]);
+> +		goto err_unlock_dev_lease;
+> +	}
+> +	if (netdev_queue_busy(dev_lease, queue_id_lease, info->extack)) {
+> +		err = -EBUSY;
+> +		goto err_unlock_dev_lease;
+> +	}
+> +
+> +	rxq_lease = __netif_get_rx_queue(dev_lease, queue_id_lease);
+> +	rxq = __netif_get_rx_queue(dev, dev->real_num_rx_queues - 1);
+> +
+> +	if (rxq->lease && rxq->lease->dev != dev_lease) {
+> +		err = -EOPNOTSUPP;
+> +		NL_SET_ERR_MSG(info->extack,
+> +			       "Leasing multiple queues from different devices not supported");
+> +		goto err_unlock_dev_lease;
+> +	}
+> +
+> +	err = queue_id = dev->queue_mgmt_ops->ndo_queue_create(dev);
+> +	if (err < 0) {
+> +		NL_SET_ERR_MSG(info->extack,
+> +			       "Device is unable to create a new queue");
+> +		goto err_unlock_dev_lease;
+> +	}
+> +
+> +	rxq = __netif_get_rx_queue(dev, queue_id);
+> +	netdev_rx_queue_lease(rxq, rxq_lease);
+> +
+> +	nla_put_u32(rsp, NETDEV_A_QUEUE_ID, queue_id);
+> +	genlmsg_end(rsp, hdr);
+> +
+> +	netdev_unlock(dev_lease);
+> +	netdev_unlock(dev);
+> +
+> +	return genlmsg_reply(rsp, info);
+> +
+> +err_unlock_dev_lease:
+> +	netdev_unlock(dev_lease);
+> +err_unlock_dev:
+> +	netdev_unlock(dev);
+> +err_genlmsg_free:
+> +	nlmsg_free(rsp);
+> +	return err;
+>  }
+>  
+>  void netdev_nl_sock_priv_init(struct netdev_nl_sock *priv)
+> diff --git a/net/core/netdev_queues.c b/net/core/netdev_queues.c
+> index 251f27a8307f..fae92ee090c4 100644
+> --- a/net/core/netdev_queues.c
+> +++ b/net/core/netdev_queues.c
+> @@ -1,6 +1,8 @@
+>  // SPDX-License-Identifier: GPL-2.0-or-later
+>  
+>  #include <net/netdev_queues.h>
+> +#include <net/netdev_rx_queue.h>
+> +#include <net/xdp_sock_drv.h>
+>  
+>  /**
+>   * netdev_queue_get_dma_dev() - get dma device for zero-copy operations
+> @@ -25,3 +27,58 @@ struct device *netdev_queue_get_dma_dev(struct net_device *dev, int idx)
+>  	return dma_dev && dma_dev->dma_mask ? dma_dev : NULL;
+>  }
+>  
+> +bool netdev_can_create_queue(const struct net_device *dev,
+> +			     struct netlink_ext_ack *extack)
+> +{
+> +	if (dev->dev.parent) {
+> +		NL_SET_ERR_MSG(extack, "Device is not a virtual device");
+> +		return false;
+> +	}
+> +	if (!dev->queue_mgmt_ops ||
+> +	    !dev->queue_mgmt_ops->ndo_queue_create) {
+> +		NL_SET_ERR_MSG(extack, "Device does not support queue creation");
+> +		return false;
+> +	}
+> +	if (dev->real_num_rx_queues < 1 ||
+> +	    dev->real_num_tx_queues < 1) {
+> +		NL_SET_ERR_MSG(extack, "Device must have at least one real queue");
+> +		return false;
+> +	}
+> +	return true;
+> +}
+> +
+> +bool netdev_can_lease_queue(const struct net_device *dev,
+> +			    struct netlink_ext_ack *extack)
+> +{
+> +	if (!dev->dev.parent) {
+> +		NL_SET_ERR_MSG(extack, "Lease device is a virtual device");
+> +		return false;
+> +	}
+> +	if (!netif_device_present(dev)) {
+> +		NL_SET_ERR_MSG(extack, "Lease device has been removed from the system");
+> +		return false;
+> +	}
+> +	if (!dev->queue_mgmt_ops) {
+> +		NL_SET_ERR_MSG(extack, "Lease device does not support queue management operations");
+> +		return false;
+> +	}
+> +	return true;
+> +}
+> +
+> +bool netdev_queue_busy(struct net_device *dev, int idx,
+> +		       struct netlink_ext_ack *extack)
+> +{
+> +	if (netif_rxq_is_leased(dev, idx)) {
+> +		NL_SET_ERR_MSG(extack, "Lease device queue is already leased");
+> +		return true;
+> +	}
+> +	if (xsk_get_pool_from_qid(dev, idx)) {
+> +		NL_SET_ERR_MSG(extack, "Lease device queue in use by AF_XDP");
+> +		return true;
+> +	}
+> +	if (netif_rxq_has_mp(dev, idx)) {
+> +		NL_SET_ERR_MSG(extack, "Lease device queue in use by memory provider");
+> +		return true;
+> +	}
+> +	return false;
+> +}
+> diff --git a/net/core/netdev_rx_queue.c b/net/core/netdev_rx_queue.c
+> index c7d9341b7630..ed85dfb434a0 100644
+> --- a/net/core/netdev_rx_queue.c
+> +++ b/net/core/netdev_rx_queue.c
+> @@ -9,15 +9,57 @@
+>  
+>  #include "page_pool_priv.h"
+>  
+> -/* See also page_pool_is_unreadable() */
+> -bool netif_rxq_has_unreadable_mp(struct net_device *dev, int idx)
+> +void netdev_rx_queue_lease(struct netdev_rx_queue *rxq_dst,
+> +			   struct netdev_rx_queue *rxq_src)
+> +{
+> +	netdev_assert_locked(rxq_src->dev);
+> +	netdev_assert_locked(rxq_dst->dev);
+> +
+> +	WARN_ON_ONCE(READ_ONCE(rxq_src->dev->reg_state) == NETREG_UNREGISTERING);
 
-As I already explained many times, the ROOT cause is enqueuing
-to the root qdisc, not anything else.
-
-We need to completely forget all the kernel knowledge and ask
-a very simple question here: is enqueuing to root qdisc a reasonable
-use? More importantly, could we really define it?
-
-I already provided my answer in my patch description, sorry for not
-keeping repeating it for at least the 3rd time.
-
-Therefore, I still don't think you fix the root cause here. The
-problematic behavior of enqueuing to root qdisc should be corrected,
-regardless of any kernel detail.
-
-Thanks.
-Cong
+I might have missed some of your discussions with Jakub, but what is
+this WARN_ON_ONCE above trying to catch? And why not handle it explicitly
+(via returning an error from netdev_rx_queue_lease)?
 
