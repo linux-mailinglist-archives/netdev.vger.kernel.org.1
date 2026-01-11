@@ -1,120 +1,131 @@
-Return-Path: <netdev+bounces-248854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3853D0FE49
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 22:06:21 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0600D0FF15
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 22:23:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CC3753043110
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 21:06:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7FDEF3028D61
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 21:23:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BC1224886E;
-	Sun, 11 Jan 2026 21:06:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF0F3274B2B;
+	Sun, 11 Jan 2026 21:23:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a/4BEopE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lhXfo7hH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B1123D7CD
-	for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 21:06:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F33FD26A1AF
+	for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 21:23:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768165564; cv=none; b=FAlZXuF6xgnJInRj77RrPdY2xZPKC6UcCIWswJMe1YLur1eQcAm7HEX7QEIWa4bcIExlmDR03UHPQyO0C9n8f6VHyDFy9sY2LrmjtWuXLtJM2UE3D9Zgg8HgXO+b13lw/0CDttKLsSVnZymQdGLCmFCiMUj+bBIyrj/6WdOidRs=
+	t=1768166609; cv=none; b=Onk4o5S5BRg23RTZLumHGuxpHPQnCyOQKjdxiuVCeK5wTagWbd+BMVGkTuKK7YjpWTyhTcCPKPXLkxkg8EWiYXSFBxKC3XzTEgRRhrA+Z1ESrXkO7p2Dk1tDKpLboJ1fTyuYuZxYQRQB0golwglHAOCdpxNGqS4m0wl+zBY+XaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768165564; c=relaxed/simple;
-	bh=u1Jkpw8NjtbE9Z4sIubffTJqLQzvKHtO8V8ejMIuAIg=;
+	s=arc-20240116; t=1768166609; c=relaxed/simple;
+	bh=hrNZpWUScS3zOWmXDW/r1WSv0E6W8BnDA5eInYBnEjw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=peR6BdVvliTexBK8/ePrYP7gRS8eA/9LiFazk09b7UjjqIyltaXhMORikF3Jxsv0aunTmZjxDsLcOrFu/s+4F6fCCipHWEYgd/A/qRhw/L4c1+gRAiO5oCMp+p9vP3h3IdUKnMKdc/CWFKoiCTiJNV8A6XEfZSi1UI0PkTgoOT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a/4BEopE; arc=none smtp.client-ip=209.85.128.50
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pa/KUt9qxM+KngGhQAUvSF/++tOZk2z5uDNnrPmla3Vz7mDf6AF/LZNNlvTw7MSSypVV4gSBJtLw3oaEzc4nKx6EE2vvW31mz7ebWdyKPPnJI2KCyzz/A3i51AfAOdOZlt0/LxB+zZ6lZZk89g4JbB59d57xJ1pxIHJE658jDiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lhXfo7hH; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-47796a837c7so40177245e9.0
-        for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 13:06:02 -0800 (PST)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b7277324204so885150766b.0
+        for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 13:23:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768165561; x=1768770361; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=09OQOrO3GhfKvMA1ou0hkENJeEYVaIdNncnbvvzVVAI=;
-        b=a/4BEopEzakthQdb1XqkBjkNOApFIMZwFPs5h8YhfYF3Cmp2dhflOoshASU8i/PQ6m
-         SE+topLLZJdy7c9wSwAzS+2mHIl4BPTJMBa8EEwQNxoT6ULGGrSDhK26gVbwO2cJ4T+f
-         FS++UiCToF3nFdG6yLArjRckvSbWes39hGHpdZcUHF0/Wd2xoH1I7QABy7UXausQcS2q
-         kZsKE/JENid+a4SfNcxuNF+LzS4LEkT3TT4q0j1dNg8J1y3PWvT6O7FYbTlygspHHM8Q
-         FmwOlh2bpItiVywLJ61VUh7uBGPuO3RP0KrUKbxGAcaJjPQ1AWEIuuUlMGjbkX9Wjso1
-         7/BQ==
+        d=gmail.com; s=20230601; t=1768166603; x=1768771403; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=hQ0Q1EyOWWVCDl/r3tyDScTjDzaDhclLQJzdDcIL3qk=;
+        b=lhXfo7hHKWQJkyumuBKSDXCxp5kQjBXqNUr6gsAP1vR/bSo9c0ukfCK6vrH8xugP4b
+         0QNGK0JPrUG7SC9z1TQYID0zeBbdb7JLdc7O98UEb6N3uoJEu9LvNt6RM8ZWVstnCETw
+         9WmQDvHWfaidZFLNOFvd4Q3wsTievABrsGsXHo0rjEHXIlgE/9tqXgVdcsQkoWBJH2iz
+         8oBHgkE84K7hv5X5+0rqA6PRfGYPFwBS83sLL1dR4/5WaH6CIFNHBaRp8hx/EATU/Uez
+         oREESSp0wcK5C3itaYtAw9abWditoQcCfH444VOBAlH8mFVzr+uPoM3iYXIKMV8nLOXA
+         5d4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768165561; x=1768770361;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=09OQOrO3GhfKvMA1ou0hkENJeEYVaIdNncnbvvzVVAI=;
-        b=ZFpHisig5ikzHknYzRdUKz6hxDCNw44+/r9awMwYBlYN3chYbM3x2FSDlpQEtLaUxT
-         TNB/wLvWmYTj8AJJkJzrt+5ZQzhZUMv+1zW8+lOddVHt4FBt3C1wZBip0+1YZ0gkN9MX
-         TAnvXZ2pXuNnGqeDe2/Z9ltjjmV7jZQBHUZxsqz3ClAbUAbh0DXVk1aSwB5hh5bqNS/N
-         5nqL8hKDyw1FU5IGyXp4EwiTIGwX2LWIiEjM/10tg1keMoMVL9Zurit+Lkt5Tkr34ND6
-         DH26tauEja8yg41ayPY0wcaYIcOncPPWQKqawQUqwvf4rO5+PtoQzoJ2y4/udlRBcy8c
-         HyrA==
-X-Forwarded-Encrypted: i=1; AJvYcCXUsh5+vszyz2NfKZuyROu9Jc7Zini14na/17uI4YgXVPo5wQQi6mCaFgfmQD+dtUw3ktiMOBc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBGJD6zt2cIgQq4Ntqj5ihru4CYVmAc9cXk2kVAcTamsKPuj+J
-	HRT/zL59/PuNH2xh48uWtMANb/3ZnOFAQfutKA2WevcC7FsTEI9vMKWI/NPn8Q==
-X-Gm-Gg: AY/fxX5fa9F8Uq47c1ygsWyd+vy/Zv3Rs7PLg3oHokeIBoRs06d6g7PY+Qvze2J0Z5y
-	mZTG0pA0XyeikjJPny4zwL0Eaju7hYklL961kX/lVmSzQN/ci7lgFIUFTkJsF/msYjDFWdt7ndU
-	kvydd06Z2AOHcjK+37QsXETMaCblLocnE0xclxHpModezw3Vq8jiPluTE4dsua+YJCMiEN5sq9S
-	3QFiXiuIcUIHx+gHl1RfJvPVKA78pAMMBDYyqwh+kJP7LKP0fRh7jkAda1o9o7hnmLCElmwA85p
-	1kYgwBC/DXepVqcqRTcdSQdkvEx6lbf27mldvtbS4UiviZCbrVCMIfKx6TmGWxSocngO6YRpAXQ
-	1NVOJO61+7c4m1PMXy4pgIWFvjJ23qC1QUozQp7iHcIbshiEw+CTIP83MSDq0t1Duq5DRE/TZkg
-	hLC6hcDTiYH/t4mVY=
-X-Google-Smtp-Source: AGHT+IHekT0JGfFdxaYLnpuijyPTatbI4Dy0bZH56fvbuVTlauw9jEYsNIe8ZzeDpfLNNxQjNydPXQ==
-X-Received: by 2002:a05:600c:1d0e:b0:47d:3ffb:16c9 with SMTP id 5b1f17b1804b1-47d84b54c31mr171924585e9.23.1768165561015;
-        Sun, 11 Jan 2026 13:06:01 -0800 (PST)
-Received: from google.com ([37.228.206.31])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d8717d78fsm115098425e9.9.2026.01.11.13.05.59
+        d=1e100.net; s=20230601; t=1768166603; x=1768771403;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hQ0Q1EyOWWVCDl/r3tyDScTjDzaDhclLQJzdDcIL3qk=;
+        b=OE0PR89c3JQdzURoM8aXhgzM929FzLZBEsP12YV5Tgtia26UoV5N4kvnLs/u+qxoeY
+         b+joQ5Xfykr4q7z/Jqz9ogUv6FaefFI5UZpFfoyiTXAEFQlvUWP4R5KbQcO1RwXEAx+G
+         5Ceet+Pao4gfB/TUw0DucubP+4dHZfpgbRE4ARzci5wcymiLAwXpkaJSXJblI/fMN6g4
+         ZQYoJSKQmC1iEPYK+Ogp21RNOR6I0d5j3kjDyoe+ImvhCFn9XWiOTAzaqElHMduHXRct
+         pRPkOKPuGs1WQP6AIpTYezdv4P+O6C6JT59JYQnV5siBWW1Qey1QyDpILRh8tcGccCWs
+         gjJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWje7AtzICy4A+EC+S/Naqe2P+wTHrUQxFPIZD8ghcsgWe7vfDD7LxXABNIiERdPA6/w4dJPJc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8p9sUFVDpR8JeDC0Rja5XZTLTBboMcaKioyplu4z/D1uJYldk
+	zedodPFwux6q13b20I3HqDY0RfC3lx0ceIcPbT5IavNUzw4h8/levkEw
+X-Gm-Gg: AY/fxX7Bw5362z31vKcaR/ZVohP1PQxxMLXanuHHvoq2+nYYoajKDnEqy2aQVSjL598
+	7I2pWqIfhRHSpKTD6zbSbpjJfuLt3H1rFCDcY/ltk56mMaqfi8g65L0dHw1Qn0b2SI4XZ64CrYF
+	8zLPZMlReThyh5xAT+pX06L2gG74z9KbHLIApSamKVvOW4KRao0Wqn5aOB5+x5IpzSi6slssrow
+	HvJLfpwP/37idkKKvcgGy75wXzbKzBiQ3Jpn6mqCMLVLcYN5VBUkDB67h0Hc1OuAJdkcXRQKyYk
+	WzBmjShsrDbojfPBzgCryCcsdQWB2m/3l/xhjp50Xzf0RH3BI7nt3GyTanKI2crJxmQm58UjOaT
+	CIBisfwHyqN/T1vwQTuHXOX0P8CmG1mJE6jaVM8ky+VUngpKDSPaxIy7sx5xdby3ivfJdd3H2GD
+	S6ub9sd/etj0KoQO/5cpKtNDmUJF6Ps6k3dIR2
+X-Google-Smtp-Source: AGHT+IE4SD9Js6DcJylwHTqTIwS2RPmaKH1MF2UkoFYIeU8uSCLX6DhVncOA5ljCMLRYi9Fc9iaxNQ==
+X-Received: by 2002:a17:907:96a1:b0:b80:6ddc:7dcd with SMTP id a640c23a62f3a-b84453a123amr1554539466b.31.1768166603103;
+        Sun, 11 Jan 2026 13:23:23 -0800 (PST)
+Received: from localhost (ip87-106-108-193.pbiaas.com. [87.106.108.193])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b86f1e95273sm512889966b.62.2026.01.11.13.23.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Jan 2026 13:06:00 -0800 (PST)
-Date: Sun, 11 Jan 2026 21:05:58 +0000
-From: Fabio Baltieri <fabio.baltieri@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Russell King - ARM Linux <linux@armlinux.org.uk>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Michael Klein <michael@fossekall.de>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Realtek linux nic maintainers <nic_swsd@realtek.com>,
-	Aleksander Jan Bajkowski <olek2@wp.pl>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 2/2] r8169: add support for RTL8127ATF (Fiber
- SFP)
-Message-ID: <aWQQti6G-b87xvxh@google.com>
-References: <c2ad7819-85f5-4df8-8ecf-571dbee8931b@gmail.com>
- <5c390273-458f-4d92-896b-3d85f2998d7d@gmail.com>
+        Sun, 11 Jan 2026 13:23:22 -0800 (PST)
+Date: Sun, 11 Jan 2026 22:23:16 +0100
+From: =?iso-8859-1?Q?G=FCnther?= Noack <gnoack3000@gmail.com>
+To: Matthieu Buffet <matthieu@buffet.re>
+Cc: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
+	=?iso-8859-1?Q?G=FCnther?= Noack <gnoack@google.com>,
+	linux-security-module@vger.kernel.org,
+	Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>,
+	konstantin.meskhidze@huawei.com, netdev@vger.kernel.org
+Subject: Re: [RFC PATCH v3 0/8] landlock: Add UDP access control support
+Message-ID: <20260111.f025d6aefcf4@gnoack.org>
+References: <20251212163704.142301-1-matthieu@buffet.re>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <5c390273-458f-4d92-896b-3d85f2998d7d@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251212163704.142301-1-matthieu@buffet.re>
 
-On Sat, Jan 10, 2026 at 04:15:32PM +0100, Heiner Kallweit wrote:
-> RTL8127ATF supports a SFP+ port for fiber modules (10GBASE-SR/LR/ER/ZR and
-> DAC). The list of supported modes was provided by Realtek. According to the
-> r8127 vendor driver also 1G modules are supported, but this needs some more
-> complexity in the driver, and only 10G mode has been tested so far.
-> Therefore mainline support will be limited to 10G for now.
-> The SFP port signals are hidden in the chip IP and driven by firmware.
-> Therefore mainline SFP support can't be used here.
-> 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+Hello Matthieu!
 
-Pulled and tested again, just in case
+On Fri, Dec 12, 2025 at 05:36:56PM +0100, Matthieu Buffet wrote:
+> Here is v3 of UDP support for Landlock. My apologies for the delay, I've
+> had to deal with unrelated problems. All feedback from v1/v2 should be
+> merged, thanks again for taking the time to review them.
 
-Tested-by: Fabio Baltieri <fabio.baltieri@gmail.com>
+Good to see the patch again. :)
 
-Cheers,
-Fabio
+Apologies for review delay as well.  There are many Landlock reviews
+in flight at the moment, it might take some time to catch up with all
+of them.
+
+FYI: In [1], I have been sending a patch for controlling UNIX socket
+lookup, which is restricting connect() and sendmsg() operations for
+UNIX domain sockets of types SOCK_STREAM, SOCK_DGRAM and
+SOCK_SEQPACKET.  I am bringing it up because it feels that the
+semantics for the UDP and UNIX datagram access rights hook in similar
+places and therefore should work similarly?
+
+In the current UNIX socket patch set (v2), there is only one Landlock
+access right which controls both connect() and sendmsg() when they are
+done on a UNIX datagram socket.  This feels natural to be, because you
+can reach the same recipient address whether that is done with
+connect() or with sendmsg()...?
+
+(Was there a previous discussion where it was decided that these
+should be two different access rights for UDP sockets and UNIX dgram
+sockets?)
+
+[1] https://lore.kernel.org/all/20260101134102.25938-1-gnoack3000@gmail.com/
+
+Thanks,
+–Günther
 
