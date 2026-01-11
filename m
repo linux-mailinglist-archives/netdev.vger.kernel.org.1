@@ -1,114 +1,119 @@
-Return-Path: <netdev+bounces-248813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA9E7D0EF74
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 14:16:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB492D0F076
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 15:05:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AE4CE30081AA
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 13:15:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F2822300B295
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 14:04:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6E73339873;
-	Sun, 11 Jan 2026 13:15:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79ADB33DEF7;
+	Sun, 11 Jan 2026 14:04:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="EV/49LMB"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="QExsiGGl"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A4833BBD4
-	for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 13:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81569450F2
+	for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 14:04:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768137342; cv=none; b=FeggNBtFj36+0EwSUWg59FycWl/UbUT+/B0I9iTNKhJI4YEPvH5eJtOOozqXOwHMZVKDMw1H4PSy0hrPPguSNsoQPocMSGixzkm5qIihVIrzJbocONa9EI8XdguMreBLGSI+1asxNgK7Iq7hVnyFE69rbAYf2cGlCdwr/8n+yPE=
+	t=1768140299; cv=none; b=TA0JBr5jskslyGdDhG8kbLFAm677Q4mLhBvYePsPvwVt7hiU5pbOASDWdC7KrbCcuv4a2kemRVpAYDsPtXuvdSiEsK+L4oqHUayPAbAaFazoleL+Q9X5iMo/tslU4VitK7C4D0It4X+DMeMnbDGK13SsvSTBj9tW6qud17TJABM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768137342; c=relaxed/simple;
-	bh=DcEpzS2uINsKoiKHI5QeBCJ506husK4XESUiksdi67M=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=MqXaI8MjpqS6VxaIeFWiWvvzl8gaq6IO4bxfq0XYuxDhMHKHXYG+qbFROE1T4wYpMsEvZxQXYkB9jzn+86pUbbs/U7VUjteNTEi6fD9FuCbOcsxR9Tx+1RRBNFzjjzmWFg8ulGY3mMi5To5SqN6m5FTNOME2BAq5Ki3DCLMR8iE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=EV/49LMB; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=mhHZZmL/NcTBBpVOifiOT25mcW059BgaRnaZdAmQTz8=; b=EV/49LMBt6VNFsFdpMQS8rgGvP
-	3EZCbcdowNm30Qx4X/rGGaAzNvX24gj4Od6dqcYBsDuKu2d435qDJ0QGIr4oXPWT4Uk3r77U+vjXG
-	WepGdjMn/fAFgatj+IpYBgY+4+nO+sfnj1ke3ch/DKGd85eQj+GBGRFlb3S8fH3qu6jSKyl718e34
-	MOcWu5wspOxCURrtrMyCpyLHG2gc523QyC44AHjsa4c4uSkRL9NPh8dye1ucb0v/XDrbgO++IQM7g
-	sLe1qQk+0bLUsK4wYi350fW5mRCt34gF+qRd9UsLAoD/EqiaxyGiVQDteML20UiPGAdtcQ08U1lRH
-	OEbkPkNQ==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:48912 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vevI3-000000005Uz-0nSI;
-	Sun, 11 Jan 2026 13:15:31 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vevI1-00000002Yp8-3cM3;
-	Sun, 11 Jan 2026 13:15:29 +0000
-In-Reply-To: <aWOiOfDQkMXDwtPp@shell.armlinux.org.uk>
-References: <aWOiOfDQkMXDwtPp@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 5/5] net: stmmac: report PCS link changes to phylink
+	s=arc-20240116; t=1768140299; c=relaxed/simple;
+	bh=btyv13yF1O8eLHTxPRhdfp8TKAEfJvTKBJK1fYmI6Xg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nb3Hgx047uv16cm0NAxxiInA5JEHjIfWkMGv4ylp1U0jh0ZuTJ2gf3poFjOtxK2b2wNDgV8U95bvfk9Q3uBVkpswqqVuQMnA15Qm7vwnp+koA4sM6M2XbevLa7/x5Sjx481yQEpVJrFmRhl66pBvIheO3ZtMVGJywEHWiVl2kAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=QExsiGGl; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-64dfb22c7e4so7701029a12.1
+        for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 06:04:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1768140296; x=1768745096; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0XwABaHQba0TZXE5KSskxvkqQOly72ac18mmHR+qtCY=;
+        b=QExsiGGlElrMbdLuVLF3vOqHwCf+WCT61him0YoQoIEWfiO4yNLyd4VPBUAKN40Gej
+         x+S845X0jv6JN0VBlI7arOrMRZmUjNjdywGxqg5AZeDp411nr7Ct3jMkAyw9oGfZ80tp
+         9peF5Nu7BK/4h9jjmebrpbIuSLELKFU7zvnFZqdA2gopeWLxeGHjMxwhymx3RIJ7uMfB
+         hpCmIW4/qAYok/gFj8dEiDrfBxbl4cYeMBaBpOEfsfmWLMvsLKPHH+jcF56wU5GfMxNT
+         Fk83jkyDvYSwRUyk76cF/DEUlxrfU34/Cp8JPQf9+99HmKUb0Ee91SKnRcSXxBM8h+ZI
+         d3oQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768140296; x=1768745096;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0XwABaHQba0TZXE5KSskxvkqQOly72ac18mmHR+qtCY=;
+        b=XdXHPxwhysj2QJ1StxOq8tJ1hFjMNBsl0Ip5YMzTeOFRaGx6neo5Mb+tTuLqyxvbQh
+         LBD8Y1L/ArYn6+LjvS9boZldX4u0Pp/S3bPGHE5nMbXeXk6wuWo8BLOdmar3Z+5plDTu
+         C2aVqjf/TuY81R8E+cyw6BzkFQ8cX5MY6HClhCJUczazNTcy/ibAOkhHTLCMsnun1Nbk
+         AYLzQ+SqQJbs4Me6TSXarh9vVLS3SkMkRdr6B33dpDfyb8gqhr8pxVlILCLwqYV/Ap2X
+         XC9hrPR9kZcKOZgIZ4zjwbSJTYnK5ht498p1XcTa9OkqzikR+MfnctygFq8jPnxjSOjq
+         c5ew==
+X-Forwarded-Encrypted: i=1; AJvYcCUnc7mbRiMsEPgPjG10ccCLjX68qz86wZFLENB21+F4RcrdoEKIMC+sqSAdPBi9rHJBC0SmD3g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrEx5XCGSxA/SZDBJTL2pxZlm6vx9y6kfoO9q+vGU+tbxbI+MP
+	hf+LW4Y73NJFAam69W6Vvd0JwSeGl8cayf2nS2nbw7+JhaydkL/oqhLb0g9YsvfAqVQ=
+X-Gm-Gg: AY/fxX78eFMzUPN+nNvvsef10viQ5N4kHf3nAzYXWm1ehFkB87jDiNRe0Xq0kl5JCAm
+	qCnLORbVp0Irh+Y26NdCB5WHNu60w5eKCGCcvChWIL2Kl6Tvcy3EMMPlfcH/Vv9SVuAwz1NutkC
+	Himbq+cJaAi4ekcvAauTexOE3LHi3sbNhWTP9qYz84OEmMmUfCdwWezCZEPKespv7ZTcthqVnFY
+	ItvJ5Xyt76lswT9RNOqNIwfY/mCqjAp7gVjrtOtTvXFVIc3UFo51psxPQmNoro0tyEMpUYuUthL
+	UiG+Z8Wkx1JnK6ZKzBkC78JZbVTiR7Q+D/xZJmySZXiDVTl1fs/k6syERUC6QDGUtEG5p6mUka2
+	fQBnu0ex4QNNsIY0k+Qu2vSLtSml2fnnCdEGEZHHIkmN+IHoWTDvROz2+u6Y2KBdoMRnkp4Euju
+	wjUvn3CBAcumhfagB1UEtPJ5I=
+X-Google-Smtp-Source: AGHT+IFH0IHMLB/e9VMPw+PNQvxklsKe4TmQmjkQDY/3vRiOU9XAUjD+Bmvv1dPy8Ir0WmHAJUU9Lg==
+X-Received: by 2002:a17:907:a08:b0:b07:87f1:fc42 with SMTP id a640c23a62f3a-b8444f488f0mr1766243166b.16.1768140295378;
+        Sun, 11 Jan 2026 06:04:55 -0800 (PST)
+Received: from [10.216.106.246] ([213.233.110.57])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b86f0d6d7c6sm455055266b.42.2026.01.11.06.04.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 11 Jan 2026 06:04:54 -0800 (PST)
+Message-ID: <3f82d755-552a-4074-bee4-b2660eb6a979@tuxon.dev>
+Date: Sun, 11 Jan 2026 16:04:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vevI1-00000002Yp8-3cM3@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Sun, 11 Jan 2026 13:15:29 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 01/15] dt-bindings: usb: Add Microchip LAN969x support
+To: Robert Marko <robert.marko@sartura.hr>, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, nicolas.ferre@microchip.com,
+ alexandre.belloni@bootlin.com, herbert@gondor.apana.org.au,
+ davem@davemloft.net, vkoul@kernel.org, andi.shyti@kernel.org,
+ lee@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, linusw@kernel.org, Steen.Hegelund@microchip.com,
+ daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
+ olivia@selenic.com, radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com,
+ gregkh@linuxfoundation.org, jirislaby@kernel.org, broonie@kernel.org,
+ lars.povlsen@microchip.com, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+ linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org,
+ linux-serial@vger.kernel.org, linux-usb@vger.kernel.org
+Cc: luka.perkov@sartura.hr
+References: <20251229184004.571837-1-robert.marko@sartura.hr>
+ <20251229184004.571837-2-robert.marko@sartura.hr>
+Content-Language: en-US
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <20251229184004.571837-2-robert.marko@sartura.hr>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Report PCS link changes to phylink, which will allow phylink's inband
-support to respoind to link events once the PCS is appropriately
-configured.
 
-An expected behavioural change is that should the PCS report that its
-link has failed, but phylink is operating in outband mode and the PHY
-reports that link is up, this event will cause the netdev's link to
-momentarily drop, making the event more noticable, rather than just
-producing a "stmmac_pcs: Link Down" message.
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c | 2 ++
- 1 file changed, 2 insertions(+)
+On 12/29/25 20:37, Robert Marko wrote:
+> Microchip LAN969x has DWC3 compatible controller, though limited to 2.0(HS)
+> speed, so document it.
+> 
+> Signed-off-by: Robert Marko<robert.marko@sartura.hr>
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
-index 28748e7ef7dd..2f826fe7229b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
-@@ -62,6 +62,8 @@ void stmmac_integrated_pcs_irq(struct stmmac_priv *priv, u32 status,
- 		x->irq_pcs_link_n++;
- 		dev_info(priv->device, "PCS Link %s\n",
- 			 val & GMAC_AN_STATUS_LS ? "Up" : "Down");
-+
-+		phylink_pcs_change(&spcs->pcs, val & GMAC_AN_STATUS_LS);
- 	}
- }
- 
--- 
-2.47.3
-
+Reviewed-by: Claudiu Beznea <claudiu.beznea@tuxon.dev>
 
