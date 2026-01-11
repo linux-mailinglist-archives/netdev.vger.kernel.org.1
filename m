@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-248794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D7F4D0EA48
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 12:00:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 297BBD0EA56
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 12:00:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 491AC30072AC
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 11:00:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4AF5F30263C8
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 11:00:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A05C2241CB7;
-	Sun, 11 Jan 2026 11:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 231FF332EC9;
+	Sun, 11 Jan 2026 11:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="gIttdBbc"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="e0RSaExe"
 X-Original-To: netdev@vger.kernel.org
 Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F4EE42048;
-	Sun, 11 Jan 2026 11:00:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC2C0336EC6;
+	Sun, 11 Jan 2026 11:00:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768129214; cv=none; b=lH9gxZ5ngk5nk9NmenOjFQhE0HN/fGHLuFBWN7AY5ztHb5Hcp+yYY6H1XcjY47ibmdz5cGJjxeNy2nrno5TbXa97Ba4fBhbYyMM7oNkuMCWlGJaG8EmF4SAvdx2qPI0xpsNL8FZIuRhdtc79KqG0XuDVgzEfCS+Hg3FSRxw5zxY=
+	t=1768129222; cv=none; b=nSZf6TZhICNP8/VXL267rzKWZdpbwex598zojykIvAC18rTlMqNfpe0ZqfCqFKqy4dgo6Xx8DjzCFM3ab/iv/RHY1SXitCnw9Dtkfd85ISYvW9bqd2KLdlzzriWBdlLM5hKagzTqxZAcyAieu/FFn7FXeGPCcCrWFhg3I0d6Cz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768129214; c=relaxed/simple;
-	bh=meGd7AwSWHQxCNFnfcJQBz3TtBD4Lp2Slh3imR0wTzg=;
+	s=arc-20240116; t=1768129222; c=relaxed/simple;
+	bh=ELIZpjH4jshC+q126H2p3RkHz0HlUxEYfJcAfY+Z9YE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s+TauGF0wWrg0jzJ/UM5I64Wi9tKyJjTh+4uJoZXqSFOwap1RfQvYAXmRd0m9ewTeMN6E8+jb6EkYZw+9pZdzEkLsRrnRyMWtZq31bEYA9du/CoFYjbhxYALM5WuqkRkzHoQk1ztc5QkaUOHMSmGzcU9vEbVyt1oTV/Fi817yNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=gIttdBbc; arc=none smtp.client-ip=185.226.149.38
+	 In-Reply-To:Content-Type; b=t8jaea0Q615Ns42nqGNUgr1gg55m4DQJkmLFdhNlImipKVnHWXYyW0B9RilENovhmsQmIA70HRDpxOrTg3LyAuYHi1v4yWKBzJjPR3TpX9WmNpbp6KduY7I8LKYRsbNG3hiS+zGnWmb85WOORBoWhnuO1MKpBuAJF+d7atCZrqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=e0RSaExe; arc=none smtp.client-ip=185.226.149.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
 	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1vetAn-009gsJ-O0; Sun, 11 Jan 2026 11:59:53 +0100
+	id 1vetB6-009gyI-Sj; Sun, 11 Jan 2026 12:00:12 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
 	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
 	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=scKKsBdmiFKU4HTFxkWMttf7eOA7bKyWv2l9rVYugb4=; b=gIttdBbcr9aXvqOyJrxw1sQn7X
-	vSZyoSfnP6otpsl3gPrIFY+QW3o4rV/Gexi20o8WOfcWPWNox+hcMHZ+NBuFlTGAWS4RNms0qSlna
-	f9Nx3sXU8mvf1J2EK6wWcyfGilKq15eylLUpfFx/Fce4c9xYNGJS5XCmuM3/+PBv4gP423Wdw1fuy
-	RDnst5SluxsjoG7zlh1pZ0e/FzuSrPDy3z5/JaL7dchT/BxrALwHy2ipy39MowBegNJtFIG86xVFb
-	Fp8rSxpWbAjKHs2ACzymtVCPQ6t4UUQlOkSVfOBKtfAavPPfZIiW+HXm1IjZ+QBI5IE96g83kFtr3
-	YAAuKpvQ==;
+	bh=5uZ3LZfOZWVMlL8l8PLhGgJ10/9cK55ZfyWwVPRLGsk=; b=e0RSaExegxUf16QCIIQ+dyZvdP
+	spQfbYMwB0zpJ/3wGvx1IXbHwIAnXj8hLsOaQWpGPowImVIjE+u4ydYvzhb2pL0srfVdEl/wWObl6
+	agWl8SPivrToaW3n4tdmhccjYG6bGl/LQyCwJ6D6/TBm2wq0f/8yQ8NTjQhMgdidJuXpm+kfuwXhB
+	Xkhqt6GfIErXBPAlL5cL0/ZlTUEqeQUZob1Hv8+9sEu8J/sAGCMTfDiGZmN0keywKZV5q/hSz53L6
+	15MydZzaL0EUGuLHJi8WqOShrn8hvvaI61IzWLr+l6Alv+g18GzcnfUkw5Z7dCY/Gayil2Qwl0Rxp
+	nrBqHsEw==;
 Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1vetAm-0003Gy-Qw; Sun, 11 Jan 2026 11:59:52 +0100
+	id 1vetB6-0006ng-Eu; Sun, 11 Jan 2026 12:00:12 +0100
 Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1vetAg-007axd-2J; Sun, 11 Jan 2026 11:59:46 +0100
-Message-ID: <ae564ab4-2dd2-4a12-a92c-b613fa430829@rbox.co>
-Date: Sun, 11 Jan 2026 11:59:44 +0100
+	id 1vetAp-007ayA-Cb; Sun, 11 Jan 2026 11:59:55 +0100
+Message-ID: <76ca0c9f-dcda-4a53-ac1f-c5c28d1ecf44@rbox.co>
+Date: Sun, 11 Jan 2026 11:59:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,7 +59,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] vsock/virtio: Coalesce only linear skb
+Subject: Re: [PATCH 2/2] vsock/test: Add test for a linear and non-linear skb
+ getting coalesced
 To: Stefano Garzarella <sgarzare@redhat.com>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
  Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
@@ -71,44 +72,132 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
  virtualization@lists.linux.dev, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org
 References: <20260108-vsock-recv-coalescence-v1-0-26f97bb9a99b@rbox.co>
- <20260108-vsock-recv-coalescence-v1-1-26f97bb9a99b@rbox.co>
- <aWEnYm6ePitdHPQe@sgarzare-redhat>
+ <20260108-vsock-recv-coalescence-v1-2-26f97bb9a99b@rbox.co>
+ <aWEqjjE1vb_t35lQ@sgarzare-redhat>
 Content-Language: pl-PL, en-GB
 From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <aWEnYm6ePitdHPQe@sgarzare-redhat>
+In-Reply-To: <aWEqjjE1vb_t35lQ@sgarzare-redhat>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 1/9/26 17:18, Stefano Garzarella wrote:
-> On Thu, Jan 08, 2026 at 10:54:54AM +0100, Michal Luczaj wrote:
-...
->> @@ -1375,7 +1375,8 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
->> 		 * of a new message.
->> 		 */
->> 		if (skb->len < skb_tailroom(last_skb) &&
->> -		    !(le32_to_cpu(last_hdr->flags) & VIRTIO_VSOCK_SEQ_EOM)) {
->> +		    !(le32_to_cpu(last_hdr->flags) & VIRTIO_VSOCK_SEQ_EOM) &&
->> +		    !skb_is_nonlinear(skb)) {
+On 1/9/26 17:32, Stefano Garzarella wrote:
+> On Thu, Jan 08, 2026 at 10:54:55AM +0100, Michal Luczaj wrote:
+>> Loopback transport can mangle data in rx queue when a linear skb is
+>> followed by a small MSG_ZEROCOPY packet.
 > 
-> Why here? I mean we can do the check even early, something like this:
+> Can we describe a bit more what the test is doing?
+
+I've expanded the commit message:
+
+To exercise the logic, send out two packets: a weirdly sized one (to ensure
+some spare tail room in the skb) and a zerocopy one that's small enough to
+fit in the spare room of its predecessor. Then, wait for both to land in
+the rx queue, and check the data received. Faulty packets merger manifests
+itself by corrupting payload of the later packet.
+
+>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>> ---
+>> tools/testing/vsock/vsock_test.c          |  5 +++
+>> tools/testing/vsock/vsock_test_zerocopy.c | 67 +++++++++++++++++++++++++++++++
+>> tools/testing/vsock/vsock_test_zerocopy.h |  3 ++
+>> 3 files changed, 75 insertions(+)
+>>
+>> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>> index bbe3723babdc..21c8616100f1 100644
+>> --- a/tools/testing/vsock/vsock_test.c
+>> +++ b/tools/testing/vsock/vsock_test.c
+>> @@ -2403,6 +2403,11 @@ static struct test_case test_cases[] = {
+>> 		.run_client = test_stream_accepted_setsockopt_client,
+>> 		.run_server = test_stream_accepted_setsockopt_server,
+>> 	},
+>> +	{
+>> +		.name = "SOCK_STREAM MSG_ZEROCOPY coalescence corruption",
 > 
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -1361,7 +1361,8 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
->           * to avoid wasting memory queueing the entire buffer with a small
->           * payload.
->           */
-> -       if (len <= GOOD_COPY_LEN && !skb_queue_empty(&vvs->rx_queue)) {
-> +       if (len <= GOOD_COPY_LEN && !skb_queue_empty(&vvs->rx_queue) &&
-> +           !skb_is_nonlinear(skb)) {
->                  struct virtio_vsock_hdr *last_hdr;
->                  struct sk_buff *last_skb;
+> This is essentially a regression test for virtio transport, so I'd add 
+> virtio in the test name.
 
-Right, can do. I've assumed skb being non-linear is the least likely in
-this context.
+Isn't virtio transport unaffected? It's about loopback transport (that
+shares common code with virtio transport).
 
-> I would also add the reason in the comment before that to make it clear.
+>> +		.run_client = test_stream_msgzcopy_mangle_client,
+>> +		.run_server = test_stream_msgzcopy_mangle_server,
+>> +	},
+>> 	{},
+>> };
+>>
+>> diff --git a/tools/testing/vsock/vsock_test_zerocopy.c b/tools/testing/vsock/vsock_test_zerocopy.c
+>> index 9d9a6cb9614a..6735a9d7525d 100644
+>> --- a/tools/testing/vsock/vsock_test_zerocopy.c
+>> +++ b/tools/testing/vsock/vsock_test_zerocopy.c
+>> @@ -9,11 +9,13 @@
+>> #include <stdio.h>
+>> #include <stdlib.h>
+>> #include <string.h>
+>> +#include <sys/ioctl.h>
+>> #include <sys/mman.h>
+>> #include <unistd.h>
+>> #include <poll.h>
+>> #include <linux/errqueue.h>
+>> #include <linux/kernel.h>
+>> +#include <linux/sockios.h>
+>> #include <errno.h>
+>>
+>> #include "control.h"
+>> @@ -356,3 +358,68 @@ void test_stream_msgzcopy_empty_errq_server(const struct test_opts *opts)
+>> 	control_expectln("DONE");
+>> 	close(fd);
+>> }
+>> +
+>> +#define GOOD_COPY_LEN	128	/* net/vmw_vsock/virtio_transport_common.c */
+> 
+> I think we don't need this, I mean we can eventually just send a single 
+> byte, no?
 
-OK, sure.
+For a single byte sent, you get a single byte of uninitialized kernel
+memory. Uninitialized memory can by anything, in particular it can be
+(coincidentally) what you happen to expect. Which would result in a false
+positive. So instead of estimating what length sufficiently reduces
+probability of such false positive, I just took the upper bound.
+
+BTW, I've realized recv_verify() is reinventing the wheel. How about
+dropping it in favour of what test_seqpacket_msg_bounds_client() does, i.e.
+calc the hash of payload and send it over the control channel for verification?
+
+>> +
+>> +void test_stream_msgzcopy_mangle_client(const struct test_opts *opts)
+>> +{
+>> +	char sbuf1[PAGE_SIZE + 1], sbuf2[GOOD_COPY_LEN];
+>> +	struct pollfd fds;
+>> +	int fd;
+>> +
+>> +	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+>> +	if (fd < 0) {
+>> +		perror("connect");
+>> +		exit(EXIT_FAILURE);
+>> +	}
+>> +
+>> +	enable_so_zerocopy_check(fd);
+>> +
+>> +	memset(sbuf1, '1', sizeof(sbuf1));
+>> +	memset(sbuf2, '2', sizeof(sbuf2));
+>> +
+>> +	send_buf(fd, sbuf1, sizeof(sbuf1), 0, sizeof(sbuf1));
+>> +	send_buf(fd, sbuf2, sizeof(sbuf2), MSG_ZEROCOPY, sizeof(sbuf2));
+>> +
+>> +	fds.fd = fd;
+>> +	fds.events = 0;
+>> +
+>> +	if (poll(&fds, 1, -1) != 1 || !(fds.revents & POLLERR)) {
+>> +		perror("poll");
+>> +		exit(EXIT_FAILURE);
+>> +	}
+> 
+> Should we also call vsock_recv_completion() or we don't care about the 
+> result?
+> 
+> If we need it, maybe we can factor our the poll + 
+> vsock_recv_completion().
+
+Nope, we don't care about the result.
 
 
