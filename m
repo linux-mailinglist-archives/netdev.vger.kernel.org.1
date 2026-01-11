@@ -1,165 +1,179 @@
-Return-Path: <netdev+bounces-248775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AE97D0E06B
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 02:55:37 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30BA1D0E0F4
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 05:01:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8EAF3300BA3C
-	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 01:55:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BF29E3012BC8
+	for <lists+netdev@lfdr.de>; Sun, 11 Jan 2026 04:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A02DB1E51EE;
-	Sun, 11 Jan 2026 01:55:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 038611E98E6;
+	Sun, 11 Jan 2026 04:01:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pcnFjEY7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UHkujdTP"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E541C84D7
-	for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 01:55:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883E943ABC
+	for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 04:01:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768096524; cv=none; b=FfVbpRJvAcb1cdJrQVFRep6MTx+AsQSCsPcKaFvBkIeryQKOr+hbjHBNUcyxGvgY2LvIIyOmD36tz8yDivuNEzmsxZY9swjq6DYRoSPPhp3GKbzbQDhapt69gcv34y/1iIh6LmRIXGF0TrzOrsM4+8P/tFfkeJmLWIkHf+OtF2U=
+	t=1768104093; cv=none; b=NjNiSPGMpKPyceDzrIsx6bSjrYTzpu6rjp/5VEAWJJXmaEqdXFZkQyHDfntSHnpPSL6OxOHicblklxH+FQfhrTikxkBqGVHUuh6a9Fu1i0yfmu72iNB74+o1FpdQejtG2kDxQa6lldTQcoxUFV7ovq7+iZiujTz/9hFhB5e2oPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768096524; c=relaxed/simple;
-	bh=xyAKM2qH6mR4SilETkaj33RNXFrNkJQhGxHK6tgGqns=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mdwba8qc/ECxbiD9W4ttMkGNaXV/dnEDRg0FJo+JSvuMe3mdDYfnXg3RzO5r2BW26Spo/CbY65KPtTCNPPWr9Mvc29TW0R3oM8nly1u3m90glQ+4noGWc3MH7MjsQLNojdxjBdr1mqGtOOmPNvvcUAqT/8RQ8ytkbXRiyAfTvms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pcnFjEY7; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768096520;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vvQHbocNqZC5c16pNBSQv3SGQpCUORCgSh12YOLA3+k=;
-	b=pcnFjEY7LL/4OU5wajjDNZJDj+/ea60YnIBPWIgUUeA43eBTLnlp5hXR7WLD+HgQ80UaJZ
-	t36nZ8T899kuf1nCYKi8nTbmwfgXOlKPanYt4ELvGyWwiMdTYKbmGLhHfcndni/OGZVMVR
-	8qUuvtgxrfxQGRjSpn00Lj9MAg6+2bE=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: menglong8.dong@gmail.com, ast@kernel.org, andrii@kernel.org,
- bot+bpf-ci@kernel.org
-Cc: daniel@iogearbox.net, martin.lau@linux.dev, eddyz87@gmail.com,
- song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
- kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
- davem@davemloft.net, dsahern@kernel.org, tglx@linutronix.de,
- mingo@redhat.com, jiang.biao@linux.dev, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net,
- martin.lau@kernel.org, eddyz87@gmail.com, yonghong.song@linux.dev,
- clm@meta.com, ihor.solodrai@linux.dev
-Subject:
- Re: [PATCH bpf-next v9 05/11] bpf: support fsession for bpf_session_cookie
-Date: Sun, 11 Jan 2026 09:54:57 +0800
-Message-ID: <5959432.DvuYhMxLoT@7950hx>
-In-Reply-To:
- <75ddb4013c7de3c454d564f3052afc81a0906226a17d75aa4301f750e3ef7723@mail.kernel.org>
-References:
- <20260110141115.537055-6-dongml2@chinatelecom.cn>
- <75ddb4013c7de3c454d564f3052afc81a0906226a17d75aa4301f750e3ef7723@mail.kernel.org>
+	s=arc-20240116; t=1768104093; c=relaxed/simple;
+	bh=NcyWFIXdLsWHECMpFUUH7I65oUK5b9E6foMv8yDUJvc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ibsFmU/cG0RkWWmWDiCZ3nB4iQgzFc0pE6SiGx1aj8rL/y3BzovPErlQrEVe2T5o4k6u/+LHqdW1rjmm3gArCXVf+JKGTIqFAFQVVJb3nzN65zlkKLU9AEOQYO4COdBIODL/toHXbp0W8bblet5UPJ2iVVN1sE+Tj7e6xKP4Bcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UHkujdTP; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-c2dc870e194so2851433a12.2
+        for <netdev@vger.kernel.org>; Sat, 10 Jan 2026 20:01:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768104092; x=1768708892; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6aSQimWPEMhTKsPYUy1vj9/5sPSG4zuP/FMO33v30Ew=;
+        b=UHkujdTP3pfdfkoy5DtjZApnH1qGblmPGxMBYDeZ3lu5s+80KCNb2T7lKkdaaj49l1
+         NXJLfiORPdLsorP7RI1j3fpHB5YZt0orGFT2lYuE1BTHsnY2w/tQLMsiuFFcGsd6++w2
+         yzK2SffhUBWnY3sGHmXByjw3CP+vEcLAor0s/Dqui4ZtjKj/7XdouOUxzxM/zdrXRuRx
+         10+rvjMUGbsKPfdp5ViuIMGGS4XBTWdD7EdeH/ua+Jtg6Z9+4D14rRS7/T6aLyv4sY2q
+         iaqoegt90ri4auriS4wVSFgIWlBwBA5xOYr+Fe74t2jwvGzae1DsEwDkgBvwtGytyxDG
+         xdGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768104092; x=1768708892;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6aSQimWPEMhTKsPYUy1vj9/5sPSG4zuP/FMO33v30Ew=;
+        b=a43/p8l80Gu/Yvd0p0TNIwjeBa1+Ry3ABEcZTxJWvlkTl025Np7YgHIWKMbQnsIXEH
+         K28JLKdq4SDR2AGYItOk193q5e7uBDeHMQ6AIcBMyoy8i2AvpFMcsUxQB3XVBjAgRY9W
+         9+fOb7ySji+lyss7gragfQWz35Jc4/pxvw0yoMnRiqgdRjBkPiG7LkvmSUzg9Bjwmb9d
+         lh9NTt/BbvNgaqUGYF1taNbxDVWvsNNS3bt+QMAJv2AZtWPWpPqUp2+Zo7xxQ/xSlsul
+         9Gwrpr336otfwVORvc/MEuOmVWzH9/bwg+C9h0cxFkCPB+pMWlmqqHAs0snqhhiVfrSd
+         78tw==
+X-Forwarded-Encrypted: i=1; AJvYcCVit7AeU+nNKnQXEMwmaCz/fQ64vBesL4tKvfrmcYh9MwtYWSbuX68t6qP7eHnMI0rNkZ4pYr0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3hTGVVy9WahLMF0bCDb24UQcvK7veYSb/z44MVm9gGHKUU2hq
+	PRbIWXouEJqAMNlN0RqQpMhZkM6jN3IByVnKFPqrFQ0kH04gQnR0tQAr
+X-Gm-Gg: AY/fxX5KXXac10FKNNT2Dqtb85S+xgrhUnQHQRjGozuHrNK4nJHuosQ+rc+uKCN0G15
+	8jSoHc7riLJHClS0HUzA+CNwPjj937VvX/+lqCYl8amCDdnaNynObtx14oJRpCFGDJvJcAED5Fi
+	dyvhHlvp2+oVYj/Q3C0Zyin8ye9OVIJgUdyzrQLZZldobmZMLQOyYyZSPeZmc+uNZonQX0Wkok+
+	isjR3vC86iTZAahJ5iPFMZj7yyW3JeX9K2nr/HRzsNYgsmw6397JCfjLHeNN5y0wfEeyWNmfSAR
+	u9QgonWyFPM/IlTrN3kTaltTlhc03LxqjRZBPDlxUNpz2ddro0e9Y+/Q/IPnzNsZ4jGGFFwJ7Ie
+	F5Sl4Kuq0oA4Bdt/9PeAuiUD3sSHvDnhMIjrtdWSQ6ZT8jTRI3USI8JUo/IuzDk75BA6+OPETrf
+	uf340F
+X-Google-Smtp-Source: AGHT+IGPybPvZupy/FYihDwzQNc/n+V1kR/RRvYwaA6/FcFDZUxpWNk2e4gufz92hDuNfXzVOvBWtg==
+X-Received: by 2002:a05:6a20:a128:b0:35f:68d:430e with SMTP id adf61e73a8af0-3898f8f45bemr12792422637.9.1768104091706;
+        Sat, 10 Jan 2026 20:01:31 -0800 (PST)
+Received: from [0.0.0.0] ([8.222.167.232])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c4cc96ca7a9sm13871167a12.25.2026.01.10.20.01.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 10 Jan 2026 20:01:31 -0800 (PST)
+Message-ID: <0d54ddca-9270-40a5-aa82-d8a7b65027ff@gmail.com>
+Date: Sat, 10 Jan 2026 20:05:31 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 1/2] dt-bindings: ethernet: eswin: add clock sampling
+ control
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>
+Cc: lizhi2@eswincomputing.com, devicetree@vger.kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+ alexandre.torgue@foss.st.com, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ ningyu@eswincomputing.com, linmin@eswincomputing.com,
+ pinkesh.vaghela@einfochips.com, weishangjuan@eswincomputing.com
+References: <20260109080601.1262-1-lizhi2@eswincomputing.com>
+ <20260109080859.1285-1-lizhi2@eswincomputing.com>
+ <00b7b42f-2f9d-402a-82f0-21641ea894a1@lunn.ch>
+ <aWKZvEW7rKFFwZLG@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Bo Gan <ganboing@gmail.com>
+In-Reply-To: <aWKZvEW7rKFFwZLG@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 2026/1/10 22:42, bot+bpf-ci@kernel.org wrote:
-> > diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-> > index 2640ec2157e1..a416050e0dd2 100644
-> > --- a/include/linux/bpf.h
-> > +++ b/include/linux/bpf.h
-> > @@ -1231,6 +1231,7 @@ enum {
-> >
-> >  #define BPF_TRAMP_M_NR_ARGS	0
-> >  #define BPF_TRAMP_M_IS_RETURN	8
-> > +#define BPF_TRAMP_M_COOKIE	9
+On 1/10/26 10:26, Russell King (Oracle) wrote:
+> On Fri, Jan 09, 2026 at 07:27:54PM +0100, Andrew Lunn wrote:
+>>>     rx-internal-delay-ps:
+>>> -    enum: [0, 200, 600, 1200, 1600, 1800, 2000, 2200, 2400]
+>>> +    enum: [0, 20, 60, 100, 200, 400, 800, 1600, 2400]
+>>>   
+>>>     tx-internal-delay-ps:
+>>> -    enum: [0, 200, 600, 1200, 1600, 1800, 2000, 2200, 2400]
+>>> +    enum: [0, 20, 60, 100, 200, 400, 800, 1600, 2400]
+>>
+>> You need to add some text to the Changelog to indicate why this is
+>> safe to do, and will not cause any regressions for DT blobs already in
+>> use. Backwards compatibility is very important and needs to be
+>> addressed.
+>>
+>>> +  eswin,rx-clk-invert:
+>>> +    description:
+>>> +      Invert the receive clock sampling polarity at the MAC input.
+>>> +      This property may be used to compensate for SoC-specific
+>>> +      receive clock to data skew and help ensure correct RX data
+>>> +      sampling at high speed.
+>>> +    type: boolean
+>>
+>> This does not make too much sense to me. The RGMII standard indicates
+>> sampling happens on both edges of the clock. The rising edge is for
+>> the lower 4 bits, the falling edge for the upper 4 bits. Flipping the
+>> polarity would only swap the nibbles around.
 > 
-> [ ... ]
+> I'm going to ask a rather pertinent question. Why do we have this
+> eswin stuff in the kernel tree?
 > 
-> > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> > index 1b0292a03186..b91fd8af2393 100644
-> > --- a/kernel/bpf/verifier.c
-> > +++ b/kernel/bpf/verifier.c
+> I've just been looking to see whether I can understand more about this,
+> and although I've discovered the TRM is available for the EIC7700:
 > 
-> [ ... ]
+> https://github.com/eswincomputing/EIC7700X-SoC-Technical-Reference-Manual/releases
 > 
-> > @@ -22571,6 +22575,22 @@ static int fixup_kfunc_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
-> >  		insn_buf[1] = BPF_ALU64_IMM(BPF_RSH, BPF_REG_0, BPF_TRAMP_M_IS_RETURN);
-> >  		insn_buf[2] = BPF_ALU64_IMM(BPF_AND, BPF_REG_0, 1);
-> >  		*cnt = 3;
-> > +	} else if (desc->func_id == special_kfunc_list[KF_bpf_session_cookie] &&
-> > +		   env->prog->expected_attach_type == BPF_TRACE_FSESSION) {
-> > +		/* inline bpf_session_cookie() for fsession:
-> > +		 *   __u64 *bpf_session_cookie(void *ctx)
-> > +		 *   {
-> > +		 *       u64 off = (((u64 *)ctx)[-1] >> BPF_TRAMP_M_COOKIE) & 0xFF;
-> > +		 *       return &((u64 *)ctx)[-off];
-> > +		 *   }
-> > +		 */
-> > +		insn_buf[0] = BPF_LDX_MEM(BPF_DW, BPF_REG_0, BPF_REG_1, -8);
-> > +		insn_buf[1] = BPF_ALU64_IMM(BPF_RSH, BPF_REG_0, BPF_TRAMP_M_COOKIE);
-> > +		insn_buf[2] = BPF_ALU64_IMM(BPF_AND, BPF_REG_0, 0xFF);
-> > +		insn_buf[3] = BPF_ALU64_IMM(BPF_LSH, BPF_REG_0, 3);
-> > +		insn_buf[4] = BPF_ALU64_REG(BPF_SUB, BPF_REG_0, BPF_REG_1);
-> > +		insn_buf[5] = BPF_ALU64_IMM(BPF_NEG, BPF_REG_0, 0);
->                         ^^^^^^^^
+> that isn't particularly helpful on its own.
 > 
-> This inline code reads the cookie offset from (ctx[-1] >> 9) & 0xFF, but
-> does the x86 trampoline actually store the cookie offset at bit position 9?
+> There doesn't appear to be any device tree source files that describe
+> the hardware. The DT bindings that I can find seem to describe only
+> ethernet and USB. describe the ethernet and USB, and maybe sdhci.
 > 
-> Looking at arch/x86/net/bpf_jit_comp.c in __arch_prepare_bpf_trampoline(),
-> the trampoline stores nr_regs to the nregs_off location:
+> I was looking for something that would lead me to what this
+> eswin,hsp-sp-csr thing is, but that doesn't seem to exist in our
+> DT binding documentation, nor does greping for "hsp.sp.csr" in
+> arch/*/boot/dts find anything.
 > 
->     emit_mov_imm64(&prog, BPF_REG_0, 0, (u32) nr_regs);
->     emit_stx(&prog, BPF_DW, BPF_REG_FP, BPF_REG_0, -nregs_off);
-> 
-> This sets ctx[-1] to a small value like 0x0000000000000006, with the high
-> bits all zero. When the inline code executes:
-> 
->     off = (ctx[-1] >> 9) & 0xFF  --> off = 0
-> 
-> The function then returns &ctx[-0] = ctx itself, which points to the
-> function arguments instead of the session cookie.
-> 
-> Is there a missing dependency on a later commit in the series? Commit
-> 983968c39241 ("bpf,x86: add fsession support for x86_64") appears to add
-> the trampoline code that stores the cookie offset, but it comes after this
-> commit in the patch series.
-
-This is intentionally. The whole feature is partly architecture specific.
-In this patch, we implement the common part, and in the
-983968c39241 ("bpf,x86: add fsession support for x86_64"), we
-implement the feature for x86_64.
-
-If the current architecture doesn't implement this feature, the
-fsession will not be usable, so this inline code will not be called,
-which make sense.
-
-Thanks!
-Menglong Dong
-
-> 
-> > +		*cnt = 6;
-> > +	}
-> 
-> 
-> ---
-> AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-> See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-> 
-> CI run summary: https://github.com/kernel-patches/bpf/actions/runs/20879693280
+> So, we can't know what this "hsp" thing is to even know where to look
+> in the 80MiB of PDF documentation.
 > 
 
+HSP -> High-Speed Peripheral. eswin,hsp-sp-csr is mentioned in
 
+Documentation/devicetree/bindings/mmc/snps,dwcmshc-sdhci.yaml
+Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
+Documentation/devicetree/bindings/usb/eswin,eic7700-usb.yaml
 
+ From ESWIN's vendor/testing kernel tree:
 
+hsp_sp_csr: hsp-sp-top-csr@0x50440000 {
+   compatible = "syscon";
+   #size-cells = <2>;
+   reg = <0x0 0x50440000 0x0 0x2000>;
+};
+
+Apparently it's just a register block that controls varies behaviors of
+high speed peripherals. I'm not sure if DT bindings mandates it, but it's
+undocumented in the TRM. Perhaps ESWIN should properly document it going
+forward? Also, I think ESWIN needs to check-in the sdhci/eth/usb device-
+tree components ASAP, so folks can test it.
+
+Bo
 
