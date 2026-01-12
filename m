@@ -1,72 +1,155 @@
-Return-Path: <netdev+bounces-249083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 461DAD13B1E
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 16:33:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 645D5D13C2F
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 16:44:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DFBEF3001604
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:33:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4926930F643E
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:35:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BDC435F8C1;
-	Mon, 12 Jan 2026 15:33:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB0633612E2;
+	Mon, 12 Jan 2026 15:35:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SHXh23RM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D9n0X+7Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAF2535F8D6
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 15:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A4535FF64
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 15:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768232012; cv=none; b=akx30XSKKXUkzgWfr0uFdqWP5tAWnFocHeXNsf9atNfq4bsVamgwacfXO7AEK1x4cqhyyoq+79MWXfxMjg5NwY6rU2KpN/j1XbJlYE6hNkKltaqW3g7tgkYQ5dyXokBoz1gs0pPZleFQxqztGwnBHgn9mbXv9ae+AFa0sGEu9DI=
+	t=1768232121; cv=none; b=aYxyTXFzHQV0yZNnqhZ28hhXOAkD5uzFG/UmEhS0LCbQ4MfMO5JnhEh8zl3fO+cKYI2gv4EjZolV9wEcBa5Ba04Enso3IHRj8eaFZWEGQqjp0Uc1owwX98b2GmYCE3MjTd0U0paamZXPprnYrjiK0LNhOdx/LTUgBOX0vIKDLPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768232012; c=relaxed/simple;
-	bh=7br71al70osdNhYhoyfhcPflvupA4OlexkHzJQSUs7w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sWzESSKsX0dY/xAC0BPiUzRF46oXNTSc+vubfLEWs+GJVMvQh+ozn12Wqi9txATPKpM03so995hcyZaOo99HoL5Jpn50BsoOMx+11LoX2oiMS3FCqNnfYIjmG98ktLG3gkMW5fGUqqZrM/eFCI31db3WttZ9X6MxjEdnvyskAsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SHXh23RM; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=+tS+VPw2eHksooP1q/eKYTDOe/N7Ous7Lw3PFa80c8o=; b=SHXh23RMSQbQZBvzoogHvuhzmb
-	rgfazA1/obO6kDzaB3dO8Bi6Z6scSSmcVNiJHRtdNTgCvwaFNIU1EwZE+pZDe+D4RSoJQ2Ho0rzoJ
-	AK498+YXIRKpZxfeiMyuL61blcDFDZC5sYu9AT6D59n50CRD3C0ohPZhuxqd+pOi+unY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vfJv2-002Uy5-Bd; Mon, 12 Jan 2026 16:33:24 +0100
-Date: Mon, 12 Jan 2026 16:33:24 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	s=arc-20240116; t=1768232121; c=relaxed/simple;
+	bh=CqkrBbQJARC77HViTJ7Fw835RSSe59j00Y/6Yal3gVQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fVSOBW3WM0ktYow+pqP+XGWg02V535NBhy8gVqwmJYrgslvHsogDqfze9Q9TJ/k+q1uAP5+HYa8yVFG0Nohg4AYLEpt9eodmASNyOEZLmHDfzON8m8LAUMJsgFGJDS+KK4W9bEdMMMm10HEoUPTCsOo/dwe/EyaV7umyxURICdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D9n0X+7Q; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-47796a837c7so45317445e9.0
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 07:35:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768232118; x=1768836918; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bisDuv4nPIuBAuwZ3nv0ukh31CRRL1f/LFbl87ZPJiM=;
+        b=D9n0X+7QWT8DaUBECRPZFql2/dw1VTf8WiXIdYwrvAqtKEL/DOi2N6oXE7P/u5K6MM
+         Kml8FbKjx05yrg8GbLcH6gH5mMKEeZQH+ww/hUgeeueG0kyhyjHcXFCW51B3lZ223PX5
+         iYGBF6lWvo197Uw8CRni2C9jMPerPEn8ebrrbdtlehZKIoCpd6qDNvKyiKh/gN5ccIeg
+         pPOoJC+1qr3Ld6TsSSfLBHS0FoGTnG3w7nQv9MWabMicebP6XgojgbB70Zqsws08TYdp
+         EKqZb0pvCcWuJjJSvp6XGTcdZ8V27izgbvxETc0mlRMzHBXxhAMc7ABkgnQcZbk3q8dy
+         IEOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768232118; x=1768836918;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bisDuv4nPIuBAuwZ3nv0ukh31CRRL1f/LFbl87ZPJiM=;
+        b=VreXxWOgI1C+nY+e5Rt9rIMvIKFXYz009HXTkSy9KLIsPKAJohBuX/vz94QFkG1pgU
+         C33ooln9FpxMeHG50tmDeKP0ldBnv4NqaPwDHMdgLH4E9IDXuPKukoizJJZDA5LxtZOe
+         Gi6HOaDt6M4ae9SZduaz4KZXJYyz9lwYZ9TsoVGQPS572cRgtZtEwdkexdybKHqtBttJ
+         MwptPnXBJvIxz3lAYb7dwJo+uV33Y5MpL/GNmIKYlND8uHmqV22I+8ChSwSdrx+VZSUX
+         lC0+U/dGZeHBSS+KmdjiBibr5RiuaNcM0+hoD1JvzPRzJzSY6+NxAB2kWjqbd7+XHZ+l
+         KFKg==
+X-Forwarded-Encrypted: i=1; AJvYcCW9sjEYM7Dm7PKrYfSHeUtoCJX1S2yfO1Mn42US32DAoqkN+0FSFkh4UUVLswum1KYWuWWduH4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2Ca0hw/9WrdXTmkljwYopptuBWYQrH+GP4afDQLf2A+ilWV+M
+	vVTK49E/+k8oM47976lrtPDL86hbx/J7WbSgvuV5cui1YJFf/TmI3Jz7mcgokRY0
+X-Gm-Gg: AY/fxX6Y3RUpoRI/C3chnC6XrWyLZ4HqUL/fjvmxKlrRUDDwzqaxjr9/EDwDf2vkGD9
+	NnBB+kWbiRqhhbxWnjvqO9boqlZ0v0/Hf4H1tPhFFm2v4YQ9tBjGaSRq6W8nf7tF08WsvAYQXOw
+	bPbINutEgadGv6Q0bq43Qu01LmB/e9KNey9XG0t3YODpUzsXPTGffA3tYnKwMLmo9LyUOfFKF1H
+	TXZVFArR1APeyJta2nr8rOQBj3IKfv3xjRzcHjDTltR0K8UJEgbDqz4Z9F0JebW0ef2IUE5cbja
+	E4ZfAuWHlvRuHneWLt+jvqh3Bo8py34P+JtOPv4VdFXRxYve5Jqbsf1h61qmBbMDFiQ5ayQ3i0D
+	oNwgEKAuJZrldsLj4pfJ7ETMM2UGbpH6hIz3FMh8vy3+CQrHCzJr+nWhsawG3vbu59OEcijkK4m
+	1Xr+lUS8AclumUPXiwd54/jfv2xFV6l/1scg==
+X-Google-Smtp-Source: AGHT+IFkionbBPxAVMu1Bo9fnGCSD/FhMiTLzbgpT1ra0OiOGliqUo8UWo/OByWQL36OmxlkAVQrNQ==
+X-Received: by 2002:a5d:64e7:0:b0:430:f7ae:af3c with SMTP id ffacd0b85a97d-432c374fc2dmr21802974f8f.31.1768232118128;
+        Mon, 12 Jan 2026 07:35:18 -0800 (PST)
+Received: from imac.lan ([2a02:8010:60a0:0:c1a8:6cc9:af79:502a])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5df9afsm41592789f8f.24.2026.01.12.07.35.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jan 2026 07:35:17 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Donald Hunter <donhunte@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
 	netdev@vger.kernel.org,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: Re: [PATCH iwl-next v1 5/7] ixgbe: move EEE config validation out of
- ixgbe_set_eee()
-Message-ID: <29577cab-c96f-4799-99d7-c78cf61cfd61@lunn.ch>
-References: <20260112140108.1173835-1-jedrzej.jagielski@intel.com>
- <20260112140108.1173835-6-jedrzej.jagielski@intel.com>
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-doc@vger.kernel.org
+Cc: Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net v1] tools: ynl: render event op docs correctly
+Date: Mon, 12 Jan 2026 15:34:36 +0000
+Message-ID: <20260112153436.75495-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260112140108.1173835-6-jedrzej.jagielski@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-> +	if (keee_stored.eee_enabled == keee_requested->eee_enabled)
-> +		return -EALREADY;
+The docs for YNL event ops currently render raw python structs. For
+example in:
 
-I know this is just moving code around, but i don't know of any other
-implementation of EEE which returns -EALREADY when no change has been
-requested by the user. Maybe in a follow up patch you change this to 0?
+https://docs.kernel.org/netlink/specs/ethtool.html#cable-test-ntf
 
-	  Andrew
+  event: {‘attributes’: [‘header’, ‘status’, ‘nest’], ‘__lineno__’: 2385}
+
+Handle event ops correctly and render their op attributes:
+
+  event: attributes: [header, status]
+
+Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+---
+ tools/net/ynl/pyynl/lib/doc_generator.py | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/tools/net/ynl/pyynl/lib/doc_generator.py b/tools/net/ynl/pyynl/lib/doc_generator.py
+index 3a16b8eb01ca..8b922d8f89e8 100644
+--- a/tools/net/ynl/pyynl/lib/doc_generator.py
++++ b/tools/net/ynl/pyynl/lib/doc_generator.py
+@@ -166,13 +166,13 @@ class YnlDocGenerator:
+                 continue
+             lines.append(self.fmt.rst_paragraph(self.fmt.bold(key), level + 1))
+             if key in ['request', 'reply']:
+-                lines.append(self.parse_do_attributes(do_dict[key], level + 1) + "\n")
++                lines.append(self.parse_op_attributes(do_dict[key], level + 1) + "\n")
+             else:
+                 lines.append(self.fmt.headroom(level + 2) + do_dict[key] + "\n")
+ 
+         return "\n".join(lines)
+ 
+-    def parse_do_attributes(self, attrs: Dict[str, Any], level: int = 0) -> str:
++    def parse_op_attributes(self, attrs: Dict[str, Any], level: int = 0) -> str:
+         """Parse 'attributes' section"""
+         if "attributes" not in attrs:
+             return ""
+@@ -184,7 +184,7 @@ class YnlDocGenerator:
+ 
+     def parse_operations(self, operations: List[Dict[str, Any]], namespace: str) -> str:
+         """Parse operations block"""
+-        preprocessed = ["name", "doc", "title", "do", "dump", "flags"]
++        preprocessed = ["name", "doc", "title", "do", "dump", "flags", "event"]
+         linkable = ["fixed-header", "attribute-set"]
+         lines = []
+ 
+@@ -217,6 +217,9 @@ class YnlDocGenerator:
+             if "dump" in operation:
+                 lines.append(self.fmt.rst_paragraph(":dump:", 0))
+                 lines.append(self.parse_do(operation["dump"], 0))
++            if "event" in operation:
++                lines.append(self.fmt.rst_paragraph(":event:", 0))
++                lines.append(self.parse_op_attributes(operation["event"], 0))
+ 
+             # New line after fields
+             lines.append("\n")
+-- 
+2.52.0
+
 
