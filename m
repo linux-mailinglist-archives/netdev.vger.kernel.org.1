@@ -1,118 +1,112 @@
-Return-Path: <netdev+bounces-249056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 189CBD1342B
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:46:16 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A72C9D13452
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:47:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9BED1303851D
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 14:39:56 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A0BF9302C3B5
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 14:40:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A06927C842;
-	Mon, 12 Jan 2026 14:39:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E2EA25B1D2;
+	Mon, 12 Jan 2026 14:40:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hjCTacTc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m/yy/SHn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 178AA279DAF;
-	Mon, 12 Jan 2026 14:39:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B18722DFA4;
+	Mon, 12 Jan 2026 14:40:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768228788; cv=none; b=HOwb/pVIS2hn597wpa4h3xy92MLlSie0U1bTmjAntdfMcHGZHejPf8WHw7yPfja3Lh4OvGO1qLlLc1JirjzkTGN5EIQ1HAW8OHeA3r3XklvIR6rBqBulUtqGNQ1/fQqsnYeMkFD37x99EXASBuiEVhhtL3UmIAApG2Eghy8ac1w=
+	t=1768228841; cv=none; b=dPBqz+1tsYTbc+rE1mHWBbi2gIm6TFym8n0IPLax04cBT8ev01Q3Spug6atyI8x8qWcX3iPZHgt/MSVD5pJM2BWaP75AvRdhFKhv/w09JS/IR1ze224YOWBZ8OT8X9QEje9y4vRB1Ni9cpPZIt8MXGe0IZy5uav+fy7mqbE50yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768228788; c=relaxed/simple;
-	bh=Bjyt5KUV8P+4QGX2zRHH3aY+0f1xiaDf64lQ7qf9Kes=;
+	s=arc-20240116; t=1768228841; c=relaxed/simple;
+	bh=SDAL0N+qnwLvzZJAzcXSoQROGQiuK08faEFfpMLHSZA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pdqyGrzmPSLz5uf3gl1u1Ka8TkhBeUBz4m67fODjKDs9FnCK605ytDWYo8l+7GNE/18OaEpdtPo6tHAngxOjrkRnw32/EC04lBqjEp4iQn+/Z+LCjNTZrqfpKIefmJJeTIBndiXUSziChMpmMUEgJXjCqhTQ9f1lbLPShSp8TY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hjCTacTc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BC38C19422;
-	Mon, 12 Jan 2026 14:39:45 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ooAGfX38eUyTZUr5IFMKui7YRGrNmtgvdfhY5AP0eVdXAX/ksaWJ82PsXOnuuUdAR5iWwaQcvl4GbmwCH7efUCas0dZnH9cePOHQIUR70bebeilfGV0d41xZd0oHkH3t5E3RU6uC62KSzHWBGdIsyzMPrBfuWQHoAGnK+tLKkIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m/yy/SHn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FCBFC19421;
+	Mon, 12 Jan 2026 14:40:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768228787;
-	bh=Bjyt5KUV8P+4QGX2zRHH3aY+0f1xiaDf64lQ7qf9Kes=;
+	s=k20201202; t=1768228840;
+	bh=SDAL0N+qnwLvzZJAzcXSoQROGQiuK08faEFfpMLHSZA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hjCTacTc+HRb9n57RJgZKPsBGvNjKECq6ff2ShXpqijLvhKLoqJiIncpFASCvMnqE
-	 R0s6ebAhisTQPDfGm3+dRFlJWLVYkRX4w9AByxdW8WQXYza2oFJk7LlxyKiZff87Nd
-	 0y0FmyPnJ9VxaUyZcsvXgd1KVpPVFVpISjxbPSgWQ29oKChl+Y+GcbgeJm4B4GU899
-	 Lw5F3isMGLC+n/UmhcZshTXyeRjDPyn1S0kg/69/h0k9UTAKHj+coRUeCUJoLL8LQn
-	 WLpCLJdCzqXEFToaMi4mAM/4Sfy4RZpXocGx2Sq+FDjuwMLy5HWXrcWaa5K4ExifF/
-	 TiqjkgKxHLN/A==
-Date: Mon, 12 Jan 2026 14:39:42 +0000
-From: Simon Horman <horms@kernel.org>
-To: Vimlesh Kumar <vimleshk@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	sedara@marvell.com, srasheed@marvell.com, hgani@marvell.com,
-	Veerasenareddy Burru <vburru@marvell.com>,
-	Satananda Burla <sburla@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	b=m/yy/SHnqAKrjtGGfSswYMzKavZlqQqzOfGZKk7cxHJ9SwyNHu76QGX8eMuT8MKED
+	 CIVV6guZOvV3zdpAHHY3JtpNpRR+VRwmiEOvRTzKPruYxyRQN8o7Z9hiOPTF6V61fx
+	 5RSIwlNr0VpwquOMXhbMllbrMGjpmvd14l8kSOSPLt45xbZYUAjXPTGKNl/V3i+0MC
+	 C29rSyOSZW4aX+B8al2ILOz1UwUmL+ef5ZKVQg0fUXL6raFjU7QgEZ6alXHRdpBqsc
+	 sdsdg1TPTBm5wS5u7uPOqwOM/pSkCPS500YgbhGKRnCf4XBJQr2RvKn49X9ZVslzyc
+	 jKMwtYbmpRP3A==
+Date: Mon, 12 Jan 2026 15:40:38 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net v3 3/3] octeon_ep_vf: ensure dbell BADDR updation
-Message-ID: <aWUHrqOpf-6hZqlu@horms.kernel.org>
-References: <20260107131857.3434352-1-vimleshk@marvell.com>
- <20260107131857.3434352-4-vimleshk@marvell.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next 2/2] net: airoha: npu: Add the capability to
+ read firmware names from dts
+Message-ID: <aWUH5nHR3xz-vk-a@lore-desk>
+References: <20260112-airoha-npu-firmware-name-v1-0-d0b148b6710f@kernel.org>
+ <20260112-airoha-npu-firmware-name-v1-2-d0b148b6710f@kernel.org>
+ <f57867a0-a57d-4572-b0ed-b2adb41d9689@lunn.ch>
+ <aWT4vcBzG6UnaqOF@lore-desk>
+ <81f98b9a-3905-4bd9-80ee-348facefeab9@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="35dfMFi+mqodQRNK"
+Content-Disposition: inline
+In-Reply-To: <81f98b9a-3905-4bd9-80ee-348facefeab9@lunn.ch>
+
+
+--35dfMFi+mqodQRNK
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260107131857.3434352-4-vimleshk@marvell.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 07, 2026 at 01:18:56PM +0000, Vimlesh Kumar wrote:
-> Make sure the OUT DBELL base address reflects the
-> latest values written to it.
-> 
-> Fix:
-> Add a wait until the OUT DBELL base address register
-> is updated with the DMA ring descriptor address,
-> and modify the setup_oq function to properly
-> handle failures.
-> 
-> Fixes: 2c0c32c72be29 ("octeon_ep_vf: add hardware configuration APIs")
-> Signed-off-by: Sathesh Edara <sedara@marvell.com>
-> Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
-> Signed-off-by: Vimlesh Kumar <vimleshk@marvell.com>
+> > > Why cannot this scheme be extended with another compatible?
+> >=20
+> > yes, that is another possibility I was thinking of but then I found
+> > "firwmare-name" property was quite a common approach.
+> > Something like:
+>=20
+> Having two different ways of doing the same thing in one driver just
+> add unneeded complexity. Please just key of the compatible like all
+> other devices this driver supports.
+>=20
+>     Andrew
+
+ack, I will fix it in v2.
+
+Regards,
+Lorenzo
+
+>=20
 > ---
-> V3:
-> - Use reverse christmas tree order variable declaration.
-> - Return error if timeout happens during setup oq.
+> pw-bot: cr
 
-...
+--35dfMFi+mqodQRNK
+Content-Type: application/pgp-signature; name=signature.asc
 
-> diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
-> index d70c8be3cfc4..6446f6bf0b90 100644
-> --- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
-> +++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
-> @@ -171,7 +171,9 @@ static int octep_vf_setup_oq(struct octep_vf_device *oct, int q_no)
->  		goto oq_fill_buff_err;
->  
->  	octep_vf_oq_reset_indices(oq);
-> -	oct->hw_ops.setup_oq_regs(oct, q_no);
-> +	if (oct->hw_ops.setup_oq_regs(oct, q_no))
-> +		goto oq_fill_buff_err;
-> +
+-----BEGIN PGP SIGNATURE-----
 
-Hi Vimlesh, all,
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaWUH5gAKCRA6cBh0uS2t
+rD+QAQD2KKc4Cab4DOiJr5tUgFk9XtQJh21lPwcIXXyOJIv41AEAivnvtVJJ4Nyo
+VQCZ8SeSJRq/fIn4RXDBDubNyNDJhAg=
+=G7LN
+-----END PGP SIGNATURE-----
 
-I think that a new label needs to be added to the unwind ladder such that
-octep_vf_oq_free_ring_buffers() is called if the error condition above is met.
-
-Likewise in patch 2/3.
-
-Flagged by Claude Code with Review Prompts[1]
-
-[1] https://github.com/masoncl/review-prompts/
-
->  	oct->num_oqs++;
->  
->  	return 0;
-
--- 
-pw-bot: cr
+--35dfMFi+mqodQRNK--
 
