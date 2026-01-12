@@ -1,86 +1,62 @@
-Return-Path: <netdev+bounces-249064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90DF1D1352D
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:54:00 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 512C4D13723
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 16:06:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8D9513002150
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 14:53:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 95A28309902E
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 14:53:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F3422C1586;
-	Mon, 12 Jan 2026 14:53:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81BF82C1586;
+	Mon, 12 Jan 2026 14:53:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CYSKjae3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XulgnKH4"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 964152BEFFB;
-	Mon, 12 Jan 2026 14:53:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F0D02BDC32;
+	Mon, 12 Jan 2026 14:53:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768229636; cv=none; b=QjG7I4l6fuiTqpPKL15uEryTyA4R6Yre/Bqhvl5J3Cur49sABREo5wMmI+Vt/7ymNvNRGMhjOJ6WBOdHhF8oP6YsNoi54WoMVC/bjuPTIQze5OdVOYQeUClystl5H3jpKjsYSQmksAWyvbzg0T5Goy9g9SEEdEu1OZ8ZxYo05hY=
+	t=1768229605; cv=none; b=KNDx/ep0R64E7mU0KQmHNFhriyFUD4ZYGv67/Jt6HZw/80cWCo9UqvYr/rThza+ZWYMj/zk+H94F23SiN0EViX4v/Jnu/o7QMXfajJrCKvOxyFsOw3N443GePFLbWkNpwa1q6DU6z3gAYCfbPmL18E0bVd1nsNDBSVEl3WV2j+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768229636; c=relaxed/simple;
-	bh=vMdMbkaj9FIBvbrqlM+Ht0cnW5A4bq8nE13c3jx00b4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F4PIUSsQz2PH8NG0p1p04Bbf2guBZ+o6Er/bbEUEOww6/7kyD9Gj5kNhLXfuViRrYQN7EqJxt9RPdLKLw+IKG3Y34ETWVeuzKRkUWbNCL19+ixvz3lSnfI/dlExjQcYMyVKTXzNLP8HhdEBnUGwrvBFhB1JUh/aymv2f/6zWVow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CYSKjae3; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <e6499ec9-92d3-4a63-8172-3c09a8b64066@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768229632;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WJRXUcKkDog21NY9arGh1QRo0yXqzWSWI32WfNW/NXU=;
-	b=CYSKjae3S5FACFkMnLMzwVE2kPTt9AMRFN7mSAGW7ME7h8gCmWVnkY/8iXTwGDn78taKG+
-	dlMM0E4bxhFjRCNUCQ0EdYqXcA3SfGlSkxhCK1yFDn7rUu5Sk2zK83MCOlOKqDNNxxeFqM
-	XELoFN5cAGbovb03AKSOu9bx+yyVOnI=
-Date: Mon, 12 Jan 2026 09:53:28 -0500
+	s=arc-20240116; t=1768229605; c=relaxed/simple;
+	bh=VhCW7vRIXwurZNwbV3YMAmi3ZKSjZNwGP3snZqr0BGg=;
+	h=Date:From:To:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=csmFJYYCjlms9pLEBFr3n6gpZ2eIJep5MB1ShZKBgeEzwydn38VadX2/eYpHu8wRbNycJE/7C6RXPFaeW9VKsjc42+8Lbe4W50inYfVitGhnB8mMHMr0F8wam400sExv0B0b3eOqXFBPv3RfNNEBxBn+g/sVU3Q3u5qm6BfzL7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XulgnKH4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF141C16AAE;
+	Mon, 12 Jan 2026 14:53:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768229605;
+	bh=VhCW7vRIXwurZNwbV3YMAmi3ZKSjZNwGP3snZqr0BGg=;
+	h=Date:From:To:Subject:In-Reply-To:References:From;
+	b=XulgnKH4jlHP07FM0FnsNUXv+kb2RHE2s3KK+u+B/mppKR3SXg2rgEDO+3nXNA7Bo
+	 ZofRAnGSRijSaGHNKSr8yRU4NqTeXzP333Ty+kAcNnG0HU+s2YXf4urZ1qcodZb1Ky
+	 xuYCc2SXx5Sd0UIe+b8lt2gn6QiUA4n+pxui7gXAWY0J/5fw50R+VimqGQWQf9he1o
+	 i18GCrOTf6NCsjjAUJ+Zw+UHSVsiemmIwSbAe7CC+BJtiggx5RtiVPr/smOdV/zIm1
+	 Wu6YI7eEeIJC6UQF9+84BdzsPijUABhgBrslSzQSbHRVpsqRWMTTSVj9o917QyD5mJ
+	 vik+XsPDFrX4w==
+Date: Mon, 12 Jan 2026 06:53:24 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
+Subject: Re: [ANN] netdev call - Jan 12th
+Message-ID: <20260112065324.1f8fb086@kernel.org>
+In-Reply-To: <20260112065256.341cbd65@kernel.org>
+References: <20260112065256.341cbd65@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 2/2] net: axienet: Fix resource release ordering
-To: Jakub Kicinski <kuba@kernel.org>, Suraj Gupta <suraj.gupta2@amd.com>
-Cc: mturquette@baylibre.com, sboyd@kernel.org, radhey.shyam.pandey@amd.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, michal.simek@amd.com, linux@armlinux.org.uk,
- linux-clk@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- bmasney@redhat.com
-References: <20260109071051.4101460-1-suraj.gupta2@amd.com>
- <20260109071051.4101460-3-suraj.gupta2@amd.com>
- <20260110115306.4049b2cb@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <20260110115306.4049b2cb@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 1/10/26 14:53, Jakub Kicinski wrote:
-> On Fri, 9 Jan 2026 12:40:51 +0530 Suraj Gupta wrote:
->> Device-managed resources are released after manually-managed resources.
->> Therefore, once any manually-managed resource is acquired, all further
->> resources must be manually-managed too.
-> 
-> only for resources which have dependencies. Please include in the commit
-> message what exactly is going wrong in this driver. The commit under
-> Fixes seems to be running ioremap, I don't see how that matters vs
-> netdev allocation for example..
+On Mon, 12 Jan 2026 06:52:56 -0800 Jakub Kicinski wrote:
+> Subject: [ANN] netdev call - Jan 12th
 
-In the series I originally submitted this in, I wanted to add a devm
-resources (mdio bus etc.) at the end of probe that required the clocks
-to be running. But as a standalone patch this is more of a cleanup.
-
->> Convert all resources before the MDIO bus is created into device-managed
->> resources. In all cases but one there are already devm variants available.
+Sigh, of course I meant Jan 13th!
 
