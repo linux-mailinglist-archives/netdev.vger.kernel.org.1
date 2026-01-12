@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-249113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E7C5D14653
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 18:36:10 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32620D146BC
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 18:40:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A2FEB30081A5
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 17:36:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AC122302025F
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 17:36:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D9AF37E31A;
-	Mon, 12 Jan 2026 17:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94BEE37F0F6;
+	Mon, 12 Jan 2026 17:36:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ASIC0QAa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H2/CRee0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C64EC37A4BA
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 17:36:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C200137E309
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 17:36:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768239368; cv=none; b=qk4WyDkyaPylNJGo/vxoR2oTsjKN5WFkvZEo8yNBUwpie9YIrk2ZHwAeH/Mb523Tm1red1FfDyWwJem3DEtmdMxW2Km7OkCUfgQCxhL+ROp9zDixl6nHsFfBKIaPSpIwImYf+LS+0ll1As7dvvcS+MS8Q16akqAcaNYqkwgQKB4=
+	t=1768239370; cv=none; b=aG9hI5rkgyPYXuVQGQSRVB/6K+b0Nx4Yx+odmEI8DweRPLHMvVpCkd9IoLGk1PcVA9jqQvRNmyKqMXzsQyVZChpXeg0yWWIX8ZEOfILOSxF2JTzNed9U75yWoyJ/AgHUrV0LOFuxwOLRlSfUkGxGMq2CP1bAmkmh+862R5SfqhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768239368; c=relaxed/simple;
-	bh=qhaneb/ITX8BfdzzKqTGjLQZIrHw1/KIZJZVKgONY7c=;
+	s=arc-20240116; t=1768239370; c=relaxed/simple;
+	bh=GCdO5a+HMfjS0Onb4iX2dcKWJm/SM5/aDLNSivt+rZg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T806avIgb/giwOBOGTQdNdlmvUQUxfCBCjQRxt+91C4SClEe9vQTcBk0NueBYLKu2srTi4+ckjqurrBFpkFU3EME5SfPM30+BQkMRkAGsZ/loq19Gg6n3TcYWME9nVuZdLhLqYP89pj7ehmTd4cYDO0ut3WjW2eg0Q99qn0il6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ASIC0QAa; arc=none smtp.client-ip=209.85.221.43
+	 MIME-Version; b=H3WucaAa45n16qHbI/fSHogsrIt4sgbs7YgtsKvA5MNWbaJjgJye5/wieDEbECEJVm7JC3LHZI95yt/sSsXZDxbcrjEy/YemAUE11FALM5qFOv0/UGPqh2l46XWRYdYKGkGYa7h90OBG1GxYolbYmoXZp0OZJRph9XUZjHSmZbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H2/CRee0; arc=none smtp.client-ip=209.85.221.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-42fbad1fa90so5740813f8f.0
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 09:36:06 -0800 (PST)
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-42fb03c3cf2so3565034f8f.1
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 09:36:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768239365; x=1768844165; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1768239366; x=1768844166; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LofV/9jgUKtLuCH/txad3m3y4ltofMV2NrIML7mtBRU=;
-        b=ASIC0QAaTm8EwN2Xp9fzxcmQOHsKRlM8olVtFoiknXZc9E73MIWU3/+nR6loxnSCXd
-         7IOnKnYzGytuZ6PsrKZC8/4eQuL2dGmd18elLezY6wlVsQaK3BYHUQ4PQgxjeEeYiOm0
-         0/30JBjPoVqScEBSFUQ0PTky4SzZwy7RO4MGQOOZ0OtO0jw1l+pEuc7NnuYjFj+Iblbc
-         cOMkNs/7LSTU1oI4oiop/gzlXO7mLrqPx1cyogfX+heVlnGwbtSw99dEsr1I2qEI+ahl
-         6cHoOVAJFPsz9Y4PpEU6KNLuryGWbhfQa+IgMNUB5VI0ZLGyP+bsJ9/IjBadEIVzYYrh
-         Pc2Q==
+        bh=tuk52pHE2ucr51aG3tpUoDcttX6aTJw3OWzP3ZmFW2E=;
+        b=H2/CRee0//rGPYg0l1zmRr7B+722QUuuMKv92yP2gmELT0GHa8y0AorCZVvDDfMMl5
+         VVod1fNSHqTcetc4SehLAHpe7Yg8Ykj4tIgaZ/01MPtd41ptcqFS9A7cTtMbfjAp5+Wz
+         GBLWx6tHYBvuGc84oL3pqgXWLqiiBcxUqhJYyL51qnjuKfDFjZdPKvzlf+RmmNhTNYRe
+         H+kyiohngHx8+UwJ3ICkHQuX/cwsQ9dUETgTP8LkGnIZPjV52/M5Vyv1S0bGJoOxntCk
+         il1IyCt5gbYw3OsizN0ize6bEE80kfcUruHiMAI/UfNuVKTUM/rTBsS33BIu5ndA9zu/
+         O4uA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768239365; x=1768844165;
+        d=1e100.net; s=20230601; t=1768239366; x=1768844166;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=LofV/9jgUKtLuCH/txad3m3y4ltofMV2NrIML7mtBRU=;
-        b=f/DxBTjlETR1hlS/gycJD1rFBdNYFOM2epgIAjy8OA1vh5vp6P134OUSdNz7QjKl49
-         L5ikrCsEUJjT/S+dYQi3tIoYRZT71o/6Dk8MDV8yxQzNcoS9B1k0aO5npSKovHir7SRc
-         rAgvXkIaiP3sWUlV0TFvmC5RzHnfBFu0O/VXEv8XOrEqzkGLAPh3A9b6QQwL+pfkj4ok
-         fObWyF+5XtrxzH1OsG6LsupIHXCbPCAKPCmkj8o+AUDYojNgUj28nPxnXIMuexNcxRRR
-         jlcjtls9toiSdtb4eLO5o0Natkpty9mdnVBhy+Kww6TaWdOhN6lBYd4fj6ICg+y5zTxK
-         i05A==
-X-Forwarded-Encrypted: i=1; AJvYcCUlNXm8EXCAXafgAAuCAi4dkXzVh82OM23drrVdXy5gtuPQ+wuYbOR79r+hzVvFJQLByUr0JCA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxaYFgDvlCeiVbzOyzI3HVtRofiyBgSlv6gCkLy/2p24SQ1pFdM
-	X4e4rI7x2xij/oxA8mrUri2d+FBlhMqOWZbe53YC24G5yDkI6XiD8RQO
-X-Gm-Gg: AY/fxX7IPatv2Pjks4VjHPJVCf+IKbCCEyBvLKXQ1coc33vYCBbDfE5eU0J4rrVOPmm
-	TcghOQKbMTFM8W0MKu9pOD/8Uw9MiPMH1O/Zj3R0kfn/UQRjf/dunV9lZjGzgKsM5D92X/dnJAf
-	I5LZPtBE5ucCTxw4hKDdWgYL+V3iDzhuFrBFe4sxcd9o7yTtWpeuD3JORSTYHwem4qjCPyeEEqF
-	h0060ToEUBSLwRZQKRUIPNB4HQNDtJSxTqxXFRX9dQz9yQleQBYmyfvmlTbvy+4TQUkhjT7WVjM
-	uS+R4uY8XYWZQwUmNkSwzlF1Q1+cC3ckoNfTfmuaJ6/TnRN7zIaOcAnBs34GLs/pUKGtC5iRKX+
-	39Cs3iWTDB9ViZI+zXP3Fp3ytIsZoknrvjr/mGmkOcNH9XWBjam7pkbrtPqR6NLAOoKDeaMSEtu
-	bNies102UBj1Kr+GDTzG94xN0MUBHh/vtbI4rTSbrcU/6tovQ0vL77XrROcDSyFnxQiiir4QeWR
-	xm409TcMTgC3NmzgKS1tVhy
-X-Google-Smtp-Source: AGHT+IEsEyE0BOISsSRMidibssI3SeWdxDaxfffmQ7He+i2Idme1wQ2WQKE8+LIdSmxGLQOJmqbBcg==
-X-Received: by 2002:a05:6000:1448:b0:432:5c43:5d with SMTP id ffacd0b85a97d-432c37c87bbmr20748927f8f.36.1768239364905;
-        Mon, 12 Jan 2026 09:36:04 -0800 (PST)
+        bh=tuk52pHE2ucr51aG3tpUoDcttX6aTJw3OWzP3ZmFW2E=;
+        b=kv8qNgIgO34E/Ubz+GbyJs2IesQ2XfY5YLp5vEB9VFgfNXyKUGMuK+odHqy99HfBPs
+         kzXy/GkeY9geO2BdP0cUF/eTCE/tG3lc1M+BM/zthvbTavtBKPDKiKmZQvMAllCSmpTR
+         33GMbwOFx/rGALF16DcWfYIj789bjVRYHHOhRnY6ydwFii/D87VgdoB/zbt7FReCp7zi
+         Ii7WlM+NDv/yLALVP7b3yczxNRyV6F1FBKzuUSfk64JqvfPepl7lWaT3Hsylrqmj6ODR
+         s186KzaUDY3a0Rz8nOI24LOC6pClWRcTLVy92HyE8ULwjmorEBgwf/TxwloogyCYiOwB
+         EHyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVLecduWrCpNFtIFEsox5OcjbNOb2PDqZ8o8x2wxt/VkhlQuQbkU+P7ju3yAlLV9PyTEd+Ipew=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpsndmY7/tjPB/GR2+EroQCYt+ulPGjEoC7EUhlZcnve7x0VQX
+	yrRrqIxDrWTupxLrXXccdEj1cRWX+0KICdEsvxmYxb+VV7zc59NzjpRR
+X-Gm-Gg: AY/fxX4rAXjeDxEd/7CLl8kHcOL/CJOTnMmZQqNWOpvArfpJets82elFWHIQPbBQ4cR
+	aNrY+kem4L7MjPgG4EoSdHGsiOI+yH+r4gBl5YfERnFFqRMxmBg5DLyXJK/sJm5/faPqBvyjUor
+	YDD3iA17d8ZlCKM0wYwH1Pa0VGvIcYtYPNSd3KiMwpaohSXpdpIsk0hJpjGymdobYB0wauLCHns
+	GtZ7RksNf18hcSQRSnjz8y3lFVs7NYYxlg9/nMNBYyS9iBYFl4iUqIlSEwPaQ7gQPRSMvAOK0mO
+	ubd89TSl5zoEkStTZtbK2v/pdAdrMsShrcskI87cn5HQhVhHRvH36GqdvHiTiy06/rxnr/mmSZh
+	CEGqS600v0ULFlKj8hIdbuz9nT5pShy+ePsA0/cXMuugVyH/gQXjgKMYImZrnYgSyVWXyFGZdWv
+	pKvfru7avdUZeCJK/YKTHYJ7xV3Zn0oKbPE4bNRjv4/jSbQ87fOVE23xyAcyOgNpRAgzWCpsWwQ
+	pXA/+EvzHL8J6LGw01hF3Pm4QvmGfjahdA=
+X-Google-Smtp-Source: AGHT+IHvetCOikt5zHJa+kt1XGT/CFTzAu/3wOZte9eNFcIcwZdd0nfXB3SqwzR7iSvrVRxboWe4ZQ==
+X-Received: by 2002:a05:6000:2087:b0:430:f8b3:e834 with SMTP id ffacd0b85a97d-432c3629b4amr24163355f8f.11.1768239366073;
+        Mon, 12 Jan 2026 09:36:06 -0800 (PST)
 Received: from iku.Home ([2a06:5906:61b:2d00:9336:b2a5:a8c1:722e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5ff0b2sm39625403f8f.42.2026.01.12.09.36.04
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5ff0b2sm39625403f8f.42.2026.01.12.09.36.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jan 2026 09:36:04 -0800 (PST)
+        Mon, 12 Jan 2026 09:36:05 -0800 (PST)
 From: Prabhakar <prabhakar.csengg@gmail.com>
 X-Google-Original-From: Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 To: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <clement.leger@bootlin.com>,
@@ -96,9 +96,9 @@ Cc: linux-renesas-soc@vger.kernel.org,
 	Biju Das <biju.das.jz@bp.renesas.com>,
 	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
 	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: [PATCH net-next v3 1/2] dt-bindings: net: pcs: renesas,rzn1-miic: Add phy_link property
-Date: Mon, 12 Jan 2026 17:35:54 +0000
-Message-ID: <20260112173555.1166714-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: [PATCH net-next v3 2/2] net: pcs: rzn1-miic: Add PHY_LINK active-level configuration support
+Date: Mon, 12 Jan 2026 17:35:55 +0000
+Message-ID: <20260112173555.1166714-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260112173555.1166714-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
 References: <20260112173555.1166714-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
@@ -112,22 +112,26 @@ Content-Transfer-Encoding: 8bit
 
 From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-Add the renesas,miic-phy-link-active-low property to allow configuring
-the active level of phy_link status signals provided by the MIIC block.
+Add support to configure the active level of MIIC PHY_LINK status signals
+on a per-converter basis using a DT property.
 
-EtherPHY link-up and link-down status is required as a hardware IP
-feature independent of whether GMAC or ETHSW is used. With GMAC, link
-state is retrieved via MDC/MDIO and handled in software. In contrast,
-ETHSW exposes dedicated PHY_LINK pins that provide this information
-directly in hardware.
+MIIC provides dedicated PHY_LINK signals that indicate EtherPHY link-up and
+link-down status in hardware. These signals are required regardless of
+whether GMAC or ETHSW is used. With GMAC, link state is retrieved via
+MDC/MDIO and handled in software, while ETHSW relies on PHY_LINK pins for
+both CPU-assisted operation and switch-only data paths that do not involve
+the host.
 
-These PHY_LINK signals are required not only for host-controlled traffic
-but also for switch-only forwarding paths where frames are exchanged
-between external nodes without CPU involvement. This is particularly
-important for redundancy protocols such as DLR (Device Level Ring),
-which depend on fast detection of link-down events caused by cable or
-port failures. Handling such events purely in software introduces
-latency, which is why ETHSW provides dedicated hardware PHY_LINK pins.
+Hardware PHY_LINK signals are also critical for fast reaction to link-down
+events, for example when running redundancy protocols such as Device Level
+Ring (DLR), where rapid detection of cable faults is required to switch to
+an alternate path without software latency.
+
+Parse the requested polarity from DT, accumulate the configuration during
+probing, and apply it to the MIIC_PHY_LINK register once hardware
+initialization is complete, when the registers can be safely modified.
+Handle SoC-specific bit layout differences between RZ/N1 and RZ/T2H/N2H
+within the driver.
 
 Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 ---
@@ -135,31 +139,206 @@ v2->v3:
 - Updated commit message
 - Renamed DT property from renesas,miic-phylink-active-low to
   renesas,miic-phy-link-active-low.
+- Simplified the PHY_LINK configuration parsing logic in the driver
+  as suggested.
 
 v1->v2:
-- Updated commit message to elaborate the necessity of PHY link signals.
+- No changes.
 ---
- .../devicetree/bindings/net/pcs/renesas,rzn1-miic.yaml     | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/net/pcs/pcs-rzn1-miic.c | 105 +++++++++++++++++++++++++++++++-
+ 1 file changed, 102 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/pcs/renesas,rzn1-miic.yaml b/Documentation/devicetree/bindings/net/pcs/renesas,rzn1-miic.yaml
-index 3adbcf56d2be..f9d39114e667 100644
---- a/Documentation/devicetree/bindings/net/pcs/renesas,rzn1-miic.yaml
-+++ b/Documentation/devicetree/bindings/net/pcs/renesas,rzn1-miic.yaml
-@@ -86,6 +86,13 @@ patternProperties:
-           and include/dt-bindings/net/renesas,r9a09g077-pcs-miic.h for RZ/N2H, RZ/T2H SoCs.
-         $ref: /schemas/types.yaml#/definitions/uint32
+diff --git a/drivers/net/pcs/pcs-rzn1-miic.c b/drivers/net/pcs/pcs-rzn1-miic.c
+index 885f17c32643..8d7f82c1df2f 100644
+--- a/drivers/net/pcs/pcs-rzn1-miic.c
++++ b/drivers/net/pcs/pcs-rzn1-miic.c
+@@ -28,6 +28,8 @@
  
-+      renesas,miic-phy-link-active-low:
-+        type: boolean
-+        description: Indicates that the PHY-link signal provided by the Ethernet switch,
-+          EtherCAT, or SERCOS3 interface is active low. When present, this property
-+          sets the corresponding signal polarity to active low. When omitted, the signal
-+          defaults to active high.
+ #define MIIC_MODCTRL			0x8
+ 
++#define MIIC_PHY_LINK			0x14
 +
-     required:
-       - reg
-       - renesas,miic-input
+ #define MIIC_CONVCTRL(port)		(0x100 + (port) * 4)
+ 
+ #define MIIC_CONVCTRL_CONV_SPEED	GENMASK(1, 0)
+@@ -177,6 +179,16 @@ static const char * const rzt2h_reset_ids[] = {
+ 	"crst",
+ };
+ 
++/**
++ * struct miic_phy_link_cfg - MIIC PHY_LINK configuration
++ * @mask: Mask of phy_link bits
++ * @val: Value of phy_link bits
++ */
++struct miic_phy_link_cfg {
++	u32 mask;
++	u32 val;
++};
++
+ /**
+  * struct miic - MII converter structure
+  * @base: base address of the MII converter
+@@ -184,6 +196,7 @@ static const char * const rzt2h_reset_ids[] = {
+  * @lock: Lock used for read-modify-write access
+  * @rsts: Reset controls for the MII converter
+  * @of_data: Pointer to OF data
++ * @link_cfg: MIIC PHY_LINK configuration
+  */
+ struct miic {
+ 	void __iomem *base;
+@@ -191,6 +204,12 @@ struct miic {
+ 	spinlock_t lock;
+ 	struct reset_control_bulk_data rsts[MIIC_MAX_NUM_RSTS];
+ 	const struct miic_of_data *of_data;
++	struct miic_phy_link_cfg link_cfg;
++};
++
++enum miic_type {
++	MIIC_TYPE_RZN1,
++	MIIC_TYPE_RZT2H,
+ };
+ 
+ /**
+@@ -210,6 +229,7 @@ struct miic {
+  * @init_unlock_lock_regs: Flag to indicate if registers need to be unlocked
+  *  before access.
+  * @miic_write: Function pointer to write a value to a MIIC register
++ * @type: Type of MIIC
+  */
+ struct miic_of_data {
+ 	struct modctrl_match *match_table;
+@@ -226,6 +246,7 @@ struct miic_of_data {
+ 	u8 reset_count;
+ 	bool init_unlock_lock_regs;
+ 	void (*miic_write)(struct miic *miic, int offset, u32 value);
++	enum miic_type type;
+ };
+ 
+ /**
+@@ -581,10 +602,79 @@ static int miic_match_dt_conf(struct miic *miic, s8 *dt_val, u32 *mode_cfg)
+ 	return -EINVAL;
+ }
+ 
++static void miic_configure_phy_link(struct miic *miic, u32 conf,
++				    u32 port, bool active_low)
++{
++	bool polarity_active_high;
++	u32 mask, shift;
++
++	/* determine shift and polarity for this conf */
++	if (miic->of_data->type == MIIC_TYPE_RZN1) {
++		switch (conf) {
++		/* switch ports => bits [3:0] (shift 0), active when low */
++		case MIIC_SWITCH_PORTA:
++		case MIIC_SWITCH_PORTB:
++		case MIIC_SWITCH_PORTC:
++		case MIIC_SWITCH_PORTD:
++			shift = 0;
++			polarity_active_high = false;
++			break;
++
++		/* EtherCAT ports => bits [7:4] (shift 4), active when high */
++		case MIIC_ETHERCAT_PORTA:
++		case MIIC_ETHERCAT_PORTB:
++		case MIIC_ETHERCAT_PORTC:
++			shift = 4;
++			polarity_active_high = true;
++			break;
++
++		/* Sercos ports => bits [11:8] (shift 8), active when high */
++		case MIIC_SERCOS_PORTA:
++		case MIIC_SERCOS_PORTB:
++			shift = 8;
++			polarity_active_high = true;
++			break;
++
++		default:
++			return;
++		}
++	} else {
++		switch (conf) {
++		/* ETHSW ports => bits [3:0] (shift 0), active when low */
++		case ETHSS_ETHSW_PORT0:
++		case ETHSS_ETHSW_PORT1:
++		case ETHSS_ETHSW_PORT2:
++			shift = 0;
++			polarity_active_high = false;
++			break;
++
++		/* ESC ports => bits [7:4] (shift 4), active when high */
++		case ETHSS_ESC_PORT0:
++		case ETHSS_ESC_PORT1:
++		case ETHSS_ESC_PORT2:
++			shift = 4;
++			polarity_active_high = true;
++			break;
++
++		default:
++			return;
++		}
++	}
++
++	mask = BIT(port + shift);
++
++	miic->link_cfg.mask |= mask;
++	if (polarity_active_high != active_low)
++		miic->link_cfg.val |= mask;
++	else
++		miic->link_cfg.val &= ~mask;
++}
++
+ static int miic_parse_dt(struct miic *miic, u32 *mode_cfg)
+ {
+ 	struct device_node *np = miic->dev->of_node;
+ 	struct device_node *conv;
++	bool active_low;
+ 	int port, ret;
+ 	s8 *dt_val;
+ 	u32 conf;
+@@ -603,10 +693,15 @@ static int miic_parse_dt(struct miic *miic, u32 *mode_cfg)
+ 		if (of_property_read_u32(conv, "reg", &port))
+ 			continue;
+ 
++		if (of_property_read_u32(conv, "renesas,miic-input", &conf))
++			continue;
++
+ 		/* Adjust for 0 based index */
+-		port += !miic->of_data->miic_port_start;
+-		if (of_property_read_u32(conv, "renesas,miic-input", &conf) == 0)
+-			dt_val[port] = conf;
++		dt_val[port + !miic->of_data->miic_port_start] = conf;
++
++		active_low = of_property_read_bool(conv, "renesas,miic-phy-link-active-low");
++
++		miic_configure_phy_link(miic, conf, port, active_low);
+ 	}
+ 
+ 	ret = miic_match_dt_conf(miic, dt_val, mode_cfg);
+@@ -696,6 +791,8 @@ static int miic_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		goto disable_runtime_pm;
+ 
++	miic_reg_rmw(miic, MIIC_PHY_LINK, miic->link_cfg.mask, miic->link_cfg.val);
++
+ 	/* miic_create() relies on that fact that data are attached to the
+ 	 * platform device to determine if the driver is ready so this needs to
+ 	 * be the last thing to be done after everything is initialized
+@@ -729,6 +826,7 @@ static struct miic_of_data rzn1_miic_of_data = {
+ 	.sw_mode_mask = GENMASK(4, 0),
+ 	.init_unlock_lock_regs = true,
+ 	.miic_write = miic_reg_writel_unlocked,
++	.type = MIIC_TYPE_RZN1,
+ };
+ 
+ static struct miic_of_data rzt2h_miic_of_data = {
+@@ -745,6 +843,7 @@ static struct miic_of_data rzt2h_miic_of_data = {
+ 	.reset_ids = rzt2h_reset_ids,
+ 	.reset_count = ARRAY_SIZE(rzt2h_reset_ids),
+ 	.miic_write = miic_reg_writel_locked,
++	.type = MIIC_TYPE_RZT2H,
+ };
+ 
+ static const struct of_device_id miic_of_mtable[] = {
 -- 
 2.52.0
 
