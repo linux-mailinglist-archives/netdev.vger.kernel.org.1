@@ -1,173 +1,249 @@
-Return-Path: <netdev+bounces-249095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3084D13E2A
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 17:06:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A1B4D13F67
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 17:24:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A78CD301F8FF
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 16:06:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 69C60305E3E3
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 16:20:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35A2E364049;
-	Mon, 12 Jan 2026 16:06:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4211C3644BB;
+	Mon, 12 Jan 2026 16:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NQK4xeDg"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="Pcq+7xEk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from smtp-8fad.mail.infomaniak.ch (smtp-8fad.mail.infomaniak.ch [83.166.143.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE8B2361DAD;
-	Mon, 12 Jan 2026 16:06:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD8273644A4
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 16:20:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768234002; cv=none; b=i2x9rYpAutVYyOWcI6GvIw3eHKmOPfgKWmdtdDr6UKYWWmeospOm8bpjn7OCnQzdx6yl0RBvRVjocb35GcNF9WSVApneMcHsw1Rc56G/hoc4jaAF3hnOsv7zE6pAgm+2YVEEpVOC3UIuMvAHo7MfxPV00H4GuDnfByiKPI18QXw=
+	t=1768234814; cv=none; b=CyoHf8b/+BfSJT1GMeBnATOEuMk31Czu+ikhmcpRpH+Y8z8T6AW//m3f9c+rFeB1pdkt5GrYrGDcDMu/DrJE+yZSMTJXHjlRZSdVl9tpvSKP6TqDIJAqD/hGKBDBEkgCH9bSU+XgkA48KZm17tm9sxRaMYUqSciO/BKwXkA+Wpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768234002; c=relaxed/simple;
-	bh=fyNj7tGccVud7VFJ570wDzTR6P1wo4PxWud1jjxeoLA=;
+	s=arc-20240116; t=1768234814; c=relaxed/simple;
+	bh=1nBCITjqomWB9lUtyhFM4fajJwtdvdo71dDPZ6vyU+M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EEUMnXZOP5clK1kEUaR8fHVgn5d98tKjCr+v8zgynTpVd35VQ/js7gykznJ2blNWCN2MhlyGrbur3gBj+DMmDgQgz81VgHwXD8rWZWXH9mwqqzNk7vuZ1xeUI1IG81WRGvKc3FqI0/gdEc2yInL9JQ94Kkq+33dU/eEP86ytoKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NQK4xeDg; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768234001; x=1799770001;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=fyNj7tGccVud7VFJ570wDzTR6P1wo4PxWud1jjxeoLA=;
-  b=NQK4xeDgINA2JepN0LwHCqxN+8xfsClRMqgWQMR0jK/fa2fc42nLSdDT
-   q3aIJFIhJ+sqq2Rz6BwBvbQT/VacXSmDwo7a3UOExKH+cnDqFpegPczQR
-   saUh4P50Ti2XGRq7WqeMYQSTW5E1fVJTO7C5k0sBYhvjcNFgPE09LI+Bh
-   q3BxUgPB/W6A6ARZfQ+MAq3n3iUYrjmNZP4yDTaxMGjNRF4QQk0yPECNF
-   snIudgnYlRT58kVLBHnU9wvkJaGCGVjQeHsrBcnlK0FnZHimCi84+66cC
-   QDkw7QFkvy4qC1UyZXPivOHNqMz0eRJaOoCQjL1kWr7miMdzf2hknNGKb
-   A==;
-X-CSE-ConnectionGUID: HHv9pSoXTAy0yrHNrPXlIQ==
-X-CSE-MsgGUID: lOl6P1QdRVSBB6MqLpIzLg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11669"; a="80231449"
-X-IronPort-AV: E=Sophos;i="6.21,221,1763452800"; 
-   d="scan'208";a="80231449"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 08:06:40 -0800
-X-CSE-ConnectionGUID: iSLH7eN9SFOCYq5DOJ5WIw==
-X-CSE-MsgGUID: HOa+UAlbQ7W7l2VewISO6g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,221,1763452800"; 
-   d="scan'208";a="203337754"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by orviesa010.jf.intel.com with ESMTP; 12 Jan 2026 08:06:34 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vfKR5-00000000DY0-2V2o;
-	Mon, 12 Jan 2026 16:06:31 +0000
-Date: Tue, 13 Jan 2026 00:06:17 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Rob Herring <robh@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, linux-rdma@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	intel-wired-lan@lists.osuosl.org, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Mark Bloch <mbloch@nvidia.com>, linux-kernel@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Saeed Mahameed <saeedm@nvidia.com>
-Subject: Re: [Intel-wired-lan] [PATCH net-next 10/12] dpll: Add reference
- count tracking support
-Message-ID: <202601122334.64RmoU1u-lkp@intel.com>
-References: <20260108182318.20935-11-ivecera@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=W2SObyW46gEBJIK9bar95uL3394On55l6IHFfdED8ReXGHCsjmbCNWoYdhVHRSgx/O7tDkn9R/GM2XJyjPn7lg1JMnHY5C8HGc3E9tUWpuWVg8v41anY5Mk14Fvg82gFpjCy851hUxCrNmZabOf0WUo9ZNFb2scdKB++aaD23Ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=Pcq+7xEk; arc=none smtp.client-ip=83.166.143.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0000.mail.infomaniak.ch (unknown [IPv6:2001:1600:7:10::a6b])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4dqcjd2T3gzjrv;
+	Mon, 12 Jan 2026 17:08:05 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1768234085;
+	bh=fuGNBBmrV1aaR4mfqBEY752BSmb2lnimAb5XpRaYrrE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Pcq+7xEkzz8ORRTFZUA+HkwHYaf0f3sb4sKz3kod+D+bbNzuAkYf2+KhMGcZsi7EU
+	 hFw+UNsLt7NF0TdHkiUpVv4c+MTIhZl97dmeJRKH8QcZr4mlpJ4dwDODuPyiKOIXiN
+	 PpKC7k3BV+h9XTEmgCL/E0hRMsIpJ+cmiXrPofGI=
+Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4dqcjb6Gvrzg7Z;
+	Mon, 12 Jan 2026 17:08:03 +0100 (CET)
+Date: Mon, 12 Jan 2026 17:08:02 +0100
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack3000@gmail.com>
+Cc: Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
+	"Serge E . Hallyn" <serge@hallyn.com>, linux-security-module@vger.kernel.org, 
+	Tingmao Wang <m@maowtm.org>, Justin Suess <utilityemal77@gmail.com>, 
+	Samasth Norway Ananda <samasth.norway.ananda@oracle.com>, Matthieu Buffet <matthieu@buffet.re>, 
+	Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, konstantin.meskhidze@huawei.com, 
+	Demi Marie Obenour <demiobenour@gmail.com>, Alyssa Ross <hi@alyssa.is>, Jann Horn <jannh@google.com>, 
+	Tahera Fahimi <fahimitahera@gmail.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>
+Subject: Re: [PATCH v2 0/5] landlock: Pathname-based UNIX connect() control
+Message-ID: <20260112.Wufar9coosoo@digikod.net>
+References: <20260110143300.71048-2-gnoack3000@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260108182318.20935-11-ivecera@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260110143300.71048-2-gnoack3000@gmail.com>
+X-Infomaniak-Routing: alpha
 
-Hi Ivan,
+On Sat, Jan 10, 2026 at 03:32:55PM +0100, Günther Noack wrote:
+> Hello!
+> 
+> This patch set introduces a filesystem-based Landlock restriction
+> mechanism for connecting to UNIX domain sockets (or addressing them
+> with sendmsg(2)).  It introduces a file system access right for each
+> type of UNIX domain socket:
+> 
+>  * LANDLOCK_ACCESS_FS_RESOLVE_UNIX_STREAM
+>  * LANDLOCK_ACCESS_FS_RESOLVE_UNIX_DGRAM
+>  * LANDLOCK_ACCESS_FS_RESOLVE_UNIX_SEQPACKET
+> 
+> For the connection-oriented SOCK_STREAM and SOCK_SEQPACKET type
+> sockets, the access right makes the connect(2) operation fail with
+> EACCES, if denied.
+> 
+> SOCK_DGRAM-type UNIX sockets can be used both with connect(2), or by
+> passing an explicit recipient address with every sendmsg(2)
+> invocation.  In the latter case, the Landlock check is done when an
+> explicit recipient address is passed to sendmsg(2) and can make
+> sendmsg(2) return EACCES.  When UNIX datagram sockets are connected
+> with connect(2), a fixed recipient address is associated with the
+> socket and the check happens during connect(2) and may return EACCES.
+> 
+> ## Motivation
+> 
+> Currently, landlocked processes can connect() to named UNIX sockets
+> through the BSD socket API described in unix(7), by invoking socket(2)
+> followed by connect(2) with a suitable struct sockname_un holding the
+> socket's filename.  This can come as a surprise for users (e.g. in
+> [1]) and it can be used to escape a sandbox when a Unix service offers
+> command execution (some scenarios were listed by Tingmao Wang in [2]).
+> 
+> The original feature request is at [4].
+> 
+> ## Alternatives and Related Work
+> 
 
-kernel test robot noticed the following build errors:
+> ### Alternative: Use existing LSM hooks
+> 
+> The existing hooks security_unix_stream_connect(),
+> security_unix_may_send() and security_socket_connect() do not give
+> access to the resolved file system path.
+> 
+> Resolving the file system path again within Landlock would in my
+> understanding produce a TOCTOU race, so making the decision based on
+> the struct sockaddr_un contents is not an option.
+> 
+> It is tempting to use the struct path that the listening socket is
+> bound to, which can be acquired through the existing hooks.
+> Unfortunately, the listening socket may have been bound from within a
+> different namespace, and it is therefore a path that can not actually
+> be referenced by the sandboxed program at the time of constructing the
+> Landlock policy.  (More details are on the Github issue at [6] and on
+> the LKML at [9]).
 
-[auto build test ERROR on net-next/main]
+Please move (or duplicate) this rationale in the patch dedicated to the
+new hook.  It helps patch review (and to understand commits when already
+merged).
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ivan-Vecera/dt-bindings-dpll-add-common-dpll-pin-consumer-schema/20260109-022618
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260108182318.20935-11-ivecera%40redhat.com
-patch subject: [Intel-wired-lan] [PATCH net-next 10/12] dpll: Add reference count tracking support
-config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20260112/202601122334.64RmoU1u-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 15.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260112/202601122334.64RmoU1u-lkp@intel.com/reproduce)
+> 
+> ### Related work: Scope Control for Pathname Unix Sockets
+> 
+> The motivation for this patch is the same as in Tingmao Wang's patch
+> set for "scoped" control for pathname Unix sockets [2], originally
+> proposed in the Github feature request [5].
+> 
+> In my reply to this patch set [3], I have discussed the differences
+> between these two approaches.  On the related discussions on Github
+> [4] and [5], there was consensus that the scope-based control is
+> complimentary to the file system based control, but does not replace
+> it.  Mickael's opening remark on [5] says:
+> 
+> > This scoping would be complementary to #36 which would mainly be
+> > about allowing a sandboxed process to connect to a more privileged
+> > service (identified with a path).
+> 
+> ## Open questions in V2
+> 
+> Seeking feedback on:
+> 
+> - Feedback on the LSM hook name would be appreciated. We realize that
+>   not all invocations of the LSM hook are related to connect(2) as the
+>   name suggests, but some also happen during sendmsg(2).
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601122334.64RmoU1u-lkp@intel.com/
+Renaming security_unix_path_connect() to security_unix_find() would look
+appropriate to me wrt the caller.
 
-All errors (new ones prefixed by >>):
+> - Feedback on the structuring of the Landlock access rights, splitting
+>   them up by socket type.  (Also naming; they are now consistently
+>   called "RESOLVE", but could be named "CONNECT" in the stream and
+>   seqpacket cases?)
 
-   lib/ref_tracker.c: In function 'ref_tracker_alloc':
->> lib/ref_tracker.c:277:22: error: implicit declaration of function 'stack_trace_save'; did you mean 'stack_depot_save'? [-Wimplicit-function-declaration]
-     277 |         nr_entries = stack_trace_save(entries, ARRAY_SIZE(entries), 1);
-         |                      ^~~~~~~~~~~~~~~~
-         |                      stack_depot_save
+I don't see use cases where differenciating the type of unix socket
+would be useful.  LANDLOCK_ACCESS_FS_RESOLVE_UNIX would look good to me.
 
-Kconfig warnings: (for reference only)
-   WARNING: unmet direct dependencies detected for REF_TRACKER
-   Depends on [n]: STACKTRACE_SUPPORT
-   Selected by [y]:
-   - DPLL_REFCNT_TRACKER [=y] && DPLL [=y]
+Tests should still cover all these types though.
 
+What would be the inverse of "resolve" (i.e. to restrict the server
+side)?  Would LANDLOCK_ACCESS_FS_MAKE_SOCK be enough?
 
-vim +277 lib/ref_tracker.c
-
-4e66934eaadc83b Eric Dumazet  2021-12-04  252  
-4e66934eaadc83b Eric Dumazet  2021-12-04  253  int ref_tracker_alloc(struct ref_tracker_dir *dir,
-4e66934eaadc83b Eric Dumazet  2021-12-04  254  		      struct ref_tracker **trackerp,
-4e66934eaadc83b Eric Dumazet  2021-12-04  255  		      gfp_t gfp)
-4e66934eaadc83b Eric Dumazet  2021-12-04  256  {
-4e66934eaadc83b Eric Dumazet  2021-12-04  257  	unsigned long entries[REF_TRACKER_STACK_ENTRIES];
-4e66934eaadc83b Eric Dumazet  2021-12-04  258  	struct ref_tracker *tracker;
-4e66934eaadc83b Eric Dumazet  2021-12-04  259  	unsigned int nr_entries;
-acd8f0e5d72741b Andrzej Hajda 2023-06-02  260  	gfp_t gfp_mask = gfp | __GFP_NOWARN;
-4e66934eaadc83b Eric Dumazet  2021-12-04  261  	unsigned long flags;
-4e66934eaadc83b Eric Dumazet  2021-12-04  262  
-e3ececfe668facd Eric Dumazet  2022-02-04  263  	WARN_ON_ONCE(dir->dead);
-e3ececfe668facd Eric Dumazet  2022-02-04  264  
-8fd5522f44dcd7f Eric Dumazet  2022-02-04  265  	if (!trackerp) {
-8fd5522f44dcd7f Eric Dumazet  2022-02-04  266  		refcount_inc(&dir->no_tracker);
-8fd5522f44dcd7f Eric Dumazet  2022-02-04  267  		return 0;
-8fd5522f44dcd7f Eric Dumazet  2022-02-04  268  	}
-c12837d1bb31032 Eric Dumazet  2022-01-12  269  	if (gfp & __GFP_DIRECT_RECLAIM)
-c12837d1bb31032 Eric Dumazet  2022-01-12  270  		gfp_mask |= __GFP_NOFAIL;
-c12837d1bb31032 Eric Dumazet  2022-01-12  271  	*trackerp = tracker = kzalloc(sizeof(*tracker), gfp_mask);
-4e66934eaadc83b Eric Dumazet  2021-12-04  272  	if (unlikely(!tracker)) {
-4e66934eaadc83b Eric Dumazet  2021-12-04  273  		pr_err_once("memory allocation failure, unreliable refcount tracker.\n");
-4e66934eaadc83b Eric Dumazet  2021-12-04  274  		refcount_inc(&dir->untracked);
-4e66934eaadc83b Eric Dumazet  2021-12-04  275  		return -ENOMEM;
-4e66934eaadc83b Eric Dumazet  2021-12-04  276  	}
-4e66934eaadc83b Eric Dumazet  2021-12-04 @277  	nr_entries = stack_trace_save(entries, ARRAY_SIZE(entries), 1);
-4e66934eaadc83b Eric Dumazet  2021-12-04  278  	tracker->alloc_stack_handle = stack_depot_save(entries, nr_entries, gfp);
-4e66934eaadc83b Eric Dumazet  2021-12-04  279  
-4e66934eaadc83b Eric Dumazet  2021-12-04  280  	spin_lock_irqsave(&dir->lock, flags);
-4e66934eaadc83b Eric Dumazet  2021-12-04  281  	list_add(&tracker->head, &dir->list);
-4e66934eaadc83b Eric Dumazet  2021-12-04  282  	spin_unlock_irqrestore(&dir->lock, flags);
-4e66934eaadc83b Eric Dumazet  2021-12-04  283  	return 0;
-4e66934eaadc83b Eric Dumazet  2021-12-04  284  }
-4e66934eaadc83b Eric Dumazet  2021-12-04  285  EXPORT_SYMBOL_GPL(ref_tracker_alloc);
-4e66934eaadc83b Eric Dumazet  2021-12-04  286  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> 
+> ## Credits
+> 
+> The feature was originally suggested by Jann Horn in [7].
+> 
+> Tingmao Wang and Demi Marie Obenour have taken the initiative to
+> revive this discussion again in [1], [4] and [5] and Tingmao Wang has
+> sent the patch set for the scoped access control for pathname Unix
+> sockets [2].
+> 
+> Justin Suess has sent the patch for the LSM hook in [8].
+> 
+> Ryan Sullivan has started on an initial implementation and has brought
+> up relevant discussion points on the Github issue at [4] that lead to
+> the current approach.
+> 
+> [1] https://lore.kernel.org/landlock/515ff0f4-2ab3-46de-8d1e-5c66a93c6ede@gmail.com/
+> [2] Tingmao Wang's "Implemnet scope control for pathname Unix sockets"
+>     https://lore.kernel.org/all/cover.1767115163.git.m@maowtm.org/
+> [3] https://lore.kernel.org/all/20251230.bcae69888454@gnoack.org/
+> [4] Github issue for FS-based control for named Unix sockets:
+>     https://github.com/landlock-lsm/linux/issues/36
+> [5] Github issue for scope-based restriction of named Unix sockets:
+>     https://github.com/landlock-lsm/linux/issues/51
+> [6] https://github.com/landlock-lsm/linux/issues/36#issuecomment-2950632277
+> [7] https://lore.kernel.org/linux-security-module/CAG48ez3NvVnonOqKH4oRwRqbSOLO0p9djBqgvxVwn6gtGQBPcw@mail.gmail.com/
+> [8] Patch for the LSM hook:
+>     https://lore.kernel.org/all/20251231213314.2979118-1-utilityemal77@gmail.com/
+> [9] https://lore.kernel.org/all/20260108.64bd7391e1ae@gnoack.org/
+> 
+> ---
+> 
+> ## Older versions of this patch set
+> 
+> V1: https://lore.kernel.org/all/20260101134102.25938-1-gnoack3000@gmail.com/
+> 
+> Changes in V2:
+>  * Send Justin Suess's LSM hook patch together with the Landlock
+>    implementation
+>  * LSM hook: Pass type and flags parameters to the hook, to make the
+>    access right more generally usable across LSMs, per suggestion from
+>    Paul Moore (Implemented by Justin)
+>  * Split the access right into the three types of UNIX domain sockets:
+>    SOCK_STREAM, SOCK_DGRAM and SOCK_SEQPACKET.
+>  * selftests: More exhaustive tests.
+>  * Removed a minor commit from V1 which adds a missing close(fd) to a
+>    test (it is already in the mic-next branch)
+> 
+> Günther Noack (4):
+>   landlock: Control pathname UNIX domain socket resolution by path
+>   samples/landlock: Add support for named UNIX domain socket
+>     restrictions
+>   landlock/selftests: Test named UNIX domain socket restrictions
+>   landlock: Document FS access rights for pathname UNIX sockets
+> 
+> Justin Suess (1):
+>   lsm: Add hook unix_path_connect
+> 
+>  Documentation/userspace-api/landlock.rst     |  25 ++-
+>  include/linux/lsm_hook_defs.h                |   4 +
+>  include/linux/security.h                     |  11 +
+>  include/uapi/linux/landlock.h                |  10 +
+>  net/unix/af_unix.c                           |   9 +
+>  samples/landlock/sandboxer.c                 |  18 +-
+>  security/landlock/access.h                   |   2 +-
+>  security/landlock/audit.c                    |   6 +
+>  security/landlock/fs.c                       |  34 ++-
+>  security/landlock/limits.h                   |   2 +-
+>  security/landlock/syscalls.c                 |   2 +-
+>  security/security.c                          |  20 ++
+>  tools/testing/selftests/landlock/base_test.c |   2 +-
+>  tools/testing/selftests/landlock/fs_test.c   | 225 +++++++++++++++++--
+>  14 files changed, 344 insertions(+), 26 deletions(-)
+> 
+> -- 
+> 2.52.0
+> 
+> 
 
