@@ -1,153 +1,99 @@
-Return-Path: <netdev+bounces-249060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 111B9D1367B
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 16:02:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AC10D135E4
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:59:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BB32F30D7E64
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 14:52:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EFCFB3112D08
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 14:53:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A24DC2DAFAF;
-	Mon, 12 Jan 2026 14:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 579C22DB79C;
+	Mon, 12 Jan 2026 14:52:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Qip6fCr2"
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E94A52D5432;
-	Mon, 12 Jan 2026 14:52:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D2392D9EF4
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 14:52:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768229543; cv=none; b=Jg83ABZ7pijt6d4lM7hgftMw5zsdNohNdel5utbVLbtRFz0fm1VeQMZRJqJEMVvEEVRXxFcOnUqjcyz/YVPPCu0r39XghjQF1IG4448IjqYvxiidUqhhYu/NWDQ3vrhXzvQGfE/uPCbr2FX96y9wMx1YP8LMys/lhbaeiRYv3RU=
+	t=1768229571; cv=none; b=ExTSwTcPf/kEhfhWDpIbA0Ob2hJbnsWcPuTUWA5n8y3HeM6KcS8+DUFs7rJwnktjz/pga/gFOfOiQrXvn+4nOVx9V0O+LuPz5V+OiSvgHGsipFAkVSHz4tlWqM4FFKpqmpuH0hBHgxcny5K+jIhC35xK3Q8J7g/ZMToxUELYdfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768229543; c=relaxed/simple;
-	bh=6FsGGpwsZXSBclx9LRhZ4lHtZuEYOyZtvFG9RaggGRs=;
-	h=Content-Type:Message-ID:Date:MIME-Version:To:Cc:From:Subject; b=T4de1a2rkcDKoPMXXyZ2oeIwRAL9HmwKx/Ab0OvdGSpA1u5fo0hLT+ICjwlLtk2NJADXHubk/D42xqHLUC9alOkyd9uSp7RMxPAewwbmb81IT0RmbLVRV124jC9k+9LnbG8BCj4EodVGdmV2tLrCp3ej52VHGQWLo+5rujrLeLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 60CEpvYb043406;
-	Mon, 12 Jan 2026 23:51:57 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 60CEpvsJ043403
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Mon, 12 Jan 2026 23:51:57 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Content-Type: multipart/mixed; boundary="------------aRZKhr9TM3hQQGUnYLQ90N0C"
-Message-ID: <faee3f3c-b03d-4937-9202-97ec5920d699@I-love.SAKURA.ne.jp>
-Date: Mon, 12 Jan 2026 23:51:57 +0900
+	s=arc-20240116; t=1768229571; c=relaxed/simple;
+	bh=rk8bXKLs85EyZHFcbsB6vMfK2HtohBmLI1PGrH8lWtk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oKBPAeMSZLwymzq0zyqWmfZg7iuwyDqb59s61bW8bqPn//VQWIZJ5rMqf5zbXl9EN0ZL+x3uPjXSfFlbzOnDCqMWUbbYA0y3xSFnC2DT3APfaxbFm96vEPxw2ceDL9i5XY3Ac0gWlexD/GHnThuUod+WZC1blDWCnFIMb/O9fac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Qip6fCr2; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <87495044-59a3-49ed-b00c-01a7e9a23f6b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1768229556;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=t0emvJ+ADmIcSWvy6T91yM9f9/IPC+6X0Ta51udzejc=;
+	b=Qip6fCr24w+mxhxajrnVbpJNOVzhcHP5SS4dq32LFfeHU6v++EZE708vYsjQP9R7ZtENgv
+	3YxK9vD1mGRbCrfHbGZweg3170J+D6Wdn9qD6krCW9LQR4Wkt25LMMic/cLfy+u9tel1xT
+	f1wp+rkLsaWPuOpgKjA53vMXKfcqtHk=
+Date: Mon, 12 Jan 2026 14:52:30 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC] Defining a home/maintenance model for non-NIC PHC devices
+ using the /dev/ptpX API
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Sven Schnelle <svens@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ Richard Cochran <richardcochran@gmail.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Dust Li <dust.li@linux.alibaba.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, David Woodhouse <dwmw2@infradead.org>,
+ virtualization@lists.linux.dev, Nick Shi <nick.shi@broadcom.com>,
+ Paolo Abeni <pabeni@redhat.com>, linux-clk@vger.kernel.org
+References: <0afe19db-9c7f-4228-9fc2-f7b34c4bc227@linux.alibaba.com>
+ <yt9decnv6qpc.fsf@linux.ibm.com>
+ <6a32849d-6c7b-4745-b7f0-762f1b541f3d@linux.dev>
+ <7be41f07-50ab-4363-8a53-dcdda63b9147@lunn.ch>
 Content-Language: en-US
-To: Robin van der Gracht <robin@protonic.nl>,
-        Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de,
-        Oliver Hartkopp <socketcan@hartkopp.net>,
-        Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org
-Cc: Network Development <netdev@vger.kernel.org>
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Subject: can: j1939: unregister_netdevice: waiting for vcan0 to become free.
-X-Virus-Status: clean
-X-Anti-Virus-Server: fsav101.rs.sakura.ne.jp
-
-This is a multi-part message in MIME format.
---------------aRZKhr9TM3hQQGUnYLQ90N0C
-Content-Type: text/plain; charset=UTF-8
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <7be41f07-50ab-4363-8a53-dcdda63b9147@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello.
+On 12/01/2026 13:24, Andrew Lunn wrote:
+>>> drivers/ptp/core    - API as written above
+>>> drivers/ptp/virtual - all PtP drivers somehow emulating a PtP clock
+>>>                         (like the ptp_s390 driver)
+>>> drivers/ptp/net     - all NIC related drivers.
+>>>
+>>
+>>
+>> Well, drivers/ptp/virtual is not really good, because some drivers are
+>> for physical devices exporting PTP interface, but without NIC.
+> 
+> If the lack of a NIC is the differentiating property:
+> 
+>>> drivers/ptp/net     - all NIC related drivers.
+>>> drivers/ptp/netless - all related drivers which are not associated to a NIC.
+> 
+> Or
+> 
+>>> drivers/ptp/emulating - all drivers emulating a PtP clock
 
-I found a simplified C reproducer for
-https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84 from
+I would go with "emulating" then.
 
-  r1 = socket$can_j1939(0x1d, 0x2, 0x7)
-  ioctl$ifreq_SIOCGIFINDEX_vcan(r1, 0x8933, &(0x7f0000001440)={'vcan0\x00', <r2=>0x0})
-  r3 = socket$can_j1939(0x1d, 0x2, 0x7)
-  ioctl$ifreq_SIOCGIFINDEX_vcan(r3, 0x8933, &(0x7f00000000c0)={'vcan0\x00', <r4=>0x0})
-  bind$can_j1939(r3, &(0x7f0000000340)={0x1d, r4, 0x0, {0x2, 0x0, 0x6}, 0xfe}, 0x18)
-  setsockopt$sock_int(r3, 0x1, 0x6, &(0x7f0000000040)=0x1, 0x4)
-  sendmsg$inet(r3, &(0x7f0000000140)={0x0, 0x0, &(0x7f00000003c0)=[{&(0x7f0000000540)="81b641f1f3843704b6", 0x9}], 0x1}, 0x4048081)
-  bind$can_j1939(r1, &(0x7f0000000100)={0x1d, r2, 0x0, {0x1, 0xf0, 0x4}, 0xfe}, 0x18)
-  setsockopt$sock_int(r1, 0x1, 0x6, &(0x7f0000000040)=0x1, 0x4)
-  sendmsg$inet(r3, &(0x7f0000000080)={0x0, 0x0, &(0x7f0000000a80)=[{&(0x7f0000000000)="81b641f1f3843704b6", 0x9}], 0x1}, 0x48005)
+> 
+> 	Andrew
 
-lines. Can you find what is wrong?
-
-  [   58.844267] [   T1225] CAN device driver interface
-  [   58.865035] [   T1225] vcan: Virtual CAN interface driver
-  [   58.924043] [   T1227] can: controller area network core
-  [   58.929503] [   T1227] NET: Registered PF_CAN protocol family
-  [   58.959118] [   T1228] can: SAE J1939
-  [   59.215990] [      C0] vcan0: j1939_tp_rxtimer: 0x0000000042028812: rx timeout, send abort
-  [   59.716693] [      C0] vcan0: j1939_tp_rxtimer: 0x0000000041105737: rx timeout, send abort
-  [   59.722127] [      C0] vcan0: j1939_tp_rxtimer: 0x0000000042028812: abort rx timeout. Force session deactivation
-  [   59.742525] [      C0] vcan0: j1939_xtp_rx_rts_session_active: 0x0000000041105737: connection exists (fe ff). last cmd: 20
-  [   59.992638] [      C0] vcan0: j1939_tp_rxtimer: 0x0000000069d7bfc6: rx timeout, send abort
-  [   60.497771] [      C0] vcan0: j1939_tp_rxtimer: 0x0000000069d7bfc6: abort rx timeout. Force session deactivation
-  [   70.677761] [     T12] unregister_netdevice: waiting for vcan0 to become free. Usage count = 2
---------------aRZKhr9TM3hQQGUnYLQ90N0C
-Content-Type: text/plain; charset=UTF-8; name="repro.c"
-Content-Disposition: attachment; filename="repro.c"
-Content-Transfer-Encoding: base64
-
-I2RlZmluZSBfR05VX1NPVVJDRQojaW5jbHVkZSA8ZXJybm8uaD4KI2luY2x1ZGUgPGZjbnRs
-Lmg+CiNpbmNsdWRlIDxzY2hlZC5oPgojaW5jbHVkZSA8c3RkaW50Lmg+CiNpbmNsdWRlIDxz
-dGRpby5oPgojaW5jbHVkZSA8c3RkbGliLmg+CiNpbmNsdWRlIDxzdHJpbmcuaD4KI2luY2x1
-ZGUgPHN5cy9pb2N0bC5oPgojaW5jbHVkZSA8c3lzL3NvY2tldC5oPgojaW5jbHVkZSA8c3lz
-L3N0YXQuaD4KI2luY2x1ZGUgPHN5cy90eXBlcy5oPgojaW5jbHVkZSA8dW5pc3RkLmg+CiNp
-bmNsdWRlIDxzeXMvbW1hbi5oPgoKc3RhdGljIHZvaWQgZXhlY3V0ZV9vbmUodm9pZCkKewoJ
-aW50IGlkeCA9IDA7Cgljb25zdCBpbnQgT05FID0gMTsKCS8vICBzb2NrZXQkY2FuX2oxOTM5
-IGFyZ3VtZW50czogWwoJLy8gICAgZG9tYWluOiBjb25zdCA9IDB4MWQgKDggYnl0ZXMpCgkv
-LyAgICB0eXBlOiBjb25zdCA9IDB4MiAoOCBieXRlcykKCS8vICAgIHByb3RvOiBjb25zdCA9
-IDB4NyAoNCBieXRlcykKCS8vICBdCgkvLyAgcmV0dXJucyBzb2NrX2Nhbl9qMTkzOQoJY29u
-c3QgaW50IGZkID0gc29ja2V0KDB4MWQsIDIsIDcpOwoJLy8gIGlvY3RsJGlmcmVxX1NJT0NH
-SUZJTkRFWF92Y2FuIGFyZ3VtZW50czogWwoJLy8gICAgZmQ6IHNvY2sgKHJlc291cmNlKQoJ
-Ly8gICAgY21kOiBjb25zdCA9IDB4ODkzMyAoNCBieXRlcykKCS8vICAgIGFyZzogcHRyW291
-dCwgaWZyZXFfZGV2X3RbdmNhbl9kZXZpY2VfbmFtZXMsIGlmaW5kZXhfdmNhbl1dIHsKCS8v
-ICAgICAgaWZyZXFfZGV2X3RbdmNhbl9kZXZpY2VfbmFtZXMsIGlmaW5kZXhfdmNhbl0gewoJ
-Ly8gICAgICAgIGlmcl9pZnJuOiBidWZmZXI6IHs3NiA2MyA2MSA2ZSAzMCAwMCAwMCAwMCAw
-MCAwMCAwMCAwMCAwMCAwMCAwMCAwMH0KCS8vICAgICAgICAobGVuZ3RoIDB4MTApIGVsZW06
-IGlmaW5kZXhfdmNhbiAocmVzb3VyY2UpIHBhZCA9IDB4MCAoMjAgYnl0ZXMpCgkvLyAgICAg
-IH0KCS8vICAgIH0KCS8vICBdCgltZW1jcHkoKHZvaWQqKTB4MjAwMDAwMDAxNDQwLAoJICAg
-ICAgICJ2Y2FuMFwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMFwwMDBcMDAwXDAwMFwwMDBcMDAw
-IiwgMTYpOwoJaWYgKGlvY3RsKGZkLCAweDg5MzMsIDB4MjAwMDAwMDAxNDQwdWwpICE9IC0x
-KQoJCWlkeCA9ICoodWludDMyX3QqKTB4MjAwMDAwMDAxNDUwOwoJLy8gIGJpbmQkY2FuX2ox
-OTM5IGFyZ3VtZW50czogWwoJLy8gICAgZmQ6IHNvY2tfY2FuX2oxOTM5IChyZXNvdXJjZSkK
-CS8vICAgIGFkZHI6IHB0cltpbiwgc29ja2FkZHJfY2FuX2oxOTM5XSB7CgkvLyAgICAgIHNv
-Y2thZGRyX2Nhbl9qMTkzOSB7CgkvLyAgICAgICAgY2FuX2ZhbWlseTogY29uc3QgPSAweDFk
-ICgyIGJ5dGVzKQoJLy8gICAgICAgIHBhZCA9IDB4MCAoMiBieXRlcykKCS8vICAgICAgICBj
-YW5faWZpbmRleDogaWZpbmRleF92Y2FuIChyZXNvdXJjZSkKCS8vICAgICAgICBuYW1lOiBp
-bnQ2NCA9IDB4MCAoOCBieXRlcykKCS8vICAgICAgICBwZ246IGNhbl9qMTkzOV9wZ24gewoJ
-Ly8gICAgICAgICAgcGduX3BzOiBjYW5fajE5MzlfcGduX3BzID0gMHgxICgxIGJ5dGVzKQoJ
-Ly8gICAgICAgICAgcGduX3BmOiBjYW5fajE5MzlfcGduX3BmID0gMHhmMCAoMSBieXRlcykK
-CS8vICAgICAgICAgIHBnbl9mbGFnczogY2FuX2oxOTM5X3Bnbl9mbGFncyA9IDB4NCAoMSBi
-eXRlcykKCS8vICAgICAgICAgIHBnbl91bnVzZWQ6IGNvbnN0ID0gMHgwICgxIGJ5dGVzKQoJ
-Ly8gICAgICAgIH0KCS8vICAgICAgICBhZGRyOiBjYW5fajE5MzlfYWRkcnMgPSAweGZlICgx
-IGJ5dGVzKQoJLy8gICAgICAgIHBhZCA9IDB4MCAoMyBieXRlcykKCS8vICAgICAgfQoJLy8g
-ICAgfQoJLy8gICAgbGVuOiBieXRlc2l6ZSA9IDB4MTggKDggYnl0ZXMpCgkvLyAgXQoJKih1
-aW50MTZfdCopMHgyMDAwMDAwMDAxMDAgPSAweDFkOwoJKih1aW50MzJfdCopMHgyMDAwMDAw
-MDAxMDQgPSBpZHg7CgkqKHVpbnQ2NF90KikweDIwMDAwMDAwMDEwOCA9IDA7CgkqKHVpbnQ4
-X3QqKTB4MjAwMDAwMDAwMTEwID0gMTsKCSoodWludDhfdCopMHgyMDAwMDAwMDAxMTEgPSAw
-eGYwOwoJKih1aW50OF90KikweDIwMDAwMDAwMDExMiA9IDQ7CgkqKHVpbnQ4X3QqKTB4MjAw
-MDAwMDAwMTEzID0gMDsKCSoodWludDhfdCopMHgyMDAwMDAwMDAxMTQgPSAweGZlOwoJYmlu
-ZChmZCwgKHN0cnVjdCBzb2NrYWRkciAqKSAweDIwMDAwMDAwMDEwMHVsLCAweDE4dWwpOwoJ
-c2V0c29ja29wdChmZCwgU09MX1NPQ0tFVCwgU09fQlJPQURDQVNULCAmT05FLCBzaXplb2Yo
-T05FKSk7CglzZW5kKGZkLCAiXHg4MVx4YjZceDQxXHhmMVx4ZjNceDg0XHgzN1x4MDRceGI2
-IiwgOSwgMCk7CglzZW5kKGZkLCAiXHg4MVx4YjZceDQxXHhmMVx4ZjNceDg0XHgzN1x4MDRc
-eGI2IiwgOSwgMCk7Cn0KCmludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCnsKCW1t
-YXAoKHZvaWQgKikgMHgyMDAwMDAwMDAwMDB1bCwgMHgxMDAwMDAwdWwsCgkgICAgIFBST1Rf
-V1JJVEV8UFJPVF9SRUFEfFBST1RfRVhFQywKCSAgICAgTUFQX0ZJWEVEfE1BUF9BTk9OWU1P
-VVN8TUFQX1BSSVZBVEUsIC0xLCAwKTsKCWlmICh1bnNoYXJlKENMT05FX05FV05FVCkpCgkJ
-cmV0dXJuIDE7CglzeXN0ZW0oImlwIGxpbmsgYWRkIG5hbWUgdmNhbjAgdXAgdHlwZSB2Y2Fu
-Iik7CglzeXN0ZW0oImlwIGFkZHIgYWRkIDE3Mi4yMC4yMC4wLzI0IGRldiB2Y2FuMCIpOwoJ
-ZXhlY3V0ZV9vbmUoKTsKCXJldHVybiAwOwp9Cg==
-
---------------aRZKhr9TM3hQQGUnYLQ90N0C--
 
