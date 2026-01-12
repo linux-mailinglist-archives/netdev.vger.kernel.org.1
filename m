@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-249029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F0A8D12F12
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 14:55:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BE9DD12F24
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 14:56:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 02B32302BD2F
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 13:51:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3A89C30505BA
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 13:52:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FE6435BDBE;
-	Mon, 12 Jan 2026 13:51:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 187A135B123;
+	Mon, 12 Jan 2026 13:52:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69D235B123;
-	Mon, 12 Jan 2026 13:51:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4658A355051;
+	Mon, 12 Jan 2026 13:51:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768225912; cv=none; b=ZZXqK62k6ZuyzQViz2N2AG9LqbljNHnPjqtYgNDiV0AdhzQt9JZlEbsfKgmY9s7rTgnTDejqpPua9r6aE279e9i/U/Bv74CnoatUIbLPpcM21uaTmJ0qrWKv2a43I7Ct/sHedXEjYte27ILtFXW3iCR+6ECqhkAWdv43/2hLPGg=
+	t=1768225920; cv=none; b=IVoa2I7knremVwkq2ShRTcrxJ/+e8hv56pLrsssJ/tCX+kL5I789/IQWBfSVCKM8ipC76e94Dx2BmsuHHkImtueZGfVtKcvmiUB6tec7yeOQfMw2f79aNImJ0noqePz8JfHMo4qEXp6j+8yM78ZOT80jh+ZxxvgqsH8v7rOztuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768225912; c=relaxed/simple;
-	bh=sAHIE7Npb6HrcjK93DhS/NFh6lQ03vD9kLlLyrL3ngU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=DznUSlPXtFGdMy6qpo837itsrCxEY1ISuTAeqVa5OT0DO37kYo908ZyYFM0Gr+/Wxw+gJ9gm1Tq+GF+WGm9dSWXzJgqPBAo1ZoT17E+jhoywpuP+HeO6ZeakIgYRIxykd9qLY49q6+FbpEZ9Ay+Boi4E6Kw+Kq5CQRzKVQCOAHY=
+	s=arc-20240116; t=1768225920; c=relaxed/simple;
+	bh=qJ7fPKDAKf5WsmXrLY4XtPXYwan8e6N3wM1bsKRTCrs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XFGEpqakIG7TfKaX4M9ZOVE0yD3LWfD8hcKlYoWhp4cXqCxctQroC1i7fDVimeUs4vUug9sE/WbI++rns7T7KsIGAtcrNQ3ne4KxUKuJLzLhI7biz/o+ssS858K1R02S4LvL3a/xSo92AuNvpxNgKfmKcsoxtX3tuBFs6tepiWQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -31,9 +31,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.99)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1vfIKc-0000000065U-3NpR;
-	Mon, 12 Jan 2026 13:51:42 +0000
-Date: Mon, 12 Jan 2026 13:51:38 +0000
+	id 1vfIKo-0000000065p-2mqG;
+	Mon, 12 Jan 2026 13:51:54 +0000
+Date: Mon, 12 Jan 2026 13:51:51 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -56,9 +56,9 @@ Cc: Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next v5 0/4] net: dsa: initial support for MaxLinear
- MxL862xx switches
-Message-ID: <cover.1768225363.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v5 1/4] dt-bindings: net: dsa: add MaxLinear MxL862xx
+Message-ID: <f831d7fc8e02ee155943707ec825cd3b343c05e2.1768225363.git.daniel@makrotopia.org>
+References: <cover.1768225363.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,139 +67,203 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <cover.1768225363.git.daniel@makrotopia.org>
 
-This series adds very basic DSA support for the MaxLinear MxL86252
-(5 PHY ports) and MxL86282 (8 PHY ports) switches.
+Add documentation and an example for MaxLinear MxL86282 and MxL86252
+switches.
 
-MxL862xx integrates a firmware running on an embedded processor (Zephyr
-RTOS). Host interaction uses a simple API transported over MDIO/MMD.
-This series includes only what's needed to pass traffic between user
-ports and the CPU port: relayed MDIO to internal PHYs, basic port
-enable/disable, and CPU-port special tagging.
-
-At this point the driver does NOT configure any bridges and bridge
-ports, so isolation of the userports depends on the pre-configuration
-stored on the flash chip attached to the switch IC.
-
-This is going to be addressed in follow-up series adding support for
-configuring bridges and bridge-ports, and also use the added API for
-that to make sure the switch is always in a well-defined condition (ie.
-all ports isolated in individual bridges, learning disabled, and not
-depending on attached pre-configuration) after reset.
-
-
-Changes since RFC v4
-1/4 dt-bindings: net: dsa: add MaxLinear MxL862xx
- * no changes
-
-2/4 net: dsa: add tag format for MxL862xx switches
- * drop unused precompiler macros
-
-3/4 net: mdio: add unlocked mdiodev C45 bus accessors
- * fix indentation
-
-4/4 net: dsa: add basic initial driver for MxL862xx switches
- * output warning in .setup regarding unknown pre-configuration
- * add comment explaining why CFGGET is used in reset function
-
-
-Changes since RFC v3
-1/4 dt-bindings: net: dsa: add MaxLinear MxL862xx
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+---
+v5: no changes
+RFC v4:
  * remove labels from example
  * remove 'bindings for' from commit title
+RFC v3: no changes
+RFC v2: better description in dt-bindings doc
 
-2/4 net: dsa: add tag format for MxL862xx switches
- * describe fields and variables with comments
- * sub-interface is only 5 bits
- * harmonize Kconfig symbol name
- * maintain alphabetic order in Kconfig
- * fix typo s/beginnig/beginning/
- * fix typo s/swtiches/switches/
- * arrange local variables in reverse xmas tree order
-
-3/4 net: mdio: add unlocked mdiodev C45 bus accessors
- * unchanged
-
-4/4 net: dsa: add basic initial driver for MxL862xx switches
- * poll switch readiness after reset
- * implement driver shutdown
- * added port_fast_aging API call and driver op
- * unified port setup in new .port_setup op
- * improve comment explaining special handlign for unaligned API read
- * various typos and formatting improvements
-
-
-Changes since RFC v2
-1/4, 2/4, 3/4: unchanged
-
-4/4 net: dsa: add basic initial driver for MxL862xx switches
- * fix return value being uninitialized on error in mxl862xx_api_wrap()
- * add missing description in kerneldoc comment of
-   struct mxl862xx_ss_sp_tag
-
-
-Changes since initial RFC
-
-1/4 dt-bindings: net: dsa: add bindings for MaxLinear MxL862xx
- * better description in dt-bindings doc
-
-2/4 net: dsa: add tag formats for MxL862xx switches
- * make sure all tag fields are initialized
-
-3/4 net: mdio: add unlocked mdiodev C45 bus accessors
- * new patch
-
-4/4 net: dsa: add basic initial driver for MxL862xx switches
- * make use of struct mdio_device
- * add phylink_mac_ops stubs
- * drop leftover nonsense from mxl862xx_phylink_get_caps()
- * fix endian conversions
- * use __le32 instead of enum types in over-the-wire structs
- * use existing MDIO_* macros whenever possible
- * simplify API constants to be more readable
- * use readx_poll_timeout instead of open-coding poll timeout loop
- * add mxl862xx_reg_read() and mxl862xx_reg_write() helpers
- * demystify error codes returned by the firmware
- * add #defines for mxl862xx_ss_sp_tag member values
- * move reset to dedicated function, clarify magic number being the
-   reset command ID
-
-
-Daniel Golle (4):
-  dt-bindings: net: dsa: add MaxLinear MxL862xx
-  net: dsa: add tag format for MxL862xx switches
-  net: mdio: add unlocked mdiodev C45 bus accessors
-  net: dsa: add basic initial driver for MxL862xx switches
-
- .../bindings/net/dsa/maxlinear,mxl862xx.yaml  | 154 +++++++
- MAINTAINERS                                   |   8 +
- drivers/net/dsa/Kconfig                       |   2 +
- drivers/net/dsa/Makefile                      |   1 +
- drivers/net/dsa/mxl862xx/Kconfig              |  12 +
- drivers/net/dsa/mxl862xx/Makefile             |   3 +
- drivers/net/dsa/mxl862xx/mxl862xx-api.h       | 177 +++++++
- drivers/net/dsa/mxl862xx/mxl862xx-cmd.h       |  32 ++
- drivers/net/dsa/mxl862xx/mxl862xx-host.c      | 230 ++++++++++
- drivers/net/dsa/mxl862xx/mxl862xx-host.h      |   5 +
- drivers/net/dsa/mxl862xx/mxl862xx.c           | 433 ++++++++++++++++++
- drivers/net/dsa/mxl862xx/mxl862xx.h           |  24 +
- include/linux/mdio.h                          |  13 +
- include/net/dsa.h                             |   2 +
- net/dsa/Kconfig                               |   7 +
- net/dsa/Makefile                              |   1 +
- net/dsa/tag_mxl862xx.c                        | 116 +++++
- 17 files changed, 1220 insertions(+)
+ .../bindings/net/dsa/maxlinear,mxl862xx.yaml  | 154 ++++++++++++++++++
+ MAINTAINERS                                   |   6 +
+ 2 files changed, 160 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml
- create mode 100644 drivers/net/dsa/mxl862xx/Kconfig
- create mode 100644 drivers/net/dsa/mxl862xx/Makefile
- create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-api.h
- create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-cmd.h
- create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-host.c
- create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-host.h
- create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx.c
- create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx.h
- create mode 100644 net/dsa/tag_mxl862xx.c
 
+diff --git a/Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml b/Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml
+new file mode 100644
+index 0000000000000..77e48f0c7b1e3
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml
+@@ -0,0 +1,154 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/dsa/maxlinear,mxl862xx.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: MaxLinear MxL862xx Ethernet Switch Family
++
++maintainers:
++  - Daniel Golle <daniel@makrotopia.org>
++
++description:
++  The MaxLinear MxL862xx switch family are multi-port Ethernet switches with
++  integrated 2.5GE PHYs. The MxL86252 has five PHY ports and the MxL86282
++  has eight PHY ports. Both models come with two 10 Gigabit/s SerDes
++  interfaces to be used to connect external PHYs or SFP cages, or as CPU
++  port.
++
++allOf:
++  - $ref: dsa.yaml#/$defs/ethernet-ports
++
++properties:
++  compatible:
++    enum:
++      - maxlinear,mxl86252
++      - maxlinear,mxl86282
++
++  reg:
++    maxItems: 1
++    description: MDIO address of the switch
++
++  mdio:
++    $ref: /schemas/net/mdio.yaml#
++    unevaluatedProperties: false
++
++required:
++  - compatible
++  - reg
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    mdio {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        switch@0 {
++            compatible = "maxlinear,mxl86282";
++            reg = <0>;
++
++            ethernet-ports {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                port@0 {
++                    reg = <0>;
++                    phy-handle = <&phy0>;
++                    phy-mode = "internal";
++                };
++
++                port@1 {
++                    reg = <1>;
++                    phy-handle = <&phy1>;
++                    phy-mode = "internal";
++                };
++
++                port@2 {
++                    reg = <2>;
++                    phy-handle = <&phy2>;
++                    phy-mode = "internal";
++                };
++
++                port@3 {
++                    reg = <3>;
++                    phy-handle = <&phy3>;
++                    phy-mode = "internal";
++                };
++
++                port@4 {
++                    reg = <4>;
++                    phy-handle = <&phy4>;
++                    phy-mode = "internal";
++                };
++
++                port@5 {
++                    reg = <5>;
++                    phy-handle = <&phy5>;
++                    phy-mode = "internal";
++                };
++
++                port@6 {
++                    reg = <6>;
++                    phy-handle = <&phy6>;
++                    phy-mode = "internal";
++                };
++
++                port@7 {
++                    reg = <7>;
++                    phy-handle = <&phy7>;
++                    phy-mode = "internal";
++                };
++
++                port@8 {
++                    reg = <8>;
++                    label = "cpu";
++                    ethernet = <&gmac0>;
++                    phy-mode = "usxgmii";
++
++                    fixed-link {
++                        speed = <10000>;
++                        full-duplex;
++                    };
++                };
++            };
++
++            mdio {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                phy0: ethernet-phy@0 {
++                    reg = <0>;
++                };
++
++                phy1: ethernet-phy@1 {
++                    reg = <1>;
++                };
++
++                phy2: ethernet-phy@2 {
++                    reg = <2>;
++                };
++
++                phy3: ethernet-phy@3 {
++                    reg = <3>;
++                };
++
++                phy4: ethernet-phy@4 {
++                    reg = <4>;
++                };
++
++                phy5: ethernet-phy@5 {
++                    reg = <5>;
++                };
++
++                phy6: ethernet-phy@6 {
++                    reg = <6>;
++                };
++
++                phy7: ethernet-phy@7 {
++                    reg = <7>;
++                };
++            };
++        };
++    };
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 90aa1f5575c01..162859534a77c 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -15614,6 +15614,12 @@ S:	Supported
+ F:	drivers/net/phy/mxl-86110.c
+ F:	drivers/net/phy/mxl-gpy.c
+ 
++MAXLINEAR MXL862XX SWITCH DRIVER
++M:	Daniel Golle <daniel@makrotopia.org>
++L:	netdev@vger.kernel.org
++S:	Maintained
++F:	Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml
++
+ MCAN DEVICE DRIVER
+ M:	Markus Schneider-Pargmann <msp@baylibre.com>
+ L:	linux-can@vger.kernel.org
 -- 
 2.52.0
 
