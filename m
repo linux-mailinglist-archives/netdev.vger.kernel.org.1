@@ -1,174 +1,108 @@
-Return-Path: <netdev+bounces-248916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8ED60D11535
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 09:49:37 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 638DBD1156D
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 09:53:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7C309300816C
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 08:49:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5E635302CB9C
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 08:52:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ED33346768;
-	Mon, 12 Jan 2026 08:49:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF624345722;
+	Mon, 12 Jan 2026 08:52:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cMoMxT85"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="KmzRg/RA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outbound.st.icloud.com (p-east2-cluster4-host8-snip4-4.eps.apple.com [57.103.78.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBDF33451CA
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 08:49:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDB9C345CAA
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 08:52:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.78.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768207771; cv=none; b=VsMgtY33i4rQkppIxG3NqpFjt08R+fsspP/DWHlC4f3OywEAAApC4ZdGvZXumLera/zXA+m3HVQgGwmUGJ+/wwH9DtGdq+OjZdZV8E+sQ7CSTJUkN134kr06rdnD8gr1r/lLIw6E9GN+EdxAeH1gSL1LmBDY/CJL94hg5udy+uA=
+	t=1768207959; cv=none; b=CP/uriQfwQZwahcSxgsk6F+w/DObLKP369M+Lz2Z3IRpPbnYYWXJEHkz0TGPtcrk8+ggU8qZmV3MDLk9BWDRCG3yCJK8Eaoq8lU0DJgeV5wfYDTpY0rxSY32Yi8nAh4oHbvo531u32sfMWkk20URVm+SHTAevTtX4SjHbUgMX6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768207771; c=relaxed/simple;
-	bh=KXJCkJibHwTGoYr5Lg2+Uv1ZwUqidOCb1dOy2IAkNvc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MoiA+bMvd8O/XGXYI1lI/JoCT3CzAUk6bwagXolVisJPeR2UVM6kbDu4H6ndKJlGr9KEnDW1oYhiDujQYcsYqHG4jSOnujCRjsVON4k40EWRhZfXGtav0R9Nq/W5wSzl5Ut4H2ja2ipcGAvAeHh/YZoTyMpzCdTdkAxqcD0qzyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cMoMxT85; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-81f4f4d4822so293115b3a.3
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 00:49:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768207765; x=1768812565; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=F4IfMbbm6AK8/Hw5YB/wQdRPE3JSJ2bRCDHrhjKzWJg=;
-        b=cMoMxT85K7hNxH+k94ZxBqsZ0WkaeSfoumF96vhMHsnsluZSUwinhhBRncmovuOQJP
-         5/51g8lg+Z+AJeLvsS4WJDdtLxlCRMPIRQeSxtdqdLqalQ3Wk08KUmV/d3qGKpLwvMGE
-         uY+cz4rAoqfwAK+ZlQhtQN20EKWMDqFBnPm2zxjZoRc+mgXBjup9OxRxLAajBPL+JfYV
-         xMcRdfx0kkFwItWTm0saIc9cKAZBeT6NQQFPaFgX3uysOKumw8K/aa96AH3+Ip95HLny
-         k98MCpbwJhDT8+I4zLfUXi5/zlVALhXbuJ3PMguJFCHtNcJz1ue/xdYhqXgJo7HCogaI
-         XqiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768207765; x=1768812565;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=F4IfMbbm6AK8/Hw5YB/wQdRPE3JSJ2bRCDHrhjKzWJg=;
-        b=ngb9NKXbtZJMXQ5dp0wnCB88wS/cHya2Ky+JRvE0YzT5KnyCury8f8Fk8S3VZY0hYe
-         /9EiR8GBmnsyAkI5SCubacWF3fXbeb6eKEIJrjwC1HiI5p24vUC/XfP/dMEKCHmUHab0
-         5DtJI+TECxzsK9xjm7mFuCiZUfYUzb/1/wij0X0WXWKlE0LDaxflMypXQ4844f+uMPvU
-         ABFtmgsKNK0r0Jorwm4aX25uMjY4OVpseufDGkS+e1OU/L71grx+oteVKOmECqIvPCvn
-         SE3Fpyht01Iu/UZqpAPOpYBK5THrM4n2YMJQ+VBlKHI7ED2PnXpYKGKdFE+MZEnHDWXt
-         EvSQ==
-X-Gm-Message-State: AOJu0YzMUGs2lzxSy4VQNaq7soGz03thfz+AaNl2vp98THplSIIk/VFp
-	fccdov6VT9CmEMporJYEDkYhsq9tuesMNt9mZzZyNM0OQBuddQ3lR+UV
-X-Gm-Gg: AY/fxX6ycq5CdWvcKSqYJfe0KabSuKP9f2LQOPbx6JX0FN72jgERitqMphbPahMpcCk
-	qYBMrdvVCXmCxIcs2pCZ/sSOBy7rU9qGVUZE8IITpLyQpFd32OuopRtDhzwbHMyEEpjQkhRdTwh
-	uItnuYR23scZGeaXUE3KoLLgtYShglx6vqTJr1UAU/UD3Un/FImrrMQEKfXe69knFQO1v6ezBDo
-	ERPYX/2n7k0VDPe/eIhFJPGUCQR6lA5TE6HdUW5hFJ69J5qvwxpoTqIXdFC396DvFRSeYNMvePA
-	40pzpz8LPHFMb1tKhX2JY2Upf61ZzXdPgaOveES/cXKHoFFn8ai3nbyIaKuw5lG4W1/PvmUYe8F
-	LwlFzx97Lxp7oHe2okOz2oWRFlJabVtnKCAMyykvgVsWSCcJWx4x1gKq2thUBqVKUcnugWQ6eAj
-	2vt0vo8hv1feZ6f8o=
-X-Google-Smtp-Source: AGHT+IEIRNmchKMf6M/fWpXsHDPS9Tyuz8cNXAfpYvi+SAJDgrrSvB8hvLlQuEUkkXncriGP8bbIxg==
-X-Received: by 2002:a05:6a21:9990:b0:366:2696:1455 with SMTP id adf61e73a8af0-3898f8f5526mr14664745637.16.1768207764795;
-        Mon, 12 Jan 2026 00:49:24 -0800 (PST)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c4cbfc2f481sm16678179a12.10.2026.01.12.00.49.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jan 2026 00:49:24 -0800 (PST)
-Date: Mon, 12 Jan 2026 08:49:17 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Tonghao Zhang <tonghao@bamaicloud.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1768207959; c=relaxed/simple;
+	bh=/yRazxsbNMX774Mh8GZGUYzGMpZwHziAMhcBRbGAQQQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R/evWhEPOVC9/gMQV8hM+oZ6BJ4z8efztFLYAT3k5r5m9LS2rxEt0fDKSkl7HB3GW1AsLwLbOnN7/qp7o6OzHwNpCtbQ3bIFfy+DOwIYH+PL7EZkI6c5+XC/jfHFv0BEQkIRWChlVRzJnY+g+9fJI+gxh1T4levSOvbX0R+Fl+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=KmzRg/RA reason="key not found in DNS"; arc=none smtp.client-ip=57.103.78.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=y-koj.net
+Received: from outbound.st.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-east-1a-100-percent-2 (Postfix) with ESMTPS id 254CC1800176;
+	Mon, 12 Jan 2026 08:52:33 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; bh=4Itv0Ooc4L8CDM5G3pwk44bU8zUPWzoZLezCw3n7i6w=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=KmzRg/RAPg5QAK/cngZHWlIw2gN20ktGGy6gT7n/QgXKGoIE3zPp+mnDLHZRlZBEmylYT1zo9A6BoGtv+1hR8VDFg8RpmutIJkIAMOiqsPM54gWI4WdysTiMI3+JSJoyAuuufI7llzFfMcL2R0kwAZrbJC+m4JnBiAGmM/H19KZs7N8htxLym0EC6A05ymCsKocHWw4MdvYW7/D6kNdZ1QPUvTniqIkEATTT/1/RXdNlRXNbm7QZB164UX7mWUM3abJcJjjv6q0Py23E0ByrDysAv3nfiXFRVCS18yJUdK/pkxkvqDkkjYAFDyC/DvIeB0XVarPmy6ymMfnUs6LGew==
+mail-alias-created-date: 1719758601013
+Received: from desktop.tail809fd.ts.net (unknown [17.42.251.67])
+	by p00-icloudmta-asmtp-us-east-1a-100-percent-2 (Postfix) with ESMTPSA id 894D718000B9;
+	Mon, 12 Jan 2026 08:52:31 +0000 (UTC)
+From: Yohei Kojima <yk@y-koj.net>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Jason Xing <kerneljasonxing@gmail.com>
-Subject: Re: [PATCH RESEND net-next v4 3/4] net: bonding: skip the 2nd
- trylock when first one fail
-Message-ID: <aWS1jST2907AGCLi@fedora>
-References: <cover.1768184929.git.tonghao@bamaicloud.com>
- <e90a599a58a3738d69a2b879f31871afa223d7ab.1768184929.git.tonghao@bamaicloud.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yohei Kojima <yk@y-koj.net>
+Subject: [PATCH net-next 0/2] selftests: net: improve error handling in passive TFO test
+Date: Mon, 12 Jan 2026 17:51:42 +0900
+Message-ID: <cover.1768207347.git.yk@y-koj.net>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e90a599a58a3738d69a2b879f31871afa223d7ab.1768184929.git.tonghao@bamaicloud.com>
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTEyMDA2OSBTYWx0ZWRfX3V6EZ9fWe7+H
+ tWIcAI7qBnylYzR6Newu1QuvxC7MSEhV3mt8nCslFDh+LzQ5IIIjDDG76B5I4MWWIUr55nn4GiN
+ whW9JPVTVvs150wI77zX1x1EEOo8xBEFgbaNg81CEnILfq+jxWwn7I+kka658T7vYy5YbiHQ4DW
+ Sc303QNvkPgYNfj+AyC4/lwTPX/ofot2QNWIdmHso8LbIVGTbq5q4lelkPO8DAfWqqYYrzEdi/+
+ cnB+eq49TXoPV25nYt+87RMhjViZDpwe0hidyuNuj1039ooSp4Y0+Doodn0xdD9/i5L3qslUUeR
+ tw4x7x+dyJoJ7mEEyvp
+X-Authority-Info: v=2.4 cv=UaRciaSN c=1 sm=1 tr=0 ts=6964b652
+ cx=c_apl:c_apl_out:c_pps a=YrL12D//S6tul8v/L+6tKg==:117
+ a=YrL12D//S6tul8v/L+6tKg==:17 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=jnl5ZKOAAAAA:8 a=BzLB1Msb6QmX_b4eOlEA:9
+ a=RNrZ5ZR47oNZP8zBN2PD:22
+X-Proofpoint-GUID: 5b7hPN9b5qdm09jQkz2Jm-13iPD3rbVU
+X-Proofpoint-ORIG-GUID: 5b7hPN9b5qdm09jQkz2Jm-13iPD3rbVU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-12_02,2026-01-09_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
+ clxscore=1030 phishscore=0 adultscore=0 bulkscore=0 spamscore=0
+ mlxlogscore=827 suspectscore=0 malwarescore=0 classifier=spam authscore=0
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
+ definitions=main-2601120069
+X-JNJ: AAAAAAABph2r8x2NWv2ySL5voK8tTMyoIvedlYtIjOdpZ6pxmaKaXO73V5YMgUivD5lZA9GAgD2tBCOjBapsr34ibjKvJT73aHfjdQeed2xPK1EheW9DEmUWK3EfzlKmqLMwK0s8ZCFjjkUSLYID3Yv+wKEI75Cg0ilkAOWc6fOhxX9G//1Mzj9h8wczJJXVkvSiuZJPqsxxwe57jwQsiZ6FzzP367qtWofYZ6+6neP7ilYM+wQe878U6kk23cg25YNGKewunvYhOiUzAaksPJcRhqi1xCg3xvr0HIpbIdQeQk7hWZK+PFdT3/YTRiaHkxOr6TsLDXdta9w5FO5v4ny5jim0Bt9uBONPyiHrRITvX5R6GY5mOvE7m9j5Im079zKUWCSpnPs/x836OPChptu862VieLRxFHyLViLXRPZO/3PquswhpLxc6kk4k+vpPeAbs98Ncv79QsvjPUOpX6KMffWX+sCSL/trKSRmB+Ed/s2sKlqrpJBntha2jxV0RcXDlthfm8YtECDMl5vGQIrUpn1sG2IWcdI97NsoscxgtMQPeR97ccyw08wPYnm3m3vdrFGSUmYoRE/7ntzorwtYoBSO1i+v7a1iIYH9/3gsexRCxIZWu3nTXjb6koAA43ZPWu1MfNvYld12Q7ASMnYhzSNlgAquyMHelrt1oMYSsSEbDWt9QfPyAFMr+5snqafhP37FrIBB7T1QMbXnlg==
 
-On Mon, Jan 12, 2026 at 10:40:50AM +0800, Tonghao Zhang wrote:
-> After the first trylock fail, retrying immediately is
-> not advised as there is a high probability of failing
-> to acquire the lock again. This optimization makes sense.
-> 
-> Cc: Jay Vosburgh <jv@jvosburgh.net>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Simon Horman <horms@kernel.org>
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-> Cc: Nikolay Aleksandrov <razor@blackwall.org>
-> Cc: Hangbin Liu <liuhangbin@gmail.com>
-> Cc: Jason Xing <kerneljasonxing@gmail.com>
-> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
-> ---
-> v2-4:
-> - no change
-> v1:
-> - splitted from: https://patchwork.kernel.org/project/netdevbpf/patch/20251118090431.35654-1-tonghao@bamaicloud.com/
-> - this patch only skip the 2nd rtnl lock.
-> - add this patch to series
-> ---
->  drivers/net/bonding/bond_main.c | 16 +++++++++-------
->  1 file changed, 9 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-> index 8be7f52e847c..b835f63d2871 100644
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
-> @@ -3756,7 +3756,7 @@ static bool bond_ab_arp_probe(struct bonding *bond)
->  
->  static void bond_activebackup_arp_mon(struct bonding *bond)
->  {
-> -	bool should_notify_rtnl = false;
-> +	bool should_notify_rtnl;
->  	int delta_in_ticks;
->  
->  	delta_in_ticks = msecs_to_jiffies(bond->params.arp_interval);
-> @@ -3784,13 +3784,11 @@ static void bond_activebackup_arp_mon(struct bonding *bond)
->  	should_notify_rtnl = bond_ab_arp_probe(bond);
->  	rcu_read_unlock();
->  
-> -re_arm:
-> -	if (bond->params.arp_interval)
-> -		queue_delayed_work(bond->wq, &bond->arp_work, delta_in_ticks);
-> -
->  	if (bond->send_peer_notif || should_notify_rtnl) {
-> -		if (!rtnl_trylock())
-> -			return;
-> +		if (!rtnl_trylock()) {
-> +			delta_in_ticks = 1;
-> +			goto re_arm;
-> +		}
->  
->  		if (bond->send_peer_notif) {
->  			if (bond_should_notify_peers(bond))
-> @@ -3805,6 +3803,10 @@ static void bond_activebackup_arp_mon(struct bonding *bond)
->  
->  		rtnl_unlock();
->  	}
-> +
-> +re_arm:
-> +	if (bond->params.arp_interval)
-> +		queue_delayed_work(bond->wq, &bond->arp_work, delta_in_ticks);
->  }
->  
->  static void bond_arp_monitor(struct work_struct *work)
-> -- 
-> 2.34.1
-> 
+This series improves error handling in the passive TFO test by (1)
+fixing a broken behavior when the child processes failed (or timed out),
+and (2) adding more error handlng code in the test program.
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+The first patch fixes the behavior that the test didn't report failure
+even if the server or the client process exited with non-zero status.
+The second patch adds error handling code in the test program to improve
+reliability of the test.
+
+This series was split out from the following series to address the
+feedback from Andrew Lunn:
+https://lore.kernel.org/netdev/cover.1767032397.git.yk@y-koj.net/
+
+Yohei Kojima (2):
+  selftests: net: fix passive TFO test to fail if child processes failed
+  selftests: net: improve error handling in passive TFO test
+
+ tools/testing/selftests/net/tfo.c          | 10 +++++++---
+ tools/testing/selftests/net/tfo_passive.sh | 13 ++++++++++++-
+ 2 files changed, 19 insertions(+), 4 deletions(-)
+
+-- 
+2.52.0
+
 
