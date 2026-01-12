@@ -1,338 +1,144 @@
-Return-Path: <netdev+bounces-248967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF4CAD11F29
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 11:38:30 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B63CD128E1
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 13:32:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B0D0F301A72D
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 10:38:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 677893036C7B
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 12:31:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C98B2C21EF;
-	Mon, 12 Jan 2026 10:38:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ff7SB9RL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ADF2224AFA;
+	Mon, 12 Jan 2026 12:31:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE4D02C237F
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 10:38:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 223EB1A9FB7
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 12:31:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768214309; cv=none; b=f2Zl64QkPpR9v3G4OIgY67or53aLszGToFD58z/rQW/zZ3UEzh3CLj9W/GZY4vtC8MSKtVD9fATfszduMc78b+X9uFAnkFO2QEew7ho8DNw8HzL0k/D84Wyaihz8xljUpF6JgksWW1LBGwr3yw6IvCLhbePT2dbDDGdqKbv5PPk=
+	t=1768221117; cv=none; b=J7ztwYKiDdvJAQ4DMSALL1xtCZfSV3MSPFv4b5B+Y5FQDxqVsQhx9+oZdYTZDDhIKvnuyMyMu7O9IO6wL7EFIhLWclzRlmXa8a4b1sts24T4zzKHeZXTfk7oI2UHxNv/yzzdbheEDbKQbySSKcGKH83oQmgE8lQozancwgUUiuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768214309; c=relaxed/simple;
-	bh=cOm/ERwPfe+Xo3Qo6wuMNiIL2iu8c51aQ+1vzEqbbuY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=DQbKdySKpIX6lV+fXqSlvaklRy4BOAB2/V+oGX70RCjJvi9VBpqwEaTIQA4CZqf5zjdtf364cg5iOwyw3UcMygNk+vcj5BEYs3SbjQ91gO7/LL2NyKNnbh/JHxbiQyuHUGJAdXBpGAoi1aeyFeaZ3wJN2sRXANHET50nThJEfUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ff7SB9RL; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-792785bc7ffso16003947b3.3
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 02:38:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768214307; x=1768819107; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=xQC5N3XNGquXZOqwYNNYDjkmqVzyTHgte0jy1aBx8QU=;
-        b=ff7SB9RLYnIIe+Vmj4AKCajl12vrbabVJ9EaaMHWK5Ily4mAReTjdytHOE6kYqDWxe
-         hU4mbICojAOamv0CxsE+Lu9/xE8j0hCns1DvcS4E+I5BFM/igCz5LDGT6fe1If17KHrF
-         rxUdavqi+XL6AW1SrHJpwbFA3tYgvct4q9EaEqbsAILe2Dtaj/BYFrk1fMPu9a7tIyKP
-         shTNHQji26SfvKN2wTuF2bjqKiAr3iFr1ZZqJj5SleJBhFNN86Jb5Q+4+IyTytK+v23h
-         Q1lFLTDH7xs9fcNEgO6ZUJEU0FYsZMN46qkjhH8c5JPZh3+wtWBVxRRbYDd/ztZC0/4z
-         BHdA==
+	s=arc-20240116; t=1768221117; c=relaxed/simple;
+	bh=D+eSIORp6hkFjtzYOBatu8K5maR1eLde4wH4IDQSgv4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bckJbRSsmbm6k9+dqKKaWQ/e7Afw/U+847HtAcoQcVHRQrlSV85ODNkb6yPHwgbp8TG+4TOWe+A9tQkwjrgrvL3DXiihilAGUt96opSdpTB99uuPPMOUck7aEJf4dcVmv6ECvZS9qEEEOFS/R+tRD04uM2Wo9ZTQ4U8QR8UdOoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.217.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-5efa4229bd2so1821850137.0
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 04:31:55 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768214307; x=1768819107;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xQC5N3XNGquXZOqwYNNYDjkmqVzyTHgte0jy1aBx8QU=;
-        b=sXJl8nKips6r5fWgYIvIxgJ1ZmRzrM9KudAuTgECm4sCde97pdezdRs+yQ1hydER5i
-         nyTTeR07k1M9CKxX7SV4aXkLHT1OAuXP0jble1SM/qG9DQhjRwbKMRSw8ePuU4KtB40b
-         0gjIQfoU9ijImzhODmPU9q9fnWVYAnFTjWP5OZYcz94cuFFMlYbfqbVfZTo38OnsIKUP
-         TRrLigkCQv7zm+mWTDkD3qA3L6fCDlKC8LORmHw4bnYk/A0HW9DFyFOSM2WZuWz9BIjm
-         vdTjplhe1P4tPBmH/3Zw8gS6a1ldkf6ve6hvHCXWIVm9HPtxGQQ+J3Js/tGgwQaVfdQ3
-         LPzg==
-X-Forwarded-Encrypted: i=1; AJvYcCXNIsXSY5e64Bk4MYdg2Blrdf+yRutD0WiXhVkZ//lzz0NP8VqTX8ESkvTQm/ISU0nyGBV4SNY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySJPGv3yKmA1mDSVzd+uOK+3a7O8PtGRAqWF8gGo5lEEmRNEWw
-	UVdLqDoYx3Wh9UM24UFL2y0WQ63FKJKpRxpEVMnDx49Deu2rg9QNC01na+34GZCBotQUsisrMZ1
-	VFc/0nnNvKlNF7w==
-X-Google-Smtp-Source: AGHT+IE5dDVVFv3KsL6FjnOJI1qn0i77gODoAiVIXk9OnmrgsUHsr+aeZT2uMC9xzgIOerlvszEbhX82jiaS0A==
-X-Received: from ywll16.prod.google.com ([2002:a05:690c:a1d0:b0:789:2e24:b795])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:690c:490a:b0:78f:a7aa:b684 with SMTP id 00721157ae682-790b56176ccmr142095007b3.31.1768214306789;
- Mon, 12 Jan 2026 02:38:26 -0800 (PST)
-Date: Mon, 12 Jan 2026 10:38:25 +0000
+        d=1e100.net; s=20230601; t=1768221115; x=1768825915;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=t872TIfE/0yLSN2fTJlE7imIk93fYjUN6CJU2FvEfLA=;
+        b=nI/MUg2c2qoUQUgNn/T4D3j8yavr08qz2zwWWi+jFAeAGhv47FByX5TE5fO3rxZ0Wv
+         BRcCF2o+iEFEtNVbCKumobrZvXv1Xap4SODIm3Wtl/s3DBkzk05rcGyx+uZIaspIjOKK
+         WtTWoBpQNeujQMLrOvG2ly8ai9Q/atv1KQ4Bd4pp3lAoCl1EZcr+IAtJqvmt06XfzXp8
+         Fi4ZilbKDygQQ0r6/1EKwyV5Z9nVVCJgeL7SgcNLoWFvfaLNCTB3jXkjWOlSpo6QrCsa
+         A6ixb2XOkDOuWlhRgJFeKPwZgJDsb5epWhz6JjeFn2lgIpRdMrz4kAPXg+bKtqYNswOs
+         8u8g==
+X-Forwarded-Encrypted: i=1; AJvYcCWRn+F6N/VS74tCUR4S7SN+T14DcRRdX9kZ7zoV8Icc5cDF76qvferBB2tiEU4A/Gox+36Za4s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6DsNqFBwvbPOAPVHhoKNX1+dqQ5Qlf7jF3a8A4KwJwNbWY1mu
+	nwgd4m8GMWsCtKBOnyZk6BIE8TEU/Gvx+TFwF3cQMhgjiPpzk8FGOY/Rf6uAXvVk
+X-Gm-Gg: AY/fxX6NvJSIkTrRJc9X4C0h8dZwUyaO3lAZoLXHD6A5K9QmFskB1s0yUkNeTiWUrG/
+	GKziOnYtEkTCEs4ooaU0fQTxRMv/NICKEaNqI71XLkVUp6USVhCiSjuS5McQ6GdPDT2apoDy/4n
+	k7LdRbklkbbPCbwEqTVq9ZWZjmp+WuQVsaIfd3Xl9HmO4uRtkOIrfJvlR4/mhyrXEjQGJDe3z0y
+	9XLDFuWCqFNElm3LDEt9oQcKsdS+3EFvtdeVVTsrQOeFuP7hZ+YkxacsyBiw6LJHouqFr2WisB8
+	4oMcydjBGdjNkc1KCrr6I1UzhQPB0nlnE7RsMShgbg7xzED5zHvjwFoEx3ABtrJDBZe0enR2rmG
+	kS9I0hchtepL2J1AqhJCY7vCtLI0e8EFxvT9cGcbLzPQ4V1spT0opXJaq1ZEic49/HqF5HvkZ3F
+	Fomg==
+X-Google-Smtp-Source: AGHT+IFUh41EDGB00B1ng9zvevzsW5YndFOwaUcgnhcK73da0G9DNjBeIh1Xql/tMhA/jjXPanwVdA==
+X-Received: by 2002:a05:6870:d187:b0:3ff:68aa:ebb0 with SMTP id 586e51a60fabf-3ffc0bd60fdmr8472571fac.52.1768215308916;
+        Mon, 12 Jan 2026 02:55:08 -0800 (PST)
+Received: from gmail.com ([2a03:2880:10ff:40::])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3ffa507235fsm12386412fac.13.2026.01.12.02.55.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jan 2026 02:55:08 -0800 (PST)
+Date: Mon, 12 Jan 2026 02:55:06 -0800
+From: Breno Leitao <leitao@debian.org>
+To: John Ogness <john.ogness@linutronix.de>, pmladek@suse.com, 
+	osandov@osandov.com
+Cc: Petr Mladek <pmladek@suse.com>, mpdesouza@suse.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, 
+	gustavold@gmail.com, calvin@wbinvd.org, jv@jvosburgh.net, kernel-team@meta.com, 
+	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, rostedt@goodmis.org
+Subject: Re: [PATCH net-next 0/2] net: netconsole: convert to NBCON console
+ infrastructure
+Message-ID: <44upa7szd563kggh4xolznmfcwfnhrrh5guvecp6pzlvp5qvic@w7hxtzy7huzf>
+References: <20251222-nbcon-v1-0-65b43c098708@debian.org>
+ <5mpei32y7sl5jmi2ciim4crxbc55zztiucxxsdd633mvzxlk7n@fowtsefym5y6>
+ <87zf6pfmlq.fsf@jogness.linutronix.de>
+ <4dwhhlnuv2n3f7d3hqoulcnsg6ljucd6v47kqcszcwcshfoqno@rzxvg456q4fi>
+ <j764nuipx4nvemd3wlqfyx77lkdf7wgs5z452hlacwglvc2e7n@vsko4bq5xb2f>
+ <87eco09hgb.fsf@jogness.linutronix.de>
+ <aWECzkapsFFPFKNP@pathway.suse.cz>
+ <875x9a6cpw.fsf@jogness.linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260112103825.3810713-1-edumazet@google.com>
-Subject: [PATCH net] dst: fix races in rt6_uncached_list_del() and rt_del_uncached_list()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
-	syzbot+179fc225724092b8b2b2@syzkaller.appspotmail.com, 
-	Martin KaFai Lau <martin.lau@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <875x9a6cpw.fsf@jogness.linutronix.de>
 
-syzbot was able to crash the kernel in rt6_uncached_list_flush_dev()
-in an interesting way [1]
+On Fri, Jan 09, 2026 at 04:19:31PM +0106, John Ogness wrote:
+> On 2026-01-09, Petr Mladek <pmladek@suse.com> wrote:
 
-Crash happens in list_del_init()/INIT_LIST_HEAD() while writing
-list->prev, while the prior write on list->next went well.
+...
 
-static inline void INIT_LIST_HEAD(struct list_head *list)
-{
-	WRITE_ONCE(list->next, list); // This went well
-	WRITE_ONCE(list->prev, list); // Crash, @list has been freed.
-}
+> Crash/dump tools that are not updated would at least continue to print
+> the text at the beginning of the line. Here are a few projects that I
+> track and how they would react (unmodified):
+> 
+> makedumpfile
+> - https://github.com/makedumpfile/makedumpfile/blob/master/printk.c#L134
+> - will print "\x00" between the fields
+> 
+> vmcore-dmesg
+> - https://git.kernel.org/pub/scm/utils/kernel/kexec/kexec-tools.git/tree/util_lib/elf_info.c?h=main#n904
+> - will print "\x00" between the fields
+> 
+> crash
+> - https://github.com/crash-utility/crash/blob/master/printk.c#L210
+> - will print "." between the fields
 
-Issue here is that rt6_uncached_list_del() did not attempt to lock
-ul->lock, as list_empty(&rt->dst.rt_uncached) returned
-true because the WRITE_ONCE(list->next, list) happened on the other CPU.
+drgn:
 
-We might use list_del_init_careful() and list_empty_careful(),
-or make sure rt6_uncached_list_del() always grabs the spinlock
-whenever rt->dst.rt_uncached_list has been set.
+I know that drgn also parses it, and has a if depending the kernel
+version (before or after commit commit 896fbe20b4e2 ("printk: use the
+lockless ringbuffer")
 
-A similar fix is neeed for IPv4.
+https://github.com/osandov/drgn/blob/44ba3eb43a44f246fe3e65a728aa2594a19f15ee/drgn/helpers/linux/printk.py#L252C1-L255C55
 
-[1]
+> > My opinion:
+> > ===========
+> >
+> > I personally think that the approach B) is the best compromise for now
+> > because:
+> >
+> > 1. We really should distinguish task/interrupt context. IMHO, it is
+> >    a very useful information provided by the caller_id now.
 
- BUG: KASAN: slab-use-after-free in INIT_LIST_HEAD include/linux/list.h:46 [inline]
- BUG: KASAN: slab-use-after-free in list_del_init include/linux/list.h:296 [inline]
- BUG: KASAN: slab-use-after-free in rt6_uncached_list_flush_dev net/ipv6/route.c:191 [inline]
- BUG: KASAN: slab-use-after-free in rt6_disable_ip+0x633/0x730 net/ipv6/route.c:5020
-Write of size 8 at addr ffff8880294cfa78 by task kworker/u8:14/3450
+Agree. I don't have it in netconsole yet, but, this is I would like to
+implement.
 
-CPU: 0 UID: 0 PID: 3450 Comm: kworker/u8:14 Tainted: G             L      syzkaller #0 PREEMPT_{RT,(full)}
-Tainted: [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-Workqueue: netns cleanup_net
-Call Trace:
- <TASK>
-  dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
-  print_address_description mm/kasan/report.c:378 [inline]
-  print_report+0xca/0x240 mm/kasan/report.c:482
-  kasan_report+0x118/0x150 mm/kasan/report.c:595
-  INIT_LIST_HEAD include/linux/list.h:46 [inline]
-  list_del_init include/linux/list.h:296 [inline]
-  rt6_uncached_list_flush_dev net/ipv6/route.c:191 [inline]
-  rt6_disable_ip+0x633/0x730 net/ipv6/route.c:5020
-  addrconf_ifdown+0x143/0x18a0 net/ipv6/addrconf.c:3853
- addrconf_notify+0x1bc/0x1050 net/ipv6/addrconf.c:-1
-  notifier_call_chain+0x19d/0x3a0 kernel/notifier.c:85
-  call_netdevice_notifiers_extack net/core/dev.c:2268 [inline]
-  call_netdevice_notifiers net/core/dev.c:2282 [inline]
-  netif_close_many+0x29c/0x410 net/core/dev.c:1785
-  unregister_netdevice_many_notify+0xb50/0x2330 net/core/dev.c:12353
-  ops_exit_rtnl_list net/core/net_namespace.c:187 [inline]
-  ops_undo_list+0x3dc/0x990 net/core/net_namespace.c:248
-  cleanup_net+0x4de/0x7b0 net/core/net_namespace.c:696
-  process_one_work kernel/workqueue.c:3257 [inline]
-  process_scheduled_works+0xad1/0x1770 kernel/workqueue.c:3340
-  worker_thread+0x8a0/0xda0 kernel/workqueue.c:3421
-  kthread+0x711/0x8a0 kernel/kthread.c:463
-  ret_from_fork+0x510/0xa50 arch/x86/kernel/process.c:158
-  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
- </TASK>
+> My ordered preferences for right now would be:
+> 
+> 1. keeping @caller_id semantics + adding @cpu + adding @comm (similar to
+> your C)
 
-Allocated by task 803:
-  kasan_save_stack mm/kasan/common.c:57 [inline]
-  kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
-  unpoison_slab_object mm/kasan/common.c:340 [inline]
-  __kasan_slab_alloc+0x6c/0x80 mm/kasan/common.c:366
-  kasan_slab_alloc include/linux/kasan.h:253 [inline]
-  slab_post_alloc_hook mm/slub.c:4953 [inline]
-  slab_alloc_node mm/slub.c:5263 [inline]
-  kmem_cache_alloc_noprof+0x18d/0x6c0 mm/slub.c:5270
-  dst_alloc+0x105/0x170 net/core/dst.c:89
-  ip6_dst_alloc net/ipv6/route.c:342 [inline]
-  icmp6_dst_alloc+0x75/0x460 net/ipv6/route.c:3333
-  mld_sendpack+0x683/0xe60 net/ipv6/mcast.c:1844
-  mld_send_cr net/ipv6/mcast.c:2154 [inline]
-  mld_ifc_work+0x83e/0xd60 net/ipv6/mcast.c:2693
-  process_one_work kernel/workqueue.c:3257 [inline]
-  process_scheduled_works+0xad1/0x1770 kernel/workqueue.c:3340
-  worker_thread+0x8a0/0xda0 kernel/workqueue.c:3421
-  kthread+0x711/0x8a0 kernel/kthread.c:463
-  ret_from_fork+0x510/0xa50 arch/x86/kernel/process.c:158
-  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
+This is similar the PoC I wrote earlier in this thread [0] plus @comm.
 
-Freed by task 20:
-  kasan_save_stack mm/kasan/common.c:57 [inline]
-  kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
-  kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:584
-  poison_slab_object mm/kasan/common.c:253 [inline]
-  __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:285
-  kasan_slab_free include/linux/kasan.h:235 [inline]
-  slab_free_hook mm/slub.c:2540 [inline]
-  slab_free mm/slub.c:6670 [inline]
-  kmem_cache_free+0x18f/0x8d0 mm/slub.c:6781
-  dst_destroy+0x235/0x350 net/core/dst.c:121
-  rcu_do_batch kernel/rcu/tree.c:2605 [inline]
-  rcu_core kernel/rcu/tree.c:2857 [inline]
-  rcu_cpu_kthread+0xba5/0x1af0 kernel/rcu/tree.c:2945
-  smpboot_thread_fn+0x542/0xa60 kernel/smpboot.c:160
-  kthread+0x711/0x8a0 kernel/kthread.c:463
-  ret_from_fork+0x510/0xa50 arch/x86/kernel/process.c:158
-  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
+Link: https://lore.kernel.org/all/j764nuipx4nvemd3wlqfyx77lkdf7wgs5z452hlacwglvc2e7n@vsko4bq5xb2f/ [0]
 
-Last potentially related work creation:
-  kasan_save_stack+0x3e/0x60 mm/kasan/common.c:57
-  kasan_record_aux_stack+0xbd/0xd0 mm/kasan/generic.c:556
-  __call_rcu_common kernel/rcu/tree.c:3119 [inline]
-  call_rcu+0xee/0x890 kernel/rcu/tree.c:3239
-  refdst_drop include/net/dst.h:266 [inline]
-  skb_dst_drop include/net/dst.h:278 [inline]
-  skb_release_head_state+0x71/0x360 net/core/skbuff.c:1156
-  skb_release_all net/core/skbuff.c:1180 [inline]
-  __kfree_skb net/core/skbuff.c:1196 [inline]
-  sk_skb_reason_drop+0xe9/0x170 net/core/skbuff.c:1234
-  kfree_skb_reason include/linux/skbuff.h:1322 [inline]
-  tcf_kfree_skb_list include/net/sch_generic.h:1127 [inline]
-  __dev_xmit_skb net/core/dev.c:4260 [inline]
-  __dev_queue_xmit+0x26aa/0x3210 net/core/dev.c:4785
-  NF_HOOK_COND include/linux/netfilter.h:307 [inline]
-  ip6_output+0x340/0x550 net/ipv6/ip6_output.c:247
-  NF_HOOK+0x9e/0x380 include/linux/netfilter.h:318
-  mld_sendpack+0x8d4/0xe60 net/ipv6/mcast.c:1855
-  mld_send_cr net/ipv6/mcast.c:2154 [inline]
-  mld_ifc_work+0x83e/0xd60 net/ipv6/mcast.c:2693
-  process_one_work kernel/workqueue.c:3257 [inline]
-  process_scheduled_works+0xad1/0x1770 kernel/workqueue.c:3340
-  worker_thread+0x8a0/0xda0 kernel/workqueue.c:3421
-  kthread+0x711/0x8a0 kernel/kthread.c:463
-  ret_from_fork+0x510/0xa50 arch/x86/kernel/process.c:158
-  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
-
-The buggy address belongs to the object at ffff8880294cfa00
- which belongs to the cache ip6_dst_cache of size 232
-The buggy address is located 120 bytes inside of
- freed 232-byte region [ffff8880294cfa00, ffff8880294cfae8)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x294cf
-memcg:ffff88803536b781
-flags: 0x80000000000000(node=0|zone=1)
-page_type: f5(slab)
-raw: 0080000000000000 ffff88802ff1c8c0 ffffea0000bf2bc0 dead000000000006
-raw: 0000000000000000 00000000800c000c 00000000f5000000 ffff88803536b781
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52820(GFP_ATOMIC|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 9, tgid 9 (kworker/0:0), ts 91119585830, free_ts 91088628818
-  set_page_owner include/linux/page_owner.h:32 [inline]
-  post_alloc_hook+0x234/0x290 mm/page_alloc.c:1857
-  prep_new_page mm/page_alloc.c:1865 [inline]
-  get_page_from_freelist+0x28c0/0x2960 mm/page_alloc.c:3915
-  __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:5210
-  alloc_pages_mpol+0xd1/0x380 mm/mempolicy.c:2486
-  alloc_slab_page mm/slub.c:3075 [inline]
-  allocate_slab+0x86/0x3b0 mm/slub.c:3248
-  new_slab mm/slub.c:3302 [inline]
-  ___slab_alloc+0xb10/0x13e0 mm/slub.c:4656
-  __slab_alloc+0xc6/0x1f0 mm/slub.c:4779
-  __slab_alloc_node mm/slub.c:4855 [inline]
-  slab_alloc_node mm/slub.c:5251 [inline]
-  kmem_cache_alloc_noprof+0x101/0x6c0 mm/slub.c:5270
-  dst_alloc+0x105/0x170 net/core/dst.c:89
-  ip6_dst_alloc net/ipv6/route.c:342 [inline]
-  icmp6_dst_alloc+0x75/0x460 net/ipv6/route.c:3333
-  mld_sendpack+0x683/0xe60 net/ipv6/mcast.c:1844
-  mld_send_cr net/ipv6/mcast.c:2154 [inline]
-  mld_ifc_work+0x83e/0xd60 net/ipv6/mcast.c:2693
-  process_one_work kernel/workqueue.c:3257 [inline]
-  process_scheduled_works+0xad1/0x1770 kernel/workqueue.c:3340
-  worker_thread+0x8a0/0xda0 kernel/workqueue.c:3421
-  kthread+0x711/0x8a0 kernel/kthread.c:463
-  ret_from_fork+0x510/0xa50 arch/x86/kernel/process.c:158
-page last free pid 5859 tgid 5859 stack trace:
-  reset_page_owner include/linux/page_owner.h:25 [inline]
-  free_pages_prepare mm/page_alloc.c:1406 [inline]
-  __free_frozen_pages+0xfe1/0x1170 mm/page_alloc.c:2943
-  discard_slab mm/slub.c:3346 [inline]
-  __put_partials+0x149/0x170 mm/slub.c:3886
-  __slab_free+0x2af/0x330 mm/slub.c:5952
-  qlink_free mm/kasan/quarantine.c:163 [inline]
-  qlist_free_all+0x97/0x100 mm/kasan/quarantine.c:179
-  kasan_quarantine_reduce+0x148/0x160 mm/kasan/quarantine.c:286
-  __kasan_slab_alloc+0x22/0x80 mm/kasan/common.c:350
-  kasan_slab_alloc include/linux/kasan.h:253 [inline]
-  slab_post_alloc_hook mm/slub.c:4953 [inline]
-  slab_alloc_node mm/slub.c:5263 [inline]
-  kmem_cache_alloc_noprof+0x18d/0x6c0 mm/slub.c:5270
-  getname_flags+0xb8/0x540 fs/namei.c:146
-  getname include/linux/fs.h:2498 [inline]
-  do_sys_openat2+0xbc/0x200 fs/open.c:1426
-  do_sys_open fs/open.c:1436 [inline]
-  __do_sys_openat fs/open.c:1452 [inline]
-  __se_sys_openat fs/open.c:1447 [inline]
-  __x64_sys_openat+0x138/0x170 fs/open.c:1447
-  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-  do_syscall_64+0xec/0xf80 arch/x86/entry/syscall_64.c:94
-
-Fixes: 8d0b94afdca8 ("ipv6: Keep track of DST_NOCACHE routes in case of iface down/unregister")
-Fixes: 78df76a065ae ("ipv4: take rt_uncached_lock only if needed")
-Reported-by: syzbot+179fc225724092b8b2b2@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/6964cdf2.050a0220.eaf7.009d.GAE@google.com/T/#u
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Martin KaFai Lau <martin.lau@kernel.org>
----
- net/core/dst.c   | 1 +
- net/ipv4/route.c | 4 ++--
- net/ipv6/route.c | 4 ++--
- 3 files changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/net/core/dst.c b/net/core/dst.c
-index e9d35f49c9e7800d7397b643c70931dd516a6265..1dae26c51ebec0bd4fc088284ce7165606d5eaf6 100644
---- a/net/core/dst.c
-+++ b/net/core/dst.c
-@@ -68,6 +68,7 @@ void dst_init(struct dst_entry *dst, struct dst_ops *ops,
- 	dst->lwtstate = NULL;
- 	rcuref_init(&dst->__rcuref, 1);
- 	INIT_LIST_HEAD(&dst->rt_uncached);
-+	dst->rt_uncached_list = NULL;
- 	dst->__use = 0;
- 	dst->lastuse = jiffies;
- 	dst->flags = flags;
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index b549d6a573073b3319fef2f4b76d49bf5ed7a6d7..11d990703d31a9cfa48646b298cd149025c72123 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -1537,9 +1537,9 @@ void rt_add_uncached_list(struct rtable *rt)
- 
- void rt_del_uncached_list(struct rtable *rt)
- {
--	if (!list_empty(&rt->dst.rt_uncached)) {
--		struct uncached_list *ul = rt->dst.rt_uncached_list;
-+	struct uncached_list *ul = rt->dst.rt_uncached_list;
- 
-+	if (ul) {
- 		spin_lock_bh(&ul->lock);
- 		list_del_init(&rt->dst.rt_uncached);
- 		spin_unlock_bh(&ul->lock);
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index a3e051dc66ee07c5bc22ba94388097b72d8270b6..e3a260a5564ba84fd4a4f9c57670c1fff7dc28ed 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -148,9 +148,9 @@ void rt6_uncached_list_add(struct rt6_info *rt)
- 
- void rt6_uncached_list_del(struct rt6_info *rt)
- {
--	if (!list_empty(&rt->dst.rt_uncached)) {
--		struct uncached_list *ul = rt->dst.rt_uncached_list;
-+	struct uncached_list *ul = rt->dst.rt_uncached_list;
- 
-+	if (ul) {
- 		spin_lock_bh(&ul->lock);
- 		list_del_init(&rt->dst.rt_uncached);
- 		spin_unlock_bh(&ul->lock);
--- 
-2.52.0.457.g6b5491de43-goog
-
+Let me hack a new version of it with @comm, and post here to check how
+it looks likes.
 
