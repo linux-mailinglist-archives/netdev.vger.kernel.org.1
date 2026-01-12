@@ -1,94 +1,104 @@
-Return-Path: <netdev+bounces-249020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2F84D12C96
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 14:28:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CFDCCD12CCC
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 14:29:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 31765303435C
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 13:25:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E9F113088098
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 13:25:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52306358D3C;
-	Mon, 12 Jan 2026 13:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3865D358D2F;
+	Mon, 12 Jan 2026 13:25:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Qpn3gOt5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S4UtK85o"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 740D52222C4;
-	Mon, 12 Jan 2026 13:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D0D2D063E
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 13:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768224324; cv=none; b=orVoxeyo+0tF+7WCphaHTgcZvJjlXtbF3MdiY1/QeRfvZyGpOvtk8C36aj3mScQO764DjHG3p8nngkINt7/CR0rvtzJ8q7SY0cVrJJnbfCMjrs6IOSXazNZbzTqDGd3gZWwa//PoedevJ+3ze1RhwsyDO+wgBh4bTg+Z2dD9kRk=
+	t=1768224342; cv=none; b=TehLK2QFXQsFe4+eT0cUEyr9A3O2p22PAXyiLTTW5sEEXg2d+wwv8rjZrxXrxxsMsx/MvMjT+wfZlOm9Kyni/tpVznm3vC6v5RYQ5gjI99pr3WNc9RqBavxtaTJHjVobjLWX+GHi7c+nE1dtDeC1HrL5BYedxCNIZBenGHuNz0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768224324; c=relaxed/simple;
-	bh=ZtIEImTdbFc51Ru7QpmEbr/ImRDQRUOshNIVRQzsSoE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WcV0yOF9u1Ix1K/NBbsSKPDLuVA+gEu01hUJoV61H7FJl5J9ehygopsNUwAAKQ3H5Nq1YsupEODOFTdYSgihN9foYuHoslrlf9mjD80S/O+qKU4hzvBvKPKrMEjhMKM+Ig4fgOrMPuwCstCtcnEC0vL1pGigh3zE2Mk5T8Re7Ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Qpn3gOt5; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=iHbP176mpgAGq9kCi92VZjk+dqr0heKyjL7PyZirZAU=; b=Qpn3gOt5j18vViglQafGzGgs7Z
-	aGqRBHTEbpMRnopGmke0ysw231OEgJmD+vg9xfpc0ycQ0Lt1ybVN33dI5rPguR8HkSCbSPgSDqr2u
-	nAW7TKLGpuTHekdPm53Fjs4hafIeYNNY2r8qRd5reJvitrHsAdMHLJHa5W6PS5RjbyJg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vfHui-002Tf4-4v; Mon, 12 Jan 2026 14:24:56 +0100
-Date: Mon, 12 Jan 2026 14:24:56 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Sven Schnelle <svens@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Richard Cochran <richardcochran@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Dust Li <dust.li@linux.alibaba.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	David Woodhouse <dwmw2@infradead.org>,
-	virtualization@lists.linux.dev, Nick Shi <nick.shi@broadcom.com>,
-	Paolo Abeni <pabeni@redhat.com>, linux-clk@vger.kernel.org
-Subject: Re: [RFC] Defining a home/maintenance model for non-NIC PHC devices
- using the /dev/ptpX API
-Message-ID: <7be41f07-50ab-4363-8a53-dcdda63b9147@lunn.ch>
-References: <0afe19db-9c7f-4228-9fc2-f7b34c4bc227@linux.alibaba.com>
- <yt9decnv6qpc.fsf@linux.ibm.com>
- <6a32849d-6c7b-4745-b7f0-762f1b541f3d@linux.dev>
+	s=arc-20240116; t=1768224342; c=relaxed/simple;
+	bh=x0YNOdM+ctmecPZk+Jkix0XUJyfewE/Ff1dKHXqpWBI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Xp9vq4J7AWXfBL92BQigwVm9RLgLZiOX8K1kaihomMi01PnV489lCnB8vsu3wCIGU1HTV5hLf91nAdnrZognyrRxAnUdyP5OSuTS9DH0J2ZEJbb3nyZsW5mg4H4yxMw0OcYiF4FRGAenlSYnZdvPs2936UopWRXYmVolRSBLnsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S4UtK85o; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768224337;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j55coe+3ogEU9UNSDZ1oIEXEqPhWjD615rcMEm1F0gQ=;
+	b=S4UtK85orayzhoTgHyYtEtke66mq4h/FC6u02/Eew2Vipl2Sp2Eypm8j8TGZnjAE4z2Z9V
+	aZr71tij34EjQmds24OtETGr5Ao2skMn4OosOUGPv9e1HVE9gVzg31WyYL13kp6745yPwz
+	mu0TD8lLagDp0hYjXAs+HCfkq3m/88g=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-606-vTz3vBllMH6ASN4CCwExig-1; Mon,
+ 12 Jan 2026 08:25:34 -0500
+X-MC-Unique: vTz3vBllMH6ASN4CCwExig-1
+X-Mimecast-MFC-AGG-ID: vTz3vBllMH6ASN4CCwExig_1768224333
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4789D1800BE7;
+	Mon, 12 Jan 2026 13:25:31 +0000 (UTC)
+Received: from fweimer-oldenburg.csb.redhat.com (unknown [10.44.32.58])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3721A1955F43;
+	Mon, 12 Jan 2026 13:25:27 +0000 (UTC)
+From: Florian Weimer <fweimer@redhat.com>
+To: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+Cc: Arnd Bergmann <arnd@arndb.de>,  Jakub Kicinski <kuba@kernel.org>,  Eric
+ Dumazet <edumazet@google.com>,  Kuniyuki Iwashima <kuniyu@google.com>,
+  Paolo Abeni <pabeni@redhat.com>,  Willem de Bruijn <willemb@google.com>,
+  Netdev <netdev@vger.kernel.org>,  linux-kernel@vger.kernel.org,
+  linux-api@vger.kernel.org
+Subject: Re: [PATCH net-next] net: uapi: Provide an UAPI definition of
+ 'struct sockaddr'
+In-Reply-To: <20260112124604-dbf7f68d-2182-438f-9495-2931cac02a81@linutronix.de>
+	("Thomas =?utf-8?Q?Wei=C3=9Fschuh=22's?= message of "Mon, 12 Jan 2026
+ 12:55:07 +0100")
+References: <20260105-uapi-sockaddr-v1-1-b7653aba12a5@linutronix.de>
+	<20260105095713.0b312b26@kernel.org>
+	<20260106112714-d47c16e0-0020-4851-9c2a-f8849c9a0677@linutronix.de>
+	<20260106151313.1f8bd508@kernel.org>
+	<06cf1396-c100-45ba-8b46-edb4ed4feb62@app.fastmail.com>
+	<lhu7btnkqg6.fsf@oldenburg.str.redhat.com>
+	<20260112124604-dbf7f68d-2182-438f-9495-2931cac02a81@linutronix.de>
+Date: Mon, 12 Jan 2026 14:25:25 +0100
+Message-ID: <lhutswrj73u.fsf@oldenburg.str.redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6a32849d-6c7b-4745-b7f0-762f1b541f3d@linux.dev>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-> > drivers/ptp/core    - API as written above
-> > drivers/ptp/virtual - all PtP drivers somehow emulating a PtP clock
-> >                        (like the ptp_s390 driver)
-> > drivers/ptp/net     - all NIC related drivers.
-> > 
-> 
-> 
-> Well, drivers/ptp/virtual is not really good, because some drivers are
-> for physical devices exporting PTP interface, but without NIC.
+* Thomas Wei=C3=9Fschuh:
 
-If the lack of a NIC is the differentiating property:
+>> If you call the data member sa_data just like glibc, it will only fail
+>> in C++, not C.  GCC considers the two definitions sufficiently
+>> equivalent (even though glibc adds a may_alias attribute to meet POSIX
+>> requirements), and duplicate definitions are permitted in C.
+>
+> clang is not so lenient and will error out.
 
-> > drivers/ptp/net     - all NIC related drivers.
-> > drivers/ptp/netless - all related drivers which are not associated to a NIC.
+It seems it accepts it if you switch to C23 mode.
 
-Or
+Thanks,
+Florian
 
-> > drivers/ptp/emulating - all drivers emulating a PtP clock
-
-	Andrew
 
