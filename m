@@ -1,154 +1,145 @@
-Return-Path: <netdev+bounces-249147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C167DD14DD0
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 20:08:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DC22D14E44
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 20:20:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 848A9301EC61
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 19:08:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 515A7301FB75
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 19:20:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 010BB311C22;
-	Mon, 12 Jan 2026 19:08:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E936C3191A9;
+	Mon, 12 Jan 2026 19:19:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j1VI4fIT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i4dq3UQu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EAB531195C
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 19:08:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD209318EF7;
+	Mon, 12 Jan 2026 19:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768244882; cv=none; b=qSF7SozhRk4hbs/RfWYYZA3NEKb7eBpv4QYxzb0X/IlC8zm6vHKJEQJdFyTUumT40tCqlY+x46mt7c1Z6zu2qB9NfzPC00DA0g/CRFtO9/tWhAR/Z3gCcQEsclT3UebKm2EDqUK+dCwxe6820dubH6vP4XHuMVrXITNSVXPaD4M=
+	t=1768245599; cv=none; b=Mt8S1H76O/N5AuXbPW1rxFnJnhn0Z59TaxMvNArByAc5J8aypAzxroX+YO7RVHavG9LP69G5Er1CEYa0wSRk3r8jNORvzcE+/SOp2UeKa9ZPyFpEeYDPUEoVTfokzvRKxc6EOqU3wMQ+x48DEtrtLt+gGNK3xBpTOkX2W5ecGxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768244882; c=relaxed/simple;
-	bh=Mq7uXqS6T5Xz1xoZKG18HBsOLjiBcAZdwTFCXme3IrU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=eTJBT02izXCk72FLiUGgdi88Ka1BB4S9pzErUzg2C5H1EthyzZ/19wmiH9bNdQ69ziQdnusKOdK7I6Q0OryXhH2IN41r+ffRfEtrhlu0pN0JyKtESmXgV8dxHMuJZuAX+osGKtDNF4hJBXbG0oRl717hYsX1NTBMRaLklaFZHMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j1VI4fIT; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-78e7ba9fc29so71774977b3.2
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 11:08:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768244880; x=1768849680; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6lC9vBT6yM5y7jhlUfarQ88uAGxz1NwoUlxmckh4/4Q=;
-        b=j1VI4fITKMfFurLUmaB+6Eo/rovhqH9ZcAjrG3yOnamZzhlra7kA4uUkjmoC+wjPHj
-         IHoVV3ugWJtFefJf+U1roN56XuPezSGwkHgZmEBvvxSrtBJreGFNqSvNPWqtFpS/bcOB
-         nyF3caGRqmA7QiHxl7SWNqMnyVXKbndEqZsuN6SYPB4FUbfa/gWyk92grQxgJBFWYFl2
-         z9+lqCvKzT4QHajED8e00vgB9TMfBMMLNwIwq6g6RTs3VEIZ0Su62qVvI3kHkyfaVwpG
-         T8U73LqJQNWSWIzeMO/LLJOo7NJSczFzm/ADSbGIf8xvGAkYupJrOKq/QJxOMqj89dcb
-         qTXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768244880; x=1768849680;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6lC9vBT6yM5y7jhlUfarQ88uAGxz1NwoUlxmckh4/4Q=;
-        b=KtfQs9EK1CBTvsMBekQFjw4ZdIU1d2IvsPfUb1ZeCi5VucDbAe/1Ga9Y3cBiYa1lL2
-         rTYIyflcr5X2a8Kl91S4qBwfBpnlA5ajyVZ5Nit0IvK2NjR3TY0s06fIrXbKi9meoSyx
-         +PZ9lLsK8LgeHtVVBavePpR/VKxKWhVRgACHAkFEIF5ejZLIekJ+qpCVB3R2KL7sXCD0
-         OUBpYMrj56wxBCsIZwXZAK126BrkpWjxwafOiEyr59zh21bG67+5pOBJNByEW+t35QId
-         Od+c0VcrR7LM49xQdpRebPM0Ap+eJMpEl1KS6dqnqb7jeUU2OcsTPHj7b37I/VIgCBLA
-         xfaA==
-X-Forwarded-Encrypted: i=1; AJvYcCXGGje6dumWc8XPYQh6pcj9jVpFyt0fbhncyC6Uo8r3r7A+o2CqU++BLeW/S9x1RiAsYjxrMR4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzo92zxIO4ukIt4SUxbcWG6DdrtjMacqpA0rVjh+mi5iReAw3ui
-	17ZOQMPiyXMUC3EA3SiAcZH80KyGtXwVOh/RUnLHYd8BBTCpuhtghGs4
-X-Gm-Gg: AY/fxX4OH738Z1kXH0I89XUDqo6iVCw4+T+ZAx9K7DWsed+gR9nSWWbo7Mujv4ztNhj
-	s+kqBpQS5Rk1j5c0FJ5PgD6Flf9F36sgOWqzlTvR+91n5qb1lu0qYtdfXLUARpRCOAxD/U8wr+H
-	UnM799W09NjN+7TcejbRiWRIbjFqIxqmeqDU+jgpvUXtKyp7avMsX5zk/uKH23Lwzpm6JZXrB9v
-	UPUuSjW+9Beofww0GGwmrC7r8psWCdfv+c6bRuJR6agCcnBp6pznt2UHSVegNaUw21hW869ZwfD
-	bm1cKXcyX/SCExbOxZ4aMBY5GcPLvMP+Tb35zzg5XW867pRePvAEBlsuDAQ2L52Oq1mIO30GP1C
-	SvVwMGRf4qio9MZVUCx2c/3Qz3E11BgDzIS3FOeruSz8zQvjc1WGnJ9h9m0wDLvKYSe6JlI+L+Z
-	TGMVq/k4N1g869TSZ92V/DYfdOjIjZ6OFH5Dr4b9tFwD85rQuBqFoI2xCoqjE=
-X-Google-Smtp-Source: AGHT+IGMhShTLSM5xramlWSucf+AFeyl1EZsQeY2uRviPiqlBmNrtG8/e82FQkvZl2O2Dz9mOq4QCA==
-X-Received: by 2002:a05:690e:11c4:b0:646:518b:8f8a with SMTP id 956f58d0204a3-64716b399femr16233996d50.18.1768244880112;
-        Mon, 12 Jan 2026 11:08:00 -0800 (PST)
-Received: from gmail.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-6470d8c500esm8295975d50.23.2026.01.12.11.07.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jan 2026 11:07:59 -0800 (PST)
-Date: Mon, 12 Jan 2026 14:07:58 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, 
- netdev@vger.kernel.org, 
- eric.dumazet@gmail.com, 
- Eric Dumazet <edumazet@google.com>
-Message-ID: <willemdebruijn.kernel.338b382b46c4b@gmail.com>
-In-Reply-To: <20260112172621.4188700-1-edumazet@google.com>
-References: <20260112172621.4188700-1-edumazet@google.com>
-Subject: Re: [PATCH net] net: add skb->data_len and (skb>end - skb->tail) to
- skb_dump()
+	s=arc-20240116; t=1768245599; c=relaxed/simple;
+	bh=8XdDuYY8o16AHBqptf2+Lenxj/jSJqYCRVV3ayhVeHI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pdAXbHT7FlrxGay2lcXwgRa1Rboppo/j3zimxAabWQvRAOlykPwWWInCFhh/yFLgPUpdqsA2QUXqn8Lk4XZpoGsjiH1op+mGWh6MNVYmyIqtUXjXwY5+5M+nsKhQKxTnL2k8PApAVQb9llWLZkxeHkPWzoScKunyQgZqxLnPX+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i4dq3UQu; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768245596; x=1799781596;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=8XdDuYY8o16AHBqptf2+Lenxj/jSJqYCRVV3ayhVeHI=;
+  b=i4dq3UQuLJKe0UMkY2PBi/sS5UEiZ3MC7haLiYb2wmgqdc/r9+7O1WEC
+   7Ay8FKRVgZtTkaET2HqF5Ag4qlGp+Tuh68Wo34iF6P9xLgEGo0ktY3QcM
+   oVX3DoUho2NbqSw0qdtcuXRmsuevqrAr+8su1fQldrm7WU6UF9GLk5LzF
+   DqfWhxXPNp/o6im2TYhqg5QA1L71qv+Fj2s0jMZH0P6+tl2ydfd+ADb3g
+   zvuOO3kFYxMm++r/gQ+EWxiAKuvk1prCnw3KoArMCTCX4MwOtDkTt+AFT
+   dfsJ83a0yu7EAB6u1CYpAzGS7hEajbO5DtfZ1oVJjGOPfs/WIZEANlnMu
+   w==;
+X-CSE-ConnectionGUID: rf9aYiOiSRaJWLL0AnWM1A==
+X-CSE-MsgGUID: KYMo2/e6TDSyUUn11/mp+w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11669"; a="69450951"
+X-IronPort-AV: E=Sophos;i="6.21,221,1763452800"; 
+   d="scan'208";a="69450951"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 11:19:54 -0800
+X-CSE-ConnectionGUID: MXpzZ1xnR9iTu7OhIX4rXg==
+X-CSE-MsgGUID: +gG6zgHgS7iFR/wRaFE7Qg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,221,1763452800"; 
+   d="scan'208";a="203987512"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 12 Jan 2026 11:19:49 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vfNS6-00000000Dme-1S2R;
+	Mon, 12 Jan 2026 19:19:46 +0000
+Date: Tue, 13 Jan 2026 03:19:09 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Eric Dumazet <edumazet@google.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Rob Herring <robh@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, linux-rdma@vger.kernel.org,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	intel-wired-lan@lists.osuosl.org, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, devicetree@vger.kernel.org,
+	Conor Dooley <conor+dt@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Mark Bloch <mbloch@nvidia.com>, linux-kernel@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Saeed Mahameed <saeedm@nvidia.com>
+Subject: Re: [Intel-wired-lan] [PATCH net-next 06/12] dpll: Support dynamic
+ pin index allocation
+Message-ID: <202601130301.7QjXjwFp-lkp@intel.com>
+References: <20260108182318.20935-7-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260108182318.20935-7-ivecera@redhat.com>
 
-Eric Dumazet wrote:
-> While working on a syzbot report, I found that skb_dump()
-> is lacking two important parts :
-> 
-> - skb->data_len.
-> 
-> - (skb>end - skb->tail) tailroom is zero if skb is not linear.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+Hi Ivan,
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+kernel test robot noticed the following build warnings:
 
-Good point on tailroom, I was not aware of that limitation on linear.
+[auto build test WARNING on net-next/main]
 
-data_len is calculated from len and headlen, but may be nice to print.
+url:    https://github.com/intel-lab-lkp/linux/commits/Ivan-Vecera/dt-bindings-dpll-add-common-dpll-pin-consumer-schema/20260109-022618
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260108182318.20935-7-ivecera%40redhat.com
+patch subject: [Intel-wired-lan] [PATCH net-next 06/12] dpll: Support dynamic pin index allocation
+config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20260113/202601130301.7QjXjwFp-lkp@intel.com/config)
+compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260113/202601130301.7QjXjwFp-lkp@intel.com/reproduce)
 
-> ---
->  net/core/skbuff.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index a56133902c0d9c47b45a4a19b228b151456e5051..61746c2b95f63e465c1f2cd05bf6a61bc5331d8f 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -1312,14 +1312,15 @@ void skb_dump(const char *level, const struct sk_buff *skb, bool full_pkt)
->  	has_mac = skb_mac_header_was_set(skb);
->  	has_trans = skb_transport_header_was_set(skb);
->  
-> -	printk("%sskb len=%u headroom=%u headlen=%u tailroom=%u\n"
-> -	       "mac=(%d,%d) mac_len=%u net=(%d,%d) trans=%d\n"
-> +	printk("%sskb len=%u data_len=%u headroom=%u headlen=%u tailroom=%u\n"
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601130301.7QjXjwFp-lkp@intel.com/
 
-Maybe order len, headlen, datalen, headroom, tailroom.
+All warnings (new ones prefixed by >>):
 
-And really no need to ever print skb_tailroom if end-tail always
-captures that. Can just call that tailroom or tailroom* or so.
-
-> +	       "end-tail=%u mac=(%d,%d) mac_len=%u net=(%d,%d) trans=%d\n"
->  	       "shinfo(txflags=%u nr_frags=%u gso(size=%hu type=%u segs=%hu))\n"
->  	       "csum(0x%x start=%u offset=%u ip_summed=%u complete_sw=%u valid=%u level=%u)\n"
->  	       "hash(0x%x sw=%u l4=%u) proto=0x%04x pkttype=%u iif=%d\n"
->  	       "priority=0x%x mark=0x%x alloc_cpu=%u vlan_all=0x%x\n"
->  	       "encapsulation=%d inner(proto=0x%04x, mac=%u, net=%u, trans=%u)\n",
-> -	       level, skb->len, headroom, skb_headlen(skb), tailroom,
-> +	       level, skb->len, skb->data_len, headroom, skb_headlen(skb),
-> +	       tailroom, skb->end - skb->tail,
->  	       has_mac ? skb->mac_header : -1,
->  	       has_mac ? skb_mac_header_len(skb) : -1,
->  	       skb->mac_len,
-> -- 
-> 2.52.0.457.g6b5491de43-goog
-> 
+>> drivers/dpll/dpll_core.c:499:21: warning: overflow in expression; result is -2147483648 with type 'int' [-Winteger-overflow]
+     499 |         pin_idx -= INT_MAX + 1;
+         |                            ^
+   1 warning generated.
 
 
+vim +/int +499 drivers/dpll/dpll_core.c
+
+   490	
+   491	static void dpll_pin_idx_free(u32 pin_idx)
+   492	{
+   493		if (pin_idx <= INT_MAX)
+   494			return; /* Not a dynamic pin index */
+   495	
+   496		/* Map the index value from dynamic pin index range to IDA range and
+   497		 * free it.
+   498		 */
+ > 499		pin_idx -= INT_MAX + 1;
+   500		ida_free(&dpll_pin_idx_ida, pin_idx);
+   501	}
+   502	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
