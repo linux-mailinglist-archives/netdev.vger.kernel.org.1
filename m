@@ -1,172 +1,119 @@
-Return-Path: <netdev+bounces-249111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D229D145F3
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 18:31:30 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F9A9D14566
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 18:26:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 65EA030BCA94
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 17:26:38 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B8EC6300518F
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 17:26:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DBE837BE88;
-	Mon, 12 Jan 2026 17:26:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4F7B37BE85;
+	Mon, 12 Jan 2026 17:26:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZmpWYhiD";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="CoIhvYqc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yeh7ZzgY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f74.google.com (mail-yx1-f74.google.com [74.125.224.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D09302CD9
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 17:26:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A75637BE6D
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 17:26:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768238797; cv=none; b=Juqg0hhxtTLPkcHO9mEAzVpwckGRBW9atx0/2Lty4HwR2a0NbMxdOeDHejoP9Rg6XATgvuYDhC/ZZxi1p/GCFUztbCVyb5oeQJl24afIJUEbEe1mbqtOqIQcrrFuw6kkP1J+KFy5iibMfUWjOCXBz8DUdGhAGNnzQtbkzVw+Ni0=
+	t=1768238787; cv=none; b=WCJs4LRpXNgIAz2bVmyhS/HPtJrbN+ZVBYqOH1SnY9mx+d53sCWPFmzH2Fo48wkDTqrF8tZbTiSGuMKX1Qu5VyP979gSMSPknTwY2rA4ngSYBviQ6oZq3oBgD/Lp7nHoH8PlMm32MHQtisuTMNWqthMLWQdKiYhrc5eLL9SRb0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768238797; c=relaxed/simple;
-	bh=VcWKMM3TsRHjfu+KXLUJOs/P3Fis/5txZmCUs7c62Fs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i4JBNPTCY8IM8Pc/vOJw4bYbMreonauiU0yeDX0OaVf6yp43YuiVTdtmns9h54dXKrYKhpzbpWXhcI1lswLB8v4pjf7CoVxi1FybcrkPWSCNFRI+Bu1KRpHp6f6dJ5rXo81EEhMv8y5GBRkf2J4n37vpdvkMvZn8CePlFSI1Sg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZmpWYhiD; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=CoIhvYqc; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768238793;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BcomD5fw9IVBx/EvgIn//kfeDV6vnh/bPzC6DXjWibA=;
-	b=ZmpWYhiDhRmuy/8Pn3LnebpH3C5PrvXo372pclJH1ddRVwBSF8AfNxcp1pOVbHov1TKBjD
-	e6Xeh5yWbjrQHJWOsl6WQ77R4TYVOgacOJ9rDfyyceOBjghjLTbCbuwY01F9oioYo/xtL1
-	9TXNIGrZWBFYDaFmBiZzumv/kGfnofE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-246-8b8uPc4IOlqlD5X4jQQFFA-1; Mon, 12 Jan 2026 12:26:32 -0500
-X-MC-Unique: 8b8uPc4IOlqlD5X4jQQFFA-1
-X-Mimecast-MFC-AGG-ID: 8b8uPc4IOlqlD5X4jQQFFA_1768238791
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-477563e531cso47204805e9.1
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 09:26:32 -0800 (PST)
+	s=arc-20240116; t=1768238787; c=relaxed/simple;
+	bh=pVzeseCGTQjYnn9NrHy5k1f8dONmqCxqxqzzsQCYVyI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=XQV+7XRor33FyKE82sHsK5eyvTbRcmCcbSxiiVx4gVFPTLLdNKDLhAx7rcMuR9+jShmCViEvp/uTgSlyMFj/JExPiah8HJ6TSHWoX2zj3yG8jbMNGQlGWVFLwjYQ/3r8dJLFUaKsmcciJJLb2tVzI4KbzsDneneaM7LAu858FiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yeh7ZzgY; arc=none smtp.client-ip=74.125.224.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yx1-f74.google.com with SMTP id 956f58d0204a3-645592c1b59so10222974d50.0
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 09:26:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768238791; x=1768843591; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BcomD5fw9IVBx/EvgIn//kfeDV6vnh/bPzC6DXjWibA=;
-        b=CoIhvYqcw17rpFY27OsZLFV1dDWaDQMOaAHz1OB5jLxB54fYAPrI66KLbBgQmDOt4e
-         0Byy7xM5hAxUXVhsa1Tz8xVcXVCjH/QREGxVoXc1FllIr/4XEwey1bEGcKKkTBBTDGYe
-         RVdyC/1a3XSA6X+HcSXhgAuBm4nP1PZulUasF+3a/7rpyK2c8XWIsIzVKcA9A90W5hak
-         FrLyr0Wn+RyWzqmtjL9y0C/OFEA2+mv80M73RbQ+23xfnsrlkR0szr02/wWloSNz/Yn+
-         Q9Vc//qrx0+Ik8cPZYnIuwQwRH2l05c17KpyDxWm6X3RBcEBayBmKfiNtr8mMAeBME+0
-         a0zw==
+        d=google.com; s=20230601; t=1768238784; x=1768843584; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=dayk09/m+Nfda3ixgXC7gUsRzkBW8nWV/PvEEGeqODQ=;
+        b=yeh7ZzgYGIu3thS9QfSHKDtRpdoyefk5Zy2CLU5x1Bju93c21ShknahWiFjQSFqv0c
+         GXpqNUT5ONkwdj0yXC4Phv9GSZwnifCE111E0d/7P0KHFBPCbpuWIovcHwHmF9FxgnVS
+         /Bdbhc7pZXTj8h+8lGLp2m2gnRCc+LUohMDuXeggVJ7yej5v3vqKLcZChSkBP4n87jxP
+         HEKz9Rx1Pa51Tpwn1gbbKelWWMYMr77+vaTOzXSSfPVObc80xNkCtqAyzp7g9BGjAL99
+         uSEy/7gswwDOs7T1D+GsbOcRfuJI8r31ifvnSl8dXcgL6g2q3i5zZgOvHD8eXqM2Gg3g
+         BMoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768238791; x=1768843591;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BcomD5fw9IVBx/EvgIn//kfeDV6vnh/bPzC6DXjWibA=;
-        b=WoPeCaPtn5Fbd7FcgjoyztO4k4ZkVa3mom7EwW3jAePQ6mLYkTNp/WtWesED28QI3p
-         ZGTM71cs68r4ZYMq9dgHUCHODamu4lchYbgtu9hJJKeo+vBfx2YVqfb3GA1g7dzKWkMs
-         No5jbTzS/4+pOqSfp6TXaR+2TdZTK7M49vkf8J35zMzWwBhO91wnlwyX0veKe1lYOeHd
-         p3/eV3G1p7M7O5huh9Wt9Z14DynPIFMW5IVsWV1hrZAcLaJw/LTOXqoVD48ASIAaQdT2
-         7Pm/+1PIANzzV8zQ/71DYG2cXcMJnE1j8J2Ovl514NL7D8Oq1g/X9sTXr19/WXfqool1
-         6SDA==
-X-Forwarded-Encrypted: i=1; AJvYcCX8vBdS2Pt3M75dvg9xHo4GhjVvuUa1cL5N0zAYU6gd+KXMg8FXTsEF2AhlhiEwSG2DjU05deg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsmV+0VxMX88wRyRAVNbF1oQ0uSuMT8tu8kjK78ziitj0OIJaT
-	7zmZrjZHltA30mKHf3zERfhHEzCeIrhmpm5psgPsVhIWTfPWzbK8wQzJCGYK2nu93vjYcTOghAy
-	M6WMlD80qLXmTzq6ylVAA+fMZrLksHtqk/ghecMZzxvWn4mXlu8wU81JptQ==
-X-Gm-Gg: AY/fxX5CfIrJYp/ki/a/QFCP6+KwlKNRNatnBy24vB7Mw9XG3xiAVjLntJnZePdDmWy
-	+w49VPHtSVI/8BgaCe/qUoRloIK6Nuo8RT0amXnxwnpwMupRm49lkXYhT2fKySAT5ib63y1zLxL
-	Ep0fGWP87JiTzU9e2NE0ywaA+AESqkysh0j6ZIkKlPq0W4IlyiIgrhdt1CYqiUA6JCdj6Uv+EZe
-	Yyk26jlenekfOwNlWQQ9/8TWE+ZFT9lb72FS2QN7QMSKNDlpEadcsmozei/23LLefykoxUopipP
-	bOlaGLJrmMLZ0xCwtYNiAPWnIDijBGv4Cbo585NYoqmd0FuQ2rVOUJHB88ZRvHrwLDKaG6BTVXb
-	N/dl16smY4O3ZFS0b5+/GOliH75xJKySWZOJQ2WCrStD5m926PyuR9MJ6boxUcw==
-X-Received: by 2002:a05:600c:3556:b0:477:9b35:3e49 with SMTP id 5b1f17b1804b1-47d84b0a23cmr220596175e9.3.1768238791237;
-        Mon, 12 Jan 2026 09:26:31 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHbooX6m235tcKkT8gxwgze2BljLHzxenepn63aMTJ5BFbz8FRH46rUY9bsCgL8OFUNeCvvZA==
-X-Received: by 2002:a05:600c:3556:b0:477:9b35:3e49 with SMTP id 5b1f17b1804b1-47d84b0a23cmr220595755e9.3.1768238790766;
-        Mon, 12 Jan 2026 09:26:30 -0800 (PST)
-Received: from sgarzare-redhat (host-87-12-25-233.business.telecomitalia.it. [87.12.25.233])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f6ef868sm358964245e9.11.2026.01.12.09.26.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jan 2026 09:26:30 -0800 (PST)
-Date: Mon, 12 Jan 2026 18:26:18 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Bobby Eshleman <bobbyeshleman@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, 
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, Long Li <longli@microsoft.com>, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	berrange@redhat.com, Sargun Dhillon <sargun@sargun.me>, 
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH RFC net-next v13 00/13] vsock: add namespace support to
- vhost-vsock and loopback
-Message-ID: <aWUnqbDlBmjfnC_Q@sgarzare-redhat>
-References: <20251223-vsock-vmtest-v13-0-9d6db8e7c80b@meta.com>
- <aWGZILlNWzIbRNuO@devvm11784.nha0.facebook.com>
- <20260110191107-mutt-send-email-mst@kernel.org>
+        d=1e100.net; s=20230601; t=1768238784; x=1768843584;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dayk09/m+Nfda3ixgXC7gUsRzkBW8nWV/PvEEGeqODQ=;
+        b=gfbjttwFsllf3rSpZuKw2A+JB/R4tnFf8XL8H88kr4pxIweOaLqMhhlSzKPv7nPstl
+         8uCNfJZRRq8eNW2AQBppIuBB8E8CD82RByxZ3tVE07wy6kMJedX6KuWCSoFBr+1alvlY
+         odKKUQzcxQxmCf+9nvbNtOcIl+l/r345KpGKhWCorOHRU7H+q+3q2COXwj1gEYRsK/8V
+         UFKf64uhECRoMNpcCQPdQHHLdU5Qrtdhw/YUPqC1fMHDteE6zCn/Gnjd0PU/C7DGgvJ3
+         x4woqePkU7UjJE09eCk8LAy+8fEmoo+V5A6yWzj7NW5UCTjsfTUALHTn1j8A79MzuqEZ
+         v9tA==
+X-Forwarded-Encrypted: i=1; AJvYcCXbxgjZxMFOdrTRe1KyYotAcnASXE8wzAm0SoI5NEp8G09/+LBxvEGS0R/NswvDxRwbSisxI1c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyp3//GlglYNBtv34AknNitHSeWvZ+4qmuuVgfihPq9GWZ3Fctw
+	XDIEiD/VuZ/rb1QubMWvmwy6GtUWZ3cSvAhQP9zmghHBVGmnez92Ypxje7hy7Bwpgik5EHp+fMv
+	SoCFEoEmNjsx5SA==
+X-Google-Smtp-Source: AGHT+IF8vGswqeN8Xozk20KFck02xUrpvGvdH1VyN0KV0Y1bSVR1I5TR+1yW4M07Nwbceu02rOmefkiRbaFtCA==
+X-Received: from ywzz2.prod.google.com ([2002:a05:690c:a702:b0:790:acaf:4494])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:690e:1405:b0:647:108c:15e with SMTP id 956f58d0204a3-64716c38402mr15610420d50.54.1768238783639;
+ Mon, 12 Jan 2026 09:26:23 -0800 (PST)
+Date: Mon, 12 Jan 2026 17:26:21 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260110191107-mutt-send-email-mst@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
+Message-ID: <20260112172621.4188700-1-edumazet@google.com>
+Subject: [PATCH net] net: add skb->data_len and (skb>end - skb->tail) to skb_dump()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Jan 10, 2026 at 07:12:07PM -0500, Michael S. Tsirkin wrote:
->On Fri, Jan 09, 2026 at 04:11:12PM -0800, Bobby Eshleman wrote:
->> On Tue, Dec 23, 2025 at 04:28:34PM -0800, Bobby Eshleman wrote:
->> > This series adds namespace support to vhost-vsock and loopback. It does
->> > not add namespaces to any of the other guest transports (virtio-vsock,
->> > hyperv, or vmci).
->> >
->> > The current revision supports two modes: local and global. Local
->> > mode is complete isolation of namespaces, while global mode is complete
->> > sharing between namespaces of CIDs (the original behavior).
->> >
->> > The mode is set using the parent namespace's
->> > /proc/sys/net/vsock/child_ns_mode and inherited when a new namespace is
->> > created. The mode of the current namespace can be queried by reading
->> > /proc/sys/net/vsock/ns_mode. The mode can not change after the namespace
->> > has been created.
->> >
->> > Modes are per-netns. This allows a system to configure namespaces
->> > independently (some may share CIDs, others are completely isolated).
->> > This also supports future possible mixed use cases, where there may be
->> > namespaces in global mode spinning up VMs while there are mixed mode
->> > namespaces that provide services to the VMs, but are not allowed to
->> > allocate from the global CID pool (this mode is not implemented in this
->> > series).
->>
->> Stefano, would like me to resend this without the RFC tag, or should I
->> just leave as is for review? I don't have any planned changes at the
->> moment.
->>
->> Best,
->> Bobby
->
->i couldn't apply it on top of net-next so pls do.
->
+While working on a syzbot report, I found that skb_dump()
+is lacking two important parts :
 
-Yeah, some difficulties to apply also here.
-I tried `base-commit: 962ac5ca99a5c3e7469215bf47572440402dfd59` as 
-mentioned in the cover, but didn't apply. After several tries I 
-successfully applied on top of commit bc69ed975203 ("Merge tag 
-'for_linus' of git://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost")
+- skb->data_len.
 
-So, I agree, better to resend and you can remove RFC.
+- (skb>end - skb->tail) tailroom is zero if skb is not linear.
 
-BTW I'll do my best to start to review tomorrow!
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/core/skbuff.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-Thanks,
-Stefano
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index a56133902c0d9c47b45a4a19b228b151456e5051..61746c2b95f63e465c1f2cd05bf6a61bc5331d8f 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -1312,14 +1312,15 @@ void skb_dump(const char *level, const struct sk_buff *skb, bool full_pkt)
+ 	has_mac = skb_mac_header_was_set(skb);
+ 	has_trans = skb_transport_header_was_set(skb);
+ 
+-	printk("%sskb len=%u headroom=%u headlen=%u tailroom=%u\n"
+-	       "mac=(%d,%d) mac_len=%u net=(%d,%d) trans=%d\n"
++	printk("%sskb len=%u data_len=%u headroom=%u headlen=%u tailroom=%u\n"
++	       "end-tail=%u mac=(%d,%d) mac_len=%u net=(%d,%d) trans=%d\n"
+ 	       "shinfo(txflags=%u nr_frags=%u gso(size=%hu type=%u segs=%hu))\n"
+ 	       "csum(0x%x start=%u offset=%u ip_summed=%u complete_sw=%u valid=%u level=%u)\n"
+ 	       "hash(0x%x sw=%u l4=%u) proto=0x%04x pkttype=%u iif=%d\n"
+ 	       "priority=0x%x mark=0x%x alloc_cpu=%u vlan_all=0x%x\n"
+ 	       "encapsulation=%d inner(proto=0x%04x, mac=%u, net=%u, trans=%u)\n",
+-	       level, skb->len, headroom, skb_headlen(skb), tailroom,
++	       level, skb->len, skb->data_len, headroom, skb_headlen(skb),
++	       tailroom, skb->end - skb->tail,
+ 	       has_mac ? skb->mac_header : -1,
+ 	       has_mac ? skb_mac_header_len(skb) : -1,
+ 	       skb->mac_len,
+-- 
+2.52.0.457.g6b5491de43-goog
 
 
