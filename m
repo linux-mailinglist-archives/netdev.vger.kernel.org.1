@@ -1,214 +1,306 @@
-Return-Path: <netdev+bounces-249085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFFF5D13BEA
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 16:42:13 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C4F3D13CB3
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 16:49:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1C37E30D3164
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:35:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 79E4B3057076
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:37:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FD6935F8DC;
-	Mon, 12 Jan 2026 15:35:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FDB5361649;
+	Mon, 12 Jan 2026 15:37:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="NhW5I0pp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TY+xgpMK"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11021110.outbound.protection.outlook.com [52.101.62.110])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f67.google.com (mail-oo1-f67.google.com [209.85.161.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E22335F8AA;
-	Mon, 12 Jan 2026 15:35:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.110
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768232103; cv=fail; b=nyqnJyyp4ArjrTCSjVvzrenHGqJTdQQ711CmKwxWmFsyzZpupOdk1nwtVSKIc4jF2f7e5oV36Xx/HXbiw7IRfkk+g67qtUuwokX4Kr8gNboNzMjT4lwTNKGCPzdx/DCj55RgIGZ20bqHF5crbDkrn1T0IV8oPBbA7E7QfufEyMs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768232103; c=relaxed/simple;
-	bh=Gb6IDFWS1zP4u61lc4SW8a1onFsyFUFJ7fJAQCHvjGc=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=K3xMRo+Um8/9Jw14ECCJV3cf09Sh0j3Q+lU/18fknrxMAQdus5VpEi9Xg8pNsMcv5KLqFodfDO7SPHhaiggS9pMU4SiuBbwPVzu8aU+gu0QrqLx/Na21fMYKXIJPT9Q6IMi5jfOMlUpBNo5nLN6EECPaIZorFmzg+DgoCKf0xXw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=NhW5I0pp; arc=fail smtp.client-ip=52.101.62.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=W4gwTzXUn+xf5VBOPKCUve1OnRUyKvmGpkUK2DvTChaZHzZdni5jyr7alNflkxNdLuyO7eeCPX3+aQGPO5Bm4fav5G1IYwFXgaOLm+lJ/gP8TxrUZ4e4LLGkL+5m7zuwbxNDxxoW5D3zbRzFPYIInjXFSfBGbNov1SHk+O0wO0QLTYoY8x5Y/OZAV8yTntjb7/SdrTyJ6NDrXHVbH5T1hop/Rb2WX/qVlyOOUwzQZdFjMjE/fgGpWd9GMjXFlQl9odNNBbEssRDA8Zd1VVovUpkoFUfK7CZLZ+BLsNC3WbY7Jr6U/J2gzF/4YWu6ggS0wS6zUtbpituAFLd8a03ePw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Gb6IDFWS1zP4u61lc4SW8a1onFsyFUFJ7fJAQCHvjGc=;
- b=QawKLUFqwjQa3xz7xmArcMne44rfv0Iv9xFh9cLoYYoq9BILK1GW+bhQypgF3hwX+a011a4JdasjxZWQynDZgTIbMwC3HszAjxPdVak/ZXsv2xL/p9CzK3DGTIU1ZjOLNdZTeo2GLR+1Bgb497y/Dnx9StZaRGQEYSR4YtnMRB6sDEdIQorDWbF6OmlOlEeP51WguIih5KhQEhtwL+YD6iLVzgRQmw0UMu9orDT3Ti8eMjQRP+DMLAd2C7BZz30dCjysd4ngEiQToQ8WSnP3H0OGzpKvhRNPUwHa7AN+S0wPPpx4AcsFczF0fAEn/oCQkDiYnCBXUWrxfX8z+m2qUQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Gb6IDFWS1zP4u61lc4SW8a1onFsyFUFJ7fJAQCHvjGc=;
- b=NhW5I0ppxBgNo4JcnYGJrRM5kE1/MrmEm6QkJ71APrNmlUEgFLH4rKDSsWE2B6KRRN4ySHvEuL0BRGyJJkIcOgVxXZyixYQDv8pqX0Lr7NCHoCoW2FOFcPWOSHpiceVthHyaR/RUde/ym+e6IC5D/L4+27mJBsPc6bTw1S4fvnE=
-Received: from SA3PR21MB3867.namprd21.prod.outlook.com (2603:10b6:806:2fc::15)
- by SA1PR21MB6058.namprd21.prod.outlook.com (2603:10b6:806:4aa::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.1; Mon, 12 Jan
- 2026 15:34:59 +0000
-Received: from SA3PR21MB3867.namprd21.prod.outlook.com
- ([fe80::70ff:4d3:2cb6:92a3]) by SA3PR21MB3867.namprd21.prod.outlook.com
- ([fe80::70ff:4d3:2cb6:92a3%6]) with mapi id 15.20.9520.001; Mon, 12 Jan 2026
- 15:34:59 +0000
-From: Haiyang Zhang <haiyangz@microsoft.com>
-To: Aditya Garg <gargaditya@linux.microsoft.com>, KY Srinivasan
-	<kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui
-	<DECUI@microsoft.com>, Long Li <longli@microsoft.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"stephen@networkplumber.org" <stephen@networkplumber.org>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"dipayanroy@linux.microsoft.com" <dipayanroy@linux.microsoft.com>,
-	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
-	"shradhagupta@linux.microsoft.com" <shradhagupta@linux.microsoft.com>,
-	"ernis@linux.microsoft.com" <ernis@linux.microsoft.com>, Aditya Garg
-	<gargaditya@microsoft.com>
-Subject: RE: [PATCH net-next] net: hv_netvsc: reject RSS hash key programming
- without RX indirection table
-Thread-Topic: [PATCH net-next] net: hv_netvsc: reject RSS hash key programming
- without RX indirection table
-Thread-Index: AQHcg6qEiIS7Jlmg8U2ogNOKW3DLI7VOqkqA
-Date: Mon, 12 Jan 2026 15:34:59 +0000
-Message-ID:
- <SA3PR21MB3867F67C949B42DF5984A71CCA81A@SA3PR21MB3867.namprd21.prod.outlook.com>
-References: <1768212093-1594-1-git-send-email-gargaditya@linux.microsoft.com>
-In-Reply-To: <1768212093-1594-1-git-send-email-gargaditya@linux.microsoft.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=58883b51-fecd-4e79-90be-e636c928ea65;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2026-01-12T15:33:33Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA3PR21MB3867:EE_|SA1PR21MB6058:EE_
-x-ms-office365-filtering-correlation-id: b316a31c-6609-4898-c185-08de51f0257d
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|7416014|366016|1800799024|38070700021|7142099003|7053199007|921020;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?sQq1C+gyNTniXimIihHraC0QaqAsfbGa1Eef7/Cq0AwpZ7eGkqVccHSjmVpN?=
- =?us-ascii?Q?8okcyRMP0OxEgsLdnKcmbMRcxrS4zhpux8Xwq4LovD1hLz3deIp2ZSeLmHyO?=
- =?us-ascii?Q?tSBg/ABb9N7hSM3nliXdYuklQg6HN27jTQSN5biimMG6hZ4cJcOZkFoWbDmh?=
- =?us-ascii?Q?fLX0pcIAyBZ/JfEWwyWnCISrcLzT58sRrdlEpOqPK4l/WrsjCgXEGTT88KIR?=
- =?us-ascii?Q?pOCjlIBLIjY3sraYVPBAfVestEdDP3Go5hrHrfwdT/4VLfkWndTP9+UvDbBH?=
- =?us-ascii?Q?ezq8til+dETT+BVz416PNnBQemR2w6txAFjACrwMSDfN+g9yNc7OVZn8MoSe?=
- =?us-ascii?Q?6Wjy7iqKc8eZ/APFVtMDNkkAw3x4cDvn9+ohrpkgvSt8/+SaFEKQAOjrbiLH?=
- =?us-ascii?Q?i/CPcyYsbooTLE+ZV41FDVPRh8eK2XuNDcp7MGxPxWOyKt37xJEN4wE71gd5?=
- =?us-ascii?Q?7bHsGfi8EOvhI8DQNeKu8emnFKr6x36h2Ev4h5NVfMheXcp+2uaOIuEEG5DV?=
- =?us-ascii?Q?0iHhF9HtZ4Yh3kLRNtm3MLtFwKisqGjzC+4IyhJoVt+MMevNqE+pkmzVpy7z?=
- =?us-ascii?Q?86cJGYA3rF8wsr3L4VdndbqYEgosreWjVXS5o7xAgTsVOL6oQPhLeyUNkzUB?=
- =?us-ascii?Q?6GMMRtj5pY4h2gXZqJlbIWllTPTRfyzCGfcPydg5BfdTYptbfbox/qvnu3kr?=
- =?us-ascii?Q?iQxervyWl+K7ULGMsL0DTt2f0t5hLHqoVbgSUmibJVHP/pqDt3r69udd47l4?=
- =?us-ascii?Q?kg5mzLfilXXf7XwrsItO1/nM6gOidFq1AVmJ8YUXiKSvbG3W2ygeCyyZynVy?=
- =?us-ascii?Q?HUhlDsVh9RKkx6jKae8Za3ecWEBMMmQwIW0SvLrqrHkzX/ewCs5lif5Buhht?=
- =?us-ascii?Q?V7HZI6UxGSJzrb7Raq3GKSmyIzkGCGuM+hOdVmWGFHb+RUo5d9+uDwcYAErR?=
- =?us-ascii?Q?6rgkG5eqMlOky1xu3duTcXTJb5THnBB1Wwcb7Q1GoOHdKjru1t553zZAMdJ9?=
- =?us-ascii?Q?qDdEwBx4Tz+XFQWIZmhv0VdxJz+L9isrsAy4Dxj4MpuHNILJMQL2XWxKjlzr?=
- =?us-ascii?Q?vf2b/sRaUeYJZNSIcKiJ/5S2NKiQLOBekLzMJZPwxzI/fmrrAPrGsn8WkhVD?=
- =?us-ascii?Q?EPzAhu5ZboY0CvR+FRp68IWiTct8ObFQZU5I3HtJw2Zm8wUxV4u6dOzYHjMI?=
- =?us-ascii?Q?5lpm/n6aUB0zdjxWNk6prH825EyVmytCCFiJs2CRpuvjZhtP27rmaIyXR+4x?=
- =?us-ascii?Q?fP1YGKhKW8w8euhAtkoaHAcqe9BJOfHwsbberV7x+Y37/LeYYD3i5XN5KTng?=
- =?us-ascii?Q?vtd8+mKjkYVGTsRz7q+bOh9xb2bMm9HIMkLTXkCceD9kVT7fU4h0V0xoEIN4?=
- =?us-ascii?Q?N/lZYbe6Q3vBcCu+RCEssQqobb6jr3WkbxwGXeW2CPKNUlfoMvnuAQsX2dkB?=
- =?us-ascii?Q?3vx8px9eiPUANsPoYMKjn/5Joc07wso1LWgoGqt0rdBph0zR2w6feuYWc1DQ?=
- =?us-ascii?Q?xt8NIUpcc1g5gKKCeeKreVTIzOTA5XDjnH5nY7RzkrgWq23JQ08SNcfV1g?=
- =?us-ascii?Q?=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR21MB3867.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(38070700021)(7142099003)(7053199007)(921020);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?PMQIe76DHCiE91zkEUvjHMWfa8fJjCNJyolxS0PKMOwcE0u6C/tgDdy6NnSA?=
- =?us-ascii?Q?FhO/pF92bWvNKNu8/IJV6C4vqjHB/2/9xGzGZjYQ2KPWneQXxPjBpniUHXeR?=
- =?us-ascii?Q?Dxv+vQz/iDmrcfgjhsT7CFz8o1DQ7AoW6yPKN4GgHGt8BaWzRmiZzC//M34N?=
- =?us-ascii?Q?Ke1k4WGdsfyDKuohWwnt6D9h1c8sLvxG7GJe+X2ZaUYZkZ5pJrCzdWf9J0y6?=
- =?us-ascii?Q?bNCQhfiy753IIqws/z5nk2I8E2kuAUrI0geQpiyWFnucBPLbCXL9Nc0t4zrx?=
- =?us-ascii?Q?8Xw+n1RmaiwcHrYVjkMaCUrftwNmaHkgX2MwJy4izqrdEK4mLdUGAEita3KV?=
- =?us-ascii?Q?NFdTTnGp6oZ9gnsIlv+eQfDI6rnEhUKeG85n0dlGUbqocrskzdnjb3rSUEjb?=
- =?us-ascii?Q?6JcCu5mAlJc9/+oNGoOGrcix8NyXeWppmP0hKROT19IO+KEdvkItQgPAE5aY?=
- =?us-ascii?Q?17l9wBF3oP5AbPIvrKaIYbs3k/HIhk5S1jrnvnH8xsNLSS1rawICxXKj2wxJ?=
- =?us-ascii?Q?R2CeU091jPoKW3xD2lalhKoE4mcluLGi+XExkeAkH4n+AjHYcFGMJojyrUhE?=
- =?us-ascii?Q?91hDE2C+NKWEd1+JMrSdJ5VqlYHykDLWu4q6hsq8b09GMfODtP95pEM7hxT8?=
- =?us-ascii?Q?dTbjB+5qoun1WRHn0jkPBB9NpDq3wgyIFhxI4KSRqjNHiDSNUFOGkhnHsFYx?=
- =?us-ascii?Q?t+6d7I/8DNu7nx3GbSuzrjlmwZ0dK2z7Y6w7PgviTXJcuL8W6kzPra3OVcqa?=
- =?us-ascii?Q?I+C1Z3HjN+S7e3j6PSyhmSz5feyhJWcfr1xye2nlnwZ8vA8zgRBTuH7OF5PB?=
- =?us-ascii?Q?L8CxJnN5xe0h5OeqMGLeC6zrOPo9KnGP6Rrn1Q2N1H7LBWvftkW7mgDEAlCz?=
- =?us-ascii?Q?DaAx+oweQoKHgQPI/z7GeczxLj/KNmWxepfIwgXnw0BRt7eA/yChG3h609BY?=
- =?us-ascii?Q?CaVo3ohrIpU6lwhTFdjq4avDz8bDBXmZidrt/mJdzTiQsQBIh/J8U4Su8lHy?=
- =?us-ascii?Q?AGVH9VQcPS/XLhCuHlQni+H46T6+se1HZF9H7DjTLpaHjjiuQgA4J6SsJNTp?=
- =?us-ascii?Q?hg7pzlz8MhmQqgEcEJPpGKQT/ril/q9Hi/dVWOrshvk9pfhY4hVMJtKei+CF?=
- =?us-ascii?Q?5LQP9ZVKrM37zfE0iqNH7yA6UGXRrB7bjndBarBQwNKU88ni9/ZeH+YkP1Sp?=
- =?us-ascii?Q?uAkc/TZZWc//zynfe8m28LJdgGIEyPewJ3IvTNP9c2IdhC/YdXUIODJ6VQ3Q?=
- =?us-ascii?Q?JAoEA5mT2uqhyHqIaVxIEnnZWeV0YvkY3jDUAfbtM2x8INk/SjFLX5pC6pm7?=
- =?us-ascii?Q?EuuA/u46tiyy5pfKcdjzFppuCSMaXKT4593bPKI2EucuAWOuO3QdKnctD5X7?=
- =?us-ascii?Q?4JffUniUJMDc0LbSYl91tWxFNJ6lPaZwXqk4vpijJLrLwBNitzhHvNWLDxfo?=
- =?us-ascii?Q?uol8w9eVQHo1RLDMLxAaXi/Xkke25cHvmLziaVK49ADBeO82dmw/sJDeG17h?=
- =?us-ascii?Q?g6XQsobvMlGrTiBSKdwGuilyUR5iZxh2Kg9QPEO2+fcm+a2rbA4ssV9rFqZY?=
- =?us-ascii?Q?O/xs7wKpRt1YF3+oDLPRzZVHxpgHhmM63Z1EEbJzNRB7OL2v++TCnkFGd8Bq?=
- =?us-ascii?Q?lfm0wnSVnATiqbkBuV9Ez9eMViO9K9IZuJYRPxtrDc1HoNG3+Q1Q1QC0TlB4?=
- =?us-ascii?Q?bLQh8aDi2nXO2JL+dj5m29lAfJQO3/UiUIb/KT0UvsRDX2uI4qEQlj466sHK?=
- =?us-ascii?Q?mgDkC38lQw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE2633612CB
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 15:37:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.67
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768232231; cv=none; b=r7GN6O6bLVculi7LfuYBw1cu38zrIO+PW8uASxLUPJRzRqE7LGC2ELstQ+1hv3BiylqztxOYcb7PcO1Tp5iyZ9i6c4Wz4Tuz5iWWrzT+o3fdjLYjc6ag8uhyiwtceDJfxX4xFkitSESlNVnShVvugGRT2Ic87CqvNiF6gcYsGRU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768232231; c=relaxed/simple;
+	bh=n+Dg+KzPvb/r7hEMNmOehERgMf7Fyb87bwnsLcHLJdU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LWlkAnxkxhXmbtJDJoue2gxoTejDe2Hbs0gCFSiRW84gsp3kPSkkuGFtfjwRaSFwMruq8tzi0IQoU2ByxRhOVyHSj0c6iQsfUwUESXXJPDLIIj9Qs/0TfGjglyb+06tWHcBfuU9lhAut9HGx//LB5I4DyZADq6nJ4oU9xjeLwNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TY+xgpMK; arc=none smtp.client-ip=209.85.161.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f67.google.com with SMTP id 006d021491bc7-65f7268fbd2so1051435eaf.2
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 07:37:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768232228; x=1768837028; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=vEIVUXaPFIderMGdJFmz2WNJUbhy4IuvTb9rGw59PzI=;
+        b=TY+xgpMKM93aYCmtyBcpyuGS29cueCiIrR+rpz8NrW6Kk7rkGeS+j2JUL59gxjO+Xs
+         YUO579Yv7h+T493NUDt7KgVdJ+mMGWQstcMyk1rW7rc2DZHwOIwSwgSkj1fJuTFHg8LM
+         AayN+6qck7ua8QerDGpT5Ga0UClTBZuebE8qRsFl8x/MmwOSDtP3nKc38nmYBi37Nk+u
+         cNT5XIr9mNsUZ7qM8Mn2MgRE9gMwdgEorxPXUAMbsQ0MD7KlNmDhw183AIxCbnSD2zh+
+         9Wwms3bzkj6tAEO5b7Hbjy5TMRcPJIdTPUM8fHA2nBhgzLUJSSMaRfp+pdaA3nQhYGRy
+         MrDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768232228; x=1768837028;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vEIVUXaPFIderMGdJFmz2WNJUbhy4IuvTb9rGw59PzI=;
+        b=RoVOPCXEo4r4r/wUacjndGLY6Ao6ZhCz0z3w3d8dQXAqeqGrNtYFHOob8+WTrSSUIW
+         MEEX2DfTg9TbdT+WSv3NXRVVDfvmmKPLmh5ETgN5gBRWAGA8CJ+br9dqIs1GL1O8Sf3j
+         zY9eVHNGOLB1lGfSR5OueE/kmMvdkzYd8nWtVFhcQcz+E79Uxhx6M3NMkfP7tr6l6msJ
+         OA9GAlZVT/9K0PIlJhLuc7ruV5t2vhaK8R/koPn/4NRgBjEf1IBmQ6eC6TkdkyadkmUh
+         BkYbqBYyhf9pzqaS2jcl8erQH8PbDYuR2J9uxpta0LDIoKlcSa5Qbix7E4gBL8Qnunos
+         fAmg==
+X-Forwarded-Encrypted: i=1; AJvYcCVjMRDxdbUNPMYmrqrFLiqpQ4BMpYHJj0j5kFgrJPZzvZLnHjQX8+C2Ir8D+h+4P1gRGzzXPFk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yydw6krCHP4Mwxh+gFSGtKtKrBtJ8j3AsLUkcBTCKVDtXlQanmI
+	RoA1n0xAQkY6Qc+BQn44oKceq829356UjtsTZPeJRWY5WCSJHDHuPG/neJJw8FkOj/sEty+Lp+n
+	bge9ZiCsk/HEeZxTDxWX14rm+j7VhfNw=
+X-Gm-Gg: AY/fxX4hjSx4fP4tv2VpNP1UxeHI6WyMl9UsHwdWNJk5KDRW1Z+SQxPAcl4Vldadc8h
+	QpglLf2kn8WPvpHMCMXp5Ru+ubhFfrJviB7PhvOWgCT0kTnluQ15vf8HAPNXu4rRwgJ2e3F9Kk2
+	WcnWlwKnwbJIxxLJb6xPJCteF9Qnj0DHWChcPN5Ax3yf5z8VD4F4WK/za5jeA8pYxlRTdnSUJR0
+	388pdYsijAin1qVNa3xYuI6UdOmY83/hR1jdK2CxP6sxJ2RyjHfj5pCvBBzRGFuuNrN6kWQlyoZ
+	lWHhSeQOCZcuZfHN6bf5ewtN1USn/eJVC4waNqGv
+X-Google-Smtp-Source: AGHT+IGZuGyGAxx3SKkd4x6JWgt9zJmw9k4Ch6jw0XyDS4VjF2EvPwfilN5NNiHA0S8IgQUyM4KM+WmZfWV+AvpOLvg=
+X-Received: by 2002:a05:6820:6e81:b0:659:9a49:8ece with SMTP id
+ 006d021491bc7-65f550a6b58mr6011451eaf.82.1768232228432; Mon, 12 Jan 2026
+ 07:37:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR21MB3867.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b316a31c-6609-4898-c185-08de51f0257d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jan 2026 15:34:59.5796
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: c9DSBCzy6nBjCMrHlLeEgLcq9L1rfnuJwYyFrB0hjPyhG4IBLCnmyg0MT4S8bdeiY6YGG0GYYipY3ZUjlxDqQQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR21MB6058
+References: <20251218175628.1460321-1-ameryhung@gmail.com> <20251218175628.1460321-11-ameryhung@gmail.com>
+In-Reply-To: <20251218175628.1460321-11-ameryhung@gmail.com>
+From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Date: Mon, 12 Jan 2026 16:36:31 +0100
+X-Gm-Features: AZwV_Qg00i6ACjDBHBWS2sXfaStb9fk-05zKWzt7S_Um5wqMWl8WR2Ow8L2ZsgU
+Message-ID: <CAP01T77R+inOoL-f7RMovqE1rwG5YTBysEXg2Sez60LiWZu2eg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 10/16] bpf: Support lockless unlink when
+ freeing map or local storage
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, martin.lau@kernel.org, 
+	kpsingh@kernel.org, yonghong.song@linux.dev, song@kernel.org, 
+	haoluo@google.com, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+
+On Thu, 18 Dec 2025 at 18:56, Amery Hung <ameryhung@gmail.com> wrote:
+>
+> Introduce bpf_selem_unlink_lockless() to properly handle errors returned
+> from rqspinlock in bpf_local_storage_map_free() and
+> bpf_local_storage_destroy() where the operation must succeeds.
+>
+> The idea of bpf_selem_unlink_lockless() is to allow an selem to be
+> partially linked and use refcount to determine when and who can free the
+> selem. An selem initially is fully linked to a map and a local storage
+> and therefore selem->link_cnt is set to 2. Under normal circumstances,
+> bpf_selem_unlink_lockless() will be able to grab locks and unlink
+> an selem from map and local storage in sequeunce, just like
+> bpf_selem_unlink(), and then add it to a local tofree list provide by
+> the caller. However, if any of the lock attempts fails, it will
+> only clear SDATA(selem)->smap or selem->local_storage depending on the
+> caller and decrement link_cnt to signal that the corresponding data
+> structure holding a reference to the selem is gone. Then, only when both
+> map and local storage are gone, an selem can be free by the last caller
+> that turns link_cnt to 0.
+>
+> To make sure bpf_obj_free_fields() is done only once and when map is
+> still present, it is called when unlinking an selem from b->list under
+> b->lock.
+>
+> To make sure uncharging memory is only done once and when owner is still
+> present, only unlink selem from local_storage->list in
+> bpf_local_storage_destroy() and return the amount of memory to uncharge
+> to the caller (i.e., owner) since the map associated with an selem may
+> already be gone and map->ops->map_local_storage_uncharge can no longer
+> be referenced.
+>
+> Finally, access of selem, SDATA(selem)->smap and selem->local_storage
+> are racy. Callers will protect these fields with RCU.
+>
+> Co-developed-by: Martin KaFai Lau <martin.lau@kernel.org>
+> Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> ---
+>  include/linux/bpf_local_storage.h |  2 +-
+>  kernel/bpf/bpf_local_storage.c    | 77 +++++++++++++++++++++++++++++--
+>  2 files changed, 74 insertions(+), 5 deletions(-)
+>
+> diff --git a/include/linux/bpf_local_storage.h b/include/linux/bpf_local_storage.h
+> index 20918c31b7e5..1fd908c44fb6 100644
+> --- a/include/linux/bpf_local_storage.h
+> +++ b/include/linux/bpf_local_storage.h
+> @@ -80,9 +80,9 @@ struct bpf_local_storage_elem {
+>                                                  * after raw_spin_unlock
+>                                                  */
+>         };
+> +       atomic_t link_cnt;
+>         u16 size;
+>         bool use_kmalloc_nolock;
+> -       /* 4 bytes hole */
+>         /* The data is stored in another cacheline to minimize
+>          * the number of cachelines access during a cache hit.
+>          */
+> diff --git a/kernel/bpf/bpf_local_storage.c b/kernel/bpf/bpf_local_storage.c
+> index 62201552dca6..4c682d5aef7f 100644
+> --- a/kernel/bpf/bpf_local_storage.c
+> +++ b/kernel/bpf/bpf_local_storage.c
+> @@ -97,6 +97,7 @@ bpf_selem_alloc(struct bpf_local_storage_map *smap, void *owner,
+>                         if (swap_uptrs)
+>                                 bpf_obj_swap_uptrs(smap->map.record, SDATA(selem)->data, value);
+>                 }
+> +               atomic_set(&selem->link_cnt, 2);
+>                 selem->size = smap->elem_size;
+>                 selem->use_kmalloc_nolock = smap->use_kmalloc_nolock;
+>                 return selem;
+> @@ -200,9 +201,11 @@ static void bpf_selem_free_rcu(struct rcu_head *rcu)
+>         /* The bpf_local_storage_map_free will wait for rcu_barrier */
+>         smap = rcu_dereference_check(SDATA(selem)->smap, 1);
+>
+> -       migrate_disable();
+> -       bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
+> -       migrate_enable();
+> +       if (smap) {
+> +               migrate_disable();
+> +               bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
+> +               migrate_enable();
+> +       }
+>         kfree_nolock(selem);
+>  }
+>
+> @@ -227,7 +230,8 @@ void bpf_selem_free(struct bpf_local_storage_elem *selem,
+>                  * is only supported in task local storage, where
+>                  * smap->use_kmalloc_nolock == true.
+>                  */
+> -               bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
+> +               if (smap)
+> +                       bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
+>                 __bpf_selem_free(selem, reuse_now);
+>                 return;
+>         }
+> @@ -419,6 +423,71 @@ int bpf_selem_unlink(struct bpf_local_storage_elem *selem, bool reuse_now)
+>         return err;
+>  }
+>
+> +/* Callers of bpf_selem_unlink_lockless() */
+> +#define BPF_LOCAL_STORAGE_MAP_FREE     0
+> +#define BPF_LOCAL_STORAGE_DESTROY      1
+> +
+> +/*
+> + * Unlink an selem from map and local storage with lockless fallback if callers
+> + * are racing or rqspinlock returns error. It should only be called by
+> + * bpf_local_storage_destroy() or bpf_local_storage_map_free().
+> + */
+> +static void bpf_selem_unlink_lockless(struct bpf_local_storage_elem *selem,
+> +                                     struct hlist_head *to_free, int caller)
+> +{
+> +       struct bpf_local_storage *local_storage;
+> +       struct bpf_local_storage_map_bucket *b;
+> +       struct bpf_local_storage_map *smap;
+> +       unsigned long flags;
+> +       int err, unlink = 0;
+> +
+> +       local_storage = rcu_dereference_check(selem->local_storage, bpf_rcu_lock_held());
+> +       smap = rcu_dereference_check(SDATA(selem)->smap, bpf_rcu_lock_held());
+> +
+> +       /*
+> +        * Free special fields immediately as SDATA(selem)->smap will be cleared.
+> +        * No BPF program should be reading the selem.
+> +        */
+> +       if (smap) {
+> +               b = select_bucket(smap, selem);
+> +               err = raw_res_spin_lock_irqsave(&b->lock, flags);
+
+Please correct me if I'm wrong with any of this here. I think this is
+the only potential problem I see, i.e. if we assume that this call can
+fail for map_free.
+map_free fails here, goes to the bottom with unlink == 0, and moves
+refcnt from 2 to 1.
+Before it restarts its loop, destroy() which was going in parallel and
+caused the failure already succeeded in smap removal and local storage
+removal, has unlink == 2, so proceeds with bpf_selem_free_list.
+It frees the selem with RCU gp.
+Meanwhile our loop races around cond_resched_rcu(), which restarts the
+read section so the element is freed before we restart the while loop.
+Would we do UAF?
+
+  1. map_free() fails b->lock, link_cnt 2->1, map_node still linked
+  2. destroy() succeeds (unlink == 2), calls bpf_selem_free_list(),
+does RCU free
+  3. map_free()'s cond_resched_rcu() releases rcu_read_lock()
+  4. RCU grace period completes, selem is freed
+  5. map_free() re-acquires rcu_read_lock(), hlist_first_rcu() returns
+freed memory
+
+I think the fix is that we might want to unlink from map_node in
+bpf_selem_free_list and do dec_not_zero instead, and avoid the
+cond_resched_rcu().
+If we race with destroy(), and end up doing another iteration on the
+same element, we will keep our RCU gp so not access freed memory, and
+avoid moving refcount < 0 due to dec_not_zero. By the time we restart
+third time we will no longer see the element.
+
+But removing cond_resched_rcu() doesn't seem attractive (I don't think
+there's a variant that does cond_resched() while holding the RCU read
+lock).
+
+Things become much simpler if we assume map_free() cannot fail when
+acquiring the bucket lock. It seems to me that we should make that
+assumption, since destroy() in task context is the only racing
+invocation.
+If we are getting timeouts something is seriously wrong.
+WARN_ON_ONCE(err && caller == BPF_LOCAL_STORAGE_MAP_FREE).
+Then remove else if branch.
+The converse (assuming it will always succeed for destroy()) is not
+true, since BPF programs can cause deadlocks. But the problem is only
+around map_node unlinking.
 
 
-
-> -----Original Message-----
-> From: Aditya Garg <gargaditya@linux.microsoft.com>
-> Sent: Monday, January 12, 2026 5:02 AM
-> To: KY Srinivasan <kys@microsoft.com>; Haiyang Zhang
-> <haiyangz@microsoft.com>; wei.liu@kernel.org; Dexuan Cui
-> <DECUI@microsoft.com>; Long Li <longli@microsoft.com>;
-> andrew+netdev@lunn.ch; davem@davemloft.net; edumazet@google.com;
-> kuba@kernel.org; pabeni@redhat.com; stephen@networkplumber.org; linux-
-> hyperv@vger.kernel.org; netdev@vger.kernel.org; linux-
-> kernel@vger.kernel.org; dipayanroy@linux.microsoft.com;
-> ssengar@linux.microsoft.com; shradhagupta@linux.microsoft.com;
-> ernis@linux.microsoft.com; Aditya Garg <gargaditya@microsoft.com>;
-> gargaditya@linux.microsoft.com
-> Subject: [PATCH net-next] net: hv_netvsc: reject RSS hash key programming
-> without RX indirection table
->=20
-> RSS configuration requires a valid RX indirection table. When the device
-> reports a single receive queue, rndis_filter_device_add() does not
-> allocate an indirection table, accepting RSS hash key updates in this
-> state leads to a hang.
->=20
-> Fix this by gating netvsc_set_rxfh() on ndc->rx_table_sz and return
-> -EOPNOTSUPP when the table is absent. This aligns set_rxfh with the devic=
-e
-> capabilities and prevents incorrect behavior.
->=20
-> Fixes: 962f3fee83a4 ("netvsc: add ethtool ops to get/set RSS key")
-> Signed-off-by: Aditya Garg <gargaditya@linux.microsoft.com>
-> Reviewed-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-
+> +               if (!err) {
+> +                       if (likely(selem_linked_to_map(selem))) {
+> +                               hlist_del_init_rcu(&selem->map_node);
+> +                               bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
+> +                               RCU_INIT_POINTER(SDATA(selem)->smap, NULL);
+> +                               unlink++;
+> +                       }
+> +                       raw_res_spin_unlock_irqrestore(&b->lock, flags);
+> +               } else if (caller == BPF_LOCAL_STORAGE_MAP_FREE) {
+> +                       RCU_INIT_POINTER(SDATA(selem)->smap, NULL);
+> +               }
+> +       }
+> +
+> +       /*
+> +        * Only let destroy() unlink from local_storage->list and do mem_uncharge
+> +        * as owner is guaranteed to be valid in destroy().
+> +        */
+> +       if (local_storage && caller == BPF_LOCAL_STORAGE_DESTROY) {
+> +               err = raw_res_spin_lock_irqsave(&local_storage->lock, flags);
+> +               if (!err) {
+> +                       hlist_del_init_rcu(&selem->snode);
+> +                       unlink++;
+> +                       raw_res_spin_unlock_irqrestore(&local_storage->lock, flags);
+> +               }
+> +               RCU_INIT_POINTER(selem->local_storage, NULL);
+> +       }
+> +
+> +       /*
+> +        * Normally, an selem can be unlink under local_storage->lock and b->lock, and
+> +        * then added to a local to_free list. However, if destroy() and map_free() are
+> +        * racing or rqspinlock returns errors in unlikely situations (unlink != 2), free
+> +        * the selem only after both map_free() and destroy() drop the refcnt.
+> +        */
+> +       if (unlink == 2 || atomic_dec_and_test(&selem->link_cnt))
+> +               hlist_add_head(&selem->free_node, to_free);
+> +}
+> +
+>  void __bpf_local_storage_insert_cache(struct bpf_local_storage *local_storage,
+>                                       struct bpf_local_storage_map *smap,
+>                                       struct bpf_local_storage_elem *selem)
+> --
+> 2.47.3
+>
 
