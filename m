@@ -1,109 +1,160 @@
-Return-Path: <netdev+bounces-249209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C97ECD157FF
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 22:55:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48D96D15879
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 23:09:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9D00730006C6
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 21:55:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D19F2301D669
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 22:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B1AA30FC1D;
-	Mon, 12 Jan 2026 21:55:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46DCB34889A;
+	Mon, 12 Jan 2026 22:09:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hueAJ1ct"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nHVmYw6N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E7A924A05D
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 21:55:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 213AC30ACFF;
+	Mon, 12 Jan 2026 22:09:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768254935; cv=none; b=o6/3Q1ETXxpwKaQ9Dyi5q6aOkivF+1uB7waocfEnVcqsxyOOWC6lTK4ATmm8r3uuHm87LZEvEidCoJGy0o9y8YTraZDy9WhJsKbZ9lOSXSoghJsBJUd1ut7ood2f7TCkAxL58Wq/Lj6JxE4NYolTIAYTCF3kMmBEjeOac9AYoi8=
+	t=1768255785; cv=none; b=BAjcWQi0Qsxc0xU3he8Tk/ACdpgGJ1AJW6drwM8WERwqH+g4BmAc3SL4ncKOlSaZ9Uu3oPfA73dHn2WorRZPkPLQp+LEM+DA9Hqh0vfKfu7/5R6Yn/OLNC/eah71NakGMrtK46mYpEiDssL18B0WL9uB+swGDMK95//6TWQ8X5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768254935; c=relaxed/simple;
-	bh=uq1j7/7lwZs97JC5UrHI7rl2H6armqzEJl+GArBu10E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MoD2pkqQSz1qa7FH3RCKxgRZLDtg279Uqy+28SDLAS4cYBqRU/01OTVYsnOpDEPFkLX0DHdDJXvJm/lJIihudTEGt6N6Y2pjC0ruIdJA9nYoLQvE9J+MCEGqkStob2+o73jLtlkkzGec4Z7WRQk0nbI+/P/ds6toemxgT5fTyO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hueAJ1ct; arc=none smtp.client-ip=74.125.82.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-11f3a10dcbbso6225013c88.1
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 13:55:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768254933; x=1768859733; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BFpZqya3J42tgEdzzL5HR/Y4eVhKBF1SwzqjTV+m+6o=;
-        b=hueAJ1ctk7QBQjOiVF2ENuisvrDi2tucdE847wgyzXWv7kECSx94V/56qtzna/Dtu8
-         e0Ku1Wc56no9ZDocmffMRhwFOM4Gq7xmKrmrocTpYfdF5d4swFxM6I7iy+0oLcxOFnAF
-         zAdKQLCX1sHosrTJUjPmOXFY59t4yPRNDzLqWFCgEP57biI5hnjXNoMW2U5lt85nqAv3
-         KdVqWLzKjE6IWi7XzXnpsaPV57xVdRIKd9Z9dZaeuXwoYK53+HguQOgdXHYwtzPQ4n58
-         lViuOLmyJaXmgCwm5ElJgbvdPtNqN+Sc4hGkWyCpZ/rWLi8dobHNE4P4vj3vnO96vbjh
-         LqKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768254933; x=1768859733;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BFpZqya3J42tgEdzzL5HR/Y4eVhKBF1SwzqjTV+m+6o=;
-        b=WOBsKX1pZTvGg7m5de1/72aGSkt4wOeMHiG10gcUZgd+T5aW5IQrCTKjpYcb3XI818
-         ImokCIBA21gLZ29FbIioTjm96BY/VVqGXE1/zWcIHstiuHrJNLo9c0makfQyfmONI96V
-         X4+x0XAwJzO7xpasvrm3FwCHv2engRfWTocb0pb5pM7JboPUkFJ72ROLGOEeEPagRj+4
-         ZV6/QajtqZsFDgZRRDR98148OgKTojGovxdtioAq6XVIK9/fw6iMNKF1/PHoh/wlzmwd
-         toFkDGHiGK0prj89nVRsDaRxw29vRbpHvl2G08TnTrsOwT4fLm44O3ulVAnCebMly+ZJ
-         yPpw==
-X-Gm-Message-State: AOJu0Yy8UsgLw9FBPaOEj3I9Bz7+kVwEEKDrzoSNUnDJCVWLdLVXN7hm
-	miq25SYzlBpJ4urixNsrBzLCSkQ+D8L5CVLMfcdoLBLF98Jfy7FSZcLaaU1Y+z39
-X-Gm-Gg: AY/fxX5/6/VnyFoG5YKVuQzw+bBxAjd5yKqeWoECT9LVJ3Au3cChjKVUUCkAhj7EkPp
-	oQOx4HH9qYSRnQ+0JhCEKNwZOVyxI/QcD+94zj3Y5trasyVjLGZY4DVyMU5tj14OwBrcjXP4dt8
-	E6eozJlJmDBf9tmtpdJFuW28WzdJyN6Ga1OE3A3du+nAXSN5AUMvSDjYqeNiBWD2kEoxQ89O7gO
-	o0xhjLvoPpqnZREffoqtysEhtLGGoc1AclHcTXdLFcUHkUS7ISF7ugfWzHS5w+FLQ4Agl6bey3U
-	ao5BT+7fgcRiPqtxMHsNM2NTWadjP6pwxlNGOIpkGrFSZUkJs+m0sR0mSPsgd9DIbYFKyWBwJIC
-	8z7M5kyyUB3Yao8VRMzRiv3E1GO2mttm1OKiRqsVjqnXwTkoJ0c6av5ZAjJ93R+Ly6DmrVm/2Pb
-	Q+SIZ+38vvp311xUDNB507zqMRlDS+LPife1WawFcDsHrLE0Sg7BLHsTKhNKpn/IQ=
-X-Google-Smtp-Source: AGHT+IFPRbvT8dlimBYDAExBs325W6HsGqVK3JPrirCAaX0G1XFg5OER8Bg2zcDIzw72720a3zTMkw==
-X-Received: by 2002:a05:7022:43a0:b0:119:e569:f609 with SMTP id a92af1059eb24-121f8afbcfemr16271974c88.2.1768254933015;
-        Mon, 12 Jan 2026 13:55:33 -0800 (PST)
-Received: from ?IPV6:2a03:83e0:1151:15:c56:221b:35d5:85f? ([2620:10d:c090:500::1:f38f])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-121f24346b5sm26632057c88.3.2026.01.12.13.55.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Jan 2026 13:55:32 -0800 (PST)
-Message-ID: <318477a7-8bbf-4300-a44a-deefe4a40758@gmail.com>
-Date: Mon, 12 Jan 2026 13:55:31 -0800
+	s=arc-20240116; t=1768255785; c=relaxed/simple;
+	bh=JxVAg6/16D5kLpXJf8cK2rWDDZ/WNlKo8ozqkYTbqEo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U/qnfSV+foaBTDbiwGIj5MohZz31SfkLXuCoPLAUW83qUSDqqnhNog4srbfmNutzOg7gMZvFybcx17s1Rx/KyOX30fa0xOAel9VVjZvt+cAPtFiGWO8oe2IkduSgZln29MgqnL3SUNTdtGv158MnXLQieGvCs+BN8De5ewfb5lw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nHVmYw6N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45A22C116D0;
+	Mon, 12 Jan 2026 22:09:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768255784;
+	bh=JxVAg6/16D5kLpXJf8cK2rWDDZ/WNlKo8ozqkYTbqEo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nHVmYw6NZl/tZREwk9G9Iv5iR5Xne4iGKYto91hcu1bIgTvjlMqP9uaM6ySc0IvWD
+	 GzwQTYft18Psn6A+Bm+D4w/vKek/yVT7FaibTOHAAloagBn8qak1jjX/wEEcoStPGc
+	 OYKkWxAsSAceDzk8dx6fDIlAkg1ncsKO1kqC//f2u6pXkij7dIRCKwde18QYO1M7HP
+	 wSyLeSrhK9sEZBOJAHFDO/0Eq+iYPd3s5/bzuXEuFpnApHEnp75LGhg+uc0YNsFytZ
+	 rnA2gOsmzObCazuI/eA9GURbG8a1plnKfvXG+Ae88LjklzVw+RPhIIFkqBmQ3LHNw+
+	 Wt1qBmrEKBjEg==
+Date: Mon, 12 Jan 2026 23:09:41 +0100
+From: Frederic Weisbecker <frederic@kernel.org>
+To: Waiman Long <llong@redhat.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, Tejun Heo <tj@kernel.org>,
+	Phil Auld <pauld@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Michal Koutny <mkoutny@suse.com>, netdev@vger.kernel.org,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	linux-block@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+	Eric Dumazet <edumazet@google.com>, Michal Hocko <mhocko@suse.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, Ingo Molnar <mingo@redhat.com>,
+	Chen Ridong <chenridong@huawei.com>, cgroups@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Simon Horman <horms@kernel.org>,
+	Shakeel Butt <shakeel.butt@linux.dev>, linux-mm@kvack.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Muchun Song <muchun.song@linux.dev>, Will Deacon <will@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Chen Ridong <chenridong@huaweicloud.com>
+Subject: Re: [PATCH 00/33 v6] cpuset/isolation: Honour kthreads preferred
+ affinity
+Message-ID: <aWVxJVQYEWQiyO8Q@pavilion.home>
+References: <20260101221359.22298-1-frederic@kernel.org>
+ <437ccd7a-e839-4b40-840c-7c40d22f8166@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next V0.5 0/5] eth: fbnic: Update IPC mailbox support
-To: netdev@vger.kernel.org
-Cc: alexanderduyck@fb.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, horms@kernel.org, jacob.e.keller@intel.com,
- kernel-team@meta.com, kuba@kernel.org, lee@trager.us, pabeni@redhat.com,
- sanman.p211993@gmail.com
-References: <20260112211925.2551576-1-mohsin.bashr@gmail.com>
-Content-Language: en-US
-From: Mohsin Bashir <mohsin.bashr@gmail.com>
-In-Reply-To: <20260112211925.2551576-1-mohsin.bashr@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <437ccd7a-e839-4b40-840c-7c40d22f8166@redhat.com>
 
-> Update IPC mailbox support for fbnic to cater for several changes.
+Le Mon, Jan 12, 2026 at 01:23:40PM -0500, Waiman Long a écrit :
+> On 1/1/26 5:13 PM, Frederic Weisbecker wrote:
+> > Hi,
+> > 
+> > The kthread code was enhanced lately to provide an infrastructure which
+> > manages the preferred affinity of unbound kthreads (node or custom
+> > cpumask) against housekeeping constraints and CPU hotplug events.
+> > 
+> > One crucial missing piece is cpuset: when an isolated partition is
+> > created, deleted, or its CPUs updated, all the unbound kthreads in the
+> > top cpuset are affine to _all_ the non-isolated CPUs, possibly breaking
+> > their preferred affinity along the way
+> > 
+> > Solve this with performing the kthreads affinity update from cpuset to
+> > the kthreads consolidated relevant code instead so that preferred
+> > affinities are honoured.
+> > 
+> > The dispatch of the new cpumasks to workqueues and kthreads is performed
+> > by housekeeping, as per the nice Tejun's suggestion.
+> > 
+> > As a welcome side effect, HK_TYPE_DOMAIN then integrates both the set
+> > from isolcpus= and cpuset isolated partitions. Housekeeping cpumasks are
+> > now modifyable with specific synchronization. A big step toward making
+> > nohz_full= also mutable through cpuset in the future.
+> > 
+> > Changes since v5:
+> > 
+> > * Add more tags
+> > 
+> > * Fix leaked destroy_work_on_stack() (Zhang Qiao, Waiman Long)
+> > 
+> > * Comment schedule_drain_work() synchronization requirement (Tejun)
+> > 
+> > * s/Revert of/Inverse of (Waiman Long)
+> > 
+> > * Remove housekeeping_update() needless (for now) parameter (Chen Ridong)
+> > 
+> > * Don't propagate housekeeping_update() failures beyond allocations (Waiman Long)
+> > 
+> > * Whitespace cleanup (Waiman Long)
+> > 
+> > 
+> > git://git.kernel.org/pub/scm/linux/kernel/git/frederic/linux-dynticks.git
+> > 	kthread/core-v6
+> > 
+> > HEAD: 811e87ca8a0a1e54eb5f23e71896cb97436cccdc
+> > 
+> > Happy new year,
+> > 	Frederic
 > 
-> Mohsin Bashir (5):
->    eth: fbnic: Use GFP_KERNEL to allocting mbx pages
->    eth: fbnic: Allocate all pages for RX mailbox
->    eth: fbnic: Reuse RX mailbox pages
->    eth: fbnic: Remove retry support
->    eth: fbnic: Update RX mbox timeout value
+> I don't see any major issue with this v6 version. There may be some minor
+> issues that can be cleaned up later. Now the issue is which tree should this
+> series go to as it touches a number of different subsystems with different
+> maintainers.
 
+It indeed crosses many subsystems. I would be fine if anybody takes it but
+nobody volunteered so far.
 
-The version information in the patches is leftover from internal. Please 
-ignore the version information. This is V1 of this series.
+The main purpose is to fix kthreads affinity (HK_TYPE_DOMAIN handling cpuset is
+a bonus). And since I made the pull request myself to Linus when I introduced
+kthreads managed affinity, I guess I could reiterate with this patchset. I
+already pushed it to linux-next.
+
+But if anybody wants to pull that to another tree, that's fine, just tell me
+so that we synchronize to avoid duplication on linux-next.
+
+Thanks.
+
+-- 
+Frederic Weisbecker
+SUSE Labs
 
