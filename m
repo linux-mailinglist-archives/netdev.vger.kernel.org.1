@@ -1,118 +1,133 @@
-Return-Path: <netdev+bounces-248881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AE17D108D9
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 05:21:08 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 241EED10948
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 05:33:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 06B09301E6B8
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 04:21:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A2CBF3008F3A
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 04:33:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3610F268C42;
-	Mon, 12 Jan 2026 04:21:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB8E30EF81;
+	Mon, 12 Jan 2026 04:33:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mqT4ntmh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VmH9pYUG";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="DflkwLav"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f195.google.com (mail-pf1-f195.google.com [209.85.210.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB29C3D6F
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 04:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8BD119CD0A
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 04:33:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768191666; cv=none; b=k7E3/d2pnNXChQLc/zw8YMIPAAroq09NbSyWzGy2RtaxdLZrG1Bjejdl3Nqhp8c5vOd1LyMd+C6wYjXI8BuOc1Gw8GxcITGBV5XfMqbZiunfnthqi/GyNdj7HjKJ5Nc3SbsMxuQkkddYe2ST8NQA0fUyv7xDxKRgLU9CrU4epO0=
+	t=1768192412; cv=none; b=If7hDxUcmOJnCMerrr58+9SZfV2eFW6mUM5K5xNB8PWEAX5fVaT1O46ElHS+0i29nBmyIArpBHvinVQEgVr8thDry7Mlu9HnCeMdg/FRyqxFCmdQ+mGRZYjuYc2xNK2quRkEcM73W17qRZIR9eS4LIbo8mWHcBFw+Kl2AGLNRA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768191666; c=relaxed/simple;
-	bh=Nciikyja+YLcLgGqFwl5ErEmhqrI+gVtzLiqfexGI3I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VUtFDQpKnQ+VRRVGU43wBXox3IaeXWGJNm2Ltwzp3JyLhOtiV+4n/ESWDxEK7nEU5guBSFO6yD1tlDZT4wktr+moBZjABR5oSbzYavLPktp0kf9ROMZ1Ph3Od/Ikw+vycNBGhzlAkteUKiAF2OwZgR9H1lpoPq58Zaa1o0UGIVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mqT4ntmh; arc=none smtp.client-ip=209.85.210.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f195.google.com with SMTP id d2e1a72fcca58-81e93c5961cso1780962b3a.0
-        for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 20:21:04 -0800 (PST)
+	s=arc-20240116; t=1768192412; c=relaxed/simple;
+	bh=JsECp4e88xlO5Vo5MlkaWcurekx6DybzbgYXNqaqYFQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k9Ka5o5DvlhVHsgfoAvJZsaz7taXwLAJLbqkJ09S+PSWKsADh3fuB3z10cqPg4wZmGjtWXA6Om5NuZON1OU0WeKyhIX4WirF6XD7JQ5qDG0g6X7ICXQA9Qn6QV9aK2Igu0te8FwSVR3plRisx6Rjo78wrjPMkPq3cfuNmFYRk0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VmH9pYUG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=DflkwLav; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768192398;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=APuQMk+mj1Ir7IfbwA6rsBMcZIxIkKakSr4yNu5ZY2w=;
+	b=VmH9pYUG/mLi9V1uEPPH2TR8PlbX3ABMRcRmmyeVtmLP2JCOHrvlgG4DFdgrlEPwW6JsOa
+	/KnwTPsC2Cgtzv9R/Tar7AlvCi9VxVL8OKXrpuvHcqzt0jxoH/zqNnRyMH8uvGyLt/SVKF
+	SSzfO8UiW/eoApudi0+JCfyEYNPMj+g=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-441-U6rgAWp-OSqV-i25SHxKSQ-1; Sun, 11 Jan 2026 23:33:16 -0500
+X-MC-Unique: U6rgAWp-OSqV-i25SHxKSQ-1
+X-Mimecast-MFC-AGG-ID: U6rgAWp-OSqV-i25SHxKSQ_1768192396
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-430f527f5easo2543970f8f.1
+        for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 20:33:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768191664; x=1768796464; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nciikyja+YLcLgGqFwl5ErEmhqrI+gVtzLiqfexGI3I=;
-        b=mqT4ntmhg67JUDSPPwpQ5HzL6TB+Ml43UadV/C6Wk3ynwsDnkaceine5ywScrSqGLm
-         mnFlHiYfnZAyPp1UsCN4lJgNmBavl0cYIQ9bJtTqnYiN9yMckdeDnh3T+giOBpv+KTuz
-         tOTCjb1ziiPW0hwtt3sCszSlP0p+yGMtg5ZdkgAvshnR7wDh8Id6h4Zp9atLKB6A1aC9
-         5S2HB9C8InSTbm7t71s5TAw0XkGcXER5UxoR6mFCUal3j5iwrv5tAtpl7GR1UuherZDu
-         /8pK3UeC+I/La6fWycQycPgexhe4KoMrW9BxoR1p0gH30PQmxwW0QZzSkfyLb4cSmguy
-         rVqg==
+        d=redhat.com; s=google; t=1768192396; x=1768797196; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=APuQMk+mj1Ir7IfbwA6rsBMcZIxIkKakSr4yNu5ZY2w=;
+        b=DflkwLavtgns1iGBrrhWgRVEs+l5msngmMejVs2YPVUvSIS7iiXApi0uieueCJ1R+c
+         axht/+rOF7DZSdljcnGsbarRqxblFfVq87esuBJG3XT29l2beT8mSl0xrMgzymksmoq/
+         Suc3mUsQWEcAoLE3hVuQNy0m3uXyH3GxlCFyZwI40ftKWRiHEhhfScE3svNCtoGdgJTq
+         so1ON2zo8SdGi+iDiN5F4lUvS/N7LLo1eo5o8Spc8Qr9fYkEOPUl0stwv4+8/0AeKFqA
+         pmh8Dq/5an1N9d0RvrXs7cUp+/J4SBG+93bP+lNSrQ1uP8UTBaYSl+YD74YAQ56VdLle
+         1vfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768191664; x=1768796464;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Nciikyja+YLcLgGqFwl5ErEmhqrI+gVtzLiqfexGI3I=;
-        b=aI6vBGYLDKlqWxSFN65h+ZCngPVowLzHQFd6XlD4YWIyAqMdRI6GAEukwfZcElogrA
-         p7um41QbTJTQIOOiMrlMbHi6IauEejKuks8heE/tqNBJEO1UmWiLnZ53Z5TwcBQJBhLY
-         3ySZ4e4Go+XKJtK7WC35nCybpWFBGxsz/K8pBE1BrWRri2QK4D+DI2zzlrMqUU9OH6Qb
-         39cxD8xqau61b4hN1pXWXn8+bn0RlbqkN7dcWOEK3FE8FUf5d3qIi+ibopaypOBqqOgf
-         Lz99NlQhrd1zsCOrWY/PJRtEoDKT6MT8+mQB1906njjdjecwNoy7yJGpeC6a43DCw/Jm
-         3S8Q==
-X-Gm-Message-State: AOJu0YwfhIC0IjxhFF/yxsynqZSSajXL23Vw6YBjeM/P43nX5DDXXbVG
-	i4qw6wT/Cs3TYXjfp3vYN+kZ18H618pG4jXPX5oOY3RALqUL+XsIK9uPLMRvQDPGRA==
-X-Gm-Gg: AY/fxX6r26xdLqsB5AThv+LZP0XgTi+R2qQRyQZ0qNbTM4CzH2ztSFsnefZWL7hIIGj
-	FN1MJNuf0iJs2dD3+/4rCsFle1eqClyuVsICG24CjCOilHmtKsWlrKW7QhPwmQTk3SvYujGu0vk
-	Y5wOp3QqVwTeTSlEJkTPi4qPpVLxibrqYj4PYq8Ug1NdtQqLW+VGvX/J/HrUWV7tnrEJgVZC3+F
-	6Cnt/2q2Lh6BgTJ1jW4qWXglIgV0V3Hfu5BBOrOTHrRF4oLW78J3BCVJkcv/dY8gAVZxO33/U7Q
-	648R01e2AcnUPLUIyPe1o4q+5AIMvJJ5WV49FhYYpAdWQuYvGNlH6rX+FCRkn8PSGV7ZWKSfzvG
-	SDQ9TDfGwsGOHG2b/f4x5QtmUZ9oXdZYyBtWnovetu2uZQqpMaFM0lE++AwuxPEpKNnwNAyZMou
-	VuSgmLqhHH/xz4FsSNmsROr+uQUm9LvpVCcgVyw8is
-X-Google-Smtp-Source: AGHT+IHZpT6aWRlZq21jN5DCLVhHQFqWplQ3iw+cygS38lVawxObXCzHdl7LAQF+XQnVSOiw21Umvw==
-X-Received: by 2002:a05:6a00:2a09:b0:81f:3957:276d with SMTP id d2e1a72fcca58-81f39572b67mr5108764b3a.39.1768191664075;
-        Sun, 11 Jan 2026 20:21:04 -0800 (PST)
-Received: from localhost.localdomain ([38.190.47.140])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-819c530133csm16120550b3a.31.2026.01.11.20.21.03
+        d=1e100.net; s=20230601; t=1768192396; x=1768797196;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=APuQMk+mj1Ir7IfbwA6rsBMcZIxIkKakSr4yNu5ZY2w=;
+        b=T78BluakcNt7bt6cqwFfBL+l2OiOPheQxgPaIk5lOlMchuBqW/WfFd98OT1HBJQ8Jo
+         1u2wbMl+cA7aRS9LGPHgp1Q9Bzo1zsKIBb5T0Vgx/pFg4sIhSJtb5CXxToAV8wQ+DYkm
+         UrK45L7ZZ1zbwRU6YRqj/1aHQSuU4PiFwiqhDDLNFtkBb2E+QTXgULTQPblVFjIDGmvr
+         mn117ePYlyFRt3AMVMiWM+ojPM3FIh084sMdkArnU/jjYc7E96SmWQPZFrIy7gnI9xfM
+         Vld5uZNWSVzEhZTSTmXpkmGu+aBp+7lsR4rKP4thOVSAZyzxgj8jljdLGLuwnYUUhmet
+         eGLw==
+X-Forwarded-Encrypted: i=1; AJvYcCXI1Rq6Fa1dTfYHiwJrrBwRpfx9LEapew2r8tm5ghU+CTfvi+NnNp9O6SHMk6529rDWzMXIZ0o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxskaxPZsVOdrrPjLVPWbw+xfRS9TbCBv87tRFR1b7NVLYWjIHj
+	zzkWu1M6A9GzJj7nk1ktH+jI650gFqENb+1IFaIbFWiRXU4hU2wY0LpB532Gm3EcMKqhYB0wsNI
+	G8mTJUv/yejGtcldZxRTv9ESyF+1TRRPoOPEe1F+McCDMJ/zC8o/cIl8yag==
+X-Gm-Gg: AY/fxX7UihsF+EdWLkZBng4fUjXKQOJ45Uhk3jRVZdYAR7umuJI9TOr2rh93CtJ5vpT
+	qC9YYjr26i5e4jR16Ww3xFzmBBkbOPhCLo41AoaKLRBKL94UPf7xmPJ+2S/Hy4qGXYdVv53sJmj
+	y27Fy5II/xxE8ox+ss2Qn3gED3YRZ/n7u+U6/6H0IG5FU0BFSSrM+t3EYU62CLs0uIq6RMJhTSt
+	xNa38suGjg103P9EZl4oLBEvGZsWmKFQuieo0ipAh+B+kb28aE0ebbGf5PrNaeLGZVWa1O3NGfd
+	FacrAMsUUeD3oAUHWPjBglRGojiI450m1Xw9hOzez67zTYC/kOZwh/qYlugfJmYFzaNKdsoux0U
+	aX2vM3eDAAUg469HCrakc5TyyGi9ZNjM=
+X-Received: by 2002:a05:6000:18c5:b0:432:da7c:5750 with SMTP id ffacd0b85a97d-432da7c589cmr7999793f8f.20.1768192395664;
+        Sun, 11 Jan 2026 20:33:15 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE/BXpYp147sy8NHGo+1rbRx2BpHOkLFAtFBJEDqcFXZDM5sBWqhXQb6dEWZIhQYfgNrNPMPA==
+X-Received: by 2002:a05:6000:18c5:b0:432:da7c:5750 with SMTP id ffacd0b85a97d-432da7c589cmr7999782f8f.20.1768192395211;
+        Sun, 11 Jan 2026 20:33:15 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-35-22.inter.net.il. [80.230.35.22])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5ee5e3sm35982021f8f.35.2026.01.11.20.33.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Jan 2026 20:21:03 -0800 (PST)
-From: Jinseok Kim <always.starving0@gmail.com>
-To: quic_luoj@quicinc.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jinseok Kim <always.starving0@gmail.com>
-Subject: [PATCH] net: qualcomm: ppe: Remove redundant include of dev_printk.h
-Date: Sun, 11 Jan 2026 20:20:38 -0800
-Message-ID: <20260112042038.2553-1-always.starving0@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Sun, 11 Jan 2026 20:33:14 -0800 (PST)
+Date: Sun, 11 Jan 2026 23:33:10 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: Jason Wang <jasowang@redhat.com>, willemdebruijn.kernel@gmail.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
+	leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+	tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next v7 9/9] tun/tap & vhost-net: avoid ptr_ring
+ tail-drop when qdisc is present
+Message-ID: <20260111233129-mutt-send-email-mst@kernel.org>
+References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
+ <20260107210448.37851-10-simon.schippers@tu-dortmund.de>
+ <CACGkMEuQikCsHn9cdhVxxHbjKAyW288SPNxAyXQ7FWNxd7Qenw@mail.gmail.com>
+ <bd41afae-cf1e-46ab-8948-4c7fa280b20f@tu-dortmund.de>
+ <CACGkMEs8VHGjiLqn=-Gt5=WPMzqAXNM2GcK73dLarP9CQw3+rw@mail.gmail.com>
+ <900c364b-f5ca-4458-a711-bf3e0433b537@tu-dortmund.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <900c364b-f5ca-4458-a711-bf3e0433b537@tu-dortmund.de>
 
-The header <linux/device.h> already includes <linux/dev_printk.h>.
-Therefore, explicitly including <linux/dev_printk.h> is unnecessary.
+On Fri, Jan 09, 2026 at 11:14:54AM +0100, Simon Schippers wrote:
+> Am I not allowed to stop the queue and then return NETDEV_TX_BUSY?
 
-This patch removes the redundant include. No functional changes.
+We jump through a lot of hoops in virtio_net to avoid using
+NETDEV_TX_BUSY because that bypasses all the net/ cleverness.
+Given your patches aim to improve precisely ring full,
+I would say stopping proactively before NETDEV_TX_BUSY
+should be a priority.
 
-Signed-off-by: Jinseok Kim <always.starving0@gmail.com>
----
- drivers/net/ethernet/qualcomm/ppe/ppe_debugfs.c | 1 -
- 1 file changed, 1 deletion(-)
+-- 
+MST
 
-diff --git a/drivers/net/ethernet/qualcomm/ppe/ppe_debugfs.c b/drivers/net/ethernet/qualcomm/ppe/ppe_debugfs.c
-index fd959a76ff43..df9f0cdad626 100644
---- a/drivers/net/ethernet/qualcomm/ppe/ppe_debugfs.c
-+++ b/drivers/net/ethernet/qualcomm/ppe/ppe_debugfs.c
-@@ -7,7 +7,6 @@
-
- #include <linux/bitfield.h>
- #include <linux/debugfs.h>
--#include <linux/dev_printk.h>
- #include <linux/device.h>
- #include <linux/regmap.h>
- #include <linux/seq_file.h>
---
-2.43.0
 
