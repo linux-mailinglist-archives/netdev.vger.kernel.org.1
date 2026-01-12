@@ -1,226 +1,394 @@
-Return-Path: <netdev+bounces-249194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D02E1D15610
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 22:05:48 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51E32D15625
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 22:07:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4D10D301D5C2
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 21:03:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D1E813005F22
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 21:07:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFDB23242CF;
-	Mon, 12 Jan 2026 21:03:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAA2D3218B2;
+	Mon, 12 Jan 2026 21:07:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="geUFfnC8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VcJVpwvL"
 X-Original-To: netdev@vger.kernel.org
-Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11022107.outbound.protection.outlook.com [52.101.48.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com [209.85.128.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C04530F54A;
-	Mon, 12 Jan 2026 21:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.107
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768251796; cv=fail; b=oGsP+zNFUzI8QdR0K4si1VKbmg/+ioS6pESz0uG0ohw9STl4s5wZhJES2esuFGenCZ+bmIhovcG/9vXMc3i95VGFf+sFRdZlo6DxbA6WFn5whshqZfbsBFN551FS/vqbZ6OjGM3FL7KNHjZhO8zlYiXX2CoXCrUoz9blpMtgmhI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768251796; c=relaxed/simple;
-	bh=xTS7MGGpJvC0Y8WlP1b/ygpUbonhN1u41WriLJGDGLQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=GmBMDFyeUR0Qd/TMjXRQ8CxvZb/t/k6pD5snarJOQD6a9WXLFjL6QWcX9MkubAMHa2cbmZR1D837FGRJ8wlrfYevRytSkKFmFpC/579DcKlD+tH6mee1JZ/tM0npMPjcihUMxjrfYk9OB7+bUtyFVlxyNpkaHRxrW8DDBN4jFWM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=geUFfnC8; arc=fail smtp.client-ip=52.101.48.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JpLpFxQ9ttlEOZpLcpiw5j0TGZeJKfELZyQxKVEKrMCoj4+TESxFnz312NCVTH8QSB1Iw/yYSGIDvIga3hlh1DUPpW4hx/48ZP95C0VcPOA6MuRbQmlGX+PBI+Zvzv+ZFPPGY9IY1TEFnvSARMomASrr5lDC0uPJdSF/sH/Xg4Uxns/KNpaIz5cFROqISTipBnbguRgKjkhZReF7g2FXEpGJUrkQ1PAowyS3hiDPTAsKsX9s3w+LCpiFKrnUp3xDeDgLVMRp/zwXqhE07lKFZYNthYUs5uhVL9oaLy7iT2BKkCfaCFTMK75PijKc1ESP8TPebKCcHpRcgkuz91nHTQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=z5ZYdltgLjnNIbJf7uEwneFQClaiMBrRHKqKFsL/pJ8=;
- b=XDzYKxI6lx+5gBMXbPlmtCctWS2qJ5/FLzLUtlTv3TeSp0UYPNcWghIeH6vrW34KP6weL+p/bQo785X8y7bq9VE2X/+MOmyt4W8uTRL/RjpWkYL2Fs87mOpnf6c7n6K+QOQzd2uDfje6cI4YwNLJInWnP1Fk+i/QlEFS4ZY8upfIeJt4aZj1RbYPn0A0e108/qFnQh2TAA/1n86aQOVNiC6rKXMVWIvjJ0WNd0mUhDi24cMd0I7XbbCRfnWbd2IEj5DsFB8Gez6gB5X4cRQnUBWTyEMVTVNcZ0Nsc8njm8TYN0MqwLN9pCmrCgBCT8lzKQG5cxzWVBGNTkLXAinWLA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=z5ZYdltgLjnNIbJf7uEwneFQClaiMBrRHKqKFsL/pJ8=;
- b=geUFfnC8A1XyXPxryv/GlYXFd3Hutqf23O2yYpjGLJbailhVvOMlKYa+dtN8LTNOWmAM5VsByLXnFz/CKcvxXiCdbrNGzlzwbf+AFxdXk0qNf5JUaKieBDIfXap2AaWt6fW81Vi5IS0CXwvSwZBXjGW0LaEc/fyTfRrL1yCsRxc=
-Received: from SA3PR21MB3867.namprd21.prod.outlook.com (2603:10b6:806:2fc::15)
- by SA1PR21MB6034.namprd21.prod.outlook.com (2603:10b6:806:4af::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.1; Mon, 12 Jan
- 2026 21:03:13 +0000
-Received: from SA3PR21MB3867.namprd21.prod.outlook.com
- ([fe80::70ff:4d3:2cb6:92a3]) by SA3PR21MB3867.namprd21.prod.outlook.com
- ([fe80::70ff:4d3:2cb6:92a3%6]) with mapi id 15.20.9520.001; Mon, 12 Jan 2026
- 21:03:13 +0000
-From: Haiyang Zhang <haiyangz@microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>, Haiyang Zhang
-	<haiyangz@linux.microsoft.com>
-CC: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, KY Srinivasan
-	<kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
-	<DECUI@microsoft.com>, Long Li <longli@microsoft.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Konstantin
- Taranov <kotaranov@microsoft.com>, Simon Horman <horms@kernel.org>, Erni Sri
- Satya Vennela <ernis@linux.microsoft.com>, Shradha Gupta
-	<shradhagupta@linux.microsoft.com>, Saurabh Sengar
-	<ssengar@linux.microsoft.com>, Aditya Garg <gargaditya@linux.microsoft.com>,
-	Dipayaan Roy <dipayanroy@linux.microsoft.com>, Shiraz Saleem
-	<shirazsaleem@microsoft.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>, Paul Rosswurm <paulros@microsoft.com>
-Subject: RE: [EXTERNAL] Re: [PATCH V2,net-next, 2/2] net: mana: Add ethtool
- counters for RX CQEs in coalesced type
-Thread-Topic: [EXTERNAL] Re: [PATCH V2,net-next, 2/2] net: mana: Add ethtool
- counters for RX CQEs in coalesced type
-Thread-Index: AQHcf02vovGckqnBaUyi1QeGJul7JLVKqgUAgARk5/A=
-Date: Mon, 12 Jan 2026 21:03:13 +0000
-Message-ID:
- <SA3PR21MB386767DAF624033E55FECA38CA81A@SA3PR21MB3867.namprd21.prod.outlook.com>
-References: <1767732407-12389-1-git-send-email-haiyangz@linux.microsoft.com>
-	<1767732407-12389-3-git-send-email-haiyangz@linux.microsoft.com>
- <20260109175620.3e461176@kernel.org>
-In-Reply-To: <20260109175620.3e461176@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=432aca39-706b-43b2-b81e-0122a79f343a;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2026-01-12T21:02:30Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA3PR21MB3867:EE_|SA1PR21MB6034:EE_
-x-ms-office365-filtering-correlation-id: 1be41e4e-6e0c-4710-6bc6-08de521dffc5
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|7416014|366016|1800799024|38070700021;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?FMGhB4E7lG5cf8hsPnOha8yJDovwOykxBIdMl1LJqYCYebe+1V+cV9Gmt4Xa?=
- =?us-ascii?Q?ZpFHngBTzXUYz9QMLo9L5L9D6LCKLQrTMc3fc8Owb229LZbee98L35+q70HS?=
- =?us-ascii?Q?T8gjC68qHt+dTSOblaQIpMkmU0R5ibN9DbYTIxjZIaFApIKLGKulom+/TLoD?=
- =?us-ascii?Q?vJ2pX8SCcufSX2ZaBBaZjG83VRNl42pBz3rj19c8XS2AG2isJZ/l7zrK8Rdk?=
- =?us-ascii?Q?n7Tanp/u1h4d7oTCepEsJDdjbBShs0jvO8YPHxNgKYkB4P7JtL8BIZbNstsy?=
- =?us-ascii?Q?4rv6BhBv1I74uDxkd5VaIxKPiDgib18/84tegecI5THFN0cHcbMtYCq4QDH2?=
- =?us-ascii?Q?i+/d2F5MPVTOGM9VTjwMn2x5zf+08ph2rRL+zsYpHtdLKX+hvMWF0JlPI8Es?=
- =?us-ascii?Q?KcoyZoDcgj6+j+jBVFMb3+3cEumAIrgBXpj0LLK5IS4TEexlwwmg2ZnFvJJ0?=
- =?us-ascii?Q?1J3HRuSFLBPq5acvA3QZSuKrbdzUqeOjQmJRf66APk/A91G8Oe4opFNCruX2?=
- =?us-ascii?Q?HrYC6AwR7TlYml9zOCbbbfMv0oasivpBGBEvNWEXu2EXNWxMsu+ZhcsJx/Ia?=
- =?us-ascii?Q?YNhgPhSTbLI+vuI4HANN2aCTl76V8ZXUB1zhG3Y1UTL3Uz8oejvDFDI5xqks?=
- =?us-ascii?Q?nvCI5dQ4Ijs2Jy4Dv7+z2AjqopGSLw0CGLUAAIU2jAUVOt95Rm+yxecBZ3xA?=
- =?us-ascii?Q?bFU32QQKZjM/aCAPljnSaUicpFMeCgFSdU8qDHWy9NXfVXvfLDjtttbi2RHZ?=
- =?us-ascii?Q?M+ILKt37xBYmn+kwY7l22VXcsNNtn55ms4/wDLURp0rsiNOuu+iFYnCD1eT3?=
- =?us-ascii?Q?HxdXhGXozcSq7eSSnjylguYuIGuejUMqcP3I3BFibQUPei3z3M6g1W3ivQOJ?=
- =?us-ascii?Q?Cvnb/PjZUCuDDtE8cqpyuvW/n3cvD2F6TxnbLx820jt4wgC2JLllszugtFgI?=
- =?us-ascii?Q?uK4v5kKhCi0kHtIsczwDfGLZVL9OthsWGJ6ucSwkuliClxQzcmJwaukaqgX0?=
- =?us-ascii?Q?EBlCvTO5bQvYlfvIkpI/QGqH6f+r2AIscFOgvJw2/rkfIGxzM8P+TmIQBV1f?=
- =?us-ascii?Q?oER4Ux4JgUqNzdGrSwWcxuQ24OPtEsMYvZvILAeQLvsX9kxjGflHEm01PE8I?=
- =?us-ascii?Q?dVOog9QDMPzDghVKuDjPU6Uu521UdTfUrSg1RoT1sTOT7pO/vS5FmXqAnyfu?=
- =?us-ascii?Q?0FoglntRWwsZmERf4UVprvR5GUBGG4o8GOSjJ0UsK0BU0FQKk6oodGxk9DhI?=
- =?us-ascii?Q?Pjgu6j69zFZmDlNzorP593UUsYrB287D5VEewSWkHIl3Qjd+G1xptFjmp/6o?=
- =?us-ascii?Q?z5rTwi4ls7iKr6G5GWMk+0K6jPyPUy7cL6mPxzTl+oBVVUmlhHLG4NqjlSUm?=
- =?us-ascii?Q?39Yxd4KWurm5FWafOJG8nK7o0diRiSNY4Vfk9z0z9hTQ8okjUknl+gNIHP52?=
- =?us-ascii?Q?2x8vzFSStUi9K6SbL6zOpAoxWeOgxR+GNrdxciviaRCmQ7cljlPd+6PyP/Ha?=
- =?us-ascii?Q?oE7sxVauFI6GVBEtxruNMOOqaxhezXKCujJ2?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR21MB3867.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(38070700021);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?xJvBXt7EA/Mj6RKRQyI9uD8dXdwoivTZC0wwezJXe6kRXYRvj926bfdeQTTa?=
- =?us-ascii?Q?5yu8v5FLWhhjM5dPE+DT6RLOhtYoX3Z9k5MTx0ru9w5H14JWHK1S6l7vPF0B?=
- =?us-ascii?Q?iW6Evw44QOvMk7XwSw1YgFAsfRzVp6rjzNzkzrLuISPZp+VGuxur7jYMUUrD?=
- =?us-ascii?Q?azDyD7Qvq+GgdkPW06J0Rc2GVv7ykgr86RkAZNMmMgfy4IyCkT8Qj0HRut2D?=
- =?us-ascii?Q?nr4JOxoLNZXOcncql2lMo/EomxS8KuVDi10ZdoH+pXh19ovwFNVnOIvRiBOe?=
- =?us-ascii?Q?aINCaUBl20WDEWN++9UR7HaYrNEF5aXhqkjBaxPHy/Jm5q3xdxxJiZX+u7/1?=
- =?us-ascii?Q?TgszvlAlAdBH1FGK/yg9MNAAjUKoo450MCupGWFUpIRjxdqkQeXYMPSDKp6q?=
- =?us-ascii?Q?xfQO7rDkEdEyKrDZpAgrH0Kc0Lvigu1WWLkbE1QhNf0YCiYh+K0R+qfAgaKH?=
- =?us-ascii?Q?AQT8lXtwTs/4nOA28H+4TgJkSOKFQa2UQ0Sg+8upiapTNDR/dZAbp3izXRZU?=
- =?us-ascii?Q?PeUbpePJtZCiAUR6VXoalhmwTJiom7NEDPuKb3VxM1uSFDRdYGWZ4BSqsYUJ?=
- =?us-ascii?Q?cxzSy55ueAb9R/qd3+cl7YOyKzYIHOR3OmnTJRgI/2j0diq6sFUiD5nJjnni?=
- =?us-ascii?Q?1AGjA0HdY2iIOa/zE8UoYNGZpXOjAA5FZr+yxWt2fB3DO0rfkQhLYOJRakMP?=
- =?us-ascii?Q?a01jOabYnHmnzkvSAE0PVNlUWndJwkYr/rezQq2ksCdr7+33C+X+yOxnnk/b?=
- =?us-ascii?Q?SNbUpMfGim86Ns3U0Au4kPPRqM5fkVQaGWvWPtBsepSzKz5bvLgWBeZGFAc3?=
- =?us-ascii?Q?znPipqCbFf5aCPB3uXiwJ8Lu7sUUXpouWeCkPMYgXKUH5YQ3A2v5nFL9NMLg?=
- =?us-ascii?Q?H8n8um14OSYrP4+qBMproZSFFla7+d7mOXvcIb2GniC2fGy82QkLSptgXHFB?=
- =?us-ascii?Q?ia8W74Nf9+vbSob1VdROS3Z3iWS7yANC8mnHElOByrcT+VFSLAUo1/m/Ug3q?=
- =?us-ascii?Q?8JxAhYm+h7j8n0MPTQZAK3vAxoZMgw+up1yNm6XHFUwAuR1oM69RQTGDFN64?=
- =?us-ascii?Q?hLrjFUiOhW7BwFfQHCQJ3tmC28gZgaPvaHFCUqga6Oj/vxRKtnVWjlSKdS83?=
- =?us-ascii?Q?5H2jsccbbH7C23stlpATTmr4titMgsq/PW4RHKDvzRsx2Utjra02FVZOqx79?=
- =?us-ascii?Q?MXEMCj/gtopzX3lH8Nosrm6d9Pf7ttp7S2LO+DMkPrWOfXSYV1cqqxFgMKKQ?=
- =?us-ascii?Q?RxIeyNjwClwwW5whbClyl97Ot/fYflUdxow+RLJrwL6uoQijSaU4Pec9wQuS?=
- =?us-ascii?Q?btbM88sGAX74+8clQxhNIcoy7BR5P4OiIjBy4hSIRsKqhby1zUOmTJZv1/Vu?=
- =?us-ascii?Q?V6EYiQr3jipjetg+28fR3K/8p7Ft+BNkiA+T7sm040rKc/k146ym0HImP31E?=
- =?us-ascii?Q?PXTkuxOnnP+Rw+KOfO8ce+xzGRjeHVtVOtCiCdYpccPBfGKkv2UIgNandqRC?=
- =?us-ascii?Q?VXGKHZx54aqHlOFGxWaiqjdN8iqCYTMy7yNnbqXgBQeoWpAuynoQ/F2M9THR?=
- =?us-ascii?Q?UbAhrd6u/vxgTn1Vo39iZVJPmzFtAXfvBmQDRDqo4NBNs73BS/+o0omTqrbA?=
- =?us-ascii?Q?9FsJdDZcuwWoCTjOIidNac9HV/bpFZJAJE3pgKB44ggmSiI5xF/2YHD8gm/O?=
- =?us-ascii?Q?50rYchE+dktMIStfaEJ+ueWor1LdOH2/lGKM7EOI6LdPrau1?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F6C0340A43
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 21:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.68
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768252044; cv=none; b=nx+x9J5L07TFyPj6Hy6eHz/Pjrw3Kt6r3+ndkUmuR55T3Q/Cp9DK+qG7eiRtNAwVLIY+mkAHuUoCNXZcZUXmiUX68iEKRjh6eyDCnlVSkGa7nGNHN5X83gc1aaD71HvItVlMG3IEWivOpMcqog9rs6Y9KctX2mLNziF9kmQ/zcs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768252044; c=relaxed/simple;
+	bh=JHm7KYhm6uqdC1zHtP+V6HTCv0NcKOxB/h5vIcqQXe4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P7W+vuiIJ7wpVdwk1uTf/cV5fspihQMUFVgem+GBH6GUpVuWhjLJVQT7gAKsK4LpbpX37vG79bh0JB2KpXPO8bCheJSKJVF92jC7wT3kjqOIi55QsU3xzraQ/Z4xY178SyN8Mub3DektamZBj9+9KYDQ2fbX6vFKvF7b4YcOxz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VcJVpwvL; arc=none smtp.client-ip=209.85.128.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f68.google.com with SMTP id 5b1f17b1804b1-4779b49d724so7372265e9.0
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 13:07:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768252040; x=1768856840; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LTRRd85RBYWRayG0scxIO+L0xVmBDXqrnT6ievTwV7E=;
+        b=VcJVpwvLw+wPvvFakYblRCYnZy6DISMFmMfWohRKgkkZPbQ+kVNn8qklxm9QmE/RyH
+         SdVyHv8byCVGfBKAoZtKVEjWOPVoKS/s45SJGHIu0c8jssadupKsRAIGH33z0wWSi4JM
+         alHiEN8QW4OC98NOEe/FUrURTGUbyChZPbsdbBvP6tfJ8H9GqCuaCFNEW3E/1SEJ26rF
+         IiHqjgp7yXd4BS+YYczkzXNQ7HXGlt0OILs0OKQcF+R6hYQlLDT3LqhynwxMNRheRLM5
+         +0DXhar4cEWlovFwQABEB285a6zitvIIeWodmdOns0j+vfKyBLx5TkeCsSAEsXPjFnfS
+         a6vA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768252040; x=1768856840;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LTRRd85RBYWRayG0scxIO+L0xVmBDXqrnT6ievTwV7E=;
+        b=eETmdh1w49nDXvWMSzBEjzcNmUR/1cvuW6kLgtzqGc4Vg9XquIiHA25PRW8PAQjssX
+         BImzJvj8M/QD+hloxTAfe8KO0EVnrrMIs4+ghyGWjq/magsX7xr2JIL8GUMKqE9VqCHr
+         U64fRnk+711StraMvzanCwA+J59WCgC3jG4NaJl3eDWPNAgHGS01ZqNZ9RsPh31Gnkre
+         2KWOsqpsBbQ17Ih2nF6K5C/2kP7+U/c1dz18FQd3KWJ+Cn3ESRZCeI/XlP81BGuRKhKw
+         w8Nsk3xifUCeEAABNhg21MnsQNDZ7lD6CwGZ73vBxoc1FadehXmv4lOnYItqsKqsxnPW
+         6Xug==
+X-Forwarded-Encrypted: i=1; AJvYcCUwjMjmXgaXB8wuyHjaZhJNgERug/yfIs8GmbngIhognSMszLL1mC/kOfAUqJV1+xP+slOXYo4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFGQqMYuIctmXPxWSR9navfyVeMp01NsePzP+vSoJKnzgZ/y7+
+	74T3G7ICbVcRSV7QRYoW26Xdo1K76IwYM4vbyFylGgHBgO4e8wLjSFsZWn3yINHD7Uirrg==
+X-Gm-Gg: AY/fxX48/5ukh9FjktaKyTZNvsRTXFlhriYhxYxvx3IX7jev6xt7YIuCMLgTc7fpdC4
+	/JMmSB7ksTbjxchPlOKxunSioOw6osUU0UQA142R2GEuX5FayzadQAnk/2wvl7cIe0LMZiYriHD
+	astCvnjSIyu0g/SheWYx5OwX7W28pkwDJKDPOJ380lnWYdAw1a8YsX51OtBPa2TXvavL7/Mn3zv
+	17lJVHH5BYoM8PUpKdXNe4cI1IPi6Vsw9Qnp6vmK+kUalxuXYmk23m0KJ8kIPiHk6T418y6tr5K
+	JtpkrcqEnpqSzCCtvwpQQbpNjSQF2+G0N/m9X6mAhEgOpDqprsZy5NSijPux7HwOX2Tn/ojqDgz
+	DKJS+QUNfRM5jBzD2G36rvxWZbu8y8AWly5/HM+qATpRqsPDh6AiyC5OkMnFWVgh61vE7qSWH+R
+	VaYyO3oqSP/eWl
+X-Google-Smtp-Source: AGHT+IHQRMPmOM6xCgmzNY9m15hZq4NLGioFeUynsXXgG9+Gtex8WwWoqV8ZlCmJJYH/3tn82SPnCQ==
+X-Received: by 2002:a05:600c:3b28:b0:475:d7b8:8505 with SMTP id 5b1f17b1804b1-47d84b4118fmr120655015e9.7.1768252039902;
+        Mon, 12 Jan 2026 13:07:19 -0800 (PST)
+Received: from skbuf ([2a02:2f04:d804:300:5991:1d11:eff7:807a])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f620ac8sm362358265e9.0.2026.01.12.13.07.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jan 2026 13:07:18 -0800 (PST)
+Date: Mon, 12 Jan 2026 23:07:16 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Linus Walleij <linusw@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] net: dsa: tag_ks8995: Add the KS8995 tag
+ handling
+Message-ID: <20260112210716.vhznted6ojxca6bz@skbuf>
+References: <20260107-ks8995-dsa-tagging-v1-0-1a92832c1540@kernel.org>
+ <20260107-ks8995-dsa-tagging-v1-0-1a92832c1540@kernel.org>
+ <20260107-ks8995-dsa-tagging-v1-1-1a92832c1540@kernel.org>
+ <20260107-ks8995-dsa-tagging-v1-1-1a92832c1540@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR21MB3867.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1be41e4e-6e0c-4710-6bc6-08de521dffc5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jan 2026 21:03:13.1434
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vrnN+vZf4K7cZ0NaZLKMnZoXbfF7No6pb0kmC9EjZsV3J+uWh72eEuAD85psycun2CK6yQP4HtFkfhx+pIudug==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR21MB6034
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260107-ks8995-dsa-tagging-v1-1-1a92832c1540@kernel.org>
+ <20260107-ks8995-dsa-tagging-v1-1-1a92832c1540@kernel.org>
 
+Hi Linus,
 
+It's nice to see old hardware being consolidated into the DSA framework.
+Thanks for that effort.
 
-> -----Original Message-----
-> From: Jakub Kicinski <kuba@kernel.org>
-> Sent: Friday, January 9, 2026 8:56 PM
-> To: Haiyang Zhang <haiyangz@linux.microsoft.com>
-> Cc: linux-hyperv@vger.kernel.org; netdev@vger.kernel.org; KY Srinivasan
-> <kys@microsoft.com>; Haiyang Zhang <haiyangz@microsoft.com>; Wei Liu
-> <wei.liu@kernel.org>; Dexuan Cui <DECUI@microsoft.com>; Long Li
-> <longli@microsoft.com>; Andrew Lunn <andrew+netdev@lunn.ch>; David S.
-> Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Paolo
-> Abeni <pabeni@redhat.com>; Konstantin Taranov <kotaranov@microsoft.com>;
-> Simon Horman <horms@kernel.org>; Erni Sri Satya Vennela
-> <ernis@linux.microsoft.com>; Shradha Gupta
-> <shradhagupta@linux.microsoft.com>; Saurabh Sengar
-> <ssengar@linux.microsoft.com>; Aditya Garg
-> <gargaditya@linux.microsoft.com>; Dipayaan Roy
-> <dipayanroy@linux.microsoft.com>; Shiraz Saleem
-> <shirazsaleem@microsoft.com>; linux-kernel@vger.kernel.org; linux-
-> rdma@vger.kernel.org; Paul Rosswurm <paulros@microsoft.com>
-> Subject: [EXTERNAL] Re: [PATCH V2,net-next, 2/2] net: mana: Add ethtool
-> counters for RX CQEs in coalesced type
->=20
-> On Tue,  6 Jan 2026 12:46:47 -0800 Haiyang Zhang wrote:
-> > @@ -227,8 +232,6 @@ struct mana_rxcomp_perpkt_info {
-> >  	u32 pkt_hash;
-> >  }; /* HW DATA */
-> >
-> > -#define MANA_RXCOMP_OOB_NUM_PPI 4
-> > -
-> >  /* Receive completion OOB */
-> >  struct mana_rxcomp_oob {
-> >  	struct mana_cqe_header cqe_hdr;
-> > @@ -378,7 +381,6 @@ struct mana_ethtool_stats {
-> >  	u64 tx_cqe_err;
-> >  	u64 tx_cqe_unknown_type;
-> >  	u64 tx_linear_pkt_cnt;
-> > -	u64 rx_coalesced_err;
-> >  	u64 rx_cqe_unknown_type;
-> >  };
->=20
-> This should be deleted in the previous patch already
-Will do.
+On Wed, Jan 07, 2026 at 01:57:14PM +0100, Linus Walleij wrote:
+> The KS8995 100Mbit switch can do proper DSA per-port tagging
+> with the proper set-up. This adds the code to handle ingress
+> and egress KS8995 tags.
+> 
+> The tag is a modified 0x8100 ethertype tag where a bit in the
+> last byte is set for each target port.
+> 
+> Signed-off-by: Linus Walleij <linusw@kernel.org>
+> ---
+>  include/net/dsa.h    |   2 +
+>  net/dsa/Kconfig      |   6 +++
+>  net/dsa/Makefile     |   1 +
+>  net/dsa/tag_ks8995.c | 114 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 123 insertions(+)
+> 
+> diff --git a/include/net/dsa.h b/include/net/dsa.h
+> index cced1a866757..b4c1ac14d051 100644
+> --- a/include/net/dsa.h
+> +++ b/include/net/dsa.h
+> @@ -57,6 +57,7 @@ struct tc_action;
+>  #define DSA_TAG_PROTO_BRCM_LEGACY_FCS_VALUE	29
+>  #define DSA_TAG_PROTO_YT921X_VALUE		30
+>  #define DSA_TAG_PROTO_MXL_GSW1XX_VALUE		31
+> +#define DSA_TAG_PROTO_KS8995_VALUE		32
+>  
+>  enum dsa_tag_protocol {
+>  	DSA_TAG_PROTO_NONE		= DSA_TAG_PROTO_NONE_VALUE,
+> @@ -91,6 +92,7 @@ enum dsa_tag_protocol {
+>  	DSA_TAG_PROTO_VSC73XX_8021Q	= DSA_TAG_PROTO_VSC73XX_8021Q_VALUE,
+>  	DSA_TAG_PROTO_YT921X		= DSA_TAG_PROTO_YT921X_VALUE,
+>  	DSA_TAG_PROTO_MXL_GSW1XX	= DSA_TAG_PROTO_MXL_GSW1XX_VALUE,
+> +	DSA_TAG_PROTO_KS8995		= DSA_TAG_PROTO_KS8995_VALUE,
+>  };
+>  
+>  struct dsa_switch;
+> diff --git a/net/dsa/Kconfig b/net/dsa/Kconfig
+> index f86b30742122..c5272dc7af88 100644
+> --- a/net/dsa/Kconfig
+> +++ b/net/dsa/Kconfig
+> @@ -112,6 +112,12 @@ config NET_DSA_TAG_MXL_GSW1XX
+>  	  Say Y or M if you want to enable support for tagging frames for
+>  	  MaxLinear GSW1xx switches.
+>  
+> +config NET_DSA_TAG_KS8995
+> +	tristate "Tag driver for Micrel KS8995 switch"
+> +	help
+> +	  Say Y if you want to enable support for tagging frames for the
+> +	  Micrel KS8995 switch.
+> +
+>  config NET_DSA_TAG_KSZ
+>  	tristate "Tag driver for Microchip 8795/937x/9477/9893 families of switches"
+>  	help
+> diff --git a/net/dsa/Makefile b/net/dsa/Makefile
+> index 42d173f5a701..03eed7653a34 100644
+> --- a/net/dsa/Makefile
+> +++ b/net/dsa/Makefile
+> @@ -25,6 +25,7 @@ obj-$(CONFIG_NET_DSA_TAG_BRCM_COMMON) += tag_brcm.o
+>  obj-$(CONFIG_NET_DSA_TAG_DSA_COMMON) += tag_dsa.o
+>  obj-$(CONFIG_NET_DSA_TAG_GSWIP) += tag_gswip.o
+>  obj-$(CONFIG_NET_DSA_TAG_HELLCREEK) += tag_hellcreek.o
+> +obj-$(CONFIG_NET_DSA_TAG_KS8995) += tag_ks8995.o
+>  obj-$(CONFIG_NET_DSA_TAG_KSZ) += tag_ksz.o
+>  obj-$(CONFIG_NET_DSA_TAG_LAN9303) += tag_lan9303.o
+>  obj-$(CONFIG_NET_DSA_TAG_MTK) += tag_mtk.o
+> diff --git a/net/dsa/tag_ks8995.c b/net/dsa/tag_ks8995.c
+> new file mode 100644
+> index 000000000000..a5adda4767a3
+> --- /dev/null
+> +++ b/net/dsa/tag_ks8995.c
+> @@ -0,0 +1,114 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) 2025 Linus Walleij <linusw@kernel.org>
 
-- Haiyang
+You can update to 2026.
+
+> + */
+> +#include <linux/etherdevice.h>
+> +#include <linux/log2.h>
+> +#include <linux/list.h>
+> +#include <linux/slab.h>
+> +
+> +#include "tag.h"
+> +
+> +/* The KS8995 Special Tag Packet ID (STPID)
+> + * pushes its tag in a way similar to a VLAN tag
+> + * -----------------------------------------------------------
+> + * | MAC DA | MAC SA | 2 bytes tag | 2 bytes TCI | EtherType |
+> + * -----------------------------------------------------------
+> + * The tag is: 0x8100 |= BIT(port), ports 0,1,2,3
+> + */
+> +
+> +#define KS8995_NAME "ks8995"
+> +
+> +#define KS8995_TAG_LEN 4
+> +
+> +static struct sk_buff *ks8995_xmit(struct sk_buff *skb, struct net_device *dev)
+> +{
+> +	struct dsa_port *dp = dsa_user_to_port(dev);
+> +	u16 ks8995_tag;
+> +	__be16 *p;
+> +	u16 port;
+> +	u16 tci;
+> +
+> +	/* Prepare the special KS8995 tags */
+> +	port = dsa_xmit_port_mask(skb, dev);
+> +	/* The manual says to set this to the CPU port if no port is indicated */
+> +	if (!port)
+> +		port = BIT(5);
+> +
+> +	ks8995_tag = ETH_P_8021Q | port;
+> +	tci = port & VLAN_VID_MASK;
+
+I think this is incorrect on multiple counts.
+
+The first red flag is that the port mask is packed twice into the tag,
+once into the TPID and second into the TCI. I opened the reference
+manual and my reading is that the TCI portion is unnecessary/incorrect;
+it remains processed by the switch as a TCI (aka VLAN ID + PCP), with no
+port semantics overlaid on top.
+
+Regarding the sentence "The manual says to set this to the CPU port if
+no port is indicated" - I did not find that. I just found these
+sentences instead:
+- No change to TCI if not null VID
+- Replace VID with ingress (port 5) port VID if null VID
+
+which say a different story.
+
+If VID==0, the packet will be processed in the CPU port's PVID,
+otherwise the VID is preserved during the forwarding process. In both
+cases, the VID may be stripped on egress, depending on VLAN table
+settings, or not.
+
+Practically, this means you have a combined DSA+VLAN tag.
+On xmit, you'd need logic like this (not compiled, sorry):
+
+#define KS8995M_STPID_STD	GENMASK(15, 4)
+#define KS8995M_STPID_PORTMASK	GENMASK(3, 0)
+#define KS8995M_STPID(portmask)	htons(ETH_P_8021Q | FIELD_PREP(KS8995M_STPID_PORTMASK, portmask))
+
+	struct vlan_ethhdr *hdr = vlan_eth_hdr(skb);
+	bool have_hwaccel_tag = false;
+	int tci = 0, portmask;
+
+	portmask = dsa_xmit_port_mask(skb, dev);
+
+	if (skb_vlan_tag_present(skb) && skb->vlan_proto == htons(ETH_P_8021Q)) {
+		tci = skb_vlan_tag_get(skb);
+		__vlan_hwaccel_clear_tag(skb);
+		have_hwaccel_tag = true;
+	}
+
+	if (have_hwaccel_tag || hdr->h_vlan_proto != htons(ETH_P_8021Q)) {
+		skb = vlan_insert_tag(skb, KS8995M_STPID(portmask), tci);
+		if (!skb)
+			return NULL;
+	} else {
+		/* VLAN tag already exists in skb head, modify it in place */
+		hdr->h_vlan_proto = KS8995M_STPID(portmask);
+		hdr->h_vlan_TCI = htons(tci);
+	}
+
+and on rcv, something like this:
+
+	/* We are expecting all received packets to have a mangled VLAN
+	 * TPID, so drop anything else. Because of the non-standard TPID,
+	 * don't even bother looking for a tag in the hwaccel area
+	 */
+	if (FIELD_GET(KS8995M_STPID_STD, ntohs(skb->protocol)) != ETH_P_8021Q)
+		return NULL;
+
+	/* Move the custom DSA+VLAN tag into the hwaccel area and strip
+	 * it from the skb head
+	 */
+	skb = skb_vlan_untag(skb);
+	if (!skb)
+		return NULL;
+
+	portmask = FIELD_GET(KS8995M_STPID_PORTMASK, ntohs(skb->vlan_proto));
+	skb->dev = dsa_conduit_find_user(dev, 0, ilog2(portmask));
+	if (!skb->dev)
+		return NULL;
+
+	/* Preserve the VLAN tag if it contains a non-zero VID or PCP,
+	 * and restore its TPID to the standard value
+	 */
+	skb->vlan_proto = htons(ETH_P_8021Q);
+	if (!skb->vlan_tci)
+		__vlan_hwaccel_clear_tag(skb);
+
+	dsa_default_offload_fwd_mark(skb);
+
+Lastly, dsa_xmit_port_mask() never returns 0, so the extra code is dead.
+
+The reason why you didn't notice anything out of place when transmitting
+packets with VID=BIT(port) is, I believe, because you're configuring the
+user ports as egress-untagged for all VLANs. Contrary to more advanced
+switches where the untagged port mask is per VLAN, here it is per port
+(the same "Tag insertion" and "Tag removal" bits from the Port Control 0
+registers that you're also enabling on the CPU port). So any blunder in
+the tagging protocol is being wiped by the switch.
+
+> +
+> +	/* Push in a tag between MAC and ethertype */
+> +	netdev_dbg(dev, "egress packet tag: add tag %04x %04x to port %d\n",
+> +		   ks8995_tag, tci, dp->index);
+> +
+> +	skb_push(skb, KS8995_TAG_LEN);
+> +	dsa_alloc_etype_header(skb, KS8995_TAG_LEN);
+> +
+> +	p = dsa_etype_header_pos_tx(skb);
+> +	p[0] = htons(ks8995_tag);
+> +	p[1] = htons(tci);
+> +
+> +	return skb;
+> +}
+> +
+> +static struct sk_buff *ks8995_rcv(struct sk_buff *skb, struct net_device *dev)
+> +{
+> +	unsigned int port;
+> +	__be16 *p;
+> +	u16 etype;
+> +	u16 tci;
+> +
+> +	if (unlikely(!pskb_may_pull(skb, KS8995_TAG_LEN))) {
+> +		netdev_err(dev, "dropping packet, cannot pull\n");
+> +		return NULL;
+> +	}
+> +
+> +	p = dsa_etype_header_pos_rx(skb);
+> +	etype = ntohs(p[0]);
+> +
+> +	if (etype == ETH_P_8021Q) {
+> +		/* That's just an ordinary VLAN tag, pass through */
+
+I hope you don't have a use case for such packets passing through.
+
+> +		return skb;
+> +	}
+> +
+> +	if ((etype & 0xFFF0U) != ETH_P_8021Q) {
+> +		/* Not custom, just pass through */
+> +		netdev_dbg(dev, "non-KS8995 ethertype 0x%04x\n", etype);
+> +		return skb;
+> +	}
+> +
+> +	port = ilog2(etype & 0xF);
+> +	tci = ntohs(p[1]);
+> +	netdev_dbg(dev, "ingress packet tag: %04x %04x, port %d\n",
+> +		   etype, tci, port);
+> +
+> +	skb->dev = dsa_conduit_find_user(dev, 0, port);
+> +	if (!skb->dev) {
+> +		netdev_err(dev, "could not find user for port %d\n", port);
+> +		return NULL;
+> +	}
+> +
+> +	/* Remove KS8995 tag and recalculate checksum */
+> +	skb_pull_rcsum(skb, KS8995_TAG_LEN);
+> +
+> +	dsa_strip_etype_header(skb, KS8995_TAG_LEN);
+> +
+> +	dsa_default_offload_fwd_mark(skb);
+> +
+> +	return skb;
+> +}
+> +
+> +static const struct dsa_device_ops ks8995_netdev_ops = {
+> +	.name = KS8995_NAME,
+> +	.proto	= DSA_TAG_PROTO_KS8995,
+> +	.xmit = ks8995_xmit,
+> +	.rcv = ks8995_rcv,
+> +	.needed_headroom = KS8995_TAG_LEN,
+
+VLAN_HLEN
+
+> +};
+> +
+> +MODULE_DESCRIPTION("DSA tag driver for Micrel KS8995 family of switches");
+> +MODULE_LICENSE("GPL");
+> +MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_KS8995, KS8995_NAME);
+> +
+> +module_dsa_tag_driver(ks8995_netdev_ops);
+> 
+> -- 
+> 2.52.0
+> 
+
 
