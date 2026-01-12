@@ -1,222 +1,175 @@
-Return-Path: <netdev+bounces-249101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 321C3D1411D
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 17:34:40 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC806D14160
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 17:37:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7D050302EB2B
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 16:30:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 89F5B3016926
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 16:34:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7741366DC4;
-	Mon, 12 Jan 2026 16:30:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22AC4365A1E;
+	Mon, 12 Jan 2026 16:34:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="YjInOPXb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hErqo7P3"
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E1836654C;
-	Mon, 12 Jan 2026 16:30:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90AF33659FA
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 16:34:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768235409; cv=none; b=LlcpiSr241kBH+EczTOrjkIh4TQtZs6nPwN23Cqr2LaLTg8h9bZvL0SnsJjUf5cl6M0adRfOoBIFZaHnk5Tf7UvjXUJoQItaKJ3EsJuPGO1fMQjKVvw6fzFwmalgJEBvzXDoHn9S3h1DM8QklbTH9vwt+1rGi7YP4oQjEuQzm2s=
+	t=1768235644; cv=none; b=BxgV958ZjAFqHMTfLNg/isve3lvJ13rgXmkid8aNrvtBt9fcG2TR8oHCNZOXOMvWOuvhJtjzC33Q5JXFNNg1EDSjnVKoq4Z20pQckFkivDwbgVmfHGVQmoZ4+3RfQs6P1ALpYPCt+Cb+5Q6XJJ5A9AhbtL8lZ0jqH/6AK2TOFyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768235409; c=relaxed/simple;
-	bh=V3juCesM+1mXkrkDiZyaDHCqV1PZp1PRI3aC9pWunWo=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=JcgDAWxZZihpDfuJlXq+EznP+1bQo94xx00pbbMP/EgkdPOZcdDAyMTxjEfX8l8uyplNhwZpYv/seYH0pHmB0G5cqXZFHJili1hvxfof0MEl4I9c4hMGUhYDRj/NnHMkvIEqKcPAb8eSK/YRWBHBMNGwxIIK4edc66Xdbi0YD7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=YjInOPXb; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from [192.168.178.143] (p5dc880d2.dip0.t-ipconnect.de [93.200.128.210])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.16/8.18.1.16) with ESMTPSA id 60CGTnlV012646
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Mon, 12 Jan 2026 17:29:50 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1768235391;
-	bh=V3juCesM+1mXkrkDiZyaDHCqV1PZp1PRI3aC9pWunWo=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To;
-	b=YjInOPXb77BnI7AIboa0ZEgGwXW+spC2mbo1b4vyRIvkHpus4rntPoFLLblTZ4Lnu
-	 IjZhm3tEbHkT5Cj2KeG+7vUQx/qzjVV3I8U79ZCNs8gC+p3Ma78AdaWM8EWiK14TLB
-	 oWGRXILmJ7wEk+ac5j9onlC+OQpqCjJFp+PdwC2Q=
-Message-ID: <1e9d6b19-da6f-49fd-a1f4-a1c6e47b2906@tu-dortmund.de>
-Date: Mon, 12 Jan 2026 17:29:49 +0100
+	s=arc-20240116; t=1768235644; c=relaxed/simple;
+	bh=qObXrZZY/g3E4GCjc0G54e2FFMUVE8T5kZfQcSCoJ94=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D2bRafi8raq2PSGnMga+ddsIU7iL7aH9hsV/uJfU9Nqis3Z5gAmKn7iEWMhor30WxN+t9MMfncrs1Kb3gLM8P8fUep89Q28gpMGBLLBqZPsDox/A5/N4yAVM0cATQIH/p7UXcbfCi61uhOjxPKDBJp9IbJy+Rjtq6rjM6tYtIJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hErqo7P3; arc=none smtp.client-ip=74.125.224.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-64476c85854so6388408d50.0
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 08:34:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768235641; x=1768840441; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KuJVkRWTkGkTXSTXinl6EKTHqtS+lO+xdjv/rVIuI/Q=;
+        b=hErqo7P3fCkDNmuylITsU/vVdNRLaAw0BLTnaYW52RjBR5pbIMB84h1300SGNc/aon
+         KPV7avpEz51Dbz1Ho/B0BlSoCoV5bc1WfYJv/+GgsakmX3Ai6k1eZqfEks1a7wMZYiN+
+         IjCZaDtREfjr3QDjVptX3xGKN/hmesn57kXZD1uFCCZH+134iwO2Of7WW4KikXD9u7u6
+         Pi0wzxMdauqlgmCtS8/PBlpSRYQ0MdDFhDzE0hGgTGahhUu4sNyk7efxSAk1Ml0lA4wB
+         +sQdOTnf9//oWm1tlQ3Qqm85zJRSHE0PTVCpQzAkeyYiZqlfw0fAACaMDMwTFl1QxBoV
+         PtYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768235641; x=1768840441;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KuJVkRWTkGkTXSTXinl6EKTHqtS+lO+xdjv/rVIuI/Q=;
+        b=W8ZB/eNkYaXnR1wj9CLGjcIjb9q1gFMEKg4t69YXA3qE5WkpM1loB2zIwcSf6oPqda
+         PCg3Q5YTPU2oHM8LZs1EN0Q2NtdzKs765POmW+7XVIcLv4+DMI5GXeAkseMuMIpXbHHD
+         oS+xD/oLUumySU9ezuttU2sztvkj2DxGbtlQAB8XD9hMHwcfJnE9iLZ0zWRKl/Kobl88
+         usAxOw+ZDNSaQmFFttJF4ysNk0S/PCQedkNs304JVG/7xI68q069ClfWmnaowN+Hppr4
+         O2C8N7ALFl0oJYGGX/NM9iRg4AUBrZXw+0qvdI58i9Dgo7A8lFYOcCzphxdhFOWM4FG3
+         eRYQ==
+X-Gm-Message-State: AOJu0Yy4TPx+WCbaTVhp9qMOtOMEYF4RhKxQw93RchKYxv6A2r0J2e03
+	RzPJLMlsCFNjtEgMOxZlkfprGYziYVp7t0RxeuZojuBqEXjSBHekAAjZexFRFQ==
+X-Gm-Gg: AY/fxX7gBNiTCjWsZOtu5+3zqVZ1MpgSRx7KU1m16pD7Efg5yI7ctUVnL0BV7ABX3Gf
+	NkBXGzfRHoQwXNee+2/l9yp4zmiqp2DM8W0boTv8EOVmZviSc8WRKi0cIk5uIG0lMBFiddapqUy
+	wON9JmCbSkgXQ7uVM/YEfyggeJ6i3n3OVJNTPEI7iol+vTSCT4pUimvcfHrP4I0guSeg8vSGTxh
+	+2bj6KrY85zAcqs9MIijoMWTYwtYXihkrf34NwVrajJ0SmREP/eIm3OkTkSuNpBi6vcuEe2L0H+
+	oBl52B6QGWsL1sG0Z/GJlV7WnOGBsXS+IkHkVToPyWhpN5p0hI76+7ONBBBso0a2yXOAByV3orx
+	qdpQJ/21mh+reS6ACS4vyk8A/gABRwh3cZsM17auOyAnnghCdqLXIh1mSdc9ypygxqf6ry5pPl+
+	wyx8dnp/4WR2UI4MXRVg0F/TWhhZn8ZoQsL93ApIKP2AtguYRkrKkk7FYpk51Eh01AeXfFDNV6f
+	DOydiJbHg==
+X-Google-Smtp-Source: AGHT+IHwCAsygqtGFPRDkA2lpMh2n1Jks08uLWVmcs8Ruowj98Oq2HZmppb7RJ2spxJlhQnmaa8tKw==
+X-Received: by 2002:a05:690c:6605:b0:786:7a54:4624 with SMTP id 00721157ae682-790b57238dfmr346819387b3.7.1768235641256;
+        Mon, 12 Jan 2026 08:34:01 -0800 (PST)
+Received: from willemb.c.googlers.com.com (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-790aa58f9f5sm69610607b3.24.2026.01.12.08.34.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jan 2026 08:34:00 -0800 (PST)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next] selftests: net: reduce txtimestamp deschedule flakes
+Date: Mon, 12 Jan 2026 11:33:39 -0500
+Message-ID: <20260112163355.3510150-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v7 2/9] ptr_ring: add helper to detect newly freed
- space on consume
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, eperezma@redhat.com,
-        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
-        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux.dev
-References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
- <20260107210448.37851-3-simon.schippers@tu-dortmund.de>
- <20260109021023-mutt-send-email-mst@kernel.org>
- <a0d5d875-9a9c-4bfe-8943-c7b28185c083@tu-dortmund.de>
- <20260109033028-mutt-send-email-mst@kernel.org>
- <7a093d8f-4822-49b4-bd0e-6b9885fc87a0@tu-dortmund.de>
-Content-Language: en-US
-In-Reply-To: <7a093d8f-4822-49b4-bd0e-6b9885fc87a0@tu-dortmund.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 1/9/26 10:06, Simon Schippers wrote:
-> On 1/9/26 09:31, Michael S. Tsirkin wrote:
->> On Fri, Jan 09, 2026 at 08:35:31AM +0100, Simon Schippers wrote:
->>> On 1/9/26 08:22, Michael S. Tsirkin wrote:
->>>> On Wed, Jan 07, 2026 at 10:04:41PM +0100, Simon Schippers wrote:
->>>>> This proposed function checks whether __ptr_ring_zero_tail() was invoked
->>>>> within the last n calls to __ptr_ring_consume(), which indicates that new
->>>>> free space was created. Since __ptr_ring_zero_tail() moves the tail to
->>>>> the head - and no other function modifies either the head or the tail,
->>>>> aside from the wrap-around case described below - detecting such a
->>>>> movement is sufficient to detect the invocation of
->>>>> __ptr_ring_zero_tail().
->>>>>
->>>>> The implementation detects this movement by checking whether the tail is
->>>>> at most n positions behind the head. If this condition holds, the shift
->>>>> of the tail to its current position must have occurred within the last n
->>>>> calls to __ptr_ring_consume(), indicating that __ptr_ring_zero_tail() was
->>>>> invoked and that new free space was created.
->>>>>
->>>>> This logic also correctly handles the wrap-around case in which
->>>>> __ptr_ring_zero_tail() is invoked and the head and the tail are reset
->>>>> to 0. Since this reset likewise moves the tail to the head, the same
->>>>> detection logic applies.
->>>>>
->>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
->>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
->>>>> ---
->>>>>  include/linux/ptr_ring.h | 13 +++++++++++++
->>>>>  1 file changed, 13 insertions(+)
->>>>>
->>>>> diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
->>>>> index a5a3fa4916d3..7cdae6d1d400 100644
->>>>> --- a/include/linux/ptr_ring.h
->>>>> +++ b/include/linux/ptr_ring.h
->>>>> @@ -438,6 +438,19 @@ static inline int ptr_ring_consume_batched_bh(struct ptr_ring *r,
->>>>>  	return ret;
->>>>>  }
->>>>>  
->>>>> +/* Returns true if the consume of the last n elements has created space
->>>>> + * in the ring buffer (i.e., a new element can be produced).
->>>>> + *
->>>>> + * Note: Because of batching, a successful call to __ptr_ring_consume() /
->>>>> + * __ptr_ring_consume_batched() does not guarantee that the next call to
->>>>> + * __ptr_ring_produce() will succeed.
->>>>
->>>>
->>>> I think the issue is it does not say what is the actual guarantee.
->>>>
->>>> Another issue is that the "Note" really should be more prominent,
->>>> it really is part of explaining what the functions does.
->>>>
->>>> Hmm. Maybe we should tell it how many entries have been consumed and
->>>> get back an indication of how much space this created?
->>>>
->>>> fundamentally
->>>> 	 n - (r->consumer_head - r->consumer_tail)?
->>>
->>> No, that is wrong from my POV.
->>>
->>> It always creates the same amount of space which is the batch size or
->>> multiple batch sizes (or something less in the wrap-around case). That is
->>> of course only if __ptr_ring_zero_tail() was executed at least once,
->>> else it creates zero space.
->>
->> exactly, and caller does not know, and now he wants to know so
->> we add an API for him to find out?
->>
->> I feel the fact it's a binary (batch or 0) is an implementation
->> detail better hidden from user.
-> 
-> I agree, and I now understood your logic :)
-> 
-> So it should be:
-> 
-> static inline int __ptr_ring_consume_created_space(struct ptr_ring *r,
-> 						   int n)
-> {
-> 	return max(n - (r->consumer_head - r->consumer_tail), 0);
-> }
-> 
-> Right?
+From: Willem de Bruijn <willemb@google.com>
 
-BTW:
+This test occasionally fails due to exceeding timing bounds, as
+run in continuous testing on netdev.bots:
 
-No, that's still not correct. It misses the elements between the tail and
-head that existed before the consume operation (called pre_consume_gap in
-the code below).
+  https://netdev.bots.linux.dev/contest.html?test=txtimestamp-sh
 
-After thinking about it a bit more, the best solution I came up with is:
+A common pattern is a single elevated delay between USR and SND.
 
-static inline int __ptr_ring_consume_created_space(struct ptr_ring *r,
-						   int n)
-{
-	int pre_consume_gap = (r->head - n) % r->size % r->batch;
-	return n - (r->head - r->tail) + pre_consume_gap;
-}
+    # 8.36 [+0.00] test SND
+    # 8.36 [+0.00]     USR: 1767864384 s 240994 us (seq=0, len=0)
+    # 8.44 [+0.08] ERROR: 18461 us expected between 10000 and 18000
+    # 8.44 [+0.00]     SND: 1767864384 s 259455 us (seq=42, len=10)  (USR +18460 us)
+    # 8.52 [+0.07]     SND: 1767864384 s 339523 us (seq=42, len=10)  (USR +10005 us)
+    # 8.52 [+0.00]     USR: 1767864384 s 409580 us (seq=0, len=0)
+    # 8.60 [+0.08]     SND: 1767864384 s 419586 us (seq=42, len=10)  (USR +10005 us)
+    # 8.60 [+0.00]     USR: 1767864384 s 489645 us (seq=0, len=0)
+    # 8.68 [+0.08]     SND: 1767864384 s 499651 us (seq=42, len=10)  (USR +10005 us)
+    # 8.68 [+0.00]     USR-SND: count=4, avg=12119 us, min=10005 us, max=18460 us
 
-Here, (r->head - n) represents the head position before the consume, but
-it may be negative. The first modulo normalizes it to a positive value in
-the range [0, size). Applying the modulo batch to the pre-consume head
-position then yields the number of elements that were between the tail
-and head before the consume.
+(Note that other delays are nowhere near the large 8ms tolerance.)
 
-With this approach, we no longer need max(..., 0), because if
-n < (r->head - r->tail), the + pre_consume_gap term cancels it out.
+One hypothesis is that the task is descheduled between taking the USR
+timestamp and sending the packet. Possibly in printing.
 
+Delay taking the timestamp closer to sendmsg, and delay printing until
+after sendmsg.
 
-Is this solution viable in terms of performance regarding the modulo
-operations?
+With this change, failure rate is significantly lower in current runs.
 
-> 
->>
->>
->>
->>>>
->>>>
->>>> does the below sound good maybe?
->>>>
->>>> /* Returns the amound of space (number of new elements that can be
->>>>  * produced) that calls to ptr_ring_consume created.
->>>>  *
->>>>  * Getting n entries from calls to ptr_ring_consume() /
->>>>  * ptr_ring_consume_batched() does *not* guarantee that the next n calls to
->>>>  * ptr_ring_produce() will succeed.
->>>>  *
->>>>  * Use this function after consuming n entries to get a hint about
->>>>  * how much space was actually created.
->>>>
->>>>
->>>>
->>>>
->>>>
->>>>> + */
->>>>> +static inline bool __ptr_ring_consume_created_space(struct ptr_ring *r,
->>>>> +						    int n)
->>>>> +{
->>>>> +	return r->consumer_head - r->consumer_tail < n;
->>>>> +}
->>>>> +
->>>>>  /* Cast to structure type and call a function without discarding from FIFO.
->>>>>   * Function must return a value.
->>>>>   * Callers must take consumer_lock.
->>>>> -- 
->>>>> 2.43.0
->>>>
->>
+Link: https://lore.kernel.org/netdev/20260107110521.1aab55e9@kernel.org/
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Willem de Bruijn <willemb@google.com>
+---
+ tools/testing/selftests/net/txtimestamp.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/tools/testing/selftests/net/txtimestamp.c b/tools/testing/selftests/net/txtimestamp.c
+index bcc14688661d..170be192f5c7 100644
+--- a/tools/testing/selftests/net/txtimestamp.c
++++ b/tools/testing/selftests/net/txtimestamp.c
+@@ -206,12 +206,10 @@ static void __print_timestamp(const char *name, struct timespec *cur,
+ 	fprintf(stderr, "\n");
+ }
+ 
+-static void print_timestamp_usr(void)
++static void record_timestamp_usr(void)
+ {
+ 	if (clock_gettime(CLOCK_REALTIME, &ts_usr))
+ 		error(1, errno, "clock_gettime");
+-
+-	__print_timestamp("  USR", &ts_usr, 0, 0);
+ }
+ 
+ static void print_timestamp(struct scm_timestamping *tss, int tstype,
+@@ -599,8 +597,6 @@ static void do_test(int family, unsigned int report_opt)
+ 			fill_header_udp(buf + off, family == PF_INET);
+ 		}
+ 
+-		print_timestamp_usr();
+-
+ 		iov.iov_base = buf;
+ 		iov.iov_len = total_len;
+ 
+@@ -655,10 +651,14 @@ static void do_test(int family, unsigned int report_opt)
+ 
+ 		}
+ 
++		record_timestamp_usr();
++
+ 		val = sendmsg(fd, &msg, 0);
+ 		if (val != total_len)
+ 			error(1, errno, "send");
+ 
++		__print_timestamp("  USR", &ts_usr, 0, 0);
++
+ 		/* wait for all errors to be queued, else ACKs arrive OOO */
+ 		if (cfg_sleep_usec)
+ 			usleep(cfg_sleep_usec);
+-- 
+2.52.0.457.g6b5491de43-goog
+
 
