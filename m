@@ -1,78 +1,77 @@
-Return-Path: <netdev+bounces-249139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1616DD14BA8
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 19:21:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D210D14BB4
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 19:21:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0B8F130953BA
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 18:17:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8742C301A499
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 18:17:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2FCD3815C1;
-	Mon, 12 Jan 2026 18:17:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B38F387596;
+	Mon, 12 Jan 2026 18:17:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hf37x+/B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hd8xi1Vn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5100930F931
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 18:17:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31B2637F8A0
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 18:17:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768241863; cv=none; b=pO3ySPB8h8xuWfYXJwC2eO1UhFIspnX84QFnj90PZ/7ThZGdPclIVMvEzWV+EkTSzIlkuACIUdHQxVhaK7+YLF4JXlq0VvrRMVIYGTDqZQOX5aSL8NN4t3dh2mnoaLj/j7RRpk088vw5p+Q+3m9bJi9x5jiNPCaElooxWk/lZIo=
+	t=1768241873; cv=none; b=RwnfXd23sjeFH5GjTxuP3RvXniPMgRfJJKi0jTFnTvzFSzXZHnuyFKpHuGBKDOWMSBNzMcTixNCtFabVOMvZqwXzly/njBBfv70pVc3Z/eIEeNSVQIx9aN71B6HlCVk2mCdYSjb65++CSH9pc1ThU1d9qfymgwdklEuVlNg9HQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768241863; c=relaxed/simple;
-	bh=2Sqpis1K0LSL/WFSvtY09l86+t1Bt2h1wW9J0JxvOs0=;
+	s=arc-20240116; t=1768241873; c=relaxed/simple;
+	bh=7+9/4nymDsorNrdw/Y+cdaz+q2znF/7yqtVvfiRWfiw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CkHGrRtbv2fwd2LCZHhr8aLfXnyq0G4z/d5HOIJr2DVo+2D74IAo3/BWcVv+XaDLYTliCWzTAPNSTHvtsMkE7nOqYG/1bhiYGiowr7+PNWZ8/y18Gdiaxm8iZJmNHvQqDQiUIms3kBwjUQnw1qx8A4Sqh7b2AOSfMNm9S/TWCgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hf37x+/B; arc=none smtp.client-ip=209.85.216.52
+	 MIME-Version; b=analr3qoiUOzklYCV3W3QP6ra/ZUOr0LWA2hZZinsgDUSydyiFqyfhTrcS88IKeXQ6vxyHJGVTVMn05o2iZqMiWGBxJZ/WH/UZGzfpsi+U4eDT3vATm7pA4zPq1KEMXMsyX1n5cEsCvsgNgMR47lIuWNoVslacbViXKpS9hR2VM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hd8xi1Vn; arc=none smtp.client-ip=209.85.215.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-34f634dbfd6so4811500a91.2
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 10:17:42 -0800 (PST)
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-c13771b2cf9so5064654a12.1
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 10:17:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768241862; x=1768846662; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1768241871; x=1768846671; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=el5UxGKyuVvQQYU13vsmsSfuItrkm2KM2pfP5FWsHjg=;
-        b=hf37x+/By0SXrsXwEiQ/Q2Lu3GotwIJu0BtSLx8dTlFZCKGSx7d4+UwGmC7Rr+E73w
-         VkEz7YfMkgm59DiRLoL3u4rQV4JQTnxNbrF3F/jXXL/X4XyiU/knYw3MO5+Oc2DMBf63
-         axKdfcekRyXOl9u7Ix2qj89X6BRDOe2BdGVcPHTuSugkvTVZHi9P6wWig638cZRoa5WI
-         HQ2OwbG/0KUA/oxX07YYaSQNGZRxvTuhLUZOR+a5jowFuNoQOYYRILt7QG2ZAOtkcrOw
-         sKyMQDgKdD83bi7zSoTbDpuIxxk6DHRfuL/acx8WhZbbp30LcHHaTD0594DjayxbER0y
-         SW8A==
+        bh=4iPYz0c2/YOE9HPEJLTZDgF+3tXabqT+BOwl+/nVPFU=;
+        b=Hd8xi1Vnh+6zvIHokUglamIp/naaI75931XzAkT5eWpqdiCmshuGNm5NuPbcoBvdQs
+         t9AZaUSFkhtvX5HIK7mpP0OJ1AqTctBtNwYdvOYob7GkNU97MN8+fzkL4Hut3M+4hich
+         jqHi9BKrr0uS2ym7fUcuO6Hi9Qxfw6SnBGH+pBRq0OlySkRL2eZCysygfR6SuCXmdali
+         zo67FRw4v2orkuWU1kxyhkaf4ippko5LwYofu8/q0YJrX16OnmT1194iuaSzd8oQ0wwc
+         txMBd6VQ2QR3ixPH5JClX/vIvtpUtDW5CssChYuy0Gx3ipuWjTtV+mPJP4PBJi6dWpoA
+         YQag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768241862; x=1768846662;
+        d=1e100.net; s=20230601; t=1768241871; x=1768846671;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=el5UxGKyuVvQQYU13vsmsSfuItrkm2KM2pfP5FWsHjg=;
-        b=HiuxQluKtUvCMzgD5yGash366CZg8Y1A+0+LMLnRTPnZ5Td/3woxJmrM2yBOVKT3sf
-         gKJGw9Z0UtcFiY8qJWrEO/QmeJhSDNylvNYfYx66BJ1fWIKpxPIrijjKxINvf94dOCs2
-         emSaVN8OlmpP11yr2VJ8e3YABdMnEQtzChiO5CXboA70ZSIy2/uGvrLR+XgY6eqcKgM9
-         vXrrYS8Gw8nr2aqDmUna+vua5yV5cCdiaGeEzKNEIER8eH8bMA/YVJIx/gB5h/cZnXc0
-         9NN2AqeduN/KPXrrjBl/lt/CRs5P2676SBqFZ8UvkrAfjx/sXgMmCKVDbAJiqb7U2EcI
-         oFeA==
-X-Forwarded-Encrypted: i=1; AJvYcCWG2R76DOQ26XqZJdDotB0xQkpTcUbu/4ESQxWkRMWjJ28t/TEUbdV9/h2lr8gAWBRwhxQKs74=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnGQynGXRRjqi304NZDOqNYWj0rFOQxZI+bLs6tKJ6vgzwU0Mc
-	Gegqow9sry98cp2dKhH7lWuO5Zz4dSgl/HTiytAo/bWlBPV0mZ6O1e9z
-X-Gm-Gg: AY/fxX5g0AFJluhl5/lObPpcbpd0epLJmF4R0e8C+YlJZYYSKcpfMxkDMXBIdzT7fa8
-	BFgojSpebJlfI4Y+Mk7LwewmDL+1MwAKQ7zE9ZX740IxrkvVb8pfuQKX7qIs6F5NMG8BF8KTWvU
-	YOwQOlp7ZHtRUcXDI2lQlWeJ+jI6b2BpYC6n4Gs6BJKdfsp23xlbprT0JHwvSsNcLbmPRSdic9O
-	mp/SER7V/Z1Y46IUWZqt+IPB13SWsF9Tw1TCX5VjSEKOBKX34iQj3Z5fFvrpbBK9iy8YsYnApUs
-	E+Yq2t8rKMFaVf+8gdDkeJEAWZ2DpIUZp8zYDXItxUbOYoKqZNHucLnF6HL7t4+IWV79QOBPX1f
-	quprPk5Z40E3sAslbeJtLU053j2FNxPrCrTlEkmL981Z3ljZGKc9zCV0jZYdOj3USLWvbdTfeMl
-	8emm7K4SU5hg5zxcmtPCBHyL0yWWNrYcrajQqkvnC/Q7GV8b2AoYv0DpbugMgyPNEMPUdTmLk29
-	jEy
-X-Google-Smtp-Source: AGHT+IGw8c/ge0kogLSvooJ8T05HpwWG8XaZIOQXBwEzKsqUzkn4DfT0BloqE2l57lQqyy6/HPMuNg==
-X-Received: by 2002:a17:90b:2692:b0:34c:99d6:175d with SMTP id 98e67ed59e1d1-34f68c30794mr16139992a91.2.1768241861645;
-        Mon, 12 Jan 2026 10:17:41 -0800 (PST)
+        bh=4iPYz0c2/YOE9HPEJLTZDgF+3tXabqT+BOwl+/nVPFU=;
+        b=XwTaBa5ZGxNue+eWSpfMOfVxVRonZY3fmXkLcoouL7smeiEY+Xvm5UYsJB5k+M4NL8
+         XDRqxeE9prNOQfQabbCHmVhROGOb06lUgcg2jjyGl2xPhjSE15HZ8Dnw/KCFhNsN9CcB
+         MvpgcAZMAcovYwVNemf/7SzvJs8ektuuBfkWYdPho8CGWgM4h1uCn4CLZqMBxeXKYffk
+         t+6j4S2QFKtXl99H6xzLlYiDUeEPLDG1Q/ub+zPJzRCowxOpf+a2jIuqdwZ1f3nHWyUd
+         a8uYr0kPD03O5S/qP1xsjdEu8CTHG7XbOpwMXuHN8T6qW37heT/GGb7yvNNHVg/Zdabz
+         rJhw==
+X-Forwarded-Encrypted: i=1; AJvYcCU+QiAOQGJvGmD/HmKof8geirniX9ORiD+2ifdSyWfw72MNAZrxfTe4EginhkBRfc7plAQDmrI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCOsTXD78FPPMBDca8JfPXQPJvclGJoTcKDsTa24LzMNvAnc1o
+	LigYBOQ+GtyetFyM45VKHijb4fxmb1DsIZ3NUUttKFEaX6ny6vn6o70e
+X-Gm-Gg: AY/fxX7P4OStXf+z84s4yP6/ryXwsqMJx0VLzC5OjQzgnYo04j/xkuPRrR1MO8cm0iT
+	uvmCxfOMxiUpaMIGbndBCqK40Tim+JZ/7ZoZjQgtJj6nLfnx6e/1EeuSgfXmenOZq9WEFZskAkq
+	WGMcIyYuwkFBPBQs+r5F5hE6hJmjvsE2lUa/rybB20Zhil30w3+4fV+hWgDyRIKP68C6I4c7YRY
+	Nh/zydYhZ4uEfRY9s0JxFlih6idQTFoPOyk4jH3+W9HQu4Q0DuOZn1TeWV+s87zbEdEfF1ftnB2
+	UD4dq2iyriD5j+HyCI0gyxmFQz8YWZL3su6CglZ7XXgyUCQywsx7b/4G1tYNvP74rX1Mwczcf00
+	cW2eDRUvh5NOTBkvwqqeHttqef5uNzsnoPKhAP2ChsOpyZfgdAMRRk8IQtpZblxzsUXmqBYihiI
+	KapkwhFaJjXe8L+BE3zNCeKO4sbZFOPNtxQUu8Ft7t+TqvTBCXy1FpuFP0Qbrd+OhrxA==
+X-Google-Smtp-Source: AGHT+IFiK1jweRQzBOm3ZEpB+UiR7srhpNL+qg9Y/k0eatbaDQCE66uWR/fEIuhnV//+2MGMla7rxw==
+X-Received: by 2002:a17:90b:5628:b0:34a:8c77:d386 with SMTP id 98e67ed59e1d1-34f68c91bbemr16740424a91.9.1768241871384;
+        Mon, 12 Jan 2026 10:17:51 -0800 (PST)
 Received: from localhost.localdomain ([122.183.54.120])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34f5f7c4141sm18165365a91.6.2026.01.12.10.17.34
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34f5f7c4141sm18165365a91.6.2026.01.12.10.17.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jan 2026 10:17:41 -0800 (PST)
+        Mon, 12 Jan 2026 10:17:50 -0800 (PST)
 From: I Viswanath <viswanathiyyappan@gmail.com>
 To: edumazet@google.com,
 	horms@kernel.org,
@@ -93,9 +92,9 @@ Cc: bcm-kernel-feedback-list@broadcom.com,
 	virtualization@lists.linux.dev,
 	netdev@vger.kernel.org,
 	I Viswanath <viswanathiyyappan@gmail.com>
-Subject: [PATCH net-next v8 5/6] vmxnet3: Implement ndo_write_rx_mode callback
-Date: Mon, 12 Jan 2026 23:46:25 +0530
-Message-ID: <20260112181626.20117-6-viswanathiyyappan@gmail.com>
+Subject: [PATCH net-next v8 6/6] pcnet32: Implement ndo_write_rx_mode callback
+Date: Mon, 12 Jan 2026 23:46:26 +0530
+Message-ID: <20260112181626.20117-7-viswanathiyyappan@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260112181626.20117-1-viswanathiyyappan@gmail.com>
 References: <20260112181626.20117-1-viswanathiyyappan@gmail.com>
@@ -112,108 +111,151 @@ deferred write model
 
 Signed-off-by: I Viswanath <viswanathiyyappan@gmail.com>
 ---
- drivers/net/vmxnet3/vmxnet3_drv.c | 38 ++++++++++++++++++++++---------
- 1 file changed, 27 insertions(+), 11 deletions(-)
+ This is a very weird driver in that it calls pcnet32_load_multicast to set up
+ the mc filter registers instead of the set_rx_mode callback in ndo_open.
+ I can't find a single other driver that does that.
+ 
+ Apart from that, I don't think it makes sense for the (now) write_rx_mode 
+ callback to call netif_wake_queue(). Correct me if I am wrong here.
+ 
+ drivers/net/ethernet/amd/pcnet32.c | 57 ++++++++++++++++++++++--------
+ 1 file changed, 43 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/net/vmxnet3/vmxnet3_drv.c b/drivers/net/vmxnet3/vmxnet3_drv.c
-index 0572f6a9bdb6..fe76f6a2afea 100644
---- a/drivers/net/vmxnet3/vmxnet3_drv.c
-+++ b/drivers/net/vmxnet3/vmxnet3_drv.c
-@@ -2775,18 +2775,18 @@ static u8 *
- vmxnet3_copy_mc(struct net_device *netdev)
+diff --git a/drivers/net/ethernet/amd/pcnet32.c b/drivers/net/ethernet/amd/pcnet32.c
+index 9eaefa0f5e80..8bb0bb3da789 100644
+--- a/drivers/net/ethernet/amd/pcnet32.c
++++ b/drivers/net/ethernet/amd/pcnet32.c
+@@ -314,8 +314,9 @@ static void pcnet32_tx_timeout(struct net_device *dev, unsigned int txqueue);
+ static irqreturn_t pcnet32_interrupt(int, void *);
+ static int pcnet32_close(struct net_device *);
+ static struct net_device_stats *pcnet32_get_stats(struct net_device *);
+-static void pcnet32_load_multicast(struct net_device *dev);
++static void pcnet32_load_multicast(struct net_device *dev, bool is_open);
+ static void pcnet32_set_multicast_list(struct net_device *);
++static void pcnet32_write_multicast_list(struct net_device *);
+ static int pcnet32_ioctl(struct net_device *, struct ifreq *, int);
+ static void pcnet32_watchdog(struct timer_list *);
+ static int mdio_read(struct net_device *dev, int phy_id, int reg_num);
+@@ -1580,6 +1581,7 @@ static const struct net_device_ops pcnet32_netdev_ops = {
+ 	.ndo_tx_timeout		= pcnet32_tx_timeout,
+ 	.ndo_get_stats		= pcnet32_get_stats,
+ 	.ndo_set_rx_mode	= pcnet32_set_multicast_list,
++	.ndo_write_rx_mode	= pcnet32_write_multicast_list,
+ 	.ndo_eth_ioctl		= pcnet32_ioctl,
+ 	.ndo_set_mac_address 	= eth_mac_addr,
+ 	.ndo_validate_addr	= eth_validate_addr,
+@@ -2264,7 +2266,7 @@ static int pcnet32_open(struct net_device *dev)
+ 
+ 	lp->init_block->mode =
+ 	    cpu_to_le16((lp->options & PCNET32_PORT_PORTSEL) << 7);
+-	pcnet32_load_multicast(dev);
++	pcnet32_load_multicast(dev, true);
+ 
+ 	if (pcnet32_init_ring(dev)) {
+ 		rc = -ENOMEM;
+@@ -2680,18 +2682,26 @@ static struct net_device_stats *pcnet32_get_stats(struct net_device *dev)
+ }
+ 
+ /* taken from the sunlance driver, which it took from the depca driver */
+-static void pcnet32_load_multicast(struct net_device *dev)
++static void pcnet32_load_multicast(struct net_device *dev, bool is_open)
  {
- 	u8 *buf = NULL;
--	u32 sz = netdev_mc_count(netdev) * ETH_ALEN;
-+	u32 sz = netif_rx_mode_mc_count(netdev) * ETH_ALEN;
+ 	struct pcnet32_private *lp = netdev_priv(dev);
+ 	volatile struct pcnet32_init_block *ib = lp->init_block;
+ 	volatile __le16 *mcast_table = (__le16 *)ib->filter;
+ 	struct netdev_hw_addr *ha;
 +	char *ha_addr;
-+	int ni;
++	bool allmulti;
+ 	unsigned long ioaddr = dev->base_addr;
+-	int i;
++	int i, ni;
+ 	u32 crc;
  
- 	/* struct Vmxnet3_RxFilterConf.mfTableLen is u16. */
- 	if (sz <= 0xffff) {
- 		/* We may be called with BH disabled */
- 		buf = kmalloc(sz, GFP_ATOMIC);
- 		if (buf) {
--			struct netdev_hw_addr *ha;
- 			int i = 0;
--
--			netdev_for_each_mc_addr(ha, netdev)
--				memcpy(buf + i++ * ETH_ALEN, ha->addr,
-+			netif_rx_mode_for_each_mc_addr(ha_addr, netdev, ni)
-+				memcpy(buf + i++ * ETH_ALEN, ha_addr,
- 				       ETH_ALEN);
- 		}
- 	}
-@@ -2796,8 +2796,23 @@ vmxnet3_copy_mc(struct net_device *netdev)
++	if (is_open)
++		allmulti = dev->flags & IFF_ALLMULTI;
++	else
++		allmulti = netif_rx_mode_get_cfg(dev,
++						 NETIF_RX_MODE_CFG_ALLMULTI);
++
+ 	/* set all multicast bits */
+-	if (dev->flags & IFF_ALLMULTI) {
++	if (allmulti) {
+ 		ib->filter[0] = cpu_to_le32(~0U);
+ 		ib->filter[1] = cpu_to_le32(~0U);
+ 		lp->a->write_csr(ioaddr, PCNET32_MC_FILTER, 0xffff);
+@@ -2705,20 +2715,40 @@ static void pcnet32_load_multicast(struct net_device *dev)
+ 	ib->filter[1] = 0;
  
- static void
- vmxnet3_set_mc(struct net_device *netdev)
+ 	/* Add addresses */
+-	netdev_for_each_mc_addr(ha, dev) {
+-		crc = ether_crc_le(6, ha->addr);
+-		crc = crc >> 26;
+-		mcast_table[crc >> 4] |= cpu_to_le16(1 << (crc & 0xf));
+-	}
++	if (is_open)
++		netdev_for_each_mc_addr(ha, dev) {
++			crc = ether_crc_le(6, ha->addr);
++			crc = crc >> 26;
++			mcast_table[crc >> 4] |= cpu_to_le16(1 << (crc & 0xf));
++		}
++	else
++		netif_rx_mode_for_each_mc_addr(ha_addr, dev, ni) {
++			crc = ether_crc_le(6, ha_addr);
++			crc = crc >> 26;
++			mcast_table[crc >> 4] |= cpu_to_le16(1 << (crc & 0xf));
++		}
++
+ 	for (i = 0; i < 4; i++)
+ 		lp->a->write_csr(ioaddr, PCNET32_MC_FILTER + i,
+ 				le16_to_cpu(mcast_table[i]));
+ }
+ 
++static void pcnet32_set_multicast_list(struct net_device *dev)
 +{
-+	bool allmulti = !!(netdev->flags & IFF_ALLMULTI);
-+	bool promisc = !!(netdev->flags & IFF_PROMISC);
-+	bool broadcast = !!(netdev->flags & IFF_BROADCAST);
++	bool allmulti = !!(dev->flags & IFF_ALLMULTI);
++	bool promisc = !!(dev->flags & IFF_PROMISC);
 +
-+	netif_rx_mode_set_flag(netdev, NETIF_RX_MODE_UC_SKIP, true);
-+	netif_rx_mode_set_flag(netdev, NETIF_RX_MODE_MC_SKIP, allmulti);
++	netif_rx_mode_set_flag(dev, NETIF_RX_MODE_UC_SKIP, true);
++	netif_rx_mode_set_flag(dev, NETIF_RX_MODE_MC_SKIP, promisc | allmulti);
 +
-+	netif_rx_mode_set_cfg(netdev, NETIF_RX_MODE_CFG_ALLMULTI, allmulti);
-+	netif_rx_mode_set_cfg(netdev, NETIF_RX_MODE_CFG_PROMISC, promisc);
-+	netif_rx_mode_set_cfg(netdev, NETIF_RX_MODE_CFG_BROADCAST, broadcast);
++	netif_rx_mode_set_cfg(dev, NETIF_RX_MODE_CFG_ALLMULTI, allmulti);
++	netif_rx_mode_set_cfg(dev, NETIF_RX_MODE_CFG_PROMISC, promisc);
 +}
 +
-+static void vmxnet3_write_mc(struct net_device *netdev)
+ /*
+  * Set or clear the multicast filter for this adaptor.
+  */
+-static void pcnet32_set_multicast_list(struct net_device *dev)
++static void pcnet32_write_multicast_list(struct net_device *dev)
  {
- 	struct vmxnet3_adapter *adapter = netdev_priv(netdev);
-+	int mc_count = netif_rx_mode_mc_count(netdev);
- 	unsigned long flags;
- 	struct Vmxnet3_RxFilterConf *rxConf =
- 					&adapter->shared->devRead.rxFilterConf;
-@@ -2806,7 +2821,7 @@ vmxnet3_set_mc(struct net_device *netdev)
- 	bool new_table_pa_valid = false;
- 	u32 new_mode = VMXNET3_RXM_UCAST;
- 
--	if (netdev->flags & IFF_PROMISC) {
-+	if (netif_rx_mode_get_cfg(netdev, NETIF_RX_MODE_CFG_PROMISC)) {
- 		u32 *vfTable = adapter->shared->devRead.rxFilterConf.vfTable;
- 		memset(vfTable, 0, VMXNET3_VFT_SIZE * sizeof(*vfTable));
- 
-@@ -2815,16 +2830,16 @@ vmxnet3_set_mc(struct net_device *netdev)
- 		vmxnet3_restore_vlan(adapter);
+ 	unsigned long ioaddr = dev->base_addr, flags;
+ 	struct pcnet32_private *lp = netdev_priv(dev);
+@@ -2727,7 +2757,7 @@ static void pcnet32_set_multicast_list(struct net_device *dev)
+ 	spin_lock_irqsave(&lp->lock, flags);
+ 	suspended = pcnet32_suspend(dev, &flags, 0);
+ 	csr15 = lp->a->read_csr(ioaddr, CSR15);
+-	if (dev->flags & IFF_PROMISC) {
++	if (netif_rx_mode_get_cfg(dev, NETIF_RX_MODE_CFG_PROMISC)) {
+ 		/* Log any net taps. */
+ 		netif_info(lp, hw, dev, "Promiscuous mode enabled\n");
+ 		lp->init_block->mode =
+@@ -2738,7 +2768,7 @@ static void pcnet32_set_multicast_list(struct net_device *dev)
+ 		lp->init_block->mode =
+ 		    cpu_to_le16((lp->options & PCNET32_PORT_PORTSEL) << 7);
+ 		lp->a->write_csr(ioaddr, CSR15, csr15 & 0x7fff);
+-		pcnet32_load_multicast(dev);
++		pcnet32_load_multicast(dev, false);
  	}
  
--	if (netdev->flags & IFF_BROADCAST)
-+	if (netif_rx_mode_get_cfg(netdev, NETIF_RX_MODE_CFG_BROADCAST))
- 		new_mode |= VMXNET3_RXM_BCAST;
- 
--	if (netdev->flags & IFF_ALLMULTI)
-+	if (netif_rx_mode_get_cfg(netdev, NETIF_RX_MODE_CFG_ALLMULTI))
- 		new_mode |= VMXNET3_RXM_ALL_MULTI;
- 	else
--		if (!netdev_mc_empty(netdev)) {
-+		if (mc_count) {
- 			new_table = vmxnet3_copy_mc(netdev);
- 			if (new_table) {
--				size_t sz = netdev_mc_count(netdev) * ETH_ALEN;
-+				size_t sz = mc_count * ETH_ALEN;
- 
- 				rxConf->mfTableLen = cpu_to_le16(sz);
- 				new_table_pa = dma_map_single(
-@@ -3213,7 +3228,7 @@ vmxnet3_activate_dev(struct vmxnet3_adapter *adapter)
+ 	if (suspended) {
+@@ -2746,7 +2776,6 @@ static void pcnet32_set_multicast_list(struct net_device *dev)
+ 	} else {
+ 		lp->a->write_csr(ioaddr, CSR0, CSR0_STOP);
+ 		pcnet32_restart(dev, CSR0_NORMAL);
+-		netif_wake_queue(dev);
  	}
  
- 	/* Apply the rx filter settins last. */
--	vmxnet3_set_mc(adapter->netdev);
-+	netif_schedule_rx_mode_work(adapter->netdev);
- 
- 	/*
- 	 * Check link state when first activating device. It will start the
-@@ -3977,6 +3992,7 @@ vmxnet3_probe_device(struct pci_dev *pdev,
- 		.ndo_get_stats64 = vmxnet3_get_stats64,
- 		.ndo_tx_timeout = vmxnet3_tx_timeout,
- 		.ndo_set_rx_mode = vmxnet3_set_mc,
-+		.ndo_write_rx_mode = vmxnet3_write_mc,
- 		.ndo_vlan_rx_add_vid = vmxnet3_vlan_rx_add_vid,
- 		.ndo_vlan_rx_kill_vid = vmxnet3_vlan_rx_kill_vid,
- #ifdef CONFIG_NET_POLL_CONTROLLER
+ 	spin_unlock_irqrestore(&lp->lock, flags);
 -- 
 2.47.3
 
