@@ -1,302 +1,233 @@
-Return-Path: <netdev+bounces-248940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 489FDD1194C
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 10:46:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68C95D11AA5
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 11:00:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C87AF309539D
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 09:41:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7EE7E3068BD2
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 09:56:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3468349B1E;
-	Mon, 12 Jan 2026 09:41:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 152382765FF;
+	Mon, 12 Jan 2026 09:56:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k4Rg5gtr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KYmzvoA3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1CC34A79D
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 09:41:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768210879; cv=none; b=fIfsndv1wSTxjoU0jWHoqRQ8DayaPjsTCwbnzGN6Z2m8afJ1rNnsZK2hf+DjwROjaVd2uRLzIUaP6Wa0q0jxFk6M5Zh9bbL9gYrjSmM7VIuP2liJV6di10Mqz5CQg+AOSqHhrNO44D1CFvJB1rQSdePtaBjke0EsNWMvGhN7BQg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768210879; c=relaxed/simple;
-	bh=KSC8Nj3DiK31fDmZ4/PzcbAzUlQgw1PwPAvmb/6l8Os=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Aw6YMG7fIVvauTxzUWWnG2vg50bbv5SU/RNIs2GUcoWJ5T0g764W3cgI7JJ+bJpgpm42rs9IpCG//uo6TMPp61ixLNDYQJcZFdWdMyWHEBjai3wSgH9h7VQ2cbLCcXreYfu+WdwilJDAiJsqtRGxwH8gNpD5Sp9brkEQrKPD/yY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k4Rg5gtr; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b87281dbdbcso52711066b.0
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 01:41:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768210874; x=1768815674; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2RFEABt6Iiak9nuJmj7Wxw5Z8I9sCXd9qm2gCXqcVTA=;
-        b=k4Rg5gtrQzZNDFwPEua/3PteELL8IOfQ76OrcxIPrd7hmF3EMtSTW93tIpL+OaBmXl
-         8HL3DUkpewKwM0YM4jx6YxsVegRMX+MxxhNxM3FTlw71JjFCGxMj3lhd2mhsyOg8EfdL
-         Xk2kFp3j4LX47D/v33R/bpeYOwKp7BJDgWgKWGTo5cLd6VqGk1JtdbGCZs39nzjiBBrc
-         RW3speVSWuV45YO0jW+2suJT3b9O7TCsirkbsCuzUney+jq6YXtuRZIlyWESpEBm2I1l
-         JCVXfkdS+d6dQPDh9upvynPl4VfKZLSjTJtCbfKLWiP9+Ox7m4KsvvulkmXGTp4ASwIH
-         SdcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768210874; x=1768815674;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=2RFEABt6Iiak9nuJmj7Wxw5Z8I9sCXd9qm2gCXqcVTA=;
-        b=hmlAmuL1grDZ4hIdC8Bdn0m4NNoOLTH9r2Om1dxRkGen69uuTZfQo3Lawqk2apDguC
-         5X4SDb1aqAOE18e9Iz24w0j1dZzmQPFiXAd7z7T8D0lLgNa7Ix4TSH4QvpFC0qKJvKZk
-         dgk4d23zlBd1Ty3vnJudRjam9tOuPSfGIo6qFh4MQyXs1xrURKJ6ut4v2FPOpdjKnjz7
-         Lz9aRUi6R60vJDujoy8X3hVnrBsr3573AOkndyXrSkzb972W4zPfl4M6pLXwReD3aBR7
-         gwJ1yha5D8FlgUzVF5e5yL2G3yAltw68Y/WtF/KX5dlPua28nZe1dkDtRzRSnY7i3isd
-         hfOQ==
-X-Gm-Message-State: AOJu0Ywok8BoA1d3mMBNinmJrISAd6Q2aLUUbz6Pta1IVXiPP91bQPM3
-	Rb2/Yr5BJjJOKPf6VvRmiP7auEZb72zbp4P8GRsgXBDqJ0J0edValVYA
-X-Gm-Gg: AY/fxX67nsgeKJm1EOjH4sfe/4Pb1lqITjzTC0kqh7HFpFQdokGnUFEcwbu3sYe/qJi
-	6qF/L3WgBjMKNElrxKEB2oeTgHUe3skObchqRoaer+lscRDIe91VYrgmy2tQ5qPm/zqLaMcGPpK
-	Fen5ZNmFgUgBe0C85ZrjJK2zhQAQlQFhGxyLeUWoYVFPZdMhyVkqQQBy1byDDuwL37U//zM6rjK
-	LICZuv15MY8vAbdEuf/zZH7HMT/SQ4lE/SdSbBHEHoO/lgFuBaJBXXaTqV7Xoj4UeZDld7+B5pV
-	0OfA9JwixrZSznW1BUQZ48KXW4iyjvHdDISLriNYIYTidAgBr1ZPXvdWlyvRbG8+Sl14QCmpshZ
-	BSYpp0yFqVOJs+xG1ZShiL4xmreHUOnKk7jYJSRratsaiF6mUKZJw2qGRaYFXDRp7m0fCFkpYDQ
-	kCIADdNJLbDf+H0oz0PFgGpdI1
-X-Google-Smtp-Source: AGHT+IE3wiOXJvIMJw8ueQ9HmSpunkUpmolMVZVGfJsiMnps0ap0V1WAk3+kWd4HECoGsMIKWUcuqw==
-X-Received: by 2002:a17:907:86a5:b0:b87:6d0:df2a with SMTP id a640c23a62f3a-b8706d0e1e9mr437193266b.40.1768210873498;
-        Mon, 12 Jan 2026 01:41:13 -0800 (PST)
-Received: from [192.168.1.243] ([143.58.192.3])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b870bcd342bsm410828766b.56.2026.01.12.01.41.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jan 2026 01:41:12 -0800 (PST)
-From: Andre Carvalho <asantostc@gmail.com>
-Date: Mon, 12 Jan 2026 09:40:58 +0000
-Subject: [PATCH net-next v10 7/7] selftests: netconsole: validate target
- resume
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9030269811
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 09:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768211795; cv=fail; b=YNh3bPKu5NdlC00nUr3sPhCpCSmr3yqekFkro5NQ+l4Y1xFhiACdEncWAzFTQxApFBfhbjlcHPgmESh/Bth6XiPCI3i+cM3/tTmXGPx6wqPXOa3VCiXLQaLvWQSpbe9TkLxGL3nj6QaTWy7x/sVvVQkky5Usk2oefdrn1zVkQfs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768211795; c=relaxed/simple;
+	bh=ZPM9Jir2agNZsy0MMdcBdknr4gM98AbTPqWoM5etetM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=rLz1rpkF9gr+RRZmrz97Y0Pw8NmY75QblDuWIGt9ESqoPeV0ZWudEP7M/daOYvBf1MpGBuTp4pnshDhaGkO+TKqKDRhkUwSem0qFiNQt2ryjMkI0r51ZXHcMREdNHcQp6ZU+GXmuFCzwcTj53ot3mmTBNOmA/BxyT7CiBEL7ujM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KYmzvoA3; arc=fail smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768211794; x=1799747794;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ZPM9Jir2agNZsy0MMdcBdknr4gM98AbTPqWoM5etetM=;
+  b=KYmzvoA3pbzR9+sbiIHDoY/8Y282jrqmUiSTo5fIc1g2r3NP9q/B61Cz
+   t+axJ38aIWUA8ce+AvZbfH4bJLElOgDUQLuYuO7pWqq7YxK+7kt6Re+2g
+   qn1ppnxafPqKmte/4lLqbVMNTLkF3Z6M3F7RxnfimLEYCkE/wWtO0FHa5
+   oE2uutTzuk2x6w+Kzx8NgbWof+Ghh5kGugv6/JhqQsyNAB/+2lcoVBJZv
+   5VpINGwPV1WvP0Vvok2yOVpX4semCwTAjGO62pp7tMJ2qfcd5Sk+2FPW0
+   ZdYc4f08sw76uyR5oB5bRebxuQx66FzVpWtaMb+dJt9BafXNecNleCO8d
+   A==;
+X-CSE-ConnectionGUID: HI8cQpE6SIyuUqp94sd2Sg==
+X-CSE-MsgGUID: MDhFXtIVRPymrchYXU/SZA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11668"; a="69535405"
+X-IronPort-AV: E=Sophos;i="6.21,219,1763452800"; 
+   d="scan'208";a="69535405"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 01:56:33 -0800
+X-CSE-ConnectionGUID: K5FDUU8LTvig+w8IXXAHcw==
+X-CSE-MsgGUID: yKJA4ZcQQ/+Q9FfcscYAOw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,219,1763452800"; 
+   d="scan'208";a="241583497"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 01:56:33 -0800
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Mon, 12 Jan 2026 01:56:32 -0800
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29 via Frontend Transport; Mon, 12 Jan 2026 01:56:32 -0800
+Received: from BL2PR02CU003.outbound.protection.outlook.com (52.101.52.35) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Mon, 12 Jan 2026 01:56:32 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=yG9OluqzW8hrr1c+Sn4du2BgWcUs/RjYM3TnpIDmvuC3ailTltCtdoCzlWy7kmU8uuqFZ9POrM++TqWywOL69MT5p4ICDXTfnki5uaBoYyZ/MwQlWoZe1RC3COkAuqzEzX35hU2Kf4UmgW2N3jkZaM+TEnUDTcm6yGqr6wrMobuiLVJvg17/UiTjMU+vEzdc9fvy3xeV6Kisncs/cZGBwcWDDI5I8T3QOs6s1WWA4WcOChFMwsPtE+TH5h3yB6cNXyLTEfzi5rTILV0dle15Ge0Cl4Bsbo1PeYhSz3p4A3pXqo51OVdCT8eXzkvq+hRmt6x6ffVtJMdaxWmi2Zqw7w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=MhTPAG6fqd9mEqvqInksfqXq8PywgFsMOe5JWneu4AA=;
+ b=XR4P5vEcYcRhdN9qM5iCi+8f4HV4NYd5EoTUYnIHFIOf4KLfIzrKc4jlRnHHzosTCkM1IpkANsB6/N0/+qXP4Sofqg1Ot/oXzXNXIPfMlH4SVZ59E2vgiYcdtw/26oP9L79MomQHQpXPac1G9Qlr6eOENwpswxrbrhd6/T2e4w6Ax82+CeOS/zQPbTKG3OtDMnKeCIA5C0diK2g90vBixIyPcDAaryX67WpmkDYgVeRcBh36SfTVsg0q+iAfqHKq/6IdFdTu4FZ+ET6FBKyKE6jaj4sqiU1bnGo9hnisTqMUtY84RZbAMFAMiJCGPAM2L+wxajDenNwpqUF0hvT5Yw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by DS0PR11MB8071.namprd11.prod.outlook.com (2603:10b6:8:12e::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Mon, 12 Jan
+ 2026 09:56:30 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408%3]) with mapi id 15.20.9499.005; Mon, 12 Jan 2026
+ 09:56:30 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: "Hay, Joshua A" <joshua.a.hay@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Hay, Joshua A"
+	<joshua.a.hay@intel.com>, "Chittim, Madhu" <madhu.chittim@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH net 5/5] idpf: remove obsolete stashing
+ code
+Thread-Topic: [Intel-wired-lan] [PATCH net 5/5] idpf: remove obsolete stashing
+ code
+Thread-Index: AQHb5er4nLFZvRIBDk2LxYPtrkhoHLVPh2Ig
+Date: Mon, 12 Jan 2026 09:56:30 +0000
+Message-ID: <IA3PR11MB8986FA04B2AF34C5810787ABE581A@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20250625161156.338777-1-joshua.a.hay@intel.com>
+ <20250625161156.338777-6-joshua.a.hay@intel.com>
+In-Reply-To: <20250625161156.338777-6-joshua.a.hay@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|DS0PR11MB8071:EE_
+x-ms-office365-filtering-correlation-id: d9b67f40-18fc-49bd-2e3d-08de51c0dc17
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700021|7142099003|7053199007;
+x-microsoft-antispam-message-info: =?us-ascii?Q?Tj7ZsBH2BT/gm8SDqPDtu8MXlX0rjc4spitw7Sf48mg57VuVyDGGdWBGuIOE?=
+ =?us-ascii?Q?d89mFm1Us/EoZ8bds7Ypgs+fbB/E4C5vV4GnYfmNKRfr/QceHW+afW+f+6mj?=
+ =?us-ascii?Q?k0HYnWafKWq2IT2xizbPmD8WdPZYUGNc9i1oo98/kaGiCSZvZtAQ0TRMoMlf?=
+ =?us-ascii?Q?kxpGXgAOgHFbnzU2MDTKnRC5noQ/p7431A0sSg8qyZ9JWNinxcY6zWICB7bO?=
+ =?us-ascii?Q?kHJp1dNDqGo508bkFwSzRAChQySw/zmypxocLCyThlqNFmrP6tCr8+p6ivDt?=
+ =?us-ascii?Q?SvnXR1l5BVg83kbbhC1dIGrWPEYVlQc/d4uz1gdkealiU9Znz+Gwy0TrQNmp?=
+ =?us-ascii?Q?a2rHrzN0oG6gPc11/Zr7o3QaSGoGpLzgcXT8LbALZZC7N119DGSbT6m3xSiv?=
+ =?us-ascii?Q?evylQNTTdcGUGGF+tekA9sIAygR4ef9w5z6KmetskpcDH1vuXUu0G0Hz28Xd?=
+ =?us-ascii?Q?Kprrqwjk/nMVE6Sdqz0TkmErmWuOhcYl2lTKhn60IDvd9B7S5kuagsBQiXUY?=
+ =?us-ascii?Q?4r+7qXlActM4BscOt17LPbADM7EcUQaQCEgy+tZJmX18lchUGaW9x4xPEwif?=
+ =?us-ascii?Q?umVEw/dkUcsWHZDJc90BKXPyBKRTZRbyihk3isAbtglmd5lM2oRZ4BVpkc+x?=
+ =?us-ascii?Q?rRVIRMNtSa3QzrO9COIxAX2k4394Avb0H0w0OESNz+at78WyeMkQfcw5KKQe?=
+ =?us-ascii?Q?YmziXvQNHcSb6zBATsDr46i68tP+1EtB0+gCjl+yYgXxtdZrGoVoldQZB+Iv?=
+ =?us-ascii?Q?Q4wYOBPXdLKUa08FYIWxbomZSjJ8Hd+OE8e/uEqb464ouKIO+DPuc8CvCADZ?=
+ =?us-ascii?Q?ObVaWiB8vcNWmLEGHy6waNEMyLAL2aiXTZtnOvTCDhMO4K20YblaS17IhwE3?=
+ =?us-ascii?Q?5JSUs1ADKmxZgvYJ0rPMeVcGWC0rUT+WGUPJ3/hnlXtPgVqDoSlrMvDS/mSJ?=
+ =?us-ascii?Q?PDLiReeYwsv0EViMaD149iZoGcrnmEvNtkz9qTrZLRVa7RGhbvpLzOX5N35M?=
+ =?us-ascii?Q?0uU4kDOkWxnjCuyjbRXAsoMa4UGsQ6qdC5IfG7vA/eftcwy8TnJ9EpN4xYgC?=
+ =?us-ascii?Q?ndEBA0TmIBMXQOhof6ju78F2l5o30Z00N9Wln7XDN0jahyTwP1e5aBDtLSYZ?=
+ =?us-ascii?Q?b5Sx9TDaSWjBOzZpKD2k6o0FfzgTfXlq5k8E1tOi2ATYrOFh4wMXIk1HHv2h?=
+ =?us-ascii?Q?1Ju/s7wuiS0lX7wVi6SvSye2ADDX11C8PA/h+KD+eYQ3SCS8oufp4+aMAd1y?=
+ =?us-ascii?Q?vabginhQhXxUOStBr2El0nGZxzIWvDGdwl3ON/lSiL9SgFeK4QaDfdTRKs2v?=
+ =?us-ascii?Q?TrRW80ihyzG4WarpltdB6yvo8nottF5MfnWpI56wXIY2ZMavpkex8Kzxmp+j?=
+ =?us-ascii?Q?2g23yiVTGUjRfIrF/jYHZ0gEJMVTBE3TgdxhysPfdD6V9DfAY2STUMxokuZK?=
+ =?us-ascii?Q?SzIbu0nSwIyWFV54XqdmpmjOhtJTIby51LssLsJ+/GJeOIKpnlNNxwm0ngPn?=
+ =?us-ascii?Q?55jdX8Zd+cpn5E95uUFlyg3cmFayPSmimZCY?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700021)(7142099003)(7053199007);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?fwIQ6jQ7pi666oBOTKqfzZfHJzXV7hbV6nrNa8LLxyWuc9xJyDgkUWIyaUNL?=
+ =?us-ascii?Q?vyeQXtci2V9dDByzXuhe5Qcgwt9QrpSFCGjdnWYfqUd/x8E+7xFs32y4kXBt?=
+ =?us-ascii?Q?lKCF2PLCIhZLIf6W4GUkYIQM2qfbKI7/zB0ITfR9o0qMqkgvmRZCLlNW6XUp?=
+ =?us-ascii?Q?8Hu3YOGETfgimDSzuvHL3nOgymwZYm/uqTtOHwJDbBr1xjBC2/hQepoYvNH0?=
+ =?us-ascii?Q?5ASAizZ+UVLW8n9ty5fBy/KjPEGE1+hWM4+Oq2leV26dKBklRl6MGmiU4lyH?=
+ =?us-ascii?Q?+tWrFVX9PmQtngmlgE/h95CT8oXg6DD3N4No0a/AKR0KCktixD3qVaBQtrIx?=
+ =?us-ascii?Q?6lrWyhXfR5cVrPuON2u/21z3zTGphn+r8UpR7K9xxso06RAPWGWtf6veq6+Z?=
+ =?us-ascii?Q?Hi40jK+GUGxkECK6to5Wpf8/KC8HvkLvqOkrZcK6x6aqMxWni7uvQXOTzxGh?=
+ =?us-ascii?Q?WyUWKnmX3pLhZd2jWpjZq1pUoLmgIv1ZJGaGPbVEBxiUbRkeG+hO9iZcDfHk?=
+ =?us-ascii?Q?QfGWWQ3G3yXyNOVNTYQOyZMVYjxgZTlwv8XS1lLns+n4l7T4ZBH8K3KOw+NR?=
+ =?us-ascii?Q?BSHuhelMvE4zbEOGJFe4J2yH/3dB4iIoIr3v2v51vbd1a94T/Xx9JczHpvLg?=
+ =?us-ascii?Q?GARj6Pae+kVeAFCQcuwFTmLt99Ef97igt9A7ts5362VX873sX24h54OoQSCY?=
+ =?us-ascii?Q?UVFuwVFW2u1PvjRm2K57l73dPTKKOOfGiV1DYD4pncbYiOD9NWgSwGlMpBTI?=
+ =?us-ascii?Q?wUfZWss5W10I3rv++pj178zNv9rkiz2cj1CvzrRO/PGBE+VdRKtPOQo1KyXK?=
+ =?us-ascii?Q?XZTaBFT8WpCPu5wReWEhfr9UkcCOJq052g59p+0dbKcviaiVK9fYI+kSkzbo?=
+ =?us-ascii?Q?jUFCT9qBb2zHIwySW7kPRgwmhbq0lcbJ9Y9ZPZQTMet/2+kbr6ZAXiUCvaKc?=
+ =?us-ascii?Q?Nyz0AYlnNLfI8CvAdhZwxqDJstHYWj0IjFq/l2CtO/9+W9688CC9MCfWt5bZ?=
+ =?us-ascii?Q?7m5z8lHh7ml7FU8CIOv1U00esW7eltR8hKWusCgIh2YomPJi4ckeYZ5E9JIN?=
+ =?us-ascii?Q?yzyhfchaZp2kYBc/j5Y5svlsb6KLjYcSPNEoFXLiU6Rc5NmLjkn7ncQV5tMi?=
+ =?us-ascii?Q?y5/OjrCvhUa5BpKOgA/UmRrKYnha0ucLZArtdKXyyio/iFIIMiTpppVKVJky?=
+ =?us-ascii?Q?XqCR+M3VCRIrt8bC6i1A6mCLQe7+qF0BdruqNvPFplUSQaJwlca5eOmIdspC?=
+ =?us-ascii?Q?L/SPF6iy+W5p10xocIT2Y34c5hzgXxBxLnLYFGKucUrQrjk3qftYEb8/oN29?=
+ =?us-ascii?Q?ULfnCi8KbX9Q6RFviruGh5OW6fiGoq6wM+7tNPdKjsWIepOuhMwLjjctFHwp?=
+ =?us-ascii?Q?k4YDLGGEJTkNO4ZZCax83bXNq9qY1cggoryjD3BQYJqOWy8fa+zehtHon6ik?=
+ =?us-ascii?Q?0LUCeDZBJa8kT6udXkb6iSRi9k1M9pNxgF+ZhzofrbZDyHxGgg4vHBGD7iZM?=
+ =?us-ascii?Q?kwslJLZxAh/Bm5Skxbk1/jTxPdL656gVVUVTSIPg6beHDDkNQ6bBBhVgnRqM?=
+ =?us-ascii?Q?BdkVd/+1Y5p9qeGSVRST7+t6/BLgx4bTK2IiFR/gmQXqVSOHsOPR38VlzU9R?=
+ =?us-ascii?Q?wdV7RHM/HBmux548ISLpApkCckUNI1SfR3+6A19qE4gIrnBj9j/W5XRzDQFS?=
+ =?us-ascii?Q?GWW0CRjAgOH4g0if3EvgWAr6crw+BXkeAOCK3NtGncK0cmIL40gp9OaeopU2?=
+ =?us-ascii?Q?d22DrXpGhg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260112-netcons-retrigger-v10-7-d82ebfc2503e@gmail.com>
-References: <20260112-netcons-retrigger-v10-0-d82ebfc2503e@gmail.com>
-In-Reply-To: <20260112-netcons-retrigger-v10-0-d82ebfc2503e@gmail.com>
-To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Andre Carvalho <asantostc@gmail.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1768210863; l=6537;
- i=asantostc@gmail.com; s=20250807; h=from:subject:message-id;
- bh=KSC8Nj3DiK31fDmZ4/PzcbAzUlQgw1PwPAvmb/6l8Os=;
- b=yT390LC8bW9NHpfY3TcipbMrxZ1ISAJCIIideT52vdpL2kwc0ZJtpmUDb7SyZ6EhSZKrh9A56
- kiD5h+lpd5OCA7yQCr9if1+60dgN/t+nBN+mVJu0b4/kjEelQ209O4m
-X-Developer-Key: i=asantostc@gmail.com; a=ed25519;
- pk=eWre+RwFHCxkiaQrZLsjC67mZ/pZnzSM/f7/+yFXY4Q=
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d9b67f40-18fc-49bd-2e3d-08de51c0dc17
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jan 2026 09:56:30.0770
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: +l0cRFTjResO0TmEHLqrLk0V4Hx9U/iMuEThxgtm+gJytWZApSw/Th9zNxyAdVpftXi3XComFbWbIn7ReqY6/8Mpw0U53edYHnJjVThQBNY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8071
+X-OriginatorOrg: intel.com
 
-Introduce a new netconsole selftest to validate that netconsole is able
-to resume a deactivated target when the low level interface comes back.
 
-The test setups the network using netdevsim, creates a netconsole target
-and then remove/add netdevsim in order to bring the same interfaces
-back. Afterwards, the test validates that the target works as expected.
 
-Targets are created via cmdline parameters to the module to ensure that
-we are able to resume targets that were bound by mac and interface name.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Joshua Hay
+> Sent: Wednesday, June 25, 2025 6:12 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Hay, Joshua A <joshua.a.hay@intel.com>;
+> Chittim, Madhu <madhu.chittim@intel.com>
+> Subject: [Intel-wired-lan] [PATCH net 5/5] idpf: remove obsolete
+> stashing code
+>=20
+> With the new Tx buffer management scheme, there is no need for all of
+> the stashing mechanisms, the hash table, the reserve buffer stack,
+> etc.
+> Remove all of that.
+>=20
+> Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
+> Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
+> ---
+>  drivers/net/ethernet/intel/idpf/idpf_txrx.c | 375 ++-----------------
+> -  drivers/net/ethernet/intel/idpf/idpf_txrx.h |  47 +--
+>  2 files changed, 23 insertions(+), 399 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> index 674b7a382bf1..811fc6d124a7 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> @@ -8,48 +8,12 @@
 
-Reviewed-by: Breno Leitao <leitao@debian.org>
-Signed-off-by: Andre Carvalho <asantostc@gmail.com>
----
- tools/testing/selftests/drivers/net/Makefile       |  1 +
- .../selftests/drivers/net/lib/sh/lib_netcons.sh    | 35 ++++++--
- .../selftests/drivers/net/netcons_resume.sh        | 97 ++++++++++++++++++++++
- 3 files changed, 128 insertions(+), 5 deletions(-)
+...
 
-diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-index f5c71d993750..3eba569b3366 100644
---- a/tools/testing/selftests/drivers/net/Makefile
-+++ b/tools/testing/selftests/drivers/net/Makefile
-@@ -19,6 +19,7 @@ TEST_PROGS := \
- 	netcons_cmdline.sh \
- 	netcons_fragmented_msg.sh \
- 	netcons_overflow.sh \
-+	netcons_resume.sh \
- 	netcons_sysdata.sh \
- 	netcons_torture.sh \
- 	netpoll_basic.py \
-diff --git a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-index ae8abff4be40..b6093bcf2b06 100644
---- a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-+++ b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-@@ -203,19 +203,21 @@ function do_cleanup() {
- function cleanup_netcons() {
- 	# delete netconsole dynamic reconfiguration
- 	# do not fail if the target is already disabled
--	if [[ ! -d "${NETCONS_PATH}" ]]
-+	local TARGET_PATH=${1:-${NETCONS_PATH}}
-+
-+	if [[ ! -d "${TARGET_PATH}" ]]
- 	then
- 		# in some cases this is called before netcons path is created
- 		return
- 	fi
--	if [[ $(cat "${NETCONS_PATH}"/enabled) != 0 ]]
-+	if [[ $(cat "${TARGET_PATH}"/enabled) != 0 ]]
- 	then
--		echo 0 > "${NETCONS_PATH}"/enabled || true
-+		echo 0 > "${TARGET_PATH}"/enabled || true
- 	fi
- 	# Remove all the keys that got created during the selftest
--	find "${NETCONS_PATH}/userdata/" -mindepth 1 -type d -delete
-+	find "${TARGET_PATH}/userdata/" -mindepth 1 -type d -delete
- 	# Remove the configfs entry
--	rmdir "${NETCONS_PATH}"
-+	rmdir "${TARGET_PATH}"
- }
- 
- function cleanup() {
-@@ -377,6 +379,29 @@ function check_netconsole_module() {
- 	fi
- }
- 
-+function wait_target_state() {
-+	local TARGET=${1}
-+	local STATE=${2}
-+	local TARGET_PATH="${NETCONS_CONFIGFS}"/"${TARGET}"
-+	local ENABLED=0
-+
-+	if [ "${STATE}" == "enabled" ]
-+	then
-+		ENABLED=1
-+	fi
-+
-+	if [ ! -d "$TARGET_PATH" ]; then
-+		echo "FAIL: Target does not exist." >&2
-+		exit "${ksft_fail}"
-+	fi
-+
-+	local CHECK_CMD="grep \"$ENABLED\" \"$TARGET_PATH/enabled\""
-+	slowwait 2 sh -c "test -n \"\$($CHECK_CMD)\"" || {
-+		echo "FAIL: ${TARGET} is not ${STATE}." >&2
-+		exit "${ksft_fail}"
-+	}
-+}
-+
- # A wrapper to translate protocol version to udp version
- function wait_for_port() {
- 	local NAMESPACE=${1}
-diff --git a/tools/testing/selftests/drivers/net/netcons_resume.sh b/tools/testing/selftests/drivers/net/netcons_resume.sh
-new file mode 100755
-index 000000000000..383ad1149271
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/netcons_resume.sh
-@@ -0,0 +1,97 @@
-+#!/usr/bin/env bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# This test validates that netconsole is able to resume a target that was
-+# deactivated when its interface was removed when the interface is brought
-+# back up.
-+#
-+# The test configures a netconsole target and then removes netdevsim module to
-+# cause the interface to disappear. Targets are configured via cmdline to ensure
-+# targets bound by interface name and mac address can be resumed.
-+# The test verifies that the target moved to disabled state before adding
-+# netdevsim and the interface back.
-+#
-+# Finally, the test verifies that the target is re-enabled automatically and
-+# the message is received on the destination interface.
-+#
-+# Author: Andre Carvalho <asantostc@gmail.com>
-+
-+set -euo pipefail
-+
-+SCRIPTDIR=$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")
-+
-+source "${SCRIPTDIR}"/lib/sh/lib_netcons.sh
-+
-+modprobe netdevsim 2> /dev/null || true
-+rmmod netconsole 2> /dev/null || true
-+
-+check_netconsole_module
-+
-+function cleanup() {
-+	cleanup_netcons "${NETCONS_CONFIGFS}/cmdline0"
-+	do_cleanup
-+	rmmod netconsole
-+}
-+
-+trap cleanup EXIT
-+
-+# Run the test twice, with different cmdline parameters
-+for BINDMODE in "ifname" "mac"
-+do
-+	echo "Running with bind mode: ${BINDMODE}" >&2
-+	# Set current loglevel to KERN_INFO(6), and default to KERN_NOTICE(5)
-+	echo "6 5" > /proc/sys/kernel/printk
-+
-+	# Create one namespace and two interfaces
-+	set_network
-+
-+	# Create the command line for netconsole, with the configuration from
-+	# the function above
-+	CMDLINE=$(create_cmdline_str "${BINDMODE}")
-+
-+	# The content of kmsg will be save to the following file
-+	OUTPUT_FILE="/tmp/${TARGET}-${BINDMODE}"
-+
-+	# Load the module, with the cmdline set
-+	modprobe netconsole "${CMDLINE}"
-+	# Expose cmdline target in configfs
-+	mkdir "${NETCONS_CONFIGFS}/cmdline0"
-+
-+	# Target should be enabled
-+	wait_target_state "cmdline0" "enabled"
-+
-+	# Remove low level module
-+	rmmod netdevsim
-+	# Target should be disabled
-+	wait_target_state "cmdline0" "disabled"
-+
-+	# Add back low level module
-+	modprobe netdevsim
-+	# Recreate namespace and two interfaces
-+	set_network
-+	# Target should be enabled again
-+	wait_target_state "cmdline0" "enabled"
-+
-+	# Listen for netconsole port inside the namespace and destination
-+	# interface
-+	listen_port_and_save_to "${OUTPUT_FILE}" &
-+	# Wait for socat to start and listen to the port.
-+	wait_local_port_listen "${NAMESPACE}" "${PORT}" udp
-+	# Send the message
-+	echo "${MSG}: ${TARGET}" > /dev/kmsg
-+	# Wait until socat saves the file to disk
-+	busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
-+	# Make sure the message was received in the dst part
-+	# and exit
-+	validate_msg "${OUTPUT_FILE}"
-+
-+	# kill socat in case it is still running
-+	pkill_socat
-+	# Cleanup & unload the module
-+	cleanup
-+
-+	echo "${BINDMODE} : Test passed" >&2
-+done
-+
-+trap - EXIT
-+exit "${EXIT_STATUS}"
+> --
+> 2.39.2
 
--- 
-2.52.0
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
 
