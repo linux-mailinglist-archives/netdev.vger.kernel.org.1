@@ -1,262 +1,192 @@
-Return-Path: <netdev+bounces-249140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D210D14BB4
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 19:21:29 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EFB2D14BE1
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 19:24:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8742C301A499
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 18:17:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A84A1300819B
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 18:24:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B38F387596;
-	Mon, 12 Jan 2026 18:17:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AACB438758E;
+	Mon, 12 Jan 2026 18:24:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hd8xi1Vn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FWpZ9Lrv";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="guWZ/pOZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31B2637F8A0
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 18:17:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 436D13815C1
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 18:24:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768241873; cv=none; b=RwnfXd23sjeFH5GjTxuP3RvXniPMgRfJJKi0jTFnTvzFSzXZHnuyFKpHuGBKDOWMSBNzMcTixNCtFabVOMvZqwXzly/njBBfv70pVc3Z/eIEeNSVQIx9aN71B6HlCVk2mCdYSjb65++CSH9pc1ThU1d9qfymgwdklEuVlNg9HQ0=
+	t=1768242241; cv=none; b=iTptsNHitjdRPTK4Kq64oGnbHqm2fUcjD3l8NKL8CagCOQgzEkjn0grt46Gdv8H2uHgXZ1iVSXGywPCNUKcsF24Q5Ec4dfeaVgfda1UtJCScKUBLTx5Oe+9Y+tGc5svdRmu+I46BtHoLZMo/2wuIL3MeXVwNWGZ3vVj14j4eICA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768241873; c=relaxed/simple;
-	bh=7+9/4nymDsorNrdw/Y+cdaz+q2znF/7yqtVvfiRWfiw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=analr3qoiUOzklYCV3W3QP6ra/ZUOr0LWA2hZZinsgDUSydyiFqyfhTrcS88IKeXQ6vxyHJGVTVMn05o2iZqMiWGBxJZ/WH/UZGzfpsi+U4eDT3vATm7pA4zPq1KEMXMsyX1n5cEsCvsgNgMR47lIuWNoVslacbViXKpS9hR2VM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hd8xi1Vn; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-c13771b2cf9so5064654a12.1
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 10:17:52 -0800 (PST)
+	s=arc-20240116; t=1768242241; c=relaxed/simple;
+	bh=zpoNdTeaB4i3QK4pd6pXO1rrYW3DhRqSBMGvDT0il6g=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Q6gye1TkwkSF/CDOqAFVC8OBWvNVlGRviHFvBwn90kHSCf7/o/EdNtJlZYu2pjxrHgwWuPSw5SwybSQ2j/uPw+bYrmiUmYHGK0xTRvGx5wzxwYuFYC7wJv8T+FmhubYiCaRa9bBU5KWrrtjQexueC8HA7Q3K6B3v4nZ10h5cC4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FWpZ9Lrv; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=guWZ/pOZ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768242239;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2gLOxIDyxhTvVzJuSwvSFZ4MlqhsCFk9OHFtuRb1ESk=;
+	b=FWpZ9LrvYHiS7aGdljd+Igfcct2cokATR6+D5ebFep8iti98uX0GqcrakCmUdIlJh8z3o/
+	eHRLERNxEe9QPsW2VDqS2q5yvNLWuPgqzxtjJAewEQbRjK+OuvXSF2ATwYstzR/B+Kwmmw
+	aHufBShApfcsR1sjFnEi4/uVfHYjqis=
+Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com
+ [209.85.217.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-642-f8j93KGnMHW6IURMnQJGdA-1; Mon, 12 Jan 2026 13:23:57 -0500
+X-MC-Unique: f8j93KGnMHW6IURMnQJGdA-1
+X-Mimecast-MFC-AGG-ID: f8j93KGnMHW6IURMnQJGdA_1768242237
+Received: by mail-vs1-f69.google.com with SMTP id ada2fe7eead31-5ecdaf59131so5202698137.2
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 10:23:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768241871; x=1768846671; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4iPYz0c2/YOE9HPEJLTZDgF+3tXabqT+BOwl+/nVPFU=;
-        b=Hd8xi1Vnh+6zvIHokUglamIp/naaI75931XzAkT5eWpqdiCmshuGNm5NuPbcoBvdQs
-         t9AZaUSFkhtvX5HIK7mpP0OJ1AqTctBtNwYdvOYob7GkNU97MN8+fzkL4Hut3M+4hich
-         jqHi9BKrr0uS2ym7fUcuO6Hi9Qxfw6SnBGH+pBRq0OlySkRL2eZCysygfR6SuCXmdali
-         zo67FRw4v2orkuWU1kxyhkaf4ippko5LwYofu8/q0YJrX16OnmT1194iuaSzd8oQ0wwc
-         txMBd6VQ2QR3ixPH5JClX/vIvtpUtDW5CssChYuy0Gx3ipuWjTtV+mPJP4PBJi6dWpoA
-         YQag==
+        d=redhat.com; s=google; t=1768242237; x=1768847037; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=2gLOxIDyxhTvVzJuSwvSFZ4MlqhsCFk9OHFtuRb1ESk=;
+        b=guWZ/pOZLgLBpVMG05eI3nl8fDNrxtbg2JeJCnJpCJrPxAsxB0oM8wX1VZpMXoNChX
+         pxVtL3oEQmmej+J7Eoz8v2sBGDeskbAevIn9NmTy3ojM3gvsNXW2FCX7PLS/gSwFs9Rg
+         22898MVltwFNGxKeyaMy5jSocMHB7lcT1a6L12IkSe0hAwRkjhrPwbyiDdX6Q6ipjmqT
+         ACAnBfRKxgkyS7q8cV5a2zWbQWX23rvz/z6tCe1AjFaUArNLOnZJ3Ouwlsk2WJK/lbk9
+         hYiI6TnNwFUjKyE28XmfU3yhWW02R0ju/S/QE4BQz+4ubhR5V1itNdkLypLRsXsJi1Eg
+         EMlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768241871; x=1768846671;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=4iPYz0c2/YOE9HPEJLTZDgF+3tXabqT+BOwl+/nVPFU=;
-        b=XwTaBa5ZGxNue+eWSpfMOfVxVRonZY3fmXkLcoouL7smeiEY+Xvm5UYsJB5k+M4NL8
-         XDRqxeE9prNOQfQabbCHmVhROGOb06lUgcg2jjyGl2xPhjSE15HZ8Dnw/KCFhNsN9CcB
-         MvpgcAZMAcovYwVNemf/7SzvJs8ektuuBfkWYdPho8CGWgM4h1uCn4CLZqMBxeXKYffk
-         t+6j4S2QFKtXl99H6xzLlYiDUeEPLDG1Q/ub+zPJzRCowxOpf+a2jIuqdwZ1f3nHWyUd
-         a8uYr0kPD03O5S/qP1xsjdEu8CTHG7XbOpwMXuHN8T6qW37heT/GGb7yvNNHVg/Zdabz
-         rJhw==
-X-Forwarded-Encrypted: i=1; AJvYcCU+QiAOQGJvGmD/HmKof8geirniX9ORiD+2ifdSyWfw72MNAZrxfTe4EginhkBRfc7plAQDmrI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCOsTXD78FPPMBDca8JfPXQPJvclGJoTcKDsTa24LzMNvAnc1o
-	LigYBOQ+GtyetFyM45VKHijb4fxmb1DsIZ3NUUttKFEaX6ny6vn6o70e
-X-Gm-Gg: AY/fxX7P4OStXf+z84s4yP6/ryXwsqMJx0VLzC5OjQzgnYo04j/xkuPRrR1MO8cm0iT
-	uvmCxfOMxiUpaMIGbndBCqK40Tim+JZ/7ZoZjQgtJj6nLfnx6e/1EeuSgfXmenOZq9WEFZskAkq
-	WGMcIyYuwkFBPBQs+r5F5hE6hJmjvsE2lUa/rybB20Zhil30w3+4fV+hWgDyRIKP68C6I4c7YRY
-	Nh/zydYhZ4uEfRY9s0JxFlih6idQTFoPOyk4jH3+W9HQu4Q0DuOZn1TeWV+s87zbEdEfF1ftnB2
-	UD4dq2iyriD5j+HyCI0gyxmFQz8YWZL3su6CglZ7XXgyUCQywsx7b/4G1tYNvP74rX1Mwczcf00
-	cW2eDRUvh5NOTBkvwqqeHttqef5uNzsnoPKhAP2ChsOpyZfgdAMRRk8IQtpZblxzsUXmqBYihiI
-	KapkwhFaJjXe8L+BE3zNCeKO4sbZFOPNtxQUu8Ft7t+TqvTBCXy1FpuFP0Qbrd+OhrxA==
-X-Google-Smtp-Source: AGHT+IFiK1jweRQzBOm3ZEpB+UiR7srhpNL+qg9Y/k0eatbaDQCE66uWR/fEIuhnV//+2MGMla7rxw==
-X-Received: by 2002:a17:90b:5628:b0:34a:8c77:d386 with SMTP id 98e67ed59e1d1-34f68c91bbemr16740424a91.9.1768241871384;
-        Mon, 12 Jan 2026 10:17:51 -0800 (PST)
-Received: from localhost.localdomain ([122.183.54.120])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34f5f7c4141sm18165365a91.6.2026.01.12.10.17.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jan 2026 10:17:50 -0800 (PST)
-From: I Viswanath <viswanathiyyappan@gmail.com>
-To: edumazet@google.com,
-	horms@kernel.org,
-	sdf@fomichev.me,
-	kuba@kernel.org,
-	andrew+netdev@lunn.ch,
-	pabeni@redhat.com,
-	jasowang@redhat.com,
-	eperezma@redhat.com,
-	mst@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	przemyslaw.kitszel@intel.com,
-	anthony.l.nguyen@intel.com,
-	ronak.doshi@broadcom.com,
-	pcnet32@frontier.com
-Cc: bcm-kernel-feedback-list@broadcom.com,
-	intel-wired-lan@lists.osuosl.org,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	I Viswanath <viswanathiyyappan@gmail.com>
-Subject: [PATCH net-next v8 6/6] pcnet32: Implement ndo_write_rx_mode callback
-Date: Mon, 12 Jan 2026 23:46:26 +0530
-Message-ID: <20260112181626.20117-7-viswanathiyyappan@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260112181626.20117-1-viswanathiyyappan@gmail.com>
-References: <20260112181626.20117-1-viswanathiyyappan@gmail.com>
+        d=1e100.net; s=20230601; t=1768242237; x=1768847037;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2gLOxIDyxhTvVzJuSwvSFZ4MlqhsCFk9OHFtuRb1ESk=;
+        b=VoJyHqR1z4330UdNH5XR2kR3FM5wSyHmnMHFVQml6Camz80yyFY6SGx4GlOVkg/GWD
+         FAHBLYqhZuBAUB6SHUBBxHM3i+1twdBRKJIVOb1MLHjEEUr8l+HAFVPjeYHY7+0Zp/Z6
+         3V3GZ6z8WFhL6uvByRzL7xAr9FiWfI8HEK/XvyLrA3u97uyOlQV7dpJU6tyCdc7E+z3Q
+         LWJXirniSJPbG+7s/E9M5OVftGrko7bKXJhSzeVHrJ39Zt/x1MU21MAFOqYEfWjAJ1ZU
+         Q5eBs/F9eobp3Iuxr9xi5G8pFfiig2u599syi80XmUtTAmrgp4+EbmTpgZGdpKd6MmnQ
+         sByw==
+X-Forwarded-Encrypted: i=1; AJvYcCVWKqyiZY+1IwKq9DaAEOG4qyWPrb/z4Kzfk6wLZKmllJ6TMUqmGqgj8NpmvmJ67yV9ksdN96k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeFiHk5u/wxna5VIujH83htmRyGkFSGzYeraaJji2YQprZOuqP
+	QUwacbbyYf5faLHQhBYocNBqePE+NIDffW7BeTlF4wxbt6SaIHiDJcfo5TzSOrx0Cm5HX9GT+ef
+	mPOES96RgpyoZliaCtXf3CdxyEhUTFDS1V8QWEKDJ19VFDb2yseNu00Wlzg==
+X-Gm-Gg: AY/fxX5YL+Rv2ey3QJGKvudkNqL1Rh3RtFXdo6dsIF3rT/eVbMQmcehpVLQbtyfnNhb
+	haHncOMmMmNfCjpQmONC0hvyNFwKXNVoMy8/yrvg0VTikvhjaPmp+JWBSz9MhZeIG9H2TBrNN8b
+	sSpVHi3ExWSqZXHxd2GGBNs+LW/NFrKPDBls76iK98HNF0/wcxKLFGWcgab1IWiwjTmkumZUDqr
+	dPeYw1xGH8lD80JC1Eo1dJ7fk3MOlSgwbNxpHJL5Dq+0AGKb5LGN6fM1A8tCvlcUef6tLhElH6A
+	TKYykNc1PRL/q+c2AB7gCXze5RIjwI6UIHbKTswQceJuEIJKuOpvR+1Z1Y91Qw4tCsNirVdPFUI
+	aAkeZ6kihKF6nOaUgTN1H+IfMT1WGib87fC5XAzG1Tw3Bg+Mr34XEiClR
+X-Received: by 2002:a05:6102:ccd:b0:5ef:b5fc:dd4c with SMTP id ada2fe7eead31-5efb5fceabcmr2465163137.7.1768242237209;
+        Mon, 12 Jan 2026 10:23:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFwmHNbjOkRHiOzASiFvy8qH079mvHRUgTgzybGWlZGH94huRhJ7zei/lWRFsGQLOin7Q4KDw==
+X-Received: by 2002:a05:6102:ccd:b0:5ef:b5fc:dd4c with SMTP id ada2fe7eead31-5efb5fceabcmr2465086137.7.1768242235294;
+        Mon, 12 Jan 2026 10:23:55 -0800 (PST)
+Received: from ?IPV6:2601:188:c102:b180:1f8b:71d0:77b1:1f6e? ([2601:188:c102:b180:1f8b:71d0:77b1:1f6e])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-5ef15be79c6sm10965711137.12.2026.01.12.10.23.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Jan 2026 10:23:54 -0800 (PST)
+From: Waiman Long <llong@redhat.com>
+X-Google-Original-From: Waiman Long <longman@redhat.com>
+Message-ID: <437ccd7a-e839-4b40-840c-7c40d22f8166@redhat.com>
+Date: Mon, 12 Jan 2026 13:23:40 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/33 v6] cpuset/isolation: Honour kthreads preferred
+ affinity
+To: Frederic Weisbecker <frederic@kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>
+Cc: Tejun Heo <tj@kernel.org>, Phil Auld <pauld@redhat.com>,
+ Peter Zijlstra <peterz@infradead.org>, Lai Jiangshan
+ <jiangshanlai@gmail.com>, Danilo Krummrich <dakr@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Michal Koutny <mkoutny@suse.com>,
+ netdev@vger.kernel.org, Roman Gushchin <roman.gushchin@linux.dev>,
+ linux-block@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+ Eric Dumazet <edumazet@google.com>, Michal Hocko <mhocko@suse.com>,
+ Bjorn Helgaas <bhelgaas@google.com>, Ingo Molnar <mingo@redhat.com>,
+ Chen Ridong <chenridong@huawei.com>, cgroups@vger.kernel.org,
+ linux-pci@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "David S . Miller" <davem@davemloft.net>, Vlastimil Babka <vbabka@suse.cz>,
+ Marco Crivellari <marco.crivellari@suse.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>,
+ "Rafael J . Wysocki" <rafael@kernel.org>,
+ Johannes Weiner <hannes@cmpxchg.org>, Simon Horman <horms@kernel.org>,
+ Shakeel Butt <shakeel.butt@linux.dev>, linux-mm@kvack.org,
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ Gabriele Monaco <gmonaco@redhat.com>, Muchun Song <muchun.song@linux.dev>,
+ Will Deacon <will@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Chen Ridong <chenridong@huaweicloud.com>
+References: <20260101221359.22298-1-frederic@kernel.org>
+Content-Language: en-US
+In-Reply-To: <20260101221359.22298-1-frederic@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Add callback and update the code to use the rx_mode snapshot and
-deferred write model
+On 1/1/26 5:13 PM, Frederic Weisbecker wrote:
+> Hi,
+>
+> The kthread code was enhanced lately to provide an infrastructure which
+> manages the preferred affinity of unbound kthreads (node or custom
+> cpumask) against housekeeping constraints and CPU hotplug events.
+>
+> One crucial missing piece is cpuset: when an isolated partition is
+> created, deleted, or its CPUs updated, all the unbound kthreads in the
+> top cpuset are affine to _all_ the non-isolated CPUs, possibly breaking
+> their preferred affinity along the way
+>
+> Solve this with performing the kthreads affinity update from cpuset to
+> the kthreads consolidated relevant code instead so that preferred
+> affinities are honoured.
+>
+> The dispatch of the new cpumasks to workqueues and kthreads is performed
+> by housekeeping, as per the nice Tejun's suggestion.
+>
+> As a welcome side effect, HK_TYPE_DOMAIN then integrates both the set
+> from isolcpus= and cpuset isolated partitions. Housekeeping cpumasks are
+> now modifyable with specific synchronization. A big step toward making
+> nohz_full= also mutable through cpuset in the future.
+>
+> Changes since v5:
+>
+> * Add more tags
+>
+> * Fix leaked destroy_work_on_stack() (Zhang Qiao, Waiman Long)
+>
+> * Comment schedule_drain_work() synchronization requirement (Tejun)
+>
+> * s/Revert of/Inverse of (Waiman Long)
+>
+> * Remove housekeeping_update() needless (for now) parameter (Chen Ridong)
+>
+> * Don't propagate housekeeping_update() failures beyond allocations (Waiman Long)
+>
+> * Whitespace cleanup (Waiman Long)
+>
+>
+> git://git.kernel.org/pub/scm/linux/kernel/git/frederic/linux-dynticks.git
+> 	kthread/core-v6
+>
+> HEAD: 811e87ca8a0a1e54eb5f23e71896cb97436cccdc
+>
+> Happy new year,
+> 	Frederic
 
-Signed-off-by: I Viswanath <viswanathiyyappan@gmail.com>
----
- This is a very weird driver in that it calls pcnet32_load_multicast to set up
- the mc filter registers instead of the set_rx_mode callback in ndo_open.
- I can't find a single other driver that does that.
- 
- Apart from that, I don't think it makes sense for the (now) write_rx_mode 
- callback to call netif_wake_queue(). Correct me if I am wrong here.
- 
- drivers/net/ethernet/amd/pcnet32.c | 57 ++++++++++++++++++++++--------
- 1 file changed, 43 insertions(+), 14 deletions(-)
+I don't see any major issue with this v6 version. There may be some 
+minor issues that can be cleaned up later. Now the issue is which tree 
+should this series go to as it touches a number of different subsystems 
+with different maintainers.
 
-diff --git a/drivers/net/ethernet/amd/pcnet32.c b/drivers/net/ethernet/amd/pcnet32.c
-index 9eaefa0f5e80..8bb0bb3da789 100644
---- a/drivers/net/ethernet/amd/pcnet32.c
-+++ b/drivers/net/ethernet/amd/pcnet32.c
-@@ -314,8 +314,9 @@ static void pcnet32_tx_timeout(struct net_device *dev, unsigned int txqueue);
- static irqreturn_t pcnet32_interrupt(int, void *);
- static int pcnet32_close(struct net_device *);
- static struct net_device_stats *pcnet32_get_stats(struct net_device *);
--static void pcnet32_load_multicast(struct net_device *dev);
-+static void pcnet32_load_multicast(struct net_device *dev, bool is_open);
- static void pcnet32_set_multicast_list(struct net_device *);
-+static void pcnet32_write_multicast_list(struct net_device *);
- static int pcnet32_ioctl(struct net_device *, struct ifreq *, int);
- static void pcnet32_watchdog(struct timer_list *);
- static int mdio_read(struct net_device *dev, int phy_id, int reg_num);
-@@ -1580,6 +1581,7 @@ static const struct net_device_ops pcnet32_netdev_ops = {
- 	.ndo_tx_timeout		= pcnet32_tx_timeout,
- 	.ndo_get_stats		= pcnet32_get_stats,
- 	.ndo_set_rx_mode	= pcnet32_set_multicast_list,
-+	.ndo_write_rx_mode	= pcnet32_write_multicast_list,
- 	.ndo_eth_ioctl		= pcnet32_ioctl,
- 	.ndo_set_mac_address 	= eth_mac_addr,
- 	.ndo_validate_addr	= eth_validate_addr,
-@@ -2264,7 +2266,7 @@ static int pcnet32_open(struct net_device *dev)
- 
- 	lp->init_block->mode =
- 	    cpu_to_le16((lp->options & PCNET32_PORT_PORTSEL) << 7);
--	pcnet32_load_multicast(dev);
-+	pcnet32_load_multicast(dev, true);
- 
- 	if (pcnet32_init_ring(dev)) {
- 		rc = -ENOMEM;
-@@ -2680,18 +2682,26 @@ static struct net_device_stats *pcnet32_get_stats(struct net_device *dev)
- }
- 
- /* taken from the sunlance driver, which it took from the depca driver */
--static void pcnet32_load_multicast(struct net_device *dev)
-+static void pcnet32_load_multicast(struct net_device *dev, bool is_open)
- {
- 	struct pcnet32_private *lp = netdev_priv(dev);
- 	volatile struct pcnet32_init_block *ib = lp->init_block;
- 	volatile __le16 *mcast_table = (__le16 *)ib->filter;
- 	struct netdev_hw_addr *ha;
-+	char *ha_addr;
-+	bool allmulti;
- 	unsigned long ioaddr = dev->base_addr;
--	int i;
-+	int i, ni;
- 	u32 crc;
- 
-+	if (is_open)
-+		allmulti = dev->flags & IFF_ALLMULTI;
-+	else
-+		allmulti = netif_rx_mode_get_cfg(dev,
-+						 NETIF_RX_MODE_CFG_ALLMULTI);
-+
- 	/* set all multicast bits */
--	if (dev->flags & IFF_ALLMULTI) {
-+	if (allmulti) {
- 		ib->filter[0] = cpu_to_le32(~0U);
- 		ib->filter[1] = cpu_to_le32(~0U);
- 		lp->a->write_csr(ioaddr, PCNET32_MC_FILTER, 0xffff);
-@@ -2705,20 +2715,40 @@ static void pcnet32_load_multicast(struct net_device *dev)
- 	ib->filter[1] = 0;
- 
- 	/* Add addresses */
--	netdev_for_each_mc_addr(ha, dev) {
--		crc = ether_crc_le(6, ha->addr);
--		crc = crc >> 26;
--		mcast_table[crc >> 4] |= cpu_to_le16(1 << (crc & 0xf));
--	}
-+	if (is_open)
-+		netdev_for_each_mc_addr(ha, dev) {
-+			crc = ether_crc_le(6, ha->addr);
-+			crc = crc >> 26;
-+			mcast_table[crc >> 4] |= cpu_to_le16(1 << (crc & 0xf));
-+		}
-+	else
-+		netif_rx_mode_for_each_mc_addr(ha_addr, dev, ni) {
-+			crc = ether_crc_le(6, ha_addr);
-+			crc = crc >> 26;
-+			mcast_table[crc >> 4] |= cpu_to_le16(1 << (crc & 0xf));
-+		}
-+
- 	for (i = 0; i < 4; i++)
- 		lp->a->write_csr(ioaddr, PCNET32_MC_FILTER + i,
- 				le16_to_cpu(mcast_table[i]));
- }
- 
-+static void pcnet32_set_multicast_list(struct net_device *dev)
-+{
-+	bool allmulti = !!(dev->flags & IFF_ALLMULTI);
-+	bool promisc = !!(dev->flags & IFF_PROMISC);
-+
-+	netif_rx_mode_set_flag(dev, NETIF_RX_MODE_UC_SKIP, true);
-+	netif_rx_mode_set_flag(dev, NETIF_RX_MODE_MC_SKIP, promisc | allmulti);
-+
-+	netif_rx_mode_set_cfg(dev, NETIF_RX_MODE_CFG_ALLMULTI, allmulti);
-+	netif_rx_mode_set_cfg(dev, NETIF_RX_MODE_CFG_PROMISC, promisc);
-+}
-+
- /*
-  * Set or clear the multicast filter for this adaptor.
-  */
--static void pcnet32_set_multicast_list(struct net_device *dev)
-+static void pcnet32_write_multicast_list(struct net_device *dev)
- {
- 	unsigned long ioaddr = dev->base_addr, flags;
- 	struct pcnet32_private *lp = netdev_priv(dev);
-@@ -2727,7 +2757,7 @@ static void pcnet32_set_multicast_list(struct net_device *dev)
- 	spin_lock_irqsave(&lp->lock, flags);
- 	suspended = pcnet32_suspend(dev, &flags, 0);
- 	csr15 = lp->a->read_csr(ioaddr, CSR15);
--	if (dev->flags & IFF_PROMISC) {
-+	if (netif_rx_mode_get_cfg(dev, NETIF_RX_MODE_CFG_PROMISC)) {
- 		/* Log any net taps. */
- 		netif_info(lp, hw, dev, "Promiscuous mode enabled\n");
- 		lp->init_block->mode =
-@@ -2738,7 +2768,7 @@ static void pcnet32_set_multicast_list(struct net_device *dev)
- 		lp->init_block->mode =
- 		    cpu_to_le16((lp->options & PCNET32_PORT_PORTSEL) << 7);
- 		lp->a->write_csr(ioaddr, CSR15, csr15 & 0x7fff);
--		pcnet32_load_multicast(dev);
-+		pcnet32_load_multicast(dev, false);
- 	}
- 
- 	if (suspended) {
-@@ -2746,7 +2776,6 @@ static void pcnet32_set_multicast_list(struct net_device *dev)
- 	} else {
- 		lp->a->write_csr(ioaddr, CSR0, CSR0_STOP);
- 		pcnet32_restart(dev, CSR0_NORMAL);
--		netif_wake_queue(dev);
- 	}
- 
- 	spin_unlock_irqrestore(&lp->lock, flags);
--- 
-2.47.3
+Cheers,
+Longman
 
 
