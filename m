@@ -1,151 +1,218 @@
-Return-Path: <netdev+bounces-248865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B90FD105DD
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 03:43:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91167D105EF
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 03:45:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 84FBF3000B59
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 02:43:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2CEF73013EF7
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 02:45:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FF563009C3;
-	Mon, 12 Jan 2026 02:43:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CCA92FFFB6;
+	Mon, 12 Jan 2026 02:45:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RIHtvEL6";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="OQaguD4O"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ED16266576
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 02:43:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92FE31AA1D2
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 02:45:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768185801; cv=none; b=XKRQpxeCwMAgMEGhh1SU+p+C9NHNRQjJDjY7sZRR1it/xFmxKK6/km1irj4B0qMlKofO0gnjqPKbefjmPG1lgM4voEh8L5GTetXtoHTrD1rZ1FC7Q0Qz2SWJhQ/wrhmLXSe4Pm+Z9EDaRQwioTOO5KVk1RnJneGOW4RSuvH4ops=
+	t=1768185957; cv=none; b=G8AXej7hXnjV3Mv0JuNxX7rFEoJH4zT239jXZArQSJtN7zqK8WlpYeDDFbS7a37d5lIAi/BvXyZef1Wc75SHiV9lR22ij8DGS2POOhLG1sO8nkWazDKUp8HX+O/MIRUyM3vlsgqHlY75Tx0pfL6l6wG+ms105YjETXTpnuoW8Jw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768185801; c=relaxed/simple;
-	bh=oQAb+2QjTzCjB0ihqCeziEaHDoA4CY2MKFyp9DpKhA8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JaIxr30xD2U0RbZc14hNsy20vlxi/7iF7jQjniijV06GSBW53YWpsRYYlL1ssJz9SktSOYecqPTPE+xYX1nSyOmH5yV3vxCbcQIhRIxYcj9RRp9lLlw72Lh5mOZ0A2OaPGQz+IHcSqGGUYu5Xo9f3ugE6e/pQ7W9Dfm5iA5yCFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.243.244.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
-X-QQ-mid: esmtpgz13t1768185782t40df39af
-X-QQ-Originating-IP: GabkaX1N4jf8AtmpEpTpwwc6Bo/tAPWjrvYQ/VUIuFw=
-Received: from localhost.localdomain ( [111.204.182.99])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 12 Jan 2026 10:42:59 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 4871000304720290591
-EX-QQ-RecipientCnt: 13
-From: Tonghao Zhang <tonghao@bamaicloud.com>
-To: netdev@vger.kernel.org
-Cc: Tonghao Zhang <tonghao@bamaicloud.com>,
-	Jay Vosburgh <jv@jvosburgh.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Jason Xing <kerneljasonxing@gmail.com>
-Subject: [PATCH RESEND net-next v4 4/4] net: bonding: add the READ_ONCE/WRITE_ONCE for outside lock accessing
-Date: Mon, 12 Jan 2026 10:40:51 +0800
-Message-Id: <5bf134412fd558dc80fbf97a149964f536a59cb7.1768184929.git.tonghao@bamaicloud.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <cover.1768184929.git.tonghao@bamaicloud.com>
-References: <cover.1768184929.git.tonghao@bamaicloud.com>
+	s=arc-20240116; t=1768185957; c=relaxed/simple;
+	bh=t3fqYup1Q4i1hX+rY6sipxB1IioFo7OZLWHTUppIxwE=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Uocwz+RMC9dll90tx6tYIeeMjbA0hfBW7141UYHHg4xis118qaa3cPxTqYPYcgCUiB11l3v3aMwtYvMCtmenXFagcEZ9ventmiG0vu+oHKMDdwEgXq4Qyfk3YotfjXGSpWjCWOGgrd97BW9viFCbLAYvghs0WVDTr0Ha4PS7tLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RIHtvEL6; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=OQaguD4O; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768185954;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xcS5shRmDCmvz+IoTKqWTzUo+o6AAuc9PAErT+qJLAs=;
+	b=RIHtvEL6WNI17SXaRSRMorIVqYMrxh0ySwzskBkEaln1u8krV+tG1S/A7Lr5TCnZ/xmPyZ
+	KtKNrpQmrQ45jIQpgu6HJ7A1kYnPaFHjPmwVj/b5VXojhbjSh2ImKwg3YSG+yXekkmAAns
+	oUF53XL9SgyNuCR2Z2VN4mMm5KjFmL8=
+Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
+ [209.85.222.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-379-8DoMO_vyOzWkHdhwvcByaQ-1; Sun, 11 Jan 2026 21:45:53 -0500
+X-MC-Unique: 8DoMO_vyOzWkHdhwvcByaQ-1
+X-Mimecast-MFC-AGG-ID: 8DoMO_vyOzWkHdhwvcByaQ_1768185953
+Received: by mail-ua1-f69.google.com with SMTP id a1e0cc1a2514c-9412e0b1ec7so6191253241.1
+        for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 18:45:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1768185953; x=1768790753; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xcS5shRmDCmvz+IoTKqWTzUo+o6AAuc9PAErT+qJLAs=;
+        b=OQaguD4OW/a0PRcKXewnQoJz2HveUAELXWyoGoFSB4eakOiaN7tvkhvroIJENmrFeJ
+         PuXhQwOuoS0ZPVBot7jNgIujYR/bmcdJMtq1VBx7U0wi1aj+iIuW4r/6YuomR+XN0y9v
+         sSRuVS20/+rxYnHwdp+oQyGga1ktao5cj7wHS/C0jbSqfrBDZZVwi5JksbrL92hPebwY
+         fLaRsznU4Ph/uhnaDGP5GyNfrYYkj71sNtZ7TZOgK0l/7FzeYA6/q8LhcJGUMV4nZinF
+         gcNf58MM8flPh5y8Kkcdqu/uhs8VpBTqx5/327LJT+G9ApAPx2w6zzFUoq4SKNY3v0qk
+         QpfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768185953; x=1768790753;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xcS5shRmDCmvz+IoTKqWTzUo+o6AAuc9PAErT+qJLAs=;
+        b=ROMaF4ekPActHXj2X/fcgh+OVfaHz1jF/iSB3Lj7AgmytpezZ7D/XT0fI8VL3mruEc
+         S3tyoi1/r5wheZlRb8ZqxAcbelPIS9ij+74KokFk5irvvPjT1BRwh8NLA1lfH/3u6Ccu
+         GHaG4DuqURsqEer3JspcCpgJsH0piohlWtoYD1HPkTMVH6pWiJOm9kqcbbZtrp4y1lr4
+         qOy2rRkS9Q9psEcoiyrCdbpzhxaZiUBFMH+5nIcdu5AEKpcuBteeAZTdTa7B0GtNpgn0
+         Zr8s6UaUxsQ6Iw2SrEAVa8UWcbU1BBLkOVf/bI2e/n36iKJtDeEp1H4O8ubNnHY8ci5V
+         yeXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV5b8LFfzjMz6hq6263cD7RMKTgakbZNrZ56MiTDHt2YdPhkMGAXxIRIsUEyfhRWI/SOxfSrxw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyeqe/2vyVfa3MDR1+h6NAgcNg1JCMVPDY0QQT4vy2MakvgoEjp
+	UpI4UJDvieBk/ebRCtpoBe5x2qI9aP8g74uHxcbhVYZAZB2sUb1GRCFJtDRt884+vrS1AXt9XHZ
+	j2WewTAC3OTB6+nAGwbg/xH9rzUZJCUTIemuSGKIjtsZEz1wHcqX1Qopwcw==
+X-Gm-Gg: AY/fxX64dykZE8IGzqWdnhFiV8YwNGqOTB55k9s0u+lBzno6f5CqaCyJTuDM7MkbpGE
+	qlLzOT1oCHRf7EZYTj6sOdScdp9E+opiGYCODw/3Mco7zQWNoxTHIfcIWi35tPf9zzsjtHtu82U
+	wRllpChBf96cIys3wCB19kkdwoh5JrYs+QnDlv4i4jrQOXHNOLangHtgt7CNlOcKTDcdCui8y6p
+	Rq+SudXQj98V5Hs0m/JG1dpaMMN+bIm5eL9mXKTQSNAPOKV2iwRX8cWAu/IliBRLoovYQDDskGT
+	rkH9no8bYrj79rMR4XCMC6eWCY9Yn+CRM4erY7q+CN9bHkUGP4cb/YTvQltzJFVi2NRX4w6zcOl
+	IzXVg6BfJr+bFx+FkMhrDsIzwvGfhaB8OYTMG3Z/I0WFDPmyUu6f5w16N
+X-Received: by 2002:a05:6122:1d4d:b0:55b:1a1b:3273 with SMTP id 71dfb90a1353d-56347d4a0bemr5054227e0c.6.1768185952726;
+        Sun, 11 Jan 2026 18:45:52 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEwOFp6cPvfkUcSbRWdkrghqM2mUWR9n3I0P3Nk8PJy6T841SLsur+1hpT47PiYyZ5sXMn8AA==
+X-Received: by 2002:a05:6122:1d4d:b0:55b:1a1b:3273 with SMTP id 71dfb90a1353d-56347d4a0bemr5054194e0c.6.1768185952291;
+        Sun, 11 Jan 2026 18:45:52 -0800 (PST)
+Received: from ?IPV6:2601:188:c102:b180:1f8b:71d0:77b1:1f6e? ([2601:188:c102:b180:1f8b:71d0:77b1:1f6e])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-563667cf148sm8166160e0c.2.2026.01.11.18.45.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 11 Jan 2026 18:45:51 -0800 (PST)
+From: Waiman Long <llong@redhat.com>
+X-Google-Original-From: Waiman Long <longman@redhat.com>
+Message-ID: <18ee9089-8a08-44ed-8761-7c9db765cd4e@redhat.com>
+Date: Sun, 11 Jan 2026 21:45:36 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 13/33] sched/isolation: Convert housekeeping cpumasks to
+ rcu pointers
+To: Simon Horman <horms@kernel.org>, Frederic Weisbecker <frederic@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
+ <mkoutny@suse.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Chen Ridong <chenridong@huawei.com>, Danilo Krummrich <dakr@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+ Lai Jiangshan <jiangshanlai@gmail.com>,
+ Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
+ <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+ Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Tejun Heo <tj@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Vlastimil Babka <vbabka@suse.cz>,
+ Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org, netdev@vger.kernel.org
+References: <20260101221359.22298-1-frederic@kernel.org>
+ <20260101221359.22298-14-frederic@kernel.org>
+ <20260107115653.GA196631@kernel.org>
+Content-Language: en-US
+In-Reply-To: <20260107115653.GA196631@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz3b-0
-X-QQ-XMAILINFO: MDSqlvH8sYTtrCF/XAqOgdjgWBJF+k5V43/iXJncH7gTD1bEBRJjzgXA
-	vH5p+xwFxqnygrrvoQa6/8l8SAEs1VVF0XBu04njAq3pWZgbhC24IDZurFMArqD7jUGqeT5
-	SzwasNbsYHXm6PhMeMHOJCqUKmgi/qD3+EaA/1osaOzJt54vZhZwUX4Upr5ocBeYe7ONRGE
-	iBM5k5zeQ7aghvSYU3jJ0azv/BZt1BFHhZKdQYRccfsB+J3+Bcqls+AfUU+HHlEUPjxYB37
-	zbS29oBnQ2FAYic+tkzUfqQAY/2Q4omjbNlRPZS5LW7ZcCKL8PdO6xj5OVa+s4CG4cinf7u
-	76PjH1kBOVoUv1BPKiPOL1swjwbDGU1KvrkD63aj8i1VApD6LH79NwzJRddntpJGCB0B1Fr
-	JKms+/mFNFxuVMN0pmNdR6QozwdiMojXiBPqTGYRweTfvsITnJPLrL7x59i7cuaFRkwdZ8i
-	e4Ql8Mfl41eCyA6VreZNWbSh8mj/TTWIk6YR4zyrC1cSG3JC45RlXFgnC9e6SKonXV3E+Zf
-	P7pU+6JeT2Go26IdzO4AH5XuQia6k79yyjpjUid4A7eqekWEn3OeTEVJi8SyQExpKG7Jlac
-	d0edtWg4LCDuAVdOtV638V4Qf3Yw3KhQzYMqFYccxXhivx5UzLrQjcxb+at/hwP+UGmRkgX
-	xY0LlyTV0aMscEMvum1/Dqir4aDoxT77J4AXeoFTLmceZm8oyz8AKBT6HuUFArYjn2RhbQJ
-	xJvcOJ5gBpWmWpP4I56PE+TrFi8k3jXO//hBh3ViuKwIv/LDfbcGot9Z8BxXke2Fc4gdXRJ
-	vMOlOgUmOO7OV84MGf8wMsBPD5wdGa9PfrcI5f5MKWdJ2/aw9bTm299rlIBacTrwkpI/M7p
-	pm6sElzVv/ia3UZR5xsO5eFDk5ESVLFEnz/qfegPx4bgn7sTV5WVkY+g+YsWQfivuJEdBtx
-	KvpUk4hKNAvl31TmBEMLVMhob/GDFdX65XS1IduNdb+6DVMrM6jaHpkhu1QCHlNV8li8uHP
-	eYoJ2qltE9tCdjmutBqfC99q1/qFplrrSLG63DhJh9TGgmpUyMHML9NgzOtxH2QX8cnD6OR
-	p5lnEhxC4zXXmzY/12M/eyF2odNVPrF7JLqbCZp7CJv
-X-QQ-XMRINFO: Mp0Kj//9VHAxzExpfF+O8yhSrljjwrznVg==
-X-QQ-RECHKSPAM: 0
 
-Although operations on the variable send_peer_notif are already within
-a lock-protected critical section, there are cases where it is accessed
-outside the lock. Therefore, READ_ONCE() and WRITE_ONCE() should be
-added to it.
+On 1/7/26 6:56 AM, Simon Horman wrote:
+> On Thu, Jan 01, 2026 at 11:13:38PM +0100, Frederic Weisbecker wrote:
+>> HK_TYPE_DOMAIN's cpumask will soon be made modifiable by cpuset.
+>> A synchronization mechanism is then needed to synchronize the updates
+>> with the housekeeping cpumask readers.
+>>
+>> Turn the housekeeping cpumasks into RCU pointers. Once a housekeeping
+>> cpumask will be modified, the update side will wait for an RCU grace
+>> period and propagate the change to interested subsystem when deemed
+>> necessary.
+>>
+>> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+>> ---
+>>   kernel/sched/isolation.c | 58 +++++++++++++++++++++++++---------------
+>>   kernel/sched/sched.h     |  1 +
+>>   2 files changed, 37 insertions(+), 22 deletions(-)
+>>
+>> diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
+>> index 11a623fa6320..83be49ec2b06 100644
+>> --- a/kernel/sched/isolation.c
+>> +++ b/kernel/sched/isolation.c
+>> @@ -21,7 +21,7 @@ DEFINE_STATIC_KEY_FALSE(housekeeping_overridden);
+>>   EXPORT_SYMBOL_GPL(housekeeping_overridden);
+>>   
+>>   struct housekeeping {
+>> -	cpumask_var_t cpumasks[HK_TYPE_MAX];
+>> +	struct cpumask __rcu *cpumasks[HK_TYPE_MAX];
+>>   	unsigned long flags;
+>>   };
+>>   
+>> @@ -33,17 +33,28 @@ bool housekeeping_enabled(enum hk_type type)
+>>   }
+>>   EXPORT_SYMBOL_GPL(housekeeping_enabled);
+>>   
+>> +const struct cpumask *housekeeping_cpumask(enum hk_type type)
+>> +{
+>> +	if (static_branch_unlikely(&housekeeping_overridden)) {
+>> +		if (housekeeping.flags & BIT(type)) {
+>> +			return rcu_dereference_check(housekeeping.cpumasks[type], 1);
+>> +		}
+>> +	}
+>> +	return cpu_possible_mask;
+>> +}
+>> +EXPORT_SYMBOL_GPL(housekeeping_cpumask);
+>> +
+> Hi Frederic,
+>
+> I think this patch should also update the access to housekeeping.cpumasks
+> in housekeeping_setup(), on line 200, to use housekeeping_cpumask().
+>
+> As is, sparse flags __rcu a annotation miss match there.
+>
+>    kernel/sched/isolation.c:200:80: warning: incorrect type in argument 3 (different address spaces)
+>    kernel/sched/isolation.c:200:80:    expected struct cpumask const *srcp3
+>    kernel/sched/isolation.c:200:80:    got struct cpumask [noderef] __rcu *
+>
+> ...
+>
+The direct housekeeping.cpumasks[type] reference is in the newly merged 
+check after Federic's initial patch series.
 
-Cc: Jay Vosburgh <jv@jvosburgh.net>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: Hangbin Liu <liuhangbin@gmail.com>
-Cc: Jason Xing <kerneljasonxing@gmail.com>
-Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
----
-v3/4:
-- no change
-v2: fix compilation errors
----
- drivers/net/bonding/bond_main.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+                 iter_flags = housekeeping.flags & (HK_FLAG_KERNEL_NOISE 
+| HK_FLAG_DOMAIN);
+                 type = find_first_bit(&iter_flags, HK_TYPE_MAX);
+                 /*
+                  * Pass the check if none of these flags were 
+previously set or
+                  * are not in the current selection.
+                  */
+                 iter_flags = flags & (HK_FLAG_KERNEL_NOISE | 
+HK_FLAG_DOMAIN);
+                 first_cpu = (type == HK_TYPE_MAX || !iter_flags) ? 0 :
+cpumask_first_and_and(cpu_present_mask,
+                                     housekeeping_staging, 
+housekeeping.cpumasks[type]);
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index b835f63d2871..909c01f55744 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -1204,8 +1204,9 @@ void bond_peer_notify_work_rearm(struct bonding *bond, unsigned long delay)
- /* Peer notify update handler. Holds only RTNL */
- static void bond_peer_notify_reset(struct bonding *bond)
- {
--	bond->send_peer_notif = bond->params.num_peer_notif *
--		max(1, bond->params.peer_notif_delay);
-+	WRITE_ONCE(bond->send_peer_notif,
-+		   bond->params.num_peer_notif *
-+		   max(1, bond->params.peer_notif_delay));
- }
- 
- static void bond_peer_notify_handler(struct work_struct *work)
-@@ -2825,7 +2826,7 @@ static void bond_mii_monitor(struct work_struct *work)
- 
- 	rcu_read_unlock();
- 
--	if (commit || bond->send_peer_notif) {
-+	if (commit || READ_ONCE(bond->send_peer_notif)) {
- 		/* Race avoidance with bond_close cancel of workqueue */
- 		if (!rtnl_trylock()) {
- 			delay = 1;
-@@ -3784,7 +3785,7 @@ static void bond_activebackup_arp_mon(struct bonding *bond)
- 	should_notify_rtnl = bond_ab_arp_probe(bond);
- 	rcu_read_unlock();
- 
--	if (bond->send_peer_notif || should_notify_rtnl) {
-+	if (READ_ONCE(bond->send_peer_notif) || should_notify_rtnl) {
- 		if (!rtnl_trylock()) {
- 			delta_in_ticks = 1;
- 			goto re_arm;
--- 
-2.34.1
+Maybe that is why it is missed.
+
+Cheers,
+Longman
 
 
