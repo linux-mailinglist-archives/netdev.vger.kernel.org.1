@@ -1,110 +1,104 @@
-Return-Path: <netdev+bounces-249012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08D48D12AD7
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 14:06:58 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 640DDD12B04
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 14:09:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BF9C3300A36E
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 13:06:56 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D81A93009D77
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 13:09:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C5E2D47E3;
-	Mon, 12 Jan 2026 13:06:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C7C93587BC;
+	Mon, 12 Jan 2026 13:09:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nbZWez4/"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="WMi/luJo"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8303E30B532
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 13:06:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2588B358D20;
+	Mon, 12 Jan 2026 13:09:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768223215; cv=none; b=WpN6K6YG+hBKvO0ngS0uy5gCLIp8VeNyRc2OkAn0PWrOc7xXTP32+bum+T9xYYZ+9L2wno4ma3eRlxTsgKOoTMQonmlfQ40bbXgYfdjG/rbZlEpxg3QR+lwIyAW4eWS4/pEpXQxAYalbqK0OzpHM4gKB0XKHXiyaAOSggLEmQKk=
+	t=1768223359; cv=none; b=f5Hw0BylCGxMHN9/196/YVei5vNOVzneoK3BzXTGREwyeKGuOLhMbEYkel4D8RFXQKWbHZSSNh36dfCWZ7JKhFDDJ62uJbzd+SHRRkWpwKsF1RzVx0hEw8u4XE3Gy8lwd5LLzES4XraYf74FY9MQqWPql39vdoUgAg82H/x0EGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768223215; c=relaxed/simple;
-	bh=FsiGsnhkfIMq5xQxcHKbKkmD3OAOQscT86cIg6iw2U8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=i99dqS7IbZ+A5bF5cw+JbgY8NU/sa0QEhSs0kQvoTRXMyxTTEb6zHfkMD15X+VPhCWLLr+Tuvn7qW9KtW1YrCi0qH2vDTd9xwpZmSR29CAgaTmcFODpklojoEBwrC1NkjvHyYdd8rA3gTy98r6+Lepy22Qzi3pgrDjlNyV7cetA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nbZWez4/; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768223211;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=xbIJal/gfJnpbqOOXrwfFZL/+IG8MB1cGwJ3x0vOuxo=;
-	b=nbZWez4/3ZblIOQ9G5g1ieE4N3T2mwTJlVl9gJg/aoSELhCwJc6RjuHmqLay54jx93el+z
-	BEWStciT9kNesSkrMC+2aO9/21ZAjpXZ2LIr9my8LnofPN6pHuFMHCsrjdw98RMtlAPnOq
-	AC85xzrI22VLmhCcvdG0U4gnYjuT9OM=
-From: Fushuai Wang <fushuai.wang@linux.dev>
-To: Jason@zx2c4.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: wireguard@lists.zx2c4.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	wangfushuai@baidu.com,
-	vadim.fedorenko@linux.dev
-Subject: [PATCH net-next v3] wireguard: allowedips: Use kfree_rcu() instead of call_rcu()
-Date: Mon, 12 Jan 2026 21:06:33 +0800
-Message-Id: <20260112130633.25563-1-fushuai.wang@linux.dev>
+	s=arc-20240116; t=1768223359; c=relaxed/simple;
+	bh=BKB9L3/szgoPtLh+SOGFMPh4uRLxohuFEDrbXrgCRdc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HHZfw9vfX3NP8Gkz0tKgJqbfPomVgxcyLCR46uFZcAEjOC3Ep3PtrJ8gz4cAtDlqQT6f5nDl+rSK0UOk5bFOb4d9pUcyo5wSr7+DFqMMjdn6rEcK1bIeZCBTxf0klOw2LdNplCgoyXf/m9/LCL5KA5zicTRnjzQh550VfAy+EyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=WMi/luJo; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id C400B201AC8B; Mon, 12 Jan 2026 05:09:07 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C400B201AC8B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1768223347;
+	bh=X5c6NHQ/R9EQQOdmt1M+0D3XF7Fx/S84TCxOUPYVNvM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WMi/luJoDWmaez/mkmmbx9R7o583mFZxT12FblvS8QKPooGyDuzKNABAOPJZTRRpG
+	 R10pdl1DvvwVCecxymFF9iInH7O74XyYz8kapjYmTrZYvw7hdX3hJKrQZ77alArZp6
+	 pa0Mdeh/70A0VwB2WmofLNtgj2qPYHFtB+EnZtY0=
+Date: Mon, 12 Jan 2026 05:09:07 -0800
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: Aditya Garg <gargaditya@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, stephen@networkplumber.org,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, ssengar@linux.microsoft.com,
+	shradhagupta@linux.microsoft.com, ernis@linux.microsoft.com,
+	gargaditya@microsoft.com
+Subject: Re: [PATCH net-next] net: hv_netvsc: reject RSS hash key programming
+ without RX indirection table
+Message-ID: <20260112130907.GA13088@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1768212093-1594-1-git-send-email-gargaditya@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1768212093-1594-1-git-send-email-gargaditya@linux.microsoft.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-From: Fushuai Wang <wangfushuai@baidu.com>
+On Mon, Jan 12, 2026 at 02:01:33AM -0800, Aditya Garg wrote:
+> RSS configuration requires a valid RX indirection table. When the device
+> reports a single receive queue, rndis_filter_device_add() does not
+> allocate an indirection table, accepting RSS hash key updates in this
+> state leads to a hang.
+> 
+> Fix this by gating netvsc_set_rxfh() on ndc->rx_table_sz and return
+> -EOPNOTSUPP when the table is absent. This aligns set_rxfh with the device
+> capabilities and prevents incorrect behavior.
+> 
+> Fixes: 962f3fee83a4 ("netvsc: add ethtool ops to get/set RSS key")
+> Signed-off-by: Aditya Garg <gargaditya@linux.microsoft.com>
+> Reviewed-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+> ---
+>  drivers/net/hyperv/netvsc_drv.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
+> index 3d47d749ef9f..cbd52cb79268 100644
+> --- a/drivers/net/hyperv/netvsc_drv.c
+> +++ b/drivers/net/hyperv/netvsc_drv.c
+> @@ -1750,6 +1750,9 @@ static int netvsc_set_rxfh(struct net_device *dev,
+>  	    rxfh->hfunc != ETH_RSS_HASH_TOP)
+>  		return -EOPNOTSUPP;
+>  
+> +	if (!ndc->rx_table_sz)
+> +		return -EOPNOTSUPP;
+> +
+>  	rndis_dev = ndev->extension;
+>  	if (rxfh->indir) {
+>  		for (i = 0; i < ndc->rx_table_sz; i++)
+> -- 
+> 2.43.0
+>
 
-Replace call_rcu() + kmem_cache_free() with kfree_rcu() to simplify
-the code and reduce function size.
+LGTM.
 
-Signed-off-by: Fushuai Wang <wangfushuai@baidu.com>
----
- drivers/net/wireguard/allowedips.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/wireguard/allowedips.c b/drivers/net/wireguard/allowedips.c
-index 09f7fcd7da78..5ece9acad64d 100644
---- a/drivers/net/wireguard/allowedips.c
-+++ b/drivers/net/wireguard/allowedips.c
-@@ -48,11 +48,6 @@ static void push_rcu(struct allowedips_node **stack,
- 	}
- }
- 
--static void node_free_rcu(struct rcu_head *rcu)
--{
--	kmem_cache_free(node_cache, container_of(rcu, struct allowedips_node, rcu));
--}
--
- static void root_free_rcu(struct rcu_head *rcu)
- {
- 	struct allowedips_node *node, *stack[MAX_ALLOWEDIPS_DEPTH] = {
-@@ -271,13 +266,13 @@ static void remove_node(struct allowedips_node *node, struct mutex *lock)
- 	if (free_parent)
- 		child = rcu_dereference_protected(parent->bit[!(node->parent_bit_packed & 1)],
- 						  lockdep_is_held(lock));
--	call_rcu(&node->rcu, node_free_rcu);
-+	kfree_rcu(node, rcu);
- 	if (!free_parent)
- 		return;
- 	if (child)
- 		child->parent_bit_packed = parent->parent_bit_packed;
- 	*(struct allowedips_node **)(parent->parent_bit_packed & ~3UL) = child;
--	call_rcu(&parent->rcu, node_free_rcu);
-+	kfree_rcu(parent, rcu);
- }
- 
- static int remove(struct allowedips_node __rcu **trie, u8 bits, const u8 *key,
--- 
-2.36.1
-
+Reviewed-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
 
