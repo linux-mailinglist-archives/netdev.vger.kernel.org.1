@@ -1,192 +1,144 @@
-Return-Path: <netdev+bounces-249217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B298AD15BF2
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 00:11:04 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88124D15C8C
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 00:23:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 584EE3009D52
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 23:10:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CA474300EE5C
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 23:22:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5305033C19C;
-	Mon, 12 Jan 2026 23:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78A2B344036;
+	Mon, 12 Jan 2026 23:21:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ynLTSRMj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bnwgFz9v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f74.google.com (mail-dl1-f74.google.com [74.125.82.74])
+Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16D2332EC7
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 23:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62D4342526
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 23:21:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768259414; cv=none; b=BhahcghurBUIOg4+xy0JbB9ms5VdGlUUnBmOVL25L4efhL1T+qXvGv/HmauQ087vaEV/ljuN2kBfthOVMWO8fGI9WAD2r/kAvNl7u4kZsmwU6LX1zSZIwGTx1sO0BIYtWapXR75KbZ1r0rsvftI0nSj8LX5f6brNNlztVIWSscY=
+	t=1768260081; cv=none; b=rm6g6rnTpGyQNkAAV4s7DrgBVEB346TdTFbvqs20w//aBUtcOO0qkrB/5U9shObjsZmmF9rmszriKitbzAuxCFCXGACnFAZmRdtwEdHsZbqJrpAeA9sjYtEuNXX7ND78IU79CwyahRWygsZDPZKJ4YQimNPTB+G/sbCHGEAvE/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768259414; c=relaxed/simple;
-	bh=OVeV2T7Schb9tKEgL7V9yVfcDlLFjn7Kd/3QGB2jaS0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=iuOSVM9ox+jAxhVQPVZPp1ijt8XiwlMQ5EHK2ZDWoQ4aqdTWd0dnZ7u5dlv5J0AbytoVIJFus+qb1GH7kH0FEjp5WPORqHK061ESqWRBCGWFJj0vBSecCI/xPEbKYAFtBIGSWeYDjvK+kaYZdb6tTUbY/IWvdnaXemj1BNKXWXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--boolli.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ynLTSRMj; arc=none smtp.client-ip=74.125.82.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--boolli.bounces.google.com
-Received: by mail-dl1-f74.google.com with SMTP id a92af1059eb24-121adbf76c3so8991399c88.1
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 15:10:12 -0800 (PST)
+	s=arc-20240116; t=1768260081; c=relaxed/simple;
+	bh=7L4AuwoQwpFDKJ+QfvB8n+UzDOCrhQdo2yK39qUc8cI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=syN8arqzky0+LRXJv8aYQ+sM+RPcpzVko8KbeF6pNMP2GanXpLP7Kx8hNaRUd9hus4SooxURRaNprkx9rVBxpnMSSQtkeqx/IyPRd3aRt+//bEYWwZa2eO7taDYuAG82pDY4BZsKZ07WCl8FVJ09Rsbv3e/KkvP8naNnIeIBVII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bnwgFz9v; arc=none smtp.client-ip=74.125.224.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-6468f0d5b1cso6178148d50.1
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 15:21:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768259412; x=1768864212; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1GtgZegM7FjbeyuOL5Y6kyqpA7dLG8bpU56qxoB17r0=;
-        b=ynLTSRMj+oVwvUq+S4c/t9F6Khf+qqUpOqTQdsVGQvhVQCpCPUIGQrKkllgUHAb86W
-         zF6w6P7T2kPMPPXIG6bGFJQMcBjPEuifRNGZzUZjc9HQSoriLxiPSLd10jFHNoySoh8M
-         oOH1F4Gwh6S0t4RCe3MR0EAMHytZ7lVKgOhTXfyo4GG4RyrfaB5Ca0Z6yTccLRmFxzOx
-         KsjJvGDKBIDE3NaBwd71dfflQPnu47WeuEpiSn9h1a+61wieRJQOkpJSWA5hiyNFYC4G
-         9dCV99ps66o0Mb45QX5NrkV15F1q8cq+nML7HXp53f8xvW2PeEXootcss+hkQZYT3TjQ
-         saMA==
+        d=gmail.com; s=20230601; t=1768260072; x=1768864872; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jtoLeYJaY/2ODhxZmDU22B5G0cJLjLhdpG7Ly3b1Aek=;
+        b=bnwgFz9vs89U9SsRGckgS2XN4MyfrbVDR1dCDH2HClRdZmlUE/XHYWgUfKlFFk7trh
+         J6XZTAZzoGBhvbI4xJTxV1ZlAMe+gZD9TUlsc8FDEJ2e3lcvL9OJUz77cb2dS3dm08lk
+         u2qddLyeSNf5u8ER8dCX9RfiSxdfKnFtX6LXWI7j8N7Ip7FzH0EzzstIx9pBLXXLaat8
+         CwVf2+Tygfn26guy/NAElPnU5Tm1t/yJV0FtgnTQZkSP1AA0vKKOyoiEpcxQL7ci4jjb
+         r8vFDHLO21Kg9zpMwL6+pmEgfPFF0R8ICp5V8V0pN0p4BaEx7BisktOLUi7hv8LBlYKq
+         HO2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768259412; x=1768864212;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1GtgZegM7FjbeyuOL5Y6kyqpA7dLG8bpU56qxoB17r0=;
-        b=uxJEo2m2L2IzWA+ubBxT7CKkDMPNHdGgZIoHmv0C4NWzYb/0RHitEsl1DR14m39mO9
-         ZZgnCIFCqnlO9ABwEuZpp+bq7pMP0zIEBJcQaPRnhRNgCyQL5rCFNMm+7DV9p9uTSOtL
-         dEl9HapUQOxpJ4/46AsXT/n8UxaLfu8uTmRURlyrKHzHqvQ+sHQuIfjT/3UozXR62JvS
-         3eivlXFsRcLEhGpPKZnlqu9WIW6xO9uoLfJE/TFBFUlGFFDVxiOfLF2DPS2fRzgDM07C
-         17oBHmkIZT4F9LUmtdGVahQt0PY29tB3W31HgNtuis67mT/kIeWACmB0ZpQ97WUq77hO
-         kK9A==
-X-Gm-Message-State: AOJu0Yy2umcPZsTkJZhh8FPY1uHRk3JY5hTsbhGnS6X4ZPbxCyTrvDvH
-	YA4nvh/XJfCUK95TAKXBXQWb7bWqfn7t84QqnLNd9irTDr2je7GzM+5jwnMkkhf4FCwxWgPTgJu
-	szCjuMQ==
-X-Google-Smtp-Source: AGHT+IFUZfbTXF1Fw1Cvh/r4GdD8A92eVq9LwJaEBG9JrsMm9bSGeUApjkJeHgxbw+xleiw77AYeSVOJYO4=
-X-Received: from dlbti6.prod.google.com ([2002:a05:7022:1b06:b0:11f:3484:4f15])
- (user=boolli job=prod-delivery.src-stubby-dispatcher) by 2002:a05:7022:f90:b0:11d:c04a:dc5b
- with SMTP id a92af1059eb24-121f8b7a790mr16487972c88.30.1768259411873; Mon, 12
- Jan 2026 15:10:11 -0800 (PST)
-Date: Mon, 12 Jan 2026 23:09:44 +0000
-In-Reply-To: <20260112230944.3085309-1-boolli@google.com>
+        d=1e100.net; s=20230601; t=1768260072; x=1768864872;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jtoLeYJaY/2ODhxZmDU22B5G0cJLjLhdpG7Ly3b1Aek=;
+        b=V8yNMEdJc3OFR6yB9Wheo6ye59zff3FkXuzch98myWNtZtxnb7hCFxI4+aHJvTsR26
+         TFwEVZcufWSY6Y/oVNny1LOITCFArsrdupR4fqBSALk9jzYtAxEgTnYzxEshjuQeKzXz
+         3jXUiyIBlYNWP3rX48V+CwvVqvUVOAKiSJ4BVcaC5/vayH4cpv/7XoUHNABVYBIA90dP
+         dzJGnlwBaSdJfI2Fif0atlqzy75jsobUkNwvDDvwE3iEmUPiecIKp2dyDZkTTVV45jO5
+         7w6piLFL1ZGqvi3Wtx6YlnjfYLvn7HdjlZEgXJULZAuYRlw6MMUDBSZB6sRYMZc8hdzM
+         gP8g==
+X-Forwarded-Encrypted: i=1; AJvYcCXq0S0Ugcb6MYXe+gq6qfTMpxI1LktwUFGScRBJQwvgdzmo5AG3xfdRZMxmeQgxRTfB1o5j+3s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIVteDz9yYipBG+ijDb1PC8QZDwC2cc/9v/C7mTRe5slWkAod+
+	YZgdDphxPWRnPI9gOb673tT+jcwV3cnR3YDIJR+3hsS5NyXS9ukkBP9x
+X-Gm-Gg: AY/fxX5TyitVEZkt+i0d3JyWtcdfbl/1jkLHURoMURwOphfQhIrXwhL3FCCS33it72+
+	HtmnM7jWq/ztSc07Zzp+AdSKCUIiiz4qvKnLgzeSRyMYEpySrEIxhkw6jFb0eUxgxXCcx9ss00Z
+	X53JmN8RBMkotXoYTMif60Nv6fHLTXkDM3yT8B0qBS2P4GB27ijPbJyHbh4uCv8/ot0fZ6T1ISn
+	P1xpVRENCK/aUNkcEt8BLrX3fi73EDtAH4xDebLyfBIfPrv6jFONB8mp/z4vroEU+sj7dgFMCEP
+	XJwQ9JjdMOHinYM4EvOYjxumUpCJ1WYdPT2ZoNSNgvrTTFkHTG8ajCyac+Y6smuGt1Tw/PIheVP
+	MVvfiCkY92CTXF7mFvEpwaVcco3UDe7bRJTwyLbi7FNkA6W40Hym/XXyhoyYBjL+RYoSxDOVlty
+	owyd5IALsuiIS3ciTVWYp5hxYyABTCRAiwhw==
+X-Google-Smtp-Source: AGHT+IGPR3yHTofTNuLsmIGRF/vxUZuNpadx2Jh/erk6LsyOgtC+kyjO5yp6nCVt3XNr+Y0sCRmwIQ==
+X-Received: by 2002:a05:690e:4085:b0:645:5297:3e65 with SMTP id 956f58d0204a3-64716b35ea6mr16989024d50.11.1768260071815;
+        Mon, 12 Jan 2026 15:21:11 -0800 (PST)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:2::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-790aa6e12ffsm74065287b3.53.2026.01.12.15.21.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jan 2026 15:21:11 -0800 (PST)
+Date: Mon, 12 Jan 2026 15:21:09 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Shuah Khan <shuah@kernel.org>, Long Li <longli@microsoft.com>,
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, kvm@vger.kernel.org,
+	linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	berrange@redhat.com, Sargun Dhillon <sargun@sargun.me>,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH RFC net-next v13 03/13] virtio: set skb owner of
+ virtio_transport_reset_no_sock() reply
+Message-ID: <aWWB5bvx677ep317@devvm11784.nha0.facebook.com>
+References: <20251223-vsock-vmtest-v13-0-9d6db8e7c80b@meta.com>
+ <20251223-vsock-vmtest-v13-3-9d6db8e7c80b@meta.com>
+ <20260111014500-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260112230944.3085309-1-boolli@google.com>
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260112230944.3085309-3-boolli@google.com>
-Subject: [PATCH 2/2] idpf: skip deallocating txq group's txqs if it is NULL.
-From: Li Li <boolli@google.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	David Decotigny <decot@google.com>, Anjali Singhai <anjali.singhai@intel.com>, 
-	Sridhar Samudrala <sridhar.samudrala@intel.com>, Brian Vazquez <brianvv@google.com>, 
-	Li Li <boolli@google.com>, emil.s.tantilov@intel.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260111014500-mutt-send-email-mst@kernel.org>
 
-In idpf_txq_group_alloc(), if any txq group's txqs failed to
-allocate memory:
+On Sun, Jan 11, 2026 at 01:46:43AM -0500, Michael S. Tsirkin wrote:
+> On Tue, Dec 23, 2025 at 04:28:37PM -0800, Bobby Eshleman wrote:
+> > From: Bobby Eshleman <bobbyeshleman@meta.com>
+> > 
+> > Associate reply packets with the sending socket. When vsock must reply
+> > with an RST packet and there exists a sending socket (e.g., for
+> > loopback), setting the skb owner to the socket correctly handles
+> > reference counting between the skb and sk (i.e., the sk stays alive
+> > until the skb is freed).
+> > 
+> > This allows the net namespace to be used for socket lookups for the
+> > duration of the reply skb's lifetime, preventing race conditions between
+> > the namespace lifecycle and vsock socket search using the namespace
+> > pointer.
+> > 
+> > Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+> > ---
+> > Changes in v11:
+> > - move before adding to netns support (Stefano)
+> 
+> can you explain about the revert please?
+> I looked at feedback from Stefano and all he said
+> aparently was not to break bisect.
 
-	for (j = 0; j < tx_qgrp->num_txq; j++) {
-		tx_qgrp->txqs[j] = kzalloc(sizeof(*tx_qgrp->txqs[j]),
-					   GFP_KERNEL);
-		if (!tx_qgrp->txqs[j])
-			goto err_alloc;
-	}
+The patch that brings support into vsock_loopback depends on this one to
+avoid a introducing a race condition, so it should come before that one.
 
-It would cause a NULL ptr kernel panic in idpf_txq_group_rel():
-
-	for (j = 0; j < txq_grp->num_txq; j++) {
-		if (flow_sch_en) {
-			kfree(txq_grp->txqs[j]->refillq);
-			txq_grp->txqs[j]->refillq = NULL;
-		}
-
-		kfree(txq_grp->txqs[j]);
-		txq_grp->txqs[j] = NULL;
-	}
-
-[    6.532461] BUG: kernel NULL pointer dereference, address: 0000000000000058
-...
-[    6.534433] RIP: 0010:idpf_txq_group_rel+0xc9/0x110
-...
-[    6.538513] Call Trace:
-[    6.538639]  <TASK>
-[    6.538760]  idpf_vport_queues_alloc+0x75/0x550
-[    6.538978]  idpf_vport_open+0x4d/0x3f0
-[    6.539164]  idpf_open+0x71/0xb0
-[    6.539324]  __dev_open+0x142/0x260
-[    6.539506]  netif_open+0x2f/0xe0
-[    6.539670]  dev_open+0x3d/0x70
-[    6.539827]  bond_enslave+0x5ed/0xf50
-[    6.540005]  ? rcutree_enqueue+0x1f/0xb0
-[    6.540193]  ? call_rcu+0xde/0x2a0
-[    6.540375]  ? barn_get_empty_sheaf+0x5c/0x80
-[    6.540594]  ? __kfree_rcu_sheaf+0xb6/0x1a0
-[    6.540793]  ? nla_put_ifalias+0x3d/0x90
-[    6.540981]  ? kvfree_call_rcu+0xb5/0x3b0
-[    6.541173]  ? kvfree_call_rcu+0xb5/0x3b0
-[    6.541365]  do_set_master+0x114/0x160
-[    6.541547]  do_setlink+0x412/0xfb0
-[    6.541717]  ? security_sock_rcv_skb+0x2a/0x50
-[    6.541931]  ? sk_filter_trim_cap+0x7c/0x320
-[    6.542136]  ? skb_queue_tail+0x20/0x50
-[    6.542322]  ? __nla_validate_parse+0x92/0xe50
-ro[o t   t o6 .d5e4f2a5u4l0t]-  ? security_capable+0x35/0x60
-[    6.542792]  rtnl_newlink+0x95c/0xa00
-[    6.542972]  ? __rtnl_unlock+0x37/0x70
-[    6.543152]  ? netdev_run_todo+0x63/0x530
-[    6.543343]  ? allocate_slab+0x280/0x870
-[    6.543531]  ? security_capable+0x35/0x60
-[    6.543722]  rtnetlink_rcv_msg+0x2e6/0x340
-[    6.543918]  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
-[    6.544138]  netlink_rcv_skb+0x16a/0x1a0
-[    6.544328]  netlink_unicast+0x20a/0x320
-[    6.544516]  netlink_sendmsg+0x304/0x3b0
-[    6.544748]  __sock_sendmsg+0x89/0xb0
-[    6.544928]  ____sys_sendmsg+0x167/0x1c0
-[    6.545116]  ? ____sys_recvmsg+0xed/0x150
-[    6.545308]  ___sys_sendmsg+0xdd/0x120
-[    6.545489]  ? ___sys_recvmsg+0x124/0x1e0
-[    6.545680]  ? rcutree_enqueue+0x1f/0xb0
-[    6.545867]  ? rcutree_enqueue+0x1f/0xb0
-[    6.546055]  ? call_rcu+0xde/0x2a0
-[    6.546222]  ? evict+0x286/0x2d0
-[    6.546389]  ? rcutree_enqueue+0x1f/0xb0
-[    6.546577]  ? kmem_cache_free+0x2c/0x350
-[    6.546784]  __x64_sys_sendmsg+0x72/0xc0
-[    6.546972]  do_syscall_64+0x6f/0x890
-[    6.547150]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[    6.547393] RIP: 0033:0x7fc1a3347bd0
-...
-[    6.551375] RIP: 0010:idpf_txq_group_rel+0xc9/0x110
-...
-[    6.578856] Rebooting in 10 seconds..
-
-We should skip deallocating txqs[j] if it is NULL in the first place.
-
-Tested: with this patch, the kernel panic no longer appears.
-Fixes: 1c325aac10a8 ("idpf: configure resources for TX queues")
-
-Signed-off-by: Li Li <boolli@google.com>
----
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index b4dab4a8ee11b..25207da6c995d 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -1311,6 +1311,9 @@ static void idpf_txq_group_rel(struct idpf_vport *vport)
- 		struct idpf_txq_group *txq_grp = &vport->txq_grps[i];
- 
- 		for (j = 0; j < txq_grp->num_txq; j++) {
-+			if (!txq_grp->txqs[j])
-+				continue;
-+
- 			if (flow_sch_en) {
- 				kfree(txq_grp->txqs[j]->refillq);
- 				txq_grp->txqs[j]->refillq = NULL;
--- 
-2.52.0.457.g6b5491de43-goog
-
+Best,
+Bobby
 
