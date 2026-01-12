@@ -1,62 +1,66 @@
-Return-Path: <netdev+bounces-248908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D279D10F9D
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 08:52:25 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1482ED111C8
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 09:12:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5DEA030C5C87
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 07:50:01 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A5E443068063
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 08:06:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6CDA3382E3;
-	Mon, 12 Jan 2026 07:50:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B502C33CEAA;
+	Mon, 12 Jan 2026 08:04:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="JIAbrxU4"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fhTLfgsl"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03D93328FB;
-	Mon, 12 Jan 2026 07:49:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED42032B98F
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 08:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768204200; cv=none; b=hSQTQJEhEkOCh/cIm2GzEksO/VYSvg/qYWloAmwlyeCFqsaEXUjxu+Z2Gkb5VmeKcgQh4RBobpuktOVNafWsfPO9p0eCrcFWt16r+pZduViUfL2GxBbddR8x4K17H216tIyh1CtKew3aeosBAQPQCVrhKLWxUKkutjSn0musRu4=
+	t=1768205072; cv=none; b=TKaMQelgfrL/6QBt6Xrfb+JcpdMGEjxFDW9GrJ05iNnsGDkYYeduIiHaMsVtMUkVhhheTX4Ei9aQhU+MdatMbHxk07QZ6Rks3Rmn8UtD9veYhGhBeGM0uHhjGnSK4SXIjOPstxwMGcrDF+kyAuuwQYFJ8E5mJOU8B0yXgoKoJFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768204200; c=relaxed/simple;
-	bh=zr+cpbgW76FANEZrnWJXeRXNoWuIFdknjGQ1xqOZS24=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=beykj3gdIXw/jWW67Jam82XkPbuLP0cAuJbn+UmXv/I5FahgmAMHBWF2NcXIjbvyFA1XoeP08ffrGh8InICdpXKATWhnKotostcJ5AwybROC52xj+0D/wzZjllUZFPV4bxrqX7QSS43Ay5aA3L8rz12HcTLeK6IKbtG0Mmo7Yhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=JIAbrxU4; arc=none smtp.client-ip=113.46.200.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=bWEhCzx9xyA3ZWKQ2WgUGddIaO+7ZeRIEJqvOKFz16c=;
-	b=JIAbrxU4VhK0/bSgwAdER2BnM99VVF5jH1LFaBmeTAwvSTIMcpyRmuOR9u3MZVtoa7go+2nrb
-	wyFIaycRbViIHNWaeDkJPMxB70CtdWPqvsoxoNALgrGL6BTLph5TLmzBR1sWwNABmTdAb6bpr9b
-	AdOao41X2u6sju7FrAtnUuE=
-Received: from mail.maildlp.com (unknown [172.19.163.15])
-	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4dqPZg1Bp4zmV8R;
-	Mon, 12 Jan 2026 15:46:19 +0800 (CST)
-Received: from kwepemk500008.china.huawei.com (unknown [7.202.194.93])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2273A40565;
-	Mon, 12 Jan 2026 15:49:38 +0800 (CST)
-Received: from huawei.com (10.50.159.234) by kwepemk500008.china.huawei.com
- (7.202.194.93) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 12 Jan
- 2026 15:49:37 +0800
-From: Chen Zhen <chenzhen126@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<huyizhen2@huawei.com>, <gaoxingwang1@huawei.com>
-Subject: [PATCH v3 net 2/2] selftests: vlan: add test for turn on hw offload with reorder_hdr off
-Date: Mon, 12 Jan 2026 15:59:39 +0800
-Message-ID: <20260112075939.2509397-3-chenzhen126@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20260112075939.2509397-1-chenzhen126@huawei.com>
-References: <20260112075939.2509397-1-chenzhen126@huawei.com>
+	s=arc-20240116; t=1768205072; c=relaxed/simple;
+	bh=N89CHE+jyXjgzNAuRTZUQT2yOxWFHhz2J4jXh2RqipE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G3o6Bs4wi5wFXzkUVJlzOB1TE+/Wtvhv2Q3tzf4erjF21T259jEFQ367OEdqZr7WO/QgqQokUj+e5r88wLTxdhyTkmtyP7BYpCBVyENV2ZT3j2ZoYFO5JfilP4RPugnvhVwU9lzm7bJWjoG54AzVyCzekKNCBr7FG3wWw0hZMuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fhTLfgsl; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1768205051;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=p4Z4ytyxGeEbNSpkRlt95EmE6o89ZwisT6/HLnk71e4=;
+	b=fhTLfgslzcQo2Qbxa+67R+P/b/RAEaHadpj8X9gtQ8BCuasRHCgdYzi7sIOYxTD1F0LrQG
+	DYBul1b9uxDxT07d/3vPT4vGP56DFo+iXAKWZVjPgcEM4Rg3fAESYFsj8KguJLXVi5TzNb
+	Se/US4LLPCY/GJPzhL+nYdSkUIu8vf4=
+From: Leon Hwang <leon.hwang@linux.dev>
+To: netdev@vger.kernel.org
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Oz Shlomo <ozsh@mellanox.com>,
+	Paul Blakey <paulb@mellanox.com>,
+	Khalid Manaa <khalidm@nvidia.com>,
+	Achiad Shochat <achiad@mellanox.com>,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Leon Hwang <leon.hwang@linux.dev>,
+	Leon Huang Fu <leon.huangfu@shopee.com>
+Subject: [PATCH net-next] net/mlx5e: Mask wqe_id when handling rx cqe
+Date: Mon, 12 Jan 2026 16:03:23 +0800
+Message-ID: <20260112080323.65456-1-leon.hwang@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,74 +68,78 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemk500008.china.huawei.com (7.202.194.93)
+X-Migadu-Flow: FLOW_OUT
 
-If vlan dev was created with reorder_hdr off and hw offload both
-off but up with hw offload on, it will trigger a skb_panic bug in
-vlan_dev_hard_header().
+The wqe_id from CQE contains wrap counter bits in addition to the WQE
+index. Mask it with sz_m1 to prevent out-of-bounds access to the
+rq->mpwqe.info[] array when wrap counter causes wqe_id to exceed RQ size.
 
-Add a test to automatically catch re-occurrence of the issue.
+Without this fix, the driver crashes with NULL pointer dereference:
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Chen Zhen <chenzhen126@huawei.com>
+  BUG: kernel NULL pointer dereference, address: 0000000000000020
+  RIP: 0010:mlx5e_skb_from_cqe_mpwrq_linear+0xb3/0x280 [mlx5_core]
+  Call Trace:
+   <IRQ>
+   mlx5e_handle_rx_cqe_mpwrq+0xe3/0x290 [mlx5_core]
+   mlx5e_poll_rx_cq+0x97/0x820 [mlx5_core]
+   mlx5e_napi_poll+0x110/0x820 [mlx5_core]
+
+Fixes: dfd9e7500cd4 ("net/mlx5e: Rx, Split rep rx mpwqe handler from nic")
+Fixes: f97d5c2a453e ("net/mlx5e: Add handle SHAMPO cqe support")
+Fixes: 461017cb006a ("net/mlx5e: Support RX multi-packet WQE (Striding RQ)")
+Signed-off-by: Leon Huang Fu <leon.huangfu@shopee.com>
+Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
 ---
- tools/testing/selftests/net/Makefile          |  1 +
- .../testing/selftests/net/vlan_hw_offload.sh  | 31 +++++++++++++++++++
- 2 files changed, 32 insertions(+)
- create mode 100755 tools/testing/selftests/net/vlan_hw_offload.sh
+ drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h | 5 +++++
+ drivers/net/ethernet/mellanox/mlx5/core/en_rx.c   | 6 +++---
+ 2 files changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index b66ba04f19d9..8b50448a01cd 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -113,6 +113,7 @@ TEST_PROGS := \
- 	veth.sh \
- 	vlan_bridge_binding.sh \
- 	vlan_hw_filter.sh \
-+	vlan_hw_offload.sh \
- 	vrf-xfrm-tests.sh \
- 	vrf_route_leaking.sh \
- 	vrf_strict_mode_test.sh \
-diff --git a/tools/testing/selftests/net/vlan_hw_offload.sh b/tools/testing/selftests/net/vlan_hw_offload.sh
-new file mode 100755
-index 000000000000..ac7140539d95
---- /dev/null
-+++ b/tools/testing/selftests/net/vlan_hw_offload.sh
-@@ -0,0 +1,31 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+# shellcheck disable=SC2329
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h b/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
+index 7e191e1569e8..df8e671d5115 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
+@@ -583,4 +583,9 @@ static inline struct mlx5e_mpw_info *mlx5e_get_mpw_info(struct mlx5e_rq *rq, int
+ 
+ 	return (struct mlx5e_mpw_info *)((char *)rq->mpwqe.info + array_size(i, isz));
+ }
 +
-+setup() {
-+	ip link add veth0 type veth peer name veth1
-+	ip link set veth0 up
-+	ip link set veth1 up
++static inline u16 mlx5e_rq_cqe_wqe_id(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
++{
++	return be16_to_cpu(cqe->wqe_id) & rq->mpwqe.wq.fbc.sz_m1;
 +}
-+
-+cleanup() {
-+	ip link delete veth0 2>/dev/null
-+}
-+
-+# turn on hw offload and set up vlan dev with reorder_hdr off
-+test_vlan_hw_offload_toggle_crash() {
-+	ethtool -K veth0 tx-vlan-hw-insert off
-+	ip link add link veth0 name veth0.10 type vlan id 10 reorder_hdr off
-+	ethtool -K veth0 tx-vlan-hw-insert on
-+
-+	# set up vlan dev and it will trigger ndisc
-+	ip link set veth0.10 up
-+	ip -6 route show dev veth0.10
-+}
-+
-+trap cleanup EXIT
-+
-+setup
-+test_vlan_hw_offload_toggle_crash
-+
-+exit 0
+ #endif
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+index 1f6930c77437..25c04684271c 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+@@ -1957,7 +1957,7 @@ static void mlx5e_handle_rx_cqe_rep(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
+ static void mlx5e_handle_rx_cqe_mpwrq_rep(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
+ {
+ 	u16 cstrides       = mpwrq_get_cqe_consumed_strides(cqe);
+-	u16 wqe_id         = be16_to_cpu(cqe->wqe_id);
++	u16 wqe_id         = mlx5e_rq_cqe_wqe_id(rq, cqe);
+ 	struct mlx5e_mpw_info *wi = mlx5e_get_mpw_info(rq, wqe_id);
+ 	u16 stride_ix      = mpwrq_get_cqe_stride_index(cqe);
+ 	u32 wqe_offset     = stride_ix << rq->mpwqe.log_stride_sz;
+@@ -2373,7 +2373,7 @@ static void mlx5e_handle_rx_cqe_mpwrq_shampo(struct mlx5e_rq *rq, struct mlx5_cq
+ 	u16 cstrides		= mpwrq_get_cqe_consumed_strides(cqe);
+ 	u32 data_offset		= wqe_offset & (PAGE_SIZE - 1);
+ 	u32 cqe_bcnt		= mpwrq_get_cqe_byte_cnt(cqe);
+-	u16 wqe_id		= be16_to_cpu(cqe->wqe_id);
++	u16 wqe_id		= mlx5e_rq_cqe_wqe_id(rq, cqe);
+ 	u32 page_idx		= wqe_offset >> PAGE_SHIFT;
+ 	u16 head_size		= cqe->shampo.header_size;
+ 	struct sk_buff **skb	= &rq->hw_gro_data->skb;
+@@ -2478,7 +2478,7 @@ static void mlx5e_handle_rx_cqe_mpwrq_shampo(struct mlx5e_rq *rq, struct mlx5_cq
+ static void mlx5e_handle_rx_cqe_mpwrq(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
+ {
+ 	u16 cstrides       = mpwrq_get_cqe_consumed_strides(cqe);
+-	u16 wqe_id         = be16_to_cpu(cqe->wqe_id);
++	u16 wqe_id         = mlx5e_rq_cqe_wqe_id(rq, cqe);
+ 	struct mlx5e_mpw_info *wi = mlx5e_get_mpw_info(rq, wqe_id);
+ 	u16 stride_ix      = mpwrq_get_cqe_stride_index(cqe);
+ 	u32 wqe_offset     = stride_ix << rq->mpwqe.log_stride_sz;
 -- 
-2.33.0
+2.52.0
 
 
