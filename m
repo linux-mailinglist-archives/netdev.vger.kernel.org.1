@@ -1,117 +1,218 @@
-Return-Path: <netdev+bounces-248883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1912D1096C
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 05:42:15 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3C1DD10972
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 05:42:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 742D530334E5
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 04:42:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4FA2130151AE
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 04:42:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1BC63043BD;
-	Mon, 12 Jan 2026 04:42:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2257A308F28;
+	Mon, 12 Jan 2026 04:42:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N3QCIJMv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BS9iPDiS";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="YQE5Yfco"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15DF2882CE
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 04:42:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 900072D23B1
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 04:42:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768192933; cv=none; b=jJJtu7OOyP0PJ1Z5Q8lmP25EH/KY0PN3cG4aNEJmko+WnkFFtTvTMLeoSQ4TrSu0cGbc7nKcN2u7/Zs2h4guj1Sb+jlCR+KHcr5qfhjCSNgMSmcC5tN3Vdp3fAv1pbcT64iyFLXzZA7gXTCCi1rN3+ZAdUHyDwDJmNXcCU2kR/s=
+	t=1768192946; cv=none; b=LXM2sogR+qR++JC2RJDgg/DYK/DtHZ2nFb/gtnNG1+xBlLCb15ylHKliKRxupEPFeU/h3krUzpgMapvfRHPglRPG85zJsZXJ7z/3f/u5CLpt5iefXL37okidUX6nhP6ZigPZnPrciR14RGEuDnB4qQNEnm1g583hD3ths3ndxLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768192933; c=relaxed/simple;
-	bh=gSP/gOHfZnG50RaSVavpEGROjWx5RAuT7ip/PUEVQ5I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OSKtgzxUmdqIM9w5j51Bjfr05rLVb3mXf5WfW4o7P8AdCC/F15TNINXHJKX6LhU7/YXR4QSV4FVak2ZKBUM1piBmi56c89mftzQ4tcwQgOZ3obzI3YfRbryvDC52ErTYCGQzRqNRtVWJaSWXaCXoORWD7He2kMlD7yG97CeQoBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N3QCIJMv; arc=none smtp.client-ip=209.85.214.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-2a09d981507so36298085ad.1
-        for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 20:42:12 -0800 (PST)
+	s=arc-20240116; t=1768192946; c=relaxed/simple;
+	bh=2VltQBFJygJXWBbOcvlhVXQ2y5H6Win1bazyoi6YOU0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YI6JvU/FgEZZtDf5G4y3hF4jKnCz/zmFsMDhJQ/NVMpjYALPx6M01pTs2Qe/LlckiSvZWKsuUd67k1WRQedkJg2aqsiMcPtXuLg9OTsz75SKKnpx5ZfiNfiXg8jAFb2o1VLqd5NaFpnUeGzyCkxykX0EZHZfjOJ7SmXEglb841Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BS9iPDiS; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=YQE5Yfco; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768192943;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eRnCSJo0TmvquSWDDIrpEWk/wUKA+CvYamy20zcpVrg=;
+	b=BS9iPDiS6g/TN7mDR/hTCCd+7nZbfzhK6CE0+jEQK/f/8OBYBRn20kyLOmxSVkMqnm9ntq
+	aeheU9vVL6D4scENC+KD1kox1uLOtNpH/kUTFB9FLu7Dg9UgOQMpPAngJckElhPb4xIhBR
+	QOWJCC2htovAqhl01idenfE0pL58wtQ=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-357-6edHFUVFOcqi-D_e3BvnDg-1; Sun, 11 Jan 2026 23:42:22 -0500
+X-MC-Unique: 6edHFUVFOcqi-D_e3BvnDg-1
+X-Mimecast-MFC-AGG-ID: 6edHFUVFOcqi-D_e3BvnDg_1768192941
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-430fb8d41acso3904903f8f.1
+        for <netdev@vger.kernel.org>; Sun, 11 Jan 2026 20:42:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768192932; x=1768797732; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=EIPM5cCx444nBn0MvLsYoHTfL8W/YpOsMH+8k6GGwPc=;
-        b=N3QCIJMv3bgH9d8BrHgkCpPwfArgbEmsfifLPkCSenm+CR1jnGK5xSk0nktMZBSDEH
-         9aW1AEMYpeXkU/aTaI8E5MXSVD5QHwHTJhmuoqHiLDgkE5cDukp8SfKcuChMjP0RCEE1
-         qdvSGON8r7kJ3KuYj+rN08hqcS4evH/YTFZfy/18MQWHFEfI1UWokJsTdcKVOKl/QASr
-         hTTsx+hT20oH2kbHNr2QZC2w0TEFCRPDxMgqgRyxCzMj0rlGKMjthuSblaEVICKwaSwr
-         tJP5TxH3EAYDeRK9X5HTPVEYF4NV8gTPyo8V9FuYcNIcrSuLHBuNHBOLXGCaAGi+BxE4
-         QQHQ==
+        d=redhat.com; s=google; t=1768192941; x=1768797741; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=eRnCSJo0TmvquSWDDIrpEWk/wUKA+CvYamy20zcpVrg=;
+        b=YQE5YfcoVGsc3kel5AZsPv+5MwoVhhFfz1JXQSX/M9CqPf9Sp5r28AoLrkLxNolKew
+         VJvvJOs7OCcjc6DyT3IzQKB6lEe5n71/Gx1e3DBjkfhQQB0NOfp7CkFunWKVMj32/a3b
+         n7NohkN93JvaCdb1VWZ3BsLNICjQbm4dREMxBgjJS4NnZ2D2xow+Fc/vuYgbCzUFcjQq
+         k9oP2XkTPOBWtLXaMixyiAuh9IbWvoMR1t2kmPKoJxFhRK7/L4ihN2O6DBxM5avfOEVK
+         ok1pz+Z2akl5/7aTvDO+vOo2mrPL5uIEmzK4INT9gIceZZR4umPSsAVC9iScz083ZsXG
+         GhiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768192932; x=1768797732;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EIPM5cCx444nBn0MvLsYoHTfL8W/YpOsMH+8k6GGwPc=;
-        b=Uh9V6Kr8CeQoewe02GLXwhw7kF6MBG9mIoo+QKJ3OWZCGTl0vXrJ9txJfGMUJkVMIl
-         LHbDSIpJs782uuiKyE0gmzSJwNVvnv17u8SwXil2FXS4dnRK1/IReeIL/JFoFNH2vSZz
-         RLZQrKbihJCI9gf7VSyj/eKGtjetiMGZoR+MXZZRJUqktqu4ev+aFXFstYohIfHJuboz
-         o7PEu7UK6vFsS/OvquomcjM5IF5R7/0XAAvaxrJw65Ih8JWig4vhhwXBX8u+DANrePlm
-         G7tRa6dIcEnmIU+vwv7cbDZg7KkA6GNm+6sqWwPJBJ3PQJj4C4PrDAHn4bpD3XrmmEoD
-         0jqA==
-X-Gm-Message-State: AOJu0YyB0fGnibP23lOFYgV1t9LnzX04WxRu57hHu5z+oNdO2MioC/Hu
-	YLV7f0aWZsqb3nQifaQk9GTnlgnbHX/pBO9K+ekRWU3xBZVNzqmFC6s=
-X-Gm-Gg: AY/fxX5SinRFYKxXM9gFRdfBKoTy+4ohfXD2xLk67vSRkzfiaUimnyx4tTX9gHkskUi
-	13M8+HJmPd+DqtAxPvV9LarZOUUAXsho+QkvqirgHTO0L9Y/TgtYaHkVw4SLXOdzVSzBv6IwEV2
-	SnigEkhruqvIMCp+U69Wrikx+Yepja4DlTt5Y98bHAxzMvlz+s/MdlwRbuSKxaHaMoiLmQAKiB8
-	e3YMq/sYqllF3XU+q4o2OjJncN4eSt0O35tlTRl9XawMu49CdVp1m4//1nmYoSK6+ks7JUk8EwY
-	ySzlp+vs81fC6b+cWzDKH0DoxPS29azigaPWH0ku88ikdXGXl6UMOlyTiLN4efdBt/vvBFRff7I
-	9uv++pfZIP/O0LTJgLzTCgK7g00zgJT3yNUHLCZLQSDESkXfIjxVmvgYbDTWeE+XJfwLTj9zyZO
-	33MCGtBnl7fHXKoDFH/ck12+Syo2nGyQ==
-X-Google-Smtp-Source: AGHT+IEzuN7aNtn1J2FG5qZS/N7WMbBL2GDIYWYs/IyqTtYi8PseFK1ZsKILx3DgykynShtWDppx3g==
-X-Received: by 2002:a17:903:1ce:b0:296:547a:4bf2 with SMTP id d9443c01a7336-2a3edba6a48mr157822475ad.27.1768192931941;
-        Sun, 11 Jan 2026 20:42:11 -0800 (PST)
-Received: from localhost.localdomain ([38.190.47.140])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a3e3cb2b4dsm164011585ad.54.2026.01.11.20.42.11
+        d=1e100.net; s=20230601; t=1768192941; x=1768797741;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eRnCSJo0TmvquSWDDIrpEWk/wUKA+CvYamy20zcpVrg=;
+        b=Mm6MumuC0iz20QgdpFlltxorNf60hTtwSSbR4GE2YW0eId+2qTwapET5BPyQvEVGvB
+         Sm5ZaPUdETRKK5lN1U0leXOAMeEvSiY9PW4BLzQzfGV4sqwD0OU0hZvAWhEwWXMa+3G/
+         iqlzR+beWRN5ZFvubIHnpRJOIdp4IuN2GsNq3aM7Vq/XrqgRJ9z+OqbakxVs52JucQ7J
+         g2RZQfjWlN2382M9q6vJYIMRtEwjGHeO/wg5rG0Vcqk95hCTtbQK2c96yEmsyVgUY1dU
+         OO+xDBsSE7cUPb/gjDB+Rdw/DE+La/+sMtO81BAgU09koxswk3bVLTK9MOPgRScyZ+cp
+         AtzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUnhL/1+rsgrpl0JRgBaLe1D3MKJ3ppJ7ldNdCvgL2N1vTJMQny70iu5uK8sHX0bGTZo6tKKoc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQd7m1ADitFc8aXfhaqcEMIihl2nAQl0fDImeTDYW7pngzRQwZ
+	XzNgc13zP+kbK9tmVmmpWZdxBnokxUpVe6PyNV8bZp0oGW2fe555dUpZz0OgTe7gMp88uLdaxBT
+	ILy2BWDwSZhIISvfOY7THWp7XUHbfoDKFZK3af9P2KMbFnuLD6QgLddP3mQ==
+X-Gm-Gg: AY/fxX6YAepvRTt7N3AmLjrpdmHDsogdBgsPWQik2V6KJmUFp2VY4aVxzu33caQB+7F
+	P2nUFq9uSTmiVnSdoeZ9aHDBkXG5tlAQ9JTh8cYUQZE+oJoK+HBZamXclQuq3KW8bAUKkuzC2Pg
+	afoVFfof8Mkrbvlmj88Z0Ac8Ag7/uX0CRmQyxN5Y3JodNi5x1ThQXuZQyFyJTmkU0MuAhZdD/4p
+	lTdAGON4YId/vLiOJs0wAKw1lPBJRCU416KT6WyLVes7Kj4TtWc8SDSHLgOj48eKJCSXHkmxDH1
+	D61PsYL8jBdCG4XMYHkHY69zCCcXSgtkHIEFkXO8GIjNUma6RJplQkq/SF10lL/xMFckaSdgWpC
+	bw9ea5vbbMdxnafkpmvLkkc4YoOjFy58=
+X-Received: by 2002:a5d:5888:0:b0:42f:edb6:3642 with SMTP id ffacd0b85a97d-432c37767acmr20558553f8f.60.1768192940942;
+        Sun, 11 Jan 2026 20:42:20 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGksWsEOp11E7do7kSJe9rVBAth4jOqGHv4mw3q8StsdQQPY6PxltAQTL2SJSNkU9vJyWdeOw==
+X-Received: by 2002:a5d:5888:0:b0:42f:edb6:3642 with SMTP id ffacd0b85a97d-432c37767acmr20558531f8f.60.1768192940549;
+        Sun, 11 Jan 2026 20:42:20 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-35-22.inter.net.il. [80.230.35.22])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5ff319sm36985010f8f.43.2026.01.11.20.42.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Jan 2026 20:42:11 -0800 (PST)
-From: Jinseok Kim <always.starving0@gmail.com>
-To: bh74.an@samsung.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jinseok Kim <always.starving0@gmail.com>
-Subject: [PATCH] net: sxgbe: fix typo in comment
-Date: Sun, 11 Jan 2026 20:41:47 -0800
-Message-ID: <20260112044147.2844-1-always.starving0@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Sun, 11 Jan 2026 20:42:19 -0800 (PST)
+Date: Sun, 11 Jan 2026 23:42:16 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Simon Schippers <simon.schippers@tu-dortmund.de>,
+	willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, eperezma@redhat.com, leiyang@redhat.com,
+	stephen@networkplumber.org, jon@nutanix.com,
+	tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next v7 7/9] vhost-net: vhost-net: replace rx_ring
+ with tun/tap ring wrappers
+Message-ID: <20260111234112-mutt-send-email-mst@kernel.org>
+References: <20260107210448.37851-1-simon.schippers@tu-dortmund.de>
+ <20260107210448.37851-8-simon.schippers@tu-dortmund.de>
+ <CACGkMEtndGm+GX+3Kn5AWTkEc+PK0Fo1=VSZzhgBQoYRQbicQw@mail.gmail.com>
+ <5961e982-9c52-4e7a-b1ca-caaf4c4d0291@tu-dortmund.de>
+ <CACGkMEsKFcsumyNU6vVgBE4LjYWNb2XQNaThwd9H5eZ+RjSwfQ@mail.gmail.com>
+ <0ae9071b-6d76-4336-8aee-d0338eecc6f5@tu-dortmund.de>
+ <CACGkMEsC0-d4oS54BHNdFVKS+74P7SdnNHPHe_d0pmo-_86ipg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEsC0-d4oS54BHNdFVKS+74P7SdnNHPHe_d0pmo-_86ipg@mail.gmail.com>
 
-Fix a misspelling in the sxgbe_mtl_init() function comment.
-"Algorith" should be spelled as "Algorithm".
+On Mon, Jan 12, 2026 at 10:54:15AM +0800, Jason Wang wrote:
+> On Fri, Jan 9, 2026 at 5:57 PM Simon Schippers
+> <simon.schippers@tu-dortmund.de> wrote:
+> >
+> > On 1/9/26 07:04, Jason Wang wrote:
+> > > On Thu, Jan 8, 2026 at 3:48 PM Simon Schippers
+> > > <simon.schippers@tu-dortmund.de> wrote:
+> > >>
+> > >> On 1/8/26 05:38, Jason Wang wrote:
+> > >>> On Thu, Jan 8, 2026 at 5:06 AM Simon Schippers
+> > >>> <simon.schippers@tu-dortmund.de> wrote:
+> > >>>>
+> > >>>> Replace the direct use of ptr_ring in the vhost-net virtqueue with
+> > >>>> tun/tap ring wrapper helpers. Instead of storing an rx_ring pointer,
+> > >>>> the virtqueue now stores the interface type (IF_TUN, IF_TAP, or IF_NONE)
+> > >>>> and dispatches to the corresponding tun/tap helpers for ring
+> > >>>> produce, consume, and unconsume operations.
+> > >>>>
+> > >>>> Routing ring operations through the tun/tap helpers enables netdev
+> > >>>> queue wakeups, which are required for upcoming netdev queue flow
+> > >>>> control support shared by tun/tap and vhost-net.
+> > >>>>
+> > >>>> No functional change is intended beyond switching to the wrapper
+> > >>>> helpers.
+> > >>>>
+> > >>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> > >>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> > >>>> Co-developed by: Jon Kohler <jon@nutanix.com>
+> > >>>> Signed-off-by: Jon Kohler <jon@nutanix.com>
+> > >>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+> > >>>> ---
+> > >>>>  drivers/vhost/net.c | 92 +++++++++++++++++++++++++++++----------------
+> > >>>>  1 file changed, 60 insertions(+), 32 deletions(-)
+> > >>>>
+> > >>>> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> > >>>> index 7f886d3dba7d..215556f7cd40 100644
+> > >>>> --- a/drivers/vhost/net.c
+> > >>>> +++ b/drivers/vhost/net.c
+> > >>>> @@ -90,6 +90,12 @@ enum {
+> > >>>>         VHOST_NET_VQ_MAX = 2,
+> > >>>>  };
+> > >>>>
+> > >>>> +enum if_type {
+> > >>>> +       IF_NONE = 0,
+> > >>>> +       IF_TUN = 1,
+> > >>>> +       IF_TAP = 2,
+> > >>>> +};
+> > >>>
+> > >>> This looks not elegant, can we simply export objects we want to use to
+> > >>> vhost like get_tap_socket()?
+> > >>
+> > >> No, we cannot do that. We would need access to both the ptr_ring and the
+> > >> net_device. However, the net_device is protected by an RCU lock.
+> > >>
+> > >> That is why {tun,tap}_ring_consume_batched() are used:
+> > >> they take the appropriate locks and handle waking the queue.
+> > >
+> > > How about introducing a callback in the ptr_ring itself, so vhost_net
+> > > only need to know about the ptr_ring?
+> >
+> > That would be great, but I'm not sure whether this should be the
+> > responsibility of the ptr_ring.
+> >
+> > If the ptr_ring were to keep track of the netdev queue, it could handle
+> > all the management itself - stopping the queue when full and waking it
+> > again once space becomes available.
+> >
+> > What would be your idea for implementing this?
+> 
+> During ptr_ring_init() register a callback, the callback will be
+> trigger during ptr_ring_consume() or ptr_ring_consume_batched() when
+> ptr_ring find there's a space for ptr_ring_produce().
+> 
+> Thanks
 
-Signed-off-by: Jinseok Kim <always.starving0@gmail.com>
----
- drivers/net/ethernet/samsung/sxgbe/sxgbe_mtl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Not sure the perceived elegance is worth the indirect call overhead.
+ptr_ring is trying hard to be low overhead.
+What this does is not really complex to justify that.
+We just need decent documentation.
 
-diff --git a/drivers/net/ethernet/samsung/sxgbe/sxgbe_mtl.c b/drivers/net/ethernet/samsung/sxgbe/sxgbe_mtl.c
-index 298a7402e39c..66e6de64626c 100644
---- a/drivers/net/ethernet/samsung/sxgbe/sxgbe_mtl.c
-+++ b/drivers/net/ethernet/samsung/sxgbe/sxgbe_mtl.c
-@@ -25,7 +25,7 @@ static void sxgbe_mtl_init(void __iomem *ioaddr, unsigned int etsalg,
- 	reg_val = readl(ioaddr + SXGBE_MTL_OP_MODE_REG);
- 	reg_val &= ETS_RST;
+> >
+> > >
+> > > Thanks
+> > >
+> > >>
+> > >>>
+> > >>> Thanks
+> > >>>
+> > >>
+> > >
+> >
 
--	/* ETS Algorith */
-+	/* ETS Algorithm */
- 	switch (etsalg & SXGBE_MTL_OPMODE_ESTMASK) {
- 	case ETS_WRR:
- 		reg_val &= ETS_WRR;
---
-2.43.0
 
