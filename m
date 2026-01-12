@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-249181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1209D15595
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 22:00:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2D84D155BF
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 22:02:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 91D75301B12E
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 21:00:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CCFDA308E624
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 21:00:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59B2531AF09;
-	Mon, 12 Jan 2026 21:00:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5789D340A6C;
+	Mon, 12 Jan 2026 21:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="neSLd5kh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qtgNnn2/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362EF2F49FD;
-	Mon, 12 Jan 2026 21:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D3C322B72;
+	Mon, 12 Jan 2026 21:00:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768251625; cv=none; b=aOvMvyG39SzexwZ5Lc+bZzWwKFGnstULT3z84vspuAz858rl14nci3B1Ri/pocrdZvcuBinli13RuSwrCarmYnakLA87P0f/VOv1/e95ck+QtGaF6ygCsmrLsk3Fm8Z9/6LN3sKxZETnQhFg5cCmiHNSYAxTTxlmD9FkPZ2Lmkg=
+	t=1768251626; cv=none; b=kQX1BeF0VBjpyOSvanHUlrY0icrY6Og+KrrqQeO4osZHD2mU7qHz+XKs+HpPRDeB4oYnz8niaKsi6IGmLrrH08hJiGraL0XmIGwk0ASa4Y46EsDbcoBCtq3ZVw9w/uvVYbRLVH33ueSXucoz6n3tMkZyhJC+Rrlk9VqvyE2q1Dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768251625; c=relaxed/simple;
-	bh=fxntyZDKwAr1NS/5LQRCWHoyFlbp632aDyhSQQ1Tr94=;
+	s=arc-20240116; t=1768251626; c=relaxed/simple;
+	bh=1dfEkIxCgWAtp/rUjtHrnLOGU8vakAdMtVZFS867zsE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=u+El2W8TEcFXEYQDzKbFaNGQoH3HboEj0cQY9rFIS6KXog7qr6v2c2bea6vgZNAKoeBToW72BAqNPtKSf6G1A4GHy1m6U2QgoKhJ8llx1pAk45cKSGkzg6fdfDy78Wh770rS0D6JXUeYWvgT/i9T+Z/CJDpaHy7JC6O0jfd8FMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=neSLd5kh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEB95C116D0;
-	Mon, 12 Jan 2026 21:00:22 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=fz7VPyrIO94bhJrzbEMMN2byxkRb2grx4Ak7kxzjUVZClcduMnn9JFwGHe4CY1FnoRyfOg1YJIzBQ2F+qP041I7IeeCpH5fQC9ixllBpBLK2gmAdwmjS+d4wEc74FvlgkWeIs9d9CqqPwERzcfNotPNOcurZcsDZR45gld6Xd8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qtgNnn2/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D42AC19421;
+	Mon, 12 Jan 2026 21:00:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768251622;
-	bh=fxntyZDKwAr1NS/5LQRCWHoyFlbp632aDyhSQQ1Tr94=;
+	s=k20201202; t=1768251624;
+	bh=1dfEkIxCgWAtp/rUjtHrnLOGU8vakAdMtVZFS867zsE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=neSLd5khzODlZk22TLBWbY1iNDVuEdtRGc8RQZA8gMoE8EFtQQNSkVYiUVfS3q5EW
-	 tSyoPBISumcU6vNwVSnY1ulTpMWZEW90bQU3OO7y2MaFq5slEgXVk+vGb50axln3FN
-	 l3DGh85/epGRAiIMy/EA+uRz/spsGjXlDMsg/8Ek3lw9Sx2a2kMI2Xrf93Y06IScVk
-	 du+b28bXyUUfhuasMyezyoW8/fdtwal/6mpZAo+qh0IHPg0vLhHQqUuSAoupGmIWkI
-	 r8KZHPgYexvcaGrRmTkISFjhBG8m+vaxYRjby+KT4GGOtH95Rysd+Ph9nSI4zcJn66
-	 rz7lYoYPUjxnQ==
+	b=qtgNnn2/9dW1SBQERQ8x+3KqCfWVk5+JRekGd0ZW5T4beeD5GU73OUKZiJeMJLH74
+	 18dykCr9Dqil5ZHqvoHtb3wE+05yGBG6qZ6+EEtUMyAmEFwjVyY1/4oEgwIHdiZ8am
+	 WbqL4qs3Puq4KywVpL6yM6d4LNZmBcUcASaIMbDO3vUuRylgPhA1MseQdxhtWDFtyG
+	 +6J3sgVAYHHsK1j1FB88r8Wg2es1NTiNjCT8UiL/RNclJ9rfiJzE6/TFFbrWOMqHRR
+	 gw0UMbF8vlCtjwVumisezJykUMY6BwiNV16jfUfBUu0E2d2vKKBFN0tDjdd7tviRiN
+	 2X9zDE3/apgOw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F37A5380CFD5;
-	Mon, 12 Jan 2026 20:56:57 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7884A380CFD5;
+	Mon, 12 Jan 2026 20:56:59 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,36 +50,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] bluetooth 2026-01-09
+Subject: Re: [PATCH net v2] vsock/test: add a final full barrier after run all
+ tests
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176825141653.1092878.14076029591226241236.git-patchwork-notify@kernel.org>
-Date: Mon, 12 Jan 2026 20:56:56 +0000
-References: <20260109211949.236218-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260109211949.236218-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+ <176825141802.1092878.8585699875911614513.git-patchwork-notify@kernel.org>
+Date: Mon, 12 Jan 2026 20:56:58 +0000
+References: <20260108114419.52747-1-sgarzare@redhat.com>
+In-Reply-To: <20260108114419.52747-1-sgarzare@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
+ davem@davemloft.net, stefanha@redhat.com, linux-kernel@vger.kernel.org,
+ leonardi@redhat.com
 
 Hello:
 
-This pull request was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  9 Jan 2026 16:19:49 -0500 you wrote:
-> The following changes since commit 872ac785e7680dac9ec7f8c5ccd4f667f49d6997:
+On Thu,  8 Jan 2026 12:44:19 +0100 you wrote:
+> From: Stefano Garzarella <sgarzare@redhat.com>
 > 
->   ipv4: ip_tunnel: spread netdev_lockdep_set_classes() (2026-01-08 18:02:35 -0800)
+> If the last test fails, the other side still completes correctly,
+> which could lead to false positives.
 > 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-01-09
+> Let's add a final barrier that ensures that the last test has finished
+> correctly on both sides, but also that the two sides agree on the
+> number of tests to be performed.
 > 
 > [...]
 
 Here is the summary with links:
-  - [GIT,PULL] bluetooth 2026-01-09
-    https://git.kernel.org/netdev/net/c/c8a49a2f9117
+  - [net,v2] vsock/test: add a final full barrier after run all tests
+    https://git.kernel.org/netdev/net/c/c39a6a277e0e
 
 You are awesome, thank you!
 -- 
