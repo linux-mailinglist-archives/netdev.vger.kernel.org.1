@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-249180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5107FD155AD
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 22:01:29 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1209D15595
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 22:00:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 72B5A3031358
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 21:00:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 91D75301B12E
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 21:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD3F6341076;
-	Mon, 12 Jan 2026 21:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59B2531AF09;
+	Mon, 12 Jan 2026 21:00:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V2PdVyRB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="neSLd5kh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8931D340A43;
-	Mon, 12 Jan 2026 21:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362EF2F49FD;
+	Mon, 12 Jan 2026 21:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768251621; cv=none; b=SgY920W0PoSCfJAY+ZJ+XuzXpQ1iOaCbGYH+nc6ucZcPRfZrH1P6I64UnZ2zYw/w6m3z8ARVng9dt6ZK0thMKWXJpS+r/wAKPVpgcfZixQApOTUUMGK0O9hYXZuqGkFaUCCBsgruA06U4Df0d2ZtJC6E3gGitFuIy1dDIZa4d8g=
+	t=1768251625; cv=none; b=aOvMvyG39SzexwZ5Lc+bZzWwKFGnstULT3z84vspuAz858rl14nci3B1Ri/pocrdZvcuBinli13RuSwrCarmYnakLA87P0f/VOv1/e95ck+QtGaF6ygCsmrLsk3Fm8Z9/6LN3sKxZETnQhFg5cCmiHNSYAxTTxlmD9FkPZ2Lmkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768251621; c=relaxed/simple;
-	bh=5PmNXY8c9JWJMqljoZbFiS8oZ+pURDpk9kyFp+ADh7U=;
+	s=arc-20240116; t=1768251625; c=relaxed/simple;
+	bh=fxntyZDKwAr1NS/5LQRCWHoyFlbp632aDyhSQQ1Tr94=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jxztiaHzP57VGsoA70sV0HpAnHP0+kRxjytn+FqlBtnu/wMbp6aR3JaxNQdK3o2aCaLyuO+XkK0/zismO5w41ajawZ0KkbOZ0LB/mXVcDK4vMYq0MakVeHYZv3XRK9VRzsxNKqbojM8ezAxj8yn/iFCCuY8UhDW/V0QG3qtfQUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V2PdVyRB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56C3FC19425;
-	Mon, 12 Jan 2026 21:00:21 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=u+El2W8TEcFXEYQDzKbFaNGQoH3HboEj0cQY9rFIS6KXog7qr6v2c2bea6vgZNAKoeBToW72BAqNPtKSf6G1A4GHy1m6U2QgoKhJ8llx1pAk45cKSGkzg6fdfDy78Wh770rS0D6JXUeYWvgT/i9T+Z/CJDpaHy7JC6O0jfd8FMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=neSLd5kh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEB95C116D0;
+	Mon, 12 Jan 2026 21:00:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768251621;
-	bh=5PmNXY8c9JWJMqljoZbFiS8oZ+pURDpk9kyFp+ADh7U=;
+	s=k20201202; t=1768251622;
+	bh=fxntyZDKwAr1NS/5LQRCWHoyFlbp632aDyhSQQ1Tr94=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=V2PdVyRB98+G3yfXHqWeanWSuyErt6+4i5AAJqrvEBLdCcNEYCWqVThT4suqudGZW
-	 pQjwlJl7MrHEk4aytYPZa95ryPnSk2TqguGTwWfYkJx6R2RsTSVZH9URIUop8NNuqQ
-	 HeVJZWbdpYRXbctpWm8k5kitDufdsZ57ghqiZX4fHA6ym6449hTvi+cRKCc96+8/FZ
-	 +y7lVbkHANGs/nH9OdCadIIuAae9Cl1c2fDLNPF39SnyffERTcOpuX9NOiXuRDq6JO
-	 ClfjJQiE6yfev5wjJIiq6h1A8S2GHkG8ckiC6jDH8dPGDLcrU5scKt9BhQb2CNNUio
-	 U4u5niRAyAGOg==
+	b=neSLd5khzODlZk22TLBWbY1iNDVuEdtRGc8RQZA8gMoE8EFtQQNSkVYiUVfS3q5EW
+	 tSyoPBISumcU6vNwVSnY1ulTpMWZEW90bQU3OO7y2MaFq5slEgXVk+vGb50axln3FN
+	 l3DGh85/epGRAiIMy/EA+uRz/spsGjXlDMsg/8Ek3lw9Sx2a2kMI2Xrf93Y06IScVk
+	 du+b28bXyUUfhuasMyezyoW8/fdtwal/6mpZAo+qh0IHPg0vLhHQqUuSAoupGmIWkI
+	 r8KZHPgYexvcaGrRmTkISFjhBG8m+vaxYRjby+KT4GGOtH95Rysd+Ph9nSI4zcJn66
+	 rz7lYoYPUjxnQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 78D1A380CFD5;
-	Mon, 12 Jan 2026 20:56:56 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F37A5380CFD5;
+	Mon, 12 Jan 2026 20:56:57 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,42 +50,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/3] can: etas_es58x: allow partial RX URB allocation
- to
- succeed
+Subject: Re: [GIT PULL] bluetooth 2026-01-09
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176825141505.1092878.276430348692974730.git-patchwork-notify@kernel.org>
-Date: Mon, 12 Jan 2026 20:56:55 +0000
-References: <20260109135311.576033-2-mkl@pengutronix.de>
-In-Reply-To: <20260109135311.576033-2-mkl@pengutronix.de>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- linux-can@vger.kernel.org, kernel@pengutronix.de, swilczek.lx@gmail.com,
- syzbot+e8cb6691a7cf68256cb8@syzkaller.appspotmail.com, mailhol@kernel.org
+ <176825141653.1092878.14076029591226241236.git-patchwork-notify@kernel.org>
+Date: Mon, 12 Jan 2026 20:56:56 +0000
+References: <20260109211949.236218-1-luiz.dentz@gmail.com>
+In-Reply-To: <20260109211949.236218-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Marc Kleine-Budde <mkl@pengutronix.de>:
+This pull request was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  9 Jan 2026 14:46:10 +0100 you wrote:
-> From: Szymon Wilczek <swilczek.lx@gmail.com>
+On Fri,  9 Jan 2026 16:19:49 -0500 you wrote:
+> The following changes since commit 872ac785e7680dac9ec7f8c5ccd4f667f49d6997:
 > 
-> When es58x_alloc_rx_urbs() fails to allocate the requested number of
-> URBs but succeeds in allocating some, it returns an error code.
-> This causes es58x_open() to return early, skipping the cleanup label
-> 'free_urbs', which leads to the anchored URBs being leaked.
+>   ipv4: ip_tunnel: spread netdev_lockdep_set_classes() (2026-01-08 18:02:35 -0800)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-01-09
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/3] can: etas_es58x: allow partial RX URB allocation to succeed
-    https://git.kernel.org/netdev/net/c/b1979778e985
-  - [net,2/3] can: gs_usb: gs_usb_receive_bulk_callback(): fix URB memory leak
-    https://git.kernel.org/netdev/net/c/7352e1d5932a
-  - [net,3/3] can: ctucanfd: fix SSP_SRC in cases when bit-rate is higher than 1 MBit.
-    https://git.kernel.org/netdev/net/c/e707c591a139
+  - [GIT,PULL] bluetooth 2026-01-09
+    https://git.kernel.org/netdev/net/c/c8a49a2f9117
 
 You are awesome, thank you!
 -- 
