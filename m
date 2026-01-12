@@ -1,217 +1,151 @@
-Return-Path: <netdev+bounces-249119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52D9BD14734
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 18:44:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC5A2D149BD
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 18:56:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0A3443013384
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 17:44:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9FD0330EF9B4
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 17:50:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F670374176;
-	Mon, 12 Jan 2026 17:44:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3685D37F723;
+	Mon, 12 Jan 2026 17:47:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cV259BDL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fQK9PnuA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B87793570AE
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 17:44:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6BFB30E82B
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 17:47:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768239848; cv=none; b=SV0hgNKPfW9SKwvr/XNVc7TD1mI1bPV1fHXRkby/LBx/NX1wzYBrV3kW3Z2zSRVtUni1zSj6YZG1+Q+Uqnx65ZjN8kLNv9HAnuWho/xw0Ah7ovAhiq8dqU3fo2Fcy/Iq0Hy0PkIWvVpzYlkyEYu9HAH/iHt+NK5bdMUrYm1BDk4=
+	t=1768240043; cv=none; b=Q7UFcrnf3pucbrXqm1yIxklpVbJKlXfiwEdZJGnd/7ZJokeAXEIyg5ihBYDZAtKLVrg30ojkp9rqBdy7ZeoaPVg2Q3gk4QzXWG/lozEnTodipGQbdJid6reqsAxHUeMkOTJgu9xE95t+zuDJLE5Uw7/mCOWKzAIf9phiul7CAc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768239848; c=relaxed/simple;
-	bh=ckuWa0hcl9zBmOGgxyGXZh35WwzxE05Qj5kMhP0yefE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=q8aKWEd5DpZ6jBbam3eaD6Ks6PM37I7OZROvhuMQauL6AIIZTVIc+gJVex4eJ5zATabYo75Rv8+0NfSoHUrSrBUBC7mdhAQCM/Gwp362NYuxnEWzKf6gbID56F8En4yYfMQmNhKkyNFMejJPmF/zXVK4k67MgBUI/EoVTSFQz6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cV259BDL; arc=none smtp.client-ip=209.85.216.51
+	s=arc-20240116; t=1768240043; c=relaxed/simple;
+	bh=/QJOFFtF5uxw5ji7BAVAG30RLwFgl9kFU9cKTxxZRZI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HRO4814Vi1KCEF2hWknqxhr9lofL/EIy6rR8PbKi6FmgytSipQERCTBuOOJbg3QhQaJMQwLZofgp8F2iLjUDYqbwnNDws3nVfAcfgowb1UH9j7cKLNjTd9iGWvrjS55LoQCNCEBUqwdaO9GT4VFgPkAUB1Yfpruxn3j5U2cX0TE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fQK9PnuA; arc=none smtp.client-ip=74.125.224.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-34f0bc64a27so3218605a91.1
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 09:44:06 -0800 (PST)
+Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-64661975669so7176397d50.3
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 09:47:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768239846; x=1768844646; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1768240041; x=1768844841; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=R2PM847sZezm8qMDrlA/C+aIUOustWEHzoWUNlVlTog=;
-        b=cV259BDLgViihtUr2aR3BuHi6K4wmrQYwTB9kVf0dCgpR6/T2/ERG5dtfBIPPYoOBV
-         xEpChRBk7rhwcUq4nmQswDnxY5Dn7FZ0uDsduTvYZDkRQsMLdNK9LKDu8mhioNwQnto/
-         05fqH3dgMy9Bh66c1jZnO8TeznUI3yjhQTwygi9M5IacgHi/HZhBC0ED/cboA7dr0aQF
-         KthJvg1oygumppuOSzo+fa68mNqsxBNHDViEiQHS2z0Ov583/LGjLbH4N6T8yTlFb5rP
-         JQzPoNlPVoH1ExFTxyS3ul3tSYsWgYSV9YU2Ga6jP5R0UStserkWkXQWrYP/Q0Cwr1ei
-         FJmw==
+        bh=o+frE4WDsMLdqbKRsugf8C8wilDLHiOI3JECrH7cio0=;
+        b=fQK9PnuAMARRtuYl90P8Aeftyy1BzpLO5RWwsDtuj1Mub88ATMcyMpg8c3JH8Lxh+0
+         NgqaFzWerT9PagZftr8XkwAnXUQ6SecSPNJEX/RreDizRg0PL/s4yetqOk9WCERWie0L
+         QVpMeNm4tJmLnRa0rYmKU+s1hONMfaol9yyKeEpN+LHkX4h3WQpie6xLrpziFY8LJ8lM
+         z8EWcf9BaiLhtC4ZU2DeiflRMLvbGb1jgGvQEUuSmsZMR9s9Cau4W96TnvdLifw6jym5
+         6ZY8R2cxukJAAqzO4BLEEuuPQfKZN8dq7JirLCHT2d9mQAf4MDE0sbg2APpB1/ZPR/6z
+         l1XA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768239846; x=1768844646;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1768240041; x=1768844841;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=R2PM847sZezm8qMDrlA/C+aIUOustWEHzoWUNlVlTog=;
-        b=oriaQKegyzlYRlf81FlZNBWJvKT2/hXzkGJYdmw1xqNS0fkhGiQ94M2UQyXvb3FDhN
-         xOhN47GYIz4ghDQlqO0kJTHKhQIQJAomnYG3QpySEvgs4AlB6EcYtynnNfEWytBZiwfO
-         cVDR0yrsuFh4tNXy2hiOs34aqHVLsQO36xtX+tTQJRazwZKOY5IYzQHjL2BFB0cxWAa6
-         IzokOSamjawYDWUylrQkj4hOGRFpdPt1QTrN6C63N7Wxk/SllKUNKLzudCAz1gTsURFW
-         /6lkcV8GVl+OFxSfTlcVx52735RfLuiIe8ixA9ZZahV5MYu4p6H3mwftIf1f+5aZcjfT
-         CH8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUYV2RmoduijDUJvDDTpHpYOahytFHE7HoKh4T3PkTJHkzunyuSHEoT7npNNbZWRtIKm2Vghyo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxaxJBjM1Q3B6Fc6ZK/wxF18Tz7GiYoECy0OTMpmYem1ykjcBOT
-	KJpJ5sfwsaOdr48F9SO+6t/EJY212prw7nNd84PdlV5hv4rimKRXfCnW
-X-Gm-Gg: AY/fxX4AKE/6m4oGyDTcd8xmMLSMX/J/qiaco/MGATo2o36eOxzXgM+E+46NbXwpALT
-	1IqULqV6TQknkftJxLzPF4MYjbqdPf4atq7kgqg8SGKek5e46m7fo/CKBUHzes5tTVtvCAFCV2W
-	pLAOnAlR87aoxIOChZHJN4+k2qKMBt+pvnyRrKvNH4e35wHSjweFMwesOyMPw4wRjb09YYmXi0g
-	uI+ToudEh4IHYI0keUo0mhMQcvErT6YdkA4d3I30mJuRWNJmAcTc3QWn2/fF13aasHs8uPpCAQ5
-	dGq0tpsgRjVXLNoZyCbL4hfZH9JnvtGZgh5ENDHjn0SyFD2J4OoPOC9j5iCJgIAyeFV1lRMDDd4
-	Qxipk7AxE4i/sr2KzcHWmUxPdbSBQpQq4KW4f+TPk3icTG9lQhDF9BAQFSAPBpp/sLfuDTfW89c
-	aZCAW8R6O2oO6iQZd2
-X-Google-Smtp-Source: AGHT+IGowUCnuSiMnioYOycVMCYNDWoins5qO8gM9NE7dzQF7NX5CSOPcjCucNoQ3IUz8H4VDDdlYQ==
-X-Received: by 2002:a17:90b:1e05:b0:32e:528c:60ee with SMTP id 98e67ed59e1d1-34f68c00a7fmr18286724a91.24.1768239845962;
-        Mon, 12 Jan 2026 09:44:05 -0800 (PST)
-Received: from rakuram-MSI ([2405:201:d027:f096:5c52:f599:118c:bed2])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c57a50da1a7sm7310733a12.36.2026.01.12.09.44.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jan 2026 09:44:05 -0800 (PST)
-From: Rakuram Eswaran <rakuram.e96@gmail.com>
-To: mailhol@kernel.org
-Cc: corbet@lwn.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mkl@pengutronix.de,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	rakuram.e96@gmail.com,
-	socketcan@hartkopp.net
-Subject: Re: [PATCH 1/2] can: dummy_can: add CAN termination support
-Date: Mon, 12 Jan 2026 23:13:55 +0530
-Message-ID: <20260112174356.10358-1-rakuram.e96@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: d058f82b-2e2f-4353-8518-2cc9e15f7a98@kernel.org
-References: <d058f82b-2e2f-4353-8518-2cc9e15f7a98@kernel.org>
+        bh=o+frE4WDsMLdqbKRsugf8C8wilDLHiOI3JECrH7cio0=;
+        b=wSciPZ9ZkxzK8XBFJJLtmIyHswFyJUYcXVPAiw+qBwFNW+R4dKWrFqWdMNn4uY5N6L
+         5vGGYuliqpeutGXZk3heoTKpshnpTOungFU136J/YrqkCFAg8wsj1kVVq5/6Yi1PNTkT
+         72LMUoJQiOUNKtgdV2AtaOZW+noWjynOfX51FiRbVWTzoW+yB6Eha6MljbJucin5cyv7
+         jjDKwFX2XP4+t2S8xO7EkbHIj+FBUkEhSsC+sri1HriguFgd32ua8sjJ9tAdXWKWcIr4
+         HxYuuV3n89dv99DkomdWrlRKnczkY+36ZrNT45FRzQvlnMPlL05IjKKYTfHYbeJVLeWp
+         /lbA==
+X-Forwarded-Encrypted: i=1; AJvYcCUqgNIAQaHpNAA8ch9ZmZ1nE+1rur19z6VAufGVqCoTxpVhabGd1XzBQX0u/kNAx4GQU4YafV4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfTz2/DQeV2HcqY/NWa+zr03aVpvn9fMwr55eaIxzSVbw8P96K
+	RQYsvDonKmMiOXzloGecvMqzXrHaGC/Sm2HVgOmKvLu/7MkubbbfAacdRbON/c+ll6ajicnIzFX
+	8Ys+pgRAEsio8oMDO55HU6RSqG8Qh7/M=
+X-Gm-Gg: AY/fxX4eSp8A3owCAotXdz9wDQZwuoh1ltYWNXeQA2HrBDm1OtRfEATHOoSBucXL+H/
+	qrQoDIBXZckzUvMcQlt7BoIWc9De5dhTMGUMeBnqWGjurpKVKY98/ZCnDN5GjWhvndufnv8qOrU
+	6XN+ZN69JJhdl4ettwnL5UuLYTnCXgveSttGaiSiDlyFXxs52GD5fA4OpnfZHOpmQqAa/TSrht5
+	dourGYkBBnyVOVFyiJqO+LiVGUpjP0PHKNF0CJrjRvqww/cyhsFtgLoyDVowH7AbOTXqA==
+X-Google-Smtp-Source: AGHT+IFVeQvnTyVi0gka/tZbpXqlCHihWT6A5xV5oVP9fW+lR6g5Zw/srIkUgZCvohE4kliOlhCty0HLnOkI4vLDbzA=
+X-Received: by 2002:a05:690e:1501:b0:63f:9a63:46e5 with SMTP id
+ 956f58d0204a3-64716b9b436mr14975163d50.28.1768240040678; Mon, 12 Jan 2026
+ 09:47:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251218175628.1460321-1-ameryhung@gmail.com> <20251218175628.1460321-2-ameryhung@gmail.com>
+ <74fa8337-b0cb-42fb-af8a-fdf6877e558d@linux.dev> <CAMB2axP5OvZKhHDnW9UD95S+2nTYaR4xLRHdg+oeXtpRJOfKrA@mail.gmail.com>
+ <f3e041d4-c65a-4c16-99ff-37caceebb54a@linux.dev>
+In-Reply-To: <f3e041d4-c65a-4c16-99ff-37caceebb54a@linux.dev>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Mon, 12 Jan 2026 09:47:08 -0800
+X-Gm-Features: AZwV_QgwOOPE3jQ0mq9YK8F7JmNsIIsVms4e0eONCJZyCYBKNOgEmrzCPzHPpUU
+Message-ID: <CAMB2axMMgGtYqE3+jbhN=T=GrGdN3DctP6jeR1t9M+4tLkeO0w@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 01/16] bpf: Convert bpf_selem_unlink_map to failable
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, memxor@gmail.com, 
+	martin.lau@kernel.org, kpsingh@kernel.org, yonghong.song@linux.dev, 
+	song@kernel.org, haoluo@google.com, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 1 Jan 2026 at 17:42, Vincent Mailhol <mailhol@kernel.org> wrote:
+On Fri, Jan 9, 2026 at 1:53=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.d=
+ev> wrote:
 >
-> On 31/12/2025 at 19:13, Rakuram Eswaran wrote:
-> > Add support for configuring bus termination in the dummy_can driver.
-> > This allows users to emulate a properly terminated CAN bus when
-> > setting up virtual test environments.
+> On 1/9/26 10:39 AM, Amery Hung wrote:
+> >>> @@ -574,20 +603,37 @@ bpf_local_storage_update(void *owner, struct bp=
+f_local_storage_map *smap,
+> >>>                goto unlock;
+> >>>        }
+> >>>
+> >>> +     b =3D select_bucket(smap, selem);
+> >>> +
+> >>> +     if (old_sdata) {
+> >>> +             old_b =3D select_bucket(smap, SELEM(old_sdata));
+> >>> +             old_b =3D old_b =3D=3D b ? NULL : old_b;
+> >>> +     }
+> >>> +
+> >>> +     raw_spin_lock_irqsave(&b->lock, b_flags);
+> >>> +
+> >>> +     if (old_b)
+> >>> +             raw_spin_lock_irqsave(&old_b->lock, old_b_flags);
+> >> This will deadlock because of the lock ordering of b and old_b.
+> >> Replacing it with res_spin_lock in the later patch can detect it and
+> >> break it more gracefully. imo, we should not introduce a known deadloc=
+k
+> >> logic in the kernel code in the syscall code path and ask the current
+> >> user to retry the map_update_elem syscall.
+> >>
+> >> What happened to the patch in the earlier revision that uses the
+> >> local_storage (or owner) for select_bucket?
+> > Thanks for reviewing!
 > >
-> > Signed-off-by: Rakuram Eswaran <rakuram.e96@gmail.com>
-> > ---
-> > Tested the termination setting using below iproute commands:
+> > I decided to revert it because this introduces the dependency of selem
+> > to local_storage when unlinking. bpf_selem_unlink_lockless() cannot
+> > assume map or local_storage associated with a selem to be alive. In
+> > the case where local_storage is already destroyed, we won't be able to
+> > figure out the bucket if select_bucket() uses local_storage for
+> > hashing.
 > >
-> >   ip link set can0 type can termination 120
-> >   ip link set can0 type can termination off
-> >   ip link set can0 type can termination potato
-> >   ip link set can0 type can termination 10000
-> >  
-> >  drivers/net/can/dummy_can.c | 25 +++++++++++++++++++++++--
-> >  1 file changed, 23 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/net/can/dummy_can.c b/drivers/net/can/dummy_can.c
-> > index 41953655e3d3c9187d6574710e6aa90fc01c92a7..418d9e25bfca1c7af924ad451c8dd8ae1bca78a3 100644
-> > --- a/drivers/net/can/dummy_can.c
-> > +++ b/drivers/net/can/dummy_can.c
-> > @@ -86,6 +86,11 @@ static const struct can_pwm_const dummy_can_pwm_const = {
-> >       .pwmo_max = 16,
-> >  };
-> >
-> > +static const u16 dummy_can_termination_const[] = {
-> > +     CAN_TERMINATION_DISABLED,       /* 0 = off */
-> > +     120,                            /* 120 Ohms */
+> > A middle ground is to use local_storage for hashing, but save the
+> > bucket index in selem so that local_storage pointer won't be needed
+> > later. WDYT?
 >
-> Nitpick: no need to explain that disabled means "off", the first comment
-> can be removed. Also, to be consistent with how the can.bitrate_max and
-> can.clock.freq are declared, you can add the unit just next to the value.
->
->         static const u16 dummy_can_termination_const[] = {
->                 CAN_TERMINATION_DISABLED,
->                 120 /* Ohms */,
->         };
->
-> (above comment is notwithstanding).
+> I would try not to add another "const"-like value to selem if it does
+> not have to. imo, it is quite wasteful considering the number of
+> selem(s) that can live in the system. Yes, there is one final 8-byte
+> hole in selem, but it still should not be used lightly unless nothing
+> else can be shared. The atomic/u16/bool added in this set can be
+> discussed later once patch 10 is concluded.
 >
 
-Yes, this looks better. 
+I see.
 
-> > +};
-> > +
-> >  static void dummy_can_print_bittiming(struct net_device *dev,
-> >                                     struct can_bittiming *bt)
-> >  {
-> > @@ -179,6 +184,16 @@ static void dummy_can_print_bittiming_info(struct net_device *dev)
-> >       netdev_dbg(dev, "\n");
-> >  }
-> >
-> > +static int dummy_can_set_termination(struct net_device *dev, u16 term)
-> > +{
-> > +     struct dummy_can *priv = netdev_priv(dev);
-> > +
-> > +     netdev_dbg(dev, "set termination to %u Ohms\n", term);
-> > +     priv->can.termination = term;
-> > +
-> > +     return 0;
-> > +}
-> > +
-> >  static int dummy_can_netdev_open(struct net_device *dev)
-> >  {
-> >       int ret;
-> > @@ -243,17 +258,23 @@ static int __init dummy_can_init(void)
-> >       dev->ethtool_ops = &dummy_can_ethtool_ops;
-> >       priv = netdev_priv(dev);
-> >       priv->can.bittiming_const = &dummy_can_bittiming_const;
-> > -     priv->can.bitrate_max = 20 * MEGA /* BPS */;
-> > -     priv->can.clock.freq = 160 * MEGA /* Hz */;
->
-> Don't add unrelated changes to your patch. Your patch should do one
-> thing (here: add the resistance termination). If you want to reorder the
-> existing lines, that should go in a separate clean-up patch. But here,
-> there is no need to touch those lines, so just drop this reorder.
+> For select_bucket in bpf_selem_unlink_lockless, map_free should know the
+> bucket. destroy() should have the local_storage, no?
 >
 
-Ack. I will revert these unrelated changes.
-
-> >       priv->can.fd.data_bittiming_const = &dummy_can_fd_databittiming_const;
-> >       priv->can.fd.tdc_const = &dummy_can_fd_tdc_const;
-> >       priv->can.xl.data_bittiming_const = &dummy_can_xl_databittiming_const;
-> >       priv->can.xl.tdc_const = &dummy_can_xl_tdc_const;
-> >       priv->can.xl.pwm_const = &dummy_can_pwm_const;
-> > +     priv->can.bitrate_max = 20 * MEGA /* BPS */;
-> > +     priv->can.clock.freq = 160 * MEGA /* Hz */;
-> > +     priv->can.termination_const_cnt = ARRAY_SIZE(dummy_can_termination_const);
-> > +     priv->can.termination_const = dummy_can_termination_const;
-> > +
-> >       priv->can.ctrlmode_supported = CAN_CTRLMODE_LISTENONLY |
-> >               CAN_CTRLMODE_FD | CAN_CTRLMODE_TDC_AUTO |
-> >               CAN_CTRLMODE_RESTRICTED | CAN_CTRLMODE_XL |
-> >               CAN_CTRLMODE_XL_TDC_AUTO | CAN_CTRLMODE_XL_TMS;
-> > +
-> > +     priv->can.do_set_termination = dummy_can_set_termination;
-> > +
-> >       priv->dev = dev;
-> >
-> >       ret = register_candev(priv->dev);
->
-> Aside from the above remark this is OK. Please send a v2 with that last
-> remark addressed. You can also add my review tag:
->
-> Reviewed-by: Vincent Mailhol <mailhol@kernel.org>
->
-
-Thanks, Vincent. I will make the change as mentioned above and send v2.
-
-Best Regards,
-Rakuram
+You are right. I can get the bucket from map_free(). I will use
+local_storage for hashing.
 
