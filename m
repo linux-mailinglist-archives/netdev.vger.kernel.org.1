@@ -1,155 +1,214 @@
-Return-Path: <netdev+bounces-249086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 645D5D13C2F
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 16:44:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DFFF5D13BEA
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 16:42:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4926930F643E
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:35:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1C37E30D3164
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:35:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB0633612E2;
-	Mon, 12 Jan 2026 15:35:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FD6935F8DC;
+	Mon, 12 Jan 2026 15:35:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D9n0X+7Q"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="NhW5I0pp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11021110.outbound.protection.outlook.com [52.101.62.110])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A4535FF64
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 15:35:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768232121; cv=none; b=aYxyTXFzHQV0yZNnqhZ28hhXOAkD5uzFG/UmEhS0LCbQ4MfMO5JnhEh8zl3fO+cKYI2gv4EjZolV9wEcBa5Ba04Enso3IHRj8eaFZWEGQqjp0Uc1owwX98b2GmYCE3MjTd0U0paamZXPprnYrjiK0LNhOdx/LTUgBOX0vIKDLPg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768232121; c=relaxed/simple;
-	bh=CqkrBbQJARC77HViTJ7Fw835RSSe59j00Y/6Yal3gVQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fVSOBW3WM0ktYow+pqP+XGWg02V535NBhy8gVqwmJYrgslvHsogDqfze9Q9TJ/k+q1uAP5+HYa8yVFG0Nohg4AYLEpt9eodmASNyOEZLmHDfzON8m8LAUMJsgFGJDS+KK4W9bEdMMMm10HEoUPTCsOo/dwe/EyaV7umyxURICdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D9n0X+7Q; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-47796a837c7so45317445e9.0
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 07:35:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768232118; x=1768836918; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bisDuv4nPIuBAuwZ3nv0ukh31CRRL1f/LFbl87ZPJiM=;
-        b=D9n0X+7QWT8DaUBECRPZFql2/dw1VTf8WiXIdYwrvAqtKEL/DOi2N6oXE7P/u5K6MM
-         Kml8FbKjx05yrg8GbLcH6gH5mMKEeZQH+ww/hUgeeueG0kyhyjHcXFCW51B3lZ223PX5
-         iYGBF6lWvo197Uw8CRni2C9jMPerPEn8ebrrbdtlehZKIoCpd6qDNvKyiKh/gN5ccIeg
-         pPOoJC+1qr3Ld6TsSSfLBHS0FoGTnG3w7nQv9MWabMicebP6XgojgbB70Zqsws08TYdp
-         EKqZb0pvCcWuJjJSvp6XGTcdZ8V27izgbvxETc0mlRMzHBXxhAMc7ABkgnQcZbk3q8dy
-         IEOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768232118; x=1768836918;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bisDuv4nPIuBAuwZ3nv0ukh31CRRL1f/LFbl87ZPJiM=;
-        b=VreXxWOgI1C+nY+e5Rt9rIMvIKFXYz009HXTkSy9KLIsPKAJohBuX/vz94QFkG1pgU
-         C33ooln9FpxMeHG50tmDeKP0ldBnv4NqaPwDHMdgLH4E9IDXuPKukoizJJZDA5LxtZOe
-         Gi6HOaDt6M4ae9SZduaz4KZXJYyz9lwYZ9TsoVGQPS572cRgtZtEwdkexdybKHqtBttJ
-         MwptPnXBJvIxz3lAYb7dwJo+uV33Y5MpL/GNmIKYlND8uHmqV22I+8ChSwSdrx+VZSUX
-         lC0+U/dGZeHBSS+KmdjiBibr5RiuaNcM0+hoD1JvzPRzJzSY6+NxAB2kWjqbd7+XHZ+l
-         KFKg==
-X-Forwarded-Encrypted: i=1; AJvYcCW9sjEYM7Dm7PKrYfSHeUtoCJX1S2yfO1Mn42US32DAoqkN+0FSFkh4UUVLswum1KYWuWWduH4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2Ca0hw/9WrdXTmkljwYopptuBWYQrH+GP4afDQLf2A+ilWV+M
-	vVTK49E/+k8oM47976lrtPDL86hbx/J7WbSgvuV5cui1YJFf/TmI3Jz7mcgokRY0
-X-Gm-Gg: AY/fxX6Y3RUpoRI/C3chnC6XrWyLZ4HqUL/fjvmxKlrRUDDwzqaxjr9/EDwDf2vkGD9
-	NnBB+kWbiRqhhbxWnjvqO9boqlZ0v0/Hf4H1tPhFFm2v4YQ9tBjGaSRq6W8nf7tF08WsvAYQXOw
-	bPbINutEgadGv6Q0bq43Qu01LmB/e9KNey9XG0t3YODpUzsXPTGffA3tYnKwMLmo9LyUOfFKF1H
-	TXZVFArR1APeyJta2nr8rOQBj3IKfv3xjRzcHjDTltR0K8UJEgbDqz4Z9F0JebW0ef2IUE5cbja
-	E4ZfAuWHlvRuHneWLt+jvqh3Bo8py34P+JtOPv4VdFXRxYve5Jqbsf1h61qmBbMDFiQ5ayQ3i0D
-	oNwgEKAuJZrldsLj4pfJ7ETMM2UGbpH6hIz3FMh8vy3+CQrHCzJr+nWhsawG3vbu59OEcijkK4m
-	1Xr+lUS8AclumUPXiwd54/jfv2xFV6l/1scg==
-X-Google-Smtp-Source: AGHT+IFkionbBPxAVMu1Bo9fnGCSD/FhMiTLzbgpT1ra0OiOGliqUo8UWo/OByWQL36OmxlkAVQrNQ==
-X-Received: by 2002:a5d:64e7:0:b0:430:f7ae:af3c with SMTP id ffacd0b85a97d-432c374fc2dmr21802974f8f.31.1768232118128;
-        Mon, 12 Jan 2026 07:35:18 -0800 (PST)
-Received: from imac.lan ([2a02:8010:60a0:0:c1a8:6cc9:af79:502a])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5df9afsm41592789f8f.24.2026.01.12.07.35.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jan 2026 07:35:17 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Donald Hunter <donhunte@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org
-Cc: Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net v1] tools: ynl: render event op docs correctly
-Date: Mon, 12 Jan 2026 15:34:36 +0000
-Message-ID: <20260112153436.75495-1-donald.hunter@gmail.com>
-X-Mailer: git-send-email 2.52.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E22335F8AA;
+	Mon, 12 Jan 2026 15:35:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.110
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768232103; cv=fail; b=nyqnJyyp4ArjrTCSjVvzrenHGqJTdQQ711CmKwxWmFsyzZpupOdk1nwtVSKIc4jF2f7e5oV36Xx/HXbiw7IRfkk+g67qtUuwokX4Kr8gNboNzMjT4lwTNKGCPzdx/DCj55RgIGZ20bqHF5crbDkrn1T0IV8oPBbA7E7QfufEyMs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768232103; c=relaxed/simple;
+	bh=Gb6IDFWS1zP4u61lc4SW8a1onFsyFUFJ7fJAQCHvjGc=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=K3xMRo+Um8/9Jw14ECCJV3cf09Sh0j3Q+lU/18fknrxMAQdus5VpEi9Xg8pNsMcv5KLqFodfDO7SPHhaiggS9pMU4SiuBbwPVzu8aU+gu0QrqLx/Na21fMYKXIJPT9Q6IMi5jfOMlUpBNo5nLN6EECPaIZorFmzg+DgoCKf0xXw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=NhW5I0pp; arc=fail smtp.client-ip=52.101.62.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=W4gwTzXUn+xf5VBOPKCUve1OnRUyKvmGpkUK2DvTChaZHzZdni5jyr7alNflkxNdLuyO7eeCPX3+aQGPO5Bm4fav5G1IYwFXgaOLm+lJ/gP8TxrUZ4e4LLGkL+5m7zuwbxNDxxoW5D3zbRzFPYIInjXFSfBGbNov1SHk+O0wO0QLTYoY8x5Y/OZAV8yTntjb7/SdrTyJ6NDrXHVbH5T1hop/Rb2WX/qVlyOOUwzQZdFjMjE/fgGpWd9GMjXFlQl9odNNBbEssRDA8Zd1VVovUpkoFUfK7CZLZ+BLsNC3WbY7Jr6U/J2gzF/4YWu6ggS0wS6zUtbpituAFLd8a03ePw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Gb6IDFWS1zP4u61lc4SW8a1onFsyFUFJ7fJAQCHvjGc=;
+ b=QawKLUFqwjQa3xz7xmArcMne44rfv0Iv9xFh9cLoYYoq9BILK1GW+bhQypgF3hwX+a011a4JdasjxZWQynDZgTIbMwC3HszAjxPdVak/ZXsv2xL/p9CzK3DGTIU1ZjOLNdZTeo2GLR+1Bgb497y/Dnx9StZaRGQEYSR4YtnMRB6sDEdIQorDWbF6OmlOlEeP51WguIih5KhQEhtwL+YD6iLVzgRQmw0UMu9orDT3Ti8eMjQRP+DMLAd2C7BZz30dCjysd4ngEiQToQ8WSnP3H0OGzpKvhRNPUwHa7AN+S0wPPpx4AcsFczF0fAEn/oCQkDiYnCBXUWrxfX8z+m2qUQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Gb6IDFWS1zP4u61lc4SW8a1onFsyFUFJ7fJAQCHvjGc=;
+ b=NhW5I0ppxBgNo4JcnYGJrRM5kE1/MrmEm6QkJ71APrNmlUEgFLH4rKDSsWE2B6KRRN4ySHvEuL0BRGyJJkIcOgVxXZyixYQDv8pqX0Lr7NCHoCoW2FOFcPWOSHpiceVthHyaR/RUde/ym+e6IC5D/L4+27mJBsPc6bTw1S4fvnE=
+Received: from SA3PR21MB3867.namprd21.prod.outlook.com (2603:10b6:806:2fc::15)
+ by SA1PR21MB6058.namprd21.prod.outlook.com (2603:10b6:806:4aa::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9542.1; Mon, 12 Jan
+ 2026 15:34:59 +0000
+Received: from SA3PR21MB3867.namprd21.prod.outlook.com
+ ([fe80::70ff:4d3:2cb6:92a3]) by SA3PR21MB3867.namprd21.prod.outlook.com
+ ([fe80::70ff:4d3:2cb6:92a3%6]) with mapi id 15.20.9520.001; Mon, 12 Jan 2026
+ 15:34:59 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: Aditya Garg <gargaditya@linux.microsoft.com>, KY Srinivasan
+	<kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui
+	<DECUI@microsoft.com>, Long Li <longli@microsoft.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"stephen@networkplumber.org" <stephen@networkplumber.org>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"dipayanroy@linux.microsoft.com" <dipayanroy@linux.microsoft.com>,
+	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+	"shradhagupta@linux.microsoft.com" <shradhagupta@linux.microsoft.com>,
+	"ernis@linux.microsoft.com" <ernis@linux.microsoft.com>, Aditya Garg
+	<gargaditya@microsoft.com>
+Subject: RE: [PATCH net-next] net: hv_netvsc: reject RSS hash key programming
+ without RX indirection table
+Thread-Topic: [PATCH net-next] net: hv_netvsc: reject RSS hash key programming
+ without RX indirection table
+Thread-Index: AQHcg6qEiIS7Jlmg8U2ogNOKW3DLI7VOqkqA
+Date: Mon, 12 Jan 2026 15:34:59 +0000
+Message-ID:
+ <SA3PR21MB3867F67C949B42DF5984A71CCA81A@SA3PR21MB3867.namprd21.prod.outlook.com>
+References: <1768212093-1594-1-git-send-email-gargaditya@linux.microsoft.com>
+In-Reply-To: <1768212093-1594-1-git-send-email-gargaditya@linux.microsoft.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=58883b51-fecd-4e79-90be-e636c928ea65;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2026-01-12T15:33:33Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA3PR21MB3867:EE_|SA1PR21MB6058:EE_
+x-ms-office365-filtering-correlation-id: b316a31c-6609-4898-c185-08de51f0257d
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|366016|1800799024|38070700021|7142099003|7053199007|921020;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?sQq1C+gyNTniXimIihHraC0QaqAsfbGa1Eef7/Cq0AwpZ7eGkqVccHSjmVpN?=
+ =?us-ascii?Q?8okcyRMP0OxEgsLdnKcmbMRcxrS4zhpux8Xwq4LovD1hLz3deIp2ZSeLmHyO?=
+ =?us-ascii?Q?tSBg/ABb9N7hSM3nliXdYuklQg6HN27jTQSN5biimMG6hZ4cJcOZkFoWbDmh?=
+ =?us-ascii?Q?fLX0pcIAyBZ/JfEWwyWnCISrcLzT58sRrdlEpOqPK4l/WrsjCgXEGTT88KIR?=
+ =?us-ascii?Q?pOCjlIBLIjY3sraYVPBAfVestEdDP3Go5hrHrfwdT/4VLfkWndTP9+UvDbBH?=
+ =?us-ascii?Q?ezq8til+dETT+BVz416PNnBQemR2w6txAFjACrwMSDfN+g9yNc7OVZn8MoSe?=
+ =?us-ascii?Q?6Wjy7iqKc8eZ/APFVtMDNkkAw3x4cDvn9+ohrpkgvSt8/+SaFEKQAOjrbiLH?=
+ =?us-ascii?Q?i/CPcyYsbooTLE+ZV41FDVPRh8eK2XuNDcp7MGxPxWOyKt37xJEN4wE71gd5?=
+ =?us-ascii?Q?7bHsGfi8EOvhI8DQNeKu8emnFKr6x36h2Ev4h5NVfMheXcp+2uaOIuEEG5DV?=
+ =?us-ascii?Q?0iHhF9HtZ4Yh3kLRNtm3MLtFwKisqGjzC+4IyhJoVt+MMevNqE+pkmzVpy7z?=
+ =?us-ascii?Q?86cJGYA3rF8wsr3L4VdndbqYEgosreWjVXS5o7xAgTsVOL6oQPhLeyUNkzUB?=
+ =?us-ascii?Q?6GMMRtj5pY4h2gXZqJlbIWllTPTRfyzCGfcPydg5BfdTYptbfbox/qvnu3kr?=
+ =?us-ascii?Q?iQxervyWl+K7ULGMsL0DTt2f0t5hLHqoVbgSUmibJVHP/pqDt3r69udd47l4?=
+ =?us-ascii?Q?kg5mzLfilXXf7XwrsItO1/nM6gOidFq1AVmJ8YUXiKSvbG3W2ygeCyyZynVy?=
+ =?us-ascii?Q?HUhlDsVh9RKkx6jKae8Za3ecWEBMMmQwIW0SvLrqrHkzX/ewCs5lif5Buhht?=
+ =?us-ascii?Q?V7HZI6UxGSJzrb7Raq3GKSmyIzkGCGuM+hOdVmWGFHb+RUo5d9+uDwcYAErR?=
+ =?us-ascii?Q?6rgkG5eqMlOky1xu3duTcXTJb5THnBB1Wwcb7Q1GoOHdKjru1t553zZAMdJ9?=
+ =?us-ascii?Q?qDdEwBx4Tz+XFQWIZmhv0VdxJz+L9isrsAy4Dxj4MpuHNILJMQL2XWxKjlzr?=
+ =?us-ascii?Q?vf2b/sRaUeYJZNSIcKiJ/5S2NKiQLOBekLzMJZPwxzI/fmrrAPrGsn8WkhVD?=
+ =?us-ascii?Q?EPzAhu5ZboY0CvR+FRp68IWiTct8ObFQZU5I3HtJw2Zm8wUxV4u6dOzYHjMI?=
+ =?us-ascii?Q?5lpm/n6aUB0zdjxWNk6prH825EyVmytCCFiJs2CRpuvjZhtP27rmaIyXR+4x?=
+ =?us-ascii?Q?fP1YGKhKW8w8euhAtkoaHAcqe9BJOfHwsbberV7x+Y37/LeYYD3i5XN5KTng?=
+ =?us-ascii?Q?vtd8+mKjkYVGTsRz7q+bOh9xb2bMm9HIMkLTXkCceD9kVT7fU4h0V0xoEIN4?=
+ =?us-ascii?Q?N/lZYbe6Q3vBcCu+RCEssQqobb6jr3WkbxwGXeW2CPKNUlfoMvnuAQsX2dkB?=
+ =?us-ascii?Q?3vx8px9eiPUANsPoYMKjn/5Joc07wso1LWgoGqt0rdBph0zR2w6feuYWc1DQ?=
+ =?us-ascii?Q?xt8NIUpcc1g5gKKCeeKreVTIzOTA5XDjnH5nY7RzkrgWq23JQ08SNcfV1g?=
+ =?us-ascii?Q?=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR21MB3867.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(38070700021)(7142099003)(7053199007)(921020);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?PMQIe76DHCiE91zkEUvjHMWfa8fJjCNJyolxS0PKMOwcE0u6C/tgDdy6NnSA?=
+ =?us-ascii?Q?FhO/pF92bWvNKNu8/IJV6C4vqjHB/2/9xGzGZjYQ2KPWneQXxPjBpniUHXeR?=
+ =?us-ascii?Q?Dxv+vQz/iDmrcfgjhsT7CFz8o1DQ7AoW6yPKN4GgHGt8BaWzRmiZzC//M34N?=
+ =?us-ascii?Q?Ke1k4WGdsfyDKuohWwnt6D9h1c8sLvxG7GJe+X2ZaUYZkZ5pJrCzdWf9J0y6?=
+ =?us-ascii?Q?bNCQhfiy753IIqws/z5nk2I8E2kuAUrI0geQpiyWFnucBPLbCXL9Nc0t4zrx?=
+ =?us-ascii?Q?8Xw+n1RmaiwcHrYVjkMaCUrftwNmaHkgX2MwJy4izqrdEK4mLdUGAEita3KV?=
+ =?us-ascii?Q?NFdTTnGp6oZ9gnsIlv+eQfDI6rnEhUKeG85n0dlGUbqocrskzdnjb3rSUEjb?=
+ =?us-ascii?Q?6JcCu5mAlJc9/+oNGoOGrcix8NyXeWppmP0hKROT19IO+KEdvkItQgPAE5aY?=
+ =?us-ascii?Q?17l9wBF3oP5AbPIvrKaIYbs3k/HIhk5S1jrnvnH8xsNLSS1rawICxXKj2wxJ?=
+ =?us-ascii?Q?R2CeU091jPoKW3xD2lalhKoE4mcluLGi+XExkeAkH4n+AjHYcFGMJojyrUhE?=
+ =?us-ascii?Q?91hDE2C+NKWEd1+JMrSdJ5VqlYHykDLWu4q6hsq8b09GMfODtP95pEM7hxT8?=
+ =?us-ascii?Q?dTbjB+5qoun1WRHn0jkPBB9NpDq3wgyIFhxI4KSRqjNHiDSNUFOGkhnHsFYx?=
+ =?us-ascii?Q?t+6d7I/8DNu7nx3GbSuzrjlmwZ0dK2z7Y6w7PgviTXJcuL8W6kzPra3OVcqa?=
+ =?us-ascii?Q?I+C1Z3HjN+S7e3j6PSyhmSz5feyhJWcfr1xye2nlnwZ8vA8zgRBTuH7OF5PB?=
+ =?us-ascii?Q?L8CxJnN5xe0h5OeqMGLeC6zrOPo9KnGP6Rrn1Q2N1H7LBWvftkW7mgDEAlCz?=
+ =?us-ascii?Q?DaAx+oweQoKHgQPI/z7GeczxLj/KNmWxepfIwgXnw0BRt7eA/yChG3h609BY?=
+ =?us-ascii?Q?CaVo3ohrIpU6lwhTFdjq4avDz8bDBXmZidrt/mJdzTiQsQBIh/J8U4Su8lHy?=
+ =?us-ascii?Q?AGVH9VQcPS/XLhCuHlQni+H46T6+se1HZF9H7DjTLpaHjjiuQgA4J6SsJNTp?=
+ =?us-ascii?Q?hg7pzlz8MhmQqgEcEJPpGKQT/ril/q9Hi/dVWOrshvk9pfhY4hVMJtKei+CF?=
+ =?us-ascii?Q?5LQP9ZVKrM37zfE0iqNH7yA6UGXRrB7bjndBarBQwNKU88ni9/ZeH+YkP1Sp?=
+ =?us-ascii?Q?uAkc/TZZWc//zynfe8m28LJdgGIEyPewJ3IvTNP9c2IdhC/YdXUIODJ6VQ3Q?=
+ =?us-ascii?Q?JAoEA5mT2uqhyHqIaVxIEnnZWeV0YvkY3jDUAfbtM2x8INk/SjFLX5pC6pm7?=
+ =?us-ascii?Q?EuuA/u46tiyy5pfKcdjzFppuCSMaXKT4593bPKI2EucuAWOuO3QdKnctD5X7?=
+ =?us-ascii?Q?4JffUniUJMDc0LbSYl91tWxFNJ6lPaZwXqk4vpijJLrLwBNitzhHvNWLDxfo?=
+ =?us-ascii?Q?uol8w9eVQHo1RLDMLxAaXi/Xkke25cHvmLziaVK49ADBeO82dmw/sJDeG17h?=
+ =?us-ascii?Q?g6XQsobvMlGrTiBSKdwGuilyUR5iZxh2Kg9QPEO2+fcm+a2rbA4ssV9rFqZY?=
+ =?us-ascii?Q?O/xs7wKpRt1YF3+oDLPRzZVHxpgHhmM63Z1EEbJzNRB7OL2v++TCnkFGd8Bq?=
+ =?us-ascii?Q?lfm0wnSVnATiqbkBuV9Ez9eMViO9K9IZuJYRPxtrDc1HoNG3+Q1Q1QC0TlB4?=
+ =?us-ascii?Q?bLQh8aDi2nXO2JL+dj5m29lAfJQO3/UiUIb/KT0UvsRDX2uI4qEQlj466sHK?=
+ =?us-ascii?Q?mgDkC38lQw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR21MB3867.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b316a31c-6609-4898-c185-08de51f0257d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jan 2026 15:34:59.5796
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: c9DSBCzy6nBjCMrHlLeEgLcq9L1rfnuJwYyFrB0hjPyhG4IBLCnmyg0MT4S8bdeiY6YGG0GYYipY3ZUjlxDqQQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR21MB6058
 
-The docs for YNL event ops currently render raw python structs. For
-example in:
 
-https://docs.kernel.org/netlink/specs/ethtool.html#cable-test-ntf
 
-  event: {‘attributes’: [‘header’, ‘status’, ‘nest’], ‘__lineno__’: 2385}
+> -----Original Message-----
+> From: Aditya Garg <gargaditya@linux.microsoft.com>
+> Sent: Monday, January 12, 2026 5:02 AM
+> To: KY Srinivasan <kys@microsoft.com>; Haiyang Zhang
+> <haiyangz@microsoft.com>; wei.liu@kernel.org; Dexuan Cui
+> <DECUI@microsoft.com>; Long Li <longli@microsoft.com>;
+> andrew+netdev@lunn.ch; davem@davemloft.net; edumazet@google.com;
+> kuba@kernel.org; pabeni@redhat.com; stephen@networkplumber.org; linux-
+> hyperv@vger.kernel.org; netdev@vger.kernel.org; linux-
+> kernel@vger.kernel.org; dipayanroy@linux.microsoft.com;
+> ssengar@linux.microsoft.com; shradhagupta@linux.microsoft.com;
+> ernis@linux.microsoft.com; Aditya Garg <gargaditya@microsoft.com>;
+> gargaditya@linux.microsoft.com
+> Subject: [PATCH net-next] net: hv_netvsc: reject RSS hash key programming
+> without RX indirection table
+>=20
+> RSS configuration requires a valid RX indirection table. When the device
+> reports a single receive queue, rndis_filter_device_add() does not
+> allocate an indirection table, accepting RSS hash key updates in this
+> state leads to a hang.
+>=20
+> Fix this by gating netvsc_set_rxfh() on ndc->rx_table_sz and return
+> -EOPNOTSUPP when the table is absent. This aligns set_rxfh with the devic=
+e
+> capabilities and prevents incorrect behavior.
+>=20
+> Fixes: 962f3fee83a4 ("netvsc: add ethtool ops to get/set RSS key")
+> Signed-off-by: Aditya Garg <gargaditya@linux.microsoft.com>
+> Reviewed-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
 
-Handle event ops correctly and render their op attributes:
-
-  event: attributes: [header, status]
-
-Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
----
- tools/net/ynl/pyynl/lib/doc_generator.py | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/tools/net/ynl/pyynl/lib/doc_generator.py b/tools/net/ynl/pyynl/lib/doc_generator.py
-index 3a16b8eb01ca..8b922d8f89e8 100644
---- a/tools/net/ynl/pyynl/lib/doc_generator.py
-+++ b/tools/net/ynl/pyynl/lib/doc_generator.py
-@@ -166,13 +166,13 @@ class YnlDocGenerator:
-                 continue
-             lines.append(self.fmt.rst_paragraph(self.fmt.bold(key), level + 1))
-             if key in ['request', 'reply']:
--                lines.append(self.parse_do_attributes(do_dict[key], level + 1) + "\n")
-+                lines.append(self.parse_op_attributes(do_dict[key], level + 1) + "\n")
-             else:
-                 lines.append(self.fmt.headroom(level + 2) + do_dict[key] + "\n")
- 
-         return "\n".join(lines)
- 
--    def parse_do_attributes(self, attrs: Dict[str, Any], level: int = 0) -> str:
-+    def parse_op_attributes(self, attrs: Dict[str, Any], level: int = 0) -> str:
-         """Parse 'attributes' section"""
-         if "attributes" not in attrs:
-             return ""
-@@ -184,7 +184,7 @@ class YnlDocGenerator:
- 
-     def parse_operations(self, operations: List[Dict[str, Any]], namespace: str) -> str:
-         """Parse operations block"""
--        preprocessed = ["name", "doc", "title", "do", "dump", "flags"]
-+        preprocessed = ["name", "doc", "title", "do", "dump", "flags", "event"]
-         linkable = ["fixed-header", "attribute-set"]
-         lines = []
- 
-@@ -217,6 +217,9 @@ class YnlDocGenerator:
-             if "dump" in operation:
-                 lines.append(self.fmt.rst_paragraph(":dump:", 0))
-                 lines.append(self.parse_do(operation["dump"], 0))
-+            if "event" in operation:
-+                lines.append(self.fmt.rst_paragraph(":event:", 0))
-+                lines.append(self.parse_op_attributes(operation["event"], 0))
- 
-             # New line after fields
-             lines.append("\n")
--- 
-2.52.0
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
 
 
