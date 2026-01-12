@@ -1,56 +1,85 @@
-Return-Path: <netdev+bounces-249011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEE38D12ACB
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 14:05:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CA31FD1344F
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:46:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5E9063005591
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 13:05:57 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1CF413009D75
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 14:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79BC73587B0;
-	Mon, 12 Jan 2026 13:05:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="M/Y6jAha"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2153125B1D2;
+	Mon, 12 Jan 2026 14:40:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 047FD346AE6;
-	Mon, 12 Jan 2026 13:05:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F41E24A06B
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 14:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768223154; cv=none; b=ZJddwLJEhxgtZUMxquu77KITgAoKH/XZu+SQVLGsVdweghjH2/pn5wFXSbvpGRM4KbPZSA5Xf5IwEUwNLo85S7wgFvM3R+AkJFUvwbaGUuvOYHGb/mC6aAbe+0ziAzftDnSYJSxTSg8GMswMWbThB6OcCkOqx4dH6FnqXNSekXU=
+	t=1768228837; cv=none; b=cInuaxGlfan2aZ5m/8/HhrGlDavep0YiP8zJ4QRJ1mu7rJHjbdArMjCRv8PcsPpmXtc/I9sxsmnbkkqtAhiPRySi2Iml2RAFVY78yMksqGL1RXJYQRsuRawJjlWr71S8XvwOUVmIwwyMvc7FuZYKxoAuPLxKxuC4XTL9LFmhA1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768223154; c=relaxed/simple;
-	bh=LDRMrQRVyy1prgME2OQUHsThxIlbPrQ6Bi0i03otMnM=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=DMvIgvoebgxiQ6uZxqpG8sf2/CIP6lB1rnaZvyTpmN8vQgBixzsd7IzDekKXGhQ+t214WE1TVEml51bk6jQ1+9MjjBOED5EDoFyCrV3AJyUe8xSBePLwB2pbjkcKnXdHtWvDHx125ObQeD4UJUHo4+3Yfrdye9qKDEhMAC5OqVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=M/Y6jAha; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1204)
-	id ACA39201AC86; Mon, 12 Jan 2026 05:05:52 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com ACA39201AC86
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1768223152;
-	bh=tEofgjfRMhXX8w5hgxWzQkqBlNRBlhwkGqlGrIa89mQ=;
-	h=Date:From:To:Subject:From;
-	b=M/Y6jAhaGZvHcUM8xjpRplCaHhdvFsALngovYyCgthkKOJQM+Zut6y3o7/PWejbA8
-	 QqzIctEwcXRYKWzuXgn52oMu3BvUFDgoBHn5Jz3O8mJSH8I2EXrOfgeJuoO3blAPSr
-	 lsWwF0VVJxRgCzSq7d398HzlWwAcPF4N8L3p+JGY=
-Date: Mon, 12 Jan 2026 05:05:52 -0800
-From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
-	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	dipayanroy@microsoft.com
-Subject: [PATCH net-next, v8] net: mana: Implement ndo_tx_timeout and
- serialize queue resets per port.
-Message-ID: <20260112130552.GA11785@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	s=arc-20240116; t=1768228837; c=relaxed/simple;
+	bh=hHp5wEWvtu2/8EyzN6x5ir5gbVmu8QuIrGAM8IielDg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nvUT3aBpVQQDTwovNL6wZlCvZ7uxW3K8lJQZZ/BNdeesekYVPQhgBkODWmTMjt26mNxNASoS2JVbl5CHVBL9MOh9QwMSnVeEqfYQ7UZL8jX2vLRnpQbnYHoaDABDPA6vP63on5i9WCFjvf3qg1uUa+4vyOx7LcVWYUukm4YJBR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-88888d80590so84271216d6.3
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 06:40:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768228834; x=1768833634;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZssGPCoEo5EOZd62uB85szCiK1muwx8pIQMV+xndCFE=;
+        b=uq06dxPhr9Rc9SbbFNfOz97EnwMY+wsMnaqviuQqiWVzNyB8p0iFWJNwjXx7i3FEdZ
+         qO2vOQI4ztQOf7T4a4xCA6tW0PX8Wh/KvNR8IDBL6wOIH+N6H5UWCFXSKzSBFDVBxSLS
+         o4a6BNw34aGAJN/yIHPixzqbh42G6j8uVKZCSB1AC9Z+BRlUk8DLNtmgao5kRvROvwvm
+         htkDhBAQj9ukx5yC3En0CLTDF3UcQehkdZSkyhWgIijGJqMC1LfGri5Krx06P4IDcai8
+         gFg1rHEkVTs37e5tY+mzn7u0MtkIKWog1TR7kPBNfFgShS+zWLCPO3tnoumVInR+xIiQ
+         vdCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUparcvTMW2tWmWUUkZHGJM1lv1YkKanDLIBSnKfHj6efvJncZvI/1tbqBNXvawCDpJtmL2reA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXmxsxtW3M8BwCG6i9sBGfJ5XFw7OXx/x1oxgwGV16mLPKUXlE
+	2PryKYX9Z85QxX0TsvqMKunOtgyYbeZNvU+La3b2vhguQmbjb5cgX96PJ+O37fH2
+X-Gm-Gg: AY/fxX4x96aNeo+KwHng1E8Q8zT4DMs6TTfKPGxTEgUkbu931GRWVYSp5dAM/GkLdKa
+	tJSS2xqjYNo+CXwsFfrn0kvwfDdsJBSF5BdBswfD+DBZTtdRAmTGp1m7YKY5J6TlU6qDtUaI/Sv
+	jxGYYdzYa6TAtpeW3OiOPrgmtV/z997LV9qzeYcjfLuXvsKn3TDgwh/HAmlYtgtzR3cisNtzBtj
+	rI5eT33xA5VsSQat+GMlPmR36U4LJn5iwYxKCNyxwJN/exZ4DxoQogW5ukMSXp5dwPGf192xOeg
+	Q6UFLNfyt0+Os2mGzFF81vT4flsWWOOHazQD7VAww0D//7RsGXggTVY6EMcTr2D77Eb4A0E4Ph2
+	6qHBhjsVoIf5Ovfvx/Dz/j+1akuzvQyz6pW3sQRLZKP7m4djbe9xOMMDVE9TnqbHuxPQhLpiRmN
+	RcyA==
+X-Google-Smtp-Source: AGHT+IEKV+JjMCOl7eFASI55Nw7wSFdRLeBwJDDUJQmSuHbbj21BVdCQpdCeTNsmKFhm0pXrszSq0Q==
+X-Received: by 2002:a05:6830:4390:b0:7c6:cb39:adf7 with SMTP id 46e09a7af769-7ce508ce57emr11413632a34.6.1768221884738;
+        Mon, 12 Jan 2026 04:44:44 -0800 (PST)
+Received: from gmail.com ([2a03:2880:10ff:59::])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7ce478af8b2sm12584208a34.15.2026.01.12.04.44.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jan 2026 04:44:44 -0800 (PST)
+Date: Mon, 12 Jan 2026 04:44:42 -0800
+From: Breno Leitao <leitao@debian.org>
+To: John Ogness <john.ogness@linutronix.de>, pmladek@suse.com, 
+	osandov@osandov.com
+Cc: mpdesouza@suse.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, gustavold@gmail.com, 
+	calvin@wbinvd.org, jv@jvosburgh.net, kernel-team@meta.com, 
+	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, rostedt@goodmis.org
+Subject: Re: [PATCH net-next 0/2] net: netconsole: convert to NBCON console
+ infrastructure
+Message-ID: <jakydyx5dprrzgbsb6lorgpova46jbhq5tecwwtiihkhyi6ofy@olsrizfk52je>
+References: <20251222-nbcon-v1-0-65b43c098708@debian.org>
+ <5mpei32y7sl5jmi2ciim4crxbc55zztiucxxsdd633mvzxlk7n@fowtsefym5y6>
+ <87zf6pfmlq.fsf@jogness.linutronix.de>
+ <4dwhhlnuv2n3f7d3hqoulcnsg6ljucd6v47kqcszcwcshfoqno@rzxvg456q4fi>
+ <j764nuipx4nvemd3wlqfyx77lkdf7wgs5z452hlacwglvc2e7n@vsko4bq5xb2f>
+ <87eco09hgb.fsf@jogness.linutronix.de>
+ <aWECzkapsFFPFKNP@pathway.suse.cz>
+ <875x9a6cpw.fsf@jogness.linutronix.de>
+ <44upa7szd563kggh4xolznmfcwfnhrrh5guvecp6pzlvp5qvic@w7hxtzy7huzf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,246 +88,245 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <44upa7szd563kggh4xolznmfcwfnhrrh5guvecp6pzlvp5qvic@w7hxtzy7huzf>
 
-Implement .ndo_tx_timeout for MANA so any stalled TX queue can be detected
-and a device-controlled port reset for all queues can be scheduled to a
-ordered workqueue. The reset for all queues on stall detection is
-recomended by hardware team.
+On Mon, Jan 12, 2026 at 02:55:06AM -0800, Breno Leitao wrote:
+> > My ordered preferences for right now would be:
+> > 
+> > 1. keeping @caller_id semantics + adding @cpu + adding @comm (similar to
+> > your C)
 
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
----
-Changes in v8:
-  - better aligned queue reset work struct.
-Changes in v7:
-  - Add enable_work in resume path.
-Changes in v6:
-  - Rebased.
-Changes in v5:
-  -Fixed commit message, used 'create_singlethread_workqueue' and fixed
-   cleanup part.
-Changes in v4:
-  -Fixed commit message, work initialization before registering netdev,
-   fixed potential null pointer de-reference bug.
-Changes in v3:
-  -Fixed commit meesage, removed rtnl_trylock and added
-   disable_work_sync, fixed mana_queue_reset_work, and few
-   cosmetics.
-Changes in v2:
-  -Fixed cosmetic changes.
----
----
- drivers/net/ethernet/microsoft/mana/mana_en.c | 77 ++++++++++++++++++-
- include/net/mana/gdma.h                       |  7 +-
- include/net/mana/mana.h                       |  3 +-
- 3 files changed, 84 insertions(+), 3 deletions(-)
+...
 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 1ad154f9db1a..91c418097284 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -299,6 +299,39 @@ static int mana_get_gso_hs(struct sk_buff *skb)
- 	return gso_hs;
- }
- 
-+static void mana_per_port_queue_reset_work_handler(struct work_struct *work)
-+{
-+	struct mana_port_context *apc = container_of(work,
-+						     struct mana_port_context,
-+						     queue_reset_work);
-+	struct net_device *ndev = apc->ndev;
-+	int err;
-+
-+	rtnl_lock();
-+
-+	/* Pre-allocate buffers to prevent failure in mana_attach later */
-+	err = mana_pre_alloc_rxbufs(apc, ndev->mtu, apc->num_queues);
-+	if (err) {
-+		netdev_err(ndev, "Insufficient memory for reset post tx stall detection\n");
-+		goto out;
-+	}
-+
-+	err = mana_detach(ndev, false);
-+	if (err) {
-+		netdev_err(ndev, "mana_detach failed: %d\n", err);
-+		goto dealloc_pre_rxbufs;
-+	}
-+
-+	err = mana_attach(ndev);
-+	if (err)
-+		netdev_err(ndev, "mana_attach failed: %d\n", err);
-+
-+dealloc_pre_rxbufs:
-+	mana_pre_dealloc_rxbufs(apc);
-+out:
-+	rtnl_unlock();
-+}
-+
- netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
- {
- 	enum mana_tx_pkt_format pkt_fmt = MANA_SHORT_PKT_FMT;
-@@ -839,6 +872,23 @@ static int mana_change_mtu(struct net_device *ndev, int new_mtu)
- 	return err;
- }
- 
-+static void mana_tx_timeout(struct net_device *netdev, unsigned int txqueue)
-+{
-+	struct mana_port_context *apc = netdev_priv(netdev);
-+	struct mana_context *ac = apc->ac;
-+	struct gdma_context *gc = ac->gdma_dev->gdma_context;
-+
-+	/* Already in service, hence tx queue reset is not required.*/
-+	if (gc->in_service)
-+		return;
-+
-+	/* Note: If there are pending queue reset work for this port(apc),
-+	 * subsequent request queued up from here are ignored. This is because
-+	 * we are using the same work instance per port(apc).
-+	 */
-+	queue_work(ac->per_port_queue_reset_wq, &apc->queue_reset_work);
-+}
-+
- static int mana_shaper_set(struct net_shaper_binding *binding,
- 			   const struct net_shaper *shaper,
- 			   struct netlink_ext_ack *extack)
-@@ -924,6 +974,7 @@ static const struct net_device_ops mana_devops = {
- 	.ndo_bpf		= mana_bpf,
- 	.ndo_xdp_xmit		= mana_xdp_xmit,
- 	.ndo_change_mtu		= mana_change_mtu,
-+	.ndo_tx_timeout		= mana_tx_timeout,
- 	.net_shaper_ops         = &mana_shaper_ops,
+> Let me hack a new version of it with @comm, and post here to check how
+> it looks likes.
+
+How does this version look like according to the suggestion above. It is
+mostly Petr's option C with a few changes:
+
+  a) caller_id continues to be unchanged with (pid and context bit)
+  b) Append @pid and @comm to printk_info
+
+
+Author: Breno Leitao <leitao@debian.org>
+Date:   Thu Jan 8 03:00:46 2026 -0800
+
+    printk: Add execution context (task name/CPU) to printk_info
+    
+    Extend struct printk_info to include the task name and CPU number
+    where printk messages originate. This information is captured at
+    vprintk_store() time and propagated through printk_message to
+    nbcon_write_context, making it available to nbcon console drivers.
+    
+    This is useful for consoles like netconsole that want to include
+    execution context in their output, allowing correlation of messages
+    with specific tasks and CPUs regardless of where the console driver
+    actually runs.
+    
+    The feature is controlled by CONFIG_PRINTK_EXECUTION_CTX, which is
+    automatically selected by CONFIG_NETCONSOLE_DYNAMIC. When disabled,
+    the helper functions compile to no-ops with no overhead.
+    
+    Suggested-by: John Ogness <john.ogness@linutronix.de>
+    Signed-off-by: Breno Leitao <leitao@debian.org>
+
+diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+index ac12eaf11755..12e47cb27ffa 100644
+--- a/drivers/net/Kconfig
++++ b/drivers/net/Kconfig
+@@ -341,6 +341,7 @@ config NETCONSOLE_DYNAMIC
+ 	bool "Dynamic reconfiguration of logging targets"
+ 	depends on NETCONSOLE && SYSFS && CONFIGFS_FS && \
+ 			!(NETCONSOLE=y && CONFIGFS_FS=m)
++	select CONSOLE_HAS_EXECUTION_CTX
+ 	help
+ 	  This option enables the ability to dynamically reconfigure target
+ 	  parameters (interface, IP addresses, port numbers, MAC addresses)
+diff --git a/include/linux/console.h b/include/linux/console.h
+index fc9f5c5c1b04..4bb97700806e 100644
+--- a/include/linux/console.h
++++ b/include/linux/console.h
+@@ -19,6 +19,7 @@
+ #include <linux/irq_work.h>
+ #include <linux/rculist.h>
+ #include <linux/rcuwait.h>
++#include <linux/sched.h>
+ #include <linux/smp.h>
+ #include <linux/types.h>
+ #include <linux/vesa.h>
+@@ -298,12 +299,18 @@ struct nbcon_context {
+  * @outbuf:		Pointer to the text buffer for output
+  * @len:		Length to write
+  * @unsafe_takeover:	If a hostile takeover in an unsafe state has occurred
++ * @msg_comm:		Name of the task that generated the message
++ * @msg_cpu:		CPU on which the message was generated
+  */
+ struct nbcon_write_context {
+ 	struct nbcon_context	__private ctxt;
+ 	char			*outbuf;
+ 	unsigned int		len;
+ 	bool			unsafe_takeover;
++#ifdef CONFIG_PRINTK_EXECUTION_CTX
++	char			msg_comm[TASK_COMM_LEN];
++	int			msg_cpu;
++#endif
  };
  
-@@ -3287,6 +3338,8 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
- 	ndev->min_mtu = ETH_MIN_MTU;
- 	ndev->needed_headroom = MANA_HEADROOM;
- 	ndev->dev_port = port_idx;
-+	/* Recommended timeout based on HW FPGA re-config scenario. */
-+	ndev->watchdog_timeo = 15 * HZ;
- 	SET_NETDEV_DEV(ndev, gc->dev);
+ /**
+diff --git a/kernel/printk/internal.h b/kernel/printk/internal.h
+index 5f5f626f4279..039eb9b44a66 100644
+--- a/kernel/printk/internal.h
++++ b/kernel/printk/internal.h
+@@ -281,12 +281,18 @@ struct printk_buffers {
+  *		nothing to output and this record should be skipped.
+  * @seq:	The sequence number of the record used for @pbufs->outbuf.
+  * @dropped:	The number of dropped records from reading @seq.
++ * @msg_comm:	Name of the task that generated the message.
++ * @msg_cpu:	CPU on which the message was generated.
+  */
+ struct printk_message {
+ 	struct printk_buffers	*pbufs;
+ 	unsigned int		outbuf_len;
+ 	u64			seq;
+ 	unsigned long		dropped;
++#ifdef CONFIG_PRINTK_EXECUTION_CTX
++	char			msg_comm[TASK_COMM_LEN];
++	int			msg_cpu;
++#endif
+ };
  
- 	netif_set_tso_max_size(ndev, GSO_MAX_SIZE);
-@@ -3303,6 +3356,10 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
- 	if (err)
- 		goto reset_apc;
+ bool printk_get_next_message(struct printk_message *pmsg, u64 seq,
+diff --git a/kernel/printk/nbcon.c b/kernel/printk/nbcon.c
+index 3fa403f9831f..38117b72d0b8 100644
+--- a/kernel/printk/nbcon.c
++++ b/kernel/printk/nbcon.c
+@@ -946,6 +946,18 @@ void nbcon_reacquire_nobuf(struct nbcon_write_context *wctxt)
+ }
+ EXPORT_SYMBOL_GPL(nbcon_reacquire_nobuf);
  
-+	/* Initialize the per port queue reset work.*/
-+	INIT_WORK(&apc->queue_reset_work,
-+		  mana_per_port_queue_reset_work_handler);
++#ifdef CONFIG_PRINTK_EXECUTION_CTX
++static inline void wctxt_load_execution_ctx(struct nbcon_write_context *wctxt,
++					    struct printk_message *pmsg)
++{
++	memcpy(wctxt->msg_comm, pmsg->msg_comm, TASK_COMM_LEN);
++	wctxt->msg_cpu = pmsg->msg_cpu;
++}
++#else
++static inline void wctxt_load_execution_ctx(struct nbcon_write_context *wctxt,
++					    struct printk_message *pmsg) {}
++#endif
 +
- 	netdev_lockdep_set_classes(ndev);
+ /**
+  * nbcon_emit_next_record - Emit a record in the acquired context
+  * @wctxt:	The write context that will be handed to the write function
+@@ -1048,6 +1060,8 @@ static bool nbcon_emit_next_record(struct nbcon_write_context *wctxt, bool use_a
+ 	/* Initialize the write context for driver callbacks. */
+ 	nbcon_write_context_set_buf(wctxt, &pmsg.pbufs->outbuf[0], pmsg.outbuf_len);
  
- 	ndev->hw_features = NETIF_F_SG | NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM;
-@@ -3492,6 +3549,7 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
- {
- 	struct gdma_context *gc = gd->gdma_context;
- 	struct mana_context *ac = gd->driver_data;
-+	struct mana_port_context *apc = NULL;
- 	struct device *dev = gc->dev;
- 	u8 bm_hostmode = 0;
- 	u16 num_ports = 0;
-@@ -3549,6 +3607,14 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
- 	if (ac->num_ports > MAX_PORTS_IN_MANA_DEV)
- 		ac->num_ports = MAX_PORTS_IN_MANA_DEV;
- 
-+	ac->per_port_queue_reset_wq =
-+		create_singlethread_workqueue("mana_per_port_queue_reset_wq");
-+	if (!ac->per_port_queue_reset_wq) {
-+		dev_err(dev, "Failed to allocate per port queue reset workqueue\n");
-+		err = -ENOMEM;
-+		goto out;
-+	}
++	wctxt_load_execution_ctx(wctxt, &pmsg);
 +
- 	if (!resuming) {
- 		for (i = 0; i < ac->num_ports; i++) {
- 			err = mana_probe_port(ac, i, &ac->ports[i]);
-@@ -3565,6 +3631,8 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
- 	} else {
- 		for (i = 0; i < ac->num_ports; i++) {
- 			rtnl_lock();
-+			apc = netdev_priv(ac->ports[i]);
-+			enable_work(&apc->queue_reset_work);
- 			err = mana_attach(ac->ports[i]);
- 			rtnl_unlock();
- 			/* we log the port for which the attach failed and stop
-@@ -3616,13 +3684,15 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+ 	if (use_atomic)
+ 		con->write_atomic(con, wctxt);
+ 	else
+diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
+index 1d765ad242b8..76dfa7ee1d23 100644
+--- a/kernel/printk/printk.c
++++ b/kernel/printk/printk.c
+@@ -2213,6 +2213,26 @@ static u16 printk_sprint(char *text, u16 size, int facility,
+ 	return text_len;
+ }
  
- 	for (i = 0; i < ac->num_ports; i++) {
- 		ndev = ac->ports[i];
--		apc = netdev_priv(ndev);
- 		if (!ndev) {
- 			if (i == 0)
- 				dev_err(dev, "No net device to remove\n");
- 			goto out;
- 		}
- 
-+		apc = netdev_priv(ndev);
-+		disable_work_sync(&apc->queue_reset_work);
++#ifdef CONFIG_PRINTK_EXECUTION_CTX
++static inline void printk_save_execution_ctx(struct printk_info *info)
++{
++	get_task_comm(info->msg_comm, current);
++	info->msg_cpu = smp_processor_id();
++}
 +
- 		/* All cleanup actions should stay after rtnl_lock(), otherwise
- 		 * other functions may access partially cleaned up data.
- 		 */
-@@ -3649,6 +3719,11 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
- 
- 	mana_destroy_eq(ac);
- out:
-+	if (ac->per_port_queue_reset_wq) {
-+		destroy_workqueue(ac->per_port_queue_reset_wq);
-+		ac->per_port_queue_reset_wq = NULL;
-+	}
++static inline void pmsg_load_execution_ctx(struct printk_message *pmsg,
++					   const struct printk_info *info)
++{
++	memcpy(pmsg->msg_comm, info->msg_comm, TASK_COMM_LEN);
++	pmsg->msg_cpu = info->msg_cpu;
++}
++#else
++static inline void printk_save_execution_ctx(struct printk_info *info) {}
 +
- 	mana_gd_deregister_device(gd);
- 
- 	if (suspending)
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index eaa27483f99b..a59bd4035a99 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -598,6 +598,10 @@ enum {
- 
- /* Driver can self reset on FPGA Reconfig EQE notification */
- #define GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE BIT(17)
++static inline void pmsg_load_execution_ctx(struct printk_message *pmsg,
++					   const struct printk_info *info) {}
++#endif
 +
-+/* Driver detects stalled send queues and recovers them */
-+#define GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY BIT(18)
+ __printf(4, 0)
+ int vprintk_store(int facility, int level,
+ 		  const struct dev_printk_info *dev_info,
+@@ -2320,6 +2340,7 @@ int vprintk_store(int facility, int level,
+ 	r.info->caller_id = caller_id;
+ 	if (dev_info)
+ 		memcpy(&r.info->dev_info, dev_info, sizeof(r.info->dev_info));
++	printk_save_execution_ctx(r.info);
+ 
+ 	/* A message without a trailing newline can be continued. */
+ 	if (!(flags & LOG_NEWLINE))
+@@ -3002,6 +3023,7 @@ bool printk_get_next_message(struct printk_message *pmsg, u64 seq,
+ 	pmsg->seq = r.info->seq;
+ 	pmsg->dropped = r.info->seq - seq;
+ 	force_con = r.info->flags & LOG_FORCE_CON;
++	pmsg_load_execution_ctx(pmsg, r.info);
+ 
+ 	/*
+ 	 * Skip records that are not forced to be printed on consoles and that
+diff --git a/kernel/printk/printk_ringbuffer.h b/kernel/printk/printk_ringbuffer.h
+index 4ef81349d9fb..4ecb26d8dc8b 100644
+--- a/kernel/printk/printk_ringbuffer.h
++++ b/kernel/printk/printk_ringbuffer.h
+@@ -6,6 +6,7 @@
+ #include <linux/atomic.h>
+ #include <linux/bits.h>
+ #include <linux/dev_printk.h>
++#include <linux/sched.h>
+ #include <linux/stddef.h>
+ #include <linux/types.h>
+ 
+@@ -23,6 +24,10 @@ struct printk_info {
+ 	u8	flags:5;	/* internal record flags */
+ 	u8	level:3;	/* syslog level */
+ 	u32	caller_id;	/* thread id or processor id */
++#ifdef CONFIG_PRINTK_EXECUTION_CTX
++	char	msg_comm[TASK_COMM_LEN]; /* name of the task that generated the message */
++	int	msg_cpu;	/* CPU where the message was generated */
++#endif
+ 
+ 	struct dev_printk_info	dev_info;
+ };
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index ba36939fda79..57f91ee10b8e 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -35,6 +35,26 @@ config PRINTK_CALLER
+ 	  no option to enable/disable at the kernel command line parameter or
+ 	  sysfs interface.
+ 
++config CONSOLE_HAS_EXECUTION_CTX
++	bool
++	help
++	  Selected by console drivers that support execution context
++	  (task name/CPU) in their output. This enables PRINTK_EXECUTION_CTX
++	  to provide the necessary infrastructure.
 +
- #define GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE BIT(6)
- 
- /* Driver supports linearizing the skb when num_sge exceeds hardware limit */
-@@ -621,7 +625,8 @@ enum {
- 	 GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE | \
- 	 GDMA_DRV_CAP_FLAG_1_PERIODIC_STATS_QUERY | \
- 	 GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE | \
--	 GDMA_DRV_CAP_FLAG_1_PROBE_RECOVERY)
-+	 GDMA_DRV_CAP_FLAG_1_PROBE_RECOVERY | \
-+	 GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY)
- 
- #define GDMA_DRV_CAP_FLAGS2 0
- 
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index d7e089c6b694..a078af283bdd 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -480,7 +480,7 @@ struct mana_context {
- 	struct mana_ethtool_hc_stats hc_stats;
- 	struct mana_eq *eqs;
- 	struct dentry *mana_eqs_debugfs;
--
-+	struct workqueue_struct *per_port_queue_reset_wq;
- 	/* Workqueue for querying hardware stats */
- 	struct delayed_work gf_stats_work;
- 	bool hwc_timeout_occurred;
-@@ -495,6 +495,7 @@ struct mana_context {
- struct mana_port_context {
- 	struct mana_context *ac;
- 	struct net_device *ndev;
-+	struct work_struct queue_reset_work;
- 
- 	u8 mac_addr[ETH_ALEN];
- 
--- 
-2.43.0
-
++config PRINTK_EXECUTION_CTX
++	bool "Include execution context (task/CPU) in printk messages"
++	depends on PRINTK && CONSOLE_HAS_EXECUTION_CTX
++	default CONSOLE_HAS_EXECUTION_CTX
++	help
++	  This option extends struct printk_info to include extra execution
++	  context in printk, such as task name and CPU number from where the
++	  message originated. This is useful for correlating printk messages
++	  with specific execution contexts.
++
++	  This is automatically enabled when a console driver that supports
++	  execution context is selected.
++
+ config STACKTRACE_BUILD_ID
+ 	bool "Show build ID information in stacktraces"
+ 	depends on PRINTK
 
