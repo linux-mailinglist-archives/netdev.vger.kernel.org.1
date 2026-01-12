@@ -1,119 +1,100 @@
-Return-Path: <netdev+bounces-249023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25651D12CDF
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 14:30:19 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5234BD12D38
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 14:33:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 14420300253B
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 13:30:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C438830024C2
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 13:33:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2808021CA02;
-	Mon, 12 Jan 2026 13:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6FD630E84F;
+	Mon, 12 Jan 2026 13:33:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pRuPEFht"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="KYQdp0nD";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="PqZ2/STn"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 388CC1EEA3C;
-	Mon, 12 Jan 2026 13:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C05A27E07A;
+	Mon, 12 Jan 2026 13:33:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768224613; cv=none; b=UydgyLmiecJK9MjjdIct/UuDWi2lq757iWUEDdA1GSQPKReXf3jmjmgbBFGmMg5JJb1E+36fljLDH+IsJStRrsuj+KS0Ir23vmP1Ig+f6Pw/KP0z2rBMoDv6gO7ZAl+fr5mhxT8h1iWw+lQRy9YWNk8qp/S07b3zyHKHIbZV/rA=
+	t=1768224825; cv=none; b=XP1Vxf7GwlMqdkzuzDUv5I4DsG4RhWC/8V1uAze2w+OFZrz8TF0lvoZ8yQgIcpWE1trlWC9SbafNXm4pLnQsaNqVs7GG6b4qF89hH8J7pOCVva80VyJYj8Mm1EpnPV6bP6qPu4iPMie6iFf5PHojWnijSSDSMB7kf+moDHw1IQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768224613; c=relaxed/simple;
-	bh=bQ7Kcy9ixF5o6sO8BCPeFyQgEI8iOT3N0Bp+vysVJxw=;
+	s=arc-20240116; t=1768224825; c=relaxed/simple;
+	bh=EYL6qPvUJNB85ib1joVC7jyA9C3txlDMBBMZAbT+6eE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z74QMXQmnuRabFqJqe8kOznatmDdrv+jdUM7RCZLjaN7Eonspj4hFilk7H8IqsbuBK1kuWSeDXLlq6tnNptA42Py2ykjMJo5efF1VQIGdx8+PIgFE3vcQEOTtco2A4t4EnZ5ALCvuqHxNH5xir1QIKKOv8dy7RMVTi+0zx6Nkyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pRuPEFht; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=fsJh8E8UiJycX/1KxA58q5x+ZruCt4gSs5ZQlOLdQ4c=; b=pRuPEFht0wctbrxahkRQ8mXek4
-	zjWENWO8/oFBWF4txBJSSIi3//MpC4LQhV6ass8io8xmHGNaW6krvBN0INt2Rc148W1LpmY1ww5L0
-	i8bdR9Wwk0u7p/eeMrrT68z8p2ecaHT1wLxAdECRk3ekvtcP57ggHrT6aghIDw/yrKBU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vfHzf-002Tk1-4i; Mon, 12 Jan 2026 14:30:03 +0100
-Date: Mon, 12 Jan 2026 14:30:03 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next 2/2] net: airoha: npu: Add the capability to
- read firmware names from dts
-Message-ID: <f57867a0-a57d-4572-b0ed-b2adb41d9689@lunn.ch>
-References: <20260112-airoha-npu-firmware-name-v1-0-d0b148b6710f@kernel.org>
- <20260112-airoha-npu-firmware-name-v1-2-d0b148b6710f@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=BpYBFVhqyAKG3lbrLRgqbqAjX1NNynRsQ2viW4gmhaTwnhtd/0M0Nfc+aoAA68nia2UueVaIuvffctwG70aqasknFzSnpx6GaeEy4obXva8MCiKPmThsltn48K7cBaf8z0CEUz7pXbaF026FXpE8K698CMkOcvpdR4NowSaEb6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=KYQdp0nD; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=PqZ2/STn; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Mon, 12 Jan 2026 14:33:39 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1768224821;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JWj4H2Lgq+WhqUr9o6eZinAp459hvArUl+5f/ZqyT2k=;
+	b=KYQdp0nDiI90EXdJkoIOi3C2UwZe5hY0UxJtySajl+TmkR9u5p/91NT4ihNdKxuCS0uhr1
+	63n+WT/0FbnSc4MQog88JJqgockJZBGurJFgngg+edfeHTVuP2oYKUizksKYJvnrD+i2u8
+	vXX0j3en1zIKt8YwNUgBVxVGManZM1vJMrny6o5ha59uaqeXBAIf8888HOYnXafPkP/x7W
+	wrQL+mwVuUY1ktJhNuecKsD4L2OH3+DVt0pMPUgB6yDLXun0SB760gfrfrXSKGlfxrJDpC
+	zPDvFcpX7XGpmPQBBTxrMijN9KzA+PNxab+4TCnwTm1Jme2LV745CQYVvw2HgQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1768224821;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JWj4H2Lgq+WhqUr9o6eZinAp459hvArUl+5f/ZqyT2k=;
+	b=PqZ2/STn7G+lEHLlQVIIXDb3DYQhyKIMPjO8HDgx2dsjxMNawG+2VKJ3dkRwZspGS8y2uH
+	oz1kuz7zjdP3k2Ag==
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+To: Florian Weimer <fweimer@redhat.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Jakub Kicinski <kuba@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
+	Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org
+Subject: Re: [PATCH net-next] net: uapi: Provide an UAPI definition of
+ 'struct sockaddr'
+Message-ID: <20260112143158-efc74534-0283-4db1-812f-402794eb8844@linutronix.de>
+References: <20260105-uapi-sockaddr-v1-1-b7653aba12a5@linutronix.de>
+ <20260105095713.0b312b26@kernel.org>
+ <20260106112714-d47c16e0-0020-4851-9c2a-f8849c9a0677@linutronix.de>
+ <20260106151313.1f8bd508@kernel.org>
+ <06cf1396-c100-45ba-8b46-edb4ed4feb62@app.fastmail.com>
+ <lhu7btnkqg6.fsf@oldenburg.str.redhat.com>
+ <20260112124604-dbf7f68d-2182-438f-9495-2931cac02a81@linutronix.de>
+ <lhutswrj73u.fsf@oldenburg.str.redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20260112-airoha-npu-firmware-name-v1-2-d0b148b6710f@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <lhutswrj73u.fsf@oldenburg.str.redhat.com>
 
-On Mon, Jan 12, 2026 at 11:00:08AM +0100, Lorenzo Bianconi wrote:
-> Introduce the capability to read the firmware binary names from device-tree
-> using the firmware-name property if available.
-> This is a preliminary patch to enable NPU offloading for MT7996 (Eagle)
-> chipset since it requires a different binary with respect to the one
-> used for MT7992 on the EN7581 SoC.
+On Mon, Jan 12, 2026 at 02:25:25PM +0100, Florian Weimer wrote:
+> * Thomas Weißschuh:
+> 
+> >> If you call the data member sa_data just like glibc, it will only fail
+> >> in C++, not C.  GCC considers the two definitions sufficiently
+> >> equivalent (even though glibc adds a may_alias attribute to meet POSIX
+> >> requirements), and duplicate definitions are permitted in C.
+> >
+> > clang is not so lenient and will error out.
+> 
+> It seems it accepts it if you switch to C23 mode.
 
-When i look at
+The currently supported baseline for UAPI headers is C90.
+We can't really force userspace to switch here.
 
-airoha_npu.c
 
-i see:
-
-#define NPU_EN7581_FIRMWARE_DATA                "airoha/en7581_npu_data.bin"
-#define NPU_EN7581_FIRMWARE_RV32                "airoha/en7581_npu_rv32.bin"
-#define NPU_AN7583_FIRMWARE_DATA                "airoha/an7583_npu_data.bin"
-#define NPU_AN7583_FIRMWARE_RV32                "airoha/an7583_npu_rv32.bin"
-
-static const struct airoha_npu_soc_data en7581_npu_soc_data = {
-        .fw_rv32 = {
-                .name = NPU_EN7581_FIRMWARE_RV32,
-                .max_size = NPU_EN7581_FIRMWARE_RV32_MAX_SIZE,
-        },
-        .fw_data = {
-                .name = NPU_EN7581_FIRMWARE_DATA,
-                .max_size = NPU_EN7581_FIRMWARE_DATA_MAX_SIZE,
-        },
-};
-
-static const struct airoha_npu_soc_data an7583_npu_soc_data = {
-        .fw_rv32 = {
-                .name = NPU_AN7583_FIRMWARE_RV32,
-                .max_size = NPU_EN7581_FIRMWARE_RV32_MAX_SIZE,
-        },
-        .fw_data = {
-                .name = NPU_AN7583_FIRMWARE_DATA,
-                .max_size = NPU_EN7581_FIRMWARE_DATA_MAX_SIZE,
-        },
-};
-
-static const struct of_device_id of_airoha_npu_match[] = {
-        { .compatible = "airoha,en7581-npu", .data = &en7581_npu_soc_data },
-        { .compatible = "airoha,an7583-npu", .data = &an7583_npu_soc_data },
-        { /* sentinel */ }
-};
-
-Why cannot this scheme be extended with another compatible?
-
-    Andrew
+Thomas
 
