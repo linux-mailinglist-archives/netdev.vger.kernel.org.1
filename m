@@ -1,107 +1,92 @@
-Return-Path: <netdev+bounces-249114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32620D146BC
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 18:40:04 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2C51D146F2
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 18:41:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id AC122302025F
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 17:36:22 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 17781300BBFA
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 17:37:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94BEE37F0F6;
-	Mon, 12 Jan 2026 17:36:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6153637A4BA;
+	Mon, 12 Jan 2026 17:37:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H2/CRee0"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="oPJYrtda"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012039.outbound.protection.outlook.com [52.101.43.39])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C200137E309
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 17:36:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768239370; cv=none; b=aG9hI5rkgyPYXuVQGQSRVB/6K+b0Nx4Yx+odmEI8DweRPLHMvVpCkd9IoLGk1PcVA9jqQvRNmyKqMXzsQyVZChpXeg0yWWIX8ZEOfILOSxF2JTzNed9U75yWoyJ/AgHUrV0LOFuxwOLRlSfUkGxGMq2CP1bAmkmh+862R5SfqhY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768239370; c=relaxed/simple;
-	bh=GCdO5a+HMfjS0Onb4iX2dcKWJm/SM5/aDLNSivt+rZg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=H3WucaAa45n16qHbI/fSHogsrIt4sgbs7YgtsKvA5MNWbaJjgJye5/wieDEbECEJVm7JC3LHZI95yt/sSsXZDxbcrjEy/YemAUE11FALM5qFOv0/UGPqh2l46XWRYdYKGkGYa7h90OBG1GxYolbYmoXZp0OZJRph9XUZjHSmZbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H2/CRee0; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-42fb03c3cf2so3565034f8f.1
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 09:36:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768239366; x=1768844166; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tuk52pHE2ucr51aG3tpUoDcttX6aTJw3OWzP3ZmFW2E=;
-        b=H2/CRee0//rGPYg0l1zmRr7B+722QUuuMKv92yP2gmELT0GHa8y0AorCZVvDDfMMl5
-         VVod1fNSHqTcetc4SehLAHpe7Yg8Ykj4tIgaZ/01MPtd41ptcqFS9A7cTtMbfjAp5+Wz
-         GBLWx6tHYBvuGc84oL3pqgXWLqiiBcxUqhJYyL51qnjuKfDFjZdPKvzlf+RmmNhTNYRe
-         H+kyiohngHx8+UwJ3ICkHQuX/cwsQ9dUETgTP8LkGnIZPjV52/M5Vyv1S0bGJoOxntCk
-         il1IyCt5gbYw3OsizN0ize6bEE80kfcUruHiMAI/UfNuVKTUM/rTBsS33BIu5ndA9zu/
-         O4uA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768239366; x=1768844166;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=tuk52pHE2ucr51aG3tpUoDcttX6aTJw3OWzP3ZmFW2E=;
-        b=kv8qNgIgO34E/Ubz+GbyJs2IesQ2XfY5YLp5vEB9VFgfNXyKUGMuK+odHqy99HfBPs
-         kzXy/GkeY9geO2BdP0cUF/eTCE/tG3lc1M+BM/zthvbTavtBKPDKiKmZQvMAllCSmpTR
-         33GMbwOFx/rGALF16DcWfYIj789bjVRYHHOhRnY6ydwFii/D87VgdoB/zbt7FReCp7zi
-         Ii7WlM+NDv/yLALVP7b3yczxNRyV6F1FBKzuUSfk64JqvfPepl7lWaT3Hsylrqmj6ODR
-         s186KzaUDY3a0Rz8nOI24LOC6pClWRcTLVy92HyE8ULwjmorEBgwf/TxwloogyCYiOwB
-         EHyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVLecduWrCpNFtIFEsox5OcjbNOb2PDqZ8o8x2wxt/VkhlQuQbkU+P7ju3yAlLV9PyTEd+Ipew=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpsndmY7/tjPB/GR2+EroQCYt+ulPGjEoC7EUhlZcnve7x0VQX
-	yrRrqIxDrWTupxLrXXccdEj1cRWX+0KICdEsvxmYxb+VV7zc59NzjpRR
-X-Gm-Gg: AY/fxX4rAXjeDxEd/7CLl8kHcOL/CJOTnMmZQqNWOpvArfpJets82elFWHIQPbBQ4cR
-	aNrY+kem4L7MjPgG4EoSdHGsiOI+yH+r4gBl5YfERnFFqRMxmBg5DLyXJK/sJm5/faPqBvyjUor
-	YDD3iA17d8ZlCKM0wYwH1Pa0VGvIcYtYPNSd3KiMwpaohSXpdpIsk0hJpjGymdobYB0wauLCHns
-	GtZ7RksNf18hcSQRSnjz8y3lFVs7NYYxlg9/nMNBYyS9iBYFl4iUqIlSEwPaQ7gQPRSMvAOK0mO
-	ubd89TSl5zoEkStTZtbK2v/pdAdrMsShrcskI87cn5HQhVhHRvH36GqdvHiTiy06/rxnr/mmSZh
-	CEGqS600v0ULFlKj8hIdbuz9nT5pShy+ePsA0/cXMuugVyH/gQXjgKMYImZrnYgSyVWXyFGZdWv
-	pKvfru7avdUZeCJK/YKTHYJ7xV3Zn0oKbPE4bNRjv4/jSbQ87fOVE23xyAcyOgNpRAgzWCpsWwQ
-	pXA/+EvzHL8J6LGw01hF3Pm4QvmGfjahdA=
-X-Google-Smtp-Source: AGHT+IHvetCOikt5zHJa+kt1XGT/CFTzAu/3wOZte9eNFcIcwZdd0nfXB3SqwzR7iSvrVRxboWe4ZQ==
-X-Received: by 2002:a05:6000:2087:b0:430:f8b3:e834 with SMTP id ffacd0b85a97d-432c3629b4amr24163355f8f.11.1768239366073;
-        Mon, 12 Jan 2026 09:36:06 -0800 (PST)
-Received: from iku.Home ([2a06:5906:61b:2d00:9336:b2a5:a8c1:722e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5ff0b2sm39625403f8f.42.2026.01.12.09.36.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jan 2026 09:36:05 -0800 (PST)
-From: Prabhakar <prabhakar.csengg@gmail.com>
-X-Google-Original-From: Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-To: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <clement.leger@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>
-Cc: linux-renesas-soc@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Prabhakar <prabhakar.csengg@gmail.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: [PATCH net-next v3 2/2] net: pcs: rzn1-miic: Add PHY_LINK active-level configuration support
-Date: Mon, 12 Jan 2026 17:35:55 +0000
-Message-ID: <20260112173555.1166714-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260112173555.1166714-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-References: <20260112173555.1166714-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07AFC364045;
+	Mon, 12 Jan 2026 17:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.39
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768239462; cv=fail; b=sTcrrfbvTd1vpRurso6FoDYWxB7HWTaCjkokHd46hG9WHXclaOK+DFCflU4j6AOV7ta4GhR/Nko7r8F1GeZYoXvj+75mwMHf7GWtYMHdM5O58tPBWn3SY7CEkLziFcfe036qRUr5IsUu48O393yfgzw6PrJqDnY37Hy+opAFTe8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768239462; c=relaxed/simple;
+	bh=OUtGW/9R4SxGmbxKqjpjz6K7sFPVohVTA8FH7f8jF38=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NEXmcC5/lM872D0iuSQctCqHi1PmHKtI/64hPoJDEa48KMvZDsGq1sJMNxHc0BRLkUuNW+jWY+nW+LQtovoxqh7B7NQumX/uyNXWs78T671R5q7AkXGfeEeFeOJJYKsup9NpFaUtG6zCaDpHGWl5iPe+Gw2kxnSgAGRkQ3RNNF4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=oPJYrtda; arc=fail smtp.client-ip=52.101.43.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lSZs+Y3cGFuAW3l0NqfP7yzm4IwHuWDE3MuPVUIOPvpNy7wMxlX02aSJQNvm9QnDn1Jt6ZyQt760LfS3UjALqt9eeMXqibFt93L9GnirymobztWtK0EVFLPpN1ylAuzBdHqvw6IeaorkpwRLp9SDOAinPvl/2GzTFvpCIjsSYST6o9dsPI0HL4B2Y/G0Jv8E6BwS+PNXtPfYOQijdrtyNR8IMcF097NYiuc84cX9rSCYv1aQ11ys9DZckW+VDdPXCnffROAn0j5DrXBYWqf8of9i4HoHPzXUXfz1lyPlqRfQY4eM56ADL9bVDxfLv4tlGpYh910gFtzUlPwOyGMMqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rxU6/gGwJwoj+PxnogPf22+bTsdeSLWEe3sRjesf1so=;
+ b=MTtFTYjFlM45jLab38YNP2t2y0OpigsiP2E4iJzCwYeQGR7rwjf6KpoJxEROQTefAinbSwP/WR6K9I6jboyAkFbwkN+4R70RymN7UQZ+ABgrz4QNlh/ZGo7/VMo2rr4XQLpxiZzshb4catee0+11Q+3JuycFU41ttNFNO7JmJx2cpyFtu9yjD1zzX7uN7TPtXpeObr9sWpbxetc3kgP1j5FAHpbIqwtsg+AagwEYHKck0UwygI+GYKPW/g6kBdgQYLWSNxKZfE8o7CIS9xU8lUVdpw7M3c5yBzn//Z3riN1Zi0aGUfqbg6zTWAgrxAYKxLUPozjGxtVp9uTrccDmOg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rxU6/gGwJwoj+PxnogPf22+bTsdeSLWEe3sRjesf1so=;
+ b=oPJYrtdaA9d1OIkkWbU5soe4Q2UbEGTPOZzrojglF8sUEFdOt6rFmQxow9qcdhJS4r1T7mTi8XfIEODuhNmDiylk7Qfm7sGdbLGZ4vg21kVrsUicA4jfi2R7JR/lgHzLo37Wrct6MsiiykemVc779aSWVmSL9ycWu5XeMLLO16gIJuzJ1yQPcqQOFgiqS++fp4X0ZT+GsuT4yetItSrPLFhRIEA26D8wpkBNQQ79wOc4o5iVktXARPKVmgG6rmciEzlej20/lh+mesxD7sqB2yA+QPd4Jr2txQXdCu4No2kheTcWCw3FFecd91WI13PVdBQoDdvckV+BM1agmSmA7Q==
+Received: from BL1PR13CA0356.namprd13.prod.outlook.com (2603:10b6:208:2c6::31)
+ by DS0PR12MB7702.namprd12.prod.outlook.com (2603:10b6:8:130::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Mon, 12 Jan
+ 2026 17:37:37 +0000
+Received: from BL6PEPF00022574.namprd02.prod.outlook.com
+ (2603:10b6:208:2c6:cafe::88) by BL1PR13CA0356.outlook.office365.com
+ (2603:10b6:208:2c6::31) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9520.4 via Frontend Transport; Mon,
+ 12 Jan 2026 17:37:28 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BL6PEPF00022574.mail.protection.outlook.com (10.167.249.42) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9520.1 via Frontend Transport; Mon, 12 Jan 2026 17:37:36 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 12 Jan
+ 2026 09:37:16 -0800
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 12 Jan
+ 2026 09:37:15 -0800
+Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Mon, 12
+ Jan 2026 09:37:12 -0800
+From: Gal Pressman <gal@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	<netdev@vger.kernel.org>
+CC: Shuah Khan <shuah@kernel.org>, Willem de Bruijn <willemb@google.com>,
+	"Petr Machata" <petrm@nvidia.com>, Coco Li <lixiaoyan@google.com>,
+	<linux-kselftest@vger.kernel.org>, Gal Pressman <gal@nvidia.com>
+Subject: [PATCH net v2 0/2] selftests: Couple of fixes in Toeplitz RPS cases
+Date: Mon, 12 Jan 2026 19:37:13 +0200
+Message-ID: <20260112173715.384843-1-gal@nvidia.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,237 +94,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF00022574:EE_|DS0PR12MB7702:EE_
+X-MS-Office365-Filtering-Correlation-Id: f9efc97f-1966-42f9-2d05-08de52014671
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024|7416014|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?MxWl2ccsUUUbPuuximtiZkzZM1XWS/HUI9sAfYCr7zB5QXKQU8GJpMRImbhq?=
+ =?us-ascii?Q?Xa1MJNXfzeToyS33PuNB6hdWNnij8FqCbeKcfOpPKUPwsnlZgvKOVHdAGlLp?=
+ =?us-ascii?Q?hJAPGNoyFTljNK9LXxnYoN6HsbeVYf2Nmw83j2WW+9IjfgRvAz2Szmm4TuCk?=
+ =?us-ascii?Q?CbWJO+urp9gmwlH2lqlFEpnAnOjJYDJFzw+Ezy/W1/3+JtImb9G4AAozJWed?=
+ =?us-ascii?Q?D0d9CjwGyEZJdGIglf0gQb6w03dQJReFhsSKmZJeQn5yvLTi8BYXOIthQmGd?=
+ =?us-ascii?Q?jJ5aX1VfrH4T/tIxLnvGvc0zVieut5li3p81Ri/GBP4DvXo5mB6UjE5VNqQe?=
+ =?us-ascii?Q?tvBQZL8h+DO77sK5j4vMTtSq9hqjQchrK1+dsTArjHfy/9NddZwI7D8mBVt6?=
+ =?us-ascii?Q?ELG2kBYPQtzqyPpN2ZgylWSwkufbW9IEfxo2YZCx8cTBGbd2FpiObRSw0zJP?=
+ =?us-ascii?Q?hq+x9UJDMuKDdk5qvIxep6JhOQaqUGwj8TjPJbjp4t77sca9uhKnvXWqq/VQ?=
+ =?us-ascii?Q?9glnf4/zDQKwtHAxjJmiFL0AYqeiw+YKZbCgX1enZWbdkrLJb9tcxE+wRAh/?=
+ =?us-ascii?Q?aWPPsjon7MpazdVCgzMJrW9S/vvva6+3zzOVkfdmmE+nsGWK8JuFplOhQjSx?=
+ =?us-ascii?Q?ynaFQsK7rg+sjnFwggVwA/b03QLCK/ENuGo82GRwz9jsSPaWKBg6uEgDbNm0?=
+ =?us-ascii?Q?NGnMD2ndZvn1qGSg3I9rPehnNwtt5s8JFIjCVOhOAZiVCymxJyuMHSbV85Cy?=
+ =?us-ascii?Q?3Wvk+9D2Aotm8lk0tL/Fwhh7wHeRSOioEMrSw2TNIc11OV6TcehPAT0kYU2g?=
+ =?us-ascii?Q?X89QcnE2C36HT5b9LgL4hl+YqZjStOv4lJNF16B4mktYesFNpsFXIZ2FT/+x?=
+ =?us-ascii?Q?MQ+mh+UiMa8keNHe2fqNGRAn1tOEvmJy08tSxJ3fJ5vSEh4gWhpu/Q2Sm1ry?=
+ =?us-ascii?Q?Tb9oZhZKMB8chnATE5uolndDtv2vKHywlveDaK6ix4gfYjeHCE1gKSmjvMEJ?=
+ =?us-ascii?Q?/MFO3qrjxKyqrtG0+N1c3PiZOtSuy3mvjJ4ysgdcijSBZ2E3ITWDLZ/ehAOc?=
+ =?us-ascii?Q?cegWsDPRqr6xeYujdxi5mIG+ZnxyhuZuJzrkq2Jtd9wleq0qu2zxh5cI6A/F?=
+ =?us-ascii?Q?AlIWrDcF+nYEx33bKN/bVk/JjCSTcuhpRnogVmstS7PjbHHClO+JrIO444jw?=
+ =?us-ascii?Q?2DrDH9EIsYjA91HdmWBI4jkPLqRAiNz9bxXJw+GGoSRn6TN+g9XwxYqfD6EZ?=
+ =?us-ascii?Q?MiqmblC/ho4vhQlxrc1e5nwVccAyscfHP0Fy8WVHuFWGvgRwYGuTi1TgEBss?=
+ =?us-ascii?Q?zlnqLYAcmZqoHWBo1mnp8qvWwbvrgJvjx2LZzktU0xkSdqCnWZV9C/LLegt8?=
+ =?us-ascii?Q?ZhnQKCDHl2jKTI3+e8EqBgJOiuTltDpQgta06TcKFYoTb4YpT3iAf74lAHSv?=
+ =?us-ascii?Q?8JPLPZJGSD2/ETXijlVnDN1b22KcYImuCpRnsji+b2m5Nk9aHZI0bcBMqUY/?=
+ =?us-ascii?Q?ATYh4/qsDW95QEAuR4gjovsmlhC71tL7lbTuLT04CWuDVdm78MJ4vsQjQXhE?=
+ =?us-ascii?Q?C11C+3sCuYGgACKBe2w=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024)(7416014)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jan 2026 17:37:36.2094
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f9efc97f-1966-42f9-2d05-08de52014671
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF00022574.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7702
 
-From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Fix a couple of bugs in the RPS cases of the Toeplitz selftest.
 
-Add support to configure the active level of MIIC PHY_LINK status signals
-on a per-converter basis using a DT property.
+Changelog -
+v1->v2: https://lore.kernel.org/all/20260111171658.179286-1-gal@nvidia.com/
+* Use a single mask variable in the second patch (Willem).
 
-MIIC provides dedicated PHY_LINK signals that indicate EtherPHY link-up and
-link-down status in hardware. These signals are required regardless of
-whether GMAC or ETHSW is used. With GMAC, link state is retrieved via
-MDC/MDIO and handled in software, while ETHSW relies on PHY_LINK pins for
-both CPU-assisted operation and switch-only data paths that do not involve
-the host.
+Gal Pressman (2):
+  selftests: drv-net: fix RPS mask handling in toeplitz test
+  selftests: drv-net: fix RPS mask handling for high CPU numbers
 
-Hardware PHY_LINK signals are also critical for fast reaction to link-down
-events, for example when running redundancy protocols such as Device Level
-Ring (DLR), where rapid detection of cable faults is required to switch to
-an alternate path without software latency.
+ tools/testing/selftests/drivers/net/hw/toeplitz.c  | 4 ++--
+ tools/testing/selftests/drivers/net/hw/toeplitz.py | 6 ++++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-Parse the requested polarity from DT, accumulate the configuration during
-probing, and apply it to the MIIC_PHY_LINK register once hardware
-initialization is complete, when the registers can be safely modified.
-Handle SoC-specific bit layout differences between RZ/N1 and RZ/T2H/N2H
-within the driver.
-
-Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
----
-v2->v3:
-- Updated commit message
-- Renamed DT property from renesas,miic-phylink-active-low to
-  renesas,miic-phy-link-active-low.
-- Simplified the PHY_LINK configuration parsing logic in the driver
-  as suggested.
-
-v1->v2:
-- No changes.
----
- drivers/net/pcs/pcs-rzn1-miic.c | 105 +++++++++++++++++++++++++++++++-
- 1 file changed, 102 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/pcs/pcs-rzn1-miic.c b/drivers/net/pcs/pcs-rzn1-miic.c
-index 885f17c32643..8d7f82c1df2f 100644
---- a/drivers/net/pcs/pcs-rzn1-miic.c
-+++ b/drivers/net/pcs/pcs-rzn1-miic.c
-@@ -28,6 +28,8 @@
- 
- #define MIIC_MODCTRL			0x8
- 
-+#define MIIC_PHY_LINK			0x14
-+
- #define MIIC_CONVCTRL(port)		(0x100 + (port) * 4)
- 
- #define MIIC_CONVCTRL_CONV_SPEED	GENMASK(1, 0)
-@@ -177,6 +179,16 @@ static const char * const rzt2h_reset_ids[] = {
- 	"crst",
- };
- 
-+/**
-+ * struct miic_phy_link_cfg - MIIC PHY_LINK configuration
-+ * @mask: Mask of phy_link bits
-+ * @val: Value of phy_link bits
-+ */
-+struct miic_phy_link_cfg {
-+	u32 mask;
-+	u32 val;
-+};
-+
- /**
-  * struct miic - MII converter structure
-  * @base: base address of the MII converter
-@@ -184,6 +196,7 @@ static const char * const rzt2h_reset_ids[] = {
-  * @lock: Lock used for read-modify-write access
-  * @rsts: Reset controls for the MII converter
-  * @of_data: Pointer to OF data
-+ * @link_cfg: MIIC PHY_LINK configuration
-  */
- struct miic {
- 	void __iomem *base;
-@@ -191,6 +204,12 @@ struct miic {
- 	spinlock_t lock;
- 	struct reset_control_bulk_data rsts[MIIC_MAX_NUM_RSTS];
- 	const struct miic_of_data *of_data;
-+	struct miic_phy_link_cfg link_cfg;
-+};
-+
-+enum miic_type {
-+	MIIC_TYPE_RZN1,
-+	MIIC_TYPE_RZT2H,
- };
- 
- /**
-@@ -210,6 +229,7 @@ struct miic {
-  * @init_unlock_lock_regs: Flag to indicate if registers need to be unlocked
-  *  before access.
-  * @miic_write: Function pointer to write a value to a MIIC register
-+ * @type: Type of MIIC
-  */
- struct miic_of_data {
- 	struct modctrl_match *match_table;
-@@ -226,6 +246,7 @@ struct miic_of_data {
- 	u8 reset_count;
- 	bool init_unlock_lock_regs;
- 	void (*miic_write)(struct miic *miic, int offset, u32 value);
-+	enum miic_type type;
- };
- 
- /**
-@@ -581,10 +602,79 @@ static int miic_match_dt_conf(struct miic *miic, s8 *dt_val, u32 *mode_cfg)
- 	return -EINVAL;
- }
- 
-+static void miic_configure_phy_link(struct miic *miic, u32 conf,
-+				    u32 port, bool active_low)
-+{
-+	bool polarity_active_high;
-+	u32 mask, shift;
-+
-+	/* determine shift and polarity for this conf */
-+	if (miic->of_data->type == MIIC_TYPE_RZN1) {
-+		switch (conf) {
-+		/* switch ports => bits [3:0] (shift 0), active when low */
-+		case MIIC_SWITCH_PORTA:
-+		case MIIC_SWITCH_PORTB:
-+		case MIIC_SWITCH_PORTC:
-+		case MIIC_SWITCH_PORTD:
-+			shift = 0;
-+			polarity_active_high = false;
-+			break;
-+
-+		/* EtherCAT ports => bits [7:4] (shift 4), active when high */
-+		case MIIC_ETHERCAT_PORTA:
-+		case MIIC_ETHERCAT_PORTB:
-+		case MIIC_ETHERCAT_PORTC:
-+			shift = 4;
-+			polarity_active_high = true;
-+			break;
-+
-+		/* Sercos ports => bits [11:8] (shift 8), active when high */
-+		case MIIC_SERCOS_PORTA:
-+		case MIIC_SERCOS_PORTB:
-+			shift = 8;
-+			polarity_active_high = true;
-+			break;
-+
-+		default:
-+			return;
-+		}
-+	} else {
-+		switch (conf) {
-+		/* ETHSW ports => bits [3:0] (shift 0), active when low */
-+		case ETHSS_ETHSW_PORT0:
-+		case ETHSS_ETHSW_PORT1:
-+		case ETHSS_ETHSW_PORT2:
-+			shift = 0;
-+			polarity_active_high = false;
-+			break;
-+
-+		/* ESC ports => bits [7:4] (shift 4), active when high */
-+		case ETHSS_ESC_PORT0:
-+		case ETHSS_ESC_PORT1:
-+		case ETHSS_ESC_PORT2:
-+			shift = 4;
-+			polarity_active_high = true;
-+			break;
-+
-+		default:
-+			return;
-+		}
-+	}
-+
-+	mask = BIT(port + shift);
-+
-+	miic->link_cfg.mask |= mask;
-+	if (polarity_active_high != active_low)
-+		miic->link_cfg.val |= mask;
-+	else
-+		miic->link_cfg.val &= ~mask;
-+}
-+
- static int miic_parse_dt(struct miic *miic, u32 *mode_cfg)
- {
- 	struct device_node *np = miic->dev->of_node;
- 	struct device_node *conv;
-+	bool active_low;
- 	int port, ret;
- 	s8 *dt_val;
- 	u32 conf;
-@@ -603,10 +693,15 @@ static int miic_parse_dt(struct miic *miic, u32 *mode_cfg)
- 		if (of_property_read_u32(conv, "reg", &port))
- 			continue;
- 
-+		if (of_property_read_u32(conv, "renesas,miic-input", &conf))
-+			continue;
-+
- 		/* Adjust for 0 based index */
--		port += !miic->of_data->miic_port_start;
--		if (of_property_read_u32(conv, "renesas,miic-input", &conf) == 0)
--			dt_val[port] = conf;
-+		dt_val[port + !miic->of_data->miic_port_start] = conf;
-+
-+		active_low = of_property_read_bool(conv, "renesas,miic-phy-link-active-low");
-+
-+		miic_configure_phy_link(miic, conf, port, active_low);
- 	}
- 
- 	ret = miic_match_dt_conf(miic, dt_val, mode_cfg);
-@@ -696,6 +791,8 @@ static int miic_probe(struct platform_device *pdev)
- 	if (ret)
- 		goto disable_runtime_pm;
- 
-+	miic_reg_rmw(miic, MIIC_PHY_LINK, miic->link_cfg.mask, miic->link_cfg.val);
-+
- 	/* miic_create() relies on that fact that data are attached to the
- 	 * platform device to determine if the driver is ready so this needs to
- 	 * be the last thing to be done after everything is initialized
-@@ -729,6 +826,7 @@ static struct miic_of_data rzn1_miic_of_data = {
- 	.sw_mode_mask = GENMASK(4, 0),
- 	.init_unlock_lock_regs = true,
- 	.miic_write = miic_reg_writel_unlocked,
-+	.type = MIIC_TYPE_RZN1,
- };
- 
- static struct miic_of_data rzt2h_miic_of_data = {
-@@ -745,6 +843,7 @@ static struct miic_of_data rzt2h_miic_of_data = {
- 	.reset_ids = rzt2h_reset_ids,
- 	.reset_count = ARRAY_SIZE(rzt2h_reset_ids),
- 	.miic_write = miic_reg_writel_locked,
-+	.type = MIIC_TYPE_RZT2H,
- };
- 
- static const struct of_device_id miic_of_mtable[] = {
 -- 
-2.52.0
+2.40.1
 
 
