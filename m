@@ -1,217 +1,144 @@
-Return-Path: <netdev+bounces-249068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 525A3D13A4B
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 16:26:56 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C50CAD13A10
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 16:24:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8B28830240BF
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:10:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 095A8302016B
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:13:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B77E2E266C;
-	Mon, 12 Jan 2026 15:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 253A72E06EF;
+	Mon, 12 Jan 2026 15:13:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="paYRtOVP";
-	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="7JUoacrb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lumYmJh3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p02-ob.smtp.rzone.de (mo4-p02-ob.smtp.rzone.de [81.169.146.168])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77AF2E11BC;
-	Mon, 12 Jan 2026 15:10:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.168
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768230626; cv=pass; b=HwpF+YyWg8blCCjGaArM1ePOaM0mQOKkrO9ecgVClSiHa9hCcrAkF9if9H/pDbiqb4ZGeRRDR0ho27rKPCvlL6zbi8dht1rBmLPZDyA5sVIZ4sld/DW+cntoDijBleCy42iq5bIV1wGuSBuI65IK9kLsQCGh0qoHuecNI6XppaI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768230626; c=relaxed/simple;
-	bh=p3XQ3+DKWGSsBOeM8FJLeKqU/tDMNkZ5U21WP7yhRDU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tsR+qi7BlgE9ncDCEPBlhI0yoNIc+Xx6D19kCVV0I+GthcM/9ngb47RyDn32bJ41D5ZOANGUQ+acAtCV7kdAqiaj0+gCnCAeOwzrRG2Xh8ED5ZRB4J+6RVC7sTjAS/ybbyNXs/x7Z9uv9huo5sS8Yc7boUoa/xwFJcQfGqejMRs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=paYRtOVP; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=7JUoacrb; arc=pass smtp.client-ip=81.169.146.168
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
-ARC-Seal: i=1; a=rsa-sha256; t=1768230593; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=RQz60J2lBrDaggmKIJbHTMQmJMGWpgHLBQ4EVe8TZviAJQ6NoaTyBYCs0Um3Ajlrnd
-    /p9uAWpnpDsWJ9iBYegE2A2VlNAQ8iSlAN3csb+wKfhdd7ytAaQGhPdi49jrwzJRqTKU
-    qdvghY+n0S3beT/vVFHncPgPPd0V290hgJuutKKuQb60GgQN2u39C9lCcAeYvvxpRKpv
-    bZIcfLRpMXWuwoZ2FIH4aHJbVrBaOg+M7SD9XSGzn3hJQ6vEhRiOwqCuR5+DXAOAa9vi
-    erMepXmJkvWDP8EXQM4IJhhhiHR1sKvnhBW7UG1TrfkdzmVIXwchtIqvj7Tu924Yil+2
-    Wt/g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1768230593;
-    s=strato-dkim-0002; d=strato.com;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=YT3BIH0lFVW+T6GCaLaBngWwyqlCLb3Ckieh5B/h9IQ=;
-    b=JSfLWp7yvHPojU1lJqyXRhLLutSkk9EyaZRtPgntHsfgezZ1OFzUyJQ5TJuueBEYpr
-    YCzPeb7///bWCs9QCPVTl/75z3GPEN7WCFPQBWFQK6nHCIFQTpgeFa41oIfYmQkAWJtD
-    frK34XGFZcx0TLJ6WuHVRCqZoITIHc26kwck69A3XJfu8+Y++5cjhoKprs098ZIHNBsv
-    egzUlUtPzdXLVCltB8Uv5mIxljcO8Oe5IbTLeuS/LZP/SUpCkazf0Vav1WsBjB09Redx
-    2zBQgMndQmaMbJVfN1CeQ1NPwnJIrxVMxWLd6DvlJoJBRrJ0dU+ctej88OJdzudoiuaw
-    3h6g==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo02
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1768230593;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=YT3BIH0lFVW+T6GCaLaBngWwyqlCLb3Ckieh5B/h9IQ=;
-    b=paYRtOVPmxo5i1M0YNe8b2ANfB06GJeIDHGxvqw4ZsAeA9T2bGMgPXxJ3RA2HgSNNH
-    3y8A9oD805uwVoW9Ss61Dm8G5T4F6qrpofZVdb6bD/yB/jOK8MgurXTtmuMUBtygcXgM
-    s22sCi0VrfNf/83fRFG8yxwNtTATS/JyeM8SRRND3/HJDhk0bly8n8icVQ32jCJRwPJw
-    tj/shWgMyiHeoyCL9SkhovkgW/NMILwDq1uxZsjDOb59+g0Fa0KY8WUBGO7/u8LPFwu7
-    tGLoUym4gfGlEZp8sKt+/rphoGM6ps9N0grcWhFHKtFPa3CkkoEuTWsrjspCeY/XigJq
-    4osg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1768230593;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=YT3BIH0lFVW+T6GCaLaBngWwyqlCLb3Ckieh5B/h9IQ=;
-    b=7JUoacrbNhzrOQ3Q9W2PmpWeedBEkCGYhute1opxCQg51STyqfN0+aUIz/oz/AgGHh
-    xZcDXxfbW7ja2GERZFCA==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeFQ7s8bGWj0Q=="
-Received: from lenov17.lan
-    by smtp.strato.de (RZmta 54.1.0 AUTH)
-    with ESMTPSA id K0e68b20CF9rgmG
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Mon, 12 Jan 2026 16:09:53 +0100 (CET)
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-To: linux-can@vger.kernel.org,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: Vincent Mailhol <mailhol@kernel.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Simon Horman <horms@kernel.org>,
-	davem@davemloft.net,
-	Oliver Hartkopp <socketcan@hartkopp.net>
-Subject: [can-next 5/5] can: gw: use new can_gw_hops variable instead of re-using csum_start
-Date: Mon, 12 Jan 2026 16:09:08 +0100
-Message-ID: <20260112150908.5815-6-socketcan@hartkopp.net>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260112150908.5815-1-socketcan@hartkopp.net>
-References: <20260112150908.5815-1-socketcan@hartkopp.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF292BDC0E;
+	Mon, 12 Jan 2026 15:13:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768230817; cv=none; b=hoOlYE0CZ0JJqZhzP7BHqfqOB744nSDzO0hU95cnMXGFsutkL503OhNf8Blz6lBdSE1rRkFcJqcApme8c7EWlU8o0mPvt6r7jHFviBgF6+mlmztTNIwk2HWJ2aDxhM4wJj3t4rvLmcm5eQiLHigLjozmSWWsgOUjSH9GEgibpPo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768230817; c=relaxed/simple;
+	bh=FH5lvgGlxlgcsI/c3Wc4LZGoA4WSMGev1ZgnwDVgbkw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pW3B5hU+gNtS+E8mRN741XEszJDg8Er6qiHLbS9B/NiN/I1fQQdWY6W+kQ5jYNJ+lyB5YoHbjXDrvZeSFNijvXkoFw3ZuwfA2tpt68cJCfU9qx+n5DYJhtvMruu4u/J+m+9WLMaakwbyMzG24OKOWUFAbjPc0fPeh2j/aPXHZKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lumYmJh3; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768230815; x=1799766815;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=FH5lvgGlxlgcsI/c3Wc4LZGoA4WSMGev1ZgnwDVgbkw=;
+  b=lumYmJh3lREzppEyuWTo96UN5qHsU6SL4JQMeIdp+CNHsYruHmIcldGb
+   c5iXHEWz1RaJ2Et9I1WXmOddUjWq0imkB1AZPJ6jwZHnj8uKz8U7fMnL8
+   zggojf93pYbJjHJ3U0FT0TD8Muq65qWKbG6/AtAUYafaNJBI7mNeKlb9R
+   cPQWGpdu8HK3F6NzqjyIBlGDu4npJssEhuh5x618zfzjKS3KBQ530aYzx
+   ldO0snRQhq6UiZvQOn4aoQIKY20Nvix6C6M72OA9/uYajeDjal+tZWWRy
+   mWxxKA/MtX9sQdRYQ6PrYeeB6PfyvljQbBntcRhsL3FXmXzcglmLHeOjv
+   A==;
+X-CSE-ConnectionGUID: rVkuwlMYTtqccaomg/qjxg==
+X-CSE-MsgGUID: AuS1hlPGRe+K/evU/xG+fw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11669"; a="73349100"
+X-IronPort-AV: E=Sophos;i="6.21,221,1763452800"; 
+   d="scan'208";a="73349100"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 07:13:34 -0800
+X-CSE-ConnectionGUID: mwqoedS6SCmoCk5xw0p26g==
+X-CSE-MsgGUID: imcgvPMSRA2CwgvMwt4IgQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,221,1763452800"; 
+   d="scan'208";a="208632334"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 12 Jan 2026 07:13:29 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vfJbi-00000000DUC-04q9;
+	Mon, 12 Jan 2026 15:13:26 +0000
+Date: Mon, 12 Jan 2026 23:13:09 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Rob Herring <robh@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, linux-rdma@vger.kernel.org,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	intel-wired-lan@lists.osuosl.org, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, devicetree@vger.kernel.org,
+	Conor Dooley <conor+dt@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Mark Bloch <mbloch@nvidia.com>, linux-kernel@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Saeed Mahameed <saeedm@nvidia.com>
+Subject: Re: [Intel-wired-lan] [PATCH net-next 06/12] dpll: Support dynamic
+ pin index allocation
+Message-ID: <202601122216.BCarSN6K-lkp@intel.com>
+References: <20260108182318.20935-7-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260108182318.20935-7-ivecera@redhat.com>
 
-As CAN skbs don't use IP checksums the skb->csum_start variable was used
-to store the can-gw CAN frame time-to-live counter together with
-skb->ip_summed set to CHECKSUM_UNNECESSARY.
+Hi Ivan,
 
-As we still have 16 bit left in the inner protocol space for ethernet/IP
-encapsulation the time-to-live counter is moved there to remove the 'hack'
-using the skb->csum_start variable.
+kernel test robot noticed the following build warnings:
 
-Patch 5/5 to remove the private CAN bus skb headroom infrastructure.
+[auto build test WARNING on net-next/main]
 
-Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
----
- include/linux/skbuff.h |  2 ++
- net/can/gw.c           | 23 ++++++-----------------
- 2 files changed, 8 insertions(+), 17 deletions(-)
+url:    https://github.com/intel-lab-lkp/linux/commits/Ivan-Vecera/dt-bindings-dpll-add-common-dpll-pin-consumer-schema/20260109-022618
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260108182318.20935-7-ivecera%40redhat.com
+patch subject: [Intel-wired-lan] [PATCH net-next 06/12] dpll: Support dynamic pin index allocation
+config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20260112/202601122216.BCarSN6K-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260112/202601122216.BCarSN6K-lkp@intel.com/reproduce)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index eccd0b3898a0..7ef0b8e24a30 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -863,10 +863,11 @@ enum skb_tstamp_type {
-  *	@vlan_all: vlan fields (proto & tci)
-  *	@vlan_proto: vlan encapsulation protocol
-  *	@vlan_tci: vlan tag control information
-  *	@can_iif: ifindex of the first interface the CAN frame appeared on
-  *	@can_framelen: cached echo CAN frame length for bql
-+ *	@can_gw_hops: can-gw CAN frame time-to-live counter
-  *	@inner_protocol: Protocol (encapsulation)
-  *	@inner_ipproto: (aka @inner_protocol) stores ipproto when
-  *		skb->inner_protocol_type == ENCAP_TYPE_IPPROTO;
-  *	@inner_transport_header: Inner transport layer header (encapsulation)
-  *	@inner_network_header: Network layer header (encapsulation)
-@@ -1085,10 +1086,11 @@ struct sk_buff {
- 
- 		/* space for protocols without protocol/header encapsulation */
- 		struct {
- 			int	can_iif;
- 			__u16	can_framelen;
-+			__u16	can_gw_hops;
- 		};
- 	};
- 
- 	__be16			protocol;
- 	__u16			transport_header;
-diff --git a/net/can/gw.c b/net/can/gw.c
-index 74d771a3540c..fca0566963a2 100644
---- a/net/can/gw.c
-+++ b/net/can/gw.c
-@@ -68,12 +68,12 @@ MODULE_ALIAS(CAN_GW_NAME);
- 
- #define CGW_MIN_HOPS 1
- #define CGW_MAX_HOPS 6
- #define CGW_DEFAULT_HOPS 1
- 
--static unsigned int max_hops __read_mostly = CGW_DEFAULT_HOPS;
--module_param(max_hops, uint, 0444);
-+static unsigned short max_hops __read_mostly = CGW_DEFAULT_HOPS;
-+module_param(max_hops, ushort, 0444);
- MODULE_PARM_DESC(max_hops,
- 		 "maximum " CAN_GW_NAME " routing hops for CAN frames "
- 		 "(valid values: " __stringify(CGW_MIN_HOPS) "-"
- 		 __stringify(CGW_MAX_HOPS) " hops, "
- 		 "default: " __stringify(CGW_DEFAULT_HOPS) ")");
-@@ -472,23 +472,12 @@ static void can_can_gw_rcv(struct sk_buff *skb, void *data)
- 	}
- 
- 	/* Do not handle CAN frames routed more than 'max_hops' times.
- 	 * In general we should never catch this delimiter which is intended
- 	 * to cover a misconfiguration protection (e.g. circular CAN routes).
--	 *
--	 * The Controller Area Network controllers only accept CAN frames with
--	 * correct CRCs - which are not visible in the controller registers.
--	 * According to skbuff.h documentation the csum_start element for IP
--	 * checksums is undefined/unused when ip_summed == CHECKSUM_UNNECESSARY.
--	 * Only CAN skbs can be processed here which already have this property.
- 	 */
--
--#define cgw_hops(skb) ((skb)->csum_start)
--
--	BUG_ON(skb->ip_summed != CHECKSUM_UNNECESSARY);
--
--	if (cgw_hops(skb) >= max_hops) {
-+	if (skb->can_gw_hops >= max_hops) {
- 		/* indicate deleted frames due to misconfiguration */
- 		gwj->deleted_frames++;
- 		return;
- 	}
- 
-@@ -517,15 +506,15 @@ static void can_can_gw_rcv(struct sk_buff *skb, void *data)
- 		gwj->dropped_frames++;
- 		return;
- 	}
- 
- 	/* put the incremented hop counter in the cloned skb */
--	cgw_hops(nskb) = cgw_hops(skb) + 1;
-+	nskb->can_gw_hops = skb->can_gw_hops + 1;
- 
- 	/* first processing of this CAN frame -> adjust to private hop limit */
--	if (gwj->limit_hops && cgw_hops(nskb) == 1)
--		cgw_hops(nskb) = max_hops - gwj->limit_hops + 1;
-+	if (gwj->limit_hops && nskb->can_gw_hops == 1)
-+		nskb->can_gw_hops = max_hops - gwj->limit_hops + 1;
- 
- 	nskb->dev = gwj->dst.dev;
- 
- 	/* pointer to modifiable CAN frame */
- 	cf = (struct canfd_frame *)nskb->data;
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601122216.BCarSN6K-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/dpll/dpll_core.c: In function 'dpll_pin_idx_free':
+>> drivers/dpll/dpll_core.c:499:28: warning: integer overflow in expression of type 'int' results in '-2147483648' [-Woverflow]
+     499 |         pin_idx -= INT_MAX + 1;
+         |                            ^
+
+
+vim +499 drivers/dpll/dpll_core.c
+
+   490	
+   491	static void dpll_pin_idx_free(u32 pin_idx)
+   492	{
+   493		if (pin_idx <= INT_MAX)
+   494			return; /* Not a dynamic pin index */
+   495	
+   496		/* Map the index value from dynamic pin index range to IDA range and
+   497		 * free it.
+   498		 */
+ > 499		pin_idx -= INT_MAX + 1;
+   500		ida_free(&dpll_pin_idx_ida, pin_idx);
+   501	}
+   502	
+
 -- 
-2.47.3
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
