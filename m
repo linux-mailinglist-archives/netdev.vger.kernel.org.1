@@ -1,197 +1,167 @@
-Return-Path: <netdev+bounces-248996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CBDFD126BB
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 12:57:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 770CED1271E
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 13:04:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E10DC30263C6
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 11:57:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 39A5A301227F
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 12:04:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 967403570D4;
-	Mon, 12 Jan 2026 11:57:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC3B3563E7;
+	Mon, 12 Jan 2026 12:04:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="dAO05LcM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mjMe152x"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010008.outbound.protection.outlook.com [52.101.61.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23BF23570C6
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 11:57:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768219054; cv=fail; b=MdRAeF51wGyFLCW+xWLInMVudyoc/GdiFzTfS2NUmNqzBIJAswXZ7nErCtzkDh5m1E3HeU7+g9ib47VvcwqhnhkoCU8nXEJm4fIrmJ2ErlGAgaiScN6EnGXFyZ5UqjE3IcSKpZppAsCMpSWSievrlykn/aJha7UeO/E9El4l+cE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768219054; c=relaxed/simple;
-	bh=xlh53/MXHr9QKNHMckCN5guNiskjExJB7sTPDPON8gg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ca9r84UejStgM+53ccPf6dNdvRyb4OzOygtOoXFLLQYAR2Ju23i9xG2uIIdLNm/qxqlHBM78cLC5RI8ScgKlk+prXwzqTdGI9yD2bGJ3mFxZ07aWAroluyIQGuOWY6x3uCS3td6zpfAtIdSoHsoBGYYWKieLsEiu1HURSG9dFVc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=dAO05LcM; arc=fail smtp.client-ip=52.101.61.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XEc6setKgKCVslsl3ka/7d4ABBkbAFaaHN8M6tN8eT52Ni+TEp5k2huJTCadpDjg6H68DrooOHkpCKoccYA96T0v5oU/IK1ceL1r0P9qsoEIKmBaF368/r8igrKnBD0BTTifG8ucNPAHfcf+oz3Bqui9PL/B4VQ/IzC/uAEUFvQuB2Sx/rvqN92BjVgsuk6xdhvOT/xNvz4Y1bcv1pZOcC3lI0aCEoTu2KAZctNfEC8RpOcekp2Df3JAw9zpNiIDOgVeCpRcgnb/J6LemblYdftN44akqNL+4MDHzJrLdPg6bAp/KHA7OeNsHcltFWOVkiR6EB4MH+scT0XOURnJ4Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lx09g0xDXHb+21cjo1iZSCImbGWzHIVlexy8dJsYasE=;
- b=eI32jI/FYrpaf7Ex+kOFlSVyloFl1j2nIHiKFVL9CXzzjM82fVmO+OuShG6JyXMIEZWcPRrw9Lt1etS8hSgmcclpWmA8iGEO4vMjvZk/qmm9AJHOzEGfGws2oQpS3wHZVREyQWVB2euYk9voI/tTlq4Ul8XpRZkGKgBW7yuhZvUGYxFG+Oo9Zv+bYqS97uLRMLZP+gYgK9q7q5YxSDRuvLR/msAIbntXEAh138R4ZXFNFWIWUyduE/16Yj++oCSWQnEwbqnOk3l4ZMb4uNX14giMFVeli7q9VciZiu/2GPLkI4nOYvJ6fMy91X/tsTwR1iZWxe7L32oxUEBvVqcwFw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lx09g0xDXHb+21cjo1iZSCImbGWzHIVlexy8dJsYasE=;
- b=dAO05LcMpSa+XTaN1/5OujyIhVVJq7HBIk51bsiEJnmevGqVnVWyJgoSezPC/W93VIKTvxz9tqkKtcyreE8yYB2H6TEF16TCz6RUbe3LKmh69cQLzfPlRwOZdtijGuWiC9OObqpXkdu5+c2N4PgYz3KY5i/9UNWOeGfhI3Y7+WDjI0YwZVAN/ABU95TFEwtzZkqKPopN/vowugP9Iztw5Zm60YYbjRXFy66/tS1GR4C+0o4iJbdAysZ55McsvC+34Q/32EZDuWcEZ/MpQyRzuaTn3Y1LeZQ4zwenZIpxnjQI+7Wt2oPTZ0/HY6Q8sYDPj/CTKuq175tDRjI+Kyvwsg==
-Received: from BYAPR11CA0081.namprd11.prod.outlook.com (2603:10b6:a03:f4::22)
- by SJ0PR12MB5611.namprd12.prod.outlook.com (2603:10b6:a03:426::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Mon, 12 Jan
- 2026 11:57:26 +0000
-Received: from SJ1PEPF0000231E.namprd03.prod.outlook.com
- (2603:10b6:a03:f4:cafe::49) by BYAPR11CA0081.outlook.office365.com
- (2603:10b6:a03:f4::22) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9499.7 via Frontend Transport; Mon,
- 12 Jan 2026 11:57:28 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SJ1PEPF0000231E.mail.protection.outlook.com (10.167.242.230) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9520.1 via Frontend Transport; Mon, 12 Jan 2026 11:57:26 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 12 Jan
- 2026 03:57:14 -0800
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 12 Jan
- 2026 03:57:12 -0800
-Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com (10.129.68.6)
- with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Mon, 12
- Jan 2026 03:57:10 -0800
-From: Gal Pressman <gal@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	<netdev@vger.kernel.org>
-CC: Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>, "Gal
- Pressman" <gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
-Subject: [PATCH net-next v2] ethtool: Clarify len/n_stats fields in/out semantics
-Date: Mon, 12 Jan 2026 13:57:08 +0200
-Message-ID: <20260112115708.244752-1-gal@nvidia.com>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACD132C029C
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 12:04:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768219465; cv=none; b=IwFdheTueYxDsFHoVazvtrrRQmAfqrewrdwud/tXXN+uLh9JTHTKsBjPhy7eRqcjMxjJJNKUZzNbozwtlP8oI9I6BsBvc7SEzRRavz6/p8pYwoxr1xFStCek6Fo55sKB5wHEjZKTZI8k24gV2pcrV+zrThVpMa+xKPq3rIoBQYk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768219465; c=relaxed/simple;
+	bh=owV/mzAQMgSgZqT2YNEQVofDEFHHk/+21LmjhX5q+Rk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rCt2j7tKwW9SfEvj0J43rHPHt9Xs8BuY6YkEAXN97xkRSC5uYVRjd1BeuAV/cj5l1Qpf/l7ovEoTBR38mvGDdTji/+5+ypnEykIKbr4C1Wh1UEvwzxdKrFjb4rNlTENGN1gceu2hzHFmHRbCDgJL8iTa+Ppcce0wPw7ISrWH8es=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mjMe152x; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-432d2c7dd52so2986866f8f.2
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 04:04:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768219462; x=1768824262; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4qCjJpPI4Nv2Sruqvo8JVCZ2nInrDNeq4vKMW92xMvc=;
+        b=mjMe152xj/lPCBJAHZ9j3TmmJeIqUB9yWgDVSCCq8IErpZkM9IDqFS7uBJQqMzrRJQ
+         K424xE1wXa6ksNhB8HVwYme4Hhiwk2YuI45VKs9bQjVDigh5rgFkb7P0OV9h98mBsKF5
+         GyCeIiwkYj9KeP6UZE5EkGYm600zXjrcug87jT6IKrSr99ky3Ihne17fieVcfqyPMT1h
+         SnFa8eOm2RwMZd401qv/Tx5FV/Xop5o2g196KNkVX/Z/jt+bOmPYtKaafG5QPpIcc58O
+         0G+jNr60tTKlUXxWRQ0tkcrSw23noR3updlySnTaSH4K77kWQZMvqAil+cHT5yKNpK16
+         ArFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768219462; x=1768824262;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=4qCjJpPI4Nv2Sruqvo8JVCZ2nInrDNeq4vKMW92xMvc=;
+        b=aO2bftmn9QtkFS6SKjmjtuxfh1YpfE5kLkLuy9cVYzp09K0rzrGMbZ9xBpTtA/62dw
+         drXiz3bHknGjqu2WVQ9Z5zriDBfkwGFs8bCkk2vCCal4xd32B5oHZpH9kchYG9Z/b8z+
+         vxGojtkjdFqM6CWVIYsaRvelnERwX3UsBhaIo0Wko4Vj+YSh92XbIL1JDNYxpXFEip7M
+         fT+5DVyygpGdQKilNDndtgjDlJzt/My8stdskuIVJIlgbrRjwGlgaWsyoKXRl2x3ret+
+         Pqm0NL5i84jaCjAQcHKAwrv+8nwrEkdEZnzD278V34ga+XNYWM+0ITz4lUIjQBuj3m+C
+         NVzw==
+X-Forwarded-Encrypted: i=1; AJvYcCU9nCB+v21GwnFGb60ucjPoLlGuuipEil5pD6waZd/VmthDsFJ4Dc+8P+VKOLi+I6Tp6+jMVvA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBqtklQi6nZU/46gDbgJNRcs3h7QapHb7j9KLb8zyi7J7il8Gb
+	TSWJ3rZU9n14VG+FY2SzMylhb3yHwIVQgvPbFCSMXOW+4dgFs/S4vrQKz+6ceiVspf900inp36G
+	TcXHJm8nxnbS6OEdZT05g7Imuo0Rf2/c=
+X-Gm-Gg: AY/fxX4BkWEmgUBFFLAkCIXypbovzLIe8dD3+TSljl1ilSTTmt1gbyRCJhfvkKY1lyX
+	iXgUOdsVMDLD88KjHdVkkDrXBStHV0YZgcYp187JZ7gFNxavaFOIeLoZjMiMkzS0E6omAThewmh
+	4eO2EtGGRMNVcpQDb2ZCVLRQQgx8htDgP1PINq2rN7+whF+O9peAUZsaU3emoFkcY135cWfirR/
+	V9hdVOQfuGvD7v5HUMogVFKbfeFpEh4f6qXbfyzlwvgMzmBdqk52187sSaQpcMWEz2jrvHwCpLj
+	AEafSiIB8lyTKXQYQHJF+nrWpCaQjiVnHWqqkCiCqBCeocEc8KAI6gw=
+X-Google-Smtp-Source: AGHT+IFleqUzD9PdoNRtoRImQZ9LCtOvaSoUd+ku2Uay3M7C+gWLGIYYIGe551DYKQUEtcgJaYVpbuo5ppnL49v+1SM=
+X-Received: by 2002:a05:6000:1844:b0:42f:bab5:953b with SMTP id
+ ffacd0b85a97d-432c37758demr20987353f8f.16.1768219461649; Mon, 12 Jan 2026
+ 04:04:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF0000231E:EE_|SJ0PR12MB5611:EE_
-X-MS-Office365-Filtering-Correlation-Id: dc437934-d172-44f7-7e0d-08de51d1c15e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?xATPtO1DQqG0vFKeLcyQs6Y4ZzM5gmGsy8r52V8qeosTGRXrCQxgauouEAQ4?=
- =?us-ascii?Q?J6lHlGWe/Uf5vKdh7WAh8vTX2v93/fY/nxJR0tvVqXXS/fbnB1stCwWT6cLR?=
- =?us-ascii?Q?T3oWzt4ltY0EFLKT6c182wwcOnyFrIZFctMfQroQlSCj2DXDX4/8VE0iRCGG?=
- =?us-ascii?Q?jUMygRVNS/Ry25BBuU8QNQlOqgBfSNMlGSSO2hOCzMvb/mFnaVomT9gbMdRS?=
- =?us-ascii?Q?ncSdhQ+SHh266TGha9ZoyPmbkoB3C10EeeRE3jMmQUzxjTTHY5iOXpmZu+dR?=
- =?us-ascii?Q?hYNLeVdY6MDJ1s+wEUBCg/sxPW34YKBtQzHxi/7ixKYZ+W/1jQzPZdoLKiJ1?=
- =?us-ascii?Q?HFs4x2S0fgeONYz21dacOekOVGrfVCOqSmrAkscmfCejrRrq89hLMnz+/sIJ?=
- =?us-ascii?Q?daLw94306hBkBvGKUl3kihRbXpcBsj33tBLTUccbKLnDeQ8oPSAOJmyI3Xwh?=
- =?us-ascii?Q?m7rngHRQNZ+m9D7IxiwUacYubi5r+y66ddstKdRLSST1I+DWzkyPTQ6Qd6Jb?=
- =?us-ascii?Q?7C8+Q2suOZpMBW3GQ3LkIGnu9FRBdw7GwNn6QChW7hcZf/DH91gI1WPIpB/u?=
- =?us-ascii?Q?6bcoBKNpHMms9L/xd3ChmvA21dZawzKGxHxzUCUJbR4KweYX7FNQJnmbTQfy?=
- =?us-ascii?Q?CKwjqYSO9ZHrgm/W/DyZvOWE3kRomTcRiLphpzuoTdZHBoTqlem2UG/B/Rif?=
- =?us-ascii?Q?H59PbZIhhx/x1pA/5v0lVZ1831gd3OYVZBHhgrPN8u2tWta6puowrremax+Q?=
- =?us-ascii?Q?kJgGw9nE6jybSlmM3Q+ySpkLmXiKZbDNdIoaf2JT1AWL2WQx1am07LtuYWMP?=
- =?us-ascii?Q?RgSiiIrCQL6aFO7BqXSXoaabwU8kMXOYaN+VeBjbELjGRCyrRLRbYOo5Lg2m?=
- =?us-ascii?Q?5lv7c3hZxHyc3TTgjdbHS9Bg3ajTb5Hbyy6VlRB/PVJqctnaTKMAQX2844W/?=
- =?us-ascii?Q?Ux1GHVb3CLxOg5avMgkak95Xl2x2csImJmjZjt3Wi0UoHBy0tpqkmXk82g45?=
- =?us-ascii?Q?VTlEl34SYHwGfL2c0tfadY/qh/CxaDMT4sdDNp12092Xcg2p/3SxJm1a7pZ3?=
- =?us-ascii?Q?7a71Rw/qIqmM67D1Bcgo6ZFuO4H+4mrZXBQpup3/gKY+WQXTHwHhJeeXE+ah?=
- =?us-ascii?Q?1pXomIZA8AstvvdVFheSW/220CKJYoRVVcQkqmC1JwWMKVDw5Hacw7U9Iz+Y?=
- =?us-ascii?Q?4eY9nJxgb5RE7mDO+T0Uv6alsmcRGhVZA9ZqdnDlkgjRMz+RmZ0K81iihdS6?=
- =?us-ascii?Q?TFA96NEuqAKVID7VKnL0oZKXw0zF8d46CMNgLKR6VELPUP0F0vJc0xoTCL/r?=
- =?us-ascii?Q?VvbObzsXPu6yXROL2pAS4SmgtZ7m7QyUsYLcuo1vYxoH0UJf2M29wP7wSunq?=
- =?us-ascii?Q?gHHFevijNOdT1agAD30FMSZcHUsHQUUvLvUtjrLoH+LxomWEFWQvqVj98/6Y?=
- =?us-ascii?Q?ei2maG5B/8IQ26CByx6OXnE32QlnLp3R0MWMTCVW5GwHiFnDwGuveZ0qZuPr?=
- =?us-ascii?Q?LgKucsCQ5Cgq9G5Y/0rb61lj5l9ESltI6N/UfstheEzgNrHKZgp2as7012Ss?=
- =?us-ascii?Q?0Jla/JBi1pAeT/nwMbQ=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024)(13003099007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jan 2026 11:57:26.6243
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: dc437934-d172-44f7-7e0d-08de51d1c15e
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF0000231E.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5611
+References: <20260109142250.3313448-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20260109142250.3313448-3-prabhakar.mahadev-lad.rj@bp.renesas.com> <aWEUvef4eDlmuOic@shell.armlinux.org.uk>
+In-Reply-To: <aWEUvef4eDlmuOic@shell.armlinux.org.uk>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Mon, 12 Jan 2026 12:03:55 +0000
+X-Gm-Features: AZwV_QioW4DXXcjEyYpawN9Qxe7RxIEI2XGhrh2bEmXD6OAYa4cj6ZYh-0RkOlQ
+Message-ID: <CA+V-a8vKJ6Z3Xp-u69oGzXr7ju+5RVdMXQcqErm8m8rU7pvauQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 2/2] net: pcs: rzn1-miic: Add support for PHY
+ link active-level configuration
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Magnus Damm <magnus.damm@gmail.com>, linux-renesas-soc@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Document that the 'len' field in ethtool_gstrings and 'n_stats' field in
-ethtool_stats optionally serve dual purposes: on entry they specify the
-number of items requested, and on return they indicate the number
-actually returned (which is not necessarily the same).
+Hi Russell,
 
-Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-Signed-off-by: Gal Pressman <gal@nvidia.com>
----
-v1->v2: https://lore.kernel.org/all/20260105163923.49104-1-gal@nvidia.com/
-* Reword comments (Jakub).
----
- include/uapi/linux/ethtool.h | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+Thank you for the review.
 
-diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
-index eb7ff2602fbb..de810f1c3bfb 100644
---- a/include/uapi/linux/ethtool.h
-+++ b/include/uapi/linux/ethtool.h
-@@ -1101,6 +1101,13 @@ enum ethtool_module_fw_flash_status {
-  * Users must use %ETHTOOL_GSSET_INFO to find the number of strings in
-  * the string set.  They must allocate a buffer of the appropriate
-  * size immediately following this structure.
-+ *
-+ * Setting @len on input is optional (though preferred), but must be zeroed
-+ * otherwise.
-+ * When set, @len will return the requested count if it matches the actual
-+ * count; otherwise, it will be zero.
-+ * This prevents issues when the number of strings is different than the
-+ * userspace allocation.
-  */
- struct ethtool_gstrings {
- 	__u32	cmd;
-@@ -1184,6 +1191,13 @@ struct ethtool_test {
-  * number of statistics that will be returned.  They must allocate a
-  * buffer of the appropriate size (8 * number of statistics)
-  * immediately following this structure.
-+ *
-+ * Setting @n_stats on input is optional (though preferred), but must be zeroed
-+ * otherwise.
-+ * When set, @n_stats will return the requested count if it matches the actual
-+ * count; otherwise, it will be zero.
-+ * This prevents issues when the number of stats is different than the
-+ * userspace allocation.
-  */
- struct ethtool_stats {
- 	__u32	cmd;
--- 
-2.40.1
+On Fri, Jan 9, 2026 at 2:46=E2=80=AFPM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Fri, Jan 09, 2026 at 02:22:50PM +0000, Prabhakar wrote:
+> > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> >
+> > Add support to configure the PHY link signal active level per converter
+> > using the DT property "renesas,miic-phylink-active-low".
+> >
+> > Introduce the MIIC_PHYLINK register definition and extend the MIIC driv=
+er
+> > with a new `phylink` structure to store the mask and value for PHY link
+> > configuration. Implement `miic_configure_phylink()` to determine the bi=
+t
+> > position and polarity for each port based on the SoC type, such as RZ/N=
+1
+> > or RZ/T2H/N2H.
+> >
+> > The accumulated configuration is stored during DT parsing and applied
+> > later in `miic_probe()` after hardware initialization, since the MIIC
+> > registers can only be modified safely once the hardware setup is comple=
+te.
+>
+> Please do not re-use "phylink", we have a subsystem in the kernel named
+> as such, and, for example, it too defines "struct phylink".
+>
+> > +/**
+> > + * struct phylink - Phylink configuration
+> > + * @mask: Mask of phylink bits
+> > + * @val: Value of phylink bits
+> > + */
+> > +struct phylink {
+> > +     u32 mask;
+> > +     u32 val;
+> > +};
+> > +
+>
+> You don't get a warning for this, because, although you have:
+>
+> #include <linux/phylink.h>
+>
+> which delares "struct phylink" as:
+>
+> struct phylink;
+>
+> The definition of this structure is entirely private to
+> drivers/net/phy/phylink.c and is intentionally not exposed.
+>
+> By redefining "struct phylink" here, it means that anyone using gdb
+> is going to run into problems - which version of this struct is the
+> right one for any particular pointer.
+>
+Ack, I will rename the struct to `miic_phy_link_cfg`.
 
+> You describe this feature as "PHY-link" and "PHY link" in your commit
+> and cover messages. Please use "phy_link" and "PHY_LINK" as identifies
+> for this so that grep can distinguish between your PHY link feature
+> and the phylink infrastructure.
+>
+Ok, I will use "phy_link"/ "PHY_LINK".
+
+Cheers,
+Prabhakar
 
