@@ -1,285 +1,325 @@
-Return-Path: <netdev+bounces-249089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 358EFD13C14
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 16:43:40 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33FEDD13D97
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 17:00:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2A7FA3009869
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:43:38 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id ABDBD305BA6F
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:50:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 397E53612ED;
-	Mon, 12 Jan 2026 15:43:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61030345CD7;
+	Mon, 12 Jan 2026 15:49:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fOrfBrGB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oozq+ZAo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f68.google.com (mail-oo1-f68.google.com [209.85.161.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 185FB3112C4;
-	Mon, 12 Jan 2026 15:43:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D19E30BF5C
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 15:49:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768232616; cv=none; b=Fq/SR9tNIkz0sIIAdl8sxj6qelhGMWjzLstiuvlH40A1cYOcJiWijH8q+wdAEJPgBXAI2w8PUPL3sZMOkkbsM1GmhV7h3ORYi1zi3Jkr7RFjrANJGZvp5WTJPe3RfiAt/fu88IyQQiNnMaHqeU807LAKklJeat9IwAWLsxHYdNA=
+	t=1768232998; cv=none; b=FB00fRfBkbteIC0X5embxAhQb6BUk+boZ4NCK0qxMH9IxBxExWfCWYeRRPPa3QZFh4H9U3UQl2KOiIRtcW9X49EVzkBwjPL/ZoSJdik9v2RqZELiLuJ5o105ANJOPeWXGFG53heFTE+vL7Qgo+MlYaORZDgL6+P4mcfm12JilHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768232616; c=relaxed/simple;
-	bh=ttyw+Z9A6Ugb9XsJhcYqjED5RJ4KVzUON4Nc9GQdA8c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qvtwjW3AygSVSgPmcgl6MiG4stlDKbJi8jmml55zB1nt34pvbRm6TPj3VvTnR4nZHmC0z91jfQH699SS3zvoLkpZYiUWR+BHRMgEFCrhYv+E60vcSlAmPPbk1E134SkvlpSddrGSfms02qt5uG3m07n0BHsDb8ZqQnpbtc2pUGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fOrfBrGB; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768232614; x=1799768614;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ttyw+Z9A6Ugb9XsJhcYqjED5RJ4KVzUON4Nc9GQdA8c=;
-  b=fOrfBrGBnCvHkekiwLYqSX1hRHiXbaG9jKy21e4HeSEz1icuxKRvunVA
-   hr59EpC9jmKdyUVDea+xHudWyHlZzeGtVRVL+NXldOdu5Ttzve6fM3izx
-   gLyKfrkyHHPvEBfmfxDN34N/pPuNAx3W4TWn+rz3CE13mv9J4KJO6yZ6O
-   OvrxNCK02TvXnHr3dhUOdhHq6+khLQNwYXLsOBBkboOlTeiPcw7pLzn+T
-   JnkkJmXX5Zxkgt2++uDWMlLlp9fzVhWXDCzhHA4WHFEgPSZiF0CY3+0BY
-   T11u+lmtecoy8iZLpHIIJU5VlMgfg6YqOeVsDTcxKFGwmQtaDTmWGX4+4
-   A==;
-X-CSE-ConnectionGUID: BOI4/mB6QSy1YXarsqmJXA==
-X-CSE-MsgGUID: +LoLcujERyCrSaPVumaIXw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11669"; a="69664113"
-X-IronPort-AV: E=Sophos;i="6.21,221,1763452800"; 
-   d="scan'208";a="69664113"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 07:43:33 -0800
-X-CSE-ConnectionGUID: mYxfRhNcTuC89TqzwR8OuA==
-X-CSE-MsgGUID: 6cZwTC1iS0eMNNfq0rXzWg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,221,1763452800"; 
-   d="scan'208";a="204029064"
-Received: from gabaabhi-mobl2.amr.corp.intel.com (HELO [10.125.110.139]) ([10.125.110.139])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 07:43:29 -0800
-Message-ID: <71518468-e877-4b78-ac22-bb50e40915f3@intel.com>
-Date: Mon, 12 Jan 2026 08:43:28 -0700
+	s=arc-20240116; t=1768232998; c=relaxed/simple;
+	bh=/dd1UJJ2nhAGVZD0sEL9rOugwmjQEBNbEOLYq03yUeg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=i3LV0cIx2yOTc5qcqViwUXlu9u9B2p57SoE1GU+VJ12+YV/KiURmdcpk+O8yUATS/INlv54fpoDMZXlVcwkV060ilRdKz/ueBkX4gXXOSWuD8avj0fbY/3wHz6cWOf4VRT5T3jF+WrOTdbfC6XCSJO0FFRZyCsGCtKzKK21TBkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Oozq+ZAo; arc=none smtp.client-ip=209.85.161.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f68.google.com with SMTP id 006d021491bc7-65f59501dacso3162417eaf.0
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 07:49:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768232995; x=1768837795; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=/wO2v9oAq4HDRitwosILZQTFB2vQXSt64Xwv5qiWNBI=;
+        b=Oozq+ZAoR3hFx1j8V83UsJiJQiodDOfn/MxReHoiYFOx1nOwigQX5C5eJ1P4UnrP3+
+         cPiHtOog7I81BPLCzer8vDSE87emYD9pntIUy0XlV5EIj28jksz7uiBYJ2LnCvNH8bwr
+         OLHSMBaaA2RTyHAgjk++AfYey4jlwhB3/cGb1iq+YrhbQDqUizLyYN/+OgumrWBSqaad
+         mofLB//SvI88lNAwLDUzEDLBBXF5YXZ5h2u6SugrKQ+eTkOnYOcltU6RqPk0PVpfJ/+h
+         PMEmm8BeEfJcElJJ+Syb0ogM6rrz4zoSJLqvnx7RZ/VKKrsci4AK6gtEmDJlOCokLf+1
+         8MMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768232995; x=1768837795;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/wO2v9oAq4HDRitwosILZQTFB2vQXSt64Xwv5qiWNBI=;
+        b=sSctUsBjr4UAGJRKyBJg+930p8DwHkY+3arjR4feOga7mtOcqPUn67uUbmMjT6E/uE
+         IhhFUDg4zjpsX+f/CwCi2mEhUp25V3OtjsE0I02TS5k3rRlJT520LeO4HVMZ/9H13SBA
+         K76YY2/HhhxqE085SY0/g3MB/lH6lmqsgR7L3fIslpm+Xfi5LzEEOGbtVfTh2gP++ISy
+         bL8bD4ouJBf9zIIwReCBqewFOGYiVyB5FlUuwyTDedFv9WemJ4e8VA+XwTtDrFDrgF6a
+         vpNYLUsbfkovm2asnoM7bi/8+1YpY3y3waMkSBJanvEoPpcMxJ8T2LIv9Sv+9uxe6t+j
+         Fqzg==
+X-Forwarded-Encrypted: i=1; AJvYcCVYQj704FPSotPUY1iFaAbG9fCCrZUAWC6EdR7LVHo+PtY070yuJ2K9Hf22OEhm8ga4h4bGbtk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxoba4Hvd7XMP1mCtcdpY8h0FEm4gc80b68g+WaVfg8N5O7qA8j
+	GXEn+pzGoAloe7mFFA4kqHSoiEu6gPi91nBx8MOGKSFWvCWvPnGdnZDxxuYoKaOJ8YTub8J4Kei
+	++ejYxw1THrW3/ynEeDuT0ceG7h0gx02gbRvY
+X-Gm-Gg: AY/fxX7GFyKGeDJ2WeDTlsjYqHG5yvawqDK3Kf0AoXiLtG+moCP0nEjhdxXQdrGNeM1
+	Ox4RdSym0QngrdVkDDsE8DtfFBI9R5XM+bzX2TzvFKSTGqIChAh7YZ977ZLZrfP23L0NBwLK9A7
+	K9rnNOyXyu9Wn7IZCs5kXVEzuVn4ChPV5cSsTksKn+Vcru6BH7/DwwYlIrKx59S4jnbWIsEepbo
+	Xv7xlx260q/H3iDKM8sG4RMn79MBMGaikyhJOE16LJU+m8yxd5Zwmvp+uIh4hBEg5xNZwi0ZuNh
+	yd4Oho1XIth5TfpJCECTSLPP6tk6NA==
+X-Google-Smtp-Source: AGHT+IEj9SoWYZyTHFrKRzaxLI82uXheBUaEIJYjZDmvArQO4afXlIKWGBFWZPXXeXQQ/aoF+OMIg4ioGnnXNH8ihr4=
+X-Received: by 2002:a05:6820:6e81:b0:659:9a49:8ece with SMTP id
+ 006d021491bc7-65f550a6b58mr6022718eaf.82.1768232995278; Mon, 12 Jan 2026
+ 07:49:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 26/35] NTB: ntb_transport: Introduce DW eDMA backed
- transport mode
-To: Koichiro Den <den@valinux.co.jp>
-Cc: Frank.Li@nxp.com, ntb@lists.linux.dev, linux-pci@vger.kernel.org,
- dmaengine@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, mani@kernel.org,
- kwilczynski@kernel.org, kishon@kernel.org, bhelgaas@google.com,
- corbet@lwn.net, geert+renesas@glider.be, magnus.damm@gmail.com,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, vkoul@kernel.org,
- joro@8bytes.org, will@kernel.org, robin.murphy@arm.com, jdmason@kudzu.us,
- allenbh@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- Basavaraj.Natikar@amd.com, Shyam-sundar.S-k@amd.com,
- kurt.schwemmer@microsemi.com, logang@deltatee.com, jingoohan1@gmail.com,
- lpieralisi@kernel.org, utkarsh02t@gmail.com, jbrunet@baylibre.com,
- dlemoal@kernel.org, arnd@arndb.de, elfring@users.sourceforge.net
-References: <20251217151609.3162665-1-den@valinux.co.jp>
- <20251217151609.3162665-27-den@valinux.co.jp>
- <e3229f31-e781-4680-aed1-05ad5174a793@intel.com>
- <gvwki3y5bec5lr4eukzreuojw4t55og72bnuoh74gmbgrdbtiq@c5qgmt5cdygd>
- <cb83f12f-14f9-4df1-bd43-c127a06bb7dc@intel.com>
- <rlqffb3dnvalfjj4vcbmqkraqxmqdv5vd4tpqq2cssyuwrydc3@ujkesovxdgfy>
- <71fd5c95-3734-479f-b1dd-9a2b48fdeb74@intel.com>
- <3zrstpea6x4imus6vskkm72hnf45l32qai4d6qdtyf5fu7tzl6@nl2xlv7ivka7>
-Content-Language: en-US
-From: Dave Jiang <dave.jiang@intel.com>
-In-Reply-To: <3zrstpea6x4imus6vskkm72hnf45l32qai4d6qdtyf5fu7tzl6@nl2xlv7ivka7>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251218175628.1460321-1-ameryhung@gmail.com> <20251218175628.1460321-11-ameryhung@gmail.com>
+ <CAP01T77R+inOoL-f7RMovqE1rwG5YTBysEXg2Sez60LiWZu2eg@mail.gmail.com>
+In-Reply-To: <CAP01T77R+inOoL-f7RMovqE1rwG5YTBysEXg2Sez60LiWZu2eg@mail.gmail.com>
+From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Date: Mon, 12 Jan 2026 16:49:17 +0100
+X-Gm-Features: AZwV_QgTaTsDOg4me4yJjhT2SyaBhd_v6OuVhIihBFrDHYCMU8QEaboWlQClMQs
+Message-ID: <CAP01T77j50Mfh52zvOzg_1PqseGvoeMB8mDPTi-8dJ1EMqA2Zw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 10/16] bpf: Support lockless unlink when
+ freeing map or local storage
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, martin.lau@kernel.org, 
+	kpsingh@kernel.org, yonghong.song@linux.dev, song@kernel.org, 
+	haoluo@google.com, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+
+On Mon, 12 Jan 2026 at 16:36, Kumar Kartikeya Dwivedi <memxor@gmail.com> wrote:
+>
+> On Thu, 18 Dec 2025 at 18:56, Amery Hung <ameryhung@gmail.com> wrote:
+> >
+> > Introduce bpf_selem_unlink_lockless() to properly handle errors returned
+> > from rqspinlock in bpf_local_storage_map_free() and
+> > bpf_local_storage_destroy() where the operation must succeeds.
+> >
+> > The idea of bpf_selem_unlink_lockless() is to allow an selem to be
+> > partially linked and use refcount to determine when and who can free the
+> > selem. An selem initially is fully linked to a map and a local storage
+> > and therefore selem->link_cnt is set to 2. Under normal circumstances,
+> > bpf_selem_unlink_lockless() will be able to grab locks and unlink
+> > an selem from map and local storage in sequeunce, just like
+> > bpf_selem_unlink(), and then add it to a local tofree list provide by
+> > the caller. However, if any of the lock attempts fails, it will
+> > only clear SDATA(selem)->smap or selem->local_storage depending on the
+> > caller and decrement link_cnt to signal that the corresponding data
+> > structure holding a reference to the selem is gone. Then, only when both
+> > map and local storage are gone, an selem can be free by the last caller
+> > that turns link_cnt to 0.
+> >
+> > To make sure bpf_obj_free_fields() is done only once and when map is
+> > still present, it is called when unlinking an selem from b->list under
+> > b->lock.
+> >
+> > To make sure uncharging memory is only done once and when owner is still
+> > present, only unlink selem from local_storage->list in
+> > bpf_local_storage_destroy() and return the amount of memory to uncharge
+> > to the caller (i.e., owner) since the map associated with an selem may
+> > already be gone and map->ops->map_local_storage_uncharge can no longer
+> > be referenced.
+> >
+> > Finally, access of selem, SDATA(selem)->smap and selem->local_storage
+> > are racy. Callers will protect these fields with RCU.
+> >
+> > Co-developed-by: Martin KaFai Lau <martin.lau@kernel.org>
+> > Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
+> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> > ---
+> >  include/linux/bpf_local_storage.h |  2 +-
+> >  kernel/bpf/bpf_local_storage.c    | 77 +++++++++++++++++++++++++++++--
+> >  2 files changed, 74 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/include/linux/bpf_local_storage.h b/include/linux/bpf_local_storage.h
+> > index 20918c31b7e5..1fd908c44fb6 100644
+> > --- a/include/linux/bpf_local_storage.h
+> > +++ b/include/linux/bpf_local_storage.h
+> > @@ -80,9 +80,9 @@ struct bpf_local_storage_elem {
+> >                                                  * after raw_spin_unlock
+> >                                                  */
+> >         };
+> > +       atomic_t link_cnt;
+> >         u16 size;
+> >         bool use_kmalloc_nolock;
+> > -       /* 4 bytes hole */
+> >         /* The data is stored in another cacheline to minimize
+> >          * the number of cachelines access during a cache hit.
+> >          */
+> > diff --git a/kernel/bpf/bpf_local_storage.c b/kernel/bpf/bpf_local_storage.c
+> > index 62201552dca6..4c682d5aef7f 100644
+> > --- a/kernel/bpf/bpf_local_storage.c
+> > +++ b/kernel/bpf/bpf_local_storage.c
+> > @@ -97,6 +97,7 @@ bpf_selem_alloc(struct bpf_local_storage_map *smap, void *owner,
+> >                         if (swap_uptrs)
+> >                                 bpf_obj_swap_uptrs(smap->map.record, SDATA(selem)->data, value);
+> >                 }
+> > +               atomic_set(&selem->link_cnt, 2);
+> >                 selem->size = smap->elem_size;
+> >                 selem->use_kmalloc_nolock = smap->use_kmalloc_nolock;
+> >                 return selem;
+> > @@ -200,9 +201,11 @@ static void bpf_selem_free_rcu(struct rcu_head *rcu)
+> >         /* The bpf_local_storage_map_free will wait for rcu_barrier */
+> >         smap = rcu_dereference_check(SDATA(selem)->smap, 1);
+> >
+> > -       migrate_disable();
+> > -       bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
+> > -       migrate_enable();
+> > +       if (smap) {
+> > +               migrate_disable();
+> > +               bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
+> > +               migrate_enable();
+> > +       }
+> >         kfree_nolock(selem);
+> >  }
+> >
+> > @@ -227,7 +230,8 @@ void bpf_selem_free(struct bpf_local_storage_elem *selem,
+> >                  * is only supported in task local storage, where
+> >                  * smap->use_kmalloc_nolock == true.
+> >                  */
+> > -               bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
+> > +               if (smap)
+> > +                       bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
+> >                 __bpf_selem_free(selem, reuse_now);
+> >                 return;
+> >         }
+> > @@ -419,6 +423,71 @@ int bpf_selem_unlink(struct bpf_local_storage_elem *selem, bool reuse_now)
+> >         return err;
+> >  }
+> >
+> > +/* Callers of bpf_selem_unlink_lockless() */
+> > +#define BPF_LOCAL_STORAGE_MAP_FREE     0
+> > +#define BPF_LOCAL_STORAGE_DESTROY      1
+> > +
+> > +/*
+> > + * Unlink an selem from map and local storage with lockless fallback if callers
+> > + * are racing or rqspinlock returns error. It should only be called by
+> > + * bpf_local_storage_destroy() or bpf_local_storage_map_free().
+> > + */
+> > +static void bpf_selem_unlink_lockless(struct bpf_local_storage_elem *selem,
+> > +                                     struct hlist_head *to_free, int caller)
+> > +{
+> > +       struct bpf_local_storage *local_storage;
+> > +       struct bpf_local_storage_map_bucket *b;
+> > +       struct bpf_local_storage_map *smap;
+> > +       unsigned long flags;
+> > +       int err, unlink = 0;
+> > +
+> > +       local_storage = rcu_dereference_check(selem->local_storage, bpf_rcu_lock_held());
+> > +       smap = rcu_dereference_check(SDATA(selem)->smap, bpf_rcu_lock_held());
+> > +
+> > +       /*
+> > +        * Free special fields immediately as SDATA(selem)->smap will be cleared.
+> > +        * No BPF program should be reading the selem.
+> > +        */
+> > +       if (smap) {
+> > +               b = select_bucket(smap, selem);
+> > +               err = raw_res_spin_lock_irqsave(&b->lock, flags);
+>
+> Please correct me if I'm wrong with any of this here. I think this is
+> the only potential problem I see, i.e. if we assume that this call can
+> fail for map_free.
+> map_free fails here, goes to the bottom with unlink == 0, and moves
+> refcnt from 2 to 1.
+> Before it restarts its loop, destroy() which was going in parallel and
+> caused the failure already succeeded in smap removal and local storage
+> removal, has unlink == 2, so proceeds with bpf_selem_free_list.
+> It frees the selem with RCU gp.
+> Meanwhile our loop races around cond_resched_rcu(), which restarts the
+> read section so the element is freed before we restart the while loop.
+> Would we do UAF?
+>
+>   1. map_free() fails b->lock, link_cnt 2->1, map_node still linked
+>   2. destroy() succeeds (unlink == 2), calls bpf_selem_free_list(),
+> does RCU free
+
+The ordering here is probably a bit messed up, but map_free would need
+to wrap around to the start of its loop on the other side right before
+destroy() does hlist_del_init_rcu(), and then let it free the node
+before proceeding.
+At that point I guess it would still wait for our newly started read
+section, but we'd probably still observe the refcount as 0 and end up
+underflowing.
+So we may not need any change to cond_resched_rcu() but just a
+dec_not_zero to make things safe.
+
+That said none of it feels worth it when compared to just warning on
+an error taking the bucket lock in map_free(), unless there are other
+concerns I missed.
 
 
-
-On 1/10/26 6:43 AM, Koichiro Den wrote:
-> On Thu, Jan 08, 2026 at 10:55:46AM -0700, Dave Jiang wrote:
->>
->>
->> On 1/7/26 6:25 PM, Koichiro Den wrote:
->>> On Wed, Jan 07, 2026 at 12:02:15PM -0700, Dave Jiang wrote:
->>>>
->>>>
->>>> On 1/7/26 7:54 AM, Koichiro Den wrote:
->>>>> On Tue, Jan 06, 2026 at 11:51:03AM -0700, Dave Jiang wrote:
->>>>>>
->>>>>>
->>>>>> On 12/17/25 8:16 AM, Koichiro Den wrote:
->>>>>>> Add a new ntb_transport backend that uses a DesignWare eDMA engine
->>>>>>> located on the endpoint, to be driven by both host and endpoint.
->>>>>>>
->>>>>>> The endpoint exposes a dedicated memory window which contains the eDMA
->>>>>>> register block, a small control structure (struct ntb_edma_info) and
->>>>>>> per-channel linked-list (LL) rings for read channels. Endpoint drives
->>>>>>> its local eDMA write channels for its transmission, while host side
->>>>>>> uses the remote eDMA read channels for its transmission.
->>>>>>>
->>>>>>> A key benefit of this backend is that the memory window no longer needs
->>>>>>> to carry data-plane payload. This makes the design less sensitive to
->>>>>>> limited memory window space and allows scaling to multiple queue pairs.
->>>>>>> The memory window layout is specific to the eDMA-backed backend, so
->>>>>>> there is no automatic fallback to the memcpy-based default transport
->>>>>>> that requires the different layout.
->>>>>>>
->>>>>>> Signed-off-by: Koichiro Den <den@valinux.co.jp>
->>>>>>> ---
->>>>>>>  drivers/ntb/Kconfig                  |  12 +
->>>>>>>  drivers/ntb/Makefile                 |   2 +
->>>>>>>  drivers/ntb/ntb_transport_core.c     |  15 +-
->>>>>>>  drivers/ntb/ntb_transport_edma.c     | 987 +++++++++++++++++++++++++++
->>>>>>>  drivers/ntb/ntb_transport_internal.h |  15 +
->>>>>>>  5 files changed, 1029 insertions(+), 2 deletions(-)
->>>>>>>  create mode 100644 drivers/ntb/ntb_transport_edma.c
->>>>>>>
->>>>>>> diff --git a/drivers/ntb/Kconfig b/drivers/ntb/Kconfig
->>>>>>> index df16c755b4da..5ba6d0b7f5ba 100644
->>>>>>> --- a/drivers/ntb/Kconfig
->>>>>>> +++ b/drivers/ntb/Kconfig
->>>>>>> @@ -37,4 +37,16 @@ config NTB_TRANSPORT
->>>>>>>  
->>>>>>>  	 If unsure, say N.
->>>>>>>  
->>>>>>> +config NTB_TRANSPORT_EDMA
->>>>>>> +	bool "NTB Transport backed by remote eDMA"
->>>>>>> +	depends on NTB_TRANSPORT
->>>>>>> +	depends on PCI
->>>>>>> +	select DMA_ENGINE
->>>>>>> +	select NTB_EDMA
->>>>>>> +	help
->>>>>>> +	  Enable a transport backend that uses a remote DesignWare eDMA engine
->>>>>>> +	  exposed through a dedicated NTB memory window. The host uses the
->>>>>>> +	  endpoint's eDMA engine to move data in both directions.
->>>>>>> +	  Say Y here if you intend to use the 'use_remote_edma' module parameter.
->>>>>>> +
->>>>>>>  endif # NTB
->>>>>>> diff --git a/drivers/ntb/Makefile b/drivers/ntb/Makefile
->>>>>>> index 9b66e5fafbc0..b9086b32ecde 100644
->>>>>>> --- a/drivers/ntb/Makefile
->>>>>>> +++ b/drivers/ntb/Makefile
->>>>>>> @@ -6,3 +6,5 @@ ntb-y			:= core.o
->>>>>>>  ntb-$(CONFIG_NTB_MSI)	+= msi.o
->>>>>>>  
->>>>>>>  ntb_transport-y		:= ntb_transport_core.o
->>>>>>> +ntb_transport-$(CONFIG_NTB_TRANSPORT_EDMA)	+= ntb_transport_edma.o
->>>>>>> +ntb_transport-$(CONFIG_NTB_TRANSPORT_EDMA)	+= hw/edma/ntb_hw_edma.o
->>>>>>> diff --git a/drivers/ntb/ntb_transport_core.c b/drivers/ntb/ntb_transport_core.c
->>>>>>> index 40c2548f5930..bd21232f26fe 100644
->>>>>>> --- a/drivers/ntb/ntb_transport_core.c
->>>>>>> +++ b/drivers/ntb/ntb_transport_core.c
->>>>>>> @@ -104,6 +104,12 @@ module_param(use_msi, bool, 0644);
->>>>>>>  MODULE_PARM_DESC(use_msi, "Use MSI interrupts instead of doorbells");
->>>>>>>  #endif
->>>>>>>  
->>>>>>> +bool use_remote_edma;
->>>>>>> +#ifdef CONFIG_NTB_TRANSPORT_EDMA
->>>>>>> +module_param(use_remote_edma, bool, 0644);
->>>>>>> +MODULE_PARM_DESC(use_remote_edma, "Use remote eDMA mode (when enabled, use_msi is ignored)");
->>>>>>> +#endif
->>>>>>
->>>>>> This seems clunky. Can the ntb_transport_core determine this when the things are called through ntb_transport_edma? Or maybe a set_transport_type can be introduced by the transport itself during allocation?
->>>>>
->>>>> Agreed. I plan to drop 'use_remote_edma' and instead,
->>>>> - add a module parameter: transport_type={"default","edma"} (defaulting to "default"),
->>>>> - introduce ntb_transport_backend_register() for transports to self-register via
->>>>>   struct ntb_transport_backend { .name, .ops }, and
->>>>> - have the core select the backend whose .name matches transport_type.
->>>>>
->>>>> I think this should keep any non-default transport-specific logic out of
->>>>> ntb_transport_core, or at least keep it to a minimum, while still allowing
->>>>> non-defualt transports (*ntb_transport_edma is the only choice for now
->>>>> though) to plug in cleanly.
->>>>>
->>>>> If you see a cleaner approach, I would appreciate it if you could elaborate
->>>>> a bit more on your idea.
->>>>
->>>
->>> Thank you for the comment, let me respond inline below.
->>>
->>>> Do you think it's flexible enough that we can determine a transport type per 'ntb_transport_mw' or is this an all or nothing type of thing?
->>>
->>> At least in the current implementation, the remote eDMA use is an
->>> all-or-nothing type rather than something that can be selected per
->>> ntb_transport_mw.
->>>
->>> The way remote eDMA consumes MW is quite similar to how ntb_msi uses them
->>> today. Assuming multiple MWs are available, the last MW is reserved to
->>> expose the remote eDMA info/register/LL regions to the host by packing all
->>> of them into a single MW. In that sense, it does not map naturally to a
->>> per-MW selection model.
->>>
->>>> I'm trying to see if we can do away with the module param.
->>>
->>> I think it is useful to keep an explicit way for an administrator to choose
->>> the transport type (default vs edma). Even on platforms where dw-edma is
->>> available, there can potentially be platform-specific or hard-to-reproduce
->>> issues (e.g. problems that only show up with certain transfer patterns),
->>> and having a way to fall back the long-existing traditional transport can
->>> be valuable.
->>>
->>> That said, I am not opposed to making the default behavior an automatic
->>> selection, where edma is chosen when it's available and the parameter is
->>> left unset.
->>>
->>>> Or I guess when you probe ntb_netdev, the selection would happen there and thus transport_type would be in ntb_netdev module?
->>>
->>> I'm not sure how selecting the transport type at ntb_netdev probe time
->>> would work in practice, and what additional benefit that would provide.
->>
->> So currently ntb_netdev or ntb_transport are not auto-loaded right? They are manually probed by the user. So with the new transport, the user would modprobe ntb_transport_edma.ko. And that would trigger the eDMA transport setup right? With the ntb_transport_core library existing, we should be able to load both the ntb_transport_host and ntb_transport_edma at the same time theoretically. And ntb_netdev should be able to select one or the other transport. This is the most versatile scenario. An alternative is there can be only 1 transport ever loaded, and when ntb_transport_edma is loaded, it just looks like the default transport and netdev functions as it always has without knowing what the underneath transport is. On the platform if there are multiple NTB ports, it would be nice to have the flexibility of allowing each port choose the usage of the current transport and the edma transport if the user desires.
-> 
-> I was assuming manual load in my previous response. Also in this RFC v3,
-> ntb_transport_edma is not even a standalone module yet (although I do think
-> it should be). At this point, I feel the RFC v3 implementation is still a
-> bit too rough to use as a basis for discussing the ideal long-term design,
-> so I'd like to set it aside for a moment and focus on what the ideal shape
-> could look like.
-> 
-> My current thoughts on the ideal structure, after reading your last
-> comment, are as follows:
-> 
-> * The existing cpu/dma memcpy-based transport becomes "ntb_transport_host",
->   and the new eDMA-based transport becomes "ntb_transport_edma".
-> * Each transport is a separate kernel module, and each provides its own
->   ntb_client implementation (i.e. each registers independently with the
->   NTB core). In this model, it should be perfectly fine for both modules to
->   be loaded at the same time.
-> * Common pieces (e.g. ntb_transport_bus registration, shared helpers, and
->   the boundary/API exposed to ntb_transport_clients such as ntb_netdev)
->   should live in a shared library module, such as "ntb_transport_core" (or
->   "ntb_transport", naming TBD).
-> 
-> Then, for transport type selection:
-> 
-> * If we want to switch the transport type (host vs edma) on a per-NTB-port
->   (device) basis, we can rely on the standard driver override framework
->   (ie. driver_override, unbind/bind). To make that work, at first we need
->   to add driver_override support to ntb_bus.
-> * In the case that ntb_netdev wants to explicitly select a transport type,
->   I think it should still be handled via the per-NTB-port driver_override
->   rather than building transport-selection logic into ntb_netdev itself
->   (perhaps with some extension to the boundary API for
->   ntb_transport_clients).
-> * If ntb_transport_host / ntb_transport_edma are built-in modules, a
->   post-boot rebind might be sufficient in most cases. If that's not
->   sufficient, we could also consider providing a kernel parameter to define
->   a boot-time policy. For example, something like:
->     ntb_transport.policy=edma@0000:01:00.0,host@0000:5f:00.0
-> 
-> How doe that sound? In any case, I am planning to submit RFC v4.
-
-Yup that sounds about what I was thinking. If you are submitting RFC v4 w/o the changes mentioned about, just mention that the progress is moving towards that in the cover letter to remind people. Thanks!
-
-Any additional thoughts Jon?
-
-> 
-> Thanks for the review,
-> Koichiro
-
-
-
+>   3. map_free()'s cond_resched_rcu() releases rcu_read_lock()
+>   4. RCU grace period completes, selem is freed
+>   5. map_free() re-acquires rcu_read_lock(), hlist_first_rcu() returns
+> freed memory
+>
+> I think the fix is that we might want to unlink from map_node in
+> bpf_selem_free_list and do dec_not_zero instead, and avoid the
+> cond_resched_rcu().
+> If we race with destroy(), and end up doing another iteration on the
+> same element, we will keep our RCU gp so not access freed memory, and
+> avoid moving refcount < 0 due to dec_not_zero. By the time we restart
+> third time we will no longer see the element.
+>
+> But removing cond_resched_rcu() doesn't seem attractive (I don't think
+> there's a variant that does cond_resched() while holding the RCU read
+> lock).
+>
+> Things become much simpler if we assume map_free() cannot fail when
+> acquiring the bucket lock. It seems to me that we should make that
+> assumption, since destroy() in task context is the only racing
+> invocation.
+> If we are getting timeouts something is seriously wrong.
+> WARN_ON_ONCE(err && caller == BPF_LOCAL_STORAGE_MAP_FREE).
+> Then remove else if branch.
+> The converse (assuming it will always succeed for destroy()) is not
+> true, since BPF programs can cause deadlocks. But the problem is only
+> around map_node unlinking.
+>
+>
+> > +               if (!err) {
+> > +                       if (likely(selem_linked_to_map(selem))) {
+> > +                               hlist_del_init_rcu(&selem->map_node);
+> > +                               bpf_obj_free_fields(smap->map.record, SDATA(selem)->data);
+> > +                               RCU_INIT_POINTER(SDATA(selem)->smap, NULL);
+> > +                               unlink++;
+> > +                       }
+> > +                       raw_res_spin_unlock_irqrestore(&b->lock, flags);
+> > +               } else if (caller == BPF_LOCAL_STORAGE_MAP_FREE) {
+> > +                       RCU_INIT_POINTER(SDATA(selem)->smap, NULL);
+> > +               }
+> > +       }
+> > +
+> > +       /*
+> > +        * Only let destroy() unlink from local_storage->list and do mem_uncharge
+> > +        * as owner is guaranteed to be valid in destroy().
+> > +        */
+> > +       if (local_storage && caller == BPF_LOCAL_STORAGE_DESTROY) {
+> > +               err = raw_res_spin_lock_irqsave(&local_storage->lock, flags);
+> > +               if (!err) {
+> > +                       hlist_del_init_rcu(&selem->snode);
+> > +                       unlink++;
+> > +                       raw_res_spin_unlock_irqrestore(&local_storage->lock, flags);
+> > +               }
+> > +               RCU_INIT_POINTER(selem->local_storage, NULL);
+> > +       }
+> > +
+> > +       /*
+> > +        * Normally, an selem can be unlink under local_storage->lock and b->lock, and
+> > +        * then added to a local to_free list. However, if destroy() and map_free() are
+> > +        * racing or rqspinlock returns errors in unlikely situations (unlink != 2), free
+> > +        * the selem only after both map_free() and destroy() drop the refcnt.
+> > +        */
+> > +       if (unlink == 2 || atomic_dec_and_test(&selem->link_cnt))
+> > +               hlist_add_head(&selem->free_node, to_free);
+> > +}
+> > +
+> >  void __bpf_local_storage_insert_cache(struct bpf_local_storage *local_storage,
+> >                                       struct bpf_local_storage_map *smap,
+> >                                       struct bpf_local_storage_elem *selem)
+> > --
+> > 2.47.3
+> >
 
