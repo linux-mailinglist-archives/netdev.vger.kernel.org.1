@@ -1,90 +1,77 @@
-Return-Path: <netdev+bounces-249070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C50CAD13A10
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 16:24:30 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8810D13922
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 16:17:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 095A8302016B
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:13:39 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E2C2030019F5
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:17:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 253A72E06EF;
-	Mon, 12 Jan 2026 15:13:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lumYmJh3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEE1E2E7F1D;
+	Mon, 12 Jan 2026 15:16:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF292BDC0E;
-	Mon, 12 Jan 2026 15:13:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142EF2E62A2
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 15:16:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768230817; cv=none; b=hoOlYE0CZ0JJqZhzP7BHqfqOB744nSDzO0hU95cnMXGFsutkL503OhNf8Blz6lBdSE1rRkFcJqcApme8c7EWlU8o0mPvt6r7jHFviBgF6+mlmztTNIwk2HWJ2aDxhM4wJj3t4rvLmcm5eQiLHigLjozmSWWsgOUjSH9GEgibpPo=
+	t=1768231019; cv=none; b=bUz1QKtwvuF7Rh+QEZQvaD/JH+dEBLEGsqt/a/hjfK87b0ci9Xs/7da0QCm66Nju5VIKDb5Sb2bAlxXbo1qiTB845S6POKIgPaTrrLmYOzRRugoWRAEjs/Q9LLIUZOKchSHS0/mAPzQrlrfPwBQ+7L6whEMW7+uOd0UM0WivaqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768230817; c=relaxed/simple;
-	bh=FH5lvgGlxlgcsI/c3Wc4LZGoA4WSMGev1ZgnwDVgbkw=;
+	s=arc-20240116; t=1768231019; c=relaxed/simple;
+	bh=EShopnW71/xFcgQTbpFPl66ggY2BecFS9wgT1FftxTM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pW3B5hU+gNtS+E8mRN741XEszJDg8Er6qiHLbS9B/NiN/I1fQQdWY6W+kQ5jYNJ+lyB5YoHbjXDrvZeSFNijvXkoFw3ZuwfA2tpt68cJCfU9qx+n5DYJhtvMruu4u/J+m+9WLMaakwbyMzG24OKOWUFAbjPc0fPeh2j/aPXHZKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lumYmJh3; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768230815; x=1799766815;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=FH5lvgGlxlgcsI/c3Wc4LZGoA4WSMGev1ZgnwDVgbkw=;
-  b=lumYmJh3lREzppEyuWTo96UN5qHsU6SL4JQMeIdp+CNHsYruHmIcldGb
-   c5iXHEWz1RaJ2Et9I1WXmOddUjWq0imkB1AZPJ6jwZHnj8uKz8U7fMnL8
-   zggojf93pYbJjHJ3U0FT0TD8Muq65qWKbG6/AtAUYafaNJBI7mNeKlb9R
-   cPQWGpdu8HK3F6NzqjyIBlGDu4npJssEhuh5x618zfzjKS3KBQ530aYzx
-   ldO0snRQhq6UiZvQOn4aoQIKY20Nvix6C6M72OA9/uYajeDjal+tZWWRy
-   mWxxKA/MtX9sQdRYQ6PrYeeB6PfyvljQbBntcRhsL3FXmXzcglmLHeOjv
-   A==;
-X-CSE-ConnectionGUID: rVkuwlMYTtqccaomg/qjxg==
-X-CSE-MsgGUID: AuS1hlPGRe+K/evU/xG+fw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11669"; a="73349100"
-X-IronPort-AV: E=Sophos;i="6.21,221,1763452800"; 
-   d="scan'208";a="73349100"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 07:13:34 -0800
-X-CSE-ConnectionGUID: mwqoedS6SCmoCk5xw0p26g==
-X-CSE-MsgGUID: imcgvPMSRA2CwgvMwt4IgQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,221,1763452800"; 
-   d="scan'208";a="208632334"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 12 Jan 2026 07:13:29 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vfJbi-00000000DUC-04q9;
-	Mon, 12 Jan 2026 15:13:26 +0000
-Date: Mon, 12 Jan 2026 23:13:09 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Rob Herring <robh@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, linux-rdma@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	intel-wired-lan@lists.osuosl.org, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Mark Bloch <mbloch@nvidia.com>, linux-kernel@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Saeed Mahameed <saeedm@nvidia.com>
-Subject: Re: [Intel-wired-lan] [PATCH net-next 06/12] dpll: Support dynamic
- pin index allocation
-Message-ID: <202601122216.BCarSN6K-lkp@intel.com>
-References: <20260108182318.20935-7-ivecera@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ceWWVlFt8IfcQwSq3/+4Jb19X4a+1aP5S6hFwVXm8JN+FBbMjnmvqmYtwmu7DBEqO0tw/NXv5axY47pSIvW2/d3/f8jykCChyQdF1MPrUV8mHu3LlKdRVMpn0fZigJBxd1oSFBanfPnw9clU0+/apdc+yg5BzqFLln9E7NgFq7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-459ac2f1dc2so3777790b6e.3
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 07:16:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768231017; x=1768835817;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=K2lP+KPaY9dq3lWX+X1Khpp2qI/DD2GRwQIakoNQiEk=;
+        b=pRdffW1EjGPKiDgEMD4Beos2ga0Wfe5mLI/yxxGbaZaHpp9N+Fg2Dcblrg+g7DasHG
+         pLBUC9nZjNehj/jjo8xR2Df1ndkk6xfTqK2Y2eNBp0G/ZerSbVIA1mtYVd/EChKH7BLn
+         GkvY2w5kW2g3GhLZtJMfiH/Lfmqtuej1INSc9yzu3Mc7UPwmOOIDVKHdgKR9PNV1oLiH
+         jeN+HfpcwBf28tgtEeb78FskL5+vEUI+eRdukNLquHlw293LtBjm9UyN8gBqwTmotCpk
+         o8CHPu4n4XtathzPZ1adOVSZQIlDpd5fW8JjBO8KWiBWjOYzvaGnyYpygwFOmIxtaxZY
+         Nypg==
+X-Forwarded-Encrypted: i=1; AJvYcCUpjvn6EXDo/joyMQaqq45Zk2U40Lhjql/qpCImCZYvs3n2WmXfpzn5TBOY3hAHgdrClsPUfLE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZn3q2VEu5Ucyy5OHZXM73Z20owGgd7fNX3wqHsKs0KN88oEfF
+	94Wuo3xPnuDQ4Phjy50ThZk1VwQkfTbwYhTrMmYFeOafee9KUbfSajgS
+X-Gm-Gg: AY/fxX7pPVZC/Lm1913F0o+zhwqnAjDDH/akQ/Nf8UsG2go8Vh5L7aLCkqRO3yeCYXM
+	dg0XJkoWpdlHiUl/wlDz7onwLforKsRRTcrQVdMtxi2y3/SFC49/aKCsuaNrgeVUS04uqBNASeY
+	EU+2uDNqVKDyAk5YmGK2TZHLdWbKyu4Cs+dQ0ynHIFO5yKqvGzjNVVt2IjjdvbL2CMmt02a0QIN
+	c6lrHgmWE+n4BosTMAaOztnw2gJDexBqPEf1cqAC97WwkAnJeYLprmtrKPfp8EVTeEF/hwnV11I
+	q9lq9x2CzRfiJB7fzP56z6NM6h8j1F7DdBBDuQYnkI6XPHdseQMsAh7q/BERv7CVPXKnKjQGjXu
+	v/MVTDkqXtTyPdvLOeKOwMrzwgN5i4qgkFTvwUSvtbiAvSWkACWVEBYVLgx+TlH35hGanRvxteA
+	==
+X-Google-Smtp-Source: AGHT+IHXfMnaYPQo14c++hNdyyk6Ymr6+cKtUfrFEeM1r20pAZ3gzUSjR2INaAmkNP4czHxbLR1BrQ==
+X-Received: by 2002:a05:6808:11c9:b0:44f:da6f:edb1 with SMTP id 5614622812f47-45a6bd83ba4mr8571597b6e.13.1768231016956;
+        Mon, 12 Jan 2026 07:16:56 -0800 (PST)
+Received: from gmail.com ([2a03:2880:10ff::])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-45a5e288c42sm8280583b6e.11.2026.01.12.07.16.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jan 2026 07:16:56 -0800 (PST)
+Date: Mon, 12 Jan 2026 07:16:54 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andre Carvalho <asantostc@gmail.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v10 7/7] selftests: netconsole: validate target
+ resume
+Message-ID: <uzrkzwqpy2mf5je44xz2xtody5ajfw54v7kqb2prfib3kz7gvj@wtsjtgde5thb>
+References: <20260112-netcons-retrigger-v10-0-d82ebfc2503e@gmail.com>
+ <20260112-netcons-retrigger-v10-7-d82ebfc2503e@gmail.com>
+ <20260112061642.7092437c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,52 +80,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260108182318.20935-7-ivecera@redhat.com>
+In-Reply-To: <20260112061642.7092437c@kernel.org>
 
-Hi Ivan,
+On Mon, Jan 12, 2026 at 06:16:42AM -0800, Jakub Kicinski wrote:
+> On Mon, 12 Jan 2026 09:40:58 +0000 Andre Carvalho wrote:
+> > Introduce a new netconsole selftest to validate that netconsole is able
+> > to resume a deactivated target when the low level interface comes back.
+> > 
+> > The test setups the network using netdevsim, creates a netconsole target
+> > and then remove/add netdevsim in order to bring the same interfaces
+> > back. Afterwards, the test validates that the target works as expected.
+> > 
+> > Targets are created via cmdline parameters to the module to ensure that
+> > we are able to resume targets that were bound by mac and interface name.
+> 
+> The new test seems to be failing in netdev CI:
+> 
+> TAP version 13
+> 1..1
+> # timeout set to 180
+> # selftests: drivers/net: netcons_resume.sh
+> # Running with bind mode: ifname
+> not ok 1 selftests: drivers/net: netcons_resume.sh # exit=1
 
-kernel test robot noticed the following build warnings:
+I was discussing this with Andre on private.
 
-[auto build test WARNING on net-next/main]
+Also, do you know why we got:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ivan-Vecera/dt-bindings-dpll-add-common-dpll-pin-consumer-schema/20260109-022618
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260108182318.20935-7-ivecera%40redhat.com
-patch subject: [Intel-wired-lan] [PATCH net-next 06/12] dpll: Support dynamic pin index allocation
-config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20260112/202601122216.BCarSN6K-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 15.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260112/202601122216.BCarSN6K-lkp@intel.com/reproduce)
+	/srv/vmksft/testing/wt-18/tools/testing/selftests/kselftest/runner.sh: line 50: : No such file or directory
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601122216.BCarSN6K-lkp@intel.com/
+after the test failed?
 
-All warnings (new ones prefixed by >>):
-
-   drivers/dpll/dpll_core.c: In function 'dpll_pin_idx_free':
->> drivers/dpll/dpll_core.c:499:28: warning: integer overflow in expression of type 'int' results in '-2147483648' [-Woverflow]
-     499 |         pin_idx -= INT_MAX + 1;
-         |                            ^
-
-
-vim +499 drivers/dpll/dpll_core.c
-
-   490	
-   491	static void dpll_pin_idx_free(u32 pin_idx)
-   492	{
-   493		if (pin_idx <= INT_MAX)
-   494			return; /* Not a dynamic pin index */
-   495	
-   496		/* Map the index value from dynamic pin index range to IDA range and
-   497		 * free it.
-   498		 */
- > 499		pin_idx -= INT_MAX + 1;
-   500		ida_free(&dpll_pin_idx_ida, pin_idx);
-   501	}
-   502	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Link: https://netdev-ctrl.bots.linux.dev/logs/vmksft/net-drv-dbg/results/470321/3-netcons-resume-sh/stdout
 
