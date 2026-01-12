@@ -1,196 +1,112 @@
-Return-Path: <netdev+bounces-249008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16B11D12A5B
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 13:57:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D12FD12A76
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 13:59:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BBC983080372
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 12:55:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2E0BC30221BA
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 12:59:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ED9B359FB4;
-	Mon, 12 Jan 2026 12:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A7AF3587A6;
+	Mon, 12 Jan 2026 12:59:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PFo0d1up";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="a2cu08iV"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="PBM75E9Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17AA359F8F
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 12:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E0DB1A9FB7;
+	Mon, 12 Jan 2026 12:59:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768222504; cv=none; b=TUPPpxvnDNho+U8oFItoUbSaBVsL2espv/KVFz9+6YMjZ4Gt9d1X6W8EZAyZ+7O6XTGdBif4bdy8FzeBtBxMR4KH6gLACIoWR7Fl8Anos+/ofnSdOBCyZ6VJflO5V5DdFyJHwVIbH8WjOXPoQzH1gx7Q2u1h7+PsDS509EI/3eY=
+	t=1768222759; cv=none; b=lSSs2YhzaQiQJpRxFyA0oKb1YpgrSy9hDPzE+yJ2kQgHgZda0Lj8EY7zXTvfD26UFHKORmJyw5G5a5wiyN2eSPnrt1In0oYdhUrxA7ccsUnxrQlIOyfCaHkpRzVpsK6XZ9fDkcwXFhFguKy6X0SIUtoqdbNJ7MosoY8sct5giC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768222504; c=relaxed/simple;
-	bh=TCr86+g83B5jykr4uoI4MF4hOXPzr5E27AlUPYqmfnw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nNxQgu5CAhgwzJ0ZdGHNVBA3s4pF+xlp+gLUCABbhFR8YqsBSzS6wt15BDeqUlWyVc8IYmW22dVJ3siCWAOQEpKB8vO2nE/i8NnoLFYi9VVyf8eWjM4lx9SLunNEudvOZEoQF171M1CN/OwEsk7rB94nOaFZwOCEwW5Ba54ps/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PFo0d1up; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=a2cu08iV; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768222501;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rhxkLbdZYuCDIREBJ5aMnl1Pqa4kOCAZc2N2w1wi0pg=;
-	b=PFo0d1upUW83+n7Dv77dKkBu/gq5gfntsjyfS20sCIoS4O5ME+5k/Pe1NBOtRAp73REcMz
-	q9+wvLJiHCXgWL5OUdraStZ62dZoBf10vILcz5+XGdwcTbqMFQUDDpv3sydQUahJTFEGka
-	rOQ8MwDygUUcOTxi3VZTcfH46p+uA/I=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-493-3sK6p162PQCSD5YvzOnbJQ-1; Mon, 12 Jan 2026 07:54:59 -0500
-X-MC-Unique: 3sK6p162PQCSD5YvzOnbJQ-1
-X-Mimecast-MFC-AGG-ID: 3sK6p162PQCSD5YvzOnbJQ_1768222498
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b872c88d115so44149566b.2
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 04:54:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768222498; x=1768827298; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rhxkLbdZYuCDIREBJ5aMnl1Pqa4kOCAZc2N2w1wi0pg=;
-        b=a2cu08iVMFn/z5KVTdc33ddBRhM9nauUO+V8DwpNdFsMpxt232p6ZYmRWfPT/Q0oHG
-         Qw3GHiPJBzHZ4iigWJ2KQXwzanAxlsSUj80xkJ90GIVVnsQby1B0hmjPWazr6l3+b+T8
-         ctYH1c9NTrcIfrjNClPCGuvzE30AIretagA5yiIeaWCT/pGzdEinYjAGbjRWStU2KA2h
-         P37z+/qGACCyilZ/Y1IUCewb9qSxh8mOUzkKKPxY9tO588Ks+HpFJOgv6MQ7IRrYzoCn
-         RvCD659tiovByLPspnNOJctMGD8Z41RlRezMjtXYJ6qXkT77PPjXrnE/mzCofGem9xS9
-         +/bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768222498; x=1768827298;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=rhxkLbdZYuCDIREBJ5aMnl1Pqa4kOCAZc2N2w1wi0pg=;
-        b=WmMjrsBrZvGlvEH5KBczEG8zJHFd4sxqZvn8lou07L9fzOJWqwed+o+ZGRBQ5jK0jc
-         J/AWY3Q2bYN0odH6I6EyHM1hsdj02lsJG0UynBidlVqzGKsfexaFCYET21IQ/p0GDAD+
-         kipqQSpvdbVXRMT1SlhclagidSTBdkrmNGImcxZULe7xCXMCNf+da2rvE8m55oqUSMvf
-         00IGiMbp2vxX3bJ5jWGtDB8cve+dGV1CmGfYFKoxZepNrlAYz1mgLoEhSGX6lOmPWMO/
-         IF3okHtXYVK6WJsoZXPQYIPJ7Xjr7ie3hA9cjzArkoH1pVfSXHhVr3YDTyV29nwbPH0g
-         6l2w==
-X-Forwarded-Encrypted: i=1; AJvYcCWfUPg2baerINYKYr5B1Ulo36rWfPQb6qInxvU+P92WWkICH2IE7DD5XkMCBVdO6hne/kd9NRM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5EJD09Jwo9+Cezy4WTx/YxcL/+9FhBoak8eZuwRqQ9O2hRiJf
-	TyxhxlNyewhilzU1YUsXdTqvYX9coecJddDjfpXU1jHaSsh1q1FALUCV2UxFHGalHE2ufnOTPFz
-	zDgWk62opRmnYDYopMSE1oWwNfBaVw8uHHf5bnYbwBtpHWJ/8Oup3hEIEcQ==
-X-Gm-Gg: AY/fxX7N7XNyENKyPBxJ6ZQR1HCDu4UaUbpAPgCSGICQB4uhX8HDFQlg4yR17pdnyKD
-	szBd+rHk+Q/s0X2OPwpmbVUd7Jn5X6j05zSMN7A5FMABtpMqx+2YXk2PEACp4iig4TeuHcY0dWu
-	w84xibtAvHDNI8DEZD8U8t5xFcIQJYuQ3sjzBzAH1+9ol4XL5wPmE2rGCuWBaistGm+jfzs/+pL
-	iFXjOdjXqz0qklsbyAb+q9dEY4I36+UI8UIbEnmAGSRu9+0L/kVR5uFBYHcqHFnl7qgR9rplfPs
-	OdJM8fewIVCBwosIv3BMzW7iE3nyZzOsiaXSNjuTuaZHc8aQ4rr35SyDznWRs+fscjioDwhWyjx
-	sAdiF4Y9SIhlze8iQsLPbnEh5VcOMNfXG6krGYUhcBf5rYNd8N2H058jnhjI=
-X-Received: by 2002:a17:907:26c7:b0:b73:a2ce:540f with SMTP id a640c23a62f3a-b8444c80f04mr1718744066b.17.1768222498464;
-        Mon, 12 Jan 2026 04:54:58 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHPr3dIgVWRsuP91OEnws2gf/Ukq1HmhAKZbz1wMFay2J0zyGKodjzzWjXpSeXa764C1KXgRg==
-X-Received: by 2002:a17:907:26c7:b0:b73:a2ce:540f with SMTP id a640c23a62f3a-b8444c80f04mr1718740366b.17.1768222497991;
-        Mon, 12 Jan 2026 04:54:57 -0800 (PST)
-Received: from lbulwahn-thinkpadx1carbongen12.rmtde.csb ([2a02:810d:7e01:ef00:ff56:9b88:c93b:ed43])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8706c2604bsm497062466b.16.2026.01.12.04.54.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jan 2026 04:54:57 -0800 (PST)
-From: Lukas Bulwahn <lbulwahn@redhat.com>
-X-Google-Original-From: Lukas Bulwahn <lukas.bulwahn@redhat.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	David Ahern <dsahern@kernel.org>,
-	netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
-	Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	linux-riscv@lists.infradead.org,
-	linux-m68k@lists.linux-m68k.org,
-	linux-s390@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Lukas Bulwahn <lukas.bulwahn@redhat.com>
-Subject: [RFC PATCH 5/5] s390/configs: replace deprecated NF_LOG configs by NF_LOG_SYSLOG
-Date: Mon, 12 Jan 2026 13:54:31 +0100
-Message-ID: <20260112125432.61218-6-lukas.bulwahn@redhat.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260112125432.61218-1-lukas.bulwahn@redhat.com>
-References: <20260112125432.61218-1-lukas.bulwahn@redhat.com>
+	s=arc-20240116; t=1768222759; c=relaxed/simple;
+	bh=iM9ySH1VudsAVsJxN3YO9yeXlcElpjQQLPymtIdEdiQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i/0ocw5FVBYEysZ34nXWZ8+9+BGmZC0PF708g+1HieOAXjmKk26i6yTRKmfXS2CTc/fjXOWe9138JXMOKPw4qu8rLEyuu3VOko/ohi6WK70uNTbElGh2G3krFfCnglB4zZXnGeJt04H3nzFzxICJbcB4gnD+VSPL3wKIYxkcpag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=PBM75E9Y; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id C21FB200D64E; Mon, 12 Jan 2026 04:59:17 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C21FB200D64E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1768222757;
+	bh=pj0DXsYF0cYZ/I5eNAIxHncu+iCcd64gU83LJP5fx6o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PBM75E9YGAxd/sHVitbxUm0dQRXqENj3bNEUdftv5R1/KNhVv+Xj3o1917WFP0h8I
+	 S/fM/OORmuUDjVLcD/WIRUMpnL1sZeROZAWplhmIqd3qpkbeXRgqPFfu9UYh2NaYbJ
+	 tSMwZUWh+Jq5p/6DFR8qw+GWNWk086kIenJmGiIE=
+Date: Mon, 12 Jan 2026 04:59:17 -0800
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
+	kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	dipayanroy@microsoft.com
+Subject: Re: [PATCH net-next, v7] net: mana: Implement ndo_tx_timeout and
+ serialize queue resets per port.
+Message-ID: <20260112125917.GA10106@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20260106230438.GA13125@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20260109180209.023c50cf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260109180209.023c50cf@kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-From: Lukas Bulwahn <lukas.bulwahn@redhat.com>
+Fri, Jan 09, 2026 at 06:02:09PM -0800, Jakub Kicinski wrote:
+> On Tue, 6 Jan 2026 15:04:38 -0800 Dipayaan Roy wrote:
+> > +static void mana_per_port_queue_reset_work_handler(struct work_struct *work)
+> > +{
+> > +	struct mana_queue_reset_work *reset_queue_work =
+> > +			container_of(work, struct mana_queue_reset_work, work);
+> > +
+> > +	struct mana_port_context *apc = container_of(reset_queue_work,
+> > +						     struct mana_port_context,
+> > +						     queue_reset_work);
+> 
+> > +struct mana_queue_reset_work {
+> > +	/* Work structure */
+> 
+> Not sure what value this comment adds. Looks like something AI
+> generator would add.
+> 
+> > +	struct work_struct work;
+> > +};
+> > +
+> >  struct mana_port_context {
+> >  	struct mana_context *ac;
+> >  	struct net_device *ndev;
+> > +	struct mana_queue_reset_work queue_reset_work;
+> 
+> Why did you wrap the work in another struct with just one member?
+> It forces you to work thru two layers of container of.
+> 
+> Either way, container_of supports nested structs so I think something
+> like:
+> 
+> 	struct mana_port_context *apc = container_of(work,
+> 						     struct mana_port_context,
+> 						     queue_reset_work.work);
+> 
+> should work (untested). But really, better to just delete the pointless
+> nesting.
+Thanks Jakub, I will remove the nesting and re-share a new patch after
+testing.
+> -- 
+> pw-bot: cr
 
-The config options NF_LOG_{ARP,IPV4,IPV6} are deprecated and they only
-exist to ensure that older kernel configurations would enable the
-replacement config option NF_LOG_SYSLOG. To step towards eventually
-removing the definitions of these deprecated config options from the kernel
-tree, update the s390 kernel configurations to set NF_LOG_SYSLOG and drop
-the deprecated config options.
-
-Signed-off-by: Lukas Bulwahn <lukas.bulwahn@redhat.com>
----
- arch/s390/configs/debug_defconfig | 2 +-
- arch/s390/configs/defconfig       | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/arch/s390/configs/debug_defconfig b/arch/s390/configs/debug_defconfig
-index 4be3a7540909..93721ca340c1 100644
---- a/arch/s390/configs/debug_defconfig
-+++ b/arch/s390/configs/debug_defconfig
-@@ -176,6 +176,7 @@ CONFIG_NETFILTER=y
- CONFIG_BRIDGE_NETFILTER=m
- CONFIG_NETFILTER_NETLINK_HOOK=m
- CONFIG_NF_CONNTRACK=m
-+CONFIG_NF_LOG_SYSLOG=m
- CONFIG_NF_CONNTRACK_SECMARK=y
- CONFIG_NF_CONNTRACK_ZONES=y
- CONFIG_NF_CONNTRACK_PROCFS=y
-@@ -327,7 +328,6 @@ CONFIG_IP_VS_FTP=m
- CONFIG_IP_VS_PE_SIP=m
- CONFIG_NFT_FIB_IPV4=m
- CONFIG_NF_TABLES_ARP=y
--CONFIG_NF_LOG_IPV4=m
- CONFIG_IP_NF_IPTABLES=m
- CONFIG_IP_NF_MATCH_AH=m
- CONFIG_IP_NF_MATCH_ECN=m
-diff --git a/arch/s390/configs/defconfig b/arch/s390/configs/defconfig
-index c064e0cacc98..7750f333a1ac 100644
---- a/arch/s390/configs/defconfig
-+++ b/arch/s390/configs/defconfig
-@@ -167,6 +167,7 @@ CONFIG_NETFILTER=y
- CONFIG_BRIDGE_NETFILTER=m
- CONFIG_NETFILTER_NETLINK_HOOK=m
- CONFIG_NF_CONNTRACK=m
-+CONFIG_NF_LOG_SYSLOG=m
- CONFIG_NF_CONNTRACK_SECMARK=y
- CONFIG_NF_CONNTRACK_ZONES=y
- CONFIG_NF_CONNTRACK_PROCFS=y
-@@ -318,7 +319,6 @@ CONFIG_IP_VS_FTP=m
- CONFIG_IP_VS_PE_SIP=m
- CONFIG_NFT_FIB_IPV4=m
- CONFIG_NF_TABLES_ARP=y
--CONFIG_NF_LOG_IPV4=m
- CONFIG_IP_NF_IPTABLES=m
- CONFIG_IP_NF_MATCH_AH=m
- CONFIG_IP_NF_MATCH_ECN=m
--- 
-2.52.0
-
+Regards
+Dipayaan Roy
 
