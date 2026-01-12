@@ -1,124 +1,107 @@
-Return-Path: <netdev+bounces-249035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E5DCD12FBD
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:04:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CACB4D1317F
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:23:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E1AE33004F4F
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 13:58:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BC1C43018F58
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 14:18:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E6C35A954;
-	Mon, 12 Jan 2026 13:58:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F5C6252292;
+	Mon, 12 Jan 2026 14:18:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zq4VCEZa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z6FNS0i9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E4D534DB71
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 13:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544831E22E9
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 14:18:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768226317; cv=none; b=lpDsv9hHL86xLOW01NneEXhWprDy4ChAExbXI0dbMFNhEP9sHiDO2fjhqfqsD8pGi6BevfRrbprqCGvYZPIoKmqvMxhk6SIRqjZCwV/w0u211mUZ0NR6gARfCp2cY0oD7ncV3xLBX5U4QwYzV/pLXNdPoiSQzxYDx2vhnWxNByw=
+	t=1768227519; cv=none; b=Rcw9aNygO/OwalPnwgwCbIu089zf0jo93fhmGqZVMtkqO46cysBAeUo+WJT2A1B3P0p2o8dXejovQtn9L7mSBUVrWzNqdCZWzwDMapo23GqtyXibluxDIEdGNcWbFYCCpyRkoFsby094quM7XZ8U6QHiWWTtsXrmsfqValdNa2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768226317; c=relaxed/simple;
-	bh=T+GK6b1uowAqZPepq8A3zrFaIzOjZkACQPLeAvudjUc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PNS+atIWrK4QOk8axpyKprvyo9hEs0HQCWIMb6GHE/9rlt/KVouTS6nO7wX33nnT9GEz3KxIvP6zV78L1VCR0s/yO/D5EaIZLsyliC5acvW1e1Z+H9RoUK/ZPoVaMvh78cUiQnncjP/3CaKZo5ZiER1L5s3lh4RxKl7rGicnDQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zq4VCEZa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57532C16AAE;
-	Mon, 12 Jan 2026 13:58:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768226317;
-	bh=T+GK6b1uowAqZPepq8A3zrFaIzOjZkACQPLeAvudjUc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Zq4VCEZao7MqqXwELU/lKXrmvwJ93PAAgrb6MAesKRuDKHmKZQT8cf6ZX2KeCTVEy
-	 jzKM/YYh0Dvp9Y7GJwYgokmQ/sZMj6spw2phNHlPee4K43Wy+JQ8FYr1tAmsU645d6
-	 PZGstD1kaaVlgcas4J7YJuS9W7r/o5TezpWW71YN15krPc1Jmhzjcv4Q3qmmxHVSy6
-	 BQYDwouzSpSjrPwlc+ccot5MBAf6OAh8qRwLiFW7lEVCdNWd8lN6zvpz9KXNNQwwEV
-	 HZHAgT2w8tlkGPaieipozxxQt9Qh+xobCeRCF6vS4EpVWq6BEukI9geje2D80jRJyq
-	 AqqMSCZxdJZAw==
-Date: Mon, 12 Jan 2026 13:58:33 +0000
-From: Simon Horman <horms@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Florian Westphal <fw@strlen.de>, Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com,
-	syzbot+6023ea32e206eef7920a@syzkaller.appspotmail.com,
-	Mazin Al Haddad <mazin@getstate.dev>
-Subject: Re: [PATCH v2 net] ip6_gre: use skb_vlan_inet_prepare() instead of
- pskb_inet_may_pull()
-Message-ID: <aWT-CTaKuup9OYvo@horms.kernel.org>
-References: <20260106144529.1424886-1-edumazet@google.com>
- <20260106095648.07a870f1@kernel.org>
- <CANn89iJnXg892OU13PeJMGvBKw90fJdqDaAmJ867Rptsm0zgNA@mail.gmail.com>
- <aV4ddkDATvo9lBHi@strlen.de>
- <CANn89iKkThtD7VAN3OaOmC9=Ekiu2u-0TJ1BJaD+g7LCg9ARVQ@mail.gmail.com>
+	s=arc-20240116; t=1768227519; c=relaxed/simple;
+	bh=vPeDa8uyWuQnIXSJZ4FwePDJ5JKSHDvAEnccORld0bc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Id6sK8O0ieF5FfdO6cNrpWUFRYKodVrjngJV+6qm88gouwxx50OhJsKK1gw9glRaLVHtvKeg9+MgUaeaGJEvOhqtbLhyfoMtWh16bUmD6M1wxFx1GHMchBIcdfS90R8cTirkHzFqMxyiBlzvZwdUU5BrcOOBHR2c+9szwH82XfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z6FNS0i9; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768227517; x=1799763517;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=vPeDa8uyWuQnIXSJZ4FwePDJ5JKSHDvAEnccORld0bc=;
+  b=Z6FNS0i9B2L3MUNcb3sn4S2UYKUr8MpuGFh1Vo/+9bxYWmVob01WItFT
+   In+QR+9oaJfN8TI74p25Db1jlAajK3WECaW8PPZs46DCBrZHQHkth5gPT
+   roUpyxheJaCrOLSgXzJaXtYyIhGwd9yqhDRYrGZxe1EYMO/tQTlUDUIPL
+   zJF3rKBJz1FqhLhkUnSx9/hlAOsdK34nhIaXYRCKANjEHZcP9UbCIMEYC
+   I2y0WwppIIDK3hmG2b2jcaQnIIclrjwBOy3RB79NibXyxvkbKDAVG5XwG
+   ZsXEAuO47bwLNMo6b2O0QWT8RaIsFBaqpibKYEEp87PeUF8hnKY9PIGY+
+   A==;
+X-CSE-ConnectionGUID: mtNB8PHVT1qcsd+6l5XpzA==
+X-CSE-MsgGUID: ny+egBSUSMOx6UbIS8HvdA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11669"; a="73352277"
+X-IronPort-AV: E=Sophos;i="6.21,221,1763452800"; 
+   d="scan'208";a="73352277"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 06:18:37 -0800
+X-CSE-ConnectionGUID: rVOT95v5QEeVCqlu981b5Q==
+X-CSE-MsgGUID: cMpwmWyVTiOvqeTm28QMgA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,221,1763452800"; 
+   d="scan'208";a="227355621"
+Received: from os-delivery.igk.intel.com ([10.102.18.218])
+  by fmviesa002.fm.intel.com with ESMTP; 12 Jan 2026 06:18:36 -0800
+From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Subject: [PATCH iwl-next v1 0/7] ixgbe: enable EEE for E610 devices
+Date: Mon, 12 Jan 2026 15:01:01 +0100
+Message-Id: <20260112140108.1173835-1-jedrzej.jagielski@intel.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iKkThtD7VAN3OaOmC9=Ekiu2u-0TJ1BJaD+g7LCg9ARVQ@mail.gmail.com>
 
-On Wed, Jan 07, 2026 at 10:01:22AM +0100, Eric Dumazet wrote:
-> On Wed, Jan 7, 2026 at 9:46 AM Florian Westphal <fw@strlen.de> wrote:
-> >
-> > Eric Dumazet <edumazet@google.com> wrote:
-> > > On Tue, Jan 6, 2026 at 6:56 PM Jakub Kicinski <kuba@kernel.org> wrote:
-> > > >
-> > > > On Tue,  6 Jan 2026 14:45:29 +0000 Eric Dumazet wrote:
-> > > > > v2: invert the conditions (Jakub)
-> > > >
-> > > > Thanks! Much better now, but still failing
-> > > > tools/testing/selftests/net/gre_gso.sh
-> > > >
-> > > > TAP version 13
-> > > > 1..1
-> > > > # timeout set to 3600
-> > > > # selftests: net: gre_gso.sh
-> > > > # 2.16 [+2.16]     TEST: GREv6/v4 - copy file w/ TSO                                   [ OK ]
-> > > > # 3.16 [+1.01] 2026/01/06 10:32:57 socat[20546] W exiting on signal 15
-> > > > # 3.17 [+0.01] 2026/01/06 10:32:57 socat[20546] W exiting on signal 15
-> > > > # 3.17 [+0.00]     TEST: GREv6/v4 - copy file w/ GSO                                   [FAIL]
-> > > > # 3.18 [+0.01] 2026/01/06 10:32:57 socat[20533] W exiting on signal 15
-> > > > # 3.19 [+0.00]     TEST: GREv6/v6 - copy file w/ TSO                                   [ OK ]
-> > > > # 4.19 [+1.00] 2026/01/06 10:32:59 socat[20559] W exiting on signal 15
-> > > > # 4.19 [+0.01]     TEST: GREv6/v6 - copy file w/ GSO                                   [FAIL]
-> > > > # 4.20 [+0.01] 2026/01/06 10:32:59 socat[20549] W exiting on signal 15
-> > > > # 4.22 [+0.02] 2026/01/06 10:32:59 socat[20560] W exiting on signal 15
-> > > > # 4.23 [+0.01]
-> > > > # 4.23 [+0.00] Tests passed:   2
-> > > > # 4.23 [+0.00] Tests failed:   2
-> > > > not ok 1 selftests: net: gre_gso.sh # exit=1
-> > > >
-> > > > https://netdev-ctrl.bots.linux.dev/logs/vmksft/net/results/461862/65-gre-gso-sh/stdout
-> > >
-> > > For some reason I am unable to run this test from a virtme-ng instance.
-> > >
-> > > I guess I wlll not make a new version of this patch, maybe Florian can
-> > > take over.
-> >
-> > Its failing because nhoff is moved by 14 bytes, test passes after doing:
-> >
-> > -       if (skb_vlan_inet_prepare(skb, false))
-> > +       if (skb_vlan_inet_prepare(skb, true))
-> 
-> Thanks Florian.
-> 
-> I finally understood that my virtme-ng problem with this test is that
-> on my platform, /proc/sys/net/core/fb_tunnels_only_for_init_net was
-> set to 2
-> 
-> Tests have a hidden dependency against this sysctl.
+Align SW structs with latest FW changes related to EEE enablement.
+Address compatibility issues caused by the buffer size changes.
+Implement ethtool callbacks which can be used to enable/disable EEE, but
+generally the feature itself is enabled by default. What's important it
+works only for link speeds > 1Gb/s, so even if enabled, it gets down
+anytime link conditions aren't met. Once met again the feature gets
+restored. Still cannot configure LPI timers and EEE advertised speeds.
 
-Should unhide it by making the tests check or set this value?
+Jedrzej Jagielski (7):
+  ixgbe: E610: add discovering EEE capability
+  ixgbe: E610: use new version of 0x601 ACI command buffer
+  ixgbe: E610: update EEE supported speeds
+  ixgbe: E610: update ACI command structs with EEE fields
+  ixgbe: move EEE config validation out of ixgbe_set_eee()
+  ixgbe: replace EEE enable flag with state enum
+  ixgbe: E610: add EEE support
 
-It seems like a lot of time was lost on this already.
+ drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  13 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c |  77 +++++-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |   1 +
+ .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  | 250 +++++++++++++++---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  42 ++-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |   1 +
+ .../ethernet/intel/ixgbe/ixgbe_type_e610.h    |  38 ++-
+ include/linux/net/intel/libie/adminq.h        |   1 +
+ 8 files changed, 358 insertions(+), 65 deletions(-)
+
+
+base-commit: 8fccf912252d8d61064058caf4d6e1085c5ac309
+-- 
+2.31.1
+
 
