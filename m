@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-249179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A80B4D15598
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 22:00:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5107FD155AD
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 22:01:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A37A8303C206
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 21:00:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 72B5A3031358
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 21:00:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2804534028D;
-	Mon, 12 Jan 2026 21:00:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD3F6341076;
+	Mon, 12 Jan 2026 21:00:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LgkcLwAs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V2PdVyRB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0276A333427;
-	Mon, 12 Jan 2026 21:00:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8931D340A43;
+	Mon, 12 Jan 2026 21:00:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768251620; cv=none; b=RGLpVaPH9dflsjJFtIRuCDxo/BgjiQRZeKED0eDyi4yrQbBip6EiPQKOxBD7VViRj8llfF65K3Hh+zA+fQW4+CfD6I7nCoWikpfCatLian22yUAxwt56jRt776sNUWZWwXKgk8gGWoaAw8IjJHTcKBocRfjidhemkBqJLQPKupA=
+	t=1768251621; cv=none; b=SgY920W0PoSCfJAY+ZJ+XuzXpQ1iOaCbGYH+nc6ucZcPRfZrH1P6I64UnZ2zYw/w6m3z8ARVng9dt6ZK0thMKWXJpS+r/wAKPVpgcfZixQApOTUUMGK0O9hYXZuqGkFaUCCBsgruA06U4Df0d2ZtJC6E3gGitFuIy1dDIZa4d8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768251620; c=relaxed/simple;
-	bh=6MvNfPDEFcfkquy8gkIp2qFI3WAKNMNlg7aMEqc5UPQ=;
+	s=arc-20240116; t=1768251621; c=relaxed/simple;
+	bh=5PmNXY8c9JWJMqljoZbFiS8oZ+pURDpk9kyFp+ADh7U=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ERtHecbpFTVvUQgoq3mKiP8eIaz9kHj/5fxQKXiHsqsv8ctGXjxn88VXglqXaimvyjX1QOq4TBY6lGUgTQykhVsClf6SFc9HUIaNTKlvxFf951EUK6TvvsMO1SOt+iLThXmKpjAqx8u1KA0Jc/HLs84ZKW4hkOgZ1Vs4XF/ptMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LgkcLwAs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4E83C19421;
-	Mon, 12 Jan 2026 21:00:19 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=jxztiaHzP57VGsoA70sV0HpAnHP0+kRxjytn+FqlBtnu/wMbp6aR3JaxNQdK3o2aCaLyuO+XkK0/zismO5w41ajawZ0KkbOZ0LB/mXVcDK4vMYq0MakVeHYZv3XRK9VRzsxNKqbojM8ezAxj8yn/iFCCuY8UhDW/V0QG3qtfQUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V2PdVyRB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56C3FC19425;
+	Mon, 12 Jan 2026 21:00:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768251619;
-	bh=6MvNfPDEFcfkquy8gkIp2qFI3WAKNMNlg7aMEqc5UPQ=;
+	s=k20201202; t=1768251621;
+	bh=5PmNXY8c9JWJMqljoZbFiS8oZ+pURDpk9kyFp+ADh7U=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LgkcLwAsPnG17Go3if3ARUaYuY6re3WqdWam724Cf73tWVhHlbqqCgvwrF++2XyXy
-	 kOKhDWMIqvR5mU1NtNU17VXiLcVjpbvyTFtMS3RWsvxmXwmmL9/9eDNU7cIrqRcbHk
-	 jqMuQ3inTaS3LMDX5R1JgacNIdUvO1cz/iD21E2hvoMuMgMjYHp49zV1XtsTDB09+W
-	 hJw6WXswv3FzQQsIrvwpSlxXw84bdcAm6qGrqCYqB+3WUenRoxILEkAm7D17yYI+k9
-	 68nNnbFdp7FPPgsEylEuftWqYjRsrajx/KluUEcpzmTHYh7mMtD4uMcIJi0/7hMql5
-	 a9Av7ANHpOfhQ==
+	b=V2PdVyRB98+G3yfXHqWeanWSuyErt6+4i5AAJqrvEBLdCcNEYCWqVThT4suqudGZW
+	 pQjwlJl7MrHEk4aytYPZa95ryPnSk2TqguGTwWfYkJx6R2RsTSVZH9URIUop8NNuqQ
+	 HeVJZWbdpYRXbctpWm8k5kitDufdsZ57ghqiZX4fHA6ym6449hTvi+cRKCc96+8/FZ
+	 +y7lVbkHANGs/nH9OdCadIIuAae9Cl1c2fDLNPF39SnyffERTcOpuX9NOiXuRDq6JO
+	 ClfjJQiE6yfev5wjJIiq6h1A8S2GHkG8ckiC6jDH8dPGDLcrU5scKt9BhQb2CNNUio
+	 U4u5niRAyAGOg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2CF0380CFD5;
-	Mon, 12 Jan 2026 20:56:54 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 78D1A380CFD5;
+	Mon, 12 Jan 2026 20:56:56 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,44 +50,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3 0/3] virtio-net: fix the deadlock when disabling rx
- NAPI
+Subject: Re: [PATCH net 1/3] can: etas_es58x: allow partial RX URB allocation
+ to
+ succeed
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176825141377.1092878.9401605106447575333.git-patchwork-notify@kernel.org>
-Date: Mon, 12 Jan 2026 20:56:53 +0000
-References: <20260106150438.7425-1-minhquangbui99@gmail.com>
-In-Reply-To: <20260106150438.7425-1-minhquangbui99@gmail.com>
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
- xuanzhuo@linux.alibaba.com, eperezma@redhat.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
- john.fastabend@gmail.com, sdf@fomichev.me, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+ <176825141505.1092878.276430348692974730.git-patchwork-notify@kernel.org>
+Date: Mon, 12 Jan 2026 20:56:55 +0000
+References: <20260109135311.576033-2-mkl@pengutronix.de>
+In-Reply-To: <20260109135311.576033-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de, swilczek.lx@gmail.com,
+ syzbot+e8cb6691a7cf68256cb8@syzkaller.appspotmail.com, mailhol@kernel.org
 
 Hello:
 
 This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+by Marc Kleine-Budde <mkl@pengutronix.de>:
 
-On Tue,  6 Jan 2026 22:04:35 +0700 you wrote:
-> Calling napi_disable() on an already disabled napi can cause the
-> deadlock. In commit 4bc12818b363 ("virtio-net: disable delayed refill
-> when pausing rx"), to avoid the deadlock, when pausing the RX in
-> virtnet_rx_pause[_all](), we disable and cancel the delayed refill work.
-> However, in the virtnet_rx_resume_all(), we enable the delayed refill
-> work too early before enabling all the receive queue napis.
+On Fri,  9 Jan 2026 14:46:10 +0100 you wrote:
+> From: Szymon Wilczek <swilczek.lx@gmail.com>
+> 
+> When es58x_alloc_rx_urbs() fails to allocate the requested number of
+> URBs but succeeds in allocating some, it returns an error code.
+> This causes es58x_open() to return early, skipping the cleanup label
+> 'free_urbs', which leads to the anchored URBs being leaked.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v3,1/3] virtio-net: don't schedule delayed refill worker
-    https://git.kernel.org/netdev/net/c/fcdef3bcbb2c
-  - [net,v3,2/3] virtio-net: remove unused delayed refill worker
-    https://git.kernel.org/netdev/net/c/1e7b90aa7988
-  - [net,v3,3/3] virtio-net: clean up __virtnet_rx_pause/resume
-    https://git.kernel.org/netdev/net/c/a0c159647e66
+  - [net,1/3] can: etas_es58x: allow partial RX URB allocation to succeed
+    https://git.kernel.org/netdev/net/c/b1979778e985
+  - [net,2/3] can: gs_usb: gs_usb_receive_bulk_callback(): fix URB memory leak
+    https://git.kernel.org/netdev/net/c/7352e1d5932a
+  - [net,3/3] can: ctucanfd: fix SSP_SRC in cases when bit-rate is higher than 1 MBit.
+    https://git.kernel.org/netdev/net/c/e707c591a139
 
 You are awesome, thank you!
 -- 
