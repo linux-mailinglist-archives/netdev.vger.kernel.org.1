@@ -1,129 +1,222 @@
-Return-Path: <netdev+bounces-249155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFD51D15264
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 21:03:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61961D1525B
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 21:02:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2B43A303A02C
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 20:01:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 62CD9300A2AB
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 20:02:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5311311C36;
-	Mon, 12 Jan 2026 20:01:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cmRTtpW0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D774131AA83;
+	Mon, 12 Jan 2026 20:02:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f79.google.com (mail-oa1-f79.google.com [209.85.160.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92DCD2E7BDC;
-	Mon, 12 Jan 2026 20:01:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B9C2D839E
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 20:02:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768248106; cv=none; b=duOR7oBu+EgP6ybMIaXfN2czHBuejYe82vUXjS3Iq64/oXT+TtMgkXYlozC2PuzGnhhwJngStL3C6EIbKupCJcG3zdJ18yx1l3LuT/BNjG42B6wKjZHifYAR2HPN5uScNTumIW6/ghKz4fiJd4Z+uci2xbtmRCph/ncpQbTFMkI=
+	t=1768248141; cv=none; b=tNqGgUrtpooCnRwxyrxaTf4U5BcXXv0QyugLUGtUAbjAZHFJWEt/XQaP+tiWlPY/6pjlToI+o23S7jd1OexpgTiSXR7m3MNiEG9Kw8IAGwbXq6t4K6mYLuCbEuISW9mQUj+nYY0e0phvNPq4ig2c2+vYHAINhCc2goNRX4DyKVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768248106; c=relaxed/simple;
-	bh=iAzLbGMDXQfuE3s4KFa2lQ8l5bKVW/+TK+/FOv2Eho4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ELjSNVRcvGgJrp6r0rp5xvx9DCiGF5qw9A1PSpCy/sXjGjvVWwnzhUwb94MbKxeje2ly73fA3iXXAtKIcIb5djAlW9NwF75tG6x8OaJZuBCYyRhdf4rAV09w1ne6e+52OIFrrxTiTpUQd3zaDdxhVprPeliEcEFR/DbdMEzN0Qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cmRTtpW0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05D75C116D0;
-	Mon, 12 Jan 2026 20:01:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768248106;
-	bh=iAzLbGMDXQfuE3s4KFa2lQ8l5bKVW/+TK+/FOv2Eho4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cmRTtpW0cY4oNrQtvYdKlC26VlGGgiFUrlh1ys7lAGIXsBImtcv9fbxXcfAzv35w6
-	 GaCEUXCJJ9DajEsHvVfLZlvLZ1o8g6qhe8jqJP+I/v0W28Qb9X04J0DxlQpqYlF1rk
-	 rqauQh08FgmsrE9N/Oh9DsGa2zX+Yjq3nhAh4wzrFOzlAxNMN2z97cm3vvzlatqYDl
-	 rI0tZFsJuf7kCtx/pneTrvKh4BS4Plk3xYDOusK3NsxRQhiyXUjXXEm/FpNgVh0eSj
-	 bQVUcZUGC3N7QtGsIFi7QPeyQ9vHl8/wPphA6UsoUUdaq3V+JCwd7EA6oyM9cOfoMh
-	 pGUKXhKqAJiBQ==
-Date: Mon, 12 Jan 2026 20:01:40 +0000
-From: Simon Horman <horms@kernel.org>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>
-Subject: Re: [PATCH net-next 2/2] net: stmmac: qcom-ethqos: convert to
- set_clk_tx_rate() method
-Message-ID: <aWVTJL_G__7IQTBn@horms.kernel.org>
-References: <aWU4gnjv7-mcgphM@shell.armlinux.org.uk>
- <E1vfMO1-00000002kJF-33UK@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1768248141; c=relaxed/simple;
+	bh=yERk988J8WSuxkAUOYHeDqadc6S8MRdTfxUh4QNnNas=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=LMJ4iqvFi1xQ2NIl7cx8a00pyUKvEea0hnylpzf2taJSmz40WJfWFKQJ3CtNy9C6zWc6B2TQBXm/QoPOlqEU4GJzmIGIFdlcxXxLThlapJKdWikuxuh7QPwDmbVuY5rMPkP9KBMC143oNqKjHoGHb3tvDrflAPDy976+2m4XzRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oa1-f79.google.com with SMTP id 586e51a60fabf-3fea6c3e817so13944628fac.1
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 12:02:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768248139; x=1768852939;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Wty6kl/vaGXT/vbAntON52X8q04OV9SYetRDcXlHvvs=;
+        b=vF0G/jqDNy/5+zgpMPQtDUj/kLvWCos/6SOgeglBSGUct6tk/a8RgzCsIgkk+yFvqa
+         qgqt0Pet5sEIahPaG1crXaVHmQpVIvoGNugk8GY639Q3P8Xb9hxRZD88pbpo/aY32iaD
+         rWsW+wzpfgrPrXB6ZsY2xurp+mQ8IrKo+bFYSeqV7fM90SiIwz9oEhnigCngnqXV7sAI
+         5sKigEGnmT+qoHnZRgfIUgM26wBFgRZdjVTJsACi796kCT/jHDfEAvfXMuZQDmIaQfmV
+         luoxPK0d8sqgG4TZqd0vU+bM9dWVd5ineMAHsZ0JZzB6r/G4ewKUR6Rme6APcY2GrQBm
+         DDcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUISznIukQKEne5S8oVyh/axZOkxKGbkEoWt53bOBCSqVJ6TGmv+PBrMjQednmptFlWvA1Fg7c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJmGEmAIaxqWfrf09uOvRMNwuU5Te+QDczySSeBmLhfgWE8s0A
+	sWRfc968CZ+a+0GhX/r7jh8hy+MAuuVefsj67FM+e5gmF2YG9SYm/gFhMNQJFI0pqPHOQzwF8/A
+	jfBdY9sOnds9sDZ7j28jHGuKQfw/EUUn7X/gZfSpsjvBN0OImLV5S2qbeSYc=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1vfMO1-00000002kJF-33UK@rmk-PC.armlinux.org.uk>
+X-Received: by 2002:a05:6820:2bc4:b0:65f:552e:2ceb with SMTP id
+ 006d021491bc7-660f29f93b0mr189331eaf.25.1768248139186; Mon, 12 Jan 2026
+ 12:02:19 -0800 (PST)
+Date: Mon, 12 Jan 2026 12:02:19 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6965534b.050a0220.38aacd.0001.GAE@google.com>
+Subject: [syzbot] [net?] memory leak in __build_skb (4)
+From: syzbot <syzbot+4d8c7d16b0e95c0d0f0d@syzkaller.appspotmail.com>
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	jasowang@redhat.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	willemdebruijn.kernel@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Jan 12, 2026 at 06:11:29PM +0000, Russell King (Oracle) wrote:
-> Set the RGMII link clock using the set_clk_tx_rate() method rather than
-> coding it into the .fix_mac_speed() method. This simplifies ethqos's
-> ethqos_fix_mac_speed().
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->  .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 19 +++++++++----------
->  1 file changed, 9 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> index 869f924f3cde..d6df3ca757be 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> @@ -102,7 +102,6 @@ struct qcom_ethqos {
->  	void __iomem *rgmii_base;
->  	int (*configure_func)(struct qcom_ethqos *ethqos, int speed);
->  
-> -	unsigned int link_clk_rate;
->  	struct clk *link_clk;
->  	struct phy *serdes_phy;
->  	int serdes_speed;
-> @@ -174,19 +173,18 @@ static void rgmii_dump(void *priv)
->  		rgmii_readl(ethqos, EMAC_SYSTEM_LOW_POWER_DEBUG));
->  }
->  
-> -static void
-> -ethqos_update_link_clk(struct qcom_ethqos *ethqos, int speed)
-> +static int ethqos_set_clk_tx_rate(void *bsp_priv, struct clk *clk_tx_i,
-> +				  phy_interface_t interface, int speed)
->  {
-> +	struct qcom_ethqos *ethqos = bsp_priv;
->  	long rate;
->  
-> -	if (!phy_interface_mode_is_rgmii(ethqos->phy_mode))
-> -		return;
-> +	if (!phy_interface_mode_is_rgmii(interface))
-> +		return 0;
->  
->  	rate = rgmii_clock(speed);
->  	if (rate > 0)
-> -		ethqos->link_clk_rate = rate * 2;
-> -
-> -	clk_set_rate(ethqos->link_clk, ethqos->link_clk_rate);
-> +		clk_set_rate(ethqos->link_clk, rate * 2);
+Hello,
 
-Hi Russell,
+syzbot found the following issue on:
 
-An int needs to be returned here.
+HEAD commit:    623fb9912f6a Merge tag 'pinctrl-v6.19-2' of git://git.kern..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=149a1922580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d60836e327fd6756
+dashboard link: https://syzkaller.appspot.com/bug?extid=4d8c7d16b0e95c0d0f0d
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=137fb1fc580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14c0519a580000
 
->  }
->  
->  static void
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/a5d95462c1e9/disk-623fb991.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/0305879ad943/vmlinux-623fb991.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/98136e3b98e4/bzImage-623fb991.xz
 
--- 
-pw-bot: cr
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+4d8c7d16b0e95c0d0f0d@syzkaller.appspotmail.com
+
+BUG: memory leak
+unreferenced object 0xffff888109695a00 (size 240):
+  comm "syz.0.17", pid 6088, jiffies 4294943096
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 40 c2 10 81 88 ff ff 00 00 00 00 00 00 00 00  .@..............
+  backtrace (crc a84b336f):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4958 [inline]
+    slab_alloc_node mm/slub.c:5263 [inline]
+    kmem_cache_alloc_noprof+0x3b4/0x590 mm/slub.c:5270
+    __build_skb+0x23/0x60 net/core/skbuff.c:474
+    build_skb+0x20/0x190 net/core/skbuff.c:490
+    __tun_build_skb drivers/net/tun.c:1541 [inline]
+    tun_build_skb+0x4a1/0xa40 drivers/net/tun.c:1636
+    tun_get_user+0xc12/0x2030 drivers/net/tun.c:1770
+    tun_chr_write_iter+0x71/0x120 drivers/net/tun.c:1999
+    new_sync_write fs/read_write.c:593 [inline]
+    vfs_write+0x45d/0x710 fs/read_write.c:686
+    ksys_write+0xa7/0x170 fs/read_write.c:738
+    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+    do_syscall_64+0xa4/0xf80 arch/x86/entry/syscall_64.c:94
+    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+BUG: memory leak
+unreferenced object 0xffff8881037b5e40 (size 192):
+  comm "syz.0.17", pid 6088, jiffies 4294943096
+  hex dump (first 32 bytes):
+    00 40 9c 26 81 88 ff ff c0 66 0b 87 ff ff ff ff  .@.&.....f......
+    21 52 bc 85 ff ff ff ff 00 00 00 00 00 00 00 00  !R..............
+  backtrace (crc fcd1b1c6):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4958 [inline]
+    slab_alloc_node mm/slub.c:5263 [inline]
+    kmem_cache_alloc_noprof+0x3b4/0x590 mm/slub.c:5270
+    dst_alloc+0x5b/0xe0 net/core/dst.c:89
+    rt_dst_alloc+0x32/0xe0 net/ipv4/route.c:1651
+    ip_route_input_slow+0xaa0/0x1560 net/ipv4/route.c:2429
+    ip_route_input_rcu net/ipv4/route.c:2543 [inline]
+    ip_route_input_noref+0xd1/0xe0 net/ipv4/route.c:2554
+    ip_rcv_finish_core+0xca/0x7f0 net/ipv4/ip_input.c:368
+    ip_rcv_finish net/ipv4/ip_input.c:451 [inline]
+    NF_HOOK include/linux/netfilter.h:318 [inline]
+    NF_HOOK include/linux/netfilter.h:312 [inline]
+    ip_rcv+0x197/0x240 net/ipv4/ip_input.c:573
+    __netif_receive_skb_one_core+0xd0/0x100 net/core/dev.c:6139
+    __netif_receive_skb+0x1d/0x80 net/core/dev.c:6252
+    netif_receive_skb_internal net/core/dev.c:6338 [inline]
+    netif_receive_skb+0x49/0x240 net/core/dev.c:6397
+    tun_rx_batched drivers/net/tun.c:1485 [inline]
+    tun_get_user+0x1dbf/0x2030 drivers/net/tun.c:1953
+    tun_chr_write_iter+0x71/0x120 drivers/net/tun.c:1999
+    new_sync_write fs/read_write.c:593 [inline]
+    vfs_write+0x45d/0x710 fs/read_write.c:686
+    ksys_write+0xa7/0x170 fs/read_write.c:738
+    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+    do_syscall_64+0xa4/0xf80 arch/x86/entry/syscall_64.c:94
+    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+BUG: memory leak
+unreferenced object 0xffff8881095d2200 (size 240):
+  comm "syz.0.18", pid 6092, jiffies 4294943097
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 40 c2 10 81 88 ff ff 00 00 00 00 00 00 00 00  .@..............
+  backtrace (crc e1df1ba8):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4958 [inline]
+    slab_alloc_node mm/slub.c:5263 [inline]
+    kmem_cache_alloc_noprof+0x3b4/0x590 mm/slub.c:5270
+    __build_skb+0x23/0x60 net/core/skbuff.c:474
+    build_skb+0x20/0x190 net/core/skbuff.c:490
+    __tun_build_skb drivers/net/tun.c:1541 [inline]
+    tun_build_skb+0x4a1/0xa40 drivers/net/tun.c:1636
+    tun_get_user+0xc12/0x2030 drivers/net/tun.c:1770
+    tun_chr_write_iter+0x71/0x120 drivers/net/tun.c:1999
+    new_sync_write fs/read_write.c:593 [inline]
+    vfs_write+0x45d/0x710 fs/read_write.c:686
+    ksys_write+0xa7/0x170 fs/read_write.c:738
+    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+    do_syscall_64+0xa4/0xf80 arch/x86/entry/syscall_64.c:94
+    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+BUG: memory leak
+unreferenced object 0xffff888109688800 (size 240):
+  comm "syz.0.19", pid 6094, jiffies 4294943098
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 40 c2 10 81 88 ff ff 00 00 00 00 00 00 00 00  .@..............
+  backtrace (crc 4b7eec9d):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4958 [inline]
+    slab_alloc_node mm/slub.c:5263 [inline]
+    kmem_cache_alloc_noprof+0x3b4/0x590 mm/slub.c:5270
+    __build_skb+0x23/0x60 net/core/skbuff.c:474
+    build_skb+0x20/0x190 net/core/skbuff.c:490
+    __tun_build_skb drivers/net/tun.c:1541 [inline]
+    tun_build_skb+0x4a1/0xa40 drivers/net/tun.c:1636
+    tun_get_user+0xc12/0x2030 drivers/net/tun.c:1770
+    tun_chr_write_iter+0x71/0x120 drivers/net/tun.c:1999
+    new_sync_write fs/read_write.c:593 [inline]
+    vfs_write+0x45d/0x710 fs/read_write.c:686
+    ksys_write+0xa7/0x170 fs/read_write.c:738
+    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+    do_syscall_64+0xa4/0xf80 arch/x86/entry/syscall_64.c:94
+    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+connection error: failed to recv *flatrpc.ExecutorMessageRawT: EOF
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
