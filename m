@@ -1,239 +1,204 @@
-Return-Path: <netdev+bounces-249127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B1EDD14A74
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 19:04:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EEB28D14AA4
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 19:07:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 147AC30DC304
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 18:00:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BB9A030935CA
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 18:04:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FDD837F75E;
-	Mon, 12 Jan 2026 18:00:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7232B3803FD;
+	Mon, 12 Jan 2026 18:04:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="feB0lBBc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G3tdV0YV";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jhd2Aqry"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 355E22749C7;
-	Mon, 12 Jan 2026 18:00:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB6D3803FC
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 18:04:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768240812; cv=none; b=MdVsoSNeyl0vxmYPE3UuN9S7qQFMh5SVszACwn1OjrN0YCoKu8UJQW38hpPi2WuuuRgWCRFqUQCEsTehPL4hwhyjZDScYupBQPSCLSCFcPZD4YUNauD9y2K3Uwsm5MKVF+9ccX+bKNjk0tflayntGYdBDgpFrE4975LlpnUnDVE=
+	t=1768241050; cv=none; b=uKSJz/lY8FG45ox/w5uqkQitxvzMIi9c1ztBNPFZTeFMDquJoazfa0KjWuXXCILEQ7HTY35nxeie5udlKg5bKxJcdxoMAdkwwVCtHcpg7VrAjtGGhkgT1wlHzeYskdXAK44NefgM3hWqpNSNnqlewHRTFL4dy+jxGW5AGgHh9zc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768240812; c=relaxed/simple;
-	bh=mGbofIjwnm9caXWlIFuD+vvkQiRMHg0CWCn2+iWjokQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZYFiooY0b1a/i6UV9W/Jo7nfz2yNL0fO9jAgK+zkV8vpQXMDDQMITwx/J2Eh6q1rdqmydYkEY6cWFDtleelSANRcPJRydhws7DBw/0NRxpkOZZwAsx3uLaPpmexn2bSd2N3qG273KlN3H4dFkXDwFZkzE/VzOH2fUMrLsZ45Tro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=feB0lBBc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB923C16AAE;
-	Mon, 12 Jan 2026 18:00:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768240811;
-	bh=mGbofIjwnm9caXWlIFuD+vvkQiRMHg0CWCn2+iWjokQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=feB0lBBcPjMm6TcLwyV7ebbxAv/YTwcCPMIuU2dVmvhL5mGCrIawtev3cma1EX2dA
-	 gimcge4/rXibL+oI/bA4/8WLwnYBQjmUWgdqxGK+z6QcoubI5S8MGhmHsN6RGU3I0m
-	 bOaihftKwYyTpOxlZre+emHgYCTF4qUVx3nrUpVhTKwciuti+mwHDDCK+Uudv2JTSh
-	 R6RBys8rz+B/35nVnKrzi3MKeFCyoNWx7MF7/pgVShpqzu4mBxe+J9/cv0NwkEif1g
-	 VG+WPfM/JevSndphvgNzv7J2+6JAdWpT5GxWT+B4lRohyxUT14oeDlYMchDvMoo1+A
-	 VALVB9TuQpPSg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: bartosz.golaszewski@oss.qualcomm.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	jbrunet@baylibre.com,
-	linux-stm32@st-md-mailman.stormreply.com,
-	devicetree@vger.kernel.org,
-	neil.armstrong@linaro.org,
-	unicorn_wang@outlook.com,
-	andrew+netdev@lunn.ch,
-	vkoul@kernel.org,
-	peppe.cavallaro@st.com,
-	jernej.skrabec@gmail.com,
-	samin.guo@starfivetech.com,
-	david.wu@rock-chips.com,
-	christophe.roullier@foss.st.com,
-	linux-amlogic@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	martin.blumenstingl@googlemail.com,
-	robh@kernel.org,
-	linux-imx@nxp.com,
-	andersson@kernel.org,
-	joabreu@synopsys.com,
-	s32@nxp.com,
-	swathi.ks@samsung.com,
-	konradybcio@kernel.org,
-	krzk+dt@kernel.org,
-	keguang.zhang@gmail.com,
-	kernel@pengutronix.de,
-	romain.gantois@bootlin.com,
-	brgl@kernel.org,
-	sophgo@lists.linux.dev,
-	netdev@vger.kernel.org,
-	xiaoning.wang@nxp.com,
-	imx@lists.linux.dev,
-	dfustini@tenstorrent.com,
-	davem@davemloft.net,
-	jan.petrous@oss.nxp.com,
-	magnus.damm@gmail.com,
-	lizhi2@eswincomputing.com,
-	linux-sunxi@lists.linux.dev,
-	linux-mips@vger.kernel.org,
-	vineetha.g.jaya.kumaran@intel.com,
-	matthew.gerlach@altera.com,
-	wefu@redhat.com,
-	geert+renesas@glider.be,
-	edumazet@google.com,
-	linux-kernel@vger.kernel.org,
-	Frank.Li@nxp.com,
-	conor+dt@kernel.org,
-	mripard@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kernel@esmil.dk,
-	linux-renesas-soc@vger.kernel.org,
-	alexandre.torgue@foss.st.com,
-	inochiama@gmail.com,
-	minda.chen@starfivetech.com,
-	s.hauer@pengutronix.de,
-	nobuhiro.iwamatsu.x90@mail.toshiba,
-	prabhakar.mahadev-lad.rj@bp.renesas.com,
-	fustini@kernel.org,
-	richardcochran@gmail.com,
-	pabeni@redhat.com,
-	shawnguo@kernel.org,
-	wens@kernel.org,
-	heiko@sntech.de,
-	guoren@kernel.org,
-	weishangjuan@eswincomputing.com,
-	mcoquelin.stm32@gmail.com,
-	khilman@baylibre.com,
-	festevam@gmail.com,
-	liangshuang@eswincomputing.com,
-	krzysztof.kozlowski@oss.qualcomm.com,
-	linux-arm-msm@vger.kernel.org,
-	konrad.dybcio@oss.qualcomm.com,
-	linux-rockchip@lists.infradead.org,
-	samuel@sholland.org
-Subject: Re: [RESEND,net-next,v6,7/7] net: stmmac: qcom-ethqos: add support for sa8255p
-Date: Mon, 12 Jan 2026 10:00:05 -0800
-Message-ID: <20260112180005.4144056-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260112-qcom-sa8255p-emac-v6-7-86a3d4b2ad83@oss.qualcomm.com>
-References: <20260112-qcom-sa8255p-emac-v6-7-86a3d4b2ad83@oss.qualcomm.com>
+	s=arc-20240116; t=1768241050; c=relaxed/simple;
+	bh=Iavh03TY5rGjXb0qFvEJfW6qnYQtMHWYb1cCMI4+Vo4=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=kLuolK/68eGju2kkKGDADXcLhigIAr31IFU3tkmBzrXMgWmRgATFv0npgRhYN0AMIVa/mDb+kUhZsG30EGAg8bJrbj31P3mEaWkaI+PfAuDmdNTwuv865hcek+pwudklRc/VCfPAD2uCl0qS/edYnfXoj4t/Eb+tnzj5jDnW++M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G3tdV0YV; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jhd2Aqry; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768241047;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nGMJ5LbPFmGC8KsyFzZBiUpjaLMx+kfqn+JlgSdWn4Q=;
+	b=G3tdV0YVtqaZwU/JxwnYc7Pp5q1DkKKKOoXWkACh1xDZ4iPa5Rja7dfrzXZpzQl2L9rVdj
+	4NLSAlA4bjuX9iXkgWRrTWuZL07GzrBLGwko3WiK5CSMf+sUE1zF7UeWmebqNAd3sNpqwn
+	+FSTFuL6ASosclHEH11O69TSgcok4Kw=
+Received: from mail-vk1-f198.google.com (mail-vk1-f198.google.com
+ [209.85.221.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-624-XRBpfJ80PAuwvvE0nuKMsA-1; Mon, 12 Jan 2026 13:04:05 -0500
+X-MC-Unique: XRBpfJ80PAuwvvE0nuKMsA-1
+X-Mimecast-MFC-AGG-ID: XRBpfJ80PAuwvvE0nuKMsA_1768241045
+Received: by mail-vk1-f198.google.com with SMTP id 71dfb90a1353d-5635d2bec8bso9103643e0c.0
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 10:04:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1768241045; x=1768845845; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=nGMJ5LbPFmGC8KsyFzZBiUpjaLMx+kfqn+JlgSdWn4Q=;
+        b=Jhd2Aqryx6Ox2MJbtXyvKBOpO43V8dczTEH0pP7Yh1mQFQJNTZUQUvOPahfuDbvpDw
+         47KE+d/IK64MrNdI86dhLQkM6t6/cMoaPHWjpCtGcrBipKe7D9zTqQAtNwAZIFpDdzQ/
+         2UxXz1F52L5SXl8QP6mzAaJ5i8j9/HMovFu3uAYs3d4Ps5reYCgMfsGHrJCkfZkcwXH6
+         NBsQLjMk71ELOAnpTXLG6m0LNp1PdEDOms8b9dZ1iMTIoUfGp8DwCZJIeFic5UjAVRfx
+         Ef+MMZXvlBOUxrBgw1qI2TI5B/SNx0LsE1yrDyts9JiVSbSncvqMFsJc0nDxwybhchfo
+         HTFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768241045; x=1768845845;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nGMJ5LbPFmGC8KsyFzZBiUpjaLMx+kfqn+JlgSdWn4Q=;
+        b=i3TtEo7hZ/uKSUZv+34l75FIJmAYB353jzQHGS/ie9oUb71dO0pi7ljFwuwPDWj/xA
+         7zY5TSnARLBgApIl3FMlMbC21Nxr8+AYMNnXEMXIF1KsiEmXL+6/MfwjMW1WOTYJgKjs
+         ZoUU1hgcEDXWBoFW3wsXYoJ0NmLuevm/d9HWjo6ecSUoVz+jEWVB5x/288laIJZVfg/W
+         SGgzV3vycfq6Y6MjAdfc2RzTk0rpplE7OhevO08a78WPVs01aUI9+sLvqM+LhJWnlQ4x
+         cnsigfBZB5GVhrKbRduGUlyveE3k54Uk7HOUAJDKaNo6TNOS+agBbynyxlUEPxn8IjF2
+         pyig==
+X-Forwarded-Encrypted: i=1; AJvYcCWdVt+TfC3bL8Gxt//e0qRIMGRDHxQGf6uRtUix9KuJy7P7+/rLVzs1yfnEL4qJXaV3t8HWT0c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwabXR8yJZLqJ1VVDZa+q2hgT5pWrMwnoh2K9hFCFajvnMRaTW6
+	CjKknzid412aOTHHKxm3JEqeV08xx4HSNFOSTRrKeUTaZmdt+RzY5BmN5THvePDBHvz9P/4NM8w
+	d/gdU2+BeiVViiO93vIVKAn4Rga1Ky7nyfvpnbndV6VrZGDW/01Mqh4Aehg==
+X-Gm-Gg: AY/fxX5kCy+fs1/H+vbeJs+XahZKDu8b5HTFP1JNCq5RgBW371H2AJN53ycdfhhcU/w
+	+W1HdttoNKoAeSY0KokedM0A649B2qiKUoUZuEzPvYT9Sl8O8LIoe6bglMi4ZaqSYNIYEEJDikt
+	NNkjH2suHnPXPj//8ynPEII4QFGpUJm6YpFbED2ywnx8NHKM2DOFAYNR+Nfkcr8II2FvfAuxki7
+	o8MGoDT/a0ozDZ6yacZUcJuHYD6Mnvd/8AIkX8olu7qBuLJzx/DUGT521bDO9hNScuqugGFARFG
+	T0GbxPergkP90rFrpRKgYZJoqVf0U9vJ3TgCRloIsYaE3ekfFKVhHOnyABjBeIAPUV0SWIKOMRU
+	gAHh/sJl5UUBKwCVw2oI5zfMeBPXeotJ5u7W55qyfXgN/h0RrXOifxx78
+X-Received: by 2002:a05:6122:4897:b0:563:7886:5e7a with SMTP id 71dfb90a1353d-563788663a0mr2842022e0c.9.1768241044907;
+        Mon, 12 Jan 2026 10:04:04 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHM6+Ba4s/MEV+9Zbgj4Jf91uX/qo/VCXWtL6yFKP9LvZ7kJD7E9gBdpreY2pV75Zsq8xOxKw==
+X-Received: by 2002:a05:6122:4897:b0:563:7886:5e7a with SMTP id 71dfb90a1353d-563788663a0mr2841898e0c.9.1768241043068;
+        Mon, 12 Jan 2026 10:04:03 -0800 (PST)
+Received: from ?IPV6:2601:188:c102:b180:1f8b:71d0:77b1:1f6e? ([2601:188:c102:b180:1f8b:71d0:77b1:1f6e])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-563667cf148sm10043559e0c.2.2026.01.12.10.03.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Jan 2026 10:04:02 -0800 (PST)
+From: Waiman Long <llong@redhat.com>
+X-Google-Original-From: Waiman Long <longman@redhat.com>
+Message-ID: <c1cac1a6-22fe-479f-bfc5-89a5d3aabda5@redhat.com>
+Date: Mon, 12 Jan 2026 13:03:47 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 05/33] sched/isolation: Save boot defined domain flags
+To: Frederic Weisbecker <frederic@kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>
+Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Chen Ridong <chenridong@huawei.com>, Danilo Krummrich <dakr@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+ Lai Jiangshan <jiangshanlai@gmail.com>,
+ Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
+ <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+ Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
+ Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Vlastimil Babka <vbabka@suse.cz>, Will Deacon <will@kernel.org>,
+ cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-block@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20260101221359.22298-1-frederic@kernel.org>
+ <20260101221359.22298-6-frederic@kernel.org>
+Content-Language: en-US
+In-Reply-To: <20260101221359.22298-6-frederic@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least pausible.
-
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-net: stmmac: qcom-ethqos: add support for sa8255p
-
-This commit adds support for the SA8255P SoC which uses power domains
-managed via SCMI firmware, rather than the traditional clock/phy-based
-power management used by other variants.
-
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> index 8ba57bba3f2e..54f8ef3cfd7d 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-
-[ ... ]
-
-> +static void ethqos_disable_serdes(void *data)
-> +{
-> +	struct qcom_ethqos *ethqos = data;
-> +
-> +	qcom_ethqos_domain_on(ethqos, ETHQOS_PD_SERDES);
-                          ^^
-
-Should this be qcom_ethqos_domain_off() instead of qcom_ethqos_domain_on()?
-
-This function is registered as a cleanup action via devm_add_action_or_reset()
-to undo the qcom_ethqos_domain_on(ETHQOS_PD_SERDES) call during probe. Using
-domain_on here would increment the PM runtime usage counter again rather than
-decrementing it. The serdes power domain would never be properly turned off
-on driver removal.
-
-Compare with qcom_ethqos_pd_serdes_powerdown() which correctly uses
-qcom_ethqos_domain_off().
-
-> +}
-
-[ ... ]
-
-> +static int qcom_ethqos_pd_init(struct device *dev, void *priv)
-> +{
-> +	struct qcom_ethqos *ethqos = priv;
-> +	int ret;
-> +
-> +	/*
-> +	 * Enable functional clock to prevent DMA reset after timeout due
-> +	 * to no PHY clock being enabled after the hardware block has been
-> +	 * power cycled. The actual configuration will be adjusted once
-> +	 * ethqos_fix_mac_speed() is called.
-> +	 */
-> +	ethqos_set_func_clk_en(ethqos);
-> +
-> +	ret = qcom_ethqos_domain_on(ethqos, ETHQOS_PD_CORE);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = qcom_ethqos_domain_on(ethqos, ETHQOS_PD_MDIO);
-> +	if (ret) {
-> +		qcom_ethqos_domain_off(ethqos, ETHQOS_PD_CORE);
-> +		return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-
-[ ... ]
-
->  	if (pm_data && pm_data->use_domains) {
->  		ethqos->set_serdes_speed = ethqos_set_serdes_speed_pd;
+On 1/1/26 5:13 PM, Frederic Weisbecker wrote:
+> HK_TYPE_DOMAIN will soon integrate not only boot defined isolcpus= CPUs
+> but also cpuset isolated partitions.
 >
-> +		ret = devm_pm_domain_attach_list(dev, &pm_data->pd,
-> +						 &ethqos->pd.pd_list);
-> +		if (ret < 0)
-> +			return dev_err_probe(dev, ret, "Failed to attach power domains\n");
-> +
-> +		plat_dat->clks_config = ethqos_pd_clks_config;
-> +		plat_dat->serdes_powerup = qcom_ethqos_pd_serdes_powerup;
-> +		plat_dat->serdes_powerdown = qcom_ethqos_pd_serdes_powerdown;
-> +		plat_dat->exit = qcom_ethqos_pd_exit;
-> +		plat_dat->init = qcom_ethqos_pd_init;
-                             ^^^^^^^^^^^^^^^^^^^^^^^
+> Housekeeping still needs a way to record what was initially passed
+> to isolcpus= in order to keep these CPUs isolated after a cpuset
+> isolated partition is modified or destroyed while containing some of
+> them.
+>
+> Create a new HK_TYPE_DOMAIN_BOOT to keep track of those.
+>
+> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> Reviewed-by: Phil Auld <pauld@redhat.com>
+> ---
+>   include/linux/sched/isolation.h | 4 ++++
+>   kernel/sched/isolation.c        | 5 +++--
+>   2 files changed, 7 insertions(+), 2 deletions(-)
+>
+> diff --git a/include/linux/sched/isolation.h b/include/linux/sched/isolation.h
+> index d8501f4709b5..c7cf6934489c 100644
+> --- a/include/linux/sched/isolation.h
+> +++ b/include/linux/sched/isolation.h
+> @@ -7,8 +7,12 @@
+>   #include <linux/tick.h>
+>   
+>   enum hk_type {
+> +	/* Inverse of boot-time isolcpus= argument */
+> +	HK_TYPE_DOMAIN_BOOT,
+>   	HK_TYPE_DOMAIN,
+> +	/* Inverse of boot-time isolcpus=managed_irq argument */
+>   	HK_TYPE_MANAGED_IRQ,
+> +	/* Inverse of boot-time nohz_full= or isolcpus=nohz arguments */
+>   	HK_TYPE_KERNEL_NOISE,
+>   	HK_TYPE_MAX,
+>   
+> diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
+> index 3ad0d6df6a0a..11a623fa6320 100644
+> --- a/kernel/sched/isolation.c
+> +++ b/kernel/sched/isolation.c
+> @@ -11,6 +11,7 @@
+>   #include "sched.h"
+>   
+>   enum hk_flags {
+> +	HK_FLAG_DOMAIN_BOOT	= BIT(HK_TYPE_DOMAIN_BOOT),
+>   	HK_FLAG_DOMAIN		= BIT(HK_TYPE_DOMAIN),
+>   	HK_FLAG_MANAGED_IRQ	= BIT(HK_TYPE_MANAGED_IRQ),
+>   	HK_FLAG_KERNEL_NOISE	= BIT(HK_TYPE_KERNEL_NOISE),
+> @@ -239,7 +240,7 @@ static int __init housekeeping_isolcpus_setup(char *str)
+>   
+>   		if (!strncmp(str, "domain,", 7)) {
+>   			str += 7;
+> -			flags |= HK_FLAG_DOMAIN;
+> +			flags |= HK_FLAG_DOMAIN | HK_FLAG_DOMAIN_BOOT;
+>   			continue;
+>   		}
+>   
+> @@ -269,7 +270,7 @@ static int __init housekeeping_isolcpus_setup(char *str)
+>   
+>   	/* Default behaviour for isolcpus without flags */
+>   	if (!flags)
+> -		flags |= HK_FLAG_DOMAIN;
+> +		flags |= HK_FLAG_DOMAIN | HK_FLAG_DOMAIN_BOOT;
+>   
+>   	return housekeeping_setup(str, flags);
+>   }
+Reviewed-by: Waiman Long <longman@redhat.com>
 
-> +		plat_dat->clk_ptp_rate = pm_data->clk_ptp_rate;
-> +
-> +		ret = qcom_ethqos_pd_init(dev, ethqos);
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Is qcom_ethqos_pd_init() being called twice?
-
-It is assigned to plat_dat->init above, and then called directly here. Later,
-devm_stmmac_pltfr_probe() -> stmmac_pltfr_probe() -> stmmac_dvr_probe() will
-call plat_dat->init() again (see stmmac_main.c stmmac_dvr_probe function).
-
-Each call to qcom_ethqos_pd_init() increments the PM runtime usage counter
-for ETHQOS_PD_CORE and ETHQOS_PD_MDIO via pm_runtime_resume_and_get(). With
-two calls, the refcount would be 2 for each domain, but qcom_ethqos_pd_exit()
-only decrements once per domain. This would leave the power domains with a
-dangling reference.
-
-Perhaps the direct call to qcom_ethqos_pd_init() here should be removed, and
-let stmmac_dvr_probe() invoke it through the plat_dat->init callback?
-
-> +		if (ret)
-> +			return ret;
-
-[ ... ]
 
