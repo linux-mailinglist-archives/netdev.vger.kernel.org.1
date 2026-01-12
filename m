@@ -1,531 +1,206 @@
-Return-Path: <netdev+bounces-249176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9637D15537
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 21:51:52 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EA8AD15549
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 21:53:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C13923016EDF
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 20:51:40 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0351330049EA
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 20:53:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFF8F33986F;
-	Mon, 12 Jan 2026 20:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E61433986F;
+	Mon, 12 Jan 2026 20:53:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZJGrNG4a"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZmqqOUJV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B8535C1A9
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 20:51:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D097033BBD2
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 20:53:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768251098; cv=none; b=X7Bm0iuyRYQ+5Ddr3d3H7wbxQhAQTAuqy7G7HP1dyd0px+MJPpA+RQiKAcU791k5djtcuhAFx2r7oZJwpDU01vs4HbYk+feS9Oy6C0l0WLIhQAjvKqlRsvEczqRboHoRqQGl7sb1Pfg2odImIqt7R7S4nFh12dCSUBIHGT5DXHU=
+	t=1768251196; cv=none; b=Nh8O0wcx8aoSZjdQ+E7/0Je08xbmJOsJeWji+sWWs8JTFlgxtlKRGA6xXVTq+m3xBgl4dsO63q1Ro646MIPdsn9vsu/fcm40A3V+X+gyGLVuRdkH0GSwdpRbGGgol+MWDuOP8xrAKRZJcCZndZsCHEBYwUItOdw93dTcn6brBWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768251098; c=relaxed/simple;
-	bh=q/1Vdn/mRuXZMfBrJGr6NN+UJULjFY21F+jYLeMz3KY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rhKNwBN4OhXeZOLoj+J2vCQMzrN9YPhyzocUT36wRDctaEgcVJkonm7xKBACqaFALGNbnOGA2zGrAfruvnST0Vc8ytRR8WtyVE78GOYL8J9emfiCdFpIPIQWJYxTVmpIH+wDv8/seQ1mcKwmqGBUhzvEwVnD/W/4CJj2scXw/2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZJGrNG4a; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768251084;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HkDq8Wa5YosiITgIkvPkZk3Pfc4bnZiJ9sn2hq2y/Po=;
-	b=ZJGrNG4a/biit97pOB0u1Xdjub2m7+uklbzJLFlJD0vjGDyXwt1+fgiGVe0G+8r1DJ1U1F
-	xca6AyTVG/adBaJySBTf/YPZPt/TX0NwCGKTTUQiDzjgU/mpptd1kReHwPdvTUDkuDppDM
-	o0rNhGWBZqQ1CPIawxiw/udNH9G7pBA=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-322-5fWRby7ZMiG0z5_1I16eMQ-1; Mon,
- 12 Jan 2026 15:51:23 -0500
-X-MC-Unique: 5fWRby7ZMiG0z5_1I16eMQ-1
-X-Mimecast-MFC-AGG-ID: 5fWRby7ZMiG0z5_1I16eMQ_1768251080
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8C9EF1954B0C;
-	Mon, 12 Jan 2026 20:51:20 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.212])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D14F61800577;
-	Mon, 12 Jan 2026 20:51:17 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Shuah Khan <shuah@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Subject: [PATCH v2 net-next 10/10] selftests: net: tests for add double tunneling GRO/GSO
-Date: Mon, 12 Jan 2026 21:50:26 +0100
-Message-ID: <df77a82818890a3cd4a0d68d65d2dbab22a5eae7.1768250796.git.pabeni@redhat.com>
-In-Reply-To: <cover.1768250796.git.pabeni@redhat.com>
-References: <cover.1768250796.git.pabeni@redhat.com>
+	s=arc-20240116; t=1768251196; c=relaxed/simple;
+	bh=2f2JZeVGWCW6MseXjXSM2VcjS00tFAddsU9KnOxeaeg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=frBmUgbvFnF+0GUx6X+wp+CnP3eqqnL/Z7fYlSXI/2v9irmJfgjoJYhhqJz/UowGnev50WWATQdr34A8K5NdxIhJnPrzGFc8JL2kM6qXdeMY7+xycDPtrdZ95DTi4NrgvphxoBfxlXRYkT+bpKm1jX+KSwcBlmm2IXTY+bhgqIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZmqqOUJV; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b86f212c3b0so351818766b.0
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 12:53:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768251193; x=1768855993; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=6OT3Y3o4F52r4hCTWjlx3c+S7vYLsCoyZBNF3ULoc70=;
+        b=ZmqqOUJV3X4LwHQxNm8JyRT7XheHOLOiUMapGQm5tXtgKc6nTwL/WpYMIbItzhDfU5
+         /PYgYwSCSS4HqX9AvO4rPpGUQG7i4mfjhLxF76XAQVjRFArkHy71TfKalx92+vmjizd+
+         A14VTTVd/ZlpZQ7/VQHOlxWAY5JKT4d0t5vqXOJsD2FOqvfsUsP7s4/n8mKQjTliAP2j
+         7tzNE9ORpaRh4bJksOFKWO1Jx/GOmqBYd4DCLEwJ7rod+la7BFVGABLTZ7+7p4EX1n+/
+         KW+LnP/Uy5M1Ovz5Ytb7jcPSslxAlC1yNiS84dInO2hgiBSzhZYCO9G6ATEYq/FIaaZZ
+         kA3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768251193; x=1768855993;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6OT3Y3o4F52r4hCTWjlx3c+S7vYLsCoyZBNF3ULoc70=;
+        b=wTln61pnJpJ/L5tGTJLi2GvveNdqY5ehkrtoFcuYEZ5zQ4CyWhDV2xJZnJdl5WtmPT
+         v6jEbNoPVHPkpHmP5thbMoBNganISV9O/01M4utTHlfPvsFuZhDfaYmvv4TMjFcCiXAv
+         BDkREHq27pb6J6ZFSqzTl6Nw3c+ZcWiLa2sBkhVzRksjxnT4nYNLKmC86cDSKx9kCG+u
+         eRM2Fck9fDjrdq33eUKfBeDdgfMGaB7iPv3pE3vrUKI8xQZtBnleeze3YLzFL7K7/jnX
+         0pilGkXPbiqlumPcKN5YpdBSNx7Ltz673BRMODTOeIKSyz7NNpo0xeAGl4+NTZ1jkpFY
+         Bz8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWkk42wL2CgdtXasNFKpZ95So8j7D6i/05SoeLYtHleIcrZRzB5nc1MPwmWCvWJrDNK3v8l/NM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyqk6hJRlTAf3D6oKsrQ8w/+Ytl3oIS+E2InlkXv5uwNPGFFk+w
+	/lFK7jVivpd8lQE3bHq5cT3JkcbK+Ii5dyGLcbH9VNCEPPSsjVINEjFT
+X-Gm-Gg: AY/fxX5R7Ik4Uk6ncYwwYX+0pl5zSFaCxk6GfwmZ2HPGAIBsascq18SbBsTTacoTXC2
+	htszk+JZQKkiAgt7gGCYvLXIz+DoVo+W/2GC2LBW/QUfsQx7MBHFuFoH6cQqc71dsW8J40H03F1
+	LemzVVCHV/gxXTmNCFJ398bH97dlgGkTNaVFaCtyj5RVDaHY2X5y+Yim0pe3RnXecJi7KMO+lua
+	drVGF9jZ4aPU7EYS/Xcg7PVCYmnisd9LqBafQEmwWHNUbseZ895Dr4FVrP/CbzevpmG0ff75rRM
+	UevG4ntE7Op8GfzvuvCAIE0cZqGXLpyzU6KmGJjKll11+cmfu2r5FhwfFSET+POboqyQo6q0Kdl
+	3PcwI7/E0MsBcbFs9y37bK6VfK20Wo6j//tbN4++fUDQtPkaxTnYDTRHprO1JQEuciYKeLa31jh
+	UqFSTF3Lb/2AcJiutKjbQzcTOI5JQccjTnQvL+
+X-Received: by 2002:a17:907:9404:b0:b87:17f6:6f12 with SMTP id a640c23a62f3a-b87355c8cf1mr65261766b.1.1768251193006;
+        Mon, 12 Jan 2026 12:53:13 -0800 (PST)
+Received: from localhost (ip87-106-108-193.pbiaas.com. [87.106.108.193])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b842a4d1c6csm1959967466b.39.2026.01.12.12.53.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jan 2026 12:53:12 -0800 (PST)
+Date: Mon, 12 Jan 2026 21:53:08 +0100
+From: =?iso-8859-1?Q?G=FCnther?= Noack <gnoack3000@gmail.com>
+To: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
+	Justin Suess <utilityemal77@gmail.com>
+Cc: Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E . Hallyn" <serge@hallyn.com>,
+	linux-security-module@vger.kernel.org, Tingmao Wang <m@maowtm.org>,
+	Samasth Norway Ananda <samasth.norway.ananda@oracle.com>,
+	Matthieu Buffet <matthieu@buffet.re>,
+	Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>,
+	konstantin.meskhidze@huawei.com,
+	Demi Marie Obenour <demiobenour@gmail.com>,
+	Alyssa Ross <hi@alyssa.is>, Jann Horn <jannh@google.com>,
+	Tahera Fahimi <fahimitahera@gmail.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>
+Subject: Re: [PATCH v2 0/5] landlock: Pathname-based UNIX connect() control
+Message-ID: <20260112.a7f8e16a6573@gnoack.org>
+References: <20260110143300.71048-2-gnoack3000@gmail.com>
+ <20260112.Wufar9coosoo@digikod.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+In-Reply-To: <20260112.Wufar9coosoo@digikod.net>
 
-Create a simple, netns-based topology with double, nested UDP tunnels and
-perform TSO transfers on top.
+Thanks for the review!
 
-Explicitly enable GSO and/or GRO and check the skb layout consistency with
-different configuration allowing (or not) GSO frames to be delivered on
-the other end.
+On Mon, Jan 12, 2026 at 05:08:02PM +0100, Mickaël Salaün wrote:
+> On Sat, Jan 10, 2026 at 03:32:55PM +0100, Günther Noack wrote:
+> > ## Alternatives and Related Work
+> > 
+> 
+> > ### Alternative: Use existing LSM hooks
+> > 
+> > The existing hooks security_unix_stream_connect(),
+> > security_unix_may_send() and security_socket_connect() do not give
+> > access to the resolved file system path.
+> > 
+> > Resolving the file system path again within Landlock would in my
+> > understanding produce a TOCTOU race, so making the decision based on
+> > the struct sockaddr_un contents is not an option.
+> > 
+> > It is tempting to use the struct path that the listening socket is
+> > bound to, which can be acquired through the existing hooks.
+> > Unfortunately, the listening socket may have been bound from within a
+> > different namespace, and it is therefore a path that can not actually
+> > be referenced by the sandboxed program at the time of constructing the
+> > Landlock policy.  (More details are on the Github issue at [6] and on
+> > the LKML at [9]).
+> 
+> Please move (or duplicate) this rationale in the patch dedicated to the
+> new hook.  It helps patch review (and to understand commits when already
+> merged).
 
-The trickest part is account in a robust way the aggregated/unaggregated
-packets with double encapsulation: use a classic bpf filter for it.
+Justin, would you like to look into this?
+Please feel free to copy the wording.
 
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
-v1 -> v2:
-  - fixed a few shellcheck issues
-  - added bpf filter to improve accounting
----
- tools/testing/selftests/net/Makefile          |   1 +
- tools/testing/selftests/net/config            |   1 +
- .../testing/selftests/net/double_udp_encap.sh | 394 ++++++++++++++++++
- 3 files changed, 396 insertions(+)
- create mode 100755 tools/testing/selftests/net/double_udp_encap.sh
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index b66ba04f19d9..063155f42cd7 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -22,6 +22,7 @@ TEST_PROGS := \
- 	cmsg_so_mark.sh \
- 	cmsg_so_priority.sh \
- 	cmsg_time.sh \
-+	double_udp_encap.sh \
- 	drop_monitor_tests.sh \
- 	fcnal-ipv4.sh \
- 	fcnal-ipv6.sh \
-diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
-index 1e1f253118f5..61b866dca311 100644
---- a/tools/testing/selftests/net/config
-+++ b/tools/testing/selftests/net/config
-@@ -76,6 +76,7 @@ CONFIG_NET_DROP_MONITOR=m
- CONFIG_NETFILTER=y
- CONFIG_NETFILTER_ADVANCED=y
- CONFIG_NETFILTER_XTABLES_LEGACY=y
-+CONFIG_NETFILTER_XT_MATCH_BPF=m
- CONFIG_NETFILTER_XT_MATCH_LENGTH=m
- CONFIG_NETFILTER_XT_MATCH_POLICY=m
- CONFIG_NETFILTER_XT_NAT=m
-diff --git a/tools/testing/selftests/net/double_udp_encap.sh b/tools/testing/selftests/net/double_udp_encap.sh
-new file mode 100755
-index 000000000000..055f65b4d18d
---- /dev/null
-+++ b/tools/testing/selftests/net/double_udp_encap.sh
-@@ -0,0 +1,394 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+source lib.sh
-+
-+# shellcheck disable=SC2155 # prefer RO variable over return value from cmd
-+readonly CLI="$(dirname "$(readlink -f "$0")")/../../../net/ynl/pyynl/cli.py"
-+
-+readonly SRC=1
-+readonly DST=2
-+
-+readonly NET_V4=192.168.1.
-+readonly NET_V6=2001:db8::
-+readonly OL1_NET_V4=172.16.1.
-+readonly OL1_NET_V6=2001:db8:1::
-+readonly OL2_NET_V4=172.16.2.
-+readonly OL2_NET_V6=2001:db8:2::
-+
-+trap cleanup_all_ns EXIT
-+
-+# shellcheck disable=SC2329 # can't figure out usage trough a variable
-+is_ipv6() {
-+	if [[ $1 =~ .*:.* ]]; then
-+		return 0
-+	fi
-+	return 1
-+}
-+
-+# shellcheck disable=SC2329 # can't figure out usage trough a variable
-+create_gnv_endpoint() {
-+	local -r netns=$1
-+	local -r bm_rem_addr=$2
-+	local -r gnv_dev=$3
-+	local -r gnv_id=$4
-+	local opts=$5
-+	local gnv_json
-+	local rem
-+
-+	if is_ipv6 "$bm_rem_addr"; then
-+		rem=remote6
-+	else
-+		rem=remote
-+	fi
-+
-+	# add ynl opt separator, if needed
-+	[ -n "$opts" ] && opts=", $opts"
-+
-+	gnv_json="{ \"id\": $gnv_id, \"$rem\": \"$bm_rem_addr\"$opts }"
-+	ip netns exec "$netns" "$CLI" --family rt-link --create --excl \
-+		--do newlink  --json "{\"ifname\": \"$gnv_dev\",
-+				       \"linkinfo\": {\"kind\":\"geneve\",
-+				       \"data\": $gnv_json } }" > /dev/null
-+	ip -n "$netns" link set dev "$gnv_dev" up
-+}
-+
-+# shellcheck disable=SC2329 # can't figure out usage trough a variable
-+create_vxlan_endpoint() {
-+	local -r netns=$1
-+	local -r bm_rem_addr=$2
-+	local -r vxlan_dev=$3
-+	local -r vxlan_id=$4
-+	local -r opts_str=$5
-+	local oldifs
-+	local -a opts
-+	local opt
-+
-+	# convert the arguments from yaml format
-+	oldifs=$IFS
-+	IFS=','
-+	for opt in $opts_str; do
-+		local pattern='"port":'
-+
-+		[ -n "$opt" ] || continue
-+
-+		opts+=("${opt/$pattern*/dstport}" "${opt/$pattern/}")
-+	done
-+	IFS=$oldifs
-+	[ ${#opts[@]} -gt 0 ] || opts+=("dstport" "4789")
-+
-+	ip -n "$netns" link add "$vxlan_dev" type vxlan id "$vxlan_id" \
-+		remote "$bm_rem_addr" "${opts[@]}"
-+	ip -n "$netns" link set dev "$vxlan_dev" up
-+}
-+
-+create_ns() {
-+	local nested_opt='"port":6082'
-+	local create_endpoint
-+	local options="$1"
-+	local feature
-+	local dev
-+	local id
-+	local ns
-+
-+	RET=0
-+
-+	#  +-------------+    +-------------+
-+	#  | NS_SRC      |    | NS_NST_DST  |
-+	#  |             |    |             |
-+	#  |   gnv_nst1  |    |  gnv_nst2   |
-+	#  |   +         |    |         +   |
-+	#  |   |         |    |         |   |
-+	#  |   +         |    |         +   |
-+	#  |  gnv1       |    |        gnv2 |
-+	#  |   +         |    |         +   |
-+	#  |   |         |    |         |   |
-+	#  |   + veth1 +--------+ veth2 +   |
-+	#  |             |    |             |
-+	#  +-------------+    +-------------+
-+
-+	setup_ns NS_SRC NS_DST
-+
-+	# concatenate caller provided options and default one
-+	[ -n "$2" ] && nested_opt="$nested_opt,$2"
-+
-+	ip link add name "veth$SRC" netns "$NS_SRC" type veth \
-+		peer name "veth$DST" netns "$NS_DST"
-+	case "$ENCAP" in
-+	vxlan)
-+		create_endpoint=create_vxlan_endpoint
-+		dev=vx
-+		;;
-+	geneve)
-+		create_endpoint=create_gnv_endpoint
-+		dev=gnv
-+		;;
-+	esac
-+
-+	id=1
-+	for ns in "${NS_LIST[@]}"; do
-+		ip -n "$ns" link set dev "veth$id" up
-+
-+		# ensure the sender can do large write just after 3whs
-+		ip netns exec "$ns" \
-+			sysctl -qw net.ipv4.tcp_wmem="4096 4194304 4194304"
-+
-+		# note that 3 - $SRC == $DST and 3 - $DST == $SRC
-+		if [ $FAMILY = "4" ]; then
-+			ip -n "$ns" addr add dev "veth$id" "$NET_V4$id/24"
-+			$create_endpoint "$ns" "$NET_V4$((3 - id))" \
-+				"$dev$id" 4 "$options"
-+			ip -n "$ns" addr add dev "$dev$id" "$OL1_NET_V4$id/24"
-+
-+			# nested tunnel devices
-+			# pmtu can't be propagated to upper layer devices;
-+			# need manual adjust
-+			$create_endpoint "$ns" "$OL1_NET_V4$((3 - id))" \
-+				"$dev"_nst"$id" 40 "$nested_opt"
-+			ip -n "$ns" addr add dev "$dev"_nst"$id" \
-+				"$OL2_NET_V4$id/24"
-+			ip -n "$ns" link set dev "$dev"_nst"$id" mtu 1392
-+		else
-+			ip -n "$ns" addr add dev "veth$id" "$NET_V6$id/64" \
-+				nodad
-+			$create_endpoint "$ns" "$NET_V6$((3 - id))" \
-+				"$dev"6"$id" 6 "$options"
-+			ip -n "$ns" addr add dev "$dev"6"$id" \
-+				"$OL1_NET_V6$id/64" nodad
-+
-+			$create_endpoint "$ns" "$OL1_NET_V6$((3 - id))" \
-+				"$dev"6_nst"$id" 60 "$nested_opt"
-+			ip -n "$ns" addr add dev "$dev"6_nst"$id" \
-+				"$OL2_NET_V6$id/64" nodad
-+			ip -n "$ns" link set dev "$dev"6_nst"$id" mtu 1352
-+		fi
-+		id=$((id+1))
-+	done
-+
-+	# enable GRO heuristic on the veth peer and ensure UDP L4 over tunnel is
-+	# actually segmented
-+	for feature in tso tx-udp_tnl-segmentation; do
-+		ip netns exec "$NS_SRC" ethtool -K "veth$SRC" \
-+			"$feature" off 2>/dev/null
-+	done
-+}
-+
-+create_ns_gso()
-+{
-+	local dev
-+
-+	create_ns "$@"
-+	if [ "$ENCAP" = "geneve" ]; then
-+		dev=gnv
-+	else
-+		dev=vx
-+	fi
-+	if [ "$FAMILY" = "4" ]; then
-+		ip netns exec "$NS_SRC" ethtool -K "$dev$SRC" \
-+			tx-gso-partial on \
-+			tx-udp_tnl-segmentation on \
-+			tx-udp_tnl-csum-segmentation on
-+	else
-+		ip netns exec "$NS_SRC" ethtool -K "$dev"6"$SRC" \
-+			tx-gso-partial on \
-+			tx-udp_tnl-segmentation on \
-+			tx-udp_tnl-csum-segmentation on
-+	fi
-+}
-+
-+create_ns_gso_gro()
-+{
-+	create_ns_gso "$@"
-+	ip netns exec "$NS_DST" ethtool -K "veth$DST" gro on
-+	ip netns exec "$NS_SRC" ethtool -K "veth$SRC" tx off >/dev/null 2>&1
-+}
-+
-+run_test() {
-+	local -r dst=$NET$DST
-+	local -r msg=$1
-+	local -r total_size=$2
-+	local -r encappkts=$3
-+	local inner_proto_offset=0
-+	local inner_maclen=14
-+	local rx_family="-4"
-+	local ipt=iptables
-+	local bpf_filter
-+	local -a rx_args
-+	local wire_pkts
-+	local rcvpkts
-+	local encl=8
-+	local dport
-+	local pkts
-+	local snd
-+
-+	if [ $FAMILY = "6" ]; then
-+		ipt=ip6tables
-+	else
-+		# rx program does not support '-6' and implies ipv6 usage by
-+		# default
-+		rx_args=("$rx_family")
-+	fi
-+
-+	# The received can only check fixed size packet
-+	pkts=$((total_size / GSO_SIZE))
-+	if [ -n "$4" ]; then
-+		wire_pkts=$4
-+	elif [ $((total_size % GSO_SIZE)) -eq 0 ]; then
-+		wire_pkts=1
-+		rx_args+=("-l" "$GSO_SIZE")
-+	else
-+		wire_pkts=2
-+		pkts=$((pkts + 1))
-+	fi
-+
-+	if [ "$ENCAP" = "geneve" ]; then
-+		dport=6081
-+	else
-+		dport=4789
-+	fi
-+
-+	# Either:
-+	# - IPv4, nested tunnel carries UDP over IPv4, with dport 6082,
-+	#   innermost is TCP over IPv4 on port 8000
-+	# - IPv6, nested tunnel carries UDP over IPv6, with dport 6082,
-+	#   innermost is TCP over IPv6 on port 8000
-+	# The nested tunnel port is 6082 and the nested encap len is 8
-+	# regardless of the encap type (no geneve opts).
-+	# In inherit protocol mode there is no nested mac hdr and the nested
-+	# l3 protocol type field belongs to the geneve hdr.
-+	[ "$USE_HINT" = true ] && encl=16
-+	[ "$INHERIT" = true ] && inner_maclen=0
-+	[ "$INHERIT" = true ] && inner_proto_offset=-4
-+	local inner=$((inner_maclen+encl))
-+	local proto=$((inner_maclen+encl+inner_proto_offset))
-+	bpf_filter=$(nfbpf_compile "(ip &&
-+		ip[$((40+encl))] == 0x08 && ip[$((41+encl))] == 0x00 &&
-+		ip[$((51+encl))] == 0x11 &&
-+		ip[$((64+encl))] == 0x17 && ip[$((65+encl))] == 0xc2 &&
-+		ip[$((76+proto))] == 0x08 && ip[$((77+proto))] == 0x00 &&
-+		ip[$((87+inner))] == 0x6 &&
-+		ip[$((100+inner))] == 0x1f && ip[$((101+inner))] == 0x40) ||
-+		(ip6 &&
-+		ip6[$((60+encl))] == 0x86 && ip6[$((61+encl))] == 0xdd &&
-+		ip6[$((68+encl))] == 0x11 &&
-+		ip6[$((104+encl))] == 0x17 && ip6[$((105+encl))] == 0xc2 &&
-+		ip6[$((116+proto))] == 0x86 && ip6[$((117+proto))] == 0xdd &&
-+		ip6[$((124+inner))] == 0x6 &&
-+		ip6[$((160+inner))] == 0x1f && ip6[$((161+inner))] == 0x40)")
-+
-+	# ignore shorts packet, to avoid arp/mld induced noise
-+	ip netns exec "$NS_SRC" "$ipt" -A OUTPUT -p udp --dport "$dport" \
-+		-m length --length 600:65535 \
-+		-m bpf --bytecode "$bpf_filter"
-+	ip netns exec "$NS_DST" "$ipt" -A INPUT -p udp --dport "$dport" \
-+		-m length --length 600:65535 \
-+		-m bpf --bytecode "$bpf_filter"
-+	ip netns exec "$NS_DST" ./udpgso_bench_rx -C 2000 -t -R 100 \
-+		-n "$pkts" "${rx_args[@]}" &
-+	local pid=$!
-+	wait_local_port_listen "$NS_DST" 8000 tcp
-+	ip netns exec "$NS_SRC" ./udpgso_bench_tx -"$FAMILY" -t -M 1 \
-+		-s "$total_size" -D "$dst"
-+	local ret=$?
-+	check_err "$ret" "client failure exit code $ret"
-+	wait "$pid"
-+	ret=$?
-+	check_err "$ret" "sever failure exit code $ret"
-+
-+	snd=$(ip netns exec "$NS_SRC" "$ipt"-save -c |
-+		    grep "dport $dport" | sed -e 's/\[//' -e 's/:.*//')
-+
-+	[ "$snd" = "$wire_pkts" ]
-+	# shellcheck disable=SC2319 # known false positive
-+	check_err $? "send $snd packets on the lowest link, expected $wire_pkts"
-+
-+	rcvpkts=$(ip netns exec "$NS_DST" "$ipt"-save -c | \
-+		grep "dport $dport" | sed -e 's/\[//' -e 's/:.*//')
-+
-+	[ "$rcvpkts" = "$encappkts" ]
-+	check_err $? "received $rcvpkts $ENCAP packets, expected $encappkts"
-+	log_test "$msg"
-+}
-+
-+require_command nfbpf_compile
-+require_command jq
-+
-+# tcp retransmisions will break the accounting
-+[ "$KSFT_MACHINE_SLOW" = yes ] && FAIL_TO_XFAIL=yes
-+for FAMILY in 4 6; do
-+	NET=$OL2_NET_V4
-+	GSO_SIZE=1340 # 1392 - 20 - 32
-+
-+	if [ $FAMILY = 6 ]; then
-+		NET=$OL2_NET_V6
-+		GSO_SIZE=1280 # 1352 - 40 - 32
-+	fi
-+
-+	echo "IPv$FAMILY"
-+
-+	unset USE_HINT
-+	unset INHERIT
-+
-+	# "geneve" must be last encap in list, so that later
-+	# test cases will run on it
-+	for ENCAP in "vxlan" "geneve"; do
-+		create_ns
-+		run_test "No GSO - $ENCAP" $((GSO_SIZE * 4)) 4 4
-+		cleanup_all_ns
-+
-+		create_ns_gso
-+		run_test "GSO without GRO - $ENCAP" $((GSO_SIZE * 4)) 4 1
-+		cleanup_all_ns
-+
-+		# IPv4 only test
-+		[ $FAMILY = "4" ] || continue
-+		create_ns_gso
-+		ip netns exec "$NS_SRC" sysctl -qw net.ipv4.ip_no_pmtu_disc=1
-+		run_test "GSO disable due to no fixedid - $ENCAP" \
-+			$((GSO_SIZE * 4)) 4 4
-+		cleanup_all_ns
-+	done
-+
-+	# GRO tests imply/require geneve encap, the only one providing
-+	# GRO hints
-+	create_ns_gso_gro
-+	run_test "double tunnel GRO, no hints" $((GSO_SIZE * 4)) 4
-+	cleanup_all_ns
-+
-+	USE_HINT=true
-+	create_ns_gso_gro \
-+		'"gro-hint":1,"udp-zero-csum6-tx":1,"udp-zero-csum6-rx":1' \
-+		'"udp-zero-csum6-tx":1,"udp-zero-csum6-rx":1'
-+	run_test "double tunnel GRO" $((GSO_SIZE * 4)) 1
-+	cleanup_all_ns
-+
-+	create_ns_gso_gro '"gro-hint":1,"udp-csum":1' '"udp-csum":1'
-+	run_test "double tunnel GRO - csum complete" $((GSO_SIZE * 4)) 1
-+	cleanup_all_ns
-+
-+	create_ns_gso_gro '"gro-hint":1' \
-+		'"udp-csum":0,"udp-zero-csum6-tx":1,"udp-zero-csum6-rx":1'
-+	run_test "double tunnel GRO - no nested csum" $((GSO_SIZE * 4)) 1
-+	cleanup_all_ns
-+
-+	create_ns_gso_gro \
-+		'"gro-hint":1,"udp-zero-csum6-tx":1,"udp-zero-csum6-rx":1' \
-+		'"udp-csum":1'
-+	run_test "double tunnel GRO - skip due nested csum with outer 0-csum" \
-+		$((GSO_SIZE * 4)) 4
-+	cleanup_all_ns
-+
-+	INHERIT=true
-+	create_ns_gso_gro '"gro-hint":1,"udp-csum":1' \
-+		'"udp-csum":1,"inner-proto-inherit":1'
-+	run_test "double tunnel GRO - nested inherit proto" $((GSO_SIZE * 4)) 1
-+	cleanup_all_ns
-+	unset INHERIT
-+
-+	create_ns_gso_gro '"gro-hint":1'
-+	run_test "double tunnel GRO - short last pkt" \
-+		$((GSO_SIZE * 4 + GSO_SIZE / 2)) 2
-+	cleanup_all_ns
-+done
-+
-+exit "$EXIT_STATUS"
--- 
-2.52.0
+> > ### Related work: Scope Control for Pathname Unix Sockets
+> > 
+> > The motivation for this patch is the same as in Tingmao Wang's patch
+> > set for "scoped" control for pathname Unix sockets [2], originally
+> > proposed in the Github feature request [5].
+> > 
+> > In my reply to this patch set [3], I have discussed the differences
+> > between these two approaches.  On the related discussions on Github
+> > [4] and [5], there was consensus that the scope-based control is
+> > complimentary to the file system based control, but does not replace
+> > it.  Mickael's opening remark on [5] says:
+> > 
+> > > This scoping would be complementary to #36 which would mainly be
+> > > about allowing a sandboxed process to connect to a more privileged
+> > > service (identified with a path).
+> > 
+> > ## Open questions in V2
+> > 
+> > Seeking feedback on:
+> > 
+> > - Feedback on the LSM hook name would be appreciated. We realize that
+> >   not all invocations of the LSM hook are related to connect(2) as the
+> >   name suggests, but some also happen during sendmsg(2).
+> 
+> Renaming security_unix_path_connect() to security_unix_find() would look
+> appropriate to me wrt the caller.
 
+Justin, this is also on your commit.  (I find security_unix_find() and
+security_unix_resolve() equally acceptable options.)
+
+
+> > - Feedback on the structuring of the Landlock access rights, splitting
+> >   them up by socket type.  (Also naming; they are now consistently
+> >   called "RESOLVE", but could be named "CONNECT" in the stream and
+> >   seqpacket cases?)
+> 
+> I don't see use cases where differenciating the type of unix socket
+> would be useful.  LANDLOCK_ACCESS_FS_RESOLVE_UNIX would look good to me.
+
+I did it mostly because it seemed consistent with the TCP and (soon)
+UDP controls, which are also controls specific to the socket type and
+not just the address family.  But I agree that the granularity is
+likely not needed here.  I can change it back for v3 and rename it to
+LANDLOCK_ACCESS_FS_RESOLVE_UNIX.
+
+
+> What would be the inverse of "resolve" (i.e. to restrict the server
+> side)?  Would LANDLOCK_ACCESS_FS_MAKE_SOCK be enough?
+
+Yes, that would be enough. My reasoning is as follows:
+
+The server-side operation that is related to associating the service
+with a given file system name is bind(2), and that is restrictable in
+that case using LANDLOCK_ACCESS_FS_MAKE_SOCK.
+
+Also, to my delight (and other than in TCP), listening on an unbound
+socket does not work (see unix_listen() in af_unix.c):
+
+  if (!READ_ONCE(u->addr))
+  	goto out;	/* No listens on an unbound socket */
+
+(You can get it to "autobind" during an explicit bind() or a connect()
+call, but that creates an abstract UNIX address. (Documented in
+socket(7) and implemented in unix_autobind() in af_unix.c))
+
+
+–Günther
 
