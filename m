@@ -1,228 +1,148 @@
-Return-Path: <netdev+bounces-248922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-248923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8344AD11664
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 10:04:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 40813D11702
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 10:16:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 295D83026D80
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 09:03:38 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B88553009D48
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 09:16:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C66D346E53;
-	Mon, 12 Jan 2026 09:03:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D5D526738B;
+	Mon, 12 Jan 2026 09:16:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YrlKWx+y"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="QVxbCrRA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C593346E61
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 09:03:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FB611E1A3D;
+	Mon, 12 Jan 2026 09:16:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768208600; cv=none; b=SXp20T85ZSyqocAVP/fPCGRSTB1J/ZM5epjP5LquTV2ErdpJ9UFFIqil6S5d8i3yffQQgueWteJfQxM5I54PqiSyL6tV2uaMeyG3RiHxOJ8MccYSALCdEJGN4q5AH4BCBbraEH4sO2kssz2NSKLweS7Wn5FCQyohWyu2vIS280Q=
+	t=1768209393; cv=none; b=bRj8u0ZCGcB+1lSfGhlaJN8Vr1/O6/DpNHwQxrBlk91gtL8JPluI3f3DG3N2YzuIdDSiE9xNF5w+g35Vmki5+h6/MuC+CbguglrBh2v4OyxL4fzOooDDyALqOc2mKSXhv13f8WZ1n/ipmP4BltAJWjxDkmULBWGMFb41ztiQleg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768208600; c=relaxed/simple;
-	bh=uIlL1TesxPAL+j5ySj25Skrss4WO/SL0ackhRPMVxYE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j1+Pd0lfMYbRFL7vGV7BTBe7eSmjvXCM4sWy3UDfPRNYsiLKMibuHybL7EKKzifHu8il1hb/WpStnNnZ96ASzSqxkWWSTpIuHrwUZPi66Fay1Sqzy+GncMhcQL/wahu7QA007cThSfSLxdLaeaIDBS1lOTr/kr9OmWz5BYlFzuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YrlKWx+y; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4ffa95fc5f1so62970791cf.3
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 01:03:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768208595; x=1768813395; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QYekpeL873Q/xCGRxoaN26TWZbwOPIDS4BfElGQRGaY=;
-        b=YrlKWx+yW2bXoK5hlaTBCUzKWfs8EjHXNIKlVGr37nMk9RH7zHwebNH/jUpXbEmEJp
-         z3OlYkYPAu5G0NUhRycZWpubneZQCwRF9mHbH0hsY3ug1B+oWynfuQebgf0i8AyDYXIA
-         FTXHj7pWcLC/QNzcfT748e449MxHzQ2M5nml/X238SbOmicD211yhpGfG4fu1ucA2mhl
-         ULvSvBgPJQIaajdwcGwAczUmSoMQbGwPdkGd0Q0yS+I8eX3uhNYKte0GlzuW3JcIghWD
-         74GGdG3wb1wkj7D3uoYx/gQ3euOIO4J/+oDeZhi+9H4lJGJ3f3ZHCn3o6LzCfVyAgIsr
-         PE5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768208595; x=1768813395;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=QYekpeL873Q/xCGRxoaN26TWZbwOPIDS4BfElGQRGaY=;
-        b=pFHOKJZrVZdOvCQEJ+eagBWOpxf8l/CHNSpPeqJ1K/5MJRAPxKeCvZaE3pjMiq2ljk
-         cYppeMY1IYRio/KGXgtYcPhEyTMGAl2ufp7+agFTeNj4jPfk6JsdGKCxT/+tTt+VNHtu
-         x3ab3fHTtpbiXnksALyDBkamyQzrD4BIjyfBkISWqfZgw6qhioBuHlpj/lJhiHcErt29
-         BQeiuV0FTP1SEA++UXasT36ZkcKzlPh0uq7zrKCoQYeuesBnOuMiWWz76O0ffcLbM7FX
-         72juEXHcj98HDXTevM1aSmFDyXpVkdnt6OPXuVLwNe85oj82xvOUcFlfR1DmN89qdZYy
-         r7qA==
-X-Forwarded-Encrypted: i=1; AJvYcCXCuAHJOfZ57yBMWOCRON0/af4UiXyzs0zOGLSDdQ/pd0x41+EK/iEjmOzQ6CBInkqsqnv/Oqw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzW9UDpDzXQKlMPcYj9mjxGVIVuHy95an+eBFE2pfzyMnURrcc7
-	jLbzsI+T9WW4rvmLXm9q7vwfiEQG7PEZjk0tykkxULK64kxsCqc3K2QVsONMHNhM6jHci5snw9g
-	j2c+KrT8r1mLnNkubS1XQvsHP8pR8w9FzE3cTrptZ
-X-Gm-Gg: AY/fxX6xeeVU1CYEimZC1z3oH7YA+5+UQrKJ+jZqZgfr04KCsKtHasFx5AoEZrq/iLX
-	o9gyF4p45o2N7Q++ZKWch0h/sfCbsIDonrZee96BGV0dFwPTVXQSvYGar9aALsExKoIEpr8FvuR
-	v3Y0WKxV/1DgPZR1DDlOwO3AzDS5fjMROSLBXe5L0xm3nS+powC2qpgJlQebkTZlACXV959v9fu
-	PN7kMbStbERWgzYWQTTbPzRR0izSRp02G21EPlZ0NSJ7TlrJyJ0o6QGTShu+UeD/qdsrLo=
-X-Google-Smtp-Source: AGHT+IErfp9tA43Y2SyvQ1LCTByw91YVng252tRwj4dEGmt8yb/8X/4f8MgmVarviI+MFyvNG9TMZsB4gbUEVfpiCzk=
-X-Received: by 2002:a05:622a:608:b0:4f1:bdb8:b05 with SMTP id
- d75a77b69052e-4ffb4a5d526mr238735781cf.72.1768208594421; Mon, 12 Jan 2026
- 01:03:14 -0800 (PST)
+	s=arc-20240116; t=1768209393; c=relaxed/simple;
+	bh=a2Apgp3txJDXP1LXGxolFndMyiXgc0Q1fhjM84r8dEo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=V/Fi9vzGtVbr4yFNp+WBcfyrSy1linAxsoBXP3bYKhesHlwZuWYmBBG36K9wfR+NMZIyLj6tRCx788Q9dqDccHXqm4QIPpLAmAJfSo4nEBPtBOpuD5iuvg75HYlsOIxVjKrp8NigukqmVD2OLJhJ0CnuBhO/H194QIak6KO6Km0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=QVxbCrRA; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=xVfHY/A51XJ1I0Z/+snPmmW9HiqBPPgHrDRxZuZPkpU=; b=QVxbCrRApgvPPCgZYQXPdsAqU5
+	LrIcZh2+TEMsyMKMqOoNAVerSeqTbub937sHTs9XLNztTnnSG4zHGIvY/wDPTrpKRaBiPDT9fQOpD
+	gROhKHSlEaKNYG32QYSEBFeATSd9nqWYIi4A7qxr8w0SAb7eaxVL+l/addYyzbZ6V6n/SfVWYSgGL
+	rxq0BJpgziO9qzdrmFcbJuUZsMSk93EUhizUrJ31CAXKE/4Z0euU21tirDyv5z1jw8GrQpP6Nfd/m
+	zOkO8bHuSDoW6IkHGrxZaguMm/qrfDvQrj4z9ewRkoQeqTJ982/zcrUVpgY/rS0jWtj+UA6cLgSHb
+	M0c0I7TA==;
+Received: from sslproxy06.your-server.de ([78.46.172.3])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1vfE1o-0004Be-2d;
+	Mon, 12 Jan 2026 10:16:00 +0100
+Received: from localhost ([127.0.0.1])
+	by sslproxy06.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1vfE1n-0005lK-2v;
+	Mon, 12 Jan 2026 10:15:59 +0100
+Message-ID: <b5d2beb4-eb8d-4cb6-a50c-c3800fe8eff0@iogearbox.net>
+Date: Mon, 12 Jan 2026 10:15:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260112075939.2509397-1-chenzhen126@huawei.com> <20260112075939.2509397-2-chenzhen126@huawei.com>
-In-Reply-To: <20260112075939.2509397-2-chenzhen126@huawei.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 12 Jan 2026 10:03:03 +0100
-X-Gm-Features: AZwV_QjuCVefdPk58sVMmu3aCg3YxPUshT_sD2m4if7Fahn2gAkwMBnJr09KNKM
-Message-ID: <CANn89iL5TbT24Xy_=9SrqE=QJ-aF2V+jiuUY37KBnjK-qPcefQ@mail.gmail.com>
-Subject: Re: [PATCH v3 net 1/2] net: vlan: set header_ops to match
- hard_header_len when hw offload is toggled
-To: Chen Zhen <chenzhen126@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, huyizhen2@huawei.com, 
-	gaoxingwang1@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 02/16] net: Implement
+ netdev_nl_queue_create_doit
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, kuba@kernel.org,
+ davem@davemloft.net, razor@blackwall.org, pabeni@redhat.com,
+ willemb@google.com, sdf@fomichev.me, john.fastabend@gmail.com,
+ martin.lau@kernel.org, jordan@jrife.io, maciej.fijalkowski@intel.com,
+ magnus.karlsson@intel.com, dw@davidwei.uk, toke@redhat.com,
+ yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
+References: <20260109212632.146920-1-daniel@iogearbox.net>
+ <20260109212632.146920-3-daniel@iogearbox.net> <aWQOO0xhXxNebmXF@mini-arch>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <aWQOO0xhXxNebmXF@mini-arch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27878/Mon Jan 12 08:25:31 2026)
 
-On Mon, Jan 12, 2026 at 8:49=E2=80=AFAM Chen Zhen <chenzhen126@huawei.com> =
-wrote:
->
-> When tx-vlan-hw-insert is toggled to on, vlan device hard_header_len
-> will be reduced to dev->hard_header_len since commit 029f5fc31cdb
-> ("8021q: set hard_header_len when VLAN offload features are toggled"),
-> but the header_ops remains unchanged, ndisc skb will be allocated
-> with this len and filled in vlan hdr in vlan_dev_hard_header(), but
-> with reorder_hdr off, the skb room is not enough so it triggers
-> skb_panic() as below:
->
-> skbuff: skb_under_panic: text:ffffffffa0535126 len:90 put:14
->  head:ffff916c04232ec0 data:ffff916c04232ebe tail:0x58 end:0x180 dev:veth=
-0.10
-> ------------[ cut here ]------------
->  kernel BUG at net/core/skbuff.c:197!
->  <TASK>
->   skb_push+0x39/0x40 net/core/skbuff.c:207
->   eth_header+0x26/0xb0 net/ethernet/eth.c:90
->   vlan_dev_hard_header+0x58/0x130 net/8021q/vlan_dev.c:85 [8021q]
->   neigh_connected_output+0xae/0x100 net/core/neighbour.c:1589
->   ip6_finish_output2+0x2cc/0x650 net/ipv6/ip6_output.c:213
->   ip6_finish_output+0x27/0xd0 net/ipv6/ip6_output.c:246
->   ndisc_send_skb+0x1d0/0x370 net/ipv6/ndisc.c:516
->   ndisc_send_ns+0x5a/0xb0 net/ipv6/ndisc.c:672
->   addrconf_dad_work+0x2b5/0x380 net/ipv6/addrconf.c:4258
->   process_one_work+0x17f/0x320 kernel/workqueue.c:2743
->
-> Fix this by also setting header_ops of vlan dev when offload feature
-> is toggled.
->
-> Fixes: 029f5fc31cdb ("8021q: set hard_header_len when VLAN offload featur=
-es are toggled")
-> Signed-off-by: Chen Zhen <chenzhen126@huawei.com>
-> ---
->  net/8021q/vlan.c     |  5 +----
->  net/8021q/vlan.h     |  3 +++
->  net/8021q/vlan_dev.c | 22 ++++++++++++++--------
->  3 files changed, 18 insertions(+), 12 deletions(-)
->
-> diff --git a/net/8021q/vlan.c b/net/8021q/vlan.c
-> index 2b74ed56eb16..84b3a3f67996 100644
-> --- a/net/8021q/vlan.c
-> +++ b/net/8021q/vlan.c
-> @@ -323,10 +323,7 @@ static void vlan_transfer_features(struct net_device=
- *dev,
->
->         netif_inherit_tso_max(vlandev, dev);
->
-> -       if (vlan_hw_offload_capable(dev->features, vlan->vlan_proto))
-> -               vlandev->hard_header_len =3D dev->hard_header_len;
-> -       else
-> -               vlandev->hard_header_len =3D dev->hard_header_len + VLAN_=
-HLEN;
-> +       vlan_dev_set_header_attributes(dev, vlandev, vlan->vlan_proto);
->
->  #if IS_ENABLED(CONFIG_FCOE)
->         vlandev->fcoe_ddp_xid =3D dev->fcoe_ddp_xid;
-> diff --git a/net/8021q/vlan.h b/net/8021q/vlan.h
-> index c7ffe591d593..1d837814e061 100644
-> --- a/net/8021q/vlan.h
-> +++ b/net/8021q/vlan.h
-> @@ -143,6 +143,9 @@ int register_vlan_dev(struct net_device *dev, struct =
-netlink_ext_ack *extack);
->  void unregister_vlan_dev(struct net_device *dev, struct list_head *head)=
-;
->  bool vlan_dev_inherit_address(struct net_device *dev,
->                               struct net_device *real_dev);
-> +void vlan_dev_set_header_attributes(struct net_device *dev,
-> +                                   struct net_device *vlan_dev,
-> +                                   __be16 proto);
->
->  static inline u32 vlan_get_ingress_priority(struct net_device *dev,
->                                             u16 vlan_tci)
-> diff --git a/net/8021q/vlan_dev.c b/net/8021q/vlan_dev.c
-> index fbf296137b09..1fe171748711 100644
-> --- a/net/8021q/vlan_dev.c
-> +++ b/net/8021q/vlan_dev.c
-> @@ -519,6 +519,19 @@ static const struct device_type vlan_type =3D {
->
->  static const struct net_device_ops vlan_netdev_ops;
->
-> +void vlan_dev_set_header_attributes(struct net_device *dev,
-> +                                   struct net_device *vlan_dev,
-> +                                   __be16 proto)
-> +{
-> +       if (vlan_hw_offload_capable(dev->features, proto)) {
-> +               vlan_dev->header_ops      =3D &vlan_passthru_header_ops;
-> +               vlan_dev->hard_header_len =3D dev->hard_header_len;
-> +       } else {
-> +               vlan_dev->header_ops      =3D &vlan_header_ops;
-> +               vlan_dev->hard_header_len =3D dev->hard_header_len + VLAN=
-_HLEN;
-> +       }
-> +}
-> +
->  static int vlan_dev_init(struct net_device *dev)
->  {
->         struct vlan_dev_priv *vlan =3D vlan_dev_priv(dev);
-> @@ -572,14 +585,7 @@ static int vlan_dev_init(struct net_device *dev)
->  #endif
->
->         dev->needed_headroom =3D real_dev->needed_headroom;
-> -       if (vlan_hw_offload_capable(real_dev->features, vlan->vlan_proto)=
-) {
-> -               dev->header_ops      =3D &vlan_passthru_header_ops;
-> -               dev->hard_header_len =3D real_dev->hard_header_len;
-> -       } else {
-> -               dev->header_ops      =3D &vlan_header_ops;
-> -               dev->hard_header_len =3D real_dev->hard_header_len + VLAN=
-_HLEN;
-> -       }
-> -
-> +       vlan_dev_set_header_attributes(real_dev, dev, vlan->vlan_proto);
->         dev->netdev_ops =3D &vlan_netdev_ops;
->
->         SET_NETDEV_DEVTYPE(dev, &vlan_type);
-> --
-> 2.33.0
->
+On 1/11/26 9:55 PM, Stanislav Fomichev wrote:
+> On 01/09, Daniel Borkmann wrote:
+[...]
+>> +void netdev_rx_queue_lease(struct netdev_rx_queue *rxq_dst,
+>> +			   struct netdev_rx_queue *rxq_src)
+>> +{
+>> +	netdev_assert_locked(rxq_src->dev);
+>> +	netdev_assert_locked(rxq_dst->dev);
+>> +
+>> +	WARN_ON_ONCE(READ_ONCE(rxq_src->dev->reg_state) == NETREG_UNREGISTERING);
+> 
+> I might have missed some of your discussions with Jakub, but what is
+> this WARN_ON_ONCE above trying to catch? And why not handle it explicitly
+> (via returning an error from netdev_rx_queue_lease)?
 
-While nice to have, I think a race is still possible.
+This is basically just an assertion. The unregistering part is handled internally
+via __netdev_put_lock() which releases the held reference on the netdev, and if
+the netdev is still registered it tries to lock the instance lock. If its
+being unregistered that function returns NULL and therefore we bail out in the
+netdev_nl_queue_create_doit() at netdev_put_lock() getting a NULL device back.
 
-Some callers might see different hard_header_len values along their
-path and crash.
-
-Look at
-
- commit db5b4e39c4e63700c68a7e65fc4e1f1375273476
-Author: Eric Dumazet <edumazet@google.com>
-Date:   Thu Dec 11 17:35:50 2025 +0000
-
-    ip6_gre: make ip6gre_header() robust
-
-
-My suggestion would be to always add VLAN_HLEN in hard_header_len,
-even if the 'current' operational mode would not request it.
+Thanks,
+Daniel
 
