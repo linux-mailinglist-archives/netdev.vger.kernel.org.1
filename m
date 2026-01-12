@@ -1,91 +1,95 @@
-Return-Path: <netdev+bounces-249148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DC22D14E44
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 20:20:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 14F5ED14E5C
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 20:22:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 515A7301FB75
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 19:20:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 32A75302C8C1
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 19:22:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E936C3191A9;
-	Mon, 12 Jan 2026 19:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6848331A7EA;
+	Mon, 12 Jan 2026 19:22:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i4dq3UQu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZMc2VYzS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD209318EF7;
-	Mon, 12 Jan 2026 19:19:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE6C311C17;
+	Mon, 12 Jan 2026 19:22:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768245599; cv=none; b=Mt8S1H76O/N5AuXbPW1rxFnJnhn0Z59TaxMvNArByAc5J8aypAzxroX+YO7RVHavG9LP69G5Er1CEYa0wSRk3r8jNORvzcE+/SOp2UeKa9ZPyFpEeYDPUEoVTfokzvRKxc6EOqU3wMQ+x48DEtrtLt+gGNK3xBpTOkX2W5ecGxk=
+	t=1768245767; cv=none; b=PoZtR1j3bdfJw55KXkT8mnGWCf2DPt25KFUPuyu8zzNZcOQCVZZ9ld3MSMLg8P+PFptaIWcFgUxVE7pGA41yFG57Aqz4kpEPLtgrbZmJCb4E3jhJF1wRweBoK7MF1dQ5I7NwUJVQq3VmJvNg0vZaUBwWhWt/RVWhdOSPj6FaVME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768245599; c=relaxed/simple;
-	bh=8XdDuYY8o16AHBqptf2+Lenxj/jSJqYCRVV3ayhVeHI=;
+	s=arc-20240116; t=1768245767; c=relaxed/simple;
+	bh=gy3vUzeNs/9BwKXtMR4uniH68yQHA+hJ41Jnz6faEIM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pdAXbHT7FlrxGay2lcXwgRa1Rboppo/j3zimxAabWQvRAOlykPwWWInCFhh/yFLgPUpdqsA2QUXqn8Lk4XZpoGsjiH1op+mGWh6MNVYmyIqtUXjXwY5+5M+nsKhQKxTnL2k8PApAVQb9llWLZkxeHkPWzoScKunyQgZqxLnPX+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i4dq3UQu; arc=none smtp.client-ip=198.175.65.21
+	 Content-Type:Content-Disposition:In-Reply-To; b=oUdIc3Z3B+utFvoVnYVOK5U3Tk/OrY/7heVycXv0xHbUCTGZc5UFlzaL5lFU7il+RdaC0RHT71sSSvMc2Db6JBXuT96U1I3tuISr3DU63l2SO38LBMFh8wuWBhko1IzAzfBIOSHNy/y2ROnmg4DFqi9SyN2sEX1g2beuvegXTpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZMc2VYzS; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768245596; x=1799781596;
+  t=1768245766; x=1799781766;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=8XdDuYY8o16AHBqptf2+Lenxj/jSJqYCRVV3ayhVeHI=;
-  b=i4dq3UQuLJKe0UMkY2PBi/sS5UEiZ3MC7haLiYb2wmgqdc/r9+7O1WEC
-   7Ay8FKRVgZtTkaET2HqF5Ag4qlGp+Tuh68Wo34iF6P9xLgEGo0ktY3QcM
-   oVX3DoUho2NbqSw0qdtcuXRmsuevqrAr+8su1fQldrm7WU6UF9GLk5LzF
-   DqfWhxXPNp/o6im2TYhqg5QA1L71qv+Fj2s0jMZH0P6+tl2ydfd+ADb3g
-   zvuOO3kFYxMm++r/gQ+EWxiAKuvk1prCnw3KoArMCTCX4MwOtDkTt+AFT
-   dfsJ83a0yu7EAB6u1CYpAzGS7hEajbO5DtfZ1oVJjGOPfs/WIZEANlnMu
-   w==;
-X-CSE-ConnectionGUID: rf9aYiOiSRaJWLL0AnWM1A==
-X-CSE-MsgGUID: KYMo2/e6TDSyUUn11/mp+w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11669"; a="69450951"
+  bh=gy3vUzeNs/9BwKXtMR4uniH68yQHA+hJ41Jnz6faEIM=;
+  b=ZMc2VYzSquSajN6kv1927+5UfrI12PNR7To/VfrurD/W1STSoH36TWr3
+   v13giALa9e9vzUTR0N6c6xeZaF7feKH8bOMzXl/s1ofyEHp12m3B1xc0i
+   pGyINlwiaShF70RMA7siAbQPX77c2rveBmBxjJVcTHGOXdSMQwRejaGnF
+   01fLtCNFJKczPjtSSFTYpASmByWkkEhD0pCtzMxfK8Gi8J7AFLYPB0KHp
+   Zp69V9E7UtHEoK5950/GJjqTPveGdxwqM5hN6DlaG1CG1cELFPJvuCC+M
+   yXKBELwTK7yTfR40/btjmIeD0+7aU8OeV+u4ZDOnth+OSGOu7ePblQclV
+   g==;
+X-CSE-ConnectionGUID: iuBLUA5TQN2VbdU4j5CfyA==
+X-CSE-MsgGUID: XOG1mdt3SziU7q191vypPQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11669"; a="69259621"
 X-IronPort-AV: E=Sophos;i="6.21,221,1763452800"; 
-   d="scan'208";a="69450951"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 11:19:54 -0800
-X-CSE-ConnectionGUID: MXpzZ1xnR9iTu7OhIX4rXg==
-X-CSE-MsgGUID: +gG6zgHgS7iFR/wRaFE7Qg==
+   d="scan'208";a="69259621"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 11:22:45 -0800
+X-CSE-ConnectionGUID: CjsHXDcET8G3zdx532W5jQ==
+X-CSE-MsgGUID: Et1a2lnCR3m3hPhoCRr6cw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,221,1763452800"; 
-   d="scan'208";a="203987512"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 12 Jan 2026 11:19:49 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+   d="scan'208";a="235411831"
+Received: from igk-lkp-server01.igk.intel.com (HELO 8581b2e2a62c) ([10.211.93.152])
+  by fmviesa001.fm.intel.com with ESMTP; 12 Jan 2026 11:22:39 -0800
+Received: from kbuild by 8581b2e2a62c with local (Exim 4.98.2)
 	(envelope-from <lkp@intel.com>)
-	id 1vfNS6-00000000Dme-1S2R;
-	Mon, 12 Jan 2026 19:19:46 +0000
-Date: Tue, 13 Jan 2026 03:19:09 +0800
+	id 1vfNUq-000000000yP-3Vw4;
+	Mon, 12 Jan 2026 19:22:36 +0000
+Date: Mon, 12 Jan 2026 20:22:22 +0100
 From: kernel test robot <lkp@intel.com>
-To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
+To: Leon Hwang <leon.hwang@linux.dev>, bpf@vger.kernel.org
 Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Eric Dumazet <edumazet@google.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Rob Herring <robh@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, linux-rdma@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	intel-wired-lan@lists.osuosl.org, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Mark Bloch <mbloch@nvidia.com>, linux-kernel@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Saeed Mahameed <saeedm@nvidia.com>
-Subject: Re: [Intel-wired-lan] [PATCH net-next 06/12] dpll: Support dynamic
- pin index allocation
-Message-ID: <202601130301.7QjXjwFp-lkp@intel.com>
-References: <20260108182318.20935-7-ivecera@redhat.com>
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Matt Bobrowski <mattbobrowski@google.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Leon Hwang <leon.hwang@linux.dev>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next 2/3] bpf: Introduce BPF_BRANCH_SNAPSHOT_F_COPY
+ flag for bpf_get_branch_snapshot helper
+Message-ID: <202601122013.hmoeIXXs-lkp@intel.com>
+References: <20260109153420.32181-3-leon.hwang@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,50 +98,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260108182318.20935-7-ivecera@redhat.com>
+In-Reply-To: <20260109153420.32181-3-leon.hwang@linux.dev>
 
-Hi Ivan,
+Hi Leon,
 
-kernel test robot noticed the following build warnings:
+kernel test robot noticed the following build errors:
 
-[auto build test WARNING on net-next/main]
+[auto build test ERROR on bpf-next/master]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ivan-Vecera/dt-bindings-dpll-add-common-dpll-pin-consumer-schema/20260109-022618
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260108182318.20935-7-ivecera%40redhat.com
-patch subject: [Intel-wired-lan] [PATCH net-next 06/12] dpll: Support dynamic pin index allocation
-config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20260113/202601130301.7QjXjwFp-lkp@intel.com/config)
-compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260113/202601130301.7QjXjwFp-lkp@intel.com/reproduce)
+url:    https://github.com/intel-lab-lkp/linux/commits/Leon-Hwang/bpf-x64-Call-perf_snapshot_branch_stack-in-trampoline/20260109-234435
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20260109153420.32181-3-leon.hwang%40linux.dev
+patch subject: [PATCH bpf-next 2/3] bpf: Introduce BPF_BRANCH_SNAPSHOT_F_COPY flag for bpf_get_branch_snapshot helper
+config: x86_64-kexec (https://download.01.org/0day-ci/archive/20260112/202601122013.hmoeIXXs-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260112/202601122013.hmoeIXXs-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601130301.7QjXjwFp-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601122013.hmoeIXXs-lkp@intel.com/
 
-All warnings (new ones prefixed by >>):
+All errors (new ones prefixed by >>):
 
->> drivers/dpll/dpll_core.c:499:21: warning: overflow in expression; result is -2147483648 with type 'int' [-Winteger-overflow]
-     499 |         pin_idx -= INT_MAX + 1;
-         |                            ^
-   1 warning generated.
-
-
-vim +/int +499 drivers/dpll/dpll_core.c
-
-   490	
-   491	static void dpll_pin_idx_free(u32 pin_idx)
-   492	{
-   493		if (pin_idx <= INT_MAX)
-   494			return; /* Not a dynamic pin index */
-   495	
-   496		/* Map the index value from dynamic pin index range to IDA range and
-   497		 * free it.
-   498		 */
- > 499		pin_idx -= INT_MAX + 1;
-   500		ida_free(&dpll_pin_idx_ida, pin_idx);
-   501	}
-   502	
+>> ld.lld: error: undefined symbol: bpf_branch_snapshot
+   >>> referenced by bpf_trace.c:1182 (kernel/trace/bpf_trace.c:1182)
+   >>>               vmlinux.o:(bpf_get_branch_snapshot)
+   >>> referenced by bpf_trace.c:0 (kernel/trace/bpf_trace.c:0)
+   >>>               vmlinux.o:(bpf_get_branch_snapshot)
 
 -- 
 0-DAY CI Kernel Test Service
