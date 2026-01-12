@@ -1,77 +1,63 @@
-Return-Path: <netdev+bounces-249072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8810D13922
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 16:17:44 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B54DD13A93
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 16:28:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E2C2030019F5
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:17:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9676A30022EA
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 15:23:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEE1E2E7F1D;
-	Mon, 12 Jan 2026 15:16:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BA692E7185;
+	Mon, 12 Jan 2026 15:23:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ljI1jKTN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142EF2E62A2
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 15:16:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB06627602C;
+	Mon, 12 Jan 2026 15:23:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768231019; cv=none; b=bUz1QKtwvuF7Rh+QEZQvaD/JH+dEBLEGsqt/a/hjfK87b0ci9Xs/7da0QCm66Nju5VIKDb5Sb2bAlxXbo1qiTB845S6POKIgPaTrrLmYOzRRugoWRAEjs/Q9LLIUZOKchSHS0/mAPzQrlrfPwBQ+7L6whEMW7+uOd0UM0WivaqQ=
+	t=1768231390; cv=none; b=ktFcqs2UY3aQ4XJJcmBcXk59Yua9OYOIZrsLWCzG7Zj4sIIB9wrs5KesK0pFjnynaIAmVLqkszM/PDPohf1ld3mBv+NCDOUVGx6RtJdokoXJPO37Ww+FOfwsToUj+AO9sMOnGkmS4Z43fF36sKHZjRD0FTWIkcoiP9LLovWg79c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768231019; c=relaxed/simple;
-	bh=EShopnW71/xFcgQTbpFPl66ggY2BecFS9wgT1FftxTM=;
+	s=arc-20240116; t=1768231390; c=relaxed/simple;
+	bh=UWx7yPFkkQmM09w3EAQe8LZDF7F0YySqGqrHHQJMuaE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ceWWVlFt8IfcQwSq3/+4Jb19X4a+1aP5S6hFwVXm8JN+FBbMjnmvqmYtwmu7DBEqO0tw/NXv5axY47pSIvW2/d3/f8jykCChyQdF1MPrUV8mHu3LlKdRVMpn0fZigJBxd1oSFBanfPnw9clU0+/apdc+yg5BzqFLln9E7NgFq7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-459ac2f1dc2so3777790b6e.3
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 07:16:57 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768231017; x=1768835817;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=K2lP+KPaY9dq3lWX+X1Khpp2qI/DD2GRwQIakoNQiEk=;
-        b=pRdffW1EjGPKiDgEMD4Beos2ga0Wfe5mLI/yxxGbaZaHpp9N+Fg2Dcblrg+g7DasHG
-         pLBUC9nZjNehj/jjo8xR2Df1ndkk6xfTqK2Y2eNBp0G/ZerSbVIA1mtYVd/EChKH7BLn
-         GkvY2w5kW2g3GhLZtJMfiH/Lfmqtuej1INSc9yzu3Mc7UPwmOOIDVKHdgKR9PNV1oLiH
-         jeN+HfpcwBf28tgtEeb78FskL5+vEUI+eRdukNLquHlw293LtBjm9UyN8gBqwTmotCpk
-         o8CHPu4n4XtathzPZ1adOVSZQIlDpd5fW8JjBO8KWiBWjOYzvaGnyYpygwFOmIxtaxZY
-         Nypg==
-X-Forwarded-Encrypted: i=1; AJvYcCUpjvn6EXDo/joyMQaqq45Zk2U40Lhjql/qpCImCZYvs3n2WmXfpzn5TBOY3hAHgdrClsPUfLE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZn3q2VEu5Ucyy5OHZXM73Z20owGgd7fNX3wqHsKs0KN88oEfF
-	94Wuo3xPnuDQ4Phjy50ThZk1VwQkfTbwYhTrMmYFeOafee9KUbfSajgS
-X-Gm-Gg: AY/fxX7pPVZC/Lm1913F0o+zhwqnAjDDH/akQ/Nf8UsG2go8Vh5L7aLCkqRO3yeCYXM
-	dg0XJkoWpdlHiUl/wlDz7onwLforKsRRTcrQVdMtxi2y3/SFC49/aKCsuaNrgeVUS04uqBNASeY
-	EU+2uDNqVKDyAk5YmGK2TZHLdWbKyu4Cs+dQ0ynHIFO5yKqvGzjNVVt2IjjdvbL2CMmt02a0QIN
-	c6lrHgmWE+n4BosTMAaOztnw2gJDexBqPEf1cqAC97WwkAnJeYLprmtrKPfp8EVTeEF/hwnV11I
-	q9lq9x2CzRfiJB7fzP56z6NM6h8j1F7DdBBDuQYnkI6XPHdseQMsAh7q/BERv7CVPXKnKjQGjXu
-	v/MVTDkqXtTyPdvLOeKOwMrzwgN5i4qgkFTvwUSvtbiAvSWkACWVEBYVLgx+TlH35hGanRvxteA
-	==
-X-Google-Smtp-Source: AGHT+IHXfMnaYPQo14c++hNdyyk6Ymr6+cKtUfrFEeM1r20pAZ3gzUSjR2INaAmkNP4czHxbLR1BrQ==
-X-Received: by 2002:a05:6808:11c9:b0:44f:da6f:edb1 with SMTP id 5614622812f47-45a6bd83ba4mr8571597b6e.13.1768231016956;
-        Mon, 12 Jan 2026 07:16:56 -0800 (PST)
-Received: from gmail.com ([2a03:2880:10ff::])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-45a5e288c42sm8280583b6e.11.2026.01.12.07.16.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jan 2026 07:16:56 -0800 (PST)
-Date: Mon, 12 Jan 2026 07:16:54 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andre Carvalho <asantostc@gmail.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v10 7/7] selftests: netconsole: validate target
- resume
-Message-ID: <uzrkzwqpy2mf5je44xz2xtody5ajfw54v7kqb2prfib3kz7gvj@wtsjtgde5thb>
-References: <20260112-netcons-retrigger-v10-0-d82ebfc2503e@gmail.com>
- <20260112-netcons-retrigger-v10-7-d82ebfc2503e@gmail.com>
- <20260112061642.7092437c@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=mmiHacHkY01p7FHBin9JZrkJ+fasTz2emkcPQqCvEMC3MHJDk3mW1+qjuxOOinzKLburCaRHfHHaIwlUhDokKEvOOPaSA8awBAo8cc586AEIx36GU5cwivPY5ggnR+Cs05q2OBcHtu3hZqLQ1slAjgAQcr+rjj3FOf/9BVa4E84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ljI1jKTN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20ABDC19422;
+	Mon, 12 Jan 2026 15:23:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768231390;
+	bh=UWx7yPFkkQmM09w3EAQe8LZDF7F0YySqGqrHHQJMuaE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ljI1jKTNt6e7G6yhmtu/piIwtEEg5YQN0Jc6qpEYcFAtSqy/1RSWmO7SSLiqLzEbr
+	 6xcpW144b6CmYHQ3qdoJ0+2GnCv0ujWvH8JaTkTYHCElpCd/9YJ4Hq3j4nuA4lHc+d
+	 94g6QHhl7aIIloRiQzHC9AfKzoQ8YAmFLhA9q9fc75lRSXLOBMrvWoo/y6KZl7tkZm
+	 kuMW3TZzxltfTQ8HJGkShbUdhCa6OJl3UoHwqpqspM1qY6qHIiSwvNJVjKWATurJZs
+	 PG0SIYt4XU0C7LEtiO/tOl2LFpaKk4pAapr5AaHMQt56/Jg8EW/qgTWRr/fn5k+hYX
+	 RxsWVZPm6siAw==
+Date: Mon, 12 Jan 2026 15:22:59 +0000
+From: Will Deacon <will@kernel.org>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: David Woodhouse <dwmw2@infradead.org>, linux-kernel@vger.kernel.org,
+	Keir Fraser <keirf@google.com>,
+	Steven Moreland <smoreland@google.com>,
+	Frederick Mayle <fmayle@google.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	netdev@vger.kernel.org, virtualization@lists.linux.dev
+Subject: Re: [PATCH v4 4/9] vsock/virtio: Resize receive buffers so that each
+ SKB fits in a 4K page
+Message-ID: <aWUR00JlpXo1Dyl5@willie-the-truck>
+References: <20250717090116.11987-1-will@kernel.org>
+ <20250717090116.11987-5-will@kernel.org>
+ <fa3cd687961e63dd2b79780eb84c243c8d35532a.camel@infradead.org>
+ <aWUFnZTkdOrZAest@sgarzare-redhat>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,36 +66,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260112061642.7092437c@kernel.org>
+In-Reply-To: <aWUFnZTkdOrZAest@sgarzare-redhat>
 
-On Mon, Jan 12, 2026 at 06:16:42AM -0800, Jakub Kicinski wrote:
-> On Mon, 12 Jan 2026 09:40:58 +0000 Andre Carvalho wrote:
-> > Introduce a new netconsole selftest to validate that netconsole is able
-> > to resume a deactivated target when the low level interface comes back.
+On Mon, Jan 12, 2026 at 03:48:11PM +0100, Stefano Garzarella wrote:
+> On Thu, Jan 08, 2026 at 05:33:42PM +0100, David Woodhouse wrote:
+> > On Thu, 2025-07-17 at 10:01 +0100, Will Deacon wrote:
+> > > 
+> > > -#define VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE	(1024 * 4)
+> > > +/* Dimension the RX SKB so that the entire thing fits exactly into
+> > > + * a single 4KiB page. This avoids wasting memory due to alloc_skb()
+> > > + * rounding up to the next page order and also means that we
+> > > + * don't leave higher-order pages sitting around in the RX queue.
+> > > + */
+> > > +#define
+> > > VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE	SKB_WITH_OVERHEAD(1024 * 4)
 > > 
-> > The test setups the network using netdevsim, creates a netconsole target
-> > and then remove/add netdevsim in order to bring the same interfaces
-> > back. Afterwards, the test validates that the target works as expected.
+> > Should this be SKB_WITH_OVERHEAD()?
+> 
+> ehm, is what the patch is doing, no?
+> 
 > > 
-> > Targets are created via cmdline parameters to the module to ensure that
-> > we are able to resume targets that were bound by mac and interface name.
+> > Or should it subtract VIRTIO_VSOCK_SKB_HEADROOM instead?
 > 
-> The new test seems to be failing in netdev CI:
+> Why?
 > 
-> TAP version 13
-> 1..1
-> # timeout set to 180
-> # selftests: drivers/net: netcons_resume.sh
-> # Running with bind mode: ifname
-> not ok 1 selftests: drivers/net: netcons_resume.sh # exit=1
+> IIRC the goal of the patch was to have an SKB that fit entirely on one page,
+> to avoid wasting memory, so yes, we are reducing the payload a little bit
+> (4K vs 4K - VIRTIO_VSOCK_SKB_HEADROOM - SKB_OVERHEAD), but we are also
+> reducing segmentation.
+> 
+> > 
+> > (And also, I have use cases where I want to expand this to 64KiB. Can I
+> > make it controllable with a sockopt? module param?)
 
-I was discussing this with Andre on private.
+What page size are you using? At some point I had this as PAGE_SIZE but
+it wasn't popular:
 
-Also, do you know why we got:
+https://lore.kernel.org/all/20250701201400.52442b0e@pumpkin/
 
-	/srv/vmksft/testing/wt-18/tools/testing/selftests/kselftest/runner.sh: line 50: : No such file or directory
+> I'm not sure about sockopt, because this is really device specific and can't
+> be linked to a specific socket, since the device will pre-fill the queue
+> with buffers that can be assigned to different sockets.
+> 
+> But yeah, perhaps a module parameter would suffice, provided that it can
+> only be modified at load time, otherwise we would have to do something
+> similar to NIC and ethtool, but I feel that would be too complicated for
+> this use case.
 
-after the test failed?
+FWIW, we carried something similar in Android for a while on the
+transmit side and it was a bit of a pain to maintain; we ended up in
+situations where the guest and the host had to be configured similarly
+for things to work, although the non-linear support should solve those
+issues now. I'm not against the idea, I just wouldn't wish that pain on
+anybody else!
 
-Link: https://netdev-ctrl.bots.linux.dev/logs/vmksft/net-drv-dbg/results/470321/3-netcons-resume-sh/stdout
+Anyway, if we wanted to support something similar upstream for the rx
+buffers, I'd suggest specifying it as a page-order for the entire
+SKB allocation and clamping it to PAGE_ALLOC_COSTLY_ORDER.
+
+Will
 
