@@ -1,127 +1,117 @@
-Return-Path: <netdev+bounces-249014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46ED4D12B0D
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 14:10:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1D62D12B83
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 14:18:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B888A3000DFE
-	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 13:10:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C3C0D305BC1E
+	for <lists+netdev@lfdr.de>; Mon, 12 Jan 2026 13:15:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A8E3587D7;
-	Mon, 12 Jan 2026 13:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F7E425FA29;
+	Mon, 12 Jan 2026 13:15:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SHlRpbfa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vzSKUPpJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41FE73587AA
-	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 13:10:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECE5D358D23
+	for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 13:15:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768223421; cv=none; b=aMoV2vrVsqFDgry73KsRXyYWGkcB1Z6jKAtn6AHwx6C2+yCzz88eeHKo0nRv4D2TGUzBCZZ++RDoPLRM1gxQL+SSZBvSN3Ar57/pWAmP3TTpjjZJW7BdiqDAJ/au9cG0nHcdi9872In5kjsShSQb/CM2lB86vk2roplDcJmCQYk=
+	t=1768223719; cv=none; b=KhGwGeCnhRxY+G/E6BUJPrlZi2oBIe8lwf+ZSnDRN4fqQpqTbIFgkAPAgdM6T8qQ3qzJ+3SmjzNyWeiXk4mGePcPQilzCMTsb55XItbtcazvirK06ZJuisBcvPnaN46LbioHMxfoq6K2HQ6k2o79Zvwdal2V495KQObctkySXTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768223421; c=relaxed/simple;
-	bh=KLb7rrix/hx2YIVl8QWBGWMLT0jC1Fm7N/5kv+rcUdY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rb2t/Fouv/cxmFFRlNDXpDk4/RruVSFXolPOduViYbjMYtz+Y0T5cTTLvAZuFFtTRD94P3IAy05nBEyj9HfrSNbIn5z9Gw9piL9Se3Xw/ts4WoWN4nG8MXy9V/zI2i2STkD6UmS6t13n3S198Yp47skTL9VbY/204YTmuKE2P54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SHlRpbfa; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768223419;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fCxte+sASljka+rQHwJ/rlUEewr2IBIVlYyDsrOe3CA=;
-	b=SHlRpbfaNwW67YDVnjkEUE537JG135KZnz7uzj1ekMqdo319+XK0tQ322Vm52Okw0ZQQCf
-	ZBpCuXxIBrIyxt5Uupq4YpVU8ByW2UOHDWf2DbGngN4an4kc21APzEmaUyGPlLLbQcG7ps
-	i8JrzJ5UV1bvFnGCVus3KahOIcqx/eo=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-399-S8ApqOwZNA6v_BM_gFkFSQ-1; Mon,
- 12 Jan 2026 08:10:15 -0500
-X-MC-Unique: S8ApqOwZNA6v_BM_gFkFSQ-1
-X-Mimecast-MFC-AGG-ID: S8ApqOwZNA6v_BM_gFkFSQ_1768223413
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0A98B180045C;
-	Mon, 12 Jan 2026 13:10:13 +0000 (UTC)
-Received: from [10.44.34.128] (unknown [10.44.34.128])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3FFCF30001A2;
-	Mon, 12 Jan 2026 13:10:08 +0000 (UTC)
-Message-ID: <e676a8f1-0b82-4053-86d6-a8c492cf7238@redhat.com>
-Date: Mon, 12 Jan 2026 14:10:07 +0100
+	s=arc-20240116; t=1768223719; c=relaxed/simple;
+	bh=LhOcpeJcHqa1igwCqRc5+tNMu/qR8by9bvyDzIqbNHw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=WFRM2Hp57AR1kiJQd51Hn8i0ci2qBGzyuRQI1R2co6uMkUMiU55otlNUeiQ+0Ktio9OyobbrN6CCbS8boe9h+Fa3TaHL3yI4kRODXxndzFCojQ1Bpv03mUKbbtg5Fqa6stgQQ22gnyiptX1kyBM+DMmYmGZqvNYCXyjRvd8uk3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vzSKUPpJ; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-79043e14dfdso82013657b3.0
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 05:15:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768223717; x=1768828517; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YSKPMjUKQFZkXncdezhcC0dL3TdZP2aGdtekHJ7PVwo=;
+        b=vzSKUPpJ/LS1PYjjf0U1yfJd7cg5LZJ4YUdkUKdGLfN1baqP7u17YBAvO2u6KxQa//
+         QhqyObbTOJ/8RIRBiRH+am1tgD4PjybQR7Jz/Rnfu119KO2tN5Q1T62y6ph2oLSU0hUZ
+         GkPUWnd78bgMcXCyOVbw2QdaMj6QxzmAN6AmAh9ttyRJO4o5h8tAGD/lk3WsWkqwFL46
+         +D4OFRY2F9A1DL/dvJ915YlF95/+59QX0fGgA5DFfxO8Bs2zLTdNAUfG22AkHt9RE3X4
+         8IKmTTqiinreRgZwZM5iCE7sNbiI0yUpBuLqJIY/xr+zO3NDTspIwRzlR9rE7bl5k6AF
+         3z8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768223717; x=1768828517;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YSKPMjUKQFZkXncdezhcC0dL3TdZP2aGdtekHJ7PVwo=;
+        b=op0vnEwSiQwI4ZZ9tt5we9fYm1uplMMY8ylJSX9eCRfRfNABI9GrckUK4mzNHvF3W/
+         j0xUwR/EvvX018qveeEq+w+JmMcyCkJC7Zgde3bKql+jicU89aJr8Zp3fvyl+P6qPUc7
+         ZEhwBj201WcMCHOiDi4NcFsvkNX219pYNdI01poweOLaiMpf5wluMd8toq9WmTsPVbtj
+         Qy9/5ZgXosVL9a0Jk36lq7Zo0m8YtwboWLXsyKuXCGswpw3Yr1omhjzpJDqOTq6mDMV7
+         3PP7bVxzRI/eOye/8nYOeG5ng5FcBZJC8BXXXX32VQKBgzpLhX9xgWbYLp4o2LPVrkAA
+         8Xuw==
+X-Forwarded-Encrypted: i=1; AJvYcCVQvCxTqGbYo6o4z9sGW8fzDdAQzxRZk/6tjuNMwpFgLq19bvGe0DdKXlCpeI1vjXBHRmwKkTA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJkMWpLLSbIPfM2CVZgrub24x43LgWdqu5huMB5wdlDV521YtQ
+	C0TuFWWLm1HSlS/Al8Yp3t/tuhprR7ffsEHo12IoMihPC5DNDKb2d7a3n/xjvRSg8847kZj95L7
+	G1HtdGosnEsuHiw==
+X-Google-Smtp-Source: AGHT+IFBbVlN/l9YvwZ1uax9Mv65fCDUhkOVfeRVUW71MdGjvA11TAoddfwFho9qNmqB60e4VkejUCZiTCoMRA==
+X-Received: from ywbme3-n2.prod.google.com ([2002:a05:690c:8683:20b0:786:98b0:a64d])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:690e:b42:b0:647:108c:15b with SMTP id 956f58d0204a3-64716c0618cmr14234435d50.65.1768223716850;
+ Mon, 12 Jan 2026 05:15:16 -0800 (PST)
+Date: Mon, 12 Jan 2026 13:15:15 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/3] dpll: add dpll_device op to set working mode
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org
-Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Prathosh Satish <Prathosh.Satish@microchip.com>, Petr Oros
- <poros@redhat.com>, linux-kernel@vger.kernel.org,
- Michal Schmidt <mschmidt@redhat.com>
-References: <20260112101409.804206-1-ivecera@redhat.com>
- <20260112101409.804206-3-ivecera@redhat.com>
- <0179717b-9567-4f3d-a521-6988c2d21ba6@linux.dev>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <0179717b-9567-4f3d-a521-6988c2d21ba6@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
+Message-ID: <20260112131515.4051589-1-edumazet@google.com>
+Subject: [PATCH net-next] net: inline napi_skb_cache_get()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
+clang is inlining it already, gcc (14.2) does not.
 
+Small space cost (215 bytes on x86_64) but faster sk_buff allocations.
 
-On 1/12/26 12:35 PM, Vadim Fedorenko wrote:
->> diff --git a/Documentation/netlink/specs/dpll.yaml b/Documentation/ 
->> netlink/specs/dpll.yaml
->> index 78d0724d7e12c..b55afa77eac4b 100644
->> --- a/Documentation/netlink/specs/dpll.yaml
->> +++ b/Documentation/netlink/specs/dpll.yaml
->> @@ -550,6 +550,7 @@ operations:
->>           request:
->>             attributes:
->>               - id
->> +            - mode
->>               - phase-offset-monitor
->>               - phase-offset-avg-factor
->>       -
->> diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
->> index d6a0e272d7038..37ca90ab841bd 100644
->> --- a/drivers/dpll/dpll_netlink.c
->> +++ b/drivers/dpll/dpll_netlink.c
->> @@ -853,6 +853,45 @@ int dpll_pin_change_ntf(struct dpll_pin *pin)
->>   }
->>   EXPORT_SYMBOL_GPL(dpll_pin_change_ntf);
->> +static int
->> +dpll_mode_set(struct dpll_device *dpll, struct nlattr *a,
->> +          struct netlink_ext_ack *extack)
->> +{
->> +    const struct dpll_device_ops *ops = dpll_device_ops(dpll);
->> +    enum dpll_mode mode = nla_get_u32(a), old_mode;
->> +    DECLARE_BITMAP(modes, DPLL_MODE_MAX) = { 0 };
-> 
-> I believe the size of bitmap should be DPLL_MODE_MAX + 1 or
-> __DPLL_MODE_MAX?
+$ scripts/bloat-o-meter -t net/core/skbuff.gcc.before.o net/core/skbuff.gcc.after.o
+add/remove: 0/1 grow/shrink: 4/1 up/down: 359/-144 (215)
+Function                                     old     new   delta
+__alloc_skb                                  471     611    +140
+napi_build_skb                               245     363    +118
+napi_alloc_skb                               331     416     +85
+skb_copy_ubufs                              1869    1885     +16
+skb_shift                                   1445    1413     -32
+napi_skb_cache_get                           112       -    -112
+Total: Before=59941, After=60156, chg +0.36%
 
-Yes, you are right... will fix.
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/core/skbuff.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks,
-Ivan
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index a56133902c0d9c47b45a4a19b228b151456e5051..9e94590914b7f9b1cc748262c73eb5aa4f9d2df8 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -280,7 +280,7 @@ EXPORT_SYMBOL(__netdev_alloc_frag_align);
+  */
+ static u32 skbuff_cache_size __read_mostly;
+ 
+-static struct sk_buff *napi_skb_cache_get(bool alloc)
++static inline struct sk_buff *napi_skb_cache_get(bool alloc)
+ {
+ 	struct napi_alloc_cache *nc = this_cpu_ptr(&napi_alloc_cache);
+ 	struct sk_buff *skb;
+-- 
+2.52.0.457.g6b5491de43-goog
 
 
