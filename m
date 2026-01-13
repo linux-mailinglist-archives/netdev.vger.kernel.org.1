@@ -1,65 +1,79 @@
-Return-Path: <netdev+bounces-249247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF46FD163F4
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 03:00:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0EE0D16400
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 03:01:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 79E40300AAF4
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 02:00:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DA91C3027CC2
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 02:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCB422DAFA5;
-	Tue, 13 Jan 2026 02:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DD0D2D4805;
+	Tue, 13 Jan 2026 02:00:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="fbQYBnUj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lWBBMepc"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.126.com (m16.mail.126.com [117.135.210.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BCCE2D7D41;
-	Tue, 13 Jan 2026 02:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4FD22258C;
+	Tue, 13 Jan 2026 02:00:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768269632; cv=none; b=uStaxxtUNEwj4zs2Jne7cQhHI9wG0mm1HG/75PWNPwGVPOI1Gk2840BHPAv74LFuOtsCHV+eDviK8lWZ5ztpb7lOSrLgTo9C3LkoTC/E2e9/owc7ePR3I3pxjHGr5LZzTl7MBWhdZGzzi+AQubwrOi2hOxP1pckA0f/hHOIrboM=
+	t=1768269640; cv=none; b=E3HaZ+YDLO/24IBv/k8Crh5KhfYHAdLyt/ZRsJC94B7Y52qDBx7bzdy21ObSMR0QYKMW/dvzCeJxunC25Imh6z8vjBdsY0CKzCKnAtmtABqY0Z24wciXxU8pqidRbkGu6+UGskUrzp2Eith/4TwaCZ51Gw5ZQa6iK1j4dpCtRYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768269632; c=relaxed/simple;
-	bh=cpMMSXmxxAK/oz2nR0lbi8N/BFlxzjt8GL5z0xcp/9A=;
-	h=Date:From:To:Subject:Content-Type:MIME-Version:Message-ID; b=nAJK6QAl7qC2JZIOS1BZrJkRt2oragDdpfYBxv3w6bAcUZNVJns+e3OWnTxOjUpFKNm0LtfPNO1kjYVO3mAp0HmSvs7DqH5aEYpRbsUpjpIZpC8qN1J3PiqLJ2byMx+TnjrgKFEzopRjZM+s34eGsSeIuWoNHM5C9Ftv1Ympg8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=fbQYBnUj; arc=none smtp.client-ip=117.135.210.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=cpMMSXmxxAK/oz2nR0lbi8N/BFlxzjt8GL5z0xcp/9A=; b=f
-	bQYBnUj2Twy3AHfRba6wPyvWh1IVSEZVHlnZGVIaPV1SjkfJyK6C/P2/2e7cDf+y
-	pTj4N3HuNrYyNbsBsj3dZ0m38dARQqxWsJxf2PjksjujZzLUpm5esStCIis6oFEb
-	rIy0ppNTZcGLRkhBbcOr/hKwWgak9/kd1P0VzCojOs=
-Received: from cp3alai$126.com ( [49.7.65.243] ) by
- ajax-webmail-wmsvr-41-107 (Coremail) ; Tue, 13 Jan 2026 10:00:11 +0800
- (CST)
-Date: Tue, 13 Jan 2026 10:00:11 +0800 (CST)
-From: alai <cp3alai@126.com>
-To: netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, linux-mm@kvack.org
-Subject: =?GBK?B?wLTX1GFsYWm1xNPKvP4=?=
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
- 20251222(83accb85) Copyright (c) 2002-2026 www.mailtech.cn 126com
-X-NTES-SC: AL_Qu2dCv6dtk4q5yCdZOkfmUkUjus3WMKyuv4u34RQPpF8jDrjwg4aTHFNLVTZ2dCFLSqMiTaGVSZo9+Z/T4RIYKUOLK5IUAtaKRTxyH8BokwUqg==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	s=arc-20240116; t=1768269640; c=relaxed/simple;
+	bh=4EMDG5MkNURT82eJloQVVgkX9mdPfR3RCLoql906wHU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HH+LKZqFezBoRZILFnbGC/OGRTJ/rxNxOpM+hxjoYdRn2T/l258u8GZv9WksaLcUHSaZNyyYul9up33Bdf0UdjFBTaPmiIR4A8Fn2OnUNbwphIUAFcd2fx4iDlubmVPT4BxjS6GFunlZsOP3EmZSw0PQyufd1KrJ845b9IOdms4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lWBBMepc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F7D0C116D0;
+	Tue, 13 Jan 2026 02:00:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768269640;
+	bh=4EMDG5MkNURT82eJloQVVgkX9mdPfR3RCLoql906wHU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lWBBMepciK4CWeA+W9PZrytxuc3GkF5he3To6Ttyy7KsQcTkLfOZBfH7lQ9JRdWL9
+	 lAWKDGnyoIEigQhZZYCvCrlPFNOVqZEmDSqvprvuMXvArKAR3ry4I/JcQjpKFJTAMU
+	 SkBEdYdAWvhtLVI9j2QVjW9wIWwx5krEvv5CqosYP3SB/OQ0RqIXcmNIj5yNWMXJ2l
+	 1fNVypha1QboN1YThvF7k3JMtzQE41b08MlQWGTGV0sHIab/EddysisXM69FUiyHO3
+	 ox+KtGooyZpUmpJsppU/OAI6ZCEMskg03dzRBqtupyAsMAh21C7e2jbigsaVpU94Er
+	 j0KY11SC146LQ==
+Date: Mon, 12 Jan 2026 18:00:38 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Mina Almasry <almasrymina@google.com>, Stanislav Fomichev
+ <sdf@fomichev.me>, asml.silence@gmail.com, Bobby Eshleman
+ <bobbyeshleman@meta.com>
+Subject: Re: [PATCH RESEND net-next v2] net: devmem: convert binding
+ refcount to percpu_ref
+Message-ID: <20260112180038.0ab231ae@kernel.org>
+In-Reply-To: <20260107-upstream-precpu-ref-v2-v2-1-a709f098b3dc@meta.com>
+References: <20260107-upstream-precpu-ref-v2-v2-1-a709f098b3dc@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <697cd2e2.171a.19bb5150035.Coremail.cp3alai@126.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:aykvCgDXnxArp2VpysNDAA--.50487W
-X-CM-SenderInfo: lfsttzldl6ij2wof0z/xtbBrQunZGllpyuk1wAA3W
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-CgpzdWJzY3JpYmU=
+On Wed, 07 Jan 2026 17:29:38 -0800 Bobby Eshleman wrote:
+> Convert net_devmem_dmabuf_binding refcount from refcount_t to percpu_ref
+> to optimize common-case reference counting on the hot path.
+> 
+> The typical devmem workflow involves binding a dmabuf to a queue
+> (acquiring the initial reference on binding->ref), followed by
+> high-volume traffic where every skb fragment acquires a reference.
+> Eventually traffic stops and the unbind operation releases the initial
+> reference. Additionally, the high traffic hot path is often multi-core.
+> This access pattern is ideal for percpu_ref as the first and last
+> reference during bind/unbind normally book-ends activity in the hot
+> path.
+
+Applied, thanks!
 
