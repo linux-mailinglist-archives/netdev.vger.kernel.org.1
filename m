@@ -1,127 +1,272 @@
-Return-Path: <netdev+bounces-249549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D807AD1AE1A
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 19:46:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CE9F3D1AE5F
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 19:51:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D3FE1305B591
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 18:45:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AE0E53007691
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 18:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56B5D350288;
-	Tue, 13 Jan 2026 18:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="x5L4mwpy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0951B284662;
+	Tue, 13 Jan 2026 18:50:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f80.google.com (mail-oo1-f80.google.com [209.85.161.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79536196C7C;
-	Tue, 13 Jan 2026 18:45:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE152FD1DB
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 18:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768329910; cv=none; b=lArKPSRpywAFmCBTiQV2+ZZK4qTu7jxJMldk4xQndN0dawtfOgDpkwCXRIQ4uuzVtp5vEM6aM1191v3Ry960keZNkfEIvoIyl2padqizE5RcF+NjiBMC1+6BOyq6NTLCT6b2FRnxxjnifAELfjpweMnIFlKUtgp+sxj6lGlmfk0=
+	t=1768330228; cv=none; b=RV9Y/rtyq0sYNCNaywINiiJyggIZ6WFOSWwa4nTr6zuW1pJSy4GL23c/SrNoXJT/atWI8kCj0hUHZiVz5PW/AV/sUAT/mDMsQI0y95IejxKT6fXZGOMXz2V7fADJ7C4j4HmNURb+pam3WDsKk0+QKRLteZs0MofHZCFCQ14aj/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768329910; c=relaxed/simple;
-	bh=dnQ/G+I4tRhS20kh89+6F8e7BWwbcVN5W6/MKzUdxoE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nj/6kQG/tP62gwLehw8eQzDoXli6cmjWH7nWu9DwBtyQD0xw0dfwBVK/P3jArh4NyB0Qn9FPws6CmLYy9DDAVLaMq1WJzsN2WFIf/BgGPt/jPV4TZ4NKZew1BlBgj60WCSW+I6ueAMoqa497kQF43Fc2/mHgK9yeXlBqiaCXFZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=x5L4mwpy; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=jKtoDk43UnDtrx3CwO7HNH0Si8rMrFbLT6eAxKpAHcA=; b=x5L4mwpyvVpXTleXSTA4E7TB3x
-	PqA0EFm3g+ADDRa9RRrchtOtp6ieun8dXwnrsSCngYksIOzLTsbduJGHO93EJ5sOmTiopDikrI2W1
-	Q8ax2P98YDpsczL0Zc0iK7HY9RCHuKVTZVtqdNu73ghhxJVok54d0lPGUxUjqkfTn1U6uJVhV0fZz
-	m+jTOB9IGzXsFfAtxqO7S7Y9km8DXM5EvpxKlPFYsnxmZdRCk91uYE3SLfMJZDZHjfWS2hwp2QEX9
-	NihTgk+QmcNcL9S75eoUCpaLW0+DpTXskcwjiqgJh+s8Bnb6Kvtoc9KXPZiORwxY6qyROiEx6dYal
-	5yterFBA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50244)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vfjNs-000000007ks-3HYJ;
-	Tue, 13 Jan 2026 18:44:53 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vfjNl-000000000u1-2HNB;
-	Tue, 13 Jan 2026 18:44:45 +0000
-Date: Tue, 13 Jan 2026 18:44:45 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Pei Xiao <xiaopei01@kylinos.cn>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH net] net: freescale: ucc_geth: Return early when TBI
- found can't be found
-Message-ID: <aWaSnRbINHoAerGo@shell.armlinux.org.uk>
-References: <20260113074316.145077-1-maxime.chevallier@bootlin.com>
- <d89cb3a7-3a55-4bdf-805a-b3386572b220@bootlin.com>
+	s=arc-20240116; t=1768330228; c=relaxed/simple;
+	bh=CPaZtlabZZadvDBnMvqkuiC+LcouVGPw7C1XjYBNfK8=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=A/L9BIUFKEuS66Dn8KIs7n2F4NHU0jabBduFsCaC0LK9NJvqZg7CssfIi4G1UAoi3N6aukxUIdqZii2ZMRV8ipLfbgxc4jO0JYX5IlIIS9FKpzHFIKiJYIBMBVeBSd3vo+yuD1FtcLw9tBg6KSeou/TDGlW+yey3jTNlWcwudi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f80.google.com with SMTP id 006d021491bc7-65f6794a794so216489eaf.1
+        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 10:50:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768330226; x=1768935026;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lLWFX4rd56Op6Ev6w4wgVAXH9BmsMSbCEl4xvf6wcQs=;
+        b=M74ZP1M/Jtpp0xBPgzU98M6G0JOQruWkBujkc+rSA3fc+tZ2ArmMS1lTBRcFBVpT46
+         uj5vYxZ1E1Ptbs5pxsfNeuiLb2uy4e9HE0UsDe23pMLf2vc6loE0rViIhjtiRw1jV+oR
+         I4jWk72PKrQr0z5FVqQPU6gJmF+Zk2760so4UqYH+gOL8duc4ZDJMEHiyBZYlJYW49Pr
+         wd+rmWc9MWUi/7s9s7aEE/a6X+F2Tg6JeFRt6RrUXMWuoJVQp0ZhD9KIPgR2Zl9hJf/F
+         XOilRBjoV/S6mspTw5KBjw4sJu3n5okilQ+O02nruxxkUYbzfEHbmrQDWwR0Mp7xxeak
+         eErA==
+X-Forwarded-Encrypted: i=1; AJvYcCVqTX7Qf6hbaT1FAi+bQYjOZ+1hq4HWKTUJV2cAVUr75nn6k7KC3SdFsPiliZQjsvX4hu3q/0Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlFdRxiHgFDher/3Se/j+YwfRPQxzm4hNTSmiJbbqh0CZKYSU3
+	5Ak7yfWEhz6Rze7WaJXFM5PmP2hbWeFgn5fYWUaUQzVePnXjWao0CVF2l5oGwuHr9pn6lDIoeCf
+	K2ZkAahtySeSv/nLZt9BIAZWZPNCUiMLHC/z2PB7S0+nyMx8qJpi+GHEMQFE=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d89cb3a7-3a55-4bdf-805a-b3386572b220@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Received: by 2002:a05:6820:270:b0:660:fdef:87c7 with SMTP id
+ 006d021491bc7-660fdef9198mr544747eaf.41.1768330226350; Tue, 13 Jan 2026
+ 10:50:26 -0800 (PST)
+Date: Tue, 13 Jan 2026 10:50:26 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <696693f2.a70a0220.245e30.0001.GAE@google.com>
+Subject: [syzbot] [net?] memory leak in l2tp_tunnel_create
+From: syzbot <syzbot+2c42ea4485b29beb0643@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jan 13, 2026 at 09:16:29AM +0100, Maxime Chevallier wrote:
-> Hi,
-> 
-> On 13/01/2026 08:43, Maxime Chevallier wrote:
-> > In ucc_geth's .mac_config(), we configure the TBI block represented by a
-> > struct phy_device that we get from firmware.
-> > 
-> > While porting to phylink, a check was missed to make sure we don't try
-> > to access the TBI PHY if we can't get it. Let's add it and return early
-> > in case of error
-> > 
-> > Reported-by: kernel test robot <lkp@intel.com>
-> > Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> > Closes: https://lore.kernel.org/r/202601130843.rFGNXA5a-lkp@intel.com/
-> > Fixes: 53036aa8d031 ("net: freescale: ucc_geth: phylink conversion")
-> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> 
-> Heh that's what I get from sending patches while having mild fever, the
-> patch title is all wrong and should be :
-> 
-> net: freescale: ucc_geth: Return early when TBI PHY can't be found
-> 
-> I'll wait for the 24h cooldown, grab some honey + milk and resend after :)
+Hello,
 
-A question - based on dwmac:
+syzbot found the following issue on:
 
-When implementing dwmac to support 1000base-X, the dwmac doesn't
-implement the _full_ 1000base-X, but only up to the PCS. The PCS
-provides a TBI interface to the SerDes PHY provided by the SoC
-designer which acts as the PMA layer.
+HEAD commit:    f0b9d8eb98df Merge tag 'nfsd-6.19-3' of git://git.kernel.o..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1252c19a580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d60836e327fd6756
+dashboard link: https://syzkaller.appspot.com/bug?extid=2c42ea4485b29beb0643
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12741074580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15fba922580000
 
-The talk here of TBI makes me wonder whether the same thing is going
-on with ucc_geth. Is the "TBI PHY" in fact the SerDes ?
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/aad2d47ff01d/disk-f0b9d8eb.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c31e7ae85c07/vmlinux-f0b9d8eb.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/5525fab81561/bzImage-f0b9d8eb.xz
 
-Traditionally, we've represented the SerDes using drivers/phy rather
-than the drivers/net/phy infrastructure, mainly because implementations
-hvaen't provided anything like an 802.3 PHY register set, but moreover
-because the SerDes tends to be generic across ethernet, PCIe, USB, SATA
-etc (basically, anything that is a high speed balanced pair serial
-communication) and thus the "struct phy" from drivers/phy can be used
-by any of these subsystems.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+2c42ea4485b29beb0643@syzkaller.appspotmail.com
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+BUG: memory leak
+unreferenced object 0xffff88811b68c400 (size 256):
+  comm "syz.0.17", pid 6086, jiffies 4294944299
+  hex dump (first 32 bytes):
+    01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc cc18917d):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4958 [inline]
+    slab_alloc_node mm/slub.c:5263 [inline]
+    __kmalloc_cache_noprof+0x3b2/0x570 mm/slub.c:5771
+    kmalloc_noprof include/linux/slab.h:957 [inline]
+    kzalloc_noprof include/linux/slab.h:1094 [inline]
+    l2tp_tunnel_create+0x55/0x130 net/l2tp/l2tp_core.c:1573
+    pppol2tp_tunnel_get+0x134/0x250 net/l2tp/l2tp_ppp.c:653
+    pppol2tp_connect+0x234/0x920 net/l2tp/l2tp_ppp.c:710
+    __sys_connect_file+0x7a/0xb0 net/socket.c:2089
+    __sys_connect+0xde/0x110 net/socket.c:2108
+    __do_sys_connect net/socket.c:2114 [inline]
+    __se_sys_connect net/socket.c:2111 [inline]
+    __x64_sys_connect+0x1c/0x30 net/socket.c:2111
+    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+    do_syscall_64+0xa4/0xf80 arch/x86/entry/syscall_64.c:94
+    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+BUG: memory leak
+unreferenced object 0xffff88810a290200 (size 512):
+  comm "syz.0.17", pid 6086, jiffies 4294944299
+  hex dump (first 32 bytes):
+    7d eb 04 0c 00 00 00 00 01 00 00 00 00 00 00 00  }...............
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc babb6a4f):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4958 [inline]
+    slab_alloc_node mm/slub.c:5263 [inline]
+    __do_kmalloc_node mm/slub.c:5656 [inline]
+    __kmalloc_noprof+0x3e0/0x660 mm/slub.c:5669
+    kmalloc_noprof include/linux/slab.h:961 [inline]
+    kzalloc_noprof include/linux/slab.h:1094 [inline]
+    l2tp_session_create+0x3a/0x3b0 net/l2tp/l2tp_core.c:1778
+    pppol2tp_connect+0x48b/0x920 net/l2tp/l2tp_ppp.c:755
+    __sys_connect_file+0x7a/0xb0 net/socket.c:2089
+    __sys_connect+0xde/0x110 net/socket.c:2108
+    __do_sys_connect net/socket.c:2114 [inline]
+    __se_sys_connect net/socket.c:2111 [inline]
+    __x64_sys_connect+0x1c/0x30 net/socket.c:2111
+    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+    do_syscall_64+0xa4/0xf80 arch/x86/entry/syscall_64.c:94
+    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+BUG: memory leak
+unreferenced object 0xffff88811b68c500 (size 256):
+  comm "syz.0.18", pid 6087, jiffies 4294944299
+  hex dump (first 32 bytes):
+    01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc a2050c30):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4958 [inline]
+    slab_alloc_node mm/slub.c:5263 [inline]
+    __kmalloc_cache_noprof+0x3b2/0x570 mm/slub.c:5771
+    kmalloc_noprof include/linux/slab.h:957 [inline]
+    kzalloc_noprof include/linux/slab.h:1094 [inline]
+    l2tp_tunnel_create+0x55/0x130 net/l2tp/l2tp_core.c:1573
+    pppol2tp_tunnel_get+0x134/0x250 net/l2tp/l2tp_ppp.c:653
+    pppol2tp_connect+0x234/0x920 net/l2tp/l2tp_ppp.c:710
+    __sys_connect_file+0x7a/0xb0 net/socket.c:2089
+    __sys_connect+0xde/0x110 net/socket.c:2108
+    __do_sys_connect net/socket.c:2114 [inline]
+    __se_sys_connect net/socket.c:2111 [inline]
+    __x64_sys_connect+0x1c/0x30 net/socket.c:2111
+    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+    do_syscall_64+0xa4/0xf80 arch/x86/entry/syscall_64.c:94
+    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+BUG: memory leak
+unreferenced object 0xffff88810a290400 (size 512):
+  comm "syz.0.18", pid 6087, jiffies 4294944299
+  hex dump (first 32 bytes):
+    7d eb 04 0c 00 00 00 00 01 00 00 00 00 00 00 00  }...............
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc c3dcc856):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4958 [inline]
+    slab_alloc_node mm/slub.c:5263 [inline]
+    __do_kmalloc_node mm/slub.c:5656 [inline]
+    __kmalloc_noprof+0x3e0/0x660 mm/slub.c:5669
+    kmalloc_noprof include/linux/slab.h:961 [inline]
+    kzalloc_noprof include/linux/slab.h:1094 [inline]
+    l2tp_session_create+0x3a/0x3b0 net/l2tp/l2tp_core.c:1778
+    pppol2tp_connect+0x48b/0x920 net/l2tp/l2tp_ppp.c:755
+    __sys_connect_file+0x7a/0xb0 net/socket.c:2089
+    __sys_connect+0xde/0x110 net/socket.c:2108
+    __do_sys_connect net/socket.c:2114 [inline]
+    __se_sys_connect net/socket.c:2111 [inline]
+    __x64_sys_connect+0x1c/0x30 net/socket.c:2111
+    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+    do_syscall_64+0xa4/0xf80 arch/x86/entry/syscall_64.c:94
+    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+BUG: memory leak
+unreferenced object 0xffff88810ac82840 (size 1472):
+  comm "syz.0.19", pid 6088, jiffies 4294944300
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 22 0e aa 38 00 00 00 00  ........"..8....
+    0a 00 07 40 00 00 00 00 18 ae 57 0a 81 88 ff ff  ...@......W.....
+  backtrace (crc 6ae27eda):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4958 [inline]
+    slab_alloc_node mm/slub.c:5263 [inline]
+    kmem_cache_alloc_noprof+0x3b4/0x590 mm/slub.c:5270
+    sk_prot_alloc+0x3e/0x1b0 net/core/sock.c:2239
+    sk_alloc+0x36/0x440 net/core/sock.c:2301
+    inet6_create net/ipv6/af_inet6.c:193 [inline]
+    inet6_create+0x163/0x550 net/ipv6/af_inet6.c:120
+    __sock_create+0x1a9/0x310 net/socket.c:1605
+    sock_create net/socket.c:1663 [inline]
+    __sys_socket_create net/socket.c:1700 [inline]
+    __sys_socket+0xb9/0x1a0 net/socket.c:1747
+    __do_sys_socket net/socket.c:1761 [inline]
+    __se_sys_socket net/socket.c:1759 [inline]
+    __x64_sys_socket+0x1b/0x30 net/socket.c:1759
+    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+    do_syscall_64+0xa4/0xf80 arch/x86/entry/syscall_64.c:94
+    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+BUG: memory leak
+unreferenced object 0xffff8881285dd800 (size 32):
+  comm "syz.0.19", pid 6088, jiffies 4294944300
+  hex dump (first 32 bytes):
+    f8 52 86 00 81 88 ff ff 00 00 00 00 00 00 00 00  .R..............
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc bad1c2bd):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4958 [inline]
+    slab_alloc_node mm/slub.c:5263 [inline]
+    __do_kmalloc_node mm/slub.c:5656 [inline]
+    __kmalloc_noprof+0x3e0/0x660 mm/slub.c:5669
+    kmalloc_noprof include/linux/slab.h:961 [inline]
+    kzalloc_noprof include/linux/slab.h:1094 [inline]
+    lsm_blob_alloc+0x4d/0x70 security/security.c:192
+    lsm_sock_alloc security/security.c:4375 [inline]
+    security_sk_alloc+0x2f/0x270 security/security.c:4391
+    sk_prot_alloc+0x8f/0x1b0 net/core/sock.c:2248
+    sk_alloc+0x36/0x440 net/core/sock.c:2301
+    inet6_create net/ipv6/af_inet6.c:193 [inline]
+    inet6_create+0x163/0x550 net/ipv6/af_inet6.c:120
+    __sock_create+0x1a9/0x310 net/socket.c:1605
+    sock_create net/socket.c:1663 [inline]
+    __sys_socket_create net/socket.c:1700 [inline]
+    __sys_socket+0xb9/0x1a0 net/socket.c:1747
+    __do_sys_socket net/socket.c:1761 [inline]
+    __se_sys_socket net/socket.c:1759 [inline]
+    __x64_sys_socket+0x1b/0x30 net/socket.c:1759
+    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+    do_syscall_64+0xa4/0xf80 arch/x86/entry/syscall_64.c:94
+    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+connection error: failed to recv *flatrpc.ExecutorMessageRawT: EOF
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
