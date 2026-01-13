@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-249608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id F15DBD1B848
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 23:02:47 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id B47A6D1B854
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 23:03:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9D3B83012E9F
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:02:39 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DC12A300FBF2
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:02:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BA63354AEB;
-	Tue, 13 Jan 2026 22:02:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79543354AF4;
+	Tue, 13 Jan 2026 22:02:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JhOVTI7G"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FBOn/x6w"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8AEA350D62
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 22:02:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A807354AE9
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 22:02:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768341752; cv=none; b=AKMOlksNDbEkbn0LpM5nJF89qdOr+UZx7UGMoRr6jreTH/xEyi+NxAJrDzlSZe5WwOUYuokhEvzPnW2Aomgm/RLlMOxMHs5BXIfTecrHu51GvaXRuStps9K7Yx3FnxlufDIlv0w3Dc/6DTDw1G2lT8YaSccyXLkIzOS1vgoB8NM=
+	t=1768341754; cv=none; b=mpJjo5BwMbP85KivICShaRRaJCr+/Wpjy4lsst6MSZhBpHmD+1+2xVpVpeu7111vEqbtMiEZoqQY8uNxogshLZagqdBBb61RUkcdwyjhRlMWGw/h2u+9KkNRy4EYeFgASmXp1T6tSPpB9aIVL7kXAZ6MK9toO03mDQ/NDR+12N4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768341752; c=relaxed/simple;
-	bh=22quTL7fh9scRyyVrxtChnsb+pVvyQ7G290IuYomw4o=;
+	s=arc-20240116; t=1768341754; c=relaxed/simple;
+	bh=VfZx+6vMFCWhp5+5AclqfRlOCNS9CJuu6ubQONt55M4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PyOhanhZNMo4hDo7zO65njlZ0CFIggpCuzhjzYJjDPbuLT+r2xlspuJHlBXjaglX36qvQQdxNmiB0ak9zAL3lUDyfz/Q52rj0pgqggbzxYRatZry7oeXHwpXH6VyI3/E7jLaTrkPZKCPceMBWJpzxeTVlc2eg6S8UVbbUJydUe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JhOVTI7G; arc=none smtp.client-ip=198.175.65.21
+	 MIME-Version; b=YoyTEEtJQMuwgGf2z5iaHWRrvOBkRJM78vroeE6nTPP0SeCKNVAN/xzLVW6QdHuOtO40e3I6Or+oaF5o5carrpHVA/DjofrcBBMIpTZkSwJYG+fJtf9W6fhSMhIyaZP5K3Md0WjuSD7GIjxvfkFN7QnGNF3lYnrxJ0htvKMoKFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FBOn/x6w; arc=none smtp.client-ip=198.175.65.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768341751; x=1799877751;
+  t=1768341754; x=1799877754;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=22quTL7fh9scRyyVrxtChnsb+pVvyQ7G290IuYomw4o=;
-  b=JhOVTI7GCpCk8T8gBvmx5of0XOx0IU3OoUjGvU/3O/9EroEEbITp4m8b
-   MAbUArkAPLZlDcvNVSGzB2L1MO0e4ahFqfzsEgtv+aHCiq6uWNBIGlQwu
-   ik9njFcl/zJCM3rV+qcxiChTxrO9GxbZCUIkSeNteIDTxKQhcvy3qzRja
-   68bDNJ5nK/MGnaeAV20SfxTzO5Kpwks761pCA7Do847REG41OT4MtOVqV
-   iccWi1ruG/5hgUz9PI1SUAFuiuA/KnLqD/Rekw8mkuvRFTcskqKm3oybN
-   uy51qms5M1U0wwDzMsL5E3HJY6Ic6UZgs9ZtVthLEbbvTPBsQgr3/e4Ax
-   w==;
-X-CSE-ConnectionGUID: ZrpP/iicRxuTKwnS7CrWYQ==
-X-CSE-MsgGUID: Ed82LXySTBOAp90ViQjo2g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11670"; a="69558674"
+  bh=VfZx+6vMFCWhp5+5AclqfRlOCNS9CJuu6ubQONt55M4=;
+  b=FBOn/x6wVVkHWbm6G3ehIrjhG0uClgRU9HQTtj9J2ai2GYmRljt5ZvkN
+   1rUIJKo6PoYjHCKYXsd5OuAcQfdboOwktf6ze4nCYQev/YCXNNP/lmmPD
+   B6wZbbZM/+jDbx1aVDoVYTtPJ5ijB4vPEA3PLRwm7HIJ27hYUL44Yn+BD
+   T1R1UTqCEJx1IQihVbUVkBgq7QrV5FD/9b9trI+y5W2fylQZlZXISgA2T
+   wBLKvtmEpL/KMgAV/yjs/v/qv9ByaBLh97yNKnCRq4fLqNG6QOIUzIlOJ
+   NgFHtMJ7ZJmgR1D4DnqyD6yeKCg/Jc1nun1WWerTINwTnuG9qvf2Zobdz
+   Q==;
+X-CSE-ConnectionGUID: h7mqVbIJQdK5RK4qfyZHyA==
+X-CSE-MsgGUID: li6UUsWyTxmULQl+AyDBNw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11670"; a="69558683"
 X-IronPort-AV: E=Sophos;i="6.21,224,1763452800"; 
-   d="scan'208";a="69558674"
+   d="scan'208";a="69558683"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
   by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2026 14:02:29 -0800
-X-CSE-ConnectionGUID: D1nm+0Q+QN6dv9R53EpRgA==
-X-CSE-MsgGUID: 8Z811L0JSS+0txPORkzzXg==
+X-CSE-ConnectionGUID: yUryBcAhSxOAOfQMG24ICw==
+X-CSE-MsgGUID: cflAVd10RlevMqp31cKj9Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,224,1763452800"; 
-   d="scan'208";a="204388177"
+   d="scan'208";a="204388181"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa006.fm.intel.com with ESMTP; 13 Jan 2026 14:02:28 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -63,17 +63,17 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Ding Hui <dinghui@sangfor.com.cn>,
+Cc: Kurt Kanzenbach <kurt@linutronix.de>,
 	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	Simon Horman <horms@kernel.org>,
+	vitaly.lifshits@intel.com,
+	dima.ruinskiy@intel.com,
+	bigeasy@linutronix.de,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Rinitha S <sx.rinitha@intel.com>
-Subject: [PATCH net 3/6] ice: Fix incorrect timeout ice_release_res()
-Date: Tue, 13 Jan 2026 14:02:16 -0800
-Message-ID: <20260113220220.1034638-4-anthony.l.nguyen@intel.com>
+	Avigail Dahan <avigailx.dahan@intel.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Subject: [PATCH net 4/6] igc: Restore default Qbv schedule when changing channels
+Date: Tue, 13 Jan 2026 14:02:17 -0800
+Message-ID: <20260113220220.1034638-5-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20260113220220.1034638-1-anthony.l.nguyen@intel.com>
 References: <20260113220220.1034638-1-anthony.l.nguyen@intel.com>
@@ -85,45 +85,83 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Ding Hui <dinghui@sangfor.com.cn>
+From: Kurt Kanzenbach <kurt@linutronix.de>
 
-The commit 5f6df173f92e ("ice: implement and use rd32_poll_timeout for
-ice_sq_done timeout") converted ICE_CTL_Q_SQ_CMD_TIMEOUT from jiffies
-to microseconds.
+The Multi-queue Priority (MQPRIO) and Earliest TxTime First (ETF) offloads
+utilize the Time Sensitive Networking (TSN) Tx mode. This mode is always
+coupled to IEEE 802.1Qbv time aware shaper (Qbv). Therefore, the driver
+sets a default Qbv schedule of all gates opened and a cycle time of
+1s. This schedule is set during probe.
 
-But the ice_release_res() function was missed, and its logic still
-treats ICE_CTL_Q_SQ_CMD_TIMEOUT as a jiffies value.
+However, the following sequence of events lead to Tx issues:
 
-So correct the issue by usecs_to_jiffies().
+ - Boot a dual core system
+   igc_probe():
+     igc_tsn_clear_schedule():
+       -> Default Schedule is set
+       Note: At this point the driver has allocated two Tx/Rx queues, because
+       there are only two CPUs.
 
-Found by inspection of the DDP downloading process.
-Compile and modprobe tested only.
+ - ethtool -L enp3s0 combined 4
+   igc_ethtool_set_channels():
+     igc_reinit_queues()
+       -> Default schedule is gone, per Tx ring start and end time are zero
 
-Fixes: 5f6df173f92e ("ice: implement and use rd32_poll_timeout for ice_sq_done timeout")
-Signed-off-by: Ding Hui <dinghui@sangfor.com.cn>
-Reviewed-by: Simon Horman <horms@kernel.org>
+  - tc qdisc replace dev enp3s0 handle 100 parent root mqprio \
+      num_tc 4 map 3 3 2 2 0 1 1 1 3 3 3 3 3 3 3 3 \
+      queues 1@0 1@1 1@2 1@3 hw 1
+    igc_tsn_offload_apply():
+      igc_tsn_enable_offload():
+        -> Writes zeros to IGC_STQT(i) and IGC_ENDQT(i), causing Tx to stall/fail
+
+Therefore, restore the default Qbv schedule after changing the number of
+channels.
+
+Furthermore, add a restriction to not allow queue reconfiguration when
+TSN/Qbv is enabled, because it may lead to inconsistent states.
+
+Fixes: c814a2d2d48f ("igc: Use default cycle 'start' and 'end' values for queues")
+Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+Tested-by: Avigail Dahan <avigailx.dahan@intel.com>
+Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_common.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/intel/igc/igc_ethtool.c | 4 ++--
+ drivers/net/ethernet/intel/igc/igc_main.c    | 5 +++++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 046bc9c65c51..785bf5cc1b25 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -2251,7 +2251,7 @@ void ice_release_res(struct ice_hw *hw, enum ice_aq_res_ids res)
- 	/* there are some rare cases when trying to release the resource
- 	 * results in an admin queue timeout, so handle them correctly
- 	 */
--	timeout = jiffies + 10 * ICE_CTL_Q_SQ_CMD_TIMEOUT;
-+	timeout = jiffies + 10 * usecs_to_jiffies(ICE_CTL_Q_SQ_CMD_TIMEOUT);
- 	do {
- 		status = ice_aq_release_res(hw, res, 0, NULL);
- 		if (status != -EIO)
+diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+index e94c1922b97a..3172cdbca9cc 100644
+--- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
++++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+@@ -1565,8 +1565,8 @@ static int igc_ethtool_set_channels(struct net_device *netdev,
+ 	if (ch->other_count != NON_Q_VECTORS)
+ 		return -EINVAL;
+ 
+-	/* Do not allow channel reconfiguration when mqprio is enabled */
+-	if (adapter->strict_priority_enable)
++	/* Do not allow channel reconfiguration when any TSN qdisc is enabled */
++	if (adapter->flags & IGC_FLAG_TSN_ANY_ENABLED)
+ 		return -EINVAL;
+ 
+ 	/* Verify the number of channels doesn't exceed hw limits */
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index 7aafa60ba0c8..89a321a344d2 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -7759,6 +7759,11 @@ int igc_reinit_queues(struct igc_adapter *adapter)
+ 	if (netif_running(netdev))
+ 		err = igc_open(netdev);
+ 
++	if (!err) {
++		/* Restore default IEEE 802.1Qbv schedule after queue reinit */
++		igc_tsn_clear_schedule(adapter);
++	}
++
+ 	return err;
+ }
+ 
 -- 
 2.47.1
 
