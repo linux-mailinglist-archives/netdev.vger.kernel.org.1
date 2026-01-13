@@ -1,147 +1,187 @@
-Return-Path: <netdev+bounces-249374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C45AD17BF5
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 10:46:08 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D472D17B08
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 10:38:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 18E66306435B
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 09:34:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 276BB3010E5E
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 09:37:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7912A33BBC6;
-	Tue, 13 Jan 2026 09:34:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420D537FF63;
+	Tue, 13 Jan 2026 09:37:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OmJvPuye"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pi01Ba6u";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qe4f/O7u"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556D22EA48F;
-	Tue, 13 Jan 2026 09:34:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B0E5192B75
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 09:36:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768296846; cv=none; b=jRKygaTFk6RsYTEatS54jNIKfTFadtYwrgjI6Pl3MFFRsoF1E/C5gVOBmfdyHbf2aUdH40OsUzhdSHJXTHQ4IpdG7UFLWFYBijR70DYIQ+q6WhQPDPNWjj84QQGSUORbbSacO5Gnkg/69kzHHZwzk03LU8qZQyEtTHC5gruAm2Q=
+	t=1768297020; cv=none; b=a3rzBrTULWuqiJP8bxPPJc1R35fmHtxs9sSqIEFkYLvRc6AhudrRRLZsecrZFFZ5AXtxPrup9PvPqkYuE05I4jl5S0pcy5TYRO43+qd2AJvbRsKzZ+5WOePCrPVrzUrRuXrAu4jcwUT5MjlS5YgH1aW9hCER7asI7AS1jMcNFsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768296846; c=relaxed/simple;
-	bh=3BAHxdUuSQCK2Gm9pkSjDL+/cYetI64jI16DsIz55Bs=;
+	s=arc-20240116; t=1768297020; c=relaxed/simple;
+	bh=i7jmKtKg7PeuT25Uc1BWE7cT/g0kspLdiSl6D9EotN8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hAgtDs4zRFNXMICzY0EV8dx9nurmMc7XtZ/T7e+lqYOKW0uJyFe29X1Xc2wC3xeUQD5Ie7+icMR2NyC+HyTC2ZQ8H3A2r17FAk37nk05YqirvaCBI1nyNJNUh9T5ugHESX/Cg+nCntm08ctnEAREhtxIqW5m20B6URqR/E019MA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OmJvPuye; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A040C116C6;
-	Tue, 13 Jan 2026 09:34:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768296846;
-	bh=3BAHxdUuSQCK2Gm9pkSjDL+/cYetI64jI16DsIz55Bs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OmJvPuyeZ/EGjyDFqRTMxV0H0EnvyUmm1xDGSf1aLxX6xBNDIz9gShJvhj8P+1sXb
-	 mFmpnPgcnDgAZW+3ubBRbyqtG/Viv9XrFeF8YF8nJYf/X9Pgv1SigGt/1479pe3/ZA
-	 rXU6wUNYsnM7S+yyVnMK70vOzJcdPHB24oOEYK6nOnxveZlpAD3/t+42v0QGQ+t26g
-	 nFH7wEF8YSKAE0RMS249z4cD70XX39fApOQbq6jGp8jSQkt90iUwMIR74ZSC/KkXLJ
-	 WcnaaudOpZuEroltlHbBxqKMD6Hilgv7RH1B58ugeU8mJrseyJLAer95Psf3riaogO
-	 P9wOrgbMWdfuQ==
-Date: Tue, 13 Jan 2026 10:34:00 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack3000@gmail.com>
-Cc: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E . Hallyn" <serge@hallyn.com>, Justin Suess <utilityemal77@gmail.com>, 
-	linux-security-module@vger.kernel.org, Tingmao Wang <m@maowtm.org>, 
-	Samasth Norway Ananda <samasth.norway.ananda@oracle.com>, Matthieu Buffet <matthieu@buffet.re>, 
-	Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, konstantin.meskhidze@huawei.com, 
-	Demi Marie Obenour <demiobenour@gmail.com>, Alyssa Ross <hi@alyssa.is>, Jann Horn <jannh@google.com>, 
-	Tahera Fahimi <fahimitahera@gmail.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	Alexander Viro <viro@zeniv.linux.org.uk>
-Subject: Re: [PATCH v2 1/5] lsm: Add hook unix_path_connect
-Message-ID: <20260113-kerngesund-etage-86de4a21da24@brauner>
-References: <20260110143300.71048-2-gnoack3000@gmail.com>
- <20260110143300.71048-4-gnoack3000@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=DLqSh5cy4ySWUtSU4/nJ+wgXpl9Z5RrbK1E7sLvulizdo1bWTdZTSxZ8s97JzksJDsqgVkdKgEfXKJvSOK604cn/ZxkNuag+DSlsjeB2s9dEqik27e7vrcdgePeH+G9wSrjUvr1Xj+9Y7a61aoFzcnQNkus07CF0FKClq4u1oCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pi01Ba6u; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qe4f/O7u; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768297018;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pg4CF8mbdvXgdlxK3eag1qF9zBIQiZ4lLsv36mMbgWM=;
+	b=Pi01Ba6uThWnTNnUI8c1UqU1ZaIBNclqiwTbJqr318FXEcmttfMlzyX9khiVn0zHFQVUPv
+	zxlKYYZO7/A0QpD1v5DhtstFx8EhWifUc76o/HGKd1W/kmvPUveAVoo1eecvdFnuwnNznO
+	bG35TAYCm0bX6i6i1oH0iJzrJvekuAk=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-351-OVlg_PyJNFu4iPb6bvmE2A-1; Tue, 13 Jan 2026 04:36:56 -0500
+X-MC-Unique: OVlg_PyJNFu4iPb6bvmE2A-1
+X-Mimecast-MFC-AGG-ID: OVlg_PyJNFu4iPb6bvmE2A_1768297016
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-431026b6252so5800732f8f.1
+        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 01:36:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1768297011; x=1768901811; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pg4CF8mbdvXgdlxK3eag1qF9zBIQiZ4lLsv36mMbgWM=;
+        b=Qe4f/O7uRm8C2wshHKoVgSo0Kl26YcWaIctRvc5+rRbcMp2yIlc8OFcugjYLKVOeq9
+         Tzj3Q5U08ZrP2R0Xxm3iRN7AqvjusR8A1Dk/XusPD9tQLfw+cAORRGSyFrMKd/oMwIhI
+         cadGQq+aELEVKZ+nopOlKUSbdvd/sEKEn72y9F729NaZWohibBmgfzB1pT7ZSuil5idq
+         dqm5ajjqHPdj7utUjFTJPk8zqS3nic+LjyBpUOSMKlCcE5BvfO6KwBQ+JX5b/Xbs7452
+         JE6MAsYjCiWwIzCVr23zrG17w190MruR0v7YSznoXTrrLz5a0XXVwrslrz56d12hcnqr
+         iE7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768297011; x=1768901811;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pg4CF8mbdvXgdlxK3eag1qF9zBIQiZ4lLsv36mMbgWM=;
+        b=kM9HhbXNBzwerdNyLU4Ftj4zqp+j4/uQFLdv/y2LTC6XL3CF8vpNI445IU2LNHNSCj
+         L1/oro/zagAEQjib8QwsDoaYHg547Fl1q0lj+tv+f6wP83jli4GYu4/4+jY6EOxzmhT0
+         lqI6GjReNct9komCPRHqb0D8xkD5Rgbqcm4UMcj8V4Hpx4DpHj2/6RaiPxnBZlSnz/JJ
+         6QlU2sbx4gjtW3VZTaSEPHXygLpr8NCn8fzEXfUbpv5FysvO7QpkUvA1z98D66zSJJou
+         BjR8Z8BSlJTuMEcY4xZr0lw9m3V6xbALv+a79BBAxzzNZYT5AgfEbPYgWhCEp73SdWvL
+         aq/g==
+X-Forwarded-Encrypted: i=1; AJvYcCXOEzEDBOpZExM0eYMoT5E6LMfxKcma0zXTq7ZKnz0fJaJYZxv7ldHjmY9icjwfnyK+tNLKigA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHGQhWCrn83Ep27zfHK6BQKmMg8I5lbH9l/rbI3HatHRQUtFUX
+	PNqb5rR3Zkkn913ubAXW7wtFo1byLGSlZVs6bCYb3hXvZph0uW059Z4PdJLZA0/t0YD8ps9IiSm
+	uwPNkpW6vhEsi/DNifAcIkp4wPI8Ue3V/m1ScRvvTryaNcq7WrcTla/EUXw==
+X-Gm-Gg: AY/fxX5y8tXnnsQoTr0DEccApTa4tiwjysYFLdkkltOqvq8q/xMd9PHNfVcy/NIg0oo
+	+D0qMe6o8aYVSC2d98VdztiPWKNUOAxzGTc2lL/E4iXSNEwAyNVlXCdvs3PZNJqDqK1jr5rAFT3
+	OB4478x/sx/1r5icb97MBDu/kpAokpTL19X8Zx4IcMFNE8/uviTlQ0MvF2hOo6oSgUhouRaV2vj
+	QelgSCjvxTwAju703+r4/kqrtCIakozyl6j+oZ54j2iwX46id/Za/rP6iNvU1w7exEQt8GDm0HW
+	bJdqk1WE/Yx7X2SnAgoMvVMVL9RDHulVdj35/CJs3JCghvo/N1gEHj4UXvzDGf555n3boIiXBDl
+	vNsntpsVPKHaVQwnBrrkoA5bCDpcLicGp9nqxVq38WIhzXJ+Wg9WcUYLBuvalBA==
+X-Received: by 2002:a05:600c:1394:b0:47d:3ffa:5f03 with SMTP id 5b1f17b1804b1-47d84b3467emr250088665e9.21.1768297011479;
+        Tue, 13 Jan 2026 01:36:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHBInHZFJ8RidwkWLMCKS42wGE9AndYw8hKlz7EsNrZzGfvzlSbcNPT7twl1koVSE4j25wDOQ==
+X-Received: by 2002:a05:600c:1394:b0:47d:3ffa:5f03 with SMTP id 5b1f17b1804b1-47d84b3467emr250088215e9.21.1768297010851;
+        Tue, 13 Jan 2026 01:36:50 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-25-233.business.telecomitalia.it. [87.12.25.233])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5fe83bsm43257713f8f.38.2026.01.13.01.36.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Jan 2026 01:36:50 -0800 (PST)
+Date: Tue, 13 Jan 2026 10:36:42 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Arseniy Krasnov <avkrasnov@salutedevices.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] vsock/test: Add test for a linear and non-linear skb
+ getting coalesced
+Message-ID: <aWYQRK-fRHOqQNc8@sgarzare-redhat>
+References: <20260108-vsock-recv-coalescence-v1-0-26f97bb9a99b@rbox.co>
+ <20260108-vsock-recv-coalescence-v1-2-26f97bb9a99b@rbox.co>
+ <aWEqjjE1vb_t35lQ@sgarzare-redhat>
+ <76ca0c9f-dcda-4a53-ac1f-c5c28d1ecf44@rbox.co>
+ <aWT6EH8oWpw-ADtm@sgarzare-redhat>
+ <080d7ae8-e184-4af8-bd72-765bb30b63a5@rbox.co>
+ <aWUk0axv-GZu7VD2@sgarzare-redhat>
+ <0b15644b-9394-4734-9c0e-0a6d1355604a@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260110143300.71048-4-gnoack3000@gmail.com>
+In-Reply-To: <0b15644b-9394-4734-9c0e-0a6d1355604a@rbox.co>
 
-On Sat, Jan 10, 2026 at 03:32:57PM +0100, Günther Noack wrote:
-> From: Justin Suess <utilityemal77@gmail.com>
-> 
-> Adds an LSM hook unix_path_connect.
-> 
-> This hook is called to check the path of a named unix socket before a
-> connection is initiated.
-> 
-> Cc: Günther Noack <gnoack3000@gmail.com>
-> Signed-off-by: Justin Suess <utilityemal77@gmail.com>
-> ---
->  include/linux/lsm_hook_defs.h |  4 ++++
->  include/linux/security.h      | 11 +++++++++++
->  net/unix/af_unix.c            |  9 +++++++++
->  security/security.c           | 20 ++++++++++++++++++++
->  4 files changed, 44 insertions(+)
-> 
-> diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
-> index 8c42b4bde09c..1dee5d8d52d2 100644
-> --- a/include/linux/lsm_hook_defs.h
-> +++ b/include/linux/lsm_hook_defs.h
-> @@ -317,6 +317,10 @@ LSM_HOOK(int, 0, post_notification, const struct cred *w_cred,
->  LSM_HOOK(int, 0, watch_key, struct key *key)
->  #endif /* CONFIG_SECURITY && CONFIG_KEY_NOTIFICATIONS */
->  
-> +#if defined(CONFIG_SECURITY_NETWORK) && defined(CONFIG_SECURITY_PATH)
-> +LSM_HOOK(int, 0, unix_path_connect, const struct path *path, int type, int flags)
-> +#endif /* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
-> +
->  #ifdef CONFIG_SECURITY_NETWORK
->  LSM_HOOK(int, 0, unix_stream_connect, struct sock *sock, struct sock *other,
->  	 struct sock *newsk)
-> diff --git a/include/linux/security.h b/include/linux/security.h
-> index 83a646d72f6f..382612af27a6 100644
-> --- a/include/linux/security.h
-> +++ b/include/linux/security.h
-> @@ -1931,6 +1931,17 @@ static inline int security_mptcp_add_subflow(struct sock *sk, struct sock *ssk)
->  }
->  #endif	/* CONFIG_SECURITY_NETWORK */
->  
-> +#if defined(CONFIG_SECURITY_NETWORK) && defined(CONFIG_SECURITY_PATH)
-> +
-> +int security_unix_path_connect(const struct path *path, int type, int flags);
-> +
-> +#else /* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
-> +static inline int security_unix_path_connect(const struct path *path, int type, int flags)
-> +{
-> +	return 0;
-> +}
-> +#endif /* CONFIG_SECURITY_NETWORK && CONFIG_SECURITY_PATH */
-> +
->  #ifdef CONFIG_SECURITY_INFINIBAND
->  int security_ib_pkey_access(void *sec, u64 subnet_prefix, u16 pkey);
->  int security_ib_endport_manage_subnet(void *sec, const char *name, u8 port_num);
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index 55cdebfa0da0..3aabe2d489ae 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -1226,6 +1226,15 @@ static struct sock *unix_find_bsd(struct sockaddr_un *sunaddr, int addr_len,
->  	if (!S_ISSOCK(inode->i_mode))
->  		goto path_put;
->  
-> +	/*
-> +	 * We call the hook because we know that the inode is a socket
-> +	 * and we hold a valid reference to it via the path.
-> +	 */
-> +	err = security_unix_path_connect(&path, type, flags);
-> +	if (err)
-> +		goto path_put;
+On Mon, Jan 12, 2026 at 10:20:50PM +0100, Michal Luczaj wrote:
+>On 1/12/26 17:48, Stefano Garzarella wrote:
+>>>>>>> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>>>>>>> index bbe3723babdc..21c8616100f1 100644
+>>>>>>> --- a/tools/testing/vsock/vsock_test.c
+>>>>>>> +++ b/tools/testing/vsock/vsock_test.c
+>>>>>>> @@ -2403,6 +2403,11 @@ static struct test_case test_cases[] = {
+>>>>>>> 		.run_client = test_stream_accepted_setsockopt_client,
+>>>>>>> 		.run_server = test_stream_accepted_setsockopt_server,
+>>>>>>> 	},
+>>>>>>> +	{
+>>>>>>> +		.name = "SOCK_STREAM MSG_ZEROCOPY coalescence corruption",
+>>>>>>
+>>>>>> This is essentially a regression test for virtio transport, so I'd add
+>>>>>> virtio in the test name.
+>>>>>
+>>>>> Isn't virtio transport unaffected? It's about loopback transport (that
+>>>>> shares common code with virtio transport).
+>>>>
+>>>> Why virtio transport is not affected?
+>>>
+>>> With the usual caveat that I may be completely missing something, aren't
+>>> all virtio-transport's rx skbs linear? See virtio_vsock_alloc_linear_skb()
+>>> in virtio_vsock_rx_fill().
+>>>
+>>
+>> True, but what about drivers/vhost/vsock.c ?
+>>
+>> IIUC in vhost_vsock_handle_tx_kick() we call vhost_vsock_alloc_skb(),
+>> that calls virtio_vsock_alloc_skb() and pass that skb to
+>> virtio_transport_recv_pkt(). So, it's also affected right?
+>
+>virtio_vsock_alloc_skb() returns a non-linear skb only if size >
+>SKB_WITH_OVERHEAD(PAGE_SIZE << PAGE_ALLOC_COSTLY_ORDER)). And that is way
+>more than GOOD_COPY_LEN, so we're good.
+>
+>At least until someone increases GOOD_COPY_LEN and/or reduces the size
+>condition for non-linear allocation. So, yeah, a bit brittle.
 
-Couldn't we try reflowing the code here so the path is passed to
-security_unix_stream_connect() and security_unix_may_send() so that all
-LSMs get the same data and we don't have to have different LSMs hooks
-into different callpaths that effectively do the same thing.
+I see, thanks for clarify. So please add all of this conclusions in the 
+patch 1 description to make it clear that only loopback is affected, so 
+no guest/host attack is possible. (not really severe CVE)
 
-I mean the objects are even in two completely different states between
-those hooks. Even what type of sockets get a call to the LSM is
-different between those two hooks.
+>
+>> BTW in general we consider loopback as one of virtio devices since it
+>> really shares with them most of the code.
+>
+>Fair enough, I'll add "virtio" to the test name.
+
+Thanks.
+
+>
+>> That said, now I'm thinking more about Fixes tag.
+>> Before commit 6693731487a8 ("vsock/virtio: Allocate nonlinear SKBs for
+>> handling large transmit buffers") was that a real issue?
+>
+>I don't really think that commit changes anything for the zerocopy case. It
+>only makes some big (>GOOD_COPY_LEN) non-ZC skbs turn non-linear.
+>
+
+I see.
+
+Stefano
+
 
