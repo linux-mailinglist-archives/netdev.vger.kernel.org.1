@@ -1,144 +1,114 @@
-Return-Path: <netdev+bounces-249574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54CB6D1B181
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 20:45:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A54C8D1B1DC
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 20:54:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 15547301645C
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 19:45:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 363003016CEA
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 19:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AB633126C2;
-	Tue, 13 Jan 2026 19:45:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B312C36A010;
+	Tue, 13 Jan 2026 19:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aPiPLF4i"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="YPLNkRO3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 129DB23BF9B
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 19:45:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10FE03570CF
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 19:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768333511; cv=none; b=CuWVlK/M9xc+oZkOEGNxZyolQxK8+OFST/LDzWWkKyLlG/iMai8TYmRAB7B8ZFLrBA3mMg1wmNOWZ1+sce/mRa8OGPu9GJEgo/aEesnJGvUMTqQLkoXvIzT1Lu45Pds8uT5RBONelpJNJWm9GJBhkrh6xfRpUi7ITg1QBXrJSdA=
+	t=1768334082; cv=none; b=LoLJFS0/Y+9EP/HKLDLAIuafU6Ys0WkKMNH/qcIlPrecP8VNEXUgqJH5vDU9g+ibr4aw49WKfERn0skaL3xXf0rIOj1+OkTFwOtMPB+mGne/lhytfl54rltbNgeeL6/YtByDaP/+PF+5YlyNZqjcs8/79hKVSYu7IZlsaVHTlWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768333511; c=relaxed/simple;
-	bh=BUigQmv+IS7SNf1S/5NL6itraOCI8E1tv4UT92H7zMA=;
+	s=arc-20240116; t=1768334082; c=relaxed/simple;
+	bh=YdW2q0GpO4EHX0WhRe6b4HjMfoeWHSyAzK/rRaAABi0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XDEBW1i/Dr2ijGSPeteRE0hlQT83Xdw1SD3JBChbZcesrXemIWwxRCFxaI7JfW5kbqMM8VqvTBiITo6m6pDooVIYUjdX0QYM067hjhiFmlqfBk1Eekwh9++pkUEAoGI2IsQnlkXNn1oUW5zGuCZNdsamjHO7xfDO3P/On1DygxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aPiPLF4i; arc=none smtp.client-ip=209.85.217.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-5eae7bb8018so3122182137.2
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 11:45:09 -0800 (PST)
+	 To:Cc:Content-Type; b=WgwLiesXZLXu0F7ggSbUrK9abZGO95VEtGdLCWkk8qKw43yNP+dFtPa6Bm4oYBtOxMLphmhLvydCK774lAhJ5gcTs8lzbAH39e/aCz7xOxuSRsCCNsvwAdYynHOdy1i9tMOXUuPwRrIiGS3n8GXpWPzFoE6jkundC/OYbF9Q8g0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=YPLNkRO3; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-383247376a4so36329681fa.3
+        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 11:54:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768333509; x=1768938309; darn=vger.kernel.org;
+        d=herbertland.com; s=google; t=1768334079; x=1768938879; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BUigQmv+IS7SNf1S/5NL6itraOCI8E1tv4UT92H7zMA=;
-        b=aPiPLF4iQFJ2frMo536J5NyvXV+rKXUnT5jUXc5bIHceaTY9lF7rfKPN1GTpvAFe0h
-         xxdsW+P7DTXuQ1VJvFIzRN0Tr6/vRuvVnTpb+WLqsDog1tSRUONBveJLJBv8vXjI2tfs
-         glWSoCgA3JCBPYAfjmnwl9VOy8pu7ZU+K7mAU2Rc0pOutQC13kKNTODyddR1cyvPlDS0
-         5fzeLxOphFObZN5LuB22ugEXxQ5BNMBDQfWYicdhkjNGcnC9sj7UVnK8kAOWkKsihiaK
-         AWdwTayv4k1Kz1cz3e0Y32tb1E8Fkb/doSr0lIErUVf4eLVuTAotOerkI8X6nTL9t+9X
-         jmdA==
+        bh=IIoy/FVe88F+06EGG091rXbZFZp4KaZzIOjxCBl2QNU=;
+        b=YPLNkRO3Dehzy2C0oa21msgRqhgDjP6Xx3AkyXtlvQKv+cJSSUD5HQMehG2jTYakQ7
+         xrBllLxO86+gKFSXGJjsK/3Cgu6jxO+v/oUPUkVLzUvG+ddry7YHmUfpTZz1mHrp+QlX
+         Fd5D8qnX0o0KPa20pufZel3G80pM19nRuQw5kMlYKZZCLhWSeI0+dudBy2g0GEBaecJm
+         kCe4PxZz+Ubh7vg+rFp9qHBohhIwuED1ejvX9RQfpOMg4Td/iwF86llyP42F1SyrdUxN
+         Pef2moA6IsYrlzceEwjd5f29MA7B+veTRI70HuPCm7McJBH6iRVTqBCJTX/NDx6GJZHV
+         qzrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768333509; x=1768938309;
+        d=1e100.net; s=20230601; t=1768334079; x=1768938879;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=BUigQmv+IS7SNf1S/5NL6itraOCI8E1tv4UT92H7zMA=;
-        b=uANtPT4ovE+KVMIAEI/He7Doc7FAlA3VmoBJiw9luiKBjLUPtfEsz0aIWWnyEE9URr
-         7ZKRcv+MLsegWBRkBKj4bFmSHDsCKrnI/3mopAm6ewomrjR0D56vxQFawiRz3DwAwPo1
-         cBq9UYObLsj+EySXrHQnAEu6iFWUzJytjztIsh6Io0crzDrsbeZmEH3pqDOpcQtBQJdJ
-         JJ6bPoFNQ6LJgKzVxuv9yfAcoZX0FmPbtQyLN9T7OTfIvqTi+jqj+rfUxiWyIVUrMCXM
-         S6WzvBn4lzFpRhmcb/jMpoj2SreGct8ImIz85ecaDWZ+PlMJ5xddEIQFDbCOBDqqShC6
-         YjHA==
-X-Forwarded-Encrypted: i=1; AJvYcCVHkvLwmEmZOfLQjt3ox51lmach5mmOQB04uXP4slBFu2KytzE+o8z0i7iYAqE0BypLV1JCu50=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTLodJEJzqTrzmwPmO3u1WzMq/MBPex0EyZESbCElxRKSuywjr
-	AN+krd4ci+bdyECEN1RFLnijnZ3Hk2E9AfcYZ0swXBLDdn/qZbN6pA/r2kXkuakbkDGtWI33VI5
-	3yh+GAixSQvzaqJMPcPE1dIfeU5Ch1qE=
-X-Gm-Gg: AY/fxX5jITsXtgfmtkTw6UGl89iTsA9gwWQXOtFc11T8rHfEsy/2snjCjjNNKHmDlaR
-	ek7lEK2+JIxVrXv1ZGeI/ykOEsjZb52CpDrxy4jkeIB4kjYL5qkkUYSd/uqokuiF+CXs13NZ1Fj
-	bLNiEvxTTwYd5hGbbYd2cGTyx27cV7wXzPHVVoww2rscQjC4V3hcQzjjsDo1N3Z4KXauEENfdAE
-	jgc3Jz5nM51EeYB61TBi95cOq99dpXeeDp9ymNHVCZ3lB81PElpcA01rOgyQgsq7StV2Za0/m7q
-	9rAQ8MmDuZoheRaUdddN0GFMHH80
-X-Received: by 2002:a05:6102:3913:b0:5db:e6bf:c4d7 with SMTP id
- ada2fe7eead31-5f17f5c0ffbmr152415137.21.1768333508926; Tue, 13 Jan 2026
- 11:45:08 -0800 (PST)
+        bh=IIoy/FVe88F+06EGG091rXbZFZp4KaZzIOjxCBl2QNU=;
+        b=kAtkoNU6MCsoNBhKTb/zP2kPf1EJAXIQsrX2+zeRZQlb3GOih0CdPqARljTV6u5iXS
+         pwZLpuMjjRxE/s2lEYFxQPU6uC3mEAyBae0a5LjeUn9Yiha7jToFrzSz3UFuVRxLfAjq
+         OwGmS00ogm4JpUGVEUW5Wx7gW0dmgDvNhjm7DXQXwegzUuBoob+Z4CZR+cFxy+DY/dDk
+         hG1soOYx2uRwRJOGu+g/2VSFVB3kUQLedKR4uN83LUJRFeK//Wxii7YoZfVXnn7n+tLs
+         VmoZ0b8/bDiGa/pAGo7CNwiBfhVmEmZtcz+Qdw+1lGolCEHGeKmOWVU9QeGFxbVtDZqI
+         vzNg==
+X-Forwarded-Encrypted: i=1; AJvYcCWF9K3cYDbRVl0THAKeGWTK1EFnbiVDTzeilWCNyuethvLWe0fvEaGxTxa2jloz3v98FlFQ3DU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwR/8Ks0srm7lJmTT0Swy51pj/6U85BemN2RwJDi5WsHysscM53
+	7jJPFfsqliQwMdbq/eZjrM3kNV+YdTQuG/es2s5CYw2dBgAhHhBoC71oTDlYSUnoA6zyBGgJq0A
+	Pvi9Jqxctv2y/kgaJmZ77hTr07v2syGvUUbOWkMEcQ9nS6b1NWtx40g==
+X-Gm-Gg: AY/fxX4k35mgmVCnWJ8KCV7urz3n2LnrSbhDFReVNc/GsCI82LLj5tpDiAe7cFVsEn2
+	8rHPbZCSxjlwx/WtlGfheueVATjkRJYtJYF5YOPGu5Kk2g8AQbvZ5NVF0+PAi0+/tWZXvVCMpg6
+	GGRyI7eGAj8f9mEs+FimM3yrm76ZMXcSBbTip55ss04x0rpWMys6I0rzM2StY+K2dAlcXjg6kPz
+	iLiPOdnA28J8TkJ403FYcPDZZ3W++OKiJoDyust4p2c9o0iV9HDGK+1cPFxSOQ3uadE+a3Y1asl
+	OfoW6+oaQDX/chNnuw2zqoW/tnO+BBh5y6Bpl1mjciO2gZ0ik6bT8ljNg++G
+X-Received: by 2002:a2e:bc1d:0:b0:383:1737:5ae1 with SMTP id
+ 38308e7fff4ca-383606c207cmr760461fa.11.1768334078904; Tue, 13 Jan 2026
+ 11:54:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260111163947.811248-1-jhs@mojatatu.com> <20260111163947.811248-2-jhs@mojatatu.com>
-In-Reply-To: <20260111163947.811248-2-jhs@mojatatu.com>
-From: Cong Wang <xiyou.wangcong@gmail.com>
-Date: Tue, 13 Jan 2026 11:44:57 -0800
-X-Gm-Features: AZwV_QghuBmNS2SHRIXNqqie9Rli8ChJPn_4i1AP_4fpkgiSVL0_Wio5jYQkhwU
-Message-ID: <CAM_iQpVPnwe=YqZubeUFy78ym_TM-R3qvx3u3ydN0t6GbFnmgg@mail.gmail.com>
-Subject: Re: [PATCH net 1/6] net: Introduce skb ttl field to track packet loops
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, andrew+netdev@lunn.ch, 
-	netdev@vger.kernel.org, jiri@resnulli.us, victor@mojatatu.com, 
-	dcaratti@redhat.com, lariel@nvidia.com, daniel@iogearbox.net, 
-	pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de, phil@nwl.cc, 
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	zyc199902@zohomail.cn, lrGerlinde@mailfence.com, jschung2@proton.me
+References: <20260108171456.47519-1-tom@herbertland.com> <20260109115015.727c7e9e@kernel.org>
+In-Reply-To: <20260109115015.727c7e9e@kernel.org>
+From: Tom Herbert <tom@herbertland.com>
+Date: Tue, 13 Jan 2026 11:54:26 -0800
+X-Gm-Features: AZwV_QgIKeAH8yz7acGLRvA3u1Gx-zA8ckufMopKOvwiH9oKaZ4eUgRk8r3UUB0
+Message-ID: <CALx6S36qzL2etxrTgEn5XurzvKfnPneAG25z5kebsbtVc7c9wQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 0/4] ipv6: Disable IPv6 Destination Options RX
+ processing by default
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: quoted-printable
 
-T24gU3VuLCBKYW4gMTEsIDIwMjYgYXQgODo0MOKAr0FNIEphbWFsIEhhZGkgU2FsaW0gPGpoc0Bt
-b2phdGF0dS5jb20+IHdyb3RlOg0KPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9za2J1ZmYu
-aCBiL2luY2x1ZGUvbGludXgvc2tidWZmLmgNCj4gaW5kZXggODY3MzcwNzYxMDFkLi43ZjE4YjBj
-Mjg3MjggMTAwNjQ0DQo+IC0tLSBhL2luY2x1ZGUvbGludXgvc2tidWZmLmgNCj4gKysrIGIvaW5j
-bHVkZS9saW51eC9za2J1ZmYuaA0KPiBAQCAtODQwLDYgKzg0MCw3IEBAIGVudW0gc2tiX3RzdGFt
-cF90eXBlIHsNCj4gICAqICAgICBAbm9fZmNzOiAgUmVxdWVzdCBOSUMgdG8gdHJlYXQgbGFzdCA0
-IGJ5dGVzIGFzIEV0aGVybmV0IEZDUw0KPiAgICogICAgIEBlbmNhcHN1bGF0aW9uOiBpbmRpY2F0
-ZXMgdGhlIGlubmVyIGhlYWRlcnMgaW4gdGhlIHNrYnVmZiBhcmUgdmFsaWQNCj4gICAqICAgICBA
-ZW5jYXBfaGRyX2NzdW06IHNvZnR3YXJlIGNoZWNrc3VtIGlzIG5lZWRlZA0KPiArICogICAgIEB0
-dGw6IHRpbWUgdG8gbGl2ZSBjb3VudCB3aGVuIGEgcGFja2V0IGxvb3BzLg0KPiAgICogICAgIEBj
-c3VtX3ZhbGlkOiBjaGVja3N1bSBpcyBhbHJlYWR5IHZhbGlkDQo+ICAgKiAgICAgQGNzdW1fbm90
-X2luZXQ6IHVzZSBDUkMzMmMgdG8gcmVzb2x2ZSBDSEVDS1NVTV9QQVJUSUFMDQo+ICAgKiAgICAg
-QGNzdW1fY29tcGxldGVfc3c6IGNoZWNrc3VtIHdhcyBjb21wbGV0ZWQgYnkgc29mdHdhcmUNCj4g
-QEAgLTEwMDAsNiArMTAwMSw3IEBAIHN0cnVjdCBza19idWZmIHsNCj4gICAgICAgICAvKiBJbmRp
-Y2F0ZXMgdGhlIGlubmVyIGhlYWRlcnMgYXJlIHZhbGlkIGluIHRoZSBza2J1ZmYuICovDQo+ICAg
-ICAgICAgX191OCAgICAgICAgICAgICAgICAgICAgZW5jYXBzdWxhdGlvbjoxOw0KPiAgICAgICAg
-IF9fdTggICAgICAgICAgICAgICAgICAgIGVuY2FwX2hkcl9jc3VtOjE7DQo+ICsgICAgICAgX191
-OCAgICAgICAgICAgICAgICAgICAgdHRsOjI7DQoNCkluIHRoZSB3b3JzdCBjYXNlIGl0IGluY3Jl
-YXNlcyBza19idWZmIHNpemUuDQoNCiAg4pSM4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA
-4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA
-4pSA4pSs4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA
-4pSA4pSA4pSs4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA
-4pSA4pSA4pSA4pSs4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSQDQogIOKUgiAgICAgICBD
-b25maWcgc2NlbmFyaW8gICAgICAgIOKUgiAgICAgIEN1cnJlbnQgICAgICDilIIgICBBZnRlciBj
-aGFuZ2UNCiAg4pSCICBEZWx0YSAg4pSCDQogIOKUnOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUvOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUvOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKU
-gOKUgOKUgOKUgOKUgOKUvOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUpA0KICDilIIgQWxs
-IGNvbmZpZ3MgZW5hYmxlZCAgICAgICAgICDilIIgMTcgYml0cyAoMyBieXRlcykg4pSCIDE4IGJp
-dHMgKDMNCmJ5dGVzKSDilIIgMCAgICAgICDilIINCiAg4pSc4pSA4pSA4pSA4pSA4pSA4pSA4pSA
-4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA
-4pSA4pSA4pSA4pSA4pS84pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA
-4pSA4pSA4pSA4pSA4pSA4pS84pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA
-4pSA4pSA4pSA4pSA4pSA4pSA4pS84pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSkDQogIOKU
-giBDT05GSUdfTkVUX1JFRElSRUNUIGRpc2FibGVkIOKUgiAxNiBiaXRzICAgICAgICAgICDilIIg
-MTggYml0cw0KICDilIIgKzIgYml0cyDilIINCiAg4pSc4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA
-4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA
-4pSA4pSA4pSA4pS84pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA
-4pSA4pSA4pSA4pSA4pS84pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA
-4pSA4pSA4pSA4pSA4pSA4pS84pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSA4pSkDQogIOKUgiBN
-aW5pbWFsIGNvbmZpZyAgICAgICAgICAgICAgIOKUgiA3IGJpdHMgKDEgYnl0ZSkgICDilIIgOSBi
-aXRzICgyDQpieXRlcykgIOKUgiArMSBieXRlIOKUgg0KICDilJTilIDilIDilIDilIDilIDilIDi
-lIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
-lIDilIDilIDilIDilIDilLTilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
-lIDilIDilIDilIDilIDilIDilLTilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDi
-lIDilIDilIDilIDilIDilIDilIDilLTilIDilIDilIDilIDilIDilIDilIDilIDilIDilJgNCg0K
-SSB0aGluayB0aGlzIHdvdWxkIGJlIGEgY2xlYXIgc3RvcHBlciBpbiBuZXRkZXYuDQoNCkdvb2Qg
-bHVjayB0byB5b3Ugb24gZmlnaHRpbmcgd2l0aCBpbmNyZWFzaW5nIHNrX2J1ZmYgc2l6ZSENCg0K
-UmVnYXJkcywNCkNvbmcNCg==
+On Fri, Jan 9, 2026 at 11:50=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Thu,  8 Jan 2026 09:14:52 -0800 Tom Herbert wrote:
+> > This patchset set changes the interpretation of the Destination Options
+> > and Hop-by-Hop Options sysctl limits, net.ipv6.max_dst_opts_number and
+> > net.ipv6.max_dst_opts_number to mean that when the sysctl is zero
+> > processing of the associated extension header is disabled such that
+> > packets received with the extension header are dropped.
+>
+> Hi Tom!
+>
+> Unfortunately, this breaks GRE:
+> https://netdev.bots.linux.dev/contest.html?pw-n=3D0&branch=3Dnet-next-202=
+6-01-09--18-00&pw-n=3D0&pass=3D0
+
+Jakub,
+
+There's a hidden Destination Option used by GREv6 in
+IPV6_TLV_TNL_ENCAP_LIMIT (not defined with the other TLVs and not
+processed in the main TLV loop). So probably can't disable Destination
+options by default. I'll respin the patch set to restrict EH as much
+as possible to avoid DoS.
+
+Tom
 
