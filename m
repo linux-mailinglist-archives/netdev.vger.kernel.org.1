@@ -1,76 +1,80 @@
-Return-Path: <netdev+bounces-249425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43DE4D18A92
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 13:17:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E803BD18A9B
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 13:18:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 895F8300E014
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 12:16:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8D8C83067F5F
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 12:16:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BC6138F22D;
-	Tue, 13 Jan 2026 12:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 428FF38F22E;
+	Tue, 13 Jan 2026 12:16:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TgNqBv0n"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LjvU7Kif"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B655536657B
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 12:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D5038F23F
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 12:16:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768306610; cv=none; b=H/B07fjojJdr8tIUvbMWHPb5hsxEuQB0qdFrUwP9nqG8hcRR+hDuQGvhFqwsMpndTz+oFVa60NzZD/eBWYpL0pAhgi2dEI7bxcK/yObpKtrR5H/Zv65lLEw4d7W3qqqjvd8EdQ+gvhqeasot0itj9d6A7M29tw2z1h+w5shw5NY=
+	t=1768306615; cv=none; b=e4WUZO4YpPgCtN4GQSCS8m2pnGn+/0PY+TZGfENjPE8hymtyjXYWeZFtkyui2CVvXJE2p0lJ3JGpM2R5vt0ri7qpXi/cgJD5DswzQyO5DyxEdM6Qw1trazm351xnOdUHQ/PDPNd74GfdBwY/fib8E7qflDcbhdA7TcRrJXdoImo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768306610; c=relaxed/simple;
-	bh=15XRqH7R/RxGogfgkL4oC0Xx7K1JIHEOSLhERD77Qnk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JPU1+iQw4jIQV4F+biQsMmPeHjt1UEDxCgx2HTWeFOuL6xBmgI6R1qjQGVzN6vHe9WjwpXSSdxM2UTI5XPx9xlYj5ZT/s8bcXdxdIgwxv5AP4gP2Rac3Dpvvxu4G6UUrsm6jSMNSfWqlY5Elrifp79uu3VQeNFhDnKE7i5LNWKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TgNqBv0n; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1768306615; c=relaxed/simple;
+	bh=bVuF1P85qk2nIVFQAduEGeybJ3EoyK4Df4J67c8h6Zo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=kgvMMW5VyjYniXuQdMBNzgDqcqTHzMWCMb240ccZzbODRcajYKJ3cVNmj+t0U9Z7ZttWnbEQIpcuTcn+e6AsbZxIFbIHjmSxyL5S1jRO/+qSVVcbG5oQFJofj3TNcldLh9FxrhQ+lBlJ5eLbSEVZ2R/NFhZdywP0HQLwIWGDO0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LjvU7Kif; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768306607;
+	s=mimecast20190719; t=1768306611;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=0JNGNvBziTaoOvYW4PsewM8UhjwXEaQNNqkgeKTFmuA=;
-	b=TgNqBv0npJYyMs9wzbC0Wbm4DAuA9j7dZLNZ0u/xSJiZ7X5ttYYKTb7/om+W7sSiHHGZO9
-	u8wndwAjX0UhYjYt6EfWINM3VC6DgTcvQTLx6puG+lUdaDTZ8suRtvAhdmHqeSlBnRv7/t
-	jzsQr4vwhlJRW0jlmV1MrcRTOD6limY=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P4QFbR+Fv3opz6CX9XGah80QyrpW4c2Rsa1dj3PoBEs=;
+	b=LjvU7KifVfvWZfHFaYB10Qf8Z2qXoIN+y7ZdsRKUpyXn2WOb/4xyKtTZty4eYnHlI+wvbC
+	Hd/FEltHXo0oarA0JyrIYr60jkpC3fSyGWALSfJ4P4ysy23M3476J5BiJ6nxfwfBK7y9SY
+	2+xai63Mod6n7aUR4WTPXu3kIA9uERs=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-344-NU9MEMljPW27twYVFiuXTg-1; Tue,
- 13 Jan 2026 07:16:44 -0500
-X-MC-Unique: NU9MEMljPW27twYVFiuXTg-1
-X-Mimecast-MFC-AGG-ID: NU9MEMljPW27twYVFiuXTg_1768306602
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-611-yfRjeOi1NLqrEPWPjAA8wQ-1; Tue,
+ 13 Jan 2026 07:16:49 -0500
+X-MC-Unique: yfRjeOi1NLqrEPWPjAA8wQ-1
+X-Mimecast-MFC-AGG-ID: yfRjeOi1NLqrEPWPjAA8wQ_1768306607
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7A475180035C;
-	Tue, 13 Jan 2026 12:16:42 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 697651953994;
+	Tue, 13 Jan 2026 12:16:47 +0000 (UTC)
 Received: from p16v.redhat.com (unknown [10.44.33.116])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A877A19560AB;
-	Tue, 13 Jan 2026 12:16:37 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E3DCB19560AB;
+	Tue, 13 Jan 2026 12:16:42 +0000 (UTC)
 From: Ivan Vecera <ivecera@redhat.com>
 To: netdev@vger.kernel.org
-Cc: Donald Hunter <donald.hunter@gmail.com>,
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Donald Hunter <donald.hunter@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
 	Jiri Pirko <jiri@resnulli.us>,
 	Prathosh Satish <Prathosh.Satish@microchip.com>,
 	Petr Oros <poros@redhat.com>,
 	linux-kernel@vger.kernel.org,
 	Michal Schmidt <mschmidt@redhat.com>
-Subject: [PATCH net-next v2 0/3] dpll: support mode switching
-Date: Tue, 13 Jan 2026 13:16:33 +0100
-Message-ID: <20260113121636.71565-1-ivecera@redhat.com>
+Subject: [PATCH net-next v2 1/3] dpll: add dpll_device op to get supported modes
+Date: Tue, 13 Jan 2026 13:16:34 +0100
+Message-ID: <20260113121636.71565-2-ivecera@redhat.com>
+In-Reply-To: <20260113121636.71565-1-ivecera@redhat.com>
+References: <20260113121636.71565-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,37 +84,91 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-This series adds support for switching the working mode (automatic vs
-manual) of a DPLL device via netlink.
+Currently, the DPLL subsystem assumes that the only supported mode is
+the one currently active on the device. When dpll_msg_add_mode_supported()
+is called, it relies on ops->mode_get() and reports that single mode
+to userspace. This prevents users from discovering other modes the device
+might be capable of.
 
-Currently, the DPLL subsystem allows userspace to retrieve the current
-working mode but lacks the mechanism to configure it. Userspace is also
-unaware of which modes a specific device actually supports, as it
-currently assumes only the active mode is supported.
+Add a new callback .supported_modes_get() to struct dpll_device_ops. This
+allows drivers to populate a bitmap indicating all modes supported by
+the hardware.
 
-The series addresses these limitations by:
-1. Introducing .supported_modes_get() callback to allow drivers to report
-   all modes capable of running on the device.
-2. Introducing .mode_set() callback and updating the netlink policy
-   to allow userspace to request a mode change.
-3. Implementing these callbacks in the zl3073x driver, enabling dynamic
-   switching between automatic and manual modes.
+Update dpll_msg_add_mode_supported() to utilize this new callback:
 
-Changelog:
-v2 - addressed issues reported by Vadim
+* if ops->supported_modes_get is defined, use it to retrieve the full
+  bitmap of supported modes.
+* if not defined, fall back to the existing behavior: retrieve
+  the current mode via ops->mode_get and set the corresponding bit
+  in the bitmap.
 
-Ivan Vecera (3):
-  dpll: add dpll_device op to get supported modes
-  dpll: add dpll_device op to set working mode
-  dpll: zl3073x: Implement device mode setting support
+Finally, iterate over the bitmap and add a DPLL_A_MODE_SUPPORTED netlink
+attribute for every set bit, accurately reporting the device's capabilities
+to userspace.
 
- Documentation/netlink/specs/dpll.yaml |   1 +
- drivers/dpll/dpll_netlink.c           |  71 ++++++++++++++--
- drivers/dpll/dpll_nl.c                |   1 +
- drivers/dpll/zl3073x/dpll.c           | 112 ++++++++++++++++++++++++++
- include/linux/dpll.h                  |   5 ++
- 5 files changed, 182 insertions(+), 8 deletions(-)
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+---
+ drivers/dpll/dpll_netlink.c | 27 +++++++++++++++++++--------
+ include/linux/dpll.h        |  3 +++
+ 2 files changed, 22 insertions(+), 8 deletions(-)
 
+diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
+index 64944f601ee5a..d6a0e272d7038 100644
+--- a/drivers/dpll/dpll_netlink.c
++++ b/drivers/dpll/dpll_netlink.c
+@@ -128,18 +128,29 @@ dpll_msg_add_mode_supported(struct sk_buff *msg, struct dpll_device *dpll,
+ 			    struct netlink_ext_ack *extack)
+ {
+ 	const struct dpll_device_ops *ops = dpll_device_ops(dpll);
++	DECLARE_BITMAP(modes, DPLL_MODE_MAX + 1) = { 0 };
+ 	enum dpll_mode mode;
+ 	int ret;
+ 
+-	/* No mode change is supported now, so the only supported mode is the
+-	 * one obtained by mode_get().
+-	 */
++	if (ops->supported_modes_get) {
++		ret = ops->supported_modes_get(dpll, dpll_priv(dpll), modes,
++					       extack);
++		if (ret)
++			return ret;
++	} else {
++		/* If the supported modes are not reported by the driver, the
++		 * only supported mode is the one obtained by mode_get().
++		 */
++		ret = ops->mode_get(dpll, dpll_priv(dpll), &mode, extack);
++		if (ret)
++			return ret;
+ 
+-	ret = ops->mode_get(dpll, dpll_priv(dpll), &mode, extack);
+-	if (ret)
+-		return ret;
+-	if (nla_put_u32(msg, DPLL_A_MODE_SUPPORTED, mode))
+-		return -EMSGSIZE;
++		__set_bit(mode, modes);
++	}
++
++	for_each_set_bit(mode, modes, DPLL_MODE_MAX + 1)
++		if (nla_put_u32(msg, DPLL_A_MODE_SUPPORTED, mode))
++			return -EMSGSIZE;
+ 
+ 	return 0;
+ }
+diff --git a/include/linux/dpll.h b/include/linux/dpll.h
+index 562f520b23c27..912a2ca3e0ee7 100644
+--- a/include/linux/dpll.h
++++ b/include/linux/dpll.h
+@@ -20,6 +20,9 @@ struct dpll_pin_esync;
+ struct dpll_device_ops {
+ 	int (*mode_get)(const struct dpll_device *dpll, void *dpll_priv,
+ 			enum dpll_mode *mode, struct netlink_ext_ack *extack);
++	int (*supported_modes_get)(const struct dpll_device *dpll,
++				   void *dpll_priv, unsigned long *modes,
++				   struct netlink_ext_ack *extack);
+ 	int (*lock_status_get)(const struct dpll_device *dpll, void *dpll_priv,
+ 			       enum dpll_lock_status *status,
+ 			       enum dpll_lock_status_error *status_error,
 -- 
 2.52.0
 
