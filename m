@@ -1,69 +1,48 @@
-Return-Path: <netdev+bounces-249586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14736D1B59F
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:07:56 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DED0D1B632
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:26:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0D55830021EA
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 21:07:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 880643032E82
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 21:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5308632143E;
-	Tue, 13 Jan 2026 21:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57F12316180;
+	Tue, 13 Jan 2026 21:26:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=3e8.eu header.i=@3e8.eu header.b="EtTk97qV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kux567s+"
 X-Original-To: netdev@vger.kernel.org
-Received: from srv5.3e8.eu (srv5.3e8.eu [94.16.113.219])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B19CC318BBD;
-	Tue, 13 Jan 2026 21:07:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.16.113.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 349F4632;
+	Tue, 13 Jan 2026 21:26:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768338471; cv=none; b=dc2F0iYKNKpeeKSbOMUhdrO4b/qb3zoudSLQlI38lKmqWH1r3joUY/g3R/XbfxNq3KlcAD2tq6PVT5R2Z76ta8ao+LgS/mUcbHgrXuCmRupenOBId+B90gDCdNHjunf/reCc9IJQRqizRGqVRKgq3bVFkdkHteoCk7BmO8Kx2y4=
+	t=1768339590; cv=none; b=EqnMxHMRSBlHHchRYusd0TF1Hw8JcT/EkKK7y0roDpq4BCNDXonq05OSK9myFhpGoJhv5S1BqOtH225fXsjPltlZJemjhPmt93QWyLrwstza5CMjQ2qVfBZtHUK1bWDBze2q28QM0az2vEMLxxbpzxVvmee/ugKfKzz1N2f65uQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768338471; c=relaxed/simple;
-	bh=hVvt1hy0fhPrDke3dMsM0EaUiJ8dO4HektY/hMvgHgM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ig5VhHbbG0JfvvapSwDuL0emiFCZOW/MZhKcuw2yHvWQSaf87yLUuZvpo+EnUZYrQS3JY5+a25x6aLKpDtMXTr3cjQAKojjqdW5UfTyHtb3mcPDQGr2BhgGOMb6jSgd/3O4KGP2YlCn4PfRJvkfaYMWKgTHAtI1a/6rXb/jPeJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=3e8.eu; spf=pass smtp.mailfrom=3e8.eu; dkim=pass (2048-bit key) header.d=3e8.eu header.i=@3e8.eu header.b=EtTk97qV; arc=none smtp.client-ip=94.16.113.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=3e8.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=3e8.eu
-Received: from jan-pc (p200300ed47159ba0e29a2b5a09ffd5c0.dip0.t-ipconnect.de [IPv6:2003:ed:4715:9ba0:e29a:2b5a:9ff:d5c0])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by srv5.3e8.eu (Postfix) with ESMTPSA id 1DEBF1201AE;
-	Tue, 13 Jan 2026 21:56:50 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=3e8.eu; s=mail20211217;
-	t=1768337812;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=DSzAqKIi7H+h3ZgX5UzhooE7Rl4zTVAZh+rL++kKiKo=;
-	b=EtTk97qVhDDz6+Qjg+Dv3/qw0vxPo4MHf7YZQE69CsDexV8dmTzPKRg135qeVZkx7lLqpY
-	ODjMlmvnMiU19aLgHepDcyDY7ItMHG974ppn6tIg4CkFBulJxJ4qYnLV2g3/vX+AitBrLg
-	5DzIbzgxH3ZYjSbHGYiQvwJESJASdBFnu1EqCin3CBEFYYuYH985LrvMuQoWzf3y8veaiP
-	yYFyZlEYAyoXmF1t9y+CXR9bnsytZ8HkOWBj48budJ+38ztf03IZnJrofCajD31RzPlVjC
-	yuM/9rTOutBg2ZPl4IH7Wz6D2RYh8z1Hcy6Ex/R+PRGQUo3VEGOTjGgU5PsAxw==
-From: Jan Hoffmann <jan@3e8.eu>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Michael Klein <michael@fossekall.de>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Aleksander Jan Bajkowski <olek2@wp.pl>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Jan Hoffmann <jan@3e8.eu>
-Subject: [PATCH net-next] net: phy: realtek: fix in-band capabilities for 2.5G PHYs
-Date: Tue, 13 Jan 2026 21:55:44 +0100
-Message-ID: <20260113205557.503409-1-jan@3e8.eu>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1768339590; c=relaxed/simple;
+	bh=DSpGbkss/5fbHFcpztSVDDE/5IHICOG994oOnN1kB9g=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=s/66N6LzZ4+N4Mx6gp1j94eeUW5eUeNZA1pzUo2E1ZJWsFGMrc2T0E2ZHMadJyeWjCeeUV7xBRyPNNMrolKn0NPkdUveWshdrUkKDDQ73zys8k1rz8k51hHmvxf9X3CXZW3Jq1ILnGZ03c9RdMgUec7FWhOAJMo8sAJ/b7ywgIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kux567s+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F02E8C116C6;
+	Tue, 13 Jan 2026 21:26:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768339590;
+	bh=DSpGbkss/5fbHFcpztSVDDE/5IHICOG994oOnN1kB9g=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=kux567s+wJGIxOaiydgPz9mtcsAN0i4v2Txv5Apc9iuFfEP1UAfszB8X2nfEag23K
+	 hVzvo0aXrRmqIEQuIqqgqM7GImcNI5v0GcvsYTw6+0DcOlgy/CYFE5+iLB1aBarpTq
+	 VZ9FZcSTxp0tLmQIV27c+ESUzRxFczBTRZ+o39Y7s3g3/PrqyGAlg9Zzg7GnmKrUqi
+	 LQuP1U+qoXuxa4No+xbiw/hWogv5nrWrbqmL4YnSpPwpyvBrJUZ/O4sULaoIRcDhju
+	 9gaL6cXXjjD4kB7BBPEh3hc/h1v5ZrCk2bKcOV/tbp3ka7QqVDBVUGG3NKktZz5fnu
+	 GqLGmZwqLlB3w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 789C23808200;
+	Tue, 13 Jan 2026 21:23:04 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,37 +50,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [pull-request] mlx5-next updates 2026-01-13
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176833938330.2413578.6783157955963748240.git-patchwork-notify@kernel.org>
+Date: Tue, 13 Jan 2026 21:23:03 +0000
+References: <1768299471-1603093-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1768299471-1603093-1-git-send-email-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
+ alazar@nvidia.com, ohartoov@nvidia.com
 
-It looks like the configuration of in-band AN only affects SGMII, and it
-is always disabled for 2500Base-X. Adjust the reported capabilities
-accordingly.
+Hello:
 
-This is based on testing using OpenWrt on Zyxel XGS1010-12 rev A1 with
-RTL8226-CG, and Zyxel XGS1210-12 rev B1 with RTL8221B-VB-CG. On these
-devices, 2500Base-X in-band AN is known to work with some SFP modules
-(containing an unknown PHY). However, with the built-in Realtek PHYs,
-no auto-negotiation takes place, irrespective of the configuration of
-the PHY.
+This pull request was applied to bpf/bpf-next.git (net)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Fixes: 10fbd71fc5f9b ("net: phy: realtek: implement configuring in-band an")
-Signed-off-by: Jan Hoffmann <jan@3e8.eu>
----
- drivers/net/phy/realtek/realtek_main.c | 1 +
- 1 file changed, 1 insertion(+)
+On Tue, 13 Jan 2026 12:17:51 +0200 you wrote:
+> Hi,
+> 
+> The following pull-request contains common mlx5 updates
+> for your *net-next* tree.
+> Please pull and let me know of any problem.
+> 
+> Regards,
+> Tariq
+> 
+> [...]
 
-diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index 5a7f472bf58e..7b7a48e5082a 100644
---- a/drivers/net/phy/realtek/realtek_main.c
-+++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -1429,6 +1429,7 @@ static unsigned int rtl822x_inband_caps(struct phy_device *phydev,
- {
- 	switch (interface) {
- 	case PHY_INTERFACE_MODE_2500BASEX:
-+		return LINK_INBAND_DISABLE;
- 	case PHY_INTERFACE_MODE_SGMII:
- 		return LINK_INBAND_DISABLE | LINK_INBAND_ENABLE;
- 	default:
+Here is the summary with links:
+  - [pull-request] mlx5-next updates 2026-01-13
+    https://git.kernel.org/bpf/bpf-next/c/c9dfb92de073
+
+You are awesome, thank you!
 -- 
-2.52.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
