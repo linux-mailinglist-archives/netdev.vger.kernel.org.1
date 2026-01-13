@@ -1,82 +1,116 @@
-Return-Path: <netdev+bounces-249479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4334D19BE6
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 16:10:02 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 980ACD19CB5
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 16:16:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 235A83024F77
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:07:38 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id F31B03044748
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:09:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D44682EDD45;
-	Tue, 13 Jan 2026 15:07:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE8EF38E5FC;
+	Tue, 13 Jan 2026 15:09:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sqLkAafZ"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="AjqgBDJT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF5C02EA490;
-	Tue, 13 Jan 2026 15:07:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 140E138FF10;
+	Tue, 13 Jan 2026 15:09:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768316854; cv=none; b=tsXKX/mSbAr02LYo6+wSwJrhLIerTNtYxG61plmxzeVB80MEcksf+6Qu241bEv3VNdStvvdOfvvoySvP0KZED2cptkeM5uX3s83zLjzBc9FgfXoFlrysfz4hP5rjLA+T/oWhn745VdLvq/XVXilOLToHbRAFa27fGh2g0vfPFKo=
+	t=1768316969; cv=none; b=XVnx7JNdRaWmbXjllAH2UThBe1Z0ARf9Yzs+tD8UV7I+lWAFRsRPcF7PFFbv5By1rqxaH8cHBszMA8UXa9yDRcIl3cqfon9Rxzk3GCgNC/fXxNRqk2IDNkjephad0QlYrfxTO5koJ8bB6IEyM1dW9bBtxcXZKGngz3PGPQp2Zok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768316854; c=relaxed/simple;
-	bh=kCuQ0ij1Y+/unHswtDoNgzxyh96mltfgo/pfVbF3aes=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qiV9hr4oGP/n9YGiDF8X24N0egQ/Gv//TFCW9Kw+xF2gnTwe/KpP1mTuBe9N6jyy6WfaRI5KBYZByWlFOp65RXCYkK9YLXG84PI2nw1hfgO3FRT9opsDJXnb/DcWUAveYlB4sawojFHcdFrzb0iw481GP+5n6ZSC63FWw3Sz/Ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sqLkAafZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC7B9C116C6;
-	Tue, 13 Jan 2026 15:07:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768316854;
-	bh=kCuQ0ij1Y+/unHswtDoNgzxyh96mltfgo/pfVbF3aes=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sqLkAafZPsxrqZ/vgi7qDKjRluH05Wl3wbgnaxjnw4XcFMzIaai6RTi/H581LYgdb
-	 OPeOlqgMFvk7BDTMWN/K6Srb5ubcLSd27P0MhKBG/pXmELH0D+SRm74N6HtgERpVkE
-	 YyjMROuWnyBEbjfHrjjVdSVqoqAQw0qGD01wlmo7WqjE68JZvNtniSqydS7x5ekhZ2
-	 BeflhGUGB27RA+9G5aY0Ck+ww3mFYMbFbX7JGKrD4vJ5OQdKl7RZuss4riKcyqYu80
-	 BNf+9d4mBma2GBIqv9g2ld9te6Y53AOtHMFRw9jW2rrwmZEhUCNLj6r1pe6t1L/Cir
-	 PV/PImQzpruXQ==
-Date: Tue, 13 Jan 2026 07:07:32 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
- <pabeni@redhat.com>, <andrew+netdev@lunn.ch>
-Subject: Re: [PATCH net-next v3 01/13] octeontx2-af: npc: cn20k: Index
- management
-Message-ID: <20260113070732.6eb491de@kernel.org>
-In-Reply-To: <aWYebi6adm9zD2gB@rkannoth-OptiPlex-7090>
-References: <20260109054828.1822307-1-rkannoth@marvell.com>
-	<20260109054828.1822307-2-rkannoth@marvell.com>
-	<20260110145842.2f81ffdc@kernel.org>
-	<aWYebi6adm9zD2gB@rkannoth-OptiPlex-7090>
+	s=arc-20240116; t=1768316969; c=relaxed/simple;
+	bh=APW+EJqGlo11Nfil1gNg8AwhxKUcfOhkC/Pj8Alu+yE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Yvi8M5WOSwge9GdrzlPtN3uVjjvWbiDkSMhPe3gSPEa1WagsI2WYJnpkJCp89BX1rmMmfGRNqirPUld0mhaDSndbE56ez60Jxhpg9jDrqoFcUVvTa+KAnT4wFHRv2MKZxEaPBtACW2Eufa1LUOZvpcqf1btIVUn46jtm9P9Au6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=AjqgBDJT; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1vfg1E-00GIgx-Mv; Tue, 13 Jan 2026 16:09:16 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From; bh=cxZA9OymIPUQa2MzaISiJK8WAe7p4NePlnkCYENkOz4=
+	; b=AjqgBDJTZnsqToBFmZ1io0UhL7t+xA9pQLT79xgqnenoU7dAWSTWraYmz7XNjgA+UtXfsJczk
+	2lXqLkfdEWsQOXTlH+1DUWEyaEqOxbAd0h08P0qFgX1dWSltNKEbYl/8i5CJRqyrejzZh/e0Lua1w
+	9i1I6NgcFP25qRgKXB7j51YYpCnwgd2U9u1dXlvOu68oowOu5pH4NUz7tbuyGehryUQo603F343oO
+	luctmLzEZLCWwk1Zz9amNEjTN5Y8JHsCz0yUxVp/J9IiiOlcqbSi99xZ8hvurt3R7ZdhRbWBmoLu2
+	y5LFZv6jujnCjxAc5Ie9DU36vnIgN4QL7jCyVg==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1vfg1E-0004kO-B5; Tue, 13 Jan 2026 16:09:16 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1vfg0u-00DMTf-9Q; Tue, 13 Jan 2026 16:08:56 +0100
+From: Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH net v2 0/2] vsock/virtio: Fix data loss/disclosure due to
+ joining of non-linear skb
+Date: Tue, 13 Jan 2026 16:08:17 +0100
+Message-Id: <20260113-vsock-recv-coalescence-v2-0-552b17837cf4@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOFfZmkC/3WNwQqDMBBEf0X23C1JBDU99T/EQ7JuamhJSiLBI
+ v57g/Ta45th3uyQOXnOcGt2SFx89jFUUJcGaDHhwejnyqCE6oQULZYc6YmJqSBF8+JMHIixHWQ
+ /OONmKQjq+J3Y+e0UjxB4hamGi89rTJ/zrMiz+nmHf94iUaDqnO6t1UZre082bleKMB3H8QWDH
+ K1VvwAAAA==
+X-Change-ID: 20260103-vsock-recv-coalescence-38178fafd10c
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+ Stefan Hajnoczi <stefanha@redhat.com>, 
+ Stefano Garzarella <sgarzare@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Michal Luczaj <mhal@rbox.co>
+X-Mailer: b4 0.14.3
 
-On Tue, 13 Jan 2026 15:59:02 +0530 Ratheesh Kannoth wrote:
-> On 2026-01-11 at 04:28:42, Jakub Kicinski (kuba@kernel.org) wrote:
-> > On Fri, 9 Jan 2026 11:18:16 +0530 Ratheesh Kannoth wrote:  
-> > > +static int
-> > > +npc_subbank_srch_order_parse_n_fill(struct rvu *rvu, char *options,
-> > > +				    int num_subbanks)  
-> >
-> > Please avoid writable debugfs files,  
-> I explored devlink option, but the input string is too big.
-> 
-> > do you really need them?  
-> Customer can change subbank search order by modifying the search order
-> thru this devlink.
+Loopback transport coalesces some skbs too eagerly. Handling a zerocopy
+(non-linear) skb as a linear one leads to skb data loss and kernel memory
+disclosure.
 
-Unclear what you're trying to say. Hope you documented this much better
-in v4, otherwise this series if 7kLoC will take a very long time to
-review..
+Plug the loss/leak by allowing only linear skb join. Provide a test.
+
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+Changes in v2:
+- Point out virtio transports affected/unaffected [Stefano]
+- Move and comment skb_is_nonlinear() check [Stefano]
+- Describe test logic in detail, mention "virtio" in the name [Stefano]
+- Test: call poll() with a proper timeout, drop recv_verify()
+- Link to v1: https://lore.kernel.org/r/20260108-vsock-recv-coalescence-v1-0-26f97bb9a99b@rbox.co
+
+---
+Michal Luczaj (2):
+      vsock/virtio: Coalesce only linear skb
+      vsock/test: Add test for a linear and non-linear skb getting coalesced
+
+ net/vmw_vsock/virtio_transport_common.c   |  6 ++-
+ tools/testing/vsock/vsock_test.c          |  5 +++
+ tools/testing/vsock/vsock_test_zerocopy.c | 74 +++++++++++++++++++++++++++++++
+ tools/testing/vsock/vsock_test_zerocopy.h |  3 ++
+ 4 files changed, 86 insertions(+), 2 deletions(-)
+---
+base-commit: ffe4ccd359d006eba559cb1a3c6113144b7fb38c
+change-id: 20260103-vsock-recv-coalescence-38178fafd10c
+
+Best regards,
+-- 
+Michal Luczaj <mhal@rbox.co>
+
 
