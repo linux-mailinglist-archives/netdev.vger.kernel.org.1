@@ -1,128 +1,318 @@
-Return-Path: <netdev+bounces-249501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78BBCD1A0A7
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 16:57:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 278BED1A0D1
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 16:59:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6D55D3009113
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:57:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1A5F9300A9E3
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:59:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A715F340DB2;
-	Tue, 13 Jan 2026 15:57:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AB71332901;
+	Tue, 13 Jan 2026 15:59:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="SvxzNM+o"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="iCAAvbUx"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.st.icloud.com (p-east2-cluster2-host10-snip4-2.eps.apple.com [57.103.78.75])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011064.outbound.protection.outlook.com [52.101.70.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 155021B6CE9
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 15:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.78.75
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768319864; cv=none; b=EW+19fYU2VQrEGpTFtYRbgF4dUbw6bOVz5VY30CI8C73Wbbh+OE86H46VicVvIZ5hkjm5BIlPDlBEut9GX8P4LhwrniMxa7oKsNJYtOGa7OBTrtqIgHtv1TaZX0X9S7g6CeG4ksgkMjjz71iKytwVO2VCh5ut5kvohW764xKQlY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768319864; c=relaxed/simple;
-	bh=0vkdgA6r80mxKpfAZplIxC5l8+NyKcyQL7sxtbuQ5wg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f81pIWI0P6iIRKuO9T3bT4syRXwSv/gnC0ldZmXgJ50Gn2h3Y07tFXOq751xDrPK8krKqkczgoY1bJvnVH0acIHeWEtvFmyAs1ZtBmVtj2px8ykgMfobOeIwdw9AoHCBsuZ5LxPrgtaoNr01+zxEsif4jtwgSJm0vvPjfqO+fSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=SvxzNM+o reason="key not found in DNS"; arc=none smtp.client-ip=57.103.78.75
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=y-koj.net
-Received: from outbound.st.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-east-1a-10-percent-3 (Postfix) with ESMTPS id 193E51800295;
-	Tue, 13 Jan 2026 15:57:38 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; bh=iDyf4DVmjcKyNW0ewJj9vMN4f3ffdtug7yHxKcn/nWI=; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=SvxzNM+oWtPMtF2uKbra/P9zes1HfLC51jCRSpi5r9ebeYNJ0Ig8pWQOz7zaa8TDOAwcaCC+EGUC494Lz8UsCsaPrWq8mEH5sN+xJPEq2o/uqEEafQhEGoOjuPkB7I7ZVkBKT+vGuRpsqEJdH+XCSygCjXiL843mVNmhFRrAcwYXw/mwYOgUbjo+RXpP0AVBb18sLhByuuIROskjRvkuuo8jxc35rNRl5bZeAwaR6DAaKx45xV7Be4wJaCwrnGOEoeFulheK/nOQmXOOTS1DWrmMxuUi4AlqQGEDCMP/HnXs+/daMjXL3Qzg5H2IUXKsXUqjjVasVcB1F/x1VhORCQ==
-mail-alias-created-date: 1719758601013
-Received: from desktop.y-koj.net (unknown [17.42.251.67])
-	by p00-icloudmta-asmtp-us-east-1a-10-percent-3 (Postfix) with ESMTPSA id 2DBD318006DC;
-	Tue, 13 Jan 2026 15:57:36 +0000 (UTC)
-Date: Wed, 14 Jan 2026 00:57:33 +0900
-From: Yohei Kojima <yk@y-koj.net>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
-Subject: Re: [PATCH net-next v2 2/2] selftests: net: improve error handling
- in passive TFO test
-Message-ID: <aWZrbRhat5mw1tnl@desktop.y-koj.net>
-References: <cover.1768312014.git.yk@y-koj.net>
- <24707c8133f7095c0e5a94afa69e75c3a80bf6e7.1768312014.git.yk@y-koj.net>
- <607a0338-5e84-4aaf-b705-18dcd4aca05f@web.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890DD3043D5;
+	Tue, 13 Jan 2026 15:59:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.64
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768319963; cv=fail; b=Er4p42pgNkpJgXQj8G76SdG2u5vuzr9oXl8WokgGqp0tVYPEt8HKpM03H6jCM8waMoPIBXbD4K/LkKQOpuC0g1UTosovFh61E2gc2diZPPbmNhYlyHGoaCwKZ9BeGacN/dPKYGGs0ddyyD78M+73JgN2r+QiiUuoNzzFyhERgGY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768319963; c=relaxed/simple;
+	bh=HfU4Joog9Q1IPT3eelUZqiitNdN4pvRcNSrKzJC2F0g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=BnJM9SoxPig8EuMzsfHMYC5fGKfgYiKaJk/2uzWWhgxvPNGwizcrCHcwNTEzKBIbVCd7Hn3rN3gqqw+eaPFvjY+rfvhvqbkJg1fgOmdmyneTDAxKopCzvMNAcOY0/c/WOxb1cM+Ot99G/Kbcm0Cpej5b4VPG1AdLTlzn779huiE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=iCAAvbUx; arc=fail smtp.client-ip=52.101.70.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=FoxDB0bJgDHYsjMTvTBdOp3UAVW9/Tsd8YD0QI7MyPAG7pRbb9cZG9G3Gtddg7ZwOr6hbhhg7WtYBy04XVuWWQLNU25wmXnqK+rK6shJH6v6MABBw0POt8lhFZqjkVSBS3AmB7ElcomAh39bXPrhdiKCzvqiPdztwSNzvMto9YCcc0/lZKhJ+o2GX8wRR01hdYqOxRNAzwu1dyD+Vt/KVQ74sNzFMCtXYRWI/Sb/QdXV3sNukhpoQmCGjsS8LldXr8E5zepUb4K5mAwwVxW0v8WZSbIWPn/bu0Kd5Yl5E20NSK75E1x7QMMbF7NDqCZfSWVHNj80RuzCmWCo29Ydpw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=koh3kjKETNol40FWJLeGOTzykos4xQU8gMOMUtdCk5U=;
+ b=RCcGFVq6MML/OgjNDvsgs/vU7jXzcwhh4ERQoSM6rKkXzmJr+SkMYECfXzZ84dKjZqhWnLi4R0HWfqOhUHVZtml2YzTAFWILrlZougGwWXq3oyUjw17JHQDWo8fUeXUdjUbgZNwPqAEPnNeVpaeM7ldIWjOPSa0pr981cTXwr59nr9P0CKM49Mo04lCO+PMBdYPn5zvEeRSAiRWhdIK0kA2KUZMI25BUQsLana9SEJBc/t8KzE1zScLCBlSs6ioRAh0qgPwYBgvZpdRve2dc143g2DeXQ772vn6792YB/oxrFglbSjekur1v2Ln/1VZT/xwqMkWwY9W7Y/O5Es5Ftg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=koh3kjKETNol40FWJLeGOTzykos4xQU8gMOMUtdCk5U=;
+ b=iCAAvbUxlylDe4MRLjvD68XnPl2m/7I55vNd1dOS+WwXMvQjkBC5RCLw7w2xRDMI6FiBX7tF/DQRmAUfz/F6dvkmLNy+jmQWd/J7CX6hs7G/zuc/6PsFUlm7TKqSiwHnpVejr7fXtcyKzRXOaTLltXJNirXPRDc7n5ECoo0Zakv/fGVGUkha3JlihhVxdsysBnInjPi4Xlxm4XQ0VTQcB1OnEnR+zTB7rq/SC/YCA/WLb9Z097ydK0pikoXNmvDqWe0wsfZQpYbufPBv64aRYMa2tw2ZTyW0wXFKkOebTEhcoTehdhwq6OvVW/WBoydaPblR4vYdJXnymV/5BO2C5w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AS8PR04MB8948.eurprd04.prod.outlook.com (2603:10a6:20b:42f::17)
+ by AS8PR04MB7672.eurprd04.prod.outlook.com (2603:10a6:20b:23e::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.6; Tue, 13 Jan
+ 2026 15:59:17 +0000
+Received: from AS8PR04MB8948.eurprd04.prod.outlook.com
+ ([fe80::843f:752e:60d:3e5e]) by AS8PR04MB8948.eurprd04.prod.outlook.com
+ ([fe80::843f:752e:60d:3e5e%4]) with mapi id 15.20.9499.002; Tue, 13 Jan 2026
+ 15:59:17 +0000
+Date: Tue, 13 Jan 2026 10:59:08 -0500
+From: Frank Li <Frank.li@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: shenwei.wang@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
+	hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next 04/11] net: fec: add fec_build_skb() to build a
+ skb
+Message-ID: <aWZrzOiL884q/7Gq@lizhi-Precision-Tower-5810>
+References: <20260113032939.3705137-1-wei.fang@nxp.com>
+ <20260113032939.3705137-5-wei.fang@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260113032939.3705137-5-wei.fang@nxp.com>
+X-ClientProxiedBy: PH0P220CA0021.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:510:d3::9) To AS8PR04MB8948.eurprd04.prod.outlook.com
+ (2603:10a6:20b:42f::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <607a0338-5e84-4aaf-b705-18dcd4aca05f@web.de>
-X-Authority-Info: v=2.4 cv=PN0COPqC c=1 sm=1 tr=0 ts=69666b74
- cx=c_apl:c_apl_out:c_pps a=YrL12D//S6tul8v/L+6tKg==:117
- a=YrL12D//S6tul8v/L+6tKg==:17 a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=uZvujYp8AAAA:8 a=nPUG_8v1aTBAjSS_qAYA:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=-gmKWNR2uOgA:10
- a=SLzB8X_8jTLwj6mN0q5r:22
-X-Proofpoint-ORIG-GUID: 8P5KFWalA--lY3sIqN8O-ciaPhoMwZtx
-X-Proofpoint-GUID: 8P5KFWalA--lY3sIqN8O-ciaPhoMwZtx
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTEzMDEzMyBTYWx0ZWRfXzE9BXl7XQanw
- AF89VUuuXxtf7nkOrMnjxE+YcnZV2kwJlGoJibuuCqW1dHsJmbxQPOz/GM4j0UREGNncfLOgbKK
- E32K7dxbVJDFEmXDO3H0B8Q8wpyCKQOlsVG4+/IVzRZpN7z36jLnG9fI3niIv2h8wb0DG/eS3Bp
- +979Amo7PRkPdOy+n5+eSwN6yz8f1lJsSNMahV7pP+p/ahrjCzRNKSfSzAYlF2KDUVWc6rWu0eB
- Sbx30CNES+8TXjLMIjDnaNMc6+akP+hWzHLWF4EC1eVwy/fUHC8f/o3TSnBRBMa7lKApd8oPTr6
- 3BU4HO84suNlP1Y9vAN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-13_03,2026-01-09_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
- bulkscore=0 suspectscore=0 spamscore=0 clxscore=1030 malwarescore=0
- adultscore=0 mlxlogscore=854 phishscore=0 classifier=spam authscore=0
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
- definitions=main-2601130133
-X-JNJ: AAAAAAABEotqHbVajvSgoEhTB8ZHlQ066JYL27IyhwhN9FPZDXZjJxRxdH0qL/A0jLkIKAMUZRsx6/BAmsFPHR2F6RkV51rIAA7l5HqhtIhQoWucsNbCBCf8/HKj4xXW+6LwRhNZ7joY+8ihKD2mvPNEyZmkqzou0sRBH8ZU5B9gErHHDNWpJIHouX6NOpQrcJpk+Qp+CtDl1N7l5qJ4wmm93F48/7+z5OJRyKqbUPphircK6C51qicrN/Qxsz/6+kqLAYkbtpkysm6JZsGUTpodZTvo9IzDGKGwfrhAwGyNyenKUZ1pcelbkYPTAySipN/h713EP6IQNJ/tzjRGvBuozPeGNVe4ma5+P+WfjTSILevXQJS8ynYlFOXk6J2BykRtp73ruHU5GFeXxc1BU3wEsy83qRReJLZ1gGXHmn2JilS5m8P7PAbNAYHGteH39hk5wYxvYBpAIPGLb22nP2hsIcC3/qoK1hmlN8M22LKKkzkO5W+dRYLwylfVSdnxv318HmR8BKRzgYjTE8kXAKYSaEpD1p+46fojkmObUqp8ZuwXDIeqRgyhHJovJCJcZkM46S2hFN+s5LyLWxBcTBwJVzg2jsQCWMVpo6pdTKiVnP/4dGpVhoNiQI6QOC2vkduLNTulALfGSIDizEhFlTYP8I3SaCKeX9WDdS/FF/6tKUbw9d7J9KE8EFuh1CghX+006cJHxZTjhWGTYRRcC9RDaOoe36yP+aN18yw4ukjv2qMWtvcF71q4Ol1rHSS4HRYuv+QYJ6DG
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS8PR04MB8948:EE_|AS8PR04MB7672:EE_
+X-MS-Office365-Filtering-Correlation-Id: da165bab-9891-4270-74b8-08de52bcb4df
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|19092799006|366016|52116014|1800799024|7416014|376014|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?E+Yr4Z5pC8j9qRWqeJmVVXraCV73qStWKwQ0Ka8LG++Zdg7/IoTZHpoJI84a?=
+ =?us-ascii?Q?sOECPxMavSPHK9CgWBmF7ov3wAQcEaAPdrNJH21CNX5bFM/3UA/qDjqxceL9?=
+ =?us-ascii?Q?4glO5yRyDQzzTnPrRjgDpe7DMpFGqpxk3kRjVQcpnPRBcVY9YDIqU3F0vXg9?=
+ =?us-ascii?Q?J8kJ9eQvdCqKdB/dGC4cPDU8o362k4Qsyn2/dHflUysY0whGwuTl/jcnZfq5?=
+ =?us-ascii?Q?MDTETfAyAj0m+gWcuOnbSq4UyqxHPyPri/2SMmEyAmdp0eKzDEUEmKn3CtPP?=
+ =?us-ascii?Q?ApF4gsKG/mtX47yQ4n6PwVdgiJ3HCDnxZozKCz6nOG6wIiiA+fpA5CMdelsL?=
+ =?us-ascii?Q?iYi4Kull/xUOUI89M9yVFitauReO4SP6YWbn3lJFJogd873fXQqSK009x7h0?=
+ =?us-ascii?Q?OIOBxWLZqtapG5VfyEdtlH/eObtZRApcoloqh2jXBpmz7yAMdfhH+ew+ltM+?=
+ =?us-ascii?Q?nExBL18N4So9RqBKcLvkBK3Uw3cP9uzDhzHhfEYtq872DmeP5SUCrARcMPl3?=
+ =?us-ascii?Q?CeJo2ogPO/aMM6tCiRzUp2NZIwyEyZHm1F4E/ehDjT1fIORUagk20TQ7YmBG?=
+ =?us-ascii?Q?ysCuFGYYYZ/047rLM56r7Ih2mffJLDGb52+KCgJB9W5sECm72abhkmktz4CB?=
+ =?us-ascii?Q?G3TLj2xiCovCBg+u6vGEs2GKiwy+Ex4AI4g4r8xmDdduxgXYgX4B8qIX5FIP?=
+ =?us-ascii?Q?HeTPzmwHbs09gw+e3H0Npud0wdWH6OAHOvrqRHEYIFP2VomS8cDOuJecNsVm?=
+ =?us-ascii?Q?R5cTO2b/x/yHPQnHGKezyUwCcxp/7ogMZ6ryaYo75BifkNiQBfZlYB80EVX+?=
+ =?us-ascii?Q?mR6A9+MKlhx4UdCjx3kVqOZ7Nlhg+yGFn5khKDlxrc6vF27HVaO2DO00T/z0?=
+ =?us-ascii?Q?yM1jsCM1VwFNmPMGXtvqU9nAkaeNgchuF0a69gIPP8BlepIpJEG4ic/nL9Dg?=
+ =?us-ascii?Q?5Z71Teq7rKENtsHWZojXefSPbgsd8QfdYBxkUqQaQ15ykMAHKKtdjCt61gbx?=
+ =?us-ascii?Q?uHCUjOE6mvTRb4XcoUaJweGIHFYgsUhkQOP2T4iXZs1dgmTuFbGKDEmIhzH+?=
+ =?us-ascii?Q?RDzc/FnntEk9pAFtPlV2zgx/Dz1K/h7W7pKB/3lyafDiTPFKa5eLb02dWOhn?=
+ =?us-ascii?Q?AlV3JuZZCIJzAW7hJZq17gU0p4q8n4AnIcw1Kd2ELbysEv+nB04KeeqDJGbs?=
+ =?us-ascii?Q?CdkFdSYMXpCNbNfJFtyVU5XGd4k6UFikkn+e9HkEwaaIQxIdFRaQwLIOfV9e?=
+ =?us-ascii?Q?U05AeWttY+MhiWteMjzuSRcZ9xIW6YpKEnn8p/n7gRc29u8qpjSotk6Ar8rU?=
+ =?us-ascii?Q?r1p4wwWEU+YHVXaMeRwixwiHJweFREsBcizNEHxIHi4Xz+cx1s3Sxd2+ezjK?=
+ =?us-ascii?Q?x5Vmjsy/mw9Fo4r3Y84vkeMkDUOjlkHuXpO8mLDJsJi21M+cmKD5MccoKBwh?=
+ =?us-ascii?Q?1lkb6bZONZ5KhroVVQJr1ohScKx9O9OJnXdcof4EKpDwa6mufN25huXHwJRT?=
+ =?us-ascii?Q?G/1BzzNOhAVhQx4=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8948.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(366016)(52116014)(1800799024)(7416014)(376014)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?1mOylAixWE0d/cfFVLzzdv7vYu1qcuQ0RQNGhYnKSOlFrjKgXPQl8iWRAltk?=
+ =?us-ascii?Q?FgxU9HlUln5aQAxhJcjhrnj6R+dQ/jPUTguEVSyBPauAGEnw0OzBqV/vc640?=
+ =?us-ascii?Q?2hP3MbqkzAL+iFXrY5gGJy68+16Si3Le5xuj4sn2nMI5DRG2AZAdAbY5FY+y?=
+ =?us-ascii?Q?tlP2gXK36hDPW3yAZc3ZNS7s1gcHLwEN5zJhvD2WE4SD/pkH71v/suC074Co?=
+ =?us-ascii?Q?HUY6ZDhM/0K0Nz4k3vgS8NpTnuFC5wjaYlx/JDK4vKsnLkjybMQMci7bJiRN?=
+ =?us-ascii?Q?kFS00sWiUDXo4rEwt4l0N8SRZOjXA2uyU8nKbOdMj5WZ+eDIA+NXpsybwtJg?=
+ =?us-ascii?Q?Fxv/ZlaSS/JE3BTl44I/Y71ZVJdk9l69Sg5o0Xo9jGIpjqjE0Yb3m4MSU++Q?=
+ =?us-ascii?Q?imt/wePjWjAZw78QwqaHlYc4dyljXg6+W9gFFVbcxfGvx/mG49FdwtsQtxqF?=
+ =?us-ascii?Q?US49PHcRegxbQOKd75mc0jVfJTp5feKuDINY2V/l6r6nkXfF4EENxTEIeGQm?=
+ =?us-ascii?Q?WikxhCAx0fKwrhIsc+40T7nOTlEXgfjLBHQb8ws2j+E9bIvBS+SlTT+kdwXN?=
+ =?us-ascii?Q?LPObwsRX4cNO9qMbJQys1g2O0Uhl8dfPLzTqR1na9JoyyVdaoDlgYtFzi8Db?=
+ =?us-ascii?Q?3DBbY2n1OrAC2VxQ2myyjF1JavfhYACIJe7JI/4dOIwNnVlFcpxXbQLF0KdK?=
+ =?us-ascii?Q?4pSs0esM1tRrSAhy+1BYpLTcbfL9dR3qObqKpd+vWP8wNvRBtE5JxL5FbsJ/?=
+ =?us-ascii?Q?LUBvcRRh7HAdGN3sS9qp/Gx+kSHk2O8uytgisoCN8IGWn1uX7QqDJF2ViBVB?=
+ =?us-ascii?Q?n25cu7JZH85qVAxVGZW10t7z3AuuMWXuU0b0aabhjsHipqCTK5UIh792Jcbo?=
+ =?us-ascii?Q?OiI7IxfN/GVYsIy45WjZKWFGnpvsStTx4L5gkbxBpJBXjDQwoSISkinuW8l8?=
+ =?us-ascii?Q?xY6MWZEuZlVQ/KEG7t+qH4lc2s8+3b9z7qOWAjetpvDh/FhC7iAgTpt74TyY?=
+ =?us-ascii?Q?WaUinAySN/ZfCWcJvipLZGx4d7yLsIeZDwv1GXbQiLYMOyNcqngVEdsh9yxh?=
+ =?us-ascii?Q?WzkI22Q0JYN17vgDH7kq8rMJ5Kzed3O7BOZ9rSozb+4hZ6kvyYONeewQ06Mp?=
+ =?us-ascii?Q?tBnSsGVGRVjmg4Ix4NESPIILN0Q/GsPmz+ECGWlcILY2cZsoM0M6BpLWctP9?=
+ =?us-ascii?Q?fHr7o1UDxkOB+VKbcYNfbTAUMSjS80cBfCokubEqR0Q93CfB0ALfV3uBTqoc?=
+ =?us-ascii?Q?B0sIykeRSi56qt7UGpjzPduUvnqHL/UACpstnM/64F9IEhPGtkvj8rHneE/j?=
+ =?us-ascii?Q?abWaGYw0U7VQQ8lf9UZIzKXsvH8JPobS6xbCPPEB+S9CnmKfXcoRXXktRefs?=
+ =?us-ascii?Q?lW7sLh939TbCBNZd802nSFmJ42H+3nRGq8MakKewRCgZlxVMNqdHmAw7cYBd?=
+ =?us-ascii?Q?Okg5vNwAqS0NOfg0/ytrRPK7u2S3HzrMBBA2uBQfTEjWQzCrFxm4YMkntLpP?=
+ =?us-ascii?Q?YxHNYjJromZw5YgbrezibTawD/SrdlbUDcMYHkdZ0WEigA6VS2qHKdOwK8+d?=
+ =?us-ascii?Q?HhzWy9RuBWJRxxv8Dcqq1oYkyN06EkkwJrwUGBdn1qKBh6IEDZJ2/hgRXdEu?=
+ =?us-ascii?Q?k6J/vAaXGXkVv3wXxjU3lID0RmtLM+UckuatUL0APPb3oK6o3gbj10n0sCDd?=
+ =?us-ascii?Q?6PrSc587cFpou6xWG4J4LMxrYWJuc/hdVn7tlMFC1jB6rPYl?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: da165bab-9891-4270-74b8-08de52bcb4df
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8948.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2026 15:59:17.6437
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lX64ocLq0TjpUzP17qU+9QT5flZ+Lm1ukRVCRpmv3EvNPmg6zThxn128uj7wQYdsl6K09etrD6miH4tkSH8YrQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7672
 
-On Tue, Jan 13, 2026 at 03:48:11PM +0100, Markus Elfring wrote:
-> …
-> > +++ b/tools/testing/selftests/net/tfo.c
-> > @@ -82,8 +82,10 @@ static void run_server(void)
-> …
-> >  	if (read(connfd, buf, 64) < 0)
-> > -		perror("read()");
-> > -	fprintf(outfile, "%d\n", opt);
-> > +		error(1, errno, "read()");
-> > +
-> > +	if (fprintf(outfile, "%d\n", opt) < 0)
-> > +		error(1, errno, "fprintf()");
-> >  
-> >  	fclose(outfile);
-> >  	close(connfd);
-> …
-> 
-> Why was error detection omitted for close() calls here so far?
+On Tue, Jan 13, 2026 at 11:29:32AM +0800, Wei Fang wrote:
+> Extract the helper fec_build_skb() from fec_enet_rx_queue(), so that the
+> code for building a skb is centralized in fec_build_skb(), which makes
+> the code of fec_enet_rx_queue() more concise and readable.
+>
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> ---
+>  drivers/net/ethernet/freescale/fec_main.c | 106 ++++++++++++----------
+>  1 file changed, 60 insertions(+), 46 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+> index 68410cb3ef0a..7e8ac9d2a5ff 100644
+> --- a/drivers/net/ethernet/freescale/fec_main.c
+> +++ b/drivers/net/ethernet/freescale/fec_main.c
+> @@ -1781,6 +1781,59 @@ static int fec_rx_error_check(struct net_device *ndev, u16 status)
+>  	return 0;
+>  }
+>
+> +static struct sk_buff *fec_build_skb(struct fec_enet_private *fep,
+> +				     struct fec_enet_priv_rx_q *rxq,
+> +				     struct bufdesc *bdp,
+> +				     struct page *page, u32 len)
+> +{
+> +	struct net_device *ndev = fep->netdev;
+> +	struct bufdesc_ex *ebdp;
+> +	struct sk_buff *skb;
+> +
+> +	skb = build_skb(page_address(page),
+> +			PAGE_SIZE << fep->pagepool_order);
+> +	if (unlikely(!skb)) {
+> +		page_pool_recycle_direct(rxq->page_pool, page);
+> +		ndev->stats.rx_dropped++;
+> +		if (net_ratelimit())
+> +			netdev_err(ndev, "build_skb failed\n");
+> +
+> +		return NULL;
+> +	}
+> +
+> +	skb_reserve(skb, FEC_ENET_XDP_HEADROOM + fep->rx_shift);
+> +	skb_put(skb, len);
+> +	skb_mark_for_recycle(skb);
+> +
+> +	/* Get offloads from the enhanced buffer descriptor */
+> +	if (fep->bufdesc_ex) {
+> +		ebdp = (struct bufdesc_ex *)bdp;
+> +
+> +		/* If this is a VLAN packet remove the VLAN Tag */
+> +		if (ebdp->cbd_esc & cpu_to_fec32(BD_ENET_RX_VLAN))
+> +			fec_enet_rx_vlan(ndev, skb);
+> +
+> +		/* Get receive timestamp from the skb */
+> +		if (fep->hwts_rx_en)
+> +			fec_enet_hwtstamp(fep, fec32_to_cpu(ebdp->ts),
+> +					  skb_hwtstamps(skb));
+> +
+> +		if (fep->csum_flags & FLAG_RX_CSUM_ENABLED) {
+> +			if (!(ebdp->cbd_esc &
+> +			      cpu_to_fec32(FLAG_RX_CSUM_ERROR)))
+> +				/* don't check it */
+> +				skb->ip_summed = CHECKSUM_UNNECESSARY;
+> +			else
+> +				skb_checksum_none_assert(skb);
+> +		}
+> +	}
+> +
+> +	skb->protocol = eth_type_trans(skb, ndev);
+> +	skb_record_rx_queue(skb, rxq->bd.qid);
+> +
+> +	return skb;
+> +}
+> +
+>  /* During a receive, the bd_rx.cur points to the current incoming buffer.
+>   * When we update through the ring, if the next incoming buffer has
+>   * not been given to the system, we just set the empty indicator,
+> @@ -1796,7 +1849,6 @@ fec_enet_rx_queue(struct net_device *ndev, u16 queue_id, int budget)
+>  	struct  sk_buff *skb;
+>  	ushort	pkt_len;
+>  	int	pkt_received = 0;
+> -	struct	bufdesc_ex *ebdp = NULL;
+>  	int	index = 0;
+>  	bool	need_swap = fep->quirks & FEC_QUIRK_SWAP_FRAME;
+>  	u32 data_start = FEC_ENET_XDP_HEADROOM + fep->rx_shift;
+> @@ -1866,24 +1918,6 @@ fec_enet_rx_queue(struct net_device *ndev, u16 queue_id, int budget)
+>  				goto rx_processing_done;
+>  		}
+>
+> -		/* The packet length includes FCS, but we don't want to
+> -		 * include that when passing upstream as it messes up
+> -		 * bridging applications.
+> -		 */
+> -		skb = build_skb(page_address(page),
+> -				PAGE_SIZE << fep->pagepool_order);
+> -		if (unlikely(!skb)) {
+> -			page_pool_recycle_direct(rxq->page_pool, page);
+> -			ndev->stats.rx_dropped++;
+> -
+> -			netdev_err_once(ndev, "build_skb failed!\n");
+> -			goto rx_processing_done;
+> -		}
+> -
+> -		skb_reserve(skb, data_start);
+> -		skb_put(skb, pkt_len - sub_len);
+> -		skb_mark_for_recycle(skb);
+> -
+>  		if (unlikely(need_swap)) {
+>  			u8 *data;
+>
+> @@ -1891,34 +1925,14 @@ fec_enet_rx_queue(struct net_device *ndev, u16 queue_id, int budget)
+>  			swap_buffer(data, pkt_len);
+>  		}
+>
 
-Because I believe that checking the return value of fclose() would not
-provide additional value in this test case, which is focused on testing
-the behavior of passive TFO.
+Missed swap_buffer() in helper funciton()?
 
-I understand that fclose() could fail there, but considering the
-trade-off between test reliability and code complexity (which increases
-review and maintenance costs), I think checking the return value there
-does not provide benefits to justify the added complexity. In fact, as
-far as I can see, none of the existing tests in selftests/net check the
-fclose() return value.
-
-Thank you,
-Yohei
-
-> 
-> https://pubs.opengroup.org/onlinepubs/9799919799/functions/fclose.html
-> 
-> Regards,
-> Markus
+Frank
+> -		/* Extract the enhanced buffer descriptor */
+> -		ebdp = NULL;
+> -		if (fep->bufdesc_ex)
+> -			ebdp = (struct bufdesc_ex *)bdp;
+> -
+> -		/* If this is a VLAN packet remove the VLAN Tag */
+> -		if (fep->bufdesc_ex &&
+> -		    (ebdp->cbd_esc & cpu_to_fec32(BD_ENET_RX_VLAN)))
+> -			fec_enet_rx_vlan(ndev, skb);
+> -
+> -		skb->protocol = eth_type_trans(skb, ndev);
+> -
+> -		/* Get receive timestamp from the skb */
+> -		if (fep->hwts_rx_en && fep->bufdesc_ex)
+> -			fec_enet_hwtstamp(fep, fec32_to_cpu(ebdp->ts),
+> -					  skb_hwtstamps(skb));
+> -
+> -		if (fep->bufdesc_ex &&
+> -		    (fep->csum_flags & FLAG_RX_CSUM_ENABLED)) {
+> -			if (!(ebdp->cbd_esc & cpu_to_fec32(FLAG_RX_CSUM_ERROR))) {
+> -				/* don't check it */
+> -				skb->ip_summed = CHECKSUM_UNNECESSARY;
+> -			} else {
+> -				skb_checksum_none_assert(skb);
+> -			}
+> -		}
+> +		/* The packet length includes FCS, but we don't want to
+> +		 * include that when passing upstream as it messes up
+> +		 * bridging applications.
+> +		 */
+> +		skb = fec_build_skb(fep, rxq, bdp, page, pkt_len - sub_len);
+> +		if (!skb)
+> +			goto rx_processing_done;
+>
+> -		skb_record_rx_queue(skb, queue_id);
+>  		napi_gro_receive(&fep->napi, skb);
+>
+>  rx_processing_done:
+> --
+> 2.34.1
+>
 
