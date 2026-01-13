@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-249307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2F9CD168C3
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 04:46:11 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43602D168B7
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 04:45:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D1D043013BD8
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 03:44:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 208EC3012AAF
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 03:44:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72CF834BA46;
-	Tue, 13 Jan 2026 03:44:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B929834C9A9;
+	Tue, 13 Jan 2026 03:44:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BBF43090D2;
-	Tue, 13 Jan 2026 03:44:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34AD334B402;
+	Tue, 13 Jan 2026 03:44:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768275884; cv=none; b=Hf5YQSAMmS63hdLrifiUJILnO0Yb0pYBxVUOD52Hr2RLXw7iIBYxF37jKFg90eD3aeplprKeqKpH8BgTfMwVwGwxR/C17sHxnJ9EnOkXVLxPjDr3rNKJPND7lJyv4zy2fxiCb5ID0u7meZXcp8QvUouzpwwntJHOWbD9KlrfXo8=
+	t=1768275891; cv=none; b=r81GKGS72+/2F177yzJafhQrB2Egdj5JCUpOreoNvKQxqlUhyFqq6/Ch6Ffx8hyvYDLcA/hxEM2jeC1f/HX2A3/CJqAwlE1UFavpNTQ28b+YzdAxxvnPaHuTZUwxqeGyoZRlspiALg265tDf3/cfvxB+P+JkfoZ/jKMhHDMs+lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768275884; c=relaxed/simple;
-	bh=9lYvE1lWK65fQNDb1ov3iurb3fOw/SUHyMdoLQ73OKw=;
+	s=arc-20240116; t=1768275891; c=relaxed/simple;
+	bh=NEAUdBrd7GLl5xTCc1kpmwGN5yG334eMqysWwH8Ip5w=;
 	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fTauYkujVK88TQSNnTFNGmYZJuzv/ArsT+mWkUrjz4gonAZGzQyvzL9gaNgjpdNrS//lJvbq541J/3HBxuHTrNM7gzJtuoJKCyAGSy1YYTXA1gs5hIWjNYql565KxhaYwTM/D0VM11AtldIUSaMf1wzRuZTI3+QfWkvqpdfMnEY=
+	 Content-Type:Content-Disposition:In-Reply-To; b=PKE9q0Xqv6dq/qcrXbubUB35PXNdllcThTO9+9RCrLLMBbvHwWElUbTd5sR2GqdYwnJGkN8LPHLZBPAhR+jg5TlxhmDi1O8gxoYfqDbDoskd/89ZHxDuO3//I4qQs1phZMS8mBVxI5hqiizkbJCuLzfviKH5yV7ToXMnDAmI7/k=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -31,9 +31,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.99)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1vfVKe-000000001Vl-0ug9;
-	Tue, 13 Jan 2026 03:44:36 +0000
-Date: Tue, 13 Jan 2026 03:44:33 +0000
+	id 1vfVKn-000000001WH-2Iy1;
+	Tue, 13 Jan 2026 03:44:45 +0000
+Date: Tue, 13 Jan 2026 03:44:42 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>,
@@ -45,8 +45,8 @@ To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	Vladimir Oltean <vladimir.oltean@nxp.com>,
 	Aleksander Jan Bajkowski <olek2@wp.pl>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 4/5] net: phy: realtek: demystify PHYSR register location
-Message-ID: <6ed246e0aa3ca8038d2fa432d51518959fb89b6b.1768275364.git.daniel@makrotopia.org>
+Subject: [PATCH v2 5/5] net: phy: realtek: simplify bogus paged operations
+Message-ID: <0c5cbb66ce3e72a011d76f8c3d61ebcac44483bb.1768275364.git.daniel@makrotopia.org>
 References: <cover.1768275364.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -58,95 +58,96 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1768275364.git.daniel@makrotopia.org>
 
-Turns out that register address RTL_VND2_PHYSR (0xa434) maps to
-Clause-22 register MII_RESV2. Use that to get rid of yet another magic
-number, and rename access macros accordingly.
+Only registers 0x10~0x17 are affected by the value in the page
+selection register 0x1f. Hence there is no point in using paged
+operations when accessing any other registers.
+Simplify the driver by using the normal phy_read and phy_write
+operations for registers which are anyway not affected by paging.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
-v2: rebase on top of recent commit
-    "net: phy: realtek: add dummy PHY driver for RTL8127ATF"
-    replacing newly added reference to RTL_VND2_PHYSR
+v2: no changes
 
- drivers/net/phy/realtek/realtek_main.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ drivers/net/phy/realtek/realtek_main.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index 4512fad3f64b8..8f1c8424e7f94 100644
+index 8f1c8424e7f94..1b0d0602ee40d 100644
 --- a/drivers/net/phy/realtek/realtek_main.c
 +++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -179,12 +179,12 @@
- #define RTL9000A_GINMR				0x14
- #define RTL9000A_GINMR_LINK_STATUS		BIT(4)
+@@ -68,7 +68,6 @@
+ #define RTL8211E_DELAY_MASK			GENMASK(13, 11)
  
--#define RTL_VND2_PHYSR				0xa434
--#define RTL_VND2_PHYSR_DUPLEX			BIT(3)
--#define RTL_VND2_PHYSR_SPEEDL			GENMASK(5, 4)
--#define RTL_VND2_PHYSR_SPEEDH			GENMASK(10, 9)
--#define RTL_VND2_PHYSR_MASTER			BIT(11)
--#define RTL_VND2_PHYSR_SPEED_MASK		(RTL_VND2_PHYSR_SPEEDL | RTL_VND2_PHYSR_SPEEDH)
-+#define RTL_PHYSR				MII_RESV2
-+#define RTL_PHYSR_DUPLEX			BIT(3)
-+#define RTL_PHYSR_SPEEDL			GENMASK(5, 4)
-+#define RTL_PHYSR_SPEEDH			GENMASK(10, 9)
-+#define RTL_PHYSR_MASTER			BIT(11)
-+#define RTL_PHYSR_SPEED_MASK			(RTL_PHYSR_SPEEDL | RTL_PHYSR_SPEEDH)
+ /* RTL8211F PHY configuration */
+-#define RTL8211F_PHYCR_PAGE			0xa43
+ #define RTL8211F_PHYCR1				0x18
+ #define RTL8211F_ALDPS_PLL_OFF			BIT(1)
+ #define RTL8211F_ALDPS_ENABLE			BIT(2)
+@@ -78,7 +77,6 @@
+ #define RTL8211F_CLKOUT_EN			BIT(0)
+ #define RTL8211F_PHYCR2_PHY_EEE_ENABLE		BIT(5)
  
- #define	RTL_MDIO_PCS_EEE_ABLE			0xa5c4
- #define	RTL_MDIO_AN_EEE_ADV			0xa5d0
-@@ -1103,12 +1103,12 @@ static void rtlgen_decode_physr(struct phy_device *phydev, int val)
- 	 * 0: Half Duplex
- 	 * 1: Full Duplex
- 	 */
--	if (val & RTL_VND2_PHYSR_DUPLEX)
-+	if (val & RTL_PHYSR_DUPLEX)
- 		phydev->duplex = DUPLEX_FULL;
+-#define RTL8211F_INSR_PAGE			0xa43
+ #define RTL8211F_INSR				0x1d
+ 
+ /* RTL8211F LED configuration */
+@@ -333,7 +331,7 @@ static int rtl8211f_ack_interrupt(struct phy_device *phydev)
+ {
+ 	int err;
+ 
+-	err = phy_read_paged(phydev, RTL8211F_INSR_PAGE, RTL8211F_INSR);
++	err = phy_read(phydev, RTL8211F_INSR);
+ 
+ 	return (err < 0) ? err : 0;
+ }
+@@ -479,7 +477,7 @@ static irqreturn_t rtl8211f_handle_interrupt(struct phy_device *phydev)
+ {
+ 	int irq_status;
+ 
+-	irq_status = phy_read_paged(phydev, RTL8211F_INSR_PAGE, RTL8211F_INSR);
++	irq_status = phy_read(phydev, RTL8211F_INSR);
+ 	if (irq_status < 0) {
+ 		phy_error(phydev);
+ 		return IRQ_NONE;
+@@ -670,8 +668,8 @@ static int rtl8211f_config_clk_out(struct phy_device *phydev)
+ 				       RTL8211FVD_CLKOUT_REG,
+ 				       RTL8211FVD_CLKOUT_EN, 0);
  	else
- 		phydev->duplex = DUPLEX_HALF;
+-		ret = phy_modify_paged(phydev, RTL8211F_PHYCR_PAGE,
+-				       RTL8211F_PHYCR2, RTL8211F_CLKOUT_EN, 0);
++		ret = phy_modify(phydev, RTL8211F_PHYCR2, RTL8211F_CLKOUT_EN,
++				 0);
+ 	if (ret)
+ 		return ret;
  
--	switch (val & RTL_VND2_PHYSR_SPEED_MASK) {
-+	switch (val & RTL_PHYSR_SPEED_MASK) {
- 	case 0x0000:
- 		phydev->speed = SPEED_10;
- 		break;
-@@ -1136,7 +1136,7 @@ static void rtlgen_decode_physr(struct phy_device *phydev, int val)
- 	 * 1: Master Mode
- 	 */
- 	if (phydev->speed >= 1000) {
--		if (val & RTL_VND2_PHYSR_MASTER)
-+		if (val & RTL_PHYSR_MASTER)
- 			phydev->master_slave_state = MASTER_SLAVE_STATE_MASTER;
- 		else
- 			phydev->master_slave_state = MASTER_SLAVE_STATE_SLAVE;
-@@ -1156,8 +1156,7 @@ static int rtlgen_read_status(struct phy_device *phydev)
- 	if (!phydev->link)
+@@ -696,15 +694,14 @@ static int rtl8211f_config_aldps(struct phy_device *phydev)
+ 	if (!priv->enable_aldps)
  		return 0;
  
--	val = phy_read_paged(phydev, RTL822X_VND2_TO_PAGE(RTL_VND2_PHYSR),
--			     RTL822X_VND2_TO_PAGE_REG(RTL_VND2_PHYSR));
-+	val = phy_read(phydev, RTL_PHYSR);
- 	if (val < 0)
- 		return val;
+-	return phy_modify_paged(phydev, RTL8211F_PHYCR_PAGE, RTL8211F_PHYCR1,
+-				mask, mask);
++	return phy_modify(phydev, RTL8211F_PHYCR1, mask, mask);
+ }
  
-@@ -1623,7 +1622,8 @@ static int rtl822x_c45_read_status(struct phy_device *phydev)
- 	}
+ static int rtl8211f_config_phy_eee(struct phy_device *phydev)
+ {
+ 	/* Disable PHY-mode EEE so LPI is passed to the MAC */
+-	return phy_modify_paged(phydev, RTL8211F_PHYCR_PAGE, RTL8211F_PHYCR2,
+-				RTL8211F_PHYCR2_PHY_EEE_ENABLE, 0);
++	return phy_modify(phydev, RTL8211F_PHYCR2,
++			  RTL8211F_PHYCR2_PHY_EEE_ENABLE, 0);
+ }
  
- 	/* Read actual speed from vendor register. */
--	val = phy_read_mmd(phydev, MDIO_MMD_VEND2, RTL_VND2_PHYSR);
-+	val = phy_read_mmd(phydev, MDIO_MMD_VEND2,
-+			   RTL822X_VND2_C22_REG(RTL_PHYSR));
- 	if (val < 0)
- 		return val;
+ static int rtl8211f_config_init(struct phy_device *phydev)
+@@ -770,7 +767,7 @@ static int rtl8211f_suspend(struct phy_device *phydev)
+ 			goto err;
  
-@@ -2127,7 +2127,7 @@ static int rtlgen_sfp_read_status(struct phy_device *phydev)
- 	if (!phydev->link)
- 		return 0;
+ 		/* Read the INSR to clear any pending interrupt */
+-		phy_read_paged(phydev, RTL8211F_INSR_PAGE, RTL8211F_INSR);
++		phy_read(phydev, RTL8211F_INSR);
  
--	val = rtlgen_read_vend2(phydev, RTL_VND2_PHYSR);
-+	val = phy_read(phydev, RTL_PHYSR);
- 	if (val < 0)
- 		return val;
- 
+ 		/* Reset the WoL to ensure that an event is picked up.
+ 		 * Unless we do this, even if we receive another packet,
 -- 
 2.52.0
 
