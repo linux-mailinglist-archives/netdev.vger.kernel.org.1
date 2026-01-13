@@ -1,142 +1,272 @@
-Return-Path: <netdev+bounces-249439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD644D18F34
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 13:55:03 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 595F5D18F3D
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 13:55:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E71A03010CFB
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 12:52:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 937E8300A3F3
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 12:54:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82F2938F25C;
-	Tue, 13 Jan 2026 12:52:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D833C38E13F;
+	Tue, 13 Jan 2026 12:54:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="UJCF6D6L"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WwStXEDi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5FD638A9D4
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 12:52:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768308740; cv=none; b=Wr140hh6h+ShKHsvByw7oFlq2d6mcyMRSxIZ+hJrE5ZQX62XihSZnOxbnS7zYTZK5dZgsd2EO39s5OaxdmInBpkgOLW1v1nhzTYYLbQakzrJ8JX/CoH5YWPmkAY6Ol9NESbwvNK1xgklpVY9/bMXRIT+SlOVpT4Wvv/83Pknd+k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768308740; c=relaxed/simple;
-	bh=M3cd1ChoyL/JPoUh1TebMNfZNb0CMOQ+wKlup/AKWzI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=d8+xXMldUYZRoKFopKzLXkTZp/aic/zuznCTgy3i0faVTHhcT3/uFHFZsQ06DIedZERUF0G17w+MGkURSsKyzF5Br5FC3sYm6LbtFv2ueZrWQSf69tEVgnD+UsdnjBRn6Y/OrAEbSEzMgm3ThIXTqszyQTRAY8ZF2RcdXNj33rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=UJCF6D6L; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-b87113bd83bso399314366b.1
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 04:52:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1768308737; x=1768913537; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=uEb4fpri3npogF5JFpOtWuoL+P7ayMQsw+8rwNvJPCI=;
-        b=UJCF6D6LC6b8pKI37H8H6uwCtxnY+bmQP6DMaYddWTbJSgZpLHhTbQM358bn5S5xS4
-         qIgDKfHKxt5ShNajmTZNOhEI6lk6dyOQlTDrirBc/A8rsebRG2RSVrBTNrtAR/k50ezj
-         AB+B9ZIrmnZaUo5Vu04Dm+3jgdsJRSOCRFDr4H5yrjPn7XTa+kAMk/t9Y5NDkRDalhwr
-         e4+ATGp6OfT6Aq2vke/Sp/Vc/a4sn0E/FUdSLjGXS/ugfe72mM9LiZFsoQwavbbTYCpf
-         GsUqSfYGJKTk+3x7IhEJJyA7wHrHwyORGItLVyEzl8TDBE/0z6oGOgxGBlnYiq7omenn
-         i3tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768308737; x=1768913537;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uEb4fpri3npogF5JFpOtWuoL+P7ayMQsw+8rwNvJPCI=;
-        b=D5aGvWuU4dPVTSgcDo/chpM9vRL3HkA8942csZGTJm34JeW5ZAvSIrlXHukSMSMkbE
-         UKYJRP36LVIO/E82VNUGaEhKHioq6VMjfK2L+UwHCjauNt3lBFCXMc5FBPWHcYoau1Di
-         T9c4uozHpNb6gHYGtQNmGbKVtdQeGJfng1vHjaW6SDTpOSwskTNJ9Gr+ynfvNVe/yBRi
-         rgkdIqTq6QdRQUrVPNmpyq914gJ73wruV5NLevWbl9/YR0gwQFEQGLKlMlI6ZoGfxaZf
-         NdwUlEZj1Tr//BuNtrMbwNRVeyLvm2SaYSWel9btYjTBPsxvWs+akOTSM2iAX6J60BG0
-         ucdQ==
-X-Gm-Message-State: AOJu0YzZwOOnJdo0ntGGbOINa9O98rR1go9cZHZ1pqeWCA6OFWSfv3Xq
-	gepx05+bx93LywdUgRzGMw9Ztut14/6ThzEGSzWEdsoJ4Z7TisU81SIHxqhzhTYM2oY=
-X-Gm-Gg: AY/fxX7IG6cFS4UltoAGaIvZ5i4uSpkbBQjpVDUxWWRoP0HJ6heQ6R2k/e6nw3rJZcU
-	O4udSSsRAXjAoOYI9CexbYeH7SKwuWWRNu5I8Y+85JkvM6rZQMUqTxD/ic4io7pJRXH9fuaHttc
-	gx7rQT+wWNhRDRw/5deAXNMinveNfFna46DReWm6wu05fYC2rOZ9rWFypBQIVoqIt77hEgpCcRr
-	2z3GHk2OZHW182yvei5aiF977A2zUVrjGqxy5tIJIQHAWVBpPlDXpT+RqZb6tL4bI1fw/+mVDmY
-	94V/XOB/Yxumqk7UOzPhifidaMutqzkNaZ3ySEBC1KYePfq80meVJZYYou8mN1sat1l7A4zXyO3
-	XABJtIyGlOlzSKwgX0DbxVCiSiTV0vvSTBi7sh0jbOsyMHFKysqbNBkrVXUljxsuaZxlKtl9f3T
-	lX5rPmsJBVZM3j
-X-Google-Smtp-Source: AGHT+IFX81GRz/hwINL72rPQLm6j5tregnFNpNUvMTj08WVBOxYe/hO3B2KEOTqbE2tiVZ7xDeaggw==
-X-Received: by 2002:a17:907:7293:b0:b87:2fcd:1955 with SMTP id a640c23a62f3a-b872fcd1bf1mr388012666b.50.1768308737057;
-        Tue, 13 Jan 2026 04:52:17 -0800 (PST)
-Received: from cloudflare.com ([2a09:bac5:5063:2dc::49:1cb])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8706c2604bsm780426066b.16.2026.01.13.04.52.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jan 2026 04:52:16 -0800 (PST)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
- Abeni <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,  Michael Chan
- <michael.chan@broadcom.com>,  Pavan Chebbi <pavan.chebbi@broadcom.com>,
-  Andrew Lunn <andrew+netdev@lunn.ch>,  Tony Nguyen
- <anthony.l.nguyen@intel.com>,  Przemek Kitszel
- <przemyslaw.kitszel@intel.com>,  Saeed Mahameed <saeedm@nvidia.com>,  Leon
- Romanovsky <leon@kernel.org>,  Tariq Toukan <tariqt@nvidia.com>,  Mark
- Bloch <mbloch@nvidia.com>,  Alexei Starovoitov <ast@kernel.org>,  Daniel
- Borkmann <daniel@iogearbox.net>,  Jesper Dangaard Brouer
- <hawk@kernel.org>,  John Fastabend <john.fastabend@gmail.com>,  Stanislav
- Fomichev <sdf@fomichev.me>,  intel-wired-lan@lists.osuosl.org,
-  bpf@vger.kernel.org,  kernel-team@cloudflare.com
-Subject: Re: [PATCH net-next 07/10] mlx5e: Call skb_metadata_set when
- skb->data points past metadata
-In-Reply-To: <4261e437-84b2-4d0d-af52-c5ee7fcf07cb@gmail.com> (Tariq Toukan's
-	message of "Tue, 13 Jan 2026 08:08:48 +0200")
-References: <20260110-skb-meta-fixup-skb_metadata_set-calls-v1-0-1047878ed1b0@cloudflare.com>
-	<20260110-skb-meta-fixup-skb_metadata_set-calls-v1-7-1047878ed1b0@cloudflare.com>
-	<4261e437-84b2-4d0d-af52-c5ee7fcf07cb@gmail.com>
-Date: Tue, 13 Jan 2026 13:52:15 +0100
-Message-ID: <873449wu80.fsf@cloudflare.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E23B3D3B3
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 12:54:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768308869; cv=fail; b=Hg9i1a33srSx4x49BmmKpO46/Ek7mNLTxLZRcN7zISulylMzPPogkTluF9d8ZpPzIWAzMmFIBTPtSfPmO4ipusHZ0BQ5Mfw3FjZrhmI3ybzH7ddxQEHV+fE3NCN8mR3Khz5UqtTDPV5NdiWoV2+nevE6G51fF++8EoEXbIpLyDs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768308869; c=relaxed/simple;
+	bh=bigKjLJzbkCRyDdCPRgUjwxB7IXnd5a7t0dCub5T6Pg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=s9FOqJuwOFdYuaFAK4a3CFB3T8Y/lk7uG2UQbMXbfyYVyWddlLCOKs/xcAr1eApxZJhvOT5iBMNdp5LpTWlF49rzzjZr+o2u1lus0fnjUTelCudKyNXh4vJfJjge3iesqiTD60NubSya8b59YPm3SHNah0M3gSfy5xxyxOWnNyc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WwStXEDi; arc=fail smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768308868; x=1799844868;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=bigKjLJzbkCRyDdCPRgUjwxB7IXnd5a7t0dCub5T6Pg=;
+  b=WwStXEDi9SsDi97rT1dClmW1Hwd66A+2s3aJpD7IHK0+DGF8MUysz4av
+   ctRYgX1AYjBy6TR/K5Ia1IIttD9dc3IZ+7LazxMw5cAnUi+3SgZyN7rqM
+   oiBDZooQPC3uOdMeowne8nMjAWdwvo3oFx1RX7b7DZ9CxTTUPJpcCojBT
+   nC5kE6cuLOXoHrppL8pZ9CS6SKvBelDdl4rJ7JDuFNY4+41ORlKfYDii+
+   bHq14b3UKaaBdsmgToT8n/zJMtE2mA1YpR4bpinFHwXsLuA4RVVB+PRw0
+   qBADfp4slWU+6oZu3vUVAJX32rEOY0TNZqZtqr9cohV8xVyAvy+zu5X6L
+   A==;
+X-CSE-ConnectionGUID: mrIK6M0DT2qhc9zVXsouTQ==
+X-CSE-MsgGUID: iFe2d/ecRSuL6OEQjMCpVw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11669"; a="69749654"
+X-IronPort-AV: E=Sophos;i="6.21,222,1763452800"; 
+   d="scan'208";a="69749654"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2026 04:54:28 -0800
+X-CSE-ConnectionGUID: m5keRF9oQXy3yXu6DnKD4A==
+X-CSE-MsgGUID: OWc4y9tkR2iNrtZV2AEfQA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,222,1763452800"; 
+   d="scan'208";a="203587810"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2026 04:54:27 -0800
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Tue, 13 Jan 2026 04:54:27 -0800
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29 via Frontend Transport; Tue, 13 Jan 2026 04:54:27 -0800
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.1) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Tue, 13 Jan 2026 04:54:27 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qvTFOjWIvjZLJ9a7yiZFpapT6BGNduVbFhyiVvuITCSvtB3lhFxwb7NRs81jMMwUjEpdMt9oIHJQdBPiPSPj89epmQXpG6t1AaTZmfCBZpdaXti+Xp1dsruucOAB73tAqL2R+Nl/ot903L77Oq62XyxSCG2eUC6bZ6wFXnILfAvefN7Ijjkpp62x8I070lZUIdPXbBo7YDnUE4KKl3AByTJWls+FjOXcjJ92z6Pg6PJvgefmMeI7hYDB8I1689A8lr5GXw6Ev6lItbUXvlrLEarvGqHrIzeHXQib7fe39AJwwjcaS67M3iE5vI9ajIYNNSwxBWWCkmjHBgkKA9S/Zg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kM9h/YteBxAVzT70ZH8jKv9zDLf0413WTpQAn/pzQGA=;
+ b=cQehYURgl3U/HWkPvBljqAF4s4YMQcAMiIa7BggBP+siJaFpDrSHU/JpxjxWRklHQNc+Pe4F9541o7lFRMjxbt41yme/2d3zu7iteF07I3t0KJAC+ZFpMw6Gl96UlQW+B0qIihLUro5WfxGh7SL73zEqHnem5uPNCjcmykKE41l1t9uHJhAWNUjBim9LTe6zOJBwsIvHh9hr4Sqn3J93gQG6fZ4vx+5fjnCdJJc08Jz4eD6ruF7WJAUF+PEriyAUlOpAHm2rYX9Ke8ZjksF8LdrNuBwCyZ3N25jshVPc+eDDYRUobbOMmE1mS3hfgYybDylu4fOB1DUB8/kFCrm0uQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH0PR11MB5902.namprd11.prod.outlook.com (2603:10b6:510:14d::19)
+ by BL3PR11MB6481.namprd11.prod.outlook.com (2603:10b6:208:3bc::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Tue, 13 Jan
+ 2026 12:54:19 +0000
+Received: from PH0PR11MB5902.namprd11.prod.outlook.com
+ ([fe80::4a8e:9ecf:87d:f4ca]) by PH0PR11MB5902.namprd11.prod.outlook.com
+ ([fe80::4a8e:9ecf:87d:f4ca%4]) with mapi id 15.20.9499.005; Tue, 13 Jan 2026
+ 12:54:17 +0000
+From: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "Loktionov, Aleksandr"
+	<aleksandr.loktionov@intel.com>
+Subject: RE: [PATCH iwl-next v1 7/7] ixgbe: E610: add EEE support
+Thread-Topic: [PATCH iwl-next v1 7/7] ixgbe: E610: add EEE support
+Thread-Index: AQHcg85mGdPyN9rrUEKCvn5x6C7DdLVOsGEAgAFeHuA=
+Date: Tue, 13 Jan 2026 12:54:17 +0000
+Message-ID: <PH0PR11MB5902F35989E72643B7B1173AF08EA@PH0PR11MB5902.namprd11.prod.outlook.com>
+References: <20260112140108.1173835-1-jedrzej.jagielski@intel.com>
+ <20260112140108.1173835-8-jedrzej.jagielski@intel.com>
+ <8ca1bd29-a736-40bf-8d53-39c9577228c0@lunn.ch>
+In-Reply-To: <8ca1bd29-a736-40bf-8d53-39c9577228c0@lunn.ch>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB5902:EE_|BL3PR11MB6481:EE_
+x-ms-office365-filtering-correlation-id: 94312f66-6c8b-4718-740e-08de52a2dcde
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700021;
+x-microsoft-antispam-message-info: =?us-ascii?Q?/fqqjtdaQeg4IFwWJ+OGM4fWMnmjnYufeM8q+oStZOctVT+tSElyfrnEDblL?=
+ =?us-ascii?Q?fyrdJI4lB5G3oK43wtO/IEAaJ3y0qZldx8ij9GjR5EZ5Ee5CtGr0li5w7+Ci?=
+ =?us-ascii?Q?mrpd5MQ6bawYXQoGAt2/dtmrLcHbZMj8wfM/DRqFnHRBCZCwuD2arJTC6sx/?=
+ =?us-ascii?Q?uB9qaMGJjH/yaVVXjLaCzzAIaTxCjvuF1gtjFWzQnCsdcg9lcx4vGSESHSB1?=
+ =?us-ascii?Q?2N0uBTaWsobE7LPLBQz7pCl1aMuSjRUXOYSh34TeiuI1RFRHgJF8Pao4m4+r?=
+ =?us-ascii?Q?951Q2EgK/FHKCjZCb3NsDMQfjRxJcc7HZyjG6SViY3LVdbNGt6fCEk9yhWCO?=
+ =?us-ascii?Q?Jgg3/EZmh5V+UCmdmhEHbZcdfj25PaLqrUkXJRPI1t9yp+omTqpiWq9m0h7K?=
+ =?us-ascii?Q?kRfM9oIQx+4vOb/ePzqilhN/863vvzV0uf3gqmftveVozafxqVmi+SgAMQBN?=
+ =?us-ascii?Q?W61WPs8bKSkivnfdVjGRxdeDE9rAdBZxZ+3jTpBguwEvzxlAqjQHekzPFB5A?=
+ =?us-ascii?Q?vaeF2FANvU/3Vxg3inz/U+QvzEO87fdgFxWO7ePjoiVSewSSkbWx5vQikDkS?=
+ =?us-ascii?Q?+u+fqrg2qgc4INxsETMHvjaHq7vBcHH8S71S8doEFTS9KvZSBkcpTgGPIc8d?=
+ =?us-ascii?Q?+jVh/g5fDkpL8yIwmz1srRuHrgbLTZ5jcjAPd/uT+n8R2kkB0a6yiATriVPF?=
+ =?us-ascii?Q?c5QAyCrOPVxwRVaIYpPX6g5/8Jx1sxLl4zegNrxZKkb7g+vPoxQlnMWMebPO?=
+ =?us-ascii?Q?/HoceisI3eVR0ZsAWP11tiXSr/4rDEXiIkQz2VhevVFrT7alRwV2rI5ebVQo?=
+ =?us-ascii?Q?39Mh6abZWA7x+R9k9EQEzzG9wk8kLQGVYGDdUIk0uMzcGAnAa7/Dk2qh6224?=
+ =?us-ascii?Q?NBNzSIKpdkdmxGhrGMdGK4oFhGS2WFjDA1aINO01nEkhjf2udHANT32SnfnG?=
+ =?us-ascii?Q?q8T7Y49uICNjWLrjOVZvyhzuRg27ZLokopWjV/Pwq7dsX0oMdayLiJ7qPElx?=
+ =?us-ascii?Q?pIjwm03DlF0Yv7hd48suNeGld6OFXxJZBMRo+LcPgXWAaNAEZRb/oz26ek94?=
+ =?us-ascii?Q?PfJ9uO+7CrfcmXYUooLBRETKHNirFyS/OVkJTG7G4kKPy3uSO1om5fVrPeEk?=
+ =?us-ascii?Q?54l6c8RXERm3fGptQm2EusJVM2iDKtdyyWuEOY1AtaIJZlq2eE3ykTW69B5P?=
+ =?us-ascii?Q?fRd2eeCG88mQkYdvAlZAT38cSpo4mVJ/8L3CZlf/JbcVo32j3bGBF5nQoqLQ?=
+ =?us-ascii?Q?vJaf37Zntxp2oomSV3tthjxFg7KnYRSU3KZUfDwlCl0KN0wYptJCxPlXtO4X?=
+ =?us-ascii?Q?SFH+vI5PyDlWle/0SOUUtyAd2Z3y4yHxbyPZREVfPCqKoSMsucsiswqga2AX?=
+ =?us-ascii?Q?qV7UHRFZLzvh/Zml8aIpufQe5KMOojbTy6VGTrYULhkdJ1Ahip+CCK9+fXpu?=
+ =?us-ascii?Q?LQd5/gm2uBR4V6KkMtsfnCsQ7OAX1sPuvz9sLAdg2Wv96o2suWYOrU+8Ogj3?=
+ =?us-ascii?Q?9OYReie8dP5Sk0mjvzSb9Ue+Y4E/R+L2QdWC?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5902.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Dfh+O5PIjitzTHBaQHq0a3m2dTg8Eq2RzIh7qjohjS2NpYAA7NEG5lrnxDkB?=
+ =?us-ascii?Q?oYnTaPfmU6m6i/ipTCeiuBvroOY7FXLKY81K0e3OWqbJ1bhKX0sEoLhk7jxu?=
+ =?us-ascii?Q?lMI3HjR9YCfdy5rZqL3Ku98VUNXmJ8N1Pj3PRG6dlQhjTb3rS/2vVXysq+mp?=
+ =?us-ascii?Q?SX1IobD+W1WIF32OEl0hGP3sqWU3sT3ENtCL4mdz149q8K53hqmT8z4iDMZ9?=
+ =?us-ascii?Q?zIiq0TSJkotSDlTCj3TvT7YUtAWdBkhnywDRvtn1rOccKbx2K4Kz4NxjcZ8f?=
+ =?us-ascii?Q?WEOB4Z6RV4Yk8MrhlcKzZyl5yCqkkKNBXP4M9k0ca60w/0zRELhcK/iKPBvL?=
+ =?us-ascii?Q?g9q+9D/G4XoX2/kdI6+HU/3sq+KU6TNoqakMZ2Lzl5tYQISPK4HwJ5GhKd3G?=
+ =?us-ascii?Q?L5IhzvWnnXAy+C1PRLEgNTrWDr0MxseIGq1jm8111uBZ6NigiPsaaE1llZym?=
+ =?us-ascii?Q?M2wEbx2M9tE5RuNp92KcBh0/tRfOjyF97xy70bXFHlBTmyz9c7iZvUwY3feA?=
+ =?us-ascii?Q?z9I2IFqJqMJ5bHyLza4ELt8MowqSpY9zbSWD2qhQacig8Tgw84+3K9kEICSb?=
+ =?us-ascii?Q?Vx9yufK0xPizZmxCiOTNlP5upo8r1jHLInpz3APAKF0lcL8NtASEdYY/6pO3?=
+ =?us-ascii?Q?n0JOz7EikaP/dr5z0s+jtUOZZ0v5b42SlNKLRzEWszHF1sB95+6QHAwSmznV?=
+ =?us-ascii?Q?5sxBFhq5WVAi3Ch1YSgRv66Hq1fYi1PSf/BuMtK4i5brqAryJtKgm6lkf2Ke?=
+ =?us-ascii?Q?3ug9FRMITNH9Ew7kxMxi60u8vEY0Xi4KNgCHJgps17WFMhxV8UJH6yQ0OrjW?=
+ =?us-ascii?Q?EY0wo1TKBM3KXQxODAY6lc/Il/SoTJb4M1r1MQvqQoNfNW/qTWJUFrSJlgxb?=
+ =?us-ascii?Q?J8yePzPXd2shXXh14N+CzkZUV48kANUFYOWZeICPiI34ClIhAZ3mK/dWYY2p?=
+ =?us-ascii?Q?NsH6XpHgHqD6xwYvns771kAUawfJY0V3+PXjR9e+r7pupqG6wnwGY5VHvwHF?=
+ =?us-ascii?Q?VZQ8Dh/YQu/dcMCZOG8QWQfJpl8tZbStGW9oJ648/6/pxXvHx+EGrCi3gaov?=
+ =?us-ascii?Q?5KrnBCmFQQbxhjlXs+oPmnnT6G6EfYTjoae8pUkX3F78juTGmWeSWyQFF64i?=
+ =?us-ascii?Q?U7+C9CZqT6mY1Gy31nDuTfOoDxCUbPBQzHZjteQTP3E6E+X6QNLZ0oSRmjwE?=
+ =?us-ascii?Q?Eay9d6G36UZvBzzar+DM0cUpTF7zwFiNmvNARSuJBcuiQjxFB8/m3w+c+f2a?=
+ =?us-ascii?Q?p3w1SO916ZGh+75zxzUCDDSLQL6Ruwnh0P8YyruOzBR78ADMLgul/OvdkgVB?=
+ =?us-ascii?Q?acplg9KIHOuAZnFtvXRIvxEKYHD/QMeQ9s5ij5J52rwdV64SnQtawV5DGyp6?=
+ =?us-ascii?Q?oNzI3Dr8nUMH3/b8j8+WyocLurZapPdDa6lAbC0W2+UMbOCDro/shK/Qxfy/?=
+ =?us-ascii?Q?qhvLTOfPHaXhb+P9d5E114XPdupOnLgrQXKeQce9xae06dsfdhujUTpTq9TR?=
+ =?us-ascii?Q?XifrSKdrF9arjn6onMiPdhJpE+zK0y/Ho+kHznqt0bXTXV6tXgkf0fV8qYUq?=
+ =?us-ascii?Q?kwMvw5OFPV7UNDAN6dgRUJvrR1u6DlrQTfn9IAQFkI+JsExjZfcPB5KhK7sy?=
+ =?us-ascii?Q?7k0zxyJ8Axi5ryXe9MKEctWvbywZDkrapgCTzzJ9GmoHvN5HV4ZngHEx20yG?=
+ =?us-ascii?Q?GajEDVjuRo3Lsnk/Cm2bAwDkduF74J6iuYTloCSCEosYgp5MjD0xk+LAF8nh?=
+ =?us-ascii?Q?rKATr5lZBw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5902.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 94312f66-6c8b-4718-740e-08de52a2dcde
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jan 2026 12:54:17.6618
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Lqx13EwUidOXNDgBrBdnvPnmItPxGrWnpYQ7Q7dKephM0FLdEFni/tTM+30CgHgCdCvv+cADmdi9Empp3KlHAgq5Pt9Dk7kGotnC2HMehrE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB6481
+X-OriginatorOrg: intel.com
 
-On Tue, Jan 13, 2026 at 08:08 AM +02, Tariq Toukan wrote:
-> On 10/01/2026 23:05, Jakub Sitnicki wrote:
->> Prepare to copy the XDP metadata into an skb extension in skb_metadata_set.
->> Adjust the driver to pull from skb->data before calling skb_metadata_set.
->> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
->> ---
->>   drivers/net/ethernet/mellanox/mlx5/core/en/xsk/rx.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/rx.c
->> b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/rx.c
->> index 2b05536d564a..20c983c3ce62 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/rx.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/rx.c
->> @@ -237,8 +237,8 @@ static struct sk_buff *mlx5e_xsk_construct_skb(struct mlx5e_rq *rq, struct xdp_b
->>   	skb_put_data(skb, xdp->data_meta, totallen);
->>     	if (metalen) {
->> -		skb_metadata_set(skb, metalen);
->>   		__skb_pull(skb, metalen);
->> +		skb_metadata_set(skb, metalen);
->>   	}
->>     	return skb;
->> 
+From: Andrew Lunn <andrew@lunn.ch>=20
+Sent: Monday, January 12, 2026 4:56 PM
+
+>> +/**
+>> + * ixgbe_setup_eee_e610 - Enable/disable EEE support
+>> + * @hw: pointer to the HW structure
+>> + * @enable_eee: boolean flag to enable EEE
+>> + *
+>> + * Enable/disable EEE based on @enable_eee.
+>> + *
+>> + * Return: the exit code of the operation.
+>> + */
+>> +int ixgbe_setup_eee_e610(struct ixgbe_hw *hw, bool enable_eee)
+>> +{
+>> +	struct ixgbe_aci_cmd_get_phy_caps_data phy_caps =3D {};
+>> +	struct ixgbe_aci_cmd_set_phy_cfg_data phy_cfg =3D {};
+>> +	u16 eee_cap =3D 0;
+>> +	int err;
+>> +
+>> +	err =3D ixgbe_aci_get_phy_caps(hw, false,
+>> +		IXGBE_ACI_REPORT_ACTIVE_CFG, &phy_caps);
+>> +	if (err)
+>> +		return err;
+>> +
+>> +	ixgbe_copy_phy_caps_to_cfg(&phy_caps, &phy_cfg);
+>> +	phy_cfg.caps |=3D (IXGBE_ACI_PHY_ENA_LINK |
+>> +			IXGBE_ACI_PHY_ENA_AUTO_LINK_UPDT);
+>> +
+>> +	if (enable_eee) {
+>> +		if (hw->phy.eee_speeds_advertised & IXGBE_LINK_SPEED_100_FULL)
+>> +			eee_cap |=3D IXGBE_ACI_PHY_EEE_EN_100BASE_TX;
+>> +		if (hw->phy.eee_speeds_advertised & IXGBE_LINK_SPEED_1GB_FULL)
+>> +			eee_cap |=3D IXGBE_ACI_PHY_EEE_EN_1000BASE_T;
 >
-> Patch itself is simple..
+>You say in a few different places that EEE is not supported for <=3D
+>1G. So why have this? It should never happen.
+
+You're right, it was implemented in more general manner, every possible bit
+value was taken under consideration here.
+I will reduce it under next revision.
+
 >
-> I share my concerns about the perf impact of the series idea.
-> Do you have some working PoC? Please share some perf numbers..
+>> +bool ixgbe_is_eee_link_speed_supported_e610(struct ixgbe_adapter *adapt=
+er,
+>> +					    bool print_msg)
+>> +{
+>> +	switch (adapter->link_speed) {
+>> +	case IXGBE_LINK_SPEED_10GB_FULL:
+>> +	case IXGBE_LINK_SPEED_2_5GB_FULL:
+>> +	case IXGBE_LINK_SPEED_5GB_FULL:
+>> +		return true;
+>> +	case IXGBE_LINK_SPEED_10_FULL:
+>
+>I don't think IEEE defines EEE for 10Mbs. So this should be in your
+>default case, where you handle 10_HALF, 100_HALF, 1G_HALF which also
+>are not defined in 802.3.
 
-Sorry, nothing to show yet. I've shared more context in my reply to
-Jakub [1].
+Thanks for noting that, will be corrected.
 
-The series itself is an interface cleanup, whether we end up needing it
-for the metadata effort or not. Hence I wanted to salvage it from [2].
+>
+>> +	case IXGBE_LINK_SPEED_100_FULL:
+>> +	case IXGBE_LINK_SPEED_1GB_FULL:
+>> +		if (print_msg)
+>> +			e_dev_info("Energy Efficient Ethernet (EEE) feature is not supported=
+ on link speeds equal to or below 1Gbps. EEE is supported on speeds above 1=
+Gbps.\n");
+>> +		fallthrough;
+>> +	default:
+>> +		return false;
+>> +	}
+>> +}
+>
+>	Andrew
+>
+Thanks for notes Andrew!
 
-[1] https://lore.kernel.org/all/87bjixwv41.fsf@cloudflare.com/
-[2] https://lore.kernel.org/r/20260107-skb-meta-safeproof-netdevs-rx-only-v3-0-0d461c5e4764@cloudflare.com
-
+Jedrek
 
