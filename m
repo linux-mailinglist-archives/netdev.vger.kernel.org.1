@@ -1,159 +1,140 @@
-Return-Path: <netdev+bounces-249367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48EB8D17542
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 09:38:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30600D17575
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 09:42:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C2F22300816B
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 08:34:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6C41E3046426
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 08:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00CF2F12A3;
-	Tue, 13 Jan 2026 08:34:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05AAC37FF62;
+	Tue, 13 Jan 2026 08:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AEKP2mr8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G6viJSGs";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="JOBASqT3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADAF929BD8C;
-	Tue, 13 Jan 2026 08:34:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BADF192B75
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 08:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768293242; cv=none; b=ZOzwXzIIuQQGaOthwbLUOedkeeeXYU8ZjAp0DCbLA3aXSfFDb4VZR5G/6dS7ZQ6JwaUMIzfmcjZExyDqL5U9Ljuo4Ekgm16CFhcsz6kmpkzqHyvNHZY62uO3hL851wMFhfr1nVMwutWySVova5vhGZaS2NzBAR/PmHcRE5+2u/w=
+	t=1768293627; cv=none; b=HicKhM3z1qVZ9qIwdWifnc59JP8U4Iki+WRG55m2w46urXErO9cLdlfVynobi3+Nw9uKggrBdYuSfwPBpoMj0B7OqiB0evRII3/ZynZhjXTmNSWWXWo0DqGlkfY3e4OXLxHD0QoPa5H9zFGi10E0xs8Ni9ehsXr/Ft4IlhDJ/HY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768293242; c=relaxed/simple;
-	bh=jjUCjRQRE+P4dpfL4pcQVDUjSJrZEHUP4TE7rk2uXEc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gX5sAcByHj1b77lKOydNV1EJ7QN79U2vI5kYkLAJ11o3J248fq1DQJmBQJkJlyx3JLhTAPspSCebytFSfpc/ieh13sMqFEa8pAkj4dh3+NjDHPsRRcXqFN4e+oKdrXhAIpVdO+PiEKtKaWVOAdtPopctPE7o9UHa5YweuvWstY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AEKP2mr8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B693DC116C6;
-	Tue, 13 Jan 2026 08:34:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768293242;
-	bh=jjUCjRQRE+P4dpfL4pcQVDUjSJrZEHUP4TE7rk2uXEc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AEKP2mr8PVEGjqZ/tiSEGkd/4F0WoFrcus8hDFhcRnbYyTHQyUcDORMuCxhHlqMbz
-	 gDhlQWTcxfOyvkYOKfsiRayJCm60lC3tZOnSe5DXnmTFAsHi6NnbC0K9jbhZKUL1h7
-	 tqWc6xVz16UOvQSC8JVAdzAymwaahi86G2ikDCcJvKuaTt9wXFac0pmwUmxXiO5XJp
-	 rlQ1LkM9/UUHFj8/tTO5pdM8ec8DrWXW2P2UxU0Ncj7Z0QdKrce7PMlecimOLIZ6pg
-	 giqHUrxeWLUEk1XtoG+8aN4fWlFdqzZ62NIwpKsve8RZ4ewwDiL4H0uHDiIQk/f2IF
-	 6eWKUjnncmS4Q==
-Date: Tue, 13 Jan 2026 09:33:59 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v3 1/2] dt-bindings: net: airoha: npu: Add BA
- memory region
-Message-ID: <aWYDd4Pwi84gA6zy@lore-desk>
-References: <20260108-airoha-ba-memory-region-v3-0-bf1814e5dcc4@kernel.org>
- <20260108-airoha-ba-memory-region-v3-1-bf1814e5dcc4@kernel.org>
+	s=arc-20240116; t=1768293627; c=relaxed/simple;
+	bh=5d+Aj25+Wy2MF4TmrP6n9RSDTIyAAa0UhQnWMQPCzl8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=rwJn7eoN4WiOUrQ1PcHV4jDTd3uoHwGQOJJMF45nrcU8vk0tXT7742rzuL9eb1QIHBVT0JcaCrx3U0OznDoSB7HhM5qNFhphYwyNPpbHr8ZaS6mLzbkgWSczEZYozUNOrDZ1LW6VVcgts9gASDEAd3Sp40stKf+3fczoVucEFr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G6viJSGs; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=JOBASqT3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768293625;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PHjif2oseQDGo7ug5NpF3GFGVdnlKLG7ITtzjPbnaog=;
+	b=G6viJSGs+8iB6P2EjipVFSJPq9exjvzaAO/NgKmgqr7rU8ArMdgj3OjjScSGMd6bL8UK0J
+	t/xRVTJEJ5TV3H41T+1/JXpINuzu4H+kMpX9FQ4KF1KV5I0DmtkhsDUzk4+KPc4cboaFmu
+	FHyhVIuajkrtmlrD5ip71WS20DRfqWY=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-649-G2Aj-4xxPYCw3rgMHASFBw-1; Tue, 13 Jan 2026 03:40:24 -0500
+X-MC-Unique: G2Aj-4xxPYCw3rgMHASFBw-1
+X-Mimecast-MFC-AGG-ID: G2Aj-4xxPYCw3rgMHASFBw_1768293623
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-432c05971c6so3784088f8f.1
+        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 00:40:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1768293623; x=1768898423; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=PHjif2oseQDGo7ug5NpF3GFGVdnlKLG7ITtzjPbnaog=;
+        b=JOBASqT3oSJzxTVe8aCAWo1vtyH1azTCxR1KKZCTIqZfwlWkXTBN1Vkcq+9dPP6ixZ
+         yD0bKgwK4ub73VmoM97pa87G53nmvYLFnydVdqMpftJ+g5qDqw42Z4m3k9kF6Pn0L3QR
+         iYO+gq6WjlwGWXZt2R+bGtI1teO4dqu438yylpVVYX8eEd2hmFIyFhpNogN43HVgtkpH
+         DX6XctRdw0NnJqU+G0hmk03TTKt0cPxDuJYmR5LSogZe36CO7q2pf76qY6D9YGB5x2Bu
+         F100G25WwoSIad8OatNdhDPgcOVLSqD4ztoXgAvzWPuEbii4EPC2npGol4ChCmBBdEfv
+         O1Tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768293623; x=1768898423;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PHjif2oseQDGo7ug5NpF3GFGVdnlKLG7ITtzjPbnaog=;
+        b=hLjlz2vhS9RUDvmhFjTACIlshOUqUNCiMErBXRlZ3NZE3yr2iefc6LFuz1CJUCvW1X
+         U0ntUavMipUW3L5yD0CSA8YTaPAkufwNo2FZeOGQ9nFYjqOyKGDhPd4kx1jGGs6BH2xm
+         +z2b/VfA0uJ8sN3bNhqxshN1anXTpfdxihuiP0HCeACkAklMwHi7+RzVh06iAR/8xX6Y
+         xI+oVuJh9TWNUsf2c+ScSIPyrbDXU8HBl91pSDDy/eP4OAkS0xmt8SD8jhSGAlzpcwQE
+         7YyLTAVZaTfWe8c6E+9U3Q0aaS23QaNhY4EsrMtQ1aIyOCfyyKS3Kx2/tRQY181ptAaG
+         5flw==
+X-Forwarded-Encrypted: i=1; AJvYcCXEZbOowkiO3fpYZIXuBu3tazUzAiV3dQtUN/paEfLaj+5ijSPSgZ3RQMmG+FN1vA1DwEPRhPc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyvhkzn73ESwJcgenSIc6R1hRJm5631BvbbnhG+pfoSTg5uxh1O
+	d05SmfG1MgvvgzBitBkl9OOYt32T8adSQ5d1Ki8DEoey7MRUWoMHrIO/wygO17e4C9//hXHQ5F7
+	xyO87yiAEGyP9wJPU6gCgaUWY1EXsYCJMOxhC5l4f41JzZ1ZKos70oyEJjchj2qJfMA==
+X-Gm-Gg: AY/fxX5SNKpX/KQ1d33rng/KT0z71owHDDy8RdKt5Dk9HpWLJJVC7+A/PaWcapVKffS
+	ZIhMkbPCQLijDFeRbVHfguprhU8ATSkUtCBB+nL0JWCJOGtOJv4AjQOmWHtSWC3sdzukSBkyKlV
+	2jfcN5G2+6OlBKvwRlxPZ9vPlpuJRTZJ7DA8+tKxQgAcDaiGb0y6S54ZCVl1B7qj+9Mp78RuJgF
+	R6IOVtW6VcSIQh7pwMHxHqPeNyieUccZpMbZNoKpapstLk7O1tfhn/Kej2eaRCwf+VWraPllfPK
+	NNTU4GbF75qSNlAtvk7RdqWSaBMm008yPMJBI0zTB6ATZhXVgazIVaBJF6RqPWGw8OdWOtkih0U
+	ftK6Ip4/k2M+z
+X-Received: by 2002:adf:fe88:0:b0:429:ca7f:8d6f with SMTP id ffacd0b85a97d-43423e85ee2mr2411458f8f.15.1768293623024;
+        Tue, 13 Jan 2026 00:40:23 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGk7yRVGOvPWgqFM7nh65H8YTuIBt3gIdcaiheePtsBA4Ith3KNqhyBQU540bDN6V7F+wYHVA==
+X-Received: by 2002:adf:fe88:0:b0:429:ca7f:8d6f with SMTP id ffacd0b85a97d-43423e85ee2mr2411430f8f.15.1768293622645;
+        Tue, 13 Jan 2026 00:40:22 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.93])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5ff319sm43668352f8f.43.2026.01.13.00.40.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Jan 2026 00:40:21 -0800 (PST)
+Message-ID: <a9dcc27d-521e-44b0-b399-c353ef50077a@redhat.com>
+Date: Tue, 13 Jan 2026 09:40:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="yz3hkU5huftspXAr"
-Content-Disposition: inline
-In-Reply-To: <20260108-airoha-ba-memory-region-v3-1-bf1814e5dcc4@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/3] net: gso: do not include jumbogram HBH
+ header in seglen calculation
+To: Mariusz Klimek <maklimek97@gmail.com>, netdev@vger.kernel.org,
+ Jason Wang <jasowang@redhat.com>
+References: <20260106095243.15105-1-maklimek97@gmail.com>
+ <20260106095243.15105-2-maklimek97@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260106095243.15105-2-maklimek97@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 1/6/26 10:52 AM, Mariusz Klimek wrote:
+> @@ -177,8 +178,13 @@ static unsigned int skb_gso_transport_seglen(const struct sk_buff *skb)
+>   */
+>  static unsigned int skb_gso_network_seglen(const struct sk_buff *skb)
+>  {
+> -	unsigned int hdr_len = skb_transport_header(skb) -
+> -			       skb_network_header(skb);
+> +	unsigned int off = skb_network_offset(skb) + sizeof(struct ipv6hdr);
+> +	unsigned int hdr_len = skb_network_header_len(skb);
+> +
+> +	/* Jumbogram HBH header is removed upon segmentation. */
+> +	if (skb_protocol(skb, true) == htons(ETH_P_IPV6) &&
+> +	    skb->len - off > IPV6_MAXPLEN)
+> +		hdr_len -= sizeof(struct hop_jumbo_hdr);
 
---yz3hkU5huftspXAr
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+IIRC there is some ongoing discussion about introducing big tcp support
+for virtio. Perhaps a DEBUG_NET_WARN_ON_ONCE(SKB_GSO_DODGY) could help
+keeping this check updated at due time?
 
-> Introduce Block Ack memory region used by NPU MT7996 (Eagle) offloading.
->=20
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->  .../devicetree/bindings/net/airoha,en7581-npu.yaml  | 21 +++++++++++----=
-------
->  1 file changed, 11 insertions(+), 10 deletions(-)
+@Jason: could you please double check if I'm off WRT virtio support for
+big TCP?
 
-Hi Rob, Krzysztof and Conor,
+/P
 
-Since this patch has been marked as 'needs ack' on patchwork, do you have a=
-ny
-comments on it? Thanks in advance.
-
-Regards,
-Lorenzo
-
->=20
-> diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml=
- b/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml
-> index 59c57f58116b568092446e6cfb7b6bd3f4f47b82..19860b41286fd42f2a5ed15d5=
-dc75ee0eb00a639 100644
-> --- a/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml
-> +++ b/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml
-> @@ -42,14 +42,13 @@ properties:
->        - description: wlan irq line5
-> =20
->    memory-region:
-> -    oneOf:
-> -      - items:
-> -          - description: NPU firmware binary region
-> -      - items:
-> -          - description: NPU firmware binary region
-> -          - description: NPU wlan offload RX buffers region
-> -          - description: NPU wlan offload TX buffers region
-> -          - description: NPU wlan offload TX packet identifiers region
-> +    items:
-> +      - description: NPU firmware binary region
-> +      - description: NPU wlan offload RX buffers region
-> +      - description: NPU wlan offload TX buffers region
-> +      - description: NPU wlan offload TX packet identifiers region
-> +      - description: NPU wlan Block Ack buffers region
-> +    minItems: 1
-> =20
->    memory-region-names:
->      items:
-> @@ -57,6 +56,8 @@ properties:
->        - const: pkt
->        - const: tx-pkt
->        - const: tx-bufid
-> +      - const: ba
-> +    minItems: 1
-> =20
->  required:
->    - compatible
-> @@ -93,7 +94,7 @@ examples:
->                       <GIC_SPI 122 IRQ_TYPE_LEVEL_HIGH>,
->                       <GIC_SPI 123 IRQ_TYPE_LEVEL_HIGH>;
->          memory-region =3D <&npu_firmware>, <&npu_pkt>, <&npu_txpkt>,
-> -                        <&npu_txbufid>;
-> -        memory-region-names =3D "firmware", "pkt", "tx-pkt", "tx-bufid";
-> +                        <&npu_txbufid>, <&npu_ba>;
-> +        memory-region-names =3D "firmware", "pkt", "tx-pkt", "tx-bufid",=
- "ba";
->        };
->      };
->=20
-> --=20
-> 2.52.0
->=20
-
---yz3hkU5huftspXAr
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaWYDdwAKCRA6cBh0uS2t
-rFtBAQD0yo69p4xD8JEzaHh0K8d8OYSRtrHkmX343xvu19+f8wEA9FbT9Hg1SDZr
-MxzoKUFGCDbNaLfe1G88bl8Ds5L68QQ=
-=FNzg
------END PGP SIGNATURE-----
-
---yz3hkU5huftspXAr--
 
