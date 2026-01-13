@@ -1,114 +1,76 @@
-Return-Path: <netdev+bounces-249471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07907D198FE
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:43:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5D04D199A8
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:49:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 846BB303527C
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:40:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C2842303ADD3
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:46:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5B562BF3F3;
-	Tue, 13 Jan 2026 14:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 294672882C9;
+	Tue, 13 Jan 2026 14:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XxSfx36p";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="uCtC8EPk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k1UJICsW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9B529AB15
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 14:40:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05524287268;
+	Tue, 13 Jan 2026 14:46:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768315203; cv=none; b=pr70VQWrX5BtiC6MxhhpGMUR7EavxV9ZJNQONA/bR6spSQWK00PS+jNDgDDlY1lUgE0YcHwyy0VL1TWj8vUeXH9BCXGtyHPn2zVULmLNVpf0ptYHMRfd6K2CERAGw3GUjO7OudL2k07SQCZ2a3JPY7vGZh/zEUbadmTiq+L1vQY=
+	t=1768315577; cv=none; b=i7Klcgcs6n5yD83GN3MOhfbyNj+H+u7VhoXWyAaoZD851Nlbx+0gJZ++Z57+1T3o6222QcHzvRT1VcGFOACPnBXn6TnlRuOjkPFTHg1GPIx0/opJ0S2ymTvBKimUfx4OldR/j4sa/k10FfVAc3YFp7BDoiZi16wN6drpyhw22Vw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768315203; c=relaxed/simple;
-	bh=2hZQd5ccuxCC0AQonBSE9AjAhDyO99yxUSsTxYrB3Ow=;
+	s=arc-20240116; t=1768315577; c=relaxed/simple;
+	bh=cEyiVLjNwfdDXJ0451AwNlqy8+a2Ag+lY1jlX6JLTDE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O3sjKDIlODUhzEL2gQ6anOVOehjIwSalC0hseD/c3qsFQukjm4TesQdPXPzzBewINmbAr+OAQ4VyxngAW0fuIsD1HFnjhu4ftnKzdQT7i3/pa1VXpWgr+gCB6HulhTnrnhOlkL1EVYQFGI9oOVSGP4MTu1C8znqm2RNKBj4Qlv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XxSfx36p; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=uCtC8EPk; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768315201;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vI5WiD76L9Ehd6Z/1lg+/ZLNpd63ZuSYDf1K66rRYIM=;
-	b=XxSfx36pt58PzoTc7hYyrmE0HyWJnaT6ng0XY2+tvtsiJ3wpBgfbWSM5A/BiZAQ8cPqUFd
-	lfBQ/l7i8P8V709pB8V4mWKb25pNz4aVfK48tCdf3LjOOywf5YBdpXqYWHcl+EAqGFcdZ1
-	NbTWm36JFlvp1sDARwVbuhIllieDHw4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-629-qO4eyokNM-eUx3_CVwzXCA-1; Tue, 13 Jan 2026 09:40:00 -0500
-X-MC-Unique: qO4eyokNM-eUx3_CVwzXCA-1
-X-Mimecast-MFC-AGG-ID: qO4eyokNM-eUx3_CVwzXCA_1768315199
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47d3ba3a49cso70387145e9.2
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 06:40:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768315199; x=1768919999; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vI5WiD76L9Ehd6Z/1lg+/ZLNpd63ZuSYDf1K66rRYIM=;
-        b=uCtC8EPktpg79KJq3NhZmLMOojjsGV36QOQ2C75RV7tWhldmcNscRQm68h53HdPDVQ
-         bVF0CC7s4O548jj2mF1mjj6n0LkckDcrqb/X5ChgYz6OrOrwDu660ihuweWk6iAWb1aD
-         naiUHhUscfXXl1VT4FZKDSK1am9Uek4xEZBYDDqiFCCMEw/3IEPLJ+y/VZpoW06OL1G8
-         egnGO8O/ybtmHBva9LTtPHIVZKazn035rTXLOyYSv702biO5Fnr35Yay+BpuARBjJmlJ
-         K5TcZkk7kqTC42zHvR1z4iBCv6Gr3wxh99a8/j7/Gz8f33DLqvyUdRtXvLyZM/525745
-         0MpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768315199; x=1768919999;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vI5WiD76L9Ehd6Z/1lg+/ZLNpd63ZuSYDf1K66rRYIM=;
-        b=w19Cq54zbxX0xkBncb+atIv9iB/OfwUnii3cKsz1JoBoU3ZMpyhjiXbiDuNhfBRnr1
-         YftV9TF3KdRDe25vre3vjf1mfRKGUTKKoFHcc561Lrb7+pNV/TyxViNi4Cs9Cfs7X6g7
-         +Q+DRV8ZBYyNeQ1hnArYizfXcgcDJg79QTiIsWtCBd79OVk6CED1GDEG2SjIUs46m9OJ
-         ay+PoLyCKuhlr3oXGUX6qfJehmgN8J5/Mhlj/fQM1toYZu6uh3T5sqB13lz5T5t8mES5
-         H/ydFKQrs5l0sYvMkVSkUJYHmFZ0dywpIDFndRIAZcT7qWMMjqaok0ovx9RMXRkEU20j
-         eChw==
-X-Forwarded-Encrypted: i=1; AJvYcCUswhhmY/HZw+vutMOdYSO7mOwNGJeiFMsMJGPXBnJpSOe4/sBOW7QpYD5qyKChPKiIkVIaVGI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySmQ3QT+C/0xfyNFiYcImHWjTW0lyeMmAgR0n2fNMecZu1TEQN
-	KwUyQvso8OrXjUkW0P6bMKb3iNDMbGBVn67vd4c2WjCGQJUGUNdhXxa4/imJCD3VPkVPKvlHSIe
-	MS35xWoXA6ctlCwi1aZWsE+T4aJRAnSnpIonwYlMfk3s7TBlkrcAleGD6ZQ==
-X-Gm-Gg: AY/fxX419S7qPw0QixR/D5Jxv1H8l2dsSoEMOydNrt2I9vvhjNuUReHlhy7zqwov0sx
-	xz0tAh8sns7fHLBm2NNQHrLjROX0dtZGke6FZvzLrxhBfDM54HoNRPUY5K+ar7G6Z7qFnLJJOdv
-	mFKw/4/PdHzsdxoTAXoZKu/b61K6VmFqVJWvlBefDvOR6JsmzF0ZthXsuPCeUZq4dGAeWx2aY1C
-	MKuaaHH+KdtZKK2hlhLC+QT0tst2Z4KMlv17s2/Cn9Chn8lO6k3RoT4kG0cEkt804mvj96utMSw
-	dyGXbV9MkjSDB41JksaJsJ6P1gV5fE50tqxAv01RaSvfO5jZ+lTGH11twYYQj0PLjfKlLhwXRej
-	jYqzD54AVTP2UEXliSaEWDlCGxnthA1k=
-X-Received: by 2002:a05:600c:c493:b0:477:639d:bca2 with SMTP id 5b1f17b1804b1-47d84b0aaaemr221925725e9.4.1768315199009;
-        Tue, 13 Jan 2026 06:39:59 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEegKDUfwO8TWm5wKSLnhblYGT24MNgG1NnbHZguDqFhvW2s+7iCnFk9O9XcmwAVqNDE6f4XA==
-X-Received: by 2002:a05:600c:c493:b0:477:639d:bca2 with SMTP id 5b1f17b1804b1-47d84b0aaaemr221925125e9.4.1768315198204;
-        Tue, 13 Jan 2026 06:39:58 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-35-22.inter.net.il. [80.230.35.22])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f6953fasm398836085e9.5.2026.01.13.06.39.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jan 2026 06:39:57 -0800 (PST)
-Date: Tue, 13 Jan 2026 09:39:54 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=ifj+xwkPaGyz6CDpifyE/fwX1ZjWWM6k3rVlR88UjZNnw41L4VeVeDy/9UDRUj4T3xBX0ADV3aebjLAYJYtu2UvmrwltE7oXYEPVXsDMB7abRJ0jUSVYaeBLGyQvhhcft6wBsS+syKiEHaVXA+OWb0hj3OHuxbZtO4toGX1T7Ew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k1UJICsW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68BD9C116C6;
+	Tue, 13 Jan 2026 14:46:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768315576;
+	bh=cEyiVLjNwfdDXJ0451AwNlqy8+a2Ag+lY1jlX6JLTDE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=k1UJICsWnKR2goQAsuExFImjT+eFEgpQjbCn0i5tvA/k95KQgHuEfHWabfCo+6Db6
+	 9svQn2BaVk+2sQ6ujwqRGONZITsj+220A1aY4SwFzU5YAcBAxC+GywH7gTGuuc1B+4
+	 tiKFkQ7kxBF3i9wBtnNadL9pSMYwCecxMURmjbVijmuChN4/9GnWBP2lem64Lb8qF0
+	 hhF+fEfxqHVM+lNuqC/SRooItfr1lUEujnaArVkqu1CKMAP14hyEyPhFjku9KRqJxk
+	 lTgv8gv+OOqwo5FezVP1Kg/P7NzSojA5ovnHWZBE6s3w71SMHflg38zqdsUUO/+0Ps
+	 bBkd5y2nQBz8A==
+Date: Tue, 13 Jan 2026 08:46:14 -0600
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: linux-arm-msm@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Antoine Tenart <atenart@kernel.org>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Herve Codina <herve.codina@bootlin.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org, Kees Cook <kees@kernel.org>
-Subject: Re: [PATCH v2][next] virtio_net: Fix misalignment bug in struct
- virtnet_info
-Message-ID: <20260113093839-mutt-send-email-mst@kernel.org>
-References: <aWIItWq5dV9XTTCJ@kspp>
- <e9607915-892c-4724-b97f-7c90918f86fe@redhat.com>
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	mwojtas@chromium.org, devicetree@vger.kernel.org,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+	netdev@vger.kernel.org, davem@davemloft.net,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Tariq Toukan <tariqt@nvidia.com>, Simon Horman <horms@kernel.org>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: Re: [PATCH net-next v22 01/14] dt-bindings: net: Introduce the
+ ethernet-connector description
+Message-ID: <176831557374.3740779.1775436338458125748.robh@kernel.org>
+References: <20260108080041.553250-1-maxime.chevallier@bootlin.com>
+ <20260108080041.553250-2-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -117,96 +79,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e9607915-892c-4724-b97f-7c90918f86fe@redhat.com>
+In-Reply-To: <20260108080041.553250-2-maxime.chevallier@bootlin.com>
 
-On Tue, Jan 13, 2026 at 03:30:00PM +0100, Paolo Abeni wrote:
-> On 1/10/26 9:07 AM, Gustavo A. R. Silva wrote:
-> > Use the new TRAILING_OVERLAP() helper to fix a misalignment bug
-> > along with the following warning:
-> > 
-> > drivers/net/virtio_net.c:429:46: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> > 
-> > This helper creates a union between a flexible-array member (FAM)
-> > and a set of members that would otherwise follow it (in this case
-> > `u8 rss_hash_key_data[VIRTIO_NET_RSS_MAX_KEY_SIZE];`). This
-> > overlays the trailing members (rss_hash_key_data) onto the FAM
-> > (hash_key_data) while keeping the FAM and the start of MEMBERS aligned.
-> > The static_assert() ensures this alignment remains.
-> > 
-> > Notice that due to tail padding in flexible `struct
-> > virtio_net_rss_config_trailer`, `rss_trailer.hash_key_data`
-> > (at offset 83 in struct virtnet_info) and `rss_hash_key_data` (at
-> > offset 84 in struct virtnet_info) are misaligned by one byte. See
-> > below:
-> > 
-> > struct virtio_net_rss_config_trailer {
-> >         __le16                     max_tx_vq;            /*     0     2 */
-> >         __u8                       hash_key_length;      /*     2     1 */
-> >         __u8                       hash_key_data[];      /*     3     0 */
-> > 
-> >         /* size: 4, cachelines: 1, members: 3 */
-> >         /* padding: 1 */
-> >         /* last cacheline: 4 bytes */
-> > };
-> > 
-> > struct virtnet_info {
-> > ...
-> >         struct virtio_net_rss_config_trailer rss_trailer; /*    80     4 */
-> > 
-> >         /* XXX last struct has 1 byte of padding */
-> > 
-> >         u8                         rss_hash_key_data[40]; /*    84    40 */
-> > ...
-> >         /* size: 832, cachelines: 13, members: 48 */
-> >         /* sum members: 801, holes: 8, sum holes: 31 */
-> >         /* paddings: 2, sum paddings: 5 */
-> > };
-> > 
-> > After changes, those members are correctly aligned at offset 795:
-> > 
-> > struct virtnet_info {
-> > ...
-> >         union {
-> >                 struct virtio_net_rss_config_trailer rss_trailer; /*   792     4 */
-> >                 struct {
-> >                         unsigned char __offset_to_hash_key_data[3]; /*   792     3 */
-> >                         u8         rss_hash_key_data[40]; /*   795    40 */
-> >                 };                                       /*   792    43 */
-> >         };                                               /*   792    44 */
-> > ...
-> >         /* size: 840, cachelines: 14, members: 47 */
-> >         /* sum members: 801, holes: 8, sum holes: 35 */
-> >         /* padding: 4 */
-> >         /* paddings: 1, sum paddings: 4 */
-> >         /* last cacheline: 8 bytes */
-> > };
-> > 
-> > As a result, the RSS key passed to the device is shifted by 1
-> > byte: the last byte is cut off, and instead a (possibly
-> > uninitialized) byte is added at the beginning.
-> > 
-> > As a last note `struct virtio_net_rss_config_hdr *rss_hdr;` is also
-> > moved to the end, since it seems those three members should stick
-> > around together. :)
-> > 
-> > Cc: stable@vger.kernel.org
-> > Fixes: ed3100e90d0d ("virtio_net: Use new RSS config structs")
-> > Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> > ---
-> > Changes in v2:
-> >  - Update subject and changelog text (include feedback from Simon and
-> >    Michael --thanks folks)
-> >  - Add Fixes tag and CC -stable.
+
+On Thu, 08 Jan 2026 09:00:26 +0100, Maxime Chevallier wrote:
+> The ability to describe the physical ports of Ethernet devices is useful
+> to describe multi-port devices, as well as to remove any ambiguity with
+> regard to the nature of the port.
 > 
-> @Michael, @Jason: This is still apparently targeting 'net-next', but I
-> think it should land in the 'net' tree, right?
+> Moreover, describing ports allows for a better description of features
+> that are tied to connectors, such as PoE through the PSE-PD devices.
 > 
-> /P
+> Introduce a binding to allow describing the ports, for now with 2
+> attributes :
+> 
+>  - The number of pairs, which is a quite generic property that allows
+>    differentating between multiple similar technologies such as BaseT1
+>    and "regular" BaseT (which usually means BaseT4).
+> 
+>  - The media that can be used on that port, such as BaseT for Twisted
+>    Copper, BaseC for coax copper, BaseS/L for Fiber, BaseK for backplane
+>    ethernet, etc. This allows defining the nature of the port, and
+>    therefore avoids the need for vendor-specific properties such as
+>    "micrel,fiber-mode" or "ti,fiber-mode".
+> 
+> The port description lives in its own file, as it is intended in the
+> future to allow describing the ports for phy-less devices.
+> 
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> ---
+>  .../bindings/net/ethernet-connector.yaml      | 56 +++++++++++++++++++
+>  .../devicetree/bindings/net/ethernet-phy.yaml | 18 ++++++
+>  MAINTAINERS                                   |  1 +
+>  3 files changed, 75 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/ethernet-connector.yaml
+> 
 
-Probably but I'm yet to properly review it. The thing that puzzles me at
-a first glance is how are things working right now then?
-
--- 
-MST
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
 
