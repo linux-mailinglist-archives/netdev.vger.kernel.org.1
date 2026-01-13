@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-249607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54C20D1B84B
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 23:02:53 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id F15DBD1B848
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 23:02:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6158C300B888
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:02:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9D3B83012E9F
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:02:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CED3C352FA7;
-	Tue, 13 Jan 2026 22:02:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BA63354AEB;
+	Tue, 13 Jan 2026 22:02:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fOjY6/yU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JhOVTI7G"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE07340A59
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8AEA350D62
 	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 22:02:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768341751; cv=none; b=cQmNt+4fmsNx3clqMrlp+xjWrJc1uNp8TOqDqUMsDBmWpbBa+OpdxpZKrjm3kgJxbiAuHkftMGof6PSHKpz0MNGMrzNl0353hVvB//LLZyBoWxNyrRVzcJ9IgW3VFmfQpcpoQg7uHUMBU0A9jSyu91Kffv80VnitiRVPpes83DA=
+	t=1768341752; cv=none; b=AKMOlksNDbEkbn0LpM5nJF89qdOr+UZx7UGMoRr6jreTH/xEyi+NxAJrDzlSZe5WwOUYuokhEvzPnW2Aomgm/RLlMOxMHs5BXIfTecrHu51GvaXRuStps9K7Yx3FnxlufDIlv0w3Dc/6DTDw1G2lT8YaSccyXLkIzOS1vgoB8NM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768341751; c=relaxed/simple;
-	bh=xBsPBISSykwswXhXV++rDuVUjC/mP9Vh09suG+bkuZ0=;
+	s=arc-20240116; t=1768341752; c=relaxed/simple;
+	bh=22quTL7fh9scRyyVrxtChnsb+pVvyQ7G290IuYomw4o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XAiHsgXsc9g7sXqQDZdLWZ3WJC/PEx1BTWpe5JOseTT0XjIvZGRc3xAnQ0nj1Py1S/8KYSIL9ze2NsWg1CGxfn35OXAjn3d7Jcfg1nXtlu9GVxjfGUDn1RukGRykVBOlv1MCGE1dHdf4sQMzmS/Nq8bTL5rJTnKF1pjKPGwHAjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fOjY6/yU; arc=none smtp.client-ip=198.175.65.21
+	 MIME-Version; b=PyOhanhZNMo4hDo7zO65njlZ0CFIggpCuzhjzYJjDPbuLT+r2xlspuJHlBXjaglX36qvQQdxNmiB0ak9zAL3lUDyfz/Q52rj0pgqggbzxYRatZry7oeXHwpXH6VyI3/E7jLaTrkPZKCPceMBWJpzxeTVlc2eg6S8UVbbUJydUe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JhOVTI7G; arc=none smtp.client-ip=198.175.65.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -34,28 +34,28 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1768341751; x=1799877751;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=xBsPBISSykwswXhXV++rDuVUjC/mP9Vh09suG+bkuZ0=;
-  b=fOjY6/yUCrHND/40h9BbmrcrR3TM9iVXHnLOrEmOT/MkSdU8RZvfmnfh
-   cWy3xMVK5zf6cCtGrZpSnTUesnChQooqAmmZl3GiP17WsWWs4tG0cqyhZ
-   0ihEUmG/n2IllXr6HjrvwIQxh/SN2lGC0Y/Ncv34Ag0qQ1fa/dqKFMd9g
-   QRhrQBtoBmCE5Tai59nSFMAwHgfnP7V6Eepj/0A9niXTW54Tf4hx3k5LO
-   k3IemrB6zaFLM+YRo+W2XnpfhbheoZo4dz1wNO0zIXkw2WCRuRw7ZNDO6
-   F5bFBFlYENqVrvIYglhy1apCrkg1HSI4L6eEpNuBSSfNvBuApPwA14ao9
-   g==;
-X-CSE-ConnectionGUID: 35KEaRXGTTyu40TrR4Z4+Q==
-X-CSE-MsgGUID: YACdfERKTu+2TgnbKdHXGA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11670"; a="69558668"
+  bh=22quTL7fh9scRyyVrxtChnsb+pVvyQ7G290IuYomw4o=;
+  b=JhOVTI7GCpCk8T8gBvmx5of0XOx0IU3OoUjGvU/3O/9EroEEbITp4m8b
+   MAbUArkAPLZlDcvNVSGzB2L1MO0e4ahFqfzsEgtv+aHCiq6uWNBIGlQwu
+   ik9njFcl/zJCM3rV+qcxiChTxrO9GxbZCUIkSeNteIDTxKQhcvy3qzRja
+   68bDNJ5nK/MGnaeAV20SfxTzO5Kpwks761pCA7Do847REG41OT4MtOVqV
+   iccWi1ruG/5hgUz9PI1SUAFuiuA/KnLqD/Rekw8mkuvRFTcskqKm3oybN
+   uy51qms5M1U0wwDzMsL5E3HJY6Ic6UZgs9ZtVthLEbbvTPBsQgr3/e4Ax
+   w==;
+X-CSE-ConnectionGUID: ZrpP/iicRxuTKwnS7CrWYQ==
+X-CSE-MsgGUID: Ed82LXySTBOAp90ViQjo2g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11670"; a="69558674"
 X-IronPort-AV: E=Sophos;i="6.21,224,1763452800"; 
-   d="scan'208";a="69558668"
+   d="scan'208";a="69558674"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2026 14:02:28 -0800
-X-CSE-ConnectionGUID: /KUXH6EGSS2OwVphHLLp3Q==
-X-CSE-MsgGUID: GUmgD21HQjKSawsiU1qy/w==
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2026 14:02:29 -0800
+X-CSE-ConnectionGUID: D1nm+0Q+QN6dv9R53EpRgA==
+X-CSE-MsgGUID: 8Z811L0JSS+0txPORkzzXg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,224,1763452800"; 
-   d="scan'208";a="204388173"
+   d="scan'208";a="204388177"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa006.fm.intel.com with ESMTP; 13 Jan 2026 14:02:27 -0800
+  by fmviesa006.fm.intel.com with ESMTP; 13 Jan 2026 14:02:28 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -63,15 +63,17 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Dave Ertman <david.m.ertman@intel.com>,
+Cc: Ding Hui <dinghui@sangfor.com.cn>,
 	anthony.l.nguyen@intel.com,
-	daniel.machon@microchip.com,
+	przemyslaw.kitszel@intel.com,
+	Simon Horman <horms@kernel.org>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
 	Jacob Keller <jacob.e.keller@intel.com>,
-	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
 	Rinitha S <sx.rinitha@intel.com>
-Subject: [PATCH net 2/6] ice: Avoid detrimental cleanup for bond during interface stop
-Date: Tue, 13 Jan 2026 14:02:15 -0800
-Message-ID: <20260113220220.1034638-3-anthony.l.nguyen@intel.com>
+Subject: [PATCH net 3/6] ice: Fix incorrect timeout ice_release_res()
+Date: Tue, 13 Jan 2026 14:02:16 -0800
+Message-ID: <20260113220220.1034638-4-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20260113220220.1034638-1-anthony.l.nguyen@intel.com>
 References: <20260113220220.1034638-1-anthony.l.nguyen@intel.com>
@@ -83,72 +85,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Dave Ertman <david.m.ertman@intel.com>
+From: Ding Hui <dinghui@sangfor.com.cn>
 
-When the user issues an administrative down to an interface that is the
-primary for an aggregate bond, the prune lists are being purged. This
-breaks communication to the secondary interface, which shares a prune
-list on the main switch block while bonded together.
+The commit 5f6df173f92e ("ice: implement and use rd32_poll_timeout for
+ice_sq_done timeout") converted ICE_CTL_Q_SQ_CMD_TIMEOUT from jiffies
+to microseconds.
 
-For the primary interface of an aggregate, avoid deleting these prune
-lists during stop, and since they are hardcoded to specific values for
-the default vlan and QinQ vlans, the attempt to re-add them during the
-up phase will quietly fail without any additional problem.
+But the ice_release_res() function was missed, and its logic still
+treats ICE_CTL_Q_SQ_CMD_TIMEOUT as a jiffies value.
 
-Fixes: 1e0f9881ef79 ("ice: Flesh out implementation of support for SRIOV on bonded interface")
+So correct the issue by usecs_to_jiffies().
+
+Found by inspection of the DDP downloading process.
+Compile and modprobe tested only.
+
+Fixes: 5f6df173f92e ("ice: implement and use rd32_poll_timeout for ice_sq_done timeout")
+Signed-off-by: Ding Hui <dinghui@sangfor.com.cn>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-Signed-off-by: Dave Ertman <david.m.ertman@intel.com>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_lib.c | 25 ++++++++++++++++--------
- 1 file changed, 17 insertions(+), 8 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index 9ebbe1bff214..98010354db15 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -3809,22 +3809,31 @@ int ice_vsi_add_vlan_zero(struct ice_vsi *vsi)
- int ice_vsi_del_vlan_zero(struct ice_vsi *vsi)
- {
- 	struct ice_vsi_vlan_ops *vlan_ops = ice_get_compat_vsi_vlan_ops(vsi);
-+	struct ice_pf *pf = vsi->back;
- 	struct ice_vlan vlan;
- 	int err;
- 
--	vlan = ICE_VLAN(0, 0, 0);
--	err = vlan_ops->del_vlan(vsi, &vlan);
--	if (err && err != -EEXIST)
--		return err;
-+	if (pf->lag && pf->lag->primary) {
-+		dev_dbg(ice_pf_to_dev(pf), "Interface is primary in aggregate - not deleting prune list\n");
-+	} else {
-+		vlan = ICE_VLAN(0, 0, 0);
-+		err = vlan_ops->del_vlan(vsi, &vlan);
-+		if (err && err != -EEXIST)
-+			return err;
-+	}
- 
- 	/* in SVM both VLAN 0 filters are identical */
- 	if (!ice_is_dvm_ena(&vsi->back->hw))
- 		return 0;
- 
--	vlan = ICE_VLAN(ETH_P_8021Q, 0, 0);
--	err = vlan_ops->del_vlan(vsi, &vlan);
--	if (err && err != -EEXIST)
--		return err;
-+	if (pf->lag && pf->lag->primary) {
-+		dev_dbg(ice_pf_to_dev(pf), "Interface is primary in aggregate - not deleting QinQ prune list\n");
-+	} else {
-+		vlan = ICE_VLAN(ETH_P_8021Q, 0, 0);
-+		err = vlan_ops->del_vlan(vsi, &vlan);
-+		if (err && err != -EEXIST)
-+			return err;
-+	}
- 
- 	/* when deleting the last VLAN filter, make sure to disable the VLAN
- 	 * promisc mode so the filter isn't left by accident
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index 046bc9c65c51..785bf5cc1b25 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -2251,7 +2251,7 @@ void ice_release_res(struct ice_hw *hw, enum ice_aq_res_ids res)
+ 	/* there are some rare cases when trying to release the resource
+ 	 * results in an admin queue timeout, so handle them correctly
+ 	 */
+-	timeout = jiffies + 10 * ICE_CTL_Q_SQ_CMD_TIMEOUT;
++	timeout = jiffies + 10 * usecs_to_jiffies(ICE_CTL_Q_SQ_CMD_TIMEOUT);
+ 	do {
+ 		status = ice_aq_release_res(hw, res, 0, NULL);
+ 		if (status != -EIO)
 -- 
 2.47.1
 
