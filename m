@@ -1,126 +1,141 @@
-Return-Path: <netdev+bounces-249328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34218D16B50
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 06:34:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C1F9D16BFB
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 06:53:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 48E8D300462D
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 05:34:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BBBA530169B4
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 05:53:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24F973587C9;
-	Tue, 13 Jan 2026 05:34:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 965F930DD10;
+	Tue, 13 Jan 2026 05:53:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qi0P1HkH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CUhY7zAC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CBFC35771B
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 05:34:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2433C1E9B1C
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 05:53:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768282464; cv=none; b=agljxOt/gCZwK4cSY8kLl3RH/73XtnC2zBwG/THy6mF/OeUhB89OIBnTYM7N0dKyz3iHlEGRQCNhpApdI61gN1Te0eNvWpaJv5CJsPLhk8P0PS0qZCMR0fP7fxY71FgS/rUQ8VuYEOJ0bRIfCcsWbAJQWXFvXTddT2kIbMMNyMU=
+	t=1768283604; cv=none; b=oQCg7oXQu7ZxkZvisfbfm7P6qd0qqmhyTASEs+atAwXwATacGXk5KSFGAA/CjkACMZF5oVox6fHI3yMvKbSfzezGEvt9zDMoMdC+EsF2frx+KmgyBzp+bPVbgfJm0+DcMmp3G6oEOglUuCjdpEvKoKKMSRQcc8thfVXMzYYvI8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768282464; c=relaxed/simple;
-	bh=vksA+EIfpcr5nEbE3T0odlE0kg9ymd6yCaeY6w6Gv5M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Kraqhdh9z1+ODZOUiuL9gPSHpJlH8XMQ3mYaH9Hj7a7D6d8M5EPK+AiCFozDpmj6ePPaHF44TYTaP41tZoSf/9zpAxqur+Gj6UKv96gbiVyLYnnvfzwE7pUd+pMZnP3FZMUIpR8vmYNkcPeBiPbwfAErebO9+pP0RkG2x4yH2yQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qi0P1HkH; arc=none smtp.client-ip=209.85.210.46
+	s=arc-20240116; t=1768283604; c=relaxed/simple;
+	bh=19vdQo6pYfLOqyUW2a2rZf9ayU9mlx5fbadNgHNsOsU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SpVVaQ2hQ6adZewCzTtpr1pz9yZ3Wjygcl9XszidIkwXA8c+t/BB9LCasYhdFSVZHUbtPNOhQMb/JETzpHV2EGYJ8rQoPNqoMd8UJFb4l7G7EpfVhuB7Vr7A5N58UPB9miLW00OP3gle36WQl8AMchoRBhqWYMsDXPWPmKDbKcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CUhY7zAC; arc=none smtp.client-ip=209.85.221.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7c76d855ddbso2357110a34.3
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 21:34:20 -0800 (PST)
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-432d256c2e6so3646196f8f.3
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 21:53:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768282459; x=1768887259; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vksA+EIfpcr5nEbE3T0odlE0kg9ymd6yCaeY6w6Gv5M=;
-        b=Qi0P1HkHLkIYX/JKQVkF/9qm9c7ufOIH+uEmfizwjWJ4PTEqwJHPc2VNxHpPMxD2iY
-         uQCalXujiFI80t9M+Ay/IP2k0xuFAxQyrzc4I8xv2WIw2PUqr6EcVnzKwln9Ozqzn0bu
-         RKZuvEw5L/Ovrd1z0DFb0Af1Nor6NJsy3bDL6+PkgpHLgYDK/cJHpjf0JBKGoQ44yLw1
-         HlCRlOVotht318coQf8ZOtnIFB9UllhAo+ngh1nLhmT+2a0Slg6PsXw4UIeazVlTSbMu
-         ghzVHvEEZLDGgkDtkHQdbijjNFPXuPqWLglbfEQ0CmnBiEtHAecTiwML4tJxjolZoWWM
-         2CpQ==
+        d=gmail.com; s=20230601; t=1768283601; x=1768888401; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=88pm3P6g81XtGnprrTXJfTCXXLwIxJufnowFgUK1NPI=;
+        b=CUhY7zACyQqSbtyWkASj38wKtk3Qx+ufSfDyWRcAFPP2aoXqPpf7mPmDlv3/ym436L
+         CPEGfO7jpYDy/IXrLBWiQkXujXCK6jlKBzHQu1Bd1/Plvq+RLTWwHU5McINusb9vkn1d
+         PLTBDM747TQKhWS8Q95+HLxaJoY1yBf2I7gfRQiUQsf8kGbJoFvdF1bQbsn4tT8UL/mU
+         BsWt50uqTYWGmuWmDoIrAXjeMQv1V/DLn4dLe+ft6x9zT/2AGO+pGLcvjcNVgaihGzGd
+         fU+/lZbrYsb92JBBf9KywTexTU4CbO91CmMmSY3Re0SFWPA/Z9yYTza5wnW4auYK8/vM
+         cZrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768282459; x=1768887259;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=vksA+EIfpcr5nEbE3T0odlE0kg9ymd6yCaeY6w6Gv5M=;
-        b=ROZKWANrMisM80qGWhHWzaHbTFbPMz/W7WpOHNaZsL9GNHl3bJn5u8SjNMf77wTRAT
-         ljnFWAdvQa8A2Nd96Ws594Pc05KSuBUmbx+qltwi+Vdl7n2mpNAaWMTj1zr5CC5r7dXl
-         lWLm73cHRDet40E8FcmWeBCYPx5uVGdo2+bepcKIyrFc/08GY+FWDpMsZhM9XQtKNdPY
-         2bh7mkLZdBgrm5WXv5bvLEPkLtoeIJ3fZ0irItF5p6Pb0udvhUUF9aKLW5SfoMV4BUcv
-         HROJtBoka+QwTz3WJPsIzK/+/LQWd/9Sp15JNUn7C6mBiJyXVzD/hzDP009Q7D6y5602
-         g+Pg==
-X-Forwarded-Encrypted: i=1; AJvYcCUWwIoy/RE3Q4dmxYjWelo7XDcTx7cjv8AyxPg8CdsbXe/ZQSZ2cuD6DVUEiSoAKvJZhyugxPU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxstUMUc/zHuthwgdZ/bGfPGlOjRMF0EfnFLZSISuG+EzneWAP5
-	9bnLWLkAFC2lMu8U8TiIRMwa/H9cWY1K8TVfljx82TrtX0InMGNmTEMougbQQ5irNRWm6j4xOQ+
-	VmHP8B/3M3OPHQwuifxksRiFIcBG+AzM=
-X-Gm-Gg: AY/fxX4f3pKZju1kRiJw5Vdd89SueI/dIvILp7/are8WzycLr8gt9BhmAuCDm2UsOzb
-	ebC0XnKCwIvx9del2Ga/D/EeyEcxw1yK53syHikq7IfGXwC5RIn/39Q2YL8t3U9fBOLYKyzNvF/
-	JiwOQux2Zi34bUu1ADKwI53NRpvYDwaC88p+E6N3iA/wNlXOwe2uqSoh5Fq33ZNaG7bwTuLZSbX
-	vndGw1CiJqd6GAkGHDPmPsrKx5nfTZdBeGeiI3qgoSmkFP1NAi6YJlxc+UWiwxGcI0qfzo1H0NM
-	qBzSbh4=
-X-Google-Smtp-Source: AGHT+IGUWvJNZ4ZkTAUw4qdkc0PCAeA1Ef1SChvyzkxPUurNCVcqpq8VZPOJBJoics8U1EpcygF6TSKigI0mES/zmgE=
-X-Received: by 2002:a05:6820:2282:b0:65f:7470:38be with SMTP id
- 006d021491bc7-65f74703e4bmr4185292eaf.61.1768282459515; Mon, 12 Jan 2026
- 21:34:19 -0800 (PST)
+        d=1e100.net; s=20230601; t=1768283601; x=1768888401;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=88pm3P6g81XtGnprrTXJfTCXXLwIxJufnowFgUK1NPI=;
+        b=HoTJu6XLzC0TI5/FOPq8ksOIuC9P9MH0wxtNE7QYwJZU9eeZKkTTtJg+0lh7ujUNOw
+         axiCkGBos8Yi0VB+E9c4Yg17IVvE7xVR1SGfWU2QFBxC4+6vNW5EPiCNElEutqJMHz52
+         Sptn52rfy4FGo7g2wB1fikOX7iyOXMfFkuOnvQOHU12urJTF2xP5LPLgnPKYhnjzMYuh
+         e7o0GEbCFEaj+JxRUS+28XRe6N6N/Rej42zJ0DA1fjFUP9TRy2ezxnbslLghfINIPrU8
+         DzY6FyyfSSTYWtZfsVIEUR2cxjm+9/UMVnI+5f3xjKouG9KgDrGyWtt6Hf+++F4Xan5M
+         Z9ZQ==
+X-Gm-Message-State: AOJu0YzPwaaJFJJXSWXxMTmUyf4xiGAUfV8KXNZNOlXHxKuWEUY1Uf8k
+	4C7yUvNtcwsGdGJ6+cRcaEDpZNijuRWPY7WvtgdQ+xXUWFXygGqaMngr
+X-Gm-Gg: AY/fxX4WLLfjEvnKfJsrHXT7SxTDfOrTp7TekOVeWvGofSDj7EZftg3JgEdIIGf7OcC
+	2Zu7w45HyngUwVKUwOXmoK107o2gZfHAiV21U2omWvtwB43y/JslAoxfYUUW0nqUFFrob2HivEs
+	bOOFaBe9jaMgIW0UjWgEqApHHuQVblO6fxwLPRKyGKccF+K7KT2kbzerj7WpVhB1w3mYmddcPWc
+	jjB+N7PjfUIfZ3oqBQp3PxUegXxUu4D6+zMxgSG8PBKOp8x9Yw7XgUAqqMfSPWwoaw2dcv5HISJ
+	ldEOmCHzqyf+342Q2Nzca+dalcEfofLXpDUWS63b4KwAlWoGdkmvy1y6G+ni46fLMXFW2OfwXNy
+	OaO8BdEwXD3PECUWiUxRIGeREGXWrLwmYEV1syj5bplNXRmqIjcQ+fI+GpiBp3GJT74hwcJLYK7
+	CIWSOzQ+6yYGgUyeC/WVTQ8WCtl9pJGOXeigmv3S6laF+xuw==
+X-Google-Smtp-Source: AGHT+IF68TWf4Pq2Z9GvExTY2L9ytnAtr4ik5TJl9gx8maZgQ9A4SM9KuPGxVZgVMoqKVWvHWhCqpQ==
+X-Received: by 2002:a05:6000:4387:b0:42c:b8fd:21b3 with SMTP id ffacd0b85a97d-432c37a756bmr26203367f8f.57.1768283601377;
+        Mon, 12 Jan 2026 21:53:21 -0800 (PST)
+Received: from [10.221.200.118] ([165.85.126.46])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432dfa6dc4esm20377651f8f.23.2026.01.12.21.53.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Jan 2026 21:53:21 -0800 (PST)
+Message-ID: <9c8a5d43-2c1e-4a3b-8708-c92a11ad56ff@gmail.com>
+Date: Tue, 13 Jan 2026 07:53:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260104012125.44003-1-kerneljasonxing@gmail.com> <20260104012125.44003-3-kerneljasonxing@gmail.com>
-In-Reply-To: <20260104012125.44003-3-kerneljasonxing@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 13 Jan 2026 13:33:43 +0800
-X-Gm-Features: AZwV_Qia6l88ADQNzz1m_sO2YC4k30nIzEfbrxq1JjMEght9dQfip4Vy5SfFItQ
-Message-ID: <CAL+tcoDgNWBehTrtYhhdu7qBRkNLNH4FJV5T0an0tmLP+yvtqQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 2/2] xsk: move cq_cached_prod_lock to avoid
- touching a cacheline in sending path
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net/mlx5: Fix return type mismatch in
+ mlx5_esw_vport_vhca_id()
+To: Zeng Chi <zeng_chi911@163.com>, saeedm@nvidia.com, leon@kernel.org,
+ tariqt@nvidia.com, mbloch@nvidia.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, zengchi@kylinos.cn
+References: <20260109090650.1734268-1-zeng_chi911@163.com>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20260109090650.1734268-1-zeng_chi911@163.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, Jan 4, 2026 at 9:21=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.co=
-m> wrote:
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> We (Paolo and I) noticed that in the sending path touching an extra
-> cacheline due to cq_cached_prod_lock will impact the performance. After
-> moving the lock from struct xsk_buff_pool to struct xsk_queue, the
-> performance is increased by ~5% which can be observed by xdpsock.
->
-> An alternative approach [1] can be using atomic_try_cmpxchg() to have the
-> same effect. But unfortunately I don't have evident performance numbers t=
-o
-> prove the atomic approach is better than the current patch. The advantage
-> is to save the contention time among multiple xsks sharing the same pool
-> while the disadvantage is losing good maintenance. The full discussion ca=
-n
-> be found at the following link.
->
-> [1]: https://lore.kernel.org/all/20251128134601.54678-1-kerneljasonxing@g=
-mail.com/
->
-> Suggested-by: Paolo Abeni <pabeni@redhat.com>
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
 
-Hi Magnus, Maciej and Stanislav,
 
-Any feedback on the whole series?
+On 09/01/2026 11:06, Zeng Chi wrote:
+> From: Zeng Chi <zengchi@kylinos.cn>
+> 
 
-Thanks,
-Jason
+Thanks for your patch.
+
+Please specify target branch.
+
+> The function mlx5_esw_vport_vhca_id() is declared to return bool,
+> but returns -EOPNOTSUPP (-45), which is an int error code. This
+> causes a signedness bug as reported by smatch.
+> 
+> This patch fixes this smatch report:
+> drivers/net/ethernet/mellanox/mlx5/core/eswitch.h:981 mlx5_esw_vport_vhca_id()
+> warn: signedness bug returning '(-45)'
+> 
+
+Missing Fixes tag.
+
+> Signed-off-by: Zeng Chi <zengchi@kylinos.cn>
+> ---
+>   drivers/net/ethernet/mellanox/mlx5/core/eswitch.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+> index ad1073f7b79f..e7fe43799b23 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+> @@ -1009,7 +1009,7 @@ mlx5_esw_host_functions_enabled(const struct mlx5_core_dev *dev)
+>   static inline bool
+>   mlx5_esw_vport_vhca_id(struct mlx5_eswitch *esw, u16 vportn, u16 *vhca_id)
+>   {
+> -	return -EOPNOTSUPP;
+> +	return false;
+>   }
+>   
+>   #endif /* CONFIG_MLX5_ESWITCH */
+
+
+Regards,
+Tariq
 
