@@ -1,235 +1,156 @@
-Return-Path: <netdev+bounces-249343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EACCD16FCE
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 08:23:24 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8941BD17047
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 08:30:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 516B1302EAE4
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 07:23:23 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 23AA0300E614
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 07:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95FB369962;
-	Tue, 13 Jan 2026 07:23:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68089310636;
+	Tue, 13 Jan 2026 07:30:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TPfBOJIg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cA2zBGk2";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hu3xkvuf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12EAA1BC08F
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 07:23:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDF412D77FE
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 07:30:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768289002; cv=none; b=A0kHMGufLLZRCAyOtRLqvbzZ1Oh7xdnzqhjLgh+n5+92TjcBbVtkt6C4mdXNxGI1NA8KPmg5ll006rzt/d7U4xjwxpstxNqFEyjswVtQ0dYPJmG1XViZSQYi0e1dm1u9oD+SHMroBfVCyc0VxeZHcTT2x1nZM9qYbh4RiqkRRYY=
+	t=1768289424; cv=none; b=HY/zr8xC7Uy1HgaZ2XIyQAmkP30tw+YP1lV0EQkbdo2C5LEDIrFZbDSoRT+miY3qIA0VG57V6iTDn7UlxkZTtutTBor+SHbEBX7Re4pORpL4TAZsBV6qbRjrrdr+H4WFv4k/lAL5eU0l+2hUgGQyRte2QQSGWSIy+kGNNkTcYsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768289002; c=relaxed/simple;
-	bh=jCZOTQ0S4zPGrVewV7zNDwWTEanfwMTrGpGoODy9ROY=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=plSB04IywF16nsdR7WUDhisJTnkDzyf9qBmAHjStd7X9fsfQ5S24F/ZtY+NFQa9SUuCx9S8uONa72pSC4WdurbcIATWGnPrF0geiNA64g62ajhhFG25QK3rsia4JWRNwzM9tl6W7f0Zh8zfPkf3eA7bD37A8m4xoSz4Cp6iqQlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TPfBOJIg; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-42fb5810d39so3732345f8f.2
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 23:23:20 -0800 (PST)
+	s=arc-20240116; t=1768289424; c=relaxed/simple;
+	bh=s0jNNTCFNE3uPdMhFoPhUG0485jwxbZ2R+RoOksHx5c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qM0tsjdSMLD4bgvK+G8tG7D8iuYtgPvB1nMASupFKjkfK1ezn993XbujbBV3kM49tC/kBEziWpH+zoYFd3hp5HdDjJ3l7QtYOTc1uBb37ShMcT3ld6nuHdmYviVaO9HoQoj1NAyi3J2IJViX53INvd36S9B99H3HBkyqRHQM9Eo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cA2zBGk2; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hu3xkvuf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768289422;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wiNF2ZRVVEZ6E26LXjvC+Q546JUw1TsWOthVS73LBBw=;
+	b=cA2zBGk2wXt5TQspVbL47TQTf+KQ3xcxj1gei3XiceNqJ9eBGc5kHMBd0p5GBqTkn2alpE
+	tNkWPwgSkaNckSD32+dgTTCfiEfMijZY1iTdIT/EwFPzXtdDOuky2CiA8kUIiZky4Ra9oY
+	0nVk1972pssadvPZ847k1a2Ga+bZU30=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-390-wRT8orrENu669_SaIplyzQ-1; Tue, 13 Jan 2026 02:30:18 -0500
+X-MC-Unique: wRT8orrENu669_SaIplyzQ-1
+X-Mimecast-MFC-AGG-ID: wRT8orrENu669_SaIplyzQ_1768289418
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4775f51ce36so66193345e9.1
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 23:30:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768288999; x=1768893799; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YEbfMOGmFF3KnEiYpptf/1+FNigGAulyjnzCIqxEBOU=;
-        b=TPfBOJIgrjKwtS0hbpOa+YFYudKlrR0CPcUtTfdEvzeeGkf75XE8p5OdMCp+xgNSUr
-         Em3jDJO4Lsxe5HJ/s68EtWjooy9yuBpYMojRsUEtrcnqb0GlX2/yWNCILSWys35oaI0+
-         BY+PokINPAVyhaz73SHbevjePMu4Z0Qc0nHDfHKdF/sscQwpjtciIxVlN3F7njfU7S0z
-         BH//oazgL9BxiOsuzX771XeAgdNqgurTA7TGX9AT+BqNK2MYiY+AvAtiliY6YJQiNLSP
-         SUNnG3Up14dd+6EQuGcl58SVYqS6LrdLuRdS0wiJ0m2Jk7OsdkAz5H0fimFeyn7gsqgQ
-         bodg==
+        d=redhat.com; s=google; t=1768289417; x=1768894217; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wiNF2ZRVVEZ6E26LXjvC+Q546JUw1TsWOthVS73LBBw=;
+        b=Hu3xkvufn78FZdBEEX1IdPZFwyD/nIXq0pMZ26krCPKgxE8HfsF6nuo93gESERcw86
+         EbzrF3vJFCncxk6NALu9WHyZjhs0GNKZHIJ4DmX0KC9vOOyRFiM14uavu7qIx02uKe1a
+         rwQBHg59EjNzFqSRoszN2h9tndEht8pO2YXYoHYQRhxZxp7C3/7tTfcR/NluQPTaL0py
+         j/ybjS6O1kUqo27rufyygKHMKTtnAU9eUJ54rq4sTqiz+bAePCurm6X5sU7GIdoHAPdg
+         pVCMfgDKELhnLVNWwhzsQqX0dWlhjm1gdQtPsCcV8S9zpXvIbq+T7S72bGpTml53IT31
+         wPwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768288999; x=1768893799;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YEbfMOGmFF3KnEiYpptf/1+FNigGAulyjnzCIqxEBOU=;
-        b=tR6CJe1QOqJZWkzccR7rYFNROXHNJotFWspfq7MmNKoOLjxbf85KO+/khiW8TV+LPP
-         tXVJpkSOg3Ym+LRiPttGY6rgPyKgtmqp2E3wHbfxXicbpO3+t+o2ANG9JtjaYaz71v8A
-         5dxKrckysxfjwHigOtB5mFH3imDFm6Nf78oWz7rStDa2j2iSOdXwdujX/UHd1+u6HMfV
-         KQmlbA5ZHfayA2kKG02CmvbvrFIGF6VGZ2ZtOUmF7nlbFu/G6dq5YgwFOYwQqnMA3LqU
-         tNW1Jt8GOoDGvgnDOj2YPDilgvF+PY0JjzJTVw9kfi5baa1gThsDt4yTjyQJHdwWkZBN
-         yf2A==
-X-Gm-Message-State: AOJu0YzQZw5mJjVH4BzVtuA5lOROJC9gdDbfKbBS9nz8Ez0erbkrNBWA
-	iv44F6vsXrGLZeOj87i4ezQqlPGyFHJYqot+4fe2Et6i5047v62udpPO
-X-Gm-Gg: AY/fxX7Lr81eZAcYRhBnTv56YNogUfJ1RcgW/RZ8wSfFI0BgiSJlcUmBXKPWBi6qCOL
-	QQhnDKx0EC6iUX4wSbq7sW7W6GaOnUBaj5d5NowK9FRpEmhhpLBB/LUg//zZuUlGRtKhdveIl6K
-	EYppr0pt1YYLFFO5CfG6xFGE2HCJXFFL0AwJSU+OE2ZnHce2fON/dei6V4kw2z8c4zhtnowXVrv
-	LQOiy1oFsRe22lPvP8t03SmrvkLKlLkIiF5NBtuWy3f38ww7feJNXOQvCXZCTkULqYGly3GXhfD
-	uzFMRoGj4GiB3Ya+Y5GVY4uFbx8oHy4IMkeP9JXr/t1IHCoSEYE+2GcNIDlb40ZG1PPcpvDNhRQ
-	4SX69+ApGMR4sN4imgqLgYR84fCJQLW75ZPj8CT7Bo7HWpMPaHa1Mdoaxpb/4eQuywzmhHTxBy0
-	a8OPH7m9iiR+DjrHMq46EcOY6t8UXiVUVkEWEV8BoZLmP9xdM4ZKcUFp0yIwEWA8xyKaOM2jjzU
-	nky3dhKTmqx6c+9vUJqSPjiPAer3OV64E0wP3uLxUe6KodIxDP2BA==
-X-Google-Smtp-Source: AGHT+IFV42pk/BOqaBnb9I6uBmKsbIDQ/GvcmLOlMRG74oAZupSAMqRvBe/YcWOX7gd+PN5uttt4Jw==
-X-Received: by 2002:a05:6000:1448:b0:431:a0:7dea with SMTP id ffacd0b85a97d-432c374ff61mr26596396f8f.40.1768288999226;
-        Mon, 12 Jan 2026 23:23:19 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f03:3800:3cc9:69c1:1a2a:f175? (p200300ea8f0338003cc969c11a2af175.dip0.t-ipconnect.de. [2003:ea:8f03:3800:3cc9:69c1:1a2a:f175])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0e199bsm42227535f8f.16.2026.01.12.23.23.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Jan 2026 23:23:18 -0800 (PST)
-Message-ID: <ff8ac321-435c-48d0-b376-fbca80c0c22e@gmail.com>
-Date: Tue, 13 Jan 2026 08:23:17 +0100
+        d=1e100.net; s=20230601; t=1768289417; x=1768894217;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wiNF2ZRVVEZ6E26LXjvC+Q546JUw1TsWOthVS73LBBw=;
+        b=v+Vn2LsTKdW7F+NPB/ScMdFkjmDMU5VDV7AGWDkcjhUdG/WedgV9lH4hLbgExH1Bb0
+         qsSayRYwR0nXrQDk1KYzBMEbKQ2FwjoxqEsc1ZwC27XzONYBgacX2qla9wjJ6U9aWGhm
+         vcWgp0CkZugMvLfE1jivIn0xtlu11J35e5qn2qutVsuQrNBLSziVi0BdmNFlNX+1NIx+
+         nTrB0sWNSyLbP5lFSSTIc6StFg+ttQxzozXOgXNRuzliHEAU3HNC7EFCxGU5AoMuQjv5
+         tOZTf39VVtKTncLBDOa02TFCAQvJLgmuD9bTeVB4Pt9XzejPVmq6Ac0cPU35xMky8fL4
+         3ieA==
+X-Forwarded-Encrypted: i=1; AJvYcCUr+rQHzsiYK9US2qgGrKjhVhu51J3ODmFeMRsxOZ9fQF6O2IkE5jBwEwGmctaTU4Fjvca5lpM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjRDpJvE5JxmsaZpY2mEZQRWqVA7SIAFkzH3rKOmeZe6vGEYLH
+	Z6u00NW2dRDfXY5djQKKx0L242pQLC76DIDRmxT63HoF/WqXLWQQZCg0eLhtIbI92xvUau5Dy2/
+	0tHL9HCgwOvYKMz1TZ+vIxjxWgzGZCJXW/8vVUxqjs7FxVZfGKuDkwg7zAA==
+X-Gm-Gg: AY/fxX5zGCsyuhlExQFH2Mx8Dt0JWkUc9bta9p6RiQwZ0DPYVrctgEhD18Y5ky4lyJe
+	nV9drWDqn/BtgrSUOaOw1UcKdnhEhXiJ13SmRgu49GzwcAUGECFB6GqwbXKo6mff0tt1OHWYgNO
+	6vmMN8YBvR6x80Qg5IjJCwL7wQJo8d3AIljwPnHP905tyloRWJ3dEKuQalocev+MJXE7pz3G9nh
+	pGv1QQAhRqxsKRmn8WZeYvSknpeSCVKJ1fmKB3CcxjhyqiAH6hT9qC0Smv6dafygIB++9GIi7yL
+	1jycKIHQtQifKmC9dnORiJ1X7GFq4vJWLz1Vj/fBc0Gv8mYdKn+wYSQfKP3frIUTRQQQSOYy2DE
+	WjTK/DggQgHnYoMdf4hP1HfkvqEY+qB0=
+X-Received: by 2002:a05:600c:c3cd:20b0:477:af07:dd21 with SMTP id 5b1f17b1804b1-47d8a17124bmr147931965e9.25.1768289417456;
+        Mon, 12 Jan 2026 23:30:17 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEZ7vVe0350H0JVYXQsiMlO2kPVRC9RBhfa40QZOD1BpNkmOPxCYFtpzNzUhbsBf042icJ1Ug==
+X-Received: by 2002:a05:600c:c3cd:20b0:477:af07:dd21 with SMTP id 5b1f17b1804b1-47d8a17124bmr147931635e9.25.1768289417019;
+        Mon, 12 Jan 2026 23:30:17 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-35-22.inter.net.il. [80.230.35.22])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f6ef868sm387228755e9.11.2026.01.12.23.30.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jan 2026 23:30:16 -0800 (PST)
+Date: Tue, 13 Jan 2026 02:30:13 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Kommula Shiva Shankar <kshankar@marvell.com>
+Cc: jasowang@redhat.com, virtualization@lists.linux.dev,
+	eperezma@redhat.com, kvm@vger.kernel.org, netdev@vger.kernel.org,
+	jerinj@marvell.com, ndabilpuram@marvell.com, schalla@marvell.com,
+	dtatulea@nvidia.com, jgg@nvidia.com
+Subject: Re: [PATCH] vhost: fix caching attributes of MMIO regions by setting
+ them explicitly
+Message-ID: <20260113022538-mutt-send-email-mst@kernel.org>
+References: <20260102065703.656255-1-kshankar@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Jonathan Corbet <corbet@lwn.net>, Simon Horman <horms@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- linux-doc@vger.kernel.org
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH v2 net-next] net: phy: remove unused fixup unregistering
- functions
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260102065703.656255-1-kshankar@marvell.com>
 
-No user of PHY fixups unregisters these. IOW: The fixup unregistering
-functions are unused and can be removed. Remove also documentation
-for these functions. Whilst at it, remove also mentioning of
-phy_register_fixup() from the Documentation, as this function has been
-static since ea47e70e476f ("net: phy: remove fixup-related definitions
-from phy.h which are not used outside phylib").
+On Fri, Jan 02, 2026 at 12:27:03PM +0530, Kommula Shiva Shankar wrote:
+> Explicitly set non-cached caching attributes for MMIO regions.
+> Default write-back mode can cause CPU to cache device memory,
+> causing invalid reads and unpredictable behavior.
+> 
+> Invalid read and write issues were observed on ARM64 when mapping the
+> notification area to userspace via mmap.
 
-Fixup unregistering functions were added with f38e7a32ee4f
-("phy: add phy fixup unregister functions") in 2016, and last user
-was removed with 6782d06a47ad ("net: usb: lan78xx: Remove KSZ9031 PHY
-fixup") in 2024.
+device memory in question is the VQ kick, yes?
+So if it is cached, the kick can get delayed, but how
+is this causing "invalid read and write issues"?
+What is read/written exactly?
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
-v2:
-- improve commit message
-- remove related documentation
-- remove also phy_register_fixup from documentation
----
- Documentation/networking/phy.rst | 22 +--------------
- drivers/net/phy/phy_device.c     | 46 --------------------------------
- include/linux/phy.h              |  4 ---
- 3 files changed, 1 insertion(+), 71 deletions(-)
+> 
+> Signed-off-by: Kommula Shiva Shankar <kshankar@marvell.com>
+> Acked-by: Jason Wang <jasowang@redhat.com>
 
-diff --git a/Documentation/networking/phy.rst b/Documentation/networking/phy.rst
-index b0f2ef83735..0170c9d4dc5 100644
---- a/Documentation/networking/phy.rst
-+++ b/Documentation/networking/phy.rst
-@@ -524,33 +524,13 @@ When a match is found, the PHY layer will invoke the run function associated
- with the fixup.  This function is passed a pointer to the phy_device of
- interest.  It should therefore only operate on that PHY.
- 
--The platform code can either register the fixup using phy_register_fixup()::
--
--	int phy_register_fixup(const char *phy_id,
--		u32 phy_uid, u32 phy_uid_mask,
--		int (*run)(struct phy_device *));
--
--Or using one of the two stubs, phy_register_fixup_for_uid() and
--phy_register_fixup_for_id()::
-+The platform code can register the fixup using one of::
- 
-  int phy_register_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask,
- 		int (*run)(struct phy_device *));
-  int phy_register_fixup_for_id(const char *phy_id,
- 		int (*run)(struct phy_device *));
- 
--The stubs set one of the two matching criteria, and set the other one to
--match anything.
--
--When phy_register_fixup() or \*_for_uid()/\*_for_id() is called at module load
--time, the module needs to unregister the fixup and free allocated memory when
--it's unloaded.
--
--Call one of following function before unloading module::
--
-- int phy_unregister_fixup(const char *phy_id, u32 phy_uid, u32 phy_uid_mask);
-- int phy_unregister_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask);
-- int phy_register_fixup_for_id(const char *phy_id);
--
- Standards
- =========
- 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 81984d4ebb7..95f5bb3ab59 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -474,52 +474,6 @@ int phy_register_fixup_for_id(const char *bus_id,
- }
- EXPORT_SYMBOL(phy_register_fixup_for_id);
- 
--/**
-- * phy_unregister_fixup - remove a phy_fixup from the list
-- * @bus_id: A string matches fixup->bus_id (or PHY_ANY_ID) in phy_fixup_list
-- * @phy_uid: A phy id matches fixup->phy_id (or PHY_ANY_UID) in phy_fixup_list
-- * @phy_uid_mask: Applied to phy_uid and fixup->phy_uid before comparison
-- */
--int phy_unregister_fixup(const char *bus_id, u32 phy_uid, u32 phy_uid_mask)
--{
--	struct list_head *pos, *n;
--	struct phy_fixup *fixup;
--	int ret;
--
--	ret = -ENODEV;
--
--	mutex_lock(&phy_fixup_lock);
--	list_for_each_safe(pos, n, &phy_fixup_list) {
--		fixup = list_entry(pos, struct phy_fixup, list);
--
--		if ((!strcmp(fixup->bus_id, bus_id)) &&
--		    phy_id_compare(fixup->phy_uid, phy_uid, phy_uid_mask)) {
--			list_del(&fixup->list);
--			kfree(fixup);
--			ret = 0;
--			break;
--		}
--	}
--	mutex_unlock(&phy_fixup_lock);
--
--	return ret;
--}
--EXPORT_SYMBOL(phy_unregister_fixup);
--
--/* Unregisters a fixup of any PHY with the UID in phy_uid */
--int phy_unregister_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask)
--{
--	return phy_unregister_fixup(PHY_ANY_ID, phy_uid, phy_uid_mask);
--}
--EXPORT_SYMBOL(phy_unregister_fixup_for_uid);
--
--/* Unregisters a fixup of the PHY with id string bus_id */
--int phy_unregister_fixup_for_id(const char *bus_id)
--{
--	return phy_unregister_fixup(bus_id, PHY_ANY_UID, 0xffffffff);
--}
--EXPORT_SYMBOL(phy_unregister_fixup_for_id);
--
- /* Returns 1 if fixup matches phydev in bus_id and phy_uid.
-  * Fixups can be set to match any in one or more fields.
-  */
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index fbbe028cc4b..082612ee954 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -2356,10 +2356,6 @@ int phy_register_fixup_for_id(const char *bus_id,
- int phy_register_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask,
- 			       int (*run)(struct phy_device *));
- 
--int phy_unregister_fixup(const char *bus_id, u32 phy_uid, u32 phy_uid_mask);
--int phy_unregister_fixup_for_id(const char *bus_id);
--int phy_unregister_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask);
--
- int phy_eee_tx_clock_stop_capable(struct phy_device *phydev);
- int phy_eee_rx_clock_stop(struct phy_device *phydev, bool clk_stop_enable);
- int phy_init_eee(struct phy_device *phydev, bool clk_stop_enable);
--- 
-2.52.0
+I also worry a bit about regressing on other hardware.
+Cc nvidia guys.
+
+
+> ---
+> Originally sent to net-next, now redirected to vhost tree
+> per Jason Wang's suggestion. 
+> 
+>  drivers/vhost/vdpa.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 05a481e4c385..b0179e8567ab 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -1527,6 +1527,7 @@ static int vhost_vdpa_mmap(struct file *file, struct vm_area_struct *vma)
+>  	if (vma->vm_end - vma->vm_start != notify.size)
+>  		return -ENOTSUPP;
+>  
+> +	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+>  	vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP);
+>  	vma->vm_ops = &vhost_vdpa_vm_ops;
+>  	return 0;
+> -- 
+> 2.48.1
 
 
