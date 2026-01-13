@@ -1,152 +1,201 @@
-Return-Path: <netdev+bounces-249249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9DCFD16409
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 03:04:22 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6992D16453
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 03:19:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id EF82B30055B7
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 02:04:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C4FB1300F72A
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 02:19:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5610265CDD;
-	Tue, 13 Jan 2026 02:04:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E28A2BEFFB;
+	Tue, 13 Jan 2026 02:19:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="atxGie5c"
+	dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b="gb3o+ZcR"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA55E1C862F
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 02:04:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD2BE257423;
+	Tue, 13 Jan 2026 02:19:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768269860; cv=none; b=tLHDLhps9Q4jdF8kAzykb2X6mBJuDuBQbzsskdugSjcOFA/4kPEdn6WMnk3nzuK5HXn88sLQ7srBUARHMsh7hiok884amCpKJGPRMmg6hG0c36t2g4f6suz+yV02hTKvFnpH1DU5QRHHAxJw/LThlTf/mI8wm0optof0F0X6FO8=
+	t=1768270760; cv=none; b=AyPHsG7rMj7kUeuXF4zkOvD+W9wc6/TA3ImWaASp4hMAmvtY/ULoobXsLzE/ItIy2cLph/o7qtHJKMtY250KmXMYSD5GMEovNdTKLj2S7v4qSLeErMILw/BLlNkhlOaxHZ+rc/N7LE8vI/4IPfgfU5yvCDIKv0hKQ5ssbnEh4Ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768269860; c=relaxed/simple;
-	bh=I+2N4wREuryIvkzcEpv8eoiAgk0VL8EFLEYPD9vh2c4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=q8DlaSKg7ZF5x3UQz5VBHa2nHM8oG0hF0t6bheWd9PiHKER3ARRekV1r/Nia3kiI3w7KyYDYlYiPqlAYgQ7y0BexslgPhTdTjy9pXd1JzUfkW7rWqfFixt7h+q596b8p2vZ0nRQFi+x3QYgyRPGP8Oa9jKDyFaNusTOw62z9W+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=atxGie5c; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=I+2N4wREuryIvkzcEpv8eoiAgk0VL8EFLEYPD9vh2c4=; b=a
-	txGie5cajyv82c6t1mU+WtWq7TdgoqwjKGRw5k4AasWYt96v98NEca8HUWuzX2g6
-	p5nrSIYs0zREINL/vn8C5Nsf3bpMA4KeN+8hc1p6rbRLizxLfY5BsEY7zUGmaCe5
-	XijxQGQYsril8+YJt3UMbatQT2DetlVaHblOQdIDlU=
-Received: from slark_xiao$163.com (
- [2409:895b:3866:aa48:64f5:82f9:a1a0:82de] ) by ajax-webmail-wmsvr-40-116
- (Coremail) ; Tue, 13 Jan 2026 10:03:19 +0800 (CST)
-Date: Tue, 13 Jan 2026 10:03:19 +0800 (CST)
-From: "Slark Xiao" <slark_xiao@163.com>
-To: "Sergey Ryazanov" <ryazanov.s.a@gmail.com>
-Cc: "Loic Poulain" <loic.poulain@oss.qualcomm.com>,
-	"Johannes Berg" <johannes@sipsolutions.net>,
-	"Andrew Lunn" <andrew+netdev@lunn.ch>,
-	"Eric Dumazet" <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	"Jakub Kicinski" <kuba@kernel.org>,
-	"Paolo Abeni" <pabeni@redhat.com>, netdev@vger.kernel.org,
-	"Muhammad Nuzaihan" <zaihan@unrealasia.net>,
-	"Daniele Palmas" <dnlplm@gmail.com>,
-	"Qiang Yu" <quic_qianyu@quicinc.com>,
-	"Manivannan Sadhasivam" <mani@kernel.org>,
-	"Johan Hovold" <johan@kernel.org>
-Subject: Re:Re:[RFC PATCH v5 0/7] net: wwan: add NMEA port type support
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
- 20251222(83accb85) Copyright (c) 2002-2026 www.mailtech.cn 163com
-In-Reply-To: <DF8AF3F7-9A3F-4DCB-963C-DCAE46309F7B@gmail.com>
-References: <20260109010909.4216-1-ryazanov.s.a@gmail.com>
- <1b1a21b2.31c6.19ba0c6143b.Coremail.slark_xiao@163.com>
- <DF8AF3F7-9A3F-4DCB-963C-DCAE46309F7B@gmail.com>
-X-NTES-SC: AL_Qu2dCv6dtk8i7yGQZ+kfmk8Sg+84W8K3v/0v1YVQOpF8jD3p+gU8c1B4MUHH6uyNNzuNvgacSABu7/1+Q6V/Zo0o2eAT8s/xQ5PPQu9u9TCigw==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	s=arc-20240116; t=1768270760; c=relaxed/simple;
+	bh=TJn0iiD3S1e1mJdBvUIfALaRjCn9XNtxKFmkEP8NGYs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lJbYyk72h3C0yqFGdXhNTKvg9hqH8BpBH1zTmRKwvahmXsaVGXj9u0d8c0NCdGKRL7/7J3obed/c0dX1D4/mlKEEMcbo2a2w/aI2V9jX0xAf6ZO+iDcGbRzHvN1R4gR/q1Yk658HCYIf02IoOu2ejEkJvU9XbaePECsq4QbsJXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn; spf=pass smtp.mailfrom=realsil.com.cn; dkim=pass (2048-bit key) header.d=realsil.com.cn header.i=@realsil.com.cn header.b=gb3o+ZcR; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realsil.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realsil.com.cn
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 60D2IkHK22110009, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realsil.com.cn;
+	s=dkim; t=1768270727;
+	bh=/7UYmLXIsEPCx4Cb3ttL8SM1JRy/evR1z1ykAtNkesw=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding:Content-Type;
+	b=gb3o+ZcRNG2f0ycYh4rA4qNiHIXkTIlfeq78hcVv7sF33xWaY6jawMvlX7iqQ9CxY
+	 CWgUqipMcS7zy0BedQpga/N9XX+F1hnK3gyt3BWYQ+WtIsu6l9NCUdS8mpCOlAfLJI
+	 9BK/vIDVR5uf2iGVs5qholuVSmSoDfHcWKzm876HqPNVfnEhXVXI88eQJw+zSg4JTm
+	 ZgCCUYSsMpxzyQUna9ffHsnKN9NYHpdRKDthHljrvHWQ5BuAB+758Fm4Q+1gvbCk1n
+	 cRDD4GpL25QYpkX2DZgoO3QuSaFtqRH+DK6EIVWgbl8exi3cQ4e+nBq4ZmftvkdaCf
+	 TG/GuJ/f9DZzw==
+Received: from RS-EX-MBS3.realsil.com.cn ([172.29.17.103])
+	by rtits2.realtek.com.tw (8.15.2/3.21/5.94) with ESMTPS id 60D2IkHK22110009
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 13 Jan 2026 10:18:46 +0800
+Received: from RS-EX-MBS2.realsil.com.cn (172.29.17.102) by
+ RS-EX-MBS3.realsil.com.cn (172.29.17.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.39; Tue, 13 Jan 2026 10:18:45 +0800
+Received: from 172.29.37.154 (172.29.37.152) by RS-EX-MBS2.realsil.com.cn
+ (172.29.17.102) with Microsoft SMTP Server id 15.2.1748.39 via Frontend
+ Transport; Tue, 13 Jan 2026 10:18:45 +0800
+From: javen <javen_xu@realsil.com.cn>
+To: <hkallweit1@gmail.com>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <horms@kernel.org>, <javen_xu@realsil.com.cn>, <kuba@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <nic_swsd@realtek.com>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v1 3/3] r8169: add support for chip RTL9151AS
+Date: Tue, 13 Jan 2026 10:18:44 +0800
+Message-ID: <20260113021845.411-1-javen_xu@realsil.com.cn>
+X-Mailer: git-send-email 2.50.1.windows.1
+In-Reply-To: <02c00a95-34c6-4b01-8f0a-7dbd113e26ba@gmail.com>
+References: <02c00a95-34c6-4b01-8f0a-7dbd113e26ba@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <3669f7f7.1b05.19bb517df16.Coremail.slark_xiao@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:dCgvCgD3XyTnp2Vpo_RUAA--.29211W
-X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/xtbCvwfWO2llp+ev3QAA3r
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-CkF0IDIwMjYtMDEtMDkgMTU6MTE6NTgsICJTZXJnZXkgUnlhemFub3YiIDxyeWF6YW5vdi5zLmFA
-Z21haWwuY29tPiB3cm90ZToKPk9uIEphbnVhcnkgOSwgMjAyNiA1OjIxOjM0IEFNLCBTbGFyayBY
-aWFvIDxzbGFya194aWFvQDE2My5jb20+IHdyb3RlOgo+PkF0IDIwMjYtMDEtMDkgMDk6MDk6MDIs
-ICJTZXJnZXkgUnlhemFub3YiIDxyeWF6YW5vdi5zLmFAZ21haWwuY29tPiB3cm90ZToKPj4+VGhl
-IHNlcmllcyBpbnRyb2R1Y2VzIGEgbG9uZyBkaXNjdXNzZWQgTk1FQSBwb3J0IHR5cGUgc3VwcG9y
-dCBmb3IgdGhlCj4+PldXQU4gc3Vic3lzdGVtLiBUaGVyZSBhcmUgdHdvIGdvYWxzLiBGcm9tIHRo
-ZSBXV0FOIGRyaXZlciBwZXJzcGVjdGl2ZSwKPj4+Tk1FQSBleHBvcnRlZCBhcyBhbnkgb3RoZXIg
-cG9ydCB0eXBlIChlLmcuIEFULCBNQklNLCBRTUksIGV0Yy4pLiBGcm9tCj4+PnVzZXIgc3BhY2Ug
-c29mdHdhcmUgcGVyc3BlY3RpdmUsIHRoZSBleHBvcnRlZCBjaGFyZGV2IGJlbG9uZ3MgdG8gdGhl
-Cj4+PkdOU1MgY2xhc3Mgd2hhdCBtYWtlcyBpdCBlYXN5IHRvIGRpc3Rpbmd1aXNoIGRlc2lyZWQg
-cG9ydCBhbmQgdGhlIFdXQU4KPj4+ZGV2aWNlIGNvbW1vbiB0byBib3RoIE5NRUEgYW5kIGNvbnRy
-b2wgKEFULCBNQklNLCBldGMuKSBwb3J0cyBtYWtlcyBpdAo+Pj5lYXN5IHRvIGxvY2F0ZSBhIGNv
-bnRyb2wgcG9ydCBmb3IgdGhlIEdOU1MgcmVjZWl2ZXIgYWN0aXZhdGlvbi4KPj4+Cj4+PkRvbmUg
-YnkgZXhwb3J0aW5nIHRoZSBOTUVBIHBvcnQgdmlhIHRoZSBHTlNTIHN1YnN5c3RlbSB3aXRoIHRo
-ZSBXV0FOCj4+PmNvcmUgYWN0aW5nIGFzIHByb3h5IGJldHdlZW4gdGhlIFdXQU4gbW9kZW0gZHJp
-dmVyIGFuZCB0aGUgR05TUwo+Pj5zdWJzeXN0ZW0uCj4+Pgo+Pj5UaGUgc2VyaWVzIHN0YXJ0cyBm
-cm9tIGEgY2xlYW51cCBwYXRjaC4gVGhlbiB0aHJlZSBwYXRjaGVzIHByZXBhcmVzIHRoZQo+Pj5X
-V0FOIGNvcmUgZm9yIHRoZSBwcm94eSBzdHlsZSBvcGVyYXRpb24uIEZvbGxvd2VkIGJ5IGEgcGF0
-Y2ggaW50cm9kaW5nIGEKPj4+bmV3IFdXTkEgcG9ydCB0eXBlLCBpbnRlZ3JhdGlvbiB3aXRoIHRo
-ZSBHTlNTIHN1YnN5c3RlbSBhbmQgZGVtdXguIFRoZQo+Pj5zZXJpZXMgZW5kcyB3aXRoIGEgY291
-cGxlIG9mIHBhdGNoZXMgdGhhdCBpbnRyb2R1Y2UgZW11bGF0ZWQgRU1FQSBwb3J0Cj4+PnRvIHRo
-ZSBXV0FOIEhXIHNpbXVsYXRvci4KPj4+Cj4+PlRoZSBzZXJpZXMgaXMgdGhlIHByb2R1Y3Qgb2Yg
-dGhlIGRpc2N1c3Npb24gd2l0aCBMb2ljIGFib3V0IHRoZSBwcm9zIGFuZAo+Pj5jb25zIG9mIHBv
-c3NpYmxlIG1vZGVscyBhbmQgaW1wbGVtZW50YXRpb24uIEFsc28gTXVoYW1tYWQgYW5kIFNsYXJr
-IGRpZAo+Pj5hIGdyZWF0IGpvYiBkZWZpbmluZyB0aGUgcHJvYmxlbSwgc2hhcmluZyB0aGUgY29k
-ZSBhbmQgcHVzaGluZyBtZSB0bwo+Pj5maW5pc2ggdGhlIGltcGxlbWVudGF0aW9uLiBEYW5pZWxl
-IGhhcyBjYXVnaHQgYW4gaXNzdWUgb24gZHJpdmVyCj4+PnVubG9hZGluZyBhbmQgc3VnZ2VzdGVk
-IGFuIGludmVzdGlnYXRpb24gZGlyZWN0aW9uLiBXaGF0IHdhcyBjb25jbHVkZWQKPj4+YnkgTG9p
-Yy4gTWFueSB0aGFua3MuCj4+Pgo+Pj5TbGFyaywgaWYgdGhpcyBzZXJpZXMgd2l0aCB0aGUgdW5y
-ZWdpc3RlciBmaXggc3VpdHMgeW91LCBwbGVhc2UgYnVuZGxlCj4+Pml0IHdpdGggeW91ciBNSEkg
-cGF0Y2gsIGFuZCAocmUtKXNlbmQgZm9yIGZpbmFsIGluY2x1c2lvbi4KPj4+Cj4+PkNoYW5nZXMg
-UkZDdjEtPlJGQ3YyOgo+Pj4qIFVuaWZvcm1seSB1c2UgcHV0X2RldmljZSgpIHRvIHJlbGVhc2Ug
-cG9ydCBtZW1vcnkuIFRoaXMgbWFkZSBjb2RlIGxlc3MKPj4+ICB3ZWlyZCBhbmQgd2F5IG1vcmUg
-Y2xlYXIuIFRoYW5rIHlvdSwgTG9pYywgZm9yIG5vdGljaW5nIGFuZCB0aGUgZml4Cj4+PiAgZGlz
-Y3Vzc2lvbiEKPj4+Q2hhbmdlcyBSRkN2Mi0+UkZDdjU6Cj4+PiogRml4IHByZW1hdHVyZSBXV0FO
-IGRldmljZSB1bnJlZ2lzdGVyOyBuZXcgcGF0Y2ggMi83LCB0aHVzLCBhbGwKPj4+ICBzdWJzZXF1
-ZW50IHBhdGNoZXMgaGF2ZSBiZWVuIHJlbnVtYmVyZWQKPj4+KiBNaW5vciBhZGp1c3RtZW50cyBo
-ZXJlIGFuZCB0aGVyZQo+Pj4KPj5TaGFsbCBJIGtlZXAgdGhlc2UgUkZDIGNoYW5nZXMgaW5mbyBp
-biBteSBuZXh0IGNvbW1pdD8KPj5BbHNvIHRoZXNlIFJGQyBjaGFuZ2VzIGluZm8gaW4gdGhlc2Ug
-c2luZ2xlIHBhdGNoLgo+Cj5HZW5lcmFsbHksIHllYWgsIGl0J3MgYSBnb29kIGlkZWEgdG8ga2Vl
-cCBpbmZvcm1hdGlvbiBhYm91dCBjaGFuZ2VzLCBlc3BlY2lhbGx5IHBlciBpdGVtIHBhdGNoLiBL
-ZWVwaW5nIHRoZSBjb3ZlciBsYXR0ZXIgY2hhbmdlbG9nIGlzIHVwIHRvIHlvdS4KPgo+PkFuZCBJ
-IHdhbnQgdG8ga25vdyB3aGV0aGVyICB2NSBvciB2NiBzaGFsbCBiZSB1c2VkIGZvciBteSBuZXh0
-IHNlcmlhbD8KPgo+QW55IG9mIHRoZW0gd2lsbCB3b3JrLiBJZiB5b3UgYXNraW5nIG1lLCB0aGVu
-IEkgd291bGQgc3VnZ2VzdCB0byBzZW5kIGl0IGFzIHY2IHRvIGNvbnRpbnVlIG51bWJlcmluZy4K
-Pgo+PklzIHRoZXJlIGEgcmV2aWV3IHByb2dyZXNzIGZvciB0aGVzZSBSRkMgcGF0Y2hlcyAoIGZv
-ciBwYXRjaCAyLzcgYW5kIAo+PjMvNyBlc3BlY2lhbGx5KS4gSWYgeWVzLCBJIHdpbGwgaG9sZCBt
-eSBjb21taXQgdW50aWwgdGhlc2UgcmV2aWV3IHByb2dyZXNzCj4+ZmluaXNoZWQuIElmIG5vdCwg
-SSB3aWxsIGNvbWJpbmUgdGhlc2UgY2hhbmdlcyB3aXRoIG15IE1ISSBwYXRjaCBhbmQgc2VuZAo+
-PnRoZW0gb3V0IGFzYXAuCj4KPkkgaGF2ZSBjb2xsZWN0ZWQgYWxsIHRoZSBmZWVkYmFjay4gRS5n
-LiwgbWlub3IgbnVtYmVyIGxlYWsgd2FzIGZpeGVkLiBGaXhlZCBvbmUgbG9uZyBub3RpY2VkIG1p
-c3R5cGUuIEFuZCBjb2xsZWN0ZWQgdHdvIG5ldyByZXZpZXcgdGFncyBnaXZlbiBieSBMb2ljLiBT
-bywgbXkgYWR2aWNlIGlzIHRvIHVzZSB0aGVzZSBwYXRjaGVzIGFzIGJhc2UgYW5kIHB1dCB5b3Vy
-IE1ISSBwYXRjaCBvbiB0b3Agb2YgdGhlbS4KPgpIaSBTZXJnZXksCkkgZGlkbid0IGZpbmQgdGhl
-IHJldmlldyB0YWdzIGZvciB5b3VyIHBhdGNoIDIvNyBhbmQgMy83IHVudGlsIG5vdy4gQW0gSSBt
-aXNzaW5nIHNvbWV0aGluZz8KCj4+PkNDOiBTbGFyayBYaWFvIDxzbGFya194aWFvQDE2My5jb20+
-Cj4+PkNDOiBNdWhhbW1hZCBOdXphaWhhbiA8emFpaGFuQHVucmVhbGFzaWEubmV0Pgo+Pj5DQzog
-RGFuaWVsZSBQYWxtYXMgPGRubHBsbUBnbWFpbC5jb20+Cj4+PkNDOiBRaWFuZyBZdSA8cXVpY19x
-aWFueXVAcXVpY2luYy5jb20+Cj4+PkNDOiBNYW5pdmFubmFuIFNhZGhhc2l2YW0gPG1hbmlAa2Vy
-bmVsLm9yZz4KPj4+Q0M6IEpvaGFuIEhvdm9sZCA8am9oYW5Aa2VybmVsLm9yZz4KPj4+Cj4+PlNl
-cmdleSBSeWF6YW5vdiAoNyk6Cj4+PiAgbmV0OiB3d2FuOiBjb3JlOiByZW1vdmUgdW51c2VkIHBv
-cnRfaWQgZmllbGQKPj4+ICBuZXQ6IHd3YW46IGNvcmU6IGV4cGxpY2l0IFdXQU4gZGV2aWNlIHJl
-ZmVyZW5jZSBjb3VudGluZwo+Pj4gIG5ldDogd3dhbjogY29yZTogc3BsaXQgcG9ydCBjcmVhdGlv
-biBhbmQgcmVnaXN0cmF0aW9uCj4+PiAgbmV0OiB3d2FuOiBjb3JlOiBzcGxpdCBwb3J0IHVucmVn
-aXN0ZXIgYW5kIHN0b3AKPj4+ICBuZXQ6IHd3YW46IGFkZCBOTUVBIHBvcnQgc3VwcG9ydAo+Pj4g
-IG5ldDogd3dhbjogaHdzaW06IHJlZmFjdG9yIHRvIHN1cHBvcnQgbW9yZSBwb3J0IHR5cGVzCj4+
-PiAgbmV0OiB3d2FuOiBod3NpbTogc3VwcG9ydCBOTUVBIHBvcnQgZW11bGF0aW9uCj4+Pgo+Pj4g
-ZHJpdmVycy9uZXQvd3dhbi9LY29uZmlnICAgICAgfCAgIDEgKwo+Pj4gZHJpdmVycy9uZXQvd3dh
-bi93d2FuX2NvcmUuYyAgfCAyODAgKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLQo+
-Pj4gZHJpdmVycy9uZXQvd3dhbi93d2FuX2h3c2ltLmMgfCAyMDEgKysrKysrKysrKysrKysrKysr
-Ky0tLS0tCj4+PiBpbmNsdWRlL2xpbnV4L3d3YW4uaCAgICAgICAgICB8ICAgMiArCj4+PiA0IGZp
-bGVzIGNoYW5nZWQsIDM5NiBpbnNlcnRpb25zKCspLCA4OCBkZWxldGlvbnMoLSkKPj4+Cj4+Pi0t
-IAo+Pj4yLjUyLjAKPgo+SGkgU2xhcmsK
+> On 1/12/2026 3:45 AM, javen wrote:=0D
+> > From: Javen Xu <javen_xu@realsil.com.cn>=0D
+> >=0D
+> > This patch adds support for chip RTL9151AS. Since lacking of Hardware=0D
+> > version IDs, we use TX_CONFIG_V2 to recognize RTL9151AS and coming=0D
+> chips.=0D
+> > rtl_chip_infos_extend is used to store IC information for RTL9151AS=0D
+> > and coming chips. The TxConfig value between RTL9151AS and RTL9151A is=
+=0D
+> >=0D
+> > different.=0D
+> >=0D
+> > Signed-off-by: Javen Xu <javen_xu@realsil.com.cn>=0D
+> > ---=0D
+> >  drivers/net/ethernet/realtek/r8169.h      |  3 ++-=0D
+> >  drivers/net/ethernet/realtek/r8169_main.c | 28=0D
+> > +++++++++++++++++++++--=0D
+> >  2 files changed, 28 insertions(+), 3 deletions(-)=0D
+> >=0D
+> > diff --git a/drivers/net/ethernet/realtek/r8169.h=0D
+> > b/drivers/net/ethernet/realtek/r8169.h=0D
+> > index 2c1a0c21af8d..f66c279cbee6 100644=0D
+> > --- a/drivers/net/ethernet/realtek/r8169.h=0D
+> > +++ b/drivers/net/ethernet/realtek/r8169.h=0D
+> > @@ -72,7 +72,8 @@ enum mac_version {=0D
+> >       RTL_GIGA_MAC_VER_70,=0D
+> >       RTL_GIGA_MAC_VER_80,=0D
+> >       RTL_GIGA_MAC_NONE,=0D
+> > -     RTL_GIGA_MAC_VER_LAST =3D RTL_GIGA_MAC_NONE - 1=0D
+> > +     RTL_GIGA_MAC_VER_LAST =3D RTL_GIGA_MAC_NONE - 1,=0D
+> > +     RTL_GIGA_MAC_VER_CHECK_EXTEND=0D
+> >  };=0D
+> >=0D
+> >  struct rtl8169_private;=0D
+> > diff --git a/drivers/net/ethernet/realtek/r8169_main.c=0D
+> > b/drivers/net/ethernet/realtek/r8169_main.c=0D
+> > index 9b89bbf67198..164ad6570059 100644=0D
+> > --- a/drivers/net/ethernet/realtek/r8169_main.c=0D
+> > +++ b/drivers/net/ethernet/realtek/r8169_main.c=0D
+> > @@ -95,8 +95,8 @@=0D
+> >  #define JUMBO_16K    (SZ_16K - VLAN_ETH_HLEN - ETH_FCS_LEN)=0D
+> >=0D
+> >  static const struct rtl_chip_info {=0D
+> > -     u16 mask;=0D
+> > -     u16 val;=0D
+> > +     u32 mask;=0D
+> > +     u32 val;=0D
+> >       enum mac_version mac_version;=0D
+> >       const char *name;=0D
+> >       const char *fw_name;=0D
+> > @@ -205,10 +205,20 @@ static const struct rtl_chip_info {=0D
+> >       { 0xfc8, 0x040, RTL_GIGA_MAC_VER_03, "RTL8110s" },=0D
+> >       { 0xfc8, 0x008, RTL_GIGA_MAC_VER_02, "RTL8169s" },=0D
+> >=0D
+> > +     /* extend chip version*/=0D
+> > +     { 0x7cf, 0x7c8, RTL_GIGA_MAC_VER_CHECK_EXTEND },=0D
+> > +=0D
+> >       /* Catch-all */=0D
+> >       { 0x000, 0x000, RTL_GIGA_MAC_NONE }  };=0D
+> >=0D
+> > +static const struct rtl_chip_info rtl_chip_infos_extend[] =3D {=0D
+> > +     { 0x7fffffff, 0x00000000, RTL_GIGA_MAC_VER_64, "RTL9151AS",=0D
+> > +FIRMWARE_9151A_1},=0D
+> > +=0D
+> =0D
+> Seems all bits except bit 31 are used for chip detection. However registe=
+r is=0D
+> named TX_CONFIG_V2, even though only bit 31 is left for actual tx=0D
+> configuration.=0D
+> Is the register name misleading, or is the mask incorrect?=0D
+> =0D
+=0D
+Previously, we used TxConfig for chip detection. But considering that the =
+=0D
+remaining version IDs are limited, we need to extend it. To remain the =0D
+consistency of name, we choose TX_CONFIG_V2 to extend it. Bit 31 is =0D
+reserved and always 0. Only if nic link drop, it will be set to 1.=0D
+ =0D
+> > +     /* Catch-all */=0D
+> > +     { 0x00000000, 0x00000000, RTL_GIGA_MAC_NONE } };=0D
+> > +=0D
+> >  static const struct pci_device_id rtl8169_pci_tbl[] =3D {=0D
+> >       { PCI_VDEVICE(REALTEK,  0x2502) },=0D
+> >       { PCI_VDEVICE(REALTEK,  0x2600) }, @@ -255,6 +265,8 @@ enum=0D
+> > rtl_registers {=0D
+> >       IntrStatus      =3D 0x3e,=0D
+> >=0D
+> >       TxConfig        =3D 0x40,=0D
+> > +     /* Extend version register */=0D
+> > +     TX_CONFIG_V2    =3D 0x60b0,=0D
+> >  #define      TXCFG_AUTO_FIFO                 (1 << 7)        /* 8111e-=
+vl */=0D
+> >  #define      TXCFG_EMPTY                     (1 << 11)       /* 8111e-=
+vl */=0D
+> >=0D
+> > @@ -2351,6 +2363,15 @@ static const struct ethtool_ops=0D
+> rtl8169_ethtool_ops =3D {=0D
+> >       .get_eth_ctrl_stats     =3D rtl8169_get_eth_ctrl_stats,=0D
+> >  };=0D
+> >=0D
+> > +static const struct rtl_chip_info=0D
+> > +*rtl8169_get_extend_chip_version(u32 txconfigv2) {=0D
+> > +     const struct rtl_chip_info *p =3D rtl_chip_infos_extend;=0D
+> > +=0D
+> > +     while ((txconfigv2 & p->mask) !=3D p->val)=0D
+> > +             p++;=0D
+> > +     return p;=0D
+> > +}=0D
+> > +=0D
+> >  static const struct rtl_chip_info *rtl8169_get_chip_version(u16 xid,=0D
+> > bool gmii)  {=0D
+> >       /* Chips combining a 1Gbps MAC with a 100Mbps PHY */ @@ -5543,6=0D
+> > +5564,9 @@ static int rtl_init_one(struct pci_dev *pdev, const struct=0D
+> > pci_device_id *ent)=0D
+> >=0D
+> >       /* Identify chip attached to board */=0D
+> >       chip =3D rtl8169_get_chip_version(xid, tp->supports_gmii);=0D
+> > +=0D
+> > +     if (chip->mac_version =3D=3D RTL_GIGA_MAC_VER_CHECK_EXTEND)=0D
+> > +             chip =3D rtl8169_get_extend_chip_version(RTL_R32(tp,=0D
+> > + TX_CONFIG_V2));=0D
+> >       if (chip->mac_version =3D=3D RTL_GIGA_MAC_NONE)=0D
+> >               return dev_err_probe(&pdev->dev, -ENODEV,=0D
+> >                                    "unknown chip XID %03x, contact=0D
+> > r8169 maintainers (see MAINTAINERS file)\n",=
 
