@@ -1,113 +1,126 @@
-Return-Path: <netdev+bounces-249370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C9C2D17605
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 09:49:56 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FB3ED17744
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 10:02:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BC33030057DA
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 08:48:12 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AF0053014740
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 09:02:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AE2E30F7F2;
-	Tue, 13 Jan 2026 08:48:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C16C3815D5;
+	Tue, 13 Jan 2026 09:02:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Wgy3+WMb"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="ROfQah8D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D901331AAA2
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 08:48:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F813815C2;
+	Tue, 13 Jan 2026 09:01:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768294092; cv=none; b=TO5pl5GcE7OVO3DMX+/1tTvMSCtFhPUvKRH5I/ZSbisDLXhv2W8f+191UD8+I2SDvVZJedg1iuIAEYlDC6odq6/cvGRZD5NFT23kZ8JEvvOzovqvr1URFQD53qSkmRvsl8SQEQvoVvAeRzhWc+AerXIg1qrqR2fS60wuk217jkc=
+	t=1768294931; cv=none; b=a0sN1Rg77h5iy6hAL3b2Oqc4n28GP//laKo7WqNPFqc8epYGMrpQp5t45Pi8xBV/BIlvi/EjL4x5OuczYnFUtO6iwsSvAJO6OmDG3VkHMo40eeEZZEiXhyczwkEb0pUfzDdf7EBjhRLrl+8H2GMVaUbhu4rhVhNAe4I81mO8nMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768294092; c=relaxed/simple;
-	bh=xWTcOvUelEh2wlIx8ZWkSVkfKJ811YZn2XrcMxVzqTM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e0l1A6P0IjUGrQ3Qe7B/lLvM42VWt820Wrc/wo1dJu/Lx4GyhRMiL3Sx5xBa6x5N6eZvR+HY2CB+mw3kngAsaLArY4EI+FsxmeOAVdRbP/+qqResIqBE4ayVnMm+b8d5DgP1D1zuJNRB+KAytBmORLwootE+t2sXwRY4XnzuelA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Wgy3+WMb; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4f4cd02f915so54156581cf.1
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 00:48:10 -0800 (PST)
+	s=arc-20240116; t=1768294931; c=relaxed/simple;
+	bh=nr9/IaOsQYlU/C7lAnMxfez17MlQ2jIUCG6wMu+TG1M=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=FawajF4byJGF7EZ94uFAvKcT9O/YIKwVKocGOOwp/NwPavcq1153gL+PfsfYcmeY3S50uaIf8q11VScdldRv+xiY34nPrtzYXfepC0E8itEI79AHTHQouXABT9sv8NxqY90RLAhoxZocG1TgBIg/KTyFfLnq532sgPk+fZ0SNao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=ROfQah8D; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768294090; x=1768898890; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xWTcOvUelEh2wlIx8ZWkSVkfKJ811YZn2XrcMxVzqTM=;
-        b=Wgy3+WMbgBIOUslbscAXfV8Az3DSsmhiYZ1OXF4VxsJLgxF7Xa6TCeXkC8/Cwu/eTA
-         sBTDJnXBuoP1hDFi8ubyI83HU8Ljqnmk3mqh+/0f+cYYaDaI3HVTPivt8Gkkn2y3dYN0
-         NHdu0NU/9FUtn/t56sfVKSCTL5sy3FkBvExkCYery4NWMy0R7sB991912G0EUdtHqtrQ
-         XjdExYInEnt4+VyfvrPcbmyQI145T9VOFM7cO8LKmEQjstGR6GVDWH/VQ07xZIa1YQR7
-         V5HpG3IYJVthEvAlaJpPLeh1J36VB25Ny5HVpu3QxaoCwxnS8hYA4MQRVT4xwatjxDDs
-         3Qlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768294090; x=1768898890;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xWTcOvUelEh2wlIx8ZWkSVkfKJ811YZn2XrcMxVzqTM=;
-        b=Z2aUZIe1nrPGEogesbA5Zx6LP4pQGBTmcp1syYW4QiQbFzi5P53dex2Ed8K6PPZCID
-         dJQbi8ZQklYGDfVg9NOTFXj4hbB52WKsx4Mdn50YFCnt6HwB7uOpPWtxXs0PG+YYI6YW
-         OevVyhG+aSh5OZROumRCJOAGF7mEr3QMdDci9kFEDWiP/mmkMZg0CG2ntO5AsKIDoC+d
-         563dLVHLKoVipftF9ZikcfTunewlUZFTfiicm5Nb15v6AcdT1zvXYkacRvl3nhjU7CGJ
-         XF9zB+sZ8DqLBLZsfMKkpnJM2pbsrNAICjnbUYpiXHiDwu2XD2JzLo/YBmOZsrCJkat+
-         609g==
-X-Forwarded-Encrypted: i=1; AJvYcCXUYNuNTp2Bk5+nhO9aFOfqEDT2TztW2iVUg7IkPA7GI8vmITpj1XH0mdoT8qUZ5T902qsvoKY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyk7iRN1UA1QZiU5Yc14cHz+/JDPHeuRrYxclrIn8c9bpWVZ0vn
-	glEIOAaoVGG68CQK5uLtXVoP8folVkyAI8nDX67PwCGanOY6hqne9c8PZP6kdZpiTx/S9UrEkjZ
-	BBtUMO05hMdVNg5CiwHKKUiJpV7lNZsfV6lVqeOFU
-X-Gm-Gg: AY/fxX7sQaC+bYyNTlCZJQux30DtlNWP3x1obP4a5jwgOwxNmuVpHyw7V42cLXkpXCB
-	IxcxLDolzcNsUI1wEr1NTJQJv9g94vX0pMO8LvCaNoyCQtlea47MgnD/vQ/oLPwxru+zP8LEWeh
-	ww2/pAMQMXibOwTu+x/Cq215Tmbw9I1EKFom9Y//iRnNybf+4emueOTIIDb2XP0NsNYZAGXbZDX
-	dpdkWkGt/qWWETdnux782o8xCQ+LNas5DGSH25nVSHEyKX7HWD6ZDR+o1sqidPAWapM9Q==
-X-Google-Smtp-Source: AGHT+IHBodmwyOFJurQ+j86jkZWF22e+f2Ai5mnijzTMsW3bOwQs1AkFCDX6tugUSnrzGTTtmz+7TDBQ6mU6EsXWLCA=
-X-Received: by 2002:a05:622a:4d4a:b0:501:1466:8419 with SMTP id
- d75a77b69052e-50114668b8bmr167085251cf.29.1768294089448; Tue, 13 Jan 2026
- 00:48:09 -0800 (PST)
+	d=codeconstruct.com.au; s=2022a; t=1768294903;
+	bh=8Q0eeOz992UGSXugxwAvk0uVEvAvMrcHzJfCBaiSzpY=;
+	h=From:Date:Subject:To:Cc;
+	b=ROfQah8DqvFjaMlXBZRkw6sduPOs7SdiMZTptAUPL1HVekzmdZxrJlUNk9cu1o/bN
+	 XaJ2gJteHCs0P2SA1Aiq/FjmhP/NdIdyCvDIdcCkVuq7zXEx2Boko6hh+HgtVTDgjr
+	 HHcSwAb7QYewp1YHMwj4bSvJNn0ub4oAuIQUHnVXbD4xrIvLc23GQ72RNAvK6eeDY/
+	 nR2+K2rhiAs0PfDtqwGwWmJsVGrxEnSdGBnuRS4mUL2JGPZpqakRnTcvSUe9f1N5eF
+	 NF4NlJgqXnjgmnLRpWuz5E6uv8TOav3wYmjC9vlI4g2TKnBT0OysyUyXQf4Q+5cGwR
+	 GH+ktHWgmYYFw==
+Received: by codeconstruct.com.au (Postfix, from userid 10001)
+	id 9294F6775C; Tue, 13 Jan 2026 17:01:43 +0800 (AWST)
+From: Matt Johnston <matt@codeconstruct.com.au>
+Date: Tue, 13 Jan 2026 17:01:16 +0800
+Subject: [PATCH net-next] mctp i2c: initialise event handler read bytes
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260113010538.2019411-1-kuniyu@google.com>
-In-Reply-To: <20260113010538.2019411-1-kuniyu@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 13 Jan 2026 09:47:58 +0100
-X-Gm-Features: AZwV_Qh0aRTx8atoL3Kjk1QVPCZHcQQAehrMlSFyDcJgAL1qYXnllqVjo5qBqyM
-Message-ID: <CANn89iKb1gasQifwoiebUOWgEL-dY=_iHR-EMprmpw5E5NJ=zg@mail.gmail.com>
-Subject: Re: [PATCH v1 net] ipv6: Fix use-after-free in inet6_addr_del().
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Hangbin Liu <liuhangbin@gmail.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	syzbot+72e610f4f1a930ca9d8a@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260113-mctp-read-fix-v1-1-70c4b59c741c@codeconstruct.com.au>
+X-B4-Tracking: v=1; b=H4sIANsJZmkC/y2OSw7CMAxEr1J5jaO4DdBWCHEP1EVIDASpKSQBF
+ arenfBZjkfznieIHBxHaIsJAj9cdIPPgRYFmLP2J0Znc4ZSlitJVGFv0hUDa4tHNyJTQ9Vyra1
+ UDeTNNXA+f3l78JzQ85ig+zWBb/csSP/6oCOjGfrepbZ4rAQ1GIz6UHqOUX/VbbH5mWVNkuqyE
+ URKKlUj4evz38VpLypZlbvDM7HV3rDIzC108/wGErWLLt0AAAA=
+X-Change-ID: 20260113-mctp-read-fix-e191357ad049
+To: Jeremy Kerr <jk@codeconstruct.com.au>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Wolfram Sang <wsa@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Andrew Jeffery <andrew@codeconstruct.com.au>, 
+ Matt Johnston <matt@codeconstruct.com.au>
+X-Mailer: b4 0.15-dev-cbbb4
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1768294902; l=1673;
+ i=matt@codeconstruct.com.au; s=20241018; h=from:subject:message-id;
+ bh=nr9/IaOsQYlU/C7lAnMxfez17MlQ2jIUCG6wMu+TG1M=;
+ b=XNEXjgUx2OEDYxSuNJaeIB6npzDcprMXzwtVo0jM3ac47xPzWjICRSi92H3oL4o1BFu9QEA1l
+ NSGYd1YHBfTD6MxbOT7l1Glaflzb8zps5vseZrudhdwL7aVM2Vx2zck
+X-Developer-Key: i=matt@codeconstruct.com.au; a=ed25519;
+ pk=exersTcCYD/pEBOzXGO6HkLd6kKXRuWxHhj+LXn3DYE=
 
-On Tue, Jan 13, 2026 at 2:05=E2=80=AFAM Kuniyuki Iwashima <kuniyu@google.co=
-m> wrote:
->
-> syzbot reported use-after-free of inet6_ifaddr in
-> inet6_addr_del(). [0]
->
-> The cited commit accidentally moved ipv6_del_addr() for
-> mngtmpaddr before reading its ifp->flags for temporary
-> addresses in inet6_addr_del().
->
-> Let's move ipv6_del_addr() down to fix the UAF.
->
+Set a 0xff value for i2c reads of an mctp-i2c device. Otherwise reads
+will return "val" from the i2c bus driver. For i2c-aspeed and
+i2c-npcm7xx that is a stack uninitialised u8.
 
-> Fixes: 00b5b7aab9e42 ("net/ipv6: delete temporary address if mngtmpaddr i=
-s removed or unmanaged")
-> Reported-by: syzbot+72e610f4f1a930ca9d8a@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/696598e9.050a0220.3be5c5.0009.GAE@=
-google.com/
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> ---
+Tested with "i2ctransfer -y 1 r10@0x34" where 0x34 is a mctp-i2c
+instance, now it returns all 0xff.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Fixes: f5b8abf9fc3d ("mctp i2c: MCTP I2C binding driver")
+Signed-off-by: Matt Johnston <matt@codeconstruct.com.au>
+---
+I'm targeting net-next since this depends on the just-committed fix
+from Jian Zhang 
+ae4744e173fa ("net: mctp-i2c: fix duplicate reception of old data")
+
+That patch and this one should both be applied to stable - will that
+happen automatically with "Fixes:"?
+
+Thanks,
+Matt
+---
+ drivers/net/mctp/mctp-i2c.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/net/mctp/mctp-i2c.c b/drivers/net/mctp/mctp-i2c.c
+index ecda1cc36391ce50a6b28e6a9e13c3b344f8f993..8043b57bdf25095b3b4e6bacd3abbc6f8952acfe 100644
+--- a/drivers/net/mctp/mctp-i2c.c
++++ b/drivers/net/mctp/mctp-i2c.c
+@@ -243,7 +243,10 @@ static int mctp_i2c_slave_cb(struct i2c_client *client,
+ 
+ 	switch (event) {
+ 	case I2C_SLAVE_READ_REQUESTED:
++	case I2C_SLAVE_READ_PROCESSED:
++		/* MCTP I2C transport only uses writes */
+ 		midev->rx_pos = 0;
++		*val = 0xff;
+ 		break;
+ 	case I2C_SLAVE_WRITE_RECEIVED:
+ 		if (midev->rx_pos < MCTP_I2C_BUFSZ) {
+
+---
+base-commit: f10c325a345fef0a688a2bcdfab1540d1c924148
+change-id: 20260113-mctp-read-fix-e191357ad049
+prerequisite-message-id: <20260108101829.1140448-1-zhangjian.3032@bytedance.com>
+prerequisite-patch-id: 0765450364f2e9f65f6f3940d4a45598763aae8c
+
+Best regards,
+-- 
+Matt Johnston <matt@codeconstruct.com.au>
+
 
