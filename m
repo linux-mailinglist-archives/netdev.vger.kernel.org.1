@@ -1,272 +1,110 @@
-Return-Path: <netdev+bounces-249440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 595F5D18F3D
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 13:55:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B59E0D1906B
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:09:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 937E8300A3F3
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 12:54:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 37B7630042BE
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 13:09:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D833C38E13F;
-	Tue, 13 Jan 2026 12:54:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FA473904E4;
+	Tue, 13 Jan 2026 13:09:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WwStXEDi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZdrGHKbC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E23B3D3B3
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 12:54:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768308869; cv=fail; b=Hg9i1a33srSx4x49BmmKpO46/Ek7mNLTxLZRcN7zISulylMzPPogkTluF9d8ZpPzIWAzMmFIBTPtSfPmO4ipusHZ0BQ5Mfw3FjZrhmI3ybzH7ddxQEHV+fE3NCN8mR3Khz5UqtTDPV5NdiWoV2+nevE6G51fF++8EoEXbIpLyDs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768308869; c=relaxed/simple;
-	bh=bigKjLJzbkCRyDdCPRgUjwxB7IXnd5a7t0dCub5T6Pg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=s9FOqJuwOFdYuaFAK4a3CFB3T8Y/lk7uG2UQbMXbfyYVyWddlLCOKs/xcAr1eApxZJhvOT5iBMNdp5LpTWlF49rzzjZr+o2u1lus0fnjUTelCudKyNXh4vJfJjge3iesqiTD60NubSya8b59YPm3SHNah0M3gSfy5xxyxOWnNyc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WwStXEDi; arc=fail smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768308868; x=1799844868;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=bigKjLJzbkCRyDdCPRgUjwxB7IXnd5a7t0dCub5T6Pg=;
-  b=WwStXEDi9SsDi97rT1dClmW1Hwd66A+2s3aJpD7IHK0+DGF8MUysz4av
-   ctRYgX1AYjBy6TR/K5Ia1IIttD9dc3IZ+7LazxMw5cAnUi+3SgZyN7rqM
-   oiBDZooQPC3uOdMeowne8nMjAWdwvo3oFx1RX7b7DZ9CxTTUPJpcCojBT
-   nC5kE6cuLOXoHrppL8pZ9CS6SKvBelDdl4rJ7JDuFNY4+41ORlKfYDii+
-   bHq14b3UKaaBdsmgToT8n/zJMtE2mA1YpR4bpinFHwXsLuA4RVVB+PRw0
-   qBADfp4slWU+6oZu3vUVAJX32rEOY0TNZqZtqr9cohV8xVyAvy+zu5X6L
-   A==;
-X-CSE-ConnectionGUID: mrIK6M0DT2qhc9zVXsouTQ==
-X-CSE-MsgGUID: iFe2d/ecRSuL6OEQjMCpVw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11669"; a="69749654"
-X-IronPort-AV: E=Sophos;i="6.21,222,1763452800"; 
-   d="scan'208";a="69749654"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2026 04:54:28 -0800
-X-CSE-ConnectionGUID: m5keRF9oQXy3yXu6DnKD4A==
-X-CSE-MsgGUID: OWc4y9tkR2iNrtZV2AEfQA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,222,1763452800"; 
-   d="scan'208";a="203587810"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2026 04:54:27 -0800
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Tue, 13 Jan 2026 04:54:27 -0800
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Tue, 13 Jan 2026 04:54:27 -0800
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.1) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Tue, 13 Jan 2026 04:54:27 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qvTFOjWIvjZLJ9a7yiZFpapT6BGNduVbFhyiVvuITCSvtB3lhFxwb7NRs81jMMwUjEpdMt9oIHJQdBPiPSPj89epmQXpG6t1AaTZmfCBZpdaXti+Xp1dsruucOAB73tAqL2R+Nl/ot903L77Oq62XyxSCG2eUC6bZ6wFXnILfAvefN7Ijjkpp62x8I070lZUIdPXbBo7YDnUE4KKl3AByTJWls+FjOXcjJ92z6Pg6PJvgefmMeI7hYDB8I1689A8lr5GXw6Ev6lItbUXvlrLEarvGqHrIzeHXQib7fe39AJwwjcaS67M3iE5vI9ajIYNNSwxBWWCkmjHBgkKA9S/Zg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kM9h/YteBxAVzT70ZH8jKv9zDLf0413WTpQAn/pzQGA=;
- b=cQehYURgl3U/HWkPvBljqAF4s4YMQcAMiIa7BggBP+siJaFpDrSHU/JpxjxWRklHQNc+Pe4F9541o7lFRMjxbt41yme/2d3zu7iteF07I3t0KJAC+ZFpMw6Gl96UlQW+B0qIihLUro5WfxGh7SL73zEqHnem5uPNCjcmykKE41l1t9uHJhAWNUjBim9LTe6zOJBwsIvHh9hr4Sqn3J93gQG6fZ4vx+5fjnCdJJc08Jz4eD6ruF7WJAUF+PEriyAUlOpAHm2rYX9Ke8ZjksF8LdrNuBwCyZ3N25jshVPc+eDDYRUobbOMmE1mS3hfgYybDylu4fOB1DUB8/kFCrm0uQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB5902.namprd11.prod.outlook.com (2603:10b6:510:14d::19)
- by BL3PR11MB6481.namprd11.prod.outlook.com (2603:10b6:208:3bc::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Tue, 13 Jan
- 2026 12:54:19 +0000
-Received: from PH0PR11MB5902.namprd11.prod.outlook.com
- ([fe80::4a8e:9ecf:87d:f4ca]) by PH0PR11MB5902.namprd11.prod.outlook.com
- ([fe80::4a8e:9ecf:87d:f4ca%4]) with mapi id 15.20.9499.005; Tue, 13 Jan 2026
- 12:54:17 +0000
-From: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Loktionov, Aleksandr"
-	<aleksandr.loktionov@intel.com>
-Subject: RE: [PATCH iwl-next v1 7/7] ixgbe: E610: add EEE support
-Thread-Topic: [PATCH iwl-next v1 7/7] ixgbe: E610: add EEE support
-Thread-Index: AQHcg85mGdPyN9rrUEKCvn5x6C7DdLVOsGEAgAFeHuA=
-Date: Tue, 13 Jan 2026 12:54:17 +0000
-Message-ID: <PH0PR11MB5902F35989E72643B7B1173AF08EA@PH0PR11MB5902.namprd11.prod.outlook.com>
-References: <20260112140108.1173835-1-jedrzej.jagielski@intel.com>
- <20260112140108.1173835-8-jedrzej.jagielski@intel.com>
- <8ca1bd29-a736-40bf-8d53-39c9577228c0@lunn.ch>
-In-Reply-To: <8ca1bd29-a736-40bf-8d53-39c9577228c0@lunn.ch>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR11MB5902:EE_|BL3PR11MB6481:EE_
-x-ms-office365-filtering-correlation-id: 94312f66-6c8b-4718-740e-08de52a2dcde
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700021;
-x-microsoft-antispam-message-info: =?us-ascii?Q?/fqqjtdaQeg4IFwWJ+OGM4fWMnmjnYufeM8q+oStZOctVT+tSElyfrnEDblL?=
- =?us-ascii?Q?fyrdJI4lB5G3oK43wtO/IEAaJ3y0qZldx8ij9GjR5EZ5Ee5CtGr0li5w7+Ci?=
- =?us-ascii?Q?mrpd5MQ6bawYXQoGAt2/dtmrLcHbZMj8wfM/DRqFnHRBCZCwuD2arJTC6sx/?=
- =?us-ascii?Q?uB9qaMGJjH/yaVVXjLaCzzAIaTxCjvuF1gtjFWzQnCsdcg9lcx4vGSESHSB1?=
- =?us-ascii?Q?2N0uBTaWsobE7LPLBQz7pCl1aMuSjRUXOYSh34TeiuI1RFRHgJF8Pao4m4+r?=
- =?us-ascii?Q?951Q2EgK/FHKCjZCb3NsDMQfjRxJcc7HZyjG6SViY3LVdbNGt6fCEk9yhWCO?=
- =?us-ascii?Q?Jgg3/EZmh5V+UCmdmhEHbZcdfj25PaLqrUkXJRPI1t9yp+omTqpiWq9m0h7K?=
- =?us-ascii?Q?kRfM9oIQx+4vOb/ePzqilhN/863vvzV0uf3gqmftveVozafxqVmi+SgAMQBN?=
- =?us-ascii?Q?W61WPs8bKSkivnfdVjGRxdeDE9rAdBZxZ+3jTpBguwEvzxlAqjQHekzPFB5A?=
- =?us-ascii?Q?vaeF2FANvU/3Vxg3inz/U+QvzEO87fdgFxWO7ePjoiVSewSSkbWx5vQikDkS?=
- =?us-ascii?Q?+u+fqrg2qgc4INxsETMHvjaHq7vBcHH8S71S8doEFTS9KvZSBkcpTgGPIc8d?=
- =?us-ascii?Q?+jVh/g5fDkpL8yIwmz1srRuHrgbLTZ5jcjAPd/uT+n8R2kkB0a6yiATriVPF?=
- =?us-ascii?Q?c5QAyCrOPVxwRVaIYpPX6g5/8Jx1sxLl4zegNrxZKkb7g+vPoxQlnMWMebPO?=
- =?us-ascii?Q?/HoceisI3eVR0ZsAWP11tiXSr/4rDEXiIkQz2VhevVFrT7alRwV2rI5ebVQo?=
- =?us-ascii?Q?39Mh6abZWA7x+R9k9EQEzzG9wk8kLQGVYGDdUIk0uMzcGAnAa7/Dk2qh6224?=
- =?us-ascii?Q?NBNzSIKpdkdmxGhrGMdGK4oFhGS2WFjDA1aINO01nEkhjf2udHANT32SnfnG?=
- =?us-ascii?Q?q8T7Y49uICNjWLrjOVZvyhzuRg27ZLokopWjV/Pwq7dsX0oMdayLiJ7qPElx?=
- =?us-ascii?Q?pIjwm03DlF0Yv7hd48suNeGld6OFXxJZBMRo+LcPgXWAaNAEZRb/oz26ek94?=
- =?us-ascii?Q?PfJ9uO+7CrfcmXYUooLBRETKHNirFyS/OVkJTG7G4kKPy3uSO1om5fVrPeEk?=
- =?us-ascii?Q?54l6c8RXERm3fGptQm2EusJVM2iDKtdyyWuEOY1AtaIJZlq2eE3ykTW69B5P?=
- =?us-ascii?Q?fRd2eeCG88mQkYdvAlZAT38cSpo4mVJ/8L3CZlf/JbcVo32j3bGBF5nQoqLQ?=
- =?us-ascii?Q?vJaf37Zntxp2oomSV3tthjxFg7KnYRSU3KZUfDwlCl0KN0wYptJCxPlXtO4X?=
- =?us-ascii?Q?SFH+vI5PyDlWle/0SOUUtyAd2Z3y4yHxbyPZREVfPCqKoSMsucsiswqga2AX?=
- =?us-ascii?Q?qV7UHRFZLzvh/Zml8aIpufQe5KMOojbTy6VGTrYULhkdJ1Ahip+CCK9+fXpu?=
- =?us-ascii?Q?LQd5/gm2uBR4V6KkMtsfnCsQ7OAX1sPuvz9sLAdg2Wv96o2suWYOrU+8Ogj3?=
- =?us-ascii?Q?9OYReie8dP5Sk0mjvzSb9Ue+Y4E/R+L2QdWC?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5902.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Dfh+O5PIjitzTHBaQHq0a3m2dTg8Eq2RzIh7qjohjS2NpYAA7NEG5lrnxDkB?=
- =?us-ascii?Q?oYnTaPfmU6m6i/ipTCeiuBvroOY7FXLKY81K0e3OWqbJ1bhKX0sEoLhk7jxu?=
- =?us-ascii?Q?lMI3HjR9YCfdy5rZqL3Ku98VUNXmJ8N1Pj3PRG6dlQhjTb3rS/2vVXysq+mp?=
- =?us-ascii?Q?SX1IobD+W1WIF32OEl0hGP3sqWU3sT3ENtCL4mdz149q8K53hqmT8z4iDMZ9?=
- =?us-ascii?Q?zIiq0TSJkotSDlTCj3TvT7YUtAWdBkhnywDRvtn1rOccKbx2K4Kz4NxjcZ8f?=
- =?us-ascii?Q?WEOB4Z6RV4Yk8MrhlcKzZyl5yCqkkKNBXP4M9k0ca60w/0zRELhcK/iKPBvL?=
- =?us-ascii?Q?g9q+9D/G4XoX2/kdI6+HU/3sq+KU6TNoqakMZ2Lzl5tYQISPK4HwJ5GhKd3G?=
- =?us-ascii?Q?L5IhzvWnnXAy+C1PRLEgNTrWDr0MxseIGq1jm8111uBZ6NigiPsaaE1llZym?=
- =?us-ascii?Q?M2wEbx2M9tE5RuNp92KcBh0/tRfOjyF97xy70bXFHlBTmyz9c7iZvUwY3feA?=
- =?us-ascii?Q?z9I2IFqJqMJ5bHyLza4ELt8MowqSpY9zbSWD2qhQacig8Tgw84+3K9kEICSb?=
- =?us-ascii?Q?Vx9yufK0xPizZmxCiOTNlP5upo8r1jHLInpz3APAKF0lcL8NtASEdYY/6pO3?=
- =?us-ascii?Q?n0JOz7EikaP/dr5z0s+jtUOZZ0v5b42SlNKLRzEWszHF1sB95+6QHAwSmznV?=
- =?us-ascii?Q?5sxBFhq5WVAi3Ch1YSgRv66Hq1fYi1PSf/BuMtK4i5brqAryJtKgm6lkf2Ke?=
- =?us-ascii?Q?3ug9FRMITNH9Ew7kxMxi60u8vEY0Xi4KNgCHJgps17WFMhxV8UJH6yQ0OrjW?=
- =?us-ascii?Q?EY0wo1TKBM3KXQxODAY6lc/Il/SoTJb4M1r1MQvqQoNfNW/qTWJUFrSJlgxb?=
- =?us-ascii?Q?J8yePzPXd2shXXh14N+CzkZUV48kANUFYOWZeICPiI34ClIhAZ3mK/dWYY2p?=
- =?us-ascii?Q?NsH6XpHgHqD6xwYvns771kAUawfJY0V3+PXjR9e+r7pupqG6wnwGY5VHvwHF?=
- =?us-ascii?Q?VZQ8Dh/YQu/dcMCZOG8QWQfJpl8tZbStGW9oJ648/6/pxXvHx+EGrCi3gaov?=
- =?us-ascii?Q?5KrnBCmFQQbxhjlXs+oPmnnT6G6EfYTjoae8pUkX3F78juTGmWeSWyQFF64i?=
- =?us-ascii?Q?U7+C9CZqT6mY1Gy31nDuTfOoDxCUbPBQzHZjteQTP3E6E+X6QNLZ0oSRmjwE?=
- =?us-ascii?Q?Eay9d6G36UZvBzzar+DM0cUpTF7zwFiNmvNARSuJBcuiQjxFB8/m3w+c+f2a?=
- =?us-ascii?Q?p3w1SO916ZGh+75zxzUCDDSLQL6Ruwnh0P8YyruOzBR78ADMLgul/OvdkgVB?=
- =?us-ascii?Q?acplg9KIHOuAZnFtvXRIvxEKYHD/QMeQ9s5ij5J52rwdV64SnQtawV5DGyp6?=
- =?us-ascii?Q?oNzI3Dr8nUMH3/b8j8+WyocLurZapPdDa6lAbC0W2+UMbOCDro/shK/Qxfy/?=
- =?us-ascii?Q?qhvLTOfPHaXhb+P9d5E114XPdupOnLgrQXKeQce9xae06dsfdhujUTpTq9TR?=
- =?us-ascii?Q?XifrSKdrF9arjn6onMiPdhJpE+zK0y/Ho+kHznqt0bXTXV6tXgkf0fV8qYUq?=
- =?us-ascii?Q?kwMvw5OFPV7UNDAN6dgRUJvrR1u6DlrQTfn9IAQFkI+JsExjZfcPB5KhK7sy?=
- =?us-ascii?Q?7k0zxyJ8Axi5ryXe9MKEctWvbywZDkrapgCTzzJ9GmoHvN5HV4ZngHEx20yG?=
- =?us-ascii?Q?GajEDVjuRo3Lsnk/Cm2bAwDkduF74J6iuYTloCSCEosYgp5MjD0xk+LAF8nh?=
- =?us-ascii?Q?rKATr5lZBw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B408338FF0B;
+	Tue, 13 Jan 2026 13:09:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768309758; cv=none; b=eISODufpRSq7RkjYwwdOLGBpNCejGIFRn4/1aOrCpFfQXH4Q7fiJ6ezMFZ3kj0mxlOj6mOQgNjIyz3nJc4rcdtgL7NobziKJWV0fb7CjBbbjQ0W0YCCA2lYUTo83K75kCnh+0DDIsuQYjLtRhOAaASYPcjfB/jv6LoLGNhdc23Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768309758; c=relaxed/simple;
+	bh=/sdxEgRgpIsKuwLdsB+gz2Y2g+rnDI4mnmM+bV5MHKk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HfRjkxuwmFxldzx6UCfwR3NVKVO/St0bitvfyTQSXwsacE68Zvb8qipS5y3H8W3lkR7vd6ovIXRk7JqrLyXzDht+21PSUix1TkE0/2rYO6voq6a+P0ZUP2mmypXHgLOSMVUBej0tG7uURNeuaoE92qVRZ+Zl6PXxYopJO8mWdSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZdrGHKbC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1A40C116C6;
+	Tue, 13 Jan 2026 13:09:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768309757;
+	bh=/sdxEgRgpIsKuwLdsB+gz2Y2g+rnDI4mnmM+bV5MHKk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZdrGHKbC4SlbtUGTP/WJ3hy03vSHM9sncl0yGFQePY+aJN9SHggONTnrckxoZ5jNT
+	 G1v/MmJ7zUY0Co15VoJ9yCwC3rYMED40XBOq7B1v07XFJ72Z/gmamSkegIDHZdjCbq
+	 l86DniNM1fq3NcUUCSalzyZvgmZnKdrT2o3HtStqGmtcuKjQT4ypVzZba5VPZco4e5
+	 h1rRbBqxrqUq1v6yi98M4AvolNpvhKzMFt+KwF8CmoNvmI6k2TIFrBdkSqRbQAyjmw
+	 sn2tJ/JpirIGVmSVKMNOzVNAhad0+9IcM4nqGscj9ptSSlyPn/whx95EgqqUBWxpQ7
+	 bOxU+UiI91VwA==
+Date: Tue, 13 Jan 2026 13:09:13 +0000
+From: Simon Horman <horms@kernel.org>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	sgoutham@marvell.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	sumang@marvell.com
+Subject: Re: [PATCH net-next 01/13] octeontx2-af: npc: cn20k: Index management
+Message-ID: <aWZD-bDON-wzfQHe@horms.kernel.org>
+References: <20260105023254.1426488-1-rkannoth@marvell.com>
+ <20260105023254.1426488-2-rkannoth@marvell.com>
+ <20260108175357.GJ345651@kernel.org>
+ <aWBqq9UKWD5ewKpA@rkannoth-OptiPlex-7090>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5902.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 94312f66-6c8b-4718-740e-08de52a2dcde
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jan 2026 12:54:17.6618
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Lqx13EwUidOXNDgBrBdnvPnmItPxGrWnpYQ7Q7dKephM0FLdEFni/tTM+30CgHgCdCvv+cADmdi9Empp3KlHAgq5Pt9Dk7kGotnC2HMehrE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB6481
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aWBqq9UKWD5ewKpA@rkannoth-OptiPlex-7090>
 
-From: Andrew Lunn <andrew@lunn.ch>=20
-Sent: Monday, January 12, 2026 4:56 PM
+On Fri, Jan 09, 2026 at 08:10:43AM +0530, Ratheesh Kannoth wrote:
+> On 2026-01-08 at 23:23:57, Simon Horman (horms@kernel.org) wrote:
+> > On Mon, Jan 05, 2026 at 08:02:42AM +0530, Ratheesh Kannoth wrote:
+> >
+> > > +		if (strlen(t1) < 3) {
+> > > +			pr_err("%s:%d Bad Token %s=%s\n",
+> > > +			       __func__, __LINE__, t1, t2);
+> > > +			goto err;
+> > > +		}
+> > > +
+> > > +		if (t1[0] != '[' || t1[strlen(t1) - 1] != ']') {
+> > > +			pr_err("%s:%d Bad Token %s=%s\n",
+> > > +			       __func__, __LINE__, t1, t2);
+> >
+> > Hi Ratheesh,
+> >
+> > FWIIW, I would advocate slightly more descriptive and thus unique
+> > error messages
+> ACK.
+> 
+> >and dropping __func__ and __LINE__ from logs,
+> > here and elsewhere.
+> ACK.
+> 
+> >
+> > The __func__, and in particular __LINE__ information will only
+> > tend to change as the file is up dated, and so any debugging will
+> > need to know the source that the kernel was compiled from.
+> ACK.
+> 
+> >
+> > And I'd say that given the state of debugging functionality in the kernel -
+> > e..g dynamic tracepoints - this is not as useful as it may seem at first.
+> Since these represent valid error cases, they should be logged by default.
+> Relying on dynamic trace points would require the customer to recompile the
+> kernel and retest, which could lead to significant debugging delays and
+> multiple rounds of communication.
 
->> +/**
->> + * ixgbe_setup_eee_e610 - Enable/disable EEE support
->> + * @hw: pointer to the HW structure
->> + * @enable_eee: boolean flag to enable EEE
->> + *
->> + * Enable/disable EEE based on @enable_eee.
->> + *
->> + * Return: the exit code of the operation.
->> + */
->> +int ixgbe_setup_eee_e610(struct ixgbe_hw *hw, bool enable_eee)
->> +{
->> +	struct ixgbe_aci_cmd_get_phy_caps_data phy_caps =3D {};
->> +	struct ixgbe_aci_cmd_set_phy_cfg_data phy_cfg =3D {};
->> +	u16 eee_cap =3D 0;
->> +	int err;
->> +
->> +	err =3D ixgbe_aci_get_phy_caps(hw, false,
->> +		IXGBE_ACI_REPORT_ACTIVE_CFG, &phy_caps);
->> +	if (err)
->> +		return err;
->> +
->> +	ixgbe_copy_phy_caps_to_cfg(&phy_caps, &phy_cfg);
->> +	phy_cfg.caps |=3D (IXGBE_ACI_PHY_ENA_LINK |
->> +			IXGBE_ACI_PHY_ENA_AUTO_LINK_UPDT);
->> +
->> +	if (enable_eee) {
->> +		if (hw->phy.eee_speeds_advertised & IXGBE_LINK_SPEED_100_FULL)
->> +			eee_cap |=3D IXGBE_ACI_PHY_EEE_EN_100BASE_TX;
->> +		if (hw->phy.eee_speeds_advertised & IXGBE_LINK_SPEED_1GB_FULL)
->> +			eee_cap |=3D IXGBE_ACI_PHY_EEE_EN_1000BASE_T;
->
->You say in a few different places that EEE is not supported for <=3D
->1G. So why have this? It should never happen.
+FTR, I think that logging them is reasonable, it's just the __func__ and
+__LINE__ portions that I question the usefulness of.
 
-You're right, it was implemented in more general manner, every possible bit
-value was taken under consideration here.
-I will reduce it under next revision.
+Also, in my experience, recompiling is not necessary to use dynamic trace
+points. But YMMV.
 
->
->> +bool ixgbe_is_eee_link_speed_supported_e610(struct ixgbe_adapter *adapt=
-er,
->> +					    bool print_msg)
->> +{
->> +	switch (adapter->link_speed) {
->> +	case IXGBE_LINK_SPEED_10GB_FULL:
->> +	case IXGBE_LINK_SPEED_2_5GB_FULL:
->> +	case IXGBE_LINK_SPEED_5GB_FULL:
->> +		return true;
->> +	case IXGBE_LINK_SPEED_10_FULL:
->
->I don't think IEEE defines EEE for 10Mbs. So this should be in your
->default case, where you handle 10_HALF, 100_HALF, 1G_HALF which also
->are not defined in 802.3.
-
-Thanks for noting that, will be corrected.
-
->
->> +	case IXGBE_LINK_SPEED_100_FULL:
->> +	case IXGBE_LINK_SPEED_1GB_FULL:
->> +		if (print_msg)
->> +			e_dev_info("Energy Efficient Ethernet (EEE) feature is not supported=
- on link speeds equal to or below 1Gbps. EEE is supported on speeds above 1=
-Gbps.\n");
->> +		fallthrough;
->> +	default:
->> +		return false;
->> +	}
->> +}
->
->	Andrew
->
-Thanks for notes Andrew!
-
-Jedrek
+...
 
