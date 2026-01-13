@@ -1,190 +1,212 @@
-Return-Path: <netdev+bounces-249622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2144FD1BAA0
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 00:12:29 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FA06D1BB0B
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 00:23:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D1A513006463
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 23:12:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 512FE3005F1E
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 23:23:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8327A350D79;
-	Tue, 13 Jan 2026 23:12:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00C4B36997B;
+	Tue, 13 Jan 2026 23:23:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dIsuq2Gy"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="jI/zYN/s"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E8CB26B74A;
-	Tue, 13 Jan 2026 23:12:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4538241690;
+	Tue, 13 Jan 2026 23:23:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768345943; cv=none; b=X7Azk9cwCVz4R5kAv00FWyRkNQGvWU+tO1Fy2PgrHkBYPpRIFj6mhE1YnHV8UCIJ+DVA9113SvO5t96PGvg37htvlI2jnnvmwsOyO8q7GgSbY95DRwNzgsU7+io5bkTBkGYDHngjTjueL2fU8oh1c59qC8Z2oWMJcj8TJipOh5o=
+	t=1768346602; cv=none; b=aURmNYTO6u42TmZecblMJf26BpW6e79Nzdu9Xc0VTHZVcC5FpZJcJ1wm+7YDhvCM2OzBeqhDjnj1XbNOMSRBYqRGoSGbgWEhtbPXthQ7VDoREfq4Pfh6K1Y1rGX/q6ECqSA1y7V1aHFZAuV6oPJ0WGgunUV9sPKiHUQJvKYq9Mg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768345943; c=relaxed/simple;
-	bh=KVvUjtgHP/EnKb5VOEjjBg5TqpHapWWCoF0IBZbv+IU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sqy+kam1a4p8bevaENxuiyzsFyFrP0VEkRSxUINVnplIqdoEtzlD75atbNbr6GITbcDJTMpGiaG6kWxpSe7CqrKqHGv40xFmXuhwAuJphp3sB7BwRMKtUibDk/07o0DjFSZF2JEnTBb7u9Hpwg1abohspXFiW51lTuzNsU9unPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dIsuq2Gy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD7F5C116C6;
-	Tue, 13 Jan 2026 23:12:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768345943;
-	bh=KVvUjtgHP/EnKb5VOEjjBg5TqpHapWWCoF0IBZbv+IU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dIsuq2GykDPHWJFBN+4HvzBChNmyu1hHIMJc8+H4jvYmt6n43+njE75R+vlQRLYNN
-	 uZ0BrIy8AWcVEC5/DIaiQkv+R/elVNvDWaalS/dQEeBnPIrqw9GWEVFCxBgIfZTtYI
-	 oX+Z9IgWJ4pifJfQrKis+JiKRLmljeUw0wK5m2Y6/3K5UzzuX3RybFsJV0ewR3/8yX
-	 2DCnCQvhGukGpnarWWhTu8cjDSS4riMOq0yYx+IEZttsqpSWaPQzfGCjHkrPR3vAGb
-	 6vcEduOgLU0zPq1eCNnPwX6d17bIAYW/EItgbEpvZGEDrUjdhCQCH8BCC0G/4mb7aa
-	 kWVwXKUYByr7w==
-Date: Tue, 13 Jan 2026 17:12:22 -0600
-From: Rob Herring <robh@kernel.org>
-To: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
-	conor+dt@kernel.org, krzk+dt@kernel.org, pabeni@redhat.com,
-	kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
-	andrew+netdev@lunn.ch
-Subject: Re: [PATCH net-next v1] dt-bindings: net: Convert icplus-ip101ag to
- yaml format
-Message-ID: <20260113231222.GA421230-robh@kernel.org>
-References: <20260110235544.1593197-1-martin.blumenstingl@googlemail.com>
+	s=arc-20240116; t=1768346602; c=relaxed/simple;
+	bh=KDCbhLq0dGTObzOl9kd7FyC+CNGXDffNYcsegK7M3v4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jWeUb1Ch9VWa9oQXrMCBRZg9vRLUdkd+10khYuVbZq34cd4euT1oIOab147EtnF7YXvZLJ04rMw/G13kICQ+kb26P8d8txiy2jnz91hOXq5J2+p4j0oPKaVo5w/KW2hwwoQzXKNIzLaAOsSuNbv+HStawSVzoMUxB/8NZFHxykw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=jI/zYN/s; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=+3Wc1zE3FbV1o3OPptrIsJUG/DAOQPGqS4QpYdY+NCQ=; b=jI/zYN/sIBAO/uzel0Sct2ZtjV
+	CQISgcPJtlshBL2d2oH+UPp8XHomkseQKV5x99OC0aWFxyVhARMGAcurswTJ4eHbDFRgBq7fMmw1N
+	kSBcT7iFaq/tOzY6TDF70hq67YQ52BOZ4/QsWCh0e2SX61CHmk6tEOss8wmrehInsPdHq9AZCYg4P
+	OVY9x759Ft4Z2IUysARtTZol7aOnaLbBp07vf9vlEvTwqLRmsYgTp7sKWVEoZ2LStfTnY0wGZFsqI
+	dG7NKo6ao1dJpsbhMTa/0tYFMkY3kPoJZv1EyVlzkseHflF/vO3AlV0iokbUYDZxCjYpnbqPypWFI
+	B1UxKZHA==;
+Received: from localhost ([127.0.0.1])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1vfnj1-0003VG-0Z;
+	Wed, 14 Jan 2026 00:22:59 +0100
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	razor@blackwall.org,
+	pabeni@redhat.com,
+	willemb@google.com,
+	sdf@fomichev.me,
+	john.fastabend@gmail.com,
+	martin.lau@kernel.org,
+	jordan@jrife.io,
+	maciej.fijalkowski@intel.com,
+	magnus.karlsson@intel.com,
+	dw@davidwei.uk,
+	toke@redhat.com,
+	yangzhenze@bytedance.com,
+	wangdongdong.6@bytedance.com
+Subject: [PATCH net-next v6 00/16] netkit: Support for io_uring zero-copy and AF_XDP
+Date: Wed, 14 Jan 2026 00:22:41 +0100
+Message-ID: <20260113232257.200036-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260110235544.1593197-1-martin.blumenstingl@googlemail.com>
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27879/Tue Jan 13 08:26:16 2026)
 
-On Sun, Jan 11, 2026 at 12:55:44AM +0100, Martin Blumenstingl wrote:
-> This allows for better validation of .dts.
-> 
-> Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-> ---
->  .../bindings/net/icplus,ip101ag.yaml          | 75 +++++++++++++++++++
->  .../bindings/net/icplus-ip101ag.txt           | 19 -----
->  2 files changed, 75 insertions(+), 19 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/net/icplus,ip101ag.yaml
->  delete mode 100644 Documentation/devicetree/bindings/net/icplus-ip101ag.txt
-> 
-> diff --git a/Documentation/devicetree/bindings/net/icplus,ip101ag.yaml b/Documentation/devicetree/bindings/net/icplus,ip101ag.yaml
-> new file mode 100644
-> index 000000000000..f245516103b3
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/icplus,ip101ag.yaml
-> @@ -0,0 +1,75 @@
-> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/icplus,ip101ag.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: IC Plus Corp. IP101A / IP101G Ethernet PHYs
-> +
-> +maintainers:
-> +  - Andrew Lunn <andrew@lunn.ch>
-> +  - Florian Fainelli <f.fainelli@gmail.com>
-> +  - Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-> +
-> +description: |
-> +  Bindings for IC Plus Corp. IP101A / IP101G Ethernet MII/RMII PHYs
+Containers use virtual netdevs to route traffic from a physical netdev
+in the host namespace. They do not have access to the physical netdev
+in the host and thus can't use memory providers or AF_XDP that require
+reconfiguring/restarting queues in the physical netdev.
 
-Drop 'Bindings for'
+This patchset adds the concept of queue leasing to virtual netdevs that
+allow containers to use memory providers and AF_XDP at native speed.
+Leased queues are bound to a real queue in a physical netdev and act
+as a proxy.
 
-> +
-> +  There are different models of the IP101G Ethernet PHY:
-> +  - IP101GR (32-pin QFN package)
-> +  - IP101G (die only, no package)
-> +  - IP101GA (48-pin LQFP package)
-> +
-> +  There are different models of the IP101A Ethernet PHY (which is the
-> +  predecessor of the IP101G):
-> +  - IP101A (48-pin LQFP package)
-> +  - IP101AH (48-pin LQFP package)
-> +
-> +  All of them share the same PHY ID.
-> +
-> +allOf:
-> +  - $ref: ethernet-phy.yaml#
-> +
-> +properties:
-> +  compatible:
-> +    contains:
+Memory providers and AF_XDP operations take an ifindex and queue id,
+so containers would pass in an ifindex for a virtual netdev and a queue
+id of a leased queue, which then gets proxied to the underlying real
+queue.
 
-Drop contains. The list(s) of allowed values should be exact.
+We have implemented support for this concept in netkit and tested the
+latter against Nvidia ConnectX-6 (mlx5) as well as Broadcom BCM957504
+(bnxt_en) 100G NICs. For more details see the individual patches.
 
-> +      enum:
-> +        - ethernet-phy-id0243.0c54
-> +
-> +  icplus,select-rx-error:
-> +    type: boolean
-> +    description: |
-> +      Pin 21 ("RXER/INTR_32") will output the receive error status.
-> +      Interrupts are not routed outside the PHY in this mode.
-> +
-> +      This is only supported for IP101GR (32-pin QFN package).
-> +
-> +  icplus,select-interrupt:
-> +    type: boolean
-> +    description: |
-> +      Pin 21 ("RXER/INTR_32") will output the interrupt signal.
-> +
-> +      This is only supported for IP101GR (32-pin QFN package).
-> +
-> +# RXER and INTR_32 functions are mutually exclusive
-> +dependentSchemas:
-> +  icplus,select-rx-error:
-> +    properties:
-> +      icplus,select-interrupt: false
-> +  icplus,select-interrupt:
-> +    properties:
-> +      icplus,select-rx-error: false
-> +
-> +unevaluatedProperties: false
-> +
-> +examples:
-> +  - |
-> +    mdio {
-> +        #address-cells = <1>;
-> +        #size-cells = <0>;
-> +
-> +        ethphy1: ethernet-phy@1 {
-> +                compatible = "ethernet-phy-id0243.0c54";
-> +                reg = <1>;
-> +                icplus,select-interrupt;
-> +        };
-> +    };
-> diff --git a/Documentation/devicetree/bindings/net/icplus-ip101ag.txt b/Documentation/devicetree/bindings/net/icplus-ip101ag.txt
-> deleted file mode 100644
-> index a784592bbb15..000000000000
-> --- a/Documentation/devicetree/bindings/net/icplus-ip101ag.txt
-> +++ /dev/null
-> @@ -1,19 +0,0 @@
-> -IC Plus Corp. IP101A / IP101G Ethernet PHYs
-> -
-> -There are different models of the IP101G Ethernet PHY:
-> -- IP101GR (32-pin QFN package)
-> -- IP101G (die only, no package)
-> -- IP101GA (48-pin LQFP package)
-> -
-> -There are different models of the IP101A Ethernet PHY (which is the
-> -predecessor of the IP101G):
-> -- IP101A (48-pin LQFP package)
-> -- IP101AH (48-pin LQFP package)
-> -
-> -Optional properties for the IP101GR (32-pin QFN package):
-> -
-> -- icplus,select-rx-error:
-> -  pin 21 ("RXER/INTR_32") will output the receive error status.
-> -  interrupts are not routed outside the PHY in this mode.
-> -- icplus,select-interrupt:
-> -  pin 21 ("RXER/INTR_32") will output the interrupt signal.
-> -- 
-> 2.52.0
-> 
+v5->v6:
+ - Fix nest_queue test in netdev_nl_queue_fill_one (Jakub/AI bot)
+ - Fix netdev notifier locking leak (Jakub/AI bot)
+ - Drop NETREG_UNREGISTERING WARN_ON_ONCE to avoid confusion (Stan)
+ - Remove slipped-in .gitignore cruft in net selftest (Stan)
+ - Fix Pylint warnings in net selftest (Jakub)
+v4->v5:
+ - Rework of the core API into queue-create op (Jakub)
+ - Rename from queue peering to queue leasing (Jakub)
+ - Add net selftests for queue leasing (Stan, Jakub)
+ - Move netkit_queue_get_dma_dev into core (Jakub)
+ - Dropped netkit_get_channels (Jakub)
+ - Moved ndo_queue_create back to return index or error (Jakub)
+ - Inline __netdev_rx_queue_{peer,unpeer} helpers (Jakub)
+ - Adding helpers in patches where they are used (Jakub)
+ - Undo inline for netdev_put_lock (Jakub)
+ - Factoring out checks whether device can lease (Jakub)
+ - Fix up return codes in netdev_nl_bind_queue_doit (Jakub)
+ - Reject when AF_XDP or mp already bound (Jakub)
+ - Switch some error cases to NL_SET_BAD_ATTR() (Jakub)
+ - Rebase and retested everything with mlx5 + bnxt_en
+v3->v4:
+ - ndo_queue_create store dst queue via arg (Nikolay)
+ - Small nits like a spelling issue + rev xmas (Nikolay)
+ - admin-perm flag in bind-queue spec (Jakub)
+ - Fix potential ABBA deadlock situation in bind (Jakub, Paolo, Stan)
+ - Add a peer dev_tracker to not reuse the sysfs one (Jakub)
+ - New patch (12/14) to handle the underlying device going away (Jakub)
+ - Improve commit message on queue-get (Jakub)
+ - Do not expose phys dev info from container on queue-get (Jakub)
+ - Add netif_put_rx_queue_peer_locked to simplify code (Stan)
+ - Rework xsk handling to simplify the code and drop a few patches
+ - Rebase and retested everything with mlx5 + bnxt_en
+v2->v3:
+ - Use netdev_ops_assert_locked instead of netdev_assert_locked (syzbot)
+ - Add missing netdev_lockdep_set_classes in netkit
+v1->v2:
+ - Removed bind sample ynl code (Stan)
+ - Reworked netdev locking to have consistent order (Stan, Kuba)
+ - Return 'not supported' in API patch (Stan)
+ - Improved ynl documentation (Kuba)
+ - Added 'max: s32-max' in ynl spec for ifindex (Kuba)
+ - Added also queue type in ynl to have user specify rx to make
+   it obvious (Kuba)
+ - Use of netdev_hold (Kuba)
+ - Avoid static inlines from another header (Kuba)
+ - Squashed some commits (Kuba, Stan)
+ - Removed ndo_{peer,unpeer}_queues callback and simplified
+   code (Kuba)
+ - Improved commit messages (Toke, Kuba, Stan, zf)
+ - Got rid of locking genl_sk_priv_get (Stan)
+ - Removed af_xdp cleanup churn (Maciej)
+ - Added netdev locking asserts (Stan)
+ - Reject ethtool ioctl path queue resizing (Kuba)
+ - Added kdoc for ndo_queue_create (Stan)
+ - Uninvert logic in netkit single dev mode (Jordan)
+ - Added binding support for multiple queues
+
+Daniel Borkmann (9):
+  net: Add queue-create operation
+  net: Implement netdev_nl_queue_create_doit
+  net: Add lease info to queue-get response
+  net, ethtool: Disallow leased real rxqs to be resized
+  xsk: Extend xsk_rcv_check validation
+  xsk: Proxy pool management for leased queues
+  netkit: Add single device mode for netkit
+  netkit: Add netkit notifier to check for unregistering devices
+  netkit: Add xsk support for af_xdp applications
+
+David Wei (7):
+  net: Proxy net_mp_{open,close}_rxq for leased queues
+  net: Proxy netdev_queue_get_dma_dev for leased queues
+  netkit: Implement rtnl_link_ops->alloc and ndo_queue_create
+  selftests/net: Add bpf skb forwarding program
+  selftests/net: Add env for container based tests
+  selftests/net: Make NetDrvContEnv support queue leasing
+  selftests/net: Add netkit container tests
+
+ Documentation/netlink/specs/netdev.yaml       |  44 +++
+ drivers/net/netkit.c                          | 358 +++++++++++++++---
+ include/linux/netdevice.h                     |   6 +
+ include/net/netdev_queues.h                   |  19 +-
+ include/net/netdev_rx_queue.h                 |  21 +-
+ include/net/page_pool/memory_provider.h       |   4 +-
+ include/net/xdp_sock_drv.h                    |   2 +-
+ include/uapi/linux/if_link.h                  |   6 +
+ include/uapi/linux/netdev.h                   |  11 +
+ net/core/dev.c                                |   7 +
+ net/core/dev.h                                |   2 +
+ net/core/netdev-genl-gen.c                    |  20 +
+ net/core/netdev-genl-gen.h                    |   2 +
+ net/core/netdev-genl.c                        | 185 +++++++++
+ net/core/netdev_queues.c                      |  74 +++-
+ net/core/netdev_rx_queue.c                    | 169 +++++++--
+ net/ethtool/channels.c                        |  12 +-
+ net/ethtool/ioctl.c                           |   9 +-
+ net/xdp/xsk.c                                 |  73 +++-
+ tools/include/uapi/linux/netdev.h             |  11 +
+ .../testing/selftests/drivers/net/README.rst  |   7 +
+ .../testing/selftests/drivers/net/hw/Makefile |   2 +
+ .../drivers/net/hw/lib/py/__init__.py         |   7 +-
+ .../selftests/drivers/net/hw/nk_forward.bpf.c |  49 +++
+ .../selftests/drivers/net/hw/nk_netns.py      |  23 ++
+ .../selftests/drivers/net/hw/nk_qlease.py     |  55 +++
+ .../selftests/drivers/net/lib/py/__init__.py  |   7 +-
+ .../selftests/drivers/net/lib/py/env.py       | 157 +++++++-
+ 28 files changed, 1224 insertions(+), 118 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/hw/nk_forward.bpf.c
+ create mode 100755 tools/testing/selftests/drivers/net/hw/nk_netns.py
+ create mode 100755 tools/testing/selftests/drivers/net/hw/nk_qlease.py
+
+-- 
+2.43.0
+
 
