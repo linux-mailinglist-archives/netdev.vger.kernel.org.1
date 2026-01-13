@@ -1,166 +1,214 @@
-Return-Path: <netdev+bounces-249382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5804D17D64
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 11:02:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D204ED17EA2
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 11:15:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4692B3001825
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 10:02:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B0E6D30BBDF0
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 10:10:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 470C9343D84;
-	Tue, 13 Jan 2026 10:02:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E27D38A724;
+	Tue, 13 Jan 2026 10:09:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="O4rRT5Ag"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Mn3xaSJ6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013031.outbound.protection.outlook.com [40.93.201.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED93833F8C5;
-	Tue, 13 Jan 2026 10:02:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768298575; cv=none; b=aOiqbjyViPa4Im5rF0420lP2qocXmBPpVawDeUl8qnA2A1nvKkAL00gF8oVgwYgy0pMcLxNfV7Sm3YwUCjogmuJUggd027KB59614gTBjUTAip7ryPFiopxPhwm3fBdNejrwN8GkxGLFj6NsbV+K7CphqNRgmvU6BHMkO8XjFsk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768298575; c=relaxed/simple;
-	bh=Hk5FuLQBlGYUXB8fZpgsLrSdmPEDFxsobo45wV+rXco=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PGmgLlb85/tC0gdzR/muFTqs4c04Lb2m5lisMpgdz97vPt5w/IFDZK1CCVqkSTWJU7b01ocr16+MmVY+GT44QtFZrWA+Ikz5NrDlZdIKiYLkFU2Ji25OMLy4Y+2B5o9jiIpaAgOWGvGQVYBBuke49AlJvml/PPD2DAfO9L3JK4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=O4rRT5Ag; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60D7Q6F93356391;
-	Tue, 13 Jan 2026 02:02:51 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=1wfYsnindzhA7nEu3JrsaIIXG
-	dfqodSsR/2kzV/ZtbI=; b=O4rRT5AgLkiIRHTuZekql4Q4UIOppyXOJmVhIeMov
-	8MfjC0UpI/kRlJ2EZKRSlREnpk4iP9XZzOCuvCmPGntPVScrdaBJa5K5mF7dg/wV
-	ZTJ9gKkkOrb5dsFB7osDoxCsEi1gzRkS5AJf+CukjTrug6yBMogAGv/qBMgRf2br
-	/4xqSbq4e328xaESu3+1w5payV9ZC7qkmL97iZYIMzmS5dhOf83j7Tk0o44AdImr
-	Ibpq8qPpAD22FsnPzIf5cAIr803POvvVBdfXaGl5IAiRjs+EnkOcWyzBM6CEdI63
-	pVkkXU0kzRkKpVtqjC9nDmEPXyCWeXlyei5u/eM0nHcDg==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4bnd2g8sbj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 13 Jan 2026 02:02:51 -0800 (PST)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 13 Jan 2026 02:02:50 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Tue, 13 Jan 2026 02:02:50 -0800
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id B581E3F709C;
-	Tue, 13 Jan 2026 02:02:48 -0800 (PST)
-Date: Tue, 13 Jan 2026 15:32:47 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [net-next,v3,04/13] ocetontx2-af: npc: cn20k: MKEX profile
- support
-Message-ID: <aWYYR6eDcY-0ByTY@rkannoth-OptiPlex-7090>
-References: <20260109054828.1822307-5-rkannoth@marvell.com>
- <20260110225932.3900827-1-kuba@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A76F3806C1;
+	Tue, 13 Jan 2026 10:09:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.31
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768298977; cv=fail; b=KQDyzkAWwFMJgZps6BWBiVgOUn+WDRdo+uBL8tRfVTmErkbPpWyFAy+W+qoviORtJimwASH/Irv4DUq3J3Ig4sWp3w8Sn8DixeDxMxQQmgWHgunfGOkjkrKpQ+zHk7pdmM9EB56OzpWXEZqO4jDmsLQQoQQVjXVLWX8Dkl3Etx4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768298977; c=relaxed/simple;
+	bh=xg5pRAdG1cuUJYrDTDaJ5j5ECHHiDN7b5FVJ7ITC4vQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CU6eKHzD4suN8cgE4VuvBg079StkoLOYxamK2wC50EaFe4pfsRWfpCTRSGVvQ9cSwcTcNU1/Yf+8lfSb44fSlt3f8F1/HT+F7GWAJOAZ6TFCt5ETnoUM5uWYYvXqIQ33ZHVaWPjhZFJp6yBNqKifD6nuYU8pbdeJEdNaVJ0Rm0g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Mn3xaSJ6; arc=fail smtp.client-ip=40.93.201.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HfF8GIAUF6xOm9A6WMnMdxOQoSO/iFL8DQnY5QgRgjY5vCAn8ZV0JJNCKnqXMJUAjzL+T3oI/n+6qBt+4YrLHujTcU8JflykXFn5eN6m9lbkO9IgAmNRBzt7zg6urnz5SWbN2EfXFyWDdxmPEPcxXVXdAbnjAjrSWwmTqXSEeUIo6nBNHlGWbk/sTHotkUfxoiP1ubr3KwFSokYMtBRIWh3iO5VjiJzgVdVGhwo6UK2qRVFisUbagYcQsSMLQZe0PYnbeqw2kHVqX5vlWgSSWi2SER18qev+dBdrDyLwckI4T5yex00DfVWtHt5VTrBKnBwg9O0bEOs18WBo6ywjGQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NRtBSDH12tEMNnwB2CrjRgVTq8OUaB43Ub8hSl9pWBU=;
+ b=w1gmcKVKXW3gP5fOWZ0eYNT/Ef3gpohkilBUbpWwepP01/7bqE1XDC6GefFUkRm9QotMuGTEpJhe10qQ89WWPNQSjyJkfjfStoPys6k0K7mQcWrsh91OoFlznr9AW6rty4JzmwPd4CLULu9+02BD3UzoKGV/mt2Xh74jMBRC301uQ8mJB8VvaYvMQM3EoJqIrJy9z71s1xzgGzj2IbNBv7uN1paKIJFaxvJ2c5sDh03pYgjagiCUNSN2RRNpdFFMXxlr0bmckwvnBQhCbyV2xq+u68w64EhC4bGCUahYmENWuBJ7NCKbrhcY2Ikswq/9xfvhlfPCgIkrJSU33V5BJw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NRtBSDH12tEMNnwB2CrjRgVTq8OUaB43Ub8hSl9pWBU=;
+ b=Mn3xaSJ6eWvPgMSHusQJVkiTMLsmDeJzZTwiaySHYzRQXw4uBrC//LlU7fwTaa88OoZ8irSXQaqn2nCZyHDMib6IfzxRppz7oMrHdaMwdvzJg37C8bhwIy3kT+Rc7D2BnpqGYabV/hC9D8Yd7ACSUkwhAEerGUcXCIbZsQwxgpvWQfUdm3VzzO2oMA71exXLGJTDWKlhCyGlc/D70yeGrtmvSRSYe9MgSIe5i0eMMOaQdk33oMoF1mW51YEbTZImD1HGRsTVyY/L6OB0IvQKE0nUshUpwL6cOuy4QxTOdNBxGFV8tcz79ZTFfwZ6Vr2syndPr+kZqQMXPPdaRDFf6A==
+Received: from MN0P221CA0023.NAMP221.PROD.OUTLOOK.COM (2603:10b6:208:52a::9)
+ by BY5PR12MB4275.namprd12.prod.outlook.com (2603:10b6:a03:20a::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Tue, 13 Jan
+ 2026 10:09:32 +0000
+Received: from BL02EPF00021F68.namprd02.prod.outlook.com
+ (2603:10b6:208:52a:cafe::59) by MN0P221CA0023.outlook.office365.com
+ (2603:10b6:208:52a::9) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9499.7 via Frontend Transport; Tue,
+ 13 Jan 2026 10:09:18 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BL02EPF00021F68.mail.protection.outlook.com (10.167.249.4) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9520.1 via Frontend Transport; Tue, 13 Jan 2026 10:09:31 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 13 Jan
+ 2026 02:09:12 -0800
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 13 Jan
+ 2026 02:09:11 -0800
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Tue, 13
+ Jan 2026 02:09:07 -0800
+From: Tariq Toukan <tariqt@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>
+CC: Jonathan Corbet <corbet@lwn.net>, <netdev@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Mark Bloch
+	<mbloch@nvidia.com>, Gal Pressman <gal@nvidia.com>, Bagas Sanjaya
+	<bagasdotme@gmail.com>, Sabrina Dubroca <sd@queasysnail.net>, Shahar Shitrit
+	<shshitrit@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
+Subject: [PATCH net-next V2] docs: tls: Enhance TLS resync async process documentation
+Date: Tue, 13 Jan 2026 12:08:03 +0200
+Message-ID: <1768298883-1602599-1-git-send-email-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.8.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260110225932.3900827-1-kuba@kernel.org>
-X-Proofpoint-ORIG-GUID: AdkEtDa2pt5AAHuxpo56gdSxFkITA4V5
-X-Authority-Analysis: v=2.4 cv=OvlCCi/t c=1 sm=1 tr=0 ts=6966184b cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=9R54UkLUAAAA:8 a=VwQbUJbxAAAA:8 a=qdG5cbYOcRVrSoTU22UA:9 a=CjuIK1q_8ugA:10
- a=16MAPSKLCI0A:10 a=YTcpBFlVQWkNscrzJ_Dz:22
-X-Proofpoint-GUID: AdkEtDa2pt5AAHuxpo56gdSxFkITA4V5
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTEzMDA4MyBTYWx0ZWRfX340RNGqAYL7I
- Bdfo7ic1L4LD6eQ5e5SKG1BRIDqmNMaiiRNVDEGfr1Zkua0QMM9utDDkmuzO3UwQB+i5tBTrrZn
- mtz0+O/K0wr5IYOfgRvLGIveSZOqUW+vH/0gKmXJp53f/aP7tBWaGx4E98zhGZ8IPQqVAWqW27u
- DodZyanp5VcNmwerntGst7MBOYosMTnBv9b00kPQIijJETokP28Q0dZeJwnOamkjxVwtJKH4R7f
- YtSvVqRVK52m9rGlSU8eXaAatRXZFLQZwYvCB9fLZCmTCvA9Gd1peQtlC882BRN3rvBGg/VNxfg
- i6pQ5pg4xh/mRB6hRZTg7v2mpGLrGuhtk7cHLfl/wZiU/rpkx0qj8o/Kqwbl++HEiIuYG395ZPo
- f1rKrXE3zLzTtTdZ/1r7EOvvmoBcdqOglCs45JPnT8MV/fXeygMKL8CIjUDvJFanvO0Z51wmN5W
- Fzc4CiJSs8tZ3SWPXLA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-13_02,2026-01-09_02,2025-10-01_01
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF00021F68:EE_|BY5PR12MB4275:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7673cd11-e0b4-424f-60a5-08de528bd83d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|7416014|82310400026|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?DB84NpIVbu66kWKNhmpVSkR66UCMlzUpdWYmAUETIajACPxQAOldv7GhhcBn?=
+ =?us-ascii?Q?rM+r6kzabI9zaNfu3P1p/N39bh03O0VgbFnc8xpkkIIvXtLIsdTyOsvix9bq?=
+ =?us-ascii?Q?jI9UkoO290gigT1SKYZClW9giFu+jV9OnHxBH6IPv0wzkeHzMXRg+/RXfsX1?=
+ =?us-ascii?Q?LD0mL23TOaYh1KicLNChCV2zhwLaaCYYGpsTshD7gEQjCdDKza83gqw+7wpQ?=
+ =?us-ascii?Q?A2BVBoCl8u/SF0y5JB7INykYXllcMYGVF7lSoyvwySVem+C3dZboNl1zpo46?=
+ =?us-ascii?Q?bVQ8cb7njuriE4htc0R3V2kIRB9DuCIGgfEZucQDHL9uYJ4Wokt4L2E7UT5E?=
+ =?us-ascii?Q?NRQwQNjHoIHbUMTnySmuBYMnZ7b827zrGrSueJIyE4EEhve6iZ51E21He+RM?=
+ =?us-ascii?Q?an76KRLc1HkrJzD85kDOndVLl7GL5xcmbOQ76Om7vpJ6gEY04Rw6xmLsOV2S?=
+ =?us-ascii?Q?dZ8UEKgH+vWkYBaeXP9l1cur7JfQGToWJR8DY89euIzdosuBB7njGyo7s0z+?=
+ =?us-ascii?Q?DBNhYqlFJ6JSCbGMiKqfmEzbqnYsHhLhIX5n2VcbfKVPTJ4m/M4vAzvr60Zq?=
+ =?us-ascii?Q?F83FTEEgveXXFbDa42Mec+uAy0MV3NEjIJqAHf791msu5t8tQw2AvbFkXBxE?=
+ =?us-ascii?Q?M6Q1G/U/KCdXpwHoO3UdAko7NOAfOXmc/LoJi8TNIoWRat9h0oADa4NpiJhx?=
+ =?us-ascii?Q?7zbu/zJXfDvDG6IVVTPYXREMjPlgrn3+KlcZDd32oErjoLiAb4hm6VXEnnrf?=
+ =?us-ascii?Q?npbmtkJOB5hhDzkoL+ORL3rrgsV5JDYsrHa0zVKoSGzwwpJSl22cq2gcTd1u?=
+ =?us-ascii?Q?HZMQb9GY4vkQ0yZjWetrIAj1s4rgfi9F0QaFI++E7trR4vWUzNiutJditbrY?=
+ =?us-ascii?Q?GqQM/u5X2eiAN8k2Ozbn+x+Uw5MlyGVdH/iXDFIRxV71TK6r5fVZXW/Aokm/?=
+ =?us-ascii?Q?9Q3G3/LHxOrbR1eGF0Hf5ziJODHZ0E6D36DnjnaWV/Kb1QCv6auj21vAuxgG?=
+ =?us-ascii?Q?kcserhPgTVgUbxtaqBMu/yMVWul6e/8LCrNJKSbVv51M/EnILJzRtNuFwYEz?=
+ =?us-ascii?Q?1b8weKpXB4uIKL0ZgVC7xBjHCfHIfa8p6oou5q7WVqKgfvdLccMqaFq4P2G+?=
+ =?us-ascii?Q?0dSHmv3ZY5Hk5+ax8AqsVtXGY11fTJBZQw4U7bHKJfx8DXGZXHzrd0LD3fPQ?=
+ =?us-ascii?Q?ktf4j6CddGL6moIOZp0jtaaPQWSxj/XmrCyly0o9KPVxzYek8wOmZ+lQKyB0?=
+ =?us-ascii?Q?dbAYqIbTEZ6obRQrwH0JeO7dV+DJ6xhM8j1IjF0Ht3CHHXJaOwGCV5niKLBo?=
+ =?us-ascii?Q?PK4oUvcdqP1b2PAlXogBR1RFs4FZwzecPeG93aEQXAZBVbgpwvH18FrvdE4S?=
+ =?us-ascii?Q?b8JlihGUTiZlejdABx+P2yWuZFgt3/RJ78erjguu/7D7CF8VQpMDd+VMt1On?=
+ =?us-ascii?Q?M/jO9NUPUKvNBPacNYyeRmv3hVknXLQg7xBWUQifrOO77vQRdJev4HLWLklQ?=
+ =?us-ascii?Q?HQ5tgxHPUTIAO6SJKUB8VPJaHZNh/MU9teUgBEP4yDFOlCVBTPi4A4f1EDpT?=
+ =?us-ascii?Q?4s3xBVWn0g+obpdDuSg=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(7416014)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2026 10:09:31.3034
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7673cd11-e0b4-424f-60a5-08de528bd83d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF00021F68.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4275
 
-On 2026-01-11 at 04:29:32, Jakub Kicinski (kuba@kernel.org) wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least pausible.
->
-> For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
-> ---
-> ocetontx2-af: npc: cn20k: MKEX profile support
->
-> This patch adds MKEX profile support for the cn20k silicon variant,
-> introducing a new key extractor concept with up to 24 extractors per
-> packet parsing profile.
->
-> > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-> > index 316e6cd1436a..88d7f65d246c 100644
-> > --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-> > +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
->
-> [ ... ]
->
-> > +void npc_cn20k_load_mkex_profile(struct rvu *rvu, int blkaddr,
-> > +				 const char *mkex_profile)
-> > +{
-> > +	struct npc_mcam_kex_extr *mcam_kex_extr;
-> > +	struct device *dev = &rvu->pdev->dev;
-> > +	void __iomem *mkex_prfl_addr = NULL;
-> > +	u64 prfl_sz;
-> > +	int ret;
-> > +
-> > +	/* If user not selected mkex profile */
-> > +	if (rvu->kpu_fwdata_sz ||
-> > +	    !strncmp(mkex_profile, cn20k_def_pfl_name, MKEX_NAME_LEN))
-> > +		goto program_mkex_extr;
-> > +
-> > +	/* Setting up the mapping for mkex profile image */
-> > +	ret = npc_fwdb_prfl_img_map(rvu, &mkex_prfl_addr, &prfl_sz);
-> > +	if (ret < 0)
-> > +		goto program_mkex_extr;
-> > +
-> > +	mcam_kex_extr = (struct npc_mcam_kex_extr __force *)mkex_prfl_addr;
-> > +
-> > +	while (((s64)prfl_sz > 0) && (mcam_kex_extr->mkex_sign != MKEX_END_SIGN)) {
-> > +		/* Compare with mkex mod_param name string */
-> > +		if (mcam_kex_extr->mkex_sign == MKEX_CN20K_SIGN &&
-> > +		    !strncmp(mcam_kex_extr->name, mkex_profile, MKEX_NAME_LEN)) {
-> > +			rvu->kpu.mcam_kex_prfl.mkex_extr = mcam_kex_extr;
-> > +			goto program_mkex_extr;
-> > +		}
-> > +
-> > +		mcam_kex_extr++;
-> > +		prfl_sz -= sizeof(struct npc_mcam_kex);
->                                  ^^^^^^^^^^^^^^^^^^^^^
->
-> The loop iterates over struct npc_mcam_kex_extr entries (the pointer
-> mcam_kex_extr is advanced by sizeof(struct npc_mcam_kex_extr) via
-> mcam_kex_extr++), but the size decrement uses sizeof(struct npc_mcam_kex).
->
-> These structures have different sizes:
-> - struct npc_mcam_kex_extr contains intf_extr_lid[2][24] and
->   intf_extr_lt[2][24][16] arrays
-> - struct npc_mcam_kex contains intf_lid_lt_ld[2][8][16][2] and
->   intf_ld_flags[2][2][16] arrays
->
-> Should this be sizeof(struct npc_mcam_kex_extr) to match the pointer
-> increment? Otherwise the loop termination condition will be incorrect
-> and could read beyond the profile buffer boundaries.
-ACK.
->
-> > +	}
-> > +	dev_warn(dev, "Failed to load requested profile: %s\n", mkex_profile);
->
-> [ ... ]
+From: Shahar Shitrit <shshitrit@nvidia.com>
+
+Expand the tls-offload.rst documentation to provide a more detailed
+explanation of the asynchronous resync process, including the role
+of struct tls_offload_resync_async in managing resync requests on
+the kernel side.
+
+Also, add documentation for helper functions
+tls_offload_rx_resync_async_request_start/ _end/ _cancel.
+
+Signed-off-by: Shahar Shitrit <shshitrit@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+---
+ Documentation/networking/tls-offload.rst | 30 ++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+
+V2:
+- Fix style issues.
+
+diff --git a/Documentation/networking/tls-offload.rst b/Documentation/networking/tls-offload.rst
+index 7354d48cdf92..42800d86d269 100644
+--- a/Documentation/networking/tls-offload.rst
++++ b/Documentation/networking/tls-offload.rst
+@@ -318,6 +318,36 @@ is restarted.
+ When the header is matched the device sends a confirmation request
+ to the kernel, asking if the guessed location is correct (if a TLS record
+ really starts there), and which record sequence number the given header had.
++
++The asynchronous resync process is coordinated on the kernel side using
++struct tls_offload_resync_async, which tracks and manages the resync request.
++
++Helper functions to manage struct tls_offload_resync_async:
++
++``tls_offload_rx_resync_async_request_start()``
++Initializes an asynchronous resync attempt by specifying the sequence range to
++monitor and resetting internal state in the struct.
++
++``tls_offload_rx_resync_async_request_end()``
++Retains the device's guessed TCP sequence number for comparison with current or
++future logged ones. It also clears the RESYNC_REQ_ASYNC flag from the resync
++request, indicating that the device has submitted its guessed sequence number.
++
++``tls_offload_rx_resync_async_request_cancel()``
++Cancels any in-progress resync attempt, clearing the request state.
++
++When the kernel processes an RX segment that begins a new TLS record, it
++examines the current status of the asynchronous resynchronization request.
++
++If the device is still waiting to provide its guessed TCP sequence number
++(the async state), the kernel records the sequence number of this segment so
++that it can later be compared once the device's guess becomes available.
++
++If the device has already submitted its guessed sequence number (the non-async
++state), the kernel now tries to match that guess against the sequence numbers of
++all TLS record headers that have been logged since the resync request
++started.
++
+ The kernel confirms the guessed location was correct and tells the device
+ the record sequence number. Meanwhile, the device had been parsing
+ and counting all records since the just-confirmed one, it adds the number
+
+base-commit: cbe8e6bef6a3b4b895b47ea56f5952f1936aacb6
+-- 
+2.31.1
+
 
