@@ -1,101 +1,116 @@
-Return-Path: <netdev+bounces-249309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EECE9D168C9
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 04:46:26 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45BE5D168E1
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 04:48:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 181EA300D818
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 03:46:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8A91730142C5
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 03:46:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CE2C2EF673;
-	Tue, 13 Jan 2026 03:46:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cNcnXEJG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99B972F1FD9;
+	Tue, 13 Jan 2026 03:46:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD6F52E9ECA;
-	Tue, 13 Jan 2026 03:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C9F2F0C62;
+	Tue, 13 Jan 2026 03:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768275981; cv=none; b=LTdXkTnNw5vGETNTMFG4pzHDS+RgLMYbCE1+lOqF5G8HmX528clkkx2hbvK2p6KTpKbzknN3vNwaGpkqthaXYlzX1x53ufpUGidYWds8H41/SXqOSJF27fgUe/jgwBNByKEhAQp9CAOmHb6o33tx8llovPVQ0QsG86tkgO6BPHg=
+	t=1768276016; cv=none; b=VlOLWKRGPqxLyfPRqtNdFystpvdcDUUjG268ABdVPiCuIPb5NsFl5pVmzXI+uesQttkCCGckfOu0X4dtelcUSd5Ca9rI2LOiJnqQYT5LoQ5NPnSlDxE7ttOEzccti7Cv9FMtRjdJ1zT83m+KWY20wacGrMM+UeJXEZ7Qq3OICdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768275981; c=relaxed/simple;
-	bh=e8ar5iRaPWcIRipGAbsY+EJ9j4DyfXTRDnfzAz6mJSg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Zl0OU+7dRRxgBUHx6Z3+CIqcqee9QTANN8OTI/zilkbdYHCLMxLInwInsBnqc1rjYBT/ImgG612pfBo9gMNfO7PGy1hiJd7TP1zEbIBXnxwOs7SKhk22ySFq1DLkSJaEKbAXbKzCpu7fjOq4qvr91NLFRwvIrPWmzpH9TjMfs48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cNcnXEJG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B684CC116C6;
-	Tue, 13 Jan 2026 03:46:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768275981;
-	bh=e8ar5iRaPWcIRipGAbsY+EJ9j4DyfXTRDnfzAz6mJSg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cNcnXEJGD+9i2sqchkDQeHfKczZ8BAYi4M/9RosqLwYz03V0EZt5p2+eceYAZd2V7
-	 /8BiFiSddn+5Kt1PFe1xEr9lGa1ep1vJX3E1xJT9tx1C9e9fCtpgyeo1YX8MJQex95
-	 8eOoNYvaTkt31ZSTzz/vsVJ5x1QgtAvHjIKed8zfE7K5F4DYnfN8RwU9L0hY57OvhU
-	 pHXI+ti83sqliKVzxfhXVDtPxN/cViBq+FWqYW3gaFfeDmWLMP2Zn8BCnXeNbpwSW6
-	 RIAJxaY2ht/6kBo7t0qDtzIHxO9bideDH7LNhV4vUGccIWm/9VHh0ngq0fe+GQbcGa
-	 EaA1PROS8sOcw==
-Date: Mon, 12 Jan 2026 19:46:19 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Chalios, Babis" <bchalios@amazon.es>
-Cc: "robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
- <krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>,
- "richardcochran@gmail.com" <richardcochran@gmail.com>,
- "dwmw2@infradead.org" <dwmw2@infradead.org>, "andrew+netdev@lunn.ch"
- <andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "devicetree@vger.kernel.org"
- <devicetree@vger.kernel.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "Graf (AWS), Alexander" <graf@amazon.de>,
- "mzxreary@0pointer.de" <mzxreary@0pointer.de>, "Cali, Marco"
- <xmarcalx@amazon.co.uk>, "Woodhouse, David" <dwmw@amazon.co.uk>
-Subject: Re: [PATCH v5 4/7] ptp: ptp_vmclock: Add device tree support
-Message-ID: <20260112194619.70ed3a24@kernel.org>
-In-Reply-To: <20260107132514.437-5-bchalios@amazon.es>
-References: <20260107132514.437-1-bchalios@amazon.es>
-	<20260107132514.437-5-bchalios@amazon.es>
+	s=arc-20240116; t=1768276016; c=relaxed/simple;
+	bh=VmNIpfC1AQ4hFEMJRZCZ6rIbB8XApUfA7pL8k0q9cMo=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=rpWa7STn6YPG6+wncTkq01Svv74c+U/dBcJi24UfBMaEC9t+uow6HB68NntSHNXg9HDF3U/SAywaTRlsz+LgpWMn/Z9/KDa3TMWwgOAnyphLMQE0F//SGG/rJZSGFGcaTfB5hNRNAn4ODuz8wwJEPlPcikwoJ68anEfp+jAWB58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 60D3kVoG026732;
+	Tue, 13 Jan 2026 12:46:31 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 60D3kVdI026729
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Tue, 13 Jan 2026 12:46:31 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <4b1fbe9d-5ca2-41e9-b252-1304cc7c215a@I-love.SAKURA.ne.jp>
+Date: Tue, 13 Jan 2026 12:46:30 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: Re: can: j1939: unregister_netdevice: waiting for vcan0 to become
+ free.
+To: Robin van der Gracht <robin@protonic.nl>,
+        Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de,
+        Oliver Hartkopp <socketcan@hartkopp.net>,
+        Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org
+Cc: Network Development <netdev@vger.kernel.org>
+References: <faee3f3c-b03d-4937-9202-97ec5920d699@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+In-Reply-To: <faee3f3c-b03d-4937-9202-97ec5920d699@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav304.rs.sakura.ne.jp
+X-Virus-Status: clean
 
-On Wed, 7 Jan 2026 13:26:01 +0000 Chalios, Babis wrote:
-> +static int vmclock_setup_notification(struct device *dev,
-> +				      struct vmclock_state *st)
-> +{
-> +	/* The device does not support notifications. Nothing else to do */
-> +	if (!(le64_to_cpu(st->clk->flags) & VMCLOCK_FLAG_NOTIFICATION_PRESENT))
-> +		return 0;
-> +
-> +	if (has_acpi_companion(dev)) {
-> +		return vmclock_setup_acpi_notification(dev);
-> +	} else {
-> +		return vmclock_setup_of_notification(dev);
-> +	}
-> +
-> +}
-> +
-> +
->  static void vmclock_put_idx(void *data)
+Currently, the (session->last_cmd != 0) path in j1939_xtp_rx_rts_session_active() is
+preventing the (session->state == J1939_SESSION_WAITING_ABORT) path in j1939_tp_rxtimer()
+ from being called. This results in two j1939_priv refcounts leak (which in turn results in
+one net_device refcount leak) due to j1939_session_deactivate_activate_next() being not called.
 
-Please run checkpatch.
+This problem goes away if I do either
 
-CHECK: Blank lines aren't necessary before a close brace '}'
-#109: FILE: drivers/ptp/ptp_vmclock.c:636:
-+
-+}
+diff --git a/net/can/j1939/transport.c b/net/can/j1939/transport.c
+--- a/net/can/j1939/transport.c
++++ b/net/can/j1939/transport.c
+@@ -1689,16 +1692,18 @@ static int j1939_xtp_rx_rts_session_active(struct j1939_session *session,
 
-CHECK: Please don't use multiple blank lines
-#111: FILE: drivers/ptp/ptp_vmclock.c:638:
-+
-+
+        if (session->last_cmd != 0) {
+                /* we received a second rts on the same connection */
+-               netdev_alert(priv->ndev, "%s: 0x%p: connection exists (%02x %02x). last cmd: %x\n",
++               netdev_alert(priv->ndev, "%s (modified): 0x%p: connection exists (%02x %02x). last cmd: %x\n",
+                             __func__, session, skcb->addr.sa, skcb->addr.da,
+                             session->last_cmd);
+
++               /*
+                j1939_session_timers_cancel(session);
+                j1939_session_cancel(session, J1939_XTP_ABORT_BUSY);
+                if (session->transmission)
+                        j1939_session_deactivate_activate_next(session);
+
+                return -EBUSY;
++               */
+        }
+
+        if (session->skcb.addr.sa != skcb->addr.sa ||
+
+or
+
+diff --git a/net/can/j1939/transport.c b/net/can/j1939/transport.c
+--- a/net/can/j1939/transport.c
++++ b/net/can/j1939/transport.c
+@@ -1697,6 +1700,11 @@ static int j1939_xtp_rx_rts_session_active(struct j1939_session *session,
+                j1939_session_cancel(session, J1939_XTP_ABORT_BUSY);
+                if (session->transmission)
+                        j1939_session_deactivate_activate_next(session);
++               else if (session->state == J1939_SESSION_WAITING_ABORT) {
++                       netdev_alert(priv->ndev, "%s (modified): 0x%p: abort rx timeout. Force session deactivation\n",
++                                    __func__, session);
++                       j1939_session_deactivate_activate_next(session);
++               }
+
+                return -EBUSY;
+        }
+
+. But what is the correct approach?
+
 
