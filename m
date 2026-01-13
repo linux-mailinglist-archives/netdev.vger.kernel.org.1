@@ -1,246 +1,183 @@
-Return-Path: <netdev+bounces-249332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50BB1D16D49
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 07:25:47 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 429F6D16CE0
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 07:21:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8C47330C6C83
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 06:20:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 92A3C301AB9F
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 06:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84415368299;
-	Tue, 13 Jan 2026 06:20:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93A69366571;
+	Tue, 13 Jan 2026 06:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="CsxZI6Cb"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="l5xoPLo9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A4036AB4B;
-	Tue, 13 Jan 2026 06:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.148.174
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768285207; cv=fail; b=JlAloRiZ9CgZKAEIFAzQMqPPIWQQAySbuuu/LeI8vvYi2WGTSJRP48hMTXGhrO2WgvOHx6pRdbvlucDwnBeaGLRdbZI+l8GJHbxLPnTc9GeWn362/oSuSBQHLlrCrW1KBNxd2W87iaUAip9spw21jSWj9X1O6pLyB5JbjBxvq/A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768285207; c=relaxed/simple;
-	bh=F4JYDbYuDtJ1E1W7oxTgdisg0ofaI39rn4/vdLvHQ0I=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=VTNA5OQQguPLY1+d8C50hJ4XCJd3kGtPUuWSuhHX+hEo1x6Xc8ozlvsI6lmdoorS2bRgDJ+QcP9BD53dmEz+OKQkC7E7RriBV0LwBYlhb0Tj5VLRCMcAW0Joj8obIgpgRUIEGvtT0sQCZh70tnTKBw1UCH2w+IzPDuNWaJGntx4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=CsxZI6Cb; arc=fail smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60D6INKY325821;
-	Mon, 12 Jan 2026 22:19:54 -0800
-Received: from sj2pr03cu001.outbound.protection.outlook.com (mail-westusazon11022107.outbound.protection.outlook.com [52.101.43.107])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4bngnq802j-1
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Mon, 12 Jan 2026 22:19:54 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UJyOqd7roKL4bB8swO41jyBE0VbX/OfL18DhGNDs4gGRh/cGSinTwRnH+WXQRvYGkkAZTun+AphftRM+eoAReTwdpsC5yzG/2UPvCCjMJIE3XmxocyAQ7gIn2lCqbpoKVuvbIf0BjBaNoZwnyZ6KJejmhISIFKF1CRhxZvJ3CzSCJ6QX7yjgrB6nLbP3uE5ls3HxOgkp+zajYmoEUhodF2lv2rKNnrcQsh1kYFpycrqwwk57oxtmKG4dTr5mF2VBPNCGoFgook/1lUjtaQ8J21AFWGUnX+vX9TQRYk/WaHcZ3C3Su/uoTIiw02SrIcgUoWxqlA8B2BUD2Ox94FuVFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=F4JYDbYuDtJ1E1W7oxTgdisg0ofaI39rn4/vdLvHQ0I=;
- b=qVaOVfdsHJ4zcPJw8ypCDz0DRNTQit12WNPCqUVSXTUsMTIEOIz/rGrdQ+amlgZ7UPWKy+Fl3FpcVdWvTuk6l6ePqjwJC60PwuOiEnrqOtRQpucF5QmsKwBFidugF848SRew1gCO3JFpSkpNcB2kL1FtDeFBgb61X+whifF8hC0PGp+lvOce5w8fTg6Waid1m9lJlr2cVXB3ueumb9pTbvX6zSwuG7H6IvbPhJCgnjdfr/kFd3QzaNIde/a1RiJxfWx4Evp8cj/rm+DuNkMTzN9cyigABI31zWOjFKRWWx2mTmMo0KA1o5ZDi6XIxwR3R12p8pCUvP2djDSfbJeOVA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=F4JYDbYuDtJ1E1W7oxTgdisg0ofaI39rn4/vdLvHQ0I=;
- b=CsxZI6CbfaY6HE24qGo6iWngiIMon/Bf/5JLXXJ0W3t3HwIyTIZlxI0pZ/jgIppKZCmauYRabX2QhsWDgKvVEp7uWdAJwSAmkPU3f+JvAZEqP2Gcycq/VRtbHJAWFYBuMHHD8GeA6MrplRvtbfYzM7qgcqtpuwdevrVWJsymFVU=
-Received: from DM4PR18MB4269.namprd18.prod.outlook.com (2603:10b6:5:394::18)
- by SJ0PR18MB5213.namprd18.prod.outlook.com (2603:10b6:a03:381::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Tue, 13 Jan
- 2026 06:19:51 +0000
-Received: from DM4PR18MB4269.namprd18.prod.outlook.com
- ([fe80::9796:166:30d:454a]) by DM4PR18MB4269.namprd18.prod.outlook.com
- ([fe80::9796:166:30d:454a%6]) with mapi id 15.20.9499.005; Tue, 13 Jan 2026
- 06:19:51 +0000
-From: Shiva Shankar Kommula <kshankar@marvell.com>
-To: "mst@redhat.com" <mst@redhat.com>
-CC: "jasowang@redhat.com" <jasowang@redhat.com>,
-        "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-        "eperezma@redhat.com" <eperezma@redhat.com>,
-        "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Jerin Jacob <jerinj@marvell.com>,
-        Nithin Kumar Dabilpuram
-	<ndabilpuram@marvell.com>,
-        Srujana Challa <schalla@marvell.com>
-Subject: Re: [EXTERNAL] [PATCH] vhost: fix caching attributes of MMIO regions
- by setting them explicitly
-Thread-Topic: [EXTERNAL] [PATCH] vhost: fix caching attributes of MMIO regions
- by setting them explicitly
-Thread-Index: AQHce7UIItncUIS6dU6cL1NVseOYirVPsZCA
-Date: Tue, 13 Jan 2026 06:19:51 +0000
-Message-ID: <ECE065A9-1556-4525-A478-62343C6FB477@marvell.com>
-References: <20260102065703.656255-1-kshankar@marvell.com>
-In-Reply-To: <20260102065703.656255-1-kshankar@marvell.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-mailer: Apple Mail (2.3826.600.51.1.1)
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM4PR18MB4269:EE_|SJ0PR18MB5213:EE_
-x-ms-office365-filtering-correlation-id: b0c71b2e-014e-4064-20db-08de526bc2a8
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700021;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?UqFzpz0uCHscW1U0YXX/TThUiCKc9LyTYXb/yPcezuyPoYZuzou+Umz6S4qY?=
- =?us-ascii?Q?Ht+7gnoHFWoAq0eMV6U2bv9JFwghxH/WDvR64l0Lr/tORXz7zAI6jYDA+eaQ?=
- =?us-ascii?Q?Ce9bm3L0E4Vv8mMpGXRlK5rchM5ftSltGIm1U6t6Ydr3JOcXzBtgEdYrA/mw?=
- =?us-ascii?Q?SJLIhOJaAEB/DID/Kb28ylUPwrBisXNpRZHV0URjPjVYBHVQ8USkXJCOW/4e?=
- =?us-ascii?Q?9E0yVS5hnebHJvCtlGyYlhcO/SSj85ZnLtdG0O5gG3sqzfbIld6qOqDkM+H/?=
- =?us-ascii?Q?pf15rnJP00AQGk9FtxqRYindTcCboNhc9uCJrvhOewL+cywMsGuIOEvMqCcc?=
- =?us-ascii?Q?1VohoH4PEQhoQx35UMlXscJBEj2bRAQ0wdb323DSQd0rcUmCdNy4vSoKca7W?=
- =?us-ascii?Q?su1zVZhGNbspVszdeCYu75135ouMfcKC/sdqJAOXteh7LMK1mfqnQnSvRqF3?=
- =?us-ascii?Q?9ZqGclheOYvO8Us9KwKtedlvUEWCLpnGO4Xohyf7GSeGnSlz2t2Y/fXoJBYe?=
- =?us-ascii?Q?5Lle8v0s3KmjXvGbNOK9R2hdgOkCixaD3I+N0P7lms8756dydXnesbYBbawu?=
- =?us-ascii?Q?IvVEAdx/CuiXjPpQFvaqiGpGeQQocoFwHVGxRPGwjmvhGkpAGOPg1l50L9ew?=
- =?us-ascii?Q?vP1GMNFw5LGbWNrWC+7fi5hIsPxrQQx4FqpeMiiOX39v6KzvIy2h+r6aSTDB?=
- =?us-ascii?Q?Ozo1l+S+58SgE4Bk4HmhP4PYWZsD3i8IxqGAoa2Y1/SLtCK/LeU7m5TmJZRg?=
- =?us-ascii?Q?QjvaiLu+cHQ52FsD8pFQPX8Djhcj4p7adcZuszZCUz/iKT99T+4w/8eELiuH?=
- =?us-ascii?Q?Qq+6zejHjHU//yxRwC+TYfEpB/NGi0OUPUzUWft9BbYS4Fyy97mzbdc2goN0?=
- =?us-ascii?Q?eSSE9gRE3NTp7MLKKv8kvMlCxvQLAeg9SBV+0kpELRLNNhs5Zp/0c13Wbmi/?=
- =?us-ascii?Q?i8zIoVszbrI7j4hsRGUdyPqhkKLVbQDntJnQgmNkRUS7oeeA+mVRxvVJcVao?=
- =?us-ascii?Q?2b1WqOniKy9jKBAgOTcHf4m4RVJbKYXdCFUogyK87hXmpyqH8FiCYE91y7Ar?=
- =?us-ascii?Q?Ux602fECBbNMVADgh/hQPdXeqvSg80JqoAjgcga1xfYMm2tX5bfjxdLVHlAN?=
- =?us-ascii?Q?9Uf9VSFVuW5n5tNVfn9zyYvUQd9TdbxfAhfFWNYHi9sDMPMCp975Zt32rwlB?=
- =?us-ascii?Q?GSASjqnS9LT8bpYJ1lgInwkGIitz9R3kHc5hf7jFyAnADuWCzGN9V4PSFRnN?=
- =?us-ascii?Q?WoQSdcZZhKzqtoKPTp1KqHvNezfqQU+efRICrbQQ9OJju29Fhu2y/Ddy9oiQ?=
- =?us-ascii?Q?OyayhTcUXNL1xZwdZXLXSMfvf/lUqY5c3MoNUmE2NW6jpmWJNAeUOIQ3y+/F?=
- =?us-ascii?Q?Oc/+Zpp5kenSCgve6ngaUSm+C3Fh9L862rTIjugUdQg0v4JZagOHm8jiadnb?=
- =?us-ascii?Q?EKrI4gpzXOIIhnNf5DewPYCFO63kiAQe+62zyLcVWScCfm6yswwU7+fjXT63?=
- =?us-ascii?Q?i2WZces4RSarazgydFnuQboKXQTog2HLVosL?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR18MB4269.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700021);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?TOVPVgcPv0L+uGYoEb1ETwPGtHjJdYdFVb+H0ZehQsl6otIF4TmxoGI0HS5R?=
- =?us-ascii?Q?32xoeDTEUZSwrTAxNSLqoM4BIwn2aAZH5c3ZaF252pj02e8c8FVTTxLoyVMG?=
- =?us-ascii?Q?DQ1HOUfAzgfoJf6fm7bNAdhc45LOrL+Ikv1S5RDm5vqJpC9IPY/XLCFy39Na?=
- =?us-ascii?Q?bmEI5JmF7m//ABWCeZ/9FxVJInTEZLlg7xDRW+OgZbUGWJzvX9omqLMyU9MY?=
- =?us-ascii?Q?yuvI00Y/m6VaPpAxyBu9MvVVGN7NWyqM2Ve8o23/VH2p0I5dhe/cvvkNzYCK?=
- =?us-ascii?Q?6wMIFPOw4YEEsRLAlN4aT842J1XaXOb/gTxux3G6uXmgQDOz6WzDFOgATdUp?=
- =?us-ascii?Q?h127owBza3MXb4dhpwo9TpVrJXIlvfq4+lKo4/ghPRgdqM1/exVdW6svJih8?=
- =?us-ascii?Q?YR3KlCnfwf9XkHndTVZe/dhH7a7MZdKavZJ2ycMI+B8tQotnHvVrGnQXw/1f?=
- =?us-ascii?Q?UwTTos5sO6EtualxGy/BunL1ps+Lut8kbKuQcyFSZXI8pNd1lSgI57SR/wn+?=
- =?us-ascii?Q?al6YnjiQpEqVbdCOjgNdKzh6fOkpjhvTrinrFLn6wSwKXqy/3QLIsm1QmKPd?=
- =?us-ascii?Q?Pe2j1RB+9eLqR9uhcyOvQHpHmD28sGDqN+yg5cFXFx8P4wMuULl1hHs4OyMc?=
- =?us-ascii?Q?CU9vHzMOyKx2qiGttHsDhqE/xIulEXtj9NeNl1SVyoKCzZaIiIxBJtPv0sL7?=
- =?us-ascii?Q?ACuKdZMnCt9pLx7qVmoEnhJ3yAJ8YXcxj1IElukFMOYb2pVqDHNwBbZ+GmcG?=
- =?us-ascii?Q?7U7U7LO7inHarPXUq0p3ao3QfRXkI50xvbEdV9VKUMydICKkc3Na2IP1yZLe?=
- =?us-ascii?Q?p6/Ni/1Ev2ZZPj05F0Yo6esWQ6HP0i2n1L8UrCZqblvbTssHHkRjuc3XML+P?=
- =?us-ascii?Q?EzWKl4nU/ay5s76CYrU+QfJaDBx3KahlqXJJSj3Gn18Ro1BTH383maEe/Zbx?=
- =?us-ascii?Q?C8bjq5Avn4xlDim0Wu4T2BghjUo6LypUMRQgFjU2g9pYpRPfmO5iak6swJ1q?=
- =?us-ascii?Q?rFLxgYtaP23VcLz/fh74tMNBxniqgazCgDshaatRsc90N2REChmYV6jpmHXs?=
- =?us-ascii?Q?b3TYPiyLQiCKLbkig9LEeSM1/XWSE5HY3e60aao64j3XUsnZY/mI2XeDMdaA?=
- =?us-ascii?Q?IRQ8EjxnkuJMRmeqqZ0vfItJApeVVXD6fpc9+Glbac/eIRckh3FGTtdPA9pS?=
- =?us-ascii?Q?hZ1RdEec8KDiPahTOzyKzl595NMHmg6oV1umD6X1fby8cUDe6yRCNhOKRzsk?=
- =?us-ascii?Q?tIbEApikCrXENkyx1M0XZ3StMGrQ8XsC5AVsWuq7KXdulT2sXdW0xB04i9G5?=
- =?us-ascii?Q?4e06IGV/gcetsfvizL/vEMXW5Z9qOoD3v6oSug1uK4TgZ+WWE3ttiOdBihyc?=
- =?us-ascii?Q?Vk3BJaXlZJGNLp8rQMCdD1qJudNyMqBUX7oqz5jDx8aW7T71Y1TU8GSQFn1i?=
- =?us-ascii?Q?bS9ACPDuszPB09nqFnyrx/K73KgXqsfYB5QJagAPoEntsRVE9wZWtnTzmjEc?=
- =?us-ascii?Q?z1EVhY7nke3lQPFpsWDKdtgllpmd4M+jSmgdjFxKhzWjLOEM5v0R3gxFkDyk?=
- =?us-ascii?Q?x6ZbH2SGNGn+jwss9qigVXOUKr79j0UtGtI1CJfpfKj4GKctdk3fpJZZatd5?=
- =?us-ascii?Q?y3J9C7nbbCaaezbOO/FedpYYd3s+XV9n2DoocfqosGb4EYJaNnD1cJaYMz5Q?=
- =?us-ascii?Q?4B7XlepuayZ2JVW7sNrCETgWNdJUgev+aJknNPgAkKnfWz0YLdCOtAhghpmB?=
- =?us-ascii?Q?2HrxLird2Q=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <7DACC71CC02521498F00DF9729FFF151@namprd18.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE7232862D
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 06:20:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768285229; cv=none; b=tJRrwKRs5NkxRIMzfPGSaaudSw0XVC9QhUKbL3ttuhNtaUt9CXjSOx/cgHgD3/Y1Mc6R6+vCnqIn005wDPfGLaaacTI54VYrkv+0IPvhenuy/070C+zE9xJiv+ffBeT2QnAeYVMob3hp+NNp+coqWgq1s7krzzMuqsYzCzV/iHg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768285229; c=relaxed/simple;
+	bh=wCB7Qgvlxm8kjbQcp7dMePk88omGQti/GWMRHOWyOsQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oxGi58ZWgQkHhOjbhhzKr0bmbBKg0FDtu0Ugco1TB2o8rPSanx4zdmPynmQjqaR/um+r2EUtzC3WVcUUX1I9jttK9KP2ugaABMS3BF8xCUpqJW1NBsmBrEu8ETjm9zZExEekW0fpCEwQ7g+QMKI8kAjhzcJaQZP9Mln0J79NRec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=l5xoPLo9; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-47bdbc90dcaso50566985e9.1
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 22:20:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1768285226; x=1768890026; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+5c6uNihQYtmaNA7ilYqerYKnx3q5lMZZF3n4+EDPoc=;
+        b=l5xoPLo9LrgtnMLu8vGTAQBhGockQbUu6+RlvBwgsg90XBWSH7p7W7ZW5z2MqaBNeW
+         7X8fx8VNGDD33jVluQINpKTkwkKI86AdqhlVLex2J1r0dy5Awyb87sWRv4jq2wamRSNB
+         UeTYPLxX0RZAvikFuBAHVHhme5cTMkV2TI2to4haxrYMW7s3ZpRViwYgTYJgyLJ5OB7s
+         k+idq0L2NJ6tbCOwV4gyVjpat5aZBL/1hiYEuefLFrZR/D3K6Fz/K8XwTZxTCyL4+2Ox
+         yMoUPBdUKtEKN+qSHonomAp3oBmrhE1oCt1LH+nwqOicZ5jLu+z6DGOvH+VsdwrjZj5n
+         2BhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768285226; x=1768890026;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=+5c6uNihQYtmaNA7ilYqerYKnx3q5lMZZF3n4+EDPoc=;
+        b=ZeFqD4fffy7mp0at47UY4ZuJCu5CZ2w/cWloLAW03/VqEz6qv75ELDSGsI/szfLUma
+         G4Cs4mzTZh4rHY0gzv84bI3ClbPfWU6ZtbXAwN/WGYM5ntYAmG3spRTW7YFZFH13G/89
+         PFr9H4in4zsDEppyLlqD4sHJh7LQzPtrg3dnqzdZqky3KfrPk0a4XrzBv4eCGr0V1cT7
+         Z197sL5ixoRI4WejkuxjpjRN8MevwKubqbvtATKQWqB1az286tl/lczFZyk6HgUhRTOp
+         PUNYFrSL8GALKI4nhQbUFq0zoNzHop3UEN5LtG/zxWIqqxTkAt2iy2IYKlsp+VYqpCYv
+         k8xA==
+X-Forwarded-Encrypted: i=1; AJvYcCW/GrAVSqea9pIt7XARjhSz0Go7G9gu6EJdLnieRVX1JqmdSbxA1vCzpP1/DbOOTls9RMRhlic=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxACZ4wNBsgXeRW0BqxhFdkIola/3RYj85GMpg8mwA07tY8my4i
+	WTkwgE2rfJi0jC8gNK7Curu7jJ6yeOyFJ2RKQOQElg7+eQMuRDFqndWHYrK4P5onvBE=
+X-Gm-Gg: AY/fxX4ylFn4ADlmt9bgxBg+l36iTI4NHaJVcAdII5RdSdeYLwlFIU3k/Jwl9L5f2iB
+	TGjySlYgeBijDBfqDPnvTyjC1OO9y5LC34VdGJclMllLqvCCRgy3fPKiH4FoOkJALPvOE24GcxG
+	16/Oujl/SlQFg2zXnRapGztbqjTTq+fZbqBf+GMhUbwwdQWg8CBRk+VJLW0YMEjaZPVBVJReOV/
+	ITDLtvrEJY9xLNHDa0Djr8K9wjZQ8ja5Q+vakRvRCWGBptkSxuDHZPFQyz2Zm350Skl+TsxxuLv
+	/shUyv/pdB+pM01WK6z/4xe2q477qbUEc+kp+Q1sVjhRpMlLvJDDGBfOHuQId1lZwXN7anRNRKT
+	i0ghl6zlQJ5BjbPApfaI13pGcjQoVbc6Ef0v+zldIsxDdAXXjLr/Y0SArXmTXEDWJPV0I2/zYou
+	rLmvdNqtjeL7HzRGQCQlyY1Bsi55yAGIU33zQCsoofI0C6drwGuagfOJYPvTawD8I=
+X-Google-Smtp-Source: AGHT+IEiWbsU2G7On+GlJQdRLa1I0QYbmcddBFpX+1V/SFXuq+KJVQQTG97s3EQDxxOc8KC7Hn8irw==
+X-Received: by 2002:a05:600c:4447:b0:477:3e0b:c0e3 with SMTP id 5b1f17b1804b1-47d84b3b8b9mr216297115e9.32.1768285225735;
+        Mon, 12 Jan 2026 22:20:25 -0800 (PST)
+Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f6953fasm378393495e9.5.2026.01.12.22.20.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jan 2026 22:20:25 -0800 (PST)
+Date: Mon, 12 Jan 2026 22:20:17 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, andrew+netdev@lunn.ch,
+ netdev@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ victor@mojatatu.com, dcaratti@redhat.com, lariel@nvidia.com,
+ daniel@iogearbox.net, pablo@netfilter.org, kadlec@netfilter.org,
+ fw@strlen.de, phil@nwl.cc, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, zyc199902@zohomail.cn, lrGerlinde@mailfence.com,
+ jschung2@proton.me
+Subject: Re: [PATCH net 0/6] net/sched: Fix packet loops in mirred and netem
+Message-ID: <20260112222017.3d1da4c9@phoenix.local>
+In-Reply-To: <20260111163947.811248-1-jhs@mojatatu.com>
+References: <20260111163947.811248-1-jhs@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR18MB4269.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b0c71b2e-014e-4064-20db-08de526bc2a8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jan 2026 06:19:51.3429
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: OHylkZ4cNx/+oa0ml9ABXAkj9VvEo9UjamBqCwGlZrV1O7jzkO50wj/ny5TnuMeqD8TcAoNskY30Lb3/FoAiHA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR18MB5213
-X-Authority-Analysis: v=2.4 cv=DLeCIiNb c=1 sm=1 tr=0 ts=6965e40a cx=c_pps
- a=sUbwXUxkMQNSWKNRO95rnw==:117 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
- a=vUbySO9Y5rIA:10 a=-AAbraWEqlQA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=M5GUcnROAAAA:8 a=20KFwNOVAAAA:8 a=-EP0ZEmctIjLeFn3QbIA:9 a=CjuIK1q_8ugA:10
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: 6KcMf4VJVleEfBZy_LxSdixmxdOd_xP2
-X-Proofpoint-ORIG-GUID: 6KcMf4VJVleEfBZy_LxSdixmxdOd_xP2
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTEzMDA1MCBTYWx0ZWRfXzhvDcatB9ioh
- 7oAtAhLWkn1YpXGAin2qsWzYCL9qg6iCRJNLftanyHkZ3gCuI0eiq+C8XC64A38t9egSObnEbpM
- gFuiPVfEz8XZXzpyvpezQa3w3HM0Dt78Ceowzh7KttQG1ppzKwrAoY+bpXM6YPY0JIrDHcZCwji
- N6T1Bkr7/zYsE0u4LwUruSg0NrvH7E7vaV5MFULuLx8wXRuAiTPw3qtPE4GV2IxHxf/xWgXJAKE
- CTfTu6uNiGZg7lZpNkLV2Tw0vyZiQlUtMbXA8+sho3A/FiCPE+wyMFxXSfVfdp20oi/I/HSIQv6
- wxy7HIh7Yc8U8R9CLK9RRo6wvYK886gy/gMBv2Tpx1zOIMcS+/d8nN78IKXIsVCgq5zDuq6/24P
- aex8L9iPPUXa1AJZcKT/6hcrau8SCOS9t1hrh0kEC0auC6o/cT2370miiUFHyI8B9KdYsaPCcW2
- hCV93zofqntZjWEjWYA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-13_01,2026-01-09_02,2025-10-01_01
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Michael,=20
-Just a ping on this patch. Would appreciate your review when you get a chan=
-ce.
+On Sun, 11 Jan 2026 11:39:41 -0500
+Jamal Hadi Salim <jhs@mojatatu.com> wrote:
 
-Thanks
+> We introduce a 2-bit global skb->ttl counter.Patch #1 describes how we pu=
+ti
+> together those bits. Patches #2 and patch #5 use these bits.
+> I added Fixes tags to patch #1 in case it is useful for backporting.
+> Patch #3 and #4 revert William's earlier netem commits. Patch #6 introduc=
+es
+> tdc test cases.
+>=20
+> Jamal Hadi Salim (5):
+>   net: Introduce skb ttl field to track packet loops
+>   net/sched: Fix ethx:ingress -> ethy:egress -> ethx:ingress mirred loop
+>   Revert "net/sched: Restrict conditions for adding duplicating netems
+>     to qdisc tree"
+>   Revert "selftests/tc-testing: Add tests for restrictions on netem
+>     duplication"
+>   net/sched: fix packet loop on netem when duplicate is on
+>=20
+> Victor Nogueira (1):
+>   selftests/tc-testing: Add netem/mirred test cases exercising loops
+>=20
+>  drivers/net/ifb.c                             |   2 +-
+>  include/linux/skbuff.h                        |  24 +-
+>  include/net/sch_generic.h                     |  22 +
+>  net/netfilter/nft_fwd_netdev.c                |   1 +
+>  net/sched/act_mirred.c                        |  45 +-
+>  net/sched/sch_netem.c                         |  47 +-
+>  .../tc-testing/tc-tests/actions/mirred.json   | 616 +++++++++++++++++-
+>  .../tc-testing/tc-tests/infra/qdiscs.json     |   5 +-
+>  .../tc-testing/tc-tests/qdiscs/netem.json     |  96 +--
+>  9 files changed, 698 insertions(+), 160 deletions(-)
+>
+
+Reviewed-by: Stephen Hemminger <stephen@networkplumber.org>
+
+This is a complex patch series so I decided to get a second opinion using A=
+I.
+It is worth reading (but not completely trusting). Review prompt is Chris M=
+ason's
+Claude review prompts.
 
 
-> On 2 Jan 2026, at 12:27, Kommula Shiva Shankar <kshankar@marvell.com> wro=
-te:
->=20
-> Prioritize security for external emails:
-> Confirm sender and content safety before clicking links or opening attach=
-ments
-> Report Suspicious
-> Explicitly set non-cached caching attributes for MMIO regions.
-> Default write-back mode can cause CPU to cache device memory,
-> causing invalid reads and unpredictable behavior.
->=20
-> Invalid read and write issues were observed on ARM64 when mapping the
-> notification area to userspace via mmap.
->=20
-> Signed-off-by: Kommula Shiva Shankar <kshankar@marvell.com>
-> Acked-by: Jason Wang <jasowang@redhat.com>
-> ---
-> Originally sent to net-next, now redirected to vhost tree
-> per Jason Wang's suggestion.=20
->=20
-> drivers/vhost/vdpa.c | 1 +
-> 1 file changed, 1 insertion(+)
->=20
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index 05a481e4c385..b0179e8567ab 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -1527,6 +1527,7 @@ static int vhost_vdpa_mmap(struct file *file, struc=
-t vm_area_struct *vma)
-> if (vma->vm_end - vma->vm_start !=3D notify.size)
-> return -ENOTSUPP;
->=20
-> + vma->vm_page_prot =3D pgprot_noncached(vma->vm_page_prot);
-> vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP);
-> vma->vm_ops =3D &vhost_vdpa_vm_ops;
-> return 0;
-> --=20
-> 2.48.1
->=20
->=20
->=20
->=20
+Summary: Patch Series Analysis
+Patches Reviewed
+6-patch series from Jamal Hadi Salim fixing loop detection in mirred and ne=
+tem:
 
+Patch 1/6: Introduces skb->ttl (2-bit field) for cross-deferral loop tracki=
+ng, moves from_ingress to qdisc_skb_cb
+Patch 2/6: Fixes mirred ingress=E2=86=92egress=E2=86=92ingress loop detecti=
+on using ttl
+Patch 3/6: Reverts netem duplication restrictions (preparation for proper f=
+ix)
+Patch 4/6: Reverts associated selftests
+Patch 5/6: Fixes netem duplicate infinite loop using ttl
+Patch 6/6: (Email thread discussion, not code)
+
+Key Findings
+No regressions identified. The analysis covered:
+AreaResultSKB structure change (ttl field)=E2=9C=93 Safe - properly initial=
+ized via zeroingfrom_ingress relocation=E2=9C=93 Safe - written immediately=
+ before readLoop detection logic=E2=9C=93 Correct - ttl tracks across async=
+ boundariesNetem duplicate fix=E2=9C=93 Improvement over old q->duplicate h=
+ackLocking=E2=9C=93 Correct softirq/per-cpu patternsResource management=E2=
+=9C=93 No leaks identified
+Design Assessment
+The approach is sound:
+
+Egress paths: Continue using per-cpu sched_mirred_dev[] array for immediate=
+ loop detection
+Ingress paths: Use skb->ttl to track loops across netif_rx() deferral bound=
+aries
+Netem: ttl-based dup prevention works across entire qdisc tree (better than=
+ old local-only fix)
+
+Recommendation
+Yes, the patch is OK to merge.
+The series correctly fixes real bugs (CVE-worthy loop conditions) with a mi=
+nimal, well-designed solution. The 2-bit ttl field is sufficient for the us=
+e case (limit of 3 ingress redirects), and the changes maintain backward co=
+mpatibility for existing configurations while closing the loop detection ga=
+ps.
 
