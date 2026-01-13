@@ -1,176 +1,239 @@
-Return-Path: <netdev+bounces-249542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D9DAD1ACA0
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 19:06:35 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2B95D1AC9A
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 19:06:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 446D430433D5
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 18:05:47 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 656C130039F9
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 18:06:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 508F52FD660;
-	Tue, 13 Jan 2026 18:05:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UuUiaski";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="PAs3hAQD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78E9F30F811;
+	Tue, 13 Jan 2026 18:06:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f77.google.com (mail-oo1-f77.google.com [209.85.161.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0480287516
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 18:05:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF45030EF85
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 18:06:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768327545; cv=none; b=LdWUEcylwCKdzQyjgsUb9hu0bgUD75VbSnIGiRpN/F2zvOcoZ7mByDyT11wYaJtU2O7bpO1E0ssXMfC6OE4OOdVMWvh5rQewmziO+7OI5LILozWhh0r+vb6tpT56W9FBhdD7wwAE1lF2pwRmzp35JdoncAPzCGtzo3JE9eQn2XE=
+	t=1768327588; cv=none; b=SfpTq+upe5d9QHpUIo91Yl70E1asgCoM6XK6yuCNHZ7vpXG3OeodYnh50Yc8OYLvuRMgWbKfmyHU0SSuQG37ePdkQwC6yV333CkYoY+YYl76dmrCjGpiRfw8sUhusBme+7/2/oe3R5PvKhOHOgBF74iXeo5DP6kZmdb2vrn0wR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768327545; c=relaxed/simple;
-	bh=kDcutUv7aJWCyIO8UR7LdBNvzrb9hA26dEL2hHvbg7o=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=KQPZ+7uIG6rEhvKZDf8kyr/hAUo0L/Mc1ODbIehAJSo+h133/hkqk2Z+6xjwHwe0yrm0L81o9zGi0xuX30xk8KJOf89fuV983upcTKcX9EgNiX7IQGS9UxuDIi9G+lvwD4AffH0el2iQOd0v5TdeM7+d3nOvSz4yz7Qtvknw7ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UuUiaski; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=PAs3hAQD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768327542;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XxL2HkSMC0C5tMevLp4wu8EtMnlPBJAnMlfItJKvzso=;
-	b=UuUiaskiU2qLjamscz4wJVKpJQgKuIcya4ml7R/ypPlilDl12lKYiYXwMww7Fd5n4l+aq8
-	6r2sHi0WrJckF+OSvX3vY/Gg2owRQ50NNKn+BmrKk16TeJrlpNMDkl6QabUvhXdxkN/UmE
-	84BXChUYoKU9E38KRwTAV6HEtWVXOqU=
-Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
- [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-660-m-fsLFvGM9qvw7AdN6F0hg-1; Tue, 13 Jan 2026 13:05:41 -0500
-X-MC-Unique: m-fsLFvGM9qvw7AdN6F0hg-1
-X-Mimecast-MFC-AGG-ID: m-fsLFvGM9qvw7AdN6F0hg_1768327541
-Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-78fc5b493c8so103259527b3.0
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 10:05:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768327541; x=1768932341; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=XxL2HkSMC0C5tMevLp4wu8EtMnlPBJAnMlfItJKvzso=;
-        b=PAs3hAQD3xs/BloqXEKztwPdp7Z0r2B8b5DQ0Rog93AYpi3puhlwQRE4+GBl3G0S/3
-         NNWGD9TSm6b4bK0pQ2GqYirXEGPVvcvsM9MqXB4aDDL5p4Nd2Ds20HQmtGbxlUit7vXO
-         x8cbrfxyb32uSplUC2/VvsNI9DCOWnFsrbz4OjOG+NohX9+IIe7//Z6kXmGCxrbkn6qu
-         DHDJKqhneyqKMVuPQHJIOYcVtc1dN3woIjNkB+Lh2PmDUYEv3P6gv3XPy8hNtj1oiTGG
-         hoOgvtNK4/j+ofUtamhMNcsioSC+edLz3PR0Th+gxL41LO0xfkM2mXG1p1Bgo0npmLxf
-         OlXw==
+	s=arc-20240116; t=1768327588; c=relaxed/simple;
+	bh=pLTO+XZIUa0VX3iogiRJDvqFsnY3vFJd98Zib6H02Bs=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=euZxru8Mo6qy2ByvCf3R6qDj2aAuask04V4VzDPms6mIleHwuwDYZNh9yOpTxLvsrqh3T7D258Vct2CpXxjrFeSj7G0LDKiVtB/35+zfhzyuj0ONLybecNOnqLR5t45XsrD468Iuh2HhDL4q3A2KozehfTIx4y2ElOChnPTShzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f77.google.com with SMTP id 006d021491bc7-6574d3d44f9so17395039eaf.3
+        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 10:06:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768327541; x=1768932341;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XxL2HkSMC0C5tMevLp4wu8EtMnlPBJAnMlfItJKvzso=;
-        b=uKmTR9+Is/2+6dXVD5iqwQsVRtiGZhlOn8T/RBEsCanKjGzOHipsq9IBkKMFn57r0P
-         6uWeOzFJbJADWZvPDDc5+i1LzRstCNltAR1EpFAf97IZtkC4waRQUw3rskvQwtztTymB
-         qWbsDIQ4vYV0z7Wka8eNTt65HFGqHQl00mWk78jOnVXGLKspllPoi5URD063IRD4BQL3
-         c7qcAVKQBeWa8QQrD8HmBY4zvPP/B2FOu5YBOeYt6z5RXx+VqQz6/UQXDARFpRoyXcma
-         l65P5n+j2Cc0Tu1ISRAxfszBAEvhrRB8Kxb7l6AnBg1Vf0uu2sOFCHbMFEezTVfy5WUF
-         04Sg==
-X-Gm-Message-State: AOJu0YxnGcpUNC/KCrhse87NBPHgjDRs3qXWnYGNvlGX8zJGa+dcY+Br
-	MHPIFJdCRI62YDHxJo6iLM9YAUD9AbVP+DcNfMRBX3QLq1VfY2X/5vhz3vo0RkhB9uP0VXprEbR
-	D9D9ahonRVJkBD3t7of3PTRfagJs4//xX3k2f3X8SKuBADrVPreXZu+Bu9qYvPXJhMxLFtld6a2
-	9BurxqfVnLa2RYPkV97jyvLPWNUzG8GAts7BFL5oM=
-X-Gm-Gg: AY/fxX46W2S0n6AH7KL9nGDIB/aQsAsW00OgBffAtBAnJ27mZWJM3Pj/PAnVcaTzc45
-	IZYXHMJKQa/v0yZtxsOmgfl9wCSPvNmZa9gCzaBKSZKOjQxrpH6n7OyZBkelMavI2A+Qg3zFvP3
-	XGSzxYbYwjv3uC/AyCMW/BDR6Tm3aILrLG4CO0cANZtTn3DwJ3RYhyReJSB+JCLUd3kkcKG7L4f
-	+5m5jQM0Izelg5V3B+rzg6x3pfollk6B/09PBho1U+f/saDjq0jTGZK9pUSdf4yz/ErS6Lef9XN
-	HMF2HYPs0jshgxylWG4IoHaaT0RGR6GpUBYjxX2VNV3nBo6CG2xoYZ/cv9kE9eS2mDzcRvgwbsU
-	neI9fqyIDdM2n
-X-Received: by 2002:a05:690e:bcb:b0:644:7933:ae89 with SMTP id 956f58d0204a3-64901b2d245mr63979d50.89.1768327540694;
-        Tue, 13 Jan 2026 10:05:40 -0800 (PST)
-X-Received: by 2002:a05:690e:bcb:b0:644:7933:ae89 with SMTP id 956f58d0204a3-64901b2d245mr63937d50.89.1768327540151;
-        Tue, 13 Jan 2026 10:05:40 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.93])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6470d89d607sm9552428d50.12.2026.01.13.10.05.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Jan 2026 10:05:39 -0800 (PST)
-Message-ID: <12266a40-cbf9-4a55-bf9f-625e38be90c1@redhat.com>
-Date: Tue, 13 Jan 2026 19:05:37 +0100
+        d=1e100.net; s=20230601; t=1768327585; x=1768932385;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2AeiBtUGtTF1FdzbrsNXuUrvDkJx671OyYLEcVvL3hk=;
+        b=Tf4X0lOdQh604G22zHlK2PFQ8hvY8Xwc1lQvJS+o/xJ5r+pqFzi6wy3zm/2vjFK/wz
+         Quby9KJyCQvcIopRdqzpweii/+3Me9pLBRMpZZ3/KTpInnDvMgXMUM/RCCpCbSqmsZ+I
+         wGuUxrfOg3PMPZ6NwlklLEiY7qVmtd7Ul+vjMKwKEQSxQA4yuoc3dHAOgM7OsvJmK2nM
+         YT/sra9WEUE2UQHltkqbVBGgfAph1oJGelMm7TtMGKxH3+ei9L0Yul1QjYTg4mhy+9e4
+         LQ3sxqLYclqqjwJfDgjtw9S4f/tcda7QeINRQSBaiIDjj0CnKyqQYkdAyOLYofP2TpOd
+         AU4g==
+X-Forwarded-Encrypted: i=1; AJvYcCUvZuWPlYdJIOghCd7veW1cBCGyW40CUJwk31SOG0xDB4kcjZxT04OV3SNt2PeRA+j3QcFQ7lA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9BlNyzuPiOor7PxnyAx3Rb5ikpsVdt2rKLouV6XaKo5sYdk02
+	8EH/6OmXmwbDqPei0Irf5nqVFkVt3bJuSs0uz18U5xM0NhF2XnMlEweq7P4wwStrdpjyI9GoW5I
+	XNWqxWnGOq55yjJjdZb1mjZoVWIlC20ME+J80QRqFNeDbuT1invuP6WF8oV0=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 00/10] geneve: introduce double tunnel GSO/GRO
- support
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-References: <cover.1768250796.git.pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <cover.1768250796.git.pabeni@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6820:518c:b0:65f:68f5:1a17 with SMTP id
+ 006d021491bc7-66100621a53mr29525eaf.4.1768327585686; Tue, 13 Jan 2026
+ 10:06:25 -0800 (PST)
+Date: Tue, 13 Jan 2026 10:06:25 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <696689a1.a70a0220.2cc00b.0001.GAE@google.com>
+Subject: [syzbot] [bridge?] INFO: rcu detected stall in br_handle_frame (6)
+From: syzbot <syzbot+f8850bc3986562f79619@syzkaller.appspotmail.com>
+To: bridge@lists.linux.dev, coreteam@netfilter.org, davem@davemloft.net, 
+	edumazet@google.com, fw@strlen.de, horms@kernel.org, idosch@nvidia.com, 
+	kadlec@netfilter.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
+	pablo@netfilter.org, phil@nwl.cc, razor@blackwall.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 1/12/26 9:50 PM, Paolo Abeni wrote:
-> This is the [belated] incarnation of topic discussed in the last Neconf
-> [1].
-> 
-> In container orchestration in virtual environments there is a consistent
-> usage of double UDP tunneling - specifically geneve. Such setup lack
-> support of GRO and GSO for inter VM traffic.
-> 
-> After commit b430f6c38da6 ("Merge branch 'virtio_udp_tunnel_08_07_2025'
-> of https://github.com/pabeni/linux-devel") and the qemu cunter-part, VMs
-> are able to send/receive GSO over UDP aggregated packets.
-> 
-> This series introduces the missing bit for full end-to-end aggregation
-> in the above mentioned scenario. Specifically:
-> 
-> - introduces a new netdev feature set to generalize existing per device
-> driver GSO admission check.1
-> - adds GSO partial support for the geneve and vxlan drivers
-> - introduces and use a geneve option to assist double tunnel GRO
-> - adds some simple functional tests for the above.
-> 
-> The new device features set is not strictly needed for the following
-> work, but avoids the introduction of trivial `ndo_features_check` to
-> support GSO partial and thus possible performance regression due to the
-> additional indirect call. Such feature set could be leveraged by a
-> number of existing drivers (intel, meta and possibly wangxun) to avoid
-> duplicate code/tests. Such part has been omitted here to keep the series
-> small.
-> 
-> Both GSO partial support and double GRO support have some downsides.
-> With the first in place, GSO partial packets will traverse the network
-> stack 'downstream' the outer geneve UDP tunnel and will be visible by
-> the udp/IP/IPv6 and by netfilter. Currently only H/W NICs implement GSO
-> partial support and such packets are visible only via software taps.
-> 
-> Double UDP tunnel GRO will cook 'GSO partial' like aggregate packets,
-> i.e. the inner UDP encapsulation headers set will still carry the
-> wire-level lengths and csum, so that segmentation considering such
-> headers parts of a giant, constant encapsulation header will yield the
-> correct result.
-> 
-> The correct GSO packet layout is applied when the packet traverse the
-> outermost geneve encapsulation.
-> 
-> Both GSO partial and double UDP encap are disabled by default and must
-> be explicitly enabled via, respectively ethtool and geneve device
-> configuration.
-> 
-> Finally note that the GSO partial feature could potentially be applied
-> to all the other UDP tunnels, but this series limits its usage to geneve
-> and vxlan devices.
-> 
-> Link: https://netdev.bots.linux.dev/netconf/2024/paolo.pdf [1]
+Hello,
 
-The AI reported concerns look valid, and I'll take care of them in the
-next revision.
+syzbot found the following issue on:
 
-/P
+HEAD commit:    f83a4f2a4d8c Merge tag 'erofs-for-6.17-rc6-fixes' of git:/..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17d98762580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4d8792ecb6308d0f
+dashboard link: https://syzkaller.appspot.com/bug?extid=f8850bc3986562f79619
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=102d3b62580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=174fb934580000
 
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/446b6da00381/disk-f83a4f2a.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/acc2d4e8a1cc/vmlinux-f83a4f2a.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/cec01f1ca35a/bzImage-f83a4f2a.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+f8850bc3986562f79619@syzkaller.appspotmail.com
+
+rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+rcu: 	0-...!: (2 ticks this GP) idle=e7fc/1/0x4000000000000000 softirq=18961/18961 fqs=0
+rcu: 	(detected by 1, t=10502 jiffies, g=12417, q=367 ncpus=2)
+Sending NMI from CPU 1 to CPUs 0:
+NMI backtrace for cpu 0
+CPU: 0 UID: 0 PID: 807 Comm: kworker/u8:5 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/18/2025
+Workqueue: ipv6_addrconf addrconf_dad_work
+RIP: 0010:taprio_set_budgets+0x12b/0x3b0 net/sched/sch_taprio.c:671
+Code: e8 48 c1 e8 03 48 89 44 24 10 31 db 45 31 e4 4c 89 6c 24 18 bf 10 00 00 00 4c 89 e6 e8 8e 70 24 f8 49 83 fc 0f 48 89 6c 24 30 <0f> 87 8a 01 00 00 4d 8d 2c 2f 4c 89 e8 48 c1 e8 03 48 b9 00 00 00
+RSP: 0018:ffffc90000006060 EFLAGS: 00000093
+RAX: ffffffff899b5352 RBX: 0000000000000000 RCX: ffff88802481bc00
+RDX: 0000000000010100 RSI: 0000000000000000 RDI: 0000000000000010
+RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000004
+R10: dffffc0000000000 R11: fffff52000000c08 R12: 0000000000000000
+R13: ffff8880313e32e0 R14: ffff8880743df930 R15: ffff8880743dfc00
+FS:  0000000000000000(0000) GS:ffff888125c15000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055556d266808 CR3: 000000007e704000 CR4: 00000000003526f0
+Call Trace:
+ <IRQ>
+ advance_sched+0x963/0xc90 net/sched/sch_taprio.c:982
+ __run_hrtimer kernel/time/hrtimer.c:1761 [inline]
+ __hrtimer_run_queues+0x52c/0xc60 kernel/time/hrtimer.c:1825
+ hrtimer_interrupt+0x45b/0xaa0 kernel/time/hrtimer.c:1887
+ local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1039 [inline]
+ __sysvec_apic_timer_interrupt+0x108/0x410 arch/x86/kernel/apic/apic.c:1056
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1050 [inline]
+ sysvec_apic_timer_interrupt+0x52/0xc0 arch/x86/kernel/apic/apic.c:1050
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:stack_trace_consume_entry+0x5/0x280 kernel/stacktrace.c:83
+Code: f0 5b 41 5e 5d c3 cc cc cc cc cc e8 05 fc cd 09 0f 1f 44 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 55 <41> 57 41 56 41 55 41 54 53 48 83 ec 18 48 ba 00 00 00 00 00 fc ff
+RSP: 0018:ffffc90000006518 EFLAGS: 00000286
+RAX: ffffffff8184f87d RBX: ffffc900000065e0 RCX: 7a67f0fb8b1bf500
+RDX: 0000000000000001 RSI: ffffffff8184f87d RDI: ffffc900000065e0
+RBP: ffffc900000065b0 R08: ffffc90003387170 R09: 0000000000000000
+R10: ffffc90000006578 R11: ffffffff81ac4b00 R12: ffff88802481bc00
+R13: 0000000000000000 R14: ffffffff81ac4b00 R15: ffffc90000006528
+ arch_stack_walk+0x10d/0x150 arch/x86/kernel/stacktrace.c:27
+ stack_trace_save+0x9c/0xe0 kernel/stacktrace.c:122
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:68
+ kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:576
+ poison_slab_object mm/kasan/common.c:243 [inline]
+ __kasan_slab_free+0x5b/0x80 mm/kasan/common.c:275
+ kasan_slab_free include/linux/kasan.h:233 [inline]
+ slab_free_hook mm/slub.c:2422 [inline]
+ slab_free mm/slub.c:4695 [inline]
+ kmem_cache_free+0x18f/0x400 mm/slub.c:4797
+ skb_ext_del include/linux/skbuff.h:4929 [inline]
+ nf_bridge_info_free net/bridge/br_netfilter_hooks.c:156 [inline]
+ br_nf_dev_queue_xmit+0x4ee/0x24a0 net/bridge/br_netfilter_hooks.c:851
+ NF_HOOK+0x618/0x6b0 include/linux/netfilter.h:318
+ br_nf_post_routing+0xb66/0xfe0 net/bridge/br_netfilter_hooks.c:966
+ nf_hook_entry_hookfn include/linux/netfilter.h:158 [inline]
+ nf_hook_slow+0xc5/0x220 net/netfilter/core.c:623
+ nf_hook include/linux/netfilter.h:273 [inline]
+ NF_HOOK+0x215/0x3c0 include/linux/netfilter.h:316
+ br_forward_finish+0xd3/0x130 net/bridge/br_forward.c:66
+ br_nf_hook_thresh net/bridge/br_netfilter_hooks.c:-1 [inline]
+ br_nf_forward_finish+0xa40/0xe60 net/bridge/br_netfilter_hooks.c:662
+ NF_HOOK+0x618/0x6b0 include/linux/netfilter.h:318
+ br_nf_forward_ip+0x647/0x7e0 net/bridge/br_netfilter_hooks.c:716
+ nf_hook_entry_hookfn include/linux/netfilter.h:158 [inline]
+ nf_hook_slow+0xc5/0x220 net/netfilter/core.c:623
+ nf_hook include/linux/netfilter.h:273 [inline]
+ NF_HOOK+0x215/0x3c0 include/linux/netfilter.h:316
+ __br_forward+0x41e/0x600 net/bridge/br_forward.c:115
+ br_handle_frame_finish+0x14b4/0x19b0 net/bridge/br_input.c:221
+ br_nf_hook_thresh+0x3c3/0x4a0 net/bridge/br_netfilter_hooks.c:-1
+ br_nf_pre_routing_finish_ipv6+0x948/0xd00 net/bridge/br_netfilter_ipv6.c:-1
+ NF_HOOK include/linux/netfilter.h:318 [inline]
+ br_nf_pre_routing_ipv6+0x37e/0x6b0 net/bridge/br_netfilter_ipv6.c:184
+ nf_hook_entry_hookfn include/linux/netfilter.h:158 [inline]
+ nf_hook_bridge_pre net/bridge/br_input.c:283 [inline]
+ br_handle_frame+0x982/0x14c0 net/bridge/br_input.c:434
+ __netif_receive_skb_core+0x10b6/0x4020 net/core/dev.c:5878
+ __netif_receive_skb_one_core net/core/dev.c:5989 [inline]
+ __netif_receive_skb+0x72/0x380 net/core/dev.c:6104
+ process_backlog+0x60e/0x14f0 net/core/dev.c:6456
+ __napi_poll+0xc7/0x360 net/core/dev.c:7506
+ napi_poll net/core/dev.c:7569 [inline]
+ net_rx_action+0x707/0xe30 net/core/dev.c:7696
+ handle_softirqs+0x283/0x870 kernel/softirq.c:579
+ do_softirq+0xec/0x180 kernel/softirq.c:480
+ </IRQ>
+ <TASK>
+ __local_bh_enable_ip+0x17d/0x1c0 kernel/softirq.c:407
+ local_bh_enable include/linux/bottom_half.h:33 [inline]
+ rcu_read_unlock_bh include/linux/rcupdate.h:910 [inline]
+ __dev_queue_xmit+0x1d79/0x3b50 net/core/dev.c:4752
+ neigh_output include/net/neighbour.h:547 [inline]
+ ip6_finish_output2+0x11fb/0x16a0 net/ipv6/ip6_output.c:141
+ NF_HOOK include/linux/netfilter.h:318 [inline]
+ ndisc_send_skb+0xb54/0x1440 net/ipv6/ndisc.c:512
+ ndisc_send_ns+0xcb/0x150 net/ipv6/ndisc.c:670
+ addrconf_dad_work+0xaae/0x14b0 net/ipv6/addrconf.c:4282
+ process_one_work kernel/workqueue.c:3236 [inline]
+ process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3319
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3400
+ kthread+0x70e/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x436/0x7d0 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+rcu: rcu_preempt kthread timer wakeup didn't happen for 10501 jiffies! g12417 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x402
+rcu: 	Possible timer handling issue on cpu=0 timer-softirq=3323
+rcu: rcu_preempt kthread starved for 10502 jiffies! g12417 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x402 ->cpu=0
+rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
+rcu: RCU grace-period kthread stack dump:
+task:rcu_preempt     state:I stack:26632 pid:16    tgid:16    ppid:2      task_flags:0x208040 flags:0x00004000
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5357 [inline]
+ __schedule+0x1798/0x4cc0 kernel/sched/core.c:6961
+ __schedule_loop kernel/sched/core.c:7043 [inline]
+ schedule+0x165/0x360 kernel/sched/core.c:7058
+ schedule_timeout+0x12b/0x270 kernel/time/sleep_timeout.c:99
+ rcu_gp_fqs_loop+0x301/0x1540 kernel/rcu/tree.c:2083
+ rcu_gp_kthread+0x99/0x390 kernel/rcu/tree.c:2285
+ kthread+0x70e/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x436/0x7d0 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
