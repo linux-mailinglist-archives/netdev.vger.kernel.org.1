@@ -1,113 +1,127 @@
-Return-Path: <netdev+bounces-249604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D4B6D1B836
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 23:01:43 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F6C3D1B842
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 23:02:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B5AEA300671F
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:01:39 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7EF973012A85
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:02:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37619350A0A;
-	Tue, 13 Jan 2026 22:01:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65CA231AF30;
+	Tue, 13 Jan 2026 22:02:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wWdBfa9H"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QD2lHW7D"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92DCE3033C1;
-	Tue, 13 Jan 2026 22:01:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BABD82F363E
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 22:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768341696; cv=none; b=imsuNKBsIAZXvE0FOKbL2jWmIUBp9o2j2PKKZkJQDTOzTXIINVj1H3w9dmQPceaHEbJr51nzVty9r/QLynmClkcAEsqAgjNkW9HuEhP7+fxPCB2YkC3U8ueYkuKF0Fmifj9hCQFvtq+1npcMQrJzfXpgc4Kw4R72Cdse2LefLfg=
+	t=1768341750; cv=none; b=TFpa7WFxpB2d12HUWg1SvxOG9dt48r1C7siubHZQuxMFFcoxEUyPQdVeU6T98sJhxMo1UeVnodaGHPZBgqGXYsL4QiW/MA+9jDseQoPniMfB6C+RoL+XTS9KNZb6ZsXMVF92AUcwpCjRwEXBbECOsNyJ4TJ0iDnG22A1rcvIl14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768341696; c=relaxed/simple;
-	bh=JvEbElP3uMxqSEOP3ISEuBtd+wigJtDEi+eNzvV65L4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mYYkxyiFlXQLku/BhmDsPs1/85eKSuT+YR7dIutlniUPRQ6fjSjMnxvQEyGsuYR3ni9Ko43K/uOBQNF0LPZhbIIKa14nnuEeL1erclCbO2cj4e8CyLJkJ+mgAso08rhY9jjtqNZfGbUx9x4/Vu6cvmenilb152OFbnXRLe6rxZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wWdBfa9H; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=+/hmyK68GNYmzVLXF7pCpHn2vvi/9fuPFNsaXRo0bTQ=; b=wWdBfa9HE9yvd0cCqtqwFLpPfC
-	BLDzE3FDZI7swPftVpAjvudlyibMHJqW9TY80mp4QYnFs5cusbCNmzEGkJZ41Z+euVNFnPi+dRLEz
-	mGVy2K2KejoUfAxT6D6JhUoIgY1IGYygIwmoIpConwFVll5MYO38v/as9EAZ+Q4ckm4A=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vfmRy-002hKr-QO; Tue, 13 Jan 2026 23:01:18 +0100
-Date: Tue, 13 Jan 2026 23:01:18 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yeounsu Moon <yyyynoom@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dlink: count tx_dropped when dropping skb
- on link down
-Message-ID: <0d17b8bf-f8dc-4738-87bc-357d92768381@lunn.ch>
-References: <20260106122350.21532-2-yyyynoom@gmail.com>
- <b6ff2078-86d7-4416-a914-e07ae13e2128@lunn.ch>
- <DFNFEBZPHG3I.1YEOOHK1BTI3N@gmail.com>
+	s=arc-20240116; t=1768341750; c=relaxed/simple;
+	bh=oTn1rRjFkoKJSVY1tdUfLmXmMX+bVGMA0ZNDEKvrtkw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p0Jdjl2BrxxnvJ8/7erv+HqKt4/qQyTsJwaPfwEHlbB1GTghO7iXhYFqqcvITi4Z7NdgmHjfptIawDQkbiCaIFpzKb51dCf1f5N3gbsKd5f0+S0VAAfIY3regxk1TdidMXXnFLNFE+jw27IKxbfN0qcpJD5r4icF6/33Un1cXI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QD2lHW7D; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768341749; x=1799877749;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=oTn1rRjFkoKJSVY1tdUfLmXmMX+bVGMA0ZNDEKvrtkw=;
+  b=QD2lHW7DWdV3DyZaJSDhf7fqGIu5f3oyXxjYrnTOFygMSEh+teRGn0ll
+   4Qtk4EIs7tWAc78hBLev1jlSoFqbSojiZhG0NxeNboWR+8vvmt610kL7a
+   GT7NK95HmrdqtWqAcF+pUiE3PWN57mF2Tql2lTzb461aJABHDvI4LcuKE
+   o0oUsrw6hXeGsP3meKpB6he9D/V9+C27Di7bqLNVLJSRXaiYKAUf4hqPD
+   fyvzC0q3zW/VHgn39+SSbyiBjEdJEieGce9+vXKLZZkslPLaqichrv3+x
+   W+edcXnx1uzG0uZXZ9Z5aUuqs5BrfDxW+k0maZC5S+82oEaLtjQSF/SEe
+   Q==;
+X-CSE-ConnectionGUID: jo0dBDHlT7Kymiptsv3c2A==
+X-CSE-MsgGUID: aPVvhFC3RMeEDRzveoXAaQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11670"; a="69558652"
+X-IronPort-AV: E=Sophos;i="6.21,224,1763452800"; 
+   d="scan'208";a="69558652"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2026 14:02:28 -0800
+X-CSE-ConnectionGUID: ZAn4oT7ZRJGlqT5wqgJzDA==
+X-CSE-MsgGUID: wKNu7LyBQ+2kXXe4gSkmGw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,224,1763452800"; 
+   d="scan'208";a="204388161"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa006.fm.intel.com with ESMTP; 13 Jan 2026 14:02:26 -0800
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net 0/6][pull request] Intel Wired LAN Driver Updates 2026-01-13 (ice, igc)
+Date: Tue, 13 Jan 2026 14:02:13 -0800
+Message-ID: <20260113220220.1034638-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DFNFEBZPHG3I.1YEOOHK1BTI3N@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 13, 2026 at 08:30:45PM +0900, Yeounsu Moon wrote:
-> On Tue Jan 6, 2026 at 10:44 PM KST, Andrew Lunn wrote:
-> > On Tue, Jan 06, 2026 at 09:23:51PM +0900, Yeounsu Moon wrote:
-> >> Increment tx_dropped when dropping the skb due to link down.
-> >> 
-> >> Tested-on: D-Link DGE-550T Rev-A3
-> >> Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
-> >> ---
-> >>  drivers/net/ethernet/dlink/dl2k.c | 1 +
-> >>  1 file changed, 1 insertion(+)
-> >> 
-> >> diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
-> >> index 846d58c769ea..edc6cd64ac56 100644
-> >> --- a/drivers/net/ethernet/dlink/dl2k.c
-> >> +++ b/drivers/net/ethernet/dlink/dl2k.c
-> >> @@ -733,6 +733,7 @@ start_xmit (struct sk_buff *skb, struct net_device *dev)
-> >>  	u64 tfc_vlan_tag = 0;
-> >>  
-> >>  	if (np->link_status == 0) {	/* Link Down */
-> >> +		dev->stats.tx_dropped++;
-> >
-> > Do you see this being hit very often? It should be that as soon as you
-> > know the link is down, you tell the core, and it will stop calling
-> > start_xmit. If you see this counter being incremented a lot, it
-> > indicates there is a problem somewhere else.
-> >
-> > You might want to consider converting this driver to phylink.
-> >
-> > 	  Andrew
-> 
-> Sorry for the late reply. I recently started my first job and have been
-> a bit busy settling in.
-> 
-> To answer your question: this path is hit extremely rarely. In practice,
-> I only observed it in rather extreme cases, such as forcibly
-> disconnecting the physical link (e.g. unplugging the Ethernet cable). I
-> have not seen it occurring during normal operation.
+For ice:
+Jake adds missing initialization calls to u64_stats_init().
 
-In that case, i think this is fine. There is a race condition here
-between indicating the carrier is down and the network stopping
-passing packets, so this can happen, and incrementing the counter is
-fine.
+Dave stops deletion of VLAN 0 from prune list when device is primary
+LAG interface.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Ding Hui adds a missed unit conversion function for proper timeout
+value.
 
-    Andrew
+For igc:
+Kurt Kanzenbach adds a call to re-set default Qbv schedule when number
+of channels changes.
+
+Chwee-Lin Choong reworks Tx timestamp detection logic to resolve a race
+condition and reverts changes to TSN packet buffer size causing Tx
+hangs under heavy load.
+
+The following are changes since commit ffe4ccd359d006eba559cb1a3c6113144b7fb38c:
+  net: add net.core.qdisc_max_burst
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 100GbE
+
+Chwee-Lin Choong (2):
+  igc: fix race condition in TX timestamp read for register 0
+  igc: Reduce TSN TX packet buffer from 7KB to 5KB per queue
+
+Dave Ertman (1):
+  ice: Avoid detrimental cleanup for bond during interface stop
+
+Ding Hui (1):
+  ice: Fix incorrect timeout ice_release_res()
+
+Jacob Keller (1):
+  ice: initialize ring_stats->syncp
+
+Kurt Kanzenbach (1):
+  igc: Restore default Qbv schedule when changing channels
+
+ drivers/net/ethernet/intel/ice/ice_common.c  |  2 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c     | 29 +++++++++----
+ drivers/net/ethernet/intel/igc/igc_defines.h |  5 ++-
+ drivers/net/ethernet/intel/igc/igc_ethtool.c |  4 +-
+ drivers/net/ethernet/intel/igc/igc_main.c    |  5 +++
+ drivers/net/ethernet/intel/igc/igc_ptp.c     | 43 ++++++++++++--------
+ 6 files changed, 57 insertions(+), 31 deletions(-)
+
+-- 
+2.47.1
+
 
