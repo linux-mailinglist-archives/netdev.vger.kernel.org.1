@@ -1,110 +1,105 @@
-Return-Path: <netdev+bounces-249441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B59E0D1906B
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:09:21 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F261D19083
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:10:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 37B7630042BE
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 13:09:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B6768300163B
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 13:10:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FA473904E4;
-	Tue, 13 Jan 2026 13:09:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BC1538F953;
+	Tue, 13 Jan 2026 13:10:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZdrGHKbC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2SXvWykz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B408338FF0B;
-	Tue, 13 Jan 2026 13:09:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B899038FEFD
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 13:10:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768309758; cv=none; b=eISODufpRSq7RkjYwwdOLGBpNCejGIFRn4/1aOrCpFfQXH4Q7fiJ6ezMFZ3kj0mxlOj6mOQgNjIyz3nJc4rcdtgL7NobziKJWV0fb7CjBbbjQ0W0YCCA2lYUTo83K75kCnh+0DDIsuQYjLtRhOAaASYPcjfB/jv6LoLGNhdc23Y=
+	t=1768309821; cv=none; b=O8nNaF6syRHn5dPUGgQNo9cM40Yixvy5dffW6Ea5etwDrEHQRzK3o9W4UrmiNO+8V/J7MYOY2Thl1XaCcvoYvBBi0aJR5I1MGKHiZhd+KnwwfzPBv32m+rHvnCY6md0S3NE3W5mNA0G98WqUl6PUO+W8kr+yDKoEfvF63QNT2kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768309758; c=relaxed/simple;
-	bh=/sdxEgRgpIsKuwLdsB+gz2Y2g+rnDI4mnmM+bV5MHKk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HfRjkxuwmFxldzx6UCfwR3NVKVO/St0bitvfyTQSXwsacE68Zvb8qipS5y3H8W3lkR7vd6ovIXRk7JqrLyXzDht+21PSUix1TkE0/2rYO6voq6a+P0ZUP2mmypXHgLOSMVUBej0tG7uURNeuaoE92qVRZ+Zl6PXxYopJO8mWdSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZdrGHKbC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1A40C116C6;
-	Tue, 13 Jan 2026 13:09:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768309757;
-	bh=/sdxEgRgpIsKuwLdsB+gz2Y2g+rnDI4mnmM+bV5MHKk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZdrGHKbC4SlbtUGTP/WJ3hy03vSHM9sncl0yGFQePY+aJN9SHggONTnrckxoZ5jNT
-	 G1v/MmJ7zUY0Co15VoJ9yCwC3rYMED40XBOq7B1v07XFJ72Z/gmamSkegIDHZdjCbq
-	 l86DniNM1fq3NcUUCSalzyZvgmZnKdrT2o3HtStqGmtcuKjQT4ypVzZba5VPZco4e5
-	 h1rRbBqxrqUq1v6yi98M4AvolNpvhKzMFt+KwF8CmoNvmI6k2TIFrBdkSqRbQAyjmw
-	 sn2tJ/JpirIGVmSVKMNOzVNAhad0+9IcM4nqGscj9ptSSlyPn/whx95EgqqUBWxpQ7
-	 bOxU+UiI91VwA==
-Date: Tue, 13 Jan 2026 13:09:13 +0000
-From: Simon Horman <horms@kernel.org>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	sgoutham@marvell.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
-	sumang@marvell.com
-Subject: Re: [PATCH net-next 01/13] octeontx2-af: npc: cn20k: Index management
-Message-ID: <aWZD-bDON-wzfQHe@horms.kernel.org>
-References: <20260105023254.1426488-1-rkannoth@marvell.com>
- <20260105023254.1426488-2-rkannoth@marvell.com>
- <20260108175357.GJ345651@kernel.org>
- <aWBqq9UKWD5ewKpA@rkannoth-OptiPlex-7090>
+	s=arc-20240116; t=1768309821; c=relaxed/simple;
+	bh=SUugGjgG+7vEqHmUCtlpGkRukFLpAgMmpUFWDnD8g/o=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=lxFDu9TMXEGxwONwpL5aHgHn7VdTh2+MMIDN+7/Hseml8P3DPls9Gy/3Vua472gRdmb8SR9BZgbGYy89g6z1v5JDojD/YRua2eBNVgfOlHr3kbASuJvWpdh0gpNeP++RezCef2nnXZ4nbtaosS5wA7joJ9lVy1l2Fqk4DzyDF1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2SXvWykz; arc=none smtp.client-ip=209.85.219.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-88a3929171bso158048826d6.3
+        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 05:10:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768309818; x=1768914618; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/srtRv/gdOtsYHQ+DxBxBqOCSfeVGTnOu6cSMjM9zI8=;
+        b=2SXvWykzYm+2fdS/kmWsjFEjusOkwD5GVlLnOW1Dida+FbWzq1jZkC+VgpV+GCRfbR
+         +v1sQiL8LZ2ToXsZHvw4KsATPmNfCRH/XsheVDHhjvloLjhxA6vpC3vrdHXSQwbgdzFP
+         V08WhNHWtixzRGqcBRp65lPc5ci9sDJ8a0vtDjQMk9pvpwltFvog1zIzh5XqRcetqwFy
+         3M173lecy9rKN3wlyufhT+HCThucwaaOLy/lqvh07jUpw9XsWlqGyXrCrX+8Zfa/kIt/
+         t5XXjSe0eviINAknDDV2DHfrDHrK53el45D6swIIMx2x3C67Sp8tXrIsg7AmDyPyplFA
+         jCpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768309818; x=1768914618;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/srtRv/gdOtsYHQ+DxBxBqOCSfeVGTnOu6cSMjM9zI8=;
+        b=cVgvWMUjxyeRwpaQNP+7b3ZWxv0mryOptfTyZEnFupHIuLxMa6PaKrixK7AK1lZGiB
+         IWxPgNj+zMaDZMrC4U0C0BQxBnTv+1XPgJaq7gbUhRy1k4U6/okgKxAi2jg4Q3Qi8r9u
+         4p8tlza1rbBywkKxReUlMVBPMkVeFHDOehbACvp0U5At3k7SpXaHkjQzf2XGIjrfARdB
+         qQhYiwClJyQcb2GfFEyGn0hg8Frw3Jg9axB7EAQcXcbYy/YbG76SzqM3MCosJRaSepkh
+         fTBn0gxALtYXhlmKQnFZ/lo3lCQcc0cJRbD4eYLHmUZNHA1o2jV5GPgkRQhGXzio19rG
+         uAZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWMvBjNl/c3gwwyEkAuvdQYFwBM/nN2dLKNpmS9U6GcelIldgtdP5KjOvBeqz7U7SHQFsIpwh0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMoJvYKgRJI4LLsCH83Y8nEEObRgGlQofVqMmK8iedOlymCTqE
+	qaN5+TVwIoBdEqcb43Qxy2qHm6QSTi1dmFjWmUO7gE7ySUbyBUlE4NFPx7Yrf+zMp1LF3yraG0D
+	BnhGTRKD20NvHqA==
+X-Google-Smtp-Source: AGHT+IFGDnc8WBZgUMsSMePdVdyUIhlf0lNNZLeTi8fT7ANbXp35eba3gYEyO6N4YZIjs2Z3G3Wp0nO/dCJryg==
+X-Received: from qvblh6.prod.google.com ([2002:a05:6214:54c6:b0:888:3b63:e0d7])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6214:488f:b0:87d:c7ab:e5d0 with SMTP id 6a1803df08f44-890842757cbmr320345746d6.55.1768309818669;
+ Tue, 13 Jan 2026 05:10:18 -0800 (PST)
+Date: Tue, 13 Jan 2026 13:10:17 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aWBqq9UKWD5ewKpA@rkannoth-OptiPlex-7090>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
+Message-ID: <20260113131017.2310584-1-edumazet@google.com>
+Subject: [PATCH net-next] net: minor __alloc_skb() optimization
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Jan 09, 2026 at 08:10:43AM +0530, Ratheesh Kannoth wrote:
-> On 2026-01-08 at 23:23:57, Simon Horman (horms@kernel.org) wrote:
-> > On Mon, Jan 05, 2026 at 08:02:42AM +0530, Ratheesh Kannoth wrote:
-> >
-> > > +		if (strlen(t1) < 3) {
-> > > +			pr_err("%s:%d Bad Token %s=%s\n",
-> > > +			       __func__, __LINE__, t1, t2);
-> > > +			goto err;
-> > > +		}
-> > > +
-> > > +		if (t1[0] != '[' || t1[strlen(t1) - 1] != ']') {
-> > > +			pr_err("%s:%d Bad Token %s=%s\n",
-> > > +			       __func__, __LINE__, t1, t2);
-> >
-> > Hi Ratheesh,
-> >
-> > FWIIW, I would advocate slightly more descriptive and thus unique
-> > error messages
-> ACK.
-> 
-> >and dropping __func__ and __LINE__ from logs,
-> > here and elsewhere.
-> ACK.
-> 
-> >
-> > The __func__, and in particular __LINE__ information will only
-> > tend to change as the file is up dated, and so any debugging will
-> > need to know the source that the kernel was compiled from.
-> ACK.
-> 
-> >
-> > And I'd say that given the state of debugging functionality in the kernel -
-> > e..g dynamic tracepoints - this is not as useful as it may seem at first.
-> Since these represent valid error cases, they should be logged by default.
-> Relying on dynamic trace points would require the customer to recompile the
-> kernel and retest, which could lead to significant debugging delays and
-> multiple rounds of communication.
+We can directly call __finalize_skb_around()
+instead of __build_skb_around() because @size is not zero.
 
-FTR, I think that logging them is reasonable, it's just the __func__ and
-__LINE__ portions that I question the usefulness of.
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/core/skbuff.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Also, in my experience, recompiling is not necessary to use dynamic trace
-points. But YMMV.
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 4887099e8678352a62d805e1b0be2736dc985376..77508cf7c41e829a11a988d8de3d2673ff1ff121 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -714,7 +714,7 @@ struct sk_buff *__alloc_skb(unsigned int size, gfp_t gfp_mask,
+ 	prefetchw(data + SKB_WITH_OVERHEAD(size));
+ 
+ 	skbuff_clear(skb);
+-	__build_skb_around(skb, data, size);
++	__finalize_skb_around(skb, data, size);
+ 	skb->pfmemalloc = pfmemalloc;
+ 
+ 	if (flags & SKB_ALLOC_FCLONE) {
+-- 
+2.52.0.457.g6b5491de43-goog
 
-...
 
