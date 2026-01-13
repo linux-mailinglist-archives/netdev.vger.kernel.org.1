@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-249609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id B47A6D1B854
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 23:03:13 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F17BD1B857
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 23:03:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DC12A300FBF2
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:02:41 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 52AE03010054
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:02:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79543354AF4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98550354AF9;
 	Tue, 13 Jan 2026 22:02:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FBOn/x6w"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f9nJF/TI"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A807354AE9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F61E352F82
 	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 22:02:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768341754; cv=none; b=mpJjo5BwMbP85KivICShaRRaJCr+/Wpjy4lsst6MSZhBpHmD+1+2xVpVpeu7111vEqbtMiEZoqQY8uNxogshLZagqdBBb61RUkcdwyjhRlMWGw/h2u+9KkNRy4EYeFgASmXp1T6tSPpB9aIVL7kXAZ6MK9toO03mDQ/NDR+12N4=
+	t=1768341754; cv=none; b=CTNUEJ50lw8Fur02iYTE/XBQpVTpJBwZZPeiCxlUGxIjcPFF05agUyvuuJTva+l+Q9TtgeAjC4Y21TfpGaw33wJG3i6hMRy8leXR5NY10HHgYc5wCoXcITIW5g8pWUMRQ99rVQjjjtwTT++D6dx7oQ/B7XpIvpc3gD5IVqUX5CI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1768341754; c=relaxed/simple;
-	bh=VfZx+6vMFCWhp5+5AclqfRlOCNS9CJuu6ubQONt55M4=;
+	bh=9urtO/0OnmlmE7+3D8dzBvfkOm0JlXS8w7IgqLlJ8io=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YoyTEEtJQMuwgGf2z5iaHWRrvOBkRJM78vroeE6nTPP0SeCKNVAN/xzLVW6QdHuOtO40e3I6Or+oaF5o5carrpHVA/DjofrcBBMIpTZkSwJYG+fJtf9W6fhSMhIyaZP5K3Md0WjuSD7GIjxvfkFN7QnGNF3lYnrxJ0htvKMoKFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FBOn/x6w; arc=none smtp.client-ip=198.175.65.21
+	 MIME-Version; b=Gc0k86Y4TOCslP8hC2eODQSsBymQoVlTGIxtwnotOKCUgR9CmP51DHj5kS4tVUEeQ98b/CIHImvO6JaXOMrSw9Icl/PEl1f9FbTAfKVOkUY5fq1nyUliteAK2L03preKnFB6XUYyoulCnzrHSvS7tgaaX0z+jXkp7ac43iJF3Rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f9nJF/TI; arc=none smtp.client-ip=198.175.65.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -34,26 +34,26 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1768341754; x=1799877754;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=VfZx+6vMFCWhp5+5AclqfRlOCNS9CJuu6ubQONt55M4=;
-  b=FBOn/x6wVVkHWbm6G3ehIrjhG0uClgRU9HQTtj9J2ai2GYmRljt5ZvkN
-   1rUIJKo6PoYjHCKYXsd5OuAcQfdboOwktf6ze4nCYQev/YCXNNP/lmmPD
-   B6wZbbZM/+jDbx1aVDoVYTtPJ5ijB4vPEA3PLRwm7HIJ27hYUL44Yn+BD
-   T1R1UTqCEJx1IQihVbUVkBgq7QrV5FD/9b9trI+y5W2fylQZlZXISgA2T
-   wBLKvtmEpL/KMgAV/yjs/v/qv9ByaBLh97yNKnCRq4fLqNG6QOIUzIlOJ
-   NgFHtMJ7ZJmgR1D4DnqyD6yeKCg/Jc1nun1WWerTINwTnuG9qvf2Zobdz
-   Q==;
-X-CSE-ConnectionGUID: h7mqVbIJQdK5RK4qfyZHyA==
-X-CSE-MsgGUID: li6UUsWyTxmULQl+AyDBNw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11670"; a="69558683"
+  bh=9urtO/0OnmlmE7+3D8dzBvfkOm0JlXS8w7IgqLlJ8io=;
+  b=f9nJF/TIGu/My0//ICi/kVe7+ql7RL0dWmSE756goF7p9vHTCS8GT5o7
+   Zx+5zVnUwwrxFdzvtYwBOg+ZLauDSEs+o51dtQRqaAEdupckk5kFDmdOI
+   hNZyfCpBVvzaFElCjVwgLlnd2MlOC07aBIZWVunz1dRuJ6SP+7G87hG+y
+   njyTsHcz6XcgOnIcsIZL+0e8yc8Q5/Re4Dw65jaJ8HcGWAcK5+TSMP76Q
+   otkGHdjcgzWk5OvwbwTV1z/ADcs3Did9m4K7wlxWCNjSmp1e6uMWtvvhB
+   SLauK6OjumwrzCeSMucYnit+iI57nbClpNleokL3rfKOBpyrOmeXJpDSj
+   g==;
+X-CSE-ConnectionGUID: EX+K0ZxtQc2EMvRX+gQCOA==
+X-CSE-MsgGUID: ybKDu2urTEeoagwfO0BiVA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11670"; a="69558691"
 X-IronPort-AV: E=Sophos;i="6.21,224,1763452800"; 
-   d="scan'208";a="69558683"
+   d="scan'208";a="69558691"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2026 14:02:29 -0800
-X-CSE-ConnectionGUID: yUryBcAhSxOAOfQMG24ICw==
-X-CSE-MsgGUID: cflAVd10RlevMqp31cKj9Q==
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2026 14:02:30 -0800
+X-CSE-ConnectionGUID: GY+LL5iQRLGImWkqf2u/ag==
+X-CSE-MsgGUID: 5NSaDDW4TbWa1RTWrUmnog==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,224,1763452800"; 
-   d="scan'208";a="204388181"
+   d="scan'208";a="204388186"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa006.fm.intel.com with ESMTP; 13 Jan 2026 14:02:28 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -63,17 +63,21 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Kurt Kanzenbach <kurt@linutronix.de>,
+Cc: Chwee-Lin Choong <chwee.lin.choong@intel.com>,
 	anthony.l.nguyen@intel.com,
 	vitaly.lifshits@intel.com,
 	dima.ruinskiy@intel.com,
-	bigeasy@linutronix.de,
+	richardcochran@gmail.com,
+	vinicius.gomes@intel.com,
+	yipeng.chai@amd.com,
+	alexander.deucher@amd.com,
+	Avi Shalev <avi.shalev@intel.com>,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Avigail Dahan <avigailx.dahan@intel.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Subject: [PATCH net 4/6] igc: Restore default Qbv schedule when changing channels
-Date: Tue, 13 Jan 2026 14:02:17 -0800
-Message-ID: <20260113220220.1034638-5-anthony.l.nguyen@intel.com>
+	Song Yoong Siang <yoong.siang.song@intel.com>,
+	Avigail Dahan <avigailx.dahan@intel.com>
+Subject: [PATCH net 5/6] igc: fix race condition in TX timestamp read for register 0
+Date: Tue, 13 Jan 2026 14:02:18 -0800
+Message-ID: <20260113220220.1034638-6-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20260113220220.1034638-1-anthony.l.nguyen@intel.com>
 References: <20260113220220.1034638-1-anthony.l.nguyen@intel.com>
@@ -85,83 +89,120 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Kurt Kanzenbach <kurt@linutronix.de>
+From: Chwee-Lin Choong <chwee.lin.choong@intel.com>
 
-The Multi-queue Priority (MQPRIO) and Earliest TxTime First (ETF) offloads
-utilize the Time Sensitive Networking (TSN) Tx mode. This mode is always
-coupled to IEEE 802.1Qbv time aware shaper (Qbv). Therefore, the driver
-sets a default Qbv schedule of all gates opened and a cycle time of
-1s. This schedule is set during probe.
+The current HW bug workaround checks the TXTT_0 ready bit first,
+then reads TXSTMPL_0 twice (before and after reading TXSTMPH_0)
+to detect whether a new timestamp was captured by timestamp
+register 0 during the workaround.
 
-However, the following sequence of events lead to Tx issues:
+This sequence has a race: if a new timestamp is captured after
+checking the TXTT_0 bit but before the first TXSTMPL_0 read, the
+detection fails because both the "old" and "new" values come from
+the same timestamp.
 
- - Boot a dual core system
-   igc_probe():
-     igc_tsn_clear_schedule():
-       -> Default Schedule is set
-       Note: At this point the driver has allocated two Tx/Rx queues, because
-       there are only two CPUs.
+Fix by reading TXSTMPL_0 first to establish a baseline, then
+checking the TXTT_0 bit. This ensures any timestamp captured
+during the race window will be detected.
 
- - ethtool -L enp3s0 combined 4
-   igc_ethtool_set_channels():
-     igc_reinit_queues()
-       -> Default schedule is gone, per Tx ring start and end time are zero
+Old sequence:
+  1. Check TXTT_0 ready bit
+  2. Read TXSTMPL_0 (baseline)
+  3. Read TXSTMPH_0 (interrupt workaround)
+  4. Read TXSTMPL_0 (detect changes vs baseline)
 
-  - tc qdisc replace dev enp3s0 handle 100 parent root mqprio \
-      num_tc 4 map 3 3 2 2 0 1 1 1 3 3 3 3 3 3 3 3 \
-      queues 1@0 1@1 1@2 1@3 hw 1
-    igc_tsn_offload_apply():
-      igc_tsn_enable_offload():
-        -> Writes zeros to IGC_STQT(i) and IGC_ENDQT(i), causing Tx to stall/fail
+New sequence:
+  1. Read TXSTMPL_0 (baseline)
+  2. Check TXTT_0 ready bit
+  3. Read TXSTMPH_0 (interrupt workaround)
+  4. Read TXSTMPL_0 (detect changes vs baseline)
 
-Therefore, restore the default Qbv schedule after changing the number of
-channels.
-
-Furthermore, add a restriction to not allow queue reconfiguration when
-TSN/Qbv is enabled, because it may lead to inconsistent states.
-
-Fixes: c814a2d2d48f ("igc: Use default cycle 'start' and 'end' values for queues")
-Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+Fixes: c789ad7cbebc ("igc: Work around HW bug causing missing timestamps")
+Suggested-by: Avi Shalev <avi.shalev@intel.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Co-developed-by: Song Yoong Siang <yoong.siang.song@intel.com>
+Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
+Signed-off-by: Chwee-Lin Choong <chwee.lin.choong@intel.com>
 Tested-by: Avigail Dahan <avigailx.dahan@intel.com>
-Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/igc/igc_ethtool.c | 4 ++--
- drivers/net/ethernet/intel/igc/igc_main.c    | 5 +++++
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/intel/igc/igc_ptp.c | 43 ++++++++++++++----------
+ 1 file changed, 25 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-index e94c1922b97a..3172cdbca9cc 100644
---- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -1565,8 +1565,8 @@ static int igc_ethtool_set_channels(struct net_device *netdev,
- 	if (ch->other_count != NON_Q_VECTORS)
- 		return -EINVAL;
+diff --git a/drivers/net/ethernet/intel/igc/igc_ptp.c b/drivers/net/ethernet/intel/igc/igc_ptp.c
+index b7b46d863bee..7aae83c108fd 100644
+--- a/drivers/net/ethernet/intel/igc/igc_ptp.c
++++ b/drivers/net/ethernet/intel/igc/igc_ptp.c
+@@ -774,36 +774,43 @@ static void igc_ptp_tx_reg_to_stamp(struct igc_adapter *adapter,
+ static void igc_ptp_tx_hwtstamp(struct igc_adapter *adapter)
+ {
+ 	struct igc_hw *hw = &adapter->hw;
++	u32 txstmpl_old;
+ 	u64 regval;
+ 	u32 mask;
+ 	int i;
  
--	/* Do not allow channel reconfiguration when mqprio is enabled */
--	if (adapter->strict_priority_enable)
-+	/* Do not allow channel reconfiguration when any TSN qdisc is enabled */
-+	if (adapter->flags & IGC_FLAG_TSN_ANY_ENABLED)
- 		return -EINVAL;
- 
- 	/* Verify the number of channels doesn't exceed hw limits */
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 7aafa60ba0c8..89a321a344d2 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -7759,6 +7759,11 @@ int igc_reinit_queues(struct igc_adapter *adapter)
- 	if (netif_running(netdev))
- 		err = igc_open(netdev);
- 
-+	if (!err) {
-+		/* Restore default IEEE 802.1Qbv schedule after queue reinit */
-+		igc_tsn_clear_schedule(adapter);
-+	}
++	/* Establish baseline of TXSTMPL_0 before checking TXTT_0.
++	 * This baseline is used to detect if a new timestamp arrives in
++	 * register 0 during the hardware bug workaround below.
++	 */
++	txstmpl_old = rd32(IGC_TXSTMPL);
 +
- 	return err;
- }
+ 	mask = rd32(IGC_TSYNCTXCTL) & IGC_TSYNCTXCTL_TXTT_ANY;
+ 	if (mask & IGC_TSYNCTXCTL_TXTT_0) {
+ 		regval = rd32(IGC_TXSTMPL);
+ 		regval |= (u64)rd32(IGC_TXSTMPH) << 32;
+ 	} else {
+-		/* There's a bug in the hardware that could cause
+-		 * missing interrupts for TX timestamping. The issue
+-		 * is that for new interrupts to be triggered, the
+-		 * IGC_TXSTMPH_0 register must be read.
++		/* TXTT_0 not set - register 0 has no new timestamp initially.
++		 *
++		 * Hardware bug: Future timestamp interrupts won't fire unless
++		 * TXSTMPH_0 is read, even if the timestamp was captured in
++		 * registers 1-3.
+ 		 *
+-		 * To avoid discarding a valid timestamp that just
+-		 * happened at the "wrong" time, we need to confirm
+-		 * that there was no timestamp captured, we do that by
+-		 * assuming that no two timestamps in sequence have
+-		 * the same nanosecond value.
++		 * Workaround: Read TXSTMPH_0 here to enable future interrupts.
++		 * However, this read clears TXTT_0. If a timestamp arrives in
++		 * register 0 after checking TXTT_0 but before this read, it
++		 * would be lost.
+ 		 *
+-		 * So, we read the "low" register, read the "high"
+-		 * register (to latch a new timestamp) and read the
+-		 * "low" register again, if "old" and "new" versions
+-		 * of the "low" register are different, a valid
+-		 * timestamp was captured, we can read the "high"
+-		 * register again.
++		 * To detect this race: We saved a baseline read of TXSTMPL_0
++		 * before TXTT_0 check. After performing the workaround read of
++		 * TXSTMPH_0, we read TXSTMPL_0 again. Since consecutive
++		 * timestamps never share the same nanosecond value, a change
++		 * between the baseline and new TXSTMPL_0 indicates a timestamp
++		 * arrived during the race window. If so, read the complete
++		 * timestamp.
+ 		 */
+-		u32 txstmpl_old, txstmpl_new;
++		u32 txstmpl_new;
  
+-		txstmpl_old = rd32(IGC_TXSTMPL);
+ 		rd32(IGC_TXSTMPH);
+ 		txstmpl_new = rd32(IGC_TXSTMPL);
+ 
+@@ -818,7 +825,7 @@ static void igc_ptp_tx_hwtstamp(struct igc_adapter *adapter)
+ 
+ done:
+ 	/* Now that the problematic first register was handled, we can
+-	 * use retrieve the timestamps from the other registers
++	 * retrieve the timestamps from the other registers
+ 	 * (starting from '1') with less complications.
+ 	 */
+ 	for (i = 1; i < IGC_MAX_TX_TSTAMP_REGS; i++) {
 -- 
 2.47.1
 
