@@ -1,179 +1,205 @@
-Return-Path: <netdev+bounces-249465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB33CD196AF
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:25:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55032D19795
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:32:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4B651300DB04
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:22:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 982673038282
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:30:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97B2D286881;
-	Tue, 13 Jan 2026 14:22:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47F9429E0F7;
+	Tue, 13 Jan 2026 14:30:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bromVzgr";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="AkGAVH8A"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0449D21CA02;
-	Tue, 13 Jan 2026 14:22:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D98B29AB15
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 14:30:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768314167; cv=none; b=tZsrc9d2wLZrP0NhLi0WlD7wrsBGDtkuAIxP3vzERj9m5O+BeGx5m4MGwK39MtcgZsyiq4s3r09upItckoh1gG272JNlHBtriAKIO6Zqe9AZpSOItLGRuGz7gfAztEdB8IwZSf4jqcwWbJJC5+UUFqpymCxB06HlSw9w8ufb3Cw=
+	t=1768314609; cv=none; b=WdpvygbnbmMnXSb0NsZoYMTPgXuFjIQhclrDJlHZOOhsfNOXBGgwf0JIA8pYTPUfvzqFICy2NbcKjJdbdRA+EmkHL0C9cHuFzXs9EKmu09ypIxE1IA+oAjg64kIuY/bW9RR9aczJOuHsMD5/PVBgFUb4vrdKauAsuurQ8tYbdd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768314167; c=relaxed/simple;
-	bh=45dZQdW9fGUa224LTS3tQ2Qsw+8kqQrF6HjLpsqqbfQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rde93hUFKgQVE6aTYusHwYea0UHaEdzQTn8RtNU5xekv6yUjCJXGOHxBzsOqBqpB7ZYPQxi3jzdF0UPkCdQpGp5cFkjPpud17r+CxHOW48NU0UDLLc2eDX1y6Djm9vcNBYXSBC06F4D+Yh7cJGfAFuuLWa6vbFxbWzPPK6h2+Fc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vffHv-000000004Ng-1YDD;
-	Tue, 13 Jan 2026 14:22:27 +0000
-Date: Tue, 13 Jan 2026 14:22:24 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Bc-bocun Chen <bc-bocun.chen@mediatek.com>,
-	Rex Lu <rex.lu@mediatek.com>,
-	Mason-cw Chang <Mason-cw.Chang@mediatek.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next RFC] net: ethernet: mtk_eth_soc: support using
- non-MediaTek DSA switches
-Message-ID: <aWZVIBh6AKiIaxdr@makrotopia.org>
-References: <34647edacab660b4cabed9733d2d3ef22bc041ac.1768273593.git.daniel@makrotopia.org>
- <252d6877-d966-4d19-a38c-cc83ba908494@lunn.ch>
+	s=arc-20240116; t=1768314609; c=relaxed/simple;
+	bh=lHu6MXmC881GNys4A4x9dwsGJnuct71yJhITMvkSNBg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=m1NVNVU8wKfZtZcdD/pBuOHegAq5lEl6j9hvMKZ+LWZdCGSRMQczAPdChzfJVIkUf4xy8ME1jkX5/fL9ARnhB6ruLRVfdjIsMCHu5mXWMe9QlZ7hzbYaKV3ohZycFeOPm8cFTXinZe+9RwdtgXYG5/W30G1z95uUpw6I7+kK1EI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bromVzgr; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AkGAVH8A; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768314606;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BsGMLadexo/nCzuVTGjgLCJkB33PukmvAkeDyomNP3Y=;
+	b=bromVzgrBJurf6ULQmtIlScUDtIY1Pv68F1sIuDGnLPmYnT03ugRa/YEMygbX2a4kBcz5Y
+	ONP5Slyy9UA7q/eG4Z3wkwHx0RLhCVUObbG9SqPH+ePueEzQ9Z2a4S5RBpvOqj92ixY0ym
+	wnvOqd4az+yHrISLx36hc571cDtcXzQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-656-vSETYqBKP6-d23Cd3tn8UA-1; Tue, 13 Jan 2026 09:30:04 -0500
+X-MC-Unique: vSETYqBKP6-d23Cd3tn8UA-1
+X-Mimecast-MFC-AGG-ID: vSETYqBKP6-d23Cd3tn8UA_1768314603
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-430fcf10287so6219566f8f.0
+        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 06:30:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1768314603; x=1768919403; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BsGMLadexo/nCzuVTGjgLCJkB33PukmvAkeDyomNP3Y=;
+        b=AkGAVH8AAq7YbxYn2HohM+WvuYm26hHNeYCJ9GMukCkw3vgLzKZzWtgDZj1sYqEz5G
+         GQRnn9dT2I2UD37mPsM10Jl5VaRIRAKaj0gfl00kov7vXBEC2/nPa7k8VmMW6GApgJjX
+         momVrU+4Edk+Fg4PpowsqTdf9LzaDhb002ZlK/rPlaCF13SFddR8OZD1LEU2gy7Mj/su
+         yUUW7QeIPaHdU/cyObfavcHW3UnF8joQLmjpPu292FiA+iSBUGnJVCn4nnXIb9rh6ZzL
+         uIKbsYgYNnaESReoejdSLhkcrtLCGPSrG7xzd759PRs1IdAYuHH5M8i0f0wkk2wfGf7b
+         +XSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768314603; x=1768919403;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BsGMLadexo/nCzuVTGjgLCJkB33PukmvAkeDyomNP3Y=;
+        b=PzslaPmueANM0WKGhBFQm3vBEsjI8wYwxUd60iCr8cnbj0GrL2IvHhfnNeknTHJTh1
+         z94k0rFjThiCwWCC7lq9HUvpMzNoNYUt22NTW9N9EdjXTn13KH7jbDMEBwpYOyivIYH1
+         MhFwrRqLR4lGDq6bcCYlofn/SDU4ZMYOd7VwSPxHMoua56Lebzms7lVdZRWB3xuW76lJ
+         cKOyFyszjxDYx/H5aOFZmBp267OHDz3vKBBycb5UheaUL/f5SaHKA1mRvuJjm8FuLj9C
+         WVB7upUKzXAgIFsjkxN98Ug/ipda4clqARq9WKQasBuWsmCwsDzeIuJI39NgLZs/sTT+
+         dIpQ==
+X-Gm-Message-State: AOJu0YyBKM7MNtCw+0AP6/4QG3iTHelB0LXZ2wq+y5CJd3kp338DZSRx
+	5Orfh+0q7wWAS72524eGlzt9BV8rYzcJrTk5yc/RJsrEkapgPJMaevm5PSv4brwvKREa2BtZd6K
+	CQPFmjDYyfn4i9wukO/OOBQ4DODiFsvoEECL4koF1M8/WZJ32M6K1GLyE6Q==
+X-Gm-Gg: AY/fxX7aheEa1AJsTxGslGBGh+0ml3g5OoKkt+faMfZpx7PE7QdBvef8b5eIjlsYRmH
+	3xU+EtFO4joNfEd/OKVgSO/NgCmpc/rIIZgDlstqEt/Bst0ka2ZAfokDimByjDeRRFiFOXMRFpd
+	VRuuzj4Hs0O6hfu7Rvm9n4a3G5PZnkcNwnQU9tRYjAR+BiJIE8I828rtgKVkzSmheD1Rj9D0oc4
+	C+5x8F9VByjCf/ync7wnkQ9Xyzqwdxd487FA3JuKJ4X56HCNEReBlGlG8z/QJUweTCLDQFoT1I2
+	Ug9Z25qqSSL8j6reNAsWwmH4dpiNtitiAKX6fHBa1A0T1uvROnK8InwZJhUXLzonHdSTKfZYJgs
+	ouCnogrIPCzI/
+X-Received: by 2002:a05:6000:2411:b0:431:c2:c632 with SMTP id ffacd0b85a97d-432c38d22f0mr26992648f8f.57.1768314603278;
+        Tue, 13 Jan 2026 06:30:03 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH/QAVAjAHGrbVqsroQVjucumpuberxPHjIK5D6+36lcnv98Jxe8Pu+ntURZqANmPNOZ6UFhw==
+X-Received: by 2002:a05:6000:2411:b0:431:c2:c632 with SMTP id ffacd0b85a97d-432c38d22f0mr26992605f8f.57.1768314602838;
+        Tue, 13 Jan 2026 06:30:02 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.93])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5df9afsm47097191f8f.24.2026.01.13.06.30.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Jan 2026 06:30:02 -0800 (PST)
+Message-ID: <e9607915-892c-4724-b97f-7c90918f86fe@redhat.com>
+Date: Tue, 13 Jan 2026 15:30:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <252d6877-d966-4d19-a38c-cc83ba908494@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2][next] virtio_net: Fix misalignment bug in struct
+ virtnet_info
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Akihiko Odaki <akihiko.odaki@daynix.com>,
+ Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+ Kees Cook <kees@kernel.org>
+References: <aWIItWq5dV9XTTCJ@kspp>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <aWIItWq5dV9XTTCJ@kspp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 13, 2026 at 03:00:18PM +0100, Andrew Lunn wrote:
-> On Tue, Jan 13, 2026 at 03:11:54AM +0000, Daniel Golle wrote:
-> > MediaTek's Ethernet Frame Engine is tailored for use with their
-> > switches. This broke checksum and VLAN offloading when attaching a
-> > DSA switch which does not use MediaTek special tag format.
+On 1/10/26 9:07 AM, Gustavo A. R. Silva wrote:
+> Use the new TRAILING_OVERLAP() helper to fix a misalignment bug
+> along with the following warning:
 > 
-> This has been seen before. The Freescale FEC has similar problems when
-> combined with a Marvell switch, it cannot find the IP header, and so
-> checksum offloading does not work.
+> drivers/net/virtio_net.c:429:46: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
 > 
-> I thought we solved this be modifying the ndev->feature of the conduit
-> interface to disable such offloads. But i don't see such code. So i
-> must be remembering wrongly.
+> This helper creates a union between a flexible-array member (FAM)
+> and a set of members that would otherwise follow it (in this case
+> `u8 rss_hash_key_data[VIRTIO_NET_RSS_MAX_KEY_SIZE];`). This
+> overlays the trailing members (rss_hash_key_data) onto the FAM
+> (hash_key_data) while keeping the FAM and the start of MEMBERS aligned.
+> The static_assert() ensures this alignment remains.
 > 
-> This is assuming the frame engine respects these flags:
+> Notice that due to tail padding in flexible `struct
+> virtio_net_rss_config_trailer`, `rss_trailer.hash_key_data`
+> (at offset 83 in struct virtnet_info) and `rss_hash_key_data` (at
+> offset 84 in struct virtnet_info) are misaligned by one byte. See
+> below:
 > 
-> /usr/sbin/ethtool -k enp2s0
-> Features for enp2s0:
-> rx-checksumming: on
-> tx-checksumming: on
-> 	tx-checksum-ipv4: on
-> 	tx-checksum-ip-generic: off [fixed]
-> 	tx-checksum-ipv6: on
-> 	tx-checksum-fcoe-crc: off [fixed]
-> 	tx-checksum-sctp: off [fixed]
+> struct virtio_net_rss_config_trailer {
+>         __le16                     max_tx_vq;            /*     0     2 */
+>         __u8                       hash_key_length;      /*     2     1 */
+>         __u8                       hash_key_data[];      /*     3     0 */
 > 
-> When you combine a Marvell Ethernet interface with a Marvell switch
-> offloading works of course. So it probably does require some logic in
-> the MAC driver to determine if the switch is of the same vendor or
-> not.
+>         /* size: 4, cachelines: 1, members: 3 */
+>         /* padding: 1 */
+>         /* last cacheline: 4 bytes */
+> };
+> 
+> struct virtnet_info {
+> ...
+>         struct virtio_net_rss_config_trailer rss_trailer; /*    80     4 */
+> 
+>         /* XXX last struct has 1 byte of padding */
+> 
+>         u8                         rss_hash_key_data[40]; /*    84    40 */
+> ...
+>         /* size: 832, cachelines: 13, members: 48 */
+>         /* sum members: 801, holes: 8, sum holes: 31 */
+>         /* paddings: 2, sum paddings: 5 */
+> };
+> 
+> After changes, those members are correctly aligned at offset 795:
+> 
+> struct virtnet_info {
+> ...
+>         union {
+>                 struct virtio_net_rss_config_trailer rss_trailer; /*   792     4 */
+>                 struct {
+>                         unsigned char __offset_to_hash_key_data[3]; /*   792     3 */
+>                         u8         rss_hash_key_data[40]; /*   795    40 */
+>                 };                                       /*   792    43 */
+>         };                                               /*   792    44 */
+> ...
+>         /* size: 840, cachelines: 14, members: 47 */
+>         /* sum members: 801, holes: 8, sum holes: 35 */
+>         /* padding: 4 */
+>         /* paddings: 1, sum paddings: 4 */
+>         /* last cacheline: 8 bytes */
+> };
+> 
+> As a result, the RSS key passed to the device is shifted by 1
+> byte: the last byte is cut off, and instead a (possibly
+> uninitialized) byte is added at the beginning.
+> 
+> As a last note `struct virtio_net_rss_config_hdr *rss_hdr;` is also
+> moved to the end, since it seems those three members should stick
+> around together. :)
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: ed3100e90d0d ("virtio_net: Use new RSS config structs")
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> ---
+> Changes in v2:
+>  - Update subject and changelog text (include feedback from Simon and
+>    Michael --thanks folks)
+>  - Add Fixes tag and CC -stable.
 
-MediaTek folks also got back to me in a private message, confirming
-the issue and also clarifying that the length of the tag is the
-limiting factor. Every 4-byte tag can work, sizes other than 4 bytes
-cannot. As MediaTek's tag format includes the 802.1Q VLAN as part of
-the tag itself I suspect VLAN offloading will still need some extra
-care to work on non-MTK 4-byte tags (like RealTek 4B, for example)...
+@Michael, @Jason: This is still apparently targeting 'net-next', but I
+think it should land in the 'net' tree, right?
 
-> 
-> > diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> > index e68997a29191b..654b707ee27a1 100644
-> > --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> > +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> > @@ -1459,6 +1459,26 @@ static void setup_tx_buf(struct mtk_eth *eth, struct mtk_tx_buf *tx_buf,
-> >  	}
-> >  }
-> >  
-> > +static bool mtk_uses_dsa(struct net_device *dev)
-> > +{
-> > +#if IS_ENABLED(CONFIG_NET_DSA)
-> > +	return netdev_uses_dsa(dev) &&
-> > +	       dev->dsa_ptr->tag_ops->proto == DSA_TAG_PROTO_MTK;
-> > +#else
-> > +	return false;
-> > +#endif
-> 
-> I think the concept of determining if the switch is using a specific
-> tag in order to enable/disable acceleration should be generic. So i
-> would try to make this an helper in include/next/dsa.h. Any MAC driver
-> can then use it.
+/P
 
-Now that I know that the Ethernet driver should have 4 modes:
- - no DSA at all
- - DSA with MediaTek special tag
- - DSA with non-MediaTek but still 4 byte special tag
-   -> VLAN offloading needs to be figured out
- - DSA with special tag size not equal to 4 bytes
-   -> no checksum and no VLAN offloading
-
-> 
-> > @@ -1531,7 +1551,7 @@ static void mtk_tx_set_dma_desc_v2(struct net_device *dev, void *txd,
-> >  		/* tx checksum offload */
-> >  		if (info->csum)
-> >  			data |= TX_DMA_CHKSUM_V2;
-> > -		if (mtk_is_netsys_v3_or_greater(eth) && netdev_uses_dsa(dev))
-> > +		if (mtk_is_netsys_v3_or_greater(eth) && mtk_uses_dsa(dev))
-> >  			data |= TX_DMA_SPTAG_V3;
-> 
-> This looks to be in the hot path. Do you really want to do this
-> evaluation on every frame? You can change the tag protocol via sysfs,
-> however, dsa_tree_change_tag_proto() will only allow you to change the
-> tag while the conduit interface is down. So it should be safe to look
-> at the tag protocol once during open, and cache the result somewhere
-> local, struct mtk_eth? That should avoid a few cache misses.
-
-+1
-
-> 
-> > @@ -3192,6 +3212,14 @@ static netdev_features_t mtk_fix_features(struct net_device *dev,
-> >  		}
-> >  	}
-> >  
-> > +	if ((features & NETIF_F_IP_CSUM) &&
-> > +	    non_mtk_uses_dsa(dev))
-> > +		features &= ~NETIF_F_IP_CSUM;
-> > +
-> > +	if ((features & NETIF_F_IPV6_CSUM) &&
-> > +	    non_mtk_uses_dsa(dev))
-> > +		features &= ~NETIF_F_IPV6_CSUM;
-> > +
-> 
-> 
-> When is mtk_fix_features() actually called? I don't know without
-> looking at the core. You will want it when open is called, when the
-> tagging protocol is fixed.
-
-It's used as .ndo_fix_features operation, which is called by
-__netdev_update_features() at various occasions, and I'm not sure if it
-would be called as well when changing the tag protocol...
 
