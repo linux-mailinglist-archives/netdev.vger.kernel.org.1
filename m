@@ -1,149 +1,148 @@
-Return-Path: <netdev+bounces-249460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21366D19634
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:19:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D09F8D19679
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:22:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D08E8302F730
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:14:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6065830158D6
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:15:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBF5B2E1758;
-	Tue, 13 Jan 2026 14:14:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09275392B7F;
+	Tue, 13 Jan 2026 14:14:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nMUfFQoY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YauCC3HT";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="isVVI3NB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578DF392C36
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 14:13:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA36F39282A
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 14:14:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768313639; cv=none; b=fMEJZvitRfDxb48ZxVvQ9lzRznmv+pTz22OYnyMQGY6CUMRgqxB+ryAw7jFvMYf8tEL9MYHY3ssoTITdbV0kNzkrfu0C52gJIdBEv1/UyzRAd9YiPheCYzuHFvi9daFgxTGY2Upw+I5G0nKZlGSvcfTJIUwiGQOGYwNGI8u2SE8=
+	t=1768313674; cv=none; b=SAX1AkdLe6HdMI3m7KWs5zkQH1h/vzreYfXmNagj9WiBbk2rvyl1nFHhJp8MGdTNMC3uqcjOiuv97daw8Th2rHa3jKhUG8a5CmWFpuBHldm++ldQf01eutNEbXGbqboqxaZrQFihmf4YTzRw9E33YAwZhUjnXKGpw4YD5BHFGok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768313639; c=relaxed/simple;
-	bh=CKKW/gznSDOPnlhwknSKAxHfsRLSGV4Nuag72DM6Dyo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ioSL7vKRj1buUaYZNKQZ8otXCNk0W/OnqAyq71UfNrAZg9/xEXqCcSphMbE2DUwarITAe3t+l2Hrmqg/uP409acZNskykiaJ+A7n/BsMi7juZhd/HqXlvjXnhFmR8tWiE77eCmI6kKaPyqM5K8qCEJ5b+VwCvJUk9g35yMrqPC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=nMUfFQoY; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-47edffe5540so3020335e9.0
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 06:13:55 -0800 (PST)
+	s=arc-20240116; t=1768313674; c=relaxed/simple;
+	bh=aBVelbI/sMGAYMMEAE2Ew3E7aX9YWT4jgzkmVOrZRUM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=TWtohkh6AkkvkzywLKDMy8O4svdThZRur60jO3yRo9SdiiAh0CQSz3Iiskfl2bcHg+fo6qHyBmgXq/GwhDTZcUIFnwLfsATIxZsYz3a41Blk4vOH6bQK7p92uw51OK9nxEs+cEFvhuHPRt6RN4zU8Ncjszgn7axuzNtv9JUjN0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YauCC3HT; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=isVVI3NB; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768313670;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SBJmtZHikDScEfDNRwxtIPloOkwf8FJUCotz3rSZm9U=;
+	b=YauCC3HTmdzaKnKzIk02OMoM9Nmo8i99mJ7My4qCPp08Cqk4mKpQSVKXcS7ls5wn4bbrJ1
+	w/T0r7VHSaN9LG3RE6z202YtLAQY7TZxsPOOvGGEo/WdJBanLqbSb7+XYbUhqKYQH4xWqy
+	Exv15zM6jNj3LMpSu9LOy2Cbha66Igw=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-422-1NARqoIYPlyqK4XtNtibaA-1; Tue, 13 Jan 2026 09:14:29 -0500
+X-MC-Unique: 1NARqoIYPlyqK4XtNtibaA-1
+X-Mimecast-MFC-AGG-ID: 1NARqoIYPlyqK4XtNtibaA_1768313668
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4775f51ce36so69793255e9.1
+        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 06:14:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1768313634; x=1768918434; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wIl4MJEHigyP1D4DG/B4IxRmiFqSM8hzu8VMWNA8Grc=;
-        b=nMUfFQoYDK6jx3qMp5cu1uz78jp4NBTslIgEX6eavV+NvzK+ApgVmP+UN6wtR8FvNY
-         1MNKHywyzCLyTJR8uaLWWccayWXSBK0/QNUelzx6W/8wdnh/vhwGcChU7FXgk2QC03Ig
-         XJX6aNuMZPXNKW0eTaxkhK2lTIfb+q0ypxoChO72ZOqx9RZMts38cT1vFkXqmdAblOFN
-         r7W87e1FzDW4hmTzCevxCVknhrkt6/tcKnhBCy4CY4CRBlWJaiN74Nve5K5Lhrju2D2S
-         XESymgW0VFtQrG8hHSgbSxHRtAG6ND1Ig5yDyFZU0S+khHkdQ0XWqEsmQFXPL+O66CFo
-         Y66Q==
+        d=redhat.com; s=google; t=1768313668; x=1768918468; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=SBJmtZHikDScEfDNRwxtIPloOkwf8FJUCotz3rSZm9U=;
+        b=isVVI3NBGtBLzouvb/jTs1t1e8UrQRUtev6Lx0SiUK045mFXpwXZMO2RI06zltCrRe
+         XhWphegcoYy7avE9ebpRLx35SkxoKeN2OyxJEvErAjcP8v4EwRshdwqM2IYzZBaY8Wts
+         xFf1Z7FcqmzKzNLVNqFSowS5ANrB02Fo3aN5vXSAN5X6cD19DCRKW6ClQJdDtH5ghqzU
+         TbDRIVVoh9hao6Utojwbuzx2b7lamunogY7HvfHyewWbjfsa3xT7z/5lZTunv/a9Y1l4
+         cMhVs+kE52zmjQrpeZZA8h0nyJyD05rsPjTPNWUifIux5RJbJrXPSCi+4DQf6nNEKZLf
+         qxyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768313634; x=1768918434;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wIl4MJEHigyP1D4DG/B4IxRmiFqSM8hzu8VMWNA8Grc=;
-        b=Vuj2ouljhnwniiDKMeidv6JqtgUbaQkD5EDAnMLlw7QzJ4XJGrUBwmhIu9H6bOsdfN
-         Bu8FjWwedXaRpCuuKvsmfV3hT2T1Z2q35sYvdq9qd4eLTbyPOWiZtTJIqw7z+kppc1pn
-         vWWg969BZ3LOSaWpVN4hzDXh+CXo9X1XmeAHW0jyM7mg+g+tifYhJaVKA+GGjJQAfbO7
-         LEsszsuTgphXzxAoJYTxt4m6+hllIKSAciAlhiWBTP628lPVLauHELwRZ5Z5/Q8w0pP/
-         Vl3inOoogNS9GSZvChXltFR37+szge1Ka1mVV+WyHG0U/heRk6ryileYcujyVzfPNkTQ
-         3V1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWwuLzPzB1nWLDhq1NT+wB99YuPV9qTamAE+bsNRyzjGtLT3S6+DkJNsVJoytFpIaMn04gGVXc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYerRwGM6/tTjbwwbVrpw3ITEo5LFHuazcL4kQUQoCuMghS75J
-	WkDQ8WKTUF0Eu8bb/Xlyi/ft1JigMPvVztLxCHE62DgWRcj1+3xbNfZmCHsnECH1bdk=
-X-Gm-Gg: AY/fxX7b5Euc0hflMiYPytpc7LiVhpumsfcZhl2W5SLtPoT5v4a9+qdNH7Xb679icAv
-	sYE48fvUU8FESs5euted56552PRY+W30KA1rz1zsFf6WqSvqHz4VGFDqh7y8cqcTetHozqPLjWl
-	hq+spmjpPw3DnYqcVlZB/j9Rh4id9uXZShxH6AMrpR3DGbqT9m0Xo6BzgP1XD6NznjJMD6nJGOk
-	AgV0JQ2W6t5dA9Q8uVrBY1yJNN8GTQnF/k7Vfp+3/CuhHSGam6LYOKh7bAvJr1IFwafv0+N3GQx
-	1tx+/CtiH8BxJSKYN8xmCAn0WsNig5oKQ5WxxPFOUkJ10GohGL2ftJFMug8lP+8fEwGPyXU4rrA
-	0qZpCxxj7VzdNubgEv9oILkRE3pdEyHGauGbc703QSSYdT1FSTVwscm2awdsLaT6u31odJyiACV
-	UppU0UIgDg5mgE2z1W
-X-Google-Smtp-Source: AGHT+IHkyPQVUw8xs93KfcHsRE5T/d53G146wp+tXJe4SYI9ShWK2S78YZfw2MZQRgqiABbgN1Oeug==
-X-Received: by 2002:a05:6000:3104:b0:432:7068:17d with SMTP id ffacd0b85a97d-432c3775aa7mr27685504f8f.20.1768313634216;
-        Tue, 13 Jan 2026 06:13:54 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0e19bfsm44033372f8f.18.2026.01.13.06.13.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jan 2026 06:13:53 -0800 (PST)
-Date: Tue, 13 Jan 2026 17:13:32 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Jan Petrous <jan.petrous@oss.nxp.com>, Frank Li <Frank.li@nxp.com>
-Cc: s32@nxp.com, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linaro-s32@linaro.org, imx@lists.linux.dev
-Subject: [PATCH v3 2/3] dt-bindings: net: nxp,s32-dwmac: Use the GPR syscon
-Message-ID: <7662931f7cbafe29fc94c132afce07ba44b09116.1768311583.git.dan.carpenter@linaro.org>
-References: <cover.1768311583.git.dan.carpenter@linaro.org>
+        d=1e100.net; s=20230601; t=1768313668; x=1768918468;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SBJmtZHikDScEfDNRwxtIPloOkwf8FJUCotz3rSZm9U=;
+        b=RssetaV5QBZq/eeRch8ZM5b/vxSl8gD2VtVjMXQATP8rcpaCzUGmXOKdhfqfKG6oRk
+         6zpOUpDbSYs1Jktdoar9AZxNJSaYngpCDjHEbVhguolEKJNs5NcZD/MusFhPik+14SN8
+         lZwkqDqdS1EHNz8t3TkyroYHxr6aFDpHU5YAGYMuKV/MHbTixFD7SHXA147pxhtpUEVU
+         pIIEEV3fWWeo4nDBU3RXDSAmo+ycC0SOGjBi1EMSWS5eEjKyHu+K8tLSPM11YugJYKfP
+         6PlPRu/x7U76gpIpVIYeFp33VIubhZqcAs1HmvGa36Idozm2yS6S+8tP5ueoZBuqjtMC
+         4z3g==
+X-Forwarded-Encrypted: i=1; AJvYcCXu6vKLejBl+iTvN5A1tBc+m7sFUNVcun/TYVUJcEIFFLVF4w/aAzdc/EXH6DDg/a+VBa6pOOo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJMrGRO7FRt89CkTBe4Rb7ByXtuHBhurIDm2l2Jnf+XmdpIr1C
+	DhB3pLgw8OTAVkxynbrULPPNtFfHicttM7LOsPOh6J3CMmbpyO3oSfQkX1+BCa/umXcdCV3raVs
+	27Ytf+9li5lFG4VQO7FZQ1Pro8rCw29ZTsnXxM2I1jCiqpFkYfD11b6s5Bg==
+X-Gm-Gg: AY/fxX6WlutTFoh9SbjhlFLtEbYNDFm0ISvqe+2uu+ni5mmhzseo8yX8qULYen0xN+l
+	CR2MaHVtGHLfewJ8A52j/DtybqNroFZCToMtH7S+PqgfLD9c35jT/WGj7xEA+QFraupXrCfM3XR
+	ddGDMeyjdIQZ9ERIWvOsapYdEYtru3Ty9fukRpPQCqALqECW7GZw25XtA62L+AtKtoTKJb6QkE8
+	BEfUD2l6q3Mjy1TnI767ASIhNmlKVQ+FIeA4RRAz8FgK/WyA2nBaXP+ZOvKzaGJPxh1FG/qz5kG
+	0l1sD/Pbx5UPG/m0M/AeLah/vciaJPjriymtHgl4pCSkCPHkfUrg7aJUPtp25eVRbIl7HrvpWRg
+	2xw5e1xJeGzkT
+X-Received: by 2002:a05:600c:c3cd:20b0:477:af07:dd21 with SMTP id 5b1f17b1804b1-47d8a17124bmr160381915e9.25.1768313667996;
+        Tue, 13 Jan 2026 06:14:27 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFnqXP1Utpvoan26ZK//j88cBpCAw6IzGcyvoYOK6Q6IIyxoX08lXHXm3zbOQMApf4MebttCQ==
+X-Received: by 2002:a05:600c:c3cd:20b0:477:af07:dd21 with SMTP id 5b1f17b1804b1-47d8a17124bmr160381655e9.25.1768313667579;
+        Tue, 13 Jan 2026 06:14:27 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.93])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f7035f2sm390629415e9.12.2026.01.13.06.14.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Jan 2026 06:14:27 -0800 (PST)
+Message-ID: <3e3ef9d0-f1df-4568-a207-2a121ca76def@redhat.com>
+Date: Tue, 13 Jan 2026 15:14:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1768311583.git.dan.carpenter@linaro.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/3] net: gso: do not include jumbogram HBH
+ header in seglen calculation
+To: Mariusz Klimek <maklimek97@gmail.com>, netdev@vger.kernel.org
+References: <20260106095243.15105-1-maklimek97@gmail.com>
+ <20260106095243.15105-2-maklimek97@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260106095243.15105-2-maklimek97@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The S32 chipsets have a GPR region which has a miscellaneous registers
-including the GMAC_0_CTRL_STS register.  Originally, this code accessed
-that register in a sort of ad-hoc way, but it's cleaner to use a
-syscon interface to access these registers.
+On 1/6/26 10:52 AM, Mariusz Klimek wrote:
+> @@ -177,8 +178,13 @@ static unsigned int skb_gso_transport_seglen(const struct sk_buff *skb)
+>   */
+>  static unsigned int skb_gso_network_seglen(const struct sk_buff *skb)
+>  {
+> -	unsigned int hdr_len = skb_transport_header(skb) -
+> -			       skb_network_header(skb);
+> +	unsigned int off = skb_network_offset(skb) + sizeof(struct ipv6hdr);
+> +	unsigned int hdr_len = skb_network_header_len(skb);
+> +
+> +	/* Jumbogram HBH header is removed upon segmentation. */
+> +	if (skb_protocol(skb, true) == htons(ETH_P_IPV6) &&
+> +	    skb->len - off > IPV6_MAXPLEN)
+> +		hdr_len -= sizeof(struct hop_jumbo_hdr);
 
-We still need to maintain the old method of accessing the GMAC register
-but using a syscon will let us access other registers more cleanly.
+I'm sorry for splitting the feedback in multiple replies.
 
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
-v3: Better documentation about what GMAC_0_CTRL_STS register does.
-v2: Add the vendor prefix to the phandle
-    Fix the documentation
+I think the concern I expressed on v1:
 
- .../devicetree/bindings/net/nxp,s32-dwmac.yaml       | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+https://lore.kernel.org/netdev/a7b90a3a-79ed-42a4-a782-17cde1b9a2d6@redhat.com/
 
-diff --git a/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml b/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
-index 2b8b74c5feec..cc0dd3941715 100644
---- a/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
-+++ b/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
-@@ -32,6 +32,17 @@ properties:
-       - description: Main GMAC registers
-       - description: GMAC PHY mode control register
- 
-+  nxp,phy-sel:
-+    $ref: /schemas/types.yaml#/definitions/phandle-array
-+    items:
-+      - description: phandle to the GPR syscon node
-+      - description: offset of PHY selection register
-+    description:
-+      This phandle points to the GMAC_0_CTRL_STS register which controls the
-+      GMAC_0 configuration options.  The register lets you select the PHY
-+      interface and the PHY mode.  It also controls if the FTM_0 or FTM_1
-+      FlexTimer Modules connect to GMAC_O.
-+
-   interrupts:
-     maxItems: 1
- 
-@@ -74,6 +85,7 @@ examples:
-         compatible = "nxp,s32g2-dwmac";
-         reg = <0x0 0x4033c000 0x0 0x2000>, /* gmac IP */
-               <0x0 0x4007c004 0x0 0x4>;    /* GMAC_0_CTRL_STS */
-+        nxp,phy-sel = <&gpr 0x4>;
-         interrupt-parent = <&gic>;
-         interrupts = <GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>;
-         interrupt-names = "macirq";
--- 
-2.51.0
+is still not addressed here. What I fear is:
+
+- TCP cooks a plain GSO packet just below the 64K limit.
+- Such packet goes trough UDP (or gre) encapsulation, the skb->len size
+(including outer network header) grows above the 64K limit.
+- the above check is satisfied, but no jumbo hop option is present.
+
+I think you could use the `ipv6_has_hopopt_jumbo()` helper to be on the
+safe side.
+
+/P
 
 
