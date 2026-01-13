@@ -1,102 +1,136 @@
-Return-Path: <netdev+bounces-249485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 573A6D19C2B
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 16:12:24 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 029DAD19C3A
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 16:12:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 84494300533D
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:12:05 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 066C23012A99
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:12:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 588F2392832;
-	Tue, 13 Jan 2026 15:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76960381715;
+	Tue, 13 Jan 2026 15:11:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="CI+oWJf0"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02DE38FEE1;
-	Tue, 13 Jan 2026 15:11:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C3FB2EA743;
+	Tue, 13 Jan 2026 15:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768317101; cv=none; b=LKKIgD05KtHW7XSRD4JNYJNlgWI/TRcHdaYUiZylciekApoD0bmQdwvEKpK2xYuh4fRYT+rI+2k7vj5SaqdibZ/FKPTb3m3AVOBnOqYgN34541lv8A1hNzolHh88HLEi3mHPhOH/AIyPLugg7gGne+4E/dIEuCRuGojKnPq57gs=
+	t=1768317117; cv=none; b=Ju0K4LkTeRwwt7KrlEOLOcahYbWfVdSmDLOCMMFAYrZwVitZXFNBvDQumhkjLoA8hlaIiM6+I7xs7+zyvpg8WyQ7fnbsaFAK4IzXnb7WhE2RzTGT4vrXnvh1nCsXvQLfIS1AqYwm4mVevpsOaZyqLRbK1LORI9aW0fF0/IeT6PU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768317101; c=relaxed/simple;
-	bh=AWS7Xlr64jAUWbLqzrwIJU45griMgDUfS/i7tmMdgu0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GIcz9H3KJgmcQYwhc/WKCM/+Bcn+CORtPzm5ka7fuLp+cY91Pev7ZSLmYWcTlEwdCNnAP6zBGPDRIv086JaVI/765JgZUnun7wZNuqIUeDgAQgQtOS3dF21RPStRWw5dcUXf7Pw4y3sObu1mA6ZCDaFLeL1xYzuTxnqypPSEaoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 4C9F96035A; Tue, 13 Jan 2026 16:11:35 +0100 (CET)
-Date: Tue, 13 Jan 2026 16:11:30 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>, Phil Sutter <phil@nwl.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
-	Shuah Khan <shuah@kernel.org>, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH nf-next v2 1/4] netfilter: Introduce tunnel metadata info
- in nf_flowtable_ctx struct
-Message-ID: <aWZgos3epThP36en@strlen.de>
-References: <20251209-b4-flowtable-offload-ip6ip6-v2-0-44817f1be5c6@kernel.org>
- <20251209-b4-flowtable-offload-ip6ip6-v2-1-44817f1be5c6@kernel.org>
+	s=arc-20240116; t=1768317117; c=relaxed/simple;
+	bh=hx7AqJD3qv9gfYaKs+593kiJFrdJtZyUf80B12a0amk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=epYsFD3bPQyNrv+m2YL3Zp/ZzhUXvt9+mB9dgI1kPEjhwlqPgBVvK3Ye4RXhtMUVykh1LqDurKimyzd9jlbuMiXJbMkMWKjYAs9c8dQVkTDoJyof9uowN5+aqecnYQZggnd8p7pMBorS6Uzyg158fR2o4b4PhR75M4stDUNl9eA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=CI+oWJf0; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1vfg3j-00GGMD-D0; Tue, 13 Jan 2026 16:11:51 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=1hHdeBqT1SYDsAZ2LmaivRkI41scFYVMHnCQzatSUk0=; b=CI+oWJf05SwV7jhnCaW7k7gABT
+	qxVNCxGtOCUx4Mke4CP+G4yuHaLOTKzMi/LRhRT6NNNlzR/i7LOD0r+1j1TtuEKvsVI5T1TMO4hBF
+	rmhyqW+uk/6voTHvGvWSk4cn5IaVxmQmmOy41ufnOeGPnDRit0Dd/uMw+qAYBwNCik9bU1fsKLM9h
+	kWDthD/gdyWwpzOG45TPuyTISMB+obB45/LfQdiBvTDYt8Xo6jtwzqnAGxW80Cxz1iMfyHDqbauaF
+	IF7ltuGvxFEbrl2vKzATcNY4/fodLaTGsZcs20CGDd+hyDCxmfnN7Y2B53KLUGhxTfKMYwZeJjPlx
+	mSOvHL1A==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1vfg3i-0008Bn-TX; Tue, 13 Jan 2026 16:11:51 +0100
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1vfg3S-00D7GU-TT; Tue, 13 Jan 2026 16:11:35 +0100
+Message-ID: <e16c6062-ca32-4c78-bb97-5860c28102fd@rbox.co>
+Date: Tue, 13 Jan 2026 16:11:33 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251209-b4-flowtable-offload-ip6ip6-v2-1-44817f1be5c6@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] vsock/test: Add test for a linear and non-linear skb
+ getting coalesced
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Arseniy Krasnov <avkrasnov@salutedevices.com>, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260108-vsock-recv-coalescence-v1-0-26f97bb9a99b@rbox.co>
+ <20260108-vsock-recv-coalescence-v1-2-26f97bb9a99b@rbox.co>
+ <aWEqjjE1vb_t35lQ@sgarzare-redhat>
+ <76ca0c9f-dcda-4a53-ac1f-c5c28d1ecf44@rbox.co>
+ <aWT6EH8oWpw-ADtm@sgarzare-redhat>
+ <080d7ae8-e184-4af8-bd72-765bb30b63a5@rbox.co>
+ <aWUk0axv-GZu7VD2@sgarzare-redhat>
+ <0b15644b-9394-4734-9c0e-0a6d1355604a@rbox.co>
+ <aWYQRK-fRHOqQNc8@sgarzare-redhat>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <aWYQRK-fRHOqQNc8@sgarzare-redhat>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Lorenzo Bianconi <lorenzo@kernel.org> wrote:
-> This is a preliminary patch to introduce IP6IP6 flowtable acceleration.
-
-Would you mind extending this a little bit?
-AFAICS this prepares for IP6IP6 by removing the 'its ipv4'
-assumptions resp. adding needed 'its ipv4' checks:
-no ipv6 support is added here.
-
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->  net/netfilter/nf_flow_table_ip.c | 80 ++++++++++++++++++++++------------------
->  1 file changed, 44 insertions(+), 36 deletions(-)
+On 1/13/26 10:36, Stefano Garzarella wrote:
+> On Mon, Jan 12, 2026 at 10:20:50PM +0100, Michal Luczaj wrote:
+>> On 1/12/26 17:48, Stefano Garzarella wrote:
+>>>>>>>> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>>>>>>>> index bbe3723babdc..21c8616100f1 100644
+>>>>>>>> --- a/tools/testing/vsock/vsock_test.c
+>>>>>>>> +++ b/tools/testing/vsock/vsock_test.c
+>>>>>>>> @@ -2403,6 +2403,11 @@ static struct test_case test_cases[] = {
+>>>>>>>> 		.run_client = test_stream_accepted_setsockopt_client,
+>>>>>>>> 		.run_server = test_stream_accepted_setsockopt_server,
+>>>>>>>> 	},
+>>>>>>>> +	{
+>>>>>>>> +		.name = "SOCK_STREAM MSG_ZEROCOPY coalescence corruption",
+>>>>>>>
+>>>>>>> This is essentially a regression test for virtio transport, so I'd add
+>>>>>>> virtio in the test name.
+>>>>>>
+>>>>>> Isn't virtio transport unaffected? It's about loopback transport (that
+>>>>>> shares common code with virtio transport).
+>>>>>
+>>>>> Why virtio transport is not affected?
+>>>>
+>>>> With the usual caveat that I may be completely missing something, aren't
+>>>> all virtio-transport's rx skbs linear? See virtio_vsock_alloc_linear_skb()
+>>>> in virtio_vsock_rx_fill().
+>>>>
+>>>
+>>> True, but what about drivers/vhost/vsock.c ?
+>>>
+>>> IIUC in vhost_vsock_handle_tx_kick() we call vhost_vsock_alloc_skb(),
+>>> that calls virtio_vsock_alloc_skb() and pass that skb to
+>>> virtio_transport_recv_pkt(). So, it's also affected right?
+>>
+>> virtio_vsock_alloc_skb() returns a non-linear skb only if size >
+>> SKB_WITH_OVERHEAD(PAGE_SIZE << PAGE_ALLOC_COSTLY_ORDER)). And that is way
+>> more than GOOD_COPY_LEN, so we're good.
+>>
+>> At least until someone increases GOOD_COPY_LEN and/or reduces the size
+>> condition for non-linear allocation. So, yeah, a bit brittle.
 > 
-> diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
-> index e128b0fe9a7bf50b458df9940d629ea08c521871..14c01b59f76569170057d2465ee5953efb557bcc 100644
-> --- a/net/netfilter/nf_flow_table_ip.c
-> +++ b/net/netfilter/nf_flow_table_ip.c
-> @@ -142,7 +142,18 @@ static bool ip_has_options(unsigned int thoff)
->  	return thoff != sizeof(struct iphdr);
->  }
->  
-> -static void nf_flow_tuple_encap(struct sk_buff *skb,
-> +struct nf_flowtable_ctx {
-> +	const struct net_device	*in;
-> +	u32			offset;
-> +	u32			hdrsize;
-> +	struct {
-> +		u32 offset;
-> +		u8 proto;
-> +	} tun;
-> +};
+> I see, thanks for clarify. So please add all of this conclusions in the 
+> patch 1 description to make it clear that only loopback is affected, so 
+> no guest/host attack is possible. (not really severe CVE)
 
-Could you add comments for the members here?
+OK, here's v2:
+https://lore.kernel.org/netdev/20260113-vsock-recv-coalescence-v2-0-552b17837cf4@rbox.co/
 
-In particular, we now have @offset and @tun.offset.
-
-I can guess that the offset is the start of the inner
-ip header and tun.offset is the start of the header
-following the inner ip header.
-
-This patch would perhaps be easier to review if the
-pure move of the ctx structure and passing the extra
-'ctx' arg would be in a separate patch.
 
