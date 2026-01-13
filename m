@@ -1,135 +1,144 @@
-Return-Path: <netdev+bounces-249611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14CF3D1B869
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 23:03:46 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EC73D1B893
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 23:06:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 45CD0305BCC8
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:02:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3DA593013D78
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:06:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA9B352F85;
-	Tue, 13 Jan 2026 22:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DE7734FF46;
+	Tue, 13 Jan 2026 22:06:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hvDdG3Ar"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kIY8zUy9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332AF354ADF
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 22:02:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA6326ED37;
+	Tue, 13 Jan 2026 22:06:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768341756; cv=none; b=daeahdt9AmBRvMkVReY0etVYuOTgCWgdmmJh8ay81Ij//PvAijE7cpYHIxK9ncrHeJ5CA9tRw0OijiuAxjtk8S2W4PkJ4IaAiVsjF6WZl66ZxuXQs/OAlR0MQ5ACQrPBHsUudzQralqJW5+d0GtJ+8jvW4Wdz16S+3QqpWoWne4=
+	t=1768342001; cv=none; b=Yju2tlKoAgEIjpMkrK7wx9J2N7IHhj/uOaraFGZgwEmimY9aQMj1UuXNxf4+su5WMW5SRZwroD1tCh7vStge9hBMhiOxDwQsiz+j32zVGTGgWP/CzjvP0adCjlLe+kdqFe779rKf5AwbKYikLrWQm3WiwThUU8eyKgCG028s5UI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768341756; c=relaxed/simple;
-	bh=O30zNuUgcXWpAZnP8awUzRYoPOQwiv79rAPaCfxgXHQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Mx2usiGCzIOiT8tpHCyqDou0vGMumTc9i/pfrri2XnN+wfxUh8Pzw805He9t3pKh6P7mbkZ1MPaPGH9dknZ8W2wREATG+yMXl8e6WwbT+5YribrVS8S5MB91GkpVx8gQaWBftnUMzqFjYm7kOsEJwYocBpZTsWRyPiNNnI7FNr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hvDdG3Ar; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768341756; x=1799877756;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=O30zNuUgcXWpAZnP8awUzRYoPOQwiv79rAPaCfxgXHQ=;
-  b=hvDdG3Ar6+Hx42sL93ixWTkuXwdDzDn5+QWgCRUt4aVPSdSGb5mAYa1i
-   6wKRgFBkqcPrYh3buWHgJjvnpnpEHMN3tRobFeldMVVgUKsnDuE4m1Lo6
-   o34PfYORb3sMshCQXvdsMF3MrnfW2iQ/Q00qeMlDaPFpOhihAsLEFVn92
-   yyOQ6ckrXDVWuaWlagcjTr8saEEh/OXdANrVFomdYaa/BlYyYZ1N9Q5So
-   duTYSRBVmqc61tLWmfZRZAOtb/x14fmljzHlQxLk4hKHNyPbLi5onQO8Z
-   YQoDmE055mBgPH2e8aB/E9zF64L5XDTQKN29z8vssM2k/cmPTWUG3QhBI
-   w==;
-X-CSE-ConnectionGUID: uSQmuG2NQgCT5opPHrQdng==
-X-CSE-MsgGUID: T0ZIbJCzR9enWFvdlVLrfQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11670"; a="69558700"
-X-IronPort-AV: E=Sophos;i="6.21,224,1763452800"; 
-   d="scan'208";a="69558700"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2026 14:02:30 -0800
-X-CSE-ConnectionGUID: aj/DVSmGTEOHLFSI6BXs/g==
-X-CSE-MsgGUID: xtLdutRgRD6ClxnIiBTAvg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,224,1763452800"; 
-   d="scan'208";a="204388190"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa006.fm.intel.com with ESMTP; 13 Jan 2026 14:02:29 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Chwee-Lin Choong <chwee.lin.choong@intel.com>,
-	anthony.l.nguyen@intel.com,
-	vinicius.gomes@intel.com,
-	vitaly.lifshits@intel.com,
-	dima.ruinskiy@intel.com,
-	faizal.abdul.rahim@linux.intel.com,
-	richardcochran@gmail.com,
-	Zdenek Bouska <zdenek.bouska@siemens.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Simon Horman <horms@kernel.org>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Avigail Dahan <avigailx.dahan@intel.com>
-Subject: [PATCH net 6/6] igc: Reduce TSN TX packet buffer from 7KB to 5KB per queue
-Date: Tue, 13 Jan 2026 14:02:19 -0800
-Message-ID: <20260113220220.1034638-7-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20260113220220.1034638-1-anthony.l.nguyen@intel.com>
-References: <20260113220220.1034638-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1768342001; c=relaxed/simple;
+	bh=LsQ80Nt6Qk+bvf75Ia6NSgSazOOzop19Sk4/CGy3YPk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FBGh41ry7BZWQImFUuQa74CNNBF/4OjFTJIWWC7HV08SCBafMvnfmqAlRvw/60/9Ac/+/nJeAokSSZUolN6Ql8arZaKO2e7mZPBp8scRGx1D6ZtdKRoiYgI2TaaOOvwZIZlweWKqLzIN22AR/g7nZOzNg74LWEMEU7P2otBpEuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kIY8zUy9; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=oBM2ZoOF22ddiLW29uUZvDBCanemUcQlDXTvmAcjlq4=; b=kI
+	Y8zUy97+/X5jNowUufRNGBEkL5lckHnRZAeGH2ky7o8DY2gnk+V1zKaO95hqWEgDAg40w523H3J+c
+	+cBn8rp7OJQD/Z+CBIQkEsT1pZZgZ0TM2oaYWUL7T5O8Q6hif/olvCQyS1uUtoDXmW//efHVd6A5l
+	wb+967zbnQezKGU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vfmWA-002hQ8-MR; Tue, 13 Jan 2026 23:05:38 +0100
+Date: Tue, 13 Jan 2026 23:05:38 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Bartosz Golaszewski <brgl@kernel.org>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>, Chen-Yu Tsai <wens@kernel.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Matthew Gerlach <matthew.gerlach@altera.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Keguang Zhang <keguang.zhang@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Jan Petrous <jan.petrous@oss.nxp.com>, s32@nxp.com,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Chen Wang <unicorn_wang@outlook.com>,
+	Inochi Amaoto <inochiama@gmail.com>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	Drew Fustini <fustini@kernel.org>, Guo Ren <guoren@kernel.org>,
+	Fu Wei <wefu@redhat.com>,
+	Nobuhiro Iwamatsu <nobuhiro.iwamatsu.x90@mail.toshiba>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Shuang Liang <liangshuang@eswincomputing.com>,
+	Zhi Li <lizhi2@eswincomputing.com>,
+	Shangjuan Wei <weishangjuan@eswincomputing.com>,
+	"G. Jaya Kumaran" <vineetha.g.jaya.kumaran@intel.com>,
+	Clark Wang <xiaoning.wang@nxp.com>, Linux Team <linux-imx@nxp.com>,
+	Frank Li <Frank.Li@nxp.com>, David Wu <david.wu@rock-chips.com>,
+	Samin Guo <samin.guo@starfivetech.com>,
+	Christophe Roullier <christophe.roullier@foss.st.com>,
+	Swathi K S <swathi.ks@samsung.com>, linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Drew Fustini <dfustini@tenstorrent.com>,
+	linux-sunxi@lists.linux.dev, linux-amlogic@lists.infradead.org,
+	linux-mips@vger.kernel.org, imx@lists.linux.dev,
+	linux-renesas-soc@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, sophgo@lists.linux.dev,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH RESEND net-next v6 2/7] net: stmmac: qcom-ethqos: use
+ generic device properties
+Message-ID: <7865a1fb-91bb-4aec-ab3a-b53050d992e8@lunn.ch>
+References: <20260112-qcom-sa8255p-emac-v6-0-86a3d4b2ad83@oss.qualcomm.com>
+ <20260112-qcom-sa8255p-emac-v6-2-86a3d4b2ad83@oss.qualcomm.com>
+ <a2a610a3-aead-4e85-8a4c-7b83ccf276dc@lunn.ch>
+ <CAMRc=Mf8TTTcU9A3gc_LQF3Ow6Ww0omVJH6x-DQEnOSPXfaUQw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMRc=Mf8TTTcU9A3gc_LQF3Ow6Ww0omVJH6x-DQEnOSPXfaUQw@mail.gmail.com>
 
-From: Chwee-Lin Choong <chwee.lin.choong@intel.com>
+On Tue, Jan 13, 2026 at 01:36:53PM +0100, Bartosz Golaszewski wrote:
+> On Mon, Jan 12, 2026 at 2:45 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> >
+> > On Mon, Jan 12, 2026 at 11:15:41AM +0100, Bartosz Golaszewski wrote:
+> > > From: Bartosz Golaszewski <brgl@kernel.org>
+> > >
+> > > In order to drop the dependency on CONFIG_OF, convert all device property
+> > > getters from OF-specific to generic device properties and stop pulling
+> > > in any linux/of.h symbols.
+> >
+> > Is the intention to read these properties from ACPI tables?
+> >
+> 
+> No. Other than a couple property getters which can use the fwnode
+> abstraction, there's nothing here that requires the OF dependence.
 
-The previous 7 KB per queue caused TX unit hangs under heavy
-timestamping load. Reducing to 5 KB avoids these hangs and matches
-the TSN recommendation in I225/I226 SW User Manual Section 7.5.4.
+So what is the need for not using OF? Why do you want this patch?
 
-The 8 KB "freed" by this change is currently unused. This reduction
-is not expected to impact throughput, as the i226 is PCIe-limited
-for small TSN packets rather than TX-buffer-limited.
-
-Fixes: 0d58cdc902da ("igc: optimize TX packet buffer utilization for TSN mode")
-Reported-by: Zdenek Bouska <zdenek.bouska@siemens.com>
-Closes: https://lore.kernel.org/netdev/AS1PR10MB5675DBFE7CE5F2A9336ABFA4EBEAA@AS1PR10MB5675.EURPRD10.PROD.OUTLOOK.COM/
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Chwee-Lin Choong <chwee.lin.choong@intel.com>
-Tested-by: Avigail Dahan <avigailx.dahan@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/igc/igc_defines.h | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/igc/igc_defines.h b/drivers/net/ethernet/intel/igc/igc_defines.h
-index 498ba1522ca4..9482ab11f050 100644
---- a/drivers/net/ethernet/intel/igc/igc_defines.h
-+++ b/drivers/net/ethernet/intel/igc/igc_defines.h
-@@ -443,9 +443,10 @@
- #define IGC_TXPBSIZE_DEFAULT ( \
- 	IGC_TXPB0SIZE(20) | IGC_TXPB1SIZE(0) | IGC_TXPB2SIZE(0) | \
- 	IGC_TXPB3SIZE(0) | IGC_OS2BMCPBSIZE(4))
-+/* TSN value following I225/I226 SW User Manual Section 7.5.4 */
- #define IGC_TXPBSIZE_TSN ( \
--	IGC_TXPB0SIZE(7) | IGC_TXPB1SIZE(7) | IGC_TXPB2SIZE(7) | \
--	IGC_TXPB3SIZE(7) | IGC_OS2BMCPBSIZE(4))
-+	IGC_TXPB0SIZE(5) | IGC_TXPB1SIZE(5) | IGC_TXPB2SIZE(5) | \
-+	IGC_TXPB3SIZE(5) | IGC_OS2BMCPBSIZE(4))
- 
- #define IGC_DTXMXPKTSZ_TSN	0x19 /* 1600 bytes of max TX DMA packet size */
- #define IGC_DTXMXPKTSZ_DEFAULT	0x98 /* 9728-byte Jumbo frames */
--- 
-2.47.1
-
+    Andrew
 
