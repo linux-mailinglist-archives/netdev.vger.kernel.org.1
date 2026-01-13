@@ -1,281 +1,127 @@
-Return-Path: <netdev+bounces-249577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AC03D1B26D
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 21:09:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D622D1B293
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 21:11:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 141B530133FF
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 20:09:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8FEE630393CF
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 20:10:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23D5B36E48A;
-	Tue, 13 Jan 2026 20:09:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 223E036A027;
+	Tue, 13 Jan 2026 20:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="zIz8nYJt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dgcf9VMx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D251C318EC5
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 20:09:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B024B3191D0
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 20:10:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768334995; cv=none; b=ZdxbbhDfOy2FGRlsbywt7K1Odew+vpsG4T2XZI/LTrJYlDpQqxucVHggoMKTMDb4js6ZwiBwCgbxboqhKoDBJGvYkxrRiIXtLRPJ2Phg9GvC+8R78Hop5VNz5nY8T+bkLeB4snoATUgik9RyAa8FUKhiztVWcv+FfLoZdeinfJ4=
+	t=1768335026; cv=none; b=kltke2XimyuN/u3ThoLLcryaWTjxBJkzYkPFZqB9wnDAd1UoEE+7oPFJRre/7LxHzQIArxEcpbIg0U2jSxGkKsdo/tXoEvSReJrw25LuJUhM3VjlqqQAokhGj6xs9KZgMC6mbUq3FDRuRBB9mlsqBL1jNiyRtRCj+avIQGcJEWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768334995; c=relaxed/simple;
-	bh=pyMp5oFQEzQGlgpWodh5m5sUhmJKSJMmcF9EpqTle4o=;
+	s=arc-20240116; t=1768335026; c=relaxed/simple;
+	bh=PISqowe2c+4RDD8+Y4LJYF6tRP/gV/zX+U5Yg9psxTc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ixXeueN/SEFzSezfOCIJqo/jqAmNd0SsohAtbUvo8qMisjsAnZYZuj8AFiHkzxMioz0p/KVnmfEn/U6RHyuEwGRPVyX+dzhDFmZnE3DRyt1IdqGq30wWUHV9+XTQ+E7xrNPq1C42UhEKexSZP44+gaODLJREiahvU1tfQzRgxYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=zIz8nYJt; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-b86f212c3b0so31517366b.0
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 12:09:52 -0800 (PST)
+	 To:Cc:Content-Type; b=L9jxtQ2TQJjJTAVrLKULqloLcdbCVsrdD0MLZrD0ADOwnGUnHny99J6Eas3iPDMs8mXYgRknokxFHLHWoiLN4X//SLWMWKUzwZR+bhgwRERPZq542jBgBjIzFERv8BioYfQ72nKdqYAeZ4+W2GW5V6PKyvev3YxwPVvofAYQPfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dgcf9VMx; arc=none smtp.client-ip=209.85.222.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-944199736ebso2431092241.2
+        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 12:10:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1768334991; x=1768939791; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1768335024; x=1768939824; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=X3PB19UpbesWMeT0R3+l59gQeDUb0GCMAUDX3FFcChs=;
-        b=zIz8nYJtuj84rCwrR4h2rYUNtQy0kQi3Vs6Pa4eyUFvYBSmR3JdcK91Z5LcbNLJJbd
-         KBv1zpWpctONSZSIZfox4XBRJ3RoOniV3X3ufcycnUMgiQws9qL2iJTLfcYz/6ywcGtF
-         IEbL5rTF894Idp+8ULCgygVGYo7r2T+AndIh1IP7v3vgatT1IQO43J17idGJA2xunR2Y
-         7fJ9k/8LfGQoxc/GCDnq0d/fOOs+esgxOp4GdBC/tXJBsPbMEB8jlL/iIMNJVyMCIozF
-         aMqv/iMccUIy3JOOqaYhzVETvgeYFGAbN22kE3vQ40Dtdd6YFQhBIm6KtULuMQfYbl9n
-         eBaQ==
+        bh=PISqowe2c+4RDD8+Y4LJYF6tRP/gV/zX+U5Yg9psxTc=;
+        b=dgcf9VMxJ1/K4XNYip4IbzCvlRr6ktVMJYXp0hHpj8rc0xkbkik/EF/fkOUesDZqa7
+         YDaNdIFLvRQmYZvK6dIltZzTb8gP9DP+xotlr1eudJfLMGbpEXiM1onTNpnCj4TGH1yk
+         X0Z5SDx2KNFBDMP7JUTEsupinwNxlN4XBuOM2LUmUlweWPSWaDDI2IU5fvjUJwjlC36j
+         SPGt2VKPH//Mtf3D1/WqPzZaxkQBvZNfiTngKHek8Zc7Jw/b/zbjVGVUNZSObY32cQXN
+         GAshSYG7Z0y0oUU8Sx0UousG9sHKg05k0wmke751o0uv0vZdnVV1ELyzLdby4jluV2dq
+         2UaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768334991; x=1768939791;
+        d=1e100.net; s=20230601; t=1768335024; x=1768939824;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=X3PB19UpbesWMeT0R3+l59gQeDUb0GCMAUDX3FFcChs=;
-        b=jztLuxD1dmWq6Qsh73dHon6tEwqxKIhdmnkRuCHr8tLG38Mcr/aJoFj3FeL/sJz0HP
-         KTDsEqtJ6bjZbzLCbW89dsQoDL2+E8F9xFDPMJ3dCMiN1y3FeGXCoxcSxFHk1x490fAJ
-         V4foxg3/feIaocd+o3WmuPnpdlkO5bXD0XU1GonHmUJmUee7YVjTuirHWNefoKDl57bo
-         WaHE6vFD6g44JJ/V436aQxNL9yT+O5G+3H4qukFrpIKY2Fu4vmMZ9kpvieg1ZFj6Adxh
-         /nmr57nuO2dQEk/O+c7Psb7lUDjBcEsPjpsi3mV3LQH9DMYcWITwBFU8cZ/W/xH28Nvs
-         MxlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVXUaD4mbIGLuND4rUIdDzUmyMa0DJ8i/bdKSbE4QELQxPVA+bzK4LAnhWGP2kCXHGhDTkWkk0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxvs0M3j2K/A6gjThSUIPaUD5WOXwGjchbqpfd/nJTDk5MQwG8o
-	DqpxQ8UrRpFmP5jkFTl9aZfglILCcwAuMtypxYXzx5VYI1vrQQINeTsz6ijOfO936zqHeQDAYkY
-	MON5m+VaE2oWaDEP0i+hg6dwbAQS0Fq4i/huIY4gqiw==
-X-Gm-Gg: AY/fxX5fSay+W7gaSroqvsEsG3fqiGUgyIF6ZFYVY+WjaPn4tYZGWrzD3epyU677Kjm
-	/Jai1FKccv/o7MgeJ7JCMQR60ZY2SFEoeCINapRlwZHnyKjWxWjdRIRSU7hr2iJwN/sn8UjWa6t
-	uaQdc+nv+E7G+UEbX8Wl8czwifz3LHIsb+v7H3PJuIOic92900n9aSvuXpx67bHuLJVYomZORIq
-	L7lJs6wynF9Wrfwpe1Jm7fTWAt2cJNFhR7cf+qg3CrqW2WXTQPiX6hMyK58QYYEkreyhS++Dr/Y
-	yiDSPgS9aLPvR3X+c0NFbsZ/F2AOsXeBasUW4Uo0y64edjhtddA/7rnj64ew
-X-Received: by 2002:a17:907:9483:b0:b87:191f:4fab with SMTP id
- a640c23a62f3a-b8761d928b1mr18947166b.26.1768334991113; Tue, 13 Jan 2026
- 12:09:51 -0800 (PST)
+        bh=PISqowe2c+4RDD8+Y4LJYF6tRP/gV/zX+U5Yg9psxTc=;
+        b=hjjarE8VqJH+tQNwHFJFW0XuYb4iCYNK70Bs3YUrzlQ+FFjZ64aknY/5qHo5+IhZvR
+         fAwFdHCYgUP8Q5O7o6mxJr0S7+nUhU3DEcmX/PVNXAwnKVDQ+OCuv7qXFSBGo/K80/du
+         2Syr/M7SgEVNH9wvLaT9bwURuctXLqgbucxLPGkfGn1kv//1Dp0Ddg+Rf6Hy+QKGREqn
+         EsDoYCLcAUSEwDg+nORrUMcqK8zb47V8vRzb1nFTVXlGUt23F3umKBrY/SKEF3J/1+fa
+         P6sN9H5EnVMkPb4fPi9N3bw4sai6G/ZVGEJfChzUi/0UuzY13TeoqY0VmtP5W6oCJIz8
+         h+XA==
+X-Forwarded-Encrypted: i=1; AJvYcCXPhE8nlK+uKtaNZu4NzHvAIS0rBjVMnc/wImdyc0ht+2bqUwK9Y0QP56iwL+37xCpO2rFZUgY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqY2GLnHLXHkuAIfEmCclEOSkxWrCPNUllO/uyHFr0LqJ5jizI
+	Se7/tOSnXhJuwBfp30yT+T5i0ZScxZdK8EGe/SMluXIAagOh+6jcshHqNx8HeHI0+c1dEh7BKc3
+	ivNfNB6iSnTixuB54gQQcv/xEA2W0Khc=
+X-Gm-Gg: AY/fxX6Kp7Diql8m1we4dxKaDt0yLORROLOnn7gDNNglImQnkDLaDZlKhwQZq0IUd7q
+	KpsVr4hr7cBJoRrgGI9Q9g3vOYxcOneapaRbFr1OTCaCbANVHLfWJSK6a2DsNibrsh0BlbS4OSH
+	RSlzQYHpkm1IJrmQ+PQBmkWv+MHE/2DAxgMjkHHycCiLZ4W2To3rwh+zPpqa5EIFXMh3tV3Un5r
+	lgdyMH58h8amVKWnzhgr3crFTSFdeqcaACiCur4aRMEh+HdlFz1qxm26UvskjORtm6VtTBglzvz
+	8cRw4dlRTGdZKROtgYrjnsuzkn2U
+X-Received: by 2002:a05:6102:292b:b0:5ef:a247:4749 with SMTP id
+ ada2fe7eead31-5f17f584f40mr196449137.23.1768335023609; Tue, 13 Jan 2026
+ 12:10:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251229184004.571837-1-robert.marko@sartura.hr>
- <20251229184004.571837-16-robert.marko@sartura.hr> <858ca139-61c5-45e3-a2c9-d0af414e3592@tuxon.dev>
-In-Reply-To: <858ca139-61c5-45e3-a2c9-d0af414e3592@tuxon.dev>
-From: Robert Marko <robert.marko@sartura.hr>
-Date: Tue, 13 Jan 2026 21:09:40 +0100
-X-Gm-Features: AZwV_QhCSNrQ25JXSm6moAYHvYjCfUUDQoR1FC1MV_mP0oSiXaM4vWsMWx6MKV0
-Message-ID: <CA+HBbNFYBhtvUxd45O7eP_1JYENxeGZOkA+yUsEdztOSSi9Gdg@mail.gmail.com>
-Subject: Re: [PATCH v4 15/15] arm64: dts: microchip: add EV23X71A board
-To: claudiu beznea <claudiu.beznea@tuxon.dev>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
-	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org, 
-	andi.shyti@kernel.org, lee@kernel.org, andrew+netdev@lunn.ch, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, linusw@kernel.org, 
-	Steen.Hegelund@microchip.com, daniel.machon@microchip.com, 
-	UNGLinuxDriver@microchip.com, olivia@selenic.com, radu_nicolae.pirea@upb.ro, 
-	richard.genoud@bootlin.com, gregkh@linuxfoundation.org, jirislaby@kernel.org, 
-	broonie@kernel.org, lars.povlsen@microchip.com, devicetree@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, netdev@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-spi@vger.kernel.org, linux-serial@vger.kernel.org, 
-	linux-usb@vger.kernel.org, luka.perkov@sartura.hr
+References: <20260111163947.811248-1-jhs@mojatatu.com>
+In-Reply-To: <20260111163947.811248-1-jhs@mojatatu.com>
+From: Cong Wang <xiyou.wangcong@gmail.com>
+Date: Tue, 13 Jan 2026 12:10:12 -0800
+X-Gm-Features: AZwV_Qh110CfAjqIeJ9pDoXr3a--Err3wGqCF4LHns3UhhlVCEjcOsKHE3kYvJQ
+Message-ID: <CAM_iQpXXiOj=+jbZbmcth06-46LoU_XQd5-NuusaRdJn-80_HQ@mail.gmail.com>
+Subject: Re: [PATCH net 0/6] net/sched: Fix packet loops in mirred and netem
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, andrew+netdev@lunn.ch, 
+	netdev@vger.kernel.org, jiri@resnulli.us, victor@mojatatu.com, 
+	dcaratti@redhat.com, lariel@nvidia.com, daniel@iogearbox.net, 
+	pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de, phil@nwl.cc, 
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	zyc199902@zohomail.cn, lrGerlinde@mailfence.com, jschung2@proton.me
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jan 11, 2026 at 3:42=E2=80=AFPM claudiu beznea <claudiu.beznea@tuxo=
-n.dev> wrote:
+On Sun, Jan 11, 2026 at 8:40=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
 >
-> Hi, Robert,
 >
-> On 12/29/25 20:37, Robert Marko wrote:
-> > Microchip EV23X71A is an LAN9696 based evaluation board.
-> >
-> > Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-> > ---
-> > Changes in v2:
-> > * Split from SoC DTSI commit
-> > * Apply DTS coding style
-> > * Enclose array in i2c-mux
-> > * Alphanumericaly sort nodes
-> > * Change management port mode to RGMII-ID
-> >
-> >   arch/arm64/boot/dts/microchip/Makefile        |   1 +
-> >   .../boot/dts/microchip/lan9696-ev23x71a.dts   | 757 +++++++++++++++++=
-+
-> >   2 files changed, 758 insertions(+)
-> >   create mode 100644 arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dts
-> >
-> > diff --git a/arch/arm64/boot/dts/microchip/Makefile b/arch/arm64/boot/d=
-ts/microchip/Makefile
-> > index c6e0313eea0f..09d16fc1ce9a 100644
-> > --- a/arch/arm64/boot/dts/microchip/Makefile
-> > +++ b/arch/arm64/boot/dts/microchip/Makefile
-> > @@ -1,4 +1,5 @@
-> >   # SPDX-License-Identifier: GPL-2.0
-> > +dtb-$(CONFIG_ARCH_LAN969X) +=3D lan9696-ev23x71a.dtb
-> >   dtb-$(CONFIG_ARCH_SPARX5) +=3D sparx5_pcb125.dtb
-> >   dtb-$(CONFIG_ARCH_SPARX5) +=3D sparx5_pcb134.dtb sparx5_pcb134_emmc.d=
-tb
-> >   dtb-$(CONFIG_ARCH_SPARX5) +=3D sparx5_pcb135.dtb sparx5_pcb135_emmc.d=
-tb
-> > diff --git a/arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dts b/arch/=
-arm64/boot/dts/microchip/lan9696-ev23x71a.dts
-> > new file mode 100644
-> > index 000000000000..435df455b078
-> > --- /dev/null
-> > +++ b/arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dts
->
-> [ ...]
->
-> > +&gpio {
-> > +     emmc_sd_pins: emmc-sd-pins {
-> > +             /* eMMC_SD - CMD, CLK, D0, D1, D2, D3, D4, D5, D6, D7, RS=
-TN */
-> > +             pins =3D "GPIO_14", "GPIO_15", "GPIO_16", "GPIO_17",
-> > +                    "GPIO_18", "GPIO_19", "GPIO_20", "GPIO_21",
-> > +                    "GPIO_22", "GPIO_23", "GPIO_24";
-> > +             function =3D "emmc_sd";
-> > +     };
-> > +
-> > +     fan_pins: fan-pins {
-> > +             pins =3D "GPIO_25", "GPIO_26";
-> > +             function =3D "fan";
-> > +     };
-> > +
-> > +     fc0_pins: fc0-pins {
-> > +             pins =3D "GPIO_3", "GPIO_4";
-> > +             function =3D "fc";
-> > +     };
-> > +
-> > +     fc2_pins: fc2-pins {
-> > +             pins =3D "GPIO_64", "GPIO_65", "GPIO_66";
-> > +             function =3D "fc";
-> > +     };
-> > +
-> > +     fc3_pins: fc3-pins {
-> > +             pins =3D "GPIO_55", "GPIO_56";
-> > +             function =3D "fc";
-> > +     };
-> > +
-> > +     mdio_pins: mdio-pins {
-> > +             pins =3D "GPIO_9", "GPIO_10";
-> > +             function =3D "miim";
-> > +     };
-> > +
-> > +     mdio_irq_pins: mdio-irq-pins {
-> > +             pins =3D "GPIO_11";
-> > +             function =3D "miim_irq";
-> > +     };
-> > +
-> > +     sgpio_pins: sgpio-pins {
-> > +             /* SCK, D0, D1, LD */
-> > +             pins =3D "GPIO_5", "GPIO_6", "GPIO_7", "GPIO_8";
-> > +             function =3D "sgpio_a";
-> > +     };
-> > +
-> > +     usb_ulpi_pins: usb-ulpi-pins {
-> > +             pins =3D "GPIO_30", "GPIO_31", "GPIO_32", "GPIO_33",
-> > +                    "GPIO_34", "GPIO_35", "GPIO_36", "GPIO_37",
-> > +                    "GPIO_38", "GPIO_39", "GPIO_40", "GPIO_41";
-> > +             function =3D "usb_ulpi";
-> > +     };
-> > +
-> > +     usb_rst_pins: usb-rst-pins {
-> > +             pins =3D "GPIO_12";
-> > +             function =3D "usb2phy_rst";
-> > +     };
-> > +
-> > +     usb_over_pins: usb-over-pins {
-> > +             pins =3D "GPIO_13";
-> > +             function =3D "usb_over_detect";
-> > +     };
-> > +
-> > +     usb_power_pins: usb-power-pins {
-> > +             pins =3D "GPIO_1";
-> > +             function =3D "usb_power";
-> > +     };
-> > +
-> > +     ptp_out_pins: ptp-out-pins {
-> > +             pins =3D "GPIO_58";
-> > +             function =3D "ptpsync_4";
-> > +     };
->
-> Could you please move this one upper to have all the entries in the gpio
-> container alphanumerically sorted?
->
-> > +
-> > +     ptp_ext_pins: ptp-ext-pins {
-> > +             pins =3D "GPIO_59";
-> > +             function =3D "ptpsync_5";
-> > +     };
->
-> Same here.
+> We introduce a 2-bit global skb->ttl counter.Patch #1 describes how we pu=
+ti
+> together those bits. Patches #2 and patch #5 use these bits.
+> I added Fixes tags to patch #1 in case it is useful for backporting.
+> Patch #3 and #4 revert William's earlier netem commits. Patch #6 introduc=
+es
+> tdc test cases.
 
-Sure, I will make sure that pin nodes are alphabetical (I found some
-more that are not) in v5.
+3 reasons why this patchset should be rejected:
 
->
-> [ ...]
->
-> > +             port29: port@29 {
-> > +                     reg =3D <29>;
-> > +                     phys =3D <&serdes 11>;
-> > +                     phy-handle =3D <&phy3>;
-> > +                     phy-mode =3D "rgmii-id";
-> > +                     microchip,bandwidth =3D <1000>;
->
-> There are some questions around this node from Andrew in v1 of this serie=
-s,
-> which I don't see an answer for in any of the following versions. Could y=
-ou
-> please clarify?
+1) It increases sk_buff size potentially by 1 byte with minimal config
 
-Sure, as for the RGMII I switched to rgmii-id so the PHY is adding the dela=
-ys.
-Though, I am not sure if its better to add them via MAC as it can add
-the delays instead of the PHY,
-so I am open to suggestions here.
+2) Infinite loop is the symptom caused by enqueuing to the root qdisc,
+fixing the infinite loop itself is fixing the symptom and covering up the
+root cause deeper.
 
-As for the phys property, yes that is not required here as RGMII ports
-are dedicated, there are no
-SERDES lanes being used for them.
+3) Using skb->ttl makes netem duplication behavior less predictable
+for users. With a TTL-based approach, the duplication depth is limited
+by a kernel-internal constant that is invisible to userspace. Users
+configuring nested netem hierarchies cannot determine from tc
+commands alone whether their packets will be duplicated at each
+stage or silently pass through when TTL is exhausted.
 
-I have updated the bindings to account for this and it will be part of v5.
+NACKed-by: Cong Wang <xiyou.wangcong@gmail.com>
+
+(I hope I am still better than your AI.)
 
 Regards,
-Robert
-
->
-> The rest looks good to me.
->
-> Thank you,
-> Claudiu
->
-
-
---=20
-Robert Marko
-Staff Embedded Linux Engineer
-Sartura d.d.
-Lendavska ulica 16a
-10000 Zagreb, Croatia
-Email: robert.marko@sartura.hr
-Web: www.sartura.hr
+Cong
 
