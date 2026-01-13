@@ -1,154 +1,118 @@
-Return-Path: <netdev+bounces-249616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 263F5D1B985
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 23:31:59 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79A10D1B9CD
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 23:39:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D4EE43010FC3
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:31:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7A58930052A5
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:39:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 783A027E07A;
-	Tue, 13 Jan 2026 22:31:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D90AD35C181;
+	Tue, 13 Jan 2026 22:39:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ijx8tYjs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599E921FF4D;
-	Tue, 13 Jan 2026 22:31:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625F73557F4
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 22:39:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768343517; cv=none; b=WPMsbLGuLWI4QsEwrEwM+9jOFlozXUYLK0pfJRBe0yWI3nFhO5lBWPHJ3+loDwJz71gvKEZE5T5bzJaJh5zp18cTtyXZ8Y8yaTMLVsPqPBvXtzusVOUdmr4BiiYj0huliEaPHlTpGFgqzmEYngPfLwJDsPvu0XAOMmUhFGQarXo=
+	t=1768343945; cv=none; b=kyMOWXOJZ+mkQykJBuCDB+WIpUSgyhsU2h1ea3P08fu2YMr7tMcbXa0IT4RRZsc9H5ZYKQwIeXL6RFFCNNa+NoEufjN/u9NPURLnU6YDsccipiHoYGAJBoynPXStTm4c9EN3DbZbso83O5sRFQ+0G+v/Z6LlmZmhwvzvUGMFLJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768343517; c=relaxed/simple;
-	bh=bRfy4giqRiYNrUXuD2iU+wbIkkdIRnPy9TgSPsmiCa4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sGn8rftsmSP9pAgMAsCoi16Kt/cLZ+nL4x8Umuy6P/CcP6Ys3Uvt0eeYEEVrg+Kw5FUpaAldpR1WsNBJfg7c5I2E26+oYRy0HiwK7q2DiCCl6IiNxa+bu+kAEOm2XRO0x9ZD5/4PyOs7aT8IAlH8a1Uog5T65+boDgmTKlMRsZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [10.0.56.51] (unknown [62.214.191.67])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id A1D142387DCFE;
-	Tue, 13 Jan 2026 23:31:24 +0100 (CET)
-Message-ID: <f0fee9dd-7236-464d-9e06-6adbeece81a8@molgen.mpg.de>
-Date: Tue, 13 Jan 2026 23:31:20 +0100
+	s=arc-20240116; t=1768343945; c=relaxed/simple;
+	bh=pjrV8Ah/L7zNpoB870nEG8kWEgsLpqEksFVHqYTKqU0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sdYJvf97LVI6f4ebQIXQ+5Jrn3vlEHYHH6E3mQ9A2mT5E7CQGvrvM2aFc0vA7SI7ucRaRlEuL6miRJouX9xZEudQNsuQa8UtpA66p3vKbV8gWdolGXvikhV5ZGVlVQBoQZ+G2jpQVbLhjHaKrF0bCuVirBqHAJc9nUaiM0n2nww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ijx8tYjs; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-64d4d8b3ad7so13014692a12.2
+        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 14:39:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768343943; x=1768948743; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=pjrV8Ah/L7zNpoB870nEG8kWEgsLpqEksFVHqYTKqU0=;
+        b=Ijx8tYjs+w5bTf9KCRQz8GckPxFCmiHYVct44S1f3GlSYitzyDyYS51Gw8Y5AEYflA
+         Mzu23STfOmIrLwxyRINmeMmepCvH4mPHXn5H3vweX5mNTzvgfbulK1nB5t0sgv3E6oQr
+         4RYmWOFPxtXpkUVxl4xhDf2mAl+QP/0UjxNTIs9E03uoN/Exa/GLzfbK8emjgfqXctjv
+         el2pPGUte52odN6sbn2ApvRx0pfnq8EWuyYQCOVq0GN8hHqXu41/12LK/WuISZvtCFMD
+         PKahVLmPdvP+qf9887Wt87RQLCWH3nYbPHivRdUiPX6aEjJK9MlrX/f7G3QhiM2zKWux
+         lylg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768343943; x=1768948743;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pjrV8Ah/L7zNpoB870nEG8kWEgsLpqEksFVHqYTKqU0=;
+        b=p+XbdeFU3BjQnMBbi1zRoWFrbHYYD48NyDhNA1TDQJul4h3Fci5KDMdehiUdcgxzpv
+         8ac3PGN5/4FodP4sLOi2QPiQ/97cpw9JwTFEBu03mFPyd+y+qruv7lwwgRleo0NMH72A
+         7f/VguXKrMZvYxyqfzVeL+/Ghitvz9k6dUYcKJMLTLzNeBNzhh1DteKY0Xv7gn6/y7R5
+         LscIeCrLM1SvxBC/uMir3oHJMIaS8xL7ewtFv1Jek31BWbr2mfrdTs2qmg6OTf2aaHja
+         drrabD8gbBnxawClpo+3VDBXNBDkCGLkTXrysBtiot2rgDtn4mhqvM8jvPHh5zMnwJJG
+         yLww==
+X-Forwarded-Encrypted: i=1; AJvYcCVrQxs4MlEHCwBpBxv4sn5hAuKDz+sVIRzejrIjL3yixZ2RIHOywCC7e0HMeO65kzk1Muv2Saw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJfnm+O9dYi6guEVEsmxc+DklgucY/s70OBiJWqg5mGPfZKGFb
+	4bTBtKEv+AKgpZECUSz47NyZb4QxWWZ6DYwURUlju6YbSSM4hQjXvTxAr4rGiq5QUYpQzE/dU0U
+	3ggsJP6MG7YPXodfbMKkq9xETtBw9SsU=
+X-Gm-Gg: AY/fxX5JwfSThJVKa26OKVDSZyj6txppErDMlE2gzQiQF+4pHwl140QhO/FJge/WYdG
+	jKufeUjE++dxf/Y0yA09VccELChzUN9mMqNFVZrheW2wyqHI59mje2CjkJBPRMwfaLvQb5g30HK
+	lAl7wt3UOJgPy8Uvk4BR53UiJSgd1ZWFDoSlg4A4Nvcmb+snMERlDhk8gB7mzLaOPM/IYSTNNuy
+	YBQPMZtpti2n1aEZHmXJr0DMSWorBxhj7zZ4KvlBWmen9fWeXS/VrW6BK53kC6tjrlYNr1m7w7H
+	s2aVYRQVDkwhRPAE32OFIAvo9A==
+X-Received: by 2002:a17:907:d27:b0:b73:7a44:b4d5 with SMTP id
+ a640c23a62f3a-b8761139a87mr45560466b.41.1768343942489; Tue, 13 Jan 2026
+ 14:39:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net 1/2] ice: reintroduce retry
- mechanism for indirect AQ
-To: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- stable@vger.kernel.org, Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
- Jakub Staniszewski <jakub.staniszewski@linux.intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Michal Schmidt <mschmidt@redhat.com>
-References: <20260113193817.582-1-dawid.osuchowski@linux.intel.com>
- <20260113193817.582-2-dawid.osuchowski@linux.intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20260113193817.582-2-dawid.osuchowski@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <34647edacab660b4cabed9733d2d3ef22bc041ac.1768273593.git.daniel@makrotopia.org>
+ <252d6877-d966-4d19-a38c-cc83ba908494@lunn.ch> <aWZVIBh6AKiIaxdr@makrotopia.org>
+In-Reply-To: <aWZVIBh6AKiIaxdr@makrotopia.org>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Tue, 13 Jan 2026 19:38:50 -0300
+X-Gm-Features: AZwV_Qjg4zpsS4od6KBCg5IH7ipEaILyUhtFhNBfGxqCxTWtWrTgv-97YJUF4cY
+Message-ID: <CAJq09z727C=9mh2a0BEVcVLKkWcdVOL7oNvVBq12k6zm7nxXZQ@mail.gmail.com>
+Subject: Re: [PATCH net-next RFC] net: ethernet: mtk_eth_soc: support using
+ non-MediaTek DSA switches
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, 
+	Sean Wang <sean.wang@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>, 
+	Bc-bocun Chen <bc-bocun.chen@mediatek.com>, Rex Lu <rex.lu@mediatek.com>, 
+	Mason-cw Chang <Mason-cw.Chang@mediatek.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Vladimir Oltean <olteanv@gmail.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mediatek@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 
-[Cc: +Michal]
+> MediaTek folks also got back to me in a private message, confirming
+> the issue and also clarifying that the length of the tag is the
+> limiting factor. Every 4-byte tag can work, sizes other than 4 bytes
+> cannot. As MediaTek's tag format includes the 802.1Q VLAN as part of
+> the tag itself I suspect VLAN offloading will still need some extra
+> care to work on non-MTK 4-byte tags (like RealTek 4B, for example)...
 
-Dear Dawid, dear Jakub,
+My suggestion is to enable it only when sure (mediatek tag) and drop
+it otherwise. Something like this:
 
+https://github.com/openwrt/openwrt/commit/2603d6d81d1a088c6ad271fe20a63fa6e3a75124
 
-Am 13.01.26 um 20:38 schrieb Dawid Osuchowski:
-> From: Jakub Staniszewski <jakub.staniszewski@linux.intel.com>
-> 
-> Add retry mechanism for indirect Admin Queue (AQ) commands. To do so we
-> need to keep the command buffer.
-> 
-> This technically reverts commit 43a630e37e25
-> ("ice: remove unused buffer copy code in ice_sq_send_cmd_retry()"),
-> but combines it with a fix in the logic by using a kmemdup() call,
-> making it more robust and less likely to break in the future due to
-> programmer error.
-> 
-> Cc: Michal Schmidt <mschmidt@redhat.com>
-> Cc: stable@vger.kernel.org
-> Fixes: 3056df93f7a8 ("ice: Re-send some AQ commands, as result of EBUSY AQ error")
-> Signed-off-by: Jakub Staniszewski <jakub.staniszewski@linux.intel.com>
-> Co-developed-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-> Signed-off-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> ---
-> Ccing Michal, given they are the author of the "reverted" commit.
+It is not worth it to risk enabling offload for unknown cases.
 
-At least Michal was not in the (visible) Cc: list
+As Realtek was mentioned, the 4-byte tag (rtl4_a) is for old SoCs,
+hardly paired with a mediatek SoC. The newer tag, rtl8_4, is already
+too big (8 bytes).
 
->   drivers/net/ethernet/intel/ice/ice_common.c | 12 +++++++++---
->   1 file changed, 9 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-> index a400bf4f239a..aab00c44e9b2 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_common.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
-> @@ -1879,34 +1879,40 @@ ice_sq_send_cmd_retry(struct ice_hw *hw, struct ice_ctl_q_info *cq,
->   {
->   	struct libie_aq_desc desc_cpy;
->   	bool is_cmd_for_retry;
-> +	u8 *buf_cpy = NULL;
->   	u8 idx = 0;
->   	u16 opcode;
->   	int status;
->   
->   	opcode = le16_to_cpu(desc->opcode);
->   	is_cmd_for_retry = ice_should_retry_sq_send_cmd(opcode);
->   	memset(&desc_cpy, 0, sizeof(desc_cpy));
->   
->   	if (is_cmd_for_retry) {
-> -		/* All retryable cmds are direct, without buf. */
-> -		WARN_ON(buf);
-> +		if (buf) {
-> +			buf_cpy = kmemdup(buf, buf_size, GFP_KERNEL);
-> +			if (!buf_cpy)
-> +				return -ENOMEM;
-> +		}
->   
->   		memcpy(&desc_cpy, desc, sizeof(desc_cpy));
->   	}
->   
->   	do {
->   		status = ice_sq_send_cmd(hw, cq, desc, buf, buf_size, cd);
->   
->   		if (!is_cmd_for_retry || !status ||
->   		    hw->adminq.sq_last_status != LIBIE_AQ_RC_EBUSY)
->   			break;
->   
-> +		if (buf_cpy)
-> +			memcpy(buf, buf_cpy, buf_size);
->   		memcpy(desc, &desc_cpy, sizeof(desc_cpy));
-> -
+Regards,
 
-Unrelated change?
-
->   		msleep(ICE_SQ_SEND_DELAY_TIME_MS);
->   
->   	} while (++idx < ICE_SQ_SEND_MAX_EXECUTE);
->   
-> +	kfree(buf_cpy);
->   	return status;
->   }
-
-The diff looks good otherwise.
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
+Luiz
 
