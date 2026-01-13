@@ -1,101 +1,95 @@
-Return-Path: <netdev+bounces-249539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 519A8D1ABA4
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 18:49:02 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07106D1ABAD
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 18:49:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BA1FD3047101
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 17:47:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D477E306875D
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 17:47:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABF103921D1;
-	Tue, 13 Jan 2026 17:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 586763939C5;
+	Tue, 13 Jan 2026 17:47:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UlNA/ulJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V6fMARB7"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 148FC2EBB8C
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 17:47:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3477434D90D;
+	Tue, 13 Jan 2026 17:47:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768326452; cv=none; b=IDk3Ra/dvVOL8jvl4kYOmjX1oMDXSRxRfInECfR6EvZyTbzvRG4g2ol1zk16mixCitNct6crvs4UGTQjhqLJiWaJAdY3h5mXfAJpYc4cDKNYEafbejB9E1yeYmde9WTGjVGrufw1LJxbXzOJUCbPSBrjpDnVskzcEN2k2L5Aae8=
+	t=1768326455; cv=none; b=ZSRKJ+gScGxZQs4X9+/VnRwrBpHD1eT6VsEi3plEi3jjwcM2xUPfEeTKaAGk2Lf6F0BLGo4vtw2vdTd6abbHR/eQjtQUrxNdmNCTopG/MkDFXfDYsWvnhsOkUAwhPmzXys9XlAe7JzLf1eayUkjsH8xHfnh0vtIM7i1ZXVuWWfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768326452; c=relaxed/simple;
-	bh=RH9nwLZfwqDtoGRjdzJMCotUZ0i2h75iTckvMVVSMKQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Nb/ZfoU/sKl8oyRmH33LbFa2A8UZSQF1hroAvrx8pKM025faVaGG3ldk7zNBVPSoQtNUChsuet5ukpukH1AwzcvdnJ+FOvtiobi+v/op5Sf81b4pAn0WRDygECjCF1/5rSDSjqlSm+Os9dKpa+U5iqDLTeKj+UEgdvrsLjN8QMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UlNA/ulJ; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <c5a1f45f-542e-4280-a601-ae96f2d1cac4@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768326439;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T4vksd3pjNJfhy1H7Erqq68uqNFlEYJUmzKTqs9bkQc=;
-	b=UlNA/ulJrL/RNvg+RqqwV5HLpmx3p2CRs+wXc6gNRYi/A2xeVk3Ev9X2DIHgddijRuPQ4u
-	EG80mydp+xTY4axuT0wqlAXEaCr1A3WFNZ4oh1OAVEzyaWDFbbannuFAKSKLi59NukSQj2
-	TfN2mXehSyP5yrp9HHY43Haprripdz0=
-Date: Tue, 13 Jan 2026 17:47:07 +0000
+	s=arc-20240116; t=1768326455; c=relaxed/simple;
+	bh=08QBqmZ6vl5jlxbVBid2paYidrcy2skUmee6MBLxCEo=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=X+JDF4xruI5vRZzw5cmbZt+AZayfj+mlVXvkqJBWyrKbvMsBSTums2xeEP80wNHwovrVqnbiSvFBqxnRgy3DAIOeqCF/dqvOp/TGCHCBuL7IusZF9doAE+0hcoSfj+FOfIJ/jDb3577wBupoPonxBKyASZOBU1ISLBBOuwFElCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V6fMARB7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 782F9C116C6;
+	Tue, 13 Jan 2026 17:47:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768326455;
+	bh=08QBqmZ6vl5jlxbVBid2paYidrcy2skUmee6MBLxCEo=;
+	h=From:Date:Subject:To:Cc:From;
+	b=V6fMARB73crLUQJ3VXRzYWZvy2+J/IlMqbM9xQL8XoBUkWHyFBaPGsTJNDjG+wPF8
+	 cOcVEy5aDuQxPOIfqs6S9137QqBP1/txIs1f0d/Gf4XnNQja/5pGMBlKlviT2Xv51H
+	 qctFeQdCxemnDgOOyf7l1y623B1k3xaStTe0WgNq/GbHlovvaejezb7YTkAhUG3GNZ
+	 idI530vRvAfZhFzDu1i3YVVaVaoAGiH2eIxiBiRKTvvy/IAxb630i8DpFIxiOQQji0
+	 rGFbb74hmD/DclXCjeUkQDwDAYKHagUvRbbjWIys2rTQH3PHtV904WZBgh5HigBalu
+	 ASmaSy2EYE6mg==
+From: Simon Horman <horms@kernel.org>
+Date: Tue, 13 Jan 2026 17:47:15 +0000
+Subject: [PATCH] docs: netdev: refine 15-patch limit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v2 2/3] dpll: add dpll_device op to set working
- mode
-To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
-Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Prathosh Satish <Prathosh.Satish@microchip.com>, Petr Oros
- <poros@redhat.com>, linux-kernel@vger.kernel.org,
- Michal Schmidt <mschmidt@redhat.com>
-References: <20260113121636.71565-1-ivecera@redhat.com>
- <20260113121636.71565-3-ivecera@redhat.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20260113121636.71565-3-ivecera@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Message-Id: <20260113-15-minutes-of-fame-v1-1-0806b418c6fd@kernel.org>
+X-B4-Tracking: v=1; b=H4sIACKFZmkC/x3MQQqAIBBA0avErBtwNCO6SrSIHGsWWmhFEN09a
+ fkW/z+QOQln6KsHEl+SZYsFVFcwr1NcGMUVg1a6VUQGyWKQeB6ccfPop8DodWNU56xVTFDCPbG
+ X+58O4/t+HT3EdmQAAAA=
+X-Change-ID: 20260113-15-minutes-of-fame-f24308d550e1
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>
+Cc: netdev@vger.kernel.org, workflows@vger.kernel.org, 
+ linux-doc@vger.kernel.org
+X-Mailer: b4 0.14.2
 
-On 13/01/2026 12:16, Ivan Vecera wrote:
-> Currently, userspace can retrieve the DPLL working mode but cannot
-> configure it. This prevents changing the device operation, such as
-> switching from manual to automatic mode and vice versa.
-> 
-> Add a new callback .mode_set() to struct dpll_device_ops. Extend
-> the netlink policy and device-set command handling to process
-> the DPLL_A_MODE attribute.  Update the netlink YAML specification
-> to include the mode attribute in the device-set operation.
-> 
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-> ---
-> v2:
-> * fixed bitmap size in dpll_mode_set()
+The 15 patch limit is intended by the maintainers to cover
+all outstanding patches on the mailing list, not just those
+in a single patchset. Document this practice accordingly.
 
-[...]
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+ Documentation/process/maintainer-netdev.rst | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-> +static int
-> +dpll_mode_set(struct dpll_device *dpll, struct nlattr *a,
-> +	      struct netlink_ext_ack *extack)
-> +{
-> +	const struct dpll_device_ops *ops = dpll_device_ops(dpll);
-> +	enum dpll_mode mode = nla_get_u32(a), old_mode;
-> +	DECLARE_BITMAP(modes, DPLL_MODE_MAX + 1) = { 0 };
+diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
+index 989192421cc9db6c93c816f2dfb7afbe48dd25fc..d98d2f46129eb0eaf55e5106d50b214ddc7bfb67 100644
+--- a/Documentation/process/maintainer-netdev.rst
++++ b/Documentation/process/maintainer-netdev.rst
+@@ -363,6 +363,14 @@ just do it. As a result, a sequence of smaller series gets merged quicker and
+ with better review coverage. Re-posting large series also increases the mailing
+ list traffic.
+ 
++Limit patches outstanding on mailing list
++-----------------------------------------
++
++Avoid having more than 15 patches, across all series, outstanding for
++review on the mailing list. This limit is intended to focus developer
++effort on testing patches before upstream review. Aiding the quality of
++upstream submissions, and easing the load on reviewers.
++
+ .. _rcs:
+ 
+ Local variable ordering ("reverse xmas tree", "RCS")
 
-this one breaks reverse xmas tree order.
 
-with this fixed:
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+
 
