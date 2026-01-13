@@ -1,109 +1,179 @@
-Return-Path: <netdev+bounces-249464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF581D197BA
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:33:43 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB33CD196AF
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:25:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E30E73034FF5
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:22:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4B651300DB04
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:22:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3812029AB02;
-	Tue, 13 Jan 2026 14:22:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="kniYjxpI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97B2D286881;
+	Tue, 13 Jan 2026 14:22:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.st.icloud.com (p-east2-cluster4-host7-snip4-10.eps.apple.com [57.103.78.241])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A322828DEE9
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 14:22:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.78.241
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0449D21CA02;
+	Tue, 13 Jan 2026 14:22:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768314141; cv=none; b=Z/6IOkiTI6RqyfP9J0iBXgPcTL7xY1fxzEqQb1CM0fiKnOjdILRtBFx2XmpfITIYYO94hI2iQ+gAWV0z411/jCLCLV2/wluDIa3nOVnD6+GV8vWGHQX/ZRMDxFIt2s/UKe0UkMj2kWiGSNSYBEN5reOsftEHomU2D+CEPQW4gjU=
+	t=1768314167; cv=none; b=tZsrc9d2wLZrP0NhLi0WlD7wrsBGDtkuAIxP3vzERj9m5O+BeGx5m4MGwK39MtcgZsyiq4s3r09upItckoh1gG272JNlHBtriAKIO6Zqe9AZpSOItLGRuGz7gfAztEdB8IwZSf4jqcwWbJJC5+UUFqpymCxB06HlSw9w8ufb3Cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768314141; c=relaxed/simple;
-	bh=So/GytmIyFefKTETm6v5F3X/wbvcCdhrK9s43Pcqp88=;
+	s=arc-20240116; t=1768314167; c=relaxed/simple;
+	bh=45dZQdW9fGUa224LTS3tQ2Qsw+8kqQrF6HjLpsqqbfQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A/O9DQoEjnPMlqn0uMJ6oQb4OlV31vkM0HyFu5H94/vr8Shrb1/wVHFksyjfvuAb6ApXgZgpavxW0dP+6VE5wn4eTLtVvkcrlNmn5UjQUGROARBQPyM3T08YJpGAICOh8sZmnwvHhS0jCiGQ61W/L/hQEo9qWrGnu08JLF97DjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=kniYjxpI reason="key not found in DNS"; arc=none smtp.client-ip=57.103.78.241
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=y-koj.net
-Received: from outbound.st.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-east-1a-60-percent-8 (Postfix) with ESMTPS id 6052B1801503;
-	Tue, 13 Jan 2026 14:22:18 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; bh=fmxsnE/L7NFB0ejvFSKTM8y9Gw52rQC2a6j27SV3+Gw=; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=kniYjxpIcw+W0Ypplo5vQFdrd5zf3UO2//+/avcKMnS8R3U0IWeHZM7eAJA3jV68j8c5bLBj4qQp7A7Yyss2Tc0MnBRHWqZK8f1qP/tUbJI4TdjBQrsouIGOaB43oOtTgKGEQG2K2nZ0u7+jburBkItlfAC0addONr47vdUdIwNLH0CapHL0QiqeLU7DV4c67NJZDitgPdMDojGyBNmIYMxKYs16AQN7Q53QbQgdLOebo798xKPg5SbeLGW5iv7AheugF9Td0nmbssdSMD/uQURohEsU4pqf/KkQLvcAOdlMHBIPOzPEGoZ9k2oP0fIXqOLw3mCb4RobcMTStECOAg==
-mail-alias-created-date: 1719758601013
-Received: from desktop.y-koj.net (unknown [17.42.251.67])
-	by p00-icloudmta-asmtp-us-east-1a-60-percent-8 (Postfix) with ESMTPSA id 27BB91801534;
-	Tue, 13 Jan 2026 14:22:16 +0000 (UTC)
-Date: Tue, 13 Jan 2026 23:22:13 +0900
-From: Yohei Kojima <yk@y-koj.net>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
+	 Content-Type:Content-Disposition:In-Reply-To; b=rde93hUFKgQVE6aTYusHwYea0UHaEdzQTn8RtNU5xekv6yUjCJXGOHxBzsOqBqpB7ZYPQxi3jzdF0UPkCdQpGp5cFkjPpud17r+CxHOW48NU0UDLLc2eDX1y6Djm9vcNBYXSBC06F4D+Yh7cJGfAFuuLWa6vbFxbWzPPK6h2+Fc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vffHv-000000004Ng-1YDD;
+	Tue, 13 Jan 2026 14:22:27 +0000
+Date: Tue, 13 Jan 2026 14:22:24 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Bc-bocun Chen <bc-bocun.chen@mediatek.com>,
+	Rex Lu <rex.lu@mediatek.com>,
+	Mason-cw Chang <Mason-cw.Chang@mediatek.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 2/2] selftests: net: improve error handling in
- passive TFO test
-Message-ID: <aWZVFRrhENOk_l6z@desktop.y-koj.net>
-References: <60dc3da1f913aa9625e864ea862c23c401e7bc6e.1768207347.git.yk@y-koj.net>
- <88ead962-fec5-4834-88af-c478ee2bf023@web.de>
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next RFC] net: ethernet: mtk_eth_soc: support using
+ non-MediaTek DSA switches
+Message-ID: <aWZVIBh6AKiIaxdr@makrotopia.org>
+References: <34647edacab660b4cabed9733d2d3ef22bc041ac.1768273593.git.daniel@makrotopia.org>
+ <252d6877-d966-4d19-a38c-cc83ba908494@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <88ead962-fec5-4834-88af-c478ee2bf023@web.de>
-X-Authority-Info: v=2.4 cv=Kv9AGGWN c=1 sm=1 tr=0 ts=6966551a
- cx=c_apl:c_apl_out:c_pps a=YrL12D//S6tul8v/L+6tKg==:117
- a=YrL12D//S6tul8v/L+6tKg==:17 a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=P-IC7800AAAA:8 a=sMBj6sIwAAAA:8 a=VwQbUJbxAAAA:8
- a=jnl5ZKOAAAAA:8 a=OB2aahCY2n3uGOuFrBcA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=3o_l8myHFtgA:10 a=zgiPjhLxNE0A:10 a=d3PnA9EDa4IxuAV0gXij:22
- a=RNrZ5ZR47oNZP8zBN2PD:22
-X-Proofpoint-ORIG-GUID: IX-QzqVa4XBnGw_bD4KU7-oq8BiSfyfv
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTEzMDEyMSBTYWx0ZWRfX1oxpEhxr4QYx
- eFz77APdkQdxdkbG+I13uv88jCWdRXZ59PFC7aydLJNhyhCoQ6gNKHDCgEiy70+ZAFUdBVL+hKq
- Lomq2RM0NHqV0oDR3qIusvTe1Y2+E3CODlzzFMOyny7WvLkIJQEnHU0m9uYbB+u/ZwUvNbZzyGw
- jKC7InWSZZ+edQ/5wh7Z1lsYb3YhDKfvnf/EvTxBkRTP09jYfHDrZ2ZvhDn3uGFC4nlAz9C/6n0
- VyrrnMF0QtLTidCIk36qdAZ5DQMUlgnVpMvkAN5YqeYBh7JV1NPsU6uI1QletJtoYim/RDuQa2G
- FzDkjwcDWtpv1mdKWYQ
-X-Proofpoint-GUID: IX-QzqVa4XBnGw_bD4KU7-oq8BiSfyfv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-13_03,2026-01-09_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
- phishscore=0 adultscore=0 suspectscore=0 bulkscore=0 mlxscore=0 clxscore=1030
- malwarescore=0 mlxlogscore=999 classifier=spam authscore=0 adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2601130121
-X-JNJ: AAAAAAABkxOfaRosJ03tVZJfoO7SWg4Ois74AQlyHGfy/1l9Wkq1pEpjLXxMarCdtU5pu3SPPWWko+AoVAZ6EGBahdPkQvj6hpJtbyRrUyHM56ZVlMvV4sGbyJMXTyAlJHlMcoWSXtoxF7NzBCvpJ6XopTeDJVQhcOJvGPevdpetwvDzpR+BR/GPrz3oysPxxeALKgKugMu9NAsm966Iu2Yi2lUwRJMujkY/1Z1ggYkxOskRvjPMTJLUw2uY5EtRF0UQRJL/R8kyaGBx46bIZDHTf/WyvwptaptiAKHiV9/1qnbrOBZ/E6PJYdIAF/UDgPTPLF2NzKVK9eGsID2ApOXAKOOqCtbr3/G9KGTTfvT5Q3D/hZmvuGwsqGLpsSgmxo3w2v0dntLrh5OLBXa69GF6DFJTHVVVLKV9XJnY9okFx7gDG04c+1vzUW6zKdfLu2flwhyG3R6p77jSUnpD+gpPSdNemy0pCQno9pcl2redO2C87A8TdWZ5YBwO6omUJk+AJ1OtUZ+YshZ0x9CbsWnI9yh1cqWp8uG5c2z4bDze6rt/7GP2SJGizd1dDr7BBQNSCRzFtNQ8v6999M3A0Lr12R+KJ5qKzywaLE9A8tRxGzWGk/9eCqNngI82s2Q8OINoiWa2XppzDqTmRsYsHhtP83ppP5OIAPegO+PUqu+3J6yQFQZl+q2DjObRz18WufDTPcIOLlc2bCwLwffYsIH9jOPrE6MNBCQqvaoHIA==
+In-Reply-To: <252d6877-d966-4d19-a38c-cc83ba908494@lunn.ch>
 
-On Tue, Jan 13, 2026 at 10:46:10AM +0100, Markus Elfring wrote:
-> > This commit improves the error handling in passive TFO test to check the
-> > return value from … and  to fail if read() failed.
+On Tue, Jan 13, 2026 at 03:00:18PM +0100, Andrew Lunn wrote:
+> On Tue, Jan 13, 2026 at 03:11:54AM +0000, Daniel Golle wrote:
+> > MediaTek's Ethernet Frame Engine is tailored for use with their
+> > switches. This broke checksum and VLAN offloading when attaching a
+> > DSA switch which does not use MediaTek special tag format.
 > 
-> Would any developers and system testers like to care more also for data output failures?
-> https://elixir.bootlin.com/linux/v6.19-rc4/source/tools/testing/selftests/net/tfo.c#L86-L88
-> https://cwe.mitre.org/data/definitions/252.html
+> This has been seen before. The Freescale FEC has similar problems when
+> combined with a Marvell switch, it cannot find the IP header, and so
+> checksum offloading does not work.
+> 
+> I thought we solved this be modifying the ndev->feature of the conduit
+> interface to disable such offloads. But i don't see such code. So i
+> must be remembering wrongly.
+> 
+> This is assuming the frame engine respects these flags:
+> 
+> /usr/sbin/ethtool -k enp2s0
+> Features for enp2s0:
+> rx-checksumming: on
+> tx-checksumming: on
+> 	tx-checksum-ipv4: on
+> 	tx-checksum-ip-generic: off [fixed]
+> 	tx-checksum-ipv6: on
+> 	tx-checksum-fcoe-crc: off [fixed]
+> 	tx-checksum-sctp: off [fixed]
+> 
+> When you combine a Marvell Ethernet interface with a Marvell switch
+> offloading works of course. So it probably does require some logic in
+> the MAC driver to determine if the switch is of the same vendor or
+> not.
 
-That's right. Although we can assume that fprintf() usually succeeds,
-it worth checking its return value as tfo_passive.sh relies on the
-content of the output.
-
-I posted the v2 series adding fprintf() error handling here:
-https://lore.kernel.org/netdev/cover.1768312014.git.yk@y-koj.net/
-
-Thank you,
-Yohei
+MediaTek folks also got back to me in a private message, confirming
+the issue and also clarifying that the length of the tag is the
+limiting factor. Every 4-byte tag can work, sizes other than 4 bytes
+cannot. As MediaTek's tag format includes the 802.1Q VLAN as part of
+the tag itself I suspect VLAN offloading will still need some extra
+care to work on non-MTK 4-byte tags (like RealTek 4B, for example)...
 
 > 
-> Regards,
-> Markus
+> > diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> > index e68997a29191b..654b707ee27a1 100644
+> > --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> > +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> > @@ -1459,6 +1459,26 @@ static void setup_tx_buf(struct mtk_eth *eth, struct mtk_tx_buf *tx_buf,
+> >  	}
+> >  }
+> >  
+> > +static bool mtk_uses_dsa(struct net_device *dev)
+> > +{
+> > +#if IS_ENABLED(CONFIG_NET_DSA)
+> > +	return netdev_uses_dsa(dev) &&
+> > +	       dev->dsa_ptr->tag_ops->proto == DSA_TAG_PROTO_MTK;
+> > +#else
+> > +	return false;
+> > +#endif
+> 
+> I think the concept of determining if the switch is using a specific
+> tag in order to enable/disable acceleration should be generic. So i
+> would try to make this an helper in include/next/dsa.h. Any MAC driver
+> can then use it.
+
+Now that I know that the Ethernet driver should have 4 modes:
+ - no DSA at all
+ - DSA with MediaTek special tag
+ - DSA with non-MediaTek but still 4 byte special tag
+   -> VLAN offloading needs to be figured out
+ - DSA with special tag size not equal to 4 bytes
+   -> no checksum and no VLAN offloading
+
+> 
+> > @@ -1531,7 +1551,7 @@ static void mtk_tx_set_dma_desc_v2(struct net_device *dev, void *txd,
+> >  		/* tx checksum offload */
+> >  		if (info->csum)
+> >  			data |= TX_DMA_CHKSUM_V2;
+> > -		if (mtk_is_netsys_v3_or_greater(eth) && netdev_uses_dsa(dev))
+> > +		if (mtk_is_netsys_v3_or_greater(eth) && mtk_uses_dsa(dev))
+> >  			data |= TX_DMA_SPTAG_V3;
+> 
+> This looks to be in the hot path. Do you really want to do this
+> evaluation on every frame? You can change the tag protocol via sysfs,
+> however, dsa_tree_change_tag_proto() will only allow you to change the
+> tag while the conduit interface is down. So it should be safe to look
+> at the tag protocol once during open, and cache the result somewhere
+> local, struct mtk_eth? That should avoid a few cache misses.
+
++1
+
+> 
+> > @@ -3192,6 +3212,14 @@ static netdev_features_t mtk_fix_features(struct net_device *dev,
+> >  		}
+> >  	}
+> >  
+> > +	if ((features & NETIF_F_IP_CSUM) &&
+> > +	    non_mtk_uses_dsa(dev))
+> > +		features &= ~NETIF_F_IP_CSUM;
+> > +
+> > +	if ((features & NETIF_F_IPV6_CSUM) &&
+> > +	    non_mtk_uses_dsa(dev))
+> > +		features &= ~NETIF_F_IPV6_CSUM;
+> > +
+> 
+> 
+> When is mtk_fix_features() actually called? I don't know without
+> looking at the core. You will want it when open is called, when the
+> tagging protocol is fixed.
+
+It's used as .ndo_fix_features operation, which is called by
+__netdev_update_features() at various occasions, and I'm not sure if it
+would be called as well when changing the tag protocol...
 
