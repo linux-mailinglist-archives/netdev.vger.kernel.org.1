@@ -1,95 +1,56 @@
-Return-Path: <netdev+bounces-249623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E51ED1BAB5
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 00:13:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2144FD1BAA0
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 00:12:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9F2CC30082EB
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 23:13:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D1A513006463
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 23:12:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 337BE36A036;
-	Tue, 13 Jan 2026 23:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8327A350D79;
+	Tue, 13 Jan 2026 23:12:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nqAAh529"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dIsuq2Gy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC8335CB93;
-	Tue, 13 Jan 2026 23:12:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E8CB26B74A;
+	Tue, 13 Jan 2026 23:12:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768345980; cv=none; b=KcIZy2X6gGlM5j4Zib5R0f1IICzHVB8UlrEkDXhdrUx9z59X3NEVlvWO5d/635cROUQM9gi8GuGHFi3wcv+P5FPUGeAQ75uBEjNPUT/ffydelTXlforaztNUigKr9vf03S/Kr3slDKGz5j0OIDTD3yMWQtyrzTrWWs4w7/vLWLU=
+	t=1768345943; cv=none; b=X7Azk9cwCVz4R5kAv00FWyRkNQGvWU+tO1Fy2PgrHkBYPpRIFj6mhE1YnHV8UCIJ+DVA9113SvO5t96PGvg37htvlI2jnnvmwsOyO8q7GgSbY95DRwNzgsU7+io5bkTBkGYDHngjTjueL2fU8oh1c59qC8Z2oWMJcj8TJipOh5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768345980; c=relaxed/simple;
-	bh=tfux4HuM++A7BLYQlaWz5mpF//WwyNWgU6Ipl96sA5I=;
+	s=arc-20240116; t=1768345943; c=relaxed/simple;
+	bh=KVvUjtgHP/EnKb5VOEjjBg5TqpHapWWCoF0IBZbv+IU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RIoomfMS18r7Qpy4BSLqBXioMPiXzEGH8tiDMwErwmJA5vDc2yRBjkQo2DI5qmtGXZhF2Ig0sNxNUXAbTRuldDG5o+xKDIks28l6CR605eF0goebpETeuQzWt3cLLJ8o1NJWAjP/X6V2LjjvrrjxWYDvPg5z2jQm6cA9IoeIfNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nqAAh529; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768345978; x=1799881978;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tfux4HuM++A7BLYQlaWz5mpF//WwyNWgU6Ipl96sA5I=;
-  b=nqAAh529Wap5PRAuBNWOW1ERqtSVdKqybJiJ2X0aGgs8bkMDkE4Ogk5y
-   SqEdgCbGQwAczu0baC93vAUgXpYKyBCfwFpAKxR67zSRxPXZwekkv8/SG
-   DGRdgVLTHv+F2UMaWFVojMUMGh4pzIF73sZVGD7NtMy0Ud2FWZIEJduLL
-   UCYWgXaIkMVhlzLSGTfPPEtUnVhL9gDQRFzrEIB8QOIf9uk9UjfTDe421
-   3z/I6+EOQjSi742o7f2dNl2sVUimySh64fHhUcN4l08TkGLAqzhPOEmMH
-   02V4ZU0eG0n3X+Tmu3jXTOGKmq+wmhwqVJjrJl5tuu0ZcRqztR6xvw2aM
-   Q==;
-X-CSE-ConnectionGUID: Dzp/q/EJQ3Sbq7j+4clz+Q==
-X-CSE-MsgGUID: KQ/P4AJmQV2SNN53EoZ6WQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11670"; a="69376945"
-X-IronPort-AV: E=Sophos;i="6.21,224,1763452800"; 
-   d="scan'208";a="69376945"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2026 15:12:57 -0800
-X-CSE-ConnectionGUID: kzgyrO3ORaOlo4V3eNE03g==
-X-CSE-MsgGUID: IWu9cYVeQviBmeKCDLTDgg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,224,1763452800"; 
-   d="scan'208";a="204307734"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 13 Jan 2026 15:12:52 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vfnZB-00000000FTo-04NN;
-	Tue, 13 Jan 2026 23:12:49 +0000
-Date: Wed, 14 Jan 2026 07:12:08 +0800
-From: kernel test robot <lkp@intel.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Long Li <longli@microsoft.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, berrange@redhat.com,
-	Sargun Dhillon <sargun@sargun.me>,
-	Bobby Eshleman <bobbyeshleman@gmail.com>
-Subject: Re: [PATCH net-next v14 01/12] vsock: add netns to vsock core
-Message-ID: <202601140749.5TXm5gpl-lkp@intel.com>
-References: <20260112-vsock-vmtest-v14-1-a5c332db3e2b@meta.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=sqy+kam1a4p8bevaENxuiyzsFyFrP0VEkRSxUINVnplIqdoEtzlD75atbNbr6GITbcDJTMpGiaG6kWxpSe7CqrKqHGv40xFmXuhwAuJphp3sB7BwRMKtUibDk/07o0DjFSZF2JEnTBb7u9Hpwg1abohspXFiW51lTuzNsU9unPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dIsuq2Gy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD7F5C116C6;
+	Tue, 13 Jan 2026 23:12:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768345943;
+	bh=KVvUjtgHP/EnKb5VOEjjBg5TqpHapWWCoF0IBZbv+IU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dIsuq2GykDPHWJFBN+4HvzBChNmyu1hHIMJc8+H4jvYmt6n43+njE75R+vlQRLYNN
+	 uZ0BrIy8AWcVEC5/DIaiQkv+R/elVNvDWaalS/dQEeBnPIrqw9GWEVFCxBgIfZTtYI
+	 oX+Z9IgWJ4pifJfQrKis+JiKRLmljeUw0wK5m2Y6/3K5UzzuX3RybFsJV0ewR3/8yX
+	 2DCnCQvhGukGpnarWWhTu8cjDSS4riMOq0yYx+IEZttsqpSWaPQzfGCjHkrPR3vAGb
+	 6vcEduOgLU0zPq1eCNnPwX6d17bIAYW/EItgbEpvZGEDrUjdhCQCH8BCC0G/4mb7aa
+	 kWVwXKUYByr7w==
+Date: Tue, 13 Jan 2026 17:12:22 -0600
+From: Rob Herring <robh@kernel.org>
+To: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
+	conor+dt@kernel.org, krzk+dt@kernel.org, pabeni@redhat.com,
+	kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+	andrew+netdev@lunn.ch
+Subject: Re: [PATCH net-next v1] dt-bindings: net: Convert icplus-ip101ag to
+ yaml format
+Message-ID: <20260113231222.GA421230-robh@kernel.org>
+References: <20260110235544.1593197-1-martin.blumenstingl@googlemail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,32 +59,132 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260112-vsock-vmtest-v14-1-a5c332db3e2b@meta.com>
+In-Reply-To: <20260110235544.1593197-1-martin.blumenstingl@googlemail.com>
 
-Hi Bobby,
+On Sun, Jan 11, 2026 at 12:55:44AM +0100, Martin Blumenstingl wrote:
+> This allows for better validation of .dts.
+> 
+> Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+> ---
+>  .../bindings/net/icplus,ip101ag.yaml          | 75 +++++++++++++++++++
+>  .../bindings/net/icplus-ip101ag.txt           | 19 -----
+>  2 files changed, 75 insertions(+), 19 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/net/icplus,ip101ag.yaml
+>  delete mode 100644 Documentation/devicetree/bindings/net/icplus-ip101ag.txt
+> 
+> diff --git a/Documentation/devicetree/bindings/net/icplus,ip101ag.yaml b/Documentation/devicetree/bindings/net/icplus,ip101ag.yaml
+> new file mode 100644
+> index 000000000000..f245516103b3
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/icplus,ip101ag.yaml
+> @@ -0,0 +1,75 @@
+> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/icplus,ip101ag.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: IC Plus Corp. IP101A / IP101G Ethernet PHYs
+> +
+> +maintainers:
+> +  - Andrew Lunn <andrew@lunn.ch>
+> +  - Florian Fainelli <f.fainelli@gmail.com>
+> +  - Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+> +
+> +description: |
+> +  Bindings for IC Plus Corp. IP101A / IP101G Ethernet MII/RMII PHYs
 
-kernel test robot noticed the following build warnings:
+Drop 'Bindings for'
 
-[auto build test WARNING on net-next/main]
+> +
+> +  There are different models of the IP101G Ethernet PHY:
+> +  - IP101GR (32-pin QFN package)
+> +  - IP101G (die only, no package)
+> +  - IP101GA (48-pin LQFP package)
+> +
+> +  There are different models of the IP101A Ethernet PHY (which is the
+> +  predecessor of the IP101G):
+> +  - IP101A (48-pin LQFP package)
+> +  - IP101AH (48-pin LQFP package)
+> +
+> +  All of them share the same PHY ID.
+> +
+> +allOf:
+> +  - $ref: ethernet-phy.yaml#
+> +
+> +properties:
+> +  compatible:
+> +    contains:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Bobby-Eshleman/virtio-set-skb-owner-of-virtio_transport_reset_no_sock-reply/20260113-125559
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260112-vsock-vmtest-v14-1-a5c332db3e2b%40meta.com
-patch subject: [PATCH net-next v14 01/12] vsock: add netns to vsock core
-config: x86_64-buildonly-randconfig-004-20260113 (https://download.01.org/0day-ci/archive/20260114/202601140749.5TXm5gpl-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260114/202601140749.5TXm5gpl-lkp@intel.com/reproduce)
+Drop contains. The list(s) of allowed values should be exact.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601140749.5TXm5gpl-lkp@intel.com/
-
-All warnings (new ones prefixed by >>, old ones prefixed by <<):
-
->> WARNING: modpost: net/vmw_vsock/vsock: section mismatch in reference: vsock_exit+0x25 (section: .exit.text) -> vsock_sysctl_ops (section: .init.data)
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> +      enum:
+> +        - ethernet-phy-id0243.0c54
+> +
+> +  icplus,select-rx-error:
+> +    type: boolean
+> +    description: |
+> +      Pin 21 ("RXER/INTR_32") will output the receive error status.
+> +      Interrupts are not routed outside the PHY in this mode.
+> +
+> +      This is only supported for IP101GR (32-pin QFN package).
+> +
+> +  icplus,select-interrupt:
+> +    type: boolean
+> +    description: |
+> +      Pin 21 ("RXER/INTR_32") will output the interrupt signal.
+> +
+> +      This is only supported for IP101GR (32-pin QFN package).
+> +
+> +# RXER and INTR_32 functions are mutually exclusive
+> +dependentSchemas:
+> +  icplus,select-rx-error:
+> +    properties:
+> +      icplus,select-interrupt: false
+> +  icplus,select-interrupt:
+> +    properties:
+> +      icplus,select-rx-error: false
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    mdio {
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+> +
+> +        ethphy1: ethernet-phy@1 {
+> +                compatible = "ethernet-phy-id0243.0c54";
+> +                reg = <1>;
+> +                icplus,select-interrupt;
+> +        };
+> +    };
+> diff --git a/Documentation/devicetree/bindings/net/icplus-ip101ag.txt b/Documentation/devicetree/bindings/net/icplus-ip101ag.txt
+> deleted file mode 100644
+> index a784592bbb15..000000000000
+> --- a/Documentation/devicetree/bindings/net/icplus-ip101ag.txt
+> +++ /dev/null
+> @@ -1,19 +0,0 @@
+> -IC Plus Corp. IP101A / IP101G Ethernet PHYs
+> -
+> -There are different models of the IP101G Ethernet PHY:
+> -- IP101GR (32-pin QFN package)
+> -- IP101G (die only, no package)
+> -- IP101GA (48-pin LQFP package)
+> -
+> -There are different models of the IP101A Ethernet PHY (which is the
+> -predecessor of the IP101G):
+> -- IP101A (48-pin LQFP package)
+> -- IP101AH (48-pin LQFP package)
+> -
+> -Optional properties for the IP101GR (32-pin QFN package):
+> -
+> -- icplus,select-rx-error:
+> -  pin 21 ("RXER/INTR_32") will output the receive error status.
+> -  interrupts are not routed outside the PHY in this mode.
+> -- icplus,select-interrupt:
+> -  pin 21 ("RXER/INTR_32") will output the interrupt signal.
+> -- 
+> 2.52.0
+> 
 
