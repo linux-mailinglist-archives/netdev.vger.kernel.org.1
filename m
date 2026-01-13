@@ -1,139 +1,137 @@
-Return-Path: <netdev+bounces-249336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5D5AD16D97
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 07:33:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45DC7D16DD6
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 07:40:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0FB27303C990
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 06:32:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CB4813015ECD
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 06:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189E4368283;
-	Tue, 13 Jan 2026 06:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A8A535CB8D;
+	Tue, 13 Jan 2026 06:40:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M9QjCqi6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QGtT10iG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-dy1-f196.google.com (mail-dy1-f196.google.com [74.125.82.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32FC230DD25
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 06:32:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00CE354ADD
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 06:40:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768285924; cv=none; b=r0K3RUH0nhclqd5KYOpJ8m7Qq4N2v8cVsXW1beKxtT1kubBmWYu56N6Lrz42sxkoYyTWOVPctAZxRpL+H/abPMS9zW32qj/qB2eGdiRGdYont78tzGq2tvQNLFtVPKT3lnmi6KTa1+JbmvQ02YLbIJQ5CF51Y6YvmssXz7sIeBE=
+	t=1768286433; cv=none; b=Xl4YJKNZ7akKBYq0EvkWnppNhJ08oTNKVx2ta81kZEq2D0fewTtXYpZQEKzzpCERubUlXKlrwa+mjUld/2tg8MbAE5U73dV0mq0OKDEqpOm6DqbtdLVlLhwdQukAjwG5Ao+Owla3K1u0XQjfgZtK/Ke+cbJpMpHJGHxVEssgkiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768285924; c=relaxed/simple;
-	bh=yX7DhlFraPUD//ZuqML4tqjQ5mKp1gfm8pBA5BRUq/M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=edqbQhkRiOv4FqgCiO3am7FPuWZsRNlqp/cak5ROBXsbNMeAWqIoICotCxJXoniBcRSoBg5ZTIoDlVefA7ro5tn59Nju9BLbSahj5Qa8PqmxfRF+j3TudHXgmE6BDiyo5C3IJJGLcu23XcZ9LkUi3QpvQoJe6NIVHPtvZkTwUZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M9QjCqi6; arc=none smtp.client-ip=209.85.128.42
+	s=arc-20240116; t=1768286433; c=relaxed/simple;
+	bh=+Z3tflR0QPv/AtHYde2Bbd0mWjOrz9fOlEL9zrZ6pJA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IpAk6CqH437jx3rsUjKc4/3Y3IDdnlWnPm/kdZoEcU4HTBdxJ3SirAEfFYNXtxBjCweCBj+VDU5TvHBfGY8wy2E3AR/OawMBgrKKJUSZJHxNJJF2DAou4B4lJ99xC9XfqJx8hYxhkivzcK656PoTGyDXoK/B688Ospkqs+8xSq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QGtT10iG; arc=none smtp.client-ip=74.125.82.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-47d3ffb0f44so49537865e9.3
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 22:32:00 -0800 (PST)
+Received: by mail-dy1-f196.google.com with SMTP id 5a478bee46e88-2b04fcfc0daso7393718eec.0
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 22:40:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768285919; x=1768890719; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LQhbZxT1S/lDurK26TholDxT9dj20OVvsAU3YYjIzC4=;
-        b=M9QjCqi6CQFL/lUsrNPux0k/Fxi0Ix/7huip3lofiin1oMdBv3NTzN6Sc0Aop2dym8
-         6jSORaAoz1DS4w/HAHNxbPI0rFghqENG1bXatbX6wEzE6zgUijGKQCkRkCQj4WM+Ndv6
-         M5eRg2UEH4dpG/hMLgfUTNv2mxcBbhnVS0gNt1B6s9qQmnrTWybN39hFJKuGDW4KZp7d
-         FuDy4pBwgwM7hVTXshhnqTYemLnSRmuHw/87dDhqRFzR4l2cOChxiC/6lsblovClHP0M
-         PK6VlBOpjcznGHaFRpvfCTB3ytXAW0CbXKTWkDoYlojbNTiigHRs5GaOnuUHgyRSYxiS
-         Ebug==
+        d=gmail.com; s=20230601; t=1768286431; x=1768891231; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=whUZoFPva/1DPSFs6qyuipXE3Qp8iIeejIqod2xKLLQ=;
+        b=QGtT10iGg83mPq5E6j8L5Ut2OpbR3KjCYOLbtX1bsP6ERkDICTZyq0c1Bt32teoiqu
+         JIwl7sFhcYarGmEcxiYn6EYgByfX1QSqawNWP6FokwiKEJ1DQDCzPGx1WRWm2/hAiopU
+         yQGD7TAyyz6SpESktYIDy8W20XjB6muKkjycbKjYr41GufK2a2oCEm0c++OSbwpbZ4hF
+         I+hVfjdQFKy2Go2tJyGWOULua3xMdpkPtGf0nYZ4Ilh4nnc1fcdxUWUYFVWWkjCNBXVh
+         VT62ZC6aH6cxw7W99Yt0VbU5XT/1RLBrDo52VpeYNnPFcdAE0Ll1RLjwUXIcbRrFQfIj
+         zeOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768285919; x=1768890719;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LQhbZxT1S/lDurK26TholDxT9dj20OVvsAU3YYjIzC4=;
-        b=mMcLiFrmBrr/uLZyC80gQYzPm1oaVFbinF31W7TEEYLc6oHi0L2iFqiStgSYeuILt9
-         7Gc937Bc6li/O2lXVGp5BshkO6N41EHtScipYXvU2l4NnkJNvxD+TpbouU9KdZec/bu8
-         Kj8VJDPLnB6g4r2w702uuA4zYfUp6iiub2Ag51+W/cHmxC4c8plm4RrONkHLsRvcdjdW
-         tyOVxpjGcNX06XXS/x5y2Cb2bKL26YZJacX7DBD486aQVp+ZEDNE1vEDvjh4IQUDP7PD
-         Pfg3A1fx4XzjRLbNHXQsxsaM0rg5xVhbUyc0UalMPcOrJ3IZ6QSnC3eoF9/dpI9/7wMo
-         xZfA==
-X-Gm-Message-State: AOJu0YztANqzrtu/tf9N/VXo8ygaW7SYvK79nG1RIr8KafAAPxIXbVMk
-	C8FPA59gS4zYCKgxCp8V7wYLLzN3f5gWAhWZmInvTFiJns1AfC311tb7
-X-Gm-Gg: AY/fxX6t/jz5MYGD3UV3ze5qr2OUyEDv5pD8Vi4OWjItNK6MJDCJPMOpuZ3s4m4ga1o
-	UDHKSly47wwiVXPWN7RejYQj4u1T1n1IyqpTRU+Dmn6eDxEyoDa/2a+Vf25yNcx7LjoXgNS5wbj
-	0xcWPd55NdNZeoV4RNboqniePg8+kYJ81CDmfi1ZlaTARjO8WHTv3ry2dlc2PBzQhYnWajAU6/f
-	Dxziuy4UTVUOX+tO9Aytrn56H5eGyglE9G1mij66D9N7gPC4S9HWIgI78fD6uNz2t8Ff5ULgVR1
-	INftD8nhVXyeGDHiKDur9songU/qwi6IGZ/AuLneRkWwV97kWx/f18/M5JyKRvZupZ6I/pyFglX
-	0KF1Ye8jrG0FfBsAkDYzGavzhBGWJSRjXKd9wkPDECl2MzKXVdeARjfnfwR1HpTV2T/+tyBtJ8K
-	htULMQIj5dvabtFqA+DnZx4ok4b7u9QMbaE4s=
-X-Google-Smtp-Source: AGHT+IEUAFfAI80TkN+eVQsY3YtARbADJ3c4FvvQWuIZMALTzGmm7ksRXUr+QWT776d5USXcuu/wkw==
-X-Received: by 2002:a05:600c:c4a3:b0:46e:6d5f:f68 with SMTP id 5b1f17b1804b1-47ed1422becmr69367275e9.12.1768285919415;
-        Mon, 12 Jan 2026 22:31:59 -0800 (PST)
-Received: from [10.221.200.118] ([165.85.126.46])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47ed9eb9319sm9021265e9.2.2026.01.12.22.31.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Jan 2026 22:31:58 -0800 (PST)
-Message-ID: <0ac69f6a-d587-45a7-be30-6ad4429ef8d2@gmail.com>
-Date: Tue, 13 Jan 2026 08:31:57 +0200
+        d=1e100.net; s=20230601; t=1768286431; x=1768891231;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=whUZoFPva/1DPSFs6qyuipXE3Qp8iIeejIqod2xKLLQ=;
+        b=A3LVqaKI/cozX9xXvEFczRsPvtPzGH9pZhJ1D2FyhmoUCx8VLjp04f7xZpgSCTcqls
+         /4aIDOaXHjoNtM7FD/m7oRhlybwOhK+I/JA26BiX2wtnf4GAXu7/GmufiYYcGphth95J
+         SVdks9zWOpBtDaW/z4OPdpRFElrLXPKoSw1D8gpYKGhmfdhyzsrchLloL4CVg3tex0Gj
+         XbyeFTlu3KDUF2OmVbJX5UleN1i7H9832M1DpbWKwjJTCA28gnSr5adjdzd/4c7b3RvS
+         oq4wmXcsVyA6xj1TfXFHjRV9/fKwEH6XSQXo4HM2NoTJbrz3jWhkx3fcjC5cREr4Qx2/
+         d77Q==
+X-Gm-Message-State: AOJu0YxL6hgWpc3aSSiri4U3HRU8Rij9ABptLa8tYZoQowe48HjVDsW+
+	klveI+WowPMaiBHhFlx2G+tpXEkzdnvv/27fWc466uVs2w0lytWx7nMuVpeuUaxx
+X-Gm-Gg: AY/fxX4vCxtHSi0DDyO8OwJYJapDMZlMh12P/66zTroDfLzGF+ixOXZP2Yxc0ZTzXyH
+	dTv+3a6a7i7RgWevrzcfmSUQ18aaT6G9g4sPc/xkTMygL/P3VCWRhly8ZdbGEyXOjhwlKrsR5gi
+	vNdZ8OUHAEL2qFsQxV9BZWNKOwSdvXB5tYFWRWD0LvinzhIKsD19cyiwzFt9Eo2NUkBE/P6XQza
+	WfYyhNtNB9XRu6AyPJAl4AdfrbcLeHNEJghtRm1e28Eh/heEiV99Ke9J/HQY91cyK13rTLgf2nk
+	ho8vaUr2+xKNfqyJgqYoqYfFbgv99/uRp4LPkQV51HrjsladI7MepyHLl9n18kD55sCyKg4w7c2
+	7Bepc4AEs492ZB97rZNByekrQoUx4GfXQV+LESJ2I9dnmLoYuWcck1AXBHmtIoIKnK2CiIacSXT
+	kIRSRWI36A7AHzM76oAYfWFNJGdh1sTHtg4m9NSALvFysSWMjMD8iDoiTyrlkOvAUKNfRVcAVNh
+	X2xCIOblsQ6ioEUUSpD5CQ+8DLUD3CTA9KrAtF4hfXWfPpPELZOx4ZJb3eV1mrHINU6iejqq8ZI
+	HVU7
+X-Google-Smtp-Source: AGHT+IGPO+RR2k2lWqN1OBFQOL1/b6w1FynFekD9M3vfPiG17tDe926KBgpNLC1VR/Gl1O4Os+tcQw==
+X-Received: by 2002:a05:7300:c99:b0:2b0:5342:e00a with SMTP id 5a478bee46e88-2b17d251c0bmr18093494eec.15.1768286430816;
+        Mon, 12 Jan 2026 22:40:30 -0800 (PST)
+Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2b17078dd78sm16913729eec.19.2026.01.12.22.40.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jan 2026 22:40:30 -0800 (PST)
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+To: netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
+	Peter Korsgaard <peter@korsgaard.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Liu Junliang <liujunliang_ljl@163.com>
+Subject: [PATCH net-next] net: usb: dm9601: remove broken SR9700 support
+Date: Mon, 12 Jan 2026 22:39:24 -0800
+Message-ID: <20260113063924.74464-1-enelsonmoore@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC mlx5-next 0/1] net/mlx5e: Expose physical received
- bits counters to ethtool
-To: Kenta Akagi <k@mgml.me>, Saeed Mahameed <saeedm@nvidia.com>,
- Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260112070324.38819-1-k@mgml.me>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20260112070324.38819-1-k@mgml.me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+The SR9700 chip sends more than one packet in a USB transaction,
+like the DM962x chips can optionally do, but the dm9601 driver does not
+support this mode, and the hardware does not have the DM962x
+MODE_CTL register to disable it, so this driver drops packets on SR9700
+devices. The sr9700 driver correctly handles receiving more than one
+packet per transaction.
 
+While the dm9601 driver could be improved to handle this, the easiest
+way to fix this issue in the short term is to remove the SR9700 device
+ID from the dm9601 driver so the sr9700 driver is always used. This
+device ID should not have been in more than one driver to begin with.
 
-On 12/01/2026 9:03, Kenta Akagi wrote:
-> Hi,
-> 
-> I would like to measure the cable BER on ConnectX.
-> 
-> According to the documentation[1][2], there are counters that can be used
-> for this purpose: rx_corrected_bits_phy, rx_pcs_symbol_err_phy and
-> rx_bits_phy. However, rx_bits_phy does not show up in ethtool
-> statistics.
-> 
-> This patch exposes the PPCNT phy_received_bits as rx_bits_phy.
-> 
-> 
-> On a ConnectX-5 with 25Gbase connection, it works as expected.
-> 
-> On the other hand, although I have not verified it, in an 800Gbps
-> environment rx_bits_phy would likely overflow after about 124 days.
-> Since I cannot judge whether this is acceptable, I am posting this as an
-> RFC first.
-> 
+The "Fixes" commit was chosen so that the patch is automatically
+included in all kernels that have the sr9700 driver, even though the
+issue affects dm9601.
 
-Hi,
+Fixes: c9b37458e956 ("USB2NET : SR9700 : One chip USB 1.1 USB2NET SR9700Device Driver Support")
+Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+---
+ drivers/net/usb/dm9601.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-This is a 64-bits counter so no overflow is expected.
-
-> 
-> [1] commit 8ce3b586faa4 ("net/mlx5: Add counter information to mlx5
->      driver documentation")
-> [2] https://docs.kernel.org/networking/device_drivers/ethernet/mellanox/mlx5/counters.html
-> 
-> Kenta Akagi (1):
->    net/mlx5e: Expose physical received bits counters to ethtool
-> 
->   drivers/net/ethernet/mellanox/mlx5/core/en_stats.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
+diff --git a/drivers/net/usb/dm9601.c b/drivers/net/usb/dm9601.c
+index 8b6d6a1b3c2e..2b4716ccf0c5 100644
+--- a/drivers/net/usb/dm9601.c
++++ b/drivers/net/usb/dm9601.c
+@@ -603,10 +603,6 @@ static const struct usb_device_id products[] = {
+ 	USB_DEVICE(0x0fe6, 0x8101),	/* DM9601 USB to Fast Ethernet Adapter */
+ 	.driver_info = (unsigned long)&dm9601_info,
+ 	 },
+-	{
+-	 USB_DEVICE(0x0fe6, 0x9700),	/* DM9601 USB to Fast Ethernet Adapter */
+-	 .driver_info = (unsigned long)&dm9601_info,
+-	 },
+ 	{
+ 	 USB_DEVICE(0x0a46, 0x9000),	/* DM9000E */
+ 	 .driver_info = (unsigned long)&dm9601_info,
+-- 
+2.43.0
 
 
