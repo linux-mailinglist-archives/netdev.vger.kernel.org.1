@@ -1,284 +1,192 @@
-Return-Path: <netdev+bounces-249403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17084D18041
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 11:29:07 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C14D6D1807C
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 11:30:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9225E3020267
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 10:19:50 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B4B263065C2F
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 10:20:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9333B3904CF;
-	Tue, 13 Jan 2026 10:17:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53AC038A9A2;
+	Tue, 13 Jan 2026 10:18:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="fdnLbZ9I"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="iOk76IjX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010058.outbound.protection.outlook.com [52.101.201.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FAAC38FF02;
-	Tue, 13 Jan 2026 10:17:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768299478; cv=none; b=p+RABvbO/z3Cp/O7LDBR9KPdA/nsIByENjhxeBmqTTCdNmDcELX40Mg+jd/+8Yqv/gEB/uG+apNM+OQ4Wnma6C0t2E6AW0xAJn3s8LA4Sg636Ednz2x11Xb8cYaPYUyFa6d7Ata9k0RawYyiA2a+BsN8dyUJGpZLrrEhcQSj9m0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768299478; c=relaxed/simple;
-	bh=rBH5LZn6EEZ3aNnM3aKa6wO3oG0lh7eDQQ17f0ChjeI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gzXNtve/cjPdKMAjbBbOIGgpo9qWJgcWMtgrVNqanLkfMOJuL5S3YO+VE/U1PtnzTg6WQuUYKJbMx+PEOmDp/AIxWJuznfPCb8FyJqvgcCShajhQ3ETGxPpeIuI7i36xksbJuF5wL8TfkljKPks7NaAKYDwJZ0w/3LhZosoOWJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=fdnLbZ9I; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60D7Q9rl449708;
-	Tue, 13 Jan 2026 02:17:47 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=T
-	dB8TDEHZmEnI2Mluzkf9GakYHLT9A34CmXmfba0OZ8=; b=fdnLbZ9IKoZyuauST
-	SgWBDmGyfOYhzzskB2jLmWmAb+rWs6oU1DW4CEArhk29dmaaLOn7jrHp/C7AnVRP
-	JYD51pS4JATYR1itfsQ1ncUUIeyE7QF+xtjLLg/rm74kWCwTUBDlOUeUdPJ3+6sz
-	141+8hvb9glDC2qPP6Tgnp/9Gr2MW8MJkth4MoFfzAxFfQ4FJO0rVHPRACKC6Ky7
-	YJiq5tCcHnL3XxWqNWmvX53nlK9q1knmfjJ89iJyCSAbBD7AwW2KODWqMnNpieZR
-	gJ8b3VZTn5KchPzngD20OurraM38qB3eudI+oKc8QltpIWpQvV4mx7zjeAidXEv9
-	2r3tA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4bngnq8dne-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 13 Jan 2026 02:17:47 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 13 Jan 2026 02:18:02 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Tue, 13 Jan 2026 02:18:02 -0800
-Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id 510483F7096;
-	Tue, 13 Jan 2026 02:17:44 -0800 (PST)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-        "Ratheesh
- Kannoth" <rkannoth@marvell.com>
-Subject: [PATCH net-next v4 13/13] octeontx2-af: npc: Use common structures
-Date: Tue, 13 Jan 2026 15:46:58 +0530
-Message-ID: <20260113101658.4144610-14-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260113101658.4144610-1-rkannoth@marvell.com>
-References: <20260113101658.4144610-1-rkannoth@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E3E38A729;
+	Tue, 13 Jan 2026 10:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768299518; cv=fail; b=HEldpKqzjXP1HH9EQ5zACuan6GYkynwj3NZ4p0aCIJNrBk+qOuVh2zq7WXFp9jsS6I8CEfPr8qyDxcVaouKmrm6HOsay4bfCkiIriSppVTe3pcAGSvm1dYDptZUHPMG3MyiPBdyTo3Tuyenet1HEQkfo01kjoVWF6WYspnemWnQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768299518; c=relaxed/simple;
+	bh=3q3nrmBR7ock52HFuvs9jhFrvYTSo9IuAcn7Yx2idPs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=s9CR1rO3bk0fUIVO4aXm++vL7WFydZ7lbL8Jd68PxDEFLCizmdCd5FcXchUnIkxoy08M4sVfymNSPtAj/3yZq5nrqCWgLejqV7kreqARdAK29+00mJRegJHT8xLxB7s/fm0X3o97mc19w4QqyOhPZwJY5jpD1YCh6fn2NvhLd08=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=iOk76IjX; arc=fail smtp.client-ip=52.101.201.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=f9B8plC4Fn4HOjAagl+Oo+YV68FjH9oNZr8Z2X6QNGrnT/PWwXf/+LJClX9UbCag8m2T+rzqlkzms7MslgPGZ/QXDQJVnesWnJwtRTz3tU1U9XFpnzQULDmF3hb032EekEVbWsQuCyShjbt1m5DD2GdFivXGKCzmlMYhLmpFutx+hkz2b9WQpBog13Mfs6i5c0t9+RWUydKbB2q/NXGZp5iKhh1lw9qMVPn62g45ddulETn7yaiR3yHHqdxv8dGxwruBfYLIZ0PFlcqCqgU5yn4gpDnzzrgbbH9T/SsBWu3mJ/BcQ38WgpvG8zBWx0cdky/VVRI+U/VfVn3Dp7nKLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Gq/3YhSDI6qp9xzkYP6GoOEhy/awOGh0F6YiE/YpjrQ=;
+ b=Jrm//9sGoBgtlNSmf0PSDBxGcJ3gWsFsrDeN6ELNHYTkLFtkmIu45vuC1Pa1cu/pcpg/JoUm2LHyimWt3c8Oy6Vf02TDY/nZT3hoMyXDkXkNQpUO3TUIGX0zIs/YhuxMYSmf6qCYjemyn5SUrtQakviljY2ElEluVfNG+xJ1uFLSPm2062s6v9XnoiZ8oE/rFd9dboXMvpbFaHYtx85bSgETFBfK4HBH2C2j21+AOKB/9trS90gXMjQ8XRO7UIB0SJtp9uCcnQK+zj4Cevj+X7BDrD2A2G2s5p0WFCOaPQkng4xiCmHtw4gslZrsocWwwfteC5ySIr9JNTSxfAE5/g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Gq/3YhSDI6qp9xzkYP6GoOEhy/awOGh0F6YiE/YpjrQ=;
+ b=iOk76IjXHMYSy3azZZSAp2Jl/nxbS3QfofssDmZhj5zKBfvbR3QttkDUWRFXbRoEGLPoeJ8F54dlU7a1IgCom9LMSqotIdwCCsB/gUXirDJ+ft0dXunsmlgr8XovrT4osU5viTMGHlmYWtI1pGR87MPiv4Zhr6zs+ArvCFtR5fHjEvqMw39+2k1qIG4ZaOZvEOdZ3Ebs5AFfhfJseoJK37nW8HjmU7y5Haqx35JG1K9cIJljOdQN6kl3WV2O7XfcdGCqRilDtLudqnlGS3PvgLpv5ZROWmWaYUynWDFTT4es8GYoA2/IdMhV3FG76NoPZwLLydvpjxokiyoINfAeNA==
+Received: from BN9PR03CA0898.namprd03.prod.outlook.com (2603:10b6:408:13c::33)
+ by SJ1PR12MB6098.namprd12.prod.outlook.com (2603:10b6:a03:45f::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.5; Tue, 13 Jan
+ 2026 10:18:30 +0000
+Received: from BN2PEPF000055DF.namprd21.prod.outlook.com
+ (2603:10b6:408:13c:cafe::df) by BN9PR03CA0898.outlook.office365.com
+ (2603:10b6:408:13c::33) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9499.7 via Frontend Transport; Tue,
+ 13 Jan 2026 10:18:29 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BN2PEPF000055DF.mail.protection.outlook.com (10.167.245.9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9542.0 via Frontend Transport; Tue, 13 Jan 2026 10:18:29 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 13 Jan
+ 2026 02:18:14 -0800
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 13 Jan
+ 2026 02:18:14 -0800
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.9)
+ with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Tue, 13
+ Jan 2026 02:18:11 -0800
+From: Tariq Toukan <tariqt@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>
+CC: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Alexei Lazar
+	<alazar@nvidia.com>, Or Har-Toov <ohartoov@nvidia.com>
+Subject: [pull-request] mlx5-next updates 2026-01-13
+Date: Tue, 13 Jan 2026 12:17:51 +0200
+Message-ID: <1768299471-1603093-1-git-send-email-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.8.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=DLeCIiNb c=1 sm=1 tr=0 ts=69661bcb cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
- a=bNx57pydN-Y4TXDtlhsA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: Wd22ZhJM_VyT6ai6ahJXHgFU0cCT5QoJ
-X-Proofpoint-ORIG-GUID: Wd22ZhJM_VyT6ai6ahJXHgFU0cCT5QoJ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTEzMDA4NyBTYWx0ZWRfX1sXjjAxV45gR
- YncaaazeSxi6RMz/AVfqiS2V9gaXTrGYeBSd5rzPc9SLUUy3k9v6iHAF+N/Odti1rxUJc51pELr
- WuSQkBUHRwi+QvpjP/PR3uXfR+pg4k1akM0fZA9A209m5ibIOTRmg91TkFzQ0E35wdNMi6tmzEm
- OjONbZjjUBCZsdKIP0jL+wO+n68/uF5+ljEFRvHso57uYVaolf8+g0F7k5I83qUw7ss/g80BBkN
- f6pmD3t18cRqN9umWneqoMLADUrzAWnj/o1+fRWpEjTZR0vwKdRaA9/53lilR7/IXn3x9c4sTKj
- fr5lGIJK2J7YjwSesHClwdaQtFqI4ADrcPDRj5jh7IpjeQ8Iea1/Hw16HwNCiCDgDQbJa/Fp21u
- 4pOAKuf1an0mvisJGI3nP1d2LF4sdQbL4O8ktimHmrd82vyF21ZzCdTs6L+LxzpeBEUmISiQDqr
- oHRH63j7u2ffJuncyfQ==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-13_02,2026-01-09_02,2025-10-01_01
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF000055DF:EE_|SJ1PR12MB6098:EE_
+X-MS-Office365-Filtering-Correlation-Id: 88f70508-7c8e-4753-49f3-08de528d18fd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|36860700013|82310400026|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Nmfyp0rITdSgmmLLCCXzS5tXe5Bwt4D14jWC08IzVG5t9EdMDfn28wjRfgPY?=
+ =?us-ascii?Q?BwJM/P+enkxXlUAA62mL3wbteQG4aniA+ZtzbbCVpX+flibXmWq1p6UzQbYN?=
+ =?us-ascii?Q?CMbP0XsZfYXm6Oge8csyn8irGyU2MPWLipYhuMPG29zdLMWEc3G4V4u5mjKT?=
+ =?us-ascii?Q?ZaquLQUdoLKSQ8aruXb/j1KHvh0tYm/wq9s6o/+c9sqzroH4rjzk11No+fZl?=
+ =?us-ascii?Q?+yM5Ocql05o+hlbJWq1YZPufL6wvpp9c2HpqB+3SdgMcNFT9JyQ5B+9J6slc?=
+ =?us-ascii?Q?LMGwyOaNzMpOCy2Hn6UAqg4GRwH+mjmzVXxKaHszK+HpsnQxQZFknCw+p3GI?=
+ =?us-ascii?Q?Yl5NcBj+12+n6nJjiIRS20r009har6Aa17ZfbOLTMbPq14UXYHkDU2VnOVxA?=
+ =?us-ascii?Q?aLROO8CIfcO5hXp+CCrI8JNPrqLlJmn3nf6ykgUh562LBw4HJAX2vBW2Z4e2?=
+ =?us-ascii?Q?xYEHCVUi527zRzrUxXGYf2GxeIMztfZoTpQnHsUrtAF2ggnm3mBwXH52+eB3?=
+ =?us-ascii?Q?Mz/xYvZFU04YyozbXCWcSYQZW/6y4SQW0RP6KVa60lCM+YoFcF17+Of6oNrd?=
+ =?us-ascii?Q?kDVK1uwX1R0wksd1qJfE/p9bA4t2n0HVBoLzRxoT0x/1hUTZc4eSV0Hmv31i?=
+ =?us-ascii?Q?1yTnE3mLsEzXKZLZeRGja5n8RzgYootS6ub6yjwDG87VVOJkNOpgOFugGnAk?=
+ =?us-ascii?Q?HUtJ9NG8yDvMPnC5jIj+5mHDhOwGfRi9mD3ERwwlOr8CG71sOtnj7MD/hBCN?=
+ =?us-ascii?Q?HlbbamLFchMswSXohdFJ/i22G/9GKFJWhZyPFZqtCaEsX3xlSCDsbpgRnwE9?=
+ =?us-ascii?Q?1hTP1cFVnLERlr6bZNPMPRmwQlGB6vg3amRsF5FeB3+rUL90IRN3h5safEjA?=
+ =?us-ascii?Q?4bWgMlfPEPlYWcKkkODsq5tBQb8okv6wUH6FrJFwzrOQl+RLFdogIKcNUPFR?=
+ =?us-ascii?Q?JE4Jccgjq0b9y6O1iofA81krPjTs3kN2KIpbBcoCkIUh4DoeU82nCicC90xL?=
+ =?us-ascii?Q?2t5FlTa5MIk0ahLqT6pNYw6t6PFhT+DKUQrLUkwGkSNSHl3GCUM2aTxP7EhE?=
+ =?us-ascii?Q?kmG9GxtxaGfxHKIfWyVp/l4lMLGKxX29Xplz+CL0cXkoOXeeN4xk4WQAJ6Mk?=
+ =?us-ascii?Q?q3cDt6IUWQZF7YwZJHCAj1aHU2aV45YXhwU65uI1ECxdGTahQPer4745VDac?=
+ =?us-ascii?Q?i9Ih38ATLkNBf5uz8rJTTYVH4UcZmx9H8/v/VoKMlN7U9WPoTYSUC2lLFQkV?=
+ =?us-ascii?Q?PBomhZtQM1Wle8Y/geXJgqzsLBx7vVUreJmrQsO6Ro2jocqgc7ItlU8tD0BU?=
+ =?us-ascii?Q?4cNTz4peUYQqO7yhJt0qIMtQ9bbnK5sVXLDSAfCSkNz0X1u946BP89T0dn+x?=
+ =?us-ascii?Q?TJ/PTdL3J5zeokGtac9Dy77tQbcrrRjPB6dAsHXcar1ArySDUI5qN8cBsND/?=
+ =?us-ascii?Q?vgaczqboDWeKRmtOmYZ+rin4AyK3hORRQI7w4TLO/D3ztd+e3XctyFjy/xQS?=
+ =?us-ascii?Q?rdjWXVyUeqJWbiKmdI6gxGUofNcZExkA94DA5N2QnDL1hPDiRA0+7WASr9rP?=
+ =?us-ascii?Q?JsDGMRis15PjNlpJizs=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(36860700013)(82310400026)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2026 10:18:29.4460
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 88f70508-7c8e-4753-49f3-08de528d18fd
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF000055DF.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6098
 
-CN20K and legacy silicon differ in the size of key words used
-in NPC MCAM. However, SoC-specific structures are not required
-for low-level functions. Remove the SoC-specific structures
-and rename the macros to improve readability.
+Hi,
 
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
----
- .../ethernet/marvell/octeontx2/af/cn20k/npc.c | 11 ++++---
- .../net/ethernet/marvell/octeontx2/af/mbox.h  | 16 ++++++----
- .../net/ethernet/marvell/octeontx2/af/rvu.h   |  2 +-
- .../marvell/octeontx2/af/rvu_npc_fs.c         | 31 ++++++++-----------
- 4 files changed, 30 insertions(+), 30 deletions(-)
+The following pull-request contains common mlx5 updates
+for your *net-next* tree.
+Please pull and let me know of any problem.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-index 6f35ff94202e..ac9e95cc3755 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/npc.c
-@@ -3986,10 +3986,10 @@ int rvu_mbox_handler_npc_get_num_kws(struct rvu *rvu,
- 				     struct npc_get_num_kws_req *req,
- 				     struct npc_get_num_kws_rsp *rsp)
- {
-+	u64 kw_mask[NPC_KWS_IN_KEY_SZ_MAX] = { 0 };
-+	u64 kw[NPC_KWS_IN_KEY_SZ_MAX] = { 0 };
- 	struct rvu_npc_mcam_rule dummy = { 0 };
--	struct cn20k_mcam_entry cn20k_entry = { 0 };
- 	struct mcam_entry_mdata mdata = { };
--	struct mcam_entry entry = { 0 };
- 	struct npc_install_flow_req *fl;
- 	int i, cnt = 0, blkaddr;
- 
-@@ -4006,7 +4006,8 @@ int rvu_mbox_handler_npc_get_num_kws(struct rvu *rvu,
- 		return NPC_MCAM_INVALID_REQ;
- 	}
- 
--	npc_populate_mcam_mdata(rvu, &mdata, &cn20k_entry, &entry);
-+	mdata.kw = kw;
-+	mdata.kw_mask = kw_mask;
- 
- 	npc_update_flow(rvu, &mdata, fl->features, &fl->packet,
- 			&fl->mask, &dummy, fl->intf, blkaddr);
-@@ -4014,8 +4015,8 @@ int rvu_mbox_handler_npc_get_num_kws(struct rvu *rvu,
- 	/* Find the most significant word valid. Traverse from
- 	 * MSB to LSB, check if cam0 or cam1 is set
- 	 */
--	for (i = NPC_CN20K_MAX_KWS_IN_KEY - 1; i >= 0; i--) {
--		if (cn20k_entry.kw[i] || cn20k_entry.kw_mask[i]) {
-+	for (i = NPC_KWS_IN_KEY_SZ_MAX - 1; i >= 0; i--) {
-+		if (kw[i] || kw_mask[i]) {
- 			cnt = i + 1;
- 			break;
- 		}
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-index 2d9f6cb4820f..dc42c81c0942 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-@@ -1593,18 +1593,22 @@ struct mcam_entry_mdata {
- 	u8 max_kw;
- };
- 
-+enum npc_kws_in_key_sz {
-+	NPC_KWS_IN_KEY_SZ_7 = 7,
-+	NPC_KWS_IN_KEY_SZ_8 = 8,
-+	NPC_KWS_IN_KEY_SZ_MAX,
-+};
-+
- struct mcam_entry {
--#define NPC_MAX_KWS_IN_KEY	7 /* Number of keywords in max keywidth */
--	u64	kw[NPC_MAX_KWS_IN_KEY];
--	u64	kw_mask[NPC_MAX_KWS_IN_KEY];
-+	u64	kw[NPC_KWS_IN_KEY_SZ_7];
-+	u64	kw_mask[NPC_KWS_IN_KEY_SZ_7];
- 	u64	action;
- 	u64	vtag_action;
- };
- 
- struct cn20k_mcam_entry {
--#define NPC_CN20K_MAX_KWS_IN_KEY	8
--	u64	kw[NPC_CN20K_MAX_KWS_IN_KEY];
--	u64	kw_mask[NPC_CN20K_MAX_KWS_IN_KEY];
-+	u64	kw[NPC_KWS_IN_KEY_SZ_8];
-+	u64	kw_mask[NPC_KWS_IN_KEY_SZ_8];
- 	u64	action;
- 	u64	vtag_action;
- 	u64	action2;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-index f811d6b5c545..a466181cf908 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
-@@ -197,7 +197,7 @@ struct npc_key_field {
- 	/* Masks where all set bits indicate position
- 	 * of a field in the key
- 	 */
--	u64 kw_mask[NPC_CN20K_MAX_KWS_IN_KEY];
-+	u64 kw_mask[NPC_KWS_IN_KEY_SZ_MAX];
- 	/* Number of words in the key a field spans. If a field is
- 	 * of 16 bytes and key offset is 4 then the field will use
- 	 * 4 bytes in KW0, 8 bytes in KW1 and 4 bytes in KW2 and
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-index c5e466c7e514..cb33c213ba47 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-@@ -227,7 +227,7 @@ static bool npc_check_overlap(struct rvu *rvu, int blkaddr,
- 		input = &mcam->tx_key_fields[type];
- 	}
- 
--	kws = NPC_MAX_KWS_IN_KEY;
-+	kws = NPC_KWS_IN_KEY_SZ_7;
- 
- 	if (is_cn20k(rvu->pdev))
- 		goto skip_cn10k_config;
-@@ -289,7 +289,7 @@ static bool npc_check_overlap(struct rvu *rvu, int blkaddr,
- 			 * field bits
- 			 */
- 			if (npc_check_overlap_fields(dummy, input,
--						     NPC_CN20K_MAX_KWS_IN_KEY))
-+						     NPC_KWS_IN_KEY_SZ_8))
- 				return true;
- 		}
- 	}
-@@ -460,9 +460,9 @@ static void npc_handle_multi_layer_fields(struct rvu *rvu, int blkaddr, u8 intf)
- 	u8 start_lid;
- 
- 	if (is_cn20k(rvu->pdev))
--		max_kw = NPC_CN20K_MAX_KWS_IN_KEY;
-+		max_kw = NPC_KWS_IN_KEY_SZ_8;
- 	else
--		max_kw = NPC_MAX_KWS_IN_KEY;
-+		max_kw = NPC_KWS_IN_KEY_SZ_7;
- 
- 	key_fields = mcam->rx_key_fields;
- 	features = &mcam->rx_features;
-@@ -906,12 +906,12 @@ void npc_update_entry(struct rvu *rvu, enum key_fields type,
- 		      struct mcam_entry_mdata *mdata, u64 val_lo,
- 		      u64 val_hi, u64 mask_lo, u64 mask_hi, u8 intf)
- {
--	struct cn20k_mcam_entry cn20k_dummy = { {0} };
-+	u64 kw_mask[NPC_KWS_IN_KEY_SZ_MAX] = { 0 };
-+	u64 kw[NPC_KWS_IN_KEY_SZ_MAX] = { 0 };
- 	struct npc_mcam *mcam = &rvu->hw->mcam;
--	struct mcam_entry dummy = { {0} };
--	u64 *kw, *kw_mask, *val, *mask;
- 	struct npc_key_field *field;
- 	u64 kw1, kw2, kw3;
-+	u64 *val, *mask;
- 	int i, max_kw;
- 	u8 shift;
- 
-@@ -922,15 +922,10 @@ void npc_update_entry(struct rvu *rvu, enum key_fields type,
- 	if (!field->nr_kws)
- 		return;
- 
--	if (is_cn20k(rvu->pdev)) {
--		max_kw = NPC_CN20K_MAX_KWS_IN_KEY;
--		kw = cn20k_dummy.kw;
--		kw_mask = cn20k_dummy.kw_mask;
--	} else {
--		max_kw = NPC_MAX_KWS_IN_KEY;
--		kw = dummy.kw;
--		kw_mask = dummy.kw_mask;
--	}
-+	if (is_cn20k(rvu->pdev))
-+		max_kw = NPC_KWS_IN_KEY_SZ_8;
-+	else
-+		max_kw = NPC_KWS_IN_KEY_SZ_7;
- 
- 	for (i = 0; i < max_kw; i++) {
- 		if (!field->kw_mask[i])
-@@ -1315,14 +1310,14 @@ npc_populate_mcam_mdata(struct rvu *rvu,
- 		mdata->kw_mask = cn20k_entry->kw_mask;
- 		mdata->action = &cn20k_entry->action;
- 		mdata->vtag_action = &cn20k_entry->vtag_action;
--		mdata->max_kw = NPC_CN20K_MAX_KWS_IN_KEY;
-+		mdata->max_kw = NPC_KWS_IN_KEY_SZ_8;
- 		return;
- 	}
- 	mdata->kw = entry->kw;
- 	mdata->kw_mask = entry->kw_mask;
- 	mdata->action = &entry->action;
- 	mdata->vtag_action = &entry->vtag_action;
--	mdata->max_kw = NPC_MAX_KWS_IN_KEY;
-+	mdata->max_kw = NPC_KWS_IN_KEY_SZ_7;
- }
- 
- static int npc_update_rx_entry(struct rvu *rvu, struct rvu_pfvf *pfvf,
--- 
-2.43.0
+Regards,
+Tariq
 
+----------------------------------------------------------------
+The following changes since commit f8f9c1f4d0c7a64600e2ca312dec824a0bc2f1da:
+
+  Linux 6.19-rc3 (2025-12-28 13:24:26 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git mlx5-next
+
+for you to fetch changes up to 49e41f3ea3f7545c732a0b399cb123173afc5cfe:
+
+  net/mlx5: Add IFC bits for extended ETS rate limit bandwidth value (2026-01-13 03:43:00 -0500)
+
+----------------------------------------------------------------
+Alexei Lazar (1):
+      net/mlx5: Add IFC bits for extended ETS rate limit bandwidth value
+
+Or Har-Toov (4):
+      net/mlx5: Add max_tx_speed and its CAP bit to IFC
+      net/mlx5: Propagate LAG effective max_tx_speed to vports
+      net/mlx5: Handle port and vport speed change events in MPESW
+      net/mlx5: Add support for querying bond speed
+
+ drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c  | 215 +++++++++++++++++++++
+ drivers/net/ethernet/mellanox/mlx5/core/lag/lag.h  |  11 ++
+ .../net/ethernet/mellanox/mlx5/core/lag/mpesw.c    |  39 ++++
+ .../net/ethernet/mellanox/mlx5/core/lag/mpesw.h    |  14 ++
+ .../net/ethernet/mellanox/mlx5/core/mlx5_core.h    |   1 +
+ drivers/net/ethernet/mellanox/mlx5/core/port.c     |  24 +++
+ drivers/net/ethernet/mellanox/mlx5/core/vport.c    |  74 +++++++
+ include/linux/mlx5/driver.h                        |   1 +
+ include/linux/mlx5/mlx5_ifc.h                      |  16 +-
+ include/linux/mlx5/vport.h                         |   6 +
+ 10 files changed, 395 insertions(+), 6 deletions(-)
 
