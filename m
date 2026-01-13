@@ -1,114 +1,119 @@
-Return-Path: <netdev+bounces-249575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A54C8D1B1DC
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 20:54:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38E04D1B221
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 21:03:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 363003016CEA
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 19:54:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 20F59301FFBD
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 20:03:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B312C36A010;
-	Tue, 13 Jan 2026 19:54:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6774E318BAE;
+	Tue, 13 Jan 2026 20:03:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="YPLNkRO3"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vaXTZFop"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10FE03570CF
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 19:54:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DDA11A5B84;
+	Tue, 13 Jan 2026 20:03:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768334082; cv=none; b=LoLJFS0/Y+9EP/HKLDLAIuafU6Ys0WkKMNH/qcIlPrecP8VNEXUgqJH5vDU9g+ibr4aw49WKfERn0skaL3xXf0rIOj1+OkTFwOtMPB+mGne/lhytfl54rltbNgeeL6/YtByDaP/+PF+5YlyNZqjcs8/79hKVSYu7IZlsaVHTlWo=
+	t=1768334610; cv=none; b=fw9SyLYE1Mr6ViJxBAAZrMCX1etKrQjcTybvrsu7B7s4JdMPfVtLSgqkTF/yCac9Jr3hk7VCOdzR56Z72SZKHLRsyttXtbnXNOchkG3b6xNTxvtdlzSjI6wZqLWN+TznWGtcRXOFOmWLcqAB0Vo0i2EqqqPS9MEe24uDKhECWfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768334082; c=relaxed/simple;
-	bh=YdW2q0GpO4EHX0WhRe6b4HjMfoeWHSyAzK/rRaAABi0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WgwLiesXZLXu0F7ggSbUrK9abZGO95VEtGdLCWkk8qKw43yNP+dFtPa6Bm4oYBtOxMLphmhLvydCK774lAhJ5gcTs8lzbAH39e/aCz7xOxuSRsCCNsvwAdYynHOdy1i9tMOXUuPwRrIiGS3n8GXpWPzFoE6jkundC/OYbF9Q8g0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=YPLNkRO3; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-383247376a4so36329681fa.3
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 11:54:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1768334079; x=1768938879; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IIoy/FVe88F+06EGG091rXbZFZp4KaZzIOjxCBl2QNU=;
-        b=YPLNkRO3Dehzy2C0oa21msgRqhgDjP6Xx3AkyXtlvQKv+cJSSUD5HQMehG2jTYakQ7
-         xrBllLxO86+gKFSXGJjsK/3Cgu6jxO+v/oUPUkVLzUvG+ddry7YHmUfpTZz1mHrp+QlX
-         Fd5D8qnX0o0KPa20pufZel3G80pM19nRuQw5kMlYKZZCLhWSeI0+dudBy2g0GEBaecJm
-         kCe4PxZz+Ubh7vg+rFp9qHBohhIwuED1ejvX9RQfpOMg4Td/iwF86llyP42F1SyrdUxN
-         Pef2moA6IsYrlzceEwjd5f29MA7B+veTRI70HuPCm7McJBH6iRVTqBCJTX/NDx6GJZHV
-         qzrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768334079; x=1768938879;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=IIoy/FVe88F+06EGG091rXbZFZp4KaZzIOjxCBl2QNU=;
-        b=kAtkoNU6MCsoNBhKTb/zP2kPf1EJAXIQsrX2+zeRZQlb3GOih0CdPqARljTV6u5iXS
-         pwZLpuMjjRxE/s2lEYFxQPU6uC3mEAyBae0a5LjeUn9Yiha7jToFrzSz3UFuVRxLfAjq
-         OwGmS00ogm4JpUGVEUW5Wx7gW0dmgDvNhjm7DXQXwegzUuBoob+Z4CZR+cFxy+DY/dDk
-         hG1soOYx2uRwRJOGu+g/2VSFVB3kUQLedKR4uN83LUJRFeK//Wxii7YoZfVXnn7n+tLs
-         VmoZ0b8/bDiGa/pAGo7CNwiBfhVmEmZtcz+Qdw+1lGolCEHGeKmOWVU9QeGFxbVtDZqI
-         vzNg==
-X-Forwarded-Encrypted: i=1; AJvYcCWF9K3cYDbRVl0THAKeGWTK1EFnbiVDTzeilWCNyuethvLWe0fvEaGxTxa2jloz3v98FlFQ3DU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwR/8Ks0srm7lJmTT0Swy51pj/6U85BemN2RwJDi5WsHysscM53
-	7jJPFfsqliQwMdbq/eZjrM3kNV+YdTQuG/es2s5CYw2dBgAhHhBoC71oTDlYSUnoA6zyBGgJq0A
-	Pvi9Jqxctv2y/kgaJmZ77hTr07v2syGvUUbOWkMEcQ9nS6b1NWtx40g==
-X-Gm-Gg: AY/fxX4k35mgmVCnWJ8KCV7urz3n2LnrSbhDFReVNc/GsCI82LLj5tpDiAe7cFVsEn2
-	8rHPbZCSxjlwx/WtlGfheueVATjkRJYtJYF5YOPGu5Kk2g8AQbvZ5NVF0+PAi0+/tWZXvVCMpg6
-	GGRyI7eGAj8f9mEs+FimM3yrm76ZMXcSBbTip55ss04x0rpWMys6I0rzM2StY+K2dAlcXjg6kPz
-	iLiPOdnA28J8TkJ403FYcPDZZ3W++OKiJoDyust4p2c9o0iV9HDGK+1cPFxSOQ3uadE+a3Y1asl
-	OfoW6+oaQDX/chNnuw2zqoW/tnO+BBh5y6Bpl1mjciO2gZ0ik6bT8ljNg++G
-X-Received: by 2002:a2e:bc1d:0:b0:383:1737:5ae1 with SMTP id
- 38308e7fff4ca-383606c207cmr760461fa.11.1768334078904; Tue, 13 Jan 2026
- 11:54:38 -0800 (PST)
+	s=arc-20240116; t=1768334610; c=relaxed/simple;
+	bh=xLC39Qjr6cigv4A14inCUgMMPso9QTfTtOhZjTdsxlc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SMvTASed5YkoWZ1ypTho6A9CAXwk5Z2j6v9Uxl3VjFsl0UfM+vMqq2j0AJ0YIY2J5vVt5ZtUWFbXs5Rlh4anDCk0btlctQoAv8ij8HZB5Ol/4tQK1DzmYVoFa78LjsjMoL6fCbUHlXfe2FJ5sZQbdRwNsC6fB87QOhK4N3QFeZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=vaXTZFop; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=R4xqXbi0Q6/KYvVejxl+JdEUTYv8X6JqtJIUMrlC0/k=; b=vaXTZFopVYFJ+1D12g7VeYnimX
+	j2qvYhj1URhpdStAcJsG1wgRMWXqo5YWlcH1/1AdiZbJW1VVriiayZ813j1Uu0nEVHxm8X2f1Gws8
+	f8Gf0Wjih1q6PpZ52poe6txIDIcMjI7F7gPx8rhptWQJnQHAuhFZoC8spSb/Yf6jeQcJHQBadGBbf
+	XItxE1KBBgPM75frlDd8yk/HWi5CVtW9RO6ZT8xesIHgquzWo58y5XUAfcD3c7gygm+WP/mYbEAkh
+	E7EWr0QA4ZnYNMW7zdyAPVvuzz2zM7oTcU+qmqWpFePAdC72RhKLUGRx6Fw/o1PIfH7nl9qIzm9QO
+	0BhT84fQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39018)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vfkbm-000000007nt-0s0Q;
+	Tue, 13 Jan 2026 20:03:18 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vfkbg-000000000wo-1dCM;
+	Tue, 13 Jan 2026 20:03:12 +0000
+Date: Tue, 13 Jan 2026 20:03:12 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Pei Xiao <xiaopei01@kylinos.cn>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH net] net: freescale: ucc_geth: Return early when TBI
+ found can't be found
+Message-ID: <aWalAMC2FWKlXK0E@shell.armlinux.org.uk>
+References: <20260113074316.145077-1-maxime.chevallier@bootlin.com>
+ <d89cb3a7-3a55-4bdf-805a-b3386572b220@bootlin.com>
+ <aWaSnRbINHoAerGo@shell.armlinux.org.uk>
+ <6b8aebe7-495e-40e5-a99d-57f8f7b2e683@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260108171456.47519-1-tom@herbertland.com> <20260109115015.727c7e9e@kernel.org>
-In-Reply-To: <20260109115015.727c7e9e@kernel.org>
-From: Tom Herbert <tom@herbertland.com>
-Date: Tue, 13 Jan 2026 11:54:26 -0800
-X-Gm-Features: AZwV_QgIKeAH8yz7acGLRvA3u1Gx-zA8ckufMopKOvwiH9oKaZ4eUgRk8r3UUB0
-Message-ID: <CALx6S36qzL2etxrTgEn5XurzvKfnPneAG25z5kebsbtVc7c9wQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 0/4] ipv6: Disable IPv6 Destination Options RX
- processing by default
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6b8aebe7-495e-40e5-a99d-57f8f7b2e683@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, Jan 9, 2026 at 11:50=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Thu,  8 Jan 2026 09:14:52 -0800 Tom Herbert wrote:
-> > This patchset set changes the interpretation of the Destination Options
-> > and Hop-by-Hop Options sysctl limits, net.ipv6.max_dst_opts_number and
-> > net.ipv6.max_dst_opts_number to mean that when the sysctl is zero
-> > processing of the associated extension header is disabled such that
-> > packets received with the extension header are dropped.
->
-> Hi Tom!
->
-> Unfortunately, this breaks GRE:
-> https://netdev.bots.linux.dev/contest.html?pw-n=3D0&branch=3Dnet-next-202=
-6-01-09--18-00&pw-n=3D0&pass=3D0
+On Tue, Jan 13, 2026 at 08:24:49PM +0100, Maxime Chevallier wrote:
+> Hi Russell,
+> > Traditionally, we've represented the SerDes using drivers/phy rather
+> > than the drivers/net/phy infrastructure, mainly because implementations
+> > hvaen't provided anything like an 802.3 PHY register set, but moreover
+> > because the SerDes tends to be generic across ethernet, PCIe, USB, SATA
+> > etc (basically, anything that is a high speed balanced pair serial
+> > communication) and thus the "struct phy" from drivers/phy can be used
+> > by any of these subsystems.
+> > 
+> 
+> True, and I completely agree with that. The reason I didn't touch that
+> when porting to phylink is that the device I'm using, that has a
+> Motorola/Freescale/NXP MPC832x, doesn't have that TBI/RTBI block, so I
+> can't test that at all should we move to a more modern SerDes driver
+> (modern w.r.t when this driver was written) :(
 
-Jakub,
+Over the last few days, I've been adding "generic" stmmac SerDes
+support (which basically means not in the platform glue) to replace
+the qcom-ethqos stuff, and while doing so, the thought did cross my
+mind whether I should be adding that to phylink rather than stmmac.
 
-There's a hidden Destination Option used by GREv6 in
-IPV6_TLV_TNL_ENCAP_LIMIT (not defined with the other TLVs and not
-processed in the main TLV loop). So probably can't disable Destination
-options by default. I'll respin the patch set to restrict EH as much
-as possible to avoid DoS.
+stmmac's "I can't reset without all the clocks running" makes it
+rather special though, but we already have phylink_rx_clk_stop_block()
+to guarantee that the PHY itself won't stop its receive clock when
+entering LPI, so phylink already knows when the clock is required
+(although with a slight abuse of the names of these functions.)
 
-Tom
+Given that the two qcom-ethqos patches I sent last night failed to
+build (oops) I may change the patch order... it does need the stmmac
+PCS work to be merged first though.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
