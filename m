@@ -1,224 +1,146 @@
-Return-Path: <netdev+bounces-249468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C04DD198AA
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:40:44 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 925EBD197DF
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:34:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DF5683008F50
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:32:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 189B0300B299
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:32:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8432128506A;
-	Tue, 13 Jan 2026 14:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UZg4nc/N";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="nigjGHDr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1AC7283FE3;
+	Tue, 13 Jan 2026 14:32:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBEBC285072
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 14:32:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D70622258C
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 14:32:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768314752; cv=none; b=FpnqfLy2A2Z+3HheXi2HfLuh8TW0y1RWqfB060zZurAqQD+3BeCyNO749bKV39NU2pOKhhWjPbrTRhTy3AsBB3N0G9cYd4yELVZFAtOmWDoUnkINWMgs6tOgAjORM4gl/SlsYQuKzb4gPd4WFABlvpL+EminDtDZxmGksP3jrOk=
+	t=1768314730; cv=none; b=QgGatOhGAxe0C2R+Z67EAl6+sscQ0kQlHE2mFfGuHCGdAFOM49EVnwwZk3uKvnCDr40ey6QuGa/i8grYjqPmax9k4ho3TSKfMMUcAxBA0wdfN2L8aYjjFXGrZhj0ieBAgr+SWGqYxe4Buv0v8br6qaNA9d2p4grc8uCY0tc0tsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768314752; c=relaxed/simple;
-	bh=MfqKVHtv0vqzjMqznyO3Be6RMpXSTRkmeRmaH7eIsW8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pwU+nq/HIKQFhvxIeiKhXTseGwEsEzQ0z2QbYFivPSZxWR5rQOgVnC5Gn23EkZGxeT6ChwZnxcHP2dcDPO3CGJ6D3xxSm3Q/0w2eQu8qIBMsNAPdX/DmCt/TbtUTRK0FSk3mhCVSuGoWR7FB3UI27yOrHS1kzjOfvNoGGxBqd5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UZg4nc/N; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=nigjGHDr; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768314749;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=dkuxnI9DAgtlkp1zs4xwDhM8bobKr8HeiWSG4uzIRZg=;
-	b=UZg4nc/NhS5NTu8WUfR1v7ToFlfDFstTZJu+6EMWzTg1a05ehutvFWtro4ld/ZauDmqpbO
-	mzo+fpiOstXWiEBm+LpTkfYSlW6RKlzvBrH+aUCtk8O6X1RU3kZe5hU0IXNQunsNWTQPk0
-	q2mBCHoJw2DkViGUJiZHXIudx12YJnQ=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-39--CWXTZd0NWqo6VT6FiweYA-1; Tue, 13 Jan 2026 09:32:24 -0500
-X-MC-Unique: -CWXTZd0NWqo6VT6FiweYA-1
-X-Mimecast-MFC-AGG-ID: -CWXTZd0NWqo6VT6FiweYA_1768314743
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b8701175a88so209760566b.1
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 06:32:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768314743; x=1768919543; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=dkuxnI9DAgtlkp1zs4xwDhM8bobKr8HeiWSG4uzIRZg=;
-        b=nigjGHDriPOgdQndt4nLsIae0X3p3G+YdTu/90CkfXT9gHTouPYUJJYewlrygnbbm2
-         hjkvcgDZYiGoc1irBJ9GVyrAJscK5gSgqOKRr9eNvfFvHBAx0OZDKAYIk1EMIjIIXRLC
-         9X1oD2tEEuBhcXpEP2XjkQUmjF1LVHQ6+6NHm2tbeptlRLXyxxWrSRVJIfI6q3+QIUhO
-         XS6sJ+A+6WV2suBbhA0zwGJtGOZeJJf5LigirQ1L+lfzLl0Wdh6s/AHqcBIwxzC++V++
-         C6ZUwEgRYtnFggKeiASSWbg7LMx2kXHn/paYOfoITtDV93y2+VQMDQEitGH9vkx9LfC6
-         otFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768314743; x=1768919543;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dkuxnI9DAgtlkp1zs4xwDhM8bobKr8HeiWSG4uzIRZg=;
-        b=gyt8ZqmFCk9kB9aILCEnj2R1VneznqtZfmr2XFA4YvPSkZtWaQBbI4gUZ4DE89w0uy
-         QxOGUt0S+XRzlQZofjlTsX2P23jMonRWarFuEmM5ViNAg8ntfvj+6lQ48HcCuDvRe6yt
-         Ms3cunrRQSsZ6Xz97EFSeMS29tvhoRgMlMGW8fokGTzZqu4fhVH1X/OdFjFqzS8JU/b5
-         fpSBBTDqkoAMW5b17mQGftB/Gd9K4Ckqo3vfspFTgMhIQMXpqGSqxSCigXFem/Os+Cnz
-         BVVujciX2NnWfFlXDJj+jGNI/tY5VIUf5/gTj6M7uAY3OMbv+912acHKiqL2UoulY+TU
-         o7xQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWVv7Q6VHWaQXBwv6tV53V+itHBD9Mtc8MU4hObdN3hOa+/weONJGC5xiqweuNBGTJotrNRAq8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyegjSfWyPP9LapksaaOS9txmK7E6fm4ZjRfgVh4+X3+HfSKi56
-	/DHLscOp515g5+ntnT9vlJ4zvqTYq2W5SVB2flG1f7qXWG7FVVjhZQFx9YA3E/hZZLEXKihIhrp
-	4Ze+pTw/sFa+KUmwYiO5rbYuxCLWDo7X73AyDdPKeefSdEsbTKkFLl6s1Bw==
-X-Gm-Gg: AY/fxX4L7vl6CuSJia959JU2olTcX6FkKNW5NppuUyzjE1c/ZcDfYIElc8tZ8UqjvHP
-	nXQgs8eFcZPOkAI/nMUC8yUb9bmfhJHFvoS+zfZylAgNI4ko30i5T3AUGqmTHoqsKdl7y4j9Jvy
-	sUERYPfJdA5YOzMbLSj9YamXHo5zKQkr1B18w9owQ73QCopFqNh9jfRE4gZme5vi7eJr2yjfpjw
-	dUCY6ew8i/XSS401tMhsURD+O2Q1oUtsiY6pY6F7qcsuagjRAoaoSQC6WIBmiMJh0J5E9qQqkkC
-	rovE7lS49QcPyoorUqJ+Tzsg0WnGyFYvZWSf1/MXmjmvRTrWujaaeIKSM8zWUbIGXKhXn+blWuq
-	bEUu4CUGtqb70HfNNNfKuA+vWJk1fzGlumsfJ
-X-Received: by 2002:a17:907:1b1d:b0:b73:6c97:af4b with SMTP id a640c23a62f3a-b84453eb56amr2069034866b.45.1768314742852;
-        Tue, 13 Jan 2026 06:32:22 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEB+MEceAg42yKB6X3GnjXTXcTjic7cEQBXwGrKiPhtu7WnQmtOEtd433LcjlYixKzqnjazwg==
-X-Received: by 2002:a17:907:1b1d:b0:b73:6c97:af4b with SMTP id a640c23a62f3a-b84453eb56amr2069032066b.45.1768314742303;
-        Tue, 13 Jan 2026 06:32:22 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b86f0d6d7c6sm1037956666b.42.2026.01.13.06.32.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jan 2026 06:32:21 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 739F240894F; Tue, 13 Jan 2026 15:32:18 +0100 (CET)
-From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>
-Cc: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	cake@lists.bufferbloat.net,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next] net/sched: cake: avoid separate allocation of struct cake_sched_config
-Date: Tue, 13 Jan 2026 15:31:56 +0100
-Message-ID: <20260113143157.2581680-1-toke@redhat.com>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1768314730; c=relaxed/simple;
+	bh=UUC360G7hHA1urjzlmBV49AhilqbSpaiCfBOoZFfi0M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FQUlvQoJKtvy/NEsmvHTaxUB/FVQt7qxoca1Q0+4KqAP0WD9dpXBHatPO/1zb3yVYiRJwK84/GGyRFvzS0sSQukga3ZGZH+HF+OWbi9d/hwtJ2pWgMHOgZ/nq+UmjyiSaZ8bfNKIcvOsYSgLFNmc0pqNGkeZ4V3oNFMQlIs+X/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vffRB-0007zC-Qz; Tue, 13 Jan 2026 15:32:01 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vffRA-000RDq-0Y;
+	Tue, 13 Jan 2026 15:31:59 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vffR9-009thO-1D;
+	Tue, 13 Jan 2026 15:31:59 +0100
+Date: Tue, 13 Jan 2026 15:31:59 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc: Robin van der Gracht <robin@protonic.nl>, kernel@pengutronix.de,
+	Oliver Hartkopp <socketcan@hartkopp.net>,
+	Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
+	Network Development <netdev@vger.kernel.org>
+Subject: Re: can: j1939: unregister_netdevice: waiting for vcan0 to become
+ free.
+Message-ID: <aWZXX_FWwXu-ejEk@pengutronix.de>
+References: <faee3f3c-b03d-4937-9202-97ec5920d699@I-love.SAKURA.ne.jp>
+ <4b1fbe9d-5ca2-41e9-b252-1304cc7c215a@I-love.SAKURA.ne.jp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <4b1fbe9d-5ca2-41e9-b252-1304cc7c215a@I-love.SAKURA.ne.jp>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Paolo pointed out that we can avoid separately allocating struct
-cake_sched_config even in the non-mq case, by embedding it into struct
-cake_sched_data. This reduces the complexity of the logic that swaps the
-pointers and frees the old value, at the cost of adding 56 bytes to the
-latter. Since cake_sched_data is already almost 17k bytes, this seems
-like a reasonable tradeoff.
+Hi,
 
-Suggested-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
----
- net/sched/sch_cake.c | 29 ++++++-----------------------
- 1 file changed, 6 insertions(+), 23 deletions(-)
+On Tue, Jan 13, 2026 at 12:46:30PM +0900, Tetsuo Handa wrote:
+> Currently, the (session->last_cmd != 0) path in j1939_xtp_rx_rts_session_active() is
+> preventing the (session->state == J1939_SESSION_WAITING_ABORT) path in j1939_tp_rxtimer()
+>  from being called. This results in two j1939_priv refcounts leak (which in turn results in
+> one net_device refcount leak) due to j1939_session_deactivate_activate_next() being not called.
+> 
+> This problem goes away if I do either
+> 
+> diff --git a/net/can/j1939/transport.c b/net/can/j1939/transport.c
+> --- a/net/can/j1939/transport.c
+> +++ b/net/can/j1939/transport.c
+> @@ -1689,16 +1692,18 @@ static int j1939_xtp_rx_rts_session_active(struct j1939_session *session,
+> 
+>         if (session->last_cmd != 0) {
+>                 /* we received a second rts on the same connection */
+> -               netdev_alert(priv->ndev, "%s: 0x%p: connection exists (%02x %02x). last cmd: %x\n",
+> +               netdev_alert(priv->ndev, "%s (modified): 0x%p: connection exists (%02x %02x). last cmd: %x\n",
+>                              __func__, session, skcb->addr.sa, skcb->addr.da,
+>                              session->last_cmd);
+> 
+> +               /*
+>                 j1939_session_timers_cancel(session);
+>                 j1939_session_cancel(session, J1939_XTP_ABORT_BUSY);
+>                 if (session->transmission)
+>                         j1939_session_deactivate_activate_next(session);
+> 
+>                 return -EBUSY;
+> +               */
+>         }
+> 
+>         if (session->skcb.addr.sa != skcb->addr.sa ||
+> 
+> or
+> 
+> diff --git a/net/can/j1939/transport.c b/net/can/j1939/transport.c
+> --- a/net/can/j1939/transport.c
+> +++ b/net/can/j1939/transport.c
+> @@ -1697,6 +1700,11 @@ static int j1939_xtp_rx_rts_session_active(struct j1939_session *session,
+>                 j1939_session_cancel(session, J1939_XTP_ABORT_BUSY);
+>                 if (session->transmission)
+>                         j1939_session_deactivate_activate_next(session);
+> +               else if (session->state == J1939_SESSION_WAITING_ABORT) {
 
-diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
-index e30ef7f8ee68..fd56b7d88301 100644
---- a/net/sched/sch_cake.c
-+++ b/net/sched/sch_cake.c
-@@ -221,6 +221,7 @@ struct cake_sched_data {
- 	struct tcf_block *block;
- 	struct cake_tin_data *tins;
- 	struct cake_sched_config *config;
-+	struct cake_sched_config initial_config;
- 
- 	struct cake_heap_entry overflow_heap[CAKE_QUEUES * CAKE_MAX_TINS];
- 
-@@ -2798,8 +2799,6 @@ static void cake_destroy(struct Qdisc *sch)
- 	qdisc_watchdog_cancel(&q->watchdog);
- 	tcf_block_put(q->block);
- 	kvfree(q->tins);
--	if (q->config && !q->config->is_shared)
--		kvfree(q->config);
- }
- 
- static void cake_config_init(struct cake_sched_config *q, bool is_shared)
-@@ -2822,13 +2821,9 @@ static int cake_init(struct Qdisc *sch, struct nlattr *opt,
- 		     struct netlink_ext_ack *extack)
- {
- 	struct cake_sched_data *qd = qdisc_priv(sch);
--	struct cake_sched_config *q;
-+	struct cake_sched_config *q = &qd->initial_config;
- 	int i, j, err;
- 
--	q = kzalloc(sizeof(*q), GFP_KERNEL);
--	if (!q)
--		return -ENOMEM;
--
- 	cake_config_init(q, false);
- 
- 	sch->limit = 10240;
-@@ -2842,14 +2837,13 @@ static int cake_init(struct Qdisc *sch, struct nlattr *opt,
- 
- 	if (opt) {
- 		err = cake_change(sch, opt, extack);
--
- 		if (err)
--			goto err;
-+			return err;
- 	}
- 
- 	err = tcf_block_get(&qd->block, &qd->filter_list, sch, extack);
- 	if (err)
--		goto err;
-+		return err;
- 
- 	quantum_div[0] = ~0;
- 	for (i = 1; i <= CAKE_QUEUES; i++)
-@@ -2857,10 +2851,8 @@ static int cake_init(struct Qdisc *sch, struct nlattr *opt,
- 
- 	qd->tins = kvcalloc(CAKE_MAX_TINS, sizeof(struct cake_tin_data),
- 			    GFP_KERNEL);
--	if (!qd->tins) {
--		err = -ENOMEM;
--		goto err;
--	}
-+	if (!qd->tins)
-+		return -ENOMEM;
- 
- 	for (i = 0; i < CAKE_MAX_TINS; i++) {
- 		struct cake_tin_data *b = qd->tins + i;
-@@ -2893,22 +2885,13 @@ static int cake_init(struct Qdisc *sch, struct nlattr *opt,
- 	qd->last_checked_active = 0;
- 
- 	return 0;
--err:
--	kvfree(qd->config);
--	qd->config = NULL;
--	return err;
- }
- 
- static void cake_config_replace(struct Qdisc *sch, struct cake_sched_config *cfg)
- {
- 	struct cake_sched_data *qd = qdisc_priv(sch);
--	struct cake_sched_config *q = qd->config;
- 
- 	qd->config = cfg;
--
--	if (!q->is_shared)
--		kvfree(q);
--
- 	cake_reconfigure(sch);
- }
- 
+This way looks better for me. May be add a comment like this:
+            /* Force deactivation for the receiver.
+             * If we rely on the timer starting in j1939_session_cancel, 
+             * a second RTS call here will cancel that timer and fail 
+             * to restart it because the state is already WAITING_ABORT.
+             */
+
+> +                       netdev_alert(priv->ndev, "%s (modified): 0x%p: abort rx timeout. Force session deactivation\n",
+> +                                    __func__, session);
+> +                       j1939_session_deactivate_activate_next(session);
+> +               }
+> 
+>                 return -EBUSY;
+>         }
+> 
+> . But what is the correct approach?
+
+The second one. Thank you for your work.
+
+Best Regards,
+Oleksij
 -- 
-2.52.0
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
