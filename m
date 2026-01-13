@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-249591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87DE9D1B656
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:28:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2F7BD1B659
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:28:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A142E302EA22
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 21:27:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9B4FF3047961
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 21:27:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44134329E4E;
-	Tue, 13 Jan 2026 21:27:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D037332EB3;
+	Tue, 13 Jan 2026 21:27:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="bZSP1Br9";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ZXJ3rbwV"
+	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="F5zVmqgD";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ppghVhTo"
 X-Original-To: netdev@vger.kernel.org
 Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774803242B5
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 21:27:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B7832B9A2
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 21:27:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768339665; cv=none; b=kOqLMsZIjbT+hVT/atSTDiU4/1SrM0dm9pRnJySug64widHMgPhTieY+CWoaPBn+yB7u0ulxso1WSzaPblul7dk5dSUrFpQUuWYbTmU2b0P6oyI01EdWafRdNY/ULOpZMh0+sbHzvAq9kh/vxgx6ZHybi6IMeTiOtvJM4Yb+Uu4=
+	t=1768339670; cv=none; b=VzJ7IjsZ61+mOxHUUIfMbo8//8IJ+4L7zNmsHqpNgSbwjDxQk+idm4oNBfdqrnrFD6ELtz3YNIbFIiyu0TM10VweGlEsd141O3pElBCuZl09z0h7456AwGz8XvAc5oSzxuso8zCTvZpfCby0Rw/UW1SR7nQx7L9sSyZbgL/BBoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768339665; c=relaxed/simple;
-	bh=GOaC3GFPCYe7EGe9tE80fZK7oF1kspRjiyDRjApM39Q=;
+	s=arc-20240116; t=1768339670; c=relaxed/simple;
+	bh=onLy8rh0Sxzq+on4nQlM7E1vkIm2/fx4ObviXrPUnMg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=taiOudodC5plsY72c2s8V1+CY1z3meyIYLqPdkVFSpU4oygG79UPZp/Zq2I7W6SRoTzK6NrjktLREYB5Br5jYpDpNLIAXswTRzSyrPDGvN3nfY881ajYNa/AcLq6M3SeaIGDEa8mHaLbPmnLj2CWiQSICvfKk+DAe3QGus9ct4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=bZSP1Br9; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ZXJ3rbwV; arc=none smtp.client-ip=103.168.172.157
+	 MIME-Version; b=lYNuxsc5Dsj61wDG1N4on4wZc6RKJSRMPLF8PrGz/LaMgVSjBRiBuiQAuu2eDgQOR+RJpLQR3W7pcULp899vwVMxYcENkBN6H0ExITUUCocQejMFbMXi8dV6xvigb3V68ZdBVWXumCP10ypD6rMHdd1ZR+GVudEKhUt3X72uJmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=F5zVmqgD; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ppghVhTo; arc=none smtp.client-ip=103.168.172.157
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
-Received: from phl-compute-08.internal (phl-compute-08.internal [10.202.2.48])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id AE578140001F;
-	Tue, 13 Jan 2026 16:27:42 -0500 (EST)
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id DAFE714000FB;
+	Tue, 13 Jan 2026 16:27:44 -0500 (EST)
 Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-08.internal (MEProxy); Tue, 13 Jan 2026 16:27:42 -0500
+  by phl-compute-04.internal (MEProxy); Tue, 13 Jan 2026 16:27:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
 	cc:cc:content-transfer-encoding:content-type:date:date:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1768339662; x=
-	1768426062; bh=QdynlgnTtZWSH2GJBUkGCtTncNLNXDyX8tztADSxgEk=; b=b
-	ZSP1Br9AzVEyMelRvc1mXv+OvzYG9bd7brudUo1bCyXovCTfeqGQFJrUy59iiANm
-	c4TCXP6z5zxOdGXEJGo6ho62kMpjtHcdHrlXDqGQJg0TTe1Z95/edBNro8XrFSUP
-	iyHUqMhYRt3fwla322IynDUCU/SOp2+SGtIXk/SJNaye5976j6y8aQqoIeRe2BbJ
-	fEMUnCYhaL++tVhz92v3fRIlbSRp81D+qSDLS8SLVJE5TePZTW9herIpMcCoAHQj
-	XvrqjW/ANE37kQNGf6ynxqU7AJMohu04U0yh+Yf0xDSNXJY8tLgD2S/HLfOJ5mVP
-	G2XAlF8f1JIyOH4nqGenQ==
+	:reply-to:subject:subject:to:to; s=fm2; t=1768339664; x=
+	1768426064; bh=97rZN3zfyP+9HyJaaXJWBdlSFYbE1XZFkkSX0/ke+ik=; b=F
+	5zVmqgDLXky59l0jXW6rEt7pw29WtzRvYa2OPpvDZSEIZ/qvlRGF77LirqRvswoR
+	iQJZpyKNqyk6X78jTsXHI20DogvFgig7H/vk3yDlcM4tviHioiDlslbA+9wU+OJx
+	CPotmnGdSHxB7dr2Z8oksL3y0iF676eoREsrz/V8Lrhk5PffSLB3adm0JgIxUtCx
+	iJfJKgaEcv9piaqJI1CCIXBQt+YR3qepZKsu8f0apoCQb6hlmpivqpKrJ0qSWeL6
+	6nmsB9HEiSOHr0XAbPnRWSRheyThP064i20yjaydEnEtHh8LcC3nXxQ8Yeu5iGwN
+	dgWCyk5pHHos08W7dte/Q==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm2; t=1768339662; x=1768426062; bh=Q
-	dynlgnTtZWSH2GJBUkGCtTncNLNXDyX8tztADSxgEk=; b=ZXJ3rbwV048XiHqqI
-	xY9KJvbdoobjrMLJ6s1X3vAxCltbtHKlW0R9dAyvn65gi7v7Uu6APhTFdalZj9+I
-	C+5zmoKi4lSNtLlu8ArnjbSPzO6I7He/5pGQmCAwPy1KG2aihBTLjzqFgD2Sr9E/
-	UKGF9B1MsFBQkYm0AzG5CGs1LiWYspIm78ExTYr/rgM6ndewvOGxCeHdvCgWPumi
-	j4hBAV1a/5/fmrkFM/ipjRpnn3zxXB/zrJFBP/QYNO5jb4iP52c7P2Mo9WDbCPwA
-	5FkB1trWm45mDQ4iESqc4f4EAI576sbBQMXnItqKyurDlQXxtb5DtKuHZcI03m23
-	+SfSA==
-X-ME-Sender: <xms:zrhmaaEIF02OPQjT0534GI5XUB_k9TV1-guavfg1fLYCkO4w2BunIw>
-    <xme:zrhmaRvRZWlbCRPT9qX-1NeYV8_RMS1mXP5jGdpKGOAfruDKymvykjbIe-fiDCXL-
-    0lzQb6QcJb0eVr4l-TxFmkMMrqljv33GiZ7HbJZYoEdy2_PNIG1bxE>
-X-ME-Received: <xmr:zrhmaQZsDAYdEakFrZ4io9cb_s53vtTAAyHJU40AxVEU5xEIzTPEg7UsWDNv7mN1h5mYoHwIzMN3k4OqsGsUl0dV>
+	:x-me-sender:x-sasl-enc; s=fm2; t=1768339664; x=1768426064; bh=9
+	7rZN3zfyP+9HyJaaXJWBdlSFYbE1XZFkkSX0/ke+ik=; b=ppghVhToH7qC7DOI5
+	d12+fQKtgntXcmQYSawlKVvDFfEQJ+91hAPhjmLQUm0J018rNOT0QEIt80ifOk4G
+	2XBND7XohWdp+R+Lti1oCALpyDWn4klNpw2m6cAtwxBDGZuYPbkL+89YBHQO+fMQ
+	fPwAmYvaBnqSlW5F4/EMdzPDTo/YkCDSEpBdbm6mJPITSwMLNz6E7R0rYI/86m8b
+	TJL2vivvE0Q5amB7grcAmAsSQfbZZzmm2IPZ7radPmk5vGLNd+bHzRRg/MY97w4x
+	j77nZjZ3Vw5IXq4MRIDlIGelIIZyH1LasX1MhylHnY9ZiPZyWBrrQm0Xr58z6DNx
+	xVpvg==
+X-ME-Sender: <xms:0LhmaYAcwIZ-PVIfmdiLZrLzkolzQJv0AElLJif4R-yrsTLssAFzLA>
+    <xme:0LhmaQ6h0ZEj7MV3BGsZ_kdRoBFhN7SrVm9zO7FK20rjEFir_16YyGLC2uoDMJx4A
+    mqcGrLVIntR7Eyj4Bxm3oJ4xhOli7KQuQG91HObyispL3srOXKrCw>
+X-ME-Received: <xmr:0LhmaX1IzIaadVZPjTvlvuzqiRyytR1Xz0oD91e_zGSbgxwFVR3tIXS_IcJe9nt2rAW16IZi8GEZNA1LU7HYKZ9l>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduvddugedtucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
@@ -79,14 +79,14 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduvddugedtucetufdote
     grihhlrdgtohhmpdhrtghpthhtohepfihilhhlvghmuggvsghruhhijhhnrdhkvghrnhgv
     lhesghhmrghilhdrtghomhdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlhdroh
     hrghdprhgtphhtthhopehrrgiiohhrsegslhgrtghkfigrlhhlrdhorhhg
-X-ME-Proxy: <xmx:zrhmaR4CTevIr3BEyhD_4ND52H_n6ay-sYRK5Bg9Y2QFJo3rS6fZDg>
-    <xmx:zrhmaY_lQvCER3x_Ww1shGbXgj-jdbi32YfF3AHp_wfnFz_32Z8Xsg>
-    <xmx:zrhmadaDOBa39dJ7CRAm9Ohk9falQHTsVq3sr4ihBJOzPriOF3Iiow>
-    <xmx:zrhmaR5JuNOyu-myQyFgsaKBpO1aTZahBqRK26Yt2LaD_9GiRCTOwg>
-    <xmx:zrhmaSypOoVCjb-0TzAXKhXVVFSvk-ySKUJMYQZ9m5FlsbbbSMohjIBG>
+X-ME-Proxy: <xmx:0LhmacnKxIy6OeT4qyM0cZVmnyp77XEJszJAQXaUcFDJGU4uavxjdA>
+    <xmx:0LhmaV74MJa1aB9jE-U8vp4l-l4HEV6-HmnG_XalGoV3vt5f1FpovQ>
+    <xmx:0Lhmafl_UHqyDtI8wviAHbkp9RP7H1W4kmPcCDJ-mNLfBqHr1zyFeQ>
+    <xmx:0LhmaQUWusjhsrDiK8-MD5-Wk4W1X4TMw0aBj3U9rjwTev1ieH1H0A>
+    <xmx:0LhmaS9avmweTx9dhyCXM7_eVjuPaw78h3CIYAHwkQhe1302vVNHB9jj>
 Feedback-ID: i559e4809:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 13 Jan 2026 16:27:41 -0500 (EST)
+ 13 Jan 2026 16:27:44 -0500 (EST)
 From: Alice Mikityanska <alice.kernel@fastmail.im>
 To: Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -101,9 +101,9 @@ Cc: Shuah Khan <shuah@kernel.org>,
 	Stanislav Fomichev <stfomichev@gmail.com>,
 	netdev@vger.kernel.org,
 	Alice Mikityanska <alice@isovalent.com>
-Subject: [PATCH net-next v2 02/11] net/ipv6: Drop HBH for BIG TCP on TX side
-Date: Tue, 13 Jan 2026 23:26:46 +0200
-Message-ID: <20260113212655.116122-3-alice.kernel@fastmail.im>
+Subject: [PATCH net-next v2 03/11] net/ipv6: Drop HBH for BIG TCP on RX side
+Date: Tue, 13 Jan 2026 23:26:47 +0200
+Message-ID: <20260113212655.116122-4-alice.kernel@fastmail.im>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260113212655.116122-1-alice.kernel@fastmail.im>
 References: <20260113212655.116122-1-alice.kernel@fastmail.im>
@@ -117,94 +117,74 @@ Content-Transfer-Encoding: 8bit
 
 From: Alice Mikityanska <alice@isovalent.com>
 
-BIG TCP IPv6 inserts a hop-by-hop extension header to indicate the real
-IPv6 payload length when it doesn't fit into the 16-bit field in the
-IPv6 header itself. While it helps tools parse the packet, it also
-requires every driver that supports TSO and BIG TCP to remove this
-8-byte extension header. It might not sound that bad until we try to
-apply it to tunneled traffic. Currently, the drivers don't attempt to
-strip HBH if skb->encapsulation = 1. Moreover, trying to do so would
-require dissecting different tunnel protocols and making corresponding
-adjustments on case-by-case basis, which would slow down the fastpath
-(potentially also requiring adjusting checksums in outer headers).
-
-At the same time, BIG TCP IPv4 doesn't insert any extra headers and just
-calculates the payload length from skb->len, significantly simplifying
-implementing BIG TCP for tunnels.
-
-Stop inserting HBH when building BIG TCP GSO SKBs.
+Complementary to the previous commit, stop inserting HBH when building
+BIG TCP GRO SKBs.
 
 Signed-off-by: Alice Mikityanska <alice@isovalent.com>
 ---
- include/linux/ipv6.h  |  1 -
- net/ipv6/ip6_output.c | 20 +++-----------------
- 2 files changed, 3 insertions(+), 18 deletions(-)
+ net/core/gro.c         |  2 --
+ net/ipv6/ip6_offload.c | 28 +---------------------------
+ 2 files changed, 1 insertion(+), 29 deletions(-)
 
-diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
-index 9dd05743de36..e9c7127aaef3 100644
---- a/include/linux/ipv6.h
-+++ b/include/linux/ipv6.h
-@@ -175,7 +175,6 @@ struct inet6_skb_parm {
- #define IP6SKB_L3SLAVE         64
- #define IP6SKB_JUMBOGRAM      128
- #define IP6SKB_SEG6	      256
--#define IP6SKB_FAKEJUMBO      512
- #define IP6SKB_MULTIPATH      1024
- #define IP6SKB_MCROUTE        2048
- };
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index f904739e99b9..ed1b8e62ef61 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -179,8 +179,7 @@ ip6_finish_output_gso_slowpath_drop(struct net *net, struct sock *sk,
- static int ip6_finish_output_gso(struct net *net, struct sock *sk,
- 				 struct sk_buff *skb, unsigned int mtu)
- {
--	if (!(IP6CB(skb)->flags & IP6SKB_FAKEJUMBO) &&
--	    !skb_gso_validate_network_len(skb, mtu))
-+	if (!skb_gso_validate_network_len(skb, mtu))
- 		return ip6_finish_output_gso_slowpath_drop(net, sk, skb, mtu);
+diff --git a/net/core/gro.c b/net/core/gro.c
+index 76f9c3712422..b95df1d85946 100644
+--- a/net/core/gro.c
++++ b/net/core/gro.c
+@@ -115,8 +115,6 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb)
  
- 	return ip6_finish_output2(net, sk, skb);
-@@ -273,8 +272,6 @@ int ip6_xmit(const struct sock *sk, struct sk_buff *skb, struct flowi6 *fl6,
- 	struct in6_addr *first_hop = &fl6->daddr;
- 	struct dst_entry *dst = skb_dst(skb);
- 	struct inet6_dev *idev = ip6_dst_idev(dst);
--	struct hop_jumbo_hdr *hop_jumbo;
--	int hoplen = sizeof(*hop_jumbo);
- 	struct net *net = sock_net(sk);
- 	unsigned int head_room;
- 	struct net_device *dev;
-@@ -287,7 +284,7 @@ int ip6_xmit(const struct sock *sk, struct sk_buff *skb, struct flowi6 *fl6,
- 	rcu_read_lock();
+ 	if (unlikely(p->len + len >= GRO_LEGACY_MAX_SIZE)) {
+ 		if (NAPI_GRO_CB(skb)->proto != IPPROTO_TCP ||
+-		    (p->protocol == htons(ETH_P_IPV6) &&
+-		     skb_headroom(p) < sizeof(struct hop_jumbo_hdr)) ||
+ 		    p->encapsulation)
+ 			return -E2BIG;
+ 	}
+diff --git a/net/ipv6/ip6_offload.c b/net/ipv6/ip6_offload.c
+index 6762ce7909c8..e5861089cc80 100644
+--- a/net/ipv6/ip6_offload.c
++++ b/net/ipv6/ip6_offload.c
+@@ -342,40 +342,14 @@ INDIRECT_CALLABLE_SCOPE int ipv6_gro_complete(struct sk_buff *skb, int nhoff)
+ 	const struct net_offload *ops;
+ 	struct ipv6hdr *iph;
+ 	int err = -ENOSYS;
+-	u32 payload_len;
  
- 	dev = dst_dev_rcu(dst);
--	head_room = sizeof(struct ipv6hdr) + hoplen + LL_RESERVED_SPACE(dev);
-+	head_room = sizeof(struct ipv6hdr) + LL_RESERVED_SPACE(dev);
- 	if (opt)
- 		head_room += opt->opt_nflen + opt->opt_flen;
- 
-@@ -312,19 +309,8 @@ int ip6_xmit(const struct sock *sk, struct sk_buff *skb, struct flowi6 *fl6,
- 					     &fl6->saddr);
+ 	if (skb->encapsulation) {
+ 		skb_set_inner_protocol(skb, cpu_to_be16(ETH_P_IPV6));
+ 		skb_set_inner_network_header(skb, nhoff);
  	}
  
--	if (unlikely(seg_len > IPV6_MAXPLEN)) {
--		hop_jumbo = skb_push(skb, hoplen);
+-	payload_len = skb->len - nhoff - sizeof(*iph);
+-	if (unlikely(payload_len > IPV6_MAXPLEN)) {
+-		struct hop_jumbo_hdr *hop_jumbo;
+-		int hoplen = sizeof(*hop_jumbo);
 -
--		hop_jumbo->nexthdr = proto;
+-		/* Move network header left */
+-		memmove(skb_mac_header(skb) - hoplen, skb_mac_header(skb),
+-			skb->transport_header - skb->mac_header);
+-		skb->data -= hoplen;
+-		skb->len += hoplen;
+-		skb->mac_header -= hoplen;
+-		skb->network_header -= hoplen;
+-		iph = (struct ipv6hdr *)(skb->data + nhoff);
+-		hop_jumbo = (struct hop_jumbo_hdr *)(iph + 1);
+-
+-		/* Build hop-by-hop options */
+-		hop_jumbo->nexthdr = iph->nexthdr;
 -		hop_jumbo->hdrlen = 0;
 -		hop_jumbo->tlv_type = IPV6_TLV_JUMBO;
 -		hop_jumbo->tlv_len = 4;
--		hop_jumbo->jumbo_payload_len = htonl(seg_len + hoplen);
+-		hop_jumbo->jumbo_payload_len = htonl(payload_len + hoplen);
 -
--		proto = IPPROTO_HOPOPTS;
-+	if (unlikely(seg_len > IPV6_MAXPLEN))
- 		seg_len = 0;
--		IP6CB(skb)->flags |= IP6SKB_FAKEJUMBO;
+-		iph->nexthdr = NEXTHDR_HOP;
 -	}
+-
+ 	iph = (struct ipv6hdr *)(skb->data + nhoff);
+-	ipv6_set_payload_len(iph, payload_len);
++	ipv6_set_payload_len(iph, skb->len - nhoff - sizeof(*iph));
  
- 	skb_push(skb, sizeof(struct ipv6hdr));
- 	skb_reset_network_header(skb);
+ 	nhoff += sizeof(*iph) + ipv6_exthdrs_len(iph, &ops);
+ 	if (WARN_ON(!ops || !ops->callbacks.gro_complete))
 -- 
 2.52.0
 
