@@ -1,111 +1,118 @@
-Return-Path: <netdev+bounces-249349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A55AED170E8
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 08:44:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DEAFD170EE
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 08:44:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D3BB83053F84
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 07:43:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1FD323012770
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 07:44:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6242B36A024;
-	Tue, 13 Jan 2026 07:43:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3218436A005;
+	Tue, 13 Jan 2026 07:44:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="IhV3i2/m"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="r6U0/+pa";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="cE08Hi90"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91BA736923C
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 07:43:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B951E2EDD58;
+	Tue, 13 Jan 2026 07:44:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768290229; cv=none; b=oPhwRnXwDyKjVT7JGI61Gkzu1Aij0P64efh2V6cvzmdTeC/AkLlQhgKNqqCYOOK4ey+s0lrR8D35ri18aTUh4z0MSPeJ/IStL2dP+7jpNqagAv4n0yDRF3emfNksHNu4jALKzQ2vbiWPN5pKz5+ybM/tMbmHQAM1zi2GcfAuP20=
+	t=1768290272; cv=none; b=YO2WZjTJFSSyy/nzyrB0L20c3dMxHwLfStc3sIX+x/01kgml7Of8xntEGpI4oViERsrAwUbg7mBr5S71YbqxuGsKKfasFyeVmGcBPi28Fk4nK32YpeFSNfc1GIu/V+H7MTwfpaVGyNYWSLc8yVzK9ipMjVRwkYQdOevcdgbN6Og=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768290229; c=relaxed/simple;
-	bh=OQDoSB2IzjLVr1l775Y7jgqqODinC4ipSFd3uBtG/0o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GrW+Dn3op2t5Jv7NkbFDgs5EyMIvSegeEsT0cDZN1XquSFCasQI8YaPegb/mkFbvNu4OCWA/lwGxBFlLH8Fr4YHj9wlXE9ozfuj+c08KfxPtYeDtZVYTF20u5R9uze09DGFCv0dXAr8/nVR/9rjhHYZQ89rR45llKT9UEwJY/Mk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=IhV3i2/m; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 09A83C20878;
-	Tue, 13 Jan 2026 07:43:04 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 6909B60732;
-	Tue, 13 Jan 2026 07:43:30 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4EF4A103C9297;
-	Tue, 13 Jan 2026 08:43:22 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1768290209; h=from:subject:date:message-id:to:cc:mime-version:
-	 content-transfer-encoding; bh=HmfawJeph5zrc/JQ3yN5fBTmU7PzUKSvNQ03fKIgN2o=;
-	b=IhV3i2/mfLNUHoS9K/xk7g7E069bNzozobESkhXkwuKPnhHyjy/jqwYbzx0j3daBQPjIGA
-	6QGC8dBTCvXj9I0G5YZT93WIzHOL3aYorIE+LXOc0iLbA7ws4ymwoCZvEFP3yDbD9IMLtC
-	MD2HEPEof7ZIKuV9PP0YsBocy35oQPc890QxD2gueebMpFM5nOjR0siIjuIJV8pqmzBFkc
-	qvwjx0u1+afdtnUtZqz9dNt7R0hc9X+jk3pZN+/Ib6UMSc5vvw6NtQVc1O2G7cwhL/wfUM
-	RofTXY/40NkSj9F06BLr1wIoGGEgNWlFBzinX7nq2dadLtRQcNOzX4MJq5jnkw==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Pei Xiao <xiaopei01@kylinos.cn>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Russell King <linux@armlinux.org.uk>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH net] net: freescale: ucc_geth: Return early when TBI found can't be found
-Date: Tue, 13 Jan 2026 08:43:15 +0100
-Message-ID: <20260113074316.145077-1-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1768290272; c=relaxed/simple;
+	bh=DXWaBVbdjEWE1IyIqhzZ2dOoLEM7O6me/InOVvTKOxc=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=t72E8+1Gdvi8lyfmkkSQAAoCP+sXpDNLLuMk2ZgM7iU+8pJsFORhwAY0GvAB6hOmpA09+whB/88A08HzTTkD/zXpnYmSeYdg4EJcp1nk5TDJ6xzHF4Pt9QZc2PuoH0AcF01x6qAS5mHFi7lmwwYeacV3AwimuCz3vLRc1ePYWFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=r6U0/+pa; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=cE08Hi90; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1768290262;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=SFawNSuHNydwNCwxZe5OLXeU10e6H8J4jG7cxGHVXrQ=;
+	b=r6U0/+pa0F/yLezwn5/En9erLmC3oSlovPPpp8KvTBHPp+HqfzDtuD4Uy2y0Hwp8KtNhC+
+	qyjas07ek5TzGEMqXUGhPFxGPf6z/0DaXvmGE10TPKym3P+15VLNi6F/vcD6x6FZhOZe+K
+	BrfoZ6PSCZvdvJV6UEUw8ZypGp7/csMyHQpJNair0aZkHtnOiyTJ0qvydd/rX6EMoE0mHW
+	FP0p9ACxwyMqVWbxE6KbE2IPfoxvcXeeforCJllKTKqj21U5J9ioPOvyO6niUa+Fc8HSH+
+	IeBk1OTTX+Zz2MEbxFLjgKZrzCKN4tLGLHbK+lgC9qUF2y84XiMHumRXwB0UNg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1768290262;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=SFawNSuHNydwNCwxZe5OLXeU10e6H8J4jG7cxGHVXrQ=;
+	b=cE08Hi90SD9HkPtY+I3x01d8WtwHaobgpqohhLy9nryv82g98M1KjmFVGFvi/fyNn8whRE
+	7PucC0ZyTsdNFjBw==
+Subject: [PATCH v2 0/3] uapi: Use UAPI definitions of INT_MAX and INT_MIN
+Date: Tue, 13 Jan 2026 08:44:16 +0100
+Message-Id: <20260113-uapi-limits-v2-0-93c20f4b2c1a@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+X-B4-Tracking: v=1; b=H4sIAND3ZWkC/1XMSw6DIBSF4a2YOy4Nj4KhI/fROKBI600sGkBiY
+ 9h70VmH/0nOt0N0AV2Ee7NDcBkjzr4GvzRgR+PfjuBQGzjlknGuyWoWJBN+MEUilb1Jq4XSVkN
+ 9LMG9cDu1R197xJjm8D3xzI71cBRlVP45mRFKKBdP2xomqGi7Cf2awuxxuw4O+lLKD4kHrg2qA
+ AAA
+X-Change-ID: 20251229-uapi-limits-56c45c9369c9
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Andrew Lunn <andrew@lunn.ch>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, 
+ Phil Sutter <phil@nwl.cc>
+Cc: Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+ coreteam@netfilter.org, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1768290260; l=1133;
+ i=thomas.weissschuh@linutronix.de; s=20240209; h=from:subject:message-id;
+ bh=DXWaBVbdjEWE1IyIqhzZ2dOoLEM7O6me/InOVvTKOxc=;
+ b=cHAPH+f2Jw/xofJujyo+AixKrXcr+0qlmt3bYZhyx35wrWZMtjbFgq9b14Tis6HD7ZmD3NQBo
+ CO97MFYxShUDNoAVKB30VNbll36DdKiUEWyYacW30X7Y2REiXRIs3YS
+X-Developer-Key: i=thomas.weissschuh@linutronix.de; a=ed25519;
+ pk=pfvxvpFUDJV2h2nY0FidLUml22uGLSjByFbM6aqQQws=
 
-In ucc_geth's .mac_config(), we configure the TBI block represented by a
-struct phy_device that we get from firmware.
+Using <limits.h> to gain access to INT_MAX and INT_MIN introduces a
+dependency on a libc, which UAPI headers should not do.
 
-While porting to phylink, a check was missed to make sure we don't try
-to access the TBI PHY if we can't get it. Let's add it and return early
-in case of error
+Introduce and use equivalent UAPI constants.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Closes: https://lore.kernel.org/r/202601130843.rFGNXA5a-lkp@intel.com/
-Fixes: 53036aa8d031 ("net: freescale: ucc_geth: phylink conversion")
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Signed-off-by: Thomas Weißschuh <thomas.weissschuh@linutronix.de>
 ---
- drivers/net/ethernet/freescale/ucc_geth.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Changes in v2:
+- Use uapi/linux/typelimits.h over uapi/linux/limits.h
+- Drop RFC status
+- Link to v1: https://lore.kernel.org/r/20260105-uapi-limits-v1-0-023bc7a13037@linutronix.de
 
-diff --git a/drivers/net/ethernet/freescale/ucc_geth.c b/drivers/net/ethernet/freescale/ucc_geth.c
-index affd5a6c44e7..131d1210dc4a 100644
---- a/drivers/net/ethernet/freescale/ucc_geth.c
-+++ b/drivers/net/ethernet/freescale/ucc_geth.c
-@@ -1602,8 +1602,10 @@ static void ugeth_mac_config(struct phylink_config *config, unsigned int mode,
- 			pr_warn("TBI mode requires that the device tree specify a tbi-handle\n");
- 
- 		tbiphy = of_phy_find_device(ug_info->tbi_node);
--		if (!tbiphy)
-+		if (!tbiphy) {
- 			pr_warn("Could not get TBI device\n");
-+			return;
-+		}
- 
- 		value = phy_read(tbiphy, ENET_TBI_MII_CR);
- 		value &= ~0x1000;	/* Turn off autonegotiation */
+---
+Thomas Weißschuh (3):
+      uapi: add INT_MAX and INT_MIN constants
+      ethtool: uapi: Use UAPI definition of INT_MAX
+      netfilter: uapi: Use UAPI definition of INT_MAX and INT_MIN
+
+ include/uapi/linux/ethtool.h          | 7 ++-----
+ include/uapi/linux/netfilter_bridge.h | 9 +++------
+ include/uapi/linux/netfilter_ipv4.h   | 9 ++++-----
+ include/uapi/linux/netfilter_ipv6.h   | 7 +++----
+ include/uapi/linux/typelimits.h       | 8 ++++++++
+ 5 files changed, 20 insertions(+), 20 deletions(-)
+---
+base-commit: 16ce6e6fa946ca6fd1e4fce6926b52b6263d98a8
+change-id: 20251229-uapi-limits-56c45c9369c9
+
+Best regards,
 -- 
-2.49.0
+Thomas Weißschuh <thomas.weissschuh@linutronix.de>
 
 
