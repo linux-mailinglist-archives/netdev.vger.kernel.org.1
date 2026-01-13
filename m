@@ -1,191 +1,235 @@
-Return-Path: <netdev+bounces-249342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19C66D16EEE
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 07:59:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EACCD16FCE
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 08:23:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1908530312DB
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 06:59:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 516B1302EAE4
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 07:23:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B5F7350D62;
-	Tue, 13 Jan 2026 06:59:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95FB369962;
+	Tue, 13 Jan 2026 07:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YuYheU6U"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TPfBOJIg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC75E25F98B
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 06:59:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12EAA1BC08F
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 07:23:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768287583; cv=none; b=BuQZpyqguxJceEBYRBWyoqH/chZgbG7kiOHpukynv1my+/Ncx5ZaGyMVAcndWX9timeobrpcxz45anZclVPHTPy7UZ3GdWCCdyB+kIA0zefBUerZ+QlHqIk2iZOjg9PXr19LnQfo8UBCTXRiPrO3p3A0zPWUJeIq9W/MDPZ1N60=
+	t=1768289002; cv=none; b=A0kHMGufLLZRCAyOtRLqvbzZ1Oh7xdnzqhjLgh+n5+92TjcBbVtkt6C4mdXNxGI1NA8KPmg5ll006rzt/d7U4xjwxpstxNqFEyjswVtQ0dYPJmG1XViZSQYi0e1dm1u9oD+SHMroBfVCyc0VxeZHcTT2x1nZM9qYbh4RiqkRRYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768287583; c=relaxed/simple;
-	bh=5kYm/f6y5eDZFOhknW/woguSkyF5acmAV11mLjLfnFE=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=rhGZuVSDuTl0t57j9nqmXPdl95Jzkr+p8zQCbkIOGVWvwyYly44VRxXzu3TYWykBmrz3MFQSSAWwF4Bjvw8TxToFRlL7gHIZTOX5bo3fkeQIgs1Mgw8cjdsf8hYv53x4M+kcRu7/0BUepMmSAgf1W8cWTFyZRx7WqaCvROSe5Gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YuYheU6U; arc=none smtp.client-ip=209.85.128.51
+	s=arc-20240116; t=1768289002; c=relaxed/simple;
+	bh=jCZOTQ0S4zPGrVewV7zNDwWTEanfwMTrGpGoODy9ROY=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=plSB04IywF16nsdR7WUDhisJTnkDzyf9qBmAHjStd7X9fsfQ5S24F/ZtY+NFQa9SUuCx9S8uONa72pSC4WdurbcIATWGnPrF0geiNA64g62ajhhFG25QK3rsia4JWRNwzM9tl6W7f0Zh8zfPkf3eA7bD37A8m4xoSz4Cp6iqQlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TPfBOJIg; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-47d5e021a53so52710875e9.3
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 22:59:41 -0800 (PST)
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-42fb5810d39so3732345f8f.2
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 23:23:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768287580; x=1768892380; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=PGEtEJ71QhQ9scdgCDEq+WFEpq4/A8zAmzd+iyJjt4Y=;
-        b=YuYheU6UvcVdiJE96wX1WT2U5neW6VxN54CsCmUbpF20qJEJFTmEAJbX0B8DCpkIOl
-         aGZs3OwVb/Cs1LeGJDlDHLB8AMXsuwlAYtYRbm6zOWXwLxwBIX+qQ8R9nAFmFO1kGxv8
-         2Q2OJyWas3N7J+BX2RgQOQZDwYLWWTitWHn76eSaU7Xmc4K65wv55hT0h25VyobJAE//
-         jxjc1sWIGTVc+thbt/N/FGpRrom+ZpOv+nBXW5RbVVOJiJVqPKdqGI+1CLxpQs9gfSNT
-         ZnA2H3q3yM+kIL99MsgcSx0WzuJBmQN5SPqZWIPVCqGdYtyU4GJGD9oQnuxTzZvqH9GC
-         pe1g==
+        d=gmail.com; s=20230601; t=1768288999; x=1768893799; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YEbfMOGmFF3KnEiYpptf/1+FNigGAulyjnzCIqxEBOU=;
+        b=TPfBOJIgrjKwtS0hbpOa+YFYudKlrR0CPcUtTfdEvzeeGkf75XE8p5OdMCp+xgNSUr
+         Em3jDJO4Lsxe5HJ/s68EtWjooy9yuBpYMojRsUEtrcnqb0GlX2/yWNCILSWys35oaI0+
+         BY+PokINPAVyhaz73SHbevjePMu4Z0Qc0nHDfHKdF/sscQwpjtciIxVlN3F7njfU7S0z
+         BH//oazgL9BxiOsuzX771XeAgdNqgurTA7TGX9AT+BqNK2MYiY+AvAtiliY6YJQiNLSP
+         SUNnG3Up14dd+6EQuGcl58SVYqS6LrdLuRdS0wiJ0m2Jk7OsdkAz5H0fimFeyn7gsqgQ
+         bodg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768287580; x=1768892380;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PGEtEJ71QhQ9scdgCDEq+WFEpq4/A8zAmzd+iyJjt4Y=;
-        b=YAYfmH01gMoUl0GzOp+dB9TeyrfgMtAZl9mCSbO6dfnkdIErjXdXzxWd2XFR/cKsuT
-         ckCM4rpg7vZKMK+27tQrHVJuyD6AIfma97v104vocvKYTPCww957+OmBdfEKUNldtvTE
-         r+jzUkTLxLVBHU/8Ah07/7nPt5o4e9WD6tVmX9dIF43MjB96rGx37LANNC/j0n/oKF31
-         QPNKHWToUxHKXhRVBBXJMVt3doZmuE4drjQXtJ+Ay5EKb/fFGAu0ELndFJcN8geoi394
-         6wBUhg3L4z3LBUBUpwq+rCCNYz4xhuP75CLJ2zWvlGPdUL0miiD8Z5TBrFEuhZly00ps
-         laow==
-X-Forwarded-Encrypted: i=1; AJvYcCVf7os5AxjjEBIKbhE0Ax+tpDoJk1BtrvFlzdAczHtXR/i7wdGCt4Q0sXvtoQvjjbV7RujrCdM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8f0e+sHtETwdfEGaw2Og+uBTDRQZBaGn1EJUER+q7EwDex/gs
-	10Yd1UHcO8CO/vFlcCIw1rGVgYEUO6CZ7jpr0868+MrdKfWIM88nd0rz
-X-Gm-Gg: AY/fxX7YPw9g+5gUIaSEyIvbJ8Hh7OnWAL3H0IgpSDzDbA4cILdYrWHZjF69Zi3Y79k
-	7BrbQESJ54ZbF6YU+s5BQr1+hgzVlcjMIKS+YU4Ppb5Ue0VrOhppcVn+DdGQfy5jOfHAuD2EudT
-	ML1wDS6qEPDimuX2sJfrJVHWTbM5N6YUVpiz1UDgE9oUVpK2QHt+Rdrh14+Xvj6M/gyI7kR4vm0
-	V4vlw5GioG9Le672T0REDIs9wvp9GpEtfnmjYKWIEvxw8M3WK9Z3WUTUi7v8/qziLRBXo021NFU
-	HoeBeDfsVBN1AzeRlGI94tW993y4YgK3eCBmXAqNFbMQAiJ2QQuKQ+kPXmmxfFL9R79G/dbk+OV
-	c/nb/VBFIjCG8n/6tiiZd8TxHqRzfGf9sJWX6W1t5na0Da5U2GaJzoRhHpWYwea7HRIBY6dm8Ys
-	DLreE4h1ZQ+vkG1hxu360fPsyAlrLRSj6WHQ==
-X-Google-Smtp-Source: AGHT+IEQjxI6fpER4WRXmfHttzhiU1CsOOFkXmnEbm2lJSnSadsG1UWd7h31FAWSaH5F7soVC2ZyQQ==
-X-Received: by 2002:a05:600c:6287:b0:477:7af8:c88b with SMTP id 5b1f17b1804b1-47d84b1861bmr218312995e9.11.1768287580133;
-        Mon, 12 Jan 2026 22:59:40 -0800 (PST)
-Received: from ehlo.thunderbird.net ([80.244.29.171])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f68f69dsm387368335e9.1.2026.01.12.22.59.38
+        d=1e100.net; s=20230601; t=1768288999; x=1768893799;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YEbfMOGmFF3KnEiYpptf/1+FNigGAulyjnzCIqxEBOU=;
+        b=tR6CJe1QOqJZWkzccR7rYFNROXHNJotFWspfq7MmNKoOLjxbf85KO+/khiW8TV+LPP
+         tXVJpkSOg3Ym+LRiPttGY6rgPyKgtmqp2E3wHbfxXicbpO3+t+o2ANG9JtjaYaz71v8A
+         5dxKrckysxfjwHigOtB5mFH3imDFm6Nf78oWz7rStDa2j2iSOdXwdujX/UHd1+u6HMfV
+         KQmlbA5ZHfayA2kKG02CmvbvrFIGF6VGZ2ZtOUmF7nlbFu/G6dq5YgwFOYwQqnMA3LqU
+         tNW1Jt8GOoDGvgnDOj2YPDilgvF+PY0JjzJTVw9kfi5baa1gThsDt4yTjyQJHdwWkZBN
+         yf2A==
+X-Gm-Message-State: AOJu0YzQZw5mJjVH4BzVtuA5lOROJC9gdDbfKbBS9nz8Ez0erbkrNBWA
+	iv44F6vsXrGLZeOj87i4ezQqlPGyFHJYqot+4fe2Et6i5047v62udpPO
+X-Gm-Gg: AY/fxX7Lr81eZAcYRhBnTv56YNogUfJ1RcgW/RZ8wSfFI0BgiSJlcUmBXKPWBi6qCOL
+	QQhnDKx0EC6iUX4wSbq7sW7W6GaOnUBaj5d5NowK9FRpEmhhpLBB/LUg//zZuUlGRtKhdveIl6K
+	EYppr0pt1YYLFFO5CfG6xFGE2HCJXFFL0AwJSU+OE2ZnHce2fON/dei6V4kw2z8c4zhtnowXVrv
+	LQOiy1oFsRe22lPvP8t03SmrvkLKlLkIiF5NBtuWy3f38ww7feJNXOQvCXZCTkULqYGly3GXhfD
+	uzFMRoGj4GiB3Ya+Y5GVY4uFbx8oHy4IMkeP9JXr/t1IHCoSEYE+2GcNIDlb40ZG1PPcpvDNhRQ
+	4SX69+ApGMR4sN4imgqLgYR84fCJQLW75ZPj8CT7Bo7HWpMPaHa1Mdoaxpb/4eQuywzmhHTxBy0
+	a8OPH7m9iiR+DjrHMq46EcOY6t8UXiVUVkEWEV8BoZLmP9xdM4ZKcUFp0yIwEWA8xyKaOM2jjzU
+	nky3dhKTmqx6c+9vUJqSPjiPAer3OV64E0wP3uLxUe6KodIxDP2BA==
+X-Google-Smtp-Source: AGHT+IFV42pk/BOqaBnb9I6uBmKsbIDQ/GvcmLOlMRG74oAZupSAMqRvBe/YcWOX7gd+PN5uttt4Jw==
+X-Received: by 2002:a05:6000:1448:b0:431:a0:7dea with SMTP id ffacd0b85a97d-432c374ff61mr26596396f8f.40.1768288999226;
+        Mon, 12 Jan 2026 23:23:19 -0800 (PST)
+Received: from ?IPV6:2003:ea:8f03:3800:3cc9:69c1:1a2a:f175? (p200300ea8f0338003cc969c11a2af175.dip0.t-ipconnect.de. [2003:ea:8f03:3800:3cc9:69c1:1a2a:f175])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0e199bsm42227535f8f.16.2026.01.12.23.23.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Jan 2026 22:59:39 -0800 (PST)
-Date: Tue, 13 Jan 2026 08:59:36 +0200
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-To: Slark Xiao <slark_xiao@163.com>
-CC: Loic Poulain <loic.poulain@oss.qualcomm.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- Muhammad Nuzaihan <zaihan@unrealasia.net>, Daniele Palmas <dnlplm@gmail.com>,
- Qiang Yu <quic_qianyu@quicinc.com>, Manivannan Sadhasivam <mani@kernel.org>,
- Johan Hovold <johan@kernel.org>
-Subject: Re:Re:[RFC PATCH v5 0/7] net: wwan: add NMEA port type support
-User-Agent: K-9 Mail for Android
-In-Reply-To: <3669f7f7.1b05.19bb517df16.Coremail.slark_xiao@163.com>
-References: <20260109010909.4216-1-ryazanov.s.a@gmail.com> <1b1a21b2.31c6.19ba0c6143b.Coremail.slark_xiao@163.com> <DF8AF3F7-9A3F-4DCB-963C-DCAE46309F7B@gmail.com> <3669f7f7.1b05.19bb517df16.Coremail.slark_xiao@163.com>
-Message-ID: <845D539E-E546-4652-A37F-F9E655B37369@gmail.com>
+        Mon, 12 Jan 2026 23:23:18 -0800 (PST)
+Message-ID: <ff8ac321-435c-48d0-b376-fbca80c0c22e@gmail.com>
+Date: Tue, 13 Jan 2026 08:23:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Jonathan Corbet <corbet@lwn.net>, Simon Horman <horms@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ linux-doc@vger.kernel.org
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH v2 net-next] net: phy: remove unused fixup unregistering
+ functions
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On January 13, 2026 4:03:19 AM, Slark Xiao <slark_xiao@163=2Ecom> wrote:
->At 2026-01-09 15:11:58, "Sergey Ryazanov" <ryazanov=2Es=2Ea@gmail=2Ecom> =
-wrote:
->>On January 9, 2026 5:21:34 AM, Slark Xiao <slark_xiao@163=2Ecom> wrote:
->>>At 2026-01-09 09:09:02, "Sergey Ryazanov" <ryazanov=2Es=2Ea@gmail=2Ecom=
-> wrote:
->>>>The series introduces a long discussed NMEA port type support for the
->>>>WWAN subsystem=2E There are two goals=2E From the WWAN driver perspect=
-ive,
->>>>NMEA exported as any other port type (e=2Eg=2E AT, MBIM, QMI, etc=2E)=
-=2E From
->>>>user space software perspective, the exported chardev belongs to the
->>>>GNSS class what makes it easy to distinguish desired port and the WWAN
->>>>device common to both NMEA and control (AT, MBIM, etc=2E) ports makes =
-it
->>>>easy to locate a control port for the GNSS receiver activation=2E
->>>>
->>>>Done by exporting the NMEA port via the GNSS subsystem with the WWAN
->>>>core acting as proxy between the WWAN modem driver and the GNSS
->>>>subsystem=2E
->>>>
->>>>The series starts from a cleanup patch=2E Then three patches prepares =
-the
->>>>WWAN core for the proxy style operation=2E Followed by a patch introdi=
-ng a
->>>>new WWNA port type, integration with the GNSS subsystem and demux=2E T=
-he
->>>>series ends with a couple of patches that introduce emulated EMEA port
->>>>to the WWAN HW simulator=2E
->>>>
->>>>The series is the product of the discussion with Loic about the pros a=
-nd
->>>>cons of possible models and implementation=2E Also Muhammad and Slark =
-did
->>>>a great job defining the problem, sharing the code and pushing me to
->>>>finish the implementation=2E Daniele has caught an issue on driver
->>>>unloading and suggested an investigation direction=2E What was conclud=
-ed
->>>>by Loic=2E Many thanks=2E
->>>>
->>>>Slark, if this series with the unregister fix suits you, please bundle
->>>>it with your MHI patch, and (re-)send for final inclusion=2E
->>>>
->>>>Changes RFCv1->RFCv2:
->>>>* Uniformly use put_device() to release port memory=2E This made code =
-less
->>>>  weird and way more clear=2E Thank you, Loic, for noticing and the fi=
-x
->>>>  discussion!
->>>>Changes RFCv2->RFCv5:
->>>>* Fix premature WWAN device unregister; new patch 2/7, thus, all
->>>>  subsequent patches have been renumbered
->>>>* Minor adjustments here and there
->>>>
->>>Shall I keep these RFC changes info in my next commit?
->>>Also these RFC changes info in these single patch=2E
->>
->>Generally, yeah, it's a good idea to keep information about changes, esp=
-ecially per item patch=2E Keeping the cover latter changelog is up to you=
-=2E
->>
->>>And I want to know whether  v5 or v6 shall be used for my next serial?
->>
->>Any of them will work=2E If you asking me, then I would suggest to send =
-it as v6 to continue numbering=2E
->>
->>>Is there a review progress for these RFC patches ( for patch 2/7 and=20
->>>3/7 especially)=2E If yes, I will hold my commit until these review pro=
-gress
->>>finished=2E If not, I will combine these changes with my MHI patch and =
-send
->>>them out asap=2E
->>
->>I have collected all the feedback=2E E=2Eg=2E, minor number leak was fix=
-ed=2E Fixed one long noticed mistype=2E And collected two new review tags g=
-iven by Loic=2E So, my advice is to use these patches as base and put your =
-MHI patch on top of them=2E
->>
->Hi Sergey,
->I didn't find the review tags for your patch 2/7 and 3/7 until now=2E Am =
-I missing something?
+No user of PHY fixups unregisters these. IOW: The fixup unregistering
+functions are unused and can be removed. Remove also documentation
+for these functions. Whilst at it, remove also mentioning of
+phy_register_fixup() from the Documentation, as this function has been
+static since ea47e70e476f ("net: phy: remove fixup-related definitions
+from phy.h which are not used outside phylib").
 
-You are right, there are no review tags have been given for these patches=
-=2E If it works for your device, just send the complete series=2E You testi=
-ng going to be enough=2E
+Fixup unregistering functions were added with f38e7a32ee4f
+("phy: add phy fixup unregister functions") in 2016, and last user
+was removed with 6782d06a47ad ("net: usb: lan78xx: Remove KSZ9031 PHY
+fixup") in 2024.
 
---
-Sergey
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+v2:
+- improve commit message
+- remove related documentation
+- remove also phy_register_fixup from documentation
+---
+ Documentation/networking/phy.rst | 22 +--------------
+ drivers/net/phy/phy_device.c     | 46 --------------------------------
+ include/linux/phy.h              |  4 ---
+ 3 files changed, 1 insertion(+), 71 deletions(-)
 
-Hi Slark,
+diff --git a/Documentation/networking/phy.rst b/Documentation/networking/phy.rst
+index b0f2ef83735..0170c9d4dc5 100644
+--- a/Documentation/networking/phy.rst
++++ b/Documentation/networking/phy.rst
+@@ -524,33 +524,13 @@ When a match is found, the PHY layer will invoke the run function associated
+ with the fixup.  This function is passed a pointer to the phy_device of
+ interest.  It should therefore only operate on that PHY.
+ 
+-The platform code can either register the fixup using phy_register_fixup()::
+-
+-	int phy_register_fixup(const char *phy_id,
+-		u32 phy_uid, u32 phy_uid_mask,
+-		int (*run)(struct phy_device *));
+-
+-Or using one of the two stubs, phy_register_fixup_for_uid() and
+-phy_register_fixup_for_id()::
++The platform code can register the fixup using one of::
+ 
+  int phy_register_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask,
+ 		int (*run)(struct phy_device *));
+  int phy_register_fixup_for_id(const char *phy_id,
+ 		int (*run)(struct phy_device *));
+ 
+-The stubs set one of the two matching criteria, and set the other one to
+-match anything.
+-
+-When phy_register_fixup() or \*_for_uid()/\*_for_id() is called at module load
+-time, the module needs to unregister the fixup and free allocated memory when
+-it's unloaded.
+-
+-Call one of following function before unloading module::
+-
+- int phy_unregister_fixup(const char *phy_id, u32 phy_uid, u32 phy_uid_mask);
+- int phy_unregister_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask);
+- int phy_register_fixup_for_id(const char *phy_id);
+-
+ Standards
+ =========
+ 
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 81984d4ebb7..95f5bb3ab59 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -474,52 +474,6 @@ int phy_register_fixup_for_id(const char *bus_id,
+ }
+ EXPORT_SYMBOL(phy_register_fixup_for_id);
+ 
+-/**
+- * phy_unregister_fixup - remove a phy_fixup from the list
+- * @bus_id: A string matches fixup->bus_id (or PHY_ANY_ID) in phy_fixup_list
+- * @phy_uid: A phy id matches fixup->phy_id (or PHY_ANY_UID) in phy_fixup_list
+- * @phy_uid_mask: Applied to phy_uid and fixup->phy_uid before comparison
+- */
+-int phy_unregister_fixup(const char *bus_id, u32 phy_uid, u32 phy_uid_mask)
+-{
+-	struct list_head *pos, *n;
+-	struct phy_fixup *fixup;
+-	int ret;
+-
+-	ret = -ENODEV;
+-
+-	mutex_lock(&phy_fixup_lock);
+-	list_for_each_safe(pos, n, &phy_fixup_list) {
+-		fixup = list_entry(pos, struct phy_fixup, list);
+-
+-		if ((!strcmp(fixup->bus_id, bus_id)) &&
+-		    phy_id_compare(fixup->phy_uid, phy_uid, phy_uid_mask)) {
+-			list_del(&fixup->list);
+-			kfree(fixup);
+-			ret = 0;
+-			break;
+-		}
+-	}
+-	mutex_unlock(&phy_fixup_lock);
+-
+-	return ret;
+-}
+-EXPORT_SYMBOL(phy_unregister_fixup);
+-
+-/* Unregisters a fixup of any PHY with the UID in phy_uid */
+-int phy_unregister_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask)
+-{
+-	return phy_unregister_fixup(PHY_ANY_ID, phy_uid, phy_uid_mask);
+-}
+-EXPORT_SYMBOL(phy_unregister_fixup_for_uid);
+-
+-/* Unregisters a fixup of the PHY with id string bus_id */
+-int phy_unregister_fixup_for_id(const char *bus_id)
+-{
+-	return phy_unregister_fixup(bus_id, PHY_ANY_UID, 0xffffffff);
+-}
+-EXPORT_SYMBOL(phy_unregister_fixup_for_id);
+-
+ /* Returns 1 if fixup matches phydev in bus_id and phy_uid.
+  * Fixups can be set to match any in one or more fields.
+  */
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index fbbe028cc4b..082612ee954 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -2356,10 +2356,6 @@ int phy_register_fixup_for_id(const char *bus_id,
+ int phy_register_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask,
+ 			       int (*run)(struct phy_device *));
+ 
+-int phy_unregister_fixup(const char *bus_id, u32 phy_uid, u32 phy_uid_mask);
+-int phy_unregister_fixup_for_id(const char *bus_id);
+-int phy_unregister_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask);
+-
+ int phy_eee_tx_clock_stop_capable(struct phy_device *phydev);
+ int phy_eee_rx_clock_stop(struct phy_device *phydev, bool clk_stop_enable);
+ int phy_init_eee(struct phy_device *phydev, bool clk_stop_enable);
+-- 
+2.52.0
+
 
