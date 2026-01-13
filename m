@@ -1,148 +1,115 @@
-Return-Path: <netdev+bounces-249340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B7F6D16E15
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 07:44:02 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C60DD16E31
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 07:46:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 8AF31300EDA8
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 06:43:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6018A3030223
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 06:46:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59B23366DD9;
-	Tue, 13 Jan 2026 06:43:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99FD72DBF76;
+	Tue, 13 Jan 2026 06:46:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mlqznh0K"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="cm4n/UO8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3B935CB8D
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 06:43:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C8418BC3B;
+	Tue, 13 Jan 2026 06:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768286627; cv=none; b=brHzEoOSzxhlLaiDZy9vP1e+EEsMOPcvgUxTpQx3gqFcIjcUXUALKntnw4P/wnAeBAudqfVnBVYtN1iNVTIEhcGD8Zwpntj60yWIeEr0xY+JGG5qxDkSDfejyrkRW9G0fzxCCQMZSBqSsAPpUR9DZpVsIbG03MArp5lLRgRIAIk=
+	t=1768286789; cv=none; b=S8rgtn8/nMJjB0ekBpOBH/CDJdN5OD+3MS5cO6EnRNLs/kbN9KzDrVpMkrERX7SklyIq12T0RiuhegwTlh/22kP5KpdeWWSK/c5rnRgNBc5KRPWyClKzCt0Kyt4DG1/98Ae1dTfuIhgOoJY9k7QHS4ymswM2azKihYIKXBR8GJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768286627; c=relaxed/simple;
-	bh=4xRp9EmzMV7UevZ0sWEkDBOodR/UA5X1qgUIvoNC9pQ=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=kv19tc5EkYLXWooawWrJWQv5m3cxBDhhx9BCtFNheiRJNuMIfRkpeapO+12+y7hFNeAsA+Ckqoa6vx+fxVkSok6n7dCbuQhGQ97CeLehPTOv8lrYA1W3JZNoOqnYvGsGj17q1St2iJFXAxPmZq+rkf470EVm8k+eB4peGzn+ung=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mlqznh0K; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-42fb03c3cf2so3809713f8f.1
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 22:43:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768286624; x=1768891424; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ghDCM8N9hxvDdm5XEm74/ukNIOPEjRNuq6UPBRaEC88=;
-        b=mlqznh0KAmc2HekvQQUM75RbUjXLgwKRtqyFu60L1W1iK2cI1m6WdjgRE8NbDcuOux
-         GAbpmKYMDi0zOzCFH/oEkvMEml9+A3iG9nMffG6b/3fVhNJN7JazjMtHO31i0MQLGnfQ
-         /2nemnnh7Qa+Cs/3rciDVlP5tw0kW6IYXNmNs9Y9ZSIZy1iur3JVIgzuwCjj1OYLc9ob
-         6B2WGt78puBqtMzzEfEKWHyzHfbN6mo1UDTLQ3RxCJaW9ZZTxGe7pfukIL9+hvY1wn1M
-         2s8Em6Ux8utqmH6jZvMPciWRjmEKqp4H0JxORveQ3mzcD90XG5hdCbLFaDjgIHXvYlos
-         IMQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768286624; x=1768891424;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ghDCM8N9hxvDdm5XEm74/ukNIOPEjRNuq6UPBRaEC88=;
-        b=h9t2C25kyFJbKt0ym/KzeZ/XWdHLTW2c0HcEVaD7MYXI4+UIor71w/qsk0h5M5bkp6
-         DEtUZUtESSNb/pwab2r7fCPfCVmayEO/S3fO0IPLky2AeP646B8Atu0GJPP/zSX5+ePW
-         2lZpbpjaV7V8UgXWKsxwvT9XcZCVTv34mPL6JVQUKSrSvtBJUh8AQEuZKa6HaH15QtWh
-         eUkyuKjm+ogym45HnQ4PkYGFl5nfsg3M2BbMsYeZyJGsgia+Sh0S6TB6uGnOZ5r00mNY
-         GNRjvN/ulm2Q0T/+KAlJ32pKGyYh8Qxs0/G7VXkaJkLTjA8oDSWg7NTe2GYOU4z6AV5a
-         r3ZQ==
-X-Gm-Message-State: AOJu0YyysOEn1kRt1LrSh1YoYZwSzoI4gVegU/nMb7Ew0EuGMJ5fvrnz
-	8lIyc9PGRWVPJptqJ7E+mn+Fcd9pAVmJOB8DxZZwl+hw/D5RAy1xHcsk
-X-Gm-Gg: AY/fxX7d+SF4H97Egs/INhAVw72YoiFd/Ozbe3gyhnzt7PL/o145MYq2hdhA62RrCXx
-	SzhY/TqCaEaJ2FtrtWBNMFIBaJUuUJBJvR6pyPFDitr9dggthQ+gcWLTQdEu1D0CHCyak+xi9h1
-	RsmSCVX2LOs8TAyGa+iwIYvxHDapK9ezylKX3neoW5R43eVRQRXYr8IeEzqtBK2XVKVgTLiX2CZ
-	AVfMe1vaFMqpD/yzeAlffgpc9N5cMp6PH3/I2hqpWAlQJIpmvok+qiawIjRjKlNfRm5GFVkkDpQ
-	3tpi9st381TC8a5BDog0BLJ+T8MVX22NTsxtVhX0YWID6FbOVir+4yyqQKakjTBT1YVf8+Ap/dN
-	PYmesirT7UcM/65ohDh13MQ4B6h7IeVjPeW2w5/o9MzkOb6+DHzsCnyovrJ98D82Ud5Nr0nfBBW
-	nY5Z6LUpKupTAFg4GyLZ4/vwyqcb6NJbytuKQ=
-X-Google-Smtp-Source: AGHT+IG5Hg9+17m7J4fNxlH62AWH3o6AAFlmU1pJNtsSLShz7avFHksvTJHxAOMxOVStty2IwBs58g==
-X-Received: by 2002:a05:6000:178a:b0:430:f449:5f18 with SMTP id ffacd0b85a97d-432c37644b4mr25992646f8f.46.1768286623960;
-        Mon, 12 Jan 2026 22:43:43 -0800 (PST)
-Received: from [10.221.200.118] ([165.85.126.46])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5df90dsm42594086f8f.20.2026.01.12.22.43.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Jan 2026 22:43:43 -0800 (PST)
-Message-ID: <e22a37a6-d15c-4abe-becd-4c538d99ad30@gmail.com>
-Date: Tue, 13 Jan 2026 08:43:42 +0200
+	s=arc-20240116; t=1768286789; c=relaxed/simple;
+	bh=WYLVVsm/f0wWhH49pN+r0wI/gqn0Mu5pimgqHVHK0NA=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TxfYdF4Fm1gNTULDDvzasLp/Gh1JFxVbykGivn+dcBpNC5EQzS3uO14Dvc+oRCuoWdpR97OTsG85mZWg8DFed5g8tkUa/Ehs1bn7b4msbh6VK4Yl5XUNSh4OOO5KpSAjhO6R3lsYS93RWDx2IVkE+SHcDrcwi2V34z/oC2VYm5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=cm4n/UO8; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60D2eN5i1937684;
+	Mon, 12 Jan 2026 22:46:15 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=pbco9KdxLBQ0u/dKq/fRZNEVR
+	EufFkvrOOAQnIwrBO4=; b=cm4n/UO8T9ELThMPysGRQklx1cVIs8G0zDoKvvS/V
+	CuENQs+P9V0giL/pU6vDJy9lXQStoTN64V1o9LyeC99qcmNigbSEmChpxysztJTt
+	giNVIf6TM8BwU4vZM+fXMs64Yr8r0hfB0l2UvGWa/lrkwanOPobKsyqYYeGLPPWy
+	kicri+bLbYaQWXfob4fiWrFcgwH0976TC+dyeW7rajs0kmqd8R+jYDKQBibAF+ee
+	OjJzffVuR5kT6SilEH76zirtLXjSl9Mrp6wfVCuUUc7t748uxj4m2qhXVV+mFNtB
+	Xn0nhx4knkJyQuvxeeKqahJ0qzdNVQj8wEqwCzbZVZf9A==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bmvfkb0jn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 12 Jan 2026 22:46:15 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 12 Jan 2026 22:46:29 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Mon, 12 Jan 2026 22:46:29 -0800
+Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with SMTP id 381953F70BB;
+	Mon, 12 Jan 2026 22:46:09 -0800 (PST)
+Date: Tue, 13 Jan 2026 12:16:08 +0530
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+CC: <kys@microsoft.com>, <haiyangz@microsoft.com>, <wei.liu@kernel.org>,
+        <decui@microsoft.com>, <longli@microsoft.com>, <andrew+netdev@lunn.ch>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <dipayanroy@linux.microsoft.com>,
+        <ssengar@linux.microsoft.com>, <shirazsaleem@microsoft.com>,
+        <shradhagupta@linux.microsoft.com>, <gargaditya@linux.microsoft.com>,
+        <linux-hyperv@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: mana: Add MAC address to vPort logs and
+ clarify error messages
+Message-ID: <aWXqMC3C4rcdKjD0@test-OptiPlex-Tower-Plus-7010>
+References: <20260113052458.25338-1-ernis@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC mlx5-next 0/1] net/mlx5e: Expose physical received
- bits counters to ethtool
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-To: Kenta Akagi <k@mgml.me>, Saeed Mahameed <saeedm@nvidia.com>,
- Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260112070324.38819-1-k@mgml.me>
- <0ac69f6a-d587-45a7-be30-6ad4429ef8d2@gmail.com>
-Content-Language: en-US
-In-Reply-To: <0ac69f6a-d587-45a7-be30-6ad4429ef8d2@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20260113052458.25338-1-ernis@linux.microsoft.com>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTEzMDA1NCBTYWx0ZWRfX1lhxAe6sQWBg
+ DW9XJ0EYfu4oozyK1AncPw+hOW8ntv3FF/YoKz1YFeo1l2XFjm/BTI2Ot57Y3yrQt9YNEcpbm/B
+ FLKHtjaUHT8xVHP15dCj3kFmC1LMWsavBbPR91SSJerl112q1sDuoNXJkp8GMNYia13RkL1qSqv
+ hunW0+fcTtyvF1KuZPCBmWt/K4BdTkODuN8cNMmBU3PDpkpiFjJ75EEx0CjqjLOYwv4lzYZn4f6
+ 3CZ5rsaNcQtWvW3rAdLga6u1KncY9MjNzDkNj4V6K+wMYVj/7Eh578Wa5KdSZlrHlV391zSZUqm
+ 06wJL8v3Rc8kX/PIvP7IeZ6v/B+GKu02JklGyC26PEfg1WaviK5v/LJXzhiG7dWLicU2ASldp7s
+ 5NMCMNWh2c42M5PMUvzfB4HZIbW1TdoN8hKLC2BKkV/DwiucvUVSNSVH2o3Dal+WQZFiluYMNBs
+ n3Qswzc+1ZIwQvR/kxw==
+X-Proofpoint-GUID: WW3qbR9GMJ0fuYzq3h70msTExCzipuwP
+X-Proofpoint-ORIG-GUID: WW3qbR9GMJ0fuYzq3h70msTExCzipuwP
+X-Authority-Analysis: v=2.4 cv=AZe83nXG c=1 sm=1 tr=0 ts=6965ea37 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=yMhMjlubAAAA:8 a=M5GUcnROAAAA:8 a=lN0AB7UQOaEN70Y1j8gA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-13_01,2026-01-09_02,2025-10-01_01
 
-
-
-On 13/01/2026 8:31, Tariq Toukan wrote:
+On 2026-01-13 at 10:54:58, Erni Sri Satya Vennela (ernis@linux.microsoft.com) wrote:
+> Add MAC address to vPort configuration success message and update error
+> message to be more specific about HWC message errors in
+> mana_send_request.
 > 
-> 
-> On 12/01/2026 9:03, Kenta Akagi wrote:
->> Hi,
->>
->> I would like to measure the cable BER on ConnectX.
->>
->> According to the documentation[1][2], there are counters that can be used
->> for this purpose: rx_corrected_bits_phy, rx_pcs_symbol_err_phy and
->> rx_bits_phy. However, rx_bits_phy does not show up in ethtool
->> statistics.
->>
->> This patch exposes the PPCNT phy_received_bits as rx_bits_phy.
->>
->>
->> On a ConnectX-5 with 25Gbase connection, it works as expected.
->>
->> On the other hand, although I have not verified it, in an 800Gbps
->> environment rx_bits_phy would likely overflow after about 124 days.
->> Since I cannot judge whether this is acceptable, I am posting this as an
->> RFC first.
->>
-> 
-> Hi,
-> 
-> This is a 64-bits counter so no overflow is expected.
-> 
-
-Sorry, ignore my comment, your numbers make sense.
-Maybe it's ~248 days, but same idea.
-
->>
->> [1] commit 8ce3b586faa4 ("net/mlx5: Add counter information to mlx5
->>      driver documentation")
->> [2] https://docs.kernel.org/networking/device_drivers/ethernet/ 
->> mellanox/mlx5/counters.html
->>
->> Kenta Akagi (1):
->>    net/mlx5e: Expose physical received bits counters to ethtool
->>
->>   drivers/net/ethernet/mellanox/mlx5/core/en_stats.c | 1 +
->>   1 file changed, 1 insertion(+)
->>
-> 
-
+> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+> ---
+>  drivers/net/ethernet/microsoft/mana/hw_channel.c | 12 +++++++-----
+>  drivers/net/ethernet/microsoft/mana/mana_en.c    |  8 ++++----
+>  2 files changed, 11 insertions(+), 9 deletions(-)
+>
+Reviewed-by: Hariprasad Kelam <hkelam@marvell.com>
+ 
 
