@@ -1,369 +1,89 @@
-Return-Path: <netdev+bounces-249523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4C40D1A689
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 17:51:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C4FFD1A78E
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 17:58:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1EC98300F052
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 16:50:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 13E25301F8ED
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 16:53:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F12C34DB6D;
-	Tue, 13 Jan 2026 16:50:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB004346AD6;
+	Tue, 13 Jan 2026 16:53:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EPDsUKYM";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="VBDAb6xN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UTwUMYqV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B059734DCD2
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 16:50:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C411B6CE9
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 16:53:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768323053; cv=none; b=RvQ5Yg6MZ7B1G257Eyd+OL7rjkOrZqhyxCr//czPnJ/ZgrC8u2D63XWSUyd2yOdqF5Ws+cynyNusUzwYY0dmKLynmOsVkx+0IvPICEPDh6YU3zKrvicvCTsauQfMnH7e8VRtupS5rwLFtVIKbi6npFskFfdzj1wr/c9gQhdvVb0=
+	t=1768323183; cv=none; b=IYWV/vmChIh+YmrttRSBw/cKipTZfU6btcNrOu3vqKL37caFRtH496XLTr5nSO6AsaGvh00DHAib2LCLCgXOMUNqjqkYYuCyjnkhwP9iSrCRH3kJnDISBLWonhC7VrIdAJV06u+zWIE4C0JOixiLwUybf4x79QLKVoPa6+EraWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768323053; c=relaxed/simple;
-	bh=l/MzUKV5vBhOjr5ZED+tJpwan1YXWA9mauHZNOyldN8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jCvRMOQ3fblngRQ/v0AP62UrkCLuV/Svg6146RoYtRkwXglsciFUxeMO68HGt/rHlZrQQru+grKSOTHXolZtnzSX0WwVGupM/TCD+AYhxi0Mu7o2MAKHbwgaJEszRbTcjdGm5DDhYAVCHiEvMD9zonwQpYuJkvfw6wd9UaOA2Bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EPDsUKYM; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=VBDAb6xN; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1768323183; c=relaxed/simple;
+	bh=rXmPc5Im099qC/8JbkGbcDimCDqQ39qSDWNlcGyQVdw=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=OVc7t0BrmsBlGtjozWTIoya2O2rRb6yrSl+CGBcFGuLLglQjwufstx7vtigC0njrKglihDrw+tQAxxTS1ap8Po6aRMEzvrHasaH3mq9rP6ZQsf7bWqDytiXl2AtFdxeZ2UZCV1wCXO4mw7g87OI/qtzVEh/l5gBsZPNhq1tmkJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UTwUMYqV; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768323049;
+	s=mimecast20190719; t=1768323181;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=DG0WRw7YxgTU3+MntFsjdanWVcUUw4Bpd9rGhDr013E=;
-	b=EPDsUKYM/iHMyQzeU3SwLfDtsJ1qv5zoEfA83mHcT1a3H2GG7h/rSHDKmvL0cQ8tzzPgqW
-	nF3Zyuzl5TALA33M7Hw8+tL71JFsqVEq2sDGbQgBGGwdVqrLeXmYK38zJQD/rwpK5+Pw7z
-	DRDpDAoEJufKchehzbgYTkMMmlMs1KI=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-679-mdy_gyHQORmyjgGB29cEAQ-1; Tue, 13 Jan 2026 11:50:48 -0500
-X-MC-Unique: mdy_gyHQORmyjgGB29cEAQ-1
-X-Mimecast-MFC-AGG-ID: mdy_gyHQORmyjgGB29cEAQ_1768323047
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-477cf25ceccso68168735e9.0
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 08:50:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768323047; x=1768927847; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DG0WRw7YxgTU3+MntFsjdanWVcUUw4Bpd9rGhDr013E=;
-        b=VBDAb6xNI58zdYmTI6oRUjQtylcczFbmLkUlF6la5VPMIDA+aYzveCUe2FHTYaZupU
-         KPxXOepYzi3KHEAdUFiI20ol+rprv2Av2YZNHdDb5JmxWQGGmsRSLJN1fjCa62xsxB7V
-         efWldlZ0/Cayp3bpYradXrr/rWRJoZyLEClXmqP38iw4C1Qc/tZb9nr67regoc0Ff3m/
-         kgkpkr+zIRnfbfuLJ+LUmLtG6Bp95vVfRqJpfiyTMmFDCGLzFjRGaE0kGA+Bo/MyOGjy
-         TKf79NkD7NNobtE0k72kI1JBXW9iUEYnK5nxjtjp68JkUgO2O7V9yRL7XlD6eeEefTa+
-         Y4ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768323047; x=1768927847;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DG0WRw7YxgTU3+MntFsjdanWVcUUw4Bpd9rGhDr013E=;
-        b=MTFDGqu52dhpw5bPOKcz6xxyCDkGfHbbP114xU4db6ey12H3Edk7PEl0mWNLI/sKbV
-         4SORag54XOjrwVJ9Id3rcuT73DtueqM3CDGyi+fMg0C9XJ5J0qSHxyjHvD6rvRWswMu9
-         f+HAV9ygP3XOtW5wHq4b2N3+bCbByaaTzcIuNRb9RdyMIQvEO0Qz7QSIRPY1uShJU96/
-         jb4FU/QIMHRICGDpRFLYC3JaAQtu3ZeKj/gVO+IsKVRfXMtXoRywSLERytdraW3KpC6w
-         3N/7+qtzdvbm3QhKMggMpa4xOWdnHb8UTzPaAS+2d//kQLdfo7wIK4Fecl/Ub3GILgCX
-         7JMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUw43hBHHdvU4rKzUMZxtDokiiNcx13GaOf7CiZTAJoKffSLg4wiBcySbjsku7pIGfTsJhr+Rc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx99BKfPBx5iUR5CufbL9qUACTbWOG0rN/ZLot+ZW+FkkdCvwwB
-	WDG46MEaCLF6UAuXRbmc8DqzUtRuovjXpv7ndrzOE7njONRjstuy4HwMXwdiE4vdpJlGLRfiuUh
-	ikLnKJQhYmihBsNUy/aQE0B5FJ3UzR1SdiPffdcAFKTVHbQ4apZMfWtXo4w==
-X-Gm-Gg: AY/fxX6dmlIZutPMySm+BrmlJs+nENqIpgdlhktLUbykZiT4+/gZmSqfZLuORMdoCPz
-	DkL7QGoRRlF4vyIESySaQcOLGaamQRo1TBYBtE1/2Iz7F4SBxWnn/gSEXsuHcWEoHxz+41lzUSr
-	8WMALLVYKCwwzTwloAGPmo9wZUoq8jbnjTugwT+s3j4IwPzeBdSVCp0qbi3CtOnLpodIX/Yq4DF
-	FAbfMGYIGRh54z7g8/id55gcCjgfy3tVJWr1q0ecrLIzgKHxe8gz61BS89hIwjFVjMQnnJ8Hqav
-	TwwlX0jEVrVYzmKt7vB8i3Ld4raGZJsyGEA9rltunsqU9HzDB51ESW3Kqx48S1DVWfDSi/vPvjk
-	3F+qClXOaKaGi0Luxcl1gXeTo1YBi7n5gnq7iwYv1XkMHkx8ksKXHv9rLuYf98Q==
-X-Received: by 2002:a05:600c:4692:b0:47d:3ead:7439 with SMTP id 5b1f17b1804b1-47d84b5403dmr248980035e9.37.1768323047192;
-        Tue, 13 Jan 2026 08:50:47 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHlubu09xauLTgM5vIaUwncOAsAxE5DLD0jbAoR78s6Ju0YY/wLL6jLo1N3GDIcOu7AsHYzxQ==
-X-Received: by 2002:a05:600c:4692:b0:47d:3ead:7439 with SMTP id 5b1f17b1804b1-47d84b5403dmr248979725e9.37.1768323046648;
-        Tue, 13 Jan 2026 08:50:46 -0800 (PST)
-Received: from sgarzare-redhat (host-87-12-25-233.business.telecomitalia.it. [87.12.25.233])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47ee134a057sm7988835e9.14.2026.01.13.08.50.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jan 2026 08:50:46 -0800 (PST)
-Date: Tue, 13 Jan 2026 17:50:35 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, Long Li <longli@microsoft.com>, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	berrange@redhat.com, Sargun Dhillon <sargun@sargun.me>, 
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v14 09/12] selftests/vsock: add tests for proc
- sys vsock ns_mode
-Message-ID: <aWZ3xxGbK0Ccldv9@sgarzare-redhat>
-References: <20260112-vsock-vmtest-v14-0-a5c332db3e2b@meta.com>
- <20260112-vsock-vmtest-v14-9-a5c332db3e2b@meta.com>
+	bh=rXmPc5Im099qC/8JbkGbcDimCDqQ39qSDWNlcGyQVdw=;
+	b=UTwUMYqVt56lqGYUR/SHL8XQlWD6FpcuaMkRTViylXsouzAqWGOXjui7vd/pDl78b2HUJO
+	hchAqlAbNYrSVMmyDy/Y4EjbGvOQykzczQWTdlB3DSZxR6Qz55XG6XXS9tahc/Ifs0zZYe
+	SF2qdM4v8V+jrPNokF383VLu9UkQ8SQ=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-500-XfcamgqROY-BDgovdSznhw-1; Tue,
+ 13 Jan 2026 11:52:55 -0500
+X-MC-Unique: XfcamgqROY-BDgovdSznhw-1
+X-Mimecast-MFC-AGG-ID: XfcamgqROY-BDgovdSznhw_1768323173
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1C63E18005A7;
+	Tue, 13 Jan 2026 16:52:53 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 147D630001A8;
+	Tue, 13 Jan 2026 16:52:49 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <3535584.1768322992@warthog.procyon.org.uk>
+References: <3535584.1768322992@warthog.procyon.org.uk>
+To: netdev@vger.kernel.org
+Cc: dhowells@redhat.com,
+    syzbot+6182afad5045e6703b3d@syzkaller.appspotmail.com,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Eric Dumazet <edumazet@google.com>,
+    "David S.
+ Miller" <davem@davemloft.net>,
+    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+    Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org,
+    stable@kernel.org, linux-kernel@kernel.org
+Subject: Re: [PATCH] rxrpc: Fix data-race warning and potential load/store tearing
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260112-vsock-vmtest-v14-9-a5c332db3e2b@meta.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3535878.1768323166.1@warthog.procyon.org.uk>
+Date: Tue, 13 Jan 2026 16:52:46 +0000
+Message-ID: <3535879.1768323166@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Mon, Jan 12, 2026 at 07:11:18PM -0800, Bobby Eshleman wrote:
->From: Bobby Eshleman <bobbyeshleman@meta.com>
->
->Add tests for the /proc/sys/net/vsock/{ns_mode,child_ns_mode}
->interfaces. Namely, that they accept/report "global" and "local" strings
->and enforce their access policies.
->
->Start a convention of commenting the test name over the test
->description. Add test name comments over test descriptions that existed
->before this convention.
->
->Add a check_netns() function that checks if the test requires namespaces
->and if the current kernel supports namespaces. Skip tests that require
->namespaces if the system does not have namespace support.
->
->This patch is the first to add tests that do *not* re-use the same
->shared VM. For that reason, it adds a run_ns_tests() function to run
->these tests and filter out the shared VM tests.
->
->Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
->---
->Changes in v13:
->- remove write-once test ns_host_vsock_ns_mode_write_once_ok to reflect
->  removing the write-once policy
->- add child_ns_mode test test_ns_host_vsock_child_ns_mode_ok
->- modify test_ns_host_vsock_ns_mode_ok() to check that the correct mode
->  was inherited from child_ns_mode
->
->Changes in v12:
->- remove ns_vm_local_mode_rejected test, due to dropping that constraint
->
->Changes in v11:
->- Document ns_ prefix above TEST_NAMES (Stefano)
->
->Changes in v10:
->- Remove extraneous add_namespaces/del_namespaces calls.
->- Rename run_tests() to run_ns_tests() since it is designed to only
->  run ns tests.
->
->Changes in v9:
->- add test ns_vm_local_mode_rejected to check that guests cannot use
->  local mode
->---
-> tools/testing/selftests/vsock/vmtest.sh | 140 +++++++++++++++++++++++++++++++-
-> 1 file changed, 138 insertions(+), 2 deletions(-)
-
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
->
->diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
->index 0e681d4c3a15..38785a102236 100755
->--- a/tools/testing/selftests/vsock/vmtest.sh
->+++ b/tools/testing/selftests/vsock/vmtest.sh
->@@ -41,14 +41,38 @@ readonly KERNEL_CMDLINE="\
-> 	virtme.ssh virtme_ssh_channel=tcp virtme_ssh_user=$USER \
-> "
-> readonly LOG=$(mktemp /tmp/vsock_vmtest_XXXX.log)
->-readonly TEST_NAMES=(vm_server_host_client vm_client_host_server vm_loopback)
->+
->+# Namespace tests must use the ns_ prefix. This is checked in check_netns() and
->+# is used to determine if a test needs namespace setup before test execution.
->+readonly TEST_NAMES=(
->+	vm_server_host_client
->+	vm_client_host_server
->+	vm_loopback
->+	ns_host_vsock_ns_mode_ok
->+	ns_host_vsock_child_ns_mode_ok
->+)
-> readonly TEST_DESCS=(
->+	# vm_server_host_client
-> 	"Run vsock_test in server mode on the VM and in client mode on the host."
->+
->+	# vm_client_host_server
-> 	"Run vsock_test in client mode on the VM and in server mode on the host."
->+
->+	# vm_loopback
-> 	"Run vsock_test using the loopback transport in the VM."
->+
->+	# ns_host_vsock_ns_mode_ok
->+	"Check /proc/sys/net/vsock/ns_mode strings on the host."
->+
->+	# ns_host_vsock_child_ns_mode_ok
->+	"Check /proc/sys/net/vsock/ns_mode is read-only and child_ns_mode is writable."
-> )
->
->-readonly USE_SHARED_VM=(vm_server_host_client vm_client_host_server vm_loopback)
->+readonly USE_SHARED_VM=(
->+	vm_server_host_client
->+	vm_client_host_server
->+	vm_loopback
->+)
-> readonly NS_MODES=("local" "global")
->
-> VERBOSE=0
->@@ -196,6 +220,20 @@ check_deps() {
-> 	fi
-> }
->
->+check_netns() {
->+	local tname=$1
->+
->+	# If the test requires NS support, check if NS support exists
->+	# using /proc/self/ns
->+	if [[ "${tname}" =~ ^ns_ ]] &&
->+	   [[ ! -e /proc/self/ns ]]; then
->+		log_host "No NS support detected for test ${tname}"
->+		return 1
->+	fi
->+
->+	return 0
->+}
->+
-> check_vng() {
-> 	local tested_versions
-> 	local version
->@@ -519,6 +557,54 @@ log_guest() {
-> 	LOG_PREFIX=guest log "$@"
-> }
->
->+ns_get_mode() {
->+	local ns=$1
->+
->+	ip netns exec "${ns}" cat /proc/sys/net/vsock/ns_mode 2>/dev/null
->+}
->+
->+test_ns_host_vsock_ns_mode_ok() {
->+	for mode in "${NS_MODES[@]}"; do
->+		local actual
->+
->+		actual=$(ns_get_mode "${mode}0")
->+		if [[ "${actual}" != "${mode}" ]]; then
->+			log_host "expected mode ${mode}, got ${actual}"
->+			return "${KSFT_FAIL}"
->+		fi
->+	done
->+
->+	return "${KSFT_PASS}"
->+}
->+
->+test_ns_host_vsock_child_ns_mode_ok() {
->+	local orig_mode
->+	local rc
->+
->+	orig_mode=$(cat /proc/sys/net/vsock/child_ns_mode)
->+
->+	rc="${KSFT_PASS}"
->+	for mode in "${NS_MODES[@]}"; do
->+		local ns="${mode}0"
->+
->+		if echo "${mode}" 2>/dev/null > /proc/sys/net/vsock/ns_mode; then
->+			log_host "ns_mode should be read-only but write succeeded"
->+			rc="${KSFT_FAIL}"
->+			continue
->+		fi
->+
->+		if ! echo "${mode}" > /proc/sys/net/vsock/child_ns_mode; then
->+			log_host "child_ns_mode should be writable to ${mode}"
->+			rc="${KSFT_FAIL}"
->+			continue
->+		fi
->+	done
->+
->+	echo "${orig_mode}" > /proc/sys/net/vsock/child_ns_mode
->+
->+	return "${rc}"
->+}
->+
-> test_vm_server_host_client() {
-> 	if ! vm_vsock_test "init_ns" "server" 2 "${TEST_GUEST_PORT}"; then
-> 		return "${KSFT_FAIL}"
->@@ -592,6 +678,11 @@ run_shared_vm_tests() {
-> 			continue
-> 		fi
->
->+		if ! check_netns "${arg}"; then
->+			check_result "${KSFT_SKIP}" "${arg}"
->+			continue
->+		fi
->+
-> 		run_shared_vm_test "${arg}"
-> 		check_result "$?" "${arg}"
-> 	done
->@@ -645,6 +736,49 @@ run_shared_vm_test() {
-> 	return "${rc}"
-> }
->
->+run_ns_tests() {
->+	for arg in "${ARGS[@]}"; do
->+		if shared_vm_test "${arg}"; then
->+			continue
->+		fi
->+
->+		if ! check_netns "${arg}"; then
->+			check_result "${KSFT_SKIP}" "${arg}"
->+			continue
->+		fi
->+
->+		add_namespaces
->+
->+		name=$(echo "${arg}" | awk '{ print $1 }')
->+		log_host "Executing test_${name}"
->+
->+		host_oops_before=$(dmesg 2>/dev/null | grep -c -i 'Oops')
->+		host_warn_before=$(dmesg --level=warn 2>/dev/null | grep -c -i 'vsock')
->+		eval test_"${name}"
->+		rc=$?
->+
->+		host_oops_after=$(dmesg 2>/dev/null | grep -c -i 'Oops')
->+		if [[ "${host_oops_after}" -gt "${host_oops_before}" ]]; then
->+			echo "FAIL: kernel oops detected on host" | log_host
->+			check_result "${KSFT_FAIL}" "${name}"
->+			del_namespaces
->+			continue
->+		fi
->+
->+		host_warn_after=$(dmesg --level=warn 2>/dev/null | grep -c -i 'vsock')
->+		if [[ "${host_warn_after}" -gt "${host_warn_before}" ]]; then
->+			echo "FAIL: kernel warning detected on host" | log_host
->+			check_result "${KSFT_FAIL}" "${name}"
->+			del_namespaces
->+			continue
->+		fi
->+
->+		check_result "${rc}" "${name}"
->+
->+		del_namespaces
->+	done
->+}
->+
-> BUILD=0
-> QEMU="qemu-system-$(uname -m)"
->
->@@ -690,6 +824,8 @@ if shared_vm_tests_requested "${ARGS[@]}"; then
-> 	terminate_pidfiles "${pidfile}"
-> fi
->
->+run_ns_tests "${ARGS[@]}"
->+
-> echo "SUMMARY: PASS=${cnt_pass} SKIP=${cnt_skip} FAIL=${cnt_fail}"
-> echo "Log: ${LOG}"
->
->
->-- 
->2.47.3
->
+Fixes: ace45bec6d77 ("rxrpc: Fix firewall route keepalive")
 
 
