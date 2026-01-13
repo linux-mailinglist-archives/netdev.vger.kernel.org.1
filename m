@@ -1,226 +1,163 @@
-Return-Path: <netdev+bounces-249600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF8A5D1B662
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:30:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 544F7D1B665
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:30:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 10D6330124DA
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 21:28:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7FB113012754
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 21:28:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B2A329E4E;
-	Tue, 13 Jan 2026 21:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1768E32BF25;
+	Tue, 13 Jan 2026 21:28:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="VDXe/1sa";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="NtHlG48+"
+	dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b="KzjkkSvO"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 845E8346E5D
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 21:28:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A1F31ED95
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 21:28:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768339686; cv=none; b=GpgrZYvKbSOGhFYuEjID5MRzZP51UbCZrtpZPGmCemfn2wHpBflVYgQpcRo8Gix/zWq6BG+6CAzpEMUxwyB1BTy8d3O61E0hPKE/UshtVeY0sEADyMuL71RVQkVi//3ipNGCTVuGe0w/jshJiDqQXMwZXbUOk41AO/7iT7bC37g=
+	t=1768339715; cv=none; b=BxCDRa+IbxJ6BNrd2Y2DB69hTBHOQ1Yi+WABA6i/BeqD3W2rxJ87IZvZtaiEabExOp7r1Nd+0B7fQX5sr4/BgM+agxTnNuBkKoWGYOravbSxPQ1rav93bIeKrlSsfHfYcG04g2Fp0/PCwc2AfKNiwXpvQumZuFlCzcm610OdWaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768339686; c=relaxed/simple;
-	bh=HmNZZHPnu1GpLH5DOlfNw1WkySlEL6fvbagz8JYkG/w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TiHDfZTtKknfkCt0nnM2/bfoed1/t8STZ/9/HHSySuSdxJMt/ZrYzFmtAg7PMol44EbrL0Fx+o9AP44pxk6m0nedMh11ImPliew8ABqYRSMYNrxZhUwhNOUHjgTdde4OKyaOYqLTO1RLd4k2+km5TiHDnIw3rklIynXqme+AbPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=VDXe/1sa; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=NtHlG48+; arc=none smtp.client-ip=103.168.172.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 000CC140011C;
-	Tue, 13 Jan 2026 16:28:03 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Tue, 13 Jan 2026 16:28:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1768339682; x=
-	1768426082; bh=5g5pifFRiK8bhQWxl12/uac4Ak48MuSG5XI8vK1p3nU=; b=V
-	DXe/1saCl+g0Cxyg4keCeg2al+O+Ld+Bgoz3VOVbrEHxhLAxsoyo+lQmYsn4dphe
-	lSQxNdpOSbaEZbemrsVyPkxoBGgPgYTc+OQnG62hl7oggHOg5PZp+xoD7N8/gChb
-	Z5hlqF1ns34gd7H5DTvco2mqXOaGT/SRgD1gEZCtBYH9U51qhGaitbkM4oo3WC3G
-	72BP0Ctf6llpmsIxScAG68bE+0tVcqe4j6aIvS3wcY8/p/eK7w7bQnCbZCdOppr8
-	XpqpxpGWeL9jHJ5qqOPL5eNXHHZst4ZtVM0A4cfGw7rVvvF/8Rl5ZOJMD2R51gQV
-	lllBJe/X8zFyF73tAqcww==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm2; t=1768339682; x=1768426082; bh=5
-	g5pifFRiK8bhQWxl12/uac4Ak48MuSG5XI8vK1p3nU=; b=NtHlG48+P9ow0pADY
-	tD+g7SKeFvrmsUcndLfG1W4JlEeiG+Xlwk8EX/OWnKiC94zRYaODfNAzAleAdpcH
-	BUpFvIB6gCNNYCIhRGE33TfmGuGQta/Zt9S1ouA8ECptQaT4WNC+C3WAFPEdRhJh
-	0DDPdAaVYXALD9d7zgwzzZjhLImWTGlAy8ydXVLIcBBDqlqQTr4UvSMUSqpxb/V4
-	UWLAsY/QXXRtQeS2hgwvPH7ho9furwMj/Suow4DVdcyrIqf+LYEzBo2tVcniyIew
-	Qvx2pT56JHZraI4ODaxc7GOUJxHzXWh/1CsRclotjkr2adHjcuR+0Hu3tK+Rg2X9
-	tXu2Q==
-X-ME-Sender: <xms:4rhmaSERChxUW8RWrXkvI7ZFdAiTGVelUbpHTZnCuPZWcnNWY88pBA>
-    <xme:4rhmaZtvg7Y78Ul-m57r0B-vTdSoa6X9T9Qo8fhPh7vEBmZguc9SksicWdTqqUN67
-    Vy2X5JoRfuUWwOOo8TNwSRKZhmTxyMxBs_hvN0TSU3MOBN9VfEOgg>
-X-ME-Received: <xmr:4rhmaYboD5ZrusVqDvg9gnnNMlXnWTHwTnJOb7Bbvk823Gq2btSXZf-mGp_gc5KtxB87qpQGDsdZTs4-l_a3j3OZ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduvddugedtucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomheptehlihgtvgcu
-    ofhikhhithihrghnshhkrgcuoegrlhhitggvrdhkvghrnhgvlhesfhgrshhtmhgrihhlrd
-    himheqnecuggftrfgrthhtvghrnhepteffleejfedvhfehieejlefgkeeljeevueeggeev
-    tefhgfeuhfduffegkedvtddtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
-    hmrghilhhfrhhomheprghlihgtvgdrkhgvrhhnvghlsehfrghsthhmrghilhdrihhmpdhn
-    sggprhgtphhtthhopedufedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrnh
-    hivghlsehiohhgvggrrhgsohigrdhnvghtpdhrtghpthhtohepuggrvhgvmhesuggrvhgv
-    mhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtoh
-    hmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggs
-    vghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhutghivghnrdigihhnsehgmh
-    grihhlrdgtohhmpdhrtghpthhtohepfihilhhlvghmuggvsghruhhijhhnrdhkvghrnhgv
-    lhesghhmrghilhdrtghomhdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlhdroh
-    hrghdprhgtphhtthhopehrrgiiohhrsegslhgrtghkfigrlhhlrdhorhhg
-X-ME-Proxy: <xmx:4rhmaZ4EpCSCsDzgtQIdHi8V2USiCS6WPzpDvai7tWNo76_QChUawQ>
-    <xmx:4rhmaQ_2jdRe5AU5nVhZDjcBBwv59-NlUO-cQIb-jHc5XHdo2YzZnw>
-    <xmx:4rhmaVaKAfEQ-ZMcgKNXrRQb9X881EMeGINTFpefiIXnrsDZoRVw1Q>
-    <xmx:4rhmaZ4NJ5VxidKQ-jolpkbOrBXSJoBeJihiXiQg0OMTZdFMR0vA0A>
-    <xmx:4rhmaaw_kLWqWMtGkjFvHfPMxXuPbxLONM3POYRbYK4KT0jhrtBJd1Ns>
-Feedback-ID: i559e4809:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 13 Jan 2026 16:28:02 -0500 (EST)
-From: Alice Mikityanska <alice.kernel@fastmail.im>
-To: Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	David Ahern <dsahern@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>
-Cc: Shuah Khan <shuah@kernel.org>,
-	Stanislav Fomichev <stfomichev@gmail.com>,
-	netdev@vger.kernel.org,
-	Alice Mikityanska <alice@isovalent.com>
-Subject: [PATCH net-next v2 11/11] net/ipv6: Remove HBH helpers
-Date: Tue, 13 Jan 2026 23:26:55 +0200
-Message-ID: <20260113212655.116122-12-alice.kernel@fastmail.im>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260113212655.116122-1-alice.kernel@fastmail.im>
-References: <20260113212655.116122-1-alice.kernel@fastmail.im>
+	s=arc-20240116; t=1768339715; c=relaxed/simple;
+	bh=/sjXZqJqPC7crHm9RyJs5cBFt5BsXo1n8SIelhpIFpI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=COO26WSD+2/gN+uewdTBAIp6LsVCtkUKtUEHxLi4DNJTxzvXCiC50TbTVp0M1n9fea5LQGLHaoKSiTiEK2N1k9qGI1VowMT9kFt/BwntLSSfZ3OJJkLWwfA5E0iFOFIajd8fKHH5lpOwriflmk2XV9jLQnpQWY+yZJljO5UdId4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=isovalent.com; spf=pass smtp.mailfrom=isovalent.com; dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b=KzjkkSvO; arc=none smtp.client-ip=74.125.82.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=isovalent.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isovalent.com
+Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-12336f33098so59438c88.0
+        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 13:28:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=isovalent.com; s=google; t=1768339713; x=1768944513; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=UBRC+Rpbdm2zKDeU90T2kAoRrIazNYEJECuptdIqsQY=;
+        b=KzjkkSvOfjlruLadAlnu0egm9cnWbOBFFjfBcw3A2thjdww4PkAtQrsv9bj3iHWomc
+         TrP+2PAuFXINs2hMHyyzYcJ6WgDcQFOoFUJ1mkThSu/JLAQ+yAei1SYhYTkeS0636Zyf
+         7pl/QMqcaVOl729egHNzPSwbGipwlX5wXEgMIcibxuta0dHSxcxCJIU2A9c1fjF+YIk6
+         X0pry+Az80VhH7pfngOY4nM6IT+crU8i2pDVxuJdGIHyVHIe4Uff9nsRO6upu86nVT0+
+         RlPcoxhOFEm8dEle8BI4ry4Ma20RVDaDO/oco36mxmPMs29SzAQox1HtowriQ/JRDd+U
+         tvxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768339713; x=1768944513;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UBRC+Rpbdm2zKDeU90T2kAoRrIazNYEJECuptdIqsQY=;
+        b=g5OAXnpE6vGoGFBuenradYTGVYSu1gGsBssgMlz02X48lDBOpuNeDD3C82HWrHUr05
+         JH+hrYXq2BWEwKNXc8PMse/ZntJ+nCbENLpvDws2HxaWn7mbxpcLZ0gEVmSRt3hpTF5H
+         MOGFsok7kMUsTFtY+LphV4DltBeFn7B/n7VnfPU6/hQu3u1BYgKPgqEIZ3pr+rQJEcXg
+         MuNgwe+uxbxYO3o/fNRkwWZ3tkmIm0pVKVqY6/sVElolzW50IaiHO8xhRAtCHJRB00u1
+         mK3RcI8NNBo6MYkwXqNa0sUOoboLf9x0ObBjgtY8eBKipCpfv0f5GnZ27TZKPuuzgpGC
+         O05g==
+X-Forwarded-Encrypted: i=1; AJvYcCWAis3rDyYzoVPRkoFM/B+J6al9T6aAVpaJgzLtjuH6KDuENtTbWli5YGVh3Nr1R48VlryuEME=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyx31TCxUS/RRKBU1/p6dKDQth/gYDdF1krpjumzPepY+ZVxwi+
+	peadeJos+EIqTWc/hN2nNrRuPHxSjjPoONbQ3PHQ8QF6kTwN2zYgsO2X1JOEetUgzbqKwd89HTp
+	Ayk4/OtOoaxXuRt0H8Yx66a5oaHkFlvq/XtJqOo2Owg==
+X-Gm-Gg: AY/fxX6nU0SpFoL7fk/7byjv48q+SSy/CktG0d78D54CYvhhYIn1j6TUPL9RAlbStz4
+	Ffe08pPZqA8lKiNSKGpDDLbiv/fUcn1auX1YHZZU+72+PMggGgbf9YEkUjE8SCPTl5nrPQ1gfYg
+	NgbwXRYzYIADQRs0N+RiHeMSCLGT7P+Rjp8FdiZ/Mr5U07Eu5rLNRmGauKgqsUdZiY1y1NS9CCX
+	5jw58pp87+5DCku6od7ABcIBgHB6wrvUS3FCUkAaeh3zPGs/tRXvIvMA2RGIdnsWVl+MHtdcDqY
+	J5ynK1W4sHJ0zdX4364CxcoDIWsw0mtDrjg9
+X-Received: by 2002:a05:7022:1709:b0:11b:d6f2:a6d6 with SMTP id
+ a92af1059eb24-12336a81135mr297133c88.34.1768339712508; Tue, 13 Jan 2026
+ 13:28:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-
+References: <20250923134742.1399800-1-maxtram95@gmail.com> <20250923134742.1399800-2-maxtram95@gmail.com>
+ <aNWIi0Ni-kwUmYul@mini-arch>
+In-Reply-To: <aNWIi0Ni-kwUmYul@mini-arch>
 From: Alice Mikityanska <alice@isovalent.com>
+Date: Tue, 13 Jan 2026 23:28:16 +0200
+X-Gm-Features: AZwV_QjhSUd5CXclGB56T4LMVGk3qAsJcZaPa1XUyr_KMTrbqFSQ7G3ginp8umk
+Message-ID: <CAD0BsJXNcZ0w7BViTz4t07pY7ViSNbNJx_XR4LVRtdjC-x9vCA@mail.gmail.com>
+Subject: Re: [PATCH net-next 01/17] net/ipv6: Introduce payload_len helpers
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Maxim Mikityanskiy <maxtram95@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, David Ahern <dsahern@kernel.org>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org, 
+	tcpdump-workers@lists.tcpdump.org, Guy Harris <gharris@sonic.net>, 
+	Michael Richardson <mcr@sandelman.ca>, Denis Ovsienko <denis@ovsienko.info>, Xin Long <lucien.xin@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Now that the HBH jumbo helpers are not used by any driver or GSO, remove
-them altogether.
+On Thu, 25 Sept 2025 at 21:23, Stanislav Fomichev <stfomichev@gmail.com> wrote:
+>
+> On 09/23, Maxim Mikityanskiy wrote:
+> > From: Maxim Mikityanskiy <maxim@isovalent.com>
+> >
+> > From: Maxim Mikityanskiy <maxim@isovalent.com>
+> >
+> > The next commits will transition away from using the hop-by-hop
+> > extension header to encode packet length for BIG TCP. Add wrappers
+> > around ip6->payload_len that return the actual value if it's non-zero,
+> > and calculate it from skb->len if payload_len is set to zero (and a
+> > symmetrical setter).
+> >
+> > The new helpers are used wherever the surrounding code supports the
+> > hop-by-hop jumbo header for BIG TCP IPv6, or the corresponding IPv4 code
+> > uses skb_ip_totlen (e.g., in include/net/netfilter/nf_tables_ipv6.h).
+> >
+> > No behavioral change in this commit.
+> >
+> > Signed-off-by: Maxim Mikityanskiy <maxim@isovalent.com>
+> > ---
+> >  include/linux/ipv6.h                       | 20 ++++++++++++++++++++
+> >  include/net/ipv6.h                         |  2 --
+> >  include/net/netfilter/nf_tables_ipv6.h     |  4 ++--
+> >  net/bridge/br_netfilter_ipv6.c             |  2 +-
+> >  net/bridge/netfilter/nf_conntrack_bridge.c |  4 ++--
+> >  net/ipv6/ip6_input.c                       |  2 +-
+> >  net/ipv6/ip6_offload.c                     |  7 +++----
+> >  net/ipv6/output_core.c                     |  7 +------
+> >  net/netfilter/ipvs/ip_vs_xmit.c            |  2 +-
+> >  net/netfilter/nf_conntrack_ovs.c           |  2 +-
+> >  net/netfilter/nf_log_syslog.c              |  2 +-
+> >  net/sched/sch_cake.c                       |  2 +-
+> >  12 files changed, 34 insertions(+), 22 deletions(-)
+> >
+> > diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
+> > index 43b7bb828738..44c4b791eceb 100644
+> > --- a/include/linux/ipv6.h
+> > +++ b/include/linux/ipv6.h
+> > @@ -126,6 +126,26 @@ static inline unsigned int ipv6_transport_len(const struct sk_buff *skb)
+> >              skb_network_header_len(skb);
+> >  }
+> >
+> > +static inline unsigned int ipv6_payload_len(const struct sk_buff *skb, const struct ipv6hdr *ip6)
+> > +{
+> > +     u32 len = ntohs(ip6->payload_len);
+> > +
+> > +     return (len || !skb_is_gso(skb) || !skb_is_gso_tcp(skb)) ?
+> > +            len : skb->len - skb_network_offset(skb) - sizeof(struct ipv6hdr);
+>
+> Any reason not to return skb->len - skb_network_offset(skb) - sizeof(struct ipv6hdr)
+> here unconditionally? Will it not work in some cases?
 
-Signed-off-by: Alice Mikityanska <alice@isovalent.com>
----
- include/net/ipv6.h | 77 ----------------------------------------------
- 1 file changed, 77 deletions(-)
+Just submitted a v2. Yes, it's intentional:
 
-diff --git a/include/net/ipv6.h b/include/net/ipv6.h
-index f65bcef57d80..e697e5fd5fc1 100644
---- a/include/net/ipv6.h
-+++ b/include/net/ipv6.h
-@@ -149,17 +149,6 @@ struct frag_hdr {
- 	__be32	identification;
- };
- 
--/*
-- * Jumbo payload option, as described in RFC 2675 2.
-- */
--struct hop_jumbo_hdr {
--	u8	nexthdr;
--	u8	hdrlen;
--	u8	tlv_type;	/* IPV6_TLV_JUMBO, 0xC2 */
--	u8	tlv_len;	/* 4 */
--	__be32	jumbo_payload_len;
--};
--
- #define	IP6_MF		0x0001
- #define	IP6_OFFSET	0xFFF8
- 
-@@ -462,72 +451,6 @@ bool ipv6_opt_accepted(const struct sock *sk, const struct sk_buff *skb,
- struct ipv6_txoptions *ipv6_update_options(struct sock *sk,
- 					   struct ipv6_txoptions *opt);
- 
--/* This helper is specialized for BIG TCP needs.
-- * It assumes the hop_jumbo_hdr will immediately follow the IPV6 header.
-- * It assumes headers are already in skb->head.
-- * Returns: 0, or IPPROTO_TCP if a BIG TCP packet is there.
-- */
--static inline int ipv6_has_hopopt_jumbo(const struct sk_buff *skb)
--{
--	const struct hop_jumbo_hdr *jhdr;
--	const struct ipv6hdr *nhdr;
--
--	if (likely(skb->len <= GRO_LEGACY_MAX_SIZE))
--		return 0;
--
--	if (skb->protocol != htons(ETH_P_IPV6))
--		return 0;
--
--	if (skb_network_offset(skb) +
--	    sizeof(struct ipv6hdr) +
--	    sizeof(struct hop_jumbo_hdr) > skb_headlen(skb))
--		return 0;
--
--	nhdr = ipv6_hdr(skb);
--
--	if (nhdr->nexthdr != NEXTHDR_HOP)
--		return 0;
--
--	jhdr = (const struct hop_jumbo_hdr *) (nhdr + 1);
--	if (jhdr->tlv_type != IPV6_TLV_JUMBO || jhdr->hdrlen != 0 ||
--	    jhdr->nexthdr != IPPROTO_TCP)
--		return 0;
--	return jhdr->nexthdr;
--}
--
--/* Return 0 if HBH header is successfully removed
-- * Or if HBH removal is unnecessary (packet is not big TCP)
-- * Return error to indicate dropping the packet
-- */
--static inline int ipv6_hopopt_jumbo_remove(struct sk_buff *skb)
--{
--	const int hophdr_len = sizeof(struct hop_jumbo_hdr);
--	int nexthdr = ipv6_has_hopopt_jumbo(skb);
--	struct ipv6hdr *h6;
--
--	if (!nexthdr)
--		return 0;
--
--	if (skb_cow_head(skb, 0))
--		return -1;
--
--	/* Remove the HBH header.
--	 * Layout: [Ethernet header][IPv6 header][HBH][L4 Header]
--	 */
--	memmove(skb_mac_header(skb) + hophdr_len, skb_mac_header(skb),
--		skb_network_header(skb) - skb_mac_header(skb) +
--		sizeof(struct ipv6hdr));
--
--	__skb_pull(skb, hophdr_len);
--	skb->network_header += hophdr_len;
--	skb->mac_header += hophdr_len;
--
--	h6 = ipv6_hdr(skb);
--	h6->nexthdr = nexthdr;
--
--	return 0;
--}
--
- static inline bool ipv6_accept_ra(const struct inet6_dev *idev)
- {
- 	s32 accept_ra = READ_ONCE(idev->cnf.accept_ra);
--- 
-2.52.0
+Many callers do extra checks that the payload length is valid, i.e.
+not bigger than the SKB length. If we just use the calculation
+unconditionally, those checks will always pass, even for invalid
+packets that have payload_len bigger than the actual packet size.
 
+For example, bridge and netfilter validate that an IPv6 packet either
+has a non-zero payload_len that fits into the SKB, or it has a zero
+payload_len and an HBH Jumbo header with a length that fits into the
+SKB, or it's a new-style BIG TCP packet with a zero payload_len, hence
+the checks for GRO/GSO in ipv6_payload_len(): we make sure that it
+didn't come with payload_len = 0 from the wire (ipv6_gro_receive also
+checks payload_len before aggregating packets).
+
+Note that this commit aims to reflect the same behavior that we have
+with IPv4 and iph_totlen.
 
