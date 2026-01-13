@@ -1,105 +1,163 @@
-Return-Path: <netdev+bounces-249442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F261D19083
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:10:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA496D19159
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:22:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B6768300163B
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 13:10:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 00BBC3011EF1
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 13:21:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BC1538F953;
-	Tue, 13 Jan 2026 13:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4222330DEB7;
+	Tue, 13 Jan 2026 13:21:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2SXvWykz"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="sImy+7TU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B899038FEFD
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 13:10:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5115B26D4EF;
+	Tue, 13 Jan 2026 13:21:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768309821; cv=none; b=O8nNaF6syRHn5dPUGgQNo9cM40Yixvy5dffW6Ea5etwDrEHQRzK3o9W4UrmiNO+8V/J7MYOY2Thl1XaCcvoYvBBi0aJR5I1MGKHiZhd+KnwwfzPBv32m+rHvnCY6md0S3NE3W5mNA0G98WqUl6PUO+W8kr+yDKoEfvF63QNT2kc=
+	t=1768310510; cv=none; b=rL1/geTMbpsQ97/6MD0mlpKZ4GLMvHtzpmytH4QNLr9nBEmm/5SwEZI48qyzkk8reN1UO3Ux2kLSt2cw6NJG5vMfuhHuHEm++oeLqbcRBQs8rSjnyeiyDZ3RomqxXTwlnFetLqMQ9jjAA3oZlQaAGDxhYLiBr2fsQrHMwPj8OmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768309821; c=relaxed/simple;
-	bh=SUugGjgG+7vEqHmUCtlpGkRukFLpAgMmpUFWDnD8g/o=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=lxFDu9TMXEGxwONwpL5aHgHn7VdTh2+MMIDN+7/Hseml8P3DPls9Gy/3Vua472gRdmb8SR9BZgbGYy89g6z1v5JDojD/YRua2eBNVgfOlHr3kbASuJvWpdh0gpNeP++RezCef2nnXZ4nbtaosS5wA7joJ9lVy1l2Fqk4DzyDF1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2SXvWykz; arc=none smtp.client-ip=209.85.219.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-88a3929171bso158048826d6.3
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 05:10:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768309818; x=1768914618; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/srtRv/gdOtsYHQ+DxBxBqOCSfeVGTnOu6cSMjM9zI8=;
-        b=2SXvWykzYm+2fdS/kmWsjFEjusOkwD5GVlLnOW1Dida+FbWzq1jZkC+VgpV+GCRfbR
-         +v1sQiL8LZ2ToXsZHvw4KsATPmNfCRH/XsheVDHhjvloLjhxA6vpC3vrdHXSQwbgdzFP
-         V08WhNHWtixzRGqcBRp65lPc5ci9sDJ8a0vtDjQMk9pvpwltFvog1zIzh5XqRcetqwFy
-         3M173lecy9rKN3wlyufhT+HCThucwaaOLy/lqvh07jUpw9XsWlqGyXrCrX+8Zfa/kIt/
-         t5XXjSe0eviINAknDDV2DHfrDHrK53el45D6swIIMx2x3C67Sp8tXrIsg7AmDyPyplFA
-         jCpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768309818; x=1768914618;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/srtRv/gdOtsYHQ+DxBxBqOCSfeVGTnOu6cSMjM9zI8=;
-        b=cVgvWMUjxyeRwpaQNP+7b3ZWxv0mryOptfTyZEnFupHIuLxMa6PaKrixK7AK1lZGiB
-         IWxPgNj+zMaDZMrC4U0C0BQxBnTv+1XPgJaq7gbUhRy1k4U6/okgKxAi2jg4Q3Qi8r9u
-         4p8tlza1rbBywkKxReUlMVBPMkVeFHDOehbACvp0U5At3k7SpXaHkjQzf2XGIjrfARdB
-         qQhYiwClJyQcb2GfFEyGn0hg8Frw3Jg9axB7EAQcXcbYy/YbG76SzqM3MCosJRaSepkh
-         fTBn0gxALtYXhlmKQnFZ/lo3lCQcc0cJRbD4eYLHmUZNHA1o2jV5GPgkRQhGXzio19rG
-         uAZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWMvBjNl/c3gwwyEkAuvdQYFwBM/nN2dLKNpmS9U6GcelIldgtdP5KjOvBeqz7U7SHQFsIpwh0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMoJvYKgRJI4LLsCH83Y8nEEObRgGlQofVqMmK8iedOlymCTqE
-	qaN5+TVwIoBdEqcb43Qxy2qHm6QSTi1dmFjWmUO7gE7ySUbyBUlE4NFPx7Yrf+zMp1LF3yraG0D
-	BnhGTRKD20NvHqA==
-X-Google-Smtp-Source: AGHT+IFGDnc8WBZgUMsSMePdVdyUIhlf0lNNZLeTi8fT7ANbXp35eba3gYEyO6N4YZIjs2Z3G3Wp0nO/dCJryg==
-X-Received: from qvblh6.prod.google.com ([2002:a05:6214:54c6:b0:888:3b63:e0d7])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:488f:b0:87d:c7ab:e5d0 with SMTP id 6a1803df08f44-890842757cbmr320345746d6.55.1768309818669;
- Tue, 13 Jan 2026 05:10:18 -0800 (PST)
-Date: Tue, 13 Jan 2026 13:10:17 +0000
+	s=arc-20240116; t=1768310510; c=relaxed/simple;
+	bh=gtRSjksw9jDTYGXf0RhgAwYLTZztraOK8uc+9QY38mo=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=cuyaCkLeGWHz9oCJ+oHeWMoBN/nvGP4gglQVmXGbR0af/WOzMo84TioMGgbeRxJCwCeypNsxVaqEZhRCmRrduCjleEKhx4YRwSHdSR4MeLI0kC0uS0k5UzgqR1iaoa2ne3uWV04C23NIKsENuI4kBq/7A6VEliPdHFOvHkXNnP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=sImy+7TU; arc=none smtp.client-ip=212.227.15.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1768310494; x=1768915294; i=markus.elfring@web.de;
+	bh=gtRSjksw9jDTYGXf0RhgAwYLTZztraOK8uc+9QY38mo=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=sImy+7TUBBHdWwS/IvPRKP5Oh2rT6ipPlwwvoHEtJBhnG5YYyv63XZIiWxyr6lo5
+	 iw6nerSEbn+AfGSi01SNzvfAB716BCzwzuq9Au7Po5Nh83mR5B4CfXBQowSzf35Vk
+	 n/l3fkJofhRlFKaWtTOc4VOtXOeuU7/AroMaIWTmHOM+RvRoMA2EVkjFIeT3xhqYl
+	 QypouXwCMWHeCFaXGIAtVCO8TKNXMltnuE5BUhDBam+5aizFUtJARPeemUnoXw+dp
+	 BDYxHdABW8yhgKM3RCOwN/pBFaXRqFL0aAWGxlmXjoa9gVIO3+afUXvj8ZK5nNZ7B
+	 Yi56VYQakYXsljmS4w==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.69.174]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MqIFD-1wAMOL27dr-00lilB; Tue, 13
+ Jan 2026 14:21:34 +0100
+Message-ID: <eeef5d49-9019-4ad6-b7dc-9b193350d73b@web.de>
+Date: Tue, 13 Jan 2026 14:21:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260113131017.2310584-1-edumazet@google.com>
-Subject: [PATCH net-next] net: minor __alloc_skb() optimization
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+To: Zeng Chi <zengchi@kylinos.cn>, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Zeng Chi <zeng_chi911@163.com>, LKML <linux-kernel@vger.kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+ Mark Bloch <mbloch@nvidia.com>, Paolo Abeni <pabeni@redhat.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
+References: <20260109090650.1734268-1-zeng_chi911@163.com>
+Subject: Re: [PATCH] net/mlx5: Fix return type mismatch in
+ mlx5_esw_vport_vhca_id()
+Content-Language: en-GB, de-DE
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20260109090650.1734268-1-zeng_chi911@163.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:9qOw+zDNVsvq1oUdjaJLTB/d0wq/Q0DrhFrwiqtXEAVOzXxBJEu
+ mscDas4lHUJ8CgrGZKl6GunKd5eAxT2q29q4DxxSySCTLj/ZPrzxI0UDU1PU05h8Z4J2u5s
+ BLdrJr7xn2xjzAOeL9st2BZDRYLJ7tFfVF8mKO9Dl5Pf5l4xStGchcC6tffpai2NWXX/CEY
+ fNPDJcGvDQ9Io9oWb9HTQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:g1O6J4lAyFE=;ZsTfizGTzzPlF/JqWnaNhMkR8LP
+ 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
+ 3GFVyVazk5mA8dmvo=
 
-We can directly call __finalize_skb_around()
-instead of __build_skb_around() because @size is not zero.
+=E2=80=A6
+> This patch fixes this smatch report:
+=E2=80=A6
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/core/skbuff.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+See also once more:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
+cumentation/process/submitting-patches.rst?h=3Dv6.19-rc5#n94
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 4887099e8678352a62d805e1b0be2736dc985376..77508cf7c41e829a11a988d8de3d2673ff1ff121 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -714,7 +714,7 @@ struct sk_buff *__alloc_skb(unsigned int size, gfp_t gfp_mask,
- 	prefetchw(data + SKB_WITH_OVERHEAD(size));
- 
- 	skbuff_clear(skb);
--	__build_skb_around(skb, data, size);
-+	__finalize_skb_around(skb, data, size);
- 	skb->pfmemalloc = pfmemalloc;
- 
- 	if (flags & SKB_ALLOC_FCLONE) {
--- 
-2.52.0.457.g6b5491de43-goog
-
+Regards,
+Markus
 
