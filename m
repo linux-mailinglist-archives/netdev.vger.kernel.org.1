@@ -1,128 +1,127 @@
-Return-Path: <netdev+bounces-249548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4ADC5D1ADDE
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 19:39:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D807AD1AE1A
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 19:46:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 744133068DC6
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 18:39:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D3FE1305B591
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 18:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28765343D78;
-	Tue, 13 Jan 2026 18:39:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56B5D350288;
+	Tue, 13 Jan 2026 18:45:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dz19fCc5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="x5L4mwpy"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B606D34E776
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 18:38:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79536196C7C;
+	Tue, 13 Jan 2026 18:45:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768329540; cv=none; b=OgrR11jJD8zyUUIlNcVIsMFnA2tSTir6YbVU4c/y+rovfLk/04rJ4pgWVzkvd4ieUHs07s67z3p7OBTqTgPU0L747TQOMggxXPuiLrPNOXrmf+d10mZmV7EdhmtotgeZvtSMTWs3wyjUa0P/m0tPkE2D/1zuRR7JO42JV+Weq/4=
+	t=1768329910; cv=none; b=lArKPSRpywAFmCBTiQV2+ZZK4qTu7jxJMldk4xQndN0dawtfOgDpkwCXRIQ4uuzVtp5vEM6aM1191v3Ry960keZNkfEIvoIyl2padqizE5RcF+NjiBMC1+6BOyq6NTLCT6b2FRnxxjnifAELfjpweMnIFlKUtgp+sxj6lGlmfk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768329540; c=relaxed/simple;
-	bh=T3XklyHmi0zL6Hq6XVLpoC/iYJ/hpCdZU4WmsKgj6ws=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WAcFbaaX7/JxcyeekpyiKe0MKeLBKPrJn+BAWTq5blbJdb4HT4QaILFpC7/D/8JxSvfZvcNki/bzKDFSR/wi1nllTexX3aGSE43yoHgBh7H4aUyRNLLp84gMOP9KPapHtAY/oPv0HvsPT1z3cGhIVKrAnEwEGsWplukKlFATzfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dz19fCc5; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768329535;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WYLQ9pb7mDbdjvW5qFhZLjZCZDcUydviJ4/haXg7EfY=;
-	b=dz19fCc5bQaVRpNgV8KYpNzTnaUJnSQnE8/DzWHs6AOsKyxS9ocy9g3ARZDVi6x8QkD8wF
-	ls8wJIjF6Kuuy+Mg8EcC5i9HxvNS303WH2Q14Ih5ysLEPvIOt8yPLrQdSRUvd3yXKlkvxK
-	uDr+AqhYsaZOzGIayWKNe3j6RuN7oDY=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-496-M2IR8reHOdyts1QFqy7SpA-1; Tue,
- 13 Jan 2026 13:38:50 -0500
-X-MC-Unique: M2IR8reHOdyts1QFqy7SpA-1
-X-Mimecast-MFC-AGG-ID: M2IR8reHOdyts1QFqy7SpA_1768329528
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 556541800610;
-	Tue, 13 Jan 2026 18:38:48 +0000 (UTC)
-Received: from [10.44.32.45] (unknown [10.44.32.45])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AEF1B30001A2;
-	Tue, 13 Jan 2026 18:38:44 +0000 (UTC)
-Message-ID: <cb8e4434-7a34-4580-a830-a9e79c049c94@redhat.com>
-Date: Tue, 13 Jan 2026 19:38:43 +0100
+	s=arc-20240116; t=1768329910; c=relaxed/simple;
+	bh=dnQ/G+I4tRhS20kh89+6F8e7BWwbcVN5W6/MKzUdxoE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nj/6kQG/tP62gwLehw8eQzDoXli6cmjWH7nWu9DwBtyQD0xw0dfwBVK/P3jArh4NyB0Qn9FPws6CmLYy9DDAVLaMq1WJzsN2WFIf/BgGPt/jPV4TZ4NKZew1BlBgj60WCSW+I6ueAMoqa497kQF43Fc2/mHgK9yeXlBqiaCXFZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=x5L4mwpy; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=jKtoDk43UnDtrx3CwO7HNH0Si8rMrFbLT6eAxKpAHcA=; b=x5L4mwpyvVpXTleXSTA4E7TB3x
+	PqA0EFm3g+ADDRa9RRrchtOtp6ieun8dXwnrsSCngYksIOzLTsbduJGHO93EJ5sOmTiopDikrI2W1
+	Q8ax2P98YDpsczL0Zc0iK7HY9RCHuKVTZVtqdNu73ghhxJVok54d0lPGUxUjqkfTn1U6uJVhV0fZz
+	m+jTOB9IGzXsFfAtxqO7S7Y9km8DXM5EvpxKlPFYsnxmZdRCk91uYE3SLfMJZDZHjfWS2hwp2QEX9
+	NihTgk+QmcNcL9S75eoUCpaLW0+DpTXskcwjiqgJh+s8Bnb6Kvtoc9KXPZiORwxY6qyROiEx6dYal
+	5yterFBA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50244)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vfjNs-000000007ks-3HYJ;
+	Tue, 13 Jan 2026 18:44:53 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vfjNl-000000000u1-2HNB;
+	Tue, 13 Jan 2026 18:44:45 +0000
+Date: Tue, 13 Jan 2026 18:44:45 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Pei Xiao <xiaopei01@kylinos.cn>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH net] net: freescale: ucc_geth: Return early when TBI
+ found can't be found
+Message-ID: <aWaSnRbINHoAerGo@shell.armlinux.org.uk>
+References: <20260113074316.145077-1-maxime.chevallier@bootlin.com>
+ <d89cb3a7-3a55-4bdf-805a-b3386572b220@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 2/3] dpll: add dpll_device op to set working
- mode
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org
-Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Prathosh Satish <Prathosh.Satish@microchip.com>, Petr Oros
- <poros@redhat.com>, linux-kernel@vger.kernel.org,
- Michal Schmidt <mschmidt@redhat.com>
-References: <20260113121636.71565-1-ivecera@redhat.com>
- <20260113121636.71565-3-ivecera@redhat.com>
- <c5a1f45f-542e-4280-a601-ae96f2d1cac4@linux.dev>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <c5a1f45f-542e-4280-a601-ae96f2d1cac4@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d89cb3a7-3a55-4bdf-805a-b3386572b220@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-
-
-On 1/13/26 6:47 PM, Vadim Fedorenko wrote:
-> On 13/01/2026 12:16, Ivan Vecera wrote:
->> Currently, userspace can retrieve the DPLL working mode but cannot
->> configure it. This prevents changing the device operation, such as
->> switching from manual to automatic mode and vice versa.
->>
->> Add a new callback .mode_set() to struct dpll_device_ops. Extend
->> the netlink policy and device-set command handling to process
->> the DPLL_A_MODE attribute.  Update the netlink YAML specification
->> to include the mode attribute in the device-set operation.
->>
->> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
->> ---
->> v2:
->> * fixed bitmap size in dpll_mode_set()
+On Tue, Jan 13, 2026 at 09:16:29AM +0100, Maxime Chevallier wrote:
+> Hi,
 > 
-> [...]
+> On 13/01/2026 08:43, Maxime Chevallier wrote:
+> > In ucc_geth's .mac_config(), we configure the TBI block represented by a
+> > struct phy_device that we get from firmware.
+> > 
+> > While porting to phylink, a check was missed to make sure we don't try
+> > to access the TBI PHY if we can't get it. Let's add it and return early
+> > in case of error
+> > 
+> > Reported-by: kernel test robot <lkp@intel.com>
+> > Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> > Closes: https://lore.kernel.org/r/202601130843.rFGNXA5a-lkp@intel.com/
+> > Fixes: 53036aa8d031 ("net: freescale: ucc_geth: phylink conversion")
+> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 > 
->> +static int
->> +dpll_mode_set(struct dpll_device *dpll, struct nlattr *a,
->> +          struct netlink_ext_ack *extack)
->> +{
->> +    const struct dpll_device_ops *ops = dpll_device_ops(dpll);
->> +    enum dpll_mode mode = nla_get_u32(a), old_mode;
->> +    DECLARE_BITMAP(modes, DPLL_MODE_MAX + 1) = { 0 };
+> Heh that's what I get from sending patches while having mild fever, the
+> patch title is all wrong and should be :
 > 
-> this one breaks reverse xmas tree order.
+> net: freescale: ucc_geth: Return early when TBI PHY can't be found
+> 
+> I'll wait for the 24h cooldown, grab some honey + milk and resend after :)
 
-oops, my bad :-(
+A question - based on dwmac:
 
-> with this fixed:
-> Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+When implementing dwmac to support 1000base-X, the dwmac doesn't
+implement the _full_ 1000base-X, but only up to the PCS. The PCS
+provides a TBI interface to the SerDes PHY provided by the SoC
+designer which acts as the PMA layer.
 
-will fix... thanks for pointing this out.
+The talk here of TBI makes me wonder whether the same thing is going
+on with ucc_geth. Is the "TBI PHY" in fact the SerDes ?
 
-Ivan
+Traditionally, we've represented the SerDes using drivers/phy rather
+than the drivers/net/phy infrastructure, mainly because implementations
+hvaen't provided anything like an 802.3 PHY register set, but moreover
+because the SerDes tends to be generic across ethernet, PCIe, USB, SATA
+etc (basically, anything that is a high speed balanced pair serial
+communication) and thus the "struct phy" from drivers/phy can be used
+by any of these subsystems.
 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
