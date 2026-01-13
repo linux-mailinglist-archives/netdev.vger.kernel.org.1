@@ -1,271 +1,130 @@
-Return-Path: <netdev+bounces-249428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 416B7D18AC3
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 13:19:52 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 261D5D18AC9
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 13:20:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7475D3043787
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 12:17:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8B3E23004E24
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 12:20:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A1738F241;
-	Tue, 13 Jan 2026 12:17:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDCBB38A29C;
+	Tue, 13 Jan 2026 12:19:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e49/McPZ"
+	dkim=pass (2048-bit key) header.d=edu.ge.ch header.i=@edu.ge.ch header.b="mFWt1riB"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from gwsmtp.ge.ch (smtpsw24.ge.ch [160.53.250.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B201838F237
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 12:17:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347A9346AF7;
+	Tue, 13 Jan 2026 12:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.53.250.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768306629; cv=none; b=hKolPzDpgdA9DTX8mGedYkBXk/UFqJKgi/qzdoRHkuV9PtoxdtW/Yc71hlFVQ803bJMKg8iSqN/vjings8rSkqpHw0Rpi/bJVQ5IZ6Ma32rpf0nDNz++trLdMv/1M//ILeJP15HKpS24jAZ4eInLqhfuHgshIPkZi6ME1/u9jLU=
+	t=1768306799; cv=none; b=fX7C9JGnusfRsKpzzl9tw/0StT1Kc3hKkoKAvbO7IQkhYJDMrYtxY4NCT6xOQSurj4a8hSBoNto6fC/bk/T27/rQocUskb/9l/9PjWJTW1TN24JoRloh7tCZGZ+G405SiUmY11CUZqfKsCFPnKoWlQvqrffbWI8+nk0iskfqEYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768306629; c=relaxed/simple;
-	bh=xP93VIKpObzbvyld2iuB5BR9QJPYkq90JwMjod3oPxU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mTpPeUJoeltceC4BX1RufdHEwdPa16ZE6SPKZ7jJlDarJsvDeJzfQ3bobQPS6XF5geXepSGJ7mh2udcAXha5kmUIQ/ioj8vlaELm+7JntaBR1PoDx8PsAeO9yKvm7dMO+gtsbw4B1s0O07I7gHi/covh6bujNAkdbV3mrybgeiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e49/McPZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768306624;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S+3BLDyp40rfFFbBDUJeuhOZtok2AbBGm0ObGnrAe3A=;
-	b=e49/McPZ3mLRSQcAZvmSr7wjh7UTkkiaukEgoeNprhGfYPoNOPXbOaUxBfqjK3BJid8VSb
-	euhmdVpdykrFXeMrgkZJ38fS70lBeJFjDacgQANG3FIrJGQE41tfiDdsNzc4Ca/6II6IKa
-	TQpYBYPaPVjft9VPfyt266azG0kyAFM=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-683-_c9VpyY1PRKSN1vkOWPctg-1; Tue,
- 13 Jan 2026 07:17:01 -0500
-X-MC-Unique: _c9VpyY1PRKSN1vkOWPctg-1
-X-Mimecast-MFC-AGG-ID: _c9VpyY1PRKSN1vkOWPctg_1768306620
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AF96D195605F;
-	Tue, 13 Jan 2026 12:16:59 +0000 (UTC)
-Received: from p16v.redhat.com (unknown [10.44.33.116])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B4DCA19560AB;
-	Tue, 13 Jan 2026 12:16:55 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Petr Oros <poros@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Michal Schmidt <mschmidt@redhat.com>
-Subject: [PATCH net-next v2 3/3] dpll: zl3073x: Implement device mode setting support
-Date: Tue, 13 Jan 2026 13:16:36 +0100
-Message-ID: <20260113121636.71565-4-ivecera@redhat.com>
-In-Reply-To: <20260113121636.71565-1-ivecera@redhat.com>
-References: <20260113121636.71565-1-ivecera@redhat.com>
+	s=arc-20240116; t=1768306799; c=relaxed/simple;
+	bh=wXYqp44HS9RMJoTPuDDx16pvgLusmSnqacU6mo8+/FU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ktMgOXMcj7x3ZmXtQvijQPadDIau/GQucSJiCIcmF2mzwsb/ABcf3VcoNar+Rz3dg2vulMdp2ItlI83kzzc6MtND5Q/PGXPIRi/ymB4G39eNduKeMp/xFoZr1fZd+tAkOPu89zeyRXMMKvEm5xDHGOhtYTlcrGVxBWx+e/NqQxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=edu.ge.ch; spf=pass smtp.mailfrom=edu.ge.ch; dkim=pass (2048-bit key) header.d=edu.ge.ch header.i=@edu.ge.ch header.b=mFWt1riB; arc=none smtp.client-ip=160.53.250.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=edu.ge.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=edu.ge.ch
+From: "Wenger Jeremie (EDU)" <jeremie.wenger@edu.ge.ch>
+To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
+	"przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [Intel-wired-lan] [REGRESSION] e1000e: RX stops after link
+ down/up on Intel 8086:550a since v6.12.43 (fixed by suspend/resume)
+Thread-Index: AQHcgKY4vqPf4k7m6ECp9OMR6mOttLVPYM6AgACqqoo=
+Date: Tue, 13 Jan 2026 12:19:47 +0000
+Message-ID: <eeb0f6c90cf847879f22ce2ec1591668@edu.ge.ch>
+References: <c8bd43a3053047dba7999102920d37c9@edu.ge.ch>,<1e905400-da08-47e8-af6e-91c24e3166e4@intel.com>
+In-Reply-To: <1e905400-da08-47e8-af6e-91c24e3166e4@intel.com>
+Accept-Language: fr-CH, en-US
+Content-Language: fr-CH
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-FEAS-BEC-Info: WlpIGw0aAQkEARIJHAEHBlJSCRoLAAEeDUhZUEhYSFhIWUhZXkguLUVaIy48WlpbWFhYWFldSFpcSAINGg0FAQ1GHw0GDw0aKA0MHUYPDUYLAEhZSFpeSAkGHAAHBhFGBEYGDx0RDQYoAQYcDQRGCwcFSFhIWkhZW0hZWEZZXF1GUF5GWV9ZSFBIWEhYSFtIWEhYSFhIWl5ICQYcAAcGEUYERgYPHRENBigBBhwNBEYLBwVIWEhbWkgBBhwNBEUfARoNDEUECQYoBAEbHBtGBxsdBxsERgcaD0hYSFpQSAQBBh0QRQMNGgYNBCgeDw0aRgMNGgYNBEYHGg9IWA==
+X-SM-outgoing: yes
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; d=edu.ge.ch; s=GVA21; c=relaxed/relaxed;
+ h=from:to:cc:subject:date:message-id:references:content-type:mime-version;
+ bh=wXYqp44HS9RMJoTPuDDx16pvgLusmSnqacU6mo8+/FU=;
+ b=mFWt1riBboU8t3mXs8FtxLta6YMPcx+FjqVOKEZ/1iUMwu2sraCIv7KPvJoPsgjRdvb77CaRouLS
+	kP3KY/vPgECJwwpGw/WHTRqf2zmhz60dF2NsuYddseon6RDm8rPnSWDwjOmqsSh0OyTxQihIa6sE
+	zi3c4d2mXGPLFJmc/Lbgm538WMnAggWurLg9gZNABNq/6iI7TSdc5STC6EJZE28x088+XgJPva3v
+	32fzcKfJX1VIgU+/R+UaRon9W9hj+l7D3SzQ2ZzzHLkmzmviZ/HnrYTk+Jzz2OjjUk9LJVPouj7p
+	bTYkHTOzhm3qViT2qUyzJ1BOOYDBYEPvj0OhJA==
 
-Add support for .supported_modes_get() and .mode_set() callbacks
-to enable switching between manual and automatic modes via netlink.
-
-Implement .supported_modes_get() to report available modes based
-on the current hardware configuration:
-
-* manual mode is always supported
-* automatic mode is supported unless the dpll channel is configured
-  in NCO (Numerically Controlled Oscillator) mode
-
-Implement .mode_set() to handle the specific logic required when
-transitioning between modes:
-
-1) Transition to manual:
-* If a valid reference is currently active, switch the hardware
-  to ref-lock mode (force lock to that reference).
-* If no reference is valid and the DPLL is unlocked, switch to freerun.
-* Otherwise, switch to Holdover.
-
-2) Transition to automatic:
-* If the currently selected reference pin was previously marked
-  as non-selectable (likely during a previous manual forcing
-  operation), restore its priority and selectability in the hardware.
-* Switch the hardware to Automatic selection mode.
-
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
-v2:
-* added extack error messages in error paths
----
- drivers/dpll/zl3073x/dpll.c | 112 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 112 insertions(+)
-
-diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c
-index 9879d85d29af0..7d8ed948b9706 100644
---- a/drivers/dpll/zl3073x/dpll.c
-+++ b/drivers/dpll/zl3073x/dpll.c
-@@ -100,6 +100,20 @@ zl3073x_dpll_pin_direction_get(const struct dpll_pin *dpll_pin, void *pin_priv,
- 	return 0;
- }
- 
-+static struct zl3073x_dpll_pin *
-+zl3073x_dpll_pin_get_by_ref(struct zl3073x_dpll *zldpll, u8 ref_id)
-+{
-+	struct zl3073x_dpll_pin *pin;
-+
-+	list_for_each_entry(pin, &zldpll->pins, list) {
-+		if (zl3073x_dpll_is_input_pin(pin) &&
-+		    zl3073x_input_pin_ref_get(pin->id) == ref_id)
-+			return pin;
-+	}
-+
-+	return NULL;
-+}
-+
- static int
- zl3073x_dpll_input_pin_esync_get(const struct dpll_pin *dpll_pin,
- 				 void *pin_priv,
-@@ -1137,6 +1151,26 @@ zl3073x_dpll_lock_status_get(const struct dpll_device *dpll, void *dpll_priv,
- 	return 0;
- }
- 
-+static int
-+zl3073x_dpll_supported_modes_get(const struct dpll_device *dpll,
-+				 void *dpll_priv, unsigned long *modes,
-+				 struct netlink_ext_ack *extack)
-+{
-+	struct zl3073x_dpll *zldpll = dpll_priv;
-+
-+	/* We support switching between automatic and manual mode, except in
-+	 * a case where the DPLL channel is configured to run in NCO mode.
-+	 * In this case, report only the manual mode to which the NCO is mapped
-+	 * as the only supported one.
-+	 */
-+	if (zldpll->refsel_mode != ZL_DPLL_MODE_REFSEL_MODE_NCO)
-+		__set_bit(DPLL_MODE_AUTOMATIC, modes);
-+
-+	__set_bit(DPLL_MODE_MANUAL, modes);
-+
-+	return 0;
-+}
-+
- static int
- zl3073x_dpll_mode_get(const struct dpll_device *dpll, void *dpll_priv,
- 		      enum dpll_mode *mode, struct netlink_ext_ack *extack)
-@@ -1217,6 +1251,82 @@ zl3073x_dpll_phase_offset_avg_factor_set(const struct dpll_device *dpll,
- 	return 0;
- }
- 
-+static int
-+zl3073x_dpll_mode_set(const struct dpll_device *dpll, void *dpll_priv,
-+		      enum dpll_mode mode, struct netlink_ext_ack *extack)
-+{
-+	struct zl3073x_dpll *zldpll = dpll_priv;
-+	u8 hw_mode, mode_refsel, ref;
-+	int rc;
-+
-+	rc = zl3073x_dpll_selected_ref_get(zldpll, &ref);
-+	if (rc) {
-+		NL_SET_ERR_MSG_MOD(extack, "failed to get selected reference");
-+		return rc;
-+	}
-+
-+	if (mode == DPLL_MODE_MANUAL) {
-+		/* We are switching from automatic to manual mode:
-+		 * - if we have a valid reference selected during auto mode then
-+		 *   we will switch to forced reference lock mode and use this
-+		 *   reference for selection
-+		 * - if NO valid reference is selected, we will switch to forced
-+		 *   holdover mode or freerun mode, depending on the current
-+		 *   lock status
-+		 */
-+		if (ZL3073X_DPLL_REF_IS_VALID(ref))
-+			hw_mode = ZL_DPLL_MODE_REFSEL_MODE_REFLOCK;
-+		else if (zldpll->lock_status == DPLL_LOCK_STATUS_UNLOCKED)
-+			hw_mode = ZL_DPLL_MODE_REFSEL_MODE_FREERUN;
-+		else
-+			hw_mode = ZL_DPLL_MODE_REFSEL_MODE_HOLDOVER;
-+	} else {
-+		/* We are switching from manual to automatic mode:
-+		 * - if there is a valid reference selected then ensure that
-+		 *   it is selectable after switch to automatic mode
-+		 * - switch to automatic mode
-+		 */
-+		struct zl3073x_dpll_pin *pin;
-+
-+		pin = zl3073x_dpll_pin_get_by_ref(zldpll, ref);
-+		if (pin && !pin->selectable) {
-+			/* Restore pin priority in HW */
-+			rc = zl3073x_dpll_ref_prio_set(pin, pin->prio);
-+			if (rc) {
-+				NL_SET_ERR_MSG_MOD(extack,
-+						   "failed to restore pin priority");
-+				return rc;
-+			}
-+
-+			pin->selectable = true;
-+		}
-+
-+		hw_mode = ZL_DPLL_MODE_REFSEL_MODE_AUTO;
-+	}
-+
-+	/* Build mode_refsel value */
-+	mode_refsel = FIELD_PREP(ZL_DPLL_MODE_REFSEL_MODE, hw_mode);
-+
-+	if (ZL3073X_DPLL_REF_IS_VALID(ref))
-+		mode_refsel |= FIELD_PREP(ZL_DPLL_MODE_REFSEL_REF, ref);
-+
-+	/* Update dpll_mode_refsel register */
-+	rc = zl3073x_write_u8(zldpll->dev, ZL_REG_DPLL_MODE_REFSEL(zldpll->id),
-+			      mode_refsel);
-+	if (rc) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "failed to set reference selection mode");
-+		return rc;
-+	}
-+
-+	zldpll->refsel_mode = hw_mode;
-+
-+	if (ZL3073X_DPLL_REF_IS_VALID(ref))
-+		zldpll->forced_ref = ref;
-+
-+	return 0;
-+}
-+
- static int
- zl3073x_dpll_phase_offset_monitor_get(const struct dpll_device *dpll,
- 				      void *dpll_priv,
-@@ -1276,10 +1386,12 @@ static const struct dpll_pin_ops zl3073x_dpll_output_pin_ops = {
- static const struct dpll_device_ops zl3073x_dpll_device_ops = {
- 	.lock_status_get = zl3073x_dpll_lock_status_get,
- 	.mode_get = zl3073x_dpll_mode_get,
-+	.mode_set = zl3073x_dpll_mode_set,
- 	.phase_offset_avg_factor_get = zl3073x_dpll_phase_offset_avg_factor_get,
- 	.phase_offset_avg_factor_set = zl3073x_dpll_phase_offset_avg_factor_set,
- 	.phase_offset_monitor_get = zl3073x_dpll_phase_offset_monitor_get,
- 	.phase_offset_monitor_set = zl3073x_dpll_phase_offset_monitor_set,
-+	.supported_modes_get = zl3073x_dpll_supported_modes_get,
- };
- 
- /**
--- 
-2.52.0
-
+RGUgOiBMaWZzaGl0cywgVml0YWx5IDx2aXRhbHkubGlmc2hpdHNAaW50ZWwuY29tPg0KRW52b3nD
+qSA6IG1hcmRpLCAxMyBqYW52aWVyIDIwMjYgMDQ6MDUNCsOAIDogV2VuZ2VyIEplcmVtaWUgKEVE
+VSk7IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmcNCkNjwqA6IGFudGhvbnkubC5uZ3V5ZW5AaW50ZWwu
+Y29tOyBwcnplbXlzbGF3LmtpdHN6ZWxAaW50ZWwuY29tOyBpbnRlbC13aXJlZC1sYW5AbGlzdHMu
+b3N1b3NsLm9yZzsgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZw0KT2JqZXQgOiBSZTogW0lu
+dGVsLXdpcmVkLWxhbl0gW1JFR1JFU1NJT05dIGUxMDAwZTogUlggc3RvcHMgYWZ0ZXIgbGluayBk
+b3duL3VwIG9uIEludGVsIDgwODY6NTUwYSBzaW5jZSB2Ni4xMi40MyAoZml4ZWQgYnkgc3VzcGVu
+ZC9yZXN1bWUpDQrCoCAgIA0KUFJVREVOQ0UuIENlIG1lc3NhZ2UgcHJvdmllbnQgZCd1biBleHDD
+qWRpdGV1ciBleHRlcm5lIMOgIGwnw4l0YXQuIE5lIGNsaXF1ZXogc3VyIGxlcyBsaWVucyBvdSBu
+J291dnJleiBsZXMgcGnDqGNlcyBqb2ludGVzIHF1ZSBzaSB2b3VzIGZhaXRlcyBlbnRpw6hyZSBj
+b25maWFuY2Ugw6AgY2V0IGV4cMOpZGl0ZXVyLg0KDQpPbiAxLzgvMjAyNiA0OjE1IFBNLCBXZW5n
+ZXIgSmVyZW1pZSAoRURVKSB2aWEgSW50ZWwtd2lyZWQtbGFuIHdyb3RlOg0KPiBIZWxsbywNCj4N
+Cj4NCj4gSSB3b3VsZCBsaWtlIHRvIHJlcG9ydCBhIHJlZ3Jlc3Npb24gaW4gdGhlIGUxMDAwZSBk
+cml2ZXIgYWZmZWN0aW5nIGFuDQo+IEludGVsIGludGVncmF0ZWQgRXRoZXJuZXQgY29udHJvbGxl
+ci4NCj4NCj4NCj4gSGFyZHdhcmU6DQo+IEludGVsIEV0aGVybmV0IGNvbnRyb2xsZXIgWzgwODY6
+NTUwYV0NCj4gRHJpdmVyOiBlMTAwMGUNCj4NCj4NCj4gU3VtbWFyeToNCj4gUlggc3RvcHMgd29y
+a2luZyBhZnRlciBhbiBFdGhlcm5ldCBsaW5rIGRvd24vdXAgKHVucGx1Zy9yZXBsdWcgY2FibGUp
+Lg0KPiBUWCBzdGlsbCB3b3Jrcy4gQSBzeXN0ZW0gc3VzcGVuZC9yZXN1bWUgcmVsaWFibHkgcmVz
+dG9yZXMgUlguDQo+DQo+DQo+IFJlZ3Jlc3Npb24gcmFuZ2U6DQo+DQo+wqDCoCAqDQo+DQo+wqDC
+oMKgwqAgV29ya2luZzogdjYuMTIuMjINCj4NCj7CoMKgICoNCj4NCj7CoMKgwqDCoCBCcm9rZW46
+IHY2LjEyLjQzIC4uIHY2LjE4LjMgKHRlc3RlZCBvbiBEZWJpYW4gMTIgYmFja3BvcnRzLCBEZWJp
+YW4NCj7CoMKgwqDCoCAxMywgRGViaWFuIHNpZCkuIHY2LjE4LjMgaXMgdGhlIG1vc3QgcmVjZW50
+IGtlcm5lbCB0ZXN0ZWQgc28gZmFyLCBzbw0KPsKgwqDCoMKgIHRoZSByZWdyZXNzaW9uIGlzIGxp
+a2VseSBzdGlsbCBwcmVzZW50IGluIG5ld2VyIGtlcm5lbHMuDQo+DQo+IFN5bXB0b21zOg0KPg0K
+PsKgwqAgKg0KPg0KPsKgwqDCoMKgIExpbmsgaXMgZGV0ZWN0ZWQgKDFHYnBzLCBmdWxsIGR1cGxl
+eCkuDQo+DQo+wqDCoCAqDQo+DQo+wqDCoMKgwqAgREhDUCBESVNDT1ZFUiBmcmFtZXMgYXJlIHRy
+YW5zbWl0dGVkIChjb25maXJtZWQgdmlhIGV4dGVybmFsIHBhY2tldA0KPsKgwqDCoMKgIGNhcHR1
+cmUpLg0KPg0KPsKgwqAgKg0KPg0KPsKgwqDCoMKgIE5vIHBhY2tldHMgYXJlIHJlY2VpdmVkIChu
+byBESENQIE9GRkVSLCBSWCBhcHBlYXJzIGRlYWQpLg0KPg0KPsKgwqAgKg0KPg0KPsKgwqDCoMKg
+IEJvb3Rpbmcgd2l0aCB0aGUgY2FibGUgcGx1Z2dlZCB3b3Jrcy4NCj4NCj7CoMKgICoNCj4NCj7C
+oMKgwqDCoCBUaGUgaXNzdWUgaXMgdHJpZ2dlcmVkIG9ubHkgYWZ0ZXIgdW5wbHVnZ2luZyBhbmQg
+cmVwbHVnZ2luZyB0aGUgY2FibGUuDQo+DQo+wqDCoCAqDQo+DQo+wqDCoMKgwqAgQSBzdXNwZW5k
+L3Jlc3VtZSBjeWNsZSByZXN0b3JlcyBSWCBpbW1lZGlhdGVseS4NCj4NCj7CoMKgICoNCj4NCj7C
+oMKgwqDCoCBVc2luZyBhIFVTQiBFdGhlcm5ldCBhZGFwdGVyIChyODE1Mikgb24gdGhlIHNhbWUg
+bmV0d29yayB3b3Jrcw0KPsKgwqDCoMKgIGNvcnJlY3RseS4NCj4NCj4gUmVwcm9kdWN0aW9uIHN0
+ZXBzOg0KPg0KPsKgIDEuDQo+DQo+wqDCoMKgwqAgQm9vdCB3aXRoIEV0aGVybmV0IGNhYmxlIHBs
+dWdnZWQuDQo+DQo+wqAgMi4NCj4NCj7CoMKgwqDCoCBWZXJpZnkgbmV0d29yayBjb25uZWN0aXZp
+dHkgd29ya3MuDQo+DQo+wqAgMy4NCj4NCj7CoMKgwqDCoCBVbnBsdWcgdGhlIEV0aGVybmV0IGNh
+YmxlLg0KPg0KPsKgIDQuDQo+DQo+wqDCoMKgwqAgUGx1ZyB0aGUgRXRoZXJuZXQgY2FibGUgYmFj
+ayBpbi4NCj4NCj7CoCA1Lg0KPg0KPsKgwqDCoMKgIE9ic2VydmUgdGhhdCBSWCBubyBsb25nZXIg
+d29ya3MgKG5vIERIQ1AgT0ZGRVIpLg0KPg0KPsKgIDYuDQo+DQo+wqDCoMKgwqAgU3VzcGVuZC9y
+ZXN1bWUgdGhlIHN5c3RlbSDihpIgUlggd29ya3MgYWdhaW4uDQo+DQo+IFRoaXMgc3VnZ2VzdHMg
+dGhhdCB0aGUgUEhZIG9yIFJYIHBhdGggaXMgbm90IGNvcnJlY3RseSByZWluaXRpYWxpemVkDQo+
+IG9uIGxpbmsgdXAgYWZ0ZXIgYSBsaW5rIGRvd24gZXZlbnQsIHdoaWxlIHRoZSByZXN1bWUgcGF0
+aCBwZXJmb3JtcyBhDQo+IG1vcmUgY29tcGxldGUgcmVzZXQuDQo+DQo+DQo+IEkgY2FuIHByb3Zp
+ZGUgYWRkaXRpb25hbCBsb2dzLCBldGh0b29sIHN0YXRpc3RpY3MsIG9yIHRlc3QgcGF0Y2hlcyBp
+Zg0KPiBuZWVkZWQuDQo+DQo+DQo+DQo+IEJlc3QgcmVnYXJkcywNCj4NCj4NCj4gSsOpcsOpbWll
+IFdlbmdlcg0KPg0KPg0KDQpIaSBKw6lyw6ltaWUsDQoNCllvdXIgaXNzdWUgc291bmRzIHZlcnkg
+c2ltaWxhciB0byB0aGUgaXNzdWVzIHRoYXQgd2VyZSBhZGRyZXNzZXMgaW4gdGhpcw0KY29tbWl0
+Og0KaHR0cHM6Ly9naXRodWIuY29tL3RvcnZhbGRzL2xpbnV4L2NvbW1pdC8zYzdiZjVhZjIxOTYw
+ODdmMzk0ZjkwOTliNTNlMzc1Njk2MzZiMjU5DQoNCkFyZSB5b3UgYWJsZSB0byByZXByb2R1Y2Ug
+aXQgb3ZlciB0aGUgbGF0ZXN0IGtlcm5lbCA2LjE5Pw0KDQogICAgDQoNCkhpIFZpdGFseSwNCg0K
+WWVzLCBJIGNhbiBjb25maXJtIHRoaXMuDQoNCkkgdGVzdGVkIHdpdGggTGludXggNi4xOSAoNi4x
+OX5yYzQtMX5leHAxKSwgYW5kIHRoZSBpc3N1ZSBpcyBmaXhlZCB0aGVyZS4NCkFmdGVyIGFuIEV0
+aGVybmV0IGxpbmsgZG93bi91cCwgUlggbm93IHJlY292ZXJzIGNvcnJlY3RseSB3aXRob3V0IHJl
+cXVpcmluZw0KYSBzdXNwZW5kL3Jlc3VtZSBjeWNsZS4NCg0KU28gdGhpcyBhcHBlYXJzIHRvIGJl
+IHJlc29sdmVkIGJ5IGNvbW1pdDoNCjNjN2JmNWFmMjE5NjA4N2YzOTRmOTA5OWI1M2UzNzU2OTYz
+NmIyNTkNCg0KRG8geW91IGtub3cgaWYgdGhpcyBmaXggaXMgcGxhbm5lZCB0byBiZSBiYWNrcG9y
+dGVkIHRvIHN0YWJsZSBrZXJuZWxzDQooZS5nLiA2LjEyLnkpLCBvciBpZiBhIGJhY2twb3J0IHdv
+dWxkIGJlIGFjY2VwdGFibGU/DQoNClRoYW5rcyBhZ2FpbiBmb3IgeW91ciBoZWxwLg0KDQpCZXN0
+IHJlZ2FyZHMsDQoNCkrDqXLDqW1pZQ0K
 
