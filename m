@@ -1,210 +1,354 @@
-Return-Path: <netdev+bounces-249521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DCD1D1A6C2
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 17:53:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57491D1A6D4
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 17:54:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B2B00300453D
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 16:49:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 557B23013387
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 16:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29D8334D91B;
-	Tue, 13 Jan 2026 16:49:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1627734DB48;
+	Tue, 13 Jan 2026 16:50:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZTKsGJqB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f79.google.com (mail-oo1-f79.google.com [209.85.161.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE352571C5
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 16:49:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE4434DB59
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 16:50:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768322975; cv=none; b=PTEEL3UPECPi/AndKvyABRr+WZL2GRgcDo6VfdWl9NyvHkQZib1t6x0SiVYIz+d5c0oDtI5da3z5uPoKnTsfwSTWjCNL/TROhCprpsnII/7UfP/E4gxZjyPsTZsCfz+Z85Ozi0pZ5hgRv9Qk+jMagmDcOvxjOBCYfzOibOpUtrE=
+	t=1768323017; cv=none; b=Xtm3txW7124fqvx64rLA++YXuSyJVnAllwRr+6iaaDJqHI3ipwEbT7bwaEyyV76/vTtJH+XnTibQSgLI4mNetbk5W9Hyv7n//3iePn5F/fQsyXmMhtau1ZY7MTpM5nRQnh1X0Nns3sX91yBfmlGXvlKe8oEciwX1JmlrHlvDsTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768322975; c=relaxed/simple;
-	bh=JKV6GmAoHH6oMG9RtZl5ikrn+qQp/xRkZ93O5+SeUjA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=uHMd0aAtKZid8ldLuSsvMd+YS4dJEJJ3VJvhGac8Xx4A0PJnbnGqY/y2msq23mb1/Qr4ryVnqT2n2seeyZ7SyY82PCJ2mz+/StYhcqO0h/fCzkmg0FKiMSQuqUzepbBGgGyyV8iZzpFIPHs+yX3hZdndicq2DatWKxPNZv2rJtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f79.google.com with SMTP id 006d021491bc7-6574475208eso8597280eaf.3
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 08:49:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768322972; x=1768927772;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=s9l8oU/c63XdGQ4bmpll3fc4/YEXsaRrmbMS6OocjtA=;
-        b=bZTb8EkCHdew5ED8mbjhg6q57Cx0GCukhY5FN6XLnzAqXCwXcAWp9i+LVAVSBT2MUB
-         C/1hSOut2YJmT86SWhThqkhJ6tc0HCshluzNfIWzQlMwhQOUYTHQ20TayMM5JhX+/mu8
-         l/Js5nAaMY1yCFKBm68ndbrdIYvm4v5RX7HL8ovONAnYMZwnJZsDAD/VKDH5msaFnwQs
-         3CdEJdK1QUNLbHIdsGvTBfhW0+sorblSd6P5IDGkDYrB4yb2ArCDBQ/da9meWD35J8Nc
-         SviSUqmlyiRsJx3z0psd0gJWj02IHVfSLqfRiWFcoAmyFrWwUBdhbzmigyCOJasA7NBe
-         uBiw==
-X-Forwarded-Encrypted: i=1; AJvYcCVwe/OHt3kq6l0fBZIV9g+9xe1T5B1s6v87EI+RQk7+wUtaHPD6w8DyqHCZRNu/pBvKvJT2lOA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOa/DiaxW4x7cZap82i2wekcVa5GwzS88VbDAi3L5VPgFVR4xZ
-	aJiYJBsHxM9fticTaP34XCAJrD61SOtO1pt2qz27bFti0jBI4gjIwR+COHFamTmjpS4Cvj086p4
-	HhlW7WpltkGhHyt9WvYO6X1X7GmaGTLp7IQDj5KwfPRvKfkhC4AxucSoKEX4=
-X-Google-Smtp-Source: AGHT+IEe/slWVvl0T454EGqu8WlPgYqlIICpSF4oVyCGrhUTsIMlkv0ggB+FG4mhkY906wm3GJ8Yk+twQIkabsYOF//ltoNzLnrG
+	s=arc-20240116; t=1768323017; c=relaxed/simple;
+	bh=JM/jRfpSojIyOTap2qBhhOUT/PIsFaVuwfayYSdLV4E=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=anj7kvqqVHUE5QRz+jSKExGdaB3JEb6WFF8Z0I7JheH72VTseEzMROGtfXo34f0dqHWu2isecT4+Q6qTZ/Lp2nHRjWSBiFyJPTQUs8Ub1u1x8D1kEsvr58JUkk7w3ZhOXVW3epx9wLIRvfODO1dTA09gPGlCeMzAYNtqgH0Z+og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZTKsGJqB; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768323015;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=TF6Fx/gHurHr6/2KxpxLTuyD2i0KFuT/OKY4sLDOqE4=;
+	b=ZTKsGJqBTeVho1BnxVSawVp4OUkEn0cZAoBbg0gE8CU40cgHA3b7BxgBNNed1Tv+50YAhW
+	ExX80m9aCY8bkW7Xw7xwKX8Fzjw6ZJkDNvVnGg/PaPaE/8wnHqh/uKX/Eihh6ZfoYDa0RJ
+	jTSk70/H3T+phaZRt2Oq/UvRi6sGfFc=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-330-Y2Pcbg7ZOQCxqwu2v0Ia4A-1; Tue,
+ 13 Jan 2026 11:50:11 -0500
+X-MC-Unique: Y2Pcbg7ZOQCxqwu2v0Ia4A-1
+X-Mimecast-MFC-AGG-ID: Y2Pcbg7ZOQCxqwu2v0Ia4A_1768323010
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6E4DA1956094;
+	Tue, 13 Jan 2026 16:50:09 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A204A19560B2;
+	Tue, 13 Jan 2026 16:49:55 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+cc: dhowells@redhat.com,
+    syzbot+6182afad5045e6703b3d@syzkaller.appspotmail.com,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Eric Dumazet <edumazet@google.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+    Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org,
+    stable@kernel.org, linux-kernel@kernel.org
+Subject: [PATCH] rxrpc: Fix data-race warning and potential load/store tearing
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:a1a5:b0:65f:6df9:215f with SMTP id
- 006d021491bc7-65f6df92832mr3738213eaf.32.1768322972506; Tue, 13 Jan 2026
- 08:49:32 -0800 (PST)
-Date: Tue, 13 Jan 2026 08:49:32 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6966779c.050a0220.1a12f3.09f0.GAE@google.com>
-Subject: [syzbot] [kernfs?] INFO: rcu detected stall in cleanup_net (8)
-From: syzbot <syzbot+0604401cc084920f6c3d@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	gregkh@linuxfoundation.org, horms@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, tj@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3535583.1768322992.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 13 Jan 2026 16:49:52 +0000
+Message-ID: <3535584.1768322992@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Hello,
+    =
 
-syzbot found the following issue on:
+Fix the following:
 
-HEAD commit:    008d3547aae5 Add linux-next specific files for 20251210
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=147c3a1a580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a94030c847137a18
-dashboard link: https://syzkaller.appspot.com/bug?extid=0604401cc084920f6c3d
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13f9deb4580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1406b992580000
+        BUG: KCSAN: data-race in rxrpc_peer_keepalive_worker / rxrpc_send_=
+data_packet
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f5497242418d/disk-008d3547.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/46fd6edd4284/vmlinux-008d3547.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/61e6e2e573e8/bzImage-008d3547.xz
+which is reporting an issue with the reads and writes to ->last_tx_at in:
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+0604401cc084920f6c3d@syzkaller.appspotmail.com
+        conn->peer->last_tx_at =3D ktime_get_seconds();
 
-rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-rcu: 	Tasks blocked on level-0 rcu_node (CPUs 0-1): P5930/1:b..l
-rcu: 	(detected by 1, t=10502 jiffies, g=11645, q=51 ncpus=2)
-task:kworker/u8:12   state:R  running task     stack:22432 pid:5930  tgid:5930  ppid:2      task_flags:0x4208060 flags:0x00080000
-Workqueue: netns cleanup_net
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5256 [inline]
- __schedule+0x14bc/0x5000 kernel/sched/core.c:6863
- preempt_schedule_irq+0xb5/0x150 kernel/sched/core.c:7190
- irqentry_exit+0x5d8/0x660 kernel/entry/common.c:216
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
-RIP: 0010:rcu_is_watching+0x67/0xb0 kernel/rcu/tree.c:752
-Code: 89 f7 e8 0c 71 80 00 48 c7 c3 d8 f6 7f 92 49 03 1e 48 89 d8 48 c1 e8 03 42 0f b6 04 38 84 c0 75 34 8b 03 65 ff 0d 79 1d d7 10 <74> 11 83 e0 04 c1 e8 02 5b 41 5e 41 5f e9 97 d8 b6 09 cc e8 71 d5
-RSP: 0018:ffffc900043af018 EFLAGS: 00000286
-RAX: 000000000003f46c RBX: ffff8880b86336d8 RCX: 1e5222b0fc0eb100
-RDX: 000000005b9ddbdf RSI: ffffffff8bc07c40 RDI: ffffffff8bc07c00
-RBP: dffffc0000000000 R08: ffffffff81743f85 R09: ffffffff8df41a60
-R10: ffffc900043af158 R11: ffffffff81ada810 R12: 1ffff92000875e21
-R13: ffffc900043af140 R14: ffffffff8d9b1dd0 R15: dffffc0000000000
- rcu_read_lock include/linux/rcupdate.h:868 [inline]
- class_rcu_constructor include/linux/rcupdate.h:1195 [inline]
- unwind_next_frame+0xd4/0x2390 arch/x86/kernel/unwind_orc.c:479
- arch_stack_walk+0x11c/0x150 arch/x86/kernel/stacktrace.c:25
- stack_trace_save+0x9c/0xe0 kernel/stacktrace.c:122
- kasan_save_stack mm/kasan/common.c:57 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
- kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:584
- poison_slab_object mm/kasan/common.c:253 [inline]
- __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:285
- kasan_slab_free include/linux/kasan.h:235 [inline]
- slab_free_hook mm/slub.c:2540 [inline]
- slab_free mm/slub.c:6668 [inline]
- kfree+0x1c0/0x660 mm/slub.c:6876
- devinet_sysctl_unregister net/ipv4/devinet.c:2729 [inline]
- inetdev_destroy net/ipv4/devinet.c:334 [inline]
- inetdev_event+0x78e/0x15b0 net/ipv4/devinet.c:1655
- notifier_call_chain+0x19d/0x3a0 kernel/notifier.c:85
- call_netdevice_notifiers_extack net/core/dev.c:2269 [inline]
- call_netdevice_notifiers net/core/dev.c:2283 [inline]
- unregister_netdevice_many_notify+0x1867/0x2340 net/core/dev.c:12400
- unregister_netdevice_many net/core/dev.c:12463 [inline]
- default_device_exit_batch+0x964/0x9e0 net/core/dev.c:13055
- ops_exit_list net/core/net_namespace.c:205 [inline]
- ops_undo_list+0x525/0x990 net/core/net_namespace.c:252
- cleanup_net+0x4d8/0x7a0 net/core/net_namespace.c:696
- process_one_work+0x93a/0x15a0 kernel/workqueue.c:3279
- process_scheduled_works kernel/workqueue.c:3362 [inline]
- worker_thread+0x9b0/0xee0 kernel/workqueue.c:3443
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x599/0xb30 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
- </TASK>
-rcu: rcu_preempt kthread starved for 10553 jiffies! g11645 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=1
-rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-rcu: RCU grace-period kthread stack dump:
-task:rcu_preempt     state:R  running task     stack:27736 pid:16    tgid:16    ppid:2      task_flags:0x208040 flags:0x00080000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5256 [inline]
- __schedule+0x14bc/0x5000 kernel/sched/core.c:6863
- __schedule_loop kernel/sched/core.c:6945 [inline]
- schedule+0x165/0x360 kernel/sched/core.c:6960
- schedule_timeout+0x12b/0x270 kernel/time/sleep_timeout.c:99
- rcu_gp_fqs_loop+0x301/0x1540 kernel/rcu/tree.c:2083
- rcu_gp_kthread+0x99/0x390 kernel/rcu/tree.c:2285
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x599/0xb30 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
- </TASK>
-rcu: Stack dump where RCU GP kthread last ran:
-CPU: 1 UID: 0 PID: 0 Comm: swapper/1 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-RIP: 0010:pv_native_safe_halt+0x13/0x20 arch/x86/kernel/paravirt.c:82
-Code: 13 ee 02 00 cc cc cc 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 66 90 0f 00 2d 73 c0 0c 00 f3 0f 1e fa fb f4 <c3> cc cc cc cc cc cc cc cc cc cc cc cc 90 90 90 90 90 90 90 90 90
-RSP: 0018:ffffc90000197de0 EFLAGS: 000002c6
-RAX: 2bdaeed9ae4cb000 RBX: ffffffff8197971a RCX: 2bdaeed9ae4cb000
-RDX: 0000000000000001 RSI: ffffffff8d791c9e RDI: ffffffff8bc07c60
-RBP: ffffc90000197f10 R08: ffff8880b87336db R09: 1ffff110170e66db
-R10: dffffc0000000000 R11: ffffed10170e66dc R12: ffffffff8f820770
-R13: 1ffff110039dcb70 R14: 0000000000000001 R15: 0000000000000001
-FS:  0000000000000000(0000) GS:ffff888125f34000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffee7189228 CR3: 00000000753b0000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- arch_safe_halt arch/x86/include/asm/paravirt.h:107 [inline]
- default_idle+0x13/0x20 arch/x86/kernel/process.c:767
- default_idle_call+0x73/0xb0 kernel/sched/idle.c:122
- cpuidle_idle_call kernel/sched/idle.c:191 [inline]
- do_idle+0x1ea/0x520 kernel/sched/idle.c:332
- cpu_startup_entry+0x44/0x60 kernel/sched/idle.c:430
- start_secondary+0x101/0x110 arch/x86/kernel/smpboot.c:312
- common_startup_64+0x13e/0x147
- </TASK>
+and:
 
+        keepalive_at =3D peer->last_tx_at + RXRPC_KEEPALIVE_TIME;
 
+The lockless accesses to these to values aren't actually a problem as the
+read only needs an approximate time of last transmission for the purposes
+of deciding whether or not the transmission of a keepalive packet is
+warranted yet.
+
+Also, as ->last_tx_at is a 64-bit value, tearing can occur on a 32-bit
+arch.
+
+Fix both of these by switching to an unsigned int for ->last_tx_at and onl=
+y
+storing the LSW of the time64_t.  It can then be reconstructed at need
+provided no more than 68 years has elapsed since the last transmission.
+
+Reported-by: syzbot+6182afad5045e6703b3d@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/r/695e7cfb.050a0220.1c677c.036b.GAE@google=
+.com/
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: Eric Dumazet <edumazet@google.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Simon Horman <horms@kernel.org>
+cc: linux-afs@lists.infradead.org
+cc: netdev@vger.kernel.org
+cc: stable@kernel.org
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/rxrpc/ar-internal.h |    9 ++++++++-
+ net/rxrpc/conn_event.c  |    2 +-
+ net/rxrpc/output.c      |   14 +++++++-------
+ net/rxrpc/peer_event.c  |   17 ++++++++++++++++-
+ net/rxrpc/proc.c        |    2 +-
+ net/rxrpc/rxgk.c        |    2 +-
+ net/rxrpc/rxkad.c       |    2 +-
+ 7 files changed, 35 insertions(+), 13 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
+index 5b7342d43486..36d6ca0d1089 100644
+--- a/net/rxrpc/ar-internal.h
++++ b/net/rxrpc/ar-internal.h
+@@ -387,7 +387,7 @@ struct rxrpc_peer {
+ 	struct rb_root		service_conns;	/* Service connections */
+ 	struct list_head	keepalive_link;	/* Link in net->peer_keepalive[] */
+ 	unsigned long		app_data;	/* Application data (e.g. afs_server) */
+-	time64_t		last_tx_at;	/* Last time packet sent here */
++	unsigned int		last_tx_at;	/* Last time packet sent here (time64_t LSW) *=
+/
+ 	seqlock_t		service_conn_lock;
+ 	spinlock_t		lock;		/* access lock */
+ 	int			debug_id;	/* debug ID for printks */
+@@ -1379,6 +1379,13 @@ void rxrpc_peer_keepalive_worker(struct work_struct=
+ *);
+ void rxrpc_input_probe_for_pmtud(struct rxrpc_connection *conn, rxrpc_ser=
+ial_t acked_serial,
+ 				 bool sendmsg_fail);
+ =
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
++/* Update the last transmission time on a peer for keepalive purposes. */
++static inline void rxrpc_peer_mark_tx(struct rxrpc_peer *peer)
++{
++	/* To avoid tearing on 32-bit systems, we only keep the LSW. */
++	WRITE_ONCE(peer->last_tx_at, ktime_get_seconds());
++}
++
+ /*
+  * peer_object.c
+  */
+diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
+index 232b6986da83..98ad9b51ca2c 100644
+--- a/net/rxrpc/conn_event.c
++++ b/net/rxrpc/conn_event.c
+@@ -194,7 +194,7 @@ void rxrpc_conn_retransmit_call(struct rxrpc_connectio=
+n *conn,
+ 	}
+ =
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+ 	ret =3D kernel_sendmsg(conn->local->socket, &msg, iov, ioc, len);
+-	conn->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(conn->peer);
+ 	if (ret < 0)
+ 		trace_rxrpc_tx_fail(chan->call_debug_id, serial, ret,
+ 				    rxrpc_tx_point_call_final_resend);
+diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
+index 8b5903b6e481..d70db367e358 100644
+--- a/net/rxrpc/output.c
++++ b/net/rxrpc/output.c
+@@ -275,7 +275,7 @@ static void rxrpc_send_ack_packet(struct rxrpc_call *c=
+all, int nr_kv, size_t len
+ 	rxrpc_local_dont_fragment(conn->local, why =3D=3D rxrpc_propose_ack_ping=
+_for_mtu_probe);
+ =
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+ 	ret =3D do_udp_sendmsg(conn->local->socket, &msg, len);
+-	call->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(call->peer);
+ 	if (ret < 0) {
+ 		trace_rxrpc_tx_fail(call->debug_id, serial, ret,
+ 				    rxrpc_tx_point_call_ack);
+@@ -411,7 +411,7 @@ int rxrpc_send_abort_packet(struct rxrpc_call *call)
+ =
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+ 	iov_iter_kvec(&msg.msg_iter, WRITE, iov, 1, sizeof(pkt));
+ 	ret =3D do_udp_sendmsg(conn->local->socket, &msg, sizeof(pkt));
+-	conn->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(conn->peer);
+ 	if (ret < 0)
+ 		trace_rxrpc_tx_fail(call->debug_id, serial, ret,
+ 				    rxrpc_tx_point_call_abort);
+@@ -698,7 +698,7 @@ void rxrpc_send_data_packet(struct rxrpc_call *call, s=
+truct rxrpc_send_data_req
+ 			ret =3D 0;
+ 			trace_rxrpc_tx_data(call, txb->seq, txb->serial, txb->flags,
+ 					    rxrpc_txdata_inject_loss);
+-			conn->peer->last_tx_at =3D ktime_get_seconds();
++			rxrpc_peer_mark_tx(conn->peer);
+ 			goto done;
+ 		}
+ 	}
+@@ -711,7 +711,7 @@ void rxrpc_send_data_packet(struct rxrpc_call *call, s=
+truct rxrpc_send_data_req
+ 	 */
+ 	rxrpc_inc_stat(call->rxnet, stat_tx_data_send);
+ 	ret =3D do_udp_sendmsg(conn->local->socket, &msg, len);
+-	conn->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(conn->peer);
+ =
 
-If you want to undo deduplication, reply with:
-#syz undup
+ 	if (ret =3D=3D -EMSGSIZE) {
+ 		rxrpc_inc_stat(call->rxnet, stat_tx_data_send_msgsize);
+@@ -797,7 +797,7 @@ void rxrpc_send_conn_abort(struct rxrpc_connection *co=
+nn)
+ =
+
+ 	trace_rxrpc_tx_packet(conn->debug_id, &whdr, rxrpc_tx_point_conn_abort);
+ =
+
+-	conn->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(conn->peer);
+ }
+ =
+
+ /*
+@@ -917,7 +917,7 @@ void rxrpc_send_keepalive(struct rxrpc_peer *peer)
+ 		trace_rxrpc_tx_packet(peer->debug_id, &whdr,
+ 				      rxrpc_tx_point_version_keepalive);
+ =
+
+-	peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(peer);
+ 	_leave("");
+ }
+ =
+
+@@ -973,7 +973,7 @@ void rxrpc_send_response(struct rxrpc_connection *conn=
+, struct sk_buff *response
+ 	if (ret < 0)
+ 		goto fail;
+ =
+
+-	conn->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(conn->peer);
+ 	return;
+ =
+
+ fail:
+diff --git a/net/rxrpc/peer_event.c b/net/rxrpc/peer_event.c
+index 7f4729234957..9d02448ac062 100644
+--- a/net/rxrpc/peer_event.c
++++ b/net/rxrpc/peer_event.c
+@@ -237,6 +237,21 @@ static void rxrpc_distribute_error(struct rxrpc_peer =
+*peer, struct sk_buff *skb,
+ 	spin_unlock_irq(&peer->lock);
+ }
+ =
+
++/*
++ * Reconstruct the last transmission time.  The difference calculated sho=
+uld be
++ * valid provided no more than ~68 years elapsed since the last transmiss=
+ion.
++ */
++static time64_t rxrpc_peer_get_tx_mark(const struct rxrpc_peer *peer, tim=
+e64_t base)
++{
++	s32 last_tx_at =3D READ_ONCE(peer->last_tx_at);
++	s32 base_lsw =3D base;
++	s32 diff =3D last_tx_at - base_lsw;
++
++	diff =3D clamp(diff, -RXRPC_KEEPALIVE_TIME, RXRPC_KEEPALIVE_TIME);
++
++	return diff + base;
++}
++
+ /*
+  * Perform keep-alive pings.
+  */
+@@ -265,7 +280,7 @@ static void rxrpc_peer_keepalive_dispatch(struct rxrpc=
+_net *rxnet,
+ 		spin_unlock_bh(&rxnet->peer_hash_lock);
+ =
+
+ 		if (use) {
+-			keepalive_at =3D peer->last_tx_at + RXRPC_KEEPALIVE_TIME;
++			keepalive_at =3D rxrpc_peer_get_tx_mark(peer, base) + RXRPC_KEEPALIVE_=
+TIME;
+ 			slot =3D keepalive_at - base;
+ 			_debug("%02x peer %u t=3D%d {%pISp}",
+ 			       cursor, peer->debug_id, slot, &peer->srx.transport);
+diff --git a/net/rxrpc/proc.c b/net/rxrpc/proc.c
+index d803562ca0ac..8c9f9d510fe2 100644
+--- a/net/rxrpc/proc.c
++++ b/net/rxrpc/proc.c
+@@ -302,7 +302,7 @@ static int rxrpc_peer_seq_show(struct seq_file *seq, v=
+oid *v)
+ 		   refcount_read(&peer->ref),
+ 		   peer->cong_ssthresh,
+ 		   peer->max_data,
+-		   now - peer->last_tx_at,
++		   (s32)now - (s32)peer->last_tx_at,
+ 		   READ_ONCE(peer->recent_srtt_us),
+ 		   READ_ONCE(peer->recent_rto_us));
+ =
+
+diff --git a/net/rxrpc/rxgk.c b/net/rxrpc/rxgk.c
+index dce5a3d8a964..43cbf9efd89f 100644
+--- a/net/rxrpc/rxgk.c
++++ b/net/rxrpc/rxgk.c
+@@ -678,7 +678,7 @@ static int rxgk_issue_challenge(struct rxrpc_connectio=
+n *conn)
+ =
+
+ 	ret =3D do_udp_sendmsg(conn->local->socket, &msg, len);
+ 	if (ret > 0)
+-		conn->peer->last_tx_at =3D ktime_get_seconds();
++		rxrpc_peer_mark_tx(conn->peer);
+ 	__free_page(page);
+ =
+
+ 	if (ret < 0) {
+diff --git a/net/rxrpc/rxkad.c b/net/rxrpc/rxkad.c
+index 3657c0661cdc..a756855a0a62 100644
+--- a/net/rxrpc/rxkad.c
++++ b/net/rxrpc/rxkad.c
+@@ -694,7 +694,7 @@ static int rxkad_issue_challenge(struct rxrpc_connecti=
+on *conn)
+ 		return -EAGAIN;
+ 	}
+ =
+
+-	conn->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(conn->peer);
+ 	trace_rxrpc_tx_packet(conn->debug_id, &whdr,
+ 			      rxrpc_tx_point_rxkad_challenge);
+ 	_leave(" =3D 0");
+
 
