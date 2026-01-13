@@ -1,111 +1,101 @@
-Return-Path: <netdev+bounces-249538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A537D1AB80
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 18:47:39 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 519A8D1ABA4
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 18:49:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A4763302AE2E
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 17:46:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BA1FD3047101
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 17:47:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9E5538FF01;
-	Tue, 13 Jan 2026 17:46:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABF103921D1;
+	Tue, 13 Jan 2026 17:47:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DPC/Phas"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UlNA/ulJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 871C634EEF9;
-	Tue, 13 Jan 2026 17:46:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 148FC2EBB8C
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 17:47:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768326400; cv=none; b=p2Qye9ykYRQ0eBdeNLG0iSm4qg7Lrt+yHKBDVrKe3eK9BzZDrppPYgR7bgZngc4QiW4PtuLi6DMnQvQKf9asn4Yu6Y4+J+lnsPntDqeZKmt0Vgs1bkyH2nciXeC8h3FThVE0UHJaq6ZyedmQGqq9dKP0wrEtSmMHIlBftvbF6SE=
+	t=1768326452; cv=none; b=IDk3Ra/dvVOL8jvl4kYOmjX1oMDXSRxRfInECfR6EvZyTbzvRG4g2ol1zk16mixCitNct6crvs4UGTQjhqLJiWaJAdY3h5mXfAJpYc4cDKNYEafbejB9E1yeYmde9WTGjVGrufw1LJxbXzOJUCbPSBrjpDnVskzcEN2k2L5Aae8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768326400; c=relaxed/simple;
-	bh=0DoJQCma/nt+GuLmHQ0hPqIC2uUmE8bIQDPHwrMc9Qs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hos4HZelcjNTZzwPevaXF1+qQfbil1qKYYYS7qAfb2b2nSZl1BPQXKH7TEAe6+NhCjXW/0K56i+6ok82a0aqkKXbPmbOTnGhPWqKkIaQdXK59vyHPIqKDf07w/IH8IOybKlTbyXR/TAEW5VU9RGp1KdCSwZL3bTBryOsFekckjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DPC/Phas; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E0ADC116C6;
-	Tue, 13 Jan 2026 17:46:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768326400;
-	bh=0DoJQCma/nt+GuLmHQ0hPqIC2uUmE8bIQDPHwrMc9Qs=;
-	h=From:To:Cc:Subject:Date:From;
-	b=DPC/PhasrZE4MJB1ci1n39baEWkFCqnga9OPr5shTsS7t3KyLb/znWhmnpBj3BEil
-	 wqgtBiZuxfFa+Ve/8CUHWJNqy4CHi/YmzKaYDijpqXgRuPKHZUSGC+jnoL6q+G6MaH
-	 JkXIJezdLdIwX66dkFvovlnRpdneUifRZmMvNpnkLAIb05VnV1MpII3srtrUFyPnZM
-	 TIiYUD0ceYCyTmpxYDIP/RTfNvtYzMYK/z51h/iV8kH/XlIb015sbjtMoo1wMLLv+F
-	 +SLlG/0sEJdbDkL5QF80hqDxa9i/2soUTtSITWB/5fdonLtWi25L4Z1nCRWF7ekF+J
-	 xkCMOimj/4U5Q==
-From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Willem de Bruijn <willemb@google.com>
-Cc: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] selftests: net: csum: Fix printk format in recv_get_packet_csum_status()
-Date: Tue, 13 Jan 2026 18:44:19 +0100
-Message-ID: <b0e24fd07302aac492d03d0bcd30626a338f976f.1768326133.git.chleroy@kernel.org>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1768326452; c=relaxed/simple;
+	bh=RH9nwLZfwqDtoGRjdzJMCotUZ0i2h75iTckvMVVSMKQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Nb/ZfoU/sKl8oyRmH33LbFa2A8UZSQF1hroAvrx8pKM025faVaGG3ldk7zNBVPSoQtNUChsuet5ukpukH1AwzcvdnJ+FOvtiobi+v/op5Sf81b4pAn0WRDygECjCF1/5rSDSjqlSm+Os9dKpa+U5iqDLTeKj+UEgdvrsLjN8QMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UlNA/ulJ; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c5a1f45f-542e-4280-a601-ae96f2d1cac4@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1768326439;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=T4vksd3pjNJfhy1H7Erqq68uqNFlEYJUmzKTqs9bkQc=;
+	b=UlNA/ulJrL/RNvg+RqqwV5HLpmx3p2CRs+wXc6gNRYi/A2xeVk3Ev9X2DIHgddijRuPQ4u
+	EG80mydp+xTY4axuT0wqlAXEaCr1A3WFNZ4oh1OAVEzyaWDFbbannuFAKSKLi59NukSQj2
+	TfN2mXehSyP5yrp9HHY43Haprripdz0=
+Date: Tue, 13 Jan 2026 17:47:07 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2234; i=chleroy@kernel.org; h=from:subject:message-id; bh=T9mDX+l55XQ9vC0s5GLbMDjW2QU1NWZkZNG6faVyoMQ=; b=owGbwMvMwCV2d0KB2p7V54MZT6slMWSmtZS8ncn9wCGdTWhaKPeu5YJ9Rm3HDmWd/a/lsvLQH Vvn4rorHaUsDGJcDLJiiizH/3PvmtH1JTV/6i59mDmsTCBDGLg4BWAiev8YGdZ+eBka0LlSvyXr duR5pfP9D8yFTefczZL3vyH5MD9GJI7hn7Hxpm+zpm7UnvIsZeeEM2sdL6xeVNfEHhK4uXTPJNn 692wA
-X-Developer-Key: i=chleroy@kernel.org; a=openpgp; fpr=10FFE6F8B390DE17ACC2632368A92FEB01B8DD78
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 2/3] dpll: add dpll_device op to set working
+ mode
+To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
+Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>, Petr Oros
+ <poros@redhat.com>, linux-kernel@vger.kernel.org,
+ Michal Schmidt <mschmidt@redhat.com>
+References: <20260113121636.71565-1-ivecera@redhat.com>
+ <20260113121636.71565-3-ivecera@redhat.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20260113121636.71565-3-ivecera@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
+On 13/01/2026 12:16, Ivan Vecera wrote:
+> Currently, userspace can retrieve the DPLL working mode but cannot
+> configure it. This prevents changing the device operation, such as
+> switching from manual to automatic mode and vice versa.
+> 
+> Add a new callback .mode_set() to struct dpll_device_ops. Extend
+> the netlink policy and device-set command handling to process
+> the DPLL_A_MODE attribute.  Update the netlink YAML specification
+> to include the mode attribute in the device-set operation.
+> 
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> ---
+> v2:
+> * fixed bitmap size in dpll_mode_set()
 
-  CC       csum
-csum.c: In function 'recv_get_packet_csum_status':
-csum.c:710:50: warning: format '%lu' expects argument of type 'long unsigned int', but argument 4 has type 'size_t' {aka 'unsigned int'} [-Wformat=]
-  710 |                         error(1, 0, "cmsg: len=%lu expected=%lu",
-      |                                                ~~^
-      |                                                  |
-      |                                                  long unsigned int
-      |                                                %u
-  711 |                               cm->cmsg_len, CMSG_LEN(sizeof(struct tpacket_auxdata)));
-      |                               ~~~~~~~~~~~~
-      |                                 |
-      |                                 size_t {aka unsigned int}
-csum.c:710:63: warning: format '%lu' expects argument of type 'long unsigned int', but argument 5 has type 'unsigned int' [-Wformat=]
-  710 |                         error(1, 0, "cmsg: len=%lu expected=%lu",
-      |                                                             ~~^
-      |                                                               |
-      |                                                               long unsigned int
-      |                                                             %u
+[...]
 
-Correct format from %lu to %u for both.
+> +static int
+> +dpll_mode_set(struct dpll_device *dpll, struct nlattr *a,
+> +	      struct netlink_ext_ack *extack)
+> +{
+> +	const struct dpll_device_ops *ops = dpll_device_ops(dpll);
+> +	enum dpll_mode mode = nla_get_u32(a), old_mode;
+> +	DECLARE_BITMAP(modes, DPLL_MODE_MAX + 1) = { 0 };
 
-Fixes: 91a7de85600d ("selftests/net: add csum offload test")
-Signed-off-by: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
----
- tools/testing/selftests/net/lib/csum.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+this one breaks reverse xmas tree order.
 
-diff --git a/tools/testing/selftests/net/lib/csum.c b/tools/testing/selftests/net/lib/csum.c
-index 27437590eeb53..9bcd7394b3043 100644
---- a/tools/testing/selftests/net/lib/csum.c
-+++ b/tools/testing/selftests/net/lib/csum.c
-@@ -707,7 +707,7 @@ static uint32_t recv_get_packet_csum_status(struct msghdr *msg)
- 			      cm->cmsg_level, cm->cmsg_type);
- 
- 		if (cm->cmsg_len != CMSG_LEN(sizeof(struct tpacket_auxdata)))
--			error(1, 0, "cmsg: len=%lu expected=%lu",
-+			error(1, 0, "cmsg: len=%u expected=%u",
- 			      cm->cmsg_len, CMSG_LEN(sizeof(struct tpacket_auxdata)));
- 
- 		aux = (void *)CMSG_DATA(cm);
--- 
-2.49.0
-
+with this fixed:
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
