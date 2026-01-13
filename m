@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-249383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7642ED17DDF
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 11:08:18 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF311D17DD7
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 11:07:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 525B0300E7A2
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 10:03:36 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AC05C3016239
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 10:03:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB99F34402B;
-	Tue, 13 Jan 2026 10:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02A2D38A289;
+	Tue, 13 Jan 2026 10:03:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OZ3rDIAO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HD+Io5AA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990F933F8C5;
-	Tue, 13 Jan 2026 10:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48DC389E19;
+	Tue, 13 Jan 2026 10:03:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768298615; cv=none; b=OiSHlxvgR45UCKoNp4QN4XqAf2c26jXFObYPryzRI8ht1EdVfHLrqaK1IueR+cASzUi4hyoayhNFU/AzN00ahO5JfsPNftaIysO6lmJs8prflkPJLUCQAwzI8wJGqGKniEffU4EnAqGjaPl/yl0Q/GGb1BvZd78gYyuErmIA3wk=
+	t=1768298616; cv=none; b=G3fzQqBiD2wZfY85Zo5it3kKRryoI4FsYhQTwnkaYg99je9YlR+Qj18F80a0oVgljYic9teVBniSPIc2uUltG0wQ52AOQxRHl8QXuA7/q6fAbWL7k3ehs+e71qQhvShQ9P19HVz6QeuzXx1ArIzu+yJvQ9zFWeC6w9dMzCYjyQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768298615; c=relaxed/simple;
-	bh=EAvGdCgC6Y7QZ5BpMT7lTdbXqfTu4aZ4EUD1ioOKm9s=;
+	s=arc-20240116; t=1768298616; c=relaxed/simple;
+	bh=N/JgtIC0F9eFQi2kpAeeEiQOn5k9jMHhvpkpoD30b1Q=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Apy5P16DZUQeokLenEQmtVrXHxhNV0PzoF4NIOUwY0pj+yZEKL/PM3vwXSu0MH7h6ub6JHsre3KsCe6pwai7YaYvKcogNGXsIsElpA0z9JSnOvptXDN83A7W5xtjzoR7CI3C0dGNesH4W2Al3M4Ekt3f1tyyixjyAA248nTBVyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OZ3rDIAO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C44DC116C6;
-	Tue, 13 Jan 2026 10:03:35 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=PAIA5sjA3EFu20mj8QN6eKDWqdD7qcI9akC+yGU9iXL1YB2PmEQ68DT0IlUJ7A4BYpEya4HLfV4mRrkb/cTv/yOqNCoBwIAfJbTFAG8fhDGqa9aWX7gk3v30r+/e0MpNZkn23OGCecRweUl/jlSBLbC+GErwYl6GJFYV7RoF+xY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HD+Io5AA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B350C116C6;
+	Tue, 13 Jan 2026 10:03:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768298615;
-	bh=EAvGdCgC6Y7QZ5BpMT7lTdbXqfTu4aZ4EUD1ioOKm9s=;
+	s=k20201202; t=1768298616;
+	bh=N/JgtIC0F9eFQi2kpAeeEiQOn5k9jMHhvpkpoD30b1Q=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OZ3rDIAOWQsFkHdhuvs+ty0/53kEdnIVYgE8NlQSCgaTGuEYNV4sCmMcBZA+FNtUY
-	 24rvgyIhDb0zqXX1sA4X2qcm/HKk2aQpzNtRVO4WSEztMHkOCcYwExnjmb+VrCsosY
-	 fbBIbDBYwj0bDsyPdMwRKZa4dZucRY2tkhFResJiOoLvgPCu7VsYYYU0SAo5FTs9A+
-	 8qKw5W0hIHiHvKvXs8MMCXnxP6npCcpwDFTyBiiky/geBDxEFGr5df4q1lARM6ulFV
-	 oZoVshaCABcdnVsot5NGcq2+dmQSzm/i5jploCSatZyFEMDNzTin55SXpX07ZHDAMQ
-	 aKeglIvhXoSCg==
+	b=HD+Io5AAjuz9I20SDQz0adeDQnhaUNh0Gxv/SYaa/n9Q6Trb3QdbZbsHh1OjQCYI4
+	 F3O3W/DmuercoVJ6+Xm7VIwnx3ROgojXAR8kBa5xUz3RzPLlWm9pIqznFggYmJ1ue3
+	 V7bktmKVNjvhAWkFO8HIBMj7K0LJeb6iOFaqLuFL6BozDJ0JRF2izECRTGCPxYQoVi
+	 Q6txwM0THmuThENR+hKkx7jqh3S1RAVNpNRoyUWt51zGNt3enTq/6rPFb9lqvUyJwm
+	 QbuhNKfphwfCa42PnAuFFQV0ey7uS00tdiG3FacQAVwbeAGeJQj+/NR/Cng9hhiLMF
+	 8pH3JKii5YulA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3BA093808200;
-	Tue, 13 Jan 2026 10:00:10 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 532853808200;
+	Tue, 13 Jan 2026 10:00:11 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,13 +50,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 0/2] r8169: add dash and LTR support
+Subject: Re: [PATCH net-next v1 0/3] r8169: add dash/LTR/RTL9151AS support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176829840911.2162163.10508690250538159049.git-patchwork-notify@kernel.org>
-Date: Tue, 13 Jan 2026 10:00:09 +0000
-References: <20260109070415.1115-1-javen_xu@realsil.com.cn>
-In-Reply-To: <20260109070415.1115-1-javen_xu@realsil.com.cn>
+ <176829841027.2162163.2380139406681496633.git-patchwork-notify@kernel.org>
+Date: Tue, 13 Jan 2026 10:00:10 +0000
+References: <20260112024541.1847-1-javen_xu@realsil.com.cn>
+In-Reply-To: <20260112024541.1847-1-javen_xu@realsil.com.cn>
 To: javen <javen_xu@realsil.com.cn>
 Cc: hkallweit1@gmail.com, nic_swsd@realtek.com, andrew+netdev@lunn.ch,
  davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
@@ -67,24 +67,27 @@ Hello:
 This series was applied to netdev/net-next.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Fri, 9 Jan 2026 15:04:13 +0800 you wrote:
+On Mon, 12 Jan 2026 10:45:38 +0800 you wrote:
 > From: Javen Xu <javen_xu@realsil.com.cn>
 > 
-> This series patch adds dash support for RTL8127AP and LTR support for
-> RTL8168FP/RTL8168EP/RTL8168H/RTL8125/RTL8126/RTL8127.
+> This series patch adds dash support for RTL8127AP, LTR support for
+> RTL8168FP/RTL8168EP/RTL8168H/RTL8125/RTL8126/RTL8127 and support for
+> new chip RTL9151AS.
 > 
-> ---
-> Changes in v2:
-> - Replace some register numbers with names according to the datasheet.
-> - Link to v1: https://lore.kernel.org/netdev/20260106083012.164-1-javen_xu@realsil.com.cn/
+> Javen Xu (3):
+>   r8169: add DASH support for RTL8127AP
+>   r8169: enable LTR support
+>   r8169: add support for chip RTL9151AS
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v4,1/2] r8169: add DASH support for RTL8127AP
+  - [net-next,v1,1/3] r8169: add DASH support for RTL8127AP
     https://git.kernel.org/netdev/net-next/c/3259d2cf9427
-  - [net-next,v4,2/2] r8169: enable LTR support
+  - [net-next,v1,2/3] r8169: enable LTR support
     https://git.kernel.org/netdev/net-next/c/9ab94a32af70
+  - [net-next,v1,3/3] r8169: add support for chip RTL9151AS
+    (no matching commit)
 
 You are awesome, thank you!
 -- 
