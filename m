@@ -1,76 +1,118 @@
-Return-Path: <netdev+bounces-249454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28772D194A3
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:07:17 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF2CDD195C6
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:17:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9760630118F7
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:05:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9681230339A4
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:12:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4568E3933E3;
-	Tue, 13 Jan 2026 14:05:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A53DA392B78;
+	Tue, 13 Jan 2026 14:12:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="icIkQpDU"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="v5V/WSVn"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from outbound.st.icloud.com (p-east2-cluster6-host6-snip4-10.eps.apple.com [57.103.76.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1472392C5B
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 14:05:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2873921F2
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 14:12:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.76.231
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768313117; cv=none; b=BpDz+k1R0ZOIGqaZp7t3fKF20gHzt6lJp0Pz24QKHDdJqeGdQMdXyUh/s5oFwpksXy1E2ucC4DGpy2cnHnmrT6YoeRnWOq7k/n/rHjZNGQIu64o6al0YdOglKZxHIkZizNGL1qDWap2zkcD95ctczjqKpbazr4Bi5+5Ow/Ppb7k=
+	t=1768313565; cv=none; b=asbcQh5SkKFCas5+wpyRYhEit0AsiktTMExncOCDGJWuV8Mxgb973yQQ+5lh0jazLvz3T2/ELx+IKJVahLiOhJ6pLoF65ukJG1bAB7a60XpVq/+Swqu8om/luWbTnibOqQwM/ynaokD65E3DrIafYP68rn59fzTzb9Rx0Mo24gc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768313117; c=relaxed/simple;
-	bh=8/sOBd+1YrLPJE5npHPXqw2HyqHJ5W48330FYqFzL2E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LSkwepXzj5Hk6Z73NyLzY6ajDqpqY/Irlw5k49Ixe1QG8x1btM/vxHOxM9bGrTZgm4omsLXHvhZqQJmX0QmEy2MwO//fTmXP8gSUMEN00jZs1Hu5BMiU1zdArL6NFQiB26n0Z1SvLKiWmFRZm3bz0fcXq2dMJhQyQyBqk5acZ+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=icIkQpDU; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=3b67iZ9CiqCH20NvQLTsQVqLE9T86R59H9dxNQXhdGo=; b=icIkQpDUuhl5TjkwARxisWAJVI
-	WOKDYbDCQpVhO9gkcXY3OPqjyEEZZCoQ2mVPstGsTXSYaZI3H/y8A3AXMGG9lKwcYIXCppiK70HGM
-	S/HM9h5l8mnMHOV8lIc+xeAk2rjT2028Sq88MJ+93gGtq5It40B+P6x0IJdCzd0aRTR0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vff18-002dcl-Q5; Tue, 13 Jan 2026 15:05:06 +0100
-Date: Tue, 13 Jan 2026 15:05:06 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1768313565; c=relaxed/simple;
+	bh=iyta8NE5NDlfmw6L04V4o5AAcmnE1uFMrJ6X4Vhs6ZY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B701osPX3WPuk4FwbxOONR5SR2aGjxd5JA0Qt5CPgyRW1kYpQxUU98C4oZu8+R0vFCg6ywmFemX5rcJee1H+kBBjrUZp2mbFB2BhbQjuYJVrhKwinEmfqCIOfs7VdESv4VyWyxHyacihsuLVp59kwr7H1xZjdKw4zSVK6xArCuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=v5V/WSVn reason="key not found in DNS"; arc=none smtp.client-ip=57.103.76.231
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=y-koj.net
+Received: from outbound.st.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-east-1a-100-percent-1 (Postfix) with ESMTPS id 0B7DA1825592;
+	Tue, 13 Jan 2026 14:12:39 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; bh=WZtDG6mvRdZYrbjETM4DpUeWhiTJW9EtZ1QWUihic5o=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=v5V/WSVnitvNLMCfLH/PYKHSNrunAjNhpht0yqaStCK57438kZEyK76GpIEPqJ92U8wTMv5vf9ZrHJgEiiqPtzY1kSrapogp2j0Ty5uTSLoFSyBStSnr0JGL7mVpdLTrhvaM6VaCQsmVFOMZduxkUSHsyTKfTKzpfgNmRPuTi8NKCuA97Y/Eu81USBvz7zPD2BRvo66stbSJc77KdhvuMdRLFgHXwGGw1zkO618MZoO1njCguKRXez5PTE6CtYKm/4OV26tNKPLbvYULd5hQSLQECRC9ZwTlQflJLtsY2Fu7navhD1XYbvpSy3CmwHCNOICEVqH0IAMXypWhdGsSUQ==
+mail-alias-created-date: 1719758601013
+Received: from desktop.tail809fd.ts.net (unknown [17.42.251.67])
+	by p00-icloudmta-asmtp-us-east-1a-100-percent-1 (Postfix) with ESMTPSA id 777E6180185E;
+	Tue, 13 Jan 2026 14:12:35 +0000 (UTC)
+From: Yohei Kojima <yk@y-koj.net>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH RESEND net-next] mdio: Make use of bus callbacks
-Message-ID: <5ca319af-46c1-4c3c-af50-c804a8ba2a8d@lunn.ch>
-References: <20260113102636.3822825-2-u.kleine-koenig@baylibre.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>
+Cc: Yohei Kojima <yk@y-koj.net>,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH net-next v2 0/2] selftests: net: improve error handling in passive TFO test
+Date: Tue, 13 Jan 2026 23:11:53 +0900
+Message-ID: <cover.1768312014.git.yk@y-koj.net>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260113102636.3822825-2-u.kleine-koenig@baylibre.com>
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: idCf3MxPphw8xzIQQv5SB-jlAkRN5G8-
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTEzMDExOSBTYWx0ZWRfXxxB2Sip32ap8
+ Ks+LjXKlVhuv641tDkrndCr0nJRfodrFyypUWFp5YM9vXXR26cU0/OX7JkqIGnVSdBiWCB6rkxj
+ fky8UdQAKRYze69AZlnR8X3Y0oz0dgN5GokgRiEzyLIHDY+tWC1pCkDvrjWIHVVxGNacMid3maA
+ EoB94gFJbcgbohSoydQ7N7XdmJneOiICVgP0Xt7RrGxGvlzv/GJvKRg7wFkovjZQprfiw9ohSNO
+ JEjl6Tj8w7b6dGwH1O4a9U48x8Wlz3mn17vdb4Cp21QWKPXAruM05aSLeysmTL3pwJmg+63uC1y
+ 6MpJJ73KHOwAuv6P92u
+X-Proofpoint-ORIG-GUID: idCf3MxPphw8xzIQQv5SB-jlAkRN5G8-
+X-Authority-Info: v=2.4 cv=QolTHFyd c=1 sm=1 tr=0 ts=696652d9
+ cx=c_apl:c_apl_out:c_pps a=YrL12D//S6tul8v/L+6tKg==:117
+ a=YrL12D//S6tul8v/L+6tKg==:17 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=jnl5ZKOAAAAA:8 a=pgjvsvh3yOMjbX-kRL8A:9
+ a=RNrZ5ZR47oNZP8zBN2PD:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-13_03,2026-01-09_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ suspectscore=0 mlxscore=0 bulkscore=0 spamscore=0 mlxlogscore=999
+ clxscore=1030 phishscore=0 malwarescore=0 classifier=spam authscore=0
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
+ definitions=main-2601130119
+X-JNJ: AAAAAAAB0L3yRii6cal3MdZCcKZxqLy2LrXtDOxIw0XkQEFHSVMySvWRScksoYzqXRsMfSUd24nFH4sB9kK+USBm2OfOlJVcKWDT/9qVnNIamsGB4AB1zvGn02ejjPzpUCFf4MvZmarmE3RSCWBwLd4T71LVOvTWOFVAtbx4jKiaDRysKYggOpZ0VckzsDNuBdNMuiTiJX/vNEIooSBx53d7SJQanraBbjpCTDKRYLcGYtuU98ELY3e8JI+dTkRhjB6eK8jVZ1uvGDMe9fq6JyS8Y/FayUT0uJc65bFxmBDA3CQV6J24lQKyat+6lRHb2MwdewJyAINSdf9B5znAecR5tdNYFveewUt/EpF/FiKGI8XvaaDpMEGvk4rGTK5IKce+Nmh8cODXFWu5i1GxSPSsE5Xsc9SwltUgAIOGlAM8ROz/1p+YQ9jBOw2UBe13KL5rq50U6WOWc3cWE3Ovjn1w96AtOjOmY+JoGsEK05iCKueY8/jexUPgT73jI/qjkIrwq291nHtMsNPk4DUP5lAJ7C0ynEtXj4visG78DnlKnb4UvoRUnymldnWvOo9N/szauTWRKvSAJrMorTw3+IidEuFxFSZ3P2JCscDHDBsZfdxd1mmGadYmvvMJRA/xEimvYclHDkNini7EK4vqVOVEjAdjKMiP4GS7vDHPVKZoAbanL3GU+yvckVQ6x+Fy6dOLufzII9Bnq6U6orAp+FBhyYLfRHot+wnrRVVE9pb5wI9hF10=
 
-> Hello,
-> 
-> it seems I misunderstood when net-next opens, I thought this happens
-> "automatically" after an -rc1
+This series improves error handling in the passive TFO test by (1)
+fixing a broken behavior when the child processes failed (or timed out),
+and (2) adding more error handlng code in the test program.
 
-Normally yes, although it is a manual operation, Jakub sends an email
-saying it is open. However, this time, there was a poll of
-Maintainers, and it was decided to keep it closed until January due to
-the holidays and not having Maintainer bandwidth to process patches.
+The first patch fixes the behavior that the test didn't report failure
+even if the server or the client process exited with non-zero status.
+The second patch adds error handling code in the test program to improve
+reliability of the test.
 
-	Andrew
+This series was split out from the following series to address the
+feedback from Andrew Lunn:
+https://lore.kernel.org/netdev/cover.1767032397.git.yk@y-koj.net/
+
+ ChangeLog
+ ========= 
+v2 (this version):
+ - Fix a typo in the patch description
+ - Rephrase the patch description in imperative mood
+ - Add error handling for fprintf() reflecting Markus Elfring's feedback
+v1: https://lore.kernel.org/netdev/cover.1768207347.git.yk@y-koj.net/
+
+Yohei Kojima (2):
+  selftests: net: fix passive TFO test to fail if child processes failed
+  selftests: net: improve error handling in passive TFO test
+
+ tools/testing/selftests/net/tfo.c          | 13 +++++++++----
+ tools/testing/selftests/net/tfo_passive.sh | 13 ++++++++++++-
+ 2 files changed, 21 insertions(+), 5 deletions(-)
+
+-- 
+2.52.0
+
 
