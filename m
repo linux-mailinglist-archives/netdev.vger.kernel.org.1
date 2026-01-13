@@ -1,141 +1,119 @@
-Return-Path: <netdev+bounces-249311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAA12D16903
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 04:53:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F88BD16908
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 04:54:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0CE15300A799
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 03:53:41 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3695D300A799
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 03:54:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC904309DDF;
-	Tue, 13 Jan 2026 03:53:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FD14309DDF;
+	Tue, 13 Jan 2026 03:53:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eKfcxiAt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="arMfPHWA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF681301001;
-	Tue, 13 Jan 2026 03:53:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2336D308F3D;
+	Tue, 13 Jan 2026 03:53:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768276419; cv=none; b=LKZqloR86qwaMxtWnAr0jGcJNgNxC4+T1KCOcgELiG35vUH8XEUgTL9Un+TqdzOQ+aRlwAXLNXHvB8usOkwk/fFID1KEn7vjUwPgueTJaMnH24tTkNT+GDFq9n/NQyJ8RqiG90IqVqOuIr/FLc6yb8Nu9awuVe9sYTu+ETwQNAY=
+	t=1768276439; cv=none; b=IKl6+EKgUl3+SdJ2S5tWZSSEWezd133PwhFUlq5AW9mIk0mn5p0PE0qELxOpOuQnpra17B/Sk8zhnRjczjYH4ytsOQSpYcYt3V17goIvkbITMoWfkrNmpw0MUjsLLvtfH6nrKIJ/ETi9jtPDVvzHOZ2zCGxcquoAI5VBRuBAim4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768276419; c=relaxed/simple;
-	bh=/IRlg/HZqaWarHkvItRChuZKhbeASWJFIkTvLPcavzU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UlPJR/Ozokku7y7X0O8+fNlkmjhBSbzU8saSeuQkJZ9jD+k5esyZdoX5vYm8WDLGB/gnfONlHF2108wvrNrlnHuqeHkkCmdMeukcgnS3E6Y0D1M2ibAP8Ytxb8F3UO+PseHCDz0FczczOT7fx81vGG052SI0Lma/sB/959/8SsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eKfcxiAt; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768276418; x=1799812418;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/IRlg/HZqaWarHkvItRChuZKhbeASWJFIkTvLPcavzU=;
-  b=eKfcxiAtWlC8rWX7aNs0zATyd1sWWCkgHr/HcFShCsumXy5qmLWfKms6
-   LgK2qOWTZdJLArtK0zjsu2hcvIT9gxq/qE8J0yveG9dzkfq2kBtuBDOdH
-   0Cmuk+bwG9FRiWQcTcAe5LIjgDubhZXBrkGjbiKAMoekDbSS+DCNMmL9I
-   hQBX2DHnoRY7Ds+n9qR8OOlYSTi22Pi7XrB/pFM0d6z7juJDHwvS+941h
-   LyGV4Jxra8JpQmi1ZA1PWJsOBCEM2fmNLDeuDXr7qXfoYfNz/1rjpH+YE
-   GrNgfJHduN2EW3sMtrj++P9JqJcnOMBIflG6wNM6jF5RO9eTi0zDjL0nV
-   w==;
-X-CSE-ConnectionGUID: m7ArWosKRDCZQEuXQPWWaA==
-X-CSE-MsgGUID: FeLEXhiRRgux2JXpDCuGpA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11669"; a="69613557"
-X-IronPort-AV: E=Sophos;i="6.21,222,1763452800"; 
-   d="scan'208";a="69613557"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 19:53:37 -0800
-X-CSE-ConnectionGUID: ZcgYCdDKQQa6FHqWUrNpng==
-X-CSE-MsgGUID: mlgWcsnIQTGOQJ6oXCw5Ug==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,222,1763452800"; 
-   d="scan'208";a="227496203"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 12 Jan 2026 19:53:33 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vfVTH-00000000EBU-1ImV;
-	Tue, 13 Jan 2026 03:53:31 +0000
-Date: Tue, 13 Jan 2026 11:52:52 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: oe-kbuild-all@lists.linux.dev,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>
-Subject: Re: [PATCH net-next 2/2] net: stmmac: qcom-ethqos: convert to
- set_clk_tx_rate() method
-Message-ID: <202601131106.zgy17BPH-lkp@intel.com>
-References: <E1vfMO1-00000002kJF-33UK@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1768276439; c=relaxed/simple;
+	bh=BW7uKjiVxwuHSxcWF5TrcbXInN61SNCbm7vJWu9mXzg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ok9EeAsna52mwJs/LJt/T45T4VLTdjmt1dmAXjK+KRHSYVk0D3kXbsClql+6hwjOZdF8dQDzzo/XReMxcXdbUIo9LK9w6CvW4wYyzw7IeVv2NV70CuPS6dEFOICzcJZdSqr7c/5RJPX0GZbHsl4v+xKcCkWyKbKSCeLXPpTFvWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=arMfPHWA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02D82C116C6;
+	Tue, 13 Jan 2026 03:53:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768276438;
+	bh=BW7uKjiVxwuHSxcWF5TrcbXInN61SNCbm7vJWu9mXzg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=arMfPHWA88eGaBqamCOBG1nAl5oSJsIOD56uaWS7mmB5walVIyCPUvUzOC1O/evsW
+	 sGHXosq9+CxDg6xeozDdMikQ9g0Y8FATvz9uVGjfSFiAWhlSCuW/dMpSzq7NM+0LKb
+	 BzT+5N/8v85WYsbuLfuW8xQ8z2l/v94w8iYAosNw2x48sFDKpNTKpDdYwJ3tkJHZg0
+	 qNF/MzGd1C6hf4WrIIxaKCKqVYttM5SETw1gEf1QpL/IJoIXjOz47Nt6nksSkuS9NQ
+	 PRdCtGy2+SWiTpBYYn1Gz2NZXGrdNKV1zGjo/OObZ52xU7kdEocaKSp0acSQ0/3zdg
+	 C+MBMZNuY8vlQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: daniel@iogearbox.net
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	jordan@jrife.io,
+	maciej.fijalkowski@intel.com,
+	willemb@google.com,
+	yangzhenze@bytedance.com,
+	razor@blackwall.org,
+	dw@davidwei.uk,
+	pabeni@redhat.com,
+	sdf@fomichev.me,
+	wangdongdong.6@bytedance.com,
+	john.fastabend@gmail.com,
+	martin.lau@kernel.org,
+	magnus.karlsson@intel.com,
+	toke@redhat.com,
+	davem@davemloft.net
+Subject: Re: [net-next,v5,03/16] net: Add lease info to queue-get response
+Date: Mon, 12 Jan 2026 19:53:53 -0800
+Message-ID: <20260113035353.405418-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260109212632.146920-4-daniel@iogearbox.net>
+References: <20260109212632.146920-4-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1vfMO1-00000002kJF-33UK@rmk-PC.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-Hi Russell,
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least pausible.
 
-kernel test robot noticed the following build warnings:
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+    net: Add lease info to queue-get response
 
-[auto build test WARNING on net-next/main]
+This commit populates nested lease info in the queue-get response, returning
+the ifindex, queue id with type, and optionally the netns id if the device
+resides in a different network namespace.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Russell-King-Oracle/net-stmmac-qcom-ethqos-remove-mac_base/20260113-061245
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/E1vfMO1-00000002kJF-33UK%40rmk-PC.armlinux.org.uk
-patch subject: [PATCH net-next 2/2] net: stmmac: qcom-ethqos: convert to set_clk_tx_rate() method
-config: arc-allyesconfig (https://download.01.org/0day-ci/archive/20260113/202601131106.zgy17BPH-lkp@intel.com/config)
-compiler: arc-linux-gcc (GCC) 15.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260113/202601131106.zgy17BPH-lkp@intel.com/reproduce)
+> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+> index cd4dc4eef029..002d68f62131 100644
+> --- a/net/core/netdev-genl.c
+> +++ b/net/core/netdev-genl.c
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601131106.zgy17BPH-lkp@intel.com/
+[ ... ]
 
-All warnings (new ones prefixed by >>):
+> @@ -410,6 +413,37 @@ netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
+>  		if (nla_put_napi_id(rsp, rxq->napi))
+>  			goto nla_put_failure;
+>
+> +		if (netif_rx_queue_lease_get_owner(&netdev, &lease_q_idx)) {
+> +			struct net *net, *peer_net;
+> +
+> +			nest_lease = nla_nest_start(rsp, NETDEV_A_QUEUE_LEASE);
+> +			if (!nest_lease)
+> +				goto nla_put_failure;
+> +			nest_queue = nla_nest_start(rsp, NETDEV_A_LEASE_QUEUE);
+> +			if (!nest_lease)
+                            ^^^^^^^^^^
 
-   drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c: In function 'ethqos_set_clk_tx_rate':
->> drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c:188:1: warning: control reaches end of non-void function [-Wreturn-type]
-     188 | }
-         | ^
+Should this check nest_queue instead of nest_lease? The assignment is to
+nest_queue but the check is on nest_lease. If nla_nest_start() fails for
+NETDEV_A_LEASE_QUEUE and returns NULL, the check passes because nest_lease
+is non-NULL from the previous successful call. This would lead to
+nla_nest_end(rsp, nest_queue) being called with a NULL pointer, causing a
+NULL pointer dereference when accessing start->nla_len.
 
+> +				goto nla_put_failure;
 
-vim +188 drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-
-a7c30e62d4b895 Vinod Koul            2019-01-21  175  
-a69650e88a5551 Russell King (Oracle  2026-01-12  176) static int ethqos_set_clk_tx_rate(void *bsp_priv, struct clk *clk_tx_i,
-a69650e88a5551 Russell King (Oracle  2026-01-12  177) 				  phy_interface_t interface, int speed)
-a7c30e62d4b895 Vinod Koul            2019-01-21  178  {
-a69650e88a5551 Russell King (Oracle  2026-01-12  179) 	struct qcom_ethqos *ethqos = bsp_priv;
-98f9928843331f Russell King (Oracle  2025-02-21  180) 	long rate;
-98f9928843331f Russell King (Oracle  2025-02-21  181) 
-a69650e88a5551 Russell King (Oracle  2026-01-12  182) 	if (!phy_interface_mode_is_rgmii(interface))
-a69650e88a5551 Russell King (Oracle  2026-01-12  183) 		return 0;
-26311cd112d05a Sarosh Hasan          2024-02-26  184  
-98f9928843331f Russell King (Oracle  2025-02-21  185) 	rate = rgmii_clock(speed);
-98f9928843331f Russell King (Oracle  2025-02-21  186) 	if (rate > 0)
-a69650e88a5551 Russell King (Oracle  2026-01-12  187) 		clk_set_rate(ethqos->link_clk, rate * 2);
-a7c30e62d4b895 Vinod Koul            2019-01-21 @188  }
-a7c30e62d4b895 Vinod Koul            2019-01-21  189  
-
+[ ... ]
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+pw-bot: cr
 
