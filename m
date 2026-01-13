@@ -1,143 +1,172 @@
-Return-Path: <netdev+bounces-249330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D411FD16C34
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 07:08:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F236D16C8F
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 07:17:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B528030173AE
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 06:08:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2B907303BE20
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 06:16:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1805535CBA4;
-	Tue, 13 Jan 2026 06:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 059D92FF176;
+	Tue, 13 Jan 2026 06:16:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MyQ3nMc+"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="Vc++aZfL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C5462F6925
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 06:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C543530C62F;
+	Tue, 13 Jan 2026 06:16:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768284534; cv=none; b=sJZmChiAzEzIVndj9ABhgg8GORk9C+mWXYIpS22BiPLpjqVc/kB5T2y0hBXBR38Aa8iQn7Gail2wwKheS04WnjzHGlhqgg/9poh29Ze0dRIYYWF6W++Yebpx7VuQ91A3UVEztBuGVdClfd99icelPD0/OIKSsCl7CrttQaQvmHY=
+	t=1768285002; cv=none; b=uCS821wYAp7W7QpxbJkpOsGkgp/2QCXljazjqC+ZpIlKdRjx+/QtcpwWJ6psZwuagdx6AsAP2AokR5D4x7Av3XS3Og8yhxEXDj2U1zfl0vYV6TPUlcpiZWpSTqwIAttgOtPmA2PO25RWLFanAEgOUu6i8zskC6YVaVuhZoF5fCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768284534; c=relaxed/simple;
-	bh=s+Zptr/HPYKDK7I+WrntNKJrNlP3RpkE+kxChvEy6nw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s8H2D0sKoBSv9NZkUsPdmc/Vwk2FAWKyaH45bmNwv+X1p03sGWo3T6YyAcSKfPCKxZqJs4cWkS+3FQz9An+xyZagSWTaSKzzX/8J6CFspWbIYjv4ScnGZAjUOjseZLMgvn4L5ZIyyf66H5V78DQq2gADpSO8esMvtWoxpXQte8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MyQ3nMc+; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-47d3ba3a4deso41112885e9.2
-        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 22:08:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768284531; x=1768889331; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=X9ZSFs1AHwHUdEkUdQBHwokHKh6cloNR08U6DUqtuI0=;
-        b=MyQ3nMc+ojltg9/JczXKRJjjnv5NV26iBkoU3YmLbiUrtVVOX3lwyA4KlW1/TsPqrf
-         ZOdg0Z1v74vH0Lu4wf1sphvbTqpGDnzOWDwj3PtuQgKkfXdoZqoEaSm7xZE1KPnUo4qB
-         BmfpPMpigsnJhgwN3DNblHFFbtH7a8us8o8o9hSpsPYNkVKHOYN6r6QsBavZJb68ha8g
-         LhwmmxoOd2M9miemmfJJ1GnmdPWvjTCkDx8RZlsdyVSZ9YndcsQauZBJXzahu3y0Xfgt
-         BkbnGwsN+sKFQyz0C/3KwjHvhEV8AblX1h7sszOSbXhywf7U410GQIWdWeVkl6uTWZk3
-         P8iA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768284531; x=1768889331;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=X9ZSFs1AHwHUdEkUdQBHwokHKh6cloNR08U6DUqtuI0=;
-        b=vrcfuEsKvmLDlbcRyCO2hlBbxXdyPpoPdBPr/UR6WQluKREKiyTmjaOoZeQwet7LRs
-         odbBrQGzpU2GeAXxi/AwYKSkLJngZChrUoSk5JOSCRc85jUZn1UjY3ArRR9Lum3Uco5a
-         Ts3H6TW6XkzTrQtwCddws72Mbo4GH9XgjLmOJZcTRq6d1I5JZ2aU447UewZC5CbNROvF
-         vO9KGLOF9cr58t3SsnLiUxrcH67sFW17D70Xcd3PSanViwvhCYS2iEFHOFQ9ii4fA7Bm
-         D28opJhfA4W0b6E+MTvWs9QvRCjD1mtiUJWPySiSnDfM9L8O7vr2sb5/XGkSatTLVBJW
-         QD8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUukyZ7nHBh+HRwHq0XA1W6yl9zFHGp4qRT2izlJOJESx8LlHddQEMAh01AJaAuTtPnXUPKAi0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzfv631QNb2K5EKwdI7nW/2BiOvunyfUGPApyzfJjiw7LB7wvJg
-	kxUa5gwstro6pVRk7CWbbgeYYszEJdtci7drjZWvNcGyWA+LDVake3ms
-X-Gm-Gg: AY/fxX4RA2rT0SBGXCebMQWE5Lg4R+Eet0ndMP/R4Yt6EfKhZN6zn1Psc4pqogWBF9X
-	gAW7CAkzkIB4+wSXiVzv9ctxJbZSA6oaQsbWJudBDtpKr13AdTPCe7Y5TxhOUQgibl8ZkNNsICM
-	mcfE/R+b5966Rr/G3ZnUIZ4AXEMl1BGeFdnm+aLhpWT7o52W/KDnDp/dkTQFaiSK1lqqR/A97M+
-	yFFkYBb8VO+1dJfCxDmLw27HwbqV3XbcQFIfUNS7jpef4nYJTHos5/ZfLFcW7OGZBoAFkcXLbSc
-	7YFaRS0zJUbMnxCqQGPwTf0HSc1PU396uVrMEXpSBh1wrciQ8beqyXrSJh6chThh3NCnHdovnO6
-	imEGWmrJeT85kDty17icePmvMPbVWrZ7WHy//G49/AhRD0iktCggI6AJCM1y7iHskRx18m7yrB0
-	NB5MDF9OgXVoMhjI+FTNTHuGJQ2rqf0RkzbTIJP/dZ/xLIKQ==
-X-Google-Smtp-Source: AGHT+IG15wErQ03UH9DVDeoYCjGbCNvRirkF29C6VV/Z9728PIAUXXm8+rFEeW3TuGRjq5cyJFWLUA==
-X-Received: by 2002:a05:600c:45c3:b0:46e:48fd:a1a9 with SMTP id 5b1f17b1804b1-47d84b3f642mr218415835e9.33.1768284530620;
-        Mon, 12 Jan 2026 22:08:50 -0800 (PST)
-Received: from [10.221.200.118] ([165.85.126.46])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f620ac8sm378935045e9.0.2026.01.12.22.08.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Jan 2026 22:08:50 -0800 (PST)
-Message-ID: <4261e437-84b2-4d0d-af52-c5ee7fcf07cb@gmail.com>
-Date: Tue, 13 Jan 2026 08:08:48 +0200
+	s=arc-20240116; t=1768285002; c=relaxed/simple;
+	bh=gwYog2yWkILne/uAzUmg5SLLW7BGAalPbgUvpHrN5uc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=GIoD8yREXKQZ3TFayi/glBcnkyGLU0iRmSSobUPROCobD9S2aGURvlLu7xIYXd5dSHIENVk19MqJDlp8ySIFvTqEl8KI6aVCqaMzKoN2muQHc3a/WoPpl87ULraHCXPZCrRjJsao8EadUMAWoz8Jd5AxP9MGxECs6AqAcA5AVXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=Vc++aZfL; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1768284995;
+	bh=cSbee1z1O436wXLvlU5AQ4uXuwyWU7NpC5/DBlBWO0w=;
+	h=Date:From:To:Cc:Subject:From;
+	b=Vc++aZfLFDDRwp/flwWLjrZbzKMiJP0R/FJzq3prQiUkvu6LdOzWtGpWY7se2GieK
+	 g48luRTj/i4zgAoah7nH85qp2/lzUPMn0JVU+LIf7njz7TAa9fHdwTQco9K/kyseio
+	 OrfA42zuBcvfM1E2LZHgc05NWYFajJOgqFoQR1zzov7DhukxhcmsG0N83oW6khib8C
+	 nPItFnoX9Ib1C8jPX9DYfX/qA+023Bc2b+fOhHCGRTE6n/Eb8PVPn3JZ1b9St5mewv
+	 i4gRXPzfJKU5FQ2qMGGFYVB6Ri75xUd9aBjp15I3uQq2M2LGLOAjulj0jeimvZQSYL
+	 guQNL8N4X8dpw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4dqzXg0g21z4w0Q;
+	Tue, 13 Jan 2026 17:16:34 +1100 (AEDT)
+Date: Tue, 13 Jan 2026 17:16:33 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Michael Chan
+ <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
+ Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: build failure after merge of the net-next tree
+Message-ID: <20260113171633.1536cc74@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 07/10] mlx5e: Call skb_metadata_set when
- skb->data points past metadata
-To: Jakub Sitnicki <jakub@cloudflare.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, intel-wired-lan@lists.osuosl.org,
- bpf@vger.kernel.org, kernel-team@cloudflare.com
-References: <20260110-skb-meta-fixup-skb_metadata_set-calls-v1-0-1047878ed1b0@cloudflare.com>
- <20260110-skb-meta-fixup-skb_metadata_set-calls-v1-7-1047878ed1b0@cloudflare.com>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20260110-skb-meta-fixup-skb_metadata_set-calls-v1-7-1047878ed1b0@cloudflare.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="Sig_/ibQmQTlDxduYNNkZ=PQk3_l";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/ibQmQTlDxduYNNkZ=PQk3_l
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+Hi all,
+
+After merging the net-next tree, today's linux-next build (powerpc
+allyesconfig) failed like this:
+
+drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c: In function 'bnxt_ptp_init':
+drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c:1141:13: error: implicit decl=
+aration of function 'boot_cpu_has'; did you mean 'boot_cpu_init'? [-Wimplic=
+it-function-declaration]
+ 1141 |             boot_cpu_has(X86_FEATURE_ART))
+      |             ^~~~~~~~~~~~
+      |             boot_cpu_init
+drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c:1141:26: error: 'X86_FEATURE_=
+ART' undeclared (first use in this function); did you mean 'X86_FEATURE_ANY=
+'?
+ 1141 |             boot_cpu_has(X86_FEATURE_ART))
+      |                          ^~~~~~~~~~~~~~~
+      |                          X86_FEATURE_ANY
+drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c:1141:26: note: each undeclare=
+d identifier is reported only once for each function it appears in
+
+Caused by commit
+
+  c470195b989f ("bnxt_en: Add PTP .getcrosststamp() interface to get device=
+/host times")
+
+boot_cpu_has() only exists for X86 ...
+
+I have applied the folloring hack for today:
+
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Date: Tue, 13 Jan 2026 16:51:58 +1100
+Subject: [PATCH] fix up for "bnxt_en: Add PTP .getcrosststamp() interface to
+ get device/host times"
+
+Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/et=
+hernet/broadcom/bnxt/bnxt_ptp.c
+index 75ad385f5f79..20f5a9f38fee 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+@@ -882,6 +882,7 @@ void bnxt_tx_ts_cmp(struct bnxt *bp, struct bnxt_napi *=
+bnapi,
+ 	}
+ }
+=20
++#ifdef X86_FEATURE_ART
+ static int bnxt_phc_get_syncdevicetime(ktime_t *device,
+ 				       struct system_counterval_t *system,
+ 				       void *ctx)
+@@ -924,6 +925,7 @@ static int bnxt_ptp_getcrosststamp(struct ptp_clock_inf=
+o *ptp_info,
+ 	return get_device_system_crosststamp(bnxt_phc_get_syncdevicetime,
+ 					     ptp, NULL, xtstamp);
+ }
++#endif
+=20
+ static const struct ptp_clock_info bnxt_ptp_caps =3D {
+ 	.owner		=3D THIS_MODULE,
+@@ -1137,9 +1139,11 @@ int bnxt_ptp_init(struct bnxt *bp)
+ 		if (bnxt_ptp_pps_init(bp))
+ 			netdev_err(bp->dev, "1pps not initialized, continuing without 1pps supp=
+ort\n");
+ 	}
++#ifdef X86_FEATURE_ART
+ 	if ((bp->fw_cap & BNXT_FW_CAP_PTP_PTM) && pcie_ptm_enabled(bp->pdev) &&
+ 	    boot_cpu_has(X86_FEATURE_ART))
+ 		ptp->ptp_info.getcrosststamp =3D bnxt_ptp_getcrosststamp;
++#endif
+=20
+ 	ptp->ptp_clock =3D ptp_clock_register(&ptp->ptp_info, &bp->pdev->dev);
+ 	if (IS_ERR(ptp->ptp_clock)) {
+--=20
+2.52.0
 
 
 
-On 10/01/2026 23:05, Jakub Sitnicki wrote:
-> Prepare to copy the XDP metadata into an skb extension in skb_metadata_set.
-> 
-> Adjust the driver to pull from skb->data before calling skb_metadata_set.
-> 
-> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
-> ---
->   drivers/net/ethernet/mellanox/mlx5/core/en/xsk/rx.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/rx.c
-> index 2b05536d564a..20c983c3ce62 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/rx.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/rx.c
-> @@ -237,8 +237,8 @@ static struct sk_buff *mlx5e_xsk_construct_skb(struct mlx5e_rq *rq, struct xdp_b
->   	skb_put_data(skb, xdp->data_meta, totallen);
->   
->   	if (metalen) {
-> -		skb_metadata_set(skb, metalen);
->   		__skb_pull(skb, metalen);
-> +		skb_metadata_set(skb, metalen);
->   	}
->   
->   	return skb;
-> 
+--=20
+Cheers,
+Stephen Rothwell
 
-Patch itself is simple..
+--Sig_/ibQmQTlDxduYNNkZ=PQk3_l
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-I share my concerns about the perf impact of the series idea.
-Do you have some working PoC? Please share some perf numbers..
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmll40EACgkQAVBC80lX
+0GzUwQf/RWC50gqZ0/DmGrLkCT1s2mKBTAr2KsOAAlmNAayfym7gktMKFIABEwQl
+wHJK6T+v2Zslf/Ad4jztMbFuRSyDljQiz4I+KuvnPXv+AKTc/ZYhQZ2zR5UWHmrP
++68T+BSGfSzfBIM7G542AoGlYj21dxRUEEVlcl1pApuvzFhnHZ3IkkbzMgiyG85L
+DbLpuQbMPFffyCs9YqSR8bL8Lsg3YX7WD2BFqiSc5LK+1WWBUz9evo2VQRjM3JQP
+PoApT/lD6zUz8Spe8aUT9eAdK3QWXJRzpI1ohTTIwn0StmgVCrcnViyZgetI1K01
+AQp0XgdBJ/4VhuNGoE58OM1qRpveNw==
+=TLLL
+-----END PGP SIGNATURE-----
+
+--Sig_/ibQmQTlDxduYNNkZ=PQk3_l--
 
