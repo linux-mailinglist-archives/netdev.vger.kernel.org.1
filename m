@@ -1,163 +1,171 @@
-Return-Path: <netdev+bounces-249601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 544F7D1B665
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:30:34 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62A4FD1B71D
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:38:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7FB113012754
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 21:28:35 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DB37E30131FA
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 21:38:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1768E32BF25;
-	Tue, 13 Jan 2026 21:28:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFD6234D4F9;
+	Tue, 13 Jan 2026 21:38:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b="KzjkkSvO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HUtJyVo6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A1F31ED95
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 21:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA5234AAFB;
+	Tue, 13 Jan 2026 21:38:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768339715; cv=none; b=BxCDRa+IbxJ6BNrd2Y2DB69hTBHOQ1Yi+WABA6i/BeqD3W2rxJ87IZvZtaiEabExOp7r1Nd+0B7fQX5sr4/BgM+agxTnNuBkKoWGYOravbSxPQ1rav93bIeKrlSsfHfYcG04g2Fp0/PCwc2AfKNiwXpvQumZuFlCzcm610OdWaI=
+	t=1768340285; cv=none; b=ZhZaMf+Yen2QbBpKYSqZ2rECOrrR/ZOx/+p06g86w4+y0CJLXIYqLHJq4Bo39DIxj3ZRhzsELF5vnSDEgdau3RRrkqEbZYXim9FYwrNduWMZ7VI4galmwDu1RlQwp081Y9cOABCG+JD/Fb9ZFdE5SByb+7de7Jd/2/hLaGq5R9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768339715; c=relaxed/simple;
-	bh=/sjXZqJqPC7crHm9RyJs5cBFt5BsXo1n8SIelhpIFpI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=COO26WSD+2/gN+uewdTBAIp6LsVCtkUKtUEHxLi4DNJTxzvXCiC50TbTVp0M1n9fea5LQGLHaoKSiTiEK2N1k9qGI1VowMT9kFt/BwntLSSfZ3OJJkLWwfA5E0iFOFIajd8fKHH5lpOwriflmk2XV9jLQnpQWY+yZJljO5UdId4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=isovalent.com; spf=pass smtp.mailfrom=isovalent.com; dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b=KzjkkSvO; arc=none smtp.client-ip=74.125.82.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=isovalent.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isovalent.com
-Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-12336f33098so59438c88.0
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 13:28:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=isovalent.com; s=google; t=1768339713; x=1768944513; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=UBRC+Rpbdm2zKDeU90T2kAoRrIazNYEJECuptdIqsQY=;
-        b=KzjkkSvOfjlruLadAlnu0egm9cnWbOBFFjfBcw3A2thjdww4PkAtQrsv9bj3iHWomc
-         TrP+2PAuFXINs2hMHyyzYcJ6WgDcQFOoFUJ1mkThSu/JLAQ+yAei1SYhYTkeS0636Zyf
-         7pl/QMqcaVOl729egHNzPSwbGipwlX5wXEgMIcibxuta0dHSxcxCJIU2A9c1fjF+YIk6
-         X0pry+Az80VhH7pfngOY4nM6IT+crU8i2pDVxuJdGIHyVHIe4Uff9nsRO6upu86nVT0+
-         RlPcoxhOFEm8dEle8BI4ry4Ma20RVDaDO/oco36mxmPMs29SzAQox1HtowriQ/JRDd+U
-         tvxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768339713; x=1768944513;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UBRC+Rpbdm2zKDeU90T2kAoRrIazNYEJECuptdIqsQY=;
-        b=g5OAXnpE6vGoGFBuenradYTGVYSu1gGsBssgMlz02X48lDBOpuNeDD3C82HWrHUr05
-         JH+hrYXq2BWEwKNXc8PMse/ZntJ+nCbENLpvDws2HxaWn7mbxpcLZ0gEVmSRt3hpTF5H
-         MOGFsok7kMUsTFtY+LphV4DltBeFn7B/n7VnfPU6/hQu3u1BYgKPgqEIZ3pr+rQJEcXg
-         MuNgwe+uxbxYO3o/fNRkwWZ3tkmIm0pVKVqY6/sVElolzW50IaiHO8xhRAtCHJRB00u1
-         mK3RcI8NNBo6MYkwXqNa0sUOoboLf9x0ObBjgtY8eBKipCpfv0f5GnZ27TZKPuuzgpGC
-         O05g==
-X-Forwarded-Encrypted: i=1; AJvYcCWAis3rDyYzoVPRkoFM/B+J6al9T6aAVpaJgzLtjuH6KDuENtTbWli5YGVh3Nr1R48VlryuEME=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyx31TCxUS/RRKBU1/p6dKDQth/gYDdF1krpjumzPepY+ZVxwi+
-	peadeJos+EIqTWc/hN2nNrRuPHxSjjPoONbQ3PHQ8QF6kTwN2zYgsO2X1JOEetUgzbqKwd89HTp
-	Ayk4/OtOoaxXuRt0H8Yx66a5oaHkFlvq/XtJqOo2Owg==
-X-Gm-Gg: AY/fxX6nU0SpFoL7fk/7byjv48q+SSy/CktG0d78D54CYvhhYIn1j6TUPL9RAlbStz4
-	Ffe08pPZqA8lKiNSKGpDDLbiv/fUcn1auX1YHZZU+72+PMggGgbf9YEkUjE8SCPTl5nrPQ1gfYg
-	NgbwXRYzYIADQRs0N+RiHeMSCLGT7P+Rjp8FdiZ/Mr5U07Eu5rLNRmGauKgqsUdZiY1y1NS9CCX
-	5jw58pp87+5DCku6od7ABcIBgHB6wrvUS3FCUkAaeh3zPGs/tRXvIvMA2RGIdnsWVl+MHtdcDqY
-	J5ynK1W4sHJ0zdX4364CxcoDIWsw0mtDrjg9
-X-Received: by 2002:a05:7022:1709:b0:11b:d6f2:a6d6 with SMTP id
- a92af1059eb24-12336a81135mr297133c88.34.1768339712508; Tue, 13 Jan 2026
- 13:28:32 -0800 (PST)
+	s=arc-20240116; t=1768340285; c=relaxed/simple;
+	bh=Ue0kX6WDxmwPMCZ/GKz/k0/R9KvOYfmHiZqM0wnXDGQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gIhVcEwX7dhN2+qnNP/n+2JvD+XjVuhl9mBJ1o7bzfUhv8EWdnPjX3i9+yoPQ1HeoiQJdIeh2ZRULruSBtbdNIEo4kY6qqYj6NgS0z2MvkBmYfUn48jXwjsHPL3+ci+NDn4XgAuqvd+gnqfQgjO8dtA+BvZZ+3fJBUgWEqhLgAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HUtJyVo6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F3A9C16AAE;
+	Tue, 13 Jan 2026 21:38:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768340285;
+	bh=Ue0kX6WDxmwPMCZ/GKz/k0/R9KvOYfmHiZqM0wnXDGQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=HUtJyVo6tFy6D2+6OTOd9Tv6Ujj2G4eqP8Sqsp6CvXxIi0m6pfEMUN9iQxl2niTkb
+	 MZaA2823gSY+QqfaKURHBIVDbZc6kHXd5Hsqd4GW/aUmuaqZ9Vea7JPQ94ATsXpG+Y
+	 RAtRBh5tNZx6yt9jD7gISK/kxvrTOs0VHn/zOsN8sEa7+raVMmkzjhQIMdXZS2txTA
+	 8s2gr8MCbCvgLXZdWwiugtv+zvnvfh45af0wunCFtZQ8R7v9V0Du6A+WQhnk1Yd8oS
+	 tc7eRpVIAqyjS6oMMCbu1n7emEUzmAUwM2WG51axjcZknTaW+UKkGNvjFyCD2sQYjb
+	 gaJE9bb5U6EGQ==
+Message-ID: <a2dc72ae-0798-4baa-b4d2-fa66c334576a@kernel.org>
+Date: Tue, 13 Jan 2026 15:37:57 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250923134742.1399800-1-maxtram95@gmail.com> <20250923134742.1399800-2-maxtram95@gmail.com>
- <aNWIi0Ni-kwUmYul@mini-arch>
-In-Reply-To: <aNWIi0Ni-kwUmYul@mini-arch>
-From: Alice Mikityanska <alice@isovalent.com>
-Date: Tue, 13 Jan 2026 23:28:16 +0200
-X-Gm-Features: AZwV_QjhSUd5CXclGB56T4LMVGk3qAsJcZaPa1XUyr_KMTrbqFSQ7G3ginp8umk
-Message-ID: <CAD0BsJXNcZ0w7BViTz4t07pY7ViSNbNJx_XR4LVRtdjC-x9vCA@mail.gmail.com>
-Subject: Re: [PATCH net-next 01/17] net/ipv6: Introduce payload_len helpers
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Maxim Mikityanskiy <maxtram95@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, David Ahern <dsahern@kernel.org>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org, 
-	tcpdump-workers@lists.tcpdump.org, Guy Harris <gharris@sonic.net>, 
-	Michael Richardson <mcr@sandelman.ca>, Denis Ovsienko <denis@ovsienko.info>, Xin Long <lucien.xin@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/3] net: stmmac: socfpga: add call to assert/deassert
+ ahb reset line
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Philipp Zabel <p.zabel@pengutronix.de>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Mamta Shukla <mamta.shukla@leica-geosystems.com>,
+ Ahmad Fatoum <a.fatoum@pengutronix.de>,
+ bsp-development.geo@leica-geosystems.com,
+ Pengutronix Kernel Team <kernel@pengutronix.de>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org
+References: <20260108-remove_ocp-v3-0-ea0190244b4c@kernel.org>
+ <20260108-remove_ocp-v3-1-ea0190244b4c@kernel.org>
+ <aV_W2yLmnHrTvbTP@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Dinh Nguyen <dinguyen@kernel.org>
+In-Reply-To: <aV_W2yLmnHrTvbTP@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, 25 Sept 2025 at 21:23, Stanislav Fomichev <stfomichev@gmail.com> wrote:
->
-> On 09/23, Maxim Mikityanskiy wrote:
-> > From: Maxim Mikityanskiy <maxim@isovalent.com>
-> >
-> > From: Maxim Mikityanskiy <maxim@isovalent.com>
-> >
-> > The next commits will transition away from using the hop-by-hop
-> > extension header to encode packet length for BIG TCP. Add wrappers
-> > around ip6->payload_len that return the actual value if it's non-zero,
-> > and calculate it from skb->len if payload_len is set to zero (and a
-> > symmetrical setter).
-> >
-> > The new helpers are used wherever the surrounding code supports the
-> > hop-by-hop jumbo header for BIG TCP IPv6, or the corresponding IPv4 code
-> > uses skb_ip_totlen (e.g., in include/net/netfilter/nf_tables_ipv6.h).
-> >
-> > No behavioral change in this commit.
-> >
-> > Signed-off-by: Maxim Mikityanskiy <maxim@isovalent.com>
-> > ---
-> >  include/linux/ipv6.h                       | 20 ++++++++++++++++++++
-> >  include/net/ipv6.h                         |  2 --
-> >  include/net/netfilter/nf_tables_ipv6.h     |  4 ++--
-> >  net/bridge/br_netfilter_ipv6.c             |  2 +-
-> >  net/bridge/netfilter/nf_conntrack_bridge.c |  4 ++--
-> >  net/ipv6/ip6_input.c                       |  2 +-
-> >  net/ipv6/ip6_offload.c                     |  7 +++----
-> >  net/ipv6/output_core.c                     |  7 +------
-> >  net/netfilter/ipvs/ip_vs_xmit.c            |  2 +-
-> >  net/netfilter/nf_conntrack_ovs.c           |  2 +-
-> >  net/netfilter/nf_log_syslog.c              |  2 +-
-> >  net/sched/sch_cake.c                       |  2 +-
-> >  12 files changed, 34 insertions(+), 22 deletions(-)
-> >
-> > diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
-> > index 43b7bb828738..44c4b791eceb 100644
-> > --- a/include/linux/ipv6.h
-> > +++ b/include/linux/ipv6.h
-> > @@ -126,6 +126,26 @@ static inline unsigned int ipv6_transport_len(const struct sk_buff *skb)
-> >              skb_network_header_len(skb);
-> >  }
-> >
-> > +static inline unsigned int ipv6_payload_len(const struct sk_buff *skb, const struct ipv6hdr *ip6)
-> > +{
-> > +     u32 len = ntohs(ip6->payload_len);
-> > +
-> > +     return (len || !skb_is_gso(skb) || !skb_is_gso_tcp(skb)) ?
-> > +            len : skb->len - skb_network_offset(skb) - sizeof(struct ipv6hdr);
->
-> Any reason not to return skb->len - skb_network_offset(skb) - sizeof(struct ipv6hdr)
-> here unconditionally? Will it not work in some cases?
 
-Just submitted a v2. Yes, it's intentional:
 
-Many callers do extra checks that the payload length is valid, i.e.
-not bigger than the SKB length. If we just use the calculation
-unconditionally, those checks will always pass, even for invalid
-packets that have payload_len bigger than the actual packet size.
+On 1/8/26 10:10, Russell King (Oracle) wrote:
+> On Thu, Jan 08, 2026 at 07:08:09AM -0600, Dinh Nguyen wrote:
+>> The "stmmaceth-ocp" reset line of stmmac controller on the SoCFPGA
+>> platform is essentially the "ahb" reset on the standard stmmac
+>> controller. But since stmmaceth-ocp has already been introduced into
+>> the wild, we cannot just remove support for it. But what we can do is
+>> to support both "stmmaceth-ocp" and "ahb" reset names. Going forward we
+>> will be using "ahb", but in order to not break ABI, we will be call reset
+>> assert/de-assert both ahb and stmmaceth-ocp.
+>>
+>> The ethernet hardware on SoCFPGA requires either the stmmaceth-ocp or
+>> ahb reset to be asserted every time before changing the phy mode, then
+>> de-asserted when the phy mode has been set.
+> 
+> This is not SoCFPGA specific. The dwmac core only samples its
+> phy_intf_sel_i signals when coming out of reset, and then latches
+> that as the operating mode.
+> 
+> Currently, the dwmac core driver does not support dynamically changing
+> plat_dat->phy_interface at runtime. That may change in the future, but
+> as it requires a hardware reset which will clear out the PTP state, it
+> would need consideration of that effect.
+> 
+> The SoCFPGA driver only calls the set_phy_mode() methods from
+> socfpga_dwmac_init(), which in turn is called from the plat_dat->init
+> hook. This will be called from:
+> 
+> 1. When stmmac_dvr_probe() is called, prior to allocating any
+>     resources, and prior to the core driver's first call to:
+>     reset_control_deassert(priv->plat->stmmac_ahb_rst);
+> 
+> 2. As plat_dat->resume is not populated by the glue driver, the init
+>     hook will also be called when resuming from stmmac_resume().
+> 
+> Lastly, nothing in the main driver corrently writes to ->phy_interface.
+> 
+> I would like to see the platform glue drivers using more of what is
+> in the core driver, rather than re-inventing it, so I support the
+> idea of getting rid of dwmac->stmmac_ocp_rst.
+> 
+> What I suggest is to get rid of dwmac->stmmac_ocp_rst now.
+> devm_stmmac_probe_config_dt() will parse the device tree, looking for
+> the "ahb" reset, and assigning that to plat->stmmac_ahb_rst. If it
+> doesn't exist, then plat->stmmac-ahb_rst will be NULL.
+> 
+> So, in socfpga_dwmac_probe(), do something like this:
+> 
+> 	struct reset_control *ocp_rst;
+> ...
+> 	if (!plat_dat->stmmac_ahb_rst) {
+> 		ocp_rst = devm_reset_control_get_optional(dev, "stmmaceth-ocp");
+> 		if (IS_ERR(ocp_rst))
+> 			return dev_err_probe(dev, PTR_ERR(ocp_rst),
+> 					     "failed to get ocp reset");
+> 
+> 		if (ocp_rst)
+> 			dev_warn(dev, "ocp reset is deprecated, please update device tree.\n");
+> 
+> 		plat_dat->stmmac_ahb_rst = ocp_rst;
+> 	}
+> 
+> Then, change all remaining instances of dwmac->stmmac_ocp_rst to
+> dwmac->plat_dat->stmmac_ahb_rst... and job done. You have compatibility
+> with device trees that use "ahb", and with device trees that use
+> "stmmaceth-ocp".
+> 
+> Given that struct socfpga_dwmac contains the plat_dat pointer, rather
+> than copying plat_dat->stmmac_rst to your private structure, please
+> use the one in the plat_dat structure.
+> 
+> The next question I have is - do you need to assert both the AHB reset
+> and stmmac_rst to set the PHY interface mode? I don't see a dependency
+> between these two resets in the socfpga code - the driver doesn't treat
+> them as nested. It asserts the AHB reset _then_ the stmmac reset, and
+> then releases them in the same order rather than reverse order. This
+> suggests there's no interdependence between them, and probably it's
+> only necessary to assert the stmmac core's reset (stmmac_rst).
+> 
+> So, maybe the driver can leave the handling of plat_dat->stmmac_ahb_rst
+> to the stmmac core code?
+> 
 
-For example, bridge and netfilter validate that an IPv6 packet either
-has a non-zero payload_len that fits into the SKB, or it has a zero
-payload_len and an HBH Jumbo header with a length that fits into the
-SKB, or it's a new-style BIG TCP packet with a zero payload_len, hence
-the checks for GRO/GSO in ipv6_payload_len(): we make sure that it
-didn't come with payload_len = 0 from the wire (ipv6_gro_receive also
-checks payload_len before aggregating packets).
+Thanks for the suggestion. According to this commit[1], it seems that 
+both reset lines need to get toggled. But I'm going to run some test on 
+HW and make the appropriate changes.
 
-Note that this commit aims to reflect the same behavior that we have
-with IPv4 and iph_totlen.
+Dinh
+
+[1] 
+https://lore.kernel.org/all/20250205134428.529625725@linuxfoundation.org/
+
 
