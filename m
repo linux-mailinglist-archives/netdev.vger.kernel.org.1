@@ -1,241 +1,178 @@
-Return-Path: <netdev+bounces-249641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 590FBD1BB92
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 00:29:40 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58019D1BB74
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 00:27:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 422203049C68
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 23:26:31 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6EDBE3012665
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 23:27:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F82E36AB65;
-	Tue, 13 Jan 2026 23:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E1136B069;
+	Tue, 13 Jan 2026 23:27:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BDHagSbB"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="cz7LpQGf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE9935580E
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 23:26:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FAAA34FF59
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 23:27:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768346790; cv=none; b=aI0cIjvZlG4flF5JCK5cFpSstCfFLln6XFiP6sLCVO6bsZA660hB7CUEjzS8ve6YoWnFR4pJ8aZXUm5lkEym5oNHnipB4JjNIMho2YCjkVm+CCYcPj80nsiTxXhd/GJENvlTZbpg6LumuNZwXaTot1xhQIeV6xIIlxwI9uVhUv0=
+	t=1768346849; cv=none; b=DgLp5T5sRWSqFIwOyrq+sCcNaxhnWC9s5SUIWwcQNNDARcXiFZ4bX9BqdmK34g1jCvVy4v6E+9jsqycOk3e2IRxSXHNuU9tKTRfLl8/bX+AqKaOOZMeIeQ9DfByguKknhMhwZHDyJvCdAbkW2UiI/QU8FQaupd7uibQBDoJU/K8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768346790; c=relaxed/simple;
-	bh=3y+bk/MJ2poSwYsFVrenX8t8LScuLKE/QqLdiQeYYzQ=;
+	s=arc-20240116; t=1768346849; c=relaxed/simple;
+	bh=eSKvxq9YwVBzyMuYewlHzV06JI+v3ubEKxN2UzdrhAk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pO2y5ZR8P3NRlIBTf50jBxksaWwOr5tgeDr7TspIdlxiFAId+YVYnvobaLfO9CJnB0L5OiC0vB66sr0vwdFE9IjDhI3iibRS0D+XtRJym0L2eL8z5ZxLIrMQz1PKNoTAtaxAui5pb1a8oorHog0dyaAym7sLBhfO07p9OFPA7VM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BDHagSbB; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-34cf1e31f85so4763777a91.1
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 15:26:29 -0800 (PST)
+	 To:Cc:Content-Type; b=FIbdfsZsjUPECY/dLWM1GJrpPkXdmWAOwx/y31ynB0CYoQ/JFXleqvGFwDLRoSQN0eYCL6uTy6jBHZvA095VJN3fOpsWtJqXG7Zwn7UWGotLcQ1Yj9ILjqQTGp/hD5scVq3DE72HjoqlzUs2IOOFXTblRQkrw2f7zNMoehgz4fE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=cz7LpQGf; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-34c2f335681so4722414a91.1
+        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 15:27:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768346788; x=1768951588; darn=vger.kernel.org;
+        d=paul-moore.com; s=google; t=1768346847; x=1768951647; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Qk8oA44ICG5vF7hOIh71S9DCMNMJEV8Knkk8c5MK7oM=;
-        b=BDHagSbBxApMmxT+gdwbrzdf29fHeXXGthMFxFtspMTtwuUJJmpgzPu1RErOXxkPgs
-         pWYQVande4Wu9it5hL+fi49k6PtAqA1AnCvI7f10d0FKbMtY5GOSzczMZHbeplUBma6D
-         vxFEQpqO5i5L9Yc2+xbW6WEgtiZb1goUI9EixuO9J9v5EUqxUJCgRPfdEw7Wvs0H5dc4
-         tBtkwFJtg/I7kmz3w7tPYRj2V/9R8pbIcdjcWS2Oktv8dnfSK6vNx0PSfuC1EPlJZLAI
-         laY2sgflB0V6l8j8S7O411JEJwRlLoE6+vZMOr7IjfQTrUl3YGZn31knVwcwnWjPTPdz
-         /L8g==
+        bh=myIopHE8OLjLfSfgj5xRK52HoztIhbA+miJiAcmBvWQ=;
+        b=cz7LpQGfuOmJ1Y66NOVYcrK1WRxvDD9ajc9Fl7lq/dg9TJbjXqOfolAdlT+Qjy4BtE
+         dcnHaezi1WNKhrYZCHOhgxPCIQeGk6DBCw1ivOnTBpWVFazDH9kkiBAAQWwnEpdL0Yij
+         sHZgg8OQZm4/6HpAez5YqNjhdn8O1S9ZlMvnuB63LEg8IRkGAqTIxAdFnWEXOSsHnlTY
+         lgBAKdQuX0YWl/+OghPMnan1WtNwBaUJ4ZrJ2oBqmtH0uGZdhUX6kmG2pntgX97VMBZ5
+         CgOLVsJwvkpmq9AvrNxoRBDNMaYEZdNAOsLTTNq9Cwx6LnzTwO7X4+cpyldDVhhsfk3Z
+         3GqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768346788; x=1768951588;
+        d=1e100.net; s=20230601; t=1768346847; x=1768951647;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Qk8oA44ICG5vF7hOIh71S9DCMNMJEV8Knkk8c5MK7oM=;
-        b=rqwovXpc+EKNcQWDE04xfomiIMuyahe9ffJCFraOI9wgMy26A6XtPS2GGn/aiUgji5
-         rVGxs9d+Ds5LcqrrhYZbSkztbKwZXfP/EW/msYo6ejV7ajDYxGox1IsBUVI8psXrKk2m
-         PA+lT0jXn7D3rn8kxodU6jiLYVjynbm79xD7bd0Gf9kyEhAAJTysk8iqdPnjTFf5Vvcz
-         E6kuyMG7NkJYQPcpzhC7XrIVPiVmz7pfXfdTSAW+KEaLb8AqCxGhlru9p2HbvY/BTHLA
-         grNRNCM/hzNRC1XHcow6ckAYFDq7IIV0wcxhpEN2a6/ljS6XfnVu/KP8Fif7rqVOPFAC
-         Qykg==
-X-Forwarded-Encrypted: i=1; AJvYcCUAcmDey80UxC8/ex3qF/b5c5xlIALhZwa0Sv1UDy8mG77JskQz2LlDqi6XOYGSXUPBvO4z6zc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yylg8zHGHxMns6d402+xhuuIJyUpYU4vRa1PIF5jKZ0/htydmSm
-	W1R5Z8yz7I1FmU4BF+o5cfJD0VcgrLbWhaKv46wXEhRZHDXvQ9YKG5g2Z/qSY2+lkIEXaxQbD79
-	m58UPh3LaX7vR1UoWPoj0n0rgV+XGl8k=
-X-Gm-Gg: AY/fxX7R9XYQg5g4gQR9L+nlyEcWt5//S8YAvTH0/yAGGIXcVe8iiIpT0RpNnMs329+
-	QQa19cHFftOL3e0syhuToMrl58f/lDTj/R2w7ev8IGy4CXGa25cPs3vazlIouI1ys3pBOxYNZhs
-	JIa29AyVEqM/36Ysnp1NDTTh4VfugBHF/YVhxtlzVy44RhhRCx1LqaUpz/c9RWRif6oqU/l5hU/
-	8TJZNLa76/hpGnKOJqG4wca+tHrdbGX81tUyzoB32KgRi/NoGmCA/gyvuSei4kOW8cJkeylX43r
-	UE6/+Cd/Pvo=
-X-Received: by 2002:a17:90b:134f:b0:34c:3cbc:db8e with SMTP id
- 98e67ed59e1d1-35109131d4cmr585428a91.25.1768346788364; Tue, 13 Jan 2026
- 15:26:28 -0800 (PST)
+        bh=myIopHE8OLjLfSfgj5xRK52HoztIhbA+miJiAcmBvWQ=;
+        b=FTyKuZ/Q58igbLSNNsOSOFeod9OD8tqqfSbSPbf+CZvVci01URB0cfSImrHHjAMX3v
+         0lrT1p+L+5UJxZxt9BLDEyrx2RtE2l6Z16AODQhI8agZpoj4g52nnpPKiVPTNpZ7xsBG
+         cKBtU1xD+Sk2NoZDE2bbFjeYqURjLS1JKyPtalqPYqCSvTQaB09NAyqLbEmNcaz//IuA
+         hxtkMQCQkngYEWReoMobf3c9kfgDn5PrlRtcJOI+fSbxyHYpbTOJ916RKkH9Dcfcoey/
+         21FDyDjsn/pV1eljt/QpcGrkTZ4ZWniUtUBTeD/BUrLL2TXyTOzpkFszfn2sv7wQyEE+
+         7YRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUToaOburliGHpSS/8wVq/EI198rDg4BrJYfoZJxCsRcRfkwAMHhRBuVQsi7n5kSmxnMrBooh8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzWBBphkSFozxxwrs4W5E8+F6yftow2T8ZRj7uppIfAbZxvjd/
+	Y4b1oKpvPqH9zO8cKohsq4aXrMH2HIBAaldXcgRnnnNcq0TA0cT/iqHzrbJ8WCpB8E1kultoc6M
+	xJoAC36k4OzQ2dNKy+4sCf3e7mJ1E7Ksj4NhaFbNH
+X-Gm-Gg: AY/fxX4MIsF8WYOK5GKWFEHzQiFQsoNWCsKUgXEFzu+pV4yGght6D32ftlH7/VCNTSv
+	haS2zY5V1VyxJgkqKJFy2bQFL3miqPRd9QyaIRjOnuZI1EGRAbR5c3vwtG2xGLkkBpcOXtYZ2Jk
+	zCT/jdQntAPyNmuFY17qsYy/203eNI4RFWG0tvjlzeiTIEJtwyJNknfrzWnTYm5SdjNF+eRE5UV
+	HQBYOxQ/vjPJjTwGOv+cS/PbGcc4BEv4+ssa3yAognBuYXLprZuOcoFWyj3TRI/MH7/7PU=
+X-Received: by 2002:a17:90b:5808:b0:34f:454f:69a9 with SMTP id
+ 98e67ed59e1d1-35109176388mr565981a91.28.1768346847514; Tue, 13 Jan 2026
+ 15:27:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20200818223921.2911963-1-andriin@fb.com> <20200818223921.2911963-4-andriin@fb.com>
- <2249675.irdbgypaU6@7940hx>
-In-Reply-To: <2249675.irdbgypaU6@7940hx>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Tue, 13 Jan 2026 15:26:16 -0800
-X-Gm-Features: AZwV_QgxH4FXvpvlBSjSBp25Kg_vI2UVSYICc-R2vbjGt5ITBE9M2KmYnV9d5ZY
-Message-ID: <CAEf4Bzb04C97K=S1av_6EKG3jKHoG+mKwaxVw3cCnNsbyiDzmw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 3/9] libbpf: improve relocation ambiguity detection
-To: Menglong Dong <menglong.dong@linux.dev>
-Cc: Andrii Nakryiko <andriin@fb.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, ast@fb.com, 
-	daniel@iogearbox.net, kernel-team@fb.com
+References: <20260110143300.71048-2-gnoack3000@gmail.com> <20260110143300.71048-4-gnoack3000@gmail.com>
+ <20260113-kerngesund-etage-86de4a21da24@brauner>
+In-Reply-To: <20260113-kerngesund-etage-86de4a21da24@brauner>
+From: Paul Moore <paul@paul-moore.com>
+Date: Tue, 13 Jan 2026 18:27:15 -0500
+X-Gm-Features: AZwV_Qh90nIBcXw1OpIJ0y4At6w-yMoPWBag3gRCXMZrMzEXPFso5KKQHG1ZKIY
+Message-ID: <CAHC9VhQOQ096WEZPLo4-57cYkM8c38qzE-F8L3f_cSSB4WadGg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/5] lsm: Add hook unix_path_connect
+To: Christian Brauner <brauner@kernel.org>
+Cc: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack3000@gmail.com>, 
+	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	James Morris <jmorris@namei.org>, "Serge E . Hallyn" <serge@hallyn.com>, 
+	Justin Suess <utilityemal77@gmail.com>, linux-security-module@vger.kernel.org, 
+	Tingmao Wang <m@maowtm.org>, Samasth Norway Ananda <samasth.norway.ananda@oracle.com>, 
+	Matthieu Buffet <matthieu@buffet.re>, Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, 
+	konstantin.meskhidze@huawei.com, Demi Marie Obenour <demiobenour@gmail.com>, 
+	Alyssa Ross <hi@alyssa.is>, Jann Horn <jannh@google.com>, Tahera Fahimi <fahimitahera@gmail.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	Alexander Viro <viro@zeniv.linux.org.uk>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 12, 2026 at 11:36=E2=80=AFPM Menglong Dong <menglong.dong@linux=
-.dev> wrote:
->
-> On 2020/8/19 06:39 Andrii Nakryiko <andriin@fb.com> write:
-> > Split the instruction patching logic into relocation value calculation =
-and
-> > application of relocation to instruction. Using this, evaluate relocati=
-on
-> > against each matching candidate and validate that all candidates agree =
-on
-> > relocated value. If not, report ambiguity and fail load.
+On Tue, Jan 13, 2026 at 4:34=E2=80=AFAM Christian Brauner <brauner@kernel.o=
+rg> wrote:
+> On Sat, Jan 10, 2026 at 03:32:57PM +0100, G=C3=BCnther Noack wrote:
+> > From: Justin Suess <utilityemal77@gmail.com>
 > >
-> > This logic is necessary to avoid dangerous (however unlikely) accidenta=
-l match
-> > against two incompatible candidate types. Without this change, libbpf w=
-ill
-> > pick a random type as *the* candidate and apply potentially invalid
-> > relocation.
+> > Adds an LSM hook unix_path_connect.
 > >
-> > Signed-off-by: Andrii Nakryiko <andriin@fb.com>
+> > This hook is called to check the path of a named unix socket before a
+> > connection is initiated.
+> >
+> > Cc: G=C3=BCnther Noack <gnoack3000@gmail.com>
+> > Signed-off-by: Justin Suess <utilityemal77@gmail.com>
 > > ---
-> >  tools/lib/bpf/libbpf.c | 170 ++++++++++++++++++++++++++++++-----------
-> >  1 file changed, 124 insertions(+), 46 deletions(-)
-> >
-> > diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
-> > index 2047e4ed0076..1ba458140f50 100644
-> > --- a/tools/lib/bpf/libbpf.c
-> [......]
-> > @@ -5005,16 +5063,31 @@ static int bpf_core_reloc_field(struct bpf_prog=
-ram *prog,
-> >               if (err =3D=3D 0)
-> >                       continue;
-> >
-> > +             err =3D bpf_core_calc_relo(prog, relo, relo_idx, &local_s=
-pec, &cand_spec, &cand_res);
-> > +             if (err)
-> > +                     return err;
-> > +
-> >               if (j =3D=3D 0) {
-> > +                     targ_res =3D cand_res;
-> >                       targ_spec =3D cand_spec;
-> >               } else if (cand_spec.bit_offset !=3D targ_spec.bit_offset=
-) {
-> > -                     /* if there are many candidates, they should all
-> > -                      * resolve to the same bit offset
-> > +                     /* if there are many field relo candidates, they
-> > +                      * should all resolve to the same bit offset
-> >                        */
-> > -                     pr_warn("prog '%s': relo #%d: offset ambiguity: %=
-u !=3D %u\n",
-> > +                     pr_warn("prog '%s': relo #%d: field offset ambigu=
-ity: %u !=3D %u\n",
-> >                               prog_name, relo_idx, cand_spec.bit_offset=
-,
-> >                               targ_spec.bit_offset);
-> >                       return -EINVAL;
-> > +             } else if (cand_res.poison !=3D targ_res.poison || cand_r=
-es.new_val !=3D targ_res.new_val) {
-> > +                     /* all candidates should result in the same reloc=
-ation
-> > +                      * decision and value, otherwise it's dangerous t=
-o
-> > +                      * proceed due to ambiguity
-> > +                      */
-> > +                     pr_warn("prog '%s': relo #%d: relocation decision=
- ambiguity: %s %u !=3D %s %u\n",
-> > +                             prog_name, relo_idx,
-> > +                             cand_res.poison ? "failure" : "success", =
-cand_res.new_val,
-> > +                             targ_res.poison ? "failure" : "success", =
-targ_res.new_val);
-> > +                     return -EINVAL;
-> >               }
->
-> Hi, Andrii. This approach is not friend to bpf_core_cast() if the struct
-> is not used in the vmlinux, but the kernel modules.
->
-> Take "struct nft_chain" for example. Following code will fail:
->     struct nft_chain *chain =3D bpf_core_cast(ptr, struct nft_chain).
->
-> The bpf_core_cast() will record a BPF_CORE_TYPE_ID_TARGET relocation
-> for "struct nft_chain". The libbpf will find multi btf type of nft_chain
-> in the modules nf_tables, nft_reject, etc, and it will fail the verificat=
-ion
-> due to the "new_val", which is btf type id, not the same, even if all
-> the "struct nft_chain" are exactly the same in different kernel modules.
->
-> I think this is a common case. So how about we check the consistence of
-> struct nft_chain in all the candidate list, and use the first one if all =
-of
-> them have exactly the same definition?
+> >  include/linux/lsm_hook_defs.h |  4 ++++
+> >  include/linux/security.h      | 11 +++++++++++
+> >  net/unix/af_unix.c            |  9 +++++++++
+> >  security/security.c           | 20 ++++++++++++++++++++
+> >  4 files changed, 44 insertions(+)
 
-BTF type ID for some type in some kernel is not meaningful without
-also capturing module's BTF ID or FD, so we'd be just capturing some
-relatively random and meaningless type ID.
+...
 
-I'm actually not sure bpf_core_cast() can work with BTF types defined
-in module's BTF. Can you please check what we do if we have
-non-ambiguous BTF type defined only in module's BTF?
+> > diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> > index 55cdebfa0da0..3aabe2d489ae 100644
+> > --- a/net/unix/af_unix.c
+> > +++ b/net/unix/af_unix.c
+> > @@ -1226,6 +1226,15 @@ static struct sock *unix_find_bsd(struct sockadd=
+r_un *sunaddr, int addr_len,
+> >       if (!S_ISSOCK(inode->i_mode))
+> >               goto path_put;
+> >
+> > +     /*
+> > +      * We call the hook because we know that the inode is a socket
+> > +      * and we hold a valid reference to it via the path.
+> > +      */
+> > +     err =3D security_unix_path_connect(&path, type, flags);
+> > +     if (err)
+> > +             goto path_put;
+>
+> Couldn't we try reflowing the code here so the path is passed ...
 
->
-> We can check all the members in the struct iteratively, and make
-> sure they are all the same.
->
+It would be good if you could be a bit more specific about your
+desires here.  Are you talking about changing the
+unix_find_other()/unix_find_bsd() code path such that the path is
+available to unix_find_other() callers and not limited to the
+unix_find_bsd() scope?
 
-It's not even clear what "same" would mean here, btw. None of the
-issues you bring up are easy to solve :)
+> ... to
+> security_unix_stream_connect() and security_unix_may_send() so that all
+> LSMs get the same data and we don't have to have different LSMs hooks
+> into different callpaths that effectively do the same thing.
+>
+> I mean the objects are even in two completely different states between
+> those hooks. Even what type of sockets get a call to the LSM is
+> different between those two hooks.
 
-> Thanks!
-> Menglong Dong
->
-> >
-> >               cand_ids->data[j++] =3D cand_spec.spec[0].type_id;
-> > @@ -5042,13 +5115,18 @@ static int bpf_core_reloc_field(struct bpf_prog=
-ram *prog,
-> >        * verifier. If it was an error, then verifier will complain and =
-point
-> >        * to a specific instruction number in its log.
-> >        */
-> > -     if (j =3D=3D 0)
-> > +     if (j =3D=3D 0) {
-> >               pr_debug("prog '%s': relo #%d: no matching targets found\=
-n",
-> >                        prog_name, relo_idx);
-> >
-> > -     /* bpf_core_reloc_insn should know how to handle missing targ_spe=
-c */
-> > -     err =3D bpf_core_reloc_insn(prog, relo, relo_idx, &local_spec,
-> > -                               j ? &targ_spec : NULL);
-> > +             /* calculate single target relo result explicitly */
-> > +             err =3D bpf_core_calc_relo(prog, relo, relo_idx, &local_s=
-pec, NULL, &targ_res);
-> > +             if (err)
-> > +                     return err;
-> > +     }
-> > +
-> > +     /* bpf_core_patch_insn() should know how to handle missing targ_s=
-pec */
-> > +     err =3D bpf_core_patch_insn(prog, relo, relo_idx, &targ_res);
-> >       if (err) {
-> >               pr_warn("prog '%s': relo #%d: failed to patch insn at off=
-set %d: %d\n",
-> >                       prog_name, relo_idx, relo->insn_off, err);
-> > --
-> > 2.24.1
-> >
-> >
->
->
->
->
+I'm working on the assumption that you are talking about changing the
+UNIX socket code so that the path info is available to the existing
+_may_send() and _stream_connect() hooks.  If that isn't the case, and
+you're thinking of something different, disregard my comments below.
+
+In both the unix_dgram_{connect(),sendmsg()}, aka
+security_unix_may_send(), cases and the unix_stream_connect(), aka
+security_unix_stream_connect(), case the call to unix_find_other() is
+done to lookup the other end of the communication channel, which does
+seem reasonably consistent to me.  Yes, of course, once you start
+getting into the specifics of the UNIX socket handling the unix_dgram_
+and unix_stream_ cases are very different, including their
+corresponding existing LSM hooks, but that doesn't mean in the context
+of unix_find_bsd() that security_unix_path_connect() doesn't have
+value.
+
+The alternative would be some rather serious surgery in af_unix.c to
+persist the path struct from unix_find_bsd() until the later LSM hooks
+are executed.  It's certainly not impossible, but I'm not sure it is
+necessary or desirable at this point in time.  LSMs that wish to
+connect the information from _unix_path_connect() to either
+_unix_stream_connect() or _unix_may_send() can do so today without
+needing to substantially change af_unix.c.
+
+--=20
+paul-moore.com
 
