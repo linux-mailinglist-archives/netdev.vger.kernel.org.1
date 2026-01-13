@@ -1,354 +1,369 @@
-Return-Path: <netdev+bounces-249522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57491D1A6D4
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 17:54:33 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4C40D1A689
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 17:51:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 557B23013387
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 16:50:18 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1EC98300F052
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 16:50:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1627734DB48;
-	Tue, 13 Jan 2026 16:50:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F12C34DB6D;
+	Tue, 13 Jan 2026 16:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZTKsGJqB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EPDsUKYM";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="VBDAb6xN"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE4434DB59
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 16:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B059734DCD2
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 16:50:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768323017; cv=none; b=Xtm3txW7124fqvx64rLA++YXuSyJVnAllwRr+6iaaDJqHI3ipwEbT7bwaEyyV76/vTtJH+XnTibQSgLI4mNetbk5W9Hyv7n//3iePn5F/fQsyXmMhtau1ZY7MTpM5nRQnh1X0Nns3sX91yBfmlGXvlKe8oEciwX1JmlrHlvDsTQ=
+	t=1768323053; cv=none; b=RvQ5Yg6MZ7B1G257Eyd+OL7rjkOrZqhyxCr//czPnJ/ZgrC8u2D63XWSUyd2yOdqF5Ws+cynyNusUzwYY0dmKLynmOsVkx+0IvPICEPDh6YU3zKrvicvCTsauQfMnH7e8VRtupS5rwLFtVIKbi6npFskFfdzj1wr/c9gQhdvVb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768323017; c=relaxed/simple;
-	bh=JM/jRfpSojIyOTap2qBhhOUT/PIsFaVuwfayYSdLV4E=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=anj7kvqqVHUE5QRz+jSKExGdaB3JEb6WFF8Z0I7JheH72VTseEzMROGtfXo34f0dqHWu2isecT4+Q6qTZ/Lp2nHRjWSBiFyJPTQUs8Ub1u1x8D1kEsvr58JUkk7w3ZhOXVW3epx9wLIRvfODO1dTA09gPGlCeMzAYNtqgH0Z+og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZTKsGJqB; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1768323053; c=relaxed/simple;
+	bh=l/MzUKV5vBhOjr5ZED+tJpwan1YXWA9mauHZNOyldN8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jCvRMOQ3fblngRQ/v0AP62UrkCLuV/Svg6146RoYtRkwXglsciFUxeMO68HGt/rHlZrQQru+grKSOTHXolZtnzSX0WwVGupM/TCD+AYhxi0Mu7o2MAKHbwgaJEszRbTcjdGm5DDhYAVCHiEvMD9zonwQpYuJkvfw6wd9UaOA2Bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EPDsUKYM; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=VBDAb6xN; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768323015;
+	s=mimecast20190719; t=1768323049;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=TF6Fx/gHurHr6/2KxpxLTuyD2i0KFuT/OKY4sLDOqE4=;
-	b=ZTKsGJqBTeVho1BnxVSawVp4OUkEn0cZAoBbg0gE8CU40cgHA3b7BxgBNNed1Tv+50YAhW
-	ExX80m9aCY8bkW7Xw7xwKX8Fzjw6ZJkDNvVnGg/PaPaE/8wnHqh/uKX/Eihh6ZfoYDa0RJ
-	jTSk70/H3T+phaZRt2Oq/UvRi6sGfFc=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-330-Y2Pcbg7ZOQCxqwu2v0Ia4A-1; Tue,
- 13 Jan 2026 11:50:11 -0500
-X-MC-Unique: Y2Pcbg7ZOQCxqwu2v0Ia4A-1
-X-Mimecast-MFC-AGG-ID: Y2Pcbg7ZOQCxqwu2v0Ia4A_1768323010
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6E4DA1956094;
-	Tue, 13 Jan 2026 16:50:09 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A204A19560B2;
-	Tue, 13 Jan 2026 16:49:55 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-cc: dhowells@redhat.com,
-    syzbot+6182afad5045e6703b3d@syzkaller.appspotmail.com,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Eric Dumazet <edumazet@google.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-    Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org,
-    stable@kernel.org, linux-kernel@kernel.org
-Subject: [PATCH] rxrpc: Fix data-race warning and potential load/store tearing
+	 in-reply-to:in-reply-to:references:references;
+	bh=DG0WRw7YxgTU3+MntFsjdanWVcUUw4Bpd9rGhDr013E=;
+	b=EPDsUKYM/iHMyQzeU3SwLfDtsJ1qv5zoEfA83mHcT1a3H2GG7h/rSHDKmvL0cQ8tzzPgqW
+	nF3Zyuzl5TALA33M7Hw8+tL71JFsqVEq2sDGbQgBGGwdVqrLeXmYK38zJQD/rwpK5+Pw7z
+	DRDpDAoEJufKchehzbgYTkMMmlMs1KI=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-679-mdy_gyHQORmyjgGB29cEAQ-1; Tue, 13 Jan 2026 11:50:48 -0500
+X-MC-Unique: mdy_gyHQORmyjgGB29cEAQ-1
+X-Mimecast-MFC-AGG-ID: mdy_gyHQORmyjgGB29cEAQ_1768323047
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-477cf25ceccso68168735e9.0
+        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 08:50:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1768323047; x=1768927847; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DG0WRw7YxgTU3+MntFsjdanWVcUUw4Bpd9rGhDr013E=;
+        b=VBDAb6xNI58zdYmTI6oRUjQtylcczFbmLkUlF6la5VPMIDA+aYzveCUe2FHTYaZupU
+         KPxXOepYzi3KHEAdUFiI20ol+rprv2Av2YZNHdDb5JmxWQGGmsRSLJN1fjCa62xsxB7V
+         efWldlZ0/Cayp3bpYradXrr/rWRJoZyLEClXmqP38iw4C1Qc/tZb9nr67regoc0Ff3m/
+         kgkpkr+zIRnfbfuLJ+LUmLtG6Bp95vVfRqJpfiyTMmFDCGLzFjRGaE0kGA+Bo/MyOGjy
+         TKf79NkD7NNobtE0k72kI1JBXW9iUEYnK5nxjtjp68JkUgO2O7V9yRL7XlD6eeEefTa+
+         Y4ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768323047; x=1768927847;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DG0WRw7YxgTU3+MntFsjdanWVcUUw4Bpd9rGhDr013E=;
+        b=MTFDGqu52dhpw5bPOKcz6xxyCDkGfHbbP114xU4db6ey12H3Edk7PEl0mWNLI/sKbV
+         4SORag54XOjrwVJ9Id3rcuT73DtueqM3CDGyi+fMg0C9XJ5J0qSHxyjHvD6rvRWswMu9
+         f+HAV9ygP3XOtW5wHq4b2N3+bCbByaaTzcIuNRb9RdyMIQvEO0Qz7QSIRPY1uShJU96/
+         jb4FU/QIMHRICGDpRFLYC3JaAQtu3ZeKj/gVO+IsKVRfXMtXoRywSLERytdraW3KpC6w
+         3N/7+qtzdvbm3QhKMggMpa4xOWdnHb8UTzPaAS+2d//kQLdfo7wIK4Fecl/Ub3GILgCX
+         7JMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUw43hBHHdvU4rKzUMZxtDokiiNcx13GaOf7CiZTAJoKffSLg4wiBcySbjsku7pIGfTsJhr+Rc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx99BKfPBx5iUR5CufbL9qUACTbWOG0rN/ZLot+ZW+FkkdCvwwB
+	WDG46MEaCLF6UAuXRbmc8DqzUtRuovjXpv7ndrzOE7njONRjstuy4HwMXwdiE4vdpJlGLRfiuUh
+	ikLnKJQhYmihBsNUy/aQE0B5FJ3UzR1SdiPffdcAFKTVHbQ4apZMfWtXo4w==
+X-Gm-Gg: AY/fxX6dmlIZutPMySm+BrmlJs+nENqIpgdlhktLUbykZiT4+/gZmSqfZLuORMdoCPz
+	DkL7QGoRRlF4vyIESySaQcOLGaamQRo1TBYBtE1/2Iz7F4SBxWnn/gSEXsuHcWEoHxz+41lzUSr
+	8WMALLVYKCwwzTwloAGPmo9wZUoq8jbnjTugwT+s3j4IwPzeBdSVCp0qbi3CtOnLpodIX/Yq4DF
+	FAbfMGYIGRh54z7g8/id55gcCjgfy3tVJWr1q0ecrLIzgKHxe8gz61BS89hIwjFVjMQnnJ8Hqav
+	TwwlX0jEVrVYzmKt7vB8i3Ld4raGZJsyGEA9rltunsqU9HzDB51ESW3Kqx48S1DVWfDSi/vPvjk
+	3F+qClXOaKaGi0Luxcl1gXeTo1YBi7n5gnq7iwYv1XkMHkx8ksKXHv9rLuYf98Q==
+X-Received: by 2002:a05:600c:4692:b0:47d:3ead:7439 with SMTP id 5b1f17b1804b1-47d84b5403dmr248980035e9.37.1768323047192;
+        Tue, 13 Jan 2026 08:50:47 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHlubu09xauLTgM5vIaUwncOAsAxE5DLD0jbAoR78s6Ju0YY/wLL6jLo1N3GDIcOu7AsHYzxQ==
+X-Received: by 2002:a05:600c:4692:b0:47d:3ead:7439 with SMTP id 5b1f17b1804b1-47d84b5403dmr248979725e9.37.1768323046648;
+        Tue, 13 Jan 2026 08:50:46 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-25-233.business.telecomitalia.it. [87.12.25.233])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47ee134a057sm7988835e9.14.2026.01.13.08.50.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Jan 2026 08:50:46 -0800 (PST)
+Date: Tue, 13 Jan 2026 17:50:35 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, Long Li <longli@microsoft.com>, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	berrange@redhat.com, Sargun Dhillon <sargun@sargun.me>, 
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v14 09/12] selftests/vsock: add tests for proc
+ sys vsock ns_mode
+Message-ID: <aWZ3xxGbK0Ccldv9@sgarzare-redhat>
+References: <20260112-vsock-vmtest-v14-0-a5c332db3e2b@meta.com>
+ <20260112-vsock-vmtest-v14-9-a5c332db3e2b@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3535583.1768322992.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 13 Jan 2026 16:49:52 +0000
-Message-ID: <3535584.1768322992@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20260112-vsock-vmtest-v14-9-a5c332db3e2b@meta.com>
 
-    =
+On Mon, Jan 12, 2026 at 07:11:18PM -0800, Bobby Eshleman wrote:
+>From: Bobby Eshleman <bobbyeshleman@meta.com>
+>
+>Add tests for the /proc/sys/net/vsock/{ns_mode,child_ns_mode}
+>interfaces. Namely, that they accept/report "global" and "local" strings
+>and enforce their access policies.
+>
+>Start a convention of commenting the test name over the test
+>description. Add test name comments over test descriptions that existed
+>before this convention.
+>
+>Add a check_netns() function that checks if the test requires namespaces
+>and if the current kernel supports namespaces. Skip tests that require
+>namespaces if the system does not have namespace support.
+>
+>This patch is the first to add tests that do *not* re-use the same
+>shared VM. For that reason, it adds a run_ns_tests() function to run
+>these tests and filter out the shared VM tests.
+>
+>Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+>---
+>Changes in v13:
+>- remove write-once test ns_host_vsock_ns_mode_write_once_ok to reflect
+>  removing the write-once policy
+>- add child_ns_mode test test_ns_host_vsock_child_ns_mode_ok
+>- modify test_ns_host_vsock_ns_mode_ok() to check that the correct mode
+>  was inherited from child_ns_mode
+>
+>Changes in v12:
+>- remove ns_vm_local_mode_rejected test, due to dropping that constraint
+>
+>Changes in v11:
+>- Document ns_ prefix above TEST_NAMES (Stefano)
+>
+>Changes in v10:
+>- Remove extraneous add_namespaces/del_namespaces calls.
+>- Rename run_tests() to run_ns_tests() since it is designed to only
+>  run ns tests.
+>
+>Changes in v9:
+>- add test ns_vm_local_mode_rejected to check that guests cannot use
+>  local mode
+>---
+> tools/testing/selftests/vsock/vmtest.sh | 140 +++++++++++++++++++++++++++++++-
+> 1 file changed, 138 insertions(+), 2 deletions(-)
 
-Fix the following:
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-        BUG: KCSAN: data-race in rxrpc_peer_keepalive_worker / rxrpc_send_=
-data_packet
-
-which is reporting an issue with the reads and writes to ->last_tx_at in:
-
-        conn->peer->last_tx_at =3D ktime_get_seconds();
-
-and:
-
-        keepalive_at =3D peer->last_tx_at + RXRPC_KEEPALIVE_TIME;
-
-The lockless accesses to these to values aren't actually a problem as the
-read only needs an approximate time of last transmission for the purposes
-of deciding whether or not the transmission of a keepalive packet is
-warranted yet.
-
-Also, as ->last_tx_at is a 64-bit value, tearing can occur on a 32-bit
-arch.
-
-Fix both of these by switching to an unsigned int for ->last_tx_at and onl=
-y
-storing the LSW of the time64_t.  It can then be reconstructed at need
-provided no more than 68 years has elapsed since the last transmission.
-
-Reported-by: syzbot+6182afad5045e6703b3d@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/r/695e7cfb.050a0220.1c677c.036b.GAE@google=
-.com/
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: Eric Dumazet <edumazet@google.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Simon Horman <horms@kernel.org>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
-cc: stable@kernel.org
----
- net/rxrpc/ar-internal.h |    9 ++++++++-
- net/rxrpc/conn_event.c  |    2 +-
- net/rxrpc/output.c      |   14 +++++++-------
- net/rxrpc/peer_event.c  |   17 ++++++++++++++++-
- net/rxrpc/proc.c        |    2 +-
- net/rxrpc/rxgk.c        |    2 +-
- net/rxrpc/rxkad.c       |    2 +-
- 7 files changed, 35 insertions(+), 13 deletions(-)
-
-diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
-index 5b7342d43486..36d6ca0d1089 100644
---- a/net/rxrpc/ar-internal.h
-+++ b/net/rxrpc/ar-internal.h
-@@ -387,7 +387,7 @@ struct rxrpc_peer {
- 	struct rb_root		service_conns;	/* Service connections */
- 	struct list_head	keepalive_link;	/* Link in net->peer_keepalive[] */
- 	unsigned long		app_data;	/* Application data (e.g. afs_server) */
--	time64_t		last_tx_at;	/* Last time packet sent here */
-+	unsigned int		last_tx_at;	/* Last time packet sent here (time64_t LSW) *=
-/
- 	seqlock_t		service_conn_lock;
- 	spinlock_t		lock;		/* access lock */
- 	int			debug_id;	/* debug ID for printks */
-@@ -1379,6 +1379,13 @@ void rxrpc_peer_keepalive_worker(struct work_struct=
- *);
- void rxrpc_input_probe_for_pmtud(struct rxrpc_connection *conn, rxrpc_ser=
-ial_t acked_serial,
- 				 bool sendmsg_fail);
- =
-
-+/* Update the last transmission time on a peer for keepalive purposes. */
-+static inline void rxrpc_peer_mark_tx(struct rxrpc_peer *peer)
-+{
-+	/* To avoid tearing on 32-bit systems, we only keep the LSW. */
-+	WRITE_ONCE(peer->last_tx_at, ktime_get_seconds());
-+}
-+
- /*
-  * peer_object.c
-  */
-diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
-index 232b6986da83..98ad9b51ca2c 100644
---- a/net/rxrpc/conn_event.c
-+++ b/net/rxrpc/conn_event.c
-@@ -194,7 +194,7 @@ void rxrpc_conn_retransmit_call(struct rxrpc_connectio=
-n *conn,
- 	}
- =
-
- 	ret =3D kernel_sendmsg(conn->local->socket, &msg, iov, ioc, len);
--	conn->peer->last_tx_at =3D ktime_get_seconds();
-+	rxrpc_peer_mark_tx(conn->peer);
- 	if (ret < 0)
- 		trace_rxrpc_tx_fail(chan->call_debug_id, serial, ret,
- 				    rxrpc_tx_point_call_final_resend);
-diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
-index 8b5903b6e481..d70db367e358 100644
---- a/net/rxrpc/output.c
-+++ b/net/rxrpc/output.c
-@@ -275,7 +275,7 @@ static void rxrpc_send_ack_packet(struct rxrpc_call *c=
-all, int nr_kv, size_t len
- 	rxrpc_local_dont_fragment(conn->local, why =3D=3D rxrpc_propose_ack_ping=
-_for_mtu_probe);
- =
-
- 	ret =3D do_udp_sendmsg(conn->local->socket, &msg, len);
--	call->peer->last_tx_at =3D ktime_get_seconds();
-+	rxrpc_peer_mark_tx(call->peer);
- 	if (ret < 0) {
- 		trace_rxrpc_tx_fail(call->debug_id, serial, ret,
- 				    rxrpc_tx_point_call_ack);
-@@ -411,7 +411,7 @@ int rxrpc_send_abort_packet(struct rxrpc_call *call)
- =
-
- 	iov_iter_kvec(&msg.msg_iter, WRITE, iov, 1, sizeof(pkt));
- 	ret =3D do_udp_sendmsg(conn->local->socket, &msg, sizeof(pkt));
--	conn->peer->last_tx_at =3D ktime_get_seconds();
-+	rxrpc_peer_mark_tx(conn->peer);
- 	if (ret < 0)
- 		trace_rxrpc_tx_fail(call->debug_id, serial, ret,
- 				    rxrpc_tx_point_call_abort);
-@@ -698,7 +698,7 @@ void rxrpc_send_data_packet(struct rxrpc_call *call, s=
-truct rxrpc_send_data_req
- 			ret =3D 0;
- 			trace_rxrpc_tx_data(call, txb->seq, txb->serial, txb->flags,
- 					    rxrpc_txdata_inject_loss);
--			conn->peer->last_tx_at =3D ktime_get_seconds();
-+			rxrpc_peer_mark_tx(conn->peer);
- 			goto done;
- 		}
- 	}
-@@ -711,7 +711,7 @@ void rxrpc_send_data_packet(struct rxrpc_call *call, s=
-truct rxrpc_send_data_req
- 	 */
- 	rxrpc_inc_stat(call->rxnet, stat_tx_data_send);
- 	ret =3D do_udp_sendmsg(conn->local->socket, &msg, len);
--	conn->peer->last_tx_at =3D ktime_get_seconds();
-+	rxrpc_peer_mark_tx(conn->peer);
- =
-
- 	if (ret =3D=3D -EMSGSIZE) {
- 		rxrpc_inc_stat(call->rxnet, stat_tx_data_send_msgsize);
-@@ -797,7 +797,7 @@ void rxrpc_send_conn_abort(struct rxrpc_connection *co=
-nn)
- =
-
- 	trace_rxrpc_tx_packet(conn->debug_id, &whdr, rxrpc_tx_point_conn_abort);
- =
-
--	conn->peer->last_tx_at =3D ktime_get_seconds();
-+	rxrpc_peer_mark_tx(conn->peer);
- }
- =
-
- /*
-@@ -917,7 +917,7 @@ void rxrpc_send_keepalive(struct rxrpc_peer *peer)
- 		trace_rxrpc_tx_packet(peer->debug_id, &whdr,
- 				      rxrpc_tx_point_version_keepalive);
- =
-
--	peer->last_tx_at =3D ktime_get_seconds();
-+	rxrpc_peer_mark_tx(peer);
- 	_leave("");
- }
- =
-
-@@ -973,7 +973,7 @@ void rxrpc_send_response(struct rxrpc_connection *conn=
-, struct sk_buff *response
- 	if (ret < 0)
- 		goto fail;
- =
-
--	conn->peer->last_tx_at =3D ktime_get_seconds();
-+	rxrpc_peer_mark_tx(conn->peer);
- 	return;
- =
-
- fail:
-diff --git a/net/rxrpc/peer_event.c b/net/rxrpc/peer_event.c
-index 7f4729234957..9d02448ac062 100644
---- a/net/rxrpc/peer_event.c
-+++ b/net/rxrpc/peer_event.c
-@@ -237,6 +237,21 @@ static void rxrpc_distribute_error(struct rxrpc_peer =
-*peer, struct sk_buff *skb,
- 	spin_unlock_irq(&peer->lock);
- }
- =
-
-+/*
-+ * Reconstruct the last transmission time.  The difference calculated sho=
-uld be
-+ * valid provided no more than ~68 years elapsed since the last transmiss=
-ion.
-+ */
-+static time64_t rxrpc_peer_get_tx_mark(const struct rxrpc_peer *peer, tim=
-e64_t base)
-+{
-+	s32 last_tx_at =3D READ_ONCE(peer->last_tx_at);
-+	s32 base_lsw =3D base;
-+	s32 diff =3D last_tx_at - base_lsw;
-+
-+	diff =3D clamp(diff, -RXRPC_KEEPALIVE_TIME, RXRPC_KEEPALIVE_TIME);
-+
-+	return diff + base;
-+}
-+
- /*
-  * Perform keep-alive pings.
-  */
-@@ -265,7 +280,7 @@ static void rxrpc_peer_keepalive_dispatch(struct rxrpc=
-_net *rxnet,
- 		spin_unlock_bh(&rxnet->peer_hash_lock);
- =
-
- 		if (use) {
--			keepalive_at =3D peer->last_tx_at + RXRPC_KEEPALIVE_TIME;
-+			keepalive_at =3D rxrpc_peer_get_tx_mark(peer, base) + RXRPC_KEEPALIVE_=
-TIME;
- 			slot =3D keepalive_at - base;
- 			_debug("%02x peer %u t=3D%d {%pISp}",
- 			       cursor, peer->debug_id, slot, &peer->srx.transport);
-diff --git a/net/rxrpc/proc.c b/net/rxrpc/proc.c
-index d803562ca0ac..8c9f9d510fe2 100644
---- a/net/rxrpc/proc.c
-+++ b/net/rxrpc/proc.c
-@@ -302,7 +302,7 @@ static int rxrpc_peer_seq_show(struct seq_file *seq, v=
-oid *v)
- 		   refcount_read(&peer->ref),
- 		   peer->cong_ssthresh,
- 		   peer->max_data,
--		   now - peer->last_tx_at,
-+		   (s32)now - (s32)peer->last_tx_at,
- 		   READ_ONCE(peer->recent_srtt_us),
- 		   READ_ONCE(peer->recent_rto_us));
- =
-
-diff --git a/net/rxrpc/rxgk.c b/net/rxrpc/rxgk.c
-index dce5a3d8a964..43cbf9efd89f 100644
---- a/net/rxrpc/rxgk.c
-+++ b/net/rxrpc/rxgk.c
-@@ -678,7 +678,7 @@ static int rxgk_issue_challenge(struct rxrpc_connectio=
-n *conn)
- =
-
- 	ret =3D do_udp_sendmsg(conn->local->socket, &msg, len);
- 	if (ret > 0)
--		conn->peer->last_tx_at =3D ktime_get_seconds();
-+		rxrpc_peer_mark_tx(conn->peer);
- 	__free_page(page);
- =
-
- 	if (ret < 0) {
-diff --git a/net/rxrpc/rxkad.c b/net/rxrpc/rxkad.c
-index 3657c0661cdc..a756855a0a62 100644
---- a/net/rxrpc/rxkad.c
-+++ b/net/rxrpc/rxkad.c
-@@ -694,7 +694,7 @@ static int rxkad_issue_challenge(struct rxrpc_connecti=
-on *conn)
- 		return -EAGAIN;
- 	}
- =
-
--	conn->peer->last_tx_at =3D ktime_get_seconds();
-+	rxrpc_peer_mark_tx(conn->peer);
- 	trace_rxrpc_tx_packet(conn->debug_id, &whdr,
- 			      rxrpc_tx_point_rxkad_challenge);
- 	_leave(" =3D 0");
+>
+>diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
+>index 0e681d4c3a15..38785a102236 100755
+>--- a/tools/testing/selftests/vsock/vmtest.sh
+>+++ b/tools/testing/selftests/vsock/vmtest.sh
+>@@ -41,14 +41,38 @@ readonly KERNEL_CMDLINE="\
+> 	virtme.ssh virtme_ssh_channel=tcp virtme_ssh_user=$USER \
+> "
+> readonly LOG=$(mktemp /tmp/vsock_vmtest_XXXX.log)
+>-readonly TEST_NAMES=(vm_server_host_client vm_client_host_server vm_loopback)
+>+
+>+# Namespace tests must use the ns_ prefix. This is checked in check_netns() and
+>+# is used to determine if a test needs namespace setup before test execution.
+>+readonly TEST_NAMES=(
+>+	vm_server_host_client
+>+	vm_client_host_server
+>+	vm_loopback
+>+	ns_host_vsock_ns_mode_ok
+>+	ns_host_vsock_child_ns_mode_ok
+>+)
+> readonly TEST_DESCS=(
+>+	# vm_server_host_client
+> 	"Run vsock_test in server mode on the VM and in client mode on the host."
+>+
+>+	# vm_client_host_server
+> 	"Run vsock_test in client mode on the VM and in server mode on the host."
+>+
+>+	# vm_loopback
+> 	"Run vsock_test using the loopback transport in the VM."
+>+
+>+	# ns_host_vsock_ns_mode_ok
+>+	"Check /proc/sys/net/vsock/ns_mode strings on the host."
+>+
+>+	# ns_host_vsock_child_ns_mode_ok
+>+	"Check /proc/sys/net/vsock/ns_mode is read-only and child_ns_mode is writable."
+> )
+>
+>-readonly USE_SHARED_VM=(vm_server_host_client vm_client_host_server vm_loopback)
+>+readonly USE_SHARED_VM=(
+>+	vm_server_host_client
+>+	vm_client_host_server
+>+	vm_loopback
+>+)
+> readonly NS_MODES=("local" "global")
+>
+> VERBOSE=0
+>@@ -196,6 +220,20 @@ check_deps() {
+> 	fi
+> }
+>
+>+check_netns() {
+>+	local tname=$1
+>+
+>+	# If the test requires NS support, check if NS support exists
+>+	# using /proc/self/ns
+>+	if [[ "${tname}" =~ ^ns_ ]] &&
+>+	   [[ ! -e /proc/self/ns ]]; then
+>+		log_host "No NS support detected for test ${tname}"
+>+		return 1
+>+	fi
+>+
+>+	return 0
+>+}
+>+
+> check_vng() {
+> 	local tested_versions
+> 	local version
+>@@ -519,6 +557,54 @@ log_guest() {
+> 	LOG_PREFIX=guest log "$@"
+> }
+>
+>+ns_get_mode() {
+>+	local ns=$1
+>+
+>+	ip netns exec "${ns}" cat /proc/sys/net/vsock/ns_mode 2>/dev/null
+>+}
+>+
+>+test_ns_host_vsock_ns_mode_ok() {
+>+	for mode in "${NS_MODES[@]}"; do
+>+		local actual
+>+
+>+		actual=$(ns_get_mode "${mode}0")
+>+		if [[ "${actual}" != "${mode}" ]]; then
+>+			log_host "expected mode ${mode}, got ${actual}"
+>+			return "${KSFT_FAIL}"
+>+		fi
+>+	done
+>+
+>+	return "${KSFT_PASS}"
+>+}
+>+
+>+test_ns_host_vsock_child_ns_mode_ok() {
+>+	local orig_mode
+>+	local rc
+>+
+>+	orig_mode=$(cat /proc/sys/net/vsock/child_ns_mode)
+>+
+>+	rc="${KSFT_PASS}"
+>+	for mode in "${NS_MODES[@]}"; do
+>+		local ns="${mode}0"
+>+
+>+		if echo "${mode}" 2>/dev/null > /proc/sys/net/vsock/ns_mode; then
+>+			log_host "ns_mode should be read-only but write succeeded"
+>+			rc="${KSFT_FAIL}"
+>+			continue
+>+		fi
+>+
+>+		if ! echo "${mode}" > /proc/sys/net/vsock/child_ns_mode; then
+>+			log_host "child_ns_mode should be writable to ${mode}"
+>+			rc="${KSFT_FAIL}"
+>+			continue
+>+		fi
+>+	done
+>+
+>+	echo "${orig_mode}" > /proc/sys/net/vsock/child_ns_mode
+>+
+>+	return "${rc}"
+>+}
+>+
+> test_vm_server_host_client() {
+> 	if ! vm_vsock_test "init_ns" "server" 2 "${TEST_GUEST_PORT}"; then
+> 		return "${KSFT_FAIL}"
+>@@ -592,6 +678,11 @@ run_shared_vm_tests() {
+> 			continue
+> 		fi
+>
+>+		if ! check_netns "${arg}"; then
+>+			check_result "${KSFT_SKIP}" "${arg}"
+>+			continue
+>+		fi
+>+
+> 		run_shared_vm_test "${arg}"
+> 		check_result "$?" "${arg}"
+> 	done
+>@@ -645,6 +736,49 @@ run_shared_vm_test() {
+> 	return "${rc}"
+> }
+>
+>+run_ns_tests() {
+>+	for arg in "${ARGS[@]}"; do
+>+		if shared_vm_test "${arg}"; then
+>+			continue
+>+		fi
+>+
+>+		if ! check_netns "${arg}"; then
+>+			check_result "${KSFT_SKIP}" "${arg}"
+>+			continue
+>+		fi
+>+
+>+		add_namespaces
+>+
+>+		name=$(echo "${arg}" | awk '{ print $1 }')
+>+		log_host "Executing test_${name}"
+>+
+>+		host_oops_before=$(dmesg 2>/dev/null | grep -c -i 'Oops')
+>+		host_warn_before=$(dmesg --level=warn 2>/dev/null | grep -c -i 'vsock')
+>+		eval test_"${name}"
+>+		rc=$?
+>+
+>+		host_oops_after=$(dmesg 2>/dev/null | grep -c -i 'Oops')
+>+		if [[ "${host_oops_after}" -gt "${host_oops_before}" ]]; then
+>+			echo "FAIL: kernel oops detected on host" | log_host
+>+			check_result "${KSFT_FAIL}" "${name}"
+>+			del_namespaces
+>+			continue
+>+		fi
+>+
+>+		host_warn_after=$(dmesg --level=warn 2>/dev/null | grep -c -i 'vsock')
+>+		if [[ "${host_warn_after}" -gt "${host_warn_before}" ]]; then
+>+			echo "FAIL: kernel warning detected on host" | log_host
+>+			check_result "${KSFT_FAIL}" "${name}"
+>+			del_namespaces
+>+			continue
+>+		fi
+>+
+>+		check_result "${rc}" "${name}"
+>+
+>+		del_namespaces
+>+	done
+>+}
+>+
+> BUILD=0
+> QEMU="qemu-system-$(uname -m)"
+>
+>@@ -690,6 +824,8 @@ if shared_vm_tests_requested "${ARGS[@]}"; then
+> 	terminate_pidfiles "${pidfile}"
+> fi
+>
+>+run_ns_tests "${ARGS[@]}"
+>+
+> echo "SUMMARY: PASS=${cnt_pass} SKIP=${cnt_skip} FAIL=${cnt_fail}"
+> echo "Log: ${LOG}"
+>
+>
+>-- 
+>2.47.3
+>
 
 
