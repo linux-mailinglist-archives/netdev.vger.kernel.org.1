@@ -1,187 +1,164 @@
-Return-Path: <netdev+bounces-249375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D472D17B08
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 10:38:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F691D17C56
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 10:51:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 276BB3010E5E
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 09:37:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2AC8A304DB58
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 09:46:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420D537FF63;
-	Tue, 13 Jan 2026 09:37:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98CD3387347;
+	Tue, 13 Jan 2026 09:46:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pi01Ba6u";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qe4f/O7u"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="DvAK00ee"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mout.web.de (mout.web.de [212.227.15.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B0E5192B75
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 09:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C133E2F1FC9;
+	Tue, 13 Jan 2026 09:46:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768297020; cv=none; b=a3rzBrTULWuqiJP8bxPPJc1R35fmHtxs9sSqIEFkYLvRc6AhudrRRLZsecrZFFZ5AXtxPrup9PvPqkYuE05I4jl5S0pcy5TYRO43+qd2AJvbRsKzZ+5WOePCrPVrzUrRuXrAu4jcwUT5MjlS5YgH1aW9hCER7asI7AS1jMcNFsQ=
+	t=1768297589; cv=none; b=cYQQ2sS1M2UoW/iyalj8yg557Jbr6hLCW5ApAxOvv0m0BmEPVowqydvEV/LAy9KVXkMans9ADzSCahUKh7WLlqMTMV2TSaCZ31iTRath55VfKemW3R1ciyk3NwN96F3U4g1Apc7WVOtXwXE/e1qxK5SCXqIboWVteMR6RoGgVLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768297020; c=relaxed/simple;
-	bh=i7jmKtKg7PeuT25Uc1BWE7cT/g0kspLdiSl6D9EotN8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DLqSh5cy4ySWUtSU4/nJ+wgXpl9Z5RrbK1E7sLvulizdo1bWTdZTSxZ8s97JzksJDsqgVkdKgEfXKJvSOK604cn/ZxkNuag+DSlsjeB2s9dEqik27e7vrcdgePeH+G9wSrjUvr1Xj+9Y7a61aoFzcnQNkus07CF0FKClq4u1oCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pi01Ba6u; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qe4f/O7u; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768297018;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pg4CF8mbdvXgdlxK3eag1qF9zBIQiZ4lLsv36mMbgWM=;
-	b=Pi01Ba6uThWnTNnUI8c1UqU1ZaIBNclqiwTbJqr318FXEcmttfMlzyX9khiVn0zHFQVUPv
-	zxlKYYZO7/A0QpD1v5DhtstFx8EhWifUc76o/HGKd1W/kmvPUveAVoo1eecvdFnuwnNznO
-	bG35TAYCm0bX6i6i1oH0iJzrJvekuAk=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-351-OVlg_PyJNFu4iPb6bvmE2A-1; Tue, 13 Jan 2026 04:36:56 -0500
-X-MC-Unique: OVlg_PyJNFu4iPb6bvmE2A-1
-X-Mimecast-MFC-AGG-ID: OVlg_PyJNFu4iPb6bvmE2A_1768297016
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-431026b6252so5800732f8f.1
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 01:36:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768297011; x=1768901811; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pg4CF8mbdvXgdlxK3eag1qF9zBIQiZ4lLsv36mMbgWM=;
-        b=Qe4f/O7uRm8C2wshHKoVgSo0Kl26YcWaIctRvc5+rRbcMp2yIlc8OFcugjYLKVOeq9
-         Tzj3Q5U08ZrP2R0Xxm3iRN7AqvjusR8A1Dk/XusPD9tQLfw+cAORRGSyFrMKd/oMwIhI
-         cadGQq+aELEVKZ+nopOlKUSbdvd/sEKEn72y9F729NaZWohibBmgfzB1pT7ZSuil5idq
-         dqm5ajjqHPdj7utUjFTJPk8zqS3nic+LjyBpUOSMKlCcE5BvfO6KwBQ+JX5b/Xbs7452
-         JE6MAsYjCiWwIzCVr23zrG17w190MruR0v7YSznoXTrrLz5a0XXVwrslrz56d12hcnqr
-         iE7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768297011; x=1768901811;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pg4CF8mbdvXgdlxK3eag1qF9zBIQiZ4lLsv36mMbgWM=;
-        b=kM9HhbXNBzwerdNyLU4Ftj4zqp+j4/uQFLdv/y2LTC6XL3CF8vpNI445IU2LNHNSCj
-         L1/oro/zagAEQjib8QwsDoaYHg547Fl1q0lj+tv+f6wP83jli4GYu4/4+jY6EOxzmhT0
-         lqI6GjReNct9komCPRHqb0D8xkD5Rgbqcm4UMcj8V4Hpx4DpHj2/6RaiPxnBZlSnz/JJ
-         6QlU2sbx4gjtW3VZTaSEPHXygLpr8NCn8fzEXfUbpv5FysvO7QpkUvA1z98D66zSJJou
-         BjR8Z8BSlJTuMEcY4xZr0lw9m3V6xbALv+a79BBAxzzNZYT5AgfEbPYgWhCEp73SdWvL
-         aq/g==
-X-Forwarded-Encrypted: i=1; AJvYcCXOEzEDBOpZExM0eYMoT5E6LMfxKcma0zXTq7ZKnz0fJaJYZxv7ldHjmY9icjwfnyK+tNLKigA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHGQhWCrn83Ep27zfHK6BQKmMg8I5lbH9l/rbI3HatHRQUtFUX
-	PNqb5rR3Zkkn913ubAXW7wtFo1byLGSlZVs6bCYb3hXvZph0uW059Z4PdJLZA0/t0YD8ps9IiSm
-	uwPNkpW6vhEsi/DNifAcIkp4wPI8Ue3V/m1ScRvvTryaNcq7WrcTla/EUXw==
-X-Gm-Gg: AY/fxX5y8tXnnsQoTr0DEccApTa4tiwjysYFLdkkltOqvq8q/xMd9PHNfVcy/NIg0oo
-	+D0qMe6o8aYVSC2d98VdztiPWKNUOAxzGTc2lL/E4iXSNEwAyNVlXCdvs3PZNJqDqK1jr5rAFT3
-	OB4478x/sx/1r5icb97MBDu/kpAokpTL19X8Zx4IcMFNE8/uviTlQ0MvF2hOo6oSgUhouRaV2vj
-	QelgSCjvxTwAju703+r4/kqrtCIakozyl6j+oZ54j2iwX46id/Za/rP6iNvU1w7exEQt8GDm0HW
-	bJdqk1WE/Yx7X2SnAgoMvVMVL9RDHulVdj35/CJs3JCghvo/N1gEHj4UXvzDGf555n3boIiXBDl
-	vNsntpsVPKHaVQwnBrrkoA5bCDpcLicGp9nqxVq38WIhzXJ+Wg9WcUYLBuvalBA==
-X-Received: by 2002:a05:600c:1394:b0:47d:3ffa:5f03 with SMTP id 5b1f17b1804b1-47d84b3467emr250088665e9.21.1768297011479;
-        Tue, 13 Jan 2026 01:36:51 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHBInHZFJ8RidwkWLMCKS42wGE9AndYw8hKlz7EsNrZzGfvzlSbcNPT7twl1koVSE4j25wDOQ==
-X-Received: by 2002:a05:600c:1394:b0:47d:3ffa:5f03 with SMTP id 5b1f17b1804b1-47d84b3467emr250088215e9.21.1768297010851;
-        Tue, 13 Jan 2026 01:36:50 -0800 (PST)
-Received: from sgarzare-redhat (host-87-12-25-233.business.telecomitalia.it. [87.12.25.233])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5fe83bsm43257713f8f.38.2026.01.13.01.36.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jan 2026 01:36:50 -0800 (PST)
-Date: Tue, 13 Jan 2026 10:36:42 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Arseniy Krasnov <avkrasnov@salutedevices.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] vsock/test: Add test for a linear and non-linear skb
- getting coalesced
-Message-ID: <aWYQRK-fRHOqQNc8@sgarzare-redhat>
-References: <20260108-vsock-recv-coalescence-v1-0-26f97bb9a99b@rbox.co>
- <20260108-vsock-recv-coalescence-v1-2-26f97bb9a99b@rbox.co>
- <aWEqjjE1vb_t35lQ@sgarzare-redhat>
- <76ca0c9f-dcda-4a53-ac1f-c5c28d1ecf44@rbox.co>
- <aWT6EH8oWpw-ADtm@sgarzare-redhat>
- <080d7ae8-e184-4af8-bd72-765bb30b63a5@rbox.co>
- <aWUk0axv-GZu7VD2@sgarzare-redhat>
- <0b15644b-9394-4734-9c0e-0a6d1355604a@rbox.co>
+	s=arc-20240116; t=1768297589; c=relaxed/simple;
+	bh=WBXEgVHWC84VgTSSlpHKNpV0StmDXPiNGP06GtDnKiA=;
+	h=Message-ID:Date:MIME-Version:Cc:References:Subject:From:To:
+	 In-Reply-To:Content-Type; b=usYsDLU3USP2cN0zf9hVMdMiT5Ezc4YJaG4enzVaZpvn12inav1DyAkJg7expSayYhNUGr/kL0Zf5JRjToZNMGP7bPGulEQwMbC8OywA1Uy+Iqad7/JzGnFds7I9KTkbXYHtPMizh4yn6cL5SEv+rn9vlIYH+ysY78dY0148Y3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=DvAK00ee; arc=none smtp.client-ip=212.227.15.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1768297580; x=1768902380; i=markus.elfring@web.de;
+	bh=Jj84gbOx4Ct7lfUmxsO/SAuHmlAz+3I/LsTKcGdmQ84=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Cc:References:
+	 Subject:From:To:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=DvAK00eeh2R5ZlEmp/5vk9qWbRMK9Jui3b17cVsLXKQzvSmlAYCaBDIMQU+hhxZW
+	 V+9ipGzqCmxtue/P6Np+DvOzUkOoiMbCoojqZ7wkQln1VZj5w3+giiBWwhTMHNTT4
+	 s6rzR2g5ed3kTG8l+mb793/kM7BmWTQZO1xUwr2wyqWq812vSJUMoIXn/P+aReIKy
+	 tcF51zapN8s0Xjn8FH8RhR8yTu11Ao5aE2P4KZJWrrZkwY5eQYNS/IwgQuCBqI1ir
+	 VDNJKW99Dv1FmOcu1F/LT/tXOxiLy2M1XueRKSEHN+I4E4rckKNOKL6hcDYT4MMmW
+	 el1dWC5RMh19b97h5Q==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.69.174]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MGxMN-1vawPI3nxz-002ebR; Tue, 13
+ Jan 2026 10:46:19 +0100
+Message-ID: <88ead962-fec5-4834-88af-c478ee2bf023@web.de>
+Date: Tue, 13 Jan 2026 10:46:10 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <0b15644b-9394-4734-9c0e-0a6d1355604a@rbox.co>
+User-Agent: Mozilla Thunderbird
+Cc: LKML <linux-kernel@vger.kernel.org>
+References: <60dc3da1f913aa9625e864ea862c23c401e7bc6e.1768207347.git.yk@y-koj.net>
+Subject: Re: [PATCH net-next 2/2] selftests: net: improve error handling in
+ passive TFO test
+Content-Language: en-GB, de-DE
+From: Markus Elfring <Markus.Elfring@web.de>
+To: Yohei Kojima <yk@y-koj.net>, linux-kselftest@vger.kernel.org,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ Simon Horman <horms@kernel.org>
+In-Reply-To: <60dc3da1f913aa9625e864ea862c23c401e7bc6e.1768207347.git.yk@y-koj.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:6nvAWxGYrxSW2G13Czqo/6AaqmVOFrdAhI4tgGI4ItTCnf/DIso
+ 8CSFHEITfvWleQN3iP9Rmd9wKd4kLMvB5A63s45EZUYMH2RPwXjn7UFBVe+ZEFd/7lWwdO0
+ b3wM/1LE+LFiz6C6Nsl2eGtEx/qpxK9agAi7UbdXfZKk95prJ3cDutKoroB/C5yvLuxUqxk
+ jWfZAAGmrrD44sdC88uZQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:mb+dNvivDfI=;bUnAjpq/sOxVl+puNm+5ZAyEIX0
+ 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
+ s4F1KK60=
 
-On Mon, Jan 12, 2026 at 10:20:50PM +0100, Michal Luczaj wrote:
->On 1/12/26 17:48, Stefano Garzarella wrote:
->>>>>>> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->>>>>>> index bbe3723babdc..21c8616100f1 100644
->>>>>>> --- a/tools/testing/vsock/vsock_test.c
->>>>>>> +++ b/tools/testing/vsock/vsock_test.c
->>>>>>> @@ -2403,6 +2403,11 @@ static struct test_case test_cases[] = {
->>>>>>> 		.run_client = test_stream_accepted_setsockopt_client,
->>>>>>> 		.run_server = test_stream_accepted_setsockopt_server,
->>>>>>> 	},
->>>>>>> +	{
->>>>>>> +		.name = "SOCK_STREAM MSG_ZEROCOPY coalescence corruption",
->>>>>>
->>>>>> This is essentially a regression test for virtio transport, so I'd add
->>>>>> virtio in the test name.
->>>>>
->>>>> Isn't virtio transport unaffected? It's about loopback transport (that
->>>>> shares common code with virtio transport).
->>>>
->>>> Why virtio transport is not affected?
->>>
->>> With the usual caveat that I may be completely missing something, aren't
->>> all virtio-transport's rx skbs linear? See virtio_vsock_alloc_linear_skb()
->>> in virtio_vsock_rx_fill().
->>>
->>
->> True, but what about drivers/vhost/vsock.c ?
->>
->> IIUC in vhost_vsock_handle_tx_kick() we call vhost_vsock_alloc_skb(),
->> that calls virtio_vsock_alloc_skb() and pass that skb to
->> virtio_transport_recv_pkt(). So, it's also affected right?
->
->virtio_vsock_alloc_skb() returns a non-linear skb only if size >
->SKB_WITH_OVERHEAD(PAGE_SIZE << PAGE_ALLOC_COSTLY_ORDER)). And that is way
->more than GOOD_COPY_LEN, so we're good.
->
->At least until someone increases GOOD_COPY_LEN and/or reduces the size
->condition for non-linear allocation. So, yeah, a bit brittle.
+> This commit improves the error handling in passive TFO test to check the
+> return value from =E2=80=A6 and  to fail if read() failed.
 
-I see, thanks for clarify. So please add all of this conclusions in the 
-patch 1 description to make it clear that only loopback is affected, so 
-no guest/host attack is possible. (not really severe CVE)
+Would any developers and system testers like to care more also for data ou=
+tput failures?
+https://elixir.bootlin.com/linux/v6.19-rc4/source/tools/testing/selftests/=
+net/tfo.c#L86-L88
+https://cwe.mitre.org/data/definitions/252.html
 
->
->> BTW in general we consider loopback as one of virtio devices since it
->> really shares with them most of the code.
->
->Fair enough, I'll add "virtio" to the test name.
-
-Thanks.
-
->
->> That said, now I'm thinking more about Fixes tag.
->> Before commit 6693731487a8 ("vsock/virtio: Allocate nonlinear SKBs for
->> handling large transmit buffers") was that a real issue?
->
->I don't really think that commit changes anything for the zerocopy case. It
->only makes some big (>GOOD_COPY_LEN) non-ZC skbs turn non-linear.
->
-
-I see.
-
-Stefano
-
+Regards,
+Markus
 
