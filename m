@@ -1,114 +1,185 @@
-Return-Path: <netdev+bounces-249475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51A58D19AE4
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 16:01:04 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF08ED19A54
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:57:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E6100303869F
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:56:41 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 67AD83002940
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:57:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E1A82D6E5A;
-	Tue, 13 Jan 2026 14:56:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCF3A2BD5B4;
+	Tue, 13 Jan 2026 14:57:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bQEy7znO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="koHONHtz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A2412D5950;
-	Tue, 13 Jan 2026 14:56:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8502882D0
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 14:57:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768316201; cv=none; b=NrfHfH1ibvsrO5s9S8WCIUL53Kat7n+xiBOMWicgXQtF/8IlyvBXrbkVVXG2zz8/5jOjJDzwtX2yu7yZvcKdGNkW1vqJTHskQwwKMJ85kOtCPpwx4KWWdTw+STVtVfEUU0kUncrIDrMSBFA9V3qO5yUkTP6yxRInFY7Cg1RHArI=
+	t=1768316240; cv=none; b=g/wA8hV6NiS1/I8Cr4D++jKlDxpzDAJQokIhpvD2wQtUPS0uCtkvAWqVIgaMC4Urx5VoSDuh6G+q8OfJCO0puqVFRWvz3AiU+3PX0CMdtjLWjwYZekvw2quBFglhFNV0Iz6Q2WVvOG8xTasUW5OP7IK7MGeAanCfZfDn5wap6hk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768316201; c=relaxed/simple;
-	bh=mddwGk9E211pqqLNC87BrcxRIxMRADenQX665fNT+nM=;
+	s=arc-20240116; t=1768316240; c=relaxed/simple;
+	bh=YWHxoLNGH2PLo0cBwASlxNC9mjTQKZKN1bkIjvL6+rs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UmJWllKxNMhA+jxOXnesHAYtuHTn5AIM9wppD/gJMdByaZrE5BFKAoijyN17Pn0+TutVOxip6FG94IS/2PKQgp0rodFcPlbgzV9tI/+f9GL6JGV8Nzldx7vRWnpm+r4wdhfKH/cbzI8klULQdTSLrRm6fzl8u/GUKPfLFIsNdoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bQEy7znO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4680C16AAE;
-	Tue, 13 Jan 2026 14:56:40 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ecwgtS6RI7lb+ecFezYJoznvVL1Nqy4GeKHPP8IoyazDzjyVKCTct1cooIZGA9c9P2Iwb1FSzJVGduz3p4OnqHCznz5h8qljQooolzisxCjT+8aKqpTNGQY3Xd3pPCpJvFvZZRc/+4rp6I4wVzyZTIgGhJ9P8WHon1xrYBEtyCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=koHONHtz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82E0BC116C6;
+	Tue, 13 Jan 2026 14:57:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768316201;
-	bh=mddwGk9E211pqqLNC87BrcxRIxMRADenQX665fNT+nM=;
+	s=k20201202; t=1768316240;
+	bh=YWHxoLNGH2PLo0cBwASlxNC9mjTQKZKN1bkIjvL6+rs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bQEy7znOEvUxQVJxKZIutih3qVH2s3AZ7kK6fZPcaUm9v3ikfbWiVeujHa7YYbOwf
-	 HLkcSgTKMKZYjqRCgu4MtT2LzkWVtea1D0KE2bD3KXeCkWEP1ov/JAFQIki+qqS4yv
-	 KQSJh4jbhl0E3RpHy4q1qlecCr6bqMgC6iVCuoXiCIMN4xX/D+65DxU47Xj7h/JHI2
-	 +QpUSLZVdh4YQaS907kjL7ftjsMmPmyp8ZgmnmqMEosxO2u9caB21mCed5JEZfLz/E
-	 SZX++KBa9Hj7Cxe1//y39fxHiELp6Bqet2nE7a0uK0igrZYrgiAZJAHYi/vGrua72Y
-	 YawIfjvtPDD2g==
-Date: Tue, 13 Jan 2026 15:56:38 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Aleksander Jan Bajkowski <olek2@wp.pl>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: airoha: implement get_link_ksettings
-Message-ID: <aWZdJoELeXE4GtGY@lore-desk>
-References: <20260110170212.570793-1-olek2@wp.pl>
+	b=koHONHtzToSZC71NWMBPbrRdd3uEBYmE76CrUIIoOBNzJOuG/R7MIPpXM8LgbBQ6A
+	 yR+HWvDqzV4e4+WZI1GVGGAfY1kG7/LYjephMQ2AQv1dHAMdrSbJ4hcWPU2PUSqmFj
+	 SDr/Qn34hantVE1/3QBMAcGbsHvUS/0+LVpvpHQPVXLVQhugK8PpYqo2TTxkOG+AZH
+	 F8R3iaxJnpN3HXTe6nDhh59Zne3DHcUBEg2ZHVN9uyI2FWBjWfdwsWoNkpwNogVOUC
+	 PLh8sAJABaBhfAqh11BPjmba4qlvX8T2E3ir4rpUOh7Q1xCRQJJxVXLfi7lljMrSEn
+	 RqY5cAj7yjVRA==
+Date: Tue, 13 Jan 2026 14:57:16 +0000
+From: Simon Horman <horms@kernel.org>
+To: Antony Antony <antony.antony@secunet.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	devel@linux-ipsec.org
+Subject: Re: [PATCH ipsec-next 4/6] xfrm: add XFRM_MSG_MIGRATE_STATE for
+ single SA migration
+Message-ID: <aWZdTOXTn_YBKKhv@horms.kernel.org>
+References: <cover.1767964254.git.antony@moon.secunet.de>
+ <3558d8c20a0a973fd873ca6f50aef47a9caffcdc.1767964254.git.antony@moon.secunet.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="F0XY5+WqgebaVLDU"
-Content-Disposition: inline
-In-Reply-To: <20260110170212.570793-1-olek2@wp.pl>
-
-
---F0XY5+WqgebaVLDU
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <3558d8c20a0a973fd873ca6f50aef47a9caffcdc.1767964254.git.antony@moon.secunet.de>
 
-> Implement the .get_link_ksettings to get the rate, duplex, and
-> auto-negotiation status.
->=20
-> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
-> ---
->  drivers/net/ethernet/airoha/airoha_eth.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ether=
-net/airoha/airoha_eth.c
-> index 315d97036ac1..00cae2833f09 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> @@ -2803,6 +2803,7 @@ static const struct ethtool_ops airoha_ethtool_ops =
-=3D {
->  	.get_drvinfo		=3D airoha_ethtool_get_drvinfo,
->  	.get_eth_mac_stats      =3D airoha_ethtool_get_mac_stats,
->  	.get_rmon_stats		=3D airoha_ethtool_get_rmon_stats,
-> +	.get_link_ksettings	=3D phy_ethtool_get_link_ksettings,
->  	.get_link		=3D ethtool_op_get_link,
->  };
+On Fri, Jan 09, 2026 at 02:38:05PM +0100, Antony Antony wrote:
+> Add a new netlink method to migrate a single xfrm_state.
+> Unlike the existing migration mechanism (SA + policy), this
+> supports migrating only the SA and allows changing the reqid.
+> 
+> Signed-off-by: Antony Antony <antony.antony@secunet.com>
 
-Tested-by: Lorenzo Bianconi <lorenzo@kernel.org>
+...
 
-Regards,
-Lorenzo
+> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> index ef832ce477b6..04c893e42bc1 100644
+> --- a/net/xfrm/xfrm_state.c
+> +++ b/net/xfrm/xfrm_state.c
+> @@ -1967,7 +1967,8 @@ static inline int clone_security(struct xfrm_state *x, struct xfrm_sec_ctx *secu
+>  
+>  static struct xfrm_state *xfrm_state_clone_and_setup(struct xfrm_state *orig,
+>  					   struct xfrm_encap_tmpl *encap,
+> -					   struct xfrm_migrate *m)
+> +					   struct xfrm_migrate *m,
 
-> =20
-> --=20
-> 2.47.3
->=20
+Hi Antony,
 
---F0XY5+WqgebaVLDU
-Content-Type: application/pgp-signature; name=signature.asc
+Not strictly related to this patch, but FWIIW, it seems that m could be
+const in this call stack.  And, moreover, I think there would be some value
+in constifying parameters throughout xfrm.
 
------BEGIN PGP SIGNATURE-----
+> +					   struct netlink_ext_ack *extack)
+>  {
+>  	struct net *net = xs_net(orig);
+>  	struct xfrm_state *x = xfrm_state_alloc(net);
+> @@ -1979,9 +1980,13 @@ static struct xfrm_state *xfrm_state_clone_and_setup(struct xfrm_state *orig,
+>  	memcpy(&x->lft, &orig->lft, sizeof(x->lft));
+>  	x->props.mode = orig->props.mode;
+>  	x->props.replay_window = orig->props.replay_window;
+> -	x->props.reqid = orig->props.reqid;
+>  	x->props.saddr = orig->props.saddr;
+>  
+> +	if (orig->props.reqid != m->new_reqid)
+> +		x->props.reqid = m->new_reqid;
+> +	else
+> +		x->props.reqid = orig->props.reqid;
+> +
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaWZdJgAKCRA6cBh0uS2t
-rFqnAP90urg3GOxbCoFAMqLCFB/L1q7Qs9YnOIYJFgJgDjGEOgEApHYGEt+vKXfJ
-hqWzAes4qvKgR6IWh7zYpF5BMJQ3pAI=
-=6pTG
------END PGP SIGNATURE-----
+Claude Code with Review Prompts [1] flags that until the next
+patch of this series m->new_reqid is used uninitialised in the following
+call stack:
 
---F0XY5+WqgebaVLDU--
+xfrm_do_migrate -> xfrm_migrate -> xfrm_state_migrate -> xfrm_state_clone_and_setup
+
+Also, while I could have missed something, it seems to me that it is
+also uninitialised in this call stack:
+
+pfkey_migrate -> xfrm_migrate -> xfrm_state_migrate -> xfrm_state_clone_and_setup
+
+[1] https://github.com/masoncl/review-prompts/
+
+>  	if (orig->aalg) {
+>  		x->aalg = xfrm_algo_auth_clone(orig->aalg);
+>  		if (!x->aalg)
+> @@ -2059,7 +2064,6 @@ static struct xfrm_state *xfrm_state_clone_and_setup(struct xfrm_state *orig,
+>  			goto error;
+>  	}
+>  
+> -
+
+nit: this hunk doesn't seem related to the rest of the patch.
+
+>  	x->props.family = m->new_family;
+>  	memcpy(&x->id.daddr, &m->new_daddr, sizeof(x->id.daddr));
+>  	memcpy(&x->props.saddr, &m->new_saddr, sizeof(x->props.saddr));
+
+...
+
+> diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+
+...
+
+> +static inline unsigned int xfrm_migrate_state_msgsize(bool with_encap, bool with_xuo)
+
+Please don't use the inline keyword in .c files unless there is a
+demonstrable - usually performance - reason to do so.
+Rather, please let the compiler inline (or not) code as it sees fit.
+
+> +{
+> +	return NLMSG_ALIGN(sizeof(struct xfrm_user_migrate_state)) +
+> +		(with_encap ? nla_total_size(sizeof(struct xfrm_encap_tmpl)) : 0) +
+> +		(with_xuo ? nla_total_size(sizeof(struct xfrm_user_offload)) : 0);
+> +}
+> +
+
+...
+
+> +static int xfrm_send_migrate_state(const struct xfrm_user_migrate_state *um,
+> +				   const struct xfrm_encap_tmpl *encap,
+> +				   const struct xfrm_user_offload *xuo)
+> +{
+> +	int err;
+> +	struct sk_buff *skb;
+> +	struct net *net = &init_net;
+> +
+> +	skb = nlmsg_new(xfrm_migrate_state_msgsize(!!encap, !!xuo), GFP_ATOMIC);
+> +	if (!skb)
+> +		return -ENOMEM;
+> +
+> +	err = build_migrate_state(skb, um, encap, xuo);
+> +	if (err < 0) {
+> +		WARN_ON(1);
+> +		return err;
+
+skb seems to be leaked here.
+
+Also flagged by Review Prompts.
+
+> +	}
+> +
+> +	return xfrm_nlmsg_multicast(net, skb, 0, XFRMNLGRP_MIGRATE);
+> +}
+
+...
 
