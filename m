@@ -1,149 +1,145 @@
-Return-Path: <netdev+bounces-249552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D83B2D1AE8F
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 19:53:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB367D1AEAD
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 19:55:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DB526303A39B
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 18:53:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9F57F300C0CC
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 18:54:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 924DB352C3F;
-	Tue, 13 Jan 2026 18:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B84334D915;
+	Tue, 13 Jan 2026 18:54:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YwJQHrN8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2TRaVXDM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A130352C3B;
-	Tue, 13 Jan 2026 18:53:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBF3E30DEAC
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 18:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768330381; cv=none; b=sC9iCtV0f4MGmF/OSnhqC0qG+xPznK3Hwn5ST/T8S4osUNapLsZHiU0TzquG8VKNomlgRyl/miw0Cph5iLKiZi5wslrBsf4G2+peCLNVsmWDMLDZVoGAwfkKd8jmeHknnEr5lGPvc/3cO42ApT0kM512hZoi3aj+kqQVRI12KDs=
+	t=1768330491; cv=none; b=WyFi49mp97BWQwQYIgNKtSqmGLajWDz48HQL003UNoc8oY0VivDKjGcj0Hww8n7AA+yuZ/Ckw1Wiw8K4jHtV5RxBby9g0h2KWArUaowJXxk0dpHU2NBEx+vrL1HZdoH1ddcEz5nrsI2Rmpnzzisdk/t/O11wZFYqaaUDIQZJ5RA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768330381; c=relaxed/simple;
-	bh=IaYCk5AV+POZj/ED4ZWmEONB7R/2K+ZYIpDzpu9rJBs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=REczjSIIoeOpVLqjPZZMn694dhcQnuzAZR9Himc5KMob2ZeiWtDHpjb4zSCDpDqOAOt//OLTN3nhJJal+rpSxiqQ61GWAgET+9tWPLiU9omoMpzG57VeV+dzyis0BjxoO+SHMB9t3J3XeZu+G0yzJ0WhyvLj2AK/ZYnEDIlz8Ao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YwJQHrN8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8AE5C19422;
-	Tue, 13 Jan 2026 18:52:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768330380;
-	bh=IaYCk5AV+POZj/ED4ZWmEONB7R/2K+ZYIpDzpu9rJBs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=YwJQHrN8/WZuVd8DEiONBEUw3GT0IYaD4s7Tvz+c73GT1hYAD1r6pXvjVCpoN/Fmw
-	 6Dfgj8baImfprvw2MaH8bhtBOzgiSH9LeYnWLY4eUgKetq6LpRmCP+pQ4I3Pf1G5zd
-	 aGIJRkSs4J5u/iCv4iuaT8MIQl5ek6tpsObbvokhmzxWUGvJgobIxcGSIhw5eMyrlo
-	 aBRGzBNZod3cAZ+ubXUEwF/PAq+Ud1Wn7ur6kPCI0ceOALn5cxvFeW5kh9hF5lYt3i
-	 MJ9V+3SN5EK1ZAszMGsXHXb7vv5A0nqNbni6n0aJgAc6msv8I8qFKczJpJdkHLOkIA
-	 7DwMzal1Tkc+g==
-Message-ID: <bd29d196-5854-4a0c-a78c-e4869a59b91f@kernel.org>
-Date: Tue, 13 Jan 2026 19:52:53 +0100
+	s=arc-20240116; t=1768330491; c=relaxed/simple;
+	bh=rAy3yooNBLjH8MpcXBQu414KwY6i2PXFMSX45Ekp1Jw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ANBO8dQNdypvrsSsF/q4x8bJ8UmmuR+MXgyvvQx1rXzegen/+VnU46KDBXoBc71ekLGu74kxzYBOSL6N1lsD98cWIURh+1/S9lSX2yJf7fLwXEGHOZFDc71oLubjXgB6L6WhXxWf3eilD5LtG81fc6L9EEu4XxB7ZQ5R+OBZIIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2TRaVXDM; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-29f27176aa7so115278895ad.2
+        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 10:54:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768330489; x=1768935289; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2L0ZmDOwqQEFT1x/tt2l42V00vJsq1Kz90dfZa40+gI=;
+        b=2TRaVXDMeIoMrm14fkxVIDel5VvofYhoyLjCF4jlsixr5YJWZXrwneVVl6rxWSiz4r
+         hWvnKGMvKZyec9bWEwnir9c6X3VVgE1vqTuastncKyKUdz3ubMSO8tBKUQoSDczjq60q
+         Rccve8L0e5fwXzgJDGXQdQ9XzHkWvRY8aa7oF7rT6uzZuLGf/sxv5R+CtzpVQMD2N07z
+         E6Fyir//FKEdFZJ//TDuX5PkeOXrf57BPwF/xICNzWX60u1weSSIVkqojXPy8Ngk742t
+         qbTawM/BQVkXoKPwzHu/ANUQO+Y/72UJHW2yJRKIGRkOaD6r5dF3GOVL0RZgOYzNW8TU
+         d3CA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768330489; x=1768935289;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2L0ZmDOwqQEFT1x/tt2l42V00vJsq1Kz90dfZa40+gI=;
+        b=eGchuCHLHW8ywD8fIMLxECyVh1qOjRpNnm+ohmpv24d1rQ8OQjlP/mZuRX5NIfFA+/
+         P7n0EmE4C+z2HLI7lqS/PPdatSG4nFpVZz8F3IgdJvJnzxLRfDKrR7QfGQ3kYAonSXYc
+         eBd/KJ4sx5ROpHUQX83j3j5uzntlrx4tamHymBtU9BU156tZd1+cuPgCLB7k0cbj4Itc
+         sE3IS8xgb3zX5FEjFGrA7Zby5r1TBm+uGDVYu2X4REMgKd9NnqcNdSp1tK6Oei5wdtPL
+         kbvPsTQXcnWFAQKmcD1XkYL5uArIjvKTJdifwhGxVmfY98KgG8IXOezlRh2i6WWvR49C
+         5t1A==
+X-Forwarded-Encrypted: i=1; AJvYcCVLxKO2ZNaHfqmVbMia0MOEaNUjJzhzviFqM/ZfogJIDbg8JmibfX0AvIk7FsZyD+p58TVuS7A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyt7x+sbW9DiCaowxT7+sIAdjtKXJ5RSSXiT2moU8ykgXzDD3N5
+	MyEueZdkh/XbUNwh06w2GyyIWcCFmk2hyYJC1tBNzDYPXaiRDBEoPsa4RfZWfBX/STDYXuToEOh
+	wpiKYGw==
+X-Received: from pjbge11.prod.google.com ([2002:a17:90b:e0b:b0:34c:e366:3f3f])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ec90:b0:298:2637:800b
+ with SMTP id d9443c01a7336-2a599e34891mr115855ad.31.1768330489041; Tue, 13
+ Jan 2026 10:54:49 -0800 (PST)
+Date: Tue, 13 Jan 2026 18:54:44 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 00/10] Call skb_metadata_set when skb->data
- points past metadata
-To: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Jakub Sitnicki <jakub@cloudflare.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, intel-wired-lan@lists.osuosl.org,
- bpf@vger.kernel.org, kernel-team@cloudflare.com,
- Jesse Brandeburg <jbrandeburg@cloudflare.com>,
- Willem Ferguson <wferguson@cloudflare.com>,
- Arthur Fabre <arthur@arthurfabre.com>
-References: <20260110-skb-meta-fixup-skb_metadata_set-calls-v1-0-1047878ed1b0@cloudflare.com>
- <20260112190856.3ff91f8d@kernel.org>
- <36deb505-1c82-4339-bb44-f72f9eacb0ac@redhat.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <36deb505-1c82-4339-bb44-f72f9eacb0ac@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
+Message-ID: <20260113185446.2533333-1-kuniyu@google.com>
+Subject: [PATCH v1 net] l2tp: Fix memleak in l2tp_udp_encap_recv().
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	syzbot+2c42ea4485b29beb0643@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 
+syzbot reported memleak of struct l2tp_session, l2tp_tunnel,
+sock, etc. [0]
 
+The cited commit moved down the validation of the protocol
+version in l2tp_udp_encap_recv().
 
-On 13/01/2026 13.09, Paolo Abeni wrote:
-> On 1/13/26 4:08 AM, Jakub Kicinski wrote:
->> On Sat, 10 Jan 2026 22:05:14 +0100 Jakub Sitnicki wrote:
->>> This series is split out of [1] following discussion with Jakub.
->>>
->>> To copy XDP metadata into an skb extension when skb_metadata_set() is
->>> called, we need to locate the metadata contents.
->>
->> "When skb_metadata_set() is called"? I think that may cause perf
->> regressions unless we merge major optimizations at the same time?
->> Should we defer touching the drivers until we have a PoC and some
->> idea whether allocating the extension right away is manageable or
->> we are better off doing it via a kfunc in TC (after GRO)?
->> To be clear putting the metadata in an extension right away would
->> indeed be much cleaner, just not sure how much of the perf hit we
->> can optimize away..
-> 
-> I agree it would be better deferring touching the driver before we have
-> proof there will not be significant regressions.
+The new place requires an extra error handling to avoid the
+memleak.
 
-It will be a performance regression to (as cover-letter says):
-  "To copy XDP metadata into an skb extension when skb_metadata_set() is 
-called".
-The XDP to TC-ingress code path is a fast-path IMHO.
+Let's call l2tp_session_put() there.
 
-*BUT* this patchset isn't doing that. To me it looks like a cleanup
-patchset that simply makes it consistent when skb_metadata_set() called.
-Selling it as a pre-requirement for doing copy later seems fishy.
+[0]:
+BUG: memory leak
+unreferenced object 0xffff88810a290200 (size 512):
+  comm "syz.0.17", pid 6086, jiffies 4294944299
+  hex dump (first 32 bytes):
+    7d eb 04 0c 00 00 00 00 01 00 00 00 00 00 00 00  }...............
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc babb6a4f):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4958 [inline]
+    slab_alloc_node mm/slub.c:5263 [inline]
+    __do_kmalloc_node mm/slub.c:5656 [inline]
+    __kmalloc_noprof+0x3e0/0x660 mm/slub.c:5669
+    kmalloc_noprof include/linux/slab.h:961 [inline]
+    kzalloc_noprof include/linux/slab.h:1094 [inline]
+    l2tp_session_create+0x3a/0x3b0 net/l2tp/l2tp_core.c:1778
+    pppol2tp_connect+0x48b/0x920 net/l2tp/l2tp_ppp.c:755
+    __sys_connect_file+0x7a/0xb0 net/socket.c:2089
+    __sys_connect+0xde/0x110 net/socket.c:2108
+    __do_sys_connect net/socket.c:2114 [inline]
+    __se_sys_connect net/socket.c:2111 [inline]
+    __x64_sys_connect+0x1c/0x30 net/socket.c:2111
+    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+    do_syscall_64+0xa4/0xf80 arch/x86/entry/syscall_64.c:94
+    entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
+Fixes: 364798056f518 ("l2tp: Support different protocol versions with same IP/port quadruple")
+Reported-by: syzbot+2c42ea4485b29beb0643@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/696693f2.a70a0220.245e30.0001.GAE@google.com/
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+ net/l2tp/l2tp_core.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-> IIRC, at early MPTCP impl time, Eric suggested increasing struct sk_buff
-> size as an alternative to the mptcp skb extension, leaving the added
-> trailing part uninitialized when the sk_buff is allocated.
-> 
-> If skb extensions usage become so ubicuos they are basically allocated
-> for each packet, the total skb extension is kept under strict control
-> and remains reasonable (assuming it is :), perhaps we could consider
-> revisiting the above mentioned approach?
-
-
-I really like this idea.  As using the uninitialized tail room in the
-SKB (memory area) will make SKB extensions fast.  Today SKBs are
-allocated via SLUB-alloacator cache-aligned so the real size is 256
-bytes.  On my system the actual SKB (sk_buff) size is 232 bytes (already
-leaving us 24 bytes). The area that gets zero-initialized is only 192
-bytes (3 cache-lines).  My experience with the SLUB allocator is that
-increasing the object size doesn't increase the allocation cost (below
-PAGE_SIZE).  So, the suggestion of simply allocating a larger sk_buff is
-valid as it doesn't cost more (if we don't touch those cache-lines).  We
-could even make it a CONFIG compile time option how big this area should be.
-
-For Jakub this unfortunately challenge/breaks the design of keeping
-data_meta area valid deeper into the netstack.  With all the challenges
-around encapsulation/decap it seems hard/infeasible to maintain this
-area in-front of the packet data pointer deeper into the netstack.
-
-Instead of blindly copying XDP data_meta area into a single SKB
-extension.  What if we make it the responsibility of the TC-ingress BPF-
-hook to understand the data_meta format and via (kfunc) helpers
-transfer/create the SKB extension that it deems relevant.
-Would this be an acceptable approach that makes it easier to propagate
-metadata deeper in netstack?
-
---Jesper
-
-p.s. For compact storage of SKB extensions in the SKB tail-area, we
-could revisit Arthur's "traits" (compact-KV storage).
+diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
+index 687c1366a4d0f..70335667ef037 100644
+--- a/net/l2tp/l2tp_core.c
++++ b/net/l2tp/l2tp_core.c
+@@ -1086,8 +1086,10 @@ int l2tp_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
+ 	tunnel = session->tunnel;
+ 
+ 	/* Check protocol version */
+-	if (version != tunnel->version)
++	if (version != tunnel->version) {
++		l2tp_session_put(session);
+ 		goto invalid;
++	}
+ 
+ 	if (version == L2TP_HDR_VER_3 &&
+ 	    l2tp_v3_ensure_opt_in_linear(session, skb, &ptr, &optr)) {
+-- 
+2.52.0.457.g6b5491de43-goog
 
 
