@@ -1,205 +1,189 @@
-Return-Path: <netdev+bounces-249536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7E71D1AAE1
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 18:39:41 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D9D4D1AAFF
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 18:42:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CC1F5309FD34
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 17:37:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 095263019C62
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 17:41:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D392352C31;
-	Tue, 13 Jan 2026 17:37:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BB173933F2;
+	Tue, 13 Jan 2026 17:41:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Ru2sEbeo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eIyoa0I2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0BD43806AC
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 17:37:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF5D38A728
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 17:41:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768325845; cv=none; b=Bs1P/iNDJTCL+RpP8tckK8vxXe/kT9n49mtVhHaKSbPJM+scV0PWWwxCRHWK+Iw15wvMPECoEjun5Vq605KlChPLqCubFKvQhCgRx5ofL9qqHehb0JEqqUpkAHQgbyHXTw5y87sqDbt5Dalm41OOMjBYHS9kBUz6+ydP/7gfqso=
+	t=1768326090; cv=none; b=lWaNbcYIMi4kCJnxLPMW9kXz0ZdPGTb4vYnc+aK1iAAiN3ZDfJqjXkEdESmVvDAeaKYOlyhr6bS8o4JAJJkY3ZFWYJyB6vR9wvBFuX3m39O+UTOmJlO5r5i+OZC68Q1v9UGIC8MZdjKewgL22mlML8u2ZBRLbJX26oLBhPgYgLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768325845; c=relaxed/simple;
-	bh=ICK4ui9NDNRZmZPvqUFhVVRYDzu3U7vjvh8uoefFqv4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TE3uPhH7CqUO+0/DTau+AuUSaBAWQvEv8nbZ7fV3YFXuhKoDyRv6COq6+myygocr80iRZbm7vo0MSBRa9M4zUd4pun4AqcWAnRS32xRiUW0abtFpjo3n3yJQmYKnmU0ul2XdafQK7wgPbJbtzX4xs9r1Dt1pgPeTCM3GfdQZEl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Ru2sEbeo; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-42fb0fc5aa9so3710211f8f.1
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 09:37:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1768325840; x=1768930640; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/CVOy4tPw1zWY0e6rYcKRwtfrfRvUlKFzd8YTNoGp5w=;
-        b=Ru2sEbeo3aF1V5dVdmZ8y7qebfvXyJmIOu3zKjZ0L9VDAaRDnX70AwM7BG2MTCNZwb
-         Wt2M0HgSorW10TpGQfsg9caRtjEHGygzZnBCUoVZVtJ9cb0vr93mesbIAhkVPGacjxdE
-         7HU2OwKQxMCRd8/BsuI9FzZju+1UH8Go43H+kiq9CHCnMXgCIpF7/w0CTdPzN1DW1Rpm
-         vJFnt7QVkUwAiqmRpO4P0wQ4QtHunX4dgFkC5Y5pl2pjWjZOPmVYlIv+L2228OrXc7FR
-         T3QgLrVe14c5TYcEkEJYXN3hig3ZqFkIKuc/jaTuv7lqME1z4P3n4adyHDJ+f9c9YNAe
-         Bvig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768325840; x=1768930640;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/CVOy4tPw1zWY0e6rYcKRwtfrfRvUlKFzd8YTNoGp5w=;
-        b=j6r1HF/IKaQTdGjMmhHzFtHvYvqi+q7AH8ZARKvIfwYj7V/LVQq82V0X1VL1FYKGHS
-         25Wis7QtA08t8ktB/m8YtNzBttAXMR8sIqrUvdbDyqOmf2+hXdFiXX77SWQHyS0SNpgB
-         vc0AaRxeiQ4k1ZcCIx11bOvawsK4dy5Xs46FtiqWNp20BM6irhoqSQvNI4HqF8v8ieFL
-         osZOe1uJa+wbtiavRuu7S9u1J/McHxOp+Fti+5YTeBDjvPb4Rofi+Ustdk50FYuNWHQm
-         srtC56zRry1+nk2HL/Ixg0ZWyzQcec6EehLlbsznKVLcDxihgaGsmqGzEjSplBHtdly3
-         JrhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWz5/7VZ0tyevHwoleqGLitalwqPD8PZDulZIkAtam6K0x422isNGr68W30N/ZZD2RkZlMqBDw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxH74kQe+SDu97pEj4mUctsPEbftq2DP4jph4d/ptAI3p/eIAzq
-	Ah7pMj9UCpd82XDTEsGqD0TQKVM+/m7oiS1hAaXn8KitWT2A9p23HBHmULGHnjkGF4M=
-X-Gm-Gg: AY/fxX71ObILUJ5MXbxJn4K6/srWxKqn2hFh88NMaPbzRSUxGUTrwX587nL15yi3/an
-	udYll4Hhl0giBDlQqPT2Bwv8Gb0s5hbTzcyv7KS7nlUFuLoEBuK1FDeXqcSmT4jfGDiPNcWgMzK
-	fJPh2dG9ugkL+E/9BDzAkJrShTitALITm2tTcnG+Xl4tJkwmEFzzqW32mvsvx9Spp/14fKDaIZR
-	cWHsw/Wo89w0fvdceVXU+R3D/lz2rmR4jIcvHd51uUzeDdtXk6GV12R6mTxqaqEKPb+m29dfyff
-	E4mJahJmi8Nw6qNKqehy3QsEpos40zNt9gie1Pd5jYNe7t6apZxj9FEARWjETYt31WYLWQE9oZ0
-	frb7mTiLtA+HrLwx5SLjSOh6I6Vah3AJjpcuRB0xIT5qiCbsdcnn3XJ9xoav3TT3IBa8rTphHA+
-	BW8bodTquWRo13aw==
-X-Google-Smtp-Source: AGHT+IHUReQqvVgC0db5F0/UgqAPwHgCcpq2ZD0lhm0g7XnDeEa3Phlj1/GEitKl8zvqkUFbSZC6XA==
-X-Received: by 2002:a05:6000:2dc9:b0:430:fced:902 with SMTP id ffacd0b85a97d-432c36436fbmr29258778f8f.26.1768325840268;
-        Tue, 13 Jan 2026 09:37:20 -0800 (PST)
-Received: from pathway.suse.cz ([176.114.240.130])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432d9610671sm28342147f8f.34.2026.01.13.09.37.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jan 2026 09:37:19 -0800 (PST)
-Date: Tue, 13 Jan 2026 18:37:17 +0100
-From: Petr Mladek <pmladek@suse.com>
-To: Marcos Paulo de Souza <mpdesouza@suse.com>
-Cc: Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jason Wessel <jason.wessel@windriver.com>,
-	Daniel Thompson <danielt@kernel.org>,
-	Douglas Anderson <dianders@chromium.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	John Ogness <john.ogness@linutronix.de>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jiri Slaby <jirislaby@kernel.org>, Breno Leitao <leitao@debian.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Kees Cook <kees@kernel.org>, Tony Luck <tony.luck@intel.com>,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jacky Huang <ychuang3@nuvoton.com>,
-	Shan-Chun Hung <schung@nuvoton.com>,
-	Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-	linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kgdb-bugreport@lists.sourceforge.net, linux-serial@vger.kernel.org,
-	netdev@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
-	linux-hardening@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	sparclinux@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 02/19] printk: Introduce console_is_nbcon
-Message-ID: <aWaCzZ8_UuyAa6xp@pathway.suse.cz>
-References: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
- <20251227-printk-cleanup-part3-v1-2-21a291bcf197@suse.com>
+	s=arc-20240116; t=1768326090; c=relaxed/simple;
+	bh=qQ0f52JN5/uHLZvfmLsNRAQs0bKe9Q06K1Qab1mrmjU=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=RnU0W/FCZp6k4cavQtwmH0dMmvajKJmTx9t2jdLY9IaddMJbqAq4AkhpOXAe6pCxaN5dF9XHZesu2MimLr9AmwRlsRhBTgwBb2kBGeOaGkoUmTiT1FlrRR1u2XTwaz1AQKw8on8ZCwkOwVP27FlhcV3JTENX+RJUGkyYzDOPYFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eIyoa0I2; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768326079;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=GnHx1xZ/qeVaPJvNMrQ25xIvqfc7ydmJVX2qUkgASNM=;
+	b=eIyoa0I21FmZOhJlh06luGhVl6TQrDLpzff2UA+iEIRxWHciMRLECjVskV2yWwtlWRHwpO
+	BKppHnMff6402qiJhM86vmlRQyOl2zRg4+1YEZoSpK9OAyQhaXCT70wuVKAxZ7hld/i7aW
+	CZ7W4Byu72YzrMQRB7w0NJYTI/GahGM=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-466-tG2kSP6nMTC2-p4ruXN7DQ-1; Tue,
+ 13 Jan 2026 12:41:15 -0500
+X-MC-Unique: tG2kSP6nMTC2-p4ruXN7DQ-1
+X-Mimecast-MFC-AGG-ID: tG2kSP6nMTC2-p4ruXN7DQ_1768326073
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3BEA71800365;
+	Tue, 13 Jan 2026 17:41:13 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 09E6A30001A2;
+	Tue, 13 Jan 2026 17:41:08 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+cc: dhowells@redhat.com, Faith <faith@zellic.io>,
+    Pumpkin Chang <pumpkin@devco.re>,
+    Marc Dionne <marc.dionne@auristor.com>, Nir Ohfeld <niro@wiz.io>,
+    Willy Tarreau <w@1wt.eu>, Eric Dumazet <edumazet@google.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+    Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org,
+    security@kernel.org, stable@kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH net] rxrpc: Fix recvmsg() unconditional requeue
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251227-printk-cleanup-part3-v1-2-21a291bcf197@suse.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3537105.1768326067.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 13 Jan 2026 17:41:07 +0000
+Message-ID: <3537106.1768326067@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Sat 2025-12-27 09:16:09, Marcos Paulo de Souza wrote:
-> Besides checking if the current console is NBCON or not, console->flags
-> is also being read in order to serve as argument of the console_is_usable
-> function.
-> 
-> But CON_NBCON flag is unique: it's set just once in the console
-> registration and never cleared. In this case it can be possible to read
-> the flag when console_srcu_lock is held (which is the case when using
-> for_each_console).
-> 
-> This change makes possible to remove the flags argument from
-> console_is_usable in the next patches.
-> 
-> Signed-off-by: Petr Mladek <pmladek@suse.com>
-> Signed-off-by: Marcos Paulo de Souza <mpdesouza@suse.com>
-> ---
->  include/linux/console.h   | 27 +++++++++++++++++++++++++++
->  kernel/debug/kdb/kdb_io.c |  2 +-
->  kernel/printk/nbcon.c     |  2 +-
->  kernel/printk/printk.c    | 15 ++++++---------
->  4 files changed, 35 insertions(+), 11 deletions(-)
-> 
-> diff --git a/include/linux/console.h b/include/linux/console.h
-> index 35c03fc4ed51..dd4ec7a5bff9 100644
-> --- a/include/linux/console.h
-> +++ b/include/linux/console.h
-> @@ -561,6 +561,33 @@ static inline void console_srcu_write_flags(struct console *con, short flags)
->  	WRITE_ONCE(con->flags, flags);
->  }
->  
-> +/**
-> + * console_srcu_is_nbcon - Locklessly check whether the console is nbcon
+    =
 
-There is _srcu in the function name, see below.
+If rxrpc_recvmsg() fails because MSG_DONTWAIT was specified but the call a=
+t
+the front of the recvmsg queue already has its mutex locked, it requeues
+the call - whether or not the call is already queued.  The call may be on
+the queue because MSG_PEEK was also passed and so the call was not dequeue=
+d
+or because the I/O thread requeued it.
 
-> + * @con:	struct console pointer of console to check
-> + *
-> + * Requires console_srcu_read_lock to be held, which implies that @con might
-> + * be a registered console. The purpose of holding console_srcu_read_lock is
-> + * to guarantee that no exit/cleanup routines will run if the console
-> + * is currently undergoing unregistration.
-> + *
-> + * If the caller is holding the console_list_lock or it is _certain_ that
-> + * @con is not and will not become registered, the caller may read
-> + * @con->flags directly instead.
-> + *
-> + * Context: Any context.
-> + * Return: True when CON_NBCON flag is set.
-> + */
-> +static inline bool console_is_nbcon(const struct console *con)
+The unconditional requeue may then corrupt the recvmsg queue, leading to
+things like UAFs or refcount underruns.
 
-And here it is without _srcu.
+Fix this by only requeuing the call if it isn't already on the queue - and
+moving it to the front if it is already queued.
 
-I would prefer the variant with _srcu to make it clear that it
-can be called only under _srcu. Similar to console_srcu_read_flags(con).
+Also, MSG_PEEK doesn't dequeue the call so shouldn't call
+rxrpc_notify_socket() for the call if we didn't use up all the data on the
+queue, so fix that also.
 
-> +{
-> +	WARN_ON_ONCE(!console_srcu_read_lock_is_held());
-> +
-> +	/*
-> +	 * The CON_NBCON flag is statically initialized and is never
-> +	 * set or cleared at runtime.
-> +	 */
-> +	return data_race(con->flags & CON_NBCON);
-> +}
-> +
->  /* Variant of console_is_registered() when the console_list_lock is held. */
->  static inline bool console_is_registered_locked(const struct console *con)
->  {
+Fixes: 540b1c48c37a ("rxrpc: Fix deadlock between call creation and sendms=
+g/recvmsg")
+Reported-by: Faith <faith@zellic.io>
+Reported-by: Pumpkin Chang <pumpkin@devco.re>
+Signed-off-by: David Howells <dhowells@redhat.com>
+Acked-by: Marc Dionne <marc.dionne@auristor.com>
+cc: Nir Ohfeld <niro@wiz.io>
+cc: Willy Tarreau <w@1wt.eu>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Simon Horman <horms@kernel.org>
+cc: linux-afs@lists.infradead.org
+cc: netdev@vger.kernel.org
+cc: security@kernel.org
+cc: stable@kernel.org
+---
+ include/trace/events/rxrpc.h |    4 ++++
+ net/rxrpc/recvmsg.c          |   15 ++++++++++++---
+ 2 files changed, 16 insertions(+), 3 deletions(-)
 
-Otherwise, it looks good to me.
+diff --git a/include/trace/events/rxrpc.h b/include/trace/events/rxrpc.h
+index de6f6d25767c..869f97c9bf73 100644
+--- a/include/trace/events/rxrpc.h
++++ b/include/trace/events/rxrpc.h
+@@ -322,6 +322,7 @@
+ 	EM(rxrpc_call_put_kernel,		"PUT kernel  ") \
+ 	EM(rxrpc_call_put_poke,			"PUT poke    ") \
+ 	EM(rxrpc_call_put_recvmsg,		"PUT recvmsg ") \
++	EM(rxrpc_call_put_recvmsg_peek_nowait,	"PUT peek-nwt") \
+ 	EM(rxrpc_call_put_release_recvmsg_q,	"PUT rls-rcmq") \
+ 	EM(rxrpc_call_put_release_sock,		"PUT rls-sock") \
+ 	EM(rxrpc_call_put_release_sock_tba,	"PUT rls-sk-a") \
+@@ -340,6 +341,9 @@
+ 	EM(rxrpc_call_see_input,		"SEE input   ") \
+ 	EM(rxrpc_call_see_notify_released,	"SEE nfy-rlsd") \
+ 	EM(rxrpc_call_see_recvmsg,		"SEE recvmsg ") \
++	EM(rxrpc_call_see_recvmsg_requeue,	"SEE recv-rqu") \
++	EM(rxrpc_call_see_recvmsg_requeue_first, "SEE recv-rqF") \
++	EM(rxrpc_call_see_recvmsg_requeue_move,	"SEE recv-rqM") \
+ 	EM(rxrpc_call_see_release,		"SEE release ") \
+ 	EM(rxrpc_call_see_userid_exists,	"SEE u-exists") \
+ 	EM(rxrpc_call_see_waiting_call,		"SEE q-conn  ") \
+diff --git a/net/rxrpc/recvmsg.c b/net/rxrpc/recvmsg.c
+index 7fa7e77f6bb9..2c42823f472b 100644
+--- a/net/rxrpc/recvmsg.c
++++ b/net/rxrpc/recvmsg.c
+@@ -518,7 +518,8 @@ int rxrpc_recvmsg(struct socket *sock, struct msghdr *=
+msg, size_t len,
+ 	if (rxrpc_call_has_failed(call))
+ 		goto call_failed;
+ =
 
-With a consistent name, feel free to use:
+-	if (!skb_queue_empty(&call->recvmsg_queue))
++	if (!(flags & MSG_PEEK) &&
++	    !skb_queue_empty(&call->recvmsg_queue))
+ 		rxrpc_notify_socket(call);
+ 	goto not_yet_complete;
+ =
 
-Reviewed-by: Petr Mladek <pmladek@suse.com>
+@@ -549,11 +550,19 @@ int rxrpc_recvmsg(struct socket *sock, struct msghdr=
+ *msg, size_t len,
+ error_requeue_call:
+ 	if (!(flags & MSG_PEEK)) {
+ 		spin_lock_irq(&rx->recvmsg_lock);
+-		list_add(&call->recvmsg_link, &rx->recvmsg_q);
++		if (list_empty(&call->recvmsg_link)) {
++			list_add(&call->recvmsg_link, &rx->recvmsg_q);
++			rxrpc_see_call(call, rxrpc_call_see_recvmsg_requeue);
++		} else if (list_is_first(&call->recvmsg_link, &rx->recvmsg_q)) {
++			rxrpc_see_call(call, rxrpc_call_see_recvmsg_requeue_first);
++		} else {
++			list_move(&call->recvmsg_link, &rx->recvmsg_q);
++			rxrpc_see_call(call, rxrpc_call_see_recvmsg_requeue_move);
++		}
+ 		spin_unlock_irq(&rx->recvmsg_lock);
+ 		trace_rxrpc_recvmsg(call_debug_id, rxrpc_recvmsg_requeue, 0);
+ 	} else {
+-		rxrpc_put_call(call, rxrpc_call_put_recvmsg);
++		rxrpc_put_call(call, rxrpc_call_put_recvmsg_peek_nowait);
+ 	}
+ error_no_call:
+ 	release_sock(&rx->sk);
 
-Best Regards,
-Petr
 
