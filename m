@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-249306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 545F4D168C0
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 04:45:49 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2F9CD168C3
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 04:46:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E6B963048D80
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 03:44:36 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D1D043013BD8
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 03:44:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0917534BA40;
-	Tue, 13 Jan 2026 03:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72CF834BA46;
+	Tue, 13 Jan 2026 03:44:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61917346FC8;
-	Tue, 13 Jan 2026 03:44:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BBF43090D2;
+	Tue, 13 Jan 2026 03:44:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768275874; cv=none; b=HM1mGyqtXxzM1KVPV9NEtogIyB47fN4CgRcsK38S5qXJmADXsfZRWSW5e2nFtxLdWCYgooPpETgy3BjM58idVrZrQQo9ic6cm3b2YLvmt3aG7LYX0ck+fpgcZZN9NnGyVUceYEfXrXm28CmmBPX4HhFctm3yqLqeOhOb989W1kY=
+	t=1768275884; cv=none; b=Hf5YQSAMmS63hdLrifiUJILnO0Yb0pYBxVUOD52Hr2RLXw7iIBYxF37jKFg90eD3aeplprKeqKpH8BgTfMwVwGwxR/C17sHxnJ9EnOkXVLxPjDr3rNKJPND7lJyv4zy2fxiCb5ID0u7meZXcp8QvUouzpwwntJHOWbD9KlrfXo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768275874; c=relaxed/simple;
-	bh=D6jaX+T2Ty56vMuNiH0I3jaW1WG0HYDH33ZQKrpxhXE=;
+	s=arc-20240116; t=1768275884; c=relaxed/simple;
+	bh=9lYvE1lWK65fQNDb1ov3iurb3fOw/SUHyMdoLQ73OKw=;
 	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NUMKd0EKD22EANNXUERf+2iWL2OzdlOllH39VK2bEvc3GqWkVa9b0QsTiIWFYL+BZx83voYM3rpRFxKha03enNQ2N3rdixShctLt9RfZYZxRaFHXguvtv4Rm4Ztr5gjp9mUe8VULtS2a+bs2YTB8iLTWpx3/wtIj+czU0FU+nds=
+	 Content-Type:Content-Disposition:In-Reply-To; b=fTauYkujVK88TQSNnTFNGmYZJuzv/ArsT+mWkUrjz4gonAZGzQyvzL9gaNgjpdNrS//lJvbq541J/3HBxuHTrNM7gzJtuoJKCyAGSy1YYTXA1gs5hIWjNYql565KxhaYwTM/D0VM11AtldIUSaMf1wzRuZTI3+QfWkvqpdfMnEY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -31,9 +31,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.99)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1vfVKW-000000001VE-2FTY;
-	Tue, 13 Jan 2026 03:44:28 +0000
-Date: Tue, 13 Jan 2026 03:44:25 +0000
+	id 1vfVKe-000000001Vl-0ug9;
+	Tue, 13 Jan 2026 03:44:36 +0000
+Date: Tue, 13 Jan 2026 03:44:33 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>,
@@ -45,8 +45,8 @@ To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	Vladimir Oltean <vladimir.oltean@nxp.com>,
 	Aleksander Jan Bajkowski <olek2@wp.pl>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/5] net: phy: realtek: reunify C22 and C45 drivers
-Message-ID: <bffcb85fdc20e07056976962d3caaa1be5d0ddb0.1768275364.git.daniel@makrotopia.org>
+Subject: [PATCH v2 4/5] net: phy: realtek: demystify PHYSR register location
+Message-ID: <6ed246e0aa3ca8038d2fa432d51518959fb89b6b.1768275364.git.daniel@makrotopia.org>
 References: <cover.1768275364.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -58,136 +58,95 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1768275364.git.daniel@makrotopia.org>
 
-Reunify the split C22/C45 drivers for the RTL8221B-VB-CG 2.5Gbps and
-RTL8221B-VM-CG 2.5Gbps PHYs back into a single driver.
-
-This is possible now by using all the driver operations previously used
-by the C45 driver, as transparent access to all MMDs including
-MDIO_MMD_VEND2 is now possible also over Clause-22 MDIO.
-
-The unified driver will still only use Clause-45 access on any Clause-45
-capable busses while still working fine on Clause-22 busses.
+Turns out that register address RTL_VND2_PHYSR (0xa434) maps to
+Clause-22 register MII_RESV2. Use that to get rid of yet another magic
+number, and rename access macros accordingly.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
-v2: improve commit message
+v2: rebase on top of recent commit
+    "net: phy: realtek: add dummy PHY driver for RTL8127ATF"
+    replacing newly added reference to RTL_VND2_PHYSR
 
- drivers/net/phy/realtek/realtek_main.c | 72 ++++++--------------------
- 1 file changed, 16 insertions(+), 56 deletions(-)
+ drivers/net/phy/realtek/realtek_main.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index 74980b2d66157..4512fad3f64b8 100644
+index 4512fad3f64b8..8f1c8424e7f94 100644
 --- a/drivers/net/phy/realtek/realtek_main.c
 +++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -1880,28 +1880,18 @@ static int rtl8221b_match_phy_device(struct phy_device *phydev,
- 	return phydev->phy_id == RTL_8221B && rtlgen_supports_mmd(phydev);
- }
+@@ -179,12 +179,12 @@
+ #define RTL9000A_GINMR				0x14
+ #define RTL9000A_GINMR_LINK_STATUS		BIT(4)
  
--static int rtl8221b_vb_cg_c22_match_phy_device(struct phy_device *phydev,
--					       const struct phy_driver *phydrv)
-+static int rtl8221b_vb_cg_match_phy_device(struct phy_device *phydev,
-+					   const struct phy_driver *phydrv)
- {
--	return rtlgen_is_c45_match(phydev, RTL_8221B_VB_CG, false);
-+	return rtlgen_is_c45_match(phydev, RTL_8221B_VB_CG, true) ||
-+	       rtlgen_is_c45_match(phydev, RTL_8221B_VB_CG, false);
- }
+-#define RTL_VND2_PHYSR				0xa434
+-#define RTL_VND2_PHYSR_DUPLEX			BIT(3)
+-#define RTL_VND2_PHYSR_SPEEDL			GENMASK(5, 4)
+-#define RTL_VND2_PHYSR_SPEEDH			GENMASK(10, 9)
+-#define RTL_VND2_PHYSR_MASTER			BIT(11)
+-#define RTL_VND2_PHYSR_SPEED_MASK		(RTL_VND2_PHYSR_SPEEDL | RTL_VND2_PHYSR_SPEEDH)
++#define RTL_PHYSR				MII_RESV2
++#define RTL_PHYSR_DUPLEX			BIT(3)
++#define RTL_PHYSR_SPEEDL			GENMASK(5, 4)
++#define RTL_PHYSR_SPEEDH			GENMASK(10, 9)
++#define RTL_PHYSR_MASTER			BIT(11)
++#define RTL_PHYSR_SPEED_MASK			(RTL_PHYSR_SPEEDL | RTL_PHYSR_SPEEDH)
  
--static int rtl8221b_vb_cg_c45_match_phy_device(struct phy_device *phydev,
--					       const struct phy_driver *phydrv)
-+static int rtl8221b_vm_cg_match_phy_device(struct phy_device *phydev,
-+					   const struct phy_driver *phydrv)
- {
--	return rtlgen_is_c45_match(phydev, RTL_8221B_VB_CG, true);
--}
--
--static int rtl8221b_vm_cg_c22_match_phy_device(struct phy_device *phydev,
--					       const struct phy_driver *phydrv)
--{
--	return rtlgen_is_c45_match(phydev, RTL_8221B_VM_CG, false);
--}
--
--static int rtl8221b_vm_cg_c45_match_phy_device(struct phy_device *phydev,
--					       const struct phy_driver *phydrv)
--{
--	return rtlgen_is_c45_match(phydev, RTL_8221B_VM_CG, true);
-+	return rtlgen_is_c45_match(phydev, RTL_8221B_VM_CG, true) ||
-+	       rtlgen_is_c45_match(phydev, RTL_8221B_VM_CG, false);
- }
+ #define	RTL_MDIO_PCS_EEE_ABLE			0xa5c4
+ #define	RTL_MDIO_AN_EEE_ADV			0xa5d0
+@@ -1103,12 +1103,12 @@ static void rtlgen_decode_physr(struct phy_device *phydev, int val)
+ 	 * 0: Half Duplex
+ 	 * 1: Full Duplex
+ 	 */
+-	if (val & RTL_VND2_PHYSR_DUPLEX)
++	if (val & RTL_PHYSR_DUPLEX)
+ 		phydev->duplex = DUPLEX_FULL;
+ 	else
+ 		phydev->duplex = DUPLEX_HALF;
  
- static int rtl_internal_nbaset_match_phy_device(struct phy_device *phydev,
-@@ -2324,27 +2314,8 @@ static struct phy_driver realtek_drvs[] = {
- 		.read_mmd	= rtl822xb_read_mmd,
- 		.write_mmd	= rtl822xb_write_mmd,
- 	}, {
--		.match_phy_device = rtl8221b_vb_cg_c22_match_phy_device,
--		.name		= "RTL8221B-VB-CG 2.5Gbps PHY (C22)",
--		.config_intr	= rtl8221b_config_intr,
--		.handle_interrupt = rtl8221b_handle_interrupt,
--		.probe		= rtl822x_probe,
--		.get_features	= rtl822x_get_features,
--		.config_aneg	= rtl822x_config_aneg,
--		.config_init	= rtl822xb_config_init,
--		.inband_caps	= rtl822x_inband_caps,
--		.config_inband	= rtl822x_config_inband,
--		.get_rate_matching = rtl822xb_get_rate_matching,
--		.read_status	= rtl822xb_read_status,
--		.suspend	= genphy_suspend,
--		.resume		= rtlgen_resume,
--		.read_page	= rtl821x_read_page,
--		.write_page	= rtl821x_write_page,
--		.read_mmd	= rtl822xb_read_mmd,
--		.write_mmd	= rtl822xb_write_mmd,
--	}, {
--		.match_phy_device = rtl8221b_vb_cg_c45_match_phy_device,
--		.name		= "RTL8221B-VB-CG 2.5Gbps PHY (C45)",
-+		.match_phy_device = rtl8221b_vb_cg_match_phy_device,
-+		.name		= "RTL8221B-VB-CG 2.5Gbps PHY",
- 		.config_intr	= rtl8221b_config_intr,
- 		.handle_interrupt = rtl8221b_handle_interrupt,
- 		.probe		= rtl822x_probe,
-@@ -2357,28 +2328,13 @@ static struct phy_driver realtek_drvs[] = {
- 		.read_status	= rtl822xb_c45_read_status,
- 		.suspend	= genphy_c45_pma_suspend,
- 		.resume		= rtlgen_c45_resume,
--	}, {
--		.match_phy_device = rtl8221b_vm_cg_c22_match_phy_device,
--		.name		= "RTL8221B-VM-CG 2.5Gbps PHY (C22)",
--		.config_intr	= rtl8221b_config_intr,
--		.handle_interrupt = rtl8221b_handle_interrupt,
--		.probe		= rtl822x_probe,
--		.get_features	= rtl822x_get_features,
--		.config_aneg	= rtl822x_config_aneg,
--		.config_init	= rtl822xb_config_init,
--		.inband_caps	= rtl822x_inband_caps,
--		.config_inband	= rtl822x_config_inband,
--		.get_rate_matching = rtl822xb_get_rate_matching,
--		.read_status	= rtl822xb_read_status,
--		.suspend	= genphy_suspend,
--		.resume		= rtlgen_resume,
- 		.read_page	= rtl821x_read_page,
- 		.write_page	= rtl821x_write_page,
- 		.read_mmd	= rtl822xb_read_mmd,
- 		.write_mmd	= rtl822xb_write_mmd,
- 	}, {
--		.match_phy_device = rtl8221b_vm_cg_c45_match_phy_device,
--		.name		= "RTL8221B-VM-CG 2.5Gbps PHY (C45)",
-+		.match_phy_device = rtl8221b_vm_cg_match_phy_device,
-+		.name		= "RTL8221B-VM-CG 2.5Gbps PHY",
- 		.config_intr	= rtl8221b_config_intr,
- 		.handle_interrupt = rtl8221b_handle_interrupt,
- 		.probe		= rtl822x_probe,
-@@ -2391,6 +2347,10 @@ static struct phy_driver realtek_drvs[] = {
- 		.read_status	= rtl822xb_c45_read_status,
- 		.suspend	= genphy_c45_pma_suspend,
- 		.resume		= rtlgen_c45_resume,
-+		.read_page	= rtl821x_read_page,
-+		.write_page	= rtl821x_write_page,
-+		.read_mmd	= rtl822xb_read_mmd,
-+		.write_mmd	= rtl822xb_write_mmd,
- 	}, {
- 		.match_phy_device = rtl8251b_c45_match_phy_device,
- 		.name		= "RTL8251B 5Gbps PHY",
+-	switch (val & RTL_VND2_PHYSR_SPEED_MASK) {
++	switch (val & RTL_PHYSR_SPEED_MASK) {
+ 	case 0x0000:
+ 		phydev->speed = SPEED_10;
+ 		break;
+@@ -1136,7 +1136,7 @@ static void rtlgen_decode_physr(struct phy_device *phydev, int val)
+ 	 * 1: Master Mode
+ 	 */
+ 	if (phydev->speed >= 1000) {
+-		if (val & RTL_VND2_PHYSR_MASTER)
++		if (val & RTL_PHYSR_MASTER)
+ 			phydev->master_slave_state = MASTER_SLAVE_STATE_MASTER;
+ 		else
+ 			phydev->master_slave_state = MASTER_SLAVE_STATE_SLAVE;
+@@ -1156,8 +1156,7 @@ static int rtlgen_read_status(struct phy_device *phydev)
+ 	if (!phydev->link)
+ 		return 0;
+ 
+-	val = phy_read_paged(phydev, RTL822X_VND2_TO_PAGE(RTL_VND2_PHYSR),
+-			     RTL822X_VND2_TO_PAGE_REG(RTL_VND2_PHYSR));
++	val = phy_read(phydev, RTL_PHYSR);
+ 	if (val < 0)
+ 		return val;
+ 
+@@ -1623,7 +1622,8 @@ static int rtl822x_c45_read_status(struct phy_device *phydev)
+ 	}
+ 
+ 	/* Read actual speed from vendor register. */
+-	val = phy_read_mmd(phydev, MDIO_MMD_VEND2, RTL_VND2_PHYSR);
++	val = phy_read_mmd(phydev, MDIO_MMD_VEND2,
++			   RTL822X_VND2_C22_REG(RTL_PHYSR));
+ 	if (val < 0)
+ 		return val;
+ 
+@@ -2127,7 +2127,7 @@ static int rtlgen_sfp_read_status(struct phy_device *phydev)
+ 	if (!phydev->link)
+ 		return 0;
+ 
+-	val = rtlgen_read_vend2(phydev, RTL_VND2_PHYSR);
++	val = phy_read(phydev, RTL_PHYSR);
+ 	if (val < 0)
+ 		return val;
+ 
 -- 
 2.52.0
 
