@@ -1,279 +1,196 @@
-Return-Path: <netdev+bounces-249406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E1F4D17FFF
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 11:27:19 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AEDAD1810C
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 11:34:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6C4F63014D97
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 10:27:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8AAC1301D8A6
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 10:28:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DC963876D1;
-	Tue, 13 Jan 2026 10:27:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3AF38B99A;
+	Tue, 13 Jan 2026 10:27:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="Qh2IkMS9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NClj29oc";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="EYSiAaws"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com [209.85.128.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23EBF3446CC
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 10:26:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55C7C38B7B1
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 10:27:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768300023; cv=none; b=Auh/E2Z7BdEozkyIg7u39Nc3cZCKGWN2yKDoAL/mGixy1sBl2D0GgIDVqKTFyehRcNY+pQq8zAfaCfNRNkh9UVcEd5vlji3sfCvVmBygL1ExsON085k457YT+Qvcn9uY5pGeRpftxan3V0rWl8ZvNOaRzjLkm773tH5Gnt4wAMg=
+	t=1768300079; cv=none; b=cEWBP4Pj+ZCqShIXvM5XMNHQMyckXGCMeAkM0cgE/qlxBCHe+8z96lJuNkdSve8bDL4Lc0QhZvDQNANy3y3n5KhZY25H8CpBBu7uxwTTzDVGfFkMNcEmc4yUINnuJvOdJgZSKcqrbdu51//kZTxm5SynY68sKsP6LHb95xdMGik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768300023; c=relaxed/simple;
-	bh=o+nhYXWfd2zUEo4WHOw2AX4PEwxHY0tWx9PSX+0A1QM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rknhZV0DErldK8Z0xIfYwZoaMu1xJQyV8B6ltHGYs50bI541Oggr23PR01OyvAMduYsXMZX8Hl7PE9e92Cb+DXO6+CT+zkzseVqDwnI0A+tVatCFPEb1vYRrzI/dVskP4dDPMEKn/sRb2ejYMZNQEd7SgjSiSU1/FViiEwVx6Pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=Qh2IkMS9; arc=none smtp.client-ip=209.85.128.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wm1-f66.google.com with SMTP id 5b1f17b1804b1-47d5e021a53so54439965e9.3
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 02:26:49 -0800 (PST)
+	s=arc-20240116; t=1768300079; c=relaxed/simple;
+	bh=Xs40V71NSFgBl8ux07wXA+nnPiuQ97Bp4CQVChxYDDY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HlgCFz5aLsPEO6kIjbmEe3FArckmASex19XlCvXQAoNHmLP51LpRAQmw8HyninQKTESj1NaTQdsSKoIEYxWhQ1DXPgFEKBiO5wn2eDuW4k43kPVGeFm48ksMNqOcrsOLlnfGsqSWCvU+MTLsHpGs7Q4rvRS3c/Iv1MIeY7vKLYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NClj29oc; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=EYSiAaws; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768300075;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WZv6AyyuLVVLAZ1eQ6zjrtIwS0o/q5F3gCFQ/xz3D2k=;
+	b=NClj29ocrXBwpERDSs1D7BvqCTEwbxSgumH3xypeSfL4Ed1Ul5PKrpFSr0Zqi1kDKw0IOq
+	geC9aM/QNMyUGf+dBIEBdbl3VjYb128jEagbVYrjEoWCoIYCG3nxNymrrRWwA25LW/cSZX
+	CBGoFJFSfV109z2rwkiUrHPUq/Zt2ek=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-677-Z9RZNdMnMxSekgKLBuct-A-1; Tue, 13 Jan 2026 05:27:52 -0500
+X-MC-Unique: Z9RZNdMnMxSekgKLBuct-A-1
+X-Mimecast-MFC-AGG-ID: Z9RZNdMnMxSekgKLBuct-A_1768300072
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-431054c09e3so4333349f8f.0
+        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 02:27:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1768300008; x=1768904808; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HJpIuelX4DquNfRDlO2MRonQeXm4YP1X8f+1rZWzezQ=;
-        b=Qh2IkMS94JQ3ryTsDa/EE0dqR8PrGwbAVHfvnXW4gYs0XFPdlbSTIO2Ww95wApt5WO
-         9RWwCV6vBtZKOaRQn3+LFOJuGLrAC15nMYx0WH7EVjZLCZxlen40+kFvhOxRdbA6Eo2x
-         jxcP1FOaeTEoe7RnlIbv0n07DCi2DjU1EGDJQzUlYCjJvpGFofWgKifF/gMsG70tkr/c
-         cc/mLbBT0Cr3CV2aJ7a5r4P+YeAI5Drwh8O46TSF+FijDXlwJkTW5bE5n2vvPjoMFbd7
-         txKbi17n/dvE3ezNb+2w612e2VqZhB0kQcGR/Debqnd51dWOO++p93YsZKRG+mUACDn/
-         MOgw==
+        d=redhat.com; s=google; t=1768300071; x=1768904871; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WZv6AyyuLVVLAZ1eQ6zjrtIwS0o/q5F3gCFQ/xz3D2k=;
+        b=EYSiAawsYTNJ9xFyiruITJqpMqvq5MTxe55vxFB2RULPWx2bFC4i+M0XCRiRdxO1aI
+         NLuKPzHTYQmJjQE0JAf6tkdPeouonRRwd6/g2Ggd5zDFJJLBujqKqyGJgnFuv7i4sy5z
+         3appb2k9lkm1CXMlHE+ZX5igZYi7HI+Yq8TPoelOciqgUC3rSqoQE1vsc9nByeV5um2H
+         MV/3TyCysCSGDrl53vvNLxDvytR/UUa0i3XLonf8pakzayCZ0eJ3kUN2CyT3IR62UNuw
+         0pgl28vgzJAgCd7Sqtm3c8cNz7FFONybLD578SNU7J5RuvKOu+4+VJkKUsMyysN4UZp4
+         FIuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768300008; x=1768904808;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HJpIuelX4DquNfRDlO2MRonQeXm4YP1X8f+1rZWzezQ=;
-        b=NtrMPGQgYOaEoqi5cBS3Sj8gUsPaWdRs0Hw4qP5oHePEZC7pbN+idp8DsWsh5pPrbK
-         BdxjZSK+3ehhWM3m7+vDlcQNIzIvRJuRdUuS/vcdWg33TI21DaDLg/qiMgY7tdiJvEpw
-         wsbRMKFQc/TqMoe/l6pkSMGfC7OorzQ1GiQEPgl1jsZt1yO1fQoT7WiLgDyTCAFHDX0g
-         TS7TZhl9XgAK1Wju5MYpi2k57rv45YSylRxsLs5IIpoaBRqdOyRQKELak3EjJygUFRva
-         v4vsaNeYNvKLxIHeW5bc59x6XiDqAzB655/KZQTHNfp0HVvRmg/CnOwanrTYBcHznoVS
-         2ZPw==
-X-Forwarded-Encrypted: i=1; AJvYcCWDOTMULSnAb6MyZ7icAfp92c2aVqMAdT69GEF1a0bvibOv8uX3iXE0f/NLgOvYyAJWQUHt9ao=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxg4LV+onOoWBvENFkwUzeTBQ2G0fCOVIp8RucdOm3YvB9en6/I
-	OFPxMdDOZdnUytthxTWF5bnUdIgB9WhdmbqbV2Sfog/I9DoSpqE5j/iFOQ4Lld51lnA=
-X-Gm-Gg: AY/fxX5zjsoIZewg7QFu8RvIxBxm4xju0h4igN4ly9zIB8PO2K7K5WFzoxyqePWKhQZ
-	Q8UbM+xEgtERES0OzCLWrVPltm/QuS2f9IN/FFpn680dfZwy6SDGWI0YxU92Di7TPcRPo8/3s78
-	8qPsMJWdiftOK2pvATOguO6LEqTL5Fqvqw7HuOX01hM3T9VX9UhZkur1NkEZpUvEDvy4Zl+akQC
-	L8BVeZGvD1r9XSl+KzOJPmhMA5PE6XDzbYD910zRrZOMIliu0z7dlRHfdFruqcBTurZZxXFqz7K
-	MgjqvzvXvb6+N7jjDpoie9pllS0QvEdwzRkxYeBHEeAwlPtXaHPzf+1Nz4ibreI+BF2wcnGdycP
-	ajcCVjGbdXWX3RxQzjMXHaj+Nvz8rJHBR4DBzkIfh8Hvjcu67zobRdb9TXt0Cd3jB7ABJr8Ogw6
-	k2/1WM3he+DWZcInegwVC9Uf2/XM3whm38JRjn2gSEhFj9DmyE5XmJYyN4BB+jqP3pzCve17mNR
-	j0=
-X-Google-Smtp-Source: AGHT+IEbuGfxR1p+fJkXnK5yMjdSzOLHQPwM0s2lDSS9iAv4s1cNcdunRAz8eOOXng88PZ0TPbmktQ==
-X-Received: by 2002:a05:600c:3146:b0:477:b642:9dc9 with SMTP id 5b1f17b1804b1-47d84b3b513mr230348565e9.28.1768300008248;
-        Tue, 13 Jan 2026 02:26:48 -0800 (PST)
-Received: from localhost (p200300f65f20eb04dea93da528314008.dip0.t-ipconnect.de. [2003:f6:5f20:eb04:dea9:3da5:2831:4008])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-47d7f653cd6sm419605875e9.9.2026.01.13.02.26.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jan 2026 02:26:47 -0800 (PST)
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH RESEND net-next] mdio: Make use of bus callbacks
-Date: Tue, 13 Jan 2026 11:26:36 +0100
-Message-ID: <20260113102636.3822825-2-u.kleine-koenig@baylibre.com>
-X-Mailer: git-send-email 2.47.3
+        d=1e100.net; s=20230601; t=1768300071; x=1768904871;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WZv6AyyuLVVLAZ1eQ6zjrtIwS0o/q5F3gCFQ/xz3D2k=;
+        b=g1qofG9jEki56Y0VwH5ml9Nw/ofbxWzWoZvToIM2kCTwUScJTg/SXnLy1bg4PmfY26
+         wZiXWqDmzuD58sUQsxpnAkFaFzAXy6JXqgrtD6ds4sxGSGJHpZD4ct56o3e4jeTcpNVL
+         s3vgGc89zEo+JwvFHS5+y3dsnA9a7c4zTBS6fqnLlbOpPN9rMY7E/eVe4fG+uiFc0TXF
+         Rj7x96zfiQy0fGKJDu+OrA3L+YqScoqDUHh8OymYidG4iQ9ZSHOldun1VzNF6BYNgHWZ
+         3eozHQ6f6Nh2TVYqdC/z4mLJoKwy1Q/NVea+uF3B8R2ndmYvNl7Rupgq5aD3upC8tR5s
+         ok3A==
+X-Forwarded-Encrypted: i=1; AJvYcCUFB3HiGt1+vkDJhRnfZFbWwnR3VrIzdI5VoMMyRtA6um1HTvT4rV07wLGNcyKP5Q0NIlbHGZ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4x402J1Bv3W0xzEVB+MLyT4e+lIXZq6CrnvY2+8vxs1sdpkG9
+	L7Wrc4KaAzQolM5b6db4aSPEJHGNVFA2g2/BCQmGDn+79JaBVGLDP7Aha0HvjHfD+zuAIwbh4ky
+	Eipyosnka3mE5v1zihPfUW7j2EubwEoPl3+KQ5//mtXNBlwwgYZO9v2Rr6A==
+X-Gm-Gg: AY/fxX7GY7ah6kMJDkDaRh7rOHQwEpcMf76VpaI+VTHC6kVMLOihQZKM+akkZZRzK4o
+	ygksDwJIucX8SdgutIyrquqaMdDogsWDA5SZ7C2ZkYfhnIDvK1K9dAIit3AsIpwdQ7Bu3jQ4464
+	bkaDhcYfZL7CUGoP4eq0SpXo1jPHMhlvzARY2KspK7dO7p+sWurFwYSE6fj1m5Q/uBjqW4QA9mt
+	z84LDa6RqjcftGr7lfe21BPEXc7YoiHLZnjtdciwdAHYI21+ydSdhAi6v+CNYgYM157HYkBKDAK
+	F/E75aqLmM5r8s3axNZwWaRuBgIJ1h4d2h0onRpw+JHIgSf0Iwkq6QhCOo7iB+s+Fde/LZ8ZpPs
+	yPx9hwjL8YKCu
+X-Received: by 2002:a05:600c:c10f:b0:47e:d6ee:7dd1 with SMTP id 5b1f17b1804b1-47ed6ee7dfbmr30480325e9.2.1768300071537;
+        Tue, 13 Jan 2026 02:27:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFBi8qAsCyoUj8yK3DWWfIteg/UVGEMMZ3DTwKr3HpHFkur4u7m4Xtrpa9L15tB9tU9SsSBiA==
+X-Received: by 2002:a05:600c:c10f:b0:47e:d6ee:7dd1 with SMTP id 5b1f17b1804b1-47ed6ee7dfbmr30480125e9.2.1768300071047;
+        Tue, 13 Jan 2026 02:27:51 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.93])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f695956sm408197555e9.6.2026.01.13.02.27.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Jan 2026 02:27:50 -0800 (PST)
+Message-ID: <4db44c27-4654-46f9-be41-93bcf06302b2@redhat.com>
+Date: Tue, 13 Jan 2026 11:27:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 6/9] eth: bnxt: adjust the fill level of agg
+ queues with larger buffers
+To: Pavel Begunkov <asml.silence@gmail.com>, netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Joshua Washington <joshwash@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Alexander Duyck <alexanderduyck@fb.com>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, Shuah Khan
+ <shuah@kernel.org>, Willem de Bruijn <willemb@google.com>,
+ Ankit Garg <nktgrg@google.com>, Tim Hostetler <thostet@google.com>,
+ Alok Tiwari <alok.a.tiwari@oracle.com>, Ziwei Xiao <ziweixiao@google.com>,
+ John Fraker <jfraker@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Mohsin Bashir <mohsin.bashr@gmail.com>, Joe Damato <joe@dama.to>,
+ Mina Almasry <almasrymina@google.com>,
+ Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Kuniyuki Iwashima <kuniyu@google.com>,
+ Samiullah Khawaja <skhawaja@google.com>, Ahmed Zaki <ahmed.zaki@intel.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>, David Wei
+ <dw@davidwei.uk>, Yue Haibing <yuehaibing@huawei.com>,
+ Haiyue Wang <haiyuewa@163.com>, Jens Axboe <axboe@kernel.dk>,
+ Simon Horman <horms@kernel.org>, Vishwanath Seshagiri <vishs@fb.com>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, dtatulea@nvidia.com,
+ io-uring@vger.kernel.org
+References: <cover.1767819709.git.asml.silence@gmail.com>
+ <8b6486d8a498875c4157f28171b5b0d26593c3d8.1767819709.git.asml.silence@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <8b6486d8a498875c4157f28171b5b0d26593c3d8.1767819709.git.asml.silence@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5300; i=u.kleine-koenig@baylibre.com; h=from:subject; bh=o+nhYXWfd2zUEo4WHOw2AX4PEwxHY0tWx9PSX+0A1QM=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBpZh3cGmq7KsYLP3L7xoFJNIcvku+GENb/4QHz4 G0fOl0lH5KJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCaWYd3AAKCRCPgPtYfRL+ TqaWB/4o0IDIzkvxy7ETn9/nEP/UQvF+6EhhhB5BSGR8kfLp+GOcqFuaf0rIL4oK8BpwuJPS81S V0z6BiJD9+eTSt3bFwpDuHkwlkTU49vv9Q+HNnNZ2oyFNSbye7CozImV6yn03b/EePKZzrudwIM ZBCNn4kL2jkEwvWe64uLgEuOXgRilyUq62GuLawJhutHhTCFzEycp4UlXENMdVp/bMK1znO22U7 PfheoHxJ6KUjbHkjGWwOXNi9n+deDnX6hmtDfBMCpjBbwjThCs72KKaUFy/GnHfXArxDSjgQY0S 4iUmg0+58NYsZA0R91ABO9NE49ARc9+6WIwS4AgUtNdP1FOD
-X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Introduce a bus specific probe, remove and shutdown function.
+On 1/9/26 12:28 PM, Pavel Begunkov wrote:
+> From: Jakub Kicinski <kuba@kernel.org>
+> 
+> The driver tries to provision more agg buffers than header buffers
+> since multiple agg segments can reuse the same header. The calculation
+> / heuristic tries to provide enough pages for 65k of data for each header
+> (or 4 frags per header if the result is too big). This calculation is
+> currently global to the adapter. If we increase the buffer sizes 8x
+> we don't want 8x the amount of memory sitting on the rings.
+> Luckily we don't have to fill the rings completely, adjust
+> the fill level dynamically in case particular queue has buffers
+> larger than the global size.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> [pavel: rebase on top of agg_size_fac, assert agg_size_fac]
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 28 +++++++++++++++++++----
+>  1 file changed, 24 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index 8f42885a7c86..137e348d2b9c 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -3816,16 +3816,34 @@ static void bnxt_free_rx_rings(struct bnxt *bp)
+>  	}
+>  }
+>  
+> +static int bnxt_rx_agg_ring_fill_level(struct bnxt *bp,
+> +				       struct bnxt_rx_ring_info *rxr)
+> +{
+> +	/* User may have chosen larger than default rx_page_size,
+> +	 * we keep the ring sizes uniform and also want uniform amount
+> +	 * of bytes consumed per ring, so cap how much of the rings we fill.
+> +	 */
+> +	int fill_level = bp->rx_agg_ring_size;
+> +
+> +	if (rxr->rx_page_size > BNXT_RX_PAGE_SIZE)
+> +		fill_level /= rxr->rx_page_size / BNXT_RX_PAGE_SIZE;
 
-The objective is to get rid of users of struct device_driver callbacks
-.probe(), .remove() and .shutdown() to eventually remove these.
+According to the check in bnxt_alloc_rx_page_pool() it's theoretically
+possible for `rxr->rx_page_size / BNXT_RX_PAGE_SIZE` being zero. If so
+the above would crash.
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
----
-Hello,
+Side note: this looks like something AI review could/should catch. The
+fact it didn't makes me think I'm missing something...
 
-it seems I misunderstood when net-next opens, I thought this happens
-"automatically" after an -rc1 is tagged and thus delayed the original
-submission
-(https://lore.kernel.org/netdev/20251216070333.2452582-2-u.kleine-koenig@baylibre.com/)
-only until after v6.19-rc1 was tagged. Anyhow, I got a form letter in
-reply that net-next was still closed and thus here comes the requested
-resend.
-
-I based this patch on top of v6.19-rc1 for my own tracking of similar
-patches for other subsystems but it applies fine to net-next/main
-(de746f8f53410a0e31d8e5d145745332ee77d321), too.
-
-Best regards
-Uwe
-
- drivers/net/phy/mdio_bus.c    | 56 +++++++++++++++++++++++++++++++++
- drivers/net/phy/mdio_device.c | 58 -----------------------------------
- 2 files changed, 56 insertions(+), 58 deletions(-)
-
-diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
-index afdf1ad6c0e6..dea67470a7bf 100644
---- a/drivers/net/phy/mdio_bus.c
-+++ b/drivers/net/phy/mdio_bus.c
-@@ -1004,11 +1004,67 @@ static const struct attribute_group *mdio_bus_dev_groups[] = {
- 	NULL,
- };
- 
-+/**
-+ * mdio_bus_probe - probe an MDIO device
-+ * @dev: device to probe
-+ *
-+ * Description: Take care of setting up the mdio_device structure
-+ * and calling the driver to probe the device.
-+ *
-+ * Return: Zero if successful, negative error code on failure
-+ */
-+static int mdio_bus_probe(struct device *dev)
-+{
-+	struct mdio_device *mdiodev = to_mdio_device(dev);
-+	struct device_driver *drv = dev->driver;
-+	struct mdio_driver *mdiodrv = to_mdio_driver(drv);
-+	int err = 0;
-+
-+	/* Deassert the reset signal */
-+	mdio_device_reset(mdiodev, 0);
-+
-+	if (mdiodrv->probe) {
-+		err = mdiodrv->probe(mdiodev);
-+		if (err) {
-+			/* Assert the reset signal */
-+			mdio_device_reset(mdiodev, 1);
-+		}
-+	}
-+
-+	return err;
-+}
-+
-+static void mdio_bus_remove(struct device *dev)
-+{
-+	struct mdio_device *mdiodev = to_mdio_device(dev);
-+	struct device_driver *drv = dev->driver;
-+	struct mdio_driver *mdiodrv = to_mdio_driver(drv);
-+
-+	if (mdiodrv->remove)
-+		mdiodrv->remove(mdiodev);
-+
-+	/* Assert the reset signal */
-+	mdio_device_reset(mdiodev, 1);
-+}
-+
-+static void mdio_bus_shutdown(struct device *dev)
-+{
-+	struct mdio_device *mdiodev = to_mdio_device(dev);
-+	struct device_driver *drv = dev->driver;
-+	struct mdio_driver *mdiodrv = to_mdio_driver(drv);
-+
-+	if (drv && mdiodrv->shutdown)
-+		mdiodrv->shutdown(mdiodev);
-+}
-+
- const struct bus_type mdio_bus_type = {
- 	.name		= "mdio_bus",
- 	.dev_groups	= mdio_bus_dev_groups,
- 	.match		= mdio_bus_match,
- 	.uevent		= mdio_uevent,
-+	.probe		= mdio_bus_probe,
-+	.remove		= mdio_bus_remove,
-+	.shutdown	= mdio_bus_shutdown,
- };
- EXPORT_SYMBOL(mdio_bus_type);
- 
-diff --git a/drivers/net/phy/mdio_device.c b/drivers/net/phy/mdio_device.c
-index 6e90ed42cd98..29172fa8d0df 100644
---- a/drivers/net/phy/mdio_device.c
-+++ b/drivers/net/phy/mdio_device.c
-@@ -202,61 +202,6 @@ void mdio_device_reset(struct mdio_device *mdiodev, int value)
- }
- EXPORT_SYMBOL(mdio_device_reset);
- 
--/**
-- * mdio_probe - probe an MDIO device
-- * @dev: device to probe
-- *
-- * Description: Take care of setting up the mdio_device structure
-- * and calling the driver to probe the device.
-- *
-- * Return: Zero if successful, negative error code on failure
-- */
--static int mdio_probe(struct device *dev)
--{
--	struct mdio_device *mdiodev = to_mdio_device(dev);
--	struct device_driver *drv = mdiodev->dev.driver;
--	struct mdio_driver *mdiodrv = to_mdio_driver(drv);
--	int err = 0;
--
--	/* Deassert the reset signal */
--	mdio_device_reset(mdiodev, 0);
--
--	if (mdiodrv->probe) {
--		err = mdiodrv->probe(mdiodev);
--		if (err) {
--			/* Assert the reset signal */
--			mdio_device_reset(mdiodev, 1);
--		}
--	}
--
--	return err;
--}
--
--static int mdio_remove(struct device *dev)
--{
--	struct mdio_device *mdiodev = to_mdio_device(dev);
--	struct device_driver *drv = mdiodev->dev.driver;
--	struct mdio_driver *mdiodrv = to_mdio_driver(drv);
--
--	if (mdiodrv->remove)
--		mdiodrv->remove(mdiodev);
--
--	/* Assert the reset signal */
--	mdio_device_reset(mdiodev, 1);
--
--	return 0;
--}
--
--static void mdio_shutdown(struct device *dev)
--{
--	struct mdio_device *mdiodev = to_mdio_device(dev);
--	struct device_driver *drv = mdiodev->dev.driver;
--	struct mdio_driver *mdiodrv = to_mdio_driver(drv);
--
--	if (mdiodrv->shutdown)
--		mdiodrv->shutdown(mdiodev);
--}
--
- /**
-  * mdio_driver_register - register an mdio_driver with the MDIO layer
-  * @drv: new mdio_driver to register
-@@ -271,9 +216,6 @@ int mdio_driver_register(struct mdio_driver *drv)
- 	pr_debug("%s: %s\n", __func__, mdiodrv->driver.name);
- 
- 	mdiodrv->driver.bus = &mdio_bus_type;
--	mdiodrv->driver.probe = mdio_probe;
--	mdiodrv->driver.remove = mdio_remove;
--	mdiodrv->driver.shutdown = mdio_shutdown;
- 
- 	retval = driver_register(&mdiodrv->driver);
- 	if (retval) {
-
-base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
--- 
-2.47.3
+/P
 
 
