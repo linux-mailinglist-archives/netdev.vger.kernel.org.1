@@ -1,135 +1,217 @@
-Return-Path: <netdev+bounces-249457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5C59D19603
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:18:54 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15F93D195CD
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 15:17:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D87A5309154F
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:13:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8BC18302409E
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 14:13:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41D8D392B90;
-	Tue, 13 Jan 2026 14:13:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19F17392B82;
+	Tue, 13 Jan 2026 14:13:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b="rX9j2+et"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dAP2Pc6s"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.st.icloud.com (p-east2-cluster1-host3-snip4-2.eps.apple.com [57.103.76.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B090E392B77
-	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 14:13:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.76.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF71F392829
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 14:13:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768313600; cv=none; b=VjvfRxsAjwnd0rUP4EkQfM/6IMRa0/rVxr6wPM2ygG6F9jGo65BldmKqA7BDkrKINqd9h+Tpyxt/J340H8kIwNcFELhQgVmIpT0yXKnBTiCzCBXfiNNCkG4JgHCP6mzJMpFIxPbrCrHE3Hf2jAG2yATAPW/j+BI4gRaYNGMT87w=
+	t=1768313616; cv=none; b=IZZWg2UqJfN3uHJXd44vYM+1nVTWxzb62Z28j3+RFJdz6GDgCYrnvvrF9bbopDyqB0zP890tpRHw7sYMlZ8vB0BZkbtrV7dOZHnYenuqA+nXUjYSantGr0TcJ3UGS1gzPppK2itHensNnnsZPcPT/1PevkFoLgC8I53IoYjSUKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768313600; c=relaxed/simple;
-	bh=Ic05N38IwE/4wqD5ZXjgmQwte1DpIEy/9ZTMntimdac=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=P+hTcQwjhXkDAXIFpoNw6FnTmO2x7EnZAi7HiTBjVUp6PpWEs8UA/h7mMTCLWXop/ryWpItsp3Cug5OZqL9i/ldbua/CWewpblm6x6chwBVemezIfFDUTwvad/JObzexiLf5hdST4zxgtWdTYrOpOjJenUBSgGplK2uGd7/e4ZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net; spf=pass smtp.mailfrom=y-koj.net; dkim=fail (0-bit key) header.d=y-koj.net header.i=@y-koj.net header.b=rX9j2+et reason="key not found in DNS"; arc=none smtp.client-ip=57.103.76.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=y-koj.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=y-koj.net
-Received: from outbound.st.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-east-1a-100-percent-1 (Postfix) with ESMTPS id 30FD51801879;
-	Tue, 13 Jan 2026 14:13:13 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=y-koj.net; s=sig1; bh=afH/Mj5H8vualGKTm+xW5vFpaHkJrNlaQy6ZQfrpBls=; h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme; b=rX9j2+et4LuWX+Oyoyf7al7vaLWFCKUQvtowmCj1P+wT/EKrK0z+LfPxXspqCPfslzlwufsuOP3ZKXDJbMvRv2xiubmbh2IFKdC8JmASNlHD4AAD86dgEThH+69TNTm2Lr+RzJdqjQQAtjmV3cUKX8PvvcVXfl+Ty88EzpLTWCkNGsivQRC9qj4NzBhi6JVQDGgNaMA1NyXmS/rxm4jaqHHYR5MW1vY8Hm32+oEnLDYDydhDPqdb0VvWksHUIxbTiaLkmW2wu5+u+sUsIgfTToBCP3B5HRk2OlWodFwmOQ5cQ093ITWQqL0mp8hzDaYbrUp5TA2vgjz/Xw5BD7qWqA==
-mail-alias-created-date: 1719758601013
-Received: from desktop.tail809fd.ts.net (unknown [17.42.251.67])
-	by p00-icloudmta-asmtp-us-east-1a-100-percent-1 (Postfix) with ESMTPSA id EB11118000A5;
-	Tue, 13 Jan 2026 14:13:10 +0000 (UTC)
-From: Yohei Kojima <yk@y-koj.net>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>
-Cc: Yohei Kojima <yk@y-koj.net>,
+	s=arc-20240116; t=1768313616; c=relaxed/simple;
+	bh=ixwvhtBEkBoDvp5N4KEkKF182ppMydq9tQFQtSsQMTM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=jiJ41gd9o549oDsWX8d1ETdnbiKH3gA/TxfJtNM7sXuxn2C7vfHKG5CHt4ycMhNX0tI0pbw3KGANygNGkFsGzLwj3s/YfM0zmrJ/dzx1TN/hdpv+OJED+JFhbeArWed86ih1QdJIxlLp4NSxUpkHpQCKSMf3qazYBx5aWoNGARY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dAP2Pc6s; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-477a2ab455fso69746085e9.3
+        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 06:13:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1768313610; x=1768918410; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EpPYFuBpeHzrlOUi6OsVjYU9ydxR9fDDFonQuw5LFlU=;
+        b=dAP2Pc6sTNDk+xB8Fx9CPJZ5LqG1aueLBOMwUKZ+EMH2PEyy6FgLyqfSsA6v6gamPt
+         5EU7j3ls8TmXWIT3L0/vblU/e4t4H4BDYcpntOMVaTnJgC31oy8J5oNefpeM/XEpzKws
+         s4VqjitoshTyQz6xTXbHwLbDjsJR10RO6crpPQMwgnAtz9Mz4bgbDZMBn9nsSZgwEeUC
+         h4HuSA5MLSvaXx65Aq81jvGngvUHqbwB1x862xQKXbWIx1TMm7KqWf9zUFK88fR2MUlF
+         O7kAkvYZx9ktKXZ6YaxkrtShA7/2+OQ415VEQT/eYCSGgEEBPYgYPxtI0+8eOQ5gkvqr
+         U56Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768313610; x=1768918410;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EpPYFuBpeHzrlOUi6OsVjYU9ydxR9fDDFonQuw5LFlU=;
+        b=TDs7uP0jxT1EnaYcgSx/wWg7O1ABxdJQfL+QTQ+pSavdFGo4jXwPRoPRiQyUGh6p/x
+         N+86x1nDenrAHjVpqZMClZRuGWtj9cjn+er0xKKSwQ9HendUxB10acpUAq6hUMZyRooZ
+         RBcP/je4Ds7OmGrY4DhOrn7hz2hiDt1OCUfa1DvLtx0Ffj7cJBwcRjDPPOU9cfkCrt+4
+         uAaOVb9qNSa3lUCR+Z/Yr2ssXTBkuhiIoIdQs66klh8sEfIYyp+sKDg6ckWqLhEWe5Yz
+         vw0SrYecUVsDwPIE6DYa16dne914aKmQdeQ856MAJJ86epC9LlXe8CGkoFcBu33GhQ6N
+         eaIA==
+X-Forwarded-Encrypted: i=1; AJvYcCUeNkgXr7nHGcADiTKPMpvDcoDI9HydEGJ0UUt2CUAmqp1OjnSRFsnTqM/fkjASD/D2XgMxyaw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyW0AOWWdGTKGuPBjtCYytthtsAg3zFcjdHU1kwqT1MabZbAtl6
+	XmVfSMcpVxZ6BYAnpIvxdk0gAg3FOXrz5fivrOHUAMubjrCvpGmplaUs+hLDvkl6KKE=
+X-Gm-Gg: AY/fxX4Ry2t9keZ9MAUBnTOn0yI/EVj6kIhLYWTi1FYI1nB2K0ip+bThnKpkNg97wmn
+	smjpRuOKt9lD4pyi1QgjJqCmachAyhqbmtJWx0tucos3E0mbnLoE/Cjgmw9Tnd9YFk5hJ318t6y
+	witomFi04X/TSEFYDBv2D4pwRfFItZdkXRGNmEtOy57b/ML594UvWsdtON3LDda64NOCJiSQ0rY
+	8BTuBQO59m/sBDK+EwbpXYQwpR7anr0dQTdJKpo5v9DP/W+yL3YPyxKDGigtehszGaJvlwmxxSM
+	GlVGmmnVA4Hc4f6VY84nL/D7QwFyFEVxs+WvRbUdLRIwpmDWKNXkwGzkajie+jNt9xoDYi5j2d9
+	WKSJ3Ng4T3/Fr7Sk4+BvKY6odlcK3JcZOOHmIgNgrrkjXxgXjeAASfh9XVzBuYeRYVXuCaJBtKz
+	uT5dHahxo+AhsBktKLukJAJdmHiT0=
+X-Google-Smtp-Source: AGHT+IESteNDhCsp9djoyMeUvPvQ33cMYgxEEj70wmWesi8MDh/SKjav/Vxq6pmgAEpoaSXmrBuSJw==
+X-Received: by 2002:a05:600c:1392:b0:46e:37fe:f0e6 with SMTP id 5b1f17b1804b1-47d84b3b724mr277918305e9.30.1768313610033;
+        Tue, 13 Jan 2026 06:13:30 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47ee0b45b8fsm1590895e9.4.2026.01.13.06.13.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Jan 2026 06:13:29 -0800 (PST)
+Date: Tue, 13 Jan 2026 17:13:23 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Chester Lin <chester62515@gmail.com>, Frank Li <Frank.li@nxp.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Markus Elfring <Markus.Elfring@web.de>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 2/2] selftests: net: improve error handling in passive TFO test
-Date: Tue, 13 Jan 2026 23:11:55 +0900
-Message-ID: <24707c8133f7095c0e5a94afa69e75c3a80bf6e7.1768312014.git.yk@y-koj.net>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <cover.1768312014.git.yk@y-koj.net>
-References: <cover.1768312014.git.yk@y-koj.net>
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>, devicetree@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@gmail.com>,
+	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
+	imx@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
+	Jan Petrous <jan.petrous@oss.nxp.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Matthias Brugger <mbrugger@suse.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	NXP S32 Linux Team <s32@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Rob Herring <robh@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Shawn Guo <shawnguo@kernel.org>, linaro-s32@linaro.org
+Subject: [PATCH v3 0/3] s32g: Use a syscon for GPR
+Message-ID: <cover.1768311583.git.dan.carpenter@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: 8I63Zms5JlcKjlKZnZbK1Q8jV10IbCj3
-X-Authority-Info: v=2.4 cv=TMZIilla c=1 sm=1 tr=0 ts=696652fb
- cx=c_apl:c_apl_out:c_pps a=YrL12D//S6tul8v/L+6tKg==:117
- a=YrL12D//S6tul8v/L+6tKg==:17 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=jnl5ZKOAAAAA:8 a=ZXA9zuh9vTPPph4ZHScA:9 a=RNrZ5ZR47oNZP8zBN2PD:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTEzMDEyMCBTYWx0ZWRfXxqO8yJsRA3IS
- 3FXVhX1fknG+LTCk371Hi0OBWEv8LziqqqPyOC3MzDW2eGpWZ8ZVL6t7ZwgYWDZA/sYezgddDzL
- 3MZOGhSpqpyRgZsy0NwivfQvDlCvzv8xCIWx0f1jGg1b3j2gskBBeUgG6cuHI6hBzLC3i9WhVat
- aI20RIPnDrjyOeRjOtPc5yPZfH9/MHZYObIRhU/0Q/Jtr7zaAySx6jE35XuiHBhIOSHv/0OCkbu
- Wii/bsUCxwKN52PkwNOu5GmH+p+BTyiOEsWL09T3Zhv++wHYY/TSf7nlqd9DbyRz/3piEPCOgYl
- xhnZ0jvyJbE3FO87/tM
-X-Proofpoint-GUID: 8I63Zms5JlcKjlKZnZbK1Q8jV10IbCj3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-13_03,2026-01-09_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- bulkscore=0 clxscore=1030 adultscore=0 phishscore=0 mlxscore=0 malwarescore=0
- mlxlogscore=999 spamscore=0 classifier=spam authscore=0 adjust=0 reason=mlx
- scancount=1 engine=8.22.0-2510240001 definitions=main-2601130120
-X-JNJ: AAAAAAABWgyav4S6S7kZZlib5W7u9EWETIhk5XKz/IHVv5bojkzQ5weesz5OVdXAcO8cIuGJ7LvEE54K36khk5UidX+sgOdsvVQZEr6uqUS1FAiMxBznXUWJu5POdYyutms3hbAQUeT4TsZIiqJTOfadg3IiX+Ja4FPXpepK1lkpkXhAtxigZEAVCWTDfgi9ykSuzeJJMqw+1rb87edZYpl1e/S/0cK97SbfF+Zl7Z3+BvS+XEPqSJMqTJoywX1L5VCVBKAdT7txBYT3jLGHjrA/pIBKsNfWcO73/94rEoKSwg85yfvCgI6F6ekCjwYMnrG6lHyLVXYguOMa5P0cqRla3+05gqwaCDl7HdhrvGeH+V2nnWHdQpZL0IA60e5h4DdzLB5Tk15Wr3RZkTr3q4Em+8DfWB9qEkcDOsz1BsPZgEHGvW6px+ut59cuXdQ0b1z7Cu1K5uwbweGQ7QIOHDolcdFI8kHKii2QDhbigQyDRS/KmekiKACKigwgjwv2efYaz0DT7BKg6mauBytAKpbM/aBg9v8PBY4aHc3SKQu2T2HsbMI2OZwpxczBWUxpctoiw0DmCnY8Devq3Ll9ljZYHUW5in6Kj+5v6gtlYnBsAt5BMDvaB6oqjMJkUAojZz0mv37NKrjHLeqmddAG252MkNrF0ffnjDQvRds9hdayzRcHyeB4dOZ6vnBhSmRk1q0kachgwiwAX9e7zPI6zOWY3wIOHCJ9IWwOBmfEK75E6Usq10/DHMZM+/vkKp8NJDJDswy/f6O21L/Zjytsb3zbs+5tlh5XBXcoqS3OZg==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Improve the error handling in passive TFO test to check the return value
-from sendto(), and to fail if read() or fprintf() failed.
+Frank has pushed back on this a bit.  I think he objects to how
+stmmac/dwmac-s32.c controlls the PHY by writing to a register instead
+of through a driver.  Creating a syscon driver will make writing to
+other drivers even easier.  In the end, we're going to need to write
+to register eventually whether it's directly or through an abstraction
+layer.  I feel like this is a good change and when we start dealing
+with SCMI then it's an essential change.  I have fixed Krzysztof's
+complaint about the poor documentation in the nxp,s32-dwmac.yaml
+file.
 
-Signed-off-by: Yohei Kojima <yk@y-koj.net>
----
- tools/testing/selftests/net/tfo.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+The s32g devices have a GPR register region which holds a number of
+miscellaneous registers.  Currently only the stmmac/dwmac-s32.c uses
+anything from there and we just add a line to the device tree to
+access that GMAC_0_CTRL_STS register:
 
-diff --git a/tools/testing/selftests/net/tfo.c b/tools/testing/selftests/net/tfo.c
-index 8d82140f0f76..3b1ee2d3d417 100644
---- a/tools/testing/selftests/net/tfo.c
-+++ b/tools/testing/selftests/net/tfo.c
-@@ -82,8 +82,10 @@ static void run_server(void)
- 		error(1, errno, "getsockopt(SO_INCOMING_NAPI_ID)");
- 
- 	if (read(connfd, buf, 64) < 0)
--		perror("read()");
--	fprintf(outfile, "%d\n", opt);
-+		error(1, errno, "read()");
-+
-+	if (fprintf(outfile, "%d\n", opt) < 0)
-+		error(1, errno, "fprintf()");
- 
- 	fclose(outfile);
- 	close(connfd);
-@@ -92,14 +94,17 @@ static void run_server(void)
- 
- static void run_client(void)
- {
--	int fd;
-+	int fd, ret;
- 	char *msg = "Hello, world!";
- 
- 	fd = socket(AF_INET6, SOCK_STREAM, 0);
- 	if (fd == -1)
- 		error(1, errno, "socket()");
- 
--	sendto(fd, msg, strlen(msg), MSG_FASTOPEN, (struct sockaddr *)&cfg_addr, sizeof(cfg_addr));
-+	ret = sendto(fd, msg, strlen(msg), MSG_FASTOPEN,
-+		     (struct sockaddr *)&cfg_addr, sizeof(cfg_addr));
-+	if (ret < 0)
-+		error(1, errno, "sendto()");
- 
- 	close(fd);
- }
+                        reg = <0x4033c000 0x2000>, /* gmac IP */
+                              <0x4007c004 0x4>;    /* GMAC_0_CTRL_STS */
+
+I have included the whole list of registers below.
+
+We still have to maintain backwards compatibility to this format,
+of course, but it would be better to access these registers through a
+syscon.  Putting all the registers together is more organized and shows
+how the hardware actually is implemented.
+
+Secondly, in some versions of this chipset those registers can only be
+accessed via SCMI.  It's relatively straight forward to handle this
+by writing a syscon driver and registering it with of_syscon_register_regmap()
+but it's complicated to deal with if the registers aren't grouped
+together.
+
+Changed since v2:
+* Improve the documentation in .../bindings/net/nxp,s32-dwmac.yaml
+* "[PATCH v2 2/4] dt-bindings: mfd: syscon: Document the GPR syscon
+  for the NXP S32 SoCs" was applied so drop it.
+
+Changed since v1:
+* Add imx@lists.linux.dev to the CC list.
+* Fix forward porting bug.  s/PHY_INTF_SEL_RGMII/S32_PHY_INTF_SEL_RGMII/
+* Use the correct SoC names nxp,s32g2-gpr and nxp,s32g3-gpr instead of
+  nxp,s32g-gpr which is the SoC family.
+* Fix the phandle name by adding the vendor prefix
+* Fix the documentation for the phandle
+* Remove #address-cells and #size-cells from the syscon block
+
+Here is the whole list of registers in the GPR region
+
+Starting from 0x4007C000
+
+0  Software-Triggered Faults (SW_NCF)
+4  GMAC Control (GMAC_0_CTRL_STS)
+28 CMU Status 1 (CMU_STATUS_REG1)
+2C CMUs Status 2 (CMU_STATUS_REG2)
+30 FCCU EOUT Override Clear (FCCU_EOUT_OVERRIDE_CLEAR_REG)
+38 SRC POR Control (SRC_POR_CTRL_REG)
+54 GPR21 (GPR21)
+5C GPR23 (GPR23)
+60 GPR24 Register (GPR24)
+CC Debug Control (DEBUG_CONTROL)
+F0 Timestamp Control (TIMESTAMP_CONTROL_REGISTER)
+F4 FlexRay OS Tick Input Select (FLEXRAY_OS_TICK_INPUT_SELECT_REG)
+FC GPR63 Register (GPR63)
+
+Starting from 0x4007CA00
+
+0  Coherency Enable for PFE Ports (PFE_COH_EN)
+4  PFE EMAC Interface Mode (PFE_EMACX_INTF_SEL)
+20 PFE EMACX Power Control (PFE_PWR_CTRL)
+28 Error Injection on Cortex-M7 AHB and AXI Pipe (CM7_TCM_AHB_SLICE)
+2C Error Injection AHBP Gasket Cortex-M7 (ERROR_INJECTION_AHBP_GASKET_CM7)
+40 LLCE Subsystem Status (LLCE_STAT)
+44 LLCE Power Control (LLCE_CTRL)
+48 DDR Urgent Control (DDR_URGENT_CTRL)
+4C FTM Global Load Control (FLXTIM_CTRL)
+50 FTM LDOK Status (FLXTIM_STAT)
+54 Top CMU Status (CMU_STAT)
+58 Accelerator NoC No Pending Trans Status (NOC_NOPEND_TRANS)
+90 SerDes RD/WD Toggle Control (PCIE_TOGGLE)
+94 SerDes Toggle Done Status (PCIE_TOGGLEDONE_STAT)
+E0 Generic Control 0 (GENCTRL0)
+E4 Generic Control 1 (GENCTRL1)
+F0 Generic Status 0 (GENSTAT0)
+FC Cortex-M7 AXI Parity Error and AHBP Gasket Error Alarm (CM7_AXI_AHBP_GASKET_ERROR_ALARM)
+
+Starting from 4007C800
+
+4  GPR01 Register (GPR01)
+30 GPR12 Register (GPR12)
+58 GPR22 Register (GPR22)
+70 GPR28 Register (GPR28)
+74 GPR29 Register (GPR29)
+
+Starting from 4007CB00
+
+4 WKUP Pad Pullup/Pulldown Select (WKUP_PUS)
+
+Dan Carpenter (3):
+  net: stmmac: s32: use a syscon for S32_PHY_INTF_SEL_RGMII
+  dt-bindings: net: nxp,s32-dwmac: Use the GPR syscon
+  dts: s32g: Add GPR syscon region
+
+ .../bindings/net/nxp,s32-dwmac.yaml           | 12 ++++++++++
+ arch/arm64/boot/dts/freescale/s32g2.dtsi      |  6 +++++
+ arch/arm64/boot/dts/freescale/s32g3.dtsi      |  6 +++++
+ .../net/ethernet/stmicro/stmmac/dwmac-s32.c   | 23 +++++++++++++++----
+ 4 files changed, 42 insertions(+), 5 deletions(-)
+
 -- 
-2.52.0
+2.51.0
 
 
