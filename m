@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-249545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBDFED1ACDC
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 19:10:55 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00A8FD1ACD3
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 19:10:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 52EC2305E34E
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 18:10:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5C0ED300EBBC
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 18:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9C1234AB06;
-	Tue, 13 Jan 2026 18:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61AE9325706;
+	Tue, 13 Jan 2026 18:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="1kw5Lmva"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="LOs0BZcp"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012009.outbound.protection.outlook.com [40.93.195.9])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011062.outbound.protection.outlook.com [40.93.194.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ED5733B962;
-	Tue, 13 Jan 2026 18:10:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CF030F555;
+	Tue, 13 Jan 2026 18:10:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.62
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768327818; cv=fail; b=S+qNy1/q6L2UbxBHfa73snXMH5uk2kY7tQEFjDNujqu+DFFgNsMioPPmQvQ8vMUS1OzLAA03U/Hr5+CZ/iydtw6PwuXyNMBozx+yKOd9YFM9oazswJFNsAXUf2KzEYKfLOrUEqFJKSPMEMBbbE1U3QOlkLq+QDjLgw2lHQIuPkE=
+	t=1768327833; cv=fail; b=tcF4NNHEGbx88UmDvuYTypRUxI9WutVZHDdeO7mfaFmOLFyzVeguHJWwCEf0n2JLUjcaqfLUKuhlmMfZ1x+Oe27bDMn1Yw4O+eKHZO7uzAmSuCHN5GvhESUduOLhzKh+6NqHZhsi+5G0Brh0TMh/9ZMBsOix4WYcsor4+EeiEfg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768327818; c=relaxed/simple;
-	bh=ObZwXmvJFRkroBkJGXkdT5aGBtiZj/VJODmPIXBcZO0=;
+	s=arc-20240116; t=1768327833; c=relaxed/simple;
+	bh=D71eyvQE6h67pES+eJnRBEEEk65C5WCtug0DI4CXz6A=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=vEYtoaG+OCJzKtrRF/s5HT1mHPCO+3KJx8NtFN1y4mAq++n+yMcAAiHOcOLcwQ69TkvyPg6fMfxPnbDzHzzKpzXnK8wNlLxbd8vU1wbrGysu1H36cHiS5RjsUJ2gsGjze4MRArlz3QH5KSxJSLhHu0Hnxx9e5lyR44Nbe0NShfE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=1kw5Lmva; arc=fail smtp.client-ip=40.93.195.9
+	 MIME-Version:Content-Type; b=OsmMBQH2Jrk6NvinrR8AJon5eVneA0vgPS8JBm3mbGWeYFYRuask5xV/0SOwaghM6cjzFsQTmX9os6qAPEUfec75mG3ti1muhBWNGCW0eNjZNRWYxspEwPIqkpAwteDcieS0bj9fElvVvUGaiQxUEVNwFa6uZbf4iweb2kmfu4A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=LOs0BZcp; arc=fail smtp.client-ip=40.93.194.62
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qo6sMMQytbZ912sJuDsOsTKHiysu3ReR9w2HeFkNSRjhhCqFNBu/Xv+6KNaKWEiHyZaCd7b92HNtZ57yUTNb9eeJbYfiLU8eE6dPCBvUHbTUX6Byy7/5hh8BKQcG7B5kdakdY7AT9McVBTdlIIfOyFiUikAWoJpP6y4iWBJ7NbFw1eUAGBOkEwjEEVXbhxCkMltePQts8D4BSG6DtLHMedxFV3M6oBJe6YYhuVc9E1UpFnfh8TAXWWpdln+cHWvBl8HVQCBeDMoEwObhzvcdT6lOyH1caUlP6qdFh0asbE5vKkHkIpmyjKptzWGoHr+sXWFuRNRL9VjQsTZFAvb2Lg==
+ b=P+0NN9M676PEt/vKDgt7+SePSJdd6zuCXpfwm+eDv0imAJE8iaEc1VjLCeK5e5VC464GVm7RMpIVvZ7zVUKBUcg/1n5WAReqlKoulpdt6bX+nLotwfo5owgSIkDjuMA5ruKVPsdWGIAGsXjaCqBNoEImwoZyBxM06ityVbdKm/rHvxgJ/MMjWCMeGZwDXgW4JpIG+MGgX9AELDNNQMApCcQBzGyOSEvWG8hjFN+ijLjJ0Q7imgzQxq6FyoTbya9DtvOjOnwj1kNE1Kn/a78WSxEIy2R9nK4rbL6zzXFGj8mu4XY8GXV1XOF3muQGmUSYtAI+1SGB1NyKzDTGaBX4Tg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=z1y+TweL+U/hQ4anp5eAH6/GBJUhqkQ76VBYe7c+P6E=;
- b=O/LG5OFsyKclJ7R3+vVQ7sP/CqDS/vFjrbamxj4r5UuxZcPqWBFEjZ4bLikNWSFsmeEv2WbyHEX0DTptkBjAMnKY9IvlSkpuQU73j+XUr09YmQkFVVX0fFjE89lfQqQ7zymG/LHt9UT2+z28S1TDMv0xp/l1kN7xlSRFGinq1i9BnGSMOTBjH9SGWFYZ6jAnwFSlE2vZDnu+9XvVa/v5t6Ze/pa2qg88aJ9qrGZydF2yPJu4gG4jfsKX45Z/JprhLQNG39QxZ3bCdW646yVVHorn6SMTrlXsiMiNU5rGxeatK7AtYigdXoBQqAShxJb6HID42yHNFJMF5PepolY2Sw==
+ bh=sRDXY4J/uFGB1yQXyfnnJwWjtcJGqG541JFygF+15PI=;
+ b=ytrrjX/jiv1QVaM0eAYU2FphoY6rjJ8YFOfuO72hEbjZhG7R0Bd+U6bEiS6hA61WKWhxWNLaKuzSeMkhltbgsryhekdAbLHsUDYxZC/H6SCN+Z8+q8tx7LfP2G89T5+GIbYjAC3nu2GtYRLMSXkNi3z+h74Hod2ADqWF+updYAdonSRTUqQUVvLZ8CiNN8czQY0Sg538HtGLvZK+8kVJjzanIqMWHrkM/VbBey2idG5s9hIK2qvHjcMMSg0jPx/IPqCBfDUpfA7tEReYV3T59BGp8fN9iq+pWL8Sx40HRIrgkOh/HOstQcVXqFMnwkVfSWXbLmQ1UrEA6x4UtQf+mw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=baylibre.com smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=z1y+TweL+U/hQ4anp5eAH6/GBJUhqkQ76VBYe7c+P6E=;
- b=1kw5LmvaKvJdZDD44EMJ3dEiZpoE+48MNYLU8Md/x9Y/XDG/wkBqtw9yvjnOntYQbEDTWkg4wrFpWIgQ8nXrpUqV76ig+qUxQOR24e7hwXKccmVeApQOK1hksgvY3Yrpwl5rwqhv7TvfyYSKHSLFOzjIggdU8OSubXyY2mhO+ng=
-Received: from SJ0PR13CA0224.namprd13.prod.outlook.com (2603:10b6:a03:2c1::19)
- by SA1PR12MB8843.namprd12.prod.outlook.com (2603:10b6:806:379::5) with
+ bh=sRDXY4J/uFGB1yQXyfnnJwWjtcJGqG541JFygF+15PI=;
+ b=LOs0BZcpoi3RN0H/3vd+xCR4KUXEa/OZCC2Ln6kyEy9YcaQ/10Gr4OBnbmY9S3e5tzrx4uzd7c+Taam/sv6SENw06qFSRdFPWyJIfgDO5NM5Z39YMy40PL3oBIFupNoaXgdF2ngWT6Td9DrnBMDHi1zO1oLwb5krXub5dURDoB8=
+Received: from SA1PR03CA0003.namprd03.prod.outlook.com (2603:10b6:806:2d3::14)
+ by PH8PR12MB7028.namprd12.prod.outlook.com (2603:10b6:510:1bf::15) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Tue, 13 Jan
- 2026 18:10:13 +0000
-Received: from SJ1PEPF00002319.namprd03.prod.outlook.com
- (2603:10b6:a03:2c1:cafe::ce) by SJ0PR13CA0224.outlook.office365.com
- (2603:10b6:a03:2c1::19) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9520.5 via Frontend Transport; Tue,
- 13 Jan 2026 18:10:13 +0000
+ 2026 18:10:22 +0000
+Received: from SA2PEPF00001507.namprd04.prod.outlook.com
+ (2603:10b6:806:2d3:cafe::47) by SA1PR03CA0003.outlook.office365.com
+ (2603:10b6:806:2d3::14) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9520.4 via Frontend Transport; Tue,
+ 13 Jan 2026 18:10:21 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
-Received: from satlexmb08.amd.com (165.204.84.17) by
- SJ1PEPF00002319.mail.protection.outlook.com (10.167.242.229) with Microsoft
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ SA2PEPF00001507.mail.protection.outlook.com (10.167.242.39) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9520.1 via Frontend Transport; Tue, 13 Jan 2026 18:10:12 +0000
-Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb08.amd.com
- (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.9520.1 via Frontend Transport; Tue, 13 Jan 2026 18:10:21 +0000
+Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 13 Jan
- 2026 12:10:12 -0600
+ 2026 12:10:16 -0600
 Received: from xhdsuragupt40.xilinx.com (10.180.168.240) by satlexmb08.amd.com
  (10.181.42.217) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Tue, 13 Jan 2026 12:10:08 -0600
+ Transport; Tue, 13 Jan 2026 12:10:12 -0600
 From: Suraj Gupta <suraj.gupta2@amd.com>
 To: <mturquette@baylibre.com>, <sboyd@kernel.org>,
 	<radhey.shyam.pandey@amd.com>, <andrew+netdev@lunn.ch>,
@@ -80,9 +80,9 @@ CC: <sean.anderson@linux.dev>, <linux@armlinux.org.uk>,
 	<linux-clk@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<bmasney@redhat.com>
-Subject: [PATCH V2 1/2] clk: Add devm_clk_bulk_get_optional_enable() helper
-Date: Tue, 13 Jan 2026 23:40:01 +0530
-Message-ID: <20260113181002.200544-2-suraj.gupta2@amd.com>
+Subject: [PATCH V2 2/2] net: xilinx: axienet:  Use devres for resource management in probe path
+Date: Tue, 13 Jan 2026 23:40:02 +0530
+Message-ID: <20260113181002.200544-3-suraj.gupta2@amd.com>
 X-Mailer: git-send-email 2.49.1
 In-Reply-To: <20260113181002.200544-1-suraj.gupta2@amd.com>
 References: <20260113181002.200544-1-suraj.gupta2@amd.com>
@@ -96,176 +96,262 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00002319:EE_|SA1PR12MB8843:EE_
-X-MS-Office365-Filtering-Correlation-Id: ca3ac914-0d61-4ba3-e9b2-08de52cefeec
+X-MS-TrafficTypeDiagnostic: SA2PEPF00001507:EE_|PH8PR12MB7028:EE_
+X-MS-Office365-Filtering-Correlation-Id: a2d81859-b543-4392-e9dd-08de52cf0426
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|36860700013|1800799024|82310400026;
+	BCL:0;ARA:13230040|376014|7416014|82310400026|1800799024|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?v9IqPX0EMadoqSd0lEyyGZkp30k2jYap285oZG4Q7bGgwY8vVSMhQqZpN8Dx?=
- =?us-ascii?Q?AOJK2oCRqjaRnZadMqYMb4p0ynhHdp5t2J2QkXNmcIPI/bRTofKvrb3hpcZV?=
- =?us-ascii?Q?Ngx0Jl8UPVFxSX4c06v4ZMwVwOUihMV+R86Dsc6EeLL2KpfrSUHFvAEJNCXx?=
- =?us-ascii?Q?8EzLxsGYIuY2objQqxNUG2B4SBGSSEAzfH9ng4oMdw93Jv2FP/BqNDud8vTq?=
- =?us-ascii?Q?MOAnTHpJljoxxt3XtesBezX746daLzzNe9GUgyLRrV3X9skW/tGrRNU4Nsf0?=
- =?us-ascii?Q?n2kwtgLFImFIX/6k60ZfyZSerxuZZg/nfFycd7So9a/rirmqFf+L50PKtI+K?=
- =?us-ascii?Q?/9KF2l+yi/caC/QKNWpVfw+SZ3gBopVNff+MqwcKO46oTe6siPSDArl6j7M2?=
- =?us-ascii?Q?PJRQgz7DFCTrr8Q0sMONrxRXKxaAdZJfx0pRIG0z9GCWmomaQv8YZCAqqTEg?=
- =?us-ascii?Q?5OJ31QKc1fMl/lBZWSXMVCh97If/yk1PVGCPvsuzrTpWiug+quvv9Fv0HUMS?=
- =?us-ascii?Q?b0dp8a7Y3zOf39j965/8Lhu5skoQ4iWWZ+lTeQZPHiOqtok4s7QvzDIg6Idw?=
- =?us-ascii?Q?UzSHRz/ltGgEb9DIVysko3bg9X17F64b52aW31k9cESK+u5BY+oe7lyY20hh?=
- =?us-ascii?Q?SVRlptaFvML5IUq0isfn36V+U7ZHf+MnBFnLx7UroOKp7hyKIxd1L5cNLK2P?=
- =?us-ascii?Q?R1rpkyz0we3+3X6VaZSbNGur6awav+ICFhG+/CxLAHJYYHoWjwuXbYZ/z7Pk?=
- =?us-ascii?Q?ftSXBWx5B8BOXc99EAG97B7UrofogwYYLsXdCLqz/8GxldQJgnnGG32TZwCX?=
- =?us-ascii?Q?ZDftv1k34iunD2Xqcs/87+rgmSVC4GVGpU2K1HACoIodqRHwkrEerYVy9l3O?=
- =?us-ascii?Q?RrRC8/89/631itTifROYoTiuLapWe6RN1s83Ghe+xJqSo9+hOKRGKqrNRH7+?=
- =?us-ascii?Q?fpBXKND4fCDLpjB0cUWrI2168YoacX6Bfx2nS9CfndyfiaXWyMKCNoLE1qS2?=
- =?us-ascii?Q?r0ArzewzDt2TIp0PLvrayD/Lo2y/ue+y2Ai3y92imzwZKJpEVZzGErFMQviZ?=
- =?us-ascii?Q?NVlHzHASVvSVIIP6/WrbXyVPqMUYPo5s8/5CofZcn7cv1w2g9CTE357S/tUM?=
- =?us-ascii?Q?RLQatY0/Yd+N4p7bUMZRWnO8vCFudyFgZkH7ZMeUW7qvhmVsa/y2SBETzxq9?=
- =?us-ascii?Q?ZBZ+vCwA/sQJCqudfpwJqeiqPaPD+VuY522OJb0XddUaLOvscvKOVwuCj68u?=
- =?us-ascii?Q?hknNjkzVorCLS9h5OoZ0PhIXaJ2YSchouAd49kG763y3JN5hdqArkVaLPChQ?=
- =?us-ascii?Q?sgDseTUTFvPx/KiFph8voqcPLaXMk7/fzKfQcYfdppQidTzIskEIMx5K5cE2?=
- =?us-ascii?Q?BlIhwhmbrOdlAwq1Spj5i4ISDXr69wV7OVYsLzLB22ZH5MrIyIiiEpvvwJRF?=
- =?us-ascii?Q?1gx0c2CEAxbd6iGVcUsEDWBY/+v+nIJSWIZ/GbloDpD2+3omSRnfHTKKCrg5?=
- =?us-ascii?Q?9jjVG/C2uAaeyPZ0RP4AhlO6i4+MO4BMOQII1R7NV0YLJp30p4sygzJ4UxKU?=
- =?us-ascii?Q?VHGTzEjgm4dIQ1N5/cQ=3D?=
+	=?us-ascii?Q?6/UQq5wjX3CzhPyzWjYZQzaGJ22fBVhqQp3/JBEUBvcFZUVHn/Ahxu2Lho3q?=
+ =?us-ascii?Q?PKif78RmwBowxb7hfVkhwoWa3z8a8YBy9OsjehXFbbjSLYXBAekYnIuNRmX6?=
+ =?us-ascii?Q?QTbL8A5LI4t2rcfx3gx9LPAerNaNuOcl75d6Q34eahxy5mvlq2jsv8yqJCZD?=
+ =?us-ascii?Q?Viwv7huGZu5eOyv5+jjr+PJpDs2Wl2lSaU8YNg7/YN0dJtMvytVsRe7z9nPD?=
+ =?us-ascii?Q?8hQiG7JpJVESiieezpuUzWdmuxYUkHPbMw627iIIl+LXohgQee+apsjZs+Q2?=
+ =?us-ascii?Q?vGBHbWzuAvuKUja99Nw4NsXCGjcsRiEYJadjYT/izqB85EGQ28sbUReI5xAp?=
+ =?us-ascii?Q?//ke750ugiqwXdf2WMlzjELRR6CRDl9muELQ0Bh4JU5WzEoHHx/37mwAL0eO?=
+ =?us-ascii?Q?D9KBIaLp4y8F1Fcskyww1F0UQvdeBL8rTCd8eB8K8erpP7p84oKRY06iCimT?=
+ =?us-ascii?Q?wk8T5Un0j7Speg4je8Ua5zqAu3tsmTRRNcK9/lAcTj7dGuFTLOuvRRtxq/d+?=
+ =?us-ascii?Q?IobAvgljYXZRMIQYlEmsh2kcldpeUqcMtutoEaHwglZmMUK9mwroPaierKAN?=
+ =?us-ascii?Q?q0SOu5EgMYDUpLACPqG+4bmQjrJ7t02Gu5qIplS4KUoR0zVFcrbXtvfjPoHM?=
+ =?us-ascii?Q?ZAFGLFR8h+IL5udm7wOkpLbwRk+hpDoInjPrmafu5bEh05P6mdLw4PBCF9HN?=
+ =?us-ascii?Q?8oVas4ZWFMPNN6/4cUGREIwOGzZQha+BXbAbqUZ0eTk1zlgXDrWzNF1JSiCK?=
+ =?us-ascii?Q?cNznLOdV80Ozel4nHCuOg01htXgLrLmu+Tg51l/4Zif6nh/VP6oQ1oRruQa1?=
+ =?us-ascii?Q?t3emw0Cs/nnFlVYCM4kH4umYUcNfcu5LXZgz6dNZWts/H5bxcn9IvEYSLXnT?=
+ =?us-ascii?Q?nKlqt1ukBEvyJ8jpRb1tfZlSlFWJ15E4et8QCmsiOdZi41+/v1wsyX6JFyQ5?=
+ =?us-ascii?Q?UTBg/yG6u7XidsZRLtroMHQEqWdy66hcUA89blNKM3RexTfDqv/xjFAbAKJS?=
+ =?us-ascii?Q?9G2Z8GwlyZcOM0H764H5l+97Vu5iV20i4WRWkWyAc4URztEs+ygrv/8IObtr?=
+ =?us-ascii?Q?ZM5jc2AGSC0KpIPmvbwb6brTXFiGH87UyZ4Epm3DmwUOyMCj0P0d+FjETHo5?=
+ =?us-ascii?Q?zXQ8T/GZLFAY/Q2NNykJzufHTa+r2nDpLYhm7CkS8jVD+a5AK5zUU1GIa6ly?=
+ =?us-ascii?Q?YURIrl6HR+MEpZ6cklDmb+V5x5sQZMQs6kBUpPcKAZzA2k4gT143bU293YYj?=
+ =?us-ascii?Q?pHYCIiWKlMG7UBbJqo5zHV6AA2OenN3ylpPipnNjeDHudXSryb9xE90IxOYX?=
+ =?us-ascii?Q?drKF1mFON8bEPCra3kLmLpI2J2bMK1pL0AkEt+0La4qjofrcjbDhSxkroHBi?=
+ =?us-ascii?Q?63n1+DRN24OJYNKRaYRHF4a4IBiYVtK9J7I7peFUSIQ/U8uQcHj7l4QM150I?=
+ =?us-ascii?Q?BX77MFO5bydi22Fkor62dwyrIYRFh2e8inblpQUrs72KBckB3OiiixhHZG3u?=
+ =?us-ascii?Q?TN0xi/Zxc0q4ep5g24w79styK/H4h3afbYcE1zPkIFiUSNv5Go+WWDwMf9gJ?=
+ =?us-ascii?Q?hWEhMplK6xMTGfxZeCA=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(36860700013)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2026 18:10:12.5767
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2026 18:10:21.3939
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ca3ac914-0d61-4ba3-e9b2-08de52cefeec
+X-MS-Exchange-CrossTenant-Network-Message-Id: a2d81859-b543-4392-e9dd-08de52cf0426
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00002319.namprd03.prod.outlook.com
+	SA2PEPF00001507.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8843
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7028
 
-Add a new managed clock framework helper function that combines getting
-optional bulk clocks and enabling them in a single operation.
+From: Sean Anderson <sean.anderson@linux.dev>
 
-The devm_clk_bulk_get_optional_enable() function simplifies the common
-pattern where drivers need to get optional bulk clocks, prepare and enable
-them, and have them automatically disabled/unprepared and freed when the
-device is unbound.
+Transition axienet_probe() to managed resource allocation using devm_*
+APIs for network device and clock handling, while improving error paths
+with dev_err_probe(). This eliminates the need for manual resource
+cleanup during probe failures and streamlines the remove() function.
 
-This new API follows the established pattern of
-devm_clk_bulk_get_all_enabled() and reduces boilerplate code in drivers
-that manage multiple optional clocks.
-
-Suggested-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+Co-developed-by: Suraj Gupta <suraj.gupta2@amd.com>
 Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
-Reviewed-by: Brian Masney <bmasney@redhat.com>
 ---
- drivers/clk/clk-devres.c | 50 ++++++++++++++++++++++++++++++++++++++++
- include/linux/clk.h      | 23 ++++++++++++++++++
- 2 files changed, 73 insertions(+)
+ .../net/ethernet/xilinx/xilinx_axienet_main.c | 83 ++++++-------------
+ 1 file changed, 27 insertions(+), 56 deletions(-)
 
-diff --git a/drivers/clk/clk-devres.c b/drivers/clk/clk-devres.c
-index 5368d92d9b39..994d5bc5168b 100644
---- a/drivers/clk/clk-devres.c
-+++ b/drivers/clk/clk-devres.c
-@@ -179,6 +179,56 @@ int __must_check devm_clk_bulk_get_optional(struct device *dev, int num_clks,
- }
- EXPORT_SYMBOL_GPL(devm_clk_bulk_get_optional);
+diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+index 284031fb2e2c..998bacd508b8 100644
+--- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
++++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+@@ -2787,7 +2787,7 @@ static int axienet_probe(struct platform_device *pdev)
+ 	int addr_width = 32;
+ 	u32 value;
  
-+static void devm_clk_bulk_release_enable(struct device *dev, void *res)
-+{
-+	struct clk_bulk_devres *devres = res;
-+
-+	clk_bulk_disable_unprepare(devres->num_clks, devres->clks);
-+	clk_bulk_put(devres->num_clks, devres->clks);
-+}
-+
-+static int __devm_clk_bulk_get_enable(struct device *dev, int num_clks,
-+				      struct clk_bulk_data *clks, bool optional)
-+{
-+	struct clk_bulk_devres *devres;
-+	int ret;
-+
-+	devres = devres_alloc(devm_clk_bulk_release_enable,
-+			      sizeof(*devres), GFP_KERNEL);
-+	if (!devres)
-+		return -ENOMEM;
-+
-+	if (optional)
-+		ret = clk_bulk_get_optional(dev, num_clks, clks);
-+	else
-+		ret = clk_bulk_get(dev, num_clks, clks);
-+	if (ret)
-+		goto err_clk_get;
-+
-+	ret = clk_bulk_prepare_enable(num_clks, clks);
-+	if (ret)
-+		goto err_clk_prepare;
-+
-+	devres->clks = clks;
-+	devres->num_clks = num_clks;
-+	devres_add(dev, devres);
-+
-+	return 0;
-+
-+err_clk_prepare:
-+	clk_bulk_put(num_clks, clks);
-+err_clk_get:
-+	devres_free(devres);
-+	return ret;
-+}
-+
-+int __must_check devm_clk_bulk_get_optional_enable(struct device *dev, int num_clks,
-+						   struct clk_bulk_data *clks)
-+{
-+	return __devm_clk_bulk_get_enable(dev, num_clks, clks, true);
-+}
-+EXPORT_SYMBOL_GPL(devm_clk_bulk_get_optional_enable);
-+
- static void devm_clk_bulk_release_all(struct device *dev, void *res)
- {
- 	struct clk_bulk_devres *devres = res;
-diff --git a/include/linux/clk.h b/include/linux/clk.h
-index b607482ca77e..ac0affa16c8a 100644
---- a/include/linux/clk.h
-+++ b/include/linux/clk.h
-@@ -478,6 +478,22 @@ int __must_check devm_clk_bulk_get(struct device *dev, int num_clks,
-  */
- int __must_check devm_clk_bulk_get_optional(struct device *dev, int num_clks,
- 					    struct clk_bulk_data *clks);
-+/**
-+ * devm_clk_bulk_get_optional_enable - Get and enable optional bulk clocks (managed)
-+ * @dev: device for clock "consumer"
-+ * @num_clks: the number of clk_bulk_data
-+ * @clks: pointer to the clk_bulk_data table of consumer
-+ *
-+ * Behaves the same as devm_clk_bulk_get_optional() but also prepares and enables
-+ * the clocks in one operation with management. The clks will automatically be
-+ * disabled, unprepared and freed when the device is unbound.
-+ *
-+ * Returns 0 if all clocks specified in clk_bulk_data table are obtained
-+ * and enabled successfully, or for any clk there was no clk provider available.
-+ * Otherwise returns valid IS_ERR() condition containing errno.
-+ */
-+int __must_check devm_clk_bulk_get_optional_enable(struct device *dev, int num_clks,
-+						   struct clk_bulk_data *clks);
- /**
-  * devm_clk_bulk_get_all - managed get multiple clk consumers
-  * @dev: device for clock "consumer"
-@@ -1029,6 +1045,13 @@ static inline int __must_check devm_clk_bulk_get_optional(struct device *dev,
- 	return 0;
+-	ndev = alloc_etherdev(sizeof(*lp));
++	ndev = devm_alloc_etherdev(&pdev->dev, sizeof(*lp));
+ 	if (!ndev)
+ 		return -ENOMEM;
+ 
+@@ -2815,41 +2815,32 @@ static int axienet_probe(struct platform_device *pdev)
+ 	seqcount_mutex_init(&lp->hw_stats_seqcount, &lp->stats_lock);
+ 	INIT_DEFERRABLE_WORK(&lp->stats_work, axienet_refresh_stats);
+ 
+-	lp->axi_clk = devm_clk_get_optional(&pdev->dev, "s_axi_lite_clk");
++	lp->axi_clk = devm_clk_get_optional_enabled(&pdev->dev,
++						    "s_axi_lite_clk");
+ 	if (!lp->axi_clk) {
+ 		/* For backward compatibility, if named AXI clock is not present,
+ 		 * treat the first clock specified as the AXI clock.
+ 		 */
+-		lp->axi_clk = devm_clk_get_optional(&pdev->dev, NULL);
+-	}
+-	if (IS_ERR(lp->axi_clk)) {
+-		ret = PTR_ERR(lp->axi_clk);
+-		goto free_netdev;
+-	}
+-	ret = clk_prepare_enable(lp->axi_clk);
+-	if (ret) {
+-		dev_err(&pdev->dev, "Unable to enable AXI clock: %d\n", ret);
+-		goto free_netdev;
++		lp->axi_clk = devm_clk_get_optional_enabled(&pdev->dev, NULL);
+ 	}
++	if (IS_ERR(lp->axi_clk))
++		return dev_err_probe(&pdev->dev, PTR_ERR(lp->axi_clk),
++				     "could not get AXI clock\n");
+ 
+ 	lp->misc_clks[0].id = "axis_clk";
+ 	lp->misc_clks[1].id = "ref_clk";
+ 	lp->misc_clks[2].id = "mgt_clk";
+ 
+-	ret = devm_clk_bulk_get_optional(&pdev->dev, XAE_NUM_MISC_CLOCKS, lp->misc_clks);
+-	if (ret)
+-		goto cleanup_clk;
+-
+-	ret = clk_bulk_prepare_enable(XAE_NUM_MISC_CLOCKS, lp->misc_clks);
++	ret = devm_clk_bulk_get_optional_enable(&pdev->dev, XAE_NUM_MISC_CLOCKS,
++						lp->misc_clks);
+ 	if (ret)
+-		goto cleanup_clk;
++		return dev_err_probe(&pdev->dev, ret,
++				     "could not get/enable misc. clocks\n");
+ 
+ 	/* Map device registers */
+ 	lp->regs = devm_platform_get_and_ioremap_resource(pdev, 0, &ethres);
+-	if (IS_ERR(lp->regs)) {
+-		ret = PTR_ERR(lp->regs);
+-		goto cleanup_clk;
+-	}
++	if (IS_ERR(lp->regs))
++		return PTR_ERR(lp->regs);
+ 	lp->regs_start = ethres->start;
+ 
+ 	/* Setup checksum offload, but default to off if not specified */
+@@ -2918,19 +2909,17 @@ static int axienet_probe(struct platform_device *pdev)
+ 			lp->phy_mode = PHY_INTERFACE_MODE_1000BASEX;
+ 			break;
+ 		default:
+-			ret = -EINVAL;
+-			goto cleanup_clk;
++			return -EINVAL;
+ 		}
+ 	} else {
+ 		ret = of_get_phy_mode(pdev->dev.of_node, &lp->phy_mode);
+ 		if (ret)
+-			goto cleanup_clk;
++			return ret;
+ 	}
+ 	if (lp->switch_x_sgmii && lp->phy_mode != PHY_INTERFACE_MODE_SGMII &&
+ 	    lp->phy_mode != PHY_INTERFACE_MODE_1000BASEX) {
+ 		dev_err(&pdev->dev, "xlnx,switch-x-sgmii only supported with SGMII or 1000BaseX\n");
+-		ret = -EINVAL;
+-		goto cleanup_clk;
++		return -EINVAL;
+ 	}
+ 
+ 	if (!of_property_present(pdev->dev.of_node, "dmas")) {
+@@ -2945,7 +2934,7 @@ static int axienet_probe(struct platform_device *pdev)
+ 				dev_err(&pdev->dev,
+ 					"unable to get DMA resource\n");
+ 				of_node_put(np);
+-				goto cleanup_clk;
++				return ret;
+ 			}
+ 			lp->dma_regs = devm_ioremap_resource(&pdev->dev,
+ 							     &dmares);
+@@ -2962,19 +2951,17 @@ static int axienet_probe(struct platform_device *pdev)
+ 		}
+ 		if (IS_ERR(lp->dma_regs)) {
+ 			dev_err(&pdev->dev, "could not map DMA regs\n");
+-			ret = PTR_ERR(lp->dma_regs);
+-			goto cleanup_clk;
++			return PTR_ERR(lp->dma_regs);
+ 		}
+ 		if (lp->rx_irq <= 0 || lp->tx_irq <= 0) {
+ 			dev_err(&pdev->dev, "could not determine irqs\n");
+-			ret = -ENOMEM;
+-			goto cleanup_clk;
++			return -ENOMEM;
+ 		}
+ 
+ 		/* Reset core now that clocks are enabled, prior to accessing MDIO */
+ 		ret = __axienet_device_reset(lp);
+ 		if (ret)
+-			goto cleanup_clk;
++			return ret;
+ 
+ 		/* Autodetect the need for 64-bit DMA pointers.
+ 		 * When the IP is configured for a bus width bigger than 32 bits,
+@@ -3001,14 +2988,13 @@ static int axienet_probe(struct platform_device *pdev)
+ 		}
+ 		if (!IS_ENABLED(CONFIG_64BIT) && lp->features & XAE_FEATURE_DMA_64BIT) {
+ 			dev_err(&pdev->dev, "64-bit addressable DMA is not compatible with 32-bit architecture\n");
+-			ret = -EINVAL;
+-			goto cleanup_clk;
++			return -EINVAL;
+ 		}
+ 
+ 		ret = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(addr_width));
+ 		if (ret) {
+ 			dev_err(&pdev->dev, "No suitable DMA available\n");
+-			goto cleanup_clk;
++			return ret;
+ 		}
+ 		netif_napi_add(ndev, &lp->napi_rx, axienet_rx_poll);
+ 		netif_napi_add(ndev, &lp->napi_tx, axienet_tx_poll);
+@@ -3018,15 +3004,12 @@ static int axienet_probe(struct platform_device *pdev)
+ 
+ 		lp->eth_irq = platform_get_irq_optional(pdev, 0);
+ 		if (lp->eth_irq < 0 && lp->eth_irq != -ENXIO) {
+-			ret = lp->eth_irq;
+-			goto cleanup_clk;
++			return lp->eth_irq;
+ 		}
+ 		tx_chan = dma_request_chan(lp->dev, "tx_chan0");
+-		if (IS_ERR(tx_chan)) {
+-			ret = PTR_ERR(tx_chan);
+-			dev_err_probe(lp->dev, ret, "No Ethernet DMA (TX) channel found\n");
+-			goto cleanup_clk;
+-		}
++		if (IS_ERR(tx_chan))
++			return dev_err_probe(lp->dev, PTR_ERR(tx_chan),
++					     "No Ethernet DMA (TX) channel found\n");
+ 
+ 		cfg.reset = 1;
+ 		/* As name says VDMA but it has support for DMA channel reset */
+@@ -3034,7 +3017,7 @@ static int axienet_probe(struct platform_device *pdev)
+ 		if (ret < 0) {
+ 			dev_err(&pdev->dev, "Reset channel failed\n");
+ 			dma_release_channel(tx_chan);
+-			goto cleanup_clk;
++			return ret;
+ 		}
+ 
+ 		dma_release_channel(tx_chan);
+@@ -3139,13 +3122,6 @@ static int axienet_probe(struct platform_device *pdev)
+ 		put_device(&lp->pcs_phy->dev);
+ 	if (lp->mii_bus)
+ 		axienet_mdio_teardown(lp);
+-cleanup_clk:
+-	clk_bulk_disable_unprepare(XAE_NUM_MISC_CLOCKS, lp->misc_clks);
+-	clk_disable_unprepare(lp->axi_clk);
+-
+-free_netdev:
+-	free_netdev(ndev);
+-
+ 	return ret;
  }
  
-+static inline int __must_check devm_clk_bulk_get_optional_enable(struct device *dev,
-+								 int num_clks,
-+								 struct clk_bulk_data *clks)
-+{
-+	return 0;
-+}
-+
- static inline int __must_check devm_clk_bulk_get_all(struct device *dev,
- 						     struct clk_bulk_data **clks)
- {
+@@ -3163,11 +3139,6 @@ static void axienet_remove(struct platform_device *pdev)
+ 		put_device(&lp->pcs_phy->dev);
+ 
+ 	axienet_mdio_teardown(lp);
+-
+-	clk_bulk_disable_unprepare(XAE_NUM_MISC_CLOCKS, lp->misc_clks);
+-	clk_disable_unprepare(lp->axi_clk);
+-
+-	free_netdev(ndev);
+ }
+ 
+ static void axienet_shutdown(struct platform_device *pdev)
 -- 
 2.25.1
 
