@@ -1,96 +1,80 @@
-Return-Path: <netdev+bounces-249277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E77CD1678B
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 04:24:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F0F6D16791
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 04:25:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9B9923031A33
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 03:23:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D07613005E9A
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 03:24:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1E9B305968;
-	Tue, 13 Jan 2026 03:23:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pO8eJiMa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 361C82E1EE7;
+	Tue, 13 Jan 2026 03:24:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEA972F12C9;
-	Tue, 13 Jan 2026 03:23:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB0F1D5CD9;
+	Tue, 13 Jan 2026 03:24:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768274614; cv=none; b=F3bTqN1tbj7FWNcHLf33VDK0ZJVu/bu8X9JbjwsJGbyGCsj8CvTcug9udRzkUCl/R5dJzn4cSCVkOFdQPRoaN4p8eilaf3wJJk9A+MpKqlY6AZrGhxnPUl8Kz87c5ALM62BN0UU+WPhJvDl2r2r1eC7NHPR2X+0M5Wa7mQKjZ/U=
+	t=1768274682; cv=none; b=G72BfsC/7M/pp6PRBQziIvzRrwwdwlRpz65f3G8eyQHuztoL6iGULrRnaFRpoe9ICv7oDlEPOWe+CwNl/9hl+gzaAGTfEA8iwaGLUCvraHHT38Tyj+/t5VhvfbzMVLk3G7EtqY6cokabE53IHz76iPRbrV+PzlhuUAbjcI9j1cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768274614; c=relaxed/simple;
-	bh=AH+DpXBr7U60NJlcyjT/ElKt1g2jAD5EfrI1qnS/vWY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ChgxocYYXSRZLu7SQ9/0dYQO3NFE10Y4D0h/3C/36Bx4rCeExbTE69GWlgDG4DVL8MpivsyZd+IT+x3z2GwexUxjqBT9gmNgyNr7VKwplZd8bAzYWim9S4ECwIET7jEjUbOcT6FHW1HX3aBjuCxkGesmjWjjVHUeSF/vu0lOv7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pO8eJiMa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A7E3C116D0;
-	Tue, 13 Jan 2026 03:23:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768274614;
-	bh=AH+DpXBr7U60NJlcyjT/ElKt1g2jAD5EfrI1qnS/vWY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pO8eJiMa0nFYQT0xOBklFyEAGyVYSriJduglk52fsVsk2u+hl2r+9UAHOKUjLmSmE
-	 +zzjYlHqbkb9SFFS2/ytD6hUltm2uBFYO0O0cVnk6+S94tbuoVOSDxIj9DQFMEgzI/
-	 GXWbDUvOXcwHQ8uwMjIJUG+PSoKjgDQWAdGoW+fHxF2bJMkJh31f7Y75Em1bivre+q
-	 z3l5QFcK4etBf4QigkDJpECIblTD+3VEw+pwnyD9cpJAoWK/vXVoX9jCg5ci/pCZPj
-	 h7Leb6arap8Rgw2aR0nzUsC+pcHjDQP5gtH82CayNfMu08XU95l6A7WGAZOS+L6g4w
-	 GBUx2UOaKpnMQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 78AEB380CFE0;
-	Tue, 13 Jan 2026 03:20:09 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1768274682; c=relaxed/simple;
+	bh=XCi4Lr3j9ieeUWtn7Zo2RiHu2b7Si+qTebMbc+X0mgQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=fQ1LGtMwaDWaMwY7/Vvgr75qbMLotOjCF2hqYHVPJCo+69UqU7VnFihgLL4FZaA38QE1jj1vGYA9h3Wj6kNNNG/Fb5F35an2lNPjlYfazQKJ/B/pxmiDHvQE220Jf8TDebWQmp/lnPAEOexWETCEHeWTEdQZzCjZT16FaOX5MSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vfV1C-000000001LI-49cJ;
+	Tue, 13 Jan 2026 03:24:31 +0000
+Date: Tue, 13 Jan 2026 03:24:27 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Chen Minqiang <ptpt52@gmail.com>, Xinfa Deng <xinfa.deng@gl-inet.com>
+Subject: [PATCH net-next 0/3] net: dsa: lantiq: add support for Intel GSW150
+Message-ID: <cover.1768273936.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: ipconfig: Remove outdated comment and
- indent
- code block
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176827440828.1656603.11973087780237617552.git-patchwork-notify@kernel.org>
-Date: Tue, 13 Jan 2026 03:20:08 +0000
-References: <20260109121128.170020-2-thorsten.blum@linux.dev>
-In-Reply-To: <20260109121128.170020-2-thorsten.blum@linux.dev>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hello:
+The Intel GSW150 Ethernet Switch (aka. Lantiq PEB7084) is the predecessor of
+MaxLinear's GSW1xx series of switches. It shares most features, but has a
+slightly different port layout and different MII interfaces.
+Adding support for this switch to the mxl-gsw1xx driver is quite trivial.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Daniel Golle (3):
+  dt-bindings: net: dsa: lantiq,gswip: add Intel GSW150
+  net: dsa: lantiq: allow arbitrary MII registers
+  net: dsa: mxl-gsw1xx: add support for Intel GSW150
 
-On Fri,  9 Jan 2026 13:11:29 +0100 you wrote:
-> The comment has been around ever since commit 1da177e4c3f4
-> ("Linux-2.6.12-rc2") and can be removed. Remove it and indent the code
-> block accordingly.
-> 
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-> ---
-> Changes in v2:
-> - Move const definition to the top (Paolo)
-> - Format ternary expression
-> - Link to v1: https://lore.kernel.org/lkml/20251220130335.77220-1-thorsten.blum@linux.dev/
-> 
-> [...]
+ .../bindings/net/dsa/lantiq,gswip.yaml        |  2 +
+ drivers/net/dsa/lantiq/lantiq_gswip.c         | 26 +++++-
+ drivers/net/dsa/lantiq/lantiq_gswip.h         |  4 +-
+ drivers/net/dsa/lantiq/lantiq_gswip_common.c  | 27 +-----
+ drivers/net/dsa/lantiq/mxl-gsw1xx.c           | 93 ++++++++++++++++---
+ drivers/net/dsa/lantiq/mxl-gsw1xx.h           |  2 +
+ 6 files changed, 114 insertions(+), 40 deletions(-)
 
-Here is the summary with links:
-  - [net-next,v2] net: ipconfig: Remove outdated comment and indent code block
-    https://git.kernel.org/netdev/net-next/c/e405b3c9d4aa
-
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+2.52.0
 
