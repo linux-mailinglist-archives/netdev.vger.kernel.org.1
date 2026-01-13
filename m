@@ -1,110 +1,154 @@
-Return-Path: <netdev+bounces-249615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DA65D1B979
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 23:30:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 263F5D1B985
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 23:31:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D19CA30102BF
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:30:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D4EE43010FC3
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 22:31:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27477350A28;
-	Tue, 13 Jan 2026 22:30:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k9UNEkrz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 783A027E07A;
+	Tue, 13 Jan 2026 22:31:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 027C634EF05;
-	Tue, 13 Jan 2026 22:30:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599E921FF4D;
+	Tue, 13 Jan 2026 22:31:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768343405; cv=none; b=ldper4yqBnj+CR3FLpTqBuXkeZFHDVDmyxNU7ZLb/AEXrt4UDle8XbCpMtQBpw94wRqq7ZzzxzC6aFTYlmjv8P7/0IJdTZMZvMPFluJwBeEMifMCGT2sZBJMiMF7BxD86NkEtXvXbUXyLSzRmcNbusF5SJzZuEbuItAm62HUJdY=
+	t=1768343517; cv=none; b=WPMsbLGuLWI4QsEwrEwM+9jOFlozXUYLK0pfJRBe0yWI3nFhO5lBWPHJ3+loDwJz71gvKEZE5T5bzJaJh5zp18cTtyXZ8Y8yaTMLVsPqPBvXtzusVOUdmr4BiiYj0huliEaPHlTpGFgqzmEYngPfLwJDsPvu0XAOMmUhFGQarXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768343405; c=relaxed/simple;
-	bh=HhYgya/+gHZZL3BnlzehiCFBNBYrrXdk9ohT+saOEB0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y/9iM77inlXQXZ344HQmGKmWtrxBQ7Rn1CreDeUYmjKjineuPjCa6OAXyWDjXucM8fzqap6qe0+LlS7jfH9xtw5KMTp1Y4lwTS2uCiFmm0dh5/mZsx02G/XxqiY0dNnHru4PTfe4gupD500QK0dhBb2m5VmTt7Iq/6VLXWmkIoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k9UNEkrz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62439C116C6;
-	Tue, 13 Jan 2026 22:30:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768343404;
-	bh=HhYgya/+gHZZL3BnlzehiCFBNBYrrXdk9ohT+saOEB0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=k9UNEkrzSjMl/w0ZA3UHVOgoZR6ZfgYF77Fdp1b6d5mcBmMTaPRQ1Yd25VgPUGyit
-	 2HtjtFKjF0TQJdj7UuNrJqqPX4fKIq3v+VY3q4wNdvwKxTQZz/uCAxVQlswbTu0j69
-	 13G1cMBRBsllf7Vtlt6fT2O7o4WBqaz0WZuZfA2gTP65PFBz4B/J3srLI0Wyy/fih+
-	 72y4bN3s/RhYejt4JZCKArQfgFVMZ/EQywshTc11ff8fWgc+ZyFgDTMjh4H2Nrhh3e
-	 1ACeuTDzMx97tDYgI+J6rWcSLStQlijzcKofHweCezpx/6Ofz0zDzV1UgIo4YiUxWf
-	 d1uH3rLoSdV9A==
-Date: Tue, 13 Jan 2026 16:30:03 -0600
-From: Rob Herring <robh@kernel.org>
-To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: devicetree@vger.kernel.org, andrew@lunn.ch, olteanv@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, krzk+dt@kernel.org, conor+dt@kernel.org,
-	matthias.bgg@gmail.com, arinc.unal@arinc9.com,
-	Landen.Chao@mediatek.com, dqfext@gmail.com, sean.wang@mediatek.com,
-	daniel@makrotopia.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, kernel@collabora.com
-Subject: Re: [PATCH] dt-bindings: net: dsa: mt7530: Allow interrupts-extended
- dependency
-Message-ID: <20260113223003.GA198961-robh@kernel.org>
-References: <20260113110020.37013-1-angelogioacchino.delregno@collabora.com>
+	s=arc-20240116; t=1768343517; c=relaxed/simple;
+	bh=bRfy4giqRiYNrUXuD2iU+wbIkkdIRnPy9TgSPsmiCa4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sGn8rftsmSP9pAgMAsCoi16Kt/cLZ+nL4x8Umuy6P/CcP6Ys3Uvt0eeYEEVrg+Kw5FUpaAldpR1WsNBJfg7c5I2E26+oYRy0HiwK7q2DiCCl6IiNxa+bu+kAEOm2XRO0x9ZD5/4PyOs7aT8IAlH8a1Uog5T65+boDgmTKlMRsZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [10.0.56.51] (unknown [62.214.191.67])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id A1D142387DCFE;
+	Tue, 13 Jan 2026 23:31:24 +0100 (CET)
+Message-ID: <f0fee9dd-7236-464d-9e06-6adbeece81a8@molgen.mpg.de>
+Date: Tue, 13 Jan 2026 23:31:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260113110020.37013-1-angelogioacchino.delregno@collabora.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net 1/2] ice: reintroduce retry
+ mechanism for indirect AQ
+To: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ stable@vger.kernel.org, Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+ Jakub Staniszewski <jakub.staniszewski@linux.intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Michal Schmidt <mschmidt@redhat.com>
+References: <20260113193817.582-1-dawid.osuchowski@linux.intel.com>
+ <20260113193817.582-2-dawid.osuchowski@linux.intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20260113193817.582-2-dawid.osuchowski@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 13, 2026 at 12:00:20PM +0100, AngeloGioacchino Del Regno wrote:
-> When the MT7530 switch is configured as an interrupt-controller it
-> also needs an interrupt but, in this case, only "interrupts" was
-> allowed.
+[Cc: +Michal]
+
+Dear Dawid, dear Jakub,
+
+
+Am 13.01.26 um 20:38 schrieb Dawid Osuchowski:
+> From: Jakub Staniszewski <jakub.staniszewski@linux.intel.com>
 > 
-> Some devicetrees instead use the interrupts-extended property as a
-> shorter form, and in place of "interrupts" and "interrupt-parent",
-> as an equivalent.
+> Add retry mechanism for indirect Admin Queue (AQ) commands. To do so we
+> need to keep the command buffer.
 > 
-> For this reason, when interrupt-controller is present, depend on
-> either `interrupts` or `interrupts-extended`; this also resolves
-> some dtbs_check warnings.
+> This technically reverts commit 43a630e37e25
+> ("ice: remove unused buffer copy code in ice_sq_send_cmd_retry()"),
+> but combines it with a fix in the logic by using a kmemdup() call,
+> making it more robust and less likely to break in the future due to
+> programmer error.
 > 
-> Signed-off-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+> Cc: Michal Schmidt <mschmidt@redhat.com>
+> Cc: stable@vger.kernel.org
+> Fixes: 3056df93f7a8 ("ice: Re-send some AQ commands, as result of EBUSY AQ error")
+> Signed-off-by: Jakub Staniszewski <jakub.staniszewski@linux.intel.com>
+> Co-developed-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+> Signed-off-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 > ---
->  .../devicetree/bindings/net/dsa/mediatek,mt7530.yaml       | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+> Ccing Michal, given they are the author of the "reverted" commit.
+
+At least Michal was not in the (visible) Cc: list
+
+>   drivers/net/ethernet/intel/ice/ice_common.c | 12 +++++++++---
+>   1 file changed, 9 insertions(+), 3 deletions(-)
 > 
-> diff --git a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
-> index 815a90808901..ffeb8d5836fe 100644
-> --- a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
-> +++ b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
-> @@ -279,8 +279,11 @@ allOf:
->          - resets
->          - reset-names
->  
-> -  - dependencies:
-> -      interrupt-controller: [ interrupts ]
-> +  - anyOf:
-> +      - dependencies:
-> +          interrupt-controller: [ interrupts ]
-> +      - dependencies:
-> +          interrupt-controller: [ interrupts-extended ]
+> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+> index a400bf4f239a..aab00c44e9b2 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_common.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
+> @@ -1879,34 +1879,40 @@ ice_sq_send_cmd_retry(struct ice_hw *hw, struct ice_ctl_q_info *cq,
+>   {
+>   	struct libie_aq_desc desc_cpy;
+>   	bool is_cmd_for_retry;
+> +	u8 *buf_cpy = NULL;
+>   	u8 idx = 0;
+>   	u16 opcode;
+>   	int status;
+>   
+>   	opcode = le16_to_cpu(desc->opcode);
+>   	is_cmd_for_retry = ice_should_retry_sq_send_cmd(opcode);
+>   	memset(&desc_cpy, 0, sizeof(desc_cpy));
+>   
+>   	if (is_cmd_for_retry) {
+> -		/* All retryable cmds are direct, without buf. */
+> -		WARN_ON(buf);
+> +		if (buf) {
+> +			buf_cpy = kmemdup(buf, buf_size, GFP_KERNEL);
+> +			if (!buf_cpy)
+> +				return -ENOMEM;
+> +		}
+>   
+>   		memcpy(&desc_cpy, desc, sizeof(desc_cpy));
+>   	}
+>   
+>   	do {
+>   		status = ice_sq_send_cmd(hw, cq, desc, buf, buf_size, cd);
+>   
+>   		if (!is_cmd_for_retry || !status ||
+>   		    hw->adminq.sq_last_status != LIBIE_AQ_RC_EBUSY)
+>   			break;
+>   
+> +		if (buf_cpy)
+> +			memcpy(buf, buf_cpy, buf_size);
+>   		memcpy(desc, &desc_cpy, sizeof(desc_cpy));
+> -
 
-We already fixup this case:
+Unrelated change?
 
-dependencies:
-  interrupts: ...
+>   		msleep(ICE_SQ_SEND_DELAY_TIME_MS);
+>   
+>   	} while (++idx < ICE_SQ_SEND_MAX_EXECUTE);
+>   
+> +	kfree(buf_cpy);
+>   	return status;
+>   }
 
-And there's a few other cases like yours. So I've pushed a dtschema 
-change to handle this case.
+The diff looks good otherwise.
 
-Rob
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
 
