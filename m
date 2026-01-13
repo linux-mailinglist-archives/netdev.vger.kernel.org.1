@@ -1,115 +1,191 @@
-Return-Path: <netdev+bounces-249341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C60DD16E31
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 07:46:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 19C66D16EEE
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 07:59:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6018A3030223
-	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 06:46:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1908530312DB
+	for <lists+netdev@lfdr.de>; Tue, 13 Jan 2026 06:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99FD72DBF76;
-	Tue, 13 Jan 2026 06:46:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B5F7350D62;
+	Tue, 13 Jan 2026 06:59:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="cm4n/UO8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YuYheU6U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C8418BC3B;
-	Tue, 13 Jan 2026 06:46:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC75E25F98B
+	for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 06:59:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768286789; cv=none; b=S8rgtn8/nMJjB0ekBpOBH/CDJdN5OD+3MS5cO6EnRNLs/kbN9KzDrVpMkrERX7SklyIq12T0RiuhegwTlh/22kP5KpdeWWSK/c5rnRgNBc5KRPWyClKzCt0Kyt4DG1/98Ae1dTfuIhgOoJY9k7QHS4ymswM2azKihYIKXBR8GJY=
+	t=1768287583; cv=none; b=BuQZpyqguxJceEBYRBWyoqH/chZgbG7kiOHpukynv1my+/Ncx5ZaGyMVAcndWX9timeobrpcxz45anZclVPHTPy7UZ3GdWCCdyB+kIA0zefBUerZ+QlHqIk2iZOjg9PXr19LnQfo8UBCTXRiPrO3p3A0zPWUJeIq9W/MDPZ1N60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768286789; c=relaxed/simple;
-	bh=WYLVVsm/f0wWhH49pN+r0wI/gqn0Mu5pimgqHVHK0NA=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TxfYdF4Fm1gNTULDDvzasLp/Gh1JFxVbykGivn+dcBpNC5EQzS3uO14Dvc+oRCuoWdpR97OTsG85mZWg8DFed5g8tkUa/Ehs1bn7b4msbh6VK4Yl5XUNSh4OOO5KpSAjhO6R3lsYS93RWDx2IVkE+SHcDrcwi2V34z/oC2VYm5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=cm4n/UO8; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60D2eN5i1937684;
-	Mon, 12 Jan 2026 22:46:15 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=pbco9KdxLBQ0u/dKq/fRZNEVR
-	EufFkvrOOAQnIwrBO4=; b=cm4n/UO8T9ELThMPysGRQklx1cVIs8G0zDoKvvS/V
-	CuENQs+P9V0giL/pU6vDJy9lXQStoTN64V1o9LyeC99qcmNigbSEmChpxysztJTt
-	giNVIf6TM8BwU4vZM+fXMs64Yr8r0hfB0l2UvGWa/lrkwanOPobKsyqYYeGLPPWy
-	kicri+bLbYaQWXfob4fiWrFcgwH0976TC+dyeW7rajs0kmqd8R+jYDKQBibAF+ee
-	OjJzffVuR5kT6SilEH76zirtLXjSl9Mrp6wfVCuUUc7t748uxj4m2qhXVV+mFNtB
-	Xn0nhx4knkJyQuvxeeKqahJ0qzdNVQj8wEqwCzbZVZf9A==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4bmvfkb0jn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 12 Jan 2026 22:46:15 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 12 Jan 2026 22:46:29 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 12 Jan 2026 22:46:29 -0800
-Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
-	by maili.marvell.com (Postfix) with SMTP id 381953F70BB;
-	Mon, 12 Jan 2026 22:46:09 -0800 (PST)
-Date: Tue, 13 Jan 2026 12:16:08 +0530
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-CC: <kys@microsoft.com>, <haiyangz@microsoft.com>, <wei.liu@kernel.org>,
-        <decui@microsoft.com>, <longli@microsoft.com>, <andrew+netdev@lunn.ch>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <dipayanroy@linux.microsoft.com>,
-        <ssengar@linux.microsoft.com>, <shirazsaleem@microsoft.com>,
-        <shradhagupta@linux.microsoft.com>, <gargaditya@linux.microsoft.com>,
-        <linux-hyperv@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: mana: Add MAC address to vPort logs and
- clarify error messages
-Message-ID: <aWXqMC3C4rcdKjD0@test-OptiPlex-Tower-Plus-7010>
-References: <20260113052458.25338-1-ernis@linux.microsoft.com>
+	s=arc-20240116; t=1768287583; c=relaxed/simple;
+	bh=5kYm/f6y5eDZFOhknW/woguSkyF5acmAV11mLjLfnFE=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=rhGZuVSDuTl0t57j9nqmXPdl95Jzkr+p8zQCbkIOGVWvwyYly44VRxXzu3TYWykBmrz3MFQSSAWwF4Bjvw8TxToFRlL7gHIZTOX5bo3fkeQIgs1Mgw8cjdsf8hYv53x4M+kcRu7/0BUepMmSAgf1W8cWTFyZRx7WqaCvROSe5Gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YuYheU6U; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-47d5e021a53so52710875e9.3
+        for <netdev@vger.kernel.org>; Mon, 12 Jan 2026 22:59:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768287580; x=1768892380; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:references
+         :in-reply-to:user-agent:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=PGEtEJ71QhQ9scdgCDEq+WFEpq4/A8zAmzd+iyJjt4Y=;
+        b=YuYheU6UvcVdiJE96wX1WT2U5neW6VxN54CsCmUbpF20qJEJFTmEAJbX0B8DCpkIOl
+         aGZs3OwVb/Cs1LeGJDlDHLB8AMXsuwlAYtYRbm6zOWXwLxwBIX+qQ8R9nAFmFO1kGxv8
+         2Q2OJyWas3N7J+BX2RgQOQZDwYLWWTitWHn76eSaU7Xmc4K65wv55hT0h25VyobJAE//
+         jxjc1sWIGTVc+thbt/N/FGpRrom+ZpOv+nBXW5RbVVOJiJVqPKdqGI+1CLxpQs9gfSNT
+         ZnA2H3q3yM+kIL99MsgcSx0WzuJBmQN5SPqZWIPVCqGdYtyU4GJGD9oQnuxTzZvqH9GC
+         pe1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768287580; x=1768892380;
+        h=content-transfer-encoding:mime-version:message-id:references
+         :in-reply-to:user-agent:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PGEtEJ71QhQ9scdgCDEq+WFEpq4/A8zAmzd+iyJjt4Y=;
+        b=YAYfmH01gMoUl0GzOp+dB9TeyrfgMtAZl9mCSbO6dfnkdIErjXdXzxWd2XFR/cKsuT
+         ckCM4rpg7vZKMK+27tQrHVJuyD6AIfma97v104vocvKYTPCww957+OmBdfEKUNldtvTE
+         r+jzUkTLxLVBHU/8Ah07/7nPt5o4e9WD6tVmX9dIF43MjB96rGx37LANNC/j0n/oKF31
+         QPNKHWToUxHKXhRVBBXJMVt3doZmuE4drjQXtJ+Ay5EKb/fFGAu0ELndFJcN8geoi394
+         6wBUhg3L4z3LBUBUpwq+rCCNYz4xhuP75CLJ2zWvlGPdUL0miiD8Z5TBrFEuhZly00ps
+         laow==
+X-Forwarded-Encrypted: i=1; AJvYcCVf7os5AxjjEBIKbhE0Ax+tpDoJk1BtrvFlzdAczHtXR/i7wdGCt4Q0sXvtoQvjjbV7RujrCdM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8f0e+sHtETwdfEGaw2Og+uBTDRQZBaGn1EJUER+q7EwDex/gs
+	10Yd1UHcO8CO/vFlcCIw1rGVgYEUO6CZ7jpr0868+MrdKfWIM88nd0rz
+X-Gm-Gg: AY/fxX7YPw9g+5gUIaSEyIvbJ8Hh7OnWAL3H0IgpSDzDbA4cILdYrWHZjF69Zi3Y79k
+	7BrbQESJ54ZbF6YU+s5BQr1+hgzVlcjMIKS+YU4Ppb5Ue0VrOhppcVn+DdGQfy5jOfHAuD2EudT
+	ML1wDS6qEPDimuX2sJfrJVHWTbM5N6YUVpiz1UDgE9oUVpK2QHt+Rdrh14+Xvj6M/gyI7kR4vm0
+	V4vlw5GioG9Le672T0REDIs9wvp9GpEtfnmjYKWIEvxw8M3WK9Z3WUTUi7v8/qziLRBXo021NFU
+	HoeBeDfsVBN1AzeRlGI94tW993y4YgK3eCBmXAqNFbMQAiJ2QQuKQ+kPXmmxfFL9R79G/dbk+OV
+	c/nb/VBFIjCG8n/6tiiZd8TxHqRzfGf9sJWX6W1t5na0Da5U2GaJzoRhHpWYwea7HRIBY6dm8Ys
+	DLreE4h1ZQ+vkG1hxu360fPsyAlrLRSj6WHQ==
+X-Google-Smtp-Source: AGHT+IEQjxI6fpER4WRXmfHttzhiU1CsOOFkXmnEbm2lJSnSadsG1UWd7h31FAWSaH5F7soVC2ZyQQ==
+X-Received: by 2002:a05:600c:6287:b0:477:7af8:c88b with SMTP id 5b1f17b1804b1-47d84b1861bmr218312995e9.11.1768287580133;
+        Mon, 12 Jan 2026 22:59:40 -0800 (PST)
+Received: from ehlo.thunderbird.net ([80.244.29.171])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f68f69dsm387368335e9.1.2026.01.12.22.59.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Jan 2026 22:59:39 -0800 (PST)
+Date: Tue, 13 Jan 2026 08:59:36 +0200
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+To: Slark Xiao <slark_xiao@163.com>
+CC: Loic Poulain <loic.poulain@oss.qualcomm.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Muhammad Nuzaihan <zaihan@unrealasia.net>, Daniele Palmas <dnlplm@gmail.com>,
+ Qiang Yu <quic_qianyu@quicinc.com>, Manivannan Sadhasivam <mani@kernel.org>,
+ Johan Hovold <johan@kernel.org>
+Subject: Re:Re:[RFC PATCH v5 0/7] net: wwan: add NMEA port type support
+User-Agent: K-9 Mail for Android
+In-Reply-To: <3669f7f7.1b05.19bb517df16.Coremail.slark_xiao@163.com>
+References: <20260109010909.4216-1-ryazanov.s.a@gmail.com> <1b1a21b2.31c6.19ba0c6143b.Coremail.slark_xiao@163.com> <DF8AF3F7-9A3F-4DCB-963C-DCAE46309F7B@gmail.com> <3669f7f7.1b05.19bb517df16.Coremail.slark_xiao@163.com>
+Message-ID: <845D539E-E546-4652-A37F-F9E655B37369@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260113052458.25338-1-ernis@linux.microsoft.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTEzMDA1NCBTYWx0ZWRfX1lhxAe6sQWBg
- DW9XJ0EYfu4oozyK1AncPw+hOW8ntv3FF/YoKz1YFeo1l2XFjm/BTI2Ot57Y3yrQt9YNEcpbm/B
- FLKHtjaUHT8xVHP15dCj3kFmC1LMWsavBbPR91SSJerl112q1sDuoNXJkp8GMNYia13RkL1qSqv
- hunW0+fcTtyvF1KuZPCBmWt/K4BdTkODuN8cNMmBU3PDpkpiFjJ75EEx0CjqjLOYwv4lzYZn4f6
- 3CZ5rsaNcQtWvW3rAdLga6u1KncY9MjNzDkNj4V6K+wMYVj/7Eh578Wa5KdSZlrHlV391zSZUqm
- 06wJL8v3Rc8kX/PIvP7IeZ6v/B+GKu02JklGyC26PEfg1WaviK5v/LJXzhiG7dWLicU2ASldp7s
- 5NMCMNWh2c42M5PMUvzfB4HZIbW1TdoN8hKLC2BKkV/DwiucvUVSNSVH2o3Dal+WQZFiluYMNBs
- n3Qswzc+1ZIwQvR/kxw==
-X-Proofpoint-GUID: WW3qbR9GMJ0fuYzq3h70msTExCzipuwP
-X-Proofpoint-ORIG-GUID: WW3qbR9GMJ0fuYzq3h70msTExCzipuwP
-X-Authority-Analysis: v=2.4 cv=AZe83nXG c=1 sm=1 tr=0 ts=6965ea37 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=yMhMjlubAAAA:8 a=M5GUcnROAAAA:8 a=lN0AB7UQOaEN70Y1j8gA:9 a=CjuIK1q_8ugA:10
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-13_01,2026-01-09_02,2025-10-01_01
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 2026-01-13 at 10:54:58, Erni Sri Satya Vennela (ernis@linux.microsoft.com) wrote:
-> Add MAC address to vPort configuration success message and update error
-> message to be more specific about HWC message errors in
-> mana_send_request.
-> 
-> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-> ---
->  drivers/net/ethernet/microsoft/mana/hw_channel.c | 12 +++++++-----
->  drivers/net/ethernet/microsoft/mana/mana_en.c    |  8 ++++----
->  2 files changed, 11 insertions(+), 9 deletions(-)
->
-Reviewed-by: Hariprasad Kelam <hkelam@marvell.com>
- 
+On January 13, 2026 4:03:19 AM, Slark Xiao <slark_xiao@163=2Ecom> wrote:
+>At 2026-01-09 15:11:58, "Sergey Ryazanov" <ryazanov=2Es=2Ea@gmail=2Ecom> =
+wrote:
+>>On January 9, 2026 5:21:34 AM, Slark Xiao <slark_xiao@163=2Ecom> wrote:
+>>>At 2026-01-09 09:09:02, "Sergey Ryazanov" <ryazanov=2Es=2Ea@gmail=2Ecom=
+> wrote:
+>>>>The series introduces a long discussed NMEA port type support for the
+>>>>WWAN subsystem=2E There are two goals=2E From the WWAN driver perspect=
+ive,
+>>>>NMEA exported as any other port type (e=2Eg=2E AT, MBIM, QMI, etc=2E)=
+=2E From
+>>>>user space software perspective, the exported chardev belongs to the
+>>>>GNSS class what makes it easy to distinguish desired port and the WWAN
+>>>>device common to both NMEA and control (AT, MBIM, etc=2E) ports makes =
+it
+>>>>easy to locate a control port for the GNSS receiver activation=2E
+>>>>
+>>>>Done by exporting the NMEA port via the GNSS subsystem with the WWAN
+>>>>core acting as proxy between the WWAN modem driver and the GNSS
+>>>>subsystem=2E
+>>>>
+>>>>The series starts from a cleanup patch=2E Then three patches prepares =
+the
+>>>>WWAN core for the proxy style operation=2E Followed by a patch introdi=
+ng a
+>>>>new WWNA port type, integration with the GNSS subsystem and demux=2E T=
+he
+>>>>series ends with a couple of patches that introduce emulated EMEA port
+>>>>to the WWAN HW simulator=2E
+>>>>
+>>>>The series is the product of the discussion with Loic about the pros a=
+nd
+>>>>cons of possible models and implementation=2E Also Muhammad and Slark =
+did
+>>>>a great job defining the problem, sharing the code and pushing me to
+>>>>finish the implementation=2E Daniele has caught an issue on driver
+>>>>unloading and suggested an investigation direction=2E What was conclud=
+ed
+>>>>by Loic=2E Many thanks=2E
+>>>>
+>>>>Slark, if this series with the unregister fix suits you, please bundle
+>>>>it with your MHI patch, and (re-)send for final inclusion=2E
+>>>>
+>>>>Changes RFCv1->RFCv2:
+>>>>* Uniformly use put_device() to release port memory=2E This made code =
+less
+>>>>  weird and way more clear=2E Thank you, Loic, for noticing and the fi=
+x
+>>>>  discussion!
+>>>>Changes RFCv2->RFCv5:
+>>>>* Fix premature WWAN device unregister; new patch 2/7, thus, all
+>>>>  subsequent patches have been renumbered
+>>>>* Minor adjustments here and there
+>>>>
+>>>Shall I keep these RFC changes info in my next commit?
+>>>Also these RFC changes info in these single patch=2E
+>>
+>>Generally, yeah, it's a good idea to keep information about changes, esp=
+ecially per item patch=2E Keeping the cover latter changelog is up to you=
+=2E
+>>
+>>>And I want to know whether  v5 or v6 shall be used for my next serial?
+>>
+>>Any of them will work=2E If you asking me, then I would suggest to send =
+it as v6 to continue numbering=2E
+>>
+>>>Is there a review progress for these RFC patches ( for patch 2/7 and=20
+>>>3/7 especially)=2E If yes, I will hold my commit until these review pro=
+gress
+>>>finished=2E If not, I will combine these changes with my MHI patch and =
+send
+>>>them out asap=2E
+>>
+>>I have collected all the feedback=2E E=2Eg=2E, minor number leak was fix=
+ed=2E Fixed one long noticed mistype=2E And collected two new review tags g=
+iven by Loic=2E So, my advice is to use these patches as base and put your =
+MHI patch on top of them=2E
+>>
+>Hi Sergey,
+>I didn't find the review tags for your patch 2/7 and 3/7 until now=2E Am =
+I missing something?
+
+You are right, there are no review tags have been given for these patches=
+=2E If it works for your device, just send the complete series=2E You testi=
+ng going to be enough=2E
+
+--
+Sergey
+
+Hi Slark,
 
