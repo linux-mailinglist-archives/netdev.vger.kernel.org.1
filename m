@@ -1,110 +1,105 @@
-Return-Path: <netdev+bounces-249684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40CDBD1C263
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 03:39:17 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70CE6D1C27E
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 03:43:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 32C66300FD4B
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 02:39:15 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C53C7300E4F9
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 02:43:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD75131354F;
-	Wed, 14 Jan 2026 02:39:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6BB63148C7;
+	Wed, 14 Jan 2026 02:43:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cHNL/83X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ubocRfUU"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274413148B8
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 02:39:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3023230D14;
+	Wed, 14 Jan 2026 02:43:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768358354; cv=none; b=YvQXk8vKkggqHJRA2Dyl3RUCIrHQQB2jjhVX0tOzCR8RHG0doylH5bFB6oTHsuwFg3cnECBTRB3gJKXwTQHk9CW0K9rftiXNJED5iqZc8eQvuLfA6e12XTIjIZjDwkedtuqL5FOINS4IC7UMXHEtiSR2rxPpQWz74qD3VdcB/ZY=
+	t=1768358623; cv=none; b=lNBCxt4HdeAtOYQwHdb1j1vTNhit+H9fnSjTb57w3u8C5/2CzNuaQhX66JSq+M7wmbVB0BWInf5yPEK28CZHzU7omyGWwIfCfLTJOPhEbny9XW+/tNeaK4sk+bhkvCInWMushu8qMFX42t80WECVJnmFElwnKWvRNVL8TFrfF3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768358354; c=relaxed/simple;
-	bh=+BHGhlR91oVn6ZUyA9eoQ6q4H2oY5Kdr98FBuLNBnNg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nHGP+RyBX4nHHAGSogDnSJnWERltjXMAir8DvSxsQoIPlr9xZHkEBK8/kiekPXTTA1ykkPB9lcLF2WqaRMcZS01pY5C/M+YQ5CHlcwxt3nWwxwrFwKFKjzlJr4AwuLII/AxxpxNp/OQN3qQmCTAKXKDJV16kkc5ecfj5CCz0xS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cHNL/83X; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768358339;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+BHGhlR91oVn6ZUyA9eoQ6q4H2oY5Kdr98FBuLNBnNg=;
-	b=cHNL/83XJvxkBqzU+D/wOM0d8gXOzpz0elUPpI26wxSEEqSu/nIeiK8yZFLvsImb3cDqY8
-	pzqTI34xJjWm9sm/b1m7NONR8xPd+yvNrm4P0+RI8KHeqr1PAMX9NszOPi4W0NGccBSH9E
-	0FFUsQyrFOkV37bvZMAmyxPj7LDEndA=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>,
- Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Menglong Dong <menglong8.dong@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- David Ahern <dsahern@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, jiang.biao@linux.dev,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
- bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Subject:
- Re: [PATCH bpf-next v9 05/11] bpf: support fsession for bpf_session_cookie
-Date: Wed, 14 Jan 2026 10:38:46 +0800
-Message-ID: <2687399.Lt9SDvczpP@7940hx>
-In-Reply-To:
- <CAADnVQJzkXysOO9jqdvJUYbe2t+urReRV2xWQ0L2z0qcjgxdcw@mail.gmail.com>
-References:
- <20260110141115.537055-1-dongml2@chinatelecom.cn>
- <CAEf4BzbrYMSaM-EEwz4UhZr0BG4FDyxtaG16e4z10QhmAY8o=g@mail.gmail.com>
- <CAADnVQJzkXysOO9jqdvJUYbe2t+urReRV2xWQ0L2z0qcjgxdcw@mail.gmail.com>
+	s=arc-20240116; t=1768358623; c=relaxed/simple;
+	bh=B82yhT/Xs8cX6q/6DEszXt6PG6EP4RUHWy6XtrKoXU4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Fu3d0t/UsAmbX3kzzqX8nbmbEMcGYc0jCHyFczzqj0OvhVuClhU6WlUIYzy8ofxXx4o7+L5+ijuvGFDyEeap46E/4KFvAuFUVd2fLiaHFaefiBF/vzlf78ob7Dvn8a4nlTVy2yAU685eMQgb7Ei6r1bH9TwN4yRHn5dr6tZd0Bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ubocRfUU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96D0EC116C6;
+	Wed, 14 Jan 2026 02:43:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768358623;
+	bh=B82yhT/Xs8cX6q/6DEszXt6PG6EP4RUHWy6XtrKoXU4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ubocRfUUtPXACTPLANWw8GpW7Wqeal60nf4Q5GP7PPhy3mbFrGw7jaFv1VZL7Yx7l
+	 9L/TQzGaPtU5O2H0XLpRCCE90k3HLofy1AI/CXJKYPjWD+O1r67XZQ/ESvkfssx4ug
+	 5L/CFAgePxY0cb9OqiPydFkNXKlZ2Jj8k5MQSIOBnSsub1eSum8AuxeXmjAkTPpy2Y
+	 EaEsNH6RDYwJtC6HOKBdNfWmfEpezhKktHktpdQv/45KUFz8uCN05MoRuI78fZ/hK3
+	 01M8w1jd0K9UAYY2nGrzFHP7OJ+zbYRclYHRVd8q99ObXDMdmmHdwyTTKf51pjHU18
+	 DFnAfBDkryGQw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2FC03808200;
+	Wed, 14 Jan 2026 02:40:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 0/6] selftests: drv-net: gro: enable HW GRO
+ and
+ LRO testing
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176835841678.2561636.12391509152675295422.git-patchwork-notify@kernel.org>
+Date: Wed, 14 Jan 2026 02:40:16 +0000
+References: <20260113000740.255360-1-kuba@kernel.org>
+In-Reply-To: <20260113000740.255360-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org, sdf@fomichev.me, willemb@google.com,
+ petrm@nvidia.com
 
-On 2026/1/14 10:33 Alexei Starovoitov <alexei.starovoitov@gmail.com> write:
-> On Tue, Jan 13, 2026 at 5:24=E2=80=AFPM Andrii Nakryiko
-> <andrii.nakryiko@gmail.com> wrote:
-> >
-> > On Sat, Jan 10, 2026 at 6:12=E2=80=AFAM Menglong Dong <menglong8.dong@g=
-mail.com> wrote:
-> > >
-> > > Implement session cookie for fsession. In order to limit the stack us=
-age,
-> > > we make 4 as the maximum of the cookie count.
-> >
-> > This 4 is so random, tbh. Do we need to artificially limit it? Even if
-> > all BPF_MAX_TRAMP_LINKS =3D 38 where using session cookies, it would be
-> > 304 bytes. Not insignificant, but also not world-ending and IMO so
-> > unlikely that I wouldn't add extra limits at all.
->=20
-> I forgot that we already have BPF_MAX_TRAMP_LINKS limit for the total
-> number of progs. I guess extra 8 bytes per fsession prog isn't that bad.
+Hello:
 
-Ah, so it's OK to not limit the session cookie. I'll remove such limitation
-in the next version.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Thanks!
-Menglong Dong
+On Mon, 12 Jan 2026 16:07:34 -0800 you wrote:
+> Add support for running our existing GRO test against HW GRO
+> and LRO implementation. The first 3 patches are just ksft lib
+> nice-to-haves, and patch 4 cleans up the existing gro Python.
+> 
+> Patches 5 and 6 are of most practical interest. The support
+> reconfiguring the NIC to disable SW GRO and enable HW GRO and LRO.
+> Additionally last patch breaks up the existing GRO cases to
+> track HW compliance at finer granularity.
+> 
+> [...]
 
->=20
+Here is the summary with links:
+  - [net-next,v3,1/6] selftests: net: py: teach ksft_pr() multi-line safety
+    https://git.kernel.org/netdev/net-next/c/b324192e36ec
+  - [net-next,v3,2/6] selftests: net: py: teach cmd() how to print itself
+    https://git.kernel.org/netdev/net-next/c/ce0f92dc737c
+  - [net-next,v3,3/6] selftests: drv-net: gro: use cmd print
+    https://git.kernel.org/netdev/net-next/c/d131da6d7282
+  - [net-next,v3,4/6] selftests: drv-net: gro: improve feature config
+    https://git.kernel.org/netdev/net-next/c/8171f6a76b22
+  - [net-next,v3,5/6] selftests: drv-net: gro: run the test against HW GRO and LRO
+    https://git.kernel.org/netdev/net-next/c/d3b35898de02
+  - [net-next,v3,6/6] selftests: drv-net: gro: break out all individual test cases
+    https://git.kernel.org/netdev/net-next/c/fe074aaa5329
 
-
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
