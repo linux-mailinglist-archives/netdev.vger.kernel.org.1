@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-249709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AE26D1C465
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 04:38:26 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA598D1C468
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 04:38:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0F1013010AAB
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 03:38:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E08773008F54
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 03:38:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AB872C3266;
-	Wed, 14 Jan 2026 03:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88ECE2D0298;
+	Wed, 14 Jan 2026 03:38:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gpu38sFC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TupL0S0Z"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E4227FB21
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 03:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A5527FB21
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 03:38:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768361904; cv=none; b=e8Dbg1cq5QSOXl89uFPL1IpifA0AkW81lHOtd+7ruTK+75tTU3Yvx1tBCBcYGL8yM3DFWvqO6HQsJx2Y30TLLS6oCnPOdutIfVr+SNj7Yz3zH9VfY9OqPaI3XcgPphjfmH/wEhMdvoKI084MbXWXUqFG1DmjKTjUE6XL57p6L+o=
+	t=1768361906; cv=none; b=rfQQgWGZggS7jU1LZ9ZW1t5FRj8udbhUq/e1czL5A4Uj2UWTdc6XgPgF3ujbXVlpUYVHLDpgKI1T2qmWDOh42Z2DD8lnl4Md1vqbGSaOFZZ4HwG28TyT+66ERlOJBizMVyqhZCq9sCC7bO+dTDczvQnhry9r4zfcgBjG9Ehz9Rg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768361904; c=relaxed/simple;
-	bh=lPT5BE3PeQqfFRFIWWykPR23lK4xM2BkOdYn+eOOGXw=;
+	s=arc-20240116; t=1768361906; c=relaxed/simple;
+	bh=EoRxDB/I9az4pqMN3S0r+AwzFHhpRkBJT4vv8b/VTqc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YoHJZhvW1HIPzizx3Wbu2tJ00MPipmG78ABz5B8iWywn0yBEchVBy5l7rtooITsJORX76ZNY3V99ro8pAGnW1HqzjGiHTJJXeFEe4sWtCf2L/+d5Pv07TBnVWuiXCtzy9ZVFG9o6AcLLa13kQ4J4SxoylIpYHbHwteL0N1c0sAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gpu38sFC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 680A3C4CEF7;
-	Wed, 14 Jan 2026 03:38:23 +0000 (UTC)
+	 MIME-Version; b=b+p0Tcw8ObP3u8dDS+dbNtLY4Cgqy/YFoeZxF9FKh55cKN2hlTetcnrbWe7HqAdtGzYa8tzDBlh5lm22sHVAcZzd8GSESRZeY7wXIPrttgdMtx8o4PaiNhP4Cjpxas97c9YquM3maY/MBE8G79pZhOeuOwYkFT3uDC5sX/gIpII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TupL0S0Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B74CC4CEF7;
+	Wed, 14 Jan 2026 03:38:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768361904;
-	bh=lPT5BE3PeQqfFRFIWWykPR23lK4xM2BkOdYn+eOOGXw=;
+	s=k20201202; t=1768361906;
+	bh=EoRxDB/I9az4pqMN3S0r+AwzFHhpRkBJT4vv8b/VTqc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Gpu38sFCEJFbspgdGnKfFBxiwMkIrc4oiSgLOQXZGN5SA5FVYPqoYd2JrY+bprB38
-	 J7XvqTNRb3uyEu6iJMSiRcENOaHMmgJUJnGGpyFL8WO5DtNNc6j71vhrbwJD6NzMlB
-	 viW9y3AXVllTOow9xGRZYq8m7wuJ7Gpa3lctQjGQt0GThDAwhy80BslFTb5zoMTNSS
-	 NKmtncUVt1xJhxUakdNKxNPW5WXMVA/b3QwYjyLHZz9/OZBUOPHaxmhzXwffYO49Qn
-	 KiaSijQI0yKP29gzynXIzWNIppZOV081oLf8sAPQMeuMq5L36vdUEtsZRiO4Dg3FD9
-	 je7WFwJRrnp1g==
+	b=TupL0S0ZrVAhOiIcTzK4QSIuSfLK9tL6EFu0oSD7hGJtVtxnDLmnoi0neqaWeyHst
+	 uJqHr1q63QvHConjUgbe8WIYYFpN1nwNZtIfgX5LAVFBPwxt4d0JDJY9tmA+6b74lg
+	 zdzKD6pUAz87ZeGW/N25ZCdwHtC7J/10Gkv5MD3I+IZLzX50DXpX6LzEeFKWPFNQqV
+	 6AF/kqel2OVQ05mOHZaJ8d5Xc+oNgpnLhv/omIP9jqjKQOt400PRv6bOq5QwjOUssI
+	 04WayQ9WsLSBeinSMeVEk2Vc4rArT5t1NHyI6UJhKjtBU3nf/MAX5886bMtB4ByzmC
+	 Y/7Ps3pLeLXwA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: mohsin.bashr@gmail.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -53,12 +53,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	kernel-team@meta.com,
 	edumazet@google.com,
 	lee@trager.us
-Subject: Re: [net-next,V0.5,4/5] eth: fbnic: Remove retry support
-Date: Tue, 13 Jan 2026 19:38:14 -0800
-Message-ID: <20260114033814.1033266-1-kuba@kernel.org>
+Subject: Re: [net-next,V0.5,5/5] eth: fbnic: Update RX mbox timeout value
+Date: Tue, 13 Jan 2026 19:38:24 -0800
+Message-ID: <20260114033824.1033374-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260112211925.2551576-5-mohsin.bashr@gmail.com>
-References: <20260112211925.2551576-5-mohsin.bashr@gmail.com>
+In-Reply-To: <20260112211925.2551576-6-mohsin.bashr@gmail.com>
+References: <20260112211925.2551576-6-mohsin.bashr@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,12 +72,11 @@ email has considered the AI review valid, or at least pausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-    eth: fbnic: Update RX mbox timeout value
+eth: fbnic: Update RX mbox timeout value
 
-This commit unifies timeout values for firmware mailbox completion waits
-by introducing a wrapper function fbnic_mbx_wait_for_cmpl(). However,
-there appear to be two regressions where the condition logic was
-accidentally inverted.
+This commit unifies timeout values for mailbox RX read requests and
+introduces a wrapper function fbnic_mbx_wait_for_cmpl() to simplify the
+completion wait calls.
 
 > diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
 > index 1ecd777aaada..6b3fb163d381 100644
@@ -92,8 +91,8 @@ accidentally inverted.
 > +					   FBNIC_MBX_RX_TO_SEC * HZ);
 > +}
 
-The wrapper returns the same value as wait_for_completion_timeout():
-non-zero on success, zero on timeout.
+The wrapper returns the result of wait_for_completion_timeout() which is
+non-zero (remaining jiffies) on success and zero on timeout.
 
 > diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
 > index b62b1d5b1453..193f554717b3 100644
@@ -109,11 +108,11 @@ non-zero on success, zero on timeout.
 >  	else
 >  		err = -ETIMEDOUT;
 
-Was the negation here intentional? The original code sets err to
-cmpl->result when the completion succeeds (wait returns non-zero). With
-the added negation, it now sets err to cmpl->result when the wait times
-out (returns zero), and sets err to -ETIMEDOUT when the wait succeeds.
-This appears to invert the success and timeout handling.
+Is the condition inverted here? The original code enters the first branch
+when wait_for_completion_timeout() returns non-zero (success). The new
+code enters the first branch when fbnic_mbx_wait_for_cmpl() returns zero
+(timeout) due to the added negation. This would cause successful
+completions to return -ETIMEDOUT.
 
 [ ... ]
 
@@ -126,14 +125,9 @@ This appears to invert the success and timeout handling.
 >  			reinit_completion(&fw_cmpl->done);
 >  		} else {
 >  			NL_SET_ERR_MSG_FMT_MOD(extack,
->  					       "Timed out waiting on core dump (%d/%d)",
 
-Similarly here, the original code calls reinit_completion() when the wait
-succeeds (to prepare for the next iteration), and reports "Timed out" in
-the else branch when it fails. With the negation added, reinit_completion()
-is now called on timeout, and the "Timed out" error message is reported
-when the wait actually succeeds. Should the negation be removed from this
-call site as well?
--- 
-pw-bot: cr
+Similar issue in this loop - the original code calls reinit_completion()
+on success (non-zero return) and goes to error handling on timeout (zero
+return). With the added negation, success now triggers the error path
+setting err = -ETIMEDOUT, while timeout triggers reinit_completion().
 
