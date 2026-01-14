@@ -1,193 +1,170 @@
-Return-Path: <netdev+bounces-249784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 030CBD1DC25
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 10:59:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 912A2D1DC37
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 11:00:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9EFED30245E8
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 09:57:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C332E300DCAB
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 09:57:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D7733876DF;
-	Wed, 14 Jan 2026 09:57:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4665938757B;
+	Wed, 14 Jan 2026 09:57:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="A5D7e1eS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nq+u8htP";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZQlqzXfp"
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013029.outbound.protection.outlook.com [40.107.159.29])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4A93803C0;
-	Wed, 14 Jan 2026 09:57:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.29
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768384659; cv=fail; b=uYWavrxfu3S8lJ9b+WUH8FOPe4SEI1liixnesNtci5KyepHN+d82Homr0pU5vZ0mD8KnNIWO1xv6a/YUkTt3IfWL+zd4xLIVPOo5kWGCOJOfiPqdy2YBEtftpGcK5c1qw+BCztTngnr1UNitM6b5rt1WVzDI0yGmWwdSBmWhyBU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768384659; c=relaxed/simple;
-	bh=6qe0qXuOl9RsgSqVHKch7biY5RL71Eze2B788wGJ65E=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=lKU/oyAZIhD/9KRbDO+zGEFJk60FPHo/cQCmvcK5mFpkQ9mxjGVESHHI0w1InJ8D5htAiNieeaWRUPrM+XK3qVRdTtu89ZJVF2TVQXWvvG3B8NFdLODh/eF8lbRTg14bKsW134g1OaA88ZONnKJD54vGYOv3EAihnnOVhHLjxvA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=A5D7e1eS; arc=fail smtp.client-ip=40.107.159.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oZOPFrLk07+MPmvx/J2TSj9pIHBkr3eTpKolnrxoaq1T2UCFfknYXzZcAY8u+K3OfiNg9xqMhtHSCU+hSC9mvRgELJg9aDOzLMdWv/cqnxgeIJGDfzV42+PHmnWmDTBmIdK03kOS+eIcPEJ9F/dySfF1aY5poHnw06DVlinD9XxXZr2ApASjNz+of31fk+ZR4uHJ227ApPZZzNIWu2u70EFf819n8GvTCEjeRdU1GArULXFbG3q37ZV529IpdTzZ/OyMs/a9puYjx1MyYibEWyxfJPsYtH9JM/MdE9qXFcE4Gb2DmPknqrQpPoq26uHRsKtrGLwFXYxqToa28GIHYg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6qe0qXuOl9RsgSqVHKch7biY5RL71Eze2B788wGJ65E=;
- b=yQe5VmxkkuJk1r7FECghwGvt65WlSYFNyT0n0X4KqJ3wfm8PFhBFu/e01KFQsgaAWHl2m5QS9dfNnvQ3yjwV2FAiX4rpJGMUlxt0rk7/88fIRVomKbxHnb0oDGJ1YsHTaxmZOAAMubM/+CX8ayYOx4kr+mzj/oyw8qYsd2JZQMu+49CpppoRaJiji6GBw2QtTQkYWOvufDWSKbHjomoRtbrDyX6PP9+pxJbMbGoNd6UjXcqlmzSrkyjlKpxL3lZfi6Kr2xIIs0G/fZG9WOryc+K0H8rv7PkWlxys4xJfKMrYxF09nHnrpaUgauVbJEz1SMI/qkC+TdgdBgICqobyiw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6qe0qXuOl9RsgSqVHKch7biY5RL71Eze2B788wGJ65E=;
- b=A5D7e1eSMrQcjAErOE5+6JrbSJD4q3rPL6oao8jGbZ6BDJLJWJAKerVQ+7AgxzDx94YRIfZZdawVcl/hAjJhaztg33mA/nytBZGBnZVwg9dISSp3CW0w+CVGtn9D5n/eZjHWgWnhbsu5tfKDDT1Twbd1Ol+QzL5W/9tUcdNb62I0Qwsbfomu8J51j17tOV1G57gHkV5ahfPn7l3q/NCxhOI3clBHMaHXX4IyvbiDrgUNYQNekt86pI73GujAGOxR+Q/WwSXD4aK6ivvn78vmywLpAvs5mz1n+uTV6kFQn9STqrdKe54sATzFFrNXlqzoJI/icWqE4IpXsTz5ZnPbDQ==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by AM9PR04MB8383.eurprd04.prod.outlook.com (2603:10a6:20b:3ed::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Wed, 14 Jan
- 2026 09:57:34 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%4]) with mapi id 15.20.9499.001; Wed, 14 Jan 2026
- 09:57:34 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Frank Li <frank.li@nxp.com>
-CC: Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"ast@kernel.org" <ast@kernel.org>, "daniel@iogearbox.net"
-	<daniel@iogearbox.net>, "hawk@kernel.org" <hawk@kernel.org>,
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "sdf@fomichev.me"
-	<sdf@fomichev.me>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>, "bpf@vger.kernel.org"
-	<bpf@vger.kernel.org>
-Subject: RE: [PATCH net-next 06/11] net: fec: transmit XDP frames in bulk
-Thread-Topic: [PATCH net-next 06/11] net: fec: transmit XDP frames in bulk
-Thread-Index: AQHchDz627iSwMOpb0yRsS69dhRjTbVQR58AgAEhOdA=
-Date: Wed, 14 Jan 2026 09:57:34 +0000
-Message-ID:
- <PAXPR04MB8510FED850459727118CAEA0888FA@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20260113032939.3705137-1-wei.fang@nxp.com>
- <20260113032939.3705137-7-wei.fang@nxp.com>
- <aWZv/mAixEnFoMK+@lizhi-Precision-Tower-5810>
-In-Reply-To: <aWZv/mAixEnFoMK+@lizhi-Precision-Tower-5810>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|AM9PR04MB8383:EE_
-x-ms-office365-filtering-correlation-id: b2032e16-d32d-4bb7-e28c-08de5353577b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|19092799006|7416014|1800799024|366016|38070700021;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?CC8+LMBWVCbTqINj4Xqns1YSnQKdLyb+GSKezWFTbVnMdBmKcKc6sPpdeXJP?=
- =?us-ascii?Q?TN8Elkpcc8Dkm2ebxTUuIM9ChgOU6aW9CKuXpsb9pq72+mzaCJNcDDoZz9tQ?=
- =?us-ascii?Q?k4G/+PoJmej/HFy0kGtHzCinG+sswNtnhXuaajsPE4OSQSg/FyiXwK5/Nu3g?=
- =?us-ascii?Q?pLEIF/urzd+iY7iGSD5u/O5TKb8bDLxbx9/U3ZQfkTCiJjay3yARKtjs3tfH?=
- =?us-ascii?Q?+XrWDQ3Stq5mDYQwDRBL230ADSL7vX/83wEc4PA3XXWkoYb+DFTUMsKV5kWn?=
- =?us-ascii?Q?BX7t7zuANyz7VL3qZtRsbGCrcDTvdClTtYqHUIQX0cN269ULS4sD4f+sx+Ls?=
- =?us-ascii?Q?jbzi356+X/TEI0x5NcVeomuLkGvUkU07FnanKKMPVt5qYF/fTVGoyv5eE4oS?=
- =?us-ascii?Q?iOycwckbbCNO6fU2Nkut53hOUqFL4Hh6U2jsr28xK3Fivrfggzyv2p+XpRz2?=
- =?us-ascii?Q?9lJUZRSrm5/JptlnXFtTR+31JsHQjO34aAEfPwUMIDtwq46On4/5qKDgEW2w?=
- =?us-ascii?Q?5EFvfsRKTTJaLc/3h3b82fZNni+1/dq5Xv5LdGLk3KxPx7EdOqf5fF9RNife?=
- =?us-ascii?Q?iW+Qmv4wY6CU0D85aX49Dp9Xx92oywekjReRVHGg5IjTlge+9QuIjItFaE1t?=
- =?us-ascii?Q?ZwHm28OSq4wTHn5OMo373rkR7WIROndCOCihZeQjbXbY5lAuq+D2TVMqpbkG?=
- =?us-ascii?Q?wOMg16ZYDtq6kZCzBrfX9Gb5r61Bk8MDlEthRntxIeIGqsKZleGML6jXI10s?=
- =?us-ascii?Q?e0+2xDeKJnOxDVoEWVbG0IcsYzEo6+g9p/gv3aKmhaMPs+8KEJj3fuGGtfad?=
- =?us-ascii?Q?1yLwkEL/5uWvkw+mAAQGehIJ8FOCMo5p/02BFkFMCOSUYLCZuQehh5HKHoD7?=
- =?us-ascii?Q?B0DS/82XWpCwIWbvVjpa7mmbV6MbEBrebb49m52EWT7IW/OM/qPqSxCoXRw8?=
- =?us-ascii?Q?tbV2oq5/XCdECLGy5IJ6i1e9IRzAd7G49i50MF7Ssr1FxMsN7yELCAeGaxW6?=
- =?us-ascii?Q?+VPY0RoUaNG/sS+hyMsmjKm6MCy3tfQwDSuT974ISLlSkbx4fYSSswCkR53U?=
- =?us-ascii?Q?9EnHYDw45dvqm7jm+7SbG2QueZJ7kLU5nCZ6fnbWH/AbJwJoEWHN8dtQ+k7+?=
- =?us-ascii?Q?UAtm+bcak39hme6RH5/IWfWuuIqvfAqKjBb+V33EA411p39GL2fCLeunvcA3?=
- =?us-ascii?Q?jO3wr+e+dCfvJbrluXeBf+hawpkl26sCC43GhBpuFmO7c9TrRSkA1kJ5Jy+6?=
- =?us-ascii?Q?lX1WJeNyKbSDB5rGQ4m+5fXI15+c2nZFnHMVqrP1yP4fKLMNbX6J2+HBlcDa?=
- =?us-ascii?Q?fs4Gkuwt1LWO38sJb4AKrlCR9Ps37bsGFFD78PB4QXPYzxLZ/JPBiThny2bX?=
- =?us-ascii?Q?FLORHjbHCUCwwJYTRYCs7+eZ9JwOXxDgyEo+5NbBqFtYkse5j4KlxN6/y9Ra?=
- =?us-ascii?Q?KQ5XofjusjQanVEDGmvBxVrDYRidecXeSt6LXZzwaQYMgxKJMXLO+OWSxVbK?=
- =?us-ascii?Q?y2qwBP+7PCvTS+WMYphFMI+wwqGWM1Zsf74P?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(19092799006)(7416014)(1800799024)(366016)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?bJe5mEWbpXV0LfH2v8GqrjJy/IIKoRxpiai5n3rEmN9tMp+3sdSf/mglLdep?=
- =?us-ascii?Q?bqUF6A6hi4PLxDgmmpZfJkTWaXfxwJva3hJ/FdwpqtZ5pH0P9CEpe38f/+YV?=
- =?us-ascii?Q?p9NS3iZNESuvUZ61fE+iySAiTlGSRuKb184WE65eemxWUWtt2tpJUsoV4HtM?=
- =?us-ascii?Q?Jcyr20+fN1yv3fEkBFHErHO1gc74fuY6MTk+azQjbO+8yOaZ0Ig4mxBj2NDz?=
- =?us-ascii?Q?IZ1A0f7IwcPqAhg1cijZM0uaY5C7K9n9USezNJG6Ifhzlxgnp5CEefIKCGVA?=
- =?us-ascii?Q?uKBM8wDq5xHeHC0+vlse2Hbac66oniiozhDqk3Z2XsN65+vPpHWu0NsfuNEM?=
- =?us-ascii?Q?l1Eoo6bdCa20fsPY5ZeYjW+z6lbVT6BXxFw7sSJUEP5nSgVLcWme+nLrxHU2?=
- =?us-ascii?Q?Iu8INRFU1SX2xoRSSp45X2leNFdcj/NDRIaRRlKa3EvUOmC2/JMJy/JjVe40?=
- =?us-ascii?Q?2tXhl9oKOLUvbfeyGg4ejDtZlgjnPnEcN6Q2vBmmUUt993/i+VuvwTeO+1UL?=
- =?us-ascii?Q?B10QjJKEJOPMn7BaVO8KUKQQ5sya6JgPe4tJsXYHjJDzrePBnILYJVh7K1l6?=
- =?us-ascii?Q?lAOGeUjFlFp2kjHaQSPMoBdTbpocCY/oBvCHhNkA2JLc+Ri2qFPcXG04k6en?=
- =?us-ascii?Q?mCthzCSB7uXLXQ19yoN3cFIYfUcKCgEeCdBJQmoCAzAM5lkkoxSQdFBbApk1?=
- =?us-ascii?Q?z5dj+02AVJMKRPQ3D+4plT9FchwgwBIdwsepEt8Fb4OCLx8Q1jcTh48ovVUr?=
- =?us-ascii?Q?yMKiMkYc5KsUSuM1b+4Pg9I3DMJ0kXQs+j25xPzN5Ly3q1O9lgNgoiKg2Nbd?=
- =?us-ascii?Q?Y2+0otmizEuXneBGxZ2pCgVSZDjntJkCaUSXnBLEwEJni6i2I1Zuf4xMd2Qc?=
- =?us-ascii?Q?sYIsW6+CSHIftjDQpPaIHIaiNzyFUiFPSTHvSM7DyGlLeEmy5omDb77k2ZS7?=
- =?us-ascii?Q?G+XPd0Xo9ze64E0L3ZmZn54lcis410zGi46ER9gghViY9hgqlPL5K/aaf+Ff?=
- =?us-ascii?Q?Ae5TfPXVSWBOCkZLlPkjlCn3TamVWjyM4zO8bYuxuPQuQhwKWEkGquZpfmyJ?=
- =?us-ascii?Q?tWZvvONIdnen3+y6CfJoBfYI7eLZuxggJHXk0oitYQrstrI2SEgjE72dDagt?=
- =?us-ascii?Q?68K9Caj/CMedaxVDZJa0HIq+sK2FkCvL8a+SJ7RU2CtPsRJAAUO1A4ltPtxy?=
- =?us-ascii?Q?spxKNbhv/yyzPKjqIjb+vrxgLIzNz6l3Gjv6QLNB/R6/7Idl3AYK2n2x/0eW?=
- =?us-ascii?Q?pc8p0eUuH6R1miO4oRpvEriF+3rmwLhm8H577GALCu+AAtF7f+8nc4rcMqdg?=
- =?us-ascii?Q?yJut69HjxZaFLbW3NgWSAmobUZT9l+/Eod0Yzb2len+cMyqn7swRG3FOoiYJ?=
- =?us-ascii?Q?LVESPUpn35khFwC0uP8TrTVRHqioNxHyq/8n16sq4TuDSeSk6GY3NLjAZLAw?=
- =?us-ascii?Q?Ee3K+yqcgFVftc79l/Am9xwxWlFg1/l4rJcGI5P8h5oZCy6MGCmtVGCdrSSL?=
- =?us-ascii?Q?UJUZXoR6+erYFe5fc14TrymZOfdpIKnp9LoPSUxw5K1gylyUKPHWe792jtzq?=
- =?us-ascii?Q?iKcfeE5tpUCQOU9nOvb4CD+ZfkF6lNQEgGaFQAzTxwUfK4sT9sSD6eDewHer?=
- =?us-ascii?Q?IuC2D6+0AD4HGqjVHdEZti2mUJ0e4kTb8yBaTysQTxsywXvSeOFrEg9WnO4Y?=
- =?us-ascii?Q?P/HUTVWiy9Nk18DNjvolQ7mRX/16br2MigN4NQ8G+iuVli+N?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C247D34F48A
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 09:57:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768384679; cv=none; b=ePCM0iuut01g6RTwE6pIKZRZQjz0wp4HrfszmRzqh13PUAFM6LI0tUUO8B286AgAcs/NlT3lyro6iuVoIs90uxI05xBQq56hb39N2+QpxP9sbJJL2sg/UpL6aZNCheGDbv53U9e3/kmtY6mtLACn3ne928dPBj1mVoTrJaThbyI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768384679; c=relaxed/simple;
+	bh=36C4TLxXEoaix8+fMcGoCyyRChcqMGjtLcHigyw3xhI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hDvA/1fhetwzBSd+755+Zlzif+AVRY5mvxfTAcvoHasrIYBnEj691TpX05ukFaBoGltctiffaVugrl2/ZW0Fidz/qOkEHCwFHabcPSnmoCMKQa4Eyzzbny8JTAiCF2temHrWsFDpXLVARHH8R/1s8KOnFadifE7BYDhsYaaUfL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nq+u8htP; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZQlqzXfp; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768384677;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XuY/fex5vMBZkn75cmI85OoF3EbBEOIpBs2f4KCfT7Q=;
+	b=Nq+u8htPhUTfkJoQJcSAbrdTjZ21PQLmHKIRvI6fcgHC0hqM/XohE6bnmnXhBpZ7KJDD80
+	lUbiPRDsVifi1xSyf/g068JfoPwSQ8Z6t9BZIbEuoRBnGyJ0zaqToGSda0e5byGM8QNJpL
+	+ej0sQtO4LqRcLZ/G2VNpnnwOBKUd5A=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-304-7t51fULwOMK3ZuTxzSOVIA-1; Wed, 14 Jan 2026 04:57:55 -0500
+X-MC-Unique: 7t51fULwOMK3ZuTxzSOVIA-1
+X-Mimecast-MFC-AGG-ID: 7t51fULwOMK3ZuTxzSOVIA_1768384674
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47edf8ba319so10710265e9.2
+        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 01:57:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1768384674; x=1768989474; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XuY/fex5vMBZkn75cmI85OoF3EbBEOIpBs2f4KCfT7Q=;
+        b=ZQlqzXfpnQ2pDruT5B8sjn8qsNjY+fkKLMytz1ZEgHfFX6TY8wFh7A9qnoylHljs04
+         aoqh7AyDffeAZ20Wk2Adp7zDsXuFUn7Mr9kwwELULdrhwJWAlDPnQkNR4ABMwpEo9PZk
+         5IGGRfboTdTUYYuPSdrNhwJQcFODTCcceTS9Af5ffLvPkv4cCb8htH0JkJPClaKJVVpN
+         7BtESg5jyORObUkYjAwtfm38NbeU4eWg+Xy1AF+WREGfSjOIS/SKfKwrwP6Yo+177w9L
+         6tY9Uh+kxLkMIknust8LfB4pw1bFwVPBhZtcnHHIm6+rH3VOLxMQhhDiF0/yS+CQVql+
+         AOrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768384674; x=1768989474;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XuY/fex5vMBZkn75cmI85OoF3EbBEOIpBs2f4KCfT7Q=;
+        b=F0lFgyS8/MHimQp44dMFSeSd/djBSGpjJn0bGCpBmtBOgQTZUuNYN5p322wxqGnPHt
+         09Go/qoQzjYzc2Inwn1i2S0yPq1w6hho9SBWPGi53TaXGq7SlTyAN3Rn/TrISbrYSuX8
+         c7AfjgGjyd1O5X7xlQogupCL7v7ek4pUaBAKgMq/CIV/qIDorVK+/X/KsdqL5U7++kaV
+         cX+ahGJwiaqdMglOKYsN40/k4GBb4v/bdNtQTIrIX9Whj6S81NNJOBqr0rfl5WBll7q/
+         6/V23SuoTVji0w3qJ2YLku4PpNSlPlhrYbH0m9Div0DtVNQ1y9EMhAepmJzntrBjUDWa
+         KRkg==
+X-Forwarded-Encrypted: i=1; AJvYcCUCGmVMQmbdZ6nvXSMhihgTf5MsRLDAPitg0QWcUr7OYlxHQ1Cv6+AtuS70nNGWLMpSvOABB5A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzA3YC6OkmQ8IOVSKbUpS//y30MEZzqA5qvl35IOm7akd1RYWK0
+	WXn8dWWaMkk1Kc1gANiBGhHu2ff+78WREfNBUB0L0E+Nd5VzJIWKOdlxp5K9skit3dDMTs4237N
+	PZcZNhUUIg7ywG447Ga5eV2YdkmGXwmm2CrzPdRi4pF/6mC80du53ucQEwQ==
+X-Gm-Gg: AY/fxX6C2XXZ3YpdNbfHcT5g3VR38VCxrEvsfpbIteE1gtsr8pXvoSbcrNkj3tuWWqw
+	rS1gsP8GfJzPpT2HcOpn2MshS1OpcM7Masw/VEc+A7rtzFc//yx+pTA4vi+hmo1odfkRh/24SrT
+	aziaPJIzQ+D+XeQFSuAnMXNBYdyqpDkl2FpRDyEZCEoSQkHG/S2n2FQ49lNXtCMnYY9KxEucr2O
+	hwFEAAjZRc2PDzlf6GoGID/9og55uPPmqWQHSmi/EUZWgGG4mBcYqNohF3Cielgjd/6Y4aT1bZ6
+	XkpopJ/iCSlktCIyRPG+2D/nI5x17fkqrWGquhH2sJJGPXFmJYTU2PRMUPqYBkBPMWJfVO8igP2
+	UPYV27MHT9alRgB+xj2U875P/2DD//ICDUUJYdAZcqoO4jT+5mzdieodGaM38Wg==
+X-Received: by 2002:a05:600c:8b76:b0:47e:e2ec:995b with SMTP id 5b1f17b1804b1-47ee32ff3fbmr19462285e9.9.1768384674478;
+        Wed, 14 Jan 2026 01:57:54 -0800 (PST)
+X-Received: by 2002:a05:600c:8b76:b0:47e:e2ec:995b with SMTP id 5b1f17b1804b1-47ee32ff3fbmr19461915e9.9.1768384673944;
+        Wed, 14 Jan 2026 01:57:53 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-25-233.business.telecomitalia.it. [87.12.25.233])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47ee0b4559asm19833435e9.0.2026.01.14.01.57.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Jan 2026 01:57:53 -0800 (PST)
+Date: Wed, 14 Jan 2026 10:57:47 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Arseniy Krasnov <avkrasnov@salutedevices.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2 1/2] vsock/virtio: Coalesce only linear skb
+Message-ID: <aWdoY6JqlRiwfFfJ@sgarzare-redhat>
+References: <20260113-vsock-recv-coalescence-v2-0-552b17837cf4@rbox.co>
+ <20260113-vsock-recv-coalescence-v2-1-552b17837cf4@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b2032e16-d32d-4bb7-e28c-08de5353577b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jan 2026 09:57:34.8304
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: LcIv1Cx/N/xTbuRVoiHC39e+4sIS1uzd/w0LFOGm6iFcfDqS1BZJ6VS9fTNX3bz3s23Nf8yIvRqLxIxnV52gJQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8383
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20260113-vsock-recv-coalescence-v2-1-552b17837cf4@rbox.co>
 
-> On Tue, Jan 13, 2026 at 11:29:34AM +0800, Wei Fang wrote:
-> > Currently, the driver writes the ENET_TDAR register for every XDP frame
-> > to trigger transmit start. Frequent MMIO writes consume more CPU cycles
-> > and may reduce XDP TX performance, so transmit XDP frames in bulk.
-> >
-> > Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> > ---
->=20
-> Did you test light loading case? Any unexpected latency happen? sometime
-> missing trigger is hard to find when heavy loading.
->=20
+On Tue, Jan 13, 2026 at 04:08:18PM +0100, Michal Luczaj wrote:
+>vsock/virtio common tries to coalesce buffers in rx queue: if a linear skb
+>(with a spare tail room) is followed by a small skb (length limited by
+>GOOD_COPY_LEN = 128), an attempt is made to join them.
+>
+>Since the introduction of MSG_ZEROCOPY support, assumption that a small skb
+>will always be linear is incorrect. In the zerocopy case, data is lost and
+>the linear skb is appended with uninitialized kernel memory.
+>
+>Of all 3 supported virtio-based transports, only loopback-transport is
+>affected. G2H virtio-transport rx queue operates on explicitly linear skbs;
+>see virtio_vsock_alloc_linear_skb() in virtio_vsock_rx_fill(). H2G
+>vhost-transport may allocate non-linear skbs, but only for sizes that are
+>not considered for coalescence; see PAGE_ALLOC_COSTLY_ORDER in
+>virtio_vsock_alloc_skb().
+>
+>Ensure only linear skbs are coalesced. Note that skb_tailroom(last_skb) > 0
+>guarantees last_skb is linear.
+>
+>Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+> net/vmw_vsock/virtio_transport_common.c | 6 ++++--
+> 1 file changed, 4 insertions(+), 2 deletions(-)
 
-I don't think a missing trigger event will occur. The driver doesn't wait u=
-ntil
-the number of packets reaches a certain threshold before triggering the
-transmission. The driver receives some packets in each batch, the number
-is not fixed, but there is a threshold. After putting these packets on the =
-TX
-BD ring, transmission is triggered. Therefore, each batch will definitely t=
-rigger
-transmission.
+Thank you for enriching the commit message!
+
+LGTM!
+
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+
+>
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index dcc8a1d5851e..26b979ad71f0 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -1359,9 +1359,11 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
+>
+> 	/* Try to copy small packets into the buffer of last packet queued,
+> 	 * to avoid wasting memory queueing the entire buffer with a small
+>-	 * payload.
+>+	 * payload. Skip non-linear (e.g. zerocopy) skbs; these carry payload
+>+	 * in skb_shinfo.
+> 	 */
+>-	if (len <= GOOD_COPY_LEN && !skb_queue_empty(&vvs->rx_queue)) {
+>+	if (len <= GOOD_COPY_LEN && !skb_queue_empty(&vvs->rx_queue) &&
+>+	    !skb_is_nonlinear(skb)) {
+> 		struct virtio_vsock_hdr *last_hdr;
+> 		struct sk_buff *last_skb;
+>
+>
+>-- 
+>2.52.0
+>
 
 
