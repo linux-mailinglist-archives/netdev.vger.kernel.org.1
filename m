@@ -1,56 +1,65 @@
-Return-Path: <netdev+bounces-249868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89A76D1FDC5
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 16:42:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B4FBD1FF60
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 16:53:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 401F9305EFAF
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 15:41:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8EAA23049198
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 15:50:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D74239E19A;
-	Wed, 14 Jan 2026 15:41:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B4D2C159A;
+	Wed, 14 Jan 2026 15:50:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FiwNnuf7"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="v9kfuXaK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE70337F8D5;
-	Wed, 14 Jan 2026 15:41:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596692D77F7;
+	Wed, 14 Jan 2026 15:50:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768405281; cv=none; b=h16NrrOhoGnRwN+1ysXxGDLlADItWeymMf0YrjO2pL/ocTFqeypdg3++Glpf87LMp3lZ4WPSMro5mpPjQHNFXT+OQokrc8DuIRxslR7rW3oQDg4mR+f1Hg9nnmDyILz0iHadU7+xXX7r8cRhM6DekePPirrwkdwvrPsbn+6qCz0=
+	t=1768405805; cv=none; b=H3h/wfIx5z38xvnIMHBLIjdQkp5bmP1lxfrYypohcSLRSrpGMJ+mkfJYegDK2ud6JWSbNBstq0xgzRD2Frjc4XSCQDqpZjhG3bnT5d6BmfSeb4b64pybHuTsp+sIv1rslCto2dbeOp/2PwWX9ZQEP+4rnk5rpJ1p4EL+oKgyT7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768405281; c=relaxed/simple;
-	bh=RQSRiTI5Ss+Tc8KPe8Ge/hfsHFkfRdRKZ4LXmUHadGo=;
+	s=arc-20240116; t=1768405805; c=relaxed/simple;
+	bh=OeSDAJI/bjJ60crAGDq98vsBzZqcEpglb+5NDC0JzF4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HyjCqJqiBSaFtK6aGc+yb1q6h7mjh0yp0uwhchO9SKhJ33PteDq961TA8p+NICUB6td/DynAIsRAeWiUyF879yHJ3mdhPDKLaU/72H80wqptp+hYlLDaqEnSyVvz1TV8t28ogo+6VdlpdD9quVaSlZcLmlNI2cz0B2wD731099A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FiwNnuf7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DD93C4CEF7;
-	Wed, 14 Jan 2026 15:41:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768405279;
-	bh=RQSRiTI5Ss+Tc8KPe8Ge/hfsHFkfRdRKZ4LXmUHadGo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FiwNnuf7RCGJjhg58kKfW5zsBcbzbaQisBT7dpxiBPetvQ2HfDTJiDeI6FoU2SJQX
-	 J3lcqcd0B/XtWGnttdT0+JE8+76rAXwMPBGesA/bGaOwV1QRJCamr8f4zdPjm7Z5ST
-	 q/Haykvt4UDCAiCpDZd5fcipWHgtETVg7YVOmaTb8vNhtxT4JlXemfgzp/FRobhp8d
-	 Pgd9hHiscvXr7W2ZHqmJXx/QXOnbEhWqEZc3T8/kruS9s/eHV+qgKmxWac9owjr3a/
-	 OAwIL/3nSM23c6ipj+7r449GlS39xbu1Wt0rr0oBNet60cwrIknLIfruGhvS/hh3C1
-	 nMb84SuuyJwPQ==
-Date: Wed, 14 Jan 2026 15:41:14 +0000
-From: Simon Horman <horms@kernel.org>
-To: Fushuai Wang <fushuai.wang@linux.dev>
-Cc: Jason@zx2c4.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, wangfushuai@baidu.com,
-	vadim.fedorenko@linux.dev
-Subject: Re: [PATCH net-next v3] wireguard: allowedips: Use kfree_rcu()
- instead of call_rcu()
-Message-ID: <aWe5GhgmyDkaBLwS@horms.kernel.org>
-References: <20260112130633.25563-1-fushuai.wang@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qiQO5wuwQud/Thj6WHWstvxzPZaK5OFPND6NFKGnNzqMmdnvAATnE3Me3rhVcRrrMJr5A6FGmaYSt15QEejfEU1U6i7Dl+YRkpGgHTA771ufjNLr/UUwdwd9ylT1yPBX+P6smax4sdqF5hEhy0wG7+DudgDqb6xQNvQs48A1ZpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=v9kfuXaK; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=3MwXa/ICy6eTNMiYusHqgT+W35ycbQKAPOWz/OHAJ8o=; b=v9kfuXaKeDUzwifeWjMppAFgyf
+	2AJQxzNG2MXkCroXsG70fr67XXaboxSAKehO40fsM8sUdwoUb3V9zockUzgbFD2Kk6VkbwOyCa6ZJ
+	a5CRkdiiG6L9X392sNvyw3dH76jSncsN8RDyiEjo+KLSNblj0Td4zcm1N5Oz6PV3YiS8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vg37q-002oXD-Mc; Wed, 14 Jan 2026 16:49:38 +0100
+Date: Wed, 14 Jan 2026 16:49:38 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Marek Vasut <marex@nabladev.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Christophe Roullier <christophe.roullier@st.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	kernel@dh-electronics.com, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [net-next,PATCH] net: stmmac: stm32: Do not suspend downed
+ interface
+Message-ID: <3df848c5-eca8-4a57-ab35-004e59d5f719@lunn.ch>
+References: <20260114081809.12758-1-marex@nabladev.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,22 +68,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260112130633.25563-1-fushuai.wang@linux.dev>
+In-Reply-To: <20260114081809.12758-1-marex@nabladev.com>
 
-On Mon, Jan 12, 2026 at 09:06:33PM +0800, Fushuai Wang wrote:
-> From: Fushuai Wang <wangfushuai@baidu.com>
-> 
-> Replace call_rcu() + kmem_cache_free() with kfree_rcu() to simplify
-> the code and reduce function size.
-> 
-> Signed-off-by: Fushuai Wang <wangfushuai@baidu.com>
+On Wed, Jan 14, 2026 at 09:17:54AM +0100, Marek Vasut wrote:
+> If an interface is down, the ETHnSTP clock are not running. Suspending
+> such an interface will attempt to stop already stopped ETHnSTP clock,
+> and produce a warning in the kernel log about this.
 
-Thanks,
+>  static int stm32mp1_suspend(struct stm32_dwmac *dwmac)
+>  {
+> +	struct net_device *ndev = dev_get_drvdata(dwmac->dev);
+> +
+> +	if (!ndev || !netif_running(ndev))
+> +		return 0;
+> +
+>  	return clk_prepare_enable(dwmac->clk_ethstp);
 
-I believe this address prior review and moreover I agree
-with the approach taken here.
+The commit message might be missing some explanation. The
+suspend method enables the clock, not disables it.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-...
+	Andrew
 
