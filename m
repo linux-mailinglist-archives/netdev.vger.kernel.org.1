@@ -1,146 +1,145 @@
-Return-Path: <netdev+bounces-249743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24D9AD1D0B8
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 09:16:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6861DD1D0D4
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 09:18:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 445D4300BDA3
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 08:16:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6737A300E464
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 08:18:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9E793612C2;
-	Wed, 14 Jan 2026 08:16:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93CA837C10D;
+	Wed, 14 Jan 2026 08:18:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a/ZhogS/"
+	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="RS5oaMfH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D892F693D;
-	Wed, 14 Jan 2026 08:16:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE0B37C0FB;
+	Wed, 14 Jan 2026 08:18:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768378571; cv=none; b=LKX5Ut3DMeGXIeT/00U3MCmBhfXr+gMPBM8H5wrkmR8uTyBQpdg/feBIHXDlL11NpSor1HreC7LwJQ6gQAqCG6feJH/2lCCORNQ5y0zQmgZBOet2MccZt6z5XQbXIkCRvg4N7XnF7nNrNoS3yYXrV5dl2wLMtQlz3e8glxcj2Jk=
+	t=1768378704; cv=none; b=Y8Qsk39w2q+AnPaLTdpH7awOV2Zup1NuPZhrF7Lc1pUmw321ptZ2qixMdOJ1hxTEFNZrEvsuB4ILmkdGtv4vBV0jAa7Bh0HoTI9ymxw6kgbN3L2K68y1mLFRCK0hybneJVYPOzl2Aqazm5E393VJdP9Q07c1iyGIMVysKeiuYSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768378571; c=relaxed/simple;
-	bh=Tk40Z3bVifct2EirVXFgyYO4QzE6BJo2N8YtpP43AC0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rYjuSULoduP1ggjBmSns1qM3wuNJ3Ae1TmxtneavO6+lq54i+MUhpFmMzZsGTcozslIGyKA3p0Qmu6HcpBhuXLivRm2IKrxFj1y/xVwHm8gAY5PXXtDpXwWhZZp5sU/hus2OYjOzUOQL6sEdJ1jElfDcNzE+AtXPDYFKZrLxjKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a/ZhogS/; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1768378567; x=1799914567;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Tk40Z3bVifct2EirVXFgyYO4QzE6BJo2N8YtpP43AC0=;
-  b=a/ZhogS/Xw03OPjQm0HDdHHez9uqrI+Nfn2S0Sgh30vF2iCUsh/bTjJo
-   wLEA8542vZXisjzafep8MjmxlprdS2XvBn+tqhP9QewE/meLWtANTKQZf
-   7VteSDHGcRVG4iS4a0xm0hn4salZ59bZzpwrWEWLkVAkmxIW1Zl2IOgvQ
-   U0IabhGRiUpOcfVmhoRaknIr1mET60z4aLC6O0aAJlNygoV5Ch2IdUSZe
-   QIhNo/7SmYpP6IkNSMl79ox3nIRIzvbG/iLu9hGAM+aII5gQCzvIRPc9g
-   LpHcr8Qo7HAdnAefoWjgkMB6H5EinObz/AI1S0SJAUKgWeLcPQvaJrCWR
-   g==;
-X-CSE-ConnectionGUID: 6OowTB87TSeS7/wP83IfQg==
-X-CSE-MsgGUID: QLXcZpYVSDqiraR/d9XJCQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11670"; a="57228006"
-X-IronPort-AV: E=Sophos;i="6.21,225,1763452800"; 
-   d="scan'208";a="57228006"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 00:16:04 -0800
-X-CSE-ConnectionGUID: HdljNTGlSnmU4yQpS8iDuw==
-X-CSE-MsgGUID: aQ92HTXqTE2w3EbiZCrUwA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,225,1763452800"; 
-   d="scan'208";a="204506952"
-Received: from soc-5cg4396xfb.clients.intel.com (HELO [172.28.180.91]) ([172.28.180.91])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 00:16:02 -0800
-Message-ID: <954dc352-2ad2-4950-9c8b-55ebafc5841c@linux.intel.com>
-Date: Wed, 14 Jan 2026 09:15:59 +0100
+	s=arc-20240116; t=1768378704; c=relaxed/simple;
+	bh=0mEAToH2+/NIe8z8dtVBaB654C7G+O5ZHE7HywovVIk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XvpgKOXpKHjm6Tq+Oxkhp0X6immc6XUu2GiHHtHG8Vm3BYxY1tKHGBMLr/yLo7sKthFfHGQ/rt4Wz+w3UyyCjEXFiq3jvfSI4mZzVjeArlt+wmll66Puole+om7AVaft5ZYfu4YUg0ZNT2UmjDkIp+qaZzHPUh5V99p0bFctw1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=RS5oaMfH; arc=none smtp.client-ip=178.251.229.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5221810DFEC;
+	Wed, 14 Jan 2026 09:18:10 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
+	s=dkim; t=1768378696; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=Ajwkw9+NGX/WfC1IKpsfCbjnOybGHKbfekZPQpU9How=;
+	b=RS5oaMfHKR7qffACVNzlScaYa5fCYSMQRLi8g9avCRUkSiD8P4vVzwIeg/1n3RVaoBkSRw
+	yM53bftxByHwsxuGfEoT9WjDMYgUZqKUFjevFUGx/MpPkkVJ805UcJ8no/IHA7mmjYaRco
+	//tEIasJFXW0QmVZrFmbmGL+zRQRiMODy4ZkcBIpoOjcVMfnaWI1CgiXpmHmwXEl2bHmXP
+	XW3B09lTcnYg3CT62Tw71+Hz8b2R9x5uQVh/HJwpY6fzlJHNB/e+ZxK81xptzWUl3tAe5H
+	gvpTwovD9QcMLxlD0y2fyjrfIXv7LmOGd0H3PZyYSS8wVaDey1smjxhdvW41kA==
+From: Marek Vasut <marex@nabladev.com>
+To: netdev@vger.kernel.org
+Cc: Marek Vasut <marex@nabladev.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Christophe Roullier <christophe.roullier@st.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	kernel@dh-electronics.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com
+Subject: [net-next,PATCH] net: stmmac: stm32: Do not suspend downed interface
+Date: Wed, 14 Jan 2026 09:17:54 +0100
+Message-ID: <20260114081809.12758-1-marex@nabladev.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net 1/2] ice: reintroduce retry
- mechanism for indirect AQ
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- stable@vger.kernel.org, Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
- Jakub Staniszewski <jakub.staniszewski@linux.intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Michal Schmidt <mschmidt@redhat.com>
-References: <20260113193817.582-1-dawid.osuchowski@linux.intel.com>
- <20260113193817.582-2-dawid.osuchowski@linux.intel.com>
- <f0fee9dd-7236-464d-9e06-6adbeece81a8@molgen.mpg.de>
-Content-Language: pl, en-US
-From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298
- Gdansk - KRS 101882 - NIP 957-07-52-316
-In-Reply-To: <f0fee9dd-7236-464d-9e06-6adbeece81a8@molgen.mpg.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hey Paul,
+If an interface is down, the ETHnSTP clock are not running. Suspending
+such an interface will attempt to stop already stopped ETHnSTP clock,
+and produce a warning in the kernel log about this.
 
-On 2026-01-13 11:31 PM, Paul Menzel wrote:
-> [Cc: +Michal]
-> 
-> Dear Dawid, dear Jakub,
-> 
+STM32MP25xx that is booted from NFS root via its first ethernet MAC
+(also the consumer of ck_ker_eth1stp) and with its second ethernet
+MAC downed produces the following warnings during suspend resume
+cycle. This can be provoked even using pm_test:
 
+"
+$ echo devices > /sys/power/pm_test
+$ echo mem > /sys/power/state
 ...
-
-> Am 13.01.26 um 20:38 schrieb Dawid Osuchowski:
->> Ccing Michal, given they are the author of the "reverted" commit.
-> 
-> At least Michal was not in the (visible) Cc: list
-
-Interesting. I was using 'git send-email' without any suppression of Cc 
-or similar options. In the direct email sent from me Michal is in Cc, 
-seems the mailing list for some reason stripped him...
-
->>   drivers/net/ethernet/intel/ice/ice_common.c | 12 +++++++++---
->>   1 file changed, 9 insertions(+), 3 deletions(-)
->>
-
+ck_ker_eth2stp already disabled
 ...
+ck_ker_eth2stp already unprepared
+...
+"
 
->>       do {
->>           status = ice_sq_send_cmd(hw, cq, desc, buf, buf_size, cd);
->>           if (!is_cmd_for_retry || !status ||
->>               hw->adminq.sq_last_status != LIBIE_AQ_RC_EBUSY)
->>               break;
->> +        if (buf_cpy)
->> +            memcpy(buf, buf_cpy, buf_size);
->>           memcpy(desc, &desc_cpy, sizeof(desc_cpy));
->> -
-> 
-> Unrelated change?
-> 
+Fix this by not manipulating with the clock during suspend resume
+of interfaces which are downed.
 
-During internal review it was pointed out that this function contains a 
-lot of empty lines, this was my feeble attempt to at least partially 
-reduce their count.
+Signed-off-by: Marek Vasut <marex@nabladev.com>
+---
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Christophe Roullier <christophe.roullier@st.com>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: kernel@dh-electronics.com
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-stm32@st-md-mailman.stormreply.com
+Cc: netdev@vger.kernel.org
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
->>           msleep(ICE_SQ_SEND_DELAY_TIME_MS);
->>       } while (++idx < ICE_SQ_SEND_MAX_EXECUTE);
->> +    kfree(buf_cpy);
->>       return status;
->>   }
-> 
-> The diff looks good otherwise.
-> 
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> 
-> 
-> Kind regards,
-> 
-> Paul
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+index e1b260ed4790b..5b0d111afcac3 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+@@ -618,11 +618,21 @@ static void stm32_dwmac_remove(struct platform_device *pdev)
+ 
+ static int stm32mp1_suspend(struct stm32_dwmac *dwmac)
+ {
++	struct net_device *ndev = dev_get_drvdata(dwmac->dev);
++
++	if (!ndev || !netif_running(ndev))
++		return 0;
++
+ 	return clk_prepare_enable(dwmac->clk_ethstp);
+ }
+ 
+ static void stm32mp1_resume(struct stm32_dwmac *dwmac)
+ {
++	struct net_device *ndev = dev_get_drvdata(dwmac->dev);
++
++	if (!ndev || !netif_running(ndev))
++		return;
++
+ 	clk_disable_unprepare(dwmac->clk_ethstp);
+ }
+ 
+-- 
+2.51.0
 
-Thanks,
-Dawid
 
