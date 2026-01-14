@@ -1,203 +1,151 @@
-Return-Path: <netdev+bounces-249892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18315D2054C
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 17:51:24 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57FD4D205CC
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 17:56:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E77ED300B9DC
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 16:51:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CD15D3007F0A
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 16:56:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F6783A6417;
-	Wed, 14 Jan 2026 16:51:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D70439448B;
+	Wed, 14 Jan 2026 16:56:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WcAAE1MN"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="eHTlQTgE";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="KzWCT/g5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3A63A4F29
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 16:51:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768409476; cv=none; b=lnf3D6soX5aLe+hrWG2lcqDNVwdLpLQJOfqZt/R8IIIxIvi98Dk1MJ0o8fJyqDNfzpJ993/JWDmQ1TAgZ9ZBldwHX5rAsmAlxZsvg0nJxRTpvDqH/5Dnl3+TjTXfi+mJNLzQJLz9Mm204W6Ila2nkjGv3yXgJJzb6NnrfLiWCE0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768409476; c=relaxed/simple;
-	bh=NSs3Ik7B1HYMin1UpshgeyfEslwNzDKlBjC/HPARoGc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=F7Ft/r0X2Ozl1iEkxkonbLC2wUUb0hU1Yr3rYNcg9IFCe+u5BKmUIGT6TgaUWus4T2l/aS1iAHrhcKrDmPNJW3khzZHDF7Sa5upLt1h5qLYCiixXd4kf4/Ku8HyXfYTO4J7qlm7ymbODz+rewYaCqMdUaQKLaqad8FzkHn8acls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WcAAE1MN; arc=none smtp.client-ip=209.85.219.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-88fcbe2e351so25842596d6.1
-        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 08:51:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768409473; x=1769014273; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=CSs1h+3Jome9pZsP/GBiQkQN2iRCoHmDi1R4SFmOKsA=;
-        b=WcAAE1MNRbOYp19iZY96aLIYxyzhZk8IMS2zGMnUUvNnyIl2hp6fzId66lebvDVexh
-         8+mcoKe1cx8SaOQoSG82CA6Dbic/qUFHHY9dzNBlfnfEvFV5tigQ7/mAvohgKihQsySP
-         NqpxoOYrYg8gCGiyR73UJIzPfvnPOufwVXh6JjE3a9aoPfjKq1imrjscvr0GoQ/kZuvJ
-         HutSO9QprI5r/qYY/rFfOHZ7GDqjs+DUXqStSBBm3Bq1OX1UneSfZIGMdT2honPr4lhL
-         /g0NbGwI30tmj/UZUPp1qWaOQO72e5oR2r2o+RyLenF3yZ4grKFVnX1xJxZYp48guU7S
-         XiYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768409473; x=1769014273;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CSs1h+3Jome9pZsP/GBiQkQN2iRCoHmDi1R4SFmOKsA=;
-        b=f9nE4lFgYqsiXxB28VS2EuXOfknpbcwFYiGTAWwDCAynhawFGqiUr12pDAylwpOFNv
-         R7HIGq2lhpo+zN5ZeDmoSF3qUHIf9HUcappO+gFnvf8QxX/f+O53pthfMkG8QMw6RSwT
-         2tjJqWpD4XsmqZJMwYDRn+49TbkDA/j/z7nC26iZm3Z+27qma+JmoUWcwld/YslzcuLK
-         OOAEpNWVjfW2D3rrk3EexPVLZf4d0e/YOlAyjHhA87ORv5VUhjuEbOry+kMXduf90vnS
-         XWMXYd0ml2fZtOTvff4PyxMlQKB6RFyUqPPFoVuCpOVxJ15l5Sc9chXqwot5hHQgLc69
-         vLug==
-X-Forwarded-Encrypted: i=1; AJvYcCWATvGHGbGEsK+0Cg83Ez3he0iFiAhTQg6IY+bcvmFMACpWLh/nno4GK54KC5fJMGQAs8nyZ40=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxudNwKrSmMb+/G95XBawfE1Z5sF4DmseA741hEx6fS9XFy0H5S
-	+Kq0nGjugcZVPvdcqrrdK9mNuJqFwIiYg4vScigvHpLbw0B2TcOzKh4SV4kCu6KJrTGf5kIM6Kw
-	W+BgV3PcFKckZDA==
-X-Received: from qvbld33.prod.google.com ([2002:a05:6214:41a1:b0:88a:27b1:923a])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:12d1:b0:884:6f86:e09a with SMTP id 6a1803df08f44-893980c14d7mr866966d6.6.1768409473431;
- Wed, 14 Jan 2026 08:51:13 -0800 (PST)
-Date: Wed, 14 Jan 2026 16:51:09 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B5E1D5170;
+	Wed, 14 Jan 2026 16:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768409770; cv=pass; b=iCUnDmmAdr4pukyiNbY5KwyZQe9BSOY4Z0AuyqE0QFZwxxbHPzGQ1/WFZ/34BdVy6gYqUW6eRQAFIXoTMUMO5L4XweFUI2eiB1rRJUWQ5scCxJOc/4RRWeRQOq4tQ4ZoWzxGRptQEQxQTR/MiBhqeHu51124Kq48MkWxSMDN674=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768409770; c=relaxed/simple;
+	bh=netvWp8HMu5F68sSUgrtPN31M7VfJJ3V5ro7P6W7kIQ=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=o78Qqhr7icF9skGcVP5CFJ2otv67PTJQ26+zS4rjuXkn/v1b+1EYM2cFpyAvzrfAgYkpx47GLrpTQRIMtNptvCew7KXRNMor6boFvcwTyntl75oNX/lBmtkIsScvr9JHlbr4VKAlykaHjKwkJsff/h53bC3GDsTZTnMaAQVpCrw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=eHTlQTgE; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=KzWCT/g5; arc=pass smtp.client-ip=85.215.255.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1768409765; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=Co5ChP3FeP91Jxb5w9B76w612rcdihF0C079dI30EnOIdYXMkIwNcfRBn+dxWY3+24
+    r/fJuEAgsvCcJAt8KXXFupt/h+iin9DI2pQffNvp8LocBVOP89QVJnVBj/OWVtg8J0un
+    dXx6wQHd5w7VMi1FLtS1MHPHJKEw/fsiT0C7rPaR44U225H38nEdq3I327cbfc2CHhwr
+    87YGEHWFAvqD3ShOT7zGKmDXueA+B73WVullrCW0Vj1n8OGeMqyBnlp9X8XUfwcqN/s/
+    IspeE2WBNIlrEJ+SBF4XXnNNLUU6nLO2+c9Kb9H1q5u/srzuKw12xfFlpCsaQ6DDR4p1
+    wMdQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1768409765;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:References:Cc:To:From:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=YRgXCsZkgp987wIF+DINeW4kt6V2borISeBk6YwtmeY=;
+    b=tFhqVquSO34hMd8SsEfBKYq39MmeiOFYE2QefdZpibqOlVoUbfpj8sZ34OnDkOdlCC
+    BAOqWuZ6KjgRlbTxi575FZ2wckr3I35izbfzoRn8iD3k2WjXc3SgQv1BjkOMkfzR85VL
+    bCjYxENCICcAEQ+BZR4P+nN+o7zCfHB0DkD0+wtiK1wqgroLFySc8KaHEH8TUAdOfBmR
+    s8fQ+h/eTq+sdHQJaws0XckLaPI53ztoKtFkMbfUgkDrAR+qEo2hjKbQtEBbIH+jGrXq
+    Vcv5eyUjcrOScOdFEKjxYh6hj2/vEHCxT+TdYre4jxcOYtbMw7jxy8ViEIFABc8eG9WF
+    RnJw==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1768409765;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:References:Cc:To:From:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=YRgXCsZkgp987wIF+DINeW4kt6V2borISeBk6YwtmeY=;
+    b=eHTlQTgEE5ZaVPhAkWTw4Qbwk4Ou8Xq4GSvbSJnkI6xhid/Xs+c3OQI+eXVu4gPz+q
+    s1d59bPqgZnsPtbi5vmthYqPAnEZzvrAT+SlA8zN6X1NE15fcjPtNDYLC1+l0qNRCVQ9
+    325flgchGI+QOaIDN5uE2/nTxTHNrEvpnmjoWfuYLjwSfgJBk9x0mGir2fw7DLLBd7G3
+    gYsNeaZlyZKcWsHP3U7cSzePXFu5wPlMCQgSk4tIOCC8xvFUL/x7AqQlylbaUYdqHaN4
+    bGtS6SiYcJnp5C/ki3zZYWDIxTGNTuEOMdDJY/H/QaClug/EOqmjB4UxQtjQo2be9aWA
+    mfTQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1768409765;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:References:Cc:To:From:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=YRgXCsZkgp987wIF+DINeW4kt6V2borISeBk6YwtmeY=;
+    b=KzWCT/g5mDQNBf1JrqcZJJeBR4SwAJqgzy5+sXTtHsWre0tTmyh9y7qRXHkfKBr0wg
+    DoVPgyvvoF9nIRyxSIBA==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeEQ7s8bGWj0Q=="
+Received: from [IPV6:2a00:6020:4a38:6810::9f3]
+    by smtp.strato.de (RZmta 54.1.0 AUTH)
+    with ESMTPSA id K0e68b20EGu5uCc
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Wed, 14 Jan 2026 17:56:05 +0100 (CET)
+Message-ID: <5d24e045-8ede-4db1-8b0d-a6efd5037704@hartkopp.net>
+Date: Wed, 14 Jan 2026 17:55:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260114165109.1747722-1-edumazet@google.com>
-Subject: [PATCH net-next] tcp: move tcp_rate_skb_sent() to tcp_output.c
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] docs: can: update SocketCAN documentation for CAN XL
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+To: Rakuram Eswaran <rakuram.e96@gmail.com>,
+ Marc Kleine-Budde <mkl@pengutronix.de>, Vincent Mailhol
+ <mailhol@kernel.org>, Jonathan Corbet <corbet@lwn.net>
+Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org
+References: <20251231-can_doc_update_v1-v1-0-97aac5c20a35@gmail.com>
+ <20251231-can_doc_update_v1-v1-2-97aac5c20a35@gmail.com>
+ <5f8f17eb-b0d7-4b5d-aa66-31113ee891c5@hartkopp.net>
+Content-Language: en-US
+In-Reply-To: <5f8f17eb-b0d7-4b5d-aa66-31113ee891c5@hartkopp.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-It is only called from __tcp_transmit_skb() and __tcp_retransmit_skb().
+Hello Rakuram,
 
-Move it in tcp_output.c and make it static.
+On 13.01.26 17:14, Oliver Hartkopp wrote:
 
-clang compiler is now able to inline it from __tcp_transmit_skb().
+>> +For user space applications the following rules are important when
+>> +handling CAN XL:
+>> +
+>> +- Use ``struct canxl_frame`` as basic data structure when CAN XL traffic
+>> +  is expected.
+>> +- Set CANXL_XLF in ``canxl_frame.flags`` for all valid CAN XL frames.
+>> +- Ensure that undefined bits in ``canxl_frame.flags`` are kept at zero.
+>> +- Respect the configured device MTU; do not send frames larger than
+>> +  the MTU announced by the kernel.
+>> +- For mixed-mode controllers, be prepared to handle Classical CAN,
+>> +  CAN FD and CAN XL frames on the same interface and choose the frame
+>> +  structure according to the socket/protocol semantics (e.g. dedicated
+>> +  CAN XL APIs when available).
+> 
+> There's one big difference between CC/FD and XL frames when you read/ 
+> write it to CAN_RAW sockets:
+> 
+> For CAN CC and CAN FD you write struct can(fd)_frame's with CAN_MTU 
+> resp. CANFD_MTU lengths - no matter about the data length (cf->len).
+> 
+> When you read/write CAN XL frames you are reading and writing the 
+> CANXL_HDR_SIZE + the length of the data.
+> 
+> So only in the case of writing 2048 byte data, you write 2060 bytes.
+> 
+> The minimum size for read/write is CANXL_HDR_SIZE + CANXL_MIN_DLEN == 13
+> 
 
-gcc compiler inlines it in the two callers, which is also fine.
+Here is an example that I've been implemented recently that shows a good 
+example how to handle CC/FD/XL frames, when they are all enabled on the 
+CAN_RAW socket:
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/tcp.h     |  1 -
- net/ipv4/tcp_output.c | 35 +++++++++++++++++++++++++++++++++++
- net/ipv4/tcp_rate.c   | 35 -----------------------------------
- 3 files changed, 35 insertions(+), 36 deletions(-)
+https://github.com/hartkopp/can-utils/commit/bf0cae218af9b1c1f5eabad7f3704b88ab642e00
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index ef0fee58fde82620399df49a35c7ecae8e34068e..15f9b20f851fe322f4417ff403c3965436aa3f9f 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -1356,7 +1356,6 @@ static inline void tcp_ca_event(struct sock *sk, const enum tcp_ca_event event)
- void tcp_set_ca_state(struct sock *sk, const u8 ca_state);
- 
- /* From tcp_rate.c */
--void tcp_rate_skb_sent(struct sock *sk, struct sk_buff *skb);
- void tcp_rate_skb_delivered(struct sock *sk, struct sk_buff *skb,
- 			    struct rate_sample *rs);
- void tcp_rate_gen(struct sock *sk, u32 delivered, u32 lost,
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 479afb714bdf901cdf733c94cd7f22bd705c9d02..256b669e8d3b4a4d191e61e79784e412aaef8965 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -1432,6 +1432,41 @@ static void tcp_update_skb_after_send(struct sock *sk, struct sk_buff *skb,
- 	list_move_tail(&skb->tcp_tsorted_anchor, &tp->tsorted_sent_queue);
- }
- 
-+/* Snapshot the current delivery information in the skb, to generate
-+ * a rate sample later when the skb is (s)acked in tcp_rate_skb_delivered().
-+ */
-+static void tcp_rate_skb_sent(struct sock *sk, struct sk_buff *skb)
-+{
-+	struct tcp_sock *tp = tcp_sk(sk);
-+
-+	 /* In general we need to start delivery rate samples from the
-+	  * time we received the most recent ACK, to ensure we include
-+	  * the full time the network needs to deliver all in-flight
-+	  * packets. If there are no packets in flight yet, then we
-+	  * know that any ACKs after now indicate that the network was
-+	  * able to deliver those packets completely in the sampling
-+	  * interval between now and the next ACK.
-+	  *
-+	  * Note that we use packets_out instead of tcp_packets_in_flight(tp)
-+	  * because the latter is a guess based on RTO and loss-marking
-+	  * heuristics. We don't want spurious RTOs or loss markings to cause
-+	  * a spuriously small time interval, causing a spuriously high
-+	  * bandwidth estimate.
-+	  */
-+	if (!tp->packets_out) {
-+		u64 tstamp_us = tcp_skb_timestamp_us(skb);
-+
-+		tp->first_tx_mstamp  = tstamp_us;
-+		tp->delivered_mstamp = tstamp_us;
-+	}
-+
-+	TCP_SKB_CB(skb)->tx.first_tx_mstamp	= tp->first_tx_mstamp;
-+	TCP_SKB_CB(skb)->tx.delivered_mstamp	= tp->delivered_mstamp;
-+	TCP_SKB_CB(skb)->tx.delivered		= tp->delivered;
-+	TCP_SKB_CB(skb)->tx.delivered_ce	= tp->delivered_ce;
-+	TCP_SKB_CB(skb)->tx.is_app_limited	= tp->app_limited ? 1 : 0;
-+}
-+
- INDIRECT_CALLABLE_DECLARE(int ip_queue_xmit(struct sock *sk, struct sk_buff *skb, struct flowi *fl));
- INDIRECT_CALLABLE_DECLARE(int inet6_csk_xmit(struct sock *sk, struct sk_buff *skb, struct flowi *fl));
- INDIRECT_CALLABLE_DECLARE(void tcp_v4_send_check(struct sock *sk, struct sk_buff *skb));
-diff --git a/net/ipv4/tcp_rate.c b/net/ipv4/tcp_rate.c
-index a8f6d9d06f2eb1893c65dec678edb92211fee52f..98eb346f986ef24969f804c3b55acbf60d2ec299 100644
---- a/net/ipv4/tcp_rate.c
-+++ b/net/ipv4/tcp_rate.c
-@@ -34,41 +34,6 @@
-  * ready to send in the write queue.
-  */
- 
--/* Snapshot the current delivery information in the skb, to generate
-- * a rate sample later when the skb is (s)acked in tcp_rate_skb_delivered().
-- */
--void tcp_rate_skb_sent(struct sock *sk, struct sk_buff *skb)
--{
--	struct tcp_sock *tp = tcp_sk(sk);
--
--	 /* In general we need to start delivery rate samples from the
--	  * time we received the most recent ACK, to ensure we include
--	  * the full time the network needs to deliver all in-flight
--	  * packets. If there are no packets in flight yet, then we
--	  * know that any ACKs after now indicate that the network was
--	  * able to deliver those packets completely in the sampling
--	  * interval between now and the next ACK.
--	  *
--	  * Note that we use packets_out instead of tcp_packets_in_flight(tp)
--	  * because the latter is a guess based on RTO and loss-marking
--	  * heuristics. We don't want spurious RTOs or loss markings to cause
--	  * a spuriously small time interval, causing a spuriously high
--	  * bandwidth estimate.
--	  */
--	if (!tp->packets_out) {
--		u64 tstamp_us = tcp_skb_timestamp_us(skb);
--
--		tp->first_tx_mstamp  = tstamp_us;
--		tp->delivered_mstamp = tstamp_us;
--	}
--
--	TCP_SKB_CB(skb)->tx.first_tx_mstamp	= tp->first_tx_mstamp;
--	TCP_SKB_CB(skb)->tx.delivered_mstamp	= tp->delivered_mstamp;
--	TCP_SKB_CB(skb)->tx.delivered		= tp->delivered;
--	TCP_SKB_CB(skb)->tx.delivered_ce	= tp->delivered_ce;
--	TCP_SKB_CB(skb)->tx.is_app_limited	= tp->app_limited ? 1 : 0;
--}
--
- /* When an skb is sacked or acked, we fill in the rate sample with the (prior)
-  * delivery information when the skb was last transmitted.
-  *
--- 
-2.52.0.457.g6b5491de43-goog
+Feel free to pick the code for some example.
+
+But please do not reference the commit as it is in my private repo and 
+not yet integrated in the official can-utils repo.
+
+Best regards,
+Oliver
 
 
