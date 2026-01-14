@@ -1,185 +1,216 @@
-Return-Path: <netdev+bounces-249731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D32FDD1CC94
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 08:16:05 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34582D1CCA4
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 08:18:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AA1AA306FFC0
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 07:16:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D52663003B27
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 07:18:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C87378D80;
-	Wed, 14 Jan 2026 07:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 292263590C4;
+	Wed, 14 Jan 2026 07:18:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S3dbsEVX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vw+UjI7U";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="QwjLf4jd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9BB3793A8
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 07:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270A93587C3
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 07:18:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768374962; cv=none; b=Sc3sw4d5nQkM7OhTfQElzK86I175lBQqQ8gXO8ul46fXWiSZH87/d2MQc/3q7PyLFhF50YLz6pXobvCnv2QOT+Q9ABDT0abEDPsiw3jnhgvloYJ+8PWhMHrozU099W0ddQWymVGj2N80tm6CpDfLHXNIx+d5gO75lZ/konBJvFE=
+	t=1768375131; cv=none; b=RZMwjCI8f9Whn9zHIhbNtxXjBaqGloQvDT7v/7Qbv8xYw36PXMdpg/3PV+rzkQZCSJMIL9kBPKGym2vNA152+SVtJ0uIcPn+YRBFtfEguJk/9IdNXONXoYqWv/IKeqdJ+yQltALaNHOlJLSQ8lAIkXs3E2JX/PSJhhdvv5UGaa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768374962; c=relaxed/simple;
-	bh=Piy8YBm07+jMazblsEPy36XePK0a4Ln3sGMpnd+mrWk=;
+	s=arc-20240116; t=1768375131; c=relaxed/simple;
+	bh=kqP77k226Wx8tCQ/0jWeIHBXDlzM0lq0ign/yDhfiAw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Dh6c7c/SyUOEDtwp4KQokz9TEybVHCD7mVQwxhtQnBKhftJxJlUO5LmRkn51E4WTFz9UUgqqDi2zMOYx4RQob3cRP4BRJSQ1RsFUNkBH8zXcvurnDWWqJMItyOgk2E4N0aNQFq9cGaFR96fdQLtI3N2uaBxHtOx3jHMYzhxpJhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S3dbsEVX; arc=none smtp.client-ip=74.125.82.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-1233702afd3so563842c88.0
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 23:15:56 -0800 (PST)
+	 To:Cc:Content-Type; b=VnuZd9BTtNRMPdtqQkqHR/VfnnUmssvvI8+IXplLVh64PN/UVhDsoFC769KwBmBRFXJ+TYHGAlE2EHY6VciLYkFdv8QnF/bqAxXQxUzeAGsEtyfNTL2I32ZS8kimYy+a+W5vh5cZlUj7woBXGK5LhgTNRQJFPeckQtt1I5V+sdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vw+UjI7U; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=QwjLf4jd; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768375123;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L/19S94YPYflLVx22ERVlbrXJL08sz9F6OX2XWU/rfQ=;
+	b=Vw+UjI7UgeDsiuTK+AldtFGslG1lpa6BX8qwit8ktjV04T28NF/6JZkLXvWX+JezbhZZjZ
+	blBvO00IdKaLRR7uXFex1toqeaiQRsB5cvpRNriGftNCRo1DS1vuj5Ni1MFoiHLkqUlU6t
+	8ajpR1bV5fdYtvB7Na3Sqt175FSzlFM=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-533-pOzYp4XRMgiwTzmu1fCPkQ-1; Wed, 14 Jan 2026 02:18:42 -0500
+X-MC-Unique: pOzYp4XRMgiwTzmu1fCPkQ-1
+X-Mimecast-MFC-AGG-ID: pOzYp4XRMgiwTzmu1fCPkQ_1768375121
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-34c6e05af3bso8962413a91.3
+        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 23:18:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768374954; x=1768979754; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1768375121; x=1768979921; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Bs7+8D8JnuZMt5LjtRb0WRway125bvnbxPx7Fo2XEbY=;
-        b=S3dbsEVXYXx8xGailAA4eiZ/4ccEusxGpR+Tvux6Frt8lngt8OIo+T+hNFwgflW+0/
-         Ly0ipB3aVNZiTQghCvNkhHi3o25NRfkBG1M7hs/bfCMb4DjcCVQXiw7FL6QfUgCQ7biV
-         kdELjss+smJqsftUCWSX4N2CYMhLLQkL4J/afAtPtPvyi/eJq3sDWmRU/+NvWj8aWV1Z
-         +ldB/OP57hxNz9jlzGOb3fuQXpGwcjU7rzyTGGeV0kwnQUUuVbxqopXQ6MNjo8hLNriO
-         J/sQ6ngZId8x8Oft0XVPc36asrD8Pnyh0puHZdbZw43KdN4s1S79V4iIliSSFAQ17WLF
-         Qcpg==
+        bh=L/19S94YPYflLVx22ERVlbrXJL08sz9F6OX2XWU/rfQ=;
+        b=QwjLf4jd4v7iK7Jb9KwEPCFNb7YsGvratPiQCwV9o6Okk0pQNWozGR8RVAJixy12cA
+         Z99aqllsIMJZbJwuQw22x947KlhTJEbDozH9fJn/Bx+b5lxpbVZtkF4k1FYvFVx6AXKO
+         7tHQoUMFyOgDwksiqgwa6hfdZdC1FUj5/nYGbyzTZT0CvJbeb5+7tpc4YPxAEEqWhspz
+         KGje0p/cWV1HaxeIxKggWwefjyjBv4ONknIP31KwU8sxnD/1UdHSjIBTGvw/0CGx81Zg
+         3dIS1MU61tPBsBP1lo38wzGMUlGTu6t1VCDtl+DJNlxqJBbioPeyCUxhTtu8QFNAHrIf
+         YNdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768374954; x=1768979754;
+        d=1e100.net; s=20230601; t=1768375121; x=1768979921;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Bs7+8D8JnuZMt5LjtRb0WRway125bvnbxPx7Fo2XEbY=;
-        b=N8K1WeYnlXmIKwhKpZkolejY3dnaVrCPmmxFZn8swv+9EWK2OtNUInZD4+egc9Z5IW
-         d9oHhhE8VcCM3mX2mWbm2PfEzFb/EU/1iDdCSb5q/lYv2R8P26qr8dnlXVnKpDpfhxcN
-         7z+u4Ro4EbXohPSY8yIaiROAlzpHxHSEQmy1mInW0fwe41shtBfRYHnjzvxwzLB/u7/9
-         72xOETk7WlFHqxA12W5eN/cBmU7O7HngXwMUgwLxXtsDRDTtPQWIif7flfnU6zmiP2uP
-         UwX3aTeMrVlqvDd6Y+SKoYN1TzKhCz0P/LKBNHzi0KxpUStPQxXT1Fp4F1BIo+su515M
-         4/OA==
-X-Forwarded-Encrypted: i=1; AJvYcCV9IrG4+gfUqjYuArfvS0QLAs3lkh+Nn7+H8UynjpOM96l0r31DC0iQd795MnJHyI12W5aeahQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCTOFieoBW7jwTsI0WpsREi8vnyDJ4OI263TB7N/MUsNc44R7I
-	BfXYeWIXHwNpLOlNTaRRgAIy+Gzr7YpGeIWou01dNuejogRXeyMfDNzQvhMF0rALwfy569TDsl4
-	e7pagEUUAeBlwl1gbdmI8HWvckbERlrFTcp7oBogn
-X-Gm-Gg: AY/fxX6XtcF5F0wF5FzHJj5GF8qSVxvxprV8pZwgW8hvzU8dv5oAPVCNPBGYBX2v2vI
-	3gG1WsDqY9jA7qadQi8dBGvEJvihZwrjVIcCX45dWRnr6g0VQdcBSsi0kgmu/cYGCnpchNdrS1a
-	q4IP/gRGno4+GALiQIFmxhptSfdPAV1StclxtWJXNDWCviqo8IxL3j7HcLDqFR/PavlKJLhMOm4
-	r4aO5LDSDqglq9fmO0IaP7GAkUAJnYwNM4spJsWjmpivnIMzdid79rhpCsocw21H7s9VtwON27+
-	3jFXsPVd8qze/raQYUVODSZuYzw2UtNP7HFHqNnX0rhPf5YwkPNDutzDNB9Q
-X-Received: by 2002:a05:7022:3f08:b0:121:a01a:85d8 with SMTP id
- a92af1059eb24-12336aa95b5mr1646688c88.45.1768374953445; Tue, 13 Jan 2026
- 23:15:53 -0800 (PST)
+        bh=L/19S94YPYflLVx22ERVlbrXJL08sz9F6OX2XWU/rfQ=;
+        b=p1sm/CWsm9EgZgUAsR3kvxLrsHP9JnXZmRozeEBxAwIZXJVRBa+tR97YUaafA+tE0G
+         8xAHaFAEN5Ubm3jfJJAiPmUvqbtElkH0AOLTQEDGOMyY1vnTsWt285w3mJ4j+y2lqqCX
+         PE+rxaHIi4OIiihSTWNO8GLcYbNX0bSc60oFCGmGAgTquRJxjjDtYQXwB3rpOro1vo+w
+         Rx0p6w23X/6WSd0/88iraa24UGs7Y847EraMGqJm0Wve+9FgoSngjZFYjvMU0/0Lu/26
+         IwdNo4pQolSYdD6Ql4XhGA/TuWZbJyXoNuvQ4beBqavjeQx0FpyrIVWg+ZnYOorC06BQ
+         a+Hw==
+X-Forwarded-Encrypted: i=1; AJvYcCXms3DLIOJfPkKPnNRmh5gDycB+1KCAI+QCiCf77AYDsxCffmjjnISnOHu5XTMhfXhP47pCcE8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgNN2SHiWBMk/dBDSWXVdYPJpRyokd0fUL86eNG+x+BchQkyLs
+	i7prMLy0UhotvSKvNc9jIa8oxZ4vMZIkveiBzoaOoHhnWWWp09uadbizfjfZUQi0ek3CMfUG5ha
+	tYfd6yBIcV3fVXQDTbR19MWGlYQrSM3kQA9kCrS1zVifeKNIIpZQiYYbAt7DywEiffr85EZrPPC
+	+UK6nUkm34P1VoJ6r+gUGpvOB6BHq0GSJg
+X-Gm-Gg: AY/fxX5ZrIGcROkmdl7Hm+O4tsygS2hRlG7ySWIlQMc84jo2b/tuvNq41bep3xyfWeu
+	EpnPMOLiIytmBLdq6H/AAF6uUdKHLKHC/4mqq/jyo6zuQjOz197XTCNYG8VbKYexiaX8jzkLdJC
+	2U2un07xK8TG4r678XJf4HGrfv6aEEp3dPFH6boXKcL4yFE0MAWIVcnRBve72WbRg=
+X-Received: by 2002:a17:90b:28cc:b0:335:2747:a9b3 with SMTP id 98e67ed59e1d1-3510913fd7bmr1582673a91.32.1768375120981;
+        Tue, 13 Jan 2026 23:18:40 -0800 (PST)
+X-Received: by 2002:a17:90b:28cc:b0:335:2747:a9b3 with SMTP id
+ 98e67ed59e1d1-3510913fd7bmr1582663a91.32.1768375120558; Tue, 13 Jan 2026
+ 23:18:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260112200736.1884171-1-kuniyu@google.com> <20260112200736.1884171-3-kuniyu@google.com>
- <20260113191122.1d0f3ec4@kernel.org>
-In-Reply-To: <20260113191122.1d0f3ec4@kernel.org>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 13 Jan 2026 23:15:42 -0800
-X-Gm-Features: AZwV_Qj_KYC0wh6KR_Xh-vDYZtA2bH9h4PCiqkqgoUiX41UCVBaHBcpzzNqI5vs
-Message-ID: <CAAVpQUD9um80LD36osX4SuFk0BmkViHsPbKnFFXy=KtYoT_Z6g@mail.gmail.com>
-Subject: Re: [PATCH v1 net 2/2] fou: Don't allow 0 for FOU_ATTR_IPPROTO.
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Tom Herbert <therbert@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+References: <aWIItWq5dV9XTTCJ@kspp> <e9607915-892c-4724-b97f-7c90918f86fe@redhat.com>
+In-Reply-To: <e9607915-892c-4724-b97f-7c90918f86fe@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 14 Jan 2026 15:18:29 +0800
+X-Gm-Features: AZwV_Qil4_emZc9UC594LVQZD_WDE3u0sgwiGLvdx73MXFe_Cb2QNMYVC2G9b8k
+Message-ID: <CACGkMEuFePpfpFvnJz6xvrKrVG84KmAfODP55cCJgFzZqba29A@mail.gmail.com>
+Subject: Re: [PATCH v2][next] virtio_net: Fix misalignment bug in struct virtnet_info
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Akihiko Odaki <akihiko.odaki@daynix.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	linux-hardening@vger.kernel.org, Kees Cook <kees@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 13, 2026 at 7:11=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+On Tue, Jan 13, 2026 at 10:30=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wr=
 ote:
 >
-> On Mon, 12 Jan 2026 20:06:36 +0000 Kuniyuki Iwashima wrote:
-> > fou_udp_recv() has the same problem mentioned in the previous
-> > patch.
+> On 1/10/26 9:07 AM, Gustavo A. R. Silva wrote:
+> > Use the new TRAILING_OVERLAP() helper to fix a misalignment bug
+> > along with the following warning:
 > >
-> > If FOU_ATTR_IPPROTO is set to 0, skb is not freed by
-> > fou_udp_recv() nor "resubmit"-ted in ip_protocol_deliver_rcu().
+> > drivers/net/virtio_net.c:429:46: warning: structure containing a flexib=
+le array member is not at the end of another structure [-Wflex-array-member=
+-not-at-end]
 > >
-> > Let's forbid 0 for FOU_ATTR_IPPROTO.
+> > This helper creates a union between a flexible-array member (FAM)
+> > and a set of members that would otherwise follow it (in this case
+> > `u8 rss_hash_key_data[VIRTIO_NET_RSS_MAX_KEY_SIZE];`). This
+> > overlays the trailing members (rss_hash_key_data) onto the FAM
+> > (hash_key_data) while keeping the FAM and the start of MEMBERS aligned.
+> > The static_assert() ensures this alignment remains.
 > >
-> > Fixes: 23461551c0062 ("fou: Support for foo-over-udp RX path")
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> > Notice that due to tail padding in flexible `struct
+> > virtio_net_rss_config_trailer`, `rss_trailer.hash_key_data`
+> > (at offset 83 in struct virtnet_info) and `rss_hash_key_data` (at
+> > offset 84 in struct virtnet_info) are misaligned by one byte. See
+> > below:
+> >
+> > struct virtio_net_rss_config_trailer {
+> >         __le16                     max_tx_vq;            /*     0     2=
+ */
+> >         __u8                       hash_key_length;      /*     2     1=
+ */
+> >         __u8                       hash_key_data[];      /*     3     0=
+ */
+> >
+> >         /* size: 4, cachelines: 1, members: 3 */
+> >         /* padding: 1 */
+> >         /* last cacheline: 4 bytes */
+> > };
+> >
+> > struct virtnet_info {
+> > ...
+> >         struct virtio_net_rss_config_trailer rss_trailer; /*    80     =
+4 */
+> >
+> >         /* XXX last struct has 1 byte of padding */
+> >
+> >         u8                         rss_hash_key_data[40]; /*    84    4=
+0 */
+> > ...
+> >         /* size: 832, cachelines: 13, members: 48 */
+> >         /* sum members: 801, holes: 8, sum holes: 31 */
+> >         /* paddings: 2, sum paddings: 5 */
+> > };
+> >
+> > After changes, those members are correctly aligned at offset 795:
+> >
+> > struct virtnet_info {
+> > ...
+> >         union {
+> >                 struct virtio_net_rss_config_trailer rss_trailer; /*   =
+792     4 */
+> >                 struct {
+> >                         unsigned char __offset_to_hash_key_data[3]; /* =
+  792     3 */
+> >                         u8         rss_hash_key_data[40]; /*   795    4=
+0 */
+> >                 };                                       /*   792    43=
+ */
+> >         };                                               /*   792    44=
+ */
+> > ...
+> >         /* size: 840, cachelines: 14, members: 47 */
+> >         /* sum members: 801, holes: 8, sum holes: 35 */
+> >         /* padding: 4 */
+> >         /* paddings: 1, sum paddings: 4 */
+> >         /* last cacheline: 8 bytes */
+> > };
+> >
+> > As a result, the RSS key passed to the device is shifted by 1
+> > byte: the last byte is cut off, and instead a (possibly
+> > uninitialized) byte is added at the beginning.
+> >
+> > As a last note `struct virtio_net_rss_config_hdr *rss_hdr;` is also
+> > moved to the end, since it seems those three members should stick
+> > around together. :)
+> >
+> > Cc: stable@vger.kernel.org
+> > Fixes: ed3100e90d0d ("virtio_net: Use new RSS config structs")
+> > Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 > > ---
-> >  net/ipv4/fou_nl.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/net/ipv4/fou_nl.c b/net/ipv4/fou_nl.c
-> > index 7a99639204b16..0dec9da1bff46 100644
-> > --- a/net/ipv4/fou_nl.c
-> > +++ b/net/ipv4/fou_nl.c
-> > @@ -15,7 +15,7 @@
-> >  const struct nla_policy fou_nl_policy[FOU_ATTR_IFINDEX + 1] =3D {
-> >       [FOU_ATTR_PORT] =3D { .type =3D NLA_BE16, },
-> >       [FOU_ATTR_AF] =3D { .type =3D NLA_U8, },
-> > -     [FOU_ATTR_IPPROTO] =3D { .type =3D NLA_U8, },
-> > +     [FOU_ATTR_IPPROTO] =3D { .type =3D NLA_U8, .min =3D 1 },
-> >       [FOU_ATTR_TYPE] =3D { .type =3D NLA_U8, },
-> >       [FOU_ATTR_REMCSUM_NOPARTIAL] =3D { .type =3D NLA_FLAG, },
-> >       [FOU_ATTR_LOCAL_V4] =3D { .type =3D NLA_U32, },
+> > Changes in v2:
+> >  - Update subject and changelog text (include feedback from Simon and
+> >    Michael --thanks folks)
+> >  - Add Fixes tag and CC -stable.
 >
-> This code is generated, please use :
+> @Michael, @Jason: This is still apparently targeting 'net-next', but I
+> think it should land in the 'net' tree, right?
+
+Right.
+
+Thanks
+
 >
-> diff --git a/Documentation/netlink/specs/fou.yaml b/Documentation/netlink=
-/specs/fou.yaml
-> index 8e7974ec453f..331f1b342b3a 100644
-> --- a/Documentation/netlink/specs/fou.yaml
-> +++ b/Documentation/netlink/specs/fou.yaml
-> @@ -39,6 +39,8 @@ kernel-policy: global
->        -
->          name: ipproto
->          type: u8
-> +        checks:
-> +          min: 1
->        -
->          name: type
->          type: u8
-> diff --git a/net/ipv4/fou_nl.c b/net/ipv4/fou_nl.c
-> index 7a99639204b1..309d5ba983d0 100644
-> --- a/net/ipv4/fou_nl.c
-> +++ b/net/ipv4/fou_nl.c
-> @@ -15,7 +15,7 @@
->  const struct nla_policy fou_nl_policy[FOU_ATTR_IFINDEX + 1] =3D {
->         [FOU_ATTR_PORT] =3D { .type =3D NLA_BE16, },
->         [FOU_ATTR_AF] =3D { .type =3D NLA_U8, },
-> -       [FOU_ATTR_IPPROTO] =3D { .type =3D NLA_U8, },
-> +       [FOU_ATTR_IPPROTO] =3D NLA_POLICY_MIN(NLA_U8, 1),
->         [FOU_ATTR_TYPE] =3D { .type =3D NLA_U8, },
->         [FOU_ATTR_REMCSUM_NOPARTIAL] =3D { .type =3D NLA_FLAG, },
->         [FOU_ATTR_LOCAL_V4] =3D { .type =3D NLA_U32, },
+> /P
+>
 
-Oh thanks, I missed it's auto-generated.
-
-Btw I needed the change below to generate the diff above
-by "./tools/net/ynl/ynl-regen.sh -f".  Maybe depending on
-
-
-diff --git a/tools/net/ynl/ynl-regen.sh b/tools/net/ynl/ynl-regen.sh
-index 81b4ecd891006..fda5fe24cfd47 100755
---- a/tools/net/ynl/ynl-regen.sh
-+++ b/tools/net/ynl/ynl-regen.sh
-@@ -29,9 +29,9 @@ for f in $files; do
-  continue
-     fi
-
--    echo -e "\tGEN ${params[2]}\t$f"
--    $TOOL --cmp-out --mode ${params[2]} --${params[3]} \
--   --spec $KDIR/${params[0]} $args -o $f
-+    echo -e "\tGEN ${params[5]}\t$f"
-+    $TOOL --cmp-out --mode ${params[4]} --${params[5]} \
-+   --spec $KDIR/${params[1]} $args -o $f
- done
-
- popd >>/dev/null
-
-
-fwiw, $params were like
-
-3- Documentation/netlink/specs/fou.yaml
-4: YNL-GEN kernel source
---
-3- Documentation/netlink/specs/fou.yaml
-4: YNL-GEN kernel header
 
