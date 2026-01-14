@@ -1,101 +1,280 @@
-Return-Path: <netdev+bounces-249650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1915ED1BE3D
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 02:10:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62DC3D1BEA7
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 02:25:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A508130428CD
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 01:09:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D81E6303437C
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 01:22:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBF0C21D3CC;
-	Wed, 14 Jan 2026 01:09:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD3A286D5D;
+	Wed, 14 Jan 2026 01:22:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RKStq6y3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RV7FCV1Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B693015E5DC;
-	Wed, 14 Jan 2026 01:09:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AABAE2874E1
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 01:22:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768352990; cv=none; b=gerRHmmSWfeaJtLH7R9uCiGXRNoBxumG5vsiUSxzOT3a/g56H91wgM28+uuGcUjqNPIQTD39JZdDEuYTE6go8ouY1RYcioaCeZBlluqx43blieQI/XAjKEAxDTfY7Ke2TJ11qi9WcnvdsTdpgzri/XI1KQIjvNfSkswzaY91NPU=
+	t=1768353776; cv=none; b=Cg5w7y/lxdhppoBnFyjy17s0FOw4e1z60nerdqwdJG/sNhQHhvVCBkmNS37ltaIzhrjhX3cr7zw/gYwydfdZ4n6c//fwrMNfz68/uGnA1jMv/adUz5Ki3iTF8HxjyZaKQQ0ssBWzmzmfuiWaX1JwB0qkWq4FtKgH6NlXfLlQIh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768352990; c=relaxed/simple;
-	bh=FhTE2O81vVOc5m/6D5KI8Ud3LAbeCf+yg7dqhY6WG68=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aqdBAaHwjBoDgQJ3dBT5wwEcIMJNykyrkn3jzyUJFXz6Xx/qLQQO0J+d9HuZbKagxHhHlx7eYbwbicgkexiXR1eKLnop/2Kw0bbXlL3QSn0wNuYkL2RX92XA5wfsO4yet250jnS1O4FBzWZworH8hf+UlyENSF0t2p4dJMbcmEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RKStq6y3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BB7DC116C6;
-	Wed, 14 Jan 2026 01:09:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768352990;
-	bh=FhTE2O81vVOc5m/6D5KI8Ud3LAbeCf+yg7dqhY6WG68=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RKStq6y3WT2H4tBiUmrgERKeiP8a4xid8VrfXFdZdPbyCr2o0LhEc6qW/a/5ClxXO
-	 zxtMjhf790lOIqQ/iWzwaCXFQUBeeYlcwCPWKKE5m+LQinXlKMYSAiEBpVBKjzzm1F
-	 raulX2TO2qo2EWBlnJISWJrD6D3SUAaYsuLTu9TOhHIWDeGvxHHhM+AdndBOm8esck
-	 oS6a1E6Q5Fl9T/46lP2PHfua2gsMuJrpINkTs6ePSf7R7i/qccKHaIctZmdY7169ei
-	 lIAhRxLR8n43a3/V5vYRPoILHi2se1pmRreq/YDXkEzgMKgRybmaKjDQ7h8ljtO7ES
-	 2TMaAItMfuasw==
-Date: Tue, 13 Jan 2026 17:09:48 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: Haiyang Zhang <haiyangz@linux.microsoft.com>,
- "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, KY Srinivasan
- <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
- <DECUI@microsoft.com>, Long Li <longli@microsoft.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Konstantin
- Taranov <kotaranov@microsoft.com>, Simon Horman <horms@kernel.org>, Erni
- Sri Satya Vennela <ernis@linux.microsoft.com>, Shradha Gupta
- <shradhagupta@linux.microsoft.com>, Saurabh Sengar
- <ssengar@linux.microsoft.com>, Aditya Garg
- <gargaditya@linux.microsoft.com>, Dipayaan Roy
- <dipayanroy@linux.microsoft.com>, Shiraz Saleem
- <shirazsaleem@microsoft.com>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
- <linux-rdma@vger.kernel.org>, Paul Rosswurm <paulros@microsoft.com>
-Subject: Re: [EXTERNAL] Re: [PATCH V2,net-next, 1/2] net: mana: Add support
- for coalesced RX packets on CQE
-Message-ID: <20260113170948.1d6fbdaf@kernel.org>
-In-Reply-To: <SA3PR21MB3867A54AA709CEE59F610943CA8EA@SA3PR21MB3867.namprd21.prod.outlook.com>
-References: <1767732407-12389-1-git-send-email-haiyangz@linux.microsoft.com>
-	<1767732407-12389-2-git-send-email-haiyangz@linux.microsoft.com>
-	<20260109175610.0eb69acb@kernel.org>
-	<SA3PR21MB3867BAD6022A1CAE2AC9E202CA81A@SA3PR21MB3867.namprd21.prod.outlook.com>
-	<20260112172146.04b4a70f@kernel.org>
-	<SA3PR21MB3867B36A9565AB01B0114D3ACA8EA@SA3PR21MB3867.namprd21.prod.outlook.com>
-	<SA3PR21MB3867A54AA709CEE59F610943CA8EA@SA3PR21MB3867.namprd21.prod.outlook.com>
+	s=arc-20240116; t=1768353776; c=relaxed/simple;
+	bh=V9PR7P8+oHvSzq9IvIAWUry3qBCyDc5DQcqO7Fyg0iE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ir9/ioI78mmdw1LyDgIcI9aqq2DbYBFkyCCrU08SW6xbu/jDnrCC7KAfi7syGqayf7spd1yD4PhjTJaygYLZ0kw8nqRa4MtkkdIBH8d2sJG22MOnv4uL+C23lRyNpYiOrls9iAcrgUmcnFLyA8FRHnXaFMuzpfTXMbA7D+2fN8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RV7FCV1Z; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-c2af7d09533so5225731a12.1
+        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 17:22:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768353774; x=1768958574; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Pp3yniDKb6aM9fUToSqoqN/fYQ0OnPThNrfUdPGCP3M=;
+        b=RV7FCV1ZREF1tCkArG+zf8JRGZsFeBm0AtsVnpNAZPSPfFl2gjkCIx8SmnI7YBY56f
+         e15S+Ic5uTKchNzEyOeIjDFtkIqgqu16hs9rvy3NaOJyUYyBjecyCFi1NnwuWXFaTFuU
+         GGV7d7veNGz3Mxp+bDUkXLv5IdmpxbT5eR7sJl0NSfOsjT7jugZr8bJfW0sN4DU9AhI9
+         tZubiLo9F5uYJi41VU8BPG2awkOZuap8cGzRPQNnUQUm1kc0fv+Ihvh8w6Y7h3I6athU
+         eC1C0azdtINaonxIXU+lhisu/D+hVB5soP219q9HdY8x+sWYUaUhc8AStSubSNf/LRD4
+         lTbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768353774; x=1768958574;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Pp3yniDKb6aM9fUToSqoqN/fYQ0OnPThNrfUdPGCP3M=;
+        b=j1KLrY+zftjAPo+t6y9MyQGo8ZdenWVA4SdawITs8H5mqrwYIzBrKXHeBROCj4t23Z
+         WL3qoiLuhhL3rnPNps5j3s8FOUMWyQILkrkETPaDw7Ia/qLGGdO9uGUTsnC4B3gjxEOe
+         woOH1uv44v7JVf6zmBnyW8QTzoej2D/xy2MwM0HD5DwF4XHGVrm680rmtJ6o/Uj7IlPV
+         Do8thWDZZaJVhOOnqWQIO3aALd9niyiYX2/CzQ1rNHGZviavpUuhi/Sja3MAuuCRqMu4
+         lFQ5yereY6RBG+/fxlZ+Efx5hifCqAWCmGshpRC3XgPBcgY51X+a55L/PwaOXfXiYnkW
+         8Q/A==
+X-Forwarded-Encrypted: i=1; AJvYcCVccy6hlN9rAg8pcc2j/S+FGS86AaIiM74ne3ZqHHGVVofT0HEryHDq4PDlz/5aAi+9Oig9r/M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQee9Umu8O1gC8BW7V5UnPDL6xyU9yMOmkfOUPrlzYDzhYkCNu
+	1NZmqxnVPFj1Jkiglm+jPf0UW4R1ZASJk2t9gz+8hxzoXIRz7dqAS5Vt99srsoQL1dHO+S+mYFe
+	X4MfmTjAaUZ1pSyBJZJXDhqQL4dO0KH8=
+X-Gm-Gg: AY/fxX6yb4U4gDu5+15Yu2a7qwxx7vnYx00OAdHuoxThsNuAkwfgYCM19WnNuBnChC4
+	o4sxnbvZb19T95f+rDYcEEt7Ncq+BKOg6g0ThNTM6KVcPQP67NeRuDZd9nOSivqIT4+3AxSrVLH
+	GfJ6z7h52mnpvfM2/IStU81qj+F+Ds0ZUtmvSkhfQHuxUGrPxvtwpDZ62xrMVz8PpBcMUsBQ5RG
+	mh41+IGmgNQhZQEDPhJ/rBRYDeXwRBk4+iRJn8p+xq6IJdq/VFMy+jI3t8BQTTO+d/23NZ8eAlW
+	pdT2ibBAK2M=
+X-Received: by 2002:a05:6a21:6d8a:b0:366:5d1a:c737 with SMTP id
+ adf61e73a8af0-38befa93165mr420367637.16.1768353773854; Tue, 13 Jan 2026
+ 17:22:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20260110141115.537055-1-dongml2@chinatelecom.cn> <20260110141115.537055-2-dongml2@chinatelecom.cn>
+In-Reply-To: <20260110141115.537055-2-dongml2@chinatelecom.cn>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Tue, 13 Jan 2026 17:22:41 -0800
+X-Gm-Features: AZwV_QhlOKou7QUKKKa_VDsCfGtSaih_Vd9EBFHnlGVLosadwfHVqjBxzWeHa9Y
+Message-ID: <CAEf4Bzb+p4fXkCL01MVrvCwPvboeMWXgu4uTSMhweO_MYL+tqg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v9 01/11] bpf: add fsession support
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net, 
+	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org, 
+	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net, 
+	dsahern@kernel.org, tglx@linutronix.de, mingo@redhat.com, 
+	jiang.biao@linux.dev, bp@alien8.de, dave.hansen@linux.intel.com, 
+	x86@kernel.org, hpa@zytor.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 13 Jan 2026 15:13:24 +0000 Haiyang Zhang wrote:
-> > > I get that. What is the logic for combining 4 packets into a single
-> > > completion? How does it work? Your commit message mentions "regression
-> > > on latency" - what is the bound on that regression?  
-> > 
-> > When we received CQE type CQE_RX_COALESCED_4, it's a coalesced CQE. And in
-> > the CQE OOB, there is an array with 4 PPI elements, with each pkt's length:
-> > oob->ppi[i].pkt_len.
-> > 
-> > So we read the related WQE and the DMA buffers for the RX pkt payloads, up
-> > to 4.
-> > But, if the coalesced pkts <4, the pkt_len will be 0 after the last pkt,
-> > so we know when to stop reading the WQEs.  
-> 
-> And, the coalescing can add up to 2 microseconds into one-way latency.
+On Sat, Jan 10, 2026 at 6:11=E2=80=AFAM Menglong Dong <menglong8.dong@gmail=
+.com> wrote:
+>
+> The fsession is something that similar to kprobe session. It allow to
+> attach a single BPF program to both the entry and the exit of the target
+> functions.
+>
+> Introduce the struct bpf_fsession_link, which allows to add the link to
+> both the fentry and fexit progs_hlist of the trampoline.
+>
+> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> Co-developed-by: Leon Hwang <leon.hwang@linux.dev>
+> Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
+> ---
+> v5:
+> - unify the name to "fsession"
+> - use more explicit way in __bpf_trampoline_link_prog()
+>
+> v4:
+> - instead of adding a new hlist to progs_hlist in trampoline, add the bpf
+>   program to both the fentry hlist and the fexit hlist.
+> ---
+>  include/linux/bpf.h                           | 19 +++++++++
+>  include/uapi/linux/bpf.h                      |  1 +
+>  kernel/bpf/btf.c                              |  2 +
+>  kernel/bpf/syscall.c                          | 18 ++++++++-
+>  kernel/bpf/trampoline.c                       | 40 ++++++++++++++++---
+>  kernel/bpf/verifier.c                         | 12 ++++--
+>  net/bpf/test_run.c                            |  1 +
+>  net/core/bpf_sk_storage.c                     |  1 +
+>  tools/include/uapi/linux/bpf.h                |  1 +
+>  .../bpf/prog_tests/tracing_failure.c          |  2 +-
+>  10 files changed, 87 insertions(+), 10 deletions(-)
+>
 
-I am asking you how the _device_ (hypervisor?) decides when to coalesce
-and when to send a partial CQE (<4 packets in 4 pkt CQE). You are using
-the coalescing uAPI, so I'm trying to make sure this is the correct API.
-CQE configuration can also be done via ringparam.
+[...]
+
+> diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
+> index 539c9fdea41d..8b1dcd440356 100644
+> --- a/kernel/bpf/btf.c
+> +++ b/kernel/bpf/btf.c
+> @@ -6107,6 +6107,7 @@ static int btf_validate_prog_ctx_type(struct bpf_ve=
+rifier_log *log, const struct
+>                 case BPF_TRACE_FENTRY:
+>                 case BPF_TRACE_FEXIT:
+>                 case BPF_MODIFY_RETURN:
+> +               case BPF_TRACE_FSESSION:
+>                         /* allow u64* as ctx */
+>                         if (btf_is_int(t) && t->size =3D=3D 8)
+>                                 return 0;
+> @@ -6704,6 +6705,7 @@ bool btf_ctx_access(int off, int size, enum bpf_acc=
+ess_type type,
+>                         fallthrough;
+>                 case BPF_LSM_CGROUP:
+>                 case BPF_TRACE_FEXIT:
+> +               case BPF_TRACE_FSESSION:
+
+According to the comment below we make this exception due to LSM.
+FSESSION won't be using FSESSION programs, no? So this is not
+necessary?
+
+>                         /* When LSM programs are attached to void LSM hoo=
+ks
+>                          * they use FEXIT trampolines and when attached t=
+o
+>                          * int LSM hooks, they use MODIFY_RETURN trampoli=
+nes.
+
+[...]
+
+> @@ -4350,6 +4365,7 @@ attach_type_to_prog_type(enum bpf_attach_type attac=
+h_type)
+>         case BPF_TRACE_RAW_TP:
+>         case BPF_TRACE_FENTRY:
+>         case BPF_TRACE_FEXIT:
+> +       case BPF_TRACE_FSESSION:
+>         case BPF_MODIFY_RETURN:
+>                 return BPF_PROG_TYPE_TRACING;
+>         case BPF_LSM_MAC:
+> diff --git a/kernel/bpf/trampoline.c b/kernel/bpf/trampoline.c
+> index 2a125d063e62..11e043049d68 100644
+> --- a/kernel/bpf/trampoline.c
+> +++ b/kernel/bpf/trampoline.c
+> @@ -111,7 +111,7 @@ bool bpf_prog_has_trampoline(const struct bpf_prog *p=
+rog)
+>
+>         return (ptype =3D=3D BPF_PROG_TYPE_TRACING &&
+>                 (eatype =3D=3D BPF_TRACE_FENTRY || eatype =3D=3D BPF_TRAC=
+E_FEXIT ||
+> -                eatype =3D=3D BPF_MODIFY_RETURN)) ||
+> +                eatype =3D=3D BPF_MODIFY_RETURN || eatype =3D=3D BPF_TRA=
+CE_FSESSION)) ||
+>                 (ptype =3D=3D BPF_PROG_TYPE_LSM && eatype =3D=3D BPF_LSM_=
+MAC);
+
+this is getting crazy, switch to the switch (lol) maybe?
+
+>  }
+>
+> @@ -559,6 +559,8 @@ static enum bpf_tramp_prog_type bpf_attach_type_to_tr=
+amp(struct bpf_prog *prog)
+>                 return BPF_TRAMP_MODIFY_RETURN;
+>         case BPF_TRACE_FEXIT:
+>                 return BPF_TRAMP_FEXIT;
+> +       case BPF_TRACE_FSESSION:
+> +               return BPF_TRAMP_FSESSION;
+>         case BPF_LSM_MAC:
+>                 if (!prog->aux->attach_func_proto->type)
+>                         /* The function returns void, we cannot modify it=
+s
+> @@ -596,6 +598,8 @@ static int __bpf_trampoline_link_prog(struct bpf_tram=
+p_link *link,
+>  {
+>         enum bpf_tramp_prog_type kind;
+>         struct bpf_tramp_link *link_exiting;
+> +       struct bpf_fsession_link *fslink;
+
+initialize to NULL to avoid compiler (falsely, but still) complaining
+about potentially using uninitialized value
+
+> +       struct hlist_head *prog_list;
+>         int err =3D 0;
+>         int cnt =3D 0, i;
+>
+
+[...]
+
+> -       hlist_add_head(&link->tramp_hlist, &tr->progs_hlist[kind]);
+> -       tr->progs_cnt[kind]++;
+> +       hlist_add_head(&link->tramp_hlist, prog_list);
+> +       if (kind =3D=3D BPF_TRAMP_FSESSION) {
+> +               tr->progs_cnt[BPF_TRAMP_FENTRY]++;
+> +               fslink =3D container_of(link, struct bpf_fsession_link, l=
+ink.link);
+> +               hlist_add_head(&fslink->fexit.tramp_hlist,
+> +                              &tr->progs_hlist[BPF_TRAMP_FEXIT]);
+
+fits under 100 characters? keep on a single line then
+
+> +               tr->progs_cnt[BPF_TRAMP_FEXIT]++;
+> +       } else {
+> +               tr->progs_cnt[kind]++;
+> +       }
+>         err =3D bpf_trampoline_update(tr, true /* lock_direct_mutex */);
+>         if (err) {
+>                 hlist_del_init(&link->tramp_hlist);
+> -               tr->progs_cnt[kind]--;
+> +               if (kind =3D=3D BPF_TRAMP_FSESSION) {
+> +                       tr->progs_cnt[BPF_TRAMP_FENTRY]--;
+> +                       hlist_del_init(&fslink->fexit.tramp_hlist);
+> +                       tr->progs_cnt[BPF_TRAMP_FEXIT]--;
+> +               } else {
+> +                       tr->progs_cnt[kind]--;
+> +               }
+>         }
+>         return err;
+>  }
+> @@ -659,6 +683,7 @@ static int __bpf_trampoline_unlink_prog(struct bpf_tr=
+amp_link *link,
+>                                         struct bpf_trampoline *tr,
+>                                         struct bpf_prog *tgt_prog)
+>  {
+> +       struct bpf_fsession_link *fslink;
+
+used in only one branch, move declaration there?
+
+>         enum bpf_tramp_prog_type kind;
+>         int err;
+>
+> @@ -672,6 +697,11 @@ static int __bpf_trampoline_unlink_prog(struct bpf_t=
+ramp_link *link,
+>                 guard(mutex)(&tgt_prog->aux->ext_mutex);
+>                 tgt_prog->aux->is_extended =3D false;
+>                 return err;
+> +       } else if (kind =3D=3D BPF_TRAMP_FSESSION) {
+> +               fslink =3D container_of(link, struct bpf_fsession_link, l=
+ink.link);
+> +               hlist_del_init(&fslink->fexit.tramp_hlist);
+> +               tr->progs_cnt[BPF_TRAMP_FEXIT]--;
+> +               kind =3D BPF_TRAMP_FENTRY;
+>         }
+>         hlist_del_init(&link->tramp_hlist);
+>         tr->progs_cnt[kind]--;
+
+[...]
 
