@@ -1,119 +1,123 @@
-Return-Path: <netdev+bounces-249690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52CC9D1C2BA
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 03:52:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57626D1C2C9
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 03:57:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C900F30101E1
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 02:52:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D819C3014A1F
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 02:57:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E017320A1A;
-	Wed, 14 Jan 2026 02:52:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 518B0322B83;
+	Wed, 14 Jan 2026 02:57:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QLjClJDQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V8JkkpD9"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f65.google.com (mail-pj1-f65.google.com [209.85.216.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AFB6320385
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 02:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF59322A2A
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 02:57:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768359154; cv=none; b=nm8tmjnHbV/cAzEMSNBo5X8sHvSf1C7KRfCWCivcNptps75aMcwNZVzCoYTvX+7Ddio2zBwzPrzWuCT0LMLOH1ENK5pONb85iF4HOMsGwMRQd+By/dKGD6wYaIhiOlDaar2kAdjjRH5/XDv2bqOWyhydFbDV+UHdB3K21yhrxLI=
+	t=1768359457; cv=none; b=T3qUyIXgZSdY9yCtR6uX3mj+5k8VDM+sxV22jGQVp2g1ezFeQQezAFgR2u4smWWkWqD1IffSOUidpFGTeFEfQmfwe+2gc+yjtbnO7y2g6uk2/wPP+VLkRiyDqlgnvDBbXkcvyf8cpiS6CZ2iFELFWwslNiY1JAPtQcwgDfNasxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768359154; c=relaxed/simple;
-	bh=n7DJCQaBYJo/dF+7DjAAhohOYcC6OqKmz1TWgUfk4w8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ovaZ7FEIcw+yP+yeTxOR/UHzuvnxVVN4s8FZVU3srLCB2A9hEQ6FTHFR141wOJ1MN9abBgAwq1MvRMW8zHV9Qd1MGvEWTq2J4nicbrT2eX9e9eWyNNEtYDNisl6OTKQUleOORuxjZ3TfME6zMArzBltuSTT42wgyACDk1M7lbBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QLjClJDQ; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768359141;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d4WwtQ0fY8xH9388oF0irINq2fp1GmSgtWnqUwNDRtw=;
-	b=QLjClJDQqEARsSs1ufhsKWQue2W/acqqOFelG+zD8hTfAgwLCHvM/7+LRIkkf6tVVj65I4
-	HV0p3CMx17CDDohD1kCheyJZzpYmxuXpcfQae7LUwxgZ/qWLMw2GT5Un7KgXebB0FE0raS
-	7vYWmIFZhCWdtxveltz2KhEWaxXirAI=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Menglong Dong <menglong8.dong@gmail.com>,
- Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- David Ahern <dsahern@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, jiang.biao@linux.dev,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
- bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH bpf-next v9 00/11] bpf: fsession support
-Date: Wed, 14 Jan 2026 10:52:06 +0800
-Message-ID: <117894611.nniJfEyVGO@7940hx>
-In-Reply-To:
- <CAADnVQJw6HZHqBs6JRWkHESk=tFQpki9X6TnXBLKgeAhb6FK5w@mail.gmail.com>
-References:
- <20260110141115.537055-1-dongml2@chinatelecom.cn>
- <CAADnVQJw6HZHqBs6JRWkHESk=tFQpki9X6TnXBLKgeAhb6FK5w@mail.gmail.com>
+	s=arc-20240116; t=1768359457; c=relaxed/simple;
+	bh=LjBkblyUkULyDT4omYys3dIwv9tE600i8x24LDhgZYE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=N5eGt5Z17MFqv+IwHjo8+REj7WGDocj6B/pBncIKW1LEHciOGQV9Rkg0iOQ4IsdfzUYFwdoeWYA5eVAqIWuxf3BUcic7CwLTkfOfUsHB062RuZewr0A5rmJY2JarQqJgM0YfxEXlyHlPnvsJs2ZV8deVzIe64LHKXfMeKWDg1Rg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V8JkkpD9; arc=none smtp.client-ip=209.85.216.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f65.google.com with SMTP id 98e67ed59e1d1-34cf1e31f85so4833315a91.1
+        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 18:57:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768359455; x=1768964255; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=y3wa55kpx6iwIJ8pAH9E5hP+eKzgTqRTpXTNuwbc4Hw=;
+        b=V8JkkpD9dqum0XxPpTcktpLl1FXjb8LDbnQ+mNGjgIE1aCPImShhGLaurjOivWwU35
+         QQaykQUeFQbR2ja/scNL2SzgM5zsmxHycTxttAupZi0qBEgfOvsCzgOi+UPW1YjX4jjO
+         YQSAE+TwjATEGjx1nThBOzpI+tBsmDVU3oTBv5h3izBC93m4FUHiIZlxL1Gzrpw8xCdI
+         xoqW470LRJJx9vzbExMtyXPOJJ+jim9JFGFNfaY40cJWMcgLz13jzXDAWOx7QJmC6D2D
+         gk36PFSNPhafLcMDB/Bfdd+Q5Gcz8mnMQLhF5v+ZS/7sB1/o65bNG+fdaEleeUOE7cFW
+         TlIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768359455; x=1768964255;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y3wa55kpx6iwIJ8pAH9E5hP+eKzgTqRTpXTNuwbc4Hw=;
+        b=vf8s6Hb1CCuM9lMjnyxjpWOt3+bWFwqwTL1Op4xlXHBecpnpuKss9E9oJ6fmsmN7UW
+         pWqTd271s9Od8ikeg84jpKGlVg09RsCK1MHU4kWWCHHeP+tyJhgzAVL2b647+ZxO4dwa
+         OwFBYZTbnHzxD905VByIBsfxr11UZQ4hyL0bwgMhfkJ2ZG4f/EoZkma3bVZKnREC9/KF
+         bhhhkXbJiMLaOPvegzYrcIy0p/66OdlljdCJe50npLSNJIkPd/Hc34mXW1fuVG0SwhCu
+         F9NE/YPc2Y0nf3i1fnxkPLM9qnHKXD2ZN6Xl993eslWlrOZGjtY7RmVmQOC7f+neU33c
+         Pjjg==
+X-Forwarded-Encrypted: i=1; AJvYcCUlgNEtRXOAj1KKdvVr7gbuD7hPNaROPasKy/5EPzk0cLpi4DAAd0iG+HYr/EhmUGR0DRYSkiE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMhhFQ885sGOEGQQlsn9yVWKmciHdjdDoBM36rDiWy/VAG+G79
+	Me923og5S89z84Ympc4YK7YJi6KZ+XcVLcfZ2KHmJ8PSJSL5MZ0o1Xic
+X-Gm-Gg: AY/fxX5czFmb0LdASxnBhBDTVkWt3JnmJLj9vbHmakswpBnuIuhRv+xmcW1nHpK3HQ0
+	5a4wyz3/yxqWMLDuy19LvN9OOAhQJKTatNcODPdZnnOvIPeVjc4kYfllVLIOqOo5ugfJ7+ozIIp
+	Ps9/EW06twksQsICsz8uDui1IYtFvN/VDl2X4LASbpIrs/UhuEdj7Bd8xQpW6FtdQqF9x/r/9oy
+	sDWGUUFDbs27imifbDgkbCLShMVnIHrcGibNKuQzystY5NSV0hvogXmgIaMgUHu35TEEqH8aWmH
+	c2V8WLE6d72FaXHztWfJqfE2t8ooeP61mTg+jc+NQssmXFV3wzFINR2DB2QaIJhkia6Eq7DGBNQ
+	NoJkinI+Uol7ZeVy1KqglzfUpFyZ0VuBrdmKGwJnXxPcEsS9yFqiv+ypHmtmK5TdepwxRW2GLnC
+	gvFtl47LbZXXJCik44/ixfrpQNQ2O05iNfAJ5vYHbhqHYPVKzH
+X-Received: by 2002:a17:90b:2fc6:b0:32e:e18a:3691 with SMTP id 98e67ed59e1d1-3510915b7abmr1289752a91.35.1768359455374;
+        Tue, 13 Jan 2026 18:57:35 -0800 (PST)
+Received: from yemj-virtual-machine.localdomain ([111.55.148.79])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35109b1974fsm433166a91.5.2026.01.13.18.57.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Jan 2026 18:57:35 -0800 (PST)
+From: insyelu <insyelu@gmail.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	nic_swsd@realtek.com,
+	tiwai@suse.de
+Cc: hayeswang@realtek.com,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	insyelu <insyelu@gmail.com>
+Subject: [PATCH] net: usb: r8152: fix transmit queue timeout
+Date: Wed, 14 Jan 2026 10:56:22 +0800
+Message-Id: <20260114025622.24348-1-insyelu@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 2026/1/14 10:28 Alexei Starovoitov <alexei.starovoitov@gmail.com> write:
-> On Sat, Jan 10, 2026 at 6:11=E2=80=AFAM Menglong Dong <menglong8.dong@gma=
-il.com> wrote:
-> >
-> q>
-> > Changes since v8:
-> > * remove the definition of bpf_fsession_cookie and bpf_fsession_is_retu=
-rn
-> >   in the 4th and 5th patch
-> > * rename emit_st_r0_imm64() to emit_store_stack_imm64() in the 6th patch
-> >
-> > Changes since v7:
-> > * use the last byte of nr_args for bpf_get_func_arg_cnt() in the 2nd pa=
-tch
-> >
-> > Changes since v6:
-> > * change the prototype of bpf_session_cookie() and bpf_session_is_retur=
-n(),
-> >   and reuse them instead of introduce new kfunc for fsession.
-> >
-> > Changes since v5:
-> > * No changes in this version, just a rebase to deal with conflicts.
->=20
-> When you respin please add lore links to all previous revisions,
-> so it's easy to navigate to previous discussions.
-> Like:
+When the TX queue length reaches the threshold, the netdev watchdog
+immediately detects a TX queue timeout.
 
-OK. I'll use it this way in the feature. Thanks for the reminding :)
+This patch updates the transmit queue's trans_start timestamp upon
+completion of each asynchronous USB URB submission on the TX path,
+ensuring the network watchdog correctly reflects ongoing transmission
+activity.
 
->=20
-> Changes v3->v4:
-> ...
-> v3: https://...
->=20
-> Changes v2->v3:
-> ...
-> v2: https://...
->=20
+Signed-off-by: insyelu <insyelu@gmail.com>
+---
+ drivers/net/usb/r8152.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-
-
+diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+index fa5192583860..afec602a5fdb 100644
+--- a/drivers/net/usb/r8152.c
++++ b/drivers/net/usb/r8152.c
+@@ -1954,6 +1954,8 @@ static void write_bulk_callback(struct urb *urb)
+ 
+ 	if (!skb_queue_empty(&tp->tx_queue))
+ 		tasklet_schedule(&tp->tx_tl);
++
++	netif_trans_update(netdev);
+ }
+ 
+ static void intr_callback(struct urb *urb)
+-- 
+2.34.1
 
 
