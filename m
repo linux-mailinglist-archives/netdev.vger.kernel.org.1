@@ -1,136 +1,108 @@
-Return-Path: <netdev+bounces-249836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D343D1EE13
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 13:47:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B90E8D1F010
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 14:13:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id ED52F301EF03
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 12:45:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A111730963F0
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 13:10:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA5F439A7E0;
-	Wed, 14 Jan 2026 12:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6D7E39A7E3;
+	Wed, 14 Jan 2026 13:10:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="EkkhkKl8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NVt/ptqz"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FB0A399037;
-	Wed, 14 Jan 2026 12:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C253D13777E;
+	Wed, 14 Jan 2026 13:10:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768394751; cv=none; b=pzwZMMs24u1mF1Vkgtz57PF2dRvNn3MLodLmjcQWQ7amhrtbf5eH+x7fVsmkd4nE/CMB9Hf8fWsaJH5QBaExtUZzi3YXPQkIFZs08fhGyphGeQcMtuyECv/oddFTeSQSEZqgpjPUeI4MSqcUKLQ0gG86o3QxefZ1t9/CcjUBTGI=
+	t=1768396248; cv=none; b=MLkSWdJLGVv6otZIHpJMfrDzNdYYemB1gC2ggUGHse3BcJ5vUPwhI4Kretst2tbz1z8L9I0w4DglIztCc6gfaNa2OOvJ40cDORBShr/B9N8s7BNC0f3cQE/8jy0NpBfKwp8YdZQg8T+Rd6InOtC1UXKWl66cwJItx1c3hNkJ284=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768394751; c=relaxed/simple;
-	bh=vX/8Azbqx+q2cqqsokuMUDz1r5swWXuseYdw3/b29ws=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F5KQXMQCoicnskqGuMDTrWMKdD38JGymPB5G+853ScsArfg8c9Ct2DKflzQDbLxzTgz/YcO3uTzExwZh1KKzMVJcSKQXbFa3SyNRJUtxPzaT/ERoP9H6YHzO7w4EsqgFOtWFNfbtH4hKw+SWLht2oB7yBNtE2T/luDcBPHz4xSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=EkkhkKl8; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1768394740; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=tA0OUEdyVjHAlUZB1d999srJuWv325fcJ9F7cw3+x8I=;
-	b=EkkhkKl8jU8iG0bpEcpQw7dFrXNGawDdty5b+VM4lMy3fy8gAV8iTrm3jbCwSJxuTbCeEU1kGyjxV2FWYUkVlSr99UwBBpvl9SHNAq0ob1HXvDKBGN/qRC+nYi58pViZM8cl/qzt4IwCecpSkJy5yktICNT6hKvhHZ3QAMlwSuE=
-Received: from 30.221.145.108(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0Wx2Lc3W_1768394738 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 14 Jan 2026 20:45:39 +0800
-Message-ID: <ad261f12-82a1-4a02-9abd-a7d7c7e771e8@linux.alibaba.com>
-Date: Wed, 14 Jan 2026 20:45:37 +0800
+	s=arc-20240116; t=1768396248; c=relaxed/simple;
+	bh=Lbi2dkKS+CDo0VctVbxA1brjkGK2rdj50pCjLj4bluA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i8a5vjYqFTKjWXw16xZcKPo7BsDMe0JF1gN7iv/wqmTPHz/Owf+tw1Sqf4ZkTgrzYBYeM7t9dpMvCw0oxdE5t8P8kiUTRmoZ5FuczWWi+X5wQYgGW7Mn/Zor7w94ZD6HQHTcycdjOrlj1JpbpVO+WiqFtM9a3LGz4nJ5BF+A7mY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NVt/ptqz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C188C4CEF7;
+	Wed, 14 Jan 2026 13:10:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768396248;
+	bh=Lbi2dkKS+CDo0VctVbxA1brjkGK2rdj50pCjLj4bluA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NVt/ptqz34aItSGZgocy9xdXCuD9dKmJxuyqSDXO0AMFnuI8NtXYLrQc5A9pu+SvU
+	 gwBab5cCLYokIDGMQ5GOhl7HJHIbDXYxl8VKQem28J4zWopWXNeUmxNj6hhVhBbSls
+	 Ybct1F1sWabl1HKOgTK1Hqve/iiqVkOzWCEkB+WjbruQ53Pw8Ti0eKOGnHfHajqo4X
+	 upzATJnxuH8rICv9R+HRYJNRJ9FK0PSLf3HG+Y3ujcvrCCAyLaX41XFk+yGvFaaD37
+	 qQIXCBmThqq9b4q/4dMcOUVJZZGjXc0AjrEIixMXjZaeeLKUuemzZmyoXDn2TPUu49
+	 mCE86yrnxtdBw==
+Date: Wed, 14 Jan 2026 18:40:44 +0530
+From: Vinod Koul <vkoul@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-phy@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Daniel Golle <daniel@makrotopia.org>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Eric Woudstra <ericwouds@gmail.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Lee Jones <lee@kernel.org>,
+	Patrice Chotard <patrice.chotard@foss.st.com>
+Subject: Re: [PATCH v3 net-next 05/10] phy: add phy_get_rx_polarity() and
+ phy_get_tx_polarity()
+Message-ID: <aWeV1CEaEMvImS-9@vaman>
+References: <20260111093940.975359-1-vladimir.oltean@nxp.com>
+ <20260111093940.975359-6-vladimir.oltean@nxp.com>
+ <87o6n04b84.fsf@miraculix.mork.no>
+ <20260111141549.xtl5bpjtru6rv6ys@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] Defining a home/maintenance model for non-NIC PHC devices
- using the /dev/ptpX API
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Thomas Gleixner <tglx@linutronix.de>,
- Richard Cochran <richardcochran@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Dust Li <dust.li@linux.alibaba.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, David Woodhouse <dwmw2@infradead.org>,
- virtualization@lists.linux.dev, Nick Shi <nick.shi@broadcom.com>,
- Paolo Abeni <pabeni@redhat.com>, linux-clk@vger.kernel.org,
- Sven Schnelle <svens@linux.ibm.com>, Andrew Lunn <andrew@lunn.ch>
-References: <0afe19db-9c7f-4228-9fc2-f7b34c4bc227@linux.alibaba.com>
- <yt9decnv6qpc.fsf@linux.ibm.com>
- <6a32849d-6c7b-4745-b7f0-762f1b541f3d@linux.dev>
- <7be41f07-50ab-4363-8a53-dcdda63b9147@lunn.ch>
- <87495044-59a3-49ed-b00c-01a7e9a23f6b@linux.dev>
- <b5a60753-85ed-4d61-a652-568393e0dff3@linux.alibaba.com>
- <c85c77bc-9a8c-4336-ab79-89a981c43e01@linux.dev>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <c85c77bc-9a8c-4336-ab79-89a981c43e01@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260111141549.xtl5bpjtru6rv6ys@skbuf>
 
-
-
-On 2026/1/14 18:50, Vadim Fedorenko wrote:
-> On 14/01/2026 09:13, Wen Gu wrote:
->>
->> Thank you all for your suggestions.
->>
->> The drivers under drivers/ptp can be divided into (to my knowledge):
->>
->> 1. Network/1588-oriented clocks, which allow the use of tools like
->>     ptp4l to synchronize the local PHC with an external reference clock
->>     (based on the network or other methods) via the 1588 protocol to
->>     maintain accuracy. Examples include:
->>
->>     - ptp_dte
->>     - ptp_qoriq
->>     - ptp_ines
->>     - ptp_pch
->>     - ptp_idt82p33
->>     - ptp_clockmatrix
->>     - ptp_fc3
->>     - ptp_mock (mock/testing)
->>     - ptp_dfl_tod
->>     - ptp_netc
->>     - ptp_ocp (a special case which provides a grandmaster
->>                clock for a PTP enabled network, generally
->>                serves as the reference clock)
+On 11-01-26, 16:15, Vladimir Oltean wrote:
+> On Sun, Jan 11, 2026 at 12:53:15PM +0100, Bj�rn Mork wrote:
+> > Vladimir Oltean <vladimir.oltean@nxp.com> writes:
+> > 
+> > > Add helpers in the generic PHY folder which can be used using 'select
+> > > GENERIC_PHY_COMMON_PROPS' from Kconfig
+> > 
+> > The code looks good to me now.
+> > 
+> > But renaming stuff is hard. Leftover old config symbol in the commit
+> > description here. Could be fixed up on merge, maybe?
+> > 
+> > 
+> > Bj�rn
 > 
-> ptp_ocp is a timecard driver, which doesn't require calibration by
-> ptp4l/ts2phc. OCP TimeCards have their own Atomic Clock onboard which
-> is disciplined by 1-PPS or 10mhz signal from configurable source. The
-> disciplining algorithm is implemented in Atomic Clock package
-> controller. The driver exposes ptp device mostly for reading the time.
-> So I believe it belongs to group 2 rather than 1588 group.
-> 
+> This is unfortunate. I'll let Vinot comment on the preferred approach,
+> although I also wouldn't prefer resending to fix a minor commit message
+> mistake. Thanks for spotting and for the review in general.
 
-Thank you for the correction and detailed explanation. I will move
-ptp_ocp to group 2.
+Yes fixed that while applying
 
->>
->> 2. Platform/infrastructure/hypervisor-provided clocks. They don't
->>     require calibration by ptp4l based on 1588 and reference clocks,
->>     instead the underlay handle this. Users generally read the time.
->>     They include:
->>
->>     - ptp_kvm
->>     - ptp_vmclock
->>     - ptp_vmw
->>     - ptp_s390
->>     - ptp_cipu (upstreaming)
->>
->>  From this perspective, I agree that "emulating" could be an appropriate
->> name for the second ones.
->>
->> And I would like to further group the first ones to "1588", thus
->> divide drivers/ptp to:
->>
->> - drivers/ptp/core
->> - drivers/ptp/1588
->> - drivers/ptp/emulating
->>
->> Regards.
-
+-- 
+~Vinod
 
