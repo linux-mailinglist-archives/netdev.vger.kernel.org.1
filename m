@@ -1,199 +1,125 @@
-Return-Path: <netdev+bounces-249796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11AD2D1E2D4
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 11:44:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 978F8D1E496
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 12:02:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4DE83300EE74
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 10:39:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 88390307F024
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 10:55:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FFED38A288;
-	Wed, 14 Jan 2026 10:39:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c8pZQAuS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B046396B90;
+	Wed, 14 Jan 2026 10:55:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C37337F73F;
-	Wed, 14 Jan 2026 10:39:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F92395DA0
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 10:52:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768387178; cv=none; b=qUTR9jJPkNMZ9CTftiAZNuRbiPLzmwJ/IRzUGdGrsJ5Bw2Z/ggMQNDl6COx0WHBKgg+73Zq2Uy4zXwMEI5TovmhFAFS2OmCew+e7UFgQ17jBZed0kYINo8f5vBuXHOmZsQSqZ5azPN1vCOyr/jGttmgVv+JqAwK1XFMV5910hnw=
+	t=1768388109; cv=none; b=PIHhAxCPf4o8ymPGEa4XcBfwjNu/pZLkwDT6dgNwCxzoGh395UesYxkjf/TCQqk4hSXGu0KiiDQmMBbu67eQAdUItKYle7u+MDoG/0c3UROr86oazrLkcYmbJva5o9L8xM6saIErvY+d2EU4C3fYLWGAne+QiPmnfIzW+xr3/lQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768387178; c=relaxed/simple;
-	bh=PmtSOXi6c4cRmNhidQU2+wsF/W2ejrabkd2m859hO1o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZqYj47ViatPJNr/WY2ReRbvJoaZ8eRgzh4yQwSBBJx/wNTbeG73t+JGRy6Qi7vs3CHEKEQ/Zt4Gd/YpILBvHErzP3lg9fHrv6Re94IU7CxAszwOfQ+nnsxEAxFhV1q27V9vx5GHKy+ZY/gg9xpoIU9zJn3yQ0PENHNJt1HyonDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c8pZQAuS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DC50C4CEF7;
-	Wed, 14 Jan 2026 10:39:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768387178;
-	bh=PmtSOXi6c4cRmNhidQU2+wsF/W2ejrabkd2m859hO1o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=c8pZQAuS2x+DXrlRtx6UwoyXR/7RcnDqc3NIUxC3bJJQp/I59re4L7a4VfC353p/Z
-	 ANP0uWXeEAITH/OKD+02Umq+QCuxKGRd7m4UscqVRRfYAPW3OMKlhulQ3FOldAV8Y7
-	 FYlizb5GwrhY8WGovPnPKLsjWO1JOSBwPK3nh+GUDhcBg7Zf5qcex+Z6+7ivQzwqy4
-	 g5hWUPcLLZAEvnAeAi+OqarPuVV9enHrv42DGTE5xF/nrLN/koni2ttoGDaSoAMW+z
-	 tz/rNkcurxIfq9f/7q1za4joCdHKfXWWB+DJiB/9hamV7HHrKn4T+7Zj3wXLHieD5y
-	 4l/gk0KpiG0cA==
-Date: Wed, 14 Jan 2026 11:39:35 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: airoha: npu: Add
- EN7581-7996 support
-Message-ID: <aWdyZ0PAnxNCGVmn@lore-desk>
-References: <20260113-airoha-npu-firmware-name-v2-0-28cb3d230206@kernel.org>
- <20260113-airoha-npu-firmware-name-v2-1-28cb3d230206@kernel.org>
- <20260114-heretic-optimal-seahorse-bb094d@quoll>
- <aWdbWN6HS0fRqeDk@lore-desk>
- <75f9d8c9-20a9-4b7e-a41c-8a17c8288550@kernel.org>
- <69676b6c.050a0220.5afb9.88e4@mx.google.com>
- <e2d2c011-e041-4cf7-9ff5-7d042cd9005f@kernel.org>
+	s=arc-20240116; t=1768388109; c=relaxed/simple;
+	bh=xslTz0QAsrjmjJhCdA2M85qhDLJ1vcw6JdsnlpToTE0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ueIdoXqp/sGlFu4U4MNrJVK2sdpTmTzPIfCoicxeqgx0lbChPzEbzmXic4oQD/T7u+XooGOUxaeGp/ibdfWUAYJi+qb96ugtahJS0LU9VKcVD2wRB1OkGc3cFvZOw4Y7balHAYwPCwUAsrQhKw8CwozXpqIkJrtsLUhom7eAKSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vfyU4-0006p1-3t; Wed, 14 Jan 2026 11:52:16 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vfyU4-000Zeu-0a;
+	Wed, 14 Jan 2026 11:52:15 +0100
+Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 45B3A4CCB67;
+	Wed, 14 Jan 2026 10:52:15 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net 0/4] pull-request: can 2026-01-14
+Date: Wed, 14 Jan 2026 11:44:59 +0100
+Message-ID: <20260114105212.1034554-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="i+i1tfo+9kenP0X6"
-Content-Disposition: inline
-In-Reply-To: <e2d2c011-e041-4cf7-9ff5-7d042cd9005f@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
+Hello netdev-team,
 
---i+i1tfo+9kenP0X6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+this is a pull request of 4 patches for net/main.
 
-On Jan 14, Krzysztof Kozlowski wrote:
-> On 14/01/2026 11:09, Christian Marangi wrote:
-> > On Wed, Jan 14, 2026 at 10:26:33AM +0100, Krzysztof Kozlowski wrote:
-> >> On 14/01/2026 10:01, Lorenzo Bianconi wrote:
-> >>>> On Tue, Jan 13, 2026 at 09:20:27AM +0100, Lorenzo Bianconi wrote:
-> >>>>> Introduce en7581-npu-7996 compatible string in order to enable MT76=
- NPU
-> >>>>> offloading for MT7996 (Eagle) chipset since it requires different
-> >>>>> binaries with respect to the ones used for MT7992 on the EN7581 SoC.
-> >>>>>
-> >>>>> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> >>>>> ---
-> >>>>>  Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml | 1 +
-> >>>>>  1 file changed, 1 insertion(+)
-> >>>>>
-> >>>>> diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-np=
-u.yaml b/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml
-> >>>>> index 59c57f58116b568092446e6cfb7b6bd3f4f47b82..96b2525527c14f60754=
-885c1362b9603349a6353 100644
-> >>>>> --- a/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml
-> >>>>> +++ b/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml
-> >>>>> @@ -18,6 +18,7 @@ properties:
-> >>>>>    compatible:
-> >>>>>      enum:
-> >>>>>        - airoha,en7581-npu
-> >>>>> +      - airoha,en7581-npu-7996
-> >>>>
-> >>>> This does not warrant new compatible. There is some misunderstanding=
- and
-> >>>> previous discussion asked you to use proper compatible, not invent f=
-ake
-> >>>> one for non-existing hardware.  Either you have en7996-npu or
-> >>>> en7581-npu. Not some mixture.
-> >>>
-> >>> Hi Krzysztof,
-> >>>
-> >>> We need to specify which fw binaries the airoha NPU module should load
-> >>> according to the MT76 WiFi chipset is running on the board (since the=
- NPU
-> >>> firmware images are not the same for all the different WiFi chipsets).
-> >>> We have two possible combinations:
-> >>> - EN7581 NPU + MT7996 (Eagle)
-> >>> - EN7581 NPU + MT7992 (Kite)
-> >>>
-> >>> Please note the airoha NPU module is always the same (this is why is =
-just
-> >>> added the -7996 suffix in the compatible string). IIUC you are sugges=
-ting
-> >>> to use the 'airoha,en7996-npu' compatible string, right?
-> >>
-> >> No. I am suggesting you need to describe here the hardware. You said
-> >> this EN7581 NPU, so this is the only compatible you get, unless (which
-> >> is not explained anywhere here) that's part of MT799x soc, but then you
-> >> miss that compatible. Really, standard compatible rules apply - so
-> >> either this is SoC element/component or dedicated chip.
-> >>
-> >>
-> >=20
-> > Hi Krzysztof,
-> >=20
-> > just noticing this conversation and I think there is some confusion
-> > here.
-> >=20
-> > The HW is the following:
-> >=20
-> > AN/EN7581 SoC that have embedded this NPU (a network coprocessor) that
-> > require a dedicated firmware blob to be loaded to work.
-> >=20
-> > Then the SoC can have various WiFi card connected to the PCIe slot.
-> >=20
-> > For the WiFi card MT7996 (Eagle) and the WiFi card MT7992 (Kite) the NPU
-> > can also offload the WiFi traffic.
-> >=20
-> > A dedicated firmware blob for the NPU is needed to support the specific
-> > WiFi card.
-> >=20
-> > This is why v1 proposed the implementation with the firmware-names
-> > property.
-> >=20
-> > v2 introduce the compatible but I feel that doesn't strictly describe
-> > the hardware as the NPU isn't specific to the WiFi card but just the
-> > firmware blob.
-> >=20
-> >=20
-> > I still feel v1 with firmware-names should be the correct candidate to
-> > handle this.
->=20
-> Yes. What you plug into PCI is not a part of this hardware, so cannot be
-> part of the compatible.
+The first 3 patches are by Oliver Hartkopp and revert the approach to
+instantly reject unsupported CAN frames introduced in
+net-next-for-v6.19 and replace it by placing the needed data into the
+CAN specific ml_priv.
 
-ack. So is it fine to use firmware-name property in this case as proposed in
-v1?
+The last patch is by Tetsuo Handa and fixes a J1939 refcount leak for
+j1939_session in session deactivation upon receiving the second RTS.
 
-Regards,
-Lorenzo
+regards,
+Marc
 
->=20
-> >=20
-> > Hope now the HW setup is more clear.
-> >=20
->=20
->=20
-> Best regards,
-> Krzysztof
+---
 
---i+i1tfo+9kenP0X6
-Content-Type: application/pgp-signature; name=signature.asc
+The following changes since commit e707c591a139d1bfa4ddc83036fc820ca006a140:
 
------BEGIN PGP SIGNATURE-----
+  can: ctucanfd: fix SSP_SRC in cases when bit-rate is higher than 1 MBit. (2026-01-09 14:26:29 +0100)
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaWdyZwAKCRA6cBh0uS2t
-rNG6AP9ZgXi9DzZ/J5WNCHk+rSJoJ3WG0/Jl1sK+NvANqgO8RwEAvtrzXIcDbTBW
-axwTAak1fGU7QeE8dCYpEpRPA5aQNQA=
-=6lmW
------END PGP SIGNATURE-----
+are available in the Git repository at:
 
---i+i1tfo+9kenP0X6--
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-6.19-20260114
+
+for you to fetch changes up to 426c303c80c2cc220d1477c6ea63bbb183cabd77:
+
+  net: can: j1939: j1939_xtp_rx_rts_session_active(): deactivate session upon receiving the second rts (2026-01-14 11:36:58 +0100)
+
+----------------------------------------------------------------
+linux-can-fixes-for-6.19-20260114
+
+----------------------------------------------------------------
+Marc Kleine-Budde (1):
+      Merge patch series "can: raw: better approach to instantly reject unsupported CAN frames"
+
+Oliver Hartkopp (3):
+      Revert "can: raw: instantly reject unsupported CAN frames"
+      can: propagate CAN device capabilities via ml_priv
+      can: raw: instantly reject disabled CAN frames
+
+Tetsuo Handa (1):
+      net: can: j1939: j1939_xtp_rx_rts_session_active(): deactivate session upon receiving the second rts
+
+ drivers/net/can/Kconfig       |  7 +++++--
+ drivers/net/can/Makefile      |  2 +-
+ drivers/net/can/dev/Makefile  |  5 +++--
+ drivers/net/can/dev/dev.c     | 27 ++++++++++++++++++++++++
+ drivers/net/can/dev/netlink.c |  1 +
+ drivers/net/can/vcan.c        | 15 +++++++++++++
+ drivers/net/can/vxcan.c       | 15 +++++++++++++
+ include/linux/can/can-ml.h    | 24 +++++++++++++++++++++
+ include/linux/can/dev.h       |  8 +------
+ net/can/j1939/transport.c     | 10 ++++++++-
+ net/can/raw.c                 | 49 +++++++------------------------------------
+ 11 files changed, 109 insertions(+), 54 deletions(-)
 
