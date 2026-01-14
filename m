@@ -1,134 +1,105 @@
-Return-Path: <netdev+bounces-249923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73896D20B4D
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 18:59:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F0DAD20A06
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 18:48:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CE7FF3032715
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 17:59:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8199B30146F4
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 17:48:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE16332B981;
-	Wed, 14 Jan 2026 17:59:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66F3C32ABC3;
+	Wed, 14 Jan 2026 17:47:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="JFCKx6MU"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RP/MpWm/"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66D39303CAB;
-	Wed, 14 Jan 2026 17:59:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99BE8329E46;
+	Wed, 14 Jan 2026 17:47:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768413555; cv=none; b=rLsiIEREWFujatOIcV6vK8Rq+rTmkNJjmJmM9f+F2zRxxLHKk3HWzLr2zOsQa9LXOeSAtHDBdphugV0332uYbKpjduL1/RYl9ednZncu8hCvCNcGJoFBS2gGDM4eQDHBbcGB2jLEri33AOSi0abXwclOK4mjetYl9niD2bCLzVU=
+	t=1768412877; cv=none; b=tWF7rot/dOGkXp6KSaDFJDuCcmmEeTOMO0e/LcY3NaglAkFfkX0Kpo7kpIYxOUG2obH+YHzqwcZDr1/cnXVLWahV+F+c/EghL3aHtyswz/UTFHhGo4iZgMCTBBLzRVvbc4dc/5mYs2dvqLPApOWk12NUfdJiq3YC/pIV3+ikqaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768413555; c=relaxed/simple;
-	bh=kINmhQmoaLnJyInheFAGtb14x04Fk6egTTyMWNJsc6g=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=LlLEDHLYvHCwh+pUyXXV/glJerkmlIV/sFQ4ogt16KNJv5cYKTddxI07mIIqM+Wa8ZLzwBUJkf+ePl9toYwOfpSsVymGNhUT8gz9e0Z9/joT0cL+5HLJS6UPzWJKgCBBxRLhAQiWtTdpkEehy6VTSgM2CNS7/x77qCedJiXNwt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=JFCKx6MU; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=rVE0ichfCCZBPxaV5iFEVGkv6qOUUWRLscyvBIVG1Cw=; b=JFCKx6MUsF1kQlYJFJsRvxEXWU
-	KMctRT/x6Q6znR6/zKn+NWVMeAwnFZ1uNZGvs/aV/AJL27XF/ZxTP4hcFzYdQhWYC3JQXBWuApNbL
-	T+1tMfaYqDBG/5ET+T1wobIB9yr/DDi5B/RouZX4cN9K1aChvkIRIJh5060DFhR952JoR9e+4HH2s
-	5qbAHX3WxQPYwyf1qt34UyYidGkB/nAt2krtn/M9Ys1TY/LhO6/AKXO7meYwyCVkX9s5WGXuW3If9
-	M0ARH8DMunRPPRp4RE1qli5T5fgnWz9grbV/8wxDdfjP38IDuk6Z0zwGKdcrA7SFkKJLeLcB0Jl9n
-	L6mbSfYA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:36992 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vg4wp-000000000WU-1IOD;
-	Wed, 14 Jan 2026 17:46:23 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vg4wm-00000003SGx-2eSP;
-	Wed, 14 Jan 2026 17:46:20 +0000
-In-Reply-To: <aWfWDsCoBc3YRKKo@shell.armlinux.org.uk>
-References: <aWfWDsCoBc3YRKKo@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	s=arc-20240116; t=1768412877; c=relaxed/simple;
+	bh=yu2p+5/mcf8djkexz3bzB1VOl744pGcBn759PQgo7P8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qfN2pwNzsCxmM/M+tNInKvPyhYcHBZEAaFVTq9kt8y9L3BAgi2FScCZM49X1CGTregy37DqkinSPng8SSamICtiTjUm9NFKP+Jtze5xdF1Bo9TnGbDgP0RG3TGq7gzR8bTVEQk6wzkzuUOgLtiAua65qmYjmfVqZqBp4pVAihBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RP/MpWm/; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=XG98XXWLm122wWN3H5/0OaDdF3a45orRwXDXa/HYuAA=; b=RP/MpWm/ItaE40/w2jeE8X5Mfj
+	8D7l4clLFVFkOuKMoIH7cj+YPrydgMJ1eeQvcBL5wzmhpO3j41n1f3/Ftttyp8T54tWXWClcU644Z
+	EV3OyyU3H6wYLsEim1iqclB57Y7VjaD9WXT0G7PUz6PZ9fBJpnh9wGCoT5iw1wkOOQC0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vg4yA-002pWl-OJ; Wed, 14 Jan 2026 18:47:46 +0100
+Date: Wed, 14 Jan 2026 18:47:46 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-phy@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>
-Subject: [PATCH net-next 14/14] net: stmmac: report PCS configuration changes
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: airoha: npu: Add
+ EN7581-7996 support
+Message-ID: <9340a82a-bae8-4ef6-9484-3d2842cf34aa@lunn.ch>
+References: <20260113-airoha-npu-firmware-name-v2-0-28cb3d230206@kernel.org>
+ <20260113-airoha-npu-firmware-name-v2-1-28cb3d230206@kernel.org>
+ <20260114-heretic-optimal-seahorse-bb094d@quoll>
+ <aWdbWN6HS0fRqeDk@lore-desk>
+ <75f9d8c9-20a9-4b7e-a41c-8a17c8288550@kernel.org>
+ <69676b6c.050a0220.5afb9.88e4@mx.google.com>
+ <e2d2c011-e041-4cf7-9ff5-7d042cd9005f@kernel.org>
+ <69677256.5d0a0220.2dc5a5.fad0@mx.google.com>
+ <76bbffa8-e830-4d02-a676-b494616568a2@lunn.ch>
+ <6967c46a.5d0a0220.1ba90b.393c@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vg4wm-00000003SGx-2eSP@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 14 Jan 2026 17:46:20 +0000
+In-Reply-To: <6967c46a.5d0a0220.1ba90b.393c@mx.google.com>
 
-Report if/when qcom-ethqos changes the PCS configuration. With phylink
-now setting the PCS configuration, there should be no need for drivers
-to change this.
+On Wed, Jan 14, 2026 at 05:29:28PM +0100, Christian Marangi wrote:
+> On Wed, Jan 14, 2026 at 04:56:02PM +0100, Andrew Lunn wrote:
+> > > > Yes. What you plug into PCI is not a part of this hardware, so cannot be
+> > > > part of the compatible.
+> > > > 
+> > > 
+> > > Thanks for the quick response. Just to make sure Lorenzo doesn't get
+> > > confused, I guess a v3 would be sending v1 again (firmware-names
+> > > implementation series) with the review tag and we should be done with
+> > > this.
+> > 
+> > Since this is a PCI device, you can ask it what it is, and then load
+> > the correct firmware based on the PCI vendor:product. You don't need
+> > to describe the hardware in DT because it is enumerable.
+> > 
+> 
+> Hi Andrew,
+> 
+> I think it's problematic to create a bind between the NPU and
+> PCIe.
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+But the NPU must already be bound to PCIe. How else does it know which
+PCIe slot the WiFi card is on, so it can make use of it?
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
-index f9e7a7ed840b..6a1e30b10740 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
-@@ -71,6 +71,7 @@ static inline void dwmac_ctrl_ane(void __iomem *ioaddr, u32 reg, bool ane,
- 				  bool srgmi_ral)
- {
- 	u32 value = readl(ioaddr + GMAC_AN_CTRL(reg));
-+	u32 old = value, diff;
- 
- 	/* Enable and restart the Auto-Negotiation */
- 	if (ane)
-@@ -84,6 +85,20 @@ static inline void dwmac_ctrl_ane(void __iomem *ioaddr, u32 reg, bool ane,
- 	if (srgmi_ral)
- 		value |= GMAC_AN_CTRL_SGMRAL;
- 
-+	diff = old ^ value;
-+	if (diff & ~GMAC_AN_CTRL_RAN) {
-+		pr_warn("dwmac: PCS configuration changed from phylink by glue, please report: 0x%08x -> 0x%08x\n",
-+			old & ~GMAC_AN_CTRL_RAN, value & ~GMAC_AN_CTRL_RAN);
-+#define REPORT_BIT(x) \
-+		if (diff & GMAC_AN_CTRL_##x) \
-+			pr_warn("dwmac: %8s %u -> %u\n", #x, \
-+				!!(old & GMAC_AN_CTRL_##x), \
-+				!!(value & GMAC_AN_CTRL_##x))
-+		REPORT_BIT(ANE);
-+		REPORT_BIT(SGMRAL);
-+#undef REPORT_BIT
-+	}
-+
- 	writel(value, ioaddr + GMAC_AN_CTRL(reg));
- }
- #endif /* __STMMAC_PCS_H__ */
--- 
-2.47.3
-
+     Andrew
 
