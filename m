@@ -1,170 +1,253 @@
-Return-Path: <netdev+bounces-249785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 912A2D1DC37
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 11:00:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E076DD1DCBA
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 11:04:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C332E300DCAB
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 09:57:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E9617307BE44
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 10:01:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4665938757B;
-	Wed, 14 Jan 2026 09:57:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4767238A2AF;
+	Wed, 14 Jan 2026 10:01:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nq+u8htP";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZQlqzXfp"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="PKe1Ynvr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011047.outbound.protection.outlook.com [52.101.70.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C247D34F48A
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 09:57:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768384679; cv=none; b=ePCM0iuut01g6RTwE6pIKZRZQjz0wp4HrfszmRzqh13PUAFM6LI0tUUO8B286AgAcs/NlT3lyro6iuVoIs90uxI05xBQq56hb39N2+QpxP9sbJJL2sg/UpL6aZNCheGDbv53U9e3/kmtY6mtLACn3ne928dPBj1mVoTrJaThbyI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768384679; c=relaxed/simple;
-	bh=36C4TLxXEoaix8+fMcGoCyyRChcqMGjtLcHigyw3xhI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hDvA/1fhetwzBSd+755+Zlzif+AVRY5mvxfTAcvoHasrIYBnEj691TpX05ukFaBoGltctiffaVugrl2/ZW0Fidz/qOkEHCwFHabcPSnmoCMKQa4Eyzzbny8JTAiCF2temHrWsFDpXLVARHH8R/1s8KOnFadifE7BYDhsYaaUfL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nq+u8htP; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZQlqzXfp; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768384677;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XuY/fex5vMBZkn75cmI85OoF3EbBEOIpBs2f4KCfT7Q=;
-	b=Nq+u8htPhUTfkJoQJcSAbrdTjZ21PQLmHKIRvI6fcgHC0hqM/XohE6bnmnXhBpZ7KJDD80
-	lUbiPRDsVifi1xSyf/g068JfoPwSQ8Z6t9BZIbEuoRBnGyJ0zaqToGSda0e5byGM8QNJpL
-	+ej0sQtO4LqRcLZ/G2VNpnnwOBKUd5A=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-304-7t51fULwOMK3ZuTxzSOVIA-1; Wed, 14 Jan 2026 04:57:55 -0500
-X-MC-Unique: 7t51fULwOMK3ZuTxzSOVIA-1
-X-Mimecast-MFC-AGG-ID: 7t51fULwOMK3ZuTxzSOVIA_1768384674
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47edf8ba319so10710265e9.2
-        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 01:57:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768384674; x=1768989474; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XuY/fex5vMBZkn75cmI85OoF3EbBEOIpBs2f4KCfT7Q=;
-        b=ZQlqzXfpnQ2pDruT5B8sjn8qsNjY+fkKLMytz1ZEgHfFX6TY8wFh7A9qnoylHljs04
-         aoqh7AyDffeAZ20Wk2Adp7zDsXuFUn7Mr9kwwELULdrhwJWAlDPnQkNR4ABMwpEo9PZk
-         5IGGRfboTdTUYYuPSdrNhwJQcFODTCcceTS9Af5ffLvPkv4cCb8htH0JkJPClaKJVVpN
-         7BtESg5jyORObUkYjAwtfm38NbeU4eWg+Xy1AF+WREGfSjOIS/SKfKwrwP6Yo+177w9L
-         6tY9Uh+kxLkMIknust8LfB4pw1bFwVPBhZtcnHHIm6+rH3VOLxMQhhDiF0/yS+CQVql+
-         AOrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768384674; x=1768989474;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XuY/fex5vMBZkn75cmI85OoF3EbBEOIpBs2f4KCfT7Q=;
-        b=F0lFgyS8/MHimQp44dMFSeSd/djBSGpjJn0bGCpBmtBOgQTZUuNYN5p322wxqGnPHt
-         09Go/qoQzjYzc2Inwn1i2S0yPq1w6hho9SBWPGi53TaXGq7SlTyAN3Rn/TrISbrYSuX8
-         c7AfjgGjyd1O5X7xlQogupCL7v7ek4pUaBAKgMq/CIV/qIDorVK+/X/KsdqL5U7++kaV
-         cX+ahGJwiaqdMglOKYsN40/k4GBb4v/bdNtQTIrIX9Whj6S81NNJOBqr0rfl5WBll7q/
-         6/V23SuoTVji0w3qJ2YLku4PpNSlPlhrYbH0m9Div0DtVNQ1y9EMhAepmJzntrBjUDWa
-         KRkg==
-X-Forwarded-Encrypted: i=1; AJvYcCUCGmVMQmbdZ6nvXSMhihgTf5MsRLDAPitg0QWcUr7OYlxHQ1Cv6+AtuS70nNGWLMpSvOABB5A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzA3YC6OkmQ8IOVSKbUpS//y30MEZzqA5qvl35IOm7akd1RYWK0
-	WXn8dWWaMkk1Kc1gANiBGhHu2ff+78WREfNBUB0L0E+Nd5VzJIWKOdlxp5K9skit3dDMTs4237N
-	PZcZNhUUIg7ywG447Ga5eV2YdkmGXwmm2CrzPdRi4pF/6mC80du53ucQEwQ==
-X-Gm-Gg: AY/fxX6C2XXZ3YpdNbfHcT5g3VR38VCxrEvsfpbIteE1gtsr8pXvoSbcrNkj3tuWWqw
-	rS1gsP8GfJzPpT2HcOpn2MshS1OpcM7Masw/VEc+A7rtzFc//yx+pTA4vi+hmo1odfkRh/24SrT
-	aziaPJIzQ+D+XeQFSuAnMXNBYdyqpDkl2FpRDyEZCEoSQkHG/S2n2FQ49lNXtCMnYY9KxEucr2O
-	hwFEAAjZRc2PDzlf6GoGID/9og55uPPmqWQHSmi/EUZWgGG4mBcYqNohF3Cielgjd/6Y4aT1bZ6
-	XkpopJ/iCSlktCIyRPG+2D/nI5x17fkqrWGquhH2sJJGPXFmJYTU2PRMUPqYBkBPMWJfVO8igP2
-	UPYV27MHT9alRgB+xj2U875P/2DD//ICDUUJYdAZcqoO4jT+5mzdieodGaM38Wg==
-X-Received: by 2002:a05:600c:8b76:b0:47e:e2ec:995b with SMTP id 5b1f17b1804b1-47ee32ff3fbmr19462285e9.9.1768384674478;
-        Wed, 14 Jan 2026 01:57:54 -0800 (PST)
-X-Received: by 2002:a05:600c:8b76:b0:47e:e2ec:995b with SMTP id 5b1f17b1804b1-47ee32ff3fbmr19461915e9.9.1768384673944;
-        Wed, 14 Jan 2026 01:57:53 -0800 (PST)
-Received: from sgarzare-redhat (host-87-12-25-233.business.telecomitalia.it. [87.12.25.233])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47ee0b4559asm19833435e9.0.2026.01.14.01.57.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jan 2026 01:57:53 -0800 (PST)
-Date: Wed, 14 Jan 2026 10:57:47 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Arseniy Krasnov <avkrasnov@salutedevices.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2 1/2] vsock/virtio: Coalesce only linear skb
-Message-ID: <aWdoY6JqlRiwfFfJ@sgarzare-redhat>
-References: <20260113-vsock-recv-coalescence-v2-0-552b17837cf4@rbox.co>
- <20260113-vsock-recv-coalescence-v2-1-552b17837cf4@rbox.co>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD6D3876DF;
+	Wed, 14 Jan 2026 10:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768384897; cv=fail; b=H60lBP7hyLn6TW4moG4pBzVzkcCbCJKzBYbR0WJBezIu/LXvX2EXgBNOIZ3IbBdR6z34LEjlMF47P4RErwpdOGVU48kLx3ivwM+4EURvR/ZcqRgaFBL9PbTWHF5AKzLnVmfpixuzh92fYzWDLfCKhunjLZQ3HafjXklpCxwEXgc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768384897; c=relaxed/simple;
+	bh=812MH6rkcd2endAN0P5KiM1kzvtGvEe6dTf62UxJl78=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=BfXcfpy0U874/Djb0hLXgfQPljP6FcMRkSM3UY8PCxkCyPoKnNPskHY24F+TsDxG35UYtwMDZMN30/12ZlcWAmNpzAxG9LY2/5vVpybtSYnjzfUkgt0k6hGYe48p4ML8IMaBAk0nGHOroj2dCq5Cgn3cKZyHYKhH4M40SrhUTfc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=PKe1Ynvr; arc=fail smtp.client-ip=52.101.70.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=KdFk9KvMfqNxdVaBAnlYj4pmeD/+GoKMksn5E9G0IoT2aC54qkyVU4lC2YAG4RJjAZgwkjORnciPDHU6421OSOjbxznV0rOzlTvpS6cyfRcvBvjCmumdXJlwYTz/1oL+4+jsLbgHRJddcwskc5RTxa9AKH2SZKDB6M14D1TdKTASFhmm9X+fu9YFD9GOrkyiGs8GdeluNo3v2A6WJUkkkg14XB/UtTSkhEqhBd3b3vaugP7EtkGXg8rqDcsfqqUfIlzZe9y4dviK/5vjpEtZpErOmT4uzo6oSWjwXvrXleOwdL/TaUXxPZEPbqpuhyGVBTaWEmNmp9+hGerxIDtjsA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0SppurVDZyyPQZLL/EUJ0jnJ9+zyBDHdiSwNFOmAm/I=;
+ b=w7H+Ne6p3bFJwRnwFlF/YyuZPP0OzQnFeK15deP4JCNeTeapa99+nRfM4LrCuwwhqIU2FsrcdnrGx410ybEBa+KhOUaw8STo5n8wTNmDJFX1lA1eEJ5WmiWhrUzVCTq8TIUr7xOnR9uNcrbkphNJvR5fHHT3GIwKuraeiMZZ37BdfanwPe+zGnyOFtn6xOcBewA7C1IfgTIp6hpoBbR0Or+zKkX4BzsPZFEnx5oFQ6NVWW4JsB03Z7PlFkZSaARbVuxvyE7qCmRD36lwHKx2gq79jFDDYrR587IvnBpDZpthFkflK0rZEmFLOmX+33p5WK0wR15LfxpVxWjWExqKdA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0SppurVDZyyPQZLL/EUJ0jnJ9+zyBDHdiSwNFOmAm/I=;
+ b=PKe1YnvrPHdPCI0XlQ/i7zsLnKJwAFceQe+SZ1yNTyxyfveVgwjQy7C5ikXcIrc8Iqc83FKKRjctPP2BDslnoUPo13v7vz6KC2FCg0IQFFhjnvHimTPS95VTt+UOpomF/yTXy8YCN7NSiFzYkwHYXGEbpLWSu3uvPTqHywccOJctyl188SqobYDh2U/fTKt2t9zT1qUyLWo5GLm5uUHdFhq70fXsH7MlrlnKpnfpJ81VJsDHKHDRZWDnFerdMvJ08ig2FCEu8+euhB+3/QHeZ7FuLkmecxeNV4877I5EzFpL+USE13fZhbIgMJc3sZUxmviqfcPoaLBaN0YGIfDABA==
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by AMBPR04MB11764.eurprd04.prod.outlook.com (2603:10a6:20b:6f6::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Wed, 14 Jan
+ 2026 10:01:32 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%4]) with mapi id 15.20.9499.001; Wed, 14 Jan 2026
+ 10:01:26 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Frank Li <frank.li@nxp.com>
+CC: Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"ast@kernel.org" <ast@kernel.org>, "daniel@iogearbox.net"
+	<daniel@iogearbox.net>, "hawk@kernel.org" <hawk@kernel.org>,
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "sdf@fomichev.me"
+	<sdf@fomichev.me>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>, "bpf@vger.kernel.org"
+	<bpf@vger.kernel.org>
+Subject: RE: [PATCH net-next 07/11] net: fec: use switch statement to check
+ the type of tx_buf
+Thread-Topic: [PATCH net-next 07/11] net: fec: use switch statement to check
+ the type of tx_buf
+Thread-Index: AQHchDz94JEEe8B96kSUW261P6sEvLVQSREAgAEnQ6A=
+Date: Wed, 14 Jan 2026 10:01:26 +0000
+Message-ID:
+ <PAXPR04MB8510292C43DE527926154759888FA@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20260113032939.3705137-1-wei.fang@nxp.com>
+ <20260113032939.3705137-8-wei.fang@nxp.com>
+ <aWZxNFIh2trMm04T@lizhi-Precision-Tower-5810>
+In-Reply-To: <aWZxNFIh2trMm04T@lizhi-Precision-Tower-5810>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|AMBPR04MB11764:EE_
+x-ms-office365-filtering-correlation-id: 40a28965-6881-41c9-eb4b-08de5353e15b
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|19092799006|376014|1800799024|7416014|366016|38070700021;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?rCZGBiVt6uPfxVaMbs8jnYkQPVVE//Rzz6Ob0ZYg7AzFkp+jNsD+u7ugDOiq?=
+ =?us-ascii?Q?sppIhSIGtGr7nhv2YHXTgggkiP2ZCgRKSQI5A8IPLjXLjBZzja67WrZTPtSm?=
+ =?us-ascii?Q?3PLNBvcdbEYDbnCtg5uOhDwrJjrZ8PgcO73/w/YxaJUE425p6QZ+Q1kNyPEu?=
+ =?us-ascii?Q?3XkOv72KSS2Eb1/ZkRTvv65r/H09ctNqnK6Nf3oeQtSAuUuzS/raM+w3a/Zg?=
+ =?us-ascii?Q?v7nAHzPXH6792eUVo7+fVemRGpEPUuzBVtpAVxJpqrcIaaQpyIBewE3jY4fH?=
+ =?us-ascii?Q?WAcC2k+xQ8i2tV10G5DPICPdk+XSoxtdpxz++VlaNi+sY9DyVkf/w5kvURPS?=
+ =?us-ascii?Q?mV+2sSArPEscyTBseSUQnI2bnbsnNdi6W+HLwVSRIbwaOJ4DIolFZLN7igmH?=
+ =?us-ascii?Q?l5eu8seQR3/Sscqex1vSxS9q0Wh1y0Nw0OP3l3/8uTXzNOwPkZQpBcg5Tjty?=
+ =?us-ascii?Q?iDbLVL23EVOdUjgOqCHk8H89/smQ3xp4NGE1H99ndXPRriaer+wMAyePM57w?=
+ =?us-ascii?Q?Z1+wbci0aTrpIN9QGARCrYHnXAYPkYNWfrF+/gwDRWFEwI3qQtYxaNTPwd82?=
+ =?us-ascii?Q?DBsVGCPiL8z69/eE9+g2N3bxrKSiW8DhiGPKnvf37On1duB7zHQzChWptpR2?=
+ =?us-ascii?Q?rWgiTQRcnT5XmoSilCiuwcdnDUD9QwxnMyDG4GWYdjOGTK5mlEWvDFK3+ywe?=
+ =?us-ascii?Q?cGhKTcj1ufGvX0V6DfbtLgTyOeEabgrrIE/oCDMpaU+VLiumGQefRZ0efYAE?=
+ =?us-ascii?Q?NzqasFwpbMOxfQBDqRIESB/Etb4e9enM1eReIe/WL5Oe95g4L9jZppzqLVGU?=
+ =?us-ascii?Q?skiYjsLe3xeWCF/1FEGB0uB7gricBzAP+eaHaMWZ4Xb+TJDfRxk21Ot5g2KL?=
+ =?us-ascii?Q?WAIUENf0Db9ifx+9UohbyEDhRcU6Jn1AEdLoOphlXip9hzFVEtUX8S7VVi5h?=
+ =?us-ascii?Q?5XPw0SD2WKio7AV+hYoCo7wwU8XvhXdxDyXh7/uDrtmn1QNxf4mx5Uwva6cn?=
+ =?us-ascii?Q?eUS93csJRE+4wPUgbOA+DiAhcRHbOfFE7FkTpoh2AYQGul/eNwXHZRoI8ExW?=
+ =?us-ascii?Q?CVDzj61hk8CmyieQF899+Ej2Sgs5ndrgxOM3B3JJGXlpPu2uTsuc6nAdfDkF?=
+ =?us-ascii?Q?Pc2iMEVQid5VSg34DgluiQ/4HVF69VsS4sQmM2Mu73JglSir711nMn9AhNpA?=
+ =?us-ascii?Q?jxzcFV+D43zXFKvN5kI9DMx4bdVKTvVd9E7dfAx4bP4yUOAcLUWYMAbNYf1+?=
+ =?us-ascii?Q?eQ3Dalil+vggW5sv1ppw+heoO7VoKwYtDvl3AiCUwmrfKYyoX6+I6xNrAEj9?=
+ =?us-ascii?Q?BVTNH4gxDl0S1TYl03yxu0LGsHh1N1PiEB7WOOItbplveJJYKcGnLqLyW3OG?=
+ =?us-ascii?Q?VtRkvgWJL5foWhX3h/m8LToVyQhU/nw20iRKoRHMKMn1ff4eo0DuAv0A05Fe?=
+ =?us-ascii?Q?LqZKcuAb/yHHMZ7QhMZ/KHC0pNRUOOA55PV29pe1m202Qiy6jfjDsWWwgV3y?=
+ =?us-ascii?Q?JkNLR/S1Hd/hRjO+KH2Vx8+ztLG8x2CzoXmW?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(376014)(1800799024)(7416014)(366016)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?+sZOjr1wRfqdkHbwgR3Y91wTrRWuN9zrx9P3nY0KzTmebyNonRdm0QRPRk/S?=
+ =?us-ascii?Q?6xtKIKSD9sBc9CrJm7F2pnAhEVyIVKFDVoCDiLvMsu1n6p733RVDynmwE2tz?=
+ =?us-ascii?Q?12H8+EU3LeGAgbYvP7M6GaXeSdxuh4nruL0wC/UpI9IDm7iHnnATzJwMxgbq?=
+ =?us-ascii?Q?jX1sFMIKjzOvxonM9MfYQt2rPG824WiI8/zFGcxpMJKsyUQAgK0odGqWrlX3?=
+ =?us-ascii?Q?jLMVnsIGvluAsIyOPIu6frWVhnRqVG1q5Rsvmyhfq1NBzN1Vv5M51z3XZWrr?=
+ =?us-ascii?Q?j7yv1z7muA8oVfaYx2cyP1VaKcqwVe51Tnr1rSglQA0z0XiNLlZpnXNPnONH?=
+ =?us-ascii?Q?jhYmVsFvB2f3ml1OwjwRPgNiKgWKspok8nMdAPssXCzGMQW5p/DcoyyB1Ibt?=
+ =?us-ascii?Q?x/KlS1Fd96+xvBQcaB02GJq4W8XRvmDcddE3VKqMLFZt9uAkgK8NnhES68qD?=
+ =?us-ascii?Q?YK2sq0N0gVTKAKN/mTD3mlbtwsf1O/g5GQ8Fv3dfB66PLt0BrCu/Jxlfo/4J?=
+ =?us-ascii?Q?G3DCP6diQEVBQvMEipPkdDBmEjLRiG4AW4oFbFpY2owKe3SqiqQBC9Q5FL3N?=
+ =?us-ascii?Q?V6rbdzAu7mtyxFEeKA0tUmqSDDd9u1GOUWWTkJoKoi82L+uelpQSa2ubPi2k?=
+ =?us-ascii?Q?HkWimlqDfDMdB6FSlWg6iiHLYxGrtQafU2o1mzyQXtomlJDK4WdG3Ibv9HXr?=
+ =?us-ascii?Q?4sEknTdxiLI2rLSOH11IzRPsGAPZBbuFGYQMBdJ3t+1FG1LlyLvHbI4NR4Vp?=
+ =?us-ascii?Q?cQxj0i/rSorP+zWgfHyWPN1AgAvmaJF+1HFy/V5xVLkDeDLW8Yby3qyWDtbF?=
+ =?us-ascii?Q?wVAudgtqTkO+v251p55VYgffGy5k9fCH8NWmzRLHBj8sLs2WieYZhlew9SGE?=
+ =?us-ascii?Q?NKHxgBuCfbG/VN3/iX2fMFkNVhNq8CzcrMS/bMZKG7OlMuZPf8xgm6wQcmHP?=
+ =?us-ascii?Q?MfYouoCEGnWlygHZCqfBqkm0Mni+KIyfG1a4izCUSrUnA88smHmvYk5zV068?=
+ =?us-ascii?Q?kObG977c7Df7eRW71sqJUhplUKVY3Cw9kqjre5JOyF1Ujt/EjdZHOZeLRsaN?=
+ =?us-ascii?Q?JrSxNkgqycL1TgyP1FCcO9uM+JAOvuIVMaYVq9+oFFTTeLa+4GV3ZxeWTLxa?=
+ =?us-ascii?Q?iFEqW4oWcZJr7XuFlwABSaHkZ8qPrfkNYGclccFhDb4+ZRVqHKGJP+W8UJEY?=
+ =?us-ascii?Q?piueoPiUsBZFmGVVGoZghpLBpeT7iDP80Q46+HIUcGOsa30C1j4+jTgYY+pU?=
+ =?us-ascii?Q?8ecRsP4EbB0ypJ+HOv6kVh1u2jgL27rYz0bGfWbkVz2C4EbyCn6Pl9LbQHEK?=
+ =?us-ascii?Q?d7Y7S0OPCWEoN3eHH7gXgtsN7WrWUk14cJ4X85VXOQShyl8IRleH+hWUSLYq?=
+ =?us-ascii?Q?aHOWHCOvx6wxAdIaG+bieFgC/Rbq8lXcsznfl4dvibnYTK6fyaKqerYvJK44?=
+ =?us-ascii?Q?UZO+YEk2Gl/mgsVrj0+KV9/0EEiqC7ZwQjWwS1AAHyf8a5zOn1Teyw7ktBGH?=
+ =?us-ascii?Q?ygpGdFlOY9OupNS0vjp3jkzaWuKLIanUCP3JQkllCds/uuI9OIeT+rMBWwHW?=
+ =?us-ascii?Q?PcD1f1k7hzdPJHJ8w+8aprO8iXb3wiETDoipJLR/3Yv4bdY/XgBJxR6wG6Co?=
+ =?us-ascii?Q?eXDbrl4AYG5MSzIp+OeQLgtIu9ZTPCLBInc9LbGC7DVUsHAECyXTsyiLaUaS?=
+ =?us-ascii?Q?FQQxzihwhfBFG6iOoyYKpeQleXZdaYGgaXqjNsvnfyABINyk?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260113-vsock-recv-coalescence-v2-1-552b17837cf4@rbox.co>
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 40a28965-6881-41c9-eb4b-08de5353e15b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jan 2026 10:01:26.1416
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Bp3L4AjEY+sgEDP093DL5k0d9WFV6nXIxc3XJEYcegTxeUDj85BzI/ZFj0gqNJ1kMBZY8AnALE/U/uAXvpb/vw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AMBPR04MB11764
 
-On Tue, Jan 13, 2026 at 04:08:18PM +0100, Michal Luczaj wrote:
->vsock/virtio common tries to coalesce buffers in rx queue: if a linear skb
->(with a spare tail room) is followed by a small skb (length limited by
->GOOD_COPY_LEN = 128), an attempt is made to join them.
->
->Since the introduction of MSG_ZEROCOPY support, assumption that a small skb
->will always be linear is incorrect. In the zerocopy case, data is lost and
->the linear skb is appended with uninitialized kernel memory.
->
->Of all 3 supported virtio-based transports, only loopback-transport is
->affected. G2H virtio-transport rx queue operates on explicitly linear skbs;
->see virtio_vsock_alloc_linear_skb() in virtio_vsock_rx_fill(). H2G
->vhost-transport may allocate non-linear skbs, but only for sizes that are
->not considered for coalescence; see PAGE_ALLOC_COSTLY_ORDER in
->virtio_vsock_alloc_skb().
->
->Ensure only linear skbs are coalesced. Note that skb_tailroom(last_skb) > 0
->guarantees last_skb is linear.
->
->Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
->Signed-off-by: Michal Luczaj <mhal@rbox.co>
->---
-> net/vmw_vsock/virtio_transport_common.c | 6 ++++--
-> 1 file changed, 4 insertions(+), 2 deletions(-)
+> On Tue, Jan 13, 2026 at 11:29:35AM +0800, Wei Fang wrote:
+> > The tx_buf has three types: FEC_TXBUF_T_SKB, FEC_TXBUF_T_XDP_NDO and
+> > FEC_TXBUF_T_XDP_TX. Currently, the driver uses 'if...else...'
+> > statements to check the type and perform the corresponding processing.
+> > This is very detrimental to future expansion. For example, if new
+> > types are added to support XDP zero copy in the future, continuing to u=
+se
+> 'if...else...'
+> > would be a very bad coding style. So the 'if...else...' statements in
+> > the current driver are replaced with switch statements to support XDP
+> > zero copy in the future.
+> >
+> > Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> > ---
+> >  drivers/net/ethernet/freescale/fec_main.c | 167
+> > +++++++++++-----------
+> >  1 file changed, 82 insertions(+), 85 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/freescale/fec_main.c
+> > b/drivers/net/ethernet/freescale/fec_main.c
+> > index f3e93598a27c..3bd89d7f105b 100644
+> > --- a/drivers/net/ethernet/freescale/fec_main.c
+> > +++ b/drivers/net/ethernet/freescale/fec_main.c
+> > @@ -1023,33 +1023,33 @@ static void fec_enet_bd_init(struct net_device
+> *dev)
+> >  		txq->bd.cur =3D bdp;
+> >
+> >  		for (i =3D 0; i < txq->bd.ring_size; i++) {
+> > +			dma_addr_t dma =3D fec32_to_cpu(bdp->cbd_bufaddr);
+> > +			struct page *page;
+> > +
+> >  			/* Initialize the BD for every fragment in the page. */
+> >  			bdp->cbd_sc =3D cpu_to_fec16(0);
+> > -			if (txq->tx_buf[i].type =3D=3D FEC_TXBUF_T_SKB) {
+> > -				if (bdp->cbd_bufaddr &&
+> > -				    !IS_TSO_HEADER(txq,
+> fec32_to_cpu(bdp->cbd_bufaddr)))
+> > -					dma_unmap_single(&fep->pdev->dev,
+> > -							 fec32_to_cpu(bdp->cbd_bufaddr),
+> > -							 fec16_to_cpu(bdp->cbd_datlen),
+> > -							 DMA_TO_DEVICE);
+> > -				if (txq->tx_buf[i].buf_p)
+> > -					dev_kfree_skb_any(txq->tx_buf[i].buf_p);
+> > -			} else if (txq->tx_buf[i].type =3D=3D FEC_TXBUF_T_XDP_NDO) {
+> > -				if (bdp->cbd_bufaddr)
+> > -					dma_unmap_single(&fep->pdev->dev,
+> > -							 fec32_to_cpu(bdp->cbd_bufaddr),
+> > +			switch (txq->tx_buf[i].type) {
+> > +			case FEC_TXBUF_T_SKB:
+> > +				if (dma && !IS_TSO_HEADER(txq, dma))
+> > +					dma_unmap_single(&fep->pdev->dev, dma,
+> >  							 fec16_to_cpu(bdp->cbd_datlen),
+> >  							 DMA_TO_DEVICE);
+> >
+> > -				if (txq->tx_buf[i].buf_p)
+> > -					xdp_return_frame(txq->tx_buf[i].buf_p);
+> > -			} else {
+> > -				struct page *page =3D txq->tx_buf[i].buf_p;
+> > -
+> > -				if (page)
+> > -					page_pool_put_page(pp_page_to_nmdesc(page)->pp,
+> > -							   page, 0,
+> > -							   false);
+> > +				dev_kfree_skb_any(txq->tx_buf[i].buf_p);
+> > +				break;
+> > +			case FEC_TXBUF_T_XDP_NDO:
+> > +				dma_unmap_single(&fep->pdev->dev, dma,
+> > +						 fec16_to_cpu(bdp->cbd_datlen),
+> > +						 DMA_TO_DEVICE);
+> > +				xdp_return_frame(txq->tx_buf[i].buf_p);
+>=20
+> look like logic is not exactly same as original one
+>=20
+> if (txq->tx_buf[i].type =3D=3D FEC_TXBUF_T_XDP_NDO) {
+> 	if (bdp->cbd_bufaddr)
+> 		...
 
-Thank you for enriching the commit message!
-
-LGTM!
-
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
->
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index dcc8a1d5851e..26b979ad71f0 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -1359,9 +1359,11 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
->
-> 	/* Try to copy small packets into the buffer of last packet queued,
-> 	 * to avoid wasting memory queueing the entire buffer with a small
->-	 * payload.
->+	 * payload. Skip non-linear (e.g. zerocopy) skbs; these carry payload
->+	 * in skb_shinfo.
-> 	 */
->-	if (len <= GOOD_COPY_LEN && !skb_queue_empty(&vvs->rx_queue)) {
->+	if (len <= GOOD_COPY_LEN && !skb_queue_empty(&vvs->rx_queue) &&
->+	    !skb_is_nonlinear(skb)) {
-> 		struct virtio_vsock_hdr *last_hdr;
-> 		struct sk_buff *last_skb;
->
->
->-- 
->2.52.0
->
+Yes, I did some cleanup as well, because the case of NULL pointer is
+always false.
 
 
