@@ -1,66 +1,64 @@
-Return-Path: <netdev+bounces-249807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA95FD1E420
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 11:58:27 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99E37D1E367
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 11:48:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 442D83052EC0
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 10:55:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DE8AE300A79A
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 10:46:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1828B395242;
-	Wed, 14 Jan 2026 10:55:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31D85393DED;
+	Wed, 14 Jan 2026 10:46:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b="LzIDAseC"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mta-65-225.siemens.flowmailer.net (mta-65-225.siemens.flowmailer.net [185.136.65.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA606393DD0
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 10:52:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9CF8392C4D
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 10:46:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768388116; cv=none; b=UYav2fyHR9vWE7ZKxZYKua7oNg8Z8KWA+pcoj9zVMdFrgrO915RHkZHrbON8t9RbI2e9nVLXQV8OvryIYmSoqF5qmDdmbHuzxjwTc7PV82YgtowIaVGxofVsH4xooR0Iqjvm7wru6AialbaVdfdzgCPJozj9pthvEmje78p/3oM=
+	t=1768387579; cv=none; b=JG7fzpWaA+yd2XMI/qSR/4dk2z4t4ZD3vA6FAsEbX23sVhxtR1mWjRXnUNjQ+v98d8Ad8LifCcBlTIXqg+E0QN0J7eEGGTkaOCkRAcxFUDFtNDihKoAunfEO+AtOXhGU3BOG0M3rEA59mm9KRQM/du1Gr3TLTlFzm2GDX+skVpk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768388116; c=relaxed/simple;
-	bh=dmZ1esgMNgnEFzSBSSQSl82K4WIaVVp+psV9xgR2mOg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kUd5G1jJchTWw63xemU0PlOGeEiOi/5+YSi3ZzJZNN/QVSK3sKkeCBLgRw9X8/R6OLiiOl1ivoV4B8C4evPrbRliB9pFv1gmMYoIzahtFEl5xP5fxnOxcddE6DqMDViPGGMfwQtwpdC/sGcEBv05xDcvDBUEWb2wrVZ+UwwNudc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vfyU4-0006p4-5U; Wed, 14 Jan 2026 11:52:16 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vfyU4-000Zew-1A;
-	Wed, 14 Jan 2026 11:52:15 +0100
-Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 6C53A4CCB69;
-	Wed, 14 Jan 2026 10:52:15 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
+	s=arc-20240116; t=1768387579; c=relaxed/simple;
+	bh=D+e3z0jwwSJ/jjSIelEwRyJu/mea3WE63qX44iBS6wY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s2gPFCASOVAyX1NMr1mHTNFPg+0GPEiC0oXdAodkQBLjjrVtlE2L4r1QjjZPlJPr35ALSR3+IHVGVbX9rOLB5zlY7R+PK1jc40vbw8oub8QMSRtNytqghsRwccr/ivDVWhaaE5FquZM4X4/bukO1iZfdL2Kd3AMYfTkmrC1Ciwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=LzIDAseC; arc=none smtp.client-ip=185.136.65.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
+Received: by mta-65-225.siemens.flowmailer.net with ESMTPSA id 20260114104603084ccb8d4000020786
+        for <netdev@vger.kernel.org>;
+        Wed, 14 Jan 2026 11:46:03 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
+ d=siemens.com; i=alexander.sverdlin@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
+ bh=Hsk9giDZ3rzrNEZl642AzZnZlbepHrpP8Fn7XrRdciU=;
+ b=LzIDAseCuMMfV+6Uhs541ZX5a8pa5dz6Nn4ssTJDd2T39uqWbugy7c+l56J+N+MfL780Lt
+ SQXyGU6+sd0Jce+0z992jaPnIUa40Ae03iweg64Yl7A5Ip5XQZdk992RqLnaLQZd5IEfKn2v
+ 4PcT5DdVx7rA4oI8Hc0LAkCav0stLwRmCNUghDpVSDb2UsXnUHvC83lZzBMKYYNMBGEGe/g6
+ EPpS/LxQdHgZKLPj+Q5l2g6uDYOWGkQLguCL/Ch4+wWUqzpsXRgRdU0kLTawQbCWWCw7qtbN
+ rb29G9UBSxNAfgwRJVAwEl6TKRiQQ7qF/LIJMS6Ip8GsF1pHurKYaigw==;
+From: "A. Sverdlin" <alexander.sverdlin@siemens.com>
 To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Oliver Hartkopp <socketcan@hartkopp.net>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Vincent Mailhol <mailhol@kernel.org>
-Subject: [PATCH net 2/4] can: propagate CAN device capabilities via ml_priv
-Date: Wed, 14 Jan 2026 11:45:01 +0100
-Message-ID: <20260114105212.1034554-3-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260114105212.1034554-1-mkl@pengutronix.de>
-References: <20260114105212.1034554-1-mkl@pengutronix.de>
+Cc: Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Hauke Mehrtens <hauke@hauke-m.de>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Daniel Golle <daniel@makrotopia.org>
+Subject: [PATCH net-next v5 0/2] dsa: mxl-gsw1xx: Support R(G)MII slew rate configuration
+Date: Wed, 14 Jan 2026 11:45:02 +0100
+Message-ID: <20260114104509.618984-1-alexander.sverdlin@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,236 +66,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-456497:519-21489:flowmailer
 
-From: Oliver Hartkopp <socketcan@hartkopp.net>
+From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
 
-Commit 1a620a723853 ("can: raw: instantly reject unsupported CAN frames")
-caused a sequence of dependency and linker fixes.
+Maxlinear GSW1xx switches offer slew rate configuration bits for R(G)MII
+interface. The default state of the configuration bits is "normal", while
+"slow" can be used to reduce the radiated emissions. Add the support for
+the latter option into the driver as well as the new DT bindings.
 
-Instead of accessing CAN device internal data structures which caused the
-dependency problems this patch introduces capability information into the
-CAN specific ml_priv data which is accessible from both sides.
+Changelog:
+v5:
+- improved options' descriptions on Rob's suggestions
+v4:
+- separate properties for TXD and TXC pads
+- https://lore.kernel.org/all/20260107090019.2257867-1-alexander.sverdlin@siemens.com/
+v3:
+- use [pinctrl] standard "slew-rate" property as suggested by Rob
+  https://lore.kernel.org/all/20251219204324.GA3881969-robh@kernel.org/
+- better sorted struct gswip_hw_info initialisers as suggested by Daniel
+- https://lore.kernel.org/all/20260105175320.2141753-1-alexander.sverdlin@siemens.com/
+v2:
+- do not hijack gsw1xx_phylink_mac_select_pcs() for configuring the port,
+  introduce struct gswip_hw_info::port_setup callback
+- actively configure "normal" slew rate (if the new DT property is missing)
+- properly use regmap_set_bits() (v1 had reg and value mixed up)
+- https://lore.kernel.org/all/20251216121705.65156-1-alexander.sverdlin@siemens.com/
+v1:
+- https://lore.kernel.org/all/20251212204557.2082890-1-alexander.sverdlin@siemens.com/
 
-With this change the CAN network layer can check the required features and
-the decoupling of the driver layer and network layer is restored.
+Alexander Sverdlin (2):
+  dt-bindings: net: dsa: lantiq,gswip: add MaxLinear R(G)MII slew rate
+  net: dsa: mxl-gsw1xx: Support R(G)MII slew rate configuration
 
-Fixes: 1a620a723853 ("can: raw: instantly reject unsupported CAN frames")
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Vincent Mailhol <mailhol@kernel.org>
-Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
-Link: https://patch.msgid.link/20260109144135.8495-3-socketcan@hartkopp.net
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/dev/dev.c     | 27 +++++++++++++++++++++++++++
- drivers/net/can/dev/netlink.c |  1 +
- drivers/net/can/vcan.c        | 15 +++++++++++++++
- drivers/net/can/vxcan.c       | 15 +++++++++++++++
- include/linux/can/can-ml.h    | 24 ++++++++++++++++++++++++
- include/linux/can/dev.h       |  1 +
- 6 files changed, 83 insertions(+)
+ .../bindings/net/dsa/lantiq,gswip.yaml        | 22 ++++++++++
+ drivers/net/dsa/lantiq/lantiq_gswip.h         |  1 +
+ drivers/net/dsa/lantiq/lantiq_gswip_common.c  |  6 +++
+ drivers/net/dsa/lantiq/mxl-gsw1xx.c           | 40 +++++++++++++++++++
+ drivers/net/dsa/lantiq/mxl-gsw1xx.h           |  2 +
+ 5 files changed, 71 insertions(+)
 
-diff --git a/drivers/net/can/dev/dev.c b/drivers/net/can/dev/dev.c
-index 091f30e94c61..7ab9578f5b89 100644
---- a/drivers/net/can/dev/dev.c
-+++ b/drivers/net/can/dev/dev.c
-@@ -375,6 +375,32 @@ void can_set_default_mtu(struct net_device *dev)
- 	}
- }
- 
-+void can_set_cap_info(struct net_device *dev)
-+{
-+	struct can_priv *priv = netdev_priv(dev);
-+	u32 can_cap;
-+
-+	if (can_dev_in_xl_only_mode(priv)) {
-+		/* XL only mode => no CC/FD capability */
-+		can_cap = CAN_CAP_XL;
-+	} else {
-+		/* mixed mode => CC + FD/XL capability */
-+		can_cap = CAN_CAP_CC;
-+
-+		if (priv->ctrlmode & CAN_CTRLMODE_FD)
-+			can_cap |= CAN_CAP_FD;
-+
-+		if (priv->ctrlmode & CAN_CTRLMODE_XL)
-+			can_cap |= CAN_CAP_XL;
-+	}
-+
-+	if (priv->ctrlmode & (CAN_CTRLMODE_LISTENONLY |
-+			      CAN_CTRLMODE_RESTRICTED))
-+		can_cap |= CAN_CAP_RO;
-+
-+	can_set_cap(dev, can_cap);
-+}
-+
- /* helper to define static CAN controller features at device creation time */
- int can_set_static_ctrlmode(struct net_device *dev, u32 static_mode)
- {
-@@ -390,6 +416,7 @@ int can_set_static_ctrlmode(struct net_device *dev, u32 static_mode)
- 
- 	/* override MTU which was set by default in can_setup()? */
- 	can_set_default_mtu(dev);
-+	can_set_cap_info(dev);
- 
- 	return 0;
- }
-diff --git a/drivers/net/can/dev/netlink.c b/drivers/net/can/dev/netlink.c
-index d6b0e686fb11..0498198a4696 100644
---- a/drivers/net/can/dev/netlink.c
-+++ b/drivers/net/can/dev/netlink.c
-@@ -377,6 +377,7 @@ static int can_ctrlmode_changelink(struct net_device *dev,
- 	}
- 
- 	can_set_default_mtu(dev);
-+	can_set_cap_info(dev);
- 
- 	return 0;
- }
-diff --git a/drivers/net/can/vcan.c b/drivers/net/can/vcan.c
-index fdc662aea279..76e6b7b5c6a1 100644
---- a/drivers/net/can/vcan.c
-+++ b/drivers/net/can/vcan.c
-@@ -130,6 +130,19 @@ static netdev_tx_t vcan_tx(struct sk_buff *skb, struct net_device *dev)
- 	return NETDEV_TX_OK;
- }
- 
-+static void vcan_set_cap_info(struct net_device *dev)
-+{
-+	u32 can_cap = CAN_CAP_CC;
-+
-+	if (dev->mtu > CAN_MTU)
-+		can_cap |= CAN_CAP_FD;
-+
-+	if (dev->mtu >= CANXL_MIN_MTU)
-+		can_cap |= CAN_CAP_XL;
-+
-+	can_set_cap(dev, can_cap);
-+}
-+
- static int vcan_change_mtu(struct net_device *dev, int new_mtu)
- {
- 	/* Do not allow changing the MTU while running */
-@@ -141,6 +154,7 @@ static int vcan_change_mtu(struct net_device *dev, int new_mtu)
- 		return -EINVAL;
- 
- 	WRITE_ONCE(dev->mtu, new_mtu);
-+	vcan_set_cap_info(dev);
- 	return 0;
- }
- 
-@@ -162,6 +176,7 @@ static void vcan_setup(struct net_device *dev)
- 	dev->tx_queue_len	= 0;
- 	dev->flags		= IFF_NOARP;
- 	can_set_ml_priv(dev, netdev_priv(dev));
-+	vcan_set_cap_info(dev);
- 
- 	/* set flags according to driver capabilities */
- 	if (echo)
-diff --git a/drivers/net/can/vxcan.c b/drivers/net/can/vxcan.c
-index b2c19f8c5f8e..f14c6f02b662 100644
---- a/drivers/net/can/vxcan.c
-+++ b/drivers/net/can/vxcan.c
-@@ -125,6 +125,19 @@ static int vxcan_get_iflink(const struct net_device *dev)
- 	return iflink;
- }
- 
-+static void vxcan_set_cap_info(struct net_device *dev)
-+{
-+	u32 can_cap = CAN_CAP_CC;
-+
-+	if (dev->mtu > CAN_MTU)
-+		can_cap |= CAN_CAP_FD;
-+
-+	if (dev->mtu >= CANXL_MIN_MTU)
-+		can_cap |= CAN_CAP_XL;
-+
-+	can_set_cap(dev, can_cap);
-+}
-+
- static int vxcan_change_mtu(struct net_device *dev, int new_mtu)
- {
- 	/* Do not allow changing the MTU while running */
-@@ -136,6 +149,7 @@ static int vxcan_change_mtu(struct net_device *dev, int new_mtu)
- 		return -EINVAL;
- 
- 	WRITE_ONCE(dev->mtu, new_mtu);
-+	vxcan_set_cap_info(dev);
- 	return 0;
- }
- 
-@@ -167,6 +181,7 @@ static void vxcan_setup(struct net_device *dev)
- 
- 	can_ml = netdev_priv(dev) + ALIGN(sizeof(struct vxcan_priv), NETDEV_ALIGN);
- 	can_set_ml_priv(dev, can_ml);
-+	vxcan_set_cap_info(dev);
- }
- 
- /* forward declaration for rtnl_create_link() */
-diff --git a/include/linux/can/can-ml.h b/include/linux/can/can-ml.h
-index 8afa92d15a66..1e99fda2b380 100644
---- a/include/linux/can/can-ml.h
-+++ b/include/linux/can/can-ml.h
-@@ -46,6 +46,12 @@
- #include <linux/list.h>
- #include <linux/netdevice.h>
- 
-+/* exposed CAN device capabilities for network layer */
-+#define CAN_CAP_CC BIT(0) /* CAN CC aka Classical CAN */
-+#define CAN_CAP_FD BIT(1) /* CAN FD */
-+#define CAN_CAP_XL BIT(2) /* CAN XL */
-+#define CAN_CAP_RO BIT(3) /* read-only mode (LISTEN/RESTRICTED) */
-+
- #define CAN_SFF_RCV_ARRAY_SZ (1 << CAN_SFF_ID_BITS)
- #define CAN_EFF_RCV_HASH_BITS 10
- #define CAN_EFF_RCV_ARRAY_SZ (1 << CAN_EFF_RCV_HASH_BITS)
-@@ -64,6 +70,7 @@ struct can_ml_priv {
- #ifdef CAN_J1939
- 	struct j1939_priv *j1939_priv;
- #endif
-+	u32 can_cap;
- };
- 
- static inline struct can_ml_priv *can_get_ml_priv(struct net_device *dev)
-@@ -77,4 +84,21 @@ static inline void can_set_ml_priv(struct net_device *dev,
- 	netdev_set_ml_priv(dev, ml_priv, ML_PRIV_CAN);
- }
- 
-+static inline bool can_cap_enabled(struct net_device *dev, u32 cap)
-+{
-+	struct can_ml_priv *can_ml = can_get_ml_priv(dev);
-+
-+	if (!can_ml)
-+		return false;
-+
-+	return (can_ml->can_cap & cap);
-+}
-+
-+static inline void can_set_cap(struct net_device *dev, u32 cap)
-+{
-+	struct can_ml_priv *can_ml = can_get_ml_priv(dev);
-+
-+	can_ml->can_cap = cap;
-+}
-+
- #endif /* CAN_ML_H */
-diff --git a/include/linux/can/dev.h b/include/linux/can/dev.h
-index 52c8be5c160e..6d0710d6f571 100644
---- a/include/linux/can/dev.h
-+++ b/include/linux/can/dev.h
-@@ -116,6 +116,7 @@ struct can_priv *safe_candev_priv(struct net_device *dev);
- int open_candev(struct net_device *dev);
- void close_candev(struct net_device *dev);
- void can_set_default_mtu(struct net_device *dev);
-+void can_set_cap_info(struct net_device *dev);
- int __must_check can_set_static_ctrlmode(struct net_device *dev,
- 					 u32 static_mode);
- int can_hwtstamp_get(struct net_device *netdev,
 -- 
-2.51.0
+2.52.0
 
 
