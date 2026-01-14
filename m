@@ -1,154 +1,120 @@
-Return-Path: <netdev+bounces-249972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 973C8D21C24
-	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 00:27:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3923D21C42
+	for <lists+netdev@lfdr.de>; Thu, 15 Jan 2026 00:31:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E51BD300DD9E
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 23:27:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 67CC730213DF
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 23:31:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8BEC37F8C4;
-	Wed, 14 Jan 2026 23:27:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ADD437F8BC;
+	Wed, 14 Jan 2026 23:31:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="YUg1qGLJ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="tmFj3/IC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A4B738B98A;
-	Wed, 14 Jan 2026 23:27:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA17392C57;
+	Wed, 14 Jan 2026 23:30:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768433248; cv=none; b=oQQcB1yNIiw/RwBez30YQUfrjWwzsNeX6f17QI+YHc/DOT4R3W0y1dTi8JDy3F1r8Ww4k6nPyHpfFV4FxWlonJxiZMZMN2OwE62Sdbcj60YVJvHcXRLfzW3ZK5UVacqpAZ3Ek3KAFBR87G98JDrV53Ujc+YZ8bsz7No6d2viE8w=
+	t=1768433457; cv=none; b=swQZLP6jl46923YbrQn69YvX9kGO2ZCyee17Ss89CHFggCHtj+PvXT+DsixvKixHQfJexnXi8KbFurNYACiq0aXDeM01MWwnJ7zSbFXW7ejNOtEXCWZfahjk+EliiTYdt2+LgwsE/58XzRdWM+eyeaFtIxp6LSqNFddEtw7LP58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768433248; c=relaxed/simple;
-	bh=9L24GhxzhICNQ2dvNcp/Jkprwsjom4G4qj4MPdGw7j4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ET+Tc5lSIcIxDCfrcJrfTJ7ZjUhnw6knT35d/enp+YoOj57bEb+ynFilzdkuQc11hC9EbTUqkCnA0JAa2Jf7A2HgXty14paJdkzz4hAZAkHRQTSEYzJ7SXKhno38gl/YIIJj9UVzlPe4IOloet3GUhX+69VLWEddC3NqgAmCrXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=YUg1qGLJ; arc=none smtp.client-ip=178.251.229.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2988210BED7;
-	Thu, 15 Jan 2026 00:27:07 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
-	s=dkim; t=1768433233;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=IiEt5tJdQlHAgpu2iagQYFNv192gre7oSLS/ZJhMtzE=;
-	b=YUg1qGLJSITou0JJmJWYIydNnCKQ1FkTkndzOlAplCVJORItwbrLJGylBFPxYUvrzwguKA
-	88r+FXMfkjMQZyWds34VpeotYk0TorwZZ/wOWAJvlrLntLf9r423sH6R5u3kF6bFI5fTi6
-	t/zJ7TqUpNjZI1gU2qzNc9IYc5yH5daf2Ax6np8YLkc/xkoHgxu5zL2yZcJu7KCF3yXm+Y
-	Eq2MbN0RVOHKU4JX9BUTSYsM0SsKibe71KoAogQVM2Wdsqwx/dgZlQrdPgU6lFB8a0Sx7J
-	PndaRF57SYoIC4rvW18yVEfDNt82vOkMitOcqIGTq5HFtE9srI9um8AO6BMPfA==
-Message-ID: <6c9cadc2-67b7-4bfe-9cf7-2b102a0a3c21@nabladev.com>
-Date: Thu, 15 Jan 2026 00:27:05 +0100
+	s=arc-20240116; t=1768433457; c=relaxed/simple;
+	bh=Aj1V3oEaM4lxPepI3F6k0D5zGVB8AuaiOkjv8+QRYnY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AVAwr9144aprNVWNPgHvxwp/3t7Jx2PGrAqBm/Z1RpnZG474PQqemDwMVrvTbwvvErTN8/Nhoyzw+NMYB75nfGAug0bre2Hpo9TIYD52DoaFXqbQ/wqU8tkngAeT+HtIqtBnN2HC0+wcJ4UrAsV8V3xe6CIRBMmSXo0SoEEJSpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=tmFj3/IC; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=+iYzsvx/P00phS6sz+zC58IgyrS6IJI8Js8SxN6/qjQ=; b=tmFj3/IC6B2WZ2ItUrngVjA7P1
+	HfI3BvrqJ91qhk+k+VFqXjVCYxD+IA0VgfMMW25KEaIqQ37lX3f/Pt4oSo1Y9M437bWhWESEQRimy
+	qth2Y8iC2lWB6gteqiliOKJqum7DVg02+fPkYpilrCLEabbVaKul0R3Jxv9UgyBld3dGyGKfvsS8g
+	GetJn9J9pEr2SrsVz0Vmg1HzdrBedqGpUJJSZdaFQQ6iD6qZLAsuZnlmall63p6dardPNFIacj3LJ
+	WKZmYkIwPmnlvqfy0FJXuEKhjayZoE6p7r3GskBusQ5ueyEaVatKcSBlApzPLqJJqOfqWN8MpynnL
+	Hb5DX76Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49550)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vgAK2-000000000lM-1Gx7;
+	Wed, 14 Jan 2026 23:30:42 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vgAJz-0000000023M-0Qqr;
+	Wed, 14 Jan 2026 23:30:39 +0000
+Date: Wed, 14 Jan 2026 23:30:38 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jonas Jelonek <jelonek.jonas@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Simon Horman <horms@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	bcm-kernel-feedback-list@broadcom.com
+Subject: Re: [PATCH net-next 2/6] net: phylink: Allow more interfaces in SFP
+ interface selection
+Message-ID: <aWgnHo01j38TF3lp@shell.armlinux.org.uk>
+References: <20260114225731.811993-1-maxime.chevallier@bootlin.com>
+ <20260114225731.811993-3-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next,PATCH] net: stmmac: stm32: Do not suspend downed
- interface
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- Christophe Roullier <christophe.roullier@st.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Krzysztof Kozlowski <krzk@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- kernel@dh-electronics.com, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com
-References: <20260114081809.12758-1-marex@nabladev.com>
- <aWfEXX1iMHy3V5sK@shell.armlinux.org.uk>
- <aWfOYf_YmJFUakvP@shell.armlinux.org.uk>
-Content-Language: en-US
-From: Marek Vasut <marex@nabladev.com>
-In-Reply-To: <aWfOYf_YmJFUakvP@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260114225731.811993-3-maxime.chevallier@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 1/14/26 6:12 PM, Russell King (Oracle) wrote:
-> On Wed, Jan 14, 2026 at 04:29:17PM +0000, Russell King (Oracle) wrote:
->> On Wed, Jan 14, 2026 at 09:17:54AM +0100, Marek Vasut wrote:
->>> If an interface is down, the ETHnSTP clock are not running. Suspending
->>> such an interface will attempt to stop already stopped ETHnSTP clock,
->>> and produce a warning in the kernel log about this.
->>>
->>> STM32MP25xx that is booted from NFS root via its first ethernet MAC
->>> (also the consumer of ck_ker_eth1stp) and with its second ethernet
->>> MAC downed produces the following warnings during suspend resume
->>> cycle. This can be provoked even using pm_test:
->>>
->>> "
->>> $ echo devices > /sys/power/pm_test
->>> $ echo mem > /sys/power/state
->>> ...
->>> ck_ker_eth2stp already disabled
->>> ...
->>> ck_ker_eth2stp already unprepared
->>> ...
->>> "
->>>
->>> Fix this by not manipulating with the clock during suspend resume
->>> of interfaces which are downed.
->>
->> I don't think this is the correct fix. Looking back at my commits:
->> b51f34bc85e3 net: stmmac: platform: legacy hooks for suspend()/resume() methods
->> 07bbbfe7addf net: stmmac: add suspend()/resume() platform ops
->>
->> I think I changed the behaviour of the suspend/resume callbacks
->> unintentionally. Sorry, I don't have time to complete this email
->> (meeting.)
+On Wed, Jan 14, 2026 at 11:57:24PM +0100, Maxime Chevallier wrote:
+> When phylink handles an SFP module that contains a PHY, it selects a
+> phy_interface to use to communicate with it. This selection ensures that
+> the highest speed gets achieved, based on the linkmodes we want to
+> support in the module.
 > 
-> I think I'm going to start over, trying to figure out what happened.
-> 
-> c7308b2f3d0d net: stmmac: stm32: convert to suspend()/resume() methods
-> 
-> Did the conversion, and it always called stm32_dwmac_clk_disable() and
-> where it exists, dwmac->ops->suspend() on suspend, provided
-> stmmac_suspend() returns zero (which it will do, even if the interface
-> is down. On resume, it always calls dwmac->ops->resume() and
-> stm32_dwmac_init() before calling stmmac_resume().
-> 
-> The conversion added hooks into ny new ->suspend() and ->resume()
-> methods to handle the stm32_dwmac_clk_disable(), dwmac->ops->suspend(),
-> dwmac->ops->resume() and stm32_dwmac_init() steps.
-> 
-> However, in 07bbbfe7addf I failed to realise that, in order to keep
-> things compatible with how stuff works, we need to call
-> priv->plat->suspend() even if the interface is down. This is where
-> the bug is, not in your glue driver.
-> 
-> Please try this:
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index a8a78fe7d01f..2acbb0107cd3 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -8066,7 +8066,7 @@ int stmmac_suspend(struct device *dev)
->   	u32 chan;
->   
->   	if (!ndev || !netif_running(ndev))
-> -		return 0;
-> +		goto suspend_bsp;
->   
->   	mutex_lock(&priv->lock);
->   
-> @@ -8106,6 +8106,7 @@ int stmmac_suspend(struct device *dev)
->   	if (stmmac_fpe_supported(priv))
->   		ethtool_mmsv_stop(&priv->fpe_cfg.mmsv);
->   
-> +suspend_bsp:
->   	if (priv->plat->suspend)
->   		return priv->plat->suspend(dev, priv->plat->bsp_priv);
->   
-This works too, thank you.
+> This approach doesn't take into account the supported interfaces
+> reported by the module
 
-Will you send this fix ?
+This is intentional by design, because the capabilities of the PHY
+override in this case. Unfortunately, as I've said previously, the
+rush to throw in a regurgitated version of my obsoleted
+"host_interfaces" rather messed up my replacement patch set which
+had the PHY driver advertising the interface capabilities of the
+PHY, which were then going to be used to make the PHY interface
+selection when attaching the PHY.
+
+I've still got the code, but I can't now push it into mainline
+because, with the obsolete host_interfaces stuff merged, we will end
+up with two competing solutions.
+
+In any case, I really would appreciate people looking through
+http://git.armlinux.org.uk/cgit/linux-arm.git/log/?h=net-queue
+
+before doing development on SFP and phylink to see whether I've
+already something that solves their issue. Quite simply, I don't have
+the time to push every patch out that I have, especially as I'm up to
+my eyeballs with the crappy stmmac driver now, but also because I
+have work items from Oracle that reduce the time I can work on
+mainline. BTW, the "age" stated in cgit is based on the commit time
+(which gets reset when rebased) not the initial merge time. You will
+see that the "supported_interfaces" stuff dates from 2019, not 2025.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
