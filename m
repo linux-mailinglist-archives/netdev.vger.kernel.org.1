@@ -1,199 +1,151 @@
-Return-Path: <netdev+bounces-249949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCCAED217CC
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 23:04:40 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3FAAD21884
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 23:18:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8EDDE300A1EF
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 22:03:58 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2DA7030021F4
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 22:18:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 468393AEF49;
-	Wed, 14 Jan 2026 22:03:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDDB53AEF4B;
+	Wed, 14 Jan 2026 22:18:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e/qTMj93"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VPpGJjxr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912453ACA74
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 22:03:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A5243AEF2C
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 22:17:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768428231; cv=none; b=D0LlQSjSgU6cHCCb6crH0Kwpdc5Ui30f+3pPgPZNlnOfpP1uCau7JhDTJFElHsBLaMdNjLeo7zrNfRIMPGVONg51mmHLZAIwBDxaehBB8AUasuhl31n6izrnCuhj79Krj1urUc3NUhuloETPbiEOaK9Fas2tOuqyZ1ndCZ45m8Q=
+	t=1768429080; cv=none; b=LiKg6OBrEJdEB0tCX8joVUxHnvbrwFaVLpZTZt0b+q+nKki4q4nYoLqTwWLaoW3CcE4kjIjMduvQOUaGzTllO84II2/Uup2mA+/OnazWeMZGn9G7/FajmSf6MASr4j+8K0s8c68e2Zp3fj1tuRLP4sIS4uQU4kgZ/5EXhbrJTuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768428231; c=relaxed/simple;
-	bh=/+eBGPjh8RMnYdNklHH9x3cuCb2cAheWorkA3bR+mSk=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=twmVotoF9NLLVCTUzxhMZzz0E20K6VHbaqaaGOG73mmictj+Bx8uUy16Xpf+2kX+I1yksSgOpOfSFYayicQBWimgmukbHrvES5FuLk2tQz3WIVidGJILV9VpGRYRhgqx3VsqndlItruWq5KM8ImiCmKB7cjrD645HZt34cdP2Es=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e/qTMj93; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768428217;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=zyYUBAVWW4TqMuHPUSF6CvRb8vZ0ftToyTU1+rqOxR4=;
-	b=e/qTMj93o5uLUwNpTRNQqUIcRfO/+KniY+jeaoTgsnQAARrDbsPD6HMz+308LuqLJGOyk3
-	AXDr5vlcywa9zMUkZoiw/lWpfSOe2Ikny2Z213tsHyX7RVqkVGBqYEbC5bK75/u2sdXnbj
-	83OkhOm68nKwURJqld54//l+tCyji+E=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-536-vhD31TOSMS-Kowd2BPk8Xg-1; Wed,
- 14 Jan 2026 17:03:31 -0500
-X-MC-Unique: vhD31TOSMS-Kowd2BPk8Xg-1
-X-Mimecast-MFC-AGG-ID: vhD31TOSMS-Kowd2BPk8Xg_1768428209
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 873F618002C4;
-	Wed, 14 Jan 2026 22:03:28 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3E49518007D2;
-	Wed, 14 Jan 2026 22:03:24 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-cc: dhowells@redhat.com, Faith <faith@zellic.io>,
-    Pumpkin Chang <pumpkin@devco.re>,
-    Marc Dionne <marc.dionne@auristor.com>, Nir Ohfeld <niro@wiz.io>,
-    Willy Tarreau <w@1wt.eu>, Eric Dumazet <edumazet@google.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-    Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org,
-    security@kernel.org, stable@kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] rxrpc: Fix recvmsg() unconditional requeue 
+	s=arc-20240116; t=1768429080; c=relaxed/simple;
+	bh=Z81lhCkJyU5OgqsjQhSwe+xZ+f9s9magtkxs+412gks=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bGCI4gH0HpJc7+M2OkzNdJ0Yhhr1Ep089lKg96RfN7lKisSoL/UAdKI+6Pj8g0opDlFQh0bYsbp1DAgQJS98gAScDzvXWP1DGDP2JMJESifpNj+nPGlFz7guV6anYOwjCI5GleHiI2Gq8PLzYGrdmMP0D/urWhkCxXP7x93tGtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VPpGJjxr; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-64b5b22f723so37892a12.2
+        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 14:17:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768429068; x=1769033868; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3QsmNE/dBOKmZVY75i8Uf1eQVIlPFgA+6+ZN6q48cI0=;
+        b=VPpGJjxrdyPDuSFBxOcT2yErVVIF4EbVIlDESjpj3XzHGU+VCuGUzBK0xAR5UaQ89d
+         zVor8tzQGbe3MWBgKGoNFbXZo8P91lVIVIh78GabuSmSlmpV6s0yJToSkIR4Uqe+zsPj
+         rs42wR+vu7sMDi91ZQPkm/m+vaQS5pdShDMXao8S3e/pKKa/avnKHnlClpqvndO3zqZC
+         S6OvUPRtnXOV5yTZOlLzlGPSgM3ZiUXt0e+ONOU34a8q6s1NyiLa6PNbCRwq5+Fq/+54
+         hNMPgpAEtCjmE2OY9RAnkip1eKzroApwRZLor9+2HYw2ieBvUCL5oc9OwUOK6gtfenMR
+         Maew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768429068; x=1769033868;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3QsmNE/dBOKmZVY75i8Uf1eQVIlPFgA+6+ZN6q48cI0=;
+        b=SMjnSM6Dk8g+h3eDMqBAttI20J0fcxBy+fjMJLM2Qyksq18BhQ9DbROsvNXZkMFRYY
+         KhIZEE+uN7Iji7wYQuXcW9ZlzhtlXz6h257F6ZGo6kyU9WisZhwlIeytK3Uz3Ad/6vHw
+         lZ0ioxTn1AZnd7V4JEkS5C0nQng70hkEeqn16loxdCrPB9mJyVYY+Mf0Vx6au4vGCGps
+         4cLm/G6k12Lo83JYkwmBkiBKNqgMMB5Zkhoz9HmAXMLntzZlHhb4JZTLMlW/zPNsL+o7
+         JpAO6Z3HJVSW3wGsa9RR1FtHbvbfusIMC97/83+yeB5LKwEvnh9CSrRaQs3Z4uLZ7mUc
+         MB0A==
+X-Forwarded-Encrypted: i=1; AJvYcCW9zdydMZ9Q93Rj5c/P3mwJiNDii1nWALLSau3W3dDNKKMdGsBXUGWHEGdCsEjkybonOJ+TjAY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzekupsI/K1Un16Pl26AFyujHSWsHrZ1mn55QdJoJ7XzI7IV/Fh
+	XNhkHU6FWEapi2DPGBp1KSNnkaNKdDRrtMONxHFL1CLr/3v/OtaRaESY
+X-Gm-Gg: AY/fxX6r/Wg7Nj5qQdVqTBHzBNi36SWkAtWID+QZEV0pL8PcyO2k49e+RF0VZpC/Xet
+	Cl7Lz3NTLxynOADAjF/9NLPUqojz4FUJnVZ3piEE/B+hKJNcvGz+3lm+OnT0e/YUjyATy2x13Lb
+	dLNNyTuxZ9W6XeebB1r5o4MtLiwxGzIke0mwwnqWHuK05DbE0BGZMUx67ZRRFy4R6LXtyJytTQ0
+	Lj0plMzt40XOmhd8wqxnQig/oBw+EjVz1Hd4No/pdsUITNDRRxfKDxZIu75E/K/it1vyAw9eZCH
+	HhigeXMB5d9qRslpfVUEJPwmw1HO1+BRNDcr7K7YY+Co/XyiRSeesuaiEx6t0WSjVzyUFVibNzX
+	auzj51AtgAw7pZ4z7TJP2lQnRhREKADZArHuXfJRXbgg+AYnFguTqau7TFS8cz9BkRswgcQXKfz
+	clkQ==
+X-Received: by 2002:a05:6402:5186:b0:64b:a1e6:8013 with SMTP id 4fb4d7f45d1cf-653ec46689fmr1892486a12.6.1768429067635;
+        Wed, 14 Jan 2026 14:17:47 -0800 (PST)
+Received: from skbuf ([2a02:2f04:d703:5400:d5b0:b41:b5b3:8c4d])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-65412084155sm650905a12.29.2026.01.14.14.17.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Jan 2026 14:17:47 -0800 (PST)
+Date: Thu, 15 Jan 2026 00:17:43 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Daniel Golle <daniel@makrotopia.org>, Felix Fietkau <nbd@nbd.name>,
+	John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Bc-bocun Chen <bc-bocun.chen@mediatek.com>,
+	Rex Lu <rex.lu@mediatek.com>,
+	Mason-cw Chang <Mason-cw.Chang@mediatek.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next RFC] net: ethernet: mtk_eth_soc: support using
+ non-MediaTek DSA switches
+Message-ID: <20260114221743.tb56lxfi6eqoh2rw@skbuf>
+References: <34647edacab660b4cabed9733d2d3ef22bc041ac.1768273593.git.daniel@makrotopia.org>
+ <252d6877-d966-4d19-a38c-cc83ba908494@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <95162.1768428202.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 14 Jan 2026 22:03:23 +0000
-Message-ID: <95163.1768428203@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <252d6877-d966-4d19-a38c-cc83ba908494@lunn.ch>
 
-    =
+On Tue, Jan 13, 2026 at 03:00:18PM +0100, Andrew Lunn wrote:
+> On Tue, Jan 13, 2026 at 03:11:54AM +0000, Daniel Golle wrote:
+> > MediaTek's Ethernet Frame Engine is tailored for use with their
+> > switches. This broke checksum and VLAN offloading when attaching a
+> > DSA switch which does not use MediaTek special tag format.
+> 
+> This has been seen before. The Freescale FEC has similar problems when
+> combined with a Marvell switch, it cannot find the IP header, and so
+> checksum offloading does not work.
+> 
+> I thought we solved this be modifying the ndev->feature of the conduit
+> interface to disable such offloads. But i don't see such code. So i
+> must be remembering wrongly.
+> 
+> This is assuming the frame engine respects these flags:
+> 
+> /usr/sbin/ethtool -k enp2s0
+> Features for enp2s0:
+> rx-checksumming: on
+> tx-checksumming: on
+> 	tx-checksum-ipv4: on
+> 	tx-checksum-ip-generic: off [fixed]
+> 	tx-checksum-ipv6: on
+> 	tx-checksum-fcoe-crc: off [fixed]
+> 	tx-checksum-sctp: off [fixed]
+> 
+> When you combine a Marvell Ethernet interface with a Marvell switch
+> offloading works of course. So it probably does require some logic in
+> the MAC driver to determine if the switch is of the same vendor or
+> not.
 
-If rxrpc_recvmsg() fails because MSG_DONTWAIT was specified but the call a=
-t
-the front of the recvmsg queue already has its mutex locked, it requeues
-the call - whether or not the call is already queued.  The call may be on
-the queue because MSG_PEEK was also passed and so the call was not dequeue=
-d
-or because the I/O thread requeued it.
+I don't know about FEC, but we did end up documenting this:
 
-The unconditional requeue may then corrupt the recvmsg queue, leading to
-things like UAFs or refcount underruns.
+If the DSA conduit driver still uses the legacy NETIF_F_IP_CSUM
+or NETIF_F_IPV6_CSUM in vlan_features, the offload might only work if the
+offload hardware already expects that specific tag (perhaps due to matching
+vendors). DSA user ports inherit those flags from the conduit, and it is up to
+the driver to correctly fall back to software checksum when the IP header is not
+where the hardware expects.
 
-Fix this by only requeuing the call if it isn't already on the queue - and
-moving it to the front if it is already queued.  If we don't queue it, we
-have to put the ref we obtained by dequeuing it.
+I would suggest searching for skb_checksum_help() in xmit() implementations.
+For example c2945c435c99 ("net: stmmac: Prevent DSA tags from breaking COE").
 
-Also, MSG_PEEK doesn't dequeue the call so shouldn't call
-rxrpc_notify_socket() for the call if we didn't use up all the data on the
-queue, so fix that also.
-
-Fixes: 540b1c48c37a ("rxrpc: Fix deadlock between call creation and sendms=
-g/recvmsg")
-Reported-by: Faith <faith@zellic.io>
-Reported-by: Pumpkin Chang <pumpkin@devco.re>
-Signed-off-by: David Howells <dhowells@redhat.com>
-Acked-by: Marc Dionne <marc.dionne@auristor.com>
-cc: Nir Ohfeld <niro@wiz.io>
-cc: Willy Tarreau <w@1wt.eu>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Simon Horman <horms@kernel.org>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
-cc: security@kernel.org
-cc: stable@kernel.org
----
- Changes
- =3D=3D=3D=3D=3D=3D=3D
- ver #2)
- - Put our ref if the call is already queued.
-
- include/trace/events/rxrpc.h |    4 ++++
- net/rxrpc/recvmsg.c          |   21 ++++++++++++++++-----
- 2 files changed, 20 insertions(+), 5 deletions(-)
-
-diff --git a/include/trace/events/rxrpc.h b/include/trace/events/rxrpc.h
-index de6f6d25767c..869f97c9bf73 100644
---- a/include/trace/events/rxrpc.h
-+++ b/include/trace/events/rxrpc.h
-@@ -322,6 +322,7 @@
- 	EM(rxrpc_call_put_kernel,		"PUT kernel  ") \
- 	EM(rxrpc_call_put_poke,			"PUT poke    ") \
- 	EM(rxrpc_call_put_recvmsg,		"PUT recvmsg ") \
-+	EM(rxrpc_call_put_recvmsg_peek_nowait,	"PUT peek-nwt") \
- 	EM(rxrpc_call_put_release_recvmsg_q,	"PUT rls-rcmq") \
- 	EM(rxrpc_call_put_release_sock,		"PUT rls-sock") \
- 	EM(rxrpc_call_put_release_sock_tba,	"PUT rls-sk-a") \
-@@ -340,6 +341,9 @@
- 	EM(rxrpc_call_see_input,		"SEE input   ") \
- 	EM(rxrpc_call_see_notify_released,	"SEE nfy-rlsd") \
- 	EM(rxrpc_call_see_recvmsg,		"SEE recvmsg ") \
-+	EM(rxrpc_call_see_recvmsg_requeue,	"SEE recv-rqu") \
-+	EM(rxrpc_call_see_recvmsg_requeue_first, "SEE recv-rqF") \
-+	EM(rxrpc_call_see_recvmsg_requeue_move,	"SEE recv-rqM") \
- 	EM(rxrpc_call_see_release,		"SEE release ") \
- 	EM(rxrpc_call_see_userid_exists,	"SEE u-exists") \
- 	EM(rxrpc_call_see_waiting_call,		"SEE q-conn  ") \
-diff --git a/net/rxrpc/recvmsg.c b/net/rxrpc/recvmsg.c
-index 7fa7e77f6bb9..547e3e34f475 100644
---- a/net/rxrpc/recvmsg.c
-+++ b/net/rxrpc/recvmsg.c
-@@ -518,7 +518,8 @@ int rxrpc_recvmsg(struct socket *sock, struct msghdr *=
-msg, size_t len,
- 	if (rxrpc_call_has_failed(call))
- 		goto call_failed;
- =
-
--	if (!skb_queue_empty(&call->recvmsg_queue))
-+	if (!(flags & MSG_PEEK) &&
-+	    !skb_queue_empty(&call->recvmsg_queue))
- 		rxrpc_notify_socket(call);
- 	goto not_yet_complete;
- =
-
-@@ -549,11 +550,21 @@ int rxrpc_recvmsg(struct socket *sock, struct msghdr=
- *msg, size_t len,
- error_requeue_call:
- 	if (!(flags & MSG_PEEK)) {
- 		spin_lock_irq(&rx->recvmsg_lock);
--		list_add(&call->recvmsg_link, &rx->recvmsg_q);
--		spin_unlock_irq(&rx->recvmsg_lock);
--		trace_rxrpc_recvmsg(call_debug_id, rxrpc_recvmsg_requeue, 0);
-+		if (list_empty(&call->recvmsg_link)) {
-+			list_add(&call->recvmsg_link, &rx->recvmsg_q);
-+			rxrpc_see_call(call, rxrpc_call_see_recvmsg_requeue);
-+			spin_unlock_irq(&rx->recvmsg_lock);
-+		} else if (list_is_first(&call->recvmsg_link, &rx->recvmsg_q)) {
-+			spin_unlock_irq(&rx->recvmsg_lock);
-+			rxrpc_put_call(call, rxrpc_call_see_recvmsg_requeue_first);
-+		} else {
-+			list_move(&call->recvmsg_link, &rx->recvmsg_q);
-+			spin_unlock_irq(&rx->recvmsg_lock);
-+			rxrpc_put_call(call, rxrpc_call_see_recvmsg_requeue_move);
-+		}
-+ 		trace_rxrpc_recvmsg(call_debug_id, rxrpc_recvmsg_requeue, 0);
- 	} else {
--		rxrpc_put_call(call, rxrpc_call_put_recvmsg);
-+		rxrpc_put_call(call, rxrpc_call_put_recvmsg_peek_nowait);
- 	}
- error_no_call:
- 	release_sock(&rx->sk);
-
+This is just at a first glance having read the commit message and the
+discussion, not necessarily the code.
 
