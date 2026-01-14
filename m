@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-249711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEEB6D1C49F
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 04:43:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BFF6D1C4A8
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 04:43:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id BE66930019C2
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 03:43:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3CB4E3016DF1
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 03:43:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C97FC2D6E78;
-	Wed, 14 Jan 2026 03:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB5062D739B;
+	Wed, 14 Jan 2026 03:43:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TPY2DTgE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NfjnGxO9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76D72356C6
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 03:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32FD13DDAE;
+	Wed, 14 Jan 2026 03:43:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768362221; cv=none; b=WFBuOpUtkSxyp5kmD57GcZdu2B6YgEJeSRRnE5sWWjbm51/3BOZhmFP8YAD4p7Lc3jFuag2yFQLsLa6ovWRYdEwjNNxHczL4eEJAAWXS/7pKXcxHdewHG9WnciycfKhR+ZfyBLaM44hHRZavHLJ1pMAHs/zCds+mir4AUQzeLRU=
+	t=1768362225; cv=none; b=fYdg6OmlW5W25SLBRFqPyCclINj+/pl5LleIkc/405B7aMcnGr5llPxO4Z7kcXUJERVy2fcw9TuH/WnSiGkX1UOADM0xzJuy/oM6cZgFii8VUbWBhJzVKNzIRfNIj1tea7G8dBXirYqn6nSIWd0qqfFXGFHQqeEH/e11UUso1Ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768362221; c=relaxed/simple;
-	bh=bsX6P7h5mlkiKtIPh2WDj8gqWgoDrh7JW1H2JR+fQYg=;
+	s=arc-20240116; t=1768362225; c=relaxed/simple;
+	bh=fsm+RbfBmzE3HHaX362NezsDg0pqF6wDy7Rk3jWR5B8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=HCcqzcWwJ42uNZlBVebFA+z47U0MqTrMS7cvY2yQBwSlL4iDGbYOlQWX9ly6V184iDkEgu0y01owj1LOuDaf1KeuXSjSwrW/PvvJ0Xf+vCRQN3vEwGdNXqIvyj71a5/afEbgwAIMVnHaXBNS2i0HK6r8VxuTHZNs9MJ5Abhroxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TPY2DTgE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27BCCC4CEF7;
-	Wed, 14 Jan 2026 03:43:41 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=nFRj1yG+gPc1J+8po/fSwB8uA6oTZ/Y28a0xzWornEqf0S7a17Z3+0ZCwLpNbjiNXEy0p6/m4w7JvZCnRWO++jtJo5qn2abASEL2JrKYoF0bspSbFgBpzR4hjHNopxylWSdcCRj3Odt3Dx7sSXLZIWVwPDTwv8sLLvpqmVsbklQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NfjnGxO9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FC44C4CEF7;
+	Wed, 14 Jan 2026 03:43:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768362221;
-	bh=bsX6P7h5mlkiKtIPh2WDj8gqWgoDrh7JW1H2JR+fQYg=;
+	s=k20201202; t=1768362225;
+	bh=fsm+RbfBmzE3HHaX362NezsDg0pqF6wDy7Rk3jWR5B8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TPY2DTgEoiLPuVnRXqihI5Usc3AjNs/w7Wj62CxDv86fQ1+MSAnlZNvaZV1E/CB15
-	 P+Ux+YZ2Jn18acTTWyI2iDHlPoHc9ZaTJ/9lB1B6dwWKkxdWqUVu8b243ImM1FQF97
-	 H61V9+nSdBOhVLsbUEMgtWEX+C+Xrh5yMjyDu9hzwxbDqmDBmqMN0j5ExvigC1rKj4
-	 ugJdka1qc4uGm/tIrUDuPA2WRPAZM5+PxD9pupwkdh1zZtgGGvXYA65oFEQI/oHk22
-	 Y0fV3gi8DBM0JMT4nPDQH77pi/d6D0Gihvf0/xa4VlfqGaSEBsN9QyRDCOgWRViVt8
-	 Al/BK7KBPb8ng==
+	b=NfjnGxO9p8v8tgyYZ1YLhipRYtvtuDQMcttpYqDdA5nkVicBUVIP6ZiIrwUg+QFOq
+	 PNAsvPKQh8TcV7D4n8HAFdrlmLiyf1v4xT5OZ6iaBokBAG0vYlP5iVRLT4u1eJiFDz
+	 GGxeem/NiqhIlbI9MYXUk7sV74em/ptwbYPmeEbIuxgOFgb7nnxDBFOXpmMaUh5w7B
+	 Jp23alHSDsViJVw+clYHoAPnTX3fMSIM5M80FnEtVSfjUM6P1NjFz5SVuAy4zNJU+Y
+	 pWH++LTXpCfPaIyJ7CEyk99A8fZ65D7zE+x39SXgSLRoz7xUZANcLPsHuPi/XYihOX
+	 v8ezxOgq1fyrQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 789553808200;
-	Wed, 14 Jan 2026 03:40:15 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B58EE3808200;
+	Wed, 14 Jan 2026 03:40:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,41 +50,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net/sched: sch_qfq: do not free existing class in
- qfq_change_class()
+Subject: Re: [PATCH net-next, v8] net: mana: Implement ndo_tx_timeout and
+ serialize queue resets per port.
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176836201401.2575016.13444177808892506620.git-patchwork-notify@kernel.org>
-Date: Wed, 14 Jan 2026 03:40:14 +0000
-References: <20260112175656.17605-1-edumazet@google.com>
-In-Reply-To: <20260112175656.17605-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- netdev@vger.kernel.org, eric.dumazet@gmail.com,
- syzbot+07f3f38f723c335f106d@syzkaller.appspotmail.com
+ <176836201827.2575016.15589980289559695566.git-patchwork-notify@kernel.org>
+Date: Wed, 14 Jan 2026 03:40:18 +0000
+References: 
+ <20260112130552.GA11785@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+In-Reply-To: 
+ <20260112130552.GA11785@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+ shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+ ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ dipayanroy@microsoft.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 12 Jan 2026 17:56:56 +0000 you wrote:
-> Fixes qfq_change_class() error case.
+On Mon, 12 Jan 2026 05:05:52 -0800 you wrote:
+> Implement .ndo_tx_timeout for MANA so any stalled TX queue can be detected
+> and a device-controlled port reset for all queues can be scheduled to a
+> ordered workqueue. The reset for all queues on stall detection is
+> recomended by hardware team.
 > 
-> cl->qdisc and cl should only be freed if a new class and qdisc
-> were allocated, or we risk various UAF.
-> 
-> Fixes: 462dbc9101ac ("pkt_sched: QFQ Plus: fair-queueing service at DRR cost")
-> Reported-by: syzbot+07f3f38f723c335f106d@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/6965351d.050a0220.eaf7.00c5.GAE@google.com/T/#u
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net/sched: sch_qfq: do not free existing class in qfq_change_class()
-    https://git.kernel.org/netdev/net/c/3879cffd9d07
+  - [net-next,v8] net: mana: Implement ndo_tx_timeout and serialize queue resets per port.
+    https://git.kernel.org/netdev/net-next/c/3b194343c250
 
 You are awesome, thank you!
 -- 
