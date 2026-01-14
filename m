@@ -1,154 +1,124 @@
-Return-Path: <netdev+bounces-249676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8557BD1C1DF
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 03:20:49 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B0A0D1C1EE
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 03:24:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 365403021746
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 02:19:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A1565300E826
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 02:24:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B48A12F3C13;
-	Wed, 14 Jan 2026 02:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7189E2F363C;
+	Wed, 14 Jan 2026 02:24:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SSj1vj1c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TfSXZpoN"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45FB92E11A6
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 02:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DCFE280035;
+	Wed, 14 Jan 2026 02:24:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768357188; cv=none; b=u2AewM73SHlPo6eCoRXcjeT4F4skvfxNnQk9tPXltf7ytQu2rSP8vyL7qaNsiQoozo3i2rSmk7BOqRwnCmIEUc7jNIkaI0po1cOZK+hX3iwppdK0Td6wrbJYy+wkHJweX0AuGRbEQthd0GHyJZTNwn7mZa/Es79Rd5zCklGxb4I=
+	t=1768357442; cv=none; b=p5jbxFDYX9borQCt8aakJ+anQZlz635i4jlY/S1xhkJ+iXOPAfxqs8pq2E5LB5PlTc4N/3jSm3RWJL2XA+oghLGP7abYPUJ9ZyzX2FRj9lsIy5rrHaKeMHNxvwO2uks2UCYycHk3J3un4kkzIS35Ae0tRb6xmzT8DRndHQjPFtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768357188; c=relaxed/simple;
-	bh=CbOwZWVt02pTmAdBvT2v/9JOm8DTA3cij2f8VlEdS/0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=niobQP+fzr28aLWtsiqZqBHE7ODtJDq9guBOD3FUuERkV2tMIhfzpxXBQIDCselZEOCGeBC9/mlUSuRqXdb9bZg9XyZDKcsycz2MnUMtJlBLhbqgMUOwQNKfy+lUdR8QREpVyLa2nhXZCD6t7hKC/KDLbQplTPYbfLgp4+YBdNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SSj1vj1c; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768357184;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UvgWx1kTHRPgiLXD8oKSH/+hs2Bj1hao3LoyD/Aq7ys=;
-	b=SSj1vj1cuT4sC5LRrQe1UUXcjsargeO3UaGr9CAgBHU74EONr+PesIqoOaJvk2s5WWRfSY
-	Lp8AhurYUq91ogApC+cy1hzl/Kx7O1I7AKVc2wphUN6TkUeliqQI4HwBl0pVLzEFhPsigX
-	L8/dohZA2p1N+koQFoXqAk1x3oQ7I4Y=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Menglong Dong <menglong8.dong@gmail.com>,
- Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net,
- martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- dsahern@kernel.org, tglx@linutronix.de, mingo@redhat.com,
- jiang.biao@linux.dev, bp@alien8.de, dave.hansen@linux.intel.com,
- x86@kernel.org, hpa@zytor.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject:
- Re: [PATCH bpf-next v9 03/11] bpf: change prototype of
- bpf_session_{cookie,is_return}
-Date: Wed, 14 Jan 2026 10:19:34 +0800
-Message-ID: <22969680.EfDdHjke4D@7940hx>
-In-Reply-To:
- <CAEf4BzYid4WaAkNLBegeN5FLiLTjZ1scToA-Sdpz3tqL6iE=Tw@mail.gmail.com>
-References:
- <20260110141115.537055-1-dongml2@chinatelecom.cn>
- <20260110141115.537055-4-dongml2@chinatelecom.cn>
- <CAEf4BzYid4WaAkNLBegeN5FLiLTjZ1scToA-Sdpz3tqL6iE=Tw@mail.gmail.com>
+	s=arc-20240116; t=1768357442; c=relaxed/simple;
+	bh=EInKEyER/0G089jyq3knL1VkRB5cwyxxObwgPXmL5No=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nGML/R8kFjl4oopcyyACq1KJn8iL71Qq7dDDOYHmDwbaUXULSc5MLyjSV5sB6M275o6z4AVR+wUE+wMrkqy1oLPm4uHt3HqHoQ4W9L6PQznViheCLfDerxOBOTl2+Rv1IGzJLGvvdH6w3GngmL18j9zs+ujeu4xpWbPFIVrYDro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TfSXZpoN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C56E8C116C6;
+	Wed, 14 Jan 2026 02:24:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768357442;
+	bh=EInKEyER/0G089jyq3knL1VkRB5cwyxxObwgPXmL5No=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TfSXZpoN99f/bDBTdixQ/EUyg8MQQ3TFU5ZifGXAVYFGHmmAPefoSSM6ijbQj3qE8
+	 kOQpvycOcIp00mz69Bbut8ectlIM1eSPO1eft9HpKwCXQLtLXlh30yOWP+lSWy3TIN
+	 SFVvmP0ci9407DYFJNzN92lBLev2cBbJqWQMcR/Od5cWuODmF6Du4Av7ZAP9KeVObg
+	 Vtfhqk7YRpOBY5bqAHax0UFZLgCrE0yrA/r0/llljry8gv6JZxIXEwQTCil5+XD1Ts
+	 kmxMqooVt4vDnvYk9SuStCqd2I+snqNPYjOhKPw3US80rxshvrv4FRbtvrNJSOQsQf
+	 KXSoaX1Juae4A==
+Date: Tue, 13 Jan 2026 18:24:00 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Wenger Jeremie (EDU)" <jeremie.wenger@edu.ge.ch>,
+ intel-wired-lan@lists.osuosl.org
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Przemek
+ Kitszel <przemyslaw.kitszel@intel.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>
+Subject: Re: [REGRESSION] e1000e: RX stops after link down/up on Intel
+ 8086:550a since v6.12.43 (fixed by suspend/resume)
+Message-ID: <20260113182400.723e34a1@kernel.org>
+In-Reply-To: <01412a4684684995ac35b4d6dba75853@edu.ge.ch>
+References: <c8bd43a3053047dba7999102920d37c9@edu.ge.ch>
+	<01412a4684684995ac35b4d6dba75853@edu.ge.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Migadu-Flow: FLOW_OUT
 
-On 2026/1/14 09:22 Andrii Nakryiko <andrii.nakryiko@gmail.com> write:
-> On Sat, Jan 10, 2026 at 6:12=E2=80=AFAM Menglong Dong <menglong8.dong@gma=
-il.com> wrote:
-> >
-> > Add the function argument of "void *ctx" to bpf_session_cookie() and
-> > bpf_session_is_return(), which is a preparation of the next patch.
-> >
-> > The two kfunc is seldom used now, so it will not introduce much effect
-> > to change their function prototype.
-> >
-> > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> > ---
-> >  kernel/trace/bpf_trace.c                             |  4 ++--
-> >  tools/testing/selftests/bpf/bpf_kfuncs.h             |  4 ++--
-> >  .../bpf/progs/kprobe_multi_session_cookie.c          | 12 ++++++------
-> >  .../selftests/bpf/progs/uprobe_multi_session.c       |  4 ++--
-> >  .../bpf/progs/uprobe_multi_session_cookie.c          | 12 ++++++------
-> >  .../bpf/progs/uprobe_multi_session_recursive.c       |  8 ++++----
-> >  6 files changed, 22 insertions(+), 22 deletions(-)
-> >
->=20
-> LGTM, let's do it
->=20
-> Acked-by: Andrii Nakryiko <andrii@kernel.org>
->=20
-> > diff --git a/kernel/trace/bpf_trace.c b/kernel/trace/bpf_trace.c
-> > index 5f621f0403f8..297dcafb2c55 100644
-> > --- a/kernel/trace/bpf_trace.c
-> > +++ b/kernel/trace/bpf_trace.c
-> > @@ -3316,7 +3316,7 @@ static u64 bpf_uprobe_multi_entry_ip(struct bpf_r=
-un_ctx *ctx)
-> >
-> >  __bpf_kfunc_start_defs();
-> >
-> > -__bpf_kfunc bool bpf_session_is_return(void)
-> > +__bpf_kfunc bool bpf_session_is_return(void *ctx)
-> >  {
-> >         struct bpf_session_run_ctx *session_ctx;
-> >
-> > @@ -3324,7 +3324,7 @@ __bpf_kfunc bool bpf_session_is_return(void)
-> >         return session_ctx->is_return;
-> >  }
-> >
-> > -__bpf_kfunc __u64 *bpf_session_cookie(void)
-> > +__bpf_kfunc __u64 *bpf_session_cookie(void *ctx)
-> >  {
-> >         struct bpf_session_run_ctx *session_ctx;
-> >
-> > diff --git a/tools/testing/selftests/bpf/bpf_kfuncs.h b/tools/testing/s=
-elftests/bpf/bpf_kfuncs.h
-> > index e0189254bb6e..dc495cb4c22e 100644
-> > --- a/tools/testing/selftests/bpf/bpf_kfuncs.h
-> > +++ b/tools/testing/selftests/bpf/bpf_kfuncs.h
-> > @@ -79,8 +79,8 @@ extern int bpf_verify_pkcs7_signature(struct bpf_dynp=
-tr *data_ptr,
-> >                                       struct bpf_dynptr *sig_ptr,
-> >                                       struct bpf_key *trusted_keyring) =
-__ksym;
-> >
-> > -extern bool bpf_session_is_return(void) __ksym __weak;
-> > -extern __u64 *bpf_session_cookie(void) __ksym __weak;
-> > +extern bool bpf_session_is_return(void *ctx) __ksym __weak;
-> > +extern __u64 *bpf_session_cookie(void *ctx) __ksym __weak;
-> >
->=20
-> (and actually drop these, vmlinux.h will have them)
+Thanks for the report, I'm adding the relevant people to CC now.
+Please try to consult the MAINTAINERS file next time 'cause networking
+is a bit too big for the right people to always notice reports.
 
-OK, I'll drop these in the next version.
+My best guess below..
 
+On Fri, 9 Jan 2026 09:40:34 +0000 Wenger Jeremie (EDU) wrote:
+> Hello,
 >=20
-> >  struct dentry;
-> >  /* Description
+> I would like to report a regression in the e1000e driver affecting an Int=
+el=C2=A0integrated Ethernet controller.
 >=20
-> [...]
+> Hardware:
+> Intel Ethernet controller  [8086:550a]
+> Driver: e1000e
 >=20
+> Summary:
+> - RX stops working after an Ethernet link down/up (unplug/replug cable).
+> - TX still works. A system suspend/resume reliably restores RX.
+>=20
+> Regression range:
+> - Working: v6.12.22
+> - Broken: v6.12.43 .. v6.18.3 (tested on Debian 12 backports, Debian 13,=
+=C2=A0Debian sid). v6.18.3 is the most recent kernel tested so far, so the=
+=C2=A0regression is likely still present in newer kernels.
 
+Judging by the range seems like it has to be efaaf344bc2917cb
+Would you be able to try building a kernel with that commit reverted?
 
-
-
+> Symptoms:
+> - Link is detected (1Gbps, full duplex).
+> - DHCP DISCOVER frames are transmitted (confirmed via external packet cap=
+ture).
+> - No packets are received (no DHCP OFFER, RX appears dead).
+> - Booting with the cable plugged works.
+> - The issue is triggered only after unplugging and replugging the cable.
+> - A suspend/resume cycle restores RX immediately.
+> - Using a USB Ethernet adapter (r8152) on the same network works correctl=
+y.
+> =20
+> Reproduction steps:
+> - Boot with Ethernet cable plugged.
+> - Verify network connectivity works.
+> - Unplug the Ethernet cable.
+> - Plug the Ethernet cable back in.
+> - Observe that RX no longer works (no DHCP OFFER).
+> - Suspend/resume the system =E2=86=92 RX works again.
+> =20
+> This suggests that the PHY or RX path is not correctly reinitialized on=
+=C2=A0link up after a link down event, while the resume path performs a mor=
+e=C2=A0complete reset.
+>=20
+> I can provide additional logs, ethtool statistics, or test patches if nee=
+ded.
+>=20
+>=20
+> Best regards,
+>=20
+> J=C3=A9r=C3=A9mie Wenger
 
