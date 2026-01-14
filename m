@@ -1,266 +1,186 @@
-Return-Path: <netdev+bounces-249787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 346D2D1DEDF
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 11:16:38 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EE93D1DFF4
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 11:23:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9C2A0304ED9D
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 10:10:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2A641300D931
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 10:12:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 194E3393404;
-	Wed, 14 Jan 2026 10:08:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFBDA38A9D5;
+	Wed, 14 Jan 2026 10:09:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h15BPRSu";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="eBiEnuB6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ak+wGUxR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 429BD38B7C0
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 10:08:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C5C38F953
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 10:09:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768385293; cv=none; b=JnUhj6i3SBFVCnbt6pFLwCjxicar7Nf7sSXqMufrpG/aH51dOhhBKMqhkfqexMVZzw9M/pS7VsjDJh9OBn28QvFdn/X1tudpJcAn2oYwCNrk0JjcpArYHPvV9B+2SAcDZEGFfuasQ1QybTg5+exhRtwy7VQ+CiGX9m2ED/952tY=
+	t=1768385393; cv=none; b=CNnUhPYb76WSwixn6iAysc79uepkIVRJr6N6ok1VBU2aV8DV0qqYmrJW7qaDUZ6XeywuM8TCpRZOTzsXfDo9lWJLSr+80WbbTvnL9+kkEt6wrZ2/69AY+nsRd+ZT/rWQq3M+LSx2HZtpHwVMTrcXcwfev1QL5luvnM5T1w9i7tg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768385293; c=relaxed/simple;
-	bh=R34QuFzq0RM2B+MUSlKhuKjAZtk77eiyestyrQbTikI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nu0HtuuvihBqH7UaflRC3ASVr2QzzJVdgc5Ui2xPTpOCWMVFio3cy3GZafRlCnGJsuVyX8VUDy4WQz4DWgJGV5TJ7Ot29QlnjUPNoXZ4dRHqhYBJuN5oo11aE+wiM5Ymd0t8uX4pC1XrJ5UihPFYb7kEJyIZ1X5vw3b7xYUfhj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h15BPRSu; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=eBiEnuB6; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768385290;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gLVLJe5ZoPPurYSTDDy8POZ2YmIqBUOxjilC1ypOvdA=;
-	b=h15BPRSubujaR26aC/lP+rzsIrhqQJYCXKboOoo+Rfb7x7l9XqDwgmZVtxi270nUGQewRu
-	qe1hY41liDpyXXNJT5DLg9S0GdTABttqZbFZPTBeG75vJMf3DIm6y9He4pRqzwYNY/NZsG
-	N0rnnGLbhFGfTjdxzLU/z7WMbcj3d6k=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-338-7RL_xKtlM22tha1_F_6Kmg-1; Wed, 14 Jan 2026 05:08:08 -0500
-X-MC-Unique: 7RL_xKtlM22tha1_F_6Kmg-1
-X-Mimecast-MFC-AGG-ID: 7RL_xKtlM22tha1_F_6Kmg_1768385287
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b844098869cso922474266b.2
-        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 02:08:08 -0800 (PST)
+	s=arc-20240116; t=1768385393; c=relaxed/simple;
+	bh=lglvua4EVlJZWWN+umJtgEFU1k93wWFTZGM2L08B1rA=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gKTw5LaEvoK89kz+yMlEJBg0/fdnAOGAfk7ZocidsK5Kuf7BumNnNwSkZC6AE7es1sGWVBdb1bkN5N6oxVMtn37vJjvukjn1ZzwZgt8RFhrM6TYa9HIQuIdyPlgAy7vCoRzGWidsaKAtz7IQRq05M9hT/lO8hWE4B7x8ksn8NQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ak+wGUxR; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-47774d3536dso6274085e9.0
+        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 02:09:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768385287; x=1768990087; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gLVLJe5ZoPPurYSTDDy8POZ2YmIqBUOxjilC1ypOvdA=;
-        b=eBiEnuB66OPvOPhZxPaxxp7aC3QXE2up/Hs0Vq+K/u3RS8FSMGFlN1u4vZEiqlogQW
-         7TD+m+n84xHWqz946E3EIoatAHxZwf9RnGeAAKrApHly084t55zr+nTtvUxoOTvLLs0z
-         hTTfY9m9iqXMYgUTnvgxJbncpn9jju3OKaNL840XolDO4/EMzJt0bH5QMTdvsR5p+A2y
-         IwqYsCQ4AJqPY1hDo3EvLqngqHHXYHc//VFe+yYASrIfq8wgALyQlvSstzVhVecFA3mh
-         afEkR6tU0Pgusn3VWY1Hl4lorXqAEwbozwSawL55AaLNj8iWZ8HK1IIBqT4EyVIvZ/VB
-         OD3w==
+        d=gmail.com; s=20230601; t=1768385389; x=1768990189; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=uG9zT1M5JtL8PrqjGVTSA0LQwsZKFnwHyBL1SQPctlY=;
+        b=Ak+wGUxRtAMhANd9GD2S7fBDxd/S2LaWkgelddZYIOcheH4Lco/1lkQqE+GRs8h877
+         KhYkis0BsZMA8fmw1Coi8xNR5vy+OLeqWkY9FjgoB052ivNwaSqW5PI0O8/EBvN9KXRE
+         IpErG78OPJJf7l1vB3qcMVb+nS0PPeMymvB3nyRQKTPbWCNu4YUxL0MTFE2AkxqAsixl
+         l+TVo/CNqTVujHidMY1MBBF4//Gkusj/07pABU/SjDpso+YrYMjUEpQZS464gkdLt2D7
+         mrn9NBJUeYOR95UuK13EF7vVNfG+qgFRzlYpiu3mUYhv/zQp41mBspilEP34yQvDSXbQ
+         0VDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768385287; x=1768990087;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1768385389; x=1768990189;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gLVLJe5ZoPPurYSTDDy8POZ2YmIqBUOxjilC1ypOvdA=;
-        b=MoMm4IiUf2MDIQLN1obx9wkR511TNb5rO6yTptSAy3w8Kan9XOlwnWKm7evib5cTBz
-         k0vSRFEwOZG1OF89WtZQuBl83HF9qqyCwshLif3m5fP1P/UKbDVAznfJZlCJqhR2NFxY
-         vtFBaiXvHqAD/+oe+grJSE5gBCCDdUIPHgRQccWH8cKTNVKb7wpcntRcTp5hxGiHDZuk
-         vvWNXo8IoPLa6zSUq7Mp7ft2VEY/3Je14UWhvhVi/lRVkUupnN2/s/GGMokvEsOpm1yi
-         TMdES4VyrB2kadg+z8IzsgkRE9jsUDUyhkmDYuLC1X/eH6qvwgVkcLveMc+nuXL6UHj5
-         tVxA==
-X-Forwarded-Encrypted: i=1; AJvYcCWKmwMQNHUfDltYUWIULqgztuaQ5sUYfjn8MQ6S6zTIEww57NB5clN7fU0ny1C6A0jgr/NEGus=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzl4rr4qEknljOOoTDflIM/+CkRwKXFuMDrInQBK1DE4fOsspaC
-	Jfl/AOe2XjnxkiPg4dMNk7sNVGuZt+JdTexshxuA89QAlB5fq45g/J3g1Cw00lz3VspZziZS+LF
-	MDdpi2/89PcU1xfY+HqlMdjfOLtp6NWME+QDWnU0JA5PFaB23mzuYGg4Kcw==
-X-Gm-Gg: AY/fxX6nJMSHPcPr8LXAAjCRxVGjyENaRfK4O3Ji4uXek846aTer0B6VSW0MSrJle0u
-	fRJEp6hN08+Y6cIosIRyzuv7/B2eKe29NH4rwORsJNWQGCMIWrL3uXe4qU+dOqXR1trY0GjCa7z
-	3MZSvSH7qhqdyB40/vwzLPORAkoVy87QZS6x888lFmrCAfSiAnR/GAVWjE/H7Ltv9YcGyOjThMC
-	NwNeKkNACYDABBMtP6GE7kxz3otJlyz4q60y5G7yzsmdY/4ojSStJi07vMrzMJkEAQt9A3eAjXi
-	Ap/Ytsj+XEKP156wogmoLRxFSn46Bluwu2pZ7gDbX75g8o/FpZuva4ZDa4OFV/2QZIQDmAObXjc
-	tu3Y1wELg1siOxqoeXyuCbMSFAXWAVcle9ehVFnyNootr6dmP7qSCCdEZpHs4LA==
-X-Received: by 2002:a17:906:ef0a:b0:b87:b22:f5eb with SMTP id a640c23a62f3a-b87612a48d8mr180864066b.31.1768385286959;
-        Wed, 14 Jan 2026 02:08:06 -0800 (PST)
-X-Received: by 2002:a17:906:ef0a:b0:b87:b22:f5eb with SMTP id a640c23a62f3a-b87612a48d8mr180858766b.31.1768385286318;
-        Wed, 14 Jan 2026 02:08:06 -0800 (PST)
-Received: from sgarzare-redhat (host-87-12-25-233.business.telecomitalia.it. [87.12.25.233])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b871081b04bsm952619866b.53.2026.01.14.02.08.04
+        bh=uG9zT1M5JtL8PrqjGVTSA0LQwsZKFnwHyBL1SQPctlY=;
+        b=mX+Xln3t0wbUriICdbOuwQF7rkdykwGqgijImLzNAL5uAHpFestUHplaxZoKsfvVAl
+         oyd8JPOjtso6L7HJ5mnLEl4UumK9s/EWIX6jfE4YpJtcCDekWVHnsMeltWynSQQdMej6
+         tGnj9tquxfm4YiFmXQL/QCifH/XMoa71xL9lbuTQwIBlZeLBzT81lPIEEMBCTCxRcEne
+         UlR5rcMp4vQjL0Y+VQiFlzblU1E35jM1bjkZJX259A6FZ6KA4Zte7mNn51Ib9dm1WS02
+         uVfkdKboO2IgJpzU2a4EIk7DmYuTmKP+RtSGcGRc5vJ7fy52iVQJHZ9otT3TVjrj37Vg
+         8Fhg==
+X-Forwarded-Encrypted: i=1; AJvYcCWoJa8bCF5rKQ7M8wRrVpYWbJr0VAH1nTcrBZoioqDgxrwmF7vbrtAsI1saJEFd3x3fnrW7dxw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz07WvqKM+3Ti8ES5fdA9vG8L/A9uKjs3ZfUzSuke6ljdsbi9qA
+	gGz2nFBuYY0jIZ++OLwAJrHg7ZDXy2sQByhSifx7thAF7ONFfYc3O4pB
+X-Gm-Gg: AY/fxX7Ox6Rt/uXGFEmITkCdwbKiBxf3w74FbLJJ4O/qJYpZUaN3obVB/70c8JXMoGf
+	zZCX6JA1E2Mf+nXVu3MVc+ToWoHTVGrXIEfh/es0URPDuiKOEMg2yxBEBOZki8BBN7t6/lEjii4
+	MX//Gm73aeDfaWkLP9wObILBZiEipRqWcl/dO/QLtdtgJLxYmXT0NWYtH/mo5Ml0RJOWVXlW6Jx
+	U3Pn8BAQWRu5in0Gor+l7HLgob2azPv/rC47ZCYs8noxdkSOfpG+/QHS3FKhkgvXhDw0MwzCMbn
+	W8tda6z6K3ONXYG8QIn2VJMT+NFSbJpqZ3RT2v0qY44wFzMnHGMwYyXCNSOzplCOk6AUwT7GF2E
+	uGPlNZBVuIddFHjcqZyQKsn3yyEgDCdpX+zzNDp6tP/+9o0+opxIMGhftgbctSoNsnh2VdYaIi4
+	xkLh11IB0K1UvU5epyNp8gwn8dA/FHYPS6emLH9ak=
+X-Received: by 2002:a05:600c:3d96:b0:46e:59bd:f7e2 with SMTP id 5b1f17b1804b1-47ee37a442fmr23416685e9.11.1768385388706;
+        Wed, 14 Jan 2026 02:09:48 -0800 (PST)
+Received: from Ansuel-XPS. (93-34-88-81.ip49.fastwebnet.it. [93.34.88.81])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47ee27d9aaesm17665225e9.3.2026.01.14.02.09.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jan 2026 02:08:05 -0800 (PST)
-Date: Wed, 14 Jan 2026 11:07:53 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Arseniy Krasnov <avkrasnov@salutedevices.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2 2/2] vsock/test: Add test for a linear and
- non-linear skb getting coalesced
-Message-ID: <aWdq75AQZv50CMPQ@sgarzare-redhat>
-References: <20260113-vsock-recv-coalescence-v2-0-552b17837cf4@rbox.co>
- <20260113-vsock-recv-coalescence-v2-2-552b17837cf4@rbox.co>
+        Wed, 14 Jan 2026 02:09:48 -0800 (PST)
+Message-ID: <69676b6c.050a0220.5afb9.88e4@mx.google.com>
+X-Google-Original-Message-ID: <aWdraCzEqwc4D_1x@Ansuel-XPS.>
+Date: Wed, 14 Jan 2026 11:09:44 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: airoha: npu: Add
+ EN7581-7996 support
+References: <20260113-airoha-npu-firmware-name-v2-0-28cb3d230206@kernel.org>
+ <20260113-airoha-npu-firmware-name-v2-1-28cb3d230206@kernel.org>
+ <20260114-heretic-optimal-seahorse-bb094d@quoll>
+ <aWdbWN6HS0fRqeDk@lore-desk>
+ <75f9d8c9-20a9-4b7e-a41c-8a17c8288550@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260113-vsock-recv-coalescence-v2-2-552b17837cf4@rbox.co>
+In-Reply-To: <75f9d8c9-20a9-4b7e-a41c-8a17c8288550@kernel.org>
 
-On Tue, Jan 13, 2026 at 04:08:19PM +0100, Michal Luczaj wrote:
->Loopback transport can mangle data in rx queue when a linear skb is
->followed by a small MSG_ZEROCOPY packet.
->
->To exercise the logic, send out two packets: a weirdly sized one (to ensure
->some spare tail room in the skb) and a zerocopy one that's small enough to
->fit in the spare room of its predecessor. Then, wait for both to land in
->the rx queue, and check the data received. Faulty packets merger manifests
->itself by corrupting payload of the later packet.
->
->Signed-off-by: Michal Luczaj <mhal@rbox.co>
->---
-> tools/testing/vsock/vsock_test.c          |  5 +++
-> tools/testing/vsock/vsock_test_zerocopy.c | 74 +++++++++++++++++++++++++++++++
-> tools/testing/vsock/vsock_test_zerocopy.h |  3 ++
-> 3 files changed, 82 insertions(+)
-
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
->
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index bbe3723babdc..27e39354499a 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -2403,6 +2403,11 @@ static struct test_case test_cases[] = {
-> 		.run_client = test_stream_accepted_setsockopt_client,
-> 		.run_server = test_stream_accepted_setsockopt_server,
-> 	},
->+	{
->+		.name = "SOCK_STREAM virtio MSG_ZEROCOPY coalescence corruption",
->+		.run_client = test_stream_msgzcopy_mangle_client,
->+		.run_server = test_stream_msgzcopy_mangle_server,
->+	},
-> 	{},
-> };
->
->diff --git a/tools/testing/vsock/vsock_test_zerocopy.c b/tools/testing/vsock/vsock_test_zerocopy.c
->index 9d9a6cb9614a..a31ddfc1cd0c 100644
->--- a/tools/testing/vsock/vsock_test_zerocopy.c
->+++ b/tools/testing/vsock/vsock_test_zerocopy.c
->@@ -9,14 +9,18 @@
-> #include <stdio.h>
-> #include <stdlib.h>
-> #include <string.h>
->+#include <sys/ioctl.h>
-> #include <sys/mman.h>
-> #include <unistd.h>
-> #include <poll.h>
-> #include <linux/errqueue.h>
-> #include <linux/kernel.h>
->+#include <linux/sockios.h>
->+#include <linux/time64.h>
-> #include <errno.h>
->
-> #include "control.h"
->+#include "timeout.h"
-> #include "vsock_test_zerocopy.h"
-> #include "msg_zerocopy_common.h"
->
->@@ -356,3 +360,73 @@ void test_stream_msgzcopy_empty_errq_server(const struct test_opts *opts)
-> 	control_expectln("DONE");
-> 	close(fd);
-> }
->+
->+#define GOOD_COPY_LEN	128	/* net/vmw_vsock/virtio_transport_common.c */
->+
->+void test_stream_msgzcopy_mangle_client(const struct test_opts *opts)
->+{
->+	char sbuf1[PAGE_SIZE + 1], sbuf2[GOOD_COPY_LEN];
->+	unsigned long hash;
->+	struct pollfd fds;
->+	int fd, i;
->+
->+	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
->+	if (fd < 0) {
->+		perror("connect");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	enable_so_zerocopy_check(fd);
->+
->+	memset(sbuf1, 'x', sizeof(sbuf1));
->+	send_buf(fd, sbuf1, sizeof(sbuf1), 0, sizeof(sbuf1));
->+
->+	for (i = 0; i < sizeof(sbuf2); i++)
->+		sbuf2[i] = rand() & 0xff;
->+
->+	send_buf(fd, sbuf2, sizeof(sbuf2), MSG_ZEROCOPY, sizeof(sbuf2));
->+
->+	hash = hash_djb2(sbuf2, sizeof(sbuf2));
->+	control_writeulong(hash);
->+
->+	fds.fd = fd;
->+	fds.events = 0;
->+
->+	if (poll(&fds, 1, TIMEOUT * MSEC_PER_SEC) != 1 ||
->+	    !(fds.revents & POLLERR)) {
->+		perror("poll");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	close(fd);
->+}
->+
->+void test_stream_msgzcopy_mangle_server(const struct test_opts *opts)
->+{
->+	unsigned long local_hash, remote_hash;
->+	char rbuf[PAGE_SIZE + 1];
->+	int fd;
->+
->+	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
->+	if (fd < 0) {
->+		perror("accept");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	/* Wait, don't race the (buggy) skbs coalescence. */
->+	vsock_ioctl_int(fd, SIOCINQ, PAGE_SIZE + 1 + GOOD_COPY_LEN);
->+
->+	/* Discard the first packet. */
->+	recv_buf(fd, rbuf, PAGE_SIZE + 1, 0, PAGE_SIZE + 1);
->+
->+	recv_buf(fd, rbuf, GOOD_COPY_LEN, 0, GOOD_COPY_LEN);
->+	remote_hash = control_readulong();
->+	local_hash = hash_djb2(rbuf, GOOD_COPY_LEN);
->+
->+	if (local_hash != remote_hash) {
->+		fprintf(stderr, "Data received corrupted\n");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	close(fd);
->+}
->diff --git a/tools/testing/vsock/vsock_test_zerocopy.h b/tools/testing/vsock/vsock_test_zerocopy.h
->index 3ef2579e024d..d46c91a69f16 100644
->--- a/tools/testing/vsock/vsock_test_zerocopy.h
->+++ b/tools/testing/vsock/vsock_test_zerocopy.h
->@@ -12,4 +12,7 @@ void test_seqpacket_msgzcopy_server(const struct test_opts *opts);
-> void test_stream_msgzcopy_empty_errq_client(const struct test_opts *opts);
-> void test_stream_msgzcopy_empty_errq_server(const struct test_opts *opts);
->
->+void test_stream_msgzcopy_mangle_client(const struct test_opts *opts);
->+void test_stream_msgzcopy_mangle_server(const struct test_opts *opts);
->+
-> #endif /* VSOCK_TEST_ZEROCOPY_H */
->
->-- 
->2.52.0
+On Wed, Jan 14, 2026 at 10:26:33AM +0100, Krzysztof Kozlowski wrote:
+> On 14/01/2026 10:01, Lorenzo Bianconi wrote:
+> >> On Tue, Jan 13, 2026 at 09:20:27AM +0100, Lorenzo Bianconi wrote:
+> >>> Introduce en7581-npu-7996 compatible string in order to enable MT76 NPU
+> >>> offloading for MT7996 (Eagle) chipset since it requires different
+> >>> binaries with respect to the ones used for MT7992 on the EN7581 SoC.
+> >>>
+> >>> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> >>> ---
+> >>>  Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml | 1 +
+> >>>  1 file changed, 1 insertion(+)
+> >>>
+> >>> diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml b/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml
+> >>> index 59c57f58116b568092446e6cfb7b6bd3f4f47b82..96b2525527c14f60754885c1362b9603349a6353 100644
+> >>> --- a/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml
+> >>> +++ b/Documentation/devicetree/bindings/net/airoha,en7581-npu.yaml
+> >>> @@ -18,6 +18,7 @@ properties:
+> >>>    compatible:
+> >>>      enum:
+> >>>        - airoha,en7581-npu
+> >>> +      - airoha,en7581-npu-7996
+> >>
+> >> This does not warrant new compatible. There is some misunderstanding and
+> >> previous discussion asked you to use proper compatible, not invent fake
+> >> one for non-existing hardware.  Either you have en7996-npu or
+> >> en7581-npu. Not some mixture.
+> > 
+> > Hi Krzysztof,
+> > 
+> > We need to specify which fw binaries the airoha NPU module should load
+> > according to the MT76 WiFi chipset is running on the board (since the NPU
+> > firmware images are not the same for all the different WiFi chipsets).
+> > We have two possible combinations:
+> > - EN7581 NPU + MT7996 (Eagle)
+> > - EN7581 NPU + MT7992 (Kite)
+> > 
+> > Please note the airoha NPU module is always the same (this is why is just
+> > added the -7996 suffix in the compatible string). IIUC you are suggesting
+> > to use the 'airoha,en7996-npu' compatible string, right?
+> 
+> No. I am suggesting you need to describe here the hardware. You said
+> this EN7581 NPU, so this is the only compatible you get, unless (which
+> is not explained anywhere here) that's part of MT799x soc, but then you
+> miss that compatible. Really, standard compatible rules apply - so
+> either this is SoC element/component or dedicated chip.
+> 
 >
 
+Hi Krzysztof,
+
+just noticing this conversation and I think there is some confusion
+here.
+
+The HW is the following:
+
+AN/EN7581 SoC that have embedded this NPU (a network coprocessor) that
+require a dedicated firmware blob to be loaded to work.
+
+Then the SoC can have various WiFi card connected to the PCIe slot.
+
+For the WiFi card MT7996 (Eagle) and the WiFi card MT7992 (Kite) the NPU
+can also offload the WiFi traffic.
+
+A dedicated firmware blob for the NPU is needed to support the specific
+WiFi card.
+
+This is why v1 proposed the implementation with the firmware-names
+property.
+
+v2 introduce the compatible but I feel that doesn't strictly describe
+the hardware as the NPU isn't specific to the WiFi card but just the
+firmware blob.
+
+
+I still feel v1 with firmware-names should be the correct candidate to
+handle this.
+
+Hope now the HW setup is more clear.
+
+-- 
+	Ansuel
 
