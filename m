@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-249767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BADD1D1D737
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 10:17:42 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50C63D1D6D4
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 10:14:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E273430D977F
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 09:06:50 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 017723002531
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 09:13:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9328738736E;
-	Wed, 14 Jan 2026 09:06:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0C1538737F;
+	Wed, 14 Jan 2026 09:13:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="c0YTSUSH"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="a7QohZog"
 X-Original-To: netdev@vger.kernel.org
 Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B25337BE98;
-	Wed, 14 Jan 2026 09:06:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B44FF36C0BC;
+	Wed, 14 Jan 2026 09:13:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768381609; cv=none; b=Xn1gDDG1MReCzTf09C7Ncab5XljPzQ6mzGBFozNvAncGEurKHxzYSzs3JdCKOrW80JVjMlXxUGU0HOQ6dvVpUVEwTlm0KeVezZJ9hHh1KCzvg2kiaLJw0qfB5hulSnb9dKNpp1IPTh1w0C9I0KiFyy9Ot7UnOUwV9r1oAz14xtw=
+	t=1768381992; cv=none; b=ed9HTk59W6fGLExcQZi0hX4iEBxeO1UFmMAtZMfhxw7a9zw7Pk7rU+aim/X5PXgsOnjoc4/mGJtng3bWkPsk3sqNKmm3CUav/Pj54lJhtWgr4f0ty7YqIMj2mOM5ATlWvKf+XFdIOhwB0cc6vUT6Tw9nDaGUbxXhd2WRscrb1GA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768381609; c=relaxed/simple;
-	bh=DD4FRe13qzGcMMeQdQAaMdobRTMboKZxpDRC40oYCTM=;
+	s=arc-20240116; t=1768381992; c=relaxed/simple;
+	bh=DKRt2xewcoFprYqjFM8zwAQwfz3p+YwHvSsuG8tU+sc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bQUoVUgCcSjufovN3XamnFK5yYMzrZakf98e1isvkwGBxs/ERIWmLWR1t0sxVWjGYj0gHosdPjanGUSoS1kDzd1J3kyQfeweGTmMyA6N0fzHGy9urrpbhP5Cq6EA9eU1V89WY9hoUW1fdG1sQDyMuHzOVnLMkCvHH3vxP3eAzIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=c0YTSUSH; arc=none smtp.client-ip=115.124.30.112
+	 In-Reply-To:Content-Type; b=RF2dGGVjBIYm4eJHYZf/pM7Bsu9LgQPYQrzSZKfzInf7utL5dMwicc1wwCH9klcfmzyqqb18Nv5m7WizSsxvzIn0F8NDC/UlTLfk7hdSbtpGzyI4+gr4zoEp02j1Ixf1O2q2PvLYhelixlBWAXInyhjsY7VNksN6JnnBIlPgM7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=a7QohZog; arc=none smtp.client-ip=115.124.30.112
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1768381599; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=lpPs8J4lvw2Ek7cSAVnZxJCxYhLlmUj/WA28+x+Vssk=;
-	b=c0YTSUSHF+BdnxkAh3wkZd0PD/rL2qIKrJ6itLO4oSwim6u32vmPlZMnbEBLe1oKGysYna4uc5ubu4ar7xykT9/c7npp3IMw6BN3ut1iBiOyX+DyS/CLgoY3H4YQpTPOux/3TTmpXbUECEsT1VBmHazLC+btLQB6SDCTfUiWPiU=
-Received: from 30.221.145.108(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0Wx1sMOj_1768381596 cluster:ay36)
+	t=1768381987; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=XCBSysYrffz93weijRBx26v8jzyWfMtm5xKLzvHm/z0=;
+	b=a7QohZogu7NNkAoKnLQ+zqSklE2CV1ASTIOGdpw+VU8PcQDQcpM5C5bRujflR7A1d5Syf4x9K/IWsNelYliI2omVm+KWblK/WP9B8HkZ95TwrUga/+iZwGrZChgCsL/Snk4bQnueeh5wIusexENxG4LgwuMxOAi2Ixeuda9jBKg=
+Received: from 30.221.145.108(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0Wx1nFAy_1768381985 cluster:ay36)
           by smtp.aliyun-inc.com;
-          Wed, 14 Jan 2026 17:06:37 +0800
-Message-ID: <5f3bed2e-b174-4a89-9cde-5c43f9b93702@linux.alibaba.com>
-Date: Wed, 14 Jan 2026 17:06:35 +0800
+          Wed, 14 Jan 2026 17:13:05 +0800
+Message-ID: <b5a60753-85ed-4d61-a652-568393e0dff3@linux.alibaba.com>
+Date: Wed, 14 Jan 2026 17:13:04 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,75 +48,97 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [RFC] Defining a home/maintenance model for non-NIC PHC devices
  using the /dev/ptpX API
-To: David Woodhouse <dwmw2@infradead.org>,
- Thomas Gleixner <tglx@linutronix.de>,
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Andrew Lunn
+ <andrew@lunn.ch>, Sven Schnelle <svens@linux.ibm.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>,
  Richard Cochran <richardcochran@gmail.com>,
  "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Dust Li <dust.li@linux.alibaba.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ LKML <linux-kernel@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Dust Li <dust.li@linux.alibaba.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, David Woodhouse <dwmw2@infradead.org>,
  virtualization@lists.linux.dev, Nick Shi <nick.shi@broadcom.com>,
- Sven Schnelle <svens@linux.ibm.com>, Paolo Abeni <pabeni@redhat.com>,
- linux-clk@vger.kernel.org
+ Paolo Abeni <pabeni@redhat.com>, linux-clk@vger.kernel.org
 References: <0afe19db-9c7f-4228-9fc2-f7b34c4bc227@linux.alibaba.com>
- <c4090523151f1994438726686c3bc9e12c977670.camel@infradead.org>
+ <yt9decnv6qpc.fsf@linux.ibm.com>
+ <6a32849d-6c7b-4745-b7f0-762f1b541f3d@linux.dev>
+ <7be41f07-50ab-4363-8a53-dcdda63b9147@lunn.ch>
+ <87495044-59a3-49ed-b00c-01a7e9a23f6b@linux.dev>
 From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <c4090523151f1994438726686c3bc9e12c977670.camel@infradead.org>
+In-Reply-To: <87495044-59a3-49ed-b00c-01a7e9a23f6b@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 
 
-On 2026/1/12 16:04, David Woodhouse wrote:
+On 2026/1/12 22:52, Vadim Fedorenko wrote:
+> On 12/01/2026 13:24, Andrew Lunn wrote:
+>>>> drivers/ptp/core    - API as written above
+>>>> drivers/ptp/virtual - all PtP drivers somehow emulating a PtP clock
+>>>>                         (like the ptp_s390 driver)
+>>>> drivers/ptp/net     - all NIC related drivers.
+>>>>
+>>>
+>>>
+>>> Well, drivers/ptp/virtual is not really good, because some drivers are
+>>> for physical devices exporting PTP interface, but without NIC.
+>>
+>> If the lack of a NIC is the differentiating property:
+>>
+>>>> drivers/ptp/net     - all NIC related drivers.
+>>>> drivers/ptp/netless - all related drivers which are not associated to a NIC.
+>>
+>> Or
+>>
+>>>> drivers/ptp/emulating - all drivers emulating a PtP clock
 > 
-> Thanks for starting this discussion.
+> I would go with "emulating" then.
 > 
-> I agree that the existing 'pure' PHC drivers should keep the option of
-> presenting themselves as PTP devices to userspace. I would probably
-> have suggested moving them out of drivers/ptp/… to somewhere else under
-> drivers/ entirely, but that's bikeshedding.
-> 
+>>
+>>     Andrew
 
-Thanks for the feedback. The directory and naming will be improved.
+Thank you all for your suggestions.
 
-> I do think we have slightly different requirements for the pure PHCs
-> too though, particularly the virt-focused ones. It would be good if we
-> could set a guest's clock from them at startup, and the primary focus
-> of them is for calibrating the guest's CLOCK_REALTIME. Which means we
-> do actually care about consuming UTC offset and leap second information
-> from them, not just TAI.
-> 
+The drivers under drivers/ptp can be divided into (to my knowledge):
 
-Yes, we have slightly different requirements. The original motivation
-for Alibaba CIPU PTP clock was to provide usable PTP clocks for cloud
-services that require precise timing. Guest/VM time synchronization
-was not the primary target.
+1. Network/1588-oriented clocks, which allow the use of tools like
+    ptp4l to synchronize the local PHC with an external reference clock
+    (based on the network or other methods) via the 1588 protocol to
+    maintain accuracy. Examples include:
 
-However, I think the idea you mentioned is valuable for virtualization
-scenario, eliminating the need for a userspace daemon and directly
-calibrating the guest's CLOCK_REALTIME.
+    - ptp_dte
+    - ptp_qoriq
+    - ptp_ines
+    - ptp_pch
+    - ptp_idt82p33
+    - ptp_clockmatrix
+    - ptp_fc3
+    - ptp_mock (mock/testing)
+    - ptp_dfl_tod
+    - ptp_netc
+    - ptp_ocp (a special case which provides a grandmaster
+               clock for a PTP enabled network, generally
+               serves as the reference clock)
 
-> I'd also like microvms to be able to consume time directly, especially
-> from vmclock, without needing a full-blown NTP-capable userspace. I've
-> experimented with simulating 1PPS support to feed into the kernel's
-> timekeeping, although I don't think that's the best answer:
-> https://lore.kernel.org/all/87cb97d5a26d0f4909d2ba2545c4b43281109470.camel@infradead.org/
-> 
-> We could do with harmonising the workarounds for kvmclock too. I made
-> sure the vmclock driver reports its timestamp pairs in terms of either
-> CSID_X86_TSC or CSID_X86_KVM_CLK as appropriate, but ptp_kvm *only*
-> uses kvmclock (which is daft, since anyone who cares about accurate
-> time will be using tsc). I was thinking that interface of the pure PHC
-> drivers could be really simple, and our new infrastructure could
-> provide the ptp_clock_info glue, including the kvmclock conversion if
-> needed. And *also* hook them in for setting the clock at startup, and
-> even calibrating CLOCK_REALTIME.
+2. Platform/infrastructure/hypervisor-provided clocks. They don't
+    require calibration by ptp4l based on 1588 and reference clocks,
+    instead the underlay handle this. Users generally read the time.
+    They include:
 
-I expect the drivers covered by "pure PHC" will be diverse, covering
-a range of non-network/IEEE 1588-oriented implementations.
-PHC drivers for virtualization scenarios could be one subset. Further
-virtualization-specific optimizations can be considered as follow-up
-work with the virtualization and timekeeping experts.
+    - ptp_kvm
+    - ptp_vmclock
+    - ptp_vmw
+    - ptp_s390
+    - ptp_cipu (upstreaming)
+
+ From this perspective, I agree that "emulating" could be an appropriate
+name for the second ones.
+
+And I would like to further group the first ones to "1588", thus
+divide drivers/ptp to:
+
+- drivers/ptp/core
+- drivers/ptp/1588
+- drivers/ptp/emulating
 
 Regards.
 
