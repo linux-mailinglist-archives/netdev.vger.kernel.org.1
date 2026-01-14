@@ -1,49 +1,51 @@
-Return-Path: <netdev+bounces-249960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34E9CD21AEE
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 23:59:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D3A61D21AFD
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 23:59:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7495030388BD
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 22:57:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A7B3B30303B6
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 22:58:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD026350293;
-	Wed, 14 Jan 2026 22:57:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD3438F93F;
+	Wed, 14 Jan 2026 22:58:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="W2GEwpcF"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="krrboD/U"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E9E30BF6B
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 22:57:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CF1338F244;
+	Wed, 14 Jan 2026 22:57:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768431476; cv=none; b=gwf9oWt5AXFlR1xgpJHkN+mWyTdBIZtuEfx7u3+G2TPGIIykAyKgzMYDj1rEsjkkzkqUPvhFhApQ3xnGsAGKmw4o/D9cnk7SED3NY+6oIPQzBFnNHaCtumm3Zf1v93fBMQEMA9m6u8W91gwuwOhqydkZGdSzNEzhmZH3IVsjN4w=
+	t=1768431481; cv=none; b=YlHLWMuftkrt/vxFCMYObQqPRKM0cQzd+EHxF3OXwQ1hUHB323XQFy4cywnP32YPEj4u7tUFfAipip4pobLmgJ4ZWuo11LykvqXjBQnI8LS9xsevUzvAq+UWeN3E4Y7wckzoisQ8WSIJRK4uErcW6iIpAKb0u7j3ExYDEwjjrOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768431476; c=relaxed/simple;
-	bh=dRiwU05WXtoUOO2sLFeCNKsTvdpMMT11OuK+cN9JM9o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cX39Kd0m/l4fDxFdiKlQZzF9BR1YSjzaLnd1U+HBQSreI3YImYC0JAXxSk5WmD3MJOgzfPztFcHLOHaXs3zGluT/c9OCXxzYIBQJje/KdDDJWZoV1u3+TO1WTOWprXlTaqy50ZdOe/dgtKyJdr02iGd4+pxTCgqRo4gqWTeTC0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=W2GEwpcF; arc=none smtp.client-ip=185.171.202.116
+	s=arc-20240116; t=1768431481; c=relaxed/simple;
+	bh=vRRIhHFPxtzThZZQkWphkJSxIn6V0oCyMNSakYsx6Oo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=YpnsFLHx+XnBPZyXTZTL2hqyphM/cnybn+e27btIfx6ZfvXBQqRCR4bhYdcnLKYsH5gWOPPLaKdNHlZfBpjAumezrMnukciT3qD5dLIrgqJ/u3jdKEWuVAhOYT+A5/Xwx9kTq11hOJLB1uadovuuGLcLipzscCt/+H7Zcy/Z0W0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=krrboD/U; arc=none smtp.client-ip=185.246.84.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 9C89DC1F1D3;
-	Wed, 14 Jan 2026 22:57:21 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id B8F081A286C;
+	Wed, 14 Jan 2026 22:57:49 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 229E96074A;
-	Wed, 14 Jan 2026 22:57:48 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 6D0E910B68410;
-	Wed, 14 Jan 2026 23:57:41 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 8DF536074A;
+	Wed, 14 Jan 2026 22:57:49 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 63EBE10B68428;
+	Wed, 14 Jan 2026 23:57:47 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1768431467; h=from:subject:date:message-id:to:cc:mime-version:
-	 content-transfer-encoding; bh=VDfSbPYAg10o0+hHwcLXFBZaneLM220SZTxze+B/sFw=;
-	b=W2GEwpcFsWW0R60v2IFCuHLnSJXBmIgC+VFvq9WO4b/AIRYg8mfS496y5Syt3zlsITGn2R
-	dqNetWx1VYQV2PSiJE+6OuCJZjVV294YLQxodhhWdBfUcpQpjFV1qXxU5GIrxVr2s17fxU
-	sFH7OVTAZpMeOIvtG8dUTIVZShBOksSdeCiwmyF+NDWu8oYjPlnJf+O2exHuLrj2cZQEeD
-	A4JvtlB0YHa+nQKW438QcBQ9ZuE3HdlRRX/e1tkTbM2g9H+NGDd3epqRyydVll2kkmQ+FX
-	vWKRGPEA7aSOS8VYvNRb2I1xAQYAJwRUfGNDnbINGn/JmcrCRLD/pu9exj70dA==
+	t=1768431468; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=vGkT6kUPV4XCoAV2sMfIa4glGoO0PPY84FW31CL588M=;
+	b=krrboD/U0c0msIeHbPyU/Q1VZnhGftw7G9KU3HY/JcJtST9GXoGxRNrOrcXzdCz7XUKLnR
+	h7D7z9DnvM4IinXd9rf+5iGd9bPLHxw+oWEDuUiiAW0Hw6v+J7muWODIeSik+fCws6OI4V
+	6Ulegra5k2Xw4BrTPq2Um8ems14miJZPdxv52H6qD+POXiW9DWfEV/L6h4Nnxlsbe3JL7F
+	bPn2wEMvf+skrEK0jl7552pCvPWk9ikGZKOdWPG8RSkrGsTgiFX37zNfm16vG/1T9cwJk+
+	/f10LJVGwom20uhHJO6uPerckXZOMcArJLV/nu9nndvJqmpXYqUXfSvBbrtIJg==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -62,10 +64,12 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Romain Gantois <romain.gantois@bootlin.com>,
 	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
 	bcm-kernel-feedback-list@broadcom.com
-Subject: [PATCH net-next 0/6] net: sfp: Add support for SGMII to 100FX modules
-Date: Wed, 14 Jan 2026 23:57:22 +0100
-Message-ID: <20260114225731.811993-1-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next 1/6] net: sfp: Add support for SGMII to 100FX modules
+Date: Wed, 14 Jan 2026 23:57:23 +0100
+Message-ID: <20260114225731.811993-2-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20260114225731.811993-1-maxime.chevallier@bootlin.com>
+References: <20260114225731.811993-1-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,87 +79,70 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Last-TLS-Session-Version: TLSv1.3
 
-Hi everyone,
+There exist some SFP modules that rely on a built-in PHY (usually a
+Broadcom BCM5461) to output 100baseFX, using SGMII as the
+phy_interface.
 
-This series is an attempt to add support for _some_ SGMII to 100BaseFX
-SFP modules. Getting these to work was a bit challenging, and none of that
-could have been done without the precious help from Florian [1].
+This is relevant as there are devices that support SGMII and 1000BaseX,
+but not 100FX natively on their SFP cages.
 
-[1] : https://lore.kernel.org/netdev/20250624233922.45089b95@fedora.home/
+SGMII can be used to convey 100Mbps links with symbol repetition, but the
+serdes lane stays clocked at 1.25GHz. We therefore absolutely need a
+media-converter to adapt this to 100BaseFX, that runs at 125MHz.
 
-Thanks again :)
+What this means for the sfp-bus infrastructure is that we may have a PHY
+to probe when dealing with a 100FX (and possibly a 100LX) module, and if
+this PHY exist it will use SGMII.
 
-These modules are quite useful, as some MACs can output SGMII and 1000BaseX,
-but can't do 100BaseFX. Should anyone want to connect such a device to a
-100FX link-partner, they need to either use an external media-converter,
-or an SFP module that has a built-in PHY for that.
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+ drivers/net/phy/sfp-bus.c | 11 +++++++++++
+ drivers/net/phy/sfp.c     |  3 ++-
+ 2 files changed, 13 insertions(+), 1 deletion(-)
 
-SGMII can convey 100M link, but the clock speed stays at 1.25GHz. A
-100FX link is clocked at 125MHz, hence the media-converter in the
-middle.
-
-As this is something I had to get working, I got my hands on 4 such SFP
-modules :
-
- - A "Cisco-compatible" Prolabs module : "CISCO-PROLABS GLC-GE-100FX-C"
- - A "Generic" Prolabs module : "PROLABS SFP-GE-100FX-C"
- - A FS module : "FS SFP-GE-100FX"
- - A Phoenix Contact module : "PHOENIX CONTACT 2891081"
-
-Out of these, the 2 Prolabs and the FS module contain a Broadcom BCM5461
-PHY. Out-of-the-box, they don't work, but thanks to Florian's help I was
-able to get the Cisco-Prolabs and the FS one to work.
-
-I couldn't get the Generic Prolabs to work, even though the PHY is
-detected and accessible. As for the Phoenix Contact one, I don't know
-which PHY it contains, and I couldn't get anything out of it.
-
-This series therefore brings support for the "Cisco-compatible" Prolabs, and the
-FS one.
-
-Some oddities were discovered along the way. Some modules are missing
-the 100_fx bit in their EEPROM. Even stranger, trying to access the
-BCM5461 PHY with regular mdio-i2c accesses causes the PHY to freeze and
-get the i2c bus in an unrecoverable stuck state. However, accessing them
-in single-byte mdio-i2c accesses does work !
-
-Another thing that needed to be addressed is the SFP interface
-selection, that expected that 100FX modules would be using the
-PHY_INTERFACE_MODE_100BASEX mode. That's addressed by patch 2, and I'd
-really like some feedback from Russell there, I may be breaking things
-:(
-
-All in all, this series contains a lot of hacks, but for such peculiar
-modules one could expect that this wouldn't fit the current model.
-
-This was tested on 3 different MACs :
- - The KSZ9477's SGMII port (old version of xpcs)
- - The Macchiatobin's eth3 port (mvpp2 + Marvell PCS)
- - A Cyclone V Socfpga device (stmmac + Lynx PCS)
-
-Thank you,
-
-Maxime
-
-Maxime Chevallier (6):
-  net: sfp: Add support for SGMII to 100FX modules
-  net: phylink: Allow more interfaces in SFP interface selection
-  net: phy: Store module caps for PHYs embedded in SFP
-  net: phy: broadcom: Support SGMII to 100FX on BCM5461
-  net: mdio: mdio-i2c: Add single-byte C22 MDIO protocol
-  net: sfp: Add support for some BCM5461-based SGMII to 100FX modules
-
- drivers/net/mdio/mdio-i2c.c   | 12 +++--
- drivers/net/phy/broadcom.c    | 94 +++++++++++++++++++++++++++++++++++
- drivers/net/phy/phy-caps.h    |  5 ++
- drivers/net/phy/phy_caps.c    | 47 ++++++++++++++++++
- drivers/net/phy/phylink.c     | 24 +++------
- drivers/net/phy/sfp-bus.c     | 11 ++++
- drivers/net/phy/sfp.c         | 31 +++++++++++-
- include/linux/mdio/mdio-i2c.h |  1 +
- include/linux/phy.h           |  4 ++
- 9 files changed, 207 insertions(+), 22 deletions(-)
-
+diff --git a/drivers/net/phy/sfp-bus.c b/drivers/net/phy/sfp-bus.c
+index b945d75966d5..85c9f21af69b 100644
+--- a/drivers/net/phy/sfp-bus.c
++++ b/drivers/net/phy/sfp-bus.c
+@@ -105,6 +105,14 @@ static void sfp_module_parse_may_have_phy(struct sfp_bus *bus,
+ 		return;
+ 	}
+ 
++	/* Some 100M fiber modules have a PHY, acting as an SGMII to 100FX
++	 * media converter.
++	 */
++	if (id->base.e100_base_fx || id->base.e100_base_lx) {
++		bus->caps.may_have_phy = true;
++		return;
++	}
++
+ 	if (id->base.phys_id != SFF8024_ID_DWDM_SFP) {
+ 		switch (id->base.extended_cc) {
+ 		case SFF8024_ECC_10GBASE_T_SFI:
+@@ -188,6 +196,9 @@ static void sfp_module_parse_support(struct sfp_bus *bus,
+ 	if (id->base.e100_base_fx || id->base.e100_base_lx) {
+ 		phylink_set(modes, 100baseFX_Full);
+ 		__set_bit(PHY_INTERFACE_MODE_100BASEX, interfaces);
++
++		/* SGMII to 100Base-FX modules with internal PHY */
++		__set_bit(PHY_INTERFACE_MODE_SGMII, interfaces);
+ 	}
+ 	if ((id->base.e_base_px || id->base.e_base_bx10) && br_nom == 100) {
+ 		phylink_set(modes, 100baseFX_Full);
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index 84bef5099dda..5b42af1cf6aa 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -2446,7 +2446,8 @@ static int sfp_sm_mod_probe(struct sfp *sfp, bool report)
+ 	    sfp->id.base.extended_cc == SFF8024_ECC_5GBASE_T ||
+ 	    sfp->id.base.extended_cc == SFF8024_ECC_2_5GBASE_T)
+ 		sfp->mdio_protocol = MDIO_I2C_C45;
+-	else if (sfp->id.base.e1000_base_t)
++	else if (sfp->id.base.e1000_base_t || sfp->id.base.e100_base_fx ||
++		 sfp->id.base.e100_base_lx)
+ 		sfp->mdio_protocol = MDIO_I2C_MARVELL_C22;
+ 	else
+ 		sfp->mdio_protocol = MDIO_I2C_NONE;
 -- 
 2.49.0
 
