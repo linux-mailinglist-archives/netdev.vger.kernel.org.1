@@ -1,70 +1,94 @@
-Return-Path: <netdev+bounces-249664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4ACEBD1BFAC
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 02:44:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21E04D1BFF4
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 02:53:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 101493006733
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 01:44:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 43242301E174
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 01:53:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0D2A2E9749;
-	Wed, 14 Jan 2026 01:44:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64F842EE5F5;
+	Wed, 14 Jan 2026 01:53:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gvBYNROQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iMjPHHOr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEDD32E8B74
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 01:44:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4054B20DD72;
+	Wed, 14 Jan 2026 01:53:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768355058; cv=none; b=iMTOKgHQAACKcaHg1HC/lwS4MuWF8lRXH9pxy5xUKZhz2DnbXVT0O07lZWEjbbBVrHEA2IM1AGm7jRyHw4RpLaNwrXJCe45+pCzTwFfbDRIpen6epIGBcdAenkx3SOvk9evXQLcpzrHpnlDr92ccebkq7PpBQftUvwla2MGBEB4=
+	t=1768355617; cv=none; b=nCKV96azgaDG58Sa2eC5I4K5Bjd/vr8Jp7Wl64Z+meN1Dsv4eab45+jSWOOyqwSfnAvRvkebS7CmqK71lqBdQmpnxCbbkP1zaQ/sSt60OeNywZaXLJ3c1+go0C9OYTgUeB00X9lFky3I0UiaqIO5jAqWtSlR89fRFKT162JO+Rs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768355058; c=relaxed/simple;
-	bh=mRMrVTLaOg8ePa3U3lrUGHHePSswyc5c9tAr7YjqQHY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F0X5j432LWwsU9XomwlkoCwgdvcAMkb+++15Pn7Oos6SZ7eusg7VEcp7KTI5WYacRF3LwU5rqDD+LNVK7oZhjNLTxGrNvtYIjyRXr4uUOqaSgN7phvgJriK8m2hd33IFQ5giB7SPCwA9CKnd6h5DDKuftxi9JuVP8blbWNCccxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gvBYNROQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0614AC19421;
-	Wed, 14 Jan 2026 01:44:17 +0000 (UTC)
+	s=arc-20240116; t=1768355617; c=relaxed/simple;
+	bh=tAioXXnB0EhJKHYUca62Zhwl2ZlhEDoiIYO6MG1gMq0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=GTteRhhLBFaov3+1bm3+Ywj9y9OchozgmVimbqejWYPoWYXBEFp+59RzPNvk8SEE+Zc/FB1gM+HgFUsch1hrTqF7e1B00eAJ9YxncC4YTcwAmgpG8BMudup3P25wZMM8xRPfW0ptDCJaGOeKEJQR0McCmU8l8aiNJ6QhJI56Hy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iMjPHHOr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D61BFC116C6;
+	Wed, 14 Jan 2026 01:53:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768355058;
-	bh=mRMrVTLaOg8ePa3U3lrUGHHePSswyc5c9tAr7YjqQHY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gvBYNROQ+tR1gRxtLni0s+aeRiFedPQgr4z9W5YSyAQ++VxcaWVq/2FQOB/snMiik
-	 s3aeQIwgd0xnDPdP9jsCEiEtUKR13UygJ5lcmazxD39ZMgkc9r2UuPF4/TkQav28YS
-	 0h/2ruEb+eQm5GEdo6Lpl+U99/Yf8RVIK0+XMlawJGJSS+H925hXscQSu2sBbhNhc2
-	 jzpcxb1mLyEP4TcwH4a/3MH5jVEBimkIAFKqnPh73jQIirs03uC0UOokT5GNYhcLvd
-	 HH116f98y7vhqGdkKvwzQPi/9q5qUJW16fQ3FzZS28enGklFVdYYOrb8MKa9/se1Az
-	 EhMzV6OEMHqVg==
-Date: Tue, 13 Jan 2026 17:44:17 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next] net: minor __alloc_skb() optimization
-Message-ID: <20260113174417.32b13cc1@kernel.org>
-In-Reply-To: <20260113131017.2310584-1-edumazet@google.com>
-References: <20260113131017.2310584-1-edumazet@google.com>
+	s=k20201202; t=1768355616;
+	bh=tAioXXnB0EhJKHYUca62Zhwl2ZlhEDoiIYO6MG1gMq0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=iMjPHHOr7zHdosUAL50Kf0xtHN19eu8jVCcQlJM1bjb8nL6wLepFSjHQyJlvSzwCs
+	 8UaGCp5kV233Qmt+W/aw5KoptDXiuBdIl2o7bfSDR86yYPJ1gwkUl0FShwH9A87Job
+	 pcigFdOnGwoOexf8tVXRRGyh1mYvSmgSCHrEtKLrM7O0DNL23mO08QuL27FOkddIG+
+	 NJDIz8WXLzxTFTcqd+/6yAxUAlkMkLIL+gQv+MVwAJpxHSzVM88km5QeazSk1aiGIh
+	 VP70SxDp7Yhj17dVmv4qmcM9FRth6R4Ah/IYr+rPHq2N1XHgxLo2TecYpm5QQIWUmR
+	 a9diaH/iDyL0A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B6E53808200;
+	Wed, 14 Jan 2026 01:50:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [pull-request] mlx5-next updates 2026-01-13
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176835541007.2550630.2698145120983484966.git-patchwork-notify@kernel.org>
+Date: Wed, 14 Jan 2026 01:50:10 +0000
+References: <1768299471-1603093-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1768299471-1603093-1-git-send-email-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
+ alazar@nvidia.com, ohartoov@nvidia.com
 
-On Tue, 13 Jan 2026 13:10:17 +0000 Eric Dumazet wrote:
-> We can directly call __finalize_skb_around()
-> instead of __build_skb_around() because @size is not zero.
+Hello:
 
-FWIW I've been tempted to delete the zero check from
-__build_skb_around() completely recently..
-It's been a few years since we added slab_build_skb()
-surely any buggy driver that's actually used would have
-already hit that WARN_ONCE() and gotten reported?
+This pull request was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 13 Jan 2026 12:17:51 +0200 you wrote:
+> Hi,
+> 
+> The following pull-request contains common mlx5 updates
+> for your *net-next* tree.
+> Please pull and let me know of any problem.
+> 
+> Regards,
+> Tariq
+> 
+> [...]
+
+Here is the summary with links:
+  - [pull-request] mlx5-next updates 2026-01-13
+    https://git.kernel.org/netdev/net-next/c/9d405911a577
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
