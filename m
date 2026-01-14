@@ -1,138 +1,113 @@
-Return-Path: <netdev+bounces-249739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AF7AD1CF97
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 08:58:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D897D1D08A
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 09:12:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 28D1E300287B
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 07:58:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EFBEF30D3449
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 08:04:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E281537BE85;
-	Wed, 14 Jan 2026 07:58:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C4D37E316;
+	Wed, 14 Jan 2026 08:03:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vY9AIg7Q"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FJq06CMr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA3C24A067
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 07:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5372437E318;
+	Wed, 14 Jan 2026 08:03:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768377517; cv=none; b=aJ1aX/KtXs6dY+jrhSwjSzoJCx1/L96aJafVtkY5PpQIvwz+H/TDoBTDVYFbMQ+me1MHMPoFLO31rSM3ZpuPQ4bTY0r33P4quFDPTPJ+wh8Wl9h5WmzJVomI54HD4MHzEppwkJnMfvUcEb51ghWs9+dwaQIVhJGx7sDYZA1CCZo=
+	t=1768377790; cv=none; b=nq5qKq4WQZIhWZEE3LTMojan8GXNvqqD/OMTlOsHbzX1dVKzxplmtflKjuq4o5R+IKK8N7nHlHI2aPgbnplPFP0OnD/7tYdV3BiKUXZpqNgDSql2uwQdHFxYVAfebbNFmqJDjoGxzOwpKXRGPSGmxNEVVYO9M3CbFKOtvXCpq/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768377517; c=relaxed/simple;
-	bh=ur/1N+8Pp5tlFhAdJOrSuu8hzNf52osfOEhoJK6COP4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y7B7/zBxM+lvNfwbDRuXa1N7gOdn2qsk9RE+7UnXtQJiJdwLBJqxJurEFYlFUC5bZEK341+D+HnxLaAuDmEMxvuXKnlu8lgdcvjfkmGMFyemIMvNQqEtvxifgVqX5bULlwaLPbA7DbmI8x+hK18yC9kRnCVTO2F85KsJ7CnCVlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vY9AIg7Q; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-50146483bf9so15185081cf.3
-        for <netdev@vger.kernel.org>; Tue, 13 Jan 2026 23:58:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768377513; x=1768982313; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KS0RgjKS4kK/13ZceFw0e8/jjccYR83h4CV62hyXWGQ=;
-        b=vY9AIg7QZfeBAkpDCAtFbHd4SHvImIU7QLcjFepkgM76TN93gPGGKvsKzoJ27+s0cU
-         Ocbnng6EulV/h2zwQDObd5hmKFVsgJ7fhnk9FXQkSMmFQWRbyePJcyivFpHrbc5y2I1J
-         0DWefCa0SLV+Mx1MFAdPbA3LqikqweV+On3PSuavjxMkLemoSXahNSECU3wtPbdDsw+h
-         pUtYiAe5zYDYpgIdW79MBseFVvtEcufFSeYv+nw/cBpQFioyEa3zB4T/uSKYJG1d+IXt
-         oPYXv/yoIRSmLyUZU0EYRDThRkGQD7L5TEb1zCeRPsJqJ4/SvgNnZ8nh2jVDuC0+X5Sk
-         j+Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768377513; x=1768982313;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=KS0RgjKS4kK/13ZceFw0e8/jjccYR83h4CV62hyXWGQ=;
-        b=c2RtTgxRTRG+AQ0GnJpvUuDJJ+YNb4Ho+J9pQaEMr1x06uCPh/ytMstxake1NYNkve
-         wYfLD7hknaXWp6wQMEfyhQZIemZDIf17+PamKlfhrAP0SacaOxGDjW/6b9CL5XFQo8sO
-         OZWYOE2AhC0+D0vUIlatd3kCtDy3MqQM44dmTaP0jq04wavbBpnyHxua3QbvqgoMkwLE
-         x2l2pTwsG5IxDnzN9npKNkMAU/EypqYadpppSxHyvMgIa7GnWeYoqNlXYA6VU1n4nla5
-         4dmjMp+TURzq+S+AzRqNeQ4LFunI+1hyTl6GlGnN5jL0tMZm1Zq7x24FcaOjfAPcf6SC
-         RYWg==
-X-Forwarded-Encrypted: i=1; AJvYcCXgZHrsisjk65APVggfbvSgaTFhZOQED1N1pYlHzW593e5u1zaASlreESwZhEleVJWCM9oBVrM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqtVYPftGzn028XDdqFCVakHhTkeIUodhAOZi+5WeOOK+semXj
-	Ok7NlyuwHFG3JPwaJUzZwmYjh5yRLB+xE034spJ0qujclVeq0ZJ2h4j7QZ+EDaWaWxoIdtotXWh
-	60h2xCFbe/Y0+bYdxbod0twbWbz00KH2/Fds0vclR
-X-Gm-Gg: AY/fxX6cKyq0/jMrfFANnu7jlM5WoxgMbcprKo1rHu00ibdnUyqICkPjFqszq2d2yJF
-	sV5BlvIJTqO9P3d6TJ93hynpDcs8qCrxL2LoQRW0+It7X10yfaq86GhMXifcADpjpw2uZNBHekj
-	2VVvdCwcmONAU6KJeyWTDEqPPdLCxkjvOJAPDgJFBvMebq7jjnf+gkkhpW+1AwotPkxzMpdmC9Q
-	1r3tASA9I3d5+YZu5Wmm9TKOi7l2A5ioqM4AivQ4D/RDK5r7B4BX2cucnPLAeTlwkpUYrUi
-X-Received: by 2002:a05:622a:4203:b0:4ed:df82:ca30 with SMTP id
- d75a77b69052e-501481e9360mr22469121cf.13.1768377513015; Tue, 13 Jan 2026
- 23:58:33 -0800 (PST)
+	s=arc-20240116; t=1768377790; c=relaxed/simple;
+	bh=3Cy75C8SwBJveuLRIllyUR4JqbxG2bTS5ghjcJHUvV8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jBN0r7lHrVXc3BQKjdYLA/nkTv4zNMmsj9OnHbXLKrblpsvypJnM6L38O+hCDaQFa+Z4jNvLwVk9hmM/9A+gJ1SU3hpYZCMtNHAH2pU3O+NwPN/brh2vAAQj8x7Ant1qcGr2zaa64snxCyhlH7PdGYhAjT2rnU/Fr4tZ15TuMZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FJq06CMr; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id DAB164E420CD;
+	Wed, 14 Jan 2026 08:03:04 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id AC76E6074A;
+	Wed, 14 Jan 2026 08:03:04 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B92AC103C82AE;
+	Wed, 14 Jan 2026 09:02:54 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1768377783; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=wccHyx90+77q+HvZP634VNgb7Z8yQVCGjbolkwO42fU=;
+	b=FJq06CMrGUsDp0A7dlUoJU+xfMq5DxDxyEC6GTwjQmZzHw3askRRyKuu1uzafbDGFiC2JC
+	rCnVtNMkayGQPuLM2ccJOsElIwo1a4A/HoXR60cJjMvd1sFYM01l9lTnRQDla6Bp4kPMTN
+	f/9YhGRCIB0PjRjOMvr4c8X1qTR6E7DIpJmQGipvjmtR5FRbmG0ZuWbRtjdDLjQ8+J4tGJ
+	tEdWoTq8MjhyRKNF3PsFvZG/Zq42qwyW3AVmPxRnmktiNIod/j4Id5Pw3t7sS3KII/f/6n
+	FKaNMORzYf6o673G1wWB5+zeehxBs9l67sSNcACddVYTdP6GTd6AK2RlXYBd0Q==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pei Xiao <xiaopei01@kylinos.cn>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Russell King <linux@armlinux.org.uk>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH net v2] net: freescale: ucc_geth: Return early when TBI PHY can't be found
+Date: Wed, 14 Jan 2026 09:02:46 +0100
+Message-ID: <20260114080247.366252-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260113143157.2581680-1-toke@redhat.com>
-In-Reply-To: <20260113143157.2581680-1-toke@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 14 Jan 2026 08:58:22 +0100
-X-Gm-Features: AZwV_QgnLNgfxSc_QYvpFJdNGcLOfkKl5TVYTVho5qgGdKMeOVvQUnotTW6I4yw
-Message-ID: <CANn89iLdM=a=oagYA=LKbfaDuhQaYtxA0wNERuzNLGghA58Phw@mail.gmail.com>
-Subject: Re: [PATCH net-next] net/sched: cake: avoid separate allocation of
- struct cake_sched_config
-To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Cc: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@toke.dk>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	cake@lists.bufferbloat.net, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Tue, Jan 13, 2026 at 3:32=E2=80=AFPM Toke H=C3=B8iland-J=C3=B8rgensen <t=
-oke@redhat.com> wrote:
->
-> Paolo pointed out that we can avoid separately allocating struct
-> cake_sched_config even in the non-mq case, by embedding it into struct
-> cake_sched_data. This reduces the complexity of the logic that swaps the
-> pointers and frees the old value, at the cost of adding 56 bytes to the
-> latter. Since cake_sched_data is already almost 17k bytes, this seems
-> like a reasonable tradeoff.
->
-> Suggested-by: Paolo Abeni <pabeni@redhat.com>
-> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> ---
+In ucc_geth's .mac_config(), we configure the TBI Serdes block represented by a
+struct phy_device that we get from firmware.
 
-This is also fixing a panic, so :
+While porting to phylink, a check was missed to make sure we don't try
+to access the TBI PHY if we can't get it. Let's add it and return early
+in case of error
 
-Fixes: bc0ce2bad36c ("net/sched: sch_cake: Factor out config variables
-into separate struct")
+Reported-by: kernel test robot <lkp@intel.com>
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Closes: https://lore.kernel.org/r/202601130843.rFGNXA5a-lkp@intel.com/
+Fixes: 53036aa8d031 ("net: freescale: ucc_geth: phylink conversion")
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+V2: Fix commit title, adjust a bit the commit log. No code change.
 
-For the record, a fix for the panic would be :
+ drivers/net/ethernet/freescale/ucc_geth.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
-index e30ef7f8ee6862a916acc06e568e37f35fd675b1..742fb850e2afb159f215b263bc3=
-6c372552911bc
-100644
---- a/net/sched/sch_cake.c
-+++ b/net/sched/sch_cake.c
-@@ -2825,6 +2825,8 @@ static int cake_init(struct Qdisc *sch, struct
-nlattr *opt,
-        struct cake_sched_config *q;
-        int i, j, err;
+diff --git a/drivers/net/ethernet/freescale/ucc_geth.c b/drivers/net/ethernet/freescale/ucc_geth.c
+index affd5a6c44e7..131d1210dc4a 100644
+--- a/drivers/net/ethernet/freescale/ucc_geth.c
++++ b/drivers/net/ethernet/freescale/ucc_geth.c
+@@ -1602,8 +1602,10 @@ static void ugeth_mac_config(struct phylink_config *config, unsigned int mode,
+ 			pr_warn("TBI mode requires that the device tree specify a tbi-handle\n");
+ 
+ 		tbiphy = of_phy_find_device(ug_info->tbi_node);
+-		if (!tbiphy)
++		if (!tbiphy) {
+ 			pr_warn("Could not get TBI device\n");
++			return;
++		}
+ 
+ 		value = phy_read(tbiphy, ENET_TBI_MII_CR);
+ 		value &= ~0x1000;	/* Turn off autonegotiation */
+-- 
+2.49.0
 
-+       qdisc_watchdog_init(&qd->watchdog, sch);
-+
-        q =3D kzalloc(sizeof(*q), GFP_KERNEL);
-        if (!q)
-                return -ENOMEM;
-@@ -2838,7 +2840,6 @@ static int cake_init(struct Qdisc *sch, struct
-nlattr *opt,
-        qd->cur_flow  =3D 0;
-        qd->config =3D q;
-
--       qdisc_watchdog_init(&qd->watchdog, sch);
-
-        if (opt) {
-                err =3D cake_change(sch, opt, extack);
 
