@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-249859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 729B4D1FB5B
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 16:22:16 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12BCAD1FB77
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 16:23:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0CD17300F661
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 15:21:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0CE4A30491B4
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 15:21:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 207C6396B87;
-	Wed, 14 Jan 2026 15:21:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2229399A6C;
+	Wed, 14 Jan 2026 15:21:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="H8g9fx5g"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="JP1LH1By"
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012009.outbound.protection.outlook.com [52.101.66.9])
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013038.outbound.protection.outlook.com [40.107.162.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0421A38E11C;
-	Wed, 14 Jan 2026 15:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21613396D19;
+	Wed, 14 Jan 2026 15:21:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.38
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768404101; cv=fail; b=Lg75E0qARYhx6uIqysZhuOoPkKvlhYSSbUyE2Gsm1KDItqnV+sONT3hgZH8sQK4cuMfaeFHnLZClo79JRTMN2o4BZ/elAqvJD2W2JlUeLGcXeCSCfPjzRMgh2RQeP/9wXCl1jyyYHxEr2UWLEmVcCI1AGD06liC0HBOwWCZ9FP4=
+	t=1768404106; cv=fail; b=Y/lrlKF+8XQZYJILiOjNQwASGK9mhZQqcvC+qc7EIIiv9gYRIw+4WMygwnM88Ei9lniw4UjLOgVwLgxDHzH1iXvwHEPZJ476A7rJAy5H+MJIKqSSvhb019ng87p3112QyWwzK/Z+7d6sj7g8M1bkkqAZgRs5zFIgLcM1/kDh3uk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768404101; c=relaxed/simple;
-	bh=lPBsuZwNitDYMEzGkmHs2wRlfV0RtQzKGYM7hWN/dss=;
+	s=arc-20240116; t=1768404106; c=relaxed/simple;
+	bh=L131JXIzEoKLWUNypJ2saekvn1wGkGP4pmKBh4hSFJk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=PcciCgDI5gJE25hE84OTVck9WSbLcsGgW3z5FYkcFUXwGzGdWu3HJvxePBDe89R0cRF50W0pEON1xzlxZWAbpumwnzIYZ3AyS14Kt+C7dgkrqxglGl6DdhxupIvE3LsupGc80wNtOgA6dP7b4vjUM+855lmqVeYoaHz1C+hRtIg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=H8g9fx5g; arc=fail smtp.client-ip=52.101.66.9
+	 Content-Type:MIME-Version; b=BjxYazUtCWzWFopgCTeVOQGzEjTROUv/EaiByxsfnDpK1W4D1ZO1tGlD9pjH5KBN4SVo0Wo33Kgo8KKYPhwKK2x6Ufl/6vclzvzv19NCy8ELgxXGDXLKRv6XQASyuuTca6JX/bVL5RhT1AV5D6g6jSoon5mxrGGVoknepDIRPkk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=JP1LH1By; arc=fail smtp.client-ip=40.107.162.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=iMtaCAidwjobzWmZzdELA6vE5jxzmJ7TNamBeg/QcaqmsC0joCdKJ7niyv6DBYnCbar4T/xYebjQUeLg1Tey77phFwp/VlEWpAjW555fsQQ2DKr4P50U4uJyPpNysPjAgkeTtGoHVIXZAfXqxk0Xpz5OwK5M62+Ol3AoUk53iiX2zkQlWh+x404iLcboOdQCn7f36XXxbRWrBJZtp8ZNRhb9yA7FBhzuPJMIWson7DNwQH2zMiGFlIz67D1ILw+r/8Kb2im0L6A5upfofzePucCYrqOR24NiPePVht8875N6ozqYAfD3TSds2Uhpy5pIK6mAL98TrJXHR7M9t94qDg==
+ b=Dva5C8wG6+QQqs9kchN7zbbRcs4q/NHsoe4xtx5kUcpEXQ94Ve8qWBz8eiw2RScWGc4RbPndXq5R/jPBhNTO/sAyVrC3t9H2BteacSTD/SHUUDUlWy5LjRNpqNxC94cYJzyuTDP4KR7SJ5rHiyAZ1i7hTwiExXCQhKW0NSf27i+44MY73Bk2uJemf7snxptnHKIF7J4bekuBVK5LBFbkcGzOSKUP1E/tO1NDVUQ2SUPOm3X9WLe6I0e+eV7YD5MklXr+0TkrM8qQtXjNefVL/Zf6Eo+GCT5cLM4BuBbRML5IoyivSFvHnucU6y4XThkBXzNdjqgvJE9RdWLvnMh4vQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bXt94sygG4GDyOK0AIqSkIk1OcVUInQaiYyD523BQfs=;
- b=HORZ5uk/2ZpqQWw8SLSbolPtBI651Kcr+Emha4cLWUUv6IvGNtXP78/tGvPXOiHR159DAewjxc61LslEhsENtn338LlLKSkAR15P5IyIdhPeeGkrnse68SrnSNaZKvEdzJlb2st2XFB98KytpfKFcfiG0UCsitHWa3b6qYdtDJn4ZGli6Z9jjZbIpTXiskluGm7HRA5sH0nvR+Z1IC1f/6r3LZzeqoceyZFiAyTK/YN5TDu1rfkBjeiFbU7khxCamG61oU3Kq8y//xVwMo/V61094p2xxlN/zl1vinK7qFAKGbBqHUut3SxE5Wk38SCIRrJeXzBoqA15TYyf4M1rbw==
+ bh=1vixQSBgiAaI6lKHwKAuiRwZ35VXYlNG7c4Uk9Q8O6Y=;
+ b=fWIdH/e61a/t8zGPJpb+7KjC5497jttSWHgTpT2M19ydMESXoCrInX7iGXGLKdTGaqURX7yIT2kqvEm3WCWD2aagI8rEDpgtidpnrGUdlhLk8bI66zVKLOSYv/UkytnhBdsnB68Repu37d0IjO30d1G7PIaG7GTOWMC6U6/OrUkH9zuJTtAeN9nWJAEp0r5rtb3YC+B6/JYQXTUM1sMA9WFKN4WxlwxbCmd1RFCLfr9oHlnc1E1i0Gt7Ii+YBMOPd5wN7ooh4w25do/F8cFgUdp5I2NF6G5DNGJVF8pjuR/OLKJuFyx86X7DjzPwGa4GswQ9cItUnMDdh0mJPhZrxA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bXt94sygG4GDyOK0AIqSkIk1OcVUInQaiYyD523BQfs=;
- b=H8g9fx5ga90i8vuNaUDx2cxjPjJVXldqS2Z3Wu32OmpW9OWkgU/zAS5MUVNmrclJgVNLzaiTE7nmLrEmltEx0sKW6KgdhMOHvY4X4kEsGnfCsj4F6KLT6CdwpJjizFsRnwEtV+QV9g1SFsorcDhCXeB8akvjzccoI5rerPOMf10hn1uk2HDkNbXp5lqBgVXbJe+5E6DAvWMYxS+6HylBPEtsvbC4gMmLpMsw7yuE3zCx88mwgnHOV9P6ap28Os+/cjeismSyuAcH949/SWoP3Y1W1pEG9hrxlJKg3yvZBZgRydXrYlMDAsDX9ct16cZHBDObIFcsLraFy+PNOJ5YDw==
+ bh=1vixQSBgiAaI6lKHwKAuiRwZ35VXYlNG7c4Uk9Q8O6Y=;
+ b=JP1LH1Byiem8x/Gz1yeEtJjOY5jOMLxp1pwaakB0p3FHLt0+nt5Txv5w2EUAdsOzhZ0vln1P2yLtuC/GdN441vtWh5KkfNx3gSW+2SmgX6FQ4RVMnrBvX+VlHaeyuHibrpV4Ex26tcAnOfaQpKb4eD3qeR1L4YYow26gGzRVACpK4/YYJUr80HDXFE8vkWLiha+QC1Slaj3/AnLKKmJFur2/sg3KSPQWvAF8cDFnsIlNI9rIyULPsUNOtiM8dRjQlEY2XBbpdKscJiWDuofWxAoGSfJube9bGUd6zHr2wnGQ73UbykOhI4hPjgYzrCQtuG9QW4qZU2BwRoL7/6VgEg==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
  by DB8PR04MB7068.eurprd04.prod.outlook.com (2603:10a6:10:fe::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.5; Wed, 14 Jan
- 2026 15:21:23 +0000
+ 2026 15:21:24 +0000
 Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
  ([fe80::f010:fca8:7ef:62f4]) by AM9PR04MB8585.eurprd04.prod.outlook.com
  ([fe80::f010:fca8:7ef:62f4%4]) with mapi id 15.20.9520.003; Wed, 14 Jan 2026
- 15:21:23 +0000
+ 15:21:24 +0000
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 To: linux-phy@lists.infradead.org
 Cc: netdev@vger.kernel.org,
@@ -62,14 +62,10 @@ Cc: netdev@vger.kernel.org,
 	Kishon Vijay Abraham I <kishon@kernel.org>,
 	Neil Armstrong <neil.armstrong@linaro.org>,
 	Josua Mayer <josua@solid-run.com>,
-	linux-kernel@vger.kernel.org,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	devicetree@vger.kernel.org
-Subject: [PATCH phy 2/8] dt-bindings: phy: lynx-28g: add compatible strings per SerDes and instantiation
-Date: Wed, 14 Jan 2026 17:21:05 +0200
-Message-Id: <20260114152111.625350-3-vladimir.oltean@nxp.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH phy 3/8] dt-bindings: phy: lynx-28g: add constraint on LX2162A lane indices
+Date: Wed, 14 Jan 2026 17:21:06 +0200
+Message-Id: <20260114152111.625350-4-vladimir.oltean@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260114152111.625350-1-vladimir.oltean@nxp.com>
 References: <20260114152111.625350-1-vladimir.oltean@nxp.com>
@@ -86,229 +82,132 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|DB8PR04MB7068:EE_
-X-MS-Office365-Filtering-Correlation-Id: 99a1f504-f607-4517-7cb2-08de53809387
+X-MS-Office365-Filtering-Correlation-Id: 949d3bee-0acf-4412-c7f3-08de53809413
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|376014|19092799006|7416014|52116014|38350700014;
+	BCL:0;ARA:13230040|1800799024|366016|376014|19092799006|52116014|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?f84xO0GJOfOq7rC5Kz5LoID6N0YRErTd9QAreouBv/Lng2poklyNB2w+tr2r?=
- =?us-ascii?Q?eqNRPG4Py63Q++KcBzai+/ZH/kNl7RDTWFOe958rrrWS/F06HatWA586BDX8?=
- =?us-ascii?Q?n7yekF2vtUi5ZlmsNQPHGLxdojY9SK8mKt0wBE5b9lvTlzyUi/iZvv1JLsvT?=
- =?us-ascii?Q?R2swWa9Al5rPlfVXQwXFWtiAddilYXZaC9dW6XMkn4nTOC81kTRvY20xEAF3?=
- =?us-ascii?Q?kV+ygVUsBUL6+obAp0KtwDHSHtXs4ZI8575TDMufk8yl7DYceSI1pfCP3r00?=
- =?us-ascii?Q?0issBaAg38Vm9VtznzdVBSw9UMdq5XB7FgZ0FIsDDgNaPgyYuzf3t3NCe2zq?=
- =?us-ascii?Q?LcuGpdwmjbdCw69N8X8kABX0PKjnmqsJgHqFgXm4Zb607WKiHJE23p21zQ9b?=
- =?us-ascii?Q?FEe7WPCxR15A/zUKLzEo1TjUFI7Aa3VvhVX8W4l89rfMiBGFetTLZxCBAWyj?=
- =?us-ascii?Q?IQEj5DDlqh3XAmQnMB6eJCoHkW5MULF7ClLwyvkA5ksURPjAad0RTUltYGDv?=
- =?us-ascii?Q?9lgCo28HS8zouqTpw99OtFr2QtaXbdTEazXSZFa06Ago0c6Ex1En5cFspUtY?=
- =?us-ascii?Q?9vYQmSesbXe+4Kne7kUUlhgoiZpXTzj+bwrBsUgrKEgSLG3V6NvJ6M5B548/?=
- =?us-ascii?Q?6dLO+J4YoClvq5YWFcM4xBhOb18nl/b8fYc4RnULdg2JgfxMXxxQUaoIgkNi?=
- =?us-ascii?Q?kNESBLR4F8NvxAOia0noVEBTy8Gkt4Ge0UEqbkkzLQsB9p8gjHdNFThDG8Le?=
- =?us-ascii?Q?LqTQvUlgazbu1NDgz2Nytra9g5DtBmqA/NF+uF7LOkJJQEo+jug23cWkhUDT?=
- =?us-ascii?Q?0Zr3kofoxODDkwjCN3i7gG5dU9mz+GbPNzsubPOpFhtvDsOfKGDVrmLBZE/C?=
- =?us-ascii?Q?QtKfo2Y+xplGOAX/KLYwBEmkIKTXWpJdFnJtKb71agLyjqCW/KFetwLiGU1X?=
- =?us-ascii?Q?E2a4FfarpXGekIFfygY1SfLMLpNP0oa/1BS5hPrAmQNp0VAtNiVf/TbmDa6l?=
- =?us-ascii?Q?44N2DWsZd6ra7oyFipCckCYsPzlS38lUpGCOpbb+lz1iw8n0hlqNPFKzt11n?=
- =?us-ascii?Q?B1Fsoa/KdXKiwrGWsJ4lS9VKqsLxmD6bhKfcGlY0ytHeL6cf4B+ps+UK7yfv?=
- =?us-ascii?Q?oR7FHWU06uWl7C7MamzqRKU1scRlws+bwsSQqMQctECo5SyDHUMxKBRKAJQ9?=
- =?us-ascii?Q?6/QF/qyY8jnFVNUuz+HV82nEMGkbLlhfCDQrvPvhC22Qdy1YDjzFMPYRylZ0?=
- =?us-ascii?Q?E+2C3VUUi3gEdlzDPKHILdntx5ZsffYtI4+84vC16v6buPO83o1tds/tltpw?=
- =?us-ascii?Q?WffMqlkmVF4i5N2ej4FN3oUuBywn7h2SIBctZPF07WU1s8SKWClM9C1Je3MI?=
- =?us-ascii?Q?uQI6vLq3jwMIy1Gh0ipW9paILKb/HZ30dzJbMD/qIfUQOIoN65Livy7pd2ZM?=
- =?us-ascii?Q?zXzv2OrsSxuK5BsxT8sTwfaIn/roz2Aul5GosYHOq5xaHrsQRvLGxPIT0fcE?=
- =?us-ascii?Q?+eM4+3P8zoFLKh9a9KYSKopJ0jeONEWSqZ+W7PJkeE0o4cPQz1zz8OqnBrc+?=
- =?us-ascii?Q?JqYwgmPYLe9a90s9U/z31BfM9OCy0rClqSlHEK6l22eqBVRvbAM1zxjBDDFx?=
- =?us-ascii?Q?Rl4EzEiXt5fzsO8oyTGXVlAE6dveia0FmTXJEgnWugFV?=
+	=?us-ascii?Q?sUkzwLX4+QSL+y2IVIu81h+UZH21LJmPQ3fi8k8x4ePTzjp+Thk2UKqYTdmW?=
+ =?us-ascii?Q?hqS+K+wbPa32Yshs83jKsmJQ0tOsYgL1eEdfJiN8pnzeBqv7dkgQKjBEfau+?=
+ =?us-ascii?Q?4iLeRxiNJ9rhl62q0WfuE1HE8QQTBdOKNDVDv4F7idTkGosWWvd8J5glcAth?=
+ =?us-ascii?Q?WpHk7n86Bl7pSnhLAev4E3u/inZr3uu2DQUDfjiE92/iFUsD9m+F96ALCf/8?=
+ =?us-ascii?Q?qoSVtZpMzUSFZ6UXBxNFzjyh6dBM5bO/PIx/4tVDA/LPcVXkh0P310rlV6eX?=
+ =?us-ascii?Q?DGFSLgkYYnOSJdrsSM5X9cdHqU3rD6BGI3uA4utun96IjZMiM0UHNr+Tbmur?=
+ =?us-ascii?Q?RlBdwYdFUGbgnI5VsXocK2l64KPXV1bSmubFILLjKjOe2Rz5kfNrcIx7CAh2?=
+ =?us-ascii?Q?2P9/3JCH9lCw/lNqB2MZqlpJlCQKQuRcI7sKVEhH3nIKs20D1fFyfNvpAohg?=
+ =?us-ascii?Q?AFoZAjQjfvw8atlrCMrPF/BjwnoTPdedS9j4uTHRzr31F90uDK6yavEAXApR?=
+ =?us-ascii?Q?uu1aAp4mDOk04CQsWf/W78uYb6qM+JQD17w3eQcIuqo6hMK+ZAi1MWkZywaj?=
+ =?us-ascii?Q?aJOReFZX4cVFr2jxsNBwavdj/C09Ks4XQuFcgpdUU6OEnL9gtEwZm9hzJ0xq?=
+ =?us-ascii?Q?bYMd1jYRVqPWkHPpx0iixWWZP13laKAzJZAx9AMjpR+aNeA5jJp5YW4nhl9/?=
+ =?us-ascii?Q?tyV5QCCQCQdxtPMOGziVBDQ9IjvlisgAY1m50VOqv0qB7CdccgCUgpTy/7kf?=
+ =?us-ascii?Q?6OyHddTRWQHF4F+WgLC3aVHI/a5MN5EJNlWg2yFw2kG9nOtyuC1gkT9QLhh8?=
+ =?us-ascii?Q?CSdfDJpiiX5y6l4ZtYp0WvIX/4LdVTzGjwE6I277haeUHXI3k9Y5aZPuCe1J?=
+ =?us-ascii?Q?q1eaYYlZ2ciiCWLpz1CZalPNbippyRdOARjGQOfolK/2eZ31GJJqPqoW7y4X?=
+ =?us-ascii?Q?B6lIQjhQFSVVmocbN75J8h7K9oc5FTqIoTXaK8JTt+0lRmHVGYMBZN39Mjnx?=
+ =?us-ascii?Q?yFiclpNduTY8dENWxUYgbRdulMn1kkvrnU2KHH8NMQwhVOxubj16HBbX2KT3?=
+ =?us-ascii?Q?Ncd/TLhDjD0J3cR168+rtfUm8+Ni4NWuTt/dCiiDjccHr2gj5VwYDTwHOAXY?=
+ =?us-ascii?Q?EdVtqvVT/wnuF+LkKBaNkJC09ybKkXqtMBdNhRyvpRei18eOcWeMUPnyozk9?=
+ =?us-ascii?Q?G9wbo0cDkjxTflwuRfxzt32BYogmE3bI2m48xLDJrJpM5OgZXNO8lAj1rT+u?=
+ =?us-ascii?Q?bMa9kJMAbf00a/a9llGuPdWS6hc57/bShb7CBvrGr+daaOp7zrCTb1Swd7+B?=
+ =?us-ascii?Q?M/S0cD+t8koRTh78GdpX/cC5ox/9CLLy7KsGwIiV4hRvRQfZ3sTcyULtObux?=
+ =?us-ascii?Q?lGHPH9YiUzu6LmYdXzJbRn1E5YbV97N5Eq6litW5a4XmevGe321GFKwVep9/?=
+ =?us-ascii?Q?6cUB08WM4RaAYsabnwPNxe1sPq/mPFpg5DWnXo33VGuvDV9bDIAjdoUjRNX/?=
+ =?us-ascii?Q?1FhMAAbQcXUtOqWllhv9XfTb3nMSPsVVas22pmYfkD2gBsYVRxO9j5NWI81j?=
+ =?us-ascii?Q?8wTCVe6NzjwSusw9b6xOH/42wzveUURW/mtVmeJAWwuKt3mJ0MpaMZ04q8iL?=
+ =?us-ascii?Q?N92jv6b+bgDZNAF9U4YB5+w=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(19092799006)(7416014)(52116014)(38350700014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(19092799006)(52116014)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Za7DvDnjYapARpZYCSc3Id3z1/JqI7QV5LCSLwsYVP6mAwRRlYxpK3OXV0YZ?=
- =?us-ascii?Q?wxlBRRJDDCzALDpdL9wjThl1r0w4BvyJEOHRGwm9ShHID+APhwAoG/EnT095?=
- =?us-ascii?Q?ymWvmMtq+NT5G249W8+Hp7JEl6W+SbZoUW14CPUvNi+6ocKP4jsnEW5uT2or?=
- =?us-ascii?Q?zzysaO4x4nlxvrVADr8vc0Zbx2U79bVCmuGX253X97iaWOWvugHA2oQGYUU8?=
- =?us-ascii?Q?P4riHLdKaZlm/vW3CMai+oFmhCTCbgZQY0FfFZeHMOqSP/ua26pjRQEjSirF?=
- =?us-ascii?Q?M4Zquvvg/UNb3XL12bdXS1S9QFvbsnQv4n+QAjsWi0wugu5wttXUFdsvR3Uw?=
- =?us-ascii?Q?iIEtFy7QLdD/AXvSY2BSWIZFNk76bngAKi9dulx7tWqn/Uh5SkgIyWu+rAaD?=
- =?us-ascii?Q?CjcKhfq23T60DPpnbv6bOPKwu60iwvZpH2kOMlV1Q+Zd492t/8AxIcE00cNT?=
- =?us-ascii?Q?3FSWYpxvuegpbigG4vLLR7W8cZpfoI5NtBbbAPsZr0japm9fMGX1m6311uuE?=
- =?us-ascii?Q?7vjvRQwOClUp5O5Xm/INISuETH/5sMBfH7k1MUBBw4wM4JMZEIW+ovoUEuxs?=
- =?us-ascii?Q?Or6GYIZwMmfqrncd8mXDFOvZHkpyl4qFh6ut/TjXzz9lVhc9vba3kZ8AOStj?=
- =?us-ascii?Q?9dlGc4SB18aYUqn6SaxBNBcHI+pr7AZdZp/tahkLPT5S/cfFECoP+UcILy2X?=
- =?us-ascii?Q?JI/GBZlX6f9PpBT4huziOhK05oMubEdSlIQShwBguW8cI6BKd4GRcopjCq6n?=
- =?us-ascii?Q?DzVYEvRLFGBKekCXLOE3uvXEyyFfbJgHdksnS/fgdiddo86xlQeXbh4SiCHm?=
- =?us-ascii?Q?qSqG38mtQuieWFyyFX0Z4zhpOU9FxKwEz5KoNgTJvAyTxEp414dzVGrz9nnn?=
- =?us-ascii?Q?cQIe7Y6OULBiNDVz2VEQRJ2Z797Iebf0BlMQ/m6bRmgloTi71USl6zqcuauQ?=
- =?us-ascii?Q?MsJ94FHZ9UaIqe50dYef8IeLzlT5sRlHVs2kaSTS1c7QcM/WAVPxOSg+S5K/?=
- =?us-ascii?Q?lkJ35ps41+QQm9F3Vu/H7RbsHHlHnYy6hikoUhZP+hvniknHrWAUPYG0V7S4?=
- =?us-ascii?Q?N7/nLGY6L8Wy6mHc8mPc1TTShE59tkq1pksngjNN+q5/++5UqPLW3LtTjudG?=
- =?us-ascii?Q?BzwODHyHK/ylSjPcwbpfxPetq/bSytRU45dS2nDyBaf2FoBEeE75CZPCbDHy?=
- =?us-ascii?Q?xuDAHslz7Xc/99T4hRPJZyAl+RXXgbrPcC5tSrXLRwmwN97CGfKcC+lYFlim?=
- =?us-ascii?Q?IUhe97lKKPMjeTib7HVlBumsz3j+yWQjprlm7aQEPSCmvuSMjcfznJ5AbeuP?=
- =?us-ascii?Q?nV4lVwk5NU60oDpsR89P5CMKl/FhruRz75wL44sjmnuiYF9SrHxazseTIOjR?=
- =?us-ascii?Q?nxOIPKdkG+Q/BkTKxp91a7wiASc90CJ6evD/Yi7ODMgAaGaeveIa+zJDKDOE?=
- =?us-ascii?Q?he6UzYmQX21I+TofnOVnw/cXus5tV5ShNUWPJG5YAlZBfkXD9HG9MD9CWNFI?=
- =?us-ascii?Q?Pl7u2jra24GA+FURqWgXB/9pWgqWaa2Hcgh05Vg4z567uXtT1M0cbksHuDHO?=
- =?us-ascii?Q?KtMYD/h400r8jPbPGfA0/pnkohFKWNPh3K9wAb/cmkOI7LrR6Myg1EJ1qcBt?=
- =?us-ascii?Q?e2pfxB4KjynRmZfFWZ596OfKF4CJWpUUPIruvqh2Fzap8CBNczZVAjFitkQW?=
- =?us-ascii?Q?4UspMLVXqCtgldrcHQilV8+kSveK0S2ex6K57r4CxVleOaaPnqKA8KLjfYBs?=
- =?us-ascii?Q?FIhUlL3vCkg0YYnWwIWcog+sCYlujtQ=3D?=
+	=?us-ascii?Q?XCa3vZJZoC4CKg0nTnm9bLZNNEJp1E11iCdjjSNwzjX1/tPqOyvPt+B9i9SB?=
+ =?us-ascii?Q?9vTkrIq7jlINoUaNqVS8Som1FgHYLVtTE9ObIKcvxqdgre4k0WlughgxypF8?=
+ =?us-ascii?Q?WWdoA86OZLBHYI6rtR4gXZy6/TI1HGwxT7ghusgeZLKIabzDKe2PxjpjQ75i?=
+ =?us-ascii?Q?Oht59b5zTSd/PcqdE+PeE4Ebg3B1HqodYRbGNWDJKD1EArm9eaHdPWRckOC8?=
+ =?us-ascii?Q?s8l6Sv3nHmgxWBL+qKiQgpdx9a9k0WJYLYvha2hOgGPa0p83dxM9XylHsw67?=
+ =?us-ascii?Q?HfnlB5cy5FbShYc3cIBD5E7A7p99FrVixmoUIqCGEYeYVoKeMXY0rQdqXiCF?=
+ =?us-ascii?Q?E2Ii0oSgXDy0TJOEYZjqIQR2sGTM9u73bzde1mC68ycxNH8wxFJcQyG1AyWq?=
+ =?us-ascii?Q?RaZujX/1U4U+1uFe0XwBVWJVSXAfDjVhju2ILdoJ+EWgN5qRV628UBcC80oX?=
+ =?us-ascii?Q?c8JWlosgSJT66q1VLithsTH8Zo6VcY31VaICUN2j+gUM2oQlZo8tVV5Qff6P?=
+ =?us-ascii?Q?ZqMYa7dHbxKGThiIFPMzgIdn+gbV1KLcsLZVjRfce7xgGh2V+TGzCbdzuW2Z?=
+ =?us-ascii?Q?w2/Bqr4wi59d3Mxi8nERceZYU5D3OE44RDns1RDk6FbKvZAr2SJjhjU8LsWJ?=
+ =?us-ascii?Q?x0whZuwATw63FaI+GLHW6WaMtu3/Xk+b530QWAbPVMVSowcegI3P+ChDoDrf?=
+ =?us-ascii?Q?TEAjNUl87jIoaX48yZNzv/gTOe8V9ZHI3a9fUaNlCfCKzd1w8kYNZ4oTfvpS?=
+ =?us-ascii?Q?BUXeTMMhRIUwJ6IxTSWWniuo2uBrX+dzB9TlEQKl+0NxPZJ1HxctwYU3eEaN?=
+ =?us-ascii?Q?PZ19vEtmVXQSa4RA7UK7S+rlHbQex6E/Hi0uC1LCfslJ8YDm/n+8ArnQRJRq?=
+ =?us-ascii?Q?dbmlUsoA+VX6+bJ8+IWOlL/jDaEzyPAuoAA6SydsVN7n6FBZlomachAq76KV?=
+ =?us-ascii?Q?Z4+yqEXAjJLy0gRTXmSKCG+VbZ/tJx+EI2Qy7Cu7WuwQcFPQjKIrHQxGuZOA?=
+ =?us-ascii?Q?D+KLiJGQGLBeVcuLg1YjSIHmTAd4/mJ+pXP2DihC57aFQQmk/D8FJF8XZilv?=
+ =?us-ascii?Q?ww9bDAybPy5l2HvKzMZ8GijT7Qs7vcVdBkxbgDzhWZ3qjTq0m+lPHd+yTOxx?=
+ =?us-ascii?Q?5kKpKaf9uWURsySqCtsTl/yHQQV5qugxU0j4PBmD2jp1SIDSswlv1DSETcmN?=
+ =?us-ascii?Q?mDmudXP1MTrkU1OTDOlVnJrETvIWeaV1n2fOXvpsWom1ojYanDViDb9d+t2/?=
+ =?us-ascii?Q?UaAoJS6f/uM9R4AgcFWT/Erk3UxVvJJ+LzpwvxRshSW4m72If/uTNcnd0a+s?=
+ =?us-ascii?Q?uhtr0uIpp00lenJDjtUD5Ow+4s3ISokzf1TQlqkDmHeefLP+B38ZnCpa0wCB?=
+ =?us-ascii?Q?MKMdGALtyI0qjLGsI0906JQtbqO2h0RQ0mfL2uaxnUPoCzi85a8OzWVH87E5?=
+ =?us-ascii?Q?oTtbmxP2YGrBKfZYtY80XK2XyU7pHBMee/Z0JZCH+QZyCLLco7735uQxQndD?=
+ =?us-ascii?Q?9O7h2N8A5fhNVu3Zkj4YkOcuid53xFK48mo2tIv9/amX5bRGWEM6gWaBu7Mh?=
+ =?us-ascii?Q?Zh+hn9k1RXbraBJbv4RpGVdsK50ItOzNQbBr200EJyeAdSAhCQG/l99WexmX?=
+ =?us-ascii?Q?jfZg1soiOrgkNEcmTfSWJ+A7+nZj4Ea3X6TP1x+GU+VJkS7JFEOoJdJsKH85?=
+ =?us-ascii?Q?9lDUCD3Fl771wrP81PuAKoQmSvgztWHpIqHixesyCi0zQjOjl6h8CAE7RlTx?=
+ =?us-ascii?Q?jhsUSSBG0Qe9b9TfhhPV8L8KCSITyS4=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 99a1f504-f607-4517-7cb2-08de53809387
+X-MS-Exchange-CrossTenant-Network-Message-Id: 949d3bee-0acf-4412-c7f3-08de53809413
 X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jan 2026 15:21:23.0381
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jan 2026 15:21:24.0026
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: x16R9cujiqDKWHxZWMpc64jTLKlZ8jrhf12GW2NqmJ5PPOu5XkbyJWgLSUq8s3NnqjXfezcpjA6m6OUAoTPSCg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: yfFZ1jyznIWUcdnBtGgK+s+hktrXTLkybpprqHWllhf8atgg28SzLLEwTtS8Hso+F6SXuAAEahgdwJ+n7QdLCQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR04MB7068
 
-The 28G Lynx SerDes is instantiated 3 times in the NXP LX2160A SoC and
-twice in the NXP LX2162A. All these instances share the same register
-map, but the number of lanes and the protocols supported by each lane
-differs in a way that isn't detectable by the programming model.
+The SerDes 1 of LX2162A has fewer lanes than all other instances, and
+strangely, their indices are not 0-3, but 4-7.
 
-Going by the generic "fsl,lynx-28g" compatible string and expecting all
-SerDes instantiations to use it was a mistake that needs to be fixed.
+This constraint was not possible to be imposed when the schema didn't
+have per-SoC compatible strings and per-lane OF nodes, so depend on the
+two to restrict the lane index.
 
-The two major options considered are
-(a) encode the SoC and the SerDes instance in the compatible string,
-    everything else is the responsibility of the driver to derive based
-    on this sufficient information
-(b) add sufficient device tree properties to describe the per-lane
-    differences, as well as the different lane count
-
-Another important consideration is that any decision made here should
-be consistent with the decisions taken for the yet-to-be-introduced
-10G Lynx SerDes (older generation for older SoCs), because of how
-similar they are.
-
-I've seen option (b) at play in this unmerged patch set for the 10G Lynx
-here, and I didn't like it:
-https://lore.kernel.org/linux-phy/20230413160607.4128315-3-sean.anderson@seco.com/
-
-This is because there, we have a higher degree of variability in the
-PCCR register values that need to be written per protocol. This makes
-that approach more drawn-out and more prone to errors, compared to (a)
-which is more succinct and obviously correct.
-
-So I've chosen option (a) through elimination, and this also reflects
-how the SoC reference manual provides different tables with protocol
-combinations for each SerDes. NXP clearly documents these as not
-identical, and refers to them as such (SerDes 1, 2, etc).
-
-The per-SoC compatible string is prepended to the "fsl,lynx-28g" generic
-compatible, which is left there for compatibility with old kernels. An
-exception would be LX2160A SerDes #3, which at the time of writing is
-not described in fsl-lx2160a.dtsi, and is a non-networking SerDes, so
-the existing Linux driver is useless for it. So there is no practical
-reason to put the "fsl,lynx-28g" fallback for "fsl,lx2160a-serdes3".
-
-The specific compatible strings give us the opportunity to express more
-constraints in the schema that we weren't able to express before:
-- We allow #phy-cells in the top-level SerDes node only for
-  compatibility with old kernels that don't know how to translate
-  "phys = <&serdes_1_lane_a>" to a PHY. We don't need that feature for
-  the not-yet-introduced LX2160A SerDes #3, so make the presence of
-  #phy-cells at the top level be dependent on the presence of the
-  "fsl,lynx-28g" fallback compatible.
-- The modernization of the compatible string should come together with
-  per-lane OF nodes.
-- LX2162A SerDes 1 has fewer lanes than the others, and trying to use
-  lanes 0-3 would be a mistake that could be caught by the schema.
-
-Cc: Rob Herring <robh@kernel.org>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
-Cc: Conor Dooley <conor+dt@kernel.org>
-Cc: devicetree@vger.kernel.org
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 ---
-part 1 -> part 2:
-- drop everything having to do with constraints (on #phy-cells,
-  #address-cells, #size-cells) based on new compatible strings.
-
-Patch made its last appearance in v4 from part 1:
+part 1 -> part 2: patch is "new"
+This is a rewritten constraint from the previous
+"[PATCH v4 phy 15/16] dt-bindings: phy: lynx-28g: add compatible strings
+per SerDes and instantiation":
 https://lore.kernel.org/linux-phy/20251110092241.1306838-16-vladimir.oltean@nxp.com/
 
-v3->v4:
-- OF nodes per lane broken out as a separate "[PATCH v4 phy 01/16]
-  dt-bindings: phy: lynx-28g: permit lane OF PHY providers"
-- rewritten commit message
-- s|"^phy@[0-9a-f]+$"|"^phy@[0-7]$"|g in patternProperties
-- define "#address-cells" and "#size-cells" as part of common
-  properties, only leave the part which marks them required in the allOf
-  constraints area
-v2->v3:
-- re-add "fsl,lynx-28g" as fallback compatible, and #phy-cells = <1> in
-  top-level "serdes" node
-- drop useless description texts
-- fix text formatting
-- schema is more lax to allow overlaying old and new required properties
-v1->v2:
-- drop the usage of "fsl,lynx-28g" as a fallback compatible
-- mark "fsl,lynx-28g" as deprecated
-- implement Josua's request for per-lane OF nodes for the new compatible
-  strings
-
- .../devicetree/bindings/phy/fsl,lynx-28g.yaml | 33 +++++++++++++++++--
- 1 file changed, 30 insertions(+), 3 deletions(-)
+ .../devicetree/bindings/phy/fsl,lynx-28g.yaml   | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
 diff --git a/Documentation/devicetree/bindings/phy/fsl,lynx-28g.yaml b/Documentation/devicetree/bindings/phy/fsl,lynx-28g.yaml
-index e96229c2f8fb..8375bca810cc 100644
+index 8375bca810cc..2f245094a985 100644
 --- a/Documentation/devicetree/bindings/phy/fsl,lynx-28g.yaml
 +++ b/Documentation/devicetree/bindings/phy/fsl,lynx-28g.yaml
-@@ -9,10 +9,37 @@ title: Freescale Lynx 28G SerDes PHY
- maintainers:
-   - Ioana Ciornei <ioana.ciornei@nxp.com>
+@@ -78,6 +78,23 @@ required:
+   - reg
+   - "#phy-cells"
  
-+description:
-+  The Lynx 28G is a multi-lane, multi-protocol SerDes (PCIe, SATA, Ethernet)
-+  present in multiple instances on NXP LX2160A and LX2162A SoCs. All instances
-+  share a common register map and programming model, however they differ in
-+  supported protocols per lane in a way that is not detectable by said
-+  programming model without prior knowledge. The distinction is made through
-+  the compatible string.
++allOf:
++  # LX2162A SerDes 1 has fewer lanes than the others
++  - if:
++      properties:
++        compatible:
++          contains:
++            const: fsl,lx2162a-serdes1
++      patternProperties:
++        "^phy@[0-7]$": true
++    then:
++      patternProperties:
++        "^phy@[0-7]$":
++          properties:
++            reg:
++              minimum: 4
++              maximum: 7
 +
- properties:
-   compatible:
--    enum:
--      - fsl,lynx-28g
-+    oneOf:
-+      - const: fsl,lynx-28g
-+        deprecated: true
-+        description:
-+          Legacy compatibility string for Lynx 28G SerDes. Any assumption
-+          regarding whether a certain lane supports a certain protocol may
-+          be incorrect. Deprecated except when used as a fallback. Use
-+          device-specific strings instead.
-+      - items:
-+          - const: fsl,lx2160a-serdes1
-+          - const: fsl,lynx-28g
-+      - items:
-+          - const: fsl,lx2160a-serdes2
-+          - const: fsl,lynx-28g
-+      - items:
-+          - const: fsl,lx2162a-serdes1
-+          - const: fsl,lynx-28g
-+      - items:
-+          - const: fsl,lx2162a-serdes2
-+          - const: fsl,lynx-28g
-+      - const: fsl,lx2160a-serdes3
+ additionalProperties: false
  
-   reg:
-     maxItems: 1
-@@ -60,7 +87,7 @@ examples:
-       #size-cells = <2>;
- 
-       serdes@1ea0000 {
--        compatible = "fsl,lynx-28g";
-+        compatible = "fsl,lx2160a-serdes1", "fsl,lynx-28g";
-         reg = <0x0 0x1ea0000 0x0 0x1e30>;
-         #address-cells = <1>;
-         #size-cells = <0>;
+ examples:
 -- 
 2.34.1
 
