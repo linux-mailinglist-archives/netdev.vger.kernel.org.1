@@ -1,198 +1,151 @@
-Return-Path: <netdev+bounces-249839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A346D1F03B
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 14:16:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CC90D1F084
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 14:18:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0607A3011ECC
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 13:12:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BE2BC300549C
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 13:15:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 974DC39A7F1;
-	Wed, 14 Jan 2026 13:12:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1370339B4A0;
+	Wed, 14 Jan 2026 13:15:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="aWolcuWY"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="fivFvMKh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745FC39A800
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 13:12:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0847D396B92;
+	Wed, 14 Jan 2026 13:15:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768396346; cv=none; b=TFF+MgecTZgbA9NsYNNxRGwzks+v0WgWiB9u5PIlYmLCEhJpr6lIvG/OczldIX33k7XSZjO3aci2d7oLC7X3WlxVRo1YanP1RgQvs3cHKb9hODaDcZKCIrxwnbuPriE9W/VzbusrkYCDhbHXTBtUW2/eQ5aPYUq7yG4p50IUOVs=
+	t=1768396550; cv=none; b=A8t9PhQ85OG23Xdz6YWT3+6y8W5RhC0p8EufO5saxHw051fQNqOv8gV2v++lWWs0G/6jRQuQcPGDeVuSHSG2KPs/65FshSCtGJ4yECgTnXKcSrruejZA8UUYV08NEra94qpfXdViFpSVlGnh6Sz1XXZm1R0V3Im3AuabqzVhztk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768396346; c=relaxed/simple;
-	bh=qVQVDrDK8GQt0EFjDkN2BeDB9NxS3hqaAC/BXhJUBXA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VDvtgNbCk1aqgyy6TtRqx0/ZqM+9lRAS6dANC/PK1+t9eFvvOQWdT1BoSZWb8n/BfiGp0CysOi8xcFzpLKq/Dwf7zrvHO9jO9wCgRtqIMAZho2NV1xIuI5/01Lze0TST1ohBEGeA+n6ENFXI8uOVPORfXQFyAYT6K6gdqr+9iQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=aWolcuWY; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-477619f8ae5so64648005e9.3
-        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 05:12:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1768396342; x=1769001142; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ucpTGToIn8N6Wm60fm7MZ05SRRlKYptl+ek5X25PfwQ=;
-        b=aWolcuWYJf6Ct/NWQt6rExuRtGu3LFOudFYsGbsTnoG1JSvl2EkPbO/rwX483SQP4C
-         pq+N1613z+QGsd3+cQmuZQY2dTA1+dNH+/pK6fKFvPht2v/0CSotYuEcy6K+Gleu2Lza
-         tTMASq4xczVUrzU+yCJiYMdvOF5NjqYrekE+yjnbMK8aJTx5aa1Qr9V7uHjINZRmQ2Bk
-         O0B3IT0MWJoBonuK7cH3MAH9v89poQixipOhPiMGt9As9H+5tMMdFoV5oUi2G0anJjR3
-         W4piGmZHO7uQ2l5p20BhJjuRHZkRlg/Oa7Wu0iPffIImEF+o2TBhf2OwkcCv07QdI3xY
-         jDTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768396342; x=1769001142;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ucpTGToIn8N6Wm60fm7MZ05SRRlKYptl+ek5X25PfwQ=;
-        b=RpiLB8TNY9rHNT/dmGbtv1fZvASqad8lPhOf4GFle+vO6WRpIKXHWftkdjXtp/XmiE
-         Q0i1BHKJF4+k+XG2daRtyxZZi4FRGykgQOfWISvj3RrdXpGr11q1Rticoel7p5L5vdb9
-         zeaJ1VtE756nQoT1Dsemak7QE+50mXmQUrgZISXBWeGKElmgeJzfaC5+g4gkMWROhTtE
-         Zq82UsYH3vyfgwdxXkm/iTDNDSawoieARlCfyr9Y8uwWGSPL3EGVGvGbaBRbZY8/8Rbr
-         eGMDcA+ZQnwmMU/8JuSkwpAy++0I2jNT8SHO5sU9mSwUhN5MEYGd1zvrR75KCHwMnTwg
-         VYxA==
-X-Forwarded-Encrypted: i=1; AJvYcCXsMmaYYM9Cko9Lo/Be4u+NOmNBaFVVka5KHE7OTdVf3QHb6aA1Vms+WlugNWNaYLmxunDFqgQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjLxDdYF220k9Q6Qjo+KNbtzA/RBklSrfPClEVdRNWF3CUJet7
-	AbLfNsCiCgtyacVzEXtlfDE2eD9keSoEVZdCBVkxDbCWw9ja5SHTEvchMg8dI2ePQqk=
-X-Gm-Gg: AY/fxX6ZywX03X+aAdLE1lKdAahFZ9EgfVdSoVZpLjQZ4kVlH4qm80ehgcRMonK7Kyu
-	m6DnO1L6Ak8Vm/5BCehGnKV7dYiKEiqXCs79dT7EX6YlDIklGeyRWZVv/uGGqgBwIwuExoOekS7
-	n3J0hxDFRq45Dw7/R5I7TQAnQIVU3+gOmiEIkLdHNKaLy0gD5+zFL2Ib3b4dQk/xjMSiyiEVop0
-	eanDGM2f6uv6vy+CmnkbSvfRQX0vqors6l7Ykvwtp7eVSImgGpBD2g7kL36vz60I+8ASBLI5e1o
-	cFbJlpkUwzOcxzK5xDQx8PsroDbFg8lXxSYco7NxVdxV2VgMC9WyhNo+ZQAaow/Tz99+t9ACHle
-	jywrd7iAFITAEsiK7K3n926g8i0dRupF0Aixi/olt4nLFXM+8RPzXzvABk9q2/xnoswvLpDAAXa
-	aMX0r3fFQIyfAdbJ1xpDkdiYyL
-X-Received: by 2002:a05:600c:5490:b0:479:3876:22a8 with SMTP id 5b1f17b1804b1-47ee3356d5dmr36820375e9.16.1768396341643;
-        Wed, 14 Jan 2026 05:12:21 -0800 (PST)
-Received: from pathway.suse.cz ([176.114.240.130])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47ee54b8c9bsm27274065e9.3.2026.01.14.05.12.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jan 2026 05:12:21 -0800 (PST)
-Date: Wed, 14 Jan 2026 14:12:18 +0100
-From: Petr Mladek <pmladek@suse.com>
-To: Marcos Paulo de Souza <mpdesouza@suse.com>
-Cc: Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jason Wessel <jason.wessel@windriver.com>,
-	Daniel Thompson <danielt@kernel.org>,
-	Douglas Anderson <dianders@chromium.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	John Ogness <john.ogness@linutronix.de>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jiri Slaby <jirislaby@kernel.org>, Breno Leitao <leitao@debian.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Kees Cook <kees@kernel.org>, Tony Luck <tony.luck@intel.com>,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jacky Huang <ychuang3@nuvoton.com>,
-	Shan-Chun Hung <schung@nuvoton.com>,
-	Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-	linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kgdb-bugreport@lists.sourceforge.net, linux-serial@vger.kernel.org,
-	netdev@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
-	linux-hardening@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	sparclinux@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 04/19] printk: Reintroduce consoles_suspended global state
-Message-ID: <aWeWMga1VaT0sYwj@pathway.suse.cz>
-References: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
- <20251227-printk-cleanup-part3-v1-4-21a291bcf197@suse.com>
+	s=arc-20240116; t=1768396550; c=relaxed/simple;
+	bh=seSfhC8ogzDXxa89Np+o3MnqCHwdka1m3oqnUfoi4pU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=bNfpS27CoY2DepX92J8fE4LMlvuSUbpQU6khSwkrT7XK3QaAfCRHhiSM4cLsi+3Q0mEp1PvoHra1YihQlfR/8ylRLUWrIROHDzgbKO+tN+f44OuDb02/2EB/QeZdDW59ew8KSxDJsNHwrwdkfGGwA0LulhBxfOLHDOMrBWC/c5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=fivFvMKh; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=OM
+	Ei+QX/R46zrUv7SSZ7MEYUT7umCGMDz2EhK2yZNWE=; b=fivFvMKh6Stfbtyewk
+	R+eL/cId7s02KUpg7dtfWWtCZ0qEQl5gxyTm6bpbH7FBI6W4Viaa8lgq8jhTo9yp
+	uY9gPF2d4zsI7Yq1w6yC7/H7xT5VBcctsKxEbcyvPDPxmRyyeSHZrrC38gW8rxGY
+	20qqzDYkS0/o+G/mgpSOOTu9I=
+Received: from GHT-5854251031.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wDHuEKylmdpj+NjFg--.9247S2;
+	Wed, 14 Jan 2026 21:14:28 +0800 (CST)
+From: "wanquan.zhong" <zwq2226404116@163.com>
+To: loic.poulain@oss.qualcomm.com,
+	chandrashekar.devegowda@intel.com,
+	chiranjeevi.rapolu@linux.intel.com,
+	haijun.liu@mediatek.com,
+	ricardo.martinez@linux.intel.com
+Cc: netdev@vger.kernel.org,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
+	andrew+netdev@lunn.ch,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	ryazanov.s.a@gmail.com,
+	wanquan.zhong@fibocom.com
+Subject: [PATCH] net: wwan: t7xx: Add CONFIG_WWAN_ADB_PORT for ADB port control
+Date: Wed, 14 Jan 2026 21:14:23 +0800
+Message-ID: <20260114131423.202777-1-zwq2226404116@163.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <599905d9-19ac-4027-85d1-9b185603051c@gmail.com>
+References: <599905d9-19ac-4027-85d1-9b185603051c@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251227-printk-cleanup-part3-v1-4-21a291bcf197@suse.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDHuEKylmdpj+NjFg--.9247S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxAFWfuFyDZw1UJrWkJrykuFg_yoW5CrW7pa
+	1DGFyYkrWDAFnxJw4DZayI9Fy5C3ZrCFW3Kr17t345uFyYyFy5CrZ2va4ayF15JFsrZrWx
+	ArWaqF1Y93Z8Cr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UBWl9UUUUU=
+X-CM-SenderInfo: h2ztjjaswuikqrrwqiywtou0bp/xtbC0RQHXmlnlrQ-OQAA32
 
-On Sat 2025-12-27 09:16:11, Marcos Paulo de Souza wrote:
-> This change partially reverts commit 9e70a5e109a4
-> ("printk: Add per-console suspended state"). The intent of the original
-> commit was to move the management of the console suspended state to the
-> consoles themselves to be able to use SRCU instead of console lock.
-> 
-> But having a global state is still useful when checking if the global
-> suspend was triggered by power management. This way, instead of setting
-> the state of each individual console, the code would only set/read from the
-> global state.
-> 
-> Along with this change, two more fixes are necessary: change
-> console_{suspend,resume} to set/clear CON_SUSPEND instead of setting
-> CON_ENABLED and change show_cons_active to call __console_is_usable to
-> check console usefulness.
+From: "wanquan.zhong" <wanquan.zhong@fibocom.com>
 
-I would invert the logic a bit. I think that the main motivation
-is to replace CON_ENABLE -> CON_SUSPEND.
+Changes from v2:
+  1) Add missing 'net:' subsystem prefix to commit subject for compliance
+  2) Remove redundant "to config" suffix and refine commit wording
+  3) Split overlong Kconfig help text lines to meet 72-char limit
+  4) Align EXPERT dependency desc with WWAN subsystem conventions
 
-<proposal>
-The flag CON_ENABLE is cleared when serial drivers get suspended. This
-"hack" has been added by the commit 33c0d1b0c3ebb6 ("[PATCH] Serial
-driver stuff") back in v2.5.28.
+Add a new Kconfig option CONFIG_WWAN_ADB_PORT to control the ADB debug port
+functionality for MediaTek T7xx WWAN modem. This option depends on MTK_T7XX
+and EXPERT, defaults to 'y' to avoid breaking existing debugging workflows
+while mitigating potential security concerns on specific target systems.
 
-Stop hijacking CON_ENABLE flag and use the CON_SUSPEND flag instead.
+This change addresses security risks on systems such as Google Chrome OS,
+where unauthorized root access could lead to malicious ADB configuration
+of the WWAN device. The ADB port is restricted via this config only; the
+MIPC port remains unrestricted as it is MTK's internal protocol port with
+no associated security risks.
 
-Still allow to distinguish when:
+While introducing a kernel config option for a single array element may
+appear to introduce minor resource overhead, this is the most
+straightforward and maintainable implementation approach for this use case.
+Alternativeimplementation suggestions from reviewers are welcome.
 
-  - the backing device is being suspended, see console_suspend().
+Signed-off-by: wanquan.zhong <wanquan.zhong@fibocom.com>
+---
+ drivers/net/wwan/Kconfig                | 11 +++++++++++
+ drivers/net/wwan/t7xx/t7xx_port_proxy.c |  2 ++
+ 2 files changed, 13 insertions(+)
 
-  - the power management wants to calm down all consoles using
-    a big-hammer, see console_suspend_all().
+diff --git a/drivers/net/wwan/Kconfig b/drivers/net/wwan/Kconfig
+index 410b0245114e..3d49dc8491a3 100644
+--- a/drivers/net/wwan/Kconfig
++++ b/drivers/net/wwan/Kconfig
+@@ -27,6 +27,17 @@ config WWAN_DEBUGFS
+ 	  elements for each WWAN device in a directory that is corresponding to
+ 	  the device name: debugfs/wwan/wwanX.
+ 
++config WWAN_ADB_PORT
++	bool "MediaTek T7xx ADB port support" if EXPERT
++	depends on MTK_T7XX
++	default y
++	help
++	  Enables ADB (Android Debug Bridge) debug port support for MediaTek T7xx WWAN devices.
++
++	  This option enables the ADB debug port functionality in the MediaTek T7xx driver,
++	  allowing Android Debug Bridge connections through T7xx modems that support
++	  this feature. It is primarily used for debugging and development purposes.
++
+ config WWAN_HWSIM
+ 	tristate "Simulated WWAN device"
+ 	help
+diff --git a/drivers/net/wwan/t7xx/t7xx_port_proxy.c b/drivers/net/wwan/t7xx/t7xx_port_proxy.c
+index 4fc131f9632f..9f3b7b1dd4e2 100644
+--- a/drivers/net/wwan/t7xx/t7xx_port_proxy.c
++++ b/drivers/net/wwan/t7xx/t7xx_port_proxy.c
+@@ -102,6 +102,7 @@ static const struct t7xx_port_conf t7xx_port_conf[] = {
+ 		.ops = &ctl_port_ops,
+ 		.name = "t7xx_ap_ctrl",
+ 	}, {
++#ifdef CONFIG_WWAN_ADB_PORT
+ 		.tx_ch = PORT_CH_AP_ADB_TX,
+ 		.rx_ch = PORT_CH_AP_ADB_RX,
+ 		.txq_index = Q_IDX_ADB,
+@@ -112,6 +113,7 @@ static const struct t7xx_port_conf t7xx_port_conf[] = {
+ 		.port_type = WWAN_PORT_ADB,
+ 		.debug = true,
+ 	}, {
++#endif
+ 		.tx_ch = PORT_CH_MIPC_TX,
+ 		.rx_ch = PORT_CH_MIPC_RX,
+ 		.txq_index = Q_IDX_MBIM_MIPC,
+-- 
+2.43.0
 
-And restore the global "consoles_suspended" flag which was removed
-by the commit 9e70a5e109a4 ("printk: Add per-console suspended state").
-
-The difference is that accesses to the new global flag are
-synchronized the same way as to the CON_SUSPEND flag. It allows
-to read it under console_srcu_read_lock().
-
-Finally, use __console_is_usable() in show_cons_active(). It is the
-last location where the CON_ENABLED flag was checked directly.
-
-The patch should not change the existing behavior because all users check
-the state of the console using console_is_usable().
-</proposal>
-
-> diff --git a/drivers/tty/tty_io.c b/drivers/tty/tty_io.c
-> index e2d92cf70eb7..7d2bded75b75 100644
-> --- a/drivers/tty/tty_io.c
-> +++ b/drivers/tty/tty_io.c
-> @@ -3552,9 +3552,9 @@ static ssize_t show_cons_active(struct device *dev,
->  	for_each_console(c) {
->  		if (!c->device)
->  			continue;
-> -		if (!(c->flags & CON_NBCON) && !c->write)
-> -			continue;
-> -		if ((c->flags & CON_ENABLED) == 0)
-> +		if (!__console_is_usable(c, c->flags,
-> +					 consoles_suspended,
-> +					 NBCON_USE_ANY))
-
-It would be better to move this into a separate patch.
-
->  			continue;
->  		cs[i++] = c;
->  		if (i >= ARRAY_SIZE(cs))
-
-Otherwise, it looks good.
-
-Best Regards,
-Petr
 
