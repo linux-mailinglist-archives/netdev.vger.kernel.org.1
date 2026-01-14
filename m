@@ -1,301 +1,369 @@
-Return-Path: <netdev+bounces-249945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE2E5D2157D
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 22:32:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4203FD21634
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 22:40:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BFC1D302F838
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 21:32:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4588030788B6
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 21:37:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A7A8299A81;
-	Wed, 14 Jan 2026 21:32:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2ABC376BE4;
+	Wed, 14 Jan 2026 21:37:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="c/dGeYAy";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Z+VoP6Hs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CN9KoJt1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94E443AA4
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 21:31:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F9436D4FB
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 21:37:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768426321; cv=none; b=rUUdiSkeqQuyKNx8SDW4mt4X9Lu5+TxoS0jd867AQhhSKrBEg07lNpVUgBKbbstzYK9CugcOFHzMKc0rd/B17ipRaODwU5d1YDKdJreIQQJVg5OfNm9MCBNtdg6prnZ8pnNDCyJCkT9G/w6F1WYIHYBjE2GA5LmlGXbLXuco89g=
+	t=1768426651; cv=none; b=kyl8h7VdB5ppiDABL9VCCZKWT8zgwrbR/cA3zExDE09dpwmRX6+pXeZ/T7LRoS3TGMnASO8Nv1VZno4uI98lW6yGrMhh3xKWvdHERDm7yH44KbR57oWg77UUHFBcoUWsH8+iOt1qd6uHAMhhWgvMKavSReZxG8mDi3sGlhuRGPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768426321; c=relaxed/simple;
-	bh=NcogG4KS7gcdjJ6bLzdkJrwiKvOTwRq6dwpXwBUQbcY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Wk0BvJqsKmGplioiuAPkjYAOswdIsgiIvPRbM48f3h8r6Sqyi2nIpJ3883nYU4t3mWBDZ/pTMckXmhfdP6gkibU5/9ffIVxNHqFVBPzB9GlY42PGR/HpUPTJvA6o1uCOfL4srKVOWt2bjDFiHMzfZ1vc6x0/2eJpYWonkfSXhUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=c/dGeYAy; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Z+VoP6Hs; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60EKsAYD3925615
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 21:31:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	wzu6r/egvOq73eEwo8AgSlISThorKmPgNDcRZ+HtVRE=; b=c/dGeYAy1UQyyJ/q
-	deqXridmz4A5FosuRar/8wqlt5eCl/IScH2cLaS0Z9bInzTIKjEJ+iDEdv17lFa5
-	ebXPDsl6h/+yNIznlaiPhvpv+OjzlKwloCJ481MskqMI/zYq9XHoCNmTU0TMV092
-	ooUGn8ykdW0il20gPPR4JZ3KhRKM9fHppWTwd+VXFykl/Xo6/LDFD5vmPGR5w3nx
-	B4D1wOAC/wxcvxOXjkF3SGadgarah2VWW7hTZn3ww8JLBB8a2cOySADOq+/Cyo8A
-	/F89Dmu18rz3vXlC6+vzrNaaMxxKLYvwbJu1HjSB1w8F/ST1uYOl8S3TwMNUy2sk
-	a7NfXw==
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bpbdbsqmh-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 21:31:58 +0000 (GMT)
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-8b19a112b75so69908885a.1
-        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 13:31:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1768426318; x=1769031118; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wzu6r/egvOq73eEwo8AgSlISThorKmPgNDcRZ+HtVRE=;
-        b=Z+VoP6HsvjcgLs7mgg7F2yn+VDW8FPYzBlVX1L2oZj/MubKOgee8OumF+wH5/blzyo
-         hHOtzaaA5MYObqsGMIDsjoBSdGuHmsyM7CZYDToQ8O8SVRGeH9XJtlqKd+VCbxsoWfyI
-         Zf+gmbl8GC428CbLmafk8DQRvJatlJ0mNt6vbIZqvS+Hw2lap01vHeYOCtNjRL2lAX8O
-         jHyL5nze+cR6UaZv067+NAhDYuK9hhm6wI/oVTvdLZD23vprV9EqJZX7H1YYqsyOS2Gn
-         9c83QhBAOAEW9rQhXMV8dV+j4GMgHTgtu4CjMUB2YaeWhdf/u+D0PGKiUFME/HcL0Za/
-         l6xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768426318; x=1769031118;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wzu6r/egvOq73eEwo8AgSlISThorKmPgNDcRZ+HtVRE=;
-        b=ErAGLxDai26NyJGa7fokwhA2JcREfLaJxK7DCGzWPAuzSgTym9TdAhpmYqua0DhThr
-         gWVLYNfH0peEJdd3+HQZflMEV23kufPylm5hbg/CnXztQfelVIhu1OeCl8/IuIoIJxCY
-         jyYCuXwKtB3W6npxbdzp6NNJb2vynTLXDnTl2lKZppG8esWy+qZxnm6QVBHzCaBmWGU9
-         LE2s69fW6YAD8NSqXBjya37AEHPnXkbEZFyKI+Vg27RMX6JBNuzVVzJ1LrK3AK6+5qdD
-         YhIB3mfMVSFAnA7V5AA8uTluE7I2+gy4Sl3gI2wDFox9HcKpOQiIUwxDuaNYGbPqUrCC
-         3vxw==
-X-Forwarded-Encrypted: i=1; AJvYcCWKBoXv0mB0K3e/o6/z83osme/MxVQBB16RbKbXEJzGOHXAmehXPZeelzOTktjDpEADlo5tt7I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKiGdJNtPBhAM/FlgpwEPm5lNY0Fa1rL7GX65SIuwCJctUMCez
-	G8bL9PlrT3dS1P3wm6i+AbN9sNV63qB3eqW999u2AM5ueT1BMarSu66ctgUpPI04FuAjwj0d0bL
-	TNlLgRSLdyI2+sR20kaI/2xWp62Jeas9J5WgkNXaCkHz1Z6QBHrqWNtEH09HYkFmaIxJFONV2/3
-	/bUVQrsPu5qACYMTNmEJpYL9Km/6A8cyzp3g==
-X-Gm-Gg: AY/fxX4OgPzvSd0/JXyeZYPA3yJIci/UuNJIm+qP723IAedbididus0wV+LJ6GDnmbG
-	lxtq84dU7V6GcXzdjRtOkT1ibopy6yYNvHzJ+xd8EKk3gtz5ynyhzjVJnYQccPnskWEsWvSjna9
-	x+wQdmil69wz4ZWyebQKL8QfdHgviTXr4H5/uR4SHT1z3MV5wzpbZfswVGfsm/WROep0XWrpV/v
-	XO2eSmu8gx8zjC+vHJlbTrGAa0=
-X-Received: by 2002:a05:620a:4548:b0:8c3:6f1e:21ef with SMTP id af79cd13be357-8c531817a30mr426008485a.83.1768426317492;
-        Wed, 14 Jan 2026 13:31:57 -0800 (PST)
-X-Received: by 2002:a05:620a:4548:b0:8c3:6f1e:21ef with SMTP id
- af79cd13be357-8c531817a30mr426004785a.83.1768426317004; Wed, 14 Jan 2026
- 13:31:57 -0800 (PST)
+	s=arc-20240116; t=1768426651; c=relaxed/simple;
+	bh=yOiY2PnHluCIfkqe46Yjye9jkyOA0/H2b3IULGULlws=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=IhZTVld6dOu6m7BGOS0sF3xbAtMltvbaU2B/OQ0yd8aG1X2jFMKb+rypGHAjSAtNBLNoPnx1n4QNnTpkbYle53TBSfdKG0NJc/fQF8omkaLwnhUfQgKn+XYD85J72fWXkNKVKFIwTg0zEa6AW7E96ISH3TA9d49c0rXakjqtf5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CN9KoJt1; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768426625;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0UFxoOj7uBxpoYcltZPOzqeF7UevTJ0PuU8PpzgQ0CY=;
+	b=CN9KoJt1YDi7Er4WJWYY9c9zw1Cn12UIx2OnuxkoadRXvniGUqeP11+PNYcJ2u82H1ltlD
+	sFgr6ymQE8n+5baG+mOVzyyMgYuNAtDmgJKa5AGEjAz4xuaCeIXLH51Ed0rSyANuFua/Nd
+	OO2Jgr/zAXOtW+yJDMGx7HHp6BvLL8M=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-126-FYhPyw_TNjeF7pPLPspwnw-1; Wed,
+ 14 Jan 2026 16:36:59 -0500
+X-MC-Unique: FYhPyw_TNjeF7pPLPspwnw-1
+X-Mimecast-MFC-AGG-ID: FYhPyw_TNjeF7pPLPspwnw_1768426618
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B2F061956046;
+	Wed, 14 Jan 2026 21:36:56 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9E78419560A7;
+	Wed, 14 Jan 2026 21:36:53 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+cc: dhowells@redhat.com,
+    syzbot+6182afad5045e6703b3d@syzkaller.appspotmail.com,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Eric Dumazet <edumazet@google.com>,
+    "David S.
+ Miller" <davem@davemloft.net>,
+    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+    Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org,
+    stable@kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH net v2] rxrpc: Fix data-race warning and potential load/store tearing
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260109010909.4216-1-ryazanov.s.a@gmail.com> <20260109010909.4216-3-ryazanov.s.a@gmail.com>
-In-Reply-To: <20260109010909.4216-3-ryazanov.s.a@gmail.com>
-From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Date: Wed, 14 Jan 2026 22:31:45 +0100
-X-Gm-Features: AZwV_Qi2qWXnaTPD8sVWOUWF97uc62E-RDdTMMaWZQ01PSjKlP2XQX_BQpPYSCQ
-Message-ID: <CAFEp6-3n=125v7RDbbJaT2XPyt+adGfgY-pgXguymYVy+oxuaw@mail.gmail.com>
-Subject: Re: [RFC PATCH v5 2/7] net: wwan: core: explicit WWAN device
- reference counting
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        netdev@vger.kernel.org, Daniele Palmas <dnlplm@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <89225.1768426612.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
-X-Authority-Analysis: v=2.4 cv=NvncssdJ c=1 sm=1 tr=0 ts=69680b4e cx=c_pps
- a=HLyN3IcIa5EE8TELMZ618Q==:117 a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10
- a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8
- a=EUspDBNiAAAA:8 a=DxpDhW-plvI_LDxOzYgA:9 a=QEXdDO2ut3YA:10
- a=bTQJ7kPSJx9SKPbeHEYW:22
-X-Proofpoint-ORIG-GUID: ig_l1CONA7ywBS9U93KeKOqv6dh8bdKH
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTE0MDE3NiBTYWx0ZWRfX23t/TcAhj6K0
- x8ikstwLWkGh4DNSQR4dX+h68Ow0wqaoz5Jz2eGJ11VfQqL0Oq5AXrHp2I/3RvGEem62e0mtz8t
- A8/agr+kLLaoDCmalzEHXBY3MVbxC6BmTnHIip9myOFLQ2xt5oaWrTo4CVRt1k+DLxrMGqJ9uT7
- +BezCHeqtIDn8Njxgtb+RqdvfUfL7P8ncq4qeQnCV+zRdCf8qF0UQYmxV8swdZpNVl1gy0bLHyi
- 8tEF09q0vPkaWdnBK0ki1V0jHjc7lBsdzqbCT1nWlfLN494uE0fvyf03U5vaaPA6W1mER3M7ZQ0
- VSSKXDuaA0FDAGS3hWig8hArZlP5330Po2QJsOHIVnV/r+42Vj8TnaqqzNofVvZ5erfQ6GlVm/Z
- BMOCSJlFOSoEgTm8G+0dahvA98fU+mBrlPlpQSl78PRGbZ9zU7Cp5CCKBurMYa23GAG/RvAOfN9
- 32hK54JbSJ6sAHn8ijA==
-X-Proofpoint-GUID: ig_l1CONA7ywBS9U93KeKOqv6dh8bdKH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-14_06,2026-01-14_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 phishscore=0 suspectscore=0 bulkscore=0 clxscore=1015
- malwarescore=0 priorityscore=1501 adultscore=0 lowpriorityscore=0
- impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2512120000
- definitions=main-2601140176
+Date: Wed, 14 Jan 2026 21:36:52 +0000
+Message-ID: <89226.1768426612@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Fri, Jan 9, 2026 at 2:09=E2=80=AFAM Sergey Ryazanov <ryazanov.s.a@gmail.=
-com> wrote:
->
-> We need information about existing WWAN device children since we remove
-> the device after removing the last child. Previously, we tracked users
-> implicitly by checking whether ops was registered and existence of a
-> child device of the wwan_class class. Upcoming GNSS (NMEA) port type
-> support breaks this approach by introducing a child device of the
-> gnss_class class.
->
-> And a modem driver can easily trigger a kernel Oops by removing regular
-> (e.g., MBIM, AT) ports first and then removing a GNSS port. The WWAN
-> device will be unregistered on removal of a last regular WWAN port. And
-> subsequent GNSS port removal will cause NULL pointer dereference in
-> simple_recursive_removal().
->
-> In order to support ports of classes other than wwan_class, switch to
-> explicit references counting. Introduce a dedicated counter to the WWAN
-> device struct, increment it on every wwan_create_dev() call, decrement
-> on wwan_remove_dev(), and actually unregister the WWAN device when there
-> are no more references.
->
-> Run tested with wwan_hwsim with NMEA support patches applied and
-> different port removing sequences.
->
-> Reported-by: Daniele Palmas <dnlplm@gmail.com>
-> Closes: https://lore.kernel.org/netdev/CAGRyCJE28yf-rrfkFbzu44ygLEvoUM7fe=
-cK1vnrghjG_e9UaRA@mail.gmail.com/
-> Suggested-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
-> Signed-off-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-> ---
-> Changes:
-> * RFCv2->RFCv5: new patch to address modem disconnection / system
->   shutdown issues
-> ---
->  drivers/net/wwan/wwan_core.c | 37 ++++++++++++++++++------------------
->  1 file changed, 18 insertions(+), 19 deletions(-)
->
-> diff --git a/drivers/net/wwan/wwan_core.c b/drivers/net/wwan/wwan_core.c
-> index ade8bbffc93e..33f7a140fba9 100644
-> --- a/drivers/net/wwan/wwan_core.c
-> +++ b/drivers/net/wwan/wwan_core.c
-> @@ -42,6 +42,9 @@ static struct dentry *wwan_debugfs_dir;
->   * struct wwan_device - The structure that defines a WWAN device
->   *
->   * @id: WWAN device unique ID.
-> + * @refcount: Reference count of this WWAN device. When this refcount re=
-aches
-> + * zero, the device is deleted. NB: access is protected by global
-> + * wwan_register_lock mutex.
->   * @dev: Underlying device.
->   * @ops: wwan device ops
->   * @ops_ctxt: context to pass to ops
-> @@ -49,6 +52,7 @@ static struct dentry *wwan_debugfs_dir;
->   */
->  struct wwan_device {
->         unsigned int id;
-> +       int refcount;
->         struct device dev;
->         const struct wwan_ops *ops;
->         void *ops_ctxt;
-> @@ -222,8 +226,10 @@ static struct wwan_device *wwan_create_dev(struct de=
-vice *parent)
->
->         /* If wwandev already exists, return it */
->         wwandev =3D wwan_dev_get_by_parent(parent);
-> -       if (!IS_ERR(wwandev))
-> +       if (!IS_ERR(wwandev)) {
-> +               wwandev->refcount++;
->                 goto done_unlock;
-> +       }
->
->         id =3D ida_alloc(&wwan_dev_ids, GFP_KERNEL);
->         if (id < 0) {
-> @@ -242,6 +248,7 @@ static struct wwan_device *wwan_create_dev(struct dev=
-ice *parent)
->         wwandev->dev.class =3D &wwan_class;
->         wwandev->dev.type =3D &wwan_dev_type;
->         wwandev->id =3D id;
-> +       wwandev->refcount =3D 1;
->         dev_set_name(&wwandev->dev, "wwan%d", wwandev->id);
->
->         err =3D device_register(&wwandev->dev);
-> @@ -263,30 +270,21 @@ static struct wwan_device *wwan_create_dev(struct d=
-evice *parent)
->         return wwandev;
->  }
->
-> -static int is_wwan_child(struct device *dev, void *data)
-> -{
-> -       return dev->class =3D=3D &wwan_class;
-> -}
-> -
->  static void wwan_remove_dev(struct wwan_device *wwandev)
->  {
-> -       int ret;
-> -
->         /* Prevent concurrent picking from wwan_create_dev */
->         mutex_lock(&wwan_register_lock);
+    =
 
-FYI, you can use guarded mutex:
-guard(mutex)(&wwan_register_lock);
-This ensures the lock is 'automatically' released when leaving the
-scope/function, and would save the below goto/out_unlock.
+Fix the following:
 
->
-> -       /* WWAN device is created and registered (get+add) along with its=
- first
-> -        * child port, and subsequent port registrations only grab a refe=
-rence
-> -        * (get). The WWAN device must then be unregistered (del+put) alo=
-ng with
-> -        * its last port, and reference simply dropped (put) otherwise. I=
-n the
-> -        * same fashion, we must not unregister it when the ops are still=
- there.
-> -        */
-> -       if (wwandev->ops)
-> -               ret =3D 1;
-> -       else
-> -               ret =3D device_for_each_child(&wwandev->dev, NULL, is_wwa=
-n_child);
-> +       if (--wwandev->refcount <=3D 0) {
-> +               struct device *child =3D device_find_any_child(&wwandev->=
-dev);
-> +
-> +               if (WARN_ON(wwandev->ops))      /* Paranoid */
+        BUG: KCSAN: data-race in rxrpc_peer_keepalive_worker / rxrpc_send_=
+data_packet
 
-You may keep a reference to child (if existing)
+which is reporting an issue with the reads and writes to ->last_tx_at in:
 
-> +                       goto out_unlock;
-> +               if (WARN_ON(child)) {           /* Paranoid */
-> +                       put_device(child);
-> +                       goto out_unlock;
-> +               }
+        conn->peer->last_tx_at =3D ktime_get_seconds();
 
-Maybe you can simplify that with:
-```
-struct device *child =3D device_find_any_child(&wwandev->dev);
-put_device(child) /* NULL param is ok */
-if (WARN_ON(child || wwandev->ops))
-    return; /* or goto */
-```
->
-> -       if (!ret) {
->  #ifdef CONFIG_WWAN_DEBUGFS
->                 debugfs_remove_recursive(wwandev->debugfs_dir);
->  #endif
-> @@ -295,6 +293,7 @@ static void wwan_remove_dev(struct wwan_device *wwand=
-ev)
->                 put_device(&wwandev->dev);
->         }
->
-> +out_unlock:
->         mutex_unlock(&wwan_register_lock);
->  }
->
-> --
-> 2.52.0
->
+and:
 
-Regards,
-Loic
+        keepalive_at =3D peer->last_tx_at + RXRPC_KEEPALIVE_TIME;
+
+The lockless accesses to these to values aren't actually a problem as the
+read only needs an approximate time of last transmission for the purposes
+of deciding whether or not the transmission of a keepalive packet is
+warranted yet.
+
+Also, as ->last_tx_at is a 64-bit value, tearing can occur on a 32-bit
+arch.
+
+Fix both of these by switching to an unsigned int for ->last_tx_at and onl=
+y
+storing the LSW of the time64_t.  It can then be reconstructed at need
+provided no more than 68 years has elapsed since the last transmission.
+
+Fixes: ace45bec6d77 ("rxrpc: Fix firewall route keepalive")
+Reported-by: syzbot+6182afad5045e6703b3d@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/r/695e7cfb.050a0220.1c677c.036b.GAE@google=
+.com/
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: Eric Dumazet <edumazet@google.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Simon Horman <horms@kernel.org>
+cc: linux-afs@lists.infradead.org
+cc: netdev@vger.kernel.org
+cc: stable@kernel.org
+---
+ Changes
+ =3D=3D=3D=3D=3D=3D=3D
+ ver #2)
+  - Fix a format specifier to match the change in type of last_tx_at.
+
+ net/rxrpc/ar-internal.h |    9 ++++++++-
+ net/rxrpc/conn_event.c  |    2 +-
+ net/rxrpc/output.c      |   14 +++++++-------
+ net/rxrpc/peer_event.c  |   17 ++++++++++++++++-
+ net/rxrpc/proc.c        |    4 ++--
+ net/rxrpc/rxgk.c        |    2 +-
+ net/rxrpc/rxkad.c       |    2 +-
+ 7 files changed, 36 insertions(+), 14 deletions(-)
+
+diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
+index 5b7342d43486..36d6ca0d1089 100644
+--- a/net/rxrpc/ar-internal.h
++++ b/net/rxrpc/ar-internal.h
+@@ -387,7 +387,7 @@ struct rxrpc_peer {
+ 	struct rb_root		service_conns;	/* Service connections */
+ 	struct list_head	keepalive_link;	/* Link in net->peer_keepalive[] */
+ 	unsigned long		app_data;	/* Application data (e.g. afs_server) */
+-	time64_t		last_tx_at;	/* Last time packet sent here */
++	unsigned int		last_tx_at;	/* Last time packet sent here (time64_t LSW) *=
+/
+ 	seqlock_t		service_conn_lock;
+ 	spinlock_t		lock;		/* access lock */
+ 	int			debug_id;	/* debug ID for printks */
+@@ -1379,6 +1379,13 @@ void rxrpc_peer_keepalive_worker(struct work_struct=
+ *);
+ void rxrpc_input_probe_for_pmtud(struct rxrpc_connection *conn, rxrpc_ser=
+ial_t acked_serial,
+ 				 bool sendmsg_fail);
+ =
+
++/* Update the last transmission time on a peer for keepalive purposes. */
++static inline void rxrpc_peer_mark_tx(struct rxrpc_peer *peer)
++{
++	/* To avoid tearing on 32-bit systems, we only keep the LSW. */
++	WRITE_ONCE(peer->last_tx_at, ktime_get_seconds());
++}
++
+ /*
+  * peer_object.c
+  */
+diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
+index 232b6986da83..98ad9b51ca2c 100644
+--- a/net/rxrpc/conn_event.c
++++ b/net/rxrpc/conn_event.c
+@@ -194,7 +194,7 @@ void rxrpc_conn_retransmit_call(struct rxrpc_connectio=
+n *conn,
+ 	}
+ =
+
+ 	ret =3D kernel_sendmsg(conn->local->socket, &msg, iov, ioc, len);
+-	conn->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(conn->peer);
+ 	if (ret < 0)
+ 		trace_rxrpc_tx_fail(chan->call_debug_id, serial, ret,
+ 				    rxrpc_tx_point_call_final_resend);
+diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
+index 8b5903b6e481..d70db367e358 100644
+--- a/net/rxrpc/output.c
++++ b/net/rxrpc/output.c
+@@ -275,7 +275,7 @@ static void rxrpc_send_ack_packet(struct rxrpc_call *c=
+all, int nr_kv, size_t len
+ 	rxrpc_local_dont_fragment(conn->local, why =3D=3D rxrpc_propose_ack_ping=
+_for_mtu_probe);
+ =
+
+ 	ret =3D do_udp_sendmsg(conn->local->socket, &msg, len);
+-	call->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(call->peer);
+ 	if (ret < 0) {
+ 		trace_rxrpc_tx_fail(call->debug_id, serial, ret,
+ 				    rxrpc_tx_point_call_ack);
+@@ -411,7 +411,7 @@ int rxrpc_send_abort_packet(struct rxrpc_call *call)
+ =
+
+ 	iov_iter_kvec(&msg.msg_iter, WRITE, iov, 1, sizeof(pkt));
+ 	ret =3D do_udp_sendmsg(conn->local->socket, &msg, sizeof(pkt));
+-	conn->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(conn->peer);
+ 	if (ret < 0)
+ 		trace_rxrpc_tx_fail(call->debug_id, serial, ret,
+ 				    rxrpc_tx_point_call_abort);
+@@ -698,7 +698,7 @@ void rxrpc_send_data_packet(struct rxrpc_call *call, s=
+truct rxrpc_send_data_req
+ 			ret =3D 0;
+ 			trace_rxrpc_tx_data(call, txb->seq, txb->serial, txb->flags,
+ 					    rxrpc_txdata_inject_loss);
+-			conn->peer->last_tx_at =3D ktime_get_seconds();
++			rxrpc_peer_mark_tx(conn->peer);
+ 			goto done;
+ 		}
+ 	}
+@@ -711,7 +711,7 @@ void rxrpc_send_data_packet(struct rxrpc_call *call, s=
+truct rxrpc_send_data_req
+ 	 */
+ 	rxrpc_inc_stat(call->rxnet, stat_tx_data_send);
+ 	ret =3D do_udp_sendmsg(conn->local->socket, &msg, len);
+-	conn->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(conn->peer);
+ =
+
+ 	if (ret =3D=3D -EMSGSIZE) {
+ 		rxrpc_inc_stat(call->rxnet, stat_tx_data_send_msgsize);
+@@ -797,7 +797,7 @@ void rxrpc_send_conn_abort(struct rxrpc_connection *co=
+nn)
+ =
+
+ 	trace_rxrpc_tx_packet(conn->debug_id, &whdr, rxrpc_tx_point_conn_abort);
+ =
+
+-	conn->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(conn->peer);
+ }
+ =
+
+ /*
+@@ -917,7 +917,7 @@ void rxrpc_send_keepalive(struct rxrpc_peer *peer)
+ 		trace_rxrpc_tx_packet(peer->debug_id, &whdr,
+ 				      rxrpc_tx_point_version_keepalive);
+ =
+
+-	peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(peer);
+ 	_leave("");
+ }
+ =
+
+@@ -973,7 +973,7 @@ void rxrpc_send_response(struct rxrpc_connection *conn=
+, struct sk_buff *response
+ 	if (ret < 0)
+ 		goto fail;
+ =
+
+-	conn->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(conn->peer);
+ 	return;
+ =
+
+ fail:
+diff --git a/net/rxrpc/peer_event.c b/net/rxrpc/peer_event.c
+index 7f4729234957..9d02448ac062 100644
+--- a/net/rxrpc/peer_event.c
++++ b/net/rxrpc/peer_event.c
+@@ -237,6 +237,21 @@ static void rxrpc_distribute_error(struct rxrpc_peer =
+*peer, struct sk_buff *skb,
+ 	spin_unlock_irq(&peer->lock);
+ }
+ =
+
++/*
++ * Reconstruct the last transmission time.  The difference calculated sho=
+uld be
++ * valid provided no more than ~68 years elapsed since the last transmiss=
+ion.
++ */
++static time64_t rxrpc_peer_get_tx_mark(const struct rxrpc_peer *peer, tim=
+e64_t base)
++{
++	s32 last_tx_at =3D READ_ONCE(peer->last_tx_at);
++	s32 base_lsw =3D base;
++	s32 diff =3D last_tx_at - base_lsw;
++
++	diff =3D clamp(diff, -RXRPC_KEEPALIVE_TIME, RXRPC_KEEPALIVE_TIME);
++
++	return diff + base;
++}
++
+ /*
+  * Perform keep-alive pings.
+  */
+@@ -265,7 +280,7 @@ static void rxrpc_peer_keepalive_dispatch(struct rxrpc=
+_net *rxnet,
+ 		spin_unlock_bh(&rxnet->peer_hash_lock);
+ =
+
+ 		if (use) {
+-			keepalive_at =3D peer->last_tx_at + RXRPC_KEEPALIVE_TIME;
++			keepalive_at =3D rxrpc_peer_get_tx_mark(peer, base) + RXRPC_KEEPALIVE_=
+TIME;
+ 			slot =3D keepalive_at - base;
+ 			_debug("%02x peer %u t=3D%d {%pISp}",
+ 			       cursor, peer->debug_id, slot, &peer->srx.transport);
+diff --git a/net/rxrpc/proc.c b/net/rxrpc/proc.c
+index d803562ca0ac..ce4fd1af79ba 100644
+--- a/net/rxrpc/proc.c
++++ b/net/rxrpc/proc.c
+@@ -296,13 +296,13 @@ static int rxrpc_peer_seq_show(struct seq_file *seq,=
+ void *v)
+ =
+
+ 	now =3D ktime_get_seconds();
+ 	seq_printf(seq,
+-		   "UDP   %-47.47s %-47.47s %3u %4u %5u %6llus %8d %8d\n",
++		   "UDP   %-47.47s %-47.47s %3u %4u %5u %6ds %8d %8d\n",
+ 		   lbuff,
+ 		   rbuff,
+ 		   refcount_read(&peer->ref),
+ 		   peer->cong_ssthresh,
+ 		   peer->max_data,
+-		   now - peer->last_tx_at,
++		   (s32)now - (s32)peer->last_tx_at,
+ 		   READ_ONCE(peer->recent_srtt_us),
+ 		   READ_ONCE(peer->recent_rto_us));
+ =
+
+diff --git a/net/rxrpc/rxgk.c b/net/rxrpc/rxgk.c
+index dce5a3d8a964..43cbf9efd89f 100644
+--- a/net/rxrpc/rxgk.c
++++ b/net/rxrpc/rxgk.c
+@@ -678,7 +678,7 @@ static int rxgk_issue_challenge(struct rxrpc_connectio=
+n *conn)
+ =
+
+ 	ret =3D do_udp_sendmsg(conn->local->socket, &msg, len);
+ 	if (ret > 0)
+-		conn->peer->last_tx_at =3D ktime_get_seconds();
++		rxrpc_peer_mark_tx(conn->peer);
+ 	__free_page(page);
+ =
+
+ 	if (ret < 0) {
+diff --git a/net/rxrpc/rxkad.c b/net/rxrpc/rxkad.c
+index 3657c0661cdc..a756855a0a62 100644
+--- a/net/rxrpc/rxkad.c
++++ b/net/rxrpc/rxkad.c
+@@ -694,7 +694,7 @@ static int rxkad_issue_challenge(struct rxrpc_connecti=
+on *conn)
+ 		return -EAGAIN;
+ 	}
+ =
+
+-	conn->peer->last_tx_at =3D ktime_get_seconds();
++	rxrpc_peer_mark_tx(conn->peer);
+ 	trace_rxrpc_tx_packet(conn->debug_id, &whdr,
+ 			      rxrpc_tx_point_rxkad_challenge);
+ 	_leave(" =3D 0");
+
 
