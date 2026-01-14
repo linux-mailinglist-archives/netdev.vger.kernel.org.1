@@ -1,87 +1,91 @@
-Return-Path: <netdev+bounces-249802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 433B9D1E3D5
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 11:54:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B008D1E43B
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 11:59:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1F7E03011464
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 10:53:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A5642300CCEB
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 10:57:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60314396D34;
-	Wed, 14 Jan 2026 10:53:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F340395248;
+	Wed, 14 Jan 2026 10:57:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pFVsKo1F"
+	dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b="gzMW+j3Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.toke.dk (mail.toke.dk [45.145.95.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CBB9394478;
-	Wed, 14 Jan 2026 10:53:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF814304BCB
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 10:54:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.95.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768388027; cv=none; b=tTNNtrqxjl4hXJ+189ilaapgOdGg25m7Pb/Ee5XrbgE0G+k0jxhB7pZSisid7UswVsPh6rvaQQ4phNrMWyaS/qO4Q7iyhlz5Gg8tLkuQpMijVB50dJ4YbMNtjl6wbantazKh5+7g8c4fAWFr5jwolxh8omg8jWu1D8eHgF4iv4o=
+	t=1768388229; cv=none; b=BmK+p6eEPs19ktAppvcG18QuLdcnQ72lJ93xehZxRbfOjL/SiV5mneTWRx/eRSgUjQJ06Zeya5ULfNnwOLKhfgO0GSOLbWJJWajsgyEMlf1rFYDnZCkrpaLjqikJLCuJA/VvQot3DGeRQ5KXOelOUsI50p4o1PQ0yT6F88Qp8lU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768388027; c=relaxed/simple;
-	bh=HogBlS4eugUmPgdpVfFz1jm25c38dhN/Oy/Kc76rqV4=;
+	s=arc-20240116; t=1768388229; c=relaxed/simple;
+	bh=ebA5xYZs+17O4zaAsWAKepT51kZFKCWS1n0x4EfFURg=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=D5HMZ3XOaajmJ23dFcKZs7YLlktMDGBz5dl+6GN8xqfyXzWQtzh5AUsO0x0RCSsqDAv0INOCV/c5vQ0zaDtL0ZXWzBwole0lp4RyBxNqnjhBtBn0yMmN+h0f/SPBycMJHMHiPby7CUPslvEkpnR0kamAh6Isgus4FPwEVkDGD1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pFVsKo1F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2437C4CEF7;
-	Wed, 14 Jan 2026 10:53:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768388027;
-	bh=HogBlS4eugUmPgdpVfFz1jm25c38dhN/Oy/Kc76rqV4=;
+	 MIME-Version:Content-Type; b=ntiNPdHCdnFt6Rs4gtlFcTFCgmZSsOu0MPzLfSL6DGm9+XeZKXOjTIaJDVRk8hmlRDF230CPrPdYiCpXJt7rRNsGLgZvFiuOwxW5oAMEdW+tRtaC9iv7/HFhNBGITmMqxNFmYgFKdj5XnLRIG4iEoGsNJvMh6Izhq26rmbqO1fM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk; spf=pass smtp.mailfrom=toke.dk; dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b=gzMW+j3Q; arc=none smtp.client-ip=45.145.95.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toke.dk
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=toke.dk; s=20161023;
+	t=1768388054; bh=ebA5xYZs+17O4zaAsWAKepT51kZFKCWS1n0x4EfFURg=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=pFVsKo1FKQbBHCJFJYhyJGS55CrMbFsoMdeV1Qvs/JHk4w/jEcTmhaoZNu/zibSoY
-	 R4x3DKGJQvuqgCHCY3FdinXW150qZJ4zMWMmoIvIAJRgtnVCBllU9AroRLMxfRCliU
-	 YKuAdW9zRgoGaJVIWmK46yUmiE4jeAlXbYfzj8pX9Cwpm+57igkE87oHroUW+Gqxue
-	 LWeNuRFKm5xiRKM3UBrzkpQDcO/v5h6ijthQX2/3jKM+BPCgqYlsOAXEIGjNbzUNg+
-	 3zNBOgeJIh8h1XuP1M+Xxy5Ux3XCnLTcm7t94aBsBmk2tR3fnDgmOktQZAXUSHMOML
-	 7qmENa+aN4p5Q==
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 8EC37408B4C; Wed, 14 Jan 2026 11:53:42 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-To: saiaunghlyanhtet <saiaunghlyanhtet2003@gmail.com>, bpf@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>,
- netdev@vger.kernel.org, saiaunghlyanhtet <saiaunghlyanhtet2003@gmail.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, Lorenzo Bianconi
- <lorenzo.bianconi@redhat.com>
-Subject: Re: [bpf-next,v3] bpf: cpumap: report queue_index to xdp_rxq_info
-In-Reply-To: <20260114060430.1287640-1-saiaunghlyanhtet2003@gmail.com>
-References: <20260114060430.1287640-1-saiaunghlyanhtet2003@gmail.com>
+	b=gzMW+j3Qw9O4WKbG/prvJRpqAFP4vz9w5tZ0PzYaBdsX1x+kFpGnhnWwihMQViWm7
+	 7XqQiEz3wVNUaucnmfVmPYNqkqQUbpQKXfwsYoQ0ia+I9dbX9L4nuFzH8d7j0KHhRn
+	 R7jZWOi0obkMVYigAKLVS84JAfq5DKsvDNYjMoar6UnUBpJRnnpUxG37e/N/fgMlzz
+	 /CB4rHb5KlEIRB7GNg0Yi28zNfo5e4Lx8aQHJNoZFlPfi1xxy5edWVYPf6R9a3gHll
+	 Kc3S/JQsImCeWECBqeVp0cWJTmV0hqQvslI3+kmkJ3KK1DVFsjOjeIjnXobU80Ubgi
+	 HOAkCquwjVLQA==
+To: Eric Dumazet <edumazet@google.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
+ <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Paolo Abeni
+ <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ cake@lists.bufferbloat.net, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net/sched: cake: avoid separate allocation of
+ struct cake_sched_config
+In-Reply-To: <CANn89iLdM=a=oagYA=LKbfaDuhQaYtxA0wNERuzNLGghA58Phw@mail.gmail.com>
+References: <20260113143157.2581680-1-toke@redhat.com>
+ <CANn89iLdM=a=oagYA=LKbfaDuhQaYtxA0wNERuzNLGghA58Phw@mail.gmail.com>
+Date: Wed, 14 Jan 2026 11:54:12 +0100
 X-Clacks-Overhead: GNU Terry Pratchett
-Date: Wed, 14 Jan 2026 11:53:42 +0100
-Message-ID: <87h5so1n49.fsf@toke.dk>
+Message-ID: <87ecns1n3f.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-saiaunghlyanhtet <saiaunghlyanhtet2003@gmail.com> writes:
+Eric Dumazet <edumazet@google.com> writes:
 
-> When packets are redirected via cpumap, the original queue_index
-> information from xdp_rxq_info was lost. This is because the
-> xdp_frame structure did not include a queue_index field.
+> On Tue, Jan 13, 2026 at 3:32=E2=80=AFPM Toke H=C3=B8iland-J=C3=B8rgensen =
+<toke@redhat.com> wrote:
+>>
+>> Paolo pointed out that we can avoid separately allocating struct
+>> cake_sched_config even in the non-mq case, by embedding it into struct
+>> cake_sched_data. This reduces the complexity of the logic that swaps the
+>> pointers and frees the old value, at the cost of adding 56 bytes to the
+>> latter. Since cake_sched_data is already almost 17k bytes, this seems
+>> like a reasonable tradeoff.
+>>
+>> Suggested-by: Paolo Abeni <pabeni@redhat.com>
+>> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+>> ---
 >
-> This patch adds a queue_index field to struct xdp_frame and ensures
-> it is properly preserved during the xdp_buff to xdp_frame conversion.
-> Now the queue_index is reported to the xdp_rxq_info.
+> This is also fixing a panic, so :
 >
-> Resolves the TODO comment in cpu_map_bpf_prog_run_xdp().
+> Fixes: bc0ce2bad36c ("net/sched: sch_cake: Factor out config variables
+> into separate struct")
 >
-> Signed-off-by: saiaunghlyanhtet <saiaunghlyanhtet2003@gmail.com>
+> For the record, a fix for the panic would be :
 
-This exact patch was submitted before by Lorenzo[0] and was rejected
-with the argument that we shouldn't be adding more fields to xdp_frame
-in an ad-hoc manner, but rather wait until we have a more general
-solution.
+Ah yes, of course; thanks for noticing (and for the tag)!
 
 -Toke
-
-[0] https://lore.kernel.org/r/1a22e7e9-e6ef-028f-dffa-e954207dc24d@redhat.com
 
