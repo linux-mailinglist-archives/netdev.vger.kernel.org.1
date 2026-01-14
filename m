@@ -1,152 +1,301 @@
-Return-Path: <netdev+bounces-249936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4441BD21087
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 20:29:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58FBFD20F90
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 20:07:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ABE863018F7F
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 19:28:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BB669303090F
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 19:06:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B4D8346FA7;
-	Wed, 14 Jan 2026 19:28:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC043033ED;
+	Wed, 14 Jan 2026 19:06:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F1SaFUWm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WmVR/fc0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F43346AE5
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 19:28:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D272D1E0DCB
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 19:06:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768418933; cv=none; b=M0OWoLQDU/YhUt+uYEK+IPD3K76Lj3VNV7R4mekjBiTEmLF8eIETre5tW4QH7jtBZV/dPsV8tV7AmgYab58UGxhpLuLgrMZJzxjWWdJaL2XvSyALfZasB1GYH3QttXoAxr2x/OXOEIl1O2bE8F8hoXloLeH6EwRof400CiJkcxo=
+	t=1768417572; cv=none; b=o8b+YZYk88x+uh7+qlsCDJeYgjfjIVkrxGCwBjQWA9jpoQ9R7NjGYudWSTvcZrJdCJ91e3YjJnTkDf6QViuA5ejoga3qGr1HHEzwOf8e+ych+kBMczz/gJU58tOEdFlxplfha+Iw6JF1lKHtfPQn7/GyF+lqltiM9IhVgZw5cUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768418933; c=relaxed/simple;
-	bh=QKRezXrA3bG4ArDBbT58+S8c1CtyAn6iBKaQozySKZA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S0TYKCpd3bHvqnwl8YBkHmrw7c/XW46UVHQDQ9I8AgppqIRk144tCjNi5afC8bLFKkknD6vZ6FfyDaGyMXIVSGeeDj5Qy6UUzwec/4WONe7EO1uLQZQ7O19JLVWYJiXLR4pwUkUXd1z31k7wDRaNXISyHzGSAJxuk5apmhBjCnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F1SaFUWm; arc=none smtp.client-ip=209.85.221.169
+	s=arc-20240116; t=1768417572; c=relaxed/simple;
+	bh=rgbaQaXJPKl2UJf1a/PVmuHeLaG6thRyoEnpaaWZy8M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iJY30H5e8qYAeGgNhnid2L0jlm8MAbsHT3M8HbPYpkUB/aWMKSueHgZFAxlsc0C+ThGIoax6vSltX4YOANzb8abqu5ZWaX10TXmiI4S9ghNO3sjDXRE9cuhn42n4GIH0pflZWT2EGZpTIqsCQgYLhuewiikGAQxowTMEhfpR0Gs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WmVR/fc0; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-56373f07265so137592e0c.0
-        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 11:28:51 -0800 (PST)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2a137692691so1227565ad.0
+        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 11:06:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768418931; x=1769023731; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jUpDNPxjIqi9ICJXtc+mfMuxEexyo061EqFw5Nyb8q0=;
-        b=F1SaFUWm961JKpMnu0ydteNHS4t3gcUzC4JP64uX+Pxwm6r+qtELwLoB7gSni/Vb87
-         ST5RwkRCCH/SRgx5WxbexFtcrj26A8BiglaB5QC30Rl/Uv41uKG7AVFGlPgBTmFFmKJw
-         coXkIQuaGC0k2EPoL0hhFOLMboVh7HCwv30Vi4N3Rg449J4JzWWraOAZZYHXRMnpcR1z
-         pMqlkGgiEDtsaNCPANBcnVAE5GJq9rpbSUYYL9hBi1OcDD/9mpRNCtlaPN1VqTo2zk6u
-         Fztciom0/pJecn0NCLJpn+i5hSrSetqKJwq6Oc7PZsCl4e6/JZ9lYCfHMoMutSuVEZlZ
-         86mw==
+        d=gmail.com; s=20230601; t=1768417570; x=1769022370; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=udRxWZ9gu4Q93pQSMSG3gSPyr3026aY/HCSQBYrnGTE=;
+        b=WmVR/fc0xZ8I8qEdYsfJ1mktaPV16iypWdGpnPJLZyw3nAizaJN5HpU6EIBQiISMtS
+         RewRhJxY5d6iFyrjPD6zM4GgXa99HP3R8Gv0daF//QgbraOlkZlojmFNIw82L9BFxCjL
+         S7tp+IK7B0+nw6wpYQaYVNHnwYIjrdPW1goZPL0ahpFMcur7tBSaHsP92GoH1PGXjOFy
+         ZtEUFvGF+BQRFnujlqJD7dC0ViGijZ+HXHZaXmmaiBWhpLqgoM+HM8Gt+TXt8YuG7NNo
+         /it0SikkitZ3U+eYhdHJaMjZD/DfNkSVFFtWeYl9JFTZ0zs+d9P3NtzBHcHSwZGu8Vac
+         6mvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768418931; x=1769023731;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jUpDNPxjIqi9ICJXtc+mfMuxEexyo061EqFw5Nyb8q0=;
-        b=QAnQ+Wyhq+z/IJjl9C6iZtJLcfqdA3q+QvD6w4Lx8zGIZb9+ibQUHANO4EoTuJk4vB
-         QuWy5GZY4ToMlZWozbanMXCC2Q2HWkCauZjqf+G//ClsUCYmm4IAlDmPHEG1P00VK1Ng
-         Y+xqZkRGZHcUd0bfMx0iUtuKRWp96in0Ie92mUlGK1UpXB5SH0imcvCYoEgu4R80jgE9
-         sC7lFcEh790gkNPJ3qUjll0Zf/1SS1aw+6XmLLOF/zJrKvb4Mgt55A+B/w+JdgZMidbR
-         PBLbdzXetAEajcAFkXrXlIYeOPTJ0WRBAEmh1u1VztJlaUJ5wwAppvg2Kz/NmS9ZQVRX
-         0Z5g==
-X-Forwarded-Encrypted: i=1; AJvYcCVlY9wBIzkmAXE5Z33qAYQw/lJlWl1nd0xu94Nk3+VI7XzGs1rmgboUILT/sJvO7BzH2a3cQPg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxN/RHIcSZQ9OAQlGehu9X/8rTY68SLg8TxqN47utwQVstMhvNj
-	J9IwXDJRm5ZXtbbeyOYhuF9odJLVGqEjeAlF3EVdMIHtx08AbmbUZa06SKF/RA==
-X-Gm-Gg: AY/fxX7nz6wF6Tkwyq9B1Sy9nremlxVnWqxP4cLn3txs8usxNWaDr/NCW8Bxietpbuj
-	OutYLv6tuzwSk6VB219GvnU4SDRQXIgnOPr6MHf3OdI7iPSC/rpkKGnAWVuin02eORrT1BrY0aH
-	QEtMggeWwB9I7OEvWeW/hsvcnIhBg6lOHKb0yI3vsgzD8kmqRSPN9dThCzDdwtIRHEMV3YWDjqW
-	YLRRrPl0ETsLPxx70qUAoRHONNrDCxUfce7jyY54EsFmJ+dUMzg56I+LjJnw3ef9nlDEn9ke7uF
-	Su3R2QJkgotHfCDpt3FXcKkkn+t3EqNUCvNbE8TUBpFEnJwpGn0pNgsW2O5AiczlO/IVDdeeqPr
-	BSDOOSCiISD41CmVLB0vJkiSwKORswP69/pHcyZesfmOEph8V8hTtwyfK9BNmtv9Y64l2Jc4Fb5
-	/oszmvu6+XmoGqSVJTh9arPzrZvOWx8TguKQ==
-X-Received: by 2002:a05:690e:1c06:b0:646:eb06:f2e2 with SMTP id 956f58d0204a3-64903b513d2mr1973243d50.73.1768411311135;
-        Wed, 14 Jan 2026 09:21:51 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:5::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-790aa6e12ffsm92418037b3.53.2026.01.14.09.21.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jan 2026 09:21:50 -0800 (PST)
-Date: Wed, 14 Jan 2026 09:21:49 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: kernel test robot <lkp@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Long Li <longli@microsoft.com>, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, kvm@vger.kernel.org,
-	linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	berrange@redhat.com, Sargun Dhillon <sargun@sargun.me>
-Subject: Re: [PATCH net-next v14 01/12] vsock: add netns to vsock core
-Message-ID: <aWfQrS1oNcXwcXu3@devvm11784.nha0.facebook.com>
-References: <20260112-vsock-vmtest-v14-1-a5c332db3e2b@meta.com>
- <202601140749.5TXm5gpl-lkp@intel.com>
- <CAGxU2F45q7CWy3O_QhYj0Y2Bt84vA=eaTeBTu+TvEmFm0_E7Jw@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1768417570; x=1769022370;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=udRxWZ9gu4Q93pQSMSG3gSPyr3026aY/HCSQBYrnGTE=;
+        b=bc+vS5pYNHh/Gfd0Hu0Il2+yZfBIHSNKw6Fhl0QHypt1qERZWO4OiLZho3IbwQ6wz0
+         yG5PwyKpGoCs6+AqBfEAPTiL3gcd/92sMls6ZeucozUcCrV9qpyxd+RQ94dBwzdwwv75
+         24AFOMMc1Qa3Z2JZs4Vttrpk3D1mudpkKVvgrKM0CmKV64HOUM37UELbS3emCWBZzqy+
+         uvhtzcHyrTZZVoZ4qJvivHY//NW0koQ0u6HK4bFKwwbtB7usDWXVi2DHMGtqYNnW06s6
+         U4B6xVTrRDnQTHOj9PiXYxaiXeS+yIb6TiV8SnCvBriIQI9qpayX3veKzKs+XrPZlOBS
+         THXg==
+X-Forwarded-Encrypted: i=1; AJvYcCUNaZK9VQKyphs9hTSL4MCipL2pkB/7EFgOwLB/oJ99HcauiJJs7CvmV/uV+jZSnuIO9+yjTFA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhjadBDykDdggIXzGISi8ZDIYhZLOlFyM/0idfYLyjRn7Q800c
+	ruz9qAGpUKS5idCNiEgizUFN2h09oxuEeY9pf0KcKXdSJ2WrCLHbMP/dfUA2DVxCj8Ovt/G3H8G
+	DZxByFDmfzCNStsqF8FtCnbhFi/sler4=
+X-Gm-Gg: AY/fxX6GiYfbOxynFQz/Gjm1zAW1Gkta3wBmR7OPSkQVuU2lcCRxbMykfy42eVLn0hr
+	kJeeOnNhANuMvMXzsoSYzmWDlcwiVvWzGUyo2N4NrdQYDZiiAatVrKwtfDfCxIlX9LkngWTyK2V
+	EG/zmaPzffP5+fMATmZzjytRRk+qQR3Myni5ps9oxIYmynUaSCWrZaW+n5uuNWy4dH7FgcF5ODh
+	FkWwIU9AkMVgzu46TQquklVquD5n73GrICoiXBaEZGY+Q1fEwNCJEQyW689MXys8Y8zugpph/NP
+	bTcxSI22iw==
+X-Received: by 2002:a17:903:1b4e:b0:297:c71d:851c with SMTP id
+ d9443c01a7336-2a59bbf1b2fmr31346295ad.36.1768417570008; Wed, 14 Jan 2026
+ 11:06:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAGxU2F45q7CWy3O_QhYj0Y2Bt84vA=eaTeBTu+TvEmFm0_E7Jw@mail.gmail.com>
+References: <20260110141115.537055-1-dongml2@chinatelecom.cn>
+ <20260110141115.537055-8-dongml2@chinatelecom.cn> <CAEf4BzYE0ZTrCaruJSr8MXAbZSsKz8H_BqHoZX5kS63yRBa-2g@mail.gmail.com>
+ <2187165.bB369e8A3T@7940hx>
+In-Reply-To: <2187165.bB369e8A3T@7940hx>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Wed, 14 Jan 2026 11:05:56 -0800
+X-Gm-Features: AZwV_QimwagFN3yiR1pVjCVSJi-U55L205nju_mJfwvoJlf8_njPZL2Nabpui6s
+Message-ID: <CAEf4BzZZSUkMbv=7DcBubGjnABHNnAZjT3-A5XKB-UW58a=6jg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v9 07/11] bpf,x86: add fsession support for x86_64
+To: Menglong Dong <menglong.dong@linux.dev>
+Cc: Menglong Dong <menglong8.dong@gmail.com>, ast@kernel.org, andrii@kernel.org, 
+	daniel@iogearbox.net, martin.lau@linux.dev, eddyz87@gmail.com, 
+	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com, 
+	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
+	davem@davemloft.net, dsahern@kernel.org, tglx@linutronix.de, mingo@redhat.com, 
+	jiang.biao@linux.dev, bp@alien8.de, dave.hansen@linux.intel.com, 
+	x86@kernel.org, hpa@zytor.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 14, 2026 at 04:54:15PM +0100, Stefano Garzarella wrote:
-> On Wed, 14 Jan 2026 at 00:13, kernel test robot <lkp@intel.com> wrote:
+On Tue, Jan 13, 2026 at 7:27=E2=80=AFPM Menglong Dong <menglong.dong@linux.=
+dev> wrote:
+>
+> On 2026/1/14 09:25 Andrii Nakryiko <andrii.nakryiko@gmail.com> write:
+> > On Sat, Jan 10, 2026 at 6:12 AM Menglong Dong <menglong8.dong@gmail.com=
+> wrote:
+> > >
+> > > Add BPF_TRACE_FSESSION supporting to x86_64, including:
+> [...]
+> > >
+> > > diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.=
+c
+> > > index d94f7038c441..0671a434c00d 100644
+> > > --- a/arch/x86/net/bpf_jit_comp.c
+> > > +++ b/arch/x86/net/bpf_jit_comp.c
+> > > @@ -3094,12 +3094,17 @@ static int emit_cond_near_jump(u8 **pprog, vo=
+id *func, void *ip, u8 jmp_cond)
+> > >  static int invoke_bpf(const struct btf_func_model *m, u8 **pprog,
+> > >                       struct bpf_tramp_links *tl, int stack_size,
+> > >                       int run_ctx_off, bool save_ret,
+> > > -                     void *image, void *rw_image)
+> > > +                     void *image, void *rw_image, u64 func_meta)
+> > >  {
+> > >         int i;
+> > >         u8 *prog =3D *pprog;
+> > >
+> > >         for (i =3D 0; i < tl->nr_links; i++) {
+> > > +               if (tl->links[i]->link.prog->call_session_cookie) {
+> > > +                       /* 'stack_size + 8' is the offset of func_md =
+in stack */
 > >
-> > Hi Bobby,
-> >
-> > kernel test robot noticed the following build warnings:
-> >
-> > [auto build test WARNING on net-next/main]
-> >
-> > url:    https://github.com/intel-lab-lkp/linux/commits/Bobby-Eshleman/virtio-set-skb-owner-of-virtio_transport_reset_no_sock-reply/20260113-125559
-> > base:   net-next/main
-> > patch link:    https://lore.kernel.org/r/20260112-vsock-vmtest-v14-1-a5c332db3e2b%40meta.com
-> > patch subject: [PATCH net-next v14 01/12] vsock: add netns to vsock core
-> > config: x86_64-buildonly-randconfig-004-20260113 (https://download.01.org/0day-ci/archive/20260114/202601140749.5TXm5gpl-lkp@intel.com/config)
-> > compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-> > reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260114/202601140749.5TXm5gpl-lkp@intel.com/reproduce)
-> >
-> > If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> > the same patch/commit), kindly add following tags
-> > | Reported-by: kernel test robot <lkp@intel.com>
-> > | Closes: https://lore.kernel.org/oe-kbuild-all/202601140749.5TXm5gpl-lkp@intel.com/
-> >
-> > All warnings (new ones prefixed by >>, old ones prefixed by <<):
-> >
-> > >> WARNING: modpost: net/vmw_vsock/vsock: section mismatch in reference: vsock_exit+0x25 (section: .exit.text) -> vsock_sysctl_ops (section: .init.data)
-> 
-> Bobby can you check this report?
-> 
-> Could be related to `__net_initdata` annotation of `vsock_sysctl_ops` ?
-> Why we need that?
-> 
-> Thanks,
-> Stefano
-> 
+> > not func_md, don't invent new names, "func_meta" (but it's also so
+>
+>
+> Ah, it should be func_meta here, it's a typo.
+>
+>
+> > backwards that you have stack offsets as positive... and it's not even
+> > in verifier's stack slots, just bytes... very confusing to me)
+>
+>
+> Do you mean the offset to emit_store_stack_imm64()? I'll convert it
+> to negative after modify the emit_store_stack_imm64() as you suggested.
+>
 
-Yep, no problem.
+yes
 
-Best,
-Bobby
+>
+> >
+> > > +                       emit_store_stack_imm64(&prog, stack_size + 8,=
+ func_meta);
+> > > +                       func_meta -=3D (1 << BPF_TRAMP_M_COOKIE);
+> >
+> > was this supposed to be BPF_TRAMP_M_IS_RETURN?... and why didn't AI cat=
+ch this?
+>
+>
+> It should be BPF_TRAMP_M_COOKIE here. I'm decreasing and
+> compute the offset of the session cookie for the next bpf
+> program.
+>
+>
+> This part correspond to the 5th patch. It will be more clear if you
+> combine it to the 5th patch. Seems that it's a little confusing
+> here :/
+>
+
+It is confusing. And invoke_bpf is partly provided with opaque
+func_meta, but also partly knows its structure and does extra
+adjustments, I don't like it. I think it would be simpler to just pass
+nr_args and cookies_offset and let invoke_bpf construct func_meta for
+each program invocation, IMO.
+
+>
+> Maybe some comment is needed here.
+>
+>
+> >
+> > > +               }
+> > >                 if (invoke_bpf_prog(m, &prog, tl->links[i], stack_siz=
+e,
+> > >                                     run_ctx_off, save_ret, image, rw_=
+image))
+> > >                         return -EINVAL;
+> > > @@ -3222,7 +3227,9 @@ static int __arch_prepare_bpf_trampoline(struct=
+ bpf_tramp_image *im, void *rw_im
+> > >         struct bpf_tramp_links *fexit =3D &tlinks[BPF_TRAMP_FEXIT];
+> > >         struct bpf_tramp_links *fmod_ret =3D &tlinks[BPF_TRAMP_MODIFY=
+_RETURN];
+> > >         void *orig_call =3D func_addr;
+> > > +       int cookie_off, cookie_cnt;
+> > >         u8 **branches =3D NULL;
+> > > +       u64 func_meta;
+> > >         u8 *prog;
+> > >         bool save_ret;
+> > >
+> > > @@ -3290,6 +3297,11 @@ static int __arch_prepare_bpf_trampoline(struc=
+t bpf_tramp_image *im, void *rw_im
+> > >
+> > >         ip_off =3D stack_size;
+> > >
+> > > +       cookie_cnt =3D bpf_fsession_cookie_cnt(tlinks);
+> > > +       /* room for session cookies */
+> > > +       stack_size +=3D cookie_cnt * 8;
+> > > +       cookie_off =3D stack_size;
+> > > +
+> > >         stack_size +=3D 8;
+> > >         rbx_off =3D stack_size;
+> > >
+> > > @@ -3383,9 +3395,19 @@ static int __arch_prepare_bpf_trampoline(struc=
+t bpf_tramp_image *im, void *rw_im
+> > >                 }
+> > >         }
+> > >
+> > > +       if (bpf_fsession_cnt(tlinks)) {
+> > > +               /* clear all the session cookies' value */
+> > > +               for (int i =3D 0; i < cookie_cnt; i++)
+> > > +                       emit_store_stack_imm64(&prog, cookie_off - 8 =
+* i, 0);
+> > > +               /* clear the return value to make sure fentry always =
+get 0 */
+> > > +               emit_store_stack_imm64(&prog, 8, 0);
+> > > +       }
+> > > +       func_meta =3D nr_regs + (((cookie_off - regs_off) / 8) << BPF=
+_TRAMP_M_COOKIE);
+> >
+> > func_meta conceptually is a collection of bit fields, so using +/-
+> > feels weird, use | and &, more in line with working with bits?
+>
+>
+> It's not only for bit fields. For nr_args and cookie offset, they are
+> byte fields. Especially for cookie offset, arithmetic operation is perfor=
+med
+> too. So I think it make sense here, right?
+>
+>
+> >
+> > (also you defined that BPF_TRAMP_M_NR_ARGS but you are not using it
+> > consistently...)
+>
+>
+> I'm not sure if we should define it. As we use the least significant byte=
+ for
+> the nr_args, the shift for it is always 0. If we use it in the inline, un=
+necessary
+> instruction will be generated, which is the bit shift instruction.
+>
+>
+> I defined it here for better code reading. Maybe we can do some comment
+> in the inline of bpf_get_func_arg(), instead of defining such a unused
+> macro?
+
+I think I just wouldn't define NR_ARGS macro at all then, given inline
+implementation implicitly encodes that knowledge anyways.
+
+>
+>
+> Thanks!
+> Menglong Dong
+>
+>
+> >
+> >
+> >
+> >
+> > > +
+> > >         if (fentry->nr_links) {
+> > >                 if (invoke_bpf(m, &prog, fentry, regs_off, run_ctx_of=
+f,
+> > > -                              flags & BPF_TRAMP_F_RET_FENTRY_RET, im=
+age, rw_image))
+> > > +                              flags & BPF_TRAMP_F_RET_FENTRY_RET, im=
+age, rw_image,
+> > > +                              func_meta))
+> > >                         return -EINVAL;
+> > >         }
+> > >
+> > > @@ -3445,9 +3467,14 @@ static int __arch_prepare_bpf_trampoline(struc=
+t bpf_tramp_image *im, void *rw_im
+> > >                 }
+> > >         }
+> > >
+> > > +       /* set the "is_return" flag for fsession */
+> > > +       func_meta +=3D (1 << BPF_TRAMP_M_IS_RETURN);
+> > > +       if (bpf_fsession_cnt(tlinks))
+> > > +               emit_store_stack_imm64(&prog, nregs_off, func_meta);
+> > > +
+> > >         if (fexit->nr_links) {
+> > >                 if (invoke_bpf(m, &prog, fexit, regs_off, run_ctx_off=
+,
+> > > -                              false, image, rw_image)) {
+> > > +                              false, image, rw_image, func_meta)) {
+> > >                         ret =3D -EINVAL;
+> > >                         goto cleanup;
+> > >                 }
+> > > --
+> > > 2.52.0
+> > >
+> >
+>
+>
+>
+>
+>
 
