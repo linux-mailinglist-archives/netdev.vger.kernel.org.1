@@ -1,73 +1,101 @@
-Return-Path: <netdev+bounces-249692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4037D1C2E8
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 04:02:14 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BB84D1C333
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 04:05:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9541B3012254
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 03:02:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C7EAC3015926
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 03:04:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA1932BCF43;
-	Wed, 14 Jan 2026 03:02:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF1232861E;
+	Wed, 14 Jan 2026 03:04:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KXWM6BDW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M2EIj3gf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C2E2356C6;
-	Wed, 14 Jan 2026 03:02:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4999B2BDC2F
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 03:04:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768359732; cv=none; b=HTPixT/CZS707HGoaB/L6puHRsNds4h8wNvfv3m771wx8ZnkIzj2gUt4tvwVvdzdULgLnkfMdqjTb/N1cN0i+qmO7WI9t65DjEFzxdTorrcRyY1v9OjiavfW2Lifx8hl7IrpvF1fyWaZKejgLG/ihc9ZSrXG/8j+IvF0wUIg7pU=
+	t=1768359851; cv=none; b=RqtMQYQeyqcYLdvBKhc6sII8JO5yzvfz7cIQjFCA9w8ywNxQovunol+g1KHOQgW/zOTZy6ouGvs6oPVOf0FErFze51q0ftry4creCpeSnaHKB1e/kdXlf/dE63YX+uywDCfUcsEgPxkLoA8UKTfA5lPQCBDPyl8X3bJWeF9PWO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768359732; c=relaxed/simple;
-	bh=v7Y0cxUB+ZK/4JUhXqBaIjT6u2OfUUkLzJ7JLKX7x3g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FyI3r4XmpA7iw3M7KMU3OPWHEVlTWm58otZzBTgvHSb//4z5oW9vA1PH7z46W6aRIJdlyIP48Tcunf6JUV0Cjo0DvdecUY0yFRasCx6X7MEyONrbwsDWaF7b4Tp/pUsQauFVIDjEcOLe4PtBwjtBEjN2vBxqcxVQdAQg75NkrVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KXWM6BDW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1ACAC19421;
-	Wed, 14 Jan 2026 03:02:11 +0000 (UTC)
+	s=arc-20240116; t=1768359851; c=relaxed/simple;
+	bh=J7iwzGVzEFjKuyffi8fv6Bdf/peX6naZqF/0f4oKWx8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=FOl8WatK3/Cad1Zov+gmkZprR2OQwqzUD6szvk8D7nGLLpQPPhEAU/NZ0QyJCVoVhKR78A/KGEgE5rcq4jb6fXd7Y+UI96nuzlHzMFBxFOsqjAc0TFjFcSYdPCg3DhCX8anCmg6LLqzL/mYr71IMlg9QSwavCrqL0H9ZNhUBPvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M2EIj3gf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0393C116C6;
+	Wed, 14 Jan 2026 03:04:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768359732;
-	bh=v7Y0cxUB+ZK/4JUhXqBaIjT6u2OfUUkLzJ7JLKX7x3g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KXWM6BDWzLo5Cv+dcEofXhrHvpUMI/aCOPqG6l+P/Gd9XsrP/IYhv22IOWjHGMc5H
-	 7LwIRh8RKQEPiwyuOr66ua3mGolNjE4n5bp5J3GuVyUH4LQb+kuUJKA4KbpJPzs8Te
-	 9zxU1XkK8ujNkLDCycY2fHNmmZu9OvLR6Q97OT2QpYqMll3lrBxvczfvaGRTpYafef
-	 VpSMO7qbt9xyFEtl0yDUDMa8oTXJbxNoqWrz9ORuIZpBoI9ep3bqiyMRJPiNt9x9Dk
-	 xV2zEH/WenlRjuHWSwJKKLjVM7WBkyYCPL/knlby/b0GHq80Y29iU97LDTTfwDAv0o
-	 J0ICBMYxuFU/Q==
-Date: Tue, 13 Jan 2026 19:02:10 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jinseok Kim <always.starving0@gmail.com>
-Cc: quic_luoj@quicinc.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: qualcomm: ppe: Remove redundant include of
- dev_printk.h
-Message-ID: <20260113190210.5387bde1@kernel.org>
-In-Reply-To: <20260112042038.2553-1-always.starving0@gmail.com>
-References: <20260112042038.2553-1-always.starving0@gmail.com>
+	s=k20201202; t=1768359850;
+	bh=J7iwzGVzEFjKuyffi8fv6Bdf/peX6naZqF/0f4oKWx8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=M2EIj3gfPGcCMAUGoLPGGXjrREhMRyQBJP4gKS+3LDNd42tjTBQ/LrersPgk7YtNr
+	 xU1YuvQT6qyLknERim7JKf46omnvaLBjAa15hi25vpa24DwDUvG+u7fwP/zqj6V0HK
+	 TrV42rxqpPuo2oxUBT8U7o5OyxwJMFcAZi5Ifa341GlIzErOIqAnNcR+1CTtAg1cCf
+	 tbGSKJPdDk+Hh0UP4UuiOUAt857kvCf1hL6enhg1RyEIJMAYhEpnamZSOgGdS0j2SD
+	 Q/FFT+HuT6TJAilArYTt0vJjVi7boD1arqwzLHv6ViLVk4bWaYFkS4paPNXVpL5R/d
+	 wA34OGNuTQgOg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3BE1A3808200;
+	Wed, 14 Jan 2026 03:00:45 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/5] ipv6: Allow for nexthop device mismatch with
+ "onlink"
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176835964383.2565069.10118878274791234922.git-patchwork-notify@kernel.org>
+Date: Wed, 14 Jan 2026 03:00:43 +0000
+References: <20260111120813.159799-1-idosch@nvidia.com>
+In-Reply-To: <20260111120813.159799-1-idosch@nvidia.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org, horms@kernel.org,
+ petrm@nvidia.com
 
-On Sun, 11 Jan 2026 20:20:38 -0800 Jinseok Kim wrote:
-> The header <linux/device.h> already includes <linux/dev_printk.h>.
-> Therefore, explicitly including <linux/dev_printk.h> is unnecessary.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sun, 11 Jan 2026 14:08:08 +0200 you wrote:
+> This patchset aligns IPv6 with IPv4 with respect to the "onlink" keyword
+> and allows IPv6 routes to be configured with a gateway address that is
+> resolved out of a different interface than the one specified.
 > 
-> This patch removes the redundant include. No functional changes.
+> Patches #1-#3 are small preparations in the existing "onlink" selftest.
+> 
+> Patch #4 is the actual change. See the commit message for detailed
+> description and motivation.
+> 
+> [...]
 
-Unless there's some effort to remove the dev_printk.h header let's
-leave it as is. Depending on header dependencies is not generally
-recommended.
+Here is the summary with links:
+  - [net-next,1/5] selftests: fib-onlink: Remove "wrong nexthop device" IPv4 tests
+    https://git.kernel.org/netdev/net-next/c/e5566f6b1d13
+  - [net-next,2/5] selftests: fib-onlink: Remove "wrong nexthop device" IPv6 tests
+    https://git.kernel.org/netdev/net-next/c/0a3419f4ba40
+  - [net-next,3/5] selftests: fib-onlink: Add a test case for IPv4 multicast gateway
+    https://git.kernel.org/netdev/net-next/c/9bf8345fb38a
+  - [net-next,4/5] ipv6: Allow for nexthop device mismatch with "onlink"
+    https://git.kernel.org/netdev/net-next/c/b853b94e8482
+  - [net-next,5/5] selftests: fib-onlink: Add test cases for nexthop device mismatch
+    https://git.kernel.org/netdev/net-next/c/f8f9ee9d8b2e
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
