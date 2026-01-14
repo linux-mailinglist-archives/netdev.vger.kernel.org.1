@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-249700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87332D1C375
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 04:13:53 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 044A7D1C378
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 04:13:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3A338301F8F3
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 03:13:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 799D530409DC
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 03:13:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2DF8324B22;
-	Wed, 14 Jan 2026 03:13:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F04D324B22;
+	Wed, 14 Jan 2026 03:13:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B+05DgqD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rfbLYblj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A313242A4;
-	Wed, 14 Jan 2026 03:13:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2AE322B8E
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 03:13:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768360416; cv=none; b=F+OZQLHGijOEqBznk9tyVqF0f3V0CgDuskxNjdsLqe57mOntMXrKKq0jKwKnWKA4WZEhDzyLb7nR1RIemnZurB4feVkCcUJ5NPAzBDUutJNQAwYe2PvqsKVQJY7X7fHySiYhYbwgjMa5cdPrIJnY+1WunffHFrWNcz3x7kD1eBI=
+	t=1768360420; cv=none; b=OlHuvGclgmhJt0Mdyet1EfsryBKhrZb696fX/yODF03f9ON7PCbE5xFJ7JbuGD7EaXpWIBQrVMAhHVG5HknwoTnFT77XXkdqwF1RahCzJN9uEI8Wu1Lf/cicKUq5FlHnPJW6eSt3CLG1CpmJ5PyRgdp0t0I1AKS7cG9a0khb7xs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768360416; c=relaxed/simple;
-	bh=95aqeUD8V3rNNrJu+KyqNXUsjkZKiS7w5jy57uAN3EY=;
+	s=arc-20240116; t=1768360420; c=relaxed/simple;
+	bh=ZcbHNRwwcE7//Jo3n6xmIhe7WLx0rImKdrNyIPP4ouw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Qfch1CTQCluOWZUMLO0lvlvraQRFY8Iuy+HcQOt0zdk4CxLqpHIwHi67IFdbnSO3q6lIjPJNZYLV4LM2EiVPDUsPDaERFJldUnPhTrtE+aM34PZT/WMq9OhBkMnZ1SmfablCTJZp/PO3lriAOl/fnL8kfYjjp9SuQj+eKyXaw7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B+05DgqD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B7ADC116C6;
-	Wed, 14 Jan 2026 03:13:36 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=aFPLV3eVCV+EvROG/lLyZqWI1z4EA2b6/fkTmEU3NOktqbM6bZ7zBCOoVePWKyK1c5Y646KcvzC5gIq/cQxlkVebbXdt2MB0GuCe5sAq9d4WK3krJvYbQWhtG9l1p/JhByyLgqJO955fePAnUrZb4fCbLbCnqrOIywdYfDQR320=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rfbLYblj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 921D5C116C6;
+	Wed, 14 Jan 2026 03:13:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768360416;
-	bh=95aqeUD8V3rNNrJu+KyqNXUsjkZKiS7w5jy57uAN3EY=;
+	s=k20201202; t=1768360417;
+	bh=ZcbHNRwwcE7//Jo3n6xmIhe7WLx0rImKdrNyIPP4ouw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=B+05DgqDbQ0z+c8sQAIPgcL3CTm9VhWmtaYdUR7pKwU0vHNnSFk6DjLlUH8YHtirf
-	 mShQ2eTMb56cfbjuioj08dB3o3jmT23oUrf+1h+i9ogi1tXPJDuH1JEIRt4RJTnBfv
-	 4ti/CjQ9oGH3caD7D82dHwOWgMzG4mXFFsnH6BubxGlfJZkZj2hVl1bcchqCXaJoOS
-	 gMGrJzQ/34vutxJNhNV6yM79GSEP0SKfqlyd68asHGYPuJnlGXNCZkYQsaITiD1Y2H
-	 sdLPlMVo1nhEiivFTXEfuVau4GbiBOnWnwSry3rEQp1g1UmHKcR72fWldOD1jkDRd5
-	 4KDIw9cZ5sZ/w==
+	b=rfbLYblj+DRK78hd05ZX9z9SlFfDi3XLxnAcwuFri4I83M9/SzcD9d6p4fTCpx/Gm
+	 GSxflRdjkRq3FeVsk0y/mYpczrMtcFSGeJGSWTEcWua2mznhYIH1VbeWdoCOg6ezqn
+	 kQcXUOPDI/01FckyDdf0crG02LG1vbpbaYhRvo1pTLqtWz3M+pPgQcq/gd/WJX5KTC
+	 x1Q+Xim0pospDV9pcp9KgX5nkp+4QfaYfYcqMidDJlb12a00rPvRkZQ3UQcOZWsNgP
+	 0qnSFB3sG0bmugdV56jzmGVvhUWyQNjacCaJPShApKNfClAKw+f9/lre+tc+qZkc6n
+	 q4qeClmoExYMw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 786EF3808200;
-	Wed, 14 Jan 2026 03:10:10 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F29773808200;
+	Wed, 14 Jan 2026 03:10:11 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,44 +50,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: hv_netvsc: reject RSS hash key programming
- without RX indirection table
+Subject: Re: [PATCH net] dst: fix races in rt6_uncached_list_del() and
+ rt_del_uncached_list()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176836020927.2567523.1846936182754550828.git-patchwork-notify@kernel.org>
-Date: Wed, 14 Jan 2026 03:10:09 +0000
-References: <1768212093-1594-1-git-send-email-gargaditya@linux.microsoft.com>
-In-Reply-To: <1768212093-1594-1-git-send-email-gargaditya@linux.microsoft.com>
-To: Aditya Garg <gargaditya@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- stephen@networkplumber.org, linux-hyperv@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- dipayanroy@linux.microsoft.com, ssengar@linux.microsoft.com,
- shradhagupta@linux.microsoft.com, ernis@linux.microsoft.com,
- gargaditya@microsoft.com
+ <176836021053.2567523.9034814725830906123.git-patchwork-notify@kernel.org>
+Date: Wed, 14 Jan 2026 03:10:10 +0000
+References: <20260112103825.3810713-1-edumazet@google.com>
+In-Reply-To: <20260112103825.3810713-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ dsahern@kernel.org, horms@kernel.org, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com,
+ syzbot+179fc225724092b8b2b2@syzkaller.appspotmail.com, martin.lau@kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 12 Jan 2026 02:01:33 -0800 you wrote:
-> RSS configuration requires a valid RX indirection table. When the device
-> reports a single receive queue, rndis_filter_device_add() does not
-> allocate an indirection table, accepting RSS hash key updates in this
-> state leads to a hang.
+On Mon, 12 Jan 2026 10:38:25 +0000 you wrote:
+> syzbot was able to crash the kernel in rt6_uncached_list_flush_dev()
+> in an interesting way [1]
 > 
-> Fix this by gating netvsc_set_rxfh() on ndc->rx_table_sz and return
-> -EOPNOTSUPP when the table is absent. This aligns set_rxfh with the device
-> capabilities and prevents incorrect behavior.
+> Crash happens in list_del_init()/INIT_LIST_HEAD() while writing
+> list->prev, while the prior write on list->next went well.
+> 
+> static inline void INIT_LIST_HEAD(struct list_head *list)
+> {
+> 	WRITE_ONCE(list->next, list); // This went well
+> 	WRITE_ONCE(list->prev, list); // Crash, @list has been freed.
+> }
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: hv_netvsc: reject RSS hash key programming without RX indirection table
-    https://git.kernel.org/netdev/net/c/d23564955811
+  - [net] dst: fix races in rt6_uncached_list_del() and rt_del_uncached_list()
+    https://git.kernel.org/netdev/net/c/9a6f0c4d5796
 
 You are awesome, thank you!
 -- 
