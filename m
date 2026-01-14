@@ -1,66 +1,67 @@
-Return-Path: <netdev+bounces-249805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 621DBD1E48F
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 12:02:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0C99D1E307
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 11:46:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5D4A93072B0E
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 10:55:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 60A513018312
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 10:46:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54D37394472;
-	Wed, 14 Jan 2026 10:55:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F0D2393DDE;
+	Wed, 14 Jan 2026 10:46:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b="QD71lyG7"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mta-65-227.siemens.flowmailer.net (mta-65-227.siemens.flowmailer.net [185.136.65.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3E63396D10
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 10:52:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5E13939DE
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 10:46:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768388106; cv=none; b=KpBpsQ9L7lkMBqMAFiF+miiUOQu0KtWo5XqqVZ5MbidwFcZ78mitwa4nLTfk2oZoPGMrbS5TzC3TLzP8wAtjR7kOSecV2I9fr8wK02RoIf/SEdGM2Hfl5o5/atdOreH4j+ZowYcvVSflbzZaSPdcsR/rBdNTnK5JXAVaFnVk/00=
+	t=1768387573; cv=none; b=oCjfAH7kisrB0I309FRvmF4AN5wn2jkPLPDh+WzarMyHtVi5CtkdRD3B2xhG3YfNd1ycPfviFNPQyfjfC7YbVuxcnIapGeJGEQjJcnjXiL5+TzOZdENpTQTHM20t25ePpPjmF0uDfxQUHuv6pmXy8IeWAkVgdWzI520FVm0lUGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768388106; c=relaxed/simple;
-	bh=xClUHxueU9IC+ZNDK5EebSCDQYqRsL7jy2IZ06pMyfI=;
+	s=arc-20240116; t=1768387573; c=relaxed/simple;
+	bh=/RT9Fjy6zwrQxV53Khrs84p41GKb2duCHm00MjtpaeA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mIO+yDHFpK6GlfZ/8PyoFzWEGfymlXA1Ddyr7Dk/C9kCFS7kamejzg2iedCKl2oc4xUlhp1bJxouHH0doJlsipj0NWBUBOUQ8bztz17WwBnT/wphyoxrlT+AgHjiB/jFGNKMJcl6vCBic94VHfqwrslElEZHfksjuN87cm2JvMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vfyU4-0006p5-5S; Wed, 14 Jan 2026 11:52:16 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vfyU4-000Zez-1T;
-	Wed, 14 Jan 2026 11:52:15 +0100
-Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 794F14CCB6A;
-	Wed, 14 Jan 2026 10:52:15 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
+	 MIME-Version; b=qnb0yFeTZMP+7m1y2Gu+HdWEKuQNFMXpsuLcoXH3RPHC8Kt+ARyMNz/NogafzSPbVmIMq8MklDJpo2gt5iWIXsfhcXX/lJA9CExtIzmybGVDGovzgxP1+qakl0mPjCiFqRDqAejC5NCbTY+ctqTVUzW8mQw0TvT9V2gYEcOpcHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=QD71lyG7; arc=none smtp.client-ip=185.136.65.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
+Received: by mta-65-227.siemens.flowmailer.net with ESMTPSA id 20260114104603a646974726000207f5
+        for <netdev@vger.kernel.org>;
+        Wed, 14 Jan 2026 11:46:03 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
+ d=siemens.com; i=alexander.sverdlin@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
+ bh=Purx6iWjqLjZ2AucD6/DoIPyiS2j5aju+XohBp+HL+o=;
+ b=QD71lyG7kEwvMwjHakvLgAEUUgxrubLU2LRsiUtMl2rWZd1/5HtWDk+6MMMFf7fVvpBuq4
+ E2FlaNX6PhQrpu1yqV9Wu1EYIk3Mqrpz7+a0L3vMBK76dQXeasmpqvW1PC5yanQb9RKvFHoH
+ 6Qcgzwv9nhq4DwSdNQ0/jpQ43kuzXjf85I+/WEvyE/NNSCm412pvTNSspf5oTxRaD4t04gxI
+ BASqIQWVWevyrOP1BL2J/mtSZE3OXoU+RztrR4qpJ06FmPZSGglCUkvo6xMrE7qNt9lvpPGV
+ PSwqzIB+ul446V/05ICZmSv2Wd6r00dNynSQkOhT2Alaq+Y4hHmn9Icg==;
+From: "A. Sverdlin" <alexander.sverdlin@siemens.com>
 To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Oliver Hartkopp <socketcan@hartkopp.net>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Vincent Mailhol <mailhol@kernel.org>
-Subject: [PATCH net 3/4] can: raw: instantly reject disabled CAN frames
-Date: Wed, 14 Jan 2026 11:45:02 +0100
-Message-ID: <20260114105212.1034554-4-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260114105212.1034554-1-mkl@pengutronix.de>
-References: <20260114105212.1034554-1-mkl@pengutronix.de>
+Cc: Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Hauke Mehrtens <hauke@hauke-m.de>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Daniel Golle <daniel@makrotopia.org>
+Subject: [PATCH net-next v5 1/2] dt-bindings: net: dsa: lantiq,gswip: add MaxLinear R(G)MII slew rate
+Date: Wed, 14 Jan 2026 11:45:03 +0100
+Message-ID: <20260114104509.618984-2-alexander.sverdlin@siemens.com>
+In-Reply-To: <20260114104509.618984-1-alexander.sverdlin@siemens.com>
+References: <20260114104509.618984-1-alexander.sverdlin@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,98 +69,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-456497:519-21489:flowmailer
 
-From: Oliver Hartkopp <socketcan@hartkopp.net>
+From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
 
-For real CAN interfaces the CAN_CTRLMODE_FD and CAN_CTRLMODE_XL control
-modes indicate whether an interface can handle those CAN FD/XL frames.
+Add new maxlinear,slew-rate-txc and maxlinear,slew-rate-txd uint32
+properties. The properties are only applicable for ports in R(G)MII mode
+and allow for slew rate reduction in comparison to "normal" default
+configuration with the purpose to reduce radiated emissions.
 
-In the case a CAN XL interface is configured in CANXL-only mode with
-disabled error-signalling neither CAN CC nor CAN FD frames can be sent.
-
-The checks are now performed on CAN_RAW sockets to give an instant feedback
-to the user when writing unsupported CAN frames to the interface or when
-the CAN interface is in read-only mode.
-
-Fixes: 1a620a723853 ("can: raw: instantly reject unsupported CAN frames")
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Vincent Mailhol <mailhol@kernel.org>
-Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
-Link: https://patch.msgid.link/20260109144135.8495-4-socketcan@hartkopp.net
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
 ---
- net/can/raw.c | 23 ++++++++++++++---------
- 1 file changed, 14 insertions(+), 9 deletions(-)
+Changelog:
+v5:
+- improved options' descriptions on Rob's suggestions
+v4:
+- separate properties for TXD and TXC pads ("maxlinear," prefix re-appears)
+v3:
+- use [pinctrl] standard "slew-rate" property as suggested by Rob
+  https://lore.kernel.org/all/20251219204324.GA3881969-robh@kernel.org/
+v2:
+- unchanged
 
-diff --git a/net/can/raw.c b/net/can/raw.c
-index f36a83d3447c..d66036da6753 100644
---- a/net/can/raw.c
-+++ b/net/can/raw.c
-@@ -49,8 +49,8 @@
- #include <linux/if_arp.h>
- #include <linux/skbuff.h>
- #include <linux/can.h>
-+#include <linux/can/can-ml.h>
- #include <linux/can/core.h>
--#include <linux/can/dev.h> /* for can_is_canxl_dev_mtu() */
- #include <linux/can/skb.h>
- #include <linux/can/raw.h>
- #include <net/sock.h>
-@@ -892,20 +892,21 @@ static void raw_put_canxl_vcid(struct raw_sock *ro, struct sk_buff *skb)
- 	}
- }
+ .../bindings/net/dsa/lantiq,gswip.yaml        | 22 +++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+index 205b683849a53..37d64b8a76ac7 100644
+--- a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+@@ -106,6 +106,28 @@ patternProperties:
+         unevaluatedProperties: false
  
--static unsigned int raw_check_txframe(struct raw_sock *ro, struct sk_buff *skb, int mtu)
-+static unsigned int raw_check_txframe(struct raw_sock *ro, struct sk_buff *skb,
-+				      struct net_device *dev)
- {
--	/* Classical CAN -> no checks for flags and device capabilities */
--	if (can_is_can_skb(skb))
-+	/* Classical CAN */
-+	if (can_is_can_skb(skb) && can_cap_enabled(dev, CAN_CAP_CC))
- 		return CAN_MTU;
- 
--	/* CAN FD -> needs to be enabled and a CAN FD or CAN XL device */
-+	/* CAN FD */
- 	if (ro->fd_frames && can_is_canfd_skb(skb) &&
--	    (mtu == CANFD_MTU || can_is_canxl_dev_mtu(mtu)))
-+	    can_cap_enabled(dev, CAN_CAP_FD))
- 		return CANFD_MTU;
- 
--	/* CAN XL -> needs to be enabled and a CAN XL device */
-+	/* CAN XL */
- 	if (ro->xl_frames && can_is_canxl_skb(skb) &&
--	    can_is_canxl_dev_mtu(mtu))
-+	    can_cap_enabled(dev, CAN_CAP_XL))
- 		return CANXL_MTU;
- 
- 	return 0;
-@@ -944,6 +945,10 @@ static int raw_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
- 	if (!dev)
- 		return -ENXIO;
- 
-+	/* no sending on a CAN device in read-only mode */
-+	if (can_cap_enabled(dev, CAN_CAP_RO))
-+		return -EACCES;
+         properties:
++          maxlinear,slew-rate-txc:
++            $ref: /schemas/types.yaml#/definitions/uint32
++            enum: [0, 1]
++            description: |
++              RMII/RGMII TX Clock Slew Rate:
 +
- 	skb = sock_alloc_send_skb(sk, size + sizeof(struct can_skb_priv),
- 				  msg->msg_flags & MSG_DONTWAIT, &err);
- 	if (!skb)
-@@ -961,7 +966,7 @@ static int raw_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
- 	err = -EINVAL;
- 
- 	/* check for valid CAN (CC/FD/XL) frame content */
--	txmtu = raw_check_txframe(ro, skb, READ_ONCE(dev->mtu));
-+	txmtu = raw_check_txframe(ro, skb, dev);
- 	if (!txmtu)
- 		goto free_skb;
- 
++                0: Normal
++                1: Slow
++
++              If not present, the configuration made by the switch bootloader is
++              preserved.
++          maxlinear,slew-rate-txd:
++            $ref: /schemas/types.yaml#/definitions/uint32
++            enum: [0, 1]
++            description: |
++              RMII/RGMII TX Non-Clock PAD Slew Rate:
++
++                0: Normal
++                1: Slow
++
++              If not present, the configuration made by the switch bootloader is
++              preserved.
+           maxlinear,rmii-refclk-out:
+             type: boolean
+             description:
 -- 
-2.51.0
+2.52.0
 
 
