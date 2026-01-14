@@ -1,151 +1,92 @@
-Return-Path: <netdev+bounces-249873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DF08D1FF72
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 16:54:36 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEAABD2000B
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 16:58:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 94EDC30022CB
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 15:54:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0ED5C30001A0
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 15:56:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED4A22F60A2;
-	Wed, 14 Jan 2026 15:54:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACF453A0B16;
+	Wed, 14 Jan 2026 15:56:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MrXFRNpY";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="HfUYU3I6"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tazNDxBv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F653570C6
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 15:54:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41CDA36C593;
+	Wed, 14 Jan 2026 15:56:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768406073; cv=none; b=g+NQNDtiwmfznButRqbsfg2oZrVPXS35dFfJq06Pa8m/GvpkBiosgkChGLs1DvXWtg7f+f85EVFLP0J2Hfw2DVl5KtOLiz8wjTlDi1NfdAoMaAUOzxr4jb7mk54lyxSAtSTQbtqLvc+km2lVShVnO+ToLW0oTAkUey/Z0O4YhIw=
+	t=1768406170; cv=none; b=aV9xGuypt0XzwrZMLpq66t4Met1BDojdXe6DvChlOVrcPBw/Uq4bkLxAsjn1EzIByCyDRFU9HAfISVFOcls4FFf1xWNIEFIJJ+NiacqylPOmtrGTA+qKN7dJM0b+4qyVhfy1hPAovdzwccEg2w5NYg+YwBZUkrsJZunfvJhJ0Z0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768406073; c=relaxed/simple;
-	bh=vu8wNkY+ONyZ11dQOa1RhYbfZ6CIfKh+CDlvLi9Pphk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PThPLfYbetbDoJ5ZCLJMZbqOFnnG57mPs6tnCmBKvrHdOr0Gwlp3zwxQgf26IUArh9CD297CmdAiYRuqVTw7pejUIMSqk1n98bY2NMczkZ8sJ5z09Lv2N5vwC/JT+E6FtC0i9VW6duFbrMcj4FgfP+y6BJJlcOnXlWoBiKx6bC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MrXFRNpY; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=HfUYU3I6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768406071;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=45w2Nqp7W5ReZCd4Up6qyFBRnRWCXaqu4990woCkPZ0=;
-	b=MrXFRNpYH8wUVQnmIR9XvMEq7byxOJlTwsZK9GiQ0thZ9Ob/iBxJ4ZuSDmekt4/Hn+VP+A
-	9MKY0TwRcytqfMXhQslgez1p6JTTZ081M9SzeJuOamrqXeuGOQtr0AXriIYALqcgTR4DfA
-	JzS8pP5CFj0VsTclfA1AxZE9fd5ffJA=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-453-4P5-O-FSOwKi_qfgBHZaqA-1; Wed, 14 Jan 2026 10:54:30 -0500
-X-MC-Unique: 4P5-O-FSOwKi_qfgBHZaqA-1
-X-Mimecast-MFC-AGG-ID: 4P5-O-FSOwKi_qfgBHZaqA_1768406068
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-34ab8693a2cso16372005a91.0
-        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 07:54:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768406068; x=1769010868; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=45w2Nqp7W5ReZCd4Up6qyFBRnRWCXaqu4990woCkPZ0=;
-        b=HfUYU3I67nA80vs1ntunHYhEWVdZpA75QutEdzJDO9yTjYaEF1+7mFCQDghFSlT4cC
-         WYrjBmLkCWxH/ice8Q+FsXKECBpBjIbLhuV09EyYLkveJnpuiEiKvw4aYp2xB8V/lit6
-         GBakRdXp+8+c78uXoT4w3LRwD9Wdc7qfLHfhx4JJ+4EHGOPKDRqnhA1esGNK17KrwdHN
-         VUi7TYB6zLWaU+Jpaja3P6e/260gfdSHJSJ+U1mizjLtw+B4b8UKLzAdjmEFCM3iKl3P
-         MxWZhBCQjqFEg8WV5Ek+2wjH2w6lEXB5uQVKtFDL+DowQma0So4LWt4RLcEccmlNs5SO
-         RSxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768406068; x=1769010868;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=45w2Nqp7W5ReZCd4Up6qyFBRnRWCXaqu4990woCkPZ0=;
-        b=t9ZRNQozQb/5ITOGdZ9z1wGzUGEOvLEigF5GvgU8jPlSlpeSfLUEuui/eqVotQNasR
-         j6gXs2EkHTypZXYWC7q5memMlTva8vxWGeBFNWfbjTBcVLCY+vfB64cahiP4lmub/Grb
-         9jT29kSamadcoiDFL5lWbDL0zXpkrKpZ21ypUiRKBWfDwjTJgcyeeh0/NUKMFJkCPpQf
-         2HNyUHEiQmWE4qGejCPR/QT0uYwNgb5o/jbPYeh+2lAK5JNbQc/4fDuz4hZR0T8+Wzfv
-         MJ3hJMx9s2CtNPwxubE0xCZ2Ma3uZoNHsaTIjX85yulEX/bW2HZAeFnLr3NkzkECXPWX
-         YgVw==
-X-Forwarded-Encrypted: i=1; AJvYcCVIECNXYHPwKV/PyRqwAV27c/sDOfI8WW/TCzb0Uefz2s3QVI9rD15ZISQflcGQdAEudpEpumM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbE81Dg4e1rXjSe+wu2EcOnSpPQXOHRe/GXYMbvXcDEBsAyHNb
-	eUYnmBqq2G3ICiLIQSVrDT+SF5IoIC/ZIYiKM06pEBYML2l5IAFDgVrgiUS2JXnkdISu5Hf18X7
-	c4RwKGfIzSUlSxucdI964ZJWadlgy43E4BcklhyiuW2RbCF8w8KWN9uj/44udZkxd5SQ2iTRzBY
-	5bkZutQ52BeKQNNIcx4WnLYThRZTSobEPv
-X-Gm-Gg: AY/fxX4gzNleP8yvctdS4x2sLn1NaDpcXr1HYU+u6M8lNzn5znLPosZqLZItJ2dCGZe
-	cMzQGEll7QlC+VVB6YC4k+pfh8wXW4EFWMKmafsuB0MlWXtJQTTFs40kMz5/EqxtVl+xeT4iqUO
-	6K91yotai6ZJytl0SCKugyROT4tjblrgBIer+CkPCBJbhw2ZUMSIYR5/3HUfC1b10+
-X-Received: by 2002:a17:90b:590c:b0:34c:f8e6:5ec1 with SMTP id 98e67ed59e1d1-35109163a89mr3116110a91.35.1768406068151;
-        Wed, 14 Jan 2026 07:54:28 -0800 (PST)
-X-Received: by 2002:a17:90b:590c:b0:34c:f8e6:5ec1 with SMTP id
- 98e67ed59e1d1-35109163a89mr3116054a91.35.1768406067530; Wed, 14 Jan 2026
- 07:54:27 -0800 (PST)
+	s=arc-20240116; t=1768406170; c=relaxed/simple;
+	bh=Ae1ieq+fhLkuJ+oyltSTjOyNtG71Vuue9fYPvx9QIpA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uN2jc46xY7fiT4xn9fAWEqUxSWzN1RxLsMHlIBdUuhplGe3ZJZk6xyll5JJUpDZBjuVXrvDqSPqHYLwA343loMRktp48+wOvBKj7nX5JrQaHezh1R5A4iTjLTjsRil1aiebpJChT1q7DletxjASXgzfXDnD3nP01cVicVjiNhkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tazNDxBv; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=HPhK4KjjnRqSs9b7v5hKWxDnIeNV27SBK22m7p5AFTc=; b=tazNDxBvsypyesjPwJzb3+PoQj
+	S1+fjE9afh3Fm7eDFKgSWZSnz6l0FiNtvJ2DoNbLQPALi7MloHXcbj2qGjVl7zv8OXNEmYjZjQv/v
+	/Bl9JUgwpdIIOerJq7150ZXOF867L7Z3nkoUb3Xbq8iivwWFNt8DRZPQgH7Sei/7gnug=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vg3E2-002ocm-8m; Wed, 14 Jan 2026 16:56:02 +0100
+Date: Wed, 14 Jan 2026 16:56:02 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: airoha: npu: Add
+ EN7581-7996 support
+Message-ID: <76bbffa8-e830-4d02-a676-b494616568a2@lunn.ch>
+References: <20260113-airoha-npu-firmware-name-v2-0-28cb3d230206@kernel.org>
+ <20260113-airoha-npu-firmware-name-v2-1-28cb3d230206@kernel.org>
+ <20260114-heretic-optimal-seahorse-bb094d@quoll>
+ <aWdbWN6HS0fRqeDk@lore-desk>
+ <75f9d8c9-20a9-4b7e-a41c-8a17c8288550@kernel.org>
+ <69676b6c.050a0220.5afb9.88e4@mx.google.com>
+ <e2d2c011-e041-4cf7-9ff5-7d042cd9005f@kernel.org>
+ <69677256.5d0a0220.2dc5a5.fad0@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260112-vsock-vmtest-v14-1-a5c332db3e2b@meta.com> <202601140749.5TXm5gpl-lkp@intel.com>
-In-Reply-To: <202601140749.5TXm5gpl-lkp@intel.com>
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Wed, 14 Jan 2026 16:54:15 +0100
-X-Gm-Features: AZwV_Qg5JTJCQi1Wwfd0jbkgP1qN1I8qkJH4vIis9H-XSIO4o_clOB-LFig_dcA
-Message-ID: <CAGxU2F45q7CWy3O_QhYj0Y2Bt84vA=eaTeBTu+TvEmFm0_E7Jw@mail.gmail.com>
-Subject: Re: [PATCH net-next v14 01/12] vsock: add netns to vsock core
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: kernel test robot <lkp@intel.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Bryan Tan <bryan-bt.tan@broadcom.com>, 
-	Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Long Li <longli@microsoft.com>, 
-	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, berrange@redhat.com, 
-	Sargun Dhillon <sargun@sargun.me>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <69677256.5d0a0220.2dc5a5.fad0@mx.google.com>
 
-On Wed, 14 Jan 2026 at 00:13, kernel test robot <lkp@intel.com> wrote:
->
-> Hi Bobby,
->
-> kernel test robot noticed the following build warnings:
->
-> [auto build test WARNING on net-next/main]
->
-> url:    https://github.com/intel-lab-lkp/linux/commits/Bobby-Eshleman/virtio-set-skb-owner-of-virtio_transport_reset_no_sock-reply/20260113-125559
-> base:   net-next/main
-> patch link:    https://lore.kernel.org/r/20260112-vsock-vmtest-v14-1-a5c332db3e2b%40meta.com
-> patch subject: [PATCH net-next v14 01/12] vsock: add netns to vsock core
-> config: x86_64-buildonly-randconfig-004-20260113 (https://download.01.org/0day-ci/archive/20260114/202601140749.5TXm5gpl-lkp@intel.com/config)
-> compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260114/202601140749.5TXm5gpl-lkp@intel.com/reproduce)
->
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202601140749.5TXm5gpl-lkp@intel.com/
->
-> All warnings (new ones prefixed by >>, old ones prefixed by <<):
->
-> >> WARNING: modpost: net/vmw_vsock/vsock: section mismatch in reference: vsock_exit+0x25 (section: .exit.text) -> vsock_sysctl_ops (section: .init.data)
+> > Yes. What you plug into PCI is not a part of this hardware, so cannot be
+> > part of the compatible.
+> > 
+> 
+> Thanks for the quick response. Just to make sure Lorenzo doesn't get
+> confused, I guess a v3 would be sending v1 again (firmware-names
+> implementation series) with the review tag and we should be done with
+> this.
 
-Bobby can you check this report?
+Since this is a PCI device, you can ask it what it is, and then load
+the correct firmware based on the PCI vendor:product. You don't need
+to describe the hardware in DT because it is enumerable.
 
-Could be related to `__net_initdata` annotation of `vsock_sysctl_ops` ?
-Why we need that?
-
-Thanks,
-Stefano
-
+   Andrew
 
