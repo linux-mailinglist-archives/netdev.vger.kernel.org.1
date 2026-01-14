@@ -1,72 +1,96 @@
-Return-Path: <netdev+bounces-249938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 264ACD2124D
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 21:15:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 98F13D21374
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 21:48:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B6F9A302C20F
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 20:15:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 50D73303196D
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 20:48:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6955D3559C4;
-	Wed, 14 Jan 2026 20:15:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC2DD34846E;
+	Wed, 14 Jan 2026 20:48:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="aS5xEqGj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HkgeI6x8"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEDDB13AF2;
-	Wed, 14 Jan 2026 20:15:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A17126D4E5
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 20:48:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768421733; cv=none; b=egmIJjq95xV9nO39/9SGHC+ytwDfQzcF3zXZDRutLFYppcJWmsOYzZvu+Cd63nVEV81q1w5M6ZCMqtqW+4GR3QeuznFt6vCOsHBKnDiSPtDRSvyQjeHHnKOuHDbSjZnH8bpsmTFMS/rlOLHwKJ2VwnwC4AaXFbXHztt92kcCeRo=
+	t=1768423729; cv=none; b=ErvEdLiS0shq201y6wwEEZamyVt5QmD96XacyALuDIZ5PbuWniR4bqholoX8+APh+riYYsCtp9Y9nO6ldlHNGN3MenUTq+HFCxr+e9c7aisXgclp8XQdlFoZLlWYlaTYYFwA2PRLq3xlJZ2Wijpi0/iw4fRv5bvQTC0Mo7aNc8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768421733; c=relaxed/simple;
-	bh=t6EPBE8TiEfhpPXLMXa+gBTGLS2XyvfxiIxhtg7fozk=;
+	s=arc-20240116; t=1768423729; c=relaxed/simple;
+	bh=8QxqO3FSD5L1Vmub+oryPemAGs1Qef51fqxuqIV6Ei8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DZMgeTjoM/qBDpcHWUGLcJJZpxEqNj5OEFiHqrA9s8F24Wd/0iUqnCB02VvEW3xIMw6apApC2wYds/9OuI0/Udirs5vO5UA6qH0QQ0+oIM+U1BHMs6X8YxRiug3wblXHrTKHnvfCy2Rkbqfh4UucSnOZlMLVz8cYg5heNeAP7pw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=aS5xEqGj; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=8z6/tHemAyDUZ6LGRZmbfUFeZIhjen3VER7FZfVnFpc=; b=aS5xEqGjmG+E5F66GzJ46hO7mw
-	2ylPpsavqTgjSwkIvXwhPTiUslTgntwK1WteYq+FYOiQRP6H1bPUP5CpiD6kAqp8XJ3+hF0Sn6Wgv
-	MPfTze7+rthU2+SJp6XqyYXaxHtm/tWu6H9b2M5Iv6Bkl6274+KYDpIG7GD3XCOBOmGA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vg7Gx-002qQc-3R; Wed, 14 Jan 2026 21:15:19 +0100
-Date: Wed, 14 Jan 2026 21:15:19 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=EDKA9blhLht+Xzo/kPX1cIH9MAnl8ObW+ifH/30OOLQdVL3So7u9a2pBooEcgC3wRLbRd3GN6t3lN5/nFD+/yqGsoHP0daZD4nckaXLmuw/4zUtSz98VIBJWXjLY4D+Me+9A/0Y8emqZ9xpTbK+TbnmvEW3ccDbMvTbDrfcEaPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HkgeI6x8; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-b876b5c69baso4983666b.0
+        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 12:48:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768423727; x=1769028527; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=it8YUnHSXKXXQABJkL2UVvwmRP+gSrkDN7MsvYyaZ9k=;
+        b=HkgeI6x8JApyEaDjNhQ3sd86gY0G9OYvP5k3LL1uuwJmqPQ/TyhW61RyQ9UYPa6N0d
+         LSOtrj2RXe9k/0Znk+B6N/s5HM1ai5pQI3BP9FTw2WjAYA/zYHKuEWq2sDrLvRnTzP50
+         z+3M3gNDsoNQCOcjqkXnMfYDm7hlykRa3fFQp8VDsGAk2SVnsraMzjB80BSnzRuMhK7i
+         rMWEhPdQ0uCPa+zsvjZyFyFOgkQ9tM/Gg6osE8baYvMGvZPqEQhcPQPWcPF9zKQGB/H8
+         NAtAmu0O2vYOy1TdPU2fcscVVhbjnlINXj0KghSlD8dZVoUrI2UhKs7mKfpPeyej3dKL
+         XS9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768423727; x=1769028527;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=it8YUnHSXKXXQABJkL2UVvwmRP+gSrkDN7MsvYyaZ9k=;
+        b=E8is9/+yEyyMLZlgDh6qCUtJVdRkoIl/l6Qpf8HJNow+q7tTDpsHfC6aYn7ls7MK56
+         3ocgKYAgPSINBJbuVWAzXFX4K0H03RntICaGXls5Fo9RBozu3fwmHLAHDAEN9lKupt4W
+         LyiQQ7DK9zaDUK2XCQZTsdWhphJn3Uw5mgJpWVWYQ5rp9lrcmy4bs8NeaU8URO4PM8Pk
+         m9kxAB0wmFRIuyVTeuvVA8YmrIjRjNxTqPNYrfd17Ba3hm5q6u1vk4A/RT1DQpUaqF+o
+         fm5xDGrvKXOa1MYpuzqLUAnZR7i55gYttenkxgLDqXgGLA67KR8BTGNRF832vSsNYw7f
+         P55Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWqI/HuJ8lz/uCOvPGMfnjsV9aqd+aiJKkJ6g/N3KnrZEHk/BFUB1eu7Ts3t+GXx8m3PV85zNs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyL9g4pbLH5SSLAt6IhsxgX3B4IteUWx77fOLMAXnLrPYOJUtLd
+	tktCrCMdfgnfKgT4Nvl1tHxfQX8KFgVDz6/vTm8u8HAehCbp4NCSj17D
+X-Gm-Gg: AY/fxX73cx/nmCmfaXho0TJtHbsfXhi82uExhfAEJdsNu9pZ4jcAzKSK5i0OuigYghg
+	BwpwdavVyJ17TpUcjNfLFyE8gmf62bJrBdqtFmUccm2KYjbHd57SpFfxRc/XkOsMpO5WX1UMeFy
+	htggu31FIlXgMA/ck3ZPXOePLImvavhjpFVtg4ZPHYCzUyv3axp0TNemWUDXTKZ6VK+NpRO7xDf
+	4wiRi82liY3DYr8FVFQ+YYEz4wdN0urLdarQJZGwTaqH+j2v7kRw+ysKDUP4Q4PmADhG8MYicSj
+	1yK6q/czh9TI7vSlrThR0cQX8g84U2aGWx/2H9F9cHdKuPDBm2cB5wvvZAnHgK+uIGinEO43njw
+	pI9Ao9a+LQrWSQh3eR9y7pfHvp6YjI3dkK05gki3Unwmsf8empyWEWZCC8OT5cLy961W+DnNgBC
+	W9m1U=
+X-Received: by 2002:a17:907:d1f:b0:b87:2780:1b33 with SMTP id a640c23a62f3a-b876114f9b7mr180435166b.3.1768423726590;
+        Wed, 14 Jan 2026 12:48:46 -0800 (PST)
+Received: from skbuf ([2a02:2f04:d703:5400:9b39:8144:8a26:667e])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b870b0dba4esm1111374666b.17.2026.01.14.12.48.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Jan 2026 12:48:45 -0800 (PST)
+Date: Wed, 14 Jan 2026 22:48:43 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: airoha: npu: Add
- EN7581-7996 support
-Message-ID: <e8b48d9e-f5ba-400b-8e4a-66ea7608c9ae@lunn.ch>
-References: <20260114-heretic-optimal-seahorse-bb094d@quoll>
- <aWdbWN6HS0fRqeDk@lore-desk>
- <75f9d8c9-20a9-4b7e-a41c-8a17c8288550@kernel.org>
- <69676b6c.050a0220.5afb9.88e4@mx.google.com>
- <e2d2c011-e041-4cf7-9ff5-7d042cd9005f@kernel.org>
- <69677256.5d0a0220.2dc5a5.fad0@mx.google.com>
- <76bbffa8-e830-4d02-a676-b494616568a2@lunn.ch>
- <6967c46a.5d0a0220.1ba90b.393c@mx.google.com>
- <9340a82a-bae8-4ef6-9484-3d2842cf34aa@lunn.ch>
- <aWfdY53PQPcqTpYv@lore-desk>
+	Jakub Kicinski <kuba@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-phy@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH net-next 01/14] net: stmmac: qcom-ethqos: remove mac_base
+Message-ID: <20260114204843.e4pyfb64n5jn3wop@skbuf>
+References: <aWfWDsCoBc3YRKKo@shell.armlinux.org.uk>
+ <E1vg4vi-00000003SFh-0Abn@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,19 +99,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aWfdY53PQPcqTpYv@lore-desk>
+In-Reply-To: <E1vg4vi-00000003SFh-0Abn@rmk-PC.armlinux.org.uk>
 
-> In the current codebase the NPU driver does not need to access the WiFi PCIe
-> slot (or any other external device) since the offloading (wired and wireless)
-> is fully managed by the NPU chip (hw + firmware binaries).
+On Wed, Jan 14, 2026 at 05:45:14PM +0000, Russell King (Oracle) wrote:
+> Since the blamed commit, ethqos->mac_base is only written, never
+> read. Let's remove it.
+> 
+> Fixes: 9b443e58a896 ("net: stmmac: qcom-ethqos: remove MAC_CTRL_REG modification")
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
 
-Are you saying the NPU itself enumerates the PCI busses and finds the
-WiFi device?  If it can do that, why not ask it which PCI device it is
-using?
-
-Or this the PCI slot to use somehow embedded within the firmware?
-
-Or is it simply hard coded in the NPU silicon which slot to use?
-
-   Andrew
+I think we reserve the use of Fixes: tags for user-visible issues, not
+cleanup of dangling variables. You can move the sha1sum and its commit
+title in the main commit message body and delete that tag.
 
