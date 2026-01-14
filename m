@@ -1,62 +1,71 @@
-Return-Path: <netdev+bounces-249956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC6B5D21A46
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 23:44:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34E9CD21AEE
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 23:59:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DD912301D949
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 22:44:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7495030388BD
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 22:57:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F7203A9623;
-	Wed, 14 Jan 2026 22:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD026350293;
+	Wed, 14 Jan 2026 22:57:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="p4M0z9uq"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="W2GEwpcF"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADCEC3933F9
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 22:44:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E9E30BF6B
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 22:57:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768430652; cv=none; b=M6alJAsCWfOykhAvBpwjmWPvIUiCMK8IjhzaUpIwPR/tmL/L45bDZ2RdXGSWw5McZybDfjxYMfN9RyiA3sxdm05TX98+o/NDunKLI2y+OQ09OxTlkV/TJGcboY6/GhDushuB5l16+4r0Ogbe9jqqa6VcIKkSITxLGM0eI+KfUpY=
+	t=1768431476; cv=none; b=gwf9oWt5AXFlR1xgpJHkN+mWyTdBIZtuEfx7u3+G2TPGIIykAyKgzMYDj1rEsjkkzkqUPvhFhApQ3xnGsAGKmw4o/D9cnk7SED3NY+6oIPQzBFnNHaCtumm3Zf1v93fBMQEMA9m6u8W91gwuwOhqydkZGdSzNEzhmZH3IVsjN4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768430652; c=relaxed/simple;
-	bh=ntT7coBWRx6jsrH3U/PSDWGgipMEhbENiiPiB6xeQVc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r+shQhKK/fcotO6W308sS8zqBd8BT7q0FxoLhR8MaPjxVTrd9hJor7rwT+cOIVTYITKPHeTJfJnHvsMlWu1zpXIHbpJe/6KvArQlFqsYPMhIKGio258GsJHxOroyd26KyExQjq1rezoFfmB8K6XbRLovkCd7pPY3YVzzl59b7hI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=p4M0z9uq; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768430644;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YT8IYxCZzGIWLLwLEeNMhMU67fqEIU9z3PUBwsYDAOU=;
-	b=p4M0z9uqL7djafR3iA6b7d6wgzaZS6oh2O03P8+1L+HZ54FBp6+CTpiT2UUWjUE9bLvRCo
-	1ltrJgUKjzucg58cf9GW9A5FSynS5mxPfE0c4Fq2CqhP+P/9nMU39SSPJA48IK7cp1tVVr
-	ZAlke5x6QE68IzVYDKvy3rcgWnva3Uc=
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	s=arc-20240116; t=1768431476; c=relaxed/simple;
+	bh=dRiwU05WXtoUOO2sLFeCNKsTvdpMMT11OuK+cN9JM9o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cX39Kd0m/l4fDxFdiKlQZzF9BR1YSjzaLnd1U+HBQSreI3YImYC0JAXxSk5WmD3MJOgzfPztFcHLOHaXs3zGluT/c9OCXxzYIBQJje/KdDDJWZoV1u3+TO1WTOWprXlTaqy50ZdOe/dgtKyJdr02iGd4+pxTCgqRo4gqWTeTC0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=W2GEwpcF; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 9C89DC1F1D3;
+	Wed, 14 Jan 2026 22:57:21 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 229E96074A;
+	Wed, 14 Jan 2026 22:57:48 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 6D0E910B68410;
+	Wed, 14 Jan 2026 23:57:41 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1768431467; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=VDfSbPYAg10o0+hHwcLXFBZaneLM220SZTxze+B/sFw=;
+	b=W2GEwpcFsWW0R60v2IFCuHLnSJXBmIgC+VFvq9WO4b/AIRYg8mfS496y5Syt3zlsITGn2R
+	dqNetWx1VYQV2PSiJE+6OuCJZjVV294YLQxodhhWdBfUcpQpjFV1qXxU5GIrxVr2s17fxU
+	sFH7OVTAZpMeOIvtG8dUTIVZShBOksSdeCiwmyF+NDWu8oYjPlnJf+O2exHuLrj2cZQEeD
+	A4JvtlB0YHa+nQKW438QcBQ9ZuE3HdlRRX/e1tkTbM2g9H+NGDd3epqRyydVll2kkmQ+FX
+	vWKRGPEA7aSOS8VYvNRb2I1xAQYAJwRUfGNDnbINGn/JmcrCRLD/pu9exj70dA==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Kory Maincent <kory.maincent@bootlin.com>
-Cc: Richard Cochran <richardcochran@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Jonas Jelonek <jelonek.jonas@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	netdev@vger.kernel.org,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: [PATCH net-next 2/2] selftests: drv-net: extend HW timestamp test with ioctl
-Date: Wed, 14 Jan 2026 22:44:14 +0000
-Message-ID: <20260114224414.1225788-2-vadim.fedorenko@linux.dev>
-In-Reply-To: <20260114224414.1225788-1-vadim.fedorenko@linux.dev>
-References: <20260114224414.1225788-1-vadim.fedorenko@linux.dev>
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Simon Horman <horms@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	bcm-kernel-feedback-list@broadcom.com
+Subject: [PATCH net-next 0/6] net: sfp: Add support for SGMII to 100FX modules
+Date: Wed, 14 Jan 2026 23:57:22 +0100
+Message-ID: <20260114225731.811993-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,215 +73,90 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Last-TLS-Session-Version: TLSv1.3
 
-Extend HW timestamp tests to check that ioctl interface is not broken
-and configuration setups and requests are equal to netlink interface.
+Hi everyone,
 
-Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
----
- .../selftests/drivers/net/hw/nic_timestamp.py | 121 ++++++++++++++++--
- 1 file changed, 113 insertions(+), 8 deletions(-)
+This series is an attempt to add support for _some_ SGMII to 100BaseFX
+SFP modules. Getting these to work was a bit challenging, and none of that
+could have been done without the precious help from Florian [1].
 
-diff --git a/tools/testing/selftests/drivers/net/hw/nic_timestamp.py b/tools/testing/selftests/drivers/net/hw/nic_timestamp.py
-index c1e943d53f19..f016bc65c340 100755
---- a/tools/testing/selftests/drivers/net/hw/nic_timestamp.py
-+++ b/tools/testing/selftests/drivers/net/hw/nic_timestamp.py
-@@ -6,10 +6,26 @@ Tests related to configuration of HW timestamping
- """
- 
- import errno
-+import ctypes, fcntl, socket
- from lib.py import ksft_run, ksft_exit, ksft_ge, ksft_eq, KsftSkipEx
- from lib.py import NetDrvEnv, EthtoolFamily, NlError
- 
- 
-+SIOCSHWTSTAMP = 0x89b0
-+SIOCGHWTSTAMP = 0x89b1
-+class hwtstamp_config(ctypes.Structure):
-+    _fields_ = [
-+        ("flags", ctypes.c_int),
-+        ("tx_type", ctypes.c_int),
-+        ("rx_filter", ctypes.c_int),
-+    ]
-+class ifreq(ctypes.Structure):
-+    _fields_ = [
-+        ("ifr_name", ctypes.c_char * 16),
-+        ("ifr_data", ctypes.POINTER(hwtstamp_config)),
-+    ]
-+
-+
- def __get_hwtimestamp_support(cfg):
-     """ Retrieve supported configuration information """
- 
-@@ -31,8 +47,29 @@ def __get_hwtimestamp_support(cfg):
-     return ctx
- 
- 
-+def __get_hwtimestamp_config_ioctl(cfg):
-+    """ Retrieve current TS configuration information (via ioctl) """
-+
-+    config = hwtstamp_config()
-+
-+    req = ifreq()
-+    req.ifr_name = cfg.ifname.encode()
-+    req.ifr_data = ctypes.pointer(config)
-+
-+    try:
-+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-+        fcntl.ioctl(sock.fileno(), SIOCGHWTSTAMP, req)
-+        sock.close()
-+
-+    except OSError as e:
-+        if e.errno == errno.EOPNOTSUPP:
-+            raise KsftSkipEx("timestamping configuration is not supported via ioctl") from e
-+        raise
-+    return config
-+
-+
- def __get_hwtimestamp_config(cfg):
--    """ Retrieve current TS configuration information """
-+    """ Retrieve current TS configuration information (via netLink) """
- 
-     try:
-         tscfg = cfg.ethnl.tsconfig_get({'header': {'dev-name': cfg.ifname}})
-@@ -43,8 +80,27 @@ def __get_hwtimestamp_config(cfg):
-     return tscfg
- 
- 
-+def __set_hwtimestamp_config_ioctl(cfg, ts):
-+    """ Setup new TS configuration information (via ioctl) """
-+    config = hwtstamp_config()
-+    config.rx_filter = ts['rx-filters']['bits']['bit'][0]['index']
-+    config.tx_type = ts['tx-types']['bits']['bit'][0]['index']
-+    req = ifreq()
-+    req.ifr_name = cfg.ifname.encode()
-+    req.ifr_data = ctypes.pointer(config)
-+    try:
-+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-+        fcntl.ioctl(sock.fileno(), SIOCSHWTSTAMP, req)
-+        sock.close()
-+
-+    except OSError as e:
-+        if e.errno == errno.EOPNOTSUPP:
-+            raise KsftSkipEx("timestamping configuration is not supported via ioctl") from e
-+        raise
-+
-+
- def __set_hwtimestamp_config(cfg, ts):
--    """ Setup new TS configuration information """
-+    """ Setup new TS configuration information (via netlink) """
- 
-     ts['header'] = {'dev-name': cfg.ifname}
-     try:
-@@ -56,9 +112,9 @@ def __set_hwtimestamp_config(cfg, ts):
-     return res
- 
- 
--def test_hwtstamp_tx(cfg):
-+def __perform_hwtstamp_tx(cfg, is_ioctl):
-     """
--    Test TX timestamp configuration.
-+    Test TX timestamp configuration via either netlink or ioctl.
-     The driver should apply provided config and report back proper state.
-     """
- 
-@@ -66,16 +122,37 @@ def test_hwtstamp_tx(cfg):
-     ts = __get_hwtimestamp_support(cfg)
-     tx = ts['tx']
-     for t in tx:
-+        res = None
-         tscfg = orig_tscfg
-         tscfg['tx-types']['bits']['bit'] = [t]
--        res = __set_hwtimestamp_config(cfg, tscfg)
-+        if is_ioctl:
-+            __set_hwtimestamp_config_ioctl(cfg, tscfg)
-+        else:
-+            res = __set_hwtimestamp_config(cfg, tscfg)
-         if res is None:
-             res = __get_hwtimestamp_config(cfg)
-+        resioctl = __get_hwtimestamp_config_ioctl(cfg)
-         ksft_eq(res['tx-types']['bits']['bit'], [t])
-+        ksft_eq(resioctl.tx_type, t['index'])
-     __set_hwtimestamp_config(cfg, orig_tscfg)
- 
-+def test_hwtstamp_tx_netlink(cfg):
-+    """
-+    Test TX timestamp configuration setup via netlink.
-+    The driver should apply provided config and report back proper state.
-+    """
-+    __perform_hwtstamp_tx(cfg, False)
-+
- 
--def test_hwtstamp_rx(cfg):
-+def test_hwtstamp_tx_ioctl(cfg):
-+    """
-+    Test TX timestamp configuration setup via ioctl.
-+    The driver should apply provided config and report back proper state.
-+    """
-+    __perform_hwtstamp_tx(cfg, True)
-+
-+
-+def __perform_hwtstamp_rx(cfg, is_ioctl):
-     """
-     Test RX timestamp configuration.
-     The filter configuration is taken from the list of supported filters.
-@@ -87,11 +164,17 @@ def test_hwtstamp_rx(cfg):
-     ts = __get_hwtimestamp_support(cfg)
-     rx = ts['rx']
-     for r in rx:
-+        res = None
-         tscfg = orig_tscfg
-         tscfg['rx-filters']['bits']['bit'] = [r]
--        res = __set_hwtimestamp_config(cfg, tscfg)
-+        if is_ioctl:
-+            __set_hwtimestamp_config_ioctl(cfg, tscfg)
-+        else:
-+            res = __set_hwtimestamp_config(cfg, tscfg)
-         if res is None:
-             res = __get_hwtimestamp_config(cfg)
-+        resioctl = __get_hwtimestamp_config_ioctl(cfg)
-+        ksft_eq(resioctl.rx_filter, res['rx-filters']['bits']['bit'][0]['index'])
-         if r['index'] == 0 or r['index'] == 1:
-             ksft_eq(res['rx-filters']['bits']['bit'][0]['index'], r['index'])
-         else:
-@@ -100,12 +183,34 @@ def test_hwtstamp_rx(cfg):
-     __set_hwtimestamp_config(cfg, orig_tscfg)
- 
- 
-+def test_hwtstamp_rx_netlink(cfg):
-+    """
-+    Test RX timestamp configuration via netlink.
-+    The filter configuration is taken from the list of supported filters.
-+    The driver should apply the config without error and report back proper state.
-+    Some extension of the timestamping scope is allowed for PTP filters.
-+    """
-+    __perform_hwtstamp_rx(cfg, False)
-+
-+
-+def test_hwtstamp_rx_ioctl(cfg):
-+    """
-+    Test RX timestamp configuration via ioctl.
-+    The filter configuration is taken from the list of supported filters.
-+    The driver should apply the config without error and report back proper state.
-+    Some extension of the timestamping scope is allowed for PTP filters.
-+    """
-+    __perform_hwtstamp_rx(cfg, True)
-+
-+
- def main() -> None:
-     """ Ksft boiler plate main """
- 
-     with NetDrvEnv(__file__, nsim_test=False) as cfg:
-         cfg.ethnl = EthtoolFamily()
--        ksft_run([test_hwtstamp_tx, test_hwtstamp_rx], args=(cfg,))
-+        ksft_run([test_hwtstamp_tx_ioctl, test_hwtstamp_tx_netlink,
-+                  test_hwtstamp_rx_ioctl, test_hwtstamp_rx_netlink],
-+                 args=(cfg,))
-         ksft_exit()
- 
- 
+[1] : https://lore.kernel.org/netdev/20250624233922.45089b95@fedora.home/
+
+Thanks again :)
+
+These modules are quite useful, as some MACs can output SGMII and 1000BaseX,
+but can't do 100BaseFX. Should anyone want to connect such a device to a
+100FX link-partner, they need to either use an external media-converter,
+or an SFP module that has a built-in PHY for that.
+
+SGMII can convey 100M link, but the clock speed stays at 1.25GHz. A
+100FX link is clocked at 125MHz, hence the media-converter in the
+middle.
+
+As this is something I had to get working, I got my hands on 4 such SFP
+modules :
+
+ - A "Cisco-compatible" Prolabs module : "CISCO-PROLABS GLC-GE-100FX-C"
+ - A "Generic" Prolabs module : "PROLABS SFP-GE-100FX-C"
+ - A FS module : "FS SFP-GE-100FX"
+ - A Phoenix Contact module : "PHOENIX CONTACT 2891081"
+
+Out of these, the 2 Prolabs and the FS module contain a Broadcom BCM5461
+PHY. Out-of-the-box, they don't work, but thanks to Florian's help I was
+able to get the Cisco-Prolabs and the FS one to work.
+
+I couldn't get the Generic Prolabs to work, even though the PHY is
+detected and accessible. As for the Phoenix Contact one, I don't know
+which PHY it contains, and I couldn't get anything out of it.
+
+This series therefore brings support for the "Cisco-compatible" Prolabs, and the
+FS one.
+
+Some oddities were discovered along the way. Some modules are missing
+the 100_fx bit in their EEPROM. Even stranger, trying to access the
+BCM5461 PHY with regular mdio-i2c accesses causes the PHY to freeze and
+get the i2c bus in an unrecoverable stuck state. However, accessing them
+in single-byte mdio-i2c accesses does work !
+
+Another thing that needed to be addressed is the SFP interface
+selection, that expected that 100FX modules would be using the
+PHY_INTERFACE_MODE_100BASEX mode. That's addressed by patch 2, and I'd
+really like some feedback from Russell there, I may be breaking things
+:(
+
+All in all, this series contains a lot of hacks, but for such peculiar
+modules one could expect that this wouldn't fit the current model.
+
+This was tested on 3 different MACs :
+ - The KSZ9477's SGMII port (old version of xpcs)
+ - The Macchiatobin's eth3 port (mvpp2 + Marvell PCS)
+ - A Cyclone V Socfpga device (stmmac + Lynx PCS)
+
+Thank you,
+
+Maxime
+
+Maxime Chevallier (6):
+  net: sfp: Add support for SGMII to 100FX modules
+  net: phylink: Allow more interfaces in SFP interface selection
+  net: phy: Store module caps for PHYs embedded in SFP
+  net: phy: broadcom: Support SGMII to 100FX on BCM5461
+  net: mdio: mdio-i2c: Add single-byte C22 MDIO protocol
+  net: sfp: Add support for some BCM5461-based SGMII to 100FX modules
+
+ drivers/net/mdio/mdio-i2c.c   | 12 +++--
+ drivers/net/phy/broadcom.c    | 94 +++++++++++++++++++++++++++++++++++
+ drivers/net/phy/phy-caps.h    |  5 ++
+ drivers/net/phy/phy_caps.c    | 47 ++++++++++++++++++
+ drivers/net/phy/phylink.c     | 24 +++------
+ drivers/net/phy/sfp-bus.c     | 11 ++++
+ drivers/net/phy/sfp.c         | 31 +++++++++++-
+ include/linux/mdio/mdio-i2c.h |  1 +
+ include/linux/phy.h           |  4 ++
+ 9 files changed, 207 insertions(+), 22 deletions(-)
+
 -- 
-2.47.3
+2.49.0
 
 
