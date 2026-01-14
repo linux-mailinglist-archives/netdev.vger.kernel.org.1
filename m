@@ -1,92 +1,76 @@
-Return-Path: <netdev+bounces-249828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEA5ED1EC45
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 13:30:46 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7064BD1EBC1
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 13:27:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 783A930A426C
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 12:26:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2BD9030010DD
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 12:27:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFDE4397AC6;
-	Wed, 14 Jan 2026 12:26:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81737395275;
+	Wed, 14 Jan 2026 12:27:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b1i75yib"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EbjC6k+3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49123396D3E
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 12:26:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E21428469E
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 12:27:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768393588; cv=none; b=i8elU5Cx6Mh/shbj0WZh+RrKmfhp39H1AOwD7IBzIUPex2Fc1OGvftWk5rDes7zPlbHRMR2ROKBIyV48zndcKG5E++PXZ+6CRyU/nmbw8fOOvQXGwV0vtTpH5G5pRWMAjXm/u+Yzr5OHqEVSUcjM5eG74zKLPaR9D1P2VtTCCZQ=
+	t=1768393662; cv=none; b=YJruPB7ZtH7Qrr84O2/CGu9Nv7CqmXk8RmFqbNR9E9GjF3L1bSqjBAXjPc/opJY48hyVitNiYemv0BPT73QhlV+R/IpzxHUwzDE6m7r38geqUheGmaQXOcmDG4XuQtHKv+41LUspnkuPRgew9Gb12qzYvMk+QRx4I+gABVK+7oY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768393588; c=relaxed/simple;
-	bh=JEDnlZYXIHilnOnTePLHzYAZD0ZmBByyDO4WzTOYCCk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PXn+Y9VuUe1BvNEPXkPK3lUTAow2IrL3oQqY8rCxXwSSZsLrCxVeaqOcv3FPQVgtIWEWoJ7doewjHrdOrRkr4zOiNUFk57ajCyD61Co1xVO2TWxx1rZ72LzbFPzEKrFT9CLMQPaQjfyhOmo30/R9mh0R1bwRKzaKbKA96h/K+NE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b1i75yib; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-29f0f875bc5so67940185ad.3
-        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 04:26:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768393584; x=1768998384; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=AbzNlyftwKRg9xsu0MFnIl7dchtZzqwBBSHtb8zwf2M=;
-        b=b1i75yibxVgOr/Wjjc2QVYZnW3+jOTNz6BFEGAG0QuwV6TL7zfwc22aNfLk3bcD56o
-         NYZ9Gop1frF7BfSHJnfDOf4NwWmYpMqbppapjspV4Zc2fYa0lPtlZJrXfE8W964peLnj
-         mTiomx4X7nHZFwNFMwyz6REat4rCwtlnqhTCRKeD3OXumaxEHD0rMZED3xnu9VzYku2m
-         Z3PpUFVzZ4YNYJZfIlsVdCA4+Y/G4fWGxsVj9EUB2H2OskVHbQGyjH1yatTkPWndV2Q+
-         ZwvYKgRZQP1B9CUhhzr3PCz7aV9NsjYdW5dyomLar7sp8Bqkip+p890a0DvNf/s8lI03
-         3jJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768393584; x=1768998384;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AbzNlyftwKRg9xsu0MFnIl7dchtZzqwBBSHtb8zwf2M=;
-        b=YW9rYzF2BnFSBv8q3aX+LXEYBQOUqWI6AGWbCt9PYpwVSq2tksO0glASmTrIaal/8t
-         PgWGovv0wa8dzsx1lH3Frd9U7bKbRhk4RxGWvJWajRXIRIDnhco44dPykRzi1QuU9U23
-         AfITF7D4gmjw+O4A4DBBLlqwMPKFQxZAeXl/y6jIkQADhsOt/ugHZkaFJjaj/fkFI6uR
-         0B7vxAJQgi/6356nS858yFmIz/dzt2r2tC1ChKBvz+DnMJ/Gy8XzlqosDERCfFbxPxaO
-         IL4CD1ifpu8Jmstni1n+Y8XhpyiPYZ/0EoZfKw9N2pJvPTxoJ9beTOZe2hx4nOIfXwbm
-         Vseg==
-X-Gm-Message-State: AOJu0YytRobQjmEFzxrX12GFh/ZDBk45ansZN6LYvVUYSXRz8VBaQvBv
-	X4NltxuPhfXZBVWTxnaCl02GYXCIA4MB6nzuCmUYFARmPQgBQryXygUFEflZVQ==
-X-Gm-Gg: AY/fxX5jc/KOIysb10u4sEjV/3VpIEA1SWAzj4CbqafwS6VMES8mCKlEIPDfhMzY2z8
-	1MtwHbDHXGY0zZL2JMFqLsXpb0afTrYqGMQWEs0uvPc249jeYBA8pl+BZVF/GSMwtO40N0bx/wC
-	+MDK9JY1X+3nww8C0yR6zxSom+oL3DzQpiTHA8fnH3OnJXAt/ahPaf3wFFp/Bi1gIvGwKUYb0O4
-	ijS+i4+msr5BgD6f/Uf0d+y7vvh0Vk8N27qFtNe2ZYJAv961fv+phfyIaBatHDp46IYaR3yjvyR
-	85OumhyEUF6n6OHip304if/tF9zsFe5dk06xT5M0Fy78HZmmm/tODDysfxrTyLEtrzz3rBM+KnX
-	1DQxi6aZM7cXDTpJ6tOaHhtamqgHICd/A965Cw8IV2bMsr5iW93/TeODaNHZ9jXmxLQFNE7DZct
-	JppUYm0NvirwuiJNd8Nz2X09uOUG0wNQZCvC7rQKxP/fPZSWf4sYCgyg==
-X-Received: by 2002:a17:903:40d2:b0:2a0:d34f:aff3 with SMTP id d9443c01a7336-2a59bb36674mr24558905ad.18.1768393584056;
-        Wed, 14 Jan 2026 04:26:24 -0800 (PST)
-Received: from d.home.mmyangfl.tk ([2001:19f0:8001:1644:5400:5ff:fe3e:12b1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a3e3cd4401sm230327115ad.92.2026.01.14.04.25.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jan 2026 04:25:57 -0800 (PST)
-From: David Yang <mmyangfl@gmail.com>
+	s=arc-20240116; t=1768393662; c=relaxed/simple;
+	bh=RRMPE5Uwe3bGl6crR830X1+0XSG+3d4rfva3zN8Drvw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WNZiB9DqWAk5JzNkpaVDp2E6Xh2DnO12BRic6/rgtyznpHFQDU4CBBhyOOXMx43qbzbEPd7zLg6EJVyXjblM28fb9sJmFkSOLkLVF1rIyf0cIjahIBgaUxq1A67fbSID0yyp0UyEEr74F/9u/DGxQ0MHRNhheW4b5AiRMFV9nVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EbjC6k+3; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768393660;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=E37khAmOowy5nW9WqJmZa4Qtgnu7VDjSJG9/3jN2iBY=;
+	b=EbjC6k+3OARQwrQXfNe6j4+3ByvScuI3T+Qq1FdV+p5He7emQfRYAW0Riq75t9gjk/mPds
+	PWi7+o5GjYSYDkw1HEmYY6sGEtybKHArIIKcwaXivMusFFpGrOjX4RkQeMkEtdnRXcUrS/
+	QIqAOtkGNMCAt7qOHwQFqkv0Qcf7Ywc=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-38-8xD9JA1BNkOeOSltyDCPsg-1; Wed,
+ 14 Jan 2026 07:27:34 -0500
+X-MC-Unique: 8xD9JA1BNkOeOSltyDCPsg-1
+X-Mimecast-MFC-AGG-ID: 8xD9JA1BNkOeOSltyDCPsg_1768393653
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8FD4D19560B2;
+	Wed, 14 Jan 2026 12:27:32 +0000 (UTC)
+Received: from p16v.luc.cera.cz (unknown [10.44.32.45])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4E0A21956048;
+	Wed, 14 Jan 2026 12:27:28 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
 To: netdev@vger.kernel.org
-Cc: David Yang <mmyangfl@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+Cc: Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
+	Simon Horman <horms@kernel.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Petr Oros <poros@redhat.com>,
 	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH net-next] veth: fix data race in veth_get_ethtool_stats
-Date: Wed, 14 Jan 2026 20:24:45 +0800
-Message-ID: <20260114122450.227982-1-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	Michal Schmidt <mschmidt@redhat.com>
+Subject: [PATCH net-next v3 0/3] dpll: support mode switching
+Date: Wed, 14 Jan 2026 13:27:23 +0100
+Message-ID: <20260114122726.120303-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,46 +78,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-In veth_get_ethtool_stats(), some statistics protected by
-u64_stats_sync, are read and accumulated in ignorance of possible
-u64_stats_fetch_retry() events. These statistics, peer_tq_xdp_xmit and
-peer_tq_xdp_xmit_err, are already accumulated by veth_xdp_xmit(). Fix
-this by reading them into a temporary buffer first.
+This series adds support for switching the working mode (automatic vs
+manual) of a DPLL device via netlink.
 
-Signed-off-by: David Yang <mmyangfl@gmail.com>
----
- drivers/net/veth.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Currently, the DPLL subsystem allows userspace to retrieve the current
+working mode but lacks the mechanism to configure it. Userspace is also
+unaware of which modes a specific device actually supports, as it
+currently assumes only the active mode is supported.
 
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 14e6f2a2fb77..9982412fd7f2 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -228,16 +228,20 @@ static void veth_get_ethtool_stats(struct net_device *dev,
- 		const struct veth_rq_stats *rq_stats = &rcv_priv->rq[i].stats;
- 		const void *base = (void *)&rq_stats->vs;
- 		unsigned int start, tx_idx = idx;
-+		u64 buf[VETH_TQ_STATS_LEN];
- 		size_t offset;
- 
--		tx_idx += (i % dev->real_num_tx_queues) * VETH_TQ_STATS_LEN;
- 		do {
- 			start = u64_stats_fetch_begin(&rq_stats->syncp);
- 			for (j = 0; j < VETH_TQ_STATS_LEN; j++) {
- 				offset = veth_tq_stats_desc[j].offset;
--				data[tx_idx + j] += *(u64 *)(base + offset);
-+				buf[j] = *(u64 *)(base + offset);
- 			}
- 		} while (u64_stats_fetch_retry(&rq_stats->syncp, start));
-+
-+		tx_idx += (i % dev->real_num_tx_queues) * VETH_TQ_STATS_LEN;
-+		for (j = 0; j < VETH_TQ_STATS_LEN; j++)
-+			data[tx_idx + j] += buf[j];
- 	}
- 	pp_idx = idx + dev->real_num_tx_queues * VETH_TQ_STATS_LEN;
- 
+The series addresses these limitations by:
+1. Introducing .supported_modes_get() callback to allow drivers to report
+   all modes capable of running on the device.
+2. Introducing .mode_set() callback and updating the netlink policy
+   to allow userspace to request a mode change.
+3. Implementing these callbacks in the zl3073x driver, enabling dynamic
+   switching between automatic and manual modes.
+
+Changelog:
+v3 - fixed reverse xmas tree order in dpll_mode_set()
+v2 - addressed issues reported by Vadim
+
+Ivan Vecera (3):
+  dpll: add dpll_device op to get supported modes
+  dpll: add dpll_device op to set working mode
+  dpll: zl3073x: Implement device mode setting support
+
+ Documentation/netlink/specs/dpll.yaml |   1 +
+ drivers/dpll/dpll_netlink.c           |  71 ++++++++++++++--
+ drivers/dpll/dpll_nl.c                |   1 +
+ drivers/dpll/zl3073x/dpll.c           | 112 ++++++++++++++++++++++++++
+ include/linux/dpll.h                  |   5 ++
+ 5 files changed, 182 insertions(+), 8 deletions(-)
+
 -- 
-2.51.0
+2.52.0
 
 
