@@ -1,267 +1,141 @@
-Return-Path: <netdev+bounces-249852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34431D1F652
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 15:23:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8674DD1F7B7
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 15:32:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C58F23021E4D
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 14:23:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E912C300DA69
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 14:32:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 115AA2DCBFC;
-	Wed, 14 Jan 2026 14:23:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D02C2D94BB;
+	Wed, 14 Jan 2026 14:32:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="HHqfcaHC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nepQYUb0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com [209.85.128.65])
+Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com [209.85.217.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB17A2D6E73
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 14:23:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB0CD22B5A5
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 14:32:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768400586; cv=none; b=PpNLYeyDU41+Mop6/IGhSY22wKbNQN/3wyAIbEaIWt1jMpZePPC0CaUAaHThtA6xKXm/hCWlYUjnA7NyjToXqwFM58wPjLtQzaw3BSLBs5LXwJm6YJxAlOSv0DqCse3IohSlK39ic/zVqmNEXqtRYO209WLfmpY4HEP7Cb3goR4=
+	t=1768401167; cv=none; b=isV5x3MO/5OfmZga7RpwF5uLhbgerPbLQw2uJJ0gPgIwn0fYwGOSl7yXv395ms6NzoqsXgDqccXyMp+dfnjxN9PqChtZBAfdUoq2DPcyqq4ZAogpbFCOYGyOwABkkQQ3wrcCbQxo9Fc8NW6DdgOBy5B3Cwib4/JiuWWyyG0KFW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768400586; c=relaxed/simple;
-	bh=DfrdswblHy1q9UZ6D1iDapX7djYN6NrxRY58tdu4Ov8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bjAWIShbQTOt8pFlr6f+G7GO0w/qpP2EJrjBBrDZLfV1DCVsoNAdqx6ba/UEl5wdmt+SrL5EK2jylcDJysqDhpxSprhpwWMKsSI9nvK3hMZ13NEHLVlmDeoB348nmXHgnnBItHtzNw6xuOlJz0NmswkevuF96QftVdySl4V6qH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=HHqfcaHC; arc=none smtp.client-ip=209.85.128.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f65.google.com with SMTP id 5b1f17b1804b1-47ee807a4c5so3125625e9.2
-        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 06:23:04 -0800 (PST)
+	s=arc-20240116; t=1768401167; c=relaxed/simple;
+	bh=qQZhH/MEd3fGN4OPOWdeUBdYa+XsJhkaROihpCPQY28=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CMAsmTtzl36sB05p9ouM3rkJcFvLqL0c9xZbFbRrzUg0ly/CC6vuPPMpmfh13SlcGV3UD7xSjPHLXRMTq6Qn3sjUYnKWAjrwpcrsDNmX2VmlesedIfTNFoeccie7TrkRjiO7orMmNA/S+ElalfOVBB3DwdT6KQHDKxJPQ5/qFqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nepQYUb0; arc=none smtp.client-ip=209.85.217.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f45.google.com with SMTP id ada2fe7eead31-5ed0b816d76so2546359137.1
+        for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 06:32:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1768400583; x=1769005383; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rjJ0doliNf6plVmMYQkV7IlLiBwqr6x+viyB7m/anSs=;
-        b=HHqfcaHCDZ4C/25aiu2LLUMRB6a3JGJWGhQfFT6QaEtcdkNlMy33Eg5S1g6VGmzYXo
-         hpfCXuvsZWvysbszR52KoZ2Hm1zuNEeCpDbVwfZG4XIIepu7J6DwkkZTdV4+WvGZUfb2
-         J50i9CArQzRD7a32Tos9uS2iTNN+n78n5NdtroiOypIe6+cM2D5E/4P5BmzBG0Y1OMZi
-         TF2vHM81yG5bimXpDBncf/8rbHqG0I7eJ966s7d0iQ2MM9s31pdW7eDgXOSxl6kdp6c/
-         Y/on+swJawD0gJ25otHcu9wX57o6bpwey1K2T1Em/Ha1Hnr4ql+oU5YXD54Y+M9nX783
-         +Gyg==
+        d=gmail.com; s=20230601; t=1768401165; x=1769005965; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hvjffxgxOPgzQu5IYkugYM5RZ08ODCAjHZ4DzEhZhjc=;
+        b=nepQYUb0XbKi9hZkEYKMfcEYmJHA+rNl3MmgXpbSHMoj4EhriS7gNhiborF4z5FymV
+         D9389WyJVFi1eG5s+NaU/gatJItVb5e8g3SPk03gG276laWyzK5L28RnQlErnmNeNqtL
+         OHf+oiu1h1XeYCpGPiaugFWxxepxJ/EQZhrcXPfN1HLb3xRzONIduYLLDvDQCDPuQXhQ
+         VUXWLHoe/JgJv4RmNk+T2Q057iLerF3McLZPyRMVS92nGAeS8aiTa3hGWUPqcO/HvbPM
+         Y5VGwEm1CrCEXhF88jSb+zEua0voKjEW4ZU/RLFcsiOKXx0RR2/fQu3Etf5Uyfwffxi6
+         tOwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768400583; x=1769005383;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rjJ0doliNf6plVmMYQkV7IlLiBwqr6x+viyB7m/anSs=;
-        b=ZTK35VpXOE2FD6glPwDubyflaX0/PKVaFIronNUWcloJgMDJk/Nt0ydMAxVzprMFfS
-         BGK5GH3kBUFiPT8jn4TmaPTSfZi2McjYCkuYub1PpS5iL/ppoM3LedfdvzubAb1//DtD
-         AqoDizVuL285rWDtqWYueL3cipUje1j2Z2s5klnFSrSbxczLSw1cunuckzQXMNp5lgg2
-         0rSL+dKyNPkspoqg9V8fgdMG4aFb7kDle9fnhpUzT2Z+DlXO18PDNcv2+26JdXghWz12
-         X6C/jafppdRnqky3m/63oATvoi2IUn69StAZwBCQlBAorGunJzGsxYik7SUgHWadLj3L
-         xvTA==
-X-Forwarded-Encrypted: i=1; AJvYcCV2Rq/H4W4v/RJFc0DSfHdEX997fnY1HPwU/6OQOX6be8wYm7wElhB/bi/l06NITWH+suPm8SI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvBdJ8Ts7SiGVJWsHnn+5WKqGbp61svhQCDMEIdwmdHMozWGWT
-	3k2bpg3Rko3subCBbtIGxCgMUSOkweN8J5fNGjGtijkFuJ2TxV+iSbrxoOChXZjolpM=
-X-Gm-Gg: AY/fxX7iqApEWlLPPrdliroZxb2/wn5eH34Rm6IFjaYmW9zTEJCpZf2NidR+6VUf9Yu
-	3Q/rue1CKyAf5VwZnAW6du8C3e5hPAK1ggu12hmy/3zcQ871lTx6Uj1UV8HOw8DdfIaJnBH+F8r
-	1wOLV37fiHYqTG3vNLGcs7dkwy6niAR8WckG9iEBW94jutCTraf3P9mC9lCxTfwj59AJuOudmBC
-	jGtetobNH363l94zEsaZA7xjDnd6ML2yQR2tU2Bb0BKISfciFSghSWyMQcZ1aFG798YHTdggRyP
-	6RNhQ7y+gZc4Y8uGU1bUkL6UAGdtdtMuWIs6Pa+9nddfEhJJ2g2d0IG9JCRvjLY91o9S5iTmIhE
-	MPMAZ/R6VlHoRgZML/VjXWpfKfODHVxFdqwMK5+FJ2ngNSUL1WpQBHMV92G8MjYLHjmDZEBEByH
-	QoIrceUBjSLy9f2Q==
-X-Received: by 2002:a05:6000:3105:b0:431:104:6dd5 with SMTP id ffacd0b85a97d-4342c5728e2mr3256518f8f.58.1768400582935;
-        Wed, 14 Jan 2026 06:23:02 -0800 (PST)
-Received: from pathway.suse.cz ([176.114.240.130])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0dacd1sm49446446f8f.4.2026.01.14.06.23.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jan 2026 06:23:02 -0800 (PST)
-Date: Wed, 14 Jan 2026 15:22:59 +0100
-From: Petr Mladek <pmladek@suse.com>
-To: Marcos Paulo de Souza <mpdesouza@suse.com>
-Cc: Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jason Wessel <jason.wessel@windriver.com>,
-	Daniel Thompson <danielt@kernel.org>,
-	Douglas Anderson <dianders@chromium.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	John Ogness <john.ogness@linutronix.de>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jiri Slaby <jirislaby@kernel.org>, Breno Leitao <leitao@debian.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Kees Cook <kees@kernel.org>, Tony Luck <tony.luck@intel.com>,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jacky Huang <ychuang3@nuvoton.com>,
-	Shan-Chun Hung <schung@nuvoton.com>,
-	Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-	linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kgdb-bugreport@lists.sourceforge.net, linux-serial@vger.kernel.org,
-	netdev@vger.kernel.org, linux-m68k@lists.linux-m68k.org,
-	linux-hardening@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	sparclinux@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 06/19] printk: Introduce register_console_force
-Message-ID: <aWemw2ZCwtAd17I1@pathway.suse.cz>
-References: <20251227-printk-cleanup-part3-v1-0-21a291bcf197@suse.com>
- <20251227-printk-cleanup-part3-v1-6-21a291bcf197@suse.com>
+        d=1e100.net; s=20230601; t=1768401165; x=1769005965;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=hvjffxgxOPgzQu5IYkugYM5RZ08ODCAjHZ4DzEhZhjc=;
+        b=aIMy4gecsu0tCGY9IChmkPOdbScyo4t/091M5zm7DZgxUAo6AmyoaYexHw8eBOd3Tp
+         XC9UIhQZWVcaWJrTIwjI1jfMMx1pWIMUHDlR7sncB0enXZTVcwRWKq81CIKI1l6TxEHV
+         3U79Jhvs8eTJknafkOEMZ1GHvzblW0vJKwLuBFjjuO5DAP+1S8T6UCye99idtoFCwVSA
+         lhrHiPs/CKz46quELL3Ofuz6tuGae7pfFgT8um/NUnZvu4S7ykocBCn7H+VkhsCu+G/q
+         vU6DYoQQ97HM7r3C32wmr3ti1/78S8lV9jmsWpEOQ+4eEBm9Rm7PiUTsJwwgZMNYNapu
+         G3kA==
+X-Gm-Message-State: AOJu0Yy224WkFmPctOfYVwntRlUzhQnx4B05IfeanpT7prLIvQMri8rq
+	jchbjw1K4RLHprQAdyRrtXwJQ8mBhH/vLc9vgXCGUXJ/5hwopHM09TJXWqNWE+KhXXsbOI1wdkv
+	8YwmRxelAuskIdtubtBkLEM4AnA2VX7Tdbg==
+X-Gm-Gg: AY/fxX5dzzb6ux3fVmBFwMrcUTuS95WjfyU9Hsen8SdCeqHBf0jH+Z2r692D/e8guU9
+	AgQrnsq56X/Y37PoS4N4PCsLXpGCewShr2fiJaLYLKXRNAXAgr3zoyvRrbve2NsIp7nwvNKcsDP
+	J56Of4nLlxz7UDks6csCVdbf1UsrIc/XNLT9BxWOWnaxPMcbeeDxsRVgH1TY3wJ5v0kfdg+V2bF
+	4Lkxd6oRkcgNsqTAAA19ik0oKUBv5Vx/sYcEOAluKC7WPKTsQ/E9Q2lqCACXL+j0Ydphq/2kRIF
+	60hwqP3TmAQFQhFOqLDzarL2OzqfthzqsVaNNA==
+X-Received: by 2002:a05:6102:644b:b0:5ef:a6e8:3143 with SMTP id
+ ada2fe7eead31-5f17f66a78bmr945744137.37.1768401164578; Wed, 14 Jan 2026
+ 06:32:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251227-printk-cleanup-part3-v1-6-21a291bcf197@suse.com>
+References: <CAFfO_h5k7n7pJrSimuUaexwbMh9s+f0_n6jJ0TX4=+ywQyUaeg@mail.gmail.com>
+In-Reply-To: <CAFfO_h5k7n7pJrSimuUaexwbMh9s+f0_n6jJ0TX4=+ywQyUaeg@mail.gmail.com>
+From: Dorjoy Chowdhury <dorjoychy111@gmail.com>
+Date: Wed, 14 Jan 2026 20:32:33 +0600
+X-Gm-Features: AZwV_QidMrcVw-ipAMGaK0viTl8ZeetGlhjStdWzMSy3wtTrxR0xKQYf_48ndhY
+Message-ID: <CAFfO_h6bLS5vc8YUBnFffk2hS4Oj9MK7EdEyCA__5KWMqyqAPg@mail.gmail.com>
+Subject: Re: Question about timeout bug in recvmmsg
+To: netdev@vger.kernel.org
+Cc: "edumazet@google.com" <edumazet@google.com>, kuniyu@google.com, pabeni@redhat.com, 
+	willemb@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat 2025-12-27 09:16:13, Marcos Paulo de Souza wrote:
-> The register_console_force function will register a console even if it
-> wasn't specified on boot. The new function will act like all consoles
-> being registered were using the CON_ENABLED flag.
+Hi,
+Gentle ping regarding this request. I would really appreciate some
+input on this. Thank you!
 
-I am a bit confused by the last sentence. It might be bacause I am not
-a native speaker. I wonder if the following is more clear:
+Regards,
+Dorjoy
 
-<proposal>
-The register_console_force() function will register a console even if it
-wasn't preferred via the command line, SPCR, or device tree. Currently,
-certain drivers pre-set the CON_ENABLE flag to achieve this.
-</proposal>
-
-> The CON_ENABLED flag will be removed in the following patches and the
-> drivers that use it will migrate to register_console_force instead.
-> 
-> --- a/kernel/printk/printk.c
-> +++ b/kernel/printk/printk.c
-> @@ -3858,7 +3858,7 @@ static int console_call_setup(struct console *newcon, char *options)
->   * enabled such as netconsole
->   */
->  static int try_enable_preferred_console(struct console *newcon,
-> -					bool user_specified)
-> +					bool user_specified, bool force)
->  {
->  	struct console_cmdline *c;
->  	int i, err;
-> @@ -3896,12 +3896,15 @@ static int try_enable_preferred_console(struct console *newcon,
->  		return 0;
->  	}
->  
-> +	if (force)
-> +		newcon->flags |= CON_ENABLED;
-> +
-
-This makes sense because the pre-enabled CON_ENABLED flag is handled
-right below.
-
->  	/*
->  	 * Some consoles, such as pstore and netconsole, can be enabled even
->  	 * without matching. Accept the pre-enabled consoles only when match()
->  	 * and setup() had a chance to be called.
->  	 */
-> -	if (newcon->flags & CON_ENABLED && c->user_specified ==	user_specified)
-> +	if (newcon->flags & CON_ENABLED && c->user_specified == user_specified)
->  		return 0;
-
-But this location was not a good idea in the first place. It hides an unexpected
-side-effect into this function. It is easy to miss. A good example is
-the regression caused by the last patch in this patch set, see
-https://lore.kernel.org/all/89409a0f48e6998ff6dd2245691b9954f0e1e435.camel@suse.com/
-
-I actually have a patch removing this side-effect:
-
-From d24cd6b812967669900f9866f6202e8b0b65325a Mon Sep 17 00:00:00 2001
-From: Petr Mladek <pmladek@suse.com>
-Date: Mon, 24 Nov 2025 17:34:25 +0100
-Subject: [PATCH] printk/console: Do not rely on
- try_enable_preferred_console() for pre-enabled consoles
-
-try_enable_preferred_console() has non-obvious side effects. It returns
-success for pre-enabled consoles.
-
-Move the check for pre-enabled consoles to register_console(). It makes
-the handling of pre-enabled consoles more obvious.
-
-Also it will allow call try_enable_preferred_console() only when there
-is an entry in preferred_consoles[] array. But it would need some more
-changes.
-
-It is part of the code clean up. It should not change the existing
-behavior.
-
-Signed-off-by: Petr Mladek <pmladek@suse.com>
----
- kernel/printk/printk.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-index abf1b93de056..d6b1d0a26217 100644
---- a/kernel/printk/printk.c
-+++ b/kernel/printk/printk.c
-@@ -3826,14 +3826,6 @@ static int try_enable_preferred_console(struct console *newcon,
- 		return 0;
- 	}
- 
--	/*
--	 * Some consoles, such as pstore and netconsole, can be enabled even
--	 * without matching. Accept the pre-enabled consoles only when match()
--	 * and setup() had a chance to be called.
--	 */
--	if (newcon->flags & CON_ENABLED && pc->user_specified == user_specified)
--		return 0;
--
- 	return -ENOENT;
- }
- 
-@@ -4022,6 +4014,14 @@ void register_console(struct console *newcon)
- 	if (err == -ENOENT)
- 		err = try_enable_preferred_console(newcon, false);
- 
-+	/*
-+	 * Some consoles, such as pstore and netconsole, can be enabled even
-+	 * without matching. Accept them at this stage when they had a chance
-+	 * to match() and call setup().
-+	 */
-+	if (err == -ENOENT && (newcon->flags & CON_ENABLED))
-+		err = 0;
-+
- 	/* printk() messages are not printed to the Braille console. */
- 	if (err || newcon->flags & CON_BRL) {
- 		if (newcon->flags & CON_NBCON)
--- 
-2.52.0
-
-
-It would be better to do the above change 1st. Then the @force
-parameter might be checked in __register_console() directly, like:
-
-	/*
-	 * Some consoles, such as pstore and netconsole, can be enabled even
-	 * without matching. Accept them at this stage when they had a chance
-	 * to match() and call setup().
-	 */
-	if (err == -ENOENT && (force || newcon->flags & CON_ENABLED))
-		err = 0;
-
-You might just remove the check of CON_ENABLED in the last patch.
-I think that this should actually fix the regression. It will
-handle also the case when the console was enabled by
-try_enable_default_console() and try_enable_preferred_console()
-returned -ENOENT.
-
-Note: I have some more patches which clean up this mess. But they are
-      more complicated because of how the Braille console support
-      is wired. They still need some love. Anyway, the above patch should
-      be good enough for removing CON_ENABLED flag.
-
-Best Regards,
-Petr
+On Thu, Jan 8, 2026 at 12:39=E2=80=AFAM Dorjoy Chowdhury <dorjoychy111@gmai=
+l.com> wrote:
+>
+> Hi,
+> Hope everyone is doing well. I came upon this timeout bug in the
+> recvmmsg system call from this URL:
+> https://bugzilla.kernel.org/show_bug.cgi?id=3D75371 . I am not familiar
+> with the linux kernel code. I thought it would be a good idea to try
+> to fix it and as a side effect I can get to know the code a bit
+> better. As far as I can see, the system call eventually goes through
+> the do_recvmmsg function in the net/socket.c file. There is a while
+> loop that checks for timeout after the call to ___sys_recvmmsg(...).
+> So this probably is still a bug where if the socket was not configured
+> with any SO_RCVTIMEO (i.e., sk_rcvtimeo in struct sock), the call can
+> block indefinitely. Is this considered something that should ideally
+> be fixed?
+>
+> If this is something that should be fixed, I can try to take a look
+> into it. I have tried to follow the codepath a bit and from what I
+> understand, if we keep following the main function calls i.e.,
+> do_recvmmsg, ___sys_recvmmsg ... we eventually reach
+> tcp_recvmsg_locked function in net/ipv4/tcp.c (there are of course
+> other ipv6, udp code paths as well). In this function, the timeo
+> variable represents the timeout I think and it gets the timeout value
+> from the sock_rcvtimeo function. I think this is where we need to use
+> the smaller one between sk_rcvtimeo and the remaining timeout
+> (converted to 'long' from struct timespec) from the recvmmsg call (we
+> need to consider the case of timeout values 0 here of course). It
+> probably would have been easier if we could add a new member in struct
+> sock after sk_rcvtimeo, that way the change would only have to be in
+> sock_rcvtimeo function implementation. But this new timeout  value
+> from the recvmmsg call probably doesn't make sense to be part of
+> struct sock. So we need to pass this remaining timeout from
+> do_recvmmsg all the way to tcp_recvmsg_locked (and similar other
+> places) and do the check for smaller between the passed parameter and
+> return value from sock_rcvtimeo function. As we need to pass a new
+> timeout parameter anyway, it probably then makes sense to move the
+> sock_rcvtimeo call all the way up the call chain to do_recvmmsg and
+> compare and send the finalized timeout value to the function calls
+> upto tcp_recvmsg_locked, right?
+>
+> I would really appreciate any suggestion about this issue so that I
+> can try to fix it. Thank you!
+>
+> Regards,
+> Dorjoy
 
