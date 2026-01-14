@@ -1,84 +1,90 @@
-Return-Path: <netdev+bounces-249645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AA0CD1BC3D
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 01:00:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13BFFD1BC8B
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 01:13:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 39C333016340
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 00:00:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BE699301E5A4
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 00:13:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7230B35581D;
-	Wed, 14 Jan 2026 00:00:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5270D2BCFB;
+	Wed, 14 Jan 2026 00:13:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NeCMgxIZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TgV3+5Ff"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7C530E84A
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 00:00:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8A9944F;
+	Wed, 14 Jan 2026 00:13:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768348813; cv=none; b=aV34G6GPYIw1fBI8m7QbvgLWe7ATY3umyam8aGbwLk30OcbIOg7bw+9ihAJBkZ8zOTKufV5j81cIfOQPgUa6SHkfnMlsxSVkYYFQ8peYyzPaD4H1ENoc+53hCUXFOgzn+rsdYtqLyWErVQrgRbDpWQMJnmZnUUo6BjFSCUf7zT8=
+	t=1768349613; cv=none; b=G7EaOi0Ya+AmPfZIDLxS620/U2it2WQJSDZClDYQQLA6mZNW57QmMfvcrynbbscJboO2BzPG8hpDc1MqWU9TMXs1VTuLgju7x+g9CL6lR++8dUBOYD5GUf1pfOaOyhF7NcGGhcU+w5ufjYdkuNRNR/eD5rJd1yDvq6upv/2q+AQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768348813; c=relaxed/simple;
-	bh=cgBDizAyonfYIqSrnhGl9fQcV2GBbnTgA7hDpPmfvpI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RUhik+ncU4KY9fFtKuLXztkBFA3bVTDp1Hm7rxsSB2JuB+WxBZXGtUsGLKiwLbFvoq68aByZoQVQCfOzddmASA/G2jc0VMxxwpUYFPDEg0QL8inzQ+yNRXogmILLTxOqGnsuTsWcja8/qQzjFfD9i1k9a/VS8AQij5S9EPQqzjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NeCMgxIZ; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <d9b9bd69-e232-45ff-b210-c21229946427@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768348809;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9vkd5Vwe8NUqXXhB8w9t5WgfI6zx49RL54i6l3mSiy8=;
-	b=NeCMgxIZFYORfPiqkPhw0ubF/LKtnDoREbEhJZj+5PNdx2fhTBr79+ZxqC9HCVeINtrLLD
-	z+W9sS4e8uBeVZmCuZfbF14cXcwYLj0Ma15qRQ/Uaqlwc94Qsv1x8tlw5PFSY1tA2wR6+I
-	WI0fQeJdBF3zkOK0BdNIGGZe1Qj612A=
-Date: Wed, 14 Jan 2026 00:00:04 +0000
+	s=arc-20240116; t=1768349613; c=relaxed/simple;
+	bh=aqnHze+Td25OVXDIGdgpRDIRDAM53FeOGdj9+wWFseY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=DW+HDFpj2NoItVT01wtVhXIhHtrI7IOMWauUbu9DK4YKqLG9C8qX/c3wWwjCjhHS/jwOy4Z542MhQS671LozkKy9YkSVjjWzZviDaDwYiJTb8OQYrbUkOTTgqsYj18isZj675/XCWqacsa3m1KC3TfVdKUdYmT50MUkGTzTR/ME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TgV3+5Ff; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEEE8C116C6;
+	Wed, 14 Jan 2026 00:13:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768349612;
+	bh=aqnHze+Td25OVXDIGdgpRDIRDAM53FeOGdj9+wWFseY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=TgV3+5Ff8t0/g8AniA+UuBLz/Te7zln4zP21xGOw2JnnTMj3jDJZ1Dwk5FMA0H9Dj
+	 +OqDCfjpRGBvu0BYh6LnMFQePJ+g2bRtpcVOztF22fRiNA4a/mD+R1Hs7FISM5rNHF
+	 jhvfjvXWOxbz+dcGEaUhuQ3+PUjGO78rX5xPY4bimyAvbd1upIk2XmMTl7jHaZxBzw
+	 fAZRM+6nkobv7zU0ij/QyB9vBixc6RPODIg38Qr2hX1pWFehiPkTHf2d+fru2zP45w
+	 reobcE+PZXhrQ72FSvth9pxLj+AknWR3iaYJ+SjLQ606c9dQf8jc4aPtDAOOlrmboM
+	 tjQ4mazH7TALQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B9D93808200;
+	Wed, 14 Jan 2026 00:10:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next] bnxt_en: Fix build break on non-x86 platforms
-To: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com,
- andrew.gospodarek@broadcom.com, sfr@canb.auug.org.au,
- kernel test robot <lkp@intel.com>
-References: <20260113183422.508851-1-michael.chan@broadcom.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20260113183422.508851-1-michael.chan@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v1] tools: ynl: render event op docs correctly
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176834940605.2527918.15409968883446606893.git-patchwork-notify@kernel.org>
+Date: Wed, 14 Jan 2026 00:10:06 +0000
+References: <20260112153436.75495-1-donald.hunter@gmail.com>
+In-Reply-To: <20260112153436.75495-1-donald.hunter@gmail.com>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: donhunte@redhat.com, kuba@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, corbet@lwn.net, linux-doc@vger.kernel.org
 
-On 13/01/2026 18:34, Michael Chan wrote:
-> From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> 
-> Commit c470195b989fe added .getcrosststamp() interface where
-> the code uses boot_cpu_has() function which is available only
-> in x86 platforms. This fails the build on any other platform.
-> 
-> Since the interface is going to be supported only on x86 anyway,
-> we can simply compile out the entire support on non-x86 platforms.
-> 
-> Cover the .getcrosststamp support under CONFIG_X86
-> 
-> Fixes: c470195b989f ("bnxt_en: Add PTP .getcrosststamp() interface to get device/host times")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202601111808.WnBJCuWI-lkp@intel.com
-> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+Hello:
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 12 Jan 2026 15:34:36 +0000 you wrote:
+> The docs for YNL event ops currently render raw python structs. For
+> example in:
+> 
+> https://docs.kernel.org/netlink/specs/ethtool.html#cable-test-ntf
+> 
+>   event: {‘attributes’: [‘header’, ‘status’, ‘nest’], ‘__lineno__’: 2385}
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v1] tools: ynl: render event op docs correctly
+    https://git.kernel.org/netdev/net/c/fa5726692e4c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
