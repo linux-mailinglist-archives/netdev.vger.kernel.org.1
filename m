@@ -1,353 +1,125 @@
-Return-Path: <netdev+bounces-249866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38CD6D1FCC0
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 16:36:11 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89357D1FE88
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 16:46:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 95A1B304E159
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 15:28:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 88494300A782
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 15:40:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11548395275;
-	Wed, 14 Jan 2026 15:28:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF4739E6EF;
+	Wed, 14 Jan 2026 15:40:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="rlU9M4yb";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="AGbHg1qP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RPIrzyM+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565EE2E8B8A
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 15:28:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768404493; cv=fail; b=XyIVu01L9SiP4sdme8MrjFlivP/gfXPOcA/xX4TzHdU2+v1Q0SogJ6xCFP/xsCr5wMtz+rNUtD87qLixfuGKAv9a8KmwTHsT6L+SqMI4jnFwPt53dfwcp9i7c903TQZP1KfrMWFYoAvoRcSRkz9pQOElPTfSxAxZXkuYqFwETSs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768404493; c=relaxed/simple;
-	bh=r/3WWmKtb5+rC2rJ/E+tFMRyyiM107BuuLhWQgZiCNE=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=oIz7ZjDLLWWUnNRJ19LrlYy57tVGci2PYgHxCQVLjjXe0Hs23T0dsXSMFpAGIvldhdqNKesNs6C3QBNKgjdW9UEQX+X/uMu8bQGNpzjm2cxqCHGaqrzX68iKFPzxXuYGMZEpUtxnl79ovD+lLCNyARNW6GG99WJVSS6B+oJIsXw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=rlU9M4yb; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=AGbHg1qP; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60E6MUc61296941;
-	Wed, 14 Jan 2026 15:27:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=3Bpdgx2LPrW5naB7P5igFJP+ewgvRps5n25Il9TLBvk=; b=
-	rlU9M4ybxm9HiKxRviZ738MtyrJDaXW8qLlaucbzRSMSFXMCJh4gPQmwENKAf5OF
-	QYK467cPpHPe2nGwR0RlawfIiW1cDgUjwrWi4OVbxCwFtBmqJ/Go0e93/hI3Kej1
-	EoubrG4MestkGIzarUybzE0NX8Fw/rOAmlajs2vRuX8p8B4vAkftZyisk6Bt8crf
-	fjzsmbSiEE90XD1WL1Q36LqxynrdlyAcZWDNCVG+d7DAutAE1VaWvtP2tnrjEmui
-	D4+PIbaGriG5Oj+LmlEAh2b5rgjSiMzqMs9RlnD1H8y/lHWNsSGL49WBJukIIoEP
-	RRWJCXaByJo+0i6WFjkjpg==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4bp5tc0p43-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 14 Jan 2026 15:27:39 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 60EFA9nS001848;
-	Wed, 14 Jan 2026 15:27:38 GMT
-Received: from sa9pr02cu001.outbound.protection.outlook.com (mail-southcentralusazon11013014.outbound.protection.outlook.com [40.93.196.14])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4bkd7a52q1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 14 Jan 2026 15:27:38 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=f0pUoWuvWO7yljBDE2VRBExvTcIzhBDkDphvfbmKTNtgg3UZxeCHd4qOIgqZM1LEjAggS1J/NCT7XwtnGiy0kWLlffO7OHk0ihOLSyQwAKtQOBdSLDaoFKdskJOGtxn137bDu+pDVqI6yb2S5ye3vO2SdGVusO6k2c8nMny20FoDhfolRDXFoMmALMZxm2rGvbeHF9u+fz0oucxdh13AQShsFTf/tqEi3C3nfuyNhwbocnngQphI296aRrO8HJ95Pqi16at3OW+IwD6cx5AfVcf+BlehCI2kPPbAAj0pjQgH8V7BPL2NzamyKSytVUwInPnzXRYOU1qYCa8WWgUeqQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3Bpdgx2LPrW5naB7P5igFJP+ewgvRps5n25Il9TLBvk=;
- b=gGfTs46LCRQumAkSdLFILVm1jJVNdwQj7hoZLk2GwkX41H3cIBgHc+MxoiT4LSWu+ZmQG5Fy2TQXajt/bXxtxY5ktcS1RQ8/W6dm0xPvU5TwoZ1Po1PnQBCEUT9JGEl6JmKuzgLStW05giIkV+T9FbK9RFafpTGrY8SV6EkOiLYM076MBxkomeWmW5sX8ByLrjlNtwQCB40fCZ+JExRB81rnezdc1eRBIOr9fQpNT7P8x3R7V/B2mmGC6XQ6G6wm0v6Y4R4m1WutM31LGwn2CscJUJnELGXGZvTO/T/P6wcLxjgz8BS6VcdDIGZ5DQWsM4X9OzmY1zIqI6sEcCjkCA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3Bpdgx2LPrW5naB7P5igFJP+ewgvRps5n25Il9TLBvk=;
- b=AGbHg1qP/ebh1VdzAo2tuYjIyJuIjN9kqRv5/qp7v/nOaIbxCl7tSahlBY9XashDYtZAqKPxWVSEqGaJsyBK5rAKWhNUUyTwhFGhC0Sj6Ns05JVpoO+iHcgk9OQ3+H0UASkOFwV36AKsAzsyV2tpwYen0s21y47ugWEij4+4o+g=
-Received: from DS7PR10MB5328.namprd10.prod.outlook.com (2603:10b6:5:3a6::12)
- by CY8PR10MB7124.namprd10.prod.outlook.com (2603:10b6:930:75::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Wed, 14 Jan
- 2026 15:27:34 +0000
-Received: from DS7PR10MB5328.namprd10.prod.outlook.com
- ([fe80::ea13:c6c1:9956:b29c]) by DS7PR10MB5328.namprd10.prod.outlook.com
- ([fe80::ea13:c6c1:9956:b29c%5]) with mapi id 15.20.9520.005; Wed, 14 Jan 2026
- 15:27:34 +0000
-Message-ID: <bdc4505c-6982-4f47-9ee4-b1f0911da16d@oracle.com>
-Date: Wed, 14 Jan 2026 20:57:27 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH v2 net] i40e: fix src IP mask checks and
- memcpy argument names in cloud filter
-To: "Kamakshi, NelloreX" <nellorex.kamakshi@intel.com>,
-        "intel-wired-lan-bounces@osuosl.org" <intel-wired-lan-bounces@osuosl.org>,
-        "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-        "Lobakin, Aleksander" <aleksander.lobakin@intel.com>
-Cc: "pmenzel@molgen.mpg.de" <pmenzel@molgen.mpg.de>,
-        "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
-        "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "horms@kernel.org"
- <horms@kernel.org>,
-        "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "alok.a.tiwarilinux@gmail.com" <alok.a.tiwarilinux@gmail.com>
-References: <20251110191344.278323-1-alok.a.tiwari@oracle.com>
- <PH0PR11MB50139E1973CFB73CFF221FCD9687A@PH0PR11MB5013.namprd11.prod.outlook.com>
- <BL1PR11MB555670AA62929815A84BC3D5F587A@BL1PR11MB5556.namprd11.prod.outlook.com>
- <BL1PR11MB5556FF3F70C8BCED9179D4B0F584A@BL1PR11MB5556.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: ALOK TIWARI <alok.a.tiwari@oracle.com>
-In-Reply-To: <BL1PR11MB5556FF3F70C8BCED9179D4B0F584A@BL1PR11MB5556.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MA5P287CA0238.INDP287.PROD.OUTLOOK.COM
- (2603:1096:a01:1b1::11) To DS7PR10MB5328.namprd10.prod.outlook.com
- (2603:10b6:5:3a6::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E222D39E6C2;
+	Wed, 14 Jan 2026 15:40:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768405205; cv=none; b=AN3DSejkH7T7F1ItnwdG98QOwvbQ7nvWSMsr4W5/9BeeGLBBcDFkB/xs3mYbd/LVI9oGxe8grivoyREJOZ3mbV3tWEEg08/7OmhdE+SVj5doRosiubBHcbUp7MT3u+iq2fSXygdEsHTO0bhTdS55W8d1hPWzXThxBexQ+1H94AQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768405205; c=relaxed/simple;
+	bh=YtJUauv1Cw27xxlVauAE+YEqBi1wz01WVrhktnBdEBE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G7uamACKBvELOzr+9LnEmzwYrO9pye+mozhHrQZ5PVjpdYaDZPqlrVRSDt4SXKZjKEe3+ZHcTwga7laZYkyfjqtizfpYXfuZwnuYQM1ZrbOWc/54Hw+2m3V+vAr6hHE3l9twZCHRiTKqDMtrXoaGe2DrKjXy1/d9Urh0tl9nxFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RPIrzyM+; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768405202; x=1799941202;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=YtJUauv1Cw27xxlVauAE+YEqBi1wz01WVrhktnBdEBE=;
+  b=RPIrzyM+BlOlsOaphwkWAEu3DTkKKbgLHryxUy6SxeCZUFxfuCOogwY5
+   gaH6bz6aHniGTbpgA6Vs/OjYy5Xk2/o63gKPlh7MgGlM1T1tBQHn63U1t
+   lxmCKrdc8+gQzIWYt8uQ28/KgW2nY163aEJ7cJpUFSQ36Dgjb+DwkyJ0f
+   d+S6Tv4DXoxexE6yMUguekzMUemAX/4wRO3KUgjhzS5GaYMvO5lL54qhm
+   4lXaDFxAUztT6RPozfMPs2Dd7b7tg7xgBwiGCjBZS5Pp+prg5eHTirzoX
+   Z+PWtvTbGZWbvcVISCoF2jGV0jhbyNSH4+beZHWXhUD7Twx+a2yWQmwE1
+   w==;
+X-CSE-ConnectionGUID: ANi0ROZ5Q0GwMKOi830qwQ==
+X-CSE-MsgGUID: 4SX/Q4QIRYifyF3Wo51oaA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11671"; a="69791868"
+X-IronPort-AV: E=Sophos;i="6.21,225,1763452800"; 
+   d="scan'208";a="69791868"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 07:39:59 -0800
+X-CSE-ConnectionGUID: VSPdVfSCRamKaF3FSy+c/A==
+X-CSE-MsgGUID: FUF3sQHyTnCm/05iHIZarA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,225,1763452800"; 
+   d="scan'208";a="235965159"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by fmviesa001.fm.intel.com with ESMTP; 14 Jan 2026 07:39:56 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vg2yP-00000000GYy-34PK;
+	Wed, 14 Jan 2026 15:39:53 +0000
+Date: Wed, 14 Jan 2026 23:39:37 +0800
+From: kernel test robot <lkp@intel.com>
+To: Hariprasad Kelam <hkelam@marvell.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, kuba@kernel.org, davem@davemloft.net,
+	sgoutham@marvell.com, gakula@marvell.com, jerinj@marvell.com,
+	lcherian@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
+	naveenm@marvell.com, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, bbhushan2@marvell.com
+Subject: Re: [net-next 2/2] Octeontx2-pf: Add support for DMAC_FILTER trap
+Message-ID: <202601142356.TWrRByBh-lkp@intel.com>
+References: <20260114065743.2162706-3-hkelam@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR10MB5328:EE_|CY8PR10MB7124:EE_
-X-MS-Office365-Filtering-Correlation-Id: 650db826-7ed3-4631-04bd-08de53817101
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Tzd2WEVYRmJsYzg0bUtINVp2VTZkenBjSjhNZ0tKNy92TVdxd21BSnVkd29L?=
- =?utf-8?B?VTZYandBOFhtTXZ5RWhtSWc5VFJDeGk2SXVyWmNoL3ozeDVsY0l5L0Ira3Zo?=
- =?utf-8?B?MC9mWHZwZkY1clM3bUliaG1Uc1phTmlqbVd5ZVJ4TVd6d2tqd3cwaE8ydy9O?=
- =?utf-8?B?ZUc2a0NLeWJWbTZqTzhVcG90Y1pvV21PRkJmcm53ZmRFVXBJU1VpbitFazhv?=
- =?utf-8?B?NTZnMTBUUXNVbFlCVEltZXJETHUzQTFpL3BFaVhmZlNnSEtHbXdBZGhPaDMr?=
- =?utf-8?B?UW0ra203eHhRSVlTbXV3SkowamoyUXVBSE9HQVUrV29jNmhpUm5PbHg3bDNF?=
- =?utf-8?B?Qkk4R0E2T2dFR2JWMU83TldOc04wc2NmZktrUVdIamV6OEIxMlpDVTFVdGxV?=
- =?utf-8?B?QUdyMDhYYU9VSCs4Yk9EYmcyYnZINGtJeG1NbUpvYVFlRFozYWpSMHFGK2hr?=
- =?utf-8?B?aktEOTl6OVVaRHVCRFM5M1RDWW9NS0hvNmh2NHVlNTJ1S0VBVmR0ZjdWZDBk?=
- =?utf-8?B?YkhYQ2lEdVgxcHNsQzhtVHljVEIyeUhLY1k1V2pyczRXL25pNE1IbUsrS203?=
- =?utf-8?B?MGJTV0ZyK01tc1k0M0RCdGphaW1tcEg1QWdRZTRiYmVHZ1EySlZQWUIyRU4w?=
- =?utf-8?B?ZzBGanhJdkhzNHpUbDc3NG56N1JMMHFFUGNDYzRNMkNNMnNVelgrNFY0czk3?=
- =?utf-8?B?RkpGMTdlbGd4WWFwREpmSjF5VUFGYVNhL2NlS2lZaTJqVG1YaTI3bTBPQm42?=
- =?utf-8?B?dWVxYVJ5OG9iTHdNSVc3VWUzclJKRnhtWGZQcEpvWkJDeGpGczVBYkF3Sjc0?=
- =?utf-8?B?ZVVpTUtUSW54UHlqU0xTbE5Vc25JN3VYQTh6STNVM2xLcS9IVHlLdWN3eUFE?=
- =?utf-8?B?R0ZwL3RZcGdtK0hxbTR0Z1pUUUFMSWcwdEVURkROaE1oem54V1BLeWNnL2JR?=
- =?utf-8?B?VDl1REZTQ3dCTmpCZWY0M1Q2UEJrbURmVkV5VjFFdHVzbGswQVUydCtydXds?=
- =?utf-8?B?cjJ4Yzc3U0tscVNiYkRKbDhqMTJtdW52NHhNbEd1QlM2Qy9qSjJLZklSc1Nn?=
- =?utf-8?B?YVl3TjB5bm54bEttSFVKWGZhc25wVXk1NTRtWFN0U1VoRFIzeWJ4djN2dnZz?=
- =?utf-8?B?SllVNG52dUNaQWVVQVBXMTV1ZStockNxNzQzYUd2UGtGd2VRMGQweG93YnpZ?=
- =?utf-8?B?U2xEc01EZHRXMlBqNEFzZWVkbVhRRjFxTm1LY3RmZWdqNWpvRHhRa3lST1V5?=
- =?utf-8?B?NHVMZFNLZTFkVnpBM09UREpwNHF5dGtrWE1iWmFZbG1MZ1FRVUxLQVVwSjFj?=
- =?utf-8?B?WFVMQUd5WWpmYzFxMUxnOWVFUWF1YWw1NFlxZzlzVjhsZVhZbVB6OXAzc1d6?=
- =?utf-8?B?ZmZsTnlqWDRaU0JTTzJOd096Z2YyYURGZlFyOFNnWDV4TUovV0U3cVR5Z2ls?=
- =?utf-8?B?emFOREpQa25WYUxybUhJWTNrZG95RjRjbFppcnNsQnBHbU80NmFid0RPcFZB?=
- =?utf-8?B?WXFNNDgxWmdZT0I3a2xYOWkxalEvMFhFbVJPZ05HN0hFc3cvT2VEcmorTmJo?=
- =?utf-8?B?eDErNUNoWGsycU9yU2h6NnFVa2pIcTJYSElUbmh2T28wVHI3KzFWRlJrSk10?=
- =?utf-8?B?dE4xajM0TW5jQTNGNnZsZnVEMTNnZDV3TkR0Q2dMWUsxc1JrbG50bWxFS3k0?=
- =?utf-8?B?b1d3Wjk1bVBQYmR0cUpCZU1iVVZ4bE1URDU3ODFrTUQ3eFdMdFBBTFJNMEZ6?=
- =?utf-8?B?RkxXWlQ3ZTlvTWU5RzhRQzJuUFZvaDRXcDhzZ3Z1Y3hjQjc2dkRhWjZyaEp4?=
- =?utf-8?B?UnVGUHdkcSt2SUF1WWc3enlVZU0yVjFkbUpBSmFHcjJiSi9KaEkydlNUd0p0?=
- =?utf-8?B?R1krMzdCZXNZK0JNMXBYWk9uZk11QXNGSEZXNWREbFlzNlpwYXdDVmd0VVVp?=
- =?utf-8?B?b0dnU0JMZS9CVTFadzd1alRqSzV6REVyWC9wOEFodUpPcVR5cU9BNUQ4ZEk2?=
- =?utf-8?B?aUIzQ2hNN0RMcEhOc255UnhvVG0vZXVlQlYvN0EyLy83NitBblc1SVpDM2dh?=
- =?utf-8?B?KzYvNEhHTUVmRVgzL1BVbnBRKy9NQ2ZnSEpGWTNrcG9WeUNmLzh5RTdrSlAy?=
- =?utf-8?Q?mg14=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR10MB5328.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cnN3dm45bGhtNnpib296bHBYcitSVktUZ1lTSDBrb1NWc0QzRG1wU3ZhRmgy?=
- =?utf-8?B?SVViU0FMa2I2alNaTndVMStiQk9pWEx1RFBralYrak8va29QSm9Fc3crMFVh?=
- =?utf-8?B?YnhoVDYxSWc0ZVNuV1Y3SlNOQTJ4TFpTYmo4M1NIY0RlempybFNrcVZnanNE?=
- =?utf-8?B?V0ZoTU1QYnN1WDhiem9rS2VDTXpRUUQ0UmJ3YlhRY3ZkYlZ6d2N0NjVUUVVq?=
- =?utf-8?B?dlRWOS90cVl0MmpEcUNDQ1Q1WENETjBkVTNqNERBY2N5VDlrbnJ1cnpwaUFR?=
- =?utf-8?B?QllTc2VPWEh2OGxaSm5oOVo3SmVHbjNJcnNjTHdTNzNCY0Nzak5OcTA3Mkwy?=
- =?utf-8?B?dWZXVmpubnY5b25LVmt0bzFWRXh6R2RtRWRCdUY4TGg4VTFWL0RNbGp4R0Z6?=
- =?utf-8?B?R0JFZi9GVkE4aHlQUExOUTRhYzUrTFhNVDNSM2pWb0M5QVF3aURBVjhuQ2Ir?=
- =?utf-8?B?ZFBEN3o1SEdNN3Y5cjVPNy93WERiWjdRWk82RnY5MGhTd3l1OWhRN1lqVlZG?=
- =?utf-8?B?a3huZmxNeHlHNUlnM3l2ZUQxOG9WZTA0UDNYMUJPQStLSmdTYmdMUCtEemVv?=
- =?utf-8?B?Z2ZtTkVXamZ4cC9BTEt0ZFB2Um5RZ3VlcXdLaUJpM3pkcjZLdUdUTDJ1NU5B?=
- =?utf-8?B?SXk1djNiZ2xiNmRHRUJteEZIUjR3SVRrUUg3ekhncHpwU3dBMjFyN21JWHIz?=
- =?utf-8?B?QWNncXlvWC9iYjBCZ2Y2cEhzZDhsTzROU0tHMDg5dWplM3F0ZTN2WGZMeUp6?=
- =?utf-8?B?dDVxWDU0dDMvMzZ6cmhWNkFPU0R5WWI4eHg5UDVDNWhWTEV6TTdxZHdRVlNk?=
- =?utf-8?B?b29wWVlLN1JmVXQ3Zzk4T2FYYUIyL0t4Y0ZES2UzRE5ibXpMNFF2WGdPU2tF?=
- =?utf-8?B?VVgxeFVFNnhCZHRyTzM4MnhxSjRreDBWazdFWkQ0VVpqOERhM29BdGNhclB1?=
- =?utf-8?B?OFNkU0dxaU91ZWtpS0hXbi9leURvRVVZVHBtWjVqQk16VW1ZZjJma2RTL3Fp?=
- =?utf-8?B?ejRkTERrSlRPeXh5ZEx2alRNb2xMMWxCMG9ITysvWkh4NDJSalJaUDRlQlZt?=
- =?utf-8?B?c3hEVDF5L1ZwbmVzeTZPYWIxTE4ySjE0cmFEK1BxYWdHdHE0ZkovVjhQb2c1?=
- =?utf-8?B?a09DTTVxdE14OERyTmJOclkvNlk3WUJab25zemsxZ21MbVhudDBaSW9Gb2Fh?=
- =?utf-8?B?Y0JoZDl2bzNoWElraTVNY1dUdXIvS1YveEcvSEUyS0tjN1dKRkgzR0plQzht?=
- =?utf-8?B?RDNtMEdNcUpwdWJsNTNxaXByNWFUaGpvekdYaWY1TUNGTzNBdmFwMzJEeUhx?=
- =?utf-8?B?NEoxTytobE9PbTF5NzZwbFhtWGZSMFE5V284Ym1CVWtqWjJWUmxkS0dVVEUv?=
- =?utf-8?B?Ynk3d0M4RVRHb2UvdnJZblZhVFB3anFTZUF0b0c2d1V2QXd3ZmJuTVhQR2Jw?=
- =?utf-8?B?U25Bd1cxemhxTUFmYjNwQXJMZVplOTB3ak03OXZqdmxaRk1NendqNVRwUDh3?=
- =?utf-8?B?Y1FRRERKbUlrNXkwbUJYV3pPRE9hY1BDQzcxZndJUUxJYmc1clhyVXUwVkNx?=
- =?utf-8?B?N3ZlRUd3L2JvdGM5ZzBRcjRHQUxHTzJuTWZDZFRZTnBxaEZySDVycFg4Q2ly?=
- =?utf-8?B?aTBvVGtIYmpMK1NUQ2tINGVpVy9rOWhwV3MzNXlHUWw2K3JreGxPYTR3ZGh3?=
- =?utf-8?B?NVROS3ZYY2NqeUtsV0oxQnJoZzBMS0ZtVmJ2QUhqRllza2dJeS9zMHlCNytG?=
- =?utf-8?B?RXVab09PQW8yU2hNWlBncGRybU1qR0RpbGprOElUZlNRMVNhcndwRiszK0Vj?=
- =?utf-8?B?cVJycjY1N2RlR3c3YkJKUVhVN2E2RjJOVTJnNlFxYlRhd29Hek13OVRIQXQ2?=
- =?utf-8?B?WDFxcjZ5TnRleHUyN05LV2h2Zmt6L1R6S01RTWg3N2ZvZlEwbUFjZmhjS2l6?=
- =?utf-8?B?dVNhNXBIeTBzTWJ0WDJsQUJnYXhoWHgvaWVBWFFGNUYrTWJweTYzUXBOM2M3?=
- =?utf-8?B?SlR1S2xUTVE4R1NBeE0zUDRpSHRYV0ttczJJNGJTcWVpUStIbVEySHc0YTIz?=
- =?utf-8?B?bmNjcVE3ai9ZWFc4NStuaEVPVVFDanphWVVSbnUvWjhUSjg3S0tyOWc1aGQv?=
- =?utf-8?B?RTNUVUdvejVmMjBnT1c3L1lOL1Vzd21Bc1VEMWcxSXRtRVd3cXBRbjhEVmta?=
- =?utf-8?B?b1E1NkJYcVFuVjB0dEVLVVd5a2JBRGhkU09JQmhqbFFwZEY5NHJOczhncU9J?=
- =?utf-8?B?ZlFDTEl0ZVAranF1UmU0TG1rWld5Vk5nMFJDR1ZraEtJMzFiVll0Vlp3c3JP?=
- =?utf-8?B?eGlPWGNWMVpobFc5cysyV3ByOHdnSUsyTzdqQnZxNStFdmx3OHpFUT09?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	gsFcMjWiuR9Vh9R0iJyP/lP5PKuhsW5ySZjpyzRmcnw5GKCINySkS02Q6oVQBuAzwr/HZ6i3uboxGWNJF6ovdzFvpsEJO2c1k5R0FFKvS8K9qbbHbMpw2Fe/RD1KqOve0ykR8U2ygQrw/yf0AR2Yd8w+XWnrO0RfF9ZF0tGl9CpxkBsuUiUZeO3dTS/QYIyqkP+0IJjUWJIVa7tN0WnDu6YxWGkRtSE7gRfJQitR1yPA4x3HCo23NxEv3Uic3J8wOI1WpTlapvMU2D0KbbZNJClZjWjTj0BugjvHTm4j+hGms+h+nVYjvnQmOOTEj0RJRQcbRzEv6UrjmGXkuD/Eso5q/7vcGY+rpvxnSCNt2LAuGL0P+ikrb5ccwTd8NdzM0HYc4WvnRElFHwEke0sGbRfnWEsnA0MBhsBiRH7bw6GEvwDwfyWMHC+YdC7W0V23lLHT2MCLeuQgJfCPSxVXbpMRPGk80iC9I1Kaq4Da/IO60usCurtM8vCOA+rsKvKCYs76qdLzQuU7zxxpUp11tPdOMsSJaxpA+EWyEiCrzTJz36+01yUiT7CVolvI0gjGLZjwdFxBuxEynW/88crzs8WpDubeE/I+xLVonrbYUGM=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 650db826-7ed3-4631-04bd-08de53817101
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR10MB5328.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jan 2026 15:27:34.6867
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DcM6FodgZbAIcM4h9FwLG6c5sCGCmrVP709nIQJ/JRx4nvKW2o8t/1CnedY9tgugv21p3H4Vwchs8JPeCXLGspOWRHyCnKpGKsK+6YH5Ibs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR10MB7124
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-14_04,2026-01-14_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 phishscore=0
- mlxlogscore=999 adultscore=0 suspectscore=0 spamscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2512120000
- definitions=main-2601140129
-X-Authority-Analysis: v=2.4 cv=XP09iAhE c=1 sm=1 tr=0 ts=6967b5eb cx=c_pps
- a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=vUbySO9Y5rIA:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=lTbjQzD5AAAA:8 a=QyXUC8HyAAAA:8 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8
- a=Wdt1tTK3uVwnesw2-J0A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=w8YF5asEQ23juLwKoPR8:22
-X-Proofpoint-GUID: jcD2OE1nrHBRAwuVodqjkBCC1uj_jP1j
-X-Proofpoint-ORIG-GUID: jcD2OE1nrHBRAwuVodqjkBCC1uj_jP1j
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTE0MDEyOSBTYWx0ZWRfX0oSaG/40aJQh
- 740Ly6kW5EFYjcEK91VFIiOpTufRIB9unnUHCN4SdZFmMxBZ0TNJt6vFIp+oQFDK6NlRSx9b3B2
- bkOIqtKP16ToymXFmmu9NCwpsjnQ+E5hTSLDyhXOwEXP4yylftoINbVR7sxgiicZ1Ud+wEEDS0h
- RGtZ3poMQUq4X2hXMkikpe3wbTMk3a9fEc7RuQwi+VCwV2i/Yo/GJc0euRbTRa+XiCeq1J894c5
- eGmLTN8Xkv//Wv6tKSX/HaffLhUFX9/tiT3t9C8+QOxvn8nqIvgfIJ7J8/23VAvRyNI3/VZxiR/
- S98pOXuFsw2zqyOcF6XX9VbhpGcEJ0uGYzcGq1TQ86baRQxLJFw8Vt+OQUF3oXB2deHUvr2o2yE
- 3JpiNQwsK+Bsqk1CFKVJO/fp2hoRGFaOiFY+Hf5jWbNZDlIHhRDgXCjfKXJTsaJfbI4Ev/PXcvE
- ppjg/WDcOJCytOCRXuw==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260114065743.2162706-3-hkelam@marvell.com>
+
+Hi Hariprasad,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Hariprasad-Kelam/octeontx2-af-Mailbox-handlers-to-fetch-DMAC-filter-drop-counter/20260114-150046
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260114065743.2162706-3-hkelam%40marvell.com
+patch subject: [net-next 2/2] Octeontx2-pf: Add support for DMAC_FILTER trap
+config: um-allyesconfig (https://download.01.org/0day-ci/archive/20260114/202601142356.TWrRByBh-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260114/202601142356.TWrRByBh-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202601142356.TWrRByBh-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h:31,
+                    from drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:22:
+>> drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.h:30:40: warning: 'otx2_trap_groups_arr' defined but not used [-Wunused-const-variable=]
+      30 | static const struct devlink_trap_group otx2_trap_groups_arr[] = {
+         |                                        ^~~~~~~~~~~~~~~~~~~~
 
 
+vim +/otx2_trap_groups_arr +30 drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.h
 
-On 1/7/2026 11:29 AM, Kamakshi, NelloreX wrote:
-> -----Original Message-----
-> From: Intel-wired-lan<intel-wired-lan-bounces@osuosl.org> On Behalf Of Alok Tiwari
-> Sent: Tuesday, November 11, 2025 12:44 AM
-> To:pmenzel@molgen.mpg.de; Kitszel, Przemyslaw<przemyslaw.kitszel@intel.com>; Lobakin, Aleksander<aleksander.lobakin@intel.com>; Nguyen, Anthony L<anthony.l.nguyen@intel.com>;andrew+netdev@lunn.ch;kuba@kernel.org;davem@davemloft.net;edumazet@google.com;pabeni@redhat.com;horms@kernel.org;intel-wired-lan@lists.osuosl.org;netdev@vger.kernel.org
-> Cc:alok.a.tiwarilinux@gmail.com;alok.a.tiwari@oracle.com
-> Subject: [Intel-wired-lan] [PATCH v2 net] i40e: fix src IP mask checks and memcpy argument names in cloud filter
-> 
-> Fix following issues in the IPv4 and IPv6 cloud filter handling logic in both the add and delete paths:
-> 
-> - The source-IP mask check incorrectly compares mask.src_ip[0] against
->    tcf.dst_ip[0]. Update it to compare against tcf.src_ip[0]. This likely
->    goes unnoticed because the check is in an "else if" path that only
->    executes when dst_ip is not set, most cloud filter use cases focus on
->    destination-IP matching, and the buggy condition can accidentally
->    evaluate true in some cases.
-> 
-> - memcpy() for the IPv4 source address incorrectly uses
->    ARRAY_SIZE(tcf.dst_ip) instead of ARRAY_SIZE(tcf.src_ip), although
->    both arrays are the same size.
-> 
-> - The IPv4 memcpy operations used ARRAY_SIZE(tcf.dst_ip) and ARRAY_SIZE
->    (tcf.src_ip), Update these to use sizeof(cfilter->ip.v4.dst_ip) and
->    sizeof(cfilter->ip.v4.src_ip) to ensure correct and explicit copy size.
-> 
-> - In the IPv6 delete path, memcmp() uses sizeof(src_ip6) when comparing
->    dst_ip6 fields. Replace this with sizeof(dst_ip6) to make the intent
->    explicit, even though both fields are struct in6_addr.
-> 
-> Fixes: e284fc280473 ("i40e: Add and delete cloud filter")
-> Signed-off-by: Alok Tiwari<alok.a.tiwari@oracle.com>
-> Reviewed-by: Aleksandr Loktionov<aleksandr.loktionov@intel.com>
-> Reviewed-by: Paul Menzel<pmenzel@molgen.mpg.de>
-> ---
-> v1 -> v2
-> update patch subject line and replace ARRAY_SIZE with sizeof as suggested by Alex and added Reviewed-by Alex and Paul.
-> ---
->   drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 14 +++++++-------
->   1 file changed, 7 insertions(+), 7 deletions(-)
-> Unable able to create  Ipv4 and Ipv6 filter with src_ip as a match parameter. However filters are getting created with dst_ip.
-> 
-> Below are the commands I used to create the filters for IPV4 and IPV6.
-> 
-> tc filter add dev eth0 protocol ip parent ffff:  prio 1 flower dst_ip 1.1.1.1  ip_proto tcp dst_port 5000  skip_sw  hw_tc 2
-> 
-> tc filter add dev eth0 protocol ip parent ffff:  prio 1 flower src_ip 2.1.1.1  ip_proto tcp dst_port 5000  skip_sw  hw_tc 2
-> RTNETLINK answers: Operation not supported
-> We have an error talking to the kernel
-> 
-> tc filter add dev eth0 protocol ipv6 parent ffff: prio 1 flower dst_ip 2001:0db8:0:f101::11 ip_proto tcp dst_port 5200 skip_sw hw_tc 1
-> 
-> tc filter add dev eth0 protocol ipv6 parent ffff: prio 1 flower src_ip 2001:0db8:0:f101::12 ip_proto tcp dst_port 5200 skip_sw hw_tc 1
-> RTNETLINK answers: Operation not supported
-> We have an error talking to the kernel
-> 
-> Dmesg:
-> i40e 0000:5e:00.0: Failed to add cloud filter, err -95
-> i40e 0000:5e:00.0: Failed to add cloud filter, err -95
+    29	
+  > 30	static const struct devlink_trap_group otx2_trap_groups_arr[] = {
+    31		/* No policer is associated with following groups (policerid == 0)*/
+    32		DEVLINK_TRAP_GROUP_GENERIC(L2_DROPS, 0),
+    33	};
+    34	
 
-
-as src_ip cloud filter creating fails for ipv4 and ipv6.
-
-While testing cloud filter offload via tc flower, it is observed that
-filters using only src_ip fail with -EINVAL, while dst_ip filters
-work as expected.
-
-Looking at the add/delete paths, this seems to be related to how IPv4
-and IPv6 handle source and destination IP fields.
-
-In the IPv4 path, an if / else if construct is used:
-
-if (mask.dst_ip[0] & tcf.dst_ip[0])
-         memcopy dst_ip;
-else if (mask.src_ip[0] & tcf.dst_ip[0])
-         memcopy src_ip;
-
-
-This makes the source-IP handling dependent on the destination-IP check,
-so valid src_ip-only filters (and combinations of src/dst IPs) don’t
-seem to work as expected.
-
-In contrast, the IPv6 path already treats source and destination IPs
-independently using separate if statements:
-
-if (mask.dst_ip[3] & tcf.dst_ip[3])
-         memcopy dst_ip6;
-if (mask.src_ip[3] & tcf.src_ip[3])
-         memcopy src_ip6;
-
-
-Aligning the IPv4 logic with the existing IPv6 approach fixes the IPv4
-failures we are seeing and also keeps the behavior consistent across IP
-versions.
-
-It looks like cloud filter usage with src_ip might have been broken
-for some time. Even though the current change only updates the IPv4
-logic and IPv6 already has independent checks, src_ip filters are
-still seen failing for both IPv4 and IPv6 during testing.
-
-Also, using sizeof() for the memcpy lengths makes the copy size more
-explicit and avoids relying on array dimensions.
-
-Thanks,
-Alok
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
