@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-249797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0C99D1E307
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 11:46:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D02C2D1E46C
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 12:00:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 60A513018312
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 10:46:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A41A6301765D
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 10:54:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F0D2393DDE;
-	Wed, 14 Jan 2026 10:46:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b="QD71lyG7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A737396D06;
+	Wed, 14 Jan 2026 10:54:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-65-227.siemens.flowmailer.net (mta-65-227.siemens.flowmailer.net [185.136.65.227])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5E13939DE
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 10:46:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC5DB37F723
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 10:52:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768387573; cv=none; b=oCjfAH7kisrB0I309FRvmF4AN5wn2jkPLPDh+WzarMyHtVi5CtkdRD3B2xhG3YfNd1ycPfviFNPQyfjfC7YbVuxcnIapGeJGEQjJcnjXiL5+TzOZdENpTQTHM20t25ePpPjmF0uDfxQUHuv6pmXy8IeWAkVgdWzI520FVm0lUGc=
+	t=1768388047; cv=none; b=Tu9wJNk3OCJIPScdCGlTQbzOeHc3MH+PxIUxit4nhINZqfj9JN0wBmBy0VQNgCdvu9lpyEqAU/ubAvnIm61O930ZTufqxNeuI4ij3zqXeOqxinNpK2JpPSHXqm36+aj5ghMPmZuJ6HO0TBa5ERr4PDfsgtma3l7PCVqAZGqwgr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768387573; c=relaxed/simple;
-	bh=/RT9Fjy6zwrQxV53Khrs84p41GKb2duCHm00MjtpaeA=;
+	s=arc-20240116; t=1768388047; c=relaxed/simple;
+	bh=N3Pqqp8dF2+QpK86L3qSSsrFm0cAtWFa+zhTYIkq+kQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qnb0yFeTZMP+7m1y2Gu+HdWEKuQNFMXpsuLcoXH3RPHC8Kt+ARyMNz/NogafzSPbVmIMq8MklDJpo2gt5iWIXsfhcXX/lJA9CExtIzmybGVDGovzgxP1+qakl0mPjCiFqRDqAejC5NCbTY+ctqTVUzW8mQw0TvT9V2gYEcOpcHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=QD71lyG7; arc=none smtp.client-ip=185.136.65.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-65-227.siemens.flowmailer.net with ESMTPSA id 20260114104603a646974726000207f5
-        for <netdev@vger.kernel.org>;
-        Wed, 14 Jan 2026 11:46:03 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
- d=siemens.com; i=alexander.sverdlin@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
- bh=Purx6iWjqLjZ2AucD6/DoIPyiS2j5aju+XohBp+HL+o=;
- b=QD71lyG7kEwvMwjHakvLgAEUUgxrubLU2LRsiUtMl2rWZd1/5HtWDk+6MMMFf7fVvpBuq4
- E2FlaNX6PhQrpu1yqV9Wu1EYIk3Mqrpz7+a0L3vMBK76dQXeasmpqvW1PC5yanQb9RKvFHoH
- 6Qcgzwv9nhq4DwSdNQ0/jpQ43kuzXjf85I+/WEvyE/NNSCm412pvTNSspf5oTxRaD4t04gxI
- BASqIQWVWevyrOP1BL2J/mtSZE3OXoU+RztrR4qpJ06FmPZSGglCUkvo6xMrE7qNt9lvpPGV
- PSwqzIB+ul446V/05ICZmSv2Wd6r00dNynSQkOhT2Alaq+Y4hHmn9Icg==;
-From: "A. Sverdlin" <alexander.sverdlin@siemens.com>
+	 MIME-Version; b=Ph0xbmxPL3/+gpT7yaG8HH+ohpI000fEe/q59Q7SogKdMhWM5+N9yzhJkvfGMGmANiRfhCI398LUxbYlzckFI1pqzzWcADex4nnsZmPIULf18WXje01VvaJ3bGyZaOCbgQh4Mk+suJJiebuF6ySAAY9Zpk6sGjOkIHXTYZ1YfYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vfyU4-0006p6-8S; Wed, 14 Jan 2026 11:52:16 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vfyU4-000Zf2-1i;
+	Wed, 14 Jan 2026 11:52:15 +0100
+Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 96CA24CCB6B;
+	Wed, 14 Jan 2026 10:52:15 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
-Cc: Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Hauke Mehrtens <hauke@hauke-m.de>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Daniel Golle <daniel@makrotopia.org>
-Subject: [PATCH net-next v5 1/2] dt-bindings: net: dsa: lantiq,gswip: add MaxLinear R(G)MII slew rate
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de,
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+	syzbot <syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	stable@vger.kernel.org,
+	Marc Kleine-Budde <mkl@pengutronix.de>
+Subject: [PATCH net 4/4] net: can: j1939: j1939_xtp_rx_rts_session_active(): deactivate session upon receiving the second rts
 Date: Wed, 14 Jan 2026 11:45:03 +0100
-Message-ID: <20260114104509.618984-2-alexander.sverdlin@siemens.com>
-In-Reply-To: <20260114104509.618984-1-alexander.sverdlin@siemens.com>
-References: <20260114104509.618984-1-alexander.sverdlin@siemens.com>
+Message-ID: <20260114105212.1034554-5-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260114105212.1034554-1-mkl@pengutronix.de>
+References: <20260114105212.1034554-1-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,66 +69,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-456497:519-21489:flowmailer
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 
-Add new maxlinear,slew-rate-txc and maxlinear,slew-rate-txd uint32
-properties. The properties are only applicable for ports in R(G)MII mode
-and allow for slew rate reduction in comparison to "normal" default
-configuration with the purpose to reduce radiated emissions.
+Since j1939_session_deactivate_activate_next() in j1939_tp_rxtimer() is
+called only when the timer is enabled, we need to call
+j1939_session_deactivate_activate_next() if we cancelled the timer.
+Otherwise, refcount for j1939_session leaks, which will later appear as
 
-Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+| unregister_netdevice: waiting for vcan0 to become free. Usage count = 2.
+
+problem.
+
+Reported-by: syzbot <syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com>
+Closes: https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Tested-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Fixes: 9d71dd0c7009 ("can: add support of SAE J1939 protocol")
+Link: https://patch.msgid.link/b1212653-8fa1-44e1-be9d-12f950fb3a07@I-love.SAKURA.ne.jp
+Cc: stable@vger.kernel.org
+Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
-Changelog:
-v5:
-- improved options' descriptions on Rob's suggestions
-v4:
-- separate properties for TXD and TXC pads ("maxlinear," prefix re-appears)
-v3:
-- use [pinctrl] standard "slew-rate" property as suggested by Rob
-  https://lore.kernel.org/all/20251219204324.GA3881969-robh@kernel.org/
-v2:
-- unchanged
+ net/can/j1939/transport.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
- .../bindings/net/dsa/lantiq,gswip.yaml        | 22 +++++++++++++++++++
- 1 file changed, 22 insertions(+)
-
-diff --git a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
-index 205b683849a53..37d64b8a76ac7 100644
---- a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
-+++ b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
-@@ -106,6 +106,28 @@ patternProperties:
-         unevaluatedProperties: false
+diff --git a/net/can/j1939/transport.c b/net/can/j1939/transport.c
+index 613a911dda10..8656ab388c83 100644
+--- a/net/can/j1939/transport.c
++++ b/net/can/j1939/transport.c
+@@ -1695,8 +1695,16 @@ static int j1939_xtp_rx_rts_session_active(struct j1939_session *session,
  
-         properties:
-+          maxlinear,slew-rate-txc:
-+            $ref: /schemas/types.yaml#/definitions/uint32
-+            enum: [0, 1]
-+            description: |
-+              RMII/RGMII TX Clock Slew Rate:
-+
-+                0: Normal
-+                1: Slow
-+
-+              If not present, the configuration made by the switch bootloader is
-+              preserved.
-+          maxlinear,slew-rate-txd:
-+            $ref: /schemas/types.yaml#/definitions/uint32
-+            enum: [0, 1]
-+            description: |
-+              RMII/RGMII TX Non-Clock PAD Slew Rate:
-+
-+                0: Normal
-+                1: Slow
-+
-+              If not present, the configuration made by the switch bootloader is
-+              preserved.
-           maxlinear,rmii-refclk-out:
-             type: boolean
-             description:
+ 		j1939_session_timers_cancel(session);
+ 		j1939_session_cancel(session, J1939_XTP_ABORT_BUSY);
+-		if (session->transmission)
++		if (session->transmission) {
+ 			j1939_session_deactivate_activate_next(session);
++		} else if (session->state == J1939_SESSION_WAITING_ABORT) {
++			/* Force deactivation for the receiver.
++			 * If we rely on the timer starting in j1939_session_cancel,
++			 * a second RTS call here will cancel that timer and fail
++			 * to restart it because the state is already WAITING_ABORT.
++			 */
++			j1939_session_deactivate_activate_next(session);
++		}
+ 
+ 		return -EBUSY;
+ 	}
 -- 
-2.52.0
+2.51.0
 
 
