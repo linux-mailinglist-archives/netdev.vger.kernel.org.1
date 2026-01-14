@@ -1,64 +1,48 @@
-Return-Path: <netdev+bounces-249710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-249711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA598D1C468
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 04:38:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CEEB6D1C49F
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 04:43:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E08773008F54
-	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 03:38:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BE66930019C2
+	for <lists+netdev@lfdr.de>; Wed, 14 Jan 2026 03:43:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88ECE2D0298;
-	Wed, 14 Jan 2026 03:38:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C97FC2D6E78;
+	Wed, 14 Jan 2026 03:43:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TupL0S0Z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TPY2DTgE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A5527FB21
-	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 03:38:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76D72356C6
+	for <netdev@vger.kernel.org>; Wed, 14 Jan 2026 03:43:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768361906; cv=none; b=rfQQgWGZggS7jU1LZ9ZW1t5FRj8udbhUq/e1czL5A4Uj2UWTdc6XgPgF3ujbXVlpUYVHLDpgKI1T2qmWDOh42Z2DD8lnl4Md1vqbGSaOFZZ4HwG28TyT+66ERlOJBizMVyqhZCq9sCC7bO+dTDczvQnhry9r4zfcgBjG9Ehz9Rg=
+	t=1768362221; cv=none; b=WFBuOpUtkSxyp5kmD57GcZdu2B6YgEJeSRRnE5sWWjbm51/3BOZhmFP8YAD4p7Lc3jFuag2yFQLsLa6ovWRYdEwjNNxHczL4eEJAAWXS/7pKXcxHdewHG9WnciycfKhR+ZfyBLaM44hHRZavHLJ1pMAHs/zCds+mir4AUQzeLRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768361906; c=relaxed/simple;
-	bh=EoRxDB/I9az4pqMN3S0r+AwzFHhpRkBJT4vv8b/VTqc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=b+p0Tcw8ObP3u8dDS+dbNtLY4Cgqy/YFoeZxF9FKh55cKN2hlTetcnrbWe7HqAdtGzYa8tzDBlh5lm22sHVAcZzd8GSESRZeY7wXIPrttgdMtx8o4PaiNhP4Cjpxas97c9YquM3maY/MBE8G79pZhOeuOwYkFT3uDC5sX/gIpII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TupL0S0Z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B74CC4CEF7;
-	Wed, 14 Jan 2026 03:38:25 +0000 (UTC)
+	s=arc-20240116; t=1768362221; c=relaxed/simple;
+	bh=bsX6P7h5mlkiKtIPh2WDj8gqWgoDrh7JW1H2JR+fQYg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=HCcqzcWwJ42uNZlBVebFA+z47U0MqTrMS7cvY2yQBwSlL4iDGbYOlQWX9ly6V184iDkEgu0y01owj1LOuDaf1KeuXSjSwrW/PvvJ0Xf+vCRQN3vEwGdNXqIvyj71a5/afEbgwAIMVnHaXBNS2i0HK6r8VxuTHZNs9MJ5Abhroxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TPY2DTgE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27BCCC4CEF7;
+	Wed, 14 Jan 2026 03:43:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768361906;
-	bh=EoRxDB/I9az4pqMN3S0r+AwzFHhpRkBJT4vv8b/VTqc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TupL0S0ZrVAhOiIcTzK4QSIuSfLK9tL6EFu0oSD7hGJtVtxnDLmnoi0neqaWeyHst
-	 uJqHr1q63QvHConjUgbe8WIYYFpN1nwNZtIfgX5LAVFBPwxt4d0JDJY9tmA+6b74lg
-	 zdzKD6pUAz87ZeGW/N25ZCdwHtC7J/10Gkv5MD3I+IZLzX50DXpX6LzEeFKWPFNQqV
-	 6AF/kqel2OVQ05mOHZaJ8d5Xc+oNgpnLhv/omIP9jqjKQOt400PRv6bOq5QwjOUssI
-	 04WayQ9WsLSBeinSMeVEk2Vc4rArT5t1NHyI6UJhKjtBU3nf/MAX5886bMtB4ByzmC
-	 Y/7Ps3pLeLXwA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: mohsin.bashr@gmail.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	jacob.e.keller@intel.com,
-	davem@davemloft.net,
-	sanman.p211993@gmail.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	alexanderduyck@fb.com,
-	kernel-team@meta.com,
-	edumazet@google.com,
-	lee@trager.us
-Subject: Re: [net-next,V0.5,5/5] eth: fbnic: Update RX mbox timeout value
-Date: Tue, 13 Jan 2026 19:38:24 -0800
-Message-ID: <20260114033824.1033374-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260112211925.2551576-6-mohsin.bashr@gmail.com>
-References: <20260112211925.2551576-6-mohsin.bashr@gmail.com>
+	s=k20201202; t=1768362221;
+	bh=bsX6P7h5mlkiKtIPh2WDj8gqWgoDrh7JW1H2JR+fQYg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=TPY2DTgEoiLPuVnRXqihI5Usc3AjNs/w7Wj62CxDv86fQ1+MSAnlZNvaZV1E/CB15
+	 P+Ux+YZ2Jn18acTTWyI2iDHlPoHc9ZaTJ/9lB1B6dwWKkxdWqUVu8b243ImM1FQF97
+	 H61V9+nSdBOhVLsbUEMgtWEX+C+Xrh5yMjyDu9hzwxbDqmDBmqMN0j5ExvigC1rKj4
+	 ugJdka1qc4uGm/tIrUDuPA2WRPAZM5+PxD9pupwkdh1zZtgGGvXYA65oFEQI/oHk22
+	 Y0fV3gi8DBM0JMT4nPDQH77pi/d6D0Gihvf0/xa4VlfqGaSEBsN9QyRDCOgWRViVt8
+	 Al/BK7KBPb8ng==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 789553808200;
+	Wed, 14 Jan 2026 03:40:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,68 +50,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net/sched: sch_qfq: do not free existing class in
+ qfq_change_class()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176836201401.2575016.13444177808892506620.git-patchwork-notify@kernel.org>
+Date: Wed, 14 Jan 2026 03:40:14 +0000
+References: <20260112175656.17605-1-edumazet@google.com>
+In-Reply-To: <20260112175656.17605-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ syzbot+07f3f38f723c335f106d@syzkaller.appspotmail.com
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least pausible.
+Hello:
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
----
-eth: fbnic: Update RX mbox timeout value
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-This commit unifies timeout values for mailbox RX read requests and
-introduces a wrapper function fbnic_mbx_wait_for_cmpl() to simplify the
-completion wait calls.
+On Mon, 12 Jan 2026 17:56:56 +0000 you wrote:
+> Fixes qfq_change_class() error case.
+> 
+> cl->qdisc and cl should only be freed if a new class and qdisc
+> were allocated, or we risk various UAF.
+> 
+> Fixes: 462dbc9101ac ("pkt_sched: QFQ Plus: fair-queueing service at DRR cost")
+> Reported-by: syzbot+07f3f38f723c335f106d@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/6965351d.050a0220.eaf7.00c5.GAE@google.com/T/#u
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> 
+> [...]
 
-> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
-> index 1ecd777aaada..6b3fb163d381 100644
-> --- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
-> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
+Here is the summary with links:
+  - [net] net/sched: sch_qfq: do not free existing class in qfq_change_class()
+    https://git.kernel.org/netdev/net/c/3879cffd9d07
 
-[ ... ]
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> +static inline bool fbnic_mbx_wait_for_cmpl(struct fbnic_fw_completion *cmpl)
-> +{
-> +	return wait_for_completion_timeout(&cmpl->done,
-> +					   FBNIC_MBX_RX_TO_SEC * HZ);
-> +}
 
-The wrapper returns the result of wait_for_completion_timeout() which is
-non-zero (remaining jiffies) on success and zero on timeout.
-
-> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
-> index b62b1d5b1453..193f554717b3 100644
-> --- a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
-> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
-> @@ -178,7 +178,7 @@ fbnic_flash_start(struct fbnic_dev *fbd, struct pldmfw_component *component)
->  		goto cmpl_free;
->
->  	/* Wait for firmware to ack firmware upgrade start */
-> -	if (wait_for_completion_timeout(&cmpl->done, 10 * HZ))
-> +	if (!fbnic_mbx_wait_for_cmpl(cmpl))
->  		err = cmpl->result;
->  	else
->  		err = -ETIMEDOUT;
-
-Is the condition inverted here? The original code enters the first branch
-when wait_for_completion_timeout() returns non-zero (success). The new
-code enters the first branch when fbnic_mbx_wait_for_cmpl() returns zero
-(timeout) due to the added negation. This would cause successful
-completions to return -ETIMEDOUT.
-
-[ ... ]
-
-> @@ -447,7 +447,7 @@ static int fbnic_fw_reporter_dump(struct devlink_health_reporter *reporter,
->  				goto cmpl_cleanup;
->  		}
->
-> -		if (wait_for_completion_timeout(&fw_cmpl->done, 2 * HZ)) {
-> +		if (!fbnic_mbx_wait_for_cmpl(fw_cmpl)) {
->  			reinit_completion(&fw_cmpl->done);
->  		} else {
->  			NL_SET_ERR_MSG_FMT_MOD(extack,
-
-Similar issue in this loop - the original code calls reinit_completion()
-on success (non-zero return) and goes to error handling on timeout (zero
-return). With the added negation, success now triggers the error path
-setting err = -ETIMEDOUT, while timeout triggers reinit_completion().
 
